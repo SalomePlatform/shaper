@@ -24,6 +24,7 @@
 #include <Config_Common.h>
 #include <Config_ModuleReader.h>
 #include <Config_FeatureReader.h>
+#include <Config_PluginMessage.h>
 #include <Events_InfoMessage.h>
 
 #include <libxml/parser.h>
@@ -102,6 +103,13 @@ void Config_ModuleReader::processNode(xmlNodePtr theNode)
     std::string aPluginLibrary = getProperty(theNode, PLUGIN_LIBRARY);
     std::string aPluginScript = getProperty(theNode, PLUGIN_SCRIPT);
     std::string aPluginName = addPlugin(aPluginLibrary, aPluginScript, aPluginConf);
+    std::string aUsesPlugin = getProperty(theNode, PLUGIN_USES);
+    if (!aUsesPlugin.empty()) { // send information about hte plugin dependencies
+      std::shared_ptr<Config_PluginMessage> aMess(new Config_PluginMessage(
+        Events_Loop::loop()->eventByName(Config_PluginMessage::EVENT_ID()), aPluginName));
+      aMess->setUses(aUsesPlugin);
+      Events_Loop::loop()->send(aMess);
+    }
 
     std::list<std::string> aFeatures = importPlugin(aPluginName, aPluginConf);
     std::list<std::string>::iterator it = aFeatures.begin();
@@ -167,6 +175,12 @@ std::string Config_ModuleReader::addPlugin(const std::string& aPluginLibrary,
 
 void Config_ModuleReader::loadPlugin(const std::string& thePluginName)
 {
+  // informs model that plugin loading is started
+  static const Events_ID kEVENT_ID =
+    Events_Loop::loop()->eventByName(Config_PluginMessage::EVENT_ID());
+  std::shared_ptr<Config_PluginMessage> aMess(new Config_PluginMessage(kEVENT_ID, thePluginName));
+  Events_Loop::loop()->send(aMess);
+
   PluginType aType = Config_ModuleReader::Binary;
   if(myPluginTypes.find(thePluginName) != myPluginTypes.end()) {
     aType = myPluginTypes.at(thePluginName);

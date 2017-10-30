@@ -35,6 +35,7 @@
 #include <Config_ValidatorMessage.h>
 #include <Config_ModuleReader.h>
 #include <Config_ValidatorReader.h>
+#include <Config_PluginMessage.h>
 
 #include <ModelAPI_CompositeFeature.h>
 #include <ModelAPI_ResultPart.h>
@@ -165,6 +166,29 @@ std::list<std::string> Model_Session::redoList()
   return ROOT_DOC->redoList();
 }
 
+ModelAPI_Plugin* Model_Session::getPlugin(const std::string& thePluginName)
+{
+  if (myPluginObjs.find(thePluginName) == myPluginObjs.end()) {
+    // before load the used plugins
+    if (myUsePlugins.find(thePluginName) != myUsePlugins.end()) {
+      std::string aUse = myUsePlugins[thePluginName];
+      std::stringstream aUseStream(aUse);
+      std::string aPluginName;
+      while (std::getline(aUseStream, aPluginName, ',')) {
+        if (myPluginObjs.find(aPluginName) == myPluginObjs.end())
+          getPlugin(aPluginName);
+      }
+    }
+    // load plugin library if not yet done
+    Config_ModuleReader::loadPlugin(thePluginName);
+  }
+  if (myPluginObjs.find(thePluginName) == myPluginObjs.end()) {
+    Events_InfoMessage("Model_Session", "Can not load plugin '%1'").arg(thePluginName).send();
+    return NULL;
+  }
+  return myPluginObjs[thePluginName];
+}
+
 FeaturePtr Model_Session::createFeature(std::string theFeatureID, Model_Document* theDocOwner)
 {
   if (this != myImpl) {
@@ -178,26 +202,20 @@ FeaturePtr Model_Session::createFeature(std::string theFeatureID, Model_Document
     std::pair<std::string, std::string>& aPlugin = myPlugins[theFeatureID]; // plugin and doc kind
     if (!aPlugin.second.empty() && aPlugin.second != theDocOwner->kind()) {
       Events_InfoMessage("Model_Session",
-          "Feature '%1' can be created only in document '%2' by the XML definition")
-          .arg(theFeatureID).arg(aPlugin.second).send();
+        "Feature '%1' can be created only in document '%2' by the XML definition")
+        .arg(theFeatureID).arg(aPlugin.second).send();
       return FeaturePtr();
     }
-    myCurrentPluginName = aPlugin.first;
-    if (myPluginObjs.find(myCurrentPluginName) == myPluginObjs.end()) {
-      // load plugin library if not yet done
-      Config_ModuleReader::loadPlugin(myCurrentPluginName);
-    }
-    if (myPluginObjs.find(myCurrentPluginName) != myPluginObjs.end()) {
-      FeaturePtr aCreated = myPluginObjs[myCurrentPluginName]->createFeature(theFeatureID);
+    ModelAPI_Plugin* aPluginObj = getPlugin(aPlugin.first);
+    if (aPluginObj) {
+      FeaturePtr aCreated = aPluginObj->createFeature(theFeatureID);
       if (!aCreated) {
-        Events_InfoMessage("Model_Session",
-            "Can not initialize feature '%1' in plugin '%2'")
-            .arg(theFeatureID).arg(myCurrentPluginName).send();
+        Events_InfoMessage("Model_Session", "Can not initialize feature '%1' in plugin '%2'")
+          .arg(theFeatureID).arg(aPlugin.first).send();
       }
       return aCreated;
     } else {
-      Events_InfoMessage("Model_Session",
-        "Can not load plugin '%1'").arg(myCurrentPluginName).send();
+      Events_InfoMessage("Model_Session", "Can not load plugin '%1'").arg(aPlugin.first).send();
     }
   } else {
     Events_InfoMessage("Model_Session",
@@ -416,6 +434,7 @@ Model_Session::Model_Session()
   aLoop->registerListener(this, Events_Loop::eventByName(EVENT_OBJECT_UPDATED), 0, true);
   aLoop->registerListener(this, Events_Loop::eventByName(EVENT_OBJECT_DELETED), 0, true);
   aLoop->registerListener(this, Events_Loop::eventByName(EVENT_VALIDATOR_LOADED));
+  aLoop->registerListener(this, Events_Loop::eventByName(Config_PluginMessage::EVENT_ID()));
 }
 
 void Model_Session::processEvent(const std::shared_ptr<Events_Message>& theMessage)
@@ -423,6 +442,7 @@ void Model_Session::processEvent(const std::shared_ptr<Events_Message>& theMessa
   static const Events_ID kFeatureEvent =
     Events_Loop::eventByName(Config_FeatureMessage::MODEL_EVENT());
   static const Events_ID kValidatorEvent = Events_Loop::eventByName(EVENT_VALIDATOR_LOADED);
+  static const Events_ID kPluginEvent = Events_Loop::eventByName(Config_PluginMessage::EVENT_ID());
   if (theMessage->eventID() == kFeatureEvent) {
     const std::shared_ptr<Config_FeatureMessage> aMsg =
       std::dynamic_pointer_cast<Config_FeatureMessage>(theMessage);
@@ -461,6 +481,15 @@ void Model_Session::processEvent(const std::shared_ptr<Events_Message>& theMessa
       } else {  // attribute validator
         validators()->assignValidator(aMsg->validatorId(), aMsg->featureId(), aMsg->attributeId(),
                                       aMsg->parameters());
+      }
+    }
+  } else if (theMessage->eventID() == kPluginEvent) { // plugin is started to load
+    std::shared_ptr<Config_PluginMessage> aMsg =
+      std::dynamic_pointer_cast<Config_PluginMessage>(theMessage);
+    if (aMsg.get()) {
+      myCurrentPluginName = aMsg->pluginId();
+      if (!aMsg->uses().empty()) {
+        myUsePlugins[myCurrentPluginName] = aMsg->uses();
       }
     }
   } else {  // create/update/delete
