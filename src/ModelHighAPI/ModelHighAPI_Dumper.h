@@ -278,6 +278,9 @@ private:
   /// Check the result feature has default deflection
   bool isDefaultDeflection(const ResultPtr& theResult) const;
 
+  /// Check the result feature has default transparency
+  bool isDefaultTransparency(const ResultPtr& theResult) const;
+
 private:
   struct EntityName {
     std::string myCurrentName; ///< default name of current feature

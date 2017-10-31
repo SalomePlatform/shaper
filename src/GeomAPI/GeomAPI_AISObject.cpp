@@ -428,6 +428,39 @@ double GeomAPI_AISObject::getDeflection() const
   return aDeflection;
 }
 
+bool GeomAPI_AISObject::setTransparency(const double theTransparency)
+{
+  bool isModified = false;
+  Handle(AIS_InteractiveObject) anAIS = impl<Handle(AIS_InteractiveObject)>();
+  if (!anAIS.IsNull()) {
+    Handle(AIS_Shape) anAISShape = Handle(AIS_Shape)::DownCast(anAIS);
+    if (!anAISShape.IsNull()) {
+      Standard_Real aPreviousValue = anAISShape->Transparency();
+      if (fabs(aPreviousValue - theTransparency) > Precision::Confusion()) {
+        anAISShape->SetTransparency(theTransparency);
+        //>SetOwnDeviationCoefficient(theTransparency);
+        isModified = true;
+        // redisplay is necessary here to update presentation in all modes
+        // Standard True flag. Displayer uses Standard False flag. If it will be changed in
+        // displayer, redisplay here will not be necessary. But performance should be checked.
+        anAISShape->Redisplay(Standard_True);
+      }
+    }
+  }
+  return isModified;
+}
+
+double GeomAPI_AISObject::getTransparency() const
+{
+  double aTransparency = 0;
+
+  Handle(AIS_InteractiveObject) anAIS = impl<Handle(AIS_InteractiveObject)>();
+  if (!anAIS.IsNull()) {
+    aTransparency = anAIS->Transparency();
+  }
+  return aTransparency;
+}
+
 
 bool GeomAPI_AISObject::empty() const
 {

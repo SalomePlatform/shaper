@@ -155,6 +155,17 @@ void ModelHighAPI_Selection::setDeflection(double theValue)
   aDeflectionAttr->setValue(theValue);
 }
 
+void ModelHighAPI_Selection::setTransparency(double theValue)
+{
+  if (myVariantType != VT_ResultSubShapePair)
+    return;
+
+  AttributeDoublePtr aTransparencyAttr =
+    myResultSubShapePair.first->data()->real(ModelAPI_Result::TRANSPARENCY_ID());
+
+  aTransparencyAttr->setValue(theValue);
+}
+
 int ModelHighAPI_Selection::numberOfSubs() const
 {
   if (myVariantType != VT_ResultSubShapePair)

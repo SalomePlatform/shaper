@@ -104,6 +104,10 @@ public:
   MODELHIGHAPI_EXPORT
   void setDeflection(double theValue);
 
+  /// Change result's transparency
+  MODELHIGHAPI_EXPORT
+  void setTransparency(double theValue);
+
   /// Returns the number of sub-elements.
   MODELHIGHAPI_EXPORT
   int numberOfSubs() const;

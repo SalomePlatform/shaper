@@ -24,6 +24,7 @@
 #include "XGUI_MenuMgr.h"
 #include "XGUI_ColorDialog.h"
 #include "XGUI_DeflectionDialog.h"
+#include "XGUI_TransparencyWidget.h"
 #include "XGUI_ContextMenuMgr.h"
 #include "XGUI_Displayer.h"
 #include "XGUI_ErrorDialog.h"
@@ -32,6 +33,7 @@
 #include "XGUI_ObjectsBrowser.h"
 #include "XGUI_OperationMgr.h"
 #include "XGUI_PropertyPanel.h"
+#include "XGUI_PropertyDialog.h"
 #include "XGUI_SalomeConnector.h"
 #include "XGUI_Selection.h"
 #include "XGUI_SelectionMgr.h"
@@ -1354,6 +1356,10 @@ void XGUI_Workshop::onContextMenuCommand(const QString& theId, bool isChecked)
     changeColor(aObjects);
   else if (theId == "DEFLECTION_CMD")
     changeDeflection(aObjects);
+#ifdef USE_TRANSPARENCY
+  else if (theId == "TRANSPARENCY_CMD")
+    changeTransparency(aObjects);
+#endif
   else if (theId == "SHOW_CMD") {
     showObjects(aObjects, true);
     mySelector->updateSelectionBy(ModuleBase_ISelection::Browser);
@@ -1851,17 +1857,25 @@ bool XGUI_Workshop::canBeShaded(const ObjectPtr& theObject) const
 }
 
 //**************************************************************
-bool XGUI_Workshop::canChangeColor() const
+bool XGUI_Workshop::canChangeProperty(const QString& theActionName) const
 {
-  QObjectPtrList aObjects = mySelector->selection()->selectedObjects();
+  if (theActionName == "COLOR_CMD" ||
+      theActionName == "DEFLECTION_CMD"
+#ifdef USE_TRANSPARENCY
+      || theActionName == "TRANSPARENCY_CMD"
+#endif
+      ) {
+    QObjectPtrList aObjects = mySelector->selection()->selectedObjects();
 
-  std::set<std::string> aTypes;
-  aTypes.insert(ModelAPI_ResultGroup::group());
-  aTypes.insert(ModelAPI_ResultConstruction::group());
-  aTypes.insert(ModelAPI_ResultBody::group());
-  aTypes.insert(ModelAPI_ResultPart::group());
+    std::set<std::string> aTypes;
+    aTypes.insert(ModelAPI_ResultGroup::group());
+    aTypes.insert(ModelAPI_ResultConstruction::group());
+    aTypes.insert(ModelAPI_ResultBody::group());
+    aTypes.insert(ModelAPI_ResultPart::group());
 
-  return hasResults(aObjects, aTypes);
+    return hasResults(aObjects, aTypes);
+  }
+  return false;
 }
 
 void setColor(ResultPtr theResult, const std::vector<int>& theColor)
@@ -1948,19 +1962,6 @@ void XGUI_Workshop::changeColor(const QObjectPtrList& theObjects)
 }
 
 //**************************************************************
-bool XGUI_Workshop::canChangeDeflection() const
-{
-  QObjectPtrList aObjects = mySelector->selection()->selectedObjects();
-
-  std::set<std::string> aTypes;
-  aTypes.insert(ModelAPI_ResultGroup::group());
-  aTypes.insert(ModelAPI_ResultConstruction::group());
-  aTypes.insert(ModelAPI_ResultBody::group());
-  aTypes.insert(ModelAPI_ResultPart::group());
-
-  return hasResults(aObjects, aTypes);
-}
-
 void setDeflection(ResultPtr theResult, const double theDeflection)
 {
   if (!theResult.get())
@@ -1971,13 +1972,41 @@ void setDeflection(ResultPtr theResult, const double theDeflection)
     aDeflectionAttr->setValue(theDeflection);
 }
 
+//**************************************************************
+void setTransparency(ResultPtr theResult, double theTransparency)
+{
+  if (!theResult.get())
+    return;
+
+  AttributeDoublePtr anAttribute = theResult->data()->real(ModelAPI_Result::TRANSPARENCY_ID());
+  if (anAttribute.get() != NULL)
+    anAttribute->setValue(theTransparency);
+}
+
+//**************************************************************
+void setTransparency(double theTransparency, const QObjectPtrList& theObjects)
+{
+  foreach(ObjectPtr anObj, theObjects) {
+    ResultPtr aResult = std::dynamic_pointer_cast<ModelAPI_Result>(anObj);
+    if (aResult.get() != NULL) {
+      ResultCompSolidPtr aCompsolidResult =
+        std::dynamic_pointer_cast<ModelAPI_ResultCompSolid>(aResult);
+      if (aCompsolidResult.get() != NULL) { // change property for all sub-solids
+        for(int i = 0; i < aCompsolidResult->numberOfSubs(); i++) {
+          setTransparency(aCompsolidResult->subResult(i), theTransparency);
+        }
+      }
+      setTransparency(aResult, theTransparency);
+    }
+  }
+}
 
 //**************************************************************
 void XGUI_Workshop::changeDeflection(const QObjectPtrList& theObjects)
 {
   AttributeDoublePtr aDoubleAttr;
-  // 1. find the current color of the object. This is a color of AIS presentation
-  // The objects are iterated until a first valid color is found
+  // 1. find the current property of the object. This is a property of AIS presentation
+  // The objects are iterated until a first valid property is found
   double aDeflection = -1;
   foreach(ObjectPtr anObject, theObjects) {
     ResultPtr aResult = std::dynamic_pointer_cast<ModelAPI_Result>(anObject);
@@ -1985,9 +2014,9 @@ void XGUI_Workshop::changeDeflection(const QObjectPtrList& theObjects)
       aDeflection = XGUI_CustomPrs::getResultDeflection(aResult);
     }
     else {
-      // TODO: remove the obtaining a color from the AIS object
+      // TODO: remove the obtaining a property from the AIS object
       // this does not happen never because:
-      // 1. The color can be changed only on results
+      // 1. The property can be changed only on results
       // 2. The result can be not visualized in the viewer(e.g. Origin Construction)
       AISObjectPtr anAISObj = myDisplayer->getAISObject(anObject);
       if (anAISObj.get()) {
@@ -2022,7 +2051,7 @@ void XGUI_Workshop::changeDeflection(const QObjectPtrList& theObjects)
     if (aResult.get() != NULL) {
       ResultCompSolidPtr aCompsolidResult =
         std::dynamic_pointer_cast<ModelAPI_ResultCompSolid>(aResult);
-      if (aCompsolidResult.get() != NULL) { // change colors for all sub-solids
+      if (aCompsolidResult.get() != NULL) { // change property for all sub-solids
         for(int i = 0; i < aCompsolidResult->numberOfSubs(); i++) {
           setDeflection(aCompsolidResult->subResult(i), aDeflection);
         }
@@ -2032,6 +2061,90 @@ void XGUI_Workshop::changeDeflection(const QObjectPtrList& theObjects)
   }
   aMgr->finishOperation();
   updateCommandStatus();
+}
+
+//**************************************************************
+void XGUI_Workshop::changeTransparency(const QObjectPtrList& theObjects)
+{
+  AttributeDoublePtr aDoubleAttr;
+  // 1. find the current property of the object. This is a property of AIS presentation
+  // The objects are iterated until a first valid property is found
+  double aCurrentValue = -1;
+  foreach(ObjectPtr anObject, theObjects) {
+    ResultPtr aResult = std::dynamic_pointer_cast<ModelAPI_Result>(anObject);
+    if (aResult.get()) {
+      aCurrentValue = XGUI_CustomPrs::getResultTransparency(aResult);
+    }
+    else {
+      // TODO: remove the obtaining a property from the AIS object
+      // this does not happen never because:
+      // 1. The property can be changed only on results
+      // 2. The result can be not visualized in the viewer(e.g. Origin Construction)
+      AISObjectPtr anAISObj = myDisplayer->getAISObject(anObject);
+      if (anAISObj.get()) {
+        aCurrentValue = anAISObj->getDeflection();
+      }
+    }
+    if (aCurrentValue > 0)
+      break;
+  }
+  if (aCurrentValue < 0)
+    return;
+
+  if (!abortAllOperations())
+  return;
+
+  // 2. show the dialog to change the value
+  XGUI_PropertyDialog* aDlg = new XGUI_PropertyDialog(desktop());
+  aDlg->setWindowTitle("Transparency");
+  XGUI_TransparencyWidget* aTransparencyWidget = new XGUI_TransparencyWidget(aDlg);
+  connect(aTransparencyWidget, SIGNAL(transparencyValueChanged()),
+          this, SLOT(onTransparencyValueChanged()));
+  connect(aTransparencyWidget, SIGNAL(previewStateChanged()),
+          this, SLOT(onPreviewStateChanged()));
+  aDlg->setContent(aTransparencyWidget);
+  aTransparencyWidget->setValue(aCurrentValue);
+
+  // 3. abort the previous operation and start a new one
+  SessionPtr aMgr = ModelAPI_Session::get();
+  QString aDescription = contextMenuMgr()->action("TRANSPARENCY_CMD")->text();
+  aMgr->startOperation(aDescription.toStdString());
+
+  aDlg->move(QCursor::pos());
+  bool isDone = aDlg->exec() == QDialog::Accepted;
+  if (!isDone)
+    return;
+
+  // 4. set the value to all results
+  aCurrentValue = aTransparencyWidget->getValue();
+  setTransparency(aCurrentValue, theObjects);
+
+  aMgr->finishOperation();
+  updateCommandStatus();
+}
+
+//**************************************************************
+void XGUI_Workshop::onTransparencyValueChanged()
+{
+  XGUI_TransparencyWidget* aTransparencyWidget = (XGUI_TransparencyWidget*)sender();
+  if (!aTransparencyWidget || !aTransparencyWidget->isPreviewNeeded())
+    return;
+
+  QObjectPtrList anObjects = mySelector->selection()->selectedObjects();
+  setTransparency(aTransparencyWidget->getValue(), anObjects);
+  Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_TO_REDISPLAY));
+}
+
+//**************************************************************
+void XGUI_Workshop::onPreviewStateChanged()
+{
+  XGUI_TransparencyWidget* aTransparencyWidget = (XGUI_TransparencyWidget*)sender();
+  if (!aTransparencyWidget || !aTransparencyWidget->isPreviewNeeded())
+    return;
+
+  QObjectPtrList anObjects = mySelector->selection()->selectedObjects();
+  setTransparency(aTransparencyWidget->getValue(), anObjects);
+  Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_TO_REDISPLAY));
 }
 
 //**************************************************************

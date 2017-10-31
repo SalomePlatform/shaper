@@ -42,7 +42,7 @@
 double getDeflection(const ResultPtr& theResult)
 {
   double aDeflection = -1;
-  // get color from the attribute of the result
+  // get deflection from the attribute of the result
   if (theResult.get() != NULL &&
       theResult->data()->attribute(ModelAPI_Result::DEFLECTION_ID()).get() != NULL) {
     AttributeDoublePtr aDoubleAttr = theResult->data()->real(ModelAPI_Result::DEFLECTION_ID());
@@ -118,6 +118,27 @@ double XGUI_CustomPrs::getDefaultDeflection(const ObjectPtr& theObject)
   return aDeflection;
 }
 
+double getTransparency(const ResultPtr& theResult)
+{
+  double aDeflection = -1;
+  // get transparency from the attribute of the result
+  if (theResult.get() != NULL &&
+      theResult->data()->attribute(ModelAPI_Result::TRANSPARENCY_ID()).get() != NULL) {
+    AttributeDoublePtr aDoubleAttr = theResult->data()->real(ModelAPI_Result::TRANSPARENCY_ID());
+    if (aDoubleAttr.get() && aDoubleAttr->isInitialized()) {
+      double aValue = aDoubleAttr->value();
+      if (aValue > 0) /// zero value should not be used as a transparency(previous studies)
+        aDeflection = aDoubleAttr->value();
+    }
+  }
+  return aDeflection;
+}
+
+double getDefaultTransparency(const ResultPtr& theResult)
+{
+  return 0;
+}
+
 XGUI_CustomPrs::XGUI_CustomPrs(XGUI_Workshop* theWorkshop)
 : myWorkshop(theWorkshop)
 {
@@ -136,6 +157,14 @@ double XGUI_CustomPrs::getResultDeflection(const ResultPtr& theResult)
   if (aDeflection < 0)
     aDeflection = getDefaultDeflection(theResult);
   return aDeflection;
+}
+
+double XGUI_CustomPrs::getResultTransparency(const ResultPtr& theResult)
+{
+  double aTransparency = getTransparency(theResult);
+  if (aTransparency < 0)
+    aTransparency = getDefaultTransparency(theResult);
+  return aTransparency;
 }
 
 bool XGUI_CustomPrs::customisePresentation(ResultPtr theResult, AISObjectPtr thePrs,
@@ -158,6 +187,8 @@ bool XGUI_CustomPrs::customisePresentation(ResultPtr theResult, AISObjectPtr the
     aCustomized = !aColor.empty() && thePrs->setColor(aColor[0], aColor[1], aColor[2]);
 
     aCustomized = thePrs->setDeflection(getResultDeflection(theResult)) | aCustomized;
+
+    aCustomized = thePrs->setTransparency(getResultTransparency(theResult)) | aCustomized;
   }
   ModuleBase_IModule* aModule = myWorkshop->module();
   aCustomized = aModule->customisePresentation(theResult, thePrs, theCustomPrs) || aCustomized;

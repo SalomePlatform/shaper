@@ -37,6 +37,7 @@ void ModelAPI_Result::initAttributes()
   DataPtr aData = data();
   aData->addAttribute(COLOR_ID(), ModelAPI_AttributeIntArray::typeId());
   aData->addAttribute(DEFLECTION_ID(), ModelAPI_AttributeDouble::typeId());
+  aData->addAttribute(TRANSPARENCY_ID(), ModelAPI_AttributeDouble::typeId());
 }
 
 bool ModelAPI_Result::setDisabled(std::shared_ptr<ModelAPI_Result> theThis, const bool theFlag)

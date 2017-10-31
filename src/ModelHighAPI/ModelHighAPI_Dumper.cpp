@@ -474,6 +474,15 @@ void ModelHighAPI_Dumper::dumpEntitySetName()
         myDumpBuffer << ".setDeflection(" << aDeflectionAttr->value() << ")" << std::endl;
       }
     }
+    // set result transparency
+    if (!isDefaultTransparency(*aResIt)) {
+      AttributeDoublePtr aTransparencyAttr =
+        (*aResIt)->data()->real(ModelAPI_Result::TRANSPARENCY_ID());
+      if(aTransparencyAttr.get() && aTransparencyAttr->isInitialized()) {
+        *this << *aResIt;
+        myDumpBuffer << ".setTransparency(" << aTransparencyAttr->value() << ")" << std::endl;
+      }
+    }
   }
 
   myNames[aLastDumped.myEntity].myIsDumped = true;
@@ -532,6 +541,15 @@ bool ModelHighAPI_Dumper::isDefaultDeflection(const ResultPtr& theResult) const
     aDefault = Config_PropManager::real("Visualization", "body_deflection");
 
   return fabs(aCurrent - aDefault) < 1.e-12;
+}
+
+bool ModelHighAPI_Dumper::isDefaultTransparency(const ResultPtr& theResult) const
+{
+  AttributeDoublePtr anAttribute = theResult->data()->real(ModelAPI_Result::TRANSPARENCY_ID());
+  if(!anAttribute || !anAttribute->isInitialized()) {
+    return true;
+  }
+  return fabs(anAttribute->value()) < 1.e-12;
 }
 
 ModelHighAPI_Dumper& ModelHighAPI_Dumper::operator<<(const char theChar)
@@ -674,7 +692,7 @@ ModelHighAPI_Dumper& ModelHighAPI_Dumper::operator<<(const FeaturePtr& theEntity
     std::list<ResultPtr>::const_iterator aResIt = aResults.begin();
     for (; aResIt != aResults.end(); ++aResIt) {
       if (!myNames[*aResIt].myIsDefault || !isDefaultColor(*aResIt) ||
-          !isDefaultDeflection(*aResIt))
+          !isDefaultDeflection(*aResIt) || !isDefaultTransparency(*aResIt))
         aResultsWithNameOrColor.push_back(*aResIt);
 
       ResultCompSolidPtr aCompSolid =
@@ -684,7 +702,7 @@ ModelHighAPI_Dumper& ModelHighAPI_Dumper::operator<<(const FeaturePtr& theEntity
         for (int i = 0; i < aNbSubs; ++i) {
           ResultPtr aCurRes = aCompSolid->subResult(i);
           if (!myNames[aCurRes].myIsDefault || !isDefaultColor(aCurRes) ||
-              !isDefaultDeflection(aCurRes))
+              !isDefaultDeflection(aCurRes) || !isDefaultTransparency(aCurRes))
             aResultsWithNameOrColor.push_back(aCurRes);
         }
       }

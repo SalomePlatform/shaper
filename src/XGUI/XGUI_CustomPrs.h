@@ -55,6 +55,11 @@ public:
   /// \return theDeflection a real value
   static double getResultDeflection(const ResultPtr& theResult);
 
+  /// Returns transparency of a result object
+  /// \param theResult a result object
+  /// \return theTransparency a real value
+  static double getResultTransparency(const ResultPtr& theResult);
+
   /// Returns the default object color. It obtains colorConfigInfo of the object
   /// and find it in preferences. If there are no this color in preference and an empty
   /// color is interpreted as invalid, it shows error message

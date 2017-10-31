@@ -44,12 +44,14 @@ SET(PROJECT_HEADERS
     XGUI_ModuleConnector.h
     XGUI_ObjectsBrowser.h
     XGUI_OperationMgr.h
+    XGUI_PropertyDialog.h
     XGUI_PropertyPanel.h
     XGUI_QtEvents.h
     XGUI_SalomeConnector.h
     XGUI_Selection.h
     XGUI_SelectionMgr.h
     XGUI_Tools.h
+    XGUI_TransparencyWidget.h
     XGUI_ViewerProxy.h
     XGUI_Workshop.h
     XGUI_WorkshopListener.h
@@ -68,8 +70,10 @@ SET(PROJECT_MOC_HEADERS
     XGUI_ModuleConnector.h
     XGUI_ObjectsBrowser.h
     XGUI_OperationMgr.h
+    XGUI_PropertyDialog.h
     XGUI_PropertyPanel.h
     XGUI_SelectionMgr.h
+    XGUI_TransparencyWidget.h
     XGUI_ViewerProxy.h
     XGUI_Workshop.h
     XGUI_WorkshopListener.h
@@ -95,12 +99,14 @@ SET(PROJECT_SOURCES
     XGUI_ModuleConnector.cpp
     XGUI_ObjectsBrowser.cpp
     XGUI_OperationMgr.cpp
+    XGUI_PropertyDialog.cpp
     XGUI_PropertyPanel.cpp
     XGUI_QtEvents.cpp
     XGUI_SalomeConnector.cpp
     XGUI_Selection.cpp
     XGUI_SelectionMgr.cpp
     XGUI_Tools.cpp
+    XGUI_TransparencyWidget.cpp
     XGUI_ViewerProxy.cpp
     XGUI_Workshop.cpp
     XGUI_WorkshopListener.cpp

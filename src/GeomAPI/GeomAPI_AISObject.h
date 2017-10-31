@@ -148,6 +148,18 @@ class GeomAPI_AISObject : public GeomAPI_Interface
   GEOMAPI_EXPORT
   double getDeflection() const;
 
+  /** \brief Assigns the transparency to the shape
+   *  \param[in] theTransparency value of transparency
+   */
+  GEOMAPI_EXPORT
+  bool setTransparency(const double theTransparency);
+
+  /** \brief Returns deflection for the shape
+   *  \return double value
+   */
+  GEOMAPI_EXPORT
+  double getTransparency() const;
+
   /// \return Current width of the lines of shape
   GEOMAPI_EXPORT
   double width();

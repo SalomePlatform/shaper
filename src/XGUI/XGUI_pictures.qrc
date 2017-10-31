@@ -60,5 +60,7 @@
      <file>pictures/eyeclosed.png</file>
      <file>pictures/eyemiclosed.png</file>
      <file>pictures/eyeopen.png</file>
+
+     <file>pictures/transparency.png</file>
  </qresource>
  </RCC>

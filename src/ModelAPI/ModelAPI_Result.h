@@ -49,11 +49,19 @@ class ModelAPI_Result : public ModelAPI_Object
   }
 
   /// Reference to the deflection of the result.
-  /// The double value is used. The values is in [0, 1] range
+  /// The double value is used. The value is in [0, 1] range
   inline static const std::string& DEFLECTION_ID()
   {
     static const std::string MY_DEFLECTION_ID("Deflection");
     return MY_DEFLECTION_ID;
+  }
+
+  /// Reference to the transparency of the result.
+  /// The double value is used. The value is in [0, 1] range
+  inline static const std::string& TRANSPARENCY_ID()
+  {
+    static const std::string MY_TRANSPARENCY_ID("Transparency");
+    return MY_TRANSPARENCY_ID;
   }
 
   /// Returns true if the result is concealed from the data tree (referenced by other objects)

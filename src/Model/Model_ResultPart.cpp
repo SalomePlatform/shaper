@@ -54,6 +54,7 @@ void Model_ResultPart::initAttributes()
   data()->addAttribute(COLOR_ID(), ModelAPI_AttributeIntArray::typeId());
   data()->addAttribute(BASE_REF_ID(), ModelAPI_AttributeReference::typeId());
   data()->addAttribute(DEFLECTION_ID(), ModelAPI_AttributeDouble::typeId());
+  data()->addAttribute(TRANSPARENCY_ID(), ModelAPI_AttributeDouble::typeId());
 
   if (aDocRef->isInitialized() && // initialized immideately means already exist and will be loaded
       !Model_Application::getApplication()->hasDocument(aDocRef->docId()))

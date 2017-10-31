@@ -211,22 +211,24 @@ Q_OBJECT
   bool canBeShaded(const ObjectPtr& theObject) const;
 
   //! Returns true if there is at least one selected body/construction/group result
+  //! \param theActionName text of the checked action
   //! \return boolean value
-  bool canChangeColor() const;
+  bool canChangeProperty(const QString& theActionName) const;
 
   //! Change color of the results if it is possible
   //! The operation is available for construction, body and group results
   //! theObjects a list of selected objects
   void changeColor(const QObjectPtrList& theObjects);
 
-  //! Returns true if there is at least one selected body/construction/group result
-  //! \return boolean value
-  bool canChangeDeflection() const;
-
   //! Change deflection of the results if it is possible
   //! The operation is available for construction, body and group results
   //! theObjects a list of selected objects
   void changeDeflection(const QObjectPtrList& theObjects);
+
+  //! Change transparency of the results if it is possible
+  //! The operation is available for construction, body and group results
+  //! theObjects a list of selected objects
+  void changeTransparency(const QObjectPtrList& theObjects);
 
   //! Show the given features in 3d Viewer
   void showObjects(const QObjectPtrList& theList, bool isVisible);
@@ -423,6 +425,11 @@ signals:
   /// Activates/deactivates the trihedron in the viewer AIS context
   void onTrihedronVisibilityChanged(bool theState);
 
+  /// Apply the current transparency value if preview in transparency dialog is switched on
+  void onTransparencyValueChanged();
+
+  /// Switch on/off preview of transparency change
+  void onPreviewStateChanged();
 
  protected:
   /// Sets the granted operations for the parameter operation. Firstly, it finds the nested features
