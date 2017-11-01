@@ -172,7 +172,7 @@ Translation_42 = model.addTranslation(Part_1_doc, [model.selection("COMPSOLID", 
 # Translation 43
 Translation_43_1 = model.addTranslation(Part_1_doc, [model.selection("SOLID", "Box_33_1")], model.selection("EDGE", "PartSet/OX"), 5)
 Partition_8 = model.addPartition(Part_1_doc, [model.selection("SOLID", "Box_34_1"), model.selection("SOLID", "Translation_33_1")])
-Translation_43 = model.addTranslation(Part_1_doc, [model.selection("COMPSOLID", "Partition_8_1")], model.selection("EDGE", "Partition_8_1_1/Modified_Face_1_4&Partition_8_1_1/Modified_Face_1_1"), 15)
+Translation_43 = model.addTranslation(Part_1_doc, [model.selection("COMPSOLID", "Partition_8_1")], model.selection("EDGE", "Partition_8_1_1/Modified_Face_2_5&Partition_8_1_1/Modified_Face_2_2"), 15)
 
 # Translation 44
 Translation_44_1 = model.addTranslation(Part_1_doc, [model.selection("SOLID", "Box_35_1")], model.selection("EDGE", "PartSet/OX"), 5)

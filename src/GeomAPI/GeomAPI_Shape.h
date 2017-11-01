@@ -125,7 +125,9 @@ public:
 
   /// \return true if passed shape is a sub-shape of this shape.
   /// \param theShape shape to search.
-  GEOMAPI_EXPORT virtual bool isSubShape(const std::shared_ptr<GeomAPI_Shape> theShape) const;
+  /// \param theCheckOrientation if false, returns true even if orientation of shape differs
+  GEOMAPI_EXPORT virtual bool isSubShape(const std::shared_ptr<GeomAPI_Shape> theShape,
+    const bool theCheckOrientation = true) const;
 
   /// Computes boundary dimensions of the shape
   /// Returns False if it is not possible

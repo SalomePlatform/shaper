@@ -408,7 +408,8 @@ void GeomAPI_Shape::setOrientation(const GeomAPI_Shape::Orientation theOrientati
   }
 }
 
-bool GeomAPI_Shape::isSubShape(const std::shared_ptr<GeomAPI_Shape> theShape) const
+bool GeomAPI_Shape::isSubShape(const std::shared_ptr<GeomAPI_Shape> theShape,
+                               const bool theCheckOrientation) const
 {
   if(!theShape.get()) {
     return false;
@@ -420,7 +421,8 @@ bool GeomAPI_Shape::isSubShape(const std::shared_ptr<GeomAPI_Shape> theShape) co
   }
 
   for(TopExp_Explorer anExp(*MY_SHAPE, aShapeToSearch.ShapeType()); anExp.More(); anExp.Next()) {
-    if(aShapeToSearch.IsEqual(anExp.Current())) {
+    if(theCheckOrientation ?
+       aShapeToSearch.IsEqual(anExp.Current()) : aShapeToSearch.IsSame(anExp.Current())) {
       return true;
     }
   }
