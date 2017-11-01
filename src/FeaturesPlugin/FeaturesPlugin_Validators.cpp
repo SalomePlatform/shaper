@@ -20,6 +20,7 @@
 
 #include "FeaturesPlugin_Validators.h"
 
+#include "FeaturesPlugin_Boolean.h"
 #include "FeaturesPlugin_Union.h"
 
 #include <Events_InfoMessage.h>
@@ -608,8 +609,11 @@ bool FeaturesPlugin_ValidatorBooleanSelection::isValid(const AttributePtr& theAt
     ResultConstructionPtr aResultConstruction =
       std::dynamic_pointer_cast<ModelAPI_ResultConstruction>(aContext);
     if(aResultConstruction.get()) {
-      theError = "Error: Result construction not allowed for selection.";
-      return false;
+      if (anOperationType != FeaturesPlugin_Boolean::BOOL_FILL
+          || theAttribute->id() != FeaturesPlugin_Boolean::TOOL_LIST_ID()) {
+        theError = "Error: Result construction not allowed for selection.";
+        return false;
+      }
     }
     std::shared_ptr<GeomAPI_Shape> aShape = anAttrSelection->value();
     GeomShapePtr aContextShape = aContext->shape();
@@ -626,10 +630,18 @@ bool FeaturesPlugin_ValidatorBooleanSelection::isValid(const AttributePtr& theAt
     }
 
     int aShapeType = aShape->shapeType();
-    if(anOperationType == 1) {
+    if(anOperationType == FeaturesPlugin_Boolean::BOOL_FUSE) {
       // Fuse operation. Allow to select edges, faces and solids.
       if(aShapeType != GeomAPI_Shape::EDGE &&
          aShapeType != GeomAPI_Shape::FACE &&
+         aShapeType != GeomAPI_Shape::SOLID &&
+         aShapeType != GeomAPI_Shape::COMPSOLID &&
+         aShapeType != GeomAPI_Shape::COMPOUND) {
+        theError = "Error: Selected shape has the wrong type.";
+        return false;
+      }
+    } else if (anOperationType == FeaturesPlugin_Boolean::BOOL_FILL) {
+      if(aShapeType != GeomAPI_Shape::FACE &&
          aShapeType != GeomAPI_Shape::SOLID &&
          aShapeType != GeomAPI_Shape::COMPSOLID &&
          aShapeType != GeomAPI_Shape::COMPOUND) {
