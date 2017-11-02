@@ -366,9 +366,6 @@ class MODULEBASE_EXPORT ModuleBase_IModule : public QObject
                             std::string& theDescription);
 
 signals:
-  /// Signal which is emitted when operation is launched
-  void operationLaunched();
-
   /// Segnal emitted when an operation is resumed
   /// \param theOp a resumed operation
   void resumed(ModuleBase_Operation* theOp);

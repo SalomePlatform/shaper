@@ -283,7 +283,6 @@ void ModuleBase_IModule::onFeatureTriggered()
       launchModal(aCmdId);
     } else {
       launchOperation(aCmdId, false);
-      emit operationLaunched();
     }
   }
 }
