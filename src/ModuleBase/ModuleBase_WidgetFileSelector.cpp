@@ -26,6 +26,7 @@
 #include <ModuleBase_WidgetFileSelector.h>
 #include <ModuleBase_Tools.h>
 
+#include <Config_PropManager.h>
 #include <Config_WidgetAPI.h>
 
 #include <QFileDialog>
@@ -48,6 +49,9 @@ ModuleBase_WidgetFileSelector::ModuleBase_WidgetFileSelector(QWidget* theParent,
   myTitle = translate(theData->getProperty("title"));
   myType = (theData->getProperty("type") == "save") ? WFS_SAVE : WFS_OPEN;
   myDefaultPath = QString::fromStdString(theData->getProperty("path"));
+
+  if (myDefaultPath.isEmpty())
+    myDefaultPath = Config_PropManager::string("Plugins", "import_initial_path").c_str();
 
   QGridLayout* aMainLay = new QGridLayout(this);
   ModuleBase_Tools::adjustMargins(aMainLay);

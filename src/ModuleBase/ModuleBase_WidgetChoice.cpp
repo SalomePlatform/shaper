@@ -25,7 +25,10 @@
 #include <ModelAPI_AttributeInteger.h>
 #include <ModelAPI_Data.h>
 #include <Config_WidgetAPI.h>
+#include <Config_PropManager.h>
 
+#include <QDir>
+#include <QFile>
 #include <QWidget>
 #include <QLayout>
 #include <QLabel>
@@ -33,8 +36,27 @@
 #include <QButtonGroup>
 #include <QGroupBox>
 #include <QRadioButton>
+#include <QTextStream>
 #include <QToolButton>
 
+void getValues(const std::string& thePath, const std::string& theFileName,
+               QStringList& theValues)
+{
+  QString aFileName = thePath.c_str();
+  aFileName += QDir::separator();
+  aFileName += theFileName.c_str();
+
+  QFile aFile(aFileName);
+  if (!aFile.open(QIODevice::ReadOnly | QIODevice::Text))
+    return;
+
+  QTextStream aStream(&aFile);
+  while (!aStream.atEnd()) {
+    QString aLine = aStream.readLine();
+    if (!aLine.isEmpty())
+      theValues.append(aLine);
+  }
+}
 
 ModuleBase_WidgetChoice::ModuleBase_WidgetChoice(QWidget* theParent,
                                                  const Config_WidgetAPI* theData)
@@ -50,6 +72,14 @@ ModuleBase_WidgetChoice::ModuleBase_WidgetChoice(QWidget* theParent,
 
   foreach(QString aType, QString(aTypes.c_str()).split(' ')) {
     aList.append(translate(aType.toStdString()));
+  }
+  if (aTypes.empty()) {
+    aList.clear();
+    std::string aFileName = theData->getProperty("file_name");
+    if (!aFileName.empty()) {
+      std::string aPath = Config_PropManager::string("Plugins", "combo_box_elements_path");
+      getValues(aPath, aFileName, aList);
+    }
   }
 
   if (theData->getBooleanAttribute("use_in_title", false))
