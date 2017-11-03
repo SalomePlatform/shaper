@@ -33,7 +33,7 @@ Part_1 = model.addPart(partSet)
 Part_1_doc = Part_1.document()
 Wire_1 = model.addWire(Part_1_doc, [model.selection("EDGE", "PartSet/Sketch_1/Edge-SketchLine_1"), model.selection("EDGE", "PartSet/Sketch_1/Edge-SketchLine_2"), model.selection("EDGE", "PartSet/Sketch_1/Edge-SketchLine_3")])
 Extrusion_1 = model.addExtrusion(Part_1_doc, [model.selection("WIRE", "Wire_1_1")], model.selection(), 100, 0)
-Group_1 = model.addGroup(Part_1_doc, [model.selection("FACE", "Extrusion_1_1/Generated_Face_3"), model.selection("FACE", "Extrusion_1_1/Generated_Face_2"), model.selection("FACE", "Extrusion_1_1/Generated_Face_1")])
+Group_1 = model.addGroup(Part_1_doc, [model.selection("FACE", "Wire_1_1/Generated_Face_3"), model.selection("FACE", "Wire_1_1/Generated_Face_2"), model.selection("FACE", "Wire_1_1/Generated_Face_1")])
 model.do()
 model.end()
 

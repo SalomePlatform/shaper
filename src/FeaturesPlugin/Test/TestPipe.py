@@ -121,11 +121,20 @@ aSession.finishOperation()
 assert (len(aPipeFeature.results()) > 0)
 # aSession.undo()
 
+# Recover original face
+aSession.startOperation()
+aRecover = aPart.addFeature("Recover")
+aBaseObject = aRecover.reference("base_feature")
+aBaseObject.setValue(aPipeFeature)
+aRecoveredObjects = aRecover.reflist("recovered")
+aRecoveredObjects.append(aFaceResult1)
+aSession.finishOperation()
+
 # Create pipe with bi-normal
 aSession.startOperation()
 aPipeFeature = aPart.addFeature("Pipe")
 aBaseObjectsList = aPipeFeature.selectionList("base_objects")
-aBaseObjectsList.append(aFaceResult1, None)
+aBaseObjectsList.append(aRecover.firstResult(), None)
 aPathObjectSelection = aPipeFeature.selection("path_object")
 aPathObjectSelection.setValue(aWireResult, None)
 aPipeFeature.string("creation_method").setValue("binormal")
@@ -137,6 +146,15 @@ aSession.finishOperation()
 # Test results
 assert (len(aPipeFeature.results()) > 0)
 # aSession.undo()
+
+# Recover original face
+aSession.startOperation()
+aRecover2 = aPart.addFeature("Recover")
+aBaseObject = aRecover2.reference("base_feature")
+aBaseObject.setValue(aPipeFeature)
+aRecoveredObjects = aRecover2.reflist("recovered")
+aRecoveredObjects.append(aRecover.firstResult())
+aSession.finishOperation()
 
 # Create pipe with locations
 # Create a sketch with circle for pipe profile
@@ -173,7 +191,7 @@ aFaceResult2 = aFaceFeature.firstResult()
 aSession.startOperation()
 aPipeFeature = aPart.addFeature("Pipe")
 aBaseObjectsList = aPipeFeature.selectionList("base_objects")
-aBaseObjectsList.append(aFaceResult1, None)
+aBaseObjectsList.append(aRecover2.firstResult(), None)
 aBaseObjectsList.append(aFaceResult2, None)
 aPathObjectSelection = aPipeFeature.selection("path_object")
 aPathObjectSelection.setValue(aWireResult, None)

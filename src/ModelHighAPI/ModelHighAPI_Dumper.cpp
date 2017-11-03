@@ -884,7 +884,9 @@ ModelHighAPI_Dumper& ModelHighAPI_Dumper::operator<<(
     AttributeSelectionPtr anAttribute = theAttrSelList->value(anIndex);
     aShape = anAttribute->value();
     if(!aShape.get()) {
-      aShape = anAttribute->context()->shape();
+      ResultPtr aContext = anAttribute->context();
+      if (aContext.get())
+        aShape = aContext->shape();
     }
 
     if(!aShape.get()) {

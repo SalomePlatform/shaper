@@ -155,13 +155,13 @@ def check_owner(selection, topology_type, feature):
   aSession.abortOperation()
 
 # check faces
-check_owner("Extrusion_1_1/Generated_Face_1", "face", aBox)
-check_owner("Boolean_2_1/Modified_3", "face", aBox)
-check_owner("Boolean_1_1/Modified_1", "face", aHoleExt)
-check_owner("Boolean_2_1/Modified_2", "face", aTower)
+check_owner("_Extrusion_1_1/Generated_Face_1", "face", aBox)
+check_owner("Extrusion_3_1/Modified_3", "face", aBox)
+check_owner("Extrusion_1_1/Modified_1", "face", aHoleExt)
+check_owner("Extrusion_3_1/Modified_2", "face", aTower)
 # check edges without ambiguity
-check_owner("Boolean_2_1/Modified_3&Extrusion_1_1/Generated_Face_2", "edge", aBox)
-check_owner("Boolean_2_1/Modified_2&Extrusion_3_1/To_Face_1_1", "edge", aTower)
+check_owner("Extrusion_3_1/Modified_3&_Extrusion_1_1/Generated_Face_2", "edge", aBox)
+check_owner("Extrusion_3_1/Modified_2&_Extrusion_3_1/To_Face_1", "edge", aTower)
 
 # check the connected topology method: solid is not a compound of connected topology
 assert(aFuse.firstResult().shape().isConnectedTopology() == False)

@@ -31,7 +31,7 @@ Box_1 = model.addBox(Part_1_doc, 10, 10, 20)
 Plane_4 = model.addPlane(Part_1_doc, model.selection("VERTEX", "Box_1_1/Back&Box_1_1/Right&Box_1_1/Top"), model.selection("VERTEX", "Box_1_1/Front&Box_1_1/Left&Box_1_1/Top"), model.selection("VERTEX", "Box_1_1/Back&Box_1_1/Left&Box_1_1/Bottom"))
 Group_1 = model.addGroup(Part_1_doc, [model.selection("VERTEX", "Box_1_1/Back&Box_1_1/Left&Box_1_1/Top")])
 Partition_1 = model.addPartition(Part_1_doc, [model.selection("SOLID", "Box_1_1"), model.selection("FACE", "Plane_1")])
-Remove_SubShapes_1 = model.addRemoveSubShapes(Part_1_doc, model.selection("COMPSOLID", "Partition_1_1"))
+Remove_SubShapes_1 = model.addRemoveSubShapes(Part_1_doc, model.selection("COMPSOLID", "Box_1_1"))
 Remove_SubShapes_1.setSubShapesToKeep([model.selection("SOLID", "Partition_1_1_2")])
 model.do()
 # move group
