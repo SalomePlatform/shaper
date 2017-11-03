@@ -102,9 +102,14 @@ void GeomAlgoAPI_Partition::build(const ListOfShape& theObjects,
 
   // Building and getting result.
   anOperation->Perform();
+#ifdef USE_OCCT_720
+  if (anOperation->HasErrors())
+    return;
+#else
   if(anOperation->ErrorStatus() != 0) {
     return;
   }
+#endif
   TopoDS_Shape aResult = anOperation->Shape();
 
   if(aResult.ShapeType() == TopAbs_COMPOUND) {

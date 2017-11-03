@@ -821,8 +821,13 @@ void GeomAlgoAPI_ShapeTools::splitShape(const std::shared_ptr<GeomAPI_Shape>& th
   }
 
   aBOP.Perform();
+#ifdef USE_OCCT_720
+  if (aBOP.HasErrors())
+    return;
+#else
   if (aBOP.ErrorStatus())
     return;
+#endif
 
   // Collect splits
   const TopTools_ListOfShape& aSplits = aBOP.Modified(aBaseEdge);
@@ -866,8 +871,13 @@ void GeomAlgoAPI_ShapeTools::splitShape_p(const std::shared_ptr<GeomAPI_Shape>& 
   }
 
   aBOP.Perform();
+#ifdef USE_OCCT_720
+  if (aBOP.HasErrors())
+    return;
+#else
   if (aBOP.ErrorStatus())
     return;
+#endif
 
   // Collect splits
   const TopTools_ListOfShape& aSplits = aBOP.Modified(aBaseEdge);

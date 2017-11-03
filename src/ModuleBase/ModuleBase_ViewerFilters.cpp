@@ -156,6 +156,12 @@ Standard_Boolean ModuleBase_ShapeInPlaneFilter::IsOk(
             const Prs3d_DatumParts& aPart = aTrOwner->DatumPart();
             if (aPart >= Prs3d_DP_XAxis && aPart <= Prs3d_DP_ZAxis)
             {
+#ifdef USE_OCCT_720
+              gp_Ax2 anAxis = aTrihedron->Component()->Ax2();
+              gp_Dir aDir = anAxis.XDirection();
+              gp_Lin aLine(aTrihedron->Component()->Location(), aDir);
+              return aPlane.Contains(aLine, Precision::Confusion(), Precision::Angular());
+#else
               Handle(Prs3d_Drawer) aDrawer = aTrihedron->Attributes();
               Handle(Prs3d_DatumAspect) aDatumAspect = aDrawer->DatumAspect();
               Handle(Graphic3d_ArrayOfPrimitives) aPrimitives =
@@ -167,6 +173,7 @@ Standard_Boolean ModuleBase_ShapeInPlaneFilter::IsOk(
               gp_Pnt aPnt2(aX2, anY2, aZ2);
               gp_Lin aLine(aPnt1, gp_Dir(gp_Vec(aPnt1, aPnt2)));
               return aPlane.Contains(aLine, Precision::Confusion(), Precision::Angular());
+#endif
             }
           }
         }

@@ -218,9 +218,13 @@ void GeomAlgoAPI_SketchBuilder::createFaces(
       aBB.AddArgument(anEdge);
   }
   aBB.Perform();
+#ifdef USE_OCCT_720
+  if (aBB.HasErrors())
+    return;
+#else
   if (aBB.ErrorStatus())
     return;
-
+#endif
   // Collect faces
   TopTools_ListOfShape anAreas = aBB.Modified(aPlnFace);
   sortFaces(anAreas, theFeatures); // sort faces by the edges in them

@@ -1518,7 +1518,7 @@ void XGUI_Displayer::displayTrihedron(bool theToDisplay) const
   } else {
     deactivateTrihedron(false);
 
-    aContext->Erase(aTrihedron);
+    aContext->Erase(aTrihedron, Standard_True);
     #ifdef TINSPECTOR
     if (getCallBack()) getCallBack()->Remove(aTrihedron);
     #endif

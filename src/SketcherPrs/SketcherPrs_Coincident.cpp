@@ -139,7 +139,9 @@ void SketcherPrs_Coincident::SetColor(const Quantity_NameOfColor aCol)
 void SketcherPrs_Coincident::SetColor(const Quantity_Color &aCol)
 {
   hasOwnColor=Standard_True;
+#ifndef USE_OCCT_720
   myOwnColor=aCol;
+#endif
 }
 
 void SketcherPrs_Coincident::SetCustomColor(const std::vector<int>& theColor)

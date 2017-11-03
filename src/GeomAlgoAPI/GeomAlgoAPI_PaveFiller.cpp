@@ -55,20 +55,30 @@ void GeomAlgoAPI_PaveFiller::build(const ListOfShape& theListOfShape,
   }
   aPaveFiller.SetArguments(aListOfShape);
   aPaveFiller.Perform();
+#ifdef USE_OCCT_720
+  if (aPaveFiller.HasErrors())
+    return;
+#else
   Standard_Integer iErr = aPaveFiller.ErrorStatus();
   if(iErr) {
     return;
   }
+#endif
 
   BOPAlgo_Builder* aBuilder = new BOPAlgo_Builder();
   this->setImpl(aBuilder);
   this->setBuilderType(OCCT_BOPAlgo_Builder);
   aBuilder->SetArguments(aListOfShape);
   aBuilder->PerformWithFiller(aPaveFiller);
+#ifdef USE_OCCT_720
+  if (aBuilder->HasErrors())
+    return;
+#else
   iErr = aBuilder->ErrorStatus();
   if(iErr) {
     return;
   }
+#endif
 
   TopoDS_Shape aResult = aBuilder->Shape();
   if(aResult.ShapeType() == TopAbs_COMPOUND) {

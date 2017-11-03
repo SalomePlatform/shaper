@@ -90,6 +90,7 @@
 #include <AIS_InteractiveObject.hxx>
 #include <StdSelect_BRepOwner.hxx>
 #include <SelectMgr_IndexedMapOfOwner.hxx>
+#include <V3d_Coordinate.hxx>
 
 #include <QMouseEvent>
 

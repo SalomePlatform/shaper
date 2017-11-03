@@ -143,7 +143,9 @@ void GEOMAlgo_Splitter::Clear()
 //=======================================================================
 void GEOMAlgo_Splitter::BuildResult(const TopAbs_ShapeEnum theType)
 {
+#ifndef USE_OCCT_720
   myErrorStatus=0;
+#endif
   //
   TopAbs_ShapeEnum aType;
   BRep_Builder aBB;

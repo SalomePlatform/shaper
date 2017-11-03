@@ -388,7 +388,8 @@ void GeomAPI_AISObject::getColor(int& theR, int& theG, int& theB)
   if (anAIS.IsNull())
     return;
 
-  Quantity_Color aColor = anAIS->Color();
+  Quantity_Color aColor;
+  anAIS->Color(aColor);
   theR = (int)(aColor.Red()*255.);
   theG = (int)(aColor.Green()*255.);
   theB = (int)(aColor.Blue()*255.);
