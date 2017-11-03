@@ -206,7 +206,8 @@ class Model_Document : public ModelAPI_Document
   //! Registers the name of the shape for the topological naming needs
   void addNamingName(const TDF_Label theLabel, std::string theName);
   //! Updates the name of some object
-  void changeNamingName(std::string theOldName, const std::string theNewName);
+  void changeNamingName(std::string theOldName, const std::string theNewName,
+    const TDF_Label& theLabel);
   //! Returns the label, keeper of the name  for the topological naming needs
   TDF_Label findNamingName(std::string theName);
   //! Returns the result by name of the result (names of results must be unique, used for naming
@@ -351,7 +352,8 @@ class Model_Document : public ModelAPI_Document
   std::list<Transaction> myRedos;
 
   //! Optimization for finding the shape-label by topological naming names
-  std::map<std::string, TDF_Label> myNamingNames;
+  //! The name -> list of labels where this name is appeared (the last created name is last here)
+  std::map<std::string, std::list<TDF_Label> > myNamingNames;
   //! If it is true, features are not executed on update (on abort, undo, redo)
   bool myExecuteFeatures;
 

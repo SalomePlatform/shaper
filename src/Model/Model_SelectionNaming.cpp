@@ -83,7 +83,7 @@ std::string Model_SelectionNaming::getShapeName(
         // indexes are added to sub-shapes not primitives
         // (primitives must not be located at the same label)
         if(!aName.empty() && aNS->Evolution() != TNaming_PRIMITIVE && isNeedContextName) {
-          const TDF_Label& aLabel = aNS->Label();//theDoc->findNamingName(aName);
+          const TDF_Label& aLabel = aNS->Label();
           static const std::string aPostFix("_");
           TNaming_Iterator anItL(aNS);
           for(int i = 1; anItL.More(); anItL.Next(), i++) {
@@ -472,9 +472,6 @@ const TopoDS_Shape findFaceByName(
   const std::string& theSubShapeName, std::shared_ptr<Model_Document> theDoc)
 {
   TopoDS_Shape aFace;
-  //std::string::size_type n, nb = theSubShapeName.rfind('/');
-  //if (nb == std::string::npos) nb = 0;
-  //std::string aSubString = theSubShapeName.substr(nb + 1);
   std::string aSubString = theSubShapeName;
 
   TDF_Label aLabel = theDoc->findNamingName(aSubString);

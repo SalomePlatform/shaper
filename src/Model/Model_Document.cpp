@@ -1273,23 +1273,35 @@ Standard_Boolean IsEqual(const TDF_Label& theLab1, const TDF_Label& theLab2)
 
 void Model_Document::addNamingName(const TDF_Label theLabel, std::string theName)
 {
-  myNamingNames[theName] = theLabel;
+  myNamingNames[theName].push_back(theLabel);
 }
 
-void Model_Document::changeNamingName(const std::string theOldName, const std::string theNewName)
+void Model_Document::changeNamingName(const std::string theOldName,
+                                      const std::string theNewName,
+                                      const TDF_Label& theLabel)
 {
-  std::map<std::string, TDF_Label>::iterator aFind = myNamingNames.find(theOldName);
+  std::map<std::string, std::list<TDF_Label> >::iterator aFind = myNamingNames.find(theOldName);
   if (aFind != myNamingNames.end()) {
-    myNamingNames[theNewName] = aFind->second;
-    myNamingNames.erase(theOldName);
+    std::list<TDF_Label>::iterator aLabIter = aFind->second.begin();
+    for(; aLabIter != aFind->second.end(); aLabIter++) {
+      if (theLabel.IsEqual(*aLabIter)) { // found the label
+        myNamingNames[theNewName].push_back(theLabel);
+        if (aFind->second.size() == 1) { // only one element, so, just change the name
+          myNamingNames.erase(theOldName);
+        } else { // remove from the list
+          aFind->second.erase(aLabIter);
+        }
+        return;
+      }
+    }
   }
 }
 
 TDF_Label Model_Document::findNamingName(std::string theName)
 {
-  std::map<std::string, TDF_Label>::iterator aFind = myNamingNames.find(theName);
+  std::map<std::string, std::list<TDF_Label> >::iterator aFind = myNamingNames.find(theName);
   if (aFind != myNamingNames.end()) {
-    return aFind->second;
+    return *(aFind->second.rbegin());
   }
   // not found exact name, try to find by sub-components
   std::string::size_type aSlash = theName.rfind('/');
@@ -1298,24 +1310,28 @@ TDF_Label Model_Document::findNamingName(std::string theName)
     aFind = myNamingNames.find(anObjName);
     if (aFind != myNamingNames.end()) {
       TCollection_ExtendedString aSubName(theName.substr(aSlash + 1).c_str());
-      // searching sub-labels with this name
-      TDF_ChildIDIterator aNamesIter(aFind->second, TDataStd_Name::GetID(), Standard_True);
-      for(; aNamesIter.More(); aNamesIter.Next()) {
-        Handle(TDataStd_Name) aName = Handle(TDataStd_Name)::DownCast(aNamesIter.Value());
-        if (aName->Get() == aSubName)
-          return aName->Label();
-      }
-      // If not found child label with the exact sub-name, then try to find compound with
-      // such sub-name without suffix.
-      Standard_Integer aSuffixPos = aSubName.SearchFromEnd('_');
-      if (aSuffixPos != -1 && aSuffixPos != aSubName.Length()) {
-        TCollection_ExtendedString anIndexStr = aSubName.Split(aSuffixPos);
-        aSubName.Remove(aSuffixPos);
-        aNamesIter.Initialize(aFind->second, TDataStd_Name::GetID(), Standard_True);
+      // iterate all possible same-named labels starting from the last one (the recent)
+      std::list<TDF_Label>::reverse_iterator aLabIter = aFind->second.rbegin();
+      for(; aLabIter != aFind->second.rend(); aLabIter++) {
+        // searching sub-labels with this name
+        TDF_ChildIDIterator aNamesIter(*aLabIter, TDataStd_Name::GetID(), Standard_True);
         for(; aNamesIter.More(); aNamesIter.Next()) {
           Handle(TDataStd_Name) aName = Handle(TDataStd_Name)::DownCast(aNamesIter.Value());
-          if (aName->Get() == aSubName) {
+          if (aName->Get() == aSubName)
             return aName->Label();
+        }
+        // If not found child label with the exact sub-name, then try to find compound with
+        // such sub-name without suffix.
+        Standard_Integer aSuffixPos = aSubName.SearchFromEnd('_');
+        if (aSuffixPos != -1 && aSuffixPos != aSubName.Length()) {
+          TCollection_ExtendedString anIndexStr = aSubName.Split(aSuffixPos);
+          aSubName.Remove(aSuffixPos);
+          aNamesIter.Initialize(*aLabIter, TDataStd_Name::GetID(), Standard_True);
+          for(; aNamesIter.More(); aNamesIter.Next()) {
+            Handle(TDataStd_Name) aName = Handle(TDataStd_Name)::DownCast(aNamesIter.Value());
+            if (aName->Get() == aSubName) {
+              return aName->Label();
+            }
           }
         }
       }

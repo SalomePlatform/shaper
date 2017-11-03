@@ -134,7 +134,7 @@ void Model_Data::setName(const std::string& theName)
     ModelAPI_ObjectRenamedMessage::send(myObject, anOldName, theName, this);
   if (isModified && myObject && myObject->document()) {
     std::dynamic_pointer_cast<Model_Document>(myObject->document())->
-      changeNamingName(anOldName, theName);
+      changeNamingName(anOldName, theName, myLab);
   }
 #ifdef DEBUG_NAMES
   myObject->myName = theName;
