@@ -96,6 +96,10 @@ public:
   MODELHIGHAPI_EXPORT
   void setName(const std::string& theName);
 
+  /// Shortcut for result()->data()->name()
+  MODELHIGHAPI_EXPORT
+  std::string name() const;
+
   /// Change result's color
   MODELHIGHAPI_EXPORT
   void setColor(int theRed, int theGreen, int theBlue);

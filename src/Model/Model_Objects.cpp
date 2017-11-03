@@ -933,22 +933,117 @@ TDF_Label Model_Objects::resultLabel(
   return aData->label().Father().FindChild(TAG_FEATURE_RESULTS).FindChild(theResultIndex + 1);
 }
 
+
+// Obtain an index of result in the CompSolid (return 0 if the indexing is not necessary)
+static int subResultIndex(const FeaturePtr& theFeature, const ResultPtr& theResult)
+{
+  int anIndex = 0;
+  const std::list<ResultPtr>& aResults = theFeature->results();
+  for (std::list<ResultPtr>::const_iterator aResIt = aResults.begin();
+       aResIt != aResults.end(); ++aResIt) {
+    ResultCompSolidPtr aCompSolidRes =
+        std::dynamic_pointer_cast<ModelAPI_ResultCompSolid>(*aResIt);
+    if (aCompSolidRes && aCompSolidRes->isSub(theResult, anIndex))
+      break;
+  }
+  return anIndex;
+}
+
+bool Model_Objects::hasCustomName(DataPtr theFeatureData,
+                                  ResultPtr theResult,
+                                  int theResultIndex,
+                                  std::string& theParentName) const
+{
+  typedef std::list< std::pair < std::string, std::list<ObjectPtr> > > ListOfReferences;
+
+  SessionPtr aSession = ModelAPI_Session::get();
+  FeaturePtr anOwner = ModelAPI_Feature::feature(theResult->data()->owner());
+
+  ResultCompSolidPtr aCompSolidRes =
+      std::dynamic_pointer_cast<ModelAPI_ResultCompSolid>(theFeatureData->owner());
+  if (aCompSolidRes) {
+    // names of sub-solids in CompSolid should be default (for example,
+    // result of boolean operation 'Boolean_1' is a CompSolid which is renamed to 'MyBOOL',
+    // however, sub-elements of 'MyBOOL' should be named 'Boolean_1_1', 'Boolean_1_2' etc.)
+    std::ostringstream aDefaultName;
+    aDefaultName << anOwner->name();
+    // compute default name of CompSolid (name of feature + index of CompSolid's result)
+    int aCompSolidResultIndex = 0;
+    const std::list<ResultPtr>& aResults = anOwner->results();
+    for (std::list<ResultPtr>::const_iterator anIt = aResults.begin();
+         anIt != aResults.end(); ++anIt, ++aCompSolidResultIndex)
+      if (aCompSolidRes == *anIt)
+        break;
+    aDefaultName << "_" << (aCompSolidResultIndex + 1);
+    theParentName = aDefaultName.str();
+    return false;
+  }
+
+  std::shared_ptr<Model_Data> aData = std::dynamic_pointer_cast<Model_Data>(anOwner->data());
+
+  ListOfReferences aReferences;
+  aData->referencesToObjects(aReferences);
+
+  // find first result with user-defined name
+  ListOfReferences::const_iterator aFoundRef = aReferences.end();
+  for (ListOfReferences::const_iterator aRefIt = aReferences.begin();
+       aRefIt != aReferences.end(); ++aRefIt) {
+    if (aSession->validators()->isConcealed(anOwner->getKind(), aRefIt->first)) {
+      // check the referred object is a Body
+      // (for example, ExtrusionCut has a sketch as a first attribute which is concealing)
+      bool isBody = aRefIt->second.size() > 1 || (aRefIt->second.size() == 1 &&
+                    aRefIt->second.front()->groupName() == ModelAPI_ResultBody::group());
+      if (isBody && (aFoundRef == aReferences.end() ||
+          aData->isEarlierAttribute(aRefIt->first, aFoundRef->first)))
+        aFoundRef = aRefIt;
+    }
+  }
+
+  // find an object which is concealed by theResult
+  if (aFoundRef != aReferences.end() && !aFoundRef->second.empty()) {
+    std::list<ObjectPtr>::const_iterator anObjIt = aFoundRef->second.begin();
+    while (--theResultIndex >= 0) {
+      ++anObjIt;
+      if (anObjIt == aFoundRef->second.end()) {
+        anObjIt = aFoundRef->second.begin();
+        break;
+      }
+    }
+    // check the result is a Body
+    if ((*anObjIt)->groupName() == ModelAPI_ResultBody::group()) {
+      // check the result is part of CompSolid
+      ResultPtr anObjRes = std::dynamic_pointer_cast<ModelAPI_Result>(*anObjIt);
+      ResultCompSolidPtr aParentCompSolid = ModelAPI_Tools::compSolidOwner(anObjRes);
+      if (aParentCompSolid)
+        anObjRes = aParentCompSolid;
+      theParentName = anObjRes->data()->name();
+      return true;
+    }
+  }
+
+  return false;
+}
+
 void Model_Objects::storeResult(std::shared_ptr<ModelAPI_Data> theFeatureData,
-                                 std::shared_ptr<ModelAPI_Result> theResult,
-                                 const int theResultIndex)
+                                std::shared_ptr<ModelAPI_Result> theResult,
+                                const int theResultIndex)
 {
   theResult->init();
   theResult->setDoc(myDoc);
   initData(theResult, resultLabel(theFeatureData, theResultIndex), TAG_FEATURE_ARGUMENTS);
   if (theResult->data()->name().empty()) {
     // if was not initialized, generate event and set a name
-    std::stringstream aNewName;
-    aNewName<<theFeatureData->name();
-    // if there are several results (issue #899: any number of result),
-    // add unique prefix starting from second
-    if (theResultIndex > 0 || theResult->groupName() == ModelAPI_ResultBody::group())
-      aNewName<<"_"<<theResultIndex + 1;
-    theResult->data()->setName(aNewName.str());
+    std::string aNewName = theFeatureData->name();
+    if (!hasCustomName(theFeatureData, theResult, theResultIndex, aNewName)) {
+      std::stringstream aName;
+      aName << aNewName;
+      // if there are several results (issue #899: any number of result),
+      // add unique prefix starting from second
+      if (theResultIndex > 0 || theResult->groupName() == ModelAPI_ResultBody::group())
+        aName << "_" << theResultIndex + 1;
+      aNewName = aName.str();
+    }
+    theResult->data()->setName(aNewName);
   }
 }
 

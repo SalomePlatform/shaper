@@ -229,6 +229,13 @@ class Model_Objects
   /// Just removes all features without touching the document data (to be able undo)
   virtual void eraseAllFeatures();
 
+  // Check whether the pre-image of the result had user-defined name.
+  // If yes, return this name.
+  bool hasCustomName(DataPtr theFeatureData,
+                     ResultPtr theResult,
+                     int theResultIndex,
+                     std::string& theParentName) const;
+
  private:
   TDF_Label myMain; ///< main label of the data storage
 

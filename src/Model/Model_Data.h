@@ -58,9 +58,12 @@ class ModelAPI_Attribute;
 
 class Model_Data : public ModelAPI_Data
 {
+  typedef std::map<std::string, std::pair<std::shared_ptr<ModelAPI_Attribute>, int> > AttributeMap;
+
   TDF_Label myLab;  ///< label of the feature in the document
   /// All attributes of the object identified by the attribute ID
-  std::map<std::string, std::shared_ptr<ModelAPI_Attribute> > myAttrs;
+  /// (the attribute is stored together with its index in the feature)
+  AttributeMap myAttrs;
   /// Array of flags of this data
   Handle(TDataStd_BooleanArray) myFlags;
 
@@ -290,6 +293,10 @@ private:
   /// Sets the displayed/hidden state of the object. If it is changed, sends the "redisplay"
   /// signal.
   MODEL_EXPORT virtual void setDisplayed(const bool theDisplay);
+
+  /// Returns \c true if theAttribute1 is going earlier than theAttribute2 in the data
+  bool isEarlierAttribute(const std::string& theAttribute1,
+                          const std::string& theAttribute2) const;
 };
 
 /// Generic method to register back reference, used in referencing attributes.

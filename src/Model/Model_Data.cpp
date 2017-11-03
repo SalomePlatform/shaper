@@ -144,7 +144,8 @@ void Model_Data::setName(const std::string& theName)
 AttributePtr Model_Data::addAttribute(const std::string& theID, const std::string theAttrType)
 {
   AttributePtr aResult;
-  TDF_Label anAttrLab = myLab.FindChild(int(myAttrs.size()) + 1);
+  int anAttrIndex = int(myAttrs.size()) + 1;
+  TDF_Label anAttrLab = myLab.FindChild(anAttrIndex);
   ModelAPI_Attribute* anAttr = 0;
   if (theAttrType == ModelAPI_AttributeDocRef::typeId()) {
     anAttr = new Model_AttributeDocRef(anAttrLab);
@@ -203,7 +204,7 @@ AttributePtr Model_Data::addAttribute(const std::string& theID, const std::strin
   }
   if (anAttr) {
     aResult = std::shared_ptr<ModelAPI_Attribute>(anAttr);
-    myAttrs[theID] = aResult;
+    myAttrs[theID] = std::pair<AttributePtr, int>(aResult, anAttrIndex);
     anAttr->setObject(myObject);
     anAttr->setID(theID);
   } else {
@@ -217,10 +218,9 @@ AttributePtr Model_Data::addAttribute(const std::string& theID, const std::strin
 #define GET_ATTRIBUTE_BY_ID(ATTR_TYPE, METHOD_NAME) \
   std::shared_ptr<ATTR_TYPE> Model_Data::METHOD_NAME(const std::string& theID) { \
     std::shared_ptr<ATTR_TYPE> aRes; \
-    std::map<std::string, AttributePtr >::iterator aFound = \
-      myAttrs.find(theID); \
+    AttributeMap::iterator aFound = myAttrs.find(theID); \
     if (aFound != myAttrs.end()) { \
-      aRes = std::dynamic_pointer_cast<ATTR_TYPE>(aFound->second); \
+      aRes = std::dynamic_pointer_cast<ATTR_TYPE>(aFound->second.first); \
     } \
     return aRes; \
   }
@@ -246,15 +246,14 @@ std::shared_ptr<ModelAPI_Attribute> Model_Data::attribute(const std::string& the
   std::shared_ptr<ModelAPI_Attribute> aResult;
   if (myAttrs.find(theID) == myAttrs.end())  // no such attribute
     return aResult;
-  return myAttrs[theID];
+  return myAttrs[theID].first;
 }
 
 const std::string& Model_Data::id(const std::shared_ptr<ModelAPI_Attribute>& theAttr)
 {
-  std::map<std::string, std::shared_ptr<ModelAPI_Attribute> >::iterator anAttr =
-    myAttrs.begin();
+  AttributeMap::iterator anAttr = myAttrs.begin();
   for (; anAttr != myAttrs.end(); anAttr++) {
-    if (anAttr->second == theAttr)
+    if (anAttr->second.first == theAttr)
       return anAttr->first;
   }
   // not found
@@ -278,11 +277,11 @@ bool Model_Data::isValid()
 std::list<std::shared_ptr<ModelAPI_Attribute> > Model_Data::attributes(const std::string& theType)
 {
   std::list<std::shared_ptr<ModelAPI_Attribute> > aResult;
-  std::map<std::string, std::shared_ptr<ModelAPI_Attribute> >::iterator anAttrsIter =
-    myAttrs.begin();
+  AttributeMap::iterator anAttrsIter = myAttrs.begin();
   for (; anAttrsIter != myAttrs.end(); anAttrsIter++) {
-    if (theType.empty() || anAttrsIter->second->attributeType() == theType) {
-      aResult.push_back(anAttrsIter->second);
+    AttributePtr anAttr = anAttrsIter->second.first;
+    if (theType.empty() || anAttr->attributeType() == theType) {
+      aResult.push_back(anAttr);
     }
   }
   return aResult;
@@ -291,10 +290,10 @@ std::list<std::shared_ptr<ModelAPI_Attribute> > Model_Data::attributes(const std
 std::list<std::string> Model_Data::attributesIDs(const std::string& theType)
 {
   std::list<std::string> aResult;
-  std::map<std::string, std::shared_ptr<ModelAPI_Attribute> >::iterator anAttrsIter =
-    myAttrs.begin();
+  AttributeMap::iterator anAttrsIter = myAttrs.begin();
   for (; anAttrsIter != myAttrs.end(); anAttrsIter++) {
-    if (theType.empty() || anAttrsIter->second->attributeType() == theType) {
+    AttributePtr anAttr = anAttrsIter->second.first;
+    if (theType.empty() || anAttr->attributeType() == theType) {
       aResult.push_back(anAttrsIter->first);
     }
   }
@@ -380,7 +379,7 @@ void Model_Data::erase()
           if (aReferenced->get() && (*aReferenced)->data()->isValid()) {
             std::shared_ptr<Model_Data> aData =
               std::dynamic_pointer_cast<Model_Data>((*aReferenced)->data());
-            aData->removeBackReference(myAttrs[anAttrIter->first]);
+            aData->removeBackReference(myAttrs[anAttrIter->first].first);
           }
         }
       }
@@ -585,21 +584,22 @@ void Model_Data::referencesToObjects(
     static_cast<Model_ValidatorsFactory*>(ModelAPI_Session::get()->validators());
   FeaturePtr aMyFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(myObject);
 
-  std::map<std::string, std::shared_ptr<ModelAPI_Attribute> >::iterator anAttr = myAttrs.begin();
+  AttributeMap::iterator anAttrIt = myAttrs.begin();
   std::list<ObjectPtr> aReferenced; // not inside of cycle to avoid excess memory management
-  for(; anAttr != myAttrs.end(); anAttr++) {
+  for(; anAttrIt != myAttrs.end(); anAttrIt++) {
+    AttributePtr anAttr = anAttrIt->second.first;
     // skip not-case attributes, that really may refer to anything not-used (issue 671)
-    if (aMyFeature.get() && !aValidators->isCase(aMyFeature, anAttr->second->id()))
+    if (aMyFeature.get() && !aValidators->isCase(aMyFeature, anAttr->id()))
       continue;
 
-    std::string aType = anAttr->second->attributeType();
+    std::string aType = anAttr->attributeType();
     if (aType == ModelAPI_AttributeReference::typeId()) { // reference to object
       std::shared_ptr<ModelAPI_AttributeReference> aRef = std::dynamic_pointer_cast<
-          ModelAPI_AttributeReference>(anAttr->second);
+          ModelAPI_AttributeReference>(anAttr);
       aReferenced.push_back(aRef->value());
     } else if (aType == ModelAPI_AttributeRefAttr::typeId()) { // reference to attribute or object
       std::shared_ptr<ModelAPI_AttributeRefAttr> aRef = std::dynamic_pointer_cast<
-          ModelAPI_AttributeRefAttr>(anAttr->second);
+          ModelAPI_AttributeRefAttr>(anAttr);
       if (aRef->isObject()) {
         aReferenced.push_back(aRef->object());
       } else {
@@ -608,20 +608,20 @@ void Model_Data::referencesToObjects(
           aReferenced.push_back(anAttr->owner());
       }
     } else if (aType == ModelAPI_AttributeRefList::typeId()) { // list of references
-      aReferenced = std::dynamic_pointer_cast<ModelAPI_AttributeRefList>(anAttr->second)->list();
+      aReferenced = std::dynamic_pointer_cast<ModelAPI_AttributeRefList>(anAttr)->list();
     } else if (aType == ModelAPI_AttributeSelection::typeId()) { // selection attribute
       std::shared_ptr<ModelAPI_AttributeSelection> aRef = std::dynamic_pointer_cast<
-          ModelAPI_AttributeSelection>(anAttr->second);
+          ModelAPI_AttributeSelection>(anAttr);
       aReferenced.push_back(aRef->context());
     } else if (aType == ModelAPI_AttributeSelectionList::typeId()) { // list of selection attributes
       std::shared_ptr<ModelAPI_AttributeSelectionList> aRef = std::dynamic_pointer_cast<
-          ModelAPI_AttributeSelectionList>(anAttr->second);
-      for(int a = aRef->size() - 1; a >= 0; a--) {
+          ModelAPI_AttributeSelectionList>(anAttr);
+      for(int a = 0, aSize = aRef->size(); a < aSize; ++a) {
         aReferenced.push_back(aRef->value(a)->context());
       }
     } else if (aType == ModelAPI_AttributeRefAttrList::typeId()) {
       std::shared_ptr<ModelAPI_AttributeRefAttrList> aRefAttr = std::dynamic_pointer_cast<
-          ModelAPI_AttributeRefAttrList>(anAttr->second);
+          ModelAPI_AttributeRefAttrList>(anAttr);
       std::list<std::pair<ObjectPtr, AttributePtr> > aRefs = aRefAttr->list();
       std::list<std::pair<ObjectPtr, AttributePtr> >::const_iterator anIt = aRefs.begin(),
                                                                      aLast = aRefs.end();
@@ -630,25 +630,25 @@ void Model_Data::referencesToObjects(
       }
     } else if (aType == ModelAPI_AttributeInteger::typeId()) { // integer attribute
       AttributeIntegerPtr anAttribute =
-          std::dynamic_pointer_cast<ModelAPI_AttributeInteger>(anAttr->second);
+          std::dynamic_pointer_cast<ModelAPI_AttributeInteger>(anAttr);
       std::set<std::string> anUsedParameters = anAttribute->usedParameters();
       std::list<ResultParameterPtr> aParameters = findVariables(anUsedParameters);
       aReferenced.insert(aReferenced.end(), aParameters.begin(), aParameters.end());
     } else if (aType == ModelAPI_AttributeDouble::typeId()) { // double attribute
       AttributeDoublePtr anAttribute =
-          std::dynamic_pointer_cast<ModelAPI_AttributeDouble>(anAttr->second);
+          std::dynamic_pointer_cast<ModelAPI_AttributeDouble>(anAttr);
       std::set<std::string> anUsedParameters = anAttribute->usedParameters();
       std::list<ResultParameterPtr> aParameters = findVariables(anUsedParameters);
       aReferenced.insert(aReferenced.end(), aParameters.begin(), aParameters.end());
     } else if (aType == GeomDataAPI_Point::typeId()) { // point attribute
       AttributePointPtr anAttribute =
-        std::dynamic_pointer_cast<GeomDataAPI_Point>(anAttr->second);
+        std::dynamic_pointer_cast<GeomDataAPI_Point>(anAttr);
       std::set<std::string> anUsedParameters = usedParameters(anAttribute);
       std::list<ResultParameterPtr> aParameters = findVariables(anUsedParameters);
       aReferenced.insert(aReferenced.end(), aParameters.begin(), aParameters.end());
     } else if (aType == GeomDataAPI_Point2D::typeId()) { // point attribute
       AttributePoint2DPtr anAttribute =
-        std::dynamic_pointer_cast<GeomDataAPI_Point2D>(anAttr->second);
+        std::dynamic_pointer_cast<GeomDataAPI_Point2D>(anAttr);
       std::set<std::string> anUsedParameters = usedParameters(anAttribute);
       std::list<ResultParameterPtr> aParameters = findVariables(anUsedParameters);
       aReferenced.insert(aReferenced.end(), aParameters.begin(), aParameters.end());
@@ -656,7 +656,8 @@ void Model_Data::referencesToObjects(
       continue; // nothing to do, not reference
 
     if (!aReferenced.empty()) {
-      theRefs.push_back(std::pair<std::string, std::list<ObjectPtr> >(anAttr->first, aReferenced));
+      theRefs.push_back(
+          std::pair<std::string, std::list<ObjectPtr> >(anAttrIt->first, aReferenced));
       aReferenced.clear();
     }
   }
@@ -751,4 +752,16 @@ std::shared_ptr<ModelAPI_Data> Model_Data::invalidData()
 std::shared_ptr<ModelAPI_Object> Model_Data::owner()
 {
   return myObject;
+}
+
+bool Model_Data::isEarlierAttribute(const std::string& theAttribute1,
+                                    const std::string& theAttribute2) const
+{
+  AttributeMap::const_iterator aFound1 = myAttrs.find(theAttribute1);
+  AttributeMap::const_iterator aFound2 = myAttrs.find(theAttribute2);
+  if (aFound2 == myAttrs.end())
+    return true;
+  else if (aFound1 == myAttrs.end())
+    return false;
+  return aFound1->second.second < aFound2->second.second;
 }
