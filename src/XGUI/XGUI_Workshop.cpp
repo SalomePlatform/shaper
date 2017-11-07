@@ -2259,6 +2259,9 @@ void XGUI_Workshop::closeDocument()
   objectBrowser()->clearContent();
 
   module()->closeDocument();
+  // we need to clear viewer (with created filters) to do not have problems in 2nd SALOME study
+  module()->clearViewer();
+
 
   // data model need not process the document's signals about objects modifications as
   // the document is closed

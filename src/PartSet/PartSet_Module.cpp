@@ -624,7 +624,6 @@ bool PartSet_Module::isSketchNeutralPointActivated() const
 void PartSet_Module::closeDocument()
 {
   myActivePartIndex = QModelIndex();
-  clearViewer();
 }
 
 void PartSet_Module::clearViewer()

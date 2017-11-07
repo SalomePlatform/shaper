@@ -26,6 +26,7 @@
 
 #include <ModelAPI_Feature.h>
 #include <ModelAPI_ResultPart.h>
+#include <ModelAPI_ResultGroup.h>
 #include <ModelAPI_Session.h>
 
 #include <AIS_InteractiveObject.hxx>
@@ -57,11 +58,17 @@ Standard_Boolean PartSet_GlobalFilter::IsOk(const Handle(SelectMgr_EntityOwner)&
         ResultPtr aResult = std::dynamic_pointer_cast<ModelAPI_Result>(aObj);
         // result of parts belongs to PartSet document and can be selected only when PartSet
         //  is active in order to do not select the result of the active part.
-        if (aResult.get() && aResult->groupName() == ModelAPI_ResultPart::group()) {
-          SessionPtr aMgr = ModelAPI_Session::get();
-          aValid = aMgr->activeDocument() == aMgr->moduleDocument();
+        if (aResult.get()) {
+          if (aResult->groupName() == ModelAPI_ResultPart::group()) {
+            SessionPtr aMgr = ModelAPI_Session::get();
+            aValid = aMgr->activeDocument() == aMgr->moduleDocument();
+          } else if (aResult->groupName() == ModelAPI_ResultGroup::group()) {
+            aValid = Standard_False;
+          } else
+            aValid = Standard_True;
         }
-        else {
+        else { // possibly this code is obsolete, as a feature object can be selected in recovery
+          // only and there can not be Group feature
           FeaturePtr aFeature = ModelAPI_Feature::feature(aObj);
           if (aFeature) {
             aValid = aFeature->getKind() != "Group";
