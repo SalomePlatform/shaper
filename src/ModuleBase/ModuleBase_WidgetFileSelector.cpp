@@ -144,7 +144,8 @@ void ModuleBase_WidgetFileSelector::onPathSelectionBtn()
   myFileDialog = new QFileDialog(this, myTitle, aDefaultPath, aFilter);
   myFileDialog->setNameFilter(aFilter);
   myFileDialog->setOptions(QFileDialog::DontUseNativeDialog);
-  myFileDialog->setAcceptMode(myType == WFS_SAVE ? QFileDialog::AcceptSave : QFileDialog::AcceptOpen);
+  myFileDialog->setAcceptMode(myType == WFS_SAVE ? QFileDialog::AcceptSave
+                                                 : QFileDialog::AcceptOpen);
   if (myFileDialog->exec() == QDialog::Accepted)
   {
     mySelectedFilter = myFileDialog->selectedNameFilter();
