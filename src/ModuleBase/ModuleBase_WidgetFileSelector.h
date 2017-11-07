@@ -28,8 +28,9 @@
 #include <QString>
 #include <QStringList>
 
-class QWidget;
+class QFileDialog;
 class QLineEdit;
+class QWidget;
 
 /**
 * \ingroup GUI
@@ -65,7 +66,10 @@ class MODULEBASE_EXPORT ModuleBase_WidgetFileSelector : public ModuleBase_ModelW
   /// exists and has supported format
   bool isCurrentPathValid();
 
- public slots:
+  /// Reject the current editor dialog if it is shown and returns true.
+  virtual bool processEscape();
+
+public slots:
    /// Processing of path selection button press
   void onPathSelectionBtn();
 
@@ -104,6 +108,7 @@ protected:
 protected:
    /// A control for path input
   QLineEdit* myPathField;
+  QFileDialog* myFileDialog; ///< started dialog
 
   /// A title of open file dialog box
   QString myTitle;

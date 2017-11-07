@@ -44,7 +44,7 @@
 
 ModuleBase_WidgetFileSelector::ModuleBase_WidgetFileSelector(QWidget* theParent,
                                                              const Config_WidgetAPI* theData)
-: ModuleBase_ModelWidget(theParent, theData)
+: ModuleBase_ModelWidget(theParent, theData), myFileDialog(0)
 {
   myTitle = translate(theData->getProperty("title"));
   myType = (theData->getProperty("type") == "save") ? WFS_SAVE : WFS_OPEN;
@@ -123,6 +123,16 @@ bool ModuleBase_WidgetFileSelector::isCurrentPathValid()
   return aFile.exists();
 }
 
+bool ModuleBase_WidgetFileSelector::processEscape()
+{
+  if (myFileDialog) {
+    myFileDialog->reject();
+    return true;
+  }
+  return ModuleBase_ModelWidget::processEscape();
+}
+
+
 void ModuleBase_WidgetFileSelector::onPathSelectionBtn()
 {
   QString aDefaultPath = myPathField->text().isEmpty()
@@ -131,17 +141,25 @@ void ModuleBase_WidgetFileSelector::onPathSelectionBtn()
   QString aFilter = filterString();
   // use Option prohibited native dialog using to have both lower/upper extensions of files
   // satisfied to dialog filter on Linux(Calibre) Issue #2055
-  QString aFileName = (myType == WFS_SAVE)
-      ? QFileDialog::getSaveFileName(this, myTitle, aDefaultPath, aFilter, &mySelectedFilter,
-                                     QFileDialog::DontUseNativeDialog)
-      : QFileDialog::getOpenFileName(this, myTitle, aDefaultPath, aFilter, &mySelectedFilter,
-                                     QFileDialog::DontUseNativeDialog);
-  if (!aFileName.isEmpty()) {
-    if (myType == WFS_SAVE)
-      aFileName = applyExtension(aFileName, mySelectedFilter);
-    myPathField->setText(aFileName);
-    emit focusOutWidget(this);
+  myFileDialog = new QFileDialog(this, myTitle, aDefaultPath, aFilter);
+  myFileDialog->setNameFilter(aFilter);
+  myFileDialog->setOptions(QFileDialog::DontUseNativeDialog);
+  myFileDialog->setAcceptMode(myType == WFS_SAVE ? QFileDialog::AcceptSave : QFileDialog::AcceptOpen);
+  if (myFileDialog->exec() == QDialog::Accepted)
+  {
+    mySelectedFilter = myFileDialog->selectedNameFilter();
+    QStringList aFileNames = myFileDialog->selectedFiles();
+    if (!aFileNames.empty()) {
+      QString aFileName = aFileNames.first();
+      if (!aFileName.isEmpty()) {
+        if (myType == WFS_SAVE)
+          aFileName = applyExtension(aFileName, mySelectedFilter);
+        myPathField->setText(aFileName);
+        emit focusOutWidget(this);
+      }
+    }
   }
+  myFileDialog = 0;
 }
 
 void ModuleBase_WidgetFileSelector::onPathChanged()
