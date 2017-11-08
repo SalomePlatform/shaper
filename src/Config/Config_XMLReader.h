@@ -55,6 +55,11 @@ class Config_XMLReader
   CONFIG_EXPORT Config_XMLReader(const std::string& theXmlFile);
   CONFIG_EXPORT virtual ~Config_XMLReader();
   /*!
+   * Returns a path to resource files (created from ROOT_DIR environment variable)
+   * \return string value
+   */
+  CONFIG_EXPORT static std::string resourcesConfigFile();
+  /*!
    * Returns a path to the plugins.xml file (created from ROOT_DIR environment variable)
    * \return string value
    */

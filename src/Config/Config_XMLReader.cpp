@@ -60,6 +60,22 @@ Config_XMLReader::~Config_XMLReader()
   xmlFreeDoc(myXmlDoc);
 }
 
+std::string Config_XMLReader::resourcesConfigFile()
+{
+  std::string aValue;
+  char* anEnv = getenv("SHAPER_ROOT_DIR");
+  if (anEnv) {
+    aValue = std::string(anEnv) +
+      FSEP + "share" + FSEP + "salome" + FSEP + "resources" + FSEP + "shaper";
+  } else {
+    anEnv = getenv("OPENPARTS_ROOT_DIR");
+    if (anEnv) {
+      aValue = std::string(anEnv) + FSEP + "resources";
+    }
+  }
+  return aValue;
+}
+
 std::string Config_XMLReader::pluginConfigFile()
 {
   std::string aValue;

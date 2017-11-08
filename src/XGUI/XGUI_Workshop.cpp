@@ -297,8 +297,6 @@ void XGUI_Workshop::startApplication()
 
   std::string aDir = getenv(QString("%1Resources").arg(
     ModuleBase_Preferences::resourceMgr()->appName()).toLatin1());
-  Config_PropManager::registerProp("Plugins", "combo_box_elements_path",
-    "ComboBox elements directory", Config_Prop::Directory, aDir);
   Config_PropManager::registerProp("Plugins", "import_initial_path", "Import initial directory",
                                    Config_Prop::Directory, aDir);
 

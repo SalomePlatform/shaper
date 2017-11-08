@@ -23,12 +23,11 @@
 #include "ModuleBase_IconFactory.h"
 
 #include <ModelAPI_AttributeInteger.h>
+#include <ModelAPI_AttributeStringArray.h>
 #include <ModelAPI_Data.h>
 #include <Config_WidgetAPI.h>
 #include <Config_PropManager.h>
 
-#include <QDir>
-#include <QFile>
 #include <QWidget>
 #include <QLayout>
 #include <QLabel>
@@ -36,27 +35,7 @@
 #include <QButtonGroup>
 #include <QGroupBox>
 #include <QRadioButton>
-#include <QTextStream>
 #include <QToolButton>
-
-void getValues(const std::string& thePath, const std::string& theFileName,
-               QStringList& theValues)
-{
-  QString aFileName = thePath.c_str();
-  aFileName += QDir::separator();
-  aFileName += theFileName.c_str();
-
-  QFile aFile(aFileName);
-  if (!aFile.open(QIODevice::ReadOnly | QIODevice::Text))
-    return;
-
-  QTextStream aStream(&aFile);
-  while (!aStream.atEnd()) {
-    QString aLine = aStream.readLine();
-    if (!aLine.isEmpty())
-      theValues.append(aLine);
-  }
-}
 
 ModuleBase_WidgetChoice::ModuleBase_WidgetChoice(QWidget* theParent,
                                                  const Config_WidgetAPI* theData)
@@ -74,14 +53,10 @@ ModuleBase_WidgetChoice::ModuleBase_WidgetChoice(QWidget* theParent,
     aList.append(translate(aType.toStdString()));
   }
   if (aTypes.empty()) {
-    aList.clear();
-    std::string aFileName = theData->getProperty("file_name");
-    if (!aFileName.empty()) {
-      std::string aPath = Config_PropManager::string("Plugins", "combo_box_elements_path");
-      getValues(aPath, aFileName, aList);
-    }
+    myStringListAttribute = theData->getProperty("string_list_attribute");
+    if (!myStringListAttribute.empty())
+      aList.clear();
   }
-
   if (theData->getBooleanAttribute("use_in_title", false))
     myButtonTitles = aList;
 
@@ -179,6 +154,14 @@ bool ModuleBase_WidgetChoice::restoreValueCustom()
 
   if (aIntAttr->value() != -1) {
     if (myCombo) {
+      if (myCombo->count() == 0 && !myStringListAttribute.empty()) {
+        AttributeStringArrayPtr aStrAttr = aData->stringArray(myStringListAttribute);
+        if (aStrAttr) {
+          for (int i = 0; i < aStrAttr->size(); i++) {
+            myCombo->insertItem(i, aStrAttr->value(i).c_str());
+          }
+        }
+      }
       bool isBlocked = myCombo->blockSignals(true);
       myCombo->setCurrentIndex(aIntAttr->value());
       myCombo->blockSignals(isBlocked);

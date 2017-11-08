@@ -100,6 +100,7 @@ private:
 
   // XML definition of titles
   QStringList myButtonTitles;
+  std::string myStringListAttribute;
 };
 
 #endif
