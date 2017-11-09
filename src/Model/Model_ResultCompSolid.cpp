@@ -240,8 +240,7 @@ void Model_ResultCompSolid::updateSubs(const std::shared_ptr<GeomAPI_Shape>& the
   } else if (!mySubs.empty()) { // erase all subs
     while(!mySubs.empty()) {
       ResultBodyPtr anErased = *(mySubs.rbegin());
-      if (anErased->data()->isValid())
-        anErased->setDisabled(anErased, true);
+      anErased->setDisabled(anErased, true); // even if it is invalid (to erase subs on abort/undo)
       mySubs.pop_back();
     }
     mySubsMap.clear();
