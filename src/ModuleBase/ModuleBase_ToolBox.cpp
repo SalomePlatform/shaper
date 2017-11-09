@@ -72,8 +72,12 @@ void ModuleBase_ToolBox::addItem(QWidget* thePage, const QString& theName, const
   QToolButton* aButton = new QToolButton(myButtonsFrame);
   aButton->setFocusPolicy(Qt::StrongFocus);
   aButton->setCheckable(true);
-  aButton->setIcon(theIcon);
-  aButton->setIconSize(theIcon.size());
+  if (theIcon.isNull())
+    aButton->setText(theName);
+  else {
+    aButton->setIcon(theIcon);
+    aButton->setIconSize(theIcon.size());
+  }
   aButton->setToolTip(theName);
   aButton->setObjectName(theName);
   myButtonsGroup->addButton(aButton, anOldCount);

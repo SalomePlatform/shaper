@@ -94,6 +94,23 @@ double GeomAlgoAPI_ShapeTools::volume(const std::shared_ptr<GeomAPI_Shape> theSh
 }
 
 //==================================================================================================
+double GeomAlgoAPI_ShapeTools::area (const std::shared_ptr<GeomAPI_Shape> theShape)
+{
+  GProp_GProps aGProps;
+  if(!theShape.get()) {
+    return 0.0;
+  }
+  const TopoDS_Shape& aShape = theShape->impl<TopoDS_Shape>();
+  if(aShape.IsNull()) {
+    return 0.0;
+  }
+  const Standard_Real anEps = 1.e-6;
+
+  BRepGProp::SurfaceProperties(aShape, aGProps, anEps);
+  return aGProps.Mass();
+}
+
+//==================================================================================================
 std::shared_ptr<GeomAPI_Pnt>
   GeomAlgoAPI_ShapeTools::centreOfMass(const std::shared_ptr<GeomAPI_Shape> theShape)
 {

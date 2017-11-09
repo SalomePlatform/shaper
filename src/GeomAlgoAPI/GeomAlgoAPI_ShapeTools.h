@@ -48,6 +48,9 @@ public:
   /// \return the total volume of the solids of the current shape or 0.0 if it can be computed.
   GEOMALGOAPI_EXPORT static double volume(const std::shared_ptr<GeomAPI_Shape> theShape);
 
+  /// \return the total area of the faces of the current shape or 0.0 if it can be computed.
+  GEOMALGOAPI_EXPORT static double area(const std::shared_ptr<GeomAPI_Shape> theShape);
+
   /// \return the centre of mass of the current face.
   /// The coordinates returned for the center of mass
   /// are expressed in the absolute Cartesian coordinate system.
