@@ -154,6 +154,7 @@ bool ModuleBase_WidgetChoice::restoreValueCustom()
 
   if (aIntAttr->value() != -1) {
     if (myCombo) {
+      bool isBlocked = myCombo->blockSignals(true);
       if (myCombo->count() == 0 && !myStringListAttribute.empty()) {
         AttributeStringArrayPtr aStrAttr = aData->stringArray(myStringListAttribute);
         if (aStrAttr) {
@@ -162,7 +163,6 @@ bool ModuleBase_WidgetChoice::restoreValueCustom()
           }
         }
       }
-      bool isBlocked = myCombo->blockSignals(true);
       myCombo->setCurrentIndex(aIntAttr->value());
       myCombo->blockSignals(isBlocked);
     } else {
