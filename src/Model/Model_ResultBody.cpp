@@ -47,7 +47,7 @@ void Model_ResultBody::colorConfigInfo(std::string& theSection, std::string& the
 bool Model_ResultBody::setDisabled(std::shared_ptr<ModelAPI_Result> theThis, const bool theFlag)
 {
   bool aChanged = ModelAPI_ResultBody::setDisabled(theThis, theFlag);
-  if (aChanged) { // state is changed, so modifications are needed
+  if (aChanged && data()->isValid()) { // state is changed, so modifications are needed
     myBuilder->evolutionToSelection(theFlag);
   }
   return aChanged;

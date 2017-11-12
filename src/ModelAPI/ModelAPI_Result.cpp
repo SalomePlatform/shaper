@@ -44,7 +44,8 @@ bool ModelAPI_Result::setDisabled(std::shared_ptr<ModelAPI_Result> theThis, cons
 {
   if (myIsDisabled != theFlag) {
     myIsDisabled = theFlag;
-    data()->setIsDeleted(theFlag); // store it in data model (to get back on undo/redo, etc)
+    if (data()->isValid())
+      data()->setIsDeleted(theFlag); // store it in data model (to get back on undo/redo, etc)
     // this must be before "updated" message send to have history updated for OB update
     document()->updateHistory(groupName()); // to update the history cash data in the document
     // generate related events
