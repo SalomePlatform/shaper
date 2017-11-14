@@ -112,7 +112,21 @@ std::string Model_SelectionNaming::getShapeName(
             aNewContext = theDoc->objects()->object(aNSDataLab);
           }
           if (aNewContext.get()) {
-            aName = aNewContext->data()->name() + "/" + aName;
+            // this is to avoid duplicated names of results problem
+            std::string aContextName = aNewContext->data()->name();
+            // myLab corresponds to the current time
+            TDF_Label aCurrentLab = myLab;
+            while(aCurrentLab.Depth() > 3)
+              aCurrentLab = aCurrentLab.Father();
+
+            int aNumInHistoryNames =
+              theDoc->numberOfNameInHistory(aNewContext, aCurrentLab);
+            while(aNumInHistoryNames > 1) { // add "_" before name the needed number of times
+              aContextName = "_" + aContextName;
+              aNumInHistoryNames--;
+            }
+
+            aName = aContextName + "/" + aName;
           }
         }
       }
@@ -469,17 +483,18 @@ const TopoDS_Shape getShapeFromNS(
 }
 
 const TopoDS_Shape findFaceByName(
-  const std::string& theSubShapeName, std::shared_ptr<Model_Document> theDoc)
+  const std::string& theSubShapeName, std::shared_ptr<Model_Document> theDoc,
+  const ResultPtr theDetectedContext)
 {
   TopoDS_Shape aFace;
   std::string aSubString = theSubShapeName;
 
-  TDF_Label aLabel = theDoc->findNamingName(aSubString);
+  TDF_Label aLabel = theDoc->findNamingName(aSubString, theDetectedContext);
   if (aLabel.IsNull()) { // try to remove additional artificial suffix
     std::string::size_type n = aSubString.rfind('_');
     if (n != std::string::npos) {
       aSubString = aSubString.substr(0, n);
-       aLabel = theDoc->findNamingName(aSubString);
+       aLabel = theDoc->findNamingName(aSubString, theDetectedContext);
     }
   }
   if(aLabel.IsNull()) return aFace;
@@ -718,7 +733,7 @@ bool Model_SelectionNaming::selectSubShape(const std::string& theType,
 
   std::string aContName = getContextName(aSubShapeName);
   if(aContName.empty()) return false;
-  ResultPtr aCont = aDoc->findByName(aContName);
+  ResultPtr aCont = aDoc->findByName(aContName, aSubShapeName);
    // possible this is body where postfix is added to distinguish several shapes on the same label
   int aSubShapeId = -1; // -1 means sub shape not found
   // for result body the name wihtout "_" has higher priority than with it: it is always added
@@ -726,8 +741,8 @@ bool Model_SelectionNaming::selectSubShape(const std::string& theType,
        aContName == aSubShapeName) {
     size_t aPostIndex = aContName.rfind('_');
     if (aPostIndex != std::string::npos) {
-      std::string aSubContName = aContName.substr(0, aPostIndex);
-      ResultPtr aSubCont = aDoc->findByName(aSubContName);
+      std::string anEmpty, aSubContName = aContName.substr(0, aPostIndex);
+      ResultPtr aSubCont = aDoc->findByName(aSubContName, anEmpty);
       if (aSubCont.get()) {
         try {
           std::string aNum = aContName.substr(aPostIndex + 1);
@@ -750,12 +765,12 @@ bool Model_SelectionNaming::selectSubShape(const std::string& theType,
   case TopAbs_FACE:
   case TopAbs_WIRE:
     {
-      aSelection = findFaceByName(aSubShapeName, aDoc);
+      aSelection = findFaceByName(aSubShapeName, aDoc, aCont);
     }
     break;
   case TopAbs_EDGE:
     {
-      const TDF_Label& aLabel = aDoc->findNamingName(aSubShapeName);
+      const TDF_Label& aLabel = aDoc->findNamingName(aSubShapeName, aCont);
       if(!aLabel.IsNull()) {
         Handle(TNaming_NamedShape) aNS;
         if(aLabel.FindAttribute(TNaming_NamedShape::GetID(), aNS)) {
@@ -766,7 +781,7 @@ bool Model_SelectionNaming::selectSubShape(const std::string& theType,
     break;
   case TopAbs_VERTEX:
     {
-      const TDF_Label& aLabel = aDoc->findNamingName(aSubShapeName);
+      const TDF_Label& aLabel = aDoc->findNamingName(aSubShapeName, aCont);
       if(!aLabel.IsNull()) {
         Handle(TNaming_NamedShape) aNS;
         if(aLabel.FindAttribute(TNaming_NamedShape::GetID(), aNS)) {
@@ -814,8 +829,15 @@ bool Model_SelectionNaming::selectSubShape(const std::string& theType,
     if(aN >= 1) {
       TopTools_ListOfShape aList;
       std::list<std::string>::iterator it = aListofNames.begin();
-      for(; it != aListofNames.end(); it++){
-        const TopoDS_Shape aFace = findFaceByName(*it, aDoc);
+      for(; it != aListofNames.end(); it++) {
+        ResultPtr aFaceContext = aCont;
+        if (it != aListofNames.begin()) { // there may be other context for different sub-faces
+          std::string aContName = getContextName(*it);
+          if(!aContName.empty()) {
+            aFaceContext = aDoc->findByName(aContName, *it);
+          }
+        }
+        const TopoDS_Shape aFace = findFaceByName(*it, aDoc, aFaceContext);
         if(!aFace.IsNull())
           aList.Append(aFace);
       }
@@ -827,8 +849,8 @@ bool Model_SelectionNaming::selectSubShape(const std::string& theType,
   if (aN < 2) {
     size_t aConstrNamePos = aSubShapeName.find("/");
     bool isFullName = aConstrNamePos == std::string::npos;
-    std::string aContrName = aContName;
-    ResultPtr aConstr = aDoc->findByName(aContrName);
+    std::string anEmpty, aContrName = aContName;
+    ResultPtr aConstr = aDoc->findByName(aContrName, anEmpty);
     if (aConstr.get() && aConstr->groupName() == ModelAPI_ResultConstruction::group()) {
       theCont = aConstr;
       if (isFullName) {

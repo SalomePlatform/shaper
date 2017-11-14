@@ -1273,6 +1273,19 @@ Standard_Boolean IsEqual(const TDF_Label& theLab1, const TDF_Label& theLab2)
 
 void Model_Document::addNamingName(const TDF_Label theLabel, std::string theName)
 {
+  std::map<std::string, std::list<TDF_Label> >::iterator aFind = myNamingNames.find(theName);
+  if (aFind != myNamingNames.end()) { // to avoid duplicate-labels
+    std::list<TDF_Label>::iterator aLabIter = aFind->second.begin();
+    while(aLabIter != aFind->second.end()) {
+      if (theLabel.IsEqual(*aLabIter)) {
+        std::list<TDF_Label>::iterator aTmpIter = aLabIter;
+        aLabIter++;
+        aFind->second.erase(aTmpIter);
+      } else {
+        aLabIter++;
+      }
+    }
+  }
   myNamingNames[theName].push_back(theLabel);
 }
 
@@ -1297,11 +1310,19 @@ void Model_Document::changeNamingName(const std::string theOldName,
   }
 }
 
-TDF_Label Model_Document::findNamingName(std::string theName)
+TDF_Label Model_Document::findNamingName(std::string theName, ResultPtr theContext)
 {
   std::map<std::string, std::list<TDF_Label> >::iterator aFind = myNamingNames.find(theName);
   if (aFind != myNamingNames.end()) {
-    return *(aFind->second.rbegin());
+      std::list<TDF_Label>::reverse_iterator aLabIter = aFind->second.rbegin();
+      for(; aLabIter != aFind->second.rend(); aLabIter++) {
+        if (theContext.get()) {
+          // context is defined and not like this, so, skip
+          if (theContext == myObjs->object(aLabIter->Father()))
+            return *aLabIter;
+        }
+      }
+      return *(aFind->second.rbegin()); // no more variannts, so, return the last
   }
   // not found exact name, try to find by sub-components
   std::string::size_type aSlash = theName.rfind('/');
@@ -1313,6 +1334,11 @@ TDF_Label Model_Document::findNamingName(std::string theName)
       // iterate all possible same-named labels starting from the last one (the recent)
       std::list<TDF_Label>::reverse_iterator aLabIter = aFind->second.rbegin();
       for(; aLabIter != aFind->second.rend(); aLabIter++) {
+        if (theContext.get()) {
+          // context is defined and not like this, so, skip
+          if (theContext != myObjs->object(aLabIter->Father()))
+            continue;
+        }
         // searching sub-labels with this name
         TDF_ChildIDIterator aNamesIter(*aLabIter, TDataStd_Name::GetID(), Standard_True);
         for(; aNamesIter.More(); aNamesIter.Next()) {
@@ -1340,9 +1366,78 @@ TDF_Label Model_Document::findNamingName(std::string theName)
   return TDF_Label(); // not found
 }
 
-ResultPtr Model_Document::findByName(const std::string theName)
+int Model_Document::numberOfNameInHistory(
+  const ObjectPtr& theNameObject, const TDF_Label& theStartFrom)
 {
-  return myObjs->findByName(theName);
+  std::map<std::string, std::list<TDF_Label> >::iterator aFind =
+    myNamingNames.find(theNameObject->data()->name());
+  if (aFind == myNamingNames.end() || aFind->second.size() < 2) {
+    return 1; // no need to specify the name by additional identifiers
+  }
+  // get the feature of the object for relative compare
+  FeaturePtr aStart = myObjs->feature(theStartFrom);
+  if (!aStart.get()) // strange, but can not find feature by the label
+    return 1;
+  // feature that contain result with this name
+  FeaturePtr aNameFeature;
+  ResultPtr aNameResult = std::dynamic_pointer_cast<ModelAPI_Result>(theNameObject);
+  if (aNameResult)
+    aNameFeature = myObjs->feature(aNameResult);
+  else
+    aNameFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(theNameObject);
+  // iterate all labels with this name to find the nearest just before or equal relative
+  std::list<TDF_Label>::reverse_iterator aLabIter = aFind->second.rbegin();
+  for(; aLabIter != aFind->second.rend(); aLabIter++) {
+    TDF_Label aCurrentLab = *aLabIter;
+    while(aCurrentLab.Depth() > 3)
+      aCurrentLab = aCurrentLab.Father();
+    FeaturePtr aLabFeat = myObjs->feature(aCurrentLab);
+    if (!aLabFeat.get())
+      continue;
+    if (aLabFeat == aStart || myObjs->isLater(aStart, aLabFeat))
+      break;
+  }
+  int aResIndex = 1;
+  for(; aLabIter != aFind->second.rend(); aLabIter++) {
+    TDF_Label aCurrentLab = *aLabIter;
+    while(aCurrentLab.Depth() > 3)
+      aCurrentLab = aCurrentLab.Father();
+    FeaturePtr aLabFeat = myObjs->feature(aCurrentLab);
+    if (!aLabFeat.get())
+      continue;
+    if (aLabFeat == aNameFeature || myObjs->isLater(aNameFeature, aLabFeat))
+      return aResIndex;
+    aResIndex++;
+  }
+  return aResIndex; // strange
+}
+
+ResultPtr Model_Document::findByName(std::string& theName, std::string& theSubShapeName)
+{
+  int aNumInHistory = 0;
+  std::string aName = theName;
+  ResultPtr aRes = myObjs->findByName(aName);
+  while(!aRes.get() && aName[0] == '_') { // this may be thecontext with the history index
+    aNumInHistory++;
+    aName = aName.substr(1);
+    aRes = myObjs->findByName(aName);
+  }
+  if (aNumInHistory) {
+    std::map<std::string, std::list<TDF_Label> >::iterator aFind = myNamingNames.find(aName);
+    if (aFind != myNamingNames.end() && aFind->second.size() > aNumInHistory) {
+      std::list<TDF_Label>::reverse_iterator aLibIt = aFind->second.rbegin();
+      for(; aNumInHistory != 0; aNumInHistory--)
+        aLibIt++;
+      const TDF_Label& aResultLab = *aLibIt;
+      aRes = std::dynamic_pointer_cast<ModelAPI_Result>(myObjs->object(aResultLab.Father()));
+      if (aRes) { // modify the incoming names
+        if (!theSubShapeName.empty())
+          theSubShapeName = theSubShapeName.substr(theName.size() - aName.size());
+        theName = aName;
+      }
+    }
+  }
+  return aRes;
 }
 
 std::list<std::shared_ptr<ModelAPI_Feature> > Model_Document::allFeatures()

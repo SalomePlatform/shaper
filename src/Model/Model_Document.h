@@ -209,10 +209,13 @@ class Model_Document : public ModelAPI_Document
   void changeNamingName(std::string theOldName, const std::string theNewName,
     const TDF_Label& theLabel);
   //! Returns the label, keeper of the name  for the topological naming needs
-  TDF_Label findNamingName(std::string theName);
+  TDF_Label findNamingName(std::string theName, ResultPtr theContext);
+  //! Returns the number of the name in the history relatively to the given object (by label).
+  //! Start from 1 (this object).
+  int numberOfNameInHistory(const ObjectPtr& theNameObject, const TDF_Label& theStartFrom);
   //! Returns the result by name of the result (names of results must be unique, used for naming
   //! selection by name.
-  ResultPtr findByName(const std::string theName);
+  ResultPtr findByName(std::string& theName, std::string& theSubShapeName);
 
   ///! Returns all features of the document including the hidden features which are not in
   ///! history. Not very fast method, for calling once, not in big cycles.
