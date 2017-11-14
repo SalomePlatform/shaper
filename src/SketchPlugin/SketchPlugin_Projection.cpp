@@ -259,7 +259,7 @@ void SketchPlugin_Projection::computeProjection(const std::string& theID)
     if (aResult) {
       aResult->setShape(aProjection->lastResult()->shape());
       setResult(aResult);
-      aProjection->selection(EXTERNAL_ID())->setValue(lastResult(), lastResult()->shape());
+      aProjection->selection(EXTERNAL_ID())->setValue(lastResult(), NULL);
     }
   }
 }
