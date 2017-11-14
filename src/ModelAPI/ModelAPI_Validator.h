@@ -115,6 +115,12 @@ class MODELAPI_EXPORT ModelAPI_ValidatorsFactory
   /// Returns true that it was registered that attribute conceals the referenced result
   virtual bool isConcealed(std::string theFeature, std::string theAttribute) = 0;
 
+  /// Register the attribute as a main argument of the feature
+  virtual void registerMainArgument(std::string theFeature, std::string theAttribute) = 0;
+
+  /// Returns true is the attribute is a main argument of the feature
+  virtual bool isMainArgument(std::string theFeature, std::string theAttribute) = 0;
+
   /// Register the case-attribute: this attribute is checked only if its case is selected
   virtual void registerCase(std::string theFeature, std::string theAttribute,
     const std::list<std::pair<std::string, std::string> >& theCases) = 0;

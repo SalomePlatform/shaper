@@ -658,14 +658,20 @@ std::string getDefaultName(const std::shared_ptr<ModelAPI_Result>& theResult,
   ListOfReferences::const_iterator aFoundRef = aReferences.end();
   for (ListOfReferences::const_iterator aRefIt = aReferences.begin();
        aRefIt != aReferences.end(); ++aRefIt) {
-    if (aSession->validators()->isConcealed(anOwner->getKind(), aRefIt->first)) {
+    bool isConcealed = aSession->validators()->isConcealed(anOwner->getKind(), aRefIt->first);
+    bool isMainArg = isConcealed &&
+                     aSession->validators()->isMainArgument(anOwner->getKind(), aRefIt->first);
+    if (isConcealed) {
       // check the referred object is a Body
       // (for example, ExtrusionCut has a sketch as a first attribute which is concealing)
       bool isBody = aRefIt->second.size() > 1 || (aRefIt->second.size() == 1 &&
                     aRefIt->second.front()->groupName() == ModelAPI_ResultBody::group());
-      if (isBody && (aFoundRef == aReferences.end() ||
+      if (isBody && (isMainArg || aFoundRef == aReferences.end() ||
           aData->isPrecedingAttribute(aRefIt->first, aFoundRef->first)))
         aFoundRef = aRefIt;
+
+      if (isMainArg)
+        break;
     }
   }
 
