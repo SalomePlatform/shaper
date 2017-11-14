@@ -295,8 +295,8 @@ private:
   MODEL_EXPORT virtual void setDisplayed(const bool theDisplay);
 
   /// Returns \c true if theAttribute1 is going earlier than theAttribute2 in the data
-  bool isEarlierAttribute(const std::string& theAttribute1,
-                          const std::string& theAttribute2) const;
+  MODEL_EXPORT virtual bool isPrecedingAttribute(const std::string& theAttribute1,
+                                                 const std::string& theAttribute2) const;
 };
 
 /// Generic method to register back reference, used in referencing attributes.

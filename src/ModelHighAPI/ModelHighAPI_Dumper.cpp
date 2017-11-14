@@ -51,6 +51,7 @@
 #include <ModelAPI_ResultCompSolid.h>
 #include <ModelAPI_ResultConstruction.h>
 #include <ModelAPI_ResultPart.h>
+#include <ModelAPI_Tools.h>
 
 #include <PartSetPlugin_Part.h>
 
@@ -191,29 +192,16 @@ const std::string& ModelHighAPI_Dumper::parentName(const FeaturePtr& theEntity)
 void ModelHighAPI_Dumper::saveResultNames(const FeaturePtr& theFeature)
 {
   // Default name of the feature
-  const std::string& aKind = theFeature->getKind();
-  DocumentPtr aDoc = theFeature->document();
-  int aNbFeatures = myFeatureCount[aDoc][aKind];
-  std::ostringstream aNameStream;
-  aNameStream << aKind << "_" << aNbFeatures;
-  std::string aFeatureName = aNameStream.str();
+  bool isFeatureDefaultName = myNames[theFeature].myIsDefault;
 
   // Save only names of results which is not correspond to default feature name
   const std::list<ResultPtr>& aResults = theFeature->results();
   std::list<ResultPtr>::const_iterator aResIt = aResults.begin();
-  for (int i = 1; aResIt != aResults.end(); ++aResIt, ++i) {
-    bool isUserDefined = true;
+  for (int i = 0; aResIt != aResults.end(); ++aResIt, ++i) {
+    std::string aDefaultName = ModelAPI_Tools::getDefaultName(*aResIt, i);
     std::string aResName = (*aResIt)->data()->name();
-    size_t anIndex = aResName.find(aFeatureName);
-    if (anIndex == 0) {
-      std::string aSuffix = aResName.substr(aFeatureName.length());
-      if (aSuffix.empty() && i == 1) // first result may not constain index in the name
-        isUserDefined = false;
-      else {
-        if (aSuffix[0] == '_' && std::stoi(aSuffix.substr(1)) == i)
-          isUserDefined = false;
-      }
-    }
+
+    bool isUserDefined = !(isFeatureDefaultName && aDefaultName == aResName);
 
     myNames[*aResIt] = EntityName(aResName,
         (isUserDefined ? aResName : std::string()), !isUserDefined);
@@ -223,22 +211,13 @@ void ModelHighAPI_Dumper::saveResultNames(const FeaturePtr& theFeature)
     if (aCompSolid) {
       int aNbSubs = aCompSolid->numberOfSubs();
       for (int j = 0; j < aNbSubs; ++j) {
-        isUserDefined = true;
         ResultPtr aSub = aCompSolid->subResult(j);
         std::string aSubName = aSub->data()->name();
-        size_t anIndex = aSubName.find(aResName);
-        if (anIndex == 0) {
-          std::string aSuffix = aSubName.substr(aResName.length());
-          if (aSuffix.empty() && aNbSubs == 1) // first result may not constain index in the name
-            isUserDefined = false;
-          else {
-            if (aSuffix[0] == '_' && std::stoi(aSuffix.substr(1)) == j + 1)
-              isUserDefined = false;
-          }
-        }
+        aDefaultName = ModelAPI_Tools::getDefaultName(aSub, j);
 
+        bool isUserDefinedSubName = isUserDefined || aDefaultName != aSubName;
         myNames[aSub] = EntityName(aSubName,
-            (isUserDefined ? aSubName : std::string()), !isUserDefined);
+            (isUserDefinedSubName ? aSubName : std::string()), !isUserDefinedSubName);
       }
     }
   }

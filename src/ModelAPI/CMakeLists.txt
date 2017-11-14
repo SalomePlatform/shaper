@@ -176,6 +176,7 @@ ADD_UNIT_TESTS(TestConstants.py
                TestCustomName_CommonCompSolid.py
                TestCustomName_CutCompSolid.py
                TestCustomName_CutGroup.py
+               TestCustomName_DefaultName.py
                TestCustomName_ExtrudeFace.py
                TestCustomName_ExtrusionCut.py
                TestCustomName_MultiTranslation.py

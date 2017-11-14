@@ -754,8 +754,8 @@ std::shared_ptr<ModelAPI_Object> Model_Data::owner()
   return myObject;
 }
 
-bool Model_Data::isEarlierAttribute(const std::string& theAttribute1,
-                                    const std::string& theAttribute2) const
+bool Model_Data::isPrecedingAttribute(const std::string& theAttribute1,
+                                      const std::string& theAttribute2) const
 {
   AttributeMap::const_iterator aFound1 = myAttrs.find(theAttribute1);
   AttributeMap::const_iterator aFound2 = myAttrs.find(theAttribute2);
