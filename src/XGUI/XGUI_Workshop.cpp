@@ -132,8 +132,8 @@
 #ifdef TINSPECTOR
 #include <CDF_Session.hxx>
 #include <CDF_Application.hxx>
-#include <TInspector_Communicator.hxx>
-#include <VInspector_CallBack.hxx>
+#include <inspector/TInspector_Communicator.hxx>
+#include <inspector/VInspector_CallBack.hxx>
 static TInspector_Communicator* MyTCommunicator;
 static Handle(VInspector_CallBack) MyVCallBack;
 

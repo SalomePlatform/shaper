@@ -46,7 +46,7 @@
 #include <SelectMgr_ListIteratorOfListOfFilter.hxx>
 
 #ifdef TINSPECTOR
-#include <VInspectorAPI_CallBack.hxx>
+#include <inspector/VInspectorAPI_CallBack.hxx>
 #endif
 
 XGUI_SelectionMgr::XGUI_SelectionMgr(XGUI_Workshop* theParent)

@@ -74,7 +74,7 @@
 #include <TColStd_MapIteratorOfMapOfTransient.hxx>
 
 #ifdef TINSPECTOR
-#include <VInspectorAPI_CallBack.hxx>
+#include <inspector/VInspectorAPI_CallBack.hxx>
 #endif
 
 #include <Events_Loop.h>
