@@ -165,7 +165,11 @@ Face_1 = model.addFace(Part_1_doc, [model.selection("EDGE", "Sketch_2/Edge-Sketc
 Face_2 = model.addFace(Part_1_doc, [model.selection("EDGE", "Sketch_2/Edge-SketchCircle_3_2"), model.selection("EDGE", "Sketch_1/Edge-SketchCircle_2_2")])
 Face_3 = model.addFace(Part_1_doc, [model.selection("EDGE", "Sketch_2/Edge-SketchCircle_4_2"), model.selection("EDGE", "Sketch_1/Edge-SketchCircle_1_2")])
 Extrusion_2 = model.addExtrusion(Part_1_doc, [model.selection("FACE", "Face_1_1"), model.selection("FACE", "Face_2_1"), model.selection("FACE", "Face_3_1")], model.selection(), 2, 0)
+Extrusion_2.result().setName("Extrusion_2_1")
+Extrusion_2.results()[1].setName("Extrusion_2_2")
+Extrusion_2.results()[2].setName("Extrusion_2_3")
 Boolean_1 = model.addFuse(Part_1_doc, [model.selection("SOLID", "Extrusion_1_1"), model.selection("SOLID", "Extrusion_2_1"), model.selection("SOLID", "Extrusion_2_2"), model.selection("SOLID", "Extrusion_2_3")], [])
+Boolean_1.result().setName("Boolean_1_1")
 model.do()
 
 # Test reexecution after parameter change

@@ -260,7 +260,9 @@ SketchConstraintDistance_17 = Sketch_3.setDistance(SketchLine_26.result(), Sketc
 SketchConstraintLength_4 = Sketch_3.setLength(SketchLine_26.result(), "d7*coeff")
 model.do()
 ExtrusionCut_1 = model.addExtrusionCut(Part_1_doc, [model.selection("FACE", "Sketch_3/Face-SketchLine_24r-SketchLine_26r-SketchLine_27r-SketchLine_28r-SketchLine_29r")], model.selection(), model.selection("FACE", "Extrusion_2_1/Generated_Face_6"), 0, model.selection(), 0, [model.selection("SOLID", "Extrusion_2_1")])
+ExtrusionCut_1.result().setName("ExtrusionCut_1_1")
 ExtrusionCut_2 = model.addExtrusionCut(Part_1_doc, [model.selection("FACE", "Sketch_3/Face-SketchLine_30r-SketchLine_31r-SketchLine_32r-SketchLine_33r")], model.selection(), model.selection("FACE", "Extrusion_1_1/To_Face_1"), 0, model.selection(), 0, [model.selection("SOLID", "ExtrusionCut_1_1")])
+ExtrusionCut_2.result().setName("ExtrusionCut_2_1")
 Plane_5 = model.addPlane(Part_1_doc, model.selection("FACE", "Extrusion_1_1/Generated_Face_19"), "d3*coeff", True)
 Sketch_4 = model.addSketch(Part_1_doc, model.selection("FACE", "Plane_2"))
 SketchProjection_5 = Sketch_4.addProjection(model.selection("EDGE", "Extrusion_1_1/Generated_Face_16&Extrusion_1_1/To_Face_1"))
@@ -315,6 +317,7 @@ SketchConstraintDistance_22 = Sketch_5.setDistance(SketchCircle_1.center(), Sket
 SketchConstraintRadius_7 = Sketch_5.setRadius(SketchCircle_1.results()[1], "r_trou")
 model.do()
 ExtrusionCut_3 = model.addExtrusionCut(Part_1_doc, [model.selection("FACE", "Sketch_5/Face-SketchCircle_1_2f")], model.selection(), model.selection("FACE", "ExtrusionCut_1_1/Modfied_4"), 0, model.selection(), 0, [model.selection("SOLID", "ExtrusionCut_2_1")])
+ExtrusionCut_3.result().setName("ExtrusionCut_3_1")
 Sketch_6 = model.addSketch(Part_1_doc, model.selection("FACE", "Extrusion_1_1/Generated_Face_14"))
 SketchCircle_2 = Sketch_6.addCircle(70, -17.5, 5)
 SketchLine_48 = Sketch_6.addLine(model.selection("EDGE", "Extrusion_1_1/Generated_Face_14&Extrusion_1_1/To_Face_1"))
@@ -328,6 +331,7 @@ SketchConstraintDistance_24 = Sketch_6.setDistance(SketchCircle_2.center(), Sket
 SketchConstraintDistance_24.setName("SketchConstraintDistance_25")
 model.do()
 ExtrusionCut_4 = model.addExtrusionCut(Part_1_doc, [model.selection("FACE", "Sketch_6/Face-SketchCircle_2_2f")], model.selection(), model.selection("FACE", "Extrusion_1_1/Generated_Face_4"), 0, model.selection(), 0, [model.selection("SOLID", "Extrusion_1_1")])
+ExtrusionCut_4.result().setName("ExtrusionCut_4_1")
 Sketch_7 = model.addSketch(Part_1_doc, model.selection("FACE", "Extrusion_1_1/Generated_Face_8"))
 SketchLine_51 = Sketch_7.addLine(110, 21.46600893000899, 110, 7.22841614740048)
 SketchLine_51.setAuxiliary(True)
@@ -373,6 +377,7 @@ SketchConstraintMirror_2 = Sketch_7.addMirror(SketchLine_59.result(), SketchCons
 model.do()
 ExtrusionCut_5 = model.addExtrusionCut(Part_1_doc, [model.selection("WIRE", "Sketch_7/Wire-SketchArc_16_2r-SketchLine_61f-SketchLine_62r"), model.selection("FACE", "Sketch_7/Face-SketchArc_18_2r-SketchLine_65f-SketchLine_66r"), model.selection("FACE", "Sketch_7/Face-SketchArc_17_2r-SketchLine_64r-SketchLine_66r"), model.selection("WIRE", "Sketch_7/Wire-SketchArc_15_2r-SketchLine_54f-SketchLine_55r")], model.selection(), model.selection("FACE", "Extrusion_1_1/Generated_Face_10"), 0, model.selection(), 0, [model.selection("SOLID", "ExtrusionCut_4_1")])
 Boolean_1 = model.addFuse(Part_1_doc, [model.selection("SOLID", "ExtrusionCut_5_1")], [model.selection("SOLID", "Extrusion_3_1"), model.selection("SOLID", "ExtrusionCut_3_1")])
+Boolean_1.result().setName("Boolean_1_1")
 model.do()
 
 from GeomAPI import  GeomAPI_Shape
