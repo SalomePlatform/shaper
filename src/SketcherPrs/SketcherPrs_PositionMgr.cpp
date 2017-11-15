@@ -37,9 +37,9 @@
 #include <SketchPlugin_ConstraintTangent.h>
 #include <SketchPlugin_ConstraintPerpendicular.h>
 
-#include <BRepExtrema_ExtPC.hxx>
 #include <TopoDS_Vertex.hxx>
 #include <Geom_Curve.hxx>
+#include <GeomAPI_ProjectPointOnCurve.hxx>
 #include <TColGeom_SequenceOfCurve.hxx>
 #include <gp_Dir.hxx>
 
@@ -202,22 +202,11 @@ gp_Vec getVector(ObjectPtr theShape, GeomDirPtr theDir, gp_Pnt theP)
       std::shared_ptr<GeomAPI_Curve>(new GeomAPI_Curve(aShape));
 
     if (aCurve->isCircle()) {
-      GeomEdgePtr aEdgePtr(new GeomAPI_Edge(aShape));
-      GeomVertexPtr aVertexPtr(new GeomAPI_Vertex(theP.X(), theP.Y(), theP.Z()));
-      BRepExtrema_ExtPC aExtrema(aVertexPtr->impl<TopoDS_Vertex>(),
-                                 aEdgePtr->impl<TopoDS_Edge>());
-      int aNb = aExtrema.NbExt();
-      if (aNb > 0) {
-        for (int i = 1; i <= aNb; i++) {
-          if (aExtrema.IsMin(i)) {
-            double aParam = aExtrema.Parameter(i);
-            Handle(Geom_Curve) aCurv = aCurve->impl<Handle_Geom_Curve>();
-            gp_Pnt aP;
-            aCurv->D1(aParam, aP, aVec);
-            break;
-          }
-        }
-      }
+      Handle(Geom_Curve) aCurv = aCurve->impl<Handle_Geom_Curve>();
+      GeomAPI_ProjectPointOnCurve anExtr(theP, aCurv);
+      double aParam = anExtr.LowerDistanceParameter();
+      gp_Pnt aP;
+      aCurv->D1(aParam, aP, aVec);
     } else {
       GeomPointPtr aPnt1 = aCurve->getPoint(aCurve->endParam());
       GeomPointPtr aPnt2 = aCurve->getPoint(aCurve->startParam());
