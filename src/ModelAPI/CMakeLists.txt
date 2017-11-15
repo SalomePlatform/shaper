@@ -179,6 +179,7 @@ ADD_UNIT_TESTS(TestConstants.py
                TestCustomName_DefaultName.py
                TestCustomName_ExtrudeFace.py
                TestCustomName_ExtrusionCut.py
+               TestCustomName_ExtrusionCutFace.py
                TestCustomName_MultiTranslation.py
                TestCustomName_Partition.py
                TestCustomName_Placement.py
