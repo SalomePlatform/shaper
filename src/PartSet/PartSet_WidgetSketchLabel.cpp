@@ -278,7 +278,20 @@ void PartSet_WidgetSketchLabel::updateByPlaneSelected(const ModuleBase_ViewerPrs
   PartSet_Module* aModule = dynamic_cast<PartSet_Module*>(myWorkshop->module());
   if (aModule) {
     CompositeFeaturePtr aSketch = std::dynamic_pointer_cast<ModelAPI_CompositeFeature>(myFeature);
+    bool isSetSizeOfView = false;
+    double aSizeOfView = 0;
+    QString aSizeOfViewStr = mySizeOfView->text();
+    if (!aSizeOfViewStr.isEmpty()) {
+      aSizeOfView = aSizeOfViewStr.toDouble(&isSetSizeOfView);
+      if (isSetSizeOfView && aSizeOfView <= 0) {
+        isSetSizeOfView = false;
+      }
+    }
+    if (isSetSizeOfView)
+      aModule->sketchMgr()->previewSketchPlane()->setSizeOfView(aSizeOfView, true);
     aModule->sketchMgr()->previewSketchPlane()->createSketchPlane(aSketch, myWorkshop);
+    if (isSetSizeOfView)
+      aModule->sketchMgr()->previewSketchPlane()->setSizeOfView(aSizeOfView, false);
   }
   // 2. if the planes were displayed, change the view projection
   const GeomShapePtr& aShape = thePrs->shape();
@@ -333,20 +346,6 @@ void PartSet_WidgetSketchLabel::updateByPlaneSelected(const ModuleBase_ViewerPrs
     bool aRotate = Config_PropManager::boolean(SKETCH_TAB_NAME, "rotate_to_plane");
     if (aRotate) {
       myWorkshop->viewer()->setViewProjection(aXYZ.X(), aXYZ.Y(), aXYZ.Z(), aTwist);
-    }
-    QString aSizeOfViewStr = mySizeOfView->text();
-    if (!aSizeOfViewStr.isEmpty()) {
-      bool isOk;
-      double aSizeOfView = aSizeOfViewStr.toDouble(&isOk);
-      if (isOk && aSizeOfView > 0) {
-        Handle(V3d_View) aView3d = myWorkshop->viewer()->activeView();
-        if (!aView3d.IsNull()) {
-          Bnd_Box aBndBox;
-          double aHalfSize = aSizeOfView/2.0;
-          aBndBox.Update(-aHalfSize, -aHalfSize, -aHalfSize, aHalfSize, aHalfSize, aHalfSize);
-          aView3d->FitAll(aBndBox, 0.01, false);
-        }
-      }
     }
     PartSet_Module* aModule = dynamic_cast<PartSet_Module*>(myWorkshop->module());
     if (aModule)

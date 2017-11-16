@@ -41,7 +41,7 @@
 #include <SketchPlugin_SketchEntity.h>
 
 PartSet_PreviewSketchPlane::PartSet_PreviewSketchPlane()
- : myPreviewIsDisplayed(false)
+ : myPreviewIsDisplayed(false), mySizeOfView(0), myIsUseSizeOfView(false)
 {
 }
 
@@ -88,8 +88,10 @@ void PartSet_PreviewSketchPlane::createSketchPlane(const CompositeFeaturePtr& th
           theSketch->data()->attribute(SketchPlugin_Sketch::ORIGIN_ID()));
       std::shared_ptr<GeomDataAPI_Dir> aNormal = std::dynamic_pointer_cast<GeomDataAPI_Dir>(
           theSketch->data()->attribute(SketchPlugin_Sketch::NORM_ID()));
-      myShape = GeomAlgoAPI_FaceBuilder::squareFace(anOrigin->pnt(), aNormal->dir(),
-        Config_PropManager::integer(SKETCH_TAB_NAME, "planes_size"));
+
+      double aFaceSize = myIsUseSizeOfView ? mySizeOfView
+        : Config_PropManager::integer(SKETCH_TAB_NAME, "planes_size");
+      myShape = GeomAlgoAPI_FaceBuilder::squareFace(anOrigin->pnt(), aNormal->dir(), aFaceSize);
     }
     myPlane = createPreviewPlane();
   }
@@ -97,6 +99,12 @@ void PartSet_PreviewSketchPlane::createSketchPlane(const CompositeFeaturePtr& th
   XGUI_Displayer* aDisp = XGUI_Tools::workshop(theWorkshop)->displayer();
   aDisp->displayAIS(myPlane, true, 1/*shaded*/, false);
   myPreviewIsDisplayed = true;
+}
+
+void PartSet_PreviewSketchPlane::setSizeOfView(double theSizeOfView, bool isUseSizeOfView)
+{
+  mySizeOfView = theSizeOfView;
+  myIsUseSizeOfView = isUseSizeOfView;
 }
 
 AISObjectPtr PartSet_PreviewSketchPlane::createPreviewPlane()

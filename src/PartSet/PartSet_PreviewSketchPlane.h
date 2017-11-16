@@ -53,6 +53,15 @@ public:
   void createSketchPlane(const std::shared_ptr<ModelAPI_CompositeFeature>& theSketch,
                          ModuleBase_IWorkshop* theWorkshop);
 
+  /// Returns whether custom size of view is set
+  /// \return boolean value
+  bool isUseSizeOfView() const { return myIsUseSizeOfView; }
+
+  /// Sets the size of default created face
+  /// \param theSizeOfView value
+  /// \param isUseSizeOfView state whether the size should be used
+  void setSizeOfView(double theSizeOfView, bool isUseSizeOfView);
+
 private:
   /// Create a square face by parameters
   std::shared_ptr<GeomAPI_AISObject> createPreviewPlane();
@@ -61,6 +70,9 @@ private:
   bool myPreviewIsDisplayed;
   std::shared_ptr<GeomAPI_AISObject> myPlane; //! visualized presentation
   std::shared_ptr<GeomAPI_Shape> myShape; //! current shape to be displayed
+
+  double mySizeOfView; //! size that should be used by creating a default face
+  bool myIsUseSizeOfView; //! state if the size is custom or from preferences
 };
 
 #endif

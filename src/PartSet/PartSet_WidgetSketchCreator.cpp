@@ -195,6 +195,10 @@ bool PartSet_WidgetSketchCreator::isValidSelectionCustom(const ModuleBase_Viewer
 
 void PartSet_WidgetSketchCreator::activateSelectionControl()
 {
+  // reset previously set size of view needed on restart extrusion after Sketch
+  if (myModule->sketchMgr()->previewSketchPlane()->isUseSizeOfView())
+    myModule->sketchMgr()->previewSketchPlane()->setSizeOfView(0, false);
+
   // we need to call activate here as the widget has no focus accepted controls
   // if these controls are added here, activate will happens automatically after focusIn()
   XGUI_Workshop* aWorkshop = XGUI_Tools::workshop(myModule->workshop());
@@ -359,20 +363,18 @@ bool PartSet_WidgetSketchCreator::startSketchOperation(
   // Set View size if a plane is selected
   if (myPreviewPlanes->isPreviewDisplayed() &&
       myPreviewPlanes->isPreviewShape(aValue->shape())) {
+    // set default plane size
+    bool isSetSizeOfView = false;
+    double aSizeOfView = 0;
     QString aSizeOfViewStr = mySizeOfView->text();
     if (!aSizeOfViewStr.isEmpty()) {
-      bool isOk;
-      double aSizeOfView = aSizeOfViewStr.toDouble(&isOk);
-      if (isOk && aSizeOfView > 0) {
-        Handle(V3d_View) aView3d = myWorkshop->viewer()->activeView();
-        if (!aView3d.IsNull()) {
-          Bnd_Box aBndBox;
-          double aHalfSize = aSizeOfView/2.0;
-          aBndBox.Update(-aHalfSize, -aHalfSize, -aHalfSize, aHalfSize, aHalfSize, aHalfSize);
-          aView3d->FitAll(aBndBox, 0.01, false);
-        }
+      aSizeOfView = aSizeOfViewStr.toDouble(&isSetSizeOfView);
+      if (isSetSizeOfView && aSizeOfView <= 0) {
+        isSetSizeOfView = false;
       }
     }
+    if (isSetSizeOfView)
+      myModule->sketchMgr()->previewSketchPlane()->setSizeOfView(aSizeOfView, true);
   }
   // manually deactivation because the widget was not activated as has no focus acceptin controls
   deactivate();
