@@ -243,7 +243,13 @@ void SketcherPrs_Angle::Compute(const Handle(PrsMgr_PresentationManager3d)& theP
     (myConstraint->data()->attribute(SketchPlugin_ConstraintAngle::LOCATION_TYPE_ID()));
   SketcherPrs_Tools::LocationType aLocationType = aLocAttr->isInitialized() ?
     (SketcherPrs_Tools::LocationType)(aLocAttr->value()) : SketcherPrs_Tools::LOCATION_AUTOMATIC;
-  updateArrows(myAspect, GetValue(), aTextSize, aLocationType);
+
+  double aRadius = myCenterPoint.Translated(
+    gp_Vec(myCenterPoint, myFirstPoint).Normalized()*aDist).Distance(myCenterPoint);
+  double anAngleValue = myValue.myDoubleValue;
+  double anAngleCircleLength = aRadius * anAngleValue * PI / 180.;
+
+  updateArrows(myAspect, anAngleCircleLength, aTextSize, aLocationType);
 
   AIS_AngleDimension::Compute(thePresentationManager, thePresentation, theMode);
 
