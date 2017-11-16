@@ -75,9 +75,13 @@ void PartSet_PreviewSketchPlane::createSketchPlane(const CompositeFeaturePtr& th
     // selected linear face parameters
     AttributeSelectionPtr aSelAttr = std::dynamic_pointer_cast<ModelAPI_AttributeSelection>
       (theSketch->data()->attribute(SketchPlugin_SketchEntity::EXTERNAL_ID()));
-    if (aSelAttr)
+    if (aSelAttr) {
       myShape = aSelAttr->value();
-
+      // this case is needed by constructing sketch on a plane, where result shape is equal
+      // to context result, therefore value() returns NULL and we should use shape of context.
+      if (!myShape.get() && aSelAttr->context().get())
+        myShape = aSelAttr->context()->shape();
+    }
     if (!myShape.get()) {
       // Create Preview for default planes
       std::shared_ptr<GeomDataAPI_Point> anOrigin = std::dynamic_pointer_cast<GeomDataAPI_Point>(
