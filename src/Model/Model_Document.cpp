@@ -1271,10 +1271,22 @@ Standard_Boolean IsEqual(const TDF_Label& theLab1, const TDF_Label& theLab2)
   return TDF_LabelMapHasher::IsEqual(theLab1, theLab2);
 }
 
+// searches in this document feature that contains this label
+FeaturePtr Model_Document::featureByLab(const TDF_Label& theLab) {
+  TDF_Label aCurrentLab = theLab;
+  while(aCurrentLab.Depth() > 3)
+    aCurrentLab = aCurrentLab.Father();
+  return myObjs->feature(aCurrentLab);
+}
+
 void Model_Document::addNamingName(const TDF_Label theLabel, std::string theName)
 {
   std::map<std::string, std::list<TDF_Label> >::iterator aFind = myNamingNames.find(theName);
+
   if (aFind != myNamingNames.end()) { // to avoid duplicate-labels
+    // to keep correct order inspite of history line management
+    std::list<TDF_Label>::iterator anAddAfterThis = aFind->second.end();
+    FeaturePtr anAddedFeature = featureByLab(theLabel);
     std::list<TDF_Label>::iterator aLabIter = aFind->second.begin();
     while(aLabIter != aFind->second.end()) {
       if (theLabel.IsEqual(*aLabIter)) {
@@ -1282,7 +1294,19 @@ void Model_Document::addNamingName(const TDF_Label theLabel, std::string theName
         aLabIter++;
         aFind->second.erase(aTmpIter);
       } else {
+        FeaturePtr aCurFeature = featureByLab(*aLabIter);
+        if (aCurFeature.get() && anAddedFeature.get() &&
+            myObjs->isLater(anAddedFeature, aCurFeature))
+          anAddAfterThis = aLabIter;
+
         aLabIter++;
+      }
+    }
+    if (anAddAfterThis != aFind->second.end()) {
+      anAddAfterThis++;
+      if (anAddAfterThis != aFind->second.end()) {
+        myNamingNames[theName].insert(anAddAfterThis, theLabel); // inserts before anAddAfterThis
+        return;
       }
     }
   }
@@ -1366,6 +1390,30 @@ TDF_Label Model_Document::findNamingName(std::string theName, ResultPtr theConte
   return TDF_Label(); // not found
 }
 
+bool Model_Document::isLaterByDep(FeaturePtr theThis, FeaturePtr theOther) {
+  // check dependencies first: if theOther depends on theThis, theThis is not later
+  std::list<std::pair<std::string, std::list<std::shared_ptr<ModelAPI_Object> > > > aRefs;
+  theOther->data()->referencesToObjects(aRefs);
+  std::list<std::pair<std::string, std::list<std::shared_ptr<ModelAPI_Object> > > >::iterator
+    aRefIt = aRefs.begin();
+  for(; aRefIt != aRefs.end(); aRefIt++) {
+    std::list<ObjectPtr>::iterator aRefObjIt = aRefIt->second.begin();
+    for(; aRefObjIt != aRefIt->second.end(); aRefObjIt++) {
+      ObjectPtr aRefObj = *aRefObjIt;
+      if (aRefObj.get()) {
+        FeaturePtr aRefFeat = std::dynamic_pointer_cast<ModelAPI_Feature>(aRefObj);
+        if (!aRefFeat.get()) { // take feature of the result
+          aRefFeat = feature(std::dynamic_pointer_cast<ModelAPI_Result>(aRefObj));
+        }
+        if (aRefFeat.get() && aRefFeat == theThis) {
+          return false; // other references to this, so this later than other
+        }
+      }
+    }
+  }
+  return myObjs->isLater(theThis, theOther);
+}
+
 int Model_Document::numberOfNameInHistory(
   const ObjectPtr& theNameObject, const TDF_Label& theStartFrom)
 {
@@ -1388,35 +1436,31 @@ int Model_Document::numberOfNameInHistory(
   // iterate all labels with this name to find the nearest just before or equal relative
   std::list<TDF_Label>::reverse_iterator aLabIter = aFind->second.rbegin();
   for(; aLabIter != aFind->second.rend(); aLabIter++) {
-    TDF_Label aCurrentLab = *aLabIter;
-    while(aCurrentLab.Depth() > 3)
-      aCurrentLab = aCurrentLab.Father();
-    FeaturePtr aLabFeat = myObjs->feature(aCurrentLab);
+    FeaturePtr aLabFeat = featureByLab(*aLabIter);
     if (!aLabFeat.get())
       continue;
-    if (aLabFeat == aStart || myObjs->isLater(aStart, aLabFeat))
+    if (isLaterByDep(aStart, aLabFeat)) // skip also start: its result don't used
       break;
   }
   int aResIndex = 1;
   for(; aLabIter != aFind->second.rend(); aLabIter++) {
-    TDF_Label aCurrentLab = *aLabIter;
-    while(aCurrentLab.Depth() > 3)
-      aCurrentLab = aCurrentLab.Father();
-    FeaturePtr aLabFeat = myObjs->feature(aCurrentLab);
+    FeaturePtr aLabFeat = featureByLab(*aLabIter);
     if (!aLabFeat.get())
       continue;
-    if (aLabFeat == aNameFeature || myObjs->isLater(aNameFeature, aLabFeat))
+    if (aLabFeat == aNameFeature || isLaterByDep(aNameFeature, aLabFeat))
       return aResIndex;
     aResIndex++;
   }
   return aResIndex; // strange
 }
 
-ResultPtr Model_Document::findByName(std::string& theName, std::string& theSubShapeName)
+ResultPtr Model_Document::findByName(
+  std::string& theName, std::string& theSubShapeName, bool& theUniqueContext)
 {
   int aNumInHistory = 0;
   std::string aName = theName;
   ResultPtr aRes = myObjs->findByName(aName);
+  theUniqueContext = !(aRes.get() && myNamingNames.find(aName) != myNamingNames.end());
   while(!aRes.get() && aName[0] == '_') { // this may be thecontext with the history index
     aNumInHistory++;
     aName = aName.substr(1);

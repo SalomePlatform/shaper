@@ -79,7 +79,7 @@ model.do()
 #=========================================================================
 # Make a cylindrical hole using one of the produced faces
 #=========================================================================
-ExtrusionCut_2 = model.addExtrusionCut(Part_1_doc, [], model.selection(), model.selection(), 0, model.selection("FACE", "__Extrusion_1_1/Generated_Face_2"), 0, [model.selection("SOLID", "Extrusion_1_1")])
+ExtrusionCut_2 = model.addExtrusionCut(Part_1_doc, [], model.selection(), model.selection(), 0, model.selection("FACE", "_Extrusion_1_1/Generated_Face_2"), 0, [model.selection("SOLID", "Extrusion_1_1")])
 Sketch_3 = model.addSketch(Part_1_doc, model.selection("FACE", "Extrusion_1_1/Modfied_4"))
 SketchCircle_1 = Sketch_3.addCircle(143.412751420315, -228.52745656314, 32.158435160764)
 ExtrusionCut_2.setNestedSketch(Sketch_3)
@@ -125,6 +125,6 @@ import ModelAPI
 
 assert(ModelAPI.ModelAPI_Session.get().validators().validate(Sketch_4.feature()))
 assert(ModelAPI.ModelAPI_Session.get().validators().validate(ExtrusionCut_2.feature()))
-assert(Sketch_3.feature().selection("External").namingName() == "ExtrusionCut_3_1/Modfied_6")
+assert(Sketch_3.feature().selection("External").namingName() == "Extrusion_1_1/Modfied_6")
 
 assert(model.checkPythonDump())

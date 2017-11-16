@@ -1222,6 +1222,8 @@ void Model_Objects::updateResults(FeaturePtr theFeature, std::set<FeaturePtr>& t
 
 ResultPtr Model_Objects::findByName(const std::string theName)
 {
+  ResultPtr aResult;
+  FeaturePtr aResFeature; // keep feature to return the latest one
   NCollection_DataMap<TDF_Label, FeaturePtr>::Iterator anObjIter(myFeatures);
   for(; anObjIter.More(); anObjIter.Next()) {
     FeaturePtr& aFeature = anObjIter.ChangeValue();
@@ -1233,13 +1235,16 @@ ResultPtr Model_Objects::findByName(const std::string theName)
     for (; aRIter != allResults.cend(); aRIter++) {
       ResultPtr aRes = *aRIter;
       if (aRes.get() && aRes->data() && aRes->data()->isValid() && !aRes->isDisabled() &&
-          aRes->data()->name() == theName) {
-        return aRes;
+          aRes->data()->name() == theName)
+      {
+        if (!aResult.get() || isLater(aFeature, aResFeature)) { // select the latest
+          aResult = aRes;
+          aResFeature = aFeature;
+        }
       }
     }
   }
-  // not found
-  return ResultPtr();
+  return aResult;
 }
 
 FeaturePtr Model_Objects::nextFeature(FeaturePtr theCurrent, const bool theReverse)
