@@ -90,14 +90,15 @@
 #include <XGUI_SelectionMgr.h>
 #include <XGUI_ActionsMgr.h>
 
-#include <SketchPlugin_Feature.h>
-#include <SketchPlugin_Sketch.h>
 #include <SketchPlugin_ConstraintAngle.h>
 #include <SketchPlugin_ConstraintLength.h>
 #include <SketchPlugin_ConstraintDistance.h>
 #include <SketchPlugin_ConstraintParallel.h>
 #include <SketchPlugin_ConstraintPerpendicular.h>
 #include <SketchPlugin_ConstraintRadius.h>
+#include <SketchPlugin_Feature.h>
+#include <SketchPlugin_Projection.h>
+#include <SketchPlugin_Sketch.h>
 
 #include <SketcherPrs_SymbolPrs.h>
 #include <SketcherPrs_Coincident.h>
@@ -934,15 +935,21 @@ void PartSet_Module::onObjectDisplayed(ObjectPtr theObject, AISObjectPtr theAIS)
 {
   Handle(AIS_InteractiveObject) anAIS = theAIS->impl<Handle(AIS_InteractiveObject)>();
   if (!anAIS.IsNull()) {
+    bool aToUseZLayer = false;
+    FeaturePtr aFeature = ModelAPI_Feature::feature(theObject);
+    if (aFeature.get() && PartSet_Tools::findRefsToMeFeature(aFeature,
+                                                        SketchPlugin_Projection::ID()))
+      aToUseZLayer = true;
     Handle(AIS_InteractiveContext) aCtx = anAIS->GetContext();
     Handle(AIS_Dimension) aDim = Handle(AIS_Dimension)::DownCast(anAIS);
     if (!aDim.IsNull()) {
-      aCtx->SetZLayer(aDim, myVisualLayerId);
+      aToUseZLayer = true;
     } else {
       Handle(SketcherPrs_SymbolPrs) aCons = Handle(SketcherPrs_SymbolPrs)::DownCast(anAIS);
       if (!aCons.IsNull())
-        aCtx->SetZLayer(aCons, myVisualLayerId);
+      aToUseZLayer = true;
     }
+    aCtx->SetZLayer(anAIS, myVisualLayerId);
   }
 }
 
