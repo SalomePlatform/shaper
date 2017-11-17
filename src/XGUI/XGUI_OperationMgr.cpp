@@ -59,7 +59,7 @@ public:
   /// \param theParent the parent to be deleted when the parent is deleted
   /// \param theOperationMgr the class to perform deletion
   XGUI_ShortCutListener(QObject* theParent, XGUI_OperationMgr* theOperationMgr)
-    : QObject(theParent), myOperationMgr(theOperationMgr)
+    : QObject(theParent), myOperationMgr(theOperationMgr), myIsActive(false)
   {
     qApp->installEventFilter(this);
   }
