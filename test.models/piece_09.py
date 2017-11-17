@@ -376,6 +376,7 @@ SketchConstraintMirror_2 = Sketch_7.addMirror(SketchLine_59.result(), SketchCons
 [SketchArc_17, SketchLine_63, SketchLine_64, SketchArc_18, SketchLine_65, SketchLine_66] = SketchConstraintMirror_2.mirrored()
 model.do()
 ExtrusionCut_5 = model.addExtrusionCut(Part_1_doc, [model.selection("WIRE", "Sketch_7/Wire-SketchArc_16_2r-SketchLine_61f-SketchLine_62r"), model.selection("FACE", "Sketch_7/Face-SketchArc_18_2r-SketchLine_65f-SketchLine_66r"), model.selection("FACE", "Sketch_7/Face-SketchArc_17_2r-SketchLine_64r-SketchLine_66r"), model.selection("WIRE", "Sketch_7/Wire-SketchArc_15_2r-SketchLine_54f-SketchLine_55r")], model.selection(), model.selection("FACE", "Extrusion_1_1/Generated_Face_10"), 0, model.selection(), 0, [model.selection("SOLID", "ExtrusionCut_4_1")])
+ExtrusionCut_5.result().setName("ExtrusionCut_5_1")
 Boolean_1 = model.addFuse(Part_1_doc, [model.selection("SOLID", "ExtrusionCut_5_1")], [model.selection("SOLID", "Extrusion_3_1"), model.selection("SOLID", "ExtrusionCut_3_1")])
 Boolean_1.result().setName("Boolean_1_1")
 model.do()
