@@ -24,25 +24,23 @@ model.begin()
 partSet = model.moduleDocument()
 Part_1 = model.addPart(partSet)
 Part_1_doc = Part_1.document()
-Sketch_1 = model.addSketch(Part_1_doc, model.defaultPlane("YOZ"))
-SketchCircle_1 = Sketch_1.addCircle(-150, 80, 100)
+Cylinder_1 = model.addCylinder(Part_1_doc, model.selection("VERTEX", "PartSet/Origin"), model.selection("EDGE", "PartSet/OZ"), 5, 10)
+Cylinder_1.result().setName("cylinder")
+Box_1 = model.addBox(Part_1_doc, 10, 10, 10)
+Box_1.result().setName("box")
+Partition_1 = model.addPartition(Part_1_doc, [model.selection("SOLID", "box"), model.selection("SOLID", "cylinder")])
 model.do()
-Face_1 = model.addFace(Part_1_doc, [model.selection("EDGE", "Sketch_1/Edge-SketchCircle_1_2")])
-Revolution_1 = model.addRevolution(Part_1_doc, [model.selection("FACE", "Face_1_1")], model.selection("EDGE", "PartSet/OZ"), 360, 0)
-Group_1 = model.addGroup(Part_1_doc, [model.selection("EDGE", "Face_1_1/Base_Edge_1")])
-Group_2 = model.addGroup(Part_1_doc, [model.selection("EDGE", "Face_1_1/Lateral_Edge_1")])
-Group_3 = model.addGroup(Part_1_doc, [model.selection("VERTEX", "Face_1_1/Lateral_Edge_1&Face_1_1/Base_Edge_1")])
-model.end()
 
-# check that resulting group selection is valid
-from ModelAPI import *
-aFactory = ModelAPI_Session.get().validators()
-for aGroupIter in [Group_1, Group_2, Group_3]:
-  assert(aFactory.validate(aGroupIter.feature()))
-  assert(aGroupIter.groupList().size() == 1)
-  if aGroupIter == Group_3:
-    assert(aGroupIter.groupList().value(0).value().shapeTypeStr() == "VERTEX")
-  else:
-    assert(aGroupIter.groupList().value(0).value().shapeTypeStr() == "EDGE")
+PartitionResult = Partition_1.result()
+PartitionResultName = PartitionResult.name()
+assert(PartitionResultName == Box_1.result().name()), "Partition name '{}' != '{}'".format(PartitionResultName, Box_1.result().name())
+# check sub-result names
+PartitionName = Partition_1.name() + "_1"
+for i in range(0, PartitionResult.numberOfSubs()):
+  refName = PartitionName + '_' + str(i + 1)
+  subResult = PartitionResult.subResult(i)
+  assert(subResult.name() == refName), "Partition sub-result {} name '{}' != '{}'".format(i, subResult.name(), refName)
+
+model.end()
 
 assert(model.checkPythonDump())

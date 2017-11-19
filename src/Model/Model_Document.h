@@ -215,7 +215,7 @@ class Model_Document : public ModelAPI_Document
   int numberOfNameInHistory(const ObjectPtr& theNameObject, const TDF_Label& theStartFrom);
   //! Returns the result by name of the result (names of results must be unique, used for naming
   //! selection by name.
-  ResultPtr findByName(std::string& theName, std::string& theSubShapeName);
+  ResultPtr findByName(std::string& theName, std::string& theSubShapeName, bool& theUniqueContext);
 
   ///! Returns all features of the document including the hidden features which are not in
   ///! history. Not very fast method, for calling once, not in big cycles.
@@ -312,6 +312,12 @@ class Model_Document : public ModelAPI_Document
 
   /// Label that constains structures for selection of constructions of another document
   TDF_Label extConstructionsLabel() const;
+
+  /// searches in this document feature that contains this label
+  FeaturePtr featureByLab(const TDF_Label& theLab);
+
+  /// returns true if theThis is later in the features trre and dependencies than theOther
+  bool isLaterByDep(FeaturePtr theThis, FeaturePtr theOther);
 
   friend class Model_Application;
   friend class Model_Session;

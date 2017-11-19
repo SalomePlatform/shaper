@@ -172,4 +172,19 @@ ADD_UNIT_TESTS(TestConstants.py
                Test2241.py
                Test2252.py
                Test2276.py
+               TestCustomName_BooleanCut.py
+               TestCustomName_CommonCompSolid.py
+               TestCustomName_CutCompSolid.py
+               TestCustomName_CutGroup.py
+               TestCustomName_DefaultName.py
+               TestCustomName_ExtrudeFace.py
+               TestCustomName_ExtrusionCut.py
+               TestCustomName_ExtrusionCutFace.py
+               TestCustomName_MultiTranslation.py
+               TestCustomName_Partition.py
+               TestCustomName_Placement.py
+               TestCustomName_Recover.py
+               TestCustomName_Rename.py
+               TestCustomName_RotateGroup.py
+               TestCustomName_Translation.py
 )

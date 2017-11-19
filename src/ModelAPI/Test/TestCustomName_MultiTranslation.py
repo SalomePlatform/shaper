@@ -18,28 +18,31 @@
 ## email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com>
 ##
 
-# Test that removed vertex, selected in the group makes group with one invalid element (empty shape)
-
 from salome.shaper import model
 from ModelAPI import *
+
+NB_COPIES = 3
 
 model.begin()
 partSet = model.moduleDocument()
 Part_1 = model.addPart(partSet)
 Part_1_doc = Part_1.document()
-Box_1 = model.addBox(Part_1_doc, 10, 10, 20)
-Plane_4 = model.addPlane(Part_1_doc, model.selection("VERTEX", "Box_1_1/Back&Box_1_1/Right&Box_1_1/Top"), model.selection("VERTEX", "Box_1_1/Front&Box_1_1/Left&Box_1_1/Top"), model.selection("VERTEX", "Box_1_1/Back&Box_1_1/Left&Box_1_1/Bottom"))
-Group_1 = model.addGroup(Part_1_doc, [model.selection("VERTEX", "Box_1_1/Back&Box_1_1/Left&Box_1_1/Top")])
-Partition_1 = model.addPartition(Part_1_doc, [model.selection("SOLID", "Box_1_1"), model.selection("FACE", "Plane_1")])
-Remove_SubShapes_1 = model.addRemoveSubShapes(Part_1_doc, model.selection("COMPSOLID", "Box_1_1"))
-Remove_SubShapes_1.setSubShapesToKeep([model.selection("SOLID", "Partition_1_1_2")])
+Cylinder_1 = model.addCylinder(Part_1_doc, model.selection("VERTEX", "PartSet/Origin"), model.selection("EDGE", "PartSet/OZ"), 5, 10)
+Cylinder_1.result().setName("cylinder")
+MultiTranslation_1 = model.addMultiTranslation(Part_1_doc, [model.selection("SOLID", "cylinder")], model.selection("EDGE", "cylinder/Face_1"), 10, NB_COPIES)
 model.do()
-# move group
-Part_1_doc.moveFeature(Group_1.feature(), Remove_SubShapes_1.feature())
+
+TransResult = MultiTranslation_1.result()
+TransResultName = TransResult.name()
+assert(TransResultName == Cylinder_1.result().name()), "MultiTranslation name '{}' != '{}'".format(TransResultName, Cylinder_1.result().name())
+# check sub-result names
+assert(NB_COPIES == TransResult.numberOfSubs()), "Number of results {} is not equal to reference {}".format(TransResult.numberOfSubs(), NB_COPIES)
+MultiTranslationName = MultiTranslation_1.name() + "_1"
+for i in range(0, NB_COPIES):
+  refName = MultiTranslationName + '_' + str(i + 1)
+  subResult = TransResult.subResult(i)
+  assert(subResult.name() == refName), "MultiTranslation sub-result {} name '{}' != '{}'".format(i, subResult.name(), refName)
+
 model.end()
 
-# Check group
-aFactory = ModelAPI_Session.get().validators()
-selectionList = Group_1.feature().selectionList("group_list")
-assert(selectionList.size() == 1)
-assert(aFactory.validate(Group_1.feature()) == False)
+assert(model.checkPythonDump())

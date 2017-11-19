@@ -211,11 +211,13 @@ b1 = vertical_body()
 b2 = bottom_body()
 
 boolean = model.addFuse(part, b1.results() + b2.results())
+boolean.result().setName("Boolean_1_1")
 model.do()
 
 b3 = body_3()
 
 boolean = model.addFuse(part, boolean.results() + b3.results())
+boolean.result().setName("Boolean_2_1")
 model.do()
 
 # START DEBUG PURPOSES

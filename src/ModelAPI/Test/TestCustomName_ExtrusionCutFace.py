@@ -24,25 +24,18 @@ model.begin()
 partSet = model.moduleDocument()
 Part_1 = model.addPart(partSet)
 Part_1_doc = Part_1.document()
-Sketch_1 = model.addSketch(Part_1_doc, model.defaultPlane("YOZ"))
-SketchCircle_1 = Sketch_1.addCircle(-150, 80, 100)
+Box_1 = model.addBox(Part_1_doc, 10, 10, 10)
+Box_1.result().setName("box")
+Sketch_1 = model.addSketch(Part_1_doc, model.selection("FACE", "box/Front"))
+SketchCircle_1 = Sketch_1.addCircle(7, 6, 2)
 model.do()
 Face_1 = model.addFace(Part_1_doc, [model.selection("EDGE", "Sketch_1/Edge-SketchCircle_1_2")])
-Revolution_1 = model.addRevolution(Part_1_doc, [model.selection("FACE", "Face_1_1")], model.selection("EDGE", "PartSet/OZ"), 360, 0)
-Group_1 = model.addGroup(Part_1_doc, [model.selection("EDGE", "Face_1_1/Base_Edge_1")])
-Group_2 = model.addGroup(Part_1_doc, [model.selection("EDGE", "Face_1_1/Lateral_Edge_1")])
-Group_3 = model.addGroup(Part_1_doc, [model.selection("VERTEX", "Face_1_1/Lateral_Edge_1&Face_1_1/Base_Edge_1")])
-model.end()
+Face_1.result().setName("circle")
+ExtrusionCut_1 = model.addExtrusionCut(Part_1_doc, [model.selection("FACE", "circle")], model.selection(), 0, 3, [model.selection("SOLID", "box")])
+model.do()
 
-# check that resulting group selection is valid
-from ModelAPI import *
-aFactory = ModelAPI_Session.get().validators()
-for aGroupIter in [Group_1, Group_2, Group_3]:
-  assert(aFactory.validate(aGroupIter.feature()))
-  assert(aGroupIter.groupList().size() == 1)
-  if aGroupIter == Group_3:
-    assert(aGroupIter.groupList().value(0).value().shapeTypeStr() == "VERTEX")
-  else:
-    assert(aGroupIter.groupList().value(0).value().shapeTypeStr() == "EDGE")
+assert(ExtrusionCut_1.result().name() == Box_1.result().name()), "ExtrusionCut name '{}' != '{}'".format(ExtrusionCut_1.result().name(), Box_1.result().name())
+
+model.end()
 
 assert(model.checkPythonDump())

@@ -162,14 +162,23 @@ Face_13 = model.addFace(Part_1_doc, [model.selection("WIRE", "Sketch_7/Wire-Sket
 
 # Shells
 Shell_1 = model.addShell(Part_1_doc, [model.selection("FACE", "Face_10_1"), model.selection("FACE", "Face_11_1")])
+Shell_1.result().setName("Shell_1_1")
 Shell_2 = model.addShell(Part_1_doc, [model.selection("FACE", "Face_10_1"), model.selection("FACE", "Face_11_1")])
+Shell_2.result().setName("Shell_2_1")
 Shell_3 = model.addShell(Part_1_doc, [model.selection("FACE", "Face_10_1"), model.selection("FACE", "Face_11_1")])
+Shell_3.result().setName("Shell_3_1")
 Shell_4 = model.addShell(Part_1_doc, [model.selection("FACE", "Face_10_1"), model.selection("FACE", "Face_11_1")])
+Shell_4.result().setName("Shell_4_1")
 Shell_5 = model.addShell(Part_1_doc, [model.selection("FACE", "Face_10_1"), model.selection("FACE", "Face_11_1")])
+Shell_5.result().setName("Shell_5_1")
 Shell_6 = model.addShell(Part_1_doc, [model.selection("FACE", "Face_12_1"), model.selection("FACE", "Face_13_1")])
+Shell_6.result().setName("Shell_6_1")
 Shell_7 = model.addShell(Part_1_doc, [model.selection("FACE", "Face_12_1"), model.selection("FACE", "Face_13_1")])
+Shell_7.result().setName("Shell_7_1")
 Shell_8 = model.addShell(Part_1_doc, [model.selection("FACE", "Face_10_1"), model.selection("FACE", "Face_11_1")])
+Shell_8.result().setName("Shell_8_1")
 Shell_9 = model.addShell(Part_1_doc, [model.selection("FACE", "Face_10_1"), model.selection("FACE", "Face_11_1")])
+Shell_9.result().setName("Shell_9_1")
 
 # Parameters
 model.addParameter(Part_1_doc, "d", "15")

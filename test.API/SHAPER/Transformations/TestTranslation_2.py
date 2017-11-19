@@ -91,93 +91,93 @@ model.addParameter(Part_1_doc, "d", "15")
 
 # Translation 27
 Translation_27_1 = model.addTranslation(Part_1_doc, [model.selection("SOLID", "Box_1_1")], model.selection("EDGE", "PartSet/OX"), 5)
-Intersection_1 = model.addIntersection(Part_1_doc, [model.selection("SOLID", "Box_2_1")], [model.selection("SOLID", "Translation_1_1")])
-Translation_27 = model.addTranslation(Part_1_doc, [model.selection("COMPOUND", "Intersection_1_1")], model.selection("EDGE", "PartSet/OX"), 15)
+Intersection_1 = model.addIntersection(Part_1_doc, [model.selection("SOLID", "Box_2_1")], [model.selection("SOLID", "Box_1_1")])
+Translation_27 = model.addTranslation(Part_1_doc, [model.selection("COMPOUND", "Box_2_1")], model.selection("EDGE", "PartSet/OX"), 15)
 
 # Translation 28
 Translation_28_1 = model.addTranslation(Part_1_doc, [model.selection("SOLID", "Box_3_1")], model.selection("EDGE", "PartSet/OX"), 5)
-Intersection_2 = model.addIntersection(Part_1_doc, [model.selection("SOLID", "Box_4_1")], [model.selection("SOLID", "Translation_3_1")])
-Translation_28 = model.addTranslation(Part_1_doc, [model.selection("COMPOUND", "Intersection_2_1")], model.selection("EDGE", "PartSet/OX"), 0)
+Intersection_2 = model.addIntersection(Part_1_doc, [model.selection("SOLID", "Box_4_1")], [model.selection("SOLID", "Box_3_1")])
+Translation_28 = model.addTranslation(Part_1_doc, [model.selection("COMPOUND", "Box_4_1")], model.selection("EDGE", "PartSet/OX"), 0)
 
 # Translation 29
 Translation_29_1 = model.addTranslation(Part_1_doc, [model.selection("SOLID", "Box_5_1")], model.selection("EDGE", "PartSet/OX"), 5)
-Intersection_3 = model.addIntersection(Part_1_doc, [model.selection("SOLID", "Box_6_1")], [model.selection("SOLID", "Translation_5_1")])
-Translation_29 = model.addTranslation(Part_1_doc, [model.selection("COMPOUND", "Intersection_3_1")], model.selection("EDGE", "PartSet/OX"), -15)
+Intersection_3 = model.addIntersection(Part_1_doc, [model.selection("SOLID", "Box_6_1")], [model.selection("SOLID", "Box_5_1")])
+Translation_29 = model.addTranslation(Part_1_doc, [model.selection("COMPOUND", "Box_6_1")], model.selection("EDGE", "PartSet/OX"), -15)
 
 # Translation 30
 Translation_30_1 = model.addTranslation(Part_1_doc, [model.selection("SOLID", "Box_7_1")], model.selection("EDGE", "PartSet/OX"), 5)
-Intersection_4 = model.addIntersection(Part_1_doc, [model.selection("SOLID", "Box_8_1")], [model.selection("SOLID", "Translation_7_1")])
-Translation_30 = model.addTranslation(Part_1_doc, [model.selection("COMPOUND", "Intersection_4_1")], model.selection("EDGE", "InvalidName"), -15)
+Intersection_4 = model.addIntersection(Part_1_doc, [model.selection("SOLID", "Box_8_1")], [model.selection("SOLID", "Box_7_1")])
+Translation_30 = model.addTranslation(Part_1_doc, [model.selection("COMPOUND", "Box_8_1")], model.selection("EDGE", "InvalidName"), -15)
 
 # Translation 31
 Translation_31_1 = model.addTranslation(Part_1_doc, [model.selection("SOLID", "Box_9_1")], model.selection("EDGE", "PartSet/OX"), 5)
-Intersection_5 = model.addIntersection(Part_1_doc, [model.selection("SOLID", "Box_10_1")], [model.selection("SOLID", "Translation_9_1")])
-Translation_31 = model.addTranslation(Part_1_doc, [model.selection("COMPOUND", "Intersection_5_1")], model.selection("EDGE", "PartSet/OY"), "d")
+Intersection_5 = model.addIntersection(Part_1_doc, [model.selection("SOLID", "Box_10_1")], [model.selection("SOLID", "Box_9_1")])
+Translation_31 = model.addTranslation(Part_1_doc, [model.selection("COMPOUND", "Box_10_1")], model.selection("EDGE", "PartSet/OY"), "d")
 
 # Translation 32
 Translation_32_1 = model.addTranslation(Part_1_doc, [model.selection("SOLID", "Box_11_1")], model.selection("EDGE", "PartSet/OX"), 5)
-Intersection_6 = model.addIntersection(Part_1_doc, [model.selection("SOLID", "Box_12_1")], [model.selection("SOLID", "Translation_11_1")])
-Translation_32 = model.addTranslation(Part_1_doc, [model.selection("COMPOUND", "Intersection_6_1")], model.selection("EDGE", "Sketch_1/Edge-SketchLine_1"), 15)
+Intersection_6 = model.addIntersection(Part_1_doc, [model.selection("SOLID", "Box_12_1")], [model.selection("SOLID", "Box_11_1")])
+Translation_32 = model.addTranslation(Part_1_doc, [model.selection("COMPOUND", "Box_12_1")], model.selection("EDGE", "Sketch_1/Edge-SketchLine_1"), 15)
 
 # Translation 33
 Translation_33_1 = model.addTranslation(Part_1_doc, [model.selection("SOLID", "Box_13_1")], model.selection("EDGE", "PartSet/OX"), 5)
-Intersection_7 = model.addIntersection(Part_1_doc, [model.selection("SOLID", "Box_14_1")], [model.selection("SOLID", "Translation_13_1")])
-Translation_33 = model.addTranslation(Part_1_doc, [model.selection("COMPOUND", "Intersection_7_1")], model.selection("EDGE", "Edge_1_1"), 15)
+Intersection_7 = model.addIntersection(Part_1_doc, [model.selection("SOLID", "Box_14_1")], [model.selection("SOLID", "Box_13_1")])
+Translation_33 = model.addTranslation(Part_1_doc, [model.selection("COMPOUND", "Box_14_1")], model.selection("EDGE", "Edge_1_1"), 15)
 
 # Translation 34
 Translation_34_1 = model.addTranslation(Part_1_doc, [model.selection("SOLID", "Box_15_1")], model.selection("EDGE", "PartSet/OX"), 5)
-Intersection_8 = model.addIntersection(Part_1_doc, [model.selection("SOLID", "Box_16_1")], [model.selection("SOLID", "Translation_15_1")])
-Translation_34 = model.addTranslation(Part_1_doc, [model.selection("COMPOUND", "Intersection_8_1")], model.selection("EDGE", "Intersection_8_1_6"), 15)
+Intersection_8 = model.addIntersection(Part_1_doc, [model.selection("SOLID", "Box_16_1")], [model.selection("SOLID", "Box_15_1")])
+Translation_34 = model.addTranslation(Part_1_doc, [model.selection("COMPOUND", "Box_16_1")], model.selection("EDGE", "Intersection_8_1_6"), 15)
 
 # Translation 35
 Translation_35_1 = model.addTranslation(Part_1_doc, [model.selection("SOLID", "Box_17_1")], model.selection("EDGE", "PartSet/OX"), 5)
-Intersection_9 = model.addIntersection(Part_1_doc, [model.selection("SOLID", "Box_18_1")], [model.selection("SOLID", "Translation_17_1")])
-Translation_35 = model.addTranslation(Part_1_doc, [model.selection("COMPOUND", "Intersection_9_1")], model.selection("EDGE", "Axis_1"), 15)
+Intersection_9 = model.addIntersection(Part_1_doc, [model.selection("SOLID", "Box_18_1")], [model.selection("SOLID", "Box_17_1")])
+Translation_35 = model.addTranslation(Part_1_doc, [model.selection("COMPOUND", "Box_18_1")], model.selection("EDGE", "Axis_1"), 15)
 
 #Translation 36
 Translation_36_1 = model.addTranslation(Part_1_doc, [model.selection("SOLID", "Box_19_1")], model.selection("EDGE", "PartSet/OX"), 5)
-Partition_1 = model.addPartition(Part_1_doc, [model.selection("SOLID", "Box_20_1"), model.selection("SOLID", "Translation_19_1")])
-Translation_36 = model.addTranslation(Part_1_doc, [model.selection("COMPSOLID", "Partition_1_1")], model.selection("EDGE", "PartSet/OX"), 15)
+Partition_1 = model.addPartition(Part_1_doc, [model.selection("SOLID", "Box_20_1"), model.selection("SOLID", "Box_19_1")])
+Translation_36 = model.addTranslation(Part_1_doc, [model.selection("COMPSOLID", "Box_20_1")], model.selection("EDGE", "PartSet/OX"), 15)
 
 ## Translation 37
 Translation_37_1 = model.addTranslation(Part_1_doc, [model.selection("SOLID", "Box_21_1")], model.selection("EDGE", "PartSet/OX"), 5)
-Partition_2 = model.addPartition(Part_1_doc, [model.selection("SOLID", "Box_22_1"), model.selection("SOLID", "Translation_21_1")])
-Translation_37 = model.addTranslation(Part_1_doc, [model.selection("COMPSOLID", "Partition_2_1")], model.selection("EDGE", "PartSet/OX"), 0)
+Partition_2 = model.addPartition(Part_1_doc, [model.selection("SOLID", "Box_22_1"), model.selection("SOLID", "Box_21_1")])
+Translation_37 = model.addTranslation(Part_1_doc, [model.selection("COMPSOLID", "Box_22_1")], model.selection("EDGE", "PartSet/OX"), 0)
 
 ## Translation 38
 Translation_38_1 = model.addTranslation(Part_1_doc, [model.selection("SOLID", "Box_23_1")], model.selection("EDGE", "PartSet/OX"), 5)
-Partition_3 = model.addPartition(Part_1_doc, [model.selection("SOLID", "Box_24_1"), model.selection("SOLID", "Translation_23_1")])
-Translation_38 = model.addTranslation(Part_1_doc, [model.selection("COMPSOLID", "Partition_3_1")], model.selection("EDGE", "PartSet/OX"), 0)
+Partition_3 = model.addPartition(Part_1_doc, [model.selection("SOLID", "Box_24_1"), model.selection("SOLID", "Box_23_1")])
+Translation_38 = model.addTranslation(Part_1_doc, [model.selection("COMPSOLID", "Box_24_1")], model.selection("EDGE", "PartSet/OX"), 0)
 
 ## Translation 39
 Translation_39_1 = model.addTranslation(Part_1_doc, [model.selection("SOLID", "Box_25_1")], model.selection("EDGE", "PartSet/OX"), 5)
-Partition_4 = model.addPartition(Part_1_doc, [model.selection("SOLID", "Box_26_1"), model.selection("SOLID", "Translation_25_1")])
-Translation_39 = model.addTranslation(Part_1_doc, [model.selection("COMPSOLID", "Partition_4_1")], model.selection("EDGE", "InvalidName"), 0)
+Partition_4 = model.addPartition(Part_1_doc, [model.selection("SOLID", "Box_26_1"), model.selection("SOLID", "Box_25_1")])
+Translation_39 = model.addTranslation(Part_1_doc, [model.selection("COMPSOLID", "Box_26_1")], model.selection("EDGE", "InvalidName"), 0)
 
 ## Translation 40
 Translation_40_1 = model.addTranslation(Part_1_doc, [model.selection("SOLID", "Box_27_1")], model.selection("EDGE", "PartSet/OX"), 5)
-Partition_5 = model.addPartition(Part_1_doc, [model.selection("SOLID", "Box_28_1"), model.selection("SOLID", "Translation_27_1")])
-Translation_40 = model.addTranslation(Part_1_doc, [model.selection("COMPSOLID", "Partition_5_1")], model.selection("EDGE", "PartSet/OX"), "d")
+Partition_5 = model.addPartition(Part_1_doc, [model.selection("SOLID", "Box_28_1"), model.selection("SOLID", "Box_27_1")])
+Translation_40 = model.addTranslation(Part_1_doc, [model.selection("COMPSOLID", "Box_28_1")], model.selection("EDGE", "PartSet/OX"), "d")
 
 # Translation 41
 Translation_41_1 = model.addTranslation(Part_1_doc, [model.selection("SOLID", "Box_29_1")], model.selection("EDGE", "PartSet/OX"), 5)
-Partition_6 = model.addPartition(Part_1_doc, [model.selection("SOLID", "Box_30_1"), model.selection("SOLID", "Translation_29_1")])
-Translation_41 = model.addTranslation(Part_1_doc, [model.selection("COMPSOLID", "Partition_6_1")], model.selection("EDGE", "Sketch_1/Edge-SketchLine_1"), 15)
+Partition_6 = model.addPartition(Part_1_doc, [model.selection("SOLID", "Box_30_1"), model.selection("SOLID", "Box_29_1")])
+Translation_41 = model.addTranslation(Part_1_doc, [model.selection("COMPSOLID", "Box_30_1")], model.selection("EDGE", "Sketch_1/Edge-SketchLine_1"), 15)
 
 # Translation 42
 Translation_42_1 = model.addTranslation(Part_1_doc, [model.selection("SOLID", "Box_31_1")], model.selection("EDGE", "PartSet/OX"), 5)
-Partition_7 = model.addPartition(Part_1_doc, [model.selection("SOLID", "Box_32_1"), model.selection("SOLID", "Translation_31_1")])
-Translation_42 = model.addTranslation(Part_1_doc, [model.selection("COMPSOLID", "Partition_7_1")], model.selection("EDGE", "Edge_1_1"), 15)
+Partition_7 = model.addPartition(Part_1_doc, [model.selection("SOLID", "Box_32_1"), model.selection("SOLID", "Box_31_1")])
+Translation_42 = model.addTranslation(Part_1_doc, [model.selection("COMPSOLID", "Box_32_1")], model.selection("EDGE", "Edge_1_1"), 15)
 
 # Translation 43
 Translation_43_1 = model.addTranslation(Part_1_doc, [model.selection("SOLID", "Box_33_1")], model.selection("EDGE", "PartSet/OX"), 5)
-Partition_8 = model.addPartition(Part_1_doc, [model.selection("SOLID", "Box_34_1"), model.selection("SOLID", "Translation_33_1")])
-Translation_43 = model.addTranslation(Part_1_doc, [model.selection("COMPSOLID", "Partition_8_1")], model.selection("EDGE", "Partition_8_1_1/Modified_Face_2_5&Partition_8_1_1/Modified_Face_2_2"), 15)
+Partition_8 = model.addPartition(Part_1_doc, [model.selection("SOLID", "Box_34_1"), model.selection("SOLID", "Box_33_1")])
+Translation_43 = model.addTranslation(Part_1_doc, [model.selection("COMPSOLID", "Box_34_1")], model.selection("EDGE", "Partition_8_1_1/Modified_Face_2_5&Partition_8_1_1/Modified_Face_2_2"), 15)
 
 # Translation 44
 Translation_44_1 = model.addTranslation(Part_1_doc, [model.selection("SOLID", "Box_35_1")], model.selection("EDGE", "PartSet/OX"), 5)
-Partition_9 = model.addPartition(Part_1_doc, [model.selection("SOLID", "Box_36_1"), model.selection("SOLID", "Translation_35_1")])
-Translation_44 = model.addTranslation(Part_1_doc, [model.selection("COMPSOLID", "Partition_9_1")], model.selection("EDGE", "Axis_1"), 15)
+Partition_9 = model.addPartition(Part_1_doc, [model.selection("SOLID", "Box_36_1"), model.selection("SOLID", "Box_35_1")])
+Translation_44 = model.addTranslation(Part_1_doc, [model.selection("COMPSOLID", "Box_36_1")], model.selection("EDGE", "Axis_1"), 15)
 model.do()
 model.end()
 

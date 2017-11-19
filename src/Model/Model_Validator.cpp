@@ -363,3 +363,17 @@ bool Model_ValidatorsFactory::isCase(FeaturePtr theFeature, std::string theAttri
   }
   return anInCase; // if no additional conditions, this attribute is the case to be validated
 }
+
+void Model_ValidatorsFactory::registerMainArgument(std::string theFeature,
+                                                   std::string theAttribute)
+{
+  std::map<std::string, std::string>::iterator aFound = myMainArgument.find(theFeature);
+  if (aFound == myMainArgument.end())
+    myMainArgument[theFeature] = theAttribute;
+}
+
+bool Model_ValidatorsFactory::isMainArgument(std::string theFeature, std::string theAttribute)
+{
+  std::map<std::string, std::string>::iterator aFound = myMainArgument.find(theFeature);
+  return aFound != myMainArgument.end() && aFound->second == theAttribute;
+}

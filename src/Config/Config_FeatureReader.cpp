@@ -84,7 +84,10 @@ void Config_FeatureReader::processNode(xmlNodePtr theNode)
       if (!anAttributeID.empty()) {
         aMessage->setAttributeId(anAttributeID);
         aMessage->setObligatory(getBooleanAttribute(theNode, ATTR_OBLIGATORY, true));
-        aMessage->setConcealment(getBooleanAttribute(theNode, ATTR_CONCEALMENT, false));
+        bool isConcealment = getBooleanAttribute(theNode, ATTR_CONCEALMENT, false);
+        aMessage->setConcealment(isConcealment);
+        bool isMainArg = isConcealment && getBooleanAttribute(theNode, ATTR_MAIN_ARG, false);
+        aMessage->setMainArgument(isMainArg);
 
         std::list<std::pair<std::string, std::string> > aCases;
         xmlNodePtr aCaseNode =

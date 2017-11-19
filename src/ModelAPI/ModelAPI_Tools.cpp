@@ -32,6 +32,7 @@
 #include <list>
 #include <map>
 #include <iostream>
+#include <sstream>
 
 #include <Events_Loop.h>
 #include <ModelAPI_Events.h>
@@ -620,6 +621,90 @@ void getConcealedResults(const FeaturePtr& theFeature,
       }
     }
   }
+}
+
+std::string getDefaultName(const std::shared_ptr<ModelAPI_Result>& theResult,
+                           const int theResultIndex)
+{
+  typedef std::list< std::pair < std::string, std::list<ObjectPtr> > > ListOfReferences;
+
+  SessionPtr aSession = ModelAPI_Session::get();
+  FeaturePtr anOwner = ModelAPI_Feature::feature(theResult->data()->owner());
+
+  ResultCompSolidPtr aCompSolidRes = compSolidOwner(theResult);
+  if (aCompSolidRes) {
+    // names of sub-solids in CompSolid should be default (for example,
+    // result of boolean operation 'Boolean_1_1' is a CompSolid which is renamed to 'MyBOOL',
+    // however, sub-elements of 'MyBOOL' should be named 'Boolean_1_1_1', 'Boolean_1_1_2' etc.)
+    std::ostringstream aDefaultName;
+    aDefaultName << anOwner->name();
+    // compute default name of CompSolid (name of feature + index of CompSolid's result)
+    int aCompSolidResultIndex = 0;
+    const std::list<ResultPtr>& aResults = anOwner->results();
+    for (std::list<ResultPtr>::const_iterator anIt = aResults.begin();
+         anIt != aResults.end(); ++anIt, ++aCompSolidResultIndex)
+      if (aCompSolidRes == *anIt)
+        break;
+    aDefaultName << "_" << (aCompSolidResultIndex + 1) << "_" << (theResultIndex + 1);
+    return aDefaultName.str();
+  }
+
+  DataPtr aData = anOwner->data();
+
+  ListOfReferences aReferences;
+  aData->referencesToObjects(aReferences);
+
+  // find first result with user-defined name
+  ListOfReferences::const_iterator aFoundRef = aReferences.end();
+  for (ListOfReferences::const_iterator aRefIt = aReferences.begin();
+       aRefIt != aReferences.end(); ++aRefIt) {
+    bool isConcealed = aSession->validators()->isConcealed(anOwner->getKind(), aRefIt->first);
+    bool isMainArg = isConcealed &&
+                     aSession->validators()->isMainArgument(anOwner->getKind(), aRefIt->first);
+    if (isConcealed) {
+      // check the referred object is a Body
+      // (for example, ExtrusionCut has a sketch as a first attribute which is concealing)
+      bool isBody = aRefIt->second.size() > 1 || (aRefIt->second.size() == 1 &&
+                    aRefIt->second.front()->groupName() == ModelAPI_ResultBody::group());
+      if (isBody && (isMainArg || aFoundRef == aReferences.end() ||
+          aData->isPrecedingAttribute(aRefIt->first, aFoundRef->first)))
+        aFoundRef = aRefIt;
+
+      if (isMainArg)
+        break;
+    }
+  }
+
+  // find an object which is concealed by theResult
+  if (aFoundRef != aReferences.end() && !aFoundRef->second.empty()) {
+    std::list<ObjectPtr>::const_iterator anObjIt = aFoundRef->second.begin();
+    int aResultIndex = theResultIndex;
+    while (--aResultIndex >= 0) {
+      ++anObjIt;
+      if (anObjIt == aFoundRef->second.end()) {
+        anObjIt = aFoundRef->second.begin();
+        break;
+      }
+    }
+    // check the result is a Body
+    if ((*anObjIt)->groupName() == ModelAPI_ResultBody::group()) {
+      // check the result is part of CompSolid
+      ResultPtr anObjRes = std::dynamic_pointer_cast<ModelAPI_Result>(*anObjIt);
+      ResultCompSolidPtr aParentCompSolid = ModelAPI_Tools::compSolidOwner(anObjRes);
+      if (aParentCompSolid)
+        anObjRes = aParentCompSolid;
+      return anObjRes->data()->name();
+    }
+  }
+
+  // compose default name by the name of the feature and the index of result
+  std::stringstream aDefaultName;
+  aDefaultName << anOwner->name();
+  // if there are several results (issue #899: any number of result),
+  // add unique prefix starting from second
+  if (theResultIndex > 0 || theResult->groupName() == ModelAPI_ResultBody::group())
+    aDefaultName << "_" << theResultIndex + 1;
+  return aDefaultName.str();
 }
 
 } // namespace ModelAPI_Tools

@@ -199,6 +199,10 @@ class MODELAPI_EXPORT ModelAPI_Data
   /// Sets true if the object is deleted, but some data is still keept in memory
   virtual void setIsDeleted(const bool theFlag) = 0;
 
+  /// Returns \c true if theAttribute1 is going earlier than theAttribute2 in the data
+  virtual bool isPrecedingAttribute(const std::string& theAttribute1,
+                                    const std::string& theAttribute2) const = 0;
+
  protected:
   /// Objects are created for features automatically
   ModelAPI_Data();

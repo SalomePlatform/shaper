@@ -56,6 +56,8 @@ class Model_ValidatorsFactory : public ModelAPI_ValidatorsFactory
   // (switchId (ID of the attribute) and case Ids (possible values of the switch attribute))
   std::map<std::string, std::map<std::string,
           std::map<std::string, std::set<std::string> > > > myCases;
+  /// Stores main attribute for each feature
+  std::map<std::string, std::string> myMainArgument;
 
  public:
   /// Registers the instance of the validator by the ID
@@ -114,6 +116,12 @@ class Model_ValidatorsFactory : public ModelAPI_ValidatorsFactory
 
   /// Returns true if the attribute must be checked (the case is selected)
   virtual bool isCase(FeaturePtr theFeature, std::string theAttribute);
+
+  /// Register the attribute as a main argument of the feature
+  virtual void registerMainArgument(std::string theFeature, std::string theAttribute);
+
+  /// Returns true is the attribute is a main argument of the feature
+  virtual bool isMainArgument(std::string theFeature, std::string theAttribute);
 
 
 protected:

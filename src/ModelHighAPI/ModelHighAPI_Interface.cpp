@@ -91,6 +91,11 @@ void ModelHighAPI_Interface::setName(const std::string& theName)
   feature()->data()->setName(theName);
 }
 
+std::string ModelHighAPI_Interface::name() const
+{
+  return feature()->data()->name();
+}
+
 ModelHighAPI_Selection ModelHighAPI_Interface::result() const
 {
   const_cast<ModelHighAPI_Interface*>(this)->execute();

@@ -92,6 +92,7 @@ const static char* ATTR_CONCEALMENT = "concealment";
 const static char* ATTR_USE_RESET = "use_reset";
 const static char* ATTR_GREED = "greed";
 const static char* ATTR_MODIFIED_IN_EDIT = "modified_in_edit";
+const static char* ATTR_MAIN_ARG = "main_argument";
 
 // WDG_INFO properties
 const static char* INFO_WDG_TEXT = FEATURE_TEXT;

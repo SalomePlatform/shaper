@@ -71,6 +71,10 @@ public:
   MODELHIGHAPI_EXPORT
   void setName(const std::string& theName);
 
+  /// Shortcut for feature()->data()->name()
+  MODELHIGHAPI_EXPORT
+  std::string name() const;
+
   /// Return firts object of the feature
   MODELHIGHAPI_EXPORT
   virtual ModelHighAPI_Selection result() const;

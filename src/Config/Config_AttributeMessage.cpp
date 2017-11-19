@@ -84,3 +84,13 @@ void Config_AttributeMessage::setCases(const std::list<std::pair<std::string,
 {
   myCases = theCases;
 }
+
+bool Config_AttributeMessage::isMainArgument() const
+{
+  return myIsMainArgument;
+}
+
+void Config_AttributeMessage::setMainArgument(bool isMainArg)
+{
+  myIsMainArgument = isMainArg;
+}

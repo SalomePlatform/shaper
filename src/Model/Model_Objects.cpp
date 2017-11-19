@@ -933,22 +933,57 @@ TDF_Label Model_Objects::resultLabel(
   return aData->label().Father().FindChild(TAG_FEATURE_RESULTS).FindChild(theResultIndex + 1);
 }
 
+bool Model_Objects::hasCustomName(DataPtr theFeatureData,
+                                  ResultPtr theResult,
+                                  int theResultIndex,
+                                  std::string& theParentName) const
+{
+  ResultCompSolidPtr aCompSolidRes =
+      std::dynamic_pointer_cast<ModelAPI_ResultCompSolid>(theFeatureData->owner());
+  if (aCompSolidRes) {
+    FeaturePtr anOwner = ModelAPI_Feature::feature(theResult->data()->owner());
+
+    // names of sub-solids in CompSolid should be default (for example,
+    // result of boolean operation 'Boolean_1' is a CompSolid which is renamed to 'MyBOOL',
+    // however, sub-elements of 'MyBOOL' should be named 'Boolean_1_1', 'Boolean_1_2' etc.)
+    std::ostringstream aDefaultName;
+    aDefaultName << anOwner->name();
+    // compute default name of CompSolid (name of feature + index of CompSolid's result)
+    int aCompSolidResultIndex = 0;
+    const std::list<ResultPtr>& aResults = anOwner->results();
+    for (std::list<ResultPtr>::const_iterator anIt = aResults.begin();
+         anIt != aResults.end(); ++anIt, ++aCompSolidResultIndex)
+      if (aCompSolidRes == *anIt)
+        break;
+    aDefaultName << "_" << (aCompSolidResultIndex + 1);
+    theParentName = aDefaultName.str();
+    return false;
+  }
+
+  theParentName = ModelAPI_Tools::getDefaultName(theResult, theResultIndex);
+  return true;
+}
+
 void Model_Objects::storeResult(std::shared_ptr<ModelAPI_Data> theFeatureData,
-                                 std::shared_ptr<ModelAPI_Result> theResult,
-                                 const int theResultIndex)
+                                std::shared_ptr<ModelAPI_Result> theResult,
+                                const int theResultIndex)
 {
   theResult->init();
   theResult->setDoc(myDoc);
   initData(theResult, resultLabel(theFeatureData, theResultIndex), TAG_FEATURE_ARGUMENTS);
   if (theResult->data()->name().empty()) {
     // if was not initialized, generate event and set a name
-    std::stringstream aNewName;
-    aNewName<<theFeatureData->name();
-    // if there are several results (issue #899: any number of result),
-    // add unique prefix starting from second
-    if (theResultIndex > 0 || theResult->groupName() == ModelAPI_ResultBody::group())
-      aNewName<<"_"<<theResultIndex + 1;
-    theResult->data()->setName(aNewName.str());
+    std::string aNewName = theFeatureData->name();
+    if (!hasCustomName(theFeatureData, theResult, theResultIndex, aNewName)) {
+      std::stringstream aName;
+      aName << aNewName;
+      // if there are several results (issue #899: any number of result),
+      // add unique prefix starting from second
+      if (theResultIndex > 0 || theResult->groupName() == ModelAPI_ResultBody::group())
+        aName << "_" << theResultIndex + 1;
+      aNewName = aName.str();
+    }
+    theResult->data()->setName(aNewName);
   }
 }
 
@@ -1187,6 +1222,8 @@ void Model_Objects::updateResults(FeaturePtr theFeature, std::set<FeaturePtr>& t
 
 ResultPtr Model_Objects::findByName(const std::string theName)
 {
+  ResultPtr aResult;
+  FeaturePtr aResFeature; // keep feature to return the latest one
   NCollection_DataMap<TDF_Label, FeaturePtr>::Iterator anObjIter(myFeatures);
   for(; anObjIter.More(); anObjIter.Next()) {
     FeaturePtr& aFeature = anObjIter.ChangeValue();
@@ -1198,13 +1235,16 @@ ResultPtr Model_Objects::findByName(const std::string theName)
     for (; aRIter != allResults.cend(); aRIter++) {
       ResultPtr aRes = *aRIter;
       if (aRes.get() && aRes->data() && aRes->data()->isValid() && !aRes->isDisabled() &&
-          aRes->data()->name() == theName) {
-        return aRes;
+          aRes->data()->name() == theName)
+      {
+        if (!aResult.get() || isLater(aFeature, aResFeature)) { // select the latest
+          aResult = aRes;
+          aResFeature = aFeature;
+        }
       }
     }
   }
-  // not found
-  return ResultPtr();
+  return aResult;
 }
 
 FeaturePtr Model_Objects::nextFeature(FeaturePtr theCurrent, const bool theReverse)

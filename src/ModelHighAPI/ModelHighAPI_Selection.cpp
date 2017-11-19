@@ -131,6 +131,16 @@ void ModelHighAPI_Selection::setName(const std::string& theName)
   }
 }
 
+std::string ModelHighAPI_Selection::name() const
+{
+  if (myVariantType == VT_ResultSubShapePair) {
+    std::shared_ptr<ModelAPI_Result> aResult = myResultSubShapePair.first;
+    if (aResult.get())
+      return aResult->data()->name();
+  }
+  return std::string();
+}
+
 void ModelHighAPI_Selection::setColor(int theRed, int theGreen, int theBlue)
 {
   if (myVariantType != VT_ResultSubShapePair || !myResultSubShapePair.first.get())

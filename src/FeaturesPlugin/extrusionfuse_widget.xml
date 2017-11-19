@@ -109,7 +109,8 @@ email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com
     tooltip="Objects to Fuse"
     type_choice="Objects"
     use_choice="false"
-    concealment="true">
+    concealment="true"
+    main_argument="true">
     <validator id="GeomValidators_ShapeType" parameters="solid"/>
   </multi_selector>
   <validator id="GeomValidators_ZeroOffset" parameters="CreationMethod,BySizes,sketch_selection,to_size,from_size,to_object,to_offset,from_object,from_offset"/>
