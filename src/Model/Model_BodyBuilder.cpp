@@ -270,6 +270,8 @@ void Model_BodyBuilder::clean()
     }
   }
   myBuilders.clear();
+  // remove the old reference (if any)
+  aLab.ForgetAttribute(TDF_Reference::GetID());
 }
 
 Model_BodyBuilder::~Model_BodyBuilder()
