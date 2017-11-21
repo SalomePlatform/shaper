@@ -40,7 +40,7 @@ GeomAPI_Trsf::GeomAPI_Trsf()
 
 //=================================================================================================
 GeomAPI_Trsf::GeomAPI_Trsf(void* theTrsf)
-: GeomAPI_Interface(theTrsf)
+: GeomAPI_Interface((gp_Trsf*)theTrsf)
 {
 }
 
