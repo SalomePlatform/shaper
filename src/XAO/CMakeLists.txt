@@ -35,7 +35,7 @@ ADD_DEFINITIONS(-DXAO_EXPORTS ${CAS_DEFINITIONS})
 # libraries to link to
 SET(PROJECT_LIBRARIES
   ${LIBXML2_LIBRARIES}
-  ${CAS_TKBRep} ${CAS_TKTopAlgo} ${CAS_TKG2d}
+  ${CAS_TKBRep} ${CAS_TKTopAlgo} ${CAS_TKG2d} ${CAS_TKG3d}
   )
 
 # --- headers ---
