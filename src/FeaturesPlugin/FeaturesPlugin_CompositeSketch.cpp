@@ -506,6 +506,11 @@ void FeaturesPlugin_CompositeSketch::storeShapes(ResultBodyPtr theResultBody,
       std::string aName = theName + aShapeTypeStr;
       storeSubShape(theResultBody, aShape, aShapeTypeToExplore,
                     theMapOfSubShapes, aName, aShapeIndex, theTag);
+      if (theBaseShapeType == GeomAPI_Shape::WIRE) { // issue 2289: special names also for vertices
+        aName = theName + "Vertex";
+        storeSubShape(theResultBody, aShape, GeomAPI_Shape::VERTEX,
+                      theMapOfSubShapes, aName, aShapeIndex, theTag);
+      }
     }
   }
 }

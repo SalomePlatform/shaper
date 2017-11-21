@@ -104,7 +104,7 @@ void Config_ModuleReader::processNode(xmlNodePtr theNode)
     std::string aPluginScript = getProperty(theNode, PLUGIN_SCRIPT);
     std::string aPluginName = addPlugin(aPluginLibrary, aPluginScript, aPluginConf);
     std::string aUsesPlugin = getProperty(theNode, PLUGIN_USES);
-    if (!aUsesPlugin.empty()) { // send information about hte plugin dependencies
+    if (!aUsesPlugin.empty()) { // send information about the plugin dependencies
       std::shared_ptr<Config_PluginMessage> aMess(new Config_PluginMessage(
         Events_Loop::loop()->eventByName(Config_PluginMessage::EVENT_ID()), aPluginName));
       aMess->setUses(aUsesPlugin);

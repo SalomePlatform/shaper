@@ -166,7 +166,7 @@ def testHaveNamingFaces(theFeature, theModel, thePartDoc) :
     assert(name != ""), "String empty"
 
 def testHaveNamingEdges(theFeature, theModel, thePartDoc) :
-  """ Tests if all faces of result have a name
+  """ Tests if all edges of result have a name
   :param theFeature: feature to test.
   """
   # Get feature result/sub-result
@@ -197,6 +197,49 @@ def testHaveNamingEdges(theFeature, theModel, thePartDoc) :
     name = attrSelection.namingName()
     assert(shape.isEdge())
     assert(name != ""), "String empty"
+
+def testHaveNamingVertices(theFeature, theModel, thePartDoc) :
+  """ Tests if all vertices of result have a unique name
+  :param theFeature: feature to test.
+  """
+  # Get feature result/sub-result
+  aResult = theFeature.results()[0].resultSubShapePair()[0]
+  # Get result/sub-result shape
+  shape = aResult.shape()
+  # Create shape explorer with desired shape type
+  shapeExplorer = GeomAPI_ShapeExplorer(shape, GeomAPI_Shape.VERTEX)
+  # Create list, and store selections in it
+  selectionList = []
+  shapesList = [] # to append only unique shapes (not isSame)
+  while shapeExplorer.more():
+    aDuplicate = False
+    for alreadyThere in shapesList:
+      if alreadyThere.isSame(shapeExplorer.current()):
+        aDuplicate = True
+    if aDuplicate:
+      shapeExplorer.next()
+      continue
+    shapesList.append(shapeExplorer.current())
+    selection = theModel.selection(aResult, shapeExplorer.current()) # First argument should be result/sub-result, second is sub-shape on this result/sub-result
+    selectionList.append(selection)
+    shapeExplorer.next()
+  # Create group with this selection list
+  Group_1 = theModel.addGroup(thePartDoc, selectionList)
+  theModel.do()
+
+  # Check that all selected shapes in group have right shape type and unique name.
+  groupFeature = Group_1.feature()
+  groupSelectionList = groupFeature.selectionList("group_list")
+  assert(groupSelectionList.size() == len(selectionList))
+  presented_names = set()
+  for index in range(0, groupSelectionList.size()):
+    attrSelection = groupSelectionList.value(index)
+    shape = attrSelection.value()
+    name = attrSelection.namingName()
+    assert(shape.isVertex())
+    assert(name != ""), "String empty"
+    presented_names.add(name)
+  assert(len(presented_names) == groupSelectionList.size()), "Some names are not unique"
 
 
 def testNbSubFeatures(theComposite, theKindOfSub, theExpectedCount):
