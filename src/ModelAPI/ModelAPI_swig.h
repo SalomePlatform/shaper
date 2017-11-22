@@ -60,6 +60,7 @@
   #include "ModelAPI_ResultField.h"
   #include "ModelAPI_Tools.h"
   #include "ModelAPI_ResultCompSolid.h"
+  #include "ModelAPI_Folder.h"
 
   #include <memory>
   #include <string>

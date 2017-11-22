@@ -32,6 +32,7 @@
 #include <Model_ResultParameter.h>
 #include <ModelAPI_Validator.h>
 #include <ModelAPI_CompositeFeature.h>
+#include <ModelAPI_Folder.h>
 #include <ModelAPI_Tools.h>
 
 #include <Events_Loop.h>
@@ -48,6 +49,22 @@
 #include <TDF_LabelMapHasher.hxx>
 #include <TDF_LabelMap.hxx>
 #include <TDF_ListIteratorOfLabelList.hxx>
+
+static const std::string& groupNameFoldering(const std::string& theGroupID,
+                                             const bool theAllowFolder)
+{
+  if (theAllowFolder) {
+    static std::map<std::string, std::string> aNames;
+    std::map<std::string, std::string>::const_iterator aFound = aNames.find(theGroupID);
+    if (aFound == aNames.end()) {
+      aNames[theGroupID] = std::string("__") + theGroupID;
+      aFound = aNames.find(theGroupID);
+    }
+    return aFound->second;
+  }
+  return theGroupID;
+}
+
 
 static const int TAG_OBJECTS = 2;  // tag of the objects sub-tree (features, results)
 
@@ -91,6 +108,15 @@ Model_Objects::~Model_Objects()
     aFeature->removeResults(0, false);
     aFeature->erase();
     myFeatures.UnBind(aFeaturesIter.Key());
+  }
+  while (!myFolders.IsEmpty()) {
+    NCollection_DataMap<TDF_Label, ObjectPtr>::Iterator aFoldersIter(myFolders);
+    ObjectPtr aFolder = aFoldersIter.Value();
+    static Events_ID EVENT_DISP = aLoop->eventByName(EVENT_OBJECT_TO_REDISPLAY);
+    ModelAPI_EventCreator::get()->sendDeleted(myDoc, ModelAPI_Folder::group());
+    ModelAPI_EventCreator::get()->sendUpdated(aFolder, EVENT_DISP);
+    aFolder->erase();
+    myFolders.UnBind(aFoldersIter.Key());
   }
   myHistory.clear();
   aLoop->activateFlushes(isActive);
@@ -387,7 +413,9 @@ void Model_Objects::createHistory(const std::string& theGroupID)
 {
   std::map<std::string, std::vector<ObjectPtr> >::iterator aHIter = myHistory.find(theGroupID);
   if (aHIter == myHistory.end()) {
-    std::vector<ObjectPtr> aResult = std::vector<ObjectPtr>();
+    std::vector<ObjectPtr> aResult;
+    std::vector<ObjectPtr> aResultOutOfFolder;
+    FeaturePtr aLastFeatureInFolder;
     // iterate the array of references and get feature by feature from the array
     bool isFeature = theGroupID == ModelAPI_Feature::group();
     Handle(TDataStd_ReferenceArray) aRefs;
@@ -401,6 +429,9 @@ void Model_Objects::createHistory(const std::string& theGroupID)
           if (isFeature) { // here may be also disabled features
             if (!isSub && aFeature->isInHistory()) {
               aResult.push_back(aFeature);
+              // the feature is out of the folders
+              if (aLastFeatureInFolder.get() == NULL)
+                aResultOutOfFolder.push_back(aFeature);
             }
           } else if (!aFeature->isDisabled()) { // iterate all results of not-disabled feature
             // construction results of sub-features should not be in the tree
@@ -418,12 +449,34 @@ void Model_Objects::createHistory(const std::string& theGroupID)
               }
             }
           }
+
+          // the feature closes the folder, so the next features will be treated as out-of-folder
+          if (aLastFeatureInFolder.get() && aLastFeatureInFolder == aFeature)
+            aLastFeatureInFolder = FeaturePtr();
+
+        } else {
+          // it may be a folder
+          ObjectPtr aFolder = folder(aRefs->Value(a));
+          if (aFolder.get()) {
+            aResult.push_back(aFolder);
+
+            // get the last feature in the folder
+            AttributeReferencePtr aLastFeatAttr =
+                aFolder->data()->reference(ModelAPI_Folder::LAST_FEATURE_ID());
+            if (aLastFeatAttr)
+              aLastFeatureInFolder = ModelAPI_Feature::feature(aLastFeatAttr->value());
+          }
         }
       }
     }
     // to be sure that isConcealed did not update the history (issue 1089) during the iteration
-    if (myHistory.find(theGroupID) == myHistory.end())
+    if (myHistory.find(theGroupID) == myHistory.end()) {
       myHistory[theGroupID] = aResult;
+
+      // store the features placed out of any folder
+      const std::string& anOutOfFolderGroupID = groupNameFoldering(theGroupID, true);
+      myHistory[anOutOfFolderGroupID] = aResultOutOfFolder;
+    }
   }
 }
 
@@ -437,6 +490,13 @@ void Model_Objects::updateHistory(const std::string theGroup)
   std::map<std::string, std::vector<ObjectPtr> >::iterator aHIter = myHistory.find(theGroup);
   if (aHIter != myHistory.end())
     myHistory.erase(aHIter); // erase from map => this means that it is not synchronized
+}
+
+ObjectPtr Model_Objects::folder(TDF_Label theLabel) const
+{
+  if (myFolders.IsBound(theLabel))
+    return myFolders.Find(theLabel);
+  return ObjectPtr();
 }
 
 FeaturePtr Model_Objects::feature(TDF_Label theLabel) const
@@ -489,12 +549,15 @@ ObjectPtr Model_Objects::object(TDF_Label theLabel)
   return FeaturePtr();  // not found
 }
 
-ObjectPtr Model_Objects::object(const std::string& theGroupID, const int theIndex)
+ObjectPtr Model_Objects::object(const std::string& theGroupID,
+                                const int theIndex,
+                                const bool theAllowFolder)
 {
   if (theIndex == -1)
     return ObjectPtr();
-  createHistory(theGroupID);
-  return myHistory[theGroupID][theIndex];
+  const std::string& aGroupID = groupNameFoldering(theGroupID, theAllowFolder);
+  createHistory(aGroupID);
+  return myHistory[aGroupID][theIndex];
 }
 
 std::shared_ptr<ModelAPI_Object> Model_Objects::objectByName(
@@ -552,10 +615,11 @@ const int Model_Objects::index(std::shared_ptr<ModelAPI_Object> theObject)
   return -1;
 }
 
-int Model_Objects::size(const std::string& theGroupID)
+int Model_Objects::size(const std::string& theGroupID, const bool theAllowFolder)
 {
-  createHistory(theGroupID);
-  return int(myHistory[theGroupID].size());
+  const std::string& aGroupID = groupNameFoldering(theGroupID, theAllowFolder);
+  createHistory(aGroupID);
+  return int(myHistory[aGroupID].size());
 }
 
 void Model_Objects::allResults(const std::string& theGroupID, std::list<ResultPtr>& theResults)
@@ -1111,6 +1175,48 @@ std::shared_ptr<ModelAPI_ResultParameter> Model_Objects::createParameter(
   return aResult;
 }
 
+std::shared_ptr<ModelAPI_Folder> Model_Objects::createFolder(
+    const std::shared_ptr<ModelAPI_Feature>& theBeforeThis)
+{
+  FolderPtr aFolder(new ModelAPI_Folder);
+  if (!aFolder)
+    return aFolder;
+
+  TDF_Label aFeaturesLab = featuresLabel();
+  TDF_Label aFolderLab = aFeaturesLab.NewChild();
+  // store feature in the features array: before "initData" because in macro features
+  // in initData it creates new features, appeared later than this
+  TDF_Label aPrevFeatureLab;
+  if (theBeforeThis.get()) { // searching for the previous feature label
+    std::shared_ptr<Model_Data> aPrevData =
+        std::dynamic_pointer_cast<Model_Data>(theBeforeThis->data());
+    if (aPrevData.get()) {
+      aPrevFeatureLab = nextLabel(aPrevData->label().Father(), true);
+    }
+  } else { // find the label of the last feature
+    Handle(TDataStd_ReferenceArray) aRefs;
+    if (aFeaturesLab.FindAttribute(TDataStd_ReferenceArray::GetID(), aRefs))
+      aPrevFeatureLab = aRefs->Value(aRefs->Upper());
+  }
+  AddToRefArray(aFeaturesLab, aFolderLab, aPrevFeatureLab);
+
+  // keep the feature ID to restore document later correctly
+  TDataStd_Comment::Set(aFolderLab, aFolder->getKind().c_str());
+  myFolders.Bind(aFolderLab, aFolder);
+  // must be before the event sending: for OB the feature is already added
+  updateHistory(ModelAPI_Folder::group());
+
+  // must be after binding to the map because of "Box" macro feature that
+  // creates other features in "initData"
+  initData(aFolder, aFolderLab, TAG_FEATURE_ARGUMENTS);
+  // event: folder is added, must be before "initData" to update OB correctly on Duplicate:
+  // first new part, then the content
+  static Events_ID anEvent = Events_Loop::eventByName(EVENT_OBJECT_CREATED);
+  ModelAPI_EventCreator::get()->sendUpdated(aFolder, anEvent);
+
+  return aFolder;
+}
+
 std::shared_ptr<ModelAPI_Feature> Model_Objects::feature(
     const std::shared_ptr<ModelAPI_Result>& theResult)
 {
@@ -1247,23 +1353,31 @@ ResultPtr Model_Objects::findByName(const std::string theName)
   return aResult;
 }
 
+TDF_Label Model_Objects::nextLabel(TDF_Label theCurrent, const bool theReverse)
+{
+  Handle(TDataStd_ReferenceArray) aRefs;
+  if (featuresLabel().FindAttribute(TDataStd_ReferenceArray::GetID(), aRefs)) {
+    for(int a = aRefs->Lower(); a <= aRefs->Upper(); a++) { // iterate all existing features
+      TDF_Label aCurLab = aRefs->Value(a);
+      if (aCurLab.IsEqual(theCurrent)) {
+        a += theReverse ? -1 : 1;
+        if (a >= aRefs->Lower() && a <= aRefs->Upper())
+          return aRefs->Value(a);
+        break; // finish iiteration: it's last feature
+      }
+    }
+  }
+  return TDF_Label();
+}
+
 FeaturePtr Model_Objects::nextFeature(FeaturePtr theCurrent, const bool theReverse)
 {
   std::shared_ptr<Model_Data> aData = std::static_pointer_cast<Model_Data>(theCurrent->data());
   if (aData.get() && aData->isValid()) {
     TDF_Label aFeatureLabel = aData->label().Father();
-    Handle(TDataStd_ReferenceArray) aRefs;
-    if (featuresLabel().FindAttribute(TDataStd_ReferenceArray::GetID(), aRefs)) {
-      for(int a = aRefs->Lower(); a <= aRefs->Upper(); a++) { // iterate all existing features
-        TDF_Label aCurLab = aRefs->Value(a);
-        if (aCurLab.IsEqual(aFeatureLabel)) {
-          a += theReverse ? -1 : 1;
-          if (a >= aRefs->Lower() && a <= aRefs->Upper())
-            return feature(aRefs->Value(a));
-          break; // finish iiteration: it's last feature
-        }
-      }
-    }
+    TDF_Label aNextLabel = nextLabel(aFeatureLabel, theReverse);
+    if (!aNextLabel.IsNull())
+      return feature(aNextLabel);
   }
   return FeaturePtr(); // not found, last, or something is wrong
 }
@@ -1309,6 +1423,22 @@ bool Model_Objects::isLater(FeaturePtr theLater, FeaturePtr theCurrent) const
     }
   }
   return false; // not found, or something is wrong
+}
+
+std::list<std::shared_ptr<ModelAPI_Object> > Model_Objects::allObjects()
+{
+  std::list<std::shared_ptr<ModelAPI_Object> > aResult;
+  Handle(TDataStd_ReferenceArray) aRefs;
+  if (featuresLabel().FindAttribute(TDataStd_ReferenceArray::GetID(), aRefs)) {
+    for(int a = aRefs->Lower(); a <= aRefs->Upper(); a++) {
+      ObjectPtr anObject = object(aRefs->Value(a));
+      if (!anObject.get()) // is it a folder?
+        anObject = folder(aRefs->Value(a));
+      if (anObject.get())
+        aResult.push_back(anObject);
+    }
+  }
+  return aResult;
 }
 
 std::list<std::shared_ptr<ModelAPI_Feature> > Model_Objects::allFeatures()

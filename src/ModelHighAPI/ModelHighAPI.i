@@ -348,6 +348,7 @@
 %include "ModelHighAPI_Dumper.h"
 %include "ModelHighAPI_Integer.h"
 %include "ModelHighAPI_Interface.h"
+%include "ModelHighAPI_Folder.h"
 %include "ModelHighAPI_RefAttr.h"
 %include "ModelHighAPI_Reference.h"
 %include "ModelHighAPI_Selection.h"

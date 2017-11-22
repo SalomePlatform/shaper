@@ -31,6 +31,7 @@
 #include <set>
 
 class ModelAPI_Feature;
+class ModelAPI_Folder;
 class ModelAPI_Object;
 class ModelAPI_Result;
 class ModelAPI_ResultConstruction;
@@ -89,8 +90,10 @@ public:
   //! Returns the object in the group by the index (started from zero)
   //! \param theGroupID group that contains an object
   //! \param theIndex zero-based index of feature in the group
+  //! \param theAllowFolder take into account grouping feature by folders
   virtual std::shared_ptr<ModelAPI_Object> object(const std::string& theGroupID,
-                                                    const int theIndex) = 0;
+                                                  const int theIndex,
+                                                  const bool theAllowFolder = false) = 0;
 
   //! Returns the first found object in the group by the object name
   //! \param theGroupID group that contains an object
@@ -105,7 +108,9 @@ public:
   virtual const int index(std::shared_ptr<ModelAPI_Object> theObject) = 0;
 
   //! Returns the number of objects in the group of objects
-  virtual int size(const std::string& theGroupID) = 0;
+  //! \param theGroupID group of objects
+  //! \param theAllowFolder take into account grouping feature by folders
+  virtual int size(const std::string& theGroupID, const bool theAllowFolder = false) = 0;
 
   //! Returns the feature that is currently edited in this document, normally
   //! this is the latest created feature
@@ -169,6 +174,16 @@ public:
   //! Returns all features of the document including the hidden features which are not in
   //! history. Not very fast method, for calling once, not in big cycles.
   virtual std::list<std::shared_ptr<ModelAPI_Feature> > allFeatures() = 0;
+
+  //! Returns all objects of the document including the hidden features which are not in
+  //! history. Not very fast method, for calling once, not in big cycles.
+  virtual std::list<std::shared_ptr<ModelAPI_Object> > allObjects() = 0;
+
+  //! Creates a folder (group of the features in the object browser)
+  virtual std::shared_ptr<ModelAPI_Folder> addFolder(
+      std::shared_ptr<ModelAPI_Feature> theAddBefore) = 0;
+  //! Removes the folder from the document (all features in the folder will be kept).
+  virtual void removeFolder(std::shared_ptr<ModelAPI_Folder> theFolder) = 0;
 
   //! Informs the document that it becomes active and some actions must be performed
   virtual void setActive(const bool theFlag) = 0;

@@ -137,10 +137,15 @@ class Model_Document : public ModelAPI_Document
   //! Returns the feature in the group by the index (started from zero)
   //! \param theGroupID group that contains a feature
   //! \param theIndex zero-based index of feature in the group
-  MODEL_EXPORT virtual ObjectPtr object(const std::string& theGroupID, const int theIndex);
+  //! \param theAllowFolder take into account grouping feature by folders
+  MODEL_EXPORT virtual ObjectPtr object(const std::string& theGroupID,
+                                        const int theIndex,
+                                        const bool theAllowFolder = false);
 
   //! Returns the number of features in the group
-  MODEL_EXPORT virtual int size(const std::string& theGroupID);
+  //! \param theGroupID group of objects
+  //! \param theAllowFolder take into account grouping feature by folders
+  MODEL_EXPORT virtual int size(const std::string& theGroupID, const bool theAllowFolder = false);
 
   //! Returns the feature that is currently edited in this document, normally
   //! this is the latest created feature
@@ -199,6 +204,12 @@ class Model_Document : public ModelAPI_Document
   MODEL_EXPORT virtual std::shared_ptr<ModelAPI_Feature>
     feature(const std::shared_ptr<ModelAPI_Result>& theResult);
 
+  //! Creates a folder (group of the features in the object browser)
+  MODEL_EXPORT virtual std::shared_ptr<ModelAPI_Folder> addFolder(
+      std::shared_ptr<ModelAPI_Feature> theAddBefore = std::shared_ptr<ModelAPI_Feature>());
+  //! Removes the folder from the document (all features in the folder will be kept).
+  MODEL_EXPORT virtual void removeFolder(std::shared_ptr<ModelAPI_Folder> theFolder);
+
   ///! Returns true if parametric updater need to execute feature on recomputartion
   ///! On abort, undo or redo it is not necessary: results in document are updated automatically
   bool& executeFeatures() {return myExecuteFeatures;}
@@ -220,6 +231,10 @@ class Model_Document : public ModelAPI_Document
   ///! Returns all features of the document including the hidden features which are not in
   ///! history. Not very fast method, for calling once, not in big cycles.
   MODEL_EXPORT virtual std::list<std::shared_ptr<ModelAPI_Feature> > allFeatures();
+
+  //! Returns all objects of the document including the hidden features which are not in
+  //! history. Not very fast method, for calling once, not in big cycles.
+  MODEL_EXPORT virtual std::list<std::shared_ptr<ModelAPI_Object> > allObjects();
 
   /// Returns the global identifier of the current transaction (needed for the update algo)
   MODEL_EXPORT virtual int transactionID();

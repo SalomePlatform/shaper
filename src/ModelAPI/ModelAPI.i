@@ -51,6 +51,7 @@
 %feature("director") ModelAPI_Feature;
 %feature("director") ModelAPI_CompositeFeature;
 %feature("director") ModelAPI_Data;
+%feature("director") ModelAPI_Folder;
 
 // shared pointers
 // For ModelAPI_ResultConstruction.shape()
@@ -62,6 +63,7 @@
 %shared_ptr(ModelAPI_Feature)
 %shared_ptr(ModelAPI_CompositeFeature)
 %shared_ptr(ModelAPI_Data)
+%shared_ptr(ModelAPI_Folder)
 %shared_ptr(ModelAPI_Attribute)
 %shared_ptr(ModelAPI_AttributeDocRef)
 %shared_ptr(ModelAPI_AttributeDouble)
@@ -151,6 +153,7 @@
 %include "ModelAPI_ResultParameter.h"
 %include "ModelAPI_Tools.h"
 %include "ModelAPI_ResultCompSolid.h"
+#include "ModelAPI_Folder.h"
 
 // std::list -> []
 %template(StringList) std::list<std::string>;
@@ -167,6 +170,7 @@ template<class T1, class T2> std::shared_ptr<T1> shared_ptr_cast(std::shared_ptr
 %template(featureToCompositeFeature) shared_ptr_cast<ModelAPI_CompositeFeature, ModelAPI_Feature>;
 %template(objectToFeature) shared_ptr_cast<ModelAPI_Feature, ModelAPI_Object>;
 %template(objectToResult) shared_ptr_cast<ModelAPI_Result, ModelAPI_Object>;
+%template(objectToFolder) shared_ptr_cast<ModelAPI_Folder, ModelAPI_Object>;
 %template(compositeFeatureToFeature) shared_ptr_cast<ModelAPI_Feature, ModelAPI_CompositeFeature>;
 
 %template(modelAPI_Result) shared_ptr_cast<ModelAPI_Result, ModelAPI_Object>;

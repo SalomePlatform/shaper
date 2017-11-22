@@ -925,7 +925,7 @@ FeaturePtr Model_Document::addFeature(std::string theID, const bool theMakeCurre
       int aSubs = aComp->numberOfSubs(false);
       for(int a = 0; a < aSubs; a++) {
         FeaturePtr aSub = aComp->subFeature(a, false);
-        if (myObjs->isLater(aSub, aCurrent)) {
+        if (aSub && myObjs->isLater(aSub, aCurrent)) {
           isModified =  true;
           aCurrent = aSub;
         }
@@ -1031,9 +1031,11 @@ std::shared_ptr<Model_Document> Model_Document::subDoc(int theDocID)
     Model_Application::getApplication()->document(theDocID));
 }
 
-ObjectPtr Model_Document::object(const std::string& theGroupID, const int theIndex)
+ObjectPtr Model_Document::object(const std::string& theGroupID,
+                                 const int theIndex,
+                                 const bool theAllowFolder)
 {
-  return myObjs->object(theGroupID, theIndex);
+  return myObjs->object(theGroupID, theIndex, theAllowFolder);
 }
 
 std::shared_ptr<ModelAPI_Object> Model_Document::objectByName(
@@ -1047,11 +1049,11 @@ const int Model_Document::index(std::shared_ptr<ModelAPI_Object> theObject)
   return myObjs->index(theObject);
 }
 
-int Model_Document::size(const std::string& theGroupID)
+int Model_Document::size(const std::string& theGroupID, const bool theAllowFolder)
 {
   if (myObjs == 0) // may be on close
     return 0;
-  return myObjs->size(theGroupID);
+  return myObjs->size(theGroupID, theAllowFolder);
 }
 
 std::shared_ptr<ModelAPI_Feature> Model_Document::currentFeature(const bool theVisible)
@@ -1253,6 +1255,16 @@ std::shared_ptr<ModelAPI_ResultParameter> Model_Document::createParameter(
       const std::shared_ptr<ModelAPI_Data>& theFeatureData, const int theIndex)
 {
   return myObjs->createParameter(theFeatureData, theIndex);
+}
+
+std::shared_ptr<ModelAPI_Folder> Model_Document::addFolder(
+    std::shared_ptr<ModelAPI_Feature> theAddBefore)
+{
+  return myObjs->createFolder(theAddBefore);
+}
+
+void Model_Document::removeFolder(std::shared_ptr<ModelAPI_Folder> theFolder)
+{
 }
 
 std::shared_ptr<ModelAPI_Feature> Model_Document::feature(
@@ -1487,6 +1499,11 @@ ResultPtr Model_Document::findByName(
 std::list<std::shared_ptr<ModelAPI_Feature> > Model_Document::allFeatures()
 {
   return myObjs->allFeatures();
+}
+
+std::list<std::shared_ptr<ModelAPI_Object> > Model_Document::allObjects()
+{
+  return myObjs->allObjects();
 }
 
 void Model_Document::setActive(const bool theFlag)
