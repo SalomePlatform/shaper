@@ -617,8 +617,6 @@ void XGUI_Workshop::fillPropertyPanel(ModuleBase_Operation* theOperation)
       aWidget->restoreValue();
     aWidget->enableFocusProcessing();
   }
-  ModuleBase_Tools::flushUpdated(aFeature);
-
   // update visible state of Preview button
   std::shared_ptr<Config_FeatureMessage> aFeatureInfo;
 #ifdef HAVE_SALOME
@@ -647,6 +645,10 @@ void XGUI_Workshop::fillPropertyPanel(ModuleBase_Operation* theOperation)
                   new Events_Message(Events_Loop::eventByName(EVENT_PREVIEW_BLOCKED)));
     Events_Loop::loop()->send(aMsg);
   }
+  // if update happens after preview is blocked, it does nothing when blocked
+  // it improves performance for valid objects on feature start
+  ModuleBase_Tools::flushUpdated(aFeature);
+
   myPropertyPanel->setModelWidgets(aWidgets);
   aFOperation->setPropertyPanel(myPropertyPanel);
 
