@@ -32,3 +32,5 @@
 %include "std_string.i"
 
 %include "Config_ModuleReader.h"
+%include "Config_PropManager.h"
+%include "Config_Prop.h"

@@ -22,5 +22,7 @@
 #define SRC_CONFIG_SWIG_H_
 
   #include "Config_ModuleReader.h"
+  #include "Config_Prop.h"
+  #include "Config_PropManager.h"
 
 #endif /* SRC_CONFIG_SWIG_H_ */
