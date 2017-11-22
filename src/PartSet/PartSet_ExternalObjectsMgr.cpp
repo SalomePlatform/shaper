@@ -77,7 +77,7 @@ ObjectPtr PartSet_ExternalObjectsMgr::externalObject(const ObjectPtr& theSelecte
     FeaturePtr aCreatedFeature;
     aSelectedObject = PartSet_Tools::createFixedObjectByExternal(theShape,
       theSelectedObject, theSketch, theTemporary, aCreatedFeature);
-    if (aSelectedObject.get() && theTemporary)
+    if (aCreatedFeature.get() && theTemporary)
         myExternalObjectValidated = aCreatedFeature;
   }
   return aSelectedObject;
