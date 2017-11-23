@@ -96,7 +96,7 @@ aSession.finishOperation()
 
 assert(aPartDoc.size("Folders") == 1)
 FOLDER_NAME_EXPECTED = "Folder_1"
-assert(aFolder1.name() == FOLDER_NAME_EXPECTED), "Actual name '{}', expected '{}'".format(aFolder1.name(), FOLDER_NAME_EXPECTED)
+assert(aFolder2.name() == FOLDER_NAME_EXPECTED), "Actual name '{}', expected '{}'".format(aFolder2.name(), FOLDER_NAME_EXPECTED)
 
 from salome.shaper import model
 assert(model.checkPythonDump())

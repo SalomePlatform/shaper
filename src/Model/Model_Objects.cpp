@@ -392,9 +392,8 @@ void Model_Objects::clearHistory(ObjectPtr theObj)
 {
   if (theObj.get()) {
     const std::string aGroup = theObj->groupName();
-    std::map<std::string, std::vector<ObjectPtr> >::iterator aHIter = myHistory.find(aGroup);
-    if (aHIter != myHistory.end())
-      myHistory.erase(aHIter); // erase from map => this means that it is not synchronized
+    updateHistory(aGroup);
+
     if (theObj->groupName() == ModelAPI_Feature::group()) { // clear results group of the feature
       FeaturePtr aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(theObj);
       std::string aResultGroup = featureResultGroup(aFeature);
@@ -457,7 +456,7 @@ void Model_Objects::createHistory(const std::string& theGroupID)
           // it may be a folder
           ObjectPtr aFolder = folder(aRefs->Value(a));
           if (aFolder.get()) {
-            aResult.push_back(aFolder);
+            aResultOutOfFolder.push_back(aFolder);
 
             // get the last feature in the folder
             AttributeReferencePtr aLastFeatAttr =
@@ -487,8 +486,13 @@ void Model_Objects::updateHistory(const std::shared_ptr<ModelAPI_Object> theObje
 void Model_Objects::updateHistory(const std::string theGroup)
 {
   std::map<std::string, std::vector<ObjectPtr> >::iterator aHIter = myHistory.find(theGroup);
-  if (aHIter != myHistory.end())
+  if (aHIter != myHistory.end()) {
     myHistory.erase(aHIter); // erase from map => this means that it is not synchronized
+
+    // erase history for the group of objects placed out of any folder
+    const std::string& anOutOfFolderGroupID = groupNameFoldering(theGroup, true);
+    myHistory.erase(anOutOfFolderGroupID);
+  }
 }
 
 ObjectPtr Model_Objects::folder(TDF_Label theLabel) const
