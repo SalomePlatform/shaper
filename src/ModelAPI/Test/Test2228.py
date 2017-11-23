@@ -59,7 +59,7 @@ Extrusion_4 = model.addExtrusion(Part_1_doc, [model.selection("WIRE", "Sketch_1/
 Boolean_2 = model.addCut(Part_1_doc, [model.selection("SOLID", "Extrusion_1_1")], [model.selection("SOLID", "Extrusion_4_1")])
 Partition_1 = model.addPartition(Part_1_doc, [model.selection("SOLID", "Extrusion_1_1"), model.selection("SOLID", "Extrusion_2_1"), model.selection("FACE", "Face_1_1")])
 Remove_SubShapes_1 = model.addRemoveSubShapes(Part_1_doc, model.selection("COMPOUND", "Extrusion_1_1"))
-Remove_SubShapes_1.setSubShapesToKeep([model.selection("COMPSOLID", "Partition_1_1_1"), model.selection("FACE", "Partition_1_1_3"), model.selection("FACE", "Partition_1_1_4"), model.selection("FACE", "Partition_1_1_5"), model.selection("FACE", "Partition_1_1_6"), model.selection("FACE", "Partition_1_1_7")])
+Remove_SubShapes_1.setSubShapesToKeep([model.selection("COMPSOLID", "Partition_1_1_1")])
 model.end()
 
 
@@ -67,10 +67,5 @@ model.end()
 from ModelAPI import *
 aFactory = ModelAPI_Session.get().validators()
 assert(aFactory.validate(Remove_SubShapes_1.feature()))
-assert(Remove_SubShapes_1.subshapes().size() == 6)
+assert(Remove_SubShapes_1.subshapes().size() == 1)
 assert(Remove_SubShapes_1.subshapes().value(0).namingName() == "Partition_1_1_1")
-assert(Remove_SubShapes_1.subshapes().value(1).namingName() == "Partition_1_1_3")
-assert(Remove_SubShapes_1.subshapes().value(2).namingName() == "Partition_1_1_4")
-assert(Remove_SubShapes_1.subshapes().value(3).namingName() == "Partition_1_1_5")
-assert(Remove_SubShapes_1.subshapes().value(4).namingName() == "Partition_1_1_6")
-assert(Remove_SubShapes_1.subshapes().value(5).namingName() == "Partition_1_1_7")

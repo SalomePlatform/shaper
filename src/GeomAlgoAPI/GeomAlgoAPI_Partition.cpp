@@ -25,9 +25,22 @@
 
 #include <GEOMAlgo_Splitter.hxx>
 
+#include <NCollection_Vector.hxx>
 #include <TopExp_Explorer.hxx>
 #include <TopoDS_Builder.hxx>
 #include <TopTools_MapOfShape.hxx>
+
+//=================================================================================================
+bool isSubShape(const TopoDS_Shape& theShape, const TopoDS_Shape& theSubShape)
+{
+  for(TopExp_Explorer anExp(theShape, theSubShape.ShapeType()); anExp.More(); anExp.Next()) {
+    if(theSubShape.IsSame(anExp.Current())) {
+      return true;
+    }
+  }
+
+  return false;
+}
 
 //=================================================================================================
 std::shared_ptr<GeomAPI_Shape> GeomAlgoAPI_Partition::make(const ListOfShape& theObjects,
@@ -78,8 +91,10 @@ void GeomAlgoAPI_Partition::build(const ListOfShape& theObjects,
 
   TopTools_MapOfShape ShapesMap;
   // Getting objects.
-  for(ListOfShape::const_iterator
-       anObjectsIt = theObjects.begin(); anObjectsIt != theObjects.end(); anObjectsIt++) {
+  for(ListOfShape::const_iterator anObjectsIt = theObjects.begin();
+      anObjectsIt != theObjects.end();
+      anObjectsIt++)
+  {
     const TopoDS_Shape& aShape = (*anObjectsIt)->impl<TopoDS_Shape>();
     // #2240: decompose compounds to get the valid result
     TopTools_ListOfShape aSimpleShapes;
@@ -111,6 +126,37 @@ void GeomAlgoAPI_Partition::build(const ListOfShape& theObjects,
   }
 #endif
   TopoDS_Shape aResult = anOperation->Shape();
+
+  if(aResult.ShapeType() == TopAbs_COMPOUND) {
+    // Exclude faces and edges which are shared as another sub-shape.
+    NCollection_Vector<TopoDS_Shape> aFacesAndEdges;
+    TopoDS_Compound aTempCompound;
+    TopoDS_Builder aBuilder;
+    aBuilder.MakeCompound(aTempCompound);
+    for(TopoDS_Iterator anIt(aResult);
+        anIt.More();
+        anIt.Next()) {
+      const TopoDS_Shape& aSubShape = anIt.Value();
+      if (aSubShape.ShapeType() == TopAbs_FACE || aSubShape.ShapeType() == TopAbs_EDGE) {
+        aFacesAndEdges.Append(aSubShape);
+      } else {
+        aBuilder.Add(aTempCompound, aSubShape);
+      }
+    }
+
+    for (NCollection_Vector<TopoDS_Shape>::Iterator anIt(aFacesAndEdges);
+        anIt.More();
+        anIt.Next())
+    {
+      const TopoDS_Shape& aSubShape = anIt.Value();
+      if (!isSubShape(aTempCompound, aSubShape))
+      {
+        aBuilder.Add(aTempCompound, aSubShape);
+      }
+    }
+
+    aResult = aTempCompound;
+  }
 
   if(aResult.ShapeType() == TopAbs_COMPOUND) {
     std::shared_ptr<GeomAPI_Shape> aGeomShape(new GeomAPI_Shape);

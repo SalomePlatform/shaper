@@ -151,7 +151,7 @@ Shell_1 = model.addShell(Part_1_doc, [model.selection("FACE", "MultiTranslation_
 Shell_1.result().setName("Shell_1_1")
 Partition_1 = model.addPartition(Part_1_doc, [model.selection("FACE", "Face_3_1"), model.selection("FACE", "Face_3_2"), model.selection("FACE", "Face_4_1"), model.selection("FACE", "Face_2_1"), model.selection("FACE", "Face_1_1"), model.selection("FACE", "Face_3_5"), model.selection("FACE", "Face_3_3"), model.selection("FACE", "Face_3_4"), model.selection("FACE", "Face_3_7"), model.selection("FACE", "Face_3_6"), model.selection("FACE", "Face_3_8"), model.selection("FACE", "Face_3_9"), model.selection("FACE", "Face_3_10"), model.selection("FACE", "Face_3_11"), model.selection("FACE", "Face_3_12"), model.selection("SHELL", "Shell_1_1")])
 Remove_SubShapes_1 = model.addRemoveSubShapes(Part_1_doc, model.selection("COMPOUND", "Face_3_1"))
-Remove_SubShapes_1.setSubShapesToKeep([model.selection("FACE", "Partition_1_1_2"), model.selection("FACE", "Partition_1_1_3"), model.selection("FACE", "Partition_1_1_4"), model.selection("FACE", "Partition_1_1_5"), model.selection("FACE", "Partition_1_1_6"), model.selection("FACE", "Partition_1_1_7"), model.selection("FACE", "Partition_1_1_8"), model.selection("FACE", "Partition_1_1_9"), model.selection("FACE", "Partition_1_1_10"), model.selection("FACE", "Partition_1_1_11"), model.selection("FACE", "Partition_1_1_12"), model.selection("FACE", "Partition_1_1_13"), model.selection("FACE", "Partition_1_1_14"), model.selection("FACE", "Partition_1_1_15"), model.selection("FACE", "Partition_1_1_16"), model.selection("FACE", "Partition_1_1_17"), model.selection("FACE", "Partition_1_1_18"), model.selection("FACE", "Partition_1_1_19"), model.selection("FACE", "Partition_1_1_20"), model.selection("FACE", "Partition_1_1_21"), model.selection("FACE", "Partition_1_1_22"), model.selection("FACE", "Partition_1_1_23"), model.selection("FACE", "Partition_1_1_24"), model.selection("FACE", "Partition_1_1_25"), model.selection("FACE", "Partition_1_1_26"), model.selection("FACE", "Partition_1_1_27"), model.selection("FACE", "Partition_1_1_28"), model.selection("FACE", "Partition_1_1_29"), model.selection("FACE", "Partition_1_1_30"), model.selection("FACE", "Partition_1_1_31"), model.selection("FACE", "Partition_1_1_32"), model.selection("FACE", "Partition_1_1_33"), model.selection("FACE", "Partition_1_1_34"), model.selection("FACE", "Partition_1_1_35"), model.selection("FACE", "Partition_1_1_36"), model.selection("FACE", "Partition_1_1_37"), model.selection("FACE", "Partition_1_1_38"), model.selection("FACE", "Partition_1_1_39"), model.selection("FACE", "Partition_1_1_40"), model.selection("FACE", "Partition_1_1_41"), model.selection("FACE", "Partition_1_1_42"), model.selection("FACE", "Partition_1_1_43"), model.selection("FACE", "Partition_1_1_44"), model.selection("FACE", "Partition_1_1_45"), model.selection("FACE", "Partition_1_1_46"), model.selection("FACE", "Partition_1_1_47"), model.selection("FACE", "Partition_1_1_48"), model.selection("FACE", "Partition_1_1_49"), model.selection("FACE", "Partition_1_1_50"), model.selection("FACE", "Partition_1_1_51"), model.selection("FACE", "Partition_1_1_52"), model.selection("FACE", "Partition_1_1_53"), model.selection("FACE", "Partition_1_1_54"), model.selection("FACE", "Partition_1_1_55"), model.selection("FACE", "Partition_1_1_56"), model.selection("FACE", "Partition_1_1_57")])
+Remove_SubShapes_1.setSubShapesToKeep([model.selection("FACE", "Partition_1_1_2"), model.selection("FACE", "Partition_1_1_3"), model.selection("FACE", "Partition_1_1_4"), model.selection("FACE", "Partition_1_1_5"), model.selection("FACE", "Partition_1_1_6"), model.selection("FACE", "Partition_1_1_7"), model.selection("FACE", "Partition_1_1_8"), model.selection("FACE", "Partition_1_1_9")])
 model.end()
 
 # move groups
@@ -161,16 +161,27 @@ Part_1_doc.moveFeature(Group_2.feature(), Group_1.feature())
 Part_1_doc.moveFeature(Group_3.feature(), Group_2.feature())
 model.end()
 
-# check that groups 2 and 3 are correct, but Group_1 elements are removed (because shell is removed)
+# check that group 2 is correct, but Group_1 and Group_3 elements are removed (because shell is removed)
 from ModelAPI import *
 aFactory = ModelAPI_Session.get().validators()
-for Group in [Group_1, Group_2, Group_3]:
-  if Group != Group_1:
-    assert(aFactory.validate(Group.feature()))
-  assert(Group.groupList().size() != 0)
-  for a in range(Group.groupList().size()):
-    if Group == Group_1:
-      assert(len(Group.groupList().value(a).namingName()) == 0)
-    else:
-      assert(Group.groupList().value(a).value().shapeTypeStr() == "FACE")
-      assert(len(Group.groupList().value(a).namingName()) > 0)
+
+assert(Group_1.groupList().size() != 0)
+for a in range(Group_1.groupList().size()):
+  assert(len(Group_1.groupList().value(a).namingName()) == 0)
+
+assert(aFactory.validate(Group_3.feature()))
+assert(Group_3.groupList().size() != 0)
+for a in range(Group_3.groupList().size()):
+  assert(Group_3.groupList().value(a).value().shapeTypeStr() == "FACE")
+  assert(len(Group_3.groupList().value(a).namingName()) > 0)
+
+# for Group in [Group_1, Group_2, Group_3]:
+#   if Group == Group_2:
+#     assert(aFactory.validate(Group.feature()))
+#   assert(Group.groupList().size() != 0)
+#   for a in range(Group.groupList().size()):
+#     if Group != Group_2:
+#       assert(len(Group.groupList().value(a).namingName()) == 0)
+#     else:
+#       assert(Group.groupList().value(a).value().shapeTypeStr() == "FACE")
+#       assert(len(Group.groupList().value(a).namingName()) > 0)
