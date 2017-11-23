@@ -32,7 +32,6 @@
 #include <Model_ResultParameter.h>
 #include <ModelAPI_Validator.h>
 #include <ModelAPI_CompositeFeature.h>
-#include <ModelAPI_Folder.h>
 #include <ModelAPI_Tools.h>
 
 #include <Events_Loop.h>
@@ -651,6 +650,13 @@ TDF_Label Model_Objects::featuresLabel() const
   return myMain.FindChild(TAG_OBJECTS);
 }
 
+static std::string composeName(const std::string& theFeatureKind, const int theIndex)
+{
+  std::stringstream aNameStream;
+  aNameStream << theFeatureKind << "_" << theIndex;
+  return aNameStream.str();
+}
+
 void Model_Objects::setUniqueName(FeaturePtr theFeature)
 {
   if (!theFeature->data()->name().empty())
@@ -664,9 +670,7 @@ void Model_Objects::setUniqueName(FeaturePtr theFeature)
       aNumObjects++;
   }
   // generate candidate name
-  std::stringstream aNameStream;
-  aNameStream << theFeature->getKind() << "_" << aNumObjects + 1;
-  aName = aNameStream.str();
+  aName = composeName(theFeature->getKind(), aNumObjects + 1);
   // check this is unique, if not, increase index by 1
   for (aFIter.Initialize(myFeatures); aFIter.More();) {
     FeaturePtr aFeature = aFIter.Value();
@@ -681,15 +685,35 @@ void Model_Objects::setUniqueName(FeaturePtr theFeature)
 
     if (isSameName) {
       aNumObjects++;
-      std::stringstream aNameStream;
-      aNameStream << theFeature->getKind() << "_" << aNumObjects + 1;
-      aName = aNameStream.str();
+      aName = composeName(theFeature->getKind(), aNumObjects + 1);
       // reinitialize iterator to make sure a new name is unique
       aFIter.Initialize(myFeatures);
     } else
       aFIter.Next();
   }
   theFeature->data()->setName(aName);
+}
+
+void Model_Objects::setUniqueName(FolderPtr theFolder)
+{
+  if (!theFolder->name().empty())
+    return; // name is already defined
+
+  int aNbFolders = myFolders.Size();
+  std::string aName = composeName(ModelAPI_Folder::ID(), aNbFolders);
+
+  // check the uniqueness of the name
+  NCollection_DataMap<TDF_Label, ObjectPtr>::Iterator anIt(myFolders);
+  while (anIt.More()) {
+    if (anIt.Value()->data()->name() == aName) {
+      aName = composeName(ModelAPI_Folder::ID(), aNbFolders);
+      // reinitialize iterator to make sure a new name is unique
+      anIt.Initialize(myFolders);
+    } else
+      anIt.Next();
+  }
+
+  theFolder->data()->setName(aName);
 }
 
 void Model_Objects::initData(ObjectPtr theObj, TDF_Label theLab, const int theTag)
@@ -702,6 +726,10 @@ void Model_Objects::initData(ObjectPtr theObj, TDF_Label theLab, const int theTa
   FeaturePtr aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(theObj);
   if (aFeature.get()) {
     setUniqueName(aFeature);  // must be before "initAttributes" because duplicate part uses name
+  } else { // is it a folder?
+    FolderPtr aFolder = std::dynamic_pointer_cast<ModelAPI_Folder>(theObj);
+    if (aFolder)
+      setUniqueName(aFolder);
   }
   theObj->initAttributes();
 }
@@ -1201,7 +1229,7 @@ std::shared_ptr<ModelAPI_Folder> Model_Objects::createFolder(
   AddToRefArray(aFeaturesLab, aFolderLab, aPrevFeatureLab);
 
   // keep the feature ID to restore document later correctly
-  TDataStd_Comment::Set(aFolderLab, aFolder->getKind().c_str());
+  TDataStd_Comment::Set(aFolderLab, ModelAPI_Folder::ID().c_str());
   myFolders.Bind(aFolderLab, aFolder);
   // must be before the event sending: for OB the feature is already added
   updateHistory(ModelAPI_Folder::group());

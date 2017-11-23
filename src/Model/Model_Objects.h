@@ -24,6 +24,7 @@
 #include <Model.h>
 #include <ModelAPI_Document.h>
 #include <ModelAPI_Feature.h>
+#include <ModelAPI_Folder.h>
 #include <ModelAPI_Result.h>
 #include <ModelAPI_ResultParameter.h>
 
@@ -167,6 +168,9 @@ class Model_Objects
   //! Initializes feature with a unique name in this group (unique name is generated as
   //! feature type + "_" + index
   void setUniqueName(FeaturePtr theFeature);
+
+  //! Initializes the foldet with an unique name ("Folder_" + index)
+  void setUniqueName(FolderPtr theFolder);
 
   //! Synchronizes myFeatures list with the updated document
   //! \param theUpdated list of labels that are marked as modified, so featrues must be also

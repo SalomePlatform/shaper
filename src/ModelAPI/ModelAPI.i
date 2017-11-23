@@ -153,7 +153,7 @@
 %include "ModelAPI_ResultParameter.h"
 %include "ModelAPI_Tools.h"
 %include "ModelAPI_ResultCompSolid.h"
-#include "ModelAPI_Folder.h"
+%include "ModelAPI_Folder.h"
 
 // std::list -> []
 %template(StringList) std::list<std::string>;

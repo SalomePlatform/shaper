@@ -57,7 +57,8 @@ aFolder1 = aPartSetDoc.addFolder(aPoint1)
 aSession.finishOperation()
 
 assert(aPartSetDoc.size("Folders") == 1)
-assert(aFolder1.name() == "Folder_1")
+FOLDER_NAME_EXPECTED = "Folder_1"
+assert(aFolder1.name() == FOLDER_NAME_EXPECTED), "Actual name '{}', expected '{}'".format(aFolder1.name(), FOLDER_NAME_EXPECTED)
 
 ## Folder at the end of features list
 #aSession.startOperation()
@@ -94,7 +95,8 @@ aFolder2 = aPartDoc.addFolder(aPoint2)
 aSession.finishOperation()
 
 assert(aPartDoc.size("Folders") == 1)
-assert(aFolder2.data().name() == "Folder_1")
+FOLDER_NAME_EXPECTED = "Folder_1"
+assert(aFolder1.name() == FOLDER_NAME_EXPECTED), "Actual name '{}', expected '{}'".format(aFolder1.name(), FOLDER_NAME_EXPECTED)
 
 from salome.shaper import model
 assert(model.checkPythonDump())

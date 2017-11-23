@@ -42,13 +42,6 @@ public:
     return MY_FOLDER_ID;
   }
 
-  /// Returns the unique kind of a feature
-  virtual const std::string& getKind()
-  {
-    static const std::string& MY_KIND = ModelAPI_Folder::ID();
-    return MY_KIND;
-  }
-
   /// Returns the group identifier of all features
   inline static std::string group()
   {
