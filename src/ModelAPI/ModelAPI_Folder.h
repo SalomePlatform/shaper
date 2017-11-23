@@ -87,6 +87,11 @@ public:
   {
     return data()->name();
   }
+  /// Returns the reference attribute by the identifier
+  inline std::shared_ptr<ModelAPI_AttributeReference> reference(const std::string& theID)
+  {
+    return data()->reference(theID);
+  }
 
 protected:
   /// This method is called just after creation of the object: it must initialize

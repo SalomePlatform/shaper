@@ -184,6 +184,25 @@ public:
       std::shared_ptr<ModelAPI_Feature> theAddBefore) = 0;
   //! Removes the folder from the document (all features in the folder will be kept).
   virtual void removeFolder(std::shared_ptr<ModelAPI_Folder> theFolder) = 0;
+  //! Search a folder above the list of features applicable to store them
+  //! (it means the list of features stored in the folder should be consequential)
+  //! \return Empty pointer if there is no applicable folder
+  virtual std::shared_ptr<ModelAPI_Folder> findFolderAbove(
+      const std::list<std::shared_ptr<ModelAPI_Feature> >& theFeatures) = 0;
+  //! Search a folder below the list of features applicable to store them
+  //! (it means the list of features stored in the folder should be consequential)
+  //! \return Empty pointer if there is no applicable folder
+  virtual std::shared_ptr<ModelAPI_Folder> findFolderBelow(
+      const std::list<std::shared_ptr<ModelAPI_Feature> >& theFeatures) = 0;
+  //! Add a list of features to the folder. The correctness of the adding is not performed
+  //! (such checks have been done in corresponding find.. method).
+  //! \return \c true if the movement is successfull
+  virtual bool moveToFolder(const std::list<std::shared_ptr<ModelAPI_Feature> >& theFeatures,
+                            const std::shared_ptr<ModelAPI_Folder>& theFolder) = 0;
+  //! Remove features from the folder
+  //! \return \c true if the features have been moved out
+  virtual bool removeFromFolder(
+      const std::list<std::shared_ptr<ModelAPI_Feature> >& theFeatures) = 0;
 
   //! Informs the document that it becomes active and some actions must be performed
   virtual void setActive(const bool theFlag) = 0;

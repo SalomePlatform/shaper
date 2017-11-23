@@ -209,6 +209,26 @@ class Model_Document : public ModelAPI_Document
       std::shared_ptr<ModelAPI_Feature> theAddBefore = std::shared_ptr<ModelAPI_Feature>());
   //! Removes the folder from the document (all features in the folder will be kept).
   MODEL_EXPORT virtual void removeFolder(std::shared_ptr<ModelAPI_Folder> theFolder);
+  //! Search a folder above the list of features applicable to store them
+  //! (it means the list of features stored in the folder should be consequential)
+  //! \return Empty pointer if there is no applicable folder
+  MODEL_EXPORT virtual std::shared_ptr<ModelAPI_Folder> findFolderAbove(
+      const std::list<std::shared_ptr<ModelAPI_Feature> >& theFeatures);
+  //! Search a folder below the list of features applicable to store them
+  //! (it means the list of features stored in the folder should be consequential)
+  //! \return Empty pointer if there is no applicable folder
+  MODEL_EXPORT virtual std::shared_ptr<ModelAPI_Folder> findFolderBelow(
+      const std::list<std::shared_ptr<ModelAPI_Feature> >& theFeatures);
+  //! Add a list of features to the folder. The correctness of the adding is not performed
+  //! (such checks have been done in corresponding find.. method).
+  //! \return \c true if the movement is successfull
+  MODEL_EXPORT virtual bool moveToFolder(
+      const std::list<std::shared_ptr<ModelAPI_Feature> >& theFeatures,
+      const std::shared_ptr<ModelAPI_Folder>& theFolder);
+  //! Remove features from the folder
+  //! \return \c true if the features have been moved out
+  MODEL_EXPORT virtual bool removeFromFolder(
+      const std::list<std::shared_ptr<ModelAPI_Feature> >& theFeatures);
 
   ///! Returns true if parametric updater need to execute feature on recomputartion
   ///! On abort, undo or redo it is not necessary: results in document are updated automatically

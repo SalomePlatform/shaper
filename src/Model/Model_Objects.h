@@ -150,6 +150,24 @@ class Model_Objects
   /// Creates a folder (group of the features in the object browser)
   std::shared_ptr<ModelAPI_Folder> createFolder(
       const std::shared_ptr<ModelAPI_Feature>& theBeforeThis);
+  //! Removes the folder from the document (all features in the folder will be kept).
+  void removeFolder(std::shared_ptr<ModelAPI_Folder> theFolder);
+  //! Search a folder applicable for the list of features
+  //! (it means the list of features stored in the folder should be consequential)
+  //! \param theFeatures list of features to be added to folder
+  //! \param theBelow    search the folder below the features (if \c false, search above)
+  //! \return Empty pointer if there is no applicable folder
+  std::shared_ptr<ModelAPI_Folder> findFolder(
+      const std::list<std::shared_ptr<ModelAPI_Feature> >& theFeatures,
+      const bool theBelow);
+  //! Add a list of features to the folder. The correctness of the adding is not performed
+  //! (such checks have been done in corresponding find.. method).
+  //! \return \c true if the movement is successfull
+  bool moveToFolder(const std::list<std::shared_ptr<ModelAPI_Feature> >& theFeatures,
+                    const std::shared_ptr<ModelAPI_Folder>& theFolder);
+  //! Remove features from the folder
+  //! \return \c true if the features have been moved out
+  bool removeFromFolder(const std::list<std::shared_ptr<ModelAPI_Feature> >& theFeatures);
 
   //! Sets the owner of this manager
   void setOwner(DocumentPtr theDoc);

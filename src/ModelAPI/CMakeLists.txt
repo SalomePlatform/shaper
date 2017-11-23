@@ -190,4 +190,5 @@ ADD_UNIT_TESTS(TestConstants.py
                TestCustomName_RotateGroup.py
                TestCustomName_Translation.py
                TestFolder_Create.py
+               TestFolder_Update.py
 )

@@ -1265,6 +1265,33 @@ std::shared_ptr<ModelAPI_Folder> Model_Document::addFolder(
 
 void Model_Document::removeFolder(std::shared_ptr<ModelAPI_Folder> theFolder)
 {
+  if (theFolder)
+    myObjs->removeFolder(theFolder);
+}
+
+std::shared_ptr<ModelAPI_Folder> Model_Document::findFolderAbove(
+      const std::list<std::shared_ptr<ModelAPI_Feature> >& theFeatures)
+{
+  return myObjs->findFolder(theFeatures, false);
+}
+
+std::shared_ptr<ModelAPI_Folder> Model_Document::findFolderBelow(
+      const std::list<std::shared_ptr<ModelAPI_Feature> >& theFeatures)
+{
+  return myObjs->findFolder(theFeatures, true);
+}
+
+bool Model_Document::moveToFolder(
+      const std::list<std::shared_ptr<ModelAPI_Feature> >& theFeatures,
+      const std::shared_ptr<ModelAPI_Folder>& theFolder)
+{
+  return myObjs->moveToFolder(theFeatures, theFolder);
+}
+
+bool Model_Document::removeFromFolder(
+      const std::list<std::shared_ptr<ModelAPI_Feature> >& theFeatures)
+{
+  return myObjs->removeFromFolder(theFeatures);
 }
 
 std::shared_ptr<ModelAPI_Feature> Model_Document::feature(
