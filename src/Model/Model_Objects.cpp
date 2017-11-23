@@ -456,7 +456,9 @@ void Model_Objects::createHistory(const std::string& theGroupID)
           // it may be a folder
           ObjectPtr aFolder = folder(aRefs->Value(a));
           if (aFolder.get()) {
-            aResultOutOfFolder.push_back(aFolder);
+            aResult.push_back(aFolder);
+            if (theGroupID != ModelAPI_Folder::group())
+              aResultOutOfFolder.push_back(aFolder);
 
             // get the last feature in the folder
             AttributeReferencePtr aLastFeatAttr =
@@ -558,8 +560,8 @@ ObjectPtr Model_Objects::object(const std::string& theGroupID,
 {
   if (theIndex == -1)
     return ObjectPtr();
+  createHistory(theGroupID);
   const std::string& aGroupID = groupNameFoldering(theGroupID, theAllowFolder);
-  createHistory(aGroupID);
   return myHistory[aGroupID][theIndex];
 }
 
@@ -620,8 +622,8 @@ const int Model_Objects::index(std::shared_ptr<ModelAPI_Object> theObject)
 
 int Model_Objects::size(const std::string& theGroupID, const bool theAllowFolder)
 {
+  createHistory(theGroupID);
   const std::string& aGroupID = groupNameFoldering(theGroupID, theAllowFolder);
-  createHistory(aGroupID);
   return int(myHistory[aGroupID].size());
 }
 
@@ -1237,6 +1239,7 @@ std::shared_ptr<ModelAPI_Folder> Model_Objects::createFolder(
   myFolders.Bind(aFolderLab, aFolder);
   // must be before the event sending: for OB the feature is already added
   updateHistory(ModelAPI_Folder::group());
+  updateHistory(ModelAPI_Feature::group());
 
   // must be after binding to the map because of "Box" macro feature that
   // creates other features in "initData"

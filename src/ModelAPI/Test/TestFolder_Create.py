@@ -51,12 +51,15 @@ aPoint1Data.real("z").setValue(0.)
 aPoint1Data.string("creation_method").setValue("by_xyz")
 aSession.finishOperation()
 
+assert(aPartSetDoc.size("Features") == 2), "Wrong number of features: {}".format(aPartSetDoc.size("Features"))
+
 # Folder before the feature
 aSession.startOperation()
 aFolder1 = aPartSetDoc.addFolder(aPoint1)
 aSession.finishOperation()
 
-assert(aPartSetDoc.size("Folders") == 1)
+assert(aPartSetDoc.size("Folders") == 1), "Wrong number of folders: {}".format(aPartSetDoc.size("Folders"))
+assert(aPartSetDoc.size("Features") == 3), "Wrong number of features: {}".format(aPartSetDoc.size("Features"))
 FOLDER_NAME_EXPECTED = "Folder_1"
 assert(aFolder1.name() == FOLDER_NAME_EXPECTED), "Actual name '{}', expected '{}'".format(aFolder1.name(), FOLDER_NAME_EXPECTED)
 
@@ -90,11 +93,14 @@ aPoint2Data.real("z").setValue(0.)
 aPoint2Data.string("creation_method").setValue("by_xyz")
 aSession.finishOperation()
 
+assert(aPartDoc.size("Features") == 1), "Wrong number of features: {}".format(aPartDoc.size("Features"))
+
 aSession.startOperation()
 aFolder2 = aPartDoc.addFolder(aPoint2)
 aSession.finishOperation()
 
-assert(aPartDoc.size("Folders") == 1)
+assert(aPartDoc.size("Folders") == 1), "Wrong number of folders: {}".format(aPartDoc.size("Folders"))
+assert(aPartDoc.size("Features") == 2), "Wrong number of features: {}".format(aPartDoc.size("Features"))
 FOLDER_NAME_EXPECTED = "Folder_1"
 assert(aFolder2.name() == FOLDER_NAME_EXPECTED), "Actual name '{}', expected '{}'".format(aFolder2.name(), FOLDER_NAME_EXPECTED)
 
