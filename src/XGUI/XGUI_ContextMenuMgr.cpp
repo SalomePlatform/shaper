@@ -189,6 +189,13 @@ void XGUI_ContextMenuMgr::createActions()
                                            tr("Insert a folder before"), aDesktop);
   addAction("INSERT_FOLDER_CMD", aAction);
 
+  aAction = ModuleBase_Tools::createAction(QIcon(),
+                                           tr("Move into the previous folder"), aDesktop);
+  addAction("ADD_TO_FOLDER_BEFORE_CMD", aAction);
+
+  aAction = ModuleBase_Tools::createAction(QIcon(),
+                                           tr("Move into the next folder"), aDesktop);
+  addAction("ADD_TO_FOLDER_AFTER_CMD", aAction);
 
   buildObjBrowserMenu();
   buildViewerMenu();
@@ -277,7 +284,7 @@ void XGUI_ContextMenuMgr::updateObjectBrowserMenu()
     ModuleBase_Tools::checkObjects(aObjects, hasResult, hasFeature, hasParameter,
                                    hasCompositeOwner, hasResultInHistory, hasFolder);
     //Process Feature
-    if (aSelected == 1) {
+    if (aSelected == 1) { // single selection
       ObjectPtr aObject = aObjects.first();
       if (aObject) {
         if (hasResult && myWorkshop->canBeShaded(aObject)) {
@@ -318,7 +325,8 @@ void XGUI_ContextMenuMgr::updateObjectBrowserMenu()
                                                   (hasFeature || hasParameter));
         }
       }
-    } else {
+      // end single selection
+    } else { // multiselection
       // parameter is commented because the actions are not in the list of result parameter actions
       if (hasResult /*&& (!hasParameter)*/) {
         action("SHOW_CMD")->setEnabled(true);
@@ -327,7 +335,44 @@ void XGUI_ContextMenuMgr::updateObjectBrowserMenu()
         action("SHADING_CMD")->setEnabled(true);
         action("WIREFRAME_CMD")->setEnabled(true);
       }
-    }
+    } // end multiselection
+
+    // Check folder management commands state if only features are selected
+    if ((!hasResult) && hasFeature && (!hasParameter) && (!hasCompositeOwner) &&
+      (!hasResultInHistory) && (!hasFolder)) {
+      QModelIndexList aIndexes = aSelMgr->selection()->selectedIndexes();
+      QModelIndex aFirstIdx = aIndexes.first();
+      QModelIndex aLastIdx = aIndexes.last();
+      QModelIndex aParentIdx = aFirstIdx.parent();
+
+      if (aParentIdx == aLastIdx.parent()) {
+        // if all selected are from the same level
+        XGUI_DataModel* aModel = myWorkshop->objectBrowser()->dataModel();
+        ObjectPtr aDataObj = aModel->object(aParentIdx);
+
+        ObjectPtr aPrevObj;
+        if (aFirstIdx.row() > 0) {
+          QModelIndex aPrevIdx = aFirstIdx.sibling(aFirstIdx.row() - 1, 0);
+          aPrevObj = aModel->object(aPrevIdx);
+        }
+
+        ObjectPtr aNextObj;
+        if (aLastIdx.row() < (aModel->rowCount(aParentIdx) - 1)) {
+          QModelIndex aNextIdx = aFirstIdx.sibling(aLastIdx.row() + 1, 0);
+          aNextObj = aModel->object(aNextIdx);
+        }
+
+        bool isPrevFolder = (aPrevObj.get() && (aPrevObj->groupName() == ModelAPI_Folder::group()));
+        bool isNextFolder = (aNextObj.get() && (aNextObj->groupName() == ModelAPI_Folder::group()));
+        bool isInFolder = (aDataObj.get() && (aDataObj->groupName() == ModelAPI_Folder::group()));
+        bool isOutsideFolder = hasFeature && (!isInFolder);
+
+        action("INSERT_FOLDER_CMD")->setEnabled(isOutsideFolder);
+        action("ADD_TO_FOLDER_BEFORE_CMD")->setEnabled(isOutsideFolder && isPrevFolder);
+        action("ADD_TO_FOLDER_AFTER_CMD")->setEnabled(isOutsideFolder && isNextFolder);
+      }
+    } // end folder management commands
+
     bool allActive = true;
     foreach( ObjectPtr aObject, aObjects )
       if( aMgr->activeDocument() != aObject->document() )  {
@@ -342,9 +387,8 @@ void XGUI_ContextMenuMgr::updateObjectBrowserMenu()
       action("CLEAN_HISTORY_CMD")->setEnabled(true);
 
     action("SHOW_RESULTS_CMD")->setEnabled(hasFeature);
-    action("INSERT_FOLDER_CMD")->setEnabled(hasFeature);
     action("SHOW_FEATURE_CMD")->setEnabled(hasResult && hasResultInHistory);
-  }
+  } // end selection processing
 
   // Show/Hide command has to be disabled for objects from non active document
   bool aDeactivate = false;
@@ -546,6 +590,8 @@ void XGUI_ContextMenuMgr::buildObjBrowserMenu()
   aList.append(action("MOVE_CMD"));
   aList.append(mySeparator1);
   aList.append(action("INSERT_FOLDER_CMD"));
+  aList.append(action("ADD_TO_FOLDER_BEFORE_CMD"));
+  aList.append(action("ADD_TO_FOLDER_AFTER_CMD"));
   aList.append(mySeparator2);
   aList.append(action("CLEAN_HISTORY_CMD"));
   aList.append(action("DELETE_CMD"));

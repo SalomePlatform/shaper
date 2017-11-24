@@ -1415,6 +1415,10 @@ void XGUI_Workshop::onContextMenuCommand(const QString& theId, bool isChecked)
     setViewerSelectionMode(TopAbs_FACE);
   } else if (theId == "INSERT_FOLDER_CMD") {
     insertFeatureFolder();
+  } else if (theId == "ADD_TO_FOLDER_BEFORE_CMD") {
+    insertToFolderBefore();
+  } else if (theId == "ADD_TO_FOLDER_AFTER_CMD") {
+    insertToFolderAfter();
   } else if (theId == "SELECT_RESULT_CMD") {
     //setViewerSelectionMode(-1);
     //IMP: an attempt to use result selection with other selection modes
@@ -2427,6 +2431,18 @@ void XGUI_Workshop::insertFeatureFolder()
   aMgr->startOperation();
   aDoc->addFolder(aFeature);
   aMgr->finishOperation();
+}
 
-  //myObjectBrowser->rebuildDataTree();
+void XGUI_Workshop::insertToFolderBefore()
+{
+  QObjectPtrList aObjects = mySelector->selection()->selectedObjects();
+  if (aObjects.isEmpty())
+    return;
+}
+
+void XGUI_Workshop::insertToFolderAfter()
+{
+  QObjectPtrList aObjects = mySelector->selection()->selectedObjects();
+  if (aObjects.isEmpty())
+    return;
 }
