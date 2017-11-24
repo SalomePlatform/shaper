@@ -1413,6 +1413,8 @@ void XGUI_Workshop::onContextMenuCommand(const QString& theId, bool isChecked)
     setViewerSelectionMode(TopAbs_EDGE);
   } else if (theId == "SELECT_FACE_CMD") {
     setViewerSelectionMode(TopAbs_FACE);
+  } else if (theId == "INSERT_FOLDER_CMD") {
+    insertFeatureFolder();
   } else if (theId == "SELECT_RESULT_CMD") {
     //setViewerSelectionMode(-1);
     //IMP: an attempt to use result selection with other selection modes
@@ -1507,9 +1509,10 @@ void XGUI_Workshop::deleteObjects()
   bool hasParameter = false;
   bool hasCompositeOwner = false;
   bool hasResultInHistory = false;
+  bool hasFolder = false;
   ModuleBase_Tools::checkObjects(anObjects, hasResult, hasFeature, hasParameter, hasCompositeOwner,
-                                 hasResultInHistory);
-  if (!(hasFeature || hasParameter))
+                                 hasResultInHistory, hasFolder);
+  if (!(hasFeature || hasParameter || hasFolder))
     return;
 
   // delete objects
@@ -2407,4 +2410,23 @@ void XGUI_Workshop::highlightFeature(const QObjectPtrList& theObjects)
     objectBrowser()->setObjectsSelected(aSelList);
     objectBrowser()->blockSignals(aBlocked);
   }
+}
+
+void XGUI_Workshop::insertFeatureFolder()
+{
+  QObjectPtrList aObjects = mySelector->selection()->selectedObjects();
+  if (aObjects.isEmpty())
+    return;
+  ObjectPtr aObj = aObjects.first();
+  FeaturePtr aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(aObj);
+  if (aFeature.get() == NULL)
+    return;
+  SessionPtr aMgr = ModelAPI_Session::get();
+  DocumentPtr aDoc = aMgr->activeDocument();
+
+  aMgr->startOperation();
+  aDoc->addFolder(aFeature);
+  aMgr->finishOperation();
+
+  //myObjectBrowser->rebuildDataTree();
 }

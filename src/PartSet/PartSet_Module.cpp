@@ -1201,8 +1201,9 @@ void PartSet_Module::addObjectBrowserMenu(QMenu* theMenu) const
   bool hasParameter = false;
   bool hasCompositeOwner = false;
   bool hasResultInHistory = false;
+  bool hasFolder = false;
   ModuleBase_Tools::checkObjects(aObjects, hasResult, hasFeature, hasParameter,
-                                  hasCompositeOwner, hasResultInHistory);
+                                  hasCompositeOwner, hasResultInHistory, hasFolder);
 
   ModuleBase_Operation* aCurrentOp = myWorkshop->currentOperation();
   if (aSelected == 1) {

@@ -47,6 +47,7 @@
 #include <ModelAPI_ResultBody.h>
 #include <ModelAPI_Tools.h>
 #include <ModelAPI_ResultField.h>
+#include "ModelAPI_Folder.h"
 
 #include <Config_DataModelReader.h>
 
@@ -66,7 +67,7 @@
 XGUI_ContextMenuMgr::XGUI_ContextMenuMgr(XGUI_Workshop* theParent)
     : QObject(theParent),
       myWorkshop(theParent),
-      mySeparator(0)
+      mySeparator1(0), mySeparator2(0)
 {
 }
 
@@ -135,8 +136,11 @@ void XGUI_ContextMenuMgr::createActions()
                                            aDesktop);
   addAction("WIREFRAME_CMD", aAction);
 
-  mySeparator = ModuleBase_Tools::createAction(QIcon(), "", aDesktop);
-  mySeparator->setSeparator(true);
+  mySeparator1 = ModuleBase_Tools::createAction(QIcon(), "", aDesktop);
+  mySeparator1->setSeparator(true);
+
+  mySeparator2 = ModuleBase_Tools::createAction(QIcon(), "", aDesktop);
+  mySeparator2->setSeparator(true);
 
   //mySelectActions = new QActionGroup(this);
   //mySelectActions->setExclusive(true);
@@ -179,6 +183,12 @@ void XGUI_ContextMenuMgr::createActions()
   aAction = ModuleBase_Tools::createAction(QIcon(), tr("TInspector"), aDesktop);
   addAction("TINSPECTOR_VIEW", aAction);
 #endif
+
+  // Features folders actions
+  aAction = ModuleBase_Tools::createAction(QIcon(),
+                                           tr("Insert a folder before"), aDesktop);
+  addAction("INSERT_FOLDER_CMD", aAction);
+
 
   buildObjBrowserMenu();
   buildViewerMenu();
@@ -263,8 +273,9 @@ void XGUI_ContextMenuMgr::updateObjectBrowserMenu()
     bool hasParameter = false;
     bool hasCompositeOwner = false;
     bool hasResultInHistory = false;
+    bool hasFolder = false;
     ModuleBase_Tools::checkObjects(aObjects, hasResult, hasFeature, hasParameter,
-                                   hasCompositeOwner, hasResultInHistory);
+                                   hasCompositeOwner, hasResultInHistory, hasFolder);
     //Process Feature
     if (aSelected == 1) {
       ObjectPtr aObject = aObjects.first();
@@ -331,6 +342,7 @@ void XGUI_ContextMenuMgr::updateObjectBrowserMenu()
       action("CLEAN_HISTORY_CMD")->setEnabled(true);
 
     action("SHOW_RESULTS_CMD")->setEnabled(hasFeature);
+    action("INSERT_FOLDER_CMD")->setEnabled(hasFeature);
     action("SHOW_FEATURE_CMD")->setEnabled(hasResult && hasResultInHistory);
   }
 
@@ -492,7 +504,7 @@ void XGUI_ContextMenuMgr::buildObjBrowserMenu()
   aList.append(action("SHOW_CMD"));
   aList.append(action("HIDE_CMD"));
   aList.append(action("SHOW_ONLY_CMD"));
-  aList.append(mySeparator);
+  aList.append(mySeparator1);
   aList.append(action("RENAME_CMD"));
   aList.append(action("COLOR_CMD"));
   aList.append(action("DEFLECTION_CMD"));
@@ -507,12 +519,12 @@ void XGUI_ContextMenuMgr::buildObjBrowserMenu()
   aList.clear();
   aList.append(action("WIREFRAME_CMD"));
   aList.append(action("SHADING_CMD"));
-  aList.append(mySeparator); // this separator is not shown as this action is added after show only
+  aList.append(mySeparator1); // this separator is not shown as this action is added after show only
   // qt list container contains only one instance of the same action
   aList.append(action("SHOW_CMD"));
   aList.append(action("HIDE_CMD"));
   aList.append(action("SHOW_ONLY_CMD"));
-  aList.append(mySeparator);
+  aList.append(mySeparator2);
   aList.append(action("RENAME_CMD"));
   aList.append(action("COLOR_CMD"));
   aList.append(action("DEFLECTION_CMD"));
@@ -532,18 +544,25 @@ void XGUI_ContextMenuMgr::buildObjBrowserMenu()
   aList.append(action("RENAME_CMD"));
   aList.append(action("SHOW_RESULTS_CMD"));
   aList.append(action("MOVE_CMD"));
-  aList.append(mySeparator);
+  aList.append(mySeparator1);
+  aList.append(action("INSERT_FOLDER_CMD"));
+  aList.append(mySeparator2);
   aList.append(action("CLEAN_HISTORY_CMD"));
   aList.append(action("DELETE_CMD"));
   myObjBrowserMenus[ModelAPI_Feature::group()] = aList;
 
   aList.clear();
   aList.append(action("RENAME_CMD"));
-  aList.append(mySeparator);
+  aList.append(mySeparator1);
   aList.append(action("CLEAN_HISTORY_CMD"));
   aList.append(action("DELETE_CMD"));
   myObjBrowserMenus[ModelAPI_ResultParameter::group()] = aList;
   //-------------------------------------
+
+  aList.clear();
+  aList.append(action("DELETE_CMD"));
+  myObjBrowserMenus[ModelAPI_Folder::group()] = aList;
+
 }
 
 void XGUI_ContextMenuMgr::buildViewerMenu()
@@ -552,7 +571,7 @@ void XGUI_ContextMenuMgr::buildViewerMenu()
   // Result construction menu
   aList.append(action("HIDE_CMD"));
   aList.append(action("SHOW_ONLY_CMD"));
-  aList.append(mySeparator);
+  aList.append(mySeparator1);
   aList.append(action("COLOR_CMD"));
   aList.append(action("DEFLECTION_CMD"));
 #ifdef USE_TRANSPARENCY
@@ -566,10 +585,10 @@ void XGUI_ContextMenuMgr::buildViewerMenu()
   aList.clear();
   aList.append(action("WIREFRAME_CMD"));
   aList.append(action("SHADING_CMD"));
-  aList.append(mySeparator);
+  aList.append(mySeparator1);
   aList.append(action("HIDE_CMD"));
   aList.append(action("SHOW_ONLY_CMD"));
-  aList.append(mySeparator);
+  aList.append(mySeparator2);
   aList.append(action("COLOR_CMD"));
   aList.append(action("DEFLECTION_CMD"));
 #ifdef USE_TRANSPARENCY
@@ -603,11 +622,11 @@ void XGUI_ContextMenuMgr::addObjBrowserMenu(QMenu* theMenu) const
   } else if (aSelected > 1) {
       aActions.append(action("WIREFRAME_CMD"));
       aActions.append(action("SHADING_CMD"));
-      aActions.append(mySeparator);
+      aActions.append(mySeparator1);
       aActions.append(action("SHOW_CMD"));
       aActions.append(action("HIDE_CMD"));
       aActions.append(action("SHOW_ONLY_CMD"));
-      aActions.append(mySeparator);
+      aActions.append(mySeparator2);
       //aActions.append(action("MOVE_CMD"));
       aActions.append(action("COLOR_CMD"));
       aActions.append(action("DEFLECTION_CMD"));

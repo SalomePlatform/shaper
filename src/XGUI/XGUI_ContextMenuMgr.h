@@ -142,7 +142,8 @@ signals:
 
   //QActionGroup* mySelectActions;
 
-  QAction* mySeparator;
+  QAction* mySeparator1;
+  QAction* mySeparator2;
 };
 
 #endif

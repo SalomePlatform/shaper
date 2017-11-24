@@ -62,5 +62,6 @@
      <file>pictures/eyeopen.png</file>
 
      <file>pictures/transparency.png</file>
+     <file>pictures/features_folder.png</file>
  </qresource>
  </RCC>

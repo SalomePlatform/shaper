@@ -46,6 +46,7 @@
 #include <ModelAPI_Tools.h>
 #include <ModelAPI_Session.h>
 #include <ModelAPI_Events.h>
+#include <ModelAPI_Folder.h>
 
 #include <ModelGeomAlgo_Point2D.h>
 
@@ -372,20 +373,24 @@ int shapeType(const QString& theType)
 }
 
 void checkObjects(const QObjectPtrList& theObjects, bool& hasResult, bool& hasFeature,
-                  bool& hasParameter, bool& hasCompositeOwner, bool& hasResultInHistory)
+                  bool& hasParameter, bool& hasCompositeOwner, bool& hasResultInHistory,
+                  bool& hasFolder)
 {
   hasResult = false;
   hasFeature = false;
   hasParameter = false;
   hasCompositeOwner = false;
   hasResultInHistory = false;
+  hasFolder = false;
   foreach(ObjectPtr aObj, theObjects) {
     FeaturePtr aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(aObj);
     ResultPtr aResult = std::dynamic_pointer_cast<ModelAPI_Result>(aObj);
+    FolderPtr aFolder = std::dynamic_pointer_cast<ModelAPI_Folder>(aObj);
     ResultParameterPtr aConstruction = std::dynamic_pointer_cast<ModelAPI_ResultParameter>(aResult);
 
     hasResult |= (aResult.get() != NULL);
     hasFeature |= (aFeature.get() != NULL);
+    hasFolder |= (aFolder.get() != NULL);
     hasParameter |= (aConstruction.get() != NULL);
     if (hasFeature)
       hasCompositeOwner |= (ModelAPI_Tools::compositeOwner(aFeature) != NULL);
@@ -395,7 +400,7 @@ void checkObjects(const QObjectPtrList& theObjects, bool& hasResult, bool& hasFe
       hasResultInHistory = aFeature.get() && aFeature->isInHistory();
     }
 
-    if (hasFeature && hasResult  && hasParameter && hasCompositeOwner)
+    if (hasFeature && hasResult  && hasParameter && hasCompositeOwner && hasFeature)
       break;
   }
 }
