@@ -316,7 +316,7 @@ private:
     else { \
       FolderPtr anAttributeOwnerFolder = std::dynamic_pointer_cast<ModelAPI_Folder>(owner()); \
       if (anAttributeOwnerFolder.get()) \
-        aTargetData->addBackReference(anAttributeOwnerFolder, id()); \
+        aTargetData->addBackReference(ObjectPtr(anAttributeOwnerFolder), id()); \
     } \
   }
 
@@ -332,7 +332,7 @@ private:
     else { \
       FolderPtr anAttributeOwnerFolder = std::dynamic_pointer_cast<ModelAPI_Folder>(owner()); \
       if (anAttributeOwnerFolder.get()) \
-        aTargetData->removeBackReference(anAttributeOwnerFolder, id()); \
+        aTargetData->removeBackReference(ObjectPtr(anAttributeOwnerFolder), id()); \
     } \
   }
 
