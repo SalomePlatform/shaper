@@ -1497,8 +1497,10 @@ bool Model_Objects::removeFromFolder(
   if (theFeatures.empty())
     return false;
 
-  FolderPtr aFirstFeatureFolder = inFolder(theFeatures.front(), ModelAPI_Folder::FIRST_FEATURE_ID());
-  FolderPtr aLastFeatureFolder  = inFolder(theFeatures.back(),  ModelAPI_Folder::LAST_FEATURE_ID());
+  FolderPtr aFirstFeatureFolder =
+      inFolder(theFeatures.front(), ModelAPI_Folder::FIRST_FEATURE_ID());
+  FolderPtr aLastFeatureFolder =
+      inFolder(theFeatures.back(),  ModelAPI_Folder::LAST_FEATURE_ID());
 
   bool isExtractBeforeFolder = theBefore;
   FolderPtr aFoundFolder =
