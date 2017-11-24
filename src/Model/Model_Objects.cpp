@@ -608,10 +608,19 @@ std::shared_ptr<ModelAPI_Object> Model_Objects::objectByName(
   return ObjectPtr();
 }
 
-const int Model_Objects::index(std::shared_ptr<ModelAPI_Object> theObject)
+const int Model_Objects::index(std::shared_ptr<ModelAPI_Object> theObject,
+                               const bool theAllowFolder)
 {
   std::string aGroup = theObject->groupName();
+  // treat folder as feature
+  if (aGroup == ModelAPI_Folder::group())
+    aGroup = ModelAPI_Feature::group();
   createHistory(aGroup);
+
+  // get the group of features out of folder (if enabled)
+  if (theAllowFolder && !groupNameFoldering(aGroup, theAllowFolder).empty())
+    aGroup = groupNameFoldering(aGroup, theAllowFolder);
+
   std::vector<ObjectPtr>& allObjs = myHistory[aGroup];
   std::vector<ObjectPtr>::iterator anObjIter = allObjs.begin(); // iterate to search object
   for(int anIndex = 0; anObjIter != allObjs.end(); anObjIter++, anIndex++) {

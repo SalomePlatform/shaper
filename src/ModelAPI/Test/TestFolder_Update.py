@@ -131,6 +131,11 @@ NB_FEATURES_OUT += 1
 assert(aPartDoc.size("Features") == NB_FEATURES_FULL), "Wrong number of features: {}, expected: {}".format(aPartDoc.size("Features"), NB_FEATURES_FULL)
 assert(aPartDoc.size("Features", True) == NB_FEATURES_OUT), "Wrong number of features outside a folder: {}, expected: {}".format(aPartDoc.size("Features", True), NB_FEATURES_OUT)
 
+# index without respect to foldering
+assert(aPartDoc.index(aPoint4) == 5), "Wrong index of the point: {}".format(aPartDoc.index(aPoint4))
+# index according to folders
+assert(aPartDoc.index(aPoint4, True) == 3), "Wrong index of the point: {}".format(aPartDoc.index(aPoint4, True))
+
 # add a folder
 aSession.startOperation()
 aFolder2 = aPartDoc.addFolder(aPoint3)
@@ -142,6 +147,13 @@ NB_FEATURES_OUT += 1
 assert(aPartDoc.size("Folders") == 3), "Wrong number of folders: {}".format(aPartDoc.size("Folders"))
 assert(aPartDoc.size("Features") == NB_FEATURES_FULL), "Wrong number of features: {}, expected: {}".format(aPartDoc.size("Features"), NB_FEATURES_FULL)
 assert(aPartDoc.size("Features", True) == NB_FEATURES_OUT), "Wrong number of features outside a folder: {}, expected: {}".format(aPartDoc.size("Features", True), NB_FEATURES_OUT)
+
+# index without respect to foldering
+assert(aPartDoc.index(aFolder2) == 4), "Wrong index of the folder: {}".format(aPartDoc.index(aFolder2))
+assert(aPartDoc.index(aPoint4) == 6), "Wrong index of the point: {}".format(aPartDoc.index(aPoint4))
+# index according to folders
+assert(aPartDoc.index(aFolder2, True) == 2), "Wrong index of the folder: {}".format(aPartDoc.index(aFolder2, True))
+assert(aPartDoc.index(aPoint4, True) == 4), "Wrong index of the point: {}".format(aPartDoc.index(aPoint4, True))
 
 toFolder = FeatureList()
 toFolder.append(aPoint3)
@@ -159,6 +171,15 @@ NB_FEATURES_OUT -= 2
 
 assert(aPartDoc.size("Features") == NB_FEATURES_FULL), "Wrong number of features: {}, expected: {}".format(aPartDoc.size("Features"), NB_FEATURES_FULL)
 assert(aPartDoc.size("Features", True) == NB_FEATURES_OUT), "Wrong number of features outside a folder: {}, expected: {}".format(aPartDoc.size("Features", True), NB_FEATURES_OUT)
+
+# index without respect to foldering
+assert(aPartDoc.index(aFolder2) == 4), "Wrong index of the folder: {}".format(aPartDoc.index(aFolder2))
+assert(aPartDoc.index(aPoint3) == 5), "Wrong index of the point: {}".format(aPartDoc.index(aPoint3))
+assert(aPartDoc.index(aPoint4) == 6), "Wrong index of the point: {}".format(aPartDoc.index(aPoint4))
+# index according to folders
+assert(aPartDoc.index(aFolder2, True) == 2), "Wrong index of the folder: {}".format(aPartDoc.index(aFolder2, True))
+assert(aPartDoc.index(aPoint3, True) == -1), "Wrong index of the point: {}".format(aPartDoc.index(aPoint3, True))
+assert(aPartDoc.index(aPoint4, True) == -1), "Wrong index of the point: {}".format(aPartDoc.index(aPoint4, True))
 
 
 from salome.shaper import model

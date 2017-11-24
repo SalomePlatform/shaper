@@ -91,8 +91,10 @@ class Model_Objects
 
   //! Returns the object index in the group. Object must be visible. Otherwise returns -1.
   //! \param theObject object of this document
+  //! \param theAllowFolder take into account grouping feature by folders
   //! \returns index started from zero, or -1 if object is invisible or belongs to another document
-  const int index(std::shared_ptr<ModelAPI_Object> theObject);
+  const int index(std::shared_ptr<ModelAPI_Object> theObject,
+                  const bool theAllowFolder = false);
 
   //! Returns the feature in the group by the index (started from zero)
   //! \param theGroupID group that contains a feature

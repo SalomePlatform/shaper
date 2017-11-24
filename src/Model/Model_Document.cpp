@@ -1044,9 +1044,9 @@ std::shared_ptr<ModelAPI_Object> Model_Document::objectByName(
   return myObjs->objectByName(theGroupID, theName);
 }
 
-const int Model_Document::index(std::shared_ptr<ModelAPI_Object> theObject)
+const int Model_Document::index(std::shared_ptr<ModelAPI_Object> theObject, const bool theAllowFolder)
 {
-  return myObjs->index(theObject);
+  return myObjs->index(theObject, theAllowFolder);
 }
 
 int Model_Document::size(const std::string& theGroupID, const bool theAllowFolder)
