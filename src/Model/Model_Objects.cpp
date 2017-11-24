@@ -53,13 +53,9 @@ static const std::string& groupNameFoldering(const std::string& theGroupID,
                                              const bool theAllowFolder)
 {
   if (theAllowFolder) {
-    static std::map<std::string, std::string> aNames;
-    std::map<std::string, std::string>::const_iterator aFound = aNames.find(theGroupID);
-    if (aFound == aNames.end()) {
-      aNames[theGroupID] = std::string("__") + theGroupID;
-      aFound = aNames.find(theGroupID);
-    }
-    return aFound->second;
+    static const std::string anOutOfFolderName = std::string("__") + ModelAPI_Feature::group();
+    static const std::string aDummyName;
+    return theGroupID == ModelAPI_Feature::group() ? anOutOfFolderName : aDummyName;
   }
   return theGroupID;
 }
@@ -416,6 +412,7 @@ void Model_Objects::createHistory(const std::string& theGroupID)
     FeaturePtr aLastFeatureInFolder;
     // iterate the array of references and get feature by feature from the array
     bool isFeature = theGroupID == ModelAPI_Feature::group();
+    bool isFolder = theGroupID == ModelAPI_Folder::group();
     Handle(TDataStd_ReferenceArray) aRefs;
     if (featuresLabel().FindAttribute(TDataStd_ReferenceArray::GetID(), aRefs)) {
       for(int a = aRefs->Lower(); a <= aRefs->Upper(); a++) {
@@ -456,9 +453,12 @@ void Model_Objects::createHistory(const std::string& theGroupID)
           // it may be a folder
           ObjectPtr aFolder = folder(aRefs->Value(a));
           if (aFolder.get()) {
-            aResult.push_back(aFolder);
-            if (theGroupID != ModelAPI_Folder::group())
-              aResultOutOfFolder.push_back(aFolder);
+            // store folder information for the Features group only
+            if (isFeature || isFolder) {
+              aResult.push_back(aFolder);
+              if (!isFolder)
+                aResultOutOfFolder.push_back(aFolder);
+            }
 
             // get the last feature in the folder
             AttributeReferencePtr aLastFeatAttr =
@@ -475,7 +475,8 @@ void Model_Objects::createHistory(const std::string& theGroupID)
 
       // store the features placed out of any folder
       const std::string& anOutOfFolderGroupID = groupNameFoldering(theGroupID, true);
-      myHistory[anOutOfFolderGroupID] = aResultOutOfFolder;
+      if (!anOutOfFolderGroupID.empty())
+        myHistory[anOutOfFolderGroupID] = aResultOutOfFolder;
     }
   }
 }
@@ -493,7 +494,8 @@ void Model_Objects::updateHistory(const std::string theGroup)
 
     // erase history for the group of objects placed out of any folder
     const std::string& anOutOfFolderGroupID = groupNameFoldering(theGroup, true);
-    myHistory.erase(anOutOfFolderGroupID);
+    if (!anOutOfFolderGroupID.empty())
+      myHistory.erase(anOutOfFolderGroupID);
   }
 }
 
@@ -562,7 +564,7 @@ ObjectPtr Model_Objects::object(const std::string& theGroupID,
     return ObjectPtr();
   createHistory(theGroupID);
   const std::string& aGroupID = groupNameFoldering(theGroupID, theAllowFolder);
-  return myHistory[aGroupID][theIndex];
+  return aGroupID.empty() ? myHistory[theGroupID][theIndex] : myHistory[aGroupID][theIndex];
 }
 
 std::shared_ptr<ModelAPI_Object> Model_Objects::objectByName(
@@ -624,7 +626,7 @@ int Model_Objects::size(const std::string& theGroupID, const bool theAllowFolder
 {
   createHistory(theGroupID);
   const std::string& aGroupID = groupNameFoldering(theGroupID, theAllowFolder);
-  return int(myHistory[aGroupID].size());
+  return aGroupID.empty() ? int(myHistory[theGroupID].size()) : int(myHistory[aGroupID].size());
 }
 
 void Model_Objects::allResults(const std::string& theGroupID, std::list<ResultPtr>& theResults)
