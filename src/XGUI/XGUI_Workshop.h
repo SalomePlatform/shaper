@@ -451,11 +451,8 @@ private:
   /// Insert folder object before currently selected feature
   void insertFeatureFolder();
 
-  /// Insert an object to a folder above
-  void insertToFolderBefore();
-
-  /// Insert an object to a folder below
-  void insertToFolderAfter();
+  /// Insert an object to a folder above or below
+  void insertToFolder(bool isBefore);
 
  private slots:
   /// SLOT, that is called after the operation is started. Update workshop state according to

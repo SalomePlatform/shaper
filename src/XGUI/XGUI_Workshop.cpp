@@ -1416,9 +1416,9 @@ void XGUI_Workshop::onContextMenuCommand(const QString& theId, bool isChecked)
   } else if (theId == "INSERT_FOLDER_CMD") {
     insertFeatureFolder();
   } else if (theId == "ADD_TO_FOLDER_BEFORE_CMD") {
-    insertToFolderBefore();
+    insertToFolder(true);
   } else if (theId == "ADD_TO_FOLDER_AFTER_CMD") {
-    insertToFolderAfter();
+    insertToFolder(false);
   } else if (theId == "SELECT_RESULT_CMD") {
     //setViewerSelectionMode(-1);
     //IMP: an attempt to use result selection with other selection modes
@@ -2448,16 +2448,31 @@ void XGUI_Workshop::insertFeatureFolder()
   aMgr->finishOperation();
 }
 
-void XGUI_Workshop::insertToFolderBefore()
-{
-  QObjectPtrList aObjects = mySelector->selection()->selectedObjects();
-  if (aObjects.isEmpty())
-    return;
-}
 
-void XGUI_Workshop::insertToFolderAfter()
+void XGUI_Workshop::insertToFolder(bool isBefore)
 {
   QObjectPtrList aObjects = mySelector->selection()->selectedObjects();
   if (aObjects.isEmpty())
     return;
+
+  std::list<FeaturePtr> aFeatures;
+  foreach(ObjectPtr aObj, aObjects) {
+    FeaturePtr aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(aObj);
+    if (aFeature.get())
+      aFeatures.push_back(aFeature);
+  }
+  if (aFeatures.empty())
+    return;
+
+  SessionPtr aMgr = ModelAPI_Session::get();
+  DocumentPtr aDoc = aMgr->activeDocument();
+
+  FolderPtr aFolder = isBefore? aDoc->findFolderAbove(aFeatures):
+                                aDoc->findFolderBelow(aFeatures);
+  if (!aFolder.get())
+    return;
+
+  aMgr->startOperation();
+  aDoc->moveToFolder(aFeatures, aFolder);
+  aMgr->finishOperation();
 }
