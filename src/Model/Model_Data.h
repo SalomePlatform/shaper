@@ -36,6 +36,7 @@
 #include <ModelAPI_AttributeIntArray.h>
 #include <ModelAPI_Data.h>
 #include <ModelAPI_Feature.h>
+#include <ModelAPI_Folder.h>
 #include <ModelAPI_Object.h>
 
 #include <TDF_Label.hxx>
@@ -271,7 +272,7 @@ private:
   /// Removes a back reference (with identifier which attribute references to this object)
   /// \param theFeature feature referenced to this
   /// \param theAttrID identifier of the attribute that is references from theFeature to this
-  void removeBackReference(FeaturePtr theFeature, std::string theAttrID);
+  void removeBackReference(ObjectPtr theObject, std::string theAttrID);
   /// Removes a back reference (by the attribute)
   /// \param theAttr the referenced attribute
   void removeBackReference(AttributePtr theAttr);
@@ -281,6 +282,10 @@ private:
   /// \param theApplyConcealment applies consealment flag changes
   void addBackReference(FeaturePtr theFeature, std::string theAttrID,
     const bool theApplyConcealment = true);
+  /// Adds a back reference to an object
+  /// \param theObject object referenced to this
+  /// \param theAttrID identifier of the attribute that is references from theFolder to this
+  void addBackReference(ObjectPtr theObject, std::string theAttrID);
 
   /// Makes the concealment flag up to date for this object-owner.
   MODEL_EXPORT virtual void updateConcealmentFlag();
@@ -303,11 +308,15 @@ private:
 /// Without concealment change, it will be done later, on synchronization.
 #define ADD_BACK_REF(TARGET) \
   if (TARGET.get() != NULL) { \
+    std::shared_ptr<Model_Data> aTargetData = \
+        std::dynamic_pointer_cast<Model_Data>((TARGET)->data()); \
     FeaturePtr anAttributeOwnerFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(owner()); \
-    if (anAttributeOwnerFeature.get()) { \
-      std::shared_ptr<Model_Data> aTargetData = std::dynamic_pointer_cast<Model_Data>( \
-        (TARGET)->data()); \
+    if (anAttributeOwnerFeature.get()) \
       aTargetData->addBackReference(anAttributeOwnerFeature, id(), false); \
+    else { \
+      FolderPtr anAttributeOwnerFolder = std::dynamic_pointer_cast<ModelAPI_Folder>(owner()); \
+      if (anAttributeOwnerFolder.get()) \
+        aTargetData->addBackReference(anAttributeOwnerFolder, id()); \
     } \
   }
 
@@ -315,11 +324,15 @@ private:
 /// Without concealment change, it will be done later, on synchronization.
 #define REMOVE_BACK_REF(TARGET) \
   if (TARGET.get() != NULL) { \
+    std::shared_ptr<Model_Data> aTargetData = \
+        std::dynamic_pointer_cast<Model_Data>((TARGET)->data()); \
     FeaturePtr anAttOwnerFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(owner()); \
-    if (anAttOwnerFeature.get()) { \
-      std::shared_ptr<Model_Data> aTargetData = std::dynamic_pointer_cast<Model_Data>( \
-        (TARGET)->data()); \
+    if (anAttOwnerFeature.get()) \
       aTargetData->removeBackReference(anAttOwnerFeature, id()); \
+    else { \
+      FolderPtr anAttributeOwnerFolder = std::dynamic_pointer_cast<ModelAPI_Folder>(owner()); \
+      if (anAttributeOwnerFolder.get()) \
+        aTargetData->removeBackReference(anAttributeOwnerFolder, id()); \
     } \
   }
 

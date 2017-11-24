@@ -109,7 +109,7 @@ toFolder.append(aPoint2)
 
 # move point to the folder
 aSession.startOperation()
-aFolder = aPartDoc.findFolderAbove(toFolder)
+aFolder = aPartDoc.findFolderBelow(toFolder)
 assert(aFolder is not None)
 isAdded = aPartDoc.moveToFolder(toFolder, aFolder)
 aSession.finishOperation()
@@ -138,7 +138,7 @@ assert(aPartDoc.index(aPoint4, True) == 3), "Wrong index of the point: {}".forma
 
 # add a folder
 aSession.startOperation()
-aFolder2 = aPartDoc.addFolder(aPoint3)
+aFolder3 = aPartDoc.addFolder(aPoint3)
 aSession.finishOperation()
 
 NB_FEATURES_FULL += 1
@@ -149,10 +149,10 @@ assert(aPartDoc.size("Features") == NB_FEATURES_FULL), "Wrong number of features
 assert(aPartDoc.size("Features", True) == NB_FEATURES_OUT), "Wrong number of features outside a folder: {}, expected: {}".format(aPartDoc.size("Features", True), NB_FEATURES_OUT)
 
 # index without respect to foldering
-assert(aPartDoc.index(aFolder2) == 4), "Wrong index of the folder: {}".format(aPartDoc.index(aFolder2))
+assert(aPartDoc.index(aFolder3) == 4), "Wrong index of the folder: {}".format(aPartDoc.index(aFolder3))
 assert(aPartDoc.index(aPoint4) == 6), "Wrong index of the point: {}".format(aPartDoc.index(aPoint4))
 # index according to folders
-assert(aPartDoc.index(aFolder2, True) == 2), "Wrong index of the folder: {}".format(aPartDoc.index(aFolder2, True))
+assert(aPartDoc.index(aFolder3, True) == 2), "Wrong index of the folder: {}".format(aPartDoc.index(aFolder3, True))
 assert(aPartDoc.index(aPoint4, True) == 4), "Wrong index of the point: {}".format(aPartDoc.index(aPoint4, True))
 
 toFolder = FeatureList()
@@ -173,13 +173,162 @@ assert(aPartDoc.size("Features") == NB_FEATURES_FULL), "Wrong number of features
 assert(aPartDoc.size("Features", True) == NB_FEATURES_OUT), "Wrong number of features outside a folder: {}, expected: {}".format(aPartDoc.size("Features", True), NB_FEATURES_OUT)
 
 # index without respect to foldering
-assert(aPartDoc.index(aFolder2) == 4), "Wrong index of the folder: {}".format(aPartDoc.index(aFolder2))
+assert(aPartDoc.index(aFolder3) == 4), "Wrong index of the folder: {}".format(aPartDoc.index(aFolder3))
 assert(aPartDoc.index(aPoint3) == 5), "Wrong index of the point: {}".format(aPartDoc.index(aPoint3))
 assert(aPartDoc.index(aPoint4) == 6), "Wrong index of the point: {}".format(aPartDoc.index(aPoint4))
 # index according to folders
-assert(aPartDoc.index(aFolder2, True) == 2), "Wrong index of the folder: {}".format(aPartDoc.index(aFolder2, True))
+assert(aPartDoc.index(aFolder3, True) == 2), "Wrong index of the folder: {}".format(aPartDoc.index(aFolder3, True))
 assert(aPartDoc.index(aPoint3, True) == -1), "Wrong index of the point: {}".format(aPartDoc.index(aPoint3, True))
 assert(aPartDoc.index(aPoint4, True) == -1), "Wrong index of the point: {}".format(aPartDoc.index(aPoint4, True))
+
+
+# add more points to the folder to move them out
+aPoint5 = newPoint(aPartDoc, 0., 0., 10.)
+aPoint6 = newPoint(aPartDoc, 10., 0., 10.)
+aPoint7 = newPoint(aPartDoc, 10., 10., 10.)
+aPoint8 = newPoint(aPartDoc, 0., 10., 10.)
+
+toFolder = FeatureList()
+toFolder.append(aPoint5)
+toFolder.append(aPoint6)
+toFolder.append(aPoint7)
+toFolder.append(aPoint8)
+
+# move point to the folder
+aSession.startOperation()
+aFolder = aPartDoc.findFolderAbove(toFolder)
+assert(aFolder is not None)
+isAdded = aPartDoc.moveToFolder(toFolder, aFolder)
+aSession.finishOperation()
+assert(isAdded)
+
+NB_FEATURES_FULL += 4
+assert(aPartDoc.size("Features") == NB_FEATURES_FULL), "Wrong number of features: {}, expected: {}".format(aPartDoc.size("Features"), NB_FEATURES_FULL)
+assert(aPartDoc.size("Features", True) == NB_FEATURES_OUT), "Wrong number of features outside a folder: {}, expected: {}".format(aPartDoc.size("Features", True), NB_FEATURES_OUT)
+
+assert(aPartDoc.index(aPoint5, True) == -1), "Wrong index of the point: {}".format(aPartDoc.index(aPoint5, True))
+assert(aPartDoc.index(aPoint6, True) == -1), "Wrong index of the point: {}".format(aPartDoc.index(aPoint6, True))
+assert(aPartDoc.index(aPoint7, True) == -1), "Wrong index of the point: {}".format(aPartDoc.index(aPoint7, True))
+assert(aPartDoc.index(aPoint8, True) == -1), "Wrong index of the point: {}".format(aPartDoc.index(aPoint8, True))
+
+assert(aFolder3.reference("first_feature").value() is not None)
+assert(aFolder3.reference("last_feature").value() is not None)
+
+#=========================================================================
+# Test 4. Remove a point from a folder before it
+#=========================================================================
+fromFolder = FeatureList()
+fromFolder.append(aPoint3)
+
+aSession.startOperation()
+isMovedOut = aPartDoc.removeFromFolder(fromFolder)
+aSession.finishOperation()
+assert(isMovedOut)
+
+NB_FEATURES_OUT += 1
+assert(aPartDoc.size("Features") == NB_FEATURES_FULL), "Wrong number of features: {}, expected: {}".format(aPartDoc.size("Features"), NB_FEATURES_FULL)
+assert(aPartDoc.size("Features", True) == NB_FEATURES_OUT), "Wrong number of features outside a folder: {}, expected: {}".format(aPartDoc.size("Features", True), NB_FEATURES_OUT)
+
+assert(aPartDoc.index(aPoint3, True) == 2), "Wrong index of the point: {}".format(aPartDoc.index(aPoint3, True))
+assert(aPartDoc.index(aFolder3, True) == 3), "Wrong index of the folder: {}".format(aPartDoc.index(aFolder3, True))
+
+assert(aFolder3.reference("first_feature").value() is not None)
+assert(aFolder3.reference("last_feature").value() is not None)
+
+#=========================================================================
+# Test 5. Remove a point from a folder after it
+#=========================================================================
+fromFolder = FeatureList()
+fromFolder.append(aPoint8)
+
+aSession.startOperation()
+isMovedOut = aPartDoc.removeFromFolder(fromFolder)
+aSession.finishOperation()
+assert(isMovedOut)
+
+NB_FEATURES_OUT += 1
+assert(aPartDoc.size("Features") == NB_FEATURES_FULL), "Wrong number of features: {}, expected: {}".format(aPartDoc.size("Features"), NB_FEATURES_FULL)
+assert(aPartDoc.size("Features", True) == NB_FEATURES_OUT), "Wrong number of features outside a folder: {}, expected: {}".format(aPartDoc.size("Features", True), NB_FEATURES_OUT)
+
+assert(aPartDoc.index(aPoint8, True) == 4), "Wrong index of the point: {}".format(aPartDoc.index(aPoint8, True))
+assert(aPartDoc.index(aFolder3, True) == 3), "Wrong index of the folder: {}".format(aPartDoc.index(aFolder3, True))
+
+assert(aFolder3.reference("first_feature").value() is not None)
+assert(aFolder3.reference("last_feature").value() is not None)
+
+#=========================================================================
+# Test 6. Try to remove several points which are not start nor end in a folder
+#=========================================================================
+fromFolder = FeatureList()
+fromFolder.append(aPoint5)
+fromFolder.append(aPoint6)
+
+aSession.startOperation()
+isMovedOut = aPartDoc.removeFromFolder(fromFolder)
+aSession.finishOperation()
+assert(isMovedOut is False)
+
+assert(aPartDoc.size("Features") == NB_FEATURES_FULL), "Wrong number of features: {}, expected: {}".format(aPartDoc.size("Features"), NB_FEATURES_FULL)
+assert(aPartDoc.size("Features", True) == NB_FEATURES_OUT), "Wrong number of features outside a folder: {}, expected: {}".format(aPartDoc.size("Features", True), NB_FEATURES_OUT)
+
+assert(aPartDoc.index(aFolder3, True) == 3), "Wrong index of the folder: {}".format(aPartDoc.index(aFolder3, True))
+assert(aPartDoc.index(aPoint5, True) == -1), "Wrong index of the point: {}".format(aPartDoc.index(aPoint5, True))
+assert(aPartDoc.index(aPoint6, True) == -1), "Wrong index of the point: {}".format(aPartDoc.index(aPoint6, True))
+assert(aPartDoc.index(aPoint8, True) == 4), "Wrong index of the point: {}".format(aPartDoc.index(aPoint8, True))
+
+assert(aFolder3.reference("first_feature").value() is not None)
+assert(aFolder3.reference("last_feature").value() is not None)
+
+#=========================================================================
+# Test 7. Remove several points from a folder after it
+#=========================================================================
+fromFolder = FeatureList()
+fromFolder.append(aPoint6)
+fromFolder.append(aPoint7)
+
+aSession.startOperation()
+isMovedOut = aPartDoc.removeFromFolder(fromFolder)
+aSession.finishOperation()
+assert(isMovedOut)
+
+NB_FEATURES_OUT += 2
+assert(aPartDoc.size("Features") == NB_FEATURES_FULL), "Wrong number of features: {}, expected: {}".format(aPartDoc.size("Features"), NB_FEATURES_FULL)
+assert(aPartDoc.size("Features", True) == NB_FEATURES_OUT), "Wrong number of features outside a folder: {}, expected: {}".format(aPartDoc.size("Features", True), NB_FEATURES_OUT)
+
+assert(aPartDoc.index(aFolder3, True) == 3), "Wrong index of the folder: {}".format(aPartDoc.index(aFolder3, True))
+assert(aPartDoc.index(aPoint6, True) == 4), "Wrong index of the point: {}".format(aPartDoc.index(aPoint6, True))
+assert(aPartDoc.index(aPoint7, True) == 5), "Wrong index of the point: {}".format(aPartDoc.index(aPoint7, True))
+assert(aPartDoc.index(aPoint8, True) == 6), "Wrong index of the point: {}".format(aPartDoc.index(aPoint8, True))
+
+assert(aFolder3.reference("first_feature").value() is not None)
+assert(aFolder3.reference("last_feature").value() is not None)
+
+#=========================================================================
+# Test 8. Remove all remaining points from a folder after it
+#=========================================================================
+fromFolder = FeatureList()
+fromFolder.append(aPoint4)
+fromFolder.append(aPoint5)
+
+aSession.startOperation()
+isMovedOut = aPartDoc.removeFromFolder(fromFolder, False)
+aSession.finishOperation()
+assert(isMovedOut)
+
+NB_FEATURES_OUT += 2
+assert(aPartDoc.size("Features") == NB_FEATURES_FULL), "Wrong number of features: {}, expected: {}".format(aPartDoc.size("Features"), NB_FEATURES_FULL)
+assert(aPartDoc.size("Features", True) == NB_FEATURES_OUT), "Wrong number of features outside a folder: {}, expected: {}".format(aPartDoc.size("Features", True), NB_FEATURES_OUT)
+
+assert(aPartDoc.index(aFolder3, True) == 3), "Wrong index of the folder: {}".format(aPartDoc.index(aFolder3, True))
+assert(aPartDoc.index(aPoint4, True) == 4), "Wrong index of the point: {}".format(aPartDoc.index(aPoint4, True))
+assert(aPartDoc.index(aPoint5, True) == 5), "Wrong index of the point: {}".format(aPartDoc.index(aPoint5, True))
+assert(aPartDoc.index(aPoint6, True) == 6), "Wrong index of the point: {}".format(aPartDoc.index(aPoint6, True))
+assert(aPartDoc.index(aPoint7, True) == 7), "Wrong index of the point: {}".format(aPartDoc.index(aPoint7, True))
+assert(aPartDoc.index(aPoint8, True) == 8), "Wrong index of the point: {}".format(aPartDoc.index(aPoint8, True))
+
+# folder is empty
+assert(aFolder3.reference("first_feature").value() is None)
+assert(aFolder3.reference("last_feature").value() is None)
 
 
 from salome.shaper import model

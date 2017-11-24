@@ -1289,9 +1289,10 @@ bool Model_Document::moveToFolder(
 }
 
 bool Model_Document::removeFromFolder(
-      const std::list<std::shared_ptr<ModelAPI_Feature> >& theFeatures)
+      const std::list<std::shared_ptr<ModelAPI_Feature> >& theFeatures,
+      const bool theBefore)
 {
-  return myObjs->removeFromFolder(theFeatures);
+  return myObjs->removeFromFolder(theFeatures, theBefore);
 }
 
 std::shared_ptr<ModelAPI_Feature> Model_Document::feature(

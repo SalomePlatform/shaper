@@ -38,6 +38,9 @@ void ModelAPI_Folder::initAttributes()
 {
   data()->addAttribute(FIRST_FEATURE_ID(), ModelAPI_AttributeReference::typeId());
   data()->addAttribute(LAST_FEATURE_ID(),  ModelAPI_AttributeReference::typeId());
+  // nullify references for sure
+  reference(FIRST_FEATURE_ID())->setValue(ObjectPtr());
+  reference(LAST_FEATURE_ID())->setValue(ObjectPtr());
 }
 
 void ModelAPI_Folder::execute()

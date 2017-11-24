@@ -228,9 +228,14 @@ class Model_Document : public ModelAPI_Document
       const std::list<std::shared_ptr<ModelAPI_Feature> >& theFeatures,
       const std::shared_ptr<ModelAPI_Folder>& theFolder);
   //! Remove features from the folder
+  //! \param theFeatures list of features to be removed
+  //! \param theBefore   extract features before the folder (this parameter is applicable only
+  //!                    when all features in the folder are taking out,
+  //!                    in other cases the direction is taken automatically)
   //! \return \c true if the features have been moved out
   MODEL_EXPORT virtual bool removeFromFolder(
-      const std::list<std::shared_ptr<ModelAPI_Feature> >& theFeatures);
+      const std::list<std::shared_ptr<ModelAPI_Feature> >& theFeatures,
+      const bool theBefore = true);
 
   ///! Returns true if parametric updater need to execute feature on recomputartion
   ///! On abort, undo or redo it is not necessary: results in document are updated automatically
