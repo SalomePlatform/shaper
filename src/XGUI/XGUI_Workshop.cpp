@@ -1525,6 +1525,9 @@ void XGUI_Workshop::deleteObjects()
   ModuleBase_Tools::convertToFeatures(anObjects, aFeatures);
   ModelAPI_Tools::findAllReferences(aFeatures, aReferences);
 
+  std::set<FolderPtr> aFolders;
+  ModuleBase_Tools::convertToFolders(anObjects, aFolders);
+
   bool aDone = false;
   QString aDescription = contextMenuMgr()->action("DELETE_CMD")->text() + " %1";
   aDescription = aDescription.arg(XGUI_Tools::unionOfObjectNames(anObjects, ", "));
@@ -1543,6 +1546,18 @@ void XGUI_Workshop::deleteObjects()
       aFeatures.insert(aFeatureRefsToDelete.begin(), aFeatureRefsToDelete.end());
     aDone = ModelAPI_Tools::removeFeatures(aFeatures, false);
   }
+  if (aFolders.size() > 0) {
+    std::set<FolderPtr>::const_iterator anIt = aFolders.begin(),
+                                         aLast = aFolders.end();
+    for (; anIt != aLast; anIt++) {
+      FolderPtr aFolder = *anIt;
+      if (aFolder.get()) {
+        DocumentPtr aDoc = aFolder->document();
+        aDoc->removeFolder(aFolder);
+      }
+    }
+  }
+
   if (aDone)
     operationMgr()->commitOperation();
   else

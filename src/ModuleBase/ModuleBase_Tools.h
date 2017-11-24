@@ -26,6 +26,7 @@
 
 #include <ModelAPI_Attribute.h>
 #include <ModelAPI_Feature.h>
+#include <ModelAPI_Folder.h>
 
 #include <TopAbs_ShapeEnum.hxx>
 #include <TopoDS_Shape.hxx>
@@ -330,6 +331,13 @@ bool MODULEBASE_EXPORT askToDelete(const std::set<FeaturePtr> aFeatures,
 /// \param theFeatures an out conteiner of features
 void MODULEBASE_EXPORT convertToFeatures(const QObjectPtrList& theObjects,
                                          std::set<FeaturePtr>& theFeatures);
+
+
+/// Converts a list of objects to set of folders.
+/// \param theObjects a list of objects
+/// \param theFeatures an out conteiner of features
+void MODULEBASE_EXPORT convertToFolders(const QObjectPtrList& theObjects,
+                                         std::set<FolderPtr>& theFolders);
 
 
 /// Returns translation from the given data.

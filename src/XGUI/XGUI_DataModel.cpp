@@ -216,8 +216,8 @@ void XGUI_DataModel::processEvent(const std::shared_ptr<Events_Message>& theMess
     for (aIt = aGroups.begin(); aIt != aGroups.end(); ++aIt) {
       std::string aGroup = (*aIt);
       if (aDoc == aRootDoc) {  // If root objects
-        int aRow = aRootDoc->size(aGroup);
-        if (aGroup == aRootType) {
+        int aRow = aRootDoc->size(aGroup, true);
+        if ((aGroup == aRootType) || (aGroup == ModelAPI_Folder::group())) {
           // Process root folder
           removeRow(aRow + aNbFolders);
           rebuildBranch(aNbFolders, aRow);
@@ -233,7 +233,7 @@ void XGUI_DataModel::processEvent(const std::shared_ptr<Events_Message>& theMess
         // Check that some folders could erased
         QStringList aNotEmptyFolders = listOfShowNotEmptyFolders();
         foreach (QString aNotEmptyFolder, aNotEmptyFolders) {
-          if ((aNotEmptyFolder.toStdString() == aGroup) && (aRootDoc->size(aGroup) == 0)) {
+          if ((aNotEmptyFolder.toStdString() == aGroup) && (aRootDoc->size(aGroup, true) == 0)) {
             // Appears first object in folder which can not be shown empty
             removeRow(myXMLReader->rootFolderId(aGroup));
             removeShownFolder(aRootDoc, aNotEmptyFolder);
@@ -245,9 +245,9 @@ void XGUI_DataModel::processEvent(const std::shared_ptr<Events_Message>& theMess
         // Remove row for sub-document
         QModelIndex aDocRoot = findDocumentRootIndex(aDoc.get(), 0);
         if (aDocRoot.isValid()) {
-          int aRow = aDoc->size(aGroup);
+          int aRow = aDoc->size(aGroup, true);
           int aNbSubFolders = foldersCount(aDoc.get());
-          if (aGroup == aSubType) {
+          if ((aGroup == aSubType) || (aGroup == ModelAPI_Folder::group())) {
             // List of objects under document root
             removeRow(aRow + aNbSubFolders, aDocRoot);
             rebuildBranch(aNbSubFolders, aRow, aDocRoot);
@@ -262,7 +262,7 @@ void XGUI_DataModel::processEvent(const std::shared_ptr<Events_Message>& theMess
           }
           // Check that some folders could disappear
           QStringList aNotEmptyFolders = listOfShowNotEmptyFolders(false);
-          int aSize = aDoc->size(aGroup);
+          int aSize = aDoc->size(aGroup, true);
           foreach (QString aNotEmptyFolder, aNotEmptyFolders) {
             if ((aNotEmptyFolder.toStdString() == aGroup) && (aSize == 0)) {
               // Appears first object in folder which can not be shown empty
@@ -918,7 +918,7 @@ QModelIndex
       }
     }
   } else { // If document is attached to feature
-    int aNb = aRootDoc->size(ModelAPI_Feature::group());
+    int aNb = aRootDoc->size(ModelAPI_Feature::group(), true);
     ObjectPtr aObj;
     ResultPartPtr aPartRes;
     for (int i = 0; i < aNb; i++) {

@@ -1044,10 +1044,26 @@ void convertToFeatures(const QObjectPtrList& theObjects, std::set<FeaturePtr>& t
     if (!aFeature.get() && anObject->groupName() == ModelAPI_ResultParameter::group()) {
       aFeature = ModelAPI_Feature::feature(anObject);
     }
-    theFeatures.insert(aFeature);
+    if (aFeature.get())
+      theFeatures.insert(aFeature);
   }
 }
 
+//**************************************************************
+void convertToFolders(const QObjectPtrList& theObjects,
+                                         std::set<FolderPtr>& theFolders)
+{
+  QObjectPtrList::const_iterator anIt = theObjects.begin(), aLast = theObjects.end();
+  for(; anIt != aLast; anIt++) {
+    ObjectPtr anObject = *anIt;
+    FolderPtr aFeature = std::dynamic_pointer_cast<ModelAPI_Folder>(anObject);
+    if (aFeature.get())
+      theFolders.insert(aFeature);
+  }
+}
+
+
+//**************************************************************
 QString translate(const Events_InfoMessage& theMessage)
 {
   QString aMessage;
