@@ -168,8 +168,13 @@ class Model_Objects
   bool moveToFolder(const std::list<std::shared_ptr<ModelAPI_Feature> >& theFeatures,
                     const std::shared_ptr<ModelAPI_Folder>& theFolder);
   //! Remove features from the folder
+  //! \param theFeatures list of features to be removed
+  //! \param theBefore   extract features before the folder (this parameter is applicable only
+  //!                    when all features in the folder are taking out,
+  //!                    in other cases the direction is taken automatically)
   //! \return \c true if the features have been moved out
-  bool removeFromFolder(const std::list<std::shared_ptr<ModelAPI_Feature> >& theFeatures);
+  bool removeFromFolder(const std::list<std::shared_ptr<ModelAPI_Feature> >& theFeatures,
+                        const bool theBefore = true);
 
   //! Sets the owner of this manager
   void setOwner(DocumentPtr theDoc);

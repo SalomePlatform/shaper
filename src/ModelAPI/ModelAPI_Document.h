@@ -202,9 +202,14 @@ public:
   virtual bool moveToFolder(const std::list<std::shared_ptr<ModelAPI_Feature> >& theFeatures,
                             const std::shared_ptr<ModelAPI_Folder>& theFolder) = 0;
   //! Remove features from the folder
+  //! \param theFeatures list of features to be removed
+  //! \param theBefore   extract features before the folder (this parameter is applicable only
+  //!                    when all features in the folder are taking out,
+  //!                    in other cases the direction is taken automatically)
   //! \return \c true if the features have been moved out
   virtual bool removeFromFolder(
-      const std::list<std::shared_ptr<ModelAPI_Feature> >& theFeatures) = 0;
+      const std::list<std::shared_ptr<ModelAPI_Feature> >& theFeatures,
+      const bool theBefore = true) = 0;
 
   //! Informs the document that it becomes active and some actions must be performed
   virtual void setActive(const bool theFlag) = 0;
