@@ -1275,7 +1275,29 @@ std::shared_ptr<ModelAPI_Folder> Model_Objects::createFolder(
 
 void Model_Objects::removeFolder(std::shared_ptr<ModelAPI_Folder> theFolder)
 {
-  /// \todo
+  std::shared_ptr<Model_Data> aData = std::static_pointer_cast<Model_Data>(theFolder->data());
+  if (!aData.get() || !aData->isValid())
+    return;
+
+  // this must be before erase since theFolder erasing removes all information about it
+  clearHistory(theFolder);
+  // erase fields
+  theFolder->erase();
+
+  TDF_Label aFolderLabel = aData->label().Father();
+  if (myFolders.IsBound(aFolderLabel))
+    myFolders.UnBind(aFolderLabel);
+
+  static Events_ID EVENT_DISP = Events_Loop::loop()->eventByName(EVENT_OBJECT_TO_REDISPLAY);
+  ModelAPI_EventCreator::get()->sendUpdated(theFolder, EVENT_DISP);
+  // erase all attributes under the label of feature
+  aFolderLabel.ForgetAllAttributes();
+  // remove it from the references array
+  RemoveFromRefArray(featuresLabel(), aFolderLabel);
+  // event: feature is deleted
+  ModelAPI_EventCreator::get()->sendDeleted(theFolder->document(), ModelAPI_Folder::group());
+  updateHistory(ModelAPI_Folder::group());
+  updateHistory(ModelAPI_Feature::group());
 }
 
 static FeaturePtr limitingFeature(std::list<FeaturePtr>& theFeatures, const bool isLast)
