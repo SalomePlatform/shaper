@@ -55,39 +55,47 @@
 #define PRECISION 6
 #define TOLERANCE (1.e-7)
 
-ModelHighAPI_FeatureStore::ModelHighAPI_FeatureStore(FeaturePtr theFeature) {
-  storeData(theFeature->data(), myAttrs);
-  // iterate results to store
-  std::list<ResultPtr> allResults;
-  ModelAPI_Tools::allResults(theFeature, allResults);
-  std::list<ResultPtr>::iterator aRes = allResults.begin();
-  for(; aRes != allResults.end(); aRes++) {
-    std::map<std::string, std::string> aResDump;
-    storeData((*aRes)->data(), aResDump);
-    myRes.push_back(aResDump);
+ModelHighAPI_FeatureStore::ModelHighAPI_FeatureStore(ObjectPtr theObject) {
+  storeData(theObject->data(), myAttrs);
+
+  FeaturePtr aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(theObject);
+  if (aFeature) {
+    // iterate results to store
+    std::list<ResultPtr> allResults;
+    ModelAPI_Tools::allResults(aFeature, allResults);
+    std::list<ResultPtr>::iterator aRes = allResults.begin();
+    for(; aRes != allResults.end(); aRes++) {
+      std::map<std::string, std::string> aResDump;
+      storeData((*aRes)->data(), aResDump);
+      myRes.push_back(aResDump);
+    }
   }
 }
 
-std::string ModelHighAPI_FeatureStore::compare(FeaturePtr theFeature) {
-  std::string anError = compareData(theFeature->data(), myAttrs);
+std::string ModelHighAPI_FeatureStore::compare(ObjectPtr theObject) {
+  std::string anError = compareData(theObject->data(), myAttrs);
   if (!anError.empty()) {
-    return "Features '" + theFeature->name() + "' differ:" + anError;
+    return "Features '" + theObject->data()->name() + "' differ:" + anError;
   }
-  std::list<ResultPtr> allResults;
-  ModelAPI_Tools::allResults(theFeature, allResults);
-  std::list<ResultPtr>::iterator aRes = allResults.begin();
-  std::list<std::map<std::string, std::string> >::iterator aResIter = myRes.begin();
-  for(; aRes != allResults.end() && aResIter != myRes.end(); aRes++, aResIter++) {
-    anError = compareData((*aRes)->data(), *aResIter);
-    if (!anError.empty())
-      return "Results of feature '" + theFeature->name() + "' '" + (*aRes)->data()->name() +
-      "' differ:" + anError;
-  }
-  if (aRes != allResults.end()) {
-    return "Current model has more results '" + (*aRes)->data()->name() + "'";
-  }
-  if (aResIter != myRes.end()) {
-    return "Original model had more results '" + (*aResIter)["__name__"] + "'";
+
+  FeaturePtr aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(theObject);
+  if (aFeature) {
+    std::list<ResultPtr> allResults;
+    ModelAPI_Tools::allResults(aFeature, allResults);
+    std::list<ResultPtr>::iterator aRes = allResults.begin();
+    std::list<std::map<std::string, std::string> >::iterator aResIter = myRes.begin();
+    for(; aRes != allResults.end() && aResIter != myRes.end(); aRes++, aResIter++) {
+      anError = compareData((*aRes)->data(), *aResIter);
+      if (!anError.empty())
+        return "Results of feature '" + aFeature->name() + "' '" + (*aRes)->data()->name() +
+        "' differ:" + anError;
+    }
+    if (aRes != allResults.end()) {
+      return "Current model has more results '" + (*aRes)->data()->name() + "'";
+    }
+    if (aResIter != myRes.end()) {
+      return "Original model had more results '" + (*aResIter)["__name__"] + "'";
+    }
   }
   return ""; // ok
 }

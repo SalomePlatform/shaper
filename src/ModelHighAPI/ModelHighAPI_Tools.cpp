@@ -338,47 +338,53 @@ std::string storeFeatures(const std::string& theDocName, DocumentPtr theDoc,
      }
   }
   // store the model features information: iterate all features
-  int aFeaturesCount = 0; // stores the number of compared features for this document to compate
+  int anObjectsCount = 0; // stores the number of compared features for this document to compate
   std::set<std::string> aProcessed; // processed features names (that are in the current document)
-  std::list<FeaturePtr> allFeatures = theDoc->allFeatures();
-  std::list<FeaturePtr>::iterator allIter = allFeatures.begin();
-  for(; allIter != allFeatures.end(); allIter++) {
-    FeaturePtr aFeat = *allIter;
+
+  // process all objects (features and folders)
+  std::list<ObjectPtr> allObjects = theDoc->allObjects();
+  std::list<ObjectPtr>::iterator allIter = allObjects.begin();
+  for(; allIter != allObjects.end(); allIter++) {
+    ObjectPtr anObject = *allIter;
     if (theCompare) {
       std::map<std::string, ModelHighAPI_FeatureStore>::iterator
-        aFeatFind = aDocFind->second.find(aFeat->name());
-      if (aFeatFind == aDocFind->second.end()) {
-        return "Document '" + theDocName + "' feature '" + aFeat->name() + "' not found";
+        anObjFind = aDocFind->second.find(anObject->data()->name());
+      if (anObjFind == aDocFind->second.end()) {
+        return "Document '" + theDocName + "' feature '" + anObject->data()->name() + "' not found";
       }
-      std::string anError = aFeatFind->second.compare(aFeat);
+      std::string anError = anObjFind->second.compare(anObject);
       if (!anError.empty()) {
         anError = "Document " + theDocName + " " + anError;
         return anError;
       }
-      aFeaturesCount++;
-      aProcessed.insert(aFeat->name());
+      anObjectsCount++;
+      aProcessed.insert(anObject->data()->name());
     } else {
-      theStore[theDocName][aFeat->name()] = ModelHighAPI_FeatureStore(aFeat);
+      theStore[theDocName][anObject->data()->name()] = ModelHighAPI_FeatureStore(anObject);
     }
-    // iterate all results of this feature
-    std::list<ResultPtr> allResults;
-    ModelAPI_Tools::allResults(aFeat, allResults);
-    std::list<ResultPtr>::iterator aRes = allResults.begin();
-    for(; aRes != allResults.end(); aRes++) {
-      // recoursively store features of sub-documents
-      if ((*aRes)->groupName() == ModelAPI_ResultPart::group()) {
-        DocumentPtr aDoc = std::dynamic_pointer_cast<ModelAPI_ResultPart>(*aRes)->partDoc();
-        if (aDoc.get()) {
-          std::string anError = storeFeatures((*aRes)->data()->name(), aDoc, theStore, theCompare);
-          if (!anError.empty())
-            return anError;
+
+    FeaturePtr aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(anObject);
+    if (aFeature) {
+      // iterate all results of this feature
+      std::list<ResultPtr> allResults;
+      ModelAPI_Tools::allResults(aFeature, allResults);
+      std::list<ResultPtr>::iterator aRes = allResults.begin();
+      for(; aRes != allResults.end(); aRes++) {
+        // recoursively store features of sub-documents
+        if ((*aRes)->groupName() == ModelAPI_ResultPart::group()) {
+          DocumentPtr aDoc = std::dynamic_pointer_cast<ModelAPI_ResultPart>(*aRes)->partDoc();
+          if (aDoc.get()) {
+            std::string anError = storeFeatures((*aRes)->data()->name(), aDoc, theStore, theCompare);
+            if (!anError.empty())
+              return anError;
+          }
         }
       }
     }
   }
   // checks the number of compared features
   if (theCompare) {
-    if (aDocFind->second.size() != aFeaturesCount) {
+    if (aDocFind->second.size() != anObjectsCount) {
       // search for disappeared feature
       std::string aLostName;
       std::map<std::string, ModelHighAPI_FeatureStore>::iterator aLostIter;

@@ -28,13 +28,13 @@
 #include <string>
 #include <memory>
 
-class ModelAPI_Feature;
+class ModelAPI_Object;
 class ModelAPI_Data;
 class GeomAPI_Shape;
 class ModelAPI_Attribute;
 
-typedef std::shared_ptr<ModelAPI_Feature>  FeaturePtr;
-typedef std::shared_ptr<ModelAPI_Attribute>  AttributePtr;
+typedef std::shared_ptr<ModelAPI_Object>    ObjectPtr;
+typedef std::shared_ptr<ModelAPI_Attribute> AttributePtr;
 
 /**\class ModelHighAPI_FeatureStore
  * \ingroup CPPHighAPI
@@ -49,9 +49,9 @@ public:
   // unused constructor for the map container needs
   ModelHighAPI_FeatureStore() {}
   // constructor that initializes this object by feature to store
-  ModelHighAPI_FeatureStore(FeaturePtr theFeature);
+  ModelHighAPI_FeatureStore(ObjectPtr theObject);
   // compares the stored feature information with the given feature
-  std::string compare(FeaturePtr theFeature);
+  std::string compare(ObjectPtr theObject);
 
 private:
   /// stores the information about all attributes of data in map
