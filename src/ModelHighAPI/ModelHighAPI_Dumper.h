@@ -54,12 +54,14 @@ class ModelAPI_CompositeFeature;
 class ModelAPI_Document;
 class ModelAPI_Entity;
 class ModelAPI_Feature;
+class ModelAPI_Folder;
 class ModelAPI_Object;
 class ModelAPI_Result;
 
 typedef std::shared_ptr<ModelAPI_Document> DocumentPtr;
 typedef std::shared_ptr<ModelAPI_Entity>   EntityPtr;
 typedef std::shared_ptr<ModelAPI_Feature>  FeaturePtr;
+typedef std::shared_ptr<ModelAPI_Folder>   FolderPtr;
 typedef std::shared_ptr<ModelAPI_Result>   ResultPtr;
 
 /**\class ModelHighAPI_Dumper
@@ -116,6 +118,8 @@ public:
   virtual void dumpParameter(const FeaturePtr& theFeature) = 0;
   /// Dump given feature
   virtual void dumpFeature(const FeaturePtr& theFeature, const bool theForce = false) = 0;
+  /// Dump folder
+  virtual void dumpFolder(const FolderPtr& theFolder) = 0;
 
   /// Set a feature that should not be dumped anyway
   MODELHIGHAPI_EXPORT
@@ -202,6 +206,10 @@ public:
   /// Dump name of entity and remember to dump "setName" if the entity has user-defined name
   MODELHIGHAPI_EXPORT
   ModelHighAPI_Dumper& operator<<(const FeaturePtr& theEntity);
+
+  /// Dump folder
+  MODELHIGHAPI_EXPORT
+  ModelHighAPI_Dumper& operator<<(const FolderPtr& theFolder);
 
   /// Dump result
   MODELHIGHAPI_EXPORT
@@ -330,10 +338,13 @@ private:
   std::set<FeaturePtr> myFeaturesToSkip;
 
 protected:
-   /// list of entities, used by other features but not dumped yet
+  /// list of entities, used by other features but not dumped yet
   std::set<EntityPtr> myNotDumpedEntities;
+  /// list of folders which do not dumped yet
+  std::set<FolderPtr> myNotDumpedFolders;
 
   friend class SketchAPI_Sketch;
+  friend class ModelHighAPI_Folder;
 };
 
 #endif

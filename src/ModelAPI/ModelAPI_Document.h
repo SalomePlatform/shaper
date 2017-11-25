@@ -182,8 +182,10 @@ public:
   virtual std::list<std::shared_ptr<ModelAPI_Object> > allObjects() = 0;
 
   //! Creates a folder (group of the features in the object browser)
+  //! \param theAddBefore a feature, the folder is added before
+  //!                     (if empty, the folder is added after the last feature)
   virtual std::shared_ptr<ModelAPI_Folder> addFolder(
-      std::shared_ptr<ModelAPI_Feature> theAddBefore) = 0;
+      std::shared_ptr<ModelAPI_Feature> theAddBefore = std::shared_ptr<ModelAPI_Feature>()) = 0;
   //! Removes the folder from the document (all features in the folder will be kept).
   virtual void removeFolder(std::shared_ptr<ModelAPI_Folder> theFolder) = 0;
   //! Search a folder above the list of features applicable to store them

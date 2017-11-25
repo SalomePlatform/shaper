@@ -23,32 +23,66 @@
 
 //--------------------------------------------------------------------------------------
 #include <ModelHighAPI_Interface.h>
+#include <ModelHighAPI_Macro.h>
+
+#include <ModelAPI_Folder.h>
 
 #include <memory>
 //--------------------------------------------------------------------------------------
+class ModelAPI_AttributeReference;
 class ModelAPI_Document;
-class ModelAPI_Folder;
-class ModelHighAPI_Selection;
+class ModelHighAPI_Reference;
 //--------------------------------------------------------------------------------------
 /**\class ModelHighAPI_Folder
  * \ingroup CPPHighAPI
  * \brief Class for filling ModelAPI_Folder
  */
-class ModelHighAPI_Folder
+class ModelHighAPI_Folder : public ModelHighAPI_Interface
 {
 public:
   /// Constructor for a folder
   MODELHIGHAPI_EXPORT
-  explicit ModelHighAPI_Folder(const std::shared_ptr<ModelAPI_Folder> & theFolder);
+  explicit ModelHighAPI_Folder(const std::shared_ptr<ModelAPI_Folder>& theFolder);
   /// Destructor
   MODELHIGHAPI_EXPORT virtual ~ModelHighAPI_Folder();
+
+  static std::string ID() { return ModelAPI_Folder::ID(); }
+  virtual std::string getID() { return ID(); }
+
+  /// First feature reference
+  std::shared_ptr<ModelAPI_AttributeReference> firstFeature() const
+  { return myfirstFeature; }
+
+  /// Last feature reference
+  std::shared_ptr<ModelAPI_AttributeReference> lastFeature() const
+  { return mylastFeature; }
+
+  /// Dump wrapped feature
+  MODELHIGHAPI_EXPORT virtual void dump(ModelHighAPI_Dumper& theDumper) const;
+
+protected:
+  bool initialize();
+
+private:
+  std::shared_ptr<ModelAPI_Folder> myFolder;
+
+  std::shared_ptr<ModelAPI_AttributeReference> myfirstFeature;
+  std::shared_ptr<ModelAPI_AttributeReference> mylastFeature;
 };
 
 //--------------------------------------------------------------------------------------
 /**\ingroup CPPHighAPI
- * \brief Create Folder feature
+ * \brief Create empty Folder feature
  */
 MODELHIGHAPI_EXPORT
 std::shared_ptr<ModelHighAPI_Folder> addFolder(const std::shared_ptr<ModelAPI_Document>& theDoc);
+
+/**\ingroup CPPHighAPI
+ * \brief Create Folder feature
+ */
+MODELHIGHAPI_EXPORT
+std::shared_ptr<ModelHighAPI_Folder> addFolder(const std::shared_ptr<ModelAPI_Document>& theDoc,
+                                               const ModelHighAPI_Reference& theFirstFeature,
+                                               const ModelHighAPI_Reference& theLastFeature);
 //--------------------------------------------------------------------------------------
 #endif /* SRC_MODELHIGHAPI_MODELHIGHAPI_FOLDER_H_ */

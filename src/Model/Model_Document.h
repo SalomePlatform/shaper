@@ -207,6 +207,8 @@ class Model_Document : public ModelAPI_Document
     feature(const std::shared_ptr<ModelAPI_Result>& theResult);
 
   //! Creates a folder (group of the features in the object browser)
+  //! \param theAddBefore a feature, the folder is added before
+  //!                     (if empty, the folder is added after the last feature)
   MODEL_EXPORT virtual std::shared_ptr<ModelAPI_Folder> addFolder(
       std::shared_ptr<ModelAPI_Feature> theAddBefore = std::shared_ptr<ModelAPI_Feature>());
   //! Removes the folder from the document (all features in the folder will be kept).

@@ -64,8 +64,32 @@ assert(aPartDoc.size("Features") == NB_FEATURES_FULL), "Wrong number of features
 
 #=========================================================================
 # Test 1. Check number of features out of folder
-#         and absense of the crash while getting size of incorrect groupd
+#         and absense of the crash while getting size of incorrect group
 #=========================================================================
+assert(aPartDoc.size("Features", True) == NB_FEATURES_OUT), "Wrong number of features: {}, expected: {}".format(aPartDoc.size("Features", True), NB_FEATURES_OUT)
+assert(aPartDoc.size("Construction", True) == 1), "Wrong size: {}".format(aPartDoc.size("Construction", True))
+
+#=========================================================================
+# Test 2. Add a feature to the folder and check number of features once again
+#=========================================================================
+toFolder = FeatureList()
+toFolder.append(aPoint1)
+
+aSession.startOperation()
+aFolder2 = aPartDoc.addFolder(aPoint1)
+aSession.finishOperation()
+
+NB_FEATURES_FULL += 1
+NB_FEATURES_OUT  += 1
+
+aSession.startOperation()
+aFolder = aPartDoc.findFolderAbove(toFolder)
+assert(aFolder is not None)
+isAdded = aPartDoc.moveToFolder(toFolder, aFolder)
+aSession.finishOperation()
+assert(isAdded)
+
+NB_FEATURES_OUT -= 1
 assert(aPartDoc.size("Features", True) == NB_FEATURES_OUT), "Wrong number of features: {}, expected: {}".format(aPartDoc.size("Features", True), NB_FEATURES_OUT)
 assert(aPartDoc.size("Construction", True) == 1), "Wrong size: {}".format(aPartDoc.size("Construction", True))
 

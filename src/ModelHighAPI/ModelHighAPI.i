@@ -57,6 +57,7 @@
 
 // shared pointers
 %shared_ptr(ModelHighAPI_Interface)
+%shared_ptr(ModelHighAPI_Folder)
 
 // typemaps
 
