@@ -23,6 +23,7 @@
 
 #include <BOPAlgo_Builder.hxx>
 #include <BRep_Builder.hxx>
+#include <BRepTools_WireExplorer.hxx>
 #include <BRepTopAdaptor_FClass2d.hxx>
 #include <Geom_Plane.hxx>
 #include <Geom_TrimmedCurve.hxx>
@@ -63,7 +64,7 @@ static TopoDS_Vertex findStartVertex(const TopoDS_Shape& theShape)
   return aStart;
 }
 
-static TopoDS_Vertex findStartVertex(const TopoDS_Shape& theShape,
+static TopoDS_Vertex findStartVertex(const TopoDS_Wire& theWire, const TopoDS_Face& theFace,
     const std::list<std::shared_ptr<GeomAPI_Shape> >& theInitialShapes)
 {
   // Try to find edge lying on the one of original edges.
@@ -80,9 +81,9 @@ static TopoDS_Vertex findStartVertex(const TopoDS_Shape& theShape,
     if (aCurve->DynamicType() == STANDARD_TYPE(Geom_TrimmedCurve))
       aCurve = Handle(Geom_TrimmedCurve)::DownCast(aCurve)->BasisCurve();
 
-    TopExp_Explorer anExp(theShape, TopAbs_EDGE);
+    BRepTools_WireExplorer anExp(theWire, theFace);
     for (; anExp.More(); anExp.Next()) {
-      const TopoDS_Edge& aShapeEdge = TopoDS::Edge(anExp.Current());
+      const TopoDS_Edge& aShapeEdge = anExp.Current();
       double aF, aL;
       Handle(Geom_Curve) aShapeCurve = BRep_Tool::Curve(aShapeEdge, aF, aL);
       if (aShapeCurve->DynamicType() == STANDARD_TYPE(Geom_TrimmedCurve))
@@ -99,7 +100,7 @@ static TopoDS_Vertex findStartVertex(const TopoDS_Shape& theShape,
   }
 
   // start vertex is not found, use algorithm to search vertex with the greatest coordinates
-  return findStartVertex(theShape);
+  return findStartVertex(theWire);
 }
 
 // returns true if the first shape must be located earlier than the second
@@ -247,7 +248,7 @@ void GeomAlgoAPI_SketchBuilder::createFaces(
 
       // to make faces equal on different platforms, we will find
       // a vertex lying on an edge with the lowest index in the list of initial edges
-      TopoDS_Vertex aStartVertex = findStartVertex(aWire, theFeatures);
+      TopoDS_Vertex aStartVertex = findStartVertex(aWire, aFace, theFeatures);
 
       TopoDS_Wire aNewWire;
       aBuilder.MakeWire(aNewWire);
@@ -255,12 +256,12 @@ void GeomAlgoAPI_SketchBuilder::createFaces(
       bool aStartFound = false;
 
       // remove internal edges from faces and make wire start from found vertex
-      TopExp_Explorer anExp(aWire, TopAbs_EDGE);
+      BRepTools_WireExplorer anExp(aWire, aFace);
       for (; anExp.More(); anExp.Next()) {
         if (anExp.Current().Orientation() == TopAbs_INTERNAL)
           continue;
         if (!aStartFound) {
-          const TopoDS_Edge& anEdge = TopoDS::Edge(anExp.Current());
+          const TopoDS_Edge& anEdge = anExp.Current();
           TopoDS_Vertex aV1, aV2;
           TopExp::Vertices(anEdge, aV1, aV2, Standard_True);
           if (aV1.IsSame(aStartVertex) == Standard_True)
@@ -277,7 +278,7 @@ void GeomAlgoAPI_SketchBuilder::createFaces(
         aBuilder.Add(aNewWire, *aSkIt);
 
       // check the wire is empty
-      anExp.Init(aNewWire, TopAbs_EDGE);
+      anExp.Init(aNewWire);
       if (anExp.More())
         aBuilder.Add(aNewFace, aNewWire);
     }
