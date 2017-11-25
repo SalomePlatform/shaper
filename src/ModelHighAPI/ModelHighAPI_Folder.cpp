@@ -45,8 +45,15 @@ bool ModelHighAPI_Folder::initialize()
     return false;
   }
 
-  SET_ATTRIBUTE(firstFeature, ModelAPI_AttributeReference, ModelAPI_Folder::FIRST_FEATURE_ID());
-  SET_ATTRIBUTE(lastFeature,  ModelAPI_AttributeReference, ModelAPI_Folder::LAST_FEATURE_ID());
+  myFirstFeature = myFolder->reference(ModelAPI_Folder::FIRST_FEATURE_ID());
+  if (!myFirstFeature)
+    return false;
+  myAttrGetter[ModelAPI_Folder::FIRST_FEATURE_ID()] = "firstFeature";
+
+  myLastFeature = myFolder->reference(ModelAPI_Folder::LAST_FEATURE_ID());
+  if (!myLastFeature)
+    return false;
+  myAttrGetter[ModelAPI_Folder::LAST_FEATURE_ID()] = "lastFeature";
 
   return true;
 }

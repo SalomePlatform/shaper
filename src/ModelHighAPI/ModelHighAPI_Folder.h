@@ -23,7 +23,6 @@
 
 //--------------------------------------------------------------------------------------
 #include <ModelHighAPI_Interface.h>
-#include <ModelHighAPI_Macro.h>
 
 #include <ModelAPI_Folder.h>
 
@@ -51,11 +50,11 @@ public:
 
   /// First feature reference
   std::shared_ptr<ModelAPI_AttributeReference> firstFeature() const
-  { return myfirstFeature; }
+  { return myFirstFeature; }
 
   /// Last feature reference
   std::shared_ptr<ModelAPI_AttributeReference> lastFeature() const
-  { return mylastFeature; }
+  { return myLastFeature; }
 
   /// Dump wrapped feature
   MODELHIGHAPI_EXPORT virtual void dump(ModelHighAPI_Dumper& theDumper) const;
@@ -66,8 +65,8 @@ protected:
 private:
   std::shared_ptr<ModelAPI_Folder> myFolder;
 
-  std::shared_ptr<ModelAPI_AttributeReference> myfirstFeature;
-  std::shared_ptr<ModelAPI_AttributeReference> mylastFeature;
+  std::shared_ptr<ModelAPI_AttributeReference> myFirstFeature;
+  std::shared_ptr<ModelAPI_AttributeReference> myLastFeature;
 };
 
 //--------------------------------------------------------------------------------------
