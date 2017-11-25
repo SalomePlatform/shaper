@@ -374,7 +374,8 @@ std::string storeFeatures(const std::string& theDocName, DocumentPtr theDoc,
         if ((*aRes)->groupName() == ModelAPI_ResultPart::group()) {
           DocumentPtr aDoc = std::dynamic_pointer_cast<ModelAPI_ResultPart>(*aRes)->partDoc();
           if (aDoc.get()) {
-            std::string anError = storeFeatures((*aRes)->data()->name(), aDoc, theStore, theCompare);
+            std::string anError =
+                storeFeatures((*aRes)->data()->name(), aDoc, theStore, theCompare);
             if (!anError.empty())
               return anError;
           }
