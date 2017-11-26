@@ -116,11 +116,11 @@ SketchConstraintEqual_5 = Sketch_1.setEqual(SketchLine_7.result(), SketchLine_2.
 model.do()
 Extrusion_1 = model.addExtrusion(Part_1_doc, [model.selection("FACE", "Sketch_1/Face-SketchCircle_1_2r-SketchLine_5f-SketchLine_6f-SketchLine_9r-SketchLine_10r"), model.selection("FACE", "Sketch_1/Face-SketchLine_1f-SketchCircle_1_2r-SketchLine_7f-SketchLine_9f-SketchLine_12r"), model.selection("FACE", "Sketch_1/Face-SketchLine_4f-SketchCircle_1_2r-SketchLine_8f-SketchLine_11r-SketchLine_12f"), model.selection("FACE", "Sketch_1/Face-SketchLine_2f-SketchLine_3f-SketchCircle_1_2r-SketchLine_10f-SketchLine_11f")], model.selection(), 150, 0)
 Group_1 = model.addGroup(Part_1_doc, [model.selection("FACE", "Extrusion_1_1/To_Face_1"), model.selection("FACE", "Extrusion_1_1/To_Face_4"), model.selection("FACE", "Extrusion_1_1/To_Face_3"), model.selection("FACE", "Extrusion_1_1/To_Face_2")])
-Plane_4 = model.addPlane(Part_1_doc, model.selection("FACE", "Extrusion_1_1/Generated_Face_12"), 150, True)
+Plane_4 = model.addPlane(Part_1_doc, model.selection("FACE", "Extrusion_1_1/Generated_Face_15"), 150, True)
 Plane_5 = model.addPlane(Part_1_doc, model.selection("FACE", "Extrusion_1_1/Generated_Face_7"), 150, True)
 Partition_1 = model.addPartition(Part_1_doc, [model.selection("FACE", "Plane_1"), model.selection("COMPSOLID", "Extrusion_1_1"), model.selection("FACE", "Plane_2")])
 Plane_6 = model.addPlane(Part_1_doc, model.selection("FACE", "Partition_1_1_7/Modified_Face_2_4"), 110, True)
-Plane_7 = model.addPlane(Part_1_doc, model.selection("FACE", "Partition_1_1_3/Modified_Face_3_5"), 380, True)
+Plane_7 = model.addPlane(Part_1_doc, model.selection("FACE", "Partition_1_1_5/Modified_Face_3_4"), 380, True)
 Partition_2 = model.addPartition(Part_1_doc, [model.selection("FACE", "Plane_3"), model.selection("COMPSOLID", "Partition_1_1"), model.selection("FACE", "Plane_4")])
 model.do()
 

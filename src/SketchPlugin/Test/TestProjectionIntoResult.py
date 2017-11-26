@@ -95,19 +95,19 @@ aProjectedList = [("EDGE", "Sketch_1/Edge-SketchCircle_1_2"),
                   ("VERTEX", "Extrusion_1_1/Generated_Face_3&Extrusion_1_1/Generated_Face_2&Extrusion_1_1/To_Face_1"),
                   #
                   ("EDGE", "Extrusion_1_1/Generated_Face_2&Extrusion_1_1/From_Face_1"),
-                  ("EDGE", "Extrusion_1_1/Generated_Face_3&Extrusion_1_1/From_Face_1"),
+                  ("EDGE", "Extrusion_1_1/Generated_Face_1&Extrusion_1_1/From_Face_1"),
                   ("EDGE", "Extrusion_1_1/Generated_Face_4&Extrusion_1_1/From_Face_1"),
-                  ("EDGE", "Extrusion_1_1/Generated_Face_1&Extrusion_1_1/To_Face_1"),
+                  ("EDGE", "Extrusion_1_1/Generated_Face_3&Extrusion_1_1/To_Face_1"),
                   #
-                  ("EDGE", "Extrusion_1_1/Generated_Face_2&Extrusion_1_1/Generated_Face_1"),
-                  ("EDGE", "Extrusion_1_1/Generated_Face_3&Extrusion_1_1/Generated_Face_2"),
-                  ("EDGE", "Extrusion_1_1/Generated_Face_4&Extrusion_1_1/Generated_Face_3"),
+                  ("EDGE", "Extrusion_1_1/Generated_Face_2&Extrusion_1_1/Generated_Face_3"),
+                  ("EDGE", "Extrusion_1_1/Generated_Face_1&Extrusion_1_1/Generated_Face_2"),
                   ("EDGE", "Extrusion_1_1/Generated_Face_4&Extrusion_1_1/Generated_Face_1"),
+                  ("EDGE", "Extrusion_1_1/Generated_Face_4&Extrusion_1_1/Generated_Face_3"),
                   #
                   ("EDGE", "Extrusion_1_1/Generated_Face_2&Extrusion_1_1/To_Face_1"),
-                  ("EDGE", "Extrusion_1_1/Generated_Face_3&Extrusion_1_1/To_Face_1"),
+                  ("EDGE", "Extrusion_1_1/Generated_Face_1&Extrusion_1_1/To_Face_1"),
                   ("EDGE", "Extrusion_1_1/Generated_Face_4&Extrusion_1_1/To_Face_1"),
-                  ("EDGE", "Extrusion_1_1/Generated_Face_1&Extrusion_1_1/From_Face_1")
+                  ("EDGE", "Extrusion_1_1/Generated_Face_3&Extrusion_1_1/From_Face_1")
                   ]
 
 # Test projection to the same plane
@@ -129,12 +129,12 @@ Sketch_6 = model.addSketch(Part_1_doc, model.selection("FACE", "Extrusion_1_1/To
 testProjections(Part_1_doc, Sketch_6, aProjectedList, aFailedIDs)
 
 # Test projection to orthogonal side face of the prism
-Sketch_7 = model.addSketch(Part_1_doc, model.selection("FACE", "Extrusion_1_1/Generated_Face_1"))
+Sketch_7 = model.addSketch(Part_1_doc, model.selection("FACE", "Extrusion_1_1/Generated_Face_3"))
 aFailedIDs = set([0, 1, 18, 20, 26, 28])
 testProjections(Part_1_doc, Sketch_7, aProjectedList, aFailedIDs)
 
 # Test projection to slope side face of the prism
-Sketch_8 = model.addSketch(Part_1_doc, model.selection("FACE", "Extrusion_1_1/Generated_Face_3"))
+Sketch_8 = model.addSketch(Part_1_doc, model.selection("FACE", "Extrusion_1_1/Generated_Face_1"))
 aFailedIDs = set([0, 1])
 testProjections(Part_1_doc, Sketch_8, aProjectedList, aFailedIDs)
 

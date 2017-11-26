@@ -36,7 +36,7 @@ SketchConstraintCoincidence_3 = Sketch_1.setCoincident(SketchLine_3.endPoint(), 
 SketchConstraintCoincidence_4 = Sketch_1.setCoincident(SketchLine_1.startPoint(), SketchLine_4.endPoint())
 model.do()
 Revolution_1 = model.addRevolution(Part_1_doc, [model.selection("FACE", "Sketch_1/Face-SketchLine_1f-SketchLine_2f-SketchLine_3f-SketchLine_4f")], model.selection("EDGE", "Sketch_1/Edge-SketchLine_4"), 360, 0)
-Group_1 = model.addGroup(Part_1_doc, [model.selection("EDGE", "Revolution_1_1/Lateral_Edge_4"), model.selection("EDGE", "Revolution_1_1/Base_Edge_2"), model.selection("EDGE", "Revolution_1_1/Lateral_Edge_2"), model.selection("EDGE", "Revolution_1_1/Base_Edge_1"), model.selection("EDGE", "Revolution_1_1/Base_Edge_3")])
+Group_1 = model.addGroup(Part_1_doc, [model.selection("EDGE", "Revolution_1_1/Lateral_Edge_3"), model.selection("EDGE", "Revolution_1_1/Base_Edge_2"), model.selection("EDGE", "Revolution_1_1/Lateral_Edge_2"), model.selection("EDGE", "Revolution_1_1/Base_Edge_1"), model.selection("EDGE", "Revolution_1_1/Base_Edge_3")])
 model.end()
 
 # check that resulting group selection is valid

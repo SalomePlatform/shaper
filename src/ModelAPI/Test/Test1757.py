@@ -125,6 +125,6 @@ import ModelAPI
 
 assert(ModelAPI.ModelAPI_Session.get().validators().validate(Sketch_4.feature()))
 assert(ModelAPI.ModelAPI_Session.get().validators().validate(ExtrusionCut_2.feature()))
-assert(Sketch_3.feature().selection("External").namingName() == "Extrusion_1_1/Modfied_6")
+assert(Sketch_3.feature().selection("External").namingName() == "_Extrusion_1_1/Modfied_4")
 
 assert(model.checkPythonDump())
