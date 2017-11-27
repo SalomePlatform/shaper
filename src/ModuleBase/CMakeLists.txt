@@ -32,6 +32,7 @@ ADD_DEFINITIONS(${QT_DEFINITIONS})
 SET(PROJECT_HEADERS
   ModuleBase.h
   ModuleBase_ActionInfo.h
+  ModuleBase_ActionType.h
   ModuleBase_Definitions.h
   ModuleBase_DoubleSpinBox.h
   ModuleBase_Events.h

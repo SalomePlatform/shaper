@@ -123,14 +123,14 @@ class MODULEBASE_EXPORT ModuleBase_WidgetExprEditor : public ModuleBase_ModelWid
   /// Redefinition of virtual method
   virtual QList<QWidget*> getControls() const;
 
-  /// Returns true if the event is processed.
-  virtual bool processEnter();
-
 protected slots:
   /// A slot for processing text changed event
   void onTextChanged();
 
 protected:
+  /// Returns true if the event is processed.
+  virtual bool processEnter();
+
   /// Do not initialize value on the widget activation
   virtual void initializeValueByActivate();
 

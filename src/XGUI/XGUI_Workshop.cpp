@@ -327,7 +327,7 @@ void XGUI_Workshop::startApplication()
 #ifdef _DEBUG
   bool aNewPart = Config_PropManager::boolean("Plugins", "create_part_by_start");
   if (aNewPart) {
-      module()->launchOperation("Part", false);
+      module()->launchOperation("Part", false); // PartSetPlugin_Part::ID()
   }
 #endif
 }
@@ -870,6 +870,22 @@ void XGUI_Workshop::openDirectory(const QString& theDirectory)
 #ifndef HAVE_SALOME
   myMainWindow->setCurrentDir(myCurrentDir, true);
 #endif
+
+#ifdef _DEBUG
+  bool aNewPart = Config_PropManager::boolean("Plugins", "create_part_by_start");
+  if (aNewPart) {
+
+    DocumentPtr aRootDoc = ModelAPI_Session::get()->moduleDocument();
+    int aSize = aRootDoc->size(ModelAPI_ResultPart::group());
+    if (aSize > 0 ) {
+      ObjectPtr aObject = aRootDoc->object(ModelAPI_ResultPart::group(), 0);
+      ResultPartPtr aPart = std::dynamic_pointer_cast<ModelAPI_ResultPart>(aObject);
+      if (aPart.get())
+        aPart->activate();
+    }
+  }
+#endif
+
   QApplication::restoreOverrideCursor();
 }
 
@@ -1001,6 +1017,10 @@ bool XGUI_Workshop::onSaveAs()
 //******************************************************
 void XGUI_Workshop::onUndo(int theTimes)
 {
+  ModuleBase_ModelWidget* anActiveWidget = myOperationMgr->activeWidget();
+  if (anActiveWidget && anActiveWidget->processAction(ActionUndo))
+    return;
+
   objectBrowser()->treeView()->setCurrentIndex(QModelIndex());
   SessionPtr aMgr = ModelAPI_Session::get();
   std::list<std::string> aUndoList = aMgr->undoList();
@@ -1024,6 +1044,10 @@ void XGUI_Workshop::onUndo(int theTimes)
 //******************************************************
 void XGUI_Workshop::onRedo(int theTimes)
 {
+  ModuleBase_ModelWidget* anActiveWidget = myOperationMgr->activeWidget();
+  if (anActiveWidget && anActiveWidget->processAction(ActionRedo))
+    return;
+
   // the viewer update should be blocked in order to avoid the features blinking. For the created
   // feature a results are created, the flush of the created signal caused the viewer redisplay for
   // each created result. After a redisplay signal is flushed. So, the viewer update is blocked
@@ -1073,13 +1097,13 @@ void XGUI_Workshop::onRedo(int theTimes)
 //******************************************************
 void XGUI_Workshop::onWidgetStateChanged(int thePreviousState)
 {
-  ModuleBase_ModelWidget* anActiveWidget = 0;
-  ModuleBase_Operation* anOperation = myOperationMgr->currentOperation();
-  if (anOperation) {
-    ModuleBase_IPropertyPanel* aPanel = anOperation->propertyPanel();
-    if (aPanel)
-      anActiveWidget = aPanel->activeWidget();
-  }
+  ModuleBase_ModelWidget* anActiveWidget = myOperationMgr->activeWidget();
+  //ModuleBase_Operation* anOperation = myOperationMgr->currentOperation();
+  //if (anOperation) {
+  //  ModuleBase_IPropertyPanel* aPanel = anOperation->propertyPanel();
+  //  if (aPanel)
+  //    anActiveWidget = aPanel->activeWidget();
+  //}
   if (anActiveWidget)
     operationMgr()->onValidateOperation();
 
@@ -1208,10 +1232,24 @@ void XGUI_Workshop::updateCommandStatus()
   if (aMgr->hasModuleDocument()) {
     foreach(QAction* aCmd, aCommands) {
       QString aId = aCmd->data().toString();
-      if (aId == "UNDO_CMD")
-        aCmd->setEnabled(myModule->canUndo());
-      else if (aId == "REDO_CMD")
-        aCmd->setEnabled(myModule->canRedo());
+      if (aId == "UNDO_CMD") {
+        bool isActionEnabled = false;
+        // if ultimate is true -> using result of operation only, or using OR combination
+        ModuleBase_ModelWidget* anActiveWidget = myOperationMgr->activeWidget();
+        if (anActiveWidget && anActiveWidget->canProcessAction(ActionUndo, isActionEnabled))
+          aCmd->setEnabled(isActionEnabled);
+        else
+          aCmd->setEnabled(myModule->canUndo());
+      }
+      else if (aId == "REDO_CMD") {
+        bool isActionEnabled = false;
+        // if ultimate is true -> using result of operation only, or using OR combination
+        ModuleBase_ModelWidget* anActiveWidget = myOperationMgr->activeWidget();
+        if (anActiveWidget && anActiveWidget->canProcessAction(ActionRedo, isActionEnabled))
+          aCmd->setEnabled(isActionEnabled);
+        else
+          aCmd->setEnabled(myModule->canRedo());
+      }
       else
         // Enable all commands
         aCmd->setEnabled(true);

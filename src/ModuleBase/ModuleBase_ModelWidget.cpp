@@ -406,6 +406,37 @@ void ModuleBase_ModelWidget::updateObject(ObjectPtr theObject)
   }
 }
 
+bool ModuleBase_ModelWidget::canProcessAction(ModuleBase_ActionType theActionType,
+                                              bool& isActionEnabled)
+{
+  isActionEnabled = false;
+  switch (theActionType) {
+    case ActionEnter: return false;
+    case ActionEscape: return false;
+    case ActionDelete: return true;
+    case ActionUndo:
+    case ActionRedo:
+    default:
+      return false;
+  }
+}
+
+bool ModuleBase_ModelWidget::processAction(ModuleBase_ActionType theActionType)
+{
+  switch (theActionType) {
+    case ActionEnter:
+      return processEnter();
+    case ActionEscape:
+      return processEscape();
+    case ActionDelete:
+      return processDelete();
+    case ActionUndo:
+    case ActionRedo:
+    default:
+      return false;
+  }
+}
+
 bool ModuleBase_ModelWidget::processEnter()
 {
   return false;

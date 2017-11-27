@@ -22,6 +22,7 @@
 #define MODULEBASE_MODELWIDGET_H
 
 #include <ModuleBase.h>
+#include <ModuleBase_ActionType.h>
 #include <ModuleBase_OperationFeature.h>
 #include <ModelAPI_Feature.h>
 
@@ -240,14 +241,13 @@ Q_OBJECT
   /// \return Current Editing mode
   bool isEditingMode() const { return myIsEditing; }
 
-  /// Returns true if the event is processed. The default implementation is empty, returns false.
-  virtual bool processEnter();
+  /// Returns true if the action can be processed. The default implementation is empty, returns false.
+  /// \param theActionType an action type
+  /// \param isActionEnabled if true, the enable state of the action
+  virtual bool canProcessAction(ModuleBase_ActionType theActionType, bool& isActionEnabled);
 
   /// Returns true if the event is processed. The default implementation is empty, returns false.
-  virtual bool processEscape();
-
-  /// Returns true if the event is processed. The default implementation is empty, returns false.
-  virtual bool processDelete();
+  virtual bool processAction(ModuleBase_ActionType theActionType);
 
   /// Sends Update and Redisplay for the given object
   /// \param theObj is updating object
@@ -342,6 +342,15 @@ protected:
 
   /// The method called when widget is activated
   virtual void activateCustom() {};
+
+    //// Returns true if the event is processed. The default implementation is empty, returns false.
+  virtual bool processEnter();
+
+  //// Returns true if the event is processed. The default implementation is empty, returns false.
+  virtual bool processEscape();
+
+  //// Returns true if the event is processed. The default implementation is empty, returns false.
+  virtual bool processDelete();
 
 protected slots:
   /// Processing of values changed in model widget by store the current value to the feature

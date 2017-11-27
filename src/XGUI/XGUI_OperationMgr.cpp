@@ -202,6 +202,18 @@ ModuleBase_Operation* XGUI_OperationMgr::previousOperation(ModuleBase_Operation*
   return myOperations.at(idx - 1);
 }
 
+ModuleBase_ModelWidget* XGUI_OperationMgr::activeWidget() const
+{
+  ModuleBase_ModelWidget* anActiveWidget = 0;
+  ModuleBase_Operation* anOperation = currentOperation();
+  if (anOperation) {
+    ModuleBase_IPropertyPanel* aPanel = anOperation->propertyPanel();
+    if (aPanel)
+      anActiveWidget = aPanel->activeWidget();
+  }
+  return anActiveWidget;
+}
+
 bool XGUI_OperationMgr::startOperation(ModuleBase_Operation* theOperation)
 {
   if (hasOperation())
@@ -697,7 +709,7 @@ bool XGUI_OperationMgr::onKeyPressed(QObject *theObject, QKeyEvent* theEvent)
         ModuleBase_IPropertyPanel* aPanel = aOperation->propertyPanel();
         ModuleBase_ModelWidget* anActiveWgt = aPanel->activeWidget();
         if (anActiveWgt)
-          isAccepted = anActiveWgt && anActiveWgt->processEscape();
+          isAccepted = anActiveWgt && anActiveWgt->processAction(ActionEscape);
       }
       // default Escape button functionality
       if (!isAccepted && aOperation) {
@@ -737,7 +749,7 @@ bool XGUI_OperationMgr::onProcessEnter(QObject* theObject)
     }
   }
   if (!isAborted) {
-    isAccepted = anActiveWgt && anActiveWgt->processEnter();
+    isAccepted = anActiveWgt && anActiveWgt->processAction(ActionEnter);
     if (!isAccepted) {
       isAccepted =
         myWorkshop->module()->processEnter(anActiveWgt ? anActiveWgt->attributeID() : "");
@@ -784,7 +796,7 @@ bool XGUI_OperationMgr::onProcessDelete(QObject* theObject)
       if (isPPChildObject) {
         anActiveWgt = aPanel->activeWidget();
         if (anActiveWgt) {
-          isAccepted = anActiveWgt->processDelete();
+          isAccepted = anActiveWgt->processAction(ActionDelete);
         }
       }
     }

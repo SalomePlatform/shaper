@@ -68,6 +68,7 @@ Q_OBJECT
   /// \param theY the Y coordinate
   void setCursorPosition(const int theX, const int theY);
 
+protected:
   /// Returns true if the event is processed.
   virtual bool processEnter();
 

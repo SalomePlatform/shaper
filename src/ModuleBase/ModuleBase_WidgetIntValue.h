@@ -56,10 +56,10 @@ Q_OBJECT
   /// \return a control list
   virtual QList<QWidget*> getControls() const;
 
+protected:
   /// Returns true if the event is processed.
   virtual bool processEnter();
 
-protected:
   /// Saves the internal parameters to the given feature
   /// \return True in success
   virtual bool storeValueCustom();

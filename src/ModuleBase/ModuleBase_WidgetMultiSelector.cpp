@@ -58,6 +58,8 @@
 
 const int ATTRIBUTE_SELECTION_INDEX_ROLE = Qt::UserRole + 1;
 
+//#define DEBUG_UNDO_REDO
+
 /**
 * Customization of a List Widget to make it to be placed on full width of container
 */
@@ -99,11 +101,27 @@ protected:
 #endif
 };
 
+#ifdef DEBUG_UNDO_REDO
+void printHistoryInfo(const QString& theMethodName, int theCurrentHistoryIndex,
+  QList<QList<std::shared_ptr<ModuleBase_ViewerPrs> > > theSelectedHistoryValues)
+{
+  QStringList aSizes;
+  for (int i = 0; i < theSelectedHistoryValues.size(); i++)
+    aSizes.append(QString::number(theSelectedHistoryValues[i].size()));
+
+  std::cout << theMethodName.toStdString()
+            << "  current = " << theCurrentHistoryIndex
+            << " size(history) =  " << theSelectedHistoryValues.size()
+            << " (" << aSizes.join(", ").toStdString() << ")"
+            << std::endl;
+}
+#endif
+
 ModuleBase_WidgetMultiSelector::ModuleBase_WidgetMultiSelector(QWidget* theParent,
                                                                ModuleBase_IWorkshop* theWorkshop,
                                                                const Config_WidgetAPI* theData)
 : ModuleBase_WidgetSelector(theParent, theWorkshop, theData),
-  myIsSetSelectionBlocked(false)
+  myIsSetSelectionBlocked(false), myCurrentHistoryIndex(-1)
 {
   QGridLayout* aMainLay = new QGridLayout(this);
   ModuleBase_Tools::adjustMargins(aMainLay);
@@ -186,6 +204,8 @@ void ModuleBase_WidgetMultiSelector::activateCustom()
 
   myWorkshop->module()->activateCustomPrs(myFeature,
                             ModuleBase_IModule::CustomizeHighlightedObjects, true);
+  clearSelectedHistory();
+  myWorkshop->updateCommandStatus();
 }
 
 //********************************************************************
@@ -194,6 +214,8 @@ void ModuleBase_WidgetMultiSelector::deactivate()
   ModuleBase_WidgetSelector::deactivate();
 
   myWorkshop->module()->deactivateCustomPrs(ModuleBase_IModule::CustomizeHighlightedObjects, true);
+  clearSelectedHistory();
+  myWorkshop->updateCommandStatus();
 }
 
 //********************************************************************
@@ -310,6 +332,63 @@ void ModuleBase_WidgetMultiSelector::getHighlighted(QList<ModuleBase_ViewerPrsPt
 }
 
 //********************************************************************
+bool ModuleBase_WidgetMultiSelector::canProcessAction(ModuleBase_ActionType theActionType,
+                                                      bool& isActionEnabled)
+{
+  isActionEnabled = false;
+  bool aCanProcess = false;
+  switch (theActionType) {
+    case ActionUndo:
+    case ActionRedo: {
+      aCanProcess = true;
+      isActionEnabled = theActionType == ActionUndo ? myCurrentHistoryIndex > 0
+          : (mySelectedHistoryValues.size() > 0 &&
+             myCurrentHistoryIndex < mySelectedHistoryValues.size() - 1);
+    }
+    break;
+    default:
+    break;
+  }
+  return aCanProcess;
+}
+
+//********************************************************************
+bool ModuleBase_WidgetMultiSelector::processAction(ModuleBase_ActionType theActionType)
+{
+  switch (theActionType) {
+    case ActionUndo:
+    case ActionRedo: {
+      if (theActionType == ActionUndo)
+        myCurrentHistoryIndex--;
+      else
+        myCurrentHistoryIndex++;
+      QList<ModuleBase_ViewerPrsPtr> aSelected = mySelectedHistoryValues[myCurrentHistoryIndex];
+      // equal vertices should not be used here
+      ModuleBase_ISelection::filterSelectionOnEqualPoints(aSelected);
+      bool isDone = setSelection(aSelected,
+                                 false /*need not validate because values already was in list*/);
+      updateOnSelectionChanged(isDone);
+
+      myWorkshop->updateCommandStatus();
+#ifdef DEBUG_UNDO_REDO
+      printHistoryInfo(QString("processAction %1").arg(theActionType == ActionUndo ? "Undo" : "Redo"),
+        myCurrentHistoryIndex, mySelectedHistoryValues);
+#endif
+      return true;
+    }
+    default:
+      return ModuleBase_ModelWidget::processAction(theActionType);
+  }
+}
+
+//********************************************************************
+bool ModuleBase_WidgetMultiSelector::activateSelectionAndFilters(bool toActivate)
+{
+  myWorkshop->updateCommandStatus(); // update enable state of Undo/Redo application actions
+  return ModuleBase_WidgetSelector::activateSelectionAndFilters(toActivate);
+}
+
+//********************************************************************
 bool ModuleBase_WidgetMultiSelector::isValidSelectionCustom(const ModuleBase_ViewerPrsPtr& thePrs)
 {
   bool aValid = ModuleBase_WidgetSelector::isValidSelectionCustom(thePrs);
@@ -340,6 +419,8 @@ bool ModuleBase_WidgetMultiSelector::isValidSelectionCustom(const ModuleBase_Vie
 //********************************************************************
 bool ModuleBase_WidgetMultiSelector::processDelete()
 {
+  appendFirstSelectionInHistory();
+
   // find attribute indices to delete
   std::set<int> anAttributeIds;
   getSelectedAttributeIndices(anAttributeIds);
@@ -392,6 +473,7 @@ bool ModuleBase_WidgetMultiSelector::processDelete()
       }
     }
   }
+  appendSelectionInHistory();
   return aDone;
 }
 
@@ -443,6 +525,8 @@ void ModuleBase_WidgetMultiSelector::onSelectionTypeChanged()
   // may be the feature's result is not displayed, but attributes should be
   myWorkshop->module()->customizeObject(myFeature, ModuleBase_IModule::CustomizeArguments,
                             true); /// hope that something is redisplayed by object updated
+  // clear history should follow after set selected to do not increase history by setSelected
+  clearSelectedHistory();
 }
 
 //********************************************************************
@@ -462,7 +546,47 @@ void ModuleBase_WidgetMultiSelector::onSelectionChanged()
       }
     }
   }
+  appendFirstSelectionInHistory();
   ModuleBase_WidgetSelector::onSelectionChanged();
+  appendSelectionInHistory();
+}
+
+void ModuleBase_WidgetMultiSelector::appendFirstSelectionInHistory()
+{
+  if (mySelectedHistoryValues.empty()) {
+    myCurrentHistoryIndex++;
+    mySelectedHistoryValues.append(getAttributeSelection());
+
+#ifdef DEBUG_UNDO_REDO
+    printHistoryInfo("appendSelectionInHistory", myCurrentHistoryIndex, mySelectedHistoryValues);
+#endif
+  }
+}
+
+void ModuleBase_WidgetMultiSelector::appendSelectionInHistory()
+{
+  while (myCurrentHistoryIndex != mySelectedHistoryValues.count() - 1)
+    mySelectedHistoryValues.removeLast();
+
+  QList<ModuleBase_ViewerPrsPtr> aSelected = getFilteredSelected();
+  myCurrentHistoryIndex++;
+  mySelectedHistoryValues.append(aSelected);
+  myWorkshop->updateCommandStatus();
+
+#ifdef DEBUG_UNDO_REDO
+  printHistoryInfo("appendSelectionInHistory", myCurrentHistoryIndex, mySelectedHistoryValues);
+#endif
+}
+
+void ModuleBase_WidgetMultiSelector::clearSelectedHistory()
+{
+  mySelectedHistoryValues.clear();
+  myCurrentHistoryIndex = -1;
+  myWorkshop->updateCommandStatus();
+
+#ifdef DEBUG_UNDO_REDO
+  printHistoryInfo("clearSelectedHistory", myCurrentHistoryIndex, mySelectedHistoryValues);
+#endif
 }
 
 void ModuleBase_WidgetMultiSelector::updateFocus()

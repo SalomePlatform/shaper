@@ -66,9 +66,6 @@ class MODULEBASE_EXPORT ModuleBase_WidgetFileSelector : public ModuleBase_ModelW
   /// exists and has supported format
   bool isCurrentPathValid();
 
-  /// Reject the current editor dialog if it is shown and returns true.
-  virtual bool processEscape();
-
 public slots:
    /// Processing of path selection button press
   void onPathSelectionBtn();
@@ -77,6 +74,9 @@ public slots:
   void onPathChanged();
 
 protected:
+  /// Reject the current editor dialog if it is shown and returns true.
+  virtual bool processEscape();
+
   /// Saves the internal parameters to the given feature
   /// \return True in success
   virtual bool storeValueCustom();

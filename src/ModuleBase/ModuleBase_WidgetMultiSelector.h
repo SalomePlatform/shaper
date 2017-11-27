@@ -88,13 +88,22 @@ class MODULEBASE_EXPORT ModuleBase_WidgetMultiSelector : public ModuleBase_Widge
   /// \param theValues a list of presentations
   virtual void getHighlighted(QList<std::shared_ptr<ModuleBase_ViewerPrs>>& theValues);
 
+  /// Returns true if the action can be processed. The default implementation is empty, returns false.
+  /// \param theActionType an action type
+  /// \param isActionEnabled if true, the enable state of the action
+  virtual bool canProcessAction(ModuleBase_ActionType theActionType, bool& isActionEnabled);
+
+  /// Returns true if the event is processed. The default implementation is empty, returns false.
+  virtual bool processAction(ModuleBase_ActionType theActionType);
+
+  /// Activate or deactivate selection and selection filters
+  /// \return true if the selection filter of the widget is activated in viewer context
+  virtual bool activateSelectionAndFilters(bool toActivate);
+
   /// Checks the widget validity. By default, it returns true.
   /// \param thePrs a selected presentation in the view
   /// \return a boolean value
   virtual bool isValidSelectionCustom(const std::shared_ptr<ModuleBase_ViewerPrs>& thePrs);
-
-  /// Returns true if the event is processed. The default implementation is empty, returns false.
-  virtual bool processDelete();
 
 public slots:
   /// Slot is called on selection type changed
@@ -115,6 +124,9 @@ protected slots:
   void onListSelection();
 
 protected:
+  /// Returns true if the event is processed. The default implementation is empty, returns false.
+  virtual bool processDelete();
+
   /// The methiod called when widget is activated
   virtual void activateCustom();
 
@@ -122,7 +134,18 @@ protected:
   /// \return True in success
   virtual bool storeValueCustom();
 
+  /// restire type of selection by feature attribute
   virtual bool restoreValueCustom();
+
+  /// Creates an element of the attribute current selection if history is empty
+  virtual void appendFirstSelectionInHistory();
+
+  /// Create an element in the history that stores the current selection,
+  /// position in the history is incremented
+  void appendSelectionInHistory();
+
+  /// Clear list of stored selected items, reset current position into '-1'
+  void clearSelectedHistory();
 
   /// Set the focus on the last item in  the list
   virtual void updateFocus();
@@ -215,6 +238,11 @@ protected:
 
   /// A flag to block set selection perform if the method is in process
   bool myIsSetSelectionBlocked;
+
+  /// A container of selected objects
+  QList<QList<std::shared_ptr<ModuleBase_ViewerPrs> > > mySelectedHistoryValues;
+  /// Position in a container of selected values
+  int myCurrentHistoryIndex;
 };
 
 #endif /* MODULEBASE_WIDGETFILESELECTOR_H_ */
