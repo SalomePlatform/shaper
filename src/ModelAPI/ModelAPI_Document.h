@@ -198,6 +198,14 @@ public:
   //! \return Empty pointer if there is no applicable folder
   virtual std::shared_ptr<ModelAPI_Folder> findFolderBelow(
       const std::list<std::shared_ptr<ModelAPI_Feature> >& theFeatures) = 0;
+  //! Search a folder containing the given feature.
+  //! Addtionally calculates a zero-based index of the feature in this folder.
+  //! \param theFeature feature to search
+  //! \param theIndexInFolder zero-based index in the folder or -1 if the feature is top-level.
+  //! \return the folder containing the feature or empty pointer if the feature is top-level.
+  virtual std::shared_ptr<ModelAPI_Folder> findContainingFolder(
+      const std::shared_ptr<ModelAPI_Feature>& theFeature,
+      int& theIndexInFolder) = 0;
   //! Add a list of features to the folder. The correctness of the adding is not performed
   //! (such checks have been done in corresponding find.. method).
   //! \return \c true if the movement is successfull

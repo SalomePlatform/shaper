@@ -1580,6 +1580,59 @@ bool Model_Objects::removeFromFolder(
   return true;
 }
 
+FolderPtr Model_Objects::findContainingFolder(const FeaturePtr& theFeature, int& theIndexInFolder)
+{
+  // search the label in the list of references
+  TDF_Label aFeaturesLab = featuresLabel();
+  Handle(TDataStd_ReferenceArray) aRefs;
+  if (!aFeaturesLab.FindAttribute(TDataStd_ReferenceArray::GetID(), aRefs))
+    return FolderPtr(); // no reference array (something is wrong)
+
+  std::shared_ptr<Model_Data> aData =
+      std::static_pointer_cast<Model_Data>(theFeature->data());
+  if (!aData || !aData->isValid())
+    return FolderPtr();
+  TDF_Label aLabelToFind = aData->label().Father();
+
+  theIndexInFolder = -1;
+  FolderPtr aFoundFolder;
+  TDF_Label aLastFeatureLabel;
+
+  for (int aRefIndex = aRefs->Lower(); aRefIndex <= aRefs->Upper(); ++aRefIndex) {
+    if (aFoundFolder)
+      ++theIndexInFolder;
+
+    TDF_Label aCurLabel = aRefs->Value(aRefIndex);
+    if (aCurLabel == aLabelToFind) // the feature is reached
+      return aFoundFolder;
+
+    if (!aFoundFolder) {
+      // if the current label refers to a folder, feel all necessary data
+      aFoundFolder = std::dynamic_pointer_cast<ModelAPI_Folder>(folder(aCurLabel));
+      if (aFoundFolder) {
+        theIndexInFolder = -1;
+
+        AttributeReferencePtr aLastRef =
+            aFoundFolder->reference(ModelAPI_Folder::LAST_FEATURE_ID());
+        if (aLastRef->value()) {
+          aData = std::static_pointer_cast<Model_Data>(aLastRef->value()->data());
+          if (aData && aData->isValid())
+            aLastFeatureLabel = aData->label().Father();
+        } else // folder is empty
+          aFoundFolder = FolderPtr();
+      }
+    } else if (aLastFeatureLabel == aCurLabel) {
+      // folder is finished, clear all stored data
+      theIndexInFolder = -1;
+      aFoundFolder = FolderPtr();
+    }
+  }
+
+  // folder is not found
+  theIndexInFolder = -1;
+  return FolderPtr();
+}
+
 
 std::shared_ptr<ModelAPI_Feature> Model_Objects::feature(
     const std::shared_ptr<ModelAPI_Result>& theResult)

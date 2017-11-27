@@ -116,6 +116,8 @@
   }
 }
 
+%apply int& OUTPUT {int&};
+
 // all supported interfaces
 %include "ModelAPI_Entity.h"
 %include "ModelAPI_Document.h"

@@ -80,6 +80,11 @@ assert(aPartDoc.size("Features") == NB_FEATURES_FULL), "Wrong number of features
 # number of features outside the folder
 assert(aPartDoc.size("Features", True) == NB_FEATURES_OUT), "Wrong number of features outside a folder: {}, expected: {}".format(aPartDoc.size("Features", True), NB_FEATURES_OUT)
 
+# check the index of the point in the folder
+aFound = aPartDoc.findContainingFolder(aPoint1)
+assert(aFound[0].data().isEqual(aFolder1.data()))
+assert(aFound[1] == 0)
+
 #=========================================================================
 # Test 2. Add a point into a folder below
 #=========================================================================
@@ -119,6 +124,13 @@ NB_FEATURES_OUT -= 1
 
 assert(aPartDoc.size("Features") == NB_FEATURES_FULL), "Wrong number of features: {}, expected: {}".format(aPartDoc.size("Features"), NB_FEATURES_FULL)
 assert(aPartDoc.size("Features", True) == NB_FEATURES_OUT), "Wrong number of features outside a folder: {}, expected: {}".format(aPartDoc.size("Features", True), NB_FEATURES_OUT)
+
+# check the index of the point in the folder
+aFound = aPartDoc.findContainingFolder(aPoint2)
+assert(aFound[0].data().isEqual(aFolder2.data()))
+assert(aFound[1] == 0)
+aFound = aPartDoc.findContainingFolder(aPoint3)
+assert(aFound == -1)
 
 #=========================================================================
 # Test 3. Add several points into a folder
@@ -180,6 +192,14 @@ assert(aPartDoc.index(aPoint4) == 6), "Wrong index of the point: {}".format(aPar
 assert(aPartDoc.index(aFolder3, True) == 2), "Wrong index of the folder: {}".format(aPartDoc.index(aFolder3, True))
 assert(aPartDoc.index(aPoint3, True) == -1), "Wrong index of the point: {}".format(aPartDoc.index(aPoint3, True))
 assert(aPartDoc.index(aPoint4, True) == -1), "Wrong index of the point: {}".format(aPartDoc.index(aPoint4, True))
+
+# check the index of the point in the folder
+aFound = aPartDoc.findContainingFolder(aPoint3)
+assert(aFound[0].data().isEqual(aFolder3.data()))
+assert(aFound[1] == 0)
+aFound = aPartDoc.findContainingFolder(aPoint4)
+assert(aFound[0].data().isEqual(aFolder3.data()))
+assert(aFound[1] == 1)
 
 
 # add more points to the folder to move them out

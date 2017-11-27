@@ -1282,6 +1282,13 @@ std::shared_ptr<ModelAPI_Folder> Model_Document::findFolderBelow(
   return myObjs->findFolder(theFeatures, true);
 }
 
+std::shared_ptr<ModelAPI_Folder> Model_Document::findContainingFolder(
+      const std::shared_ptr<ModelAPI_Feature>& theFeature,
+      int& theIndexInFolder)
+{
+  return myObjs->findContainingFolder(theFeature, theIndexInFolder);
+}
+
 bool Model_Document::moveToFolder(
       const std::list<std::shared_ptr<ModelAPI_Feature> >& theFeatures,
       const std::shared_ptr<ModelAPI_Folder>& theFolder)
