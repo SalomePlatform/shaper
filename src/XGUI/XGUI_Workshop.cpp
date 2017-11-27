@@ -55,6 +55,8 @@
 #include <AppElements_Workbench.h>
 #endif
 
+#include <Config_XMLReader.h>
+
 #include <ModelAPI_AttributeDocRef.h>
 #include <ModelAPI_AttributeIntArray.h>
 #include <ModelAPI_AttributeDouble.h>
@@ -295,8 +297,7 @@ void XGUI_Workshop::startApplication()
   Config_PropManager::registerProp("Plugins", "default_path", "Default Path",
                                    Config_Prop::Directory, "");
 
-  std::string aDir = getenv(QString("%1Resources").arg(
-    ModuleBase_Preferences::resourceMgr()->appName()).toLatin1());
+  std::string aDir = Config_XMLReader::resourcesConfigFile();
   Config_PropManager::registerProp("Plugins", "import_initial_path", "Import initial directory",
                                    Config_Prop::Directory, aDir);
 

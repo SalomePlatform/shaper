@@ -371,8 +371,8 @@ bool ModuleBase_WidgetMultiSelector::processAction(ModuleBase_ActionType theActi
 
       myWorkshop->updateCommandStatus();
 #ifdef DEBUG_UNDO_REDO
-      printHistoryInfo(QString("processAction %1").arg(theActionType == ActionUndo ? "Undo" : "Redo"),
-        myCurrentHistoryIndex, mySelectedHistoryValues);
+      printHistoryInfo(QString("processAction %1").arg(theActionType == ActionUndo ? "Undo"
+        : "Redo"), myCurrentHistoryIndex, mySelectedHistoryValues);
 #endif
       return true;
     }
