@@ -162,7 +162,8 @@ void SketchPlugin_Projection::computeProjection(const std::string& theID)
       std::dynamic_pointer_cast<ModelAPI_ResultConstruction>(lastResult());
   if (aResult && aResult->shape() && theID == EXTERNAL_FEATURE_ID()) {
     aResult->setShape(std::shared_ptr<GeomAPI_Edge>());
-    aProjection->selection(EXTERNAL_ID())->setValue(lastResult(), lastResult()->shape());
+    if (aProjection)
+      aProjection->selection(EXTERNAL_ID())->setValue(lastResult(), lastResult()->shape());
   }
 
   if (aVertex) {
