@@ -87,7 +87,8 @@ anExtrusionResult = modelAPI_ResultCompSolid(modelAPI_ResultBody(anExtrusionFeat
 aSession.startOperation()
 aRemoveSubShapesFeature = aPart.addFeature("Remove_SubShapes")
 aRemoveSubShapesFeature.selection("base_shape").setValue(anExtrusionResult, None)
-aRemoveSubShapesFeature.selectionList("subshapes").removeLast();
+aRemoveSubShapesFeature.string("creation_method").setValue("by_keep_subshapes")
+aRemoveSubShapesFeature.selectionList("subshapes_to_keep").removeLast();
 aSession.finishOperation()
 assert (len(aRemoveSubShapesFeature.results()) > 0)
 anUnionResult = modelAPI_ResultCompSolid(modelAPI_ResultBody(aRemoveSubShapesFeature.firstResult()))

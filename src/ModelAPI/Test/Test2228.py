@@ -67,5 +67,5 @@ model.end()
 from ModelAPI import *
 aFactory = ModelAPI_Session.get().validators()
 assert(aFactory.validate(Remove_SubShapes_1.feature()))
-assert(Remove_SubShapes_1.subshapes().size() == 1)
-assert(Remove_SubShapes_1.subshapes().value(0).namingName() == "Partition_1_1_1")
+assert(Remove_SubShapes_1.subshapesToKeep().size() == 1)
+assert(Remove_SubShapes_1.subshapesToKeep().value(0).namingName() == "Partition_1_1_1")
