@@ -88,7 +88,7 @@ class MODULEBASE_EXPORT ModuleBase_WidgetMultiSelector : public ModuleBase_Widge
   /// \param theValues a list of presentations
   virtual void getHighlighted(QList<std::shared_ptr<ModuleBase_ViewerPrs>>& theValues);
 
-  /// Returns true if the action can be processed. The default implementation is empty, returns false.
+  /// Returns true if the action can be processed. By default it is empty and returns false.
   /// \param theActionType an action type
   /// \param isActionEnabled if true, the enable state of the action
   virtual bool canProcessAction(ModuleBase_ActionType theActionType, bool& isActionEnabled);
