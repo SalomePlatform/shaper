@@ -771,7 +771,7 @@ bool FeaturesPlugin_ValidatorRemoveSubShapesResult::isValid(
   Events_InfoMessage& theError) const
 {
   static const std::string aBaseShapeID = "base_shape";
-  static const std::string aSubShapesID = "subshapes";
+  static const std::string aSubShapesID = "subshapes_to_keep";
 
   if(theFeature->getKind() != "Remove_SubShapes") {
     theError = "Error: Feature \"%1\" does not supported by this validator.";
@@ -800,6 +800,11 @@ bool FeaturesPlugin_ValidatorRemoveSubShapesResult::isValid(
     return false;
   }
   GeomShapePtr aResultShape = aBaseShape->emptyCopied();
+
+  if (aSubShapesAttrList->size() == 0) {
+    theError = "Error: Resulting shape is not valid.";
+    return false;
+  }
 
   // Copy sub-shapes from list to new shape.
   for(int anIndex = 0; anIndex < aSubShapesAttrList->size(); ++anIndex) {

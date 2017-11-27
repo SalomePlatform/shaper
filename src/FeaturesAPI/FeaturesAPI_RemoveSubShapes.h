@@ -50,11 +50,15 @@ public:
   FEATURESAPI_EXPORT
   virtual ~FeaturesAPI_RemoveSubShapes();
 
-  INTERFACE_2(FeaturesPlugin_RemoveSubShapes::ID(),
+  INTERFACE_4(FeaturesPlugin_RemoveSubShapes::ID(),
               base, FeaturesPlugin_RemoveSubShapes::BASE_SHAPE_ID(),
               ModelAPI_AttributeSelection, /** Base */,
-              subshapes, FeaturesPlugin_RemoveSubShapes::SUBSHAPES_ID(),
-              ModelAPI_AttributeSelectionList, /** Subshapes */)
+              creationMethod, FeaturesPlugin_RemoveSubShapes::CREATION_METHOD(),
+              ModelAPI_AttributeString, /** Creation method */,
+              subshapesToKeep, FeaturesPlugin_RemoveSubShapes::SUBSHAPES_TO_KEEP_ID(),
+              ModelAPI_AttributeSelectionList, /** Subshapes to keep*/,
+              subshapesToRemove, FeaturesPlugin_RemoveSubShapes::SUBSHAPES_TO_REMOVE_ID(),
+              ModelAPI_AttributeSelectionList, /** Subshapes to remove*/)
 
   /// Modify objects attribute of the feature.
   FEATURESAPI_EXPORT
@@ -63,6 +67,10 @@ public:
   /// Modify tools attribute of the feature.
   FEATURESAPI_EXPORT
   void setSubShapesToKeep(const std::list<ModelHighAPI_Selection>& theSubShapes);
+
+  /// Modify tools attribute of the feature.
+  FEATURESAPI_EXPORT
+  void setSubShapesToRemove(const std::list<ModelHighAPI_Selection>& theSubShapes);
 
   /// Dump wrapped feature
   FEATURESAPI_EXPORT

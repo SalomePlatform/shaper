@@ -21,6 +21,7 @@
 #include "FeaturesPlugin_RemoveSubShapes.h"
 
 #include <ModelAPI_AttributeSelectionList.h>
+#include <ModelAPI_AttributeString.h>
 #include <ModelAPI_ResultBody.h>
 #include <ModelAPI_ResultCompSolid.h>
 #include <ModelAPI_ResultConstruction.h>
@@ -38,6 +39,7 @@
 
 //==================================================================================================
 FeaturesPlugin_RemoveSubShapes::FeaturesPlugin_RemoveSubShapes()
+: myChangedInCode(false)
 {
 }
 
@@ -46,59 +48,141 @@ void FeaturesPlugin_RemoveSubShapes::initAttributes()
 {
   data()->addAttribute(BASE_SHAPE_ID(), ModelAPI_AttributeSelection::typeId());
 
-  data()->addAttribute(SUBSHAPES_ID(), ModelAPI_AttributeSelectionList::typeId());
+  data()->addAttribute(CREATION_METHOD(), ModelAPI_AttributeString::typeId());
+
+  data()->addAttribute(SUBSHAPES_TO_KEEP_ID(), ModelAPI_AttributeSelectionList::typeId());
+
+  data()->addAttribute(SUBSHAPES_TO_REMOVE_ID(), ModelAPI_AttributeSelectionList::typeId());
 }
 
 void FeaturesPlugin_RemoveSubShapes::attributeChanged(const std::string& theID)
 {
   ModelAPI_Feature::attributeChanged(theID);
 
+  if (myChangedInCode) return;
+
+  AttributeSelectionPtr aShapeAttrSelection = selection(BASE_SHAPE_ID());
+  AttributeSelectionListPtr aSubShapesToKeepAttrList = selectionList(SUBSHAPES_TO_KEEP_ID());
+  AttributeSelectionListPtr aSubShapesToRemoveAttrList = selectionList(SUBSHAPES_TO_REMOVE_ID());
+  if (!aShapeAttrSelection.get()
+      || !aSubShapesToKeepAttrList.get()
+      || !aSubShapesToRemoveAttrList.get())
+  {
+    return;
+  }
+
+  ResultPtr aContext = aShapeAttrSelection->context();
+  ResultCompSolidPtr aResultCompSolid =
+    std::dynamic_pointer_cast<ModelAPI_ResultCompSolid>(aContext);
+  if(!aResultCompSolid.get()) {
+    aSubShapesToKeepAttrList->clear();
+    aSubShapesToRemoveAttrList->clear();
+    return;
+  }
+  const int aNumOfSubs = aResultCompSolid->numberOfSubs();
+
+  GeomShapePtr aBaseShape = aShapeAttrSelection->value();
+  if(!aBaseShape.get()) {
+    aBaseShape = aContext->shape();
+  }
+
+  myChangedInCode = true;
+
   if(theID == BASE_SHAPE_ID()) {
-    AttributeSelectionPtr aShapeAttrSelection = selection(BASE_SHAPE_ID());
-    AttributeSelectionListPtr aSubShapesAttrList = selectionList(SUBSHAPES_ID());
-    if(!aShapeAttrSelection.get() || !aSubShapesAttrList.get()) {
+    aSubShapesToKeepAttrList->clear();
+    aSubShapesToRemoveAttrList->clear();
+
+    if (!aBaseShape.get()) {
       return;
     }
 
-    aSubShapesAttrList->clear();
-
-    ResultPtr aContext = aShapeAttrSelection->context();
-    ResultCompSolidPtr aResultCompSolid =
-      std::dynamic_pointer_cast<ModelAPI_ResultCompSolid>(aContext);
-    if(!aResultCompSolid.get()) {
-      return;
-    }
-
-    GeomShapePtr aBaseShape = aShapeAttrSelection->value();
-    if(!aBaseShape.get()) {
-      aBaseShape = aContext->shape();
-    }
-    if(!aBaseShape.get()) {
-      return;
-    }
-    GeomAPI_Shape::ShapeType aShapeType = aBaseShape->shapeType();
-    if(aShapeType != GeomAPI_Shape::WIRE
-        && aShapeType != GeomAPI_Shape::SHELL
-        && aShapeType != GeomAPI_Shape::COMPSOLID
-        && aShapeType != GeomAPI_Shape::COMPOUND) {
-      return;
-    }
     for(GeomAPI_ShapeIterator anIt(aBaseShape); anIt.more(); anIt.next()) {
       GeomShapePtr aSubShape = anIt.current();
-      const int aNumOfSubs = aResultCompSolid->numberOfSubs();
       if(aNumOfSubs == 0) {
-        aSubShapesAttrList->append(aContext, aSubShape);
+        aSubShapesToKeepAttrList->append(aContext, aSubShape);
       } else {
         for(int anIndex = 0; anIndex < aResultCompSolid->numberOfSubs(); ++anIndex) {
           ResultBodyPtr aSubResult = aResultCompSolid->subResult(anIndex);
           if(aSubResult->shape()->isEqual(aSubShape)) {
-            aSubShapesAttrList->append(aSubResult, aSubShape);
+            aSubShapesToKeepAttrList->append(aSubResult, aSubShape);
             break;
           }
         }
       }
     }
   }
+  else if (theID == SUBSHAPES_TO_KEEP_ID())
+  {
+    aSubShapesToRemoveAttrList->clear();
+
+    if (!aBaseShape.get()) {
+      return;
+    }
+
+    int anIndex;
+    const int aSubsToKeepNb = aSubShapesToKeepAttrList->size();
+    for(GeomAPI_ShapeIterator anIt(aBaseShape); anIt.more(); anIt.next()) {
+      GeomShapePtr aSubShape = anIt.current();
+      for(anIndex = 0; anIndex < aSubsToKeepNb; ++anIndex) {
+        AttributeSelectionPtr anAttrSelectionInList = aSubShapesToKeepAttrList->value(anIndex);
+        GeomShapePtr aSubShapeToKeep = anAttrSelectionInList->value();
+        if (aSubShapeToKeep.get() && aSubShapeToKeep->isEqual(aSubShape)) {
+          break;
+        }
+      }
+
+      if (anIndex == aSubsToKeepNb) {
+        if(aNumOfSubs == 0) {
+          aSubShapesToRemoveAttrList->append(aContext, aSubShape);
+        } else {
+          for(int anIndex = 0; anIndex < aResultCompSolid->numberOfSubs(); ++anIndex) {
+            ResultBodyPtr aSubResult = aResultCompSolid->subResult(anIndex);
+            if(aSubResult->shape()->isEqual(aSubShape)) {
+              aSubShapesToRemoveAttrList->append(aSubResult, aSubShape);
+              break;
+            }
+          }
+        }
+      }
+    }
+  }
+  else if (theID == SUBSHAPES_TO_REMOVE_ID())
+  {
+    aSubShapesToKeepAttrList->clear();
+
+    if (!aBaseShape.get()) {
+      return;
+    }
+
+    int anIndex;
+    const int aSubsToRemoveNb = aSubShapesToRemoveAttrList->size();
+    for(GeomAPI_ShapeIterator anIt(aBaseShape); anIt.more(); anIt.next()) {
+      GeomShapePtr aSubShape = anIt.current();
+      for(anIndex = 0; anIndex < aSubsToRemoveNb; ++anIndex) {
+        AttributeSelectionPtr anAttrSelectionInList = aSubShapesToRemoveAttrList->value(anIndex);
+        GeomShapePtr aSubShapeToRemove = anAttrSelectionInList->value();
+        if (aSubShapeToRemove.get() && aSubShapeToRemove->isEqual(aSubShape)) {
+          break;
+        }
+      }
+
+      if (anIndex == aSubsToRemoveNb) {
+        if(aNumOfSubs == 0) {
+          aSubShapesToKeepAttrList->append(aContext, aSubShape);
+        } else {
+          for(int anIndex = 0; anIndex < aResultCompSolid->numberOfSubs(); ++anIndex) {
+            ResultBodyPtr aSubResult = aResultCompSolid->subResult(anIndex);
+            if(aSubResult->shape()->isEqual(aSubShape)) {
+              aSubShapesToKeepAttrList->append(aSubResult, aSubShape);
+              break;
+            }
+          }
+        }
+      }
+    }
+  }
+
+  myChangedInCode = false;
 }
 
 //==================================================================================================
@@ -106,7 +190,7 @@ void FeaturesPlugin_RemoveSubShapes::execute()
 {
   // Get base shape and sub-shapes list.
   AttributeSelectionPtr aShapeAttrSelection = selection(BASE_SHAPE_ID());
-  AttributeSelectionListPtr aSubShapesAttrList = selectionList(SUBSHAPES_ID());
+  AttributeSelectionListPtr aSubShapesAttrList = selectionList(SUBSHAPES_TO_KEEP_ID());
   if(!aShapeAttrSelection.get() || !aSubShapesAttrList.get()) {
     return;
   }

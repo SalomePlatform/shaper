@@ -48,12 +48,41 @@ public:
     return MY_BASE_SHAPE_ID;
   }
 
-  /// Attribute name of sub-shapes.
-  inline static const std::string& SUBSHAPES_ID()
+  /// Attribute name for creation method.
+  inline static const std::string& CREATION_METHOD()
   {
-    static const std::string MY_SUBSHAPES_ID("subshapes");
+    static const std::string MY_CREATION_METHOD_ID("creation_method");
+    return MY_CREATION_METHOD_ID;
+  }
+
+  /// Attribute name for creation method.
+  inline static const std::string& CREATION_METHOD_BY_KEEP_SUBSHAPES()
+  {
+    static const std::string MY_CREATION_METHOD_ID("by_keep_subshapes");
+    return MY_CREATION_METHOD_ID;
+  }
+
+  /// Attribute name for creation method.
+  inline static const std::string& CREATION_METHOD_BY_REMOVE_SUBSHAPES()
+  {
+    static const std::string MY_CREATION_METHOD_ID("by_remove_subshapes");
+    return MY_CREATION_METHOD_ID;
+  }
+
+  /// Attribute name of sub-shapes to keep.
+  inline static const std::string& SUBSHAPES_TO_KEEP_ID()
+  {
+    static const std::string MY_SUBSHAPES_ID("subshapes_to_keep");
     return MY_SUBSHAPES_ID;
   }
+
+  /// Attribute name of sub-shapes to remove.
+  inline static const std::string& SUBSHAPES_TO_REMOVE_ID()
+  {
+    static const std::string MY_SUBSHAPES_ID("subshapes_to_remove");
+    return MY_SUBSHAPES_ID;
+  }
+
 
   /// \return the kind of a feature.
   FEATURESPLUGIN_EXPORT virtual const std::string& getKind()
@@ -71,6 +100,9 @@ public:
 
   /// Creates a new part document if needed.
   FEATURESPLUGIN_EXPORT virtual void execute();
+
+private:
+  bool myChangedInCode;
 };
 
 #endif
