@@ -401,9 +401,12 @@ void XGUI_ContextMenuMgr::updateObjectBrowserMenu()
             aNextObj = aModel->object(aNextIdx);
           }
 
-          bool isPrevFolder = (aPrevObj.get() && (aPrevObj->groupName() == ModelAPI_Folder::group()));
-          bool isNextFolder = (aNextObj.get() && (aNextObj->groupName() == ModelAPI_Folder::group()));
-          bool isInFolder = (aDataObj.get() && (aDataObj->groupName() == ModelAPI_Folder::group()));
+          bool isPrevFolder = (aPrevObj.get() &&
+            (aPrevObj->groupName() == ModelAPI_Folder::group()));
+          bool isNextFolder = (aNextObj.get() &&
+            (aNextObj->groupName() == ModelAPI_Folder::group()));
+          bool isInFolder = (aDataObj.get() &&
+            (aDataObj->groupName() == ModelAPI_Folder::group()));
           bool isOutsideFolder = !isInFolder;
 
           bool hasFirst = false;
