@@ -30,23 +30,23 @@ email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com
     <validator id="GeomValidators_BodyShapes" parameters="toplevel"/>
   </shape_selector>
   <toolbox id="creation_method">
-    <box id="by_keep_subshapes"
-     title="By keeping sub-shapes"
-     icon="icons/Features/keep_subshapes_32x32.png">
-      <multi_selector id="subshapes_to_keep"
-                label="Sub-Shapes to keep:"
-                tooltip="Select shapes to keep."
-                type_choice="vertices edges wires faces shells solids compsolids compounds"
-                clear_in_neutral_point="false">
-        <validator id="FeaturesPlugin_ValidatorRemoveSubShapesSelection"/>
-      </multi_selector>
-    </box>
     <box id="by_remove_subshapes"
      title="By removing sub-shapes"
      icon="icons/Features/remove_subshapes_32x32.png">
       <multi_selector id="subshapes_to_remove"
                 label="Sub-Shapes to remove:"
                 tooltip="Select shapes to remove."
+                type_choice="vertices edges wires faces shells solids compsolids compounds"
+                clear_in_neutral_point="false">
+        <validator id="FeaturesPlugin_ValidatorRemoveSubShapesSelection"/>
+      </multi_selector>
+    </box>
+    <box id="by_keep_subshapes"
+     title="By keeping sub-shapes"
+     icon="icons/Features/keep_subshapes_32x32.png">
+      <multi_selector id="subshapes_to_keep"
+                label="Sub-Shapes to keep:"
+                tooltip="Select shapes to keep."
                 type_choice="vertices edges wires faces shells solids compsolids compounds"
                 clear_in_neutral_point="false">
         <validator id="FeaturesPlugin_ValidatorRemoveSubShapesSelection"/>
