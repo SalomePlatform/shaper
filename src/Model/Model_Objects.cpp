@@ -789,16 +789,23 @@ void Model_Objects::synchronizeFeatures(
   }
 
   // update all objects by checking are they on labels or not
-  std::set<FeaturePtr> aNewFeatures, aKeptFeatures;
+  std::set<ObjectPtr> aNewFeatures, aKeptFeatures;
   TDF_ChildIDIterator aLabIter(featuresLabel(), TDataStd_Comment::GetID());
   for (; aLabIter.More(); aLabIter.Next()) {
     TDF_Label aFeatureLabel = aLabIter.Value()->Label();
-    FeaturePtr aFeature;
-    if (!myFeatures.IsBound(aFeatureLabel)) {  // a new feature is inserted
+    if (!myFeatures.IsBound(aFeatureLabel) && !myFolders.IsBound(aFeatureLabel)) {
+      // a new feature or folder is inserted
+
+      std::string aFeatureID = TCollection_AsciiString(Handle(TDataStd_Comment)::DownCast(
+                               aLabIter.Value())->Get()).ToCString();
+      bool isFolder = aFeatureID == ModelAPI_Folder::ID();
+
+      std::shared_ptr<Model_Session> aSession =
+          std::dynamic_pointer_cast<Model_Session>(ModelAPI_Session::get());
+
       // create a feature
-      aFeature = std::dynamic_pointer_cast<Model_Session>(ModelAPI_Session::get())->createFeature(
-        TCollection_AsciiString(Handle(TDataStd_Comment)::DownCast(aLabIter.Value())->Get())
-        .ToCString(), anOwner);
+      ObjectPtr aFeature = isFolder ? ObjectPtr(new ModelAPI_Folder)
+                                    : aSession->createFeature(aFeatureID, anOwner);
       if (!aFeature.get()) {
         // somethig is wrong, most probably, the opened document has invalid structure
         Events_InfoMessage("Model_Objects", "Invalid type of object in the document").send();
@@ -807,7 +814,10 @@ void Model_Objects::synchronizeFeatures(
       }
       aFeature->init();
       // this must be before "setData" to redo the sketch line correctly
-      myFeatures.Bind(aFeatureLabel, aFeature);
+      if (isFolder)
+        myFolders.Bind(aFeatureLabel, aFeature);
+      else
+        myFeatures.Bind(aFeatureLabel, std::dynamic_pointer_cast<ModelAPI_Feature>(aFeature));
       aNewFeatures.insert(aFeature);
       initData(aFeature, aFeatureLabel, TAG_FEATURE_ARGUMENTS);
       updateHistory(aFeature);
@@ -815,18 +825,25 @@ void Model_Objects::synchronizeFeatures(
       // event: model is updated
       ModelAPI_EventCreator::get()->sendUpdated(aFeature, aCreateEvent);
     } else {  // nothing is changed, both iterators are incremented
-      aFeature = myFeatures.Find(aFeatureLabel);
-      aKeptFeatures.insert(aFeature);
+      ObjectPtr anObject;
+      FeaturePtr aFeature;
+      if (myFeatures.Find(aFeatureLabel, aFeature)) {
+        aKeptFeatures.insert(aFeature);
+        anObject = aFeature;
+      } else
+        if (myFolders.Find(aFeatureLabel, anObject))
+          aKeptFeatures.insert(anObject);
+
       if (anUpdatedMap.Contains(aFeatureLabel)) {
         if (!theOpen) { // on abort/undo/redo reinitialize attributes if something is changed
           std::list<std::shared_ptr<ModelAPI_Attribute> > anAttrs =
-            aFeature->data()->attributes("");
+            anObject->data()->attributes("");
           std::list<std::shared_ptr<ModelAPI_Attribute> >::iterator anAttr = anAttrs.begin();
           for(; anAttr != anAttrs.end(); anAttr++)
             (*anAttr)->reinit();
         }
-        ModelAPI_EventCreator::get()->sendUpdated(aFeature, anUpdateEvent);
-        if (aFeature->getKind() == "Parameter") {
+        ModelAPI_EventCreator::get()->sendUpdated(anObject, anUpdateEvent);
+        if (aFeature && aFeature->getKind() == "Parameter") {
           // if parameters are changed, update the results (issue 937)
           const std::list<std::shared_ptr<ModelAPI_Result> >& aResults = aFeature->results();
           std::list<std::shared_ptr<ModelAPI_Result> >::const_iterator aRIter = aResults.begin();
@@ -864,6 +881,24 @@ void Model_Objects::synchronizeFeatures(
         aFIter.Initialize(myFeatures);
     } else
       aFIter.Next();
+  }
+  // verify folders are checked: if not => is was removed
+  for (NCollection_DataMap<TDF_Label, ObjectPtr>::Iterator aFldIt(myFolders);
+       aFldIt.More(); aFldIt.Next()) {
+    ObjectPtr aCurObj = aFldIt.Value();
+    if (aKeptFeatures.find(aCurObj) == aKeptFeatures.end() &&
+        aNewFeatures.find(aCurObj) == aNewFeatures.end()) {
+      ModelAPI_EventCreator::get()->sendDeleted(myDoc, ModelAPI_Folder::group());
+      // results of this feature must be redisplayed (hided)
+      // redisplay also removed feature (used for sketch and AISObject)
+      ModelAPI_EventCreator::get()->sendUpdated(aCurObj, aRedispEvent);
+      updateHistory(aCurObj);
+      aCurObj->erase();
+
+      // unbind after the "erase" call: on abort sketch
+      // is removes sub-objects that corrupts aFIter
+      myFolders.UnBind(aFldIt.Key());
+    }
   }
 
   if (theUpdateReferences) {
