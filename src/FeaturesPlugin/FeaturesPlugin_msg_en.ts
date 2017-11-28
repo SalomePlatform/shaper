@@ -3688,8 +3688,8 @@
   <context>
     <name>Union:GeomValidators_MinObjectsSelected</name>
     <message>
-      <source>Error: Attribute \"%1\" should contain at least %2 items.</source>
-      <translation></translation>
+      <source>Error: Attribute "%1" should contain at least %2 items.</source>
+      <translation>"Base objects" should contain at least 2 items.</translation>
     </message>
   </context>
 </TS>
