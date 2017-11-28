@@ -805,7 +805,7 @@ void Model_Objects::synchronizeFeatures(
 
       // create a feature
       ObjectPtr aFeature = isFolder ? ObjectPtr(new ModelAPI_Folder)
-                                    : aSession->createFeature(aFeatureID, anOwner);
+                                    : ObjectPtr(aSession->createFeature(aFeatureID, anOwner));
       if (!aFeature.get()) {
         // somethig is wrong, most probably, the opened document has invalid structure
         Events_InfoMessage("Model_Objects", "Invalid type of object in the document").send();
