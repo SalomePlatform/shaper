@@ -957,7 +957,10 @@ void Model_Objects::synchronizeBackRefsForObject(const std::set<AttributePtr>& t
   for(; aNewIter != theNewRefs.end(); aNewIter++) {
     if (aData->refsToMe().find(*aNewIter) == aData->refsToMe().end()) {
       FeaturePtr aRefFeat = std::dynamic_pointer_cast<ModelAPI_Feature>((*aNewIter)->owner());
-      aData->addBackReference(aRefFeat, (*aNewIter)->id());
+      if (aRefFeat)
+        aData->addBackReference(aRefFeat, (*aNewIter)->id());
+      else // add back reference to a folder
+        aData->addBackReference((*aNewIter)->owner(), (*aNewIter)->id());
     }
   }
   if (theNewRefs.size() != aData->refsToMe().size()) { // some back ref must be removed
