@@ -352,86 +352,89 @@ void XGUI_ContextMenuMgr::updateObjectBrowserMenu()
     // Check folder management commands state if only features are selected
     if ((!hasResult) && hasFeature && (!hasParameter) && (!hasCompositeOwner) &&
       (!hasResultInHistory) && (!hasFolder)) {
-      QModelIndexList aIndexes = aSelMgr->selection()->selectedIndexes();
-      QModelIndex aFirstIdx = aIndexes.first();
-      QModelIndex aLastIdx = aIndexes.last();
-      QModelIndex aParentIdx = aFirstIdx.parent();
+      std::list<FeaturePtr> aFeatures = aSelMgr->getSelectedFeatures();
+      if (aFeatures.size() > 0) { // Check that features do not include Parts
+        QModelIndexList aIndexes = aSelMgr->selection()->selectedIndexes();
+        QModelIndex aFirstIdx = aIndexes.first();
+        QModelIndex aLastIdx = aIndexes.last();
+        QModelIndex aParentIdx = aFirstIdx.parent();
 
-      // if all selected are from the same level
-      bool isSameParent = true;
-      foreach(QModelIndex aIdx, aIndexes) {
-        if (aIdx.parent() != aParentIdx) {
-          isSameParent = false;
-          break;
+        // if all selected are from the same level
+        bool isSameParent = true;
+        foreach(QModelIndex aIdx, aIndexes) {
+          if (aIdx.parent() != aParentIdx) {
+            isSameParent = false;
+            break;
+          }
         }
-      }
-      if (isSameParent) {
-        // Check is selection continuous
-        XGUI_DataModel* aModel = myWorkshop->objectBrowser()->dataModel();
-        DocumentPtr aDoc = aMgr->activeDocument();
-        std::list<FeaturePtr> aFeatures = aSelMgr->getSelectedFeatures();
+        if (isSameParent) {
+          // Check is selection continuous
+          XGUI_DataModel* aModel = myWorkshop->objectBrowser()->dataModel();
+          DocumentPtr aDoc = aMgr->activeDocument();
+          std::list<FeaturePtr> aFeatures = aSelMgr->getSelectedFeatures();
 
-        bool isContinuos = true;
-        if (aSelected > 1) {
-          int aId = -1;
-          foreach(FeaturePtr aF, aFeatures) {
-            if (aId == -1)
-              aId = aDoc->index(aF);
-            else {
-              aId++;
-              if (aId != aDoc->index(aF)) {
-                isContinuos = false;
-                break;
+          bool isContinuos = true;
+          if (aSelected > 1) {
+            int aId = -1;
+            foreach(FeaturePtr aF, aFeatures) {
+              if (aId == -1)
+                aId = aDoc->index(aF);
+              else {
+                aId++;
+                if (aId != aDoc->index(aF)) {
+                  isContinuos = false;
+                  break;
+                }
               }
             }
           }
-        }
-        if (isContinuos) {
-          ObjectPtr aDataObj = aModel->object(aParentIdx);
+          if (isContinuos) {
+            ObjectPtr aDataObj = aModel->object(aParentIdx);
 
-          ObjectPtr aPrevObj;
-          if (aFirstIdx.row() > 0) {
-            QModelIndex aPrevIdx = aFirstIdx.sibling(aFirstIdx.row() - 1, 0);
-            aPrevObj = aModel->object(aPrevIdx);
+            ObjectPtr aPrevObj;
+            if (aFirstIdx.row() > 0) {
+              QModelIndex aPrevIdx = aFirstIdx.sibling(aFirstIdx.row() - 1, 0);
+              aPrevObj = aModel->object(aPrevIdx);
+            }
+
+            ObjectPtr aNextObj;
+            if (aLastIdx.row() < (aModel->rowCount(aParentIdx) - 1)) {
+              QModelIndex aNextIdx = aFirstIdx.sibling(aLastIdx.row() + 1, 0);
+              aNextObj = aModel->object(aNextIdx);
+            }
+
+            bool isPrevFolder = (aPrevObj.get() &&
+              (aPrevObj->groupName() == ModelAPI_Folder::group()));
+            bool isNextFolder = (aNextObj.get() &&
+              (aNextObj->groupName() == ModelAPI_Folder::group()));
+            bool isInFolder = (aDataObj.get() &&
+              (aDataObj->groupName() == ModelAPI_Folder::group()));
+            bool isOutsideFolder = !isInFolder;
+
+            bool hasFirst = false;
+            bool hasLast = false;
+            if (isInFolder) {
+              FolderPtr aFolder = std::dynamic_pointer_cast<ModelAPI_Folder>(aDataObj);
+              FeaturePtr aFirstFeatureInFolder;
+              AttributeReferencePtr aFirstFeatAttr =
+                  aFolder->data()->reference(ModelAPI_Folder::FIRST_FEATURE_ID());
+              if (aFirstFeatAttr)
+                aFirstFeatureInFolder = ModelAPI_Feature::feature(aFirstFeatAttr->value());
+              hasFirst = (aFirstFeatureInFolder == aFeatures.front());
+
+              FeaturePtr aLastFeatureInFolder;
+              AttributeReferencePtr aLastFeatAttr =
+                  aFolder->data()->reference(ModelAPI_Folder::LAST_FEATURE_ID());
+              if (aLastFeatAttr)
+                aLastFeatureInFolder = ModelAPI_Feature::feature(aLastFeatAttr->value());
+              hasLast = (aLastFeatureInFolder == aFeatures.back());
+            }
+            action("INSERT_FOLDER_CMD")->setEnabled(isOutsideFolder);
+            action("ADD_TO_FOLDER_BEFORE_CMD")->setEnabled(isOutsideFolder && isPrevFolder);
+            action("ADD_TO_FOLDER_AFTER_CMD")->setEnabled(isOutsideFolder && isNextFolder);
+            action("ADD_OUT_FOLDER_BEFORE_CMD")->setEnabled(isInFolder && hasFirst);
+            action("ADD_OUT_FOLDER_AFTER_CMD")->setEnabled(isInFolder && hasLast);
           }
-
-          ObjectPtr aNextObj;
-          if (aLastIdx.row() < (aModel->rowCount(aParentIdx) - 1)) {
-            QModelIndex aNextIdx = aFirstIdx.sibling(aLastIdx.row() + 1, 0);
-            aNextObj = aModel->object(aNextIdx);
-          }
-
-          bool isPrevFolder = (aPrevObj.get() &&
-            (aPrevObj->groupName() == ModelAPI_Folder::group()));
-          bool isNextFolder = (aNextObj.get() &&
-            (aNextObj->groupName() == ModelAPI_Folder::group()));
-          bool isInFolder = (aDataObj.get() &&
-            (aDataObj->groupName() == ModelAPI_Folder::group()));
-          bool isOutsideFolder = !isInFolder;
-
-          bool hasFirst = false;
-          bool hasLast = false;
-          if (isInFolder) {
-            FolderPtr aFolder = std::dynamic_pointer_cast<ModelAPI_Folder>(aDataObj);
-            FeaturePtr aFirstFeatureInFolder;
-            AttributeReferencePtr aFirstFeatAttr =
-                aFolder->data()->reference(ModelAPI_Folder::FIRST_FEATURE_ID());
-            if (aFirstFeatAttr)
-              aFirstFeatureInFolder = ModelAPI_Feature::feature(aFirstFeatAttr->value());
-            hasFirst = (aFirstFeatureInFolder == aFeatures.front());
-
-            FeaturePtr aLastFeatureInFolder;
-            AttributeReferencePtr aLastFeatAttr =
-                aFolder->data()->reference(ModelAPI_Folder::LAST_FEATURE_ID());
-            if (aLastFeatAttr)
-              aLastFeatureInFolder = ModelAPI_Feature::feature(aLastFeatAttr->value());
-            hasLast = (aLastFeatureInFolder == aFeatures.back());
-          }
-          action("INSERT_FOLDER_CMD")->setEnabled(isOutsideFolder);
-          action("ADD_TO_FOLDER_BEFORE_CMD")->setEnabled(isOutsideFolder && isPrevFolder);
-          action("ADD_TO_FOLDER_AFTER_CMD")->setEnabled(isOutsideFolder && isNextFolder);
-          action("ADD_OUT_FOLDER_BEFORE_CMD")->setEnabled(isInFolder && hasFirst);
-          action("ADD_OUT_FOLDER_AFTER_CMD")->setEnabled(isInFolder && hasLast);
         }
       }
     } // end folder management commands

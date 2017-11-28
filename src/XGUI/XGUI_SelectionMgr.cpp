@@ -228,10 +228,15 @@ std::list<FeaturePtr> XGUI_SelectionMgr::getSelectedFeatures()
   if (aObjects.isEmpty())
     return aFeatures;
 
+  bool isPart = false;
   foreach(ObjectPtr aObj, aObjects) {
     FeaturePtr aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(aObj);
-    if (aFeature.get())
-      aFeatures.push_back(aFeature);
+    if (aFeature.get()) {
+      ResultPtr aRes = aFeature->firstResult();
+      isPart = (aRes.get() && (aRes->groupName() == ModelAPI_ResultPart::group()));
+      if (!isPart)
+        aFeatures.push_back(aFeature);
+    }
   }
   return aFeatures;
 }

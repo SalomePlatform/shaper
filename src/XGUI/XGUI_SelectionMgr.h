@@ -78,7 +78,7 @@ Q_OBJECT
   /// \param thePlace a widget where selection has happened.
   void updateSelectionBy(const ModuleBase_ISelection::SelectionPlace& thePlace);
 
-  /// Returns list of selected features (ignores other selected objects)
+  /// Returns list of selected features (ignores other selected objects and parts)
   std::list<FeaturePtr> getSelectedFeatures();
 
 signals:
