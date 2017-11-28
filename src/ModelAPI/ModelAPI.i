@@ -116,7 +116,7 @@
   }
 }
 
-%apply int& OUTPUT {int&};
+%apply int& OUTPUT {int& theIndexInFolder};
 
 // all supported interfaces
 %include "ModelAPI_Entity.h"
