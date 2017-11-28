@@ -182,6 +182,9 @@ private:
   /// \param fromRoot - root document flag
   QStringList listOfShowNotEmptyFolders(bool fromRoot = true) const;
 
+  int getNumberOfFolderItems(const ModelAPI_Folder* theFolder) const;
+  ObjectPtr getObjectInFolder(const ModelAPI_Folder* theFolder, int theId) const;
+
   VisibilityState getVisibilityState(const QModelIndex& theIndex) const;
 
   void addShownFolder(DocumentPtr theDoc, QString theFolder)

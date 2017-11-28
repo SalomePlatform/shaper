@@ -36,6 +36,7 @@
 #include <ModelAPI_ResultField.h>
 #include <ModelAPI_Tools.h>
 #include <ModelAPI_Folder.h>
+#include <ModelAPI_AttributeReference.h>
 
 #include <Config_FeatureMessage.h>
 #include <Config_DataModelReader.h>
@@ -74,7 +75,10 @@ ResultPartPtr getPartResult(ModelAPI_Object* theObj)
 /// Returns pointer on document if the given object is document object
 ModelAPI_Document* getSubDocument(void* theObj)
 {
-  ModelAPI_Document* aDoc = dynamic_cast<ModelAPI_Document*>((ModelAPI_Entity*)theObj);
+  ModelAPI_Document* aDoc = 0;
+  try {
+    aDoc = dynamic_cast<ModelAPI_Document*>((ModelAPI_Entity*)theObj);
+  } catch(...) {}
   return aDoc;
 }
 
@@ -284,7 +288,6 @@ void XGUI_DataModel::processEvent(const std::shared_ptr<Events_Message>& theMess
     std::set<ObjectPtr> aObjects = aUpdMsg->objects();
 
     std::set<ObjectPtr>::const_iterator aIt;
-    std::string aObjType;
     for (aIt = aObjects.begin(); aIt != aObjects.end(); ++aIt) {
       ObjectPtr aObject = (*aIt);
       if (aObject->data()->isValid()) {
@@ -296,9 +299,13 @@ void XGUI_DataModel::processEvent(const std::shared_ptr<Events_Message>& theMess
             QModelIndex aIndex = objectIndex(aResult, 0);
             removeRows(0, aResult->stepsSize(), aIndex);
         } else {
-          QModelIndex aIndex = objectIndex(aObject, 0);
-          if (aIndex.isValid()) {
-            emit dataChanged(aIndex, aIndex);
+          if (aObject->groupName() == ModelAPI_Folder::group()) {
+            rebuildDataTree();
+          } else {
+            QModelIndex aIndex = objectIndex(aObject, 0);
+            if (aIndex.isValid()) {
+              emit dataChanged(aIndex, aIndex);
+            }
           }
         }
       } else {
@@ -398,6 +405,10 @@ QModelIndex XGUI_DataModel::objectIndex(const ObjectPtr theObject, int theColumn
           }
         }
       }
+      int aFRow = -1;
+      FolderPtr aFolder = aDoc->findContainingFolder(aFeature, aFRow);
+      if (aFolder.get())
+        aRow = aFRow;
     } else {
       ResultPtr aResult = std::dynamic_pointer_cast<ModelAPI_Result>(theObject);
       if (aResult.get()) {
@@ -620,6 +631,9 @@ int XGUI_DataModel::rowCount(const QModelIndex& theParent) const
         ModelAPI_ResultField* aFieldRes = dynamic_cast<ModelAPI_ResultField*>(aObj);
         if (aFieldRes)
           return aFieldRes->stepsSize();
+        ModelAPI_Folder* aFolder = dynamic_cast<ModelAPI_Folder*>(aObj);
+        if (aFolder)
+          return getNumberOfFolderItems(aFolder);
       }
     }
   }
@@ -710,6 +724,11 @@ QModelIndex XGUI_DataModel::index(int theRow, int theColumn, const QModelIndex &
                 dynamic_cast<ModelAPI_ResultField*>(aParentObj);
               if (aFieldRes) {
                 aIndex = createIndex(theRow, theColumn, aFieldRes->step(theRow));
+              } else {
+                ModelAPI_Folder* aFolder = dynamic_cast<ModelAPI_Folder*>(aParentObj);
+                ObjectPtr aObj = getObjectInFolder(aFolder, theRow);
+                if (aObj.get())
+                  aIndex = objectIndex(aObj, theColumn);
               }
             }
           }
@@ -740,7 +759,7 @@ QModelIndex XGUI_DataModel::parent(const QModelIndex& theIndex) const
     }
     ObjectPtr aObj = object(theIndex);
     if (!aObj.get()) {
-      // It can b e a step of a field
+      // It can be a step of a field
       ModelAPI_ResultField::ModelAPI_FieldStep* aStep =
         dynamic_cast<ModelAPI_ResultField::ModelAPI_FieldStep*>
         ((ModelAPI_Entity*)theIndex.internalPointer());
@@ -766,6 +785,11 @@ QModelIndex XGUI_DataModel::parent(const QModelIndex& theIndex) const
       if (aCompFea.get()) {
         return objectIndex(aCompFea);
       }
+      DocumentPtr aDoc = aFeature->document();
+      int aRow;
+      FolderPtr aFolder = aDoc->findContainingFolder(aFeature, aRow);
+      if (aFolder.get())
+        return objectIndex(aFolder);
     }
     ResultPtr aResult = std::dynamic_pointer_cast<ModelAPI_Result>(aObj);
     if (aResult.get()) {
@@ -1122,4 +1146,46 @@ XGUI_DataModel::VisibilityState
     }
   }
   return NoneState;
+}
+
+
+int XGUI_DataModel::getNumberOfFolderItems(const ModelAPI_Folder* theFolder) const
+{
+  DocumentPtr aDoc = theFolder->document();
+
+  FeaturePtr aFirstFeatureInFolder;
+  AttributeReferencePtr aFirstFeatAttr =
+      theFolder->data()->reference(ModelAPI_Folder::FIRST_FEATURE_ID());
+  if (aFirstFeatAttr)
+    aFirstFeatureInFolder = ModelAPI_Feature::feature(aFirstFeatAttr->value());
+  if (!aFirstFeatureInFolder.get())
+    return 0;
+
+  FeaturePtr aLastFeatureInFolder;
+  AttributeReferencePtr aLastFeatAttr =
+      theFolder->data()->reference(ModelAPI_Folder::LAST_FEATURE_ID());
+  if (aLastFeatAttr)
+    aLastFeatureInFolder = ModelAPI_Feature::feature(aLastFeatAttr->value());
+  if (!aLastFeatureInFolder.get())
+    return 0;
+
+  int aFirst = aDoc->index(aFirstFeatureInFolder);
+  int aLast = aDoc->index(aLastFeatureInFolder);
+  return aLast - aFirst + 1;
+}
+
+ObjectPtr XGUI_DataModel::getObjectInFolder(const ModelAPI_Folder* theFolder, int theId) const
+{
+  DocumentPtr aDoc = theFolder->document();
+
+  FeaturePtr aFirstFeatureInFolder;
+  AttributeReferencePtr aFirstFeatAttr =
+      theFolder->data()->reference(ModelAPI_Folder::FIRST_FEATURE_ID());
+  if (aFirstFeatAttr)
+    aFirstFeatureInFolder = ModelAPI_Feature::feature(aFirstFeatAttr->value());
+  if (!aFirstFeatureInFolder.get())
+    return ObjectPtr();
+
+  int aFirst = aDoc->index(aFirstFeatureInFolder);
+  return aDoc->object(ModelAPI_Feature::group(), aFirst + theId);
 }

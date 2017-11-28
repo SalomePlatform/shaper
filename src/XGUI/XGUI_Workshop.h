@@ -454,6 +454,9 @@ private:
   /// Insert an object to a folder above or below
   void insertToFolder(bool isBefore);
 
+  /// Insert an object to a folder above or below
+  void moveOutFolder(bool isBefore);
+
  private slots:
   /// SLOT, that is called after the operation is started. Update workshop state according to
   /// the started operation, e.g. visualizes the property panel and connect to it.

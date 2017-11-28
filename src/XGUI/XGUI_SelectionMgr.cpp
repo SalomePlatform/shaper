@@ -220,3 +220,18 @@ void XGUI_SelectionMgr::convertToObjectBrowserSelection(
     }
   }
 }
+
+std::list<FeaturePtr> XGUI_SelectionMgr::getSelectedFeatures()
+{
+  std::list<FeaturePtr> aFeatures;
+  QObjectPtrList aObjects = selection()->selectedObjects();
+  if (aObjects.isEmpty())
+    return aFeatures;
+
+  foreach(ObjectPtr aObj, aObjects) {
+    FeaturePtr aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(aObj);
+    if (aFeature.get())
+      aFeatures.push_back(aFeature);
+  }
+  return aFeatures;
+}

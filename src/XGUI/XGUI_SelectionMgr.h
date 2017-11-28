@@ -24,6 +24,7 @@
 #include "XGUI.h"
 #include <ModuleBase_Definitions.h>
 #include <ModuleBase_ISelection.h>
+#include <ModelAPI_Feature.h>
 #include <QObject>
 #include <QModelIndexList>
 
@@ -76,6 +77,9 @@ Q_OBJECT
   /// Updates selection, which are depend on the selection in the given place
   /// \param thePlace a widget where selection has happened.
   void updateSelectionBy(const ModuleBase_ISelection::SelectionPlace& thePlace);
+
+  /// Returns list of selected features (ignores other selected objects)
+  std::list<FeaturePtr> getSelectedFeatures();
 
 signals:
   //! Emited when selection in a one of viewers was changed
