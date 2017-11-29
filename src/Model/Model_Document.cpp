@@ -1817,3 +1817,15 @@ void Model_Document::eraseAllFeatures()
   if (myObjs)
     myObjs->eraseAllFeatures();
 }
+
+void Model_Document::setExecuteFeatures(const bool theFlag)
+{
+  myExecuteFeatures = theFlag;
+  const std::set<int> aSubs = subDocuments();
+  std::set<int>::iterator aSubIter = aSubs.begin();
+  for (; aSubIter != aSubs.end(); aSubIter++) {
+    if (!subDoc(*aSubIter)->myObjs)
+      continue;
+    subDoc(*aSubIter)->setExecuteFeatures(theFlag);
+  }
+}

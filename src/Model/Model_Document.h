@@ -201,7 +201,10 @@ class Model_Document : public ModelAPI_Document
 
   ///! Returns true if parametric updater need to execute feature on recomputartion
   ///! On abort, undo or redo it is not necessary: results in document are updated automatically
-  bool& executeFeatures() {return myExecuteFeatures;}
+  bool executeFeatures() {return myExecuteFeatures;}
+
+  ///! On abort, undo or redo it is not necessary: results in document are updated automatically
+  void setExecuteFeatures(const bool theFlag);
 
   //! Registers the name of the shape for the topological naming needs
   void addNamingName(const TDF_Label theLabel, std::string theName);

@@ -90,6 +90,7 @@ bool Model_Update::addModified(FeaturePtr theFeature, FeaturePtr theReason) {
   bool isNotExecuted = theFeature->isPersistentResult() &&
     !std::dynamic_pointer_cast<Model_Document>((theFeature)->document())->executeFeatures();
   if (isNotExecuted) {
+    redisplayWithResults(theFeature, ModelAPI_StateNothing, false); // redisplay even not executed
     if (!theReason.get()) // no reason => no construction reason
       return false;
     if (myNotPersistentRefs.find(theFeature) == myNotPersistentRefs.end()) {
@@ -104,7 +105,10 @@ bool Model_Update::addModified(FeaturePtr theFeature, FeaturePtr theReason) {
 
   // update arguments for "apply button" state change
   if ((!theFeature->isPreviewNeeded() && !myIsFinish) || myIsPreviewBlocked) {
-    myProcessOnFinish.insert(theFeature);
+    if (theReason.get())
+      myProcessOnFinish[theFeature].insert(theReason);
+    else if (myProcessOnFinish.find(theFeature) == myProcessOnFinish.end())
+      myProcessOnFinish[theFeature] = std::set<std::shared_ptr<ModelAPI_Feature> >();
 #ifdef DEB_UPDATE
       std::cout<<"*** Add process on finish "<<theFeature->name()<<std::endl;
 #endif
@@ -319,10 +323,20 @@ void Model_Update::processEvent(const std::shared_ptr<Events_Message>& theMessag
     if (theMessage->eventID() == kOpFinishEvent) {
       myIsFinish = true;
       // add features that wait for finish as modified
-      std::set<std::shared_ptr<ModelAPI_Feature> >::iterator aFeature = myProcessOnFinish.begin();
-      for(; aFeature != myProcessOnFinish.end(); aFeature++)
-        if ((*aFeature)->data()->isValid()) // there may be already removed wait for features
-          addModified(*aFeature, FeaturePtr());
+      std::map<std::shared_ptr<ModelAPI_Feature>, std::set<std::shared_ptr<ModelAPI_Feature> > >::
+        iterator aFeature = myProcessOnFinish.begin();
+      for(; aFeature != myProcessOnFinish.end(); aFeature++) {
+        if (aFeature->first->data()->isValid()) {// there may be already removed while wait
+          if (aFeature->second.empty()) {
+            addModified(aFeature->first, FeaturePtr());
+            continue;
+          }
+          std::set<std::shared_ptr<ModelAPI_Feature> >::iterator aReasons;
+          for(aReasons = aFeature->second.begin(); aReasons != aFeature->second.end(); aReasons++) {
+            addModified(aFeature->first, *aReasons);
+          }
+        }
+      }
       myIsFinish = false;
     }
     // processed features must be only on finish, so clear anyway (to avoid reimport on load)
@@ -628,7 +642,8 @@ bool Model_Update::processFeature(FeaturePtr theFeature)
   return true;
 }
 
-void Model_Update::redisplayWithResults(FeaturePtr theFeature, const ModelAPI_ExecState theState)
+void Model_Update::redisplayWithResults(
+  FeaturePtr theFeature, const ModelAPI_ExecState theState, bool theUpdateState)
 {
   // make updated and redisplay all results
   static Events_ID EVENT_DISP = Events_Loop::loop()->eventByName(EVENT_OBJECT_TO_REDISPLAY);
@@ -641,7 +656,8 @@ void Model_Update::redisplayWithResults(FeaturePtr theFeature, const ModelAPI_Ex
     if (!aRes->isDisabled()) {
       // update state only for enabled results
       // (Placement Result Part may make the original Part Result as invalid)
-      aRes->data()->execState(theState);
+      if (theUpdateState)
+        aRes->data()->execState(theState);
     }
     if (theFeature->data()->updateID() > aRes->data()->updateID()) {
       aRes->data()->setUpdateID(theFeature->data()->updateID());
@@ -650,7 +666,8 @@ void Model_Update::redisplayWithResults(FeaturePtr theFeature, const ModelAPI_Ex
   }
   // to redisplay "presentable" feature (for ex. distance constraint)
   ModelAPI_EventCreator::get()->sendUpdated(theFeature, EVENT_DISP);
-  theFeature->data()->execState(theState);
+  if (theUpdateState)
+    theFeature->data()->execState(theState);
 }
 
 /// Updates the state by the referenced object: if something bad with it, set state for this one

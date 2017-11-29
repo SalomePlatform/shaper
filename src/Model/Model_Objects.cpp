@@ -69,7 +69,7 @@ void Model_Objects::setOwner(DocumentPtr theDoc)
   myDoc = theDoc;
   // update all fields and recreate features and result objects if needed
   TDF_LabelList aNoUpdated;
-  synchronizeFeatures(aNoUpdated, true, true, true, true);
+  synchronizeFeatures(aNoUpdated, true, false, true, true);
   myHistory.clear();
 }
 
@@ -783,8 +783,8 @@ void Model_Objects::synchronizeFeatures(
     myHistory.clear();
   }
 
-  if (theExecuteFeatures)
-    anOwner->executeFeatures() = false;
+  if (!theExecuteFeatures)
+    anOwner->setExecuteFeatures(false);
   aLoop->activateFlushes(isActive);
 
   if (theFlush) {
@@ -797,8 +797,8 @@ void Model_Objects::synchronizeFeatures(
     aLoop->flush(aRedispEvent);
     aLoop->flush(aToHideEvent);
   }
-  if (theExecuteFeatures)
-    anOwner->executeFeatures() = true;
+  if (!theExecuteFeatures)
+    anOwner->setExecuteFeatures(true);
 }
 
 /// synchronises back references for the given object basing on the collected data

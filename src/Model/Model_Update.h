@@ -56,8 +56,10 @@ class Model_Update : public Events_Listener
   bool myIsFinish;
   /// try if processing is currently performed
   bool myIsProcessed;
-  /// set that contains features that must be executed only on finish of the operation
-  std::set<std::shared_ptr<ModelAPI_Feature> > myProcessOnFinish;
+  /// map that contains features that must be executed only on finish of the operation
+  /// the value in map is the set of reasons
+  std::map<std::shared_ptr<ModelAPI_Feature>, std::set<std::shared_ptr<ModelAPI_Feature> > >
+    myProcessOnFinish;
   /// to avoid infinitive cycling: feature -> count of the processing periods during this update
   std::map<std::shared_ptr<ModelAPI_Feature>, int > myProcessed;
   /// if preview in hte property panel is blocked and
@@ -89,7 +91,7 @@ protected:
 
   /// Sends the redisplay events for feature and results, updates the updated status
   void redisplayWithResults(std::shared_ptr<ModelAPI_Feature> theFeature,
-    const ModelAPI_ExecState theState);
+    const ModelAPI_ExecState theState, bool theUpdateState = true);
 
   /// On operation start/end/abort the "Just" fileds must be cleared and processed in the right way
   //! \param theFlushRedisplay a boolean value if the redisplay signal should be flushed
