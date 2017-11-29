@@ -845,11 +845,28 @@ bool FeaturesPlugin_ValidatorUnionSelection::isValid(const AttributePtr& theAttr
   for(int anIndex = 0; anIndex < aBaseObjectsAttrList->size(); ++anIndex) {
     bool isSameFound = false;
     AttributeSelectionPtr anAttrSelectionInList = aBaseObjectsAttrList->value(anIndex);
+    ResultPtr aContext = anAttrSelectionInList->context();
+
+    ResultConstructionPtr aConstruction =
+      std::dynamic_pointer_cast<ModelAPI_ResultConstruction>(aContext);
+    if(aConstruction.get()) {
+      theError = "Error: Result construction not allowed for selection.";
+      return false;
+    }
+
+    GeomShapePtr aShape = anAttrSelectionInList->value();
+    GeomShapePtr aContextShape = aContext->shape();
+    if (aShape.get() && aContextShape.get() && !aContextShape->isEqual(aShape)) {
+      theError = "Error: Local selection not allowed.";
+      return false;
+    }
+
     ResultCompSolidPtr aResult =
-      std::dynamic_pointer_cast<ModelAPI_ResultCompSolid>(anAttrSelectionInList->context());
+      std::dynamic_pointer_cast<ModelAPI_ResultCompSolid>(aContext);
     if(!aResult.get()) {
       continue;
     }
+
     if(aResult->numberOfSubs() > 0) {
       theError = "Error: Whole compsolids not allowed for selection.";
       return false;
@@ -882,17 +899,27 @@ bool FeaturesPlugin_ValidatorUnionArguments::isValid(
   }
 
   // Get all shapes.
+  GeomAPI_Shape::ShapeType aType = GeomAPI_Shape::COMPSOLID;
   ListOfShape aBaseShapesList;
   for(int anIndex = 0; anIndex < aBaseObejctsAttrList->size(); ++anIndex) {
     AttributeSelectionPtr anAttrSelectionInList = aBaseObejctsAttrList->value(anIndex);
     GeomShapePtr aShape = anAttrSelectionInList->value();
+    if (!aShape.get()) {
+      continue;
+    }
     aBaseShapesList.push_back(aShape);
+    aType = aShape->shapeType() == GeomAPI_Shape::FACE ? GeomAPI_Shape::SHELL :
+                                                         GeomAPI_Shape::COMPSOLID;
   }
 
-  // Make componud and find connected.
+  // Make compound and find connected.
   GeomShapePtr aCompound = GeomAlgoAPI_CompoundBuilder::compound(aBaseShapesList);
   ListOfShape aCombined, aFree;
-  GeomAlgoAPI_ShapeTools::combineShapes(aCompound, GeomAPI_Shape::COMPSOLID, aCombined, aFree);
+  GeomAlgoAPI_ShapeTools::combineShapes(
+    aCompound,
+    aType,
+    aCombined,
+    aFree);
 
   if(aFree.size() > 0 || aCombined.size() > 1) {
     theError = "Error: Not all shapes have shared topology.";
