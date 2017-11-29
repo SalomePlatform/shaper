@@ -73,6 +73,7 @@ SET(PROJECT_HEADERS
     GeomAlgoAPI_Symmetry.h
     GeomAlgoAPI_Scale.h
     GeomAlgoAPI_Circ2dBuilder.h
+    GeomAlgoAPI_UnifySameDomain.h
 )
 
 SET(PROJECT_SOURCES
@@ -124,6 +125,7 @@ SET(PROJECT_SOURCES
     GeomAlgoAPI_Symmetry.cpp
     GeomAlgoAPI_Scale.cpp
     GeomAlgoAPI_Circ2dBuilder.cpp
+    GeomAlgoAPI_UnifySameDomain.cpp
 )
 
 SET(PROJECT_LIBRARIES

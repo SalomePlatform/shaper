@@ -23,7 +23,7 @@ email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com
   <multi_selector id="base_objects"
     label="Base objects:"
     tooltip="Select solids for union."
-    type_choice="solids compsolids"
+    type_choice="faces solids compsolids"
     use_choice="false"
     concealment="true">
     <validator id="FeaturesPlugin_ValidatorUnionSelection"/>
