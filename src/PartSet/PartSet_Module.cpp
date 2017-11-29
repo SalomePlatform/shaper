@@ -1004,8 +1004,6 @@ void PartSet_Module::onViewTransformed(int theTrsfType)
     SketcherPrs_Tools::setArrowSize(aLen);
     const double aCurScale = aViewer->activeView()->Camera()->Scale();
     aViewer->SetScale(aViewer->activeView(), aCurScale);
-    double aTextHeight = SketcherPrs_Tools::getConfigTextHeight();
-    SketcherPrs_Tools::setTextHeight (aTextHeight);
     bool isModified = false;
     QList<AISObjectPtr> aPrsList = aDisplayer->displayedPresentations();
     foreach (AISObjectPtr aAIS, aPrsList) {
@@ -1014,7 +1012,6 @@ void PartSet_Module::onViewTransformed(int theTrsfType)
       Handle(AIS_Dimension) aDim = Handle(AIS_Dimension)::DownCast(aAisObj);
       if (!aDim.IsNull()) {
         aDim->DimensionAspect()->ArrowAspect()->SetLength(aLen);
-        aDim->DimensionAspect()->TextAspect()->SetHeight(aTextHeight);
         aContext->Redisplay(aDim, false);
         isModified = true;
       }

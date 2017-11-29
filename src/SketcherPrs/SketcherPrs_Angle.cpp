@@ -281,7 +281,7 @@ void SketcherPrs_Angle::ComputeSelection(const Handle(SelectMgr_Selection)& aSel
     return;
   }
   }
-  SetSelToleranceForText2d(SketcherPrs_Tools::getTextHeight());
+  SetSelToleranceForText2d(SketcherPrs_Tools::getArrowSize()/5.);
   AIS_AngleDimension::ComputeSelection(aSelection, aMode);
 }
 

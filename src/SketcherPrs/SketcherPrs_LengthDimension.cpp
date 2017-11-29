@@ -311,6 +311,6 @@ void SketcherPrs_LengthDimension::ComputeSelection(const Handle(SelectMgr_Select
     return;
   }
   }
-  SetSelToleranceForText2d(SketcherPrs_Tools::getTextHeight());
+  SetSelToleranceForText2d(SketcherPrs_Tools::getArrowSize()/5.);
   AIS_LengthDimension::ComputeSelection(aSelection, aMode);
 }
