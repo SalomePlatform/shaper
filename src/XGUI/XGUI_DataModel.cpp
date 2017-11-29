@@ -1089,6 +1089,8 @@ XGUI_DataModel::VisibilityState
 
   ObjectPtr aObj = object(theIndex);
   if (aObj.get()) {
+    if (aObj->groupName() == ModelAPI_ResultParameter::group())
+      return NoneState;
     ResultPtr aResObj = std::dynamic_pointer_cast<ModelAPI_Result>(aObj);
     if (aResObj.get()) {
       XGUI_Displayer* aDisplayer = myWorkshop->displayer();
