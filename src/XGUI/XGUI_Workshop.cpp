@@ -2214,6 +2214,15 @@ void XGUI_Workshop::showObjects(const QObjectPtrList& theList, bool isVisible)
     aObj->setDisplayed(isVisible);
   }
   Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_TO_REDISPLAY));
+#ifndef WIN32
+  // Necessary for update icons in ObjectBrowser on Linux
+  QModelIndexList aIndexes = mySelector->selection()->selectedIndexes();
+  foreach (QModelIndex aIdx, aIndexes) {
+    if (aIdx.column() == 0) {
+      myObjectBrowser->treeView()->update(aIdx);
+    }
+  }
+#endif
 }
 
 //**************************************************************
@@ -2239,6 +2248,15 @@ void XGUI_Workshop::showOnlyObjects(const QObjectPtrList& theList)
     aObj->setDisplayed(true);
   }
   Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_TO_REDISPLAY));
+#ifndef WIN32
+  // Necessary for update icons in ObjectBrowser on Linux
+  QModelIndexList aIndexes = mySelector->selection()->selectedIndexes();
+  foreach (QModelIndex aIdx, aIndexes) {
+    if (aIdx.column() == 0) {
+      myObjectBrowser->treeView()->update(aIdx);
+    }
+  }
+#endif
 }
 
 
