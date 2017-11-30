@@ -24,7 +24,8 @@
 #include <NCollection_Map.hxx>
 #include <TopoDS_Shape.hxx>
 
-#define MY_MAP implPtr<NCollection_DataMap<TopoDS_Shape, NCollection_Map<TopoDS_Shape> > >()
+typedef NCollection_DataMap<TopoDS_Shape, NCollection_Map<TopoDS_Shape> > MAP;
+#define MY_MAP implPtr<MAP>()
 
 //=================================================================================================
 GeomAPI_DataMapOfShapeMapOfShapes::GeomAPI_DataMapOfShapeMapOfShapes()
@@ -112,4 +113,159 @@ void GeomAPI_DataMapOfShapeMapOfShapes::clear()
 int GeomAPI_DataMapOfShapeMapOfShapes::size() const
 {
   return MY_MAP->Size();
+}
+
+
+//=================================================================================================
+//   iterator implementation
+//=================================================================================================
+
+class IteratorImpl : public GeomAPI_DataMapOfShapeMapOfShapes::iterator
+{
+public:
+  IteratorImpl() {}
+
+  IteratorImpl(const MAP::Iterator& theIterator)
+    : myIterator(theIterator)
+  {}
+
+  IteratorImpl(const std::shared_ptr<IteratorImpl>& theIterator)
+  {
+    mySelf = theIterator;
+  }
+
+  bool operator==(const std::shared_ptr<IteratorImpl>& theOther) const
+  {
+    if (theOther)
+      return theOther->myIterator.IsEqual(myIterator);
+
+    // theOther is end iterator => check the current iterator is not at the end
+    return !myIterator.More();
+  }
+
+  virtual iterator& operator++()
+  {
+    myIterator.Next();
+    return *this;
+  }
+  virtual iterator operator++(int)
+  {
+    std::shared_ptr<IteratorImpl> aSelf = std::dynamic_pointer_cast<IteratorImpl>(mySelf);
+    std::shared_ptr<IteratorImpl> aCopy(new IteratorImpl(aSelf->myIterator));
+    myIterator.Next();
+    return IteratorImpl(aCopy);
+  }
+
+  virtual key_type first() const
+  {
+    if (mySelf)
+      return iterator::first();
+
+    GeomShapePtr aShape(new GeomAPI_Shape);
+    aShape->setImpl(new TopoDS_Shape(myIterator.Key()));
+    return aShape;
+  }
+
+  virtual mapped_type second() const
+  {
+    if (mySelf)
+      return iterator::second();
+
+    ListOfShape anItems;
+    const NCollection_Map<TopoDS_Shape>& aMap = myIterator.Value();
+    for(NCollection_Map<TopoDS_Shape>::Iterator anIt(aMap); anIt.More(); anIt.Next()) {
+      std::shared_ptr<GeomAPI_Shape> aShape(new GeomAPI_Shape);
+      aShape->setImpl(new TopoDS_Shape(anIt.Value()));
+      anItems.push_back(aShape);
+    }
+    return anItems;
+  }
+
+private:
+  MAP::Iterator myIterator;
+};
+
+
+GeomAPI_DataMapOfShapeMapOfShapes::iterator::iterator()
+{
+}
+
+GeomAPI_DataMapOfShapeMapOfShapes::iterator::iterator(
+    const GeomAPI_DataMapOfShapeMapOfShapes::iterator& theOther)
+  : mySelf(theOther.mySelf)
+{
+}
+
+const GeomAPI_DataMapOfShapeMapOfShapes::iterator&
+    GeomAPI_DataMapOfShapeMapOfShapes::iterator::operator=(
+      const GeomAPI_DataMapOfShapeMapOfShapes::iterator& theOther)
+{
+  mySelf = theOther.mySelf;
+  return *this;
+}
+
+bool GeomAPI_DataMapOfShapeMapOfShapes::iterator::operator==(const iterator& theOther) const
+{
+  std::shared_ptr<IteratorImpl> aSelf = std::dynamic_pointer_cast<IteratorImpl>(mySelf);
+  std::shared_ptr<IteratorImpl> aSelfOther =
+      std::dynamic_pointer_cast<IteratorImpl>(theOther.mySelf);
+
+  return aSelf ? aSelf->operator==(aSelfOther)
+                : (aSelfOther ? aSelfOther->operator==(aSelf) : true);
+}
+
+bool GeomAPI_DataMapOfShapeMapOfShapes::iterator::operator!=(const iterator& theOther) const
+{
+  return !operator==(theOther);
+}
+
+GeomAPI_DataMapOfShapeMapOfShapes::iterator&
+    GeomAPI_DataMapOfShapeMapOfShapes::iterator::operator++()
+{
+  mySelf->operator++();
+  return *this;
+}
+
+GeomAPI_DataMapOfShapeMapOfShapes::iterator
+    GeomAPI_DataMapOfShapeMapOfShapes::iterator::operator++(int)
+{
+  return ++(*mySelf);
+}
+
+GeomAPI_DataMapOfShapeMapOfShapes::iterator::key_type
+    GeomAPI_DataMapOfShapeMapOfShapes::iterator::first() const
+{
+  return mySelf->first();
+}
+
+GeomAPI_DataMapOfShapeMapOfShapes::iterator::mapped_type
+    GeomAPI_DataMapOfShapeMapOfShapes::iterator::second() const
+{
+  return mySelf->second();
+}
+
+
+
+GeomAPI_DataMapOfShapeMapOfShapes::iterator GeomAPI_DataMapOfShapeMapOfShapes::begin()
+{
+  MAP::Iterator anIt(*MY_MAP);
+  std::shared_ptr<IteratorImpl> anIter(new IteratorImpl(anIt));
+  return IteratorImpl(anIter);
+}
+
+GeomAPI_DataMapOfShapeMapOfShapes::const_iterator GeomAPI_DataMapOfShapeMapOfShapes::begin() const
+{
+  MAP::Iterator anIt(*MY_MAP);
+  std::shared_ptr<IteratorImpl> anIter(new IteratorImpl(anIt));
+  return IteratorImpl(anIter);
+}
+
+GeomAPI_DataMapOfShapeMapOfShapes::iterator GeomAPI_DataMapOfShapeMapOfShapes::end()
+{
+  return IteratorImpl(std::shared_ptr<IteratorImpl>());
+}
+
+GeomAPI_DataMapOfShapeMapOfShapes::const_iterator GeomAPI_DataMapOfShapeMapOfShapes::end() const
+{
+  return IteratorImpl(std::shared_ptr<IteratorImpl>());
 }

@@ -64,6 +64,40 @@ public:
 
   /// \return size of map.
   GEOMAPI_EXPORT int size() const;
+
+public:
+  class iterator
+  {
+  public:
+    typedef GeomShapePtr key_type;
+    typedef ListOfShape  mapped_type;
+    typedef std::pair<GeomShapePtr, ListOfShape> value_type;
+
+  public:
+    GEOMAPI_EXPORT iterator();
+    GEOMAPI_EXPORT iterator(const iterator&);
+    GEOMAPI_EXPORT const iterator& operator=(const iterator&);
+
+    GEOMAPI_EXPORT bool operator==(const iterator&) const;
+    GEOMAPI_EXPORT bool operator!=(const iterator&) const;
+
+    GEOMAPI_EXPORT virtual iterator& operator++();
+    GEOMAPI_EXPORT virtual iterator  operator++(int);
+
+    GEOMAPI_EXPORT virtual key_type first() const;
+    GEOMAPI_EXPORT virtual mapped_type second() const;
+
+  protected:
+    std::shared_ptr<iterator> mySelf;
+  };
+
+  typedef iterator const_iterator;
+
+  GEOMAPI_EXPORT iterator begin();
+  GEOMAPI_EXPORT const_iterator begin() const;
+
+  GEOMAPI_EXPORT iterator end();
+  GEOMAPI_EXPORT const_iterator end() const;
 };
 
 #endif

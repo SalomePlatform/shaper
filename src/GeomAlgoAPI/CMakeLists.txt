@@ -74,6 +74,7 @@ SET(PROJECT_HEADERS
     GeomAlgoAPI_Scale.h
     GeomAlgoAPI_Circ2dBuilder.h
     GeomAlgoAPI_UnifySameDomain.h
+    GeomAlgoAPI_Fillet.h
 )
 
 SET(PROJECT_SOURCES
@@ -126,6 +127,7 @@ SET(PROJECT_SOURCES
     GeomAlgoAPI_Scale.cpp
     GeomAlgoAPI_Circ2dBuilder.cpp
     GeomAlgoAPI_UnifySameDomain.cpp
+    GeomAlgoAPI_Fillet.cpp
 )
 
 SET(PROJECT_LIBRARIES
@@ -140,6 +142,7 @@ SET(PROJECT_LIBRARIES
     ${CAS_TKBRep}
     ${CAS_TKCAF}
     ${CAS_TKCAF}
+    ${CAS_TKFillet}
     ${CAS_TKLCAF}
     ${CAS_TKPrim}
     ${CAS_TKSTEP}

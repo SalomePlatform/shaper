@@ -44,6 +44,7 @@
 %shared_ptr(FeaturesAPI_ExtrusionBoolean)
 %shared_ptr(FeaturesAPI_ExtrusionCut)
 %shared_ptr(FeaturesAPI_ExtrusionFuse)
+%shared_ptr(FeaturesAPI_Fillet)
 %shared_ptr(FeaturesAPI_Intersection)
 %shared_ptr(FeaturesAPI_MultiRotation)
 %shared_ptr(FeaturesAPI_MultiTranslation)
@@ -66,6 +67,7 @@
 %include "FeaturesAPI_Boolean.h"
 %include "FeaturesAPI_Extrusion.h"
 %include "FeaturesAPI_ExtrusionBoolean.h"
+%include "FeaturesAPI_Fillet.h"
 %include "FeaturesAPI_Intersection.h"
 %include "FeaturesAPI_MultiRotation.h"
 %include "FeaturesAPI_MultiTranslation.h"

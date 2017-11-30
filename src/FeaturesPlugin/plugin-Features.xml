@@ -80,6 +80,11 @@ email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com
         <source path="recover_widget.xml"/>
       </feature>
     </group>
+    <group id="Fillet">
+      <feature id="Fillet" title="Fillet" tooltip="Perform fillet on face or edge" icon="icons/Features/fillet.png" auto_preview="true">
+        <source path="fillet_widget.xml"/>
+      </feature>
+    </group>
   </workbench>
   <workbench id="Part">
     <group id="Movement">

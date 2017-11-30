@@ -51,6 +51,7 @@ SET(PROJECT_HEADERS
     FeaturesPlugin_Scale.h
     FeaturesPlugin_MultiTranslation.h
     FeaturesPlugin_MultiRotation.h
+    FeaturesPlugin_Fillet.h
 )
 
 SET(PROJECT_SOURCES
@@ -82,6 +83,7 @@ SET(PROJECT_SOURCES
     FeaturesPlugin_Scale.cpp
     FeaturesPlugin_MultiTranslation.cpp
     FeaturesPlugin_MultiRotation.cpp
+    FeaturesPlugin_Fillet.cpp
 )
 
 SET(XML_RESOURCES
@@ -106,6 +108,7 @@ SET(XML_RESOURCES
   scale_widget.xml
   multitranslation_widget.xml
   multirotation_widget.xml
+  fillet_widget.xml
 )
 
 SET(TEXT_RESOURCES

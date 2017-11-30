@@ -24,6 +24,7 @@
 #include <FeaturesPlugin_Extrusion.h>
 #include <FeaturesPlugin_ExtrusionCut.h>
 #include <FeaturesPlugin_ExtrusionFuse.h>
+#include <FeaturesPlugin_Fillet.h>
 #include <FeaturesPlugin_Intersection.h>
 #include <FeaturesPlugin_MultiRotation.h>
 #include <FeaturesPlugin_MultiTranslation.h>
@@ -84,6 +85,8 @@ FeaturesPlugin_Plugin::FeaturesPlugin_Plugin()
                               new FeaturesPlugin_ValidatorUnionArguments);
   aFactory->registerValidator("FeaturesPlugin_ValidatorConcealedResult",
                               new FeaturesPlugin_ValidatorConcealedResult);
+  aFactory->registerValidator("FeaturesPlugin_ValidatorFilletSelection",
+                              new FeaturesPlugin_ValidatorFilletSelection);
 
   // register this plugin
   ModelAPI_Session::get()->registerPlugin(this);
@@ -131,6 +134,8 @@ FeaturePtr FeaturesPlugin_Plugin::createFeature(std::string theFeatureID)
     return FeaturePtr(new FeaturesPlugin_MultiTranslation);
   } else if (theFeatureID == FeaturesPlugin_MultiRotation::ID()) {
     return FeaturePtr(new FeaturesPlugin_MultiRotation);
+  } else if (theFeatureID == FeaturesPlugin_Fillet::ID()) {
+    return FeaturePtr(new FeaturesPlugin_Fillet);
   }
 
   // feature of such kind is not found

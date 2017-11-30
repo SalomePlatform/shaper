@@ -9,3 +9,4 @@ from FeaturesAPI import addPipe
 from FeaturesAPI import addCut, addFuse, addCommon, addSmash, addFill
 from FeaturesAPI import addIntersection, addPartition, addUnion, addRemoveSubShapes
 from FeaturesAPI import addRecover
+from FeaturesAPI import addFillet

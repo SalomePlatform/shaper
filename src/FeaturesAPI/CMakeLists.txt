@@ -25,6 +25,7 @@ SET(PROJECT_HEADERS
   FeaturesAPI_Boolean.h
   FeaturesAPI_Extrusion.h
   FeaturesAPI_ExtrusionBoolean.h
+  FeaturesAPI_Fillet.h
   FeaturesAPI_Intersection.h
   FeaturesAPI_MultiRotation.h
   FeaturesAPI_MultiTranslation.h
@@ -46,6 +47,7 @@ SET(PROJECT_SOURCES
   FeaturesAPI_Boolean.cpp
   FeaturesAPI_Extrusion.cpp
   FeaturesAPI_ExtrusionBoolean.cpp
+  FeaturesAPI_Fillet.cpp
   FeaturesAPI_Intersection.cpp
   FeaturesAPI_MultiRotation.cpp
   FeaturesAPI_MultiTranslation.cpp

@@ -152,6 +152,22 @@ public:
                        Events_InfoMessage& theError) const;
 };
 
+/// \class FeaturesPlugin_ValidatorFilletSelection
+/// \ingroup Validators
+/// \brief Validates selection for fillet operation.
+class FeaturesPlugin_ValidatorFilletSelection: public ModelAPI_AttributeValidator
+{
+public:
+  /// \return True if the attribute is valid. It checks whether the selection
+  /// is acceptable for boolean operation.
+  /// \param[in] theAttribute an attribute to check.
+  /// \param[in] theArguments a filter parameters.
+  /// \param[out] theError error message.
+  virtual bool isValid(const AttributePtr& theAttribute,
+                       const std::list<std::string>& theArguments,
+                       Events_InfoMessage& theError) const;
+};
+
 /// \class FeaturesPlugin_ValidatorPartitionSelection
 /// \ingroup Validators
 /// \brief Validates selection for partition.
