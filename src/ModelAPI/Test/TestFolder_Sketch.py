@@ -37,12 +37,12 @@ model.do()
 Sketch_1 = model.addSketch(Part_1_doc, model.defaultPlane("XOY"))
 SketchCircle_1 = Sketch_1.addCircle(50, 50, 25)
 model.do()
-Extrusion_1 = model.addExtrusion(Part_1_doc, [model.selection("FACE", "Sketch_1/Face-SketchCircle_1_2f")], model.selection(), 50, 0)
+Extrusion_1 = model.addExtrusion(Part_1_doc, [model.selection("FACE", "Sketch_2/Face-SketchCircle_1_2f")], model.selection(), 50, 0)
 
 Sketch_2 = model.addSketch(Part_1_doc, model.standardPlane("XOY"))
 SketchCircle_2 = Sketch_2.addCircle(100, -100, 50)
 model.do()
-Extrusion_2 = model.addExtrusion(Part_1_doc, [model.selection("COMPOUND", "Sketch_2")], model.selection(), 10, 0)
+Extrusion_2 = model.addExtrusion(Part_1_doc, [model.selection("COMPOUND", "Sketch_3")], model.selection(), 10, 0)
 ExtrusionCut_1 = model.addExtrusionCut(Part_1_doc, [], model.selection(), 0, 10, [model.selection("SOLID", "Extrusion_2_1")])
 Sketch_3 = model.addSketch(Part_1_doc, model.selection("FACE", "Extrusion_2_1/To_Face_1"))
 SketchProjection_1 = Sketch_3.addProjection(model.selection("VERTEX", "Extrusion_2_1/Generated_Face_1&Extrusion_2_1/To_Face_1__cc"), False)
@@ -56,7 +56,6 @@ model.end()
 
 aSession = ModelAPI_Session.get()
 aPartDoc = aSession.activeDocument()
-
 
 #=========================================================================
 # Test 1. Sketch and extrusion could be added to the folder above
