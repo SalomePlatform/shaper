@@ -23,10 +23,12 @@ INCLUDE(Common)
 SET(PROJECT_HEADERS
   GDMLAPI.h
   GDMLAPI_ConeSegment.h
+  GDMLAPI_Ellipsoid.h
 )
 
 SET(PROJECT_SOURCES
   GDMLAPI_ConeSegment.cpp
+  GDMLAPI_Ellipsoid.cpp
 )
 
 SET(PROJECT_LIBRARIES

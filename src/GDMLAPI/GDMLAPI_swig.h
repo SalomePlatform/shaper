@@ -25,6 +25,7 @@
 
   #include "GDMLAPI.h"
   #include "GDMLAPI_ConeSegment.h"
+  #include "GDMLAPI_Ellipsoid.h"
 
 #endif // GDMLAPI_swig_H_
 

@@ -45,7 +45,8 @@
 
 // shared pointers
 %shared_ptr(GDMLAPI_ConeSegment)
+%shared_ptr(GDMLAPI_Ellipsoid)
 
 // all supported interfaces
 %include "GDMLAPI_ConeSegment.h"
-
+%include "GDMLAPI_Ellipsoid.h"
