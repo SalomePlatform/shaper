@@ -189,23 +189,23 @@ void XGUI_ContextMenuMgr::createActions()
 #endif
 
   // Features folders actions
-  aAction = ModuleBase_Tools::createAction(QIcon(),
+  aAction = ModuleBase_Tools::createAction(QIcon(":pictures/create_folder.png"),
                                            tr("Insert a folder before"), aDesktop);
   addAction("INSERT_FOLDER_CMD", aAction);
 
-  aAction = ModuleBase_Tools::createAction(QIcon(),
+  aAction = ModuleBase_Tools::createAction(QIcon(":pictures/insert_folder_before.png"),
                                            tr("Move into the previous folder"), aDesktop);
   addAction("ADD_TO_FOLDER_BEFORE_CMD", aAction);
 
-  aAction = ModuleBase_Tools::createAction(QIcon(),
+  aAction = ModuleBase_Tools::createAction(QIcon(":pictures/insert_folder_after.png"),
                                            tr("Move into the next folder"), aDesktop);
   addAction("ADD_TO_FOLDER_AFTER_CMD", aAction);
 
-  aAction = ModuleBase_Tools::createAction(QIcon(),
+  aAction = ModuleBase_Tools::createAction(QIcon(":pictures/move_out_before.png"),
                                            tr("Move out before the folder"), aDesktop);
   addAction("ADD_OUT_FOLDER_BEFORE_CMD", aAction);
 
-  aAction = ModuleBase_Tools::createAction(QIcon(),
+  aAction = ModuleBase_Tools::createAction(QIcon(":pictures/move_out_after.png"),
                                            tr("Move out after the folder"), aDesktop);
   addAction("ADD_OUT_FOLDER_AFTER_CMD", aAction);
 

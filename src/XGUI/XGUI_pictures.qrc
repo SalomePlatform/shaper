@@ -63,5 +63,10 @@
 
      <file>pictures/transparency.png</file>
      <file>pictures/features_folder.png</file>
+     <file>pictures/create_folder.png</file>
+     <file>pictures/insert_folder_after.png</file>
+     <file>pictures/insert_folder_before.png</file>
+     <file>pictures/move_out_after.png</file>
+     <file>pictures/move_out_before.png</file>
  </qresource>
  </RCC>
