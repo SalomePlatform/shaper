@@ -96,6 +96,9 @@ void ModelHighAPI_Dumper::clear(bool bufferOnly)
     myFeatureCount.clear();
     while (!myEntitiesStack.empty())
       myEntitiesStack.pop();
+
+    myPostponed.clear();
+    myDumpPostponedInProgress = false;
   }
 }
 
@@ -139,7 +142,6 @@ const std::string& ModelHighAPI_Dumper::name(const EntityPtr& theEntity,
       aName = aFolder->data()->name();
       aKind = ModelAPI_Folder::ID();
       isSaveNotDumped = false;
-      myNotDumpedFolders.insert(aFolder);
     }
   }
 
@@ -362,17 +364,41 @@ bool ModelHighAPI_Dumper::processSubs(
   if (isDumpSetName)
     dumpEntitySetName();
   // dump folders if any
-  dumpFolders();
+  dumpPostponed();
   return isOk;
 }
 
-void ModelHighAPI_Dumper::dumpFolders()
+void ModelHighAPI_Dumper::postpone(const EntityPtr& theEntity)
 {
-  std::set<FolderPtr>::const_iterator aFolderIt = myNotDumpedFolders.begin();
-  while (aFolderIt != myNotDumpedFolders.end()) {
-    FolderPtr aFolder = *aFolderIt++;
-    dumpFolder(aFolder);
+  // keep the name
+  name(theEntity, false);
+  myPostponed.push_back(theEntity);
+}
+
+void ModelHighAPI_Dumper::dumpPostponed()
+{
+  if (myDumpPostponedInProgress)
+    return;
+
+  myDumpPostponedInProgress = true;
+  // make a copy of postponed entities, because the list will be updated
+  // if some features are not able to be dumped
+  std::list<EntityPtr> aPostponedCopy = myPostponed;
+  myPostponed.clear();
+
+  // iterate over postponed entities and try to dump them
+  std::list<EntityPtr>::const_iterator anIt = aPostponedCopy.begin();
+  for (; anIt != aPostponedCopy.end(); ++anIt) {
+    FolderPtr aFolder = std::dynamic_pointer_cast<ModelAPI_Folder>(*anIt);
+    if (aFolder)
+      dumpFolder(aFolder);
+    else {
+      FeaturePtr aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(*anIt);
+      if (aFeature)
+        dumpFeature(aFeature);
+    }
   }
+  myDumpPostponedInProgress = false;
 }
 
 void ModelHighAPI_Dumper::dumpSubFeatureNameAndColor(const std::string theSubFeatureGet,
@@ -511,6 +537,28 @@ bool ModelHighAPI_Dumper::isDumped(const EntityPtr& theEntity) const
   FeaturePtr aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(theEntity);
   return (aFound != myNames.end() && aFound->second.myIsDumped) ||
          myFeaturesToSkip.find(aFeature) != myFeaturesToSkip.end();
+}
+
+bool ModelHighAPI_Dumper::isDumped(const AttributeRefAttrPtr& theRefAttr) const
+{
+  FeaturePtr aFeature;
+  if (theRefAttr->isObject())
+    aFeature = ModelAPI_Feature::feature(theRefAttr->object());
+  else
+    aFeature = ModelAPI_Feature::feature(theRefAttr->attr()->owner());
+  return aFeature && isDumped(aFeature);
+}
+
+bool ModelHighAPI_Dumper::isDumped(const AttributeRefListPtr& theRefList) const
+{
+  std::list<ObjectPtr> aRefs = theRefList->list();
+  std::list<ObjectPtr>::iterator anIt = aRefs.begin();
+  for (; anIt != aRefs.end(); ++anIt) {
+    FeaturePtr aFeature = ModelAPI_Feature::feature(*anIt);
+    if (aFeature && !isDumped(aFeature))
+      return false;
+  }
+  return true;
 }
 
 bool ModelHighAPI_Dumper::isDefaultColor(const ResultPtr& theResult) const
@@ -700,7 +748,6 @@ ModelHighAPI_Dumper& ModelHighAPI_Dumper::operator<<(
 ModelHighAPI_Dumper& ModelHighAPI_Dumper::operator<<(const FolderPtr& theFolder)
 {
   myDumpBuffer << name(theFolder);
-  myNotDumpedFolders.erase(theFolder);
   return *this;
 }
 
@@ -990,7 +1037,7 @@ ModelHighAPI_Dumper& operator<<(ModelHighAPI_Dumper& theDumper,
           isCopy = aCopyAttr.get() && aCopyAttr->value();
         }
       }
-    } while (isCopy);
+    } while (isCopy && !theDumper.myEntitiesStack.empty());
   }
 
   // store all not-dumped entities first
@@ -1031,8 +1078,8 @@ ModelHighAPI_Dumper& operator<<(ModelHighAPI_Dumper& theDumper,
   // then store currently dumped string
   theDumper.myFullDump << aBufCopy;
 
-  // now, store all not dumped folders
-  theDumper.dumpFolders();
+  // now, store all postponed features
+  theDumper.dumpPostponed();
 
   return theDumper;
 }

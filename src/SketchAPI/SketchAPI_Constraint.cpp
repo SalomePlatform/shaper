@@ -169,6 +169,18 @@ void SketchAPI_Constraint::dump(ModelHighAPI_Dumper& theDumper) const
       return;
   }
 
+  // Check all attributes are already dumped. If not, store the constraint as postponed.
+  bool areAttributesDumped = true;
+  for (int i = 0; i < CONSTRAINT_ATTR_SIZE && areAttributesDumped; ++i) {
+    AttributeRefAttrPtr aRefAttr = aBase->refattr(SketchPlugin_Constraint::ATTRIBUTE(i));
+    if (aRefAttr && aRefAttr->isInitialized())
+      areAttributesDumped = theDumper.isDumped(aRefAttr);
+  }
+  if (!areAttributesDumped) {
+    theDumper.postpone(aBase);
+    return;
+  }
+
   bool isAngle = aBase->getKind() == SketchPlugin_ConstraintAngle::ID();
   std::string aSetterSuffix;
   if (isAngle)

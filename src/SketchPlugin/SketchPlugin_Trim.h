@@ -117,7 +117,8 @@ class SketchPlugin_Trim : public SketchPlugin_Feature, public GeomAPI_IPresentab
 
 private:
   bool setCoincidenceToAttribute(const AttributePtr& theAttribute,
-            const std::set<std::shared_ptr<GeomDataAPI_Point2D> >& theFurtherCoincidences);
+            const std::set<std::shared_ptr<GeomDataAPI_Point2D> >& theFurtherCoincidences,
+            std::set<std::shared_ptr<ModelAPI_Feature>>& theFeaturesToDelete);
   /// Move tangency constraint to the feature if it is geometrically closely to it
   /// \param theAttribute an attribute of a tangent constraint feature
   /// \param theFeature a feature that can be set into the attribute

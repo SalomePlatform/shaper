@@ -121,6 +121,11 @@ public:
   /// Dump folder
   virtual void dumpFolder(const FolderPtr& theFolder) = 0;
 
+  /// Set feature postponed until all its dependencies are not dumped.
+  /// The name of the feature is stored anyway.
+  MODELHIGHAPI_EXPORT
+  void postpone(const EntityPtr& theEntity);
+
   /// Set a feature that should not be dumped anyway
   MODELHIGHAPI_EXPORT
   void doNotDumpFeature(const FeaturePtr& theFeature)
@@ -252,6 +257,16 @@ public:
   /// clear list of not dumped entities
   MODELHIGHAPI_EXPORT void clearNotDumped();
 
+  /// Check the entity is already dumped
+  MODELHIGHAPI_EXPORT
+  bool isDumped(const EntityPtr& theEntity) const;
+  /// Check theRefAttr is already dumped
+  MODELHIGHAPI_EXPORT
+  bool isDumped(const std::shared_ptr<ModelAPI_AttributeRefAttr>& theRefAttr) const;
+  /// Check all objects in theRefList are already dumped
+  MODELHIGHAPI_EXPORT
+  bool isDumped(const std::shared_ptr<ModelAPI_AttributeRefList>& theRefList) const;
+
 protected:
   /// Dump "setName" command if last entity had user-defined name
   MODELHIGHAPI_EXPORT void dumpEntitySetName();
@@ -274,9 +289,6 @@ private:
   bool processSubs(const std::shared_ptr<ModelAPI_CompositeFeature>& theComposite,
                    bool theDumpModelDo = false);
 
-  /// Check the entity is already dumped
-  bool isDumped(const EntityPtr& theEntity) const;
-
   /// Stores names of results for the given feature
   void saveResultNames(const FeaturePtr& theFeature);
 
@@ -289,8 +301,8 @@ private:
   /// Check the result feature has default transparency
   bool isDefaultTransparency(const ResultPtr& theResult) const;
 
-  /// Dump stored folders if possible
-  void dumpFolders();
+  /// Dump postponed entities
+  void dumpPostponed();
 
 private:
   struct EntityName {
@@ -340,11 +352,12 @@ private:
   /// features which should not be dumped (like coincidence and tangency created by tangent arc)
   std::set<FeaturePtr> myFeaturesToSkip;
 
+  std::list<EntityPtr> myPostponed; ///< list of postponed entities (sketch constraints or folders)
+  bool myDumpPostponedInProgress; ///< processing postponed is in progress
+
 protected:
   /// list of entities, used by other features but not dumped yet
   std::set<EntityPtr> myNotDumpedEntities;
-  /// list of folders which do not dumped yet
-  std::set<FolderPtr> myNotDumpedFolders;
 
   friend class SketchAPI_Sketch;
   friend class ModelHighAPI_Folder;

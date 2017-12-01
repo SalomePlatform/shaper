@@ -379,7 +379,7 @@ void SketchPlugin_Trim::execute()
       anIt != aLast; anIt++) {
     AttributePtr anAttribute = *anIt;
 
-    if (setCoincidenceToAttribute(anAttribute, aFurtherCoincidences))
+    if (setCoincidenceToAttribute(anAttribute, aFurtherCoincidences, aFeaturesToDelete))
       continue;
 
     // move tangency constraint to the nearest feature if possible
@@ -533,7 +533,8 @@ std::string SketchPlugin_Trim::processEvent(const std::shared_ptr<Events_Message
 }
 
 bool SketchPlugin_Trim::setCoincidenceToAttribute(const AttributePtr& theAttribute,
-                                const std::set<AttributePoint2DPtr>& theFurtherCoincidences)
+                                const std::set<AttributePoint2DPtr>& theFurtherCoincidences,
+                                std::set<std::shared_ptr<ModelAPI_Feature>>& theFeaturesToDelete)
 {
   FeaturePtr aFeature = ModelAPI_Feature::feature(theAttribute->owner());
   if (aFeature->getKind() != SketchPlugin_ConstraintCoincidence::ID())
@@ -551,12 +552,9 @@ bool SketchPlugin_Trim::setCoincidenceToAttribute(const AttributePtr& theAttribu
     AttributePoint2DPtr aPointAttribute = (*anIt);
     std::shared_ptr<GeomAPI_Pnt2d> aPoint2d = aPointAttribute->pnt();
     if (aPoint2d->isEqual(aRefPnt2d)) {
-      AttributeRefAttrPtr aRefAttr = std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(
-                                                                           theAttribute);
-      if (aRefAttr.get()) {
-        aRefAttr->setAttr(aPointAttribute);
-        aFoundPoint = true;
-      }
+      // create new coincidence and then remove the old one
+      createConstraint(SketchPlugin_ConstraintCoincidence::ID(), aRefPointAttr, aPointAttribute);
+      theFeaturesToDelete.insert(aFeature);
     }
   }
   return aFoundPoint;

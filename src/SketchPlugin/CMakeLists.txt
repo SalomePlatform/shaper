@@ -179,6 +179,7 @@ ADD_UNIT_TESTS(TestSketchPointLine.py
                TestConstraintTangent.py
                TestConstraintAngle.py
                TestConstraintMiddlePoint.py
+               TestEdgesOrder.py
                TestMirror.py
                TestMultiRotation.py
                TestMultiTranslation.py

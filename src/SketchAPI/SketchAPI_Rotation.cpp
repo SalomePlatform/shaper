@@ -86,6 +86,12 @@ void SketchAPI_Rotation::dump(ModelHighAPI_Dumper& theDumper) const
   AttributeIntegerPtr aNbCopies = numberOfObjects();
   bool isFullValue = valueType()->value() != "SingleAngle";
 
+  // Check all attributes are already dumped. If not, store the constraint as postponed.
+  if (!theDumper.isDumped(aCenter) || !theDumper.isDumped(aRotObjects)) {
+    theDumper.postpone(aBase);
+    return;
+  }
+
   theDumper << aBase << " = " << aSketchName << ".addRotation("
             << aRotObjects << ", " << aCenter << ", " << anAngle << ", " << aNbCopies;
   if (isFullValue)

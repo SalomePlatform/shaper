@@ -86,6 +86,13 @@ void SketchAPI_Translation::dump(ModelHighAPI_Dumper& theDumper) const
   AttributeIntegerPtr aNbCopies = numberOfObjects();
   bool isFullValue = valueType()->value() != "SingleValue";
 
+  // Check all attributes are already dumped. If not, store the constraint as postponed.
+  if (!theDumper.isDumped(aStart) || !theDumper.isDumped(aEnd) ||
+      !theDumper.isDumped(aTransObjects)) {
+    theDumper.postpone(aBase);
+    return;
+  }
+
   theDumper << aBase << " = " << aSketchName << ".addTranslation("
             << aTransObjects << ", " << aStart << ", " << aEnd << ", " << aNbCopies;
   if (isFullValue)

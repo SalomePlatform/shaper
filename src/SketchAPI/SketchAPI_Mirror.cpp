@@ -70,8 +70,16 @@ void SketchAPI_Mirror::dump(ModelHighAPI_Dumper& theDumper) const
   FeaturePtr aBase = feature();
   const std::string& aSketchName = theDumper.parentName(aBase);
 
+
   AttributeRefAttrPtr aMirrorLine = mirrorLine();
   AttributeRefListPtr aMirrorObjects = mirrorList();
+
+  // Check all attributes are already dumped. If not, store the constraint as postponed.
+  if (!theDumper.isDumped(aMirrorLine) || !theDumper.isDumped(aMirrorObjects)) {
+    theDumper.postpone(aBase);
+    return;
+  }
+
   theDumper << aBase << " = " << aSketchName << ".addMirror(" << aMirrorLine << ", "
             << aMirrorObjects << ")" << std::endl;
 
