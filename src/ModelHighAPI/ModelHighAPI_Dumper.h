@@ -289,6 +289,9 @@ private:
   /// Check the result feature has default transparency
   bool isDefaultTransparency(const ResultPtr& theResult) const;
 
+  /// Dump stored folders if possible
+  void dumpFolders();
+
 private:
   struct EntityName {
     std::string myCurrentName; ///< default name of current feature

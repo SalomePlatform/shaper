@@ -21,6 +21,7 @@
 #include "ModelHighAPI_Folder.h"
 #include <ModelHighAPI_Dumper.h>
 #include <ModelHighAPI_Reference.h>
+#include <ModelHighAPI_Tools.h>
 
 #include <ModelAPI_AttributeReference.h>
 #include <ModelAPI_Document.h>
@@ -91,10 +92,10 @@ std::shared_ptr<ModelHighAPI_Folder> addFolder(const std::shared_ptr<ModelAPI_Do
   std::shared_ptr<ModelAPI_Folder> aFolder = theDoc->addFolder(theFirstFeature.feature());
 
   AttributeReferencePtr aFirstFeatAttr = aFolder->reference(ModelAPI_Folder::FIRST_FEATURE_ID());
-  theFirstFeature.fillAttribute(aFirstFeatAttr);
+  fillAttribute(theFirstFeature.feature(), aFirstFeatAttr);
 
   AttributeReferencePtr aLastFeatAttr = aFolder->reference(ModelAPI_Folder::LAST_FEATURE_ID());
-  theLastFeature.fillAttribute(aLastFeatAttr);
+  fillAttribute(theLastFeature.feature(), aLastFeatAttr);
 
   return std::shared_ptr<ModelHighAPI_Folder>(new ModelHighAPI_Folder(aFolder));
 }

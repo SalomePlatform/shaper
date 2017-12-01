@@ -361,7 +361,18 @@ bool ModelHighAPI_Dumper::processSubs(
   // dump "setName" for composite feature
   if (isDumpSetName)
     dumpEntitySetName();
+  // dump folders if any
+  dumpFolders();
   return isOk;
+}
+
+void ModelHighAPI_Dumper::dumpFolders()
+{
+  std::set<FolderPtr>::const_iterator aFolderIt = myNotDumpedFolders.begin();
+  while (aFolderIt != myNotDumpedFolders.end()) {
+    FolderPtr aFolder = *aFolderIt++;
+    dumpFolder(aFolder);
+  }
 }
 
 void ModelHighAPI_Dumper::dumpSubFeatureNameAndColor(const std::string theSubFeatureGet,
@@ -498,7 +509,8 @@ bool ModelHighAPI_Dumper::isDumped(const EntityPtr& theEntity) const
 {
   EntityNameMap::const_iterator aFound = myNames.find(theEntity);
   FeaturePtr aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(theEntity);
-  return aFound != myNames.end() || myFeaturesToSkip.find(aFeature) != myFeaturesToSkip.end();
+  return (aFound != myNames.end() && aFound->second.myIsDumped) ||
+         myFeaturesToSkip.find(aFeature) != myFeaturesToSkip.end();
 }
 
 bool ModelHighAPI_Dumper::isDefaultColor(const ResultPtr& theResult) const
@@ -1019,11 +1031,7 @@ ModelHighAPI_Dumper& operator<<(ModelHighAPI_Dumper& theDumper,
   theDumper.myFullDump << aBufCopy;
 
   // now, store all not dumped folders
-  std::set<FolderPtr>::const_iterator aFolderIt = theDumper.myNotDumpedFolders.begin();
-  while (aFolderIt != theDumper.myNotDumpedFolders.end()) {
-    FolderPtr aFolder = *aFolderIt++;
-    theDumper.dumpFolder(aFolder);
-  }
+  theDumper.dumpFolders();
 
   return theDumper;
 }
