@@ -118,10 +118,14 @@ void FeaturesPlugin_Boolean::execute()
         aCompSolidsObjects[aContextShape].push_back(anObject);
       }
     } else {
-      if(anObject->shapeType() == GeomAPI_Shape::EDGE ||
-         anObject->shapeType() == GeomAPI_Shape::FACE) {
+      if(aType != BOOL_FILL
+        && (anObject->shapeType() == GeomAPI_Shape::EDGE
+          || anObject->shapeType() == GeomAPI_Shape::FACE))
+      {
         anEdgesAndFaces.push_back(anObject);
-      } else {
+      }
+      else
+      {
         anObjects.push_back(anObject);
       }
     }
@@ -136,8 +140,11 @@ void FeaturesPlugin_Boolean::execute()
       // It could be a construction plane.
       ResultPtr aContext = aToolAttr->context();
       aPlanes.push_back(aToolAttr->context()->shape());
-    } else if(aTool->shapeType() == GeomAPI_Shape::EDGE ||
-       aTool->shapeType() == GeomAPI_Shape::FACE) {
+    }
+    else if(aType != BOOL_FILL
+      && (aTool->shapeType() == GeomAPI_Shape::EDGE
+        || aTool->shapeType() == GeomAPI_Shape::FACE))
+    {
       anEdgesAndFaces.push_back(aTool);
     } else {
       aTools.push_back(aTool);

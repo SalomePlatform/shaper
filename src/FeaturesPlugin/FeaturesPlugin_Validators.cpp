@@ -629,33 +629,35 @@ bool FeaturesPlugin_ValidatorBooleanSelection::isValid(const AttributePtr& theAt
       return false;
     }
 
-    int aShapeType = aShape->shapeType();
+    GeomAPI_Shape::ShapeType aShapeType = aShape->shapeType();
+    std::set<GeomAPI_Shape::ShapeType> anAllowedTypes;
     if(anOperationType == FeaturesPlugin_Boolean::BOOL_FUSE) {
-      // Fuse operation. Allow to select edges, faces and solids.
-      if(aShapeType != GeomAPI_Shape::EDGE &&
-         aShapeType != GeomAPI_Shape::FACE &&
-         aShapeType != GeomAPI_Shape::SOLID &&
-         aShapeType != GeomAPI_Shape::COMPSOLID &&
-         aShapeType != GeomAPI_Shape::COMPOUND) {
-        theError = "Error: Selected shape has the wrong type.";
-        return false;
-      }
+      anAllowedTypes.insert(GeomAPI_Shape::EDGE);
+      anAllowedTypes.insert(GeomAPI_Shape::FACE);
+      anAllowedTypes.insert(GeomAPI_Shape::SOLID);
+      anAllowedTypes.insert(GeomAPI_Shape::COMPSOLID);
+      anAllowedTypes.insert(GeomAPI_Shape::COMPOUND);
     } else if (anOperationType == FeaturesPlugin_Boolean::BOOL_FILL) {
-      if(aShapeType != GeomAPI_Shape::FACE &&
-         aShapeType != GeomAPI_Shape::SOLID &&
-         aShapeType != GeomAPI_Shape::COMPSOLID &&
-         aShapeType != GeomAPI_Shape::COMPOUND) {
-        theError = "Error: Selected shape has the wrong type.";
-        return false;
-      }
+      anAllowedTypes.insert(GeomAPI_Shape::VERTEX);
+      anAllowedTypes.insert(GeomAPI_Shape::EDGE);
+      anAllowedTypes.insert(GeomAPI_Shape::WIRE);
+      anAllowedTypes.insert(GeomAPI_Shape::FACE);
+      anAllowedTypes.insert(GeomAPI_Shape::SHELL);
+      anAllowedTypes.insert(GeomAPI_Shape::SOLID);
+      anAllowedTypes.insert(GeomAPI_Shape::COMPSOLID);
+      anAllowedTypes.insert(GeomAPI_Shape::COMPOUND);
     } else {
-      if(aShapeType != GeomAPI_Shape::SOLID &&
-         aShapeType != GeomAPI_Shape::COMPSOLID &&
-         aShapeType != GeomAPI_Shape::COMPOUND) {
-        theError = "Error: Selected shape has the wrong type.";
-        return false;
-      }
+      anAllowedTypes.insert(GeomAPI_Shape::SOLID);
+      anAllowedTypes.insert(GeomAPI_Shape::COMPSOLID);
+      anAllowedTypes.insert(GeomAPI_Shape::COMPOUND);
     }
+
+    if(anAllowedTypes.find(aShapeType) == anAllowedTypes.end()
+      || (aResultConstruction.get() && aShapeType != GeomAPI_Shape::FACE)) {
+      theError = "Error: Selected shape has the wrong type.";
+      return false;
+    }
+
   }
 
   return true;
