@@ -382,6 +382,7 @@ bool removeFeaturesAndReferences(const std::set<FeaturePtr>& theFeatures,
   return ModelAPI_Tools::removeFeatures(aFeatures, false);
 }
 
+//***********************************************************************
 bool removeFeatures(const std::set<FeaturePtr>& theFeatures,
                     const bool theFlushRedisplay)
 {
@@ -406,6 +407,7 @@ bool removeFeatures(const std::set<FeaturePtr>& theFeatures,
   return true;
 }
 
+//***********************************************************************
 // Fills the references list by all references of the feature from the references map.
 // This is a recusive method to find references by next found feature in the map of references.
 // \param theFeature a feature to find references

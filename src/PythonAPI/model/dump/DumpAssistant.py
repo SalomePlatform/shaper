@@ -72,6 +72,11 @@ class DumpAssistant(ModelHighAPI.ModelHighAPI_Dumper):
             # In case of theFeature is not a constraint, it will not be dumped.
             self.myFeatures[SketchAPI.SketchAPI_Constraint.ID()](theFeature).dump(self)
 
+    ## Create wrapper for a folder and dump it
+    def dumpFolder(self, theFolder):
+        if theFolder.ID() in self.myFeatures:
+            self.myFeatures[theFolder.ID()](theFolder).dump(self)
+
     ## Dump all parameters
     def dumpParameter(self, theFeature):
         aFeatureKind = theFeature.getKind()

@@ -46,6 +46,7 @@
 #include <ModelAPI_Document.h>
 #include <ModelAPI_Entity.h>
 #include <ModelAPI_Feature.h>
+#include <ModelAPI_Folder.h>
 #include <ModelAPI_Result.h>
 #include <ModelAPI_ResultBody.h>
 #include <ModelAPI_ResultCompSolid.h>
@@ -124,14 +125,27 @@ const std::string& ModelHighAPI_Dumper::name(const EntityPtr& theEntity,
     return aFound->second.myCurrentName;
 
   // entity is not found, store it
-  std::string aName;
+  std::string aName, aKind;
   bool isDefaultName = false;
+  bool isSaveNotDumped = theSaveNotDumped;
   std::ostringstream aDefaultName;
   FeaturePtr aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(theEntity);
   if (aFeature) {
     aName = aFeature->name();
-    const std::string& aKind = aFeature->getKind();
-    DocumentPtr aDoc = aFeature->document();
+    aKind = aFeature->getKind();
+  } else {
+    FolderPtr aFolder = std::dynamic_pointer_cast<ModelAPI_Folder>(theEntity);
+    if (aFolder) {
+      aName = aFolder->data()->name();
+      aKind = ModelAPI_Folder::ID();
+      isSaveNotDumped = false;
+      myNotDumpedFolders.insert(aFolder);
+    }
+  }
+
+  ObjectPtr anObject = std::dynamic_pointer_cast<ModelAPI_Object>(theEntity);
+  if (anObject) {
+    DocumentPtr aDoc = anObject->document();
     int& aNbFeatures = myFeatureCount[aDoc][aKind];
     aNbFeatures += 1;
 
@@ -164,7 +178,7 @@ const std::string& ModelHighAPI_Dumper::name(const EntityPtr& theEntity,
   }
 
   myNames[theEntity] = EntityName(aDefaultName.str(), aName, isDefaultName);
-  if (theSaveNotDumped)
+  if (isSaveNotDumped)
     myNotDumpedEntities.insert(theEntity);
 
   // store names of results
@@ -238,18 +252,30 @@ bool ModelHighAPI_Dumper::process(const std::shared_ptr<ModelAPI_Document>& theD
 bool ModelHighAPI_Dumper::process(const std::shared_ptr<ModelAPI_Document>& theDoc)
 {
   bool isOk = true;
-  std::list<FeaturePtr> aFeatures = theDoc->allFeatures();
-  std::list<FeaturePtr>::const_iterator aFeatIt = aFeatures.begin();
+  std::list<ObjectPtr> anObjects = theDoc->allObjects();
+  std::list<ObjectPtr>::const_iterator anObjIt = anObjects.begin();
   // firstly, dump all parameters
-  for (; aFeatIt != aFeatures.end(); ++ aFeatIt)
-    dumpParameter(*aFeatIt);
+  for (; anObjIt != anObjects.end(); ++ anObjIt) {
+    FeaturePtr aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(*anObjIt);
+    if (aFeature)
+      dumpParameter(aFeature);
+  }
   // dump all other features
-  for (aFeatIt = aFeatures.begin(); aFeatIt != aFeatures.end(); ++aFeatIt) {
-    CompositeFeaturePtr aCompFeat = std::dynamic_pointer_cast<ModelAPI_CompositeFeature>(*aFeatIt);
+  for (anObjIt = anObjects.begin(); anObjIt != anObjects.end(); ++anObjIt) {
+    CompositeFeaturePtr aCompFeat = std::dynamic_pointer_cast<ModelAPI_CompositeFeature>(*anObjIt);
     if (aCompFeat) // iteratively process composite features
       isOk = process(aCompFeat) && isOk;
-    else if (!isDumped(*aFeatIt)) // dump common feature
-      dumpFeature(*aFeatIt);
+    else if (!isDumped(*anObjIt)) {
+      // dump folder
+      FolderPtr aFolder = std::dynamic_pointer_cast<ModelAPI_Folder>(*anObjIt);
+      if (aFolder)
+        dumpFolder(aFolder);
+      else {
+        FeaturePtr aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(*anObjIt);
+        if (aFeature) // dump common feature
+          dumpFeature(aFeature);
+      }
+    }
   }
   return isOk;
 }
@@ -335,7 +361,18 @@ bool ModelHighAPI_Dumper::processSubs(
   // dump "setName" for composite feature
   if (isDumpSetName)
     dumpEntitySetName();
+  // dump folders if any
+  dumpFolders();
   return isOk;
+}
+
+void ModelHighAPI_Dumper::dumpFolders()
+{
+  std::set<FolderPtr>::const_iterator aFolderIt = myNotDumpedFolders.begin();
+  while (aFolderIt != myNotDumpedFolders.end()) {
+    FolderPtr aFolder = *aFolderIt++;
+    dumpFolder(aFolder);
+  }
 }
 
 void ModelHighAPI_Dumper::dumpSubFeatureNameAndColor(const std::string theSubFeatureGet,
@@ -472,7 +509,8 @@ bool ModelHighAPI_Dumper::isDumped(const EntityPtr& theEntity) const
 {
   EntityNameMap::const_iterator aFound = myNames.find(theEntity);
   FeaturePtr aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(theEntity);
-  return aFound != myNames.end() || myFeaturesToSkip.find(aFeature) != myFeaturesToSkip.end();
+  return (aFound != myNames.end() && aFound->second.myIsDumped) ||
+         myFeaturesToSkip.find(aFeature) != myFeaturesToSkip.end();
 }
 
 bool ModelHighAPI_Dumper::isDefaultColor(const ResultPtr& theResult) const
@@ -656,6 +694,13 @@ ModelHighAPI_Dumper& ModelHighAPI_Dumper::operator<<(
     const std::shared_ptr<ModelAPI_AttributeString>& theAttrStr)
 {
   myDumpBuffer << "\"" << theAttrStr->value() << "\"";
+  return *this;
+}
+
+ModelHighAPI_Dumper& ModelHighAPI_Dumper::operator<<(const FolderPtr& theFolder)
+{
+  myDumpBuffer << name(theFolder);
+  myNotDumpedFolders.erase(theFolder);
   return *this;
 }
 
@@ -985,6 +1030,9 @@ ModelHighAPI_Dumper& operator<<(ModelHighAPI_Dumper& theDumper,
     aBufCopy.erase(anInd, 1);
   // then store currently dumped string
   theDumper.myFullDump << aBufCopy;
+
+  // now, store all not dumped folders
+  theDumper.dumpFolders();
 
   return theDumper;
 }

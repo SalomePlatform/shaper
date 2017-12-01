@@ -26,6 +26,7 @@
 
 #include <ModelAPI_Attribute.h>
 #include <ModelAPI_Feature.h>
+#include <ModelAPI_Folder.h>
 
 #include <TopAbs_ShapeEnum.hxx>
 #include <TopoDS_Shape.hxx>
@@ -176,9 +177,10 @@ MODULEBASE_EXPORT bool isSubResult(ObjectPtr theObject);
 /// \param hasParameter will be set to true if list contains Parameter objects
 /// \param hasCompositeOwner will be set to true if list contains Sub-Feature objects
 /// \param hasResultInHistory will be set to true if one of result is in history
+/// \param hasFolder will be set to true if one of folder is in the list
 MODULEBASE_EXPORT void checkObjects(const QObjectPtrList& theObjects, bool& hasResult,
                            bool& hasFeature, bool& hasParameter, bool& hasCompositeOwner,
-                           bool& hasResultInHistory);
+                           bool& hasResultInHistory, bool& hasFolder);
 
 /// Sets the default coeffient into the driver calculated accordingly the shape type.
 /// It provides 1.e-4 for results of construction type
@@ -329,6 +331,13 @@ bool MODULEBASE_EXPORT askToDelete(const std::set<FeaturePtr> aFeatures,
 /// \param theFeatures an out conteiner of features
 void MODULEBASE_EXPORT convertToFeatures(const QObjectPtrList& theObjects,
                                          std::set<FeaturePtr>& theFeatures);
+
+
+/// Converts a list of objects to set of folders.
+/// \param theObjects a list of objects
+/// \param theFeatures an out conteiner of features
+void MODULEBASE_EXPORT convertToFolders(const QObjectPtrList& theObjects,
+                                         std::set<FolderPtr>& theFolders);
 
 
 /// Returns translation from the given data.

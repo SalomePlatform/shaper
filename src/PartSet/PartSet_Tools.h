@@ -256,7 +256,7 @@ public:
     std::set<AttributePtr>::const_iterator anIt;
     for (anIt = aRefsList.cbegin(); anIt != aRefsList.cend(); ++anIt) {
       FeaturePtr aRefFeature = std::dynamic_pointer_cast<ModelAPI_Feature>((*anIt)->owner());
-      if (aRefFeature->getKind() == theFeatureId)
+      if (aRefFeature && aRefFeature->getKind() == theFeatureId)
         return aRefFeature;
     }
     return FeaturePtr();

@@ -24,6 +24,7 @@
 #include <Model.h>
 #include <ModelAPI_Document.h>
 #include <ModelAPI_Feature.h>
+#include <ModelAPI_Folder.h>
 #include <ModelAPI_Result.h>
 #include <ModelAPI_ResultParameter.h>
 
@@ -90,16 +91,23 @@ class Model_Objects
 
   //! Returns the object index in the group. Object must be visible. Otherwise returns -1.
   //! \param theObject object of this document
+  //! \param theAllowFolder take into account grouping feature by folders
   //! \returns index started from zero, or -1 if object is invisible or belongs to another document
-  const int index(std::shared_ptr<ModelAPI_Object> theObject);
+  const int index(std::shared_ptr<ModelAPI_Object> theObject,
+                  const bool theAllowFolder = false);
 
   //! Returns the feature in the group by the index (started from zero)
   //! \param theGroupID group that contains a feature
   //! \param theIndex zero-based index of feature in the group
-  ObjectPtr object(const std::string& theGroupID, const int theIndex);
+  //! \param theAllowFolder take into account grouping feature by folders
+  ObjectPtr object(const std::string& theGroupID,
+                   const int theIndex,
+                   const bool theAllowFolder = false);
 
   //! Returns the number of features in the group
-  int size(const std::string& theGroupID);
+  //! \param theGroupID group of objects
+  //! \param theAllowFolder take into account grouping feature by folders
+  int size(const std::string& theGroupID, const bool theAllowFolder = false);
 
   //! Returns all (and disabled) results of the given type.
   //! Not fast method (iterates all features).
@@ -141,6 +149,41 @@ class Model_Objects
   std::shared_ptr<ModelAPI_Feature>
     feature(const std::shared_ptr<ModelAPI_Result>& theResult);
 
+  /// Creates a folder (group of the features in the object browser)
+  std::shared_ptr<ModelAPI_Folder> createFolder(
+      const std::shared_ptr<ModelAPI_Feature>& theBeforeThis);
+  //! Removes the folder from the document (all features in the folder will be kept).
+  void removeFolder(std::shared_ptr<ModelAPI_Folder> theFolder);
+  //! Search a folder applicable for the list of features
+  //! (it means the list of features stored in the folder should be consequential)
+  //! \param theFeatures list of features to be added to folder
+  //! \param theBelow    search the folder below the features (if \c false, search above)
+  //! \return Empty pointer if there is no applicable folder
+  std::shared_ptr<ModelAPI_Folder> findFolder(
+      const std::list<std::shared_ptr<ModelAPI_Feature> >& theFeatures,
+      const bool theBelow);
+  //! Search a folder containing the given feature.
+  //! Addtionally calculates a zero-based index of the feature in this folder.
+  //! \param theFeature feature to search
+  //! \param theIndexInFolder zero-based index in the folder or -1 if the feature is top-level.
+  //! \return the folder containing the feature or empty pointer if the feature is top-level.
+  std::shared_ptr<ModelAPI_Folder> findContainingFolder(
+      const std::shared_ptr<ModelAPI_Feature>& theFeature,
+      int& theIndexInFolder);
+  //! Add a list of features to the folder. The correctness of the adding is not performed
+  //! (such checks have been done in corresponding find.. method).
+  //! \return \c true if the movement is successfull
+  bool moveToFolder(const std::list<std::shared_ptr<ModelAPI_Feature> >& theFeatures,
+                    const std::shared_ptr<ModelAPI_Folder>& theFolder);
+  //! Remove features from the folder
+  //! \param theFeatures list of features to be removed
+  //! \param theBefore   extract features before the folder (this parameter is applicable only
+  //!                    when all features in the folder are taking out,
+  //!                    in other cases the direction is taken automatically)
+  //! \return \c true if the features have been moved out
+  bool removeFromFolder(const std::list<std::shared_ptr<ModelAPI_Feature> >& theFeatures,
+                        const bool theBefore = true);
+
   //! Sets the owner of this manager
   void setOwner(DocumentPtr theDoc);
 
@@ -158,6 +201,9 @@ class Model_Objects
   //! Initializes feature with a unique name in this group (unique name is generated as
   //! feature type + "_" + index
   void setUniqueName(FeaturePtr theFeature);
+
+  //! Initializes the foldet with an unique name ("Folder_" + index)
+  void setUniqueName(FolderPtr theFolder);
 
   //! Synchronizes myFeatures list with the updated document
   //! \param theUpdated list of labels that are marked as modified, so featrues must be also
@@ -214,6 +260,11 @@ class Model_Objects
   /// Returns true if theLater is in history of features creation later than theCurrent
   bool isLater(FeaturePtr theLater, FeaturePtr theCurrent) const;
 
+  /// Returns the next or previous label
+  /// \param theCurrent given label
+  /// \param theReverse if it is true, iterates in reverced order (next becomes previous)
+  TDF_Label nextLabel(TDF_Label theCurrent, const bool theReverse = false);
+
   /// Returns the result group identifier of the given feature (for this at least one result must
   /// be created before)
   std::string featureResultGroup(FeaturePtr theFeature);
@@ -221,6 +272,10 @@ class Model_Objects
   //! Returns all features of the document including the hidden features which are not in
   //! history. Not very fast method, for calling once, not in big cycles.
   std::list<std::shared_ptr<ModelAPI_Feature> > allFeatures();
+
+  //! Returns all objects of the document including the hidden features which are not in
+  //! history. Not very fast method, for calling once, not in big cycles.
+  std::list<std::shared_ptr<ModelAPI_Object> > allObjects();
 
   //! synchronises back references for the given object basing on the collected data
   void synchronizeBackRefsForObject(
@@ -236,6 +291,9 @@ class Model_Objects
                      int theResultIndex,
                      std::string& theParentName) const;
 
+  /// Return object representing a folder or empty pointer
+  ObjectPtr folder(TDF_Label theLabel) const;
+
  private:
   TDF_Label myMain; ///< main label of the data storage
 
@@ -244,6 +302,9 @@ class Model_Objects
   /// All managed features (not only in history of OB)
   /// For optimization mapped by labels
   NCollection_DataMap<TDF_Label, FeaturePtr> myFeatures;
+
+  /// Managed folders
+  NCollection_DataMap<TDF_Label, ObjectPtr> myFolders;
 
   /// Map from group id to the array that contains all objects located in history.
   /// Each array is updated by demand from scratch, by browing all the features in the history.

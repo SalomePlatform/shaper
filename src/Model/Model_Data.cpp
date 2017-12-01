@@ -468,9 +468,9 @@ void Model_Data::eraseBackReferences()
     aRes->setIsConcealed(false);
 }
 
-void Model_Data::removeBackReference(FeaturePtr theFeature, std::string theAttrID)
+void Model_Data::removeBackReference(ObjectPtr theObject, std::string theAttrID)
 {
-  AttributePtr anAttribute = theFeature->data()->attribute(theAttrID);
+  AttributePtr anAttribute = theObject->data()->attribute(theAttrID);
   removeBackReference(anAttribute);
 }
 
@@ -492,10 +492,7 @@ void Model_Data::removeBackReference(AttributePtr theAttr)
 void Model_Data::addBackReference(FeaturePtr theFeature, std::string theAttrID,
    const bool theApplyConcealment)
 {
-  // it is possible to add the same attribute twice: may be last time the owner was not Stable...
-  AttributePtr anAttribute = theFeature->data()->attribute(theAttrID);
-  if (myRefsToMe.find(anAttribute) == myRefsToMe.end())
-    myRefsToMe.insert(theFeature->data()->attribute(theAttrID));
+  addBackReference(ObjectPtr(theFeature), theAttrID);
 
   if (theApplyConcealment &&  theFeature->isStable() &&
       ModelAPI_Session::get()->validators()->isConcealed(theFeature->getKind(), theAttrID)) {
@@ -508,6 +505,14 @@ void Model_Data::addBackReference(FeaturePtr theFeature, std::string theAttrID,
       aRes->setIsConcealed(true);
     }
   }
+}
+
+void Model_Data::addBackReference(ObjectPtr theObject, std::string theAttrID)
+{
+  // it is possible to add the same attribute twice: may be last time the owner was not Stable...
+  AttributePtr anAttribute = theObject->data()->attribute(theAttrID);
+  if (myRefsToMe.find(anAttribute) == myRefsToMe.end())
+    myRefsToMe.insert(anAttribute);
 }
 
 void Model_Data::updateConcealmentFlag()

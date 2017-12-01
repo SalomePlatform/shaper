@@ -448,6 +448,15 @@ private:
   /// Display results from a group
   void displayGroupResults(DocumentPtr theDoc, std::string theGroup);
 
+  /// Insert folder object before currently selected feature
+  void insertFeatureFolder();
+
+  /// Insert an object to a folder above or below
+  void insertToFolder(bool isBefore);
+
+  /// Insert an object to a folder above or below
+  void moveOutFolder(bool isBefore);
+
  private slots:
   /// SLOT, that is called after the operation is started. Update workshop state according to
   /// the started operation, e.g. visualizes the property panel and connect to it.

@@ -1452,6 +1452,16 @@ void XGUI_Workshop::onContextMenuCommand(const QString& theId, bool isChecked)
     setViewerSelectionMode(TopAbs_EDGE);
   } else if (theId == "SELECT_FACE_CMD") {
     setViewerSelectionMode(TopAbs_FACE);
+  } else if (theId == "INSERT_FOLDER_CMD") {
+    insertFeatureFolder();
+  } else if (theId == "ADD_TO_FOLDER_BEFORE_CMD") {
+    insertToFolder(true);
+  } else if (theId == "ADD_TO_FOLDER_AFTER_CMD") {
+    insertToFolder(false);
+  } else if (theId == "ADD_OUT_FOLDER_BEFORE_CMD") {
+    moveOutFolder(true);
+  } else if (theId == "ADD_OUT_FOLDER_AFTER_CMD") {
+    moveOutFolder(false);
   } else if (theId == "SELECT_RESULT_CMD") {
     //setViewerSelectionMode(-1);
     //IMP: an attempt to use result selection with other selection modes
@@ -1546,9 +1556,10 @@ void XGUI_Workshop::deleteObjects()
   bool hasParameter = false;
   bool hasCompositeOwner = false;
   bool hasResultInHistory = false;
+  bool hasFolder = false;
   ModuleBase_Tools::checkObjects(anObjects, hasResult, hasFeature, hasParameter, hasCompositeOwner,
-                                 hasResultInHistory);
-  if (!(hasFeature || hasParameter))
+                                 hasResultInHistory, hasFolder);
+  if (!(hasFeature || hasParameter || hasFolder))
     return;
 
   // delete objects
@@ -1556,6 +1567,9 @@ void XGUI_Workshop::deleteObjects()
   std::set<FeaturePtr> aFeatures;
   ModuleBase_Tools::convertToFeatures(anObjects, aFeatures);
   ModelAPI_Tools::findAllReferences(aFeatures, aReferences);
+
+  std::set<FolderPtr> aFolders;
+  ModuleBase_Tools::convertToFolders(anObjects, aFolders);
 
   bool aDone = false;
   QString aDescription = contextMenuMgr()->action("DELETE_CMD")->text() + " %1";
@@ -1575,6 +1589,18 @@ void XGUI_Workshop::deleteObjects()
       aFeatures.insert(aFeatureRefsToDelete.begin(), aFeatureRefsToDelete.end());
     aDone = ModelAPI_Tools::removeFeatures(aFeatures, false);
   }
+  if (aFolders.size() > 0) {
+    std::set<FolderPtr>::const_iterator anIt = aFolders.begin(),
+                                         aLast = aFolders.end();
+    for (; anIt != aLast; anIt++) {
+      FolderPtr aFolder = *anIt;
+      if (aFolder.get()) {
+        DocumentPtr aDoc = aFolder->document();
+        aDoc->removeFolder(aFolder);
+      }
+    }
+  }
+
   if (aDone)
     operationMgr()->commitOperation();
   else
@@ -2464,4 +2490,55 @@ void XGUI_Workshop::highlightFeature(const QObjectPtrList& theObjects)
     objectBrowser()->setObjectsSelected(aSelList);
     objectBrowser()->blockSignals(aBlocked);
   }
+}
+
+void XGUI_Workshop::insertFeatureFolder()
+{
+  QObjectPtrList aObjects = mySelector->selection()->selectedObjects();
+  if (aObjects.isEmpty())
+    return;
+  ObjectPtr aObj = aObjects.first();
+  FeaturePtr aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(aObj);
+  if (aFeature.get() == NULL)
+    return;
+  SessionPtr aMgr = ModelAPI_Session::get();
+  DocumentPtr aDoc = aMgr->activeDocument();
+
+  aMgr->startOperation();
+  aDoc->addFolder(aFeature);
+  aMgr->finishOperation();
+}
+
+
+void XGUI_Workshop::insertToFolder(bool isBefore)
+{
+  std::list<FeaturePtr> aFeatures = mySelector->getSelectedFeatures();
+  if (aFeatures.empty())
+    return;
+
+  SessionPtr aMgr = ModelAPI_Session::get();
+  DocumentPtr aDoc = aMgr->activeDocument();
+
+  FolderPtr aFolder = isBefore? aDoc->findFolderAbove(aFeatures):
+                                aDoc->findFolderBelow(aFeatures);
+  if (!aFolder.get())
+    return;
+
+  aMgr->startOperation();
+  aDoc->moveToFolder(aFeatures, aFolder);
+  aMgr->finishOperation();
+}
+
+void XGUI_Workshop::moveOutFolder(bool isBefore)
+{
+  std::list<FeaturePtr> aFeatures = mySelector->getSelectedFeatures();
+  if (aFeatures.empty())
+    return;
+
+  SessionPtr aMgr = ModelAPI_Session::get();
+  DocumentPtr aDoc = aMgr->activeDocument();
+
+  aMgr->startOperation();
+  aDoc->removeFromFolder(aFeatures, isBefore);
+  aMgr->finishOperation();
 }

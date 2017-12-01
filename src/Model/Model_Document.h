@@ -122,8 +122,10 @@ class Model_Document : public ModelAPI_Document
 
   //! Returns the object index in the group. Object must be visible. Otherwise returns -1.
   //! \param theObject object of this document
+  //! \param theAllowFolder take into account grouping feature by folders
   //! \returns index started from zero, or -1 if object is invisible or belongs to another document
-  MODEL_EXPORT virtual const int index(std::shared_ptr<ModelAPI_Object> theObject);
+  MODEL_EXPORT virtual const int index(std::shared_ptr<ModelAPI_Object> theObject,
+                                       const bool theAllowFolder = false);
 
   //! Internal sub-document by ID
   MODEL_EXPORT virtual std::shared_ptr<Model_Document> subDoc(int theDocID);
@@ -137,10 +139,15 @@ class Model_Document : public ModelAPI_Document
   //! Returns the feature in the group by the index (started from zero)
   //! \param theGroupID group that contains a feature
   //! \param theIndex zero-based index of feature in the group
-  MODEL_EXPORT virtual ObjectPtr object(const std::string& theGroupID, const int theIndex);
+  //! \param theAllowFolder take into account grouping feature by folders
+  MODEL_EXPORT virtual ObjectPtr object(const std::string& theGroupID,
+                                        const int theIndex,
+                                        const bool theAllowFolder = false);
 
   //! Returns the number of features in the group
-  MODEL_EXPORT virtual int size(const std::string& theGroupID);
+  //! \param theGroupID group of objects
+  //! \param theAllowFolder take into account grouping feature by folders
+  MODEL_EXPORT virtual int size(const std::string& theGroupID, const bool theAllowFolder = false);
 
   //! Returns the feature that is currently edited in this document, normally
   //! this is the latest created feature
@@ -199,6 +206,47 @@ class Model_Document : public ModelAPI_Document
   MODEL_EXPORT virtual std::shared_ptr<ModelAPI_Feature>
     feature(const std::shared_ptr<ModelAPI_Result>& theResult);
 
+  //! Creates a folder (group of the features in the object browser)
+  //! \param theAddBefore a feature, the folder is added before
+  //!                     (if empty, the folder is added after the last feature)
+  MODEL_EXPORT virtual std::shared_ptr<ModelAPI_Folder> addFolder(
+      std::shared_ptr<ModelAPI_Feature> theAddBefore = std::shared_ptr<ModelAPI_Feature>());
+  //! Removes the folder from the document (all features in the folder will be kept).
+  MODEL_EXPORT virtual void removeFolder(std::shared_ptr<ModelAPI_Folder> theFolder);
+  //! Search a folder above the list of features applicable to store them
+  //! (it means the list of features stored in the folder should be consequential)
+  //! \return Empty pointer if there is no applicable folder
+  MODEL_EXPORT virtual std::shared_ptr<ModelAPI_Folder> findFolderAbove(
+      const std::list<std::shared_ptr<ModelAPI_Feature> >& theFeatures);
+  //! Search a folder below the list of features applicable to store them
+  //! (it means the list of features stored in the folder should be consequential)
+  //! \return Empty pointer if there is no applicable folder
+  MODEL_EXPORT virtual std::shared_ptr<ModelAPI_Folder> findFolderBelow(
+      const std::list<std::shared_ptr<ModelAPI_Feature> >& theFeatures);
+  //! Search a folder containing the given feature.
+  //! Addtionally calculates a zero-based index of the feature in this folder.
+  //! \param theFeature feature to search
+  //! \param theIndexInFolder zero-based index in the folder or -1 if the feature is top-level.
+  //! \return the folder containing the feature or empty pointer if the feature is top-level.
+  MODEL_EXPORT virtual std::shared_ptr<ModelAPI_Folder> findContainingFolder(
+      const std::shared_ptr<ModelAPI_Feature>& theFeature,
+      int& theIndexInFolder);
+  //! Add a list of features to the folder. The correctness of the adding is not performed
+  //! (such checks have been done in corresponding find.. method).
+  //! \return \c true if the movement is successfull
+  MODEL_EXPORT virtual bool moveToFolder(
+      const std::list<std::shared_ptr<ModelAPI_Feature> >& theFeatures,
+      const std::shared_ptr<ModelAPI_Folder>& theFolder);
+  //! Remove features from the folder
+  //! \param theFeatures list of features to be removed
+  //! \param theBefore   extract features before the folder (this parameter is applicable only
+  //!                    when all features in the folder are taking out,
+  //!                    in other cases the direction is taken automatically)
+  //! \return \c true if the features have been moved out
+  MODEL_EXPORT virtual bool removeFromFolder(
+      const std::list<std::shared_ptr<ModelAPI_Feature> >& theFeatures,
+      const bool theBefore = true);
+
   ///! Returns true if parametric updater need to execute feature on recomputartion
   ///! On abort, undo or redo it is not necessary: results in document are updated automatically
   bool executeFeatures() {return myExecuteFeatures;}
@@ -223,6 +271,10 @@ class Model_Document : public ModelAPI_Document
   ///! Returns all features of the document including the hidden features which are not in
   ///! history. Not very fast method, for calling once, not in big cycles.
   MODEL_EXPORT virtual std::list<std::shared_ptr<ModelAPI_Feature> > allFeatures();
+
+  //! Returns all objects of the document including the hidden features which are not in
+  //! history. Not very fast method, for calling once, not in big cycles.
+  MODEL_EXPORT virtual std::list<std::shared_ptr<ModelAPI_Object> > allObjects();
 
   /// Returns the global identifier of the current transaction (needed for the update algo)
   MODEL_EXPORT virtual int transactionID();

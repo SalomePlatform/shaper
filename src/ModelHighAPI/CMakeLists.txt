@@ -33,6 +33,7 @@ SET(PROJECT_HEADERS
   ModelHighAPI_Services.h
   ModelHighAPI_Tools.h
   ModelHighAPI_FeatureStore.h
+  ModelHighAPI_Folder.h
 )
 
 SET(PROJECT_SOURCES
@@ -46,6 +47,7 @@ SET(PROJECT_SOURCES
   ModelHighAPI_Services.cpp
   ModelHighAPI_Tools.cpp
   ModelHighAPI_FeatureStore.cpp
+  ModelHighAPI_Folder.cpp
 )
 
 SET(PROJECT_LIBRARIES

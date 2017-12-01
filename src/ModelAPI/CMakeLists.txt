@@ -51,6 +51,7 @@ SET(PROJECT_HEADERS
     ModelAPI_Expression.h
     ModelAPI_Feature.h
     ModelAPI_FeatureValidator.h
+    ModelAPI_Folder.h
     ModelAPI_IReentrant.h
     ModelAPI_Object.h
     ModelAPI_Plugin.h
@@ -94,6 +95,7 @@ SET(PROJECT_SOURCES
     ModelAPI_Expression.cpp
     ModelAPI_Feature.cpp
     ModelAPI_FeatureValidator.cpp
+    ModelAPI_Folder.cpp
     ModelAPI_IReentrant.cpp
     ModelAPI_Object.cpp
     ModelAPI_Plugin.cpp
@@ -187,4 +189,8 @@ ADD_UNIT_TESTS(TestConstants.py
                TestCustomName_Rename.py
                TestCustomName_RotateGroup.py
                TestCustomName_Translation.py
+               TestFolder_Create.py
+               TestFolder_Update.py
+               TestFolder_Remove.py
+               TestFolder_Stability.py
 )

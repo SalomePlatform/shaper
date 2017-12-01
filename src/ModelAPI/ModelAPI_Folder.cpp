@@ -18,24 +18,28 @@
 // email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com>
 //
 
-#ifndef SRC_MODELHIGHAPI_MODELHIGHAPI_SWIG_H_
-#define SRC_MODELHIGHAPI_MODELHIGHAPI_SWIG_H_
+#include "ModelAPI_Folder.h"
 
-  #include <GeomAPI_swig.h>
-  #include <ModelAPI_swig.h>
-  #include <GeomDataAPI_swig.h>
+#include <ModelAPI_AttributeReference.h>
 
-  #include "ModelHighAPI.h"
-  #include "ModelHighAPI_Double.h"
-  #include "ModelHighAPI_Dumper.h"
-  #include "ModelHighAPI_Folder.h"
-  #include "ModelHighAPI_Integer.h"
-  #include "ModelHighAPI_Interface.h"
-  #include "ModelHighAPI_Macro.h"
-  #include "ModelHighAPI_RefAttr.h"
-  #include "ModelHighAPI_Reference.h"
-  #include "ModelHighAPI_Selection.h"
-  #include "ModelHighAPI_Services.h"
-  #include "ModelHighAPI_Tools.h"
+ModelAPI_Folder::ModelAPI_Folder()
+{
+}
 
-#endif /* SRC_MODELHIGHAPI_MODELHIGHAPI_SWIG_H_ */
+ModelAPI_Folder::~ModelAPI_Folder()
+{
+}
+
+void ModelAPI_Folder::init()
+{
+}
+
+void ModelAPI_Folder::initAttributes()
+{
+  data()->addAttribute(FIRST_FEATURE_ID(), ModelAPI_AttributeReference::typeId());
+  data()->addAttribute(LAST_FEATURE_ID(),  ModelAPI_AttributeReference::typeId());
+}
+
+void ModelAPI_Folder::execute()
+{
+}
