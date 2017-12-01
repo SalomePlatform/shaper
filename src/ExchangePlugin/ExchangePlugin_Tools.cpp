@@ -34,13 +34,15 @@ std::list<std::string> ExchangePlugin_Tools::split(const std::string& theString,
 
 std::string ExchangePlugin_Tools::selectionType2xaoDimension(const std::string& theType)
 {
-  if (theType == "Vertices" || theType == "vertex")
+  // if the selection is done in the GUI, the type is lower case
+  // if the selection is done in python, the type is in upper case
+  if (theType == "Vertices" || theType == "vertex" || theType == "VERTEX")
     return "vertex";
-  else if (theType == "Edges" || theType == "edge")
+  else if (theType == "Edges" || theType == "edge" || theType == "EDGE")
     return "edge";
-  else if (theType == "Faces" || theType == "face")
+  else if (theType == "Faces" || theType == "face" || theType == "FACE")
     return "face";
-  else if (theType == "Solids" || theType == "solid")
+  else if (theType == "Solids" || theType == "solid" || theType == "SOLID")
     return "solid";
   else if (theType == "Part" || theType == "part")
     return "part";
