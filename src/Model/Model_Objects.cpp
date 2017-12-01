@@ -1351,6 +1351,26 @@ static FeaturePtr limitingFeature(std::list<FeaturePtr>& theFeatures, const bool
   return aFeature;
 }
 
+// Obtain index of last sub-feature in the composite feature.
+// Parameter theIndex is an index of theComposite feature in theReferences list.
+static void lastIndexOfComposite(Model_Objects* theObjectsEnt,
+                                 const FeaturePtr& theComposite,
+                                 const Handle(TDataStd_ReferenceArray)& theReferences,
+                                 int& theIndex)
+{
+  CompositeFeaturePtr aComposite =
+      std::dynamic_pointer_cast<ModelAPI_CompositeFeature>(theComposite);
+  if (!aComposite)
+    return;
+
+  for (; theIndex < theReferences->Upper(); ++theIndex) {
+    TDF_Label aNextLab = theReferences->Value(theIndex + 1);
+    ObjectPtr aNextObj = theObjectsEnt->object(aNextLab);
+    if (!aComposite->isSub(aNextObj))
+      break;
+  }
+}
+
 std::shared_ptr<ModelAPI_Folder> Model_Objects::findFolder(
       const std::list<std::shared_ptr<ModelAPI_Feature> >& theFeatures,
       const bool theBelow)
@@ -1363,9 +1383,9 @@ std::shared_ptr<ModelAPI_Folder> Model_Objects::findFolder(
   if (!aFeaturesLab.FindAttribute(TDataStd_ReferenceArray::GetID(), aRefs))
     return FolderPtr(); // no reference array (something is wrong)
 
+  // obtain first or last feature of the list according to the direction where to search a folder
   std::list<std::shared_ptr<ModelAPI_Feature> > aFeatures = theFeatures;
   std::shared_ptr<ModelAPI_Feature> aLimitingFeature = limitingFeature(aFeatures, theBelow);
-
   std::shared_ptr<Model_Data> aData =
       std::static_pointer_cast<Model_Data>(aLimitingFeature->data());
   if (!aData || !aData->isValid())
@@ -1374,8 +1394,11 @@ std::shared_ptr<ModelAPI_Folder> Model_Objects::findFolder(
   // label of the first feature in the list for fast searching
   TDF_Label aFirstFeatureLabel = aData->label().Father();
 
-  // find a folder above the features and
-  // check the given features represent a sequential list of objects following the folder
+  // Search applicable folder (above or below the list of features):
+  // [above] - find in the list of references the last folder
+  //           before the first feature from the list;
+  // [below] - skip all references until last feature in the list is found,
+  //           then check the next reference is a folder.
   FolderPtr aFoundFolder;
   TDF_Label aLastFeatureInFolder;
   int aRefIndex = aRefs->Lower();
@@ -1388,6 +1411,7 @@ std::shared_ptr<ModelAPI_Folder> Model_Objects::findFolder(
     if (theBelow)
       continue;
 
+    // skip features in the current folder
     if (!aLastFeatureInFolder.IsNull()) {
       if (IsEqual(aCurLabel, aLastFeatureInFolder))
         aLastFeatureInFolder.Nullify(); // the last feature in the folder is achived
@@ -1410,10 +1434,18 @@ std::shared_ptr<ModelAPI_Folder> Model_Objects::findFolder(
     }
   }
 
+  // Skip all features in the composite until the last feature is not reached.
+  // Keep the index, due to aLimitingFeature may be composite, thus aRefIndex
+  // will be set to the last sub. But if we search a folder below the features,
+  // we do not want to obtain index current composite feature once again.
+  int anIndexCopy = aRefIndex;
+  lastIndexOfComposite(this, aLimitingFeature, aRefs, aRefIndex);
+
   if (theBelow && aRefIndex < aRefs->Upper()) {
     // check the next object is a folder
     TDF_Label aLabel = aRefs->Value(aRefIndex + 1);
     aFoundFolder = std::dynamic_pointer_cast<ModelAPI_Folder>(folder(aLabel));
+    aRefIndex = anIndexCopy; // restore index of parent composite
   }
 
   if (!aLastFeatureInFolder.IsNull() || // the last feature of the folder above is not found
@@ -1433,6 +1465,21 @@ std::shared_ptr<ModelAPI_Folder> Model_Objects::findFolder(
     if (aData && aData->isValid())
       aFeatureLabel = aData->label().Father();
 
+    if (theBelow) {
+      // find index of parent composite feature
+      FeaturePtr aComposite = ModelAPI_Tools::compositeOwner(feature(aCurLabel));
+      if (aComposite) {
+        aData = std::static_pointer_cast<Model_Data>(aComposite->data());
+        if (aData && aData->isValid())
+          aCurLabel = aData->label().Father();
+        while (aRefs->Value(aRefIndex) != aCurLabel)
+          --aRefIndex;
+      }
+    } else {
+      // skip all features in the composite until the last feature is not reached
+      lastIndexOfComposite(this, aLimitingFeature, aRefs, aRefIndex);
+    }
+
     if (!IsEqual(aCurLabel, aFeatureLabel))
       return FolderPtr(); // not a sequential list
   }
@@ -1448,11 +1495,17 @@ bool Model_Objects::moveToFolder(
     return false;
 
   // labels for the folder and last feature in the list
+  // (if the last feature is composite, obtain label of the last sub-feature)
   TDF_Label aFolderLabel, aLastFeatureLabel;
   std::shared_ptr<Model_Data> aData =
       std::static_pointer_cast<Model_Data>(theFolder->data());
   if (aData && aData->isValid())
     aFolderLabel = aData->label().Father();
+  FeaturePtr aLastFeature = theFeatures.back();
+  CompositeFeaturePtr aComposite =
+      std::dynamic_pointer_cast<ModelAPI_CompositeFeature>(aLastFeature);
+  if (aComposite)
+    aLastFeature = aComposite->subFeature(aComposite->numberOfSubs() - 1);
   aData = std::static_pointer_cast<Model_Data>(theFeatures.back()->data());
   if (aData && aData->isValid())
     aLastFeatureLabel = aData->label().Father();
@@ -1576,7 +1629,16 @@ bool Model_Objects::removeFromFolder(
     aFolderEndFeature   = aFoundFolder->reference(ModelAPI_Folder::LAST_FEATURE_ID())->value();
   }
 
-  FeaturePtr aFeatureToFind = isExtractBeforeFolder ? theFeatures.back() : theFeatures.front();
+  FeaturePtr aFeatureToFind;
+  if (isExtractBeforeFolder) {
+    aFeatureToFind = theFeatures.back();
+    // if the last feature is composite, obtain its last sub-feature
+    CompositeFeaturePtr aComposite =
+        std::dynamic_pointer_cast<ModelAPI_CompositeFeature>(aFeatureToFind);
+    if (aComposite)
+      aFeatureToFind = aComposite->subFeature(aComposite->numberOfSubs() - 1);
+  } else
+    aFeatureToFind = theFeatures.front();
   std::shared_ptr<Model_Data> aData =
       std::static_pointer_cast<Model_Data>(aFeatureToFind->data());
   if (!aData || !aData->isValid())
