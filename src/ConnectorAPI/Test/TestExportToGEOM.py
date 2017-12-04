@@ -65,10 +65,10 @@ def dumpShaper(fileName):
   pass
 
 def getTmpFileName(ext):
-    tempdir = tempfile.gettempdir()
-    tmp_file = tempfile.NamedTemporaryFile(suffix=".%s"%ext, prefix='shaper_', dir=tempdir, delete=False)
-    tmp_filename = tmp_file.name
-    return tmp_filename
+  tempdir = tempfile.gettempdir()
+  tmp_file = tempfile.NamedTemporaryFile(suffix=".%s"%ext, prefix='shaper_', dir=tempdir, delete=False)
+  tmp_filename = tmp_file.name
+  return tmp_filename
 
 # Create 2 boxes
 # Create a group of faces
