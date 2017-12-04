@@ -267,7 +267,7 @@ bool ModelHighAPI_Dumper::process(const std::shared_ptr<ModelAPI_Document>& theD
     CompositeFeaturePtr aCompFeat = std::dynamic_pointer_cast<ModelAPI_CompositeFeature>(*anObjIt);
     if (aCompFeat) // iteratively process composite features
       isOk = process(aCompFeat) && isOk;
-    else if (!isDumped(*anObjIt)) {
+    else if (!isDumped(EntityPtr(*anObjIt))) {
       // dump folder
       FolderPtr aFolder = std::dynamic_pointer_cast<ModelAPI_Folder>(*anObjIt);
       if (aFolder)
@@ -288,7 +288,7 @@ bool ModelHighAPI_Dumper::process(const std::shared_ptr<ModelAPI_CompositeFeatur
   // increase composite features stack
   ++gCompositeStackDepth;
   // dump composite itself
-  if (!isDumped(theComposite) || isForce)
+  if (!isDumped(EntityPtr(theComposite)) || isForce)
     dumpFeature(FeaturePtr(theComposite), isForce);
 
   // sub-part is processed independently, because it provides separate document
@@ -338,7 +338,7 @@ bool ModelHighAPI_Dumper::processSubs(
   int aNbSubs = theComposite->numberOfSubs();
   for (int anIndex = 0; anIndex < aNbSubs; ++anIndex) {
     FeaturePtr aFeature = theComposite->subFeature(anIndex);
-    if (isDumped(aFeature))
+    if (isDumped(EntityPtr(aFeature)))
       continue;
 
     isSubDumped = true;
@@ -546,7 +546,7 @@ bool ModelHighAPI_Dumper::isDumped(const AttributeRefAttrPtr& theRefAttr) const
     aFeature = ModelAPI_Feature::feature(theRefAttr->object());
   else
     aFeature = ModelAPI_Feature::feature(theRefAttr->attr()->owner());
-  return aFeature && isDumped(aFeature);
+  return aFeature && isDumped(EntityPtr(aFeature));
 }
 
 bool ModelHighAPI_Dumper::isDumped(const AttributeRefListPtr& theRefList) const
@@ -555,7 +555,7 @@ bool ModelHighAPI_Dumper::isDumped(const AttributeRefListPtr& theRefList) const
   std::list<ObjectPtr>::iterator anIt = aRefs.begin();
   for (; anIt != aRefs.end(); ++anIt) {
     FeaturePtr aFeature = ModelAPI_Feature::feature(*anIt);
-    if (aFeature && !isDumped(aFeature))
+    if (aFeature && !isDumped(EntityPtr(aFeature)))
       return false;
   }
   return true;
@@ -1064,7 +1064,7 @@ ModelHighAPI_Dumper& operator<<(ModelHighAPI_Dumper& theDumper,
           if ((*aRefIt)->id() == "ProjectedFeature")
           { // process projection only
             FeaturePtr anOwner = ModelAPI_Feature::feature((*aRefIt)->owner());
-            if (anOwner && !theDumper.isDumped(anOwner))
+            if (anOwner && !theDumper.isDumped(EntityPtr(anOwner)))
               theDumper.dumpFeature(anOwner, true);
           }
       }
