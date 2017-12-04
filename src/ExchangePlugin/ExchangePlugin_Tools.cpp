@@ -44,7 +44,7 @@ std::string ExchangePlugin_Tools::selectionType2xaoDimension(const std::string& 
     return "face";
   else if (theType == "Solids" || theType == "solid" || theType == "SOLID")
     return "solid";
-  else if (theType == "Part" || theType == "part")
+  else if (theType == "Part" || theType == "part" || theType == "PART")
     return "part";
 
   return std::string();
