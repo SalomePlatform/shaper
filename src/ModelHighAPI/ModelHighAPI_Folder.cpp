@@ -70,7 +70,7 @@ void ModelHighAPI_Folder::dump(ModelHighAPI_Dumper& theDumper) const
   // Otherwise, store the folder postponed.
   if (!aEndRef->value())
     theDumper << myFolder << " = model.addFolder(" << aDocName << ")" << std::endl;
-  else if (theDumper.isDumped(aEndRef->value()))
+  else if (theDumper.isDumped(EntityPtr(aEndRef->value())))
     theDumper << myFolder << " = model.addFolder(" << aDocName << ", "
               << aStartRef << ", " << aEndRef << ")" << std::endl;
   else
