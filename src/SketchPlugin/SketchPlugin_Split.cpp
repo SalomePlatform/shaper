@@ -64,7 +64,7 @@
 
 //#define CREATE_CONSTRAINTS
 
-#define DEBUG_SPLIT
+//#define DEBUG_SPLIT
 #ifdef DEBUG_SPLIT
 #include <iostream>
 #endif
