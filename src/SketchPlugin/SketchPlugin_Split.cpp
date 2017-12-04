@@ -64,7 +64,7 @@
 
 //#define CREATE_CONSTRAINTS
 
-//#define DEBUG_SPLIT
+#define DEBUG_SPLIT
 #ifdef DEBUG_SPLIT
 #include <iostream>
 #endif
@@ -317,7 +317,7 @@ void SketchPlugin_Split::execute()
 
   // coincidence to feature
   updateCoincidenceConstraintsToFeature(aCoincidenceToFeature, aFurtherCoincidences,
-                                        aFeatureResults, aSplitFeature);
+                                        aFeatureResults, aSplitFeature, aFeaturesToDelete);
 
   updateRefAttConstraints(aBaseRefAttributes, aModifiedAttributes);
 
@@ -875,7 +875,8 @@ void SketchPlugin_Split::updateCoincidenceConstraintsToFeature(
       const std::map<std::shared_ptr<ModelAPI_Feature>, IdToPointPair>& theCoincidenceToFeature,
       const std::set<std::shared_ptr<GeomDataAPI_Point2D> >& theFurtherCoincidences,
       const std::set<ResultPtr>& theFeatureResults,
-      const FeaturePtr& theSplitFeature)
+      const FeaturePtr& theSplitFeature,
+      std::set<FeaturePtr>& theFeaturesToDelete)
 {
   if (theCoincidenceToFeature.empty())
     return;
@@ -898,6 +899,9 @@ void SketchPlugin_Split::updateCoincidenceConstraintsToFeature(
   for (; aCIt != aCLast; aCIt++) {
     FeaturePtr aCoincFeature = aCIt->first;
     std::string anAttributeId = aCIt->second.first;
+    std::string aSecondAttribute = anAttributeId == SketchPlugin_Constraint::ENTITY_A() ?
+        SketchPlugin_Constraint::ENTITY_B() : SketchPlugin_Constraint::ENTITY_A();
+
     AttributePoint2DPtr aCoincPoint = aCIt->second.second;
     std::set<AttributePoint2DPtr>::const_iterator aFCIt = theFurtherCoincidences.begin(),
                                                   aFCLast = theFurtherCoincidences.end();
@@ -909,17 +913,16 @@ void SketchPlugin_Split::updateCoincidenceConstraintsToFeature(
         aFeaturePointAttribute = aFCAttribute;
     }
     if (aFeaturePointAttribute.get()) {
-      aCoincFeature->refattr(anAttributeId)->setObject(ResultPtr());
-      aCoincFeature->refattr(anAttributeId)->setAttr(aFeaturePointAttribute);
+      // create new constraint and remove the current
+      aCoincFeature = createConstraint(SketchPlugin_ConstraintCoincidence::ID(),
+          aFeaturePointAttribute, aCoincFeature->refattr(aSecondAttribute)->attr());
+      theFeaturesToDelete.insert(aCIt->first);
       // create new coincidences to split feature points
       std::set<AttributePoint2DPtr>::const_iterator aSFIt = aNewCoincidencesToSplitFeature.begin(),
                                                     aSFLast = aNewCoincidencesToSplitFeature.end();
       for (; aSFIt != aSFLast; aSFIt++) {
         AttributePoint2DPtr aSFAttribute = *aSFIt;
         if (aCoincPnt->isEqual(aSFAttribute->pnt())) {
-          std::string aSecondAttribute = SketchPlugin_Constraint::ENTITY_A();
-          if (anAttributeId == SketchPlugin_Constraint::ENTITY_A())
-            aSecondAttribute = SketchPlugin_Constraint::ENTITY_B();
           createConstraint(SketchPlugin_ConstraintCoincidence::ID(),
                            aSFAttribute, aCoincFeature->refattr(aSecondAttribute)->attr());
         }

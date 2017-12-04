@@ -181,12 +181,15 @@ private:
   /// \param theFurtherCoincidences a list of points where coincidences will be build
   /// \param theFeatureResults created results after split where constaint might be connected
   /// \param theSplitFeature feature created by split, new coincidences to points should be created
+  /// \param theFeaturesToDelete the list of removed features (will be updated here by
+  ///                            the coincidences to be removed)
   /// if theCoincidenceToFeature contains equal points
   void updateCoincidenceConstraintsToFeature(
       const std::map<std::shared_ptr<ModelAPI_Feature>, IdToPointPair>& theCoincidenceToFeature,
       const std::set<std::shared_ptr<GeomDataAPI_Point2D> >& theFurtherCoincidences,
       const std::set<ResultPtr>& theFeatureResults,
-      const FeaturePtr& theSplitFeature);
+      const FeaturePtr& theSplitFeature,
+      std::set<FeaturePtr>& theFeaturesToDelete);
 
   /// Move constraints from base feature to given feature
   /// \param theFeature a base feature
