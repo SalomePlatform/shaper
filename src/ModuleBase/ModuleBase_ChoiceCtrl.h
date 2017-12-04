@@ -32,6 +32,13 @@ class QComboBox;
 class QGroupBox;
 class QButtonGroup;
 
+/**
+* \ingroup GUI
+* A Choice control. It provides a choice in several strings.
+* It can be represented by several radiobuttons or by combo box.
+* Radio buttons can be represented as by radiou buttons with text
+* or by icons in toggle buttons.
+*/
 class MODULEBASE_EXPORT ModuleBase_ChoiceCtrl: public QWidget
 {
 Q_OBJECT
@@ -41,36 +48,70 @@ public:
     ComboBox
   };
 
+  /**
+  * Constructor
+  * \param theParent a parent widget
+  * \param theChoiceList a list of choice strings
+  * \param theIconsList a list of icon names for radiou buttons
+  * \param theType a type of choice representation
+  * \param theButtonsDir direction of radio buttons placement
+  */
   ModuleBase_ChoiceCtrl(QWidget* theParent,
                         const QStringList& theChoiceList,
                         const QStringList& theIconsList,
                         ControlType theType = RadioButtons,
                         Qt::Orientation theButtonsDir = Qt::Horizontal);
 
+  /// Set label for the controls.
+  /// It is a label for combo box and title for group of radio buttons.
+  /// \param theText a text of the label
   void setLabel(const QString& theText);
 
+  /// Set Icon for the label. Used only for combo box.
+  /// \param theIcon a name of icon
   void setLabelIcon(const QString& theIcon);
 
+  /// Set value: Id of button or item of combo box.
+  /// \param theVal a value (from 0 to number of items)
   void setValue(int theVal);
 
+  /// Set tool tip for label. Used only for combo box.
   void setTooltip(QString theTip);
 
+  /// Returns currently selected value
   int value() const;
 
+  /// Returns text of currently selected value
+  QString textValue() const;
+
+  /// Transfer focus on itself
   bool focusTo();
 
+  /// Returns controls for activation
   QList<QWidget*> getControls() const;
 
+  /// Set list of choice
+  /// \param theChoiceList a string list of items
   void setChoiceList(const QStringList& theChoiceList);
 
 signals:
+  /// A signal raised on change of current value
   void valueChanged(int theVal);
 
 private:
+  /// Control type
   ControlType myType;
+
+  /// A label for cmbo box
   QLabel* myLabel;
+
+  /// A combo box represerntation of control
   QComboBox* myCombo;
+
+  /// A group box for radio buttons
   QGroupBox* myGroupBox;
+
+  /// A group of buttons
   QButtonGroup* myButtons;
 };
 

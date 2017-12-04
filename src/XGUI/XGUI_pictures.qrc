@@ -62,5 +62,9 @@
      <file>pictures/eyeopen.png</file>
 
      <file>pictures/transparency.png</file>
+     <file>pictures/solid32.png</file>
+     <file>pictures/face32.png</file>
+     <file>pictures/edge32.png</file>
+     <file>pictures/vertex32.png</file>
  </qresource>
  </RCC>

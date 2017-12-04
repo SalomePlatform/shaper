@@ -173,3 +173,14 @@ void ModuleBase_ChoiceCtrl::setChoiceList(const QStringList& theChoiceList)
     myCombo->addItems(theChoiceList);
   }
 }
+
+QString ModuleBase_ChoiceCtrl::textValue() const
+{
+  switch (myType) {
+  case RadioButtons:
+    return myButtons->checkedButton()->toolTip();
+  case ComboBox:
+    return myCombo->currentText();
+  }
+  return "";
+}

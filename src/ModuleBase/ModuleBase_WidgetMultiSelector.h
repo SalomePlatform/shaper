@@ -38,9 +38,10 @@
 
 class QWidget;
 class QListWidget;
-class QComboBox;
+//class QComboBox;
 class ModuleBase_IWorkshop;
 class QAction;
+class ModuleBase_ChoiceCtrl;
 
 
 /**
@@ -218,8 +219,10 @@ protected:
   /// List control
   QListWidget* myListControl;
 
-  /// Combobox of types
-  QComboBox* myTypeCombo;
+  QStringList myShapeTypes;
+
+  /// Control for types
+  ModuleBase_ChoiceCtrl* myTypeCtrl;
 
   /// Provides correspondance between Result object and its shape
   typedef QPair<ResultPtr, GeomShapePtr> GeomSelection;
