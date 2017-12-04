@@ -25,9 +25,7 @@
 #include "ModuleBase_ModelWidget.h"
 
 class QWidget;
-class QLabel;
-class QComboBox;
-class QButtonGroup;
+class ModuleBase_ChoiceCtrl;
 
 /**
 * \ingroup GUI
@@ -92,11 +90,12 @@ private slots:
 
 private:
   /// The label
-  QLabel* myLabel;
+  //QLabel* myLabel;
 
   /// The control
-  QComboBox* myCombo;
-  QButtonGroup* myButtons;
+  //QComboBox* myCombo;
+  //QButtonGroup* myButtons;
+  ModuleBase_ChoiceCtrl* myChoiceCtrl;
 
   // XML definition of titles
   QStringList myButtonTitles;
