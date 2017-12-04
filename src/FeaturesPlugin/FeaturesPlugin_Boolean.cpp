@@ -246,7 +246,9 @@ void FeaturesPlugin_Boolean::execute()
 
         aMakeShapeList.appendAlgo(aBoolAlgo);
 
-        if(GeomAlgoAPI_ShapeTools::volume(aResShape) > 1.e-27) {
+        if(GeomAlgoAPI_ShapeTools::volume(aResShape) > 1.e-27
+          || (aType != BOOL_CUT && aType != BOOL_COMMON))
+        {
           std::shared_ptr<ModelAPI_ResultBody> aResultBody =
             document()->createBody(data(), aResultIndex);
 
@@ -364,7 +366,9 @@ void FeaturesPlugin_Boolean::execute()
           aResultShape = aFillerAlgo->shape();
         }
 
-        if(GeomAlgoAPI_ShapeTools::volume(aResultShape) > 1.e-27) {
+        if(GeomAlgoAPI_ShapeTools::volume(aResultShape) > 1.e-27
+          || (aType != BOOL_CUT && aType != BOOL_COMMON))
+        {
           std::shared_ptr<ModelAPI_ResultBody> aResultBody =
             document()->createBody(data(), aResultIndex);
 
