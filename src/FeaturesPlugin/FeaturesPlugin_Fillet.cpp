@@ -214,14 +214,14 @@ void FeaturesPlugin_Fillet::loadNamingDS(
   const std::string aFilletFaceName = "Fillet_Face";
 
   // Store modified faces
-  theResultBody->loadAndOrientModifiedShapes(theMakeShape.get(), theBaseShape, GeomAPI_Shape::FACE,
-      aModifyTag, aModFaceName, *aMapOfShapes);
+  theResultBody->loadAndOrientModifiedShapes(theMakeShape.get(), theBaseShape,
+      GeomAPI_Shape::FACE, aModifyTag, aModFaceName, *aMapOfShapes);
 
   // Store new faces generated from edges and vertices
-  theResultBody->loadAndOrientGeneratedShapes(theMakeShape.get(), theBaseShape, GeomAPI_Shape::EDGE,
-      aGeneratedTag, aFilletFaceName, *aMapOfShapes);
-  theResultBody->loadAndOrientGeneratedShapes(theMakeShape.get(), theBaseShape, GeomAPI_Shape::VERTEX,
-      aGeneratedTag, aFilletFaceName, *aMapOfShapes);
+  theResultBody->loadAndOrientGeneratedShapes(theMakeShape.get(), theBaseShape,
+      GeomAPI_Shape::EDGE, aGeneratedTag, aFilletFaceName, *aMapOfShapes);
+  theResultBody->loadAndOrientGeneratedShapes(theMakeShape.get(), theBaseShape,
+      GeomAPI_Shape::VERTEX, aGeneratedTag, aFilletFaceName, *aMapOfShapes);
 
   // Deleted shapes
   theResultBody->loadDeletedShapes(theMakeShape.get(), theBaseShape,
