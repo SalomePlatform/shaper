@@ -225,6 +225,7 @@ void ExchangePlugin_ExportFeature::exportXAO(const std::string& theFileName)
 
   // make shape for export from all results
   std::list<GeomShapePtr> aShapes;
+  std::list<ResultBodyPtr> aResults;
   int aBodyCount = document()->size(ModelAPI_ResultBody::group());
   for (int aBodyIndex = 0; aBodyIndex < aBodyCount; ++aBodyIndex) {
     ResultBodyPtr aResultBody =
@@ -233,6 +234,7 @@ void ExchangePlugin_ExportFeature::exportXAO(const std::string& theFileName)
     if (!aResultBody.get())
       continue;
     aShapes.push_back(aResultBody->shape());
+    aResults.push_back(aResultBody);
   }
   GeomShapePtr aShape = (aShapes.size() == 1)
       ? *aShapes.begin()
@@ -246,8 +248,13 @@ void ExchangePlugin_ExportFeature::exportXAO(const std::string& theFileName)
   }
 
   // geometry name
-
   std::string aGeometryName = string(ExchangePlugin_ExportFeature::XAO_GEOMETRY_NAME_ID())->value();
+  if (aGeometryName.empty() and aBodyCount == 1){
+    // get the name from the first result
+    ResultBodyPtr aResultBody = *aResults.begin();
+    aGeometryName = aResultBody->data()->name();
+  }
+
   aXao.getGeometry()->setName(aGeometryName);
 
   // groups
@@ -276,7 +283,12 @@ void ExchangePlugin_ExportFeature::exportXAO(const std::string& theFileName)
       AttributeSelectionPtr aSelection = aSelectionList->value(aSelectionIndex);
 
       // complex conversion of reference id to element index
-      int aReferenceID = aSelection->Id();
+      // gives bad id in case the selection is done from python script
+      // => using GeomAlgoAPI_CompoundBuilder::id instead
+      // int aReferenceID_old = aSelection->Id();
+
+      int aReferenceID = GeomAlgoAPI_CompoundBuilder::id(aShape, aSelection->value());
+
       std::string aReferenceString = XAO::XaoUtils::intToString(aReferenceID);
       int anElementID =
         aXao.getGeometry()->getElementIndexByReference(aGroupDimension, aReferenceString);
@@ -335,7 +347,12 @@ void ExchangePlugin_ExportFeature::exportXAO(const std::string& theFileName)
             AttributeSelectionPtr aSelection = aSelectionList->value(aRow - 1);
 
             // complex conversion of reference id to element index
-            int aReferenceID = aSelection->Id();
+            // gives bad id in case the selection is done from python script
+            // => using GeomAlgoAPI_CompoundBuilder::id instead
+            //int aReferenceID_old = aSelection->Id();
+
+            int aReferenceID = GeomAlgoAPI_CompoundBuilder::id(aShape, aSelection->value());
+
             std::string aReferenceString = XAO::XaoUtils::intToString(aReferenceID);
             anElementID =
               aXao.getGeometry()->getElementIndexByReference(aFieldDimension, aReferenceString);
