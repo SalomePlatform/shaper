@@ -34,11 +34,65 @@
 //--------------------------------------------------------------------------------------
 class ModelHighAPI_Selection;
 //--------------------------------------------------------------------------------------
+
+
+/// \class ExchangeAPI_Export
+/// \ingroup CPPHighAPI
+/// \brief Interface for Export feature.
+class ExchangeAPI_Export: public ModelHighAPI_Interface
+{
+public:
+  /// Constructor without values.
+  EXCHANGEAPI_EXPORT
+  explicit ExchangeAPI_Export(const std::shared_ptr<ModelAPI_Feature>& theFeature);
+
+  /// Constructor with values for XAO export.
+  EXCHANGEAPI_EXPORT
+  explicit ExchangeAPI_Export(const std::shared_ptr<ModelAPI_Feature>& theFeature,
+                              const std::string & theFilePath,
+                              const std::string & theAuthor = std::string(),
+                              const std::string & theGeometryName = std::string());
+
+  /// Constructor with values for export in other formats than XAO.
+  EXCHANGEAPI_EXPORT
+  explicit ExchangeAPI_Export(const std::shared_ptr<ModelAPI_Feature>& theFeature,
+                              const std::string & theFilePath,
+                              const std::list<ModelHighAPI_Selection> & theSelectionList,
+                              const std::string & theFileFormat = std::string());
+
+  /// Destructor.
+  EXCHANGEAPI_EXPORT
+  virtual ~ExchangeAPI_Export();
+
+  INTERFACE_7(ExchangePlugin_ExportFeature::ID(),
+             exportType, ExchangePlugin_ExportFeature::EXPORT_TYPE_ID(),
+             ModelAPI_AttributeString, /** ExportType */,
+             filePath, ExchangePlugin_ExportFeature::FILE_PATH_ID(),
+             ModelAPI_AttributeString, /** file path */,
+             xaoFilePath, ExchangePlugin_ExportFeature::XAO_FILE_PATH_ID(),
+             ModelAPI_AttributeString, /** xao_file_path */,
+             fileFormat, ExchangePlugin_ExportFeature::FILE_FORMAT_ID(),
+             ModelAPI_AttributeString, /** file format */,
+             selectionList, ExchangePlugin_ExportFeature::SELECTION_LIST_ID(),
+             ModelAPI_AttributeString, /** selection list */,
+             xaoAuthor, ExchangePlugin_ExportFeature::XAO_AUTHOR_ID(),
+             ModelAPI_AttributeString, /** xao author */,
+             xaoGeometryName, ExchangePlugin_ExportFeature::XAO_GEOMETRY_NAME_ID(),
+             ModelAPI_AttributeString, /** xao geometry name */)
+
+  /// Dump wrapped feature
+  EXCHANGEAPI_EXPORT
+  virtual void dump(ModelHighAPI_Dumper& theDumper) const;
+};
+
+/// Pointer on Export object
+typedef std::shared_ptr<ExchangeAPI_Export> ExportPtr;
+
 /**\ingroup CPPHighAPI
  * \brief Export to file
  */
 EXCHANGEAPI_EXPORT
-void exportToFile(const std::shared_ptr<ModelAPI_Document> & thePart,
+ExportPtr exportToFile(const std::shared_ptr<ModelAPI_Document> & thePart,
                   const std::string & theFilePath,
                   const std::list<ModelHighAPI_Selection> & theSelectionList,
                   const std::string & theFileFormat = std::string());
@@ -47,7 +101,7 @@ void exportToFile(const std::shared_ptr<ModelAPI_Document> & thePart,
  * \brief Export XAO
  */
 EXCHANGEAPI_EXPORT
-void exportToXAO(const std::shared_ptr<ModelAPI_Document> & thePart,
+ExportPtr exportToXAO(const std::shared_ptr<ModelAPI_Document> & thePart,
                  const std::string & theFilePath,
                  const std::string & theAuthor = std::string(),
                  const std::string & theGeometryName = std::string());
