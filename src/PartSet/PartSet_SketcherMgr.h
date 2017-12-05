@@ -194,6 +194,12 @@ public:
   /// \param theOperation a committed operation
   void commitNestedSketch(ModuleBase_Operation* theOperation);
 
+  /// Append the sketch selection filters in 3D viewer (plane and circle pointer)
+  void activateSelectionFilters();
+
+  // Remove sketch selection filter from the current viewer
+  virtual void deactivateSelectionFilters();
+
   /// Append the sketch plane filter into the current viewer
   /// \param toActivate state whether the filter should be activated/deactivated
   void activatePlaneFilter(const bool& toActivate);

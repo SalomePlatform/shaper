@@ -27,6 +27,7 @@
 #include <ModuleBase_IModule.h>
 #include <ModuleBase_IconFactory.h>
 #include <ModuleBase_ResultPrs.h>
+#include <ModuleBase_ViewerPrs.h>
 
 #include <ModelAPI_Attribute.h>
 #include <ModelAPI_AttributeRefAttr.h>
@@ -50,6 +51,7 @@
 
 #include <ModelGeomAlgo_Point2D.h>
 
+#include <StdSelect_BRepOwner.hxx>
 #include <TopoDS_Iterator.hxx>
 
 #include <GeomDataAPI_Point2D.h>
@@ -514,6 +516,18 @@ TopAbs_ShapeEnum getCompoundSubType(const TopoDS_Shape& theShape)
     }
   }
   return aShapeType;
+}
+
+TopoDS_Shape getSelectedShape(const std::shared_ptr<ModuleBase_ViewerPrs>& thePrs)
+{
+  if (thePrs->shape().get())
+    return thePrs->shape()->impl<TopoDS_Shape>();
+
+  Handle(StdSelect_BRepOwner) anOwner = Handle(StdSelect_BRepOwner)::DownCast(thePrs->owner());
+  if (!anOwner.IsNull())
+    return anOwner->Shape();
+
+  return TopoDS_Shape();
 }
 
 void getParameters(QStringList& theParameters)

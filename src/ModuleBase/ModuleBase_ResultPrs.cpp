@@ -19,13 +19,16 @@
 //
 
 #include "ModuleBase_ResultPrs.h"
-#include "ModuleBase_Tools.h"
+
+#include <GeomAPI_PlanarEdges.h>
 
 #include <ModelAPI_Events.h>
 #include <ModelAPI_Tools.h>
 #include <ModelAPI_ResultConstruction.h>
 #include <ModelAPI_ResultCompSolid.h>
-#include <GeomAPI_PlanarEdges.h>
+
+#include "ModuleBase_Tools.h"
+#include "ModuleBase_BRepOwner.h"
 
 #include <Events_InfoMessage.h>
 #include <Events_Loop.h>
@@ -47,8 +50,6 @@
 #include <TColStd_ListIteratorOfListOfInteger.hxx>
 #include <Graphic3d_AspectMarker3d.hxx>
 #include <TopExp_Explorer.hxx>
-
-IMPLEMENT_STANDARD_RTTIEXT(ModuleBase_BRepOwner, StdSelect_BRepOwner);
 
 //*******************************************************************************************
 
@@ -80,6 +81,56 @@ void ModuleBase_ResultPrs::setAdditionalSelectionPriority(const int thePriority)
   myAdditionalSelectionPriority = thePriority;
 }
 
+bool ModuleBase_ResultPrs::setSubShapeHidden(const NCollection_List<TopoDS_Shape>& theShapes)
+{
+  bool isModified = false;
+
+  // restore hidden shapes if there are not the shapes in parameter container
+  NCollection_List<TopoDS_Shape> aVisibleSubShapes;
+  for (NCollection_List<TopoDS_Shape>::Iterator aHiddenIt(myHiddenSubShapes); aHiddenIt.More();
+       aHiddenIt.Next()) {
+    if (!theShapes.Contains(aHiddenIt.Value()))
+      aVisibleSubShapes.Append(aHiddenIt.Value());
+  }
+  isModified = !aVisibleSubShapes.IsEmpty();
+  for (NCollection_List<TopoDS_Shape>::Iterator aVisibleIt(aVisibleSubShapes); aVisibleIt.More();
+       aVisibleIt.Next())
+    myHiddenSubShapes.Remove(aVisibleIt.Value());
+
+  // append hidden shapes into internal container if there are not these shapes
+  for (NCollection_List<TopoDS_Shape>::Iterator aShapeIt(theShapes); aShapeIt.More();
+    aShapeIt.Next())
+  {
+    if (aShapeIt.Value().ShapeType() != TopAbs_FACE) // only face shape can be hidden
+      continue;
+
+    if (!myHiddenSubShapes.Contains(aShapeIt.Value())) {
+      myHiddenSubShapes.Append(aShapeIt.Value());
+      isModified = true;
+    }
+  }
+  return isModified;
+}
+
+bool ModuleBase_ResultPrs::hasSubShapeVisible(const TopoDS_Shape& theShape)
+{
+  int aNbOfHiddenSubShapes = myHiddenSubShapes.Size();
+
+  if (!myHiddenSubShapes.Contains(theShape))
+    aNbOfHiddenSubShapes++; // the shape to be hidden later
+
+  TopExp_Explorer anExp(myOriginalShape, TopAbs_FACE);
+  bool aHasVisibleShape = false;
+  for(TopExp_Explorer anExp(myOriginalShape, TopAbs_FACE); anExp.More() && !aHasVisibleShape;
+      anExp.Next())
+  {
+    aNbOfHiddenSubShapes--;
+    if (aNbOfHiddenSubShapes < 0)
+      aHasVisibleShape = true;
+  }
+  return aHasVisibleShape;
+}
+
 void ModuleBase_ResultPrs::Compute(
           const Handle(PrsMgr_PresentationManager3d)& thePresentationManager,
           const Handle(Prs3d_Presentation)& thePresentation,
@@ -89,8 +140,25 @@ void ModuleBase_ResultPrs::Compute(
   bool aReadyToDisplay = aShapePtr.get();
   if (aReadyToDisplay) {
     myOriginalShape = aShapePtr->impl<TopoDS_Shape>();
-    if (!myOriginalShape.IsNull())
-      Set(myOriginalShape);
+    if (myHiddenSubShapes.IsEmpty() || myOriginalShape.ShapeType() > TopAbs_FACE ) {
+      if (!myOriginalShape.IsNull())
+        Set(myOriginalShape);
+    }
+    else { // convert shape into SHELL
+      TopoDS_Shell aShell;
+      BRep_Builder aShellBuilder;
+      aShellBuilder.MakeShell(aShell);
+      bool isEmptyShape = true;
+      for(TopExp_Explorer anExp(myOriginalShape, TopAbs_FACE); anExp.More(); anExp.Next()) {
+        if (myHiddenSubShapes.Contains(anExp.Current()))
+          continue;
+        aShellBuilder.Add(aShell, anExp.Current());
+        isEmptyShape = false;
+      }
+      Set(aShell);
+      if (isEmptyShape)
+        aReadyToDisplay = false;
+    }
   }
   // change deviation coefficient to provide more precise circle
   //ModuleBase_Tools::setDefaultDeviationCoefficient(myResult, Attributes());

@@ -113,17 +113,24 @@ bool ModuleBase_WidgetFeatureSelector::setSelectionCustom(const ModuleBase_Viewe
 void ModuleBase_WidgetFeatureSelector::deactivate()
 {
   ModuleBase_ModelWidget::deactivate();
-  disconnect(myWorkshop, SIGNAL(selectionChanged()), this, SLOT(onSelectionChanged()));
   activateFilters(false);
   myWorkshop->deactivateSubShapesSelection();
 }
 
 //********************************************************************
+bool ModuleBase_WidgetFeatureSelector::processAction(ModuleBase_ActionType theActionType)
+{
+  if (theActionType == ActionSelection)
+    onSelectionChanged();
+  else
+    return ModuleBase_WidgetValidated::processAction(theActionType);
+
+  return true;
+}
+
+//********************************************************************
 void ModuleBase_WidgetFeatureSelector::activateCustom()
 {
-  connect(myWorkshop, SIGNAL(selectionChanged()), this,
-          SLOT(onSelectionChanged()), Qt::UniqueConnection);
-
   activateFilters(true);
 
   QIntList aShapeTypes;

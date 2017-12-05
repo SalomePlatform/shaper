@@ -21,6 +21,7 @@
 #include "ModuleBase_ViewerPrs.h"
 
 #include <ModuleBase_ResultPrs.h>
+#include <StdSelect_BRepOwner.hxx>
 
 ModuleBase_ViewerPrs::ModuleBase_ViewerPrs(ObjectPtr theResult,
                                            const GeomShapePtr& theShape,

@@ -18,22 +18,32 @@
 // email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com>
 //
 
-#ifndef ModuleBase_ActionType_H_
-#define ModuleBase_ActionType_H_
+#include <XGUI_FacesPanelSelector.h>
 
-#include <ModuleBase.h>
+#include <XGUI_FacesPanel.h>
 
-/*!
- * Structure to describe widget processed types of actions.
- */
-enum MODULEBASE_EXPORT ModuleBase_ActionType
+//********************************************************************
+XGUI_FacesPanelSelector::XGUI_FacesPanelSelector(XGUI_FacesPanel* thePanel)
+: myPanel(thePanel)
 {
-  ActionEnter,
-  ActionEscape,
-  ActionDelete,
-  ActionSelection,
-  ActionUndo,
-  ActionRedo
-};
+  connect(myPanel, SIGNAL(activated()), this, SIGNAL(activated()));
+  connect(myPanel, SIGNAL(deactivated()), this, SIGNAL(deactivated()));
+}
 
-#endif /* ModuleBase_ActionType_H_ */
+//********************************************************************
+void XGUI_FacesPanelSelector::reset()
+{
+  myPanel->reset(true);
+}
+
+//********************************************************************
+void XGUI_FacesPanelSelector::setActive(const bool& isActive)
+{
+  myPanel->setActivePanel(isActive);
+}
+
+//********************************************************************
+void XGUI_FacesPanelSelector::processSelection()
+{
+  myPanel->processSelection();
+}

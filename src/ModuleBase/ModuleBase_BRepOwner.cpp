@@ -18,22 +18,6 @@
 // email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com>
 //
 
-#ifndef ModuleBase_ActionType_H_
-#define ModuleBase_ActionType_H_
+#include "ModuleBase_BRepOwner.h"
 
-#include <ModuleBase.h>
-
-/*!
- * Structure to describe widget processed types of actions.
- */
-enum MODULEBASE_EXPORT ModuleBase_ActionType
-{
-  ActionEnter,
-  ActionEscape,
-  ActionDelete,
-  ActionSelection,
-  ActionUndo,
-  ActionRedo
-};
-
-#endif /* ModuleBase_ActionType_H_ */
+IMPLEMENT_STANDARD_RTTIEXT(ModuleBase_BRepOwner, StdSelect_BRepOwner);

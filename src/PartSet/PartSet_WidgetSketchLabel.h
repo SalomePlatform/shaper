@@ -80,6 +80,9 @@ public:
   /// The methiod called when widget is deactivated
   virtual void deactivate();
 
+  /// The method called if widget should be activated always
+  virtual bool needToBeActiated() { return true; }
+
   /// Returns sketcher plane
   std::shared_ptr<GeomAPI_Pln> plane() const;
 
@@ -91,6 +94,9 @@ public:
   /// Returns True if the selected presentation can be used for plane definition
   /// \param thePrs a presentation
   static bool canFillSketch(const std::shared_ptr<ModuleBase_ViewerPrs>& thePrs);
+
+  /// Processes Selection action.
+  virtual bool processAction(ModuleBase_ActionType theActionType);
 
 signals:
   /// Signal on plane selection
@@ -172,10 +178,11 @@ protected:
   /// Activate or deactivate selection
   void activateSelection(bool toActivate);
 
- private slots:
+ private:
    /// Slot on change selection
   void onSelectionChanged();
 
+private slots:
   /// A slot called on set sketch plane view
   void onSetPlaneView();
 

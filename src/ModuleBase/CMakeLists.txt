@@ -33,6 +33,7 @@ SET(PROJECT_HEADERS
   ModuleBase.h
   ModuleBase_ActionInfo.h
   ModuleBase_ActionType.h
+  ModuleBase_BRepOwner.h
   ModuleBase_Definitions.h
   ModuleBase_DoubleSpinBox.h
   ModuleBase_Events.h
@@ -49,6 +50,7 @@ SET(PROJECT_HEADERS
   ModuleBase_IWidgetCreator.h
   ModuleBase_IWorkshop.h
   ModuleBase_LabelValue.h
+  ModuleBase_ListView.h
   ModuleBase_ModelWidget.h
   ModuleBase_Operation.h
   ModuleBase_OperationAction.h
@@ -106,6 +108,7 @@ SET(PROJECT_MOC_HEADERS
   ModuleBase_IViewer.h
   ModuleBase_IWorkshop.h
   ModuleBase_LabelValue.h
+  ModuleBase_ListView.h
   ModuleBase_ModelDialogWidget.h
   ModuleBase_ModelWidget.h
   ModuleBase_Operation.h
@@ -142,6 +145,7 @@ SET(PROJECT_MOC_HEADERS
 
 SET(PROJECT_SOURCES
   ModuleBase_ActionInfo.cpp
+  ModuleBase_BRepOwner.cpp
   ModuleBase_DoubleSpinBox.cpp
   ModuleBase_Filter.cpp
   ModuleBase_FilterValidated.cpp
@@ -156,6 +160,7 @@ SET(PROJECT_SOURCES
   ModuleBase_IWidgetCreator.cpp
   ModuleBase_IWorkshop.cpp
   ModuleBase_LabelValue.cpp
+  ModuleBase_ListView.cpp
   ModuleBase_ModelWidget.cpp
   ModuleBase_Operation.cpp
   ModuleBase_OperationAction.cpp

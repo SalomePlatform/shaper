@@ -21,6 +21,8 @@
 #include "XGUI_Workshop.h"
 
 #include "XGUI_ActionsMgr.h"
+#include "XGUI_ActiveControlMgr.h"
+#include "XGUI_ActiveControlSelector.h"
 #include "XGUI_MenuMgr.h"
 #include "XGUI_ColorDialog.h"
 #include "XGUI_DeflectionDialog.h"
@@ -29,10 +31,13 @@
 #include "XGUI_Displayer.h"
 #include "XGUI_ErrorDialog.h"
 #include "XGUI_ErrorMgr.h"
+#include "XGUI_FacesPanel.h"
+#include "XGUI_FacesPanelSelector.h"
 #include "XGUI_ModuleConnector.h"
 #include "XGUI_ObjectsBrowser.h"
 #include "XGUI_OperationMgr.h"
 #include "XGUI_PropertyPanel.h"
+#include "XGUI_PropertyPanelSelector.h"
 #include "XGUI_PropertyDialog.h"
 #include "XGUI_SalomeConnector.h"
 #include "XGUI_Selection.h"
@@ -65,13 +70,13 @@
 #include <ModelAPI_Feature.h>
 #include <ModelAPI_Object.h>
 #include <ModelAPI_ResultBody.h>
+#include <ModelAPI_ResultCompSolid.h>
 #include <ModelAPI_ResultConstruction.h>
 #include <ModelAPI_ResultGroup.h>
 #include <ModelAPI_ResultParameter.h>
 #include <ModelAPI_ResultField.h>
 #include <ModelAPI_Session.h>
 #include <ModelAPI_Validator.h>
-#include <ModelAPI_ResultCompSolid.h>
 #include <ModelAPI_Tools.h>
 
 //#include <PartSetPlugin_Part.h>
@@ -152,18 +157,23 @@ static Handle(VInspector_CallBack) MyVCallBack;
 #include <dlfcn.h>
 #endif
 
+//#define DEBUG_FACES_PANEL
+//#define DEBUG_WITH_MESSAGE_REPORT
+
 QString XGUI_Workshop::MOVE_TO_END_COMMAND = QObject::tr("Move to the end");
 
 //#define DEBUG_DELETE
 //#define DEBUG_FEATURE_NAME
 //#define DEBUG_CLEAN_HISTORY
 
+//******************************************************
 XGUI_Workshop::XGUI_Workshop(XGUI_SalomeConnector* theConnector)
     : QObject(),
       myCurrentDir(QString()),
       myModule(NULL),
       mySalomeConnector(theConnector),
       myPropertyPanel(0),
+      myFacesPanel(0),
       myObjectBrowser(0),
       myDisplayer(0)
       //myViewerSelMode(TopAbs_FACE)
@@ -213,6 +223,7 @@ XGUI_Workshop::XGUI_Workshop(XGUI_SalomeConnector* theConnector)
   connect(mySelector, SIGNAL(selectionChanged()), this, SLOT(updateCommandStatus()));
 
   myActionsMgr = new XGUI_ActionsMgr(this);
+  myActiveControlMgr = new XGUI_ActiveControlMgr(myModuleConnector);
   myMenuMgr = new XGUI_MenuMgr(this);
   myErrorDlg = new XGUI_ErrorDialog(QApplication::desktop());
   myContextMenuMgr = new XGUI_ContextMenuMgr(this);
@@ -333,6 +344,7 @@ void XGUI_Workshop::startApplication()
 #endif
 }
 
+//******************************************************
 void XGUI_Workshop::activateModule()
 {
   myModule->activateSelectionFilters();
@@ -351,6 +363,7 @@ void XGUI_Workshop::activateModule()
   myOperationMgr->activate();
 }
 
+//******************************************************
 void XGUI_Workshop::deactivateModule()
 {
   myModule->deactivateSelectionFilters();
@@ -415,14 +428,6 @@ void XGUI_Workshop::initMenu()
   addHistoryMenu(aAction, SIGNAL(updateRedoHistory(const QList<ActionInfo>&)), SLOT(onRedo(int)));
 
   salomeConnector()->addDesktopMenuSeparator("MEN_DESK_EDIT");
-  //aAction = salomeConnector()->addDesktopCommand("REBUILD_CMD", tr("Rebuild"),
-  //                                            tr("Rebuild data objects"),
-  //                                            QIcon(":pictures/rebuild.png"), QKeySequence(),
-  //                                            false, "MEN_DESK_EDIT");
-  //salomeConnector()->addActionInToolbar( aAction, aToolBarTitle );
-
-  //connect(aAction, SIGNAL(triggered(bool)), this, SLOT(onRebuild()));
-  //salomeConnector()->addDesktopMenuSeparator("MEN_DESK_EDIT");
 
   aAction = salomeConnector()->addDesktopCommand("SAVEAS_CMD", tr("Export native..."),
                                              tr("Export the current document into a native file"),
@@ -470,12 +475,6 @@ void XGUI_Workshop::initMenu()
                  SIGNAL(updateRedoHistory(const QList<ActionInfo>&)),
                  SLOT(onRedo(int)));
 
-  //aCommand = aGroup->addFeature("REBUILD_CMD", tr("Rebuild"), tr("Rebuild data objects"),
-  //  QIcon(":pictures/rebuild.png"), QKeySequence());
-  //aCommand->connectTo(this, SLOT(onRebuild()));
-
-  //aCommand->disable();
-
   aCommand = aGroup->addFeature("OPEN_CMD", tr("Open..."), tr("Open a new document"),
                                 QIcon(":pictures/open.png"), QKeySequence::Open);
   aCommand->connectTo(this, SLOT(onOpen()));
@@ -491,6 +490,7 @@ void XGUI_Workshop::initMenu()
 }
 
 #ifndef HAVE_SALOME
+//******************************************************
 AppElements_Workbench* XGUI_Workshop::addWorkbench(const QString& theName)
 {
   AppElements_MainMenu* aMenuBar = myMainWindow->menuObject();
@@ -576,6 +576,7 @@ bool XGUI_Workshop::isFeatureOfNested(const FeaturePtr& theFeature)
   return aHasNested;
 }
 
+//******************************************************
 void XGUI_Workshop::fillPropertyPanel(ModuleBase_Operation* theOperation)
 {
   ModuleBase_OperationFeature* aFOperation =
@@ -583,7 +584,7 @@ void XGUI_Workshop::fillPropertyPanel(ModuleBase_Operation* theOperation)
   if (!aFOperation)
     return;
 
-  showPropertyPanel();
+  showPanel(myPropertyPanel);
   myPropertyPanel->cleanContent();
 
   QList<ModuleBase_ModelWidget*> aWidgets;
@@ -667,6 +668,7 @@ void XGUI_Workshop::fillPropertyPanel(ModuleBase_Operation* theOperation)
   myErrorMgr->setPropertyPanel(myPropertyPanel);
 }
 
+//******************************************************
 void XGUI_Workshop::connectToPropertyPanel(const bool isToConnect)
 {
   XGUI_PropertyPanel* aPropertyPanel = propertyPanel();
@@ -716,7 +718,7 @@ void XGUI_Workshop::onOperationStopped(ModuleBase_Operation* theOperation)
   ModuleBase_ISelection* aSel = mySelector->selection();
   QObjectPtrList aObj = aSel->selectedPresentations();
   //!< No need for property panel
-  hidePropertyPanel();
+  hidePanel(myPropertyPanel);
   myPropertyPanel->cleanContent();
 
   connectToPropertyPanel(false);
@@ -742,17 +744,19 @@ void XGUI_Workshop::onOperationStopped(ModuleBase_Operation* theOperation)
   activateObjectsSelection(anObjects);
 }
 
-
+//******************************************************
 void XGUI_Workshop::onOperationCommitted(ModuleBase_Operation* theOperation)
 {
   myModule->operationCommitted(theOperation);
 }
 
+//******************************************************
 void XGUI_Workshop::onOperationAborted(ModuleBase_Operation* theOperation)
 {
   myModule->operationAborted(theOperation);
 }
 
+//******************************************************
 void XGUI_Workshop::setGrantedFeatures(ModuleBase_Operation* theOperation)
 {
   ModuleBase_OperationFeature* aFOperation =
@@ -1079,23 +1083,6 @@ void XGUI_Workshop::onRedo(int theTimes)
 }
 
 //******************************************************
-//void XGUI_Workshop::onRebuild()
-//{
-//  SessionPtr aMgr = ModelAPI_Session::get();
-//  bool aWasOperation = aMgr->isOperation(); // keep this value
-//  if (!aWasOperation) {
-//    aMgr->startOperation("Rebuild");
-//  }
-//  static const Events_ID aRebuildEvent = Events_Loop::loop()->eventByName("Rebuild");
-//  Events_Loop::loop()->send(std::shared_ptr<Events_Message>(
-//    new Events_Message(aRebuildEvent, this)));
-//  if (!aWasOperation) {
-//    aMgr->finishOperation();
-//  }
-//  updateCommandStatus();
-//}
-
-//******************************************************
 void XGUI_Workshop::onWidgetStateChanged(int thePreviousState)
 {
   ModuleBase_ModelWidget* anActiveWidget = myOperationMgr->activeWidget();
@@ -1133,11 +1120,13 @@ void XGUI_Workshop::onValuesChanged()
   }
 }
 
+//******************************************************
 void XGUI_Workshop::onWidgetObjectUpdated()
 {
   operationMgr()->onValidateOperation();
 }
 
+//******************************************************
 ModuleBase_IModule* XGUI_Workshop::loadModule(const QString& theModule)
 {
   QString libName = QString::fromStdString(library(theModule.toStdString()));
@@ -1271,6 +1260,7 @@ void XGUI_Workshop::updateCommandStatus()
   emit commandStatusUpdated();
 }
 
+//******************************************************
 void XGUI_Workshop::updateHistory()
 {
   std::list<std::string> aUndoList = ModelAPI_Session::get()->undoList();
@@ -1312,13 +1302,45 @@ void XGUI_Workshop::createDockWidgets()
   QDockWidget* aObjDock = createObjectBrowser(aDesktop);
   aDesktop->addDockWidget(Qt::LeftDockWidgetArea, aObjDock);
   myPropertyPanel = new XGUI_PropertyPanel(aDesktop, myOperationMgr);
+  myActiveControlMgr->addSelector(new XGUI_PropertyPanelSelector(myPropertyPanel));
+
   myPropertyPanel->setupActions(myActionsMgr);
   myPropertyPanel->setAllowedAreas(Qt::LeftDockWidgetArea |
                                    Qt::RightDockWidgetArea |
                                    Qt::BottomDockWidgetArea);
   aDesktop->addDockWidget(Qt::LeftDockWidgetArea, myPropertyPanel);
-  hidePropertyPanel();  ///<! Invisible by default
+  hidePanel(myPropertyPanel);  ///<! Invisible by default
+
+  myFacesPanel = new XGUI_FacesPanel(aDesktop, myModuleConnector);
+  myActiveControlMgr->addSelector(new XGUI_FacesPanelSelector(myFacesPanel));
+  myFacesPanel->setAllowedAreas(Qt::LeftDockWidgetArea |
+                                Qt::RightDockWidgetArea |
+                                Qt::BottomDockWidgetArea);
+  connect(myFacesPanel, SIGNAL(closed()), myFacesPanel, SLOT(onClosed()));
+
+  aDesktop->addDockWidget(
+#ifdef HAVE_SALOME
+    Qt::RightDockWidgetArea,
+#else
+    Qt::LeftDockWidgetArea,
+#endif
+    myFacesPanel);
+  hidePanel(myFacesPanel);  ///<! Invisible by default
+
+#ifdef DEBUG_FACES_PANEL
+  aDesktop->addDockWidget(Qt::RightDockWidgetArea, myFacesPanel);
+  showPanel(myFacesPanel);
+#endif
+
   hideObjectBrowser();
+
+#ifdef DEBUG_FACES_PANEL
+#else
+#ifndef HAVE_SALOME
+  aDesktop->tabifyDockWidget(myFacesPanel, aObjDock);
+#endif
+#endif
+
   aDesktop->tabifyDockWidget(aObjDock, myPropertyPanel);
   myPropertyPanel->installEventFilter(myOperationMgr);
 
@@ -1338,28 +1360,32 @@ void XGUI_Workshop::createDockWidgets()
 }
 
 //******************************************************
-void XGUI_Workshop::showPropertyPanel()
+void XGUI_Workshop::showPanel(QDockWidget* theDockWidget)
 {
-  QAction* aViewAct = myPropertyPanel->toggleViewAction();
-  ///<! Restore ability to close panel from the window's menu
-  aViewAct->setEnabled(true);
-  myPropertyPanel->show();
-  myPropertyPanel->raise();
+  if (theDockWidget == myPropertyPanel) {
+    QAction* aViewAct = myPropertyPanel->toggleViewAction();
+    ///<! Restore ability to close panel from the window's menu
+    aViewAct->setEnabled(true);
+  }
+  theDockWidget->show();
+  theDockWidget->raise();
 
   // The next code is necessary to made the property panel the active window
   // in order to operation manager could process key events of the panel.
   // otherwise they are ignored. It happens only if the same(activateWindow) is
   // not happened by property panel activation(e.g. resume operation of Sketch)
-  ModuleBase_Tools::setFocus(myPropertyPanel, "XGUI_Workshop::showPropertyPanel()");
+  ModuleBase_Tools::setFocus(theDockWidget, "XGUI_Workshop::showPanel()");
 }
 
 //******************************************************
-void XGUI_Workshop::hidePropertyPanel()
+void XGUI_Workshop::hidePanel(QDockWidget* theDockWidget)
 {
-  QAction* aViewAct = myPropertyPanel->toggleViewAction();
-  ///<! Do not allow to show empty property panel
-  aViewAct->setEnabled(false);
-  myPropertyPanel->hide();
+  if (theDockWidget && theDockWidget == myPropertyPanel) {
+    QAction* aViewAct = theDockWidget->toggleViewAction();
+    ///<! Do not allow to show empty property panel
+    aViewAct->setEnabled(false);
+  }
+  theDockWidget->hide();
 
   // the property panel is active window of the desktop, when it is
   // hidden, it is undefined which window becomes active. By this reason
@@ -1369,7 +1395,7 @@ void XGUI_Workshop::hidePropertyPanel()
   // are processed by this console. For example Undo actions.
   // It is possible that this code is to be moved to SHAPER package
   QMainWindow* aDesktop = desktop();
-  ModuleBase_Tools::setFocus(aDesktop, "XGUI_Workshop::showPropertyPanel()");
+  ModuleBase_Tools::setFocus(aDesktop, "XGUI_Workshop::hidePanel()");
 }
 
 //******************************************************
@@ -1487,6 +1513,13 @@ void XGUI_Workshop::onContextMenuCommand(const QString& theId, bool isChecked)
         if (!aContext.IsNull())
           aParameters.Append(aContext);
 
+#ifdef DEBUG_WITH_MESSAGE_REPORT
+        Handle(Message_Report) aContextReport = aContext->GetReport();
+        aContextReport->SetActive (Standard_True);
+        aContextReport->SetLimit (1000);
+        if (!aContextReport.IsNull())
+          aParameters.Append(aContextReport);
+#endif
         MyVCallBack = new VInspector_CallBack();
         myDisplayer->setCallBack(MyVCallBack);
         #ifndef HAVE_SALOME
@@ -1499,13 +1532,23 @@ void XGUI_Workshop::onContextMenuCommand(const QString& theId, bool isChecked)
         MyTCommunicator->RegisterPlugin("TKDFBrowser");
         MyTCommunicator->RegisterPlugin("TKShapeView");
         MyTCommunicator->RegisterPlugin("TKVInspector");
+#ifdef DEBUG_WITH_MESSAGE_REPORT
+        MyTCommunicator->RegisterPlugin("TKMessageView");
+#endif
         MyTCommunicator->RegisterPlugin("SMBrowser"); // custom plugin to view ModelAPI
         //MyTCommunicator->RegisterPlugin("TKSMBrowser"); // custom plugin to view ModelAPI
 
         MyTCommunicator->Init(aParameters);
         MyTCommunicator->Activate("TKSMBrowser"); // to have button in TInspector
+#ifndef DEBUG_WITH_MESSAGE_REPORT
         MyTCommunicator->Activate("TKVInspector"); // to have filled callback by model
+#endif
         MyTCommunicator->Activate("TKDFBrowser");
+
+#ifdef DEBUG_WITH_MESSAGE_REPORT
+        MyTCommunicator->Activate("TKMessageView"); // temporary
+        MyTCommunicator->Activate("TKVInspector"); // to have filled callback by model
+#endif
       }
       MyTCommunicator->SetVisible(true);
     }
@@ -1516,6 +1559,10 @@ void XGUI_Workshop::onContextMenuCommand(const QString& theId, bool isChecked)
 //**************************************************************
 void XGUI_Workshop::setViewerSelectionMode(int theMode)
 {
+  XGUI_ActiveControlSelector* anActiveSelector = activeControlMgr()->activeSelector();
+  if (anActiveSelector && anActiveSelector->getType() == XGUI_FacesPanelSelector::Type())
+    facesPanel()->setActivePanel(false);
+
   if (theMode == -1)
     myViewerSelMode.clear();
   else {
@@ -1535,6 +1582,56 @@ void XGUI_Workshop::activateObjectsSelection(const QObjectPtrList& theList)
   if (aModes.isEmpty() && (myViewerSelMode.length() > 0))
     aModes.append(myViewerSelMode);
   myDisplayer->activateObjects(aModes, theList);
+}
+
+//**************************************************************
+bool XGUI_Workshop::prepareForDisplay(const std::set<ObjectPtr>& theObjects) const
+{
+  // generate container of objects taking into account sub elments of compsolid
+  std::set<ObjectPtr> anAllProcessedObjects;
+  for (std::set<ObjectPtr>::const_iterator anObjectsIt = theObjects.begin();
+    anObjectsIt != theObjects.end(); anObjectsIt++) {
+    ObjectPtr anObject = *anObjectsIt;
+    ResultCompSolidPtr aCompRes = std::dynamic_pointer_cast<ModelAPI_ResultCompSolid>(anObject);
+    if (aCompRes.get()) {
+      if (aCompRes->numberOfSubs(true) == 0)
+        anAllProcessedObjects.insert(anObject);
+      else {
+        for (int i = 0; i < aCompRes->numberOfSubs(true); i++) {
+          ResultPtr aSubRes = aCompRes->subResult(i, true);
+          anAllProcessedObjects.insert(aCompRes->subResult(i, true));
+        }
+      }
+    }
+    else
+      anAllProcessedObjects.insert(anObject);
+  }
+
+  // find hidden objects in faces panel
+  std::set<ObjectPtr> aHiddenObjects;
+  QStringList aHiddenObjectNames;
+  for (std::set<ObjectPtr>::const_iterator anObjectsIt = theObjects.begin();
+    anObjectsIt != theObjects.end(); anObjectsIt++) {
+    if (!facesPanel()->isObjectHiddenByPanel(*anObjectsIt))
+      continue;
+    aHiddenObjects.insert(*anObjectsIt);
+    aHiddenObjectNames.append((*anObjectsIt)->data()->name().c_str());
+  }
+  if (aHiddenObjects.empty())
+    return true;
+
+  int anAnswer = QMessageBox::question(
+        desktop(), tr("Show object"),
+        tr("The following objects are hidden by the '%1' panel:\n %2.\
+           \nRemove objects from the panel to be displayed?")
+        .arg(facesPanel()->windowTitle()).arg(aHiddenObjectNames.join(','),
+        QMessageBox::Yes | QMessageBox::No, QMessageBox::No));
+
+  bool aToBeDisplayed = anAnswer == QMessageBox::Yes;
+  if (aToBeDisplayed)
+    facesPanel()->restoreObjects(aHiddenObjects);
+
+  return aToBeDisplayed;
 }
 
 //**************************************************************
@@ -1800,6 +1897,7 @@ bool XGUI_Workshop::deleteFeatures(const QObjectPtrList& theObjects)
   return ModelAPI_Tools::removeFeaturesAndReferences(aFeatures);
 }
 
+//******************************************************
 bool hasResults(QObjectPtrList theObjects, const std::set<std::string>& theTypes)
 {
   bool isFoundResultType = false;
@@ -1873,6 +1971,7 @@ std::list<FeaturePtr> toCurrentFeatures(const ObjectPtr& theObject)
   return std::list<FeaturePtr>(aObjectIt, aCurrentIt);
 }
 
+//******************************************************
 bool XGUI_Workshop::canMoveFeature()
 {
   QString anActionId = "MOVE_CMD";
@@ -1960,6 +2059,7 @@ bool XGUI_Workshop::canChangeProperty(const QString& theActionName) const
   return false;
 }
 
+//******************************************************
 void setColor(ResultPtr theResult, const std::vector<int>& theColor)
 {
   if (!theResult.get())
@@ -2234,8 +2334,19 @@ void XGUI_Workshop::onPreviewStateChanged()
 for (int i = 0; i < aDoc->size(aGroupName); i++) { \
   aDoc->object(aGroupName, i)->setDisplayed(aDisplay); \
 }
+
+//******************************************************
 void XGUI_Workshop::showObjects(const QObjectPtrList& theList, bool isVisible)
 {
+  if (isVisible) {
+    std::set<ObjectPtr> anObjects;
+    foreach (ObjectPtr aObj, theList) {
+      anObjects.insert(aObj);
+    }
+    if (!prepareForDisplay(anObjects))
+      return;
+  }
+
   foreach (ObjectPtr aObj, theList) {
     aObj->setDisplayed(isVisible);
   }
@@ -2269,6 +2380,14 @@ void XGUI_Workshop::showOnlyObjects(const QObjectPtrList& theList)
     viewer()->eraseAll();
 #endif
 
+  std::set<ObjectPtr> anObjects;
+  foreach (ObjectPtr aObj, theList) {
+    anObjects.insert(aObj);
+  }
+
+  if (!prepareForDisplay(anObjects))
+    return;
+
   // Show only objects from the list
   foreach (ObjectPtr aObj, theList) {
     aObj->setDisplayed(true);
@@ -2284,7 +2403,6 @@ void XGUI_Workshop::showOnlyObjects(const QObjectPtrList& theList)
   }
 #endif
 }
-
 
 //**************************************************************
 void XGUI_Workshop::registerValidators() const
@@ -2356,6 +2474,7 @@ void XGUI_Workshop::closeDocument()
   //objectBrowser()->dataModel()->blockEventsProcessing(isBlocked);
 }
 
+//******************************************************
 void XGUI_Workshop::addHistoryMenu(QObject* theObject, const char* theSignal, const char* theSlot)
 {
   XGUI_HistoryMenu* aMenu = NULL;
@@ -2372,6 +2491,7 @@ void XGUI_Workshop::addHistoryMenu(QObject* theObject, const char* theSignal, co
   connect(aMenu, SIGNAL(actionSelected(int)), this, theSlot);
 }
 
+//******************************************************
 QList<ActionInfo> XGUI_Workshop::processHistoryList(const std::list<std::string>& theList) const
 {
   QList<ActionInfo> aResult;
@@ -2397,6 +2517,7 @@ QList<ActionInfo> XGUI_Workshop::processHistoryList(const std::list<std::string>
   return aResult;
 }
 
+//******************************************************
 void XGUI_Workshop::setStatusBarMessage(const QString& theMessage)
 {
 #ifdef HAVE_SALOME
@@ -2406,6 +2527,7 @@ void XGUI_Workshop::setStatusBarMessage(const QString& theMessage)
 #endif
 }
 
+//******************************************************
 void XGUI_Workshop::synchronizeViewer()
 {
   SessionPtr aMgr = ModelAPI_Session::get();
@@ -2421,6 +2543,7 @@ void XGUI_Workshop::synchronizeViewer()
   }
 }
 
+//******************************************************
 void XGUI_Workshop::synchronizeGroupInViewer(const DocumentPtr& theDoc,
                                              const std::string& theGroup,
                                              bool theUpdateViewer)
@@ -2442,6 +2565,7 @@ void XGUI_Workshop::synchronizeGroupInViewer(const DocumentPtr& theDoc,
     myDisplayer->updateViewer();
 }
 
+//******************************************************
 void XGUI_Workshop::highlightResults(const QObjectPtrList& theObjects)
 {
   FeaturePtr aFeature;
@@ -2470,6 +2594,7 @@ void XGUI_Workshop::highlightResults(const QObjectPtrList& theObjects)
                              tr("Results not found"), QMessageBox::Ok);
 }
 
+//******************************************************
 void XGUI_Workshop::highlightFeature(const QObjectPtrList& theObjects)
 {
   ResultPtr aResult;

@@ -18,12 +18,13 @@
 // email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com>
 //
 
-#include "XGUI_Displayer.h"
-#include "XGUI_Workshop.h"
-#include "XGUI_ViewerProxy.h"
-#include "XGUI_SelectionMgr.h"
-#include "XGUI_Selection.h"
 #include "XGUI_CustomPrs.h"
+#include "XGUI_Displayer.h"
+#include "XGUI_FacesPanel.h"
+#include "XGUI_Selection.h"
+#include "XGUI_SelectionMgr.h"
+#include "XGUI_ViewerProxy.h"
+#include "XGUI_Workshop.h"
 
 #ifndef HAVE_SALOME
 #include <AppElements_Viewer.h>
@@ -36,11 +37,12 @@
 #include <ModelAPI_AttributeIntArray.h>
 #include <ModelAPI_ResultCompSolid.h>
 
+#include <ModuleBase_BRepOwner.h>
+#include <ModuleBase_IModule.h>
+#include <ModuleBase_Preferences.h>
 #include <ModuleBase_ResultPrs.h>
 #include <ModuleBase_Tools.h>
-#include <ModuleBase_IModule.h>
 #include <ModuleBase_ViewerPrs.h>
-#include <ModuleBase_Preferences.h>
 
 #include <GeomAPI_Shape.h>
 #include <GeomAPI_IPresentable.h>
@@ -266,7 +268,7 @@ bool XGUI_Displayer::display(ObjectPtr theObject, AISObjectPtr theAIS,
   if (!anAISIO.IsNull()) {
     appendResultObject(theObject, theAIS);
 
-    bool isCustomized = customizeObject(theObject);
+    bool isCustomized = customizeObject(theObject, true);
 
     int aDispMode = isShading? Shading : Wireframe;
     if (isShading)
@@ -369,7 +371,7 @@ bool XGUI_Displayer::redisplay(ObjectPtr theObject, bool theUpdateViewer)
       }
     }
     // Customization of presentation
-    bool isCustomized = customizeObject(theObject);
+    bool isCustomized = customizeObject(theObject, false);
     #ifdef DEBUG_FEATURE_REDISPLAY
       qDebug(QString("Redisplay: %1, isEqualShapes=%2, isCustomized=%3").
         arg(!isEqualShapes || isCustomized).arg(isEqualShapes)
@@ -1365,7 +1367,7 @@ bool XGUI_Displayer::activate(const Handle(AIS_InteractiveObject)& theIO,
   return isActivationChanged;
 }
 
-bool XGUI_Displayer::customizeObject(ObjectPtr theObject)
+bool XGUI_Displayer::customizeObject(ObjectPtr theObject, const bool isDisplayed)
 {
   AISObjectPtr anAISObj = getAISObject(theObject);
   // correct the result's color it it has the attribute
@@ -1389,6 +1391,12 @@ bool XGUI_Displayer::customizeObject(ObjectPtr theObject)
                       aCustomPrs->customisePresentation(aResult, anAISObj, myCustomPrs);
   isCustomized = myWorkshop->module()->afterCustomisePresentation(aResult, anAISObj, myCustomPrs)
                  || isCustomized;
+
+  // update presentation state if faces panel is active
+  if (anAISObj.get() && myWorkshop->facesPanel())
+    isCustomized = myWorkshop->facesPanel()->customizeObject(theObject, isDisplayed) ||
+                   isCustomized;
+
   return isCustomized;
 }
 

@@ -19,23 +19,18 @@
 //
 
 #include "XGUI_WorkshopListener.h"
-#include "XGUI_Workshop.h"
-#include "XGUI_Displayer.h"
-#include "XGUI_ErrorMgr.h"
-#include "XGUI_OperationMgr.h"
-#include "XGUI_SalomeConnector.h"
-#include "XGUI_ActionsMgr.h"
-#include "XGUI_PropertyPanel.h"
-#include "XGUI_ModuleConnector.h"
-#include "XGUI_QtEvents.h"
-#include "XGUI_SelectionMgr.h"
 
 #ifndef HAVE_SALOME
 #include <AppElements_MainWindow.h>
 #endif
 
-#include <ModuleBase_IModule.h>
-#include <ModuleBase_Events.h>
+#include <Config_FeatureMessage.h>
+#include <Config_PointerMessage.h>
+#include <Config_Keywords.h>
+
+#include <Events_InfoMessage.h>
+#include <Events_Loop.h>
+#include <Events_LongOp.h>
 
 #include <ModelAPI_Object.h>
 #include <ModelAPI_Events.h>
@@ -46,27 +41,33 @@
 #include <ModelAPI_ResultCompSolid.h>
 #include <ModelAPI_Tools.h>
 
-#include <Events_Loop.h>
-#include <Events_LongOp.h>
-
+#include <ModuleBase_Events.h>
+#include <ModuleBase_IModule.h>
+#include <ModuleBase_IViewer.h>
 #include <ModuleBase_IWorkshop.h>
-
 #include <ModuleBase_Operation.h>
 #include <ModuleBase_OperationDescription.h>
 #include <ModuleBase_OperationFeature.h>
 #include <ModuleBase_Tools.h>
-#include <ModuleBase_IViewer.h>
 #include <ModuleBase_WidgetSelector.h>
 
-#include <Config_FeatureMessage.h>
-#include <Config_PointerMessage.h>
-#include <Config_Keywords.h>
-#include <Events_InfoMessage.h>
+#include "XGUI_ActionsMgr.h"
+#include "XGUI_Displayer.h"
+#include "XGUI_ErrorMgr.h"
+#include "XGUI_FacesPanel.h"
+#include "XGUI_OperationMgr.h"
+#include "XGUI_ModuleConnector.h"
+#include "XGUI_PropertyPanel.h"
 
+#include "XGUI_QtEvents.h"
+#include "XGUI_SalomeConnector.h"
+#include "XGUI_SelectionMgr.h"
+#include "XGUI_Workshop.h"
+
+#include <QAction>
 #include <QApplication>
 #include <QMainWindow>
 #include <QThread>
-#include <QAction>
 
 #ifdef _DEBUG
 #include <QDebug>
@@ -110,6 +111,9 @@ void XGUI_WorkshopListener::initializeEventListening()
   aLoop->registerListener(this, Events_Loop::eventByName(EVENT_UPDATE_VIEWER_UNBLOCKED));
   aLoop->registerListener(this, Events_Loop::eventByName(EVENT_EMPTY_AIS_PRESENTATION));
   aLoop->registerListener(this, Events_Loop::eventByName(EVENT_UPDATE_BY_WIDGET_SELECTION));
+
+  aLoop->registerListener(this, Events_Loop::eventByName("FinishOperation"));
+  aLoop->registerListener(this, Events_Loop::eventByName("AbortOperation"));
 }
 
 //******************************************************
@@ -157,7 +161,9 @@ void XGUI_WorkshopListener::processEvent(const std::shared_ptr<Events_Message>& 
       if (aWidgetSelector)
         workshop()->selector()->setSelected(aWidgetSelector->getAttributeSelection());
     }
-  }
+  } else if (theMessage->eventID() == Events_Loop::eventByName("FinishOperation") ||
+             theMessage->eventID() == Events_Loop::eventByName("AbortOperation"))
+    workshop()->facesPanel()->reset(false); // do not flush redisplay, it is flushed after event
 
   //Update property panel on corresponding message. If there is no current operation (no
   //property panel), or received message has different feature to the current - do nothing.

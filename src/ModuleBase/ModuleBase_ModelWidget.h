@@ -184,6 +184,9 @@ Q_OBJECT
   /// The method called when widget is deactivated
   virtual void deactivate();
 
+  /// The method called if widget should be activated always
+  virtual bool needToBeActiated() { return false; }
+
   /// Returns list of widget controls
   /// \return a control list
   virtual QList<QWidget*> getControls() const = 0;

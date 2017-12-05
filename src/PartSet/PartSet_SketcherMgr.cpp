@@ -183,12 +183,15 @@ PartSet_SketcherMgr::PartSet_SketcherMgr(PartSet_Module* theModule)
   myIsConstraintsShown[PartSet_Tools::Expressions] = false;
 
   mySketchPlane = new PartSet_PreviewSketchPlane();
+
+  myCirclePointFilter = new PartSet_CirclePointFilter(anIWorkshop);
+  myPlaneFilter = new ModuleBase_ShapeInPlaneFilter();
 }
 
 PartSet_SketcherMgr::~PartSet_SketcherMgr()
 {
-  if (!myPlaneFilter.IsNull())
-    myPlaneFilter.Nullify();
+  myPlaneFilter.Nullify();
+  myCirclePointFilter.Nullify();
 }
 
 void PartSet_SketcherMgr::onEnterViewPort()
@@ -1005,20 +1008,12 @@ void PartSet_SketcherMgr::startSketch(ModuleBase_Operation* theOperation)
   qDebug(QString("startSketch: %1, %2").arg(anInfo.size()).arg(anInfoStr).toStdString().c_str());
 #endif
 
-  if(myCirclePointFilter.IsNull()) {
-    myCirclePointFilter = new PartSet_CirclePointFilter(myModule->workshop());
-  }
-
-  myModule->workshop()->viewer()->addSelectionFilter(myCirclePointFilter);
-
-  if (myPlaneFilter.IsNull())
-    myPlaneFilter = new ModuleBase_ShapeInPlaneFilter();
-
-  myModule->workshop()->viewer()->addSelectionFilter(myPlaneFilter);
   bool aHasPlane = false;
   std::shared_ptr<GeomAPI_Pln> aPln;
   aPln = PartSet_Tools::sketchPlane(myCurrentSketch);
   myPlaneFilter->setPlane(aPln);
+
+  activateSelectionFilters();
 
   Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_TO_REDISPLAY));
   // all displayed objects should be activated in current selection modes according to switched
@@ -1049,9 +1044,6 @@ void PartSet_SketcherMgr::stopSketch(ModuleBase_Operation* theOperation)
     // The sketch was aborted
     myCurrentSketch = CompositeFeaturePtr();
     mySketchPlane->eraseSketchPlane(myModule->workshop());
-    // TODO: move this outside of if-else
-    myModule->workshop()->viewer()->removeSelectionFilter(myCirclePointFilter);
-    myModule->workshop()->viewer()->removeSelectionFilter(myPlaneFilter);
 
     // Erase all sketcher objects
     QObjectPtrList aObjects = aDisplayer->displayedObjects();
@@ -1094,11 +1086,10 @@ void PartSet_SketcherMgr::stopSketch(ModuleBase_Operation* theOperation)
     myCurrentSketch = CompositeFeaturePtr();
     mySketchPlane->eraseSketchPlane(myModule->workshop());
 
-    myModule->workshop()->viewer()->removeSelectionFilter(myCirclePointFilter);
-    myModule->workshop()->viewer()->removeSelectionFilter(myPlaneFilter);
-
     Events_Loop::loop()->flush(aDispEvent);
   }
+  deactivateSelectionFilters();
+
   // restore the module selection modes, which were changed on startSketch
   aConnector->activateModuleSelectionModes();
 }
@@ -1158,6 +1149,18 @@ void PartSet_SketcherMgr::commitNestedSketch(ModuleBase_Operation* theOperation)
       }
     }
   }
+}
+
+void PartSet_SketcherMgr::activateSelectionFilters()
+{
+  myModule->workshop()->viewer()->addSelectionFilter(myCirclePointFilter);
+  myModule->workshop()->viewer()->addSelectionFilter(myPlaneFilter);
+}
+
+void PartSet_SketcherMgr::deactivateSelectionFilters()
+{
+  myModule->workshop()->viewer()->removeSelectionFilter(myCirclePointFilter);
+  myModule->workshop()->viewer()->removeSelectionFilter(myPlaneFilter);
 }
 
 void PartSet_SketcherMgr::activatePlaneFilter(const bool& toActivate)
@@ -1470,9 +1473,6 @@ bool PartSet_SketcherMgr::isObjectOfSketch(const ObjectPtr& theObject) const
 
 void PartSet_SketcherMgr::onPlaneSelected(const std::shared_ptr<GeomAPI_Pln>& thePln)
 {
-  if (myPlaneFilter.IsNull())
-   myPlaneFilter = new ModuleBase_ShapeInPlaneFilter();
-
   myPlaneFilter->setPlane(thePln);
 }
 

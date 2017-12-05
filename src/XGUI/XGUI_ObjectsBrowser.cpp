@@ -29,6 +29,8 @@
 
 #include <ModuleBase_Tools.h>
 
+#include <XGUI_Workshop.h>
+
 #include <QLayout>
 #include <QLineEdit>
 #include <QPixmap>
@@ -233,14 +235,19 @@ void XGUI_DataTree::processEyeClick(const QModelIndex& theIndex)
   ObjectPtr aObj = aModel->object(theIndex);
   if (aObj.get()) {
     ResultPtr aResObj = std::dynamic_pointer_cast<ModelAPI_Result>(aObj);
+    XGUI_ObjectsBrowser* aObjBrowser = qobject_cast<XGUI_ObjectsBrowser*>(parent());
     if (aResObj.get()) {
+      std::set<ObjectPtr> anObjects;
+      anObjects.insert(aResObj);
+      if (aObjBrowser && !aResObj->isDisplayed() &&
+          !aObjBrowser->workshop()->prepareForDisplay(anObjects))
+        return;
       aResObj->setDisplayed(!aResObj->isDisplayed());
       Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_TO_REDISPLAY));
       update(theIndex);
     }
     // Update list of selected objects because this event happens after
     // selection event in object browser
-    XGUI_ObjectsBrowser* aObjBrowser = qobject_cast<XGUI_ObjectsBrowser*>(parent());
     if (aObjBrowser) {
       aObjBrowser->onSelectionChanged();
     }

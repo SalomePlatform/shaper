@@ -18,9 +18,15 @@
 // email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com>
 //
 
-#include <XGUI_PropertyPanel.h>
 #include <XGUI_ActionsMgr.h>
+#include <XGUI_ActiveControlMgr.h>
+#include <XGUI_ActiveControlSelector.h>
+#include <XGUI_PropertyPanel.h>
+#include <XGUI_PropertyPanelSelector.h>
 #include <XGUI_OperationMgr.h>
+#include <XGUI_Tools.h>
+#include <XGUI_Workshop.h>
+
 //#include <AppElements_Constants.h>
 #include <ModuleBase_WidgetMultiSelector.h>
 #include <ModuleBase_Tools.h>
@@ -122,6 +128,10 @@ void XGUI_PropertyPanel::cleanContent()
 {
   if (myActiveWidget)
     myActiveWidget->deactivate();
+
+  XGUI_ActiveControlSelector* aPPSelector = XGUI_Tools::workshop(myOperationMgr->workshop())->
+    activeControlMgr()->getSelector(XGUI_PropertyPanelSelector::Type());
+  aPPSelector->reset(); // it removes need to be updated widget link
 
   /// as the widgets are deleted later, it is important that the signals
   /// of these widgets are not processed. An example of the error is issue 986.

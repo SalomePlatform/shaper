@@ -24,8 +24,9 @@
 #include "XGUI_ViewerProxy.h"
 #include "XGUI_ObjectsBrowser.h"
 
+#include "ModuleBase_BRepOwner.h"
 #include "ModuleBase_ResultPrs.h"
-#include <ModuleBase_ViewerPrs.h>
+#include "ModuleBase_ViewerPrs.h"
 
 #include <ModelAPI_Feature.h>
 #include <ModelAPI_Tools.h>

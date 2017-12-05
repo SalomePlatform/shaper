@@ -88,6 +88,8 @@ public:
   virtual void activateSelectionFilters();
   // Remove default selection filters of the module from the current viewer
   virtual void deactivateSelectionFilters();
+  /// Update selection filters depending on the module active controls
+  virtual void updateActiveSelectionFilters();
 
   // Stores the current selection
   virtual void storeSelection();

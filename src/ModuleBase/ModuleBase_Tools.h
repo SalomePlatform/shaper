@@ -45,9 +45,10 @@ class QWidget;
 class QLayout;
 class QDoubleSpinBox;
 class QAction;
+class ModuleBase_IWorkshop;
 class ModuleBase_ParamIntSpinBox;
 class ModuleBase_ParamSpinBox;
-class ModuleBase_IWorkshop;
+class ModuleBase_ViewerPrs;
 
 class GeomAPI_Shape;
 
@@ -211,6 +212,12 @@ MODULEBASE_EXPORT ObjectPtr getObject(const AttributePtr& theAttribute);
 /// Returns the object from the attribute
 /// \param theObj an object
 MODULEBASE_EXPORT TopAbs_ShapeEnum getCompoundSubType(const TopoDS_Shape& theShape);
+
+/// Returns either presentation shape or shape of BREP owner if it is casted to it
+/// \param thePrs selection presentation
+/// \return shape
+MODULEBASE_EXPORT TopoDS_Shape getSelectedShape(
+  const std::shared_ptr<ModuleBase_ViewerPrs>& thePrs);
 
 /// Returns list of parameters accessible in the active part and partset
 /// \theParameters a list of parameter names

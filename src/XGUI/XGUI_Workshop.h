@@ -41,10 +41,12 @@ class AppElements_Workbench;
 #endif
 
 class XGUI_ActionsMgr;
+class XGUI_ActiveControlMgr;
 class XGUI_ContextMenuMgr;
 class XGUI_Displayer;
 class XGUI_ErrorDialog;
 class XGUI_ErrorMgr;
+class XGUI_FacesPanel;
 class XGUI_MenuMgr;
 class XGUI_ModuleConnector;
 class XGUI_ObjectsBrowser;
@@ -131,6 +133,12 @@ Q_OBJECT
     return myActionsMgr;
   }
 
+  //! ! Returns an active control manager
+  XGUI_ActiveControlMgr* activeControlMgr() const
+  {
+    return myActiveControlMgr;
+  }
+
   //! ! Returns an actions manager
   XGUI_MenuMgr* menuMgr() const
   {
@@ -141,6 +149,12 @@ Q_OBJECT
   XGUI_PropertyPanel* propertyPanel() const
   {
     return myPropertyPanel;
+  }
+
+  //! Returns panel for hide object faces
+  XGUI_FacesPanel* facesPanel() const
+  {
+    return myFacesPanel;
   }
 
   //! Returns context menu manager object
@@ -189,6 +203,12 @@ Q_OBJECT
   /// Returns a desktop
   /// \return a desktop instance
   QMainWindow* desktop() const;
+
+  /// If faces panel made the object hidden, show message box whether the object should be
+  /// restored (removed from the panel) and displayed, if answer is No, returns false
+  /// \param theObject a model object
+  /// \return boolean state if the object should not be displayed
+  virtual bool prepareForDisplay(const std::set<ObjectPtr>& theObjects) const;
 
   //! Delete features
   void deleteObjects();
@@ -379,9 +399,6 @@ signals:
   /// Redo previous command
   void onRedo(int times = 1);
 
-  // Rebuild data tree
-  //void onRebuild();
-
   /// Validates the operation to change the "Apply" button state.
   /// \param thePreviousState the previous state of the widget
   void onWidgetStateChanged(int thePreviousState);
@@ -393,11 +410,11 @@ signals:
   /// Listens the corresponded signal of model widget and updates Apply button state by feature
   void onWidgetObjectUpdated();
 
-  /// Show property panel
-  void showPropertyPanel();
+  /// Show dock widget panel
+  void showPanel(QDockWidget* theDockWidget);
 
-  /// Hide property panel
-  void hidePropertyPanel();
+  /// Hide dock widget panel
+  void hidePanel(QDockWidget* theDockWidget);
 
   /// Show object Browser
   void showObjectBrowser();
@@ -541,10 +558,12 @@ private:
   XGUI_ErrorMgr* myErrorMgr;
   XGUI_ObjectsBrowser* myObjectBrowser;
   XGUI_PropertyPanel* myPropertyPanel;
+  XGUI_FacesPanel* myFacesPanel; //< panel for hide object faces
   XGUI_SelectionMgr* mySelector;
   XGUI_Displayer* myDisplayer;
   XGUI_OperationMgr* myOperationMgr;  ///< manager to manipulate through the operations
   XGUI_ActionsMgr* myActionsMgr;
+  XGUI_ActiveControlMgr* myActiveControlMgr; ///< manager to have none or one active control
   XGUI_MenuMgr* myMenuMgr; ///< manager to build menu/tool bar using order defined in XML
   XGUI_SalomeConnector* mySalomeConnector;
   XGUI_ErrorDialog* myErrorDlg;

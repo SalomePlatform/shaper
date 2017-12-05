@@ -97,7 +97,7 @@ void PartSet_PreviewSketchPlane::createSketchPlane(const CompositeFeaturePtr& th
   }
 
   XGUI_Displayer* aDisp = XGUI_Tools::workshop(theWorkshop)->displayer();
-  aDisp->displayAIS(myPlane, true, 1/*shaded*/, false);
+  aDisp->displayAIS(myPlane, false/*load object in selection*/, 1/*shaded*/, false);
   myPreviewIsDisplayed = true;
 }
 

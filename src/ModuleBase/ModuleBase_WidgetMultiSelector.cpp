@@ -19,16 +19,18 @@
 //
 
 #include <ModuleBase_WidgetMultiSelector.h>
-#include <ModuleBase_WidgetShapeSelector.h>
-#include <ModuleBase_ISelection.h>
-#include <ModuleBase_IWorkshop.h>
-#include <ModuleBase_IViewer.h>
-#include <ModuleBase_Tools.h>
+
 #include <ModuleBase_Definitions.h>
-#include <ModuleBase_IModule.h>
-#include <ModuleBase_ViewerPrs.h>
-#include <ModuleBase_IconFactory.h>
 #include <ModuleBase_Events.h>
+#include <ModuleBase_IconFactory.h>
+#include <ModuleBase_IModule.h>
+#include <ModuleBase_ISelection.h>
+#include <ModuleBase_IViewer.h>
+#include <ModuleBase_IWorkshop.h>
+#include <ModuleBase_ListView.h>
+#include <ModuleBase_Tools.h>
+#include <ModuleBase_ViewerPrs.h>
+#include <ModuleBase_WidgetShapeSelector.h>
 
 #include <ModelAPI_Data.h>
 #include <ModelAPI_Object.h>
@@ -47,7 +49,6 @@
 #include <QString>
 #include <QComboBox>
 #include <QEvent>
-#include <QAction>
 #include <QApplication>
 #include <QClipboard>
 #include <QTimer>
@@ -56,50 +57,7 @@
 #include <memory>
 #include <string>
 
-const int ATTRIBUTE_SELECTION_INDEX_ROLE = Qt::UserRole + 1;
-
 //#define DEBUG_UNDO_REDO
-
-/**
-* Customization of a List Widget to make it to be placed on full width of container
-*/
-class CustomListWidget : public QListWidget
-{
-public:
-  /// Constructor
-  /// \param theParent a parent widget
-  CustomListWidget( QWidget* theParent )
-    : QListWidget( theParent )
-  {
-  }
-
-  /// Redefinition of virtual method
-  virtual QSize	sizeHint() const
-  {
-    int aHeight = 2*QFontMetrics( font() ).height();
-    QSize aSize = QListWidget::sizeHint();
-    return QSize( aSize.width(), aHeight );
-  }
-
-  /// Redefinition of virtual method
-  virtual QSize	minimumSizeHint() const
-  {
-    int aHeight = 4/*2*/*QFontMetrics( font() ).height();
-    QSize aSize = QListWidget::minimumSizeHint();
-    return QSize( aSize.width(), aHeight );
-  }
-
-#ifndef WIN32
-// The code is necessary only for Linux because
-//it can not update viewport on widget resize
-protected:
-  void resizeEvent(QResizeEvent* theEvent)
-  {
-    QListWidget::resizeEvent(theEvent);
-    QTimer::singleShot(5, viewport(), SLOT(repaint()));
-  }
-#endif
-};
 
 #ifdef DEBUG_UNDO_REDO
 void printHistoryInfo(const QString& theMethodName, int theCurrentHistoryIndex,
@@ -163,32 +121,17 @@ ModuleBase_WidgetMultiSelector::ModuleBase_WidgetMultiSelector(QWidget* theParen
   }
 
   QString aToolTip = QString::fromStdString(theData->widgetTooltip());
-  myListControl = new CustomListWidget(this);
   QString anObjName = QString::fromStdString(attributeID());
-  myListControl->setObjectName(anObjName);
-  myListControl->setToolTip(aToolTip);
-  myListControl->setSelectionMode(QAbstractItemView::ExtendedSelection);
+  myListView = new ModuleBase_ListView(this, anObjName, aToolTip);
+  connect(myListView->getControl(), SIGNAL(itemSelectionChanged()), SLOT(onListSelection()));
+  connect(myListView, SIGNAL(deleteActionClicked()), SLOT(onDeleteItem()));
 
-  aMainLay->addWidget(myListControl, 2, 0, 1, -1);
+  aMainLay->addWidget(myListView->getControl(), 2, 0, 1, -1);
   aMainLay->setRowStretch(2, 1);
   //aMainLay->addWidget(new QLabel(this)); //FIXME(sbh)???
   //aMainLay->setRowMinimumHeight(3, 20);
   //this->setLayout(aMainLay);
   connect(myTypeCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(onSelectionTypeChanged()));
-
-  myCopyAction = ModuleBase_Tools::createAction(QIcon(":pictures/copy.png"), tr("Copy"),
-                          myWorkshop->desktop(), this, SLOT(onCopyItem()));
-  myCopyAction->setShortcut(QKeySequence::Copy);
-  myCopyAction->setEnabled(false);
-  myListControl->addAction(myCopyAction);
-
-  myDeleteAction = ModuleBase_Tools::createAction(QIcon(":pictures/delete.png"), tr("Delete"),
-                          myWorkshop->desktop(), this, SLOT(onDeleteItem()));
-  myDeleteAction->setEnabled(false);
-  myListControl->addAction(myDeleteAction);
-
-  myListControl->setContextMenuPolicy(Qt::ActionsContextMenu);
-  connect(myListControl, SIGNAL(itemSelectionChanged()), SLOT(onListSelection()));
 
   myIsNeutralPointClear = theData->getBooleanAttribute("clear_in_neutral_point", true);
 }
@@ -425,7 +368,7 @@ bool ModuleBase_WidgetMultiSelector::processDelete()
   std::set<int> anAttributeIds;
   getSelectedAttributeIndices(anAttributeIds);
 
-  QModelIndexList aIndexes = myListControl->selectionModel()->selectedIndexes();
+  QModelIndexList anIndices = myListView->getControl()->selectionModel()->selectedIndexes();
 
   // refill attribute by the items which indices are not in the list of ids
   bool aDone = false;
@@ -462,17 +405,8 @@ bool ModuleBase_WidgetMultiSelector::processDelete()
   }
 
   // Restore selection
-  int aRows = myListControl->model()->rowCount();
-  if (aRows > 0) {
-    foreach(QModelIndex aIndex, aIndexes) {
-      if (aIndex.row() < aRows)
-        myListControl->selectionModel()->select(aIndex, QItemSelectionModel::Select);
-      else {
-        QModelIndex aIdx = myListControl->model()->index(aRows - 1, 0);
-        myListControl->selectionModel()->select(aIdx, QItemSelectionModel::Select);
-      }
-    }
-  }
+  myListView->restoreSelection(anIndices);
+
   appendSelectionInHistory();
   return aDone;
 }
@@ -482,7 +416,7 @@ QList<QWidget*> ModuleBase_WidgetMultiSelector::getControls() const
 {
   QList<QWidget*> result;
   //result << myTypeCombo;
-  result << myListControl;
+  result << myListView->getControl();
   return result;
 }
 
@@ -593,7 +527,7 @@ void ModuleBase_WidgetMultiSelector::updateFocus()
 {
   // Set focus to List control in order to make possible
   // to use Tab key for transfer the focus to next widgets
-  ModuleBase_Tools::setFocus(myListControl,
+  ModuleBase_Tools::setFocus(myListView->getControl(),
                              "ModuleBase_WidgetMultiSelector::onSelectionTypeChanged()");
 }
 
@@ -670,7 +604,7 @@ QList<ModuleBase_ViewerPrsPtr> ModuleBase_WidgetMultiSelector::getAttributeSelec
 //********************************************************************
 void ModuleBase_WidgetMultiSelector::updateSelectionList()
 {
-  myListControl->clear();
+  myListView->getControl()->clear();
 
   DataPtr aData = myFeature->data();
   AttributePtr anAttribute = aData->attribute(attributeID());
@@ -679,9 +613,7 @@ void ModuleBase_WidgetMultiSelector::updateSelectionList()
     AttributeSelectionListPtr aSelectionListAttr = aData->selectionList(attributeID());
     for (int i = 0; i < aSelectionListAttr->size(); i++) {
       AttributeSelectionPtr aAttr = aSelectionListAttr->value(i);
-      QListWidgetItem* anItem = new QListWidgetItem(aAttr->namingName().c_str(), myListControl);
-      anItem->setData(ATTRIBUTE_SELECTION_INDEX_ROLE, i);
-      myListControl->addItem(anItem);
+      myListView->addItem(aAttr->namingName().c_str(), i);
     }
   }
   else if (aType == ModelAPI_AttributeRefList::typeId()) {
@@ -689,10 +621,7 @@ void ModuleBase_WidgetMultiSelector::updateSelectionList()
     for (int i = 0; i < aRefListAttr->size(); i++) {
       ObjectPtr anObject = aRefListAttr->object(i);
       if (anObject.get()) {
-        QListWidgetItem* anItem = new QListWidgetItem(anObject->data()->name().c_str(),
-                                                      myListControl);
-        anItem->setData(ATTRIBUTE_SELECTION_INDEX_ROLE, i);
-        myListControl->addItem(anItem);
+        myListView->addItem(anObject->data()->name().c_str(), i);
       }
     }
   }
@@ -711,14 +640,12 @@ void ModuleBase_WidgetMultiSelector::updateSelectionList()
           aName = anObject->data()->name().c_str();
         }
       }
-      QListWidgetItem* anItem = new QListWidgetItem(aName, myListControl);
-      anItem->setData(ATTRIBUTE_SELECTION_INDEX_ROLE, i);
-      myListControl->addItem(anItem);
+      myListView->addItem(aName, i);
     }
   }
 
   // We have to call repaint because sometimes the List control is not updated
-  myListControl->repaint();
+  myListView->getControl()->repaint();
 }
 
 //********************************************************************
@@ -746,27 +673,11 @@ void ModuleBase_WidgetMultiSelector::clearSelection()
 
   QList<ModuleBase_ViewerPrsPtr> anEmptyList;
   // This method will call Selection changed event which will call onSelectionChanged
-  // To clear mySelection, myListControl and storeValue()
+  // To clear mySelection, myListView and storeValue()
   // So, we don't need to call it
   myWorkshop->setSelected(anEmptyList);
 
   myIsNeutralPointClear = isClearInNeutralPoint;
-}
-
-//********************************************************************
-void ModuleBase_WidgetMultiSelector::onCopyItem()
-{
-  QList<QListWidgetItem*> aItems = myListControl->selectedItems();
-  QString aRes;
-  foreach(QListWidgetItem* aItem, aItems) {
-    if (!aRes.isEmpty())
-      aRes += "\n";
-    aRes += aItem->text();
-  }
-  if (!aRes.isEmpty()) {
-    QClipboard *clipboard = QApplication::clipboard();
-    clipboard->setText(aRes);
-  }
 }
 
 //********************************************************************
@@ -778,10 +689,6 @@ void ModuleBase_WidgetMultiSelector::onDeleteItem()
 //********************************************************************
 void ModuleBase_WidgetMultiSelector::onListSelection()
 {
-  QList<QListWidgetItem*> aItems = myListControl->selectedItems();
-  myCopyAction->setEnabled(!aItems.isEmpty());
-  myDeleteAction->setEnabled(!aItems.isEmpty());
-
   myWorkshop->module()->customizeObject(myFeature, ModuleBase_IModule::CustomizeHighlightedObjects,
                                         true);
 }
@@ -789,12 +696,7 @@ void ModuleBase_WidgetMultiSelector::onListSelection()
 //********************************************************************
 void ModuleBase_WidgetMultiSelector::getSelectedAttributeIndices(std::set<int>& theAttributeIds)
 {
-  QList<QListWidgetItem*> aItems = myListControl->selectedItems();
-  foreach(QListWidgetItem* anItem, aItems) {
-    int anIndex = anItem->data(ATTRIBUTE_SELECTION_INDEX_ROLE).toInt();
-    if (theAttributeIds.find(anIndex) == theAttributeIds.end())
-      theAttributeIds.insert(anIndex);
-  }
+  myListView->getSelectedIndices(theAttributeIds);
 }
 
 void ModuleBase_WidgetMultiSelector::convertIndicesToViewerSelection(std::set<int> theAttributeIds,

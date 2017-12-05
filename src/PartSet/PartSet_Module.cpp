@@ -75,20 +75,22 @@
 #include <GeomDataAPI_Point.h>
 #include <GeomDataAPI_Dir.h>
 
+#include <XGUI_ActiveControlMgr.h>
+#include <XGUI_ActiveControlSelector.h>
+#include <XGUI_ActionsMgr.h>
+#include <XGUI_ContextMenuMgr.h>
+#include <XGUI_CustomPrs.h>
+#include <XGUI_DataModel.h>
 #include <XGUI_Displayer.h>
-#include <XGUI_Workshop.h>
+#include <XGUI_ErrorMgr.h>
+#include <XGUI_FacesPanelSelector.h>
+#include <XGUI_ModuleConnector.h>
+#include <XGUI_ObjectsBrowser.h>
 #include <XGUI_OperationMgr.h>
 #include <XGUI_PropertyPanel.h>
-#include <XGUI_ModuleConnector.h>
-#include <XGUI_ContextMenuMgr.h>
+#include <XGUI_SelectionMgr.h>
 #include <XGUI_Tools.h>
-#include <XGUI_ObjectsBrowser.h>
-#include <XGUI_SelectionMgr.h>
-#include <XGUI_DataModel.h>
-#include <XGUI_ErrorMgr.h>
-#include <XGUI_CustomPrs.h>
-#include <XGUI_SelectionMgr.h>
-#include <XGUI_ActionsMgr.h>
+#include <XGUI_Workshop.h>
 
 #include <SketchPlugin_ConstraintAngle.h>
 #include <SketchPlugin_ConstraintLength.h>
@@ -221,6 +223,17 @@ void PartSet_Module::deactivateSelectionFilters()
     if (!aFilter.IsNull())
       myWorkshop->viewer()->removeSelectionFilter(aFilter);
   }
+}
+
+void PartSet_Module::updateActiveSelectionFilters()
+{
+  XGUI_Workshop* aWorkshop = XGUI_Tools::workshop(workshop());
+  XGUI_ActiveControlSelector* anActiveSelector = aWorkshop->activeControlMgr()->activeSelector();
+
+  if (anActiveSelector && anActiveSelector->getType() == XGUI_FacesPanelSelector::Type())
+    sketchMgr()->deactivateSelectionFilters();
+  else
+    sketchMgr()->activateSelectionFilters();
 }
 
 void PartSet_Module::storeSelection()

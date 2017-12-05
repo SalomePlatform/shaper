@@ -37,11 +37,9 @@
 #include <QMap>
 
 class QWidget;
-class QListWidget;
 class QComboBox;
+class ModuleBase_ListView;
 class ModuleBase_IWorkshop;
-class QAction;
-
 
 /**
 * \ingroup GUI
@@ -114,9 +112,6 @@ public slots:
   virtual void onSelectionChanged();
 
 protected slots:
-  /// Slot for copy command in a list pop-up menu
-  void onCopyItem();
-
   /// Slot for delete command in a list pop-up menu
   void onDeleteItem();
 
@@ -215,23 +210,9 @@ protected:
                             ModuleBase_IWorkshop* theWorkshop);
 
 protected:
-  /// List control
-  QListWidget* myListControl;
-
-  /// Combobox of types
-  QComboBox* myTypeCombo;
-
-  /// Provides correspondance between Result object and its shape
-  typedef QPair<ResultPtr, GeomShapePtr> GeomSelection;
-
-  /// A copy action for pop-up menu in a list control
-  QAction* myCopyAction;
-
-  /// A delete action for pop-up menu in a list control
-  QAction* myDeleteAction;
-
-  /// A flag to store use_choice parameter state
-  bool myIsUseChoice;
+  ModuleBase_ListView* myListView; ///< List control
+  QComboBox* myTypeCombo; ///< Combobox of types
+  bool myIsUseChoice; /// A flag to store use_choice parameter state
 
   /// A flag to clear selection by click in empty place in the viewer
   bool myIsNeutralPointClear;

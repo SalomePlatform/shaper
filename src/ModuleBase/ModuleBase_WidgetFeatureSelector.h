@@ -79,6 +79,9 @@ Q_OBJECT
   /// The method called when widget is deactivated
   virtual void deactivate();
 
+  /// Processes Selection action.
+  virtual bool processAction(ModuleBase_ActionType theActionType);
+
 protected:
   /// The method called when widget is activated
   virtual void activateCustom();
@@ -104,7 +107,7 @@ protected:
   /// \param theDone a state whether the selection is set
   virtual void updateOnSelectionChanged(const bool theDone);
 
-protected slots:
+protected:
   /// Called on selection changed event
   virtual void onSelectionChanged();
 

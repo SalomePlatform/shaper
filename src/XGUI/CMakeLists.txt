@@ -29,6 +29,8 @@ ADD_DEFINITIONS(${QT_DEFINITIONS})
 SET(PROJECT_HEADERS
     XGUI.h
     XGUI_ActionsMgr.h
+    XGUI_ActiveControlMgr.h
+    XGUI_ActiveControlSelector.h
     XGUI_ColorDialog.h
     XGUI_ContextMenuMgr.h
     XGUI_CustomPrs.h
@@ -37,6 +39,8 @@ SET(PROJECT_HEADERS
     XGUI_Displayer.h
     XGUI_ErrorDialog.h
     XGUI_ErrorMgr.h
+    XGUI_FacesPanel.h
+    XGUI_FacesPanelSelector.h
     XGUI_HistoryMenu.h
     XGUI_MenuGroup.h
     XGUI_MenuMgr.h
@@ -46,6 +50,7 @@ SET(PROJECT_HEADERS
     XGUI_OperationMgr.h
     XGUI_PropertyDialog.h
     XGUI_PropertyPanel.h
+    XGUI_PropertyPanelSelector.h
     XGUI_QtEvents.h
     XGUI_SalomeConnector.h
     XGUI_Selection.h
@@ -59,6 +64,8 @@ SET(PROJECT_HEADERS
 
 SET(PROJECT_MOC_HEADERS
     XGUI_ActionsMgr.h
+    XGUI_ActiveControlMgr.h
+    XGUI_ActiveControlSelector.h
     XGUI_ColorDialog.h
     XGUI_ContextMenuMgr.h
     XGUI_DataModel.h
@@ -66,12 +73,15 @@ SET(PROJECT_MOC_HEADERS
     XGUI_Displayer.h
     XGUI_ErrorDialog.h
     XGUI_ErrorMgr.h
+    XGUI_FacesPanel.h
+    XGUI_FacesPanelSelector.h
     XGUI_HistoryMenu.h
     XGUI_ModuleConnector.h
     XGUI_ObjectsBrowser.h
     XGUI_OperationMgr.h
     XGUI_PropertyDialog.h
     XGUI_PropertyPanel.h
+    XGUI_PropertyPanelSelector.h
     XGUI_SelectionMgr.h
     XGUI_TransparencyWidget.h
     XGUI_ViewerProxy.h
@@ -84,6 +94,7 @@ QT_WRAP_MOC(PROJECT_AUTOMOC ${PROJECT_MOC_HEADERS})
 
 SET(PROJECT_SOURCES
     XGUI_ActionsMgr.cpp
+    XGUI_ActiveControlMgr.cpp
     XGUI_ColorDialog.cpp
     XGUI_ContextMenuMgr.cpp
     XGUI_CustomPrs.cpp
@@ -92,6 +103,8 @@ SET(PROJECT_SOURCES
     XGUI_Displayer.cpp
     XGUI_ErrorDialog.cpp
     XGUI_ErrorMgr.cpp
+    XGUI_FacesPanel.cpp
+    XGUI_FacesPanelSelector.cpp
     XGUI_HistoryMenu.cpp
     XGUI_MenuGroup.cpp
     XGUI_MenuMgr.cpp
@@ -101,6 +114,7 @@ SET(PROJECT_SOURCES
     XGUI_OperationMgr.cpp
     XGUI_PropertyDialog.cpp
     XGUI_PropertyPanel.cpp
+    XGUI_PropertyPanelSelector.cpp
     XGUI_QtEvents.cpp
     XGUI_SalomeConnector.cpp
     XGUI_Selection.cpp

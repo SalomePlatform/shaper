@@ -19,9 +19,14 @@
 //
 
 #include "XGUI_OperationMgr.h"
+
+#include "XGUI_ActiveControlMgr.h"
+#include "XGUI_ActiveControlSelector.h"
+#include "XGUI_FacesPanelSelector.h"
 #include "XGUI_ModuleConnector.h"
 #include "XGUI_Workshop.h"
 #include "XGUI_ErrorMgr.h"
+#include "XGUI_FacesPanel.h"
 #include "XGUI_Tools.h"
 #include "XGUI_ObjectsBrowser.h"
 #include "XGUI_ContextMenuMgr.h"
@@ -711,6 +716,13 @@ bool XGUI_OperationMgr::onKeyPressed(QObject *theObject, QKeyEvent* theEvent)
         if (anActiveWgt)
           isAccepted = anActiveWgt && anActiveWgt->processAction(ActionEscape);
       }
+      if (!isAccepted)
+      {
+        XGUI_ActiveControlSelector* anActiveSelector =
+          XGUI_Tools::workshop(myWorkshop)->activeControlMgr()->activeSelector();
+        if (anActiveSelector && anActiveSelector->getType() == XGUI_FacesPanelSelector::Type())
+          isAccepted = XGUI_Tools::workshop(myWorkshop)->facesPanel()->processAction(ActionEscape);
+      }
       // default Escape button functionality
       if (!isAccepted && aOperation) {
         onAbortOperation();
@@ -800,6 +812,13 @@ bool XGUI_OperationMgr::onProcessDelete(QObject* theObject)
         }
       }
     }
+  }
+  if (!isAccepted)
+  {
+    XGUI_ActiveControlSelector* anActiveSelector =
+      XGUI_Tools::workshop(myWorkshop)->activeControlMgr()->activeSelector();
+    if (anActiveSelector && anActiveSelector->getType() == XGUI_FacesPanelSelector::Type())
+      isAccepted = XGUI_Tools::workshop(myWorkshop)->facesPanel()->processAction(ActionDelete);
   }
   if (!isAccepted) {
     // after widget, object browser and viewer should process delete

@@ -195,6 +195,10 @@ QList<QWidget*> PartSet_WidgetSketchLabel::getControls() const
 
 void PartSet_WidgetSketchLabel::onSelectionChanged()
 {
+  std::shared_ptr<GeomAPI_Pln> aPlane = plane();
+  if (aPlane.get())
+    return;
+
   QList<ModuleBase_ViewerPrsPtr> aSelected = getFilteredSelected();
 
   if (aSelected.empty())
@@ -356,8 +360,6 @@ void PartSet_WidgetSketchLabel::updateByPlaneSelected(const ModuleBase_ViewerPrs
   //myLabel->setText("");
   //myLabel->setToolTip("");
   XGUI_Workshop* aWorkshop = XGUI_Tools::workshop(myWorkshop);
-  disconnect(aWorkshop->selector(), SIGNAL(selectionChanged()),
-              this, SLOT(onSelectionChanged()));
   // 4. deactivate face selection filter
   activateFilters(false);
 
@@ -449,6 +451,17 @@ bool PartSet_WidgetSketchLabel::canFillSketch(const ModuleBase_ViewerPrsPtr& the
   return aCanFillSketch;
 }
 
+//********************************************************************
+bool PartSet_WidgetSketchLabel::processAction(ModuleBase_ActionType theActionType)
+{
+  if (theActionType == ActionSelection)
+    onSelectionChanged();
+  else
+    return ModuleBase_WidgetValidated::processAction(theActionType);
+
+  return true;
+}
+
 bool PartSet_WidgetSketchLabel::fillSketchPlaneBySelection(const ModuleBase_ViewerPrsPtr& thePrs)
 {
   bool isOwnerSet = false;
@@ -513,9 +526,6 @@ void PartSet_WidgetSketchLabel::activateCustom()
     mySizeOfViewWidget->setVisible(false);
 
   activateSelection(true);
-
-  connect(XGUI_Tools::workshop(myWorkshop)->selector(), SIGNAL(selectionChanged()),
-          this, SLOT(onSelectionChanged()));
   activateFilters(true);
 }
 
