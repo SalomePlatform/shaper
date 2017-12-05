@@ -84,12 +84,14 @@ void ExchangeAPI_Export::dump(ModelHighAPI_Dumper& theDumper) const
   std::string exportType = aBase->string(ExchangePlugin_ExportFeature::EXPORT_TYPE_ID())->value();
 
   if (exportType == "XAO") {
-    std::string tmpXAOFile = aBase->string(ExchangePlugin_ExportFeature::XAO_FILE_PATH_ID())->value();
+    std::string tmpXAOFile =
+                aBase->string(ExchangePlugin_ExportFeature::XAO_FILE_PATH_ID())->value();
     theDumper << "exportToXAO(" << aDocName << ", '" << tmpXAOFile << "'" ;
     std::string theAuthor = aBase->string(ExchangePlugin_ExportFeature::XAO_AUTHOR_ID())->value();
     if (not theAuthor.empty())
       theDumper << ", '" << theAuthor << "'";
-    std::string theGeometryName = aBase->string(ExchangePlugin_ExportFeature::XAO_GEOMETRY_NAME_ID())->value();
+    std::string theGeometryName =
+                aBase->string(ExchangePlugin_ExportFeature::XAO_GEOMETRY_NAME_ID())->value();
     if (not theGeometryName.empty())
       theDumper << ", '" << theGeometryName << "'";
     theDumper << ")" << std::endl;
@@ -98,7 +100,8 @@ void ExchangeAPI_Export::dump(ModelHighAPI_Dumper& theDumper) const
       theDumper << "exportToFile(" << aDocName << ", " <<
           aBase->string(ExchangePlugin_ExportFeature::FILE_PATH_ID()) << ", " <<
           aBase->selectionList(ExchangePlugin_ExportFeature::SELECTION_LIST_ID()) ;
-      std::string theFileFormat = aBase->string(ExchangePlugin_ExportFeature::FILE_FORMAT_ID())->value();
+      std::string theFileFormat =
+                  aBase->string(ExchangePlugin_ExportFeature::FILE_FORMAT_ID())->value();
       if (not theFileFormat.empty())
         theDumper << ", '" << theFileFormat << "'";
       theDumper << ")" << std::endl;
