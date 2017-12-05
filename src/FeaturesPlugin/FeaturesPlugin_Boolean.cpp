@@ -708,10 +708,11 @@ void FeaturesPlugin_Boolean::loadNamingDS(std::shared_ptr<ModelAPI_ResultBody> t
     theResultBody->store(theResultShape, false);
   } else {
     const int aModifyTag = 1;
-    const int aDeletedTag = 2;
-    /// sub solids will be placed at labels 3, 4, etc. if result is compound of solids
-    const int aSubsolidsTag = 3;
-    const int anEdgesAndFacesTag = 10000;
+    const int aModifyEdgeTag = 2;
+    const int aModifyFaceTag = 3;
+    const int aDeletedTag = 4;
+    /// sub solids will be placed at labels 5, 6, etc. if result is compound of solids
+    const int aSubsolidsTag = 5;
 
     theResultBody->storeModified(theBaseShape, theResultShape, aSubsolidsTag);
 
@@ -719,8 +720,10 @@ void FeaturesPlugin_Boolean::loadNamingDS(std::shared_ptr<ModelAPI_ResultBody> t
     const std::string aModEName = "Modified_Edge";
     const std::string aModFName = "Modified_Face";
 
+    theResultBody->loadAndOrientModifiedShapes(&theMakeShape, theBaseShape, GeomAPI_Shape::EDGE,
+      aModifyEdgeTag, aModEName, theMapOfShapes, false, theIsStoreAsGenerated, true);
     theResultBody->loadAndOrientModifiedShapes(&theMakeShape, theBaseShape, GeomAPI_Shape::FACE,
-      aModifyTag, aModName, theMapOfShapes, false, theIsStoreAsGenerated, true);
+      aModifyFaceTag, aModFName, theMapOfShapes, false, theIsStoreAsGenerated, true);
     theResultBody->loadDeletedShapes(&theMakeShape, theBaseShape,
                                      GeomAPI_Shape::FACE, aDeletedTag);
 
@@ -729,15 +732,15 @@ void FeaturesPlugin_Boolean::loadNamingDS(std::shared_ptr<ModelAPI_ResultBody> t
     for(ListOfShape::const_iterator
         anIter = theTools.begin(); anIter != theTools.end(); anIter++) {
       if((*anIter)->shapeType() == GeomAPI_Shape::EDGE) {
-        aTag = anEdgesAndFacesTag;
+        aTag = aModifyEdgeTag;
         aName = aModEName;
       }
       else if((*anIter)->shapeType() == GeomAPI_Shape::FACE) {
-        aTag = anEdgesAndFacesTag;
+        aTag = aModifyFaceTag;
         aName = aModFName;
       } else {
-        aTag = aModifyTag;
-        aName = aModName;
+        aTag = aModifyFaceTag;
+        aName = aModFName;
       }
       theResultBody->loadAndOrientModifiedShapes(&theMakeShape, *anIter,
         aName == aModEName ? GeomAPI_Shape::EDGE : GeomAPI_Shape::FACE,
