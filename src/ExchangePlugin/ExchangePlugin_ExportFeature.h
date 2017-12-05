@@ -105,16 +105,11 @@ public:
   /// Computes or recomputes the results
   EXCHANGEPLUGIN_EXPORT virtual void execute();
 
-  /// Reimplemented from ModelAPI_Feature::isMacro(). Returns false.
-  // Not a macro. Otherwise, the feature will be deleted after being executed
-  EXCHANGEPLUGIN_EXPORT virtual bool isMacro() const { return false; }
+  /// Reimplemented from ModelAPI_Feature::isMacro(). Returns true.
+  EXCHANGEPLUGIN_EXPORT virtual bool isMacro() const { return true; }
 
   /// Reimplemented from ModelAPI_Feature::isPreviewNeeded(). Returns false.
   EXCHANGEPLUGIN_EXPORT virtual bool isPreviewNeeded() const { return false; }
-
-  /// Do not put in history.
-  /// Since it is not a macro, it is not deleted, but we don't want to see it.
-  bool isInHistory()  { return false; }
 
 protected:
   /// Performs export of the file
