@@ -26,6 +26,7 @@
 #include <QClipboard>
 #include <QListWidget>
 #include <QWidget>
+#include <QTimer>
 
 const int ATTRIBUTE_SELECTION_INDEX_ROLE = Qt::UserRole + 1;
 
