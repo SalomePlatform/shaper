@@ -249,7 +249,7 @@ void ExchangePlugin_ExportFeature::exportXAO(const std::string& theFileName)
 
   // geometry name
   std::string aGeometryName = string(ExchangePlugin_ExportFeature::XAO_GEOMETRY_NAME_ID())->value();
-  if (aGeometryName.empty() and aBodyCount == 1){
+  if (aGeometryName.empty() && aBodyCount == 1) {
     // get the name from the first result
     ResultBodyPtr aResultBody = *aResults.begin();
     aGeometryName = aResultBody->data()->name();
