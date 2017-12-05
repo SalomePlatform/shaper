@@ -23,7 +23,10 @@
 
 #include "XGUI.h"
 
+#include <ModelAPI_Object.h>
+
 #include <ModuleBase_ActionType.h>
+#include <ModuleBase_ViewerPrs.h>
 
 #include <QDockWidget>
 #include <QObject>
@@ -33,10 +36,8 @@
 
 class AIS_InteractiveObject;
 
-class ModelAPI_Object;
 class ModuleBase_IWorkshop;
 class ModuleBase_ListView;
-class ModuleBase_ViewerPrs;
 
 class QAction;
 class QCheckBox;
