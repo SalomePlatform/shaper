@@ -26,7 +26,11 @@
 #include <QClipboard>
 #include <QListWidget>
 #include <QWidget>
+
+#ifndef WIN32
+#include <QResizeEvent>
 #include <QTimer>
+#endif
 
 const int ATTRIBUTE_SELECTION_INDEX_ROLE = Qt::UserRole + 1;
 
