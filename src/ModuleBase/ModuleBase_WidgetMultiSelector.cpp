@@ -22,6 +22,7 @@
 #include <ModuleBase_WidgetShapeSelector.h>
 #include <ModuleBase_ISelection.h>
 #include <ModuleBase_IWorkshop.h>
+#include <ModuleBase_IPropertyPanel.h>
 #include <ModuleBase_IViewer.h>
 #include <ModuleBase_Tools.h>
 #include <ModuleBase_Definitions.h>
@@ -152,19 +153,13 @@ ModuleBase_WidgetMultiSelector::ModuleBase_WidgetMultiSelector(QWidget* theParen
   QGridLayout* aMainLay = new QGridLayout(this);
   ModuleBase_Tools::adjustMargins(aMainLay);
 
-  //QLabel* aTypeLabel = new QLabel(tr("Type"), this);
-  //aMainLay->addWidget(aTypeLabel, 0, 0);
-
-  //myTypeCombo = new QComboBox(this);
   QStringList aIconsList = getIconsList(myShapeTypes);
   myTypeCtrl = new ModuleBase_ChoiceCtrl(this, myShapeTypes, aIconsList);
   myTypeCtrl->setLabel(tr("Type"));
   myTypeCtrl->setValue(0);
+  aMainLay->addWidget(myTypeCtrl, 0, 0, 1, 2);
 
   // There is no sense to parameterize list of types while we can not parameterize selection mode
-  //if (!aShapeTypes.empty())
-  //  myTypeCombo->addItems(aShapeTypes);
-  aMainLay->addWidget(myTypeCtrl, 0, 0, 1, 2);
   // if the xml definition contains one type, the controls to select a type should not be shown
   if (myShapeTypes.size() <= 1 || !myIsUseChoice) {
     myTypeCtrl->setVisible(false);
@@ -253,7 +248,6 @@ bool ModuleBase_WidgetMultiSelector::storeValueCustom()
   std::string aType = anAttribute->attributeType();
   if (aType == ModelAPI_AttributeSelectionList::typeId()) {
     AttributeSelectionListPtr aSelectionListAttr = myFeature->data()->selectionList(attributeID());
-    //aSelectionListAttr->setSelectionType(myTypeCombo->currentText().toStdString());
     aSelectionListAttr->setSelectionType(myTypeCtrl->textValue().toStdString());
   }
   return true;
@@ -505,7 +499,6 @@ bool ModuleBase_WidgetMultiSelector::processDelete()
 QList<QWidget*> ModuleBase_WidgetMultiSelector::getControls() const
 {
   QList<QWidget*> result;
-  //result << myTypeCombo;
   result << myListControl;
   return result;
 }
@@ -551,6 +544,9 @@ void ModuleBase_WidgetMultiSelector::onSelectionTypeChanged()
                             true); /// hope that something is redisplayed by object updated
   // clear history should follow after set selected to do not increase history by setSelected
   clearSelectedHistory();
+
+  if (myWorkshop->propertyPanel()->activeWidget() != this)
+    myWorkshop->propertyPanel()->activateWidget(this);
 }
 
 //********************************************************************
@@ -670,8 +666,6 @@ void ModuleBase_WidgetMultiSelector::setCurrentShapeType(const int theShapeType)
 {
   QString aShapeTypeName;
 
-  //for (int idx = 0; idx < myTypeCombo->count(); ++idx) {
-  //  aShapeTypeName = myTypeCombo->itemText(idx);
   int idx = 0;
   foreach (QString aShapeTypeName, myShapeTypes) {
     int aRefType = ModuleBase_Tools::shapeType(aShapeTypeName);

@@ -265,6 +265,11 @@ Q_OBJECT
   /// \return a model widget or NULL
   static ModuleBase_ModelWidget* findModelWidget(ModuleBase_IPropertyPanel* theProp,
                                                  QWidget* theWidget);
+
+  /// Returns True if the widget uses feature attribute.
+  /// If not then it means that the widget do not need attribute at all.
+  virtual bool usesAttribute() const { return true; }
+
 signals:
   /// The signal about widget values are to be changed
   void beforeValuesChanged();

@@ -598,13 +598,15 @@ void XGUI_Workshop::fillPropertyPanel(ModuleBase_Operation* theOperation)
   FeaturePtr aFeature = aFOperation->feature();
   std::string aFeatureKind = aFeature->getKind();
   foreach (ModuleBase_ModelWidget* aWidget, aWidgets) {
-    if (!aWidget->attributeID().empty() && !aFeature->attribute(aWidget->attributeID()).get()) {
-      std::string anErrorMsg = "The feature '%1' has no attribute '%2' used by widget '%3'.";
-      Events_InfoMessage("XGUI_Workshop", anErrorMsg)
-        .arg(aFeatureKind).arg(aWidget->attributeID())
-        .arg(aWidget->metaObject()->className()).send();
-      myPropertyPanel->cleanContent();
-      return;
+    if (aWidget->usesAttribute()) {
+      if (!aWidget->attributeID().empty() && !aFeature->attribute(aWidget->attributeID()).get()) {
+        std::string anErrorMsg = "The feature '%1' has no attribute '%2' used by widget '%3'.";
+        Events_InfoMessage("XGUI_Workshop", anErrorMsg)
+          .arg(aFeatureKind).arg(aWidget->attributeID())
+          .arg(aWidget->metaObject()->className()).send();
+        myPropertyPanel->cleanContent();
+        return;
+      }
     }
   }
   // for performance purpose, flush should be done after all controls are filled

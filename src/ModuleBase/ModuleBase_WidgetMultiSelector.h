@@ -244,6 +244,7 @@ protected:
 
   /// A container of selected objects
   QList<QList<std::shared_ptr<ModuleBase_ViewerPrs> > > mySelectedHistoryValues;
+
   /// Position in a container of selected values
   int myCurrentHistoryIndex;
 };
