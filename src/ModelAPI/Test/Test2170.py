@@ -66,7 +66,7 @@ Sketch_1.result().setName("tutu")
 Extrusion_1 = model.addExtrusion(Part_1_doc, [model.selection("FACE", "tutu/Face-SketchLine_1f-SketchLine_3f-SketchArc_1_2f-SketchArc_2_2f")], model.selection(), 10, 0)
 Edge_1 = model.addEdge(Part_1_doc, [model.selection("EDGE", "tutu/Edge-SketchLine_2")])
 Extrusion_2 = model.addExtrusion(Part_1_doc, [model.selection("EDGE", "Edge_1_1")], model.selection("EDGE", "PartSet/OZ"), 100, 0)
-Group_1 = model.addGroup(Part_1_doc, [model.selection("VERTEX", "Edge_1_1/Generated_Edge_2&Edge_1_1/To_Edge_1"), model.selection("VERTEX", "Edge_1_1/Generated_Edge_1&Edge_1_1/To_Edge_1")])
+Group_1 = model.addGroup(Part_1_doc, [model.selection("VERTEX", "Extrusion_2_1/Generated_Edge_2&Extrusion_2_1/To_Edge_1"), model.selection("VERTEX", "Extrusion_2_1/Generated_Edge_1&Extrusion_2_1/To_Edge_1")])
 model.end()
 
 # check that resulting group selection is valid

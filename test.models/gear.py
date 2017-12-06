@@ -197,11 +197,8 @@ SketchConstraintCoincidence_62 = Sketch_4.setCoincident(SketchPoint_6.coordinate
 SketchConstraintDistance_6 = Sketch_4.setDistance(SketchPoint_6.coordinates(), SketchLine_86.result(), 24.5)
 model.do()
 ExtrusionCut_1 = model.addExtrusionCut(Part_1_doc, [model.selection("COMPOUND", "Sketch_1")], model.selection(), model.selection("FACE", "Revolution_1_1/Generated_Face_5"), 0, model.selection(), 0, [model.selection("SOLID", "Revolution_1_1")])
-ExtrusionCut_1.result().setName("ExtrusionCut_1_1")
 RevolutionCut_1 = model.addRevolutionCut(Part_1_doc, [model.selection("COMPOUND", "Sketch_2")], model.selection("EDGE", "PartSet/OX"), 0, 360, [model.selection("SOLID", "ExtrusionCut_1_1")])
-RevolutionCut_1.result().setName("RevolutionCut_1_1")
 ExtrusionCut_2 = model.addExtrusionCut(Part_1_doc, [model.selection("COMPOUND", "Sketch_3")], model.selection(), 0, 5, [model.selection("SOLID", "RevolutionCut_1_1")])
-ExtrusionCut_2.result().setName("ExtrusionCut_2_1")
 model.do()
 
 # Test reexecution after parameter change

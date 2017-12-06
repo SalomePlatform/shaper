@@ -625,8 +625,9 @@ void getConcealedResults(const FeaturePtr& theFeature,
   }
 }
 
-std::string getDefaultName(const std::shared_ptr<ModelAPI_Result>& theResult,
-                           const int theResultIndex)
+std::pair<std::string, bool> getDefaultName(
+    const std::shared_ptr<ModelAPI_Result>& theResult,
+    const int theResultIndex)
 {
   typedef std::list< std::pair < std::string, std::list<ObjectPtr> > > ListOfReferences;
 
@@ -648,7 +649,7 @@ std::string getDefaultName(const std::shared_ptr<ModelAPI_Result>& theResult,
       if (aCompSolidRes == *anIt)
         break;
     aDefaultName << "_" << (aCompSolidResultIndex + 1) << "_" << (theResultIndex + 1);
-    return aDefaultName.str();
+    return std::pair<std::string, bool>(aDefaultName.str(), false);
   }
 
   DataPtr aData = anOwner->data();
@@ -695,7 +696,11 @@ std::string getDefaultName(const std::shared_ptr<ModelAPI_Result>& theResult,
       ResultCompSolidPtr aParentCompSolid = ModelAPI_Tools::compSolidOwner(anObjRes);
       if (aParentCompSolid)
         anObjRes = aParentCompSolid;
-      return anObjRes->data()->name();
+
+      // return name of reference result only if it has been renamed by the user,
+      // in other case compose a default name
+      if (anObjRes->data()->hasUserDefinedName())
+        return std::pair<std::string, bool>(anObjRes->data()->name(), true);
     }
   }
 
@@ -706,7 +711,7 @@ std::string getDefaultName(const std::shared_ptr<ModelAPI_Result>& theResult,
   // add unique prefix starting from second
   if (theResultIndex > 0 || theResult->groupName() == ModelAPI_ResultBody::group())
     aDefaultName << "_" << theResultIndex + 1;
-  return aDefaultName.str();
+  return std::pair<std::string, bool>(aDefaultName.str(), false);
 }
 
 } // namespace ModelAPI_Tools
