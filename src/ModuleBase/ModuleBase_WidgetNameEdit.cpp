@@ -18,7 +18,9 @@
 // email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com>
 //
 
-#include <ModuleBase_WidgetNameEdit.h>
+#include "ModuleBase_WidgetNameEdit.h"
+
+#include <ModelAPI_Result.h>
 
 #include <QLineEdit>
 
@@ -28,7 +30,11 @@ bool ModuleBase_WidgetNameEdit::storeValueCustom()
     return false;
 
   QString aValue = myLineEdit->text();
-  myFeature->data()->setName(aValue.toStdString());
+  std::string aName = aValue.toStdString();
+  myFeature->data()->setName(aName);
+  ResultPtr aRes = myFeature->firstResult();
+  if (aRes.get())
+    aRes->data()->setName(aName);
   updateObject(myFeature);
   return true;
 }
