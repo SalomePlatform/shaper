@@ -1597,17 +1597,7 @@ bool Model_Objects::removeFromFolder(
     aFolderEndFeature   = aFoundFolder->reference(ModelAPI_Folder::LAST_FEATURE_ID())->value();
   }
 
-  FeaturePtr aFeatureToFind;
-  if (isExtractBeforeFolder) {
-    aFeatureToFind = theFeatures.back();
-    // if the last feature is composite, obtain its last sub-feature for correct positioning of
-    // the folder in the reference array when theFeatures will be extracted before folder
-    CompositeFeaturePtr aComposite =
-        std::dynamic_pointer_cast<ModelAPI_CompositeFeature>(aFeatureToFind);
-    if (aComposite)
-      aFeatureToFind = aComposite->subFeature(aComposite->numberOfSubs() - 1);
-  } else
-    aFeatureToFind = theFeatures.front();
+  FeaturePtr aFeatureToFind = isExtractBeforeFolder ? theFeatures.back() : theFeatures.front();
   std::shared_ptr<Model_Data> aData =
       std::static_pointer_cast<Model_Data>(aFeatureToFind->data());
   if (!aData || !aData->isValid())
@@ -1630,15 +1620,29 @@ bool Model_Objects::removeFromFolder(
     TDF_Label aFolderLabel = aData->label().Father();
     TDF_Label aPrevFeatureLabel = aRefs->Value(aRefIndex);
     // update start reference of the folder
-    if (aFolderStartFeature.get())
-      aFolderStartFeature = feature(aRefs->Value(aRefIndex + 1));
+    if (aFolderStartFeature.get()) {
+      FeaturePtr aNewStartFeature;
+      do { // skip all features placed in the composite features
+        aPrevFeatureLabel = aRefs->Value(aRefIndex++);
+        aNewStartFeature =
+            aRefIndex <= aRefs->Upper() ? feature(aRefs->Value(aRefIndex)) : FeaturePtr();
+      } while (aNewStartFeature && isSkippedFeature(aNewStartFeature));
+      aFolderStartFeature = aNewStartFeature;
+    }
     // move the folder in the list of references after the last feature from the list
     RemoveFromRefArray(aFeaturesLab, aFolderLabel);
     AddToRefArray(aFeaturesLab, aFolderLabel, aPrevFeatureLabel);
   } else {
     // update end reference of the folder
-    if (aFolderEndFeature.get())
-      aFolderEndFeature = feature(aRefs->Value(aRefIndex - 1));
+    if (aFolderEndFeature.get()) {
+      FeaturePtr aNewEndFeature;
+      do { // skip all features placed in the composite features
+        --aRefIndex;
+        aNewEndFeature =
+            aRefIndex >= aRefs->Lower() ? feature(aRefs->Value(aRefIndex)) : FeaturePtr();
+      } while (aNewEndFeature && isSkippedFeature(aNewEndFeature));
+      aFolderEndFeature = aNewEndFeature;
+    }
   }
 
   // update folder references
