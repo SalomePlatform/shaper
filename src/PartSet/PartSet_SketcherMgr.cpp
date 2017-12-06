@@ -85,6 +85,9 @@
 #include <SketchPlugin_MultiTranslation.h>
 #include <SketchPlugin_IntersectionPoint.h>
 #include <SketchPlugin_Projection.h>
+#include <SketchPlugin_ConstraintDistanceAlongDir.h>
+#include <SketchPlugin_ConstraintDistanceHorizontal.h>
+#include <SketchPlugin_ConstraintDistanceVertical.h>
 
 #include <SketcherPrs_Tools.h>
 
@@ -802,6 +805,9 @@ const QStringList& PartSet_SketcherMgr::constraintsIdList()
     aConstraintIds << SketchPlugin_ConstraintMirror::ID().c_str();
     aConstraintIds << SketchPlugin_MultiTranslation::ID().c_str();
     aConstraintIds << SketchPlugin_MultiRotation::ID().c_str();
+    aConstraintIds << SketchPlugin_ConstraintDistanceAlongDir::ID().c_str();
+    aConstraintIds << SketchPlugin_ConstraintDistanceHorizontal::ID().c_str();
+    aConstraintIds << SketchPlugin_ConstraintDistanceVertical::ID().c_str();
   }
   return aConstraintIds;
 }
@@ -915,7 +921,10 @@ bool PartSet_SketcherMgr::isDistanceKind(std::string& theKind)
   return (theKind == SketchPlugin_ConstraintLength::ID()) ||
          (theKind == SketchPlugin_ConstraintDistance::ID()) ||
          (theKind == SketchPlugin_ConstraintRadius::ID()) ||
-         (theKind == SketchPlugin_ConstraintAngle::ID());
+         (theKind == SketchPlugin_ConstraintAngle::ID()) ||
+         (theKind == SketchPlugin_ConstraintDistanceHorizontal::ID()) ||
+         (theKind == SketchPlugin_ConstraintDistanceVertical::ID()) ||
+         (theKind == SketchPlugin_ConstraintDistanceAlongDir::ID());
 }
 
 void PartSet_SketcherMgr::startSketch(ModuleBase_Operation* theOperation)
