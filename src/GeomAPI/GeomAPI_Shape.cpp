@@ -129,6 +129,23 @@ bool GeomAPI_Shape::isCompoundOfSolids() const
   return isAtLeastOne;
 }
 
+GeomAPI_Shape::ShapeType GeomAPI_Shape::typeOfCompoundShapes() const
+{
+  const TopoDS_Shape& aShape = const_cast<GeomAPI_Shape*>(this)->impl<TopoDS_Shape>();
+  if (aShape.IsNull() || aShape.ShapeType() != TopAbs_COMPOUND)
+    return SHAPE;
+  int aType = -1;
+  for(TopoDS_Iterator aSubs(aShape); aSubs.More(); aSubs.Next()) {
+    if (!aSubs.Value().IsNull()) {
+      if (aType == -1)
+        aType = aSubs.Value().ShapeType();
+      else if (aSubs.Value().ShapeType() != aType)
+        return SHAPE;
+    }
+  }
+  return (GeomAPI_Shape::ShapeType) aType;
+}
+
 // adds the nopt-compound elements recursively to the list
 static void addSimpleToList(const TopoDS_Shape& theShape, NCollection_List<TopoDS_Shape>& theList)
 {

@@ -532,6 +532,21 @@ void XGUI_Workshop::onAcceptActionClicked()
 }
 
 //******************************************************
+void XGUI_Workshop::onAcceptPlusActionClicked()
+{
+  QAction* anAction = dynamic_cast<QAction*>(sender());
+  XGUI_OperationMgr* anOperationMgr = operationMgr();
+  if (anOperationMgr) {
+    ModuleBase_OperationFeature* aFOperation = dynamic_cast<ModuleBase_OperationFeature*>
+                                                    (anOperationMgr->currentOperation());
+    if (aFOperation) {
+      myOperationMgr->commitOperation();
+      module()->launchOperation(aFOperation->id(), false);
+    }
+  }
+}
+
+//******************************************************
 void XGUI_Workshop::onPreviewActionClicked()
 {
   ModuleBase_IPropertyPanel* aPanel = propertyPanel();
@@ -1326,6 +1341,9 @@ void XGUI_Workshop::createDockWidgets()
 
   QAction* aOkAct = myActionsMgr->operationStateAction(XGUI_ActionsMgr::Accept);
   connect(aOkAct, SIGNAL(triggered()), this, SLOT(onAcceptActionClicked()));
+
+  QAction* aOkContAct = myActionsMgr->operationStateAction(XGUI_ActionsMgr::AcceptPlus);
+  connect(aOkContAct, SIGNAL(triggered()), this, SLOT(onAcceptPlusActionClicked()));
 
   QAction* aCancelAct = myActionsMgr->operationStateAction(XGUI_ActionsMgr::Abort);
   connect(aCancelAct, SIGNAL(triggered()), myOperationMgr, SLOT(onAbortOperation()));

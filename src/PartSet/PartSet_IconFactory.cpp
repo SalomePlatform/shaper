@@ -29,6 +29,8 @@
 #include <Config_FeatureMessage.h>
 #include <Events_Loop.h>
 
+#include <CollectionPlugin_Group.h>
+
 QMap<QString, QString> PartSet_IconFactory::myIcons;
 
 PartSet_IconFactory::PartSet_IconFactory():ModuleBase_IconFactory()
@@ -94,6 +96,19 @@ QIcon PartSet_IconFactory::getIcon(ObjectPtr theObj)
     if(aShape.get()) {
       switch(aShape->shapeType()) {
         case GeomAPI_Shape::COMPOUND: {
+          FeaturePtr aFeature = ModelAPI_Feature::feature(theObj);
+          if (aFeature.get() && aFeature->getKind() == CollectionPlugin_Group::ID()) {
+            switch (aShape->typeOfCompoundShapes()) {
+            case GeomAPI_Shape::VERTEX:
+              return QIcon(":icons/group_vertex.png");
+            case GeomAPI_Shape::EDGE:
+              return QIcon(":icons/group_edge.png");
+            case GeomAPI_Shape::FACE:
+              return QIcon(":icons/group_face.png");
+            case GeomAPI_Shape::SOLID:
+              return QIcon(":icons/group_solid.png");
+            }
+          }
           ResultBodyPtr aBody = std::dynamic_pointer_cast<ModelAPI_ResultBody>(aResult);
           if (aBody.get() && aBody->isConnectedTopology())
             return QIcon(":pictures/compoundofsolids.png");

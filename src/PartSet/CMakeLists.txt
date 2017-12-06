@@ -159,6 +159,7 @@ INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR}/src/XGUI
                     ${PROJECT_SOURCE_DIR}/src/FeaturesPlugin
                     ${PROJECT_SOURCE_DIR}/src/PartSetPlugin
                     ${PROJECT_SOURCE_DIR}/src/GeomAPI
+                    ${PROJECT_SOURCE_DIR}/src/CollectionPlugin
                     ${CAS_INCLUDE_DIRS}
                     ${SUIT_INCLUDE}
 )

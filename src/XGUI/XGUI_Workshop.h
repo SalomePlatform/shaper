@@ -484,6 +484,10 @@ private:
   /// the operation can be committed and do it if it returns true.
   void onAcceptActionClicked();
 
+  /// Called by OkPlus button clicked in the property panel. Asks the error manager whether
+  /// the operation can be committed and do it if it returns true.
+  void onAcceptPlusActionClicked();
+
   /// Called by Preview button clicked in the property panel. Sends signal to model to
   /// compute preview.
   void onPreviewActionClicked();

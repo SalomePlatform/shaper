@@ -42,6 +42,9 @@ const static char* PROP_PANEL = "property_panel_dock";
 /// Internal name of Ok button
 const static char* PROP_PANEL_OK = "property_panel_ok";
 
+/// Internal name of Ok button
+const static char* PROP_PANEL_OK_PLUS = "property_panel_ok_plus";
+
 /// Internal name of Cancel button
 const static char* PROP_PANEL_CANCEL = "property_panel_cancel";
 

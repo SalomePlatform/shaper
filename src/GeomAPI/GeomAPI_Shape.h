@@ -147,9 +147,13 @@ public:
   GEOMAPI_EXPORT
   bool isIntersect(const std::shared_ptr<GeomAPI_Shape> theShape) const;
 
-  // Translates the shape along the direction for the given offset
+  /// Translates the shape along the direction for the given offset
   GEOMAPI_EXPORT
   void translate(const std::shared_ptr<GeomAPI_Dir> theDir, const double theOffset);
+
+  /// Returns type of shapes in the compound.
+  // If shapes are of different type then it will return SHAPE type
+  GEOMAPI_EXPORT ShapeType typeOfCompoundShapes() const;
 };
 
 //! Pointer on list of shapes
