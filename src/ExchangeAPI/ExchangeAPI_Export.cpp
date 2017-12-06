@@ -20,37 +20,114 @@
 
 #include "ExchangeAPI_Export.h"
 //--------------------------------------------------------------------------------------
+#include <ModelAPI_Document.h>
+#include <ModelAPI_Feature.h>
 #include <ModelHighAPI_Tools.h>
+#include <ModelHighAPI_Dumper.h>
+#include <ModelHighAPI_Services.h>
 //--------------------------------------------------------------------------------------
-void exportToFile(const std::shared_ptr<ModelAPI_Document> & thePart,
+
+ExchangeAPI_Export::ExchangeAPI_Export(const std::shared_ptr<ModelAPI_Feature>& theFeature)
+: ModelHighAPI_Interface(theFeature)
+{
+  initialize();
+}
+
+/// Constructor with values for XAO export.
+ExchangeAPI_Export::ExchangeAPI_Export(const std::shared_ptr<ModelAPI_Feature>& theFeature,
+                              const std::string & theFilePath,
+                              const std::string & theAuthor,
+                              const std::string & theGeometryName)
+: ModelHighAPI_Interface(theFeature)
+{
+  initialize();
+  fillAttribute("XAO", theFeature->string(ExchangePlugin_ExportFeature::EXPORT_TYPE_ID()));
+  fillAttribute(theFilePath, theFeature->string(ExchangePlugin_ExportFeature::XAO_FILE_PATH_ID()));
+  fillAttribute(theAuthor, theFeature->string(ExchangePlugin_ExportFeature::XAO_AUTHOR_ID()));
+  fillAttribute(theGeometryName,
+                theFeature->string(ExchangePlugin_ExportFeature::XAO_GEOMETRY_NAME_ID()));
+  fillAttribute("XAO", theFeature->string(ExchangePlugin_ExportFeature::FILE_FORMAT_ID()));
+  execute();
+  apply(); // finish operation to make sure the export is done on the current state of the history
+}
+
+/// Constructor with values for export in other formats than XAO.
+ExchangeAPI_Export::ExchangeAPI_Export(const std::shared_ptr<ModelAPI_Feature>& theFeature,
+                              const std::string & theFilePath,
+                              const std::list<ModelHighAPI_Selection> & theSelectionList,
+                              const std::string & theFileFormat)
+: ModelHighAPI_Interface(theFeature)
+{
+  initialize();
+  fillAttribute("Regular", theFeature->string(ExchangePlugin_ExportFeature::EXPORT_TYPE_ID()));
+  fillAttribute(theFilePath, theFeature->string(ExchangePlugin_ExportFeature::FILE_PATH_ID()));
+  fillAttribute(theSelectionList,
+                theFeature->selectionList(ExchangePlugin_ExportFeature::SELECTION_LIST_ID()));
+  fillAttribute(theFileFormat, theFeature->string(ExchangePlugin_ExportFeature::FILE_FORMAT_ID()));
+  execute();
+  apply(); // finish operation to make sure the export is done on the current state of the history
+}
+
+ExchangeAPI_Export::~ExchangeAPI_Export()
+{
+}
+
+
+void ExchangeAPI_Export::dump(ModelHighAPI_Dumper& theDumper) const
+{
+
+  FeaturePtr aBase = feature();
+  const std::string& aDocName = theDumper.name(aBase->document());
+
+  theDumper << aBase << " = model.";
+
+  std::string exportType = aBase->string(ExchangePlugin_ExportFeature::EXPORT_TYPE_ID())->value();
+
+  if (exportType == "XAO") {
+    std::string tmpXAOFile =
+                aBase->string(ExchangePlugin_ExportFeature::XAO_FILE_PATH_ID())->value();
+    theDumper << "exportToXAO(" << aDocName << ", '" << tmpXAOFile << "'" ;
+    std::string theAuthor = aBase->string(ExchangePlugin_ExportFeature::XAO_AUTHOR_ID())->value();
+    if (! theAuthor.empty())
+      theDumper << ", '" << theAuthor << "'";
+    std::string theGeometryName =
+                aBase->string(ExchangePlugin_ExportFeature::XAO_GEOMETRY_NAME_ID())->value();
+    if (! theGeometryName.empty())
+      theDumper << ", '" << theGeometryName << "'";
+    theDumper << ")" << std::endl;
+  }
+  else {
+      theDumper << "exportToFile(" << aDocName << ", " <<
+          aBase->string(ExchangePlugin_ExportFeature::FILE_PATH_ID()) << ", " <<
+          aBase->selectionList(ExchangePlugin_ExportFeature::SELECTION_LIST_ID()) ;
+      std::string theFileFormat =
+                  aBase->string(ExchangePlugin_ExportFeature::FILE_FORMAT_ID())->value();
+      if (! theFileFormat.empty())
+        theDumper << ", '" << theFileFormat << "'";
+      theDumper << ")" << std::endl;
+  }
+}
+
+ExportPtr exportToFile(const std::shared_ptr<ModelAPI_Document> & thePart,
                   const std::string & theFilePath,
                   const std::list<ModelHighAPI_Selection> & theSelectionList,
                   const std::string & theFileFormat)
 {
+  apply(); // finish previous operation to make sure all previous operations are done
   std::shared_ptr<ModelAPI_Feature> aFeature =
     thePart->addFeature(ExchangePlugin_ExportFeature::ID());
-  fillAttribute("Regular", aFeature->string(ExchangePlugin_ExportFeature::EXPORT_TYPE_ID()));
-  fillAttribute(theFilePath, aFeature->string(ExchangePlugin_ExportFeature::FILE_PATH_ID()));
-  fillAttribute(theSelectionList,
-                aFeature->selectionList(ExchangePlugin_ExportFeature::SELECTION_LIST_ID()));
-  fillAttribute(theFileFormat, aFeature->string(ExchangePlugin_ExportFeature::FILE_FORMAT_ID()));
-  aFeature->execute();
+  return ExportPtr(new ExchangeAPI_Export(aFeature, theFilePath, theSelectionList, theFileFormat));
 }
 
-void exportToXAO(const std::shared_ptr<ModelAPI_Document> & thePart,
+ExportPtr exportToXAO(const std::shared_ptr<ModelAPI_Document> & thePart,
                  const std::string & theFilePath,
                  const std::string & theAuthor,
                  const std::string & theGeometryName)
 {
+  apply(); // finish previous operation to make sure all previous operations are done
   std::shared_ptr<ModelAPI_Feature> aFeature =
     thePart->addFeature(ExchangePlugin_ExportFeature::ID());
-  fillAttribute("XAO", aFeature->string(ExchangePlugin_ExportFeature::EXPORT_TYPE_ID()));
-  fillAttribute(theFilePath, aFeature->string(ExchangePlugin_ExportFeature::XAO_FILE_PATH_ID()));
-  fillAttribute(theAuthor, aFeature->string(ExchangePlugin_ExportFeature::XAO_AUTHOR_ID()));
-  fillAttribute(theGeometryName,
-                aFeature->string(ExchangePlugin_ExportFeature::XAO_GEOMETRY_NAME_ID()));
-  fillAttribute("XAO", aFeature->string(ExchangePlugin_ExportFeature::FILE_FORMAT_ID()));
-  aFeature->execute();
+  return ExportPtr(new ExchangeAPI_Export(aFeature, theFilePath, theAuthor, theGeometryName));
 }
 
 //--------------------------------------------------------------------------------------

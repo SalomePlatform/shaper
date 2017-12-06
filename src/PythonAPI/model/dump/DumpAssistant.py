@@ -61,8 +61,9 @@ class DumpAssistant(ModelHighAPI.ModelHighAPI_Dumper):
         aFeatureKind = theFeature.getKind()
         if aFeatureKind in self.myFeatures:
             # Dump only feature created by user (in history).
+            # Also dump Export features (hard-coded here in order not to change the data model).
             # For all other features, just keep their name.
-            if theForce or theFeature.isInHistory():
+            if theForce or theFeature.isInHistory() or aFeatureKind=="Export":
                 self.myFeatures[aFeatureKind](theFeature).dump(self)
             else:
                 self.name(theFeature)
