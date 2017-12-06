@@ -79,6 +79,10 @@ public:
   /// \param theIsActive state whether the panel should be activated or deactivated
   void setActivePanel(const bool theIsActive);
 
+  /// Returns true if transparency choice is checked
+  /// \return boolean value
+  bool useTransparency() const;
+
   /// Returns true if the object is in internal container of hidden objects by this panel
   /// \param theObject a checked object
   /// \return boolean value

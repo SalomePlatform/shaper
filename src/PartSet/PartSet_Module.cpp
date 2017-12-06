@@ -191,6 +191,11 @@ PartSet_Module::PartSet_Module(ModuleBase_IWorkshop* theWshop)
   Config_PropManager::registerProp("Visualization", "sketch_preview_plane",
                           "Color of sketch plane", Config_Prop::Color,
                           PartSet_CustomPrs::OPERATION_SKETCH_PLANE());
+
+  Config_PropManager::registerProp("Visualization", "hidden_face_transparency",
+                                   "Hidden faces transparency",
+                                   Config_Prop::Double,
+                                   "0.8");
 }
 
 PartSet_Module::~PartSet_Module()

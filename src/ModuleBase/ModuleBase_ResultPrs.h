@@ -28,8 +28,12 @@
 #include <NCollection_List.hxx>
 #include <ViewerData_AISShape.hxx>
 #include <Standard_DefineHandle.hxx>
+#include <TopoDS_Compound.hxx>
 
 #include <QMap>
+
+class AIS_ColoredDrawer;
+class AIS_InteractiveContext;
 
 DEFINE_STANDARD_HANDLE(ModuleBase_ResultPrs, ViewerData_AISShape)
 
@@ -76,6 +80,9 @@ public:
   /// \param thePriority a new priority value
   Standard_EXPORT void setAdditionalSelectionPriority(const int thePriority);
 
+  //! Updates color of sub shape drawer
+  Standard_EXPORT virtual void SetColor (const Quantity_Color& theColor);
+
   /// Change presentation to have given shape hidden.
   /// It suports FACE type of the shape to be hidden.
   /// If presentation type is greater than FACE, the SHELL with be shown with the FACE hidden
@@ -89,6 +96,11 @@ public:
   /// \param theShapeToSkip the shape should be interpreted as additional hidden in the presentation
   /// \return boolean value
   Standard_EXPORT bool hasSubShapeVisible(const TopoDS_Shape& theShapeToSkip);
+
+  /// Set transparency of hidden sub shapes: if value is 1, shapes are entirely hidden
+  /// \param theTransparency transparency value
+  /// \return false if parameter is out of [0, 1]
+  Standard_EXPORT bool setHiddenSubShapeTransparency(double theTransparency);
 
   DEFINE_STANDARD_RTTIEXT(ModuleBase_ResultPrs, ViewerData_AISShape)
 
@@ -120,6 +132,9 @@ private:
 
   /// Container of original Shape sub shape to be hidden and not selectable
   NCollection_List<TopoDS_Shape> myHiddenSubShapes;
+  TopoDS_Compound myHiddenCompound; /// compound of hidden sub shapes
+  double myTransparency; ///< transparency of hidden shapes, where 0 - there is no transparency
+  Handle(AIS_ColoredDrawer) myHiddenSubShapesDrawer; ///< drawer for hidden sub shapes
 
   /// selection priority that will be added to the standard
   /// selection priority of the selection entity

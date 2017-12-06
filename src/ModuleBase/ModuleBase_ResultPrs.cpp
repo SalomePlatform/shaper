@@ -33,23 +33,26 @@
 #include <Events_InfoMessage.h>
 #include <Events_Loop.h>
 
+#include <AIS_ColoredDrawer.hxx>
+#include <AIS_InteractiveContext.hxx>
+#include <AIS_Selection.hxx>
 #include <BRep_Builder.hxx>
+#include <Graphic3d_AspectMarker3d.hxx>
 #include <Prs3d_Drawer.hxx>
 #include <Prs3d.hxx>
 #include <Prs3d_PointAspect.hxx>
 #include <Prs3d_IsoAspect.hxx>
-#include <TopoDS_Builder.hxx>
-#include <TopoDS.hxx>
+#include <Prs3d_ShadingAspect.hxx>
 #include <SelectMgr_SequenceOfOwner.hxx>
 #include <SelectMgr_EntityOwner.hxx>
 #include <SelectMgr_SelectionManager.hxx>
 #include <StdPrs_WFShape.hxx>
+#include <StdPrs_ShadedShape.hxx>
 #include <StdSelect_BRepSelectionTool.hxx>
-#include <AIS_InteractiveContext.hxx>
-#include <AIS_Selection.hxx>
 #include <TColStd_ListIteratorOfListOfInteger.hxx>
-#include <Graphic3d_AspectMarker3d.hxx>
 #include <TopExp_Explorer.hxx>
+#include <TopoDS.hxx>
+#include <TopoDS_Builder.hxx>
 
 //*******************************************************************************************
 
@@ -57,8 +60,10 @@ IMPLEMENT_STANDARD_RTTIEXT(ModuleBase_ResultPrs, ViewerData_AISShape);
 
 
 
+//********************************************************************
 ModuleBase_ResultPrs::ModuleBase_ResultPrs(ResultPtr theResult)
-  : ViewerData_AISShape(TopoDS_Shape()), myResult(theResult), myAdditionalSelectionPriority(0)
+  : ViewerData_AISShape(TopoDS_Shape()), myResult(theResult), myAdditionalSelectionPriority(0),
+  myTransparency(1)
 {
   std::shared_ptr<GeomAPI_Shape> aShapePtr = ModelAPI_Tools::shape(theResult);
   TopoDS_Shape aShape = aShapePtr->impl<TopoDS_Shape>();
@@ -73,24 +78,43 @@ ModuleBase_ResultPrs::ModuleBase_ResultPrs(ResultPtr theResult)
   ResultCompSolidPtr aCompSolid = ModelAPI_Tools::compSolidOwner(myResult);
   SetAutoHilight(aCompSolid.get() == NULL);
 
+  myHiddenSubShapesDrawer = new AIS_ColoredDrawer (myDrawer);
+  Handle(Prs3d_ShadingAspect) aShadingAspect = new Prs3d_ShadingAspect();
+  aShadingAspect->SetMaterial(Graphic3d_NOM_BRASS); //default value of context material
+  myHiddenSubShapesDrawer->SetShadingAspect(aShadingAspect);
+
   ModuleBase_Tools::setPointBallHighlighting(this);
 }
 
+//********************************************************************
 void ModuleBase_ResultPrs::setAdditionalSelectionPriority(const int thePriority)
 {
   myAdditionalSelectionPriority = thePriority;
 }
 
+//********************************************************************
+void ModuleBase_ResultPrs::SetColor (const Quantity_Color& theColor)
+{
+  ViewerData_AISShape::SetColor(theColor);
+  myHiddenSubShapesDrawer->ShadingAspect()->SetColor (theColor, myCurrentFacingModel);
+}
+
+//********************************************************************
 bool ModuleBase_ResultPrs::setSubShapeHidden(const NCollection_List<TopoDS_Shape>& theShapes)
 {
   bool isModified = false;
 
+  TopoDS_Compound aCompound;
+  BRep_Builder aBBuilder;
+  aBBuilder.MakeCompound (aCompound);
   // restore hidden shapes if there are not the shapes in parameter container
   NCollection_List<TopoDS_Shape> aVisibleSubShapes;
   for (NCollection_List<TopoDS_Shape>::Iterator aHiddenIt(myHiddenSubShapes); aHiddenIt.More();
        aHiddenIt.Next()) {
     if (!theShapes.Contains(aHiddenIt.Value()))
       aVisibleSubShapes.Append(aHiddenIt.Value());
+    else
+      aBBuilder.Add (aCompound, aHiddenIt.Value());
   }
   isModified = !aVisibleSubShapes.IsEmpty();
   for (NCollection_List<TopoDS_Shape>::Iterator aVisibleIt(aVisibleSubShapes); aVisibleIt.More();
@@ -106,12 +130,15 @@ bool ModuleBase_ResultPrs::setSubShapeHidden(const NCollection_List<TopoDS_Shape
 
     if (!myHiddenSubShapes.Contains(aShapeIt.Value())) {
       myHiddenSubShapes.Append(aShapeIt.Value());
+      aBBuilder.Add (aCompound, aShapeIt.Value());
       isModified = true;
     }
   }
+  myHiddenCompound = aCompound;
   return isModified;
 }
 
+//********************************************************************
 bool ModuleBase_ResultPrs::hasSubShapeVisible(const TopoDS_Shape& theShape)
 {
   int aNbOfHiddenSubShapes = myHiddenSubShapes.Size();
@@ -131,6 +158,18 @@ bool ModuleBase_ResultPrs::hasSubShapeVisible(const TopoDS_Shape& theShape)
   return aHasVisibleShape;
 }
 
+//********************************************************************
+bool ModuleBase_ResultPrs::setHiddenSubShapeTransparency(double theTransparency)
+{
+  if (theTransparency > 1 || theTransparency < 0)
+    return false;
+
+  myTransparency = theTransparency;
+  myHiddenSubShapesDrawer->ShadingAspect()->SetTransparency (theTransparency, myCurrentFacingModel);
+  return true;
+}
+
+//********************************************************************
 void ModuleBase_ResultPrs::Compute(
           const Handle(PrsMgr_PresentationManager3d)& thePresentationManager,
           const Handle(Prs3d_Presentation)& thePresentation,
@@ -164,6 +203,12 @@ void ModuleBase_ResultPrs::Compute(
   //ModuleBase_Tools::setDefaultDeviationCoefficient(myResult, Attributes());
   AIS_Shape::Compute(thePresentationManager, thePresentation, theMode);
 
+  // visualize hidden sub-shapes transparent
+  if (myTransparency < 1 && !myHiddenSubShapes.IsEmpty())
+  {
+    StdPrs_ShadedShape::Add (thePresentation, myHiddenCompound, myHiddenSubShapesDrawer);
+  }
+
   if (!aReadyToDisplay) {
     Events_InfoMessage("ModuleBase_ResultPrs",
                        "An empty AIS presentation: ModuleBase_ResultPrs").send();
@@ -172,6 +217,7 @@ void ModuleBase_ResultPrs::Compute(
   }
 }
 
+//********************************************************************
 void ModuleBase_ResultPrs::ComputeSelection(const Handle(SelectMgr_Selection)& aSelection,
                                             const Standard_Integer theMode)
 {
@@ -237,6 +283,7 @@ void ModuleBase_ResultPrs::ComputeSelection(const Handle(SelectMgr_Selection)& a
   }
 }
 
+//********************************************************************
 bool ModuleBase_ResultPrs::appendVertexSelection(const Handle(SelectMgr_Selection)& aSelection,
                                                  const Standard_Integer theMode)
 {
@@ -264,6 +311,7 @@ bool ModuleBase_ResultPrs::appendVertexSelection(const Handle(SelectMgr_Selectio
   return false;
 }
 
+//********************************************************************
 void ModuleBase_ResultPrs::HilightSelected(const Handle(PrsMgr_PresentationManager3d)& thePM,
                                            const SelectMgr_SequenceOfOwner& theOwners)
 {
@@ -290,6 +338,7 @@ void ModuleBase_ResultPrs::HilightSelected(const Handle(PrsMgr_PresentationManag
   }
 }
 
+//********************************************************************
 void ModuleBase_ResultPrs::HilightOwnerWithColor(const Handle(PrsMgr_PresentationManager3d)& thePM,
                                                  const Handle(Graphic3d_HighlightStyle)& theStyle,
                                                  const Handle(SelectMgr_EntityOwner)& theOwner)
