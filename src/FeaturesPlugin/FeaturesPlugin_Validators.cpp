@@ -693,6 +693,13 @@ bool FeaturesPlugin_ValidatorFilletSelection::isValid(const AttributePtr& theAtt
 
     ResultCompSolidPtr aContextOwner = ModelAPI_Tools::compSolidOwner(aContext);
     GeomShapePtr anOwner = aContextOwner.get() ? aContextOwner->shape() : aContext->shape();
+
+    if (anOwner->shapeType() != GeomAPI_Shape::SOLID &&
+        anOwner->shapeType() != GeomAPI_Shape::COMPSOLID) {
+      theError = "Error: Not all selected shapes are sub-shapes of solids";
+      return false;
+    }
+
     if (!aBaseSolid)
       aBaseSolid = anOwner;
     else if (!aBaseSolid->isEqual(anOwner)) {
