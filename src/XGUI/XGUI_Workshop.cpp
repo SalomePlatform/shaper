@@ -1472,6 +1472,15 @@ void XGUI_Workshop::onContextMenuCommand(const QString& theId, bool isChecked)
     viewer()->eraseAll();
 #endif
     updateCommandStatus();
+#ifndef WIN32
+  // Necessary for update icons in ObjectBrowser on Linux
+  QModelIndexList aIndexes = mySelector->selection()->selectedIndexes();
+  foreach (QModelIndex aIdx, aIndexes) {
+    if (aIdx.column() == 0) {
+      myObjectBrowser->treeView()->update(aIdx);
+    }
+  }
+#endif
   } else if (theId == "SELECT_VERTEX_CMD") {
     setViewerSelectionMode(TopAbs_VERTEX);
   } else if (theId == "SELECT_EDGE_CMD") {
