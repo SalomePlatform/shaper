@@ -624,11 +624,12 @@ void XGUI_ObjectsBrowser::setStateForDoc(DocumentPtr theDoc, const std::list<boo
 
 void XGUI_ObjectsBrowser::updateAllIndexes(int theColumn, const QModelIndex& theParent)
 {
-  const QAbstractItemModel* aModel = theParent.model();
-  int aNb = aModel->rowCount();
+  int aNb = myDocModel->rowCount(theParent);
   for (int i = 0; i < aNb; i++) {
-    QModelIndex aIdx = theParent.child(i, theColumn);
-    myTreeView->update(aIdx);
-    updateAllIndexes(theColumn, aIdx);
+    QModelIndex aIdx = myDocModel->index(i, theColumn, theParent);
+    if (aIdx.isValid()) {
+      myTreeView->update(aIdx);
+      updateAllIndexes(theColumn, aIdx);
+    }
   }
 }
