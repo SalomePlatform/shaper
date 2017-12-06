@@ -621,3 +621,14 @@ void XGUI_ObjectsBrowser::setStateForDoc(DocumentPtr theDoc, const std::list<boo
     myTreeView->setExpanded(aIdx, (*aIt));
   }
 }
+
+void XGUI_ObjectsBrowser::updateAllIndexes(int theColumn, const QModelIndex& theParent)
+{
+  const QAbstractItemModel* aModel = theParent.model();
+  int aNb = aModel->rowCount();
+  for (int i = 0; i < aNb; i++) {
+    QModelIndex aIdx = theParent.child(i, theColumn);
+    myTreeView->update(aIdx);
+    updateAllIndexes(theColumn, aIdx);
+  }
+}

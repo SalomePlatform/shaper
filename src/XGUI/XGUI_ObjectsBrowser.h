@@ -206,6 +206,10 @@ Q_OBJECT
 
   void onSelectionChanged();
 
+  /// Updates all items of object browser
+  /// \param theColumn - column of items
+  /// \param theParent - a parent item (by default from root)
+  void updateAllIndexes(int theColumn = 0, const QModelIndex& theParent = QModelIndex());
 
 public slots:
   //! Called on Edit command request
