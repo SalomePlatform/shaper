@@ -898,6 +898,8 @@ void Model_Objects::synchronizeFeatures(
       // unbind after the "erase" call: on abort sketch
       // is removes sub-objects that corrupts aFIter
       myFolders.UnBind(aFldIt.Key());
+      // reinitialize iterator because unbind may corrupt the previous order in the map
+      aFldIt.Initialize(myFolders);
     }
   }
 
