@@ -1472,10 +1472,8 @@ void XGUI_Workshop::onContextMenuCommand(const QString& theId, bool isChecked)
     viewer()->eraseAll();
 #endif
     updateCommandStatus();
-#ifndef WIN32
-  // Necessary for update icons in ObjectBrowser on Linux
-  myObjectBrowser->updateAllIndexes();
-#endif
+    // Necessary for update icons in ObjectBrowser on Linux
+    myObjectBrowser->updateAllIndexes();
   } else if (theId == "SELECT_VERTEX_CMD") {
     setViewerSelectionMode(TopAbs_VERTEX);
   } else if (theId == "SELECT_EDGE_CMD") {
@@ -2396,15 +2394,9 @@ void XGUI_Workshop::showOnlyObjects(const QObjectPtrList& theList)
     aObj->setDisplayed(true);
   }
   Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_TO_REDISPLAY));
-#ifndef WIN32
+
   // Necessary for update icons in ObjectBrowser on Linux
-  QModelIndexList aIndexes = mySelector->selection()->selectedIndexes();
-  foreach (QModelIndex aIdx, aIndexes) {
-    if (aIdx.column() == 0) {
-      myObjectBrowser->treeView()->update(aIdx);
-    }
-  }
-#endif
+  myObjectBrowser->updateAllIndexes();
 }
 
 //**************************************************************
