@@ -161,7 +161,7 @@ bool ModuleBase_ResultPrs::hasSubShapeVisible(const TopoDS_Shape& theShape)
 //********************************************************************
 bool ModuleBase_ResultPrs::setHiddenSubShapeTransparency(double theTransparency)
 {
-  if (theTransparency > 1 || theTransparency < 0)
+  if (myTransparency == theTransparency || theTransparency > 1 || theTransparency < 0)
     return false;
 
   myTransparency = theTransparency;

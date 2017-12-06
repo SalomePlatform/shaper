@@ -33,7 +33,6 @@
 #include "ModuleBase_Tools.h"
 #include "ModuleBase_ViewerPrs.h"
 
-#include "XGUI_Displayer.h"
 #include "XGUI_Tools.h"
 #include "XGUI_Workshop.h"
 
@@ -60,6 +59,8 @@ XGUI_FacesPanel::XGUI_FacesPanel(QWidget* theParent, ModuleBase_IWorkshop* theWo
   setWidget(aContent);
 
   myHiddenOrTransparent = new QCheckBox(tr("Transparent"), aContent);
+  connect(myHiddenOrTransparent, SIGNAL(toggled(bool)), SLOT(onTransparencyChanged()));
+
   myListView = new ModuleBase_ListView(aContent, "", "Hidden/transparent faces in 3D view");
   connect(myListView, SIGNAL(deleteActionClicked()), SLOT(onDeleteItem()));
 
@@ -73,23 +74,19 @@ XGUI_FacesPanel::XGUI_FacesPanel(QWidget* theParent, ModuleBase_IWorkshop* theWo
 //********************************************************************
 void XGUI_FacesPanel::reset(const bool isToFlushRedisplay)
 {
-  // restore presentation state
-  bool isModified = false;
-  std::set<ObjectPtr> aRestoredObjects;
-  for (QMap<int, ModuleBase_ViewerPrsPtr>::const_iterator anIt = myItems.begin();
-    anIt != myItems.end(); anIt++) {
-    if (aRestoredObjects.find(anIt.value()->object()) == aRestoredObjects.end())
-      aRestoredObjects.insert(anIt.value()->object());
-  }
   // clear internal containers
   myListView->getControl()->clear();
-  myLastItemIndex = 0;
   myItems.clear();
 
-  isModified = redisplayObjects(aRestoredObjects, isToFlushRedisplay);
+  // restore previous view of presentations
+  bool isModified = redisplayObjects(myItemObjects, false);
+  isModified = displayHiddenObjects(myHiddenObjects, false) || isModified;
+  if (isModified && isToFlushRedisplay)
+    Events_Loop::loop()->flush(Events_Loop::loop()->eventByName(EVENT_OBJECT_TO_REDISPLAY));
 
-  if (isToFlushRedisplay && isModified)
-    XGUI_Tools::workshop(myWorkshop)->displayer()->updateViewer();
+  updateProcessedObjects(myItems, myItemObjects);
+  myHiddenObjects.clear();
+  myLastItemIndex = 0; // it should be after redisplay as flag used in customize
 }
 
 //********************************************************************
@@ -151,15 +148,18 @@ void XGUI_FacesPanel::restoreObjects(const std::set<ObjectPtr>& theHiddenObjects
   // remove from myItes container
   for (std::set<int>::const_iterator aToBeRemovedIt = anIndicesToBeRemoved.begin();
     aToBeRemovedIt != anIndicesToBeRemoved.end(); aToBeRemovedIt++)
+  {
     myItems.remove(*aToBeRemovedIt);
-
+  }
+  if (!anIndicesToBeRemoved.empty()) // means that myItems has been changed
+    updateProcessedObjects(myItems, myItemObjects);
   myListView->removeItems(anIndicesToBeRemoved);
 
   // remove from container of hidden objects
   for (std::set<ObjectPtr>::const_iterator aHiddenIt = theHiddenObjects.begin();
     aHiddenIt != theHiddenObjects.end(); aHiddenIt++)
   {
-    if (myHiddenObjects.find(*aHiddenIt) != myHiddenObjects.end()) ///< found objects
+    if (myHiddenObjects.find(*aHiddenIt) != myHiddenObjects.end()) /// found objects
       myHiddenObjects.erase(*aHiddenIt);
   }
 }
@@ -188,24 +188,38 @@ void XGUI_FacesPanel::processSelection()
   QList<ModuleBase_ViewerPrsPtr> aSelected = myWorkshop->selection()->getSelected(
                                                        ModuleBase_ISelection::Viewer);
   bool isModified = false;
+  static Events_ID aDispEvent = Events_Loop::loop()->eventByName(EVENT_OBJECT_TO_REDISPLAY);
   for (int i = 0; i < aSelected.size(); i++) {
     ModuleBase_ViewerPrsPtr aPrs = aSelected[i];
     ObjectPtr anObject = aPrs->object();
     if (!anObject.get())
       continue;
-
     if (ModuleBase_Tools::getSelectedShape(aPrs).ShapeType() != TopAbs_FACE)
+      continue;
+
+    Handle(ModuleBase_ResultPrs) aResultPrs = Handle(ModuleBase_ResultPrs)::DownCast(
+      aPrs->interactive());
+    if (aResultPrs.IsNull())
       continue;
 
     myItems.insert(myLastItemIndex, aPrs);
     myListView->addItem(generateName(aPrs), myLastItemIndex);
-    isModified = hideFace(myLastItemIndex) || isModified;
-
     myLastItemIndex++;
-  }
+    isModified = true;
 
+    if (aResultPrs->hasSubShapeVisible(ModuleBase_Tools::getSelectedShape(aPrs))) // redisplay
+      ModelAPI_EventCreator::get()->sendUpdated(anObject, aDispEvent);
+    else { // erase object because it is entirely hidden
+      anObject->setDisplayed(false);
+      myHiddenObjects.insert(anObject);
+      ModelAPI_EventCreator::get()->sendUpdated(anObject, aDispEvent);
+    }
+  }
   if (isModified)
-    XGUI_Tools::workshop(myWorkshop)->displayer()->updateViewer();
+  {
+    updateProcessedObjects(myItems, myItemObjects);
+    Events_Loop::loop()->flush(aDispEvent);
+  }
 }
 
 //********************************************************************
@@ -221,20 +235,24 @@ bool XGUI_FacesPanel::processDelete()
 
   bool isModified = false;
   std::set<ObjectPtr> aRestoredObjects;
-  XGUI_Displayer* aDisplayer = XGUI_Tools::workshop(myWorkshop)->displayer();
   for (std::set<int>::const_iterator anIt = aSelectedIds.begin(); anIt != aSelectedIds.end();
        anIt++) {
     ModuleBase_ViewerPrsPtr aPrs = myItems[*anIt];
     if (aRestoredObjects.find(aPrs->object()) == aRestoredObjects.end())
       aRestoredObjects.insert(aPrs->object());
     myItems.remove(*anIt);
+    isModified = true;
   }
+  if (isModified) {
+    bool isRedisplayed = redisplayObjects(aRestoredObjects, false);
+    isRedisplayed = displayHiddenObjects(aRestoredObjects, false) || isRedisplayed;
+    if (isRedisplayed)
+      Events_Loop::loop()->flush(Events_Loop::loop()->eventByName(EVENT_OBJECT_TO_REDISPLAY));
+    // should be after flush of redisplay to have items object to be updated
+    updateProcessedObjects(myItems, myItemObjects);
+  }
+
   myListView->removeSelectedItems();
-
-  isModified = redisplayObjects(aRestoredObjects, true) || isModified;
-  if (isModified)
-    XGUI_Tools::workshop(myWorkshop)->displayer()->updateViewer();
-
   // Restore selection
   myListView->restoreSelection(anIndices);
   //appendSelectionInHistory();
@@ -246,65 +264,68 @@ bool XGUI_FacesPanel::redisplayObjects(
   const std::set<std::shared_ptr<ModelAPI_Object> >& theObjects,
   const bool isToFlushRedisplay)
 {
+  if (theObjects.empty())
+    return false;
+
   bool isModified = false;
-  XGUI_Displayer* aDisplayer = XGUI_Tools::workshop(myWorkshop)->displayer();
+  static Events_ID aDispEvent = Events_Loop::loop()->eventByName(EVENT_OBJECT_TO_REDISPLAY);
+  for (std::set<ObjectPtr>::const_iterator anIt = theObjects.begin(); anIt != theObjects.end();
+       anIt++)
+  {
+    ObjectPtr anObject = *anIt;
+    if (!anObject->isDisplayed())
+      continue;
+    ModelAPI_EventCreator::get()->sendUpdated(anObject, aDispEvent);
+    isModified = true;
+  }
+  if (isModified && isToFlushRedisplay)
+    Events_Loop::loop()->flush(aDispEvent);
+  return isModified;
+}
+
+//********************************************************************
+bool XGUI_FacesPanel::displayHiddenObjects(
+  const std::set<std::shared_ptr<ModelAPI_Object> >& theObjects,
+  const bool isToFlushRedisplay)
+{
+  if (theObjects.empty())
+    return false;
+
+  bool isModified = false;
   static Events_ID aDispEvent = Events_Loop::loop()->eventByName(EVENT_OBJECT_TO_REDISPLAY);
 
   for (std::set<ObjectPtr>::const_iterator anIt = theObjects.begin(); anIt != theObjects.end();
        anIt++)
   {
     ObjectPtr anObject = *anIt;
-    if (!anObject->isDisplayed()) {
-      // if the object was hidden by this panel
-      if (myHiddenObjects.find(anObject) != myHiddenObjects.end())
-        myHiddenObjects.erase(anObject);
-      anObject->setDisplayed(true); // it means that the object is hidden by hide all faces
-      ModelAPI_EventCreator::get()->sendUpdated(anObject, aDispEvent);
-      isModified = true;
-      //isModified = aDisplayer->display(anObject, false) || isModified;
-    }
-    else {
-      ModelAPI_EventCreator::get()->sendUpdated(anObject, aDispEvent);
-      isModified = true;
-    }
+    // if the object was hidden by this panel
+    if (anObject->isDisplayed() || myHiddenObjects.find(anObject) == myHiddenObjects.end())
+      continue;
+    myHiddenObjects.erase(anObject);
+    anObject->setDisplayed(true); // it means that the object is hidden by hide all faces
+    ModelAPI_EventCreator::get()->sendUpdated(anObject, aDispEvent);
+    isModified = true;
   }
-  if (isToFlushRedisplay)
+
+  if (isModified && isToFlushRedisplay)
     Events_Loop::loop()->flush(aDispEvent);
   return isModified;
 }
 
+
 //********************************************************************
-bool XGUI_FacesPanel::hideFace(const int theIndex)
+void XGUI_FacesPanel::updateProcessedObjects(QMap<int, ModuleBase_ViewerPrsPtr> theItems,
+                                             std::set<ObjectPtr>& theObjects)
 {
-  XGUI_Displayer* aDisplayer = XGUI_Tools::workshop(myWorkshop)->displayer();
-
-  if (!myItems.contains(theIndex))
-    return false;
-
-  ModuleBase_ViewerPrsPtr aPrs = myItems[theIndex];
-
-  AISObjectPtr aAISObj = aDisplayer->getAISObject(aPrs->object());
-  if (aAISObj.get() == NULL)
-    return false;
-  Handle(ModuleBase_ResultPrs) aResultPrs = Handle(ModuleBase_ResultPrs)::DownCast(
-    aAISObj->impl<Handle(AIS_InteractiveObject)>());
-  if (aResultPrs.IsNull())
-    return false;
-  // set shape hidden to check whether the presentation should be erased from the viewer
-  bool isModified = false;
-  if (aResultPrs->hasSubShapeVisible(ModuleBase_Tools::getSelectedShape(aPrs)))
-    isModified = aDisplayer->redisplay(aPrs->object(), false) || isModified;
-  else
-  {
-    ObjectPtr anObject = aPrs->object();
-    myHiddenObjects.insert(anObject);
-    static Events_ID aDispEvent = Events_Loop::loop()->eventByName(EVENT_OBJECT_TO_REDISPLAY);
-    anObject->setDisplayed(false);
-    isModified = aDisplayer->erase(anObject, false) || isModified;
-    ModelAPI_EventCreator::get()->sendUpdated(anObject, aDispEvent);
-    Events_Loop::loop()->flush(aDispEvent);
+  theObjects.clear();
+  for (QMap<int, ModuleBase_ViewerPrsPtr>::const_iterator anIt = theItems.begin();
+       anIt != theItems.end(); anIt++) {
+    ModuleBase_ViewerPrsPtr aPrs = anIt.value();
+    ObjectPtr anObject = aPrs.get() ? aPrs->object() : ObjectPtr();
+    if (anObject.get() && theObjects.find(anObject) != theObjects.end())
+      continue;
+    theObjects.insert(anObject);
   }
-  return isModified;
 }
 
 //********************************************************************
@@ -357,19 +378,16 @@ QString XGUI_FacesPanel::generateName(const ModuleBase_ViewerPrsPtr& thePrs)
 }
 
 //********************************************************************
-bool XGUI_FacesPanel::customizeObject(const ObjectPtr& theObject, const bool isDisplayed)
+bool XGUI_FacesPanel::customizeObject(const ObjectPtr& theObject,
+                                      const AISObjectPtr& thePresentation)
 {
-  if (isDisplayed && myItems.isEmpty())
+  if (myLastItemIndex == 0) // do nothing because there was no activity in the pane after reset
     return false;
 
-  XGUI_Displayer* aDisplayer = XGUI_Tools::workshop(myWorkshop)->displayer();
-
-  AISObjectPtr aAISObj = aDisplayer->getAISObject(theObject);
-  if (aAISObj.get() == NULL)
+  if (thePresentation.get() == NULL)
     return false;
-  Handle(ModuleBase_ResultPrs) aResultPrs = Handle(ModuleBase_ResultPrs)::DownCast(
-    aAISObj->impl<Handle(AIS_InteractiveObject)>());
-  if (aResultPrs.IsNull())
+
+  if (myItemObjects.find(theObject) == myItemObjects.end()) // not found
     return false;
 
   // if the object is displayed, the hidden faces are collected and set to the presentation
@@ -384,10 +402,17 @@ bool XGUI_FacesPanel::customizeObject(const ObjectPtr& theObject, const bool isD
     if (!aHiddenSubShapes.Contains(aShape))
       aHiddenSubShapes.Append(aShape);
   }
+
+  Handle(ModuleBase_ResultPrs) aResultPrs = Handle(ModuleBase_ResultPrs)::DownCast(
+    thePresentation->impl<Handle(AIS_InteractiveObject)>());
+  if (aResultPrs.IsNull())
+    return false;
+
   isModified = aResultPrs->setSubShapeHidden(aHiddenSubShapes);
+
   double aTransparency = !useTransparency() ? 1
     : Config_PropManager::real("Visualization", "hidden_face_transparency");
-  aResultPrs->setHiddenSubShapeTransparency(aTransparency);
+  isModified = aResultPrs->setHiddenSubShapeTransparency(aTransparency) || isModified;
 
   return isModified;
 }
@@ -399,7 +424,17 @@ void XGUI_FacesPanel::onDeleteItem()
 }
 
 //********************************************************************
+void XGUI_FacesPanel::onTransparencyChanged()
+{
+  bool isModified = redisplayObjects(myItemObjects, false);
+  if (isModified)
+    Events_Loop::loop()->flush(Events_Loop::loop()->eventByName(EVENT_OBJECT_TO_REDISPLAY));
+
+}
+
+//********************************************************************
 void XGUI_FacesPanel::onClosed()
 {
+  setActivePanel(false);
   reset(true);
 }

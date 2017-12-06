@@ -337,9 +337,8 @@ private:
   /// If the object is result with the color attribute value set, it is used,
   /// otherwise the customize is applyed to the object's feature if it is a custom prs
   /// \param theObject an object instance
-  /// \param isDisplayed boolean state whether the object is displayed/redisplayed
   /// \return the true state if there is changes and the presentation is customized
-  bool customizeObject(ObjectPtr theObject, const bool isDisplayed);
+  bool customizeObject(ObjectPtr theObject);
 
   /// Append the objects in the internal map. Checks whether the map already contains the object
   /// \param theObject an object to display

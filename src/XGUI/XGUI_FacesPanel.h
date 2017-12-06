@@ -36,6 +36,8 @@
 
 class AIS_InteractiveObject;
 
+class GeomAPI_AISObject;
+
 class ModuleBase_IWorkshop;
 class ModuleBase_ListView;
 
@@ -114,9 +116,10 @@ public:
   /// If the object is displayed, all panel faces selected on it will be moved into presentation
   /// or, if redisplayed, fuction return if the object should be redisplayed or not
   /// \param theObject a customized object
-  /// \param isDisplayed state if the object is displayed or redisplayed
+  /// \param thePresentation visualized presentation of the object
   /// \return true if the presentation is customized
-  bool customizeObject(const std::shared_ptr<ModelAPI_Object>& theObject, const bool isDisplayed);
+  bool customizeObject(const std::shared_ptr<ModelAPI_Object>& theObject,
+    const std::shared_ptr<GeomAPI_AISObject>& thePresentation);
 
 protected:
   /// Add panel selection filters to the current viewer
@@ -141,17 +144,25 @@ private:
   /// Activate or deactivate selection and selection filters
   void activateSelection(bool toActivate);
 
-  /// Redisplay or display objects. The viewer is not updated after redisplay.
+  /// Redisplay objects.
   /// \param theObjects container of objects
   /// \param isToFlushRedisplay flag if redisplay should be flushed immediatelly
-  /// \return true if some of objects was redisplayed to update viewer
+  /// \return true if some of objects was redisplayed
   bool redisplayObjects(const std::set<std::shared_ptr<ModelAPI_Object> >& theObjects,
                         const bool isToFlushRedisplay);
 
-  /// Change the presentation to have the selected presentation hidden
-  /// \param theIndex an index of selected item that should be hidden
-  /// \return true if presentation is changed
-  bool hideFace(const int theIndex);
+  /// Display objects if the objects are in a container of hidden by this pane.
+  /// \param theObjects container of objects
+  /// \param isToFlushRedisplay flag if redisplay should be flushed immediatelly
+  /// \return true if some of objects was redisplayed
+  bool displayHiddenObjects(const std::set<std::shared_ptr<ModelAPI_Object> >& theObjects,
+                            const bool isToFlushRedisplay);
+
+  /// Container of objects participating in the panel, it is filled by internal container
+  /// \param theItems container of selected values
+  /// \param theObjects [out] container of objects
+  static void updateProcessedObjects(QMap<int, std::shared_ptr<ModuleBase_ViewerPrs> > theItems,
+                                     std::set<std::shared_ptr<ModelAPI_Object> >& theObjects);
 
   /// Generates a presentation name in form: <object_name>/<face>_<face_index>
   /// \param thePrs a presentation
@@ -161,6 +172,9 @@ private:
 protected slots:
   /// Deletes element in list of items
   void onDeleteItem();
+
+  /// Upates hidden faces to be hidden or transparent
+  void onTransparencyChanged();
 
   /// Closes faces panel restore all hidden faces by calling reset()
   void onClosed();
@@ -174,6 +188,7 @@ protected:
   int myLastItemIndex; ///< last index to be used in the map of items for the next added item
 
   QMap<int, std::shared_ptr<ModuleBase_ViewerPrs> > myItems; ///< selected face items
+  std::set<std::shared_ptr<ModelAPI_Object> > myItemObjects; ///< cached objects of myItems
   std::set<std::shared_ptr<ModelAPI_Object> > myHiddenObjects; ///< hidden objects
 };
 

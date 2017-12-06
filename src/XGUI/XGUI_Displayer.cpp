@@ -268,7 +268,7 @@ bool XGUI_Displayer::display(ObjectPtr theObject, AISObjectPtr theAIS,
   if (!anAISIO.IsNull()) {
     appendResultObject(theObject, theAIS);
 
-    bool isCustomized = customizeObject(theObject, true);
+    bool isCustomized = customizeObject(theObject);
 
     int aDispMode = isShading? Shading : Wireframe;
     if (isShading)
@@ -371,7 +371,7 @@ bool XGUI_Displayer::redisplay(ObjectPtr theObject, bool theUpdateViewer)
       }
     }
     // Customization of presentation
-    bool isCustomized = customizeObject(theObject, false);
+    bool isCustomized = customizeObject(theObject);
     #ifdef DEBUG_FEATURE_REDISPLAY
       qDebug(QString("Redisplay: %1, isEqualShapes=%2, isCustomized=%3").
         arg(!isEqualShapes || isCustomized).arg(isEqualShapes)
@@ -1367,7 +1367,7 @@ bool XGUI_Displayer::activate(const Handle(AIS_InteractiveObject)& theIO,
   return isActivationChanged;
 }
 
-bool XGUI_Displayer::customizeObject(ObjectPtr theObject, const bool isDisplayed)
+bool XGUI_Displayer::customizeObject(ObjectPtr theObject)
 {
   AISObjectPtr anAISObj = getAISObject(theObject);
   // correct the result's color it it has the attribute
@@ -1394,8 +1394,7 @@ bool XGUI_Displayer::customizeObject(ObjectPtr theObject, const bool isDisplayed
 
   // update presentation state if faces panel is active
   if (anAISObj.get() && myWorkshop->facesPanel())
-    isCustomized = myWorkshop->facesPanel()->customizeObject(theObject, isDisplayed) ||
-                   isCustomized;
+    isCustomized = myWorkshop->facesPanel()->customizeObject(theObject, anAISObj) || isCustomized;
 
   return isCustomized;
 }
