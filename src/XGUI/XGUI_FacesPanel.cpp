@@ -20,8 +20,9 @@
 
 #include "XGUI_FacesPanel.h"
 
+#include <Config_PropManager.h>
 #include <Events_Loop.h>
-#include "GeomAlgoAPI_CompoundBuilder.h"
+#include <GeomAlgoAPI_CompoundBuilder.h>
 
 #include <ModelAPI_Events.h>
 
@@ -60,7 +61,6 @@ XGUI_FacesPanel::XGUI_FacesPanel(QWidget* theParent, ModuleBase_IWorkshop* theWo
 
   myHiddenOrTransparent = new QCheckBox(tr("Transparent"), aContent);
   myListView = new ModuleBase_ListView(aContent, "", "Hidden/transparent faces in 3D view");
-  connect(myListView->getControl(), SIGNAL(itemSelectionChanged()), SLOT(onListSelection()));
   connect(myListView, SIGNAL(deleteActionClicked()), SLOT(onDeleteItem()));
 
   aMainLayout->addWidget(myHiddenOrTransparent, 0, 0);
@@ -126,6 +126,12 @@ void XGUI_FacesPanel::setActivePanel(const bool theIsActive)
     activateSelection(theIsActive);
     emit deactivated();
   }
+}
+
+//********************************************************************
+bool XGUI_FacesPanel::useTransparency() const
+{
+  return myHiddenOrTransparent->isChecked();
 }
 
 //********************************************************************
@@ -379,6 +385,9 @@ bool XGUI_FacesPanel::customizeObject(const ObjectPtr& theObject, const bool isD
       aHiddenSubShapes.Append(aShape);
   }
   isModified = aResultPrs->setSubShapeHidden(aHiddenSubShapes);
+  double aTransparency = !useTransparency() ? 1
+    : Config_PropManager::real("Visualization", "hidden_face_transparency");
+  aResultPrs->setHiddenSubShapeTransparency(aTransparency);
 
   return isModified;
 }
