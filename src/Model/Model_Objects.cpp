@@ -1119,8 +1119,10 @@ bool Model_Objects::hasCustomName(DataPtr theFeatureData,
     return false;
   }
 
-  theParentName = ModelAPI_Tools::getDefaultName(theResult, theResultIndex);
-  return true;
+  std::pair<std::string, bool> aName = ModelAPI_Tools::getDefaultName(theResult, theResultIndex);
+  if (aName.second)
+    theParentName = aName.first;
+  return aName.second;
 }
 
 void Model_Objects::storeResult(std::shared_ptr<ModelAPI_Data> theFeatureData,
@@ -1133,7 +1135,11 @@ void Model_Objects::storeResult(std::shared_ptr<ModelAPI_Data> theFeatureData,
   if (theResult->data()->name().empty()) {
     // if was not initialized, generate event and set a name
     std::string aNewName = theFeatureData->name();
-    if (!hasCustomName(theFeatureData, theResult, theResultIndex, aNewName)) {
+    if (hasCustomName(theFeatureData, theResult, theResultIndex, aNewName)) {
+      // if the name of result is user-defined, then, at first time, assign name of the result
+      // by empty string to be sure that corresponding flag in the data model is set
+      theResult->data()->setName("");
+    } else {
       std::stringstream aName;
       aName << aNewName;
       // if there are several results (issue #899: any number of result),

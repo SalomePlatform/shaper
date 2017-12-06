@@ -74,9 +74,10 @@ class MODELAPI_EXPORT ModelAPI_Data
 
   /// Returns the name of the feature visible by the user in the object browser
   virtual std::string name() = 0;
-
   /// Defines the name of the feature visible by the user in the object browser
   virtual void setName(const std::string& theName) = 0;
+  /// Return \c true if the object has been renamed by the user
+  virtual bool hasUserDefinedName() const = 0;
 
   /// Returns the attribute that references to another document
   virtual std::shared_ptr<ModelAPI_AttributeDocRef> document(const std::string& theID) = 0;

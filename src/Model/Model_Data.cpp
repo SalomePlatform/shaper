@@ -58,6 +58,7 @@
 #include <TDataStd_Name.hxx>
 #include <TDataStd_AsciiString.hxx>
 #include <TDataStd_IntegerArray.hxx>
+#include <TDataStd_UAttribute.hxx>
 #include <TDF_AttributeIterator.hxx>
 #include <TDF_ChildIterator.hxx>
 #include <TDF_RelocationTable.hxx>
@@ -75,6 +76,9 @@ static const int kFlagInHistory = 0;
 static const int kFlagDisplayed = 1;
 //                             2 - is deleted (for results) or not
 static const int kFlagDeleted = 2;
+// TDataStd_Integer - 0 if the name of the object is generated automatically,
+//                    otherwise the name is defined by user
+Standard_GUID kUSER_DEFINED_NAME("9c694d18-a83c-4a56-bc9b-8020628a8244");
 
 // invalid data
 const static std::shared_ptr<ModelAPI_Data> kInvalid(new Model_Data());
@@ -127,8 +131,11 @@ void Model_Data::setName(const std::string& theName)
     isModified = true;
   } else {
     isModified = !aName->Get().IsEqual(theName.c_str());
-    if (isModified)
+    if (isModified) {
       aName->Set(theName.c_str());
+      // name is changed, thus special attribute is set
+      TDataStd_UAttribute::Set(myLab, kUSER_DEFINED_NAME);
+    }
   }
   if (mySendAttributeUpdated && isModified)
     ModelAPI_ObjectRenamedMessage::send(myObject, anOldName, theName, this);
@@ -139,6 +146,11 @@ void Model_Data::setName(const std::string& theName)
 #ifdef DEBUG_NAMES
   myObject->myName = theName;
 #endif
+}
+
+bool Model_Data::hasUserDefinedName() const
+{
+  return myLab.IsAttribute(kUSER_DEFINED_NAME);
 }
 
 AttributePtr Model_Data::addAttribute(const std::string& theID, const std::string theAttrType)

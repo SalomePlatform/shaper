@@ -214,7 +214,8 @@ void ModelHighAPI_Dumper::saveResultNames(const FeaturePtr& theFeature)
   const std::list<ResultPtr>& aResults = theFeature->results();
   std::list<ResultPtr>::const_iterator aResIt = aResults.begin();
   for (int i = 0; aResIt != aResults.end(); ++aResIt, ++i) {
-    std::string aDefaultName = ModelAPI_Tools::getDefaultName(*aResIt, i);
+    std::pair<std::string, bool> aName = ModelAPI_Tools::getDefaultName(*aResIt, i);
+    std::string aDefaultName = aName.first;
     std::string aResName = (*aResIt)->data()->name();
 
     bool isUserDefined = !(isFeatureDefaultName && aDefaultName == aResName);
@@ -229,7 +230,8 @@ void ModelHighAPI_Dumper::saveResultNames(const FeaturePtr& theFeature)
       for (int j = 0; j < aNbSubs; ++j) {
         ResultPtr aSub = aCompSolid->subResult(j);
         std::string aSubName = aSub->data()->name();
-        aDefaultName = ModelAPI_Tools::getDefaultName(aSub, j);
+        aName = ModelAPI_Tools::getDefaultName(aSub, j);
+        aDefaultName = aName.first;
 
         bool isUserDefinedSubName = isUserDefined || aDefaultName != aSubName;
         myNames[aSub] = EntityName(aSubName,
