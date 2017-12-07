@@ -686,13 +686,15 @@ ResultPtr PartSet_Tools::createFixedByExternalCenter(
     const std::shared_ptr<GeomAPI_Edge>& theEdge,
     ModelAPI_AttributeSelection::CenterType theType,
     const CompositeFeaturePtr& theSketch,
-    bool theTemporary)
+    bool theTemporary,
+    FeaturePtr& theCreatedFeature)
 {
   ResultPtr aResult = std::dynamic_pointer_cast<ModelAPI_Result>(theObject);
   if (!aResult.get())
     return ResultPtr();
 
   FeaturePtr aProjectionFeature = theSketch->addFeature(SketchPlugin_Projection::ID());
+  theCreatedFeature = aProjectionFeature;
   AttributeSelectionPtr anExternalAttr = std::dynamic_pointer_cast<ModelAPI_AttributeSelection>(
                  aProjectionFeature->attribute(SketchPlugin_Projection::EXTERNAL_FEATURE_ID()));
   anExternalAttr->setValueCenter(aResult, theEdge, theType, theTemporary);

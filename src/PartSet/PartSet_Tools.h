@@ -283,7 +283,8 @@ public:
                                                const std::shared_ptr<GeomAPI_Edge>& theEdge,
                                                ModelAPI_AttributeSelection::CenterType theType,
                                                const CompositeFeaturePtr& theSketch,
-                                               bool theTemporary = false);
+                                               bool theTemporary,
+                                               FeaturePtr& theCreatedFeature);
 
 };
 

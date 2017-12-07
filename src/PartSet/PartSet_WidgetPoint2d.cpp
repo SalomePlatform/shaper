@@ -726,8 +726,11 @@ void PartSet_WidgetPoint2D::mouseReleased(ModuleBase_IViewWindow* theWindow, QMo
       ResultPtr aFixedObject =
           PartSet_Tools::findFixedObjectByExternal(aShape, aAIS->object(), mySketch);
       if (!aFixedObject.get())
+      {
+        FeaturePtr aCreatedFeature;
         aFixedObject = PartSet_Tools::createFixedByExternalCenter(aAIS->object(), aAIS->edge(),
-                                                                  aAIS->centerType(), mySketch);
+          aAIS->centerType(), mySketch, false, aCreatedFeature);
+      }
       if (aFixedObject.get())
         setConstraintToObject(aFixedObject);
       // fignal updated should be flushed in order to visualize possible created

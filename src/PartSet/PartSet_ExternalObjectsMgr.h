@@ -74,6 +74,15 @@ class PARTSET_EXPORT PartSet_ExternalObjectsMgr
   ObjectPtr externalObject(const ObjectPtr& theSelectedObject, const GeomShapePtr& theShape,
                            const CompositeFeaturePtr& theSketch, const bool theTemporary = false);
 
+  /// Finds or create and external object by selected circle center (PartSet_CenterPrs)
+  /// \param thePrs a selection
+  /// \param theSketch a current sketch
+  /// \param theTemporary the created external object is temporary, execute is not performed for it
+  /// \return the object
+  ObjectPtr externalCenterObject(const std::shared_ptr<ModuleBase_ViewerPrs>& thePrs,
+                                 const CompositeFeaturePtr& theSketch,
+                                 const bool theTemporary);
+
   // Removes the external presentation from the model
   /// \param theSketch a current sketch
   /// \param theFeature a current feature

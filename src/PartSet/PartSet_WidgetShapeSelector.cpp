@@ -19,6 +19,8 @@
 //
 
 #include "PartSet_WidgetShapeSelector.h"
+
+#include "PartSet_CenterPrs.h"
 #include "PartSet_Module.h"
 #include "PartSet_SketcherMgr.h"
 
@@ -74,7 +76,12 @@ bool PartSet_WidgetShapeSelector::activateSelectionAndFilters(bool toActivate)
 //********************************************************************
 bool PartSet_WidgetShapeSelector::isValidSelectionCustom(const ModuleBase_ViewerPrsPtr& thePrs)
 {
-  bool aValid = ModuleBase_WidgetShapeSelector::isValidSelectionCustom(thePrs);
+  bool aValid = false;
+  if (thePrs.get() && thePrs->interactive()->IsKind(STANDARD_TYPE(PartSet_CenterPrs)))
+    aValid = true; // we should not check acceptSubShape for such presentation
+  else
+    aValid = ModuleBase_WidgetShapeSelector::isValidSelectionCustom(thePrs);
+
   if (aValid) {
     ObjectPtr anObject = myWorkshop->selection()->getResult(thePrs);
     aValid = myExternalObjectMgr->isValidObject(anObject);

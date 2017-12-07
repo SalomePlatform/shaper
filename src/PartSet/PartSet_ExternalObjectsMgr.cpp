@@ -19,6 +19,8 @@
 //
 
 #include "PartSet_ExternalObjectsMgr.h"
+
+#include "PartSet_CenterPrs.h"
 #include "PartSet_Tools.h"
 
 #include <XGUI_Workshop.h>
@@ -83,12 +85,40 @@ ObjectPtr PartSet_ExternalObjectsMgr::externalObject(const ObjectPtr& theSelecte
   return aSelectedObject;
 }
 
+ObjectPtr PartSet_ExternalObjectsMgr::externalCenterObject(const ModuleBase_ViewerPrsPtr& thePrs,
+                                                           const CompositeFeaturePtr& theSketch,
+                                                           const bool theTemporary)
+{
+  if (!thePrs.get() || thePrs->interactive().IsNull())
+    return ObjectPtr();
+
+  Handle(PartSet_CenterPrs) aAIS = Handle(PartSet_CenterPrs)::DownCast(thePrs->interactive());
+  if (aAIS.IsNull())
+    return ObjectPtr();
+
+  gp_Pnt aPntComp = aAIS->Component()->Pnt();
+  GeomVertexPtr aVertPtr(new GeomAPI_Vertex(aPntComp.X(), aPntComp.Y(), aPntComp.Z()));
+  TopoDS_Shape aShape = aVertPtr->impl<TopoDS_Shape>();
+
+  ResultPtr aSelectedObject =
+    PartSet_Tools::findFixedObjectByExternal(aShape, aAIS->object(), theSketch);
+  if (!aSelectedObject.get())
+  {
+    FeaturePtr aCreatedFeature;
+    aSelectedObject = PartSet_Tools::createFixedByExternalCenter(aAIS->object(), aAIS->edge(),
+      aAIS->centerType(), theSketch, theTemporary, aCreatedFeature);
+    if (aCreatedFeature.get() && theTemporary)
+        myExternalObjectValidated = aCreatedFeature;
+  }
+  return aSelectedObject;
+}
+
 void PartSet_ExternalObjectsMgr::getGeomSelection(const ModuleBase_ViewerPrsPtr& thePrs,
-                                                   ObjectPtr& theObject,
-                                                   GeomShapePtr& theShape,
-                                                   ModuleBase_IWorkshop* theWorkshop,
-                                                   const CompositeFeaturePtr& theSketch,
-                                                   const bool isInValidate)
+                                                  ObjectPtr& theObject,
+                                                  GeomShapePtr& theShape,
+                                                  ModuleBase_IWorkshop* theWorkshop,
+                                                  const CompositeFeaturePtr& theSketch,
+                                                  const bool isInValidate)
 {
   FeaturePtr aSelectedFeature = ModelAPI_Feature::feature(theObject);
   std::shared_ptr<SketchPlugin_Feature> aSPFeature =
@@ -110,6 +140,9 @@ void PartSet_ExternalObjectsMgr::getGeomSelection(const ModuleBase_ViewerPrsPtr&
         if (aShape.get() != NULL && !aShape->isNull())
           anExternalObject =
             externalObject(theObject, aShape, theSketch, isInValidate);
+        if (!anExternalObject.get()) {
+          anExternalObject = externalCenterObject(thePrs, theSketch, isInValidate);
+        }
       }
       else { /// use objects of found selection
         anExternalObject = theObject;
