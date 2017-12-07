@@ -1041,6 +1041,7 @@ void XGUI_Workshop::onUndo(int theTimes)
     if (QString((*aIt).c_str()) == MOVE_TO_END_COMMAND)
       myObjectBrowser->rebuildDataTree();
   }
+  facesPanel()->reset(true);
 
   operationMgr()->updateApplyOfOperations();
   updateCommandStatus();
@@ -1075,6 +1076,7 @@ void XGUI_Workshop::onRedo(int theTimes)
       myObjectBrowser->rebuildDataTree();
   }
   operationMgr()->updateApplyOfOperations();
+  facesPanel()->reset(true);
   updateCommandStatus();
 
   // unblock the viewer update functionality and make update on purpose
