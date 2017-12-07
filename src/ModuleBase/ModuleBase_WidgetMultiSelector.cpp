@@ -884,7 +884,8 @@ bool ModuleBase_WidgetMultiSelector::findInSelection(const ObjectPtr& theObject,
   return aFound;
 }
 
-QList<ActionInfo> ModuleBase_WidgetMultiSelector::actionsList(ModuleBase_ActionType theActionType) const
+QList<ActionInfo>
+  ModuleBase_WidgetMultiSelector::actionsList(ModuleBase_ActionType theActionType) const
 {
   QList<ActionInfo> aList;
   if (myCurrentHistoryIndex > -1) {
