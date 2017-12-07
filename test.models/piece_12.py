@@ -522,7 +522,7 @@ Extrusion_4 = model.addExtrusion(Part_1_doc, [model.selection("WIRE", "Sketch_4/
 Boolean_2 = model.addSmash(Part_1_doc, [model.selection("SOLID", "ExtrusionCut_6_1_1"), model.selection("SOLID", "Extrusion_4_1")], [model.selection("SOLID", "ExtrusionCut_6_1_2")])
 ExtrusionCut_7 = model.addExtrusionCut(Part_1_doc, [model.selection("FACE", "Sketch_4/Face-SketchCircle_9_2f")], model.selection(), 0, 10, [model.selection("SOLID", "Boolean_2_1_1")])
 ExtrusionCut_8 = model.addExtrusionCut(Part_1_doc, [model.selection("FACE", "Sketch_4/Face-SketchCircle_9_2f")], model.selection(), 0, 10, [model.selection("SOLID", "ExtrusionCut_7_1_1")])
-Sketch_5 = model.addSketch(Part_1_doc, model.selection("FACE", "Boolean_2_1_1/Modified_1"))
+Sketch_5 = model.addSketch(Part_1_doc, model.selection("FACE", "Boolean_2_1_1/Modified_Face_1"))
 SketchPoint_3 = Sketch_5.addPoint(model.selection("VERTEX", "PartSet/Origin"))
 SketchPoint_3.setName("SketchPoint_2")
 SketchPoint_3.result().setName("SketchPoint_2")
