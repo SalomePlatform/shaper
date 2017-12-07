@@ -74,13 +74,17 @@ XGUI_FacesPanel::XGUI_FacesPanel(QWidget* theParent, ModuleBase_IWorkshop* theWo
 //********************************************************************
 void XGUI_FacesPanel::reset(const bool isToFlushRedisplay)
 {
+  if (myLastItemIndex == 0) // do nothing because there was no activity in the pane after reset
+    return;
+
   // clear internal containers
   myListView->getControl()->clear();
   myItems.clear();
 
   // restore previous view of presentations
   bool isModified = redisplayObjects(myItemObjects, false);
-  isModified = displayHiddenObjects(myHiddenObjects, false) || isModified;
+  std::set<std::shared_ptr<ModelAPI_Object> > aHiddenObjects = myHiddenObjects;
+  isModified = displayHiddenObjects(aHiddenObjects, false) || isModified;
   if (isModified && isToFlushRedisplay)
     Events_Loop::loop()->flush(Events_Loop::loop()->eventByName(EVENT_OBJECT_TO_REDISPLAY));
 
