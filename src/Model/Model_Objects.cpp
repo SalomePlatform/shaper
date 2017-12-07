@@ -784,7 +784,7 @@ void Model_Objects::synchronizeFeatures(
     TDF_Label& aFeatureLab = anUpdatedIter.Value();
     while(aFeatureLab.Depth() > 3)
       aFeatureLab = aFeatureLab.Father();
-    if (myFeatures.IsBound(aFeatureLab))
+    if (myFeatures.IsBound(aFeatureLab) || myFolders.IsBound(aFeatureLab))
       anUpdatedMap.Add(aFeatureLab);
   }
 
