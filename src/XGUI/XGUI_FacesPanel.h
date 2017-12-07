@@ -148,15 +148,17 @@ private:
   /// \param theObjects container of objects
   /// \param isToFlushRedisplay flag if redisplay should be flushed immediatelly
   /// \return true if some of objects was redisplayed
-  bool redisplayObjects(const std::set<std::shared_ptr<ModelAPI_Object> >& theObjects,
-                        const bool isToFlushRedisplay);
+  static bool redisplayObjects(const std::set<std::shared_ptr<ModelAPI_Object> >& theObjects,
+                               const bool isToFlushRedisplay);
 
   /// Display objects if the objects are in a container of hidden by this pane.
   /// \param theObjects container of objects
+  /// \param theHiddenObjects hidden objects, if object is in the container, it should be removed
   /// \param isToFlushRedisplay flag if redisplay should be flushed immediatelly
   /// \return true if some of objects was redisplayed
-  bool displayHiddenObjects(const std::set<std::shared_ptr<ModelAPI_Object> >& theObjects,
-                            const bool isToFlushRedisplay);
+  static bool displayHiddenObjects(const std::set<std::shared_ptr<ModelAPI_Object> >& theObjects,
+                                   std::set<std::shared_ptr<ModelAPI_Object> >& theHiddenObjects,
+                                   const bool isToFlushRedisplay);
 
   /// Iterates by items and hide objects where all sub-shapes are hidden
   /// \return true if some of objects was redisplayed

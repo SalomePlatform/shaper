@@ -84,7 +84,7 @@ void XGUI_FacesPanel::reset(const bool isToFlushRedisplay)
   // restore previous view of presentations
   bool isModified = redisplayObjects(myItemObjects, false);
   std::set<std::shared_ptr<ModelAPI_Object> > aHiddenObjects = myHiddenObjects;
-  isModified = displayHiddenObjects(aHiddenObjects, false) || isModified;
+  isModified = displayHiddenObjects(aHiddenObjects, myHiddenObjects, false) || isModified;
   if (isModified && isToFlushRedisplay)
     Events_Loop::loop()->flush(Events_Loop::loop()->eventByName(EVENT_OBJECT_TO_REDISPLAY));
 
@@ -250,7 +250,8 @@ bool XGUI_FacesPanel::processDelete()
   }
   if (isModified) {
     bool isRedisplayed = redisplayObjects(aRestoredObjects, false);
-    isRedisplayed = displayHiddenObjects(aRestoredObjects, false) || isRedisplayed;
+    isRedisplayed = displayHiddenObjects(aRestoredObjects, myHiddenObjects, false)
+                    || isRedisplayed;
     if (isRedisplayed)
       Events_Loop::loop()->flush(Events_Loop::loop()->eventByName(EVENT_OBJECT_TO_REDISPLAY));
     // should be after flush of redisplay to have items object to be updated
@@ -291,6 +292,7 @@ bool XGUI_FacesPanel::redisplayObjects(
 //********************************************************************
 bool XGUI_FacesPanel::displayHiddenObjects(
   const std::set<std::shared_ptr<ModelAPI_Object> >& theObjects,
+  std::set<std::shared_ptr<ModelAPI_Object> >& theHiddenObjects,
   const bool isToFlushRedisplay)
 {
   if (theObjects.empty())
@@ -304,9 +306,9 @@ bool XGUI_FacesPanel::displayHiddenObjects(
   {
     ObjectPtr anObject = *anIt;
     // if the object was hidden by this panel
-    if (anObject->isDisplayed() || myHiddenObjects.find(anObject) == myHiddenObjects.end())
+    if (anObject->isDisplayed() || theHiddenObjects.find(anObject) == theHiddenObjects.end())
       continue;
-    myHiddenObjects.erase(anObject);
+    theHiddenObjects.erase(anObject);
     anObject->setDisplayed(true); // it means that the object is hidden by hide all faces
     ModelAPI_EventCreator::get()->sendUpdated(anObject, aDispEvent);
     isModified = true;
@@ -461,7 +463,7 @@ void XGUI_FacesPanel::onTransparencyChanged()
   bool isModified = false;
   if (useTransparency()) {
     std::set<std::shared_ptr<ModelAPI_Object> > aHiddenObjects = myHiddenObjects;
-    isModified = displayHiddenObjects(aHiddenObjects, false);
+    isModified = displayHiddenObjects(aHiddenObjects, myHiddenObjects, false);
   }
   else
     isModified = hideEmptyObjects();
