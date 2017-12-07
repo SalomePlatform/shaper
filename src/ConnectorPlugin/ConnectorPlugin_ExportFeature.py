@@ -36,6 +36,8 @@ def getTmpFileName(ext):
     tempdir = tempfile.gettempdir()
     tmp_file = tempfile.NamedTemporaryFile(suffix=".%s"%ext, prefix='shaper_', dir=tempdir, delete=False)
     tmp_filename = tmp_file.name
+    if os.name == "nt":
+        tmp_filename.replace("\\", "/")
     return tmp_filename
 
 ## @ingroup Plugins
