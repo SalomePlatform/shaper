@@ -30,6 +30,7 @@
 #include <XGUI_OperationMgr.h>
 #include <XGUI_Displayer.h>
 #include <XGUI_MenuMgr.h>
+#include <XGUI_FacesPanel.h>
 
 #include <ModuleBase_Operation.h>
 #include <ModuleBase_Preferences.h>
@@ -322,6 +323,7 @@ bool SHAPERGUI::deactivateModule(SUIT_Study* theStudy)
     mySelector = 0;
   }
 
+  myWorkshop->hidePanel(myWorkshop->facesPanel());
   //myWorkshop->contextMenuMgr()->disconnectViewer();
 
   SUIT_ResourceMgr* aResMgr = application()->resourceMgr();
