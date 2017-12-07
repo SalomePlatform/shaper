@@ -212,6 +212,9 @@ void SketchSolver_ConstraintMovement::startPoint(
 void SketchSolver_ConstraintMovement::moveTo(
     const std::shared_ptr<GeomAPI_Pnt2d>& theDestinationPoint)
 {
+  if (!myMovedFeature)
+    return; // nothing to move
+
   double aDelta[2] = { theDestinationPoint->x() - myStartPoint->x(),
                        theDestinationPoint->y() - myStartPoint->y() };
 
