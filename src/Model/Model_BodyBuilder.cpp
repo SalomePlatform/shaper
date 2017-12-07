@@ -391,11 +391,13 @@ void Model_BodyBuilder::loadAndOrientModifiedShapes (
     const TopoDS_Shape& aRoot = aShapeExplorer.Current ();
     if (!aView.Add(aRoot)) continue;
     if (TNaming_Tool::NamedShape(aRoot, builder(theTag)->NamedShape()->Label()).IsNull())
-      continue; // there is no sence to write history is old shape does not persented in document
+      continue; // there is no sense to write history if old shape does not exist in the document
     ListOfShape aList;
     std::shared_ptr<GeomAPI_Shape> aRShape(new GeomAPI_Shape());
     aRShape->setImpl((new TopoDS_Shape(aRoot)));
     theMS->modified(aRShape, aList);
+    // to trace situation where several objects are produced by one parent (#2317)
+    int aSameParentShapes = -1;
     std::list<std::shared_ptr<GeomAPI_Shape> >::const_iterator
       anIt = aList.begin(), aLast = aList.end();
     for (; anIt != aLast; anIt++) {
@@ -407,12 +409,18 @@ void Model_BodyBuilder::loadAndOrientModifiedShapes (
       GeomShapePtr aGeomNewShape(new GeomAPI_Shape());
       aGeomNewShape->setImpl(new TopoDS_Shape(aNewShape));
       if(!aRoot.IsSame(aNewShape) && aResultShape->isSubShape(aGeomNewShape, false)) {
+        int aBuilderTag = aTag;
+        if (!theIsStoreSeparate)
+          aSameParentShapes++;
+        if (aSameParentShapes > 0) { // store in other label (
+          aBuilderTag = 100000 - aSameParentShapes * 10 - aTag;
+        }
         if(theIsStoreAsGenerated) {
           // Here we store shapes as generated, to avoid problem when one parent shape produce
           // several child shapes. In this case naming could not determine which shape to select.
-          builder(aTag)->Generated(aRoot,aNewShape);
+          builder(aBuilderTag)->Generated(aRoot,aNewShape);
         } else {
-          builder(aTag)->Modify(aRoot,aNewShape);
+          builder(aBuilderTag)->Modify(aRoot,aNewShape);
         }
         if(isBuilt) {
           if(theIsStoreSeparate) {
@@ -421,7 +429,15 @@ void Model_BodyBuilder::loadAndOrientModifiedShapes (
             aStream << theName << "_" << anIndex++;
             aName = aStream.str();
           }
-          buildName(aTag, aName);
+          if (aSameParentShapes > 0) {
+            aStream.str(std::string());
+            aStream.clear();
+            aStream << aName << "_" << aSameParentShapes << "divided";
+            std::string aNameDiv = aStream.str();
+            buildName(aBuilderTag, aNameDiv);
+          } else {
+            buildName(aBuilderTag, aName);
+          }
         }
         if(theIsStoreSeparate) {
           aTag++;
@@ -447,7 +463,7 @@ void Model_BodyBuilder::loadAndOrientGeneratedShapes (
     const TopoDS_Shape& aRoot = aShapeExplorer.Current ();
     if (!aView.Add(aRoot)) continue;
     //if (TNaming_Tool::NamedShape(aRoot, builder(theTag)->NamedShape()->Label()).IsNull())
-    //  continue; // there is no sence to write history is old shape does not persented in document
+    //  continue; // there is no sense to write history if old shape does not exist in the document
     ListOfShape aList;
     std::shared_ptr<GeomAPI_Shape> aRShape(new GeomAPI_Shape());
     aRShape->setImpl((new TopoDS_Shape(aRoot)));

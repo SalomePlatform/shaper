@@ -355,6 +355,10 @@ std::string Model_SelectionNaming::namingName(ResultPtr& theContext,
           break;
         int n = aList.Extent();
         bool isByFaces = n >= 3;
+        if (isByFaces) { // check that by faces vertex is identified uniquly (2317)
+          TopoDS_Shape aVertex = findCommonShape(TopAbs_VERTEX, aList);
+          isByFaces = !aVertex.IsNull() && aVertex.ShapeType() == TopAbs_VERTEX;
+        }
         if(!isByFaces) { // open topology case or Compound case => via edges
           TopTools_IndexedDataMapOfShapeListOfShape aMap;
           TopExp::MapShapesAndAncestors(aContext, TopAbs_VERTEX, TopAbs_EDGE, aMap);
