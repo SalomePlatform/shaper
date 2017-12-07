@@ -505,7 +505,6 @@ void ModuleBase_WidgetMultiSelector::appendSelectionInHistory()
   QList<ModuleBase_ViewerPrsPtr> aSelected = getFilteredSelected();
   myCurrentHistoryIndex++;
   mySelectedHistoryValues.append(aSelected);
-  int aNb = mySelectedHistoryValues.count();
   myWorkshop->updateCommandStatus();
 
 #ifdef DEBUG_UNDO_REDO
