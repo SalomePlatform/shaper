@@ -244,7 +244,7 @@ bool PartSet_WidgetPoint2D::setSelectionCustom(const ModuleBase_ViewerPrsPtr& th
   GeomShapePtr aShape = theValue->shape();
   if (aShape.get() && !aShape->isNull()) {
     Handle(V3d_View) aView = myWorkshop->viewer()->activeView();
-    double aX, aY;
+    double aX = 0, aY = 0;
     const TopoDS_Shape& aTDShape = aShape->impl<TopoDS_Shape>();
     if (getPoint2d(aView, aTDShape, aX, aY)) {
       fillRefAttribute(aX, aY, theValue);
@@ -307,7 +307,7 @@ bool PartSet_WidgetPoint2D::setSelection(QList<ModuleBase_ViewerPrsPtr>& theValu
     GeomShapePtr aShape = aValue->shape();
     if (aShape.get() && !aShape->isNull()) {
       Handle(V3d_View) aView = myWorkshop->viewer()->activeView();
-      double aX, aY;
+      double aX = 0, aY = 0;
       const TopoDS_Shape& aTDShape = aShape->impl<TopoDS_Shape>();
       if (getPoint2d(aView, aTDShape, aX, aY)) {
         isDone = setPoint(aX, aY);
@@ -626,7 +626,7 @@ void PartSet_WidgetPoint2D::mouseReleased(ModuleBase_IViewWindow* theWindow, QMo
       }
     }
     if (anExternal) {
-      double aX, aY;
+      double aX = 0, aY = 0;
       if (getPoint2d(aView, aShape, aX, aY) && isFeatureContainsPoint(myFeature, aX, aY)) {
         // do not create a constraint to the point, which already used by the feature
         // if the feature contains the point, focus is not switched
@@ -673,7 +673,7 @@ void PartSet_WidgetPoint2D::mouseReleased(ModuleBase_IViewWindow* theWindow, QMo
       }
     }
     if (!anExternal) {
-      double aX, aY;
+      double aX = 0, aY = 0;
       bool isProcessed = false;
       if (getPoint2d(aView, aShape, aX, aY) && isFeatureContainsPoint(myFeature, aX, aY)) {
         // when the point is selected, the coordinates of the point should be set into the attribute
@@ -737,7 +737,7 @@ void PartSet_WidgetPoint2D::mouseReleased(ModuleBase_IViewWindow* theWindow, QMo
       // external objects e.g. selection of trihedron axis when input end arc point
       updateObject(feature());
 
-      double aX, aY;
+      double aX = 0, aY = 0;
       if (getPoint2d(aView, aShape, aX, aY)) {
         // do not create a constraint to the point, which already used by the feature
         // if the feature contains the point, focus is not switched
@@ -750,11 +750,11 @@ void PartSet_WidgetPoint2D::mouseReleased(ModuleBase_IViewWindow* theWindow, QMo
   else {
     // A case when point is taken from mouse event
     gp_Pnt aPoint = PartSet_Tools::convertClickToPoint(theEvent->pos(), theWindow->v3dView());
-    double aX, anY;
-    PartSet_Tools::convertTo2D(aPoint, mySketch, aView, aX, anY);
+    double aX = 0, aY = 0;
+    PartSet_Tools::convertTo2D(aPoint, mySketch, aView, aX, aY);
 
     // if the feature contains the point, focus is not switched
-    if (!setPoint(aX, anY) || isFeatureContainsPoint(myFeature, aX, anY))
+    if (!setPoint(aX, aY) || isFeatureContainsPoint(myFeature, aX, aY))
       return;
 
     emit focusOutWidget(this);
@@ -787,13 +787,13 @@ void PartSet_WidgetPoint2D::mouseMoved(ModuleBase_IViewWindow* theWindow, QMouse
 
   gp_Pnt aPoint = PartSet_Tools::convertClickToPoint(theEvent->pos(), theWindow->v3dView());
 
-  double aX, anY;
-  PartSet_Tools::convertTo2D(aPoint, mySketch, theWindow->v3dView(), aX, anY);
+  double aX = 0, aY = 0;
+  PartSet_Tools::convertTo2D(aPoint, mySketch, theWindow->v3dView(), aX, aY);
   if (myState != ModifiedInViewer)
     storeCurentValue();
   // we need to block the value state change
   bool isBlocked = blockValueState(true);
-  setPoint(aX, anY);
+  setPoint(aX, aY);
   blockValueState(isBlocked);
   setValueState(ModifiedInViewer);
 }
