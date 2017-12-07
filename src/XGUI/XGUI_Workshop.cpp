@@ -1265,12 +1265,21 @@ void XGUI_Workshop::updateCommandStatus()
 //******************************************************
 void XGUI_Workshop::updateHistory()
 {
-  std::list<std::string> aUndoList = ModelAPI_Session::get()->undoList();
-  QList<ActionInfo> aUndoRes = processHistoryList(aUndoList);
-  emit updateUndoHistory(aUndoRes);
+  bool isActionEnabled = false;
+  ModuleBase_ModelWidget* anActiveWidget = myOperationMgr->activeWidget();
+  QList<ActionInfo> aUndoRes;
+  QList<ActionInfo> aRedoRes;
+  if (anActiveWidget && anActiveWidget->canProcessAction(ActionUndo, isActionEnabled)) {
+    aUndoRes = anActiveWidget->actionsList(ActionUndo);
+    aRedoRes = anActiveWidget->actionsList(ActionRedo);
+  } else {
+    std::list<std::string> aUndoList = ModelAPI_Session::get()->undoList();
+    aUndoRes = processHistoryList(aUndoList);
 
-  std::list<std::string> aRedoList = ModelAPI_Session::get()->redoList();
-  QList<ActionInfo> aRedoRes = processHistoryList(aRedoList);
+    std::list<std::string> aRedoList = ModelAPI_Session::get()->redoList();
+    aRedoRes = processHistoryList(aRedoList);
+  }
+  emit updateUndoHistory(aUndoRes);
   emit updateRedoHistory(aRedoRes);
 }
 

@@ -103,6 +103,10 @@ class MODULEBASE_EXPORT ModuleBase_WidgetMultiSelector : public ModuleBase_Widge
   /// \return a boolean value
   virtual bool isValidSelectionCustom(const std::shared_ptr<ModuleBase_ViewerPrs>& thePrs);
 
+  /// Returns list of accessible actions for Undo/Redo commands. By default it returns empty list.
+  /// \param theActionType type of action. It can be ActionUndo or ActionRedo.
+  virtual QList<ActionInfo> actionsList(ModuleBase_ActionType theActionType) const;
+
 public slots:
   /// Slot is called on selection type changed
   void onSelectionTypeChanged();

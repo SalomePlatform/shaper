@@ -505,6 +505,7 @@ void ModuleBase_WidgetMultiSelector::appendSelectionInHistory()
   QList<ModuleBase_ViewerPrsPtr> aSelected = getFilteredSelected();
   myCurrentHistoryIndex++;
   mySelectedHistoryValues.append(aSelected);
+  int aNb = mySelectedHistoryValues.count();
   myWorkshop->updateCommandStatus();
 
 #ifdef DEBUG_UNDO_REDO
@@ -881,4 +882,33 @@ bool ModuleBase_WidgetMultiSelector::findInSelection(const ObjectPtr& theObject,
     }
   }
   return aFound;
+}
+
+QList<ActionInfo> ModuleBase_WidgetMultiSelector::actionsList(ModuleBase_ActionType theActionType) const
+{
+  QList<ActionInfo> aList;
+  if (myCurrentHistoryIndex > -1) {
+    int i = 0;
+    QString aTitle("Selection %1 items");
+    QIcon aIcon(":pictures/selection.png");
+    switch (theActionType) {
+    case ActionUndo:
+      i = 1;
+      while (i <= myCurrentHistoryIndex) {
+        ActionInfo aInfo(aIcon, aTitle.arg(mySelectedHistoryValues.at(i).count()));
+        aList.append(aInfo);
+        i++;
+      }
+      break;
+    case ActionRedo:
+      i = mySelectedHistoryValues.length() - 1;
+      while (i > myCurrentHistoryIndex) {
+        ActionInfo aInfo(aIcon, aTitle.arg(mySelectedHistoryValues.at(i).count()));
+        aList.append(aInfo);
+        i--;
+      }
+      break;
+    }
+  }
+  return aList;
 }

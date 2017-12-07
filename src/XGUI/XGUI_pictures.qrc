@@ -68,5 +68,6 @@
      <file>pictures/insert_folder_before.png</file>
      <file>pictures/move_out_after.png</file>
      <file>pictures/move_out_before.png</file>
+     <file>pictures/selection.png</file>
  </qresource>
  </RCC>

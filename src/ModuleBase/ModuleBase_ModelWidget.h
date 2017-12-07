@@ -24,6 +24,7 @@
 #include <ModuleBase.h>
 #include <ModuleBase_ActionType.h>
 #include <ModuleBase_OperationFeature.h>
+#include <ModuleBase_ActionInfo.h>
 #include <ModelAPI_Feature.h>
 
 #include <QWidget>
@@ -251,6 +252,11 @@ Q_OBJECT
 
   /// Returns true if the event is processed. The default implementation is empty, returns false.
   virtual bool processAction(ModuleBase_ActionType theActionType);
+
+  /// Returns list of accessible actions for Undo/Redo commands. By default it returns empty list.
+  /// \param theActionType type of action. It can be ActionUndo or ActionRedo.
+  virtual QList<ActionInfo> actionsList(ModuleBase_ActionType theActionType) const
+  { return QList<ActionInfo>(); }
 
   /// Sends Update and Redisplay for the given object
   /// \param theObj is updating object
