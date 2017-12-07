@@ -207,6 +207,7 @@ void ModuleBase_ResultPrs::Compute(
   if (myTransparency < 1 && !myHiddenSubShapes.IsEmpty())
   {
     StdPrs_ShadedShape::Add (thePresentation, myHiddenCompound, myHiddenSubShapesDrawer);
+    aReadyToDisplay = true;
   }
 
   if (!aReadyToDisplay) {

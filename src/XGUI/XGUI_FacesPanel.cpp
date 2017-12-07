@@ -207,7 +207,8 @@ void XGUI_FacesPanel::processSelection()
     myLastItemIndex++;
     isModified = true;
 
-    if (aResultPrs->hasSubShapeVisible(ModuleBase_Tools::getSelectedShape(aPrs))) // redisplay
+    if (aResultPrs->hasSubShapeVisible(ModuleBase_Tools::getSelectedShape(aPrs)) ||
+        useTransparency()) // redisplay
       ModelAPI_EventCreator::get()->sendUpdated(anObject, aDispEvent);
     else { // erase object because it is entirely hidden
       anObject->setDisplayed(false);
@@ -312,6 +313,33 @@ bool XGUI_FacesPanel::displayHiddenObjects(
   return isModified;
 }
 
+//********************************************************************
+bool XGUI_FacesPanel::hideEmptyObjects()
+{
+  bool isModified = false;
+  static Events_ID aDispEvent = Events_Loop::loop()->eventByName(EVENT_OBJECT_TO_REDISPLAY);
+  for (QMap<int, ModuleBase_ViewerPrsPtr>::const_iterator anIt = myItems.begin();
+       anIt != myItems.end(); anIt++) {
+    ModuleBase_ViewerPrsPtr aPrs = anIt.value();
+    ObjectPtr anObject = aPrs->object();
+    if (!anObject.get() || !anObject->isDisplayed())
+      continue;
+
+    Handle(ModuleBase_ResultPrs) aResultPrs = Handle(ModuleBase_ResultPrs)::DownCast(
+      aPrs->interactive());
+    if (aResultPrs.IsNull())
+      continue;
+
+    if (!aResultPrs->hasSubShapeVisible(ModuleBase_Tools::getSelectedShape(aPrs))) {
+      // erase object because it is entirely hidden
+      anObject->setDisplayed(false);
+      myHiddenObjects.insert(anObject);
+      ModelAPI_EventCreator::get()->sendUpdated(anObject, aDispEvent);
+      isModified = true;
+    }
+  }
+  return isModified;
+}
 
 //********************************************************************
 void XGUI_FacesPanel::updateProcessedObjects(QMap<int, ModuleBase_ViewerPrsPtr> theItems,
@@ -426,7 +454,15 @@ void XGUI_FacesPanel::onDeleteItem()
 //********************************************************************
 void XGUI_FacesPanel::onTransparencyChanged()
 {
-  bool isModified = redisplayObjects(myItemObjects, false);
+  bool isModified = false;
+  if (useTransparency()) {
+    std::set<std::shared_ptr<ModelAPI_Object> > aHiddenObjects = myHiddenObjects;
+    isModified = displayHiddenObjects(aHiddenObjects, false);
+  }
+  else
+    isModified = hideEmptyObjects();
+
+  isModified = redisplayObjects(myItemObjects, false) || isModified;
   if (isModified)
     Events_Loop::loop()->flush(Events_Loop::loop()->eventByName(EVENT_OBJECT_TO_REDISPLAY));
 

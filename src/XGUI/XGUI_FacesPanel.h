@@ -158,6 +158,10 @@ private:
   bool displayHiddenObjects(const std::set<std::shared_ptr<ModelAPI_Object> >& theObjects,
                             const bool isToFlushRedisplay);
 
+  /// Iterates by items and hide objects where all sub-shapes are hidden
+  /// \return true if some of objects was redisplayed
+  bool hideEmptyObjects();
+
   /// Container of objects participating in the panel, it is filled by internal container
   /// \param theItems container of selected values
   /// \param theObjects [out] container of objects
