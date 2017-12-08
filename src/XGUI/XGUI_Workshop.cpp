@@ -1030,15 +1030,19 @@ void XGUI_Workshop::onUndo(int theTimes)
       return;
   }
 
-  objectBrowser()->treeView()->setCurrentIndex(QModelIndex());
   SessionPtr aMgr = ModelAPI_Session::get();
-  std::list<std::string> aUndoList = aMgr->undoList();
   if (aMgr->isOperation()) {
+    XGUI_OperationMgr* aOpMgr = operationMgr();
     /// this is important for nested operations
     /// when sketch operation is active, this condition is false and
     /// the sketch operation is not aborted
-    operationMgr()->onAbortOperation();
+    if (aOpMgr->canStopOperation(aOpMgr->currentOperation()))
+      aOpMgr->abortOperation(aOpMgr->currentOperation());
+    else
+      return;
   }
+  objectBrowser()->treeView()->setCurrentIndex(QModelIndex());
+  std::list<std::string> aUndoList = aMgr->undoList();
   std::list<std::string>::const_iterator aIt = aUndoList.cbegin();
   for (int i = 0; (i < theTimes) && (aIt != aUndoList.cend()); ++i, ++aIt) {
     aMgr->undo();
@@ -1067,15 +1071,19 @@ void XGUI_Workshop::onRedo(int theTimes)
   // until redo of all possible objects happens
   bool isUpdateEnabled = myDisplayer->enableUpdateViewer(false);
 
-  objectBrowser()->treeView()->setCurrentIndex(QModelIndex());
   SessionPtr aMgr = ModelAPI_Session::get();
-  std::list<std::string> aRedoList = aMgr->redoList();
   if (aMgr->isOperation()) {
+    XGUI_OperationMgr* aOpMgr = operationMgr();
     /// this is important for nested operations
     /// when sketch operation is active, this condition is false and
     /// the sketch operation is not aborted
-    operationMgr()->onAbortOperation();
+    if (aOpMgr->canStopOperation(aOpMgr->currentOperation()))
+      aOpMgr->abortOperation(aOpMgr->currentOperation());
+    else
+      return;
   }
+  objectBrowser()->treeView()->setCurrentIndex(QModelIndex());
+  std::list<std::string> aRedoList = aMgr->redoList();
   std::list<std::string>::const_iterator aIt = aRedoList.cbegin();
   for (int i = 0; (i < theTimes) && (aIt != aRedoList.cend()); ++i, ++aIt) {
     aMgr->redo();
