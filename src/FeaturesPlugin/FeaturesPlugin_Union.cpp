@@ -173,16 +173,19 @@ void FeaturesPlugin_Union::execute()
   const int aDeletedTag = 3;
   /// sub solids will be placed at labels 4, 5 etc. if result is compound of solids
   const int aSubsolidsTag = 4;
-  const std::string aModName = "Modified";
+  const std::string aModEName = "Modified_Edge";
+  const std::string aModFName = "Modified_Face";
 
   std::shared_ptr<ModelAPI_ResultBody> aResultBody = document()->createBody(data());
   aResultBody->storeModified(anObjects.front(), aShape, aSubsolidsTag);
 
   for(ListOfShape::const_iterator anIter = anObjects.begin(); anIter != anObjects.end(); ++anIter) {
     aResultBody->loadAndOrientModifiedShapes(&aMakeShapeList, *anIter, GeomAPI_Shape::EDGE,
-                                             aModifyEdgeTag, aModName, aMapOfShapes);
+                                             aModifyEdgeTag, aModEName, aMapOfShapes,
+                                             false, false, true);
     aResultBody->loadAndOrientModifiedShapes(&aMakeShapeList, *anIter, GeomAPI_Shape::FACE,
-                                             aModifyFaceTag, aModName, aMapOfShapes);
+                                             aModifyFaceTag, aModFName, aMapOfShapes,
+                                             false, false, true);
     aResultBody->loadDeletedShapes(&aMakeShapeList, *anIter, GeomAPI_Shape::FACE, aDeletedTag);
   }
 
