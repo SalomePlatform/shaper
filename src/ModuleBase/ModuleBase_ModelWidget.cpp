@@ -421,7 +421,8 @@ bool ModuleBase_ModelWidget::canProcessAction(ModuleBase_ActionType theActionTyp
   }
 }
 
-bool ModuleBase_ModelWidget::processAction(ModuleBase_ActionType theActionType)
+bool ModuleBase_ModelWidget::processAction(ModuleBase_ActionType theActionType,
+                                           const ActionParamPtr& theParam)
 {
   switch (theActionType) {
     case ActionEnter:

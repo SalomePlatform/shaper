@@ -18,20 +18,18 @@
 // email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com>
 //
 
-#ifndef ModuleBase_ActionType_H_
-#define ModuleBase_ActionType_H_
+#ifndef ModuleBase_ActionParameter_H_
+#define ModuleBase_ActionParameter_H_
 
-/*!
- * Structure to describe widget processed types of actions.
- */
-enum ModuleBase_ActionType
+#include <memory>
+
+class ModuleBase_ActionParameter
 {
-  ActionEnter,
-  ActionEscape,
-  ActionDelete,
-  ActionSelection,
-  ActionUndo,
-  ActionRedo
+public:
+  /// Destuctor is added in order to virtualize the class
+  virtual ~ModuleBase_ActionParameter() {}
 };
 
-#endif /* ModuleBase_ActionType_H_ */
+typedef std::shared_ptr<ModuleBase_ActionParameter> ActionParamPtr;
+
+#endif

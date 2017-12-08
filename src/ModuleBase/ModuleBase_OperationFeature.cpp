@@ -368,12 +368,12 @@ bool ModuleBase_OperationFeature::commit()
 
     afterCommitOperation();
 #ifdef DEBUG_OPERATION_START
-  qDebug("ModuleBase_OperationFeature::commit -- end : IMPOSSIBLE to commit");
+  qDebug("ModuleBase_OperationFeature::commit -- end");
 #endif
     return true;
   }
 #ifdef DEBUG_OPERATION_START
-  qDebug("ModuleBase_OperationFeature::commit -- end");
+  qDebug("ModuleBase_OperationFeature::commit -- end : IMPOSSIBLE to commit");
 #endif
   return false;
 }

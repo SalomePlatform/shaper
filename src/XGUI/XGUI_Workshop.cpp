@@ -100,6 +100,7 @@
 #include <ModuleBase_WidgetValidated.h>
 #include <ModuleBase_ModelWidget.h>
 #include <ModuleBase_ResultPrs.h>
+#include <ModuleBase_ActionIntParameter.h>
 
 #include <Config_Common.h>
 #include <Config_FeatureMessage.h>
@@ -1023,8 +1024,11 @@ bool XGUI_Workshop::onSaveAs()
 void XGUI_Workshop::onUndo(int theTimes)
 {
   ModuleBase_ModelWidget* anActiveWidget = myOperationMgr->activeWidget();
-  if (anActiveWidget && anActiveWidget->processAction(ActionUndo))
-    return;
+  if (anActiveWidget) {
+    ActionIntParamPtr aParam(new ModuleBase_ActionIntParameter(theTimes));
+    if (anActiveWidget->processAction(ActionUndo, aParam))
+      return;
+  }
 
   objectBrowser()->treeView()->setCurrentIndex(QModelIndex());
   SessionPtr aMgr = ModelAPI_Session::get();
@@ -1051,8 +1055,11 @@ void XGUI_Workshop::onUndo(int theTimes)
 void XGUI_Workshop::onRedo(int theTimes)
 {
   ModuleBase_ModelWidget* anActiveWidget = myOperationMgr->activeWidget();
-  if (anActiveWidget && anActiveWidget->processAction(ActionRedo))
-    return;
+  if (anActiveWidget) {
+    ActionIntParamPtr aParam(new ModuleBase_ActionIntParameter(theTimes));
+    if (anActiveWidget->processAction(ActionRedo, aParam))
+      return;
+  }
 
   // the viewer update should be blocked in order to avoid the features blinking. For the created
   // feature a results are created, the flush of the created signal caused the viewer redisplay for

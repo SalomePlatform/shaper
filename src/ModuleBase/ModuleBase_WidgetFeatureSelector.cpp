@@ -118,12 +118,13 @@ void ModuleBase_WidgetFeatureSelector::deactivate()
 }
 
 //********************************************************************
-bool ModuleBase_WidgetFeatureSelector::processAction(ModuleBase_ActionType theActionType)
+bool ModuleBase_WidgetFeatureSelector::processAction(ModuleBase_ActionType theActionType,
+                                                     const ActionParamPtr& theParam)
 {
   if (theActionType == ActionSelection)
     onSelectionChanged();
   else
-    return ModuleBase_WidgetValidated::processAction(theActionType);
+    return ModuleBase_WidgetValidated::processAction(theActionType, theParam);
 
   return true;
 }

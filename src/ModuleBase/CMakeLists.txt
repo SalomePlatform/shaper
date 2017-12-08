@@ -96,6 +96,8 @@ SET(PROJECT_HEADERS
   ModuleBase_IconFactory.h
   ModuleBase_Dialog.h
   ModuleBase_ModelDialogWidget.h
+  ModuleBase_ActionParameter.h
+  ModuleBase_ActionIntParameter.h
 )
 
 SET(PROJECT_MOC_HEADERS

@@ -31,6 +31,7 @@
 #include <ModuleBase_Tools.h>
 #include <ModuleBase_ViewerPrs.h>
 #include <ModuleBase_WidgetShapeSelector.h>
+#include <ModuleBase_ActionIntParameter.h>
 
 #include <ModelAPI_Data.h>
 #include <ModelAPI_Object.h>
@@ -296,15 +297,19 @@ bool ModuleBase_WidgetMultiSelector::canProcessAction(ModuleBase_ActionType theA
 }
 
 //********************************************************************
-bool ModuleBase_WidgetMultiSelector::processAction(ModuleBase_ActionType theActionType)
+bool ModuleBase_WidgetMultiSelector::processAction(ModuleBase_ActionType theActionType,
+                                                   const ActionParamPtr& theParam)
 {
   switch (theActionType) {
     case ActionUndo:
     case ActionRedo: {
+      ActionIntParamPtr aParam =
+        std::dynamic_pointer_cast<ModuleBase_ActionIntParameter>(theParam);
+      int aNb = aParam->value();
       if (theActionType == ActionUndo)
-        myCurrentHistoryIndex--;
+        myCurrentHistoryIndex -= aNb;
       else
-        myCurrentHistoryIndex++;
+        myCurrentHistoryIndex += aNb;
       QList<ModuleBase_ViewerPrsPtr> aSelected = mySelectedHistoryValues[myCurrentHistoryIndex];
       // equal vertices should not be used here
       ModuleBase_ISelection::filterSelectionOnEqualPoints(aSelected);
@@ -320,7 +325,7 @@ bool ModuleBase_WidgetMultiSelector::processAction(ModuleBase_ActionType theActi
       return true;
     }
     default:
-      return ModuleBase_ModelWidget::processAction(theActionType);
+      return ModuleBase_ModelWidget::processAction(theActionType, theParam);
   }
 }
 
@@ -890,21 +895,35 @@ QList<ActionInfo>
   if (myCurrentHistoryIndex > -1) {
     int i = 0;
     QString aTitle("Selection %1 items");
+    QString aTit("Selection %1 item");
     QIcon aIcon(":pictures/selection.png");
+    int aNb;
     switch (theActionType) {
     case ActionUndo:
       i = 1;
       while (i <= myCurrentHistoryIndex) {
-        ActionInfo aInfo(aIcon, aTitle.arg(mySelectedHistoryValues.at(i).count()));
-        aList.append(aInfo);
+        aNb = mySelectedHistoryValues.at(i).count();
+        if (aNb == 1) {
+          ActionInfo aInfo(aIcon, aTit.arg(aNb));
+          aList.insert(0, aInfo);
+        } else {
+          ActionInfo aInfo(aIcon, aTitle.arg(aNb));
+          aList.insert(0, aInfo);
+        }
         i++;
       }
       break;
     case ActionRedo:
       i = mySelectedHistoryValues.length() - 1;
       while (i > myCurrentHistoryIndex) {
-        ActionInfo aInfo(aIcon, aTitle.arg(mySelectedHistoryValues.at(i).count()));
-        aList.append(aInfo);
+        aNb = mySelectedHistoryValues.at(i).count();
+        if (aNb == 1) {
+          ActionInfo aInfo(aIcon, aTit.arg(mySelectedHistoryValues.at(i).count()));
+          aList.insert(0, aInfo);
+        } else {
+          ActionInfo aInfo(aIcon, aTitle.arg(mySelectedHistoryValues.at(i).count()));
+          aList.insert(0, aInfo);
+        }
         i--;
       }
       break;

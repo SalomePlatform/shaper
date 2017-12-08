@@ -92,7 +92,8 @@ class MODULEBASE_EXPORT ModuleBase_WidgetMultiSelector : public ModuleBase_Widge
   virtual bool canProcessAction(ModuleBase_ActionType theActionType, bool& isActionEnabled);
 
   /// Returns true if the event is processed. The default implementation is empty, returns false.
-  virtual bool processAction(ModuleBase_ActionType theActionType);
+  virtual bool processAction(ModuleBase_ActionType theActionType,
+                             const ActionParamPtr& theParam = ActionParamPtr());
 
   /// Activate or deactivate selection and selection filters
   /// \return true if the selection filter of the widget is activated in viewer context

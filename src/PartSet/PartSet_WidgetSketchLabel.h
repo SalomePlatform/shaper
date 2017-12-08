@@ -96,7 +96,8 @@ public:
   static bool canFillSketch(const std::shared_ptr<ModuleBase_ViewerPrs>& thePrs);
 
   /// Processes Selection action.
-  virtual bool processAction(ModuleBase_ActionType theActionType);
+  virtual bool processAction(ModuleBase_ActionType theActionType,
+                             const ActionParamPtr& theParam);
 
 signals:
   /// Signal on plane selection

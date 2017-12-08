@@ -452,12 +452,13 @@ bool PartSet_WidgetSketchLabel::canFillSketch(const ModuleBase_ViewerPrsPtr& the
 }
 
 //********************************************************************
-bool PartSet_WidgetSketchLabel::processAction(ModuleBase_ActionType theActionType)
+bool PartSet_WidgetSketchLabel::processAction(ModuleBase_ActionType theActionType,
+                                              const ActionParamPtr& theParam)
 {
   if (theActionType == ActionSelection)
     onSelectionChanged();
   else
-    return ModuleBase_WidgetValidated::processAction(theActionType);
+    return ModuleBase_WidgetValidated::processAction(theActionType, theParam);
 
   return true;
 }

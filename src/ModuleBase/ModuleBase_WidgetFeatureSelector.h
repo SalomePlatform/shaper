@@ -80,7 +80,8 @@ Q_OBJECT
   virtual void deactivate();
 
   /// Processes Selection action.
-  virtual bool processAction(ModuleBase_ActionType theActionType);
+  virtual bool processAction(ModuleBase_ActionType theActionType,
+                             const ActionParamPtr& theParam = ActionParamPtr());
 
 protected:
   /// The method called when widget is activated
