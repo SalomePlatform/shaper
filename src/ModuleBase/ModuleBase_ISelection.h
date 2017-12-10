@@ -38,11 +38,9 @@
 class ModuleBase_ViewerPrs;
 class SelectMgr_EntityOwner;
 
-/**
-* \ingroup GUI
-* A class which provides access to selection.
-* A selection can be obtained as from a viewer as from Object browser in various forms
-*/
+/// \ingroup GUI
+/// A class which provides access to selection.
+/// A selection can be obtained as from a viewer as from Object browser in various forms
 class ModuleBase_ISelection
 {
  public:
@@ -71,50 +69,36 @@ class ModuleBase_ISelection
   virtual void fillPresentation(std::shared_ptr<ModuleBase_ViewerPrs>& thePrs,
                                 const Handle(SelectMgr_EntityOwner)& theOwner) const = 0;
 
-  /**
-   * Returns list of features currently selected in object browser
-   */
+  /// Returns list of features currently selected in object browser
   virtual QObjectPtrList selectedObjects() const = 0;
 
-  /// Set selected objects list
-  virtual void setSelectedObjects( const QObjectPtrList& ) const = 0;
-
-  /**
-   * Returns list of currently selected results
-   */
+  /// Returns list of currently selected results
   virtual QObjectPtrList selectedPresentations() const = 0;
 
-  //! Returns list of currently selected QModelIndexes
+  /// Returns list of currently selected QModelIndexes
   virtual QModelIndexList selectedIndexes() const = 0;
 
-  //! Returns list of currently selected AIS objects
-  //! \param theList returning list of selected AIS objects
-  virtual void selectedAISObjects(AIS_ListOfInteractive& theList) const = 0;
-
-  //! Returns list of currently selected QModelIndexes
-  virtual ObjectPtr getSelectableObject(const Handle(SelectMgr_EntityOwner)& theOwner) const = 0;
-
-  //! Return the shape from the viewer presentation.
-  //! If the shape is equal to the shape of selected object, it returns an empty shape
-  //! \param thePrs a selected object
-  //! \return a shape
+  /// Return the shape from the viewer presentation.
+  /// If the shape is equal to the shape of selected object, it returns an empty shape
+  /// \param thePrs a selected object
+  /// \return a shape
   MODULEBASE_EXPORT ResultPtr getResult(const std::shared_ptr<ModuleBase_ViewerPrs>& thePrs);
 
-  //! Return the shape from the viewer presentation.
-  //! If the shape is equal to the shape of selected object, it returns an empty shape
-  //! \param thePrs a selected object
-  //! \return a shape
+  /// Return the shape from the viewer presentation.
+  /// If the shape is equal to the shape of selected object, it returns an empty shape
+  /// \param thePrs a selected object
+  /// \return a shape
   MODULEBASE_EXPORT GeomShapePtr getShape(const std::shared_ptr<ModuleBase_ViewerPrs>& thePrs);
 
-  //! Return the IO from the viewer presentation.
-  //! \param thePrs a selected object
-  //! \return an interactive object
+  /// Return the IO from the viewer presentation.
+  /// \param thePrs a selected object
+  /// \return an interactive object
   virtual MODULEBASE_EXPORT
     Handle(AIS_InteractiveObject) getIO(const std::shared_ptr<ModuleBase_ViewerPrs>& thePrs) = 0;
 
-  //! Wraps the object list into the viewer prs list
-  //! \param theObjects a list of objects
-  //! \return a list of prs, where only object is not empty
+  /// Wraps the object list into the viewer prs list
+  /// \param theObjects a list of objects
+  /// \return a list of prs, where only object is not empty
   static MODULEBASE_EXPORT QList<std::shared_ptr<ModuleBase_ViewerPrs>> getViewerPrs(
                                                        const QObjectPtrList& theObjects);
 
@@ -122,6 +106,10 @@ class ModuleBase_ISelection
   /// owner with the qual vertex stays in the list.
   static MODULEBASE_EXPORT void filterSelectionOnEqualPoints
                                       (QList<std::shared_ptr<ModuleBase_ViewerPrs>>& theSelected);
+protected:
+  /// Returns list of currently selected QModelIndexes
+  virtual ObjectPtr getSelectableObject(const Handle(SelectMgr_EntityOwner)& theOwner) const = 0;
+
 private:
   /// Find vertex shape build by a Brep owner of the presentation if it exists
   /// \param thePrs a viewer presentation

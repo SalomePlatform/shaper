@@ -309,11 +309,6 @@ QObjectPtrList XGUI_Selection::selectedObjects() const
   return QObjectPtrList();
 }
 
-void XGUI_Selection::setSelectedObjects( const QObjectPtrList& theObjects ) const
-{
-  return myWorkshop->objectBrowser()->setObjectsSelected( theObjects );
-}
-
 QObjectPtrList XGUI_Selection::selectedPresentations() const
 {
   QObjectPtrList aSelectedList;
@@ -334,18 +329,6 @@ QObjectPtrList XGUI_Selection::selectedPresentations() const
 QModelIndexList XGUI_Selection::selectedIndexes() const
 {
   return myWorkshop->objectBrowser()->selectedIndexes();
-}
-
-//**************************************************************
-void XGUI_Selection::selectedAISObjects(AIS_ListOfInteractive& theList) const
-{
-  theList.Clear();
-
-  Handle(AIS_InteractiveContext) aContext = myWorkshop->viewer()->AISContext();
-  if (!aContext.IsNull()) {
-    for (aContext->InitSelected(); aContext->MoreSelected(); aContext->NextSelected())
-      theList.Append(aContext->SelectedInteractive());
-  }
 }
 
 //**************************************************************

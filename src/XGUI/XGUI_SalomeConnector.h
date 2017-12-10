@@ -34,7 +34,7 @@ class ModuleBase_IViewer;
 
 /**
  * \ingroup GUI
- * An interface which provides a connection of XGUI functionality 
+ * An interface which provides a connection of XGUI functionality
  * with functionality of SALOME module interface.
  */
 class XGUI_EXPORT XGUI_SalomeConnector

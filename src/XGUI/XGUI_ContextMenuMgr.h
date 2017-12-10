@@ -34,7 +34,7 @@ class QActionGroup;
 
 /**
  * \ingroup GUI
- * A claas wihich provides manement of context menu
+ * A class wihich provides managent of context menu
  */
 class XGUI_EXPORT XGUI_ContextMenuMgr : public QObject
 {

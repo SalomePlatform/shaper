@@ -18,12 +18,8 @@
 // email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com>
 //
 
-/*
- * XGUI_ActionsMgr.h
- */
-
-#ifndef XGUI_ACTIONSMGR_H_
-#define XGUI_ACTIONSMGR_H_
+#ifndef XGUI_ActionsMgr_H
+#define XGUI_ActionsMgr_H
 
 #include "XGUI.h"
 
@@ -43,10 +39,9 @@ class XGUI_OperationMgr;
 class ModuleBase_Operation;
 class QAction;
 
-/**
-* \ingroup GUI
-* A class for management of actions (features) activation/deactivation
-*/
+/// class XGUI_ActionsMgr
+/// \ingroup GUI
+/// A class for management of actions (features) activation/deactivation
 class XGUI_EXPORT XGUI_ActionsMgr : public QObject, public Events_Listener
 {
   Q_OBJECT
@@ -67,16 +62,16 @@ class XGUI_EXPORT XGUI_ActionsMgr : public QObject, public Events_Listener
     Preview = 5
   };
 
-  //! Add a command in the manager.
-  //! Please note that nested commands in the Salome mode (No AppElements_Command, pure QActions)
-  //! won't be extracted and should be added manually using the addNestedCommands method.
+  /// Add a command in the manager.
+  /// Please note that nested commands in the Salome mode (No AppElements_Command, pure QActions)
+  /// won't be extracted and should be added manually using the addNestedCommands method.
   void addCommand(QAction* theCmd);
 
-  //! Sets relation between the command (with given Id) and it's nested actions.
+  /// Sets relation between the command (with given Id) and it's nested actions.
   void addNestedCommands(const QString& theId, const QStringList& theCommands);
 
-  //! Returns list of nested commands by parent command Id
-  //! \param theId a parent command Id
+  /// Returns list of nested commands by parent command Id
+  /// \param theId a parent command Id
   QStringList nestedCommands(const QString& theId) const;
 
   /// Returns True if the given Id is an Id of nested command
@@ -92,11 +87,11 @@ class XGUI_EXPORT XGUI_ActionsMgr : public QObject, public Events_Listener
   /// \param theKeySequence - string that contain a key sequence to register
   QKeySequence registerShortcut(const QString& theKeySequence);
 
-  //! Redefinition of Events_Listener method
+  /// Redefinition of Events_Listener method
   virtual void processEvent(const std::shared_ptr<Events_Message>& theMessage);
 
-  //! Return property panel's action like ok, cancel, help.
-  //! If there is no such action, it will be created.
+  /// Return property panel's action like ok, cancel, help.
+  /// If there is no such action, it will be created.
   QAction* operationStateAction(OperationStateActionId theId);
 
   /// Return an action by the given id, if it was registered in the manager
@@ -107,40 +102,42 @@ class XGUI_EXPORT XGUI_ActionsMgr : public QObject, public Events_Listener
   ActionInfo actionInfoById(const QString& theId);
 
  private:
-  //! Update workbench actions according to OperationMgr state:
-  //! No active operations: all actions but nested are available
-  //! There is active operation: current operation + it's nested
-  //! are enabled, all the rest is disabled. All active commands is checked.
+  /// Update workbench actions according to OperationMgr state:
+  /// No active operations: all actions but nested are available
+  /// There is active operation: current operation + it's nested
+  /// are enabled, all the rest is disabled. All active commands is checked.
   void updateCommandsStatus();
 
-  //! Sets all commands checked if it's operation is active.
+  /// Sets all commands checked if it's operation is active.
   void updateCheckState();
 
-  //! Updates actions according to current selection in the viewer
+  /// Updates actions according to current selection in the viewer
   void updateOnViewSelection();
 
-  //! Sets all actions to enabled state.
+  /// Sets all actions to enabled state.
   void setAllEnabled();
 
-  //! Sets all nested actions to isEnabled state for the command with given ID.
-  //! If ID is empty - all nested actions will be affected.
+  /// Sets all nested actions to isEnabled state for the command with given ID.
+  /// If ID is empty - all nested actions will be affected.
   void setNestedCommandsEnabled(bool isEnabled, const QString& theParent = QString());
 
-  //! Sets to enabled state all siblings of the given operation and it's parents recursively
+  /// Sets to enabled state all siblings of the given operation and it's parents recursively
   void setNestedStackEnabled(ModuleBase_Operation* theOperation);
 
-  //! Sets the action with theId to theChecked state.
+  /// Sets the action with theId to theChecked state.
   void setActionChecked(const QString& theId, const bool theChecked);
 
-  //! Sets the action with theId to theEnabled state.
+  /// Sets the action with theId to theEnabled state.
   void setActionEnabled(const QString& theId, const bool theEnabled);
 
-  //! Updates actions according to their "document" tag
+  /// Updates actions according to their "document" tag
   void updateByDocumentKind();
 
-  //! Asks plugins about their features state, using the Events system
+  /// Asks plugins about their features state, using the Events system
   void updateByPlugins(FeaturePtr theActiveFeature);
 
+  /// Returns names of nested action for the feature of given operation
+  /// \param theOperation an operation
   QStringList allNestedCommands(ModuleBase_Operation* theOperation);
 
  private:
@@ -156,5 +153,5 @@ class XGUI_EXPORT XGUI_ActionsMgr : public QObject, public Events_Listener
   friend class XGUI_Workshop;
 };
 
-#endif /* XGUI_ACTIONSMGR_H_ */
+#endif /* XGUI_ActionsMgr_H */
 

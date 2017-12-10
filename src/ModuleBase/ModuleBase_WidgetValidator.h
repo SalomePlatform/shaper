@@ -106,7 +106,7 @@ protected:
   /// Reference to workshop
   ModuleBase_ModelWidget* myModelWidget; ///< the current widget to be validated
   ModuleBase_IWorkshop* myWorkshop; ///< the active workshop
-  ModuleBase_WidgetSelectorStore* myAttributeStore; //< store/restore attribute values
+  ModuleBase_WidgetSelectorStore* myAttributeStore; ///< store/restore attribute values
 
   /// cash of valid selection presentations
   QList<std::shared_ptr<ModuleBase_ViewerPrs>> myValidPrs;

@@ -53,8 +53,8 @@ public:
   /// Enumeration of kind of message that is used when trying to stop the active operation
   enum XGUI_MessageKind
   {
-    XGUI_AbortOperationMessage, //< warns and give possibility to abort current operation
-    XGUI_InformationMessage //< ask to apply the current operation before performing something
+    XGUI_AbortOperationMessage, ///< warns and give possibility to abort current operation
+    XGUI_InformationMessage ///< ask to apply the current operation before performing something
   };
 
 public:

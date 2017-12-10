@@ -37,10 +37,8 @@ class XGUI_Workshop;
 class SelectMgr_EntityOwner;
 class ModuleBase_ViewerPrs;
 
-/**
-* \ingroup GUI
-* Implementation of \ref ModuleBase_ISelection interface.
-*/
+/// \ingroup GUI
+/// Implementation of \ref ModuleBase_ISelection interface.
 class XGUI_EXPORT XGUI_Selection : public ModuleBase_ISelection
 {
  public:
@@ -63,53 +61,42 @@ class XGUI_EXPORT XGUI_Selection : public ModuleBase_ISelection
   /// \return list of presentations
   virtual QList<std::shared_ptr<ModuleBase_ViewerPrs>> getHighlighted() const;
 
-  /**
-   * Returns list of currently selected objects in object browser
-   */
+  /// Returns list of currently selected objects in object browser
   virtual QObjectPtrList selectedObjects() const;
 
-  virtual void setSelectedObjects( const QObjectPtrList& ) const;
-
-  /**
-   * Returns list of currently selected results
-   */
+  /// Returns list of currently selected results
   virtual QObjectPtrList selectedPresentations() const;
 
-  //! Returns list of currently selected QModelIndexes
+  /// Returns list of currently selected QModelIndexes
   virtual QModelIndexList selectedIndexes() const;
 
-  //! Returns list of currently selected QModelIndexes
-  ObjectPtr getSelectableObject(const Handle(SelectMgr_EntityOwner)& theOwner);
-
-  //! Returns list of currently selected AIS objects
-  virtual void selectedAISObjects(AIS_ListOfInteractive& theList) const;
-
-  //! Return a selectable object by the entity owner. It founds AIS object in the viewer
-  //! and returns the corresponded object
-  /// \param theOwner an entity owner
-  /// \return a found object or NULL
-  ObjectPtr getSelectableObject(const Handle(SelectMgr_EntityOwner)& theOwner) const;
-
-  //! Returns list of currently selected owners
+  /// Returns list of currently selected owners
   /// \return list of owners
   void selectedOwners(SelectMgr_IndexedMapOfOwner& theSelectedOwners) const;
 
-  //! Returns a list of selection entity owners of the interactive object
+  /// Returns a list of selection entity owners of the interactive object
   /// It depends on the modes, in which the object is activated in the context
   /// \param theObject an object
   /// \param theOwners a map of entity owners
   void entityOwners(const Handle_AIS_InteractiveObject& theObject,
                     SelectMgr_IndexedMapOfOwner& theOwners) const;
 
-  //! Return the IO from the viewer presentation.
-  //! \param thePrs a selected object
-  //! \return an interactive object
+  /// Return the IO from the viewer presentation.
+  /// \param thePrs a selected object
+  /// \return an interactive object
   virtual Handle(AIS_InteractiveObject) getIO(const std::shared_ptr<ModuleBase_ViewerPrs>& thePrs);
 
 protected:
+  /// Return a selectable object by the entity owner. It founds AIS object in the viewer
+  /// and returns the corresponded object
+  /// \param theOwner an entity owner
+  /// \return a found object or NULL
+  ObjectPtr getSelectableObject(const Handle(SelectMgr_EntityOwner)& theOwner) const;
+
   /// Fills the list of presentations by objects selected in the viewer.
   /// \param thePresentations an output list of presentation
   void getSelectedInViewer(QList<std::shared_ptr<ModuleBase_ViewerPrs>>& thePresentations) const;
+
   /// Fills the list of presentations by objects selected in the object browser.
   /// ViewerPrs contains only object parameter not empty.
   /// If the given list of presentations already has a viewer presentation with the same object
@@ -125,7 +112,7 @@ protected:
 #endif
 
 private:
-  XGUI_Workshop* myWorkshop;
+  XGUI_Workshop* myWorkshop; ///< current workshop
 };
 
 #endif
