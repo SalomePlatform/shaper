@@ -85,7 +85,7 @@ void XGUI_FacesPanel::reset(const bool isToFlushRedisplay)
   bool isModified = redisplayObjects(myItemObjects, false);
   std::set<std::shared_ptr<ModelAPI_Object> > aHiddenObjects = myHiddenObjects;
   isModified = displayHiddenObjects(aHiddenObjects, myHiddenObjects, false) || isModified;
-  if (isModified && isToFlushRedisplay)
+  if (isModified)// && isToFlushRedisplay) // flush signal immediatelly until container is filled
     Events_Loop::loop()->flush(Events_Loop::loop()->eventByName(EVENT_OBJECT_TO_REDISPLAY));
 
   updateProcessedObjects(myItems, myItemObjects);

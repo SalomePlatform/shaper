@@ -158,7 +158,6 @@ static Handle(VInspector_CallBack) MyVCallBack;
 #include <dlfcn.h>
 #endif
 
-//#define DEBUG_FACES_PANEL
 //#define DEBUG_WITH_MESSAGE_REPORT
 
 QString XGUI_Workshop::MOVE_TO_END_COMMAND = QObject::tr("Move to the end");
@@ -315,6 +314,9 @@ void XGUI_Workshop::startApplication()
 
 #ifdef _DEBUG
   Config_PropManager::registerProp("Plugins", "create_part_by_start", "Create Part by Start",
+    Config_Prop::Boolean, "false");
+
+  Config_PropManager::registerProp("Plugins", "show_hide_faces", "Show Hide Faces (on the right)",
     Config_Prop::Boolean, "false");
 #endif
   registerValidators();
@@ -1023,48 +1025,24 @@ bool XGUI_Workshop::onSaveAs()
 //******************************************************
 void XGUI_Workshop::onUndo(int theTimes)
 {
-  ModuleBase_ModelWidget* anActiveWidget = myOperationMgr->activeWidget();
-  if (anActiveWidget) {
-    ActionIntParamPtr aParam(new ModuleBase_ActionIntParameter(theTimes));
-    if (anActiveWidget->processAction(ActionUndo, aParam))
-      return;
-  }
-
-  SessionPtr aMgr = ModelAPI_Session::get();
-  if (aMgr->isOperation()) {
-    XGUI_OperationMgr* aOpMgr = operationMgr();
-    /// this is important for nested operations
-    /// when sketch operation is active, this condition is false and
-    /// the sketch operation is not aborted
-    if (aOpMgr->canStopOperation(aOpMgr->currentOperation()))
-      aOpMgr->abortOperation(aOpMgr->currentOperation());
-    else
-      return;
-  }
-  objectBrowser()->treeView()->setCurrentIndex(QModelIndex());
-  std::list<std::string> aUndoList = aMgr->undoList();
-  std::list<std::string>::const_iterator aIt = aUndoList.cbegin();
-  for (int i = 0; (i < theTimes) && (aIt != aUndoList.cend()); ++i, ++aIt) {
-    aMgr->undo();
-    if (QString((*aIt).c_str()) == MOVE_TO_END_COMMAND)
-      myObjectBrowser->rebuildDataTree();
-  }
-  facesPanel()->reset(true);
-
-  operationMgr()->updateApplyOfOperations();
-  updateCommandStatus();
+  processUndoRedo(ActionUndo, theTimes);
 }
 
 //******************************************************
 void XGUI_Workshop::onRedo(int theTimes)
 {
+  processUndoRedo(ActionRedo, theTimes);
+}
+
+//******************************************************
+void XGUI_Workshop::processUndoRedo(const ModuleBase_ActionType theActionType, int theTimes)
+{
   ModuleBase_ModelWidget* anActiveWidget = myOperationMgr->activeWidget();
   if (anActiveWidget) {
     ActionIntParamPtr aParam(new ModuleBase_ActionIntParameter(theTimes));
-    if (anActiveWidget->processAction(ActionRedo, aParam))
+    if (anActiveWidget->processAction(theActionType, aParam))
       return;
   }
-
   // the viewer update should be blocked in order to avoid the features blinking. For the created
   // feature a results are created, the flush of the created signal caused the viewer redisplay for
   // each created result. After a redisplay signal is flushed. So, the viewer update is blocked
@@ -1083,10 +1061,15 @@ void XGUI_Workshop::onRedo(int theTimes)
       return;
   }
   objectBrowser()->treeView()->setCurrentIndex(QModelIndex());
-  std::list<std::string> aRedoList = aMgr->redoList();
-  std::list<std::string>::const_iterator aIt = aRedoList.cbegin();
-  for (int i = 0; (i < theTimes) && (aIt != aRedoList.cend()); ++i, ++aIt) {
-    aMgr->redo();
+  std::list<std::string> anActionList = theActionType == ActionUndo ? aMgr->undoList()
+    : aMgr->redoList();
+  std::list<std::string>::const_iterator aIt = anActionList.cbegin();
+  for (int i = 0; (i < theTimes) && (aIt != anActionList.cend()); ++i, ++aIt) {
+    if (theActionType == ActionUndo)
+      aMgr->undo();
+    else
+      aMgr->redo();
+
     if (QString((*aIt).c_str()) == MOVE_TO_END_COMMAND)
       myObjectBrowser->rebuildDataTree();
   }
@@ -1095,8 +1078,10 @@ void XGUI_Workshop::onRedo(int theTimes)
   updateCommandStatus();
 
   // unblock the viewer update functionality and make update on purpose
-  myDisplayer->enableUpdateViewer(isUpdateEnabled);
-  myDisplayer->updateViewer();
+  if (theActionType == ActionRedo) {
+    myDisplayer->enableUpdateViewer(isUpdateEnabled);
+    myDisplayer->updateViewer();
+  }
 }
 
 //******************************************************
@@ -1353,19 +1338,26 @@ void XGUI_Workshop::createDockWidgets()
     myFacesPanel);
   hidePanel(myFacesPanel);  ///<! Invisible by default
 
-#ifdef DEBUG_FACES_PANEL
-  aDesktop->addDockWidget(Qt::RightDockWidgetArea, myFacesPanel);
-  showPanel(myFacesPanel);
+#ifdef _DEBUG
+  bool aShowOnTheRight = Config_PropManager::boolean("Plugins", "show_hide_faces");
+  if (aShowOnTheRight) {
+    aDesktop->addDockWidget(Qt::RightDockWidgetArea, myFacesPanel);
+    showPanel(myFacesPanel);
+  }
 #endif
-
   hideObjectBrowser();
 
-#ifdef DEBUG_FACES_PANEL
-#else
 #ifndef HAVE_SALOME
+#ifdef _DEBUG
+  if (!aShowOnTheRight)
+  {
+#endif // _DEBUG
   aDesktop->tabifyDockWidget(myFacesPanel, aObjDock);
-#endif
-#endif
+#ifdef _DEBUG
+  }
+#endif // _DEBUG
+
+#endif // HAVE_SALOME
 
   aDesktop->tabifyDockWidget(aObjDock, myPropertyPanel);
   myPropertyPanel->installEventFilter(myOperationMgr);
@@ -2538,44 +2530,6 @@ void XGUI_Workshop::setStatusBarMessage(const QString& theMessage)
 #else
   myMainWindow->putInfo(theMessage, -1);
 #endif
-}
-
-//******************************************************
-void XGUI_Workshop::synchronizeViewer()
-{
-  SessionPtr aMgr = ModelAPI_Session::get();
-  QList<DocumentPtr> aDocs;
-  aDocs.append(aMgr->activeDocument());
-  aDocs.append(aMgr->moduleDocument());
-
-  foreach(DocumentPtr aDoc, aDocs) {
-    synchronizeGroupInViewer(aDoc, ModelAPI_ResultConstruction::group(), false);
-    synchronizeGroupInViewer(aDoc, ModelAPI_ResultBody::group(), false);
-    synchronizeGroupInViewer(aDoc, ModelAPI_ResultPart::group(), false);
-    synchronizeGroupInViewer(aDoc, ModelAPI_ResultGroup::group(), false);
-  }
-}
-
-//******************************************************
-void XGUI_Workshop::synchronizeGroupInViewer(const DocumentPtr& theDoc,
-                                             const std::string& theGroup,
-                                             bool theUpdateViewer)
-{
-  ObjectPtr aObj;
-  int aSize = theDoc->size(theGroup);
-  for (int i = 0; i < aSize; i++) {
-    aObj = theDoc->object(theGroup, i);
-    if (aObj->isDisplayed()) {
-      // Hide the presentation with an empty shape. But isDisplayed state of the object should not
-      // be changed to the object becomes visible when the shape becomes not empty
-      ResultPtr aRes = std::dynamic_pointer_cast<ModelAPI_Result>(aObj);
-      if (aRes.get() && (!aRes->shape().get() || aRes->shape()->isNull()))
-        continue;
-      myDisplayer->display(aObj, false);
-    }
-  }
-  if (theUpdateViewer)
-    myDisplayer->updateViewer();
 }
 
 //******************************************************
