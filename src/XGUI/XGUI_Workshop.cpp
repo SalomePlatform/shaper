@@ -2532,6 +2532,46 @@ void XGUI_Workshop::setStatusBarMessage(const QString& theMessage)
 #endif
 }
 
+#ifdef HAVE_SALOME
+//******************************************************
+void XGUI_Workshop::synchronizeViewer()
+{
+  SessionPtr aMgr = ModelAPI_Session::get();
+  QList<DocumentPtr> aDocs;
+  aDocs.append(aMgr->activeDocument());
+  aDocs.append(aMgr->moduleDocument());
+
+  foreach(DocumentPtr aDoc, aDocs) {
+    synchronizeGroupInViewer(aDoc, ModelAPI_ResultConstruction::group(), false);
+    synchronizeGroupInViewer(aDoc, ModelAPI_ResultBody::group(), false);
+    synchronizeGroupInViewer(aDoc, ModelAPI_ResultPart::group(), false);
+    synchronizeGroupInViewer(aDoc, ModelAPI_ResultGroup::group(), false);
+  }
+}
+
+//******************************************************
+void XGUI_Workshop::synchronizeGroupInViewer(const DocumentPtr& theDoc,
+                                             const std::string& theGroup,
+                                             bool theUpdateViewer)
+{
+  ObjectPtr aObj;
+  int aSize = theDoc->size(theGroup);
+  for (int i = 0; i < aSize; i++) {
+    aObj = theDoc->object(theGroup, i);
+    if (aObj->isDisplayed()) {
+      // Hide the presentation with an empty shape. But isDisplayed state of the object should not
+      // be changed to the object becomes visible when the shape becomes not empty
+      ResultPtr aRes = std::dynamic_pointer_cast<ModelAPI_Result>(aObj);
+      if (aRes.get() && (!aRes->shape().get() || aRes->shape()->isNull()))
+        continue;
+      myDisplayer->display(aObj, false);
+    }
+  }
+  if (theUpdateViewer)
+    myDisplayer->updateViewer();
+}
+#endif
+
 //******************************************************
 void XGUI_Workshop::highlightResults(const QObjectPtrList& theObjects)
 {

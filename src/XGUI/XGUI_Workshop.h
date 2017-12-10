@@ -264,6 +264,20 @@ Q_OBJECT
   /// \param theMessage a message
   void setStatusBarMessage(const QString& theMessage);
 
+#ifdef HAVE_SALOME
+  /// Has to be called in order to display objects with visibility status = true
+  void synchronizeViewer();
+
+  /// Has to be called in order to display objects from a specifed group
+  /// with visibility status = true
+  /// \param theDoc the document for objects synchronisation
+  /// \param theGroup the group name
+  /// \param theUpdateViewer update viewer flag
+  void synchronizeGroupInViewer(const DocumentPtr& theDoc,
+                                const std::string& theGroup,
+                                bool theUpdateViewer);
+
+#endif
   /// Update the property panel content by the XML description of the operation and set the panel
   /// into the operation
   /// \param theOperation an operation
