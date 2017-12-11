@@ -63,7 +63,8 @@ PartSet_WidgetMultiSelector::~PartSet_WidgetMultiSelector()
 bool PartSet_WidgetMultiSelector::isValidSelectionCustom(const ModuleBase_ViewerPrsPtr& thePrs)
 {
   bool aValid = false;
-  if (thePrs.get() && thePrs->interactive()->IsKind(STANDARD_TYPE(PartSet_CenterPrs)))
+  if (thePrs.get() && thePrs->interactive().get() &&
+      thePrs->interactive()->IsKind(STANDARD_TYPE(PartSet_CenterPrs)))
     aValid = true; // we should not check acceptSubShape for such presentation
   else
     aValid = ModuleBase_WidgetMultiSelector::isValidSelectionCustom(thePrs);
