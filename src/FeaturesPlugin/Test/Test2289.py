@@ -49,7 +49,7 @@ Wire_1 = model.addWire(Part_1_doc, [model.selection("EDGE", "Sketch_1/Edge-Sketc
 Extrusion_1 = model.addExtrusion(Part_1_doc, [model.selection("WIRE", "Wire_1_1")], model.selection(), 10, 0)
 model.do()
 
-model.testHaveNamingVertices(Extrusion_1, model, Part_1_doc)
+model.testHaveNamingSubshapes(Extrusion_1, model, Part_1_doc)
 
 model.end()
 
