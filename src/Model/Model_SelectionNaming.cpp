@@ -76,7 +76,14 @@ static Handle(TNaming_NamedShape) shapeToNS(const TDF_Label theLabAccess,
     TDF_Label aLabel = aNSIter.Label();
     Handle(TNaming_NamedShape) aNS;
     if (aLabel.FindAttribute(TNaming_NamedShape::GetID(), aNS)) {
-      if (aNS->Evolution() != TNaming_SELECTED) {
+      if (aNS->Evolution() != TNaming_SELECTED && aNS->Evolution() != TNaming_DELETE) {
+        // check this is new shape in this named shape
+        bool aIsNew = false;
+        for(TNaming_Iterator aNSIter(aNS); aNSIter.More(); aNSIter.Next())
+          if (!aNSIter.NewShape().IsNull() && aNSIter.NewShape().IsSame(theShape))
+            aIsNew = true;
+        if (!aIsNew)
+          continue;
         // check this is the context-shape
         while(aLabel.Depth() > aContextLabDepth)
           aLabel = aLabel.Father();
