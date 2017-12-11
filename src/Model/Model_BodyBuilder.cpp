@@ -412,7 +412,7 @@ void Model_BodyBuilder::loadAndOrientModifiedShapes (
         int aBuilderTag = aTag;
         if (!theIsStoreSeparate)
           aSameParentShapes++;
-        if (aSameParentShapes > 0) { // store in other label (
+        if (aSameParentShapes > 0) { // store in other label
           aBuilderTag = 100000 - aSameParentShapes * 10 - aTag;
         }
         if(theIsStoreAsGenerated) {

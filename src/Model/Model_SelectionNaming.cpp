@@ -47,6 +47,7 @@
 #include <TNaming_Tool.hxx>
 #include <TNaming_NamedShape.hxx>
 #include <TNaming_Localizer.hxx>
+#include <TNaming_SameShapeIterator.hxx>
 #include <TDataStd_Name.hxx>
 #include <TColStd_MapOfTransient.hxx>
 #include <algorithm>
@@ -61,6 +62,34 @@ Model_SelectionNaming::Model_SelectionNaming(TDF_Label theSelectionLab)
   myLab = theSelectionLab;
 }
 
+// searches named shape by the shape in the given document (identified by the label)
+// tries to find s shape nearest to the context-label
+static Handle(TNaming_NamedShape) shapeToNS(const TDF_Label theLabAccess,
+  const TopoDS_Shape& theShape, const TDF_Label& theContextLab)
+{
+  Handle(TNaming_NamedShape) aResult;
+  if (!TNaming_Tool::HasLabel(theLabAccess, theShape)) // no shape in the document
+    return aResult;
+  int aContextLabDepth = theContextLab.IsNull() ? 100 : theContextLab.Depth();
+  TNaming_SameShapeIterator aNSIter(theShape, theLabAccess);
+  for(; aNSIter.More(); aNSIter.Next()) {
+    TDF_Label aLabel = aNSIter.Label();
+    Handle(TNaming_NamedShape) aNS;
+    if (aLabel.FindAttribute(TNaming_NamedShape::GetID(), aNS)) {
+      if (aNS->Evolution() != TNaming_SELECTED) {
+        // check this is the context-shape
+        while(aLabel.Depth() > aContextLabDepth)
+          aLabel = aLabel.Father();
+        if (aLabel.IsEqual(theContextLab))
+          return aNS;
+        if (aResult.IsNull()) // take the first, otherwise it will get shapes from results, etc
+          aResult = aNS; // keep some result anyway - if there are no context labels return any
+      }
+    }
+  }
+  return aResult;
+}
+
 std::string Model_SelectionNaming::getShapeName(
   std::shared_ptr<Model_Document> theDoc, const TopoDS_Shape& theShape,
   ResultPtr& theContext, const bool theAnotherDoc, const bool theWholeContext)
@@ -70,13 +99,14 @@ std::string Model_SelectionNaming::getShapeName(
   // (it was in BodyBuilder, but did not work on Result rename)
   bool isNeedContextName = theContext->shape().get() != NULL;
   // check if the subShape is already in DF
-  Handle(TNaming_NamedShape) aNS = TNaming_Tool::NamedShape(theShape, myLab);
+  std::shared_ptr<Model_Data> aData =
+    std::dynamic_pointer_cast<Model_Data>(theContext->data());
+  TDF_Label aContextDataLab(aData.get() && aData->isValid() ? aData->label() : TDF_Label());
+  Handle(TNaming_NamedShape) aNS = shapeToNS(myLab, theShape, aContextDataLab);
   Handle(TDataStd_Name) anAttr;
   if(!aNS.IsNull() && !aNS->IsEmpty()) { // in the document
     if(aNS->Label().FindAttribute(TDataStd_Name::GetID(), anAttr)) {
-      std::shared_ptr<Model_Data> aData =
-        std::dynamic_pointer_cast<Model_Data>(theContext->data());
-      if (isNeedContextName && aData && aData->label().IsEqual(aNS->Label())) {
+      if (isNeedContextName && aData && aContextDataLab.IsEqual(aNS->Label())) {
         // do nothing because this context name will be added later in this method
       } else {
         aName = TCollection_AsciiString(anAttr->Get()).ToCString();
