@@ -243,7 +243,7 @@ SketchConstraintDistance_10 = Sketch_3.setDistance(SketchCircle_3.center(), Sket
 SketchConstraintDistance_10.setName("SketchConstraintDistance_9")
 SketchConstraintDistance_11 = Sketch_3.setDistance(SketchCircle_4.center(), SketchLine_28.result(), 40)
 SketchConstraintDistance_11.setName("SketchConstraintDistance_10")
-SketchProjection_1 = Sketch_3.addProjection(model.selection("EDGE", "Boolean_2_1/Modified_Face_23&Boolean_2_1/Modified_Face_7"))
+SketchProjection_1 = Sketch_3.addProjection(model.selection("EDGE", "Boolean_2_1/Modified_Face_17&Boolean_2_1/Modified_Face_7"))
 SketchLine_29 = SketchProjection_1.createdFeature()
 SketchLine_29.setName("SketchLine_26")
 SketchLine_29.result().setName("SketchLine_26")

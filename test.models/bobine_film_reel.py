@@ -97,7 +97,7 @@ SketchMultiRotation_1 = Sketch_7.addRotation([SketchCircle_7.results()[1]], Sket
 [SketchCircle_8, SketchCircle_9] = SketchMultiRotation_1.rotated()
 model.do()
 ExtrusionCut_2 = model.addExtrusionCut(Part_1_doc, [model.selection("COMPOUND", "Sketch_7")], model.selection(), model.selection("FACE", "ExtrusionCut_1_1/Modfied_2"), 0, model.selection(), 0, [model.selection("SOLID", "ExtrusionCut_1_1")])
-Sketch_8 = model.addSketch(Part_1_doc, model.selection("FACE", "ExtrusionCut_2_1/Modfied_22"))
+Sketch_8 = model.addSketch(Part_1_doc, model.selection("FACE", "ExtrusionCut_2_1/Modfied_8"))
 SketchLine_7 = Sketch_8.addLine(-2.320957096353877e-016, 11.00000001704673, -7, 11.00000001704673)
 SketchConstraintHorizontal_1 = Sketch_8.setHorizontal(SketchLine_7.result())
 SketchLine_8 = Sketch_8.addLine(-7, 11.00000001704673, -6.329882773485103e-016, 30.00000001704673)
@@ -126,7 +126,7 @@ SketchLine_14.result().setName("SketchLine_13")
 SketchLine_13.setName("SketchLine_16")
 SketchLine_13.result().setName("SketchLine_16")
 model.do()
-ExtrusionCut_3 = model.addExtrusionCut(Part_1_doc, [model.selection("FACE", "Sketch_8/Face-SketchLine_7r-SketchLine_8r-SketchLine_10f-SketchLine_11f"), model.selection("FACE", "Sketch_8/Face-SketchLine_16f-SketchLine_17f-SketchLine_18r-SketchLine_19r"), model.selection("FACE", "Sketch_8/Face-SketchLine_12f-SketchLine_13f-SketchLine_14r-SketchLine_15r")], model.selection(), model.selection("FACE", "ExtrusionCut_2_1/Modfied_23"), 0, model.selection(), 0, [model.selection("SOLID", "ExtrusionCut_2_1")])
+ExtrusionCut_3 = model.addExtrusionCut(Part_1_doc, [model.selection("FACE", "Sketch_8/Face-SketchLine_7r-SketchLine_8r-SketchLine_10f-SketchLine_11f"), model.selection("FACE", "Sketch_8/Face-SketchLine_16f-SketchLine_17f-SketchLine_18r-SketchLine_19r"), model.selection("FACE", "Sketch_8/Face-SketchLine_12f-SketchLine_13f-SketchLine_14r-SketchLine_15r")], model.selection(), model.selection("FACE", "ExtrusionCut_2_1/Modfied_9"), 0, model.selection(), 0, [model.selection("SOLID", "ExtrusionCut_2_1")])
 
 # Test reexecution after parameter change
 Parameter_R.setValue(50)
