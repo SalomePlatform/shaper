@@ -284,7 +284,8 @@ TNaming_Builder* Model_BodyBuilder::builder(const int theTag)
   std::map<int, TNaming_Builder*>::iterator aFind = myBuilders.find(theTag);
   if (aFind == myBuilders.end()) {
     std::shared_ptr<Model_Data> aData = std::dynamic_pointer_cast<Model_Data>(data());
-    myBuilders[theTag] = new TNaming_Builder(aData->shapeLab().FindChild(theTag));
+    myBuilders[theTag] = new TNaming_Builder(
+      theTag == 0 ? aData->shapeLab() : aData->shapeLab().FindChild(theTag));
     aFind = myBuilders.find(theTag);
   }
   return aFind->second;
@@ -419,9 +420,9 @@ void Model_BodyBuilder::loadAndOrientModifiedShapes (
         if(theIsStoreAsGenerated) {
           // Here we store shapes as generated, to avoid problem when one parent shape produce
           // several child shapes. In this case naming could not determine which shape to select.
-          builder(aBuilderTag)->Generated(aRoot,aNewShape);
+          builder(aBuilderTag)->Generated(aRoot, aNewShape);
         } else {
-          builder(aBuilderTag)->Modify(aRoot,aNewShape);
+          builder(aBuilderTag)->Modify(aRoot, aNewShape);
         }
         if(isBuilt) {
           if(theIsStoreSeparate) {
@@ -442,6 +443,13 @@ void Model_BodyBuilder::loadAndOrientModifiedShapes (
         }
         if(theIsStoreSeparate) {
           aTag++;
+        }
+      } else if (aResultShape->isSame(*anIt)) {
+        // keep the modification evolution on the root level (2241 - history propagation issue)
+        if(theIsStoreAsGenerated) {
+          builder(0)->Generated(aRoot, aNewShape);
+        } else {
+          builder(0)->Modify(aRoot, aNewShape);
         }
       }
     }
