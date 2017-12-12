@@ -49,6 +49,7 @@
 #include <BRep_Tool.hxx>
 #include <GeomAPI_Shape.h>
 #include <GeomAlgoAPI_MakeShape.h>
+#include <GeomAlgoAPI_SortListOfShapes.h>
 #include <Config_PropManager.h>
 // DEB
 //#include <TCollection_AsciiString.hxx>
@@ -397,6 +398,9 @@ void Model_BodyBuilder::loadAndOrientModifiedShapes (
     std::shared_ptr<GeomAPI_Shape> aRShape(new GeomAPI_Shape());
     aRShape->setImpl((new TopoDS_Shape(aRoot)));
     theMS->modified(aRShape, aList);
+    // sort the list of images before naming
+    GeomAlgoAPI_SortListOfShapes::sort(aList);
+
     // to trace situation where several objects are produced by one parent (#2317)
     int aSameParentShapes = -1;
     std::list<std::shared_ptr<GeomAPI_Shape> >::const_iterator
