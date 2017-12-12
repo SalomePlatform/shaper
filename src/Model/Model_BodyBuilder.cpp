@@ -408,7 +408,8 @@ void Model_BodyBuilder::loadAndOrientModifiedShapes (
       }
       GeomShapePtr aGeomNewShape(new GeomAPI_Shape());
       aGeomNewShape->setImpl(new TopoDS_Shape(aNewShape));
-      if(!aRoot.IsSame(aNewShape) && aResultShape->isSubShape(aGeomNewShape, false)) {
+      if(!aRoot.IsSame(aNewShape) && aResultShape->isSubShape(aGeomNewShape, false) &&
+         !aResultShape->isSame(*anIt)) { // to avoid put of same shape on main label and sub
         int aBuilderTag = aTag;
         if (!theIsStoreSeparate)
           aSameParentShapes++;
