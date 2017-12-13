@@ -84,13 +84,6 @@ public:
   PartSet_Module(ModuleBase_IWorkshop* theWshop);
   virtual ~PartSet_Module();
 
-  // Add default selection filters of the module to the current viewer
-  virtual void activateSelectionFilters();
-  // Remove default selection filters of the module from the current viewer
-  virtual void deactivateSelectionFilters();
-  /// Update selection filters depending on the module active controls
-  virtual void updateActiveSelectionFilters();
-
   // Stores the current selection
   virtual void storeSelection();
 
@@ -207,6 +200,10 @@ public:
   /// \param theObject a model object
   virtual bool canActivateSelection(const ObjectPtr& theObject) const;
 
+  /// Appends into container of workshop selection filters
+  /// \param [out] selection filters
+  virtual void selectionFilters(SelectMgr_ListOfFilter& theSelectionFilters) const;
+
   /// Add menu atems for object browser into the given menu
   /// \param theMenu a popup menu to be shown in the object browser
   virtual void addObjectBrowserMenu(QMenu* theMenu) const;
@@ -225,8 +222,8 @@ public:
   virtual void activeSelectionModes(QIntList& theModes);
 
   /// Appends specific selection modes for the module to the list of types
-  /// \param theTypes a selection modes to be extended
-  virtual void customSubShapesSelectionModes(QIntList& theTypes);
+  /// \param theModes a selection modes to be extended
+  virtual void customSubShapesSelectionModes(QIntList& theModes);
 
   /// Returns whether the mouse enter the viewer's window
   /// \return true if items are added and there is no necessity to provide standard menu

@@ -51,6 +51,7 @@
 #include <ModuleBase_IViewer.h>
 #include <ModuleBase_IViewWindow.h>
 #include <ModuleBase_IPropertyPanel.h>
+#include <ModuleBase_ISelectionActivate.h>
 #include <ModuleBase_WidgetChoice.h>
 #include <ModuleBase_WidgetEditor.h>
 #include <ModuleBase_WidgetValidated.h>
@@ -143,6 +144,7 @@ extern "C" PARTSET_EXPORT ModuleBase_IModule* createModule(ModuleBase_IWorkshop*
   return new PartSet_Module(theWshop);
 }
 
+//******************************************************
 PartSet_Module::PartSet_Module(ModuleBase_IWorkshop* theWshop)
 : ModuleBase_IModule(theWshop),
   myVisualLayerId(0),
@@ -198,6 +200,7 @@ PartSet_Module::PartSet_Module(ModuleBase_IWorkshop* theWshop)
                                    "0.8");
 }
 
+//******************************************************
 PartSet_Module::~PartSet_Module()
 {
   SelectMgr_ListIteratorOfListOfFilter aIt(mySelectionFilters);
@@ -210,37 +213,7 @@ PartSet_Module::~PartSet_Module()
   delete myOverconstraintListener;
 }
 
-void PartSet_Module::activateSelectionFilters()
-{
-  SelectMgr_ListIteratorOfListOfFilter aIt(mySelectionFilters);
-  for (; aIt.More(); aIt.Next()) {
-    Handle(SelectMgr_Filter) aFilter = aIt.Value();
-    if (!aFilter.IsNull())
-      myWorkshop->viewer()->addSelectionFilter(aFilter);
-  }
-}
-
-void PartSet_Module::deactivateSelectionFilters()
-{
-  SelectMgr_ListIteratorOfListOfFilter aIt(mySelectionFilters);
-  for (; aIt.More(); aIt.Next()) {
-    Handle(SelectMgr_Filter) aFilter = aIt.Value();
-    if (!aFilter.IsNull())
-      myWorkshop->viewer()->removeSelectionFilter(aFilter);
-  }
-}
-
-void PartSet_Module::updateActiveSelectionFilters()
-{
-  XGUI_Workshop* aWorkshop = XGUI_Tools::workshop(workshop());
-  XGUI_ActiveControlSelector* anActiveSelector = aWorkshop->activeControlMgr()->activeSelector();
-
-  if (anActiveSelector && anActiveSelector->getType() == XGUI_FacesPanelSelector::Type())
-    sketchMgr()->deactivateSelectionFilters();
-  else
-    sketchMgr()->activateSelectionFilters();
-}
-
+//******************************************************
 void PartSet_Module::storeSelection()
 {
   // cash is used only to restore selection, so it should be filled in storeSelection and
@@ -249,6 +222,7 @@ void PartSet_Module::storeSelection()
   sketchMgr()->storeSelection(PartSet_SketcherMgr::ST_SelectType, myCurrentSelection);
 }
 
+//******************************************************
 void PartSet_Module::restoreSelection()
 {
   // cash is used only to restore selection, so it should be filled in storeSelection and
@@ -257,6 +231,7 @@ void PartSet_Module::restoreSelection()
   myCurrentSelection.clear();
 }
 
+//******************************************************
 void PartSet_Module::registerValidators()
 {
   //Registering of validators
@@ -285,12 +260,14 @@ void PartSet_Module::registerValidators()
   aFactory->registerValidator("PartSet_ProjectionSelection", new PartSet_ProjectionSelection);
 }
 
+//******************************************************
 void PartSet_Module::connectToPropertyPanel(ModuleBase_ModelWidget* theWidget,
                                             const bool isToConnect)
 {
   mySketchMgr->connectToPropertyPanel(theWidget, isToConnect);
 }
 
+//******************************************************
 void PartSet_Module::operationCommitted(ModuleBase_Operation* theOperation)
 {
   if (sketchMgr()->isNestedSketchOperation(theOperation)) {
@@ -314,6 +291,7 @@ void PartSet_Module::operationCommitted(ModuleBase_Operation* theOperation)
   }
 }
 
+//******************************************************
 void PartSet_Module::operationAborted(ModuleBase_Operation* theOperation)
 {
   /// Restart sketcher operations automatically
@@ -323,6 +301,7 @@ void PartSet_Module::operationAborted(ModuleBase_Operation* theOperation)
     overconstraintListener()->setActive(false);
 }
 
+//******************************************************
 void PartSet_Module::operationStarted(ModuleBase_Operation* theOperation)
 {
   ModuleBase_OperationFeature* aFOperation = dynamic_cast<ModuleBase_OperationFeature*>
@@ -410,6 +389,7 @@ void PartSet_Module::operationStarted(ModuleBase_Operation* theOperation)
   }
 }
 
+//******************************************************
 void PartSet_Module::updateSketcherOnStart(ModuleBase_Operation* theOperation)
 {
   if (PartSet_SketcherMgr::isSketchOperation(theOperation)) {
@@ -420,6 +400,7 @@ void PartSet_Module::updateSketcherOnStart(ModuleBase_Operation* theOperation)
   }
 }
 
+//******************************************************
 void PartSet_Module::updatePresentationsOnStart(ModuleBase_Operation* theOperation)
 {
   ModuleBase_OperationFeature* aFOperation =
@@ -430,6 +411,7 @@ void PartSet_Module::updatePresentationsOnStart(ModuleBase_Operation* theOperati
   }
 }
 
+//******************************************************
 void PartSet_Module::operationResumed(ModuleBase_Operation* theOperation)
 {
   ModuleBase_IModule::operationResumed(theOperation);
@@ -442,6 +424,7 @@ void PartSet_Module::operationResumed(ModuleBase_Operation* theOperation)
   }
 }
 
+//******************************************************
 void PartSet_Module::operationStopped(ModuleBase_Operation* theOperation)
 {
   bool isModifiedArgs = myCustomPrs->deactivate(ModuleBase_IModule::CustomizeArguments, false);
@@ -468,6 +451,7 @@ void PartSet_Module::operationStopped(ModuleBase_Operation* theOperation)
   }
 }
 
+//******************************************************
 ModuleBase_Operation* PartSet_Module::currentOperation() const
 {
   XGUI_ModuleConnector* aConnector = dynamic_cast<XGUI_ModuleConnector*>(workshop());
@@ -475,6 +459,7 @@ ModuleBase_Operation* PartSet_Module::currentOperation() const
   return anOpMgr->currentOperation();
 }
 
+//******************************************************
 bool PartSet_Module::canUndo() const
 {
   bool aCanUndo = false;
@@ -487,6 +472,7 @@ bool PartSet_Module::canUndo() const
   return aCanUndo;
 }
 
+//******************************************************
 bool PartSet_Module::canRedo() const
 {
   bool aCanRedo = false;
@@ -499,6 +485,7 @@ bool PartSet_Module::canRedo() const
   return aCanRedo;
 }
 
+//******************************************************
 bool PartSet_Module::canApplyAction(const ObjectPtr& theObject, const QString& theActionId) const
 {
   bool aValid = true;
@@ -514,18 +501,21 @@ bool PartSet_Module::canApplyAction(const ObjectPtr& theObject, const QString& t
   return aValid;
 }
 
+//******************************************************
 bool PartSet_Module::canEraseObject(const ObjectPtr& theObject) const
 {
   // the sketch manager put the restriction to the objects erase
   return mySketchMgr->canEraseObject(theObject);
 }
 
+//******************************************************
 bool PartSet_Module::canDisplayObject(const ObjectPtr& theObject) const
 {
   // the sketch manager put the restriction to the objects display
   return mySketchMgr->canDisplayObject(theObject);
 }
 
+//******************************************************
 bool PartSet_Module::canUsePreselection(const QString& thePreviousOperationKind,
                                         const QString& theStartedOperationKind)
 {
@@ -540,6 +530,7 @@ bool PartSet_Module::canUsePreselection(const QString& thePreviousOperationKind,
   mySketchMgr->processHiddenObject(theObjects);
 }*/
 
+//******************************************************
 bool PartSet_Module::canActivateSelection(const ObjectPtr& theObject) const
 {
   bool aCanActivate = ModuleBase_IModule::canActivateSelection(theObject);
@@ -557,6 +548,18 @@ bool PartSet_Module::canActivateSelection(const ObjectPtr& theObject) const
   return aCanActivate;
 }
 
+//******************************************************
+void PartSet_Module::selectionFilters(SelectMgr_ListOfFilter& theSelectionFilters) const
+{
+  for (SelectMgr_ListOfFilter::Iterator aFiltersIt(mySelectionFilters); aFiltersIt.More();
+       aFiltersIt.Next())
+    theSelectionFilters.Append(aFiltersIt.Value());
+
+  if (mySketchMgr->activeSketch())
+    mySketchMgr->selectionFilters(theSelectionFilters);
+}
+
+//******************************************************
 bool PartSet_Module::addViewerMenu(const QMap<QString, QAction*>& theStdActions,
                                    QWidget* theParent,
                                    QMap<int, QAction*>& theMenuActions) const
@@ -564,11 +567,13 @@ bool PartSet_Module::addViewerMenu(const QMap<QString, QAction*>& theStdActions,
   return myMenuMgr->addViewerMenu(theStdActions, theParent, theMenuActions);
 }
 
+//******************************************************
 void PartSet_Module::updateViewerMenu(const QMap<QString, QAction*>& theStdActions)
 {
   myMenuMgr->updateViewerMenu(theStdActions);
 }
 
+//******************************************************
 bool PartSet_Module::isActionEnableStateFixed(const int theActionId) const
 {
   bool isEnabledFixed = false;
@@ -578,6 +583,7 @@ bool PartSet_Module::isActionEnableStateFixed(const int theActionId) const
   return isEnabledFixed;
 }
 
+//******************************************************
 QString PartSet_Module::getFeatureError(const FeaturePtr& theFeature)
 {
   QString anError = ModuleBase_IModule::getFeatureError(theFeature);
@@ -587,6 +593,7 @@ QString PartSet_Module::getFeatureError(const FeaturePtr& theFeature)
   return anError;
 }
 
+//******************************************************
 void PartSet_Module::grantedOperationIds(ModuleBase_Operation* theOperation,
                                          QStringList& theIds) const
 {
@@ -598,21 +605,28 @@ void PartSet_Module::grantedOperationIds(ModuleBase_Operation* theOperation,
   }
 }
 
+//******************************************************
 void PartSet_Module::activeSelectionModes(QIntList& theModes)
 {
-  theModes.clear();
   if (mySketchMgr->activeSketch().get())
-    PartSet_SketcherMgr::sketchSelectionModes(theModes);
+    PartSet_SketcherMgr::sketchSelectionModes(mySketchMgr->activeSketch(), theModes);
+  else
+    theModes = XGUI_Tools::workshop(myWorkshop)->viewerSelectionModes();
 }
 
-void PartSet_Module::customSubShapesSelectionModes(QIntList& theTypes)
+//******************************************************
+void PartSet_Module::customSubShapesSelectionModes(QIntList& theModes)
 {
-  if (theTypes.contains(TopAbs_FACE))
-    theTypes.append(SketcherPrs_Tools::Sel_Sketch_Face);
-  if (theTypes.contains(TopAbs_WIRE))
-    theTypes.append(SketcherPrs_Tools::Sel_Sketch_Wire);
+  if (theModes.contains(TopAbs_FACE))
+    theModes.append(SketcherPrs_Tools::Sel_Sketch_Face);
+  if (theModes.contains(TopAbs_WIRE))
+    theModes.append(SketcherPrs_Tools::Sel_Sketch_Wire);
+
+  if (mySketchMgr->activeSketch().get())
+    PartSet_SketcherMgr::sketchSelectionModes(mySketchMgr->activeSketch(), theModes);
 }
 
+//******************************************************
 void PartSet_Module::getGeomSelection(const std::shared_ptr<ModuleBase_ViewerPrs>& theSelected,
                                       ObjectPtr& theObject, AttributePtr& theAttribute)
 {
@@ -624,11 +638,13 @@ void PartSet_Module::getGeomSelection(const std::shared_ptr<ModuleBase_ViewerPrs
   theObject = anObject;
 }
 
+//******************************************************
 bool PartSet_Module::isMouseOverWindow()
 {
   return mySketchMgr->isMouseOverWindow();
 }
 
+//******************************************************
 bool PartSet_Module::isSketchNeutralPointActivated() const
 {
   bool isNeutralPoint = true;
@@ -640,20 +656,23 @@ bool PartSet_Module::isSketchNeutralPointActivated() const
   return isNeutralPoint;
 }
 
+//******************************************************
 void PartSet_Module::closeDocument()
 {
   myActivePartIndex = QModelIndex();
 }
 
+//******************************************************
 void PartSet_Module::clearViewer()
 {
   myCustomPrs->clearPrs();
 
   XGUI_Workshop* aWorkshop = getWorkshop();
   XGUI_Displayer* aDisplayer = aWorkshop->displayer();
-  aDisplayer->deactivateSelectionFilters();
+  aDisplayer->deactivateSelectionFilters(false);
 }
 
+//******************************************************
 void PartSet_Module::propertyPanelDefined(ModuleBase_Operation* theOperation)
 {
   ModuleBase_OperationFeature* aFOperation =
@@ -667,6 +686,7 @@ void PartSet_Module::propertyPanelDefined(ModuleBase_Operation* theOperation)
     aPanel->activateWidget(aPanel->modelWidgets().first());
 }
 
+//******************************************************
 bool PartSet_Module::createWidgets(ModuleBase_Operation* theOperation,
                                    QList<ModuleBase_ModelWidget*>& theWidgets) const
 {
@@ -719,6 +739,7 @@ bool PartSet_Module::createWidgets(ModuleBase_Operation* theOperation,
   return aProcessed;
 }
 
+//******************************************************
 void PartSet_Module::onSelectionChanged()
 {
   ModuleBase_Operation* aOperation = myWorkshop->currentOperation();
@@ -752,6 +773,7 @@ void PartSet_Module::onSelectionChanged()
   }
 }
 
+//******************************************************
 void PartSet_Module::onKeyRelease(ModuleBase_IViewWindow* theWnd, QKeyEvent* theEvent)
 {
   XGUI_ModuleConnector* aConnector = dynamic_cast<XGUI_ModuleConnector*>(workshop());
@@ -759,6 +781,7 @@ void PartSet_Module::onKeyRelease(ModuleBase_IViewWindow* theWnd, QKeyEvent* the
   anOpMgr->onKeyReleased(theWnd->viewPort(), theEvent);
 }
 
+//******************************************************
 ModuleBase_ModelWidget* PartSet_Module::createWidgetByType(const std::string& theType,
                                                            QWidget* theParent,
                                                            Config_WidgetAPI* theWidgetApi)
@@ -817,6 +840,7 @@ ModuleBase_ModelWidget* PartSet_Module::createWidgetByType(const std::string& th
   return aWgt;
 }
 
+//******************************************************
 ModuleBase_ModelWidget* PartSet_Module::activeWidget() const
 {
   ModuleBase_ModelWidget* anActiveWidget = 0;
@@ -832,6 +856,7 @@ ModuleBase_ModelWidget* PartSet_Module::activeWidget() const
   return anActiveWidget;
 }
 
+//******************************************************
 bool PartSet_Module::deleteObjects()
 {
   bool isProcessed = false;
@@ -905,17 +930,20 @@ bool PartSet_Module::deleteObjects()
   return isProcessed;
 }
 
+//******************************************************
 void PartSet_Module::editFeature(FeaturePtr theFeature)
 {
   storeConstraintsState(theFeature->getKind());
   ModuleBase_IModule::editFeature(theFeature);
 }
 
+//******************************************************
 bool PartSet_Module::canCommitOperation() const
 {
   return true;
 }
 
+//******************************************************
 void PartSet_Module::launchOperation(const QString& theCmdId, const bool& isStartAfterCommitOnly)
 {
   myIsOperationIsLaunched = true;
@@ -927,6 +955,7 @@ void PartSet_Module::launchOperation(const QString& theCmdId, const bool& isStar
   myIsOperationIsLaunched = false;
 }
 
+//******************************************************
 void PartSet_Module::storeConstraintsState(const std::string& theFeatureKind)
 {
   if (myWorkshop->currentOperation() &&
@@ -937,6 +966,7 @@ void PartSet_Module::storeConstraintsState(const std::string& theFeatureKind)
   }
 }
 
+//******************************************************
 void PartSet_Module::updateConstraintsState(const std::string& theFeatureKind)
 {
   if (PartSet_SketcherMgr::constraintsIdList().contains(theFeatureKind.c_str()) ||
@@ -949,6 +979,7 @@ void PartSet_Module::updateConstraintsState(const std::string& theFeatureKind)
   }
 }
 
+//******************************************************
 void PartSet_Module::onObjectDisplayed(ObjectPtr theObject, AISObjectPtr theAIS)
 {
   Handle(AIS_InteractiveObject) anAIS = theAIS->impl<Handle(AIS_InteractiveObject)>();
@@ -971,6 +1002,7 @@ void PartSet_Module::onObjectDisplayed(ObjectPtr theObject, AISObjectPtr theAIS)
   }
 }
 
+//******************************************************
 void PartSet_Module::onBeforeObjectErase(ObjectPtr theObject, AISObjectPtr theAIS)
 {
   // this is obsolete
@@ -980,6 +1012,7 @@ void PartSet_Module::onBeforeObjectErase(ObjectPtr theObject, AISObjectPtr theAI
   //  myCustomPrs->redisplay(theObject, false);
 }
 
+//******************************************************
 void PartSet_Module::onViewTransformed(int theTrsfType)
 {
   // Set length of arrows constant in pixel size
@@ -1039,11 +1072,13 @@ void PartSet_Module::onViewTransformed(int theTrsfType)
   }
 }
 
+//******************************************************
 bool PartSet_Module::isCustomPrsActivated(const ModuleBase_CustomizeFlag& theFlag) const
 {
   return myCustomPrs->isActive(theFlag);
 }
 
+//******************************************************
 void PartSet_Module::activateCustomPrs(const FeaturePtr& theFeature,
                                        const ModuleBase_CustomizeFlag& theFlag,
                                        const bool theUpdateViewer)
@@ -1051,12 +1086,14 @@ void PartSet_Module::activateCustomPrs(const FeaturePtr& theFeature,
   myCustomPrs->activate(theFeature, theFlag, theUpdateViewer);
 }
 
+//******************************************************
 void PartSet_Module::deactivateCustomPrs(const ModuleBase_CustomizeFlag& theFlag,
                                          const bool theUpdateViewer)
 {
   myCustomPrs->deactivate(theFlag, theUpdateViewer);
 }
 
+//******************************************************
 bool PartSet_Module::customisePresentation(ResultPtr theResult, AISObjectPtr thePrs,
                                            std::shared_ptr<GeomAPI_ICustomPrs> theCustomPrs)
 {
@@ -1081,6 +1118,7 @@ bool PartSet_Module::customisePresentation(ResultPtr theResult, AISObjectPtr the
   return aCustomized;
 }
 
+//******************************************************
 bool PartSet_Module::afterCustomisePresentation(std::shared_ptr<ModelAPI_Result> theResult,
                                                 AISObjectPtr thePrs,
                                                 GeomCustomPrsPtr theCustomPrs)
@@ -1123,6 +1161,7 @@ bool PartSet_Module::afterCustomisePresentation(std::shared_ptr<ModelAPI_Result>
   return aCustomized;
 }
 
+//******************************************************
 bool PartSet_Module::customizeObject(ObjectPtr theObject, const ModuleBase_CustomizeFlag& theFlag,
                                      const bool theUpdateViewer)
 {
@@ -1133,6 +1172,7 @@ bool PartSet_Module::customizeObject(ObjectPtr theObject, const ModuleBase_Custo
   return isRedisplayed;
 }
 
+//******************************************************
 void PartSet_Module::customizeObjectBrowser(QWidget* theObjectBrowser)
 {
   XGUI_ObjectsBrowser* aOB = dynamic_cast<XGUI_ObjectsBrowser*>(theObjectBrowser);
@@ -1150,6 +1190,7 @@ void PartSet_Module::customizeObjectBrowser(QWidget* theObjectBrowser)
   }
 }
 
+//******************************************************
 void PartSet_Module::onActiveDocPopup(const QPoint& thePnt)
 {
   SessionPtr aMgr = ModelAPI_Session::get();
@@ -1165,12 +1206,13 @@ void PartSet_Module::onActiveDocPopup(const QPoint& thePnt)
   aMenu.exec(aHeader->mapToGlobal(thePnt));
 }
 
+//******************************************************
 Handle(AIS_InteractiveObject) PartSet_Module::createPresentation(const ResultPtr& theResult)
 {
   return mySketchMgr->createPresentation(theResult);
 }
 
-
+//******************************************************
 ObjectPtr PartSet_Module::findPresentedObject(const AISObjectPtr& theAIS) const
 {
   ObjectPtr anObject;
@@ -1193,6 +1235,7 @@ ObjectPtr PartSet_Module::findPresentedObject(const AISObjectPtr& theAIS) const
   return anObject;
 }
 
+//******************************************************
 bool PartSet_Module::canBeShaded(Handle(AIS_InteractiveObject) theAIS) const
 {
   bool aCanBeShaged = true;
@@ -1204,6 +1247,7 @@ bool PartSet_Module::canBeShaded(Handle(AIS_InteractiveObject) theAIS) const
   return aCanBeShaged;
 }
 
+//******************************************************
 void PartSet_Module::addObjectBrowserMenu(QMenu* theMenu) const
 {
   QObjectPtrList aObjects = myWorkshop->selection()->selectedObjects();
@@ -1263,6 +1307,7 @@ void PartSet_Module::addObjectBrowserMenu(QMenu* theMenu) const
   }
 }
 
+//******************************************************
 #define EXPAND_PARENT(OBJ) \
 QModelIndex aObjIndex = aDataModel->objectIndex(OBJ); \
 if (aObjIndex.isValid()) { \
@@ -1272,7 +1317,7 @@ if (aObjIndex.isValid()) { \
     aTreeView->setExpanded(aParent, true); \
 }
 
-
+//******************************************************
 void PartSet_Module::processEvent(const std::shared_ptr<Events_Message>& theMessage)
 {
   if (theMessage->eventID() == Events_Loop::loop()->eventByName(EVENT_DOCUMENT_CHANGED)) {
@@ -1359,6 +1404,7 @@ void PartSet_Module::processEvent(const std::shared_ptr<Events_Message>& theMess
   }
 }
 
+//******************************************************
 void PartSet_Module::onTreeViewDoubleClick(const QModelIndex& theIndex)
 {
   if (myWorkshop->currentOperation()) // Do not change activation of parts if an operation active
@@ -1395,7 +1441,7 @@ void PartSet_Module::onTreeViewDoubleClick(const QModelIndex& theIndex)
   }
 }
 
-
+//******************************************************
 void PartSet_Module::onViewCreated(ModuleBase_IViewWindow*)
 {
   // z layer is created for all started operations in order to visualize operation AIS presentation
@@ -1423,16 +1469,8 @@ void PartSet_Module::onViewCreated(ModuleBase_IViewWindow*)
   }
   // if there is an active operation with validated widget,
   // the filters of this widget should be activated in the created view
-  ModuleBase_Operation* aOperation = myWorkshop->currentOperation();
-  if (aOperation) {
-    ModuleBase_ModelWidget* anActiveWidget = activeWidget();
-    if (anActiveWidget) {
-      ModuleBase_WidgetSelector* aWSelector =
-        dynamic_cast<ModuleBase_WidgetSelector*>(anActiveWidget);
-      if (aWSelector)
-        aWSelector->activateSelectionAndFilters(true);
-    }
-  }
+  myWorkshop->selectionActivate()->updateSelectionFilters();
+  myWorkshop->selectionActivate()->updateSelectionModes();
 }
 
 //******************************************************
@@ -1441,6 +1479,7 @@ void PartSet_Module::widgetStateChanged(int thePreviousState)
   mySketchMgr->widgetStateChanged(thePreviousState);
 }
 
+//******************************************************
 bool PartSet_Module::processEnter(const std::string& thePreviousAttributeID)
 {
   return mySketchReentrantMgr->processEnter(thePreviousAttributeID);

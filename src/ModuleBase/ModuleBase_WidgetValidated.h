@@ -73,12 +73,19 @@ class MODULEBASE_EXPORT ModuleBase_WidgetValidated : public ModuleBase_ModelWidg
   //! Returns data object by AIS
   ObjectPtr findPresentedObject(const AISObjectPtr& theAIS) const;
 
+  /// The method called when widget is deactivated
+  virtual void deactivate();
+
   //! Clear all validated cash in the widget
   void clearValidatedCash();
 
   /// Returns true if the workshop validator filter has been already activated
   /// \return boolean value
   bool isFilterActivated() const;
+
+  /// Appends into container of workshop selection filters
+  /// \param [out] selection filters
+  virtual void selectionFilters(SelectMgr_ListOfFilter& theSelectionFilters);
 
   /// Block the model flush of update and intialization of attribute
   /// \param theAttribute an attribute of blocking
@@ -147,11 +154,6 @@ protected:
   /// The presentations from the object browser are filtered by the AIS context filters
   /// \return a list of presentations
   QList<std::shared_ptr<ModuleBase_ViewerPrs>> getFilteredSelected();
-
-  /// It obtains selection filters from the workshop and activates them in the active viewer
-  /// \param toActivate a flag about activation or deactivation the filters
-  /// \return true if the selection filter of the widget is activated in viewer context
-  bool activateFilters(const bool toActivate);
 
   /// Block the model flush of update and intialization of attribute
   /// \param theAttribute an attribute of blocking

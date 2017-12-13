@@ -21,7 +21,11 @@
 #ifndef ModuleBase_WidgetValidator_H_
 #define ModuleBase_WidgetValidator_H_
 
-#include <ModuleBase.h>
+#include "ModuleBase.h"
+
+#include "ModuleBase_Definitions.h"
+
+#include <SelectMgr_ListOfFilter.hxx>
 
 #include <QList>
 #include <memory>
@@ -47,6 +51,15 @@ class MODULEBASE_EXPORT ModuleBase_WidgetValidator
                              ModuleBase_IWorkshop* theWorkshop);
   virtual ~ModuleBase_WidgetValidator();
 
+  /// Fills given container with selection modes if the widget has it
+  /// \param theModes [out] a container of modes
+  /// \param isAdditional if true, the modes are combinated with the module ones
+  virtual void selectionModes(QIntList& theModes, bool& isAdditional) {}
+
+  /// Appends into container of workshop selection filters
+  /// \param [out] selection filters
+  virtual void selectionFilters(SelectMgr_ListOfFilter& theSelectionFilters);
+
   /// Returns true if the validation is activated
   bool isInValidate() const { return myIsInValidate; }
 
@@ -57,11 +70,6 @@ class MODULEBASE_EXPORT ModuleBase_WidgetValidator
   /// \param theValue a selected presentation in the view
   /// \return a boolean value
   virtual bool isValidSelection(const std::shared_ptr<ModuleBase_ViewerPrs>& theValue);
-
-  /// It obtains selection filters from the workshop and activates them in the active viewer
-  /// \param toActivate a flag about activation or deactivation the filters
-  /// \return true if the selection filter of the widget is activated in viewer context
-  bool activateFilters(const bool toActivate);
 
     /// Creates a backup of the current values of the attribute
   /// It should be realized in the specific widget because of different
@@ -82,13 +90,13 @@ class MODULEBASE_EXPORT ModuleBase_WidgetValidator
   /// \return true if all validators return that the attribute is valid
   bool isValidAttribute(const std::shared_ptr<ModelAPI_Attribute>& theAttribute) const;
 
+  //! Clear all validated cash in the widget
+  void clearValidatedCash();
+
 private:
   /// Returns true if the workshop validator filter has been already activated
   /// \return boolean value
   bool isFilterActivated() const;
-
-  //! Clear all validated cash in the widget
-  void clearValidatedCash();
 
   /// Gets the validity state of the presentation in an internal map.
   /// Returns true if the valid state of value is stored

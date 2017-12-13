@@ -34,6 +34,7 @@
 #include <XGUI_Workshop.h>
 #include <XGUI_ContextMenuMgr.h>
 #include <XGUI_Selection.h>
+#include <XGUI_SelectionActivate.h>
 #include <XGUI_SelectionMgr.h>
 #include <XGUI_ModuleConnector.h>
 #include <XGUI_PropertyPanel.h>
@@ -812,9 +813,11 @@ const QStringList& PartSet_SketcherMgr::constraintsIdList()
   return aConstraintIds;
 }
 
-void PartSet_SketcherMgr::sketchSelectionModes(QIntList& theModes)
+void PartSet_SketcherMgr::sketchSelectionModes(const CompositeFeaturePtr& theSketch,
+                                               QIntList& theModes)
 {
-  theModes.clear();
+  if (!theSketch.get() || !PartSet_Tools::sketchPlane(theSketch).get())
+    return;
 
   theModes.append(SketcherPrs_Tools::Sel_Dimension_Text);
   theModes.append(SketcherPrs_Tools::Sel_Dimension_Line);
@@ -1022,13 +1025,10 @@ void PartSet_SketcherMgr::startSketch(ModuleBase_Operation* theOperation)
   aPln = PartSet_Tools::sketchPlane(myCurrentSketch);
   myPlaneFilter->setPlane(aPln);
 
-  activateSelectionFilters();
+  workshop()->selectionActivate()->updateSelectionFilters();
+  workshop()->selectionActivate()->updateSelectionModes();
 
   Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_TO_REDISPLAY));
-  // all displayed objects should be activated in current selection modes according to switched
-  // plane filter
-  if (aPln.get())
-    aConnector->activateModuleSelectionModes();
 
   myExternalPointsMgr = new PartSet_ExternalPointsMgr(myModule->workshop(), myCurrentSketch);
 }
@@ -1097,10 +1097,8 @@ void PartSet_SketcherMgr::stopSketch(ModuleBase_Operation* theOperation)
 
     Events_Loop::loop()->flush(aDispEvent);
   }
-  deactivateSelectionFilters();
-
-  // restore the module selection modes, which were changed on startSketch
-  aConnector->activateModuleSelectionModes();
+  workshop()->selectionActivate()->updateSelectionFilters();
+  workshop()->selectionActivate()->updateSelectionModes();
 }
 
 void PartSet_SketcherMgr::startNestedSketch(ModuleBase_Operation* theOperation)
@@ -1160,16 +1158,10 @@ void PartSet_SketcherMgr::commitNestedSketch(ModuleBase_Operation* theOperation)
   }
 }
 
-void PartSet_SketcherMgr::activateSelectionFilters()
+void PartSet_SketcherMgr::selectionFilters(SelectMgr_ListOfFilter& theSelectionFilters) const
 {
-  myModule->workshop()->viewer()->addSelectionFilter(myCirclePointFilter);
-  myModule->workshop()->viewer()->addSelectionFilter(myPlaneFilter);
-}
-
-void PartSet_SketcherMgr::deactivateSelectionFilters()
-{
-  myModule->workshop()->viewer()->removeSelectionFilter(myCirclePointFilter);
-  myModule->workshop()->viewer()->removeSelectionFilter(myPlaneFilter);
+  theSelectionFilters.Append(myCirclePointFilter);
+  theSelectionFilters.Append(myPlaneFilter);
 }
 
 void PartSet_SketcherMgr::activatePlaneFilter(const bool& toActivate)
@@ -1483,6 +1475,7 @@ bool PartSet_SketcherMgr::isObjectOfSketch(const ObjectPtr& theObject) const
 void PartSet_SketcherMgr::onPlaneSelected(const std::shared_ptr<GeomAPI_Pln>& thePln)
 {
   myPlaneFilter->setPlane(thePln);
+  workshop()->selectionActivate()->updateSelectionModes();
 }
 
 bool PartSet_SketcherMgr::setDistanceValueByPreselection(ModuleBase_Operation* theOperation,

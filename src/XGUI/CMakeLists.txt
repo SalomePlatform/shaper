@@ -54,6 +54,7 @@ SET(PROJECT_HEADERS
     XGUI_QtEvents.h
     XGUI_SalomeConnector.h
     XGUI_Selection.h
+    XGUI_SelectionActivate.h
     XGUI_SelectionMgr.h
     XGUI_Tools.h
     XGUI_TransparencyWidget.h
@@ -118,6 +119,7 @@ SET(PROJECT_SOURCES
     XGUI_QtEvents.cpp
     XGUI_SalomeConnector.cpp
     XGUI_Selection.cpp
+    XGUI_SelectionActivate.cpp
     XGUI_SelectionMgr.cpp
     XGUI_Tools.cpp
     XGUI_TransparencyWidget.cpp

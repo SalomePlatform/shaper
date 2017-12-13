@@ -26,7 +26,10 @@
 #include <ModelAPI_Object.h>
 
 #include <ModuleBase_ActionType.h>
+#include <ModuleBase_Definitions.h>
 #include <ModuleBase_ViewerPrs.h>
+
+#include <SelectMgr_ListOfFilter.hxx>
 
 #include <QDockWidget>
 #include <QObject>
@@ -73,6 +76,14 @@ public:
   /// Clear content of list widget
   /// \param isToFlushRedisplay flag if redisplay should be flushed immediatelly
   virtual void reset(const bool isToFlushRedisplay);
+
+  /// Fills container with the panel selection mode: FACE
+  // \param theModes [out] a container of modes
+  void selectionModes(QIntList& theModes);
+
+  /// Appends into container of workshop selection filters
+  /// \param [out] selection filters
+  void selectionFilters(SelectMgr_ListOfFilter& theSelectionFilters) {}
 
   /// Returns whether the panel is active or not
   bool isActivePanel() const { return myIsActive; }
@@ -122,13 +133,6 @@ public:
     const std::shared_ptr<GeomAPI_AISObject>& thePresentation);
 
 protected:
-  /// Add panel selection filters to the current viewer
-  virtual void activateSelectionFilters() {}
-
-  /// Remove panel selection filters from the current viewer
-  virtual void deactivateSelectionFilters() {}
-
-protected:
   /// Reimplementation to emit a signal about the panel close
   virtual void closeEvent(QCloseEvent* theEvent);
 
@@ -141,9 +145,6 @@ signals:
   void closed();
 
 private:
-  /// Activate or deactivate selection and selection filters
-  void activateSelection(bool toActivate);
-
   /// Redisplay objects.
   /// \param theObjects container of objects
   /// \param isToFlushRedisplay flag if redisplay should be flushed immediatelly

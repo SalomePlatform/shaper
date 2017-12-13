@@ -49,6 +49,7 @@
 //#define DEBUG_WIDGET_INSTANCE
 //#define DEBUG_ENABLE_SKETCH_INPUT_FIELDS
 
+//**************************************************************
 ModuleBase_ModelWidget::ModuleBase_ModelWidget(QWidget* theParent,
                                                const Config_WidgetAPI* theData)
     : QWidget(theParent),
@@ -85,6 +86,7 @@ ModuleBase_ModelWidget::ModuleBase_ModelWidget(QWidget* theParent,
   connect(this, SIGNAL(valuesModified()), this, SLOT(onWidgetValuesModified()));
 }
 
+//**************************************************************
 ModuleBase_ModelWidget::~ModuleBase_ModelWidget()
 {
 #ifdef DEBUG_WIDGET_INSTANCE
@@ -92,6 +94,7 @@ ModuleBase_ModelWidget::~ModuleBase_ModelWidget()
 #endif
 }
 
+//**************************************************************
 bool ModuleBase_ModelWidget::reset()
 {
   bool aResult = resetCustom();
@@ -101,11 +104,28 @@ bool ModuleBase_ModelWidget::reset()
   return aResult;
 }
 
+//**************************************************************
 bool ModuleBase_ModelWidget::isInitialized(ObjectPtr theObject) const
 {
   return theObject->data()->attribute(attributeID())->isInitialized();
 }
 
+//**************************************************************
+void ModuleBase_ModelWidget::selectionModes(QIntList& theModes, bool& isAdditional)
+{
+  isAdditional = true;
+  if (myWidgetValidator)
+    myWidgetValidator->selectionModes(theModes, isAdditional);
+}
+
+//**************************************************************
+void ModuleBase_ModelWidget::selectionFilters(SelectMgr_ListOfFilter& theSelectionFilters)
+{
+  if (myWidgetValidator)
+    myWidgetValidator->selectionFilters(theSelectionFilters);
+}
+
+//**************************************************************
 bool ModuleBase_ModelWidget::isValueEnabled() const
 {
   bool anEnabled = true;
@@ -124,12 +144,14 @@ bool ModuleBase_ModelWidget::isValueEnabled() const
   return anEnabled;
 }
 
+//**************************************************************
 void ModuleBase_ModelWidget::processValueState()
 {
   if (myState == ModifiedInPP || myState == ModifiedInViewer)
     storeValue();
 }
 
+//**************************************************************
 Events_InfoMessage ModuleBase_ModelWidget::getValueStateError() const
 {
   Events_InfoMessage aMessage;
@@ -157,6 +179,7 @@ Events_InfoMessage ModuleBase_ModelWidget::getValueStateError() const
   return aMessage;
 }
 
+//**************************************************************
 QString ModuleBase_ModelWidget::getError(const bool theValueStateChecked) const
 {
   QString anError;
@@ -194,6 +217,7 @@ QString ModuleBase_ModelWidget::getError(const bool theValueStateChecked) const
   return anError;
 }
 
+//**************************************************************
 void ModuleBase_ModelWidget::enableFocusProcessing()
 {
   QList<QWidget*> aMyControls = getControls();
@@ -203,6 +227,7 @@ void ModuleBase_ModelWidget::enableFocusProcessing()
   }
 }
 
+//**************************************************************
 void ModuleBase_ModelWidget::setHighlighted(bool isHighlighted)
 {
   QList<QWidget*> aWidgetList = getControls();
@@ -217,6 +242,7 @@ void ModuleBase_ModelWidget::setHighlighted(bool isHighlighted)
   }
 }
 
+//**************************************************************
 void ModuleBase_ModelWidget::setFeature(const FeaturePtr& theFeature, const bool theToStoreValue,
                                         const bool isUpdateFlushed)
 {
@@ -234,6 +260,7 @@ void ModuleBase_ModelWidget::setFeature(const FeaturePtr& theFeature, const bool
   myFlushUpdateBlocked = false;
 }
 
+//**************************************************************
 bool ModuleBase_ModelWidget::focusTo()
 {
 #ifdef DEBUG_WIDGET_INSTANCE
@@ -252,6 +279,7 @@ bool ModuleBase_ModelWidget::focusTo()
   return isFocusAccepted;
 }
 
+//**************************************************************
 void ModuleBase_ModelWidget::activate()
 {
 #ifdef DEBUG_WIDGET_INSTANCE
@@ -265,13 +293,10 @@ void ModuleBase_ModelWidget::activate()
     if (anAttribute.get() != NULL && !anAttribute->isInitialized())
       initializeValueByActivate();
   }
-
-  if (myWidgetValidator)
-    myWidgetValidator->activateFilters(true);
-
   activateCustom();
 }
 
+//**************************************************************
 void ModuleBase_ModelWidget::deactivate()
 {
 #ifdef DEBUG_WIDGET_INSTANCE
@@ -280,9 +305,10 @@ void ModuleBase_ModelWidget::deactivate()
   myIsValueStateBlocked = false;
   myState = Stored;
   if (myWidgetValidator)
-    myWidgetValidator->activateFilters(false);
+    myWidgetValidator->clearValidatedCash();
 }
 
+//**************************************************************
 void ModuleBase_ModelWidget::initializeValueByActivate()
 {
   if (isComputedDefault()) {
@@ -295,6 +321,7 @@ void ModuleBase_ModelWidget::initializeValueByActivate()
   }
 }
 
+//**************************************************************
 QWidget* ModuleBase_ModelWidget::getControlAcceptingFocus(const bool isFirst)
 {
   QWidget* aControl = 0;
@@ -317,11 +344,13 @@ QWidget* ModuleBase_ModelWidget::getControlAcceptingFocus(const bool isFirst)
   return aControl;
 }
 
+//**************************************************************
 void ModuleBase_ModelWidget::setDefaultValue(const std::string& theValue)
 {
   myDefaultValue = theValue;
 }
 
+//**************************************************************
 bool ModuleBase_ModelWidget::storeValue()
 {
   setValueState(Stored);
@@ -348,6 +377,8 @@ bool ModuleBase_ModelWidget::storeValue()
   return isDone;
 }
 #ifdef DEBUG_VALUE_STATE
+
+//**************************************************************
 std::string getDebugInfo(const ModuleBase_ModelWidget::ValueState& theState)
 {
   std::string anInfo;
@@ -360,8 +391,9 @@ std::string getDebugInfo(const ModuleBase_ModelWidget::ValueState& theState)
   }
   return anInfo;
 }
-
 #endif
+
+//**************************************************************
 ModuleBase_ModelWidget::ValueState ModuleBase_ModelWidget::setValueState
                                          (const ModuleBase_ModelWidget::ValueState& theState)
 {
@@ -379,6 +411,7 @@ ModuleBase_ModelWidget::ValueState ModuleBase_ModelWidget::setValueState
   return aState;
 }
 
+//**************************************************************
 bool ModuleBase_ModelWidget::blockValueState(const bool theBlocked)
 {
   bool isBlocked = myIsValueStateBlocked;
@@ -386,6 +419,7 @@ bool ModuleBase_ModelWidget::blockValueState(const bool theBlocked)
   return isBlocked;
 }
 
+//**************************************************************
 bool ModuleBase_ModelWidget::restoreValue()
 {
   emit beforeValuesRestored();
@@ -395,6 +429,7 @@ bool ModuleBase_ModelWidget::restoreValue()
   return isDone;
 }
 
+//**************************************************************
 void ModuleBase_ModelWidget::updateObject(ObjectPtr theObject)
 {
   if (!myFlushUpdateBlocked) {
@@ -406,6 +441,7 @@ void ModuleBase_ModelWidget::updateObject(ObjectPtr theObject)
   }
 }
 
+//**************************************************************
 bool ModuleBase_ModelWidget::canProcessAction(ModuleBase_ActionType theActionType,
                                               bool& isActionEnabled)
 {
@@ -414,6 +450,7 @@ bool ModuleBase_ModelWidget::canProcessAction(ModuleBase_ActionType theActionTyp
     case ActionEnter: return false;
     case ActionEscape: return false;
     case ActionDelete: return true;
+    case ActionSelection: return true;
     case ActionUndo:
     case ActionRedo:
     default:
@@ -421,6 +458,7 @@ bool ModuleBase_ModelWidget::canProcessAction(ModuleBase_ActionType theActionTyp
   }
 }
 
+//**************************************************************
 bool ModuleBase_ModelWidget::processAction(ModuleBase_ActionType theActionType,
                                            const ActionParamPtr& theParam)
 {
@@ -431,6 +469,8 @@ bool ModuleBase_ModelWidget::processAction(ModuleBase_ActionType theActionType,
       return processEscape();
     case ActionDelete:
       return processDelete();
+    case ActionSelection:
+      processSelection();
     case ActionUndo:
     case ActionRedo:
     default:
@@ -438,16 +478,19 @@ bool ModuleBase_ModelWidget::processAction(ModuleBase_ActionType theActionType,
   }
 }
 
+//**************************************************************
 bool ModuleBase_ModelWidget::processEnter()
 {
   return false;
 }
 
+//**************************************************************
 bool ModuleBase_ModelWidget::processEscape()
 {
   return false;
 }
 
+//**************************************************************
 bool ModuleBase_ModelWidget::processDelete()
 {
   // we consider that model objects eats delete key in order to
@@ -455,6 +498,13 @@ bool ModuleBase_ModelWidget::processDelete()
   return true;
 }
 
+//**************************************************************
+bool ModuleBase_ModelWidget::processSelection()
+{
+  return false;
+}
+
+//**************************************************************
 bool ModuleBase_ModelWidget::eventFilter(QObject* theObject, QEvent *theEvent)
 {
   QWidget* aWidget = qobject_cast<QWidget*>(theObject);

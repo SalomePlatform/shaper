@@ -32,6 +32,7 @@
 #include "GeomDataAPI_Point2D.h"
 
 #include <ModuleBase_IPropertyPanel.h>
+#include <ModuleBase_ISelectionActivate.h>
 #include <ModuleBase_OperationFeature.h>
 #include <ModuleBase_ModelWidget.h>
 #include <ModuleBase_ViewerPrs.h>
@@ -42,6 +43,7 @@
 #include <ModuleBase_OperationDescription.h>
 #include "ModuleBase_ToolBox.h"
 #include "ModuleBase_ISelection.h"
+#include "ModuleBase_ISelectionActivate.h"
 
 #include <SketchPlugin_Feature.h>
 #include <SketchPlugin_Line.h>
@@ -332,8 +334,9 @@ void PartSet_SketcherReentrantMgr::onWidgetActivated()
   ModuleBase_IPropertyPanel* aPanel = aModule->currentOperation()->propertyPanel();
   if (aFirstWidget != aPanel->activeWidget()) {
     ModuleBase_WidgetSelector* aWSelector = dynamic_cast<ModuleBase_WidgetSelector*>(aFirstWidget);
-    if (aWSelector)
-      aWSelector->activateSelectionAndFilters(true);
+    if (aWSelector) {
+      myWorkshop->selectionActivate()->activateSelectionAndFilters(aWSelector);
+    }
   }
 }
 
@@ -660,7 +663,7 @@ void PartSet_SketcherReentrantMgr::deleteInternalFeature()
     ModuleBase_WidgetSelector* aWSelector =
       dynamic_cast<ModuleBase_WidgetSelector*>(myInternalActiveWidget);
     if (aWSelector)
-      aWSelector->activateSelectionAndFilters(false);
+      myWorkshop->selectionActivate()->activateSelectionAndFilters(aWSelector);
     myInternalActiveWidget = 0;
   }
   delete myInternalWidget;

@@ -24,8 +24,9 @@
 #include "XGUI_SelectionMgr.h"
 #include "XGUI_Displayer.h"
 #include "XGUI_ViewerProxy.h"
-#include "XGUI_Selection.h"
 #include "XGUI_SalomeConnector.h"
+#include "XGUI_Selection.h"
+#include "XGUI_SelectionActivate.h"
 #include "XGUI_DataModel.h"
 #include "XGUI_OperationMgr.h"
 #include "XGUI_Tools.h"
@@ -541,7 +542,7 @@ void XGUI_ContextMenuMgr::updateViewerMenu()
 #endif
 
   // Update selection menu
-  QIntList aModes = aDisplayer->activeSelectionModes();
+  QIntList aModes = myWorkshop->selectionActivate()->activeSelectionModes();
   action("SELECT_VERTEX_CMD")->setEnabled(true);
   action("SELECT_EDGE_CMD")->setEnabled(true);
   action("SELECT_FACE_CMD")->setEnabled(true);
@@ -781,9 +782,8 @@ void XGUI_ContextMenuMgr::addViewerMenu(QMenu* theMenu) const
 
   // Create selection menu
   XGUI_OperationMgr* aOpMgr = myWorkshop->operationMgr();
-  QIntList aModes;
-  myWorkshop->module()->activeSelectionModes(aModes);
-  if ((!aOpMgr->hasOperation()) && aModes.isEmpty()) {
+  if (!aOpMgr->hasOperation() &&
+      myWorkshop->selectionActivate()->activeSelectionPlace() == XGUI_SelectionActivate::Workshop) {
     QMenu* aSelMenu = new QMenu(tr("Selection mode"), theMenu);
     aSelMenu->addAction(action("SELECT_VERTEX_CMD"));
     aSelMenu->addAction(action("SELECT_EDGE_CMD"));

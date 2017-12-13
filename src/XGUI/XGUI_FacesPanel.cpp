@@ -94,6 +94,12 @@ void XGUI_FacesPanel::reset(const bool isToFlushRedisplay)
 }
 
 //********************************************************************
+void XGUI_FacesPanel::selectionModes(QIntList& theModes)
+{
+  theModes.append(TopAbs_FACE);
+}
+
+//********************************************************************
 bool XGUI_FacesPanel::eventFilter(QObject* theObject, QEvent *theEvent)
 {
   QWidget* aWidget = qobject_cast<QWidget*>(theObject);
@@ -116,17 +122,9 @@ void XGUI_FacesPanel::setActivePanel(const bool theIsActive)
   myIsActive = theIsActive;
 
   if (myIsActive)
-  {
     emit activated();
-    // selection should be activated after emit signal, that deactivates current widget(selection)
-    activateSelection(theIsActive);
-  }
   else
-  {
-    // selection should be activated after emit signal, that deactivates current widget(selection)
-    activateSelection(theIsActive);
     emit deactivated();
-  }
 }
 
 //********************************************************************
@@ -367,23 +365,6 @@ void XGUI_FacesPanel::closeEvent(QCloseEvent* theEvent)
 {
   QDockWidget::closeEvent(theEvent);
   emit closed();
-}
-
-//********************************************************************
-void XGUI_FacesPanel::activateSelection(bool toActivate)
-{
-  QIntList aShapeTypes;
-  aShapeTypes.append(TopAbs_FACE);
-
-  if (toActivate) {
-    myWorkshop->activateSubShapesSelection(aShapeTypes);
-  } else {
-    myWorkshop->deactivateSubShapesSelection();
-  }
-  if (toActivate)
-    activateSelectionFilters();
-  else
-    deactivateSelectionFilters();
 }
 
 //********************************************************************

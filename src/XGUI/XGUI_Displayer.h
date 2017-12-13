@@ -24,27 +24,27 @@
 #include "XGUI.h"
 
 #include <GeomAPI_AISObject.h>
-#include <TopoDS_Shape.hxx>
-#include <AIS_InteractiveObject.hxx>
-#include <AIS_InteractiveContext.hxx>
-#include <NCollection_Map.hxx>
-#include <NCollection_DataMap.hxx>
+#include <GeomAPI_ICustomPrs.h>
 
 #include <ModelAPI_Result.h>
 
 #include <ModuleBase_Definitions.h>
 
-#include <GeomAPI_ICustomPrs.h>
-
+#include <AIS_InteractiveObject.hxx>
+#include <AIS_InteractiveContext.hxx>
+#include <NCollection_Map.hxx>
+#include <NCollection_DataMap.hxx>
 #include <SelectMgr_AndFilter.hxx>
+#include <TopoDS_Shape.hxx>
 
-#include <QString>
+#include <QColor>
 #include <QMap>
 #include <QObject>
-#include <QColor>
+#include <QString>
 
 class ModuleBase_ViewerPrs;
 class ModelAPI_Feature;
+class XGUI_SelectionActivate;
 class XGUI_Workshop;
 
 #ifdef TINSPECTOR
@@ -61,12 +61,9 @@ class XGUI_EXPORT XGUI_Displayer: public QObject
  public:
    /// \enum DisplayMode display mode
    enum DisplayMode {
-     /// Mode is not defined
-     NoMode = -1,
-     /// Wireframe display mode
-     Wireframe,
-     /// Shading display mode
-     Shading
+     NoMode = -1, ///< Mode is not defined
+     Wireframe, ///< Wireframe display mode
+     Shading ///< Shading display mode
    };
 
   /// Constructor
@@ -138,12 +135,9 @@ class XGUI_EXPORT XGUI_Displayer: public QObject
   /// \return true if the object visibility state is changed
   bool eraseAll(const bool theUpdateViewer = true);
 
-  /// Deactivates selection of sub-shapes
-  /// \param theUpdateViewer the parameter whether the viewer should be update immediatelly
-  //void closeLocalContexts(const bool theUpdateViewer = true);
-
   /// Remove default selection filters of the module from the current viewer
-  void deactivateSelectionFilters();
+  /// \param theAddFilterOnly if is not 'true' it will deactivate all fiters in viewer
+  void deactivateSelectionFilters(const bool theAddFilterOnly = true);
 
   /// \brief Add selection filter
   /// \param theFilter a filter instance
@@ -174,19 +168,6 @@ class XGUI_EXPORT XGUI_Displayer: public QObject
   /// Updates the viewer
   void updateViewer() const;
 
-  /// Activate interactive context
-  /// \param theIO an interactive object
-  /// \param theMode activation mode
-  /// \param theUpdateViewer update viewer flag
-  void activateAIS(const Handle(AIS_InteractiveObject)& theIO, const int theMode,
-                   const bool theUpdateViewer) const;
-
-  /// Activate interactive context. It is necessary to call ClearOutdatedSelection
-  /// after deactivation
-  /// \param theIO an interactive object
-  /// \param theMode a mode to deactivate. When theMode=-1 then all modes will be deactivated
-  void deactivateAIS(const Handle(AIS_InteractiveObject)& theIO, const int theMode = -1) const;
-
   /// Searches the interactive object by feature
   /// \param theObject the object or presentable feature
   /// \return theIO an interactive object
@@ -207,22 +188,6 @@ class XGUI_EXPORT XGUI_Displayer: public QObject
   /// \param theUpdateViewer update viewer flag
   void deactivateObjects(const QObjectPtrList& theObjList,
                          const bool theUpdateViewer = true);
-
-  /// Returns the modes of activation
-  /// \param theObject the feature or NULL if it not visualized
-  /// \param theModes - modes on which it is activated (can be empty)
-  void getModesOfActivation(ObjectPtr theObject, QIntList& theModes);
-
-  /// Returns true if the given object can be selected
-  /// \param theObject object to check
-  bool isActive(ObjectPtr theObject) const;
-
-  /// Activates in local context displayed outside of the context.
-  /// \param theModes - modes on which it has to be activated (can be empty)
-  /// \param theObjList - list of objects which has to be activated.
-  /// \param theUpdateViewer an update viewer flag
-  void activateObjects(const QIntList& theModes, const QObjectPtrList& theObjList,
-                       const bool theUpdateViewer = true);
 
   /// Sets display mode for the given object if this object is displayed
   void setDisplayMode(ObjectPtr theObject, DisplayMode theMode, bool theUpdateViewer = true);
@@ -256,31 +221,15 @@ class XGUI_EXPORT XGUI_Displayer: public QObject
   /// \return previously defined color on the object
   QColor setObjectColor(ObjectPtr theObject, const QColor& theColor, bool theUpdateViewer = true);
 
-  /// Returns Trihedron object if it is displayed
-  Handle(AIS_InteractiveObject) getTrihedron() const;
-
-  /// Set trihedron active (used in selection) or non active
-  void activateTrihedron(bool theIsActive);
-
   /// Displays/erases thrihedron in current modes. It will be activated or deactivated
   /// depending on the trihedron visible state and displayer active trihedron state
   void displayTrihedron(bool theToDisplay) const;
-
-  /// Returns true if the trihedron should be activated in current selection modes
-  bool isTrihedronActive() const { return myIsTrihedronActive; }
-
-  /// Returns list of currently active selection modes
-  /// Selection modes will be returned according to TopAbs_ShapeEnum
-  QIntList activeSelectionModes() const;
 
 #ifdef TINSPECTOR
   void setCallBack(const Handle(VInspectorAPI_CallBack)& theCallBack)
     { myVCallBack = theCallBack; }
   Handle(VInspectorAPI_CallBack) getCallBack() const { return myVCallBack; }
 #endif
-  /// Converts shape type (TopAbs_ShapeEnum) to selection mode
-  /// \param theShapeType a shape type from TopAbs_ShapeEnum
-  static int getSelectionMode(int theShapeType);
 
   /// Return true if the object is visible. If the object is feature, it returns true
   /// if all results of the feature are shown
@@ -318,21 +267,6 @@ signals:
                bool theUpdateViewer = true);
 
 private:
-  /// Activates the interactive object in the local context.
-  /// \param theIO an interactive object
-  /// \param theModes - modes on which it has to be activated (can be empty)
-  /// \return a flag is object activated or not
-  bool activate(const Handle(AIS_InteractiveObject)& theIO, const QIntList& theModes,
-                const bool theUpdateViewer) const;
-
-  /// Deactivates the given object (not allow selection)
-  /// \param theObject object to deactivate
-  void deactivate(ObjectPtr theObject, const bool theUpdateViewer);
-
-  /// Find a trihedron in a list of displayed presentations and deactivate it.
-  /// \param theUpdateViewer an update viewer flag
-  void deactivateTrihedron(const bool theUpdateViewer) const;
-
   /// Update the object presentable properties such as color, lines width and other
   /// If the object is result with the color attribute value set, it is used,
   /// otherwise the customize is applyed to the object's feature if it is a custom prs
@@ -366,17 +300,18 @@ private:
   /// owner is selected if it is found there.
   /// Only first owner is processed(according to OCCT logic)
   static void AddOrRemoveSelectedShapes(Handle(AIS_InteractiveContext) theContext,
-          const NCollection_DataMap<TopoDS_Shape,
-                          NCollection_Map<Handle(AIS_InteractiveObject)>>& theShapesToBeSelected);
+    const NCollection_DataMap<TopoDS_Shape,
+      NCollection_Map<Handle(AIS_InteractiveObject)>>& theShapesToBeSelected);
 
- protected:
-   /// Reference to workshop
-  XGUI_Workshop* myWorkshop;
+protected:
+  XGUI_SelectionActivate* selectionActivate() const;
+
+protected:
+  XGUI_Workshop* myWorkshop; ///< Reference to workshop
 #ifdef TINSPECTOR
   Handle(VInspectorAPI_CallBack) myVCallBack;
 #endif
-  /// A container for selection filters
-  Handle(SelectMgr_AndFilter) myAndFilter;
+  Handle(SelectMgr_AndFilter) myAndFilter; ///< A container for selection filters
 
   /// A default custom presentation, which is used if the displayed feature is not
   /// a custom presentation
@@ -384,24 +319,13 @@ private:
 
   /// Definition of a type of map which defines correspondance between objects and presentations
   typedef QMap<ObjectPtr, AISObjectPtr> ResultToAISMap;
+  ResultToAISMap myResult2AISObjectMap; ///< A map of displayed objects
 
-  /// A map of displayed objects
-  ResultToAISMap myResult2AISObjectMap;
-
-  /// Selection modes installed for external objects in local context
-  QIntList myActiveSelectionModes;
-
-  /// Number of blocking of the viewer update. The viewer is updated only if it equals zero
+  /// Number of blocking of the viewer update. The viewer is updated only if it is zero
   int myViewerBlockedRecursiveCount;
 
-  /// Flag: first asking of AIS context: trihedron activation
-  bool myIsFirstAISContextUse;
-
-  /// Flag: use trihedgon for selection or not
-  bool myIsTrihedronActive;
-
-  /// A flag that update was requested but not done
-  mutable bool myNeedUpdate;
+  bool myIsFirstAISContextUse; ///< Flag: first asking of AIS context: trihedron activation
+  mutable bool myNeedUpdate; ///< A flag that update was requested but not done
 };
 
 #endif

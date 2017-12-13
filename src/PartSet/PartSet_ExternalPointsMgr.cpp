@@ -40,6 +40,7 @@
 #include <XGUI_Tools.h>
 #include <XGUI_Displayer.h>
 #include <XGUI_Workshop.h>
+#include <XGUI_SelectionActivate.h>
 #include <XGUI_SelectionMgr.h>
 
 PartSet_ExternalPointsMgr::PartSet_ExternalPointsMgr(ModuleBase_IWorkshop* theWorkshop,
@@ -179,7 +180,8 @@ void PartSet_ExternalPointsMgr::updateCenterPresentations()
       myPresentations[aPrs->object()] = aList;
     foreach(AISObjectPtr anAIS, aList) {
       aDisplayer->displayAIS(anAIS, false);
-      aDisplayer->activateAIS(anAIS->impl<Handle(AIS_InteractiveObject)>(), TopAbs_VERTEX, false);
+      aWorkshop->selectionActivate()->activateAIS(anAIS->impl<Handle(AIS_InteractiveObject)>(),
+        TopAbs_VERTEX, false);
     }
   }
 }

@@ -20,18 +20,19 @@
 
 #include <ModuleBase_WidgetMultiSelector.h>
 
+#include <ModuleBase_ActionIntParameter.h>
 #include <ModuleBase_Definitions.h>
 #include <ModuleBase_Events.h>
 #include <ModuleBase_IconFactory.h>
 #include <ModuleBase_IModule.h>
 #include <ModuleBase_ISelection.h>
+#include <ModuleBase_ISelectionActivate.h>
 #include <ModuleBase_IViewer.h>
 #include <ModuleBase_IWorkshop.h>
 #include <ModuleBase_ListView.h>
 #include <ModuleBase_Tools.h>
 #include <ModuleBase_ViewerPrs.h>
 #include <ModuleBase_WidgetShapeSelector.h>
-#include <ModuleBase_ActionIntParameter.h>
 
 #include <ModelAPI_Data.h>
 #include <ModelAPI_Object.h>
@@ -291,6 +292,7 @@ bool ModuleBase_WidgetMultiSelector::canProcessAction(ModuleBase_ActionType theA
     }
     break;
     default:
+      aCanProcess = ModuleBase_WidgetSelector::canProcessAction(theActionType, isActionEnabled);
     break;
   }
   return aCanProcess;
@@ -330,10 +332,10 @@ bool ModuleBase_WidgetMultiSelector::processAction(ModuleBase_ActionType theActi
 }
 
 //********************************************************************
-bool ModuleBase_WidgetMultiSelector::activateSelectionAndFilters(bool toActivate)
+void ModuleBase_WidgetMultiSelector::activateSelectionAndFilters(bool toActivate)
 {
   myWorkshop->updateCommandStatus(); // update enable state of Undo/Redo application actions
-  return ModuleBase_WidgetSelector::activateSelectionAndFilters(toActivate);
+  ModuleBase_WidgetSelector::activateSelectionAndFilters(toActivate);
 }
 
 //********************************************************************
@@ -429,6 +431,7 @@ QList<QWidget*> ModuleBase_WidgetMultiSelector::getControls() const
 void ModuleBase_WidgetMultiSelector::onSelectionTypeChanged()
 {
   activateSelectionAndFilters(true);
+  myWorkshop->selectionActivate()->updateSelectionModes();
 
   if (!myFeature)
     return;
@@ -469,7 +472,7 @@ void ModuleBase_WidgetMultiSelector::onSelectionTypeChanged()
 }
 
 //********************************************************************
-void ModuleBase_WidgetMultiSelector::onSelectionChanged()
+bool ModuleBase_WidgetMultiSelector::processSelection()
 {
   if (!myIsNeutralPointClear) {
     QList<ModuleBase_ViewerPrsPtr> aSelected = getFilteredSelected();
@@ -481,13 +484,14 @@ void ModuleBase_WidgetMultiSelector::onSelectionChanged()
         static Events_ID anEvent = Events_Loop::eventByName(EVENT_UPDATE_BY_WIDGET_SELECTION);
         ModelAPI_EventCreator::get()->sendUpdated(myFeature, anEvent);
         Events_Loop::loop()->flush(anEvent);
-        return;
+        return true;
       }
     }
   }
   appendFirstSelectionInHistory();
-  ModuleBase_WidgetSelector::onSelectionChanged();
+  bool aDone = ModuleBase_WidgetSelector::processSelection();
   appendSelectionInHistory();
+  return aDone;
 }
 
 void ModuleBase_WidgetMultiSelector::appendFirstSelectionInHistory()
@@ -588,12 +592,11 @@ void ModuleBase_WidgetMultiSelector::setCurrentShapeType(const int theShapeType)
     aShapeTypeName = myTypeCombo->itemText(idx);
     int aRefType = ModuleBase_Tools::shapeType(aShapeTypeName);
     if(aRefType == theShapeType && idx != myTypeCombo->currentIndex()) {
-      bool aWasActivated = activateSelectionAndFilters(false);
+      activateSelectionAndFilters(false);
       bool isBlocked = myTypeCombo->blockSignals(true);
       myTypeCombo->setCurrentIndex(idx);
       myTypeCombo->blockSignals(isBlocked);
-      if (aWasActivated)
-        activateSelectionAndFilters(true);
+      activateSelectionAndFilters(true);
       break;
     }
   }

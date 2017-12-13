@@ -21,8 +21,9 @@
 #include "XGUI_ModuleConnector.h"
 #include "XGUI_Workshop.h"
 #include "XGUI_ViewerProxy.h"
-#include "XGUI_SelectionMgr.h"
 #include "XGUI_Selection.h"
+#include "XGUI_SelectionActivate.h"
+#include "XGUI_SelectionMgr.h"
 #include "XGUI_OperationMgr.h"
 #include "XGUI_Displayer.h"
 #include "XGUI_PropertyPanel.h"
@@ -78,6 +79,11 @@ ModuleBase_IErrorMgr* XGUI_ModuleConnector::errorMgr() const
   return myWorkshop->errorMgr();
 }
 
+ModuleBase_ISelectionActivate* XGUI_ModuleConnector::selectionActivate() const
+{
+  return myWorkshop->selectionActivate();
+}
+
 ModuleBase_Operation* XGUI_ModuleConnector::currentOperation() const
 {
   return myWorkshop->operationMgr()->currentOperation();
@@ -94,27 +100,6 @@ QObjectPtrList XGUI_ModuleConnector::activeObjects(const QObjectPtrList& theObjL
       aActiveOPbjects.append(aObj);
   }
   return aActiveOPbjects;
-}
-
-void XGUI_ModuleConnector::activateSubShapesSelection(const QIntList& theTypes)
-{
-  QIntList aTypes = theTypes;
-
-  XGUI_Displayer* aDisp = myWorkshop->displayer();
-  myWorkshop->module()->customSubShapesSelectionModes(aTypes);
-  aDisp->activateObjects(aTypes, activeObjects(aDisp->displayedObjects()));
-}
-
-void XGUI_ModuleConnector::deactivateSubShapesSelection()
-{
-  // Clear selection modes
-  activateModuleSelectionModes();
-}
-
-void XGUI_ModuleConnector::activateModuleSelectionModes()
-{
-  XGUI_Displayer* aDisp = myWorkshop->displayer();
-  myWorkshop->activateObjectsSelection(activeObjects(aDisp->displayedObjects()));
 }
 
 AISObjectPtr XGUI_ModuleConnector::findPresentation(const ObjectPtr& theObject) const

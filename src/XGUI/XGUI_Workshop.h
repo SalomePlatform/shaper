@@ -30,6 +30,8 @@
 #include <ModuleBase_ActionType.h>
 #include <ModuleBase_Definitions.h>
 
+#include <SelectMgr_ListOfFilter.hxx>
+
 #include <QIcon>
 #include <QObject>
 #include <QKeySequence>
@@ -57,6 +59,7 @@ class XGUI_OperationMgr;
 class XGUI_PropertyPanel;
 class XGUI_SalomeConnector;
 class XGUI_SalomeViewer;
+class XGUI_SelectionActivate;
 class XGUI_SelectionMgr;
 class XGUI_ViewerProxy;
 class XGUI_WorkshopListener;
@@ -102,6 +105,9 @@ Q_OBJECT
 
   /// Returns selection manager object
   XGUI_SelectionMgr* selector() const { return mySelector; }
+
+  /// Returns selection activating object
+  XGUI_SelectionActivate* selectionActivate() const { return mySelectionActivate; }
 
   /// Returns displayer
   XGUI_Displayer* displayer() const { return myDisplayer; }
@@ -289,6 +295,10 @@ Q_OBJECT
 
   /// Returns defailt selection mode in 3d viewer
   QIntList viewerSelectionModes() const { return myViewerSelMode; }
+
+  /// Appends into container of workshop selection filters
+  /// \param [out] selection filters
+  void selectionFilters(SelectMgr_ListOfFilter& theSelectionFilters);
 
   /// Highlights result objects in Object Browser according to
   /// features found in the given list
@@ -503,6 +513,7 @@ private:
   XGUI_PropertyPanel* myPropertyPanel; ///< container of feature attributes widgets
   XGUI_FacesPanel* myFacesPanel; ///< panel for hide object faces
   XGUI_SelectionMgr* mySelector; ///< handler of selection processing
+  XGUI_SelectionActivate* mySelectionActivate; /// manager of selection activating
   XGUI_Displayer* myDisplayer; ///< handler of objects display
   XGUI_OperationMgr* myOperationMgr;  ///< manager to manipulate through the operations
   XGUI_ActionsMgr* myActionsMgr; ///< manager of workshop actions

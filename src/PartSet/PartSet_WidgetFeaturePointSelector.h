@@ -74,7 +74,7 @@ Q_OBJECT
 
   /// Activate or deactivate selection and selection filters
   /// \return true if the selection filter of the widget is activated in viewer context
-  virtual bool activateSelectionAndFilters(bool toActivate);
+  virtual void activateSelectionAndFilters(bool toActivate);
 
   /// Set sketcher
   /// \param theSketch a sketcher object

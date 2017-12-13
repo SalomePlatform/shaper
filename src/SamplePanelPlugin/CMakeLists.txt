@@ -77,6 +77,7 @@ ADD_LIBRARY(SamplePanelPlugin MODULE
 TARGET_LINK_LIBRARIES(SamplePanelPlugin ${PROJECT_LIBRARIES})
 
 INCLUDE_DIRECTORIES(
+  ${CAS_INCLUDE_DIRS}
   ../Config
   ../Events
   ../ModelAPI

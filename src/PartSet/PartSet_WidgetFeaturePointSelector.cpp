@@ -86,7 +86,7 @@ bool PartSet_WidgetFeaturePointSelector::isValidSelection(
 }
 
 //********************************************************************
-bool PartSet_WidgetFeaturePointSelector::activateSelectionAndFilters(bool toActivate)
+void PartSet_WidgetFeaturePointSelector::activateSelectionAndFilters(bool toActivate)
 {
 #ifdef HIGHLIGHT_STAYS_PROBLEM
   Handle(AIS_InteractiveContext) aContext =
@@ -113,7 +113,7 @@ bool PartSet_WidgetFeaturePointSelector::activateSelectionAndFilters(bool toActi
 
 #endif
 
-  return ModuleBase_WidgetShapeSelector::activateSelectionAndFilters(toActivate);
+  ModuleBase_WidgetShapeSelector::activateSelectionAndFilters(toActivate);
 }
 
 //********************************************************************

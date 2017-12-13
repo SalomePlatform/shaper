@@ -23,10 +23,13 @@
 
 #include <ModuleBase.h>
 #include <ModuleBase_ActionType.h>
+#include <ModuleBase_Definitions.h>
 #include <ModuleBase_OperationFeature.h>
 #include <ModuleBase_ActionInfo.h>
 #include <ModuleBase_ActionParameter.h>
 #include <ModelAPI_Feature.h>
+
+#include <SelectMgr_ListOfFilter.hxx>
 
 #include <QWidget>
 
@@ -82,6 +85,15 @@ Q_OBJECT
   /// \param theObject a model feature to be checked
   /// \return the boolean result
   bool isInitialized(ObjectPtr theObject) const;
+
+  /// Fills given container with selection modes if the widget has it
+  /// \param theModes [out] a container of modes
+  /// \param isAdditional if true, the modes are combinated with the module ones
+  virtual void selectionModes(QIntList& theModes, bool& isAdditional);
+
+  /// Appends into container of workshop selection filters
+  /// \param [out] selection filters
+  virtual void selectionFilters(SelectMgr_ListOfFilter& theSelectionFilters);
 
   /// Returns true, if default value of the widget should be computed
   /// on operation's execute, like radius for circle's constraint (can not be zero)
@@ -363,7 +375,10 @@ protected:
   //// Returns true if the event is processed. The default implementation is empty, returns false.
   virtual bool processDelete();
 
-protected slots:
+  /// Returns true if envent is processed. It applyes workshop selection for the widget attribute.
+  virtual bool processSelection();
+
+  protected slots:
   /// Processing of values changed in model widget by store the current value to the feature
   void onWidgetValuesChanged();
 

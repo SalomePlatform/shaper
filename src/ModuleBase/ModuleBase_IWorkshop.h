@@ -37,6 +37,7 @@ class ModuleBase_IViewer;
 class ModuleBase_IPropertyPanel;
 class ModuleBase_IErrorMgr;
 class ModuleBase_Operation;
+class ModuleBase_ISelectionActivate;
 class ModuleBase_ViewerPrs;
 class QMainWindow;
 
@@ -58,16 +59,6 @@ Q_OBJECT
   /// Return current selection instance
   virtual ModuleBase_ISelection* selection() const = 0;
 
-  /// Activate sub-shapes selection (opens local context)
-  /// Types has to be defined according to TopAbs_ShapeEnum
-  virtual void activateSubShapesSelection(const QIntList& theTypes) = 0;
-
-  /// Activate objects in the module selection modes(opens local context)
-  virtual void activateModuleSelectionModes() = 0;
-
-  /// Deactivate sub-shapes selection (closes local context)
-  virtual void deactivateSubShapesSelection() = 0;
-
   //! Returns instance of loaded module
   virtual ModuleBase_IModule* module() const = 0;
 
@@ -83,6 +74,9 @@ Q_OBJECT
   /// A filter to process an attribute validators
   /// \return a filter
   Handle(ModuleBase_FilterValidated) validatorFilter();
+
+  /// A selection activate in 3D View handler
+  virtual ModuleBase_ISelectionActivate* selectionActivate() const = 0;
 
   //! Returns currently active operation
   virtual ModuleBase_Operation* currentOperation() const = 0;

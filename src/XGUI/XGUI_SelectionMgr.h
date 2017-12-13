@@ -28,6 +28,7 @@
 #include <QObject>
 #include <QModelIndexList>
 
+#include <AIS_InteractiveObject.hxx>
 #include <AIS_ListOfInteractive.hxx>
 #include <NCollection_List.hxx>
 #include <TopoDS_Shape.hxx>
@@ -73,6 +74,10 @@ Q_OBJECT
   //! Selection is not synchronized between these controls.
   //! \param theValues a container of values to be selected.
   void setSelected(const QList<std::shared_ptr<ModuleBase_ViewerPrs> >& theValues);
+
+  //! Find all selected owners of the object and remove the owners from selection
+  //! \param theObject an interactive object
+  void deselectPresentation(const Handle(AIS_InteractiveObject) theObject);
 
   /// Updates selection, which are depend on the selection in the given place
   /// \param thePlace a widget where selection has happened.

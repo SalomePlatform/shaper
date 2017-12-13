@@ -31,6 +31,7 @@
 #include <XGUI_Displayer.h>
 #include <XGUI_MenuMgr.h>
 #include <XGUI_FacesPanel.h>
+#include <XGUI_SelectionActivate.h>
 
 #include <ModuleBase_Operation.h>
 #include <ModuleBase_Preferences.h>
@@ -353,7 +354,8 @@ void SHAPERGUI::onViewManagerAdded(SUIT_ViewManager* theMgr)
 {
   if (!mySelector) {
     mySelector = createSelector(theMgr);
-    myWorkshop->module()->activateSelectionFilters();
+    myWorkshop->selectionActivate()->updateSelectionFilters();
+    myWorkshop->selectionActivate()->updateSelectionModes();
     myWorkshop->synchronizeViewer();
   }
 }

@@ -20,6 +20,7 @@
 
 #include <XGUI_ActionsMgr.h>
 #include <XGUI_ActiveControlMgr.h>
+#include <XGUI_SelectionActivate.h>
 #include <XGUI_ActiveControlSelector.h>
 #include <XGUI_PropertyPanel.h>
 #include <XGUI_PropertyPanelSelector.h>
@@ -151,6 +152,9 @@ void XGUI_PropertyPanel::cleanContent()
   myWidgets.clear();
   myPanelPage->clearPage();
   myActiveWidget = NULL;
+  emit propertyPanelDeactivated();
+  myOperationMgr->workshop()->selectionActivate()->updateSelectionModes();
+  myOperationMgr->workshop()->selectionActivate()->updateSelectionFilters();
 #ifdef DEBUG_ACTIVE_WIDGET
   std::cout << "myActiveWidget = NULL" << std::endl;
 #endif
@@ -487,6 +491,9 @@ bool XGUI_PropertyPanel::setActiveWidget(ModuleBase_ModelWidget* theWidget)
     theWidget->activate();
   }
   myActiveWidget = theWidget;
+  myOperationMgr->workshop()->selectionActivate()->updateSelectionModes();
+  myOperationMgr->workshop()->selectionActivate()->updateSelectionFilters();
+
 #ifdef DEBUG_ACTIVE_WIDGET
   std::cout << "myActiveWidget = " << (theWidget ? theWidget->context().c_str() : "") << std::endl;
 #endif

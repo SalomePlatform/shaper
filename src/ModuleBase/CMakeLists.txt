@@ -45,6 +45,7 @@ SET(PROJECT_HEADERS
   ModuleBase_IPrefMgr.h
   ModuleBase_IPropertyPanel.h
   ModuleBase_ISelection.h
+  ModuleBase_ISelectionActivate.h
   ModuleBase_IViewWindow.h
   ModuleBase_IViewer.h
   ModuleBase_IWidgetCreator.h

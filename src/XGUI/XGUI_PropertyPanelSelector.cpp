@@ -26,6 +26,7 @@ XGUI_PropertyPanelSelector::XGUI_PropertyPanelSelector(XGUI_PropertyPanel* thePa
 : myPanel(thePanel), myWidgetToBeActivated (NULL)
 {
   connect(myPanel, SIGNAL(widgetActivated(ModuleBase_ModelWidget*)), this, SIGNAL(activated()));
+  connect(myPanel, SIGNAL(propertyPanelDeactivated()), this, SIGNAL(deactivated()));
 }
 
 //********************************************************************

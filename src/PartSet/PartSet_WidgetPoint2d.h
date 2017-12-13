@@ -68,6 +68,11 @@ Q_OBJECT
   /// Destructor
   virtual ~PartSet_WidgetPoint2D();
 
+  /// Fills given container with selection modes if the widget has it
+  /// \param theModes [out] a container of modes
+  /// \param isAdditional if true, the modes are combinated with the module ones
+  virtual void selectionModes(QIntList& theModes, bool& isAdditional);
+
   /// Checks if the selection presentation is valid in widget
   /// \param theValue a selected presentation in the view
   /// \return a boolean value

@@ -32,6 +32,8 @@
 #include <GeomAPI_Shape.h>
 #include <GeomAPI_ICustomPrs.h>
 
+#include <SelectMgr_ListOfFilter.hxx>
+
 #include <QString>
 #include <QObject>
 #include <QMap>
@@ -77,14 +79,13 @@ class MODULEBASE_EXPORT ModuleBase_IModule : public QObject
 
   virtual ~ModuleBase_IModule() {}
 
-  /// Add default selection filters of the module to the current viewer
-  virtual void activateSelectionFilters() {}
+  /// Appends into container of workshop selection filters
+  /// \param [out] selection filters
+  virtual void selectionFilters(SelectMgr_ListOfFilter& theSelectionFilters) const {}
 
-  /// Remove default selection filters of the module from the current viewer
-  virtual void deactivateSelectionFilters() {}
-
-  /// Update selection filters depending on the module active controls
-  virtual void updateActiveSelectionFilters() {}
+  /// Returns current selection modes that should be used in 3D viewer
+  /// \param theModes container of modes
+  virtual void selectionModes(QIntList& theModes) const {}
 
   /// Stores the current selection
   virtual void storeSelection() {}
@@ -238,8 +239,8 @@ class MODULEBASE_EXPORT ModuleBase_IModule : public QObject
   virtual void activeSelectionModes(QIntList& theModes) {}
 
   /// Appends specific selection modes for the module to the list of types
-  /// \param theTypes a selection modes to be extended
-  virtual void customSubShapesSelectionModes(QIntList& theTypes) {}
+  /// \param theModes a selection modes to be extended
+  virtual void customSubShapesSelectionModes(QIntList& theModes) {}
 
   /// Return true if the custom presentation is activated
   /// \param theFlag a flag of level of customization, which means that only part of sub-elements

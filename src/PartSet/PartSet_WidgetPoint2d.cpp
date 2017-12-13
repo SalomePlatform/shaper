@@ -442,14 +442,17 @@ QList<QWidget*> PartSet_WidgetPoint2D::getControls() const
   return aControls;
 }
 
+//********************************************************************
+void PartSet_WidgetPoint2D::selectionModes(QIntList& theModes, bool& isAdditional)
+{
+  theModes << TopAbs_VERTEX;
+  theModes << TopAbs_EDGE;
+  isAdditional = true;
+}
 
+//********************************************************************
 void PartSet_WidgetPoint2D::activateCustom()
 {
-  QIntList aModes;
-  aModes << TopAbs_VERTEX;
-  aModes << TopAbs_EDGE;
-  myWorkshop->activateSubShapesSelection(aModes);
-
   if (!isEditingMode()) {
     FeaturePtr aFeature = feature();
     if (aFeature.get() && aFeature->getKind() == SketchPlugin_Point::ID())
@@ -472,7 +475,6 @@ void PartSet_WidgetPoint2D::deactivate()
     storeValue();
 
   ModuleBase_ModelWidget::deactivate();
-  myWorkshop->deactivateSubShapesSelection();
 }
 
 bool PartSet_WidgetPoint2D::getPoint2d(const Handle(V3d_View)& theView,

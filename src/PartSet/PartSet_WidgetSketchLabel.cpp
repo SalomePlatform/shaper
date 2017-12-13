@@ -25,22 +25,23 @@
 
 #include "SketchPlugin_SketchEntity.h"
 
-#include <XGUI_Workshop.h>
-#include <XGUI_Displayer.h>
-#include <XGUI_SelectionMgr.h>
-#include <XGUI_Selection.h>
-#include <XGUI_ViewerProxy.h>
 #include <XGUI_ActionsMgr.h>
-#include <XGUI_Tools.h>
+#include <XGUI_Displayer.h>
 #include <XGUI_ModuleConnector.h>
+#include <XGUI_SelectionActivate.h>
+#include <XGUI_Selection.h>
+#include <XGUI_SelectionMgr.h>
+#include <XGUI_Tools.h>
+#include <XGUI_ViewerProxy.h>
+#include <XGUI_Workshop.h>
+
+#include <ModelAPI_ResultBody.h>
+#include <ModelAPI_Tools.h>
 
 #include <ModuleBase_Operation.h>
 #include <ModuleBase_ViewerPrs.h>
 #include <ModuleBase_Tools.h>
 #include <ModuleBase_IModule.h>
-
-#include <ModelAPI_ResultBody.h>
-#include <ModelAPI_Tools.h>
 
 #include <GeomAlgoAPI_FaceBuilder.h>
 #include <GeomAlgoAPI_ShapeTools.h>
@@ -193,22 +194,24 @@ QList<QWidget*> PartSet_WidgetSketchLabel::getControls() const
   return aResult;
 }
 
-void PartSet_WidgetSketchLabel::onSelectionChanged()
+bool PartSet_WidgetSketchLabel::processSelection()
 {
   std::shared_ptr<GeomAPI_Pln> aPlane = plane();
   if (aPlane.get())
-    return;
+    return false;
 
   QList<ModuleBase_ViewerPrsPtr> aSelected = getFilteredSelected();
 
   if (aSelected.empty())
-    return;
+    return false;
   ModuleBase_ViewerPrsPtr aPrs = aSelected.first();
   bool aDone = setSelectionInternal(aSelected, false);
   if (aDone) {
     updateByPlaneSelected(aPrs);
     updateObject(myFeature);
   }
+
+  return aDone;
 }
 
 void PartSet_WidgetSketchLabel::onShowConstraint(bool theOn)
@@ -360,15 +363,14 @@ void PartSet_WidgetSketchLabel::updateByPlaneSelected(const ModuleBase_ViewerPrs
   //myLabel->setText("");
   //myLabel->setToolTip("");
   XGUI_Workshop* aWorkshop = XGUI_Tools::workshop(myWorkshop);
-  // 4. deactivate face selection filter
-  activateFilters(false);
 
   // 5. Clear selection mode and define sketching mode
   emit planeSelected(plane());
   // after the plane is selected in the sketch, the sketch selection should be activated
   // it can not be performed in the sketch label widget because, we don't need to switch off
   // the selection by any label deactivation, but need to switch it off by stop the sketch
-  activateSelection(true);
+  myWorkshop->selectionActivate()->updateSelectionFilters();
+  myWorkshop->selectionActivate()->updateSelectionModes();
 
   // 6. Update sketcher actions
   XGUI_ActionsMgr* anActMgr = aWorkshop->actionsMgr();
@@ -451,18 +453,6 @@ bool PartSet_WidgetSketchLabel::canFillSketch(const ModuleBase_ViewerPrsPtr& the
   return aCanFillSketch;
 }
 
-//********************************************************************
-bool PartSet_WidgetSketchLabel::processAction(ModuleBase_ActionType theActionType,
-                                              const ActionParamPtr& theParam)
-{
-  if (theActionType == ActionSelection)
-    onSelectionChanged();
-  else
-    return ModuleBase_WidgetValidated::processAction(theActionType, theParam);
-
-  return true;
-}
-
 bool PartSet_WidgetSketchLabel::fillSketchPlaneBySelection(const ModuleBase_ViewerPrsPtr& thePrs)
 {
   bool isOwnerSet = false;
@@ -506,7 +496,6 @@ void PartSet_WidgetSketchLabel::activateCustom()
   std::shared_ptr<GeomAPI_Pln> aPlane = plane();
   if (aPlane.get()) {
     myStackWidget->setCurrentIndex(1);
-    activateSelection(true);
     return;
   }
 
@@ -516,7 +505,7 @@ void PartSet_WidgetSketchLabel::activateCustom()
   // Clear previous selection mode It is necessary for correct activation of preview planes
   XGUI_Workshop* aWorkshop = XGUI_Tools::workshop(myWorkshop);
   XGUI_Displayer* aDisp = aWorkshop->displayer();
-  aDisp->activateObjects(QIntList(), aDisp->displayedObjects(), false);
+  aWorkshop->selectionActivate()->activateObjects(QIntList(), aDisp->displayedObjects(), false);
 
   if (!aBodyIsVisualized) {
     // We have to select a plane before any operation
@@ -525,40 +514,33 @@ void PartSet_WidgetSketchLabel::activateCustom()
   }
   else
     mySizeOfViewWidget->setVisible(false);
-
-  activateSelection(true);
-  activateFilters(true);
 }
 
 void PartSet_WidgetSketchLabel::deactivate()
 {
-  ModuleBase_ModelWidget::deactivate();
+  ModuleBase_WidgetValidated::deactivate();
   bool aHidePreview = myPreviewPlanes->isPreviewDisplayed();
   myPreviewPlanes->erasePreviewPlanes(myWorkshop);
-  activateSelection(false);
 
-  activateFilters(false);
   if (aHidePreview)
     myWorkshop->viewer()->update();
 }
 
-void PartSet_WidgetSketchLabel::activateSelection(bool toActivate)
+void PartSet_WidgetSketchLabel::selectionModes(QIntList& theModes, bool& isAdditional)
 {
-  if (toActivate) {
-    QIntList aModes;
-    std::shared_ptr<GeomAPI_Pln> aPlane = plane();
-    if (aPlane.get()) {
-      myWorkshop->module()->activeSelectionModes(aModes);
-    }
-    else {
-      aModes << TopAbs_FACE;
-    }
-    myWorkshop->activateSubShapesSelection(aModes);
-  } else {
-    myWorkshop->deactivateSubShapesSelection();
-  }
+  std::shared_ptr<GeomAPI_Pln> aPlane = plane();
+  if (!aPlane.get())
+    theModes << TopAbs_FACE;
+  isAdditional = true;
 }
 
+void PartSet_WidgetSketchLabel::selectionFilters(SelectMgr_ListOfFilter& theSelectionFilters)
+{
+  std::shared_ptr<GeomAPI_Pln> aPlane = plane();
+  if (aPlane.get())
+    return;
+  return ModuleBase_WidgetValidated::selectionFilters(theSelectionFilters);
+}
 
 std::shared_ptr<GeomAPI_Dir>
   PartSet_WidgetSketchLabel::setSketchPlane(const TopoDS_Shape& theShape)

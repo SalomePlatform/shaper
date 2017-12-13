@@ -40,6 +40,12 @@ ModuleBase_WidgetValidator::~ModuleBase_WidgetValidator()
 }
 
 //********************************************************************
+void ModuleBase_WidgetValidator::selectionFilters(SelectMgr_ListOfFilter& theSelectionFilters)
+{
+  theSelectionFilters.Append(myWorkshop->validatorFilter());
+}
+
+//********************************************************************
 bool ModuleBase_WidgetValidator::isValidSelection(const ModuleBase_ViewerPrsPtr& theValue)
 {
   bool aValid = false;
@@ -50,23 +56,6 @@ bool ModuleBase_WidgetValidator::isValidSelection(const ModuleBase_ViewerPrsPtr&
 
   storeValidState(theValue, aValid);
   return aValid;
-}
-
-bool ModuleBase_WidgetValidator::activateFilters(const bool toActivate)
-{
-  ModuleBase_IViewer* aViewer = myWorkshop->viewer();
-
-  Handle(SelectMgr_Filter) aSelFilter = myWorkshop->validatorFilter();
-  bool aHasSelectionFilter = aViewer->hasSelectionFilter(aSelFilter);
-
-  if (toActivate)
-    aViewer->addSelectionFilter(aSelFilter);
-  else {
-    aViewer->removeSelectionFilter(aSelFilter);
-    clearValidatedCash();
-  }
-
-  return aHasSelectionFilter;
 }
 
 void ModuleBase_WidgetValidator::storeAttributeValue(const AttributePtr& theAttribute)

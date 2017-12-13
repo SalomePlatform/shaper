@@ -96,8 +96,7 @@ class MODULEBASE_EXPORT ModuleBase_WidgetMultiSelector : public ModuleBase_Widge
                              const ActionParamPtr& theParam = ActionParamPtr());
 
   /// Activate or deactivate selection and selection filters
-  /// \return true if the selection filter of the widget is activated in viewer context
-  virtual bool activateSelectionAndFilters(bool toActivate);
+  virtual void activateSelectionAndFilters(bool toActivate);
 
   /// Checks the widget validity. By default, it returns true.
   /// \param thePrs a selected presentation in the view
@@ -112,9 +111,10 @@ public slots:
   /// Slot is called on selection type changed
   void onSelectionTypeChanged();
 
-  /// Slot which is called on selection event. Redefined to process XML state about
-  /// clear selection in neutral point
-  virtual void onSelectionChanged();
+protected:
+  /// Returns true if envent is processed.
+  /// Redefined to process XML state about clear selection in neutral point
+  virtual bool processSelection();
 
 protected slots:
   /// Slot for delete command in a list pop-up menu

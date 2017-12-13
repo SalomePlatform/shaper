@@ -41,6 +41,7 @@
 #include "XGUI_PropertyDialog.h"
 #include "XGUI_SalomeConnector.h"
 #include "XGUI_Selection.h"
+#include "XGUI_SelectionActivate.h"
 #include "XGUI_SelectionMgr.h"
 #include "XGUI_Tools.h"
 #include "XGUI_ViewerProxy.h"
@@ -184,6 +185,7 @@ XGUI_Workshop::XGUI_Workshop(XGUI_SalomeConnector* theConnector)
   ModuleBase_IWorkshop* aWorkshop = moduleConnector();
   // Has to be defined first in order to get errors and messages from other components
   myEventsListener = new XGUI_WorkshopListener(aWorkshop);
+  mySelectionActivate = new XGUI_SelectionActivate(aWorkshop);
 
   SUIT_ResourceMgr* aResMgr = ModuleBase_Preferences::resourceMgr();
 #ifndef HAVE_SALOME
@@ -350,7 +352,7 @@ void XGUI_Workshop::startApplication()
 //******************************************************
 void XGUI_Workshop::activateModule()
 {
-  myModule->activateSelectionFilters();
+  selectionActivate()->updateSelectionFilters();
 
   connect(myDisplayer, SIGNAL(objectDisplayed(ObjectPtr, AISObjectPtr)),
     myModule, SLOT(onObjectDisplayed(ObjectPtr, AISObjectPtr)));
@@ -369,10 +371,8 @@ void XGUI_Workshop::activateModule()
 //******************************************************
 void XGUI_Workshop::deactivateModule()
 {
-  myModule->deactivateSelectionFilters();
-
   // remove internal displayer filter
-  displayer()->deactivateSelectionFilters();
+  displayer()->deactivateSelectionFilters(false);
 
   disconnect(myDisplayer, SIGNAL(objectDisplayed(ObjectPtr, AISObjectPtr)),
     myModule, SLOT(onObjectDisplayed(ObjectPtr, AISObjectPtr)));
@@ -382,17 +382,10 @@ void XGUI_Workshop::deactivateModule()
   XGUI_Displayer* aDisplayer = displayer();
   QObjectPtrList aDisplayed = aDisplayer->displayedObjects();
   aDisplayer->deactivateObjects(aDisplayed, true);
-  Handle(AIS_InteractiveContext) aContext = viewer()->AISContext();
-  Handle(AIS_Trihedron) aTrihedron = Handle(AIS_Trihedron)::DownCast(aDisplayer->getTrihedron());
-  /// deactivate trihedron in selection modes
-  TColStd_ListOfInteger aTColModes;
-  aContext->ActivatedModes(aTrihedron, aTColModes);
-  TColStd_ListIteratorOfListOfInteger itr( aTColModes );
-  for (; itr.More(); itr.Next() ) {
-    Standard_Integer aMode = itr.Value();
-    aContext->Deactivate(aTrihedron, aMode);
-  }
+  selectionActivate()->deactivateTrihedronInSelectionModes();
+
 #ifdef BEFORE_TRIHEDRON_PATCH
+  //Handle(AIS_Trihedron) aTrihedron = Handle(AIS_Trihedron)::DownCast(aDisplayer->getTrihedron());
   /// Trihedron problem: objects stayed in the viewer, should be removed manually
   /// otherwise in SALOME happens crash by HideAll in the viewer
   aContext->Remove(aTrihedron->Position(), true);
@@ -553,7 +546,7 @@ void XGUI_Workshop::onPreviewActionClicked()
 void XGUI_Workshop::deactivateActiveObject(const ObjectPtr& theObject, const bool theUpdateViewer)
 {
   if (!myModule->canActivateSelection(theObject)) {
-    if (myDisplayer->isActive(theObject)) {
+    if (selectionActivate()->isActive(theObject)) {
       QObjectPtrList anObjects;
       anObjects.append(theObject);
       myDisplayer->deactivateObjects(anObjects, theUpdateViewer);
@@ -694,6 +687,12 @@ void XGUI_Workshop::connectToPropertyPanel(const bool isToConnect)
 }
 
 //******************************************************
+void XGUI_Workshop::selectionFilters(SelectMgr_ListOfFilter& theSelectionFilters)
+{
+  module()->selectionFilters(theSelectionFilters);
+}
+
+//******************************************************
 void XGUI_Workshop::onOperationResumed(ModuleBase_Operation* theOperation)
 {
   setGrantedFeatures(theOperation);
@@ -706,7 +705,6 @@ void XGUI_Workshop::onOperationResumed(ModuleBase_Operation* theOperation)
 
   myModule->operationResumed(theOperation);
 }
-
 
 //******************************************************
 void XGUI_Workshop::onOperationStopped(ModuleBase_Operation* theOperation)
@@ -732,14 +730,14 @@ void XGUI_Workshop::onOperationStopped(ModuleBase_Operation* theOperation)
   QObjectPtrList anObjects;
   FeaturePtr aFeature = aFOperation->feature();
   if (aFeature.get()) { // feature may be not created (plugin load fail)
-    if (myDisplayer->isVisible(aFeature) && !myDisplayer->isActive(aFeature))
+    if (myDisplayer->isVisible(aFeature) && !selectionActivate()->isActive(aFeature))
       anObjects.append(aFeature);
     std::list<ResultPtr> aResults;
     ModelAPI_Tools::allResults(aFeature, aResults);
     std::list<ResultPtr>::const_iterator aIt;
     for (aIt = aResults.begin(); aIt != aResults.end(); ++aIt) {
       ResultPtr anObject = *aIt;
-      if (myDisplayer->isVisible(anObject) && !myDisplayer->isActive(anObject)) {
+      if (myDisplayer->isVisible(anObject) && !selectionActivate()->isActive(anObject)) {
         anObjects.append(anObject);
       }
     }
@@ -1535,7 +1533,7 @@ void XGUI_Workshop::onContextMenuCommand(const QString& theId, bool isChecked)
 
 #ifdef DEBUG_WITH_MESSAGE_REPORT
         Handle(Message_Report) aContextReport = aContext->GetReport();
-        aContextReport->SetActive (Standard_True);
+        aContext->SetReportActive (Standard_True);
         aContextReport->SetLimit (1000);
         if (!aContextReport.IsNull())
           aParameters.Append(aContextReport);
@@ -1579,10 +1577,6 @@ void XGUI_Workshop::onContextMenuCommand(const QString& theId, bool isChecked)
 //**************************************************************
 void XGUI_Workshop::setViewerSelectionMode(int theMode)
 {
-  XGUI_ActiveControlSelector* anActiveSelector = activeControlMgr()->activeSelector();
-  if (anActiveSelector && anActiveSelector->getType() == XGUI_FacesPanelSelector::Type())
-    facesPanel()->setActivePanel(false);
-
   if (theMode == -1)
     myViewerSelMode.clear();
   else {
@@ -1591,7 +1585,7 @@ void XGUI_Workshop::setViewerSelectionMode(int theMode)
     else
       myViewerSelMode.append(theMode);
   }
-  activateObjectsSelection(myDisplayer->displayedObjects());
+  selectionActivate()->updateSelectionModes();
 }
 
 //**************************************************************
@@ -1601,7 +1595,7 @@ void XGUI_Workshop::activateObjectsSelection(const QObjectPtrList& theList)
   module()->activeSelectionModes(aModes);
   if (aModes.isEmpty() && (myViewerSelMode.length() > 0))
     aModes.append(myViewerSelMode);
-  myDisplayer->activateObjects(aModes, theList);
+  selectionActivate()->activateObjects(aModes, theList);
 }
 
 //**************************************************************

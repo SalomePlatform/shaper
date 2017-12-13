@@ -327,10 +327,12 @@ bool PartSet_WidgetSketchCreator::setSelection(QList<ModuleBase_ViewerPrsPtr>& t
 }
 
 //********************************************************************
-void PartSet_WidgetSketchCreator::onSelectionChanged()
+bool PartSet_WidgetSketchCreator::processSelection()
 {
   QList<ModuleBase_ViewerPrsPtr> aSelected = getFilteredSelected();
   bool isDone = setSelection(aSelected, true/*false*/);
+
+  return isDone;
 }
 
 //********************************************************************

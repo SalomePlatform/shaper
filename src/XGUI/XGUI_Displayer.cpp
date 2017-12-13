@@ -18,10 +18,12 @@
 // email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com>
 //
 
-#include "XGUI_CustomPrs.h"
 #include "XGUI_Displayer.h"
+
+#include "XGUI_CustomPrs.h"
 #include "XGUI_FacesPanel.h"
 #include "XGUI_Selection.h"
+#include "XGUI_SelectionActivate.h"
 #include "XGUI_SelectionMgr.h"
 #include "XGUI_ViewerProxy.h"
 #include "XGUI_Workshop.h"
@@ -63,12 +65,12 @@
 #include <AIS_Point.hxx>
 #endif
 #include <AIS_Selection.hxx>
-#include <TColStd_ListIteratorOfListOfInteger.hxx>
-#include <SelectMgr_ListOfFilter.hxx>
-#include <SelectMgr_ListIteratorOfListOfFilter.hxx>
 #include <Prs3d_Drawer.hxx>
 #include <Prs3d_IsoAspect.hxx>
+#include <SelectMgr_ListOfFilter.hxx>
+#include <SelectMgr_ListIteratorOfListOfFilter.hxx>
 #include <SelectMgr_SelectionManager.hxx>
+#include <TColStd_ListIteratorOfListOfInteger.hxx>
 
 #include <StdSelect_ViewerSelector3d.hxx>
 
@@ -87,11 +89,6 @@
 /// defines the local context mouse selection sensitivity
 const int MOUSE_SENSITIVITY_IN_PIXEL = 10;
 
-//#define DEBUG_ACTIVATE_OBJECTS
-//#define DEBUG_DEACTIVATE
-//#define DEBUG_ACTIVATE_AIS
-//#define DEBUG_DEACTIVATE_AIS
-
 //#define DEBUG_DISPLAY
 //#define DEBUG_FEATURE_REDISPLAY
 //#define DEBUG_SELECTION_FILTERS
@@ -102,6 +99,7 @@ const int MOUSE_SENSITIVITY_IN_PIXEL = 10;
 
 #define CLEAR_OUTDATED_SELECTION_BEFORE_REDISPLAY
 
+//**************************************************************
 void displayedObjects(const Handle(AIS_InteractiveContext)& theAIS, AIS_ListOfInteractive& theList)
 {
   // Get from null point
@@ -118,44 +116,26 @@ QString qIntListInfo(const QIntList& theValues, const QString& theSeparator = QS
   return anInfo.join(theSeparator);
 }
 
-void deselectPresentation(const Handle(AIS_InteractiveObject) theObject,
-                          const Handle(AIS_InteractiveContext)& theContext)
-{
-  NCollection_List<Handle(SelectBasics_EntityOwner)> aResultOwners;
-
-  for (theContext->InitSelected(); theContext->MoreSelected(); theContext->NextSelected()) {
-    Handle(SelectMgr_EntityOwner) anOwner = theContext->SelectedOwner();
-    if (anOwner.IsNull()) // TODO: check why it is possible
-      continue;
-    if (anOwner->Selectable() == theObject && anOwner->IsSelected())
-      aResultOwners.Append(anOwner);
-  }
-  NCollection_List<Handle(SelectBasics_EntityOwner)>::Iterator anOwnersIt (aResultOwners);
-  Handle(SelectMgr_EntityOwner) anOwner;
-  for (; anOwnersIt.More(); anOwnersIt.Next()) {
-    anOwner = Handle(SelectMgr_EntityOwner)::DownCast(anOwnersIt.Value());
-    if (!anOwner.IsNull())
-      theContext->AddOrRemoveSelected(anOwner, false);
-  }
-}
-
+//**************************************************************
 XGUI_Displayer::XGUI_Displayer(XGUI_Workshop* theWorkshop)
-  : myWorkshop(theWorkshop), myNeedUpdate(false),
-  myIsTrihedronActive(true), myViewerBlockedRecursiveCount(0),
-  myIsFirstAISContextUse(true)
+: myWorkshop(theWorkshop), myNeedUpdate(false),
+  myViewerBlockedRecursiveCount(0), myIsFirstAISContextUse(true)
 {
   myCustomPrs = std::shared_ptr<GeomAPI_ICustomPrs>(new XGUI_CustomPrs(theWorkshop));
 }
 
+//**************************************************************
 XGUI_Displayer::~XGUI_Displayer()
 {
 }
 
+//**************************************************************
 bool XGUI_Displayer::isVisible(ObjectPtr theObject) const
 {
   return myResult2AISObjectMap.contains(theObject);
 }
 
+//**************************************************************
 bool XGUI_Displayer::display(ObjectPtr theObject, bool theUpdateViewer)
 {
   bool aDisplayed = false;
@@ -237,6 +217,7 @@ bool XGUI_Displayer::display(ObjectPtr theObject, bool theUpdateViewer)
   return aDisplayed;
 }
 
+//**************************************************************
 bool canBeShaded(Handle(AIS_InteractiveObject) theAIS, ModuleBase_IModule* theModule)
 {
   Handle(AIS_Shape) aShapePrs = Handle(AIS_Shape)::DownCast(theAIS);
@@ -255,6 +236,7 @@ bool canBeShaded(Handle(AIS_InteractiveObject) theAIS, ModuleBase_IModule* theMo
   return false;
 }
 
+//**************************************************************
 bool XGUI_Displayer::display(ObjectPtr theObject, AISObjectPtr theAIS,
                              bool isShading, bool theUpdateViewer)
 {
@@ -281,7 +263,7 @@ bool XGUI_Displayer::display(ObjectPtr theObject, AISObjectPtr theAIS,
     aDisplayed = true;
 
     emit objectDisplayed(theObject, theAIS);
-    activate(anAISIO, myActiveSelectionModes, theUpdateViewer);
+    selectionActivate()->activate(anAISIO, theUpdateViewer);
   }
   if (theUpdateViewer)
     updateViewer();
@@ -289,6 +271,7 @@ bool XGUI_Displayer::display(ObjectPtr theObject, AISObjectPtr theAIS,
   return aDisplayed;
 }
 
+//**************************************************************
 bool XGUI_Displayer::erase(ObjectPtr theObject, const bool theUpdateViewer)
 {
   bool aErased = false;
@@ -326,6 +309,7 @@ bool XGUI_Displayer::erase(ObjectPtr theObject, const bool theUpdateViewer)
   return aErased;
 }
 
+//**************************************************************
 bool XGUI_Displayer::redisplay(ObjectPtr theObject, bool theUpdateViewer)
 {
   bool aRedisplayed = false;
@@ -384,7 +368,7 @@ bool XGUI_Displayer::redisplay(ObjectPtr theObject, bool theUpdateViewer)
         myWorkshop->module()->storeSelection();
 
 #ifdef CLEAR_OUTDATED_SELECTION_BEFORE_REDISPLAY
-      deselectPresentation(aAISIO, aContext);
+      myWorkshop->selector()->deselectPresentation(aAISIO);
 #endif
       aContext->Redisplay(aAISIO, false);
 
@@ -406,6 +390,7 @@ bool XGUI_Displayer::redisplay(ObjectPtr theObject, bool theUpdateViewer)
   return aRedisplayed;
 }
 
+//**************************************************************
 void XGUI_Displayer::redisplayObjects()
 {
   // redisplay objects visualized in the viewer
@@ -419,30 +404,7 @@ void XGUI_Displayer::redisplayObjects()
   Events_Loop::loop()->flush(EVENT_DISP);
 }
 
-void XGUI_Displayer::deactivate(ObjectPtr theObject, const bool theUpdateViewer)
-{
-#ifdef DEBUG_DEACTIVATE
-  QString anInfoStr = ModuleBase_Tools::objectInfo(theObject);
-  qDebug(QString("deactivate: myActiveSelectionModes[%1]: %2, objects = ").
-    arg(myActiveSelectionModes.size()).arg(qIntListInfo(myActiveSelectionModes)).
-    arg(anInfoStr).
-    toStdString().c_str());
-#endif
-  Handle(AIS_InteractiveContext) aContext = AISContext();
-  if (!aContext.IsNull() && isVisible(theObject)) {
-    AISObjectPtr anObj = myResult2AISObjectMap[theObject];
-    Handle(AIS_InteractiveObject) anAIS = anObj->impl<Handle(AIS_InteractiveObject)>();
-
-    deactivateAIS(anAIS);
-    // the selection from the previous activation modes should be cleared manually (#26172)
-#ifndef CLEAR_OUTDATED_SELECTION_BEFORE_REDISPLAY
-    deselectPresentation(anAIS, aContext);
-#endif
-    if (theUpdateViewer)
-      updateViewer();
-  }
-}
-
+//**************************************************************
 void XGUI_Displayer::deactivateObjects(const QObjectPtrList& theObjList,
                                        const bool theUpdateViewer)
 {
@@ -452,38 +414,14 @@ void XGUI_Displayer::deactivateObjects(const QObjectPtrList& theObjList,
 
   QObjectPtrList::const_iterator anIt = theObjList.begin(), aLast = theObjList.end();
   for (; anIt != aLast; anIt++) {
-    deactivate(*anIt, false);
+    selectionActivate()->deactivate(*anIt, false);
   }
   //VSV It seems that there is no necessity to update viewer on deactivation
   //if (theUpdateViewer)
   //  updateViewer();
 }
 
-void XGUI_Displayer::getModesOfActivation(ObjectPtr theObject, QIntList& theModes)
-{
-  Handle(AIS_InteractiveContext) aContext = AISContext();
-  if (aContext.IsNull() || !isVisible(theObject))
-    return;
-
-  AISObjectPtr aAISObj = getAISObject(theObject);
-
-  if (aAISObj.get() != NULL) {
-    Handle(AIS_InteractiveObject) anAISIO = aAISObj->impl<Handle(AIS_InteractiveObject)>();
-    TColStd_ListOfInteger aTColModes;
-    aContext->ActivatedModes(anAISIO, aTColModes);
-    TColStd_ListIteratorOfListOfInteger itr( aTColModes );
-    for (; itr.More(); itr.Next() ) {
-      theModes.append(itr.Value());
-    }
-  }
-}
-
-int XGUI_Displayer::getSelectionMode(int theShapeType)
-{
-  return (theShapeType > TopAbs_SHAPE) ? theShapeType :
-                                         AIS_Shape::SelectionMode((TopAbs_ShapeEnum)theShapeType);
-}
-
+//**************************************************************
 bool XGUI_Displayer::isVisible(XGUI_Displayer* theDisplayer, const ObjectPtr& theObject)
 {
   bool aVisible = false;
@@ -522,127 +460,7 @@ bool XGUI_Displayer::isVisible(XGUI_Displayer* theDisplayer, const ObjectPtr& th
   return aVisible;
 }
 
-#ifdef DEBUG_ACTIVATE_OBJECTS
-QString getModeInfo(const int theMode)
-{
-  QString anInfo = "Undefined";
-  switch(theMode) {
-    case 0: anInfo = "SHAPE(0)"; break;
-    case 1: anInfo = "VERTEX(1)"; break;
-    case 2: anInfo = "EDGE(2)"; break;
-    case 3: anInfo = "WIRE(3)"; break;
-    case 4: anInfo = "FACE(4)"; break;
-    case 5: anInfo = "SHELL(5)"; break;
-    case 6: anInfo = "SOLID(6)"; break;
-    case 7: anInfo = "COMPSOLID(7)"; break;
-    case 8: anInfo = "COMPOUND(8)"; break;
-    case 100: anInfo = "Sel_Mode_First(100)"; break; //SketcherPrs_Tools
-    case 101: anInfo = "Sel_Constraint(101)"; break;
-    case 102: anInfo = "Sel_Dimension_All(102)"; break;
-    case 103: anInfo = "Sel_Dimension_Line(103)"; break;
-    case 104: anInfo = "Sel_Dimension_Text(104)"; break;
-    default: break;
-  }
-  return anInfo;
-}
-
-QString getModesInfo(const QIntList& theModes)
-{
-  QStringList aModesInfo;
-  for (int i = 0, aSize = theModes.size(); i < aSize; i++)
-    aModesInfo.append(getModeInfo(theModes[i]));
-  return QString("[%1] = %2").arg(aModesInfo.size()).arg(aModesInfo.join(", "));
-}
-#endif
-
-void XGUI_Displayer::activateObjects(const QIntList& theModes, const QObjectPtrList& theObjList,
-                                     const bool theUpdateViewer)
-{
-  // Convert shape types to selection types
-  QIntList aModes;
-  foreach(int aType, theModes) {
-    aModes.append(getSelectionMode(aType));
-  }
-
-#ifdef DEBUG_ACTIVATE_OBJECTS
-  QStringList anInfo;
-  QObjectPtrList::const_iterator anIt = theObjList.begin(), aLast = theObjList.end();
-  for (; anIt != aLast; ++anIt) {
-    anInfo.append(ModuleBase_Tools::objectInfo((*anIt)));
-  }
-  QString anInfoStr = anInfo.join(", ");
-
-  qDebug(QString("activateObjects: new modes%1, active modes%2, objects[%3] = %4").
-    arg(getModesInfo(aModes)).
-    arg(getModesInfo(myActiveSelectionModes)).
-    arg(theObjList.size()).
-    arg(anInfoStr).
-    toStdString().c_str());
-#endif
-  // In order to avoid doblications of selection modes
-  QIntList aNewModes;
-  foreach (int aMode, aModes) {
-    if (!aNewModes.contains(aMode))
-      aNewModes.append(aMode);
-  }
-  myActiveSelectionModes = aNewModes;
-  Handle(AIS_InteractiveContext) aContext = AISContext();
-  // Open local context if there is no one
-  if (aContext.IsNull())
-    return;
-
-  //aContext->UseDisplayedObjects();
-  //myUseExternalObjects = true;
-
-  Handle(AIS_InteractiveObject) anAISIO;
-  AIS_ListOfInteractive aPrsList;
-  //if (aObjList.isEmpty())
-  //  return;
-  //else {
-  foreach(ObjectPtr aObj, theObjList) {
-    if (myResult2AISObjectMap.contains(aObj))
-      aPrsList.Append(myResult2AISObjectMap[aObj]->impl<Handle(AIS_InteractiveObject)>());
-  }
-  //}
-
-  // Add trihedron because it has to partisipate in selection
-  Handle(AIS_InteractiveObject) aTrihedron;
-  if (isTrihedronActive()) {
-    aTrihedron = getTrihedron();
-    if (!aTrihedron.IsNull() && aContext->IsDisplayed(aTrihedron))
-      aPrsList.Append(aTrihedron);
-  }
-  if (aPrsList.Extent() == 0)
-    return;
-
-  AIS_ListIteratorOfListOfInteractive aLIt(aPrsList);
-  bool isActivationChanged = false;
-  for(aLIt.Initialize(aPrsList); aLIt.More(); aLIt.Next()){
-    anAISIO = aLIt.Value();
-    if (activate(anAISIO, myActiveSelectionModes, false))
-      isActivationChanged = true;
-  }
-}
-
-bool XGUI_Displayer::isActive(ObjectPtr theObject) const
-{
-  Handle(AIS_InteractiveContext) aContext = AISContext();
-  if (aContext.IsNull() || !isVisible(theObject))
-    return false;
-
-  AISObjectPtr anObj = myResult2AISObjectMap[theObject];
-  Handle(AIS_InteractiveObject) anAIS = anObj->impl<Handle(AIS_InteractiveObject)>();
-
-  TColStd_ListOfInteger aModes;
-  aContext->ActivatedModes(anAIS, aModes);
-  #ifdef TINSPECTOR
-  if (getCallBack()) getCallBack()->ActivatedModes(anAIS, aModes);
-  #endif
-
-  return aModes.Extent() > 0;
-}
-
-
+//**************************************************************
 void XGUI_Displayer::setSelected(const  QList<ModuleBase_ViewerPrsPtr>& theValues,
                                  bool theUpdateViewer)
 {
@@ -705,6 +523,7 @@ void XGUI_Displayer::setSelected(const  QList<ModuleBase_ViewerPrsPtr>& theValue
     updateViewer();
 }
 
+//**************************************************************
 void XGUI_Displayer::clearSelected(const bool theUpdateViewer)
 {
   Handle(AIS_InteractiveContext) aContext = AISContext();
@@ -717,6 +536,7 @@ void XGUI_Displayer::clearSelected(const bool theUpdateViewer)
   }
 }
 
+//**************************************************************
 bool XGUI_Displayer::eraseAll(const bool theUpdateViewer)
 {
   bool aErased = false;
@@ -746,169 +566,8 @@ bool XGUI_Displayer::eraseAll(const bool theUpdateViewer)
   return aErased;
 }
 
-void deactivateObject(Handle(AIS_InteractiveContext) theContext,
-                      Handle(AIS_InteractiveObject) theObject
-#ifdef TINSPECTOR
-                      , Handle(VInspectorAPI_CallBack) theCallBack
-#endif
-                      )
-{
-  if (!theObject.IsNull()) {
-    theContext->Deactivate(theObject);
-    #ifdef TINSPECTOR
-    if (theCallBack) theCallBack->Deactivate(theObject);
-    #endif
-  }
-}
 
-void XGUI_Displayer::deactivateTrihedron(const bool theUpdateViewer) const
-{
-  Handle(AIS_InteractiveObject) aTrihedron = getTrihedron();
-  Handle(AIS_InteractiveContext) aContext = AISContext();
-  if (!aTrihedron.IsNull() && aContext->IsDisplayed(aTrihedron)) {
-    Handle(AIS_Trihedron) aTrie = Handle(AIS_Trihedron)::DownCast(aTrihedron);
-    deactivateObject(aContext, aTrie
-    #ifdef TINSPECTOR
-      , getCallBack()
-    #endif
-      );
-
-    /// #1136 hidden axis are selected in sketch
-#ifdef BEFORE_TRIHEDRON_PATCH
-    deactivateObject(aContext, aTrie->XAxis()
-    #ifdef TINSPECTOR
-      , getCallBack()
-    #endif
-    );
-    deactivateObject(aContext, aTrie->YAxis()
-    #ifdef TINSPECTOR
-      , getCallBack()
-    #endif
-    );
-    deactivateObject(aContext, aTrie->Axis()
-    #ifdef TINSPECTOR
-      , getCallBack()
-    #endif
-    );
-    deactivateObject(aContext, aTrie->Position()
-    #ifdef TINSPECTOR
-      , getCallBack()
-    #endif
-    );
-
-    deactivateObject(aContext, aTrie->XYPlane()
-    #ifdef TINSPECTOR
-      , getCallBack()
-    #endif
-    );
-    deactivateObject(aContext, aTrie->XZPlane()
-    #ifdef TINSPECTOR
-      , getCallBack()
-    #endif
-    );
-    deactivateObject(aContext, aTrie->YZPlane()
-    #ifdef TINSPECTOR
-      , getCallBack()
-    #endif
-    );
-#endif
-    if (theUpdateViewer)
-      updateViewer();
-  }
-}
-
-Handle(AIS_InteractiveObject) XGUI_Displayer::getTrihedron() const
-{
-  return myWorkshop->viewer()->trihedron();
-}
-
-/*void XGUI_Displayer::openLocalContext()
-{
-  Handle(AIS_InteractiveContext) aContext = AISContext();
-  // Open local context if there is no one
-  if (!aContext.IsNull() && !aContext->HasOpenedContext()) {
-    // Preserve selected objects
-    //AIS_ListOfInteractive aAisList;
-    //for (aContext->InitCurrent(); aContext->MoreCurrent(); aContext->NextCurrent())
-    //  aAisList.Append(aContext->Current());
-
-    // get the filters from the global context and append them to the local context
-    // a list of filters in the global context is not cleared and should be cleared here
-    SelectMgr_ListOfFilter aFilters;
-    aFilters.Assign(aContext->Filters());
-    // it is important to remove the filters in the global context, because there is a code
-    // in the closeLocalContex, which restore the global context filters
-    aContext->RemoveFilters();
-
-    //aContext->ClearCurrents();
-    aContext->OpenLocalContext();
-    //deactivateTrihedron();
-    //aContext->NotUseDisplayedObjects();
-
-    //myUseExternalObjects = false;
-
-    SelectMgr_ListIteratorOfListOfFilter aIt(aFilters);
-    for (;aIt.More(); aIt.Next()) {
-      aContext->AddFilter(aIt.Value());
-    }
-    // Restore selection
-    //AIS_ListIteratorOfListOfInteractive aIt2(aAisList);
-    //for(; aIt2.More(); aIt2.Next()) {
-    //  aContext->SetSelected(aIt2.Value(), false);
-    //}
-  }
-}*/
-
-/*void XGUI_Displayer::closeLocalContexts(const bool theUpdateViewer)
-{
-  Handle(AIS_InteractiveContext) aContext = AISContext();
-  if (!aContext.IsNull() && aContext->HasOpenedContext()) {
-    // Preserve selected objects
-    //AIS_ListOfInteractive aAisList;
-    //for (aContext->InitSelected(); aContext->MoreSelected(); aContext->NextSelected())
-    //  aAisList.Append(aContext->SelectedInteractive());
-
-    // get the filters from the local context and append them to the global context
-    // a list of filters in the local context is cleared
-    SelectMgr_ListOfFilter aFilters;
-    aFilters.Assign(aContext->Filters());
-
-    //aContext->ClearSelected();
-    aContext->CloseAllContexts(false);
-
-    // From the moment when the AIS_DS_Displayed flag is used in the Display of AIS object,
-    // this code is obsolete. It is temporaty commented and should be removed after
-    // the test campaign.
-    // Redisplay all object if they were displayed in localContext
-    /*Handle(AIS_InteractiveObject) aAISIO;
-    foreach (AISObjectPtr aAIS, myResult2AISObjectMap) {
-      aAISIO = aAIS->impl<Handle(AIS_InteractiveObject)>();
-      if (aContext->DisplayStatus(aAISIO) != AIS_DS_Displayed) {
-        aContext->Display(aAISIO, false);
-        aContext->SetDisplayMode(aAISIO, Shading, false);
-      }
-    }*+/
-
-    // Append the filters from the local selection in the global selection context
-    SelectMgr_ListIteratorOfListOfFilter aIt(aFilters);
-    for (;aIt.More(); aIt.Next()) {
-      Handle(SelectMgr_Filter) aFilter = aIt.Value();
-      aContext->AddFilter(aFilter);
-    }
-
-    if (theUpdateViewer)
-      updateViewer();
-    //myUseExternalObjects = false;
-
-    // Restore selection
-    //AIS_ListIteratorOfListOfInteractive aIt2(aAisList);
-    //for(; aIt2.More(); aIt2.Next()) {
-    //  if (aContext->IsDisplayed(aIt2.Value()))
-    //    aContext->SetCurrentObject(aIt2.Value(), false);
-    //}
-  }
-}*/
-
+//**************************************************************
 AISObjectPtr XGUI_Displayer::getAISObject(ObjectPtr theObject) const
 {
   AISObjectPtr anIO;
@@ -917,12 +576,14 @@ AISObjectPtr XGUI_Displayer::getAISObject(ObjectPtr theObject) const
   return anIO;
 }
 
+//**************************************************************
 ObjectPtr XGUI_Displayer::getObject(const AISObjectPtr& theIO) const
 {
   Handle(AIS_InteractiveObject) aRefAIS = theIO->impl<Handle(AIS_InteractiveObject)>();
   return getObject(aRefAIS);
 }
 
+//**************************************************************
 ObjectPtr XGUI_Displayer::getObject(const Handle(AIS_InteractiveObject)& theIO) const
 {
   ObjectPtr anObject;
@@ -944,6 +605,7 @@ ObjectPtr XGUI_Displayer::getObject(const Handle(AIS_InteractiveObject)& theIO) 
   return anObject;
 }
 
+//**************************************************************
 bool XGUI_Displayer::enableUpdateViewer(const bool isEnabled)
 {
   bool aWasEnabled = isUpdateEnabled();
@@ -959,11 +621,13 @@ bool XGUI_Displayer::enableUpdateViewer(const bool isEnabled)
   return aWasEnabled;
 }
 
+//**************************************************************
 bool XGUI_Displayer::isUpdateEnabled() const
 {
   return myViewerBlockedRecursiveCount == 0;
 }
 
+//**************************************************************
 void XGUI_Displayer::updateViewer() const
 {
   Handle(AIS_InteractiveContext) aContext = AISContext();
@@ -975,93 +639,22 @@ void XGUI_Displayer::updateViewer() const
   }
 }
 
-void XGUI_Displayer::activateAIS(const Handle(AIS_InteractiveObject)& theIO,
-                                 const int theMode, const bool theUpdateViewer) const
-{
-  Handle(AIS_InteractiveContext) aContext = myWorkshop->viewer()->AISContext();
-  if (!theIO.IsNull() && theIO == getTrihedron()) {
-    if (theMode != AIS_Shape::SelectionType(TopAbs_EDGE) &&
-        theMode != AIS_Shape::SelectionType(TopAbs_VERTEX))
-      return;
-  }
-  if (!aContext.IsNull()) {
-    if (myWorkshop->module()) {
-      int aMode = (theMode > 8)? theMode : AIS_Shape::SelectionType(theMode);
-      aContext->Activate(theIO, theMode, false);
-    } else
-      aContext->Activate(theIO, theMode, false);
-    #ifdef TINSPECTOR
-    if (getCallBack()) getCallBack()->Activate(theIO, theMode);
-    #endif
-
-    // the fix from VPA for more suitable selection of sketcher lines
-    if (theIO->Width() > 1) {
-      double aPrecision = theIO->Width() + 2;
-      if (theMode == getSelectionMode(TopAbs_VERTEX))
-        aPrecision = ModuleBase_Preferences::resourceMgr()->doubleValue("Viewer",
-                                                                    "point-selection-sensitivity",
-                                                                        12);
-      else if ((theMode == getSelectionMode(TopAbs_EDGE)) ||
-               (theMode == getSelectionMode(TopAbs_WIRE)))
-        aPrecision = theIO->Width() +
-           ModuleBase_Preferences::resourceMgr()->doubleValue("Viewer",
-                                                              "edge-selection-sensitivity", 2);
-      aContext->SetSelectionSensitivity(theIO, theMode, aPrecision);
-    }
-
-#ifdef DEBUG_ACTIVATE_AIS
-    ObjectPtr anObject = getObject(theIO);
-    anInfo.append(ModuleBase_Tools::objectInfo((*anIt)));
-    qDebug(QString("activateAIS: theMode = %1, object = %2").arg(theMode)
-      .arg(anInfo).toStdString().c_str());
-#endif
-    if (theUpdateViewer)
-      updateViewer();
-  }
-}
-
-void XGUI_Displayer::deactivateAIS(const Handle(AIS_InteractiveObject)& theIO,
-                                   const int theMode) const
-{
-  Handle(AIS_InteractiveContext) aContext = AISContext();
-  if (!aContext.IsNull()) {
-    if (theMode == -1) {
-      aContext->Deactivate(theIO);
-      #ifdef TINSPECTOR
-      if (getCallBack()) getCallBack()->Deactivate(theIO);
-      #endif
-    }
-    else {
-      aContext->Deactivate(theIO, theMode);
-      #ifdef TINSPECTOR
-      if (getCallBack()) getCallBack()->Deactivate(theIO, theMode);
-      #endif
-    }
-
-#ifdef DEBUG_DEACTIVATE_AIS
-    ObjectPtr anObject = getObject(theIO);
-    anInfo.append(ModuleBase_Tools::objectInfo((*anIt)));
-    qDebug(QString("deactivateAIS: theMode = %1, object = %2").arg(theMode)
-      .arg(anInfo).toStdString().c_str());
-#endif
-  }
-}
-
+//**************************************************************
 Handle(AIS_InteractiveContext) XGUI_Displayer::AISContext() const
 {
   Handle(AIS_InteractiveContext) aContext = myWorkshop->viewer()->AISContext();
   if (!aContext.IsNull() && myIsFirstAISContextUse/*&& !aContext->HasOpenedContext()*/) {
     XGUI_Displayer* aDisplayer = (XGUI_Displayer*)this;
     aDisplayer->myIsFirstAISContextUse = false;
-    //aContext->OpenLocalContext();
-    if (!isTrihedronActive())
-      deactivateTrihedron(true);
+    if (!myWorkshop->selectionActivate()->isTrihedronActive())
+      selectionActivate()->deactivateTrihedron(true);
     aContext->DefaultDrawer()->VIsoAspect()->SetNumber(0);
     aContext->DefaultDrawer()->UIsoAspect()->SetNumber(0);
   }
   return aContext;
 }
 
+//**************************************************************
 Handle(SelectMgr_AndFilter) XGUI_Displayer::GetFilter()
 {
   Handle(AIS_InteractiveContext) aContext = AISContext();
@@ -1072,6 +665,7 @@ Handle(SelectMgr_AndFilter) XGUI_Displayer::GetFilter()
   return myAndFilter;
 }
 
+//**************************************************************
 bool XGUI_Displayer::displayAIS(AISObjectPtr theAIS, const bool toActivateInSelectionModes,
                                 const Standard_Integer theDisplayMode, bool theUpdateViewer)
 {
@@ -1092,21 +686,16 @@ bool XGUI_Displayer::displayAIS(AISObjectPtr theAIS, const bool toActivateInSele
     #ifdef TINSPECTOR
     if (getCallBack()) getCallBack()->Load(anAISIO);
     #endif
-    if (toActivateInSelectionModes) {
-      if (myActiveSelectionModes.size() == 0)
-        activateAIS(anAISIO, 0, theUpdateViewer);
-      else {
-        foreach(int aMode, myActiveSelectionModes) {
-          activateAIS(anAISIO, aMode, theUpdateViewer);
-        }
-      }
-    }
+    if (toActivateInSelectionModes)
+      myWorkshop->selectionActivate()->activateOnDisplay(anAISIO, theUpdateViewer);
+
     if (theUpdateViewer)
       updateViewer();
   }
   return aDisplayed;
 }
 
+//**************************************************************
 bool XGUI_Displayer::eraseAIS(AISObjectPtr theAIS, const bool theUpdateViewer)
 {
   bool aErased = false;
@@ -1126,7 +715,7 @@ bool XGUI_Displayer::eraseAIS(AISObjectPtr theAIS, const bool theUpdateViewer)
   return aErased;
 }
 
-
+//**************************************************************
 void XGUI_Displayer::setDisplayMode(ObjectPtr theObject, DisplayMode theMode, bool theUpdateViewer)
 {
   if (theMode == NoMode)
@@ -1147,6 +736,7 @@ void XGUI_Displayer::setDisplayMode(ObjectPtr theObject, DisplayMode theMode, bo
     updateViewer();
 }
 
+//**************************************************************
 XGUI_Displayer::DisplayMode XGUI_Displayer::displayMode(ObjectPtr theObject) const
 {
   Handle(AIS_InteractiveContext) aContext = AISContext();
@@ -1161,7 +751,8 @@ XGUI_Displayer::DisplayMode XGUI_Displayer::displayMode(ObjectPtr theObject) con
   return (XGUI_Displayer::DisplayMode) aAISIO->DisplayMode();
 }
 
-void XGUI_Displayer::deactivateSelectionFilters()
+//**************************************************************
+void XGUI_Displayer::deactivateSelectionFilters(const bool theAddFilterOnly)
 {
   Handle(AIS_InteractiveContext) aContext = AISContext();
   if (!myAndFilter.IsNull()) {
@@ -1180,6 +771,7 @@ void XGUI_Displayer::deactivateSelectionFilters()
   }
 }
 
+//**************************************************************
 void XGUI_Displayer::addSelectionFilter(const Handle(SelectMgr_Filter)& theFilter)
 {
   Handle(AIS_InteractiveContext) aContext = AISContext();
@@ -1196,6 +788,7 @@ void XGUI_Displayer::addSelectionFilter(const Handle(SelectMgr_Filter)& theFilte
   }
 }
 
+//**************************************************************
 void XGUI_Displayer::removeSelectionFilter(const Handle(SelectMgr_Filter)& theFilter)
 {
   Handle(AIS_InteractiveContext) aContext = AISContext();
@@ -1213,6 +806,7 @@ void XGUI_Displayer::removeSelectionFilter(const Handle(SelectMgr_Filter)& theFi
   }
 }
 
+//**************************************************************
 bool XGUI_Displayer::hasSelectionFilter(const Handle(SelectMgr_Filter)& theFilter)
 {
   bool aFilterFound = false;
@@ -1237,6 +831,7 @@ bool XGUI_Displayer::hasSelectionFilter(const Handle(SelectMgr_Filter)& theFilte
   return aFilterFound;
 }
 
+//**************************************************************
 void XGUI_Displayer::removeFilters()
 {
   Handle(AIS_InteractiveContext) aContext = AISContext();
@@ -1248,6 +843,7 @@ void XGUI_Displayer::removeFilters()
     aCompositeFilter->Clear();
 }
 
+//**************************************************************
 void XGUI_Displayer::showOnly(const QObjectPtrList& theList)
 {
   QObjectPtrList aDispList = myResult2AISObjectMap.keys();
@@ -1262,6 +858,7 @@ void XGUI_Displayer::showOnly(const QObjectPtrList& theList)
   updateViewer();
 }
 
+//**************************************************************
 bool XGUI_Displayer::canBeShaded(ObjectPtr theObject) const
 {
   if (!isVisible(theObject))
@@ -1275,98 +872,7 @@ bool XGUI_Displayer::canBeShaded(ObjectPtr theObject) const
   return ::canBeShaded(anAIS, myWorkshop->module());
 }
 
-bool XGUI_Displayer::activate(const Handle(AIS_InteractiveObject)& theIO,
-                              const QIntList& theModes,
-                              const bool theUpdateViewer) const
-{
-  Handle(AIS_InteractiveContext) aContext = AISContext();
-  if (aContext.IsNull() || theIO.IsNull())
-    return false;
-
-  bool isActivationChanged = false;
-  // deactivate object in all modes, which are not in the list of activation
-  // It seems that after the IO deactivation the selected state of the IO's owners
-  // is modified in OCC(version: 6.8.0) and the selection of the object later is lost.
-  // By this reason, the number of the IO deactivate is decreased and the object is deactivated
-  // only if there is a difference in the current modes and the parameters modes.
-  // If the selection problem happens again, it is possible to write a test scenario and create
-  // a bug. The bug steps are the following:
-  // Create two IO, activate them in 5 modes, select the first IO, deactivate 3 modes for both,
-  // with clicked SHIFT select the second object.
-  // The result is the selection of the first IO is lost.
-  TColStd_ListOfInteger aTColModes;
-  aContext->ActivatedModes(theIO, aTColModes);
-  #ifdef TINSPECTOR
-  if (getCallBack()) getCallBack()->ActivatedModes(theIO, aTColModes);
-  #endif
-  TColStd_ListIteratorOfListOfInteger itr( aTColModes );
-  QIntList aModesActivatedForIO;
-  bool isDeactivated = false;
-  bool aHasValidMode = false;
-  for (; itr.More(); itr.Next() ) {
-    Standard_Integer aMode = itr.Value();
-    aHasValidMode = aHasValidMode || aMode != -1;
-    int aShapeMode = (aMode > 8)? aMode : AIS_Shape::SelectionType(aMode);
-    if (!theModes.contains(aMode)) {
-      deactivateAIS(theIO, aMode);
-      isDeactivated = true;
-    }
-    else {
-      aModesActivatedForIO.append(aMode);
-    }
-  }
-  if (isDeactivated) {
-    // the selection from the previous activation modes should be cleared manually (#26172)
-    //theIO->ClearSelected();
-    //#ifdef TINSPECTOR
-    //if (getCallBack()) getCallBack()->ClearSelected(theIO);
-    //#endif
-#ifndef CLEAR_OUTDATED_SELECTION_BEFORE_REDISPLAY
-    deselectPresentation(theIO, aContext);
-#endif
-    // For performance issues
-    //if (theUpdateViewer)
-    //  updateViewer();
-    isActivationChanged = true;
-  }
-
-  // loading the interactive object allowing the decomposition
-  if (aTColModes.IsEmpty() || !aHasValidMode) {
-    aContext->Load(theIO, -1, true);
-    Handle(AIS_Trihedron) aTrihedron = Handle(AIS_Trihedron)::DownCast(theIO);
-    if (!aTrihedron.IsNull()) {
-      // Workaround for Trihedron. It should be loaded using the next Load method to
-      // add this object to myGlobal map of selection manager
-      // it is important to activate trihedron in two selection modes: edges and vertices
-      aContext->SelectionManager()->Load(theIO);
-    }
-
-    #ifdef TINSPECTOR
-    if (getCallBack()) getCallBack()->Load(theIO);
-    #endif
-  }
-
-  // trihedron AIS check should be after the AIS loading.
-  // If it is not loaded, it is steel selectable in the viewer.
-  Handle(AIS_Trihedron) aTrihedron;
-  if (!isTrihedronActive())
-    aTrihedron = Handle(AIS_Trihedron)::DownCast(theIO);
-  if (aTrihedron.IsNull()) {
-      // In order to clear active modes list
-    if (theModes.size() == 0) {
-      activateAIS(theIO, 0, theUpdateViewer);
-    } else {
-      foreach(int aMode, theModes) {
-        if (!aModesActivatedForIO.contains(aMode)) {
-          activateAIS(theIO, aMode, theUpdateViewer);
-          isActivationChanged = true;
-        }
-      }
-    }
-  }
-  return isActivationChanged;
-}
-
+//**************************************************************
 bool XGUI_Displayer::customizeObject(ObjectPtr theObject)
 {
   AISObjectPtr anAISObj = getAISObject(theObject);
@@ -1399,7 +905,7 @@ bool XGUI_Displayer::customizeObject(ObjectPtr theObject)
   return isCustomized;
 }
 
-
+//**************************************************************
 QColor XGUI_Displayer::setObjectColor(ObjectPtr theObject,
                                       const QColor& theColor,
                                       bool theUpdateViewer)
@@ -1416,6 +922,7 @@ QColor XGUI_Displayer::setObjectColor(ObjectPtr theObject,
   return QColor(aR, aG, aB);
 }
 
+//**************************************************************
 void XGUI_Displayer::appendResultObject(ObjectPtr theObject, AISObjectPtr theAIS)
 {
   myResult2AISObjectMap[theObject] = theAIS;
@@ -1429,6 +936,7 @@ void XGUI_Displayer::appendResultObject(ObjectPtr theObject, AISObjectPtr theAIS
 }
 
 #ifdef _DEBUG
+//**************************************************************
 std::string XGUI_Displayer::getResult2AISObjectMapInfo() const
 {
   QStringList aContent;
@@ -1446,6 +954,7 @@ std::string XGUI_Displayer::getResult2AISObjectMapInfo() const
 }
 #endif
 
+//**************************************************************
 void XGUI_Displayer::getPresentations(const ObjectPtr& theObject,
                                   NCollection_Map<Handle(AIS_InteractiveObject)>& thePresentations)
 {
@@ -1490,14 +999,7 @@ void XGUI_Displayer::getPresentations(const ObjectPtr& theObject,
   }
 }
 
-void XGUI_Displayer::activateTrihedron(bool theIsActive)
-{
-  myIsTrihedronActive = theIsActive;
-  if (!myIsTrihedronActive) {
-    deactivateTrihedron(true);
-  }
-}
-
+//**************************************************************
 void XGUI_Displayer::displayTrihedron(bool theToDisplay) const
 {
   Handle(AIS_InteractiveContext) aContext = AISContext();
@@ -1506,6 +1008,7 @@ void XGUI_Displayer::displayTrihedron(bool theToDisplay) const
 
   Handle(AIS_Trihedron) aTrihedron = myWorkshop->viewer()->trihedron();
 
+  XGUI_SelectionActivate* aSelectionActive = selectionActivate();
   if (theToDisplay) {
     if (!aContext->IsDisplayed(aTrihedron))
       aContext->Display(aTrihedron,
@@ -1518,12 +1021,12 @@ void XGUI_Displayer::displayTrihedron(bool theToDisplay) const
     if (getCallBack()) getCallBack()->Display(aTrihedron);
     #endif
 
-    if (!isTrihedronActive())
-      deactivateTrihedron(false);
+    if (!aSelectionActive->isTrihedronActive())
+      aSelectionActive->deactivateTrihedron(false);
     else
-      activate(aTrihedron, myActiveSelectionModes, false);
+      aSelectionActive->activate(aTrihedron, false);
   } else {
-    deactivateTrihedron(false);
+    aSelectionActive->deactivateTrihedron(false);
 
     aContext->Erase(aTrihedron, Standard_True);
     #ifdef TINSPECTOR
@@ -1534,16 +1037,7 @@ void XGUI_Displayer::displayTrihedron(bool theToDisplay) const
   updateViewer();
 }
 
-QIntList XGUI_Displayer::activeSelectionModes() const
-{
-  QIntList aModes;
-  foreach (int aMode, myActiveSelectionModes) {
-    // aMode < 9 is a Shape Enum values
-    aModes << ((aMode < 9)? AIS_Shape::SelectionType(aMode) : aMode);
-  }
-  return aModes;
-}
-
+//**************************************************************
 void XGUI_Displayer::AddOrRemoveSelectedShapes(Handle(AIS_InteractiveContext) theContext,
                            const NCollection_DataMap<TopoDS_Shape,
                            NCollection_Map<Handle(AIS_InteractiveObject)>>& theShapesToBeSelected)
@@ -1616,4 +1110,10 @@ void XGUI_Displayer::AddOrRemoveSelectedShapes(Handle(AIS_InteractiveContext) th
       continue;
     theContext->AddOrRemoveSelected(anIt.Value(), Standard_False);
   }
+}
+
+//**************************************************************
+XGUI_SelectionActivate* XGUI_Displayer::selectionActivate() const
+{
+  return myWorkshop->selectionActivate();
 }

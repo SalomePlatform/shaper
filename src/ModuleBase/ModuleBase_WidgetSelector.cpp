@@ -20,21 +20,22 @@
 
 #include <ModuleBase_WidgetSelector.h>
 
+#include <ModuleBase_Events.h>
+#include <ModuleBase_IModule.h>
 #include <ModuleBase_ISelection.h>
+#include <ModuleBase_ISelectionActivate.h>
 #include <ModuleBase_IWorkshop.h>
-#include <ModuleBase_Tools.h>
 #include <ModuleBase_Operation.h>
 #include <ModuleBase_OperationDescription.h>
-#include <ModuleBase_WidgetFactory.h>
-#include <ModuleBase_IModule.h>
 #include <ModuleBase_ResultPrs.h>
+#include <ModuleBase_Tools.h>
 #include <ModuleBase_ViewerPrs.h>
-#include <ModuleBase_Events.h>
+#include <ModuleBase_WidgetFactory.h>
 
-#include <ModelAPI_ResultConstruction.h>
-#include <ModelAPI_Events.h>
 #include <ModelAPI_AttributeSelection.h>
 #include <ModelAPI_AttributeSelectionList.h>
+#include <ModelAPI_Events.h>
+#include <ModelAPI_ResultConstruction.h>
 
 #include <TopoDS_Iterator.hxx>
 
@@ -61,7 +62,7 @@ void ModuleBase_WidgetSelector::getGeomSelection(const ModuleBase_ViewerPrsPtr& 
 }
 
 //********************************************************************
-void ModuleBase_WidgetSelector::onSelectionChanged()
+bool ModuleBase_WidgetSelector::processSelection()
 {
   QList<ModuleBase_ViewerPrsPtr> aSelected = getFilteredSelected();
   // equal vertices should not be used here
@@ -69,6 +70,8 @@ void ModuleBase_WidgetSelector::onSelectionChanged()
 
   bool isDone = setSelection(aSelected, true/*false*/);
   updateOnSelectionChanged(isDone);
+
+  return isDone;
 }
 
 //********************************************************************
@@ -162,26 +165,27 @@ bool ModuleBase_WidgetSelector::acceptSubShape(const GeomShapePtr& theShape,
 }
 
 //********************************************************************
-bool ModuleBase_WidgetSelector::activateSelectionAndFilters(bool toActivate)
+void ModuleBase_WidgetSelector::selectionModes(QIntList& theModes, bool& isAdditional)
+{
+  theModes.append(getShapeTypes());
+  isAdditional = true;
+}
+
+//********************************************************************
+void ModuleBase_WidgetSelector::activateSelectionAndFilters(bool toActivate)
 {
   updateSelectionName();
 
-  if (toActivate) {
-    myWorkshop->activateSubShapesSelection(getShapeTypes());
-  } else {
-    myWorkshop->deactivateSubShapesSelection();
-  }
-  return activateFilters(toActivate);
+  myWorkshop->selectionActivate()->updateSelectionFilters();
+  myWorkshop->selectionActivate()->updateSelectionModes();
+
+  if (!toActivate)
+    clearValidatedCash();
 }
 
 //********************************************************************
 void ModuleBase_WidgetSelector::activateCustom()
 {
-  connect(myWorkshop, SIGNAL(selectionChanged()), this,
-          SLOT(onSelectionChanged()), Qt::UniqueConnection);
-
-  activateSelectionAndFilters(true);
-
   // Restore selection in the viewer by the attribute selection list
   // it should be postponed to have current widget as active to validate restored selection
   static Events_ID anEvent = Events_Loop::eventByName(EVENT_UPDATE_BY_WIDGET_SELECTION);
@@ -219,10 +223,7 @@ bool ModuleBase_WidgetSelector::setSelectionCustom(const ModuleBase_ViewerPrsPtr
 //********************************************************************
 void ModuleBase_WidgetSelector::deactivate()
 {
-  ModuleBase_ModelWidget::deactivate();
-  disconnect(myWorkshop, SIGNAL(selectionChanged()), this, SLOT(onSelectionChanged()));
-  activateSelectionAndFilters(false);
-
+  ModuleBase_WidgetValidated::deactivate();
   /// clear temporary cash
   AttributePtr anAttribute = attribute();
   if (!anAttribute.get())

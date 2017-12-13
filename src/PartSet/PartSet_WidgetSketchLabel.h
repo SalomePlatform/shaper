@@ -73,6 +73,15 @@ public:
   virtual bool setSelection(QList<std::shared_ptr<ModuleBase_ViewerPrs>>& theValues,
                             const bool theToValidate);
 
+  /// Fills given container with selection modes if the widget has it
+  // \param theModes [out] a container of modes
+  /// \param isAdditional if true, the modes are combinated with the module ones
+  virtual void selectionModes(QIntList& theModes, bool& isAdditional);
+
+  /// Using widget selection filter only if plane is not defined.
+  /// \param [out] selection filters
+  virtual void selectionFilters(SelectMgr_ListOfFilter& theSelectionFilters);
+
   /// Returns list of widget controls
   /// \return a control list
   virtual QList<QWidget*> getControls() const;
@@ -94,10 +103,6 @@ public:
   /// Returns True if the selected presentation can be used for plane definition
   /// \param thePrs a presentation
   static bool canFillSketch(const std::shared_ptr<ModuleBase_ViewerPrs>& thePrs);
-
-  /// Processes Selection action.
-  virtual bool processAction(ModuleBase_ActionType theActionType,
-                             const ActionParamPtr& theParam);
 
 signals:
   /// Signal on plane selection
@@ -157,6 +162,9 @@ protected:
                               bool& isAttributeSetInitializedBlocked,
                               bool& isAttributeSendUpdatedBlocked);
 
+  /// Returns true if envent is processed.
+  virtual bool processSelection();
+
   /// Set the given wrapped value to the current widget
   /// This value should be processed in the widget according to the needs
   /// The method is called by the current operation to process the operation preselection.
@@ -175,14 +183,6 @@ protected:
   /// \param thePrs a presentation
   bool fillSketchPlaneBySelection(const std::shared_ptr<ModuleBase_ViewerPrs>& thePrs);
 
- protected:
-  /// Activate or deactivate selection
-  void activateSelection(bool toActivate);
-
- private:
-   /// Slot on change selection
-  void onSelectionChanged();
-
 private slots:
   /// A slot called on set sketch plane view
   void onSetPlaneView();
@@ -191,7 +191,7 @@ private slots:
   /// \param theOn a flag show constraints or not
   void onShowConstraint(bool theOn);
 
- private:
+private:
   /// Set sketch plane by shape
   /// \param theShape a planar face
   std::shared_ptr<GeomAPI_Dir> setSketchPlane(const TopoDS_Shape& theShape);

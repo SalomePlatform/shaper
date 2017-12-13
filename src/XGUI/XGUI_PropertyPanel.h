@@ -163,6 +163,9 @@ signals:
   /// \param theObject a sender of the event
   void enterClicked(QObject* theObject);
 
+  /// Emits on clear content
+  void propertyPanelDeactivated();
+
 protected:
   /// Makes the widget active, deactivate the previous, activate and hightlight the given one
   /// \param theWidget a widget

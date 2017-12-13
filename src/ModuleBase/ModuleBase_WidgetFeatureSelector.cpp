@@ -110,34 +110,15 @@ bool ModuleBase_WidgetFeatureSelector::setSelectionCustom(const ModuleBase_Viewe
 }
 
 //********************************************************************
-void ModuleBase_WidgetFeatureSelector::deactivate()
+void ModuleBase_WidgetFeatureSelector::selectionModes(QIntList& theModes, bool& isAdditional)
 {
-  ModuleBase_ModelWidget::deactivate();
-  activateFilters(false);
-  myWorkshop->deactivateSubShapesSelection();
-}
-
-//********************************************************************
-bool ModuleBase_WidgetFeatureSelector::processAction(ModuleBase_ActionType theActionType,
-                                                     const ActionParamPtr& theParam)
-{
-  if (theActionType == ActionSelection)
-    onSelectionChanged();
-  else
-    return ModuleBase_WidgetValidated::processAction(theActionType, theParam);
-
-  return true;
+  theModes.push_back(ModuleBase_ResultPrs::Sel_Result);
+  isAdditional = true;
 }
 
 //********************************************************************
 void ModuleBase_WidgetFeatureSelector::activateCustom()
 {
-  activateFilters(true);
-
-  QIntList aShapeTypes;
-  aShapeTypes.push_back(ModuleBase_ResultPrs::Sel_Result);
-  myWorkshop->activateSubShapesSelection(aShapeTypes);
-
   // Restore selection in the viewer by the attribute selection list
   // it should be postponed to have current widget as active to validate restored selection
   //static Events_ID anEvent = Events_Loop::eventByName(EVENT_UPDATE_BY_WIDGET_SELECTION);
@@ -227,13 +208,15 @@ bool ModuleBase_WidgetFeatureSelector::isValidInFilters(const ModuleBase_ViewerP
 }
 
 //********************************************************************
-void ModuleBase_WidgetFeatureSelector::onSelectionChanged()
+bool ModuleBase_WidgetFeatureSelector::processSelection()
 {
   QList<ModuleBase_ViewerPrsPtr> aSelected = myWorkshop->selection()->getSelected(
                                                               ModuleBase_ISelection::AllControls);
 
   bool isDone = setSelection(aSelected, true/*false*/);
   updateOnSelectionChanged(isDone);
+
+  return isDone;
 }
 
 //********************************************************************

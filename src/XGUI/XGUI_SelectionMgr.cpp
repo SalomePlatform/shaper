@@ -151,6 +151,28 @@ void XGUI_SelectionMgr::onViewerSelection()
 }
 
 //**************************************************************
+void XGUI_SelectionMgr::deselectPresentation(const Handle(AIS_InteractiveObject) theObject)
+{
+  NCollection_List<Handle(SelectBasics_EntityOwner)> aResultOwners;
+
+  Handle(AIS_InteractiveContext) aContext = myWorkshop->viewer()->AISContext();
+  for (aContext->InitSelected(); aContext->MoreSelected(); aContext->NextSelected()) {
+    Handle(SelectMgr_EntityOwner) anOwner = aContext->SelectedOwner();
+    if (anOwner.IsNull()) // TODO: check why it is possible
+      continue;
+    if (anOwner->Selectable() == theObject && anOwner->IsSelected())
+      aResultOwners.Append(anOwner);
+  }
+  NCollection_List<Handle(SelectBasics_EntityOwner)>::Iterator anOwnersIt (aResultOwners);
+  Handle(SelectMgr_EntityOwner) anOwner;
+  for (; anOwnersIt.More(); anOwnersIt.Next()) {
+    anOwner = Handle(SelectMgr_EntityOwner)::DownCast(anOwnersIt.Value());
+    if (!anOwner.IsNull())
+      aContext->AddOrRemoveSelected(anOwner, false);
+  }
+}
+
+//**************************************************************
 void XGUI_SelectionMgr::updateSelectionBy(const ModuleBase_ISelection::SelectionPlace& thePlace)
 {
   QList<ModuleBase_ViewerPrsPtr> aSelectedPrs =

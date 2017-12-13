@@ -37,7 +37,10 @@
 #include <ModuleBase_ModelWidget.h>
 
 #include <GeomAPI_Pln.h>
+
 #include <SelectMgr_IndexedMapOfOwner.hxx>
+#include <SelectMgr_ListOfFilter.hxx>
+
 #include <TopoDS_Shape.hxx>
 #include <TopTools_MapOfShape.hxx>
 
@@ -194,11 +197,9 @@ public:
   /// \param theOperation a committed operation
   void commitNestedSketch(ModuleBase_Operation* theOperation);
 
-  /// Append the sketch selection filters in 3D viewer (plane and circle pointer)
-  void activateSelectionFilters();
-
-  // Remove sketch selection filter from the current viewer
-  virtual void deactivateSelectionFilters();
+  /// Appends into container of workshop selection filters
+  /// \param [out] selection filters
+  virtual void selectionFilters(SelectMgr_ListOfFilter& theSelectionFilters) const;
 
   /// Append the sketch plane filter into the current viewer
   /// \param toActivate state whether the filter should be activated/deactivated
@@ -302,8 +303,9 @@ public:
   static const QStringList& constraintsIdList();
 
   /// Returns a list of modes, where the AIS objects should be activated
+  /// \param theSketch a sketch object, modes are empty if sketch plane is not defined yet
   /// \param theModes a list of modes
-  static void sketchSelectionModes(QIntList& theModes);
+  static void sketchSelectionModes(const CompositeFeaturePtr& theSketch, QIntList& theModes);
 
   /// Create specific for the module presentation
   /// \param theResult an object for presentation

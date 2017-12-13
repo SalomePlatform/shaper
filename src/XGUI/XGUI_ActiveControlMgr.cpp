@@ -18,8 +18,12 @@
 // email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com>
 //
 
-#include <XGUI_ActiveControlMgr.h>
-#include <XGUI_ActiveControlSelector.h>
+#include "XGUI_ActiveControlMgr.h"
+#include "XGUI_ActiveControlSelector.h"
+#include "XGUI_SelectionActivate.h"
+#include "XGUI_Tools.h"
+#include "XGUI_Workshop.h"
+
 
 #include <ModuleBase_IModule.h>
 #include <ModuleBase_IWorkshop.h>
@@ -64,6 +68,8 @@ void XGUI_ActiveControlMgr::onSelectorActivated()
     myActiveSelector->setActive(false);
 
   activateSelector(aSelector);
+  XGUI_Tools::workshop(myWorkshop)->selectionActivate()->updateSelectionModes();
+  XGUI_Tools::workshop(myWorkshop)->selectionActivate()->updateSelectionFilters();
 }
 
 //********************************************************************
@@ -76,7 +82,6 @@ void XGUI_ActiveControlMgr::onSelectorDeactivated()
   myActiveSelector = NULL;
 
   aSelector->setActive(false);
-  myWorkshop->module()->updateActiveSelectionFilters();
 
   XGUI_ActiveControlSelector* aSelectorToBeActivated = 0;
   for (int i = 0, aCount = mySelectors.count(); i < aCount; i++)
@@ -88,6 +93,9 @@ void XGUI_ActiveControlMgr::onSelectorDeactivated()
   }
   if (aSelectorToBeActivated)
     activateSelector(aSelectorToBeActivated);
+
+  XGUI_Tools::workshop(myWorkshop)->selectionActivate()->updateSelectionModes();
+  XGUI_Tools::workshop(myWorkshop)->selectionActivate()->updateSelectionFilters();
 }
 
 //********************************************************************
@@ -104,6 +112,4 @@ void XGUI_ActiveControlMgr::activateSelector(XGUI_ActiveControlSelector* theSele
 {
   myActiveSelector = theSelector;
   theSelector->setActive(true);
-
-  myWorkshop->module()->updateActiveSelectionFilters();
 }

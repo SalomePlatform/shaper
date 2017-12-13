@@ -56,7 +56,7 @@ Q_OBJECT
 
   /// Activate or deactivate selection and selection filters
   /// \param toActivate boolean state whether it should be activated/deactivated
-  virtual bool activateSelectionAndFilters(bool toActivate);
+  virtual void activateSelectionAndFilters(bool toActivate);
 
 protected:
   /// Checks the widget validity. By default, it returns true.

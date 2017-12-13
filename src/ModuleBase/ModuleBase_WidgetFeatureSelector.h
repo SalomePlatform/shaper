@@ -68,6 +68,11 @@ Q_OBJECT
   virtual bool setSelection(QList<std::shared_ptr<ModuleBase_ViewerPrs>>& theValues,
                             const bool theToValidate);
 
+  /// Fills given container with selection modes if the widget has it
+  /// \param theModes [out] a container of modes
+  /// \param isAdditional if true, the modes are combinated with the module ones
+  virtual void selectionModes(QIntList& theModes, bool& isAdditional);
+
   /// Returns list of widget controls
   /// \return a control list
   virtual QList<QWidget*> getControls() const;
@@ -75,13 +80,6 @@ Q_OBJECT
   /// Fills the attribute with the value of the selected owner
   /// \param thePrs a selected owner
   virtual bool setSelectionCustom(const std::shared_ptr<ModuleBase_ViewerPrs>& thePrs);
-
-  /// The method called when widget is deactivated
-  virtual void deactivate();
-
-  /// Processes Selection action.
-  virtual bool processAction(ModuleBase_ActionType theActionType,
-                             const ActionParamPtr& theParam = ActionParamPtr());
 
 protected:
   /// The method called when widget is activated
@@ -109,8 +107,8 @@ protected:
   virtual void updateOnSelectionChanged(const bool theDone);
 
 protected:
-  /// Called on selection changed event
-  virtual void onSelectionChanged();
+  /// Returns true if envent is processed.
+  virtual bool processSelection();
 
   //----------- Class members -------------
 protected:

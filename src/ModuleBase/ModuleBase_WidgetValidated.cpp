@@ -22,6 +22,7 @@
 #include <ModuleBase_IViewer.h>
 #include <ModuleBase_IWorkshop.h>
 #include <ModuleBase_ISelection.h>
+#include <ModuleBase_ISelectionActivate.h>
 #include <ModuleBase_WidgetSelectorStore.h>
 #include <ModuleBase_ViewerPrs.h>
 
@@ -62,6 +63,12 @@ ModuleBase_WidgetValidated::~ModuleBase_WidgetValidated()
 ObjectPtr ModuleBase_WidgetValidated::findPresentedObject(const AISObjectPtr& theAIS) const
 {
   return myPresentedObject;
+}
+
+//********************************************************************
+void ModuleBase_WidgetValidated::deactivate()
+{
+  clearValidatedCash();
 }
 
 //********************************************************************
@@ -115,8 +122,12 @@ bool ModuleBase_WidgetValidated::isValidInFilters(const ModuleBase_ViewerPrsPtr&
     // the widget validator filter should be active, but during check by preselection
     // it is not yet activated, so we need to activate/deactivate it manually
     bool isActivated = isFilterActivated();
-    if (!isActivated)
-      activateFilters(true);
+    if (!isActivated) {
+      SelectMgr_ListOfFilter aSelectionFilters;
+      selectionFilters(aSelectionFilters);
+      /// after validation, the selection filters should be restored
+      myWorkshop->selectionActivate()->activateSelectionFilters(aSelectionFilters);
+    }
 
     Handle(AIS_InteractiveContext) aContext = myWorkshop->viewer()->AISContext();
     if (!aContext.IsNull()) {
@@ -128,7 +139,10 @@ bool ModuleBase_WidgetValidated::isValidInFilters(const ModuleBase_ViewerPrsPtr&
       }
     }
     if (!isActivated)
-      activateFilters(false);
+    {
+      myWorkshop->selectionActivate()->updateSelectionFilters();
+      clearValidatedCash();
+    }
   }
 
   // removes created owner
@@ -218,6 +232,7 @@ bool ModuleBase_WidgetValidated::isValidAttribute(const AttributePtr& theAttribu
   return aFactory->validate(theAttribute, aValidatorID, anError);
 }
 
+//********************************************************************
 bool ModuleBase_WidgetValidated::isFilterActivated() const
 {
   bool isActivated = false;
@@ -228,21 +243,10 @@ bool ModuleBase_WidgetValidated::isFilterActivated() const
   return aViewer->hasSelectionFilter(aSelFilter);
 }
 
-bool ModuleBase_WidgetValidated::activateFilters(const bool toActivate)
+//********************************************************************
+void ModuleBase_WidgetValidated::selectionFilters(SelectMgr_ListOfFilter& theSelectionFilters)
 {
-  ModuleBase_IViewer* aViewer = myWorkshop->viewer();
-
-  Handle(SelectMgr_Filter) aSelFilter = myWorkshop->validatorFilter();
-  bool aHasSelectionFilter = aViewer->hasSelectionFilter(aSelFilter);
-
-  if (toActivate)
-    aViewer->addSelectionFilter(aSelFilter);
-  else {
-    aViewer->removeSelectionFilter(aSelFilter);
-    clearValidatedCash();
-  }
-
-  return aHasSelectionFilter;
+  theSelectionFilters.Append(myWorkshop->validatorFilter());
 }
 
 //********************************************************************
