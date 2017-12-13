@@ -143,7 +143,6 @@ public slots:
   /**
   * Makes the given widget active, highlights it and removes
   * highlighting from the previous active widget
-  * emits widgetActivated(theWidget) signal
   * \param theWidget which has to be activated
   * \param theEmitSignal a flag to prohibit signal emit
   */

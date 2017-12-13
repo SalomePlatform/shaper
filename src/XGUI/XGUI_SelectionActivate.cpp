@@ -121,20 +121,6 @@ void XGUI_SelectionActivate::updateSelectionFilters()
 }
 
 //**************************************************************
-void XGUI_SelectionActivate::activateSelectionAndFilters(ModuleBase_ModelWidget* theWidget)
-{
-  // activate selection modes
-  QIntList aModes;
-  getSelectionModes(theWidget, aModes);
-  activateObjects(aModes, getDisplayer()->displayedObjects(), true);
-
-  // activate selection filters
-  SelectMgr_ListOfFilter aSelectionFilters;
-  getSelectionFilters(theWidget, aSelectionFilters);
-  activateSelectionFilters(aSelectionFilters);
-}
-
-//**************************************************************
 void XGUI_SelectionActivate::activateSelectionFilters
   (const SelectMgr_ListOfFilter& theSelectionFilters)
 {
@@ -148,6 +134,20 @@ void XGUI_SelectionActivate::activateSelectionFilters
       continue;
     aDisplayer->addSelectionFilter(aFilter);
   }
+}
+
+//**************************************************************
+void XGUI_SelectionActivate::activateSelectionAndFilters(ModuleBase_ModelWidget* theWidget)
+{
+  // activate selection modes
+  QIntList aModes;
+  getSelectionModes(theWidget, aModes);
+  activateObjects(aModes, getDisplayer()->displayedObjects(), true);
+
+  // activate selection filters
+  SelectMgr_ListOfFilter aSelectionFilters;
+  getSelectionFilters(theWidget, aSelectionFilters);
+  activateSelectionFilters(aSelectionFilters);
 }
 
 //**************************************************************

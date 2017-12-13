@@ -100,7 +100,7 @@ signals:
 
   /// The signal about the widget activation
   /// \param theWidget the activated widget
-  void widgetActivated(ModuleBase_ModelWidget* theWidget);
+  //void widgetActivated(ModuleBase_ModelWidget* theWidget);
 
   /// Emited when there is no next widget
   /// \param thePreviousAttributeID an attribute key of the previous active widget
@@ -117,7 +117,6 @@ public slots:
   /**
   * Makes the given widget active, highlights it and removes
   * highlighting from the previous active widget
-  * emits widgetActivated(theWidget) signal
   * \param theWidget which has to be activated
   * \param theEmitSignal a flag to prohibit signal emit
   */

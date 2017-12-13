@@ -67,10 +67,6 @@ public:
   XGUI_EXPORT virtual void activateSelectionFilters
     (const SelectMgr_ListOfFilter& theSelectionFilters);
 
-  /// Activate or deactivate selection and selection filters like the widget is active
-  /// \param theWidget a source widget of selection modes/filters
-  XGUI_EXPORT virtual void activateSelectionAndFilters(ModuleBase_ModelWidget* theWidget);
-
   /// Returns list of currently active selection modes
   /// Selection modes will be returned according to TopAbs_ShapeEnum
   XGUI_EXPORT QIntList activeSelectionModes() const;
@@ -137,6 +133,10 @@ public:
   XGUI_EXPORT void deactivateTrihedronInSelectionModes();
 
 protected:
+  /// Activate or deactivate selection and selection filters like the widget is active
+  /// \param theWidget a source widget of selection modes/filters
+  virtual void activateSelectionAndFilters(ModuleBase_ModelWidget* theWidget);
+
   /// Returns selection modes of the widget
   /// \param theWidget model widget
   /// \param theModes selection modes

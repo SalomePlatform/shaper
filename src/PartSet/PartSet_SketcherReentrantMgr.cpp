@@ -322,23 +322,23 @@ void PartSet_SketcherReentrantMgr::setReentrantPreSelection(
   aReentrantMessage->setClickedPoint(myClickedSketchPoint);
 }
 
-void PartSet_SketcherReentrantMgr::onWidgetActivated()
-{
-  if (!isActiveMgr())
-    return;
-  if (!myIsInternalEditOperation)
-    return;
-
-  PartSet_Module* aModule = module();
-  ModuleBase_ModelWidget* aFirstWidget = aModule->activeWidget();
-  ModuleBase_IPropertyPanel* aPanel = aModule->currentOperation()->propertyPanel();
-  if (aFirstWidget != aPanel->activeWidget()) {
-    ModuleBase_WidgetSelector* aWSelector = dynamic_cast<ModuleBase_WidgetSelector*>(aFirstWidget);
-    if (aWSelector) {
-      myWorkshop->selectionActivate()->activateSelectionAndFilters(aWSelector);
-    }
-  }
-}
+//void PartSet_SketcherReentrantMgr::onWidgetActivated()
+//{
+//  if (!isActiveMgr())
+//    return;
+//  if (!myIsInternalEditOperation)
+//    return;
+//
+//  PartSet_Module* aModule = module();
+//  ModuleBase_ModelWidget* aFirstWidget = aModule->activeWidget();
+//  ModuleBase_IPropertyPanel* aPanel = aModule->currentOperation()->propertyPanel();
+//  if (aFirstWidget != aPanel->activeWidget()) {
+//    ModuleBase_WidgetSelector* aWSelector = dynamic_cast<ModuleBase_WidgetSelector*>(aFirstWidget);
+//    if (aWSelector) {
+//      myWorkshop->selectionActivate()->activateSelectionAndFilters(aWSelector);
+//    }
+//  }
+//}
 
 void PartSet_SketcherReentrantMgr::onNoMoreWidgets(const std::string& thePreviousAttributeID)
 {
@@ -504,7 +504,7 @@ bool PartSet_SketcherReentrantMgr::startInternalEdit(const std::string& thePrevi
     connect(aFOperation, SIGNAL(beforeAborted()), this, SLOT(onBeforeStopped()));
 
     // activate selection filters of the first widget in the viewer
-    onWidgetActivated();
+    //onWidgetActivated();
 
     // activate the last active widget in the Property Panel
     if (!thePreviousAttributeID.empty()) {

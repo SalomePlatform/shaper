@@ -139,7 +139,7 @@ public:
 private slots:
   /// SLOT, that is called by a widget activating in the property panel
   /// If the 'internal' edit operation is started, it activates the first widget selection
-  void onWidgetActivated();
+  //void onWidgetActivated();
 
   /// SLOT, that is called by no more widget signal emitted by property panel
   /// Start an internal edit operation or, if the internal flag is forbided, commits

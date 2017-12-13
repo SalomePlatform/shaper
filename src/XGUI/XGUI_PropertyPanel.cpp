@@ -494,7 +494,7 @@ bool XGUI_PropertyPanel::setActiveWidget(ModuleBase_ModelWidget* theWidget, cons
   Events_Loop::loop()->flush(anEvent);
 
   if (isEmitSignal) {
-    emit widgetActivated(myActiveWidget);
+    //emit widgetActivated(myActiveWidget);
     if (!myActiveWidget && !isEditingMode()) {
       emit noMoreWidgets(aPreviosAttributeID);
     }
