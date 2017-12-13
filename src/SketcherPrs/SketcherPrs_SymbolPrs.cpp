@@ -59,7 +59,7 @@
 #endif
 
 /// Step between icons
-static const double MyDist = 0.02;
+static const double MyDist = 0.015;
 
 
 //**************************************************************
