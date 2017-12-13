@@ -25,6 +25,7 @@
 
 #include <ModelAPI_Result.h>
 
+#include <BRep_Builder.hxx>
 #include <NCollection_List.hxx>
 #include <ViewerData_AISShape.hxx>
 #include <Standard_DefineHandle.hxx>
@@ -124,6 +125,18 @@ private:
   bool appendVertexSelection(const Handle(SelectMgr_Selection)& aSelection,
                              const Standard_Integer theMode);
 
+  /// Creates compound of vertices, edges and faces.
+  /// If the shape is COMPOUND, iterate by sub-shapes.
+  /// If the shape is SOLID/SHEL, explore shape by FACES,
+  /// If the shape is WIRE, explore shape by EDGES
+  /// \param theBuilder result compound builder
+  /// \param theCompound the result shape
+  /// \param theShape the processed shape
+  /// \param theHiddenSubShapes container of shapes to be skipped (faces)
+  void collectSubShapes(BRep_Builder& theBuilder, TopoDS_Shape& theCompound,
+    const TopoDS_Shape& theShape, const NCollection_List<TopoDS_Shape>& theHiddenSubShapes);
+
+private:
   /// Reference to result object
   ResultPtr myResult;
 

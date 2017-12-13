@@ -36,6 +36,7 @@
 #include <AIS_ColoredDrawer.hxx>
 #include <AIS_InteractiveContext.hxx>
 #include <AIS_Selection.hxx>
+#include <BOPTools_AlgoTools3D.hxx>
 #include <BRep_Builder.hxx>
 #include <Graphic3d_AspectMarker3d.hxx>
 #include <Prs3d_Drawer.hxx>
@@ -146,16 +147,15 @@ bool ModuleBase_ResultPrs::hasSubShapeVisible(const TopoDS_Shape& theShape)
   if (!myHiddenSubShapes.Contains(theShape))
     aNbOfHiddenSubShapes++; // the shape to be hidden later
 
-  TopExp_Explorer anExp(myOriginalShape, TopAbs_FACE);
-  bool aHasVisibleShape = false;
-  for(TopExp_Explorer anExp(myOriginalShape, TopAbs_FACE); anExp.More() && !aHasVisibleShape;
-      anExp.Next())
-  {
-    aNbOfHiddenSubShapes--;
-    if (aNbOfHiddenSubShapes < 0)
-      aHasVisibleShape = true;
-  }
-  return aHasVisibleShape;
+  //const TopoDS_Shape aCurrentShape = Shape();
+  NCollection_List<TopoDS_Shape> aHiddenSubShapes = myHiddenSubShapes;
+  aHiddenSubShapes.Append(theShape);
+
+  TopoDS_Compound aCompound;
+  BRep_Builder aBuilder;
+  aBuilder.MakeCompound (aCompound);
+  collectSubShapes(aBuilder, aCompound, myOriginalShape, aHiddenSubShapes);
+  return !BOPTools_AlgoTools3D::IsEmptyShape(aCompound);
 }
 
 //********************************************************************
@@ -184,17 +184,12 @@ void ModuleBase_ResultPrs::Compute(
         Set(myOriginalShape);
     }
     else { // convert shape into SHELL
-      TopoDS_Shell aShell;
-      BRep_Builder aShellBuilder;
-      aShellBuilder.MakeShell(aShell);
-      bool isEmptyShape = true;
-      for(TopExp_Explorer anExp(myOriginalShape, TopAbs_FACE); anExp.More(); anExp.Next()) {
-        if (myHiddenSubShapes.Contains(anExp.Current()))
-          continue;
-        aShellBuilder.Add(aShell, anExp.Current());
-        isEmptyShape = false;
-      }
-      Set(aShell);
+      TopoDS_Compound aCompound;
+      BRep_Builder aBuilder;
+      aBuilder.MakeCompound (aCompound);
+      collectSubShapes(aBuilder, aCompound, myOriginalShape, myHiddenSubShapes);
+      bool isEmptyShape = BOPTools_AlgoTools3D::IsEmptyShape(aCompound);
+      Set(aCompound);
       if (isEmptyShape)
         aReadyToDisplay = false;
     }
@@ -215,6 +210,45 @@ void ModuleBase_ResultPrs::Compute(
                        "An empty AIS presentation: ModuleBase_ResultPrs").send();
     static const Events_ID anEvent = Events_Loop::eventByName(EVENT_EMPTY_AIS_PRESENTATION);
     ModelAPI_EventCreator::get()->sendUpdated(myResult, anEvent);
+  }
+}
+
+//********************************************************************
+void ModuleBase_ResultPrs::collectSubShapes(BRep_Builder& theBuilder,
+  TopoDS_Shape& theCompound, const TopoDS_Shape& theShape,
+  const NCollection_List<TopoDS_Shape>& theHiddenSubShapes)
+{
+  switch (theShape.ShapeType()) {
+    case TopAbs_COMPOUND: {
+      for (TopoDS_Iterator aChildIter (theShape); aChildIter.More(); aChildIter.Next())
+        collectSubShapes(theBuilder, theCompound, aChildIter.Value(), theHiddenSubShapes);
+    }
+    break;
+    case TopAbs_SOLID:
+    case TopAbs_SHELL: {
+      for (TopExp_Explorer anExp (theShape, TopAbs_FACE); anExp.More(); anExp.Next()) {
+        collectSubShapes(theBuilder, theCompound, anExp.Current(), theHiddenSubShapes);
+      }
+    }
+    break;
+    case TopAbs_WIRE: {
+      for (TopExp_Explorer anExp (theShape, TopAbs_EDGE); anExp.More(); anExp.Next()) {
+        collectSubShapes(theBuilder, theCompound, anExp.Current(), theHiddenSubShapes);
+      }
+    }
+    break;
+    case TopAbs_FACE: {
+      if (theHiddenSubShapes.Contains(theShape))
+        return; // remove hidden shape
+      theBuilder.Add(theCompound, theShape);
+    }
+    break;
+    case TopAbs_EDGE:
+    case TopAbs_VERTEX: {
+      theBuilder.Add(theCompound, theShape);
+    }
+    default:
+      break;
   }
 }
 
