@@ -26,7 +26,7 @@ class FeaturesPlugin_MultiRotation : public ModelAPI_Feature
   /// Multi-rotation kind.
   inline static const std::string& ID()
   {
-    static const std::string MY_MULTIROTATION_ID("MultiRotation");
+    static const std::string MY_MULTIROTATION_ID("AngularCopy");
     return MY_MULTIROTATION_ID;
   }
 

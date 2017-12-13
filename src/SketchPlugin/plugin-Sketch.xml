@@ -494,7 +494,7 @@ email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com
       <!--  SketchConstraintMirror  -->
       <feature
         id="SketchConstraintMirror"
-        title="Mirror" icon="icons/Sketch/mirror.png"
+        title="Mirror copy" icon="icons/Sketch/mirror.png"
         tooltip="Create constraint, mirroring group of objects">
         <sketch_shape_selector id="ConstraintEntityA"
             label="Mirror line" tooltip="Select mirror line" shape_types="edge">
@@ -515,8 +515,8 @@ email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com
       <!--  SketchMultiTranslation  -->
       <feature
         id="SketchMultiTranslation"
-        title="Translation" icon="icons/Sketch/translate.png"
-        tooltip="Multiple translation">
+        title="Linear copy" icon="icons/Sketch/translate.png"
+        tooltip="Copy objects and move">
         <sketch_multi_selector id="MultiTranslationList"
             label="Segments:"
             tooltip="Select list of objects to be translated"
@@ -583,8 +583,8 @@ email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com
       <!--  SketchMultiRotation  -->
       <feature
         id="SketchMultiRotation"
-        title="Rotation" icon="icons/Sketch/rotate.png"
-        tooltip="Multiple rotation">
+        title="Angular copy" icon="icons/Sketch/rotate.png"
+        tooltip="Copy objects and rotate">
         <sketch_multi_selector id="MultiRotationList"
             label="Segments:"
             tooltip="Select list of objects to be rotated"

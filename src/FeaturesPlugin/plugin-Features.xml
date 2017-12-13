@@ -100,10 +100,10 @@ email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com
       <feature id="Symmetry" title="Symmetry" tooltip="Perform symmetry with respect to a point, an axis or a plane" icon="icons/Features/symmetry.png">
         <source path="symmetry_widget.xml"/>
       </feature>
-      <feature id="MultiTranslation" title="MultiTranslation" tooltip="Perform multi-translation objects" icon="icons/Features/multitranslation.png">
+      <feature id="LinearCopy" title="Linear copy" tooltip="Perform copy and translate" icon="icons/Features/multitranslation.png">
         <source path="multitranslation_widget.xml"/>
       </feature>
-      <feature id="MultiRotation" title="MultiRotation" tooltip="Perform multi-rotation objects" icon="icons/Features/multirotation.png">
+      <feature id="AngularCopy" title="Angular Copy" tooltip="Perform copy and rotate" icon="icons/Features/multirotation.png">
         <source path="multirotation_widget.xml"/>
       </feature>
     </group>

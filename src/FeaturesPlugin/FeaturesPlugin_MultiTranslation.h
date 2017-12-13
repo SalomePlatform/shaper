@@ -38,7 +38,7 @@ class FeaturesPlugin_MultiTranslation : public ModelAPI_Feature
   /// Multi-translation kind.
   inline static const std::string& ID()
   {
-    static const std::string MY_MULTITRANSLATION_ID("MultiTranslation");
+    static const std::string MY_MULTITRANSLATION_ID("LinearCopy");
     return MY_MULTITRANSLATION_ID;
   }
 
