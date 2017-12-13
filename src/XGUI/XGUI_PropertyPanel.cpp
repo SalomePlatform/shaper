@@ -436,7 +436,7 @@ bool XGUI_PropertyPanel::focusNextPrevChild(bool theIsNext)
       bool isFirstControl = !theIsNext;
       QWidget* aLastFocusControl = myActiveWidget->getControlAcceptingFocus(isFirstControl);
       if (aFocusWidget == aLastFocusControl) {
-        setActiveWidget(NULL);
+        setActiveWidget(NULL, false);
       }
     }
 
@@ -464,15 +464,10 @@ void XGUI_PropertyPanel::activateWidget(ModuleBase_ModelWidget* theWidget, const
     aPreviosAttributeID = myActiveWidget->attributeID();
 
   // Avoid activation of already actve widget. It could happen on focusIn event many times
-  if (setActiveWidget(theWidget) && theEmitSignal) {
-    emit widgetActivated(myActiveWidget);
-    if (!myActiveWidget && !isEditingMode()) {
-      emit noMoreWidgets(aPreviosAttributeID);
-    }
-  }
+  setActiveWidget(theWidget, theEmitSignal);
 }
 
-bool XGUI_PropertyPanel::setActiveWidget(ModuleBase_ModelWidget* theWidget)
+bool XGUI_PropertyPanel::setActiveWidget(ModuleBase_ModelWidget* theWidget, const bool isEmitSignal)
 {
   // Avoid activation of already actve widget. It could happen on focusIn event many times
   if (theWidget == myActiveWidget) {
@@ -491,8 +486,6 @@ bool XGUI_PropertyPanel::setActiveWidget(ModuleBase_ModelWidget* theWidget)
     theWidget->activate();
   }
   myActiveWidget = theWidget;
-  myOperationMgr->workshop()->selectionActivate()->updateSelectionModes();
-  myOperationMgr->workshop()->selectionActivate()->updateSelectionFilters();
 
 #ifdef DEBUG_ACTIVE_WIDGET
   std::cout << "myActiveWidget = " << (theWidget ? theWidget->context().c_str() : "") << std::endl;
@@ -500,6 +493,15 @@ bool XGUI_PropertyPanel::setActiveWidget(ModuleBase_ModelWidget* theWidget)
   static Events_ID anEvent = Events_Loop::eventByName(EVENT_UPDATE_BY_WIDGET_SELECTION);
   Events_Loop::loop()->flush(anEvent);
 
+  if (isEmitSignal) {
+    emit widgetActivated(myActiveWidget);
+    if (!myActiveWidget && !isEditingMode()) {
+      emit noMoreWidgets(aPreviosAttributeID);
+    }
+  }
+  emit propertyPanelActivated();
+  myOperationMgr->workshop()->selectionActivate()->updateSelectionModes();
+  myOperationMgr->workshop()->selectionActivate()->updateSelectionFilters();
   return true;
 }
 

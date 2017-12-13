@@ -163,13 +163,16 @@ signals:
   /// \param theObject a sender of the event
   void enterClicked(QObject* theObject);
 
-  /// Emits on clear content
+  /// Emits on deactivating property panel (e.g. by clearContent)
   void propertyPanelDeactivated();
+  /// Emits on widget activating
+  void propertyPanelActivated();
 
 protected:
   /// Makes the widget active, deactivate the previous, activate and hightlight the given one
   /// \param theWidget a widget
-  bool setActiveWidget(ModuleBase_ModelWidget* theWidget);
+  /// \param isEmitSignal flag whether panel signals should be emitted
+  bool setActiveWidget(ModuleBase_ModelWidget* theWidget, const bool isEmitSignal);
   /// The parent method that processes the "Tab"/"SHIF + Tab" keyboard events
   /// Emits a signal about focus change
   /// If theIsNext is true, this function searches forward, if next is false, it searches backward.
