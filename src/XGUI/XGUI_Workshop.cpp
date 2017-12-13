@@ -2630,7 +2630,9 @@ void XGUI_Workshop::insertFeatureFolder()
   SessionPtr aMgr = ModelAPI_Session::get();
   DocumentPtr aDoc = aMgr->activeDocument();
 
-  aMgr->startOperation();
+  QString aDescription = contextMenuMgr()->action("INSERT_FOLDER_CMD")->text();
+
+  aMgr->startOperation(aDescription.toStdString());
   aDoc->addFolder(aFeature);
   aMgr->finishOperation();
 }
@@ -2650,7 +2652,10 @@ void XGUI_Workshop::insertToFolder(bool isBefore)
   if (!aFolder.get())
     return;
 
-  aMgr->startOperation();
+  QString aDescription = contextMenuMgr()->action(
+    isBefore ? "ADD_TO_FOLDER_BEFORE_CMD" : "ADD_TO_FOLDER_AFTER_CMD")->text();
+
+  aMgr->startOperation(aDescription.toStdString());
   aDoc->moveToFolder(aFeatures, aFolder);
   aMgr->finishOperation();
 }
@@ -2664,7 +2669,11 @@ void XGUI_Workshop::moveOutFolder(bool isBefore)
   SessionPtr aMgr = ModelAPI_Session::get();
   DocumentPtr aDoc = aMgr->activeDocument();
 
-  aMgr->startOperation();
+
+  QString aDescription = contextMenuMgr()->action(
+    isBefore ? "ADD_OUT_FOLDER_BEFORE_CMD" : "ADD_OUT_FOLDER_AFTER_CMD")->text();
+
+  aMgr->startOperation(aDescription.toStdString());
   aDoc->removeFromFolder(aFeatures, isBefore);
   aMgr->finishOperation();
 }
