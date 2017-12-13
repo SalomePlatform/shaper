@@ -54,10 +54,6 @@ public:
   MODULEBASE_EXPORT virtual void activateSelectionFilters
     (const SelectMgr_ListOfFilter& theSelectionFilters) = 0;
 
-  /// Activate or deactivate selection and selection filters like the widget is active
-  /// \param theWidget a source widget of selection modes/filters
-  MODULEBASE_EXPORT virtual void activateSelectionAndFilters(ModuleBase_ModelWidget* theWidget) = 0;
-
 protected:
   ModuleBase_IWorkshop* myWorkshop; ///< active workshop
 };

@@ -499,7 +499,10 @@ bool XGUI_PropertyPanel::setActiveWidget(ModuleBase_ModelWidget* theWidget, cons
       emit noMoreWidgets(aPreviosAttributeID);
     }
   }
-  emit propertyPanelActivated();
+  if (myActiveWidget)
+    emit propertyPanelActivated();
+  else
+    emit propertyPanelDeactivated();
   myOperationMgr->workshop()->selectionActivate()->updateSelectionModes();
   myOperationMgr->workshop()->selectionActivate()->updateSelectionFilters();
   return true;

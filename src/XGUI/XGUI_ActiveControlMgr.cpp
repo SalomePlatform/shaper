@@ -76,12 +76,11 @@ void XGUI_ActiveControlMgr::onSelectorActivated()
 void XGUI_ActiveControlMgr::onSelectorDeactivated()
 {
   XGUI_ActiveControlSelector* aSelector = qobject_cast<XGUI_ActiveControlSelector*>(sender());
-  if (!aSelector)
+  if (!aSelector || aSelector != myActiveSelector || !myActiveSelector)
     return;
 
+  myActiveSelector->setActive(false);
   myActiveSelector = NULL;
-
-  aSelector->setActive(false);
 
   XGUI_ActiveControlSelector* aSelectorToBeActivated = 0;
   for (int i = 0, aCount = mySelectors.count(); i < aCount; i++)

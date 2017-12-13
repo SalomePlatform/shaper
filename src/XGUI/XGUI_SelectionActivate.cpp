@@ -137,20 +137,6 @@ void XGUI_SelectionActivate::activateSelectionFilters
 }
 
 //**************************************************************
-void XGUI_SelectionActivate::activateSelectionAndFilters(ModuleBase_ModelWidget* theWidget)
-{
-  // activate selection modes
-  QIntList aModes;
-  getSelectionModes(theWidget, aModes);
-  activateObjects(aModes, getDisplayer()->displayedObjects(), true);
-
-  // activate selection filters
-  SelectMgr_ListOfFilter aSelectionFilters;
-  getSelectionFilters(theWidget, aSelectionFilters);
-  activateSelectionFilters(aSelectionFilters);
-}
-
-//**************************************************************
 void XGUI_SelectionActivate::getSelectionModes(ModuleBase_ModelWidget* theWidget,
                                                QIntList& theModes)
 {

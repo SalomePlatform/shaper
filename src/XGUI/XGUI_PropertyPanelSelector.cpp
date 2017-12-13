@@ -38,17 +38,21 @@ void XGUI_PropertyPanelSelector::reset()
 //********************************************************************
 void XGUI_PropertyPanelSelector::setActive(const bool& isActive)
 {
-  if (isActive) {
-    if (myWidgetToBeActivated)
-      myPanel->activateWidget(myWidgetToBeActivated, true);
+  if (isActive && myWidgetToBeActivated) {
+    // e.g. widget sketch label
+    myPanel->activateWidget(myWidgetToBeActivated, true);
+    myWidgetToBeActivated = NULL;
     return;
   }
-  ModuleBase_ModelWidget* aWidget = myPanel->activeWidget();
-  if (aWidget && aWidget->needToBeActiated())
-  {
-    myWidgetToBeActivated = aWidget;
+
+  if (!isActive) { // on deactivating, store previous active widget
+    ModuleBase_ModelWidget* aWidget = myPanel->activeWidget();
+    if (aWidget && aWidget->needToBeActiated())
+    {
+      myWidgetToBeActivated = aWidget;
+    }
+    myPanel->activateWidget(NULL, false);
   }
-  myPanel->activateWidget(NULL, false);
 }
 
 //********************************************************************

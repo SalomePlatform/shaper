@@ -660,13 +660,8 @@ void PartSet_SketcherReentrantMgr::deleteInternalFeature()
   std::cout << "PartSet_SketcherReentrantMgr::deleteInternalFeature: "
             << myInternalFeature->data()->name() << std::endl;
 #endif
-  if (myInternalActiveWidget) {
-    ModuleBase_WidgetSelector* aWSelector =
-      dynamic_cast<ModuleBase_WidgetSelector*>(myInternalActiveWidget);
-    if (aWSelector)
-      myWorkshop->selectionActivate()->activateSelectionAndFilters(aWSelector);
+  if (myInternalActiveWidget)
     myInternalActiveWidget = 0;
-  }
   delete myInternalWidget;
   myInternalWidget = 0;
 

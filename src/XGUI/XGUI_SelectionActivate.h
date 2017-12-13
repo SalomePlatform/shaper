@@ -133,10 +133,6 @@ public:
   XGUI_EXPORT void deactivateTrihedronInSelectionModes();
 
 protected:
-  /// Activate or deactivate selection and selection filters like the widget is active
-  /// \param theWidget a source widget of selection modes/filters
-  virtual void activateSelectionAndFilters(ModuleBase_ModelWidget* theWidget);
-
   /// Returns selection modes of the widget
   /// \param theWidget model widget
   /// \param theModes selection modes
