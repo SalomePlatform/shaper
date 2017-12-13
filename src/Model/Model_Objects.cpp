@@ -564,6 +564,9 @@ ObjectPtr Model_Objects::object(const std::string& theGroupID,
     return ObjectPtr();
   createHistory(theGroupID);
   const std::string& aGroupID = groupNameFoldering(theGroupID, theAllowFolder);
+  const std::vector<ObjectPtr>& aVec = myHistory[theGroupID];
+  if (aVec.size() <= theIndex)
+    return aVec[aVec.size() - 1]; // too high index requested (to avoid crash in #2360)
   return aGroupID.empty() ? myHistory[theGroupID][theIndex] : myHistory[aGroupID][theIndex];
 }
 
