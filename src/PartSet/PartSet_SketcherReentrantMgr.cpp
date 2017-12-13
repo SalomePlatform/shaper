@@ -333,7 +333,8 @@ void PartSet_SketcherReentrantMgr::setReentrantPreSelection(
 //  ModuleBase_ModelWidget* aFirstWidget = aModule->activeWidget();
 //  ModuleBase_IPropertyPanel* aPanel = aModule->currentOperation()->propertyPanel();
 //  if (aFirstWidget != aPanel->activeWidget()) {
-//    ModuleBase_WidgetSelector* aWSelector = dynamic_cast<ModuleBase_WidgetSelector*>(aFirstWidget);
+//    ModuleBase_WidgetSelector* aWSelector = dynamic_cast<ModuleBase_WidgetSelector*>
+//      (aFirstWidget);
 //    if (aWSelector) {
 //      myWorkshop->selectionActivate()->activateSelectionAndFilters(aWSelector);
 //    }
