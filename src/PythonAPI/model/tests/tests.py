@@ -198,31 +198,45 @@ def testHaveNamingEdges(theFeature, theModel, thePartDoc) :
     assert(shape.isEdge())
     assert(name != ""), "String empty"
 
-def testHaveNamingVertices(theFeature, theModel, thePartDoc) :
-  """ Tests if all vertices of result have a unique name
+def testHaveNamingByType(theFeature, theModel, thePartDoc, theSubshapeType) :
+  """ Tests if all sub-shapes of result have a unique name
   :param theFeature: feature to test.
+  :param theSubshapeType: type of sub-shape
   """
-  # Get feature result/sub-result
-  aResult = theFeature.results()[0].resultSubShapePair()[0]
-  # Get result/sub-result shape
-  shape = aResult.shape()
-  # Create shape explorer with desired shape type
-  shapeExplorer = GeomAPI_ShapeExplorer(shape, GeomAPI_Shape.VERTEX)
-  # Create list, and store selections in it
+  aFirstRes = theFeature.results()[0]
+  # Get number of sub-results
+  hasSubs = True
+  nbSubs = aFirstRes.numberOfSubs()
+  if nbSubs == 0:
+    # no sub-results => treat current result as a sub
+    hasSubs = False
+    nbSubs = 1
+
   selectionList = []
   shapesList = [] # to append only unique shapes (not isSame)
-  while shapeExplorer.more():
-    aDuplicate = False
-    for alreadyThere in shapesList:
-      if alreadyThere.isSame(shapeExplorer.current()):
-        aDuplicate = True
-    if aDuplicate:
+  for sub in range(0, nbSubs):
+    # Get feature result/sub-result
+    if hasSubs:
+      aResult = aFirstRes.subResult(sub).resultSubShapePair()[0]
+    else:
+      aResult = aFirstRes.resultSubShapePair()[0]
+    # Get result/sub-result shape
+    shape = aResult.shape()
+    # Create shape explorer with desired shape type
+    shapeExplorer = GeomAPI_ShapeExplorer(shape, theSubshapeType)
+    # Create list, and store selections in it
+    while shapeExplorer.more():
+      aDuplicate = False
+      for alreadyThere in shapesList:
+        if alreadyThere.isSame(shapeExplorer.current()):
+          aDuplicate = True
+      if aDuplicate:
+        shapeExplorer.next()
+        continue
+      shapesList.append(shapeExplorer.current())
+      selection = theModel.selection(aResult, shapeExplorer.current()) # First argument should be result/sub-result, second is sub-shape on this result/sub-result
+      selectionList.append(selection)
       shapeExplorer.next()
-      continue
-    shapesList.append(shapeExplorer.current())
-    selection = theModel.selection(aResult, shapeExplorer.current()) # First argument should be result/sub-result, second is sub-shape on this result/sub-result
-    selectionList.append(selection)
-    shapeExplorer.next()
   # Create group with this selection list
   Group_1 = theModel.addGroup(thePartDoc, selectionList)
   theModel.do()
@@ -236,11 +250,23 @@ def testHaveNamingVertices(theFeature, theModel, thePartDoc) :
     attrSelection = groupSelectionList.value(index)
     shape = attrSelection.value()
     name = attrSelection.namingName()
-    assert(shape.isVertex())
+    if theSubshapeType == GeomAPI_Shape.VERTEX:
+      assert(shape.isVertex())
+    elif theSubshapeType == GeomAPI_Shape.EDGE:
+      assert(shape.isEdge())
+    elif theSubshapeType == GeomAPI_Shape.FACE:
+      assert(shape.isFace())
     assert(name != ""), "String empty"
     presented_names.add(name)
   assert(len(presented_names) == groupSelectionList.size()), "Some names are not unique"
 
+def testHaveNamingSubshapes(theFeature, theModel, thePartDoc) :
+  """ Tests if all vertices/edges/faces of result have a unique name
+  :param theFeature: feature to test.
+  """
+  testHaveNamingByType(theFeature, theModel, thePartDoc, GeomAPI_Shape.VERTEX)
+  testHaveNamingByType(theFeature, theModel, thePartDoc, GeomAPI_Shape.EDGE)
+  testHaveNamingByType(theFeature, theModel, thePartDoc, GeomAPI_Shape.FACE)
 
 def testNbSubFeatures(theComposite, theKindOfSub, theExpectedCount):
   """ Tests number of sub-features of the given type
@@ -271,8 +297,8 @@ def checkBooleansResult(theFeature,theModel,NbRes,NbSubRes,NbSolid,NbFace,NbEdge
   """ Tests numbers of sub-shapes in results (used in Boolean operations tests)
   """
   theModel.testNbResults(theFeature, NbRes)
-  theModel.testNbSubResults(theFeature,NbSubRes)
-  theModel.testNbSubShapes(theFeature, GeomAPI_Shape.SOLID, NbSolid )
+  theModel.testNbSubResults(theFeature, NbSubRes)
+  theModel.testNbSubShapes(theFeature, GeomAPI_Shape.SOLID, NbSolid)
   theModel.testNbSubShapes(theFeature, GeomAPI_Shape.FACE, NbFace)
   theModel.testNbSubShapes(theFeature, GeomAPI_Shape.EDGE, NbEdge)
   theModel.testNbSubShapes(theFeature, GeomAPI_Shape.VERTEX, NbVertex)

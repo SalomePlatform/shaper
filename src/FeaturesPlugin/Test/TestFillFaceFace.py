@@ -1,0 +1,82 @@
+## Copyright (C) 2017  CEA/DEN, EDF R&D
+##
+## This library is free software; you can redistribute it and/or
+## modify it under the terms of the GNU Lesser General Public
+## License as published by the Free Software Foundation; either
+## version 2.1 of the License, or (at your option) any later version.
+##
+## This library is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+## Lesser General Public License for more details.
+##
+## You should have received a copy of the GNU Lesser General Public
+## License along with this library; if not, write to the Free Software
+## Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+##
+## See http:##www.salome-platform.org/ or
+## email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com>
+##
+
+
+from salome.shaper import model
+from SketchAPI import *
+
+model.begin()
+partSet = model.moduleDocument()
+Part_1 = model.addPart(partSet)
+Part_1_doc = Part_1.document()
+model.addParameter(Part_1_doc, "R", "50")
+Sketch_1 = model.addSketch(Part_1_doc, model.defaultPlane("XOY"))
+SketchLine_1 = Sketch_1.addLine(-49.81325699578132, 35.39936274902501, 0, 8.200436015051352)
+SketchProjection_1 = Sketch_1.addProjection(model.selection("EDGE", "PartSet/OY"), False)
+SketchLine_2 = SketchProjection_1.createdFeature()
+SketchConstraintCoincidence_1 = Sketch_1.setCoincident(SketchLine_1.endPoint(), SketchLine_2.result())
+SketchLine_3 = Sketch_1.addLine(0, 8.200436015051352, 49.94978427678259, 33.32234621934526)
+SketchConstraintCoincidence_2 = Sketch_1.setCoincident(SketchLine_1.endPoint(), SketchLine_3.startPoint())
+SketchArc_1 = Sketch_1.addArc(0, 31.08202242513997, 49.94978427678259, 33.32234621934526, -49.81325699578132, 35.39936274902501, False)
+SketchConstraintCoincidence_3 = Sketch_1.setCoincident(SketchLine_3.endPoint(), SketchArc_1.startPoint())
+SketchConstraintCoincidence_4 = Sketch_1.setCoincident(SketchLine_1.startPoint(), SketchArc_1.endPoint())
+SketchConstraintCoincidence_5 = Sketch_1.setCoincident(SketchArc_1.center(), SketchLine_2.result())
+SketchConstraintRadius_1 = Sketch_1.setRadius(SketchArc_1.results()[1], "R")
+model.do()
+Sketch_2 = model.addSketch(Part_1_doc, model.defaultPlane("YOZ"))
+SketchLine_4 = Sketch_2.addLine(31.79164821526215, 49.99496405877289, 8.200436015051352, 0)
+SketchProjection_2 = Sketch_2.addProjection(model.selection("VERTEX", "Sketch_1/Vertex-SketchLine_3s-SketchLine_1e"), False)
+SketchPoint_1 = SketchProjection_2.createdFeature()
+SketchConstraintCoincidence_6 = Sketch_2.setCoincident(SketchLine_4.endPoint(), SketchPoint_1.result())
+SketchLine_5 = Sketch_2.addLine(8.200436015051352, 0, 27.24680168984479, -49.85269382803262)
+SketchConstraintCoincidence_7 = Sketch_2.setCoincident(SketchLine_4.endPoint(), SketchLine_5.startPoint())
+SketchProjection_3 = Sketch_2.addProjection(model.selection("VERTEX", "Sketch_1/Vertex-SketchArc_1"), False)
+SketchPoint_2 = SketchProjection_3.createdFeature()
+SketchArc_2 = Sketch_2.addArc(31.08202242513997, 1.147024884467139e-021, 27.24680168984479, -49.85269382803262, 31.79164821526215, 49.99496405877289, False)
+SketchConstraintCoincidence_8 = Sketch_2.setCoincident(SketchPoint_2.result(), SketchArc_2.center())
+SketchConstraintCoincidence_9 = Sketch_2.setCoincident(SketchLine_5.endPoint(), SketchArc_2.startPoint())
+SketchConstraintCoincidence_10 = Sketch_2.setCoincident(SketchArc_2.endPoint(), SketchLine_4.startPoint())
+SketchConstraintRadius_2 = Sketch_2.setRadius(SketchArc_2.results()[1], "R")
+SketchProjection_4 = Sketch_2.addProjection(model.selection("EDGE", "PartSet/OZ"), False)
+SketchLine_6 = SketchProjection_4.createdFeature()
+SketchConstraintMirror_1 = Sketch_2.addMirror(SketchLine_6.result(), [SketchArc_2.results()[1]])
+[SketchArc_3] = SketchConstraintMirror_1.mirrored()
+SketchLine_7 = Sketch_2.addLine(-31.79164821526215, 49.99496405877289, -27.24680168984479, -49.85269382803261)
+SketchConstraintCoincidence_11 = Sketch_2.setCoincident(SketchAPI_Arc(SketchArc_3).endPoint(), SketchLine_7.startPoint())
+SketchConstraintCoincidence_12 = Sketch_2.setCoincident(SketchAPI_Arc(SketchArc_3).startPoint(), SketchLine_7.endPoint())
+model.do()
+Face_1 = model.addFace(Part_1_doc, [model.selection("WIRE", "Sketch_1/Wire-SketchLine_1f-SketchLine_3f-SketchArc_1_2f")])
+Face_2 = model.addFace(Part_1_doc, [model.selection("WIRE", "Sketch_2/Wire-SketchLine_4f-SketchLine_5f-SketchArc_2_2f")])
+Face_3 = model.addFace(Part_1_doc, [model.selection("WIRE", "Sketch_2/Wire-SketchArc_3_2f-SketchLine_7r")])
+Symmetry_1 = model.addSymmetry(Part_1_doc, [model.selection("FACE", "Face_1_1")], model.selection("FACE", "PartSet/XOZ"))
+Recover_1 = model.addRecover(Part_1_doc, Symmetry_1, [Face_1.result()])
+Boolean_1 = model.addFill(Part_1_doc, [model.selection("FACE", "Recover_1_1")], [model.selection("FACE", "Face_2_1")])
+Boolean_2 = model.addFill(Part_1_doc, [model.selection("FACE", "Symmetry_1_1")], [model.selection("FACE", "Face_3_1")])
+model.do()
+
+model.checkBooleansResult(Boolean_1, model, 1, [2], [0], [2], [6], [12])
+model.testHaveNamingSubshapes(Boolean_1, model, Part_1_doc)
+
+model.checkBooleansResult(Boolean_2, model, 1, [0], [0], [1], [5], [10])
+model.testHaveNamingSubshapes(Boolean_2, model, Part_1_doc)
+
+model.end()
+
+assert(model.checkPythonDump())

@@ -170,6 +170,54 @@ ADD_UNIT_TESTS(TestExtrusion.py
                TestPipe.py
                TestRecover.py
                TestRecover1798.py
+               TestFillEdgeVertex.py
+               TestFillEdgeEdge.py
+               TestFillEdgeEdgeIntersected.py
+               TestFillEdgeWire.py
+               TestFillEdgeFace.py
+               TestFillEdgeShell.py
+               TestFillEdgeSolid.py
+               TestFillEdgeSolidIntersected.py
+               TestFillWireVertex.py
+               TestFillWireEdge.py
+               TestFillWireWire.py
+               TestFillWireFace.py
+               TestFillWireShell.py
+               TestFillWireSolid.py
+               TestFillFaceVertex.py
+               TestFillFaceEdge.py
+               TestFillFaceEdgeInside.py
+               TestFillFaceEdgePerpendicular.py
+               TestFillFaceWire.py
+               TestFillFaceFace.py
+               TestFillFaceShell.py
+               TestFillFaceSolid.py
+               TestFillCompFaceSolid.py
+               TestFillShellVertex.py
+               TestFillShellEdge.py
+               TestFillShellConstrPlane.py
+               TestFillShellWire.py
+               TestFillShellFace.py
+               TestFillShellShell.py
+               TestFillShellSolid.py
+               TestFillSolid2ConstructionPlanes.py
+               TestFillSolidEdge.py
+               TestFillSolidFace.py
+               TestFillSolidCompFace.py
+               TestFillSolidShell.py
+               TestFillSolidCompShell.py
+               TestPartition2Faces.py
+               TestPartition2Solids.py
+               TestPartition2Wires.py
+               TestPartitionBox4Planes.py
+               TestPartitionEdgeSolid.py
+               TestPartitionFace2Solid.py
+               TestPartitionFaceSolid.py
+               TestPartitionFaceWire.py
+               TestPartitionInclinedFaceSolid.py
+               TestPartitionWireFaceSolid.py
+               TestUnion4CurvedFaces.py
+               TestUnion4Faces.py
                Test1922.py
                Test1942.py
                Test1915.py
