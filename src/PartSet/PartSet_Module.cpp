@@ -621,7 +621,7 @@ void PartSet_Module::moduleSelectionModes(int theModesType, QIntList& theModes)
 void PartSet_Module::moduleSelectionFilters(const QIntList& theFilterTypes,
                                             SelectMgr_ListOfFilter& theSelectionFilters)
 {
-  bool isSketchActive = mySketchMgr->activeSketch();
+  bool isSketchActive = mySketchMgr->activeSketch().get();
 
   std::map<XGUI_SelectionFilterType, Handle(SelectMgr_Filter)>::const_iterator aFiltersIt =
     mySelectionFilters.begin();
