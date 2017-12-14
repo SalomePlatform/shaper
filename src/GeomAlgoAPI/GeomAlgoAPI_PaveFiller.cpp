@@ -40,7 +40,7 @@ GeomAlgoAPI_PaveFiller::GeomAlgoAPI_PaveFiller(const ListOfShape& theListOfShape
 void GeomAlgoAPI_PaveFiller::build(const ListOfShape& theListOfShape,
                                    const bool theIsMakeCompSolids)
 {
-  BOPAlgo_PaveFiller aPaveFiller;
+  BOPAlgo_PaveFiller* aPaveFiller = new BOPAlgo_PaveFiller;
   BOPCol_ListOfShape aListOfShape;
   for(ListOfShape::const_iterator
     anIt = theListOfShape.cbegin(); anIt != theListOfShape.cend(); anIt++) {
@@ -53,13 +53,13 @@ void GeomAlgoAPI_PaveFiller::build(const ListOfShape& theListOfShape,
       aListOfShape.Append(aShape);
     }
   }
-  aPaveFiller.SetArguments(aListOfShape);
-  aPaveFiller.Perform();
+  aPaveFiller->SetArguments(aListOfShape);
+  aPaveFiller->Perform();
 #ifdef USE_OCCT_720
-  if (aPaveFiller.HasErrors())
+  if (aPaveFiller->HasErrors())
     return;
 #else
-  Standard_Integer iErr = aPaveFiller.ErrorStatus();
+  Standard_Integer iErr = aPaveFiller->ErrorStatus();
   if(iErr) {
     return;
   }
@@ -69,7 +69,7 @@ void GeomAlgoAPI_PaveFiller::build(const ListOfShape& theListOfShape,
   this->setImpl(aBuilder);
   this->setBuilderType(OCCT_BOPAlgo_Builder);
   aBuilder->SetArguments(aListOfShape);
-  aBuilder->PerformWithFiller(aPaveFiller);
+  aBuilder->PerformWithFiller(*aPaveFiller);
 #ifdef USE_OCCT_720
   if (aBuilder->HasErrors())
     return;
