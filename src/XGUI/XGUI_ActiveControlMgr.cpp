@@ -33,13 +33,13 @@
 void debugInfo(const QString& theMessage, XGUI_ActiveControlSelector* theSelector)
 {
   std::cout << theMessage.toStdString().c_str() << ", active: "
-    << theSelector ? theSelector->getType().toStdString().c_str() : "NULL" << std::endl;
+    << (theSelector ? theSelector->getType().toStdString().c_str() : "NULL") << std::endl;
 }
 #endif
 
 //********************************************************************
 XGUI_ActiveControlMgr::XGUI_ActiveControlMgr(ModuleBase_IWorkshop* theWorkshop)
-: myWorkshop(theWorkshop), myActiveSelector(0)
+: myWorkshop(theWorkshop), myActiveSelector(0), myIsBlocked(false)
 {
   connect(myWorkshop, SIGNAL(selectionChanged()), this, SLOT(onSelectionChanged()));
 }
@@ -73,9 +73,12 @@ void XGUI_ActiveControlMgr::onSelectorActivated()
   if (!aSelector || aSelector == myActiveSelector)
     return;
 
-  if (myActiveSelector)
+  if (myIsBlocked) // we've come here from the same method
+    return;
+  myIsBlocked = true;
+  if (myActiveSelector) {
     myActiveSelector->setActive(false);
-
+  }
   activateSelector(aSelector);
   XGUI_Tools::workshop(myWorkshop)->selectionActivate()->updateSelectionModes();
   XGUI_Tools::workshop(myWorkshop)->selectionActivate()->updateSelectionFilters();
@@ -83,6 +86,7 @@ void XGUI_ActiveControlMgr::onSelectorActivated()
 #ifdef DEBUG_ACTIVE_SELECTOR
   debugInfo("onSelectorActivated", myActiveSelector);
 #endif
+  myIsBlocked = false;
 }
 
 //********************************************************************
@@ -91,6 +95,10 @@ void XGUI_ActiveControlMgr::onSelectorDeactivated()
   XGUI_ActiveControlSelector* aSelector = qobject_cast<XGUI_ActiveControlSelector*>(sender());
   if (!aSelector || aSelector != myActiveSelector || !myActiveSelector)
     return;
+
+  if (myIsBlocked) // we've come here from the same method
+    return;
+  myIsBlocked = true;
 
   myActiveSelector->setActive(false);
   activateSelector(NULL);
@@ -111,6 +119,7 @@ void XGUI_ActiveControlMgr::onSelectorDeactivated()
 #ifdef DEBUG_ACTIVE_SELECTOR
   debugInfo("onSelectorDeactivated", myActiveSelector);
 #endif
+  myIsBlocked = false;
 }
 
 //********************************************************************

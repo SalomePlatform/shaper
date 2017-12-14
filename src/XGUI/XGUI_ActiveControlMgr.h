@@ -73,6 +73,8 @@ protected:
 
   QList<XGUI_ActiveControlSelector*> mySelectors; ///< workshop selectors
   XGUI_ActiveControlSelector* myActiveSelector; ///< active selector
+
+  bool myIsBlocked; ///< blocking flag to avoid cycling signals processing
 };
 
 #endif
