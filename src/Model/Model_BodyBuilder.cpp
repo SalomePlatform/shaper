@@ -460,6 +460,27 @@ void Model_BodyBuilder::loadAndOrientModifiedShapes (
   }
 }
 
+// Keep only the shapes with minimal shape type
+static void keepTopLevelShapes(ListOfShape& theShapes)
+{
+  GeomAPI_Shape::ShapeType aKeepShapeType = GeomAPI_Shape::SHAPE;
+  ListOfShape::iterator anIt = theShapes.begin();
+  while (anIt != theShapes.end()) {
+    GeomAPI_Shape::ShapeType aType = (*anIt)->shapeType();
+    if (aType < aKeepShapeType) {
+      // found a shape with lesser shape type => remove all previous shapes
+      aKeepShapeType = aType;
+      theShapes.erase(theShapes.begin(), anIt);
+      ++anIt;
+    } else if (aType > aKeepShapeType) {
+      // shapes with greater shape type should be removed from the list
+      ListOfShape::iterator aRemoveIt = anIt++;
+      theShapes.erase(aRemoveIt);
+    } else
+      ++anIt;
+  }
+}
+
 void Model_BodyBuilder::loadAndOrientGeneratedShapes (
   GeomAlgoAPI_MakeShape* theMS,
   std::shared_ptr<GeomAPI_Shape>  theShapeIn,
@@ -481,6 +502,7 @@ void Model_BodyBuilder::loadAndOrientGeneratedShapes (
     std::shared_ptr<GeomAPI_Shape> aRShape(new GeomAPI_Shape());
     aRShape->setImpl((new TopoDS_Shape(aRoot)));
     theMS->generated(aRShape, aList);
+    keepTopLevelShapes(aList);
     std::list<std::shared_ptr<GeomAPI_Shape> >::const_iterator
       anIt = aList.begin(), aLast = aList.end();
     for (; anIt != aLast; anIt++) {
