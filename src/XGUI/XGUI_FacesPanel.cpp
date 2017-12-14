@@ -97,6 +97,12 @@ void XGUI_FacesPanel::reset(const bool isToFlushRedisplay)
 }
 
 //********************************************************************
+bool XGUI_FacesPanel::isEmpty() const
+{
+  return myItems.size() == 0;
+}
+
+//********************************************************************
 void XGUI_FacesPanel::selectionModes(QIntList& theModes)
 {
   theModes.append(TopAbs_FACE);

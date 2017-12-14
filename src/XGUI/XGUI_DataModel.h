@@ -142,6 +142,11 @@ public:
   /// Do not processing anymore events of model loop
   //bool blockEventsProcessing(const bool theState);
 
+  /// Returns true if the data model item has Hidden visual state
+  /// \param theIndex a tree model item
+  /// \return boolean value
+  bool hasHiddenState(const QModelIndex& theIndex);
+
 signals:
   /// Signal about tree had been rebuilt
   void treeRebuilt();

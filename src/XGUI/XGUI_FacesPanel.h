@@ -77,6 +77,10 @@ public:
   /// \param isToFlushRedisplay flag if redisplay should be flushed immediatelly
   virtual void reset(const bool isToFlushRedisplay);
 
+  /// Returns whether faces panel contains elements
+  /// \return boolean value
+  bool isEmpty() const;
+
   /// Fills container with the panel selection mode: FACE
   // \param theModes [out] a container of modes
   void selectionModes(QIntList& theModes);

@@ -25,6 +25,7 @@
 #include <ModelAPI_Data.h>
 #include <ModelAPI_Session.h>
 #include <ModelAPI_Document.h>
+#include <ModelAPI_ResultCompSolid.h>
 #include <ModelAPI_Tools.h>
 
 #include <ModuleBase_Tools.h>
@@ -239,10 +240,14 @@ void XGUI_DataTree::processEyeClick(const QModelIndex& theIndex)
     if (aResObj.get()) {
       std::set<ObjectPtr> anObjects;
       anObjects.insert(aResObj);
-      if (aObjBrowser && !aResObj->isDisplayed() &&
-          !aObjBrowser->workshop()->prepareForDisplay(anObjects))
+
+      bool hasHiddenState = aModel->hasHiddenState(theIndex);
+      if (aObjBrowser && hasHiddenState && !aObjBrowser->workshop()->prepareForDisplay(anObjects))
         return;
-      aResObj->setDisplayed(!aResObj->isDisplayed());
+      if (hasHiddenState) // #issue 2335(hide all faces then show solid problem)
+        aResObj->setDisplayed(true);
+      else
+        aResObj->setDisplayed(!aResObj->isDisplayed());
       Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_TO_REDISPLAY));
       update(theIndex);
     }

@@ -1060,6 +1060,12 @@ QModelIndex XGUI_DataModel::lastHistoryIndex() const
 }
 
 //******************************************************
+bool XGUI_DataModel::hasHiddenState(const QModelIndex& theIndex)
+{
+  return getVisibilityState(theIndex) == Hidden;
+}
+
+//******************************************************
 int XGUI_DataModel::folderId(std::string theType, ModelAPI_Document* theDoc) const
 {
   SessionPtr aSession = ModelAPI_Session::get();

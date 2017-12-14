@@ -1595,6 +1595,9 @@ void XGUI_Workshop::activateObjectsSelection(const QObjectPtrList& theList)
 //**************************************************************
 bool XGUI_Workshop::prepareForDisplay(const std::set<ObjectPtr>& theObjects) const
 {
+  if (facesPanel()->isEmpty())
+    return true;
+
   // generate container of objects taking into account sub elments of compsolid
   std::set<ObjectPtr> anAllProcessedObjects;
   for (std::set<ObjectPtr>::const_iterator anObjectsIt = theObjects.begin();
@@ -1625,7 +1628,7 @@ bool XGUI_Workshop::prepareForDisplay(const std::set<ObjectPtr>& theObjects) con
     aHiddenObjects.insert(*anObjectsIt);
     aHiddenObjectNames.append((*anObjectsIt)->data()->name().c_str());
   }
-  if (aHiddenObjects.empty())
+  if (aHiddenObjects.empty()) // in parameter objects there are no hidden objects in hide face
     return true;
 
   int anAnswer = QMessageBox::question(
