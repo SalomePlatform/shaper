@@ -80,7 +80,7 @@ model.do()
 # Make a cylindrical hole using one of the produced faces
 #=========================================================================
 ExtrusionCut_2 = model.addExtrusionCut(Part_1_doc, [], model.selection(), model.selection(), 0, model.selection("FACE", "Extrusion_1_1/Generated_Face_2"), 0, [model.selection("SOLID", "ExtrusionCut_1_1")])
-Sketch_3 = model.addSketch(Part_1_doc, model.selection("FACE", "ExtrusionCut_1_1/Modfied_4"))
+Sketch_3 = model.addSketch(Part_1_doc, model.selection("FACE", "ExtrusionCut_1_1/Modfied_3"))
 SketchCircle_1 = Sketch_3.addCircle(143.412751420315, -228.52745656314, 32.158435160764)
 ExtrusionCut_2.setNestedSketch(Sketch_3)
 
@@ -92,8 +92,8 @@ Part_1.document().setCurrentFeature(ExtrusionCut_1.feature(), True)
 #=========================================================================
 # Modify the cylindrical hole base face by another groove in the history before the hole is created
 #=========================================================================
-ExtrusionCut_3 = model.addExtrusionCut(Part_1_doc, [], model.selection(), model.selection(), 0, model.selection("FACE", "Extrusion_1_1/Generated_Face_3"), -50, [model.selection("SOLID", "ExtrusionCut_1_1")])
-Sketch_4 = model.addSketch(Part_1_doc, model.selection("FACE", "Extrusion_1_1/Generated_Face_1"))
+ExtrusionCut_3 = model.addExtrusionCut(Part_1_doc, [], model.selection(), model.selection(), 0, model.selection("FACE", "Extrusion_1_1/Generated_Face_1"), -50, [model.selection("SOLID", "ExtrusionCut_1_1")])
+Sketch_4 = model.addSketch(Part_1_doc, model.selection("FACE", "Extrusion_1_1/Generated_Face_3"))
 SketchLine_9 = Sketch_4.addLine(-176.701443076057, -151.212050129331, -91.83965287802501, -151.212050129331)
 SketchLine_10 = Sketch_4.addLine(-91.83965287802501, -151.212050129331, -91.83965287802501, -84.473709256573)
 SketchLine_11 = Sketch_4.addLine(-91.83965287802501, -84.473709256573, -176.701443076057, -84.473709256573)
@@ -125,6 +125,6 @@ import ModelAPI
 
 assert(ModelAPI.ModelAPI_Session.get().validators().validate(Sketch_4.feature()))
 assert(ModelAPI.ModelAPI_Session.get().validators().validate(ExtrusionCut_2.feature()))
-assert(Sketch_3.feature().selection("External").namingName() == "ExtrusionCut_1_1/Modfied_4")
+assert(Sketch_3.feature().selection("External").namingName() == "ExtrusionCut_3_1/Modfied_5")
 
 assert(model.checkPythonDump())

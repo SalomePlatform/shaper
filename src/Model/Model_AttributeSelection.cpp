@@ -35,6 +35,7 @@
 #include <ModelAPI_CompositeFeature.h>
 #include <ModelAPI_Tools.h>
 #include <ModelAPI_Session.h>
+#include <ModelAPI_Validator.h>
 #include <Events_InfoMessage.h>
 #include <GeomAPI_Edge.h>
 #include <GeomAPI_Vertex.h>
@@ -658,7 +659,7 @@ void Model_AttributeSelection::selectBody(
     bool isFound = false;
     TopExp_Explorer anExp(aNewContext, aNewSub.ShapeType());
     for(; anExp.More(); anExp.Next()) {
-      if (anExp.Current().IsEqual(aNewSub)) {
+      if (anExp.Current().IsSame(aNewSub)) {
         isFound = true;
         break;
       }
@@ -863,7 +864,41 @@ void Model_AttributeSelection::selectSubShape(
             }
           }
         }
+        // try to find the latest active result that must be used instead of the selected
+        // to set the active context (like in GUI selection), not concealed one
+        bool aFindNewContext = true;
+        while(aFindNewContext && aCont.get() && aShapeToBeSelected.get()) {
+          aFindNewContext = false;
+          const std::set<AttributePtr>& aRefs = aCont->data()->refsToMe();
+          std::set<AttributePtr>::const_iterator aRef = aRefs.begin();
+          for(; !aFindNewContext && aRef != aRefs.end(); aRef++) {
+            if (!aRef->get() || !(*aRef)->owner().get())
+              continue;
+            // concealed attribute only
+            FeaturePtr aRefFeat = std::dynamic_pointer_cast<ModelAPI_Feature>((*aRef)->owner());
+            if (!ModelAPI_Session::get()->validators()->isConcealed(
+                    aRefFeat->getKind(), (*aRef)->id()))
+              continue;
+            // search the feature result that contains sub-shape selected
+            std::list<std::shared_ptr<ModelAPI_Result> > aResults;
+            ModelAPI_Tools::allResults(aRefFeat, aResults);
+            std::list<std::shared_ptr<ModelAPI_Result> >::iterator aResIter = aResults.begin();
+            for(; aResIter != aResults.end(); aResIter++) {
+              if (!aResIter->get() || !(*aResIter)->data()->isValid() || (*aResIter)->isDisabled())
+                continue;
+              GeomShapePtr aShape = (*aResIter)->shape();
+              if (aShape.get() && aShape->isSubShape(aShapeToBeSelected, false)) {
+                aCont = *aResIter; // found new context (produced from this) with same subshape
+                //if (!aShape->isSubShape(aShapeToBeSelected, true)) // take context orientation
+                //  aShapeToBeSelected->setOrientation();
+                aFindNewContext = true; // continue searching futher
+                break;
+              }
+            }
+          }
+        }
       }
+
       if (aCenterType != NOT_CENTER) {
         if (!aShapeToBeSelected->isEdge())
           continue;
