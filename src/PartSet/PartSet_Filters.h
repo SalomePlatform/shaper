@@ -23,6 +23,8 @@
 
 #include <ModuleBase_ViewerFilters.h>
 
+#include <set>
+#include <string>
 
 /**
 * \class PartSet_GlobalFilter
@@ -46,6 +48,31 @@ public:
   DEFINE_STANDARD_RTTIEXT(PartSet_GlobalFilter, ModuleBase_ShapeDocumentFilter)
 };
 
+/// \class PartSet_ResultGroupNameFilter
+/// \ingroup Modules
+/// A class which filters results with groupName() result in filter parameters
+DEFINE_STANDARD_HANDLE(PartSet_ResultGroupNameFilter, SelectMgr_Filter);
+class PartSet_ResultGroupNameFilter: public SelectMgr_Filter
+{
+public:
+  /// Constructor
+  /// \param theWorkshop a pointer to workshop
+  PartSet_ResultGroupNameFilter(ModuleBase_IWorkshop* theWorkshop)
+    : SelectMgr_Filter(), myWorkshop(theWorkshop) {}
+
+  void setGroupNames(const std::set<std::string>& theGroupNames);
+
+  /// Returns True if selected presentation can be selected
+  /// \param theOwner an owner of the persentation
+  Standard_EXPORT virtual Standard_Boolean
+    IsOk(const Handle(SelectMgr_EntityOwner)& theOwner) const;
+
+  DEFINE_STANDARD_RTTIEXT(PartSet_ResultGroupNameFilter, SelectMgr_Filter)
+
+private:
+  ModuleBase_IWorkshop* myWorkshop;
+  std::set<std::string> myGroupNames;
+};
 
 /// \class PartSet_CirclePointFilter
 /// \ingroup GUI

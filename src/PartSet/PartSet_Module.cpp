@@ -175,6 +175,11 @@ PartSet_Module::PartSet_Module(ModuleBase_IWorkshop* theWshop)
 
   registerSelectionFilter(SF_GlobalFilter, new PartSet_GlobalFilter(myWorkshop));
   registerSelectionFilter(SF_FilterInfinite, new PartSet_FilterInfinite(myWorkshop));
+  Handle(PartSet_ResultGroupNameFilter) aCRFilter = new PartSet_ResultGroupNameFilter(myWorkshop);
+  std::set<std::string> aCRGroupNames;
+  aCRGroupNames.insert(ModelAPI_ResultConstruction::group());
+  aCRFilter->setGroupNames(aCRGroupNames);
+  registerSelectionFilter(SF_ResultGroupNameFilter, aCRFilter);
 
   setDefaultConstraintShown();
 
@@ -608,7 +613,6 @@ void PartSet_Module::activeSelectionModes(QIntList& theModes)
 void PartSet_Module::moduleSelectionModes(int theModesType, QIntList& theModes)
 {
   customSubShapesSelectionModes(theModes);
-
   //theModes.append(XGUI_Tools::workshop(myWorkshop)->viewerSelectionModes());
   //myWorkshop->module()->activeSelectionModes(theModes);
 }
@@ -618,6 +622,9 @@ void PartSet_Module::moduleSelectionFilters(const QIntList& theFilterTypes,
                                             SelectMgr_ListOfFilter& theSelectionFilters)
 {
   bool isSketchActive = mySketchMgr->activeSketch();
+  XGUI_ActiveControlSelector* anActiveSelector = getWorkshop()->activeControlMgr()->activeSelector();
+  bool isHideFacesActive = anActiveSelector &&
+                           anActiveSelector->getType() == XGUI_FacesPanelSelector::Type();
 
   std::map<PartSet_SelectionFilterType, Handle(SelectMgr_Filter)>::const_iterator aFiltersIt =
     mySelectionFilters.begin();
@@ -630,6 +637,10 @@ void PartSet_Module::moduleSelectionFilters(const QIntList& theFilterTypes,
     // using sketch filters only if sketch operation is active
     if (!isSketchActive &&
         mySketchMgr->sketchSelectionFilter((PartSet_SelectionFilterType)aFilterType))
+      continue;
+
+    // using filtering of construction results only when faces panel is active
+    if (aFilterType == SF_ResultGroupNameFilter && !isHideFacesActive)
       continue;
 
     theSelectionFilters.Append(aFiltersIt->second);

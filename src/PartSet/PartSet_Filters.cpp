@@ -86,6 +86,41 @@ Standard_Boolean PartSet_GlobalFilter::IsOk(const Handle(SelectMgr_EntityOwner)&
   return aValid;
 }
 
+IMPLEMENT_STANDARD_RTTIEXT(PartSet_ResultGroupNameFilter, SelectMgr_Filter);
+
+void PartSet_ResultGroupNameFilter::setGroupNames(const std::set<std::string>& theGroupNames)
+{
+  myGroupNames = theGroupNames;
+}
+
+Standard_Boolean PartSet_ResultGroupNameFilter::IsOk(const Handle(SelectMgr_EntityOwner)& theOwner) const
+{
+  std::shared_ptr<GeomAPI_AISObject> aAISObj = AISObjectPtr(new GeomAPI_AISObject());
+  if (theOwner->HasSelectable()) {
+    Handle(AIS_InteractiveObject) aAisObj =
+      Handle(AIS_InteractiveObject)::DownCast(theOwner->Selectable());
+    if (!aAisObj.IsNull()) {
+      aAISObj->setImpl(new Handle(AIS_InteractiveObject)(aAisObj));
+    }
+  }
+  ObjectPtr anObject = myWorkshop->findPresentedObject(aAISObj);
+  if (!anObject.get())
+    return true;
+
+  ResultPtr aResult = std::dynamic_pointer_cast<ModelAPI_Result>(anObject);
+  // result of parts belongs to PartSet document and can be selected only when PartSet
+  //  is active in order to do not select the result of the active part.
+  if (!aResult.get())
+    return true;
+
+  std::string aGroupName = aResult->groupName();// == ModelAPI_ResultPart::group()) {
+  if (myGroupNames.find(aGroupName) != myGroupNames.end())
+    return false; // the object of the filtered type is found
+
+  return true;
+}
+
+
 IMPLEMENT_STANDARD_RTTIEXT(PartSet_CirclePointFilter, SelectMgr_Filter);
 
 Standard_Boolean

@@ -25,6 +25,7 @@
 enum PartSet_SelectionFilterType {
   SF_GlobalFilter, /// filter for different documents, group results
   SF_FilterInfinite, /// filter for infinite construction results
+  SF_ResultGroupNameFilter, /// filter for selection some kind of results
   SF_SketchCirclePointFilter, /// filter for selection circle points on current sketch
   SF_SketchPlaneFilter /// filter for selection in the current sketch plane only
 };
