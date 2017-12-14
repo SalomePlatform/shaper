@@ -200,6 +200,11 @@ Q_OBJECT
   /// The method called when widget is deactivated
   virtual void deactivate();
 
+  /// Opportunity to do something after the active widget of the property panel changed
+  virtual void updateAfterDeactivation() {}
+  /// Opportunity to do something after the active widget of the property panel changed
+  virtual void updateAfterActivation() {}
+
   /// The method called if widget should be activated always
   virtual bool needToBeActiated() { return false; }
 

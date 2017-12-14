@@ -75,6 +75,12 @@ class MODULEBASE_EXPORT ModuleBase_WidgetMultiSelector : public ModuleBase_Widge
   /// The methiod called when widget is deactivated
   virtual void deactivate();
 
+  /// Update Undo/Redo actions state
+  virtual void updateAfterDeactivation();
+
+  /// Update Undo/Redo actions state
+  virtual void updateAfterActivation();
+
   /// Set the given wrapped value to the current widget
   /// This value should be processed in the widget according to the needs
   /// \param theValues the wrapped selection values
@@ -94,9 +100,6 @@ class MODULEBASE_EXPORT ModuleBase_WidgetMultiSelector : public ModuleBase_Widge
   /// Returns true if the event is processed. The default implementation is empty, returns false.
   virtual bool processAction(ModuleBase_ActionType theActionType,
                              const ActionParamPtr& theParam = ActionParamPtr());
-
-  /// Activate or deactivate selection and selection filters
-  virtual void updateSelectionModesAndFilters(bool toActivate);
 
   /// Checks the widget validity. By default, it returns true.
   /// \param thePrs a selected presentation in the view

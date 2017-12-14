@@ -474,16 +474,19 @@ bool XGUI_PropertyPanel::setActiveWidget(ModuleBase_ModelWidget* theWidget, cons
     return false;
   }
   std::string aPreviosAttributeID;
+  ModuleBase_ModelWidget* aDeactivatedWidget = NULL, *anActivatedWidget = NULL;
   if(myActiveWidget) {
     aPreviosAttributeID = myActiveWidget->attributeID();
     myActiveWidget->processValueState();
     myActiveWidget->deactivate();
     myActiveWidget->setHighlighted(false);
+    aDeactivatedWidget = myActiveWidget;
   }
   if(theWidget) {
     emit beforeWidgetActivated(theWidget);
     theWidget->setHighlighted(true);
     theWidget->activate();
+    anActivatedWidget = theWidget;
   }
   myActiveWidget = theWidget;
 
@@ -504,6 +507,11 @@ bool XGUI_PropertyPanel::setActiveWidget(ModuleBase_ModelWidget* theWidget, cons
     emit propertyPanelDeactivated();
   myOperationMgr->workshop()->selectionActivate()->updateSelectionModes();
   myOperationMgr->workshop()->selectionActivate()->updateSelectionFilters();
+
+  if (aDeactivatedWidget)
+    aDeactivatedWidget->updateAfterDeactivation();
+  if (anActivatedWidget)
+    anActivatedWidget->updateAfterActivation();
 
   if (!anIsNoMoreWidgets && myActiveWidget)
   {

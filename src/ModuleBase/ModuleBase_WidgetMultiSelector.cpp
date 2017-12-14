@@ -150,7 +150,6 @@ void ModuleBase_WidgetMultiSelector::activateCustom()
   myWorkshop->module()->activateCustomPrs(myFeature,
                             ModuleBase_IModule::CustomizeHighlightedObjects, true);
   clearSelectedHistory();
-  myWorkshop->updateCommandStatus();
 }
 
 //********************************************************************
@@ -160,6 +159,19 @@ void ModuleBase_WidgetMultiSelector::deactivate()
 
   myWorkshop->module()->deactivateCustomPrs(ModuleBase_IModule::CustomizeHighlightedObjects, true);
   clearSelectedHistory();
+}
+
+//********************************************************************
+void ModuleBase_WidgetMultiSelector::updateAfterDeactivation()
+{
+  // restore previous Undo/Redo workshop state
+  myWorkshop->updateCommandStatus();
+}
+
+//********************************************************************
+void ModuleBase_WidgetMultiSelector::updateAfterActivation()
+{
+  // fill Undo/Redo actions with current information
   myWorkshop->updateCommandStatus();
 }
 
@@ -329,13 +341,6 @@ bool ModuleBase_WidgetMultiSelector::processAction(ModuleBase_ActionType theActi
     default:
       return ModuleBase_ModelWidget::processAction(theActionType, theParam);
   }
-}
-
-//********************************************************************
-void ModuleBase_WidgetMultiSelector::updateSelectionModesAndFilters(bool toActivate)
-{
-  myWorkshop->updateCommandStatus(); // update enable state of Undo/Redo application actions
-  ModuleBase_WidgetSelector::updateSelectionModesAndFilters(toActivate);
 }
 
 //********************************************************************
