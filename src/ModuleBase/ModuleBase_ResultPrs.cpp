@@ -146,7 +146,12 @@ bool ModuleBase_ResultPrs::hasSubShapeVisible(
   TopoDS_Compound aCompound;
   BRep_Builder aBuilder;
   aBuilder.MakeCompound (aCompound);
-  collectSubShapes(aBuilder, aCompound, myOriginalShape, theShapesToSkip);
+  NCollection_List<TopoDS_Shape> aShapesToSkip;
+  aShapesToSkip.Append(myHiddenSubShapes);
+  for (NCollection_List<TopoDS_Shape>::Iterator anIt(theShapesToSkip); anIt.More(); anIt.Next())
+    aShapesToSkip.Append(anIt.Value());
+
+  collectSubShapes(aBuilder, aCompound, myOriginalShape, aShapesToSkip);
   return !BOPTools_AlgoTools3D::IsEmptyShape(aCompound);
 }
 
