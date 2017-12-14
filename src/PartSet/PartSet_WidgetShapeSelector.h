@@ -54,9 +54,11 @@ Q_OBJECT
   /// Retrurns installed sketcher
   CompositeFeaturePtr sketch() const { return mySketch; }
 
-  /// Activate or deactivate selection and selection filters
-  /// \param toActivate boolean state whether it should be activated/deactivated
-  virtual void activateSelectionAndFilters(bool toActivate);
+  /// Appends into container of workshop selection filters
+  /// \param [out] theModuleSelectionFilters module additional modes, -1 means all default modes
+  /// \param [out] theSelectionFilters selection filters
+  virtual void selectionFilters(int& theModuleSelectionFilters,
+                                SelectMgr_ListOfFilter& theSelectionFilters);
 
 protected:
   /// Checks the widget validity. By default, it returns true.

@@ -968,7 +968,7 @@ void CollectionPlugin_WidgetField::onTableEdited(int theRow, int theCol)
 //**********************************************************************************
 void CollectionPlugin_WidgetField::onShapeTypeChanged(int theType)
 {
-  activateSelectionAndFilters(theType == 5? false:true);
+  updateSelectionModesAndFilters(theType == 5? false:true);
 
   AttributeSelectionListPtr aSelList =
     myFeature->data()->selectionList(CollectionPlugin_Field::SELECTED_ID());

@@ -332,10 +332,10 @@ bool ModuleBase_WidgetMultiSelector::processAction(ModuleBase_ActionType theActi
 }
 
 //********************************************************************
-void ModuleBase_WidgetMultiSelector::activateSelectionAndFilters(bool toActivate)
+void ModuleBase_WidgetMultiSelector::updateSelectionModesAndFilters(bool toActivate)
 {
   myWorkshop->updateCommandStatus(); // update enable state of Undo/Redo application actions
-  ModuleBase_WidgetSelector::activateSelectionAndFilters(toActivate);
+  ModuleBase_WidgetSelector::updateSelectionModesAndFilters(toActivate);
 }
 
 //********************************************************************
@@ -430,7 +430,7 @@ QList<QWidget*> ModuleBase_WidgetMultiSelector::getControls() const
 //********************************************************************
 void ModuleBase_WidgetMultiSelector::onSelectionTypeChanged()
 {
-  activateSelectionAndFilters(true);
+  updateSelectionModesAndFilters(true);
   myWorkshop->selectionActivate()->updateSelectionModes();
 
   if (!myFeature)
@@ -592,11 +592,11 @@ void ModuleBase_WidgetMultiSelector::setCurrentShapeType(const int theShapeType)
     aShapeTypeName = myTypeCombo->itemText(idx);
     int aRefType = ModuleBase_Tools::shapeType(aShapeTypeName);
     if(aRefType == theShapeType && idx != myTypeCombo->currentIndex()) {
-      activateSelectionAndFilters(false);
+      updateSelectionModesAndFilters(false);
       bool isBlocked = myTypeCombo->blockSignals(true);
       myTypeCombo->setCurrentIndex(idx);
       myTypeCombo->blockSignals(isBlocked);
-      activateSelectionAndFilters(true);
+      updateSelectionModesAndFilters(true);
       break;
     }
   }

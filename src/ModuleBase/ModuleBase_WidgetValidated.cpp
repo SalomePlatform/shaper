@@ -123,8 +123,9 @@ bool ModuleBase_WidgetValidated::isValidInFilters(const ModuleBase_ViewerPrsPtr&
     // it is not yet activated, so we need to activate/deactivate it manually
     bool isActivated = isFilterActivated();
     if (!isActivated) {
+      int aModuleSelectionFilters = -1;
       SelectMgr_ListOfFilter aSelectionFilters;
-      selectionFilters(aSelectionFilters);
+      selectionFilters(aModuleSelectionFilters, aSelectionFilters);
       /// after validation, the selection filters should be restored
       myWorkshop->selectionActivate()->activateSelectionFilters(aSelectionFilters);
     }
@@ -140,6 +141,7 @@ bool ModuleBase_WidgetValidated::isValidInFilters(const ModuleBase_ViewerPrsPtr&
     }
     if (!isActivated)
     {
+      // reset filters set in activateSelectionFilters above
       myWorkshop->selectionActivate()->updateSelectionFilters();
       clearValidatedCash();
     }
@@ -244,8 +246,10 @@ bool ModuleBase_WidgetValidated::isFilterActivated() const
 }
 
 //********************************************************************
-void ModuleBase_WidgetValidated::selectionFilters(SelectMgr_ListOfFilter& theSelectionFilters)
+void ModuleBase_WidgetValidated::selectionFilters(int& theModuleSelectionFilters,
+                                                  SelectMgr_ListOfFilter& theSelectionFilters)
 {
+  theModuleSelectionFilters = -1;
   theSelectionFilters.Append(myWorkshop->validatorFilter());
 }
 

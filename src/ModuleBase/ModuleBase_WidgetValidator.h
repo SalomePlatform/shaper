@@ -52,13 +52,15 @@ class MODULEBASE_EXPORT ModuleBase_WidgetValidator
   virtual ~ModuleBase_WidgetValidator();
 
   /// Fills given container with selection modes if the widget has it
+  /// \param [out] theModuleSelectionModes module additional modes, -1 means all default modes
   /// \param theModes [out] a container of modes
-  /// \param isAdditional if true, the modes are combinated with the module ones
-  virtual void selectionModes(QIntList& theModes, bool& isAdditional) {}
+  virtual void selectionModes(int& theModuleSelectionModes, QIntList& theModes) {}
 
   /// Appends into container of workshop selection filters
+  /// \param [out] theModuleSelectionFilters module additional modes, -1 means all default modes
   /// \param [out] selection filters
-  virtual void selectionFilters(SelectMgr_ListOfFilter& theSelectionFilters);
+  virtual void selectionFilters(int& theModuleSelectionFilters,
+                                SelectMgr_ListOfFilter& theSelectionFilters);
 
   /// Returns true if the validation is activated
   bool isInValidate() const { return myIsInValidate; }

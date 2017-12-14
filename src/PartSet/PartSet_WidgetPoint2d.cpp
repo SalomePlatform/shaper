@@ -443,11 +443,11 @@ QList<QWidget*> PartSet_WidgetPoint2D::getControls() const
 }
 
 //********************************************************************
-void PartSet_WidgetPoint2D::selectionModes(QIntList& theModes, bool& isAdditional)
+void PartSet_WidgetPoint2D::selectionModes(int& theModuleSelectionModes, QIntList& theModes)
 {
+  theModuleSelectionModes = -1;
   theModes << TopAbs_VERTEX;
   theModes << TopAbs_EDGE;
-  isAdditional = true;
 }
 
 //********************************************************************

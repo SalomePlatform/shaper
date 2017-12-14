@@ -40,8 +40,10 @@ ModuleBase_WidgetValidator::~ModuleBase_WidgetValidator()
 }
 
 //********************************************************************
-void ModuleBase_WidgetValidator::selectionFilters(SelectMgr_ListOfFilter& theSelectionFilters)
+void ModuleBase_WidgetValidator::selectionFilters(int& theModuleSelectionFilters,
+                                                  SelectMgr_ListOfFilter& theSelectionFilters)
 {
+  theModuleSelectionFilters = -1;
   theSelectionFilters.Append(myWorkshop->validatorFilter());
 }
 

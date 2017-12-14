@@ -110,10 +110,10 @@ bool ModuleBase_WidgetFeatureSelector::setSelectionCustom(const ModuleBase_Viewe
 }
 
 //********************************************************************
-void ModuleBase_WidgetFeatureSelector::selectionModes(QIntList& theModes, bool& isAdditional)
+void ModuleBase_WidgetFeatureSelector::selectionModes(int& theModuleSelectionModes, QIntList& theModes)
 {
+  theModuleSelectionModes = -1;
   theModes.push_back(ModuleBase_ResultPrs::Sel_Result);
-  isAdditional = true;
 }
 
 //********************************************************************

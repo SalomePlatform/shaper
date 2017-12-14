@@ -687,12 +687,6 @@ void XGUI_Workshop::connectToPropertyPanel(const bool isToConnect)
 }
 
 //******************************************************
-void XGUI_Workshop::selectionFilters(SelectMgr_ListOfFilter& theSelectionFilters)
-{
-  module()->selectionFilters(theSelectionFilters);
-}
-
-//******************************************************
 void XGUI_Workshop::onOperationResumed(ModuleBase_Operation* theOperation)
 {
   setGrantedFeatures(theOperation);

@@ -111,18 +111,20 @@ bool ModuleBase_ModelWidget::isInitialized(ObjectPtr theObject) const
 }
 
 //**************************************************************
-void ModuleBase_ModelWidget::selectionModes(QIntList& theModes, bool& isAdditional)
+void ModuleBase_ModelWidget::selectionModes(int& theModuleSelectionModes, QIntList& theModes)
 {
-  isAdditional = true;
+  theModuleSelectionModes = -1;
   if (myWidgetValidator)
-    myWidgetValidator->selectionModes(theModes, isAdditional);
+    myWidgetValidator->selectionModes(theModuleSelectionModes, theModes);
 }
 
 //**************************************************************
-void ModuleBase_ModelWidget::selectionFilters(SelectMgr_ListOfFilter& theSelectionFilters)
+void ModuleBase_ModelWidget::selectionFilters(int& theModuleSelectionFilters,
+                                              SelectMgr_ListOfFilter& theSelectionFilters)
 {
+  theModuleSelectionFilters = -1;
   if (myWidgetValidator)
-    myWidgetValidator->selectionFilters(theSelectionFilters);
+    myWidgetValidator->selectionFilters(theModuleSelectionFilters, theSelectionFilters);
 }
 
 //**************************************************************

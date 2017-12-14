@@ -296,10 +296,6 @@ Q_OBJECT
   /// Returns defailt selection mode in 3d viewer
   QIntList viewerSelectionModes() const { return myViewerSelMode; }
 
-  /// Appends into container of workshop selection filters
-  /// \param [out] selection filters
-  void selectionFilters(SelectMgr_ListOfFilter& theSelectionFilters);
-
   /// Highlights result objects in Object Browser according to
   /// features found in the given list
   void highlightResults(const QObjectPtrList& theObjects);

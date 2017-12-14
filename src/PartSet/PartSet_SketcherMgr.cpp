@@ -1164,14 +1164,6 @@ void PartSet_SketcherMgr::selectionFilters(SelectMgr_ListOfFilter& theSelectionF
   theSelectionFilters.Append(myPlaneFilter);
 }
 
-void PartSet_SketcherMgr::activatePlaneFilter(const bool& toActivate)
-{
-  if (toActivate)
-    myModule->workshop()->viewer()->addSelectionFilter(myPlaneFilter);
-  else
-    myModule->workshop()->viewer()->removeSelectionFilter(myPlaneFilter);
-}
-
 bool PartSet_SketcherMgr::operationActivatedByPreselection()
 {
   bool isOperationStopped = false;

@@ -200,10 +200,6 @@ public:
   /// \param theObject a model object
   virtual bool canActivateSelection(const ObjectPtr& theObject) const;
 
-  /// Appends into container of workshop selection filters
-  /// \param [out] selection filters
-  virtual void selectionFilters(SelectMgr_ListOfFilter& theSelectionFilters) const;
-
   /// Add menu atems for object browser into the given menu
   /// \param theMenu a popup menu to be shown in the object browser
   virtual void addObjectBrowserMenu(QMenu* theMenu) const;
@@ -222,8 +218,15 @@ public:
   virtual void activeSelectionModes(QIntList& theModes);
 
   /// Appends specific selection modes for the module to the list of types
+  /// \param theModesType combination of available selection filters
   /// \param theModes a selection modes to be extended
-  virtual void customSubShapesSelectionModes(QIntList& theModes);
+  virtual void moduleSelectionModes(int theModesType, QIntList& theModes);
+
+  /// Appends into container of filters module filters corresponded to the modes type
+  /// \param theModesType combination of available selection filters
+  /// \param theSelectionFilters [out] container to be extend by elements
+  virtual void moduleSelectionFilters(int theModesType,
+                                      SelectMgr_ListOfFilter& theSelectionFilters);
 
   /// Returns whether the mouse enter the viewer's window
   /// \return true if items are added and there is no necessity to provide standard menu
@@ -410,6 +413,10 @@ protected slots:
   void onChoiceChanged(ModuleBase_ModelWidget* theWidget, int theIndex);
 
 protected:
+  /// Appends specific selection modes for the module to the list of types
+  /// \param theModes a selection modes to be extended
+  virtual void customSubShapesSelectionModes(QIntList& theModes);
+
   /// Sets the constraints states in internal map. If the feature kind is a dimensional constraint
   /// other dimensions are shown.
   /// \param theFeatureKindId a feature kind

@@ -96,7 +96,7 @@ class MODULEBASE_EXPORT ModuleBase_WidgetMultiSelector : public ModuleBase_Widge
                              const ActionParamPtr& theParam = ActionParamPtr());
 
   /// Activate or deactivate selection and selection filters
-  virtual void activateSelectionAndFilters(bool toActivate);
+  virtual void updateSelectionModesAndFilters(bool toActivate);
 
   /// Checks the widget validity. By default, it returns true.
   /// \param thePrs a selected presentation in the view

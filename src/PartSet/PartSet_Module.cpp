@@ -549,17 +549,6 @@ bool PartSet_Module::canActivateSelection(const ObjectPtr& theObject) const
 }
 
 //******************************************************
-void PartSet_Module::selectionFilters(SelectMgr_ListOfFilter& theSelectionFilters) const
-{
-  for (SelectMgr_ListOfFilter::Iterator aFiltersIt(mySelectionFilters); aFiltersIt.More();
-       aFiltersIt.Next())
-    theSelectionFilters.Append(aFiltersIt.Value());
-
-  if (mySketchMgr->activeSketch())
-    mySketchMgr->selectionFilters(theSelectionFilters);
-}
-
-//******************************************************
 bool PartSet_Module::addViewerMenu(const QMap<QString, QAction*>& theStdActions,
                                    QWidget* theParent,
                                    QMap<int, QAction*>& theMenuActions) const
@@ -612,6 +601,30 @@ void PartSet_Module::activeSelectionModes(QIntList& theModes)
     PartSet_SketcherMgr::sketchSelectionModes(mySketchMgr->activeSketch(), theModes);
   else
     theModes = XGUI_Tools::workshop(myWorkshop)->viewerSelectionModes();
+}
+
+//******************************************************
+void PartSet_Module::moduleSelectionModes(int theModesType, QIntList& theModes)
+{
+  customSubShapesSelectionModes(theModes);
+
+  //theModes.append(XGUI_Tools::workshop(myWorkshop)->viewerSelectionModes());
+  //myWorkshop->module()->activeSelectionModes(theModes);
+}
+
+//******************************************************
+void PartSet_Module::moduleSelectionFilters(int theModesType,
+                                            SelectMgr_ListOfFilter& theSelectionFilters)
+{
+  //XGUI_Tools::workshop(myWorkshop)->selectionFilters(theSelectionFilters);
+  //selectionFilters(theSelectionFilters);
+
+  for (SelectMgr_ListOfFilter::Iterator aFiltersIt(mySelectionFilters); aFiltersIt.More();
+       aFiltersIt.Next())
+    theSelectionFilters.Append(aFiltersIt.Value());
+
+  if (mySketchMgr->activeSketch())
+    mySketchMgr->selectionFilters(theSelectionFilters);
 }
 
 //******************************************************

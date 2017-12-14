@@ -55,15 +55,15 @@ Q_OBJECT
   virtual ~ModuleBase_WidgetSelector();
 
   /// Fills given container with selection modes if the widget has it
-  /// \param theModes [out] a container of modes
-  /// \param isAdditional if true, the modes are combinated with the module ones
-  virtual void selectionModes(QIntList& theModes, bool& isAdditional);
+  /// \param [out] theModuleSelectionModes module additional modes, -1 means all default modes
+  /// \param [out] theModes a container of modes
+  virtual void selectionModes(int& theModuleSelectionModes, QIntList& theModes);
 
   /// Defines if it is supposed that the widget should interact with the viewer.
   virtual bool isViewerSelector() { return true; }
 
   /// Activate or deactivate selection and selection filters
-  virtual void activateSelectionAndFilters(bool toActivate);
+  virtual void updateSelectionModesAndFilters(bool toActivate);
 
   /// Checks the widget validity. By default, it returns true.
   /// \param thePrs a selected presentation in the view

@@ -84,8 +84,10 @@ class MODULEBASE_EXPORT ModuleBase_WidgetValidated : public ModuleBase_ModelWidg
   bool isFilterActivated() const;
 
   /// Appends into container of workshop selection filters
+  /// \param [out] theModuleSelectionFilters module additional modes, -1 means all default modes
   /// \param [out] selection filters
-  virtual void selectionFilters(SelectMgr_ListOfFilter& theSelectionFilters);
+  virtual void selectionFilters(int& theModuleSelectionFilters,
+                                SelectMgr_ListOfFilter& theSelectionFilters);
 
   /// Block the model flush of update and intialization of attribute
   /// \param theAttribute an attribute of blocking

@@ -79,14 +79,6 @@ class MODULEBASE_EXPORT ModuleBase_IModule : public QObject
 
   virtual ~ModuleBase_IModule() {}
 
-  /// Appends into container of workshop selection filters
-  /// \param [out] selection filters
-  virtual void selectionFilters(SelectMgr_ListOfFilter& theSelectionFilters) const {}
-
-  /// Returns current selection modes that should be used in 3D viewer
-  /// \param theModes container of modes
-  virtual void selectionModes(QIntList& theModes) const {}
-
   /// Stores the current selection
   virtual void storeSelection() {}
 
@@ -239,8 +231,15 @@ class MODULEBASE_EXPORT ModuleBase_IModule : public QObject
   virtual void activeSelectionModes(QIntList& theModes) {}
 
   /// Appends specific selection modes for the module to the list of types
+  /// \param theModesType combination of available selection filters
   /// \param theModes a selection modes to be extended
-  virtual void customSubShapesSelectionModes(QIntList& theModes) {}
+  virtual void moduleSelectionModes(int theModesType, QIntList& theModes) = 0;
+
+  /// Appends into container of filters module filters corresponded to the modes type
+  /// \param theModesType combination of available selection filters
+  /// \param theSelectionFilters [out] container to be extend by elements
+  virtual void moduleSelectionFilters(int theModesType,
+                                      SelectMgr_ListOfFilter& theSelectionFilters) = 0;
 
   /// Return true if the custom presentation is activated
   /// \param theFlag a flag of level of customization, which means that only part of sub-elements

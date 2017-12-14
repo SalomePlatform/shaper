@@ -138,12 +138,6 @@ protected:
   /// \param theModes selection modes
   void getSelectionModes(ModuleBase_ModelWidget* theWidget, QIntList& theModes);
 
-  /// Returns selection filters of the widget
-  /// \param theWidget model widget
-  /// \param theSelectionFilters selection filters
-  void getSelectionFilters(ModuleBase_ModelWidget* theWidget,
-                           SelectMgr_ListOfFilter& theSelectionFilters);
-
   /// Returns Trihedron object if it is displayed
   Handle(AIS_InteractiveObject) getTrihedron() const;
 

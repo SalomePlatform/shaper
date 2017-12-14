@@ -165,14 +165,14 @@ bool ModuleBase_WidgetSelector::acceptSubShape(const GeomShapePtr& theShape,
 }
 
 //********************************************************************
-void ModuleBase_WidgetSelector::selectionModes(QIntList& theModes, bool& isAdditional)
+void ModuleBase_WidgetSelector::selectionModes(int& theModuleSelectionModes, QIntList& theModes)
 {
+  theModuleSelectionModes = -1;
   theModes.append(getShapeTypes());
-  isAdditional = true;
 }
 
 //********************************************************************
-void ModuleBase_WidgetSelector::activateSelectionAndFilters(bool toActivate)
+void ModuleBase_WidgetSelector::updateSelectionModesAndFilters(bool toActivate)
 {
   updateSelectionName();
 

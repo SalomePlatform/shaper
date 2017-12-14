@@ -69,9 +69,9 @@ Q_OBJECT
   virtual ~PartSet_WidgetPoint2D();
 
   /// Fills given container with selection modes if the widget has it
+  /// \param [out] theModuleSelectionModes module additional modes, -1 means all default modes
   /// \param theModes [out] a container of modes
-  /// \param isAdditional if true, the modes are combinated with the module ones
-  virtual void selectionModes(QIntList& theModes, bool& isAdditional);
+  virtual void selectionModes(int& theModuleSelectionModes, QIntList& theModes);
 
   /// Checks if the selection presentation is valid in widget
   /// \param theValue a selected presentation in the view

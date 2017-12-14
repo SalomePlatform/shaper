@@ -201,10 +201,6 @@ public:
   /// \param [out] selection filters
   virtual void selectionFilters(SelectMgr_ListOfFilter& theSelectionFilters) const;
 
-  /// Append the sketch plane filter into the current viewer
-  /// \param toActivate state whether the filter should be activated/deactivated
-  void activatePlaneFilter(const bool& toActivate);
-
   /// Commit the operation if it is possible. If the operation is dimention constraint,
   /// it gives widget editor to input dimention value
   /// \return true if the operation is stopped after activation

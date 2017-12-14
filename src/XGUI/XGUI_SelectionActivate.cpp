@@ -89,7 +89,7 @@ void XGUI_SelectionActivate::updateSelectionModes()
     break;
     case FacesPanel: {
       XGUI_Tools::workshop(myWorkshop)->facesPanel()->selectionModes(aModes);
-      myWorkshop->module()->customSubShapesSelectionModes(aModes); // avoid wire selection
+      myWorkshop->module()->moduleSelectionModes(-1/*all modes*/, aModes);
     }
     break;
     default: break;
@@ -102,16 +102,18 @@ void XGUI_SelectionActivate::updateSelectionFilters()
 {
   SelectMgr_ListOfFilter aSelectionFilters;
   switch (activeSelectionPlace()) {
-  case Workshop:
-    XGUI_Tools::workshop(myWorkshop)->selectionFilters(aSelectionFilters);
+    case Workshop:
+      myWorkshop->module()->moduleSelectionFilters(-1/*all filters*/, aSelectionFilters);
     break;
     case PropertyPanel: {
       ModuleBase_ModelWidget* anActiveWidget = myWorkshop->module()->activeWidget();
-      getSelectionFilters(anActiveWidget, aSelectionFilters);
+      int aModuleSelectionFilters = -1;
+      if (anActiveWidget)
+        anActiveWidget->selectionFilters(aModuleSelectionFilters, aSelectionFilters);
+      myWorkshop->module()->moduleSelectionFilters(aModuleSelectionFilters, aSelectionFilters);
     }
     break;
     case FacesPanel: {
-      //XGUI_Tools::workshop(myWorkshop)->selectionFilters(aSelectionFilters);
       XGUI_Tools::workshop(myWorkshop)->facesPanel()->selectionFilters(aSelectionFilters);
     }
     break;
@@ -143,23 +145,9 @@ void XGUI_SelectionActivate::getSelectionModes(ModuleBase_ModelWidget* theWidget
   if (!theWidget)
     return;
 
-  bool isAdditional = false;
-  theWidget->selectionModes(theModes, isAdditional);
-  if (isAdditional) {
-    myWorkshop->module()->customSubShapesSelectionModes(theModes);
-    //theModes.append(XGUI_Tools::workshop(myWorkshop)->viewerSelectionModes());
-    //myWorkshop->module()->activeSelectionModes(theModes);
-  }
-}
-
-//**************************************************************
-void XGUI_SelectionActivate::getSelectionFilters(ModuleBase_ModelWidget* theWidget,
-                                                 SelectMgr_ListOfFilter& theSelectionFilters)
-{
-  XGUI_Tools::workshop(myWorkshop)->selectionFilters(theSelectionFilters);
-
-  if (theWidget)
-    theWidget->selectionFilters(theSelectionFilters);
+  int aModuleSelectionModes = -1;
+  theWidget->selectionModes(aModuleSelectionModes, theModes);
+  myWorkshop->module()->moduleSelectionModes(aModuleSelectionModes, theModes);
 }
 
 //**************************************************************

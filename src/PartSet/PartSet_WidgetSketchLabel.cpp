@@ -526,20 +526,23 @@ void PartSet_WidgetSketchLabel::deactivate()
     myWorkshop->viewer()->update();
 }
 
-void PartSet_WidgetSketchLabel::selectionModes(QIntList& theModes, bool& isAdditional)
+void PartSet_WidgetSketchLabel::selectionModes(int& theModuleSelectionModes, QIntList& theModes)
 {
+  theModuleSelectionModes = -1;
   std::shared_ptr<GeomAPI_Pln> aPlane = plane();
   if (!aPlane.get())
     theModes << TopAbs_FACE;
-  isAdditional = true;
 }
 
-void PartSet_WidgetSketchLabel::selectionFilters(SelectMgr_ListOfFilter& theSelectionFilters)
+void PartSet_WidgetSketchLabel::selectionFilters(int& theModuleSelectionFilters,
+                                                 SelectMgr_ListOfFilter& theSelectionFilters)
 {
+  theModuleSelectionFilters = -1;
   std::shared_ptr<GeomAPI_Pln> aPlane = plane();
   if (aPlane.get())
     return;
-  return ModuleBase_WidgetValidated::selectionFilters(theSelectionFilters);
+  return ModuleBase_WidgetValidated::selectionFilters(theModuleSelectionFilters,
+                                                      theSelectionFilters);
 }
 
 std::shared_ptr<GeomAPI_Dir>

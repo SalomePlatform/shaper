@@ -87,13 +87,15 @@ Q_OBJECT
   bool isInitialized(ObjectPtr theObject) const;
 
   /// Fills given container with selection modes if the widget has it
-  /// \param theModes [out] a container of modes
-  /// \param isAdditional if true, the modes are combinated with the module ones
-  virtual void selectionModes(QIntList& theModes, bool& isAdditional);
+  /// \param [out] theModuleSelectionModes module additional modes, -1 means all default modes
+  /// \param [out] theModes a container of modes
+  virtual void selectionModes(int& theModuleSelectionModes, QIntList& theModes);
 
   /// Appends into container of workshop selection filters
-  /// \param [out] selection filters
-  virtual void selectionFilters(SelectMgr_ListOfFilter& theSelectionFilters);
+  /// \param [out] theModuleSelectionFilters module additional modes, -1 means all default modes
+  /// \param [out] theSelectionFilters selection filters
+  virtual void selectionFilters(int& theModuleSelectionFilters,
+                                SelectMgr_ListOfFilter& theSelectionFilters);
 
   /// Returns true, if default value of the widget should be computed
   /// on operation's execute, like radius for circle's constraint (can not be zero)
