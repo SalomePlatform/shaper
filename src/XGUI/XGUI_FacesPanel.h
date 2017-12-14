@@ -83,7 +83,7 @@ public:
 
   /// Appends into container of workshop selection filters
   /// \param [out] selection filters
-  void selectionFilters(SelectMgr_ListOfFilter& theSelectionFilters) {}
+  void selectionFilters(SelectMgr_ListOfFilter& theSelectionFilters);
 
   /// Returns whether the panel is active or not
   bool isActivePanel() const { return myIsActive; }

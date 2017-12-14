@@ -101,13 +101,15 @@ void XGUI_SelectionActivate::updateSelectionModes()
 void XGUI_SelectionActivate::updateSelectionFilters()
 {
   SelectMgr_ListOfFilter aSelectionFilters;
-  QIntList aModuleSelectionFilters = myWorkshop->module()->selectionFilters();
   switch (activeSelectionPlace()) {
-    case Workshop:
+    case Workshop: {
+      QIntList aModuleSelectionFilters = myWorkshop->module()->selectionFilters();
       myWorkshop->module()->moduleSelectionFilters(aModuleSelectionFilters, aSelectionFilters);
-
+    }
     break;
     case PropertyPanel: {
+      QIntList aModuleSelectionFilters = myWorkshop->module()->selectionFilters();
+
       ModuleBase_ModelWidget* anActiveWidget = myWorkshop->module()->activeWidget();
       if (anActiveWidget)
         anActiveWidget->selectionFilters(aModuleSelectionFilters, aSelectionFilters);
@@ -116,7 +118,8 @@ void XGUI_SelectionActivate::updateSelectionFilters()
     break;
     case FacesPanel: {
       XGUI_Tools::workshop(myWorkshop)->facesPanel()->selectionFilters(aSelectionFilters);
-      myWorkshop->module()->moduleSelectionFilters(aModuleSelectionFilters, aSelectionFilters);
+      //QIntList aModuleSelectionFilters = myWorkshop->module()->selectionFilters();
+      //myWorkshop->module()->moduleSelectionFilters(aModuleSelectionFilters, aSelectionFilters);
     }
     break;
     default: break;

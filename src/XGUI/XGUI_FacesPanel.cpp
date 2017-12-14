@@ -26,6 +26,7 @@
 
 #include <ModelAPI_Events.h>
 
+#include <ModuleBase_IModule.h>
 #include <ModuleBase_ISelection.h>
 #include "ModuleBase_IWorkshop.h"
 #include "ModuleBase_ListView.h"
@@ -33,6 +34,8 @@
 #include "ModuleBase_Tools.h"
 #include "ModuleBase_ViewerPrs.h"
 
+#include "XGUI_SelectionMgr.h"
+#include "XGUI_SelectionFilterType.h"
 #include "XGUI_Tools.h"
 #include "XGUI_Workshop.h"
 
@@ -100,6 +103,17 @@ void XGUI_FacesPanel::selectionModes(QIntList& theModes)
 }
 
 //********************************************************************
+void XGUI_FacesPanel::selectionFilters(SelectMgr_ListOfFilter& theSelectionFilters)
+{
+  ModuleBase_IModule* aModule = myWorkshop->module();
+  QIntList aModuleSelectionFilters = myWorkshop->module()->selectionFilters();
+
+  theSelectionFilters.Append(aModule->selectionFilter(SF_GlobalFilter));
+  theSelectionFilters.Append(aModule->selectionFilter(SF_FilterInfinite));
+  theSelectionFilters.Append(aModule->selectionFilter(SF_ResultGroupNameFilter));
+}
+
+//********************************************************************
 bool XGUI_FacesPanel::eventFilter(QObject* theObject, QEvent *theEvent)
 {
   QWidget* aWidget = qobject_cast<QWidget*>(theObject);
@@ -121,8 +135,11 @@ void XGUI_FacesPanel::setActivePanel(const bool theIsActive)
   ModuleBase_Tools::setShadowEffect(myListView->getControl(), theIsActive);
   myIsActive = theIsActive;
 
-  if (myIsActive)
+  if (myIsActive) {
+    // the selection is cleared by activating selection control
+    XGUI_Tools::workshop(myWorkshop)->selector()->clearSelection();
     emit activated();
+  }
   else
     emit deactivated();
 }

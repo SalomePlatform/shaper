@@ -18,11 +18,13 @@
 // email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com>
 //
 
-#ifndef PartSet_SelectionFilterType_H
-#define PartSet_SelectionFilterType_H
+#ifndef XGUI_SelectionFilterType_H
+#define XGUI_SelectionFilterType_H
+
+#include "XGUI.h"
 
 /// Enumeration to specify module selection filters
-enum PartSet_SelectionFilterType {
+enum XGUI_EXPORT XGUI_SelectionFilterType {
   SF_GlobalFilter, /// filter for different documents, group results
   SF_FilterInfinite, /// filter for infinite construction results
   SF_ResultGroupNameFilter, /// filter for selection some kind of results

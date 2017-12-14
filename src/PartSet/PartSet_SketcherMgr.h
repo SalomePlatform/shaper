@@ -24,7 +24,7 @@
 #include "PartSet.h"
 
 #include "PartSet_PreviewSketchPlane.h"
-#include "PartSet_SelectionFilterType.h"
+#include "XGUI_SelectionFilterType.h"
 #include "PartSet_Tools.h"
 
 #include <ModelAPI_Feature.h>
@@ -201,12 +201,12 @@ public:
   /// Returns true if the filter is created by the sketch manager
   /// \param theFilterType a checked type
   /// \return boolean value
-  bool sketchSelectionFilter(const PartSet_SelectionFilterType theFilterType);
+  bool sketchSelectionFilter(const XGUI_SelectionFilterType theFilterType);
 
   /// Append selection filter into the module and type of the filter in internal container
   /// \param theFilterType selection filter type
   /// \param theFilter added filter
-  void registerSelectionFilter(const PartSet_SelectionFilterType theFilterType,
+  void registerSelectionFilter(const XGUI_SelectionFilterType theFilterType,
                                const Handle(SelectMgr_Filter)& theFilter);
 
   /// Commit the operation if it is possible. If the operation is dimention constraint,
@@ -445,7 +445,7 @@ private:
 
   CompositeFeaturePtr myCurrentSketch;
 
-  std::set<PartSet_SelectionFilterType> mySelectionFilterTypes;
+  std::set<XGUI_SelectionFilterType> mySelectionFilterTypes;
 
   FeatureToSelectionMap myCurrentSelection;
   bool myPreviousUpdateViewerEnabled;

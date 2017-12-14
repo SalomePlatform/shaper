@@ -245,6 +245,11 @@ class MODULEBASE_EXPORT ModuleBase_IModule : public QObject
   /// \param theSelectionFilters [out] container of type value
   virtual QIntList selectionFilters() { return QIntList(); }
 
+  /// Returns selection filter
+  /// \param theType selection filter type
+  /// \param theFilter instance of filter
+  virtual Handle(SelectMgr_Filter) selectionFilter(const int theType) = 0;
+
   /// Return true if the custom presentation is activated
   /// \param theFlag a flag of level of customization, which means that only part of sub-elements
   /// \return boolean value

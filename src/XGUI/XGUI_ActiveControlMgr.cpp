@@ -21,6 +21,7 @@
 #include "XGUI_ActiveControlMgr.h"
 #include "XGUI_ActiveControlSelector.h"
 #include "XGUI_SelectionActivate.h"
+#include "XGUI_SelectionMgr.h"
 #include "XGUI_Tools.h"
 #include "XGUI_Workshop.h"
 

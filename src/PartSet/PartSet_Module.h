@@ -24,7 +24,7 @@
 #include "PartSet.h"
 #include "PartSet_Tools.h"
 #include "PartSet_OverconstraintListener.h"
-#include "PartSet_SelectionFilterType.h"
+#include "XGUI_SelectionFilterType.h"
 #include "PartSet_SketcherMgr.h"
 
 #include <ModuleBase_IModule.h>
@@ -237,13 +237,13 @@ public:
   /// Append selection filter into the module and type of the filter in internal container
   /// \param theFilterType selection filter type
   /// \param theFilter added filter
-  void registerSelectionFilter(const PartSet_SelectionFilterType theFilterType,
+  void registerSelectionFilter(const XGUI_SelectionFilterType theFilterType,
                                const Handle(SelectMgr_Filter)& theFilter);
 
   /// Returns selection filter
-  /// \param theFilterType selection filter type
+  /// \param theType selection filter type
   /// \param theFilter instance of filter
-  Handle(SelectMgr_Filter) selectionFilter(const PartSet_SelectionFilterType theFilterType);
+  virtual Handle(SelectMgr_Filter) selectionFilter(const int theType);
 
   /// Returns whether the mouse enter the viewer's window
   /// \return true if items are added and there is no necessity to provide standard menu
@@ -473,7 +473,7 @@ protected:
 
 private:
   bool myIsOperationIsLaunched; /// state of application between launch and stop operation
-  std::map<PartSet_SelectionFilterType, Handle(SelectMgr_Filter)> mySelectionFilters;
+  std::map<XGUI_SelectionFilterType, Handle(SelectMgr_Filter)> mySelectionFilters;
 
   PartSet_SketcherMgr* mySketchMgr;
   PartSet_SketcherReentrantMgr* mySketchReentrantMgr;

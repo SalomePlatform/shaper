@@ -208,7 +208,7 @@ PartSet_Module::PartSet_Module(ModuleBase_IWorkshop* theWshop)
 //******************************************************
 PartSet_Module::~PartSet_Module()
 {
-  std::map<PartSet_SelectionFilterType, Handle(SelectMgr_Filter)>::const_iterator aFiltersIt =
+  std::map<XGUI_SelectionFilterType, Handle(SelectMgr_Filter)>::const_iterator aFiltersIt =
     mySelectionFilters.begin();
   for (; aFiltersIt != mySelectionFilters.end(); aFiltersIt++) {
     Handle(SelectMgr_Filter) aFilter = aFiltersIt->second;
@@ -622,12 +622,8 @@ void PartSet_Module::moduleSelectionFilters(const QIntList& theFilterTypes,
                                             SelectMgr_ListOfFilter& theSelectionFilters)
 {
   bool isSketchActive = mySketchMgr->activeSketch();
-  XGUI_ActiveControlSelector* anActiveSelector =
-    getWorkshop()->activeControlMgr()->activeSelector();
-  bool isHideFacesActive = anActiveSelector &&
-                           anActiveSelector->getType() == XGUI_FacesPanelSelector::Type();
 
-  std::map<PartSet_SelectionFilterType, Handle(SelectMgr_Filter)>::const_iterator aFiltersIt =
+  std::map<XGUI_SelectionFilterType, Handle(SelectMgr_Filter)>::const_iterator aFiltersIt =
     mySelectionFilters.begin();
   for (; aFiltersIt != mySelectionFilters.end(); aFiltersIt++) {
     int aFilterType = aFiltersIt->first;
@@ -637,11 +633,11 @@ void PartSet_Module::moduleSelectionFilters(const QIntList& theFilterTypes,
 
     // using sketch filters only if sketch operation is active
     if (!isSketchActive &&
-        mySketchMgr->sketchSelectionFilter((PartSet_SelectionFilterType)aFilterType))
+        mySketchMgr->sketchSelectionFilter((XGUI_SelectionFilterType)aFilterType))
       continue;
 
-    // using filtering of construction results only when faces panel is active
-    if (aFilterType == SF_ResultGroupNameFilter && !isHideFacesActive)
+    // using filtering of construction results only from faces panel
+    if (aFilterType == SF_ResultGroupNameFilter)
       continue;
 
     theSelectionFilters.Append(aFiltersIt->second);
@@ -653,7 +649,7 @@ QIntList PartSet_Module::selectionFilters()
 {
   QIntList aTypes;
 
-  std::map<PartSet_SelectionFilterType, Handle(SelectMgr_Filter)>::const_iterator aFiltersIt =
+  std::map<XGUI_SelectionFilterType, Handle(SelectMgr_Filter)>::const_iterator aFiltersIt =
     mySelectionFilters.begin();
   for (; aFiltersIt != mySelectionFilters.end(); aFiltersIt++)
     aTypes.append(aFiltersIt->first);
@@ -662,18 +658,19 @@ QIntList PartSet_Module::selectionFilters()
 }
 
 //******************************************************
-void PartSet_Module::registerSelectionFilter(const PartSet_SelectionFilterType theFilterType,
+void PartSet_Module::registerSelectionFilter(const XGUI_SelectionFilterType theFilterType,
                                              const Handle(SelectMgr_Filter)& theFilter)
 {
   mySelectionFilters[theFilterType] = theFilter;
 }
 
 //******************************************************
-Handle(SelectMgr_Filter) PartSet_Module::selectionFilter(
-  const PartSet_SelectionFilterType theFilterType)
+Handle(SelectMgr_Filter) PartSet_Module::selectionFilter(const int theType)
 {
-  if (mySelectionFilters.find(theFilterType) != mySelectionFilters.end())
-    return mySelectionFilters[theFilterType];
+  XGUI_SelectionFilterType aType = (XGUI_SelectionFilterType)theType;
+
+  if (mySelectionFilters.find(aType) != mySelectionFilters.end())
+    return mySelectionFilters[aType];
   else
     return Handle(SelectMgr_Filter)();
 }

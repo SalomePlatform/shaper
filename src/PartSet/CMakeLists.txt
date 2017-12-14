@@ -43,7 +43,6 @@ SET(PROJECT_HEADERS
     PartSet_PreviewPlanes.h
     PartSet_PreviewSketchPlane.h
     PartSet_ResultSketchPrs.h
-    PartSet_SelectionFilterType.h
     PartSet_SketcherMgr.h
     PartSet_SketcherReentrantMgr.h
     PartSet_Tools.h
