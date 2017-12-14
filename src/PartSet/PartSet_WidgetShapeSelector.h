@@ -57,7 +57,7 @@ Q_OBJECT
   /// Appends into container of workshop selection filters
   /// \param [out] theModuleSelectionFilters module additional modes, -1 means all default modes
   /// \param [out] theSelectionFilters selection filters
-  virtual void selectionFilters(int& theModuleSelectionFilters,
+  virtual void selectionFilters(QIntList& theModuleSelectionFilters,
                                 SelectMgr_ListOfFilter& theSelectionFilters);
 
 protected:

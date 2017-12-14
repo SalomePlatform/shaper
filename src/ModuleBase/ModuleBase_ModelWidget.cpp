@@ -119,10 +119,9 @@ void ModuleBase_ModelWidget::selectionModes(int& theModuleSelectionModes, QIntLi
 }
 
 //**************************************************************
-void ModuleBase_ModelWidget::selectionFilters(int& theModuleSelectionFilters,
+void ModuleBase_ModelWidget::selectionFilters(QIntList& theModuleSelectionFilters,
                                               SelectMgr_ListOfFilter& theSelectionFilters)
 {
-  theModuleSelectionFilters = -1;
   if (myWidgetValidator)
     myWidgetValidator->selectionFilters(theModuleSelectionFilters, theSelectionFilters);
 }

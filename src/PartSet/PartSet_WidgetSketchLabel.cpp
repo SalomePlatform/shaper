@@ -534,10 +534,9 @@ void PartSet_WidgetSketchLabel::selectionModes(int& theModuleSelectionModes, QIn
     theModes << TopAbs_FACE;
 }
 
-void PartSet_WidgetSketchLabel::selectionFilters(int& theModuleSelectionFilters,
+void PartSet_WidgetSketchLabel::selectionFilters(QIntList& theModuleSelectionFilters,
                                                  SelectMgr_ListOfFilter& theSelectionFilters)
 {
-  theModuleSelectionFilters = -1;
   std::shared_ptr<GeomAPI_Pln> aPlane = plane();
   if (aPlane.get())
     return;

@@ -173,8 +173,8 @@ PartSet_Module::PartSet_Module(ModuleBase_IWorkshop* theWshop)
   Events_Loop* aLoop = Events_Loop::loop();
   aLoop->registerListener(this, Events_Loop::eventByName(EVENT_DOCUMENT_CHANGED));
 
-  mySelectionFilters.Append(new PartSet_GlobalFilter(myWorkshop));
-  mySelectionFilters.Append(new PartSet_FilterInfinite(myWorkshop));
+  registerSelectionFilter(SF_GlobalFilter, new PartSet_GlobalFilter(myWorkshop));
+  registerSelectionFilter(SF_FilterInfinite, new PartSet_FilterInfinite(myWorkshop));
 
   setDefaultConstraintShown();
 
@@ -203,9 +203,10 @@ PartSet_Module::PartSet_Module(ModuleBase_IWorkshop* theWshop)
 //******************************************************
 PartSet_Module::~PartSet_Module()
 {
-  SelectMgr_ListIteratorOfListOfFilter aIt(mySelectionFilters);
-  for (; aIt.More(); aIt.Next()) {
-    Handle(SelectMgr_Filter) aFilter = aIt.Value();
+  std::map<PartSet_SelectionFilterType, Handle(SelectMgr_Filter)>::const_iterator aFiltersIt =
+    mySelectionFilters.begin();
+  for (; aFiltersIt != mySelectionFilters.end(); aFiltersIt++) {
+    Handle(SelectMgr_Filter) aFilter = aFiltersIt->second;
     if (!aFilter.IsNull())
       aFilter.Nullify();
   }
@@ -613,18 +614,56 @@ void PartSet_Module::moduleSelectionModes(int theModesType, QIntList& theModes)
 }
 
 //******************************************************
-void PartSet_Module::moduleSelectionFilters(int theModesType,
+void PartSet_Module::moduleSelectionFilters(const QIntList& theFilterTypes,
                                             SelectMgr_ListOfFilter& theSelectionFilters)
 {
-  //XGUI_Tools::workshop(myWorkshop)->selectionFilters(theSelectionFilters);
-  //selectionFilters(theSelectionFilters);
+  bool isSketchActive = mySketchMgr->activeSketch();
 
-  for (SelectMgr_ListOfFilter::Iterator aFiltersIt(mySelectionFilters); aFiltersIt.More();
-       aFiltersIt.Next())
-    theSelectionFilters.Append(aFiltersIt.Value());
+  std::map<PartSet_SelectionFilterType, Handle(SelectMgr_Filter)>::const_iterator aFiltersIt =
+    mySelectionFilters.begin();
+  for (; aFiltersIt != mySelectionFilters.end(); aFiltersIt++) {
+    int aFilterType = aFiltersIt->first;
+    // do not add not participating filters in given parameters
+    if (!theFilterTypes.contains(aFilterType))
+      continue;
 
-  if (mySketchMgr->activeSketch())
-    mySketchMgr->selectionFilters(theSelectionFilters);
+    // using sketch filters only if sketch operation is active
+    if (!isSketchActive &&
+        mySketchMgr->sketchSelectionFilter((PartSet_SelectionFilterType)aFilterType))
+      continue;
+
+    theSelectionFilters.Append(aFiltersIt->second);
+  }
+}
+
+//******************************************************
+QIntList PartSet_Module::selectionFilters()
+{
+  QIntList aTypes;
+
+  std::map<PartSet_SelectionFilterType, Handle(SelectMgr_Filter)>::const_iterator aFiltersIt =
+    mySelectionFilters.begin();
+  for (; aFiltersIt != mySelectionFilters.end(); aFiltersIt++)
+    aTypes.append(aFiltersIt->first);
+
+  return aTypes;
+}
+
+//******************************************************
+void PartSet_Module::registerSelectionFilter(const PartSet_SelectionFilterType theFilterType,
+                                             const Handle(SelectMgr_Filter)& theFilter)
+{
+  mySelectionFilters[theFilterType] = theFilter;
+}
+
+//******************************************************
+Handle(SelectMgr_Filter) PartSet_Module::selectionFilter(
+  const PartSet_SelectionFilterType theFilterType)
+{
+  if (mySelectionFilters.find(theFilterType) != mySelectionFilters.end())
+    return mySelectionFilters[theFilterType];
+  else
+    return Handle(SelectMgr_Filter)();
 }
 
 //******************************************************

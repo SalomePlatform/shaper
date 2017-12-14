@@ -23,16 +23,15 @@
 
 #include "PartSet.h"
 
-#include "PartSet_Filters.h"
-#include "PartSet_Tools.h"
 #include "PartSet_PreviewSketchPlane.h"
+#include "PartSet_SelectionFilterType.h"
+#include "PartSet_Tools.h"
 
 #include <ModelAPI_Feature.h>
 #include <ModelAPI_Attribute.h>
 #include <ModelAPI_CompositeFeature.h>
 #include <ModelAPI_Result.h>
 
-#include <ModuleBase_ViewerFilters.h>
 #include <ModuleBase_Definitions.h>
 #include <ModuleBase_ModelWidget.h>
 
@@ -47,6 +46,8 @@
 #include <QObject>
 #include <QList>
 #include <QMap>
+
+#include <set>
 
 class PartSet_Module;
 class ModuleBase_IViewWindow;
@@ -197,9 +198,16 @@ public:
   /// \param theOperation a committed operation
   void commitNestedSketch(ModuleBase_Operation* theOperation);
 
-  /// Appends into container of workshop selection filters
-  /// \param [out] selection filters
-  virtual void selectionFilters(SelectMgr_ListOfFilter& theSelectionFilters) const;
+  /// Returns true if the filter is created by the sketch manager
+  /// \param theFilterType a checked type
+  /// \return boolean value
+  bool sketchSelectionFilter(const PartSet_SelectionFilterType theFilterType);
+
+  /// Append selection filter into the module and type of the filter in internal container
+  /// \param theFilterType selection filter type
+  /// \param theFilter added filter
+  void registerSelectionFilter(const PartSet_SelectionFilterType theFilterType,
+                               const Handle(SelectMgr_Filter)& theFilter);
 
   /// Commit the operation if it is possible. If the operation is dimention constraint,
   /// it gives widget editor to input dimention value
@@ -437,8 +445,8 @@ private:
 
   CompositeFeaturePtr myCurrentSketch;
 
-  Handle(PartSet_CirclePointFilter) myCirclePointFilter;
-  Handle(ModuleBase_ShapeInPlaneFilter) myPlaneFilter;
+  std::set<PartSet_SelectionFilterType> mySelectionFilterTypes;
+
   FeatureToSelectionMap myCurrentSelection;
   bool myPreviousUpdateViewerEnabled;
 

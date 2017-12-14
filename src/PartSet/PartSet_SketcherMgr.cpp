@@ -19,6 +19,8 @@
 //
 
 #include "PartSet_SketcherMgr.h"
+
+#include "PartSet_Filters.h"
 #include "PartSet_SketcherReentrantMgr.h"
 #include "PartSet_Module.h"
 #include "PartSet_MouseProcessor.h"
@@ -56,6 +58,7 @@
 #include <ModuleBase_ViewerPrs.h>
 #include <ModuleBase_Tools.h>
 #include <ModuleBase_ResultPrs.h>
+#include <ModuleBase_ViewerFilters.h>
 
 #include <GeomDataAPI_Point2D.h>
 
@@ -188,14 +191,12 @@ PartSet_SketcherMgr::PartSet_SketcherMgr(PartSet_Module* theModule)
 
   mySketchPlane = new PartSet_PreviewSketchPlane();
 
-  myCirclePointFilter = new PartSet_CirclePointFilter(anIWorkshop);
-  myPlaneFilter = new ModuleBase_ShapeInPlaneFilter();
+  registerSelectionFilter(SF_SketchCirclePointFilter, new PartSet_CirclePointFilter(anIWorkshop));
+  registerSelectionFilter(SF_SketchPlaneFilter, new ModuleBase_ShapeInPlaneFilter());
 }
 
 PartSet_SketcherMgr::~PartSet_SketcherMgr()
 {
-  myPlaneFilter.Nullify();
-  myCirclePointFilter.Nullify();
 }
 
 void PartSet_SketcherMgr::onEnterViewPort()
@@ -1023,7 +1024,9 @@ void PartSet_SketcherMgr::startSketch(ModuleBase_Operation* theOperation)
   bool aHasPlane = false;
   std::shared_ptr<GeomAPI_Pln> aPln;
   aPln = PartSet_Tools::sketchPlane(myCurrentSketch);
-  myPlaneFilter->setPlane(aPln);
+  Handle(SelectMgr_Filter) aFilter = myModule->selectionFilter(SF_SketchPlaneFilter);
+  if (!aFilter.IsNull())
+    Handle(ModuleBase_ShapeInPlaneFilter)::DownCast(aFilter)->setPlane(aPln);
 
   workshop()->selectionActivate()->updateSelectionFilters();
   workshop()->selectionActivate()->updateSelectionModes();
@@ -1158,10 +1161,16 @@ void PartSet_SketcherMgr::commitNestedSketch(ModuleBase_Operation* theOperation)
   }
 }
 
-void PartSet_SketcherMgr::selectionFilters(SelectMgr_ListOfFilter& theSelectionFilters) const
+bool PartSet_SketcherMgr::sketchSelectionFilter(const PartSet_SelectionFilterType theFilterType)
 {
-  theSelectionFilters.Append(myCirclePointFilter);
-  theSelectionFilters.Append(myPlaneFilter);
+  return mySelectionFilterTypes.find(theFilterType) != mySelectionFilterTypes.end();
+}
+
+void PartSet_SketcherMgr::registerSelectionFilter(const PartSet_SelectionFilterType theFilterType,
+                                                  const Handle(SelectMgr_Filter)& theFilter)
+{
+  mySelectionFilterTypes.insert(theFilterType);
+  myModule->registerSelectionFilter(theFilterType, theFilter);
 }
 
 bool PartSet_SketcherMgr::operationActivatedByPreselection()
@@ -1464,9 +1473,12 @@ bool PartSet_SketcherMgr::isObjectOfSketch(const ObjectPtr& theObject) const
   return isFoundObject;
 }
 
-void PartSet_SketcherMgr::onPlaneSelected(const std::shared_ptr<GeomAPI_Pln>& thePln)
+void PartSet_SketcherMgr::onPlaneSelected(const std::shared_ptr<GeomAPI_Pln>& thePlane)
 {
-  myPlaneFilter->setPlane(thePln);
+  Handle(SelectMgr_Filter) aFilter = myModule->selectionFilter(SF_SketchPlaneFilter);
+  if (!aFilter.IsNull())
+    Handle(ModuleBase_ShapeInPlaneFilter)::DownCast(aFilter)->setPlane(thePlane);
+
   workshop()->selectionActivate()->updateSelectionModes();
 }
 

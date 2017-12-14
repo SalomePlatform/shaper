@@ -103,11 +103,12 @@ void XGUI_SelectionActivate::updateSelectionFilters()
   SelectMgr_ListOfFilter aSelectionFilters;
   switch (activeSelectionPlace()) {
     case Workshop:
-      myWorkshop->module()->moduleSelectionFilters(-1/*all filters*/, aSelectionFilters);
+      myWorkshop->module()->moduleSelectionFilters(myWorkshop->module()->selectionFilters(),
+        aSelectionFilters);
     break;
     case PropertyPanel: {
       ModuleBase_ModelWidget* anActiveWidget = myWorkshop->module()->activeWidget();
-      int aModuleSelectionFilters = -1;
+      QIntList aModuleSelectionFilters = myWorkshop->module()->selectionFilters();
       if (anActiveWidget)
         anActiveWidget->selectionFilters(aModuleSelectionFilters, aSelectionFilters);
       myWorkshop->module()->moduleSelectionFilters(aModuleSelectionFilters, aSelectionFilters);

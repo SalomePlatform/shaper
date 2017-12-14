@@ -236,10 +236,14 @@ class MODULEBASE_EXPORT ModuleBase_IModule : public QObject
   virtual void moduleSelectionModes(int theModesType, QIntList& theModes) = 0;
 
   /// Appends into container of filters module filters corresponded to the modes type
-  /// \param theModesType combination of available selection filters
+  /// \param theFilterTypes container of available selection filters
   /// \param theSelectionFilters [out] container to be extend by elements
-  virtual void moduleSelectionFilters(int theModesType,
+  virtual void moduleSelectionFilters(const QIntList& theFilterTypes,
                                       SelectMgr_ListOfFilter& theSelectionFilters) = 0;
+
+  /// Returns types of registered module selection filters
+  /// \param theSelectionFilters [out] container of type value
+  virtual QIntList selectionFilters() { return QIntList(); }
 
   /// Return true if the custom presentation is activated
   /// \param theFlag a flag of level of customization, which means that only part of sub-elements

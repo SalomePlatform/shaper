@@ -60,18 +60,14 @@ PartSet_WidgetShapeSelector::~PartSet_WidgetShapeSelector()
 }
 
 //********************************************************************
-void PartSet_WidgetShapeSelector::selectionFilters(int& theModuleSelectionFilters,
+void PartSet_WidgetShapeSelector::selectionFilters(QIntList& theModuleSelectionFilters,
                                                    SelectMgr_ListOfFilter& theSelectionFilters)
 {
   ModuleBase_WidgetShapeSelector::selectionFilters(theModuleSelectionFilters, theSelectionFilters);
 
   if (!myUseSketchPlane) {
-    theModuleSelectionFilters = -1; // TODO!!!
-
-    //XGUI_Workshop* aWorkshop = XGUI_Tools::workshop(myWorkshop);
-    //PartSet_Module* aModule = dynamic_cast<PartSet_Module*>(aWorkshop->module());
-    //bool isUsePlaneFilterOnly = !toActivate;
-    //aModule->sketchMgr()->activatePlaneFilter(isUsePlaneFilterOnly);
+    if (theModuleSelectionFilters.contains(SF_SketchPlaneFilter))
+      theModuleSelectionFilters.removeAll(SF_SketchPlaneFilter);
   }
 }
 

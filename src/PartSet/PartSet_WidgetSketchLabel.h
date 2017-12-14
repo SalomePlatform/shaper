@@ -81,7 +81,7 @@ public:
   /// Using widget selection filter only if plane is not defined.
   /// \param [out] theModuleSelectionFilters module additional modes, -1 means all default modes
   /// \param [out] selection filters
-  virtual void selectionFilters(int& theModuleSelectionFilters,
+  virtual void selectionFilters(QIntList& theModuleSelectionFilters,
                                 SelectMgr_ListOfFilter& theSelectionFilters);
 
   /// Returns list of widget controls

@@ -24,6 +24,7 @@
 #include "PartSet.h"
 #include "PartSet_Tools.h"
 #include "PartSet_OverconstraintListener.h"
+#include "PartSet_SelectionFilterType.h"
 #include "PartSet_SketcherMgr.h"
 
 #include <ModuleBase_IModule.h>
@@ -37,15 +38,16 @@
 //#include <StdSelect_FaceFilter.hxx>
 #include <TopoDS_Shape.hxx>
 #include <SelectMgr_ListOfFilter.hxx>
+#include <SelectMgr_Filter.hxx>
 
 #include <QMap>
 #include <QMenu>
 #include <QObject>
 #include <QModelIndex>
 
-#include <string>
-
+#include <map>
 #include <memory>
+#include <string>
 
 class ModuleBase_Operation;
 class ModuleBase_IViewWindow;
@@ -223,10 +225,25 @@ public:
   virtual void moduleSelectionModes(int theModesType, QIntList& theModes);
 
   /// Appends into container of filters module filters corresponded to the modes type
-  /// \param theModesType combination of available selection filters
+  /// \param theFilterTypes container of available selection filters
   /// \param theSelectionFilters [out] container to be extend by elements
-  virtual void moduleSelectionFilters(int theModesType,
+  virtual void moduleSelectionFilters(const QIntList& theFilterTypes,
                                       SelectMgr_ListOfFilter& theSelectionFilters);
+
+  /// Returns types of registered module selection filters
+  /// \param theSelectionFilters [out] container of type value
+  virtual QIntList selectionFilters();
+
+  /// Append selection filter into the module and type of the filter in internal container
+  /// \param theFilterType selection filter type
+  /// \param theFilter added filter
+  void registerSelectionFilter(const PartSet_SelectionFilterType theFilterType,
+                               const Handle(SelectMgr_Filter)& theFilter);
+
+  /// Returns selection filter
+  /// \param theFilterType selection filter type
+  /// \param theFilter instance of filter
+  Handle(SelectMgr_Filter) selectionFilter(const PartSet_SelectionFilterType theFilterType);
 
   /// Returns whether the mouse enter the viewer's window
   /// \return true if items are added and there is no necessity to provide standard menu
@@ -456,7 +473,7 @@ protected:
 
 private:
   bool myIsOperationIsLaunched; /// state of application between launch and stop operation
-  SelectMgr_ListOfFilter mySelectionFilters;
+  std::map<PartSet_SelectionFilterType, Handle(SelectMgr_Filter)> mySelectionFilters;
 
   PartSet_SketcherMgr* mySketchMgr;
   PartSet_SketcherReentrantMgr* mySketchReentrantMgr;

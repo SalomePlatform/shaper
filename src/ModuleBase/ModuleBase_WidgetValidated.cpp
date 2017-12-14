@@ -19,6 +19,7 @@
 //
 
 #include <ModuleBase_WidgetValidated.h>
+#include <ModuleBase_IModule.h>
 #include <ModuleBase_IViewer.h>
 #include <ModuleBase_IWorkshop.h>
 #include <ModuleBase_ISelection.h>
@@ -123,7 +124,7 @@ bool ModuleBase_WidgetValidated::isValidInFilters(const ModuleBase_ViewerPrsPtr&
     // it is not yet activated, so we need to activate/deactivate it manually
     bool isActivated = isFilterActivated();
     if (!isActivated) {
-      int aModuleSelectionFilters = -1;
+      QIntList aModuleSelectionFilters = myWorkshop->module()->selectionFilters();
       SelectMgr_ListOfFilter aSelectionFilters;
       selectionFilters(aModuleSelectionFilters, aSelectionFilters);
       /// after validation, the selection filters should be restored
@@ -246,10 +247,9 @@ bool ModuleBase_WidgetValidated::isFilterActivated() const
 }
 
 //********************************************************************
-void ModuleBase_WidgetValidated::selectionFilters(int& theModuleSelectionFilters,
+void ModuleBase_WidgetValidated::selectionFilters(QIntList& theModuleSelectionFilters,
                                                   SelectMgr_ListOfFilter& theSelectionFilters)
 {
-  theModuleSelectionFilters = -1;
   theSelectionFilters.Append(myWorkshop->validatorFilter());
 }
 
