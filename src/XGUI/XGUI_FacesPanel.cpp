@@ -210,6 +210,9 @@ void XGUI_FacesPanel::processSelection()
                                                        ModuleBase_ISelection::Viewer);
   bool isModified = false;
   static Events_ID aDispEvent = Events_Loop::loop()->eventByName(EVENT_OBJECT_TO_REDISPLAY);
+
+  std::map<ObjectPtr, NCollection_List<TopoDS_Shape> > anObjectToShapes;
+  std::map<ObjectPtr, Handle(ModuleBase_ResultPrs) > anObjectToPrs;
   for (int i = 0; i < aSelected.size(); i++) {
     ModuleBase_ViewerPrsPtr aPrs = aSelected[i];
     ObjectPtr anObject = aPrs->object();
@@ -228,8 +231,23 @@ void XGUI_FacesPanel::processSelection()
     myLastItemIndex++;
     isModified = true;
 
-    if (aResultPrs->hasSubShapeVisible(ModuleBase_Tools::getSelectedShape(aPrs)) ||
-        useTransparency()) // redisplay
+    if (anObjectToShapes.find(anObject) != anObjectToShapes.end())
+      anObjectToShapes.at(anObject).Append(ModuleBase_Tools::getSelectedShape(aPrs));
+    else {
+      NCollection_List<TopoDS_Shape> aListOfShapes;
+      aListOfShapes.Append(ModuleBase_Tools::getSelectedShape(aPrs));
+      anObjectToShapes[anObject] = aListOfShapes;
+      anObjectToPrs[anObject] = aResultPrs;
+    }
+  }
+  for (std::map<ObjectPtr, NCollection_List<TopoDS_Shape> >::const_iterator anIt = anObjectToShapes.begin();
+    anIt != anObjectToShapes.end(); anIt++) {
+    ObjectPtr anObject = anIt->first;
+    if (!anObject.get() || anObjectToPrs.find(anObject) == anObjectToPrs.end())
+      continue;
+    Handle(ModuleBase_ResultPrs) aResultPrs = anObjectToPrs.at(anObject);
+
+    if (aResultPrs->hasSubShapeVisible(anIt->second) || useTransparency()) // redisplay
       ModelAPI_EventCreator::get()->sendUpdated(anObject, aDispEvent);
     else { // erase object because it is entirely hidden
       anObject->setDisplayed(false);
@@ -341,6 +359,9 @@ bool XGUI_FacesPanel::hideEmptyObjects()
 {
   bool isModified = false;
   static Events_ID aDispEvent = Events_Loop::loop()->eventByName(EVENT_OBJECT_TO_REDISPLAY);
+  std::map<ObjectPtr, NCollection_List<TopoDS_Shape> > anObjectToShapes;
+  std::map<ObjectPtr, Handle(ModuleBase_ResultPrs) > anObjectToPrs;
+
   for (QMap<int, ModuleBase_ViewerPrsPtr>::const_iterator anIt = myItems.begin();
        anIt != myItems.end(); anIt++) {
     ModuleBase_ViewerPrsPtr aPrs = anIt.value();
@@ -353,7 +374,23 @@ bool XGUI_FacesPanel::hideEmptyObjects()
     if (aResultPrs.IsNull())
       continue;
 
-    if (!aResultPrs->hasSubShapeVisible(ModuleBase_Tools::getSelectedShape(aPrs))) {
+    if (anObjectToShapes.find(anObject) != anObjectToShapes.end())
+      anObjectToShapes.at(anObject).Append(ModuleBase_Tools::getSelectedShape(aPrs));
+    else {
+      NCollection_List<TopoDS_Shape> aListOfShapes;
+      aListOfShapes.Append(ModuleBase_Tools::getSelectedShape(aPrs));
+      anObjectToShapes[anObject] = aListOfShapes;
+      anObjectToPrs[anObject] = aResultPrs;
+    }
+  }
+  for (std::map<ObjectPtr, NCollection_List<TopoDS_Shape> >::const_iterator anIt = anObjectToShapes.begin();
+    anIt != anObjectToShapes.end(); anIt++) {
+    ObjectPtr anObject = anIt->first;
+    if (!anObject.get() || anObjectToPrs.find(anObject) == anObjectToPrs.end())
+      continue;
+    Handle(ModuleBase_ResultPrs) aResultPrs = anObjectToPrs.at(anObject);
+
+    if (!aResultPrs->hasSubShapeVisible(anIt->second)) {
       // erase object because it is entirely hidden
       anObject->setDisplayed(false);
       myHiddenObjects.insert(anObject);

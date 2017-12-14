@@ -140,21 +140,13 @@ bool ModuleBase_ResultPrs::setSubShapeHidden(const NCollection_List<TopoDS_Shape
 }
 
 //********************************************************************
-bool ModuleBase_ResultPrs::hasSubShapeVisible(const TopoDS_Shape& theShape)
+bool ModuleBase_ResultPrs::hasSubShapeVisible(
+  const NCollection_List<TopoDS_Shape>& theShapesToSkip)
 {
-  int aNbOfHiddenSubShapes = myHiddenSubShapes.Size();
-
-  if (!myHiddenSubShapes.Contains(theShape))
-    aNbOfHiddenSubShapes++; // the shape to be hidden later
-
-  //const TopoDS_Shape aCurrentShape = Shape();
-  NCollection_List<TopoDS_Shape> aHiddenSubShapes = myHiddenSubShapes;
-  aHiddenSubShapes.Append(theShape);
-
   TopoDS_Compound aCompound;
   BRep_Builder aBuilder;
   aBuilder.MakeCompound (aCompound);
-  collectSubShapes(aBuilder, aCompound, myOriginalShape, aHiddenSubShapes);
+  collectSubShapes(aBuilder, aCompound, myOriginalShape, theShapesToSkip);
   return !BOPTools_AlgoTools3D::IsEmptyShape(aCompound);
 }
 

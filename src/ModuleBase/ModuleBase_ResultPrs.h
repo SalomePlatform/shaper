@@ -94,9 +94,9 @@ public:
   Standard_EXPORT bool setSubShapeHidden(const NCollection_List<TopoDS_Shape>& theShapes);
 
   /// Returns true if there are no hidden sub shapes or original shape has at least one not hidden
-  /// \param theShapeToSkip the shape should be interpreted as additional hidden in the presentation
+  /// \param theShapesToSkip container of shape to be hidden in the presentation (faces)
   /// \return boolean value
-  Standard_EXPORT bool hasSubShapeVisible(const TopoDS_Shape& theShapeToSkip);
+  Standard_EXPORT bool hasSubShapeVisible(const NCollection_List<TopoDS_Shape>& theShapesToSkip);
 
   /// Set transparency of hidden sub shapes: if value is 1, shapes are entirely hidden
   /// \param theTransparency transparency value
