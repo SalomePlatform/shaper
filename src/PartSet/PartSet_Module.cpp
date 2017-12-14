@@ -998,7 +998,8 @@ void PartSet_Module::onObjectDisplayed(ObjectPtr theObject, AISObjectPtr theAIS)
       if (!aCons.IsNull())
       aToUseZLayer = true;
     }
-    aCtx->SetZLayer(anAIS, myVisualLayerId);
+    if (aToUseZLayer)
+      aCtx->SetZLayer(anAIS, myVisualLayerId);
   }
 }
 

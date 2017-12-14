@@ -24,9 +24,18 @@
 #include "XGUI_Tools.h"
 #include "XGUI_Workshop.h"
 
-
 #include <ModuleBase_IModule.h>
 #include <ModuleBase_IWorkshop.h>
+
+//#define DEBUG_ACTIVE_SELECTOR
+
+#ifdef DEBUG_ACTIVE_SELECTOR
+void debugInfo(const QString& theMessage, XGUI_ActiveControlSelector* theSelector)
+{
+  std::cout << theMessage.toStdString().c_str() << ", active: "
+    << theSelector ? theSelector->getType().toStdString().c_str() : "NULL" << std::endl;
+}
+#endif
 
 //********************************************************************
 XGUI_ActiveControlMgr::XGUI_ActiveControlMgr(ModuleBase_IWorkshop* theWorkshop)
@@ -70,6 +79,10 @@ void XGUI_ActiveControlMgr::onSelectorActivated()
   activateSelector(aSelector);
   XGUI_Tools::workshop(myWorkshop)->selectionActivate()->updateSelectionModes();
   XGUI_Tools::workshop(myWorkshop)->selectionActivate()->updateSelectionFilters();
+
+#ifdef DEBUG_ACTIVE_SELECTOR
+  debugInfo("onSelectorActivated", myActiveSelector);
+#endif
 }
 
 //********************************************************************
@@ -80,7 +93,7 @@ void XGUI_ActiveControlMgr::onSelectorDeactivated()
     return;
 
   myActiveSelector->setActive(false);
-  myActiveSelector = NULL;
+  activateSelector(NULL);
 
   XGUI_ActiveControlSelector* aSelectorToBeActivated = 0;
   for (int i = 0, aCount = mySelectors.count(); i < aCount; i++)
@@ -95,6 +108,9 @@ void XGUI_ActiveControlMgr::onSelectorDeactivated()
 
   XGUI_Tools::workshop(myWorkshop)->selectionActivate()->updateSelectionModes();
   XGUI_Tools::workshop(myWorkshop)->selectionActivate()->updateSelectionFilters();
+#ifdef DEBUG_ACTIVE_SELECTOR
+  debugInfo("onSelectorDeactivated", myActiveSelector);
+#endif
 }
 
 //********************************************************************
@@ -104,11 +120,15 @@ void XGUI_ActiveControlMgr::onSelectionChanged()
     return;
 
   myActiveSelector->processSelection();
+#ifdef DEBUG_ACTIVE_SELECTOR
+  debugInfo("onSelectionChanged", myActiveSelector);
+#endif
 }
 
 //********************************************************************
 void XGUI_ActiveControlMgr::activateSelector(XGUI_ActiveControlSelector* theSelector)
 {
   myActiveSelector = theSelector;
-  theSelector->setActive(true);
+  if (myActiveSelector)
+    myActiveSelector->setActive(true);
 }
