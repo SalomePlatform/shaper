@@ -1431,6 +1431,13 @@ TDF_Label Model_Document::findNamingName(std::string theName, ResultPtr theConte
               return aName->Label();
             }
           }
+          // check also "this" label
+          Handle(TDataStd_Name) aName;
+          if (aLabIter->FindAttribute(TDataStd_Name::GetID(), aName)) {
+            if (aName->Get() == aSubName) {
+              return aName->Label();
+            }
+          }
         }
       }
     }
