@@ -93,7 +93,8 @@ void PartSet_ResultGroupNameFilter::setGroupNames(const std::set<std::string>& t
   myGroupNames = theGroupNames;
 }
 
-Standard_Boolean PartSet_ResultGroupNameFilter::IsOk(const Handle(SelectMgr_EntityOwner)& theOwner) const
+Standard_Boolean PartSet_ResultGroupNameFilter::IsOk(
+  const Handle(SelectMgr_EntityOwner)& theOwner) const
 {
   std::shared_ptr<GeomAPI_AISObject> aAISObj = AISObjectPtr(new GeomAPI_AISObject());
   if (theOwner->HasSelectable()) {

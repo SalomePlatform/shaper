@@ -622,7 +622,8 @@ void PartSet_Module::moduleSelectionFilters(const QIntList& theFilterTypes,
                                             SelectMgr_ListOfFilter& theSelectionFilters)
 {
   bool isSketchActive = mySketchMgr->activeSketch();
-  XGUI_ActiveControlSelector* anActiveSelector = getWorkshop()->activeControlMgr()->activeSelector();
+  XGUI_ActiveControlSelector* anActiveSelector =
+    getWorkshop()->activeControlMgr()->activeSelector();
   bool isHideFacesActive = anActiveSelector &&
                            anActiveSelector->getType() == XGUI_FacesPanelSelector::Type();
 
