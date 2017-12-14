@@ -490,12 +490,11 @@ bool XGUI_PropertyPanel::setActiveWidget(ModuleBase_ModelWidget* theWidget, cons
 #ifdef DEBUG_ACTIVE_WIDGET
   std::cout << "myActiveWidget = " << (theWidget ? theWidget->context().c_str() : "") << std::endl;
 #endif
-  static Events_ID anEvent = Events_Loop::eventByName(EVENT_UPDATE_BY_WIDGET_SELECTION);
-  Events_Loop::loop()->flush(anEvent);
-
+  bool anIsNoMoreWidgets = false;
   if (isEmitSignal) {
     //emit widgetActivated(myActiveWidget);
     if (!myActiveWidget && !isEditingMode()) {
+      anIsNoMoreWidgets = true;
       emit noMoreWidgets(aPreviosAttributeID);
     }
   }
@@ -505,6 +504,13 @@ bool XGUI_PropertyPanel::setActiveWidget(ModuleBase_ModelWidget* theWidget, cons
     emit propertyPanelDeactivated();
   myOperationMgr->workshop()->selectionActivate()->updateSelectionModes();
   myOperationMgr->workshop()->selectionActivate()->updateSelectionFilters();
+
+  if (!anIsNoMoreWidgets && myActiveWidget)
+  {
+    // restore widget selection should be done after selection modes of widget activating
+    static Events_ID anEvent = Events_Loop::eventByName(EVENT_UPDATE_BY_WIDGET_SELECTION);
+    Events_Loop::loop()->flush(anEvent);
+  }
   return true;
 }
 

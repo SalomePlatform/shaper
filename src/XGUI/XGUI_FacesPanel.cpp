@@ -136,9 +136,11 @@ void XGUI_FacesPanel::setActivePanel(const bool theIsActive)
   myIsActive = theIsActive;
 
   if (myIsActive) {
+    emit activated();
+    // selection should be cleared after emit of signal to do not process selection change
+    // event by the previous selector
     // the selection is cleared by activating selection control
     XGUI_Tools::workshop(myWorkshop)->selector()->clearSelection();
-    emit activated();
   }
   else
     emit deactivated();
