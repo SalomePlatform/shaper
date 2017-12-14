@@ -240,8 +240,8 @@ void XGUI_FacesPanel::processSelection()
       anObjectToPrs[anObject] = aResultPrs;
     }
   }
-  for (std::map<ObjectPtr, NCollection_List<TopoDS_Shape> >::const_iterator anIt = anObjectToShapes.begin();
-    anIt != anObjectToShapes.end(); anIt++) {
+  for (std::map<ObjectPtr, NCollection_List<TopoDS_Shape> >::const_iterator
+    anIt = anObjectToShapes.begin(); anIt != anObjectToShapes.end(); anIt++) {
     ObjectPtr anObject = anIt->first;
     if (!anObject.get() || anObjectToPrs.find(anObject) == anObjectToPrs.end())
       continue;
@@ -383,8 +383,8 @@ bool XGUI_FacesPanel::hideEmptyObjects()
       anObjectToPrs[anObject] = aResultPrs;
     }
   }
-  for (std::map<ObjectPtr, NCollection_List<TopoDS_Shape> >::const_iterator anIt = anObjectToShapes.begin();
-    anIt != anObjectToShapes.end(); anIt++) {
+  for (std::map<ObjectPtr, NCollection_List<TopoDS_Shape> >::const_iterator
+    anIt = anObjectToShapes.begin(); anIt != anObjectToShapes.end(); anIt++) {
     ObjectPtr anObject = anIt->first;
     if (!anObject.get() || anObjectToPrs.find(anObject) == anObjectToPrs.end())
       continue;
