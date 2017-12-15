@@ -99,6 +99,8 @@ const int MOUSE_SENSITIVITY_IN_PIXEL = 10;
 
 #define CLEAR_OUTDATED_SELECTION_BEFORE_REDISPLAY
 
+//#define DEBUG_VIEWER_BLOCKED_COUNT
+
 //**************************************************************
 void displayedObjects(const Handle(AIS_InteractiveContext)& theAIS, AIS_ListOfInteractive& theList)
 {
@@ -614,6 +616,10 @@ bool XGUI_Displayer::enableUpdateViewer(const bool isEnabled)
   else
     myViewerBlockedRecursiveCount++;
 
+#ifdef DEBUG_VIEWER_BLOCKED_COUNT
+  std::cout << "myViewerBlockedRecursiveCount = " << myViewerBlockedRecursiveCount << std::endl;
+#endif
+
   if (myNeedUpdate && isUpdateEnabled()) {
     updateViewer();
     myNeedUpdate = false;
@@ -631,6 +637,11 @@ bool XGUI_Displayer::isUpdateEnabled() const
 void XGUI_Displayer::updateViewer() const
 {
   Handle(AIS_InteractiveContext) aContext = AISContext();
+
+#ifdef DEBUG_VIEWER_BLOCKED_COUNT
+  std::cout << "updateViewer: " << (myViewerBlockedRecursiveCount == 0 ? " done" : " later") << std::endl;
+#endif
+
   if (!aContext.IsNull() && isUpdateEnabled()) {
     //myWorkshop->viewer()->Zfitall();
     aContext->UpdateCurrentViewer();

@@ -1050,7 +1050,10 @@ void XGUI_Workshop::processUndoRedo(const ModuleBase_ActionType theActionType, i
     if (aOpMgr->canStopOperation(aOpMgr->currentOperation()))
       aOpMgr->abortOperation(aOpMgr->currentOperation());
     else
+    {
+      myDisplayer->enableUpdateViewer(isUpdateEnabled);
       return;
+    }
   }
   objectBrowser()->treeView()->setCurrentIndex(QModelIndex());
   std::list<std::string> anActionList = theActionType == ActionUndo ? aMgr->undoList()
@@ -1070,10 +1073,8 @@ void XGUI_Workshop::processUndoRedo(const ModuleBase_ActionType theActionType, i
   updateCommandStatus();
 
   // unblock the viewer update functionality and make update on purpose
-  if (theActionType == ActionRedo) {
-    myDisplayer->enableUpdateViewer(isUpdateEnabled);
-    myDisplayer->updateViewer();
-  }
+  myDisplayer->enableUpdateViewer(isUpdateEnabled);
+  myDisplayer->updateViewer();
 }
 
 //******************************************************
