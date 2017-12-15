@@ -75,14 +75,17 @@ void SketchPlugin_Projection::execute()
     return;
   FeaturePtr aProjection = ModelAPI_Feature::feature(aRefAttr->object());
 
-  if (!lastResult().get() && aProjection->lastResult().get()) {
+  if (!lastResult().get()) {
+    bool hasProjResult = aProjection->lastResult().get();
     ResultConstructionPtr aConstr = document()->createConstruction(data());
-    aConstr->setShape(aProjection->lastResult()->shape());
+    if (hasProjResult)
+      aConstr->setShape(aProjection->lastResult()->shape());
     aConstr->setIsInHistory(false);
     aConstr->setDisplayed(false);
     setResult(aConstr);
 
-    aProjection->selection(EXTERNAL_ID())->setValue(lastResult(), lastResult()->shape());
+    if (hasProjResult)
+      aProjection->selection(EXTERNAL_ID())->setValue(lastResult(), lastResult()->shape());
   }
 
   // is sketch plane is changed (issue 1791), attribute of projection is not changed, but
