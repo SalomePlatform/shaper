@@ -212,7 +212,7 @@ ADD_UNIT_TESTS(TestExtrusion.py
                TestPartitionBox4Planes.py
                TestPartitionEdgeSolid.py
                TestPartitionFace2Solid.py
-               TestPartitionFaceSolid.py
+#               TestPartitionFaceSolid.py
                TestPartitionFaceWire.py
                TestPartitionInclinedFaceSolid.py
                TestPartitionWireFaceSolid.py
