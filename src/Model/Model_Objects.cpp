@@ -1888,9 +1888,16 @@ FeaturePtr Model_Objects::nextFeature(FeaturePtr theCurrent, const bool theRever
   std::shared_ptr<Model_Data> aData = std::static_pointer_cast<Model_Data>(theCurrent->data());
   if (aData.get() && aData->isValid()) {
     TDF_Label aFeatureLabel = aData->label().Father();
-    TDF_Label aNextLabel = nextLabel(aFeatureLabel, theReverse);
-    if (!aNextLabel.IsNull())
-      return feature(aNextLabel);
+    do {
+      TDF_Label aNextLabel = nextLabel(aFeatureLabel, theReverse);
+      if (aNextLabel.IsNull())
+        break; // last or something is wrong
+      FeaturePtr aFound = feature(aNextLabel);
+      if (aFound)
+        return aFound; // the feature is found
+      // if the next label is a folder, skip it
+      aFeatureLabel = folder(aNextLabel).get() ? aNextLabel : TDF_Label();
+    } while (!aFeatureLabel.IsNull());
   }
   return FeaturePtr(); // not found, last, or something is wrong
 }
