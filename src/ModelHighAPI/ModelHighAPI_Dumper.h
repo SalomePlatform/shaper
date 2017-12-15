@@ -302,7 +302,7 @@ private:
   bool isDefaultTransparency(const ResultPtr& theResult) const;
 
   /// Dump postponed entities
-  void dumpPostponed();
+  void dumpPostponed(bool theDumpFolders = false);
 
 private:
   struct EntityName {

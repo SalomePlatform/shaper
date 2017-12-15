@@ -60,7 +60,7 @@ NB_FEATURES_FULL = 2
 NB_FEATURES_OUT  = 2
 
 assert(aPartDoc.size("Folders") == 1), "Wrong number of folders: {}".format(aPartDoc.size("Folders"))
-assert(aPartDoc.size("Features") == 2), "Wrong number of features: {}".format(aPartDoc.size("Features"))
+assert(aPartDoc.size("Features") == NB_FEATURES_FULL), "Wrong number of features: {}".format(aPartDoc.size("Features"))
 FOLDER_NAME_EXPECTED = "Folder_1"
 assert(aFolder1.name() == FOLDER_NAME_EXPECTED), "Actual name '{}', expected '{}'".format(aFolder1.name(), FOLDER_NAME_EXPECTED)
 
@@ -86,16 +86,33 @@ assert(aFound[0].data().isEqual(aFolder1.data()))
 assert(aFound[1] == 0)
 
 #=========================================================================
-# Test 2. Add a point into a folder below
+# Test 2. Add a point, check it is added to a folder, then move it out
 #=========================================================================
 aPoint2 = newPoint(aPartDoc, 10., 0., 0.)
-aPoint3 = newPoint(aPartDoc, 10., 10., 0.)
 
-NB_FEATURES_FULL += 2
-NB_FEATURES_OUT += 2
-
+NB_FEATURES_FULL += 1
 assert(aPartDoc.size("Features") == NB_FEATURES_FULL), "Wrong number of features: {}, expected: {}".format(aPartDoc.size("Features"), NB_FEATURES_FULL)
 assert(aPartDoc.size("Features", True) == NB_FEATURES_OUT), "Wrong number of features outside a folder: {}, expected: {}".format(aPartDoc.size("Features", True), NB_FEATURES_OUT)
+
+fromFolder = FeatureList()
+fromFolder.append(aPoint2)
+
+aSession.startOperation()
+isMovedOut = aPartDoc.removeFromFolder(fromFolder)
+aSession.finishOperation()
+assert(isMovedOut)
+
+NB_FEATURES_OUT += 1
+assert(aPartDoc.size("Features") == NB_FEATURES_FULL), "Wrong number of features: {}, expected: {}".format(aPartDoc.size("Features"), NB_FEATURES_FULL)
+assert(aPartDoc.size("Features", True) == NB_FEATURES_OUT), "Wrong number of features outside a folder: {}, expected: {}".format(aPartDoc.size("Features", True), NB_FEATURES_OUT)
+
+#=========================================================================
+# Test 3. Add a point into a folder below
+#=========================================================================
+aPoint3 = newPoint(aPartDoc, 10., 10., 0.)
+
+NB_FEATURES_FULL += 1
+NB_FEATURES_OUT += 1
 
 # add a folder
 aSession.startOperation()
@@ -133,7 +150,7 @@ aFound = aPartDoc.findContainingFolder(aPoint3)
 assert(aFound == -1)
 
 #=========================================================================
-# Test 3. Add several points into a folder
+# Test 4. Add several points into a folder
 #=========================================================================
 aPoint4 = newPoint(aPartDoc, 0., 10., 0.)
 
@@ -201,9 +218,16 @@ aFound = aPartDoc.findContainingFolder(aPoint4)
 assert(aFound[0].data().isEqual(aFolder3.data()))
 assert(aFound[1] == 1)
 
+aPoint5 = newPoint(aPartDoc, 0., 0., 10.)
+fromFolder = FeatureList()
+fromFolder.append(aPoint5)
+
+aSession.startOperation()
+isMovedOut = aPartDoc.removeFromFolder(fromFolder)
+aSession.finishOperation()
+assert(isMovedOut)
 
 # add more points to the folder to move them out
-aPoint5 = newPoint(aPartDoc, 0., 0., 10.)
 aPoint6 = newPoint(aPartDoc, 10., 0., 10.)
 aPoint7 = newPoint(aPartDoc, 10., 10., 10.)
 aPoint8 = newPoint(aPartDoc, 0., 10., 10.)
@@ -235,7 +259,7 @@ assert(aFolder3.reference("first_feature").value() is not None)
 assert(aFolder3.reference("last_feature").value() is not None)
 
 #=========================================================================
-# Test 4. Remove a point from a folder before it
+# Test 5. Remove a point from a folder before it
 #=========================================================================
 fromFolder = FeatureList()
 fromFolder.append(aPoint3)
@@ -256,7 +280,7 @@ assert(aFolder3.reference("first_feature").value() is not None)
 assert(aFolder3.reference("last_feature").value() is not None)
 
 #=========================================================================
-# Test 5. Remove a point from a folder after it
+# Test 6. Remove a point from a folder after it
 #=========================================================================
 fromFolder = FeatureList()
 fromFolder.append(aPoint8)
@@ -277,7 +301,7 @@ assert(aFolder3.reference("first_feature").value() is not None)
 assert(aFolder3.reference("last_feature").value() is not None)
 
 #=========================================================================
-# Test 6. Try to remove several points which are not start nor end in a folder
+# Test 7. Try to remove several points which are not start nor end in a folder
 #=========================================================================
 fromFolder = FeatureList()
 fromFolder.append(aPoint5)
@@ -300,7 +324,7 @@ assert(aFolder3.reference("first_feature").value() is not None)
 assert(aFolder3.reference("last_feature").value() is not None)
 
 #=========================================================================
-# Test 7. Remove several points from a folder after it
+# Test 8. Remove several points from a folder after it
 #=========================================================================
 fromFolder = FeatureList()
 fromFolder.append(aPoint6)
@@ -324,7 +348,7 @@ assert(aFolder3.reference("first_feature").value() is not None)
 assert(aFolder3.reference("last_feature").value() is not None)
 
 #=========================================================================
-# Test 8. Remove all remaining points from a folder after it
+# Test 9. Remove all remaining points from a folder after it
 #=========================================================================
 fromFolder = FeatureList()
 fromFolder.append(aPoint4)
@@ -349,7 +373,10 @@ assert(aPartDoc.index(aPoint8, True) == 8), "Wrong index of the point: {}".forma
 # folder is empty
 assert(aFolder3.reference("first_feature").value() is None)
 assert(aFolder3.reference("last_feature").value() is None)
-
+# remove empty folder
+aSession.startOperation()
+aPartDoc.removeFolder(aFolder3)
+aSession.finishOperation()
 
 from salome.shaper import model
 assert(model.checkPythonDump())

@@ -66,11 +66,13 @@ void ModelHighAPI_Folder::dump(ModelHighAPI_Dumper& theDumper) const
   AttributeReferencePtr aStartRef = myFolder->reference(ModelAPI_Folder::FIRST_FEATURE_ID());
   AttributeReferencePtr aEndRef   = myFolder->reference(ModelAPI_Folder::LAST_FEATURE_ID());
 
-  // Dump folder if it is empty or when its features have been already dumped.
-  // Otherwise, store the folder postponed.
+  // do not dump empty folders
   if (!aEndRef->value())
-    theDumper << myFolder << " = model.addFolder(" << aDocName << ")" << std::endl;
-  else if (theDumper.isDumped(EntityPtr(aEndRef->value())))
+    return;
+
+  // Dump folder when its features have been already dumped.
+  // Otherwise, store the folder postponed.
+  if (theDumper.isDumped(EntityPtr(aEndRef->value())))
     theDumper << myFolder << " = model.addFolder(" << aDocName << ", "
               << aStartRef << ", " << aEndRef << ")" << std::endl;
   else

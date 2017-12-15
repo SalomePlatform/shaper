@@ -281,6 +281,8 @@ bool ModelHighAPI_Dumper::process(const std::shared_ptr<ModelAPI_Document>& theD
       }
     }
   }
+  // dump folders if any
+  dumpPostponed(true);
   return isOk;
 }
 
@@ -327,6 +329,8 @@ bool ModelHighAPI_Dumper::process(const std::shared_ptr<ModelAPI_CompositeFeatur
   // decrease composite features stack
   --gCompositeStackDepth;
 
+  // dump folders if any
+  dumpPostponed(true);
   return isOk;
 }
 
@@ -366,7 +370,7 @@ bool ModelHighAPI_Dumper::processSubs(
   if (isDumpSetName)
     dumpEntitySetName();
   // dump folders if any
-  dumpPostponed();
+  dumpPostponed(true);
   return isOk;
 }
 
@@ -377,7 +381,7 @@ void ModelHighAPI_Dumper::postpone(const EntityPtr& theEntity)
   myPostponed.push_back(theEntity);
 }
 
-void ModelHighAPI_Dumper::dumpPostponed()
+void ModelHighAPI_Dumper::dumpPostponed(bool theDumpFolders)
 {
   if (myDumpPostponedInProgress)
     return;
@@ -392,8 +396,12 @@ void ModelHighAPI_Dumper::dumpPostponed()
   std::list<EntityPtr>::const_iterator anIt = aPostponedCopy.begin();
   for (; anIt != aPostponedCopy.end(); ++anIt) {
     FolderPtr aFolder = std::dynamic_pointer_cast<ModelAPI_Folder>(*anIt);
-    if (aFolder)
-      dumpFolder(aFolder);
+    if (aFolder) {
+      if (theDumpFolders)
+        dumpFolder(aFolder);
+      else
+        myPostponed.push_back(*anIt);
+    }
     else {
       FeaturePtr aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(*anIt);
       if (aFeature)
