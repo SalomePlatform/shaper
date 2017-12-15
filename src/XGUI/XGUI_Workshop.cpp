@@ -2632,6 +2632,8 @@ void XGUI_Workshop::insertFeatureFolder()
   aMgr->startOperation(aDescription.toStdString());
   aDoc->addFolder(aFeature);
   aMgr->finishOperation();
+
+  updateCommandStatus();
 }
 
 
@@ -2655,6 +2657,8 @@ void XGUI_Workshop::insertToFolder(bool isBefore)
   aMgr->startOperation(aDescription.toStdString());
   aDoc->moveToFolder(aFeatures, aFolder);
   aMgr->finishOperation();
+
+  updateCommandStatus();
 }
 
 void XGUI_Workshop::moveOutFolder(bool isBefore)
@@ -2673,4 +2677,6 @@ void XGUI_Workshop::moveOutFolder(bool isBefore)
   aMgr->startOperation(aDescription.toStdString());
   aDoc->removeFromFolder(aFeatures, isBefore);
   aMgr->finishOperation();
+
+  updateCommandStatus();
 }
