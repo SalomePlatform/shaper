@@ -896,6 +896,10 @@ bool FeaturesPlugin_ValidatorUnionSelection::isValid(const AttributePtr& theAttr
     bool isSameFound = false;
     AttributeSelectionPtr anAttrSelectionInList = aBaseObjectsAttrList->value(anIndex);
     ResultPtr aContext = anAttrSelectionInList->context();
+    if (!aContext.get()) {
+      theError = "Error: selection is invalid.";
+      return false;
+    }
 
     ResultConstructionPtr aConstruction =
       std::dynamic_pointer_cast<ModelAPI_ResultConstruction>(aContext);

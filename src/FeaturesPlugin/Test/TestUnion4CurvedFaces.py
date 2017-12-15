@@ -37,13 +37,13 @@ SketchConstraintCoincidence_3 = Sketch_1.setCoincident(SketchArc_1.endPoint(), S
 SketchConstraintVertical_1 = Sketch_1.setVertical(SketchLine_1.result())
 model.do()
 Edge_1 = model.addEdge(Part_1_doc, [model.selection("EDGE", "Sketch_1/Edge-SketchArc_1_2")])
-Revolution_1 = model.addRevolution(Part_1_doc, [model.selection("EDGE", "Edge_1_1")], model.selection("EDGE", "PartSet/OY"), 360, 0)
-Partition_1 = model.addPartition(Part_1_doc, [model.selection("FACE", "PartSet/YOZ"), model.selection("FACE", "PartSet/XOZ"), model.selection("FACE", "PartSet/XOY"), model.selection("FACE", "Revolution_1_1")])
-Union_1 = model.addUnion(Part_1_doc, [model.selection("FACE", "Partition_1_1_3"), model.selection("FACE", "Partition_1_1_2"), model.selection("FACE", "Partition_1_1_8"), model.selection("FACE", "Partition_1_1_7")])
+Revolution_1 = model.addRevolution(Part_1_doc, [model.selection("EDGE", "Edge_1_1")], model.selection("EDGE", "PartSet/OY"), 200, 0)
+Partition_1 = model.addPartition(Part_1_doc, [model.selection("FACE", "PartSet/XOZ"), model.selection("FACE", "Revolution_1_1")])
+Union_1 = model.addUnion(Part_1_doc, [model.selection("FACE", "Partition_1_1_1"), model.selection("FACE", "Partition_1_1_2")])
 model.do()
 
-model.checkBooleansResult(Partition_1,model,1,[8],[0],[8],[32],[64])
-model.testHaveNamingSubshapes(Partition_1,model,Part_1_doc)
+model.checkBooleansResult(Union_1,model,1,[0],[0],[1],[4],[8])
+model.testHaveNamingSubshapes(Union_1,model,Part_1_doc)
 
 model.end()
 

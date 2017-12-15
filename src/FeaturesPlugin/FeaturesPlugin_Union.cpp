@@ -166,6 +166,7 @@ void FeaturesPlugin_Union::execute()
     aMakeShapeList.appendAlgo(aFillerAlgo);
     aMapOfShapes.merge(aFillerAlgo->mapOfSubShapes());
   }
+  // workaround: make copy to name edges correctly
 
   // Store result and naming.
   const int aModifyEdgeTag = 1;
@@ -182,11 +183,11 @@ void FeaturesPlugin_Union::execute()
   for(ListOfShape::const_iterator anIter = anObjects.begin(); anIter != anObjects.end(); ++anIter) {
     aResultBody->loadAndOrientModifiedShapes(&aMakeShapeList, *anIter, GeomAPI_Shape::EDGE,
                                              aModifyEdgeTag, aModEName, aMapOfShapes,
-                                             false, false, true);
+                                             true, false, true);
     aResultBody->loadAndOrientModifiedShapes(&aMakeShapeList, *anIter, GeomAPI_Shape::FACE,
                                              aModifyFaceTag, aModFName, aMapOfShapes,
-                                             false, false, true);
-    aResultBody->loadDeletedShapes(&aMakeShapeList, *anIter, GeomAPI_Shape::FACE, aDeletedTag);
+                                             true, false, true);
+    //aResultBody->loadDeletedShapes(&aMakeShapeList, *anIter, GeomAPI_Shape::FACE, aDeletedTag);
   }
 
   setResult(aResultBody);
