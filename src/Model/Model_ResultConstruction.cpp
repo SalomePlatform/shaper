@@ -267,9 +267,36 @@ std::string fullName(CompositeFeaturePtr theComposite, const TopoDS_Shape& theSu
 }
 
 // stores shape and name on sub-label of the main stored shape
-static void saveSubName(TDF_Label& theLab, const bool isSelectionMode, const TopoDS_Shape& aSub,
+static void saveSubName(CompositeFeaturePtr theComposite,
+  TDF_Label& theLab, const bool isSelectionMode, TopoDS_Shape aSub,
   std::shared_ptr<Model_Document> theDoc, std::string theFullName)
 {
+  // trying to store the edge of composite result, not sketch sub as it is
+  if (aSub.ShapeType() == TopAbs_EDGE) {
+    ResultPtr aRes = theComposite->firstResult();
+    ResultConstructionPtr aConstr = std::dynamic_pointer_cast<Model_ResultConstruction>(aRes);
+    if (aConstr.get()) {
+      Standard_Real aSubFirst, aSubLast;
+      TopoDS_Edge aSubEdge = TopoDS::Edge(aSub);
+      Handle(Geom_Curve) aSubCurve = BRep_Tool::Curve(aSubEdge, aSubFirst, aSubLast);
+      for(int aFaceIndex = 0; aFaceIndex < aConstr->facesNum(); aFaceIndex++) {
+        GeomShapePtr aGFace = aConstr->face(aFaceIndex);
+        TopoDS_Shape aFace = aGFace->impl<TopoDS_Shape>();
+        for(TopExp_Explorer anExp(aFace, TopAbs_EDGE); anExp.More(); anExp.Next()) {
+          TopoDS_Edge anEdge = TopoDS::Edge(anExp.Current());
+          Standard_Real aFirst, aLast;
+          Handle(Geom_Curve) aCurve = BRep_Tool::Curve(anEdge, aFirst, aLast);
+          if (aCurve == aSubCurve &&
+              ((fabs(aFirst - aSubFirst) < 1.e-9 &&  fabs(aLast - aSubLast) < 1.e-9)) ||
+              (fabs(aFirst - aSubLast) < 1.e-9 &&  fabs(aLast - aSubFirst) < 1.e-9)) {
+            aSub = anEdge;
+            break;
+          }
+        }
+      }
+    }
+  }
+
   TNaming_Builder aBuilder(theLab);
   if (isSelectionMode)
     aBuilder.Select(aSub, aSub);
@@ -447,7 +474,8 @@ int Model_ResultConstruction::select(const std::shared_ptr<GeomAPI_Shape>& theSu
                     TDF_Label aSubLab = aLab.FindChild(anID);
                     TDF_Label aShapeSubLab = aLab.FindChild(aSubLabId++);
                     std::string aFullNameSub = fullName(aComposite, anEdge);
-                    saveSubName(aShapeSubLab, isSelectionMode, anEdge, aMyDoc, aFullNameSub);
+                    saveSubName(aComposite,
+                      aShapeSubLab, isSelectionMode, anEdge, aMyDoc, aFullNameSub);
 
                     int anOrient = Model_SelectionNaming::edgeOrientation(aSubShape, anEdge);
                     if (anOrient != 0) {
@@ -463,7 +491,8 @@ int Model_ResultConstruction::select(const std::shared_ptr<GeomAPI_Shape>& theSu
                     TopoDS_Vertex aV = TopoDS::Vertex(anEdgeExp.Current());
                     TDF_Label aShapeSubLab = aLab.FindChild(aSubLabId++);
                     std::string aFullNameSub = fullName(aComposite, aV);
-                    saveSubName(aShapeSubLab, isSelectionMode, aV, aMyDoc, aFullNameSub);
+                    saveSubName(aComposite,
+                      aShapeSubLab, isSelectionMode, aV, aMyDoc, aFullNameSub);
                 }
               }
             }

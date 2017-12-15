@@ -865,6 +865,19 @@ void Model_AttributeSelection::selectSubShape(
           }
         }
       }
+      // if compsolid is context, try to take sub-solid as context: like in GUI and scripts
+      if (aCont.get() && aShapeToBeSelected.get()) {
+        ResultCompSolidPtr aComp = std::dynamic_pointer_cast<ModelAPI_ResultCompSolid>(aCont);
+        if (aComp && aComp->numberOfSubs()) {
+          for(int aSubNum = aComp->numberOfSubs() - 1; aSubNum >= 0; aSubNum--) {
+            ResultPtr aSub = aComp->subResult(aSubNum);
+            if (aSub && aSub->shape().get() && aSub->shape()->isSubShape(aShapeToBeSelected)) {
+              aCont = aSub;
+              break;
+            }
+          }
+        }
+      }
       // try to find the latest active result that must be used instead of the selected
       // to set the active context (like in GUI selection), not concealed one
       bool aFindNewContext = true;
@@ -883,8 +896,9 @@ void Model_AttributeSelection::selectSubShape(
           // search the feature result that contains sub-shape selected
           std::list<std::shared_ptr<ModelAPI_Result> > aResults;
           ModelAPI_Tools::allResults(aRefFeat, aResults);
-          std::list<std::shared_ptr<ModelAPI_Result> >::iterator aResIter = aResults.begin();
-          for(; aResIter != aResults.end(); aResIter++) {
+          std::list<std::shared_ptr<ModelAPI_Result> >::reverse_iterator aResIter =
+            aResults.rbegin(); // iterate from the end to find the sub-solid first than compsolid
+          for(; aResIter != aResults.rend(); aResIter++) {
             if (!aResIter->get() || !(*aResIter)->data()->isValid() || (*aResIter)->isDisabled())
               continue;
             GeomShapePtr aShape = (*aResIter)->shape();

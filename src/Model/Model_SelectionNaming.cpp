@@ -885,7 +885,16 @@ bool Model_SelectionNaming::selectSubShape(const std::string& theType,
             aFaceContext = aDoc->findByName(aContName, *it, anUniqueContext);
           }
         }
-        const TopoDS_Shape aFace = findFaceByName(*it, aDoc, aFaceContext, anUniqueContext);
+        TopoDS_Shape aFace = findFaceByName(*it, aDoc, aFaceContext, anUniqueContext);
+        if (aFace.IsNull() && aFaceContext.get() &&
+            aFaceContext->groupName() == ModelAPI_ResultConstruction::group() ) {
+          // search the construction sub-elements for the intersection if they are in the tree
+          size_t aSlash = it->find("/");
+          if (aSlash != std::string::npos) {
+            std::string aSubShapeName = it->substr(aSlash + 1);
+            aFace = findFaceByName(aSubShapeName, aDoc, aFaceContext, true);
+          }
+        }
         if(!aFace.IsNull())
           aList.Append(aFace);
       }
@@ -894,7 +903,7 @@ bool Model_SelectionNaming::selectSubShape(const std::string& theType,
   }
   // in case of construction, there is no registered names for all sub-elements,
   // even for the main element; so, trying to find them by name (without "&" intersections)
-  if (aN < 2) {
+  if (aSelection.IsNull() && aN < 2) {
     size_t aConstrNamePos = aSubShapeName.find("/");
     bool isFullName = aConstrNamePos == std::string::npos;
     std::string anEmpty, aContrName = aContName;
