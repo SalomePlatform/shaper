@@ -869,7 +869,7 @@ void Model_AttributeSelection::selectSubShape(
       if (aCont.get() && aShapeToBeSelected.get()) {
         ResultCompSolidPtr aComp = std::dynamic_pointer_cast<ModelAPI_ResultCompSolid>(aCont);
         if (aComp && aComp->numberOfSubs()) {
-          for(int aSubNum = aComp->numberOfSubs() - 1; aSubNum >= 0; aSubNum--) {
+          for(int aSubNum = 0; aSubNum < aComp->numberOfSubs(); aSubNum++) {
             ResultPtr aSub = aComp->subResult(aSubNum);
             if (aSub && aSub->shape().get() && aSub->shape()->isSubShape(aShapeToBeSelected)) {
               aCont = aSub;
@@ -895,10 +895,24 @@ void Model_AttributeSelection::selectSubShape(
             continue;
           // search the feature result that contains sub-shape selected
           std::list<std::shared_ptr<ModelAPI_Result> > aResults;
-          ModelAPI_Tools::allResults(aRefFeat, aResults);
-          std::list<std::shared_ptr<ModelAPI_Result> >::reverse_iterator aResIter =
-            aResults.rbegin(); // iterate from the end to find the sub-solid first than compsolid
-          for(; aResIter != aResults.rend(); aResIter++) {
+
+          // take all sub-results or one result
+          const std::list<std::shared_ptr<ModelAPI_Result> >& aFResults = aRefFeat->results();
+          std::list<std::shared_ptr<ModelAPI_Result> >::const_iterator aRIter = aFResults.begin();
+          for (; aRIter != aFResults.cend(); aRIter++) {
+            // iterate sub-bodies of compsolid
+            ResultCompSolidPtr aComp = std::dynamic_pointer_cast<ModelAPI_ResultCompSolid>(*aRIter);
+            if (aComp.get() && aComp->numberOfSubs() > 0) {
+              int aNumSub = aComp->numberOfSubs();
+              for(int a = 0; a < aNumSub; a++) {
+                aResults.push_back(aComp->subResult(a));
+              }
+            } else {
+              aResults.push_back(*aRIter);
+            }
+          }
+          std::list<std::shared_ptr<ModelAPI_Result> >::iterator aResIter = aResults.begin();
+          for(; aResIter != aResults.end(); aResIter++) {
             if (!aResIter->get() || !(*aResIter)->data()->isValid() || (*aResIter)->isDisabled())
               continue;
             GeomShapePtr aShape = (*aResIter)->shape();
