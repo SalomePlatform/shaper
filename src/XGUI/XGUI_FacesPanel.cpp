@@ -34,6 +34,7 @@
 #include "ModuleBase_Tools.h"
 #include "ModuleBase_ViewerPrs.h"
 
+#include "XGUI_ObjectsBrowser.h"
 #include "XGUI_SelectionMgr.h"
 #include "XGUI_SelectionFilterType.h"
 #include "XGUI_Tools.h"
@@ -85,11 +86,11 @@ void XGUI_FacesPanel::reset(const bool isToFlushRedisplay)
   myItems.clear();
 
   // restore previous view of presentations
-  bool isModified = redisplayObjects(myItemObjects, false);
+  bool isModified = redisplayObjects(myItemObjects);
   std::set<std::shared_ptr<ModelAPI_Object> > aHiddenObjects = myHiddenObjects;
-  isModified = displayHiddenObjects(aHiddenObjects, myHiddenObjects, false) || isModified;
+  isModified = displayHiddenObjects(aHiddenObjects, myHiddenObjects) || isModified;
   if (isModified)// && isToFlushRedisplay) // flush signal immediatelly until container is filled
-    Events_Loop::loop()->flush(Events_Loop::loop()->eventByName(EVENT_OBJECT_TO_REDISPLAY));
+    flushRedisplay();
 
   updateProcessedObjects(myItems, myItemObjects);
   myHiddenObjects.clear();
@@ -261,10 +262,9 @@ void XGUI_FacesPanel::processSelection()
       ModelAPI_EventCreator::get()->sendUpdated(anObject, aDispEvent);
     }
   }
-  if (isModified)
-  {
+  if (isModified) {
     updateProcessedObjects(myItems, myItemObjects);
-    Events_Loop::loop()->flush(aDispEvent);
+    flushRedisplay();
   }
 }
 
@@ -290,11 +290,11 @@ bool XGUI_FacesPanel::processDelete()
     isModified = true;
   }
   if (isModified) {
-    bool isRedisplayed = redisplayObjects(aRestoredObjects, false);
-    isRedisplayed = displayHiddenObjects(aRestoredObjects, myHiddenObjects, false)
+    bool isRedisplayed = redisplayObjects(aRestoredObjects);
+    isRedisplayed = displayHiddenObjects(aRestoredObjects, myHiddenObjects)
                     || isRedisplayed;
     if (isRedisplayed)
-      Events_Loop::loop()->flush(Events_Loop::loop()->eventByName(EVENT_OBJECT_TO_REDISPLAY));
+      flushRedisplay();
     // should be after flush of redisplay to have items object to be updated
     updateProcessedObjects(myItems, myItemObjects);
   }
@@ -308,8 +308,7 @@ bool XGUI_FacesPanel::processDelete()
 
 //********************************************************************
 bool XGUI_FacesPanel::redisplayObjects(
-  const std::set<std::shared_ptr<ModelAPI_Object> >& theObjects,
-  const bool isToFlushRedisplay)
+  const std::set<std::shared_ptr<ModelAPI_Object> >& theObjects)
 {
   if (theObjects.empty())
     return false;
@@ -325,16 +324,13 @@ bool XGUI_FacesPanel::redisplayObjects(
     ModelAPI_EventCreator::get()->sendUpdated(anObject, aDispEvent);
     isModified = true;
   }
-  if (isModified && isToFlushRedisplay)
-    Events_Loop::loop()->flush(aDispEvent);
   return isModified;
 }
 
 //********************************************************************
 bool XGUI_FacesPanel::displayHiddenObjects(
   const std::set<std::shared_ptr<ModelAPI_Object> >& theObjects,
-  std::set<std::shared_ptr<ModelAPI_Object> >& theHiddenObjects,
-  const bool isToFlushRedisplay)
+  std::set<std::shared_ptr<ModelAPI_Object> >& theHiddenObjects)
 {
   if (theObjects.empty())
     return false;
@@ -354,9 +350,6 @@ bool XGUI_FacesPanel::displayHiddenObjects(
     ModelAPI_EventCreator::get()->sendUpdated(anObject, aDispEvent);
     isModified = true;
   }
-
-  if (isModified && isToFlushRedisplay)
-    Events_Loop::loop()->flush(aDispEvent);
   return isModified;
 }
 
@@ -506,15 +499,14 @@ void XGUI_FacesPanel::onTransparencyChanged()
   bool isModified = false;
   if (useTransparency()) {
     std::set<std::shared_ptr<ModelAPI_Object> > aHiddenObjects = myHiddenObjects;
-    isModified = displayHiddenObjects(aHiddenObjects, myHiddenObjects, false);
+    isModified = displayHiddenObjects(aHiddenObjects, myHiddenObjects);
   }
   else
     isModified = hideEmptyObjects();
 
-  isModified = redisplayObjects(myItemObjects, false) || isModified;
+  isModified = redisplayObjects(myItemObjects) || isModified;
   if (isModified)
-    Events_Loop::loop()->flush(Events_Loop::loop()->eventByName(EVENT_OBJECT_TO_REDISPLAY));
-
+    flushRedisplay();
 }
 
 //********************************************************************
@@ -522,4 +514,14 @@ void XGUI_FacesPanel::onClosed()
 {
   setActivePanel(false);
   reset(true);
+}
+
+//********************************************************************
+void XGUI_FacesPanel::flushRedisplay() const
+{
+  Events_Loop::loop()->flush(Events_Loop::loop()->eventByName(EVENT_OBJECT_TO_REDISPLAY));
+  // Necessary for update visibility icons in ObjectBrowser
+  XGUI_ObjectsBrowser* anObjectBrowser = XGUI_Tools::workshop(myWorkshop)->objectBrowser();
+  if (anObjectBrowser)
+    anObjectBrowser->updateAllIndexes();
 }

@@ -1635,7 +1635,7 @@ bool XGUI_Workshop::prepareForDisplay(const std::set<ObjectPtr>& theObjects) con
   int anAnswer = QMessageBox::question(
         desktop(), tr("Show object"),
         tr("'%1'\n are hidden by %2:\nRemove objects from the panel to be displayed?")
-        .arg(aHiddenObjectNames.join(',')).arg(facesPanel()->windowTitle()),
+        .arg(aHiddenObjectNames.join(' ,')).arg(facesPanel()->windowTitle()),
         QMessageBox::Yes | QMessageBox::No, QMessageBox::No);
 
   bool aToBeDisplayed = anAnswer == QMessageBox::Yes;

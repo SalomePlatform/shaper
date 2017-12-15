@@ -151,19 +151,15 @@ signals:
 private:
   /// Redisplay objects.
   /// \param theObjects container of objects
-  /// \param isToFlushRedisplay flag if redisplay should be flushed immediatelly
   /// \return true if some of objects was redisplayed
-  static bool redisplayObjects(const std::set<std::shared_ptr<ModelAPI_Object> >& theObjects,
-                               const bool isToFlushRedisplay);
+  static bool redisplayObjects(const std::set<std::shared_ptr<ModelAPI_Object> >& theObjects);
 
   /// Display objects if the objects are in a container of hidden by this pane.
   /// \param theObjects container of objects
   /// \param theHiddenObjects hidden objects, if object is in the container, it should be removed
-  /// \param isToFlushRedisplay flag if redisplay should be flushed immediatelly
   /// \return true if some of objects was redisplayed
   static bool displayHiddenObjects(const std::set<std::shared_ptr<ModelAPI_Object> >& theObjects,
-                                   std::set<std::shared_ptr<ModelAPI_Object> >& theHiddenObjects,
-                                   const bool isToFlushRedisplay);
+                                   std::set<std::shared_ptr<ModelAPI_Object> >& theHiddenObjects);
 
   /// Iterates by items and hide objects where all sub-shapes are hidden
   /// \return true if some of objects was redisplayed
@@ -189,6 +185,11 @@ protected slots:
 
   /// Closes faces panel restore all hidden faces by calling reset()
   void onClosed();
+
+private:
+  /// Flushes redisplay event and perform update of object browser icons
+  /// (objects might be hidden/shown)
+  void flushRedisplay() const;
 
 protected:
   QCheckBox* myHiddenOrTransparent; ///< if checked - transparent, else hidden
