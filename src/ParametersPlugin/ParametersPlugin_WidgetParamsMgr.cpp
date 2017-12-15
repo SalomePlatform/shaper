@@ -311,7 +311,7 @@ void ParametersPlugin_WidgetParamsMgr::updateParametersFeatures()
   int aNbFeatures = aDoc->numInternalFeatures();
   for (int i = 0; i < aNbFeatures; i++) {
     aParamFeature = aDoc->internalFeature(i);
-    if (aParamFeature->getKind() == ParametersPlugin_Parameter::ID()) {
+    if (aParamFeature && aParamFeature->getKind() == ParametersPlugin_Parameter::ID()) {
       myParametersList.append(aParamFeature);
     }
   }
