@@ -60,6 +60,22 @@ static const std::string& groupNameFoldering(const std::string& theGroupID,
   return theGroupID;
 }
 
+// Check theFeature is a first or last feature in folder and return this folder
+static FolderPtr inFolder(const FeaturePtr& theFeature, const std::string& theFolderAttr)
+{
+  const std::set<AttributePtr>& aRefs = theFeature->data()->refsToMe();
+  for (std::set<AttributePtr>::iterator anIt = aRefs.begin(); anIt != aRefs.end(); ++anIt) {
+    if ((*anIt)->id() != theFolderAttr)
+      continue;
+
+    ObjectPtr anOwner = (*anIt)->owner();
+    FolderPtr aFolder = std::dynamic_pointer_cast<ModelAPI_Folder>(anOwner);
+    if (aFolder.get())
+      return aFolder;
+  }
+  return FolderPtr();
+}
+
 
 static const int TAG_OBJECTS = 2;  // tag of the objects sub-tree (features, results)
 
@@ -160,12 +176,16 @@ void Model_Objects::addFeature(FeaturePtr theFeature, const FeaturePtr theAfterT
     // store feature in the features array: before "initData" because in macro features
     // in initData it creates new features, appeared later than this
     TDF_Label aPrevFeateureLab;
+    FolderPtr aParentFolder;
     if (theAfterThis.get()) { // searching for the previous feature label
       std::shared_ptr<Model_Data> aPrevData =
         std::dynamic_pointer_cast<Model_Data>(theAfterThis->data());
       if (aPrevData.get()) {
         aPrevFeateureLab = aPrevData->label().Father();
       }
+      // check if the previous feature is the last feature in a folder,
+      // then the folder should be updated to contain additional feature
+      aParentFolder = inFolder(theAfterThis, ModelAPI_Folder::LAST_FEATURE_ID());
     }
     AddToRefArray(aFeaturesLab, aFeatureLab, aPrevFeateureLab);
 
@@ -183,6 +203,12 @@ void Model_Objects::addFeature(FeaturePtr theFeature, const FeaturePtr theAfterT
     // must be after binding to the map because of "Box" macro feature that
     // creates other features in "initData"
     initData(theFeature, aFeatureLab, TAG_FEATURE_ARGUMENTS);
+    // put feature to the end of folder if it is added while
+    // the history line is set to the last feature from the folder
+    if (aParentFolder) {
+      aParentFolder->reference(ModelAPI_Folder::LAST_FEATURE_ID())->setValue(theFeature);
+      updateHistory(ModelAPI_Folder::group());
+    }
     // event: feature is added, mist be before "initData" to update OB correctly on Duplicate:
     // first new part, then the content
     static Events_ID anEvent = Events_Loop::eventByName(EVENT_OBJECT_CREATED);
@@ -1545,21 +1571,6 @@ bool Model_Objects::moveToFolder(
 
   updateHistory(ModelAPI_Feature::group());
   return true;
-}
-
-static FolderPtr inFolder(const FeaturePtr& theFeature, const std::string& theFolderAttr)
-{
-  const std::set<AttributePtr>& aRefs = theFeature->data()->refsToMe();
-  for (std::set<AttributePtr>::iterator anIt = aRefs.begin(); anIt != aRefs.end(); ++anIt) {
-    if ((*anIt)->id() != theFolderAttr)
-      continue;
-
-    ObjectPtr anOwner = (*anIt)->owner();
-    FolderPtr aFolder = std::dynamic_pointer_cast<ModelAPI_Folder>(anOwner);
-    if (aFolder.get())
-      return aFolder;
-  }
-  return FolderPtr();
 }
 
 static FolderPtr isExtractionCorrect(const FolderPtr& theFirstFeatureFolder,
