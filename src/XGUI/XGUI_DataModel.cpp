@@ -376,8 +376,11 @@ ObjectPtr XGUI_DataModel::object(const QModelIndex& theIndex) const
 {
   if (theIndex.internalId() == 0) // this is a folder
     return ObjectPtr();
-  ModelAPI_Object* aObj =
-    dynamic_cast<ModelAPI_Object*>((ModelAPI_Entity*)theIndex.internalPointer());
+  ModelAPI_Object* aObj = 0;
+  try {
+    aObj = dynamic_cast<ModelAPI_Object*>((ModelAPI_Entity*)theIndex.internalPointer());
+  } catch(...) {}
+
   if (!aObj)
     return ObjectPtr();
   if (getSubDocument(aObj)) // the selected index is a folder of sub-document
@@ -760,9 +763,12 @@ QModelIndex XGUI_DataModel::parent(const QModelIndex& theIndex) const
     ObjectPtr aObj = object(theIndex);
     if (!aObj.get()) {
       // It can be a step of a field
-      ModelAPI_ResultField::ModelAPI_FieldStep* aStep =
-        dynamic_cast<ModelAPI_ResultField::ModelAPI_FieldStep*>
-        ((ModelAPI_Entity*)theIndex.internalPointer());
+      ModelAPI_ResultField::ModelAPI_FieldStep* aStep = 0;
+      try {
+        aStep = dynamic_cast<ModelAPI_ResultField::ModelAPI_FieldStep*>
+                ((ModelAPI_Entity*)theIndex.internalPointer());
+      } catch(...) {}
+
       if (aStep) {
         ModelAPI_ResultField* aField = aStep->field();
         DocumentPtr aDoc = aSession->activeDocument();
