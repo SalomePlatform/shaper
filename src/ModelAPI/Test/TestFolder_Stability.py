@@ -92,7 +92,3 @@ assert(isAdded)
 NB_FEATURES_OUT -= 1
 assert(aPartDoc.size("Features", True) == NB_FEATURES_OUT), "Wrong number of features: {}, expected: {}".format(aPartDoc.size("Features", True), NB_FEATURES_OUT)
 assert(aPartDoc.size("Construction", True) == 1), "Wrong size: {}".format(aPartDoc.size("Construction", True))
-
-
-from salome.shaper import model
-assert(model.checkPythonDump())

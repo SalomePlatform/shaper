@@ -103,6 +103,3 @@ assert(aPartDoc.size("Folders") == 1), "Wrong number of folders: {}".format(aPar
 assert(aPartDoc.size("Features") == 2), "Wrong number of features: {}".format(aPartDoc.size("Features"))
 FOLDER_NAME_EXPECTED = "Folder_1"
 assert(aFolder2.name() == FOLDER_NAME_EXPECTED), "Actual name '{}', expected '{}'".format(aFolder2.name(), FOLDER_NAME_EXPECTED)
-
-from salome.shaper import model
-assert(model.checkPythonDump())
