@@ -371,23 +371,34 @@ void Model_BodyBuilder::loadDeletedShapes (GeomAlgoAPI_MakeShape* theMS,
 }
 
 // Keep only the shapes with minimal shape type
-static void keepTopLevelShapes(ListOfShape& theShapes)
+static void keepTopLevelShapes(ListOfShape& theShapes, const TopoDS_Shape& theRoot,
+  const GeomShapePtr& theResultShape)
 {
   GeomAPI_Shape::ShapeType aKeepShapeType = GeomAPI_Shape::SHAPE;
   ListOfShape::iterator anIt = theShapes.begin();
   while (anIt != theShapes.end()) {
-    GeomAPI_Shape::ShapeType aType = (*anIt)->shapeType();
-    if (aType < aKeepShapeType) {
-      // found a shape with lesser shape type => remove all previous shapes
-      aKeepShapeType = aType;
-      theShapes.erase(theShapes.begin(), anIt);
-      ++anIt;
-    } else if (aType > aKeepShapeType) {
-      // shapes with greater shape type should be removed from the list
+    TopoDS_Shape aNewShape = (*anIt)->impl<TopoDS_Shape>();
+    GeomShapePtr aGeomNewShape(new GeomAPI_Shape());
+    aGeomNewShape->setImpl(new TopoDS_Shape(aNewShape));
+    if (theRoot.IsSame(aNewShape) || !theResultShape->isSubShape(aGeomNewShape, false) ||
+        theResultShape->isSame(*anIt))
+    {
       ListOfShape::iterator aRemoveIt = anIt++;
       theShapes.erase(aRemoveIt);
-    } else
-      ++anIt;
+    } else {
+      GeomAPI_Shape::ShapeType aType = (*anIt)->shapeType();
+      if (aType < aKeepShapeType) {
+        // found a shape with lesser shape type => remove all previous shapes
+        aKeepShapeType = aType;
+        theShapes.erase(theShapes.begin(), anIt);
+        ++anIt;
+      } else if (aType > aKeepShapeType) {
+        // shapes with greater shape type should be removed from the list
+        ListOfShape::iterator aRemoveIt = anIt++;
+        theShapes.erase(aRemoveIt);
+      } else
+        ++anIt;
+    }
   }
 }
 
@@ -419,7 +430,8 @@ void Model_BodyBuilder::loadAndOrientModifiedShapes (
     std::shared_ptr<GeomAPI_Shape> aRShape(new GeomAPI_Shape());
     aRShape->setImpl((new TopoDS_Shape(aRoot)));
     theMS->modified(aRShape, aList);
-    keepTopLevelShapes(aList);
+    if (!theIsStoreSeparate)
+      keepTopLevelShapes(aList, aRoot, aResultShape);
     // sort the list of images before naming
     GeomAlgoAPI_SortListOfShapes::sort(aList);
 
@@ -494,6 +506,7 @@ void Model_BodyBuilder::loadAndOrientGeneratedShapes (
   TopTools_MapOfShape aView;
   bool isBuilt = !theName.empty();
   TopExp_Explorer aShapeExplorer (aShapeIn, (TopAbs_ShapeEnum)theKindOfShape);
+  GeomShapePtr aResultShape = shape();
   for (; aShapeExplorer.More(); aShapeExplorer.Next ()) {
     const TopoDS_Shape& aRoot = aShapeExplorer.Current ();
     if (!aView.Add(aRoot)) continue;
@@ -503,7 +516,7 @@ void Model_BodyBuilder::loadAndOrientGeneratedShapes (
     std::shared_ptr<GeomAPI_Shape> aRShape(new GeomAPI_Shape());
     aRShape->setImpl((new TopoDS_Shape(aRoot)));
     theMS->generated(aRShape, aList);
-    keepTopLevelShapes(aList);
+    keepTopLevelShapes(aList, aRoot, aResultShape);
     std::list<std::shared_ptr<GeomAPI_Shape> >::const_iterator
       anIt = aList.begin(), aLast = aList.end();
     for (; anIt != aLast; anIt++) {
