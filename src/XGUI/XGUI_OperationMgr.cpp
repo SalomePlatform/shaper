@@ -742,6 +742,8 @@ bool XGUI_OperationMgr::onProcessEnter(QObject* theObject)
   if (!aOperation)
     return isAccepted;
   ModuleBase_IPropertyPanel* aPanel = aOperation->propertyPanel();
+  if (!aPanel)
+    return isAccepted;
   // the next code is obsolete as we want to process Enter in property panel always
   // only property panel enter is processed in order to do not process enter in application dialogs
   //bool isPPChild = isChildObject(theObject, aPanel);
