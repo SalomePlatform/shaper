@@ -639,7 +639,8 @@ void XGUI_Displayer::updateViewer() const
   Handle(AIS_InteractiveContext) aContext = AISContext();
 
 #ifdef DEBUG_VIEWER_BLOCKED_COUNT
-  std::cout << "updateViewer: " << (myViewerBlockedRecursiveCount == 0 ? " done" : " later") << std::endl;
+  std::cout << "updateViewer: " << (myViewerBlockedRecursiveCount == 0 ? " done" : " later")
+            << std::endl;
 #endif
 
   if (!aContext.IsNull() && isUpdateEnabled()) {
