@@ -156,19 +156,20 @@ Part_1_doc.moveFeature(Group_2.feature(), Group_1.feature())
 Part_1_doc.moveFeature(Group_3.feature(), Group_2.feature())
 model.end()
 
-# check that group 2 is correct, but Group_1 and Group_3 elements are removed (because shell is removed)
+# check that group 2 is correct (some subs are removed), but Group_1 and Group_3 elements are removed (because shell is removed)
 from ModelAPI import *
 aFactory = ModelAPI_Session.get().validators()
 
-assert(Group_1.groupList().size() != 0)
-for a in range(Group_1.groupList().size()):
-  assert(len(Group_1.groupList().value(a).namingName()) == 0)
+assert(Group_2.groupList().size() != 0)
+for a in range(Group_2.groupList().size()):
+  if not Group_1.groupList().value(a).context() is None:
+    assert(len(Group_1.groupList().value(a).namingName()) == 0)
 
-assert(aFactory.validate(Group_3.feature()))
-assert(Group_3.groupList().size() != 0)
-for a in range(Group_3.groupList().size()):
-  assert(Group_3.groupList().value(a).value().shapeTypeStr() == "FACE")
-  assert(len(Group_3.groupList().value(a).namingName()) > 0)
+#assert(aFactory.validate(Group_3.feature()))
+#assert(Group_3.groupList().size() != 0)
+#for a in range(Group_3.groupList().size()):
+#  assert(Group_3.groupList().value(a).value().shapeTypeStr() == "FACE")
+#  assert(len(Group_3.groupList().value(a).namingName()) > 0)
 
 # for Group in [Group_1, Group_2, Group_3]:
 #   if Group == Group_2:

@@ -1141,40 +1141,50 @@ bool Model_AttributeSelection::searchNewContext(std::shared_ptr<Model_Document> 
 {
   std::set<ResultPtr> aResults; // to avoid duplicates, new context, null if deleted
   TopTools_ListOfShape aResContShapes;
-  TNaming_SameShapeIterator aModifIter(theContShape, theAccessLabel);
-  for(; aModifIter.More(); aModifIter.Next()) {
-    TDF_Label anObjLab = aModifIter.Label().Father();
-    ResultPtr aModifierObj = std::dynamic_pointer_cast<ModelAPI_Result>
-      (theDoc->objects()->object(anObjLab));
-    if (!aModifierObj.get()) {
-      // #2241: shape may be sub-element of new object, not main (shell created from faces)
-      if (!anObjLab.IsRoot())
-        aModifierObj = std::dynamic_pointer_cast<ModelAPI_Result>
-        (theDoc->objects()->object(anObjLab.Father()));
-      if (!aModifierObj.get())
+  // iterate context and shape, but also if it is sub-shape of main shape, check also it
+  TopTools_ListOfShape aContextList;
+  aContextList.Append(theContShape);
+  if (theContext.get()) {
+    ResultPtr aComposite = ModelAPI_Tools::compSolidOwner(theContext);
+    if (aComposite.get() && aComposite->shape().get() && !aComposite->shape()->isNull())
+      aContextList.Append(aComposite->shape()->impl<TopoDS_Shape>());
+  }
+  for(TopTools_ListOfShape::Iterator aContIter(aContextList); aContIter.More(); aContIter.Next()) {
+    TNaming_SameShapeIterator aModifIter(aContIter.ChangeValue(), theAccessLabel);
+    for(; aModifIter.More(); aModifIter.Next()) {
+      TDF_Label anObjLab = aModifIter.Label().Father();
+      ResultPtr aModifierObj = std::dynamic_pointer_cast<ModelAPI_Result>
+        (theDoc->objects()->object(anObjLab));
+      if (!aModifierObj.get()) {
+        // #2241: shape may be sub-element of new object, not main (shell created from faces)
+        if (!anObjLab.IsRoot())
+          aModifierObj = std::dynamic_pointer_cast<ModelAPI_Result>
+          (theDoc->objects()->object(anObjLab.Father()));
+        if (!aModifierObj.get())
+          continue;
+      }
+      FeaturePtr aModifierFeat = theDoc->feature(aModifierObj);
+      if (!aModifierFeat.get())
         continue;
-    }
-    FeaturePtr aModifierFeat = theDoc->feature(aModifierObj);
-    if (!aModifierFeat.get())
-      continue;
-    FeaturePtr aThisFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(owner());
-    if (aModifierFeat == aThisFeature || theDoc->objects()->isLater(aModifierFeat, aThisFeature))
-      continue; // the modifier feature is later than this, so, should not be used
-    FeaturePtr aCurrentModifierFeat = theDoc->feature(theContext);
-    if (aCurrentModifierFeat == aModifierFeat ||
-      theDoc->objects()->isLater(aCurrentModifierFeat, aModifierFeat))
-      continue; // the current modifier is later than the found, so, useless
-    Handle(TNaming_NamedShape) aNewNS;
-    aModifIter.Label().FindAttribute(TNaming_NamedShape::GetID(), aNewNS);
-    if (aNewNS->Evolution() == TNaming_MODIFY || aNewNS->Evolution() == TNaming_GENERATED) {
-      aResults.insert(aModifierObj);
-      //TNaming_Iterator aPairIter(aNewNS);
-      //aResContShapes.Append(aPairIter.NewShape());
-      aResContShapes.Append(aModifierObj->shape()->impl<TopoDS_Shape>());
-    } else if (aNewNS->Evolution() == TNaming_DELETE) { // a shape was deleted => result is empty
-      aResults.insert(ResultPtr());
-    } else { // not-precessed modification => don't support it
-      continue;
+      FeaturePtr aThisFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(owner());
+      if (aModifierFeat == aThisFeature || theDoc->objects()->isLater(aModifierFeat, aThisFeature))
+        continue; // the modifier feature is later than this, so, should not be used
+      FeaturePtr aCurrentModifierFeat = theDoc->feature(theContext);
+      if (aCurrentModifierFeat == aModifierFeat ||
+        theDoc->objects()->isLater(aCurrentModifierFeat, aModifierFeat))
+        continue; // the current modifier is later than the found, so, useless
+      Handle(TNaming_NamedShape) aNewNS;
+      aModifIter.Label().FindAttribute(TNaming_NamedShape::GetID(), aNewNS);
+      if (aNewNS->Evolution() == TNaming_MODIFY || aNewNS->Evolution() == TNaming_GENERATED) {
+        aResults.insert(aModifierObj);
+        //TNaming_Iterator aPairIter(aNewNS);
+        //aResContShapes.Append(aPairIter.NewShape());
+        aResContShapes.Append(aModifierObj->shape()->impl<TopoDS_Shape>());
+      } else if (aNewNS->Evolution() == TNaming_DELETE) { // a shape was deleted => result is empty
+        aResults.insert(ResultPtr());
+      } else { // not-precessed modification => don't support it
+        continue;
+      }
     }
   }
   if (aResults.empty())

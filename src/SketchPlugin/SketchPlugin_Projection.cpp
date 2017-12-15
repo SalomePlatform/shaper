@@ -76,7 +76,7 @@ void SketchPlugin_Projection::execute()
   FeaturePtr aProjection = ModelAPI_Feature::feature(aRefAttr->object());
 
   if (!lastResult().get()) {
-    bool hasProjResult = aProjection->lastResult().get();
+    bool hasProjResult = aProjection->lastResult().get() != NULL;
     ResultConstructionPtr aConstr = document()->createConstruction(data());
     if (hasProjResult)
       aConstr->setShape(aProjection->lastResult()->shape());
