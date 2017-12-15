@@ -731,16 +731,12 @@ void FeaturesPlugin_Boolean::loadNamingDS(std::shared_ptr<ModelAPI_ResultBody> t
     std::string aName;
     for(ListOfShape::const_iterator
         anIter = theTools.begin(); anIter != theTools.end(); anIter++) {
-      if((*anIter)->shapeType() == GeomAPI_Shape::EDGE) {
-        aTag = aModifyEdgeTag;
-        aName = aModEName;
-      }
-      else if((*anIter)->shapeType() == GeomAPI_Shape::FACE) {
+      if((*anIter)->shapeType() <= GeomAPI_Shape::FACE) {
         aTag = aModifyFaceTag;
         aName = aModFName;
       } else {
-        aTag = aModifyFaceTag;
-        aName = aModFName;
+        aTag = aModifyEdgeTag;
+        aName = aModEName;
       }
       theResultBody->loadAndOrientModifiedShapes(&theMakeShape, *anIter,
         aName == aModEName ? GeomAPI_Shape::EDGE : GeomAPI_Shape::FACE,
