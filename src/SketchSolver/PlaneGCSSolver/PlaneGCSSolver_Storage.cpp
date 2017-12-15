@@ -150,7 +150,7 @@ static bool hasReference(std::shared_ptr<SketchPlugin_Feature> theFeature,
   for (std::set<AttributePtr>::const_iterator aRefIt = aRefs.begin();
        aRefIt != aRefs.end(); ++aRefIt) {
      FeaturePtr anOwner = ModelAPI_Feature::feature((*aRefIt)->owner());
-     if (anOwner->getKind() == theFeatureKind)
+     if (anOwner && anOwner->getKind() == theFeatureKind)
        return true;
   }
   return false;

@@ -307,6 +307,8 @@ void Model_Objects::removeFeature(FeaturePtr theFeature)
         aComposite->removeFeature(theFeature);
       }
     }
+    // remove feature from folder
+    removeFromFolder(std::list<FeaturePtr>(1, theFeature));
     // this must be before erase since theFeature erasing removes all information about
     // the feature results and groups of results
     // To reproduce: create sketch, extrusion, remove sketch => constructions tree is not updated
