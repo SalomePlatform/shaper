@@ -372,17 +372,14 @@ void Model_BodyBuilder::loadDeletedShapes (GeomAlgoAPI_MakeShape* theMS,
 
 // Keep only the shapes with minimal shape type
 static void keepTopLevelShapes(ListOfShape& theShapes, const TopoDS_Shape& theRoot,
-  const GeomShapePtr& theResultShape)
+  const GeomShapePtr& theResultShape = GeomShapePtr())
 {
   GeomAPI_Shape::ShapeType aKeepShapeType = GeomAPI_Shape::SHAPE;
   ListOfShape::iterator anIt = theShapes.begin();
   while (anIt != theShapes.end()) {
     TopoDS_Shape aNewShape = (*anIt)->impl<TopoDS_Shape>();
-    GeomShapePtr aGeomNewShape(new GeomAPI_Shape());
-    aGeomNewShape->setImpl(new TopoDS_Shape(aNewShape));
-    if (theRoot.IsSame(aNewShape) || !theResultShape->isSubShape(aGeomNewShape, false) ||
-        theResultShape->isSame(*anIt))
-    {
+    if (theRoot.IsSame(aNewShape) || (theResultShape &&
+        (!theResultShape->isSubShape(*anIt, false) || theResultShape->isSame(*anIt)))) {
       ListOfShape::iterator aRemoveIt = anIt++;
       theShapes.erase(aRemoveIt);
     } else {
@@ -452,9 +449,29 @@ void Model_BodyBuilder::loadAndOrientModifiedShapes (
         int aBuilderTag = aTag;
         if (!theIsStoreSeparate)
           aSameParentShapes++;
+
+        static const int THE_ANCHOR_TAG = 100000;
+        int aCurShapeType = (int)((*anIt)->shapeType());
+        bool needSuffix = false; // suffix for the name based on the shape type
         if (aSameParentShapes > 0) { // store in other label
-          aBuilderTag = 100000 - aSameParentShapes * 10 - aTag;
+          aBuilderTag = THE_ANCHOR_TAG - aSameParentShapes * 10 - aCurShapeType;
+          needSuffix = true;
+        } else if (aCurShapeType != theKindOfShape) {
+          // modified shape has different type => set another tag
+          // to avoid shapes of different types on the same label
+          aBuilderTag = THE_ANCHOR_TAG - aCurShapeType;
+          needSuffix = true;
         }
+        std::string aSuffix;
+        if (needSuffix) {
+          switch (aCurShapeType) {
+          case GeomAPI_Shape::VERTEX: aSuffix = "_v"; break;
+          case GeomAPI_Shape::EDGE:   aSuffix = "_e"; break;
+          case GeomAPI_Shape::FACE:   aSuffix = "_f"; break;
+          default: break;
+          }
+        }
+
         if(theIsStoreAsGenerated) {
           // Here we store shapes as generated, to avoid problem when one parent shape produce
           // several child shapes. In this case naming could not determine which shape to select.
@@ -463,21 +480,20 @@ void Model_BodyBuilder::loadAndOrientModifiedShapes (
           builder(aBuilderTag)->Modify(aRoot, aNewShape);
         }
         if(isBuilt) {
-          if(theIsStoreSeparate) {
-            aStream.str(std::string());
-            aStream.clear();
-            aStream << theName << "_" << anIndex++;
-            aName = aStream.str();
-          }
+          aStream.str(std::string());
+          aStream.clear();
+          aStream << theName;
+          if(theIsStoreSeparate)
+             aStream << "_" << anIndex++;
+
           if (aSameParentShapes > 0) {
             aStream.str(std::string());
             aStream.clear();
             aStream << aName << "_" << aSameParentShapes << "divided";
-            std::string aNameDiv = aStream.str();
-            buildName(aBuilderTag, aNameDiv);
-          } else {
-            buildName(aBuilderTag, aName);
           }
+
+          aStream << aSuffix;
+          buildName(aBuilderTag, aStream.str());
         }
         if(theIsStoreSeparate) {
           aTag++;
@@ -506,7 +522,6 @@ void Model_BodyBuilder::loadAndOrientGeneratedShapes (
   TopTools_MapOfShape aView;
   bool isBuilt = !theName.empty();
   TopExp_Explorer aShapeExplorer (aShapeIn, (TopAbs_ShapeEnum)theKindOfShape);
-  GeomShapePtr aResultShape = shape();
   for (; aShapeExplorer.More(); aShapeExplorer.Next ()) {
     const TopoDS_Shape& aRoot = aShapeExplorer.Current ();
     if (!aView.Add(aRoot)) continue;
@@ -516,7 +531,7 @@ void Model_BodyBuilder::loadAndOrientGeneratedShapes (
     std::shared_ptr<GeomAPI_Shape> aRShape(new GeomAPI_Shape());
     aRShape->setImpl((new TopoDS_Shape(aRoot)));
     theMS->generated(aRShape, aList);
-    keepTopLevelShapes(aList, aRoot, aResultShape);
+    keepTopLevelShapes(aList, aRoot);
     std::list<std::shared_ptr<GeomAPI_Shape> >::const_iterator
       anIt = aList.begin(), aLast = aList.end();
     for (; anIt != aLast; anIt++) {
