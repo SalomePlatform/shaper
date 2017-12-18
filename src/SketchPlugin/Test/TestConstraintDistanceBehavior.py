@@ -40,7 +40,8 @@ model.do()
 # Test 1.
 # =============================================================================
 # horizontal distance constraint
-SketchConstraintDistanceHorizontal_1 = Sketch_1.setHorizontalDistance(firstPoint, secondPoint, "distance")
+SketchConstraintDistanceHorizontal_1 = Sketch_1.setHorizontalDistance(firstPoint, secondPoint, 10)
+SketchConstraintDistanceHorizontal_1.feature().real("ConstraintValue").setText(DistanceParam.name().value())
 model.do()
 
 # changing the parameter
@@ -63,7 +64,8 @@ model.do()
 # Test 2.
 # =============================================================================
 # Vertical distance constraint
-SketchConstraintDistanceVertical_1 = Sketch_1.setVerticalDistance(firstPoint, secondPoint, "distance")
+SketchConstraintDistanceVertical_1 = Sketch_1.setVerticalDistance(firstPoint, secondPoint, 10)
+SketchConstraintDistanceVertical_1.feature().real("ConstraintValue").setText(DistanceParam.name().value())
 model.do()
 
 # changing the parameter

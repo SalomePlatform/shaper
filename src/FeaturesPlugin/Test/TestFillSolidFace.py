@@ -46,7 +46,7 @@ SketchConstraintCoincidence_4 = Sketch_1.setCoincident(SketchLine_2.endPoint(), 
 SketchConstraintCoincidence_5 = Sketch_1.setCoincident(SketchLine_3.endPoint(), SketchArc_1.endPoint())
 SketchConstraintCoincidence_6 = Sketch_1.setCoincident(SketchLine_2.endPoint(), SketchLine_1.result())
 SketchConstraintRadius_1 = Sketch_1.setRadius(SketchArc_1.results()[1], "L+Shift/2")
-SketchConstraintDistanceVertical_1 = Sketch_1.setVerticalDistance(SketchAPI_Line(SketchLine_1).startPoint(), SketchLine_2.startPoint(), "-Shift/3")
+SketchConstraintDistanceVertical_1 = Sketch_1.setVerticalDistance(SketchAPI_Line(SketchLine_1).startPoint(), SketchLine_2.startPoint(), "Shift/3")
 SketchConstraintDistance_1 = Sketch_1.setDistance(SketchAPI_Line(SketchLine_1).startPoint(), SketchLine_3.startPoint(), "Shift", True)
 model.do()
 Face_1 = model.addFace(Part_1_doc, [model.selection("WIRE", "Sketch_1/Wire-SketchArc_1_2f-SketchLine_2f-SketchLine_3f")])

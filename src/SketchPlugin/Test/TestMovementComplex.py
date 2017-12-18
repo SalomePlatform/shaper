@@ -133,7 +133,7 @@ for i in range(1, 10):
 # =============================================================================
 # Test 3. Constrain center of circle and move it again
 # =============================================================================
-SketchConstraintDistanceHorizontal_3 = Sketch_1.setHorizontalDistance(SketchCircle_1.center(), SketchArc_1.startPoint(), -30)
+SketchConstraintDistanceHorizontal_3 = Sketch_1.setHorizontalDistance(SketchCircle_1.center(), SketchArc_1.startPoint(), 30)
 model.do()
 # move center
 delta = [1., 1.]
