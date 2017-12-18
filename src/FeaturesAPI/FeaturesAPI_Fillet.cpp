@@ -40,6 +40,8 @@ FeaturesAPI_Fillet::FeaturesAPI_Fillet(const std::shared_ptr<ModelAPI_Feature>& 
     fillAttribute(FeaturesPlugin_Fillet::CREATION_METHOD_SINGLE_RADIUS(), mycreationMethod);
     fillAttribute(theBaseObjects, mybaseObjects);
     fillAttribute(theRadius, myradius);
+
+    execIfBaseNotEmpty();
   }
 }
 
@@ -54,6 +56,8 @@ FeaturesAPI_Fillet::FeaturesAPI_Fillet(const std::shared_ptr<ModelAPI_Feature>& 
     fillAttribute(theBaseObjects, mybaseObjects);
     fillAttribute(theRadius1, mystartRadius);
     fillAttribute(theRadius2, myendRadius);
+
+    execIfBaseNotEmpty();
   }
 }
 
