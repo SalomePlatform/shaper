@@ -199,8 +199,14 @@ void SketchAPI_Constraint::dump(ModelHighAPI_Dumper& theDumper) const
     }
   }
 
-  AttributeDoublePtr aValueAttr = aBase->real(
-      isAngle ? SketchPlugin_ConstraintAngle::ANGLE_VALUE_ID() :SketchPlugin_Constraint::VALUE());
+  AttributeDoublePtr aValueAttr;
+  if (isAngle)
+    aValueAttr = aBase->real(SketchPlugin_ConstraintAngle::ANGLE_VALUE_ID());
+  else if (aBase->getKind() == SketchPlugin_ConstraintDistanceHorizontal::ID() ||
+           aBase->getKind() == SketchPlugin_ConstraintDistanceVertical::ID())
+    aValueAttr = aBase->real(SketchPlugin_ConstraintDistanceAlongDir::DISTANCE_VALUE_ID());
+  else
+    aValueAttr = aBase->real(SketchPlugin_Constraint::VALUE());
   if (aValueAttr && aValueAttr->isInitialized())
     theDumper << ", " << aValueAttr;
 

@@ -671,7 +671,8 @@ std::shared_ptr<ModelHighAPI_Interface> SketchAPI_Sketch::setHorizontalDistance(
       compositeFeature()->addFeature(SketchPlugin_ConstraintDistanceHorizontal::ID());
   fillAttribute(thePoint1, aFeature->refattr(SketchPlugin_Constraint::ENTITY_A()));
   fillAttribute(thePoint2, aFeature->refattr(SketchPlugin_Constraint::ENTITY_B()));
-  fillAttribute(theValue, aFeature->real(SketchPlugin_Constraint::VALUE()));
+  fillAttribute(theValue,
+      aFeature->real(SketchPlugin_ConstraintDistanceAlongDir::DISTANCE_VALUE_ID()));
   aFeature->execute();
   return InterfacePtr(new ModelHighAPI_Interface(aFeature));
 }
@@ -685,7 +686,8 @@ std::shared_ptr<ModelHighAPI_Interface> SketchAPI_Sketch::setVerticalDistance(
       compositeFeature()->addFeature(SketchPlugin_ConstraintDistanceVertical::ID());
   fillAttribute(thePoint1, aFeature->refattr(SketchPlugin_Constraint::ENTITY_A()));
   fillAttribute(thePoint2, aFeature->refattr(SketchPlugin_Constraint::ENTITY_B()));
-  fillAttribute(theValue, aFeature->real(SketchPlugin_Constraint::VALUE()));
+  fillAttribute(theValue,
+      aFeature->real(SketchPlugin_ConstraintDistanceAlongDir::DISTANCE_VALUE_ID()));
   aFeature->execute();
   return InterfacePtr(new ModelHighAPI_Interface(aFeature));
 }

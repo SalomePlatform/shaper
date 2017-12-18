@@ -217,6 +217,7 @@ ADD_UNIT_TESTS(TestSketchPointLine.py
                TestTrimLine02.py
                Test2229.py
                Test2239.py
+               TestDistanceDump.py
                TestDistanceSignedVsUnsigned01.py
                TestDistanceSignedVsUnsigned02.py
                TestDistanceSignedVsUnsigned03.py
