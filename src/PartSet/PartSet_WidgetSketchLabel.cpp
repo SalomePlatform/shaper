@@ -354,6 +354,20 @@ void PartSet_WidgetSketchLabel::updateByPlaneSelected(const ModuleBase_ViewerPrs
     if (aRotate) {
       myWorkshop->viewer()->setViewProjection(aXYZ.X(), aXYZ.Y(), aXYZ.Z(), aTwist);
     }
+    QString aSizeOfViewStr = mySizeOfView->text();
+    if (!aSizeOfViewStr.isEmpty()) {
+      bool isOk;
+      double aSizeOfView = aSizeOfViewStr.toDouble(&isOk);
+      if (isOk && aSizeOfView > 0) {
+        Handle(V3d_View) aView3d = myWorkshop->viewer()->activeView();
+        if (!aView3d.IsNull()) {
+          Bnd_Box aBndBox;
+          double aHalfSize = aSizeOfView/2.0;
+          aBndBox.Update(-aHalfSize, -aHalfSize, -aHalfSize, aHalfSize, aHalfSize, aHalfSize);
+          aView3d->FitAll(aBndBox, 0.01, false);
+        }
+      }
+    }
     PartSet_Module* aModule = dynamic_cast<PartSet_Module*>(myWorkshop->module());
     if (aModule)
       aModule->onViewTransformed();

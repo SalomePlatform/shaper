@@ -124,6 +124,7 @@ AISObjectPtr PartSet_PreviewSketchPlane::createPreviewPlane()
     int aDispMode = 1; // shading
     Handle(AIS_InteractiveObject) anAISIO = aAIS->impl<Handle(AIS_InteractiveObject)>();
     if (!anAISIO.IsNull()) {
+      //anAISIO->SetInfiniteState(Standard_True);
       anAISIO->Attributes()->SetFaceBoundaryDraw( Standard_True );
       anAISIO->SetDisplayMode(aDispMode);
     }
