@@ -204,6 +204,10 @@ void SketchPlugin_Projection::computeProjection(const std::string& theID)
     std::shared_ptr<GeomAPI_Circ> aCircle = anEdge->circle();
     double aRadius = aCircle->radius();
 
+    double aNormalsDot = aCircle->normal()->dot(aSketchPlane->direction());
+    if (fabs(fabs(aNormalsDot) - 1.0) > tolerance)
+      return; // circle is not in the plane, parallel to the sketch plane
+
     std::shared_ptr<GeomAPI_Pnt> aCenter = aSketchPlane->project(aCircle->center());
     std::shared_ptr<GeomAPI_Pnt2d> aCenterInSketch = sketch()->to2D(aCenter);
 
@@ -227,7 +231,11 @@ void SketchPlugin_Projection::computeProjection(const std::string& theID)
     std::shared_ptr<GeomAPI_Pnt> aCenter = aSketchPlane->project(aCircle->center());
     std::shared_ptr<GeomAPI_Pnt2d> aCenterInSketch = sketch()->to2D(aCenter);
 
-    bool isInversed = aCircle->normal()->dot(aSketchPlane->direction()) < 0.;
+    double aNormalsDot = aCircle->normal()->dot(aSketchPlane->direction());
+    if (fabs(fabs(aNormalsDot) - 1.0) > tolerance)
+      return; // arc is not in the plane, parallel to the sketch plane
+
+    bool isInversed = aNormalsDot < 0.;
 
     if (!hasPrevProj)
       aProjection = sketch()->addFeature(SketchPlugin_Arc::ID());
