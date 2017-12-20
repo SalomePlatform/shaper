@@ -150,13 +150,13 @@ void GeomAlgoAPI_Prism::build(const GeomShapePtr&                theBaseShape,
   GeomShapePtr aBasePlane;
   const bool isBoundingShapesSet = theFromShape.get() || theToShape.get();
   BRepBuilderAPI_FindPlane aFindPlane(aBaseShape);
-  if(theDirection.get()) {
+  if ((aBaseShape.ShapeType() == TopAbs_VERTEX || aBaseShape.ShapeType() == TopAbs_EDGE)
+      && theDirection.get())
+  {
     aBaseDir = theDirection;
     aDirVec = theDirection->impl<gp_Dir>();
   } else {
-    if(aBaseShape.ShapeType() == TopAbs_VERTEX
-        || aBaseShape.ShapeType() == TopAbs_EDGE
-        || aFindPlane.Found() == Standard_False) {
+    if(aFindPlane.Found() == Standard_False) {
       return;
     }
 
