@@ -359,3 +359,53 @@ bool BuildPlugin_ValidatorSubShapesSelection::isValid(const AttributePtr& theAtt
 
   return true;
 }
+
+
+//=================================================================================================
+bool BuildPlugin_ValidatorFillingSelection::isValid(const AttributePtr& theAttribute,
+                                                      const std::list<std::string>& theArguments,
+                                                      Events_InfoMessage& theError) const
+{
+  // Get base objects list.
+  if (theAttribute->attributeType() != ModelAPI_AttributeSelectionList::typeId()) {
+    std::string aMsg =
+      "Error: BuildPlugin_ValidatorFillingSelection does not support attribute type \""
+      "%1\"\n Only \"%2\" supported.";
+    Events_InfoMessage("BuildPlugin_Validators", aMsg).
+      arg(theAttribute->attributeType()).arg(ModelAPI_AttributeSelectionList::typeId()).send();
+    return false;
+  }
+  AttributeSelectionListPtr aSelectionList =
+    std::dynamic_pointer_cast<ModelAPI_AttributeSelectionList>(theAttribute);
+  if (!aSelectionList.get()) {
+    theError = "Could not get selection list.";
+    return false;
+  }
+
+  FeaturePtr anOwner = ModelAPI_Feature::feature(theAttribute->owner());
+
+  // Check selected shapes.
+  for (int anIndex = 0; anIndex < aSelectionList->size(); ++anIndex) {
+    AttributeSelectionPtr aSelectionAttrInList = aSelectionList->value(anIndex);
+    if (!aSelectionAttrInList.get()) {
+      theError = "Empty attribute in list.";
+      return false;
+    }
+
+    // Check shape exists.
+    GeomShapePtr aShapeInList = aSelectionAttrInList->value();
+    if (!aShapeInList.get()) {
+      theError = "Object has no shape";
+      return false;
+    }
+
+    // Check shape type.
+    GeomAPI_Shape::ShapeType aType = aShapeInList->shapeType();
+    if (aType != GeomAPI_Shape::EDGE && aType != GeomAPI_Shape::WIRE) {
+      theError = "Incorrect objects selected";
+      return false;
+    }
+  }
+
+  return true;
+}

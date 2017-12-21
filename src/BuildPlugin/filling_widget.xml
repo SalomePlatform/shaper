@@ -26,6 +26,7 @@ email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com
                   type_choice="edges wires"
                   concealment="false">
     <validator id="PartSet_DifferentObjects"/>
+    <validator id="BuildPlugin_ValidatorFillingSelection"/>
   </multi_selector>
   <optionalbox id="advanced_options" title="Advanced options">
     <switch id="orientation" label="Orientation">

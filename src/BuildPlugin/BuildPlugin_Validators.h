@@ -94,4 +94,19 @@ public:
                         Events_InfoMessage& theError) const;
 };
 
+/// \class BuildPlugin_ValidatorFillingSelection
+/// \ingroup Validators
+/// \brief A validator for selection of Filling feature.
+class BuildPlugin_ValidatorFillingSelection: public ModelAPI_AttributeValidator
+{
+public:
+  //! Returns true if attribute is ok.
+  //! \param[in] theAttribute the checked attribute.
+  //! \param[in] theArguments arguments of the attribute.
+  //! \param[out] theError error message.
+   virtual bool isValid(const AttributePtr& theAttribute,
+                        const std::list<std::string>& theArguments,
+                        Events_InfoMessage& theError) const;
+};
+
 #endif

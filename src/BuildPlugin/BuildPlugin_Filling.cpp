@@ -27,6 +27,7 @@
 #include <ModelAPI_AttributeString.h>
 #include <ModelAPI_ResultBody.h>
 
+#include <GeomAlgoAPI_Copy.h>
 #include <GeomAlgoAPI_Filling.h>
 #include <GeomAlgoAPI_ShapeTools.h>
 
@@ -167,7 +168,7 @@ GeomEdgePtr BuildPlugin_Filling::toEdge(const GeomShapePtr& theShape, const std:
   GeomEdgePtr anEdge;
   switch (theShape->shapeType()) {
   case GeomAPI_Shape::EDGE:
-    anEdge = GeomEdgePtr(new GeomAPI_Edge(theShape));
+    anEdge = GeomEdgePtr(new GeomAPI_Edge(GeomAlgoAPI_Copy(theShape).shape()));
     break;
   case GeomAPI_Shape::WIRE:
     anEdge = GeomAlgoAPI_ShapeTools::wireToEdge(
@@ -189,6 +190,10 @@ GeomEdgePtr BuildPlugin_Filling::toEdge(const GeomShapePtr& theShape, const std:
     // check the distance to previous edge boundaries, reverse edge if necessary
     GeomPointPtr aStartPnt = anEdge->firstPoint();
     GeomPointPtr aEndPnt = anEdge->lastPoint();
+    if (anEdge->orientation() == GeomAPI_Shape::REVERSED) {
+      aStartPnt = anEdge->lastPoint();
+      aEndPnt = anEdge->firstPoint();
+    }
     bool isReverse = false;
     if (myLastEdgeStartPoint) {
       double d1 = myLastEdgeStartPoint->distance(aStartPnt)

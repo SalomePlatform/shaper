@@ -49,6 +49,8 @@ BuildPlugin_Plugin::BuildPlugin_Plugin()
                               new BuildPlugin_ValidatorBaseForFace());
   aFactory->registerValidator("BuildPlugin_ValidatorSubShapesSelection",
                               new BuildPlugin_ValidatorSubShapesSelection());
+  aFactory->registerValidator("BuildPlugin_ValidatorFillingSelection",
+                              new BuildPlugin_ValidatorFillingSelection());
 
   // Register this plugin.
   ModelAPI_Session::get()->registerPlugin(this);
