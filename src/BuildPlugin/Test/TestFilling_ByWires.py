@@ -109,10 +109,9 @@ aBaseObjectsList.append(aWire1.lastResult(), None)
 aSession.finishOperation()
 
 # =============================================================================
-# Test 1. Filling on one wire is failed (error is reported)
+# Test 1. Filling on one wire is failed (no result is built)
 # =============================================================================
 assert(len(aFillingFeature.results()) == 0)
-assert(aFillingFeature.error() != "")
 
 # =============================================================================
 # Test 2. Add another wire, filling should be completed

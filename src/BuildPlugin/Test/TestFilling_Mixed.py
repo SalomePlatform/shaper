@@ -94,10 +94,9 @@ aBaseObjectsList.append(aSketch1Result, anArc.lastResult().shape())
 aSession.finishOperation()
 
 # =============================================================================
-# Test 1. Filling on one edge is failed (error is reported)
+# Test 1. Filling on one edge is failed (no result is built)
 # =============================================================================
 assert(len(aFillingFeature.results()) == 0)
-assert(aFillingFeature.error() != "")
 
 # =============================================================================
 # Test 2. Add a wire, filling should be completed
