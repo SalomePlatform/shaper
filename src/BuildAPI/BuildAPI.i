@@ -41,6 +41,7 @@
 // shared pointers
 %shared_ptr(BuildAPI_Edge)
 %shared_ptr(BuildAPI_Face)
+%shared_ptr(BuildAPI_Filling)
 %shared_ptr(BuildAPI_Shell)
 %shared_ptr(BuildAPI_SubShapes)
 %shared_ptr(BuildAPI_Vertex)
@@ -49,6 +50,7 @@
 // all supported interfaces
 %include "BuildAPI_Edge.h"
 %include "BuildAPI_Face.h"
+%include "BuildAPI_Filling.h"
 %include "BuildAPI_Shell.h"
 %include "BuildAPI_SubShapes.h"
 %include "BuildAPI_Vertex.h"

@@ -31,7 +31,11 @@ class GeomAPI_Wire: public GeomAPI_Shape
 public:
   /// Makes an undefined Wire.
   GEOMAPI_EXPORT GeomAPI_Wire();
+
+  /// Creation of wire by the wire-shape
+  GEOMAPI_EXPORT GeomAPI_Wire(const std::shared_ptr<GeomAPI_Shape>& theShape);
 };
 
-#endif
+typedef std::shared_ptr<GeomAPI_Wire> GeomWirePtr;
 
+#endif

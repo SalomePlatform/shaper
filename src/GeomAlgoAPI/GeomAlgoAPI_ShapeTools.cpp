@@ -28,11 +28,13 @@
 #include <GeomAPI_Face.h>
 #include <GeomAPI_Pln.h>
 #include <GeomAPI_Pnt.h>
+#include <GeomAPI_Wire.h>
 
 #include <Bnd_Box.hxx>
 #include <BOPTools.hxx>
 #include <BRep_Builder.hxx>
 #include <BRepAdaptor_Curve.hxx>
+#include <BRepAlgo.hxx>
 #include <BRepAlgo_FaceRestrictor.hxx>
 #include <BRepBndLib.hxx>
 #include <BRepBuilderAPI_FindPlane.hxx>
@@ -952,4 +954,18 @@ std::shared_ptr<GeomAPI_Dir> GeomAlgoAPI_ShapeTools::buildDirFromAxisAndShape(
                                                     aCentreOfMassPoint.Y()-aPoint.Y(),
                                                     aCentreOfMassPoint.Z()-aPoint.Z()));
   return aDir;
+}
+
+//==================================================================================================
+std::shared_ptr<GeomAPI_Edge> GeomAlgoAPI_ShapeTools::wireToEdge(
+      const std::shared_ptr<GeomAPI_Wire>& theWire)
+{
+  GeomEdgePtr anEdge;
+  if (theWire) {
+    const TopoDS_Wire& aWire = theWire->impl<TopoDS_Wire>();
+    TopoDS_Edge aNewEdge = BRepAlgo::ConcatenateWireC0(aWire);
+    anEdge = GeomEdgePtr(new GeomAPI_Edge);
+    anEdge->setImpl(new TopoDS_Edge(aNewEdge));
+  }
+  return anEdge;
 }

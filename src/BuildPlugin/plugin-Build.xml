@@ -43,5 +43,10 @@ email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com
         <source path="subshapes_widget.xml"/>
       </feature>
     </group>
-   </workbench>
+    <group id="Advanced">
+      <feature id="Filling" title="Filling" tooltip="Create face from list of edges" icon="icons/Build/feature_filling.png">
+        <source path="filling_widget.xml"/>
+      </feature>
+    </group>
+  </workbench>
 </plugin>

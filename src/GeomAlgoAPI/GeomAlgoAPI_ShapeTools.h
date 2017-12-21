@@ -36,6 +36,7 @@ class GeomAPI_Face;
 class GeomAPI_PlanarEdges;
 class GeomAPI_Pln;
 class GeomAPI_Pnt;
+class GeomAPI_Wire;
 class GeomDataAPI_Point2D;
 class ModelAPI_Object;
 
@@ -174,6 +175,10 @@ public:
   GEOMALGOAPI_EXPORT static std::shared_ptr<GeomAPI_Dir> buildDirFromAxisAndShape(
                                     const std::shared_ptr<GeomAPI_Shape> theBaseShape,
                                     const std::shared_ptr<GeomAPI_Ax1> theAxis);
+
+  /// \brief Reapproximate a wire to build a single edge
+  GEOMALGOAPI_EXPORT static std::shared_ptr<GeomAPI_Edge> wireToEdge(
+      const std::shared_ptr<GeomAPI_Wire>& theWire);
 };
 
 #endif

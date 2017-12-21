@@ -76,6 +76,7 @@ SET(PROJECT_HEADERS
     GeomAlgoAPI_UnifySameDomain.h
     GeomAlgoAPI_Fillet.h
     GeomAlgoAPI_SortListOfShapes.h
+    GeomAlgoAPI_Filling.h
 )
 
 SET(PROJECT_SOURCES
@@ -130,6 +131,7 @@ SET(PROJECT_SOURCES
     GeomAlgoAPI_UnifySameDomain.cpp
     GeomAlgoAPI_Fillet.cpp
     GeomAlgoAPI_SortListOfShapes.cpp
+    GeomAlgoAPI_Filling.cpp
 )
 
 SET(PROJECT_LIBRARIES

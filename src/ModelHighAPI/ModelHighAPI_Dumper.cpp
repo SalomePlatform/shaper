@@ -975,36 +975,56 @@ ModelHighAPI_Dumper& ModelHighAPI_Dumper::operator<<(
 ModelHighAPI_Dumper& ModelHighAPI_Dumper::operator<<(
     const std::shared_ptr<ModelAPI_AttributeSelectionList>& theAttrSelList)
 {
-  myDumpBuffer << "[";
+  static const int aThreshold = 2;
+  // if number of elements in the list if greater than a threshold,
+  // dump it in a separate line with specific name
+  std::string aDumped = myDumpBuffer.str();
 
-  GeomShapePtr aShape;
-  std::string aShapeTypeStr;
+  if (aDumped.empty() || theAttrSelList->size() <= aThreshold) {
+    myDumpBuffer << "[";
 
-  bool isAdded = false;
+    GeomShapePtr aShape;
+    std::string aShapeTypeStr;
 
-  for(int anIndex = 0; anIndex < theAttrSelList->size(); ++anIndex) {
-    AttributeSelectionPtr anAttribute = theAttrSelList->value(anIndex);
-    aShape = anAttribute->value();
-    if(!aShape.get()) {
-      ResultPtr aContext = anAttribute->context();
-      if (aContext.get())
-        aShape = aContext->shape();
+    bool isAdded = false;
+
+    for(int anIndex = 0; anIndex < theAttrSelList->size(); ++anIndex) {
+      AttributeSelectionPtr anAttribute = theAttrSelList->value(anIndex);
+      aShape = anAttribute->value();
+      if(!aShape.get()) {
+        ResultPtr aContext = anAttribute->context();
+        if (aContext.get())
+          aShape = aContext->shape();
+      }
+
+      if(!aShape.get()) {
+        continue;
+      }
+
+      if(isAdded) {
+        myDumpBuffer << ", ";
+      } else {
+        isAdded = true;
+      }
+      myDumpBuffer << "model.selection(\"" <<
+        aShape->shapeTypeStr() << "\", \"" << anAttribute->namingName() << "\")";
     }
 
-    if(!aShape.get()) {
-      continue;
-    }
-
-    if(isAdded) {
-      myDumpBuffer << ", ";
-    } else {
-      isAdded = true;
-    }
-    myDumpBuffer << "model.selection(\"" <<
-      aShape->shapeTypeStr() << "\", \"" << anAttribute->namingName() << "\")";
+    myDumpBuffer << "]";
+  } else {
+    // clear buffer and store list "as is"
+    myDumpBuffer.str("");
+    *this << theAttrSelList;
+    // save buffer and clear it again
+    std::string aDumpedList = myDumpBuffer.str();
+    myDumpBuffer.str("");
+    // obtain name of list
+    FeaturePtr anOwner = ModelAPI_Feature::feature(theAttrSelList->owner());
+    std::string aListName = name(anOwner) + "_objects";
+    // store all previous data
+    myDumpBuffer << aListName << " = " << aDumpedList << std::endl
+                 << aDumped << aListName;
   }
-
-  myDumpBuffer << "]";
   return *this;
 }
 

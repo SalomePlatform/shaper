@@ -33,3 +33,11 @@ GeomAPI_Wire::GeomAPI_Wire()
 
   this->setImpl(aWire);
 }
+
+//==================================================================================================
+GeomAPI_Wire::GeomAPI_Wire(const std::shared_ptr<GeomAPI_Shape>& theShape)
+{
+  if (!theShape->isNull() && theShape->isWire()) {
+    setImpl(new TopoDS_Shape(theShape->impl<TopoDS_Shape>()));
+  }
+}

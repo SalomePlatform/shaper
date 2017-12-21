@@ -103,6 +103,12 @@ bool GeomAPI_Shape::isEdge() const
   return !aShape.IsNull() && aShape.ShapeType() == TopAbs_EDGE;
 }
 
+bool GeomAPI_Shape::isWire() const
+{
+  const TopoDS_Shape& aShape = const_cast<GeomAPI_Shape*>(this)->impl<TopoDS_Shape>();
+  return !aShape.IsNull() && aShape.ShapeType() == TopAbs_WIRE;
+}
+
 bool GeomAPI_Shape::isFace() const
 {
   const TopoDS_Shape& aShape = const_cast<GeomAPI_Shape*>(this)->impl<TopoDS_Shape>();
@@ -406,6 +412,11 @@ void GeomAPI_Shape::setOrientation(const GeomAPI_Shape::Orientation theOrientati
     case INTERNAL: MY_SHAPE->Orientation(TopAbs_INTERNAL); break;
     case EXTERNAL: MY_SHAPE->Orientation(TopAbs_EXTERNAL); break;
   }
+}
+
+void GeomAPI_Shape::reverse()
+{
+  MY_SHAPE->Reverse();
 }
 
 bool GeomAPI_Shape::isSubShape(const std::shared_ptr<GeomAPI_Shape> theShape,

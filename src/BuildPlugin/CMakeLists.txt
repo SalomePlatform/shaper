@@ -38,6 +38,7 @@ SET(PROJECT_HEADERS
     BuildPlugin_Face.h
     BuildPlugin_Shell.h
     BuildPlugin_SubShapes.h
+    BuildPlugin_Filling.h
     BuildPlugin_Validators.h
 )
 
@@ -49,6 +50,7 @@ SET(PROJECT_SOURCES
     BuildPlugin_Face.cpp
     BuildPlugin_Shell.cpp
     BuildPlugin_SubShapes.cpp
+    BuildPlugin_Filling.cpp
     BuildPlugin_Validators.cpp
 )
 
@@ -60,6 +62,7 @@ SET(XML_RESOURCES
     face_widget.xml
     shell_widget.xml
     subshapes_widget.xml
+    filling_widget.xml
 )
 
 SET(TEXT_RESOURCES
@@ -92,4 +95,7 @@ ADD_UNIT_TESTS(TestVertex.py
                TestFace.py
                TestShell.py
                TestSubShapes.py
+               TestFilling_ByEdges.py
+               TestFilling_ByWires.py
+               TestFilling_Mixed.py
                Test1920.py)

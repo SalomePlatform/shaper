@@ -78,6 +78,10 @@ public:
   GEOMAPI_EXPORT
   virtual bool isEdge() const;
 
+  /// Returns whether the shape is a wire
+  GEOMAPI_EXPORT
+  virtual bool isWire() const;
+
   /// Returns whether the shape is a face
   GEOMAPI_EXPORT
   virtual bool isFace() const;
@@ -122,6 +126,9 @@ public:
 
   /// Sets the shape orientation.
   GEOMAPI_EXPORT virtual void setOrientation(const Orientation theOrientation);
+
+  /// Reverse shape
+  GEOMAPI_EXPORT virtual void reverse();
 
   /// \return true if passed shape is a sub-shape of this shape.
   /// \param theShape shape to search.

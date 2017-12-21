@@ -1,0 +1,47 @@
+<!--
+Copyright (C) 2017-20xx  CEA/DEN, EDF R&D
+
+This library is free software; you can redistribute it and/or
+modify it under the terms of the GNU Lesser General Public
+License as published by the Free Software Foundation; either
+version 2.1 of the License, or (at your option) any later version.
+
+This library is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+Lesser General Public License for more details.
+
+You should have received a copy of the GNU Lesser General Public
+License along with this library; if not, write to the Free Software
+Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+
+See http:##www.salome-platform.org/ or
+email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com>
+-->
+
+<source>
+  <multi_selector id="base_objects"
+                  label="Segments and wires:"
+                  tooltip="Select edges or wires."
+                  type_choice="edges wires"
+                  concealment="false">
+    <validator id="PartSet_DifferentObjects"/>
+  </multi_selector>
+  <optionalbox id="advanced_options" title="Advanced options">
+    <switch id="orientation" label="Orientation">
+      <case id="auto_correct" title="Auto-correct edges orientation"/>
+      <case id="curve_info" title="Use curve information"/>
+      <case id="edge_orient" title="Use edges orientation"/>
+    </switch>
+    <integervalue id="min_degree" label="Min deg" min="1" default="2">
+      <validator id="GeomValidators_LessOrEqual" parameters="max_degree"/>
+    </integervalue>
+    <integervalue id="max_degree" label="Max deg" min="1" default="5">
+      <validator id="GeomValidators_GreaterOrEqual" parameters="min_degree"/>
+    </integervalue>
+    <integervalue id="nb_iter" label="Nb iter" min="0" default="0"/>
+    <doublevalue id="tol_2d" label="Tol 2D" min="0" default="0.0001" step="0.0001"/>
+    <doublevalue id="tol_3d" label="Tol 3D" min="0" default="0.0001" step="0.0001"/>
+    <boolvalue id="approximation" label="Approximation"/>
+  </optionalbox>
+</source>

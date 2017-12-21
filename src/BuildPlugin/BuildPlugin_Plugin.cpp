@@ -1,4 +1,4 @@
-// Copyright (C) 2014-2017  CEA/DEN, EDF R&D
+// Copyright (C) 2017-20xx  CEA/DEN, EDF R&D
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -29,6 +29,7 @@
 #include <BuildPlugin_Face.h>
 #include <BuildPlugin_Shell.h>
 #include <BuildPlugin_SubShapes.h>
+#include <BuildPlugin_Filling.h>
 #include <BuildPlugin_Validators.h>
 
 // the only created instance of this plugin
@@ -68,6 +69,8 @@ FeaturePtr BuildPlugin_Plugin::createFeature(std::string theFeatureID)
     return FeaturePtr(new BuildPlugin_Shell());
   } else if(theFeatureID == BuildPlugin_SubShapes::ID()) {
     return FeaturePtr(new BuildPlugin_SubShapes());
+  } else if(theFeatureID == BuildPlugin_Filling::ID()) {
+    return FeaturePtr(new BuildPlugin_Filling());
   }
 
   // Feature of such kind is not found.

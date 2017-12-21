@@ -3,3 +3,4 @@
 
 from BuildAPI import addVertex, addEdge, addWire, addFace, addShell
 from BuildAPI import addSubShapes
+from BuildAPI import addFilling
