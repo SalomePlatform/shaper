@@ -23,10 +23,13 @@
 
   #include <ModelHighAPI_swig.h>
 
+  #include "BuildAPI_Compound.h"
+  #include "BuildAPI_CompSolid.h"
   #include "BuildAPI_Edge.h"
   #include "BuildAPI_Face.h"
   #include "BuildAPI_Filling.h"
   #include "BuildAPI_Shell.h"
+  #include "BuildAPI_Solid.h"
   #include "BuildAPI_SubShapes.h"
   #include "BuildAPI_Vertex.h"
   #include "BuildAPI_Wire.h"

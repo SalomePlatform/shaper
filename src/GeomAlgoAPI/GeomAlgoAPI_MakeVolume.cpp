@@ -68,7 +68,7 @@ void GeomAlgoAPI_MakeVolume::build(const ListOfShape& theFaces)
 #ifdef USE_OCCT_720
   aVolumeMaker->SetAvoidInternalShapes(true);
 #endif
-  aVolumeMaker->SetGlue(BOPAlgo_GlueShift);
+  aVolumeMaker->SetGlue(BOPAlgo_GlueOff);
 
   // building and getting result
   aVolumeMaker->Perform();

@@ -22,20 +22,26 @@ INCLUDE(Common)
 
 SET(PROJECT_HEADERS
   BuildAPI.h
+  BuildAPI_Compound.h
+  BuildAPI_CompSolid.h
   BuildAPI_Edge.h
   BuildAPI_Face.h
   BuildAPI_Filling.h
   BuildAPI_Shell.h
+  BuildAPI_Solid.h
   BuildAPI_SubShapes.h
   BuildAPI_Vertex.h
   BuildAPI_Wire.h
 )
 
 SET(PROJECT_SOURCES
+  BuildAPI_Compound.cpp
+  BuildAPI_CompSolid.cpp
   BuildAPI_Edge.cpp
   BuildAPI_Face.cpp
   BuildAPI_Filling.cpp
   BuildAPI_Shell.cpp
+  BuildAPI_Solid.cpp
   BuildAPI_SubShapes.cpp
   BuildAPI_Vertex.cpp
   BuildAPI_Wire.cpp

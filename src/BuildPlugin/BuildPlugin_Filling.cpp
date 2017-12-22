@@ -114,7 +114,7 @@ void BuildPlugin_Filling::execute()
 
   // build result
   aFilling->build(aParameters.isApprox);
-  if (isFailed(aFilling)) {
+  if (isAlgorithmFailed(aFilling)) {
     removeResults(0);
     return;
   }
@@ -132,7 +132,7 @@ void BuildPlugin_Filling::execute()
   setResult(aResultBody, 0);
 }
 
-bool BuildPlugin_Filling::isFailed(
+bool BuildPlugin_Filling::isAlgorithmFailed(
     const std::shared_ptr<GeomAlgoAPI_MakeShape>& theAlgorithm)
 {
   if (!theAlgorithm->isDone()) {

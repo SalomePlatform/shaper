@@ -165,7 +165,7 @@ public:
 
 private:
   /// Check the filling algorithm is failed
-  bool isFailed(const std::shared_ptr<GeomAlgoAPI_MakeShape>& theAlgorithm);
+  bool isAlgorithmFailed(const std::shared_ptr<GeomAlgoAPI_MakeShape>& theAlgorithm);
 
   /// Convert shape to edge according to construction method
   std::shared_ptr<GeomAPI_Edge> toEdge(const std::shared_ptr<GeomAPI_Shape>& theShape,

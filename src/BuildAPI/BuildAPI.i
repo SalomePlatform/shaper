@@ -39,19 +39,25 @@
 %include "std_shared_ptr.i"
 
 // shared pointers
+%shared_ptr(BuildAPI_Compound)
+%shared_ptr(BuildAPI_CompSolid)
 %shared_ptr(BuildAPI_Edge)
 %shared_ptr(BuildAPI_Face)
 %shared_ptr(BuildAPI_Filling)
 %shared_ptr(BuildAPI_Shell)
+%shared_ptr(BuildAPI_Solid)
 %shared_ptr(BuildAPI_SubShapes)
 %shared_ptr(BuildAPI_Vertex)
 %shared_ptr(BuildAPI_Wire)
 
 // all supported interfaces
+%include "BuildAPI_Compound.h"
+%include "BuildAPI_CompSolid.h"
 %include "BuildAPI_Edge.h"
 %include "BuildAPI_Face.h"
 %include "BuildAPI_Filling.h"
 %include "BuildAPI_Shell.h"
+%include "BuildAPI_Solid.h"
 %include "BuildAPI_SubShapes.h"
 %include "BuildAPI_Vertex.h"
 %include "BuildAPI_Wire.h"

@@ -28,6 +28,9 @@
 #include <BuildPlugin_Wire.h>
 #include <BuildPlugin_Face.h>
 #include <BuildPlugin_Shell.h>
+#include <BuildPlugin_Solid.h>
+#include <BuildPlugin_CompSolid.h>
+#include <BuildPlugin_Compound.h>
 #include <BuildPlugin_SubShapes.h>
 #include <BuildPlugin_Filling.h>
 #include <BuildPlugin_Validators.h>
@@ -69,6 +72,12 @@ FeaturePtr BuildPlugin_Plugin::createFeature(std::string theFeatureID)
     return FeaturePtr(new BuildPlugin_Face());
   } else if(theFeatureID == BuildPlugin_Shell::ID()) {
     return FeaturePtr(new BuildPlugin_Shell());
+  } else if(theFeatureID == BuildPlugin_Solid::ID()) {
+    return FeaturePtr(new BuildPlugin_Solid());
+  } else if(theFeatureID == BuildPlugin_CompSolid::ID()) {
+    return FeaturePtr(new BuildPlugin_CompSolid());
+  } else if(theFeatureID == BuildPlugin_Compound::ID()) {
+    return FeaturePtr(new BuildPlugin_Compound());
   } else if(theFeatureID == BuildPlugin_SubShapes::ID()) {
     return FeaturePtr(new BuildPlugin_SubShapes());
   } else if(theFeatureID == BuildPlugin_Filling::ID()) {

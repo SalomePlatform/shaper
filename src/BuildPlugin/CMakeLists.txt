@@ -37,6 +37,9 @@ SET(PROJECT_HEADERS
     BuildPlugin_Wire.h
     BuildPlugin_Face.h
     BuildPlugin_Shell.h
+    BuildPlugin_Solid.h
+    BuildPlugin_CompSolid.h
+    BuildPlugin_Compound.h
     BuildPlugin_SubShapes.h
     BuildPlugin_Filling.h
     BuildPlugin_Validators.h
@@ -49,6 +52,9 @@ SET(PROJECT_SOURCES
     BuildPlugin_Wire.cpp
     BuildPlugin_Face.cpp
     BuildPlugin_Shell.cpp
+    BuildPlugin_Solid.cpp
+    BuildPlugin_CompSolid.cpp
+    BuildPlugin_Compound.cpp
     BuildPlugin_SubShapes.cpp
     BuildPlugin_Filling.cpp
     BuildPlugin_Validators.cpp
@@ -61,6 +67,9 @@ SET(XML_RESOURCES
     wire_widget.xml
     face_widget.xml
     shell_widget.xml
+    solid_widget.xml
+    compsolid_widget.xml
+    compound_widget.xml
     subshapes_widget.xml
     filling_widget.xml
 )
@@ -94,6 +103,9 @@ ADD_UNIT_TESTS(TestVertex.py
                TestWire.py
                TestFace.py
                TestShell.py
+               TestSolid.py
+               TestCompSolid.py
+               TestCompound.py
                TestSubShapes.py
                TestFilling_ByEdges.py
                TestFilling_ByWires.py

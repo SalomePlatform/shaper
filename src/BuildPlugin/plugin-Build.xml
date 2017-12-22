@@ -37,6 +37,15 @@ email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com
       <feature id="Shell" title="Shell" tooltip ="Create a shell from faces or shells objects" icon="icons/Build/feature_shell.png">
         <source path="shell_widget.xml"/>
       </feature>
+      <feature id="Solid" title="Solid" tooltip ="Create a solid from faces or shells" icon="icons/Build/feature_solid.png">
+        <source path="solid_widget.xml"/>
+      </feature>
+      <feature id="CompSolid" title="CompSolid" tooltip ="Create a compsolid from solids or another compsolids" icon="icons/Build/feature_compsolid.png">
+        <source path="compsolid_widget.xml"/>
+      </feature>
+      <feature id="Compound" title="Compound" tooltip ="Create a compound of objects" icon="icons/Build/feature_compound.png">
+        <source path="compound_widget.xml"/>
+      </feature>
     </group>
     <group id="Modify">
       <feature id="SubShapes" title="Sub-Shapes" tooltip ="Allows to add or to remove sub-shapes of the selected shape" icon="icons/Build/feature_subshapes.png">
