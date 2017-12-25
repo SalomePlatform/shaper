@@ -676,6 +676,7 @@ void XGUI_ContextMenuMgr::buildObjBrowserMenu()
   //-------------------------------------
 
   aList.clear();
+  aList.append(action("RENAME_CMD"));
   aList.append(action("DELETE_CMD"));
   myObjBrowserMenus[ModelAPI_Folder::group()] = aList;
 
