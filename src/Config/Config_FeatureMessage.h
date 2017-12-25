@@ -52,7 +52,9 @@ class Config_FeatureMessage : public Events_Message
   bool myInternal;  ///<Internal feature without GUI representation
   bool myModal;     ///<True if the feature has to be represented by modal dialog box
   bool myIsAutoPreview; ///< Preview computation is performed automatically
-  bool myIsApplyContinue;  ///<True if the feature can have Apply/Continue button in its property panel
+
+  /// True if the feature can have Apply/Continue button in its property panel
+  bool myIsApplyContinue;
 
   std::string myNestedFeatures; ///<Space separated list of child features
   std::string myActionsWhenNested; ///<Space separated list of actions
@@ -143,7 +145,8 @@ class Config_FeatureMessage : public Events_Message
   CONFIG_EXPORT void setAutoPreview(bool isAutoPreview);
   ///Set modality state; If true - the feature will be represented by modal dialog box GUI
   CONFIG_EXPORT void setModal(bool isModal);
-  ///Set Apply/Continue state; If true - the feature can have Apply/Continue button in its property panel
+  ///Set Apply/Continue state;
+  ///If true - the feature can have Apply/Continue button in its property panel
   CONFIG_EXPORT void setApplyContinue(bool isModal);
 };
 

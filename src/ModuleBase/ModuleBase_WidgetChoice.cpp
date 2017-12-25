@@ -70,7 +70,8 @@ ModuleBase_WidgetChoice::ModuleBase_WidgetChoice(QWidget* theParent,
 
   QHBoxLayout* aLayout = new QHBoxLayout(this);
   myChoiceCtrl =  new ModuleBase_ChoiceCtrl(this, aList, aIconList,
-    (aWgtType == "radiobuttons")? ModuleBase_ChoiceCtrl::RadioButtons : ModuleBase_ChoiceCtrl::ComboBox,
+    (aWgtType == "radiobuttons")? ModuleBase_ChoiceCtrl::RadioButtons :
+                                  ModuleBase_ChoiceCtrl::ComboBox,
     (aWgtDir == "horizontal")? Qt::Horizontal : Qt::Vertical);
   myChoiceCtrl->setLabel(aLabelText);
 
