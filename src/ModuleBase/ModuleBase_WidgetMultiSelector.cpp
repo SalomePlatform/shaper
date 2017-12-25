@@ -435,6 +435,11 @@ QList<QWidget*> ModuleBase_WidgetMultiSelector::getControls() const
 //********************************************************************
 void ModuleBase_WidgetMultiSelector::onSelectionTypeChanged()
 {
+  // Clear current selection in order to avoid updating of object browser with obsolete indexes
+  // which can appear because of results deletetion after changing a type of selection
+  QList<ModuleBase_ViewerPrsPtr> aEmptyList;
+  myWorkshop->setSelected(aEmptyList);
+
   updateSelectionModesAndFilters(true);
   myWorkshop->selectionActivate()->updateSelectionModes();
 
