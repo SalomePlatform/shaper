@@ -37,6 +37,7 @@
 #include <ModuleBase_IModule.h>
 #include <ModuleBase_Tools.h>
 #include <ModuleBase_WidgetLineEdit.h>
+#include <ModuleBase_WidgetNameEdit.h>
 #include <ModuleBase_WidgetMultiSelector.h>
 #include <ModuleBase_WidgetConcealedObjects.h>
 #include <ModuleBase_WidgetLabel.h>
@@ -317,6 +318,9 @@ ModuleBase_ModelWidget* ModuleBase_WidgetFactory::createWidgetByType(const std::
   } else if (theType == WDG_STRINGVALUE) {
     std::string aPlaceHolder = myWidgetApi->getProperty( WDG_PLACE_HOLDER );
     result = new ModuleBase_WidgetLineEdit( theParent, myWidgetApi, aPlaceHolder );
+  } else if (theType == WDG_NAMEVALUE) {
+    std::string aPlaceHolder = myWidgetApi->getProperty( WDG_PLACE_HOLDER );
+    result = new ModuleBase_WidgetNameEdit( theParent, myWidgetApi, aPlaceHolder );
   } else if (theType == WDG_EXPR_EDITOR) {
     std::string aPlaceHolder = myWidgetApi->getProperty( WDG_PLACE_HOLDER );
     result = new ModuleBase_WidgetExprEditor( theParent, myWidgetApi, aPlaceHolder );

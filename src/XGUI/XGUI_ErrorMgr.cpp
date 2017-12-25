@@ -160,12 +160,15 @@ void XGUI_ErrorMgr::updateAcceptActionState(const QString& theError)
 {
   XGUI_ActionsMgr* anActionsMgr = workshop()->actionsMgr();
   QAction* anAcceptAction = anActionsMgr->operationStateAction(XGUI_ActionsMgr::Accept);
+  QAction* anAcceptPlusAction =
+    anActionsMgr->operationStateAction(XGUI_ActionsMgr::AcceptPlus);
 
   if (myAcceptAllToolTip.isEmpty() && myAcceptToolTip.isEmpty())
     storeInitialActionValues();
 
   bool anEnabled = theError.isEmpty();
   anAcceptAction->setEnabled(anEnabled);
+  anAcceptPlusAction->setEnabled(anEnabled);
   anAcceptAction->setToolTip(anEnabled ? myAcceptToolTip : theError);
   anAcceptAction->setStatusTip(anEnabled ? myAcceptStatusTip : theError);
   // some operations have no property panel, so it is important to check that it is not null

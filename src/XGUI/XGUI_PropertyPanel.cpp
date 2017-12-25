@@ -36,6 +36,7 @@
 #include <ModuleBase_WidgetFactory.h>
 #include <ModuleBase_OperationDescription.h>
 #include <ModuleBase_Events.h>
+#include <ModuleBase_IWorkshop.h>
 
 #include <Events_Loop.h>
 
@@ -51,7 +52,6 @@
 #include <QVBoxLayout>
 #include <QGridLayout>
 #include <QWidget>
-#include <QToolButton>
 #include <QAction>
 
 #ifdef _DEBUG
@@ -93,6 +93,7 @@ XGUI_PropertyPanel::XGUI_PropertyPanel(QWidget* theParent, XGUI_OperationMgr* th
   QStringList aBtnNames;
   aBtnNames << QString(PROP_PANEL_HELP)
             << QString(PROP_PANEL_OK)
+            << QString(PROP_PANEL_OK_PLUS)
             << QString(PROP_PANEL_CANCEL);
   foreach(QString eachBtnName, aBtnNames) {
     QToolButton* aBtn = new QToolButton(aFrm);
@@ -223,6 +224,9 @@ void XGUI_PropertyPanel::createContentPanel(FeaturePtr theFeature)
     /// Apply button should be update if the feature was modified by the panel
     myOperationMgr->onValidateOperation();
   }
+  std::shared_ptr<Config_FeatureMessage> aFeatureInfo =
+    myOperationMgr->workshop()->featureInfo(theFeature->getKind().c_str());
+  findButton(PROP_PANEL_OK_PLUS)->setVisible(aFeatureInfo->isApplyContinue());
 }
 
 void XGUI_PropertyPanel::activateNextWidget(ModuleBase_ModelWidget* theWidget)
@@ -396,11 +400,11 @@ bool XGUI_PropertyPanel::focusNextPrevChild(bool theIsNext)
     findDirectChildren(this, aChildren, true);
     int aChildrenCount = aChildren.count();
     int aFocusWidgetIndex = aChildren.indexOf(aFocusWidget);
+    QToolButton* anOkBtn = findButton(PROP_PANEL_OK);
     if (aFocusWidgetIndex >= 0) {
       if (theIsNext) {
         if (aFocusWidgetIndex == aChildrenCount-1) {
           // after the last widget focus should be set to "Apply"
-          QToolButton* anOkBtn = findButton(PROP_PANEL_OK);
           if (anOkBtn->isEnabled())
             aNewFocusWidget = anOkBtn;
           else {
@@ -420,7 +424,6 @@ bool XGUI_PropertyPanel::focusNextPrevChild(bool theIsNext)
         }
         else {
           // before the "Apply" button, the last should accept focus for consistency with "Next"
-          QToolButton* anOkBtn = findButton(PROP_PANEL_OK);
           if (aFocusWidget == anOkBtn) {
             aNewFocusWidget = aChildren[aChildrenCount - 1];
           }
@@ -551,10 +554,11 @@ void XGUI_PropertyPanel::setEditingMode(bool isEditing)
 void XGUI_PropertyPanel::setupActions(XGUI_ActionsMgr* theMgr)
 {
   QStringList aButtonNames;
-  aButtonNames << PROP_PANEL_OK << PROP_PANEL_CANCEL << PROP_PANEL_HELP << PROP_PANEL_PREVIEW;
+  aButtonNames << PROP_PANEL_OK<< PROP_PANEL_OK_PLUS << PROP_PANEL_CANCEL
+               << PROP_PANEL_HELP << PROP_PANEL_PREVIEW;
   QList<XGUI_ActionsMgr::OperationStateActionId> aActionIds;
-  aActionIds << XGUI_ActionsMgr::Accept << XGUI_ActionsMgr::Abort << XGUI_ActionsMgr::Help
-             << XGUI_ActionsMgr::Preview;
+  aActionIds << XGUI_ActionsMgr::Accept << XGUI_ActionsMgr::AcceptPlus << XGUI_ActionsMgr::Abort
+             << XGUI_ActionsMgr::Help << XGUI_ActionsMgr::Preview;
   for (int i = 0; i < aButtonNames.size(); ++i) {
     QToolButton* aBtn = findButton(aButtonNames.at(i).toStdString().c_str());
     QAction* anAct = theMgr->operationStateAction(aActionIds.at(i));

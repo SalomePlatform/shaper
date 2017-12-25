@@ -36,6 +36,8 @@ Config_FeatureMessage::Config_FeatureMessage(const Events_ID theId, const void* 
   myInternal = false;
   myUseInput = false;
   myNestedFeatures = "";
+  myModal = false;
+  myIsApplyContinue = false;
 }
 
 Config_FeatureMessage::~Config_FeatureMessage()
@@ -153,6 +155,12 @@ bool Config_FeatureMessage::isModal() const
   return myModal;
 }
 
+bool Config_FeatureMessage::isApplyContinue() const
+{
+  return myIsApplyContinue;
+}
+
+
 void Config_FeatureMessage::setUseInput(bool isUseInput)
 {
   myUseInput = isUseInput;
@@ -191,4 +199,9 @@ void Config_FeatureMessage::setActionsWhenNested(const std::string& theActions)
 void Config_FeatureMessage::setAutoPreview(bool isAutoPreview)
 {
   myIsAutoPreview = isAutoPreview;
+}
+
+void Config_FeatureMessage::setApplyContinue(bool isModal)
+{
+  myIsApplyContinue = isModal;
 }

@@ -30,6 +30,7 @@
      <file>pictures/button_help.png</file>
      <file>pictures/button_ok.png</file>
      <file>pictures/button_ok_error.png</file>
+     <file>pictures/button_ok-plus.png</file>
      <file>pictures/button_plus.png</file>
 
      <file>pictures/assembly.png</file>
@@ -62,6 +63,10 @@
      <file>pictures/eyeopen.png</file>
 
      <file>pictures/transparency.png</file>
+     <file>pictures/solid32.png</file>
+     <file>pictures/face32.png</file>
+     <file>pictures/edge32.png</file>
+     <file>pictures/vertex32.png</file>
      <file>pictures/features_folder.png</file>
      <file>pictures/create_folder.png</file>
      <file>pictures/insert_folder_after.png</file>

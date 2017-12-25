@@ -56,10 +56,11 @@ class XGUI_EXPORT XGUI_ActionsMgr : public QObject, public Events_Listener
   enum OperationStateActionId {
     Abort = 0,
     Accept = 1,
-    Help = 2,
-    AbortAll = 3,
-    AcceptAll = 4,
-    Preview = 5
+    AcceptPlus = 2,
+    Help = 3,
+    AbortAll = 4,
+    AcceptAll = 5,
+    Preview = 6
   };
 
   /// Add a command in the manager.

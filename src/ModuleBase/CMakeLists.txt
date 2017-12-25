@@ -99,6 +99,8 @@ SET(PROJECT_HEADERS
   ModuleBase_ModelDialogWidget.h
   ModuleBase_ActionParameter.h
   ModuleBase_ActionIntParameter.h
+  ModuleBase_ChoiceCtrl.h
+  ModuleBase_WidgetNameEdit.h
 )
 
 SET(PROJECT_MOC_HEADERS
@@ -144,6 +146,8 @@ SET(PROJECT_MOC_HEADERS
   ModuleBase_WidgetSwitch.h
   ModuleBase_WidgetToolbox.h
   ModuleBase_WidgetValidated.h
+  ModuleBase_ChoiceCtrl.h
+  ModuleBase_WidgetNameEdit.h
 )
 
 SET(PROJECT_SOURCES
@@ -208,6 +212,8 @@ SET(PROJECT_SOURCES
   ModuleBase_IconFactory.cpp
   ModuleBase_SelectionValidator.cpp
   ModuleBase_Dialog.cpp
+  ModuleBase_ChoiceCtrl.cpp
+  ModuleBase_WidgetNameEdit.cpp
 )
 
 SET(PROJECT_LIBRARIES

@@ -161,6 +161,8 @@ void Config_FeatureReader::fillFeature(xmlNodePtr theFeatureNode,
   outFeatureMessage->setModal(getBooleanAttribute(theFeatureNode, FEATURE_MODAL, false));
   bool isAutoPreview = getBooleanAttribute(theFeatureNode, FEATURE_AUTO_PREVIEW, true);
   outFeatureMessage->setAutoPreview(isAutoPreview);
+  outFeatureMessage->setApplyContinue(
+    getBooleanAttribute(theFeatureNode, FEATURE_APPLY_CONTINUE, false));
 
   bool isInternal = getBooleanAttribute(theFeatureNode, ATTR_INTERNAL, false);
   outFeatureMessage->setInternal(isInternal);

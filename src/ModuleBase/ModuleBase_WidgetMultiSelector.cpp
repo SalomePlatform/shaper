@@ -27,12 +27,14 @@
 #include <ModuleBase_IModule.h>
 #include <ModuleBase_ISelection.h>
 #include <ModuleBase_ISelectionActivate.h>
+#include <ModuleBase_IPropertyPanel.h>
 #include <ModuleBase_IViewer.h>
 #include <ModuleBase_IWorkshop.h>
 #include <ModuleBase_ListView.h>
 #include <ModuleBase_Tools.h>
 #include <ModuleBase_ViewerPrs.h>
 #include <ModuleBase_WidgetShapeSelector.h>
+#include <ModuleBase_ChoiceCtrl.h>
 
 #include <ModelAPI_Data.h>
 #include <ModelAPI_Object.h>
@@ -77,34 +79,50 @@ void printHistoryInfo(const QString& theMethodName, int theCurrentHistoryIndex,
 }
 #endif
 
+
+QStringList getIconsList(const QStringList& theNames)
+{
+  QStringList aIcons;
+  foreach (QString aName, theNames) {
+    QString aUName = aName.toUpper();
+    if ((aUName == "VERTICES") || (aUName == "VERTEX"))
+      aIcons << ":pictures/vertex32.png";
+    else if ((aUName == "EDGES") || (aUName == "EDGE"))
+      aIcons << ":pictures/edge32.png";
+    else if ((aUName == "FACES") || (aUName == "FACE"))
+      aIcons << ":pictures/face32.png";
+    else if ((aUName == "SOLIDS") || (aUName == "SOLID"))
+      aIcons << ":pictures/solid32.png";
+  }
+  return aIcons;
+}
+
+
+
 ModuleBase_WidgetMultiSelector::ModuleBase_WidgetMultiSelector(QWidget* theParent,
                                                                ModuleBase_IWorkshop* theWorkshop,
                                                                const Config_WidgetAPI* theData)
 : ModuleBase_WidgetSelector(theParent, theWorkshop, theData),
   myIsSetSelectionBlocked(false), myCurrentHistoryIndex(-1)
 {
+  std::string aPropertyTypes = theData->getProperty("type_choice");
+  QString aTypesStr = aPropertyTypes.c_str();
+  myShapeTypes = aTypesStr.split(' ', QString::SkipEmptyParts);
+  myIsUseChoice = theData->getBooleanAttribute("use_choice", false);
+
   QGridLayout* aMainLay = new QGridLayout(this);
   ModuleBase_Tools::adjustMargins(aMainLay);
 
-  QLabel* aTypeLabel = new QLabel(tr("Type"), this);
-  aMainLay->addWidget(aTypeLabel, 0, 0);
+  QStringList aIconsList = getIconsList(myShapeTypes);
+  myTypeCtrl = new ModuleBase_ChoiceCtrl(this, myShapeTypes, aIconsList);
+  myTypeCtrl->setLabel(tr("Type"));
+  myTypeCtrl->setValue(0);
+  aMainLay->addWidget(myTypeCtrl, 0, 0, 1, 2);
 
-  myTypeCombo = new QComboBox(this);
   // There is no sense to parameterize list of types while we can not parameterize selection mode
-
-  std::string aPropertyTypes = theData->getProperty("type_choice");
-  QString aTypesStr = aPropertyTypes.c_str();
-  QStringList aShapeTypes = aTypesStr.split(' ', QString::SkipEmptyParts);
-
-  myIsUseChoice = theData->getBooleanAttribute("use_choice", false);
-
-  if (!aShapeTypes.empty())
-    myTypeCombo->addItems(aShapeTypes);
-  aMainLay->addWidget(myTypeCombo, 0, 1);
   // if the xml definition contains one type, the controls to select a type should not be shown
-  if (aShapeTypes.size() <= 1 || !myIsUseChoice) {
-    aTypeLabel->setVisible(false);
-    myTypeCombo->setVisible(false);
+  if (myShapeTypes.size() <= 1 || !myIsUseChoice) {
+    myTypeCtrl->setVisible(false);
   }
 
   QString aLabelText = translate(theData->getProperty("label"));
@@ -112,7 +130,7 @@ ModuleBase_WidgetMultiSelector::ModuleBase_WidgetMultiSelector(QWidget* theParen
   aMainLay->addWidget(aListLabel, 1, 0);
   // if the xml definition contains one type, an information label
   // should be shown near to the latest
-  if (aShapeTypes.size() <= 1) {
+  if (myShapeTypes.size() <= 1) {
     QString aLabelIcon = QString::fromStdString(theData->widgetIcon());
     if (!aLabelIcon.isEmpty()) {
       QLabel* aSelectedLabel = new QLabel("", this);
@@ -133,7 +151,7 @@ ModuleBase_WidgetMultiSelector::ModuleBase_WidgetMultiSelector(QWidget* theParen
   //aMainLay->addWidget(new QLabel(this)); //FIXME(sbh)???
   //aMainLay->setRowMinimumHeight(3, 20);
   //this->setLayout(aMainLay);
-  connect(myTypeCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(onSelectionTypeChanged()));
+  connect(myTypeCtrl, SIGNAL(valueChanged(int)), this, SLOT(onSelectionTypeChanged()));
 
   myIsNeutralPointClear = theData->getBooleanAttribute("clear_in_neutral_point", true);
 }
@@ -187,7 +205,7 @@ bool ModuleBase_WidgetMultiSelector::storeValueCustom()
   std::string aType = anAttribute->attributeType();
   if (aType == ModelAPI_AttributeSelectionList::typeId()) {
     AttributeSelectionListPtr aSelectionListAttr = myFeature->data()->selectionList(attributeID());
-    aSelectionListAttr->setSelectionType(myTypeCombo->currentText().toStdString());
+    aSelectionListAttr->setSelectionType(myTypeCtrl->textValue().toStdString());
   }
   return true;
 }
@@ -427,7 +445,6 @@ bool ModuleBase_WidgetMultiSelector::processDelete()
 QList<QWidget*> ModuleBase_WidgetMultiSelector::getControls() const
 {
   QList<QWidget*> result;
-  //result << myTypeCombo;
   result << myListView->getControl();
   return result;
 }
@@ -450,7 +467,7 @@ void ModuleBase_WidgetMultiSelector::onSelectionTypeChanged()
   std::string aType = anAttribute->attributeType();
   if (aType == ModelAPI_AttributeSelectionList::typeId()) {
     AttributeSelectionListPtr aSelectionListAttr = myFeature->data()->selectionList(attributeID());
-    aSelectionListAttr->setSelectionType(myTypeCombo->currentText().toStdString());
+    aSelectionListAttr->setSelectionType(myTypeCtrl->textValue().toStdString());
   }
 
   // clear attribute values
@@ -479,6 +496,9 @@ void ModuleBase_WidgetMultiSelector::onSelectionTypeChanged()
                             true); /// hope that something is redisplayed by object updated
   // clear history should follow after set selected to do not increase history by setSelected
   clearSelectedHistory();
+
+  if (myWorkshop->propertyPanel()->activeWidget() != this)
+    myWorkshop->propertyPanel()->activateWidget(this);
 }
 
 //********************************************************************
@@ -583,12 +603,13 @@ QIntList ModuleBase_WidgetMultiSelector::shapeTypes() const
 {
   QIntList aShapeTypes;
 
-  if (myTypeCombo->count() > 1 && myIsUseChoice) {
-    aShapeTypes.append(ModuleBase_Tools::shapeType(myTypeCombo->currentText()));
+  if (myShapeTypes.length() > 1 && myIsUseChoice) {
+    aShapeTypes.append(ModuleBase_Tools::shapeType(myTypeCtrl->textValue()));
   }
   else {
-    for (int i = 0, aCount = myTypeCombo->count(); i < aCount; i++)
-      aShapeTypes.append(ModuleBase_Tools::shapeType(myTypeCombo->itemText(i)));
+    foreach (QString aType, myShapeTypes) {
+      aShapeTypes.append(ModuleBase_Tools::shapeType(aType));
+    }
   }
   return aShapeTypes;
 }
@@ -598,17 +619,18 @@ void ModuleBase_WidgetMultiSelector::setCurrentShapeType(const int theShapeType)
 {
   QString aShapeTypeName;
 
-  for (int idx = 0; idx < myTypeCombo->count(); ++idx) {
-    aShapeTypeName = myTypeCombo->itemText(idx);
+  int idx = 0;
+  foreach (QString aShapeTypeName, myShapeTypes) {
     int aRefType = ModuleBase_Tools::shapeType(aShapeTypeName);
-    if(aRefType == theShapeType && idx != myTypeCombo->currentIndex()) {
+    if(aRefType == theShapeType && idx != myTypeCtrl->value()) {
       updateSelectionModesAndFilters(false);
-      bool isBlocked = myTypeCombo->blockSignals(true);
-      myTypeCombo->setCurrentIndex(idx);
-      myTypeCombo->blockSignals(isBlocked);
+      bool isBlocked = myTypeCtrl->blockSignals(true);
+      myTypeCtrl->setValue(idx);
+      myTypeCtrl->blockSignals(isBlocked);
       updateSelectionModesAndFilters(true);
       break;
     }
+    idx++;
   }
 }
 

@@ -528,6 +528,21 @@ void XGUI_Workshop::onAcceptActionClicked()
 }
 
 //******************************************************
+void XGUI_Workshop::onAcceptPlusActionClicked()
+{
+  QAction* anAction = dynamic_cast<QAction*>(sender());
+  XGUI_OperationMgr* anOperationMgr = operationMgr();
+  if (anOperationMgr) {
+    ModuleBase_OperationFeature* aFOperation = dynamic_cast<ModuleBase_OperationFeature*>
+                                                    (anOperationMgr->currentOperation());
+    if (aFOperation) {
+      myOperationMgr->commitOperation();
+      module()->launchOperation(aFOperation->id(), false);
+    }
+  }
+}
+
+//******************************************************
 void XGUI_Workshop::onPreviewActionClicked()
 {
   ModuleBase_IPropertyPanel* aPanel = propertyPanel();
@@ -595,13 +610,15 @@ void XGUI_Workshop::fillPropertyPanel(ModuleBase_Operation* theOperation)
   FeaturePtr aFeature = aFOperation->feature();
   std::string aFeatureKind = aFeature->getKind();
   foreach (ModuleBase_ModelWidget* aWidget, aWidgets) {
-    if (!aWidget->attributeID().empty() && !aFeature->attribute(aWidget->attributeID()).get()) {
-      std::string anErrorMsg = "The feature '%1' has no attribute '%2' used by widget '%3'.";
-      Events_InfoMessage("XGUI_Workshop", anErrorMsg)
-        .arg(aFeatureKind).arg(aWidget->attributeID())
-        .arg(aWidget->metaObject()->className()).send();
-      myPropertyPanel->cleanContent();
-      return;
+    if (aWidget->usesAttribute()) {
+      if (!aWidget->attributeID().empty() && !aFeature->attribute(aWidget->attributeID()).get()) {
+        std::string anErrorMsg = "The feature '%1' has no attribute '%2' used by widget '%3'.";
+        Events_InfoMessage("XGUI_Workshop", anErrorMsg)
+          .arg(aFeatureKind).arg(aWidget->attributeID())
+          .arg(aWidget->metaObject()->className()).send();
+        myPropertyPanel->cleanContent();
+        return;
+      }
     }
   }
   // for performance purpose, flush should be done after all controls are filled
@@ -1357,6 +1374,9 @@ void XGUI_Workshop::createDockWidgets()
 
   QAction* aOkAct = myActionsMgr->operationStateAction(XGUI_ActionsMgr::Accept);
   connect(aOkAct, SIGNAL(triggered()), this, SLOT(onAcceptActionClicked()));
+
+  QAction* aOkContAct = myActionsMgr->operationStateAction(XGUI_ActionsMgr::AcceptPlus);
+  connect(aOkContAct, SIGNAL(triggered()), this, SLOT(onAcceptPlusActionClicked()));
 
   QAction* aCancelAct = myActionsMgr->operationStateAction(XGUI_ActionsMgr::Abort);
   connect(aCancelAct, SIGNAL(triggered()), myOperationMgr, SLOT(onAbortOperation()));

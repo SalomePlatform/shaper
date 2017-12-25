@@ -41,6 +41,7 @@ const static char* WDG_DOUBLEVALUELABEL = "labelvalue";
 const static char* WDG_INTEGERVALUE = "integervalue";
 const static char* WDG_BOOLVALUE = "boolvalue";
 const static char* WDG_STRINGVALUE = "stringvalue";
+const static char* WDG_NAMEVALUE = "namevalue";
 const static char* WDG_MULTISELECTOR = "multi_selector";
 const static char* WDG_SHAPE_SELECTOR = "shape_selector";
 const static char* WDG_FEATURE_SELECTOR = "feature_selector";
@@ -76,6 +77,7 @@ const static char* FEATURE_WHEN_NESTED_ACCEPT = "accept";
 const static char* FEATURE_WHEN_NESTED_ABORT = "abort";
 const static char* FEATURE_DOC = WORKBENCH_DOC;
 const static char* FEATURE_MODAL = "modal";
+const static char* FEATURE_APPLY_CONTINUE = "apply_continue";
 const static char* FEATURE_AUTO_PREVIEW = "auto_preview";
 // NODE_VALIDATOR properties
 const static char* _PARAMETERS = "parameters";

@@ -18,53 +18,32 @@
 // email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com>
 //
 
-#ifndef MODULEBASE_WIDGETLINEEDIT_H_
-#define MODULEBASE_WIDGETLINEEDIT_H_
+#ifndef MODULEBASE_WIDGETNAMEEDIT_H_
+#define MODULEBASE_WIDGETNAMEEDIT_H_
 
 #include <ModuleBase.h>
-#include <ModuleBase_ModelWidget.h>
+#include <ModuleBase_WidgetLineEdit.h>
 
-#include <QList>
-#include <QString>
-#include <QStringList>
-
-class QWidget;
-class QLineEdit;
-
-/**
-* \ingroup GUI
-* Implementation of model widget for line edit widget.
-* It can be defined with "stringvalue" keyword.
-*/
-class MODULEBASE_EXPORT ModuleBase_WidgetLineEdit : public ModuleBase_ModelWidget
+class ModuleBase_WidgetNameEdit : public ModuleBase_WidgetLineEdit
 {
   Q_OBJECT
- public:
-  /// Constructor
-  /// \param theParent the parent object
-  /// \param theData the widget configuration.
-  /// \param thePlaceHolder a string of placeholder
-  ModuleBase_WidgetLineEdit( QWidget* theParent,
+public:
+  ModuleBase_WidgetNameEdit( QWidget* theParent,
                              const Config_WidgetAPI* theData,
-                             const std::string& thePlaceHolder );
-  virtual ~ModuleBase_WidgetLineEdit();
+                             const std::string& thePlaceHolder )
+             : ModuleBase_WidgetLineEdit(theParent, theData, thePlaceHolder) {}
 
-  /// Redefinition of virtual method
-  virtual QList<QWidget*> getControls() const;
+  /// Returns True if the widget uses feature attribute.
+  /// If not then it means that the widget do not need attribute at all.
+  virtual bool usesAttribute() const { return false; }
 
 protected:
-  /// Returns true if the event is processed.
-  virtual bool processEnter();
-
-  /// Saves the internal parameters to the given feature
+    /// Saves the internal parameters to the given feature
   /// \return True in success
   virtual bool storeValueCustom();
 
   /// Redefinition of virtual method
   virtual bool restoreValueCustom();
-
-   /// A line edit control
-  QLineEdit* myLineEdit;
 };
 
-#endif /* MODULEBASE_WIDGETFILESELECTOR_H_ */
+#endif

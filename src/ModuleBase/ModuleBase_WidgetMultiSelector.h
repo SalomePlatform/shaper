@@ -37,9 +37,10 @@
 #include <QMap>
 
 class QWidget;
-class QComboBox;
+//class QComboBox;
 class ModuleBase_ListView;
 class ModuleBase_IWorkshop;
+class ModuleBase_ChoiceCtrl;
 
 /**
 * \ingroup GUI
@@ -219,8 +220,13 @@ protected:
 
 protected:
   ModuleBase_ListView* myListView; ///< List control
-  QComboBox* myTypeCombo; ///< Combobox of types
-  bool myIsUseChoice; /// A flag to store use_choice parameter state
+
+  bool myIsUseChoice; ///< A flag to store use_choice parameter state
+
+  QStringList myShapeTypes; ///< List of Shape types defined in XML
+
+  /// Control for types
+  ModuleBase_ChoiceCtrl* myTypeCtrl;
 
   /// A flag to clear selection by click in empty place in the viewer
   bool myIsNeutralPointClear;
@@ -230,6 +236,7 @@ protected:
 
   /// A container of selected objects
   QList<QList<std::shared_ptr<ModuleBase_ViewerPrs> > > mySelectedHistoryValues;
+
   /// Position in a container of selected values
   int myCurrentHistoryIndex;
 };

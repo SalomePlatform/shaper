@@ -255,6 +255,11 @@ QAction* XGUI_ActionsMgr::operationStateAction(OperationStateActionId theId)
                             "Apply" /*empty to show error*/, aParent);
       }
       break;
+      case AcceptPlus: {
+        aResult = ModuleBase_Tools::createAction(QIcon(":pictures/button_ok-plus.png"),
+                            "Apply and continue" /*empty to show error*/, aParent);
+      }
+      break;
       case Abort:
       case AbortAll: {
         aResult = ModuleBase_Tools::createAction(QIcon(":pictures/button_cancel.png"), "Cancel",

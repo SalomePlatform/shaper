@@ -21,6 +21,7 @@
 #include "ModuleBase_WidgetChoice.h"
 #include "ModuleBase_Tools.h"
 #include "ModuleBase_IconFactory.h"
+#include "ModuleBase_ChoiceCtrl.h"
 
 #include <ModelAPI_AttributeInteger.h>
 #include <ModelAPI_AttributeStringArray.h>
@@ -39,11 +40,8 @@
 
 ModuleBase_WidgetChoice::ModuleBase_WidgetChoice(QWidget* theParent,
                                                  const Config_WidgetAPI* theData)
-: ModuleBase_ModelWidget(theParent, theData), myCombo(0), myButtons(0)
+: ModuleBase_ModelWidget(theParent, theData)//, myCombo(0), myButtons(0)
 {
-  QHBoxLayout* aLayout = new QHBoxLayout(this);
-  ModuleBase_Tools::adjustMargins(aLayout);
-
   QString aLabelText = translate(theData->widgetLabel());
   QString aLabelIcon = QString::fromStdString(theData->widgetIcon());
   std::string aTypes = theData->getProperty("string_list");
@@ -62,72 +60,28 @@ ModuleBase_WidgetChoice::ModuleBase_WidgetChoice(QWidget* theParent,
 
   bool aHasDefaultValue;
   int aDefaultVal = QString::fromStdString(getDefaultValue()).toInt(&aHasDefaultValue);
+
   // Widget type can be combobox or radiobuttons
   std::string aWgtType = theData->getProperty("widget_type");
-  if ((aWgtType.length() > 0) && (aWgtType == "radiobuttons")) {
-    myButtons = new QButtonGroup(this);
-    QGroupBox* aGroupBox = new QGroupBox(aLabelText, this);
-    aLayout->addWidget(aGroupBox);
+  std::string aIcons = theData->getProperty("icons_list");
+  QStringList aIconList = QString(aIcons.c_str()).split(' ');
 
+  std::string aWgtDir = theData->getProperty("buttons_dir");
 
-    QLayout* aBtnLayout = 0;
-    std::string aWgtDir = theData->getProperty("buttons_dir");
-    if (aWgtDir == "horizontal")
-      aBtnLayout = new QHBoxLayout(aGroupBox);
-    else
-      aBtnLayout = new QVBoxLayout(aGroupBox);
-    ModuleBase_Tools::adjustMargins(aBtnLayout);
+  QHBoxLayout* aLayout = new QHBoxLayout(this);
+  myChoiceCtrl =  new ModuleBase_ChoiceCtrl(this, aList, aIconList,
+    (aWgtType == "radiobuttons")? ModuleBase_ChoiceCtrl::RadioButtons : ModuleBase_ChoiceCtrl::ComboBox,
+    (aWgtDir == "horizontal")? Qt::Horizontal : Qt::Vertical);
+  myChoiceCtrl->setLabel(aLabelText);
 
-    std::string aIcons = theData->getProperty("icons_list");
-    QStringList aIconList = QString(aIcons.c_str()).split(' ');
-    if (aIconList.length() == aList.length()) {
-      int aId = 0;
-      foreach(QString aBtnTxt, aList) {
-        QToolButton* aBtn = new QToolButton(aGroupBox);
-        aBtn->setFocusPolicy(Qt::StrongFocus);
-        aBtn->setCheckable(true);
-        aBtn->setToolTip(aBtnTxt);
+  if (!aLabelIcon.isEmpty())
+    myChoiceCtrl->setLabelIcon(aLabelIcon);
 
-        QPixmap aIcon = ModuleBase_IconFactory::loadPixmap(aIconList.at(aId));
-        aBtn->setIcon(aIcon);
-        aBtn->setIconSize(aIcon.size());
+  connect(myChoiceCtrl, SIGNAL(valueChanged(int)), this, SLOT(onCurrentIndexChanged(int)));
 
-        aBtnLayout->addWidget(aBtn);
-        myButtons->addButton(aBtn, aId++);
-      }
-
-    } else {
-      int aId = 0;
-      foreach(QString aBtnTxt, aList) {
-        QRadioButton* aBtn = new QRadioButton(aBtnTxt, aGroupBox);
-        aBtnLayout->addWidget(aBtn);
-        myButtons->addButton(aBtn, aId++);
-      }
-    }
-    int aCheckedId = aHasDefaultValue ? aDefaultVal : 0;
-    myButtons->button(aDefaultVal)->setChecked(true);
-    connect(myButtons, SIGNAL(buttonClicked(int)), this, SLOT(onCurrentIndexChanged(int)));
-  } else {
-    myLabel = new QLabel(aLabelText, this);
-    if (!aLabelIcon.isEmpty())
-      myLabel->setPixmap(ModuleBase_IconFactory::loadPixmap(aLabelIcon));
-    aLayout->addWidget(myLabel);
-
-    std::string aToolstr = theData->widgetTooltip();
-    if (!aToolstr.empty()) {
-      myLabel->setToolTip(QString::fromStdString(aToolstr));
-    }
-
-    myCombo = new QComboBox(this);
-    aLayout->addWidget(myCombo, 1);
-
-    myCombo->addItems(aList);
-
-    if (aHasDefaultValue && aDefaultVal < aList.size())
-      myCombo->setCurrentIndex(aDefaultVal);
-
-    connect(myCombo, SIGNAL(currentIndexChanged(int)), this, SLOT(onCurrentIndexChanged(int)));
-  }
+  int aCheckedId = aHasDefaultValue ? aDefaultVal : 0;
+  myChoiceCtrl->setValue(aCheckedId);
+  aLayout->addWidget(myChoiceCtrl);
 }
 
 ModuleBase_WidgetChoice::~ModuleBase_WidgetChoice()
@@ -139,10 +93,7 @@ bool ModuleBase_WidgetChoice::storeValueCustom()
   DataPtr aData = myFeature->data();
   std::shared_ptr<ModelAPI_AttributeInteger> aIntAttr = aData->integer(attributeID());
 
-  if (myCombo)
-    aIntAttr->setValue(myCombo->currentIndex());
-  else
-    aIntAttr->setValue(myButtons->checkedId());
+  aIntAttr->setValue(myChoiceCtrl->value());
   updateObject(myFeature);
   return true;
 }
@@ -153,54 +104,38 @@ bool ModuleBase_WidgetChoice::restoreValueCustom()
   std::shared_ptr<ModelAPI_AttributeInteger> aIntAttr = aData->integer(attributeID());
 
   if (aIntAttr->value() != -1) {
-    if (myCombo) {
-      bool isBlocked = myCombo->blockSignals(true);
-      if (myCombo->count() == 0 && !myStringListAttribute.empty()) {
-        AttributeStringArrayPtr aStrAttr = aData->stringArray(myStringListAttribute);
-        if (aStrAttr) {
-          for (int i = 0; i < aStrAttr->size(); i++) {
-            myCombo->insertItem(i, aStrAttr->value(i).c_str());
-          }
+    bool isBlocked = myChoiceCtrl->blockSignals(true);
+    if (!myStringListAttribute.empty()) {
+      AttributeStringArrayPtr aStrAttr = aData->stringArray(myStringListAttribute);
+      QStringList aChoiceList;
+      if (aStrAttr) {
+        for (int i = 0; i < aStrAttr->size(); i++) {
+          aChoiceList << aStrAttr->value(i).c_str();
         }
+        myChoiceCtrl->setChoiceList(aChoiceList);
       }
-      myCombo->setCurrentIndex(aIntAttr->value());
-      myCombo->blockSignals(isBlocked);
-    } else {
-      bool isBlocked = myButtons->blockSignals(true);
-      if (aIntAttr->isInitialized())
-        myButtons->button(aIntAttr->value())->setChecked(true);
-      else {
-        bool aHasDefaultValue;
-        int aDefaultVal = QString::fromStdString(getDefaultValue()).toInt(&aHasDefaultValue);
-        myButtons->button(aHasDefaultValue ? aDefaultVal : 0)->setChecked(true);
-      }
-      myButtons->blockSignals(isBlocked);
-      emit itemSelected(this, aIntAttr->value());
     }
+    if (aIntAttr->isInitialized())
+      myChoiceCtrl->setValue(aIntAttr->value());
+    else {
+      bool aHasDefaultValue;
+      int aDefaultVal = QString::fromStdString(getDefaultValue()).toInt(&aHasDefaultValue);
+      myChoiceCtrl->setValue(aHasDefaultValue ? aDefaultVal : 0);
+    }
+    myChoiceCtrl->blockSignals(isBlocked);
+    emit itemSelected(this, aIntAttr->value());
   }
   return true;
 }
 
 bool ModuleBase_WidgetChoice::focusTo()
 {
-  if (myCombo)
-    ModuleBase_Tools::setFocus(myCombo, "ModuleBase_WidgetChoice::focusTo()");
-  else
-    return false;
-  return true;
+  return myChoiceCtrl->focusTo();
 }
 
 QList<QWidget*> ModuleBase_WidgetChoice::getControls() const
 {
-  QList<QWidget*> aControls;
-  if (myCombo)
-    aControls.append(myCombo);
-  //else {
-  //  //foreach(QAbstractButton* aBtn, myButtons->buttons())
-  //  //if (myButtons->checkedId() != -1)
-  //  //  aControls.append(myButtons->button(myButtons->checkedId()));
-  //}
-  return aControls;
+  return myChoiceCtrl->getControls();
 }
 
 QString ModuleBase_WidgetChoice::getPropertyPanelTitle(int theIndex)
