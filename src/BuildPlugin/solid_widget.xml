@@ -25,5 +25,6 @@ email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com
                   tooltip="Select faces or shells."
                   type_choice="faces shells"
                   concealment="true">
+    <validator id="BuildPlugin_ValidatorBaseForBuild" parameters="face,shell"/>
   </multi_selector>
 </source>

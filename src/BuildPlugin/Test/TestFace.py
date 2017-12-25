@@ -35,6 +35,10 @@ aSession.finishOperation()
 aPartResult = modelAPI_ResultPart(aPartFeature.firstResult())
 aPart = aPartResult.partDoc()
 
+# =============================================================================
+# Test 1. Create face from edges of sketch
+# =============================================================================
+
 # Create a sketch
 aSession.startOperation()
 aSketchFeature = featureToCompositeFeature(aPart.addFeature("Sketch"))
@@ -82,6 +86,60 @@ aSession.finishOperation()
 
 # Test results
 assert (len(aFaceFeature.results()) > 0)
+
+# =============================================================================
+# Test 2. Create face from edges of solid
+# =============================================================================
+
+# Cylinder
+aSession.startOperation()
+aCylinder = aPart.addFeature("Cylinder")
+aCylinder.string("CreationMethod").setValue("Cylinder")
+aCylinder.selection("base_point").selectSubShape("VERTEX", "PartSet/Origin")
+aCylinder.selection("axis").selectSubShape("EDGE", "PartSet/OZ")
+aCylinder.real("radius").setValue(5)
+aCylinder.real("height").setValue(10)
+aSession.finishOperation()
+aCylinderResult = aCylinder.firstResult()
+aCylinderShape = aCylinderResult.shape()
+
+# Create face
+aSession.startOperation()
+aFaceFeature2 = aPart.addFeature("Face")
+aBaseObjectsList = aFaceFeature2.selectionList("base_objects")
+aBaseObjectsList.append("Cylinder_1_1/Face_1&Cylinder_1_1/Face_2", "EDGE")
+aSession.finishOperation()
+assert (len(aFaceFeature2.results()) > 0)
+
+# =============================================================================
+# Test 3. Create face from face of solid
+# =============================================================================
+
+aSession.startOperation()
+aFaceFeature3 = aPart.addFeature("Face")
+aBaseObjectsList = aFaceFeature3.selectionList("base_objects")
+aBaseObjectsList.append("Cylinder_1_1/Face_1", "FACE")
+aSession.finishOperation()
+assert (len(aFaceFeature3.results()) > 0)
+
+# =============================================================================
+# Test 4. Verify error is reported if selection of face feature is mixed (edges and face)
+# =============================================================================
+
+aSession.startOperation()
+aFaceFeature4 = aPart.addFeature("Face")
+aBaseObjectsList = aFaceFeature4.selectionList("base_objects")
+aShapeExplorer = GeomAPI_ShapeExplorer(aSketchShape, GeomAPI_Shape.EDGE)
+while aShapeExplorer.more():
+    aBaseObjectsList.append(aSketchResult, aShapeExplorer.current())
+    aShapeExplorer.next()
+aBaseObjectsList.append("Cylinder_1_1/Face_3", "FACE")
+aSession.finishOperation()
+assert (len(aFaceFeature4.results()) == 0)
+# remove failed feature
+aSession.startOperation()
+aPart.removeFeature(aFaceFeature4)
+aSession.finishOperation()
 
 from salome.shaper import model
 assert(model.checkPythonDump())

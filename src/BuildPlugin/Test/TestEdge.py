@@ -75,5 +75,41 @@ aSession.finishOperation()
 # Test results
 assert (len(anEdgeFeature.results()) == aNumOfLines)
 
+# Test edge building on edge of another result
+aSession.startOperation()
+aBox = aPart.addFeature("Box")
+aBox.string("CreationMethod").setValue("BoxByDimensions")
+aBox.real("dx").setValue(50)
+aBox.real("dy").setValue(50)
+aBox.real("dz").setValue(50)
+aSession.finishOperation()
+aBoxResult = aBox.firstResult()
+aBoxShape = aBoxResult.shape()
+
+# Create edges
+aSession.startOperation()
+anEdgeFeature2 = aPart.addFeature("Edge")
+aBaseObjectsList = anEdgeFeature2.selectionList("base_objects")
+aShapeExplorer = GeomAPI_ShapeExplorer(aBoxShape, GeomAPI_Shape.EDGE)
+aShapes = []
+while aShapeExplorer.more():
+    # keep unique shapes only
+    aCurrent = aShapeExplorer.current()
+    isNewShape = True
+    for s in aShapes:
+        if s.isSame(aCurrent):
+            isNewShape = False
+            break
+    if isNewShape:
+        aShapes.append(aCurrent)
+    aShapeExplorer.next()
+
+for s in aShapes:
+    aBaseObjectsList.append(aBoxResult, s)
+aSession.finishOperation()
+
+# Test results
+assert (len(anEdgeFeature2.results()) == 12)
+
 from salome.shaper import model
 assert(model.checkPythonDump())

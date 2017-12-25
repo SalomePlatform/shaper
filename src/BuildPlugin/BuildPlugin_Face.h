@@ -25,6 +25,9 @@
 
 #include <ModelAPI_Feature.h>
 
+class GeomAPI_Dir;
+class GeomAPI_Shape;
+
 /// \class BuildPlugin_Face
 /// \ingroup Plugins
 /// \brief Feature for creation of face from sketch edges or existing wires.
@@ -60,6 +63,12 @@ public:
 
   /// Creates a new part document if needed.
   BUILDPLUGIN_EXPORT virtual void execute();
+
+private:
+  /// Create faces basing on the list of edges
+  void buildFacesByEdges(const std::list< std::shared_ptr<GeomAPI_Shape> >& theEdges,
+                         const std::list< std::shared_ptr<GeomAPI_Dir> >& theNormals,
+                         std::list< std::shared_ptr<GeomAPI_Shape> >& theFaces) const;
 };
 
 #endif

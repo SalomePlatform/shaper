@@ -35,6 +35,10 @@ aSession.finishOperation()
 aPartResult = modelAPI_ResultPart(aPartFeature.firstResult())
 aPart = aPartResult.partDoc()
 
+# =============================================================================
+# Test 1. Create wire from edges of sketch
+# =============================================================================
+
 # Create a sketch
 aSession.startOperation()
 aSketchFeature = featureToCompositeFeature(aPart.addFeature("Sketch"))
@@ -85,6 +89,10 @@ assert (len(aWireFeature.results()) > 0)
 
 from salome.shaper import model
 
+# =============================================================================
+# Test 2. Complete contour by selecting only one edge
+# =============================================================================
+
 model.begin()
 partSet = model.moduleDocument()
 Part_1 = model.addPart(partSet)
@@ -106,5 +114,35 @@ model.do()
 Wire_1 = model.addWire(Part_1_doc, [model.selection("EDGE", "Sketch_1/Edge-SketchLine_1")])
 Wire_1.addContour()
 model.end()
+
+# =============================================================================
+# Test 3. Create wire from edges of solid
+# =============================================================================
+
+# Box
+aSession.startOperation()
+aBox = aPart.addFeature("Box")
+aBox.string("CreationMethod").setValue("BoxByDimensions")
+aBox.real("dx").setValue(20)
+aBox.real("dy").setValue(20)
+aBox.real("dz").setValue(20)
+aSession.finishOperation()
+aBoxResult = aBox.firstResult()
+aBoxShape = aBoxResult.shape()
+
+# Wire
+aSession.startOperation()
+aWireFeature2 = aPart.addFeature("Wire")
+aBaseObjectsList = aWireFeature2.selectionList("base_objects")
+aBaseObjectsList.append("Box_1_1/Front&Box_1_1/Bottom", "EDGE")
+aBaseObjectsList.append("Box_1_1/Front&Box_1_1/Right", "EDGE")
+aBaseObjectsList.append("Box_1_1/Right&Box_1_1/Top", "EDGE")
+aBaseObjectsList.append("Box_1_1/Back&Box_1_1/Top", "EDGE")
+aBaseObjectsList.append("Box_1_1/Back&Box_1_1/Left", "EDGE")
+aBaseObjectsList.append("Box_1_1/Left&Box_1_1/Bottom", "EDGE")
+aSession.finishOperation()
+
+# Test results
+assert (len(aWireFeature2.results()) == 1)
 
 assert(model.checkPythonDump())

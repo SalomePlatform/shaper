@@ -112,12 +112,6 @@ bool BuildPlugin_ValidatorBaseForBuild::isValid(const AttributePtr& theAttribute
         continue;
       }
     }
-
-    if(!aShape->isEqual(aContextShape)) {
-      // Local selection on body does not allowed.
-      theError = "Selected shape is in the local selection. Only global selection is allowed.";
-      return false;
-    }
   }
 
   return true;
@@ -192,6 +186,9 @@ bool BuildPlugin_ValidatorBaseForFace::isValid(const std::shared_ptr<ModelAPI_Fe
     return false;
   }
 
+  bool hasEdgesOrWires = false;
+  bool hasFaces = false;
+
   // Collect base shapes.
   ListOfShape anEdges;
   for(int anIndex = 0; anIndex < aSelectionList->size(); ++anIndex) {
@@ -204,13 +201,23 @@ bool BuildPlugin_ValidatorBaseForFace::isValid(const std::shared_ptr<ModelAPI_Fe
       }
       aShape = aSelection->context()->shape();
     }
+    if (aShape->shapeType() == GeomAPI_Shape::FACE) {
+      // skip faces exploding
+      hasFaces = true;
+      continue;
+    }
+
     for(GeomAPI_ShapeExplorer anExp(aShape, GeomAPI_Shape::EDGE); anExp.more(); anExp.next()) {
+      hasEdgesOrWires = true;
       GeomShapePtr anEdge = anExp.current();
       anEdges.push_back(anEdge);
     }
   }
 
-  if(anEdges.empty()) {
+  if (hasFaces && hasEdgesOrWires) {
+    theError = "Faces and edges/wires should be selected together.";
+    return false;
+  } else if (hasEdgesOrWires && anEdges.empty()) {
     theError = "Objects are not selected.";
     return false;
   }
@@ -235,20 +242,22 @@ bool BuildPlugin_ValidatorBaseForFace::isValid(const std::shared_ptr<ModelAPI_Fe
     }
   }
 
-  // Check that they are planar.
-  std::shared_ptr<GeomAPI_Pln> aPln = GeomAlgoAPI_ShapeTools::findPlane(anEdges);
-  if(!aPln.get()) {
-    theError = "Selected object(s) should belong to only one plane.";
-    return false;
-  }
+  if (!anEdges.empty()) {
+    // Check that they are planar.
+    std::shared_ptr<GeomAPI_Pln> aPln = GeomAlgoAPI_ShapeTools::findPlane(anEdges);
+    if(!aPln.get()) {
+      theError = "Selected object(s) should belong to only one plane.";
+      return false;
+    }
 
-  // Check that selected objects have closed contours.
-  ListOfShape aFaces;
-  GeomAlgoAPI_SketchBuilder::createFaces(aPln->location(), aPln->xDirection(),
-                                         aPln->direction(), anEdges, aFaces);
-  if(aFaces.empty()) {
-    theError = "Selected objects do not generate closed contour.";
-    return false;
+    // Check that selected objects have closed contours.
+    ListOfShape aFaces;
+    GeomAlgoAPI_SketchBuilder::createFaces(aPln->location(), aPln->xDirection(),
+                                           aPln->direction(), anEdges, aFaces);
+    if(aFaces.empty()) {
+      theError = "Selected objects do not generate closed contour.";
+      return false;
+    }
   }
 
   return true;

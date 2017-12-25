@@ -23,8 +23,8 @@ email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com
   <multi_selector id="base_objects"
                   label="Faces and shells:"
                   tooltip="Select faces or shells objects."
-                  type_choice="objects"
+                  type_choice="faces shells"
                   concealment="true">
-    <validator id="GeomValidators_ShapeType" parameters="face,shell"/>
+    <validator id="BuildPlugin_ValidatorBaseForBuild" parameters="face,shell"/>
   </multi_selector>
 </source>

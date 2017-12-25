@@ -59,6 +59,7 @@ void BuildPlugin_Face::execute()
 
   // Collect base shapes.
   ListOfShape anEdges;
+  ListOfShape anOriginalFaces;
   std::list< std::shared_ptr<GeomAPI_Dir> > aListOfNormals;
   for(int anIndex = 0; anIndex < aSelectionList->size(); ++anIndex) {
     AttributeSelectionPtr aSelection = aSelectionList->value(anIndex);
@@ -67,6 +68,12 @@ void BuildPlugin_Face::execute()
     if(!aShape.get()) {
       aShape = aContext;
     }
+    // keep selected faces "as is"
+    if (aShape->shapeType() == GeomAPI_Shape::FACE) {
+      anOriginalFaces.push_back(aShape);
+      continue;
+    }
+
     for(GeomAPI_ShapeExplorer anExp(aShape, GeomAPI_Shape::EDGE); anExp.more(); anExp.next()) {
       GeomShapePtr anEdge = anExp.current();
       anEdges.push_back(anEdge);
@@ -79,39 +86,13 @@ void BuildPlugin_Face::execute()
       aListOfNormals.push_back(aSketch->norm());
   }
 
-  // Get plane.
-  std::shared_ptr<GeomAPI_Pln> aPln = GeomAlgoAPI_ShapeTools::findPlane(anEdges);
-  std::shared_ptr<GeomAPI_Dir> aNormal = aPln->direction();
-  bool isReverse = !aListOfNormals.empty();
-  std::list< std::shared_ptr<GeomAPI_Dir> >::const_iterator aNormIt = aListOfNormals.begin();
-  for (; aNormIt != aListOfNormals.end() && isReverse; ++aNormIt)
-    if ((*aNormIt)->dot(aNormal) > 1.e-7)
-      isReverse = false;
-  if (isReverse) {
-    aNormal->reverse();
-    aPln = std::shared_ptr<GeomAPI_Pln>(new GeomAPI_Pln(aPln->location(), aNormal));
-  }
-
-  // Get faces.
+  // Build faces by edges.
   ListOfShape aFaces;
-  GeomAlgoAPI_SketchBuilder::createFaces(aPln->location(), aPln->xDirection(),
-                                         aPln->direction(), anEdges, aFaces);
+  if (!anEdges.empty())
+    buildFacesByEdges(anEdges, aListOfNormals, aFaces);
 
-  // Get wires from faces.
-  ListOfShape aWires;
-  for(ListOfShape::const_iterator anIt = aFaces.cbegin(); anIt != aFaces.cend(); ++anIt) {
-    aWires.push_back(GeomAlgoAPI_ShapeTools::getFaceOuterWire(*anIt));
-    //for(GeomAPI_ShapeExplorer anExp(*anIt, GeomAPI_Shape::WIRE); anExp.more(); anExp.next()) {
-    //  if(anExp.current()->orientation() == GeomAPI_Shape::REVERSED) {
-    //    continue;
-    //  }
-    //  aWires.push_back(anExp.current());
-    //}
-  }
-
-  // Make faces with holes.
-  aFaces.clear();
-  GeomAlgoAPI_ShapeTools::makeFacesWithHoles(aPln->location(), aPln->direction(), aWires, aFaces);
+  // Add faces selected by user.
+  aFaces.insert(aFaces.end(), anOriginalFaces.begin(), anOriginalFaces.end());
 
   // Store result.
   int anIndex = 0;
@@ -135,4 +116,37 @@ void BuildPlugin_Face::execute()
   }
 
   removeResults(anIndex);
+}
+
+void BuildPlugin_Face::buildFacesByEdges(
+    const ListOfShape& theEdges,
+    const std::list< std::shared_ptr<GeomAPI_Dir> >& theNormals,
+    ListOfShape& theFaces) const
+{
+  // Get plane.
+  std::shared_ptr<GeomAPI_Pln> aPln = GeomAlgoAPI_ShapeTools::findPlane(theEdges);
+  std::shared_ptr<GeomAPI_Dir> aNormal = aPln->direction();
+  bool isReverse = !theNormals.empty();
+  std::list< std::shared_ptr<GeomAPI_Dir> >::const_iterator aNormIt = theNormals.begin();
+  for (; aNormIt != theNormals.end() && isReverse; ++aNormIt)
+    if ((*aNormIt)->dot(aNormal) > 1.e-7)
+      isReverse = false;
+  if (isReverse) {
+    aNormal->reverse();
+    aPln = std::shared_ptr<GeomAPI_Pln>(new GeomAPI_Pln(aPln->location(), aNormal));
+  }
+
+  // Get faces.
+  GeomAlgoAPI_SketchBuilder::createFaces(aPln->location(), aPln->xDirection(),
+                                         aPln->direction(), theEdges, theFaces);
+
+  // Get wires from faces.
+  ListOfShape aWires;
+  for(ListOfShape::const_iterator anIt = theFaces.cbegin(); anIt != theFaces.cend(); ++anIt)
+    aWires.push_back(GeomAlgoAPI_ShapeTools::getFaceOuterWire(*anIt));
+
+  // Make faces with holes.
+  theFaces.clear();
+  GeomAlgoAPI_ShapeTools::makeFacesWithHoles(aPln->location(), aPln->direction(),
+                                             aWires, theFaces);
 }

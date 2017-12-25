@@ -98,5 +98,30 @@ aSession.finishOperation()
 # Test results
 assert (len(aShellFeature.results()) > 0)
 
+# Test shell building on set of faces from another result
+
+# Cylinder
+aSession.startOperation()
+aCylinder = aPart.addFeature("Cylinder")
+aCylinder.string("CreationMethod").setValue("Cylinder")
+aCylinder.selection("base_point").selectSubShape("VERTEX", "PartSet/Origin")
+aCylinder.selection("axis").selectSubShape("EDGE", "PartSet/OZ")
+aCylinder.real("radius").setValue(25)
+aCylinder.real("height").setValue(50)
+aSession.finishOperation()
+aCylinderResult = aCylinder.firstResult()
+aCylinderShape = aCylinderResult.shape()
+
+# Create shell
+aSession.startOperation()
+aShellFeature2 = aPart.addFeature("Shell")
+aBaseObjectsList = aShellFeature2.selectionList("base_objects")
+aBaseObjectsList.append("Cylinder_1_1/Face_1", "FACE")
+aBaseObjectsList.append("Cylinder_1_1/Face_3", "FACE")
+aSession.finishOperation()
+
+# Test results
+assert (len(aShellFeature2.results()) > 0)
+
 from salome.shaper import model
 assert(model.checkPythonDump())
