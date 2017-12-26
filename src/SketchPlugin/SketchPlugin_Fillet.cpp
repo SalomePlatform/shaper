@@ -24,6 +24,7 @@
 #include "SketchPlugin_Line.h"
 #include "SketchPlugin_Point.h"
 #include "SketchPlugin_Sketch.h"
+#include "SketchPlugin_ConstraintDistance.h"
 #include "SketchPlugin_ConstraintEqual.h"
 #include "SketchPlugin_ConstraintCoincidence.h"
 #include "SketchPlugin_ConstraintLength.h"
@@ -32,6 +33,8 @@
 #include "SketchPlugin_ConstraintRadius.h"
 #include "SketchPlugin_Tools.h"
 
+#include <ModelAPI_AttributeDouble.h>
+#include <ModelAPI_AttributeInteger.h>
 #include <ModelAPI_AttributeRefAttr.h>
 #include <ModelAPI_Data.h>
 #include <ModelAPI_Events.h>
@@ -102,32 +105,30 @@ void SketchPlugin_Fillet::execute()
   // create feature for fillet arc
   FeaturePtr aFilletArc = createFilletArc();
 
-  // Delete features with refs to points of edges.
-  std::shared_ptr<GeomDataAPI_Point2D> aStartPoint1;
-  int aFeatInd1 = myIsReversed ? 1 : 0;
-  int anAttrInd1 = (myIsReversed ? 2 : 0) + (myIsNotInversed[aFeatInd1] ? 0 : 1);
-  aStartPoint1 = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
-      myBaseFeatures[aFeatInd1]->attribute(myFeatAttributes[anAttrInd1]));
-  std::set<FeaturePtr> aFeaturesToBeRemoved1 =
-    findFeaturesToRemove(myBaseFeatures[aFeatInd1], aStartPoint1);
+  // collect features referred to the edges participating in fillet
+  AttributePoint2DPtr aFilletPoints[2];
+  int aFeatInd[2];
+  int anAttrInd[2];
+  std::set<FeaturePtr> aFeaturesToBeRemoved;
+  for (int i = 0; i < 2; ++i) {
+    bool isFirstIndex = (i == 0);
+    aFeatInd[i] = myIsReversed == isFirstIndex ? 1 : 0;
+    anAttrInd[i] = (myIsReversed == isFirstIndex ? 2 : 0) + (myIsNotInversed[aFeatInd[i]] ? 0 : 1);
+    aFilletPoints[i] = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
+        myBaseFeatures[aFeatInd[i]]->attribute(myFeatAttributes[anAttrInd[i]]));
+    std::set<FeaturePtr> aRemove =
+        findFeaturesToRemove(myBaseFeatures[aFeatInd[i]], aFilletPoints[i]);
+    aFeaturesToBeRemoved.insert(aRemove.begin(), aRemove.end());
+  }
 
-  std::shared_ptr<GeomDataAPI_Point2D> aStartPoint2;
-  int aFeatInd2 = myIsReversed ? 0 : 1;
-  int anAttrInd2 = (myIsReversed ? 0 : 2) + (myIsNotInversed[aFeatInd2] ? 0 : 1);
-  aStartPoint2 = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
-      myBaseFeatures[aFeatInd2]->attribute(myFeatAttributes[anAttrInd2]));
-  std::set<FeaturePtr> aFeaturesToBeRemoved2 =
-    findFeaturesToRemove(myBaseFeatures[aFeatInd2], aStartPoint2);
-
-  aFeaturesToBeRemoved1.insert(aFeaturesToBeRemoved2.begin(), aFeaturesToBeRemoved2.end());
-  ModelAPI_Tools::removeFeaturesAndReferences(aFeaturesToBeRemoved1);
-  Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_DELETED));
+  // keep "distance" constraints and remove all other references
+  removeReferencesButKeepDistances(aFeaturesToBeRemoved, aFilletPoints);
 
   // Update fillet edges.
   recalculateAttributes(aFilletArc, SketchPlugin_Arc::START_ID(),
-                        myBaseFeatures[aFeatInd1], myFeatAttributes[anAttrInd1]);
+                        myBaseFeatures[aFeatInd[0]], myFeatAttributes[anAttrInd[0]]);
   recalculateAttributes(aFilletArc, SketchPlugin_Arc::END_ID(),
-                        myBaseFeatures[aFeatInd2], myFeatAttributes[anAttrInd2]);
+                        myBaseFeatures[aFeatInd[1]], myFeatAttributes[anAttrInd[1]]);
 
   FeaturePtr aConstraint;
 
@@ -135,12 +136,12 @@ void SketchPlugin_Fillet::execute()
   aConstraint = SketchPlugin_Tools::createConstraint(sketch(),
                     SketchPlugin_ConstraintCoincidence::ID(),
                     aFilletArc->attribute(SketchPlugin_Arc::START_ID()),
-                    myBaseFeatures[aFeatInd1]->attribute(myFeatAttributes[anAttrInd1]));
+                    myBaseFeatures[aFeatInd[0]]->attribute(myFeatAttributes[anAttrInd[0]]));
   ModelAPI_EventCreator::get()->sendUpdated(aConstraint, anUpdateEvent);
   aConstraint = SketchPlugin_Tools::createConstraint(sketch(),
                     SketchPlugin_ConstraintCoincidence::ID(),
                     aFilletArc->attribute(SketchPlugin_Arc::END_ID()),
-                    myBaseFeatures[aFeatInd2]->attribute(myFeatAttributes[anAttrInd2]));
+                    myBaseFeatures[aFeatInd[1]]->attribute(myFeatAttributes[anAttrInd[1]]));
   ModelAPI_EventCreator::get()->sendUpdated(aConstraint, anUpdateEvent);
 
   // Create tangent features.
@@ -154,9 +155,8 @@ void SketchPlugin_Fillet::execute()
   }
 
   // Send events to update the sub-features by the solver.
-  if(isUpdateFlushed) {
+  if (isUpdateFlushed)
     Events_Loop::loop()->setFlushed(anUpdateEvent, true);
-  }
 }
 
 AISObjectPtr SketchPlugin_Fillet::getAISObject(AISObjectPtr thePrevious)
@@ -324,6 +324,143 @@ FeaturePtr SketchPlugin_Fillet::createFilletArc()
   aFilletArc->execute();
 
   return aFilletArc;
+}
+
+FeaturePtr SketchPlugin_Fillet::createFilletApex(const GeomPnt2dPtr& theCoordinates)
+{
+  FeaturePtr anApex = sketch()->addFeature(SketchPlugin_Point::ID());
+  AttributePoint2DPtr aCoord = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
+      anApex->attribute(SketchPlugin_Point::COORD_ID()));
+  aCoord->setValue(theCoordinates);
+
+  // additional coincidence constraints
+  static Events_ID anUpdateEvent = Events_Loop::eventByName(EVENT_OBJECT_UPDATED);
+  FeaturePtr aConstraint;
+  for (int i = 0; i < 2; i++) {
+    aConstraint = SketchPlugin_Tools::createConstraint(sketch(),
+                      SketchPlugin_ConstraintCoincidence::ID(),
+                      aCoord,
+                      myBaseFeatures[i]->lastResult());
+    aConstraint->execute();
+    ModelAPI_EventCreator::get()->sendUpdated(aConstraint, anUpdateEvent);
+  }
+
+  return anApex;
+}
+
+void SketchPlugin_Fillet::removeReferencesButKeepDistances(
+    std::set<FeaturePtr>& theFeaturesToRemove,
+    const AttributePoint2DPtr theFilletPoints[2])
+{
+  FeaturePtr aFilletApex;
+  struct Length {
+    AttributePtr myPoints[2];
+    std::string myValueText;
+    double myValueDouble;
+    GeomPnt2dPtr myFlyoutPoint;
+    int myLocationType;
+  };
+  std::list<Length> aLengthToDistance;
+
+  std::set<FeaturePtr>::iterator aFeat = theFeaturesToRemove.begin();
+  while (aFeat != theFeaturesToRemove.end()) {
+    std::shared_ptr<SketchPlugin_ConstraintDistance> aDistance =
+        std::dynamic_pointer_cast<SketchPlugin_ConstraintDistance>(*aFeat);
+    if (aDistance) {
+      if (!aFilletApex)
+        aFilletApex = createFilletApex(theFilletPoints[0]->pnt());
+      // update attributes of distance constraints
+      bool isUpdated = false;
+      for (int attrInd = 0; attrInd < CONSTRAINT_ATTR_SIZE && !isUpdated; ++attrInd) {
+        AttributeRefAttrPtr aRefAttr =
+            aDistance->refattr(SketchPlugin_Constraint::ATTRIBUTE(attrInd));
+        if (aRefAttr && !aRefAttr->isObject() &&
+           (aRefAttr->attr() == theFilletPoints[0] || aRefAttr->attr() == theFilletPoints[1])) {
+          aRefAttr->setAttr(aFilletApex->attribute(SketchPlugin_Point::COORD_ID()));
+          isUpdated = true;
+        }
+      }
+      // avoid distance from removing if it is updated
+      std::set<FeaturePtr>::iterator aKeepIt = aFeat++;
+      if (isUpdated)
+        theFeaturesToRemove.erase(aKeepIt);
+
+    } else {
+      std::shared_ptr<SketchPlugin_ConstraintLength> aLength =
+          std::dynamic_pointer_cast<SketchPlugin_ConstraintLength>(*aFeat);
+      if (aLength) {
+        if (!aFilletApex)
+          aFilletApex = createFilletApex(theFilletPoints[0]->pnt());
+        // remove Length, but create new distance constraint
+        AttributeRefAttrPtr aRefAttr =
+          aLength->refattr(SketchPlugin_Constraint::ENTITY_A());
+        FeaturePtr aLine = ModelAPI_Feature::feature(aRefAttr->object());
+        if (aLine) {
+          aLengthToDistance.push_back(Length());
+          Length& aNewLength = aLengthToDistance.back();
+          // main attrbutes
+          for (int i = 0; i < 2; ++i) {
+            AttributePtr anAttr = aLine->attribute(
+                i == 0 ? SketchPlugin_Line::START_ID() : SketchPlugin_Line::END_ID());
+            if (anAttr == theFilletPoints[0] || anAttr == theFilletPoints[1])
+              aNewLength.myPoints[i] = aFilletApex->attribute(SketchPlugin_Point::COORD_ID());
+            else
+              aNewLength.myPoints[i] = anAttr;
+          }
+          // value
+          AttributeDoublePtr aValue = aLength->real(SketchPlugin_Constraint::VALUE());
+          aNewLength.myValueDouble = aValue->value();
+          aNewLength.myValueText = aValue->text();
+          // auxiliary attributes
+          AttributePoint2DPtr aFlyoutAttr = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
+              aLength->attribute(SketchPlugin_ConstraintLength::FLYOUT_VALUE_PNT()));
+          if (aFlyoutAttr && aFlyoutAttr->isInitialized())
+            aNewLength.myFlyoutPoint = aFlyoutAttr->pnt();
+          AttributeIntegerPtr aLocationAttr =
+              aLength->integer(SketchPlugin_ConstraintLength::LOCATION_TYPE_ID());
+          if (aLocationAttr && aLocationAttr->isInitialized())
+            aNewLength.myLocationType = aLocationAttr->value();
+          else
+            aNewLength.myLocationType = -1;
+        }
+      }
+
+      ++aFeat;
+    }
+  }
+
+  // remove references
+  ModelAPI_Tools::removeFeaturesAndReferences(theFeaturesToRemove);
+  Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_DELETED));
+
+  // restore Length constraints as point-point distances
+  FeaturePtr aConstraint;
+  std::list<Length>::iterator anIt = aLengthToDistance.begin();
+  for (; anIt != aLengthToDistance.end(); ++anIt) {
+    aConstraint = SketchPlugin_Tools::createConstraint(sketch(),
+        SketchPlugin_ConstraintDistance::ID(), anIt->myPoints[0], anIt->myPoints[1]);
+    // set value
+    AttributeDoublePtr aValue = aConstraint->real(SketchPlugin_Constraint::VALUE());
+    if (anIt->myValueText.empty())
+      aValue->setValue(anIt->myValueDouble);
+    else
+      aValue->setText(anIt->myValueText);
+    // set flyout point if exists
+    if (anIt->myFlyoutPoint) {
+      AttributePoint2DPtr aFlyoutAttr = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
+          aConstraint->attribute(SketchPlugin_ConstraintDistance::FLYOUT_VALUE_PNT()));
+      aFlyoutAttr->setValue(anIt->myFlyoutPoint);
+    }
+    // set location type if initialized
+    if (anIt->myLocationType >= 0) {
+      AttributeIntegerPtr aLocationType =
+          aConstraint->integer(SketchPlugin_ConstraintDistance::LOCATION_TYPE_ID());
+      aLocationType->setValue(anIt->myLocationType);
+    }
+    aConstraint->execute();
+    ModelAPI_EventCreator::get()->sendUpdated(aConstraint,
+        Events_Loop::eventByName(EVENT_OBJECT_UPDATED));
+  }
 }
 
 // =========   Auxiliary functions   =================

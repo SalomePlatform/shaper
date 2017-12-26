@@ -27,6 +27,7 @@
 from GeomAPI import *
 from GeomDataAPI import *
 from ModelAPI import *
+from SketchAPI import *
 import math
 import unittest
 from salome.shaper import model
@@ -421,7 +422,7 @@ class TestFilletInteracting(unittest.TestCase):
     model.do()
     self.checkDOF()
     self.mySketch.setFillet(aSketchLineA.startPoint())
-    self.myDOF += 2
+    self.myDOF += 1
     model.do()
     self.checkFillet()
     self.checkDOF()
@@ -429,9 +430,10 @@ class TestFilletInteracting(unittest.TestCase):
     self.collectFeatures()
     self.checkNbFeatures("SketchLine", 2)
     self.checkNbFeatures("SketchArc", 1)
-    self.checkNbFeatures("SketchConstraintCoincidence", 2)
+    self.checkNbFeatures("SketchConstraintCoincidence", 4) # Additionally 2 coincidences for apex with fillet objects
     self.checkNbFeatures("SketchConstraintTangent", 2)
     self.checkNbFeatures("SketchConstraintLength", 0) # Length constraint expected to be removed
+    self.checkNbFeatures("SketchConstraintDistance", 1) # Distance constraint should appear instead of Length
     self.checkNbFeatures("SketchFillet", 0)
 
     model.testNbSubShapes(self.mySketch, GeomAPI_Shape.FACE, [0])
@@ -474,24 +476,40 @@ class TestFilletInteracting(unittest.TestCase):
   def test_fillet_with_distance(self):
     """ Test 12. Fillet on two connected lines in case of Distance constraint applied
     """
-    aSketchLineA = self.mySketch.addLine(10., 10., 20., 10.)
-    aSketchLineB = self.mySketch.addLine(10., 10., 10., 20.)
-    self.myDOF += 8
+    aSketchLineA = self.mySketch.addLine(20, 20, 70, 20)
+    aSketchLineB = self.mySketch.addLine(70, 20, 70, 53.16624790355412)
+    aSketchLineC = self.mySketch.addLine(70, 53.16624790355412, 20, 20)
+    self.myDOF += 12
+    model.do()
     self.checkDOF()
-    self.mySketch.setCoincident(aSketchLineA.startPoint(), aSketchLineB.startPoint())
+    # coincidences
+    self.mySketch.setCoincident(aSketchLineA.endPoint(), aSketchLineB.startPoint())
+    self.mySketch.setCoincident(aSketchLineB.endPoint(), aSketchLineC.startPoint())
+    self.mySketch.setCoincident(aSketchLineA.startPoint(), aSketchLineC.endPoint())
+    self.myDOF -= 6
+    model.do()
+    self.checkDOF()
+    # other constraints
+    self.mySketch.setHorizontal(aSketchLineA.result())
+    self.mySketch.setVertical(aSketchLineB.result())
     self.myDOF -= 2
     model.do()
     self.checkDOF()
-    # third line to apply Distance constraints
-    aSketchLineC = self.mySketch.addLine(10., 0., 20., 5.)
-    self.myDOF += 4
-    self.mySketch.setDistance(aSketchLineB.startPoint(), aSketchLineC.result(), 10.)
-    self.mySketch.setDistance(aSketchLineB.endPoint(), aSketchLineC.result(), 5.)
-    self.myDOF -= 2
+    # construction point
+    aProjection = self.mySketch.addProjection(model.selection("VERTEX", "Origin"), False)
+    aSketchPoint = SketchAPI_Point(aProjection.createdFeature())
+    model.do()
+    # distances
+    self.mySketch.setLength(aSketchLineA.result(), 50)
+    self.mySketch.setDistance(aSketchLineA.startPoint(), aSketchLineC.startPoint(), 60, True)
+    self.mySketch.setHorizontalDistance(aSketchPoint.coordinates(), aSketchLineA.startPoint(), 20)
+    self.mySketch.setVerticalDistance(aSketchPoint.coordinates(), aSketchLineC.endPoint(), 20)
+    self.myDOF -= 4
     model.do()
     self.checkDOF()
+
     self.mySketch.setFillet(aSketchLineA.startPoint())
-    self.myDOF += 2 # Distance has been removed
+    self.myDOF += 1
     model.do()
     self.checkFillet()
     self.checkDOF()
@@ -499,9 +517,14 @@ class TestFilletInteracting(unittest.TestCase):
     self.collectFeatures()
     self.checkNbFeatures("SketchLine", 3)
     self.checkNbFeatures("SketchArc", 1)
-    self.checkNbFeatures("SketchConstraintCoincidence", 2)
+    self.checkNbFeatures("SketchConstraintCoincidence", 6) # Additionally 2 coincidences for apex with fillet objects
+    self.checkNbFeatures("SketchConstraintHorizontal", 1)
+    self.checkNbFeatures("SketchConstraintVertical", 1)
     self.checkNbFeatures("SketchConstraintTangent", 2)
-    self.checkNbFeatures("SketchConstraintDistance", 1) # only one Distance should be left
+    self.checkNbFeatures("SketchConstraintLength", 0) # Length translated to Distance
+    self.checkNbFeatures("SketchConstraintDistance", 2) # Length translated to Distance
+    self.checkNbFeatures("SketchConstraintDistanceHorizontal", 1)
+    self.checkNbFeatures("SketchConstraintDistanceVertical", 1)
     self.checkNbFeatures("SketchFillet", 0)
 
     model.testNbSubShapes(self.mySketch, GeomAPI_Shape.FACE, [0])

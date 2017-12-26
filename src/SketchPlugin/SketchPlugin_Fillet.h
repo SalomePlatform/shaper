@@ -86,7 +86,16 @@ private:
   /// Create new feature presenting a fillet arc and initialize its parameters
   FeaturePtr createFilletArc();
 
-  void createCoincidenceWithFilletArc();
+  /// Create point representing fillet apex and additional coincidences with fillet features
+  FeaturePtr createFilletApex(const std::shared_ptr<GeomAPI_Pnt2d>& theCoordinates);
+
+  /// Remove references to a feature participating in fillet,
+  /// but transfer "distance" constraints to features after fillet
+  /// \param[in, out] theFeaturesToRemove  features referred to fillet edges
+  ///                 (all distances will be processed and removed from this list)
+  /// \param[in]      theFilletPoints      fillet points from participating features
+  void  removeReferencesButKeepDistances(std::set<FeaturePtr>& theFeaturesToRemove,
+                                         const AttributePoint2DPtr theFilletPoints[2]);
 
   bool findFeaturesContainingFilletPoint(std::shared_ptr<GeomDataAPI_Point2D> theFilletPoint);
 
