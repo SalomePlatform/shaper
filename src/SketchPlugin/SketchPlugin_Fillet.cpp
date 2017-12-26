@@ -348,18 +348,19 @@ FeaturePtr SketchPlugin_Fillet::createFilletApex(const GeomPnt2dPtr& theCoordina
   return anApex;
 }
 
+struct Length {
+  AttributePtr myPoints[2];
+  std::string myValueText;
+  double myValueDouble;
+  GeomPnt2dPtr myFlyoutPoint;
+  int myLocationType;
+};
+
 void SketchPlugin_Fillet::removeReferencesButKeepDistances(
     std::set<FeaturePtr>& theFeaturesToRemove,
     const AttributePoint2DPtr theFilletPoints[2])
 {
   FeaturePtr aFilletApex;
-  struct Length {
-    AttributePtr myPoints[2];
-    std::string myValueText;
-    double myValueDouble;
-    GeomPnt2dPtr myFlyoutPoint;
-    int myLocationType;
-  };
   std::list<Length> aLengthToDistance;
 
   std::set<FeaturePtr>::iterator aFeat = theFeaturesToRemove.begin();
