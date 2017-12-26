@@ -309,40 +309,40 @@ void SketchPlugin_MacroArc::execute()
   // Create constraints.
   std::string anArcType = string(ARC_TYPE())->value();
   if(anArcType == ARC_TYPE_BY_CENTER_AND_POINTS()) {
-    SketchPlugin_Tools::createConstraint(this,
+    SketchPlugin_Tools::createCoincidenceOrTangency(this,
                                          CENTER_POINT_REF_ID(),
                                          anArcFeature->attribute(SketchPlugin_Arc::CENTER_ID()),
                                          ObjectPtr(),
                                          false);
-    SketchPlugin_Tools::createConstraint(this,
+    SketchPlugin_Tools::createCoincidenceOrTangency(this,
                                          START_POINT_REF_ID(),
                                          anArcFeature->attribute(SketchPlugin_Arc::START_ID()),
                                          ObjectPtr(),
                                          false);
-    SketchPlugin_Tools::createConstraint(this,
+    SketchPlugin_Tools::createCoincidenceOrTangency(this,
                                          END_POINT_REF_ID(),
                                          anArcFeature->attribute(SketchPlugin_Arc::END_ID()),
                                          ObjectPtr(),
                                          false);
   } else if(anArcType == ARC_TYPE_BY_THREE_POINTS()) {
-    SketchPlugin_Tools::createConstraint(this,
+    SketchPlugin_Tools::createCoincidenceOrTangency(this,
                                          START_POINT_REF_ID(),
                                          anArcFeature->attribute(SketchPlugin_Arc::START_ID()),
                                          ObjectPtr(),
                                          false);
-    SketchPlugin_Tools::createConstraint(this,
+    SketchPlugin_Tools::createCoincidenceOrTangency(this,
                                          END_POINT_REF_ID(),
                                          anArcFeature->attribute(SketchPlugin_Arc::END_ID()),
                                          ObjectPtr(),
                                          false);
-    SketchPlugin_Tools::createConstraint(this,
+    SketchPlugin_Tools::createCoincidenceOrTangency(this,
                                          PASSED_POINT_REF_ID(),
                                          AttributePtr(),
                                          anArcFeature->lastResult(),
                                          true);
   } else if(anArcType == ARC_TYPE_BY_TANGENT_EDGE()) {
     // constraints for tangent arc
-    SketchPlugin_Tools::createConstraint(this,
+    SketchPlugin_Tools::createCoincidenceOrTangency(this,
                                          TANGENT_POINT_ID(),
                                          anArcFeature->attribute(SketchPlugin_Arc::START_ID()),
                                          ObjectPtr(),
@@ -355,7 +355,7 @@ void SketchPlugin_MacroArc::execute()
     AttributeRefAttrPtr aRefAttrB = aTangent->refattr(SketchPlugin_Constraint::ENTITY_B());
     aRefAttrB->setObject(anArcFeature->lastResult());
     // constraint for end point
-    SketchPlugin_Tools::createConstraint(this,
+    SketchPlugin_Tools::createCoincidenceOrTangency(this,
                                          END_POINT_REF_ID(),
                                          anArcFeature->attribute(SketchPlugin_Arc::END_ID()),
                                          ObjectPtr(),

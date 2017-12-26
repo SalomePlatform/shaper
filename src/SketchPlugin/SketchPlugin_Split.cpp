@@ -55,6 +55,7 @@
 #include <SketchPlugin_MultiRotation.h>
 #include <SketchPlugin_MultiTranslation.h>
 #include <SketchPlugin_Point.h>
+#include <SketchPlugin_Tools.h>
 
 #include <ModelGeomAlgo_Point2D.h>
 #include <ModelAPI_EventReentrantMessage.h>
@@ -64,7 +65,6 @@
 
 //#define CREATE_CONSTRAINTS
 
-//#define DEBUG_SPLIT
 #ifdef DEBUG_SPLIT
 #include <iostream>
 #endif
@@ -914,7 +914,8 @@ void SketchPlugin_Split::updateCoincidenceConstraintsToFeature(
     }
     if (aFeaturePointAttribute.get()) {
       // create new constraint and remove the current
-      aCoincFeature = createConstraint(SketchPlugin_ConstraintCoincidence::ID(),
+      aCoincFeature = SketchPlugin_Tools::createConstraint(sketch(),
+          SketchPlugin_ConstraintCoincidence::ID(),
           aFeaturePointAttribute, aCoincFeature->refattr(aSecondAttribute)->attr());
       theFeaturesToDelete.insert(aCIt->first);
       // create new coincidences to split feature points
@@ -923,7 +924,7 @@ void SketchPlugin_Split::updateCoincidenceConstraintsToFeature(
       for (; aSFIt != aSFLast; aSFIt++) {
         AttributePoint2DPtr aSFAttribute = *aSFIt;
         if (aCoincPnt->isEqual(aSFAttribute->pnt())) {
-          createConstraint(SketchPlugin_ConstraintCoincidence::ID(),
+          SketchPlugin_Tools::createConstraint(sketch(), SketchPlugin_ConstraintCoincidence::ID(),
                            aSFAttribute, aCoincFeature->refattr(aSecondAttribute)->attr());
         }
       }
@@ -1081,7 +1082,8 @@ FeaturePtr SketchPlugin_Split::splitLine(FeaturePtr& theSplitFeature,
                                              aFeature->attribute(SketchPlugin_Line::END_ID())));
       anNewFeature = aFeature;
     }
-    aConstraintFeature = createConstraint(SketchPlugin_ConstraintCoincidence::ID(),
+    aConstraintFeature = SketchPlugin_Tools::createConstraint(sketch(),
+                     SketchPlugin_ConstraintCoincidence::ID(),
                      theSplitFeature->attribute(SketchPlugin_Line::END_ID()),
                      aFeature->attribute(SketchPlugin_Line::START_ID()));
     theCreatedFeatures.insert(aConstraintFeature);
@@ -1110,7 +1112,8 @@ FeaturePtr SketchPlugin_Split::splitLine(FeaturePtr& theSplitFeature,
     fillAttribute(theBaseFeatureModified->attribute(SketchPlugin_Line::END_ID()),
                                                     aFirstPointAttrOfSplit);
     theBaseFeatureModified->execute(); // to update result
-    aConstraintFeature = createConstraint(SketchPlugin_ConstraintCoincidence::ID(),
+    aConstraintFeature = SketchPlugin_Tools::createConstraint(sketch(),
+                     SketchPlugin_ConstraintCoincidence::ID(),
                      theBaseFeatureModified->attribute(SketchPlugin_Line::END_ID()),
                      theSplitFeature->attribute(SketchPlugin_Line::START_ID()));
     theCreatedFeatures.insert(aConstraintFeature);
@@ -1126,14 +1129,16 @@ FeaturePtr SketchPlugin_Split::splitLine(FeaturePtr& theSplitFeature,
 
 #ifdef CREATE_CONSTRAINTS
   // additional constraints between split and base features
-  aConstraintFeature = createConstraintForObjects(SketchPlugin_ConstraintParallel::ID(),
-                                                       getFeatureResult(aBaseFeature),
-                                                       getFeatureResult(theSplitFeature));
+  aConstraintFeature = SketchPlugin_Tools::createConstraint(sketch(),
+          SketchPlugin_ConstraintParallel::ID(),
+          getFeatureResult(aBaseFeature),
+          getFeatureResult(theSplitFeature));
   theCreatedFeatures.insert(aConstraintFeature);
   if (theAfterFeature.get()) {
-    aConstraintFeature = createConstraintForObjects(SketchPlugin_ConstraintParallel::ID(),
-                                                    getFeatureResult(aBaseFeature),
-                                                    getFeatureResult(theAfterFeature));
+    aConstraintFeature = SketchPlugin_Tools::createConstraint(sketch(),
+          SketchPlugin_ConstraintParallel::ID(),
+          getFeatureResult(aBaseFeature),
+          getFeatureResult(theAfterFeature));
     theCreatedFeatures.insert(aConstraintFeature);
   }
 #endif
@@ -1220,7 +1225,8 @@ FeaturePtr SketchPlugin_Split::splitArc(FeaturePtr& theSplitFeature,
                                                   aFeature->attribute(SketchPlugin_Arc::END_ID())));
       anNewFeature = aFeature;
     }
-    aConstraintFeature = createConstraint(SketchPlugin_ConstraintCoincidence::ID(),
+    aConstraintFeature = SketchPlugin_Tools::createConstraint(sketch(),
+                     SketchPlugin_ConstraintCoincidence::ID(),
                      theSplitFeature->attribute(SketchPlugin_Arc::END_ID()),
                      aFeature->attribute(SketchPlugin_Arc::START_ID()));
     theCreatedFeatures.insert(aConstraintFeature);
@@ -1249,7 +1255,8 @@ FeaturePtr SketchPlugin_Split::splitArc(FeaturePtr& theSplitFeature,
     fillAttribute(theBaseFeatureModified->attribute(SketchPlugin_Arc::END_ID()),
                                                     aFirstPointAttrOfSplit);
     theBaseFeatureModified->execute(); // to update result
-    aConstraintFeature = createConstraint(SketchPlugin_ConstraintCoincidence::ID(),
+    aConstraintFeature = SketchPlugin_Tools::createConstraint(sketch(),
+                     SketchPlugin_ConstraintCoincidence::ID(),
                      theBaseFeatureModified->attribute(SketchPlugin_Arc::END_ID()),
                      theSplitFeature->attribute(SketchPlugin_Arc::START_ID()));
     theCreatedFeatures.insert(aConstraintFeature);
@@ -1265,22 +1272,26 @@ FeaturePtr SketchPlugin_Split::splitArc(FeaturePtr& theSplitFeature,
 
   // additional constraints between split and base features
 #ifdef CREATE_CONSTRAINTS
-  aConstraintFeature = createConstraintForObjects(SketchPlugin_ConstraintEqual::ID(),
-                                                       getFeatureResult(aBaseFeature),
-                                                       getFeatureResult(theSplitFeature));
+  aConstraintFeature = SketchPlugin_Tools::createConstraint(sketch(),
+          SketchPlugin_ConstraintEqual::ID(),
+          getFeatureResult(aBaseFeature),
+          getFeatureResult(theSplitFeature));
   theCreatedFeatures.insert(aConstraintFeature);
-  aConstraintFeature = createConstraintForObjects(SketchPlugin_ConstraintTangent::ID(),
-                                                       getFeatureResult(theSplitFeature),
-                                                       getFeatureResult(aBaseFeature));
+  aConstraintFeature = SketchPlugin_Tools::createConstraint(sketch(),
+          SketchPlugin_ConstraintTangent::ID(),
+          getFeatureResult(theSplitFeature),
+          getFeatureResult(aBaseFeature));
   theCreatedFeatures.insert(aConstraintFeature);
   if (theAfterFeature.get()) {
-    aConstraintFeature = createConstraintForObjects(SketchPlugin_ConstraintEqual::ID(),
-                                                    getFeatureResult(aBaseFeature),
-                                                    getFeatureResult(theAfterFeature));
+    aConstraintFeature = SketchPlugin_Tools::createConstraint(sketch(),
+                SketchPlugin_ConstraintEqual::ID(),
+                getFeatureResult(aBaseFeature),
+                getFeatureResult(theAfterFeature));
     theCreatedFeatures.insert(aConstraintFeature);
-    aConstraintFeature = createConstraintForObjects(SketchPlugin_ConstraintTangent::ID(),
-                                                    getFeatureResult(theSplitFeature),
-                                                    getFeatureResult(theAfterFeature));
+    aConstraintFeature = SketchPlugin_Tools::createConstraint(sketch(),
+                SketchPlugin_ConstraintTangent::ID(),
+                getFeatureResult(theSplitFeature),
+                getFeatureResult(theAfterFeature));
     theCreatedFeatures.insert(aConstraintFeature);
   }
 #endif
@@ -1344,19 +1355,22 @@ FeaturePtr SketchPlugin_Split::splitCircle(FeaturePtr& theSplitFeature,
                              (theBaseFeatureModified->attribute(SketchPlugin_Arc::END_ID())));
 
   // additional constraints between split and base features
-  aConstraintFeature = createConstraint(SketchPlugin_ConstraintCoincidence::ID(),
+  aConstraintFeature = SketchPlugin_Tools::createConstraint(sketch(),
+                     SketchPlugin_ConstraintCoincidence::ID(),
                      theBaseFeatureModified->attribute(SketchPlugin_Arc::END_ID()),
                      theSplitFeature->attribute(SketchPlugin_Arc::END_ID()));
   theCreatedFeatures.insert(aConstraintFeature);
-  aConstraintFeature = createConstraint(SketchPlugin_ConstraintCoincidence::ID(),
+  aConstraintFeature = SketchPlugin_Tools::createConstraint(sketch(),
+                     SketchPlugin_ConstraintCoincidence::ID(),
                      theBaseFeatureModified->attribute(SketchPlugin_Arc::START_ID()),
                      theSplitFeature->attribute(SketchPlugin_Arc::START_ID()));
   theCreatedFeatures.insert(aConstraintFeature);
 
 #ifdef CREATE_CONSTRAINTS
-  aConstraintFeature = createConstraintForObjects(SketchPlugin_ConstraintTangent::ID(),
-                                                       getFeatureResult(theSplitFeature),
-                                                       getFeatureResult(theBaseFeatureModified));
+  aConstraintFeature = SketchPlugin_Tools::createConstraint(sketch(),
+                     SketchPlugin_ConstraintTangent::ID(),
+                     getFeatureResult(theSplitFeature),
+                     getFeatureResult(theBaseFeatureModified));
   theCreatedFeatures.insert(aConstraintFeature);
 #endif
   return anNewFeature;
@@ -1501,39 +1515,6 @@ FeaturePtr SketchPlugin_Split::createArcFeature(const FeaturePtr& theBaseFeature
   aFeature->execute(); // to obtain result
 
   return aFeature;
-}
-
-FeaturePtr SketchPlugin_Split::createConstraint(const std::string& theConstraintId,
-                                                    const AttributePtr& theFirstAttribute,
-                                                    const AttributePtr& theSecondAttribute)
-{
-  FeaturePtr aConstraint = sketch()->addFeature(theConstraintId);
-  AttributeRefAttrPtr aRefAttr = std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(
-                                 aConstraint->attribute(SketchPlugin_Constraint::ENTITY_A()));
-  aRefAttr->setAttr(theFirstAttribute);
-
-  aRefAttr = std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(
-                                 aConstraint->attribute(SketchPlugin_Constraint::ENTITY_B()));
-  aRefAttr->setAttr(theSecondAttribute);
-
-  return aConstraint;
-}
-
-FeaturePtr SketchPlugin_Split::createConstraintForObjects(
-                                                    const std::string& theConstraintId,
-                                                    const ObjectPtr& theFirstObject,
-                                                    const ObjectPtr& theSecondObject)
-{
-  FeaturePtr aConstraint = sketch()->addFeature(theConstraintId);
-  AttributeRefAttrPtr aRefAttr = std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(
-                                 aConstraint->attribute(SketchPlugin_Constraint::ENTITY_A()));
-  aRefAttr->setObject(theFirstObject);
-
-  aRefAttr = std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(
-                                 aConstraint->attribute(SketchPlugin_Constraint::ENTITY_B()));
-  aRefAttr->setObject(theSecondObject);
-
-  return aConstraint;
 }
 
 void SketchPlugin_Split::updateFeaturesAfterSplit(

@@ -193,14 +193,14 @@ std::string SketchPlugin_MacroEllipse::processEvent(
 void SketchPlugin_MacroEllipse::constraintsForEllipse(FeaturePtr theEllipseFeature)
 {
   // Create constraints.
-  SketchPlugin_Tools::createConstraint(
+  SketchPlugin_Tools::createCoincidenceOrTangency(
       this, CENTER_POINT_REF_ID(),
       theEllipseFeature->attribute(SketchPlugin_Ellipse::CENTER_ID()),
       ObjectPtr(), false);
-  SketchPlugin_Tools::createConstraint(
+  SketchPlugin_Tools::createCoincidenceOrTangency(
       this, MAJOR_AXIS_POINT_REF_ID(), AttributePtr(),
       theEllipseFeature->lastResult(), true);
-  SketchPlugin_Tools::createConstraint(
+  SketchPlugin_Tools::createCoincidenceOrTangency(
       this, PASSED_POINT_REF_ID(), AttributePtr(),
       theEllipseFeature->lastResult(), true);
 }

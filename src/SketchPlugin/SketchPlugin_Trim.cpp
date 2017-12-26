@@ -45,7 +45,6 @@
 #include <SketchPlugin_Circle.h>
 #include <SketchPlugin_ConstraintCoincidence.h>
 #include <SketchPlugin_ConstraintEqual.h>
-//#include <SketchPlugin_ConstraintParallel.h>
 #include <SketchPlugin_ConstraintTangent.h>
 #include <SketchPlugin_ConstraintLength.h>
 #include <SketchPlugin_ConstraintMirror.h>
@@ -55,6 +54,7 @@
 #include <SketchPlugin_MultiTranslation.h>
 #include <SketchPlugin_Point.h>
 #include <SketchPlugin_Projection.h>
+#include <SketchPlugin_Tools.h>
 
 #include <ModelAPI_EventReentrantMessage.h>
 
@@ -67,9 +67,6 @@
 #include <Events_Loop.h>
 
 #include <cmath>
-
-//#define DEBUG_TRIM_METHODS
-//#define DEBUG_TRIM
 
 #ifdef DEBUG_TRIM
 #include <iostream>
@@ -362,8 +359,8 @@ void SketchPlugin_Trim::execute()
     const std::list<ObjectPtr>& anObjects = anInfo.second;
     for (std::list<ObjectPtr>::const_iterator anObjectIt = anObjects.begin();
       anObjectIt != anObjects.end(); anObjectIt++) {
-      createConstraintToObject(SketchPlugin_ConstraintCoincidence::ID(), aPointAttribute,
-                               *anObjectIt);
+      SketchPlugin_Tools::createConstraint(sketch(), SketchPlugin_ConstraintCoincidence::ID(),
+                                           aPointAttribute, *anObjectIt);
     }
   }
 
@@ -553,7 +550,8 @@ bool SketchPlugin_Trim::setCoincidenceToAttribute(const AttributePtr& theAttribu
     std::shared_ptr<GeomAPI_Pnt2d> aPoint2d = aPointAttribute->pnt();
     if (aPoint2d->isEqual(aRefPnt2d)) {
       // create new coincidence and then remove the old one
-      createConstraint(SketchPlugin_ConstraintCoincidence::ID(), aRefPointAttr, aPointAttribute);
+      SketchPlugin_Tools::createConstraint(sketch(), SketchPlugin_ConstraintCoincidence::ID(),
+                                           aRefPointAttr, aPointAttribute);
       theFeaturesToDelete.insert(aFeature);
     }
   }
@@ -964,10 +962,9 @@ FeaturePtr SketchPlugin_Trim::trimLine(const std::shared_ptr<GeomAPI_Pnt2d>& the
                                (aBaseFeature->attribute(aModifiedAttribute)));
 
     // Collinear constraint for lines
-    createConstraintForObjects(SketchPlugin_ConstraintCollinear::ID(),
-                               getFeatureResult(aBaseFeature),
-                               getFeatureResult(anNewFeature));
-
+    SketchPlugin_Tools::createConstraint(sketch(), SketchPlugin_ConstraintCollinear::ID(),
+                                         getFeatureResult(aBaseFeature),
+                                         getFeatureResult(anNewFeature));
   }
   return anNewFeature;
 }
@@ -1049,13 +1046,13 @@ FeaturePtr SketchPlugin_Trim::trimArc(const std::shared_ptr<GeomAPI_Pnt2d>& theS
                                (aBaseFeature->attribute(aModifiedAttribute)));
 
     // equal Radius constraint for arcs
-    createConstraintForObjects(SketchPlugin_ConstraintEqual::ID(),
-                               getFeatureResult(aBaseFeature),
-                               getFeatureResult(anNewFeature));
+    SketchPlugin_Tools::createConstraint(sketch(), SketchPlugin_ConstraintEqual::ID(),
+                                         getFeatureResult(aBaseFeature),
+                                         getFeatureResult(anNewFeature));
     // coincident centers constraint
-    createConstraint(SketchPlugin_ConstraintCoincidence::ID(),
-                     aBaseFeature->attribute(SketchPlugin_Arc::CENTER_ID()),
-                     anNewFeature->attribute(SketchPlugin_Arc::CENTER_ID()));
+    SketchPlugin_Tools::createConstraint(sketch(), SketchPlugin_ConstraintCoincidence::ID(),
+                                         aBaseFeature->attribute(SketchPlugin_Arc::CENTER_ID()),
+                                         anNewFeature->attribute(SketchPlugin_Arc::CENTER_ID()));
 
 #ifdef DEBUG_TRIM
     std::cout << "Created arc on points:" << std::endl;
@@ -1290,69 +1287,6 @@ FeaturePtr SketchPlugin_Trim::createArcFeature(const FeaturePtr& theBaseFeature,
   #endif
 
   return aFeature;
-}
-
-FeaturePtr SketchPlugin_Trim::createConstraint(const std::string& theConstraintId,
-                                               const AttributePtr& theFirstAttribute,
-                                               const AttributePtr& theSecondAttribute)
-{
-  FeaturePtr aConstraint = sketch()->addFeature(theConstraintId);
-  AttributeRefAttrPtr aRefAttr = std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(
-                                 aConstraint->attribute(SketchPlugin_Constraint::ENTITY_A()));
-  aRefAttr->setAttr(theFirstAttribute);
-
-  aRefAttr = std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(
-                                 aConstraint->attribute(SketchPlugin_Constraint::ENTITY_B()));
-  aRefAttr->setAttr(theSecondAttribute);
-
-#ifdef DEBUG_TRIM
-  std::cout << "<createConstraint to attribute> :"
-            << "first attribute - " << theFirstAttribute->id()
-            << "second attribute - " << theSecondAttribute->id()
-            << std::endl;
-#endif
-
-  return aConstraint;
-}
-
-FeaturePtr SketchPlugin_Trim::createConstraintToObject(const std::string& theConstraintId,
-                                               const AttributePtr& theFirstAttribute,
-                                               const ObjectPtr& theSecondObject)
-{
-  FeaturePtr aConstraint = sketch()->addFeature(theConstraintId);
-  AttributeRefAttrPtr aRefAttr = std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(
-                                 aConstraint->attribute(SketchPlugin_Constraint::ENTITY_A()));
-  aRefAttr->setAttr(theFirstAttribute);
-
-  aRefAttr = std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(
-                                 aConstraint->attribute(SketchPlugin_Constraint::ENTITY_B()));
-  aRefAttr->setObject(theSecondObject);
-
-#ifdef DEBUG_TRIM
-  std::cout << "<createConstraint to attribute> :"
-            << "first attribute - " << theFirstAttribute->id()
-            << "second object - " << ModelAPI_Feature::feature(theSecondObject)->getKind()
-            << std::endl;
-#endif
-
-  return aConstraint;
-}
-
-FeaturePtr SketchPlugin_Trim::createConstraintForObjects(
-                                                    const std::string& theConstraintId,
-                                                    const ObjectPtr& theFirstObject,
-                                                    const ObjectPtr& theSecondObject)
-{
-  FeaturePtr aConstraint = sketch()->addFeature(theConstraintId);
-  AttributeRefAttrPtr aRefAttr = std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(
-                                 aConstraint->attribute(SketchPlugin_Constraint::ENTITY_A()));
-  aRefAttr->setObject(theFirstObject);
-
-  aRefAttr = std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(
-                                 aConstraint->attribute(SketchPlugin_Constraint::ENTITY_B()));
-  aRefAttr->setObject(theSecondObject);
-
-  return aConstraint;
 }
 
 std::shared_ptr<ModelAPI_Result> SketchPlugin_Trim::getFeatureResult(

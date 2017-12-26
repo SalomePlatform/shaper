@@ -255,30 +255,6 @@ private:
                               const std::shared_ptr<GeomAPI_Pnt2d>& theFirstPoint,
                               const std::shared_ptr<GeomAPI_Pnt2d>& theSecondPoint);
 
-  /// Add feature coincidence constraint between given attributes
-  /// \param theConstraintId a constraint index
-  /// \param theFirstAttribute an attribute of further coincidence
-  /// \param theSecondAttribute an attribute of further coincidence
-  std::shared_ptr<ModelAPI_Feature> createConstraint(const std::string& theConstraintId,
-                        const std::shared_ptr<ModelAPI_Attribute>& theFirstAttribute,
-                        const std::shared_ptr<ModelAPI_Attribute>& theSecondAttribute);
-
-  /// Add feature coincidence constraint between given attributes
-  /// \param theConstraintId a constraint index
-  /// \param theFirstAttribute an attribute of further coincidence
-  /// \param theSecondObject an object of further coincidence
-  std::shared_ptr<ModelAPI_Feature> createConstraintToObject(const std::string& theConstraintId,
-                        const std::shared_ptr<ModelAPI_Attribute>& theFirstAttribute,
-                        const std::shared_ptr<ModelAPI_Object>& theSecondObject);
-
-  /// Add feature coincidence constraint between given attributes
-  /// \param theConstraintId a constraint index
-  /// \param theFirstAttribute an attribute of further coincidence
-  /// \param theFirstAttribute an attribute of further coincidence
-  std::shared_ptr<ModelAPI_Feature> createConstraintForObjects(const std::string& theConstraintId,
-                        const std::shared_ptr<ModelAPI_Object>& theFirstObject,
-                        const std::shared_ptr<ModelAPI_Object>& theSecondObject);
-
   /// Result result of the feature to build constraint with. For arc, circle it is an edge result.
   /// \param theFeature a feature
   /// \return result object

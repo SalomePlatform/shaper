@@ -186,11 +186,11 @@ std::string SketchPlugin_MacroCircle::processEvent(
 void SketchPlugin_MacroCircle::constraintsForCircleByCenterAndPassed(FeaturePtr theCircleFeature)
 {
   // Create constraints.
-  SketchPlugin_Tools::createConstraint(
+  SketchPlugin_Tools::createCoincidenceOrTangency(
       this, CENTER_POINT_REF_ID(),
       theCircleFeature->attribute(SketchPlugin_Circle::CENTER_ID()),
       ObjectPtr(), false);
-  SketchPlugin_Tools::createConstraint(
+  SketchPlugin_Tools::createCoincidenceOrTangency(
       this, PASSED_POINT_REF_ID(), AttributePtr(),
       theCircleFeature->lastResult(), true);
 }
@@ -203,8 +203,10 @@ void SketchPlugin_MacroCircle::constraintsForCircleByThreePoints(FeaturePtr theC
 
   // Create constraints.
   ResultPtr aCircleResult = theCircleFeature->lastResult();
-  for (int i = 0; i < 3; ++i)
-    SketchPlugin_Tools::createConstraint(this, aPointRef[i], AttributePtr(), aCircleResult, true);
+  for (int i = 0; i < 3; ++i) {
+    SketchPlugin_Tools::createCoincidenceOrTangency(
+        this, aPointRef[i], AttributePtr(), aCircleResult, true);
+  }
 }
 
 FeaturePtr SketchPlugin_MacroCircle::createCircleFeature()

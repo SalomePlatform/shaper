@@ -75,9 +75,6 @@ static void calculateFilletCenter(FeaturePtr theFilletFeatures[2],
                                   std::shared_ptr<GeomAPI_XY>& theTangentA,
                                   std::shared_ptr<GeomAPI_XY>& theTangentB);
 
-/// Get coincide edges for fillet
-static std::set<FeaturePtr> getCoincides(const FeaturePtr& theConstraintCoincidence);
-
 static std::set<FeaturePtr> findFeaturesToRemove(const FeaturePtr theFeature,
                                                  const AttributePtr theAttribute);
 
@@ -102,33 +99,8 @@ void SketchPlugin_Fillet::execute()
   // set flag here to avoid building Fillet presentation if "Redisplay" event appears
   myFilletCreated = true;
 
-  // Calculate Fillet parameters if does not yet
-  if (!myBaseFeatures[0] || !myBaseFeatures[1])
-    calculateFilletParameters();
-
-  // Create arc feature.
-  FeaturePtr aFilletArc = sketch()->addFeature(SketchPlugin_Arc::ID());
-
-  // Set arc attributes.
-  bool aWasBlocked = aFilletArc->data()->blockSendAttributeUpdated(true);
-  std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
-      aFilletArc->attribute(SketchPlugin_Arc::CENTER_ID()))->setValue(myCenterXY->x(),
-                                                                      myCenterXY->y());
-  std::shared_ptr<GeomDataAPI_Point2D> aStartPoint =
-      std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
-          aFilletArc->attribute(SketchPlugin_Arc::START_ID()));
-  std::shared_ptr<GeomDataAPI_Point2D> aEndPoint =
-      std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
-          aFilletArc->attribute(SketchPlugin_Arc::END_ID()));
-  if(aStartPoint->isInitialized() && aEndPoint->isInitialized()
-      && (aStartPoint->pnt()->xy()->distance(myTangentXY1) > tolerance
-      || aEndPoint->pnt()->xy()->distance(myTangentXY2) > tolerance)) {
-    std::dynamic_pointer_cast<SketchPlugin_Arc>(aFilletArc)->setReversed(false);
-  }
-  aStartPoint->setValue(myTangentXY1->x(), myTangentXY1->y());
-  aEndPoint->setValue(myTangentXY2->x(), myTangentXY2->y());
-  aFilletArc->data()->blockSendAttributeUpdated(aWasBlocked);
-  aFilletArc->execute();
+  // create feature for fillet arc
+  FeaturePtr aFilletArc = createFilletArc();
 
   // Delete features with refs to points of edges.
   std::shared_ptr<GeomDataAPI_Point2D> aStartPoint1;
@@ -157,37 +129,26 @@ void SketchPlugin_Fillet::execute()
   recalculateAttributes(aFilletArc, SketchPlugin_Arc::END_ID(),
                         myBaseFeatures[aFeatInd2], myFeatAttributes[anAttrInd2]);
 
+  FeaturePtr aConstraint;
+
   // Create coincidence features.
-  FeaturePtr aConstraint = sketch()->addFeature(SketchPlugin_ConstraintCoincidence::ID());
-  AttributeRefAttrPtr aRefAttr = std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(
-      aConstraint->attribute(SketchPlugin_Constraint::ENTITY_A()));
-  aRefAttr->setAttr(aFilletArc->attribute(SketchPlugin_Arc::START_ID()));
-  aRefAttr = std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(
-      aConstraint->attribute(SketchPlugin_Constraint::ENTITY_B()));
-  aRefAttr->setAttr(myBaseFeatures[aFeatInd1]->attribute(myFeatAttributes[anAttrInd1]));
-  aConstraint->execute();
+  aConstraint = SketchPlugin_Tools::createConstraint(sketch(),
+                    SketchPlugin_ConstraintCoincidence::ID(),
+                    aFilletArc->attribute(SketchPlugin_Arc::START_ID()),
+                    myBaseFeatures[aFeatInd1]->attribute(myFeatAttributes[anAttrInd1]));
   ModelAPI_EventCreator::get()->sendUpdated(aConstraint, anUpdateEvent);
-  aConstraint = sketch()->addFeature(SketchPlugin_ConstraintCoincidence::ID());
-  aRefAttr = std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(
-      aConstraint->attribute(SketchPlugin_Constraint::ENTITY_A()));
-  aRefAttr->setAttr(aFilletArc->attribute(SketchPlugin_Arc::END_ID()));
-  aRefAttr = std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(
-      aConstraint->attribute(SketchPlugin_Constraint::ENTITY_B()));
-  aRefAttr->setAttr(myBaseFeatures[aFeatInd2]->attribute(myFeatAttributes[anAttrInd2]));
-  aConstraint->execute();
+  aConstraint = SketchPlugin_Tools::createConstraint(sketch(),
+                    SketchPlugin_ConstraintCoincidence::ID(),
+                    aFilletArc->attribute(SketchPlugin_Arc::END_ID()),
+                    myBaseFeatures[aFeatInd2]->attribute(myFeatAttributes[anAttrInd2]));
   ModelAPI_EventCreator::get()->sendUpdated(aConstraint, anUpdateEvent);
 
   // Create tangent features.
   for (int i = 0; i < 2; i++) {
-    aConstraint = sketch()->addFeature(SketchPlugin_ConstraintTangent::ID());
-    aRefAttr = std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(
-        aConstraint->attribute(SketchPlugin_Constraint::ENTITY_A()));
-    aRefAttr->setObject(aFilletArc->lastResult());
-    aRefAttr = std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(
-        aConstraint->attribute(SketchPlugin_Constraint::ENTITY_B()));
-    bool isArc = myBaseFeatures[i]->getKind() == SketchPlugin_Arc::ID();
-    aRefAttr->setObject(isArc ? myBaseFeatures[i]->lastResult() :
-                                myBaseFeatures[i]->firstResult());
+    aConstraint = SketchPlugin_Tools::createConstraint(sketch(),
+                      SketchPlugin_ConstraintTangent::ID(),
+                      aFilletArc->lastResult(),
+                      myBaseFeatures[i]->lastResult());
     aConstraint->execute();
     ModelAPI_EventCreator::get()->sendUpdated(aConstraint, anUpdateEvent);
   }
@@ -242,10 +203,16 @@ bool SketchPlugin_Fillet::calculateFilletParameters()
   if (!aFilletPoint2D.get())
     return false;
 
-  if (!findFeaturesContainingFilletPoint(aFilletPoint2D)) {
+  std::set<FeaturePtr> aFilletFeatures =
+      SketchPlugin_Tools::findFeaturesCoincidentToPoint(aFilletPoint2D);
+  if (aFilletFeatures.size() != 2) {
     setError("Error: Selected point does not have two suitable edges for fillet.");
     return false;
   }
+
+  std::set<FeaturePtr>::iterator aFIt = aFilletFeatures.begin();
+  myBaseFeatures[0] = *aFIt;
+  myBaseFeatures[1] = *(++aFIt);
 
   std::shared_ptr<GeomAPI_Pnt2d> aFilletPnt2d = aFilletPoint2D->pnt();
   double aRadius = calculateFilletRadius(myBaseFeatures);
@@ -326,49 +293,37 @@ bool SketchPlugin_Fillet::calculateFilletParameters()
   return true;
 }
 
-bool SketchPlugin_Fillet::findFeaturesContainingFilletPoint(
-    std::shared_ptr<GeomDataAPI_Point2D> theFilletPoint)
+FeaturePtr SketchPlugin_Fillet::createFilletArc()
 {
-  // Obtain constraint coincidence for the fillet point.
-  FeaturePtr aConstraintCoincidence;
-  const std::set<AttributePtr>& aRefsList = theFilletPoint->owner()->data()->refsToMe();
-  for(std::set<AttributePtr>::const_iterator anIt = aRefsList.cbegin();
-      anIt != aRefsList.cend();
-      ++anIt) {
-    std::shared_ptr<ModelAPI_Attribute> anAttr = (*anIt);
-    FeaturePtr aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(anAttr->owner());
-    if(aFeature->getKind() == SketchPlugin_ConstraintCoincidence::ID()) {
-      AttributeRefAttrPtr anAttrRefA =
-          aFeature->refattr(SketchPlugin_ConstraintCoincidence::ENTITY_A());
-      AttributeRefAttrPtr anAttrRefB =
-          aFeature->refattr(SketchPlugin_ConstraintCoincidence::ENTITY_B());
-      if(anAttrRefA.get() && !anAttrRefA->isObject()) {
-        AttributePtr anAttrA = anAttrRefA->attr();
-        if(theFilletPoint == anAttrA) {
-          aConstraintCoincidence = aFeature;
-          break;
-        }
-      }
-      if(anAttrRefB.get() && !anAttrRefB->isObject()) {
-        AttributePtr anAttrB = anAttrRefB->attr();
-        if(theFilletPoint == anAttrB) {
-          aConstraintCoincidence = aFeature;
-          break;
-        }
-      }
-    }
+  // Calculate Fillet parameters if does not yet
+  if (!myBaseFeatures[0] || !myBaseFeatures[1])
+    calculateFilletParameters();
+
+  // Create arc feature.
+  FeaturePtr aFilletArc = sketch()->addFeature(SketchPlugin_Arc::ID());
+
+  // Set arc attributes.
+  bool aWasBlocked = aFilletArc->data()->blockSendAttributeUpdated(true);
+  std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
+      aFilletArc->attribute(SketchPlugin_Arc::CENTER_ID()))->setValue(myCenterXY->x(),
+                                                                      myCenterXY->y());
+  std::shared_ptr<GeomDataAPI_Point2D> aStartPoint =
+      std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
+          aFilletArc->attribute(SketchPlugin_Arc::START_ID()));
+  std::shared_ptr<GeomDataAPI_Point2D> aEndPoint =
+      std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
+          aFilletArc->attribute(SketchPlugin_Arc::END_ID()));
+  if(aStartPoint->isInitialized() && aEndPoint->isInitialized()
+      && (aStartPoint->pnt()->xy()->distance(myTangentXY1) > tolerance
+      || aEndPoint->pnt()->xy()->distance(myTangentXY2) > tolerance)) {
+    std::dynamic_pointer_cast<SketchPlugin_Arc>(aFilletArc)->setReversed(false);
   }
+  aStartPoint->setValue(myTangentXY1->x(), myTangentXY1->y());
+  aEndPoint->setValue(myTangentXY2->x(), myTangentXY2->y());
+  aFilletArc->data()->blockSendAttributeUpdated(aWasBlocked);
+  aFilletArc->execute();
 
-  if(!aConstraintCoincidence.get())
-    return false;
-
-  // Get coincide edges.
-  std::set<FeaturePtr> anEdgeFeatures = getCoincides(aConstraintCoincidence);
-  std::set<FeaturePtr>::iterator aLinesIt = anEdgeFeatures.begin();
-  for (int i = 0; aLinesIt != anEdgeFeatures.end() && i < 2; ++aLinesIt, ++i)
-    myBaseFeatures[i] = *aLinesIt;
-
-  return myBaseFeatures[0] && myBaseFeatures[1];
+  return aFilletArc;
 }
 
 // =========   Auxiliary functions   =================
@@ -463,59 +418,6 @@ double calculateFilletRadius(FeaturePtr theFilletFeatures[2])
       aLengths[i] = anEdge->length();
   }
   return std::min(aLengths[0], aLengths[1]) / 6.0;
-}
-
-std::set<FeaturePtr> getCoincides(const FeaturePtr& theConstraintCoincidence)
-{
-  std::set<FeaturePtr> aCoincides;
-
-  std::shared_ptr<GeomAPI_Pnt2d> aFilletPnt =
-    SketchPlugin_Tools::getCoincidencePoint(theConstraintCoincidence);
-
-  SketchPlugin_Tools::findCoincidences(theConstraintCoincidence,
-                                       SketchPlugin_ConstraintCoincidence::ENTITY_A(),
-                                       aCoincides,
-                                       true);
-  SketchPlugin_Tools::findCoincidences(theConstraintCoincidence,
-                                       SketchPlugin_ConstraintCoincidence::ENTITY_B(),
-                                       aCoincides,
-                                       true);
-
-  // Remove points from set of coincides.
-  std::set<FeaturePtr> aNewSetOfCoincides;
-  for(std::set<FeaturePtr>::iterator anIt = aCoincides.begin(); anIt != aCoincides.end(); ++anIt) {
-    std::shared_ptr<SketchPlugin_SketchEntity> aSketchEntity =
-      std::dynamic_pointer_cast<SketchPlugin_SketchEntity>(*anIt);
-    if(aSketchEntity.get() && (aSketchEntity->isCopy() || aSketchEntity->isExternal())) {
-      continue;
-    }
-    if((*anIt)->getKind() == SketchPlugin_Line::ID()) {
-      aNewSetOfCoincides.insert(*anIt);
-    } else if((*anIt)->getKind() == SketchPlugin_Arc::ID()) {
-      AttributePtr anAttrCenter = (*anIt)->attribute(SketchPlugin_Arc::CENTER_ID());
-      std::shared_ptr<GeomDataAPI_Point2D> aPointCenter2D =
-        std::dynamic_pointer_cast<GeomDataAPI_Point2D>(anAttrCenter);
-      if(aPointCenter2D.get() && aFilletPnt->isEqual(aPointCenter2D->pnt())) {
-        continue;
-      }
-      aNewSetOfCoincides.insert(*anIt);
-    }
-  }
-  aCoincides = aNewSetOfCoincides;
-
-  // If we still have more than two coincides remove auxilary entities from set of coincides.
-  if(aCoincides.size() > 2) {
-    aNewSetOfCoincides.clear();
-    for(std::set<FeaturePtr>::iterator
-        anIt = aCoincides.begin(); anIt != aCoincides.end(); ++anIt) {
-      if(!(*anIt)->boolean(SketchPlugin_SketchEntity::AUXILIARY_ID())->value()) {
-        aNewSetOfCoincides.insert(*anIt);
-      }
-    }
-    aCoincides = aNewSetOfCoincides;
-  }
-
-  return aCoincides;
 }
 
 std::set<FeaturePtr> findFeaturesToRemove(const FeaturePtr theFeature,

@@ -32,6 +32,10 @@
 #include <GeomDataAPI_Point.h>
 #include <GeomDataAPI_Point2D.h>
 
+#ifdef DEBUG_TRIM
+#include <iostream>
+#endif
+
 namespace SketchPlugin_Tools {
 
 void clearExpressions(AttributeDoublePtr theAttribute)
@@ -252,11 +256,11 @@ void resetAttribute(SketchPlugin_Feature* theFeature,
   }
 }
 
-void createConstraint(SketchPlugin_Feature* theFeature,
-                      const std::string& theId,
-                      const AttributePtr theAttr,
-                      const ObjectPtr theObject,
-                      const bool theIsCanBeTangent)
+void createCoincidenceOrTangency(SketchPlugin_Feature* theFeature,
+                                 const std::string& theId,
+                                 const AttributePtr theAttr,
+                                 const ObjectPtr theObject,
+                                 const bool theIsCanBeTangent)
 {
   AttributeRefAttrPtr aRefAttr = theFeature->refattr(theId);
   if(aRefAttr.get() && aRefAttr->isInitialized()) {
@@ -311,6 +315,79 @@ void convertRefAttrToPointOrTangentCurve(const AttributeRefAttrPtr&      theRefA
     anAttr = theRefAttr->attr();
 
   thePassingPoint = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(anAttr)->pnt();
+}
+
+
+FeaturePtr createConstraint(SketchPlugin_Sketch* theSketch,
+                            const std::string& theConstraintId,
+                            const AttributePtr& theFirstAttribute,
+                            const AttributePtr& theSecondAttribute)
+{
+  FeaturePtr aConstraint = theSketch->addFeature(theConstraintId);
+  AttributeRefAttrPtr aRefAttr = std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(
+                                 aConstraint->attribute(SketchPlugin_Constraint::ENTITY_A()));
+  aRefAttr->setAttr(theFirstAttribute);
+
+  aRefAttr = std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(
+                                 aConstraint->attribute(SketchPlugin_Constraint::ENTITY_B()));
+  aRefAttr->setAttr(theSecondAttribute);
+
+#if defined(DEBUG_TRIM) || defined(DEBUG_SPLIT)
+  std::cout << "<createConstraint to attribute> :"
+            << " first attribute - " << theFirstAttribute->id()
+            << " second attribute - " << theSecondAttribute->id()
+            << std::endl;
+#endif
+
+  return aConstraint;
+}
+
+FeaturePtr createConstraint(SketchPlugin_Sketch* theSketch,
+                            const std::string& theConstraintId,
+                            const AttributePtr& theFirstAttribute,
+                            const ObjectPtr& theSecondObject)
+{
+  FeaturePtr aConstraint = theSketch->addFeature(theConstraintId);
+  AttributeRefAttrPtr aRefAttr = std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(
+                                 aConstraint->attribute(SketchPlugin_Constraint::ENTITY_A()));
+  aRefAttr->setAttr(theFirstAttribute);
+
+  aRefAttr = std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(
+                                 aConstraint->attribute(SketchPlugin_Constraint::ENTITY_B()));
+  aRefAttr->setObject(theSecondObject);
+
+#if defined(DEBUG_TRIM) || defined(DEBUG_SPLIT)
+  std::cout << "<createConstraint to attribute> :"
+            << " first attribute - " << theFirstAttribute->id()
+            << " second object - " << ModelAPI_Feature::feature(theSecondObject)->getKind()
+            << std::endl;
+#endif
+
+  return aConstraint;
+}
+
+FeaturePtr createConstraint(SketchPlugin_Sketch* theSketch,
+                            const std::string& theConstraintId,
+                            const ObjectPtr& theFirstObject,
+                            const ObjectPtr& theSecondObject)
+{
+  FeaturePtr aConstraint = theSketch->addFeature(theConstraintId);
+  AttributeRefAttrPtr aRefAttr = std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(
+                                 aConstraint->attribute(SketchPlugin_Constraint::ENTITY_A()));
+  aRefAttr->setObject(theFirstObject);
+
+  aRefAttr = std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(
+                                 aConstraint->attribute(SketchPlugin_Constraint::ENTITY_B()));
+  aRefAttr->setObject(theSecondObject);
+
+#if defined(DEBUG_TRIM) || defined(DEBUG_SPLIT)
+  std::cout << "<createConstraint to attribute> :"
+            << " first object - " << ModelAPI_Feature::feature(theFirstObject)->getKind()
+            << " second object - " << ModelAPI_Feature::feature(theSecondObject)->getKind()
+            << std::endl;
+#endif
+
+  return aConstraint;
 }
 
 } // namespace SketchPlugin_Tools

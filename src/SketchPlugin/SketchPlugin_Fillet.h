@@ -83,6 +83,11 @@ class SketchPlugin_Fillet: public SketchPlugin_SketchEntity, public GeomAPI_IPre
 private:
   bool calculateFilletParameters();
 
+  /// Create new feature presenting a fillet arc and initialize its parameters
+  FeaturePtr createFilletArc();
+
+  void createCoincidenceWithFilletArc();
+
   bool findFeaturesContainingFilletPoint(std::shared_ptr<GeomDataAPI_Point2D> theFilletPoint);
 
 private:
