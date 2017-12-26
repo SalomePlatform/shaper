@@ -133,12 +133,12 @@ void SketchPlugin_Fillet::execute()
   FeaturePtr aConstraint;
 
   // Create coincidence features.
-  aConstraint = SketchPlugin_Tools::createConstraint(sketch(),
+  aConstraint = SketchPlugin_Tools::createConstraintAttrAttr(sketch(),
                     SketchPlugin_ConstraintCoincidence::ID(),
                     aFilletArc->attribute(SketchPlugin_Arc::START_ID()),
                     myBaseFeatures[aFeatInd[0]]->attribute(myFeatAttributes[anAttrInd[0]]));
   ModelAPI_EventCreator::get()->sendUpdated(aConstraint, anUpdateEvent);
-  aConstraint = SketchPlugin_Tools::createConstraint(sketch(),
+  aConstraint = SketchPlugin_Tools::createConstraintAttrAttr(sketch(),
                     SketchPlugin_ConstraintCoincidence::ID(),
                     aFilletArc->attribute(SketchPlugin_Arc::END_ID()),
                     myBaseFeatures[aFeatInd[1]]->attribute(myFeatAttributes[anAttrInd[1]]));
@@ -146,7 +146,7 @@ void SketchPlugin_Fillet::execute()
 
   // Create tangent features.
   for (int i = 0; i < 2; i++) {
-    aConstraint = SketchPlugin_Tools::createConstraint(sketch(),
+    aConstraint = SketchPlugin_Tools::createConstraintObjectObject(sketch(),
                       SketchPlugin_ConstraintTangent::ID(),
                       aFilletArc->lastResult(),
                       myBaseFeatures[i]->lastResult());
@@ -337,7 +337,7 @@ FeaturePtr SketchPlugin_Fillet::createFilletApex(const GeomPnt2dPtr& theCoordina
   static Events_ID anUpdateEvent = Events_Loop::eventByName(EVENT_OBJECT_UPDATED);
   FeaturePtr aConstraint;
   for (int i = 0; i < 2; i++) {
-    aConstraint = SketchPlugin_Tools::createConstraint(sketch(),
+    aConstraint = SketchPlugin_Tools::createConstraintAttrObject(sketch(),
                       SketchPlugin_ConstraintCoincidence::ID(),
                       aCoord,
                       myBaseFeatures[i]->lastResult());
@@ -438,7 +438,7 @@ void SketchPlugin_Fillet::removeReferencesButKeepDistances(
   FeaturePtr aConstraint;
   std::list<Length>::iterator anIt = aLengthToDistance.begin();
   for (; anIt != aLengthToDistance.end(); ++anIt) {
-    aConstraint = SketchPlugin_Tools::createConstraint(sketch(),
+    aConstraint = SketchPlugin_Tools::createConstraintAttrAttr(sketch(),
         SketchPlugin_ConstraintDistance::ID(), anIt->myPoints[0], anIt->myPoints[1]);
     // set value
     AttributeDoublePtr aValue = aConstraint->real(SketchPlugin_Constraint::VALUE());

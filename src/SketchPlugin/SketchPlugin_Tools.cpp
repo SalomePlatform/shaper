@@ -318,10 +318,10 @@ void convertRefAttrToPointOrTangentCurve(const AttributeRefAttrPtr&      theRefA
 }
 
 
-FeaturePtr createConstraint(SketchPlugin_Sketch* theSketch,
-                            const std::string& theConstraintId,
-                            const AttributePtr& theFirstAttribute,
-                            const AttributePtr& theSecondAttribute)
+FeaturePtr createConstraintAttrAttr(SketchPlugin_Sketch* theSketch,
+                                    const std::string& theConstraintId,
+                                    const AttributePtr& theFirstAttribute,
+                                    const AttributePtr& theSecondAttribute)
 {
   FeaturePtr aConstraint = theSketch->addFeature(theConstraintId);
   AttributeRefAttrPtr aRefAttr = std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(
@@ -342,10 +342,10 @@ FeaturePtr createConstraint(SketchPlugin_Sketch* theSketch,
   return aConstraint;
 }
 
-FeaturePtr createConstraint(SketchPlugin_Sketch* theSketch,
-                            const std::string& theConstraintId,
-                            const AttributePtr& theFirstAttribute,
-                            const ObjectPtr& theSecondObject)
+FeaturePtr createConstraintAttrObject(SketchPlugin_Sketch* theSketch,
+                                      const std::string& theConstraintId,
+                                      const AttributePtr& theFirstAttribute,
+                                      const ObjectPtr& theSecondObject)
 {
   FeaturePtr aConstraint = theSketch->addFeature(theConstraintId);
   AttributeRefAttrPtr aRefAttr = std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(
@@ -366,10 +366,10 @@ FeaturePtr createConstraint(SketchPlugin_Sketch* theSketch,
   return aConstraint;
 }
 
-FeaturePtr createConstraint(SketchPlugin_Sketch* theSketch,
-                            const std::string& theConstraintId,
-                            const ObjectPtr& theFirstObject,
-                            const ObjectPtr& theSecondObject)
+FeaturePtr createConstraintObjectObject(SketchPlugin_Sketch* theSketch,
+                                        const std::string& theConstraintId,
+                                        const ObjectPtr& theFirstObject,
+                                        const ObjectPtr& theSecondObject)
 {
   FeaturePtr aConstraint = theSketch->addFeature(theConstraintId);
   AttributeRefAttrPtr aRefAttr = std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(

@@ -914,7 +914,7 @@ void SketchPlugin_Split::updateCoincidenceConstraintsToFeature(
     }
     if (aFeaturePointAttribute.get()) {
       // create new constraint and remove the current
-      aCoincFeature = SketchPlugin_Tools::createConstraint(sketch(),
+      aCoincFeature = SketchPlugin_Tools::createConstraintAttrAttr(sketch(),
           SketchPlugin_ConstraintCoincidence::ID(),
           aFeaturePointAttribute, aCoincFeature->refattr(aSecondAttribute)->attr());
       theFeaturesToDelete.insert(aCIt->first);
@@ -924,7 +924,8 @@ void SketchPlugin_Split::updateCoincidenceConstraintsToFeature(
       for (; aSFIt != aSFLast; aSFIt++) {
         AttributePoint2DPtr aSFAttribute = *aSFIt;
         if (aCoincPnt->isEqual(aSFAttribute->pnt())) {
-          SketchPlugin_Tools::createConstraint(sketch(), SketchPlugin_ConstraintCoincidence::ID(),
+          SketchPlugin_Tools::createConstraintAttrAttr(sketch(),
+                           SketchPlugin_ConstraintCoincidence::ID(),
                            aSFAttribute, aCoincFeature->refattr(aSecondAttribute)->attr());
         }
       }
@@ -1082,7 +1083,7 @@ FeaturePtr SketchPlugin_Split::splitLine(FeaturePtr& theSplitFeature,
                                              aFeature->attribute(SketchPlugin_Line::END_ID())));
       anNewFeature = aFeature;
     }
-    aConstraintFeature = SketchPlugin_Tools::createConstraint(sketch(),
+    aConstraintFeature = SketchPlugin_Tools::createConstraintAttrAttr(sketch(),
                      SketchPlugin_ConstraintCoincidence::ID(),
                      theSplitFeature->attribute(SketchPlugin_Line::END_ID()),
                      aFeature->attribute(SketchPlugin_Line::START_ID()));
@@ -1112,7 +1113,7 @@ FeaturePtr SketchPlugin_Split::splitLine(FeaturePtr& theSplitFeature,
     fillAttribute(theBaseFeatureModified->attribute(SketchPlugin_Line::END_ID()),
                                                     aFirstPointAttrOfSplit);
     theBaseFeatureModified->execute(); // to update result
-    aConstraintFeature = SketchPlugin_Tools::createConstraint(sketch(),
+    aConstraintFeature = SketchPlugin_Tools::createConstraintAttrAttr(sketch(),
                      SketchPlugin_ConstraintCoincidence::ID(),
                      theBaseFeatureModified->attribute(SketchPlugin_Line::END_ID()),
                      theSplitFeature->attribute(SketchPlugin_Line::START_ID()));
@@ -1225,7 +1226,7 @@ FeaturePtr SketchPlugin_Split::splitArc(FeaturePtr& theSplitFeature,
                                                   aFeature->attribute(SketchPlugin_Arc::END_ID())));
       anNewFeature = aFeature;
     }
-    aConstraintFeature = SketchPlugin_Tools::createConstraint(sketch(),
+    aConstraintFeature = SketchPlugin_Tools::createConstraintAttrAttr(sketch(),
                      SketchPlugin_ConstraintCoincidence::ID(),
                      theSplitFeature->attribute(SketchPlugin_Arc::END_ID()),
                      aFeature->attribute(SketchPlugin_Arc::START_ID()));
@@ -1255,7 +1256,7 @@ FeaturePtr SketchPlugin_Split::splitArc(FeaturePtr& theSplitFeature,
     fillAttribute(theBaseFeatureModified->attribute(SketchPlugin_Arc::END_ID()),
                                                     aFirstPointAttrOfSplit);
     theBaseFeatureModified->execute(); // to update result
-    aConstraintFeature = SketchPlugin_Tools::createConstraint(sketch(),
+    aConstraintFeature = SketchPlugin_Tools::createConstraintAttrAttr(sketch(),
                      SketchPlugin_ConstraintCoincidence::ID(),
                      theBaseFeatureModified->attribute(SketchPlugin_Arc::END_ID()),
                      theSplitFeature->attribute(SketchPlugin_Arc::START_ID()));
@@ -1355,12 +1356,12 @@ FeaturePtr SketchPlugin_Split::splitCircle(FeaturePtr& theSplitFeature,
                              (theBaseFeatureModified->attribute(SketchPlugin_Arc::END_ID())));
 
   // additional constraints between split and base features
-  aConstraintFeature = SketchPlugin_Tools::createConstraint(sketch(),
+  aConstraintFeature = SketchPlugin_Tools::createConstraintAttrAttr(sketch(),
                      SketchPlugin_ConstraintCoincidence::ID(),
                      theBaseFeatureModified->attribute(SketchPlugin_Arc::END_ID()),
                      theSplitFeature->attribute(SketchPlugin_Arc::END_ID()));
   theCreatedFeatures.insert(aConstraintFeature);
-  aConstraintFeature = SketchPlugin_Tools::createConstraint(sketch(),
+  aConstraintFeature = SketchPlugin_Tools::createConstraintAttrAttr(sketch(),
                      SketchPlugin_ConstraintCoincidence::ID(),
                      theBaseFeatureModified->attribute(SketchPlugin_Arc::START_ID()),
                      theSplitFeature->attribute(SketchPlugin_Arc::START_ID()));

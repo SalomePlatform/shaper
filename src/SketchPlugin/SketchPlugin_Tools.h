@@ -66,30 +66,30 @@ void resetAttribute(SketchPlugin_Feature* theFeature, const std::string& theId);
 /// \param[in] theConstraintId    a constraint identifier
 /// \param[in] theFirstAttribute  an attribute of further constraint
 /// \param[in] theSecondAttribute an attribute of further constraint
-FeaturePtr createConstraint(SketchPlugin_Sketch* theSketch,
-                            const std::string& theConstraintId,
-                            const AttributePtr& theFirstAttribute,
-                            const AttributePtr& theSecondAttribute);
+FeaturePtr createConstraintAttrAttr(SketchPlugin_Sketch* theSketch,
+                                    const std::string& theConstraintId,
+                                    const AttributePtr& theFirstAttribute,
+                                    const AttributePtr& theSecondAttribute);
 
 /// Create new constraint between given attribute and object
 /// \param[in] theSketch         a sketch where the constraint will be created
 /// \param[in] theConstraintId   a constraint identifier
 /// \param[in] theFirstAttribute an attribute of further constraint
 /// \param[in] theSecondObject   an attribute of further constraint
-FeaturePtr createConstraint(SketchPlugin_Sketch* theSketch,
-                            const std::string& theConstraintId,
-                            const AttributePtr& theFirstAttribute,
-                            const ObjectPtr& theSecondObject);
+FeaturePtr createConstraintAttrObject(SketchPlugin_Sketch* theSketch,
+                                      const std::string& theConstraintId,
+                                      const AttributePtr& theFirstAttribute,
+                                      const ObjectPtr& theSecondObject);
 
 /// Create new constraint between given objects
 /// \param[in] theSketch       a sketch where the constraint will be created
 /// \param[in] theConstraintId a constraint identifier
 /// \param[in] theFirstObject  an attribute of further constraint
 /// \param[in] theSecondObject an attribute of further constraint
-FeaturePtr createConstraint(SketchPlugin_Sketch* theSketch,
-                            const std::string& theConstraintId,
-                            const ObjectPtr& theFirstObject,
-                            const ObjectPtr& theSecondObject);
+FeaturePtr createConstraintObjectObject(SketchPlugin_Sketch* theSketch,
+                                        const std::string& theConstraintId,
+                                        const ObjectPtr& theFirstObject,
+                                        const ObjectPtr& theSecondObject);
 
 /// Creates coincidence or tangent constraint.
 /// \param[in] theFeature to get selected attribute or object
