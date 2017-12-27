@@ -111,6 +111,9 @@ class MODULEBASE_EXPORT ModuleBase_WidgetMultiSelector : public ModuleBase_Widge
   /// \param theActionType type of action. It can be ActionUndo or ActionRedo.
   virtual QList<ActionInfo> actionsList(ModuleBase_ActionType theActionType) const;
 
+  /// The slot is called when user press Ok or OkPlus buttons in the parent property panel
+  virtual void onFeatureAccepted();
+
 public slots:
   /// Slot is called on selection type changed
   void onSelectionTypeChanged();
@@ -239,6 +242,9 @@ protected:
 
   /// Position in a container of selected values
   int myCurrentHistoryIndex;
+
+  bool myIsFirst;
+  std::string myDefMode;
 };
 
 #endif /* MODULEBASE_WIDGETFILESELECTOR_H_ */

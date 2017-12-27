@@ -132,6 +132,21 @@ void ModuleBase_ChoiceCtrl::setValue(int theVal)
   }
 }
 
+void ModuleBase_ChoiceCtrl::setValue(const QString& theVal)
+{
+  switch (myType) {
+  case RadioButtons:
+    foreach (QAbstractButton* aBtn, myButtons->buttons()) {
+      aBtn->setChecked(aBtn->toolTip() == theVal);
+    }
+    break;
+  case ComboBox:
+    myCombo->setCurrentText(theVal);
+    break;
+  }
+}
+
+
 void ModuleBase_ChoiceCtrl::setTooltip(QString theTip)
 {
   if (myType == ComboBox)

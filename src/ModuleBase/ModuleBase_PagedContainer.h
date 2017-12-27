@@ -62,6 +62,9 @@ class MODULEBASE_EXPORT ModuleBase_PagedContainer : public ModuleBase_ModelWidge
   /// Redefinition of virtual function
   virtual void enableFocusProcessing();
 
+  /// The slot is called when user press Ok or OkPlus buttons in the parent property panel
+  virtual void onFeatureAccepted();
+
  protected:
    /// Returns index of current page
   virtual int currentPageIndex() const = 0;
@@ -86,7 +89,8 @@ class MODULEBASE_EXPORT ModuleBase_PagedContainer : public ModuleBase_ModelWidge
   bool myIsFocusOnCurrentPage;
   QStringList myCaseIds;
   QList<ModuleBase_PageBase*> myPages;
-
+  bool myIsFirst;
+  std::string myDefValue;
 };
 
 #endif /* MODULEBASE_PAGEDCONTAINER_H_ */

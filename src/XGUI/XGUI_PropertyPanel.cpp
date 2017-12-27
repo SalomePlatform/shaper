@@ -167,7 +167,8 @@ void XGUI_PropertyPanel::cleanContent()
 void XGUI_PropertyPanel::setModelWidgets(const QList<ModuleBase_ModelWidget*>& theWidgets)
 {
   myWidgets = theWidgets;
-  if (theWidgets.empty()) return;
+  if (theWidgets.empty())
+    return;
   foreach (ModuleBase_ModelWidget* aWidget, theWidgets) {
     connect(aWidget, SIGNAL(focusInWidget(ModuleBase_ModelWidget*)),
             this,    SLOT(onFocusInWidget(ModuleBase_ModelWidget*)));
@@ -177,7 +178,6 @@ void XGUI_PropertyPanel::setModelWidgets(const QList<ModuleBase_ModelWidget*>& t
             this,    SIGNAL(keyReleased(QObject*, QKeyEvent*)));
     connect(aWidget, SIGNAL(enterClicked(QObject*)),
             this,    SIGNAL(enterClicked(QObject*)));
-
   }
 }
 
@@ -564,7 +564,19 @@ void XGUI_PropertyPanel::setupActions(XGUI_ActionsMgr* theMgr)
     QAction* anAct = theMgr->operationStateAction(aActionIds.at(i));
     aBtn->setDefaultAction(anAct);
   }
+  QToolButton* aBtn = findButton(PROP_PANEL_OK);
+  connect(aBtn->defaultAction(), SIGNAL(triggered(bool)), this, SLOT(onAcceptData()));
+  aBtn = findButton(PROP_PANEL_OK_PLUS);
+  connect(aBtn->defaultAction(), SIGNAL(triggered(bool)), this, SLOT(onAcceptData()));
 }
+
+void XGUI_PropertyPanel::onAcceptData()
+{
+  foreach (ModuleBase_ModelWidget* aWidget, myWidgets) {
+    aWidget->onFeatureAccepted();
+  }
+}
+
 
 ModuleBase_ModelWidget* XGUI_PropertyPanel::preselectionWidget() const
 {

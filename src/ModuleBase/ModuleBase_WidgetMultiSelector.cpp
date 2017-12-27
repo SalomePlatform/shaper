@@ -97,13 +97,17 @@ QStringList getIconsList(const QStringList& theNames)
   return aIcons;
 }
 
+/// Stores default values of selected option (selection mode)
+/// It is used only in case if myTypeCtrl is used
+static QMap<std::string, std::string> defaultValues;
 
 
 ModuleBase_WidgetMultiSelector::ModuleBase_WidgetMultiSelector(QWidget* theParent,
                                                                ModuleBase_IWorkshop* theWorkshop,
                                                                const Config_WidgetAPI* theData)
 : ModuleBase_WidgetSelector(theParent, theWorkshop, theData),
-  myIsSetSelectionBlocked(false), myCurrentHistoryIndex(-1)
+  myIsSetSelectionBlocked(false), myCurrentHistoryIndex(-1),
+  myIsFirst(true)
 {
   std::string aPropertyTypes = theData->getProperty("type_choice");
   QString aTypesStr = aPropertyTypes.c_str();
@@ -118,6 +122,7 @@ ModuleBase_WidgetMultiSelector::ModuleBase_WidgetMultiSelector(QWidget* theParen
   myTypeCtrl->setLabel(tr("Type"));
   myTypeCtrl->setValue(0);
   aMainLay->addWidget(myTypeCtrl, 0, 0, 1, 2);
+  myDefMode = myShapeTypes.first().toStdString();
 
   // There is no sense to parameterize list of types while we can not parameterize selection mode
   // if the xml definition contains one type, the controls to select a type should not be shown
@@ -154,6 +159,12 @@ ModuleBase_WidgetMultiSelector::ModuleBase_WidgetMultiSelector(QWidget* theParen
   connect(myTypeCtrl, SIGNAL(valueChanged(int)), this, SLOT(onSelectionTypeChanged()));
 
   myIsNeutralPointClear = theData->getBooleanAttribute("clear_in_neutral_point", true);
+  if (myShapeTypes.size() > 1 || myIsUseChoice) {
+    if (defaultValues.contains(myFeatureId)) {
+      myDefMode = defaultValues[myFeatureId];
+      myTypeCtrl->setValue(myDefMode.c_str());
+    }
+  }
 }
 
 ModuleBase_WidgetMultiSelector::~ModuleBase_WidgetMultiSelector()
@@ -205,7 +216,13 @@ bool ModuleBase_WidgetMultiSelector::storeValueCustom()
   std::string aType = anAttribute->attributeType();
   if (aType == ModelAPI_AttributeSelectionList::typeId()) {
     AttributeSelectionListPtr aSelectionListAttr = myFeature->data()->selectionList(attributeID());
-    aSelectionListAttr->setSelectionType(myTypeCtrl->textValue().toStdString());
+
+    std::string aMode = myTypeCtrl->textValue().toStdString();
+    if (myTypeCtrl->isVisible() && myIsFirst && (!myDefMode.empty()))
+      aMode = myDefMode;
+
+    aSelectionListAttr->setSelectionType(aMode);
+    myIsFirst = false;
   }
   return true;
 }
@@ -223,8 +240,11 @@ bool ModuleBase_WidgetMultiSelector::restoreValueCustom()
     AttributeSelectionListPtr aSelectionListAttr = myFeature->data()->selectionList(attributeID());
     // Restore shape type
     std::string aSelectionType = aSelectionListAttr->selectionType().c_str();
-    if (!aSelectionType.empty())
+    if (!aSelectionType.empty()) {
       setCurrentShapeType(ModuleBase_Tools::shapeType(aSelectionType.c_str()));
+      myDefMode = aSelectionType;
+      myIsFirst = false;
+    }
   }
   updateSelectionList();
   return true;
@@ -965,4 +985,10 @@ QList<ActionInfo>
     }
   }
   return aList;
+}
+
+
+void ModuleBase_WidgetMultiSelector::onFeatureAccepted()
+{
+  defaultValues[myFeatureId] = myDefMode;
 }

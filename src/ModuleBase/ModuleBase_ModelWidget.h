@@ -300,6 +300,10 @@ Q_OBJECT
   /// If not then it means that the widget do not need attribute at all.
   virtual bool usesAttribute() const { return true; }
 
+  /// It is called when user press Ok or OkPlus buttons in the parent property panel
+  /// By default this slot does nothing
+  virtual void onFeatureAccepted() {}
+
 signals:
   /// The signal about widget values are to be changed
   void beforeValuesChanged();

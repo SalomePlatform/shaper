@@ -38,10 +38,18 @@
 #include <QRadioButton>
 #include <QToolButton>
 
+static QMap<std::string, int> defaultValues;
+
 ModuleBase_WidgetChoice::ModuleBase_WidgetChoice(QWidget* theParent,
                                                  const Config_WidgetAPI* theData)
-: ModuleBase_ModelWidget(theParent, theData)//, myCombo(0), myButtons(0)
+: ModuleBase_ModelWidget(theParent, theData), myIsFirst(true)
 {
+  myHasValue = defaultValues.contains(myFeatureId);
+  if (myHasValue)
+    myDefValue = defaultValues[myFeatureId];
+  else
+    myDefValue = 0;
+
   QString aLabelText = translate(theData->widgetLabel());
   QString aLabelIcon = QString::fromStdString(theData->widgetIcon());
   std::string aTypes = theData->getProperty("string_list");
@@ -94,7 +102,16 @@ bool ModuleBase_WidgetChoice::storeValueCustom()
   DataPtr aData = myFeature->data();
   std::shared_ptr<ModelAPI_AttributeInteger> aIntAttr = aData->integer(attributeID());
 
-  aIntAttr->setValue(myChoiceCtrl->value());
+  int aCase = 0;
+  if (myIsFirst)
+    aCase = myHasValue? myDefValue : myChoiceCtrl->value();
+  else
+    aCase = myChoiceCtrl->value();
+
+  aIntAttr->setValue(aCase);
+  myDefValue = aCase;
+  myIsFirst = false;
+
   updateObject(myFeature);
   return true;
 }
@@ -125,6 +142,8 @@ bool ModuleBase_WidgetChoice::restoreValueCustom()
     }
     myChoiceCtrl->blockSignals(isBlocked);
     emit itemSelected(this, aIntAttr->value());
+    myDefValue = aIntAttr->value();
+    myIsFirst = false;
   }
   return true;
 }
@@ -154,4 +173,9 @@ void ModuleBase_WidgetChoice::onCurrentIndexChanged(int theIndex)
   // emit focusOutWidget(this);
 
   emit itemSelected(this, theIndex);
+}
+
+void ModuleBase_WidgetChoice::onFeatureAccepted()
+{
+  defaultValues[myFeatureId] = myDefValue;
 }

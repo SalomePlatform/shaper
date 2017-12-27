@@ -160,6 +160,8 @@ public slots:
   /// \param theWidget the current widget
   void onActivateNextWidget(ModuleBase_ModelWidget* theWidget);
 
+  void onAcceptData();
+
 signals:
   /// The signal is emitted if the enter is clicked in the control of the widget
   /// \param theObject a sender of the event

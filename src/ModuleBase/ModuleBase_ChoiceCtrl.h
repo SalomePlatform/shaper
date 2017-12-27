@@ -75,6 +75,10 @@ public:
   /// \param theVal a value (from 0 to number of items)
   void setValue(int theVal);
 
+  /// Set value: text of button or item of combo box.
+  /// \param theVal a value (one of text items)
+  void setValue(const QString& theVal);
+
   /// Set tool tip for label. Used only for combo box.
   void setTooltip(QString theTip);
 

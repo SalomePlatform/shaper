@@ -30,14 +30,18 @@
 #include <QVBoxLayout>
 
 
+static QMap<std::string, std::string> defaultValues;
+
 ModuleBase_PagedContainer::ModuleBase_PagedContainer(QWidget* theParent,
                                                      const Config_WidgetAPI* theData)
 : ModuleBase_ModelWidget(theParent, theData),
-  myIsFocusOnCurrentPage(false)
+  myIsFocusOnCurrentPage(false), myIsFirst(true)
 {
   // it is not obligatory to be ignored when property panel tries to activate next active widget
   // but if focus is moved to this control, it can accept it.
   myIsObligatory = false;
+  if (defaultValues.contains(myFeatureId))
+    myDefValue = defaultValues[myFeatureId];
 }
 
 ModuleBase_PagedContainer::~ModuleBase_PagedContainer()
@@ -93,10 +97,12 @@ bool ModuleBase_PagedContainer::restoreValueCustom()
     return false;
   DataPtr aData = myFeature->data();
   AttributeStringPtr aStringAttr = aData->string(attributeID());
-  QString aCaseId = QString::fromStdString(aStringAttr->value());
+  QString aCaseId = QString::fromStdString(myDefValue.empty()?
+                                           aStringAttr->value() : myDefValue);
+  myIsFirst = false;
   int idx = myCaseIds.indexOf(aCaseId);
   if (idx == -1)
-    return false;
+    idx = currentPageIndex();
   setCurrentPageIndex(idx);
   return true;
 }
@@ -113,9 +119,19 @@ bool ModuleBase_PagedContainer::storeValueCustom()
   if(!myFeature)
     return false;
   DataPtr aData = myFeature->data();
+
   AttributeStringPtr aStringAttr = aData->string(attributeID());
-  QString aWidgetValue = myCaseIds.at(currentPageIndex());
-  aStringAttr->setValue(aWidgetValue.toStdString());
+  std::string aWidgetValue;
+  if (myIsFirst)
+    aWidgetValue = myDefValue.empty()?
+        myCaseIds.at(currentPageIndex()).toStdString() : myDefValue;
+  else
+    aWidgetValue = myCaseIds.at(currentPageIndex()).toStdString();
+  myDefValue = aWidgetValue;
+  aStringAttr->setValue(aWidgetValue);
+
+  myIsFirst = false;
+
   updateObject(myFeature); // for preview
   return true;
 }
@@ -132,4 +148,8 @@ void ModuleBase_PagedContainer::onPageChanged()
     focusTo();
 }
 
+void ModuleBase_PagedContainer::onFeatureAccepted()
+{
+  defaultValues[myFeatureId] = myDefValue;
+}
 

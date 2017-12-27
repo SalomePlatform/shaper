@@ -71,6 +71,9 @@ Q_OBJECT
   /// \return the title value
   QString getPropertyPanelTitle(int theIndex);
 
+  /// The slot is called when user press Ok or OkPlus buttons in the parent property panel
+  virtual void onFeatureAccepted();
+
 signals:
   /// Segnal about selected item
   /// \param theWidget selected widget
@@ -89,17 +92,15 @@ private slots:
   void onCurrentIndexChanged(int theIndex);
 
 private:
-  /// The label
-  //QLabel* myLabel;
-
-  /// The control
-  //QComboBox* myCombo;
-  //QButtonGroup* myButtons;
   ModuleBase_ChoiceCtrl* myChoiceCtrl;
 
   // XML definition of titles
   QStringList myButtonTitles;
   std::string myStringListAttribute;
+
+  bool myIsFirst;
+  int myDefValue;
+  bool myHasValue;
 };
 
 #endif
