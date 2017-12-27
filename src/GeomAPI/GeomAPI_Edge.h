@@ -104,6 +104,12 @@ public:
   /// Returns true if the edge is degenerated (has no 3D curve)
   GEOMAPI_EXPORT
   bool isDegenerated() const;
+
+  GEOMAPI_EXPORT
+  void setFirstPointTolerance(const double theTolerance);
+
+  GEOMAPI_EXPORT
+  void setLastPointTolerance(const double theTolerance);
 };
 
 //! Pointer on attribute object

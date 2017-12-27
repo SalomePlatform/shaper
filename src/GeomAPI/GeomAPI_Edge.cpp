@@ -42,6 +42,7 @@
 #include <gp_Ax1.hxx>
 #include <gp_Pln.hxx>
 #include <gp_Elips.hxx>
+#include <TopExp.hxx>
 
 #include <GCPnts_AbscissaPoint.hxx>
 
@@ -307,4 +308,20 @@ bool GeomAPI_Edge::isDegenerated() const
   if (aShape.IsNull() || aShape.ShapeType() != TopAbs_EDGE)
     return false;
   return BRep_Tool::Degenerated(TopoDS::Edge(aShape));
+}
+
+void GeomAPI_Edge::setFirstPointTolerance(const double theTolerance)
+{
+  TopoDS_Edge anEdge = impl<TopoDS_Edge>();
+  TopoDS_Vertex aVFirst, aVLast;
+  TopExp::Vertices(anEdge, aVFirst, aVLast);
+  BRep_Builder().UpdateVertex(aVFirst, theTolerance);
+}
+
+void GeomAPI_Edge::setLastPointTolerance(const double theTolerance)
+{
+  TopoDS_Edge anEdge = impl<TopoDS_Edge>();
+  TopoDS_Vertex aVFirst, aVLast;
+  TopExp::Vertices(anEdge, aVFirst, aVLast);
+  BRep_Builder().UpdateVertex(aVLast, theTolerance);
 }

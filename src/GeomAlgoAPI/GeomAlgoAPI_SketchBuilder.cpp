@@ -199,8 +199,6 @@ void GeomAlgoAPI_SketchBuilder::createFaces(
   if (theFeatures.empty())
     return;
 
-  static const double kFUZZY_VALUE = 1.e-5; // tolerance to avoid gaps in contours
-
   BRep_Builder aBuilder;
   // Planar face, where the sketch was built
   Handle(Geom_Surface) aPlane(new Geom_Plane(theOrigin->impl<gp_Pnt>(), theNorm->impl<gp_Dir>()));
@@ -220,7 +218,6 @@ void GeomAlgoAPI_SketchBuilder::createFaces(
     if (anEdge.ShapeType() == TopAbs_EDGE)
       aBB.AddArgument(anEdge);
   }
-  aBB.SetFuzzyValue(kFUZZY_VALUE);
   aBB.Perform();
 #ifdef USE_OCCT_720
   if (aBB.HasErrors())

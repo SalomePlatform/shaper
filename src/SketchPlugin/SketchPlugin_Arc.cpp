@@ -119,14 +119,35 @@ void SketchPlugin_Arc::execute()
     aCircleForArc->parameter(anEndAttr->pnt(), paramTolerance, myParamBefore);
   }
 
-  GeomShapePtr anArcShape;
+  bool isReversed = boolean(REVERSED_ID())->value();
+
+  GeomEdgePtr anArcShape;
   if (fabs(myParamBefore - 2.0 * PI) < paramTolerance) {
     anArcShape = GeomAlgoAPI_EdgeBuilder::lineCircle(aCenter, aNormal, aStart->distance(aCenter));
     myParamBefore = 0;
   } else {
-    anArcShape = boolean(REVERSED_ID())->value() ?
+    anArcShape = isReversed ?
       GeomAlgoAPI_EdgeBuilder::lineCircleArc(aCenter, anEnd, aStart, aNormal)
     : GeomAlgoAPI_EdgeBuilder::lineCircleArc(aCenter, aStart, anEnd, aNormal);
+  }
+
+  // calculate tolerances for start and end points of the arc and set them to the result shape
+  // (this is done to fix gaps which appear because of inaccurate computation of arcs in PlaneGCS,
+  // which leads to difference in SketchPlugin_Arc attributes and boundary points of result shape)
+  if (anArcShape) {
+    for (int ind = 0; ind < 2; ++ind) {
+      bool isFirst = ind == 0;
+      GeomPointPtr anArcBndPoint = isFirst == isReversed ? anEnd : aStart;
+      GeomPointPtr aShapePoint = isFirst ? anArcShape->firstPoint() : anArcShape->lastPoint();
+      double aDistance = anArcBndPoint->distance(aShapePoint);
+      // avoid setting too high tolerance because it may be caused by incomplete update of an arc
+      if (aDistance > tolerance && aDistance < 100. * tolerance) {
+        if (isFirst)
+          anArcShape->setFirstPointTolerance(aDistance);
+        else
+          anArcShape->setLastPointTolerance(aDistance);
+      }
+    }
   }
 
   std::shared_ptr<ModelAPI_ResultConstruction> aResult = document()->createConstruction(data(), 1);
