@@ -76,5 +76,30 @@ aSession.finishOperation()
 # Test results
 assert (len(aVertexFeature.results()) == aNumOfPoints)
 
+# Check Vertex feature failed on incorrect input
+aSession.startOperation()
+aVertexFeature2 = aPart.addFeature("Vertex")
+aBaseObjectsList = aVertexFeature2.selectionList("base_objects")
+aBaseObjectsList.append(aSketchResult, None)
+aSession.finishOperation()
+assert (len(aVertexFeature2.results()) == 0)
+
+aSession.startOperation()
+aLine = aSketchFeature.addFeature("SketchLine")
+geomDataAPI_Point2D(aLine.attribute("StartPoint")).setValue(0, 0)
+geomDataAPI_Point2D(aLine.attribute("EndPoint")).setValue(100, 100)
+aSession.finishOperation()
+aSession.startOperation()
+aBaseObjectsList.clear()
+aBaseObjectsList.append(aSketchResult, aLine.lastResult().shape())
+aSession.finishOperation()
+assert (len(aVertexFeature2.results()) == 0)
+
+# remove failed feature
+aSession.startOperation()
+aPart.removeFeature(aVertexFeature2)
+aPart.setCurrentFeature(aVertexFeature, True)
+aSession.finishOperation()
+
 from salome.shaper import model
 assert(model.checkPythonDump())

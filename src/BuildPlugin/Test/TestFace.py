@@ -141,5 +141,37 @@ aSession.startOperation()
 aPart.removeFeature(aFaceFeature4)
 aSession.finishOperation()
 
+# =============================================================================
+# Test 5. Check Face feature failed on incorrect input
+# =============================================================================
+
+aSession.startOperation()
+aFaceFeature5 = aPart.addFeature("Face")
+aBaseObjectsList = aFaceFeature5.selectionList("base_objects")
+aBaseObjectsList.append(aCylinderResult, None)
+aSession.finishOperation()
+assert (len(aFaceFeature5.results()) == 0)
+
+aSession.startOperation()
+aBaseObjectsList.clear()
+aShapeExplorer = GeomAPI_ShapeExplorer(aCylinderShape, GeomAPI_Shape.VERTEX)
+aShape = aShapeExplorer.current()
+aBaseObjectsList.append(aCylinderResult, aShape)
+aSession.finishOperation()
+assert (len(aFaceFeature5.results()) == 0)
+
+aSession.startOperation()
+aBaseObjectsList.clear()
+aShapeExplorer = GeomAPI_ShapeExplorer(aFaceFeature.lastResult().shape(), GeomAPI_Shape.EDGE)
+aShape = aShapeExplorer.current()
+aBaseObjectsList.append(aFaceFeature.lastResult(), aShape)
+aSession.finishOperation()
+assert (len(aFaceFeature5.results()) == 0)
+
+# remove failed feature
+aSession.startOperation()
+aPart.removeFeature(aFaceFeature5)
+aSession.finishOperation()
+
 from salome.shaper import model
 assert(model.checkPythonDump())

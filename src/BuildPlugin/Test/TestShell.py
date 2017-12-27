@@ -123,5 +123,22 @@ aSession.finishOperation()
 # Test results
 assert (len(aShellFeature2.results()) > 0)
 
+# Check Shell feature failed on incorrect input
+aShellResult = aShellFeature.firstResult()
+aSession.startOperation()
+aShellFeature3 = aPart.addFeature("Shell")
+aBaseObjectsList = aShellFeature3.selectionList("base_objects")
+aShapeExplorer = GeomAPI_ShapeExplorer(aShellResult.shape(), GeomAPI_Shape.EDGE)
+while aShapeExplorer.more():
+    aBaseObjectsList.append(aShellResult, aShapeExplorer.current())
+    aShapeExplorer.next()
+aSession.finishOperation()
+assert (len(aShellFeature3.results()) == 0)
+
+# remove failed feature
+aSession.startOperation()
+aPart.removeFeature(aShellFeature3)
+aSession.finishOperation()
+
 from salome.shaper import model
 assert(model.checkPythonDump())

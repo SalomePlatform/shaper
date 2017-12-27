@@ -111,5 +111,34 @@ aSession.finishOperation()
 # Test results
 assert (len(anEdgeFeature2.results()) == 12)
 
+# Check Edge feature failed on incorrect input
+aSession.startOperation()
+anEdgeFeature3 = aPart.addFeature("Edge")
+aBaseObjectsList = anEdgeFeature3.selectionList("base_objects")
+aBaseObjectsList.append(aSketchResult, None)
+aSession.finishOperation()
+assert (len(anEdgeFeature3.results()) == 0)
+
+aSession.startOperation()
+aBaseObjectsList.clear()
+aShapeExplorer = GeomAPI_ShapeExplorer(aBoxShape, GeomAPI_Shape.VERTEX)
+aShape = aShapeExplorer.current()
+aBaseObjectsList.append(aBoxResult, aShape)
+aSession.finishOperation()
+assert (len(anEdgeFeature3.results()) == 0)
+
+aSession.startOperation()
+aBaseObjectsList.clear()
+aShapeExplorer = GeomAPI_ShapeExplorer(aBoxShape, GeomAPI_Shape.FACE)
+aShape = aShapeExplorer.current()
+aBaseObjectsList.append(aBoxResult, aShape)
+aSession.finishOperation()
+assert (len(anEdgeFeature3.results()) == 0)
+
+# remove failed feature
+aSession.startOperation()
+aPart.removeFeature(anEdgeFeature3)
+aSession.finishOperation()
+
 from salome.shaper import model
 assert(model.checkPythonDump())
