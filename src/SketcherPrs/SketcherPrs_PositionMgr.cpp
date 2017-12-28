@@ -89,17 +89,8 @@ int SketcherPrs_PositionMgr::getPositionIndex(ObjectPtr theLine,
 
 bool SketcherPrs_PositionMgr::isPntConstraint(const std::string& theName)
 {
-  static std::list<std::string> aConstraints;
-  if (aConstraints.size() == 0) {
-    aConstraints.push_back(SketchPlugin_ConstraintTangent::ID());
-    aConstraints.push_back(SketchPlugin_ConstraintPerpendicular::ID());
-  }
-  std::list<std::string>::const_iterator aIt;
-  for (aIt = aConstraints.cbegin(); aIt != aConstraints.cend(); ++aIt) {
-    if ((*aIt) == theName)
-      return true;
-  }
-  return false;
+  return ((theName == SketchPlugin_ConstraintTangent::ID()) ||
+    (theName == SketchPlugin_ConstraintPerpendicular::ID()));
 }
 
 bool containsPoint(const FeaturePtr& theFeature, GeomPnt2dPtr thePnt2d, GeomPointPtr thePos)
@@ -156,30 +147,26 @@ const std::array<int, 2>& SketcherPrs_PositionMgr::getPositionIndex(GeomPointPtr
     for (int i = 0; i < aNbSubs; i++) {
       FeaturePtr aFeature = aOwner->subFeature(i);
 
-      if (myPntShapes.count(aFeature.get()) == 1) {
-        myPntShapes[aFeature.get()][0] = aId;
-        aId++;
-        aFeaList.push_back(aFeature.get());
-      } else {
-        if (isPntConstraint(aFeature->getKind())) {
-          DataPtr aData = aFeature->data();
-          AttributeRefAttrPtr aObjRef = aData->refattr(SketchPlugin_Constraint::ENTITY_A());
-          FeaturePtr aObj = ModelAPI_Feature::feature(aObjRef->object());
-          bool aContains = false;
+      bool aUseFeature = ((myPntShapes.count(aFeature.get()) == 1) ||
+                         (isPntConstraint(aFeature->getKind())));
+      if (aUseFeature) {
+        DataPtr aData = aFeature->data();
+        AttributeRefAttrPtr aObjRef = aData->refattr(SketchPlugin_Constraint::ENTITY_A());
+        FeaturePtr aObj = ModelAPI_Feature::feature(aObjRef->object());
+        bool aContains = false;
+        if (containsPoint(aObj, aPnt2d, thePos)) {
+          aContains = true;
+        } else {
+          aObjRef = aData->refattr(SketchPlugin_Constraint::ENTITY_B());
+          aObj = ModelAPI_Feature::feature(aObjRef->object());
           if (containsPoint(aObj, aPnt2d, thePos)) {
             aContains = true;
-          } else {
-            aObjRef = aData->refattr(SketchPlugin_Constraint::ENTITY_B());
-            aObj = ModelAPI_Feature::feature(aObjRef->object());
-            if (containsPoint(aObj, aPnt2d, thePos)) {
-              aContains = true;
-            }
           }
-          if (aContains) {
-            myPntShapes[aFeature.get()][0] = aId;
-            aId++;
-            aFeaList.push_back(aFeature.get());
-          }
+        }
+        if (aContains) {
+          myPntShapes[aFeature.get()][0] = aId;
+          aId++;
+          aFeaList.push_back(aFeature.get());
         }
       }
     }
