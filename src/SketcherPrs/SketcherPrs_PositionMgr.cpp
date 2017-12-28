@@ -373,7 +373,8 @@ gp_Pnt SketcherPrs_PositionMgr::getPointPosition(
   const std::array<int, 2>& aPos = getPositionIndex(thePnt, thePrs);
 
   // Angle size of a symbol
-  double aAngleStep = PI * 50./180.;
+  //double aAngleStep = PI * 50./180.;
+  double aAngleStep = PI/4.;
 
   std::list<gp_Vec>::const_iterator aItVec;
   std::list<double> aAngles;
@@ -396,7 +397,7 @@ gp_Pnt SketcherPrs_PositionMgr::getPointPosition(
         }
       }
     }
-    if ((aMinAng * 2) >= aAngleStep) {
+    if (aMinAng >= aAngleStep) {
       aVectors.push_back(aVec);
       aAngles.push_back(aMinAng);
     }
@@ -408,9 +409,7 @@ gp_Pnt SketcherPrs_PositionMgr::getPointPosition(
   // directly inside of the angle
   if (aAngles.size() >= aPos[1]) {
     int aId = aPos[0];
-    std::list<gp_Vec>::iterator aVIt = aVectors.begin();
-    std::advance(aVIt, aId);
-    aVecPos = *aVIt;
+    aVecPos = *(std::next(aVectors.begin(), aId));
 
     gp_Vec aShift = aVecPos.Rotated(aRotAx, aAngleStep);
     aShift.Normalize();
