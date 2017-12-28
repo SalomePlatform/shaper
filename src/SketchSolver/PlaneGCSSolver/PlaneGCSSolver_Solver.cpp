@@ -131,7 +131,7 @@ PlaneGCSSolver_Solver::SolveStatus PlaneGCSSolver_Solver::solve()
   }
 
   if (myParameters.empty())
-    return STATUS_INCONSISTENT;
+    return myConstraints.empty() ? STATUS_OK : STATUS_INCONSISTENT;
 
   GCS::SolveStatus aResult = GCS::Success;
   Events_LongOp::start(this);
@@ -250,6 +250,7 @@ void PlaneGCSSolver_Solver::removeFictiveConstraint()
   if (myFictiveConstraint) {
     myEquationSystem->removeConstraint(myFictiveConstraint);
     myParameters.pop_back();
+    --myDOF;
 
     GCS::VEC_pD aParams = myFictiveConstraint->params();
     for (GCS::VEC_pD::iterator anIt = aParams.begin(); anIt != aParams.end(); ++ anIt)
