@@ -484,6 +484,7 @@ void ModelHighAPI_Dumper::importModule(const std::string& theModuleName,
 void ModelHighAPI_Dumper::dumpEntitySetName()
 {
   const LastDumpedEntity& aLastDumped = myEntitiesStack.top();
+  bool isBufferEmpty = myDumpBuffer.str().empty();
 
   // dump "setName" for the entity
   if (aLastDumped.myUserName) {
@@ -539,6 +540,12 @@ void ModelHighAPI_Dumper::dumpEntitySetName()
 
   myNames[aLastDumped.myEntity].myIsDumped = true;
   myEntitiesStack.pop();
+
+  // clean buffer if it was clear before
+  if (isBufferEmpty) {
+    myFullDump << myDumpBuffer.str();
+    myDumpBuffer.str("");
+  }
 }
 
 bool ModelHighAPI_Dumper::isDumped(const EntityPtr& theEntity) const
@@ -1018,9 +1025,21 @@ ModelHighAPI_Dumper& ModelHighAPI_Dumper::operator<<(
     // save buffer and clear it again
     std::string aDumpedList = myDumpBuffer.str();
     myDumpBuffer.str("");
-    // obtain name of list
+    // obtain name of list (the feature may contain several selection lists)
     FeaturePtr anOwner = ModelAPI_Feature::feature(theAttrSelList->owner());
     std::string aListName = name(anOwner) + "_objects";
+    std::list<AttributePtr> aSelLists =
+        anOwner->data()->attributes(ModelAPI_AttributeSelectionList::typeId());
+    if (aSelLists.size() > 1) {
+      int anIndex = 1;
+      for (std::list<AttributePtr>::iterator aSIt = aSelLists.begin();
+           aSIt != aSelLists.end(); ++aSIt, ++anIndex)
+        if ((*aSIt).get() == theAttrSelList.get())
+          break;
+      std::ostringstream aSStream;
+      aSStream << aListName << "_" << anIndex;
+      aListName = aSStream.str();
+    }
     // store all previous data
     myDumpBuffer << aListName << " = " << aDumpedList << std::endl
                  << aDumped << aListName;

@@ -94,7 +94,9 @@ void FeaturesAPI_RemoveSubShapes::dump(ModelHighAPI_Dumper& theDumper) const
 
   AttributeSelectionListPtr anAttrSubShapes;
 
-  if (aCreationMethod == FeaturesPlugin_RemoveSubShapes::CREATION_METHOD_BY_KEEP_SUBSHAPES()) {
+  bool isKeepSubs =
+      aCreationMethod == FeaturesPlugin_RemoveSubShapes::CREATION_METHOD_BY_KEEP_SUBSHAPES();
+  if (isKeepSubs) {
     anAttrSubShapes =
       aBase->selectionList(FeaturesPlugin_RemoveSubShapes::SUBSHAPES_TO_KEEP_ID());
   }
@@ -103,12 +105,12 @@ void FeaturesAPI_RemoveSubShapes::dump(ModelHighAPI_Dumper& theDumper) const
       aBase->selectionList(FeaturesPlugin_RemoveSubShapes::SUBSHAPES_TO_REMOVE_ID());
   }
 
-  theDumper << aBase << " = model.addRemoveSubShapes(" << aDocName << ", " << anAttrBaseShape << ")"
-            << std::endl;
-  theDumper << aBase
-    << (aCreationMethod == FeaturesPlugin_RemoveSubShapes::CREATION_METHOD_BY_KEEP_SUBSHAPES() ?
-       ".setSubShapesToKeep(" : ".setSubShapesToRemove(")
-    << anAttrSubShapes << ")" << std::endl;
+  theDumper << aBase << " = model.addRemoveSubShapes("
+            << aDocName << ", " << anAttrBaseShape << ")"
+            << "\n"
+            << theDumper.name(aBase)
+            << (isKeepSubs ? ".setSubShapesToKeep(" : ".setSubShapesToRemove(")
+            << anAttrSubShapes << ")" << std::endl;
 }
 
 //==================================================================================================

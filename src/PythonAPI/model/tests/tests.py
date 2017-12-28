@@ -241,24 +241,11 @@ def testHaveNamingByType(theFeature, theModel, thePartDoc, theSubshapeType) :
   Group_1 = theModel.addGroup(thePartDoc, selectionList)
   theModel.do()
 
-  # Check that all selected shapes in group have right shape type and unique name.
-  groupFeature = Group_1.feature()
-  groupSelectionList = groupFeature.selectionList("group_list")
+  groupSelectionList = Group_1.feature().selectionList("group_list")
   assert(groupSelectionList.size() == len(selectionList))
-  presented_names = set()
-  for index in range(0, groupSelectionList.size()):
-    attrSelection = groupSelectionList.value(index)
-    shape = attrSelection.value()
-    name = attrSelection.namingName()
-    if theSubshapeType == GeomAPI_Shape.VERTEX:
-      assert(shape.isVertex())
-    elif theSubshapeType == GeomAPI_Shape.EDGE:
-      assert(shape.isEdge())
-    elif theSubshapeType == GeomAPI_Shape.FACE:
-      assert(shape.isFace())
-    assert(name != ""), "String empty"
-    presented_names.add(name)
-  assert(len(presented_names) == groupSelectionList.size()), "Some names are not unique"
+
+  # Check that all selected shapes in group have right shape type and unique name.
+  checkGroup(Group_1, theSubshapeType)
 
 def testHaveNamingSubshapes(theFeature, theModel, thePartDoc) :
   """ Tests if all vertices/edges/faces of result have a unique name
@@ -302,3 +289,32 @@ def checkBooleansResult(theFeature,theModel,NbRes,NbSubRes,NbSolid,NbFace,NbEdge
   theModel.testNbSubShapes(theFeature, GeomAPI_Shape.FACE, NbFace)
   theModel.testNbSubShapes(theFeature, GeomAPI_Shape.EDGE, NbEdge)
   theModel.testNbSubShapes(theFeature, GeomAPI_Shape.VERTEX, NbVertex)
+
+def checkSketch(theSketch, theDOF = -1):
+  """ Tests the sketch is valid and DoF is equal to the given
+  """
+  assert(theSketch.feature().error() == ""), "Sketch failed: {}".format(theSketch.feature().error())
+  assert(theSketch.solverError().value() == ""), "Sketch solver failed: {}".format(theSketch.solverError().value())
+  if theDOF != -1:
+    aDOF = sketcher.tools.dof(theSketch)
+    assert(aDOF == theDOF), "Sketch DoF {} is wrong. Expected {}".format(aDOF, theDOF)
+
+def checkGroup(theGroup, theShapeType):
+  """ Check that all selected shapes in group have correct shape type and unique name
+  """
+  groupFeature = theGroup.feature()
+  groupSelectionList = groupFeature.selectionList("group_list")
+  presented_names = set()
+  for index in range(0, groupSelectionList.size()):
+    attrSelection = groupSelectionList.value(index)
+    shape = attrSelection.value()
+    name = attrSelection.namingName()
+    if theShapeType == GeomAPI_Shape.VERTEX:
+      assert(shape.isVertex())
+    elif theShapeType == GeomAPI_Shape.EDGE:
+      assert(shape.isEdge())
+    elif theShapeType == GeomAPI_Shape.FACE:
+      assert(shape.isFace())
+    assert(name != ""), "String empty"
+    presented_names.add(name)
+  assert(len(presented_names) == groupSelectionList.size()), "Some names are not unique"

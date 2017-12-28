@@ -289,4 +289,4 @@ model.testResultsVolumes(ExtrusionCut_6, [144033.64842978157685])
 
 model.end()
 
-assert(model.checkPythonDump)
+assert(model.checkPythonDump())
