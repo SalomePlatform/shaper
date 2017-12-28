@@ -396,16 +396,34 @@ gp_Pnt SketcherPrs_PositionMgr::getPointPosition(
         }
       }
     }
-    aVectors.push_back(aVec);
-    aAngles.push_back(aMinAng);
+    if ((aMinAng * 2) >= aAngleStep) {
+      aVectors.push_back(aVec);
+      aAngles.push_back(aMinAng);
+    }
   }
 
+  gp_Ax1 aRotAx(aP, aNormDir);
+  gp_Vec aVecPos;
+  // If number of angle less then number of symbols then each symbol can be placed
+  // directly inside of the angle
+  if (aAngles.size() >= aPos[1]) {
+    int aId = aPos[0];
+    std::list<gp_Vec>::iterator aVIt = aVectors.begin();
+    std::advance(aVIt, aId);
+    aVecPos = *aVIt;
+
+    gp_Vec aShift = aVecPos.Rotated(aRotAx, aAngleStep);
+    aShift.Normalize();
+    aShift.Multiply(theStep * 1.5);
+    return aP.Translated(aShift);
+  }
+
+  // A case when there are a lot of symbols
   int aPosCount = 0;
   double aAng;
   std::list<double>::const_iterator aItAng;
 
   double aAngPos;
-  gp_Vec aVecPos;
   bool aHasPlace = false;
   //int aIntId = 0; // a position inside a one sector
   while (aPosCount < aPos[1]) {
@@ -431,7 +449,6 @@ gp_Pnt SketcherPrs_PositionMgr::getPointPosition(
       break;
   }
 
-  gp_Ax1 aRotAx(aP, aNormDir);
   if (aHasPlace) {
     // rotate base vector on a necessary angle
     gp_Vec aShift = aVecPos.Rotated(aRotAx, aAngleStep + aAngleStep * aPos[0]);
