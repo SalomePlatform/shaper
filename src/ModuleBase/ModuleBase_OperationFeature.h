@@ -140,6 +140,14 @@ Q_OBJECT
   /// \return theFeature a feature
   FeaturePtr previousCurrentFeature();
 
+  /// Set whether the operation should be aborted. By default the state is false in operation
+  /// \param theState abort state
+  void setNeedToBeAborted(const bool theState)  { myNeedToBeAborted = theState; }
+
+  /// Returns valid state of the operation
+  /// \return custom validity state (it is almost always true)
+  bool isNeedToBeAborted() const { return myNeedToBeAborted; }
+
  public slots:
   /// Starts operation
   /// Public slot. Verifies whether operation can be started and starts operation.
@@ -185,6 +193,9 @@ Q_OBJECT
 
   /// Editing feature flag
   bool myIsEditing;
+
+  /// State used only if the operation should not be commited
+  bool myNeedToBeAborted;
 
   /// List of pre-selected object
   QList<std::shared_ptr<ModuleBase_ViewerPrs>> myPreSelection;

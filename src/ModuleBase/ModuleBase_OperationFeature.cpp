@@ -60,8 +60,7 @@
 #endif
 
 ModuleBase_OperationFeature::ModuleBase_OperationFeature(const QString& theId, QObject* theParent)
-: ModuleBase_Operation(theId, theParent),
-  myIsEditing(false)
+: ModuleBase_Operation(theId, theParent), myIsEditing(false), myNeedToBeAborted(false)
 {
 }
 

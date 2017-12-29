@@ -365,15 +365,20 @@ void PartSet_SketcherReentrantMgr::onNoMoreWidgets(const std::string& thePreviou
     return;
 
   if (aFOperation && module()->sketchMgr()->isNestedSketchOperation(aFOperation)) {
-    bool isStarted = false;
-    if (!module()->sketchMgr()->sketchSolverError()) {
-      if (myRestartingMode != RM_Forbided) {
-        myRestartingMode = RM_LastFeatureUsed;
-        isStarted = startInternalEdit(thePreviousAttributeID);
-      }
+    if (aFOperation->isNeedToBeAborted()) {
+      aFOperation->abort();
     }
-    if (!isStarted)
-      aFOperation->commit();
+    else {
+      bool isStarted = false;
+      if (!module()->sketchMgr()->sketchSolverError()) {
+        if (myRestartingMode != RM_Forbided) {
+          myRestartingMode = RM_LastFeatureUsed;
+          isStarted = startInternalEdit(thePreviousAttributeID);
+        }
+      }
+      if (!isStarted)
+        aFOperation->commit();
+    }
   }
 }
 

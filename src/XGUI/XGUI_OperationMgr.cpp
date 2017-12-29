@@ -714,7 +714,15 @@ bool XGUI_OperationMgr::onKeyPressed(QObject *theObject, QKeyEvent* theEvent)
         ModuleBase_IPropertyPanel* aPanel = aOperation->propertyPanel();
         ModuleBase_ModelWidget* anActiveWgt = aPanel->activeWidget();
         if (anActiveWgt)
+        {
           isAccepted = anActiveWgt && anActiveWgt->processAction(ActionEscape);
+          if (isAccepted) {
+            ModuleBase_OperationFeature* aFOperation =
+              dynamic_cast<ModuleBase_OperationFeature*>(currentOperation());
+            if (aFOperation)
+              aFOperation->setNeedToBeAborted(true);
+          }
+        }
       }
       if (!isAccepted)
       {
