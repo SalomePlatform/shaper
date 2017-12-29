@@ -432,9 +432,15 @@ bool XGUI_OperationMgr::canStartOperation(const QString& theId, bool& isCommitte
 
 void XGUI_OperationMgr::stopOperation(ModuleBase_Operation* theOperation, bool& isCommitted)
 {
-  if (XGUI_Tools::workshop(myWorkshop)->errorMgr()->isApplyEnabled() && theOperation->isModified())
+  if (XGUI_Tools::workshop(myWorkshop)->errorMgr()->isApplyEnabled() &&
+      theOperation->isModified()) {
+    ModuleBase_IPropertyPanel* aPanel = theOperation->propertyPanel();
+    if (aPanel) {
+      XGUI_PropertyPanel* aPP = dynamic_cast<XGUI_PropertyPanel*>(aPanel);
+      aPP->onAcceptData();
+    }
     isCommitted = theOperation->commit();
-  else {
+  } else {
     isCommitted = false;
     abortOperation(theOperation);
   }

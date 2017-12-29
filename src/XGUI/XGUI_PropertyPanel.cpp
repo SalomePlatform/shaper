@@ -226,7 +226,8 @@ void XGUI_PropertyPanel::createContentPanel(FeaturePtr theFeature)
   }
   std::shared_ptr<Config_FeatureMessage> aFeatureInfo =
     myOperationMgr->workshop()->featureInfo(theFeature->getKind().c_str());
-  findButton(PROP_PANEL_OK_PLUS)->setVisible(aFeatureInfo->isApplyContinue());
+  if (aFeatureInfo.get())
+    findButton(PROP_PANEL_OK_PLUS)->setVisible(aFeatureInfo->isApplyContinue());
 }
 
 void XGUI_PropertyPanel::activateNextWidget(ModuleBase_ModelWidget* theWidget)
@@ -564,10 +565,6 @@ void XGUI_PropertyPanel::setupActions(XGUI_ActionsMgr* theMgr)
     QAction* anAct = theMgr->operationStateAction(aActionIds.at(i));
     aBtn->setDefaultAction(anAct);
   }
-  QToolButton* aBtn = findButton(PROP_PANEL_OK);
-  connect(aBtn->defaultAction(), SIGNAL(triggered(bool)), this, SLOT(onAcceptData()));
-  aBtn = findButton(PROP_PANEL_OK_PLUS);
-  connect(aBtn->defaultAction(), SIGNAL(triggered(bool)), this, SLOT(onAcceptData()));
 }
 
 void XGUI_PropertyPanel::onAcceptData()
