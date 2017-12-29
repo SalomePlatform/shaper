@@ -237,12 +237,15 @@ void PlaneGCSSolver_Solver::addFictiveConstraintIfNecessary()
   if (myFictiveConstraint)
     return; // no need several fictive constraints
 
+  int aDOF = myDOF;
   double* aParam = createParameter();
   double* aFictiveParameter = new double(0.0);
 
   myFictiveConstraint = new GCS::ConstraintEqual(aFictiveParameter, aParam);
   myFictiveConstraint->setTag(CID_FICTIVE);
   myEquationSystem->addConstraint(myFictiveConstraint);
+  // DoF should not be changed when adding fictive constraint
+  myDOF = aDOF;
 }
 
 void PlaneGCSSolver_Solver::removeFictiveConstraint()
@@ -250,7 +253,6 @@ void PlaneGCSSolver_Solver::removeFictiveConstraint()
   if (myFictiveConstraint) {
     myEquationSystem->removeConstraint(myFictiveConstraint);
     myParameters.pop_back();
-    --myDOF;
 
     GCS::VEC_pD aParams = myFictiveConstraint->params();
     for (GCS::VEC_pD::iterator anIt = aParams.begin(); anIt != aParams.end(); ++ anIt)
