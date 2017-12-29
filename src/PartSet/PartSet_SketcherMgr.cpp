@@ -942,6 +942,13 @@ void PartSet_SketcherMgr::startSketch(ModuleBase_Operation* theOperation)
 
   // Display all sketcher sub-Objects
   myCurrentSketch = std::dynamic_pointer_cast<ModelAPI_CompositeFeature>(aFOperation->feature());
+  double aSizeOfView = 0;
+  std::shared_ptr<GeomAPI_Pnt> aCentralPoint;
+  if (aFOperation->isEditOperation() &&
+      mySketchPlane->getDefaultSizeOfView(myCurrentSketch, aSizeOfView, aCentralPoint)) {
+    mySketchPlane->setSizeOfView(aSizeOfView, true, aCentralPoint);
+  }
+
   mySketchPlane->createSketchPlane(myCurrentSketch, myModule->workshop());
   XGUI_ModuleConnector* aConnector = dynamic_cast<XGUI_ModuleConnector*>(myModule->workshop());
 

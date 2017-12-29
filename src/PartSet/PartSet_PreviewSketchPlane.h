@@ -21,6 +21,8 @@
 #ifndef PartSet_PreviewSketchPlane_H
 #define PartSet_PreviewSketchPlane_H
 
+#include <GeomAPI_Pnt.h>
+
 class GeomAPI_AISObject;
 class GeomAPI_Shape;
 
@@ -53,6 +55,16 @@ public:
   void createSketchPlane(const std::shared_ptr<ModelAPI_CompositeFeature>& theSketch,
                          ModuleBase_IWorkshop* theWorkshop);
 
+  /// Returns bounding box size covered the sketch sub-elements.
+  /// If the sketch uses extenal face, it will not have default size and returns false.
+  /// \param theSketch sources sketch
+  /// \param [out] theSizeOfView maximum value in X, Y or Z direction
+  /// \param theCentralPoint central point of the sketch sub features
+  /// \return boolean value
+  bool getDefaultSizeOfView(const std::shared_ptr<ModelAPI_CompositeFeature>& theSketch,
+                            double& theSizeOfView,
+                            std::shared_ptr<GeomAPI_Pnt>& theCentralPnt);
+
   /// Returns whether custom size of view is set
   /// \return boolean value
   bool isUseSizeOfView() const { return myIsUseSizeOfView; }
@@ -60,7 +72,8 @@ public:
   /// Sets the size of default created face
   /// \param theSizeOfView value
   /// \param isUseSizeOfView state whether the size should be used
-  void setSizeOfView(double theSizeOfView, bool isUseSizeOfView);
+  void setSizeOfView(double theSizeOfView, bool isUseSizeOfView,
+    const std::shared_ptr<GeomAPI_Pnt>& theCentralPoint = std::shared_ptr<GeomAPI_Pnt>());
 
 private:
   /// Create a square face by parameters
@@ -70,9 +83,11 @@ private:
   bool myPreviewIsDisplayed;
   std::shared_ptr<GeomAPI_AISObject> myPlane; //! visualized presentation
   std::shared_ptr<GeomAPI_Shape> myShape; //! current shape to be displayed
+  std::shared_ptr<GeomAPI_Pnt> myViewCentralPoint; //! central point of the default view
 
   double mySizeOfView; //! size that should be used by creating a default face
   bool myIsUseSizeOfView; //! state if the size is custom or from preferences
+  std::shared_ptr<GeomAPI_Pnt> myViewOrigin; //! origin point of sketch if default view is used
 };
 
 #endif

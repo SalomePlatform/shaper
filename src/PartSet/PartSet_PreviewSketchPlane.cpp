@@ -29,6 +29,7 @@
 #include <ModelAPI_Tools.h>
 
 #include <GeomAPI_AISObject.h>
+#include <GeomAPI_Pnt.h>
 
 #include <XGUI_Tools.h>
 #include <XGUI_Displayer.h>
@@ -39,6 +40,8 @@
 
 #include <SketchPlugin_Sketch.h>
 #include <SketchPlugin_SketchEntity.h>
+
+#include <BRepBndLib.hxx>
 
 PartSet_PreviewSketchPlane::PartSet_PreviewSketchPlane()
  : myPreviewIsDisplayed(false), mySizeOfView(0), myIsUseSizeOfView(false)
@@ -91,7 +94,9 @@ void PartSet_PreviewSketchPlane::createSketchPlane(const CompositeFeaturePtr& th
 
       double aFaceSize = myIsUseSizeOfView ? mySizeOfView
         : Config_PropManager::integer(SKETCH_TAB_NAME, "planes_size");
-      myShape = GeomAlgoAPI_FaceBuilder::squareFace(anOrigin->pnt(), aNormal->dir(), aFaceSize);
+
+      myShape = GeomAlgoAPI_FaceBuilder::squareFace(
+        myViewCentralPoint.get() ? myViewCentralPoint : anOrigin->pnt(), aNormal->dir(), aFaceSize);
     }
     myPlane = createPreviewPlane();
   }
@@ -101,10 +106,82 @@ void PartSet_PreviewSketchPlane::createSketchPlane(const CompositeFeaturePtr& th
   myPreviewIsDisplayed = true;
 }
 
-void PartSet_PreviewSketchPlane::setSizeOfView(double theSizeOfView, bool isUseSizeOfView)
+double maximumSize(double theXmin, double theYmin, double theZmin,
+                   double theXmax, double theYmax, double theZmax)
+{
+  double aSize = fabs(theXmax - theXmin);
+  double aSizeToCompare = fabs(theYmax - theYmin);
+  if (aSizeToCompare > aSize)
+    aSize = aSizeToCompare;
+  aSizeToCompare = fabs(theZmax - theZmin);
+  if (aSizeToCompare > aSize)
+    aSize = aSizeToCompare;
+
+  return aSize;
+}
+
+bool PartSet_PreviewSketchPlane::getDefaultSizeOfView(
+  const CompositeFeaturePtr& theSketch, double& theSizeOfView,
+  std::shared_ptr<GeomAPI_Pnt>& theCentralPnt)
+{
+  if (!PartSet_Tools::sketchPlane(theSketch).get())
+    return false;
+
+  AttributeSelectionPtr aSelAttr = std::dynamic_pointer_cast<ModelAPI_AttributeSelection>
+    (theSketch->data()->attribute(SketchPlugin_SketchEntity::EXTERNAL_ID()));
+  if (aSelAttr) {
+    myShape = aSelAttr->value();
+    // this case is needed by constructing sketch on a plane, where result shape is equal
+    // to context result, therefore value() returns NULL and we should use shape of context.
+    if (!myShape.get() && aSelAttr->context().get())
+      myShape = aSelAttr->context()->shape();
+  }
+
+  if (myShape.get())
+    return false;
+
+  Bnd_Box aBox;
+  for (int aSubFeatureId = 0; aSubFeatureId < theSketch->numberOfSubs(); aSubFeatureId++) {
+    FeaturePtr aFeature = theSketch->subFeature(aSubFeatureId);
+    if (!aFeature.get())
+      continue;
+
+    std::list<ResultPtr> aResults = aFeature->results();
+    std::list<ResultPtr>::const_iterator aResultIt;
+    for (aResultIt = aResults.begin(); aResultIt != aResults.end(); ++aResultIt) {
+      ResultPtr aResult = *aResultIt;
+      std::shared_ptr<GeomAPI_Shape> aShapePtr = aResult->shape();
+      if (aShapePtr.get()) {
+        TopoDS_Shape aShape = aShapePtr->impl<TopoDS_Shape>();
+        if (aShape.IsNull())
+          continue;
+        BRepBndLib::Add(aShape, aBox);
+      }
+    }
+  }
+  if (aBox.IsVoid())
+    return 0;
+
+  double aXmin, aXmax, anYmin, anYmax, aZmin, aZmax;
+  aBox.Get(aXmin, anYmin, aZmin, aXmax, anYmax, aZmax);
+
+  theSizeOfView = maximumSize(aXmin, anYmin, aZmin, aXmax, anYmax, aZmax);
+  if (theSizeOfView > 0) {
+    gp_Pnt aCentre(aXmax-fabs(aXmax-aXmin)/2., anYmax-fabs(anYmax-anYmin)/2.,
+                   aZmax - fabs(aZmax-aZmin)/2.);
+    theCentralPnt = std::shared_ptr<GeomAPI_Pnt>(new GeomAPI_Pnt(aCentre.X(), aCentre.Y(),
+                                                                 aCentre.Z()));
+  }
+  return true;
+}
+
+void PartSet_PreviewSketchPlane::setSizeOfView(double theSizeOfView, bool isUseSizeOfView,
+  const std::shared_ptr<GeomAPI_Pnt>& theCentralPoint)
 {
   mySizeOfView = theSizeOfView;
   myIsUseSizeOfView = isUseSizeOfView;
+
+  myViewCentralPoint = theCentralPoint;
 }
 
 AISObjectPtr PartSet_PreviewSketchPlane::createPreviewPlane()
