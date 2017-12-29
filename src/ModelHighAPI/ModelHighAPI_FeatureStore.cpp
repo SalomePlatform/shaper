@@ -360,7 +360,7 @@ std::string ModelHighAPI_FeatureStore::dumpShape(std::shared_ptr<GeomAPI_Shape>&
     aResult<<": "<<aCount<<std::endl;
   }
   // output the main characteristics
-  if (GeomAlgoAPI_ShapeTools::volume(theShape) > 1.e-7) {
+  if (GeomAlgoAPI_ShapeTools::volume(theShape) > 1.e-5) {
     aResult<<"Volume: "<<
       std::fixed<<setprecision(3)<<GeomAlgoAPI_ShapeTools::volume(theShape)<<std::endl;
   }

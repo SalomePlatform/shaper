@@ -131,7 +131,8 @@ std::shared_ptr<GeomAPI_Pnt>
     BRepGProp::LinearProperties(aShape, aGProps);
     aCentre = aGProps.CentreOfMass();
   } else {
-    BRepGProp::SurfaceProperties(aShape, aGProps);
+    const Standard_Real anEps = 1.e-6;
+    BRepGProp::SurfaceProperties(aShape, aGProps, anEps);
     aCentre = aGProps.CentreOfMass();
   }
   return std::shared_ptr<GeomAPI_Pnt>(new GeomAPI_Pnt(aCentre.X(), aCentre.Y(), aCentre.Z()));
