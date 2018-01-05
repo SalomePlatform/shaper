@@ -257,7 +257,7 @@ void SketchPlugin_Projection::computeProjection(const std::string& theID)
     aCenterPnt->setValue(aCenterInSketch);
     aProjection->boolean(SketchPlugin_Arc::REVERSED_ID())->setValue(isInversed);
 
-    aProjection->data()->blockSendAttributeUpdated(aWasBlocked, false);
+    aProjection->data()->blockSendAttributeUpdated(aWasBlocked);
   } else
     return;
 
