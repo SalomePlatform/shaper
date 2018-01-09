@@ -208,7 +208,6 @@ void FeaturesPlugin_Fillet::loadNamingDS(
   const int aSubsolidsTag = 4;
 
   theResultBody->storeModified(theBaseShape, theResultShape, aSubsolidsTag);
-  theResultBody->storeGenerated(theBaseShape, theResultShape);
 
   const std::string aModFaceName = "Modified_Face";
   const std::string aFilletFaceName = "Fillet_Face";

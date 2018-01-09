@@ -47,7 +47,7 @@
 #include <Config_PropManager.h>
 
 Model_Update MY_UPDATER_INSTANCE;  /// the only one instance initialized on load of the library
-//#define DEB_UPDATE
+#define DEB_UPDATE
 
 Model_Update::Model_Update()
 {
@@ -86,6 +86,7 @@ bool Model_Update::addModified(FeaturePtr theFeature, FeaturePtr theReason) {
 
   if (!theFeature->data()->isValid())
     return false; // delete an extrusion created on the sketch
+
 
   bool isNotExecuted = theFeature->isPersistentResult() &&
     !std::dynamic_pointer_cast<Model_Document>((theFeature)->document())->executeFeatures();
@@ -301,12 +302,16 @@ void Model_Update::processEvent(const std::shared_ptr<Events_Message>& theMessag
         const std::set<std::shared_ptr<ModelAPI_Attribute> >&
           aRefs = (*anObjIter)->data()->refsToMe();
         std::set<std::shared_ptr<ModelAPI_Attribute> >::const_iterator aRefIter = aRefs.cbegin();
+        FeaturePtr aReason;
+        ResultPtr aReasonResult = std::dynamic_pointer_cast<ModelAPI_Result>(*anObjIter);
+        if (aReasonResult.get())
+          aReason = (*anObjIter)->document()->feature(aReasonResult);
         for(; aRefIter != aRefs.cend(); aRefIter++) {
           if (!(*aRefIter)->owner()->data()->isValid())
             continue;
           FeaturePtr anUpdated = std::dynamic_pointer_cast<ModelAPI_Feature>((*aRefIter)->owner());
           if (anUpdated.get()) {
-            if (addModified(anUpdated, FeaturePtr()))
+            if (addModified(anUpdated, aReason))
               aSomeModified = true;
           }
         }
@@ -593,6 +598,23 @@ bool Model_Update::processFeature(FeaturePtr theFeature)
     CompositeFeaturePtr aCurrentOwner =
       ModelAPI_Tools::compositeOwner(theFeature->document()->currentFeature(false));
     isPostponedMain = aCurrentOwner.get() && aCompos->isSub(aCurrentOwner);
+  } else if (theFeature->getKind() == "Sketch" &&
+    std::dynamic_pointer_cast<Model_Document>((theFeature)->document())->executeFeatures()) {
+    // send event that sketch is prepared to be recomputed
+    static Events_ID anID = Events_Loop::eventByName("SketchPrepared");
+    std::shared_ptr<Events_Message> aMsg(new Events_Message(anID, this));
+    Events_Loop* aLoop = Events_Loop::loop();
+    aLoop->send(aMsg);
+    // check that sub-elements of sketch are updated => sketch must be re-processed
+    std::set<FeaturePtr> aWholeR;
+    allReasons(theFeature, aWholeR);
+    std::set<FeaturePtr>::iterator aRIter = aWholeR.begin();
+    for(; aRIter != aWholeR.end(); aRIter++) {
+      if (myModified.find(*aRIter) != myModified.end()) {
+        processFeature(theFeature);
+        return true;
+      }
+    }
   }
 
 #ifdef DEB_UPDATE
