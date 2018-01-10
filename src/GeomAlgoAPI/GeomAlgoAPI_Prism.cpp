@@ -144,22 +144,12 @@ void GeomAlgoAPI_Prism::build(const GeomShapePtr&                theBaseShape,
   }
 
   // Getting direction.
-  gp_Vec aDirVec;
+  gp_Vec aBaseVec;
   std::shared_ptr<GeomAPI_Pnt> aBaseLoc;
   std::shared_ptr<GeomAPI_Dir> aBaseDir;
-  GeomShapePtr aBasePlane;
-  const bool isBoundingShapesSet = theFromShape.get() || theToShape.get();
   BRepBuilderAPI_FindPlane aFindPlane(aBaseShape);
-  if ((aBaseShape.ShapeType() == TopAbs_VERTEX || aBaseShape.ShapeType() == TopAbs_EDGE)
-      && theDirection.get())
+  if(aFindPlane.Found() == Standard_True)
   {
-    aBaseDir = theDirection;
-    aDirVec = theDirection->impl<gp_Dir>();
-  } else {
-    if(aFindPlane.Found() == Standard_False) {
-      return;
-    }
-
     Handle(Geom_Plane) aPlane;
     if(aBaseShape.ShapeType() == TopAbs_FACE || aBaseShape.ShapeType() == TopAbs_SHELL) {
       TopExp_Explorer anExp(aBaseShape, TopAbs_FACE);
@@ -178,13 +168,23 @@ void GeomAlgoAPI_Prism::build(const GeomShapePtr&                theBaseShape,
       aPlane = aFindPlane.Plane();
     }
     gp_Pnt aLoc = aPlane->Axis().Location();
-    aDirVec = aPlane->Axis().Direction();
+    aBaseVec = aPlane->Axis().Direction();
     aBaseLoc.reset(new GeomAPI_Pnt(aLoc.X(), aLoc.Y(), aLoc.Z()));
-    aBaseDir.reset(new GeomAPI_Dir(aDirVec.X(), aDirVec.Y(), aDirVec.Z()));
+    aBaseDir.reset(new GeomAPI_Dir(aBaseVec.X(), aBaseVec.Y(), aBaseVec.Z()));
   }
+  else if (theDirection.get())
+  {
+    aBaseDir = theDirection;
+    aBaseVec = theDirection->impl<gp_Dir>();
+  }
+  else
+  {
+    return;
+  }
+
   if(!aBaseLoc.get()) {
     gp_Pnt aLoc;
-    gp_XYZ aDirXYZ = aDirVec.XYZ();
+    gp_XYZ aDirXYZ = aBaseVec.XYZ();
     Standard_Real aMinParam = Precision::Infinite();
     for(TopExp_Explorer anExp(aBaseShape, TopAbs_VERTEX); anExp.More(); anExp.Next()) {
       const TopoDS_Shape& aVertex = anExp.Current();
@@ -197,13 +197,29 @@ void GeomAlgoAPI_Prism::build(const GeomShapePtr&                theBaseShape,
     }
     aBaseLoc.reset(new GeomAPI_Pnt(aLoc.X(), aLoc.Y(), aLoc.Z()));
   }
-  aBasePlane = GeomAlgoAPI_FaceBuilder::planarFace(aBaseLoc, aBaseDir);
+
+  GeomShapePtr aBasePlane = GeomAlgoAPI_FaceBuilder::planarFace(aBaseLoc, aBaseDir);
+
+  gp_Vec anExtVec;
+  std::shared_ptr<GeomAPI_Dir> anExtDir;
+  if (theDirection.get())
+  {
+    anExtDir = theDirection;
+    anExtVec = theDirection->impl<gp_Dir>();
+  }
+  else
+  {
+    anExtDir = aBaseDir;
+    anExtVec = aBaseDir->impl<gp_Dir>();
+  }
+
 
   TopoDS_Shape aResult;
+  const bool isBoundingShapesSet = theFromShape.get() || theToShape.get();
   if(!isBoundingShapesSet) {
     // Moving base shape.
     gp_Trsf aTrsf;
-    aTrsf.SetTranslation(aDirVec * -theFromSize);
+    aTrsf.SetTranslation(anExtVec * -theFromSize);
     BRepBuilderAPI_Transform* aTransformBuilder =
       new BRepBuilderAPI_Transform(aBaseShape, aTrsf);
     if(!aTransformBuilder) {
@@ -218,7 +234,7 @@ void GeomAlgoAPI_Prism::build(const GeomShapePtr&                theBaseShape,
 
     // Making prism.
     BRepPrimAPI_MakePrism* aPrismBuilder =
-      new BRepPrimAPI_MakePrism(aMovedBase, aDirVec * (theFromSize + theToSize));
+      new BRepPrimAPI_MakePrism(aMovedBase, anExtVec * (theFromSize + theToSize));
     if(!aPrismBuilder) {
       return;
     }
@@ -249,15 +265,15 @@ void GeomAlgoAPI_Prism::build(const GeomShapePtr&                theBaseShape,
     std::shared_ptr<GeomAPI_Pnt> aToLoc = aToPln->location();
     std::shared_ptr<GeomAPI_Dir> aToDir = aToPln->direction();
 
-    bool aSign = aFromLoc->xyz()->dot(aBaseDir->xyz()) > aToLoc->xyz()->dot(aBaseDir->xyz());
+    bool aSign = aFromLoc->xyz()->dot(anExtDir->xyz()) > aToLoc->xyz()->dot(anExtDir->xyz());
 
     std::shared_ptr<GeomAPI_Pnt> aFromPnt(
-      new GeomAPI_Pnt(aFromLoc->xyz()->added(aBaseDir->xyz()->multiplied(
+      new GeomAPI_Pnt(aFromLoc->xyz()->added(anExtDir->xyz()->multiplied(
                       aSign ? theFromSize : -theFromSize))));
     aBoundingFromShape = GeomAlgoAPI_FaceBuilder::planarFace(aFromPnt, aFromDir);
 
     std::shared_ptr<GeomAPI_Pnt> aToPnt(
-      new GeomAPI_Pnt(aToLoc->xyz()->added(aBaseDir->xyz()->multiplied(
+      new GeomAPI_Pnt(aToLoc->xyz()->added(anExtDir->xyz()->multiplied(
                       aSign ? -theToSize : theToSize))));
     aBoundingToShape = GeomAlgoAPI_FaceBuilder::planarFace(aToPnt, aToDir);
 
@@ -283,7 +299,7 @@ void GeomAlgoAPI_Prism::build(const GeomShapePtr&                theBaseShape,
     IntAna_Quadric aBndFromQuadric(gp_Pln(aFromPnt->impl<gp_Pnt>(), aFromDir->impl<gp_Dir>()));
     Standard_Real aMaxToDist = 0, aMaxFromDist = 0;
     for(int i = 0; i < 8; i++) {
-      gp_Lin aLine(aPoints[i], aDirVec);
+      gp_Lin aLine(aPoints[i], anExtVec);
       IntAna_IntConicQuad aToIntAna(aLine, aBndToQuadric);
       IntAna_IntConicQuad aFromIntAna(aLine, aBndFromQuadric);
       if(aToIntAna.NbPoints() == 0 || aFromIntAna.NbPoints() == 0) {
@@ -304,7 +320,7 @@ void GeomAlgoAPI_Prism::build(const GeomShapePtr&                theBaseShape,
 
     // Moving base shape.
     gp_Trsf aTrsf;
-    aTrsf.SetTranslation(aDirVec * -aPrismLength);
+    aTrsf.SetTranslation(anExtVec * -aPrismLength);
     BRepBuilderAPI_Transform* aTransformBuilder = new BRepBuilderAPI_Transform(aBaseShape, aTrsf);
     if(!aTransformBuilder) {
       return;
@@ -318,7 +334,7 @@ void GeomAlgoAPI_Prism::build(const GeomShapePtr&                theBaseShape,
 
     // Making prism.
     BRepPrimAPI_MakePrism* aPrismBuilder =
-      new BRepPrimAPI_MakePrism(aMovedBase, aDirVec * 2 * aPrismLength);
+      new BRepPrimAPI_MakePrism(aMovedBase, anExtVec * 2 * aPrismLength);
     if(!aPrismBuilder) {
       return;
     }
@@ -332,30 +348,30 @@ void GeomAlgoAPI_Prism::build(const GeomShapePtr&                theBaseShape,
     // Orienting bounding planes.
     std::shared_ptr<GeomAPI_Pnt> aCentreOfMass = GeomAlgoAPI_ShapeTools::centreOfMass(theBaseShape);
     const gp_Pnt& aCentrePnt = aCentreOfMass->impl<gp_Pnt>();
-    gp_Lin aLine(aCentrePnt, aDirVec);
+    gp_Lin aLine(aCentrePnt, anExtVec);
     IntAna_IntConicQuad aToIntAna(aLine, aBndToQuadric);
     IntAna_IntConicQuad aFromIntAna(aLine, aBndFromQuadric);
     Standard_Real aToParameter = aToIntAna.ParamOnConic(1);
     Standard_Real aFromParameter = aFromIntAna.ParamOnConic(1);
     if(aToParameter > aFromParameter) {
       gp_Vec aVec = aToDir->impl<gp_Dir>();
-      if((aVec * aDirVec) > 0) {
+      if((aVec * anExtVec) > 0) {
         aToDir->setImpl(new gp_Dir(aVec.Reversed()));
         aBoundingToShape = GeomAlgoAPI_FaceBuilder::planarFace(aToPnt, aToDir);
       }
       aVec = aFromDir->impl<gp_Dir>();
-      if((aVec * aDirVec) < 0) {
+      if((aVec * anExtVec) < 0) {
         aFromDir->setImpl(new gp_Dir(aVec.Reversed()));
         aBoundingFromShape = GeomAlgoAPI_FaceBuilder::planarFace(aFromPnt, aFromDir);
       }
     } else {
       gp_Vec aVec = aToDir->impl<gp_Dir>();
-      if((aVec * aDirVec) < 0) {
+      if((aVec * anExtVec) < 0) {
         aToDir->setImpl(new gp_Dir(aVec.Reversed()));
         aBoundingToShape = GeomAlgoAPI_FaceBuilder::planarFace(aToPnt, aToDir);
       }
       aVec = aFromDir->impl<gp_Dir>();
-      if((aVec * aDirVec) > 0) {
+      if((aVec * anExtVec) > 0) {
         aFromDir->setImpl(new gp_Dir(aVec.Reversed()));
         aBoundingFromShape = GeomAlgoAPI_FaceBuilder::planarFace(aFromPnt, aFromDir);
       }
