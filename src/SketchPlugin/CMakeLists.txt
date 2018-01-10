@@ -183,6 +183,7 @@ ADD_UNIT_TESTS(TestSketchPointLine.py
                TestMirror.py
                TestMultiRotation.py
                TestMultiTranslation.py
+               TestMultiRotationWithParameter.py
                TestFillet.py
                TestFilletInteracting.py
                TestRectangle.py

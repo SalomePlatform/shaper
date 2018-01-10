@@ -39,7 +39,8 @@ public:
       myNumberOfCopies(0),
       myIsFullValue(false),
       myAdjusted(false),
-      myIsEventsBlocked(false)
+      myIsEventsBlocked(false),
+      myIsProcessingNotify(false)
   {}
 
   /// \brief Update constraint
@@ -97,6 +98,7 @@ protected:
   std::set<FeaturePtr> myCopiedFeatures;
 
   bool myIsEventsBlocked;
+  bool myIsProcessingNotify; ///< the notification is already processing
 };
 
 #endif

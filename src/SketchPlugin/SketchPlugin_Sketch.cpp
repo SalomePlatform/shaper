@@ -146,6 +146,20 @@ void SketchPlugin_Sketch::execute()
 
 std::shared_ptr<ModelAPI_Feature> SketchPlugin_Sketch::addFeature(std::string theID)
 {
+  // Set last feature of the sketch as current feature.
+  // Reason: Changing of parameter through Python API may lead to creation of new features
+  //         (e.g. changing number of copies in MultiRotation). If the sketch is not the last
+  //         feature in the Object Browser, then new features will be added to the end feature.
+  //         Therefore, setting any feature below the sketch as a current feature will disable
+  //         these newly created features.
+  std::shared_ptr<ModelAPI_AttributeRefList> aRefList = std::dynamic_pointer_cast<
+      ModelAPI_AttributeRefList>(data()->attribute(SketchPlugin_Sketch::FEATURES_ID()));
+  int aSize = aRefList->size(false);
+  ObjectPtr aLastObject = aSize == 0 ? data()->owner() : aRefList->object(aSize - 1, false);
+  FeaturePtr aLastFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(aLastObject);
+  document()->setCurrentFeature(aLastFeature, false);
+
+  // add new feature
   std::shared_ptr<ModelAPI_Feature> aNew = document()->addFeature(theID, false);
   if (aNew) {
     // the sketch cannot be specified for the macro-features defined in python

@@ -232,10 +232,17 @@ void SketchSolver_ConstraintMulti::notify(const FeaturePtr& theFeature,
       myCopiedFeatures.find(theFeature) == myCopiedFeatures.end())
     return; // the feature is not used by constraint => nothing to update
 
+  if (myIsProcessingNotify)
+    return; // "notify" is already processing
+
+  myIsProcessingNotify = true;
+
   // update derivative object
   updateLocal();
   myAdjusted = false;
   adjustConstraint();
+
+  myIsProcessingNotify = false;
 }
 
 void SketchSolver_ConstraintMulti::blockEvents(bool isBlocked)
