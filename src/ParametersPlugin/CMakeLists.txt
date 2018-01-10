@@ -117,4 +117,5 @@ ADD_UNIT_TESTS(TestParameterCreation.py
                TestParameterRename.py
                TestParameterChangeValue.py
                Test1806.py
+               Test2392.py
               )

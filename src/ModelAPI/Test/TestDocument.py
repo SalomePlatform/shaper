@@ -27,8 +27,6 @@
 # Initialization of the test
 #=========================================================================
 from ModelAPI import *
-# from GeomDataAPI import *
-# from GeomAlgoAPI import *
 
 __updated__ = "2014-12-26"
 
@@ -36,7 +34,6 @@ __updated__ = "2014-12-26"
 # Creation and activation of documents
 #=========================================================================
 aSession = ModelAPI_Session.get()
-# TODO: enable this assertion:
 assert(aSession.moduleDocument())
 assert(aSession.moduleDocument().id() == 0)
 assert(aSession.moduleDocument().kind() == "PartSet")
