@@ -47,7 +47,7 @@
 #include <Config_PropManager.h>
 
 Model_Update MY_UPDATER_INSTANCE;  /// the only one instance initialized on load of the library
-#define DEB_UPDATE
+//#define DEB_UPDATE
 
 Model_Update::Model_Update()
 {
