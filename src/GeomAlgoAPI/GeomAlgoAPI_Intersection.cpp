@@ -70,7 +70,10 @@ void GeomAlgoAPI_Intersection::build(const ListOfShape& theObjects,
     }
   }
   anOperation->SetTools(aTools);
-
+  // optimization for the issue #2399
+  anOperation->Approximation(Standard_True);
+  anOperation->ComputePCurveOn1(Standard_True);
+  anOperation->ComputePCurveOn2(Standard_True);
   // Building and getting result.
   anOperation->Build();
   if(!anOperation->IsDone()) {
