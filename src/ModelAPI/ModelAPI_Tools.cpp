@@ -680,9 +680,21 @@ std::pair<std::string, bool> getDefaultName(
 
   // find an object which is concealed by theResult
   if (aFoundRef != aReferences.end() && !aFoundRef->second.empty()) {
+    // store number of references for each object
+    std::map<ResultPtr, int> aNbRefToObject;
+    // search the object by result index
     std::list<ObjectPtr>::const_iterator anObjIt = aFoundRef->second.begin();
     int aResultIndex = theResultIndex;
     while (--aResultIndex >= 0) {
+      ResultPtr aCurRes = std::dynamic_pointer_cast<ModelAPI_Result>(*anObjIt);
+      ResultCompSolidPtr aParentCompSolid = ModelAPI_Tools::compSolidOwner(aCurRes);
+      if (aParentCompSolid)
+        aCurRes = aParentCompSolid;
+      if (aNbRefToObject.find(aCurRes) == aNbRefToObject.end())
+        aNbRefToObject[aCurRes] = 1;
+      else
+        aNbRefToObject[aCurRes] += 1;
+
       ++anObjIt;
       if (anObjIt == aFoundRef->second.end()) {
         anObjIt = aFoundRef->second.begin();
@@ -699,8 +711,17 @@ std::pair<std::string, bool> getDefaultName(
 
       // return name of reference result only if it has been renamed by the user,
       // in other case compose a default name
-      if (anObjRes->data()->hasUserDefinedName())
-        return std::pair<std::string, bool>(anObjRes->data()->name(), true);
+      if (anObjRes->data()->hasUserDefinedName()) {
+        std::stringstream aName;
+        aName << anObjRes->data()->name();
+        std::map<ResultPtr, int>::iterator aFound = aNbRefToObject.find(anObjRes);
+        if (aFound != aNbRefToObject.end()) {
+          // to generate unique name, add suffix if there are several results
+          // referring to the same shape
+          aName << "_" << aFound->second + 1;
+        }
+        return std::pair<std::string, bool>(aName.str(), true);
+      }
     }
   }
 

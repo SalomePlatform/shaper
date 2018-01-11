@@ -194,4 +194,5 @@ ADD_UNIT_TESTS(TestConstants.py
                TestFolder_Update.py
                TestFolder_Remove.py
                TestFolder_Stability.py
+               Test2398.py
 )
