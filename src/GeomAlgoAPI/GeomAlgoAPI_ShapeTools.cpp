@@ -45,6 +45,7 @@
 #include <BRepExtrema_ExtCF.hxx>
 #include <BRepGProp.hxx>
 #include <BRepTools.hxx>
+#include <BRepTools_WireExplorer.hxx>
 #include <BRepTopAdaptor_FClass2d.hxx>
 #include <BRepClass_FaceClassifier.hxx>
 #include <Geom2d_Curve.hxx>
@@ -71,6 +72,7 @@
 #include <TopoDS_Shell.hxx>
 #include <TopoDS_Vertex.hxx>
 #include <TopoDS.hxx>
+#include <TopExp.hxx>
 #include <TopExp_Explorer.hxx>
 #include <TopTools_ListIteratorOfListOfShape.hxx>
 
@@ -91,7 +93,10 @@ double GeomAlgoAPI_ShapeTools::volume(const std::shared_ptr<GeomAPI_Shape> theSh
     return 0.0;
   }
   const Standard_Real anEps = 1.e-6;
-  BRepGProp::VolumeProperties(aShape, aGProps, anEps);
+  if (aShape.ShapeType() <= TopAbs_SOLID)
+    BRepGProp::VolumeProperties(aShape, aGProps, anEps);
+  else
+    BRepGProp::SurfaceProperties(aShape, aGProps, anEps);
   return aGProps.Mass();
 }
 
@@ -958,12 +963,51 @@ std::shared_ptr<GeomAPI_Dir> GeomAlgoAPI_ShapeTools::buildDirFromAxisAndShape(
 }
 
 //==================================================================================================
+static TopoDS_Wire fixParametricGaps(const TopoDS_Wire& theWire)
+{
+  TopoDS_Wire aFixedWire;
+  Handle(Geom_Curve) aPrevCurve;
+  double aPrevLastParam = 0.0;
+
+  BRep_Builder aBuilder;
+  aBuilder.MakeWire(aFixedWire);
+
+  BRepTools_WireExplorer aWExp(theWire);
+  for (; aWExp.More(); aWExp.Next()) {
+    TopoDS_Edge anEdge = aWExp.Current();
+    double aFirst, aLast;
+    Handle(Geom_Curve) aCurve = BRep_Tool::Curve(anEdge, aFirst, aLast);
+    if (aCurve == aPrevCurve) {
+      // if parametric gap occurs, create new edge based on the copied curve
+      aCurve = Handle(Geom_Curve)::DownCast(aCurve->Copy());
+      TopoDS_Vertex aV1, aV2;
+      TopExp::Vertices(anEdge, aV1, aV2);
+      anEdge = TopoDS::Edge(anEdge.EmptyCopied());
+      aBuilder.UpdateEdge(anEdge, aCurve, BRep_Tool::Tolerance(anEdge));
+      aBuilder.Add(anEdge, aV1);
+      aBuilder.Add(anEdge, aV2);
+    }
+
+    aBuilder.Add(aFixedWire, anEdge);
+
+    aPrevCurve = aCurve;
+    aPrevLastParam = aLast;
+  }
+
+  return aFixedWire;
+}
+
 std::shared_ptr<GeomAPI_Edge> GeomAlgoAPI_ShapeTools::wireToEdge(
       const std::shared_ptr<GeomAPI_Wire>& theWire)
 {
   GeomEdgePtr anEdge;
   if (theWire) {
-    const TopoDS_Wire& aWire = theWire->impl<TopoDS_Wire>();
+    TopoDS_Wire aWire = theWire->impl<TopoDS_Wire>();
+    // Workaround: when concatenate a wire consisting of two edges based on the same B-spline curve
+    // (non-periodic, but having equal start and end points), first of which is placed at the end
+    // on the curve and second is placed at the start, this workaround copies second curve to avoid
+    // treating these edges as a single curve by setting trim parameters.
+    aWire = fixParametricGaps(aWire);
     TopoDS_Edge aNewEdge = BRepAlgo::ConcatenateWireC0(aWire);
     anEdge = GeomEdgePtr(new GeomAPI_Edge);
     anEdge->setImpl(new TopoDS_Edge(aNewEdge));

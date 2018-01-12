@@ -110,4 +110,6 @@ ADD_UNIT_TESTS(TestVertex.py
                TestFilling_ByEdges.py
                TestFilling_ByWires.py
                TestFilling_Mixed.py
-               Test1920.py)
+               Test1920.py
+               Test2398.py
+)
