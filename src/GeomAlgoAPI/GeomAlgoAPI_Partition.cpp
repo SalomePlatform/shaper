@@ -22,6 +22,7 @@
 
 #include <GeomAlgoAPI_DFLoader.h>
 #include <GeomAlgoAPI_ShapeTools.h>
+#include <GeomAlgoAPI_SortListOfShapes.h>
 
 #include <GEOMAlgo_Splitter.hxx>
 
@@ -30,8 +31,9 @@
 #include <TopoDS_Builder.hxx>
 #include <TopTools_MapOfShape.hxx>
 
+
 //=================================================================================================
-bool isSubShape(const TopoDS_Shape& theShape, const TopoDS_Shape& theSubShape)
+static bool isSubShape(const TopoDS_Shape& theShape, const TopoDS_Shape& theSubShape)
 {
   for(TopExp_Explorer anExp(theShape, theSubShape.ShapeType()); anExp.More(); anExp.Next()) {
     if(theSubShape.IsSame(anExp.Current())) {
@@ -40,6 +42,28 @@ bool isSubShape(const TopoDS_Shape& theShape, const TopoDS_Shape& theSubShape)
   }
 
   return false;
+}
+
+//=================================================================================================
+static void sortCompound(TopoDS_Shape& theCompound)
+{
+  ListOfShape aCombiningShapes;
+  for (TopoDS_Iterator anIt(theCompound); anIt.More(); anIt.Next()) {
+    GeomShapePtr aSub(new GeomAPI_Shape);
+    aSub->setImpl(new TopoDS_Shape(anIt.Value()));
+    aCombiningShapes.push_back(aSub);
+  }
+
+  // sort sub-shapes of compound to stabilize the sequence of the Partition's results
+  GeomAlgoAPI_SortListOfShapes::sort(aCombiningShapes);
+
+  TopoDS_Compound aTempCompound;
+  TopoDS_Builder aBuilder;
+  aBuilder.MakeCompound(aTempCompound);
+  for (ListOfShape::iterator anIt = aCombiningShapes.begin();
+       anIt != aCombiningShapes.end(); ++anIt)
+    aBuilder.Add(aTempCompound, (*anIt)->impl<TopoDS_Shape>());
+  theCompound = aTempCompound;
 }
 
 //=================================================================================================
@@ -173,6 +197,9 @@ void GeomAlgoAPI_Partition::build(const ListOfShape& theObjects,
   }
 
   if(aResult.ShapeType() == TopAbs_COMPOUND) {
+    // sort sub-shapes of compound before creation of a compsolid
+    sortCompound(aResult);
+
     std::shared_ptr<GeomAPI_Shape> aGeomShape(new GeomAPI_Shape);
     aGeomShape->setImpl(new TopoDS_Shape(aResult));
     aResult = GeomAlgoAPI_ShapeTools::groupSharedTopology(aGeomShape)->impl<TopoDS_Shape>();
