@@ -332,6 +332,7 @@ FeaturePtr SketchPlugin_Fillet::createFilletApex(const GeomPnt2dPtr& theCoordina
   AttributePoint2DPtr aCoord = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
       anApex->attribute(SketchPlugin_Point::COORD_ID()));
   aCoord->setValue(theCoordinates);
+  anApex->boolean(SketchPlugin_Point::AUXILIARY_ID())->setValue(true);
 
   // additional coincidence constraints
   static Events_ID anUpdateEvent = Events_Loop::eventByName(EVENT_OBJECT_UPDATED);
@@ -416,7 +417,7 @@ void SketchPlugin_Fillet::removeReferencesButKeepDistances(
           AttributePoint2DPtr aFlyoutAttr = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
               aLength->attribute(SketchPlugin_ConstraintLength::FLYOUT_VALUE_PNT()));
           if (aFlyoutAttr && aFlyoutAttr->isInitialized())
-            aNewLength.myFlyoutPoint = aFlyoutAttr->pnt();
+            aNewLength.myFlyoutPoint = SketchPlugin_Tools::flyoutPointCoordinates(aLength);
           AttributeIntegerPtr aLocationAttr =
               aLength->integer(SketchPlugin_ConstraintLength::LOCATION_TYPE_ID());
           if (aLocationAttr && aLocationAttr->isInitialized())

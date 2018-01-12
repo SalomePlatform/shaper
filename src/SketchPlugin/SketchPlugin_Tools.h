@@ -28,6 +28,7 @@
 #include <ModelAPI_AttributeRefAttr.h>
 #include <GeomDataAPI_Point2D.h>
 
+class SketchPlugin_Constraint;
 class SketchPlugin_Feature;
 class SketchPlugin_Sketch;
 
@@ -112,6 +113,10 @@ void convertRefAttrToPointOrTangentCurve(const AttributeRefAttrPtr&      theRefA
                                          const AttributePtr&             theDefaultAttr,
                                          std::shared_ptr<GeomAPI_Shape>& theTangentCurve,
                                          std::shared_ptr<GeomAPI_Pnt2d>& thePassingPoint);
+
+
+/// Calculate global coordinates for flyout point of Length constraint
+GeomPnt2dPtr flyoutPointCoordinates(const std::shared_ptr<SketchPlugin_Constraint>& theConstraint);
 }; // namespace SketchPlugin_Tools
 
 #endif // SKETCHPLUGIN_TOOLS_H_

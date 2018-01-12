@@ -21,13 +21,19 @@
 #include "SketchPlugin_Tools.h"
 
 #include "SketchPlugin_ConstraintCoincidence.h"
+#include "SketchPlugin_ConstraintLength.h"
 #include "SketchPlugin_ConstraintTangent.h"
+#include "SketchPlugin_Line.h"
 #include "SketchPlugin_Point.h"
 #include "SketchPlugin_SketchEntity.h"
 
 #include <SketcherPrs_Tools.h>
 
 #include <ModelAPI_AttributeDouble.h>
+
+#include <GeomAPI_Dir2d.h>
+#include <GeomAPI_Pnt2d.h>
+#include <GeomAPI_XY.h>
 
 #include <GeomDataAPI_Point.h>
 #include <GeomDataAPI_Point2D.h>
@@ -388,6 +394,37 @@ FeaturePtr createConstraintObjectObject(SketchPlugin_Sketch* theSketch,
 #endif
 
   return aConstraint;
+}
+
+GeomPnt2dPtr flyoutPointCoordinates(const ConstraintPtr& theConstraint)
+{
+  // currently process Length constraints only
+  if (theConstraint->getKind() != SketchPlugin_ConstraintLength::ID())
+    return GeomPnt2dPtr();
+
+  AttributeRefAttrPtr aLineAttr = theConstraint->refattr(SketchPlugin_Constraint::ENTITY_A());
+  if (!aLineAttr || !aLineAttr->isObject())
+    return GeomPnt2dPtr();
+  FeaturePtr aLine = ModelAPI_Feature::feature(aLineAttr->object());
+  if (!aLine || aLine->getKind() != SketchPlugin_Line::ID())
+    return GeomPnt2dPtr();
+
+  std::shared_ptr<GeomAPI_XY> aStartPnt = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
+      aLine->attribute(SketchPlugin_Line::START_ID()))->pnt()->xy();
+  std::shared_ptr<GeomAPI_XY> aEndPnt = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
+      aLine->attribute(SketchPlugin_Line::END_ID()))->pnt()->xy();
+
+  std::shared_ptr<GeomDataAPI_Point2D> aFlyoutAttr =
+      std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
+      theConstraint->attribute(SketchPlugin_Constraint::FLYOUT_VALUE_PNT()));
+  std::shared_ptr<GeomAPI_Pnt2d> aFltPnt = aFlyoutAttr->pnt();
+
+  std::shared_ptr<GeomAPI_Dir2d> aLineDir(new GeomAPI_Dir2d(aEndPnt->decreased(aStartPnt)));
+
+  double X = aStartPnt->x() + aFltPnt->x() * aLineDir->x() - aFltPnt->y() * aLineDir->y();
+  double Y = aStartPnt->y() + aFltPnt->x() * aLineDir->y() + aFltPnt->y() * aLineDir->x();
+
+  return GeomPnt2dPtr(new GeomAPI_Pnt2d(X, Y));
 }
 
 } // namespace SketchPlugin_Tools
