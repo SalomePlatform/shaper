@@ -300,7 +300,8 @@ std::list<ObjectPtr> getCurves(const GeomPointPtr& thePnt, const SketcherPrs_Sym
       GeomPnt2dPtr aPnt1 = aSPnt1->pnt();
       GeomPnt2dPtr aPnt2 = aSPnt2->pnt();
 
-      if (aPnt1->isEqual(aPnt2d) || aPnt2->isEqual(aPnt2d)) {
+      if (aPnt1->distance(aPnt2d) <= Precision::Confusion() ||
+          aPnt2->distance(aPnt2d) <= Precision::Confusion()) {
         // a point corresponds to one of the line end
         GeomShapePtr aShp = SketcherPrs_Tools::getShape(aFeature->firstResult());
         GeomCurvePtr aCurv = std::shared_ptr<GeomAPI_Curve>(new GeomAPI_Curve(aShp));
@@ -394,7 +395,7 @@ gp_Pnt SketcherPrs_PositionMgr::getPointPosition(
   gp_Vec aVecPos;
   // If number of angle less then number of symbols then each symbol can be placed
   // directly inside of the angle
-  if (aAngles.size() >= aPos[1]) {
+  if (aAngles.size() >= aPos[1] && !aVectors.empty()) {
     int aId = aPos[0];
     aVecPos = *(std::next(aVectors.begin(), aId));
 
