@@ -29,6 +29,7 @@
 #include "XGUI_PropertyPanel.h"
 #include "XGUI_ActionsMgr.h"
 #include "XGUI_ErrorMgr.h"
+#include "XGUI_ObjectsBrowser.h"
 
 #include <ModuleBase_IModule.h>
 #include <ModuleBase_ViewerPrs.h>
@@ -118,10 +119,21 @@ ObjectPtr XGUI_ModuleConnector::findPresentedObject(const AISObjectPtr& theAIS) 
 void XGUI_ModuleConnector::setSelected(const QList<ModuleBase_ViewerPrsPtr>& theValues)
 {
   XGUI_Displayer* aDisp = myWorkshop->displayer();
+  XGUI_ObjectsBrowser* aBrowser = myWorkshop->objectBrowser();
   if (theValues.isEmpty()) {
     myWorkshop->selector()->clearSelection();
-  } else
+    aBrowser->treeView()->clearSelection();
+  } else {
     aDisp->setSelected(theValues);
+    // Synchronise the selection with Object browser
+    QObjectPtrList anObjects;
+    foreach(ModuleBase_ViewerPrsPtr aVal, theValues) {
+      anObjects.append(aVal->object());
+    }
+    bool aBlocked = myWorkshop->objectBrowser()->blockSignals(true);
+    aBrowser->setObjectsSelected(anObjects);
+    myWorkshop->objectBrowser()->blockSignals(aBlocked);
+  }
 }
 
 void XGUI_ModuleConnector::setStatusBarMessage(const QString& theMessage)
