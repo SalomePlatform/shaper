@@ -133,9 +133,6 @@ Q_OBJECT
   /// \param theIsNext true, if Tab(to the next widget) or false(moving to the previous)
   bool setFocusNextPrevChild(bool theIsNext);
 
-  /// The method is called on accepting of operation
-  void onAcceptData();
-
 public slots:
   /// \brief Update all widgets in property panel with values from the given feature
   /// \param theFeature a Feature to update values in widgets
@@ -162,6 +159,9 @@ public slots:
   /// Activate next widget
   /// \param theWidget the current widget
   void onActivateNextWidget(ModuleBase_ModelWidget* theWidget);
+
+  /// The method is called on accepting of operation
+  void onAcceptData();
 
 signals:
   /// The signal is emitted if the enter is clicked in the control of the widget

@@ -565,6 +565,11 @@ void XGUI_PropertyPanel::setupActions(XGUI_ActionsMgr* theMgr)
     QAction* anAct = theMgr->operationStateAction(aActionIds.at(i));
     aBtn->setDefaultAction(anAct);
   }
+  // This code is necessary for remembering of user choice in property panel
+  QToolButton* aBtn = findButton(PROP_PANEL_OK);
+  connect(aBtn->defaultAction(), SIGNAL(triggered(bool)), this, SLOT(onAcceptData()));
+  aBtn = findButton(PROP_PANEL_OK_PLUS);
+  connect(aBtn->defaultAction(), SIGNAL(triggered(bool)), this, SLOT(onAcceptData()));
 }
 
 void XGUI_PropertyPanel::onAcceptData()
