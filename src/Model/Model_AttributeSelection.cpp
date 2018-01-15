@@ -907,7 +907,8 @@ void Model_AttributeSelection::selectSubShape(
             std::list<std::shared_ptr<ModelAPI_Result> >::const_iterator aRIter = aFResults.begin();
             for (; aRIter != aFResults.cend(); aRIter++) {
               // iterate sub-bodies of compsolid
-              ResultCompSolidPtr aComp = std::dynamic_pointer_cast<ModelAPI_ResultCompSolid>(*aRIter);
+              ResultCompSolidPtr aComp =
+                std::dynamic_pointer_cast<ModelAPI_ResultCompSolid>(*aRIter);
               if (aComp.get() && aComp->numberOfSubs() > 0) {
                 int aNumSub = aComp->numberOfSubs();
                 for(int a = 0; a < aNumSub; a++) {
