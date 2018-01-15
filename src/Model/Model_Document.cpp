@@ -1306,6 +1306,8 @@ bool Model_Document::removeFromFolder(
 std::shared_ptr<ModelAPI_Feature> Model_Document::feature(
     const std::shared_ptr<ModelAPI_Result>& theResult)
 {
+  if (myObjs == 0) // may be on close
+    return std::shared_ptr<ModelAPI_Feature>();
   return myObjs->feature(theResult);
 }
 

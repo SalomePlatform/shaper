@@ -881,47 +881,56 @@ void Model_AttributeSelection::selectSubShape(
       // try to find the latest active result that must be used instead of the selected
       // to set the active context (like in GUI selection), not concealed one
       bool aFindNewContext = true;
-      while(aFindNewContext && aCont.get() && aShapeToBeSelected.get()) {
+      while(aFindNewContext && aCont.get()) {
         aFindNewContext = false;
-        const std::set<AttributePtr>& aRefs = aCont->data()->refsToMe();
-        std::set<AttributePtr>::const_iterator aRef = aRefs.begin();
-        for(; !aFindNewContext && aRef != aRefs.end(); aRef++) {
-          if (!aRef->get() || !(*aRef)->owner().get())
-            continue;
-          // concealed attribute only
-          FeaturePtr aRefFeat = std::dynamic_pointer_cast<ModelAPI_Feature>((*aRef)->owner());
-          if (!ModelAPI_Session::get()->validators()->isConcealed(
-                  aRefFeat->getKind(), (*aRef)->id()))
-            continue;
-          // search the feature result that contains sub-shape selected
-          std::list<std::shared_ptr<ModelAPI_Result> > aResults;
-
-          // take all sub-results or one result
-          const std::list<std::shared_ptr<ModelAPI_Result> >& aFResults = aRefFeat->results();
-          std::list<std::shared_ptr<ModelAPI_Result> >::const_iterator aRIter = aFResults.begin();
-          for (; aRIter != aFResults.cend(); aRIter++) {
-            // iterate sub-bodies of compsolid
-            ResultCompSolidPtr aComp = std::dynamic_pointer_cast<ModelAPI_ResultCompSolid>(*aRIter);
-            if (aComp.get() && aComp->numberOfSubs() > 0) {
-              int aNumSub = aComp->numberOfSubs();
-              for(int a = 0; a < aNumSub; a++) {
-                aResults.push_back(aComp->subResult(a));
-              }
-            } else {
-              aResults.push_back(*aRIter);
-            }
-          }
-          std::list<std::shared_ptr<ModelAPI_Result> >::iterator aResIter = aResults.begin();
-          for(; aResIter != aResults.end(); aResIter++) {
-            if (!aResIter->get() || !(*aResIter)->data()->isValid() || (*aResIter)->isDisabled())
+        // take references to all results: root one, any sub
+        ResultCompSolidPtr aCompContext = ModelAPI_Tools::compSolidOwner(aCont);
+        int aSubsSize = (aCompContext.get() ? aCompContext->numberOfSubs() : 0) + 1;
+        for(int aResultNum = 0; aResultNum < aSubsSize; aResultNum++) {
+          ResultPtr aResCont = aCompContext.get() ? (aResultNum == aSubsSize - 1 ?
+                  aCompContext : aCompContext->subResult(aResultNum)) : aCont;
+          const std::set<AttributePtr>& aRefs = aResCont->data()->refsToMe();
+          std::set<AttributePtr>::const_iterator aRef = aRefs.begin();
+          for(; !aFindNewContext && aRef != aRefs.end(); aRef++) {
+            if (!aRef->get() || !(*aRef)->owner().get())
               continue;
-            GeomShapePtr aShape = (*aResIter)->shape();
-            if (aShape.get() && aShape->isSubShape(aShapeToBeSelected, false)) {
-              aCont = *aResIter; // found new context (produced from this) with same subshape
-              //if (!aShape->isSubShape(aShapeToBeSelected, true)) // take context orientation
-              //  aShapeToBeSelected->setOrientation();
-              aFindNewContext = true; // continue searching futher
-              break;
+            // concealed attribute only
+            FeaturePtr aRefFeat = std::dynamic_pointer_cast<ModelAPI_Feature>((*aRef)->owner());
+            if (!ModelAPI_Session::get()->validators()->isConcealed(
+              aRefFeat->getKind(), (*aRef)->id()))
+              continue;
+            // search the feature result that contains sub-shape selected
+            std::list<std::shared_ptr<ModelAPI_Result> > aResults;
+
+            // take all sub-results or one result
+            const std::list<std::shared_ptr<ModelAPI_Result> >& aFResults = aRefFeat->results();
+            std::list<std::shared_ptr<ModelAPI_Result> >::const_iterator aRIter = aFResults.begin();
+            for (; aRIter != aFResults.cend(); aRIter++) {
+              // iterate sub-bodies of compsolid
+              ResultCompSolidPtr aComp = std::dynamic_pointer_cast<ModelAPI_ResultCompSolid>(*aRIter);
+              if (aComp.get() && aComp->numberOfSubs() > 0) {
+                int aNumSub = aComp->numberOfSubs();
+                for(int a = 0; a < aNumSub; a++) {
+                  aResults.push_back(aComp->subResult(a));
+                }
+              } else {
+                aResults.push_back(*aRIter);
+              }
+            }
+            std::list<std::shared_ptr<ModelAPI_Result> >::iterator aResIter = aResults.begin();
+            for(; aResIter != aResults.end(); aResIter++) {
+              if (!aResIter->get() || !(*aResIter)->data()->isValid() || (*aResIter)->isDisabled())
+                continue;
+              GeomShapePtr aShape = (*aResIter)->shape();
+              GeomShapePtr aSelectedShape =
+                aShapeToBeSelected.get() ? aShapeToBeSelected : aCont->shape();
+              if (aShape.get() && aShape->isSubShape(aSelectedShape, false)) {
+                aCont = *aResIter; // found new context (produced from this) with same subshape
+                //if (!aShape->isSubShape(aShapeToBeSelected, true)) // take context orientation
+                //  aShapeToBeSelected->setOrientation();
+                aFindNewContext = true; // continue searching futher
+                break;
+              }
             }
           }
         }
