@@ -44,9 +44,9 @@ ModuleBase_WidgetChoice::ModuleBase_WidgetChoice(QWidget* theParent,
                                                  const Config_WidgetAPI* theData)
 : ModuleBase_ModelWidget(theParent, theData), myIsFirst(true)
 {
-  myHasValue = defaultValues.contains(myFeatureId);
+  myHasValue = defaultValues.contains(myFeatureId + attributeID());
   if (myHasValue)
-    myDefValue = defaultValues[myFeatureId];
+    myDefValue = defaultValues[myFeatureId + attributeID()];
   else
     myDefValue = 0;
 
@@ -177,5 +177,5 @@ void ModuleBase_WidgetChoice::onCurrentIndexChanged(int theIndex)
 
 void ModuleBase_WidgetChoice::onFeatureAccepted()
 {
-  defaultValues[myFeatureId] = myDefValue;
+  defaultValues[myFeatureId + attributeID()] = myDefValue;
 }

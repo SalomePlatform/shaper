@@ -160,8 +160,8 @@ ModuleBase_WidgetMultiSelector::ModuleBase_WidgetMultiSelector(QWidget* theParen
 
   myIsNeutralPointClear = theData->getBooleanAttribute("clear_in_neutral_point", true);
   if (myShapeTypes.size() > 1 || myIsUseChoice) {
-    if (defaultValues.contains(myFeatureId)) {
-      myDefMode = defaultValues[myFeatureId];
+    if (defaultValues.contains(myFeatureId + attributeID())) {
+      myDefMode = defaultValues[myFeatureId + attributeID()];
       myTypeCtrl->setValue(myDefMode.c_str());
     }
   }
@@ -990,5 +990,5 @@ QList<ActionInfo>
 
 void ModuleBase_WidgetMultiSelector::onFeatureAccepted()
 {
-  defaultValues[myFeatureId] = myDefMode;
+  defaultValues[myFeatureId + attributeID()] = myDefMode;
 }

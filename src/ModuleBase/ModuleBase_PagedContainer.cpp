@@ -40,8 +40,8 @@ ModuleBase_PagedContainer::ModuleBase_PagedContainer(QWidget* theParent,
   // it is not obligatory to be ignored when property panel tries to activate next active widget
   // but if focus is moved to this control, it can accept it.
   myIsObligatory = false;
-  if (defaultValues.contains(myFeatureId))
-    myDefValue = defaultValues[myFeatureId];
+  if (defaultValues.contains(myFeatureId + attributeID()))
+    myDefValue = defaultValues[myFeatureId + attributeID()];
 }
 
 ModuleBase_PagedContainer::~ModuleBase_PagedContainer()
@@ -150,6 +150,6 @@ void ModuleBase_PagedContainer::onPageChanged()
 
 void ModuleBase_PagedContainer::onFeatureAccepted()
 {
-  defaultValues[myFeatureId] = myDefValue;
+  defaultValues[myFeatureId + attributeID()] = myDefValue;
 }
 
