@@ -887,8 +887,11 @@ void Model_AttributeSelection::selectSubShape(
         ResultCompSolidPtr aCompContext = ModelAPI_Tools::compSolidOwner(aCont);
         int aSubsSize = (aCompContext.get() ? aCompContext->numberOfSubs() : 0) + 1;
         for(int aResultNum = 0; aResultNum < aSubsSize; aResultNum++) {
-          ResultPtr aResCont = aCompContext.get() ? (aResultNum == aSubsSize - 1 ?
-                  aCompContext : aCompContext->subResult(aResultNum)) : aCont;
+          ResultPtr aResCont = aCont;
+          if (aCompContext.get())
+            if (aResultNum == aSubsSize - 1)
+              aResCont = aCompContext;
+            else aResCont = aCompContext->subResult(aResultNum);
           const std::set<AttributePtr>& aRefs = aResCont->data()->refsToMe();
           std::set<AttributePtr>::const_iterator aRef = aRefs.begin();
           for(; !aFindNewContext && aRef != aRefs.end(); aRef++) {
