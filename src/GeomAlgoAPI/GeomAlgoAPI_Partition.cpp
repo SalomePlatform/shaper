@@ -129,7 +129,8 @@ void GeomAlgoAPI_Partition::build(const ListOfShape& theObjects,
 
   if(aResult.ShapeType() == TopAbs_COMPOUND) {
     // Exclude faces and edges which are shared as another sub-shape.
-    NCollection_Vector<TopoDS_Shape> aFacesAndEdges;
+    NCollection_Vector<TopoDS_Shape> aFaces;
+    NCollection_Vector<TopoDS_Shape> anEdges;
     TopoDS_Compound aTempCompound;
     TopoDS_Builder aBuilder;
     aBuilder.MakeCompound(aTempCompound);
@@ -137,14 +138,27 @@ void GeomAlgoAPI_Partition::build(const ListOfShape& theObjects,
         anIt.More();
         anIt.Next()) {
       const TopoDS_Shape& aSubShape = anIt.Value();
-      if (aSubShape.ShapeType() == TopAbs_FACE || aSubShape.ShapeType() == TopAbs_EDGE) {
-        aFacesAndEdges.Append(aSubShape);
+      if (aSubShape.ShapeType() == TopAbs_FACE) {
+        aFaces.Append(aSubShape);
+      } else if (aSubShape.ShapeType() == TopAbs_EDGE) {
+        anEdges.Append(aSubShape);
       } else {
         aBuilder.Add(aTempCompound, aSubShape);
       }
     }
 
-    for (NCollection_Vector<TopoDS_Shape>::Iterator anIt(aFacesAndEdges);
+    for (NCollection_Vector<TopoDS_Shape>::Iterator anIt(aFaces);
+        anIt.More();
+        anIt.Next())
+    {
+      const TopoDS_Shape& aSubShape = anIt.Value();
+      if (!isSubShape(aTempCompound, aSubShape))
+      {
+        aBuilder.Add(aTempCompound, aSubShape);
+      }
+    }
+
+    for (NCollection_Vector<TopoDS_Shape>::Iterator anIt(anEdges);
         anIt.More();
         anIt.Next())
     {
