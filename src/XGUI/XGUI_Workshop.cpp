@@ -2675,9 +2675,13 @@ void XGUI_Workshop::insertToFolder(bool isBefore)
   QString aDescription = contextMenuMgr()->action(
     isBefore ? "ADD_TO_FOLDER_BEFORE_CMD" : "ADD_TO_FOLDER_AFTER_CMD")->text();
 
+  QMap<ObjectPtr, bool> aStates = myObjectBrowser->getFoldersState(aDoc);
+
   aMgr->startOperation(aDescription.toStdString());
   aDoc->moveToFolder(aFeatures, aFolder);
   aMgr->finishOperation();
+
+  myObjectBrowser->setFoldersState(aStates);
 
   updateCommandStatus();
 }
@@ -2691,13 +2695,16 @@ void XGUI_Workshop::moveOutFolder(bool isBefore)
   SessionPtr aMgr = ModelAPI_Session::get();
   DocumentPtr aDoc = aMgr->activeDocument();
 
-
   QString aDescription = contextMenuMgr()->action(
     isBefore ? "ADD_OUT_FOLDER_BEFORE_CMD" : "ADD_OUT_FOLDER_AFTER_CMD")->text();
+
+  QMap<ObjectPtr, bool> aStates = myObjectBrowser->getFoldersState(aDoc);
 
   aMgr->startOperation(aDescription.toStdString());
   aDoc->removeFromFolder(aFeatures, isBefore);
   aMgr->finishOperation();
+
+  myObjectBrowser->setFoldersState(aStates);
 
   updateCommandStatus();
 }

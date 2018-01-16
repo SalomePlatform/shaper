@@ -26,10 +26,12 @@
 #include <ModelAPI_Object.h>
 #include <ModelAPI_ResultPart.h>
 #include <ModelAPI_Events.h>
+#include <ModelAPI_Folder.h>
 
 #include <QWidget>
 #include <QTreeView>
 #include <QLabel>
+#include <QMap>
 
 class ModuleBase_IDocumentDataModel;
 class XGUI_DataModel;
@@ -210,6 +212,10 @@ Q_OBJECT
   /// \param theColumn - column of items
   /// \param theParent - a parent item (by default from root)
   void updateAllIndexes(int theColumn = 0, const QModelIndex& theParent = QModelIndex());
+
+  QMap<ObjectPtr, bool> getFoldersState(DocumentPtr theDoc) const;
+
+  void setFoldersState(const QMap<ObjectPtr, bool>& theStates);
 
 public slots:
   //! Called on Edit command request

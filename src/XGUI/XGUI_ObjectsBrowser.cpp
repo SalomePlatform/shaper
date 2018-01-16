@@ -603,7 +603,7 @@ std::list<bool> XGUI_ObjectsBrowser::getStateForDoc(DocumentPtr theDoc) const
   QModelIndex aRootIdx = aModel->documentRootIndex(theDoc);
   int aNbChild = aModel->rowCount(aRootIdx);
   for (int i = 0; i < aNbChild; i++) {
-    QModelIndex aIdx = aModel->index(i, 1, aRootIdx);
+    QModelIndex aIdx = aModel->index(i, 0, aRootIdx);
     aStates.push_back(myTreeView->isExpanded(aIdx));
   }
   return aStates;
@@ -636,5 +636,28 @@ void XGUI_ObjectsBrowser::updateAllIndexes(int theColumn, const QModelIndex& the
       myTreeView->update(aIdx);
       updateAllIndexes(theColumn, aIdx);
     }
+  }
+}
+
+QMap<ObjectPtr, bool> XGUI_ObjectsBrowser::getFoldersState(DocumentPtr theDoc) const
+{
+  QMap<ObjectPtr, bool> aMap;
+
+  int aNb = theDoc->size(ModelAPI_Folder::group());
+  ObjectPtr aObj;
+  for (int i = 0; i < aNb; i++) {
+    aObj = theDoc->object(ModelAPI_Folder::group(), i);
+    QModelIndex aIdx = myDocModel->objectIndex(aObj);
+    aMap[aObj] = myTreeView->isExpanded(aIdx);
+  }
+  return aMap;
+}
+
+void XGUI_ObjectsBrowser::setFoldersState(const QMap<ObjectPtr, bool>& theStates)
+{
+  QMap<ObjectPtr, bool>::const_iterator aIt;
+  for (aIt = theStates.constBegin(); aIt != theStates.constEnd(); aIt++) {
+    QModelIndex aIdx = myDocModel->objectIndex(aIt.key());
+    myTreeView->setExpanded(aIdx, aIt.value());
   }
 }
