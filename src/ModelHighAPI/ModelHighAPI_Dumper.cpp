@@ -329,8 +329,6 @@ bool ModelHighAPI_Dumper::process(const std::shared_ptr<ModelAPI_CompositeFeatur
   // decrease composite features stack
   --gCompositeStackDepth;
 
-  // dump folders if any
-  dumpPostponed(true);
   return isOk;
 }
 
@@ -369,8 +367,6 @@ bool ModelHighAPI_Dumper::processSubs(
   // dump "setName" for composite feature
   if (isDumpSetName)
     dumpEntitySetName();
-  // dump folders if any
-  dumpPostponed(true);
   return isOk;
 }
 
@@ -765,6 +761,12 @@ ModelHighAPI_Dumper& ModelHighAPI_Dumper::operator<<(
 ModelHighAPI_Dumper& ModelHighAPI_Dumper::operator<<(const FolderPtr& theFolder)
 {
   myDumpBuffer << name(theFolder);
+
+  // add dumped folder to a stack
+  if (!myNames[theFolder].myIsDumped &&
+     (myEntitiesStack.empty() || myEntitiesStack.top().myEntity != theFolder))
+    myEntitiesStack.push(LastDumpedEntity(theFolder, !myNames[theFolder].myIsDefault));
+
   return *this;
 }
 

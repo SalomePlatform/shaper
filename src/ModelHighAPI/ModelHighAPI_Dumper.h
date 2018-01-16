@@ -332,7 +332,7 @@ private:
     std::list<ResultPtr> myResults;
 
     LastDumpedEntity(EntityPtr theEntity, bool theUserName,
-      const std::list<ResultPtr>& theResults)
+      const std::list<ResultPtr>& theResults = std::list<ResultPtr>())
       : myEntity(theEntity), myUserName(theUserName), myResults(theResults)
     {}
   };

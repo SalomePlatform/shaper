@@ -183,9 +183,17 @@ void Model_Objects::addFeature(FeaturePtr theFeature, const FeaturePtr theAfterT
       if (aPrevData.get()) {
         aPrevFeateureLab = aPrevData->label().Father();
       }
-      // check if the previous feature is the last feature in a folder,
-      // then the folder should be updated to contain additional feature
-      aParentFolder = inFolder(theAfterThis, ModelAPI_Folder::LAST_FEATURE_ID());
+      // Check if the previous feature is the last feature in a folder,
+      // then the folder should be updated to contain additional feature.
+      // Macro features are not stored in folder.
+      if (!theFeature->isMacro()) {
+        // If the last feature is a sub-feature of composite, use parent feature
+        // to check belonging to a folder.
+        FeaturePtr afterThis = ModelAPI_Tools::compositeOwner(theAfterThis);
+        if (!afterThis)
+          afterThis = theAfterThis;
+        aParentFolder = inFolder(afterThis, ModelAPI_Folder::LAST_FEATURE_ID());
+      }
     }
     AddToRefArray(aFeaturesLab, aFeatureLab, aPrevFeateureLab);
 
@@ -1027,6 +1035,35 @@ void Model_Objects::synchronizeBackRefsForObject(const std::set<AttributePtr>& t
           aCurrentIter = aData->refsToMe().begin(); // reinitialize iteration after delete
         } else aCurrentIter++;
       } else aCurrentIter++;
+    }
+  }
+  // for the last feature in the folder, check if it is a sub-feature,
+  // then refer the folder to a top-level parent composite feature
+  const std::set<AttributePtr>& aRefs = aData->refsToMe();
+  std::set<AttributePtr>::iterator anIt = aRefs.begin();
+  for (; anIt != aRefs.end(); ++anIt)
+    if ((*anIt)->id() == ModelAPI_Folder::LAST_FEATURE_ID())
+      break;
+  if (anIt != aRefs.end()) {
+    FeaturePtr aFeature = ModelAPI_Feature::feature(theObject);
+    if (aFeature) {
+      CompositeFeaturePtr aParent;
+      CompositeFeaturePtr aGrandParent = ModelAPI_Tools::compositeOwner(aFeature);
+      do {
+        aParent = aGrandParent;
+        if (aGrandParent)
+          aGrandParent = ModelAPI_Tools::compositeOwner(aParent);
+      } while (aGrandParent.get());
+      if (aParent) {
+        ObjectPtr aFolder = (*anIt)->owner();
+        // remove reference from the current feature
+        aData->removeBackReference(aFolder, ModelAPI_Folder::LAST_FEATURE_ID());
+        // set reference to a top-level parent
+        aFolder->data()->reference(ModelAPI_Folder::LAST_FEATURE_ID())->setValue(aParent);
+        std::shared_ptr<Model_Data> aParentData =
+            std::dynamic_pointer_cast<Model_Data>(aParent->data());
+        aParentData->addBackReference(aFolder, ModelAPI_Folder::LAST_FEATURE_ID());
+      }
     }
   }
   aData->updateConcealmentFlag();

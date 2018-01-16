@@ -505,7 +505,7 @@ FeaturePtr PartSet_Tools::findFirstCoincidence(const FeaturePtr& theFeature,
   for (aIt = aRefsList.cbegin(); aIt != aRefsList.cend(); ++aIt) {
     std::shared_ptr<ModelAPI_Attribute> aAttr = (*aIt);
     FeaturePtr aConstrFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(aAttr->owner());
-    if (aConstrFeature->getKind() == SketchPlugin_ConstraintCoincidence::ID()) {
+    if (aConstrFeature && aConstrFeature->getKind() == SketchPlugin_ConstraintCoincidence::ID()) {
       std::shared_ptr<GeomAPI_Pnt2d> a2dPnt =
         PartSet_Tools::getPoint(aConstrFeature, SketchPlugin_ConstraintCoincidence::ENTITY_A());
       if (a2dPnt.get() && thePoint->isEqual(a2dPnt)) {

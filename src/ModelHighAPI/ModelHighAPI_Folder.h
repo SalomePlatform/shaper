@@ -56,6 +56,14 @@ public:
   std::shared_ptr<ModelAPI_AttributeReference> lastFeature() const
   { return myLastFeature; }
 
+  /// Shortcut for data()->setName()
+  MODELHIGHAPI_EXPORT
+  void setName(const std::string& theName);
+
+  /// Shortcut for data()->name()
+  MODELHIGHAPI_EXPORT
+  std::string name() const;
+
   /// Dump wrapped feature
   MODELHIGHAPI_EXPORT virtual void dump(ModelHighAPI_Dumper& theDumper) const;
 

@@ -254,7 +254,7 @@ FeaturePtr findPartFeature(const DocumentPtr& theMain, const DocumentPtr& theSub
 
 CompositeFeaturePtr compositeOwner(const FeaturePtr& theFeature)
 {
-  if (theFeature.get() && theFeature->data()->isValid()) {
+  if (theFeature.get() && theFeature->data() && theFeature->data()->isValid()) {
     const std::set<std::shared_ptr<ModelAPI_Attribute> >& aRefs = theFeature->data()->refsToMe();
     std::set<std::shared_ptr<ModelAPI_Attribute> >::const_iterator aRefIter = aRefs.begin();
     for(; aRefIter != aRefs.end(); aRefIter++) {

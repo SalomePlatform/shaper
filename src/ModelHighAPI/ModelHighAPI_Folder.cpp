@@ -59,6 +59,17 @@ bool ModelHighAPI_Folder::initialize()
   return true;
 }
 
+void ModelHighAPI_Folder::setName(const std::string& theName)
+{
+  if (myFolder && myFolder->data() && myFolder->data()->isValid())
+    myFolder->data()->setName(theName);
+}
+
+std::string ModelHighAPI_Folder::name() const
+{
+  return myFolder->data()->name();
+}
+
 void ModelHighAPI_Folder::dump(ModelHighAPI_Dumper& theDumper) const
 {
   const std::string& aDocName = theDumper.name(myFolder->document());
