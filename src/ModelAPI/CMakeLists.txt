@@ -174,6 +174,7 @@ ADD_UNIT_TESTS(TestConstants.py
                Test2241.py
                Test2252.py
                Test2276.py
+               Test2389.py
                Test2391.py
                TestCustomName_BooleanCut.py
                TestCustomName_CommonCompSolid.py

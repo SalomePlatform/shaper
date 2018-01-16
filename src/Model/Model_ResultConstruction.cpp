@@ -363,17 +363,50 @@ int Model_ResultConstruction::select(const std::shared_ptr<GeomAPI_Shape>& theSu
   // if the subshape is part of a result face, select the whole face (#1997)
   bool isSelectionMode = false; // and other don't set shapes - all the naming is in face label
   if (!aSubShape.IsNull() && aSubShape.ShapeType() > TopAbs_FACE) {
-    for(int aFaceIndex = 0; aFaceIndex < facesNum(); aFaceIndex++) {
-      TopExp_Explorer anExp(face(aFaceIndex)->impl<TopoDS_Shape>(), aSubShape.ShapeType());
-      for(; anExp.More(); anExp.Next()) {
-        if (aSubShape.IsSame(anExp.Current())) { // this is the case: select the whole face
-          // here just store the face index (to update face if update of edge is needed)
-          TNaming_Builder aBuilder(aLab);
-          aBuilder.Select(aSubShape, aSubShape);
-          int aFaceSelID = select(face(aFaceIndex), theExtDoc, -1);
-          TDF_Reference::Set(aLab, aLab.Father().FindChild(aFaceSelID));
-          isSelectionMode = true;
-          break;
+    // but before check that sub-vertex correctly detected as intersection of sketch edges (#2389)
+    int anEdgesNum = 2;
+    if (aSubShape.ShapeType() == TopAbs_VERTEX) {
+      anEdgesNum = 0;
+      ResultPtr aThisPtr = std::dynamic_pointer_cast<ModelAPI_Result>(data()->owner());
+      FeaturePtr aThisFeature = document()->feature(aThisPtr);
+      CompositeFeaturePtr aComposite =
+        std::dynamic_pointer_cast<ModelAPI_CompositeFeature>(aThisFeature);
+      if (aComposite.get()) {
+        const int aSubNum = aComposite->numberOfSubs();
+        for(int a = 0; a < aSubNum; a++) {
+          int aSubID = aComposite->subFeatureId(a);
+          FeaturePtr aSub = aComposite->subFeature(a);
+          const std::list<std::shared_ptr<ModelAPI_Result> >& aResults = aSub->results();
+          std::list<std::shared_ptr<ModelAPI_Result> >::const_iterator aRes;
+          for(aRes = aResults.cbegin(); aRes != aResults.cend(); aRes++) {
+            ResultConstructionPtr aConstr =
+              std::dynamic_pointer_cast<ModelAPI_ResultConstruction>(*aRes);
+            if (aConstr->shape() && aConstr->shape()->isEdge()) {
+              TopoDS_Shape aResShape = aConstr->shape()->impl<TopoDS_Shape>();
+              for(TopExp_Explorer anExp(aResShape, TopAbs_VERTEX); anExp.More(); anExp.Next()) {
+                if (aSubShape.IsSame(anExp.Current())) {
+                  anEdgesNum++;
+                  break;
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+    if (anEdgesNum > 1) {
+      for(int aFaceIndex = 0; aFaceIndex < facesNum(); aFaceIndex++) {
+        TopExp_Explorer anExp(face(aFaceIndex)->impl<TopoDS_Shape>(), aSubShape.ShapeType());
+        for(; anExp.More(); anExp.Next()) {
+          if (aSubShape.IsSame(anExp.Current())) { // this is the case: select the whole face
+            // here just store the face index (to update face if update of edge is needed)
+            TNaming_Builder aBuilder(aLab);
+            aBuilder.Select(aSubShape, aSubShape);
+            int aFaceSelID = select(face(aFaceIndex), theExtDoc, -1);
+            TDF_Reference::Set(aLab, aLab.Father().FindChild(aFaceSelID));
+            isSelectionMode = true;
+            break;
+          }
         }
       }
     }

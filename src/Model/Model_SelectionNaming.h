@@ -83,6 +83,10 @@ protected:
   /// Gets the stored name from the document
   std::string getShapeName(std::shared_ptr<Model_Document> theDoc, const TopoDS_Shape& theShape,
     ResultPtr& theContext, const bool theAnotherDoc, const bool theWholeContext);
+
+  /// Tries to find the name of the context sub-shape as combination of edges in context
+  std::string vertexNameByEdges(TopoDS_Shape theContext, TopoDS_Shape theSub,
+    std::shared_ptr<Model_Document> theDoc, ResultPtr& theContextRes, const bool theAnotherDoc);
 };
 
 #endif

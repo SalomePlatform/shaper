@@ -256,6 +256,38 @@ const TopoDS_Shape findCommonShape(
   return aSharedShape;
 }
 
+std::string Model_SelectionNaming::vertexNameByEdges(TopoDS_Shape theContext, TopoDS_Shape theSub,
+  std::shared_ptr<Model_Document> theDoc, ResultPtr& theContextRes, const bool theAnotherDoc)
+{
+  std::string aResult;
+  TopTools_IndexedDataMapOfShapeListOfShape aMap;
+  TopExp::MapShapesAndAncestors(theContext, TopAbs_VERTEX, TopAbs_EDGE, aMap);
+  const TopTools_ListOfShape& aList22  = aMap.FindFromKey(theSub);
+  if(aList22.Extent() >= 2)  { // regular solution
+    TopTools_MapOfShape aFMap;
+    TopTools_ListOfShape aListE;
+    TopTools_ListIteratorOfListOfShape itl2(aList22);
+    for (int i = 1;itl2.More();itl2.Next(),i++) {
+      if(aFMap.Add(itl2.Value()))
+        aListE.Append(itl2.Value());
+    }
+    TopTools_ListIteratorOfListOfShape itl(aListE);
+    for (int i = 1;itl.More();itl.Next(),i++) {
+      const TopoDS_Shape& anEdge = itl.Value();
+      std::string anEdgeName = getShapeName(theDoc, anEdge, theContextRes, theAnotherDoc, false);
+      if (anEdgeName.empty()) { // edge is not in DS
+        aResult.clear();
+        return aResult;
+      }
+      if(i == 1)
+        aResult = anEdgeName;
+      else
+        aResult += "&" + anEdgeName;
+    }
+  }
+  return aResult;
+}
+
 std::string Model_SelectionNaming::namingName(ResultPtr& theContext,
   std::shared_ptr<GeomAPI_Shape> theSubSh, const std::string& theDefaultName,
   const bool theAnotherDoc)
@@ -396,40 +428,24 @@ std::string Model_SelectionNaming::namingName(ResultPtr& theContext,
           TopoDS_Shape aVertex = findCommonShape(TopAbs_VERTEX, aList);
           isByFaces = !aVertex.IsNull() && aVertex.ShapeType() == TopAbs_VERTEX;
         }
-        if(!isByFaces) { // open topology case or Compound case => via edges
-          TopTools_IndexedDataMapOfShapeListOfShape aMap;
-          TopExp::MapShapesAndAncestors(aContext, TopAbs_VERTEX, TopAbs_EDGE, aMap);
-          const TopTools_ListOfShape& aList22  = aMap.FindFromKey(aSubShape);
-          if(aList22.Extent() >= 2)  { // regular solution
 
-            // bug! duplication; fix is below
-            aFMap.Clear();
-            TopTools_ListOfShape aListE;
-            TopTools_ListIteratorOfListOfShape itl2(aList22);
-            for (int i = 1;itl2.More();itl2.Next(),i++) {
-              if(aFMap.Add(itl2.Value()))
-                aListE.Append(itl2.Value());
-            }
-            n = aListE.Extent();
-            TopTools_ListIteratorOfListOfShape itl(aListE);
-            for (int i = 1;itl.More();itl.Next(),i++) {
-              const TopoDS_Shape& anEdge = itl.Value();
-              std::string anEdgeName = getShapeName(aDoc, anEdge, theContext, theAnotherDoc, false);
-              if (anEdgeName.empty()) { // edge is not in DS, trying by faces anyway
-                isByFaces = true;
-                aName.clear();
-                break;
+        if(!isByFaces) { // open topology case or Compound case => via edges
+          aName = vertexNameByEdges(aContext, aSubShape, aDoc, theContext, theAnotherDoc);
+          isByFaces = aName.empty();
+          if (isByFaces) { // try to find a vertex in sketch faces
+            ResultConstructionPtr aConstr =
+              std::dynamic_pointer_cast<ModelAPI_ResultConstruction>(theContext);
+            if (aConstr.get() && aConstr->facesNum()) {
+              for(int aFace = aConstr->facesNum() - 1; isByFaces && aFace >= 0; aFace--) {
+                std::shared_ptr<GeomAPI_Face> aGFace = aConstr->face(aFace);
+                aName = vertexNameByEdges(aGFace->impl<TopoDS_Face>(), aSubShape,
+                  aDoc, theContext, theAnotherDoc);
+                isByFaces = aName.empty();
               }
-              if(i == 1)
-                aName = anEdgeName;
-              else
-                aName += "&" + anEdgeName;
             }
-          }//reg
-          else { // dangle vertex: if(aList22.Extent() == 1)
-            //it should be already in DF
           }
         }
+
         if (isByFaces) {
           TopTools_ListIteratorOfListOfShape itl(aList);
           for (int i = 1;itl.More();itl.Next(),i++) {
@@ -445,7 +461,6 @@ std::string Model_SelectionNaming::namingName(ResultPtr& theContext,
       break;
     }
   }
-
   return aName;
 }
 
@@ -1058,6 +1073,21 @@ bool Model_SelectionNaming::selectSubShape(const std::string& theType,
         }
       }
     }
+  } else if (aSelection.IsNull() && aN >= 2 && aType == TopAbs_VERTEX) {
+    // support of shape name as intersection separated by "&"
+    static std::string anEdgeType = "edge"; // for now it works only with su-edges
+    std::list<std::string>::iterator aSubNames = aListofNames.begin();
+    TopTools_ListOfShape aSubsList;
+    for(; aSubNames != aListofNames.end(); aSubNames++) {
+      std::string aSubName = *aSubNames;
+      std::shared_ptr<GeomAPI_Shape> aSubShapeFound;
+      std::shared_ptr<ModelAPI_Result> aContextFound;
+      if (selectSubShape(anEdgeType, aSubName, theDoc, aSubShapeFound, aContextFound)) {
+        if (aSubShapeFound.get())
+          aSubsList.Append(aSubShapeFound->impl<TopoDS_Shape>());
+      }
+    }
+    aSelection = findCommonShape(TopAbs_VERTEX, aSubsList);
   }
   if (!aSelection.IsNull()) {
     // Select it (must be after N=0 checking,
