@@ -116,10 +116,11 @@ class CompareShapes
 
   bool isLess(const gp_Pnt& theLHS, const gp_Pnt& theRHS)
   {
+    static const double aTol = 10. * Precision::Confusion();
     for (int anIndex = 1; anIndex <= 3; ++anIndex) {
-      if (isLessWithTol(theLHS.Coord(anIndex), theRHS.Coord(anIndex), Precision::Confusion()))
+      if (isLessWithTol(theLHS.Coord(anIndex), theRHS.Coord(anIndex), aTol))
         return true;
-      else if (isLessWithTol(theRHS.Coord(anIndex), theLHS.Coord(anIndex), Precision::Confusion()))
+      else if (isLessWithTol(theRHS.Coord(anIndex), theLHS.Coord(anIndex), aTol))
         return false;
     }
     // equal points

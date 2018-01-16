@@ -106,7 +106,7 @@ Boolean_4.result().subResult(2).setColor(51, 51, 102)
 Boolean_4.result().subResult(3).setColor(102, 204, 102)
 Boolean_4.result().subResult(4).setColor(204, 204, 0)
 
-Union_1 = model.addUnion(Part_1_doc, [model.selection("SOLID", "Boolean_4_1_4"), model.selection("SOLID", "Boolean_4_1_3")])
+Union_1 = model.addUnion(Part_1_doc, [model.selection("SOLID", "Boolean_4_1_4"), model.selection("SOLID", "Boolean_4_1_2")])
 
 Point_3 = model.addPoint(Part_1_doc, model.selection("EDGE", "Axis_1"), model.selection("FACE", "Plane_2 arrivee tuyau"))
 
