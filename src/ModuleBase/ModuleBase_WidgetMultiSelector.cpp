@@ -20,6 +20,8 @@
 
 #include <ModuleBase_WidgetMultiSelector.h>
 
+#include <GeomAPI_AISObject.h>
+
 #include <ModuleBase_ActionIntParameter.h>
 #include <ModuleBase_Definitions.h>
 #include <ModuleBase_Events.h>
@@ -31,6 +33,7 @@
 #include <ModuleBase_IViewer.h>
 #include <ModuleBase_IWorkshop.h>
 #include <ModuleBase_ListView.h>
+#include <ModuleBase_ResultPrs.h>
 #include <ModuleBase_Tools.h>
 #include <ModuleBase_ViewerPrs.h>
 #include <ModuleBase_WidgetShapeSelector.h>
@@ -45,6 +48,8 @@
 #include <ModelAPI_Events.h>
 
 #include <Config_WidgetAPI.h>
+
+#include <AIS_InteractiveObject.hxx>
 
 #include <QGridLayout>
 #include <QLabel>
@@ -924,12 +929,13 @@ bool ModuleBase_WidgetMultiSelector::findInSelection(const ObjectPtr& theObject,
     return true;
 
   bool aFound = false;
-  GeomShapePtr anEmptyShape(new GeomAPI_Shape());
   if (theShape.get()) { // treat shape equal to context as null: 2219, keep order of shapes in list
     const ResultPtr aContext = std::dynamic_pointer_cast<ModelAPI_Result>(theObject);
     if (aContext.get() && aContext->shape()->isEqual(theShape))
       theShape.reset();
   }
+
+  GeomShapePtr anEmptyShape(new GeomAPI_Shape());
   GeomShapePtr aShape = theShape.get() ? theShape : anEmptyShape;
   if (theGeomSelection.find(theObject) != theGeomSelection.end()) {// found
     const std::set<GeomShapePtr>& aShapes = theGeomSelection.at(theObject);
@@ -940,6 +946,19 @@ bool ModuleBase_WidgetMultiSelector::findInSelection(const ObjectPtr& theObject,
         aFound = aCShape->isSame(aShape);
     }
   }
+
+  // issue #2903: (Possibility to hide faces) - check whether given shape is a hidden sub-shape
+  if (!aFound && theWorkshop->hasSHIFTPressed() && theObject->isDisplayed()) {
+    AISObjectPtr anAIS = theWorkshop->findPresentation(theObject);
+    if (anAIS.get() != NULL) {
+      Handle(AIS_InteractiveObject) anAISIO = anAIS->impl<Handle(AIS_InteractiveObject)>();
+
+      Handle(ModuleBase_ResultPrs) aResultPrs = Handle(ModuleBase_ResultPrs)::DownCast(anAISIO);
+      if (!aResultPrs.IsNull() && aResultPrs->isSubShapeHidden(theShape->impl<TopoDS_Shape>()))
+        return true;
+    }
+  }
+
   return aFound;
 }
 

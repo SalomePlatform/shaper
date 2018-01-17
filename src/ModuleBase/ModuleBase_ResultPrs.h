@@ -93,6 +93,11 @@ public:
   /// \returns true if the presentation is changed, or false (if for example it was hidden)
   Standard_EXPORT bool setSubShapeHidden(const NCollection_List<TopoDS_Shape>& theShapes);
 
+  /// Returns true if parameter shape has been hidden
+  /// \param theShape sub-shape of the presentation shape
+  /// \return boolean value
+  Standard_EXPORT bool isSubShapeHidden(const TopoDS_Shape& theShape);
+
   /// Returns true if there are no hidden sub shapes or original shape has at least one not hidden
   /// \param theShapesToSkip container of shape to be hidden in the presentation (faces)
   /// \return boolean value

@@ -140,6 +140,26 @@ bool ModuleBase_ResultPrs::setSubShapeHidden(const NCollection_List<TopoDS_Shape
 }
 
 //********************************************************************
+bool ModuleBase_ResultPrs::isSubShapeHidden(const TopoDS_Shape& theShape)
+{
+  if (theShape.IsNull() || theShape.ShapeType() != TopAbs_FACE) // only face shape can be hidden
+    return false;
+
+  if (myHiddenSubShapes.Contains(theShape))
+    return true;
+
+  // orientation of parameter shape(come from selection) may be wrong, check isEqual() to be sure
+  for (NCollection_List<TopoDS_Shape>::Iterator aShapeIt(myHiddenSubShapes); aShapeIt.More();
+    aShapeIt.Next())
+  {
+    if (theShape.IsEqual(aShapeIt.Value()))
+      return true;
+  }
+
+  return true;
+}
+
+//********************************************************************
 bool ModuleBase_ResultPrs::hasSubShapeVisible(
   const NCollection_List<TopoDS_Shape>& theShapesToSkip)
 {
