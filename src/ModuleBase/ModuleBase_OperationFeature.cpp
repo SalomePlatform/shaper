@@ -341,6 +341,7 @@ bool ModuleBase_OperationFeature::commit()
     if (anActiveWidget && anActiveWidget->getValueState() == ModuleBase_ModelWidget::ModifiedInPP) {
       anActiveWidget->storeValue();
     }
+    aPanel->onAcceptData();
   }
   if (canBeCommitted()) {
     emit beforeCommitted();
