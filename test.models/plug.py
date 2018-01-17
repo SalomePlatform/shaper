@@ -426,7 +426,7 @@ model.testNbSubShapes(Partition_1, GeomAPI_Shape.VERTEX, [1476])
 model.testResultsVolumes(Partition_1, [28288.886256640704232268035411835])
 
 Result = model.addRemoveSubShapes(Part_1_doc, model.selection("COMPSOLID", "Partition_1_1"))
-Result.setSubShapesToRemove([model.selection("SOLID", "Partition_1_1_1")])
+Result.setSubShapesToRemove([model.selection("SOLID", "Partition_1_1_2")])
 Result.result().setName("Plug")
 # check Remove_SubShapes_1
 model.testNbResults(Result, 1)
@@ -437,7 +437,7 @@ model.testNbSubShapes(Result, GeomAPI_Shape.EDGE, [366])
 model.testNbSubShapes(Result, GeomAPI_Shape.VERTEX, [732])
 model.testResultsVolumes(Result, [14144.443128843522572424262762070])
 
-Group_1 = model.addGroup(Part_1_doc, [model.selection("FACE", "Plug/Modified_Face_1_1"), model.selection("FACE", "Plug/Modified_Face_2_1"), model.selection("FACE", "Plug/Modified_Face_3_1"), model.selection("FACE", "Plug/Modified_Face_4_1")])
+Group_1 = model.addGroup(Part_1_doc, [model.selection("FACE", "Plug/Modified_Face_3_1"), model.selection("FACE", "Plug/Modified_Face_5_1"), model.selection("FACE", "Plug/Modified_Face_46_1"), model.selection("FACE", "Plug/Modified_Face_48_1")])
 Group_1.result().setColor(68, 68, 68)
 # check Group_1
 model.checkGroup(Group_1, GeomAPI_Shape.FACE)
