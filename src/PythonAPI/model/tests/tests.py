@@ -238,6 +238,9 @@ def testHaveNamingByType(theFeature, theModel, thePartDoc, theSubshapeType) :
       selectionList.append(selection)
       shapeExplorer.next()
   # Create group with this selection list
+  # (do not create group if nothing is selected)
+  if (len(selectionList) == 0):
+    return
   Group_1 = theModel.addGroup(thePartDoc, selectionList)
   theModel.do()
 
