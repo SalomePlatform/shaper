@@ -24,17 +24,6 @@
 
 #include <QLineEdit>
 
-ModuleBase_WidgetNameEdit::ModuleBase_WidgetNameEdit(QWidget* theParent,
-                                                     const Config_WidgetAPI* theData,
-                                                     const std::string& thePlaceHolder )
- : ModuleBase_WidgetLineEdit(theParent, theData, thePlaceHolder)
-{
-  // Disconnect the signal in order to avoid Apply button activation automatically
-  // it will activate apply because of value isApplyEnabledByActiveWidget in
-  // XGUI_ErrorMgr::updateActions
-  disconnect(myLineEdit, SIGNAL(textChanged(const QString&)), this, SIGNAL(valuesModified()));
-}
-
 
 bool ModuleBase_WidgetNameEdit::storeValueCustom()
 {
