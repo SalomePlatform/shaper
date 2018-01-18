@@ -64,7 +64,7 @@ public:
 
   //! Returns index of the object
   //! \param theObject object to find
-  virtual QModelIndex objectIndex(const ObjectPtr theObject, int theColumn = 0) const;
+  virtual QModelIndex objectIndex(const ObjectPtr theObject, int theColumn = 1) const;
 
   //! Clear internal data
   virtual void clear();
@@ -131,7 +131,7 @@ public:
 
   /// Returns an index which is root of the given document
   /// \param theDoc a document
-  QModelIndex documentRootIndex(DocumentPtr theDoc, int theColumn = 0) const;
+  QModelIndex documentRootIndex(DocumentPtr theDoc, int theColumn = 1) const;
 
   /// Returns last history object index
   virtual QModelIndex lastHistoryIndex() const;

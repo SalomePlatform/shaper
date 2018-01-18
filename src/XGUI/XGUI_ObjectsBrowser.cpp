@@ -647,7 +647,7 @@ QMap<ObjectPtr, bool> XGUI_ObjectsBrowser::getFoldersState(DocumentPtr theDoc) c
   ObjectPtr aObj;
   for (int i = 0; i < aNb; i++) {
     aObj = theDoc->object(ModelAPI_Folder::group(), i);
-    QModelIndex aIdx = myDocModel->objectIndex(aObj);
+    QModelIndex aIdx = myDocModel->objectIndex(aObj, 0);
     aMap[aObj] = myTreeView->isExpanded(aIdx);
   }
   return aMap;
@@ -657,7 +657,7 @@ void XGUI_ObjectsBrowser::setFoldersState(const QMap<ObjectPtr, bool>& theStates
 {
   QMap<ObjectPtr, bool>::const_iterator aIt;
   for (aIt = theStates.constBegin(); aIt != theStates.constEnd(); aIt++) {
-    QModelIndex aIdx = myDocModel->objectIndex(aIt.key());
+    QModelIndex aIdx = myDocModel->objectIndex(aIt.key(), 0);
     myTreeView->setExpanded(aIdx, aIt.value());
   }
 }

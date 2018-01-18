@@ -332,7 +332,7 @@ std::list<ObjectPtr> getCurves(const GeomPointPtr& thePnt, const SketcherPrs_Sym
         double aEnd = aCurve->endParam();
         GeomCirclePtr  aCircle = GeomCirclePtr(new GeomAPI_Circ(aCurve));
         GeomPointPtr aProjPnt = aCircle->project(thePnt);
-        if (thePnt->distance(aProjPnt) <= Precision::Confusion())
+        if (aProjPnt && thePnt->distance(aProjPnt) <= Precision::Confusion())
           aList.push_back(aResObj);
       }
     }

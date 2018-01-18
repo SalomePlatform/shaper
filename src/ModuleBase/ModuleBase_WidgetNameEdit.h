@@ -30,8 +30,7 @@ class ModuleBase_WidgetNameEdit : public ModuleBase_WidgetLineEdit
 public:
   ModuleBase_WidgetNameEdit( QWidget* theParent,
                              const Config_WidgetAPI* theData,
-                             const std::string& thePlaceHolder )
-             : ModuleBase_WidgetLineEdit(theParent, theData, thePlaceHolder) {}
+                             const std::string& thePlaceHolder );
 
   /// Returns True if the widget uses feature attribute.
   /// If not then it means that the widget do not need attribute at all.

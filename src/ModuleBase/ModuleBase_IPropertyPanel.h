@@ -83,6 +83,9 @@ public:
   /// \return a widget or null
   ModuleBase_ModelWidget* findFirstAcceptingValueWidget();
 
+  /// The method is called on accepting of operation
+  virtual void onAcceptData() = 0;
+
   /// Returns the first widget, where canAcceptFocus returns true
   /// \return a widget or null
   static ModuleBase_ModelWidget* findFirstAcceptingValueWidget(
