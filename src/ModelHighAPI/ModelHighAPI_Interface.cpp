@@ -27,6 +27,7 @@
 #include <ModelAPI_Feature.h>
 #include <ModelAPI_Session.h>
 #include <ModelAPI_Validator.h>
+#include <ModelAPI_Result.h>
 
 #include "ModelHighAPI_Selection.h"
 //--------------------------------------------------------------------------------------
@@ -98,9 +99,10 @@ std::string ModelHighAPI_Interface::name() const
 
 ModelHighAPI_Selection ModelHighAPI_Interface::result() const
 {
-  const_cast<ModelHighAPI_Interface*>(this)->execute();
-
-  return ModelHighAPI_Selection(feature()->firstResult());
+  std::list<ModelHighAPI_Selection> aResults = results();
+  if (aResults.empty())
+    return ModelHighAPI_Selection(std::shared_ptr<ModelAPI_Result>());
+  return aResults.front();
 }
 
 std::list<ModelHighAPI_Selection> ModelHighAPI_Interface::results() const
@@ -111,7 +113,8 @@ std::list<ModelHighAPI_Selection> ModelHighAPI_Interface::results() const
 
   std::list<std::shared_ptr<ModelAPI_Result> > aResults = feature()->results();
   for (auto it = aResults.begin(), end = aResults.end(); it != end; ++it) {
-    aSelectionList.push_back(ModelHighAPI_Selection(*it));
+    if (!(*it)->isDisabled())
+      aSelectionList.push_back(ModelHighAPI_Selection(*it));
   }
 
   return aSelectionList;

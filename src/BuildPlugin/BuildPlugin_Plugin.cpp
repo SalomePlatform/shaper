@@ -50,6 +50,8 @@ BuildPlugin_Plugin::BuildPlugin_Plugin()
                               new BuildPlugin_ValidatorBaseForWire());
   aFactory->registerValidator("BuildPlugin_ValidatorBaseForFace",
                               new BuildPlugin_ValidatorBaseForFace());
+  aFactory->registerValidator("BuildPlugin_ValidatorBaseForSolids",
+                              new BuildPlugin_ValidatorBaseForSolids());
   aFactory->registerValidator("BuildPlugin_ValidatorSubShapesSelection",
                               new BuildPlugin_ValidatorSubShapesSelection());
   aFactory->registerValidator("BuildPlugin_ValidatorFillingSelection",

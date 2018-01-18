@@ -133,13 +133,6 @@ bool FeaturesPlugin_ValidatorPipeLocations::isValid(
 }
 
 //==================================================================================================
-bool FeaturesPlugin_ValidatorPipeLocations::isNotObligatory(std::string theFeature,
-                                                            std::string theAttribute)
-{
-  return false;
-}
-
-//==================================================================================================
 bool FeaturesPlugin_ValidatorBaseForGeneration::isValid(const AttributePtr& theAttribute,
                                                         const std::list<std::string>& theArguments,
                                                         Events_InfoMessage& theError) const
@@ -280,14 +273,6 @@ bool FeaturesPlugin_ValidatorBaseForGenerationSketchOrSketchObjects::isValid(
   }
 
   return true;
-}
-
-//==================================================================================================
-bool FeaturesPlugin_ValidatorBaseForGenerationSketchOrSketchObjects::isNotObligatory(
-    std::string theFeature,
-    std::string theAttribute)
-{
-  return false;
 }
 
 //==================================================================================================
@@ -523,13 +508,6 @@ bool FeaturesPlugin_ValidatorExtrusionDir::isValid(
   }
 
   return true;
-}
-
-//==================================================================================================
-bool FeaturesPlugin_ValidatorExtrusionDir::isNotObligatory(std::string theFeature,
-                                                           std::string theAttribute)
-{
-  return false;
 }
 
 //==================================================================================================
@@ -873,13 +851,6 @@ bool FeaturesPlugin_ValidatorRemoveSubShapesResult::isValid(
 }
 
 //==================================================================================================
-bool FeaturesPlugin_ValidatorRemoveSubShapesResult::isNotObligatory(std::string theFeature,
-                                                                    std::string theAttribute)
-{
-  return false;
-}
-
-//==================================================================================================
 bool FeaturesPlugin_ValidatorUnionSelection::isValid(const AttributePtr& theAttribute,
                                                      const std::list<std::string>& theArguments,
                                                      Events_InfoMessage& theError) const
@@ -981,13 +952,6 @@ bool FeaturesPlugin_ValidatorUnionArguments::isValid(
   }
 
   return true;
-}
-
-//==================================================================================================
-bool FeaturesPlugin_ValidatorUnionArguments::isNotObligatory(std::string theFeature,
-                                                             std::string theAttribute)
-{
-  return false;
 }
 
 bool FeaturesPlugin_ValidatorConcealedResult::isValid(const AttributePtr& theAttribute,

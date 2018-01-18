@@ -27,4 +27,5 @@ email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com
                   concealment="true">
     <validator id="BuildPlugin_ValidatorBaseForBuild" parameters="face,shell,solid,compsolid"/>
   </multi_selector>
+  <validator id="BuildPlugin_ValidatorBaseForSolids" parameters="base_objects,compsolid"/>
 </source>

@@ -20,7 +20,7 @@
 
 #include "BuildPlugin_CompSolid.h"
 
-#include <GeomAlgoAPI_MakeShape.h>
+#include <GeomAlgoAPI_MakeVolume.h>
 #include <ModelAPI_AttributeSelectionList.h>
 
 //=================================================================================================
@@ -37,22 +37,20 @@ void BuildPlugin_CompSolid::initAttributes()
 //=================================================================================================
 void BuildPlugin_CompSolid::execute()
 {
+  // all the needed checkings are in validator, so, here just make and store result
   ListOfShape anOriginalShapes;
-  std::shared_ptr<GeomAlgoAPI_MakeShape> aVolumeMaker;
-  if (!build(anOriginalShapes, aVolumeMaker))
-    return;
-
-  GeomShapePtr aVolumeRes = aVolumeMaker->shape();
+  AttributeSelectionListPtr aSelectionList = selectionList(BASE_OBJECTS_ID());
+  for (int anIndex = 0; anIndex < aSelectionList->size(); ++anIndex) {
+    AttributeSelectionPtr aSelection = aSelectionList->value(anIndex);
+    GeomShapePtr aShape = aSelection->value();
+    if (!aShape.get())
+      aShape = aSelection->context()->shape();
+    anOriginalShapes.push_back(aShape);
+  }
+  std::shared_ptr<GeomAlgoAPI_MakeVolume> anAlgo(new GeomAlgoAPI_MakeVolume(anOriginalShapes));
+  GeomShapePtr aVolumeRes = anAlgo->shape();
 
   // check and process result of volume maker
-  GeomShapePtr aResShape = getSingleSubshape(aVolumeRes, GeomAPI_Shape::COMPSOLID);
-  if (!aResShape) // try to build a solid
-    aResShape = getSingleSubshape(aVolumeRes, GeomAPI_Shape::SOLID);
-
-  int anIndex = 0;
-  if (aResShape) {
-    storeResult(anOriginalShapes, aResShape, aVolumeMaker);
-    ++anIndex;
-  }
-  removeResults(anIndex);
+  GeomShapePtr aResShape = getSingleSubshape(aVolumeRes);
+  storeResult(anOriginalShapes, aResShape, anAlgo);
 }

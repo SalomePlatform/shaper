@@ -29,3 +29,8 @@ ModelAPI_FeatureValidator::~ModelAPI_FeatureValidator()
 {
 
 }
+
+bool ModelAPI_FeatureValidator::isNotObligatory(std::string theFeature, std::string theAttribute)
+{
+  return false;
+}

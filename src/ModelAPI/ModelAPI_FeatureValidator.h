@@ -48,8 +48,9 @@ class MODELAPI_EXPORT ModelAPI_FeatureValidator : public ModelAPI_Validator
                        const std::list<std::string>& theArguments,
                        Events_InfoMessage& theError) const = 0;
 
-  /// Returns true if the attribute in feature is not obligatory for the feature execution
-  virtual bool isNotObligatory(std::string theFeature, std::string theAttribute) = 0;
+  /// Returns true if the attribute in feature is not obligatory for the feature execution.
+  ///Returns false by default.
+  virtual bool isNotObligatory(std::string theFeature, std::string theAttribute);
 };
 
 #endif

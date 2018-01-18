@@ -52,9 +52,6 @@ class FeaturesPlugin_ValidatorPipeLocations: public ModelAPI_FeatureValidator
   virtual bool isValid(const std::shared_ptr<ModelAPI_Feature>& theFeature,
                        const std::list<std::string>& theArguments,
                        Events_InfoMessage& theError) const;
-
-  /// Returns true if the attribute in feature is not obligatory for the feature execution
-  virtual bool isNotObligatory(std::string theFeature, std::string theAttribute);
 };
 
 /// \class FeaturesPlugin_ValidatorBaseForGeneration
@@ -93,9 +90,6 @@ class FeaturesPlugin_ValidatorBaseForGenerationSketchOrSketchObjects:
   virtual bool isValid(const std::shared_ptr<ModelAPI_Feature>& theFeature,
                        const std::list<std::string>& theArguments,
                        Events_InfoMessage& theError) const;
-
-  /// Returns true if the attribute in feature is not obligatory for the feature execution
-  virtual bool isNotObligatory(std::string theFeature, std::string theAttribute);
 };
 
 /// \class FeaturesPlugin_ValidatorCompositeLauncher
@@ -127,9 +121,6 @@ public:
   virtual bool isValid(const std::shared_ptr<ModelAPI_Feature>& theFeature,
                        const std::list<std::string>& theArguments,
                        Events_InfoMessage& theError) const;
-
-  /// \return true if the attribute in feature is not obligatory for the feature execution
-  virtual bool isNotObligatory(std::string theFeature, std::string theAttribute);
 
 private:
   bool isShapesCanBeEmpty(const AttributePtr& theAttribute,
@@ -213,9 +204,6 @@ class FeaturesPlugin_ValidatorRemoveSubShapesResult: public ModelAPI_FeatureVali
   virtual bool isValid(const std::shared_ptr<ModelAPI_Feature>& theFeature,
                        const std::list<std::string>& theArguments,
                        Events_InfoMessage& theError) const;
-
-  /// \return true if the attribute in feature is not obligatory for the feature execution
-  virtual bool isNotObligatory(std::string theFeature, std::string theAttribute);
 };
 
 /// \class FeaturesPlugin_ValidatorUnionSelection
@@ -247,9 +235,6 @@ class FeaturesPlugin_ValidatorUnionArguments: public ModelAPI_FeatureValidator
   virtual bool isValid(const std::shared_ptr<ModelAPI_Feature>& theFeature,
                        const std::list<std::string>& theArguments,
                        Events_InfoMessage& theError) const;
-
-  /// \return true if the attribute in feature is not obligatory for the feature execution
-  virtual bool isNotObligatory(std::string theFeature, std::string theAttribute);
 };
 
 /// \class FeaturesPlugin_ValidatorConcealedResult

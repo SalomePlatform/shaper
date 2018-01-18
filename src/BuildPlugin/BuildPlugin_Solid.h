@@ -65,24 +65,13 @@ public:
   BUILDPLUGIN_EXPORT virtual void execute();
 
 protected:
-  /// Build result
-  /// \param[out] theOriginalShapes list of original shapes
-  /// \param[out] theAlgorithm      algorithm to build result
-  /// \return \c true if algorithm finished without errors
-  bool build(ListOfShape& theOriginalShapes, std::shared_ptr<GeomAlgoAPI_MakeShape>& theAlgorithm);
-
   /// Store result of algorithm
   void storeResult(const ListOfShape& theOriginalShapes,
                    const GeomShapePtr& theResultShape,
                    const std::shared_ptr<GeomAlgoAPI_MakeShape>& theAlgorithm);
 
-  /// Check the algorithm is failed
-  bool isAlgorithmFailed(const std::shared_ptr<GeomAlgoAPI_MakeShape>& theAlgorithm);
-
-  /// Explode compound to get single shape of specified type
-  /// \return Empty shape if there is more than one shape in compound
-  GeomShapePtr getSingleSubshape(const GeomShapePtr& theCompound,
-                                 const GeomAPI_Shape::ShapeType theShapeType);
+  /// Explode compound to get single shape
+  GeomShapePtr getSingleSubshape(const GeomShapePtr& theCompound);
 };
 
 #endif

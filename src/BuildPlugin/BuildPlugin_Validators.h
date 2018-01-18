@@ -55,9 +55,6 @@ public:
   virtual bool isValid(const std::shared_ptr<ModelAPI_Feature>& theFeature,
                        const std::list<std::string>& theArguments,
                        Events_InfoMessage& theError) const;
-
-  /// \return true if the attribute in feature is not obligatory for the feature execution
-  virtual bool isNotObligatory(std::string theFeature, std::string theAttribute);
 };
 
 /// \class BuildPlugin_ValidatorBaseForFace
@@ -74,9 +71,22 @@ public:
   virtual bool isValid(const std::shared_ptr<ModelAPI_Feature>& theFeature,
                        const std::list<std::string>& theArguments,
                        Events_InfoMessage& theError) const;
+};
 
-  /// \return true if the attribute in feature is not obligatory for the feature execution
-  virtual bool isNotObligatory(std::string theFeature, std::string theAttribute);
+/// \class BuildPlugin_ValidatorBaseForSolids
+/// \ingroup Validators
+/// \brief A validator for selection base shapes for solid. Allows to select faces closed enough
+/// to create a solid.
+class BuildPlugin_ValidatorBaseForSolids: public ModelAPI_FeatureValidator
+{
+public:
+  //! Returns true if attributes is ok.
+  //! \param theFeature the checked feature.
+  //! \param theArguments arguments of the feature.
+  //! \param theError error message.
+  virtual bool isValid(const std::shared_ptr<ModelAPI_Feature>& theFeature,
+                       const std::list<std::string>& theArguments,
+                       Events_InfoMessage& theError) const;
 };
 
 /// \class BuildPlugin_ValidatorSubShapesSelection

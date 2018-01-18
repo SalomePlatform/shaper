@@ -55,10 +55,3 @@ bool GeomValidators_MinObjectsSelected::isValid(const std::shared_ptr<ModelAPI_F
 
   return true;
 }
-
-//================================================================================================
-bool GeomValidators_MinObjectsSelected::isNotObligatory(std::string theFeature,
-                                                        std::string theAttribute)
-{
-  return false;
-}

@@ -33,6 +33,9 @@
 #include <GeomAlgoAPI_ShapeTools.h>
 #include <GeomAlgoAPI_SketchBuilder.h>
 #include <GeomAlgoAPI_WireBuilder.h>
+#include <GeomAlgoAPI_MakeVolume.h>
+#include <GeomAPI_ShapeIterator.h>
+#include <GeomAPI_ShapeExplorer.h>
 
 #include <GeomValidators_FeatureKind.h>
 #include <GeomValidators_ShapeType.h>
@@ -161,13 +164,6 @@ bool BuildPlugin_ValidatorBaseForWire::isValid(const std::shared_ptr<ModelAPI_Fe
 }
 
 //=================================================================================================
-bool BuildPlugin_ValidatorBaseForWire::isNotObligatory(std::string theFeature,
-                                                       std::string theAttribute)
-{
-  return false;
-}
-
-//=================================================================================================
 bool BuildPlugin_ValidatorBaseForFace::isValid(const std::shared_ptr<ModelAPI_Feature>& theFeature,
                                                const std::list<std::string>& theArguments,
                                                Events_InfoMessage& theError) const
@@ -264,11 +260,86 @@ bool BuildPlugin_ValidatorBaseForFace::isValid(const std::shared_ptr<ModelAPI_Fe
 }
 
 //=================================================================================================
-bool BuildPlugin_ValidatorBaseForFace::isNotObligatory(std::string theFeature,
-                                                       std::string theAttribute)
+bool BuildPlugin_ValidatorBaseForSolids::isValid(
+  const std::shared_ptr<ModelAPI_Feature>& theFeature, const std::list<std::string>& theArguments,
+  Events_InfoMessage& theError) const
 {
-  return false;
+  // Get base objects list.
+  AttributeSelectionListPtr aSelectionList = theFeature->selectionList(theArguments.front());
+  if (!aSelectionList.get()) {
+    theError = "Could not get selection list.";
+    return false;
+  }
+  if (aSelectionList->size() == 0) {
+    theError = "Empty selection list.";
+    return false;
+  }
+
+  // Collect base shapes.
+  ListOfShape anOriginalShapes;
+  for (int anIndex = 0; anIndex < aSelectionList->size(); ++anIndex) {
+    AttributeSelectionPtr aSelection = aSelectionList->value(anIndex);
+    GeomShapePtr aShape = aSelection->value();
+    if (!aShape.get())
+      aShape = aSelection->context()->shape();
+    anOriginalShapes.push_back(aShape);
+  }
+
+  std::shared_ptr<GeomAlgoAPI_MakeVolume> anAlgorithm(new GeomAlgoAPI_MakeVolume(anOriginalShapes));
+
+  if (!anAlgorithm->isDone()) {
+    theError = "MakeVolume algorithm failed.";
+    return false;
+  }
+  if (anAlgorithm->shape()->isNull()) {
+    theError = "Resulting shape of MakeVolume is Null.";
+    return false;
+  }
+  if (!anAlgorithm->isValid()) {
+    theError = "Resulting shape of MakeVolume is not valid.";
+    return false;
+  }
+
+  // set of allowed types of results
+  std::set<GeomAPI_Shape::ShapeType> aResultType;
+  std::string aType = theArguments.back();
+  if (aType == "solid")
+    aResultType.insert(GeomAPI_Shape::SOLID);
+  else if (aType == "compsolid") {
+    aResultType.insert(GeomAPI_Shape::COMPSOLID);
+    aResultType.insert(GeomAPI_Shape::SOLID);
+  }
+
+  GeomShapePtr aCompound = anAlgorithm->shape();
+  if (aCompound->shapeType() == GeomAPI_Shape::COMPOUND) {
+    GeomAPI_ShapeIterator anIt(aCompound);
+    GeomShapePtr aFoundSub;
+    for (; anIt.more() && !aFoundSub; anIt.next()) {
+      aFoundSub = anIt.current();
+      if (aResultType.count(aFoundSub->shapeType()) == 0) {
+        theError = "Unable to build a solid";
+        return false;
+      }
+    }
+    if (anIt.more() || !aFoundSub.get()) {
+      theError = "Unable to build a solid";
+      return false;
+    }
+  } else if (aResultType.count(aCompound->shapeType()) == 0) {
+    theError = "Unable to build a solid";
+    return false;
+  }
+  // check the internal faces presence
+  for(GeomAPI_ShapeExplorer aFaces(aCompound, GeomAPI_Shape::FACE); aFaces.more(); aFaces.next()) {
+    if (aFaces.current()->orientation() == GeomAPI_Shape::INTERNAL) {
+      theError = "Internal faces are not allowed in the resulting solid";
+      return false;
+    }
+  }
+
+  return true;
 }
+
 
 //=================================================================================================
 bool BuildPlugin_ValidatorSubShapesSelection::isValid(const AttributePtr& theAttribute,

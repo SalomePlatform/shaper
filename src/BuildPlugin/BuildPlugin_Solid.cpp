@@ -41,48 +41,20 @@ void BuildPlugin_Solid::initAttributes()
 //=================================================================================================
 void BuildPlugin_Solid::execute()
 {
+  // all the needed checkings are in validator, so, here just make and store result
   ListOfShape anOriginalShapes;
-  std::shared_ptr<GeomAlgoAPI_MakeShape> aVolumeMaker;
-  if (!build(anOriginalShapes, aVolumeMaker))
-    return;
-
-  // check and process result of volume maker
-  GeomShapePtr aResShape = getSingleSubshape(aVolumeMaker->shape(), GeomAPI_Shape::SOLID);
-  int anIndex = 0;
-  if (aResShape) {
-    storeResult(anOriginalShapes, aResShape, aVolumeMaker);
-    ++anIndex;
-  }
-  removeResults(anIndex);
-}
-
-//=================================================================================================
-bool BuildPlugin_Solid::build(ListOfShape& theOriginalShapes,
-                              std::shared_ptr<GeomAlgoAPI_MakeShape>& theAlgorithm)
-{
-  // Get base objects list.
   AttributeSelectionListPtr aSelectionList = selectionList(BASE_OBJECTS_ID());
-  if (!aSelectionList.get()) {
-    setError("Error: Could not get selection list.");
-    return false;
-  }
-  if (aSelectionList->size() == 0) {
-    setError("Error: Empty selection list.");
-    return false;
-  }
-
-  // Collect base shapes.
   for (int anIndex = 0; anIndex < aSelectionList->size(); ++anIndex) {
     AttributeSelectionPtr aSelection = aSelectionList->value(anIndex);
     GeomShapePtr aShape = aSelection->value();
     if (!aShape.get())
       aShape = aSelection->context()->shape();
-    theOriginalShapes.push_back(aShape);
+    anOriginalShapes.push_back(aShape);
   }
-
-  theAlgorithm =
-      std::shared_ptr<GeomAlgoAPI_MakeVolume>(new GeomAlgoAPI_MakeVolume(theOriginalShapes));
-  return !isAlgorithmFailed(theAlgorithm);
+  std::shared_ptr<GeomAlgoAPI_MakeVolume> anAlgo(new GeomAlgoAPI_MakeVolume(anOriginalShapes));
+  // check and process result of volume maker
+  GeomShapePtr aResShape = getSingleSubshape(anAlgo->shape());
+  storeResult(anOriginalShapes, aResShape, anAlgo);
 }
 
 void BuildPlugin_Solid::storeResult(const ListOfShape& theOriginalShapes,
@@ -101,55 +73,17 @@ void BuildPlugin_Solid::storeResult(const ListOfShape& theOriginalShapes,
     aResultBody->loadAndOrientModifiedShapes(theAlgorithm.get(), aShape, GeomAPI_Shape::FACE,
         aModifiedTag, "Modified_Face", *aMapOfSubs.get(), false, true, true);
   }
-
   setResult(aResultBody);
 }
 
-GeomShapePtr BuildPlugin_Solid::getSingleSubshape(const GeomShapePtr& theCompound,
-                                                  const GeomAPI_Shape::ShapeType theShapeType)
+GeomShapePtr BuildPlugin_Solid::getSingleSubshape(const GeomShapePtr& theCompound)
 {
-  if (theCompound->shapeType() == theShapeType)
-    return theCompound;
-  else if (theCompound->shapeType() == GeomAPI_Shape::COMPOUND) {
+  if (theCompound->shapeType() == GeomAPI_Shape::COMPOUND) {
     GeomAPI_ShapeIterator anIt(theCompound);
     GeomShapePtr aFoundSub;
     for (; anIt.more() && !aFoundSub; anIt.next()) {
-      aFoundSub = anIt.current();
-      if (aFoundSub->shapeType() != theShapeType)
-        return GeomShapePtr(); // not alone sub-shape
+      return anIt.current();
     }
-    if (anIt.more()) {
-      std::string anError = "Error: unable to build a ";
-      switch (theShapeType) {
-      case GeomAPI_Shape::SOLID: anError += "solid"; break;
-      case GeomAPI_Shape::COMPSOLID: anError += "compsolid"; break;
-      default: anError += "subshape"; break;
-      }
-      setError(anError);
-    } else
-      return aFoundSub;
   }
-  // not a solid
-  return GeomShapePtr();
-}
-
-bool BuildPlugin_Solid::isAlgorithmFailed(
-    const std::shared_ptr<GeomAlgoAPI_MakeShape>& theAlgorithm)
-{
-  if (!theAlgorithm->isDone()) {
-    static const std::string aFeatureError = "Error: MakeVolume algorithm failed.";
-    setError(aFeatureError);
-    return true;
-  }
-  if (theAlgorithm->shape()->isNull()) {
-    static const std::string aShapeError = "Error: Resulting shape of MakeVolume is Null.";
-    setError(aShapeError);
-    return true;
-  }
-  if (!theAlgorithm->isValid()) {
-    std::string aFeatureError = "Error: Resulting shape of MakeVolume is not valid.";
-    setError(aFeatureError);
-    return true;
-  }
-  return false;
+  return theCompound;
 }
