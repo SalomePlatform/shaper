@@ -173,9 +173,10 @@ class TestFilletInteracting(unittest.TestCase):
     self.checkNbFeatures("SketchConstraintTangent", 0) # no tangencies should not be created
     self.checkNbFeatures("SketchFillet", 1) # fillet feature should still exist. it should be wrong
 
-    model.testNbSubShapes(self.mySketch, GeomAPI_Shape.FACE, [0])
-    model.testNbSubShapes(self.mySketch, GeomAPI_Shape.EDGE, [2])
-    model.testNbSubShapes(self.mySketch, GeomAPI_Shape.VERTEX, [4])
+    # sketch is invalid, so, no results at all
+    model.testNbSubShapes(self.mySketch, GeomAPI_Shape.FACE, [])
+    model.testNbSubShapes(self.mySketch, GeomAPI_Shape.EDGE, [])
+    model.testNbSubShapes(self.mySketch, GeomAPI_Shape.VERTEX, [])
 
     # remove fillet for correct python dump
     self.myDocument.removeFeature(aFillet.feature())
