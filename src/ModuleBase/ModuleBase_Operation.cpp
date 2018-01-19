@@ -133,6 +133,10 @@ void ModuleBase_Operation::abort()
 bool ModuleBase_Operation::commit()
 {
   if (canBeCommitted()) {
+    ModuleBase_IPropertyPanel* aPanel = propertyPanel();
+    if (aPanel)
+      aPanel->onAcceptData();
+
     SessionPtr aMgr = ModelAPI_Session::get();
 
     commitOperation();

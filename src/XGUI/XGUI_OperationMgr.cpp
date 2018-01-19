@@ -434,11 +434,6 @@ void XGUI_OperationMgr::stopOperation(ModuleBase_Operation* theOperation, bool& 
 {
   if (XGUI_Tools::workshop(myWorkshop)->errorMgr()->isApplyEnabled() &&
       theOperation->isModified()) {
-    ModuleBase_IPropertyPanel* aPanel = theOperation->propertyPanel();
-    if (aPanel) {
-      XGUI_PropertyPanel* aPP = dynamic_cast<XGUI_PropertyPanel*>(aPanel);
-      aPP->onAcceptData();
-    }
     isCommitted = theOperation->commit();
   } else {
     isCommitted = false;
