@@ -769,6 +769,7 @@ email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com
         <label title="Select a line on which to calculate length" tooltip="Select a line on which to calculate length"/>
         <shape_selector id="ConstraintEntityA" label="Line" tooltip="Select a line" shape_types="edge" >
           <validator id="GeomValidators_ShapeType" parameters="line"/>
+          <validator id="SketchPlugin_SketchFeatureValidator"/>
         </shape_selector>
         <sketch-2dpoint_flyout_selector id="ConstraintFlyoutValuePnt" default="computed" internal="1" obligatory="0"/>
         <doublevalue_editor label="Value" tooltip="Length" id="ConstraintValue" default="computed">

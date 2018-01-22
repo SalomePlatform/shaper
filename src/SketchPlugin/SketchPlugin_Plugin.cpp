@@ -136,6 +136,8 @@ SketchPlugin_Plugin::SketchPlugin_Plugin()
   aFactory->registerValidator("SketchPlugin_HasNoConstraint", new SketchPlugin_HasNoConstraint);
   aFactory->registerValidator("SketchPlugin_ReplicationReference",
                               new SketchPlugin_ReplicationReferenceValidator);
+  aFactory->registerValidator("SketchPlugin_SketchFeatureValidator",
+                              new SketchPlugin_SketchFeatureValidator);
 
   // register this plugin
   ModelAPI_Session::get()->registerPlugin(this);

@@ -464,4 +464,20 @@ class SketchPlugin_ReplicationReferenceValidator: public ModelAPI_AttributeValid
                        Events_InfoMessage& theError) const;
 };
 
+/**\class SketchPlugin_SketchFeatureValidator
+ * \ingroup Validators
+ * \brief Validator for checking whether the feature referred by attribute is a sketch feature.
+ */
+class SketchPlugin_SketchFeatureValidator: public ModelAPI_AttributeValidator
+{
+ public:
+  //! returns true if attribute is valid
+  //! \param theAttribute the checked attribute
+  //! \param theArguments arguments of the attribute
+  //! \param theError error message
+  virtual bool isValid(const AttributePtr& theAttribute,
+                       const std::list<std::string>& theArguments,
+                       Events_InfoMessage& theError) const;
+};
+
 #endif

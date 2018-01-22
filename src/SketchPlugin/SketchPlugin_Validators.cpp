@@ -1609,3 +1609,34 @@ bool SketchPlugin_ReplicationReferenceValidator::isValid(
 
   return true;
 }
+
+bool SketchPlugin_SketchFeatureValidator::isValid(const AttributePtr& theAttribute,
+                                                  const std::list<std::string>& theArguments,
+                                                  Events_InfoMessage& theError) const
+{
+  if (theAttribute->attributeType() != ModelAPI_AttributeRefAttr::typeId()) {
+    theError = "The attribute with the %1 type is not processed";
+    theError.arg(theAttribute->attributeType());
+    return false;
+  }
+
+  // check the attribute refers to a sketch feature
+  AttributeRefAttrPtr aRefAttr =
+      std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(theAttribute);
+  bool isSketchFeature = aRefAttr->isObject();
+  if (isSketchFeature) {
+    FeaturePtr aFeature = ModelAPI_Feature::feature(aRefAttr->object());
+    isSketchFeature = aFeature;
+    if (isSketchFeature) {
+      std::shared_ptr<SketchPlugin_Feature> aSketchFeature =
+          std::dynamic_pointer_cast<SketchPlugin_Feature>(aFeature);
+      isSketchFeature = aSketchFeature;
+    }
+  }
+
+  if (isSketchFeature)
+    return true;
+
+  theError = "The object selected is not a sketch feature";
+  return false;
+}
