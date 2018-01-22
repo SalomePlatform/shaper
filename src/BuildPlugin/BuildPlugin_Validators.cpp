@@ -279,6 +279,10 @@ bool BuildPlugin_ValidatorBaseForSolids::isValid(
   ListOfShape anOriginalShapes;
   for (int anIndex = 0; anIndex < aSelectionList->size(); ++anIndex) {
     AttributeSelectionPtr aSelection = aSelectionList->value(anIndex);
+    if (!aSelection->context().get()) {
+      theError = "Invalid selection.";
+      return false;
+    }
     GeomShapePtr aShape = aSelection->value();
     if (!aShape.get())
       aShape = aSelection->context()->shape();

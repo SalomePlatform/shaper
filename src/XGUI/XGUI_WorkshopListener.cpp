@@ -119,7 +119,8 @@ void XGUI_WorkshopListener::initializeEventListening()
 //******************************************************
 void XGUI_WorkshopListener::processEvent(const std::shared_ptr<Events_Message>& theMessage)
 {
-  if (QApplication::instance()->thread() != QThread::currentThread()) {
+  if (QApplication::instance() &&
+      QApplication::instance()->thread() != QThread::currentThread()) {
     #ifdef _DEBUG
     std::cout << "XGUI_Workshop::processEvent: " << "Working in another thread." << std::endl;
     #endif
