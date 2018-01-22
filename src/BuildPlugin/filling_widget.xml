@@ -45,4 +45,5 @@ email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com
     <doublevalue id="tol_3d" label="Tol 3D" min="0" default="0.0001" step="0.0001"/>
     <boolvalue id="approximation" label="Approximation"/>
   </optionalbox>
+  <validator id="GeomValidators_MinObjectsSelected" parameters="base_objects,2"/>
 </source>
