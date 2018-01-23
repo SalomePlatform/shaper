@@ -23,6 +23,7 @@
 #include <ModelAPI_AttributeSelectionList.h>
 #include <ModelAPI_ResultBody.h>
 
+#include <GeomAlgoAPI_Copy.h>
 #include <GeomAlgoAPI_CompoundBuilder.h>
 
 
@@ -56,28 +57,37 @@ void BuildPlugin_Compound::execute()
   for (int anIndex = 0; anIndex < aSelectionList->size(); ++anIndex) {
     AttributeSelectionPtr aSelection = aSelectionList->value(anIndex);
     GeomShapePtr aShape = aSelection->value();
-    if (!aShape.get())
+    if (!aShape.get()) {
+      if (!aSelection->context().get()) {
+        setError("Invalid selection");
+        return;
+      }
       aShape = aSelection->context()->shape();
+    }
     anOriginalShapes.push_back(aShape);
   }
 
   // Build compound.
   GeomShapePtr aCompound = GeomAlgoAPI_CompoundBuilder::compound(anOriginalShapes);
+  // Copy shape.
+  GeomAlgoAPI_Copy aCopyAlgo(aCompound);
+  GeomShapePtr aCopyCompound = aCopyAlgo.shape();
+
   int anIndexToRemove = 0;
-  if (aCompound) {
+  if (aCopyCompound) {
+    std::shared_ptr<GeomAPI_DataMapOfShapeShape> aMapOfShapes = aCopyAlgo.mapOfSubShapes();
+
     ResultBodyPtr aResultBody = document()->createBody(data(), anIndexToRemove++);
-    aResultBody->store(aCompound);
-
-////    // Store faces
-////    std::shared_ptr<GeomAPI_DataMapOfShapeShape> aMapOfSubs = theAlgorithm->mapOfSubShapes();
-////    int aModifiedTag = 1;
-////    for(ListOfShape::const_iterator anIt = theOriginalShapes.cbegin();
-////        anIt != theOriginalShapes.cend(); ++anIt) {
-////      GeomShapePtr aShape = *anIt;
-////      aResultBody->loadAndOrientModifiedShapes(theAlgorithm.get(), aShape, GeomAPI_Shape::FACE,
-////          aModifiedTag, "Modified_Face", *aMapOfSubs.get(), false, true, true);
-////    }
-
+    aResultBody->store(aCopyCompound);
+    aResultBody->loadAndOrientModifiedShapes(&aCopyAlgo, aCompound, GeomAPI_Shape::VERTEX,
+                                              1, "Modified_Vertex", *aMapOfShapes.get(),
+                                              true, false, true);
+    aResultBody->loadAndOrientModifiedShapes(&aCopyAlgo, aCompound, GeomAPI_Shape::EDGE,
+                                              100000, "Modified_Edge", *aMapOfShapes.get(),
+                                              true, false, true);
+    aResultBody->loadAndOrientModifiedShapes(&aCopyAlgo, aCompound, GeomAPI_Shape::FACE,
+                                              200000, "Modified_Face", *aMapOfShapes.get(),
+                                              true, false, true);
     setResult(aResultBody);
   }
   removeResults(anIndexToRemove);

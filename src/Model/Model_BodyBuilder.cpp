@@ -421,7 +421,9 @@ void Model_BodyBuilder::loadAndOrientModifiedShapes (
   for (; aShapeExplorer.More(); aShapeExplorer.Next ()) {
     const TopoDS_Shape& aRoot = aShapeExplorer.Current ();
     if (!aView.Add(aRoot)) continue;
-    if (TNaming_Tool::NamedShape(aRoot, builder(theTag)->NamedShape()->Label()).IsNull())
+    bool aNotInTree =
+      TNaming_Tool::NamedShape(aRoot, builder(theTag)->NamedShape()->Label()).IsNull();
+    if (aNotInTree && !theIsStoreSeparate)
       continue; // there is no sense to write history if old shape does not exist in the document
     ListOfShape aList;
     std::shared_ptr<GeomAPI_Shape> aRShape(new GeomAPI_Shape());
@@ -476,6 +478,9 @@ void Model_BodyBuilder::loadAndOrientModifiedShapes (
           // Here we store shapes as generated, to avoid problem when one parent shape produce
           // several child shapes. In this case naming could not determine which shape to select.
           builder(aBuilderTag)->Generated(aRoot, aNewShape);
+        } else if (aNotInTree) {
+          // not in tree -> store as primitive (stored as separated)
+          builder(aBuilderTag)->Generated(aNewShape);
         } else {
           builder(aBuilderTag)->Modify(aRoot, aNewShape);
         }

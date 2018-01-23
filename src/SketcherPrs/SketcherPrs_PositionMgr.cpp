@@ -288,8 +288,8 @@ std::list<ObjectPtr> getCurves(const GeomPointPtr& thePnt, const SketcherPrs_Sym
   int aNbSubs = aOwner->numberOfSubs();
   for (int i = 0; i < aNbSubs; i++) {
     FeaturePtr aFeature = aOwner->subFeature(i);
-    if (!aFeature->firstResult().get()) // There is no result
-      continue;
+    if (!aFeature->firstResult().get() || aFeature->firstResult()->isDisabled())
+      continue;  // There is no result
 
     if (aFeature->getKind() == SketchPlugin_Line::ID()) {
       AttributePoint2DPtr aSPnt1 = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
