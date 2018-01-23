@@ -358,7 +358,7 @@ void FeaturesPlugin_CompositeSketch::storeGenerationHistory(ResultBodyPtr theRes
       bool isClosed = false; // lateral edges are closed (in full revolution)
       GeomAPI_DataMapOfShapeShape anEdgesFromVertices;
       GeomAPI_ShapeExplorer aVertExp(theBaseShape, GeomAPI_Shape::VERTEX);
-      for(int anIndex = 1; aVertExp.more(); aVertExp.next()) {
+      for(; aVertExp.more(); aVertExp.next()) {
         ListOfShape aGenerated;
         theMakeShape->generated(aVertExp.current(), aGenerated);
         ListOfShape::iterator aGenIter = aGenerated.begin();
@@ -367,7 +367,7 @@ void FeaturesPlugin_CompositeSketch::storeGenerationHistory(ResultBodyPtr theRes
           if (anEdgesFromVertices.isBound(aGenerated)) // already here
             continue;
           std::ostringstream aStream;
-          aStream<<"Lateral_Edge_"<<anIndex++;
+          aStream<<"Lateral_"<<theTag++;
           theResultBody->generated(aGenerated, aStream.str(), theTag++);
 
           anEdgesFromVertices.bind(aGenerated, aVertExp.current());
@@ -377,11 +377,11 @@ void FeaturesPlugin_CompositeSketch::storeGenerationHistory(ResultBodyPtr theRes
       }
       if (isClosed) {
         GeomAPI_ShapeExplorer anEdgesExp(theMakeShape->shape(), GeomAPI_Shape::EDGE);
-        for(int anIndex = 1; anEdgesExp.more(); anEdgesExp.next()) {
+        for(; anEdgesExp.more(); anEdgesExp.next()) {
           if (!anEdgesFromVertices.isBound(anEdgesExp.current())) {
             // found a base edge
             std::ostringstream aStream;
-            aStream<<"Base_Edge_"<<anIndex++;
+            aStream<<"Base_Edge_"<<theTag++;
             theResultBody->generated(anEdgesExp.current(), aStream.str(), theTag++);
             // only one orientation is needed
             anEdgesFromVertices.bind(anEdgesExp.current(), anEdgesExp.current());
@@ -395,7 +395,7 @@ void FeaturesPlugin_CompositeSketch::storeGenerationHistory(ResultBodyPtr theRes
           if (!aVertices.isBound(aVertExp.current())) {
             // found a base edge
             std::ostringstream aStream;
-            aStream<<"Vertex_"<<anIndex++;
+            aStream<<"Vertex_"<<theTag++;
             theResultBody->generated(aVertExp.current(), aStream.str(), theTag++);
             // only one orientation is needed
             aVertices.bind(aVertExp.current(), aVertExp.current());
@@ -405,7 +405,7 @@ void FeaturesPlugin_CompositeSketch::storeGenerationHistory(ResultBodyPtr theRes
     } else { // issue #2197, test case 4 : edges that produce fully-revolved face,
       // but contain only 2 edges (on apex of revolution)
       GeomAPI_ShapeExplorer anEdgeExp(theBaseShape, GeomAPI_Shape::EDGE);
-      for(int anIndex = 1; anEdgeExp.more(); anEdgeExp.next()) {
+      for(; anEdgeExp.more(); anEdgeExp.next()) {
         ListOfShape aGenerated;
         theMakeShape->generated(anEdgeExp.current(), aGenerated);
         ListOfShape::iterator aGenIter = aGenerated.begin();
@@ -431,7 +431,7 @@ void FeaturesPlugin_CompositeSketch::storeGenerationHistory(ResultBodyPtr theRes
             }
             if (aNumEdges == 2 && aNumClosed == 1) {
               std::ostringstream aStream;
-              aStream<<"Base_Edge_"<<anIndex++;
+              aStream<<"Base_Edge_"<<theTag++;
               theResultBody->generated(aNotClosedEdge, aStream.str(), theTag++);
             }
           }

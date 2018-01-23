@@ -256,6 +256,46 @@ const TopoDS_Shape findCommonShape(
   return aSharedShape;
 }
 
+// searches theType shape that contains theConnectionType sub-shapes in each shape from the List,
+// so, implements the neighbours searching
+/*
+const TopoDS_Shape findCommonShapeByNB(const TopAbs_ShapeEnum theType,
+  const TopAbs_ShapeEnum theConnectionType, const TopTools_ListOfShape& theList)
+{
+TopTools_MapOfShape aCheckedShapes; // already checked shapes of type theType
+  TopoDS_Shape aResult; // theType result shape
+  for(TopTools_ListIteratorOfListOfShape anIt(theList); anIt.More(); anIt.Next()) { // iterate all
+    for(TopExp_Explorer anExp(anIt.ChangeValue(), theType); anExp.More(); anExp.Next()) {
+      if (aCheckedShapes.Contains(anExp.Current()))
+        continue; // already checked
+      aCheckedShapes.Add(anExp.Current());
+      TopTools_MapOfShape aConnectors; // all connectors of the checked theType shape
+      for(TopExp_Explorer aCExp(anExp.Current(), theConnectionType); aCExp.More(); aCExp.Next()) {
+        aConnectors.Add(aCExp.Current());
+      }
+      // check that all shapes from the List contain the connector sub-shapes
+      bool aFound = true;
+      for(TopTools_ListIteratorOfListOfShape anIt2(theList); anIt2.More() && aFound; anIt2.Next()) {
+        if (anIt2.Value().IsSame(anIt.Value()))
+          continue;
+        aFound = false;
+        for(TopExp_Explorer anE(anIt2.ChangeValue(), theConnectionType); anE.More(); anE.Next()) {
+          if (aConnectors.Contains(anE.Current())) {
+            aFound = true;
+            break;
+          }
+        }
+      }
+      if (aFound) {
+        if (!aResult.IsNull()) // more than one result
+          return TopoDS_Shape();
+        aResult = anExp.Current();
+      }
+    }
+  }
+  return aResult;
+}*/
+
 std::string Model_SelectionNaming::vertexNameByEdges(TopoDS_Shape theContext, TopoDS_Shape theSub,
   std::shared_ptr<Model_Document> theDoc, ResultPtr& theContextRes, const bool theAnotherDoc)
 {
@@ -357,7 +397,7 @@ std::string Model_SelectionNaming::namingName(ResultPtr& theContext,
           }
         } else
           break;
-        TopTools_ListOfShape aListOfNbs;
+        TopTools_MapOfShape aNbs;
         if(!isTrivialCase) { // find Neighbors
           TNaming_Localizer aLocalizer;
           TopTools_MapOfShape aMap3;
@@ -371,24 +411,24 @@ std::string Model_SelectionNaming::namingName(ResultPtr& theContext,
             TopTools_ListIteratorOfListOfShape it2(aList);
             for(;it2.More();it2.Next()) {
               if(aSMap.Contains(it2.Value())) continue; // skip this Face
-              aListOfNbs.Append(it2.Value());
+              aNbs.Add(it2.Value());
             }
           }
         }  // else a trivial case
 
         // build name of the sub-shape Edge
-        for(int i=1; i <= aSMap.Extent(); i++) {
-          const TopoDS_Shape& aFace = aSMap.FindKey(i);
+        // iterate faces of the context to get stable order, not map-order
+        TopTools_MapOfShape aStoredFaces; // to avoid duplicates
+        for(TopExp_Explorer aContExp(aContext, TopAbs_FACE); aContExp.More(); aContExp.Next()) {
+          const TopoDS_Shape& aFace = aContExp.Current();
+          if (aStoredFaces.Contains(aFace) || !(aSMap.Contains(aFace) || aNbs.Contains(aFace)))
+            continue;
+          aStoredFaces.Add(aFace);
           std::string aFaceName = getShapeName(aDoc, aFace, theContext, theAnotherDoc, false);
-          if(i == 1)
+          if(aName.empty())
             aName = aFaceName;
           else
             aName += "&" + aFaceName;
-        }
-        TopTools_ListIteratorOfListOfShape itl(aListOfNbs);
-        for (;itl.More();itl.Next()) {
-          std::string aFaceName = getShapeName(aDoc, itl.Value(), theContext, theAnotherDoc, false);
-          aName += "&" + aFaceName;
         }
       }
       break;
@@ -914,6 +954,9 @@ bool Model_SelectionNaming::selectSubShape(const std::string& theType,
           aList.Append(aFace);
       }
       aSelection = findCommonShape(aType, aList);
+      //if (aSelection.IsNull() && aType == TopAbs_EDGE) { // try to find selection by neighbours
+      //  aSelection = findCommonShapeByNB(aType, TopAbs_VERTEX, aList);
+      //}
     }
   }
   // in case of construction, there is no registered names for all sub-elements,
