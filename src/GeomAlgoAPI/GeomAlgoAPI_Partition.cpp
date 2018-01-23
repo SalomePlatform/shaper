@@ -136,7 +136,16 @@ void GeomAlgoAPI_Partition::build(const ListOfShape& theObjects,
   for (ListOfShape::const_iterator
        aToolsIt = theTools.begin(); aToolsIt != theTools.end(); aToolsIt++) {
     const TopoDS_Shape& aShape = (*aToolsIt)->impl<TopoDS_Shape>();
-    anOperation->AddTool(aShape);
+    // #2419: decompose compounds to get the valid result
+    TopTools_ListOfShape aSimpleShapes;
+    prepareShapes(aShape, aSimpleShapes);
+    TopTools_ListIteratorOfListOfShape aSimpleIter(aSimpleShapes);
+    for (; aSimpleIter.More(); aSimpleIter.Next()) {
+      const TopoDS_Shape& aSimpleSh = aSimpleIter.Value();
+      if (ShapesMap.Add(aSimpleSh)) {
+        anOperation->AddTool(aSimpleSh);
+      }
+    }
   }
 
   // Building and getting result.
