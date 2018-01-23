@@ -46,7 +46,7 @@ Extrusion_1 = model.addExtrusion(Part_1_doc, [model.selection("FACE", "Sketch_1/
 Extrusion_1.result().setName("prism")
 Revolution_1 = model.addRevolution(Part_1_doc, [model.selection("FACE", "Sketch_1/Face-SketchLine_5r-SketchLine_6r-SketchLine_7r")], model.selection("EDGE", "Sketch_1/Edge-SketchLine_6"), 360, 0)
 Revolution_1.result().setName("spinner")
-Placement_1 = model.addPlacement(Part_1_doc, [model.selection("SOLID", "spinner")], model.selection("VERTEX", "spinner/Lateral_Edge_1&spinner/Base_Edge_1"), model.selection("FACE", "prism/Generated_Face_2"), False, True)
+Placement_1 = model.addPlacement(Part_1_doc, [model.selection("SOLID", "spinner")], model.selection("VERTEX", "spinner/Lateral_6&spinner/Base_Edge_10"), model.selection("FACE", "prism/Generated_Face_2"), False, True)
 model.do()
 
 assert(Placement_1.result().name() == Revolution_1.result().name()), "Placement name '{}' != '{}'".format(Placement_1.result().name(), Revolution_1.result().name())

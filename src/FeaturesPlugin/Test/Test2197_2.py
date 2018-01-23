@@ -29,9 +29,9 @@ SketchCircle_1 = Sketch_1.addCircle(-150, 80, 100)
 model.do()
 Face_1 = model.addFace(Part_1_doc, [model.selection("EDGE", "Sketch_1/Edge-SketchCircle_1_2")])
 Revolution_1 = model.addRevolution(Part_1_doc, [model.selection("FACE", "Face_1_1")], model.selection("EDGE", "PartSet/OZ"), 360, 0)
-Group_1 = model.addGroup(Part_1_doc, [model.selection("EDGE", "Revolution_1_1/Base_Edge_1")])
-Group_2 = model.addGroup(Part_1_doc, [model.selection("EDGE", "Revolution_1_1/Lateral_Edge_1")])
-Group_3 = model.addGroup(Part_1_doc, [model.selection("VERTEX", "Revolution_1_1/Lateral_Edge_1&Revolution_1_1/Base_Edge_1")])
+Group_1 = model.addGroup(Part_1_doc, [model.selection("EDGE", "Revolution_1_1/Base_Edge_4")])
+Group_2 = model.addGroup(Part_1_doc, [model.selection("EDGE", "Revolution_1_1/Lateral_2")])
+Group_3 = model.addGroup(Part_1_doc, [model.selection("VERTEX", "Revolution_1_1/Lateral_2&Revolution_1_1/Base_Edge_4")])
 model.end()
 
 # check that resulting group selection is valid
