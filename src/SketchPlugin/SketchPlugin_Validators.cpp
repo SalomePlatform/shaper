@@ -1626,11 +1626,11 @@ bool SketchPlugin_SketchFeatureValidator::isValid(const AttributePtr& theAttribu
   bool isSketchFeature = aRefAttr->isObject();
   if (isSketchFeature) {
     FeaturePtr aFeature = ModelAPI_Feature::feature(aRefAttr->object());
-    isSketchFeature = aFeature;
+    isSketchFeature = aFeature.get() != NULL;
     if (isSketchFeature) {
       std::shared_ptr<SketchPlugin_Feature> aSketchFeature =
           std::dynamic_pointer_cast<SketchPlugin_Feature>(aFeature);
-      isSketchFeature = aSketchFeature;
+      isSketchFeature = aSketchFeature.get() != NULL;
     }
   }
 
