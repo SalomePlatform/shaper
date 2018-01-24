@@ -948,7 +948,7 @@ bool ModuleBase_WidgetMultiSelector::findInSelection(const ObjectPtr& theObject,
   }
 
   // issue #2903: (Possibility to hide faces) - check whether given shape is a hidden sub-shape
-  if (!aFound && theWorkshop->hasSHIFTPressed() && theObject->isDisplayed()) {
+  if (!aFound && theShape.get() && theWorkshop->hasSHIFTPressed() && theObject->isDisplayed()) {
     AISObjectPtr anAIS = theWorkshop->findPresentation(theObject);
     if (anAIS.get() != NULL) {
       Handle(AIS_InteractiveObject) anAISIO = anAIS->impl<Handle(AIS_InteractiveObject)>();
