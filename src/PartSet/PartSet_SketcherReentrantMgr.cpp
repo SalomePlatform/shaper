@@ -264,8 +264,9 @@ bool PartSet_SketcherReentrantMgr::processMouseReleased(ModuleBase_IViewWindow* 
         if (aPointWidget) {
           GeomShapePtr aShape;
           aPointWidget->getGeomSelection_(aValue, mySelectedObject, aShape);
-          ObjectPtr anExternalObject = aPointWidget->getExternalObjectMgr()->getExternalObjectValidated();
-          // if external object has been created before staring new operation and is used as a parameter,
+          ObjectPtr anExternalObject =
+            aPointWidget->getExternalObjectMgr()->getExternalObjectValidated();
+          // if external object is during reentrant operation and is used as a parameter of feature
           // it should be removed after the operation is restarted. (Circle feature, Projection)
           if (anExternalObject.get())
             anExternalCreatedFeature = ModelAPI_Feature::feature(anExternalObject);
