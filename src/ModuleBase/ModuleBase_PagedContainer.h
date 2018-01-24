@@ -81,6 +81,9 @@ class MODULEBASE_EXPORT ModuleBase_PagedContainer : public ModuleBase_ModelWidge
   /// Redefinition of virtual function
   virtual bool restoreValueCustom();
 
+  // A flag which let to remeber last user choice and restore it on next launch
+  bool myRemeberChoice;
+
  protected slots:
    /// A slot called on page change
   void onPageChanged();

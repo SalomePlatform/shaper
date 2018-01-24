@@ -33,6 +33,7 @@ ModuleBase_WidgetSwitch::ModuleBase_WidgetSwitch(QWidget* theParent,
   const Config_WidgetAPI* theData)
 : ModuleBase_PagedContainer(theParent, theData)
 {
+  myRemeberChoice = false;
   QVBoxLayout*  aMainLay = new QVBoxLayout(this);
   //aMainLay->setContentsMargins(2, 4, 2, 2);
   ModuleBase_Tools::adjustMargins(aMainLay);
