@@ -97,7 +97,12 @@ void GeomAlgoAPI_Filling::buildByEdges()
 
   // a 'tolerance' is used to compare 2 knots
   aSection.Perform(Precision::PConfusion());
-  Handle(GeomFill_Line) aLine = new GeomFill_Line((int)aCurves.size());
+  int aNbCurves = (int)aCurves.size();
+  Handle(GeomFill_Line) aLine = new GeomFill_Line(aNbCurves);
+
+  // check myMaxDegree >= aCurves.size() - 1 to be able to interpolate a surface
+  if (myMaxDegree + 1 < aNbCurves)
+    return;
 
   // perform filling by sections
   GeomFill_AppSurf anAppSurf(myMinDegree, myMaxDegree, myTol3D, myTol2D, myNbIter);
