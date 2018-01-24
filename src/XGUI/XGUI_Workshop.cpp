@@ -536,8 +536,8 @@ void XGUI_Workshop::onAcceptPlusActionClicked()
     ModuleBase_OperationFeature* aFOperation = dynamic_cast<ModuleBase_OperationFeature*>
                                                     (anOperationMgr->currentOperation());
     if (aFOperation) {
-      myOperationMgr->commitOperation();
-      module()->launchOperation(aFOperation->id(), false);
+      if (myOperationMgr->commitOperation())
+        module()->launchOperation(aFOperation->id(), false);
     }
   }
 }
