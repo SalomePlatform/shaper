@@ -1035,12 +1035,14 @@ bool XGUI_Workshop::onSaveAs()
 void XGUI_Workshop::onUndo(int theTimes)
 {
   processUndoRedo(ActionUndo, theTimes);
+  myObjectBrowser->updateAllIndexes(1);
 }
 
 //******************************************************
 void XGUI_Workshop::onRedo(int theTimes)
 {
   processUndoRedo(ActionRedo, theTimes);
+  myObjectBrowser->updateAllIndexes(1);
 }
 
 //******************************************************
