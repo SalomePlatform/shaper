@@ -399,6 +399,15 @@ static void keepTopLevelShapes(ListOfShape& theShapes, const TopoDS_Shape& theRo
   }
 }
 
+// returns an ancestor shape-type thaty used for naming-definition of the sub-type
+TopAbs_ShapeEnum typeOfAncestor(const TopAbs_ShapeEnum theSubType) {
+  if (theSubType == TopAbs_VERTEX)
+    return TopAbs_EDGE;
+  if (theSubType == TopAbs_EDGE)
+    return TopAbs_FACE;
+  return TopAbs_VERTEX; // bad case
+}
+
 void Model_BodyBuilder::loadAndOrientModifiedShapes (
   GeomAlgoAPI_MakeShape* theMS,
   std::shared_ptr<GeomAPI_Shape>  theShapeIn,
@@ -417,14 +426,18 @@ void Model_BodyBuilder::loadAndOrientModifiedShapes (
   GeomShapePtr aResultShape = shape();
   TopoDS_Shape aShapeIn = theShapeIn->impl<TopoDS_Shape>();
   TopTools_MapOfShape aView;
+  std::shared_ptr<Model_Data> aData = std::dynamic_pointer_cast<Model_Data>(data());
   TopExp_Explorer aShapeExplorer (aShapeIn, (TopAbs_ShapeEnum)theKindOfShape);
   for (; aShapeExplorer.More(); aShapeExplorer.Next ()) {
     const TopoDS_Shape& aRoot = aShapeExplorer.Current ();
     if (!aView.Add(aRoot)) continue;
+
     bool aNotInTree =
-      TNaming_Tool::NamedShape(aRoot, builder(theTag)->NamedShape()->Label()).IsNull();
-    if (aNotInTree && !theIsStoreSeparate)
-      continue; // there is no sense to write history if old shape does not exist in the document
+      TNaming_Tool::NamedShape(aRoot, aData->shapeLab()).IsNull();
+    if (aNotInTree && !theIsStoreSeparate) {
+      // there is no sense to write history if old shape does not exist in the document
+      continue; // but if it is stored separately, it will be builded as a primitive
+    }
     ListOfShape aList;
     std::shared_ptr<GeomAPI_Shape> aRShape(new GeomAPI_Shape());
     aRShape->setImpl((new TopoDS_Shape(aRoot)));
@@ -449,8 +462,32 @@ void Model_BodyBuilder::loadAndOrientModifiedShapes (
       if(!aRoot.IsSame(aNewShape) && aResultShape->isSubShape(aGeomNewShape, false) &&
          !aResultShape->isSame(*anIt)) { // to avoid put of same shape on main label and sub
         int aBuilderTag = aTag;
-        if (!theIsStoreSeparate)
+        if (!theIsStoreSeparate) {
           aSameParentShapes++;
+        } else if (aNotInTree) { // check this new shape can not be represented as
+          // a sub-shape of higher level sub-shapes
+          TopAbs_ShapeEnum aNewType = aNewShape.ShapeType();
+          TopAbs_ShapeEnum anAncestorType = typeOfAncestor(aNewType);
+          if (anAncestorType != TopAbs_VERTEX) {
+            bool aFound = false;
+            TopoDS_Shape aResultTShape = aResultShape->impl<TopoDS_Shape>();
+            TopExp_Explorer anAncestorExp(aResultTShape, anAncestorType);
+            for(; anAncestorExp.More() && !aFound; anAncestorExp.Next()) {
+              if (aResultTShape.IsSame(anAncestorExp.Current()))
+                continue;
+              TopExp_Explorer aSubExp(anAncestorExp.Current(), aNewType);
+              for(; aSubExp.More(); aSubExp.Next()) {
+                if (aNewShape.IsSame(aSubExp.Current())) {
+                  aFound = true;
+                  break;
+                }
+              }
+            }
+            if (aFound) {
+              continue; // not need to store this shape in the BRep structure
+            }
+          }
+        }
 
         static const int THE_ANCHOR_TAG = 100000;
         int aCurShapeType = (int)((*anIt)->shapeType());
