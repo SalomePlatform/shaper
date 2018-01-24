@@ -929,12 +929,6 @@ bool ModuleBase_WidgetMultiSelector::findInSelection(const ObjectPtr& theObject,
     return true;
 
   bool aFound = false;
-  if (theShape.get()) { // treat shape equal to context as null: 2219, keep order of shapes in list
-    const ResultPtr aContext = std::dynamic_pointer_cast<ModelAPI_Result>(theObject);
-    if (aContext.get() && aContext->shape()->isEqual(theShape))
-      theShape.reset();
-  }
-
   GeomShapePtr anEmptyShape(new GeomAPI_Shape());
   GeomShapePtr aShape = theShape.get() ? theShape : anEmptyShape;
   if (theGeomSelection.find(theObject) != theGeomSelection.end()) {// found
@@ -943,7 +937,16 @@ bool ModuleBase_WidgetMultiSelector::findInSelection(const ObjectPtr& theObject,
     for (; anIt != aLast && !aFound; anIt++) {
       GeomShapePtr aCShape = *anIt;
       if (aCShape.get())
+      {
+        // treat shape equal to context as null: 2219, keep order of shapes in list
+        if (aCShape->isNull()) { // in selection, shape of result is equal to selected shape
+          // if so, here we need to check shape of result
+          ResultPtr aResult = std::dynamic_pointer_cast<ModelAPI_Result>(theObject);
+          if (aResult.get())
+            aCShape = aResult->shape();
+        }
         aFound = aCShape->isSame(aShape);
+      }
     }
   }
 
