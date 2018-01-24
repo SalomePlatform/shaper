@@ -159,6 +159,10 @@ Q_OBJECT
                          std::shared_ptr<ModelAPI_Object>& theObject,
                          std::shared_ptr<GeomAPI_Shape>& theShape);
 
+  /// Return reference to external objects manager
+  /// \return manager instance
+  PartSet_ExternalObjectsMgr* getExternalObjectMgr() const { return myExternalObjectMgr; }
+
 signals:
   /// Signal about selection of an existing vertex from an object
   void vertexSelected();

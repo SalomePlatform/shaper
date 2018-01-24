@@ -19,6 +19,7 @@
 //
 
 #include "PartSet_SketcherReentrantMgr.h"
+#include "PartSet_ExternalObjectsMgr.h"
 #include "PartSet_Module.h"
 #include "PartSet_SketcherMgr.h"
 #include "PartSet_WidgetPoint2d.h"
@@ -254,6 +255,7 @@ bool PartSet_SketcherReentrantMgr::processMouseReleased(ModuleBase_IViewWindow* 
 
       myClickedSketchPoint = PartSet_Tools::getPnt2d(theEvent, theWindow,
                                                      module()->sketchMgr()->activeSketch());
+      FeaturePtr anExternalCreatedFeature;
       if (!aPreSelected.empty()) {
         ModuleBase_ViewerPrsPtr aValue = aPreSelected.first();
         module()->getGeomSelection(aValue, mySelectedObject, mySelectedAttribute);
@@ -262,10 +264,22 @@ bool PartSet_SketcherReentrantMgr::processMouseReleased(ModuleBase_IViewWindow* 
         if (aPointWidget) {
           GeomShapePtr aShape;
           aPointWidget->getGeomSelection_(aValue, mySelectedObject, aShape);
+          ObjectPtr anExternalObject = aPointWidget->getExternalObjectMgr()->getExternalObjectValidated();
+          // if external object has been created before staring new operation and is used as a parameter,
+          // it should be removed after the operation is restarted. (Circle feature, Projection)
+          if (anExternalObject.get())
+            anExternalCreatedFeature = ModelAPI_Feature::feature(anExternalObject);
         }
       }
 
       restartOperation();
+      // remove created external feature
+      if (anExternalCreatedFeature.get()) {
+        QObjectPtrList anObjects;
+        anObjects.append(anExternalCreatedFeature);
+        workshop()->deleteFeatures(anObjects);
+      }
+
       myClickedSketchPoint = std::shared_ptr<GeomAPI_Pnt2d>();
       mySelectedObject = ObjectPtr();
       mySelectedAttribute = AttributePtr();

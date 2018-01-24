@@ -83,6 +83,10 @@ class PARTSET_EXPORT PartSet_ExternalObjectsMgr
                                  const CompositeFeaturePtr& theSketch,
                                  const bool theTemporary);
 
+  /// Returns created external object or NULL
+  /// \return an object instance
+  ObjectPtr getExternalObjectValidated() const { return myExternalObjectValidated; }
+
   // Removes the external presentation from the model
   /// \param theSketch a current sketch
   /// \param theFeature a current feature
