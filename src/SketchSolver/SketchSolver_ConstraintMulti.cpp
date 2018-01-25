@@ -235,14 +235,18 @@ void SketchSolver_ConstraintMulti::notify(const FeaturePtr& theFeature,
   if (myIsProcessingNotify)
     return; // "notify" is already processing
 
-  myIsProcessingNotify = true;
+  // do not adjust "multi"-constraint if the number of objects is changed,
+  // wait until the constraint is updated (issue #2425: changing number of copies by parameter)
+  if (myNumberOfCopies + 1 == myBaseConstraint->integer(nameNbObjects())->value()) {
+    myIsProcessingNotify = true;
 
-  // update derivative object
-  updateLocal();
-  myAdjusted = false;
-  adjustConstraint();
+    // update derivative object
+    updateLocal();
+    myAdjusted = false;
+    adjustConstraint();
 
-  myIsProcessingNotify = false;
+    myIsProcessingNotify = false;
+  }
 }
 
 void SketchSolver_ConstraintMulti::blockEvents(bool isBlocked)
