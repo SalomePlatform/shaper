@@ -477,8 +477,8 @@ email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com
         icon="icons/Sketch/projection.png">
         <sketch_shape_selector
               id="ExternalFeature"
-              label="Edge"
-              tooltip="Select external edge."
+              label="Object"
+              tooltip="Select external edge or vertex."
               shape_types="edge vertex"
               use_external="true"
               can_create_external="false"
