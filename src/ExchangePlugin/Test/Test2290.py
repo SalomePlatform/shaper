@@ -37,3 +37,5 @@ anExportFeature.string("ExportType").setValue("XAO")
 anExportFeature.string("xao_author").setValue("me")
 anExportFeature.string("xao_geometry_name").setValue("mygeom")
 model.end()
+
+assert anExportFeature.error() == ""
