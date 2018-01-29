@@ -81,7 +81,8 @@ INSTALL(FILES ${TEXT_RESOURCES} DESTINATION ${SHAPER_INSTALL_XML_RESOURCES})
 
 ADD_UNIT_TESTS(TestImport.py
                TestExport.py
-               Test2290.py)
+               Test2290.py
+               TestExportToXAOWithGroupNotUpdated.py)
 
 SET(DATA_FILES
   solid.brep

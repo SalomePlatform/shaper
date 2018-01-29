@@ -258,7 +258,6 @@ void ExchangePlugin_ExportFeature::exportXAO(const std::string& theFileName)
   aXao.getGeometry()->setName(aGeometryName);
 
   // groups
-
   int aGroupCount = document()->size(ModelAPI_ResultGroup::group());
   for (int aGroupIndex = 0; aGroupIndex < aGroupCount; ++aGroupIndex) {
     ResultGroupPtr aResultGroup =
@@ -279,21 +278,31 @@ void ExchangePlugin_ExportFeature::exportXAO(const std::string& theFileName)
     XAO::Group* aXaoGroup = aXao.addGroup(aGroupDimension,
                                           aResultGroup->data()->name());
 
-    for (int aSelectionIndex = 0; aSelectionIndex < aSelectionList->size(); ++aSelectionIndex) {
-      AttributeSelectionPtr aSelection = aSelectionList->value(aSelectionIndex);
+    try {
+      for (int aSelectionIndex = 0; aSelectionIndex < aSelectionList->size(); ++aSelectionIndex) {
+        AttributeSelectionPtr aSelection = aSelectionList->value(aSelectionIndex);
 
-      // complex conversion of reference id to element index
-      // gives bad id in case the selection is done from python script
-      // => using GeomAlgoAPI_CompoundBuilder::id instead
-      // int aReferenceID_old = aSelection->Id();
+        // complex conversion of reference id to element index
+        // gives bad id in case the selection is done from python script
+        // => using GeomAlgoAPI_CompoundBuilder::id instead
+        // int aReferenceID_old = aSelection->Id();
 
-      int aReferenceID = GeomAlgoAPI_CompoundBuilder::id(aShape, aSelection->value());
+        int aReferenceID = GeomAlgoAPI_CompoundBuilder::id(aShape, aSelection->value());
 
-      std::string aReferenceString = XAO::XaoUtils::intToString(aReferenceID);
-      int anElementID =
-        aXao.getGeometry()->getElementIndexByReference(aGroupDimension, aReferenceString);
+        std::string aReferenceString = XAO::XaoUtils::intToString(aReferenceID);
+        int anElementID =
+          aXao.getGeometry()->getElementIndexByReference(aGroupDimension, aReferenceString);
 
-      aXaoGroup->add(anElementID);
+        aXaoGroup->add(anElementID);
+      }
+    } catch (XAO::XAO_Exception& e) {
+      std::string msg = "An error occurred while exporting group " + aResultGroup->data()->name();
+      msg += ".\n";
+      msg += e.what();
+      msg += "\n";
+      msg += "=> skipping this group from XAO export.";
+      setError(msg);
+      aXao.removeGroup(aXaoGroup);
     }
   }
 
@@ -322,61 +331,73 @@ void ExchangePlugin_ExportFeature::exportXAO(const std::string& theFileName)
 
     XAO::Field* aXaoField = aXao.addField(aFieldType, aFieldDimension, aTables->columns(),
                                           aResultField->data()->name());
-    // set components names
-    AttributeStringArrayPtr aComponents = aFieldFeature->stringArray("components_names");
-    for(int aComp = 0; aComp < aComponents->size(); aComp++) {
-      std::string aName = aComponents->value(aComp);
-      aXaoField->setComponentName(aComp, aName);
-    }
 
-    AttributeIntArrayPtr aStamps = aFieldFeature->intArray("stamps");
-    for (int aStepIndex = 0; aStepIndex < aTables->tables(); aStepIndex++) {
-      XAO::Step* aStep = aXaoField->addNewStep(aStepIndex);
-      aStep->setStep(aStepIndex);
-      int aStampIndex = aStamps->value(aStepIndex);
-      aStep->setStamp(aStampIndex);
-      int aNumElements = isWholePart ? aXaoField->countElements() : aTables->rows();
-      int aNumComps = aTables->columns();
-      std::set<int> aFilledIDs; // to fill the rest by defaults
-      // omit default values first row
-      for(int aRow = isWholePart ? 0 : 1; aRow < aNumElements; aRow++) {
-        for(int aCol = 0; aCol < aNumComps; aCol++) {
-          int anElementID = 0;
-          if (!isWholePart) {
-            // element index actually is the ID of the selection
-            AttributeSelectionPtr aSelection = aSelectionList->value(aRow - 1);
 
-            // complex conversion of reference id to element index
-            // gives bad id in case the selection is done from python script
-            // => using GeomAlgoAPI_CompoundBuilder::id instead
-            //int aReferenceID_old = aSelection->Id();
-
-            int aReferenceID = GeomAlgoAPI_CompoundBuilder::id(aShape, aSelection->value());
-
-            std::string aReferenceString = XAO::XaoUtils::intToString(aReferenceID);
-            anElementID =
-              aXao.getGeometry()->getElementIndexByReference(aFieldDimension, aReferenceString);
-          }
-
-          ModelAPI_AttributeTables::Value aVal = aTables->value(
-            isWholePart ? 0 : aRow, aCol, aStepIndex);
-          std::string aStrVal = valToString(aVal, aTables->type());
-          aStep->setStringValue(isWholePart ? aRow : anElementID, aCol, aStrVal);
-          aFilledIDs.insert(anElementID);
-        }
+    try {
+      // set components names
+      AttributeStringArrayPtr aComponents = aFieldFeature->stringArray("components_names");
+      for(int aComp = 0; aComp < aComponents->size(); aComp++) {
+        std::string aName = aComponents->value(aComp);
+        aXaoField->setComponentName(aComp, aName);
       }
-      if (!isWholePart) { // fill the rest values by default ones
-        XAO::GeometricElementList::iterator allElem = aXao.getGeometry()->begin(aFieldDimension);
-        for(; allElem != aXao.getGeometry()->end(aFieldDimension); allElem++) {
-          if (aFilledIDs.find(allElem->first) != aFilledIDs.end())
-            continue;
+
+      AttributeIntArrayPtr aStamps = aFieldFeature->intArray("stamps");
+      for (int aStepIndex = 0; aStepIndex < aTables->tables(); aStepIndex++) {
+        XAO::Step* aStep = aXaoField->addNewStep(aStepIndex);
+        aStep->setStep(aStepIndex);
+        int aStampIndex = aStamps->value(aStepIndex);
+        aStep->setStamp(aStampIndex);
+        int aNumElements = isWholePart ? aXaoField->countElements() : aTables->rows();
+        int aNumComps = aTables->columns();
+        std::set<int> aFilledIDs; // to fill the rest by defaults
+        // omit default values first row
+        for(int aRow = isWholePart ? 0 : 1; aRow < aNumElements; aRow++) {
           for(int aCol = 0; aCol < aNumComps; aCol++) {
-            ModelAPI_AttributeTables::Value aVal = aTables->value(0, aCol, aStepIndex); // default
+            int anElementID = 0;
+            if (!isWholePart) {
+              // element index actually is the ID of the selection
+              AttributeSelectionPtr aSelection = aSelectionList->value(aRow - 1);
+
+              // complex conversion of reference id to element index
+              // gives bad id in case the selection is done from python script
+              // => using GeomAlgoAPI_CompoundBuilder::id instead
+              //int aReferenceID_old = aSelection->Id();
+
+              int aReferenceID = GeomAlgoAPI_CompoundBuilder::id(aShape, aSelection->value());
+
+              std::string aReferenceString = XAO::XaoUtils::intToString(aReferenceID);
+              anElementID =
+                aXao.getGeometry()->getElementIndexByReference(aFieldDimension, aReferenceString);
+            }
+
+            ModelAPI_AttributeTables::Value aVal = aTables->value(
+              isWholePart ? 0 : aRow, aCol, aStepIndex);
             std::string aStrVal = valToString(aVal, aTables->type());
-            aStep->setStringValue(allElem->first, aCol, aStrVal);
+            aStep->setStringValue(isWholePart ? aRow : anElementID, aCol, aStrVal);
+            aFilledIDs.insert(anElementID);
+          }
+        }
+        if (!isWholePart) { // fill the rest values by default ones
+          XAO::GeometricElementList::iterator allElem = aXao.getGeometry()->begin(aFieldDimension);
+          for(; allElem != aXao.getGeometry()->end(aFieldDimension); allElem++) {
+            if (aFilledIDs.find(allElem->first) != aFilledIDs.end())
+              continue;
+            for(int aCol = 0; aCol < aNumComps; aCol++) {
+              ModelAPI_AttributeTables::Value aVal = aTables->value(0, aCol, aStepIndex); // default
+              std::string aStrVal = valToString(aVal, aTables->type());
+              aStep->setStringValue(allElem->first, aCol, aStrVal);
+            }
           }
         }
       }
+    } catch (XAO::XAO_Exception& e) {
+      std::string msg = "An error occurred while exporting field " + aResultField->data()->name();
+      msg += ".\n";
+      msg += e.what();
+      msg += "\n";
+      msg += "=> skipping this field from XAO export.";
+      setError(msg);
+      aXao.removeField(aXaoField);
     }
   }
 
