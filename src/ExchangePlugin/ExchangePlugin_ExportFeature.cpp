@@ -54,6 +54,8 @@
 #include <ModelAPI_Session.h>
 #include <ModelAPI_Validator.h>
 
+#include <Events_InfoMessage.h>
+
 #include <XAO_Group.hxx>
 #include <XAO_Field.hxx>
 #include <XAO_Xao.hxx>
@@ -301,7 +303,7 @@ void ExchangePlugin_ExportFeature::exportXAO(const std::string& theFileName)
       msg += e.what();
       msg += "\n";
       msg += "=> skipping this group from XAO export.";
-      setError(msg);
+      Events_InfoMessage("ExportFeature", msg, this).send();
       aXao.removeGroup(aXaoGroup);
     }
   }
@@ -396,7 +398,7 @@ void ExchangePlugin_ExportFeature::exportXAO(const std::string& theFileName)
       msg += e.what();
       msg += "\n";
       msg += "=> skipping this field from XAO export.";
-      setError(msg);
+      Events_InfoMessage("ExportFeature", msg, this).send();
       aXao.removeField(aXaoField);
     }
   }
