@@ -1400,8 +1400,9 @@ void PartSet_Module::processEvent(const std::shared_ptr<Events_Message>& theMess
 
     SessionPtr aMgr = ModelAPI_Session::get();
     DocumentPtr aActiveDoc = aMgr->activeDocument();
-    if (myActivePartIndex.isValid())
-      aTreeView->setExpanded(myActivePartIndex, false);
+    // workaround for #2431 (SISGSEGV when launching some unit tests from GUI)
+    //if (myActivePartIndex.isValid())
+    //  aTreeView->setExpanded(myActivePartIndex, false);
 
     XGUI_DataModel* aDataModel = aWorkshop->objectBrowser()->dataModel();
     myActivePartIndex = aDataModel->documentRootIndex(aActiveDoc, 0);
