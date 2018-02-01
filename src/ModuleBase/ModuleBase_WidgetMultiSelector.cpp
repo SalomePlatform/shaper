@@ -929,8 +929,13 @@ bool ModuleBase_WidgetMultiSelector::findInSelection(const ObjectPtr& theObject,
     return true;
 
   bool aFound = false;
-  GeomShapePtr anEmptyShape(new GeomAPI_Shape());
-  GeomShapePtr aShape = theShape.get() ? theShape : anEmptyShape;
+  GeomShapePtr aShape = theShape;
+  if (!aShape.get()) {
+    // #2429 (the preselection of a sketch is not taken into account)
+    ResultPtr aResult = std::dynamic_pointer_cast<ModelAPI_Result>(theObject);
+    if (aResult.get())
+      aShape = aResult->shape();
+  }
   if (theGeomSelection.find(theObject) != theGeomSelection.end()) {// found
     const std::set<GeomShapePtr>& aShapes = theGeomSelection.at(theObject);
     std::set<GeomShapePtr>::const_iterator anIt = aShapes.begin(), aLast = aShapes.end();
