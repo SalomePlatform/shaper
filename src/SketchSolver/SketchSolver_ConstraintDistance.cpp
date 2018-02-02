@@ -87,6 +87,12 @@ void SketchSolver_ConstraintDistance::update()
   SketchSolver_Constraint::update();
 }
 
+bool SketchSolver_ConstraintDistance::remove()
+{
+  removeConstraintsKeepingSign();
+  return SketchSolver_Constraint::remove();
+}
+
 void SketchSolver_ConstraintDistance::addConstraintsToKeepSign()
 {
   std::shared_ptr<PlaneGCSSolver_Storage> aStorage =
@@ -144,6 +150,9 @@ void SketchSolver_ConstraintDistance::addConstraintsToKeepSign()
 
 void SketchSolver_ConstraintDistance::removeConstraintsKeepingSign()
 {
+  if (!myOddPoint)
+    return; // no sign kept => nothing to remove
+
   std::shared_ptr<PlaneGCSSolver_Storage> aStorage =
       std::dynamic_pointer_cast<PlaneGCSSolver_Storage>(myStorage);
 

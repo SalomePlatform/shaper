@@ -40,6 +40,9 @@ public:
   /// \brief Update constraint
   virtual void update();
 
+  /// \brief Remove constraint
+  virtual bool remove();
+
 protected:
   /// \brief Generate list of attributes of constraint in order useful for constraints
   /// \param[out] theValue      numerical characteristic of constraint (e.g. distance)
