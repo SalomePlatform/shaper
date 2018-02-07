@@ -37,6 +37,8 @@ public:
   /// If not then it means that the widget do not need attribute at all.
   virtual bool usesAttribute() const { return false; }
 
+  virtual bool focusTo() { return false; }
+
 protected:
     /// Saves the internal parameters to the given feature
   /// \return True in success
