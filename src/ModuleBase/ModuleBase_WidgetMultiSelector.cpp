@@ -463,7 +463,7 @@ bool ModuleBase_WidgetMultiSelector::processDelete()
   myListView->restoreSelection(anIndices);
 
   appendSelectionInHistory();
-  return aDone;
+  return true/*aDone*/; // following #2438 Delete should be processed even if nothing is delete
 }
 
 //********************************************************************
