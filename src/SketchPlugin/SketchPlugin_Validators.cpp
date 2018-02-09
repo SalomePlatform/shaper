@@ -983,10 +983,15 @@ bool SketchPlugin_ProjectionValidator::isValid(const AttributePtr& theAttribute,
   if (aFeatureAttr.get()) {
     GeomShapePtr aVal = aFeatureAttr->value();
     ResultPtr aRes = aFeatureAttr->context();
-    if(aVal && aVal->isEdge()) {
+    if (aVal && aVal->isVertex())
+      return true; // vertex is always could be projected
+    if (aVal && aVal->isEdge()) {
       anEdge = std::shared_ptr<GeomAPI_Edge>(new GeomAPI_Edge(aFeatureAttr->value()));
-    } else if(aRes && aRes->shape() && aRes->shape()->isEdge()) {
-      anEdge = std::shared_ptr<GeomAPI_Edge>(new GeomAPI_Edge(aFeatureAttr->context()->shape()));
+    } else if(aRes && aRes->shape()) {
+      if (aRes->shape()->isVertex())
+        return true; // vertex is always could be projected
+      else if (aRes->shape()->isEdge())
+        anEdge = std::shared_ptr<GeomAPI_Edge>(new GeomAPI_Edge(aFeatureAttr->context()->shape()));
     }
 
     // try to convert result to sketch feature
@@ -996,15 +1001,6 @@ bool SketchPlugin_ProjectionValidator::isValid(const AttributePtr& theAttribute,
     }
   }
   if (!anEdge) {
-    // check a vertex has been selected
-    if (aFeatureAttr->value() && aFeatureAttr->value()->isVertex())
-      return true;
-    else {
-      ResultPtr aRes = aFeatureAttr->context();
-      if (aRes && aRes->shape() && aRes->shape()->isVertex())
-        return true;
-    }
-
     theError = "The attribute %1 should be an edge or vertex";
     theError.arg(theAttribute->id());
     return false;
