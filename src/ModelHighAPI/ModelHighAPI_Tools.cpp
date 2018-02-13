@@ -405,6 +405,8 @@ std::string storeFeatures(const std::string& theDocName, DocumentPtr theDoc,
 bool checkPythonDump()
 {
   SessionPtr aSession = ModelAPI_Session::get();
+  // 2431: set PartSet as a current document
+  aSession->setActiveDocument(aSession->moduleDocument(), true);
   // dump all to the python file
   aSession->startOperation("Check python dump");
   FeaturePtr aDump = aSession->moduleDocument()->addFeature("Dump");
