@@ -1146,7 +1146,8 @@ void Model_Document::setCurrentFeature(
         aDisabledFlag = false;
       else if (anOwners.find(anIter) != anOwners.end())
         // disable the higher-level feature if the nested is the current
-        aDisabledFlag = true;
+        if (aMain->getKind() != "Import") // exception for the import XAO feature with Group (2430)
+          aDisabledFlag = true;
     }
 
     if (anIter->getKind() == "Parameter") {
