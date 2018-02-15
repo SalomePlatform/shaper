@@ -103,7 +103,8 @@ void BuildPlugin_Edge::execute()
     int aModVertexTag = 1;
     std::string aModVertexName = "Modified_Vertex";
     aResultBody->loadAndOrientModifiedShapes(&aCopyAlgo, aShape, GeomAPI_Shape::VERTEX,
-                                             aModVertexTag, aModVertexName, *aSubShapes.get());
+                                             aModVertexTag, aModVertexName, *aSubShapes.get(),
+                                             true);
 
     setResult(aResultBody, aResultIndex);
     ++aResultIndex;
