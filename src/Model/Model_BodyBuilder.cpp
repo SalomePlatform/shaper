@@ -215,7 +215,8 @@ void Model_BodyBuilder::storeModified(const std::shared_ptr<GeomAPI_Shape>& theO
   if (aData) {
     TDF_Label& aShapeLab = aData->shapeLab();
     // clean builders
-    clean();
+    if (theDecomposeSolidsTag != -2)
+      clean();
     // store the new shape as primitive
     TNaming_Builder aBuilder(aShapeLab);
     if (!theOldShape || !theNewShape)
@@ -518,6 +519,9 @@ void Model_BodyBuilder::loadAndOrientModifiedShapes (
         } else if (aNotInTree) {
           // not in tree -> store as primitive (stored as separated)
           builder(aBuilderTag)->Generated(aNewShape);
+        } else if (aNewShape.ShapeType() > aRoot.ShapeType()) {
+           // if lower-level type is produced, make it as generated
+          builder(aBuilderTag)->Generated(aRoot, aNewShape);
         } else {
           builder(aBuilderTag)->Modify(aRoot, aNewShape);
         }

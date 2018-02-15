@@ -75,6 +75,25 @@ void Model_ResultCompSolid::loadAndOrientModifiedShapes(GeomAlgoAPI_MakeShape* t
   if (theSplitInSubs && mySubs.size()) { // consists of subs
     std::vector<std::shared_ptr<ModelAPI_ResultBody> >::const_iterator aSubIter = mySubs.cbegin();
     for(; aSubIter != mySubs.cend(); aSubIter++) {
+      // check that sub-shape was also created as modification of ShapeIn
+      /* to find when it is needed later to enable: to store modification of sub-bodies not only as primitives
+      GeomShapePtr aSubGeomShape = (*aSubIter)->shape();
+      if (!theIsStoreAsGenerated && aSubGeomShape.get() && !aSubGeomShape->isNull()) {
+        TopoDS_Shape aSubShape = aSubGeomShape->impl<TopoDS_Shape>();
+        TopoDS_Shape aWholeIn = theShapeIn->impl<TopoDS_Shape>();
+        for(TopExp_Explorer anExp(aWholeIn, aSubShape.ShapeType()); anExp.More(); anExp.Next()) {
+          ListOfShape aHistory;
+          std::shared_ptr<GeomAPI_Shape> aSubIn(new GeomAPI_Shape());
+          aSubIn->setImpl((new TopoDS_Shape(anExp.Current())));
+          theMS->modified(aSubIn, aHistory);
+          std::list<std::shared_ptr<GeomAPI_Shape> >::const_iterator anIt = aHistory.begin();
+          for (; anIt != aHistory.end(); anIt++) {
+            if ((*anIt)->isSame(aSubGeomShape)) {
+              (*aSubIter)->storeModified(aSubIn, aSubGeomShape, -2); // -2 is to avoid clearing
+            }
+          }
+        }
+      }*/
       (*aSubIter)->loadAndOrientModifiedShapes(
         theMS, theShapeIn, theKindOfShape, theTag, theName, theSubShapes, theIsStoreSeparate,
         theIsStoreAsGenerated);
@@ -85,7 +104,6 @@ void Model_ResultCompSolid::loadAndOrientModifiedShapes(GeomAlgoAPI_MakeShape* t
     theIsStoreAsGenerated);
   }
 }
-
 
 int Model_ResultCompSolid::numberOfSubs(bool forTree) const
 {
