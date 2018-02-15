@@ -175,9 +175,12 @@ void PartSet_WidgetFeaturePointSelector::mouseReleased(ModuleBase_IViewWindow* t
 
   updateObject(feature());
 
-  emit focusOutWidget(this);
   // we need to deselect base feature for better visibility of selected feature
   XGUI_Tools::workshop(myWorkshop)->displayer()->clearSelected(false);
+
+  // focusOutWidget should be the last functionality in the method because after this emit,
+  // the widget may be deleted and members of this class are deleted (e.g. myWorkshop)
+  emit focusOutWidget(this);
 }
 
 //********************************************************************
