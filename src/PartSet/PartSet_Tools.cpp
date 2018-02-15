@@ -374,7 +374,13 @@ ResultPtr PartSet_Tools::createFixedObjectByExternal(
   AttributeRefAttrPtr aRefAttr = aProjectionFeature->data()->refattr(
     SketchPlugin_Projection::PROJECTED_FEATURE_ID());
   if (!aRefAttr || !aRefAttr->isInitialized())
+  {
+    // remove external feature if the attribute is not filled
+    std::set<FeaturePtr> aFeatures;
+    aFeatures.insert(aProjectionFeature);
+    ModelAPI_Tools::removeFeaturesAndReferences(aFeatures);
     return ResultPtr();
+  }
 
   FeaturePtr aProjection = ModelAPI_Feature::feature(aRefAttr->object());
   if (aProjection.get() && aProjection->lastResult().get())

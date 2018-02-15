@@ -1923,7 +1923,6 @@ void XGUI_Workshop::moveObjects()
 //**************************************************************
 bool XGUI_Workshop::deleteFeatures(const QObjectPtrList& theObjects)
 {
-  std::map<FeaturePtr, std::set<FeaturePtr> > aReferences;
   std::set<FeaturePtr> aFeatures;
   ModuleBase_Tools::convertToFeatures(theObjects, aFeatures);
 
