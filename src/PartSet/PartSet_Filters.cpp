@@ -27,6 +27,7 @@
 #include <ModelAPI_Feature.h>
 #include <ModelAPI_ResultPart.h>
 #include <ModelAPI_ResultGroup.h>
+#include <ModelAPI_ResultField.h>
 #include <ModelAPI_Session.h>
 
 #include <AIS_InteractiveObject.hxx>
@@ -59,10 +60,12 @@ Standard_Boolean PartSet_GlobalFilter::IsOk(const Handle(SelectMgr_EntityOwner)&
         // result of parts belongs to PartSet document and can be selected only when PartSet
         //  is active in order to do not select the result of the active part.
         if (aResult.get()) {
-          if (aResult->groupName() == ModelAPI_ResultPart::group()) {
+          std::string aResultGroupName = aResult->groupName();
+          if (aResultGroupName == ModelAPI_ResultPart::group()) {
             SessionPtr aMgr = ModelAPI_Session::get();
             aValid = aMgr->activeDocument() == aMgr->moduleDocument();
-          } else if (aResult->groupName() == ModelAPI_ResultGroup::group()) {
+          } else if (aResultGroupName == ModelAPI_ResultGroup::group() ||
+                     aResultGroupName == ModelAPI_ResultField::group()) {
             aValid = Standard_False;
           } else
             aValid = Standard_True;
