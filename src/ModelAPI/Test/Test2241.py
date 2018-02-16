@@ -145,39 +145,22 @@ Group_3.result().setName("acier")
 Group_3.result().setColor(170, 85, 0)
 Shell_1 = model.addShell(Part_1_doc, [model.selection("FACE", "LinearCopy_1_1_1"), model.selection("FACE", "LinearCopy_1_1_2"), model.selection("FACE", "LinearCopy_1_1_3"), model.selection("FACE", "LinearCopy_1_1_4"), model.selection("FACE", "LinearCopy_1_1_5"), model.selection("FACE", "LinearCopy_1_1_6"), model.selection("FACE", "LinearCopy_1_1_7"), model.selection("FACE", "LinearCopy_2_1_4"), model.selection("FACE", "LinearCopy_2_1_5"), model.selection("FACE", "LinearCopy_2_1_6"), model.selection("FACE", "LinearCopy_2_1_7"), model.selection("FACE", "LinearCopy_2_1_8"), model.selection("FACE", "LinearCopy_2_1_1"), model.selection("FACE", "LinearCopy_2_1_2"), model.selection("FACE", "LinearCopy_2_1_3"), model.selection("FACE", "LinearCopy_3_1_4"), model.selection("FACE", "LinearCopy_3_1_3"), model.selection("FACE", "LinearCopy_3_1_2"), model.selection("FACE", "LinearCopy_3_1_1"), model.selection("FACE", "LinearCopy_4_1_1"), model.selection("FACE", "LinearCopy_4_1_2"), model.selection("FACE", "LinearCopy_4_1_3"), model.selection("FACE", "LinearCopy_5_1_1"), model.selection("FACE", "LinearCopy_5_1_2"), model.selection("FACE", "LinearCopy_1_1_8")])
 Partition_1 = model.addPartition(Part_1_doc, [model.selection("FACE", "Face_3_1"), model.selection("FACE", "Face_3_2"), model.selection("FACE", "Face_4_1"), model.selection("FACE", "Face_2_1"), model.selection("FACE", "Face_1_1"), model.selection("FACE", "Face_3_5"), model.selection("FACE", "Face_3_3"), model.selection("FACE", "Face_3_4"), model.selection("FACE", "Face_3_7"), model.selection("FACE", "Face_3_6"), model.selection("FACE", "Face_3_8"), model.selection("FACE", "Face_3_9"), model.selection("FACE", "Face_3_10"), model.selection("FACE", "Face_3_11"), model.selection("FACE", "Face_3_12"), model.selection("SHELL", "Shell_1_1")])
-Remove_SubShapes_1 = model.addRemoveSubShapes(Part_1_doc, model.selection("COMPOUND", "Partition_1_1"))
-Remove_SubShapes_1.setSubShapesToKeep([model.selection("FACE", "Partition_1_1_2"), model.selection("FACE", "Partition_1_1_3"), model.selection("FACE", "Partition_1_1_4"), model.selection("FACE", "Partition_1_1_5"), model.selection("FACE", "Partition_1_1_6"), model.selection("FACE", "Partition_1_1_7"), model.selection("FACE", "Partition_1_1_8"), model.selection("FACE", "Partition_1_1_9")])
 model.end()
 
 # move groups
 model.begin()
-Part_1_doc.moveFeature(Group_1.feature(), Remove_SubShapes_1.feature())
+Part_1_doc.moveFeature(Group_1.feature(), Partition_1.feature())
 Part_1_doc.moveFeature(Group_2.feature(), Group_1.feature())
 Part_1_doc.moveFeature(Group_3.feature(), Group_2.feature())
 model.end()
 
-# check that group 2 is correct (some subs are removed), but Group_1 and Group_3 elements are removed (because shell is removed)
+# check that all groups are correct
 from ModelAPI import *
 aFactory = ModelAPI_Session.get().validators()
 
-assert(Group_2.groupList().size() != 0)
-for a in range(Group_2.groupList().size()):
-  if not Group_1.groupList().value(a).context() is None:
-    assert(len(Group_1.groupList().value(a).namingName()) == 0)
-
-#assert(aFactory.validate(Group_3.feature()))
-#assert(Group_3.groupList().size() != 0)
-#for a in range(Group_3.groupList().size()):
-#  assert(Group_3.groupList().value(a).value().shapeTypeStr() == "FACE")
-#  assert(len(Group_3.groupList().value(a).namingName()) > 0)
-
-# for Group in [Group_1, Group_2, Group_3]:
-#   if Group == Group_2:
-#     assert(aFactory.validate(Group.feature()))
-#   assert(Group.groupList().size() != 0)
-#   for a in range(Group.groupList().size()):
-#     if Group != Group_2:
-#       assert(len(Group.groupList().value(a).namingName()) == 0)
-#     else:
-#       assert(Group.groupList().value(a).value().shapeTypeStr() == "FACE")
-#       assert(len(Group.groupList().value(a).namingName()) > 0)
+for Group in [Group_1, Group_2, Group_3]:
+  assert(aFactory.validate(Group.feature()))
+  assert(Group.groupList().size() != 0)
+  for a in range(Group.groupList().size()):
+    assert(Group.groupList().value(a).value().shapeTypeStr() == "FACE")
+    assert(len(Group.groupList().value(a).namingName()) > 0)
