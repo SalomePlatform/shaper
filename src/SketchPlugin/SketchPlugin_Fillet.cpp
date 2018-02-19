@@ -203,8 +203,15 @@ bool SketchPlugin_Fillet::calculateFilletParameters()
   if (!aFilletPoint2D.get())
     return false;
 
-  std::set<FeaturePtr> aFilletFeatures =
-      SketchPlugin_Tools::findFeaturesCoincidentToPoint(aFilletPoint2D);
+  std::set<AttributePoint2DPtr> aCoincidentPoints =
+      SketchPlugin_Tools::findPointsCoincidentToPoint(aFilletPoint2D);
+  std::set<FeaturePtr> aFilletFeatures;
+  for (std::set<AttributePoint2DPtr>::iterator aCPIt = aCoincidentPoints.begin();
+       aCPIt != aCoincidentPoints.end(); ++aCPIt) {
+    FeaturePtr anOwner = ModelAPI_Feature::feature((*aCPIt)->owner());
+    if (anOwner)
+      aFilletFeatures.insert(anOwner);
+  }
   if (aFilletFeatures.size() != 2) {
     setError("Error: Selected point does not have two suitable edges for fillet.");
     return false;
