@@ -221,10 +221,12 @@ void XGUI_DataModel::processEvent(const std::shared_ptr<Events_Message>& theMess
       std::string aGroup = (*aIt);
       if (aDoc == aRootDoc) {  // If root objects
         int aRow = aRootDoc->size(aGroup, true);
-        if ((aGroup == aRootType) || (aGroup == ModelAPI_Folder::group())) {
+        if (aGroup == aRootType) {
           // Process root folder
           removeRow(aRow + aNbFolders);
           rebuildBranch(aNbFolders, aRow);
+        } else if (aGroup == ModelAPI_Folder::group()) {
+          rebuildDataTree();
         } else {
           // Process root sub-folder
           int aFolderId = myXMLReader->rootFolderId(aGroup);
@@ -251,10 +253,12 @@ void XGUI_DataModel::processEvent(const std::shared_ptr<Events_Message>& theMess
         if (aDocRoot.isValid()) {
           int aRow = aDoc->size(aGroup, true);
           int aNbSubFolders = foldersCount(aDoc.get());
-          if ((aGroup == aSubType) || (aGroup == ModelAPI_Folder::group())) {
+          if (aGroup == aSubType) {
             // List of objects under document root
             removeRow(aRow + aNbSubFolders, aDocRoot);
             rebuildBranch(aNbSubFolders, aRow, aDocRoot);
+          } if (aGroup == ModelAPI_Folder::group()) {
+            rebuildDataTree();
           } else {
             // List of objects under a folder
             int aFolderId = folderId(aGroup, aDoc.get());
