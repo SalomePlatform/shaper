@@ -121,9 +121,6 @@ protected:
     WFS_OPEN, ///< open file
     WFS_SAVE ///< save file
   } myType; ///< type of dialog
-
-  /// Default path
-  QString myDefaultPath;
 };
 
 #endif /* MODULEBASE_WIDGETFILESELECTOR_H_ */

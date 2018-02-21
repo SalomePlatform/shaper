@@ -42,13 +42,19 @@
 #include <memory>
 #include <string>
 
+
+/// Default path
+static QString myDefaultPath;
+
+
 ModuleBase_WidgetFileSelector::ModuleBase_WidgetFileSelector(QWidget* theParent,
                                                              const Config_WidgetAPI* theData)
 : ModuleBase_ModelWidget(theParent, theData), myFileDialog(0)
 {
   myTitle = translate(theData->getProperty("title"));
   myType = (theData->getProperty("type") == "save") ? WFS_SAVE : WFS_OPEN;
-  myDefaultPath = QString::fromStdString(theData->getProperty("path"));
+  if (myDefaultPath.isNull() || myDefaultPath.isEmpty())
+    myDefaultPath = QString::fromStdString(theData->getProperty("path"));
 
   if (myDefaultPath.isEmpty())
     myDefaultPath = Config_PropManager::string("Plugins", "import_initial_path").c_str();
@@ -139,6 +145,7 @@ void ModuleBase_WidgetFileSelector::onPathSelectionBtn()
       ? myDefaultPath
       : QFileInfo(myPathField->text()).absolutePath();
   QString aFilter = filterString();
+
   // use Option prohibited native dialog using to have both lower/upper extensions of files
   // satisfied to dialog filter on Linux(Calibre) Issue #2055
   myFileDialog = new QFileDialog(this, myTitle, aDefaultPath, aFilter);
@@ -156,6 +163,7 @@ void ModuleBase_WidgetFileSelector::onPathSelectionBtn()
         if (myType == WFS_SAVE)
           aFileName = applyExtension(aFileName, mySelectedFilter);
         myPathField->setText(aFileName);
+        myDefaultPath = QFileInfo(aFileName).absolutePath();
         emit focusOutWidget(this);
       }
     }
