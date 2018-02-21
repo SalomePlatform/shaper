@@ -133,6 +133,9 @@ protected:
   /// \return string value
   static std::string generateName(const AttributePtr& theAttribute,
                                   ModuleBase_IWorkshop* theWorkshop);
+
+protected:
+  bool myIsPointsFiltering;
 };
 
 #endif

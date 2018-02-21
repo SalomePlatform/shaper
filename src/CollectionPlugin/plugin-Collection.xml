@@ -34,7 +34,8 @@ email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com
         title="Field"
         tooltip="Create fields for selected shapes"
         icon="icons/Collection/field.png">
-        <field-panel id="selected">
+        <field-panel id="selected"
+          filter_points="false" >
           <validator id="GeomValidators_BodyShapes"/>
         </field-panel>
       </feature>

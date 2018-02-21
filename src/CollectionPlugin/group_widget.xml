@@ -28,7 +28,8 @@ email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com
     tooltip="Select a set of objects"
     type_choice="Vertices Edges Faces Solids"
     use_choice="true"
-    clear_in_neutral_point="false">
+    clear_in_neutral_point="false"
+    filter_points="false" >
     <validator id="GeomValidators_BodyShapes"/>
   </multi_selector>
 </source>

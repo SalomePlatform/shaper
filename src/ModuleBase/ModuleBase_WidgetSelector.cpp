@@ -37,13 +37,19 @@
 #include <ModelAPI_Events.h>
 #include <ModelAPI_ResultConstruction.h>
 
+#include <Config_WidgetAPI.h>
+
 #include <TopoDS_Iterator.hxx>
 
 ModuleBase_WidgetSelector::ModuleBase_WidgetSelector(QWidget* theParent,
                                                      ModuleBase_IWorkshop* theWorkshop,
                                                      const Config_WidgetAPI* theData)
-: ModuleBase_WidgetValidated(theParent, theWorkshop, theData)
+: ModuleBase_WidgetValidated(theParent, theWorkshop, theData),
+myIsPointsFiltering(true)
 {
+  QString aFiltering = QString::fromStdString(theData->getProperty("filter_points"));
+  if (aFiltering.toLower() == "false")
+    myIsPointsFiltering = false;
 }
 
 //********************************************************************
@@ -66,7 +72,8 @@ bool ModuleBase_WidgetSelector::processSelection()
 {
   QList<ModuleBase_ViewerPrsPtr> aSelected = getFilteredSelected();
   // equal vertices should not be used here
-  ModuleBase_ISelection::filterSelectionOnEqualPoints(aSelected);
+  if (myIsPointsFiltering)
+    ModuleBase_ISelection::filterSelectionOnEqualPoints(aSelected);
 
   bool isDone = setSelection(aSelected, true/*false*/);
   updateOnSelectionChanged(isDone);
