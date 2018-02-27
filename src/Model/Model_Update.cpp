@@ -604,6 +604,8 @@ bool Model_Update::processFeature(FeaturePtr theFeature)
     static Events_ID anID = Events_Loop::eventByName("SketchPrepared");
     std::shared_ptr<Events_Message> aMsg(new Events_Message(anID, this));
     Events_Loop* aLoop = Events_Loop::loop();
+    // in case it is finish operation, flush for the sketch other events (#2450)
+    aLoop->flush(aLoop->eventByName(EVENT_OBJECT_UPDATED));
     aLoop->send(aMsg);
     // check that sub-elements of sketch are updated => sketch must be re-processed
     std::set<FeaturePtr> aWholeR;
