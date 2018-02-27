@@ -2026,6 +2026,16 @@ bool XGUI_Workshop::canMoveFeature()
   QObjectPtrList::const_iterator anIt = aObjects.begin(), aLast = aObjects.end();
   for (; anIt != aLast && aCanMove; anIt++) {
     ObjectPtr aObject = *anIt;
+    if (!aObject.get() || !aObject->data().get() || !aObject->data()->isValid()) {
+      aCanMove = false;
+      break;
+    }
+    FeaturePtr aFeat = std::dynamic_pointer_cast<ModelAPI_Feature>(aObject);
+    if (aFeat.get() && aFeat->getKind() != "Group") { // only groups can be moved to the end for now (#2451)
+      aCanMove = false;
+      break;
+    }
+
     // 1. Get features placed between selected and current in the document
     std::list<FeaturePtr> aFeaturesBetween = toCurrentFeatures(aObject);
     // if aFeaturesBetween is empty it means wrong order or aObject is the current feature
