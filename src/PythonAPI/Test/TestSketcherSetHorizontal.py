@@ -30,4 +30,4 @@ class SketcherSetHorizontal(SketcherTestCase):
         self.assertEqual(line.startPoint().y(), line.endPoint().y())
 
 if __name__ == "__main__":
-    unittest.main()
+    unittest.main(exit=False)

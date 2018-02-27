@@ -47,4 +47,4 @@ class SketcherAddLine(SketcherTestCase):
         # self.assertTrue(False,  msg="%s" % (dir(mirrored_circle)))
 
 if __name__ == "__main__":
-    unittest.main(verbosity=2)
+    unittest.main(verbosity=2, exit=False)

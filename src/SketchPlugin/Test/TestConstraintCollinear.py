@@ -186,7 +186,7 @@ class TestConstraintCollinear(unittest.TestCase):
     self.assertEqual(model.dof(self.mySketch), self.myDOF)
 
 if __name__ == '__main__':
-  unittest.main()
+  unittest.main(exit=False)
 #=========================================================================
 # End of test
 #=========================================================================

@@ -55,4 +55,4 @@ class PointTestCase(unittest.TestCase):
         self.assertEqual("x + 30", point.z().text())
 
 if __name__ == "__main__":
-    unittest.main()
+    unittest.main(exit=False)

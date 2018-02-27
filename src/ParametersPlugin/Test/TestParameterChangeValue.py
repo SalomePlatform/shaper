@@ -176,7 +176,7 @@ class TestParameterRename(unittest.TestCase):
         self.assertEqual(self.aRadiusAttr.value(), 200.)
 
 if __name__ == '__main__':
-    unittest.main()
+    unittest.main(exit=False)
 #=========================================================================
 # End of test
 #=========================================================================

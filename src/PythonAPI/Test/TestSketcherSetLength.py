@@ -39,4 +39,4 @@ class SketcherSetLength(SketcherTestCase):
         self.assertAlmostEqual(length, 25.0, delta=TestSketcher.DELTA)
 
 if __name__ == "__main__":
-    unittest.main()
+    unittest.main(exit=False)

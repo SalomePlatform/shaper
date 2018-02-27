@@ -38,4 +38,4 @@ class SketcherSetPerpendicular(SketcherTestCase):
         self.assertAlmostEqual(dot_product, 0.0, delta=TestSketcher.DELTA)
 
 if __name__ == "__main__":
-    unittest.main()
+    unittest.main(exit=False)

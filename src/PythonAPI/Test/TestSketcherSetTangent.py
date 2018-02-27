@@ -41,4 +41,4 @@ class SketcherSetTangent(SketcherTestCase):
             self.sketch.setTangent(None, self.arc)
 
 if __name__ == "__main__":
-    unittest.main(verbosity=2)
+    unittest.main(verbosity=2, exit=False)

@@ -45,4 +45,4 @@ class AxisTestCase(unittest.TestCase):
         self.assertEqual(100,axis.zDimension().value())
 
 if __name__ == "__main__":
-    unittest.main()
+    unittest.main(exit=False)

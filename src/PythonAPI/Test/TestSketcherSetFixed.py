@@ -32,4 +32,4 @@ class SketcherSetFixed(SketcherTestCase):
         self.assertEqual((circle.center().x(), circle.center().y()), (0, 10))
 
 if __name__ == "__main__":
-    unittest.main(verbosity=2)
+    unittest.main(verbosity=2, exit=False)

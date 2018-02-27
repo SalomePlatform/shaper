@@ -36,4 +36,4 @@ class ModelTestCase(unittest.TestCase):
         model.addSketch(self.part, plane)
 
 if __name__ == "__main__":
-    unittest.main()
+    unittest.main(exit=False)
