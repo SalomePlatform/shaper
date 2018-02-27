@@ -2031,7 +2031,8 @@ bool XGUI_Workshop::canMoveFeature()
       break;
     }
     FeaturePtr aFeat = std::dynamic_pointer_cast<ModelAPI_Feature>(aObject);
-    if (aFeat.get() && aFeat->getKind() != "Group") { // only groups can be moved to the end for now (#2451)
+    // only groups can be moved to the end for now (#2451)
+    if (aFeat.get() && aFeat->getKind() != "Group") {
       aCanMove = false;
       break;
     }
