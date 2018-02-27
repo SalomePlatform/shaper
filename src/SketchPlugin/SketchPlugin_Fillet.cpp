@@ -208,8 +208,10 @@ bool SketchPlugin_Fillet::calculateFilletParameters()
   std::set<FeaturePtr> aFilletFeatures;
   for (std::set<AttributePoint2DPtr>::iterator aCPIt = aCoincidentPoints.begin();
        aCPIt != aCoincidentPoints.end(); ++aCPIt) {
-    FeaturePtr anOwner = ModelAPI_Feature::feature((*aCPIt)->owner());
-    if (anOwner)
+    std::shared_ptr<SketchPlugin_Feature> anOwner =
+        std::dynamic_pointer_cast<SketchPlugin_Feature>(
+        ModelAPI_Feature::feature((*aCPIt)->owner()));
+    if (anOwner && !anOwner->isExternal())
       aFilletFeatures.insert(anOwner);
   }
   if (aFilletFeatures.size() != 2) {
