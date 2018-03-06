@@ -1141,6 +1141,7 @@ void setPointBallHighlighting(AIS_Shape* theAIS)
 #ifdef USE_OCCT_720
   // to do: implement ball highlighting, in 7.2.0 this drawer is NULL
 #else
+/*
   if(aDrawer->HasOwnPointAspect()) {
     Handle(Prs3d_PointAspect) aPntAspect = aDrawer->PointAspect();
     if(aPixMap->IsEmpty()) {
@@ -1158,6 +1159,7 @@ void setPointBallHighlighting(AIS_Shape* theAIS)
     aDrawer->SetPointAspect(aPntAspect);
     theAIS->SetHilightAttributes(aDrawer);
   }
+  */
 #endif
 }
 

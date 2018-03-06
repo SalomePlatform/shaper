@@ -189,8 +189,8 @@ void GeomAlgoAPI_ShapeBuilder::addInternal(const std::shared_ptr<GeomAPI_Shape> 
           }
         }
       }
-    } else if(aBaseShapeType == GeomAPI_Shape::FACE) {
-      if(aShapeToAddType == GeomAPI_Shape::EDGE) {
+    } else if(aBaseShapeType == TopAbs_FACE) {
+      if(aShapeToAddType == TopAbs_EDGE) {
         aShapeToAdd.Orientation(TopAbs_INTERNAL);
         TopoDS_Wire aWire;
         aBuilder.MakeWire(aWire);

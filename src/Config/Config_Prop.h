@@ -26,7 +26,7 @@
 #include <string>
 #include <list>
 
-static const char* SKETCH_TAB_NAME = "Sketch";
+static const char SKETCH_TAB_NAME[] = "Sketch";
 
 /*!
  * \class Config_Prop

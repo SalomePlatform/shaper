@@ -439,8 +439,10 @@ bool checkPythonDump()
   aSession->closeAll();
   // execute the dumped
   PyGILState_STATE gstate = PyGILState_Ensure(); /* acquire python thread */
-  PyObject* PyFileObject = PyFile_FromString("./check_dump.py", "r");
-  PyRun_SimpleFileEx(PyFile_AsFile(PyFileObject), "./check_dump.py", 1);
+  static char aDumpName[] = "./check_dump.py";
+  static char aReadMode[] = "r";
+  PyObject* PyFileObject = PyFile_FromString(aDumpName, aReadMode);
+  PyRun_SimpleFileEx(PyFile_AsFile(PyFileObject), aDumpName, 1);
   PyGILState_Release(gstate); /* release python thread */
 
   // compare with the stored data

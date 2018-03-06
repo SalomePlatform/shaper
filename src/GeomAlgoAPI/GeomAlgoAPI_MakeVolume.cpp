@@ -65,21 +65,13 @@ void GeomAlgoAPI_MakeVolume::build(const ListOfShape& theFaces)
   // parameters of the volume maker
   aVolumeMaker->SetArguments(anArgs);
   aVolumeMaker->SetIntersect(true); // split edges and faces
-#ifdef USE_OCCT_720
   aVolumeMaker->SetAvoidInternalShapes(true);
-#endif
   aVolumeMaker->SetGlue(BOPAlgo_GlueOff);
 
   // building and getting result
   aVolumeMaker->Perform();
-#ifdef USE_OCCT_720
   if (aVolumeMaker->HasErrors())
     return;
-#else
-  if(aVolumeMaker->ErrorStatus() != 0) {
-    return;
-  }
-#endif
   TopoDS_Shape aResult = aVolumeMaker->Shape();
 
   if(aResult.ShapeType() == TopAbs_COMPOUND) {

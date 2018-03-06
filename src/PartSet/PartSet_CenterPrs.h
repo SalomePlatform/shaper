@@ -65,7 +65,7 @@ public:
   virtual void HilightSelected(const Handle(PrsMgr_PresentationManager3d)& PM,
                                const SelectMgr_SequenceOfOwner& Seq);
   virtual void HilightOwnerWithColor (const Handle(PrsMgr_PresentationManager3d)&,
-                                      const Handle(Graphic3d_HighlightStyle)&,
+                                      const Handle(Prs3d_Drawer)&,
                                       const Handle(SelectMgr_EntityOwner)&);
 
   DEFINE_STANDARD_RTTIEXT(PartSet_CenterPrs, AIS_Point)

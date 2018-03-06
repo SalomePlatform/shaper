@@ -389,7 +389,7 @@ void ModuleBase_ResultPrs::HilightSelected(const Handle(PrsMgr_PresentationManag
 
 //********************************************************************
 void ModuleBase_ResultPrs::HilightOwnerWithColor(const Handle(PrsMgr_PresentationManager3d)& thePM,
-                                                 const Handle(Graphic3d_HighlightStyle)& theStyle,
+                                                 const Handle(Prs3d_Drawer)& theStyle,
                                                  const Handle(SelectMgr_EntityOwner)& theOwner)
 {
   Handle(StdSelect_BRepOwner) aOwner = Handle(StdSelect_BRepOwner)::DownCast(theOwner);
