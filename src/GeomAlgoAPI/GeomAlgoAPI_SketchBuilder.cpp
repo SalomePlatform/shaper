@@ -209,8 +209,8 @@ void GeomAlgoAPI_SketchBuilder::createFaces(
   BOPAlgo_Builder aBB;
   aBB.AddArgument(aPlnFace);
 
-  BOPCol_ListOfShape anEdges;
-  BOPCol_ListIteratorOfListOfShape aShapeIt;
+  NCollection_List<TopoDS_Shape> anEdges;
+  NCollection_List<TopoDS_Shape>::Iterator aShapeIt;
   std::list<std::shared_ptr<GeomAPI_Shape> >::const_iterator aFeatIt = theFeatures.begin();
   for (; aFeatIt != theFeatures.end(); aFeatIt++) {
     std::shared_ptr<GeomAPI_Shape> aShape(*aFeatIt);

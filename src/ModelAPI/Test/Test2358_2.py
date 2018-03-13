@@ -112,7 +112,7 @@ Fillet_1 = model.addFillet(Part_1_doc, Fillet_1_objects, 2)
 Group_1_objects = [model.selection("FACE", "Fillet_1_1/Modified_Face_3"), model.selection("FACE", "Fillet_1_1/Modified_Face_5"), model.selection("FACE", "Fillet_1_1/Modified_Face_9"), model.selection("FACE", "Fillet_1_1/Modified_Face_15")]
 Group_1 = model.addGroup(Part_1_doc, Group_1_objects)
 Group_2 = model.addGroup(Part_1_doc, [model.selection("EDGE", "Fillet_1_1/Fillet_Face_13&Fillet_1_1/Modified_Face_4"), model.selection("EDGE", "Fillet_1_1/Modified_Face_11&Fillet_1_1/Fillet_Face_13")])
-Group_3 = model.addGroup(Part_1_doc, [model.selection("VERTEX", "Fillet_1_1/Modified_Face_12&ExtrusionCut_1_1/Modfied_6&Fillet_1_1/Modified_Face_11"), model.selection("VERTEX", "ExtrusionCut_1_1/Modfied_6&Fillet_1_1/Modified_Face_11&Fillet_1_1/Modified_Face_6")])
+Group_3 = model.addGroup(Part_1_doc, [model.selection("VERTEX", "Fillet_1_1/Modified_Face_12&ExtrusionCut_1_1/Generated_Face_4&Fillet_1_1/Modified_Face_11"), model.selection("VERTEX", "ExtrusionCut_1_1/Generated_Face_4&Fillet_1_1/Modified_Face_11&Fillet_1_1/Modified_Face_6")])
 model.do()
 
 Folder_1 = model.addFolder(Part_1_doc, Sketch_3, ExtrusionCut_2)

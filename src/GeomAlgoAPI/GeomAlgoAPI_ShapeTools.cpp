@@ -31,7 +31,6 @@
 #include <GeomAPI_Wire.h>
 
 #include <Bnd_Box.hxx>
-#include <BOPTools.hxx>
 #include <BRep_Builder.hxx>
 #include <BRepAdaptor_Curve.hxx>
 #include <BRepAlgo.hxx>
@@ -182,8 +181,8 @@ std::shared_ptr<GeomAPI_Shape> GeomAlgoAPI_ShapeTools::combineShapes(
   }
 
   // Map subshapes and shapes.
-  BOPCol_IndexedDataMapOfShapeListOfShape aMapSA;
-  BOPTools::MapShapesAndAncestors(aShapesComp, aTS, aTA, aMapSA);
+  TopTools_IndexedDataMapOfShapeListOfShape aMapSA;
+  TopExp::MapShapesAndAncestors(aShapesComp, aTS, aTA, aMapSA);
   if(aMapSA.IsEmpty()) {
     return aResult;
   }
@@ -191,10 +190,10 @@ std::shared_ptr<GeomAPI_Shape> GeomAlgoAPI_ShapeTools::combineShapes(
   // Get all shapes with common subshapes and free shapes.
   NCollection_Map<TopoDS_Shape> aFreeShapes;
   NCollection_Vector<NCollection_Map<TopoDS_Shape>> aShapesWithCommonSubshapes;
-  for(BOPCol_IndexedDataMapOfShapeListOfShape::Iterator
+  for(TopTools_IndexedDataMapOfShapeListOfShape::Iterator
       anIter(aMapSA); anIter.More(); anIter.Next()) {
     const TopoDS_Shape& aShape = anIter.Key();
-    BOPCol_ListOfShape& aListOfShape = anIter.ChangeValue();
+    TopTools_ListOfShape& aListOfShape = anIter.ChangeValue();
     if(aListOfShape.IsEmpty()) {
       continue;
     }
@@ -217,9 +216,9 @@ std::shared_ptr<GeomAPI_Shape> GeomAlgoAPI_ShapeTools::combineShapes(
       for(NCollection_List<TopoDS_Shape>::Iterator
           aTempIter(aTempList); aTempIter.More(); aTempIter.Next()) {
         const TopoDS_Shape& aTempShape = aTempIter.Value();
-        for(BOPCol_IndexedDataMapOfShapeListOfShape::Iterator
+        for(TopTools_IndexedDataMapOfShapeListOfShape::Iterator
             anIter(aMapSA); anIter.More(); anIter.Next()) {
-          BOPCol_ListOfShape& aTempListOfShape = anIter.ChangeValue();
+          TopTools_ListOfShape& aTempListOfShape = anIter.ChangeValue();
           if(aTempListOfShape.IsEmpty()) {
             continue;
           } else if(aTempListOfShape.Size() == 1 && aTempListOfShape.First() == aTempShape) {
@@ -351,7 +350,7 @@ std::shared_ptr<GeomAPI_Shape> GeomAlgoAPI_ShapeTools::groupSharedTopology(
 
   // Iterate over all shapes and find shapes with shared vertices.
   TopTools_ListOfShape aMapOrder;
-  BOPCol_DataMapOfShapeListOfShape aVertexShapesMap;
+  TopTools_DataMapOfShapeListOfShape aVertexShapesMap;
   for(NCollection_List<TopoDS_Shape>::Iterator aShapesIt(anUngroupedShapes);
       aShapesIt.More();
       aShapesIt.Next()) {

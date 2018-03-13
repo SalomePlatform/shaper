@@ -58,7 +58,6 @@ void GeomAlgoAPI_UnifySameDomain::build(const ListOfShape& theShapes)
   this->setImpl(aUnifyAlgo);
 
   aUnifyAlgo->Initialize(aShell);
-  aUnifyAlgo->UnifyFacesAndEdges();
   aUnifyAlgo->Build();
 
   TopoDS_Shape aResult = aUnifyAlgo->Shape();

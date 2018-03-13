@@ -41,7 +41,7 @@ void GeomAlgoAPI_PaveFiller::build(const ListOfShape& theListOfShape,
                                    const bool theIsMakeCompSolids)
 {
   BOPAlgo_PaveFiller* aPaveFiller = new BOPAlgo_PaveFiller;
-  BOPCol_ListOfShape aListOfShape;
+  TopTools_ListOfShape aListOfShape;
   for(ListOfShape::const_iterator
     anIt = theListOfShape.cbegin(); anIt != theListOfShape.cend(); anIt++) {
     const TopoDS_Shape& aShape = (*anIt)->impl<TopoDS_Shape>();
