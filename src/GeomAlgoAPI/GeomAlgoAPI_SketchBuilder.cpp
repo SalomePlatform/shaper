@@ -114,7 +114,7 @@ bool isFirst(const TopoDS_Shape& theFirst, const TopoDS_Shape& theSecond,
     if (!theAreaToIndex.IsBound(aShape)) { // fill the list of curve indices
       NCollection_List<int> aNewList;
       TopExp_Explorer anEdgesExp(aShape, TopAbs_EDGE);
-      for(; anEdgesExp.More(); anEdgesExp.Next()) {
+      for (; anEdgesExp.More(); anEdgesExp.Next()) {
         double aFirst, aLast;
         Handle(Geom_Curve) aCurve = BRep_Tool::Curve(
           TopoDS::Edge(anEdgesExp.Current()), aFirst, aLast);
@@ -124,24 +124,34 @@ bool isFirst(const TopoDS_Shape& theFirst, const TopoDS_Shape& theSecond,
           aNewList.Append(theCurveToIndex.Find(aCurve));
         }
       }
-      NCollection_Array1<int> aNewArray(1, aNewList.Extent());
-      NCollection_List<int>::Iterator aListIter(aNewList);
-      for(int anIndex = 1; aListIter.More(); aListIter.Next(), anIndex++) {
-        aNewArray.SetValue(anIndex, aListIter.Value());
+      if (aNewList.Extent()) {
+        NCollection_Array1<int> aNewArray(1, aNewList.Extent());
+        NCollection_List<int>::Iterator aListIter(aNewList);
+        for (int anIndex = 1; aListIter.More(); aListIter.Next(), anIndex++) {
+          aNewArray.SetValue(anIndex, aListIter.Value());
+        }
+        std::sort(aNewArray.begin(), aNewArray.end());
+        theAreaToIndex.Bind(aShape, aNewArray);
       }
-      std::sort(aNewArray.begin(), aNewArray.end());
-      theAreaToIndex.Bind(aShape, aNewArray);
     }
   }
-  // compare lists of indices one by one to find chich list indices are lower
-  NCollection_Array1<int>::Iterator aFirstList(theAreaToIndex.ChangeFind(theFirst));
-  NCollection_Array1<int>::Iterator aSecondList(theAreaToIndex.ChangeFind(theSecond));
-  for(; aFirstList.More() && aSecondList.More(); aFirstList.Next(), aSecondList.Next()) {
-    if (aFirstList.Value() < aSecondList.Value()) return true;
-    if (aFirstList.Value() > aSecondList.Value()) return false;
+  bool isFirst;
+  bool aGeomCompare = !theAreaToIndex.IsBound(theFirst) || !theAreaToIndex.IsBound(theSecond);
+  if (!aGeomCompare) {
+    // compare lists of indices one by one to find chich list indices are lower
+    NCollection_Array1<int>::Iterator aFirstList(theAreaToIndex.ChangeFind(theFirst));
+    NCollection_Array1<int>::Iterator aSecondList(theAreaToIndex.ChangeFind(theSecond));
+    for (; aFirstList.More() && aSecondList.More(); aFirstList.Next(), aSecondList.Next()) {
+      if (aFirstList.Value() < aSecondList.Value()) return true;
+      if (aFirstList.Value() > aSecondList.Value()) return false;
+    }
+    aGeomCompare = !aFirstList.More() && !aSecondList.More();
+    isFirst = !aFirstList.More();
+  } else {
+    isFirst = !theAreaToIndex.IsBound(theFirst);
   }
   // if faces are identical by curves names (circle splitted by line in seam-point), use parameters
-  if (!aFirstList.More() && !aSecondList.More()) {
+  if (aGeomCompare) {
     GProp_GProps aGProps;
     BRepGProp::SurfaceProperties(theFirst, aGProps);
     gp_Pnt aCentre1 = aGProps.CentreOfMass();
@@ -150,7 +160,7 @@ bool isFirst(const TopoDS_Shape& theFirst, const TopoDS_Shape& theSecond,
     return aCentre1.X() + aCentre1.Y() + aCentre1.Z() < aCentre2.X() + aCentre2.Y() + aCentre2.Z();
   }
   // if in first list there is no elements left, it is the first
-  return !aFirstList.More();
+  return isFirst;
 }
 
 // sorts faces (in theAreas list) to make persistent order: by initial shapes edges
@@ -209,8 +219,8 @@ void GeomAlgoAPI_SketchBuilder::createFaces(
   BOPAlgo_Builder aBB;
   aBB.AddArgument(aPlnFace);
 
-  BOPCol_ListOfShape anEdges;
-  BOPCol_ListIteratorOfListOfShape aShapeIt;
+  NCollection_List<TopoDS_Shape> anEdges;
+  NCollection_List<TopoDS_Shape>::Iterator aShapeIt;
   std::list<std::shared_ptr<GeomAPI_Shape> >::const_iterator aFeatIt = theFeatures.begin();
   for (; aFeatIt != theFeatures.end(); aFeatIt++) {
     std::shared_ptr<GeomAPI_Shape> aShape(*aFeatIt);
