@@ -81,9 +81,9 @@ Plane_5 = model.addPlane(Part_1_doc, model.selection("FACE", "Plane_1"), model.s
 Partition_1_objects = [model.selection("EDGE", "Intersection_1_1"), model.selection("FACE", "Plane_2"), model.selection("FACE", "Plane_1")]
 Partition_1 = model.addPartition(Part_1_doc, Partition_1_objects)
 
-Filling_1 = model.addFilling(Part_1_doc, [model.selection("EDGE", "Partition_1_1_4"), model.selection("EDGE", "Edge_1_2")])
+Filling_1 = model.addFilling(Part_1_doc, [model.selection("EDGE", "Partition_1_1_3"), model.selection("EDGE", "Edge_1_2")])
 Filling_2 = model.addFilling(Part_1_doc, [model.selection("EDGE", "Partition_1_1_5"), model.selection("EDGE", "Edge_1_1")])
-Filling_3 = model.addFilling(Part_1_doc, [model.selection("EDGE", "Partition_1_1_3"), model.selection("EDGE", "Edge_1_4")])
+Filling_3 = model.addFilling(Part_1_doc, [model.selection("EDGE", "Partition_1_1_4"), model.selection("EDGE", "Edge_1_4")])
 
 Wire_1 = model.addWire(Part_1_doc, [model.selection("EDGE", "Partition_1_1_1"), model.selection("EDGE", "Partition_1_1_2")])
 Filling_4 = model.addFilling(Part_1_doc, [model.selection("EDGE", "Edge_1_3"), model.selection("WIRE", "Wire_1_1")])
