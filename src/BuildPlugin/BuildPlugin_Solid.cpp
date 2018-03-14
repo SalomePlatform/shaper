@@ -51,7 +51,8 @@ void BuildPlugin_Solid::execute()
       aShape = aSelection->context()->shape();
     anOriginalShapes.push_back(aShape);
   }
-  std::shared_ptr<GeomAlgoAPI_MakeVolume> anAlgo(new GeomAlgoAPI_MakeVolume(anOriginalShapes));
+  std::shared_ptr<GeomAlgoAPI_MakeVolume> anAlgo(
+    new GeomAlgoAPI_MakeVolume(anOriginalShapes, false));
   // check and process result of volume maker
   GeomShapePtr aResShape = getSingleSubshape(anAlgo->shape());
   storeResult(anOriginalShapes, aResShape, anAlgo);

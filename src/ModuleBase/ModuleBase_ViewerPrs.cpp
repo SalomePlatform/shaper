@@ -25,7 +25,7 @@
 
 ModuleBase_ViewerPrs::ModuleBase_ViewerPrs(ObjectPtr theResult,
                                            const GeomShapePtr& theShape,
-                                           Handle_SelectMgr_EntityOwner theOwner)
+                                           Handle(SelectMgr_EntityOwner) theOwner)
 : myResult(theResult),
   myShape(theShape),
   myOwner(theOwner)

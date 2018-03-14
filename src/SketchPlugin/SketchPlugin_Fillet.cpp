@@ -565,7 +565,7 @@ double calculateFilletRadius(FeaturePtr theFilletFeatures[2])
     if (anEdge)
       aLengths[i] = anEdge->length();
   }
-  return std::min(aLengths[0], aLengths[1]) / 6.0;
+  return (aLengths[0] < aLengths[1] ? aLengths[0] : aLengths[1]) / 6.0;
 }
 
 std::set<FeaturePtr> findFeaturesToRemove(const FeaturePtr theFeature,
