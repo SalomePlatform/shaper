@@ -45,6 +45,7 @@
 #include <ModuleBase_ResultPrs.h>
 #include <ModuleBase_Tools.h>
 #include <ModuleBase_ViewerPrs.h>
+#include <ModuleBase_IViewer.h>
 
 #include <GeomAPI_Shape.h>
 #include <GeomAPI_IPresentable.h>
@@ -662,6 +663,7 @@ Handle(AIS_InteractiveContext) XGUI_Displayer::AISContext() const
       selectionActivate()->deactivateTrihedron(true);
     aContext->DefaultDrawer()->VIsoAspect()->SetNumber(0);
     aContext->DefaultDrawer()->UIsoAspect()->SetNumber(0);
+    ModuleBase_IViewer::DefaultHighlightDrawer = aContext->HighlightStyle();
   }
   return aContext;
 }
