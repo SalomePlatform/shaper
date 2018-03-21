@@ -439,4 +439,11 @@
       <translation>Selected shape is in the local selection. Only global selection is allowed.</translation>
     </message>
   </context>
+  <context>
+    <name>Filling:GeomValidators_MinObjectsSelected</name>
+    <message>
+        <source>Error: Attribute "%1" should contain at least %2 items.</source>
+        <translation>Segments and wires list should contain at least 2 items</translation>
+    </message>
+  </context>
 </TS>
