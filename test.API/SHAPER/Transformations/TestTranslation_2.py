@@ -289,12 +289,13 @@ model.testNbSubShapes(Translation_42, GeomAPI_Shape.FACE, [18])
 model.testHaveNamingFaces(Translation_42, model, Part_1_doc)
 
 # Translation 43
-model.testNbResults(Translation_43, 1)
-model.testNbSubResults(Translation_43, [3])
-model.testNbSubShapes(Translation_43, GeomAPI_Shape.COMPSOLID, [1])
-model.testNbSubShapes(Translation_43, GeomAPI_Shape.SOLID, [3])
-model.testNbSubShapes(Translation_43, GeomAPI_Shape.FACE, [18])
-model.testHaveNamingFaces(Translation_43, model, Part_1_doc)
+# It is concealed by Partition_9
+#model.testNbResults(Translation_43, 1)
+#model.testNbSubResults(Translation_43, [3])
+#model.testNbSubShapes(Translation_43, GeomAPI_Shape.COMPSOLID, [1])
+#model.testNbSubShapes(Translation_43, GeomAPI_Shape.SOLID, [3])
+#model.testNbSubShapes(Translation_43, GeomAPI_Shape.FACE, [18])
+#model.testHaveNamingFaces(Translation_43, model, Part_1_doc)
 
 # Translation 44
 model.testNbResults(Translation_44, 1)

@@ -170,7 +170,7 @@ def body_3():
     sketch.setRadius(arc, r)
 
     # Binding
-    bottom_e = sketch.addLine("Boolean_1_1/Modified_Face_8&Boolean_1_1/Modified_Face_5")
+    bottom_e = sketch.addLine("Boolean_1_1/Modified_Face_7&Extrusion_2_1/To_Face_1")
     sketch.setCoincident(bottom_e, bottom.startPoint())
     sketch.setCoincident(bottom_e.startPoint(), bottom.endPoint())
 
@@ -192,11 +192,11 @@ def body_4():
     left, diagonal, bottom = model.addPolygon(sketch, *geom_points)
 
     # Binding
-    bottom_e = sketch.addLine("Boolean_2_1/Modified_Face_3&Boolean_2_1/Modified_Face_4")
+    bottom_e = sketch.addLine("Boolean_2_1/Modified_Face_2&Boolean_2_1/Modified_Face_4")
     sketch.setCoincident(bottom_e.endPoint(), bottom.startPoint())
     sketch.setCoincident(bottom_e.startPoint(), left.startPoint())
 
-    left_e = sketch.addLine("Boolean_2_1/Modified_Face_6&Boolean_2_1/Modified_Face_7")
+    left_e = sketch.addLine("Boolean_2_1/Modified_Face_5&Extrusion_3_1/Generated_Face_2")
     sketch.setCoincident(left_e.startPoint(), left.endPoint())
 
     model.do()  #!!!

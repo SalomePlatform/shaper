@@ -360,13 +360,19 @@ void Model_BodyBuilder::loadDeletedShapes (GeomAlgoAPI_MakeShape* theMS,
   TopoDS_Shape aShapeIn = theShapeIn->impl<TopoDS_Shape>();
   TopTools_MapOfShape aView;
   TopExp_Explorer ShapeExplorer (aShapeIn, (TopAbs_ShapeEnum)theKindOfShape);
+  GeomShapePtr aResultShape = shape();
   for (; ShapeExplorer.More(); ShapeExplorer.Next ()) {
     const TopoDS_Shape& aRoot = ShapeExplorer.Current ();
     if (!aView.Add(aRoot)) continue;
     std::shared_ptr<GeomAPI_Shape> aRShape(new GeomAPI_Shape());
     aRShape->setImpl((new TopoDS_Shape(aRoot)));
     if (theMS->isDeleted (aRShape)) {
-      builder(theTag)->Delete(aRoot);
+      if (!aResultShape->isSubShape(aRShape, false)) {
+          ListOfShape aHist;
+          theMS->modified(aRShape, aHist);
+          if (aHist.size() == 0 || (aHist.size() == 1 && aHist.front()->isSame(aRShape)))
+            builder(theTag)->Delete(aRoot);
+      }
     }
   }
 }
