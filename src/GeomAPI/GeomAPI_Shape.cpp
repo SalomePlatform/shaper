@@ -301,6 +301,8 @@ bool GeomAPI_Shape::isPlanar() const
 GeomAPI_Shape::ShapeType GeomAPI_Shape::shapeType() const
 {
   const TopoDS_Shape& aShape = impl<TopoDS_Shape>();
+  if (aShape.IsNull())
+    return GeomAPI_Shape::SHAPE;
 
   ShapeType aST = GeomAPI_Shape::SHAPE;
 
