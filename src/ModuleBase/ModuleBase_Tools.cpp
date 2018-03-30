@@ -1143,6 +1143,8 @@ void setPointBallHighlighting(AIS_Shape* theAIS)
   Handle(Graphic3d_AspectMarker3d) anAspect;
   Handle(Prs3d_Drawer) aDrawer = theAIS->DynamicHilightAttributes();
   if (aDrawer.IsNull()) {
+    if (ModuleBase_IViewer::DefaultHighlightDrawer.IsNull())
+      return;
     aDrawer = new Prs3d_Drawer(*ModuleBase_IViewer::DefaultHighlightDrawer);
     if (!aDrawer->HasOwnPointAspect()) {
       aDrawer->SetPointAspect(new Prs3d_PointAspect(Aspect_TOM_BALL, Quantity_NOC_BLACK, 2.0));
