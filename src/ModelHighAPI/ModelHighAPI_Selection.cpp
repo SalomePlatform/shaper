@@ -198,6 +198,8 @@ ModelHighAPI_Selection ModelHighAPI_Selection::subResult(int theIndex) const
       std::dynamic_pointer_cast<ModelAPI_ResultCompSolid>(myResultSubShapePair.first);
   if (!aCompSolid)
     return ModelHighAPI_Selection();
+  if (theIndex >= aCompSolid->numberOfSubs())
+    return ModelHighAPI_Selection();
 
   ResultBodyPtr aResult = aCompSolid->subResult(theIndex);
   return ModelHighAPI_Selection(aResult, aResult->shape());
