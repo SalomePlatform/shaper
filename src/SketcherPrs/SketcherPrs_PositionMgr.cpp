@@ -194,6 +194,20 @@ gp_Vec getVector(ObjectPtr theShape, GeomDirPtr theDir, gp_Pnt theP)
       double aParam = anExtr.LowerDistanceParameter();
       gp_Pnt aP;
       aCurv->D1(aParam, aP, aVec);
+      // 2458: check correct orientation of the vector
+      if (aVec.SquareMagnitude() > Precision::Confusion()) {
+        std::shared_ptr<GeomAPI_Edge> aCircEdge(new GeomAPI_Edge(aShape));
+        double aFirstParam, aLastParam;
+        aCircEdge->getRange(aFirstParam, aLastParam);
+        // if parameter is near the LastParam, make the vector go inside (reverse)
+        double aDelta = aLastParam - aParam;
+        while (aDelta < -Precision::Confusion())
+          aDelta += 2. * M_PI;
+        while (aDelta > 2. * M_PI - Precision::Confusion())
+          aDelta -= 2. * M_PI;
+        if (fabs(aDelta) < Precision::Confusion())
+          aVec.Reverse();
+      }
     } else {
       GeomPointPtr aPnt1 = aCurve->getPoint(aCurve->endParam());
       GeomPointPtr aPnt2 = aCurve->getPoint(aCurve->startParam());
