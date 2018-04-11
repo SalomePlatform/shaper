@@ -401,7 +401,7 @@ void ModelHighAPI_Dumper::dumpPostponed(bool theDumpFolders)
     else {
       FeaturePtr aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(*anIt);
       if (aFeature)
-        dumpFeature(aFeature);
+        dumpFeature(aFeature, true);
     }
   }
   myDumpPostponedInProgress = false;
