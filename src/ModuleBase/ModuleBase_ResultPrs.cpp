@@ -291,35 +291,34 @@ void ModuleBase_ResultPrs::ComputeSelection(const Handle(SelectMgr_Selection)& a
       return;
   }
 
-  if (theMode == AIS_Shape::SelectionMode(TopAbs_COMPSOLID)) {
-    // Limit selection area only by actual object (Shape)
-    ResultCompSolidPtr aCompSolid = ModelAPI_Tools::compSolidOwner(myResult);
-    if (aCompSolid.get()) {
-      std::shared_ptr<GeomAPI_Shape> aShapePtr = ModelAPI_Tools::shape(aCompSolid);
-      if (aShapePtr.get()) {
-        TopoDS_Shape aShape = aShapePtr->impl<TopoDS_Shape>();
-        int aPriority = StdSelect_BRepSelectionTool::GetStandardPriority(aShape, TopAbs_COMPSOLID);
-        /// It is important to have priority for the shape of comp solid result less than priority
-        /// for the presentation shape which is a sub-result.
-        /// Reason is to select the sub-objects before: #1592
-        aPriority = aPriority - 1;
-        double aDeflection = Prs3d::GetDeflection(aShape, myDrawer);
+  // bug 2110: if (theMode == AIS_Shape::SelectionMode(TopAbs_COMPSOLID)) {
+  //  // Limit selection area only by actual object (Shape)
+  //  ResultCompSolidPtr aCompSolid = ModelAPI_Tools::compSolidOwner(myResult);
+  //  if (aCompSolid.get()) {
+  //    std::shared_ptr<GeomAPI_Shape> aShapePtr = ModelAPI_Tools::shape(aCompSolid);
+  //    if (aShapePtr.get()) {
+  //      TopoDS_Shape aShape = aShapePtr->impl<TopoDS_Shape>();
+  //      int aPriority = StdSelect_BRepSelectionTool::GetStandardPriority(aShape, TopAbs_COMPSOLID);
+  //      /// It is important to have priority for the shape of comp solid result less than priority
+  //      /// for the presentation shape which is a sub-result.
+  //      /// Reason is to select the sub-objects before: #1592
+  //      aPriority = aPriority - 1;
+  //      double aDeflection = Prs3d::GetDeflection(aShape, myDrawer);
 
-        Handle(ModuleBase_BRepOwner) aOwner = new ModuleBase_BRepOwner(aShape, aPriority);
-        StdSelect_BRepSelectionTool::ComputeSensitive(aShape, aOwner, aSelection,
-          aDeflection, myDrawer->HLRAngle(), 9, 500);
+  //      Handle(ModuleBase_BRepOwner) aOwner = new ModuleBase_BRepOwner(aShape, aPriority);
+  //      StdSelect_BRepSelectionTool::ComputeSensitive(aShape, aOwner, aSelection,
+  //        aDeflection, myDrawer->HLRAngle(), 9, 500);
 
-        for (aSelection->Init(); aSelection->More(); aSelection->Next()) {
-          Handle(SelectMgr_EntityOwner) anOwner =
-            Handle(SelectMgr_EntityOwner)
-            ::DownCast(aSelection->Sensitive()->BaseSensitive()->OwnerId());
-          anOwner->Set(this);
-        }
-        return;
-      }
-    }
-    //AIS_Shape::ComputeSelection(aSelection, 0);
-  }
+  //      for (aSelection->Init(); aSelection->More(); aSelection->Next()) {
+  //        Handle(SelectMgr_EntityOwner) anOwner =
+  //          Handle(SelectMgr_EntityOwner)
+  //          ::DownCast(aSelection->Sensitive()->BaseSensitive()->OwnerId());
+  //        anOwner->Set(this);
+  //      }
+  //      return;
+  //    }
+  //  }
+  //}
   AIS_Shape::ComputeSelection(aSelection, theMode);
 
   if (myAdditionalSelectionPriority > 0) {
