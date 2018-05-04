@@ -343,7 +343,7 @@ bool PartSet_WidgetPoint2D::setPoint(double theX, double theY)
 bool PartSet_WidgetPoint2D::storeValueCustom()
 {
   std::shared_ptr<ModelAPI_Data> aData = myFeature->data();
-  if (!aData) // can be on abort of sketcher element
+  if (!aData || !aData->isValid()) // can be on abort of sketcher element
     return false;
   AttributePoint2DPtr aPoint = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
       aData->attribute(attributeID()));
