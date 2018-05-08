@@ -373,7 +373,7 @@ std::shared_ptr<GeomAPI_Shape> GeomAlgoAPI_ShapeTools::groupSharedTopology(
   }
 
   // Iterate over the map and group shapes.
-  NCollection_Vector<TopTools_ListOfShape> aGroups; // vector of groups of shapes connected by vertices
+  NCollection_Vector<TopTools_ListOfShape> aGroups; // groups of shapes connected by vertices
   while (!allVertices.IsEmpty()) {
     // Get first group of shapes in map, and then unbind it.
     const TopoDS_Shape& aKey = allVertices.First();
