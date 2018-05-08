@@ -250,10 +250,37 @@ void setParameterName(ResultParameterPtr theResultParameter, const std::string& 
       std::dynamic_pointer_cast<ParametersPlugin_Parameter>(
           ModelAPI_Feature::feature(theResultParameter));
 
+  std::string anOldName = aParameter->name();
   aWasBlocked = aParameter->data()->blockSendAttributeUpdated(true);
   aParameter->data()->setName(theName);
   aParameter->string(ParametersPlugin_Parameter::VARIABLE_ID())->setValue(theName);
   aParameter->data()->blockSendAttributeUpdated(aWasBlocked);
+
+  // #2474 : if parameter name now hides/shows the higher level parameter name,
+  // update the depended expressions
+  DocumentPtr aRootDoc = ModelAPI_Session::get()->moduleDocument();
+  if (theResultParameter->document() != aRootDoc) {
+    std::list<std::string> aNames; // collect names in the root document that must be checked
+    aNames.push_back(theName);
+    if (anOldName != theName) {
+      aNames.push_back(anOldName);
+    }
+    std::list<std::string>::iterator aNIter = aNames.begin();
+    for (; aNIter != aNames.end(); aNIter++) {
+      double aValue;
+      ResultParameterPtr aRootParam;
+      if (ModelAPI_Tools::findVariable(aParameter, *aNIter, aValue, aRootParam, aRootDoc)) {
+        std::set<std::shared_ptr<ModelAPI_Attribute> > anAttributes =
+          aRootParam->data()->refsToMe();
+        std::set<std::shared_ptr<ModelAPI_Attribute> >::const_iterator anAttributeIt =
+          anAttributes.cbegin();
+        for (; anAttributeIt != anAttributes.cend(); ++anAttributeIt) {
+          const AttributePtr& anAttribute = *anAttributeIt;
+          ModelAPI_AttributeEvalMessage::send(anAttribute, NULL);
+        }
+      }
+    }
+  }
 }
 
 void ParametersPlugin_EvalListener::processObjectRenamedEvent(
