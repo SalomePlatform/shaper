@@ -53,10 +53,10 @@ ConstructionPlugin_Plugin::ConstructionPlugin_Plugin()
   aFactory->registerValidator("ConstructionPlugin_ValidatorAxisTwoNotParallelPlanes",
                               new ConstructionPlugin_ValidatorAxisTwoNotParallelPlanes());
 
-  Config_PropManager::registerProp(SKETCH_TAB_NAME, "planes_size", "Size", Config_Prop::Double,
+  Config_PropManager::registerProp(SKETCH_TAB_NAME, "planes_size", "Size", Config_Prop::DblSpin,
                                    PLANE_SIZE);
   Config_PropManager::registerProp(SKETCH_TAB_NAME, "planes_thickness", "Thickness",
-                                   Config_Prop::Integer, SKETCH_WIDTH);
+    Config_Prop::IntSpin, SKETCH_WIDTH);
   Config_PropManager::registerProp(SKETCH_TAB_NAME, "rotate_to_plane",
     "Rotate to plane when selected", Config_Prop::Boolean, "false");
 

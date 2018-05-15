@@ -201,7 +201,7 @@ PartSet_Module::PartSet_Module(ModuleBase_IWorkshop* theWshop)
 
   Config_PropManager::registerProp("Visualization", "hidden_face_transparency",
                                    "Hidden faces transparency",
-                                   Config_Prop::Double,
+                                   Config_Prop::DblSpin,
                                    "0.8");
 }
 
