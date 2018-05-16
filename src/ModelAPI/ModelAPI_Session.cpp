@@ -73,12 +73,12 @@ std::shared_ptr<ModelAPI_Session> ModelAPI_Session::get()
 
     Config_PropManager::registerProp("Visualization", "body_deflection",
                                      "Body deflection coefficient",
-                                     Config_Prop::DblSpin,
+                                     Config_Prop::Double,
                                      ModelAPI_ResultBody::DEFAULT_DEFLECTION());
 
     Config_PropManager::registerProp("Visualization", "construction_deflection",
                                      "Construction deflection coefficient",
-                                     Config_Prop::DblSpin,
+                                     Config_Prop::Double,
                                      ModelAPI_ResultConstruction::DEFAULT_DEFLECTION());
 
   }
