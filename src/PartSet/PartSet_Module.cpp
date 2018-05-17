@@ -906,15 +906,15 @@ ModuleBase_ModelWidget* PartSet_Module::activeWidget() const
 {
   ModuleBase_ModelWidget* anActiveWidget = 0;
 
-  anActiveWidget = mySketchReentrantMgr->internalActiveWidget();
-  if (!anActiveWidget) {
-    ModuleBase_Operation* aOperation = myWorkshop->currentOperation();
-    if (aOperation) {
-      ModuleBase_IPropertyPanel* aPanel = aOperation->propertyPanel();
-      anActiveWidget = aPanel ? aPanel->activeWidget() : 0;
-    }
-  }
-  return anActiveWidget;
+  ModuleBase_Operation* aOperation = myWorkshop->currentOperation();
+  if (!aOperation)
+    return anActiveWidget;
+
+  ModuleBase_IPropertyPanel* aPanel = aOperation->propertyPanel();
+  if (!aPanel)
+    return anActiveWidget;
+
+  return aPanel->activeWidget(true);
 }
 
 //******************************************************

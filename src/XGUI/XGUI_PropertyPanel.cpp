@@ -36,6 +36,7 @@
 #include <ModuleBase_WidgetFactory.h>
 #include <ModuleBase_OperationDescription.h>
 #include <ModuleBase_Events.h>
+#include <ModuleBase_IModule.h>
 #include <ModuleBase_IWorkshop.h>
 
 #include <Events_Loop.h>
@@ -66,6 +67,7 @@ XGUI_PropertyPanel::XGUI_PropertyPanel(QWidget* theParent, XGUI_OperationMgr* th
     : ModuleBase_IPropertyPanel(theParent),
     myActiveWidget(NULL),
     myPreselectionWidget(NULL),
+    myInternalActiveWidget(NULL),
     myPanelPage(NULL),
     myOperationMgr(theMgr)
 {
@@ -228,6 +230,14 @@ void XGUI_PropertyPanel::createContentPanel(FeaturePtr theFeature)
     myOperationMgr->workshop()->featureInfo(theFeature->getKind().c_str());
   if (aFeatureInfo.get())
     findButton(PROP_PANEL_OK_PLUS)->setVisible(aFeatureInfo->isApplyContinue());
+}
+
+ModuleBase_ModelWidget* XGUI_PropertyPanel::activeWidget(const bool isUseCustomWidget) const
+{
+  if (isUseCustomWidget && myInternalActiveWidget)
+    return myInternalActiveWidget;
+
+  return myActiveWidget;
 }
 
 void XGUI_PropertyPanel::activateNextWidget(ModuleBase_ModelWidget* theWidget)
@@ -574,6 +584,25 @@ void XGUI_PropertyPanel::onAcceptData()
   }
 }
 
+void XGUI_PropertyPanel::setInternalActiveWidget(ModuleBase_ModelWidget* theWidget)
+{
+  if (theWidget)
+  {
+    myInternalActiveWidget = theWidget;
+    emit propertyPanelActivated();
+  }
+  else
+  {
+    if (myInternalActiveWidget)
+    {
+      delete myInternalActiveWidget;
+      myInternalActiveWidget = 0;
+    }
+    emit propertyPanelDeactivated();
+  }
+  myOperationMgr->workshop()->selectionActivate()->updateSelectionModes();
+  myOperationMgr->workshop()->selectionActivate()->updateSelectionFilters();
+}
 
 ModuleBase_ModelWidget* XGUI_PropertyPanel::preselectionWidget() const
 {
