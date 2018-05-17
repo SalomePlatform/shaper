@@ -168,13 +168,11 @@ std::string SketchPlugin_MacroCircle::processEvent(
           aRefAttr->setAttr(anAttribute);
         }
         else if (anObject.get()) {
-          // if presentation of previous reentrant macro arc is used, the object is invalid,
-          // we should use result of previous feature of the message(Arc)
-          if (!anObject->data()->isValid()) {
-            FeaturePtr aCreatedFeature = aReentrantMessage->createdFeature();
-            anObject = aCreatedFeature->lastResult();
-          }
-          aRefAttr->setObject(anObject);
+          // if attribute is NULL, only object is defined, it should be processed outside
+          // the feature because it might be an external feature, that will be
+          // removed/created again after restart operation
+          // #2468 - Crash when sketching circles successively on a repetition
+          aFilledAttributeName = CIRCLE_TYPE();
         }
       }
     }
