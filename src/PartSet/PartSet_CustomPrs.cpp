@@ -118,7 +118,7 @@ bool PartSet_CustomPrs::displayPresentation(
     default:
       return isModified;
   }
-  NCollection_DataMap<TopoDS_Shape, Handle_AIS_InteractiveObject>& aShapeMap =
+  NCollection_DataMap<TopoDS_Shape, Handle(AIS_InteractiveObject)>& aShapeMap =
                                                                  anOperationPrs->shapesMap();
   PartSet_OperationPrs::fillShapeList(aFeatureShapes, myWorkshop, aShapeMap);
 

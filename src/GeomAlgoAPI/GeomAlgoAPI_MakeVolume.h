@@ -31,6 +31,7 @@
 /// \brief Perform building solid (compsolid) from a list of faces.
 class GeomAlgoAPI_MakeVolume : public GeomAlgoAPI_MakeShape
 {
+  bool myAvoidInternal; // to remove internal faces from the result
 public:
   /// \brief Perform making volume.
   /// \param[in] theObjects list of faces.
@@ -38,7 +39,10 @@ public:
   GEOMALGOAPI_EXPORT static std::shared_ptr<GeomAPI_Shape> make(const ListOfShape& theFaces);
 
   /// Constructor.
-  GEOMALGOAPI_EXPORT GeomAlgoAPI_MakeVolume(const ListOfShape& theFaces);
+  /// \param theFaces faces that will construct a solid
+  /// \param theAvoidInternal to remove internal faces from the result
+  GEOMALGOAPI_EXPORT GeomAlgoAPI_MakeVolume(const ListOfShape& theFaces,
+    const bool theAvoidInternal);
 
 private:
   /// Builds resulting shape.

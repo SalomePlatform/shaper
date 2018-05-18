@@ -27,6 +27,8 @@
 #include "PartSet_Tools.h"
 
 #include <ModelAPI_Tools.h>
+#include <ModelAPI_ResultField.h>
+#include <ModelAPI_ResultGroup.h>
 
 #include <ModuleBase_IWorkshop.h>
 #include <ModuleBase_ViewerPrs.h>
@@ -97,6 +99,12 @@ QList<std::shared_ptr<ModuleBase_ViewerPrs>> PartSet_ExternalPointsMgr::findCirc
       continue;
 
     ResultPtr aResObj = std::dynamic_pointer_cast<ModelAPI_Result>(aObj);
+
+    // Do not use Fields and groups in selection in sketcher
+    if ((aResObj->groupName() == ModelAPI_ResultField::group()) ||
+      (aResObj->groupName() == ModelAPI_ResultGroup::group()))
+      continue;
+
     if (aResObj.get()) {
       GeomShapePtr aShape = aResObj->shape();
       if (aShape.get()) {

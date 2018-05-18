@@ -186,9 +186,8 @@ std::shared_ptr<GeomAPI_Shape> STEPImport(const std::string& theFileName,
       aResShape.Nullify();
     }
   }
-  catch (Standard_Failure) {
-    Handle(Standard_Failure) aFail = Standard_Failure::Caught();
-    theError = aFail->GetMessageString();
+  catch (Standard_Failure const& anException) {
+    theError = anException.GetMessageString();
     aResShape.Nullify();
   }
   // Return previous locale

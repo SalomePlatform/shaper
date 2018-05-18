@@ -43,8 +43,11 @@ public:
   /// Returns header widget
   virtual QWidget* headerWidget() const = 0;
 
-  /// Returns currently active widget
-  virtual ModuleBase_ModelWidget* activeWidget() const = 0;
+  /// Returns currently active widget. This is a widget from internal container of widgets
+  /// (myWidgets) activated/deactivated by focus in property panel. If parameter is true,
+  /// the method finds firstly the custom widget, after the direct active widget.
+  /// \param isUseCustomWidget boolean state if the custom widget might be a result
+  virtual ModuleBase_ModelWidget* activeWidget(const bool isUseCustomWidget = false) const = 0;
 
   /// Returns all property panel's widget created by WidgetFactory
   virtual const QList<ModuleBase_ModelWidget*>& modelWidgets() const = 0;

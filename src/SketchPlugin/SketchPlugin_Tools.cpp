@@ -191,11 +191,14 @@ public:
     std::list< std::set<AttributePoint2DPtr> >::iterator aFound1 = find(thePoint1);
     std::list< std::set<AttributePoint2DPtr> >::iterator aFound2 = find(thePoint2);
     if (aFound1 == myCoincidentPoints.end()) {
-      std::set<AttributePoint2DPtr> aNewSet;
-      aNewSet.insert(thePoint1);
-      if (thePoint2)
-        aNewSet.insert(thePoint2);
-      myCoincidentPoints.push_back(aNewSet);
+      if (aFound2 == myCoincidentPoints.end()) {
+        std::set<AttributePoint2DPtr> aNewSet;
+        aNewSet.insert(thePoint1);
+        if (thePoint2)
+          aNewSet.insert(thePoint2);
+        myCoincidentPoints.push_back(aNewSet);
+      } else
+        aFound2->insert(thePoint1);
     } else if (aFound2 == myCoincidentPoints.end()) {
       if (thePoint2)
         aFound1->insert(thePoint2);

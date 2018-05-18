@@ -146,10 +146,9 @@ bool Model_Document::load(const char* theDirName, const char* theFileName, Docum
   Handle(TDocStd_Document) aLoaded;
   try {
     aStatus = anApp->Open(aPath, aLoaded);
-  } catch (Standard_Failure) {
-    Handle(Standard_Failure) aFail = Standard_Failure::Caught();
+  } catch (Standard_Failure const& anException) {
     Events_InfoMessage("Model_Document",
-        "Exception in opening of document: %1").arg(aFail->GetMessageString()).send();
+        "Exception in opening of document: %1").arg(anException.GetMessageString()).send();
     return false;
   }
   bool isError = aStatus != PCDM_RS_OK;
@@ -284,10 +283,9 @@ bool Model_Document::save(
   PCDM_StoreStatus aStatus;
   try {
     aStatus = anApp->SaveAs(myDoc, aPath);
-  } catch (Standard_Failure) {
-    Handle(Standard_Failure) aFail = Standard_Failure::Caught();
+  } catch (Standard_Failure const& anException) {
     Events_InfoMessage("Model_Document",
-        "Exception in saving of document: %1").arg(aFail->GetMessageString()).send();
+        "Exception in saving of document: %1").arg(anException.GetMessageString()).send();
     if (aWasCurrent.get()) { // return the current feature to the initial position
       setCurrentFeature(aWasCurrent, false);
       aSession->setCheckTransactions(true);

@@ -23,22 +23,16 @@
 #include <GEOMAlgo_Splitter.hxx>
 
 #include <TopAbs_ShapeEnum.hxx>
-
+#include <TopExp.hxx>
 #include <TopoDS_Shape.hxx>
 #include <TopoDS_Compound.hxx>
 #include <TopoDS_Iterator.hxx>
 
 #include <BRep_Builder.hxx>
 
-#include <BOPCol_MapOfShape.hxx>
-#include <BOPCol_ListOfShape.hxx>
-
-#include <BOPTools.hxx>
-
-
 static 
   void TreatCompound(const TopoDS_Shape& aC, 
-                     BOPCol_ListOfShape& aLSX);
+                     NCollection_List<TopoDS_Shape>& aLSX);
 
 //=======================================================================
 //function : 
@@ -90,7 +84,7 @@ void GEOMAlgo_Splitter::AddTool(const TopoDS_Shape& theShape)
 //function : Tools
 //purpose  : 
 //=======================================================================
-const BOPCol_ListOfShape& GEOMAlgo_Splitter::Tools()const
+const NCollection_List<TopoDS_Shape>& GEOMAlgo_Splitter::Tools()const
 {
   return myTools;
 }
@@ -143,14 +137,10 @@ void GEOMAlgo_Splitter::Clear()
 //=======================================================================
 void GEOMAlgo_Splitter::BuildResult(const TopAbs_ShapeEnum theType)
 {
-#ifndef USE_OCCT_720
-  myErrorStatus=0;
-#endif
-  //
   TopAbs_ShapeEnum aType;
   BRep_Builder aBB;
-  BOPCol_MapOfShape aM;
-  BOPCol_ListIteratorOfListOfShape aIt, aItIm;
+  NCollection_Map<TopoDS_Shape> aM;
+  NCollection_List<TopoDS_Shape>::Iterator aIt, aItIm;
   //
   aIt.Initialize(myArguments);
   for (; aIt.More(); aIt.Next()) {
@@ -158,7 +148,7 @@ void GEOMAlgo_Splitter::BuildResult(const TopAbs_ShapeEnum theType)
     aType=aS.ShapeType();
     if (aType==theType && !myMapTools.Contains(aS)) {
       if (myImages.IsBound(aS)) {
-        const BOPCol_ListOfShape& aLSIm=myImages.Find(aS);
+        const NCollection_List<TopoDS_Shape>& aLSIm=myImages.Find(aS);
         aItIm.Initialize(aLSIm);
         for (; aItIm.More(); aItIm.Next()) {
           const TopoDS_Shape& aSIm=aItIm.Value();
@@ -185,11 +175,11 @@ void GEOMAlgo_Splitter::PostTreat()
     Standard_Integer i, aNbS;
     BRep_Builder aBB;
     TopoDS_Compound aC;
-    BOPCol_IndexedMapOfShape aMx;
+    TopTools_IndexedMapOfShape aMx;
     //
     aBB.MakeCompound(aC);
     //
-    BOPTools::MapShapes(myShape, myLimit, aMx);
+    TopExp::MapShapes(myShape, myLimit, aMx);
     aNbS=aMx.Extent();
     for (i=1; i<=aNbS; ++i) {
       const TopoDS_Shape& aS=aMx(i);
@@ -198,9 +188,9 @@ void GEOMAlgo_Splitter::PostTreat()
     if (myLimitMode) {
       Standard_Integer iType, iLimit, iTypeX;
       TopAbs_ShapeEnum aType, aTypeX;
-      BOPCol_ListOfShape aLSP, aLSX;
-      BOPCol_ListIteratorOfListOfShape aIt, aItX, aItIm;
-      BOPCol_MapOfShape  aM;
+      NCollection_List<TopoDS_Shape> aLSP, aLSX;
+      NCollection_List<TopoDS_Shape>::Iterator aIt, aItX, aItIm;
+      NCollection_Map<TopoDS_Shape>  aM;
       //
       iLimit=(Standard_Integer)myLimit; 
       //
@@ -238,13 +228,13 @@ void GEOMAlgo_Splitter::PostTreat()
       }// for (; aIt.More(); aIt.Next()) {
       //
       aMx.Clear();
-      BOPTools::MapShapes(aC, aMx);
+      TopExp::MapShapes(aC, aMx);
        // 2. Add them to aC
       aIt.Initialize(aLSP);
       for (; aIt.More(); aIt.Next()) {
         const TopoDS_Shape& aS=aIt.Value();
         if (myImages.IsBound(aS)) {
-          const BOPCol_ListOfShape& aLSIm=myImages.Find(aS);
+          const NCollection_List<TopoDS_Shape>& aLSIm=myImages.Find(aS);
           aItIm.Initialize(aLSIm);
           for (; aItIm.More(); aItIm.Next()) {
             const TopoDS_Shape& aSIm=aItIm.Value();
@@ -269,7 +259,7 @@ void GEOMAlgo_Splitter::PostTreat()
   //
   Standard_Integer aNbS;
   TopoDS_Iterator aIt;
-  BOPCol_ListOfShape aLS;
+  NCollection_List<TopoDS_Shape> aLS;
   //
   aIt.Initialize(myShape);
   for (; aIt.More(); aIt.Next()) {
@@ -288,12 +278,12 @@ void GEOMAlgo_Splitter::PostTreat()
 //purpose  : 
 //=======================================================================
 void TreatCompound(const TopoDS_Shape& aC1, 
-                   BOPCol_ListOfShape& aLSX)
+                   NCollection_List<TopoDS_Shape>& aLSX)
 {
   Standard_Integer aNbC1;
   TopAbs_ShapeEnum aType;
-  BOPCol_ListOfShape aLC, aLC1;
-  BOPCol_ListIteratorOfListOfShape aIt, aIt1;
+  NCollection_List<TopoDS_Shape> aLC, aLC1;
+  NCollection_List<TopoDS_Shape>::Iterator aIt, aIt1;
   TopoDS_Iterator aItC;
   //
   aLC.Append (aC1);

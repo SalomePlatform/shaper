@@ -43,7 +43,7 @@
 /// \param theDimAspect an aspect to be changed
 /// \param theDimValue an arrow value
 /// \param theTextSize an arrow value
-extern void updateArrows(Handle_Prs3d_DimensionAspect theDimAspect,
+extern void updateArrows(Handle(Prs3d_DimensionAspect) theDimAspect,
   double theDimValue, double theTextSize, SketcherPrs_Tools::LocationType theLocationType);
 
 #define PI 3.1415926535897932

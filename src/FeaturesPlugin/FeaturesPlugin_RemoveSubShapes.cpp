@@ -216,9 +216,11 @@ void FeaturesPlugin_RemoveSubShapes::execute()
     AttributeSelectionPtr anAttrSelectionInList = aSubShapesAttrList->value(0);
     aResultShape = anAttrSelectionInList->value();
   }
+  // deleted and copied must be jointed to one list which keeps all the history
+  GeomAlgoAPI_MakeShapeList aMakeShapeList;
 
   // find all removed shapes
-  GeomAlgoAPI_MakeShapeCustom aDeletedSubs;
+  std::shared_ptr<GeomAlgoAPI_MakeShapeCustom> aDeletedSubs(new GeomAlgoAPI_MakeShapeCustom);
   std::set<GeomAPI_Shape::ShapeType> aTypes; // types that where removed
   aTypes.insert(GeomAPI_Shape::FACE);
   for(GeomAPI_ShapeIterator anIt(aBaseShape); anIt.more(); anIt.next()) {
@@ -233,32 +235,33 @@ void FeaturesPlugin_RemoveSubShapes::execute()
       }
     }
     if (anIndex == aSubsNb) { // not found in left
-      aDeletedSubs.addDeleted(anIt.current());
+      aDeletedSubs->addDeleted(anIt.current());
       aTypes.insert(anIt.current()->shapeType());
       if (anIt.current()->shapeType() != GeomAPI_Shape::FACE) {
         GeomAPI_ShapeExplorer aFaces(anIt.current(), GeomAPI_Shape::FACE);
         for(; aFaces.more(); aFaces.next())
-          aDeletedSubs.addDeleted(aFaces.current());
+          aDeletedSubs->addDeleted(aFaces.current());
       }
     }
   }
+  aMakeShapeList.appendAlgo(aDeletedSubs);
 
-
-  GeomAlgoAPI_Copy aCopy(aResultShape);
-  aResultShape = aCopy.shape();
+  std::shared_ptr<GeomAlgoAPI_Copy> aCopy(new GeomAlgoAPI_Copy(aResultShape));
+  aResultShape = aCopy->shape();
+  aMakeShapeList.appendAlgo(aCopy);
 
   // Store result.
   ResultBodyPtr aResultBody = document()->createBody(data());
   aResultBody->storeModified(aBaseShape, aResultShape, 1);
   std::set<GeomAPI_Shape::ShapeType>::iterator aTypeIter = aTypes.begin();
   for(; aTypeIter != aTypes.end(); aTypeIter++)
-    aResultBody->loadDeletedShapes(&aDeletedSubs, aBaseShape, *aTypeIter, 1);
-  aResultBody->loadAndOrientModifiedShapes(&aCopy,
+    aResultBody->loadDeletedShapes(&aMakeShapeList, aBaseShape, *aTypeIter, 1);
+  aResultBody->loadAndOrientModifiedShapes(&aMakeShapeList,
                                            aBaseShape,
                                            GeomAPI_Shape::FACE,
                                            2,
                                            "Modified_Face",
-                                           *aCopy.mapOfSubShapes().get(),
+                                           *aMakeShapeList.mapOfSubShapes().get(),
                                            true, false, true);
   setResult(aResultBody);
 }

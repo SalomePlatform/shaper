@@ -129,57 +129,35 @@ Standard_Boolean ModuleBase_ShapeInPlaneFilter::IsOk(
         }
       } else {
         if (theOwner->HasSelectable()) {
-        // Check Trihedron sub-objects
-        Handle(SelectMgr_SelectableObject) aSelObj = theOwner->Selectable();
-        Handle(Standard_Type) aType = aSelObj->DynamicType();
-#ifdef BEFORE_TRIHEDRON_PATCH
-        if (aType == STANDARD_TYPE(AIS_Axis)) {
-          Handle(AIS_Axis) aAxis = Handle(AIS_Axis)::DownCast(aSelObj);
-          gp_Lin aLine = aAxis->Component()->Lin();
-          return aPlane.Contains(aLine, Precision::Confusion(), Precision::Angular());
-
-        } else if (aType == STANDARD_TYPE(AIS_Point)) {
-          Handle(AIS_Point) aPoint = Handle(AIS_Point)::DownCast(aSelObj);
-          return aPlane.Distance(aPoint->Component()->Pnt()) < Precision::Confusion();
-
-        } else if (aType == STANDARD_TYPE(AIS_Plane)) {
-          Handle(AIS_Plane) aAisPlane = Handle(AIS_Plane)::DownCast(aSelObj);
-          gp_Pln aPln = aAisPlane->Component()->Pln();
-          return aPlane.Distance(aPln) < Precision::Confusion();
-        }
-#else
-        if (aType == STANDARD_TYPE(AIS_Trihedron)) {
-          Handle(AIS_Trihedron) aTrihedron = Handle(AIS_Trihedron)::DownCast(aSelObj);
-          Handle(AIS_TrihedronOwner) aTrOwner = Handle(AIS_TrihedronOwner)::DownCast(theOwner);
-          if (!aTrOwner.IsNull())
-          {
-            const Prs3d_DatumParts& aPart = aTrOwner->DatumPart();
-            if (aPart >= Prs3d_DP_XAxis && aPart <= Prs3d_DP_ZAxis)
-            {
-#ifdef USE_OCCT_720
-              gp_Ax2 anAxis = aTrihedron->Component()->Ax2();
-              gp_Dir aDir = anAxis.XDirection();
-              gp_Lin aLine(aTrihedron->Component()->Location(), aDir);
-              return aPlane.Contains(aLine, Precision::Confusion(), Precision::Angular());
-#else
-              Handle(Prs3d_Drawer) aDrawer = aTrihedron->Attributes();
-              Handle(Prs3d_DatumAspect) aDatumAspect = aDrawer->DatumAspect();
-              Handle(Graphic3d_ArrayOfPrimitives) aPrimitives =
-                                                        aDatumAspect->ArrayOfPrimitives(aPart);
-              Standard_Real aX1, anY1, aZ1, aX2, anY2, aZ2;
-              aPrimitives->Vertice(1, aX1, anY1, aZ1);
-              aPrimitives->Vertice(2, aX2, anY2, aZ2);
-              gp_Pnt aPnt1(aX1, anY1, aZ1);
-              gp_Pnt aPnt2(aX2, anY2, aZ2);
-              gp_Lin aLine(aPnt1, gp_Dir(gp_Vec(aPnt1, aPnt2)));
-              return aPlane.Contains(aLine, Precision::Confusion(), Precision::Angular());
-#endif
+          // Check Trihedron sub-objects
+          Handle(SelectMgr_SelectableObject) aSelObj = theOwner->Selectable();
+          Handle(Standard_Type) aType = aSelObj->DynamicType();
+          if (aType == STANDARD_TYPE(AIS_Trihedron)) {
+            Handle(AIS_Trihedron) aTrihedron = Handle(AIS_Trihedron)::DownCast(aSelObj);
+            Handle(AIS_TrihedronOwner) aTrOwner = Handle(AIS_TrihedronOwner)::DownCast(theOwner);
+            if (!aTrOwner.IsNull()) {
+              const Prs3d_DatumParts& aPart = aTrOwner->DatumPart();
+              if (aPart >= Prs3d_DP_XAxis && aPart <= Prs3d_DP_ZAxis) {
+                gp_Ax2 anAxis = aTrihedron->Component()->Ax2();
+                gp_Dir aDir;
+                switch (aPart) {
+                case Prs3d_DP_XAxis:
+                  aDir = anAxis.XDirection();
+                  break;
+                case Prs3d_DP_YAxis:
+                  aDir = anAxis.YDirection();
+                  break;
+                case Prs3d_DP_ZAxis:
+                  aDir = anAxis.Direction();
+                  break;
+                }
+                gp_Lin aLine(aTrihedron->Component()->Location(), aDir);
+                return aPlane.Contains(aLine, Precision::Confusion(), Precision::Angular());
+              }
             }
           }
-        }
-#endif
-        // This is not object controlled by the filter
-        aValid = Standard_True;
+          // This is not object controlled by the filter
+          aValid = Standard_True;
         }
       }
     }

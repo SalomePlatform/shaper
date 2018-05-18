@@ -88,13 +88,13 @@ Extrusion_1.setNestedSketch(Sketch_2)
 Boolean_1 = model.addFill(Part_1_doc, [model.selection("SOLID", "Revolution_1_1")], [model.selection("SOLID", "Extrusion_1_1")])
 
 Point_2 = model.addPoint(Part_1_doc, "x", "y", "-z")
-Axis_4 = model.addAxis(Part_1_doc, model.selection("VERTEX", "Point_1"), model.selection("VERTEX", "Boolean_1_1_2/Modified_Face_1&Boolean_1_1_2/Modified_Face_3&Boolean_1_1_2/Modified_Face_4"))
+Axis_4 = model.addAxis(Part_1_doc, model.selection("VERTEX", "Point_1"), model.selection("VERTEX", "Boolean_1_1_2/Modified_Face_3&Boolean_1_1_2/Modified_Face_2&Boolean_1_1_2/Modified_Face_1"))
 Plane_4 = model.addPlane(Part_1_doc, model.selection("EDGE", "Axis_1"), model.selection("VERTEX", "Point_1"), True)
 Plane_5 = model.addPlane(Part_1_doc, model.selection("FACE", "Plane_1"), "haut_ext_tuyau", True)
 Plane_5.result().setName("Plane_2 arrivee tuyau")
-Plane_6 = model.addPlane(Part_1_doc, model.selection("FACE", "Boolean_1_1_2/Modified_Face_5"), model.selection("EDGE", "Boolean_1_1_2/Modified_Face_5&Boolean_1_1_2/Modified_Face_2"), 45)
-Plane_7 = model.addPlane(Part_1_doc, model.selection("FACE", "Boolean_1_1_2/Modified_Face_6"), model.selection("EDGE", "Boolean_1_1_2/Modified_Face_6&Boolean_1_1_2/Modified_Face_2"), 45)
-Plane_8 = model.addPlane(Part_1_doc, model.selection("FACE", "Boolean_1_1_2/Modified_Face_6"), model.selection("EDGE", "Boolean_1_1_2/Modified_Face_6&Boolean_1_1_2/Modified_Face_5"), "90+45")
+Plane_6 = model.addPlane(Part_1_doc, model.selection("FACE", "Extrusion_1_1/Generated_Face_3"), model.selection("EDGE", "Extrusion_1_1/Generated_Face_3&Extrusion_1_1/From_Face_1"), 45)
+Plane_7 = model.addPlane(Part_1_doc, model.selection("FACE", "Extrusion_1_1/Generated_Face_4"), model.selection("EDGE", "Extrusion_1_1/Generated_Face_4&Extrusion_1_1/From_Face_1"), 45)
+Plane_8 = model.addPlane(Part_1_doc, model.selection("FACE", "Extrusion_1_1/Generated_Face_4"), model.selection("EDGE", "Extrusion_1_1/Generated_Face_3&Extrusion_1_1/Generated_Face_4"), "90+45")
 
 Boolean_2 = model.addFill(Part_1_doc, [model.selection("SOLID", "Boolean_1_1_1")], [model.selection("FACE", "Plane_5")])
 Boolean_3 = model.addFill(Part_1_doc, [model.selection("SOLID", "Boolean_2_1_2")], [model.selection("FACE", "Plane_3")])
@@ -171,7 +171,7 @@ model.do()
 Revolution_2 = model.addRevolution(Part_1_doc, [model.selection("FACE", "Sketch_4/Face-SketchArc_2_2f-SketchLine_18r")], model.selection("EDGE", "Sketch_4/Edge-SketchLine_18"), 0, 180)
 
 Boolean_5 = model.addCut(Part_1_doc, [model.selection("SOLID", "Revolution_2_1")], [model.selection("SOLID", "Extrusion_3_1")])
-Boolean_5.result().setName("demi-sphère")
+Boolean_5.result().setName("demi-sphere")
 
 Plane_9 = model.addPlane(Part_1_doc, model.selection("VERTEX", "Extrusion_2_1/Generated_Face_10&Extrusion_2_1/Generated_Face_1&Extrusion_2_1/From_Face_4"), model.selection("VERTEX", "Extrusion_2_1/Generated_Face_10&Extrusion_2_1/Generated_Face_1&Extrusion_2_1/To_Face_4"), model.selection("VERTEX", "Extrusion_2_1/Generated_Face_2&Extrusion_2_1/Generated_Face_10&Extrusion_2_1/To_Face_4"))
 Plane_10 = model.addPlane(Part_1_doc, model.selection("VERTEX", "Extrusion_2_1/Generated_Face_12&Extrusion_2_1/Generated_Face_11&Extrusion_2_1/To_Face_1"), model.selection("VERTEX", "Extrusion_2_1/Generated_Face_13&Extrusion_2_1/Generated_Face_12&Extrusion_2_1/To_Face_1"), model.selection("VERTEX", "Extrusion_2_1/Generated_Face_13&Extrusion_2_1/Generated_Face_12&Extrusion_2_1/From_Face_1"))
@@ -186,7 +186,7 @@ Plane_15 = model.addPlane(Part_1_doc, model.selection("FACE", "Recover_1_1/Shape
 Plane_16 = model.addPlane(Part_1_doc, model.selection("FACE", "Recover_1_1/Shape6"), model.selection("EDGE", "Recover_1_1/Shape3&Recover_1_1/Shape6"), 45)
 
 Boolean_6_objects_2 = [model.selection("FACE", "Plane_6"), model.selection("FACE", "Plane_7"), model.selection("FACE", "Plane_8"), model.selection("FACE", "Plane_9"), model.selection("FACE", "Plane_10"), model.selection("FACE", "Plane_11"), model.selection("FACE", "Plane_12"), model.selection("FACE", "Plane_13")]
-Boolean_6 = model.addFill(Part_1_doc, [model.selection("SOLID", "demi-sphère")], Boolean_6_objects_2)
+Boolean_6 = model.addFill(Part_1_doc, [model.selection("SOLID", "demi-sphere")], Boolean_6_objects_2)
 
 Union_2_objects = [model.selection("SOLID", "Boolean_6_1_16"), model.selection("SOLID", "Boolean_6_1_13"), model.selection("SOLID", "Boolean_6_1_14")]
 Union_2 = model.addUnion(Part_1_doc, Union_2_objects)
@@ -205,7 +205,7 @@ Union_6.result().subResult(2).setColor(102, 51, 102)
 Union_6.result().subResult(3).setColor(76, 76, 153)
 Union_6.result().subResult(4).setColor(0, 0, 254)
 
-Partition_1_objects = [model.selection("SOLID", "Recover_1_1"), model.selection("COMPSOLID", "Union_1_1"), model.selection("COMPSOLID", "Extrusion_2_1"), model.selection("COMPSOLID", "demi-sphère")]
+Partition_1_objects = [model.selection("SOLID", "Recover_1_1"), model.selection("COMPSOLID", "Union_1_1"), model.selection("COMPSOLID", "Extrusion_2_1"), model.selection("COMPSOLID", "demi-sphere")]
 Partition_1 = model.addPartition(Part_1_doc, Partition_1_objects)
 Partition_1.result().setColor(102, 0, 0)
 Partition_1.result().subResult(0).setColor(255, 255, 0)

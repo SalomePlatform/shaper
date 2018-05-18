@@ -58,7 +58,6 @@ void GeomAlgoAPI_UnifySameDomain::build(const ListOfShape& theShapes)
   this->setImpl(aUnifyAlgo);
 
   aUnifyAlgo->Initialize(aShell);
-  aUnifyAlgo->UnifyFacesAndEdges();
   aUnifyAlgo->Build();
 
   TopoDS_Shape aResult = aUnifyAlgo->Shape();
@@ -96,11 +95,16 @@ void GeomAlgoAPI_UnifySameDomain::modified(const std::shared_ptr<GeomAPI_Shape> 
   const TopoDS_Shape& aShape = theShape->impl<TopoDS_Shape>();
   const ShapeUpgrade_UnifySameDomain& aUnifyAlgo = this->impl<ShapeUpgrade_UnifySameDomain>();
 
-  TopoDS_Shape aModifiedShape = aUnifyAlgo.Generated(aShape);
-
-  for(TopExp_Explorer anExp(aModifiedShape, aShape.ShapeType()); anExp.More(); anExp.Next()) {
-    GeomShapePtr aGeomShape(new GeomAPI_Shape());
-    aGeomShape->setImpl(new TopoDS_Shape(anExp.Current()));
-    theHistory.push_back(aGeomShape);
+  for (int aIsModified = 0; aIsModified <= 1; aIsModified++) {
+    const TopTools_ListOfShape& aMList = aIsModified ?
+      aUnifyAlgo.History()->Modified(aShape) : aUnifyAlgo.History()->Generated(aShape);
+    for (TopTools_ListIteratorOfListOfShape aModified(aMList); aModified.More(); aModified.Next()) {
+      for (TopExp_Explorer anExp(aModified.Value(), aShape.ShapeType());
+           anExp.More(); anExp.Next()) {
+        GeomShapePtr aGeomShape(new GeomAPI_Shape());
+        aGeomShape->setImpl(new TopoDS_Shape(anExp.Current()));
+        theHistory.push_back(aGeomShape);
+      }
+    }
   }
 }

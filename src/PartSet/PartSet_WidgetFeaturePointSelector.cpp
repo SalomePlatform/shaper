@@ -92,8 +92,8 @@ void PartSet_WidgetFeaturePointSelector::updateSelectionModesAndFilters(bool toA
   Handle(AIS_InteractiveContext) aContext =
                             XGUI_Tools::workshop(myWorkshop)->viewer()->AISContext();
   Quantity_Color aColor;
-  Handle(Graphic3d_HighlightStyle) aHStyle = aContext->HighlightStyle();
-  Handle(Graphic3d_HighlightStyle) aSStyle = aContext->SelectionStyle();
+  Handle(Prs3d_Drawer) aHStyle = aContext->HighlightStyle();
+  Handle(Prs3d_Drawer) aSStyle = aContext->SelectionStyle();
   if (toActivate) {
     std::vector<int> aColors;
     aColors = Config_PropManager::color("Visualization", "sketch_entity_color");

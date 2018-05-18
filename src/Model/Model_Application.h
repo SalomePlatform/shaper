@@ -46,7 +46,7 @@ public:
   DEFINE_STANDARD_RTTIEXT(Model_Application, TDocStd_Application)
 
   //! Retuns the application: one per process
-  MODEL_EXPORT static Handle_Model_Application getApplication();
+  MODEL_EXPORT static Handle(Model_Application) getApplication();
   //! Returns the document by the identifier
   //! \returns false of document is not yet created/not loaded
   MODEL_EXPORT std::shared_ptr<Model_Document> document(const int theDocID);

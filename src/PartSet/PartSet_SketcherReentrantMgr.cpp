@@ -44,7 +44,6 @@
 #include <ModuleBase_OperationDescription.h>
 #include "ModuleBase_ToolBox.h"
 #include "ModuleBase_ISelection.h"
-#include "ModuleBase_ISelectionActivate.h"
 
 #include <SketchPlugin_Feature.h>
 #include <SketchPlugin_Line.h>
@@ -71,31 +70,12 @@ PartSet_SketcherReentrantMgr::PartSet_SketcherReentrantMgr(ModuleBase_IWorkshop*
   myRestartingMode(RM_None),
   myIsFlagsBlocked(false),
   myIsInternalEditOperation(false),
-  myInternalActiveWidget(0),
   myNoMoreWidgetsAttribute("")
 {
 }
 
 PartSet_SketcherReentrantMgr::~PartSet_SketcherReentrantMgr()
 {
-}
-
-ModuleBase_ModelWidget* PartSet_SketcherReentrantMgr::internalActiveWidget() const
-{
-  ModuleBase_ModelWidget* aWidget = 0;
-  if (!isActiveMgr())
-    return aWidget;
-
-  ModuleBase_Operation* anOperation = myWorkshop->currentOperation();
-  if (anOperation) {
-    ModuleBase_IPropertyPanel* aPanel = anOperation->propertyPanel();
-    if (aPanel) { // check for case when the operation is started but property panel is not filled
-      ModuleBase_ModelWidget* anActiveWidget = aPanel->activeWidget();
-      if (myIsInternalEditOperation && (!anActiveWidget || !anActiveWidget->isViewerSelector()))
-        aWidget = myInternalActiveWidget;
-    }
-  }
-  return aWidget;
 }
 
 bool PartSet_SketcherReentrantMgr::isInternalEditActive() const
@@ -670,7 +650,7 @@ void PartSet_SketcherReentrantMgr::createInternalFeature()
     ModuleBase_ModelWidget* aFirstWidget = ModuleBase_IPropertyPanel::findFirstAcceptingValueWidget
                                                                                         (aWidgets);
     if (aFirstWidget)
-      myInternalActiveWidget = aFirstWidget;
+      setInternalActiveWidget(aFirstWidget);
   }
 }
 
@@ -680,8 +660,7 @@ void PartSet_SketcherReentrantMgr::deleteInternalFeature()
   std::cout << "PartSet_SketcherReentrantMgr::deleteInternalFeature: "
             << myInternalFeature->data()->name() << std::endl;
 #endif
-  if (myInternalActiveWidget)
-    myInternalActiveWidget = 0;
+  setInternalActiveWidget(0);
   delete myInternalWidget;
   myInternalWidget = 0;
 
@@ -829,4 +808,17 @@ XGUI_Workshop* PartSet_SketcherReentrantMgr::workshop() const
 PartSet_Module* PartSet_SketcherReentrantMgr::module() const
 {
   return dynamic_cast<PartSet_Module*>(myWorkshop->module());
+}
+
+void PartSet_SketcherReentrantMgr::setInternalActiveWidget(ModuleBase_ModelWidget* theWidget)
+{
+  ModuleBase_OperationFeature* aFOperation = dynamic_cast<ModuleBase_OperationFeature*>
+    (myWorkshop->currentOperation());
+  if (aFOperation)
+  {
+    XGUI_PropertyPanel* aPropertyPanel = dynamic_cast<XGUI_PropertyPanel*>
+      (aFOperation->propertyPanel());
+    if (aPropertyPanel)
+      aPropertyPanel->setInternalActiveWidget(theWidget);
+  }
 }

@@ -76,9 +76,8 @@ std::shared_ptr<GeomAPI_Shape> IGESImport(const std::string& theFileName,
       aShape.Nullify();
     }
   }
-  catch( Standard_Failure ) {
-    Handle(Standard_Failure) aFail = Standard_Failure::Caught();
-    theError = aFail->GetMessageString();
+  catch( Standard_Failure const& anException) {
+    theError = anException.GetMessageString();
     aShape.Nullify();
   }
 

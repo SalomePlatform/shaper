@@ -289,7 +289,8 @@ bool BuildPlugin_ValidatorBaseForSolids::isValid(
     anOriginalShapes.push_back(aShape);
   }
 
-  std::shared_ptr<GeomAlgoAPI_MakeVolume> anAlgorithm(new GeomAlgoAPI_MakeVolume(anOriginalShapes));
+  std::shared_ptr<GeomAlgoAPI_MakeVolume> anAlgorithm(
+    new GeomAlgoAPI_MakeVolume(anOriginalShapes, false));
 
   if (!anAlgorithm->isDone()) {
     theError = "MakeVolume algorithm failed.";

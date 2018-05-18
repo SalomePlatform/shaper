@@ -89,7 +89,7 @@ void PartSet_CenterPrs::HilightSelected(const Handle(PrsMgr_PresentationManager3
 }
 
 void PartSet_CenterPrs::HilightOwnerWithColor(const Handle(PrsMgr_PresentationManager3d)& thePM,
-                                              const Handle(Graphic3d_HighlightStyle)& theStyle,
+                                              const Handle(Prs3d_Drawer)& theStyle,
                                               const Handle(SelectMgr_EntityOwner)& theOwner)
 {
   Handle( Prs3d_Presentation ) aHilightPrs = GetHilightPresentation( thePM );

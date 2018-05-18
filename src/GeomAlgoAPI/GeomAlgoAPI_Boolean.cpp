@@ -86,14 +86,8 @@ void GeomAlgoAPI_Boolean::build(const ListOfShape& theObjects,
 
   // Building and getting result.
   aBuilder->Perform();
-#ifdef USE_OCCT_720
   if (aBuilder->HasErrors())
     return;
-#else
-  if(aBuilder->ErrorStatus() != 0) {
-    return;
-  }
-#endif
   TopoDS_Shape aResult = aBuilder->Shape();
 
   if(aResult.ShapeType() == TopAbs_COMPOUND) {

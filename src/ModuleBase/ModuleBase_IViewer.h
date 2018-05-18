@@ -129,6 +129,8 @@ Q_OBJECT
   /// Fit all along Z (perpendicular to display)
   //virtual void Zfitall() = 0;
 
+  static Handle(Prs3d_Drawer) DefaultHighlightDrawer;
+
 signals:
   /// Signal emited when last view window is closed
   void lastViewClosed();
@@ -179,6 +181,7 @@ signals:
   protected:
     /// A map for storing a scale factors dependent on view object
     QMap<Handle(V3d_View), double> myWindowScale;
+
 };
 
 #endif

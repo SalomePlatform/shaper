@@ -550,6 +550,8 @@ void XGUI_OperationMgr::onBeforeOperationAborted()
 void XGUI_OperationMgr::onOperationAborted()
 {
   ModuleBase_Operation* aSenderOperation = dynamic_cast<ModuleBase_Operation*>(sender());
+  XGUI_Workshop* aWorkshop = XGUI_Tools::workshop(myWorkshop);
+  aWorkshop->setStatusBarMessage("");
   emit operationAborted(aSenderOperation);
 }
 

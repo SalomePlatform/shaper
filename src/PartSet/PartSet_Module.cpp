@@ -201,7 +201,7 @@ PartSet_Module::PartSet_Module(ModuleBase_IWorkshop* theWshop)
 
   Config_PropManager::registerProp("Visualization", "hidden_face_transparency",
                                    "Hidden faces transparency",
-                                   Config_Prop::Double,
+                                   Config_Prop::DblSpin,
                                    "0.8");
 }
 
@@ -906,15 +906,15 @@ ModuleBase_ModelWidget* PartSet_Module::activeWidget() const
 {
   ModuleBase_ModelWidget* anActiveWidget = 0;
 
-  anActiveWidget = mySketchReentrantMgr->internalActiveWidget();
-  if (!anActiveWidget) {
-    ModuleBase_Operation* aOperation = myWorkshop->currentOperation();
-    if (aOperation) {
-      ModuleBase_IPropertyPanel* aPanel = aOperation->propertyPanel();
-      anActiveWidget = aPanel ? aPanel->activeWidget() : 0;
-    }
-  }
-  return anActiveWidget;
+  ModuleBase_Operation* aOperation = myWorkshop->currentOperation();
+  if (!aOperation)
+    return anActiveWidget;
+
+  ModuleBase_IPropertyPanel* aPanel = aOperation->propertyPanel();
+  if (!aPanel)
+    return anActiveWidget;
+
+  return aPanel->activeWidget(true);
 }
 
 //******************************************************

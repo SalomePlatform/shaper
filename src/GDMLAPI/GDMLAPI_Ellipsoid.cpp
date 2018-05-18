@@ -38,7 +38,7 @@ GDMLAPI_Ellipsoid::GDMLAPI_Ellipsoid(const std::shared_ptr<ModelAPI_Feature>& th
   if (initialize()) {
     setSizes(theAX, theBY, theCZ);
     fillAttribute("", useZCut1());
-    fillAttribute("", useZCut1());
+    fillAttribute("", useZCut2());
   }
 }
 

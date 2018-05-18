@@ -20,10 +20,14 @@
 
 #include <GDMLPlugin_Ellipsoid.h>
 
+#include <GeomAPI_ShapeExplorer.h>
+
 #include <ModelAPI_Data.h>
 #include <ModelAPI_ResultBody.h>
 #include <ModelAPI_AttributeDouble.h>
 #include <ModelAPI_AttributeString.h>
+
+#include <sstream>
 
 //=================================================================================================
 GDMLPlugin_Ellipsoid::GDMLPlugin_Ellipsoid() // Nothing to do during instantiation
@@ -108,13 +112,26 @@ void GDMLPlugin_Ellipsoid::loadNamingDS(std::shared_ptr<GeomAlgoAPI_Ellipsoid> t
   theEllipsoidAlgo->prepareNamingFaces();
 
   // Insert to faces
+  // Naming for faces and edges
   int num = 1;
   std::map< std::string, std::shared_ptr<GeomAPI_Shape> > listOfFaces =
-    theEllipsoidAlgo->getCreatedFaces();
+      theEllipsoidAlgo->getCreatedFaces();
   for (std::map< std::string, std::shared_ptr<GeomAPI_Shape> >::iterator
-    it=listOfFaces.begin(); it!=listOfFaces.end(); ++it) {
+       it=listOfFaces.begin(); it!=listOfFaces.end(); ++it) {
     std::shared_ptr<GeomAPI_Shape> aFace = (*it).second;
     theResultEllipsoid->generated(aFace, (*it).first, num++);
+  }
+
+  // Naming vertices
+  GeomAPI_DataMapOfShapeShape aVertices;
+  GeomAPI_ShapeExplorer aVertExp(theEllipsoidAlgo->shape(), GeomAPI_Shape::VERTEX);
+  for(int anIndex = 1; aVertExp.more(); aVertExp.next()) {
+    if (!aVertices.isBound(aVertExp.current())) {
+      std::ostringstream aStream;
+      aStream<<"Vertex_"<<anIndex++;
+      theResultEllipsoid->generated(aVertExp.current(), aStream.str(), num++);
+      aVertices.bind(aVertExp.current(), aVertExp.current());
+    }
   }
 }
 

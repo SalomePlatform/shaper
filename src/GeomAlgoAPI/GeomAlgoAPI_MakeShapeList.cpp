@@ -126,13 +126,18 @@ void GeomAlgoAPI_MakeShapeList::result(const std::shared_ptr<GeomAPI_Shape> theS
     for(NCollection_Map<TopoDS_Shape>::Iterator
         aShapeIt(anAlgoShapes); aShapeIt.More(); aShapeIt.Next()) {
       bool hasResults = false;
+      bool anArgumentIsInResult = false;
       std::shared_ptr<GeomAPI_Shape> aShape(new GeomAPI_Shape);
       aShape->setImpl(new TopoDS_Shape(aShapeIt.Value()));
       ListOfShape aGeneratedShapes;
       aMakeShape->generated(aShape, aGeneratedShapes);
-      for(ListOfShape::const_iterator
-          anIt = aGeneratedShapes.cbegin(); anIt != aGeneratedShapes.cend(); anIt++) {
+      for (ListOfShape::const_iterator
+        anIt = aGeneratedShapes.cbegin(); anIt != aGeneratedShapes.cend(); anIt++) {
         const TopoDS_Shape& anItShape = (*anIt)->impl<TopoDS_Shape>();
+        if (anItShape.IsSame(aShapeIt.Value())) {
+          anArgumentIsInResult = true;
+          continue;
+        }
         aTempShapes.Add(anItShape);
         if(aResultShapesMap.Add(anItShape) == Standard_True) {
           aResultShapesList.Append(anItShape);
@@ -144,13 +149,17 @@ void GeomAlgoAPI_MakeShapeList::result(const std::shared_ptr<GeomAPI_Shape> theS
       for(ListOfShape::const_iterator
           anIt = aModifiedShapes.cbegin(); anIt != aModifiedShapes.cend(); anIt++) {
         const TopoDS_Shape& anItShape = (*anIt)->impl<TopoDS_Shape>();
+        if (anItShape.IsSame(aShapeIt.Value())) {
+          anArgumentIsInResult = true;
+          continue;
+        }
         aTempShapes.Add(anItShape);
         if(aResultShapesMap.Add(anItShape) == Standard_True) {
           aResultShapesList.Append(anItShape);
         }
         hasResults = true;
       }
-      if(hasResults) {
+      if(hasResults && !anArgumentIsInResult) {
         const TopoDS_Shape& aTopoDSShape = aShapeIt.Value();
         if(aResultShapesMap.Remove(aTopoDSShape) == Standard_True) {
           for(NCollection_List<TopoDS_Shape>::Iterator

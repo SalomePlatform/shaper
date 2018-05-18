@@ -49,6 +49,10 @@
 //#define DEBUG_ACTIVATE_AIS
 //#define DEBUG_DEACTIVATE_AIS
 
+#ifdef TINSPECTOR
+#include <inspector/VInspectorAPI_CallBack.hxx>
+#endif
+
 #define CLEAR_OUTDATED_SELECTION_BEFORE_REDISPLAY
 
 //**************************************************************
@@ -333,11 +337,19 @@ void XGUI_SelectionActivate::activateAIS(const Handle(AIS_InteractiveObject)& th
   }
   if (!aContext.IsNull()) {
     if (myWorkshop->module()) {
-      int aMode = (theMode > 8)? theMode : AIS_Shape::SelectionType(theMode);
+      // the code is obsolete, used in additional check before activate, it was removed
+      //int aMode = (theMode > 8)? theMode : AIS_Shape::SelectionType(theMode);
       aContext->Activate(theIO, theMode, false);
-    } else
+#ifdef TINSPECTOR
+      if (getDisplayer()->getCallBack()) getDisplayer()->getCallBack()->Activate(theIO, theMode);
+#endif
+    }
+    else {
       aContext->Activate(theIO, theMode, false);
-
+#ifdef TINSPECTOR
+      if (getDisplayer()->getCallBack()) getDisplayer()->getCallBack()->Activate(theIO, theMode);
+#endif
+    }
     // the fix from VPA for more suitable selection of sketcher lines
     if (theIO->Width() > 1) {
       double aPrecision = theIO->Width() + 2;

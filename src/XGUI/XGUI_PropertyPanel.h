@@ -87,8 +87,11 @@ Q_OBJECT
   /// Removes all widgets in the widget area of the property panel
   virtual void cleanContent();
 
-  /// Returns currently active widget
-  virtual ModuleBase_ModelWidget* activeWidget() const { return myActiveWidget; }
+  /// Returns currently active widget. This is a widget from internal container of widgets
+  /// (myWidgets) activated/deactivated by focus in property panel. If parameter is true,
+  /// the method finds firstly the custom widget, after the direct active widget.
+  /// \param isUseCustomWidget boolean state if the custom widget might be a result
+  virtual ModuleBase_ModelWidget* activeWidget(const bool isUseCustomWidget = false) const;
 
   /// Activate the next widget in the property panel
   /// \param theWidget a widget. The next widget should be activated
@@ -135,6 +138,12 @@ Q_OBJECT
 
   /// The method is called on accepting of operation
   virtual void onAcceptData();
+
+  /// Set internal active widget, that can be returned as active widget and participate in active
+  /// selection filters/modes in application. It emits signal about property panel activation or
+  /// deactivation and updates selection filters/modes accordingly.
+  /// \param theWidget a widget control to store as internal active widget
+  void setInternalActiveWidget(ModuleBase_ModelWidget* theWidget);
 
 public slots:
   /// \brief Update all widgets in property panel with values from the given feature
@@ -203,6 +212,8 @@ private:
   ModuleBase_ModelWidget* myActiveWidget;
   /// Currently widget processed by preselection
   ModuleBase_ModelWidget* myPreselectionWidget;
+  /// Some custom widget set from outside
+  ModuleBase_ModelWidget* myInternalActiveWidget;
 
   XGUI_OperationMgr* myOperationMgr;
 };

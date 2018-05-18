@@ -81,9 +81,9 @@ Plane_5 = model.addPlane(Part_1_doc, model.selection("FACE", "Plane_1"), model.s
 Partition_1_objects = [model.selection("EDGE", "Intersection_1_1"), model.selection("FACE", "Plane_2"), model.selection("FACE", "Plane_1")]
 Partition_1 = model.addPartition(Part_1_doc, Partition_1_objects)
 
-Filling_1 = model.addFilling(Part_1_doc, [model.selection("EDGE", "Partition_1_1_4"), model.selection("EDGE", "Edge_1_2")])
+Filling_1 = model.addFilling(Part_1_doc, [model.selection("EDGE", "Partition_1_1_3"), model.selection("EDGE", "Edge_1_2")])
 Filling_2 = model.addFilling(Part_1_doc, [model.selection("EDGE", "Partition_1_1_5"), model.selection("EDGE", "Edge_1_1")])
-Filling_3 = model.addFilling(Part_1_doc, [model.selection("EDGE", "Partition_1_1_3"), model.selection("EDGE", "Edge_1_4")])
+Filling_3 = model.addFilling(Part_1_doc, [model.selection("EDGE", "Partition_1_1_4"), model.selection("EDGE", "Edge_1_4")])
 
 Wire_1 = model.addWire(Part_1_doc, [model.selection("EDGE", "Partition_1_1_1"), model.selection("EDGE", "Partition_1_1_2")])
 Filling_4 = model.addFilling(Part_1_doc, [model.selection("EDGE", "Edge_1_3"), model.selection("WIRE", "Wire_1_1")])
@@ -92,10 +92,10 @@ model.do()
 from GeomAPI import *
 
 # check fillings
-REF_DATA = [(Filling_1, 718.953160474090168463590089232),
-            (Filling_2, 910.697240711571453175565693527),
-            (Filling_3, 718.950138772744594461983069777),
-            (Filling_4, 910.697500240109889091399963945)]
+REF_DATA = [(Filling_1, 718.953888643813570524798706174),
+            (Filling_2, 910.698815675366518007649574429),
+            (Filling_3, 718.953684242875738164002541453),
+            (Filling_4, 910.697703817550063831731677055)]
 for ref in REF_DATA:
     model.testNbResults(ref[0], 1)
     model.testNbSubResults(ref[0], [0])

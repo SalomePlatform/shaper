@@ -78,7 +78,7 @@ class XGUI_EXPORT XGUI_Selection : public ModuleBase_ISelection
   /// It depends on the modes, in which the object is activated in the context
   /// \param theObject an object
   /// \param theOwners a map of entity owners
-  void entityOwners(const Handle_AIS_InteractiveObject& theObject,
+  void entityOwners(const Handle(AIS_InteractiveObject)& theObject,
                     SelectMgr_IndexedMapOfOwner& theOwners) const;
 
   /// Return the IO from the viewer presentation.

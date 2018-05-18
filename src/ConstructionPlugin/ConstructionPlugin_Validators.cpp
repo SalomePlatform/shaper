@@ -26,6 +26,7 @@
 #include <GeomAPI_Lin.h>
 #include <GeomAPI_Pln.h>
 #include <GeomAPI_Vertex.h>
+#include <GeomAPI_Pnt.h>
 #include <GeomAlgoAPI_ShapeTools.h>
 
 #include <ModelAPI_AttributeSelection.h>
@@ -211,6 +212,11 @@ bool ConstructionPlugin_ValidatorPlaneThreePoints::isValid(const AttributePtr& t
   std::shared_ptr<GeomAPI_Pnt> aPnt1 = aVertex1->point();
   std::shared_ptr<GeomAPI_Pnt> aPnt2 = aVertex2->point();
   std::shared_ptr<GeomAPI_Pnt> aPnt3 = aVertex3->point();
+
+  if (aPnt1->isEqual(aPnt2)) {
+    theError = "Selected points are equal";
+    return false;
+  }
 
   std::shared_ptr<GeomAPI_Lin> aLin(new GeomAPI_Lin(aPnt1, aPnt2));
 

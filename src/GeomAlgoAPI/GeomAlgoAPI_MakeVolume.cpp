@@ -27,7 +27,7 @@
 //=================================================================================================
 std::shared_ptr<GeomAPI_Shape> GeomAlgoAPI_MakeVolume::make(const ListOfShape& theFaces)
 {
-  GeomAlgoAPI_MakeVolume aMkVolAlgo(theFaces);
+  GeomAlgoAPI_MakeVolume aMkVolAlgo(theFaces, false);
   GeomShapePtr aResult;
   if(aMkVolAlgo.isDone() && !aMkVolAlgo.shape()->isNull() && aMkVolAlgo.isValid())
     aResult = aMkVolAlgo.shape();
@@ -35,8 +35,10 @@ std::shared_ptr<GeomAPI_Shape> GeomAlgoAPI_MakeVolume::make(const ListOfShape& t
 }
 
 //=================================================================================================
-GeomAlgoAPI_MakeVolume::GeomAlgoAPI_MakeVolume(const ListOfShape& theFaces)
+GeomAlgoAPI_MakeVolume::GeomAlgoAPI_MakeVolume(
+  const ListOfShape& theFaces, const bool theAvoidInternal)
 {
+  myAvoidInternal = theAvoidInternal;
   build(theFaces);
 }
 
@@ -65,21 +67,13 @@ void GeomAlgoAPI_MakeVolume::build(const ListOfShape& theFaces)
   // parameters of the volume maker
   aVolumeMaker->SetArguments(anArgs);
   aVolumeMaker->SetIntersect(true); // split edges and faces
-#ifdef USE_OCCT_720
-  aVolumeMaker->SetAvoidInternalShapes(true);
-#endif
+  aVolumeMaker->SetAvoidInternalShapes(myAvoidInternal);
   aVolumeMaker->SetGlue(BOPAlgo_GlueOff);
 
   // building and getting result
   aVolumeMaker->Perform();
-#ifdef USE_OCCT_720
   if (aVolumeMaker->HasErrors())
     return;
-#else
-  if(aVolumeMaker->ErrorStatus() != 0) {
-    return;
-  }
-#endif
   TopoDS_Shape aResult = aVolumeMaker->Shape();
 
   if(aResult.ShapeType() == TopAbs_COMPOUND) {

@@ -448,13 +448,14 @@ TDF_LabelMap& Model_AttributeSelection::scope()
       }
     }
     // for group Scope is not limitet: this is always up to date objects
-    bool isGroup = aFeature.get() && aFeature->getKind() == "Group";
+    // this causes problem in galeries.py
+    //bool isGroup = aFeature.get() && aFeature->getKind() == "Group";
     for(; aFIter != allFeatures.end(); aFIter++) {
       if (*aFIter == owner()) {  // the left features are created later (except subs of composite)
         aMePassed = true;
         continue;
       }
-      if (isGroup) aMePassed = false;
+      //if (isGroup) aMePassed = false;
       bool isInScope = !aMePassed;
       if (!isInScope && aComposite.get()) {
         // try to add sub-elements of composite if this is composite

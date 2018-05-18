@@ -11,7 +11,7 @@ export AUT_DIR=$(pwd)
 export TOOLS_DIR=$(pwd)
 
 export HOME_OLD=$HOME
-source /dn46/SALOME/series8x/current-2017-07-11/start.sh
+source /dn46/SALOME/series8x/current-2018-05-03/start.sh
 export HOME=$HOME_OLD
 
 # Path to solvespace-2

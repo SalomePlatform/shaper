@@ -47,7 +47,8 @@ void BuildPlugin_CompSolid::execute()
       aShape = aSelection->context()->shape();
     anOriginalShapes.push_back(aShape);
   }
-  std::shared_ptr<GeomAlgoAPI_MakeVolume> anAlgo(new GeomAlgoAPI_MakeVolume(anOriginalShapes));
+  std::shared_ptr<GeomAlgoAPI_MakeVolume> anAlgo(
+    new GeomAlgoAPI_MakeVolume(anOriginalShapes, false));
   GeomShapePtr aVolumeRes = anAlgo->shape();
 
   // check and process result of volume maker

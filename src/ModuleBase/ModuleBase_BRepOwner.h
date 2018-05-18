@@ -52,7 +52,7 @@ public:
   /// \param theStyle a style of presentation
   /// \param theMode a drawing mode
   virtual void HilightWithColor (const Handle(PrsMgr_PresentationManager3d)& aPM,
-    const Handle(Graphic3d_HighlightStyle)& theStyle, const Standard_Integer theMode = 0)
+    const Handle(Prs3d_Drawer)& theStyle, const Standard_Integer theMode = 0)
   {
     Selectable()->HilightOwnerWithColor(aPM, theStyle, this);
   }

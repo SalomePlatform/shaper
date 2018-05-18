@@ -74,10 +74,6 @@ public:
   virtual ~PartSet_SketcherReentrantMgr();
 
 public:
-  /// Returns a first widget of the current opeation if the internal edit operation is active
-  /// or return null. If the current widget of the operation is a viewer selector, it returns null.
-  ModuleBase_ModelWidget* internalActiveWidget() const;
-
   /// Return true if the current edit operation is an internal
   bool isInternalEditActive() const;
 
@@ -214,6 +210,8 @@ private:
   /// Returns the workshop module
   PartSet_Module* module() const;
 
+  void setInternalActiveWidget(ModuleBase_ModelWidget* theWidget);
+
 private:
   ModuleBase_IWorkshop* myWorkshop; /// the workshop
 
@@ -224,7 +222,6 @@ private:
   FeaturePtr myPreviousFeature; /// feature of the previous operation, which is restarted
   FeaturePtr myInternalFeature;
   QWidget* myInternalWidget;
-  ModuleBase_ModelWidget* myInternalActiveWidget;
   std::string myNoMoreWidgetsAttribute;
 
   std::shared_ptr<Events_Message> myReentrantMessage; /// message obtained by operation restart

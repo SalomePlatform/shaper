@@ -232,7 +232,7 @@ bool GeomValidators_ShapeType::isValidShape(const GeomShapePtr theShape,
       aValid = theShape->isEdge();
       break;
     case Line:
-      aValid = theShape->isEdge() && !GeomAPI_Curve(theShape).isCircle();
+      aValid = theShape->isEdge() && GeomAPI_Curve(theShape).isLine();
       break;
     case Circle:
       aValid = theShape->isEdge() && GeomAPI_Curve(theShape).isCircle();

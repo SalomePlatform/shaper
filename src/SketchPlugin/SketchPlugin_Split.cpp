@@ -371,7 +371,7 @@ void SketchPlugin_Split::execute()
       //}
       //aBaseShape = aShape;
 
-#ifdef DEBUG_TRIM_METHODS
+#ifdef DEBUG_SPLIT
       if (!aSelectedShape.get())
         std::cout << "Set empty selected object" << std::endl;
       else
@@ -423,8 +423,8 @@ void SketchPlugin_Split::execute()
 
 std::string SketchPlugin_Split::processEvent(const std::shared_ptr<Events_Message>& theMessage)
 {
-#ifdef DEBUG_TRIM_METHODS
-  std::cout << "SketchPlugin_Trim::processEvent:" << data()->name() << std::endl;
+#ifdef DEBUG_SPLIT
+  std::cout << "SketchPlugin_Split::processEvent:" << data()->name() << std::endl;
 #endif
   std::string aFilledAttributeName;
 
@@ -462,13 +462,23 @@ std::string SketchPlugin_Split::processEvent(const std::shared_ptr<Events_Messag
         Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_UPDATED));
 
         GeomShapePtr aSelectedShape = getSubShape(SELECTED_OBJECT(), SELECTED_POINT());
-  #ifdef DEBUG_TRIM_METHODS
+        if (aSelectedShape.get()) {
+          aFilledAttributeName = SELECTED_OBJECT();
+        }
+        else {
+          // #2480 - sub shape is not initialized when split sketch
+          // If restarted operation use some selection on the shape that is split and
+          // result selectiona can not participate in new split(checked shape above is null),
+          // reset filled values of selection set in this method above
+          aRefSelectedAttr->setValue(ResultPtr());
+          aRefPreviewAttr->setValue(ResultPtr());
+        }
+  #ifdef DEBUG_SPLIT
         if (!aSelectedShape.get())
           std::cout << "Set empty selected object" << std::endl;
         else
           std::cout << "Set shape with ShapeType: " << aSelectedShape->shapeTypeStr() << std::endl;
   #endif
-        aFilledAttributeName = SELECTED_OBJECT();
       }
     }
   }
@@ -537,8 +547,8 @@ AISObjectPtr SketchPlugin_Split::getAISObject(AISObjectPtr thePrevious)
     return anAIS;
   }
   return AISObjectPtr();*/
-#ifdef DEBUG_TRIM_METHODS
-  std::cout << "SketchPlugin_Trim::getAISObject: " << data()->name() << std::endl;
+#ifdef DEBUG_SPLIT
+  std::cout << "SketchPlugin_Split::getAISObject: " << data()->name() << std::endl;
 #endif
 
   AISObjectPtr anAIS = thePrevious;

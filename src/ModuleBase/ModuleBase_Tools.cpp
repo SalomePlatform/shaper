@@ -25,6 +25,7 @@
 #include <ModuleBase_WidgetFactory.h>
 #include <ModuleBase_IWorkshop.h>
 #include <ModuleBase_IModule.h>
+#include <ModuleBase_IViewer.h>
 #include <ModuleBase_IconFactory.h>
 #include <ModuleBase_ResultPrs.h>
 #include <ModuleBase_ViewerPrs.h>
@@ -53,6 +54,9 @@
 
 #include <StdSelect_BRepOwner.hxx>
 #include <TopoDS_Iterator.hxx>
+#include <AIS_InteractiveContext.hxx>
+#include <Prs3d_LineAspect.hxx>
+#include <Prs3d_PlaneAspect.hxx>
 
 #include <GeomDataAPI_Point2D.h>
 #include <Events_InfoMessage.h>
@@ -1137,10 +1141,15 @@ void setPointBallHighlighting(AIS_Shape* theAIS)
   }
 
   Handle(Graphic3d_AspectMarker3d) anAspect;
-  Handle(Prs3d_Drawer) aDrawer = theAIS->HilightAttributes();
-#ifdef USE_OCCT_720
-  // to do: implement ball highlighting, in 7.2.0 this drawer is NULL
-#else
+  Handle(Prs3d_Drawer) aDrawer = theAIS->DynamicHilightAttributes();
+  if (aDrawer.IsNull()) {
+    if (ModuleBase_IViewer::DefaultHighlightDrawer.IsNull())
+      return;
+    aDrawer = new Prs3d_Drawer(*ModuleBase_IViewer::DefaultHighlightDrawer);
+    if (!aDrawer->HasOwnPointAspect()) {
+      aDrawer->SetPointAspect(new Prs3d_PointAspect(Aspect_TOM_BALL, Quantity_NOC_BLACK, 2.0));
+    }
+  }
   if(aDrawer->HasOwnPointAspect()) {
     Handle(Prs3d_PointAspect) aPntAspect = aDrawer->PointAspect();
     if(aPixMap->IsEmpty()) {
@@ -1156,9 +1165,8 @@ void setPointBallHighlighting(AIS_Shape* theAIS)
       aPntAspect->SetAspect(anAspect);
     }
     aDrawer->SetPointAspect(aPntAspect);
-    theAIS->SetHilightAttributes(aDrawer);
+	  theAIS->SetDynamicHilightAttributes(aDrawer);
   }
-#endif
 }
 
 } // namespace ModuleBase_Tools

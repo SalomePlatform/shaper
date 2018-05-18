@@ -31,7 +31,6 @@
 #include <GeomAPI_Wire.h>
 
 #include <Bnd_Box.hxx>
-#include <BOPTools.hxx>
 #include <BRep_Builder.hxx>
 #include <BRepAdaptor_Curve.hxx>
 #include <BRepAlgo.hxx>
@@ -182,8 +181,8 @@ std::shared_ptr<GeomAPI_Shape> GeomAlgoAPI_ShapeTools::combineShapes(
   }
 
   // Map subshapes and shapes.
-  BOPCol_IndexedDataMapOfShapeListOfShape aMapSA;
-  BOPTools::MapShapesAndAncestors(aShapesComp, aTS, aTA, aMapSA);
+  TopTools_IndexedDataMapOfShapeListOfShape aMapSA;
+  TopExp::MapShapesAndAncestors(aShapesComp, aTS, aTA, aMapSA);
   if(aMapSA.IsEmpty()) {
     return aResult;
   }
@@ -191,10 +190,10 @@ std::shared_ptr<GeomAPI_Shape> GeomAlgoAPI_ShapeTools::combineShapes(
   // Get all shapes with common subshapes and free shapes.
   NCollection_Map<TopoDS_Shape> aFreeShapes;
   NCollection_Vector<NCollection_Map<TopoDS_Shape>> aShapesWithCommonSubshapes;
-  for(BOPCol_IndexedDataMapOfShapeListOfShape::Iterator
+  for(TopTools_IndexedDataMapOfShapeListOfShape::Iterator
       anIter(aMapSA); anIter.More(); anIter.Next()) {
     const TopoDS_Shape& aShape = anIter.Key();
-    BOPCol_ListOfShape& aListOfShape = anIter.ChangeValue();
+    TopTools_ListOfShape& aListOfShape = anIter.ChangeValue();
     if(aListOfShape.IsEmpty()) {
       continue;
     }
@@ -205,40 +204,39 @@ std::shared_ptr<GeomAPI_Shape> GeomAlgoAPI_ShapeTools::combineShapes(
     } else {
       NCollection_List<TopoDS_Shape> aTempList;
       NCollection_Map<TopoDS_Shape> aTempMap;
-      const TopoDS_Shape& aF = aListOfShape.First();
-      const TopoDS_Shape& aL = aListOfShape.Last();
-      aTempList.Append(aF);
-      aTempList.Append(aL);
-      aTempMap.Add(aF);
-      aTempMap.Add(aL);
-      aFreeShapes.Remove(aF);
-      aFreeShapes.Remove(aL);
+      for (TopTools_ListOfShape::Iterator aListIt(aListOfShape); aListIt.More(); aListIt.Next()) {
+        aTempList.Append(aListIt.Value());
+        aTempMap.Add(aListIt.Value());
+        aFreeShapes.Remove(aListIt.Value());
+      }
       aListOfShape.Clear();
       for(NCollection_List<TopoDS_Shape>::Iterator
           aTempIter(aTempList); aTempIter.More(); aTempIter.Next()) {
         const TopoDS_Shape& aTempShape = aTempIter.Value();
-        for(BOPCol_IndexedDataMapOfShapeListOfShape::Iterator
+        for(TopTools_IndexedDataMapOfShapeListOfShape::Iterator
             anIter(aMapSA); anIter.More(); anIter.Next()) {
-          BOPCol_ListOfShape& aTempListOfShape = anIter.ChangeValue();
+          TopTools_ListOfShape& aTempListOfShape = anIter.ChangeValue();
           if(aTempListOfShape.IsEmpty()) {
             continue;
           } else if(aTempListOfShape.Size() == 1 && aTempListOfShape.First() == aTempShape) {
             aTempListOfShape.Clear();
           } else if(aTempListOfShape.Size() > 1) {
-            if(aTempListOfShape.First() == aTempShape) {
-              const TopoDS_Shape& aTL = aTempListOfShape.Last();
-              if(aTempMap.Add(aTL)) {
-                aTempList.Append(aTL);
-                aFreeShapes.Remove(aTL);
+            TopTools_ListOfShape::Iterator anIt1(aTempListOfShape);
+            for (; anIt1.More(); anIt1.Next()) {
+              if (anIt1.Value() == aTempShape) {
+                TopTools_ListOfShape::Iterator anIt2(aTempListOfShape);
+                for (; anIt2.More(); anIt2.Next())
+                {
+                  if (anIt2.Value() != anIt1.Value()) {
+                    if (aTempMap.Add(anIt2.Value())) {
+                      aTempList.Append(anIt2.Value());
+                      aFreeShapes.Remove(anIt2.Value());
+                    }
+                  }
+                }
+                aTempListOfShape.Clear();
+                break;
               }
-              aTempListOfShape.Clear();
-            } else if(aTempListOfShape.Last() == aTempShape) {
-              const TopoDS_Shape& aTF = aTempListOfShape.First();
-              if(aTempMap.Add(aTF)) {
-                aTempList.Append(aTF);
-                aFreeShapes.Remove(aTF);
-              }
-              aTempListOfShape.Clear();
             }
           }
         }
@@ -341,7 +339,7 @@ std::shared_ptr<GeomAPI_Shape> GeomAlgoAPI_ShapeTools::groupSharedTopology(
 {
   GeomShapePtr aResult = theCompound;
 
-  if(!theCompound.get()) {
+  if (!theCompound.get()) {
     return aResult;
   }
 
@@ -350,23 +348,24 @@ std::shared_ptr<GeomAPI_Shape> GeomAlgoAPI_ShapeTools::groupSharedTopology(
   addSimpleShapeToList(anInShape, anUngroupedShapes);
 
   // Iterate over all shapes and find shapes with shared vertices.
-  TopTools_ListOfShape aMapOrder;
-  BOPCol_DataMapOfShapeListOfShape aVertexShapesMap;
-  for(NCollection_List<TopoDS_Shape>::Iterator aShapesIt(anUngroupedShapes);
-      aShapesIt.More();
-      aShapesIt.Next()) {
+  TopTools_ListOfShape allVertices;
+  TopTools_DataMapOfShapeListOfShape aVertexShapesMap;
+  for (NCollection_List<TopoDS_Shape>::Iterator aShapesIt(anUngroupedShapes);
+    aShapesIt.More();
+    aShapesIt.Next()) {
     const TopoDS_Shape& aShape = aShapesIt.Value();
-    for(TopExp_Explorer aShapeExp(aShape, TopAbs_VERTEX);
-        aShapeExp.More();
-        aShapeExp.Next()) {
+    for (TopExp_Explorer aShapeExp(aShape, TopAbs_VERTEX);
+      aShapeExp.More();
+      aShapeExp.Next()) {
       const TopoDS_Shape& aVertex = aShapeExp.Current();
       if (!aVertexShapesMap.IsBound(aVertex)) {
         NCollection_List<TopoDS_Shape> aList;
         aList.Append(aShape);
-        aMapOrder.Append(aVertex);
+        allVertices.Append(aVertex);
         aVertexShapesMap.Bind(aVertex, aList);
-      } else {
-        if(!aVertexShapesMap.ChangeFind(aVertex).Contains(aShape)) {
+      }
+      else {
+        if (!aVertexShapesMap.ChangeFind(aVertex).Contains(aShape)) {
           aVertexShapesMap.ChangeFind(aVertex).Append(aShape);
         }
       }
@@ -374,55 +373,56 @@ std::shared_ptr<GeomAPI_Shape> GeomAlgoAPI_ShapeTools::groupSharedTopology(
   }
 
   // Iterate over the map and group shapes.
-  NCollection_Vector<TopTools_ListOfShape> aGroups;
-  while (!aMapOrder.IsEmpty()) {
+  NCollection_Vector<TopTools_ListOfShape> aGroups; // groups of shapes connected by vertices
+  while (!allVertices.IsEmpty()) {
     // Get first group of shapes in map, and then unbind it.
-    const TopoDS_Shape& aKey = aMapOrder.First();
-    TopTools_ListOfShape aGroupedShapes = aVertexShapesMap.Find(aKey);
+    const TopoDS_Shape& aKey = allVertices.First();
+    TopTools_ListOfShape aConnectedShapes = aVertexShapesMap.Find(aKey);
     aVertexShapesMap.UnBind(aKey);
-    aMapOrder.Remove(aKey);
+    allVertices.Remove(aKey);
     // Iterate over shapes in this group and add to it shapes from groups in map.
-    for(TopTools_ListOfShape::Iterator aGroupIt(aGroupedShapes);
-        aGroupIt.More(); aGroupIt.Next()) {
-      const TopoDS_Shape& aGroupedShape = aGroupIt.Value();
+    for (TopTools_ListOfShape::Iterator aConnectedIt(aConnectedShapes);
+      aConnectedIt.More(); aConnectedIt.Next()) {
+      const TopoDS_Shape& aConnected = aConnectedIt.Value();
       TopTools_ListOfShape aKeysToUnbind;
-      for(TopTools_ListOfShape::Iterator aKeysIt(aMapOrder);
-          aKeysIt.More();
-          aKeysIt.Next()) {
-        const TopTools_ListOfShape& aGroupInMap = aVertexShapesMap(aKeysIt.Value());
-        if(!aGroupInMap.Contains(aGroupedShape)) {
-          // Group in map does not containt shape from our group, so go to the next group in map.
+      for (TopTools_ListOfShape::Iterator aKeysIt(allVertices);
+        aKeysIt.More();
+        aKeysIt.Next()) {
+        const TopTools_ListOfShape& anOtherConnected = aVertexShapesMap(aKeysIt.Value());
+        if (!anOtherConnected.Contains(aConnected)) {
+          // Other connected group does not containt shape from our connected group
           continue;
         }
-        // Iterate over shape in group in map, and add new shapes into our group.
-        for(TopTools_ListOfShape::Iterator aGroupInMapIt(aGroupInMap);
-            aGroupInMapIt.More();
-            aGroupInMapIt.Next()) {
-          const TopoDS_Shape& aShape = aGroupInMapIt.Value();
-          if (!aGroupedShapes.Contains(aShape)) {
-            aGroupedShapes.Append(aShape);
+        // Other is connected to our, so add them to our connected
+        for (TopTools_ListOfShape::Iterator anOtherIt(anOtherConnected);
+          anOtherIt.More();
+          anOtherIt.Next()) {
+          const TopoDS_Shape& aShape = anOtherIt.Value();
+          if (!aConnectedShapes.Contains(aShape)) {
+            aConnectedShapes.Append(aShape);
           }
         }
         // Save key to unbind from this map.
         aKeysToUnbind.Append(aKeysIt.Value());
       }
       // Unbind groups from map that we added to our group.
-      for(TopTools_ListOfShape::Iterator aKeysIt(aKeysToUnbind);
-          aKeysIt.More();
-          aKeysIt.Next()) {
+      for (TopTools_ListOfShape::Iterator aKeysIt(aKeysToUnbind);
+        aKeysIt.More();
+        aKeysIt.Next()) {
         aVertexShapesMap.UnBind(aKeysIt.Value());
-        aMapOrder.Remove(aKeysIt.Value());
+        allVertices.Remove(aKeysIt.Value());
       }
     }
-    // Sort shapes.
+    // Sort shapes from the most complicated to the simplest ones
     TopTools_ListOfShape aSortedGroup;
-    for(int aST = TopAbs_COMPOUND; aST <= TopAbs_SHAPE; ++aST) {
-      TopTools_ListOfShape::Iterator anIt(aGroupedShapes);
+    for (int aST = TopAbs_COMPOUND; aST <= TopAbs_SHAPE; ++aST) {
+      TopTools_ListOfShape::Iterator anIt(aConnectedShapes);
       while (anIt.More()) {
-        if(anIt.Value().ShapeType() == aST) {
+        if (anIt.Value().ShapeType() == aST) {
           aSortedGroup.Append(anIt.Value());
-          aGroupedShapes.Remove(anIt);
-        } else {
+          aConnectedShapes.Remove(anIt);
+        }
+        else {
           anIt.Next();
         }
       }
@@ -846,13 +846,8 @@ void GeomAlgoAPI_ShapeTools::splitShape(const std::shared_ptr<GeomAPI_Shape>& th
   }
 
   aBOP.Perform();
-#ifdef USE_OCCT_720
   if (aBOP.HasErrors())
     return;
-#else
-  if (aBOP.ErrorStatus())
-    return;
-#endif
 
   // Collect splits
   const TopTools_ListOfShape& aSplits = aBOP.Modified(aBaseEdge);
@@ -896,13 +891,8 @@ void GeomAlgoAPI_ShapeTools::splitShape_p(const std::shared_ptr<GeomAPI_Shape>& 
   }
 
   aBOP.Perform();
-#ifdef USE_OCCT_720
   if (aBOP.HasErrors())
     return;
-#else
-  if (aBOP.ErrorStatus())
-    return;
-#endif
 
   // Collect splits
   const TopTools_ListOfShape& aSplits = aBOP.Modified(aBaseEdge);

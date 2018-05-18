@@ -100,8 +100,12 @@ bool ModuleBase_PagedContainer::restoreValueCustom()
 
   DataPtr aData = myFeature->data();
   AttributeStringPtr aStringAttr = aData->string(attributeID());
-  QString aCaseId = QString::fromStdString(aDefVal.empty()?
-                                           aStringAttr->value() : aDefVal);
+  QString aCaseId;
+  if (myIsEditing)
+    aCaseId = QString::fromStdString(aStringAttr->value());
+  else
+    aCaseId = QString::fromStdString(aDefVal.empty()? aStringAttr->value() : aDefVal);
+
   myIsFirst = false;
   int idx = myCaseIds.indexOf(aCaseId);
   if (idx == -1)

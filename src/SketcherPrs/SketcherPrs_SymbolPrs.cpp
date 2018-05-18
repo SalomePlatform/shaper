@@ -99,7 +99,7 @@ public:
 
     // Update selection position only if there is no selected object
     // because it can corrupt selection of other objects
-    if ((myContext->NbCurrents() == 0) && (myContext->NbSelected() == 0))  {
+    if (myContext->NbSelected() == 0)  {
       myContext->MainSelector()->RebuildSensitivesTree(myObj);
       myContext->MainSelector()->RebuildObjectsTree (false);
     }
@@ -243,7 +243,7 @@ void SketcherPrs_SymbolPrs::HilightSelected(const Handle(PrsMgr_PresentationMana
 //*********************************************************************************
 void SketcherPrs_SymbolPrs::HilightOwnerWithColor(
                                   const Handle(PrsMgr_PresentationManager3d)& thePM,
-                                  const Handle(Graphic3d_HighlightStyle)& theStyle,
+                                  const Handle(Prs3d_Drawer)& theStyle,
                                   const Handle(SelectMgr_EntityOwner)& theOwner)
 {
   thePM->Color(this, theStyle);

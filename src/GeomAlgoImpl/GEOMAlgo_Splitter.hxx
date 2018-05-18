@@ -36,9 +36,6 @@
 
 #include <TopoDS_Shape.hxx>
 
-#include <BOPCol_ListOfShape.hxx>
-#include <BOPCol_MapOfShape.hxx>
-
 #include <BOPAlgo_Builder.hxx>
 
 //=======================================================================
@@ -67,7 +64,7 @@
   GEOMALGOIMPL_EXPORT void AddTool(const TopoDS_Shape& theShape);
 
   /// Returns list of tool shapes
-  GEOMALGOIMPL_EXPORT const BOPCol_ListOfShape& Tools()const;
+  GEOMALGOIMPL_EXPORT const NCollection_List<TopoDS_Shape>& Tools()const;
 
   /// Set type of used shapes
   /// \param aLimit a shape type
@@ -96,10 +93,10 @@
   
  protected:
    /// List of tools
-  BOPCol_ListOfShape myTools; 
+  NCollection_List<TopoDS_Shape> myTools;
 
   /// Map of tools
-  BOPCol_MapOfShape myMapTools;        
+  NCollection_Map<TopoDS_Shape> myMapTools;
 
   /// A limit type
   TopAbs_ShapeEnum myLimit;   
