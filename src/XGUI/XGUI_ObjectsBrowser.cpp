@@ -546,6 +546,20 @@ void XGUI_ObjectsBrowser::setObjectsSelected(const QObjectPtrList& theObjects)
 }
 
 //***************************************************
+void XGUI_ObjectsBrowser::ensureVisible(const ObjectPtr theObject)
+{
+  QModelIndex aIndex = myDocModel->objectIndex(theObject);
+  if (aIndex.isValid())  {
+    QModelIndex aParent = aIndex.parent();
+    while (aParent.isValid()) {
+      myTreeView->expand(aParent);
+      aParent = aParent.parent();
+    }
+    myTreeView->scrollTo(aIndex);
+  }
+}
+
+//***************************************************
 void XGUI_ObjectsBrowser::clearContent()
 {
   myTreeView->clear();

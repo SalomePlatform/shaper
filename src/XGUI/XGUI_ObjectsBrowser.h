@@ -168,6 +168,10 @@ Q_OBJECT
   /// \param theObjects list of objects to select
   void setObjectsSelected(const QObjectPtrList& theObjects);
 
+  //! Scroll TreeView to make given object visible
+  //! \param theObject object to make it visible
+  void ensureVisible(const ObjectPtr theObject);
+
   //! Returns currently selected indexes
   QModelIndexList selectedIndexes() const
   {
