@@ -53,7 +53,7 @@
 /// Returns ResultPart object if the given object is a Part feature
 /// Otherwise returns NULL
 
-#define SELECTABLE_COLOR QColor(80, 80, 80)
+#define SELECTABLE_COLOR QColor(110, 110, 110)
 #define DISABLED_COLOR QColor(200, 200, 200)
 
 
