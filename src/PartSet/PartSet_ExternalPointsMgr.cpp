@@ -101,7 +101,8 @@ QList<std::shared_ptr<ModuleBase_ViewerPrs>> PartSet_ExternalPointsMgr::findCirc
     ResultPtr aResObj = std::dynamic_pointer_cast<ModelAPI_Result>(aObj);
 
     // Do not use Fields and groups in selection in sketcher
-    if ((aResObj->groupName() == ModelAPI_ResultField::group()) ||
+    if (!aResObj.get() ||
+      (aResObj->groupName() == ModelAPI_ResultField::group()) ||
       (aResObj->groupName() == ModelAPI_ResultGroup::group()))
       continue;
 
