@@ -78,8 +78,38 @@ void ParametersPlugin_Parameter::updateName()
   data()->setName(aName);
 
   ResultParameterPtr aParam = document()->createParameter(data());
+  std::string anOldName = aParam->data()->name();
   aParam->data()->setName(aName);
   setResult(aParam);
+
+
+  // #2474 : if parameter name now hides/shows the higher level parameter name,
+  // update the depended expressions
+  DocumentPtr aRootDoc = ModelAPI_Session::get()->moduleDocument();
+  if (aParam->document() != aRootDoc) {
+    std::list<std::string> aNames; // collect names in the root document that must be checked
+    aNames.push_back(aName);
+    if (anOldName != aName) {
+      aNames.push_back(anOldName);
+    }
+    std::list<std::string>::iterator aNIter = aNames.begin();
+    for (; aNIter != aNames.end(); aNIter++) {
+      double aValue;
+      ResultParameterPtr aRootParam;
+      FeaturePtr aThis =
+        std::dynamic_pointer_cast<ModelAPI_Feature>(string(VARIABLE_ID())->owner());
+      if (ModelAPI_Tools::findVariable(aThis, *aNIter, aValue, aRootParam, aRootDoc)) {
+        std::set<std::shared_ptr<ModelAPI_Attribute> > anAttributes =
+          aRootParam->data()->refsToMe();
+        std::set<std::shared_ptr<ModelAPI_Attribute> >::const_iterator anAttributeIt =
+          anAttributes.cbegin();
+        for (; anAttributeIt != anAttributes.cend(); ++anAttributeIt) {
+          const AttributePtr& anAttribute = *anAttributeIt;
+          ModelAPI_AttributeEvalMessage::send(anAttribute, NULL);
+        }
+      }
+    }
+  }
 }
 
 bool ParametersPlugin_Parameter::updateExpression()
@@ -97,6 +127,7 @@ bool ParametersPlugin_Parameter::updateExpression()
   AttributeDoublePtr aValueAttribute = aParam->data()->real(ModelAPI_ResultParameter::VALUE());
   aValueAttribute->setValue(aValue);
   setResult(aParam);
+
   return true;
 }
 
