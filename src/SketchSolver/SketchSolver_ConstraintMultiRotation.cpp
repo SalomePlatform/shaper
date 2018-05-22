@@ -35,7 +35,7 @@
 
 void SketchSolver_ConstraintMultiRotation::getAttributes(
     EntityWrapperPtr& theCenter, ScalarWrapperPtr& theAngle,
-    bool& theFullValue, std::list<EntityWrapperPtr>& theEntities)
+    bool& theFullValue, bool& theReversed, std::list<EntityWrapperPtr>& theEntities)
 {
   AttributePtr anAngleAttr = myBaseConstraint->attribute(SketchPlugin_MultiRotation::ANGLE_ID());
   PlaneGCSSolver_AttributeBuilder aValueBuilder;
@@ -59,6 +59,8 @@ void SketchSolver_ConstraintMultiRotation::getAttributes(
       myBaseConstraint->string(SketchPlugin_MultiRotation::ANGLE_TYPE());
   theFullValue = aMethodTypeAttr->value() != "SingleAngle";
 
+  theReversed = myBaseConstraint->boolean(SketchPlugin_MultiRotation::REVERSED_ID())->value();
+
   getEntities(theEntities);
 
   // add owner of central point of Multi-Rotation to the list of monitored features
@@ -77,7 +79,7 @@ void SketchSolver_ConstraintMultiRotation::process()
 
   EntityWrapperPtr aRotationCenter;
   std::list<EntityWrapperPtr> aBaseEntities;
-  getAttributes(aRotationCenter, myAngle, myIsFullValue, aBaseEntities);
+  getAttributes(aRotationCenter, myAngle, myIsFullValue, myIsRevered, aBaseEntities);
   if (!myErrorMsg.empty())
     return;
 
@@ -90,10 +92,12 @@ void SketchSolver_ConstraintMultiRotation::process()
 void SketchSolver_ConstraintMultiRotation::updateLocal()
 {
   double aValue = myBaseConstraint->real(SketchPlugin_MultiRotation::ANGLE_ID())->value();
-  if (fabs(myAngle->value() - aValue) > tolerance)
+  bool isReversed = myBaseConstraint->boolean(SketchPlugin_MultiRotation::REVERSED_ID())->value();
+  if (fabs(myAngle->value() - aValue) > tolerance || isReversed != myIsRevered)
     myAdjusted = false;
   // update angle value
   myAngle->setValue(aValue);
+  myIsRevered = isReversed;
 
   // update center
   DataPtr aData = myBaseConstraint->data();
@@ -123,6 +127,8 @@ void SketchSolver_ConstraintMultiRotation::adjustConstraint()
     myStorage->setNeedToResolve(false);
     return;
   }
+  if (myIsRevered)
+    anAngleValue *= -1.0;
 
   // Obtain coordinates of rotation center
   AttributeRefAttrPtr aCenterAttr =
@@ -145,7 +151,14 @@ void SketchSolver_ConstraintMultiRotation::adjustConstraint()
   }
 
   if (myIsFullValue && myNumberOfCopies > 0)
-    anAngleValue /= myNumberOfCopies;
+  {
+    // if the full angle value is equal to 360, then distribute rotated items
+    // to avoid superposition of original feature and last copy
+    if (fabs(anAngleValue - 360.0) < 1.e-7)
+      anAngleValue /= (myNumberOfCopies + 1);
+    else
+      anAngleValue /= myNumberOfCopies;
+  }
 
   myRotationVal[0] = sin(anAngleValue * PI / 180.0);
   myRotationVal[1] = cos(anAngleValue * PI / 180.0);

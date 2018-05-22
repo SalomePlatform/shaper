@@ -281,7 +281,8 @@ public:
       const ModelHighAPI_RefAttr & theCenter,
       const ModelHighAPI_Double & theAngle,
       const ModelHighAPI_Integer & theNumberOfObjects,
-      bool theFullValue = false);
+      bool theFullValue = false,
+      bool theReversed  = false);
 
   /// Add split
   SKETCHAPI_EXPORT

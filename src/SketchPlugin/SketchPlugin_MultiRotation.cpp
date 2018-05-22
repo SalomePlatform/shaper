@@ -23,6 +23,7 @@
 
 #include <GeomDataAPI_Point2D.h>
 #include <ModelAPI_AttributeRefAttr.h>
+#include <ModelAPI_AttributeBoolean.h>
 #include <ModelAPI_AttributeDouble.h>
 #include <ModelAPI_AttributeString.h>
 #include <ModelAPI_AttributeInteger.h>
@@ -43,9 +44,12 @@
 
 #include <cmath>
 
-#define PI 3.1415926535897932
+static const double PI = 3.1415926535897932;
+static const double PERIOD = 360.0;
+static const double ANGLETOL = 1.e-7;
 
 SketchPlugin_MultiRotation::SketchPlugin_MultiRotation()
+  : isUpdatingAngle(false)
 {
 }
 
@@ -59,6 +63,8 @@ void SketchPlugin_MultiRotation::initAttributes()
   data()->addAttribute(SketchPlugin_Constraint::ENTITY_A(), ModelAPI_AttributeRefList::typeId());
   data()->addAttribute(SketchPlugin_Constraint::ENTITY_B(), ModelAPI_AttributeRefList::typeId());
   data()->addAttribute(ROTATION_LIST_ID(), ModelAPI_AttributeRefList::typeId());
+  data()->addAttribute(REVERSED_ID(), ModelAPI_AttributeBoolean::typeId());
+
   ModelAPI_Session::get()->validators()->
     registerNotObligatory(getKind(), SketchPlugin_Constraint::ENTITY_A());
   ModelAPI_Session::get()->validators()->
@@ -371,5 +377,30 @@ void SketchPlugin_MultiRotation::attributeChanged(const std::string& theID)
       aRefListOfRotated->clear();
       reflist(SketchPlugin_Constraint::ENTITY_A())->clear();
     }
+  }
+  else if (!isUpdatingAngle && real(ANGLE_ID())->isInitialized())
+  {
+    isUpdatingAngle = true;
+    AttributeDoublePtr anAngle = real(ANGLE_ID());
+    if (theID == ANGLE_TYPE() && integer(NUMBER_OF_OBJECTS_ID())->isInitialized()) {
+      if (string(ANGLE_TYPE())->value() != "SingleAngle")
+        anAngle->setValue(anAngle->value() * (integer(NUMBER_OF_OBJECTS_ID())->value() - 1));
+      else
+      {
+        int aNbSplits = integer(NUMBER_OF_OBJECTS_ID())->value();
+        if (anAngle->value() < PERIOD - ANGLETOL)
+          aNbSplits -= 1;
+        anAngle->setValue(anAngle->value() / aNbSplits);
+      }
+    }
+    else if (theID == ANGLE_ID()) {
+      if (anAngle->value() > PERIOD + ANGLETOL || anAngle->value() < -ANGLETOL)
+        anAngle->setValue(anAngle->value() + PERIOD * ceil(-anAngle->value() / PERIOD));
+      if (fabs(anAngle->value() - PERIOD) < ANGLETOL)
+        anAngle->setValue(PERIOD);
+      else if (fabs(anAngle->value()) < ANGLETOL)
+        anAngle->setValue(0.);
+    }
+    isUpdatingAngle = false;
   }
 }

@@ -607,14 +607,30 @@ email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com
                          label="Angle"
                          icon="icons/Sketch/angle.png"
                          tooltip="Rotation angle"
-                         default="90" use_reset="false"/>
+                         default="90" min="0" max="360"
+                         use_reset="false">
+              <validator id="SketchPlugin_MultiRotationAngleValidator" />
+            </doublevalue>
+            <boolvalue id="MultiRotationReversed"
+                       label="Reversed"
+                       tooltip="Reverse angular copy"
+                       default="false"
+                       obligatory="0"/>
           </box>
           <box id="FullAngle" title="Full angle" icon="icons/Sketch/angle_up_full_32x32.png">
             <doublevalue id="MultiRotationAngle"
                          label="Angle"
                          icon="icons/Sketch/angle.png"
                          tooltip="Rotation angle"
-                         default="90" use_reset="false"/>
+                         default="90" min="0" max="360"
+                         use_reset="false">
+              <validator id="SketchPlugin_MultiRotationAngleValidator" />
+            </doublevalue>
+            <boolvalue id="MultiRotationReversed"
+                       label="Reversed"
+                       tooltip="Reverse angular copy"
+                       default="false"
+                       obligatory="0"/>
           </box>
         </toolbox>
         <integervalue id="MultiRotationObjects"

@@ -30,6 +30,7 @@
 #include "SketchPlugin_Line.h"
 #include "SketchPlugin_MacroArc.h"
 #include "SketchPlugin_MacroCircle.h"
+#include "SketchPlugin_MultiRotation.h"
 #include "SketchPlugin_Point.h"
 #include "SketchPlugin_Sketch.h"
 #include "SketchPlugin_Trim.h"
@@ -42,8 +43,8 @@
 #include <ModelAPI_Data.h>
 #include <ModelAPI_Validator.h>
 #include <ModelAPI_AttributeDouble.h>
+#include <ModelAPI_AttributeInteger.h>
 #include <ModelAPI_AttributeRefAttr.h>
-
 #include <ModelAPI_AttributeRefAttrList.h>
 #include <ModelAPI_AttributeRefList.h>
 #include <ModelAPI_AttributeSelectionList.h>
@@ -1635,4 +1636,45 @@ bool SketchPlugin_SketchFeatureValidator::isValid(const AttributePtr& theAttribu
 
   theError = "The object selected is not a sketch feature";
   return false;
+}
+
+bool SketchPlugin_MultiRotationAngleValidator::isValid(const AttributePtr& theAttribute,
+                                                       const std::list<std::string>& theArguments,
+                                                       Events_InfoMessage& theError) const
+{
+  if (theAttribute->attributeType() != ModelAPI_AttributeDouble::typeId()) {
+    theError = "The attribute with the %1 type is not processed";
+    theError.arg(theAttribute->attributeType());
+    return false;
+  }
+
+  AttributeDoublePtr anAngleAttr =
+    std::dynamic_pointer_cast<ModelAPI_AttributeDouble>(theAttribute);
+
+  FeaturePtr aMultiRotation = ModelAPI_Feature::feature(theAttribute->owner());
+  AttributeStringPtr anAngleType =
+      aMultiRotation->string(SketchPlugin_MultiRotation::ANGLE_TYPE());
+  AttributeIntegerPtr aNbCopies =
+      aMultiRotation->integer(SketchPlugin_MultiRotation::NUMBER_OF_OBJECTS_ID());
+
+  if (anAngleType->value() != "FullAngle")
+  {
+    double aFullAngleValue = anAngleAttr->value() * (aNbCopies->value() - 1);
+    if (aFullAngleValue < -1.e-7 || aFullAngleValue > 359.9999999)
+    {
+      theError = "Rotation single angle should produce full angle less than 360 degree";
+      return false;
+    }
+  }
+  else
+  {
+    double aFullAngleValue = anAngleAttr->value();
+    if (aFullAngleValue < -1.e-7 || aFullAngleValue > 360.0000001)
+    {
+      theError = "Rotation full angle should be in range [0, 360]";
+      return false;
+    }
+  }
+
+  return true;
 }

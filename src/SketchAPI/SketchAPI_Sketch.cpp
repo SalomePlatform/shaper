@@ -509,13 +509,14 @@ std::shared_ptr<SketchAPI_Rotation> SketchAPI_Sketch::addRotation(
     const ModelHighAPI_RefAttr & theCenter,
     const ModelHighAPI_Double & theAngle,
     const ModelHighAPI_Integer & theNumberOfObjects,
-    bool theFullValue)
+    bool theFullValue,
+    bool theReversed)
 {
   std::shared_ptr<ModelAPI_Feature> aFeature =
     compositeFeature()->addFeature(SketchPlugin_MultiRotation::ID());
   return RotationPtr(
     new SketchAPI_Rotation(aFeature, theObjects, theCenter,
-                           theAngle, theNumberOfObjects, theFullValue));
+                           theAngle, theNumberOfObjects, theFullValue, theReversed));
 }
 
 //--------------------------------------------------------------------------------------
