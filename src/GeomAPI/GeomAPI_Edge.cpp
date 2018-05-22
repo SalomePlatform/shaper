@@ -38,6 +38,8 @@
 #include <Geom_Line.hxx>
 #include <Geom_Circle.hxx>
 #include <Geom_Ellipse.hxx>
+#include <Geom_Plane.hxx>
+#include <GeomAPI_IntCS.hxx>
 #include <GeomAdaptor_Curve.hxx>
 #include <gp_Ax1.hxx>
 #include <gp_Pln.hxx>
@@ -278,6 +280,33 @@ bool GeomAPI_Edge::isInPlane(std::shared_ptr<GeomAPI_Pln> thePlane) const
               aPlane.SquareDistance(aLastPnt) < Precision::SquareConfusion();
   }
   return inPlane;
+}
+
+std::list<std::shared_ptr<GeomAPI_Pnt>> GeomAPI_Edge::intersectWithPlane(
+  const std::shared_ptr<GeomAPI_Pln> thePlane) const
+{
+  std::list<GeomPointPtr> aResList;
+  double aFirst, aLast;
+  const TopoDS_Shape& aShape = const_cast<GeomAPI_Edge*>(this)->impl<TopoDS_Shape>();
+  Handle(Geom_Curve) aCurve = BRep_Tool::Curve((const TopoDS_Edge&)aShape, aFirst, aLast);
+  if (!aCurve.IsNull()) {
+    double A, B, C, D;
+    thePlane->coefficients(A, B, C, D);
+    gp_Pln aPln(A, B, C, D);
+
+    Handle(Geom_Plane) aPlane = new Geom_Plane(aPln);
+    GeomAPI_IntCS aIntersect;
+    aIntersect.Perform(aCurve, aPlane);
+    if (aIntersect.IsDone() && (aIntersect.NbPoints() > 0)) {
+      gp_Pnt aPnt;
+      for (int i = 1; i <= aIntersect.NbPoints(); i++) {
+        aPnt = aIntersect.Point(i);
+        std::shared_ptr<GeomAPI_Pnt> aPntPtr(new GeomAPI_Pnt(aPnt.X(), aPnt.Y(), aPnt.Z()));
+        aResList.push_back(aPntPtr);
+      }
+    }
+  }
+  return aResList;
 }
 
 double GeomAPI_Edge::length() const

@@ -27,7 +27,7 @@ email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com
         nested="SketchPoint SketchIntersectionPoint SketchLine
                 SketchCircle SketchMacroCircle SketchArc SketchMacroArc
                 SketchRectangle
-                SketchProjection
+                SketchProjection SketchIntersection
                 SketchConstraintLength SketchConstraintRadius SketchConstraintDistance SketchConstraintDistanceHorizontal SketchConstraintDistanceVertical
                 SketchConstraintParallel SketchConstraintPerpendicular
                 SketchConstraintRigid SketchConstraintHorizontal SketchConstraintVertical
@@ -487,6 +487,26 @@ email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com
         </sketch_shape_selector>
         <boolvalue id="IncludeToResult" label="Include into the sketch result" default="true" tooltip="Include projected feature into the sketch result"/>
         <validator id="PartSet_ProjectionSelection"/>
+      </feature>
+
+      <!-- Intersection feature -->
+      <feature
+        id="SketchIntersection"
+        title="Intersection"
+        tooltip="Intersect edge with sketch plane"
+        icon="icons/Sketch/intersection.png">
+        <sketch_shape_selector
+              id="ExternalFeature"
+              label="Object"
+              tooltip="Select external edge."
+              shape_types="edge"
+              use_external="true"
+              can_create_external="false"
+              use_sketch_plane="false">
+          <validator id="SketchPlugin_ProjectionValidator"/>
+        </sketch_shape_selector>
+        <boolvalue id="IncludeToResult" label="Include into the sketch result" default="true" tooltip="Include projected feature into the sketch result"/>
+        <validator id="PartSet_IntersectionSelection"/>
       </feature>
     </group>
 

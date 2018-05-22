@@ -264,6 +264,7 @@ void PartSet_Module::registerValidators()
     new PartSet_MultyTranslationSelection);
   aFactory->registerValidator("PartSet_SplitSelection", new PartSet_SplitSelection);
   aFactory->registerValidator("PartSet_ProjectionSelection", new PartSet_ProjectionSelection);
+  aFactory->registerValidator("PartSet_IntersectionSelection", new PartSet_IntersectionSelection);
 }
 
 //******************************************************

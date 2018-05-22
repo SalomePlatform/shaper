@@ -90,8 +90,15 @@ public:
   void getRange(double& theFirst, double& theLast) const;
 
   /// Returns true, if the edge is fully placed in the specified plane
+  /// \param thePlane a plane for intersection
   GEOMAPI_EXPORT
   bool isInPlane(const std::shared_ptr<GeomAPI_Pln> thePlane) const;
+
+  /// Returns list of intersection points if the edge has intersections with the given plane
+  /// \param thePlane a plane for intersection
+  GEOMAPI_EXPORT
+  std::list<std::shared_ptr<GeomAPI_Pnt>>
+    intersectWithPlane(const std::shared_ptr<GeomAPI_Pln> thePlane) const;
 
   /// Returns edge length.
   GEOMAPI_EXPORT

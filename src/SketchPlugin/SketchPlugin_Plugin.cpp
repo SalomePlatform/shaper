@@ -26,6 +26,7 @@
 #include <SketchPlugin_Circle.h>
 #include <SketchPlugin_Arc.h>
 #include <SketchPlugin_Projection.h>
+#include <SketchPlugin_Intersection.h>
 #include <SketchPlugin_ConstraintAngle.h>
 #include <SketchPlugin_ConstraintCoincidence.h>
 #include <SketchPlugin_ConstraintCollinear.h>
@@ -208,6 +209,8 @@ FeaturePtr SketchPlugin_Plugin::createFeature(std::string theFeatureID)
     return FeaturePtr(new SketchPlugin_Arc);
   } else if (theFeatureID == SketchPlugin_Projection::ID()) {
     return FeaturePtr(new SketchPlugin_Projection);
+  } else if (theFeatureID == SketchPlugin_Intersection::ID()) {
+    return FeaturePtr(new SketchPlugin_Intersection);
   } else if (theFeatureID == SketchPlugin_ConstraintCoincidence::ID()) {
     return FeaturePtr(new SketchPlugin_ConstraintCoincidence);
   } else if (theFeatureID == SketchPlugin_ConstraintCollinear::ID()) {
