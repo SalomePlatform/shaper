@@ -320,9 +320,9 @@ void ModuleBase_PreferencesDlg::createViewerPage(int thePageId)
 
   int sensitivityGroup = myPreferences->addItem(tr("Selection sensitivity"), viewTab);
   myPreferences->setItemProperty("columns", 2, sensitivityGroup);
-  myPreferences->addItem(tr("Vertex"), sensitivityGroup, SUIT_PreferenceMgr::Double,
+  myPreferences->addItem(tr("Vertex"), sensitivityGroup, SUIT_PreferenceMgr::DblSpin,
                          ModuleBase_Preferences::VIEWER_SECTION, "point-selection-sensitivity");
-  myPreferences->addItem(tr("Edge"), sensitivityGroup, SUIT_PreferenceMgr::Double,
+  myPreferences->addItem(tr("Edge"), sensitivityGroup, SUIT_PreferenceMgr::DblSpin,
                          ModuleBase_Preferences::VIEWER_SECTION, "edge-selection-sensitivity");
 }
 
