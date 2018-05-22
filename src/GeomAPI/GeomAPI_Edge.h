@@ -97,8 +97,7 @@ public:
   /// Returns list of intersection points if the edge has intersections with the given plane
   /// \param thePlane a plane for intersection
   GEOMAPI_EXPORT
-  std::list<std::shared_ptr<GeomAPI_Pnt>>
-    intersectWithPlane(const std::shared_ptr<GeomAPI_Pln> thePlane) const;
+  void intersectWithPlane(const std::shared_ptr<GeomAPI_Pln> thePlane, std::list<std::shared_ptr<GeomAPI_Pnt> >& theResult) const;
 
   /// Returns edge length.
   GEOMAPI_EXPORT

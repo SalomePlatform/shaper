@@ -282,10 +282,9 @@ bool GeomAPI_Edge::isInPlane(std::shared_ptr<GeomAPI_Pln> thePlane) const
   return inPlane;
 }
 
-std::list<std::shared_ptr<GeomAPI_Pnt>> GeomAPI_Edge::intersectWithPlane(
-  const std::shared_ptr<GeomAPI_Pln> thePlane) const
+void GeomAPI_Edge::intersectWithPlane(const std::shared_ptr<GeomAPI_Pln> thePlane,
+                                      std::list<std::shared_ptr<GeomAPI_Pnt>>& theResult) const
 {
-  std::list<GeomPointPtr> aResList;
   double aFirst, aLast;
   const TopoDS_Shape& aShape = const_cast<GeomAPI_Edge*>(this)->impl<TopoDS_Shape>();
   Handle(Geom_Curve) aCurve = BRep_Tool::Curve((const TopoDS_Edge&)aShape, aFirst, aLast);
@@ -302,11 +301,10 @@ std::list<std::shared_ptr<GeomAPI_Pnt>> GeomAPI_Edge::intersectWithPlane(
       for (int i = 1; i <= aIntersect.NbPoints(); i++) {
         aPnt = aIntersect.Point(i);
         std::shared_ptr<GeomAPI_Pnt> aPntPtr(new GeomAPI_Pnt(aPnt.X(), aPnt.Y(), aPnt.Z()));
-        aResList.push_back(aPntPtr);
+        theResult.push_back(aPntPtr);
       }
     }
   }
-  return aResList;
 }
 
 double GeomAPI_Edge::length() const
