@@ -32,8 +32,8 @@ FeaturesAPI_Symmetry::FeaturesAPI_Symmetry(const std::shared_ptr<ModelAPI_Featur
 
 //==================================================================================================
 FeaturesAPI_Symmetry::FeaturesAPI_Symmetry(const std::shared_ptr<ModelAPI_Feature>& theFeature,
-                                       const std::list<ModelHighAPI_Selection>& theMainObjects,
-                                       const ModelHighAPI_Selection& theObject)
+                                           const std::list<ModelHighAPI_Selection>& theMainObjects,
+                                           const ModelHighAPI_Selection& theObject)
 : ModelHighAPI_Interface(theFeature)
 {
   if(initialize()) {
@@ -98,7 +98,7 @@ void FeaturesAPI_Symmetry::dump(ModelHighAPI_Dumper& theDumper) const
 
   AttributeSelectionListPtr anAttrObjects =
     aBase->selectionList(FeaturesPlugin_Symmetry::OBJECTS_LIST_ID());
-  theDumper << aBase << " = model.addSymmetry(" << aDocName << ", " << anAttrObjects;
+  theDumper << aBase << " = model.addMirror(" << aDocName << ", " << anAttrObjects;
 
   std::string aCreationMethod =
     aBase->string(FeaturesPlugin_Symmetry::CREATION_METHOD())->value();
@@ -121,9 +121,9 @@ void FeaturesAPI_Symmetry::dump(ModelHighAPI_Dumper& theDumper) const
 }
 
 //==================================================================================================
-SymmetryPtr addSymmetry(const std::shared_ptr<ModelAPI_Document>& thePart,
-                              const std::list<ModelHighAPI_Selection>& theMainObjects,
-                              const ModelHighAPI_Selection& theObject)
+SymmetryPtr addMirror(const std::shared_ptr<ModelAPI_Document>& thePart,
+                      const std::list<ModelHighAPI_Selection>& theMainObjects,
+                      const ModelHighAPI_Selection& theObject)
 {
   std::shared_ptr<ModelAPI_Feature> aFeature = thePart->addFeature(FeaturesAPI_Symmetry::ID());
   return SymmetryPtr(new FeaturesAPI_Symmetry(aFeature, theMainObjects, theObject));

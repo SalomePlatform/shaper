@@ -27,7 +27,7 @@ Part_1_doc = Part_1.document()
 Cylinder_1 = model.addCylinder(Part_1_doc, model.selection("VERTEX", "PartSet/Origin"), model.selection("EDGE", "PartSet/OZ"), 5, 10)
 Cylinder_1.result().setName("cylinder")
 Plane_4 = model.addPlane(Part_1_doc, model.selection("FACE", "cylinder/Face_2"), 10, False)
-Symmetry_1 = model.addSymmetry(Part_1_doc, [model.selection("SOLID", "cylinder")], model.selection("FACE", "Plane_1"))
+Symmetry_1 = model.addMirror(Part_1_doc, [model.selection("SOLID", "cylinder")], model.selection("FACE", "Plane_1"))
 model.do()
 
 # check the name of the Symmetry
