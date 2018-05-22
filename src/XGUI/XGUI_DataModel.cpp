@@ -223,8 +223,10 @@ void XGUI_DataModel::processEvent(const std::shared_ptr<Events_Message>& theMess
         int aRow = aRootDoc->size(aGroup, true);
         if (aGroup == aRootType) {
           // Process root folder
-          removeRow(aRow + aNbFolders);
-          rebuildBranch(aNbFolders, aRow);
+          // remove optimization due to the issue #2456
+          //removeRow(aRow + aNbFolders);
+          //rebuildBranch(aNbFolders, aRow);
+          rebuildDataTree();
         } else if (aGroup == ModelAPI_Folder::group()) {
           rebuildDataTree();
         } else {
