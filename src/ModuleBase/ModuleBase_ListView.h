@@ -56,6 +56,10 @@ public:
   /// \param theIndex an item internal index
   void addItem(const QString& theTextValue, const int theIndex);
 
+  /// Returns True if the control already contains an item with the given text
+  /// \param theTextValue tex of item to find
+  bool hasItem(const QString& theTextValue) const;
+
   /// Returns list of internal list view item indices
   /// \param theIndices an output container for indices
   void getSelectedIndices(std::set<int>& theIndices);

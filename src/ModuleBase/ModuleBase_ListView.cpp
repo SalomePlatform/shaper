@@ -180,3 +180,9 @@ void ModuleBase_ListView::onListSelection()
   myCopyAction->setEnabled(!aItems.isEmpty());
   myDeleteAction->setEnabled(!aItems.isEmpty());
 }
+
+//********************************************************************
+bool ModuleBase_ListView::hasItem(const QString& theTextValue) const
+{
+  return myListControl->findItems(theTextValue, Qt::MatchExactly).length() > 0;
+}

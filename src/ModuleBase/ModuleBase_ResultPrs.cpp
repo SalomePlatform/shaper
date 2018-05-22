@@ -233,6 +233,7 @@ void ModuleBase_ResultPrs::collectSubShapes(BRep_Builder& theBuilder,
   const NCollection_List<TopoDS_Shape>& theHiddenSubShapes)
 {
   switch (theShape.ShapeType()) {
+    case TopAbs_COMPSOLID:
     case TopAbs_COMPOUND: {
       for (TopoDS_Iterator aChildIter (theShape); aChildIter.More(); aChildIter.Next())
         collectSubShapes(theBuilder, theCompound, aChildIter.Value(), theHiddenSubShapes);

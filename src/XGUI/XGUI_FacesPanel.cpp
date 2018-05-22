@@ -232,9 +232,12 @@ void XGUI_FacesPanel::processSelection()
       aPrs->interactive());
     if (aResultPrs.IsNull())
       continue;
+    QString aItemName = generateName(aPrs);
+    if (myListView->hasItem(aItemName))
+      return;
 
     myItems.insert(myLastItemIndex, aPrs);
-    myListView->addItem(generateName(aPrs), myLastItemIndex);
+    myListView->addItem(aItemName, myLastItemIndex);
     myLastItemIndex++;
     isModified = true;
 
