@@ -21,6 +21,7 @@
 #ifndef SketcherPrs_PositionMgr_H
 #define SketcherPrs_PositionMgr_H
 
+#include "SketcherPrs.h"
 #include "SketcherPrs_SymbolPrs.h"
 
 #include <GeomAPI_Shape.h>
@@ -36,7 +37,7 @@
 * A class Position Manager which manages position of constraints symbols along a source object line.
 * it expects that symbol icons have size 16x16 px
 */
-class SketcherPrs_PositionMgr
+class SKETCHERPRS_EXPORT SketcherPrs_PositionMgr
 {
 public:
   /// Returns current instance of position manager
@@ -52,6 +53,9 @@ public:
   /// Deletes constraint object from internal structures. Has to be called on constraint delete.
   /// \param thePrs a constraint presentation
   void deleteConstraint(const SketcherPrs_SymbolPrs* thePrs);
+
+  /// Cleares all stored positions for all constraints
+  void clearAll()  { myShapes.clear(); myPntShapes.clear(); }
 
 private:
   /// Constructor
@@ -81,9 +85,6 @@ private:
 private:
   typedef std::map<const SketcherPrs_SymbolPrs*, int> PositionsMap;
   typedef std::map<const ModelAPI_Feature*, std::array<int, 2>> FeaturesMap;
-
-  /// The map which contains position of presentation
-  PositionsMap myIndexes;
 
   /// The map contains position index
   std::map<ObjectPtr, PositionsMap> myShapes;

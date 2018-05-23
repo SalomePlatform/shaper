@@ -61,7 +61,6 @@ SketcherPrs_PositionMgr::SketcherPrs_PositionMgr()
 {
 }
 
-
 int SketcherPrs_PositionMgr::getPositionIndex(ObjectPtr theLine,
                                               const SketcherPrs_SymbolPrs* thePrs)
 {

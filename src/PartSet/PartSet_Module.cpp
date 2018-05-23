@@ -104,6 +104,7 @@
 #include <SketchPlugin_Sketch.h>
 
 #include <SketcherPrs_SymbolPrs.h>
+#include <SketcherPrs_PositionMgr.h>
 #include <SketcherPrs_Coincident.h>
 #include <SketcherPrs_Tools.h>
 
@@ -721,6 +722,7 @@ bool PartSet_Module::isSketchNeutralPointActivated() const
 void PartSet_Module::closeDocument()
 {
   myActivePartIndex = QModelIndex();
+  SketcherPrs_PositionMgr::get()->clearAll();
 }
 
 //******************************************************
