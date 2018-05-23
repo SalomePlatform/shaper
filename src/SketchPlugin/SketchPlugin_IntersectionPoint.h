@@ -44,15 +44,26 @@ public:
     return MY_KIND;
   }
 
-  static const std::string& EXTERNAL_LINE_ID()
+  static const std::string& EXTERNAL_FEATURE_ID()
   {
-    static std::string MY_LINE_ID("ExternalLine");
-    return MY_LINE_ID;
+    static std::string MY_FEATURE_ID("ExternalFeature");
+    return MY_FEATURE_ID;
+  }
+
+  static const std::string& INCLUDE_INTO_RESULT()
+  {
+    static std::string MY_INCLUDE("IncludeToResult");
+    return MY_INCLUDE;
   }
 
   /// Returns true because intersection point is always external
   virtual bool isFixed()
   { return true; }
+
+  /// Returns true if the feature and the feature results can be displayed.
+  /// \return false
+  virtual bool canBeDisplayed() const
+  { return false; }
 
   /// Creates a new part document if needed
   SKETCHPLUGIN_EXPORT virtual void execute();

@@ -66,7 +66,6 @@ SET(PROJECT_HEADERS
     SketchPlugin_Tools.h
     SketchPlugin_Trim.h
     SketchPlugin_Validators.h
-	SketchPlugin_Intersection.h
 )
 
 SET(PROJECT_SOURCES
@@ -112,7 +111,6 @@ SET(PROJECT_SOURCES
     SketchPlugin_Tools.cpp
     SketchPlugin_Trim.cpp
     SketchPlugin_Validators.cpp
-	SketchPlugin_Intersection.cpp
 )
 
 SET(PROJECT_LIBRARIES

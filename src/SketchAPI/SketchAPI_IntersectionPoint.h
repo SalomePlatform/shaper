@@ -52,11 +52,15 @@ public:
   SKETCHAPI_EXPORT
   virtual ~SketchAPI_IntersectionPoint();
 
-  INTERFACE_2(SketchPlugin_IntersectionPoint::ID(),
+  INTERFACE_4(SketchPlugin_IntersectionPoint::ID(),
               coordinates, SketchPlugin_IntersectionPoint::COORD_ID(),
               GeomDataAPI_Point2D, /** IntersectionPoint coordinates */,
-              externalLine, SketchPlugin_IntersectionPoint::EXTERNAL_LINE_ID(),
-              ModelAPI_AttributeSelection, /** External line */
+              externalFeature, SketchPlugin_IntersectionPoint::EXTERNAL_FEATURE_ID(),
+              ModelAPI_AttributeSelection, /** External edge */,
+              external, SketchPlugin_IntersectionPoint::EXTERNAL_ID(),
+              ModelAPI_AttributeSelection, /** External */,
+              includeToResult, SketchPlugin_IntersectionPoint::INCLUDE_INTO_RESULT(),
+              ModelAPI_AttributeBoolean, /** Include into result */
   )
 
   /// Set by external

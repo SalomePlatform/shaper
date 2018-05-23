@@ -29,15 +29,18 @@
 #include <GeomDataAPI_Point2D.h>
 
 SketchPlugin_IntersectionPoint::SketchPlugin_IntersectionPoint()
-    : SketchPlugin_Point()
+  : SketchPlugin_Point()
 {
 }
 
 void SketchPlugin_IntersectionPoint::initDerivedClassAttributes()
 {
-  data()->addAttribute(EXTERNAL_LINE_ID(), ModelAPI_AttributeSelection::typeId());
+  data()->addAttribute(EXTERNAL_FEATURE_ID(), ModelAPI_AttributeSelection::typeId());
+  data()->addAttribute(INCLUDE_INTO_RESULT(), ModelAPI_AttributeBoolean::typeId());
 
   SketchPlugin_Point::initDerivedClassAttributes();
+
+  ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(), AUXILIARY_ID());
 }
 
 void SketchPlugin_IntersectionPoint::execute()
@@ -54,7 +57,7 @@ void SketchPlugin_IntersectionPoint::execute()
 
 void SketchPlugin_IntersectionPoint::attributeChanged(const std::string& theID)
 {
-  if (theID == EXTERNAL_LINE_ID()) {
+  if (theID == EXTERNAL_FEATURE_ID()) {
     // compute intersection between line and sketch plane
     computePoint();
   }
@@ -63,7 +66,7 @@ void SketchPlugin_IntersectionPoint::attributeChanged(const std::string& theID)
 void SketchPlugin_IntersectionPoint::computePoint()
 {
   AttributeSelectionPtr aLineAttr =
-      std::dynamic_pointer_cast<ModelAPI_AttributeSelection>(attribute(EXTERNAL_LINE_ID()));
+      std::dynamic_pointer_cast<ModelAPI_AttributeSelection>(attribute(EXTERNAL_FEATURE_ID()));
 
   std::shared_ptr<GeomAPI_Edge> anEdge;
   if(aLineAttr && aLineAttr->value() && aLineAttr->value()->isEdge()) {

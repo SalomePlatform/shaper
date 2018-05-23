@@ -61,14 +61,14 @@ SketchAPI_IntersectionPoint::~SketchAPI_IntersectionPoint()
 //--------------------------------------------------------------------------------------
 void SketchAPI_IntersectionPoint::setByExternalLine(const ModelHighAPI_Selection & theExternalLine)
 {
-  fillAttribute(theExternalLine, externalLine());
+  fillAttribute(theExternalLine, externalFeature());
 
   execute();
 }
 
 void SketchAPI_IntersectionPoint::setByExternalLineName(const std::string & theExternalLineName)
 {
-  fillAttribute(ModelHighAPI_Selection("EDGE", theExternalLineName), externalLine());
+  fillAttribute(ModelHighAPI_Selection("EDGE", theExternalLineName), externalFeature());
 
   execute();
 }
@@ -80,7 +80,7 @@ void SketchAPI_IntersectionPoint::dump(ModelHighAPI_Dumper& theDumper) const
   FeaturePtr aBase = feature();
   const std::string& aSketchName = theDumper.parentName(aBase);
 
-  AttributeSelectionPtr aLine = externalLine();
+  AttributeSelectionPtr aLine = externalFeature();
   theDumper << aBase << " = " <<
     aSketchName << ".addIntersectionPoint(" << aLine << ")" << std::endl;
   // dump "auxiliary" flag if necessary
