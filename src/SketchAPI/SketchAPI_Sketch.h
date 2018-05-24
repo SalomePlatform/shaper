@@ -125,11 +125,13 @@ public:
   /// Add intersection point
   SKETCHAPI_EXPORT
   std::shared_ptr<SketchAPI_IntersectionPoint>
-    addIntersectionPoint(const ModelHighAPI_Selection & theExternal);
+    addIntersectionPoint(const ModelHighAPI_Selection & theExternal,
+                         bool theKeepResult = false);
   /// Add point
   SKETCHAPI_EXPORT
   std::shared_ptr<SketchAPI_IntersectionPoint>
-    addIntersectionPoint(const std::string & theExternalName);
+    addIntersectionPoint(const std::string & theExternalName,
+                         bool theKeepResult = false);
 
   /// Add line
   SKETCHAPI_EXPORT

@@ -34,6 +34,7 @@
 #include <TopoDS.hxx>
 #include <BRep_Builder.hxx>
 #include <BRep_Tool.hxx>
+#include <ElCLib.hxx>
 #include <Geom_Curve.hxx>
 #include <Geom_Line.hxx>
 #include <Geom_Circle.hxx>
@@ -299,6 +300,14 @@ void GeomAPI_Edge::intersectWithPlane(const std::shared_ptr<GeomAPI_Pln> thePlan
     if (aIntersect.IsDone() && (aIntersect.NbPoints() > 0)) {
       gp_Pnt aPnt;
       for (int i = 1; i <= aIntersect.NbPoints(); i++) {
+        // check the parameter of intersection in the edge range
+        aIntersect.Parameters(i, A, B, C);
+        if (aCurve->IsPeriodic())
+          C = ElCLib::InPeriod(C, aFirst, aFirst + aCurve->Period());
+        if (C < aFirst - Precision::PConfusion() || C > aLast + Precision::PConfusion())
+          continue;
+
+        // obtain intersection point
         aPnt = aIntersect.Point(i);
         std::shared_ptr<GeomAPI_Pnt> aPntPtr(new GeomAPI_Pnt(aPnt.X(), aPnt.Y(), aPnt.Z()));
         theResult.push_back(aPntPtr);

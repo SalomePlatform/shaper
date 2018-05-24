@@ -232,6 +232,10 @@ ADD_UNIT_TESTS(TestSketchPointLine.py
                TestDistanceSignedVsUnsigned05.py
                TestSignedDistancePointPoint.py
                TestSignedDistancePointLine.py
+               TestIntersectionWithLine.py
+               TestIntersectionWithCircle.py
+               TestIntersectionWithSpline.py
+               TestIntersectionChangeType.py
                Test2273.py
                Test2280.py
                Test2287.py

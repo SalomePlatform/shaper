@@ -19,6 +19,9 @@
 //
 
 #include "SketchAPI_IntersectionPoint.h"
+#include "SketchAPI_Point.h"
+//--------------------------------------------------------------------------------------
+#include <SketchPlugin_Point.h>
 //--------------------------------------------------------------------------------------
 #include <GeomAPI_Pnt2d.h>
 //--------------------------------------------------------------------------------------
@@ -39,7 +42,7 @@ SketchAPI_IntersectionPoint::SketchAPI_IntersectionPoint(
 : SketchAPI_SketchEntity(theFeature)
 {
   if (initialize()) {
-    setByExternalLine(theExternal);
+    setByExternalEdge(theExternal);
   }
 }
 
@@ -49,7 +52,7 @@ SketchAPI_IntersectionPoint::SketchAPI_IntersectionPoint(
 : SketchAPI_SketchEntity(theFeature)
 {
   if (initialize()) {
-    setByExternalLineName(theExternalName);
+    setByExternalEdgeName(theExternalName);
   }
 }
 
@@ -59,18 +62,46 @@ SketchAPI_IntersectionPoint::~SketchAPI_IntersectionPoint()
 }
 
 //--------------------------------------------------------------------------------------
-void SketchAPI_IntersectionPoint::setByExternalLine(const ModelHighAPI_Selection & theExternalLine)
+void SketchAPI_IntersectionPoint::setByExternalEdge(const ModelHighAPI_Selection & theExternalLine)
 {
   fillAttribute(theExternalLine, externalFeature());
 
   execute();
 }
 
-void SketchAPI_IntersectionPoint::setByExternalLineName(const std::string & theExternalLineName)
+void SketchAPI_IntersectionPoint::setByExternalEdgeName(const std::string & theExternalLineName)
 {
   fillAttribute(ModelHighAPI_Selection("EDGE", theExternalLineName), externalFeature());
 
   execute();
+}
+
+void SketchAPI_IntersectionPoint::setIncludeToResult(bool theKeepResult)
+{
+  fillAttribute(theKeepResult, includeToResult());
+  execute(true);
+}
+
+//--------------------------------------------------------------------------------------
+
+std::list<std::shared_ptr<SketchAPI_SketchEntity> >
+SketchAPI_IntersectionPoint::intersectionPoints() const
+{
+  std::list<std::shared_ptr<SketchAPI_SketchEntity> > anEntities;
+
+  std::list<ObjectPtr> anIntersections =
+      feature()->reflist(SketchPlugin_IntersectionPoint::INTERSECTION_POINTS_ID())->list();
+  for (std::list<ObjectPtr>::iterator anIt = anIntersections.begin();
+       anIt != anIntersections.end(); ++anIt) {
+    FeaturePtr aFeature = ModelAPI_Feature::feature(*anIt);
+    if (aFeature && aFeature->getKind() == SketchPlugin_Point::ID())
+    {
+      std::shared_ptr<SketchAPI_SketchEntity> anEnt(new SketchAPI_Point(aFeature));
+      anEntities.push_back(anEnt);
+    }
+  }
+
+  return anEntities;
 }
 
 //--------------------------------------------------------------------------------------
@@ -80,9 +111,21 @@ void SketchAPI_IntersectionPoint::dump(ModelHighAPI_Dumper& theDumper) const
   FeaturePtr aBase = feature();
   const std::string& aSketchName = theDumper.parentName(aBase);
 
-  AttributeSelectionPtr aLine = externalFeature();
-  theDumper << aBase << " = " <<
-    aSketchName << ".addIntersectionPoint(" << aLine << ")" << std::endl;
+  AttributeSelectionPtr anExternal = externalFeature();
+  AttributeBooleanPtr isIncludeToRes = includeToResult();
+  theDumper << aBase << " = " << aSketchName << ".addIntersectionPoint("
+            << anExternal << ", " << isIncludeToRes << ")" << std::endl;
   // dump "auxiliary" flag if necessary
   SketchAPI_SketchEntity::dump(theDumper);
+
+  // Dump variables for a list of intersected points
+  theDumper << "[";
+  std::list<std::shared_ptr<SketchAPI_SketchEntity> > aList = intersectionPoints();
+  std::list<std::shared_ptr<SketchAPI_SketchEntity> >::const_iterator anIt = aList.begin();
+  for (; anIt != aList.end(); ++anIt) {
+    if (anIt != aList.begin())
+      theDumper << ", ";
+    theDumper << (*anIt)->feature();
+  }
+  theDumper << "] = " << theDumper.name(aBase) << ".intersectionPoints()" << std::endl;
 }

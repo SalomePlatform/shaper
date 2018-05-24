@@ -801,27 +801,25 @@ bool SketchPlugin_IntersectionValidator::isValid(const AttributePtr& theAttribut
     theError.arg(theAttribute->attributeType());
     return false;
   }
-  AttributeSelectionPtr aLineAttr =
-                       std::dynamic_pointer_cast<ModelAPI_AttributeSelection>(theAttribute);
+  AttributeSelectionPtr anExternalAttr =
+      std::dynamic_pointer_cast<ModelAPI_AttributeSelection>(theAttribute);
   std::shared_ptr<GeomAPI_Edge> anEdge;
-  if(aLineAttr && aLineAttr->value() && aLineAttr->value()->isEdge()) {
-    anEdge = std::shared_ptr<GeomAPI_Edge>(new GeomAPI_Edge(aLineAttr->value()));
-  } else if(aLineAttr->context() &&
-            aLineAttr->context()->shape() && aLineAttr->context()->shape()->isEdge()) {
-    anEdge = std::shared_ptr<GeomAPI_Edge>(new GeomAPI_Edge(aLineAttr->context()->shape()));
+  if (anExternalAttr && anExternalAttr->value() && anExternalAttr->value()->isEdge()) {
+    anEdge = std::shared_ptr<GeomAPI_Edge>(new GeomAPI_Edge(anExternalAttr->value()));
+  } else if(anExternalAttr->context() && anExternalAttr->context()->shape() &&
+            anExternalAttr->context()->shape()->isEdge()) {
+    anEdge = std::shared_ptr<GeomAPI_Edge>(new GeomAPI_Edge(anExternalAttr->context()->shape()));
   }
 
-  if (!anEdge || !anEdge->isLine()) {
-    theError = "The attribute %1 should be a line";
+  if (!anEdge) {
+    theError = "The attribute %1 should be an edge";
     theError.arg(theAttribute->id());
     return false;
   }
 
-  std::shared_ptr<GeomAPI_Dir> aLineDir = anEdge->line()->direction();
-
   // find a sketch
   std::shared_ptr<SketchPlugin_Sketch> aSketch;
-  std::set<AttributePtr> aRefs = aLineAttr->owner()->data()->refsToMe();
+  std::set<AttributePtr> aRefs = anExternalAttr->owner()->data()->refsToMe();
   std::set<AttributePtr>::const_iterator anIt = aRefs.begin();
   for (; anIt != aRefs.end(); ++anIt) {
     CompositeFeaturePtr aComp =
@@ -836,9 +834,16 @@ bool SketchPlugin_IntersectionValidator::isValid(const AttributePtr& theAttribut
     return false;
   }
 
+  // check the edge is intersected with sketch plane
   std::shared_ptr<GeomAPI_Pln> aPlane = aSketch->plane();
-  std::shared_ptr<GeomAPI_Dir> aNormal = aPlane->direction();
-  return fabs(aNormal->dot(aLineDir)) > tolerance * tolerance;
+
+  std::list<GeomPointPtr> anIntersectionsPoints;
+  anEdge->intersectWithPlane(aPlane, anIntersectionsPoints);
+  if (anIntersectionsPoints.empty()) {
+    theError = "The edge is not intersected with sketch plane";
+    return false;
+  }
+  return true;
 }
 
 bool SketchPlugin_SplitValidator::isValid(const AttributePtr& theAttribute,

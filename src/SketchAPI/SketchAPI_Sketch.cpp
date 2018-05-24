@@ -235,18 +235,24 @@ std::shared_ptr<SketchAPI_Point> SketchAPI_Sketch::addPoint(const std::string & 
 
 //--------------------------------------------------------------------------------------
 std::shared_ptr<SketchAPI_IntersectionPoint> SketchAPI_Sketch::addIntersectionPoint(
-    const ModelHighAPI_Selection & theExternal)
+    const ModelHighAPI_Selection & theExternal,
+    bool theKeepResult)
 {
   std::shared_ptr<ModelAPI_Feature> aFeature =
     compositeFeature()->addFeature(SketchPlugin_IntersectionPoint::ID());
-  return IntersectionPointPtr(new SketchAPI_IntersectionPoint(aFeature, theExternal));
+  IntersectionPointPtr anIntersection(new SketchAPI_IntersectionPoint(aFeature, theExternal));
+  anIntersection->setIncludeToResult(theKeepResult);
+  return anIntersection;
 }
 std::shared_ptr<SketchAPI_IntersectionPoint> SketchAPI_Sketch::addIntersectionPoint(
-    const std::string & theExternalName)
+    const std::string & theExternalName,
+    bool theKeepResult)
 {
   std::shared_ptr<ModelAPI_Feature> aFeature =
     compositeFeature()->addFeature(SketchPlugin_IntersectionPoint::ID());
-  return IntersectionPointPtr(new SketchAPI_IntersectionPoint(aFeature, theExternalName));
+  IntersectionPointPtr anIntersection(new SketchAPI_IntersectionPoint(aFeature, theExternalName));
+  anIntersection->setIncludeToResult(theKeepResult);
+  return anIntersection;
 }
 
 //--------------------------------------------------------------------------------------

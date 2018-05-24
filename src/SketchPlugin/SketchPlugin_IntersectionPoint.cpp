@@ -19,73 +19,140 @@
 //
 
 #include "SketchPlugin_IntersectionPoint.h"
+#include "SketchPlugin_Point.h"
 
 #include <ModelAPI_AttributeSelection.h>
+#include <ModelAPI_AttributeRefList.h>
+#include <ModelAPI_ResultConstruction.h>
 #include <ModelAPI_Session.h>
+#include <ModelAPI_Tools.h>
 #include <ModelAPI_Validator.h>
 
 #include <GeomAPI_Edge.h>
 #include <GeomAPI_Lin.h>
+#include <GeomAPI_Pnt2d.h>
 #include <GeomDataAPI_Point2D.h>
 
 SketchPlugin_IntersectionPoint::SketchPlugin_IntersectionPoint()
-  : SketchPlugin_Point()
+  : SketchPlugin_SketchEntity(),
+    myIsComputing(false)
 {
 }
 
 void SketchPlugin_IntersectionPoint::initDerivedClassAttributes()
 {
   data()->addAttribute(EXTERNAL_FEATURE_ID(), ModelAPI_AttributeSelection::typeId());
+  data()->addAttribute(INTERSECTION_POINTS_ID(), ModelAPI_AttributeRefList::typeId());
+  data()->attribute(INTERSECTION_POINTS_ID())->setIsArgument(false);
+
   data()->addAttribute(INCLUDE_INTO_RESULT(), ModelAPI_AttributeBoolean::typeId());
 
-  SketchPlugin_Point::initDerivedClassAttributes();
+  data()->addAttribute(EXTERNAL_ID(), ModelAPI_AttributeSelection::typeId());
+  ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(), EXTERNAL_ID());
 
   ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(), AUXILIARY_ID());
 }
 
 void SketchPlugin_IntersectionPoint::execute()
 {
-  SketchPlugin_Sketch* aSketch = sketch();
-  if (aSketch) {
-    computePoint();
-    SketchPlugin_Point::execute();
+  AttributeRefListPtr anIntersectionsList = reflist(INTERSECTION_POINTS_ID());
+  if (!anIntersectionsList || !anIntersectionsList->isInitialized())
+    return; // no intersections
 
-    // set this feature as external
-    data()->selection(EXTERNAL_ID())->setValue(lastResult(), lastResult()->shape());
-  }
+  computePoint(EXTERNAL_FEATURE_ID());
 }
 
 void SketchPlugin_IntersectionPoint::attributeChanged(const std::string& theID)
 {
-  if (theID == EXTERNAL_FEATURE_ID()) {
-    // compute intersection between line and sketch plane
-    computePoint();
-  }
+  // compute intersection between line and sketch plane
+  computePoint(theID);
 }
 
-void SketchPlugin_IntersectionPoint::computePoint()
+void SketchPlugin_IntersectionPoint::computePoint(const std::string& theID)
 {
-  AttributeSelectionPtr aLineAttr =
-      std::dynamic_pointer_cast<ModelAPI_AttributeSelection>(attribute(EXTERNAL_FEATURE_ID()));
+  if (theID != EXTERNAL_FEATURE_ID() && theID != EXTERNAL_ID())
+    return;
 
-  std::shared_ptr<GeomAPI_Edge> anEdge;
-  if(aLineAttr && aLineAttr->value() && aLineAttr->value()->isEdge()) {
-    anEdge = std::shared_ptr<GeomAPI_Edge>(new GeomAPI_Edge(aLineAttr->value()));
-  } else if(aLineAttr->context() && aLineAttr->context()->shape() &&
-            aLineAttr->context()->shape()->isEdge()) {
-    anEdge = std::shared_ptr<GeomAPI_Edge>(new GeomAPI_Edge(aLineAttr->context()->shape()));
+  if (myIsComputing)
+    return;
+  myIsComputing = true;
+
+  AttributeSelectionPtr anExternalFeature = selection(EXTERNAL_FEATURE_ID());
+
+  GeomShapePtr aShape;
+  GeomEdgePtr anEdge;
+  if (anExternalFeature)
+    aShape = anExternalFeature->value();
+  if (!aShape && anExternalFeature->context())
+    aShape = anExternalFeature->context()->shape();
+  if (aShape && aShape->isEdge())
+    anEdge = GeomEdgePtr(new GeomAPI_Edge(aShape));
+
+  if (anEdge) {
+    std::shared_ptr<GeomAPI_Pln> aSketchPlane = sketch()->plane();
+
+    std::list<GeomPointPtr> anIntersectionsPoints;
+    anEdge->intersectWithPlane(aSketchPlane, anIntersectionsPoints);
+
+    AttributeRefListPtr anIntersectionsList = reflist(INTERSECTION_POINTS_ID());
+    std::list<ObjectPtr> anExistentIntersections = anIntersectionsList->list();
+    std::list<ObjectPtr>::const_iterator aExistInterIt = anExistentIntersections.begin();
+
+    const std::list<ResultPtr>& aResults = results();
+    std::list<ResultPtr>::const_iterator aResIt = aResults.begin();
+
+    int aResultIndex = 0;
+    for (std::list<GeomPointPtr>::iterator aPntIt = anIntersectionsPoints.begin();
+         aPntIt != anIntersectionsPoints.end(); ++aPntIt, ++aResultIndex) {
+      std::shared_ptr<SketchPlugin_Point> aCurSketchPoint;
+      ResultConstructionPtr aCurResult;
+      if (aExistInterIt == anExistentIntersections.end()) {
+        // create new point and result
+        aCurSketchPoint = std::dynamic_pointer_cast<SketchPlugin_Point>(
+          sketch()->addFeature(SketchPlugin_Point::ID()));
+        aCurSketchPoint->boolean(COPY_ID())->setValue(true);
+        anIntersectionsList->append(aCurSketchPoint);
+
+        aCurResult = document()->createConstruction(data(), aResultIndex);
+        aCurResult->setIsInHistory(false);
+        aCurResult->setDisplayed(false);
+      }
+      else {
+        // update existent result point
+        aCurSketchPoint = std::dynamic_pointer_cast<SketchPlugin_Point>(*aExistInterIt);
+        aCurResult = std::dynamic_pointer_cast<ModelAPI_ResultConstruction>(*aResIt);
+        aCurResult->setShape(std::shared_ptr<GeomAPI_Edge>());
+
+        ++aExistInterIt;
+        ++aResIt;
+      }
+
+      // update coordinates of intersection
+      GeomPnt2dPtr aPointInSketch = sketch()->to2D(*aPntIt);
+      std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
+        aCurSketchPoint->attribute(SketchPlugin_Point::COORD_ID()))->setValue(aPointInSketch);
+      aCurSketchPoint->execute();
+
+      // update result
+      aCurResult->setShape(aCurSketchPoint->lastResult()->shape());
+      setResult(aCurResult, aResultIndex);
+
+      // make intersection point external
+      GeomShapePtr anEmptyVal;
+      aCurSketchPoint->selection(EXTERNAL_ID())->setValue(aCurResult, anEmptyVal);
+    }
+
+    // remove rest results from previous pass
+    removeResults(aResultIndex);
+    std::set<FeaturePtr> aFeaturesToBeRemoved;
+    for (; aExistInterIt != anExistentIntersections.end(); ++aExistInterIt) {
+      aFeaturesToBeRemoved.insert(ModelAPI_Feature::feature(*aExistInterIt));
+      anIntersectionsList->removeLast();
+    }
+    ModelAPI_Tools::removeFeaturesAndReferences(aFeaturesToBeRemoved);
+
+    if (theID != EXTERNAL_ID())
+      selection(EXTERNAL_ID())->selectValue(anExternalFeature);
   }
-  if(!anEdge.get())
-    return;
-
-  std::shared_ptr<GeomAPI_Lin> aLine = anEdge->line();
-  std::shared_ptr<GeomAPI_Pln> aSketchPlane = sketch()->plane();
-
-  std::shared_ptr<GeomAPI_Pnt> anIntersection = aSketchPlane->intersect(aLine);
-  if (!anIntersection)
-    return;
-
-  std::shared_ptr<GeomDataAPI_Point2D> aCoordAttr =
-      std::dynamic_pointer_cast<GeomDataAPI_Point2D>(attribute(COORD_ID()));
-  aCoordAttr->setValue(sketch()->to2D(anIntersection));
+  myIsComputing = false;
 }

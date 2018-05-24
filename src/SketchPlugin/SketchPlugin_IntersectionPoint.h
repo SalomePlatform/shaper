@@ -21,14 +21,14 @@
 #ifndef SketchPlugin_IntersectionPoint_H_
 #define SketchPlugin_IntersectionPoint_H_
 
-#include "SketchPlugin_Point.h"
+#include "SketchPlugin_SketchEntity.h"
 
 /**\class SketchPlugin_IntersectionPoint
  * \ingroup Plugins
  * \brief Feature for creation of external point as an intersection
  *        between external edge and a plane of the sketch.
  */
-class SketchPlugin_IntersectionPoint : public SketchPlugin_Point
+class SketchPlugin_IntersectionPoint : public SketchPlugin_SketchEntity
 {
 public:
   /// Point feature kind
@@ -48,6 +48,12 @@ public:
   {
     static std::string MY_FEATURE_ID("ExternalFeature");
     return MY_FEATURE_ID;
+  }
+
+  static const std::string& INTERSECTION_POINTS_ID()
+  {
+    static std::string MY_INTERSECTIONS_ID("IntersectionPoints");
+    return MY_INTERSECTIONS_ID;
   }
 
   static const std::string& INCLUDE_INTO_RESULT()
@@ -80,7 +86,9 @@ protected:
 
 private:
   /// \brief Find intersection between a line and a sketch plane
-  void computePoint();
+  void computePoint(const std::string& theID);
+
+  bool myIsComputing;
 };
 
 #endif
