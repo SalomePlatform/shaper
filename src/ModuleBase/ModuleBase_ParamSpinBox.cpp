@@ -28,7 +28,6 @@
 #include <ModelAPI_Tools.h>
 
 #include <QKeyEvent>
-#include <QLineEdit>
 #include <QLocale>
 #include <QRegExp>
 #include <QToolTip>
@@ -36,20 +35,24 @@
 
 #include <QStringListModel>
 #include <QCompleter>
+#include <QAbstractItemView>
 #include <QShortcut>
 
 #include <string>
 #include <iostream>
 
-//#define DEBUG_COMPLETE_WITH_PARAMETERS
-
 ModuleBase_ParamSpinBox::ModuleBase_ParamSpinBox(QWidget* theParent, int thePrecision)
-    : ModuleBase_DoubleSpinBox(theParent, thePrecision),
-      myAcceptVariables(true)
+  : QAbstractSpinBox(theParent),
+  myPrecision(thePrecision),
+  myIsEquation(false),
+  myAcceptVariables(true),
+  myDecimals(3),
+  mySingleStep(1),
+  myMinimum(DBL_MIN),
+  myMaximum(DBL_MAX)
 {
-#ifdef DEBUG_COMPLETE_WITH_PARAMETERS
   myCompleter = new QCompleter(this);
-  myCompleter->setWidget(this);
+  myCompleter->setWidget(lineEdit());
   myCompleter->setCompletionMode(QCompleter::PopupCompletion);
 
   myCompleterModel = new QStringListModel(this);
@@ -57,20 +60,24 @@ ModuleBase_ParamSpinBox::ModuleBase_ParamSpinBox(QWidget* theParent, int thePrec
   // Use sorted model to accelerate completion (QCompleter will use binary search)
   myCompleter->setModelSorting(QCompleter::CaseInsensitivelySortedModel);
   myCompleter->setCaseSensitivity(Qt::CaseInsensitive);
+  connect(myCompleter, SIGNAL(highlighted(const QString&)),
+    this, SLOT(insertCompletion(const QString&)));
 
-  lineEdit()->setCompleter(myCompleter);
-#endif
+  //  connectSignalsAndSlots();
+  myEnabledBaseColor = palette().color(QPalette::Active, QPalette::Base);
+  connect(lineEdit(), SIGNAL(textChanged(const QString&)),
+    this, SLOT(onTextChanged(const QString&)));
 
-  connectSignalsAndSlots();
+  myValidator = new QDoubleValidator(this);
+  myValidator->setLocale(locale());
+  myValidator->setRange(myMinimum, myMaximum);
 }
 
 void ModuleBase_ParamSpinBox::setCompletionList(QStringList& theList)
 {
-#ifdef DEBUG_COMPLETE_WITH_PARAMETERS
   theList.sort();
   theList.removeDuplicates();
   myCompleterModel->setStringList(theList);
-#endif
 }
 
 /*!
@@ -91,43 +98,53 @@ ModuleBase_ParamSpinBox::~ModuleBase_ParamSpinBox()
  */
 void ModuleBase_ParamSpinBox::stepBy(int steps)
 {
-  if ((!myTextValue.isEmpty()) && hasVariable())
+  if (hasVariable())
     return;
 
-  ModuleBase_DoubleSpinBox::stepBy(steps);
+  double aVal = lineEdit()->text().toDouble();
+  aVal += steps * mySingleStep;
+  setValue(aVal);
+  QAbstractSpinBox::stepBy(steps);
 }
 
-/*!
- \brief Connect signals and slots.
- */
-void ModuleBase_ParamSpinBox::connectSignalsAndSlots()
+void ModuleBase_ParamSpinBox::onTextChanged(const QString& theText)
 {
-  connect(this, SIGNAL(valueChanged(const QString&)),
-          this, SLOT(onTextChanged(const QString&)));
+  myIsEquation = hasVariable(theText);
+  emit textChanged(theText);
 }
 
-void ModuleBase_ParamSpinBox::onTextChanged(const QString& text)
-{
-  myTextValue = text;
-  emit textChanged(text);
-}
 
-double ModuleBase_ParamSpinBox::valueFromText(const QString& theText) const
-{
-  if (!hasVariable(theText))
-    return ModuleBase_DoubleSpinBox::valueFromText(theText);
-
-  // small hack: return hash of the string to initiate valuesChanged signal
-  return qHash(theText);
-}
-
-QString ModuleBase_ParamSpinBox::textFromValue (double theValue) const
-{
-  if ((!myTextValue.isEmpty()) && hasVariable(myTextValue)){
-    return myTextValue;
-  }
-  return ModuleBase_DoubleSpinBox::textFromValue(theValue);
-}
+///*!
+// \brief Connect signals and slots.
+// */
+//void ModuleBase_ParamSpinBox::connectSignalsAndSlots()
+//{
+//  connect(this, SIGNAL(valueChanged(const QString&)),
+//          this, SLOT(onTextChanged(const QString&)));
+//}
+//
+//void ModuleBase_ParamSpinBox::onTextChanged(const QString& text)
+//{
+//  myTextValue = text;
+//  emit textChanged(text);
+//}
+//
+//double ModuleBase_ParamSpinBox::valueFromText(const QString& theText) const
+//{
+//  if (!hasVariable(theText))
+//    return ModuleBase_DoubleSpinBox::valueFromText(theText);
+//
+//  // small hack: return hash of the string to initiate valuesChanged signal
+//  return qHash(theText);
+//}
+//
+//QString ModuleBase_ParamSpinBox::textFromValue (double theValue) const
+//{
+//  if ((!myTextValue.isEmpty()) && hasVariable(myTextValue)){
+//    return myTextValue;
+//  }
+//  return ModuleBase_DoubleSpinBox::textFromValue(theValue);
+//}
 
 /*!
  \brief This function is used to determine whether input is valid.
@@ -139,13 +156,9 @@ QValidator::State ModuleBase_ParamSpinBox::validate(QString& str, int& pos) cons
 {
   // Trying to interpret the current input text as a numeric value
   if (!hasVariable(str))
-    return ModuleBase_DoubleSpinBox::validate(str, pos);
+    return myValidator->validate(str, pos);
 
-  QValidator::State res = QValidator::Invalid;
-  if (isAcceptVariables()) {
-    res = QValidator::Acceptable;
-  }
-  return res;
+  return isAcceptVariables() ? QValidator::Acceptable : QValidator::Invalid;
 }
 
 /*!
@@ -154,13 +167,25 @@ QValidator::State ModuleBase_ParamSpinBox::validate(QString& str, int& pos) cons
 
  The new value is ignored if the spinbox has a variable.
  */
-void ModuleBase_ParamSpinBox::setValue(const double value)
+void ModuleBase_ParamSpinBox::setValue(double value)
 {
-  if (hasVariable())
-    return;
+  myIsEquation = false;
+  double aVal = value;
+  if (aVal < myMinimum)
+    aVal = myMinimum;
+  else if (aVal > myMaximum)
+    aVal = myMaximum;
+  QString aText = QString::number(aVal, 'g', myDecimals);
+  lineEdit()->setText(aText);
+  emit textChanged(aText);
+}
 
-  myTextValue = ModuleBase_DoubleSpinBox::textFromValue(value);
-  ModuleBase_DoubleSpinBox::setValue(value);
+double ModuleBase_ParamSpinBox::value() const
+{
+  //if (myIsEquation) {
+
+  //}
+  return lineEdit()->text().toDouble();
 }
 
 /*!
@@ -169,8 +194,11 @@ void ModuleBase_ParamSpinBox::setValue(const double value)
  */
 void ModuleBase_ParamSpinBox::setText(const QString& value)
 {
-  myTextValue = value;
-  lineEdit()->setText(value);
+  myIsEquation = hasVariable(value);
+  if (myAcceptVariables && myIsEquation) {
+    lineEdit()->setText(value);
+    emit textChanged(value);
+  }
 }
 
 /*!
@@ -181,6 +209,9 @@ void ModuleBase_ParamSpinBox::setText(const QString& value)
 void ModuleBase_ParamSpinBox::setAcceptVariables(const bool flag)
 {
   myAcceptVariables = flag;
+  if ((!myAcceptVariables) && myIsEquation) {
+    setValue(0);
+  }
 }
 
 /*!
@@ -193,100 +224,161 @@ bool ModuleBase_ParamSpinBox::isAcceptVariables() const
 
 bool ModuleBase_ParamSpinBox::hasVariable() const
 {
-  if (myTextValue.isEmpty())
-    return false;
-  return hasVariable(myTextValue);
+  return myIsEquation;
 }
 
 bool ModuleBase_ParamSpinBox::hasVariable(const QString& theText) const
 {
-  //const QString aDigitPattern = QString("[-+]?[0-9]*[%1]?[0-9]*([eE][-+]?[0-9]+)?");
-
-  //bool aHasDigit = false;
-  //{
-  //  QRegExp varNameMask(aDigitPattern.arg("."));
-  //  aHasDigit = varNameMask.exactMatch(theText);
-  //}
-  //if (!aHasDigit)
-  //{
-  //  QRegExp varNameMask(aDigitPattern.arg(","));
-  //  aHasDigit = varNameMask.exactMatch(theText);
-  //}
   bool isDouble = false;
   QLocale::c().toDouble(theText, &isDouble);
-
-//  theText.toDouble(&isDouble);
-//  if (isDouble) {
-//    QLocale aLoc; // create default locale
-//    QChar aDecPnt = aLoc.decimalPoint();
-//    if (aDecPnt == '.')
-//      isDouble = theText.contains(aDecPnt) || (!theText.contains(','));
-//    else if (aDecPnt == ',')
-//      isDouble = theText.contains(aDecPnt) || (!theText.contains('.'));
-//  }
   return !isDouble;
 }
 
-/*!
- \brief This function is used to determine whether input is valid.
- \return validating operation result
- */
-ModuleBase_ParamSpinBox::State ModuleBase_ParamSpinBox::isValid(const QString& theText,
-                                                                double& theValue) const
-{
-  if (hasVariable() && !findVariable(theText, theValue)) {
-    bool ok = false;
-    theValue = locale().toDouble(theText, &ok);
-    if (!ok) {
-      return NoVariable;
-    }
-  }
-  if (!checkRange(theValue)) {
-    return Invalid;
-  }
-
-  return Acceptable;
-}
-
-/*!
- \brief This function is used to check that string value lies within predefined range.
- \return check status
- */
-bool ModuleBase_ParamSpinBox::checkRange(const double theValue) const
-{
-  return theValue >= minimum() && theValue <= maximum();
-}
-
-/*!
- \brief This function is used to determine whether input is a variable name and to get its value.
- \return status of search operation
- */
-bool ModuleBase_ParamSpinBox::findVariable(const QString& theName,
-                                           double& outValue) const
-{
-  ResultParameterPtr aParam;
-  return ModelAPI_Tools::findVariable(FeaturePtr(), theName.toStdString(), outValue, aParam);
-}
+///*!
+// \brief This function is used to determine whether input is valid.
+// \return validating operation result
+// */
+//ModuleBase_ParamSpinBox::State ModuleBase_ParamSpinBox::isValid(const QString& theText,
+//                                                                double& theValue) const
+//{
+//  if (hasVariable() && !findVariable(theText, theValue)) {
+//    bool ok = false;
+//    theValue = locale().toDouble(theText, &ok);
+//    if (!ok) {
+//      return NoVariable;
+//    }
+//  }
+//  if (!checkRange(theValue)) {
+//    return Invalid;
+//  }
+//
+//  return Acceptable;
+//}
+//
+///*!
+// \brief This function is used to check that string value lies within predefined range.
+// \return check status
+// */
+//bool ModuleBase_ParamSpinBox::checkRange(const double theValue) const
+//{
+//  return theValue >= minimum() && theValue <= maximum();
+//}
+//
+///*!
+// \brief This function is used to determine whether input is a variable name and to get its value.
+// \return status of search operation
+// */
+//bool ModuleBase_ParamSpinBox::findVariable(const QString& theName,
+//                                           double& outValue) const
+//{
+//  ResultParameterPtr aParam;
+//  return ModelAPI_Tools::findVariable(FeaturePtr(), theName.toStdString(), outValue, aParam);
+//}
 
 /*!
  \brief This function is called when the spinbox receives key press event.
  */
-//void ModuleBase_ParamSpinBox::keyPressEvent(QKeyEvent* e)
+void ModuleBase_ParamSpinBox::keyReleaseEvent(QKeyEvent* e)
+{
+  switch (e->key()) {
+  case Qt::Key_Return:
+  case Qt::Key_Enter:
+    if (myCompleter->popup()->isVisible()) {
+      myCompleter->popup()->hide();
+      myIsEquation = true;
+    }
+    emit textChanged(lineEdit()->text());
+    return;
+  case Qt::Key_Space:
+    if (e->modifiers() & Qt::ControlModifier) {
+      myCompletePos = lineEdit()->cursorPosition();
+      int aStart, aEnd;
+      QString aPrefix = getPrefix(aStart, aEnd);
+      myCompleter->setCompletionPrefix(aPrefix);
+      myCompleter->complete();
+    }
+    break;
+  default:
+    QAbstractSpinBox::keyReleaseEvent(e);
+  }
+}
+
+QString ModuleBase_ParamSpinBox::getPrefix(int& theStart, int& theEnd) const
+{
+  QString aPrefix;
+  QString aText = lineEdit()->text();
+  theStart = theEnd = myCompletePos;
+  const int aLen = aText.length();
+  if (aLen > 0) {
+    if (myCompletePos > 0) {
+      int aLastChar = myCompletePos - 1;
+      QChar aChar = aText.at(aLastChar);
+      while (aChar.isLetter() || aChar.isDigit()) {
+        aPrefix.prepend(aText.at(aLastChar));
+        aLastChar--;
+        if (aLastChar < 0)
+          break;
+        aChar = aText.at(aLastChar);
+      }
+      theStart = aLastChar + 1;
+    }
+    if (myCompletePos < aLen) {
+      int aLastChar = myCompletePos;
+      QChar aChar = aText.at(aLastChar);
+      while (aChar.isLetter() || aChar.isDigit()) {
+        aPrefix.append(aText.at(aLastChar));
+        aLastChar++;
+        if (aLastChar >= aLen)
+          break;
+        aChar = aText.at(aLastChar);
+      }
+      theEnd = aLastChar;
+    }
+  }
+  return aPrefix;
+}
+
+
+void ModuleBase_ParamSpinBox::insertCompletion(const QString& theText)
+{
+  QString aText = lineEdit()->text();
+  int aStart, aEnd;
+  QString aPrefix = getPrefix(aStart, aEnd);
+
+  QString aResult;
+  int aPrefLen = aPrefix.length();
+  if (aPrefLen == 0)
+    aResult = aText.insert(myCompletePos, theText);
+  else {
+    aResult = aText.left(aStart) + theText + aText.right(aText.length() - aEnd);
+  }
+  lineEdit()->setText(aResult);
+  myIsEquation = true;
+
+  qDebug("### aPos=%i", myCompletePos);
+  qDebug("### text=%s", qPrintable(aText));
+  qDebug("### prefix=%s", qPrintable(aPrefix));
+  qDebug("### result=%s", qPrintable(aResult));
+}
+
+
+///*!
+// \brief This function is called when the spinbox receives show event.
+// */
+//void ModuleBase_ParamSpinBox::showEvent(QShowEvent* theEvent)
 //{
-//  if (e->key() == Qt::Key_Return || e->key() == Qt::Key_Enter) {
-//    QWidget::keyPressEvent(e);
-//  } else {
-//    ModuleBase_DoubleSpinBox::keyPressEvent(e);
+//  ModuleBase_DoubleSpinBox::showEvent(theEvent);
+//  if ((!myTextValue.isEmpty()) && hasVariable(myTextValue)) {
+//    setText(myTextValue);
 //  }
 //}
 
-/*!
- \brief This function is called when the spinbox receives show event.
- */
-void ModuleBase_ParamSpinBox::showEvent(QShowEvent* theEvent)
+void ModuleBase_ParamSpinBox::setValueEnabled(bool theEnable)
 {
-  ModuleBase_DoubleSpinBox::showEvent(theEvent);
-  if ((!myTextValue.isEmpty()) && hasVariable(myTextValue)) {
-    setText(myTextValue);
-  }
+  setReadOnly(!theEnable);
+
+  QPalette aPal = palette();
+  aPal.setColor(QPalette::All, QPalette::Base,
+    theEnable ? myEnabledBaseColor : aPal.color(QPalette::Disabled, QPalette::Base));
+  setPalette(aPal);
 }

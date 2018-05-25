@@ -46,7 +46,7 @@
 #include <iostream>
 #endif
 
-//#define DEBUG_COMPLETE_WITH_PARAMETERS
+#define DEBUG_COMPLETE_WITH_PARAMETERS
 
 ModuleBase_WidgetDoubleValue::ModuleBase_WidgetDoubleValue(QWidget* theParent,
                                                            const Config_WidgetAPI* theData)

@@ -103,9 +103,7 @@ void ExpressionEditor::performCompletion()
   QTextCursor aCursor = textCursor();
   aCursor.select(QTextCursor::WordUnderCursor);
   const QString aPrefix = aCursor.selectedText();
-  if (!aPrefix.isEmpty() && aPrefix.at(aPrefix.length() - 1).isLetter()) {
-    performCompletion(aPrefix);
-  }
+  performCompletion(aPrefix);
 }
 
 void ExpressionEditor::performCompletion(const QString& theCompletionPrefix)
