@@ -191,7 +191,8 @@ bool ModuleBase_WidgetDoubleValue::restoreValueCustom()
     QString aText = QString::fromStdString(aTextRepr);
     if (aText.endsWith('=')) {
       if (!myParameter.get()) {
-        QString aName = aText.left(aText.length() - aText.indexOf('=')).trimmed();
+        QString aName = aText.left(aText.indexOf('=')).trimmed();
+        std::string aa = aName.toStdString();
         myParameter = findParameter(aName);
       }
       AttributeStringPtr aExprAttr = myParameter->string("expression");
