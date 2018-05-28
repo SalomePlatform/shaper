@@ -80,12 +80,23 @@ protected:
   /// \return true if the widget current value is reset
   virtual bool resetCustom();
 
+private:
+  FeaturePtr createParameter(const QString& theText) const;
+
+  void editParameter(const QString& theText);
+
+  bool isNameExist(const QString& theName) const;
+
+  FeaturePtr findParameter(const QString& theName) const;
+
 protected:
   /// Label of the widget
   QLabel* myLabel;
 
   /// Input value control
   ModuleBase_ParamSpinBox* mySpinBox;
+
+  FeaturePtr myParameter;
 };
 
 #endif

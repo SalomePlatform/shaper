@@ -20,10 +20,19 @@
 
 #include <Config_Keywords.h>
 #include <Config_WidgetAPI.h>
+#include <Events_Loop.h>
 
 #include <ModelAPI_AttributeDouble.h>
 #include <ModelAPI_Data.h>
 #include <ModelAPI_Object.h>
+#include <ModelAPI_Expression.h>
+#include <ModelAPI_AttributeString.h>
+#include <ModelAPI_Session.h>
+#include <ModelAPI_Document.h>
+#include <ModelAPI_ResultParameter.h>
+#include <ModelAPI_AttributeDouble.h>
+#include <ModelAPI_Tools.h>
+#include <ModelAPI_Events.h>
 
 #include <ModuleBase_ParamSpinBox.h>
 #include <ModuleBase_Tools.h>
@@ -149,8 +158,19 @@ bool ModuleBase_WidgetDoubleValue::storeValueCustom()
   AttributeDoublePtr aReal = aData->real(attributeID());
   if (mySpinBox->hasVariable()) {
     // Here is a text of a real value or an expression.
-    std::string aText = mySpinBox->text().toStdString();
-    aReal->setText(aText);
+    QString aText = mySpinBox->text();
+    if (aText.contains('=')) {
+      if (!myParameter.get()) {
+        myParameter = createParameter(aText);
+      } else {
+        editParameter(aText);
+      }
+      aText = aText.split('=').at(0) + "=";
+    } else if (myParameter.get()){
+      // Nullyfy the parameter reference without deletion of the created
+      myParameter = FeaturePtr();
+    }
+    aReal->setText(aText.toStdString());
   } else {
     // it is important to set the empty text value to the attribute before set the value
     // because setValue tries to calculate the attribute value according to the
@@ -168,7 +188,16 @@ bool ModuleBase_WidgetDoubleValue::restoreValueCustom()
   AttributeDoublePtr aRef = aData->real(attributeID());
   std::string aTextRepr = aRef->text();
   if (!aTextRepr.empty()) {
-    ModuleBase_Tools::setSpinText(mySpinBox, QString::fromStdString(aTextRepr));
+    QString aText = QString::fromStdString(aTextRepr);
+    if (aText.endsWith('=')) {
+      if (!myParameter.get()) {
+        QString aName = aText.left(aText.length() - aText.indexOf('=')).trimmed();
+        myParameter = findParameter(aName);
+      }
+      AttributeStringPtr aExprAttr = myParameter->string("expression");
+      aText += aExprAttr->value().c_str();
+    }
+    ModuleBase_Tools::setSpinText(mySpinBox, aText);
   } else {
     ModuleBase_Tools::setSpinValue(mySpinBox, aRef->isInitialized() ? aRef->value() : 0);
   }
@@ -195,4 +224,99 @@ bool ModuleBase_WidgetDoubleValue::processEnter()
     mySpinBox->selectAll();
   }
   return isModified;
+}
+
+
+FeaturePtr ModuleBase_WidgetDoubleValue::createParameter(const QString& theText) const
+{
+  FeaturePtr aParameter;
+  QStringList aList = theText.split("=");
+  QString aParamName = aList.at(0).trimmed();
+
+  if (isNameExist(aParamName)) {
+    return aParameter;
+  }
+
+  if (!ModelAPI_Expression::isVariable(aParamName.toStdString())) {
+    return aParameter;
+  }
+
+  QString aExpression = aList.at(1).trimmed();
+  if (aExpression.isEmpty()) {
+    return aParameter;
+  }
+
+  SessionPtr aMgr = ModelAPI_Session::get();
+  std::shared_ptr<ModelAPI_Document> aDoc = aMgr->activeDocument();
+
+  aParameter = aDoc->addFeature("Parameter");
+  if (aParameter.get()) {
+    AttributeStringPtr aNameAttr = aParameter->string("variable");
+    aNameAttr->setValue(aParamName.toStdString());
+
+    AttributeStringPtr aExprAttr = aParameter->string("expression");
+    aExprAttr->setValue(aExpression.toStdString());
+    aParameter->execute();
+
+    Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_CREATED));
+    Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_UPDATED));
+  }
+  return aParameter;
+}
+
+bool ModuleBase_WidgetDoubleValue::isNameExist(const QString& theName) const
+{
+  SessionPtr aMgr = ModelAPI_Session::get();
+  std::shared_ptr<ModelAPI_Document> aDoc = aMgr->activeDocument();
+  FeaturePtr aParamFeature;
+  int aNbFeatures = aDoc->numInternalFeatures();
+  std::string aName = theName.toStdString();
+  for (int i = 0; i < aNbFeatures; i++) {
+    aParamFeature = aDoc->internalFeature(i);
+    if (aParamFeature && aParamFeature->getKind() == "Parameter") {
+      if ((myParameter != aParamFeature) && (aParamFeature->name() == aName))
+        return true;
+    }
+  }
+  return false;
+}
+
+void ModuleBase_WidgetDoubleValue::editParameter(const QString& theText)
+{
+  QStringList aList = theText.split("=");
+  QString aParamName = aList.at(0).trimmed();
+
+  QString aExpression = aList.at(1).trimmed();
+  if (aExpression.isEmpty()) {
+    return;
+  }
+
+  if (isNameExist(aParamName)) {
+    return;
+  }
+  AttributeStringPtr aNameAttr = myParameter->string("variable");
+  aNameAttr->setValue(aParamName.toStdString());
+
+  AttributeStringPtr aExprAttr = myParameter->string("expression");
+  aExprAttr->setValue(aExpression.toStdString());
+  myParameter->execute();
+
+  Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_UPDATED));
+}
+
+FeaturePtr ModuleBase_WidgetDoubleValue::findParameter(const QString& theName) const
+{
+  SessionPtr aMgr = ModelAPI_Session::get();
+  std::shared_ptr<ModelAPI_Document> aDoc = aMgr->activeDocument();
+  FeaturePtr aParamFeature;
+  int aNbFeatures = aDoc->numInternalFeatures();
+  std::string aName = theName.toStdString();
+  for (int i = 0; i < aNbFeatures; i++) {
+    aParamFeature = aDoc->internalFeature(i);
+    if (aParamFeature && aParamFeature->getKind() == "Parameter") {
+      if (aParamFeature->name() == aName)
+        return aParamFeature;
+    }
+  }
+  return FeaturePtr();
 }

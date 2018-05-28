@@ -97,6 +97,9 @@ public:
   void setValueEnabled(bool theEnable);
 
 protected:
+  /*!
+  \brief This function is called when the spinbox receives key release event.
+  */
   virtual void keyReleaseEvent(QKeyEvent *event);
 
   virtual StepEnabled stepEnabled() const { return StepUpEnabled | StepDownEnabled; }
@@ -136,7 +139,6 @@ private slots:
 
 private:
   QString getPrefix(int& theStart, int& theEnd) const;
-
 
   bool myIsEquation;
   bool myAcceptVariables;

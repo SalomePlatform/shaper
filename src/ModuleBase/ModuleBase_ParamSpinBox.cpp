@@ -20,13 +20,6 @@
 
 #include "ModuleBase_ParamSpinBox.h"
 
-#include <ModelAPI_Session.h>
-#include <ModelAPI_Document.h>
-#include <ModelAPI_Feature.h>
-#include <ModelAPI_ResultParameter.h>
-#include <ModelAPI_AttributeDouble.h>
-#include <ModelAPI_Tools.h>
-
 #include <QKeyEvent>
 #include <QLocale>
 #include <QRegExp>
@@ -275,20 +268,20 @@ bool ModuleBase_ParamSpinBox::hasVariable(const QString& theText) const
 //  return ModelAPI_Tools::findVariable(FeaturePtr(), theName.toStdString(), outValue, aParam);
 //}
 
-/*!
- \brief This function is called when the spinbox receives key press event.
- */
 void ModuleBase_ParamSpinBox::keyReleaseEvent(QKeyEvent* e)
 {
   switch (e->key()) {
   case Qt::Key_Return:
   case Qt::Key_Enter:
+  case Qt::Key_Tab:
+  {
     if (myCompleter->popup()->isVisible()) {
       myCompleter->popup()->hide();
       myIsEquation = true;
     }
     emit textChanged(lineEdit()->text());
     return;
+  }
   case Qt::Key_Space:
     if (e->modifiers() & Qt::ControlModifier) {
       myCompletePos = lineEdit()->cursorPosition();
@@ -302,6 +295,7 @@ void ModuleBase_ParamSpinBox::keyReleaseEvent(QKeyEvent* e)
     QAbstractSpinBox::keyReleaseEvent(e);
   }
 }
+
 
 QString ModuleBase_ParamSpinBox::getPrefix(int& theStart, int& theEnd) const
 {
@@ -354,11 +348,6 @@ void ModuleBase_ParamSpinBox::insertCompletion(const QString& theText)
   }
   lineEdit()->setText(aResult);
   myIsEquation = true;
-
-  qDebug("### aPos=%i", myCompletePos);
-  qDebug("### text=%s", qPrintable(aText));
-  qDebug("### prefix=%s", qPrintable(aPrefix));
-  qDebug("### result=%s", qPrintable(aResult));
 }
 
 
