@@ -22,6 +22,7 @@
 
 #include <string>
 #include <stdexcept>
+#include <clocale>
 
 InitializationPlugin_PyInterp::InitializationPlugin_PyInterp()
 : PyInterp_Interp()
@@ -169,8 +170,13 @@ double InitializationPlugin_PyInterp::evaluate(const std::string& theExpression,
   Py_XDECREF(anEvalStrObj);
   double result = 0.;
   try {
+    // set locale due to the #2485
+    std::string aCurLocale = std::setlocale(LC_NUMERIC, 0);
+    std::setlocale(LC_NUMERIC, "C");
     result = std::stod(anEvalStr);
-  } catch (const std::invalid_argument&) {
+    std::setlocale(LC_NUMERIC, aCurLocale.c_str());
+  }
+  catch (const std::invalid_argument&) {
     theError = "Unable to eval " + anEvalStr;
   }
 
