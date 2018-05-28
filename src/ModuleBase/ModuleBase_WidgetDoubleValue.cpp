@@ -162,6 +162,15 @@ bool ModuleBase_WidgetDoubleValue::storeValueCustom()
     if (aText.contains('=')) {
       if (!myParameter.get()) {
         myParameter = createParameter(aText);
+        if (!myParameter.get()) {
+          aReal->setExpressionError("Parameter cannot be created");
+          aReal->setExpressionInvalid(true);
+          mySpinBox->setText(aReal->text().c_str());
+          return false;
+        } else if (aReal->expressionInvalid()) {
+          aReal->setExpressionError("");
+          aReal->setExpressionInvalid(false);
+        }
       } else {
         editParameter(aText);
       }
@@ -192,9 +201,12 @@ bool ModuleBase_WidgetDoubleValue::restoreValueCustom()
     if (aText.endsWith('=')) {
       if (!myParameter.get()) {
         QString aName = aText.left(aText.indexOf('=')).trimmed();
-        std::string aa = aName.toStdString();
         myParameter = findParameter(aName);
       }
+      /// If myParameter is empty then it was not created because of an error
+      if (!myParameter.get())
+        return false;
+
       AttributeStringPtr aExprAttr = myParameter->string("expression");
       aText += aExprAttr->value().c_str();
     }
@@ -232,6 +244,9 @@ FeaturePtr ModuleBase_WidgetDoubleValue::createParameter(const QString& theText)
 {
   FeaturePtr aParameter;
   QStringList aList = theText.split("=");
+  if (aList.count() != 2) {
+    return aParameter;
+  }
   QString aParamName = aList.at(0).trimmed();
 
   if (isNameExist(aParamName)) {

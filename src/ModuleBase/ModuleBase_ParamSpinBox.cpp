@@ -273,7 +273,6 @@ void ModuleBase_ParamSpinBox::keyReleaseEvent(QKeyEvent* e)
   switch (e->key()) {
   case Qt::Key_Return:
   case Qt::Key_Enter:
-  case Qt::Key_Tab:
   {
     if (myCompleter->popup()->isVisible()) {
       myCompleter->popup()->hide();
