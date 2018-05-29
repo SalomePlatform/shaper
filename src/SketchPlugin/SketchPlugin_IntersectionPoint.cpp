@@ -105,25 +105,28 @@ void SketchPlugin_IntersectionPoint::computePoint(const std::string& theID)
     for (std::list<GeomPointPtr>::iterator aPntIt = anIntersectionsPoints.begin();
          aPntIt != anIntersectionsPoints.end(); ++aPntIt, ++aResultIndex) {
       std::shared_ptr<SketchPlugin_Point> aCurSketchPoint;
-      ResultConstructionPtr aCurResult;
       if (aExistInterIt == anExistentIntersections.end()) {
-        // create new point and result
+        // create new point
         aCurSketchPoint = std::dynamic_pointer_cast<SketchPlugin_Point>(
           sketch()->addFeature(SketchPlugin_Point::ID()));
         aCurSketchPoint->boolean(COPY_ID())->setValue(true);
         anIntersectionsList->append(aCurSketchPoint);
+      } else {
+        // update existent point
+        aCurSketchPoint = std::dynamic_pointer_cast<SketchPlugin_Point>(*aExistInterIt);
+        ++aExistInterIt;
+      }
 
+      ResultConstructionPtr aCurResult;
+      if (aResIt == aResults.end()) {
+        // create new result
         aCurResult = document()->createConstruction(data(), aResultIndex);
         aCurResult->setIsInHistory(false);
         aCurResult->setDisplayed(false);
-      }
-      else {
-        // update existent result point
-        aCurSketchPoint = std::dynamic_pointer_cast<SketchPlugin_Point>(*aExistInterIt);
+      } else {
+        // update existent result
         aCurResult = std::dynamic_pointer_cast<ModelAPI_ResultConstruction>(*aResIt);
         aCurResult->setShape(std::shared_ptr<GeomAPI_Edge>());
-
-        ++aExistInterIt;
         ++aResIt;
       }
 
