@@ -364,6 +364,22 @@ QString MODULEBASE_EXPORT translate(const std::string& theContext, const std::st
 /// \param theAIS - the presentation
 void MODULEBASE_EXPORT setPointBallHighlighting(AIS_Shape* theAIS);
 
+/// Creates a parameter from a given string
+/// \theText a text wit equation
+FeaturePtr MODULEBASE_EXPORT createParameter(const QString& theText);
+
+/// Edits parameter replacing its name and expression according to the given string
+/// \theParam a editing parameter
+/// \theText a text wit equation
+void MODULEBASE_EXPORT editParameter(FeaturePtr theParam, const QString& theText);
+
+/// Returns True if a parameter with the given name already exists
+/// \theName a name of parameter
+bool MODULEBASE_EXPORT isNameExist(const QString& theName, FeaturePtr theIgnoreParameter);
+
+/// Find parameter by its name
+/// \theName a name of parameter
+FeaturePtr MODULEBASE_EXPORT findParameter(const QString& theName);
 }
 
 #endif

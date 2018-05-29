@@ -39,7 +39,6 @@ ModuleBase_ParamSpinBox::ModuleBase_ParamSpinBox(QWidget* theParent, int thePrec
   myPrecision(thePrecision),
   myIsEquation(false),
   myAcceptVariables(true),
-  myDecimals(3),
   mySingleStep(1),
   myMinimum(DBL_MIN),
   myMaximum(DBL_MAX)
@@ -61,9 +60,12 @@ ModuleBase_ParamSpinBox::ModuleBase_ParamSpinBox(QWidget* theParent, int thePrec
   connect(lineEdit(), SIGNAL(textChanged(const QString&)),
     this, SLOT(onTextChanged(const QString&)));
 
+  setLocale(QLocale::c());
+
   myValidator = new QDoubleValidator(this);
   myValidator->setLocale(locale());
   myValidator->setRange(myMinimum, myMaximum);
+  myValidator->setDecimals(3);
 }
 
 void ModuleBase_ParamSpinBox::setCompletionList(QStringList& theList)
@@ -79,6 +81,7 @@ void ModuleBase_ParamSpinBox::setCompletionList(QStringList& theList)
 ModuleBase_ParamSpinBox::~ModuleBase_ParamSpinBox()
 {
 }
+
 
 /*!
  \brief Perform \a steps increment/decrement steps.
@@ -107,38 +110,6 @@ void ModuleBase_ParamSpinBox::onTextChanged(const QString& theText)
 }
 
 
-///*!
-// \brief Connect signals and slots.
-// */
-//void ModuleBase_ParamSpinBox::connectSignalsAndSlots()
-//{
-//  connect(this, SIGNAL(valueChanged(const QString&)),
-//          this, SLOT(onTextChanged(const QString&)));
-//}
-//
-//void ModuleBase_ParamSpinBox::onTextChanged(const QString& text)
-//{
-//  myTextValue = text;
-//  emit textChanged(text);
-//}
-//
-//double ModuleBase_ParamSpinBox::valueFromText(const QString& theText) const
-//{
-//  if (!hasVariable(theText))
-//    return ModuleBase_DoubleSpinBox::valueFromText(theText);
-//
-//  // small hack: return hash of the string to initiate valuesChanged signal
-//  return qHash(theText);
-//}
-//
-//QString ModuleBase_ParamSpinBox::textFromValue (double theValue) const
-//{
-//  if ((!myTextValue.isEmpty()) && hasVariable(myTextValue)){
-//    return myTextValue;
-//  }
-//  return ModuleBase_DoubleSpinBox::textFromValue(theValue);
-//}
-
 /*!
  \brief This function is used to determine whether input is valid.
  \param str currently entered value
@@ -148,8 +119,12 @@ void ModuleBase_ParamSpinBox::onTextChanged(const QString& theText)
 QValidator::State ModuleBase_ParamSpinBox::validate(QString& str, int& pos) const
 {
   // Trying to interpret the current input text as a numeric value
-  if (!hasVariable(str))
+  if (!hasVariable(str)) {
+    /// If decimals = 0 do not accept '.' (interpret as int)
+    if ((myValidator->decimals() == 0) && str.endsWith('.'))
+      return QValidator::Invalid;
     return myValidator->validate(str, pos);
+  }
 
   return isAcceptVariables() ? QValidator::Acceptable : QValidator::Invalid;
 }
@@ -168,16 +143,13 @@ void ModuleBase_ParamSpinBox::setValue(double value)
     aVal = myMinimum;
   else if (aVal > myMaximum)
     aVal = myMaximum;
-  QString aText = QString::number(aVal, 'g', myDecimals);
+  QString aText = QString::number(aVal, 'g', decimals());
   lineEdit()->setText(aText);
   emit textChanged(aText);
 }
 
 double ModuleBase_ParamSpinBox::value() const
 {
-  //if (myIsEquation) {
-
-  //}
   return lineEdit()->text().toDouble();
 }
 
@@ -226,47 +198,6 @@ bool ModuleBase_ParamSpinBox::hasVariable(const QString& theText) const
   QLocale::c().toDouble(theText, &isDouble);
   return !isDouble;
 }
-
-///*!
-// \brief This function is used to determine whether input is valid.
-// \return validating operation result
-// */
-//ModuleBase_ParamSpinBox::State ModuleBase_ParamSpinBox::isValid(const QString& theText,
-//                                                                double& theValue) const
-//{
-//  if (hasVariable() && !findVariable(theText, theValue)) {
-//    bool ok = false;
-//    theValue = locale().toDouble(theText, &ok);
-//    if (!ok) {
-//      return NoVariable;
-//    }
-//  }
-//  if (!checkRange(theValue)) {
-//    return Invalid;
-//  }
-//
-//  return Acceptable;
-//}
-//
-///*!
-// \brief This function is used to check that string value lies within predefined range.
-// \return check status
-// */
-//bool ModuleBase_ParamSpinBox::checkRange(const double theValue) const
-//{
-//  return theValue >= minimum() && theValue <= maximum();
-//}
-//
-///*!
-// \brief This function is used to determine whether input is a variable name and to get its value.
-// \return status of search operation
-// */
-//bool ModuleBase_ParamSpinBox::findVariable(const QString& theName,
-//                                           double& outValue) const
-//{
-//  ResultParameterPtr aParam;
-//  return ModelAPI_Tools::findVariable(FeaturePtr(), theName.toStdString(), outValue, aParam);
-//}
 
 void ModuleBase_ParamSpinBox::keyReleaseEvent(QKeyEvent* e)
 {
@@ -349,17 +280,6 @@ void ModuleBase_ParamSpinBox::insertCompletion(const QString& theText)
   myIsEquation = true;
 }
 
-
-///*!
-// \brief This function is called when the spinbox receives show event.
-// */
-//void ModuleBase_ParamSpinBox::showEvent(QShowEvent* theEvent)
-//{
-//  ModuleBase_DoubleSpinBox::showEvent(theEvent);
-//  if ((!myTextValue.isEmpty()) && hasVariable(myTextValue)) {
-//    setText(myTextValue);
-//  }
-//}
 
 void ModuleBase_ParamSpinBox::setValueEnabled(bool theEnable)
 {

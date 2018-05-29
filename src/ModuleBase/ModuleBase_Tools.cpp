@@ -39,6 +39,8 @@
 #include <ModelAPI_AttributeRefAttrList.h>
 #include <ModelAPI_ResultPart.h>
 #include <ModelAPI_ResultConstruction.h>
+#include <ModelAPI_AttributeString.h>
+#include <ModelAPI_Expression.h>
 #include <Events_Loop.h>
 
 #include <ModelAPI_Data.h>
@@ -1168,6 +1170,104 @@ void setPointBallHighlighting(AIS_Shape* theAIS)
 	  theAIS->SetDynamicHilightAttributes(aDrawer);
   }
 }
+
+FeaturePtr createParameter(const QString& theText)
+{
+  FeaturePtr aParameter;
+  QStringList aList = theText.split("=");
+  if (aList.count() != 2) {
+    return aParameter;
+  }
+  QString aParamName = aList.at(0).trimmed();
+
+  if (isNameExist(aParamName, FeaturePtr())) {
+    return aParameter;
+  }
+
+  if (!ModelAPI_Expression::isVariable(aParamName.toStdString())) {
+    return aParameter;
+  }
+
+  QString aExpression = aList.at(1).trimmed();
+  if (aExpression.isEmpty()) {
+    return aParameter;
+  }
+
+  SessionPtr aMgr = ModelAPI_Session::get();
+  std::shared_ptr<ModelAPI_Document> aDoc = aMgr->activeDocument();
+
+  aParameter = aDoc->addFeature("Parameter");
+  if (aParameter.get()) {
+    AttributeStringPtr aNameAttr = aParameter->string("variable");
+    aNameAttr->setValue(aParamName.toStdString());
+
+    AttributeStringPtr aExprAttr = aParameter->string("expression");
+    aExprAttr->setValue(aExpression.toStdString());
+    aParameter->execute();
+
+    Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_CREATED));
+    Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_UPDATED));
+  }
+  return aParameter;
+}
+
+void editParameter(FeaturePtr theParam, const QString& theText)
+{
+  QStringList aList = theText.split("=");
+  QString aParamName = aList.at(0).trimmed();
+
+  QString aExpression = aList.at(1).trimmed();
+  if (aExpression.isEmpty()) {
+    return;
+  }
+
+  if (isNameExist(aParamName, theParam)) {
+    return;
+  }
+  AttributeStringPtr aNameAttr = theParam->string("variable");
+  aNameAttr->setValue(aParamName.toStdString());
+
+  AttributeStringPtr aExprAttr = theParam->string("expression");
+  aExprAttr->setValue(aExpression.toStdString());
+  theParam->execute();
+
+  Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_UPDATED));
+}
+
+bool isNameExist(const QString& theName, FeaturePtr theIgnoreParameter)
+{
+  SessionPtr aMgr = ModelAPI_Session::get();
+  std::shared_ptr<ModelAPI_Document> aDoc = aMgr->activeDocument();
+  FeaturePtr aParamFeature;
+  int aNbFeatures = aDoc->numInternalFeatures();
+  std::string aName = theName.toStdString();
+  for (int i = 0; i < aNbFeatures; i++) {
+    aParamFeature = aDoc->internalFeature(i);
+    if (aParamFeature && aParamFeature->getKind() == "Parameter") {
+      if ((theIgnoreParameter != aParamFeature) && (aParamFeature->name() == aName))
+        return true;
+    }
+  }
+  return false;
+}
+
+FeaturePtr findParameter(const QString& theName)
+{
+  SessionPtr aMgr = ModelAPI_Session::get();
+  std::shared_ptr<ModelAPI_Document> aDoc = aMgr->activeDocument();
+  FeaturePtr aParamFeature;
+  int aNbFeatures = aDoc->numInternalFeatures();
+  std::string aName = theName.toStdString();
+  for (int i = 0; i < aNbFeatures; i++) {
+    aParamFeature = aDoc->internalFeature(i);
+    if (aParamFeature && aParamFeature->getKind() == "Parameter") {
+      if (aParamFeature->name() == aName)
+        return aParamFeature;
+    }
+  }
+  return FeaturePtr();
+}
+
 
 } // namespace ModuleBase_Tools
 

@@ -88,8 +88,8 @@ public:
   void setMinimum(double theMin) { myMinimum = theMin; myValidator->setBottom(theMin); }
   void setMaximum(double theMax) { myMaximum = theMax; myValidator->setTop(theMax); }
 
-  int decimals() const { return myDecimals; }
-  void setDecimals(int thePrecision) { myDecimals = thePrecision; }
+  int decimals() const { return myValidator->decimals(); }
+  void setDecimals(int thePrecision) { myValidator->setDecimals(thePrecision); }
 
   double singleStep() const { return mySingleStep; }
   void setSingleStep(double theStep) { mySingleStep = theStep; }
@@ -150,7 +150,6 @@ private:
   double myMinimum;
   double myMaximum;
 
-  int myDecimals;
   int myCompletePos;
 
   double mySingleStep;

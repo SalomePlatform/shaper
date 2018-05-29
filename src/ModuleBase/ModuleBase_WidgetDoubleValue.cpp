@@ -25,14 +25,13 @@
 #include <ModelAPI_AttributeDouble.h>
 #include <ModelAPI_Data.h>
 #include <ModelAPI_Object.h>
-#include <ModelAPI_Expression.h>
-#include <ModelAPI_AttributeString.h>
 #include <ModelAPI_Session.h>
 #include <ModelAPI_Document.h>
 #include <ModelAPI_ResultParameter.h>
 #include <ModelAPI_AttributeDouble.h>
 #include <ModelAPI_Tools.h>
 #include <ModelAPI_Events.h>
+#include <ModelAPI_AttributeString.h>
 
 #include <ModuleBase_ParamSpinBox.h>
 #include <ModuleBase_Tools.h>
@@ -54,8 +53,6 @@
 #ifdef _DEBUG
 #include <iostream>
 #endif
-
-#define DEBUG_COMPLETE_WITH_PARAMETERS
 
 ModuleBase_WidgetDoubleValue::ModuleBase_WidgetDoubleValue(QWidget* theParent,
                                                            const Config_WidgetAPI* theData)
@@ -126,11 +123,9 @@ ModuleBase_WidgetDoubleValue::~ModuleBase_WidgetDoubleValue()
 void ModuleBase_WidgetDoubleValue::activateCustom()
 {
   ModuleBase_ModelWidget::activateCustom();
-#ifdef DEBUG_COMPLETE_WITH_PARAMETERS
   QStringList aParameters;
   ModuleBase_Tools::getParameters(aParameters);
   mySpinBox->setCompletionList(aParameters);
-#endif
 }
 
 bool ModuleBase_WidgetDoubleValue::resetCustom()
@@ -161,18 +156,18 @@ bool ModuleBase_WidgetDoubleValue::storeValueCustom()
     QString aText = mySpinBox->text();
     if (aText.contains('=')) {
       if (!myParameter.get()) {
-        myParameter = createParameter(aText);
+        myParameter = ModuleBase_Tools::createParameter(aText);
         if (!myParameter.get()) {
           aReal->setExpressionError("Parameter cannot be created");
           aReal->setExpressionInvalid(true);
-          mySpinBox->setText(aReal->text().c_str());
+          updateObject(myFeature);
           return false;
         } else if (aReal->expressionInvalid()) {
           aReal->setExpressionError("");
           aReal->setExpressionInvalid(false);
         }
       } else {
-        editParameter(aText);
+        ModuleBase_Tools::editParameter(myParameter, aText);
       }
       aText = aText.split('=').at(0) + "=";
     } else if (myParameter.get()){
@@ -201,7 +196,7 @@ bool ModuleBase_WidgetDoubleValue::restoreValueCustom()
     if (aText.endsWith('=')) {
       if (!myParameter.get()) {
         QString aName = aText.left(aText.indexOf('=')).trimmed();
-        myParameter = findParameter(aName);
+        myParameter = ModuleBase_Tools::findParameter(aName);
       }
       /// If myParameter is empty then it was not created because of an error
       if (!myParameter.get())
@@ -237,102 +232,4 @@ bool ModuleBase_WidgetDoubleValue::processEnter()
     mySpinBox->selectAll();
   }
   return isModified;
-}
-
-
-FeaturePtr ModuleBase_WidgetDoubleValue::createParameter(const QString& theText) const
-{
-  FeaturePtr aParameter;
-  QStringList aList = theText.split("=");
-  if (aList.count() != 2) {
-    return aParameter;
-  }
-  QString aParamName = aList.at(0).trimmed();
-
-  if (isNameExist(aParamName)) {
-    return aParameter;
-  }
-
-  if (!ModelAPI_Expression::isVariable(aParamName.toStdString())) {
-    return aParameter;
-  }
-
-  QString aExpression = aList.at(1).trimmed();
-  if (aExpression.isEmpty()) {
-    return aParameter;
-  }
-
-  SessionPtr aMgr = ModelAPI_Session::get();
-  std::shared_ptr<ModelAPI_Document> aDoc = aMgr->activeDocument();
-
-  aParameter = aDoc->addFeature("Parameter");
-  if (aParameter.get()) {
-    AttributeStringPtr aNameAttr = aParameter->string("variable");
-    aNameAttr->setValue(aParamName.toStdString());
-
-    AttributeStringPtr aExprAttr = aParameter->string("expression");
-    aExprAttr->setValue(aExpression.toStdString());
-    aParameter->execute();
-
-    Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_CREATED));
-    Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_UPDATED));
-  }
-  return aParameter;
-}
-
-bool ModuleBase_WidgetDoubleValue::isNameExist(const QString& theName) const
-{
-  SessionPtr aMgr = ModelAPI_Session::get();
-  std::shared_ptr<ModelAPI_Document> aDoc = aMgr->activeDocument();
-  FeaturePtr aParamFeature;
-  int aNbFeatures = aDoc->numInternalFeatures();
-  std::string aName = theName.toStdString();
-  for (int i = 0; i < aNbFeatures; i++) {
-    aParamFeature = aDoc->internalFeature(i);
-    if (aParamFeature && aParamFeature->getKind() == "Parameter") {
-      if ((myParameter != aParamFeature) && (aParamFeature->name() == aName))
-        return true;
-    }
-  }
-  return false;
-}
-
-void ModuleBase_WidgetDoubleValue::editParameter(const QString& theText)
-{
-  QStringList aList = theText.split("=");
-  QString aParamName = aList.at(0).trimmed();
-
-  QString aExpression = aList.at(1).trimmed();
-  if (aExpression.isEmpty()) {
-    return;
-  }
-
-  if (isNameExist(aParamName)) {
-    return;
-  }
-  AttributeStringPtr aNameAttr = myParameter->string("variable");
-  aNameAttr->setValue(aParamName.toStdString());
-
-  AttributeStringPtr aExprAttr = myParameter->string("expression");
-  aExprAttr->setValue(aExpression.toStdString());
-  myParameter->execute();
-
-  Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_UPDATED));
-}
-
-FeaturePtr ModuleBase_WidgetDoubleValue::findParameter(const QString& theName) const
-{
-  SessionPtr aMgr = ModelAPI_Session::get();
-  std::shared_ptr<ModelAPI_Document> aDoc = aMgr->activeDocument();
-  FeaturePtr aParamFeature;
-  int aNbFeatures = aDoc->numInternalFeatures();
-  std::string aName = theName.toStdString();
-  for (int i = 0; i < aNbFeatures; i++) {
-    aParamFeature = aDoc->internalFeature(i);
-    if (aParamFeature && aParamFeature->getKind() == "Parameter") {
-      if (aParamFeature->name() == aName)
-        return aParamFeature;
-    }
-  }
-  return FeaturePtr();
 }
