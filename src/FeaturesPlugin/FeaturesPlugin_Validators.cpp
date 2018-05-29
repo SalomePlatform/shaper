@@ -37,6 +37,7 @@
 #include <ModelAPI_Tools.h>
 
 #include <GeomValidators_BodyShapes.h>
+#include <GeomValidators_Face.h>
 #include <GeomValidators_FeatureKind.h>
 #include <GeomValidators_ShapeType.h>
 
@@ -997,4 +998,21 @@ bool FeaturesPlugin_ValidatorConcealedResult::isValid(const AttributePtr& theAtt
     theError = "Error: No concealed results.";
 
   return theError.empty();
+}
+
+bool FeaturesPlugin_ValidatorCircular::isValid(const AttributePtr& theAttribute,
+                                               const std::list<std::string>& theArguments,
+                                               Events_InfoMessage& theError) const
+{
+  static std::list<std::string> aEdgeArg(1, "circle");
+  static std::list<std::string> aFaceArg(1, "cylinder");
+
+  Events_InfoMessage aError;
+  bool isValid = GeomValidators_ShapeType().isValid(theAttribute, aEdgeArg, aError);
+  if (!isValid) {
+    isValid = GeomValidators_Face().isValid(theAttribute, aFaceArg, aError);
+    if (!isValid)
+      theError = "The shape neither circle nor cylinder";
+  }
+  return isValid;
 }

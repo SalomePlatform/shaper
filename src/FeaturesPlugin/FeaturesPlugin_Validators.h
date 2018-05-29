@@ -252,4 +252,19 @@ class FeaturesPlugin_ValidatorConcealedResult: public ModelAPI_AttributeValidato
                         Events_InfoMessage& theError) const;
 };
 
+/// \class FeaturesPlugin_ValidatorCircular
+/// \ingroup Validators
+/// \brief Verifies the selected object is circular edge or cylindrical face
+class FeaturesPlugin_ValidatorCircular : public ModelAPI_AttributeValidator
+{
+public:
+  //! \return True if the attribute is valid.
+  //! \param[in] theAttribute the checked attribute.
+  //! \param[in] theArguments arguments of the attribute.
+  //! \param[out] theError error message.
+  virtual bool isValid(const AttributePtr& theAttribute,
+                       const std::list<std::string>& theArguments,
+                       Events_InfoMessage& theError) const;
+};
+
 #endif

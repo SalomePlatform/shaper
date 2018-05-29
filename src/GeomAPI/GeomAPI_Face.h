@@ -53,5 +53,8 @@ public:
   std::shared_ptr<GeomAPI_Pln> getPlane() const;
 };
 
+//! Pointer on attribute object
+typedef std::shared_ptr<GeomAPI_Face> GeomFacePtr;
+
 #endif
 

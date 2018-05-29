@@ -10,3 +10,4 @@ from FeaturesAPI import addCut, addFuse, addCommon, addSmash, addFill
 from FeaturesAPI import addIntersection, addPartition, addUnion, addRemoveSubShapes
 from FeaturesAPI import addRecover
 from FeaturesAPI import addFillet
+from FeaturesAPI import measureLength, measureDistance, measureRadius, measureAngle

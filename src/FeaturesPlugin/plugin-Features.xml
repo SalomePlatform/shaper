@@ -107,5 +107,10 @@ email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com
         <source path="multirotation_widget.xml"/>
       </feature>
     </group>
+    <group id="Measurement">
+      <feature id="Measurement" title="Measurement" tooltip="Calculate properties of objects" icon="icons/Features/measurement.png">
+        <source path="measurement_widget.xml"/>
+      </feature>
+    </group>
   </workbench>
 </plugin>

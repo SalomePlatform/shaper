@@ -1,0 +1,80 @@
+<!--
+Copyright (C) 2018-20xx  CEA/DEN, EDF R&D
+
+This library is free software; you can redistribute it and/or
+modify it under the terms of the GNU Lesser General Public
+License as published by the Free Software Foundation; either
+version 2.1 of the License, or (at your option) any later version.
+
+This library is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+Lesser General Public License for more details.
+
+You should have received a copy of the GNU Lesser General Public
+License along with this library; if not, write to the Free Software
+Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+
+See http:##www.salome-platform.org/ or
+email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com>
+-->
+
+<source>
+  <toolbox id="MeasureKind">
+    <box id="Length" title="Edge length" icon="icons/Features/meas_length_32x32.png">
+      <shape_selector id="edge_for_length"
+                      icon="icons/Features/edge.png"
+                      label="Edge"
+                      tooltip="Select an edge"
+                      shape_types="edge"
+                      default="">
+        <validator id="GeomValidators_ShapeType" parameters="edge"/>
+      </shape_selector>
+    </box>
+    <box id="Distance" title="Distance between objects" icon="icons/Features/meas_distance_32x32.png">
+      <shape_selector id="distance_from"
+                      icon=""
+                      label="From"
+                      tooltip="Select a shape"
+                      shape_types="vertex edge wire face shell solid objects"
+                      default="">
+      </shape_selector>
+      <shape_selector id="distance_to"
+                      icon=""
+                      label="To"
+                      tooltip="Select a shape"
+                      shape_types="vertex edge wire face shell solid objects"
+                      default="">
+      </shape_selector>
+    </box>
+    <box id="Radius" title="Radius of circular" icon="icons/Features/meas_radius_32x32.png">
+      <shape_selector id="circular"
+                      icon=""
+                      label="Object"
+                      tooltip="Select an edge or face"
+                      shape_types="edge face"
+                      default="">
+        <validator id="FeaturesPlugin_ValidatorCircular"/>
+      </shape_selector>
+    </box>
+    <box id="Angle" title="Angle between edges" icon="icons/Features/meas_angle_32x32.png">
+      <shape_selector id="angle_from"
+                      icon="icons/Features/edge.png"
+                      label="First edge"
+                      tooltip="Select an edge"
+                      shape_types="edge"
+                      default="">
+        <validator id="GeomValidators_ShapeType" parameters="edge"/>
+      </shape_selector>
+      <shape_selector id="angle_to"
+                      icon="icons/Features/edge.png"
+                      label="Second edge"
+                      tooltip="Select an edge"
+                      shape_types="edge"
+                      default="">
+        <validator id="GeomValidators_ShapeType" parameters="edge"/>
+      </shape_selector>
+    </box>
+  </toolbox>
+  <label id="result"/>
+</source>

@@ -26,6 +26,7 @@
 #include <FeaturesPlugin_ExtrusionFuse.h>
 #include <FeaturesPlugin_Fillet.h>
 #include <FeaturesPlugin_Intersection.h>
+#include <FeaturesPlugin_Measurement.h>
 #include <FeaturesPlugin_MultiRotation.h>
 #include <FeaturesPlugin_MultiTranslation.h>
 #include <FeaturesPlugin_Partition.h>
@@ -87,6 +88,8 @@ FeaturesPlugin_Plugin::FeaturesPlugin_Plugin()
                               new FeaturesPlugin_ValidatorConcealedResult);
   aFactory->registerValidator("FeaturesPlugin_ValidatorFilletSelection",
                               new FeaturesPlugin_ValidatorFilletSelection);
+  aFactory->registerValidator("FeaturesPlugin_ValidatorCircular",
+                              new FeaturesPlugin_ValidatorCircular);
 
   // register this plugin
   ModelAPI_Session::get()->registerPlugin(this);
@@ -136,6 +139,8 @@ FeaturePtr FeaturesPlugin_Plugin::createFeature(std::string theFeatureID)
     return FeaturePtr(new FeaturesPlugin_MultiRotation);
   } else if (theFeatureID == FeaturesPlugin_Fillet::ID()) {
     return FeaturePtr(new FeaturesPlugin_Fillet);
+  } else if (theFeatureID == FeaturesPlugin_Measurement::ID()) {
+    return FeaturePtr(new FeaturesPlugin_Measurement);
   }
 
   // feature of such kind is not found

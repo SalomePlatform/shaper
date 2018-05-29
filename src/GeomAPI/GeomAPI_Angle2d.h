@@ -18,8 +18,8 @@
 // email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com>
 //
 
-#ifndef GeomAPI_Angle_H_
-#define GeomAPI_Angle_H_
+#ifndef GeomAPI_Angle2d_H_
+#define GeomAPI_Angle2d_H_
 
 #include <GeomAPI_Interface.h>
 
