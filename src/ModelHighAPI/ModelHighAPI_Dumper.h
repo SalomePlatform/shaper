@@ -321,9 +321,9 @@ private:
     {}
   };
 
-  typedef std::map<EntityPtr, EntityName>                     EntityNameMap;
-  typedef std::map<std::string, std::set<std::string> >       ModulesMap;
-  typedef std::map<DocumentPtr, std::map<std::string, int> >  NbFeaturesMap;
+  typedef std::map<EntityPtr, EntityName>                                      EntityNameMap;
+  typedef std::map<std::string, std::set<std::string> >                        ModulesMap;
+  typedef std::map<DocumentPtr, std::map<std::string, std::pair<int, int> > >  NbFeaturesMap;
 
   struct LastDumpedEntity {
     EntityPtr            myEntity;   ///< last dumped entity

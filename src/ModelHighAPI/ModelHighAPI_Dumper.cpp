@@ -148,8 +148,8 @@ const std::string& ModelHighAPI_Dumper::name(const EntityPtr& theEntity,
   ObjectPtr anObject = std::dynamic_pointer_cast<ModelAPI_Object>(theEntity);
   if (anObject) {
     DocumentPtr aDoc = anObject->document();
-    int& aNbFeatures = myFeatureCount[aDoc][aKind];
-    aNbFeatures += 1;
+    std::pair<int, int>& aNbFeatures = myFeatureCount[aDoc][aKind];
+    aNbFeatures.first += 1;
 
     size_t anIndex = aName.find(aKind);
     if (anIndex == 0 && aName[aKind.length()] == '_') { // name starts with "FeatureKind_"
@@ -158,10 +158,13 @@ const std::string& ModelHighAPI_Dumper::name(const EntityPtr& theEntity,
 
       // Check number of already registered objects of such kind. Index of current object
       // should be the same to identify feature's name as automatically generated.
-      if (aNbFeatures == anId) {
+      if (aNbFeatures.first == anId && aNbFeatures.second < anId) {
         // name is not user-defined
         isDefaultName = true;
       }
+
+      if (anId > aNbFeatures.second)
+        aNbFeatures.second = anId;
     }
 
     // obtain default name for the feature
@@ -171,9 +174,9 @@ const std::string& ModelHighAPI_Dumper::name(const EntityPtr& theEntity,
       int aFullIndex = 0;
       NbFeaturesMap::const_iterator aFIt = myFeatureCount.begin();
       for (; aFIt != myFeatureCount.end(); ++aFIt) {
-        std::map<std::string, int>::const_iterator aFound = aFIt->second.find(aKind);
+        std::map<std::string, std::pair<int, int> >::const_iterator aFound = aFIt->second.find(aKind);
         if (aFound != aFIt->second.end())
-          aFullIndex += aFound->second;
+          aFullIndex += aFound->second.first;
       }
       aDefaultName << aKind << "_" << aFullIndex;
     }

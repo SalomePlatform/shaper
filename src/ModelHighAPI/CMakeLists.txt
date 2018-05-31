@@ -114,4 +114,5 @@ ADD_UNIT_TESTS(
   TestRefAttr.py
   TestReference.py
   TestDeflectionDump.py
+  Test2488.py
 )
