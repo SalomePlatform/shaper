@@ -1412,35 +1412,40 @@ TDF_Label Model_Document::findNamingName(std::string theName, ResultPtr theConte
           if (theContext != myObjs->object(aLabIter->Father()))
             continue;
         }
+        // copy aSubName to avoid incorrect further processing after its suffix cutting
+        TCollection_ExtendedString aSubNameCopy(aSubName);
         // searching sub-labels with this name
         TDF_ChildIDIterator aNamesIter(*aLabIter, TDataStd_Name::GetID(), Standard_True);
         for(; aNamesIter.More(); aNamesIter.Next()) {
           Handle(TDataStd_Name) aName = Handle(TDataStd_Name)::DownCast(aNamesIter.Value());
-          if (aName->Get() == aSubName)
+          if (aName->Get() == aSubNameCopy)
             return aName->Label();
         }
         // If not found child label with the exact sub-name, then try to find compound with
         // such sub-name without suffix.
-        Standard_Integer aSuffixPos = aSubName.SearchFromEnd('_');
-        if (aSuffixPos != -1 && aSuffixPos != aSubName.Length()) {
-          TCollection_ExtendedString anIndexStr = aSubName.Split(aSuffixPos);
-          aSubName.Remove(aSuffixPos);
+        Standard_Integer aSuffixPos = aSubNameCopy.SearchFromEnd('_');
+        if (aSuffixPos != -1 && aSuffixPos != aSubNameCopy.Length()) {
+          TCollection_ExtendedString anIndexStr = aSubNameCopy.Split(aSuffixPos);
+          aSubNameCopy.Remove(aSuffixPos);
           aNamesIter.Initialize(*aLabIter, TDataStd_Name::GetID(), Standard_True);
           for(; aNamesIter.More(); aNamesIter.Next()) {
             Handle(TDataStd_Name) aName = Handle(TDataStd_Name)::DownCast(aNamesIter.Value());
-            if (aName->Get() == aSubName) {
+            if (aName->Get() == aSubNameCopy) {
               return aName->Label();
             }
           }
           // check also "this" label
           Handle(TDataStd_Name) aName;
           if (aLabIter->FindAttribute(TDataStd_Name::GetID(), aName)) {
-            if (aName->Get() == aSubName) {
+            if (aName->Get() == aSubNameCopy) {
               return aName->Label();
             }
           }
         }
       }
+      // verify context's name is same as sub-component's and use context's label
+      if (aSubName.IsEqual(anObjName.c_str()))
+        return *(aFind->second.rbegin());
     }
   }
   return TDF_Label(); // not found
