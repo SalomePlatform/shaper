@@ -733,4 +733,43 @@ std::pair<std::string, bool> getDefaultName(
   return std::pair<std::string, bool>(aDefaultName.str(), false);
 }
 
+std::string getDefaultName(const ResultPtr& theResult)
+{
+  FeaturePtr anOwner = ModelAPI_Feature::feature(theResult->data()->owner());
+
+  // names of sub-solids in CompSolid should be default (for example,
+  // result of boolean operation 'Boolean_1_1' is a CompSolid which is renamed to 'MyBOOL',
+  // however, sub-elements of 'MyBOOL' should be named 'Boolean_1_1_1', 'Boolean_1_1_2' etc.)
+  std::ostringstream aDefaultName;
+  aDefaultName << anOwner->name();
+
+  ResultPtr aResToSearch = theResult;
+  ResultCompSolidPtr aCompSolidRes = compSolidOwner(theResult);
+  if (aCompSolidRes)
+    aResToSearch = aCompSolidRes;
+
+  // obtain index of result
+  int aResIndex = 1;
+  const std::list<ResultPtr>& aResults = anOwner->results();
+  for (std::list<ResultPtr>::const_iterator anIt = aResults.begin();
+       anIt != aResults.end(); ++anIt, ++aResIndex)
+    if (aResToSearch == *anIt)
+      break;
+
+  // compute default name of CompSolid (name of feature + index of CompSolid's result)
+  aDefaultName << "_" << aResIndex;
+
+  if (aCompSolidRes) {
+    // obtain index of result in compsolid and compose a default name
+    int aNbSubs = aCompSolidRes->numberOfSubs();
+    for (int anIndex = 0; anIndex < aNbSubs; ++anIndex)
+      if (aCompSolidRes->subResult(anIndex) == theResult) {
+        aDefaultName << "_" << (anIndex + 1);
+        break;
+      }
+  }
+
+  return aDefaultName.str();
+}
+
 } // namespace ModelAPI_Tools

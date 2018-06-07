@@ -133,8 +133,19 @@ void Model_Data::setName(const std::string& theName)
     isModified = !aName->Get().IsEqual(theName.c_str());
     if (isModified) {
       aName->Set(theName.c_str());
-      // name is changed, thus special attribute is set
-      TDataStd_UAttribute::Set(myLab, kUSER_DEFINED_NAME);
+
+      // check the name of result is defined by user
+      // (name of result does not composed of the name of feature and the result index)
+      bool isUserDefined = true;
+      ResultPtr aResult = std::dynamic_pointer_cast<ModelAPI_Result>(myObject);
+      if (aResult) {
+        std::string aDefaultName = ModelAPI_Tools::getDefaultName(aResult);
+        isUserDefined = aDefaultName != theName;
+      }
+      if (isUserDefined) {
+        // name is user-defined, thus special attribute is set
+        TDataStd_UAttribute::Set(myLab, kUSER_DEFINED_NAME);
+      }
     }
   }
   if (mySendAttributeUpdated && isModified)

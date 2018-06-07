@@ -187,13 +187,17 @@ MODELAPI_EXPORT void findRefsToFeatures(
 MODELAPI_EXPORT void getConcealedResults(const std::shared_ptr<ModelAPI_Feature>& theFeature,
                                    std::list<std::shared_ptr<ModelAPI_Result> >& theResults);
 
-/*! Return the default name of the result according the the features it depends.
+/*! Return the default name of the result according the features it depends.
  *  Return also whether the name is get from the concealing result of parent object
  *  (means that concealing result has user-defined name).
  */
 MODELAPI_EXPORT std::pair<std::string, bool> getDefaultName(
     const std::shared_ptr<ModelAPI_Result>& theResult,
     const int theResultIndex);
+
+/*! Return the default name of the result according to name of the feature.
+ */
+MODELAPI_EXPORT std::string getDefaultName(const std::shared_ptr<ModelAPI_Result>& theResult);
 }
 
 #endif
