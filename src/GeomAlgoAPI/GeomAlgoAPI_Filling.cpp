@@ -101,14 +101,18 @@ void GeomAlgoAPI_Filling::buildByEdges()
   Handle(GeomFill_Line) aLine = new GeomFill_Line(aNbCurves);
 
   // check myMaxDegree >= aCurves.size() - 1 to be able to interpolate a surface
-  if (myMaxDegree + 1 < aNbCurves)
+  if (myMaxDegree + 1 < aNbCurves) {
+    myError = "Unable to interpolate surface, Max deg + 1 should be greater or equal than number of sections.";
     return;
+  }
 
   // perform filling by sections
   GeomFill_AppSurf anAppSurf(myMinDegree, myMaxDegree, myTol3D, myTol2D, myNbIter);
   anAppSurf.Perform(aLine, aSection);
-  if (!anAppSurf.IsDone())
+  if (!anAppSurf.IsDone()) {
+    myError = "Approximation algorithm failed.";
     return;
+  }
 
   // build calculated surface
   Standard_Integer UDegree, VDegree, NbUPoles, NbVPoles, NbUKnots, NbVKnots;

@@ -137,7 +137,12 @@ bool BuildPlugin_Filling::isAlgorithmFailed(
 {
   if (!theAlgorithm->isDone()) {
     static const std::string aFeatureError = "Error: filling algorithm failed.";
-    setError(aFeatureError);
+    std::string anAlgoError = theAlgorithm->getError();
+    if (anAlgoError.empty())
+      anAlgoError = aFeatureError;
+    else
+      anAlgoError = aFeatureError + " " + anAlgoError;
+    setError(anAlgoError);
     return true;
   }
   if (theAlgorithm->shape()->isNull()) {
