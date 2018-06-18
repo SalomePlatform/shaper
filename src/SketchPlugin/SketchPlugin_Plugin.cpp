@@ -138,6 +138,8 @@ SketchPlugin_Plugin::SketchPlugin_Plugin()
                               new SketchPlugin_ReplicationReferenceValidator);
   aFactory->registerValidator("SketchPlugin_SketchFeatureValidator",
                               new SketchPlugin_SketchFeatureValidator);
+  aFactory->registerValidator("SketchPlugin_MultiRotationAngleValidator",
+                              new SketchPlugin_MultiRotationAngleValidator);
 
   // register this plugin
   ModelAPI_Session::get()->registerPlugin(this);

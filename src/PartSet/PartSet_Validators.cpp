@@ -407,6 +407,17 @@ bool PartSet_ProjectionSelection::isValid(const ModuleBase_ISelection* theSelect
   }
 }
 
+bool PartSet_IntersectionSelection::isValid(const ModuleBase_ISelection* theSelection,
+                                     ModuleBase_Operation* theOperation) const
+{
+  if (theSelection->getSelected(ModuleBase_ISelection::Viewer).size() == 0) {
+    return isEmptySelectionValid(theOperation);
+  } else {
+    int aCount = shapesNbLines(theSelection);
+    return aCount == 0;
+  }
+}
+
 
 std::string PartSet_DifferentObjectsValidator::errorMessage(
                          const PartSet_DifferentObjectsValidator::ErrorType& theType,

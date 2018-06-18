@@ -87,6 +87,13 @@ class SketchPlugin_MultiRotation : public SketchPlugin_ConstraintBase
     return MY_NUMBER_OF_OBJECTS_ID;
   }
 
+  /// Name of the flag to reverse rotation
+  inline static const std::string& REVERSED_ID()
+  {
+    static const std::string MY_REVERSED_ID("MultiRotationReversed");
+    return MY_REVERSED_ID;
+  }
+
   /// \brief Creates a new part document if needed
   SKETCHPLUGIN_EXPORT virtual void execute();
 
@@ -112,6 +119,8 @@ private:
   //                   double theCenterX, double theCenterY, double theAngle);
 
   bool updateFullAngleValue();
+
+  bool isUpdatingAngle;
 };
 
 #endif

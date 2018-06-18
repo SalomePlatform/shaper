@@ -86,6 +86,8 @@ protected:
 
   /// Input value control
   ModuleBase_ParamSpinBox* mySpinBox;
+
+  FeaturePtr myParameter;
 };
 
 #endif

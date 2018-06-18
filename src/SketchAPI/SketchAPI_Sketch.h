@@ -125,11 +125,13 @@ public:
   /// Add intersection point
   SKETCHAPI_EXPORT
   std::shared_ptr<SketchAPI_IntersectionPoint>
-    addIntersectionPoint(const ModelHighAPI_Selection & theExternal);
+    addIntersectionPoint(const ModelHighAPI_Selection & theExternal,
+                         bool theKeepResult = false);
   /// Add point
   SKETCHAPI_EXPORT
   std::shared_ptr<SketchAPI_IntersectionPoint>
-    addIntersectionPoint(const std::string & theExternalName);
+    addIntersectionPoint(const std::string & theExternalName,
+                         bool theKeepResult = false);
 
   /// Add line
   SKETCHAPI_EXPORT
@@ -281,7 +283,8 @@ public:
       const ModelHighAPI_RefAttr & theCenter,
       const ModelHighAPI_Double & theAngle,
       const ModelHighAPI_Integer & theNumberOfObjects,
-      bool theFullValue = false);
+      bool theFullValue = false,
+      bool theReversed  = false);
 
   /// Add split
   SKETCHAPI_EXPORT

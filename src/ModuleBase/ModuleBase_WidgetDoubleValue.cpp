@@ -20,10 +20,18 @@
 
 #include <Config_Keywords.h>
 #include <Config_WidgetAPI.h>
+#include <Events_Loop.h>
 
 #include <ModelAPI_AttributeDouble.h>
 #include <ModelAPI_Data.h>
 #include <ModelAPI_Object.h>
+#include <ModelAPI_Session.h>
+#include <ModelAPI_Document.h>
+#include <ModelAPI_ResultParameter.h>
+#include <ModelAPI_AttributeDouble.h>
+#include <ModelAPI_Tools.h>
+#include <ModelAPI_Events.h>
+#include <ModelAPI_AttributeString.h>
 
 #include <ModuleBase_ParamSpinBox.h>
 #include <ModuleBase_Tools.h>
@@ -45,8 +53,6 @@
 #ifdef _DEBUG
 #include <iostream>
 #endif
-
-//#define DEBUG_COMPLETE_WITH_PARAMETERS
 
 ModuleBase_WidgetDoubleValue::ModuleBase_WidgetDoubleValue(QWidget* theParent,
                                                            const Config_WidgetAPI* theData)
@@ -117,11 +123,9 @@ ModuleBase_WidgetDoubleValue::~ModuleBase_WidgetDoubleValue()
 void ModuleBase_WidgetDoubleValue::activateCustom()
 {
   ModuleBase_ModelWidget::activateCustom();
-#ifdef DEBUG_COMPLETE_WITH_PARAMETERS
   QStringList aParameters;
   ModuleBase_Tools::getParameters(aParameters);
   mySpinBox->setCompletionList(aParameters);
-#endif
 }
 
 bool ModuleBase_WidgetDoubleValue::resetCustom()
@@ -149,8 +153,28 @@ bool ModuleBase_WidgetDoubleValue::storeValueCustom()
   AttributeDoublePtr aReal = aData->real(attributeID());
   if (mySpinBox->hasVariable()) {
     // Here is a text of a real value or an expression.
-    std::string aText = mySpinBox->text().toStdString();
-    aReal->setText(aText);
+    QString aText = mySpinBox->text();
+    if (aText.contains('=')) {
+      if (!myParameter.get()) {
+        myParameter = ModuleBase_Tools::createParameter(aText);
+        if (!myParameter.get()) {
+          aReal->setExpressionError("Parameter cannot be created");
+          aReal->setExpressionInvalid(true);
+          updateObject(myFeature);
+          return false;
+        } else if (aReal->expressionInvalid()) {
+          aReal->setExpressionError("");
+          aReal->setExpressionInvalid(false);
+        }
+      } else {
+        ModuleBase_Tools::editParameter(myParameter, aText);
+      }
+      aText = aText.split('=').at(0) + "=";
+    } else if (myParameter.get()){
+      // Nullyfy the parameter reference without deletion of the created
+      myParameter = FeaturePtr();
+    }
+    aReal->setText(aText.toStdString());
   } else {
     // it is important to set the empty text value to the attribute before set the value
     // because setValue tries to calculate the attribute value according to the
@@ -168,7 +192,20 @@ bool ModuleBase_WidgetDoubleValue::restoreValueCustom()
   AttributeDoublePtr aRef = aData->real(attributeID());
   std::string aTextRepr = aRef->text();
   if (!aTextRepr.empty()) {
-    ModuleBase_Tools::setSpinText(mySpinBox, QString::fromStdString(aTextRepr));
+    QString aText = QString::fromStdString(aTextRepr);
+    if (aText.endsWith('=')) {
+      if (!myParameter.get()) {
+        QString aName = aText.left(aText.indexOf('=')).trimmed();
+        myParameter = ModuleBase_Tools::findParameter(aName);
+      }
+      /// If myParameter is empty then it was not created because of an error
+      if (!myParameter.get())
+        return false;
+
+      AttributeStringPtr aExprAttr = myParameter->string("expression");
+      aText += aExprAttr->value().c_str();
+    }
+    ModuleBase_Tools::setSpinText(mySpinBox, aText);
   } else {
     ModuleBase_Tools::setSpinValue(mySpinBox, aRef->isInitialized() ? aRef->value() : 0);
   }

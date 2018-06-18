@@ -30,6 +30,7 @@
 #include "SketchPlugin_Line.h"
 #include "SketchPlugin_MacroArc.h"
 #include "SketchPlugin_MacroCircle.h"
+#include "SketchPlugin_MultiRotation.h"
 #include "SketchPlugin_Point.h"
 #include "SketchPlugin_Sketch.h"
 #include "SketchPlugin_Trim.h"
@@ -42,8 +43,8 @@
 #include <ModelAPI_Data.h>
 #include <ModelAPI_Validator.h>
 #include <ModelAPI_AttributeDouble.h>
+#include <ModelAPI_AttributeInteger.h>
 #include <ModelAPI_AttributeRefAttr.h>
-
 #include <ModelAPI_AttributeRefAttrList.h>
 #include <ModelAPI_AttributeRefList.h>
 #include <ModelAPI_AttributeSelectionList.h>
@@ -800,27 +801,25 @@ bool SketchPlugin_IntersectionValidator::isValid(const AttributePtr& theAttribut
     theError.arg(theAttribute->attributeType());
     return false;
   }
-  AttributeSelectionPtr aLineAttr =
-                       std::dynamic_pointer_cast<ModelAPI_AttributeSelection>(theAttribute);
+  AttributeSelectionPtr anExternalAttr =
+      std::dynamic_pointer_cast<ModelAPI_AttributeSelection>(theAttribute);
   std::shared_ptr<GeomAPI_Edge> anEdge;
-  if(aLineAttr && aLineAttr->value() && aLineAttr->value()->isEdge()) {
-    anEdge = std::shared_ptr<GeomAPI_Edge>(new GeomAPI_Edge(aLineAttr->value()));
-  } else if(aLineAttr->context() &&
-            aLineAttr->context()->shape() && aLineAttr->context()->shape()->isEdge()) {
-    anEdge = std::shared_ptr<GeomAPI_Edge>(new GeomAPI_Edge(aLineAttr->context()->shape()));
+  if (anExternalAttr && anExternalAttr->value() && anExternalAttr->value()->isEdge()) {
+    anEdge = std::shared_ptr<GeomAPI_Edge>(new GeomAPI_Edge(anExternalAttr->value()));
+  } else if(anExternalAttr->context() && anExternalAttr->context()->shape() &&
+            anExternalAttr->context()->shape()->isEdge()) {
+    anEdge = std::shared_ptr<GeomAPI_Edge>(new GeomAPI_Edge(anExternalAttr->context()->shape()));
   }
 
-  if (!anEdge || !anEdge->isLine()) {
-    theError = "The attribute %1 should be a line";
+  if (!anEdge) {
+    theError = "The attribute %1 should be an edge";
     theError.arg(theAttribute->id());
     return false;
   }
 
-  std::shared_ptr<GeomAPI_Dir> aLineDir = anEdge->line()->direction();
-
   // find a sketch
   std::shared_ptr<SketchPlugin_Sketch> aSketch;
-  std::set<AttributePtr> aRefs = aLineAttr->owner()->data()->refsToMe();
+  std::set<AttributePtr> aRefs = anExternalAttr->owner()->data()->refsToMe();
   std::set<AttributePtr>::const_iterator anIt = aRefs.begin();
   for (; anIt != aRefs.end(); ++anIt) {
     CompositeFeaturePtr aComp =
@@ -835,9 +834,16 @@ bool SketchPlugin_IntersectionValidator::isValid(const AttributePtr& theAttribut
     return false;
   }
 
+  // check the edge is intersected with sketch plane
   std::shared_ptr<GeomAPI_Pln> aPlane = aSketch->plane();
-  std::shared_ptr<GeomAPI_Dir> aNormal = aPlane->direction();
-  return fabs(aNormal->dot(aLineDir)) > tolerance * tolerance;
+
+  std::list<GeomPointPtr> anIntersectionsPoints;
+  anEdge->intersectWithPlane(aPlane, anIntersectionsPoints);
+  if (anIntersectionsPoints.empty()) {
+    theError = "The edge is not intersected with sketch plane";
+    return false;
+  }
+  return true;
 }
 
 bool SketchPlugin_SplitValidator::isValid(const AttributePtr& theAttribute,
@@ -1635,4 +1641,45 @@ bool SketchPlugin_SketchFeatureValidator::isValid(const AttributePtr& theAttribu
 
   theError = "The object selected is not a sketch feature";
   return false;
+}
+
+bool SketchPlugin_MultiRotationAngleValidator::isValid(const AttributePtr& theAttribute,
+                                                       const std::list<std::string>& theArguments,
+                                                       Events_InfoMessage& theError) const
+{
+  if (theAttribute->attributeType() != ModelAPI_AttributeDouble::typeId()) {
+    theError = "The attribute with the %1 type is not processed";
+    theError.arg(theAttribute->attributeType());
+    return false;
+  }
+
+  AttributeDoublePtr anAngleAttr =
+    std::dynamic_pointer_cast<ModelAPI_AttributeDouble>(theAttribute);
+
+  FeaturePtr aMultiRotation = ModelAPI_Feature::feature(theAttribute->owner());
+  AttributeStringPtr anAngleType =
+      aMultiRotation->string(SketchPlugin_MultiRotation::ANGLE_TYPE());
+  AttributeIntegerPtr aNbCopies =
+      aMultiRotation->integer(SketchPlugin_MultiRotation::NUMBER_OF_OBJECTS_ID());
+
+  if (anAngleType->value() != "FullAngle")
+  {
+    double aFullAngleValue = anAngleAttr->value() * (aNbCopies->value() - 1);
+    if (aFullAngleValue < -1.e-7 || aFullAngleValue > 359.9999999)
+    {
+      theError = "Rotation single angle should produce full angle less than 360 degree";
+      return false;
+    }
+  }
+  else
+  {
+    double aFullAngleValue = anAngleAttr->value();
+    if (aFullAngleValue < -1.e-7 || aFullAngleValue > 360.0000001)
+    {
+      theError = "Rotation full angle should be in range [0, 360]";
+      return false;
+    }
+  }
+
+  return true;
 }

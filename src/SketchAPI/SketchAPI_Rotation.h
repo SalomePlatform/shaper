@@ -54,18 +54,21 @@ public:
                      const ModelHighAPI_RefAttr & theCenter,
                      const ModelHighAPI_Double & theAngle,
                      const ModelHighAPI_Integer & theNumberOfObjects,
-                     bool theFullValue = false);
+                     bool theFullValue = false,
+                     bool theReversed  = false);
   /// Destructor
   SKETCHAPI_EXPORT
   virtual ~SketchAPI_Rotation();
 
-  INTERFACE_7(SketchPlugin_MultiRotation::ID(),
+  INTERFACE_8(SketchPlugin_MultiRotation::ID(),
               rotationList, SketchPlugin_MultiRotation::ROTATION_LIST_ID(),
               ModelAPI_AttributeRefList, /** Rotation list */,
               center, SketchPlugin_MultiRotation::CENTER_ID(),
               ModelAPI_AttributeRefAttr, /** Center */,
               angle, SketchPlugin_MultiRotation::ANGLE_ID(),
               ModelAPI_AttributeDouble, /** Angle */,
+              reversed, SketchPlugin_MultiRotation::REVERSED_ID(),
+              ModelAPI_AttributeBoolean, /** Negative angle */,
               numberOfObjects, SketchPlugin_MultiRotation::NUMBER_OF_OBJECTS_ID(),
               ModelAPI_AttributeInteger, /** Number of objects */,
               valueType, SketchPlugin_MultiRotation::ANGLE_TYPE(),

@@ -51,6 +51,7 @@
 #include <Geom2d_Curve.hxx>
 #include <BRepLib_CheckCurveOnSurface.hxx>
 #include <BRep_Tool.hxx>
+#include  <Geom_CylindricalSurface.hxx>
 #include <Geom_Line.hxx>
 #include <Geom_Plane.hxx>
 #include <GeomAPI_ProjectPointOnCurve.hxx>
@@ -140,6 +141,32 @@ std::shared_ptr<GeomAPI_Pnt>
     aCentre = aGProps.CentreOfMass();
   }
   return std::shared_ptr<GeomAPI_Pnt>(new GeomAPI_Pnt(aCentre.X(), aCentre.Y(), aCentre.Z()));
+}
+
+//==================================================================================================
+double GeomAlgoAPI_ShapeTools::radius(const std::shared_ptr<GeomAPI_Face>& theCylinder)
+{
+  double aRadius = -1.0;
+  if (theCylinder->isCylindrical()) {
+    const TopoDS_Shape& aShape = theCylinder->impl<TopoDS_Shape>();
+    Handle(Geom_Surface) aSurf = BRep_Tool::Surface(TopoDS::Face(aShape));
+    Handle(Geom_CylindricalSurface) aCyl = Handle(Geom_CylindricalSurface)::DownCast(aSurf);
+    if (!aCyl.IsNull())
+      aRadius = aCyl->Radius();
+  }
+  return aRadius;
+}
+
+//==================================================================================================
+double GeomAlgoAPI_ShapeTools::minimalDistance(const GeomShapePtr& theShape1,
+                                               const GeomShapePtr& theShape2)
+{
+  const TopoDS_Shape& aShape1 = theShape1->impl<TopoDS_Shape>();
+  const TopoDS_Shape& aShape2 = theShape2->impl<TopoDS_Shape>();
+
+  BRepExtrema_DistShapeShape aDist(aShape1, aShape2);
+  aDist.Perform();
+  return aDist.IsDone() ? aDist.Value() : Precision::Infinite();
 }
 
 //==================================================================================================

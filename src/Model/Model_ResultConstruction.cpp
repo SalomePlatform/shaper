@@ -611,10 +611,30 @@ bool Model_ResultConstruction::update(const int theIndex,
       }
       return aRes;
     } else {
+      // check is this modified or not
+      std::shared_ptr<GeomAPI_Shape> aNewShape = shape();
+      TopoDS_Shape anOldSh;
+      Handle(TNaming_NamedShape) aNS;
+      if (aLab.FindAttribute(TNaming_NamedShape::GetID(), aNS)) {
+        anOldSh = aNS->Get();
+      }
+      if (aNewShape.get()) {
+        if (anOldSh.IsNull())
+          theModified = true;
+        else {
+          std::shared_ptr<GeomAPI_Shape> anOldShape(new GeomAPI_Shape);
+          anOldShape->setImpl<TopoDS_Shape>(new TopoDS_Shape(anOldSh));
+          theModified = !anOldShape->isEqual(aNewShape);
+        }
+      }
+      else if (!anOldSh.IsNull()) {
+        theModified = true;
+      }
+
       // For correct naming selection, put the shape into the naming structure.
       // It seems sub-shapes are not needed: only this shape is (and can be ) selected.
       TNaming_Builder aBuilder(aLab);
-      aBuilder.Generated(shape()->impl<TopoDS_Shape>());
+      aBuilder.Generated(aNewShape->impl<TopoDS_Shape>());
     }
     return shape() && !shape()->isNull();
   }

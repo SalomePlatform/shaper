@@ -52,6 +52,7 @@ SET(PROJECT_HEADERS
     FeaturesPlugin_MultiTranslation.h
     FeaturesPlugin_MultiRotation.h
     FeaturesPlugin_Fillet.h
+    FeaturesPlugin_Measurement.h
 )
 
 SET(PROJECT_SOURCES
@@ -84,6 +85,7 @@ SET(PROJECT_SOURCES
     FeaturesPlugin_MultiTranslation.cpp
     FeaturesPlugin_MultiRotation.cpp
     FeaturesPlugin_Fillet.cpp
+    FeaturesPlugin_Measurement.cpp
 )
 
 SET(XML_RESOURCES
@@ -109,6 +111,7 @@ SET(XML_RESOURCES
   multitranslation_widget.xml
   multirotation_widget.xml
   fillet_widget.xml
+  measurement_widget.xml
 )
 
 SET(TEXT_RESOURCES
@@ -219,6 +222,10 @@ ADD_UNIT_TESTS(TestExtrusion.py
                TestUnion4CurvedFaces.py
                TestUnion4Faces.py
                TestUnionOfUnion.py
+               TestMeasurementLength.py
+               TestMeasurementDistance.py
+               TestMeasurementRadius.py
+               TestMeasurementAngle.py
                Test1922.py
                Test1942.py
                Test1915.py

@@ -111,9 +111,11 @@ bool Model_AttributeSelection::setValue(const ResultPtr& theContext,
   bool isOldShape = isOldContext &&
     (theSubShape == anOldShape || (theSubShape && anOldShape && theSubShape->isEqual(anOldShape)));
   if (isOldShape) return false; // shape is the same, so context is also unchanged
+  bool aToUnblock = false;
   // update the referenced object if needed
   if (!isOldContext) {
-      myRef.setValue(theContext);
+    aToUnblock = !owner()->data()->blockSendAttributeUpdated(true);
+    myRef.setValue(theContext);
   }
 
   // do noth use naming if selected shape is result shape itself, but not sub-shape
@@ -136,6 +138,8 @@ bool Model_AttributeSelection::setValue(const ResultPtr& theContext,
     TDF_Label aRefLab = myRef.myRef->Label();
     aSelLab.ForgetAllAttributes(true);
     myRef.myRef = TDF_Reference::Set(aSelLab.Father(), aSelLab.Father());
+    if (aToUnblock)
+      owner()->data()->blockSendAttributeUpdated(false);
     return false;
   }
   if (theContext->groupName() == ModelAPI_ResultBody::group()) {
@@ -170,6 +174,10 @@ bool Model_AttributeSelection::setValue(const ResultPtr& theContext,
   }
 
   owner()->data()->sendAttributeUpdated(this);
+
+  if (aToUnblock)
+    owner()->data()->blockSendAttributeUpdated(false);
+
   return true;
 }
 

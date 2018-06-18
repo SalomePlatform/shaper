@@ -451,24 +451,6 @@ email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com
 </excluded>
 
     <group id="Projection">
-      <!-- Intersection Point -->
-      <!-- feature
-        id="SketchIntersectionPoint"
-        title="Intersection Point"
-        tooltip="Create intersection point"
-        icon="icons/Sketch/intersection_point.png">
-        <sketch_shape_selector
-              id="ExternalLine"
-              label="Edge"
-              tooltip="Select external line."
-              shape_types="edge"
-              use_external="false"
-              use_sketch_plane="false">
-          <validator id="GeomValidators_ShapeType" parameters="line"/>
-          <validator id="SketchPlugin_IntersectionValidator"/>
-        </sketch_shape_selector>
-      </feature -->
-
       <!-- Projected feature -->
       <feature
         id="SketchProjection"
@@ -487,6 +469,26 @@ email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com
         </sketch_shape_selector>
         <boolvalue id="IncludeToResult" label="Include into the sketch result" default="true" tooltip="Include projected feature into the sketch result"/>
         <validator id="PartSet_ProjectionSelection"/>
+      </feature>
+
+      <!-- Intersection Point -->
+      <feature
+        id="SketchIntersectionPoint"
+        title="Intersection"
+        tooltip="Intersect edge with sketch plane"
+        icon="icons/Sketch/intersection.png">
+        <sketch_shape_selector
+              id="ExternalFeature"
+              label="Object"
+              tooltip="Select external edge."
+              shape_types="edge"
+              use_external="true"
+              can_create_external="false"
+              use_sketch_plane="false">
+          <validator id="SketchPlugin_IntersectionValidator"/>
+        </sketch_shape_selector>
+        <boolvalue id="IncludeToResult" label="Include into the sketch result" default="true" tooltip="Include projected feature into the sketch result"/>
+        <validator id="PartSet_IntersectionSelection"/>
       </feature>
     </group>
 
@@ -607,14 +609,30 @@ email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com
                          label="Angle"
                          icon="icons/Sketch/angle.png"
                          tooltip="Rotation angle"
-                         default="90" use_reset="false"/>
+                         default="90" min="0" max="360"
+                         use_reset="false">
+              <validator id="SketchPlugin_MultiRotationAngleValidator" />
+            </doublevalue>
+            <boolvalue id="MultiRotationReversed"
+                       label="Reversed"
+                       tooltip="Reverse angular copy"
+                       default="false"
+                       obligatory="0"/>
           </box>
           <box id="FullAngle" title="Full angle" icon="icons/Sketch/angle_up_full_32x32.png">
             <doublevalue id="MultiRotationAngle"
                          label="Angle"
                          icon="icons/Sketch/angle.png"
                          tooltip="Rotation angle"
-                         default="90" use_reset="false"/>
+                         default="90" min="0" max="360"
+                         use_reset="false">
+              <validator id="SketchPlugin_MultiRotationAngleValidator" />
+            </doublevalue>
+            <boolvalue id="MultiRotationReversed"
+                       label="Reversed"
+                       tooltip="Reverse angular copy"
+                       default="false"
+                       obligatory="0"/>
           </box>
         </toolbox>
         <integervalue id="MultiRotationObjects"

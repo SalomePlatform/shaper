@@ -43,6 +43,16 @@ const char* aSearchCode =
   "            positions.append((node.lineno, node.col_offset))\n"
   "FindName(name).visit(ast.parse(expression))";
 
+// make the expression be correct for the python interpreter even for the
+// beta=alfa*2 expressions
+static std::string adjustExpression(const std::string& theExpression) {
+  std::string anExpression = theExpression;
+  if (!anExpression.empty() && anExpression.back() == '=') {
+    anExpression = anExpression.substr(0, anExpression.length() - 1);
+  }
+  return anExpression;
+}
+
 std::list<std::pair<int, int> >
 InitializationPlugin_PyInterp::positions(const std::string& theExpression,
                                      const std::string& theName)
@@ -56,8 +66,9 @@ InitializationPlugin_PyInterp::positions(const std::string& theExpression,
   PyObject* aBuiltinModule = PyImport_AddModule("__builtin__");
   PyDict_SetItemString(aContext, "__builtins__", aBuiltinModule);
 
+  std::string anExpression = adjustExpression(theExpression);
   // extend aContext with variables
-  PyDict_SetItemString(aContext, "expression", PyString_FromString(theExpression.c_str()));
+  PyDict_SetItemString(aContext, "expression", PyString_FromString(anExpression.c_str()));
   PyDict_SetItemString(aContext, "name", PyString_FromString(theName.c_str()));
   PyDict_SetItemString(aContext, "positions", Py_BuildValue("[]"));
 
@@ -93,10 +104,12 @@ std::list<std::string> InitializationPlugin_PyInterp::compile(const std::string&
     PyErr_Print();
     return aResult;
   }
+  // support "variable_name=" expression as "variable_name"
+  std::string anExpression = adjustExpression(theExpression);
 
   PyObject *aCodePyObj =
     PyObject_CallMethod(aCodeopModule, (char*)"compile_command", (char*)"(s)",
-                        theExpression.c_str());
+                        anExpression.c_str());
 
   if(!aCodePyObj || aCodePyObj == Py_None || !PyCode_Check(aCodePyObj)) {
     Py_XDECREF(aCodePyObj);
@@ -144,10 +157,13 @@ void InitializationPlugin_PyInterp::clearLocalContext()
 double InitializationPlugin_PyInterp::evaluate(const std::string& theExpression,
                                                std::string& theError)
 {
+  // support "variable_name=" expression as "variable_name"
+  std::string anExpression = adjustExpression(theExpression);
+
   PyLockWrapper lck; // Acquire GIL until the end of the method
   PyCompilerFlags aFlags = {CO_FUTURE_DIVISION};
   aFlags.cf_flags = CO_FUTURE_DIVISION;
-  PyCodeObject* anExprCode = (PyCodeObject *) Py_CompileStringFlags(theExpression.c_str(),
+  PyCodeObject* anExprCode = (PyCodeObject *) Py_CompileStringFlags(anExpression.c_str(),
                                 "<string>", Py_eval_input, &aFlags);
   if(!anExprCode) {
     theError = errorMessage();

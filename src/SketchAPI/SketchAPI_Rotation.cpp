@@ -39,15 +39,17 @@ SketchAPI_Rotation::SketchAPI_Rotation(
     const ModelHighAPI_RefAttr & theCenter,
     const ModelHighAPI_Double & theAngle,
     const ModelHighAPI_Integer & theNumberOfObjects,
-    bool theFullValue)
+    bool theFullValue,
+    bool theReversed)
 : ModelHighAPI_Interface(theFeature)
 {
   if (initialize()) {
     fillAttribute(theObjects, rotationList());
     fillAttribute(theCenter, center());
-    fillAttribute(theAngle, angle());
-    fillAttribute(theNumberOfObjects, numberOfObjects());
     fillAttribute(theFullValue ? "FullAngle" : "SingleAngle", valueType());
+    fillAttribute(theAngle, angle());
+    fillAttribute(theReversed, reversed());
+    fillAttribute(theNumberOfObjects, numberOfObjects());
 
     execute(true);
   }
@@ -85,6 +87,7 @@ void SketchAPI_Rotation::dump(ModelHighAPI_Dumper& theDumper) const
   AttributeDoublePtr anAngle = angle();
   AttributeIntegerPtr aNbCopies = numberOfObjects();
   bool isFullValue = valueType()->value() != "SingleAngle";
+  bool isReversed = reversed()->value();
 
   // Check all attributes are already dumped. If not, store the constraint as postponed.
   if (!theDumper.isDumped(aCenter) || !theDumper.isDumped(aRotObjects)) {
@@ -94,8 +97,12 @@ void SketchAPI_Rotation::dump(ModelHighAPI_Dumper& theDumper) const
 
   theDumper << aBase << " = " << aSketchName << ".addRotation("
             << aRotObjects << ", " << aCenter << ", " << anAngle << ", " << aNbCopies;
-  if (isFullValue)
+  if (isFullValue || isReversed)
+  {
     theDumper << ", " << isFullValue;
+    if (isReversed)
+      theDumper << ", " << isReversed;
+  }
   theDumper << ")" << std::endl;
 
   // Dump variables for a list of rotated features

@@ -42,13 +42,15 @@ protected:
   virtual void process();
 
   /// \brief Generate list of rotated entities
-  /// \param[out] theCenter   central point of rotation
-  /// \param[out] theAngle    rotation angle
-  /// \param[out] theFullValue  applying translation using the disstance as a full or single value
-  /// \param[out] theEntities list of base entities
+  /// \param[out] theCenter    central point of rotation
+  /// \param[out] theAngle     rotation angle
+  /// \param[out] theFullValue applying translation using the distance as a full or single value
+  /// \param[out] theReversed  rotation angle is negative
+  /// \param[out] theEntities  list of base entities
   void getAttributes(EntityWrapperPtr&            theCenter,
                      ScalarWrapperPtr&            theAngle,
                      bool&                        theFullValue,
+                     bool&                        theReversed,
                      std::list<EntityWrapperPtr>& theEntities);
 
   /// \brief This method is used in derived objects to check consistence of constraint.
@@ -73,6 +75,7 @@ private:
 private:
   AttributePoint2DPtr myCenterPointAttribute; ///< a center of rotation
   ScalarWrapperPtr    myAngle;                ///< angle of rotation
+  bool myIsRevered; ///< angle of rotation is negative
 
   double myCenterCoord[2]; ///< coordinates of rotation center
   double myRotationVal[2]; ///< sinus and cosine of rotation angle

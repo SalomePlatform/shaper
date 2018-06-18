@@ -578,7 +578,10 @@ bool Model_Update::processFeature(FeaturePtr theFeature)
     if (aReason != theFeature && (aReason)->data()->isValid()) {
       if (processFeature(aReason))
         aIsModified = true;
-      if (aReason->data()->execState() == ModelAPI_StateInvalidArgument)
+      // check validity of aReason once again because it may be removed by dependent feature
+      // (e.g. by SketchPlugin_IntersectionPoint)
+      if (!aReason->data()->isValid() ||
+          aReason->data()->execState() == ModelAPI_StateInvalidArgument)
         isReferencedInvalid = true;
     }
     // searching for the next not used reason

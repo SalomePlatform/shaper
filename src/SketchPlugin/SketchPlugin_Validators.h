@@ -480,4 +480,19 @@ class SketchPlugin_SketchFeatureValidator: public ModelAPI_AttributeValidator
                        Events_InfoMessage& theError) const;
 };
 
+/**\class SketchPlugin_MultiRotationAngleValidator
+ * \ingroup Validators
+ * \brief Validator for checking whether the angle of MultiRotation is in range [0, 360].
+ */
+class SketchPlugin_MultiRotationAngleValidator : public ModelAPI_AttributeValidator
+{
+  //! returns true if attribute is valid
+  //! \param theAttribute the checked attribute
+  //! \param theArguments arguments of the attribute
+  //! \param theError error message
+  virtual bool isValid(const AttributePtr& theAttribute,
+                       const std::list<std::string>& theArguments,
+                       Events_InfoMessage& theError) const;
+};
+
 #endif

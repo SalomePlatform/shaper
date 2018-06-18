@@ -265,6 +265,7 @@ void PartSet_Module::registerValidators()
     new PartSet_MultyTranslationSelection);
   aFactory->registerValidator("PartSet_SplitSelection", new PartSet_SplitSelection);
   aFactory->registerValidator("PartSet_ProjectionSelection", new PartSet_ProjectionSelection);
+  aFactory->registerValidator("PartSet_IntersectionSelection", new PartSet_IntersectionSelection);
 }
 
 //******************************************************
@@ -1047,22 +1048,20 @@ void PartSet_Module::onObjectDisplayed(ObjectPtr theObject, AISObjectPtr theAIS)
 {
   Handle(AIS_InteractiveObject) anAIS = theAIS->impl<Handle(AIS_InteractiveObject)>();
   if (!anAIS.IsNull()) {
-    bool aToUseZLayer = false;
     FeaturePtr aFeature = ModelAPI_Feature::feature(theObject);
-    if (aFeature.get() && PartSet_Tools::findRefsToMeFeature(aFeature,
-                                                        SketchPlugin_Projection::ID()))
-      aToUseZLayer = true;
-    Handle(AIS_InteractiveContext) aCtx = anAIS->GetContext();
-    Handle(AIS_Dimension) aDim = Handle(AIS_Dimension)::DownCast(anAIS);
-    if (!aDim.IsNull()) {
-      aToUseZLayer = true;
-    } else {
-      Handle(SketcherPrs_SymbolPrs) aCons = Handle(SketcherPrs_SymbolPrs)::DownCast(anAIS);
-      if (!aCons.IsNull())
-      aToUseZLayer = true;
+    if (aFeature.get()) {
+      bool aToUseZLayer = false;
+      if (PartSet_Tools::findRefsToMeFeature(aFeature,SketchPlugin_Projection::ID()))
+        aToUseZLayer = true;
+      else {
+        CompositeFeaturePtr aParent = ModelAPI_Tools::compositeOwner(aFeature);
+        aToUseZLayer = (aParent.get() && (aParent->getKind() == SketchPlugin_Sketch::ID()));
+      }
+      if (aToUseZLayer) {
+        Handle(AIS_InteractiveContext) aCtx = anAIS->GetContext();
+        aCtx->SetZLayer(anAIS, myVisualLayerId);
+      }
     }
-    if (aToUseZLayer)
-      aCtx->SetZLayer(anAIS, myVisualLayerId);
   }
 }
 

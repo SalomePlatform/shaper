@@ -52,20 +52,30 @@ public:
   SKETCHAPI_EXPORT
   virtual ~SketchAPI_IntersectionPoint();
 
-  INTERFACE_2(SketchPlugin_IntersectionPoint::ID(),
-              coordinates, SketchPlugin_IntersectionPoint::COORD_ID(),
-              GeomDataAPI_Point2D, /** IntersectionPoint coordinates */,
-              externalLine, SketchPlugin_IntersectionPoint::EXTERNAL_LINE_ID(),
-              ModelAPI_AttributeSelection, /** External line */
+  INTERFACE_3(SketchPlugin_IntersectionPoint::ID(),
+              externalFeature, SketchPlugin_IntersectionPoint::EXTERNAL_FEATURE_ID(),
+              ModelAPI_AttributeSelection, /** External edge */,
+              external, SketchPlugin_IntersectionPoint::EXTERNAL_ID(),
+              ModelAPI_AttributeSelection, /** External */,
+              includeToResult, SketchPlugin_IntersectionPoint::INCLUDE_INTO_RESULT(),
+              ModelAPI_AttributeBoolean, /** Include into result */
   )
 
   /// Set by external
   SKETCHAPI_EXPORT
-  void setByExternalLine(const ModelHighAPI_Selection & theExternalLine);
+  void setByExternalEdge(const ModelHighAPI_Selection & theExternaEdge);
 
   /// Set by external name
   SKETCHAPI_EXPORT
-  void setByExternalLineName(const std::string & theExternalLineName);
+  void setByExternalEdgeName(const std::string & theExternalEdgeName);
+
+  /// Set flag to include projection to result or not
+  SKETCHAPI_EXPORT
+  void setIncludeToResult(bool theKeepResult);
+
+  /// Returns created intersection points
+  SKETCHAPI_EXPORT
+  std::list<std::shared_ptr<SketchAPI_SketchEntity> > intersectionPoints() const;
 
   /// Dump wrapped feature
   SKETCHAPI_EXPORT

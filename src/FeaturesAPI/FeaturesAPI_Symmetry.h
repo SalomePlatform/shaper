@@ -34,7 +34,7 @@ class ModelHighAPI_Selection;
 
 /// \class FeaturesAPI_Symmetry
 /// \ingroup CPPHighAPI
-/// \brief Interface for Symmetry feature.
+/// \brief Interface for the Mirror Copy feature.
 class FeaturesAPI_Symmetry: public ModelHighAPI_Interface
 {
 public:
@@ -45,8 +45,8 @@ public:
   /// Constructor with values.
   FEATURESAPI_EXPORT
   explicit FeaturesAPI_Symmetry(const std::shared_ptr<ModelAPI_Feature>& theFeature,
-                                   const std::list<ModelHighAPI_Selection>& theMainObjects,
-                                   const ModelHighAPI_Selection& theObject);
+                                const std::list<ModelHighAPI_Selection>& theMainObjects,
+                                const ModelHighAPI_Selection& theObject);
 
   /// Destructor.
   FEATURESAPI_EXPORT
@@ -89,10 +89,10 @@ public:
 typedef std::shared_ptr<FeaturesAPI_Symmetry> SymmetryPtr;
 
 /// \ingroup CPPHighAPI
-/// \brief Create Symmetry feature.
+/// \brief Create the Mirror Copy feature.
 FEATURESAPI_EXPORT
-SymmetryPtr addSymmetry(const std::shared_ptr<ModelAPI_Document>& thePart,
-                    const std::list<ModelHighAPI_Selection>& theMainObjects,
-                    const ModelHighAPI_Selection& theObject);
+SymmetryPtr addMirror(const std::shared_ptr<ModelAPI_Document>& thePart,
+                      const std::list<ModelHighAPI_Selection>& theMainObjects,
+                      const ModelHighAPI_Selection& theObject);
 
 #endif // FEATURESAPI_SYMMETRY_H_

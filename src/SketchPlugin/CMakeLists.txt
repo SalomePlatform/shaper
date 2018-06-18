@@ -181,9 +181,14 @@ ADD_UNIT_TESTS(TestSketchPointLine.py
                TestConstraintMiddlePoint.py
                TestEdgesOrder.py
                TestMirror.py
-               TestMultiRotation.py
                TestMultiTranslation.py
+               TestMultiRotation.py
                TestMultiRotationWithParameter.py
+               TestMultiRotation01.py
+               TestMultiRotation02.py
+               TestMultiRotation03.py
+               TestMultiRotation04.py
+               TestMultiRotation05.py
                TestFillet.py
                TestFilletInteracting.py
                TestRectangle.py
@@ -227,6 +232,10 @@ ADD_UNIT_TESTS(TestSketchPointLine.py
                TestDistanceSignedVsUnsigned05.py
                TestSignedDistancePointPoint.py
                TestSignedDistancePointLine.py
+               TestIntersectionWithLine.py
+               TestIntersectionWithCircle.py
+               TestIntersectionWithSpline.py
+               TestIntersectionChangeType.py
                Test2273.py
                Test2280.py
                Test2287.py

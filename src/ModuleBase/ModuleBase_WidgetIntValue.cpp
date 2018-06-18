@@ -21,11 +21,12 @@
 #include <ModuleBase_WidgetIntValue.h>
 #include <ModuleBase_ParamSpinBox.h>
 #include <ModuleBase_Tools.h>
-#include <ModuleBase_ParamIntSpinBox.h>
+#include <ModuleBase_ParamSpinBox.h>
 #include <ModuleBase_IconFactory.h>
 
 #include <ModelAPI_AttributeInteger.h>
 #include <ModelAPI_Data.h>
+#include <ModelAPI_AttributeString.h>
 
 #include <Config_Keywords.h>
 #include <Config_WidgetAPI.h>
@@ -62,7 +63,8 @@ ModuleBase_WidgetIntValue::ModuleBase_WidgetIntValue(QWidget* theParent,
   if (!aLabelIcon.isEmpty())
     myLabel->setPixmap(ModuleBase_IconFactory::loadPixmap(aLabelIcon));
 
-  mySpinBox = new ModuleBase_ParamIntSpinBox(this);
+  mySpinBox = new ModuleBase_ParamSpinBox(this);
+  mySpinBox->setDecimals(0);
   QString anObjName = QString::fromStdString(attributeID());
   mySpinBox->setObjectName(anObjName);
 
@@ -106,6 +108,14 @@ ModuleBase_WidgetIntValue::~ModuleBase_WidgetIntValue()
 {
 }
 
+void ModuleBase_WidgetIntValue::activateCustom()
+{
+  ModuleBase_ModelWidget::activateCustom();
+  QStringList aParameters;
+  ModuleBase_Tools::getParameters(aParameters);
+  mySpinBox->setCompletionList(aParameters);
+}
+
 bool ModuleBase_WidgetIntValue::resetCustom()
 {
   bool aDone = false;
@@ -131,8 +141,28 @@ bool ModuleBase_WidgetIntValue::storeValueCustom()
   AttributeIntegerPtr anAttribute = aData->integer(attributeID());
   if (mySpinBox->hasVariable()) {
     // Here is a text of a real value or an expression.
-    std::string aText = mySpinBox->text().toStdString();
-    anAttribute->setText(aText);
+    QString aText = mySpinBox->text();
+    if (aText.contains('=')) {
+      if (!myParameter.get()) {
+        myParameter = ModuleBase_Tools::createParameter(aText);
+        if (!myParameter.get()) {
+          anAttribute->setExpressionError("Parameter cannot be created");
+          anAttribute->setExpressionInvalid(true);
+          updateObject(myFeature);
+          return false;
+        } else if (anAttribute->expressionInvalid()) {
+          anAttribute->setExpressionError("");
+          anAttribute->setExpressionInvalid(false);
+        }
+      } else {
+        ModuleBase_Tools::editParameter(myParameter, aText);
+      }
+      aText = aText.split('=').at(0) + "=";
+    } else if (myParameter.get()) {
+      // Nullyfy the parameter reference without deletion of the created
+      myParameter = FeaturePtr();
+    }
+    anAttribute->setText(aText.toStdString());
   } else {
     // it is important to set the empty text value to the attribute before set the value
     // because setValue tries to calculate the attribute value according to the
@@ -150,7 +180,20 @@ bool ModuleBase_WidgetIntValue::restoreValueCustom()
   AttributeIntegerPtr anAttribute = aData->integer(attributeID());
   std::string aTextRepr = anAttribute->text();
   if (!aTextRepr.empty()) {
-    ModuleBase_Tools::setSpinText(mySpinBox, QString::fromStdString(aTextRepr));
+    QString aText = QString::fromStdString(aTextRepr);
+    if (aText.endsWith('=')) {
+      if (!myParameter.get()) {
+        QString aName = aText.left(aText.indexOf('=')).trimmed();
+        myParameter = ModuleBase_Tools::findParameter(aName);
+      }
+      /// If myParameter is empty then it was not created because of an error
+      if (!myParameter.get())
+        return false;
+
+      AttributeStringPtr aExprAttr = myParameter->string("expression");
+      aText += aExprAttr->value().c_str();
+    }
+    ModuleBase_Tools::setSpinText(mySpinBox, aText);
   } else {
     ModuleBase_Tools::setSpinValue(mySpinBox, anAttribute->value());
   }

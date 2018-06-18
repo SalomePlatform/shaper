@@ -59,6 +59,14 @@ public:
   GEOMALGOAPI_EXPORT static std::shared_ptr<GeomAPI_Pnt>
     centreOfMass(const std::shared_ptr<GeomAPI_Shape> theShape);
 
+  /// \brief Obtain radius of cylindrical face.
+  ///        Return negative value if the face is not a cylinder
+  GEOMALGOAPI_EXPORT static double radius(const std::shared_ptr<GeomAPI_Face>& theCylinder);
+
+  /// \brief Calculate minimal distance between shapes
+  GEOMALGOAPI_EXPORT static double minimalDistance(const GeomShapePtr& theShape1,
+                                                   const GeomShapePtr& theShape2);
+
   /// \brief Combines faces with common edges to shells, or solids to compsolids.
   /// \param[in] theCompound compound of shapes.
   /// \param[in] theType type of combine.

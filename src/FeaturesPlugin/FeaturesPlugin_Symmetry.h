@@ -27,6 +27,8 @@
 
 #include <GeomAlgoAPI_Symmetry.h>
 
+class GeomAPI_Trsf;
+
 /** \class FeaturesPlugin_Symmetry
  *  \ingroup Plugins
  *  \brief Feature that performs reflection with respect to a point, axis, or plane.
@@ -37,7 +39,7 @@ class FeaturesPlugin_Symmetry : public ModelAPI_Feature
   /// Symmetry kind.
   inline static const std::string& ID()
   {
-    static const std::string MY_SYMMETRY_ID("Symmetry");
+    static const std::string MY_SYMMETRY_ID("MirrorCopy");
     return MY_SYMMETRY_ID;
   }
 
@@ -114,6 +116,10 @@ class FeaturesPlugin_Symmetry : public ModelAPI_Feature
   FeaturesPlugin_Symmetry();
 
 private:
+  /// Obtain list of source objects of the mirror
+  bool collectSourceObjects(ListOfShape& theSourceShapes,
+                            std::list<std::shared_ptr<ModelAPI_Result>>& theSourceResults);
+
   /// Perform symmetry with respect to a point.
   void performSymmetryByPoint();
 
@@ -127,6 +133,16 @@ private:
   void loadNamingDS(GeomAlgoAPI_Symmetry& theSymmetryAlgo,
                     std::shared_ptr<ModelAPI_ResultBody> theResultBody,
                     std::shared_ptr<GeomAPI_Shape> theBaseShape);
+
+  /// Create new result on given shapes and the index of result
+  void buildResult(GeomAlgoAPI_Symmetry& theSymmetryAlgo,
+                   std::shared_ptr<GeomAPI_Shape> theBaseShape,
+                   int theResultIndex);
+
+  /// Create new result for the given part and transformation
+  void buildResult(std::shared_ptr<ModelAPI_ResultPart> theOriginal,
+                   std::shared_ptr<GeomAPI_Trsf> theTrsf,
+                   int& theResultIndex);
 };
 
 #endif // FEATURESPLUGIN_SYMMETRY_H_

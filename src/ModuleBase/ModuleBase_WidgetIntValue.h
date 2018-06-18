@@ -24,7 +24,7 @@
 #include "ModuleBase.h"
 #include "ModuleBase_ModelWidget.h"
 
-class ModuleBase_ParamIntSpinBox;
+class ModuleBase_ParamSpinBox;
 class Config_WidgetAPI;
 class QWidget;
 class QLabel;
@@ -48,6 +48,9 @@ Q_OBJECT
   ModuleBase_WidgetIntValue(QWidget* theParent, const Config_WidgetAPI* theData);
 
   virtual ~ModuleBase_WidgetIntValue();
+
+  /// The methiod called when widget is activated
+  virtual void activateCustom();
 
   /// Select the internal content if it can be selected. It is empty in the default realization
   virtual void selectContent();
@@ -77,7 +80,9 @@ protected:
   QLabel* myLabel;
 
   /// Input value control
-  ModuleBase_ParamIntSpinBox* mySpinBox;
+  ModuleBase_ParamSpinBox* mySpinBox;
+
+  FeaturePtr myParameter;
 };
 
 #endif

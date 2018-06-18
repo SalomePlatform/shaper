@@ -20,6 +20,7 @@
 
 #include <FeaturesPlugin_Symmetry.h>
 
+#include <GeomAlgoAPI_CompoundBuilder.h>
 #include <GeomAlgoAPI_PointBuilder.h>
 #include <GeomAlgoAPI_FaceBuilder.h>
 
@@ -81,27 +82,36 @@ void FeaturesPlugin_Symmetry::execute()
 }
 
 //=================================================================================================
+bool FeaturesPlugin_Symmetry::collectSourceObjects(ListOfShape& theSourceShapes,
+                                                   std::list<ResultPtr>& theSourceResults)
+{
+  AttributeSelectionListPtr anObjectsSelList =
+    selectionList(FeaturesPlugin_Symmetry::OBJECTS_LIST_ID());
+  if (anObjectsSelList->size() == 0) {
+    return false;
+  }
+  for (int anObjectsIndex = 0; anObjectsIndex < anObjectsSelList->size(); anObjectsIndex++) {
+    std::shared_ptr<ModelAPI_AttributeSelection> anObjectAttr =
+      anObjectsSelList->value(anObjectsIndex);
+    std::shared_ptr<GeomAPI_Shape> anObject = anObjectAttr->value();
+    if (!anObject.get()) { // may be for not-activated parts
+      eraseResults();
+      return false;
+    }
+    theSourceShapes.push_back(anObject);
+    theSourceResults.push_back(anObjectAttr->context());
+  }
+  return true;
+}
+
+//=================================================================================================
 void FeaturesPlugin_Symmetry::performSymmetryByPoint()
 {
   // Getting objects.
   ListOfShape anObjects;
   std::list<ResultPtr> aContextes;
-  AttributeSelectionListPtr anObjectsSelList =
-    selectionList(FeaturesPlugin_Symmetry::OBJECTS_LIST_ID());
-  if (anObjectsSelList->size() == 0) {
+  if (!collectSourceObjects(anObjects, aContextes))
     return;
-  }
-  for(int anObjectsIndex = 0; anObjectsIndex < anObjectsSelList->size(); anObjectsIndex++) {
-    std::shared_ptr<ModelAPI_AttributeSelection> anObjectAttr =
-      anObjectsSelList->value(anObjectsIndex);
-    std::shared_ptr<GeomAPI_Shape> anObject = anObjectAttr->value();
-    if(!anObject.get()) { // may be for not-activated parts
-      eraseResults();
-      return;
-    }
-    anObjects.push_back(anObject);
-    aContextes.push_back(anObjectAttr->context());
-  }
 
   //Getting point.
   std::shared_ptr<GeomAPI_Pnt> aPoint;
@@ -130,10 +140,9 @@ void FeaturesPlugin_Symmetry::performSymmetryByPoint()
       std::shared_ptr<GeomAPI_Trsf> aTrsf(new GeomAPI_Trsf());
       aTrsf->setSymmetry(aPoint);
       ResultPartPtr anOrigin = std::dynamic_pointer_cast<ModelAPI_ResultPart>(*aContext);
-      ResultPartPtr aResultPart = document()->copyPart(anOrigin, data(), aResultIndex);
-      aResultPart->setTrsf(*aContext, aTrsf);
-      setResult(aResultPart, aResultIndex);
-    } else {
+      buildResult(anOrigin, aTrsf, aResultIndex);
+    }
+    else {
       GeomAlgoAPI_Symmetry aSymmetryAlgo(aBaseShape, aPoint);
 
       if (!aSymmetryAlgo.check()) {
@@ -160,9 +169,7 @@ void FeaturesPlugin_Symmetry::performSymmetryByPoint()
         break;
       }
 
-      ResultBodyPtr aResultBody = document()->createBody(data(), aResultIndex);
-      loadNamingDS(aSymmetryAlgo, aResultBody, aBaseShape);
-      setResult(aResultBody, aResultIndex);
+      buildResult(aSymmetryAlgo, aBaseShape, aResultIndex);
     }
     aResultIndex++;
   }
@@ -177,22 +184,8 @@ void FeaturesPlugin_Symmetry::performSymmetryByAxis()
   // Getting objects.
   ListOfShape anObjects;
   std::list<ResultPtr> aContextes;
-  AttributeSelectionListPtr anObjectsSelList =
-    selectionList(FeaturesPlugin_Symmetry::OBJECTS_LIST_ID());
-  if (anObjectsSelList->size() == 0) {
+  if (!collectSourceObjects(anObjects, aContextes))
     return;
-  }
-  for(int anObjectsIndex = 0; anObjectsIndex < anObjectsSelList->size(); anObjectsIndex++) {
-    std::shared_ptr<ModelAPI_AttributeSelection> anObjectAttr =
-      anObjectsSelList->value(anObjectsIndex);
-    std::shared_ptr<GeomAPI_Shape> anObject = anObjectAttr->value();
-    if(!anObject.get()) { // may be for not-activated parts
-      eraseResults();
-      return;
-    }
-    anObjects.push_back(anObject);
-    aContextes.push_back(anObjectAttr->context());
-  }
 
   //Getting axis.
   std::shared_ptr<GeomAPI_Ax1> anAxis;
@@ -223,10 +216,9 @@ void FeaturesPlugin_Symmetry::performSymmetryByAxis()
       std::shared_ptr<GeomAPI_Trsf> aTrsf(new GeomAPI_Trsf());
       aTrsf->setSymmetry(anAxis);
       ResultPartPtr anOrigin = std::dynamic_pointer_cast<ModelAPI_ResultPart>(*aContext);
-      ResultPartPtr aResultPart = document()->copyPart(anOrigin, data(), aResultIndex);
-      aResultPart->setTrsf(*aContext, aTrsf);
-      setResult(aResultPart, aResultIndex);
-    } else {
+      buildResult(anOrigin, aTrsf, aResultIndex);
+    }
+    else {
       GeomAlgoAPI_Symmetry aSymmetryAlgo(aBaseShape, anAxis);
 
       if (!aSymmetryAlgo.check()) {
@@ -253,9 +245,7 @@ void FeaturesPlugin_Symmetry::performSymmetryByAxis()
         break;
       }
 
-      ResultBodyPtr aResultBody = document()->createBody(data(), aResultIndex);
-      loadNamingDS(aSymmetryAlgo, aResultBody, aBaseShape);
-      setResult(aResultBody, aResultIndex);
+      buildResult(aSymmetryAlgo, aBaseShape, aResultIndex);
     }
     aResultIndex++;
   }
@@ -270,22 +260,8 @@ void FeaturesPlugin_Symmetry::performSymmetryByPlane()
   // Getting objects.
   ListOfShape anObjects;
   std::list<ResultPtr> aContextes;
-  AttributeSelectionListPtr anObjectsSelList =
-    selectionList(FeaturesPlugin_Symmetry::OBJECTS_LIST_ID());
-  if (anObjectsSelList->size() == 0) {
+  if (!collectSourceObjects(anObjects, aContextes))
     return;
-  }
-  for(int anObjectsIndex = 0; anObjectsIndex < anObjectsSelList->size(); anObjectsIndex++) {
-    std::shared_ptr<ModelAPI_AttributeSelection> anObjectAttr =
-      anObjectsSelList->value(anObjectsIndex);
-    std::shared_ptr<GeomAPI_Shape> anObject = anObjectAttr->value();
-    if(!anObject.get()) { // may be for not-activated parts
-      eraseResults();
-      return;
-    }
-    anObjects.push_back(anObject);
-    aContextes.push_back(anObjectAttr->context());
-  }
 
   //Getting axis.
   std::shared_ptr<GeomAPI_Ax2> aPlane;
@@ -318,9 +294,7 @@ void FeaturesPlugin_Symmetry::performSymmetryByPlane()
       std::shared_ptr<GeomAPI_Trsf> aTrsf(new GeomAPI_Trsf());
       aTrsf->setSymmetry(aPlane);
       ResultPartPtr anOrigin = std::dynamic_pointer_cast<ModelAPI_ResultPart>(*aContext);
-      ResultPartPtr aResultPart = document()->copyPart(anOrigin, data(), aResultIndex);
-      aResultPart->setTrsf(*aContext, aTrsf);
-      setResult(aResultPart, aResultIndex);
+      buildResult(anOrigin, aTrsf, aResultIndex);
     } else {
       GeomAlgoAPI_Symmetry aSymmetryAlgo(aBaseShape, aPlane);
 
@@ -348,9 +322,7 @@ void FeaturesPlugin_Symmetry::performSymmetryByPlane()
         break;
       }
 
-      ResultBodyPtr aResultBody = document()->createBody(data(), aResultIndex);
-      loadNamingDS(aSymmetryAlgo, aResultBody, aBaseShape);
-      setResult(aResultBody, aResultIndex);
+      buildResult(aSymmetryAlgo, aBaseShape, aResultIndex);
     }
     aResultIndex++;
   }
@@ -360,13 +332,45 @@ void FeaturesPlugin_Symmetry::performSymmetryByPlane()
 }
 
 //=================================================================================================
+void FeaturesPlugin_Symmetry::buildResult(GeomAlgoAPI_Symmetry& theSymmetryAlgo,
+                                          std::shared_ptr<GeomAPI_Shape> theBaseShape,
+                                          int theResultIndex)
+{
+  // Compose source shape and the result of symmetry.
+  ListOfShape aShapes;
+  aShapes.push_back(theBaseShape);
+  aShapes.push_back(theSymmetryAlgo.shape());
+  std::shared_ptr<GeomAPI_Shape> aCompound = GeomAlgoAPI_CompoundBuilder::compound(aShapes);
+
+  // Store and name the result.
+  ResultBodyPtr aResultBody = document()->createBody(data(), theResultIndex);
+  aResultBody->storeModified(theBaseShape, aCompound);
+  loadNamingDS(theSymmetryAlgo, aResultBody, theBaseShape);
+  setResult(aResultBody, theResultIndex);
+}
+
+//=================================================================================================
+void FeaturesPlugin_Symmetry::buildResult(ResultPartPtr theOriginal,
+                                          std::shared_ptr<GeomAPI_Trsf> theTrsf,
+                                          int& theResultIndex)
+{
+  std::shared_ptr<GeomAPI_Trsf> anIdentity(new GeomAPI_Trsf());
+  ResultPartPtr aCopy = document()->copyPart(theOriginal, data(), theResultIndex);
+  aCopy->setTrsf(theOriginal, anIdentity);
+  setResult(aCopy, theResultIndex);
+
+  ++theResultIndex;
+
+  ResultPartPtr aResultPart = document()->copyPart(theOriginal, data(), theResultIndex);
+  aResultPart->setTrsf(theOriginal, theTrsf);
+  setResult(aResultPart, theResultIndex);
+}
+
+//=================================================================================================
 void FeaturesPlugin_Symmetry::loadNamingDS(GeomAlgoAPI_Symmetry& theSymmetryAlgo,
                                            std::shared_ptr<ModelAPI_ResultBody> theResultBody,
                                            std::shared_ptr<GeomAPI_Shape> theBaseShape)
 {
-  // Store and name the result.
-  theResultBody->storeModified(theBaseShape, theSymmetryAlgo.shape());
-
   // Name the faces
   std::shared_ptr<GeomAPI_DataMapOfShapeShape> aSubShapes = theSymmetryAlgo.mapOfSubShapes();
   std::string aReflectedName = "Symmetried";

@@ -2601,6 +2601,7 @@ void XGUI_Workshop::highlightResults(const QObjectPtrList& theObjects)
 {
   FeaturePtr aFeature;
   QObjectPtrList aSelList = theObjects;
+  QObjectPtrList aNewSel;
   bool aHasHidden = false;
   foreach(ObjectPtr aObj, theObjects) {
     aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(aObj);
@@ -2611,6 +2612,7 @@ void XGUI_Workshop::highlightResults(const QObjectPtrList& theObjects)
       for(aIt = aResults.cbegin(); aIt != aResults.cend(); aIt++) {
         aHasHidden |= (*aIt)->isConcealed();
         aSelList.append(*aIt);
+        aNewSel.append(*aIt);
       }
     }
   }
@@ -2619,6 +2621,7 @@ void XGUI_Workshop::highlightResults(const QObjectPtrList& theObjects)
     bool aBlocked = objectBrowser()->blockSignals(true);
     objectBrowser()->setObjectsSelected(aSelList);
     objectBrowser()->blockSignals(aBlocked);
+    objectBrowser()->ensureVisible(aNewSel.first());
   }
   if (aHasHidden)
     QMessageBox::information(desktop(), tr("Find results"),
@@ -2630,6 +2633,7 @@ void XGUI_Workshop::highlightFeature(const QObjectPtrList& theObjects)
 {
   ResultPtr aResult;
   QObjectPtrList aSelList = theObjects;
+  QObjectPtrList aNewSel;
   FeaturePtr aFeature;
   foreach(ObjectPtr aObj, theObjects) {
     aResult = std::dynamic_pointer_cast<ModelAPI_Result>(aObj);
@@ -2637,6 +2641,7 @@ void XGUI_Workshop::highlightFeature(const QObjectPtrList& theObjects)
       aFeature = ModelAPI_Feature::feature(aResult);
       if (aFeature.get()) {
         aSelList.append(aFeature);
+        aNewSel.append(aFeature);
       }
     }
   }
@@ -2645,6 +2650,7 @@ void XGUI_Workshop::highlightFeature(const QObjectPtrList& theObjects)
     bool aBlocked = objectBrowser()->blockSignals(true);
     objectBrowser()->setObjectsSelected(aSelList);
     objectBrowser()->blockSignals(aBlocked);
+    objectBrowser()->ensureVisible(aNewSel.first());
   }
 }
 
