@@ -102,7 +102,8 @@ void GeomAlgoAPI_Filling::buildByEdges()
 
   // check myMaxDegree >= aCurves.size() - 1 to be able to interpolate a surface
   if (myMaxDegree + 1 < aNbCurves) {
-    myError = "Unable to interpolate surface, Max deg + 1 should be greater or equal than number of sections.";
+    myError = "Unable to interpolate surface,"
+       " Max deg + 1 should be greater or equal than number of sections.";
     return;
   }
 
