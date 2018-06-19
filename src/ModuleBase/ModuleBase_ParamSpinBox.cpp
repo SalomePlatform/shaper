@@ -33,6 +33,7 @@
 
 #include <string>
 #include <iostream>
+#include <cfloat>
 
 ModuleBase_ParamSpinBox::ModuleBase_ParamSpinBox(QWidget* theParent, int thePrecision)
   : QAbstractSpinBox(theParent),
