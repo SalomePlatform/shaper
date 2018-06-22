@@ -60,7 +60,7 @@ public:
     static const std::string MY_CREATION_METHOD_ID("by_xyz");
     return MY_CREATION_METHOD_ID;
   }
-  /*
+
   /// Attribute name for creation method.
   inline static const std::string& CREATION_METHOD_BY_DISTANCE_ON_EDGE()
   {
@@ -68,6 +68,7 @@ public:
     return MY_CREATION_METHOD_ID;
   }
 
+  /*
   /// Attribute name for creation method.
   inline static const std::string& CREATION_METHOD_BY_PROJECTION()
   {
@@ -82,6 +83,7 @@ public:
     return MY_CREATION_METHOD_ID;
   }
   */
+
   /// Attribute name for creation method.
   inline static const std::string& CREATION_METHOD_BY_LINE_AND_PLANE_INTERSECTION()
   {
@@ -110,24 +112,45 @@ public:
     return POINT_ATTR_Z;
   }
 
-  /*/// Attribute name for selected edge.
+  /// Attribute name for selected edge.
   inline static const std::string& EDGE()
   {
     static const std::string ATTR_ID("edge");
     return ATTR_ID;
   }
 
-  /// Attribute name for distance.
-  inline static const std::string& DISTANCE_VALUE()
+  /// Attribute name for offset type on selected edge.
+  inline static const std::string& OFFSET_TYPE()
   {
-    static const std::string ATTR_ID("value");
+    static const std::string ATTR_ID("offset_type");
+    return ATTR_ID;
+  }
+
+  /// Attribute name for offset type by distance.
+  inline static const std::string& OFFSET_TYPE_BY_DISTANCE()
+  {
+    static const std::string ATTR_ID("offset_type_by_distance");
+    return ATTR_ID;
+  }
+
+  /// Attribute name for offset type by ratio.
+  inline static const std::string& OFFSET_TYPE_BY_RATIO()
+  {
+    static const std::string ATTR_ID("offset_type_by_ratio");
+    return ATTR_ID;
+  }
+
+  /// Attribute name for distance.
+  inline static const std::string& DISTANCE()
+  {
+    static const std::string ATTR_ID("distance");
     return ATTR_ID;
   }
 
   /// Attribute name for percent flag.
-  inline static const std::string& DISTANCE_PERCENT()
+  inline static const std::string& RATIO()
   {
-    static const std::string ATTR_ID("percent");
+    static const std::string ATTR_ID("ratio");
     return ATTR_ID;
   }
 
@@ -138,6 +161,7 @@ public:
     return ATTR_ID;
   }
 
+  /*
   /// Attribute name for point.
   inline static const std::string& POINT()
   {
@@ -220,8 +244,8 @@ public:
 
 private:
   std::shared_ptr<GeomAPI_Vertex> createByXYZ();
-  /*std::shared_ptr<GeomAPI_Vertex> createByDistanceOnEdge();
-  std::shared_ptr<GeomAPI_Vertex> createByProjection();
+  std::shared_ptr<GeomAPI_Vertex> createByDistanceOnEdge();
+  /*std::shared_ptr<GeomAPI_Vertex> createByProjection();
   std::shared_ptr<GeomAPI_Vertex> createByLinesIntersection();*/
   std::list<std::shared_ptr<GeomAPI_Vertex> > createByLineAndPlaneIntersection();
 

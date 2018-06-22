@@ -79,5 +79,6 @@ ADD_UNIT_TESTS(TestAxisCreation.py
                UnitTestAxis.py
                TestPoint_XYZ.py
                TestPoint_LineAndPlane.py
+               TestPoint_Edge.py
                TestPointName.py
                TestPlane.py)

@@ -55,23 +55,26 @@ void ConstructionPlugin_Point::initAttributes()
 
   data()->addAttribute(CREATION_METHOD(), ModelAPI_AttributeString::typeId());
 
-  /*data()->addAttribute(EDGE(), ModelAPI_AttributeSelection::typeId());
-  data()->addAttribute(DISTANCE_VALUE(), ModelAPI_AttributeDouble::typeId());
-  data()->addAttribute(DISTANCE_PERCENT(), ModelAPI_AttributeBoolean::typeId());
-  data()->addAttribute(REVERSE(), ModelAPI_AttributeBoolean::typeId());
-
+/*
   data()->addAttribute(POINT(), ModelAPI_AttributeSelection::typeId());
   data()->addAttribute(PLANE(), ModelAPI_AttributeSelection::typeId());
 
   data()->addAttribute(FIRST_LINE(), ModelAPI_AttributeSelection::typeId());
   data()->addAttribute(SECOND_LINE(), ModelAPI_AttributeSelection::typeId());
 */
+
   data()->addAttribute(INTERSECTION_LINE(), ModelAPI_AttributeSelection::typeId());
   data()->addAttribute(INTERSECTION_PLANE(), ModelAPI_AttributeSelection::typeId());
 
   data()->addAttribute(USE_OFFSET(), ModelAPI_AttributeString::typeId());
   data()->addAttribute(OFFSET(), ModelAPI_AttributeDouble::typeId());
   data()->addAttribute(REVERSE_OFFSET(), ModelAPI_AttributeBoolean::typeId());
+
+  data()->addAttribute(EDGE(), ModelAPI_AttributeSelection::typeId());
+  data()->addAttribute(OFFSET_TYPE(), ModelAPI_AttributeString::typeId());
+  data()->addAttribute(DISTANCE(), ModelAPI_AttributeDouble::typeId());
+  data()->addAttribute(RATIO(), ModelAPI_AttributeDouble::typeId());
+  data()->addAttribute(REVERSE(), ModelAPI_AttributeBoolean::typeId());
 }
 
 //==================================================================================================
@@ -85,9 +88,9 @@ void ConstructionPlugin_Point::execute()
     string(CREATION_METHOD())->value() : CREATION_METHOD_BY_XYZ();
   if(aCreationMethod == CREATION_METHOD_BY_XYZ()) {
     aShape = createByXYZ();
-  }/* else if(aCreationMethod == CREATION_METHOD_BY_DISTANCE_ON_EDGE()) {
+  } else if(aCreationMethod == CREATION_METHOD_BY_DISTANCE_ON_EDGE()) {
     aShape = createByDistanceOnEdge();
-  } else if(aCreationMethod == CREATION_METHOD_BY_PROJECTION()) {
+  }/* else if(aCreationMethod == CREATION_METHOD_BY_PROJECTION()) {
     aShape = createByProjection();
   } else if(aCreationMethod == CREATION_METHOD_BY_LINES_INTERSECTION()) {
     aShape = createByLinesIntersection();
@@ -138,7 +141,7 @@ std::shared_ptr<GeomAPI_Vertex> ConstructionPlugin_Point::createByXYZ()
                                           real(Z())->value());
 }
 
-/*//==================================================================================================
+//==================================================================================================
 std::shared_ptr<GeomAPI_Vertex> ConstructionPlugin_Point::createByDistanceOnEdge()
 {
   // Get edge.
@@ -150,15 +153,22 @@ std::shared_ptr<GeomAPI_Vertex> ConstructionPlugin_Point::createByDistanceOnEdge
   std::shared_ptr<GeomAPI_Edge> anEdge(new GeomAPI_Edge(aShape));
 
   // Get distance value and percent flag.
-  double aValue = real(DISTANCE_VALUE())->value();
-  bool anIsPercent = boolean(DISTANCE_PERCENT())->value();
+  double aValue;
+  bool anIsPercent = false;
+  if (string(OFFSET_TYPE())->value() == OFFSET_TYPE_BY_DISTANCE()) {
+    aValue = real(DISTANCE())->value();
+    anIsPercent = false;
+  } else {
+    aValue = real(RATIO())->value() * 100.0;
+    anIsPercent = true;
+  }
 
   // Get reverse flag.
   bool anIsReverse = boolean(REVERSE())->value();
 
   return GeomAlgoAPI_PointBuilder::vertexOnEdge(anEdge, aValue, anIsPercent, anIsReverse);
 }
-
+/*
 //==================================================================================================
 std::shared_ptr<GeomAPI_Vertex> ConstructionPlugin_Point::createByProjection()
 {

@@ -41,7 +41,6 @@ email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com
                    icon="icons/Construction/z_size.png"
                    default="0"/>
     </box>
-<!--
     <box id="by_distance_on_edge"
          title="By distance on edge"
          tooltip="Point on an edge, at a given distance of one of its end."
@@ -53,22 +52,39 @@ email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com
                       shape_types="edge">
         <validator id="GeomValidators_Finite"/>
       </shape_selector>
-      <groupbox title="Distance">
-        <doublevalue id="value"
-                     label="Value"
-                     tooltip="Distance value."
-                     icon="icons/Construction/distance_value.png"
-                     default="50"/>
-        <boolvalue id="percent"
-                   label="Percent(%)"
-                   tooltip="Distance in percent from length."
-                   default="true"/>
-      </groupbox>
+      <toolbox id="offset_type">
+        <box id="offset_type_by_distance"
+             title="Distance on edge by value"
+             tooltip="Point on an edge, at a given distance specified by value."
+             icon="icons/Construction/point_by_distance_on_edge_24x24.png">
+          <doublevalue id="distance"
+             label="Distance"
+             tooltip="Distance value."
+             icon="icons/Construction/distance_value.png"
+             min="0.0"
+             default="10">
+          </doublevalue>
+        </box>
+        <box id="offset_type_by_ratio"
+             title="Distance on edge by ratio"
+             tooltip="Point on an edge, at a given distance specified by ratio."
+             icon="icons/Construction/point_by_ratio_on_edge_24x24.png">
+          <doublevalue id="ratio"
+             label="Ratio"
+             tooltip="Ratio value."
+             icon="icons/Construction/distance_value.png"
+             min="0.0"
+             max="1.0"
+             default="0.5">
+          </doublevalue>
+        </box>
+      </toolbox>
       <boolvalue id="reverse"
            label="Reverse"
            tooltip="Distance from edge end point."
            default="false"/>
     </box>
+<!--
     <box id="by_projection"
          title="By projection"
          tooltip="Point on face surface by projection selected point."

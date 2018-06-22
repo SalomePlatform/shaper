@@ -45,18 +45,18 @@ ConstructionAPI_Point::ConstructionAPI_Point(const std::shared_ptr<ModelAPI_Feat
   }
 }
 
-/*//==================================================================================================
+//==================================================================================================
 ConstructionAPI_Point::ConstructionAPI_Point(const std::shared_ptr<ModelAPI_Feature>& theFeature,
                                              const ModelHighAPI_Selection& theEdge,
-                                             const ModelHighAPI_Double& theDistanceValue,
-                                             const bool theDistancePercent,
+                                             const ModelHighAPI_Double& theOffset,
+                                             const bool theUseRatio,
                                              const bool theReverse)
 : ModelHighAPI_Interface(theFeature)
 {
   if(initialize()) {
-    setByDistanceOnEdge(theEdge, theDistanceValue, theDistancePercent, theReverse);
+    setByOffsetOnEdge(theEdge, theOffset, theUseRatio, theReverse);
   }
-}*/
+}
 
 //==================================================================================================
 ConstructionAPI_Point::ConstructionAPI_Point(const std::shared_ptr<ModelAPI_Feature>& theFeature,
@@ -101,21 +101,28 @@ void ConstructionAPI_Point::setByXYZ(const ModelHighAPI_Double& theX,
   execute(false);
 }
 
-/*//==================================================================================================
-void ConstructionAPI_Point::setByDistanceOnEdge(const ModelHighAPI_Selection& theEdge,
-                                                const ModelHighAPI_Double& theDistanceValue,
-                                                const bool theDistancePercent,
-                                                const bool theReverse)
+//==================================================================================================
+void ConstructionAPI_Point::setByOffsetOnEdge(const ModelHighAPI_Selection& theEdge,
+                                              const ModelHighAPI_Double& theOffset,
+                                              const bool theUseRatio,
+                                              const bool theReverse)
 {
   fillAttribute(ConstructionPlugin_Point::CREATION_METHOD_BY_DISTANCE_ON_EDGE(), mycreationMethod);
   fillAttribute(theEdge, myedge);
-  fillAttribute(theDistanceValue, mydistanceValue);
-  fillAttribute(theDistancePercent, mydistancePercent);
+  if (theUseRatio) {
+    fillAttribute(ConstructionPlugin_Point::OFFSET_TYPE_BY_RATIO(), myoffsetType);
+    fillAttribute(theOffset, myratio);
+  }
+  else {
+    fillAttribute(ConstructionPlugin_Point::OFFSET_TYPE_BY_DISTANCE(), myoffsetType);
+    fillAttribute(theOffset, mydistance);
+  }
   fillAttribute(theReverse, myreverse);
 
   execute();
 }
 
+/*
 //==================================================================================================
 void ConstructionAPI_Point::setByProjection(const ModelHighAPI_Selection& theVertex,
                                             const ModelHighAPI_Selection& theFace)
@@ -136,7 +143,8 @@ void ConstructionAPI_Point::setByLinesIntersection(const ModelHighAPI_Selection&
   fillAttribute(theEdge2, mysecondLine);
 
   execute();
-}*/
+}
+*/
 
 //==================================================================================================
 void ConstructionAPI_Point::setByLineAndPlaneIntersection(const ModelHighAPI_Selection& theEdge,
@@ -170,6 +178,16 @@ void ConstructionAPI_Point::dump(ModelHighAPI_Dumper& theDumper) const
     }
     theDumper << ")" << std::endl;
   }
+  else if (aMeth == ConstructionPlugin_Point::CREATION_METHOD_BY_DISTANCE_ON_EDGE()) {
+    theDumper << edge() << ", ";
+    if (offsetType()->value() == ConstructionPlugin_Point::OFFSET_TYPE_BY_DISTANCE()) {
+      theDumper << distance() << ", " << false;
+    }
+    else {
+      theDumper << ratio() << ", " << true;
+    }
+    theDumper << ", " << reverse()->value() << ")" << std::endl;
+  }
 }
 
 //==================================================================================================
@@ -182,16 +200,16 @@ PointPtr addPoint(const std::shared_ptr<ModelAPI_Document>& thePart,
   return PointPtr(new ConstructionAPI_Point(aFeature, theX, theY, theZ));
 }
 
-/*//==================================================================================================
+//==================================================================================================
 PointPtr addPoint(const std::shared_ptr<ModelAPI_Document> & thePart,
                   const ModelHighAPI_Selection& theEdge,
-                  const ModelHighAPI_Double& theDistanceValue,
-                  const bool theDistancePercent,
+                  const ModelHighAPI_Double& theOffset,
+                  const bool theUseRatio,
                   const bool theReverse)
 {
   std::shared_ptr<ModelAPI_Feature> aFeature = thePart->addFeature(ConstructionAPI_Point::ID());
-  return PointPtr(new ConstructionAPI_Point(aFeature, theEdge, theDistanceValue, theDistancePercent, theReverse));
-}*/
+  return PointPtr(new ConstructionAPI_Point(aFeature, theEdge, theOffset, theUseRatio, theReverse));
+}
 
 //==================================================================================================
 PointPtr addPoint(const std::shared_ptr<ModelAPI_Document> & thePart,
