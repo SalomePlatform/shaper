@@ -141,7 +141,17 @@ void PartSet_OperationPrs::Compute(
         setWidth(aDrawer, aWidth);
       }
     }
-    StdPrs_WFShape::Add(thePresentation, aShape, aDrawer);
+    try {
+      StdPrs_WFShape::Add(thePresentation, aShape, aDrawer);
+    }
+    catch (...) {
+      Events_InfoMessage("PartSet_OperationPrs",
+        "An empty AIS presentation: PartSet_OperationPrs").send();
+      std::shared_ptr<Events_Message> aMsg = std::shared_ptr<Events_Message>(
+        new Events_Message(Events_Loop::eventByName(EVENT_EMPTY_OPERATION_PRESENTATION)));
+      Events_Loop::loop()->send(aMsg);
+      return;
+    }
   }
   Set(aComp);
   if (!aReadyToDisplay) {
