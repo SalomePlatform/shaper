@@ -51,7 +51,7 @@ public:
    \param theParent a parent object
    \param thePrecision a precision of values display
    */
-  ModuleBase_ParamSpinBox( QWidget* theParent = 0, int thePrecision = -12 );
+  ModuleBase_ParamSpinBox( QWidget* theParent = 0, int thePrecision = 12 );
 
   /// Set list of completion strings
   void setCompletionList(QStringList&);
