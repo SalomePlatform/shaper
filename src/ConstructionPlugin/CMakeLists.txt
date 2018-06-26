@@ -80,5 +80,6 @@ ADD_UNIT_TESTS(TestAxisCreation.py
                TestPoint_XYZ.py
                TestPoint_LineAndPlane.py
                TestPoint_Edge.py
+               TestPoint_ProjectOnFace.py
                TestPointName.py
                TestPlane.py)

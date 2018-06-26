@@ -68,14 +68,14 @@ public:
     return MY_CREATION_METHOD_ID;
   }
 
-  /*
   /// Attribute name for creation method.
-  inline static const std::string& CREATION_METHOD_BY_PROJECTION()
+  inline static const std::string& CREATION_METHOD_BY_PROJECTION_ON_FACE()
   {
-    static const std::string MY_CREATION_METHOD_ID("by_projection");
+    static const std::string MY_CREATION_METHOD_ID("by_projection_on_face");
     return MY_CREATION_METHOD_ID;
   }
 
+  /*
   /// Attribute name for creation method.
   inline static const std::string& CREATION_METHOD_BY_LINES_INTERSECTION()
   {
@@ -161,21 +161,21 @@ public:
     return ATTR_ID;
   }
 
+  /// Attribute name for point to project on surface.
+  inline static const std::string& POINT_TO_PROJECT_ON_FACE()
+  {
+    static const std::string ATTR_ID("point_to_project_on_face");
+    return ATTR_ID;
+  }
+
+  /// Attribute name for face for point projection.
+  inline static const std::string& FACE_FOR_POINT_PROJECTION()
+  {
+    static const std::string ATTR_ID("face_for_point_projection");
+    return ATTR_ID;
+  }
+
   /*
-  /// Attribute name for point.
-  inline static const std::string& POINT()
-  {
-    static const std::string ATTR_ID("point");
-    return ATTR_ID;
-  }
-
-  /// Attribute name for plane.
-  inline static const std::string& PLANE()
-  {
-    static const std::string ATTR_ID("plane");
-    return ATTR_ID;
-  }
-
   /// Attribute name for selected first line.
   inline static const std::string& FIRST_LINE()
   {
@@ -245,8 +245,8 @@ public:
 private:
   std::shared_ptr<GeomAPI_Vertex> createByXYZ();
   std::shared_ptr<GeomAPI_Vertex> createByDistanceOnEdge();
-  /*std::shared_ptr<GeomAPI_Vertex> createByProjection();
-  std::shared_ptr<GeomAPI_Vertex> createByLinesIntersection();*/
+  std::shared_ptr<GeomAPI_Vertex> createByProjectionOnFace();
+  /*std::shared_ptr<GeomAPI_Vertex> createByLinesIntersection();*/
   std::list<std::shared_ptr<GeomAPI_Vertex> > createByLineAndPlaneIntersection();
 
 };

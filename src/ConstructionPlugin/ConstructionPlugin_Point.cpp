@@ -56,9 +56,6 @@ void ConstructionPlugin_Point::initAttributes()
   data()->addAttribute(CREATION_METHOD(), ModelAPI_AttributeString::typeId());
 
 /*
-  data()->addAttribute(POINT(), ModelAPI_AttributeSelection::typeId());
-  data()->addAttribute(PLANE(), ModelAPI_AttributeSelection::typeId());
-
   data()->addAttribute(FIRST_LINE(), ModelAPI_AttributeSelection::typeId());
   data()->addAttribute(SECOND_LINE(), ModelAPI_AttributeSelection::typeId());
 */
@@ -75,6 +72,9 @@ void ConstructionPlugin_Point::initAttributes()
   data()->addAttribute(DISTANCE(), ModelAPI_AttributeDouble::typeId());
   data()->addAttribute(RATIO(), ModelAPI_AttributeDouble::typeId());
   data()->addAttribute(REVERSE(), ModelAPI_AttributeBoolean::typeId());
+
+  data()->addAttribute(POINT_TO_PROJECT_ON_FACE(), ModelAPI_AttributeSelection::typeId());
+  data()->addAttribute(FACE_FOR_POINT_PROJECTION(), ModelAPI_AttributeSelection::typeId());
 }
 
 //==================================================================================================
@@ -90,11 +90,11 @@ void ConstructionPlugin_Point::execute()
     aShape = createByXYZ();
   } else if(aCreationMethod == CREATION_METHOD_BY_DISTANCE_ON_EDGE()) {
     aShape = createByDistanceOnEdge();
-  }/* else if(aCreationMethod == CREATION_METHOD_BY_PROJECTION()) {
-    aShape = createByProjection();
-  } else if(aCreationMethod == CREATION_METHOD_BY_LINES_INTERSECTION()) {
+  } else if(aCreationMethod == CREATION_METHOD_BY_PROJECTION_ON_FACE()) {
+    aShape = createByProjectionOnFace();
+  } /* else if(aCreationMethod == CREATION_METHOD_BY_LINES_INTERSECTION()) {
     aShape = createByLinesIntersection();
-  }*/ else if(aCreationMethod == CREATION_METHOD_BY_LINE_AND_PLANE_INTERSECTION()) {
+  } */ else if(aCreationMethod == CREATION_METHOD_BY_LINE_AND_PLANE_INTERSECTION()) {
     // this may produce several points
     std::list<std::shared_ptr<GeomAPI_Vertex> > aPoints = createByLineAndPlaneIntersection();
     if (!aPoints.empty()) { // if no points found produce the standard error later
@@ -168,12 +168,12 @@ std::shared_ptr<GeomAPI_Vertex> ConstructionPlugin_Point::createByDistanceOnEdge
 
   return GeomAlgoAPI_PointBuilder::vertexOnEdge(anEdge, aValue, anIsPercent, anIsReverse);
 }
-/*
+
 //==================================================================================================
-std::shared_ptr<GeomAPI_Vertex> ConstructionPlugin_Point::createByProjection()
+std::shared_ptr<GeomAPI_Vertex> ConstructionPlugin_Point::createByProjectionOnFace()
 {
   // Get point.
-  AttributeSelectionPtr aPointSelection = selection(POINT());
+  AttributeSelectionPtr aPointSelection = selection(POINT_TO_PROJECT_ON_FACE());
   GeomShapePtr aPointShape = aPointSelection->value();
   if(!aPointShape.get()) {
     aPointShape = aPointSelection->context()->shape();
@@ -181,7 +181,7 @@ std::shared_ptr<GeomAPI_Vertex> ConstructionPlugin_Point::createByProjection()
   std::shared_ptr<GeomAPI_Vertex> aVertex(new GeomAPI_Vertex(aPointShape));
 
   // Get plane.
-  AttributeSelectionPtr aPlaneSelection = selection(PLANE());
+  AttributeSelectionPtr aPlaneSelection = selection(FACE_FOR_POINT_PROJECTION());
   GeomShapePtr aPlaneShape = aPlaneSelection->value();
   if(!aPlaneShape.get()) {
     aPlaneShape = aPlaneSelection->context()->shape();
@@ -191,6 +191,7 @@ std::shared_ptr<GeomAPI_Vertex> ConstructionPlugin_Point::createByProjection()
   return GeomAlgoAPI_PointBuilder::vertexByProjection(aVertex, aFace);
 }
 
+/*
 //==================================================================================================
 std::shared_ptr<GeomAPI_Vertex> ConstructionPlugin_Point::createByLinesIntersection()
 {

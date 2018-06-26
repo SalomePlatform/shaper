@@ -67,7 +67,7 @@ public:
   CONSTRUCTIONAPI_EXPORT
   virtual ~ConstructionAPI_Point();
 
-  INTERFACE_14(ConstructionPlugin_Point::ID(),
+  INTERFACE_16(ConstructionPlugin_Point::ID(),
                x, ConstructionPlugin_Point::X(), ModelAPI_AttributeDouble, /** X attribute */,
                y, ConstructionPlugin_Point::Y(), ModelAPI_AttributeDouble, /** Y attribute */,
                z, ConstructionPlugin_Point::Z(), ModelAPI_AttributeDouble, /** Z attribute */,
@@ -92,7 +92,11 @@ public:
                ratio, ConstructionPlugin_Point::RATIO(),
                ModelAPI_AttributeDouble, /** Ratio */,
                reverse, ConstructionPlugin_Point::REVERSE(),
-               ModelAPI_AttributeBoolean, /** Reverse */)
+               ModelAPI_AttributeBoolean, /** Reverse */,
+               poinToProjectOnFace, ConstructionPlugin_Point::POINT_TO_PROJECT_ON_FACE(),
+               ModelAPI_AttributeSelection, /** Point to project on face */,
+               faceForPointProjection, ConstructionPlugin_Point::FACE_FOR_POINT_PROJECTION(),
+               ModelAPI_AttributeSelection, /** Face for point projection */)
 
 
   /// Set point values.
@@ -108,17 +112,18 @@ public:
                          const bool theUseRatio = false,
                          const bool theReverse = false);
 
-  /*
   /// Set point and plane for projection.
   CONSTRUCTIONAPI_EXPORT
-  void setByProjection(const ModelHighAPI_Selection& theVertex,
-                       const ModelHighAPI_Selection& theFace);
+  void setByProjectionOnFace(const ModelHighAPI_Selection& theVertex,
+                             const ModelHighAPI_Selection& theFace);
 
+  /*
   /// Set lines for intersections.
   CONSTRUCTIONAPI_EXPORT
   void setByLinesIntersection(const ModelHighAPI_Selection& theEdge1,
                               const ModelHighAPI_Selection& theEdge2);
   */
+
   /// Set line and plane for intersections.
   CONSTRUCTIONAPI_EXPORT
   void setByLineAndPlaneIntersection(const ModelHighAPI_Selection& theEdge,

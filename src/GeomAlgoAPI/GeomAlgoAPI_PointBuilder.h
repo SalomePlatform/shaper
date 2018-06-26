@@ -58,11 +58,11 @@ public:
 
   /// \brief Creates vertex by projection another vertex on plane.
   /// \param[in] theVertex vertex to project.
-  /// \param[in] thePlane face for projection. Should be planar.
+  /// \param[in] theFace face for projection. Should be planar.
   /// \return created vertex.
   static std::shared_ptr<GeomAPI_Vertex>
     vertexByProjection(const std::shared_ptr<GeomAPI_Vertex> theVertex,
-                       const std::shared_ptr<GeomAPI_Face> thePlane);
+                       const std::shared_ptr<GeomAPI_Face> theFace);
 
   /// \brief Creates vertex by intersection two coplanar lines.
   /// \param[in] theEdge1 first linear edge.

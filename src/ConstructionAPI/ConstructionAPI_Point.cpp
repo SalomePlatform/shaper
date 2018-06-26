@@ -67,14 +67,13 @@ ConstructionAPI_Point::ConstructionAPI_Point(const std::shared_ptr<ModelAPI_Feat
   if(initialize()) {
     GeomAPI_Shape::ShapeType aType1 = getShapeType(theObject1);
     GeomAPI_Shape::ShapeType aType2 = getShapeType(theObject2);
-    /*
     if(aType1 == GeomAPI_Shape::VERTEX && aType2 == GeomAPI_Shape::FACE) {
       // If first object is vertex and second object is face then set by projection.
-      setByProjection(theObject1, theObject2);
-    } else if(aType1 == GeomAPI_Shape::EDGE && aType2 == GeomAPI_Shape::EDGE) {
+      setByProjectionOnFace(theObject1, theObject2);
+    } /*else if(aType1 == GeomAPI_Shape::EDGE && aType2 == GeomAPI_Shape::EDGE) {
       // If both objects are edges then set by lines intersection.
       setByLinesIntersection(theObject1, theObject2);
-    } else */if(aType1 == GeomAPI_Shape::EDGE && aType2 == GeomAPI_Shape::FACE) {
+    } */ else if(aType1 == GeomAPI_Shape::EDGE && aType2 == GeomAPI_Shape::FACE) {
       // If first object is edge and second object is face then set by line and plane intersection.
       setByLineAndPlaneIntersection(theObject1, theObject2);
     }
@@ -122,18 +121,19 @@ void ConstructionAPI_Point::setByOffsetOnEdge(const ModelHighAPI_Selection& theE
   execute();
 }
 
-/*
 //==================================================================================================
-void ConstructionAPI_Point::setByProjection(const ModelHighAPI_Selection& theVertex,
-                                            const ModelHighAPI_Selection& theFace)
+void ConstructionAPI_Point::setByProjectionOnFace(const ModelHighAPI_Selection& theVertex,
+                                                  const ModelHighAPI_Selection& theFace)
 {
-  fillAttribute(ConstructionPlugin_Point::CREATION_METHOD_BY_PROJECTION(), mycreationMethod);
-  fillAttribute(theVertex, mypoint);
-  fillAttribute(theFace, myplane);
+  fillAttribute(ConstructionPlugin_Point::CREATION_METHOD_BY_PROJECTION_ON_FACE(),
+                mycreationMethod);
+  fillAttribute(theVertex, mypoinToProjectOnFace);
+  fillAttribute(theFace, myfaceForPointProjection);
 
   execute();
 }
 
+/*
 //==================================================================================================
 void ConstructionAPI_Point::setByLinesIntersection(const ModelHighAPI_Selection& theEdge1,
                                                    const ModelHighAPI_Selection& theEdge2)
@@ -170,15 +170,13 @@ void ConstructionAPI_Point::dump(ModelHighAPI_Dumper& theDumper) const
 
   if (aMeth == "" || // default is XYZ
       aMeth == ConstructionPlugin_Point::CREATION_METHOD_BY_XYZ()) {
-    theDumper << x() << ", " << y() << ", " << z() << ")" << std::endl;
+    theDumper << x() << ", " << y() << ", " << z();
   } else if (aMeth == ConstructionPlugin_Point::CREATION_METHOD_BY_LINE_AND_PLANE_INTERSECTION()) {
     theDumper << intersectionLine() << ", " <<intersectionPlane() ;
     if (!useOffset()->value().empty()) { // call method with defined offset
       theDumper << ", " << offset() << ", " << reverseOffset();
     }
-    theDumper << ")" << std::endl;
-  }
-  else if (aMeth == ConstructionPlugin_Point::CREATION_METHOD_BY_DISTANCE_ON_EDGE()) {
+  } else if (aMeth == ConstructionPlugin_Point::CREATION_METHOD_BY_DISTANCE_ON_EDGE()) {
     theDumper << edge() << ", ";
     if (offsetType()->value() == ConstructionPlugin_Point::OFFSET_TYPE_BY_DISTANCE()) {
       theDumper << distance() << ", " << false;
@@ -186,8 +184,12 @@ void ConstructionAPI_Point::dump(ModelHighAPI_Dumper& theDumper) const
     else {
       theDumper << ratio() << ", " << true;
     }
-    theDumper << ", " << reverse()->value() << ")" << std::endl;
+    theDumper << ", " << reverse()->value();
+  } else if (aMeth == ConstructionPlugin_Point::CREATION_METHOD_BY_PROJECTION_ON_FACE()) {
+    theDumper << mypoinToProjectOnFace << ", " << myfaceForPointProjection;
   }
+
+  theDumper << ")" << std::endl;
 }
 
 //==================================================================================================

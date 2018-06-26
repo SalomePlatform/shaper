@@ -125,16 +125,16 @@ std::shared_ptr<GeomAPI_Vertex> GeomAlgoAPI_PointBuilder::vertexOnEdge(
 //==================================================================================================
 std::shared_ptr<GeomAPI_Vertex> GeomAlgoAPI_PointBuilder::vertexByProjection(
     const std::shared_ptr<GeomAPI_Vertex> theVertex,
-    const std::shared_ptr<GeomAPI_Face> thePlane)
+    const std::shared_ptr<GeomAPI_Face> theFace)
 {
   std::shared_ptr<GeomAPI_Vertex> aVertex;
 
-  if(!theVertex.get() || !thePlane.get() || !thePlane->isPlanar()) {
+  if(!theVertex.get() || !theFace.get() || !theFace->isPlanar()) {
     return aVertex;
   }
 
   std::shared_ptr<GeomAPI_Pnt> aProjPnt = theVertex->point();
-  std::shared_ptr<GeomAPI_Pln> aProjPln = thePlane->getPlane();
+  std::shared_ptr<GeomAPI_Pln> aProjPln = theFace->getPlane();
 
   std::shared_ptr<GeomAPI_Pnt> aPnt = aProjPln->project(aProjPnt);
 
