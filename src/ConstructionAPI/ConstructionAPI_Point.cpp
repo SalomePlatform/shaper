@@ -128,9 +128,11 @@ void ConstructionAPI_Point::setByOffsetOnEdge(const ModelHighAPI_Selection& theE
 void ConstructionAPI_Point::setByProjectionOnEdge(const ModelHighAPI_Selection& theVertex,
                                                   const ModelHighAPI_Selection& theEdge)
 {
-  fillAttribute(ConstructionPlugin_Point::CREATION_METHOD_BY_PROJECTION_ON_EDGE(),
+  fillAttribute(ConstructionPlugin_Point::CREATION_METHOD_BY_PROJECTION(),
                 mycreationMethod);
-  fillAttribute(theVertex, mypoinToProjectOnEdge);
+  fillAttribute(ConstructionPlugin_Point::PROJECTION_TYPE_ON_EDGE(),
+                myprojectionType);
+  fillAttribute(theVertex, mypoinToProject);
   fillAttribute(theEdge, myedgeForPointProjection);
 
   execute();
@@ -140,9 +142,11 @@ void ConstructionAPI_Point::setByProjectionOnEdge(const ModelHighAPI_Selection& 
 void ConstructionAPI_Point::setByProjectionOnFace(const ModelHighAPI_Selection& theVertex,
                                                   const ModelHighAPI_Selection& theFace)
 {
-  fillAttribute(ConstructionPlugin_Point::CREATION_METHOD_BY_PROJECTION_ON_FACE(),
+  fillAttribute(ConstructionPlugin_Point::CREATION_METHOD_BY_PROJECTION(),
                 mycreationMethod);
-  fillAttribute(theVertex, mypoinToProjectOnFace);
+  fillAttribute(ConstructionPlugin_Point::PROJECTION_TYPE_ON_FACE(),
+                myprojectionType);
+  fillAttribute(theVertex, mypoinToProject);
   fillAttribute(theFace, myfaceForPointProjection);
 
   execute();
@@ -200,10 +204,13 @@ void ConstructionAPI_Point::dump(ModelHighAPI_Dumper& theDumper) const
       theDumper << ratio() << ", " << true;
     }
     theDumper << ", " << reverse()->value();
-  } else if (aMeth == ConstructionPlugin_Point::CREATION_METHOD_BY_PROJECTION_ON_EDGE()) {
-    theDumper << mypoinToProjectOnEdge << ", " << myedgeForPointProjection;
-  } else if (aMeth == ConstructionPlugin_Point::CREATION_METHOD_BY_PROJECTION_ON_FACE()) {
-    theDumper << mypoinToProjectOnFace << ", " << myfaceForPointProjection;
+  } else if (aMeth == ConstructionPlugin_Point::CREATION_METHOD_BY_PROJECTION()) {
+    theDumper << mypoinToProject << ", ";
+    if (projectionType()->value() == ConstructionPlugin_Point::PROJECTION_TYPE_ON_EDGE()) {
+      theDumper << myedgeForPointProjection;
+    } else {
+      theDumper << myfaceForPointProjection;
+    }
   }
 
   theDumper << ")" << std::endl;

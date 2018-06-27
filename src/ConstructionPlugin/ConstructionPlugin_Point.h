@@ -69,16 +69,9 @@ public:
   }
 
   /// Attribute name for creation method.
-  inline static const std::string& CREATION_METHOD_BY_PROJECTION_ON_EDGE()
+  inline static const std::string& CREATION_METHOD_BY_PROJECTION()
   {
-    static const std::string MY_CREATION_METHOD_ID("by_projection_on_edge");
-    return MY_CREATION_METHOD_ID;
-  }
-
-  /// Attribute name for creation method.
-  inline static const std::string& CREATION_METHOD_BY_PROJECTION_ON_FACE()
-  {
-    static const std::string MY_CREATION_METHOD_ID("by_projection_on_face");
+    static const std::string MY_CREATION_METHOD_ID("by_projection");
     return MY_CREATION_METHOD_ID;
   }
 
@@ -168,10 +161,31 @@ public:
     return ATTR_ID;
   }
 
-  /// Attribute name for point to project on edge.
-  inline static const std::string& POINT_TO_PROJECT_ON_EDGE()
+  /// Attribute name for point to projection.
+  inline static const std::string& POINT_TO_PROJECT()
   {
-    static const std::string ATTR_ID("point_to_project_on_edge");
+    static const std::string ATTR_ID("point_to_project");
+    return ATTR_ID;
+  }
+
+  /// Attribute name for projection type.
+  inline static const std::string& PROJECTION_TYPE()
+  {
+    static const std::string ATTR_ID("projection_type");
+    return ATTR_ID;
+  }
+
+  /// Attribute name for projection type on edge.
+  inline static const std::string& PROJECTION_TYPE_ON_EDGE()
+  {
+    static const std::string ATTR_ID("projection_type_on_edge");
+    return ATTR_ID;
+  }
+
+  /// Attribute name for projection type on face.
+  inline static const std::string& PROJECTION_TYPE_ON_FACE()
+  {
+    static const std::string ATTR_ID("projection_type_on_face");
     return ATTR_ID;
   }
 
@@ -179,13 +193,6 @@ public:
   inline static const std::string& EDGE_FOR_POINT_PROJECTION()
   {
     static const std::string ATTR_ID("edge_for_point_projection");
-    return ATTR_ID;
-  }
-
-  /// Attribute name for point to project on surface.
-  inline static const std::string& POINT_TO_PROJECT_ON_FACE()
-  {
-    static const std::string ATTR_ID("point_to_project_on_face");
     return ATTR_ID;
   }
 

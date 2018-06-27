@@ -82,40 +82,41 @@ email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com
            tooltip="Distance from edge end point."
            default="false"/>
     </box>
-    <box id="by_projection_on_edge"
-         title="By projection on edge"
-         tooltip="Point on edge by projection selected point."
-         icon="icons/Construction/point_by_projection_on_edge_32x32.png">
-      <shape_selector id="point_to_project_on_edge"
+    <box id="by_projection"
+         title="By projection on edge or plane"
+         tooltip="Point on edge or plane by projection selected point."
+         icon="icons/Construction/point_by_projection_32x32.png">
+      <shape_selector id="point_to_project"
                       label="Point"
                       tooltip="Point for projection."
                       icon="icons/Construction/point.png"
                       shape_types="vertex">
       </shape_selector>
-      <shape_selector id="edge_for_point_projection"
-                      label="edge"
-                      tooltip="Edge for projection."
-                      icon="icons/Construction/edge.png"
-                      shape_types="edge">
-      </shape_selector>
-    </box>
-    <box id="by_projection_on_face"
-         title="By projection on face"
-         tooltip="Point on face surface by projection selected point."
-         icon="icons/Construction/point_by_projection_on_face_32x32.png">
-      <shape_selector id="point_to_project_on_face"
-                      label="Point"
-                      tooltip="Point for projection."
-                      icon="icons/Construction/point.png"
-                      shape_types="vertex">
-      </shape_selector>
-      <shape_selector id="face_for_point_projection"
-                      label="face"
-                      tooltip="Face for projection."
-                      icon="icons/Construction/face.png"
-                      shape_types="face">
-        <validator id="GeomValidators_Face" parameters="plane"/>
-      </shape_selector>
+      <toolbox id="projection_type">
+        <box id="projection_type_on_edge"
+             title="By projection on edge"
+             tooltip="Point on edge by projection selected point."
+             icon="icons/Construction/point_by_projection_on_edge_24x24.png">
+          <shape_selector id="edge_for_point_projection"
+                          label="edge"
+                          tooltip="Edge for projection."
+                          icon="icons/Construction/edge.png"
+                          shape_types="edge">
+          </shape_selector>
+        </box>
+        <box id="projection_type_on_face"
+             title="By projection on face"
+             tooltip="Point on face surface by projection selected point."
+             icon="icons/Construction/point_by_projection_on_face_24x24.png">
+          <shape_selector id="face_for_point_projection"
+                          label="face"
+                          tooltip="Face for projection."
+                          icon="icons/Construction/face.png"
+                          shape_types="face">
+            <validator id="GeomValidators_Face" parameters="plane"/>
+          </shape_selector>
+        </box>
+      </toolbox>
     </box>
 <!--
     <box id="by_lines_intersection"

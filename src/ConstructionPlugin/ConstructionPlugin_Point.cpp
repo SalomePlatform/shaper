@@ -73,10 +73,9 @@ void ConstructionPlugin_Point::initAttributes()
   data()->addAttribute(RATIO(), ModelAPI_AttributeDouble::typeId());
   data()->addAttribute(REVERSE(), ModelAPI_AttributeBoolean::typeId());
 
-  data()->addAttribute(POINT_TO_PROJECT_ON_EDGE(), ModelAPI_AttributeSelection::typeId());
+  data()->addAttribute(POINT_TO_PROJECT(), ModelAPI_AttributeSelection::typeId());
+  data()->addAttribute(PROJECTION_TYPE(), ModelAPI_AttributeString::typeId());
   data()->addAttribute(EDGE_FOR_POINT_PROJECTION(), ModelAPI_AttributeSelection::typeId());
-
-  data()->addAttribute(POINT_TO_PROJECT_ON_FACE(), ModelAPI_AttributeSelection::typeId());
   data()->addAttribute(FACE_FOR_POINT_PROJECTION(), ModelAPI_AttributeSelection::typeId());
 }
 
@@ -93,10 +92,12 @@ void ConstructionPlugin_Point::execute()
     aShape = createByXYZ();
   } else if(aCreationMethod == CREATION_METHOD_BY_DISTANCE_ON_EDGE()) {
     aShape = createByDistanceOnEdge();
-  } else if(aCreationMethod == CREATION_METHOD_BY_PROJECTION_ON_EDGE()) {
-    aShape = createByProjectionOnEdge();
-  } else if(aCreationMethod == CREATION_METHOD_BY_PROJECTION_ON_FACE()) {
-    aShape = createByProjectionOnFace();
+  } else if(aCreationMethod == CREATION_METHOD_BY_PROJECTION()) {
+    if (string(PROJECTION_TYPE())->value() == PROJECTION_TYPE_ON_EDGE()) {
+      aShape = createByProjectionOnEdge();
+    } else {
+      aShape = createByProjectionOnFace();
+    }
   } /* else if(aCreationMethod == CREATION_METHOD_BY_LINES_INTERSECTION()) {
     aShape = createByLinesIntersection();
   } */ else if(aCreationMethod == CREATION_METHOD_BY_LINE_AND_PLANE_INTERSECTION()) {
@@ -178,7 +179,7 @@ std::shared_ptr<GeomAPI_Vertex> ConstructionPlugin_Point::createByDistanceOnEdge
 std::shared_ptr<GeomAPI_Vertex> ConstructionPlugin_Point::createByProjectionOnEdge()
 {
   // Get point.
-  AttributeSelectionPtr aPointSelection = selection(POINT_TO_PROJECT_ON_EDGE());
+  AttributeSelectionPtr aPointSelection = selection(POINT_TO_PROJECT());
   GeomShapePtr aPointShape = aPointSelection->value();
   if (!aPointShape.get()) {
     aPointShape = aPointSelection->context()->shape();
@@ -200,7 +201,7 @@ std::shared_ptr<GeomAPI_Vertex> ConstructionPlugin_Point::createByProjectionOnEd
 std::shared_ptr<GeomAPI_Vertex> ConstructionPlugin_Point::createByProjectionOnFace()
 {
   // Get point.
-  AttributeSelectionPtr aPointSelection = selection(POINT_TO_PROJECT_ON_FACE());
+  AttributeSelectionPtr aPointSelection = selection(POINT_TO_PROJECT());
   GeomShapePtr aPointShape = aPointSelection->value();
   if(!aPointShape.get()) {
     aPointShape = aPointSelection->context()->shape();

@@ -45,6 +45,6 @@ assert(rightPosition.isEqual(Point_2.results()[0].resultSubShapePair()[0].shape(
 
 assert (len(Point_3.results()) > 0)
 rightPosition = GeomAPI_Vertex(50, 50, 0)
-assert(rightPosition.isEqual(Point_4.results()[0].resultSubShapePair()[0].shape()))
+assert(rightPosition.isEqual(Point_3.results()[0].resultSubShapePair()[0].shape()))
 
 assert(model.checkPythonDump())
