@@ -68,7 +68,8 @@ bool isAttributeNode(xmlNodePtr theNode)
   // it's parent is "feature" or "source" or page ("case" or "box")
   if(!hasParent(theNode, NODE_FEATURE, NODE_SOURCE,
                          WDG_GROUP, WDG_OPTIONALBOX,
-                         WDG_TOOLBOX_BOX, WDG_SWITCH_CASE, NULL))
+                         WDG_TOOLBOX_BOX, WDG_RADIOBOX_ITEM,
+                         WDG_SWITCH_CASE, NULL))
     return false;
 
   //it should not be a "source" or a "validator" node
@@ -86,7 +87,7 @@ bool isWidgetNode(xmlNodePtr theNode)
     return false;
   // it's parent is "feature" or "source" or a page ("box", "case")
   if(!hasParent(theNode, NODE_FEATURE, NODE_SOURCE, WDG_GROUP, WDG_OPTIONALBOX,
-                         WDG_TOOLBOX_BOX, WDG_SWITCH_CASE, NULL))
+    WDG_TOOLBOX_BOX, WDG_RADIOBOX_ITEM, WDG_SWITCH_CASE, NULL))
     return false;
 
   //it should not be a "source" or a "validator" node
@@ -99,7 +100,8 @@ bool isCaseNode(xmlNodePtr theNode)
   if(!isElementNode(theNode))
     return false;
 
-  return isNode(theNode, WDG_OPTIONALBOX, WDG_SWITCH_CASE, WDG_TOOLBOX_BOX, NULL);
+  return isNode(theNode, WDG_OPTIONALBOX, WDG_SWITCH_CASE, WDG_TOOLBOX_BOX,
+    WDG_RADIOBOX_ITEM, NULL);
 }
 
 bool hasChild(xmlNodePtr theNode)

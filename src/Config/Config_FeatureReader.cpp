@@ -91,7 +91,7 @@ void Config_FeatureReader::processNode(xmlNodePtr theNode)
 
         std::list<std::pair<std::string, std::string> > aCases;
         xmlNodePtr aCaseNode =
-          hasParentRecursive(theNode, WDG_SWITCH_CASE, WDG_TOOLBOX_BOX, WDG_OPTIONALBOX, NULL);
+          hasParentRecursive(theNode, WDG_SWITCH_CASE, WDG_TOOLBOX_BOX, WDG_OPTIONALBOX, WDG_RADIOBOX_ITEM, NULL);
         while(aCaseNode) {
           std::string aCaseNodeID = getProperty(aCaseNode, _ID);
           std::string aSwitchNodeID = "";
@@ -116,7 +116,7 @@ void Config_FeatureReader::processNode(xmlNodePtr theNode)
 
           aCases.push_back(std::make_pair(aSwitchNodeID, aCaseNodeID));
           aCaseNode = hasParentRecursive(aSwitchNode, WDG_SWITCH_CASE,
-                                         WDG_TOOLBOX_BOX, WDG_OPTIONALBOX, NULL);
+            WDG_TOOLBOX_BOX, WDG_OPTIONALBOX, WDG_RADIOBOX_ITEM, NULL);
         }
         aMessage->setCases(aCases);
         Events_Loop::loop()->send(aMessage);
@@ -135,7 +135,7 @@ void Config_FeatureReader::processNode(xmlNodePtr theNode)
 void Config_FeatureReader::cleanup(xmlNodePtr theNode)
 {
   if (isNode(theNode, WDG_OPTIONALBOX, WDG_SWITCH, WDG_SWITCH_CASE,
-             WDG_TOOLBOX, WDG_TOOLBOX_BOX, NULL)) {
+    WDG_TOOLBOX, WDG_TOOLBOX_BOX, WDG_RADIOBOX_ITEM, WDG_RADIOBOX, NULL)) {
     // cleanup id of cases when leave case node
     cleanupAttribute(theNode, _ID);
   }
