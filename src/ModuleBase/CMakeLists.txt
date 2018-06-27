@@ -101,6 +101,7 @@ SET(PROJECT_HEADERS
   ModuleBase_ActionIntParameter.h
   ModuleBase_ChoiceCtrl.h
   ModuleBase_WidgetNameEdit.h
+  ModuleBase_WidgetRadiobox.h
 )
 
 SET(PROJECT_MOC_HEADERS
@@ -148,6 +149,7 @@ SET(PROJECT_MOC_HEADERS
   ModuleBase_WidgetValidated.h
   ModuleBase_ChoiceCtrl.h
   ModuleBase_WidgetNameEdit.h
+  ModuleBase_WidgetRadiobox.h
 )
 
 SET(PROJECT_SOURCES
@@ -214,6 +216,7 @@ SET(PROJECT_SOURCES
   ModuleBase_Dialog.cpp
   ModuleBase_ChoiceCtrl.cpp
   ModuleBase_WidgetNameEdit.cpp
+  ModuleBase_WidgetRadiobox.cpp
 )
 
 SET(PROJECT_LIBRARIES

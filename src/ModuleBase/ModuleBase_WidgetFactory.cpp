@@ -42,6 +42,7 @@
 #include <ModuleBase_WidgetConcealedObjects.h>
 #include <ModuleBase_WidgetLabel.h>
 #include <ModuleBase_WidgetToolbox.h>
+#include <ModuleBase_WidgetRadiobox.h>
 #include <ModuleBase_PageBase.h>
 #include <ModuleBase_PageGroupBox.h>
 #include <ModuleBase_WidgetOptionalBox.h>
@@ -133,7 +134,7 @@ void ModuleBase_WidgetFactory::createWidget(ModuleBase_PageBase* thePage, bool a
             QString aCaseId = qs(myWidgetApi->getProperty(_ID));
             ModuleBase_PageBase* aPage = new ModuleBase_PageWidget(aWidget);
             createWidget(aPage);
-            if (aWdgType == WDG_SWITCH || aWdgType == WDG_TOOLBOX) {
+            if (aWdgType == WDG_SWITCH || aWdgType == WDG_TOOLBOX || aWdgType == WDG_RADIOBOX) {
               ModuleBase_PagedContainer* aContainer =
                 qobject_cast<ModuleBase_PagedContainer*>(aWidget);
 
@@ -330,6 +331,8 @@ ModuleBase_ModelWidget* ModuleBase_WidgetFactory::createWidgetByType(const std::
     result = new ModuleBase_WidgetConcealedObjects(theParent, myWidgetApi);
   } else if (theType == WDG_TOOLBOX) {
     result = new ModuleBase_WidgetToolbox(theParent, myWidgetApi);
+  } else if (theType == WDG_RADIOBOX) {
+    result = new ModuleBase_WidgetRadiobox(theParent, myWidgetApi);
   } else if (theType == WDG_SWITCH) {
     result = new ModuleBase_WidgetSwitch(theParent, myWidgetApi);
   } else if (theType == WDG_TOOLBOX_BOX || theType == WDG_SWITCH_CASE ||

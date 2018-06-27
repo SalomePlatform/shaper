@@ -103,6 +103,9 @@ void Config_FeatureReader::processNode(xmlNodePtr theNode)
           else if (!xmlStrcmp(aName, (const xmlChar *) WDG_TOOLBOX_BOX)) {
             aSwitchNode = hasParentRecursive(aCaseNode, WDG_TOOLBOX, NULL);
           }
+          else if (!xmlStrcmp(aName, (const xmlChar *)WDG_RADIOBOX_ITEM)) {
+            aSwitchNode = hasParentRecursive(aCaseNode, WDG_RADIOBOX, NULL);
+          }
           if (!xmlStrcmp(aName, (const xmlChar *) WDG_OPTIONALBOX)) {
             /// the box is optional, attribute is in case
             /// if the optional attribute value is not empty
@@ -120,7 +123,8 @@ void Config_FeatureReader::processNode(xmlNodePtr theNode)
       }
     // container pages, like "case" or "box"
     } else if (isNode(theNode, WDG_OPTIONALBOX, WDG_SWITCH, WDG_SWITCH_CASE,
-                      WDG_TOOLBOX, WDG_TOOLBOX_BOX, NULL)) {
+                      WDG_TOOLBOX, WDG_TOOLBOX_BOX,
+                      WDG_RADIOBOX, WDG_RADIOBOX_ITEM, NULL)) {
       storeAttribute(theNode, _ID); // save case:caseId (or box:boxId)
     }
   }
@@ -144,6 +148,7 @@ bool Config_FeatureReader::processChildren(xmlNodePtr theNode)
     result = isNode(theNode, NODE_FEATURE,
                              WDG_GROUP, WDG_OPTIONALBOX,
                              WDG_TOOLBOX, WDG_TOOLBOX_BOX,
+                             WDG_RADIOBOX, WDG_RADIOBOX_ITEM,
                              WDG_SWITCH, WDG_SWITCH_CASE, NULL);
   }
   return result;

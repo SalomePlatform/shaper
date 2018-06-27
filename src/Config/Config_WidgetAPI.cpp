@@ -99,7 +99,7 @@ bool Config_WidgetAPI::isGroupBoxWidget() const
 
 bool Config_WidgetAPI::isPagedWidget() const
 {
-  return isNode(myCurrentNode, WDG_TOOLBOX, WDG_SWITCH,
+  return isNode(myCurrentNode, WDG_TOOLBOX, WDG_SWITCH, WDG_RADIOBOX,
                 NULL);
 }
 
