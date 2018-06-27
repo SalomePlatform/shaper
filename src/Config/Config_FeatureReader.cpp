@@ -90,8 +90,8 @@ void Config_FeatureReader::processNode(xmlNodePtr theNode)
         aMessage->setMainArgument(isMainArg);
 
         std::list<std::pair<std::string, std::string> > aCases;
-        xmlNodePtr aCaseNode =
-          hasParentRecursive(theNode, WDG_SWITCH_CASE, WDG_TOOLBOX_BOX, WDG_OPTIONALBOX, WDG_RADIOBOX_ITEM, NULL);
+        xmlNodePtr aCaseNode = hasParentRecursive(theNode,
+          WDG_SWITCH_CASE, WDG_TOOLBOX_BOX, WDG_OPTIONALBOX, WDG_RADIOBOX_ITEM, NULL);
         while(aCaseNode) {
           std::string aCaseNodeID = getProperty(aCaseNode, _ID);
           std::string aSwitchNodeID = "";
