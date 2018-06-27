@@ -56,6 +56,14 @@ public:
                                                       const bool theIsPercent = false,
                                                       const bool theIsReverse = false);
 
+  /// \brief Creates vertex by projection another vertex on edge.
+  /// \param[in] theVertex vertex to project.
+  /// \param[in] theEdge edge for projection.
+  /// \return created vertex.
+  static std::shared_ptr<GeomAPI_Vertex>
+    vertexByProjection(const std::shared_ptr<GeomAPI_Vertex> theVertex,
+    const std::shared_ptr<GeomAPI_Edge> theEdge);
+
   /// \brief Creates vertex by projection another vertex on plane.
   /// \param[in] theVertex vertex to project.
   /// \param[in] theFace face for projection. Should be planar.

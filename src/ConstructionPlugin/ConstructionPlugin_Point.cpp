@@ -73,6 +73,9 @@ void ConstructionPlugin_Point::initAttributes()
   data()->addAttribute(RATIO(), ModelAPI_AttributeDouble::typeId());
   data()->addAttribute(REVERSE(), ModelAPI_AttributeBoolean::typeId());
 
+  data()->addAttribute(POINT_TO_PROJECT_ON_EDGE(), ModelAPI_AttributeSelection::typeId());
+  data()->addAttribute(EDGE_FOR_POINT_PROJECTION(), ModelAPI_AttributeSelection::typeId());
+
   data()->addAttribute(POINT_TO_PROJECT_ON_FACE(), ModelAPI_AttributeSelection::typeId());
   data()->addAttribute(FACE_FOR_POINT_PROJECTION(), ModelAPI_AttributeSelection::typeId());
 }
@@ -90,6 +93,8 @@ void ConstructionPlugin_Point::execute()
     aShape = createByXYZ();
   } else if(aCreationMethod == CREATION_METHOD_BY_DISTANCE_ON_EDGE()) {
     aShape = createByDistanceOnEdge();
+  } else if(aCreationMethod == CREATION_METHOD_BY_PROJECTION_ON_EDGE()) {
+    aShape = createByProjectionOnEdge();
   } else if(aCreationMethod == CREATION_METHOD_BY_PROJECTION_ON_FACE()) {
     aShape = createByProjectionOnFace();
   } /* else if(aCreationMethod == CREATION_METHOD_BY_LINES_INTERSECTION()) {
@@ -167,6 +172,28 @@ std::shared_ptr<GeomAPI_Vertex> ConstructionPlugin_Point::createByDistanceOnEdge
   bool anIsReverse = boolean(REVERSE())->value();
 
   return GeomAlgoAPI_PointBuilder::vertexOnEdge(anEdge, aValue, anIsPercent, anIsReverse);
+}
+
+//==================================================================================================
+std::shared_ptr<GeomAPI_Vertex> ConstructionPlugin_Point::createByProjectionOnEdge()
+{
+  // Get point.
+  AttributeSelectionPtr aPointSelection = selection(POINT_TO_PROJECT_ON_EDGE());
+  GeomShapePtr aPointShape = aPointSelection->value();
+  if (!aPointShape.get()) {
+    aPointShape = aPointSelection->context()->shape();
+  }
+  std::shared_ptr<GeomAPI_Vertex> aVertex(new GeomAPI_Vertex(aPointShape));
+
+  // Get edge.
+  AttributeSelectionPtr anEdgeSelection = selection(EDGE_FOR_POINT_PROJECTION());
+  GeomShapePtr anEdgeShape = anEdgeSelection->value();
+  if (!anEdgeShape.get()) {
+    anEdgeShape = anEdgeSelection->context()->shape();
+  }
+  std::shared_ptr<GeomAPI_Edge> anEdge(new GeomAPI_Edge(anEdgeShape));
+
+  return GeomAlgoAPI_PointBuilder::vertexByProjection(aVertex, anEdge);
 }
 
 //==================================================================================================

@@ -70,7 +70,10 @@ ConstructionAPI_Point::ConstructionAPI_Point(const std::shared_ptr<ModelAPI_Feat
     if(aType1 == GeomAPI_Shape::VERTEX && aType2 == GeomAPI_Shape::FACE) {
       // If first object is vertex and second object is face then set by projection.
       setByProjectionOnFace(theObject1, theObject2);
-    } /*else if(aType1 == GeomAPI_Shape::EDGE && aType2 == GeomAPI_Shape::EDGE) {
+    } else if (aType1 == GeomAPI_Shape::VERTEX && aType2 == GeomAPI_Shape::EDGE) {
+      // If first object is vertex and second object is edge then set by projection.
+      setByProjectionOnEdge(theObject1, theObject2);
+    } /* else if(aType1 == GeomAPI_Shape::EDGE && aType2 == GeomAPI_Shape::EDGE) {
       // If both objects are edges then set by lines intersection.
       setByLinesIntersection(theObject1, theObject2);
     } */ else if(aType1 == GeomAPI_Shape::EDGE && aType2 == GeomAPI_Shape::FACE) {
@@ -117,6 +120,18 @@ void ConstructionAPI_Point::setByOffsetOnEdge(const ModelHighAPI_Selection& theE
     fillAttribute(theOffset, mydistance);
   }
   fillAttribute(theReverse, myreverse);
+
+  execute();
+}
+
+//==================================================================================================
+void ConstructionAPI_Point::setByProjectionOnEdge(const ModelHighAPI_Selection& theVertex,
+                                                  const ModelHighAPI_Selection& theEdge)
+{
+  fillAttribute(ConstructionPlugin_Point::CREATION_METHOD_BY_PROJECTION_ON_EDGE(),
+                mycreationMethod);
+  fillAttribute(theVertex, mypoinToProjectOnEdge);
+  fillAttribute(theEdge, myedgeForPointProjection);
 
   execute();
 }
@@ -185,6 +200,8 @@ void ConstructionAPI_Point::dump(ModelHighAPI_Dumper& theDumper) const
       theDumper << ratio() << ", " << true;
     }
     theDumper << ", " << reverse()->value();
+  } else if (aMeth == ConstructionPlugin_Point::CREATION_METHOD_BY_PROJECTION_ON_EDGE()) {
+    theDumper << mypoinToProjectOnEdge << ", " << myedgeForPointProjection;
   } else if (aMeth == ConstructionPlugin_Point::CREATION_METHOD_BY_PROJECTION_ON_FACE()) {
     theDumper << mypoinToProjectOnFace << ", " << myfaceForPointProjection;
   }

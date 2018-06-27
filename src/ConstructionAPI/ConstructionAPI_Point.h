@@ -67,7 +67,7 @@ public:
   CONSTRUCTIONAPI_EXPORT
   virtual ~ConstructionAPI_Point();
 
-  INTERFACE_16(ConstructionPlugin_Point::ID(),
+  INTERFACE_18(ConstructionPlugin_Point::ID(),
                x, ConstructionPlugin_Point::X(), ModelAPI_AttributeDouble, /** X attribute */,
                y, ConstructionPlugin_Point::Y(), ModelAPI_AttributeDouble, /** Y attribute */,
                z, ConstructionPlugin_Point::Z(), ModelAPI_AttributeDouble, /** Z attribute */,
@@ -96,7 +96,11 @@ public:
                poinToProjectOnFace, ConstructionPlugin_Point::POINT_TO_PROJECT_ON_FACE(),
                ModelAPI_AttributeSelection, /** Point to project on face */,
                faceForPointProjection, ConstructionPlugin_Point::FACE_FOR_POINT_PROJECTION(),
-               ModelAPI_AttributeSelection, /** Face for point projection */)
+               ModelAPI_AttributeSelection, /** Face for point projection */,
+               poinToProjectOnEdge, ConstructionPlugin_Point::POINT_TO_PROJECT_ON_EDGE(),
+               ModelAPI_AttributeSelection, /** Point to project on edge */,
+               edgeForPointProjection, ConstructionPlugin_Point::EDGE_FOR_POINT_PROJECTION(),
+               ModelAPI_AttributeSelection, /** Edge for point projection */)
 
 
   /// Set point values.
@@ -112,7 +116,12 @@ public:
                          const bool theUseRatio = false,
                          const bool theReverse = false);
 
-  /// Set point and plane for projection.
+  /// Set point and edge for projection.
+  CONSTRUCTIONAPI_EXPORT
+  void setByProjectionOnEdge(const ModelHighAPI_Selection& theVertex,
+                             const ModelHighAPI_Selection& theEdge);
+
+  /// Set point and face for projection.
   CONSTRUCTIONAPI_EXPORT
   void setByProjectionOnFace(const ModelHighAPI_Selection& theVertex,
                              const ModelHighAPI_Selection& theFace);

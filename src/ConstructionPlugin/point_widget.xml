@@ -82,6 +82,23 @@ email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com
            tooltip="Distance from edge end point."
            default="false"/>
     </box>
+    <box id="by_projection_on_edge"
+         title="By projection on edge"
+         tooltip="Point on edge by projection selected point."
+         icon="icons/Construction/point_by_projection_on_edge_32x32.png">
+      <shape_selector id="point_to_project_on_edge"
+                      label="Point"
+                      tooltip="Point for projection."
+                      icon="icons/Construction/point.png"
+                      shape_types="vertex">
+      </shape_selector>
+      <shape_selector id="edge_for_point_projection"
+                      label="edge"
+                      tooltip="Edge for projection."
+                      icon="icons/Construction/edge.png"
+                      shape_types="edge">
+      </shape_selector>
+    </box>
     <box id="by_projection_on_face"
          title="By projection on face"
          tooltip="Point on face surface by projection selected point."

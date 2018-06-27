@@ -69,6 +69,13 @@ public:
   }
 
   /// Attribute name for creation method.
+  inline static const std::string& CREATION_METHOD_BY_PROJECTION_ON_EDGE()
+  {
+    static const std::string MY_CREATION_METHOD_ID("by_projection_on_edge");
+    return MY_CREATION_METHOD_ID;
+  }
+
+  /// Attribute name for creation method.
   inline static const std::string& CREATION_METHOD_BY_PROJECTION_ON_FACE()
   {
     static const std::string MY_CREATION_METHOD_ID("by_projection_on_face");
@@ -161,6 +168,20 @@ public:
     return ATTR_ID;
   }
 
+  /// Attribute name for point to project on edge.
+  inline static const std::string& POINT_TO_PROJECT_ON_EDGE()
+  {
+    static const std::string ATTR_ID("point_to_project_on_edge");
+    return ATTR_ID;
+  }
+
+  /// Attribute name for edge for point projection.
+  inline static const std::string& EDGE_FOR_POINT_PROJECTION()
+  {
+    static const std::string ATTR_ID("edge_for_point_projection");
+    return ATTR_ID;
+  }
+
   /// Attribute name for point to project on surface.
   inline static const std::string& POINT_TO_PROJECT_ON_FACE()
   {
@@ -245,6 +266,7 @@ public:
 private:
   std::shared_ptr<GeomAPI_Vertex> createByXYZ();
   std::shared_ptr<GeomAPI_Vertex> createByDistanceOnEdge();
+  std::shared_ptr<GeomAPI_Vertex> createByProjectionOnEdge();
   std::shared_ptr<GeomAPI_Vertex> createByProjectionOnFace();
   /*std::shared_ptr<GeomAPI_Vertex> createByLinesIntersection();*/
   std::list<std::shared_ptr<GeomAPI_Vertex> > createByLineAndPlaneIntersection();

@@ -34,9 +34,11 @@
 #include <Geom_Line.hxx>
 #include <GeomAdaptor_Curve.hxx>
 #include <GeomAPI_ExtremaCurveCurve.hxx>
+#include <GeomAPI_ProjectPointOnCurve.hxx>
 #include <gp_Pln.hxx>
 #include <gp_Pnt.hxx>
 #include <TopoDS.hxx>
+#include <TopoDS_Edge.hxx>
 #include <TopoDS_Vertex.hxx>
 
 //==================================================================================================
@@ -118,6 +120,41 @@ std::shared_ptr<GeomAPI_Vertex> GeomAlgoAPI_PointBuilder::vertexOnEdge(
     aVertex.reset(new GeomAPI_Vertex());
     aVertex->setImpl(new TopoDS_Vertex(aShape));
   }
+
+  return aVertex;
+}
+
+//==================================================================================================
+std::shared_ptr<GeomAPI_Vertex> GeomAlgoAPI_PointBuilder::vertexByProjection(
+  const std::shared_ptr<GeomAPI_Vertex> theVertex,
+  const std::shared_ptr<GeomAPI_Edge> theEdge)
+{
+  std::shared_ptr<GeomAPI_Vertex> aVertex;
+
+  if (!theVertex.get() || !theEdge.get()) {
+    return aVertex;
+  }
+
+  std::shared_ptr<GeomAPI_Pnt> aProjPnt = theVertex->point();
+  gp_Pnt aPnt(aProjPnt->x(), aProjPnt->y(), aProjPnt->z());
+
+  TopoDS_Edge anEdge = TopoDS::Edge(theEdge->impl<TopoDS_Shape>());
+  double aFirstOnCurve, aLastOnCurve;
+  Handle(Geom_Curve) aCurve = BRep_Tool::Curve(anEdge, aFirstOnCurve, aLastOnCurve);
+
+  if (aCurve.IsNull()) {
+    return aVertex;
+  }
+
+  GeomAPI_ProjectPointOnCurve aProjection(aPnt, aCurve);
+
+  if (aProjection.NbPoints() == 0) {
+    return aVertex;
+  }
+
+  gp_Pnt aNearestPoint = aProjection.NearestPoint();
+
+  aVertex.reset(new GeomAPI_Vertex(aNearestPoint.X(), aNearestPoint.Y(), aNearestPoint.Z()));
 
   return aVertex;
 }
