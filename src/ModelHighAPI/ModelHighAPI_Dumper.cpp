@@ -174,7 +174,8 @@ const std::string& ModelHighAPI_Dumper::name(const EntityPtr& theEntity,
       int aFullIndex = 0;
       NbFeaturesMap::const_iterator aFIt = myFeatureCount.begin();
       for (; aFIt != myFeatureCount.end(); ++aFIt) {
-        std::map<std::string, std::pair<int, int> >::const_iterator aFound = aFIt->second.find(aKind);
+        std::map<std::string, std::pair<int, int> >::const_iterator aFound =
+          aFIt->second.find(aKind);
         if (aFound != aFIt->second.end())
           aFullIndex += aFound->second.first;
       }

@@ -40,6 +40,7 @@
 
 #include <string>
 #include <iostream>
+#include <cfloat>
 
 //#define DEBUG_COMPLETE_WITH_PARAMETERS
 

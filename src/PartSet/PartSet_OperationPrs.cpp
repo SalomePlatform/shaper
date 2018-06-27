@@ -141,7 +141,12 @@ void PartSet_OperationPrs::Compute(
         setWidth(aDrawer, aWidth);
       }
     }
-    StdPrs_WFShape::Add(thePresentation, aShape, aDrawer);
+    try {
+      StdPrs_WFShape::Add(thePresentation, aShape, aDrawer);
+    }
+    catch (...) {
+      return;
+    }
   }
   Set(aComp);
   if (!aReadyToDisplay) {
