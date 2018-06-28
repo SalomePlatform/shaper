@@ -25,21 +25,7 @@ email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com
          title="By X, Y, Z"
          tooltip="Point at a given distance from the origin."
          icon="icons/Construction/point_by_xyz_32x32.png">
-      <doublevalue id="x"
-                   label="X "
-                   tooltip="X coordinate."
-                   icon="icons/Construction/x_size.png"
-                   default="0"/>
-      <doublevalue id="y"
-                   label="Y "
-                   tooltip="Y coordinate."
-                   icon="icons/Construction/y_size.png"
-                   default="0"/>
-      <doublevalue id="z"
-                   label="Z "
-                   tooltip="Z coordinate."
-                   icon="icons/Construction/z_size.png"
-                   default="0"/>
+      <point_input id="point3d"/>
     </box>
     <box id="by_distance_on_edge"
          title="By distance on edge"

@@ -30,6 +30,8 @@
 #include <ModelAPI_Events.h>
 #include <ModelAPI_Result.h>
 
+#include <GeomDataAPI_Point.h>
+
 #include <Events_Message.h>
 #include <Events_InfoMessage.h>
 
@@ -137,10 +139,9 @@ FeaturePtr InitializationPlugin_Plugin::createPoint(DocumentPtr theDoc, const st
                                                     double theX, double theY, double theZ)
 {
   std::shared_ptr<ModelAPI_Feature> aPoint = theDoc->addFeature("Point");
-  //aPoint->string("creation_method")->setValue("by_xyz");
-  aPoint->real("x")->setValue(theX);
-  aPoint->real("y")->setValue(theY);
-  aPoint->real("z")->setValue(theZ);
+  AttributePointPtr aPointAttr = std::dynamic_pointer_cast<GeomDataAPI_Point>
+    (aPoint->data()->attribute("point3d"));
+  aPointAttr->setValue(theX, theY, theZ);
   aPoint->string("creation_method")->setValue("by_xyz");
   aPoint->data()->setName(theName);
   // don't show automatically created feature in the features history

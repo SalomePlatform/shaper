@@ -54,6 +54,7 @@ SET(PROJECT_LIBRARIES
     ModelAPI
     GeomAPI
     GeomAlgoAPI
+	GeomDataAPI
 )
 
 SOURCE_GROUP ("Resource Files" FILES ${TEXT_RESOURCES})
@@ -72,6 +73,7 @@ INCLUDE_DIRECTORIES(
   ../GeomAPI
   ../GeomAlgoAPI
   ../Events
+  ../GeomDataAPI
 )
 
 

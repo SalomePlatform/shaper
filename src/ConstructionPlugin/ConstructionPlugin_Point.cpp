@@ -30,6 +30,8 @@
 #include <GeomAlgoAPI_ShapeTools.h>
 
 #include <GeomAPI_Circ.h>
+#include <GeomDataAPI_Point.h>
+
 #include <GeomAPI_Edge.h>
 #include <GeomAPI_Pnt.h>
 #include <GeomAPI_Vertex.h>
@@ -50,9 +52,7 @@ const std::string& ConstructionPlugin_Point::getKind()
 //==================================================================================================
 void ConstructionPlugin_Point::initAttributes()
 {
-  data()->addAttribute(X(), ModelAPI_AttributeDouble::typeId());
-  data()->addAttribute(Y(), ModelAPI_AttributeDouble::typeId());
-  data()->addAttribute(Z(), ModelAPI_AttributeDouble::typeId());
+  data()->addAttribute(point3d(), GeomDataAPI_Point::typeId());
 
   data()->addAttribute(CREATION_METHOD(), ModelAPI_AttributeString::typeId());
 
@@ -161,9 +161,9 @@ bool ConstructionPlugin_Point::customisePresentation(ResultPtr theResult,
 //==================================================================================================
 std::shared_ptr<GeomAPI_Vertex> ConstructionPlugin_Point::createByXYZ()
 {
-  return GeomAlgoAPI_PointBuilder::vertex(real(X())->value(),
-                                          real(Y())->value(),
-                                          real(Z())->value());
+  AttributePointPtr aPoint =
+    std::dynamic_pointer_cast<GeomDataAPI_Point>(data()->attribute(point3d()));
+  return GeomAlgoAPI_PointBuilder::vertex(aPoint->x(), aPoint->y(), aPoint->z());
 }
 
 //==================================================================================================

@@ -89,25 +89,10 @@ public:
     return MY_CREATION_METHOD_ID;
   }
 
-  /// Attribute name for X coordinate.
-  inline static const std::string& X()
+  inline static const std::string& point3d()
   {
-    static const std::string POINT_ATTR_X("x");
-    return POINT_ATTR_X;
-  }
-
-  /// Attribute name for Y coordinate.
-  inline static const std::string& Y()
-  {
-    static const std::string POINT_ATTR_Y("y");
-    return POINT_ATTR_Y;
-  }
-
-  /// Attribute name for Z coordinate.
-  inline static const std::string& Z()
-  {
-    static const std::string POINT_ATTR_Z("z");
-    return POINT_ATTR_Z;
+    static const std::string POINT_ATTR("point3d");
+    return POINT_ATTR;
   }
 
   /// Attribute name for selected edge.

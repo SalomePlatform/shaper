@@ -132,9 +132,12 @@ void ConstructionAPI_Point::setByXYZ(const ModelHighAPI_Double& theX,
                                      const ModelHighAPI_Double& theZ)
 {
   //fillAttribute(ConstructionPlugin_Point::CREATION_METHOD_BY_XYZ(), mycreationMethod);
-  fillAttribute(theX, myx);
-  fillAttribute(theY, myy);
-  fillAttribute(theZ, myz);
+
+  // TODO: Fill point attribute
+  //fillAttribute(theX, myx);
+  //fillAttribute(theY, myy);
+  //fillAttribute(theZ, myz);
+
   fillAttribute(ConstructionPlugin_Point::CREATION_METHOD_BY_XYZ(), mycreationMethod);
 
   execute(false);
@@ -262,7 +265,7 @@ void ConstructionAPI_Point::dump(ModelHighAPI_Dumper& theDumper) const
 
   if (aMeth == "" || // default is XYZ
       aMeth == ConstructionPlugin_Point::CREATION_METHOD_BY_XYZ()) {
-    theDumper << x() << ", " << y() << ", " << z();
+    theDumper << point() << ")" << std::endl;
   } else if (aMeth == ConstructionPlugin_Point::CREATION_METHOD_BY_INTERSECTION()) {
     const std::string anIntersectionType = intersectionType()->value();
     if (anIntersectionType == ConstructionPlugin_Point::INTERSECTION_TYPE_BY_LINES())

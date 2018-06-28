@@ -80,10 +80,8 @@ public:
   CONSTRUCTIONAPI_EXPORT
   virtual ~ConstructionAPI_Point();
 
-  INTERFACE_27(ConstructionPlugin_Point::ID(),
-               x, ConstructionPlugin_Point::X(), ModelAPI_AttributeDouble, /** X attribute */,
-               y, ConstructionPlugin_Point::Y(), ModelAPI_AttributeDouble, /** Y attribute */,
-               z, ConstructionPlugin_Point::Z(), ModelAPI_AttributeDouble, /** Z attribute */,
+  INTERFACE_25(ConstructionPlugin_Point::ID(),
+               point, ConstructionPlugin_Point::point3d(), GeomDataAPI_Point, /** Point attribute */,
                creationMethod, ConstructionPlugin_Point::CREATION_METHOD(),
                ModelAPI_AttributeString, /** Creation method */,
                intersectionType, ConstructionPlugin_Point::INTERSECTION_TYPE(),
