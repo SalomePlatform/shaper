@@ -55,14 +55,11 @@ void ConstructionPlugin_Point::initAttributes()
 
   data()->addAttribute(CREATION_METHOD(), ModelAPI_AttributeString::typeId());
 
-/*
-  data()->addAttribute(FIRST_LINE(), ModelAPI_AttributeSelection::typeId());
-  data()->addAttribute(SECOND_LINE(), ModelAPI_AttributeSelection::typeId());
-*/
+  data()->addAttribute(INTERSECTION_LINE_1(), ModelAPI_AttributeSelection::typeId());
+  data()->addAttribute(INTERSECTION_LINE_2(), ModelAPI_AttributeSelection::typeId());
 
   data()->addAttribute(INTERSECTION_LINE(), ModelAPI_AttributeSelection::typeId());
   data()->addAttribute(INTERSECTION_PLANE(), ModelAPI_AttributeSelection::typeId());
-
   data()->addAttribute(USE_OFFSET(), ModelAPI_AttributeString::typeId());
   data()->addAttribute(OFFSET(), ModelAPI_AttributeDouble::typeId());
   data()->addAttribute(REVERSE_OFFSET(), ModelAPI_AttributeBoolean::typeId());
@@ -77,6 +74,12 @@ void ConstructionPlugin_Point::initAttributes()
   data()->addAttribute(PROJECTION_TYPE(), ModelAPI_AttributeString::typeId());
   data()->addAttribute(EDGE_FOR_POINT_PROJECTION(), ModelAPI_AttributeSelection::typeId());
   data()->addAttribute(FACE_FOR_POINT_PROJECTION(), ModelAPI_AttributeSelection::typeId());
+
+  data()->addAttribute(INTERSECTION_TYPE(), ModelAPI_AttributeString::typeId());
+
+  data()->addAttribute(INTERSECTION_PLANE_1(), ModelAPI_AttributeSelection::typeId());
+  data()->addAttribute(INTERSECTION_PLANE_2(), ModelAPI_AttributeSelection::typeId());
+  data()->addAttribute(INTERSECTION_PLANE_3(), ModelAPI_AttributeSelection::typeId());
 }
 
 //==================================================================================================
@@ -98,22 +101,27 @@ void ConstructionPlugin_Point::execute()
     } else {
       aShape = createByProjectionOnFace();
     }
-  } /* else if(aCreationMethod == CREATION_METHOD_BY_LINES_INTERSECTION()) {
-    aShape = createByLinesIntersection();
-  } */ else if(aCreationMethod == CREATION_METHOD_BY_LINE_AND_PLANE_INTERSECTION()) {
-    // this may produce several points
-    std::list<std::shared_ptr<GeomAPI_Vertex> > aPoints = createByLineAndPlaneIntersection();
-    if (!aPoints.empty()) { // if no points found produce the standard error later
-      int anIndex = 0;
-      std::list<std::shared_ptr<GeomAPI_Vertex> >::iterator aPIter = aPoints.begin();
-      for(; aPIter != aPoints.end(); aPIter++, anIndex++) {
-        std::shared_ptr<ModelAPI_ResultConstruction> aConstr =
-          document()->createConstruction(data(), anIndex);
-        aConstr->setShape(*aPIter);
-        setResult(aConstr, anIndex);
+  } else if(aCreationMethod == CREATION_METHOD_BY_INTERSECTION()) {
+    std::string anIntersectionType = string(INTERSECTION_TYPE())->value();
+    if (anIntersectionType == INTERSECTION_TYPE_BY_LINES()) {
+      aShape = createByLinesIntersection();
+    } else if (anIntersectionType == INTERSECTION_TYPE_BY_LINE_AND_PLANE()) {
+      // this may produce several points
+      std::list<std::shared_ptr<GeomAPI_Vertex> > aPoints = createByLineAndPlaneIntersection();
+      if (!aPoints.empty()) { // if no points found produce the standard error later
+        int anIndex = 0;
+        std::list<std::shared_ptr<GeomAPI_Vertex> >::iterator aPIter = aPoints.begin();
+        for (; aPIter != aPoints.end(); aPIter++, anIndex++) {
+          std::shared_ptr<ModelAPI_ResultConstruction> aConstr =
+            document()->createConstruction(data(), anIndex);
+          aConstr->setShape(*aPIter);
+          setResult(aConstr, anIndex);
+        }
+        removeResults(anIndex);
+        return;
       }
-      removeResults(anIndex);
-      return;
+    } else {
+      aShape = createByPlanesIntersection();
     }
   }
 
@@ -219,12 +227,11 @@ std::shared_ptr<GeomAPI_Vertex> ConstructionPlugin_Point::createByProjectionOnFa
   return GeomAlgoAPI_PointBuilder::vertexByProjection(aVertex, aFace);
 }
 
-/*
 //==================================================================================================
 std::shared_ptr<GeomAPI_Vertex> ConstructionPlugin_Point::createByLinesIntersection()
 {
   // Get first line.
-  AttributeSelectionPtr aFirstLineSelection= selection(FIRST_LINE());
+  AttributeSelectionPtr aFirstLineSelection= selection(INTERSECTION_LINE_1());
   GeomShapePtr aFirstLineShape = aFirstLineSelection->value();
   if(!aFirstLineShape.get()) {
     aFirstLineShape = aFirstLineSelection->context()->shape();
@@ -232,7 +239,7 @@ std::shared_ptr<GeomAPI_Vertex> ConstructionPlugin_Point::createByLinesIntersect
   std::shared_ptr<GeomAPI_Edge> aFirstEdge(new GeomAPI_Edge(aFirstLineShape));
 
   // Get second line.
-  AttributeSelectionPtr aSecondLineSelection= selection(SECOND_LINE());
+  AttributeSelectionPtr aSecondLineSelection= selection(INTERSECTION_LINE_2());
   GeomShapePtr aSecondLineShape = aSecondLineSelection->value();
   if(!aSecondLineShape.get()) {
     aSecondLineShape = aSecondLineSelection->context()->shape();
@@ -241,7 +248,6 @@ std::shared_ptr<GeomAPI_Vertex> ConstructionPlugin_Point::createByLinesIntersect
 
   return GeomAlgoAPI_PointBuilder::vertexByIntersection(aFirstEdge, aSecondEdge);
 }
-*/
 
 //==================================================================================================
 std::list<std::shared_ptr<GeomAPI_Vertex> >
@@ -274,4 +280,49 @@ std::list<std::shared_ptr<GeomAPI_Vertex> >
 
   return GeomAlgoAPI_ShapeTools::intersect(anEdge, aFace,
     aPlaneSelection->context()->groupName() == ModelAPI_ResultConstruction::group());
+}
+
+//==================================================================================================
+std::shared_ptr<GeomAPI_Vertex> ConstructionPlugin_Point::createByPlanesIntersection()
+{
+  // Get plane.
+  AttributeSelectionPtr aPlaneSelection1 = selection(INTERSECTION_PLANE_1());
+  GeomShapePtr aPlaneShape1 = aPlaneSelection1->value();
+  if (!aPlaneShape1.get()) {
+    aPlaneShape1 = aPlaneSelection1->context()->shape();
+  }
+  std::shared_ptr<GeomAPI_Face> aFace1(new GeomAPI_Face(aPlaneShape1));
+  std::shared_ptr<GeomAPI_Pln> aPln1 = aFace1->getPlane();
+
+  // Get plane.
+  AttributeSelectionPtr aPlaneSelection2 = selection(INTERSECTION_PLANE_2());
+  GeomShapePtr aPlaneShape2 = aPlaneSelection2->value();
+  if (!aPlaneShape2.get()) {
+    aPlaneShape2 = aPlaneSelection2->context()->shape();
+  }
+  std::shared_ptr<GeomAPI_Face> aFace2(new GeomAPI_Face(aPlaneShape2));
+  std::shared_ptr<GeomAPI_Pln> aPln2 = aFace2->getPlane();
+
+  // Get plane.
+  AttributeSelectionPtr aPlaneSelection3 = selection(INTERSECTION_PLANE_3());
+  GeomShapePtr aPlaneShape3 = aPlaneSelection3->value();
+  if (!aPlaneShape3.get()) {
+    aPlaneShape3 = aPlaneSelection3->context()->shape();
+  }
+  std::shared_ptr<GeomAPI_Face> aFace3(new GeomAPI_Face(aPlaneShape3));
+  std::shared_ptr<GeomAPI_Pln> aPln3 = aFace3->getPlane();
+
+  std::shared_ptr<GeomAPI_Vertex> aVertex;
+
+  std::shared_ptr<GeomAPI_Lin> anIntersectLine = aPln1->intersect(aPln2);
+  if (!anIntersectLine.get()) {
+    return aVertex;
+  }
+
+  std::shared_ptr<GeomAPI_Pnt> aPnt = aPln3->intersect(anIntersectLine);
+  if (aPnt.get()) {
+    aVertex.reset(new GeomAPI_Vertex(aPnt->x(), aPnt->y(), aPnt->z()));
+  }
+
+  return aVertex;
 }

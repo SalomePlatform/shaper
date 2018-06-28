@@ -73,12 +73,33 @@ ConstructionAPI_Point::ConstructionAPI_Point(const std::shared_ptr<ModelAPI_Feat
     } else if (aType1 == GeomAPI_Shape::VERTEX && aType2 == GeomAPI_Shape::EDGE) {
       // If first object is vertex and second object is edge then set by projection.
       setByProjectionOnEdge(theObject1, theObject2);
-    } /* else if(aType1 == GeomAPI_Shape::EDGE && aType2 == GeomAPI_Shape::EDGE) {
+    } else if(aType1 == GeomAPI_Shape::EDGE && aType2 == GeomAPI_Shape::EDGE) {
       // If both objects are edges then set by lines intersection.
       setByLinesIntersection(theObject1, theObject2);
-    } */ else if(aType1 == GeomAPI_Shape::EDGE && aType2 == GeomAPI_Shape::FACE) {
+    } else if(aType1 == GeomAPI_Shape::EDGE && aType2 == GeomAPI_Shape::FACE) {
       // If first object is edge and second object is face then set by line and plane intersection.
       setByLineAndPlaneIntersection(theObject1, theObject2);
+    }
+  }
+}
+
+//==================================================================================================
+ConstructionAPI_Point::ConstructionAPI_Point(const std::shared_ptr<ModelAPI_Feature>& theFeature,
+                                             const ModelHighAPI_Selection& theObject1,
+                                             const ModelHighAPI_Selection& theObject2,
+                                             const ModelHighAPI_Selection& theObject3)
+: ModelHighAPI_Interface(theFeature)
+{
+  if (initialize())
+  {
+    GeomAPI_Shape::ShapeType aType1 = getShapeType(theObject1);
+    GeomAPI_Shape::ShapeType aType2 = getShapeType(theObject2);
+    GeomAPI_Shape::ShapeType aType3 = getShapeType(theObject3);
+    if (aType1 == GeomAPI_Shape::FACE
+        && aType2 == GeomAPI_Shape::FACE
+        && aType3 == GeomAPI_Shape::FACE)
+    {
+      setByPlanesIntersection(theObject1, theObject2, theObject3);
     }
   }
 }
@@ -152,28 +173,44 @@ void ConstructionAPI_Point::setByProjectionOnFace(const ModelHighAPI_Selection& 
   execute();
 }
 
-/*
 //==================================================================================================
 void ConstructionAPI_Point::setByLinesIntersection(const ModelHighAPI_Selection& theEdge1,
                                                    const ModelHighAPI_Selection& theEdge2)
 {
-  fillAttribute(ConstructionPlugin_Point::CREATION_METHOD_BY_LINES_INTERSECTION(), mycreationMethod);
-  fillAttribute(theEdge1, myfirstLine);
-  fillAttribute(theEdge2, mysecondLine);
+  fillAttribute(ConstructionPlugin_Point::CREATION_METHOD_BY_INTERSECTION(), mycreationMethod);
+  fillAttribute(ConstructionPlugin_Point::INTERSECTION_TYPE_BY_LINES(),
+                myintersectionType);
+  fillAttribute(theEdge1, myintersectionLine1);
+  fillAttribute(theEdge2, myintersectionLine2);
 
   execute();
 }
-*/
 
 //==================================================================================================
 void ConstructionAPI_Point::setByLineAndPlaneIntersection(const ModelHighAPI_Selection& theEdge,
                                                           const ModelHighAPI_Selection& theFace)
 {
-  fillAttribute(
-    ConstructionPlugin_Point::CREATION_METHOD_BY_LINE_AND_PLANE_INTERSECTION(), mycreationMethod);
+  fillAttribute(ConstructionPlugin_Point::CREATION_METHOD_BY_INTERSECTION(), mycreationMethod);
+  fillAttribute(ConstructionPlugin_Point::INTERSECTION_TYPE_BY_LINE_AND_PLANE(),
+                myintersectionType);
   fillAttribute(theEdge, myintersectionLine);
   fillAttribute(theFace, myintersectionPlane);
   fillAttribute("", useOffset()); // not used by default
+  execute();
+}
+
+//==================================================================================================
+void ConstructionAPI_Point::setByPlanesIntersection(const ModelHighAPI_Selection& theFace1,
+                                                    const ModelHighAPI_Selection& theFace2,
+                                                    const ModelHighAPI_Selection& theFace3)
+{
+  fillAttribute(ConstructionPlugin_Point::CREATION_METHOD_BY_INTERSECTION(), mycreationMethod);
+  fillAttribute(ConstructionPlugin_Point::INTERSECTION_TYPE_BY_PLANES(),
+                myintersectionType);
+  fillAttribute(theFace1, myintersectionPlane1);
+  fillAttribute(theFace2, myintersectionPlane2);
+  fillAttribute(theFace3, myintersectionPlane3);
+
   execute();
 }
 
@@ -182,7 +219,7 @@ void ConstructionAPI_Point::dump(ModelHighAPI_Dumper& theDumper) const
 {
   FeaturePtr aBase = feature();
   const std::string& aDocName = theDumper.name(aBase->document());
-  const std::string& aMeth = creationMethod()->value();
+  const std::string aMeth = creationMethod()->value();
 
   // common part
   theDumper << aBase << " = model.addPoint(" << aDocName << ", ";
@@ -190,10 +227,24 @@ void ConstructionAPI_Point::dump(ModelHighAPI_Dumper& theDumper) const
   if (aMeth == "" || // default is XYZ
       aMeth == ConstructionPlugin_Point::CREATION_METHOD_BY_XYZ()) {
     theDumper << x() << ", " << y() << ", " << z();
-  } else if (aMeth == ConstructionPlugin_Point::CREATION_METHOD_BY_LINE_AND_PLANE_INTERSECTION()) {
-    theDumper << intersectionLine() << ", " <<intersectionPlane() ;
-    if (!useOffset()->value().empty()) { // call method with defined offset
-      theDumper << ", " << offset() << ", " << reverseOffset();
+  } else if (aMeth == ConstructionPlugin_Point::CREATION_METHOD_BY_INTERSECTION()) {
+    const std::string anIntersectionType = intersectionType()->value();
+    if (anIntersectionType == ConstructionPlugin_Point::INTERSECTION_TYPE_BY_LINES())
+    {
+      theDumper << intersectionLine1() << ", " << intersectionLine2();
+    }
+    else if (anIntersectionType == ConstructionPlugin_Point::INTERSECTION_TYPE_BY_LINE_AND_PLANE())
+    {
+      theDumper << intersectionLine() << ", " << intersectionPlane();
+      if (!useOffset()->value().empty()) { // call method with defined offset
+        theDumper << ", " << offset() << ", " << reverseOffset();
+      }
+    }
+    else if (anIntersectionType == ConstructionPlugin_Point::INTERSECTION_TYPE_BY_PLANES())
+    {
+      theDumper << intersectionPlane1() << ", "
+                << intersectionPlane2() << ", "
+                << intersectionPlane3();
     }
   } else if (aMeth == ConstructionPlugin_Point::CREATION_METHOD_BY_DISTANCE_ON_EDGE()) {
     theDumper << edge() << ", ";
@@ -261,4 +312,14 @@ PointPtr addPoint(const std::shared_ptr<ModelAPI_Document> & thePart,
   fillAttribute(theReverse, anAPI->reverseOffset());
 
   return anAPI;
+}
+
+//==================================================================================================
+PointPtr addPoint(const std::shared_ptr<ModelAPI_Document> & thePart,
+                  const ModelHighAPI_Selection& theObject1,
+                  const ModelHighAPI_Selection& theObject2,
+                  const ModelHighAPI_Selection& theObject3)
+{
+  std::shared_ptr<ModelAPI_Feature> aFeature = thePart->addFeature(ConstructionAPI_Point::ID());
+  return PointPtr(new ConstructionAPI_Point(aFeature, theObject1, theObject2, theObject3));
 }

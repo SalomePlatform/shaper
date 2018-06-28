@@ -83,6 +83,11 @@ bool ConstructionPlugin_ValidatorPointLines::isValid(const AttributePtr& theAttr
   std::shared_ptr<GeomAPI_Lin> aLine1 = aLineEdge1->line();
   std::shared_ptr<GeomAPI_Lin> aLine2 = aLineEdge2->line();
 
+  if (!aLine1.get() || !aLine2.get()) {
+    theError = "Selected edge is not a line.";
+    return false;
+  }
+
   if(!aLine1->isCoplanar(aLine2)) {
     theError = "Selected lines not coplanar.";
     return false;
@@ -387,6 +392,81 @@ bool ConstructionPlugin_ValidatorAxisTwoNotParallelPlanes::isValid(
   if(aDir1->isParallel(aDir2)) {
     theError = "Planes are parallel.";
     return false;
+  }
+
+  return true;
+}
+
+//==================================================================================================
+bool ConstructionPlugin_ValidatorPointThreeNonParallelPlanes::isValid(
+  const AttributePtr& theAttribute,
+  const std::list<std::string>& theArguments,
+  Events_InfoMessage& theError) const
+{
+  FeaturePtr aFeature = ModelAPI_Feature::feature(theAttribute->owner());
+
+  AttributeSelectionPtr anAttribute1 =
+    std::dynamic_pointer_cast<ModelAPI_AttributeSelection>(theAttribute);
+  AttributeSelectionPtr anAttribute2 = aFeature->selection(theArguments.front());
+  AttributeSelectionPtr anAttribute3 = aFeature->selection(theArguments.back());
+
+  GeomShapePtr aShape1 = anAttribute1->value();
+  ResultPtr aContext1 = anAttribute1->context();
+  if (!aContext1.get()) {
+    theError = "One of the attribute not initialized.";
+    return false;
+  }
+  if (!aShape1.get()) {
+    aShape1 = aContext1->shape();
+  }
+
+  std::shared_ptr<GeomAPI_Pln> aPln1 = getPln(aShape1);
+  if (!aPln1.get()) {
+    theError = "Wrong shape types selected.";
+    return false;
+  }
+  std::shared_ptr<GeomAPI_Dir> aDir1 = aPln1->direction();
+
+  if (anAttribute2.get()) {
+    GeomShapePtr aShape2 = anAttribute2->value();
+    ResultPtr aContext2 = anAttribute2->context();
+    if (!aShape2.get() && aContext2.get()) {
+      aShape2 = aContext2->shape();
+    }
+
+    if (aShape2.get()) {
+      std::shared_ptr<GeomAPI_Pln> aPln2 = getPln(aShape2);
+      if (!aPln2.get()) {
+        theError = "Wrong shape types selected.";
+        return false;
+      }
+      std::shared_ptr<GeomAPI_Dir> aDir2 = aPln2->direction();
+      if (aDir1->isParallel(aDir2)) {
+        theError = "Planes are parallel.";
+        return false;
+      }
+    }
+  }
+
+  if (anAttribute3.get()) {
+    GeomShapePtr aShape3 = anAttribute3->value();
+    ResultPtr aContext3 = anAttribute3->context();
+    if (!aShape3.get() && aContext3.get()) {
+      aShape3 = aContext3->shape();
+    }
+
+    if (aShape3.get()) {
+      std::shared_ptr<GeomAPI_Pln> aPln3 = getPln(aShape3);
+      if (!aPln3.get()) {
+        theError = "Wrong shape types selected.";
+        return false;
+      }
+      std::shared_ptr<GeomAPI_Dir> aDir3 = aPln3->direction();
+      if (aDir1->isParallel(aDir3)) {
+        theError = "Planes are parallel.";
+        return false;
+      }
+    }
   }
 
   return true;

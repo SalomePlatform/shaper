@@ -52,6 +52,8 @@ ConstructionPlugin_Plugin::ConstructionPlugin_Plugin()
                               new ConstructionPlugin_ValidatorPlaneTwoParallelPlanes());
   aFactory->registerValidator("ConstructionPlugin_ValidatorAxisTwoNotParallelPlanes",
                               new ConstructionPlugin_ValidatorAxisTwoNotParallelPlanes());
+  aFactory->registerValidator("ConstructionPlugin_ValidatorPointThreeNonParallelPlanes",
+                              new ConstructionPlugin_ValidatorPointThreeNonParallelPlanes());
 
   Config_PropManager::registerProp(SKETCH_TAB_NAME, "planes_size", "Size", Config_Prop::DblSpin,
                                    PLANE_SIZE);

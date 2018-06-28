@@ -118,53 +118,100 @@ email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com
         </box>
       </toolbox>
     </box>
-<!--
-    <box id="by_lines_intersection"
-         title="By two lines intersection"
-         tooltip="Point by intersection of two coplanar lines."
-         icon="icons/Construction/point_by_lines_intersection_32x32.png">
-      <shape_selector id="first_line"
-                      label="First line"
-                      tooltip="First line."
-                      icon="icons/Construction/edge.png"
-                      shape_types="edge">
-        <validator id="GeomValidators_ShapeType" parameters="line"/>
-        <validator id="ConstructionPlugin_ValidatorPointLines" parameters="second_line"/>
-      </shape_selector>
-      <shape_selector id="second_line"
-                      label="Second line"
-                      tooltip="Second line."
-                      icon="icons/Construction/edge.png"
-                      shape_types="edge">
-        <validator id="GeomValidators_ShapeType" parameters="line"/>
-        <validator id="ConstructionPlugin_ValidatorPointLines" parameters="first_line"/>
-      </shape_selector>
+    <box id="by_intersection"
+         title="By intersection of objects"
+         tooltip="Point on intersection of different objects."
+         icon="icons/Construction/point_by_intersection_32x32.png">
+      <toolbox id="intersection_type">
+        <box id="intersection_type_by_lines"
+             title="By two lines intersection"
+             tooltip="Point by intersection of two coplanar lines."
+             icon="icons/Construction/point_by_lines_intersection_24x24.png">
+          <shape_selector id="intersection_line_1"
+                          label="First line"
+                          tooltip="First line."
+                          icon="icons/Construction/edge.png"
+                          shape_types="edge">
+            <validator id="GeomValidators_ShapeType" parameters="line"/>
+            <validator id="ConstructionPlugin_ValidatorPointLines"
+                       parameters="intersection_line_2"/>
+          </shape_selector>
+          <shape_selector id="intersection_line_2"
+                          label="Second line"
+                          tooltip="Second line."
+                          icon="icons/Construction/edge.png"
+                          shape_types="edge">
+            <validator id="GeomValidators_ShapeType" parameters="line"/>
+            <validator id="ConstructionPlugin_ValidatorPointLines"
+                       parameters="intersection_line_1"/>
+          </shape_selector>
+        </box>
+        <box id="intersection_type_by_line_and_plane"
+             title="By line and plane intersection"
+             tooltip="Point by intersection of line and plane."
+             icon="icons/Construction/point_by_line_and_plane_intersection_24x24.png">
+          <shape_selector id="intersection_line"
+                          label="Line"
+                          tooltip="Line for intersection."
+                          icon="icons/Construction/edge.png"
+                          shape_types="edge">
+            <validator id="ConstructionPlugin_ValidatorPointEdgeAndPlaneNotParallel"
+                       parameters="intersection_plane"/>
+          </shape_selector>
+          <shape_selector id="intersection_plane"
+                          label="Plane"
+                          tooltip="Plane for intersection."
+                          icon="icons/Construction/face.png"
+                          shape_types="face">
+            <validator id="GeomValidators_Face" parameters="plane"/>
+            <validator id="ConstructionPlugin_ValidatorPointEdgeAndPlaneNotParallel"
+                       parameters="intersection_line"/>
+          </shape_selector>
+          <optionalbox id="use_offset" title="Offset from the plane">
+            <doublevalue id="offset"
+                         label="Distance "
+                         tooltip="Distance from the plane"
+                         min="0"
+                         default="0"/>
+            <boolvalue id="reverse_offset"
+                       label="Reverse"
+                       tooltip="Reverse offset value"
+                       default="false"/>
+          </optionalbox>
+        </box>
+        <box id="intersection_type_by_planes"
+             title="By three planes intersection"
+             tooltip="Point by intersection of three planes."
+             icon="icons/Construction/point_by_planes_intersection_24x24.png">
+          <shape_selector id="intersection_plane_1"
+                          label="1st plane"
+                          tooltip="Select a planar face."
+                          icon="icons/Construction/face.png"
+                          shape_types="face">
+            <validator id="GeomValidators_Face" parameters="plane"/>
+            <validator id="ConstructionPlugin_ValidatorPointThreeNonParallelPlanes"
+                       parameters="intersection_plane_2, intersection_plane_3"/>
+          </shape_selector>
+          <shape_selector id="intersection_plane_2"
+                          label="2nd plane"
+                          tooltip="Select a planar face."
+                          icon="icons/Construction/face.png"
+                          shape_types="face">
+            <validator id="GeomValidators_Face" parameters="plane"/>
+            <validator id="ConstructionPlugin_ValidatorPointThreeNonParallelPlanes"
+                       parameters="intersection_plane_1, intersection_plane_3"/>
+          </shape_selector>
+          <shape_selector id="intersection_plane_3"
+                          label="3rd plane"
+                          tooltip="Select a planar face."
+                          icon="icons/Construction/face.png"
+                          shape_types="face">
+            <validator id="GeomValidators_Face" parameters="plane"/>
+            <validator id="ConstructionPlugin_ValidatorPointThreeNonParallelPlanes"
+                       parameters="intersection_plane_1, intersection_plane_2"/>
+          </shape_selector>
+        </box>
+        </toolbox>
     </box>
--->
-    <box id="by_line_and_plane_intersection"
-         title="By line and plane intersection"
-         tooltip="Point by intersection of line and plane."
-         icon="icons/Construction/point_by_line_and_plane_intersection_32x32.png">
-      <shape_selector id="intersection_line"
-                      label="Line"
-                      tooltip="Line for intersection."
-                      icon="icons/Construction/edge.png"
-                      shape_types="edge">
-        <validator id="ConstructionPlugin_ValidatorPointEdgeAndPlaneNotParallel" parameters="intersection_plane"/>
-      </shape_selector>
-      <shape_selector id="intersection_plane"
-                      label="Plane"
-                      tooltip="Plane for intersection."
-                      icon="icons/Construction/face.png"
-                      shape_types="face">
-        <validator id="GeomValidators_Face" parameters="plane"/>
-        <validator id="ConstructionPlugin_ValidatorPointEdgeAndPlaneNotParallel" parameters="intersection_line"/>
-      </shape_selector>
-      <optionalbox id="use_offset" title="Offset from the plane">
-        <doublevalue id="offset" label="Distance " tooltip="Distance from the plane" min="0" default="0"/>
-        <boolvalue id="reverse_offset" label="Reverse" tooltip="Reverse offset value" default="false"/>
-      </optionalbox>
-    </box>
-
   </toolbox>
 </source>

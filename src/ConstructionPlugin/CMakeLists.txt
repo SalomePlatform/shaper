@@ -78,7 +78,9 @@ INCLUDE_DIRECTORIES(
 ADD_UNIT_TESTS(TestAxisCreation.py
                UnitTestAxis.py
                TestPoint_XYZ.py
-               TestPoint_LineAndPlane.py
+               TestPoint_IntersectLines.py
+               TestPoint_IntersectLineAndPlane.py
+               TestPoint_IntersectPlanes.py
                TestPoint_Edge.py
                TestPoint_ProjectOnEdge.py
                TestPoint_ProjectOnFace.py

@@ -63,19 +63,38 @@ public:
                         const ModelHighAPI_Selection& theObject1,
                         const ModelHighAPI_Selection& theObject2);
 
+  /// Constructor with values: intersected objects.
+  CONSTRUCTIONAPI_EXPORT
+  ConstructionAPI_Point(const std::shared_ptr<ModelAPI_Feature>& theFeature,
+                        const ModelHighAPI_Selection& theObject1,
+                        const ModelHighAPI_Selection& theObject2,
+                        const ModelHighAPI_Selection& theObject3);
+
   /// Destructor.
   CONSTRUCTIONAPI_EXPORT
   virtual ~ConstructionAPI_Point();
 
-  INTERFACE_18(ConstructionPlugin_Point::ID(),
+  INTERFACE_24(ConstructionPlugin_Point::ID(),
                x, ConstructionPlugin_Point::X(), ModelAPI_AttributeDouble, /** X attribute */,
                y, ConstructionPlugin_Point::Y(), ModelAPI_AttributeDouble, /** Y attribute */,
                z, ConstructionPlugin_Point::Z(), ModelAPI_AttributeDouble, /** Z attribute */,
                creationMethod, ConstructionPlugin_Point::CREATION_METHOD(),
                ModelAPI_AttributeString, /** Creation method */,
+               intersectionType, ConstructionPlugin_Point::INTERSECTION_TYPE(),
+               ModelAPI_AttributeString, /** Type of the intersection */,
+               intersectionLine1, ConstructionPlugin_Point::INTERSECTION_LINE_1(),
+               ModelAPI_AttributeSelection, /** Line for intersection */,
+               intersectionLine2, ConstructionPlugin_Point::INTERSECTION_LINE_2(),
+               ModelAPI_AttributeSelection, /** Line for intersection */,
                intersectionLine, ConstructionPlugin_Point::INTERSECTION_LINE(),
                ModelAPI_AttributeSelection, /** Line for intersection */,
                intersectionPlane, ConstructionPlugin_Point::INTERSECTION_PLANE(),
+               ModelAPI_AttributeSelection, /** Plane for intersection */,
+               intersectionPlane1, ConstructionPlugin_Point::INTERSECTION_PLANE_1(),
+               ModelAPI_AttributeSelection, /** Plane for intersection */,
+               intersectionPlane2, ConstructionPlugin_Point::INTERSECTION_PLANE_2(),
+               ModelAPI_AttributeSelection, /** Plane for intersection */,
+               intersectionPlane3, ConstructionPlugin_Point::INTERSECTION_PLANE_3(),
                ModelAPI_AttributeSelection, /** Plane for intersection */,
                useOffset, ConstructionPlugin_Point::USE_OFFSET(),
                ModelAPI_AttributeString, /** Use offset */,
@@ -126,17 +145,21 @@ public:
   void setByProjectionOnFace(const ModelHighAPI_Selection& theVertex,
                              const ModelHighAPI_Selection& theFace);
 
-  /*
   /// Set lines for intersections.
   CONSTRUCTIONAPI_EXPORT
   void setByLinesIntersection(const ModelHighAPI_Selection& theEdge1,
                               const ModelHighAPI_Selection& theEdge2);
-  */
 
   /// Set line and plane for intersections.
   CONSTRUCTIONAPI_EXPORT
   void setByLineAndPlaneIntersection(const ModelHighAPI_Selection& theEdge,
                                      const ModelHighAPI_Selection& theFace);
+
+  /// Set faces for intersections.
+  CONSTRUCTIONAPI_EXPORT
+  void setByPlanesIntersection(const ModelHighAPI_Selection& theFace1,
+                               const ModelHighAPI_Selection& theFace2,
+                               const ModelHighAPI_Selection& theFace3);
 
   /// Dump wrapped feature
   CONSTRUCTIONAPI_EXPORT
@@ -179,5 +202,13 @@ PointPtr addPoint(const std::shared_ptr<ModelAPI_Document> & thePart,
                   const ModelHighAPI_Selection& theObject2,
                   const ModelHighAPI_Double& theDistanceValue,
                   const bool theReverse = false);
+
+/// \ingroup CPPHighAPI
+/// \brief Create Point feature as an intersection of selected planes
+CONSTRUCTIONAPI_EXPORT
+PointPtr addPoint(const std::shared_ptr<ModelAPI_Document> & thePart,
+                  const ModelHighAPI_Selection& theObject1,
+                  const ModelHighAPI_Selection& theObject2,
+                  const ModelHighAPI_Selection& theObject3);
 
 #endif /* SRC_CONSTRUCTIONAPI_CONSTRUCTIONAPI_POINT_H_ */
