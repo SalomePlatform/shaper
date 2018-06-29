@@ -226,15 +226,19 @@ def testHaveNamingByType(theFeature, theModel, thePartDoc, theSubshapeType) :
     shapeExplorer = GeomAPI_ShapeExplorer(shape, theSubshapeType)
     # Create list, and store selections in it
     while shapeExplorer.more():
+      current = shapeExplorer.current()
+      if current.isEdge() and GeomAPI.GeomAPI_Edge(current).isDegenerated(): # skip degenerative edges because they are not selected
+        shapeExplorer.next()
+        continue
       aDuplicate = False
       for alreadyThere in shapesList:
-        if alreadyThere.isSame(shapeExplorer.current()):
+        if alreadyThere.isSame(current):
           aDuplicate = True
       if aDuplicate:
         shapeExplorer.next()
         continue
-      shapesList.append(shapeExplorer.current())
-      selection = theModel.selection(aResult, shapeExplorer.current()) # First argument should be result/sub-result, second is sub-shape on this result/sub-result
+      shapesList.append(current)
+      selection = theModel.selection(aResult, current) # First argument should be result/sub-result, second is sub-shape on this result/sub-result
       selectionList.append(selection)
       shapeExplorer.next()
   # Create group with this selection list
