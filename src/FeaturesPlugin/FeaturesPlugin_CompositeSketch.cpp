@@ -438,7 +438,7 @@ void FeaturesPlugin_CompositeSketch::storeGenerationHistory(ResultBodyPtr theRes
               std::ostringstream aStream;
               aStream<<"Base_Edge_"<<theTag++;
               theResultBody->generated(aNotClosedEdge, aStream.str(), theTag++);
-              if (aDegenerateEdge.get()) { // export vertex of the degenerated edge, apex, issue 2520
+              if (aDegenerateEdge.get()) { // export vertex of the degenerated edge (apex) #2520
                 GeomAPI_ShapeExplorer anEdgeExp(aDegenerateEdge, GeomAPI_Shape::VERTEX);
                 if (anEdgeExp.more()) {
                   std::ostringstream aStream;

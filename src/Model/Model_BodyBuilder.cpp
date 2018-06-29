@@ -385,7 +385,8 @@ static void keepTopLevelShapes(ListOfShape& theShapes, const TopoDS_Shape& theRo
   ListOfShape::iterator anIt = theShapes.begin();
   while (anIt != theShapes.end()) {
     TopoDS_Shape aNewShape = (*anIt)->impl<TopoDS_Shape>();
-    bool aSkip = aNewShape.IsNull() || (aNewShape.ShapeType() == TopAbs_EDGE && BRep_Tool::Degenerated(TopoDS::Edge(aNewShape)));
+    bool aSkip = aNewShape.IsNull() ||
+      (aNewShape.ShapeType() == TopAbs_EDGE && BRep_Tool::Degenerated(TopoDS::Edge(aNewShape)));
     if (aSkip || theRoot.IsSame(aNewShape) || (theResultShape &&
         (!theResultShape->isSubShape(*anIt, false) || theResultShape->isSame(*anIt)))) {
       ListOfShape::iterator aRemoveIt = anIt++;
