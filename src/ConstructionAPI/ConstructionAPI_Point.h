@@ -70,11 +70,17 @@ public:
                         const ModelHighAPI_Selection& theObject2,
                         const ModelHighAPI_Selection& theObject3);
 
+  /// Constructor with values: object and circular edge flag.
+  CONSTRUCTIONAPI_EXPORT
+  ConstructionAPI_Point(const std::shared_ptr<ModelAPI_Feature>& theFeature,
+                        const ModelHighAPI_Selection& theObject,
+                        const bool theIsCircularEdge = false);
+
   /// Destructor.
   CONSTRUCTIONAPI_EXPORT
   virtual ~ConstructionAPI_Point();
 
-  INTERFACE_24(ConstructionPlugin_Point::ID(),
+  INTERFACE_27(ConstructionPlugin_Point::ID(),
                x, ConstructionPlugin_Point::X(), ModelAPI_AttributeDouble, /** X attribute */,
                y, ConstructionPlugin_Point::Y(), ModelAPI_AttributeDouble, /** Y attribute */,
                z, ConstructionPlugin_Point::Z(), ModelAPI_AttributeDouble, /** Z attribute */,
@@ -117,10 +123,15 @@ public:
                projectionType, ConstructionPlugin_Point::PROJECTION_TYPE(),
                ModelAPI_AttributeString, /** Type of the point projection */,
                faceForPointProjection, ConstructionPlugin_Point::FACE_FOR_POINT_PROJECTION(),
-               ModelAPI_AttributeSelection, /** Point to project on edge */,
+               ModelAPI_AttributeSelection, /** Face for point projection */,
                edgeForPointProjection, ConstructionPlugin_Point::EDGE_FOR_POINT_PROJECTION(),
-               ModelAPI_AttributeSelection, /** Edge for point projection */)
-
+               ModelAPI_AttributeSelection, /** Edge for point projection */,
+               geometricalPropertyType, ConstructionPlugin_Point::GEOMETRICAL_PROPERTY_TYPE(),
+               ModelAPI_AttributeString, /** Type of the geometrical property */,
+               objectForCenterOfGravity, ConstructionPlugin_Point::OBJECT_FOR_CENTER_OF_GRAVITY(),
+               ModelAPI_AttributeSelection, /** Object for center of gravity */,
+               objectForCenterOfCircle, ConstructionPlugin_Point::OBJECT_FOR_CENTER_OF_CIRCLE(),
+               ModelAPI_AttributeSelection, /** Object for center of circle */)
 
   /// Set point values.
   CONSTRUCTIONAPI_EXPORT
@@ -160,6 +171,14 @@ public:
   void setByPlanesIntersection(const ModelHighAPI_Selection& theFace1,
                                const ModelHighAPI_Selection& theFace2,
                                const ModelHighAPI_Selection& theFace3);
+
+  /// Set object for center of gravity.
+  CONSTRUCTIONAPI_EXPORT
+  void setByCenterOfGravity(const ModelHighAPI_Selection& theObject);
+
+  /// Set object for center of circular edge.
+  CONSTRUCTIONAPI_EXPORT
+    void setByCenterOfCircle(const ModelHighAPI_Selection& theObject);
 
   /// Dump wrapped feature
   CONSTRUCTIONAPI_EXPORT
@@ -204,11 +223,18 @@ PointPtr addPoint(const std::shared_ptr<ModelAPI_Document> & thePart,
                   const bool theReverse = false);
 
 /// \ingroup CPPHighAPI
-/// \brief Create Point feature as an intersection of selected planes
+/// \brief Create Point feature as an intersection of selected planes.
 CONSTRUCTIONAPI_EXPORT
 PointPtr addPoint(const std::shared_ptr<ModelAPI_Document> & thePart,
                   const ModelHighAPI_Selection& theObject1,
                   const ModelHighAPI_Selection& theObject2,
                   const ModelHighAPI_Selection& theObject3);
+
+/// \ingroup CPPHighAPI
+/// \brief Create Point feature as a geometrical property.
+CONSTRUCTIONAPI_EXPORT
+PointPtr addPoint(const std::shared_ptr<ModelAPI_Document> & thePart,
+                  const ModelHighAPI_Selection& theObject,
+                  const bool theIsCircularEdge = false);
 
 #endif /* SRC_CONSTRUCTIONAPI_CONSTRUCTIONAPI_POINT_H_ */

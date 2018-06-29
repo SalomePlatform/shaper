@@ -29,6 +29,7 @@
 #include <GeomAlgoAPI_PointBuilder.h>
 #include <GeomAlgoAPI_ShapeTools.h>
 
+#include <GeomAPI_Circ.h>
 #include <GeomAPI_Edge.h>
 #include <GeomAPI_Pnt.h>
 #include <GeomAPI_Vertex.h>
@@ -76,10 +77,13 @@ void ConstructionPlugin_Point::initAttributes()
   data()->addAttribute(FACE_FOR_POINT_PROJECTION(), ModelAPI_AttributeSelection::typeId());
 
   data()->addAttribute(INTERSECTION_TYPE(), ModelAPI_AttributeString::typeId());
-
   data()->addAttribute(INTERSECTION_PLANE_1(), ModelAPI_AttributeSelection::typeId());
   data()->addAttribute(INTERSECTION_PLANE_2(), ModelAPI_AttributeSelection::typeId());
   data()->addAttribute(INTERSECTION_PLANE_3(), ModelAPI_AttributeSelection::typeId());
+
+  data()->addAttribute(GEOMETRICAL_PROPERTY_TYPE(), ModelAPI_AttributeString::typeId());
+  data()->addAttribute(OBJECT_FOR_CENTER_OF_GRAVITY(), ModelAPI_AttributeSelection::typeId());
+  data()->addAttribute(OBJECT_FOR_CENTER_OF_CIRCLE(), ModelAPI_AttributeSelection::typeId());
 }
 
 //==================================================================================================
@@ -122,6 +126,13 @@ void ConstructionPlugin_Point::execute()
       }
     } else {
       aShape = createByPlanesIntersection();
+    }
+  } else if (aCreationMethod == CREATION_METHOD_BY_GEOMETRICAL_PROPERTY()) {
+    std::string aGeometricalPropertyType = string(GEOMETRICAL_PROPERTY_TYPE())->value();
+    if (aGeometricalPropertyType == GEOMETRICAL_PROPERTY_TYPE_BY_CENTER_OF_GRAVITY()) {
+      aShape = createByCenterOfGravity();
+    } else {
+      aShape = createByCenterOfCircle();
     }
   }
 
@@ -320,6 +331,48 @@ std::shared_ptr<GeomAPI_Vertex> ConstructionPlugin_Point::createByPlanesIntersec
   }
 
   std::shared_ptr<GeomAPI_Pnt> aPnt = aPln3->intersect(anIntersectLine);
+  if (aPnt.get()) {
+    aVertex.reset(new GeomAPI_Vertex(aPnt->x(), aPnt->y(), aPnt->z()));
+  }
+
+  return aVertex;
+}
+
+//==================================================================================================
+std::shared_ptr<GeomAPI_Vertex> ConstructionPlugin_Point::createByCenterOfGravity()
+{
+  // Get shape.
+  AttributeSelectionPtr aShapeSelection = selection(OBJECT_FOR_CENTER_OF_GRAVITY());
+  GeomShapePtr aShape = aShapeSelection->value();
+  if (!aShape.get())
+  {
+    aShape = aShapeSelection->context()->shape();
+  }
+
+  std::shared_ptr<GeomAPI_Vertex> aVertex;
+  std::shared_ptr<GeomAPI_Pnt> aPnt = GeomAlgoAPI_ShapeTools::centreOfMass(aShape);
+  if (aPnt.get())
+  {
+    aVertex.reset(new GeomAPI_Vertex(aPnt->x(), aPnt->y(), aPnt->z()));
+  }
+
+  return aVertex;
+}
+
+//==================================================================================================
+std::shared_ptr<GeomAPI_Vertex> ConstructionPlugin_Point::createByCenterOfCircle()
+{
+  // Get shape.
+  AttributeSelectionPtr aShapeSelection = selection(OBJECT_FOR_CENTER_OF_CIRCLE());
+  GeomShapePtr aShape = aShapeSelection->value();
+  if (!aShape.get()) {
+    aShape = aShapeSelection->context()->shape();
+  }
+  std::shared_ptr<GeomAPI_Edge> anEdge(new GeomAPI_Edge(aShape));
+  std::shared_ptr<GeomAPI_Circ> aCirc = anEdge->circle();
+
+  std::shared_ptr<GeomAPI_Vertex> aVertex;
+  std::shared_ptr<GeomAPI_Pnt> aPnt = aCirc->center();
   if (aPnt.get()) {
     aVertex.reset(new GeomAPI_Vertex(aPnt->x(), aPnt->y(), aPnt->z()));
   }

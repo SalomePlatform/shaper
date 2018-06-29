@@ -82,6 +82,35 @@
 #include <TopoDS_Edge.hxx>
 
 //==================================================================================================
+static GProp_GProps props(const TopoDS_Shape& theShape)
+{
+  GProp_GProps aGProps;
+
+  if (theShape.ShapeType() == TopAbs_EDGE || theShape.ShapeType() == TopAbs_WIRE)
+  {
+    BRepGProp::LinearProperties(theShape, aGProps);
+  }
+  else if (theShape.ShapeType() == TopAbs_FACE || theShape.ShapeType() == TopAbs_SHELL)
+  {
+    const Standard_Real anEps = 1.e-6;
+    BRepGProp::SurfaceProperties(theShape, aGProps, anEps);
+  }
+  else if (theShape.ShapeType() == TopAbs_SOLID || theShape.ShapeType() == TopAbs_COMPSOLID)
+  {
+    BRepGProp::VolumeProperties(theShape, aGProps);
+  }
+  else if (theShape.ShapeType() == TopAbs_COMPOUND)
+  {
+    for (TopoDS_Iterator anIt(theShape); anIt.More(); anIt.Next())
+    {
+      aGProps.Add(props(anIt.Value()));
+    }
+  }
+
+  return aGProps;
+}
+
+//==================================================================================================
 double GeomAlgoAPI_ShapeTools::volume(const std::shared_ptr<GeomAPI_Shape> theShape)
 {
   GProp_GProps aGProps;
@@ -132,14 +161,11 @@ std::shared_ptr<GeomAPI_Pnt>
   gp_Pnt aCentre;
   if(aShape.ShapeType() == TopAbs_VERTEX) {
     aCentre = BRep_Tool::Pnt(TopoDS::Vertex(aShape));
-  } else if(aShape.ShapeType() == TopAbs_EDGE || aShape.ShapeType() == TopAbs_WIRE) {
-    BRepGProp::LinearProperties(aShape, aGProps);
-    aCentre = aGProps.CentreOfMass();
   } else {
-    const Standard_Real anEps = 1.e-6;
-    BRepGProp::SurfaceProperties(aShape, aGProps, anEps);
+    aGProps = props(aShape);
     aCentre = aGProps.CentreOfMass();
   }
+
   return std::shared_ptr<GeomAPI_Pnt>(new GeomAPI_Pnt(aCentre.X(), aCentre.Y(), aCentre.Z()));
 }
 

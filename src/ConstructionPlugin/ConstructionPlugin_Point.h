@@ -82,6 +82,13 @@ public:
     return MY_CREATION_METHOD_ID;
   }
 
+  /// Attribute name for creation method.
+  inline static const std::string& CREATION_METHOD_BY_GEOMETRICAL_PROPERTY()
+  {
+    static const std::string MY_CREATION_METHOD_ID("by_geometrical_property");
+    return MY_CREATION_METHOD_ID;
+  }
+
   /// Attribute name for X coordinate.
   inline static const std::string& X()
   {
@@ -292,6 +299,41 @@ public:
     return ATTR_ID;
   }
 
+  /// Attribute name for property type.
+  inline static const std::string& GEOMETRICAL_PROPERTY_TYPE()
+  {
+    static const std::string ATTR_ID("geometrical_property_type");
+    return ATTR_ID;
+  }
+
+  /// Attribute name for property type by center of gravity.
+  inline static const std::string& GEOMETRICAL_PROPERTY_TYPE_BY_CENTER_OF_GRAVITY()
+  {
+    static const std::string PROPERTY_TYPE("geometrical_property_type_by_center_of_gravity");
+    return PROPERTY_TYPE;
+  }
+
+  /// Attribute name for property type by center of circle.
+  inline static const std::string& GEOMETRICAL_PROPERTY_TYPE_BY_CENTER_OF_CIRCLE()
+  {
+    static const std::string PROPERTY_TYPE("geometrical_property_type_by_center_of_circle");
+    return PROPERTY_TYPE;
+  }
+
+  /// Attribute name for selected object for center of gravity.
+  inline static const std::string& OBJECT_FOR_CENTER_OF_GRAVITY()
+  {
+    static const std::string ATTR_ID("object_for_center_of_gravity");
+    return ATTR_ID;
+  }
+
+  /// Attribute name for selected object for center of cricle.
+  inline static const std::string& OBJECT_FOR_CENTER_OF_CIRCLE()
+  {
+    static const std::string ATTR_ID("object_for_center_of_circle");
+    return ATTR_ID;
+  }
+
   /// Creates a new part document if needed.
   CONSTRUCTIONPLUGIN_EXPORT virtual void execute();
 
@@ -316,6 +358,8 @@ private:
   std::shared_ptr<GeomAPI_Vertex> createByLinesIntersection();
   std::list<std::shared_ptr<GeomAPI_Vertex> > createByLineAndPlaneIntersection();
   std::shared_ptr<GeomAPI_Vertex> createByPlanesIntersection();
+  std::shared_ptr<GeomAPI_Vertex> createByCenterOfGravity();
+  std::shared_ptr<GeomAPI_Vertex> createByCenterOfCircle();
 };
 
 #endif

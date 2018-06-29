@@ -84,5 +84,7 @@ ADD_UNIT_TESTS(TestAxisCreation.py
                TestPoint_Edge.py
                TestPoint_ProjectOnEdge.py
                TestPoint_ProjectOnFace.py
+               TestPoint_GeometricalPropertyCenterOfGravity.py
+               TestPoint_GeometricalPropertyCenterOfCircle.py
                TestPointName.py
                TestPlane.py)

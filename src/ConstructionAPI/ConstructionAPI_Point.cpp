@@ -105,6 +105,22 @@ ConstructionAPI_Point::ConstructionAPI_Point(const std::shared_ptr<ModelAPI_Feat
 }
 
 //==================================================================================================
+ConstructionAPI_Point::ConstructionAPI_Point(const std::shared_ptr<ModelAPI_Feature>& theFeature,
+                                             const ModelHighAPI_Selection& theObject,
+                                             const bool theIsCircularEdge)
+: ModelHighAPI_Interface(theFeature)
+{
+  if (initialize())
+  {
+    if (theIsCircularEdge) {
+      setByCenterOfCircle(theObject);
+    } else {
+      setByCenterOfGravity(theObject);
+    }
+  }
+}
+
+//==================================================================================================
 ConstructionAPI_Point::~ConstructionAPI_Point()
 {
 
@@ -215,6 +231,26 @@ void ConstructionAPI_Point::setByPlanesIntersection(const ModelHighAPI_Selection
 }
 
 //==================================================================================================
+void ConstructionAPI_Point::setByCenterOfGravity(const ModelHighAPI_Selection& theObject)
+{
+  fillAttribute(ConstructionPlugin_Point::CREATION_METHOD_BY_GEOMETRICAL_PROPERTY(),
+                mycreationMethod);
+  fillAttribute(ConstructionPlugin_Point::GEOMETRICAL_PROPERTY_TYPE_BY_CENTER_OF_GRAVITY(),
+                mygeometricalPropertyType);
+  fillAttribute(theObject, myobjectForCenterOfGravity);
+}
+
+//==================================================================================================
+void ConstructionAPI_Point::setByCenterOfCircle(const ModelHighAPI_Selection& theObject)
+{
+  fillAttribute(ConstructionPlugin_Point::CREATION_METHOD_BY_GEOMETRICAL_PROPERTY(),
+                mycreationMethod);
+  fillAttribute(ConstructionPlugin_Point::GEOMETRICAL_PROPERTY_TYPE_BY_CENTER_OF_CIRCLE(),
+                mygeometricalPropertyType);
+  fillAttribute(theObject, myobjectForCenterOfCircle);
+}
+
+//==================================================================================================
 void ConstructionAPI_Point::dump(ModelHighAPI_Dumper& theDumper) const
 {
   FeaturePtr aBase = feature();
@@ -256,11 +292,21 @@ void ConstructionAPI_Point::dump(ModelHighAPI_Dumper& theDumper) const
     }
     theDumper << ", " << reverse()->value();
   } else if (aMeth == ConstructionPlugin_Point::CREATION_METHOD_BY_PROJECTION()) {
-    theDumper << mypoinToProject << ", ";
+    theDumper << poinToProject() << ", ";
     if (projectionType()->value() == ConstructionPlugin_Point::PROJECTION_TYPE_ON_EDGE()) {
-      theDumper << myedgeForPointProjection;
+      theDumper << edgeForPointProjection();
     } else {
-      theDumper << myfaceForPointProjection;
+      theDumper << faceForPointProjection();
+    }
+  } else if (aMeth == ConstructionPlugin_Point::CREATION_METHOD_BY_GEOMETRICAL_PROPERTY()) {
+    if (geometricalPropertyType()->value() ==
+          ConstructionPlugin_Point::GEOMETRICAL_PROPERTY_TYPE_BY_CENTER_OF_GRAVITY())
+    {
+      theDumper << objectForCenterOfGravity();
+    }
+    else
+    {
+      theDumper << objectForCenterOfCircle() << ", " << true;
     }
   }
 
@@ -322,4 +368,13 @@ PointPtr addPoint(const std::shared_ptr<ModelAPI_Document> & thePart,
 {
   std::shared_ptr<ModelAPI_Feature> aFeature = thePart->addFeature(ConstructionAPI_Point::ID());
   return PointPtr(new ConstructionAPI_Point(aFeature, theObject1, theObject2, theObject3));
+}
+
+//==================================================================================================
+PointPtr addPoint(const std::shared_ptr<ModelAPI_Document> & thePart,
+                  const ModelHighAPI_Selection& theObject,
+                  const bool theIsCircularEdge)
+{
+  std::shared_ptr<ModelAPI_Feature> aFeature = thePart->addFeature(ConstructionAPI_Point::ID());
+  return PointPtr(new ConstructionAPI_Point(aFeature, theObject, theIsCircularEdge));
 }

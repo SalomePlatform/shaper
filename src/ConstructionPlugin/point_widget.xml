@@ -213,5 +213,36 @@ email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com
         </box>
         </toolbox>
     </box>
+    <box id="by_geometrical_property"
+         title="By geometrical property of object"
+         tooltip="Point by center of gravity or center of circle."
+         icon="icons/Construction/point_by_geometrical_property_32x32.png">
+      <toolbox id="geometrical_property_type">
+        <box id="geometrical_property_type_by_center_of_gravity"
+             title="By center of gravity"
+             tooltip="Point by center of gravity."
+             icon="icons/Construction/point_by_center_of_gravity_24x24.png">
+          <shape_selector id="object_for_center_of_gravity"
+                          label="Object"
+                          tooltip="Object for center of gravity."
+                          icon="icons/Construction/shapes.png"
+                          shape_types="vertices edges wires faces shells solids compsolids compounds">
+            <validator id="GeomValidators_Finite"/>
+          </shape_selector>
+        </box>
+        <box id="geometrical_property_type_by_center_of_circle"
+             title="By center of circle"
+             tooltip="Point by center of circle."
+             icon="icons/Construction/point_by_center_of_circle_24x24.png">
+          <shape_selector id="object_for_center_of_circle"
+                          label="Object"
+                          tooltip="Object for center of circle."
+                          icon="icons/Construction/edge.png"
+                          shape_types="edges">
+            <validator id="GeomValidators_ShapeType" parameters="circle"/>
+          </shape_selector>
+        </box>
+      </toolbox>
+    </box>
   </toolbox>
 </source>
