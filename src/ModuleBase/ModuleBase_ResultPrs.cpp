@@ -26,6 +26,7 @@
 #include <ModelAPI_Tools.h>
 #include <ModelAPI_ResultConstruction.h>
 #include <ModelAPI_ResultCompSolid.h>
+#include <ModelAPI_AttributeIntArray.h>
 
 #include "ModuleBase_Tools.h"
 #include "ModuleBase_BRepOwner.h"
@@ -69,7 +70,12 @@ ModuleBase_ResultPrs::ModuleBase_ResultPrs(ResultPtr theResult)
   std::shared_ptr<GeomAPI_Shape> aShapePtr = ModelAPI_Tools::shape(theResult);
   TopoDS_Shape aShape = aShapePtr->impl<TopoDS_Shape>();
   Set(aShape);
+
+  // Set own free boundaries aspect in order to have free an unfree boundaries with different colors
   Handle(Prs3d_Drawer) aDrawer = Attributes();
+  Handle(Prs3d_LineAspect) aFreeBndAspect = new Prs3d_LineAspect(Quantity_NOC_GREEN, Aspect_TOL_SOLID, 1);
+  aDrawer->SetFreeBoundaryAspect(aFreeBndAspect);
+
   if (aDrawer->HasOwnPointAspect())
     aDrawer->PointAspect()->SetTypeOfMarker(Aspect_TOM_PLUS);
   else
@@ -85,6 +91,9 @@ ModuleBase_ResultPrs::ModuleBase_ResultPrs(ResultPtr theResult)
   myHiddenSubShapesDrawer->SetShadingAspect(aShadingAspect);
 
   ModuleBase_Tools::setPointBallHighlighting(this);
+
+  // Define colors for wireframe mode
+  setEdgesDefaultColor();
 }
 
 //********************************************************************
@@ -98,7 +107,39 @@ void ModuleBase_ResultPrs::SetColor (const Quantity_Color& theColor)
 {
   ViewerData_AISShape::SetColor(theColor);
   myHiddenSubShapesDrawer->ShadingAspect()->SetColor (theColor, myCurrentFacingModel);
+  setEdgesDefaultColor();
 }
+
+void ModuleBase_ResultPrs::setEdgesDefaultColor()
+{
+  AttributeIntArrayPtr aColorAttr = myResult->data()->intArray(ModelAPI_Result::COLOR_ID());
+  bool aHasColor = aColorAttr.get() && aColorAttr->isInitialized();
+
+  if (!aHasColor) {
+    Handle(Prs3d_Drawer) aDrawer = Attributes();
+    Handle(Prs3d_LineAspect) anAspect; // = aDrawer->LineAspect();
+    //anAspect->SetColor(Quantity_NOC_YELLOW);
+    //aDrawer->SetLineAspect(anAspect);
+
+    // - unfree boundaries color
+    anAspect = aDrawer->UnFreeBoundaryAspect();
+    anAspect->SetColor(Quantity_NOC_YELLOW);
+    aDrawer->SetUnFreeBoundaryAspect(anAspect);
+    aDrawer->SetUnFreeBoundaryDraw(true);
+
+    // - free boundaries color
+    anAspect = aDrawer->FreeBoundaryAspect();
+    anAspect->SetColor(Quantity_NOC_GREEN);
+    aDrawer->SetFreeBoundaryAspect(anAspect);
+    aDrawer->SetFreeBoundaryDraw(true);
+
+    // - standalone edges color
+    anAspect = aDrawer->WireAspect();
+    anAspect->SetColor(Quantity_NOC_RED);
+    aDrawer->SetWireAspect(anAspect);
+  }
+}
+
 
 //********************************************************************
 bool ModuleBase_ResultPrs::setSubShapeHidden(const NCollection_List<TopoDS_Shape>& theShapes)

@@ -141,6 +141,8 @@ private:
   void collectSubShapes(BRep_Builder& theBuilder, TopoDS_Shape& theCompound,
     const TopoDS_Shape& theShape, const NCollection_List<TopoDS_Shape>& theHiddenSubShapes);
 
+  void setEdgesDefaultColor();
+
 private:
   /// Reference to result object
   ResultPtr myResult;
