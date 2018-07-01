@@ -571,8 +571,9 @@ bool FeaturesPlugin_ValidatorBooleanSelection::isValid(const AttributePtr& theAt
       "Error: This validator can only work with selection list attributes in \"Boolean\" feature.";
     return false;
   }
-  FeaturePtr aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(theAttribute->owner());
-  int anOperationType = aFeature->integer("bool_type")->value();
+  std::shared_ptr<FeaturesPlugin_Boolean> aFeature =
+    std::dynamic_pointer_cast<FeaturesPlugin_Boolean>(theAttribute->owner());
+  FeaturesPlugin_Boolean::OperationType anOperationType = aFeature->operationType();
 
   for(int anIndex = 0; anIndex < anAttrSelectionList->size(); ++anIndex) {
     AttributeSelectionPtr anAttrSelection = anAttrSelectionList->value(anIndex);
@@ -1015,4 +1016,138 @@ bool FeaturesPlugin_ValidatorCircular::isValid(const AttributePtr& theAttribute,
       theError = "The shape neither circle nor cylinder";
   }
   return isValid;
+}
+
+//=================================================================================================
+bool FeaturesPlugin_ValidatorBooleanArguments::isValid(
+  const std::shared_ptr<ModelAPI_Feature>& theFeature,
+  const std::list<std::string>& theArguments,
+  Events_InfoMessage& theError) const
+{
+  if (theArguments.size() != 2)
+  {
+    theError = "Wrong number of arguments (expected 2).";
+    return false;
+  }
+
+  int anObjectsNb = 0, aToolsNb = 0;
+  //int anOperationType = 0;
+
+  std::list<std::string>::const_iterator anIt = theArguments.begin(), aLast = theArguments.end();
+
+  bool isAllInSameCompSolid = true;
+  ResultCompSolidPtr aCompSolid;
+
+  AttributeSelectionListPtr anAttrSelList = theFeature->selectionList(*anIt);
+  if (anAttrSelList)
+  {
+    anObjectsNb = anAttrSelList->size();
+    for (int anIndex = 0; anIndex < anObjectsNb; ++anIndex)
+    {
+      AttributeSelectionPtr anAttr = anAttrSelList->value(anIndex);
+      ResultPtr aContext = anAttr->context();
+      ResultCompSolidPtr aResCompSolidPtr = ModelAPI_Tools::compSolidOwner(aContext);
+      if (aResCompSolidPtr.get())
+      {
+        if (aCompSolid.get())
+        {
+          isAllInSameCompSolid = aCompSolid == aResCompSolidPtr;
+        }
+        else
+        {
+          aCompSolid = aResCompSolidPtr;
+        }
+      }
+      else
+      {
+        isAllInSameCompSolid = false;
+        break;
+      }
+    }
+  }
+  anIt++;
+
+
+  anAttrSelList = theFeature->selectionList(*anIt);
+  if (anAttrSelList)
+  {
+    aToolsNb = anAttrSelList->size();
+    if (isAllInSameCompSolid)
+    {
+      for (int anIndex = 0; anIndex < aToolsNb; ++anIndex)
+      {
+        AttributeSelectionPtr anAttr = anAttrSelList->value(anIndex);
+        ResultPtr aContext = anAttr->context();
+        ResultCompSolidPtr aResCompSolidPtr = ModelAPI_Tools::compSolidOwner(aContext);
+        if (aResCompSolidPtr.get())
+        {
+          if (aCompSolid.get())
+          {
+            isAllInSameCompSolid = aCompSolid == aResCompSolidPtr;
+          }
+          else
+          {
+            aCompSolid = aResCompSolidPtr;
+          }
+        }
+        else
+        {
+          isAllInSameCompSolid = false;
+          break;
+        }
+      }
+    }
+  }
+  anIt++;
+
+  std::shared_ptr<FeaturesPlugin_Boolean> aFeature =
+    std::dynamic_pointer_cast<FeaturesPlugin_Boolean>(theFeature);
+  FeaturesPlugin_Boolean::OperationType anOperationType = aFeature->operationType();
+
+  if (anOperationType == FeaturesPlugin_Boolean::BOOL_FUSE)
+  {
+    // Fuse operation
+    if (anObjectsNb + aToolsNb < 2)
+    {
+      theError = "Not enough arguments for Fuse operation.";
+      return false;
+    }
+    else if (isAllInSameCompSolid)
+    {
+      theError = "Operations only between sub-shapes of the same shape not allowed.";
+      return false;
+    }
+  }
+  else
+  {
+    if (anObjectsNb < 1)
+    {
+      theError = "Objects not selected.";
+      return false;
+    }
+    if (aToolsNb < 1)
+    {
+      theError = "Tools not selected.";
+      return false;
+    }
+    if (isAllInSameCompSolid)
+    {
+      theError = "Operations only between sub-shapes of the same shape not allowed.";
+      return false;
+    }
+  }
+
+  return true;
+}
+
+//=================================================================================================
+bool FeaturesPlugin_ValidatorBooleanArguments::isNotObligatory(std::string theFeature,
+                                                               std::string theAttribute)
+{
+  if (theAttribute == "main_objects" || theAttribute == "tool_objects")
+  {
+    return true;
+  }
+
+  return false;
 }

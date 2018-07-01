@@ -39,7 +39,11 @@
 %include "std_shared_ptr.i"
 
 // shared pointers
-%shared_ptr(FeaturesAPI_Boolean)
+%shared_ptr(FeaturesAPI_BooleanCut)
+%shared_ptr(FeaturesAPI_BooleanFuse)
+%shared_ptr(FeaturesAPI_BooleanCommon)
+%shared_ptr(FeaturesAPI_BooleanSmash)
+%shared_ptr(FeaturesAPI_BooleanFill)
 %shared_ptr(FeaturesAPI_Extrusion)
 %shared_ptr(FeaturesAPI_ExtrusionBoolean)
 %shared_ptr(FeaturesAPI_ExtrusionCut)
@@ -64,7 +68,11 @@
 %shared_ptr(FeaturesAPI_Union)
 
 // all supported interfaces
-%include "FeaturesAPI_Boolean.h"
+%include "FeaturesAPI_BooleanCut.h"
+%include "FeaturesAPI_BooleanFuse.h"
+%include "FeaturesAPI_BooleanCommon.h"
+%include "FeaturesAPI_BooleanSmash.h"
+%include "FeaturesAPI_BooleanFill.h"
 %include "FeaturesAPI_Extrusion.h"
 %include "FeaturesAPI_ExtrusionBoolean.h"
 %include "FeaturesAPI_Fillet.h"

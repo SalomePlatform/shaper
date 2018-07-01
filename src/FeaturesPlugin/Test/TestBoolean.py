@@ -124,11 +124,9 @@ aSession.finishOperation()
 # Create a pacman as boolean cut of the prism from the cylinder
 #=========================================================================
 aSession.startOperation()
-aBooleanFt = aPart.addFeature("Boolean")
+aBooleanFt = aPart.addFeature("Cut")
 aBooleanFt.selectionList("main_objects").append(extrudedObjects[0], extrudedObjects[0].shape())
 aBooleanFt.selectionList("tool_objects").append(extrudedObjects[1], extrudedObjects[1].shape())
-kBooleanTypeCut = 0
-aBooleanFt.integer("bool_type").setValue(kBooleanTypeCut)
 aBooleanFt.execute()
 aSession.finishOperation()
 

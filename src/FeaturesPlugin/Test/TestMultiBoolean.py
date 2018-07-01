@@ -114,7 +114,7 @@ for i in xrange(0, N * N):
     anExtrusionFt.real("from_size").setValue(0)
     anExtrusionFt.real("to_size").setValue(10)
     anExtrusionFt.real("to_offset").setValue(0) #TODO: remove
-    anExtrusionFt.real("from_offset").setValue(0) #TODO: remove	
+    anExtrusionFt.real("from_offset").setValue(0) #TODO: remove
     # v1.0.2 from master
     # anExtrusionFt.selection("extrusion_face").setValue(
     #    aSketchResult, aSketchFaces[0])
@@ -194,13 +194,11 @@ aSession.finishOperation()
 aCurrentResult = modelAPI_ResultBody(aBox.firstResult())
 aSession.startOperation()
 
-aBooleanFt = aPart.addFeature("Boolean")
+aBooleanFt = aPart.addFeature("Cut")
 aBooleanFt.selectionList("main_objects").append(aCurrentResult, aCurrentResult.shape())
 for i in xrange(0, N * N):
     anExtrusionResult = modelAPI_ResultBody(anExtrusions[i].firstResult())
     aBooleanFt.selectionList("tool_objects").append(anExtrusionResult, anExtrusionResult.shape())
-kBooleanTypeCut = 0
-aBooleanFt.integer("bool_type").setValue(kBooleanTypeCut)
 aBooleanFt.execute()
 aFactory = ModelAPI_Session.get().validators()
 assert (aFactory.validate(aBooleanFt))

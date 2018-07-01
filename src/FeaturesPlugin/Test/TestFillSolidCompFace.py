@@ -52,7 +52,7 @@ model.do()
 Plane_5 = model.addPlane(Part_1_doc, model.selection("FACE", "Box_1_1/Left"), "Shift/3", True)
 Face_1 = model.addFace(Part_1_doc, [model.selection("WIRE", "Sketch_1/Wire-SketchArc_1_2f-SketchLine_2f-SketchLine_3f")])
 Boolean_1 = model.addFill(Part_1_doc, [model.selection("FACE", "Face_1_1")], [model.selection("FACE", "Plane_2")])
-Boolean_2 = model.addFill(Part_1_doc, [model.selection("SOLID", "Box_1_1")], [model.selection("COMPOUND", "Boolean_1_1")])
+Boolean_2 = model.addFill(Part_1_doc, [model.selection("SOLID", "Box_1_1")], [model.selection("COMPOUND", "Fill_1_1")])
 model.do()
 
 model.checkBooleansResult(Boolean_2, model, 1, [2], [2], [14], [60], [120])

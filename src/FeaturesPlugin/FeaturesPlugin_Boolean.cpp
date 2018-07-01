@@ -45,15 +45,14 @@
 #include <map>
 
 //=================================================================================================
-FeaturesPlugin_Boolean::FeaturesPlugin_Boolean()
+FeaturesPlugin_Boolean::FeaturesPlugin_Boolean(const OperationType theOperationType)
+: myOperationType(theOperationType)
 {
 }
 
 //=================================================================================================
 void FeaturesPlugin_Boolean::initAttributes()
 {
-  data()->addAttribute(FeaturesPlugin_Boolean::TYPE_ID(), ModelAPI_AttributeInteger::typeId());
-
   AttributeSelectionListPtr aSelection =
     std::dynamic_pointer_cast<ModelAPI_AttributeSelectionList>(data()->addAttribute(
     FeaturesPlugin_Boolean::OBJECT_LIST_ID(), ModelAPI_AttributeSelectionList::typeId()));
@@ -80,15 +79,14 @@ std::shared_ptr<GeomAPI_Shape> FeaturesPlugin_Boolean::getShape(const std::strin
 }
 
 //=================================================================================================
+FeaturesPlugin_Boolean::OperationType FeaturesPlugin_Boolean::operationType()
+{
+  return myOperationType;
+}
+
+//=================================================================================================
 void FeaturesPlugin_Boolean::execute()
 {
-  // Getting operation type.
-  std::shared_ptr<ModelAPI_AttributeInteger> aTypeAttr = std::dynamic_pointer_cast<
-      ModelAPI_AttributeInteger>(data()->attribute(FeaturesPlugin_Boolean::TYPE_ID()));
-  if (!aTypeAttr)
-    return;
-  OperationType aType = (FeaturesPlugin_Boolean::OperationType)aTypeAttr->value();
-
   ListOfShape anObjects, aTools, anEdgesAndFaces, aPlanes;
   std::map<std::shared_ptr<GeomAPI_Shape>, ListOfShape> aCompSolidsObjects;
 
@@ -118,7 +116,7 @@ void FeaturesPlugin_Boolean::execute()
         aCompSolidsObjects[aContextShape].push_back(anObject);
       }
     } else {
-      if(aType != BOOL_FILL
+      if(myOperationType != BOOL_FILL
         && (anObject->shapeType() == GeomAPI_Shape::EDGE
           || anObject->shapeType() == GeomAPI_Shape::FACE))
       {
@@ -141,7 +139,7 @@ void FeaturesPlugin_Boolean::execute()
       ResultPtr aContext = aToolAttr->context();
       aPlanes.push_back(aToolAttr->context()->shape());
     }
-    else if(aType != BOOL_FILL
+    else if (myOperationType != BOOL_FILL
       && (aTool->shapeType() == GeomAPI_Shape::EDGE
         || aTool->shapeType() == GeomAPI_Shape::FACE))
     {
@@ -153,7 +151,7 @@ void FeaturesPlugin_Boolean::execute()
 
   int aResultIndex = 0;
 
-  switch(aType) {
+  switch(myOperationType) {
     case BOOL_CUT:
     case BOOL_COMMON:
     case BOOL_FILL: {
@@ -174,7 +172,7 @@ void FeaturesPlugin_Boolean::execute()
         std::shared_ptr<GeomAlgoAPI_MakeShape> aBoolAlgo;
         GeomShapePtr aResShape;
 
-        switch(aType) {
+        switch(myOperationType) {
           case BOOL_CUT: {
             aBoolAlgo.reset(new GeomAlgoAPI_Boolean(aListWithObject,
                                                     aTools,
@@ -247,18 +245,19 @@ void FeaturesPlugin_Boolean::execute()
         aMakeShapeList.appendAlgo(aBoolAlgo);
 
         if(GeomAlgoAPI_ShapeTools::volume(aResShape) > 1.e-27
-          || (aType != BOOL_CUT && aType != BOOL_COMMON))
+           || (myOperationType != BOOL_CUT && myOperationType != BOOL_COMMON))
         {
           std::shared_ptr<ModelAPI_ResultBody> aResultBody =
             document()->createBody(data(), aResultIndex);
 
           ListOfShape aUsedTools = aTools;
-          if (aType == BOOL_FILL) {
+          if (myOperationType == BOOL_FILL) {
             aUsedTools.insert(aUsedTools.end(), aPlanes.begin(), aPlanes.end());
           }
 
           loadNamingDS(aResultBody, anObject, aUsedTools, aResShape,
-                       aMakeShapeList, *(aBoolAlgo->mapOfSubShapes()), aType == BOOL_FILL);
+                       aMakeShapeList, *(aBoolAlgo->mapOfSubShapes()),
+                       myOperationType == BOOL_FILL);
           setResult(aResultBody, aResultIndex);
           aResultIndex++;
         }
@@ -290,7 +289,7 @@ void FeaturesPlugin_Boolean::execute()
         GeomAlgoAPI_MakeShapeList aMakeShapeList;
         std::shared_ptr<GeomAlgoAPI_MakeShape> aBoolAlgo;
 
-        switch(aType) {
+        switch(myOperationType) {
           case BOOL_CUT: {
             aBoolAlgo.reset(new GeomAlgoAPI_Boolean(aUsedInOperationSolids,
                                                     aTools,
@@ -367,13 +366,13 @@ void FeaturesPlugin_Boolean::execute()
         }
 
         if(GeomAlgoAPI_ShapeTools::volume(aResultShape) > 1.e-27
-          || (aType != BOOL_CUT && aType != BOOL_COMMON))
+           || (myOperationType != BOOL_CUT && myOperationType != BOOL_COMMON))
         {
           std::shared_ptr<ModelAPI_ResultBody> aResultBody =
             document()->createBody(data(), aResultIndex);
 
           ListOfShape aUsedTools = aTools;
-          if (aType == BOOL_FILL) {
+          if (myOperationType == BOOL_FILL) {
             aUsedTools.insert(aUsedTools.end(), aPlanes.begin(), aPlanes.end());
           }
 
@@ -383,7 +382,7 @@ void FeaturesPlugin_Boolean::execute()
                        aResultShape,
                        aMakeShapeList,
                        aMapOfShapes,
-                       aType == BOOL_FILL);
+                       myOperationType == BOOL_FILL);
           setResult(aResultBody, aResultIndex);
           aResultIndex++;
         }

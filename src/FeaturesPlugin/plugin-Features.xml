@@ -54,7 +54,19 @@ email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com
       </feature>
     </group>
     <group id="Boolean">
-      <feature id="Boolean" title="Boolean" tooltip="Perform boolean operations with objects" icon="icons/Features/cut.png"
+      <feature id="Cut" title="Cut" tooltip="Perform boolean cut operation with objects" icon="icons/Features/bool_cut.png"
+               auto_preview="false">
+          <source path="boolean_widget.xml"/>
+      </feature>
+      <feature id="Fuse" title="Fuse" tooltip="Perform boolean fuse operation with objects" icon="icons/Features/bool_fuse.png"
+               auto_preview="false">
+          <source path="boolean_widget.xml"/>
+      </feature>
+      <feature id="Common" title="Common" tooltip="Perform boolean common operation with objects" icon="icons/Features/bool_common.png"
+               auto_preview="false">
+          <source path="boolean_widget.xml"/>
+      </feature>
+      <feature id="Smash" title="Smash" tooltip="Perform boolean smash operation with objects" icon="icons/Features/bool_smash.png"
                auto_preview="false">
           <source path="boolean_widget.xml"/>
       </feature>
@@ -64,6 +76,10 @@ email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com
       <feature id="Partition" title="Partition" tooltip="Perform partition operations with solids" icon="icons/Features/partition.png"
                auto_preview="false">
           <source path="partition_widget.xml"/>
+      </feature>
+      <feature id="Fill" title="Fill" tooltip="Perform boolean fill operation with objects" icon="icons/Features/bool_fill.png"
+               auto_preview="false">
+          <source path="boolean_widget.xml"/>
       </feature>
       <feature id="Union" title="Union" tooltip="Perform union operations with shapes" icon="icons/Features/union.png">
           <source path="union_widget.xml"/>

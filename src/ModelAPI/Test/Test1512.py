@@ -104,10 +104,9 @@ aSession.finishOperation()
 # Do cut a hole from a box
 #=========================================================================
 aSession.startOperation()
-aCut1 = aPart.addFeature("Boolean")
+aCut1 = aPart.addFeature("Cut")
 aCut1.selectionList("main_objects").append(aBox.firstResult(), None)
 aCut1.selectionList("tool_objects").append(aHoleExt.firstResult(), None)
-aCut1.integer("bool_type").setValue(0) # cut
 aSession.finishOperation()
 
 #=========================================================================
@@ -136,10 +135,9 @@ aSession.finishOperation()
 # Do fuse with a tower. Tower must be an argument (not tool) to add the problem to the faces owners detection.
 #=========================================================================
 aSession.startOperation()
-aFuse = aPart.addFeature("Boolean")
+aFuse = aPart.addFeature("Fuse")
 aFuse.selectionList("main_objects").append(aTower.firstResult(), None)
 aFuse.selectionList("tool_objects").append(aCut1.firstResult(), None)
-aFuse.integer("bool_type").setValue(1) # fuse
 aSession.finishOperation()
 
 #=========================================================================
@@ -156,12 +154,12 @@ def check_owner(selection, topology_type, feature):
 
 # check faces
 check_owner("Extrusion_1_1/Generated_Face_1", "face", aBox)
-check_owner("Boolean_2_1/Modified_Face_3", "face", aBox)
-check_owner("Boolean_1_1/Modified_Face_1", "face", aHoleExt)
-check_owner("Boolean_2_1/Modified_Face_1", "face", aTower)
+check_owner("Fuse_1_1/Modified_Face_3", "face", aBox)
+check_owner("Cut_1_1/Modified_Face_1", "face", aHoleExt)
+check_owner("Fuse_1_1/Modified_Face_1", "face", aTower)
 # check edges without ambiguity
-check_owner("Boolean_2_1/Modified_Face_2&Extrusion_1_1/Generated_Face_2", "edge", aBox)
-check_owner("Boolean_2_1/Modified_Face_1&Extrusion_3_1/To_Face_1_1", "edge", aTower)
+check_owner("Fuse_1_1/Modified_Face_2&Extrusion_1_1/Generated_Face_2", "edge", aBox)
+check_owner("Fuse_1_1/Modified_Face_1&Extrusion_3_1/To_Face_1_1", "edge", aTower)
 
 # check the connected topology method: solid is not a compound of connected topology
 assert(aFuse.firstResult().shape().isConnectedTopology() == False)

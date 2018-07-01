@@ -22,7 +22,11 @@ INCLUDE(Common)
 
 SET(PROJECT_HEADERS
   FeaturesAPI.h
-  FeaturesAPI_Boolean.h
+  FeaturesAPI_BooleanCut.h
+  FeaturesAPI_BooleanFuse.h
+  FeaturesAPI_BooleanCommon.h
+  FeaturesAPI_BooleanSmash.h
+  FeaturesAPI_BooleanFill.h
   FeaturesAPI_Extrusion.h
   FeaturesAPI_ExtrusionBoolean.h
   FeaturesAPI_Fillet.h
@@ -45,7 +49,11 @@ SET(PROJECT_HEADERS
 )
 
 SET(PROJECT_SOURCES
-  FeaturesAPI_Boolean.cpp
+  FeaturesAPI_BooleanCut.cpp
+  FeaturesAPI_BooleanFuse.cpp
+  FeaturesAPI_BooleanCommon.cpp
+  FeaturesAPI_BooleanSmash.cpp
+  FeaturesAPI_BooleanFill.cpp
   FeaturesAPI_Extrusion.cpp
   FeaturesAPI_ExtrusionBoolean.cpp
   FeaturesAPI_Fillet.cpp

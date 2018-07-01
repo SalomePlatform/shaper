@@ -234,11 +234,9 @@ aCylinderBody = modelAPI_ResultBody(anExtrusionFt.firstResult())
 # Create a cut
 #=========================================================================
 aSession.startOperation()
-aBooleanFt = aPart.addFeature("Boolean")
+aBooleanFt = aPart.addFeature("Cut")
 aBooleanFt.selectionList("main_objects").append(anExtrusionBody, None)
 aBooleanFt.selectionList("tool_objects").append(aCylinderBody, None)
-aBooleanTypeCut = 0
-aBooleanFt.integer("bool_type").setValue(aBooleanTypeCut)
 aBooleanFt.execute()
 aSession.finishOperation()
 

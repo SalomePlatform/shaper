@@ -20,7 +20,11 @@
 
 #include <FeaturesPlugin_Plugin.h>
 
-#include <FeaturesPlugin_Boolean.h>
+#include <FeaturesPlugin_BooleanCut.h>
+#include <FeaturesPlugin_BooleanFuse.h>
+#include <FeaturesPlugin_BooleanCommon.h>
+#include <FeaturesPlugin_BooleanSmash.h>
+#include <FeaturesPlugin_BooleanFill.h>
 #include <FeaturesPlugin_Extrusion.h>
 #include <FeaturesPlugin_ExtrusionCut.h>
 #include <FeaturesPlugin_ExtrusionFuse.h>
@@ -90,6 +94,8 @@ FeaturesPlugin_Plugin::FeaturesPlugin_Plugin()
                               new FeaturesPlugin_ValidatorFilletSelection);
   aFactory->registerValidator("FeaturesPlugin_ValidatorCircular",
                               new FeaturesPlugin_ValidatorCircular);
+  aFactory->registerValidator("FeaturesPlugin_ValidatorBooleanArguments",
+                              new FeaturesPlugin_ValidatorBooleanArguments);
 
   // register this plugin
   ModelAPI_Session::get()->registerPlugin(this);
@@ -105,8 +111,16 @@ FeaturePtr FeaturesPlugin_Plugin::createFeature(std::string theFeatureID)
     return FeaturePtr(new FeaturesPlugin_Rotation);
   } else if (theFeatureID == FeaturesPlugin_Translation::ID()) {
     return FeaturePtr(new FeaturesPlugin_Translation);
-  } else if (theFeatureID == FeaturesPlugin_Boolean::ID()) {
-    return FeaturePtr(new FeaturesPlugin_Boolean);
+  } else if (theFeatureID == FeaturesPlugin_BooleanCut::ID()) {
+    return FeaturePtr(new FeaturesPlugin_BooleanCut);
+  } else if (theFeatureID == FeaturesPlugin_BooleanFuse::ID()) {
+    return FeaturePtr(new FeaturesPlugin_BooleanFuse);
+  } else if (theFeatureID == FeaturesPlugin_BooleanCommon::ID()) {
+    return FeaturePtr(new FeaturesPlugin_BooleanCommon);
+  } else if (theFeatureID == FeaturesPlugin_BooleanSmash::ID()) {
+    return FeaturePtr(new FeaturesPlugin_BooleanSmash);
+  } else if (theFeatureID == FeaturesPlugin_BooleanFill::ID()) {
+    return FeaturePtr(new FeaturesPlugin_BooleanFill);
   } else if (theFeatureID == FeaturesPlugin_Intersection::ID()) {
     return FeaturePtr(new FeaturesPlugin_Intersection);
   } else if (theFeatureID == FeaturesPlugin_Partition::ID()) {

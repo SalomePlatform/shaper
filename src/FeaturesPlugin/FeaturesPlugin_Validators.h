@@ -267,4 +267,25 @@ public:
                        Events_InfoMessage& theError) const;
 };
 
+/** \class FeaturesPlugin_ValidatorBooleanArguments
+*  \ingroup Validators
+*  \brief Validates that boolean operation have enough arguments.
+*/
+class FeaturesPlugin_ValidatorBooleanArguments: public ModelAPI_FeatureValidator
+{
+public:
+  /** \brief Returns true if feature and/or attributes are valid.
+  *  \param[in] theFeature the validated feature.
+  *  \param[in] theArguments the arguments in the configuration file for this validator.
+  *  \param[out] theError error message.
+  *  \returns true if feature is valid.
+  */
+  virtual bool isValid(const std::shared_ptr<ModelAPI_Feature>& theFeature,
+                                             const std::list<std::string>& theArguments,
+                                             Events_InfoMessage& theError) const;
+
+  /// \return true if the attribute in feature is not obligatory for the feature execution.
+  virtual bool isNotObligatory(std::string theFeature, std::string theAttribute);
+};
+
 #endif

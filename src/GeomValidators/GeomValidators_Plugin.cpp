@@ -21,7 +21,6 @@
 #include <GeomValidators_Plugin.h>
 
 #include <GeomValidators_BodyShapes.h>
-#include <GeomValidators_BooleanArguments.h>
 #include <GeomValidators_ConstructionComposite.h>
 #include <GeomValidators_Different.h>
 #include <GeomValidators_DifferentShapes.h>
@@ -47,8 +46,6 @@ GeomValidators_Plugin::GeomValidators_Plugin()
   ModelAPI_ValidatorsFactory* aFactory = aMgr->validators();
 
   aFactory->registerValidator("GeomValidators_BodyShapes", new GeomValidators_BodyShapes);
-  aFactory->registerValidator("GeomValidators_BooleanArguments",
-                              new GeomValidators_BooleanArguments);
   aFactory->registerValidator("GeomValidators_ConstructionComposite",
                               new GeomValidators_ConstructionComposite);
   aFactory->registerValidator("GeomValidators_Different", new GeomValidators_Different);

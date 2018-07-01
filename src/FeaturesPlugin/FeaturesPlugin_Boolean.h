@@ -18,8 +18,8 @@
 // email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com>
 //
 
-#ifndef FeaturesPlugin_Cut_H_
-#define FeaturesPlugin_Cut_H_
+#ifndef FeaturesPlugin_Boolean_H_
+#define FeaturesPlugin_Boolean_H_
 
 #include "FeaturesPlugin.h"
 
@@ -42,13 +42,6 @@ public:
     BOOL_SMASH
   };
 
-  /// Feature kind.
-  inline static const std::string& ID()
-  {
-    static const std::string MY_ID("Boolean");
-    return MY_ID;
-  }
-
   /// Attribute name of main objects.
   inline static const std::string& OBJECT_LIST_ID()
   {
@@ -63,19 +56,8 @@ public:
     return MY_TOOL_LIST_ID;
   }
 
-  /// Attribute name of operation type.
-  inline static const std::string& TYPE_ID()
-  {
-    static const std::string MY_TYPE_ID("bool_type");
-    return MY_TYPE_ID;
-  }
-
-  /// \return the kind of a feature.
-  FEATURESPLUGIN_EXPORT virtual const std::string& getKind()
-  {
-    static std::string MY_KIND = FeaturesPlugin_Boolean::ID();
-    return MY_KIND;
-  }
+  /// \return boolean operation type.
+  FEATURESPLUGIN_EXPORT OperationType operationType();
 
   /// Creates a new part document if needed.
   FEATURESPLUGIN_EXPORT virtual void execute();
@@ -83,8 +65,10 @@ public:
   /// Request for initialization of data model of the feature: adding all attributes.
   FEATURESPLUGIN_EXPORT virtual void initAttributes();
 
+protected:
+
   /// Use plugin manager for features creation.
-  FeaturesPlugin_Boolean();
+  FeaturesPlugin_Boolean(const OperationType theOperationType);
 
 private:
   std::shared_ptr<GeomAPI_Shape> getShape(const std::string& theAttrName);
@@ -97,6 +81,9 @@ private:
                     GeomAlgoAPI_MakeShape& theMakeShape,
                     GeomAPI_DataMapOfShapeShape& theMapOfShapes,
                     const bool theIsStoreAsGenerated = false);
+
+private:
+  OperationType myOperationType;
 };
 
 #endif

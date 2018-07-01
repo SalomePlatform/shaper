@@ -30,6 +30,11 @@ SET(PROJECT_HEADERS
     FeaturesPlugin_Rotation.h
     FeaturesPlugin_Translation.h
     FeaturesPlugin_Boolean.h
+    FeaturesPlugin_BooleanCut.h
+    FeaturesPlugin_BooleanFuse.h
+    FeaturesPlugin_BooleanCommon.h
+    FeaturesPlugin_BooleanSmash.h
+    FeaturesPlugin_BooleanFill.h
     FeaturesPlugin_Intersection.h
     FeaturesPlugin_Partition.h
     FeaturesPlugin_Pipe.h
