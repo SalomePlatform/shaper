@@ -66,7 +66,7 @@ ModuleBase_ParamSpinBox::ModuleBase_ParamSpinBox(QWidget* theParent, int thePrec
   myValidator = new QDoubleValidator(this);
   myValidator->setLocale(locale());
   myValidator->setRange(myMinimum, myMaximum);
-  myValidator->setDecimals(3);
+  myValidator->setDecimals(myPrecision);
 }
 
 void ModuleBase_ParamSpinBox::setCompletionList(QStringList& theList)

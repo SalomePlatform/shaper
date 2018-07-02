@@ -111,6 +111,21 @@ int Model_ResultConstruction::facesNum()
       }
     }
     myFacesUpToDate = true;
+
+    // update all the faces and sub-elements in the naming structure
+    DocumentPtr anEmptyExt;
+    bool aNotExt = false;
+    TDF_Label aDataLab = startLabel(anEmptyExt, aNotExt);
+    TDF_ChildIterator aSubsIter(aDataLab, Standard_False);
+    for(; aSubsIter.More(); aSubsIter.Next()) {
+      const TDF_Label aLab = aSubsIter.Value();
+      if (aLab.Tag() == 1) // skip the root shape label
+        continue;
+      Handle(TNaming_NamedShape) aNS;
+      if (aLab.FindAttribute(TNaming_NamedShape::GetID(), aNS)) {
+        update(aLab.Tag() - 1, anEmptyExt, aNotExt);
+      }
+    }
   }
   return int(myFaces.size());
 }
@@ -132,7 +147,7 @@ void Model_ResultConstruction::setInfinite(const bool theInfinite)
 
 void Model_ResultConstruction::setIsConcealed(const bool theValue)
 {
-  // do nothing: the construction element is never consealed
+  // do nothing: the construction element is never concealed
 }
 
 static const int kSTART_VERTEX_DELTA = 1000000;
@@ -650,7 +665,7 @@ bool Model_ResultConstruction::update(const int theIndex,
     Handle(TDF_Reference) aRef;
     if (aLab.FindAttribute(TDF_Reference::GetID(), aRef)) {
       int aFaceIndex = aRef->Get().Tag();
-      // don't check selection ,since face may disappear, but the shape stays correct
+      // don't check selection since face may disappear, but the shape stays correct
       Model_ResultConstruction::update(aFaceIndex, theExtDoc, theModified);
     }
     // getting a type of selected shape

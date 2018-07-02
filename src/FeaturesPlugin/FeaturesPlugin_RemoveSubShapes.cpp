@@ -256,12 +256,11 @@ void FeaturesPlugin_RemoveSubShapes::execute()
   std::set<GeomAPI_Shape::ShapeType>::iterator aTypeIter = aTypes.begin();
   for(; aTypeIter != aTypes.end(); aTypeIter++)
     aResultBody->loadDeletedShapes(&aMakeShapeList, aBaseShape, *aTypeIter, 1);
-  aResultBody->loadAndOrientModifiedShapes(&aMakeShapeList,
-                                           aBaseShape,
-                                           GeomAPI_Shape::FACE,
-                                           2,
-                                           "Modified_Face",
-                                           *aMakeShapeList.mapOfSubShapes().get(),
-                                           true, false, true);
+  aResultBody->loadAndOrientModifiedShapes(&aMakeShapeList, aBaseShape, GeomAPI_Shape::FACE,
+	  2, "Modified_Face", *aMakeShapeList.mapOfSubShapes().get(), true, false, true);
+  aResultBody->loadAndOrientModifiedShapes(&aMakeShapeList, aBaseShape, GeomAPI_Shape::EDGE,
+	  3, "Modified_Edge", *aMakeShapeList.mapOfSubShapes().get(), false, false, true);
+  aResultBody->loadAndOrientModifiedShapes(&aMakeShapeList, aBaseShape, GeomAPI_Shape::VERTEX,
+	  4, "Modified_Vertex", *aMakeShapeList.mapOfSubShapes().get());
   setResult(aResultBody);
 }

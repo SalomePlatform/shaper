@@ -694,9 +694,9 @@ void SHAPERGUI::createPreferences()
 
   int sensitivityGroup = pref->addItem(tr("Selection sensitivity"), viewTab);
   pref->setItemProperty("columns", 2, sensitivityGroup);
-  pref->addItem(tr("Vertex"), sensitivityGroup, SUIT_PreferenceMgr::Double,
+  pref->addItem(tr("Vertex"), sensitivityGroup, SUIT_PreferenceMgr::DblSpin,
                 ModuleBase_Preferences::VIEWER_SECTION, "point-selection-sensitivity");
-  pref->addItem(tr("Edge"), sensitivityGroup, SUIT_PreferenceMgr::Double,
+  pref->addItem(tr("Edge"), sensitivityGroup, SUIT_PreferenceMgr::DblSpin,
                 ModuleBase_Preferences::VIEWER_SECTION, "edge-selection-sensitivity");
   pref->retrieve();
 }
