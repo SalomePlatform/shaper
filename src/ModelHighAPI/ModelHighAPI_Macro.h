@@ -832,6 +832,91 @@
   public:
 
 //--------------------------------------------------------------------------------------
+#define INTERFACE_25(KIND, \
+                     N_0, AN_0, T_0, C_0, \
+                     N_1, AN_1, T_1, C_1, \
+                     N_2, AN_2, T_2, C_2, \
+                     N_3, AN_3, T_3, C_3, \
+                     N_4, AN_4, T_4, C_4, \
+                     N_5, AN_5, T_5, C_5, \
+                     N_6, AN_6, T_6, C_6, \
+                     N_7, AN_7, T_7, C_7, \
+                     N_8, AN_8, T_8, C_8, \
+                     N_9, AN_9, T_9, C_9, \
+                     N_10, AN_10, T_10, C_10, \
+                     N_11, AN_11, T_11, C_11, \
+                     N_12, AN_12, T_12, C_12, \
+                     N_13, AN_13, T_13, C_13, \
+                     N_14, AN_14, T_14, C_14, \
+                     N_15, AN_15, T_15, C_15, \
+                     N_16, AN_16, T_16, C_16, \
+                     N_17, AN_17, T_17, C_17, \
+                     N_18, AN_18, T_18, C_18, \
+                     N_19, AN_19, T_19, C_19, \
+                     N_20, AN_20, T_20, C_20, \
+                     N_21, AN_21, T_21, C_21, \
+                     N_22, AN_22, T_22, C_22, \
+                     N_23, AN_23, T_23, C_23, \
+                     N_24, AN_24, T_24, C_24) \
+  public: \
+    INTERFACE_COMMON(KIND) \
+    DEFINE_ATTRIBUTE(N_0, T_0, C_0) \
+    DEFINE_ATTRIBUTE(N_1, T_1, C_1) \
+    DEFINE_ATTRIBUTE(N_2, T_2, C_2) \
+    DEFINE_ATTRIBUTE(N_3, T_3, C_3) \
+    DEFINE_ATTRIBUTE(N_4, T_4, C_4) \
+    DEFINE_ATTRIBUTE(N_5, T_5, C_5) \
+    DEFINE_ATTRIBUTE(N_6, T_6, C_6) \
+    DEFINE_ATTRIBUTE(N_7, T_7, C_7) \
+    DEFINE_ATTRIBUTE(N_8, T_8, C_8) \
+    DEFINE_ATTRIBUTE(N_9, T_9, C_9) \
+    DEFINE_ATTRIBUTE(N_10, T_10, C_10) \
+    DEFINE_ATTRIBUTE(N_11, T_11, C_11) \
+    DEFINE_ATTRIBUTE(N_12, T_12, C_12) \
+    DEFINE_ATTRIBUTE(N_13, T_13, C_13) \
+    DEFINE_ATTRIBUTE(N_14, T_14, C_14) \
+    DEFINE_ATTRIBUTE(N_15, T_15, C_15) \
+    DEFINE_ATTRIBUTE(N_16, T_16, C_16) \
+    DEFINE_ATTRIBUTE(N_17, T_17, C_17) \
+    DEFINE_ATTRIBUTE(N_18, T_18, C_18) \
+    DEFINE_ATTRIBUTE(N_19, T_19, C_19) \
+    DEFINE_ATTRIBUTE(N_20, T_20, C_20) \
+    DEFINE_ATTRIBUTE(N_21, T_21, C_21) \
+    DEFINE_ATTRIBUTE(N_22, T_22, C_22) \
+    DEFINE_ATTRIBUTE(N_23, T_23, C_23) \
+    DEFINE_ATTRIBUTE(N_24, T_24, C_24) \
+  protected: \
+    START_INIT() \
+      SET_ATTRIBUTE(N_0, T_0, AN_0) \
+      SET_ATTRIBUTE(N_1, T_1, AN_1) \
+      SET_ATTRIBUTE(N_2, T_2, AN_2) \
+      SET_ATTRIBUTE(N_3, T_3, AN_3) \
+      SET_ATTRIBUTE(N_4, T_4, AN_4) \
+      SET_ATTRIBUTE(N_5, T_5, AN_5) \
+      SET_ATTRIBUTE(N_6, T_6, AN_6) \
+      SET_ATTRIBUTE(N_7, T_7, AN_7) \
+      SET_ATTRIBUTE(N_8, T_8, AN_8) \
+      SET_ATTRIBUTE(N_9, T_9, AN_9) \
+      SET_ATTRIBUTE(N_10, T_10, AN_10) \
+      SET_ATTRIBUTE(N_11, T_11, AN_11) \
+      SET_ATTRIBUTE(N_12, T_12, AN_12) \
+      SET_ATTRIBUTE(N_13, T_13, AN_13) \
+      SET_ATTRIBUTE(N_14, T_14, AN_14) \
+      SET_ATTRIBUTE(N_15, T_15, AN_15) \
+      SET_ATTRIBUTE(N_16, T_16, AN_16) \
+      SET_ATTRIBUTE(N_17, T_17, AN_17) \
+      SET_ATTRIBUTE(N_18, T_18, AN_18) \
+      SET_ATTRIBUTE(N_19, T_19, AN_19) \
+      SET_ATTRIBUTE(N_20, T_20, AN_20) \
+      SET_ATTRIBUTE(N_21, T_21, AN_21) \
+      SET_ATTRIBUTE(N_22, T_22, AN_22) \
+      SET_ATTRIBUTE(N_23, T_23, AN_23) \
+      SET_ATTRIBUTE(N_24, T_24, AN_24) \
+    END_INIT() \
+  public:
+
+
+//--------------------------------------------------------------------------------------
 #define INTERFACE_27(KIND, \
                      N_0, AN_0, T_0, C_0, \
                      N_1, AN_1, T_1, C_1, \
