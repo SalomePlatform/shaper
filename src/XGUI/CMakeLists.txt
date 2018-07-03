@@ -62,6 +62,7 @@ SET(PROJECT_HEADERS
     XGUI_ViewerProxy.h
     XGUI_Workshop.h
     XGUI_WorkshopListener.h
+	XGUI_InspectionPanel.h
 )
 
 SET(PROJECT_MOC_HEADERS
@@ -89,6 +90,7 @@ SET(PROJECT_MOC_HEADERS
     XGUI_ViewerProxy.h
     XGUI_Workshop.h
     XGUI_WorkshopListener.h
+	XGUI_InspectionPanel.h
 )
 
 # sources / moc wrappings
@@ -127,6 +129,7 @@ SET(PROJECT_SOURCES
     XGUI_ViewerProxy.cpp
     XGUI_Workshop.cpp
     XGUI_WorkshopListener.cpp
+	XGUI_InspectionPanel.cpp
 )
 
 SET(PROJECT_RESOURCES

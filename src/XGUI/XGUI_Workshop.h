@@ -63,6 +63,7 @@ class XGUI_SelectionActivate;
 class XGUI_SelectionMgr;
 class XGUI_ViewerProxy;
 class XGUI_WorkshopListener;
+class XGUI_InspectionPanel;
 
 class ModuleBase_IModule;
 class ModuleBase_IViewer;
@@ -129,6 +130,9 @@ Q_OBJECT
 
   /// Returns property panel widget
   XGUI_PropertyPanel* propertyPanel() const { return myPropertyPanel; }
+
+  /// Returns property panel widget
+  XGUI_InspectionPanel* inspectionPanel() const { return myInspectionPanel; }
 
   /// Returns panel for hide object faces
   XGUI_FacesPanel* facesPanel() const { return myFacesPanel; }
@@ -480,10 +484,6 @@ private:
   /// \param theParent a parent of widget
   QDockWidget* createObjectBrowser(QWidget* theParent);
 
-  /// Create property panel widget
-  /// \param theParent a parent of widget
-  QDockWidget* createPropertyPanel(QWidget* theParent);
-
   // Creates Dock widgets: Object browser and Property panel
   void createDockWidgets();
 
@@ -528,6 +528,7 @@ private:
   QString myCurrentDir; ///< cached the last open directory
   QIntList myViewerSelMode; ///< selection modes set in the viewer
   Config_DataModelReader* myDataModelXMLReader; ///< XML reader of data model
+  XGUI_InspectionPanel* myInspectionPanel; ///< container of feature attributes widgets
 };
 
 #endif

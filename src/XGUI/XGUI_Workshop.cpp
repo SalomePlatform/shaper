@@ -50,6 +50,7 @@
 #include <XGUI_HistoryMenu.h>
 #include <XGUI_QtEvents.h>
 #include <XGUI_DataModel.h>
+#include <XGUI_InspectionPanel.h>
 
 #ifndef HAVE_SALOME
 #include <AppElements_Button.h>
@@ -174,6 +175,7 @@ XGUI_Workshop::XGUI_Workshop(XGUI_SalomeConnector* theConnector)
       myModule(NULL),
       mySalomeConnector(theConnector),
       myPropertyPanel(0),
+      myInspectionPanel(0),
       myFacesPanel(0),
       myObjectBrowser(0),
       myDisplayer(0)
@@ -1340,6 +1342,11 @@ void XGUI_Workshop::createDockWidgets()
                                 Qt::RightDockWidgetArea |
                                 Qt::BottomDockWidgetArea);
   connect(myFacesPanel, SIGNAL(closed()), myFacesPanel, SLOT(onClosed()));
+
+  myInspectionPanel = new XGUI_InspectionPanel(aDesktop, mySelector);
+  myInspectionPanel->setAllowedAreas(Qt::LeftDockWidgetArea |
+    Qt::RightDockWidgetArea);
+  aDesktop->addDockWidget(Qt::RightDockWidgetArea, myInspectionPanel);
 
   aDesktop->addDockWidget(
 #ifdef HAVE_SALOME
