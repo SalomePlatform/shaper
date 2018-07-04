@@ -164,7 +164,7 @@ void FeaturesPlugin_Measurement::computeRadius()
   if (aShape) {
     if (aShape->isEdge()) {
       GeomEdgePtr anEdge(new GeomAPI_Edge(aShape));
-      if (anEdge->isCircle()) {
+      if (anEdge->isCircle() || anEdge->isArc()) {
         aRadius = anEdge->circle()->radius();
       }
     } else if (aShape->isFace()) {
