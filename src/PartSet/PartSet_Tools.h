@@ -273,11 +273,17 @@ public:
                                    const Events_ID theId);
 
   /**
-   * Returns true if the object is a sketch entity, where auxiliary attribute has true vlaue
+   * Returns true if the object is a sketch entity, where auxiliary attribute has true value
    * \param theObject a result or feature
    * \return boolean result
    */
   static bool isAuxiliarySketchEntity(const ObjectPtr& theObject);
+
+  /**
+   * Returns true if the object is a sketch entity produced by projection or intersection feature
+   * and if it should not be included into the sketch result
+   */
+  static bool isIncludeIntoSketchResult(const ObjectPtr& theObject);
 
   static ResultPtr createFixedByExternalCenter(const ObjectPtr& theObject,
                                                const std::shared_ptr<GeomAPI_Edge>& theEdge,

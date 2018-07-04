@@ -71,6 +71,7 @@
 #include <SketchPlugin_Line.h>
 #include <SketchPlugin_Point.h>
 #include <SketchPlugin_Projection.h>
+#include <SketchPlugin_IntersectionPoint.h>
 
 #include <ModuleBase_IWorkshop.h>
 #include <ModuleBase_ViewerPrs.h>
@@ -684,6 +685,35 @@ bool PartSet_Tools::isAuxiliarySketchEntity(const ObjectPtr& theObject)
 
 
   return isAuxiliaryFeature;
+}
+
+bool PartSet_Tools::isIncludeIntoSketchResult(const ObjectPtr& theObject)
+{
+  // check the feature is neither Projection nor IntersectionPoint feature
+  FeaturePtr aFeature = ModelAPI_Feature::feature(theObject);
+  if (aFeature->getKind() == SketchPlugin_Projection::ID() ||
+      aFeature->getKind() == SketchPlugin_IntersectionPoint::ID())
+    return false;
+
+  // go through the references to the feature to check
+  // if it was created by Projection or Intersection
+  const std::set<AttributePtr>& aRefs = theObject->data()->refsToMe();
+  for (std::set<AttributePtr>::const_iterator aRefIt = aRefs.begin();
+       aRefIt != aRefs.end(); ++aRefIt) {
+    AttributePtr anAttr = *aRefIt;
+    std::string anIncludeToResultAttrName;
+    if (anAttr->id() == SketchPlugin_Projection::PROJECTED_FEATURE_ID())
+      anIncludeToResultAttrName = SketchPlugin_Projection::INCLUDE_INTO_RESULT();
+    else if (anAttr->id() == SketchPlugin_IntersectionPoint::INTERSECTION_POINTS_ID())
+      anIncludeToResultAttrName = SketchPlugin_IntersectionPoint::INCLUDE_INTO_RESULT();
+
+    if (!anIncludeToResultAttrName.empty()) {
+      // check "include into result" flag
+      FeaturePtr aParent = ModelAPI_Feature::feature(anAttr->owner());
+      return aParent->boolean(anIncludeToResultAttrName)->value();
+    }
+  }
+  return true;
 }
 
 
