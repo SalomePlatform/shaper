@@ -59,11 +59,11 @@ GeomAPI_Angle::GeomAPI_Angle(const std::shared_ptr<GeomAPI_Edge>& theEdge1,
 
   GeomAPI_ProjectPointOnCurve aProj1(aPoint, aCurve1);
   if (aProj1.NbPoints() > 0)
-    aCurve1->D1(aProj1.Parameter(1), aP, anAngle->myDir1);
+    aCurve1->D1(aProj1.LowerDistanceParameter(), aP, anAngle->myDir1);
 
   GeomAPI_ProjectPointOnCurve aProj2(aPoint, aCurve2);
   if (aProj2.NbPoints() > 0)
-    aCurve2->D1(aProj2.Parameter(1), aP, anAngle->myDir2);
+    aCurve2->D1(aProj2.LowerDistanceParameter(), aP, anAngle->myDir2);
 
   setImpl(anAngle);
 }
