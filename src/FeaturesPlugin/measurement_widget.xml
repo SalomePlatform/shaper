@@ -65,6 +65,7 @@ email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com
                       shape_types="edge"
                       default="">
         <validator id="GeomValidators_ShapeType" parameters="edge"/>
+        <validator id="GeomValidators_Intersected" parameters="angle_to"/>
       </shape_selector>
       <shape_selector id="angle_to"
                       icon="icons/Features/edge.png"
@@ -73,6 +74,7 @@ email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com
                       shape_types="edge"
                       default="">
         <validator id="GeomValidators_ShapeType" parameters="edge"/>
+        <validator id="GeomValidators_Intersected" parameters="angle_from"/>
       </shape_selector>
     </box>
   </toolbox>
