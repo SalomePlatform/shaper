@@ -52,7 +52,10 @@ class ModuleBase_EditorDialog : public QDialog
 {
 public:
   ModuleBase_EditorDialog(QWidget* theParent, Qt::WindowFlags theFlags)
-    : QDialog(theParent, theFlags) {}
+    : QDialog(theParent, theFlags)
+  {
+    setMinimumWidth(100);
+  }
   ~ModuleBase_EditorDialog() {}
 
 protected:
