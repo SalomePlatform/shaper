@@ -209,14 +209,21 @@ bool ModuleBase_ParamSpinBox::hasVariable(const QString& theText) const
   return !isDouble;
 }
 
-void ModuleBase_ParamSpinBox::showCompletion()
+void ModuleBase_ParamSpinBox::showCompletion(bool checkPrefix)
 {
   myCompletePos = lineEdit()->cursorPosition();
   int aStart, aEnd;
   QString aPrefix;
   aPrefix = getPrefix(aStart, aEnd);
-  myCompleter->setCompletionPrefix(aPrefix);
-  myCompleter->complete();
+  if (checkPrefix) {
+    if (aPrefix.length() > 0) {
+      myCompleter->setCompletionPrefix(aPrefix);
+      myCompleter->complete();
+    }
+  } else {
+    myCompleter->setCompletionPrefix(aPrefix);
+    myCompleter->complete();
+  }
 }
 
 void ModuleBase_ParamSpinBox::keyReleaseEvent(QKeyEvent* e)
@@ -225,7 +232,10 @@ void ModuleBase_ParamSpinBox::keyReleaseEvent(QKeyEvent* e)
 
   switch (e->key()) {
   case Qt::Key_Backspace:
-    showCompletion();
+    if (myCompleter->popup()->isVisible()) {
+      myCompleter->popup()->hide();
+    }
+    showCompletion(true);
     break;
   case Qt::Key_Return:
   case Qt::Key_Enter:
@@ -237,14 +247,14 @@ void ModuleBase_ParamSpinBox::keyReleaseEvent(QKeyEvent* e)
     break;
   case Qt::Key_Space:
     if (e->modifiers() & Qt::ControlModifier) {
-      showCompletion();
+      showCompletion(false);
     }
     break;  default:
     aText = e->text();
     if (aText.length() == 1) {
       QChar aChar = aText.at(0);
       if (isVariableSymbol(aChar)) {
-        showCompletion();
+        showCompletion(true);
       }
     }
   }

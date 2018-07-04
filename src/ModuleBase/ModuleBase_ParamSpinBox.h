@@ -142,7 +142,7 @@ private slots:
 
 private:
   QString getPrefix(int& theStart, int& theEnd) const;
-  void showCompletion();
+  void showCompletion(bool checkPrefix);
 
   bool myIsEquation;
   bool myAcceptVariables;
