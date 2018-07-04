@@ -215,10 +215,8 @@ void ModuleBase_ParamSpinBox::showCompletion()
   int aStart, aEnd;
   QString aPrefix;
   aPrefix = getPrefix(aStart, aEnd);
-  if (aPrefix.length() > 0) {
-    myCompleter->setCompletionPrefix(aPrefix);
-    myCompleter->complete();
-  }
+  myCompleter->setCompletionPrefix(aPrefix);
+  myCompleter->complete();
 }
 
 void ModuleBase_ParamSpinBox::keyReleaseEvent(QKeyEvent* e)
@@ -237,7 +235,11 @@ void ModuleBase_ParamSpinBox::keyReleaseEvent(QKeyEvent* e)
     }
     emit textChanged(lineEdit()->text());
     break;
-  default:
+  case Qt::Key_Space:
+    if (e->modifiers() & Qt::ControlModifier) {
+      showCompletion();
+    }
+    break;  default:
     aText = e->text();
     if (aText.length() == 1) {
       QChar aChar = aText.at(0);
