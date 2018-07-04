@@ -343,15 +343,16 @@ bool XGUI_OperationMgr::canStopOperation(ModuleBase_Operation* theOperation,
   if (isGrantedOperation(theOperation->id()))
     return true;
   if (theOperation && theOperation->isModified()) {
+    QString aTitle = theOperation->getDescription()->description();
     if (theMessageKind == XGUI_AbortOperationMessage) {
-      QString aMessage = tr("%1 operation will be aborted.").arg(theOperation->id());
+      QString aMessage = tr("%1 operation will be aborted.").arg(aTitle);
       myActiveMessageBox = createMessageBox(aMessage);
       bool aResult = myActiveMessageBox->exec() == QMessageBox::Ok;
       myActiveMessageBox = 0;
       return aResult;
     }
     else if (theMessageKind == XGUI_InformationMessage) {
-      QString aMessage = tr("Please validate your %1 before saving.").arg(theOperation->id());
+      QString aMessage = tr("Please validate your %1 before saving.").arg(aTitle);
       myActiveMessageBox = createInformationBox(aMessage);
       myActiveMessageBox->exec();
       myActiveMessageBox = 0;
