@@ -102,6 +102,9 @@ protected:
   */
   virtual void keyReleaseEvent(QKeyEvent *event);
 
+  virtual bool eventFilter(QObject* theObj, QEvent* theEvent);
+
+
   virtual StepEnabled stepEnabled() const { return StepUpEnabled | StepDownEnabled; }
 
    /// Returns True if the given text contains variable
@@ -139,6 +142,7 @@ private slots:
 
 private:
   QString getPrefix(int& theStart, int& theEnd) const;
+  void showCompletion();
 
   bool myIsEquation;
   bool myAcceptVariables;
