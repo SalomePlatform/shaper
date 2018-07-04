@@ -1025,7 +1025,7 @@ bool askToDelete(const std::set<FeaturePtr> theFeatures,
                      .arg(anOtherFeatureNames.join(aSep));
   }
   if (!aParamFeatureNames.empty()) {
-    const char* aMsg = "Parameters are used in the following features: %1.\nThese features will "
+    const char* aMsg = "Parameters are used directly and through a sequence of dependencies in the following features: %1.\nThese features will "
                        "be deleted.\nOr parameters could be replaced by their values.\n";
     aText += QString(QObject::tr(aMsg))
                      .arg(aParamFeatureNames.join(aSep));
