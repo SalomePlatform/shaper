@@ -110,7 +110,7 @@ void ModuleBase_ParamSpinBox::stepBy(int steps)
   double aVal = lineEdit()->text().toDouble();
   aVal += steps * mySingleStep;
   setValue(aVal);
-  QAbstractSpinBox::stepBy(steps);
+  //QAbstractSpinBox::stepBy(steps);
 }
 
 void ModuleBase_ParamSpinBox::onTextChanged(const QString& theText)
@@ -154,7 +154,9 @@ void ModuleBase_ParamSpinBox::setValue(double value)
   else if (aVal > myMaximum)
     aVal = myMaximum;
   QString aText = QString::number(aVal, 'g', decimals());
+  lineEdit()->blockSignals(true);
   lineEdit()->setText(aText);
+  lineEdit()->blockSignals(false);
   emit textChanged(aText);
 }
 
