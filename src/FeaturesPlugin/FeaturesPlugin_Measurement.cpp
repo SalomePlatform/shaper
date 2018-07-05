@@ -100,10 +100,11 @@ void FeaturesPlugin_Measurement::computeLength()
 
   GeomShapePtr aShape;
   GeomEdgePtr anEdge;
-  if (aSelectedFeature)
+  if (aSelectedFeature && aSelectedFeature->isInitialized()) {
     aShape = aSelectedFeature->value();
-  if (!aShape && aSelectedFeature->context())
-    aShape = aSelectedFeature->context()->shape();
+    if (!aShape && aSelectedFeature->context())
+      aShape = aSelectedFeature->context()->shape();
+  }
   if (aShape && aShape->isEdge())
     anEdge = GeomEdgePtr(new GeomAPI_Edge(aShape));
   if (!anEdge) {
@@ -125,17 +126,19 @@ void FeaturesPlugin_Measurement::computeDistance()
 {
   AttributeSelectionPtr aFirstFeature = selection(DISTANCE_FROM_OBJECT_ID());
   GeomShapePtr aShape1;
-  if (aFirstFeature)
+  if (aFirstFeature && aFirstFeature->isInitialized()) {
     aShape1 = aFirstFeature->value();
-  if (!aShape1 && aFirstFeature->context())
-    aShape1 = aFirstFeature->context()->shape();
+    if (!aShape1 && aFirstFeature->context())
+      aShape1 = aFirstFeature->context()->shape();
+  }
 
   AttributeSelectionPtr aSecondFeature = selection(DISTANCE_TO_OBJECT_ID());
   GeomShapePtr aShape2;
-  if (aSecondFeature)
+  if (aSecondFeature && aSecondFeature->isInitialized()) {
     aShape2 = aSecondFeature->value();
-  if (!aShape2 && aSecondFeature->context())
-    aShape2 = aSecondFeature->context()->shape();
+    if (!aShape2 && aSecondFeature->context())
+      aShape2 = aSecondFeature->context()->shape();
+  }
 
   if (!aShape1 || !aShape2) {
     string(RESULT_ID())->setValue("");
@@ -159,10 +162,11 @@ void FeaturesPlugin_Measurement::computeRadius()
   AttributeSelectionPtr aSelectedFeature = selection(CIRCULAR_OBJECT_ID());
 
   GeomShapePtr aShape;
-  if (aSelectedFeature)
+  if (aSelectedFeature && aSelectedFeature->isInitialized()) {
     aShape = aSelectedFeature->value();
-  if (!aShape && aSelectedFeature->context())
-    aShape = aSelectedFeature->context()->shape();
+    if (!aShape && aSelectedFeature->context())
+      aShape = aSelectedFeature->context()->shape();
+  }
 
   double aRadius = -1.0;
   if (aShape) {
@@ -197,20 +201,22 @@ void FeaturesPlugin_Measurement::computeAngle()
   AttributeSelectionPtr aFirstFeature = selection(ANGLE_FROM_EDGE_ID());
   GeomShapePtr aShape1;
   GeomEdgePtr anEdge1;
-  if (aFirstFeature)
+  if (aFirstFeature && aFirstFeature->isInitialized()) {
     aShape1 = aFirstFeature->value();
-  if (!aShape1 && aFirstFeature->context())
-    aShape1 = aFirstFeature->context()->shape();
+    if (!aShape1 && aFirstFeature->context())
+      aShape1 = aFirstFeature->context()->shape();
+  }
   if (aShape1 && aShape1->isEdge())
     anEdge1 = GeomEdgePtr(new GeomAPI_Edge(aShape1));
 
   AttributeSelectionPtr aSecondFeature = selection(ANGLE_TO_EDGE_ID());
   GeomShapePtr aShape2;
   GeomEdgePtr anEdge2;
-  if (aSecondFeature)
+  if (aSecondFeature && aSecondFeature->isInitialized()) {
     aShape2 = aSecondFeature->value();
-  if (!aShape2 && aSecondFeature->context())
-    aShape2 = aSecondFeature->context()->shape();
+    if (!aShape2 && aSecondFeature->context())
+      aShape2 = aSecondFeature->context()->shape();
+  }
   if (aShape2 && aShape2->isEdge())
     anEdge2 = GeomEdgePtr(new GeomAPI_Edge(aShape2));
 
