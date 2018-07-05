@@ -735,10 +735,15 @@ void PartSet_SketcherMgr::launchEditing()
       if (!aSPFeature->isExternal())
         myModule->editFeature(aSPFeature);
       else {
-        FeaturePtr aProjectionFeature = PartSet_Tools::findRefsToMeFeature(aFeature,
+        // need to edit a feature (Projection/IntersectionPoint),
+        // which produces current External feature
+        FeaturePtr aProducerFeature = PartSet_Tools::findRefsToMeFeature(aFeature,
                                                         SketchPlugin_Projection::ID());
-        if (aProjectionFeature.get())
-          myModule->editFeature(aProjectionFeature);
+        if (!aProducerFeature.get())
+          aProducerFeature = PartSet_Tools::findRefsToMeFeature(aFeature,
+                                                        SketchPlugin_IntersectionPoint::ID());
+        if (aProducerFeature.get())
+          myModule->editFeature(aProducerFeature);
       }
     }
   }
