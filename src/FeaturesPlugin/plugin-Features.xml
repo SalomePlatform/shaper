@@ -97,7 +97,7 @@ email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com
       <feature id="Rotation" title="Rotation" tooltip="Perform rotation of an objects around the axis to specified angle" icon="icons/Features/rotation.png">
         <source path="rotation_widget.xml"/>
       </feature>
-      <feature id="MirrorCopy" title="Mirror copy" tooltip="Perform symmetry with respect to a point, an axis or a plane" icon="icons/Features/symmetry.png">
+      <feature id="Symmetry" title="Symmetry" tooltip="Perform symmetry with respect to a point, an axis or a plane" icon="icons/Features/symmetry.png">
         <source path="symmetry_widget.xml"/>
       </feature>
       <feature id="LinearCopy" title="Linear copy" tooltip="Perform copy and translate" icon="icons/Features/multitranslation.png">

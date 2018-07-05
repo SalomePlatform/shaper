@@ -76,4 +76,5 @@ email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com
       </shape_selector>
     </box>
   </toolbox>
+  <boolvalue id="keep_original" label="Keep original result" default="true" tooltip="Do not remove original shape"/>
 </source>
