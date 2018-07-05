@@ -106,8 +106,10 @@ void FeaturesPlugin_Measurement::computeLength()
     aShape = aSelectedFeature->context()->shape();
   if (aShape && aShape->isEdge())
     anEdge = GeomEdgePtr(new GeomAPI_Edge(aShape));
-  if (!anEdge)
+  if (!anEdge) {
+    string(RESULT_ID())->setValue("");
     return;
+  }
 
   std::ostringstream anOutput;
   anOutput << "Length = " << std::setprecision(10) << anEdge->length();
@@ -135,8 +137,10 @@ void FeaturesPlugin_Measurement::computeDistance()
   if (!aShape2 && aSecondFeature->context())
     aShape2 = aSecondFeature->context()->shape();
 
-  if (!aShape1 || !aShape2)
+  if (!aShape1 || !aShape2) {
+    string(RESULT_ID())->setValue("");
     return;
+  }
 
   double aDistance = GeomAlgoAPI_ShapeTools::minimalDistance(aShape1, aShape2);
 
@@ -173,8 +177,10 @@ void FeaturesPlugin_Measurement::computeRadius()
     }
   }
 
-  if (aRadius < 0.0)
+  if (aRadius < 0.0) {
+    string(RESULT_ID())->setValue("");
     return;
+  }
 
   std::ostringstream anOutput;
   anOutput << "Radius = " << std::setprecision(10) << aRadius;
@@ -198,7 +204,6 @@ void FeaturesPlugin_Measurement::computeAngle()
   if (aShape1 && aShape1->isEdge())
     anEdge1 = GeomEdgePtr(new GeomAPI_Edge(aShape1));
 
-
   AttributeSelectionPtr aSecondFeature = selection(ANGLE_TO_EDGE_ID());
   GeomShapePtr aShape2;
   GeomEdgePtr anEdge2;
@@ -209,8 +214,10 @@ void FeaturesPlugin_Measurement::computeAngle()
   if (aShape2 && aShape2->isEdge())
     anEdge2 = GeomEdgePtr(new GeomAPI_Edge(aShape2));
 
-  if (!anEdge1 || !anEdge2)
+  if (!anEdge1 || !anEdge2) {
+    string(RESULT_ID())->setValue("");
     return;
+  }
 
   GeomShapePtr anInter = anEdge1->intersect(anEdge2);
 
