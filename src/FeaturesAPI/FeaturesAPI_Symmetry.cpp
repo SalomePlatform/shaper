@@ -129,5 +129,6 @@ SymmetryPtr addSymmetry(const std::shared_ptr<ModelAPI_Document>& thePart,
                         bool theKeepOriginal)
 {
   std::shared_ptr<ModelAPI_Feature> aFeature = thePart->addFeature(FeaturesAPI_Symmetry::ID());
-  return SymmetryPtr(new FeaturesAPI_Symmetry(aFeature, theMainObjects, theObject, theKeepOriginal));
+  return SymmetryPtr(new FeaturesAPI_Symmetry(
+      aFeature, theMainObjects, theObject, theKeepOriginal));
 }
