@@ -276,7 +276,7 @@ void FeaturesPlugin_Measurement::computeAngle()
     aValues->setValue(anIndex++, *anIt);
 }
 
-static GeomVertexPtr selectionToVertex(AttributeSelectionPtr& aSelection)
+static GeomVertexPtr selectionToVertex(const AttributeSelectionPtr& aSelection)
 {
   GeomShapePtr aShape;
   GeomVertexPtr aVertex;
