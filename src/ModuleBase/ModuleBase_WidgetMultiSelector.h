@@ -130,6 +130,8 @@ protected slots:
   /// Slot is called on selection of list of selected items
   void onListSelection();
 
+  void onListActivated();
+
 protected:
   /// Returns true if the event is processed. The default implementation is empty, returns false.
   virtual bool processDelete();

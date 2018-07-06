@@ -402,8 +402,8 @@ bool XGUI_PropertyPanel::focusNextPrevChild(bool theIsNext)
 #endif
   ModuleBase_ModelWidget* aFocusMWidget = ModuleBase_ModelWidget::findModelWidget(this,
                                                                          aFocusWidget);
-  if (aFocusMWidget)
-    aFocusMWidget->setHighlighted(false);
+  //if (aFocusMWidget)
+  //  aFocusMWidget->setHighlighted(false);
 
   QWidget* aNewFocusWidget = 0;
   if (aFocusWidget) {
@@ -459,9 +459,13 @@ bool XGUI_PropertyPanel::focusNextPrevChild(bool theIsNext)
 
     ModuleBase_ModelWidget* aNewFocusMWidget = ModuleBase_ModelWidget::findModelWidget(this,
                                                                               aNewFocusWidget);
-    if (aNewFocusMWidget)
+    if (aNewFocusMWidget) {
+      if (aFocusMWidget) {
+        aFocusMWidget->setHighlighted(false);
+      }
       aNewFocusMWidget->emitFocusInWidget();
-    isChangedFocus = true;
+      isChangedFocus = true;
+    }
   }
   return isChangedFocus;
 }
