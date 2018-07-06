@@ -75,21 +75,12 @@ void FeaturesPlugin_Measurement::execute()
 void FeaturesPlugin_Measurement::attributeChanged(const std::string& theID)
 {
   if (theID == MEASURE_KIND()) {
-    // clear selected objects
-    selection(EDGE_FOR_LENGTH_ID())->reset();
-    selection(DISTANCE_FROM_OBJECT_ID())->reset();
-    selection(DISTANCE_TO_OBJECT_ID())->reset();
-    selection(CIRCULAR_OBJECT_ID())->reset();
-    selection(ANGLE_FROM_EDGE_ID())->reset();
-    selection(ANGLE_TO_EDGE_ID())->reset();
-    selection(ANGLE_POINT1_ID())->reset();
-    selection(ANGLE_POINT2_ID())->reset();
-    selection(ANGLE_POINT3_ID())->reset();
+    // clear results
     string(RESULT_ID())->setValue("");
     std::dynamic_pointer_cast<ModelAPI_AttributeDoubleArray>(
-        attribute(RESULT_VALUES_ID()))->setSize(0);
+      attribute(RESULT_VALUES_ID()))->setSize(0);
   }
-  else if (theID != RESULT_ID()) {
+  if (theID != RESULT_ID()) {
     std::string aKind = string(MEASURE_KIND())->value();
     if (aKind == MEASURE_LENGTH())
       computeLength();
