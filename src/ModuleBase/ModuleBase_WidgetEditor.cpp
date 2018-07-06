@@ -91,6 +91,11 @@ bool ModuleBase_WidgetEditor::editedValue(double theSpinMinValue, double theSpin
   ModuleBase_ParamSpinBox* anEditor = new ModuleBase_ParamSpinBox(myEditorDialog);
   anEditor->setMinimum(theSpinMinValue);
   anEditor->setMaximum(theSpinMaxValue);
+
+  QStringList aParameters;
+  ModuleBase_Tools::getParameters(aParameters);
+  anEditor->setCompletionList(aParameters);
+
   if (outText.isEmpty())
     anEditor->setValue(outValue);
   else
