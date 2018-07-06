@@ -46,7 +46,6 @@ bool isVariableSymbol(const QChar& theChar) {
 
 ModuleBase_ParamSpinBox::ModuleBase_ParamSpinBox(QWidget* theParent, int thePrecision)
   : QAbstractSpinBox(theParent),
-  myPrecision(thePrecision),
   myIsEquation(false),
   myAcceptVariables(true),
   mySingleStep(1),
@@ -75,7 +74,7 @@ ModuleBase_ParamSpinBox::ModuleBase_ParamSpinBox(QWidget* theParent, int thePrec
   myValidator = new QDoubleValidator(this);
   myValidator->setLocale(locale());
   myValidator->setRange(myMinimum, myMaximum);
-  myValidator->setDecimals(myPrecision);
+  myValidator->setDecimals(thePrecision);
 }
 
 void ModuleBase_ParamSpinBox::setCompletionList(QStringList& theList)
@@ -153,7 +152,8 @@ void ModuleBase_ParamSpinBox::setValue(double value)
     aVal = myMinimum;
   else if (aVal > myMaximum)
     aVal = myMaximum;
-  QString aText = QString::number(aVal, 'g', decimals());
+  QString aText = (myValidator->decimals() == 0) ? QString::number((int)aVal) :
+    QString::number(aVal, 'g', decimals());
   lineEdit()->blockSignals(true);
   lineEdit()->setText(aText);
   lineEdit()->blockSignals(false);

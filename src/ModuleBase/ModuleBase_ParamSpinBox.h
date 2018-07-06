@@ -152,7 +152,6 @@ private:
 
   QStringListModel* myCompleterModel;
   QCompleter* myCompleter;
-  int myPrecision;
 
   double myMinimum;
   double myMaximum;
