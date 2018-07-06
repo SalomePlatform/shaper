@@ -33,6 +33,7 @@
 #include <GeomAPI_Pnt.h>
 #include <GeomAPI_Shape.h>
 #include <GeomAPI_ShapeIterator.h>
+#include <GeomAPI_Vertex.h>
 
 #include <GeomAlgoAPI_ShapeTools.h>
 
@@ -55,10 +56,14 @@ void FeaturesPlugin_Measurement::initAttributes()
   data()->addAttribute(DISTANCE_TO_OBJECT_ID(), ModelAPI_AttributeSelection::typeId());
   // attribute for radius
   data()->addAttribute(CIRCULAR_OBJECT_ID(), ModelAPI_AttributeSelection::typeId());
-  // attribute for angle
+  // attributes for angle
   data()->addAttribute(ANGLE_FROM_EDGE_ID(), ModelAPI_AttributeSelection::typeId());
   data()->addAttribute(ANGLE_TO_EDGE_ID(), ModelAPI_AttributeSelection::typeId());
-  // attribute for result message and values
+  // attributes for angle by 3 points
+  data()->addAttribute(ANGLE_POINT1_ID(), ModelAPI_AttributeSelection::typeId());
+  data()->addAttribute(ANGLE_POINT2_ID(), ModelAPI_AttributeSelection::typeId());
+  data()->addAttribute(ANGLE_POINT3_ID(), ModelAPI_AttributeSelection::typeId());
+  // attributes for result message and values
   data()->addAttribute(RESULT_ID(), ModelAPI_AttributeString::typeId());
   data()->addAttribute(RESULT_VALUES_ID(), ModelAPI_AttributeDoubleArray::typeId());
 }
@@ -77,6 +82,9 @@ void FeaturesPlugin_Measurement::attributeChanged(const std::string& theID)
     selection(CIRCULAR_OBJECT_ID())->reset();
     selection(ANGLE_FROM_EDGE_ID())->reset();
     selection(ANGLE_TO_EDGE_ID())->reset();
+    selection(ANGLE_POINT1_ID())->reset();
+    selection(ANGLE_POINT2_ID())->reset();
+    selection(ANGLE_POINT3_ID())->reset();
     string(RESULT_ID())->setValue("");
     std::dynamic_pointer_cast<ModelAPI_AttributeDoubleArray>(
         attribute(RESULT_VALUES_ID()))->setSize(0);
@@ -91,6 +99,8 @@ void FeaturesPlugin_Measurement::attributeChanged(const std::string& theID)
       computeRadius();
     else if (aKind == MEASURE_ANGLE())
       computeAngle();
+    else if (aKind == MEASURE_ANGLE_POINTS())
+      computeAngleByPoints();
   }
 }
 
@@ -236,7 +246,7 @@ void FeaturesPlugin_Measurement::computeAngle()
       std::shared_ptr<GeomAPI_Angle> anAngle(
           new GeomAPI_Angle(anEdge1, anEdge2, aVertex->point()));
       double anAngleValue = anAngle->angleDegree();
-      anOutput << "Angle = " << anAngleValue << std::endl;
+      anOutput << "Angle = " << std::setprecision(10) << anAngleValue << std::endl;
       aValuesList.push_back(anAngleValue);
     }
     else {
@@ -249,7 +259,8 @@ void FeaturesPlugin_Measurement::computeAngle()
         std::shared_ptr<GeomAPI_Angle> anAngle(
             new GeomAPI_Angle(anEdge1, anEdge2, aVertex->point()));
         double anAngleValue = anAngle->angleDegree();
-        anOutput << "Angle" << anIndex << " = " << anAngleValue << std::endl;
+        anOutput << "Angle" << anIndex << " = "
+                 << std::setprecision(10) << anAngleValue << std::endl;
         aValuesList.push_back(anAngleValue);
       }
     }
@@ -263,4 +274,43 @@ void FeaturesPlugin_Measurement::computeAngle()
   int anIndex = 0;
   for (std::list<double>::iterator anIt = aValuesList.begin(); anIt != aValuesList.end(); ++anIt)
     aValues->setValue(anIndex++, *anIt);
+}
+
+static GeomVertexPtr selectionToVertex(AttributeSelectionPtr& aSelection)
+{
+  GeomShapePtr aShape;
+  GeomVertexPtr aVertex;
+  if (aSelection && aSelection->isInitialized()) {
+    aShape = aSelection->value();
+    if (!aShape && aSelection->context())
+      aShape = aSelection->context()->shape();
+  }
+  if (aShape && aShape->isVertex())
+    aVertex = GeomVertexPtr(new GeomAPI_Vertex(aShape));
+  return aVertex;
+}
+
+void FeaturesPlugin_Measurement::computeAngleByPoints()
+{
+  GeomVertexPtr aVertex1 = selectionToVertex(selection(ANGLE_POINT1_ID()));
+  GeomVertexPtr aVertex2 = selectionToVertex(selection(ANGLE_POINT2_ID()));
+  GeomVertexPtr aVertex3 = selectionToVertex(selection(ANGLE_POINT3_ID()));
+
+  if (!aVertex1 || !aVertex2 || ! aVertex3) {
+    string(RESULT_ID())->setValue("");
+    return;
+  }
+
+  std::shared_ptr<GeomAPI_Angle> anAngle(
+      new GeomAPI_Angle(aVertex1->point(), aVertex2->point(), aVertex3->point()));
+  double anAngleValue = anAngle->angleDegree();
+
+  std::ostringstream anOutput;
+  anOutput << "Angle = " << std::setprecision(10) << anAngleValue;
+  string(RESULT_ID())->setValue(anOutput.str());
+
+  AttributeDoubleArrayPtr aValues =
+    std::dynamic_pointer_cast<ModelAPI_AttributeDoubleArray>(attribute(RESULT_VALUES_ID()));
+  aValues->setSize(1);
+  aValues->setValue(0, anAngleValue);
 }

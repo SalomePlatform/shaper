@@ -84,6 +84,13 @@ public:
     return MY_MEASURE_ID;
   }
 
+  /// Attribute name for angle measurement by 3 points.
+  inline static const std::string& MEASURE_ANGLE_POINTS()
+  {
+    static const std::string MY_MEASURE_ID("AngleBy3Points");
+    return MY_MEASURE_ID;
+  }
+
 
   /// Attribute name of edge selected for length calculation.
   inline static const std::string& EDGE_FOR_LENGTH_ID()
@@ -120,11 +127,32 @@ public:
     return MY_ANGLE_FROM_EDGE_ID;
   }
 
-  /// Attribute name of second shape selected for distance calculation.
+  /// Attribute name of second shape selected for angle calculation.
   inline static const std::string& ANGLE_TO_EDGE_ID()
   {
     static const std::string MY_ANGLE_TO_EDGE_ID("angle_to");
     return MY_ANGLE_TO_EDGE_ID;
+  }
+
+  /// Attribute name of first point selected for angle calculation.
+  inline static const std::string& ANGLE_POINT1_ID()
+  {
+    static const std::string MY_ANGLE_POINT1_ID("angle_point_1");
+    return MY_ANGLE_POINT1_ID;
+  }
+
+  /// Attribute name of second point (apex) selected for angle calculation.
+  inline static const std::string& ANGLE_POINT2_ID()
+  {
+    static const std::string MY_ANGLE_POINT2_ID("angle_point_2");
+    return MY_ANGLE_POINT2_ID;
+  }
+
+  /// Attribute name of third point selected for angle calculation.
+  inline static const std::string& ANGLE_POINT3_ID()
+  {
+    static const std::string MY_ANGLE_POINT3_ID("angle_point_3");
+    return MY_ANGLE_POINT3_ID;
   }
 
   /// Attribute name for result.
@@ -166,6 +194,8 @@ private:
   void computeRadius();
   /// Compute angle(s) between pair of edges if they are intersected
   void computeAngle();
+  /// Compute angle by three points
+  void computeAngleByPoints();
 };
 
 #endif

@@ -115,3 +115,28 @@ std::list<double> measureAngle(const std::shared_ptr<ModelAPI_Document>& thePart
 
   return aValues;
 }
+
+double measureAngle(const std::shared_ptr<ModelAPI_Document>& thePart,
+                    const ModelHighAPI_Selection& thePoint1,
+                    const ModelHighAPI_Selection& thePoint2,
+                    const ModelHighAPI_Selection& thePoint3)
+{
+  FeaturePtr aMeasure = thePart->addFeature(FeaturesPlugin_Measurement::ID());
+  fillAttribute(FeaturesPlugin_Measurement::MEASURE_ANGLE_POINTS(),
+                aMeasure->string(FeaturesPlugin_Measurement::MEASURE_KIND()));
+  fillAttribute(thePoint1, aMeasure->selection(FeaturesPlugin_Measurement::ANGLE_POINT1_ID()));
+  fillAttribute(thePoint2, aMeasure->selection(FeaturesPlugin_Measurement::ANGLE_POINT2_ID()));
+  fillAttribute(thePoint3, aMeasure->selection(FeaturesPlugin_Measurement::ANGLE_POINT3_ID()));
+  aMeasure->execute();
+
+  // obtain result
+  AttributeDoubleArrayPtr aResult = std::dynamic_pointer_cast<ModelAPI_AttributeDoubleArray>(
+      aMeasure->attribute(FeaturesPlugin_Measurement::RESULT_VALUES_ID()));
+  double aValue = aResult->size() ? aResult->value(0) : -1.0;
+
+  // perform removing macro feature Measurement
+  thePart->removeFeature(aMeasure);
+  apply();
+
+  return aValue;
+}

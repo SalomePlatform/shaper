@@ -68,6 +68,20 @@ GeomAPI_Angle::GeomAPI_Angle(const std::shared_ptr<GeomAPI_Edge>& theEdge1,
   setImpl(anAngle);
 }
 
+GeomAPI_Angle::GeomAPI_Angle(const std::shared_ptr<GeomAPI_Pnt>& thePoint1,
+                             const std::shared_ptr<GeomAPI_Pnt>& thePoint2,
+                             const std::shared_ptr<GeomAPI_Pnt>& thePoint3)
+{
+  gp_Pnt aPoint1 = thePoint1->impl<gp_Pnt>();
+  gp_Pnt aPoint2 = thePoint2->impl<gp_Pnt>();
+  gp_Pnt aPoint3 = thePoint3->impl<gp_Pnt>();
+
+  AngleDirections* anAngle = new AngleDirections;
+  anAngle->myDir1.SetXYZ(aPoint1.XYZ() - aPoint2.XYZ());
+  anAngle->myDir2.SetXYZ(aPoint3.XYZ() - aPoint2.XYZ());
+  setImpl(anAngle);
+}
+
 double GeomAPI_Angle::angleDegree()
 {
   return angleRadian() * 180.0 / PI;

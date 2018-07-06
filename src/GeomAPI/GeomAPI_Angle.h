@@ -38,6 +38,12 @@ public:
                 const std::shared_ptr<GeomAPI_Edge>& theEdge2,
                 const std::shared_ptr<GeomAPI_Pnt>&  thePoint);
 
+  /// Creation of an angle defined by 3 points (the second point is an apex of an angle).
+  GEOMAPI_EXPORT
+  GeomAPI_Angle(const std::shared_ptr<GeomAPI_Pnt>& thePoint1,
+                const std::shared_ptr<GeomAPI_Pnt>& thePoint2,
+                const std::shared_ptr<GeomAPI_Pnt>& thePoint3);
+
   /// Returns value of the angle in degrees
   GEOMAPI_EXPORT double angleDegree();
   /// Returns value of the angle in radians

@@ -77,6 +77,32 @@ email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com
         <validator id="GeomValidators_Intersected" parameters="angle_from"/>
       </shape_selector>
     </box>
+    <box id="AngleBy3Points" title="Angle by 3 points" icon="icons/Features/meas_angle3p_32x32.png">
+      <shape_selector id="angle_point_1"
+                      icon="icons/Features/point.png"
+                      label="Start point"
+                      tooltip="Select a point"
+                      shape_types="vertex"
+                      default="">
+        <validator id="GeomValidators_ShapeType" parameters="vertex"/>
+      </shape_selector>
+      <shape_selector id="angle_point_2"
+                      icon="icons/Features/point.png"
+                      label="Angle apex"
+                      tooltip="Select a point"
+                      shape_types="vertex"
+                      default="">
+        <validator id="GeomValidators_ShapeType" parameters="vertex"/>
+      </shape_selector>
+      <shape_selector id="angle_point_3"
+                      icon="icons/Features/point.png"
+                      label="End point"
+                      tooltip="Select a point"
+                      shape_types="vertex"
+                      default="">
+        <validator id="GeomValidators_ShapeType" parameters="vertex"/>
+      </shape_selector>
+    </box>
   </toolbox>
   <label id="result"/>
 </source>
