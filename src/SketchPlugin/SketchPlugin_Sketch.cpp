@@ -43,6 +43,7 @@
 
 #include <SketchPlugin_Sketch.h>
 #include <SketchPlugin_Feature.h>
+#include <SketchPlugin_IntersectionPoint.h>
 #include <SketchPlugin_Projection.h>
 #include <SketchPlugin_SketchEntity.h>
 #include <SketchPlugin_Tools.h>
@@ -106,8 +107,11 @@ void SketchPlugin_Sketch::execute()
       // do not include into the result the external edges with disabled flag "Include into result"
       if (aFeature->data()->attribute(SketchPlugin_SketchEntity::EXTERNAL_ID())) {
         if (aFeature->data()->selection(SketchPlugin_SketchEntity::EXTERNAL_ID())->context()) {
-          AttributeBooleanPtr aKeepResult =
-              aFeature->boolean(SketchPlugin_Projection::INCLUDE_INTO_RESULT());
+          const std::string& anAttrName =
+              aFeature->getKind() == SketchPlugin_Projection::ID() ?
+              SketchPlugin_Projection::INCLUDE_INTO_RESULT() :
+              SketchPlugin_IntersectionPoint::INCLUDE_INTO_RESULT();
+          AttributeBooleanPtr aKeepResult = aFeature->boolean(anAttrName);
           if (!aKeepResult || !aKeepResult->value())
             continue;
         }

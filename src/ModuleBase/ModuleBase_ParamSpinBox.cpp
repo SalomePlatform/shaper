@@ -35,9 +35,17 @@
 #include <iostream>
 #include <cfloat>
 
+
+bool isVariableSymbol(const QChar& theChar) {
+  if (theChar.isLetterOrNumber())
+    return true;
+  if (theChar == '_')
+    return true;
+  return false;
+}
+
 ModuleBase_ParamSpinBox::ModuleBase_ParamSpinBox(QWidget* theParent, int thePrecision)
   : QAbstractSpinBox(theParent),
-  myPrecision(thePrecision),
   myIsEquation(false),
   myAcceptVariables(true),
   mySingleStep(1),
@@ -50,11 +58,11 @@ ModuleBase_ParamSpinBox::ModuleBase_ParamSpinBox(QWidget* theParent, int thePrec
 
   myCompleterModel = new QStringListModel(this);
   myCompleter->setModel(myCompleterModel);
-  // Use sorted model to accelerate completion (QCompleter will use binary search)
-  myCompleter->setModelSorting(QCompleter::CaseInsensitivelySortedModel);
-  myCompleter->setCaseSensitivity(Qt::CaseInsensitive);
   connect(myCompleter, SIGNAL(highlighted(const QString&)),
     this, SLOT(insertCompletion(const QString&)));
+
+  QAbstractItemView* aPopup = myCompleter->popup();
+  aPopup->installEventFilter(this);
 
   //  connectSignalsAndSlots();
   myEnabledBaseColor = palette().color(QPalette::Active, QPalette::Base);
@@ -66,13 +74,13 @@ ModuleBase_ParamSpinBox::ModuleBase_ParamSpinBox(QWidget* theParent, int thePrec
   myValidator = new QDoubleValidator(this);
   myValidator->setLocale(locale());
   myValidator->setRange(myMinimum, myMaximum);
-  myValidator->setDecimals(myPrecision);
+  myValidator->setDecimals(thePrecision);
 }
 
 void ModuleBase_ParamSpinBox::setCompletionList(QStringList& theList)
 {
-  theList.sort();
   theList.removeDuplicates();
+  theList.sort();
   myCompleterModel->setStringList(theList);
 }
 
@@ -101,7 +109,7 @@ void ModuleBase_ParamSpinBox::stepBy(int steps)
   double aVal = lineEdit()->text().toDouble();
   aVal += steps * mySingleStep;
   setValue(aVal);
-  QAbstractSpinBox::stepBy(steps);
+  //QAbstractSpinBox::stepBy(steps);
 }
 
 void ModuleBase_ParamSpinBox::onTextChanged(const QString& theText)
@@ -144,8 +152,11 @@ void ModuleBase_ParamSpinBox::setValue(double value)
     aVal = myMinimum;
   else if (aVal > myMaximum)
     aVal = myMaximum;
-  QString aText = QString::number(aVal, 'g', decimals());
+  QString aText = (myValidator->decimals() == 0) ? QString::number((int)aVal) :
+    QString::number(aVal, 'g', decimals());
+  lineEdit()->blockSignals(true);
   lineEdit()->setText(aText);
+  lineEdit()->blockSignals(false);
   emit textChanged(aText);
 }
 
@@ -201,31 +212,64 @@ bool ModuleBase_ParamSpinBox::hasVariable(const QString& theText) const
   return !isDouble;
 }
 
+void ModuleBase_ParamSpinBox::showCompletion(bool checkPrefix)
+{
+  myCompletePos = lineEdit()->cursorPosition();
+  int aStart, aEnd;
+  QString aPrefix;
+  aPrefix = getPrefix(aStart, aEnd);
+  if (checkPrefix) {
+    if (aPrefix.length() > 0) {
+      myCompleter->setCompletionPrefix(aPrefix);
+      myCompleter->complete();
+    }
+  } else {
+    myCompleter->setCompletionPrefix(aPrefix);
+    myCompleter->complete();
+  }
+}
+
 void ModuleBase_ParamSpinBox::keyReleaseEvent(QKeyEvent* e)
 {
+  QString aText;
+
   switch (e->key()) {
+  case Qt::Key_Backspace:
+    if (myCompleter->popup()->isVisible()) {
+      myCompleter->popup()->hide();
+    }
+    showCompletion(true);
+    break;
   case Qt::Key_Return:
   case Qt::Key_Enter:
-  {
     if (myCompleter->popup()->isVisible()) {
       myCompleter->popup()->hide();
       myIsEquation = true;
     }
     emit textChanged(lineEdit()->text());
-    return;
-  }
+    break;
   case Qt::Key_Space:
     if (e->modifiers() & Qt::ControlModifier) {
-      myCompletePos = lineEdit()->cursorPosition();
-      int aStart, aEnd;
-      QString aPrefix = getPrefix(aStart, aEnd);
-      myCompleter->setCompletionPrefix(aPrefix);
-      myCompleter->complete();
+      showCompletion(false);
     }
-    break;
-  default:
-    QAbstractSpinBox::keyReleaseEvent(e);
+    break;  default:
+    aText = e->text();
+    if (aText.length() == 1) {
+      QChar aChar = aText.at(0);
+      if (isVariableSymbol(aChar)) {
+        showCompletion(true);
+      }
+    }
   }
+  QAbstractSpinBox::keyReleaseEvent(e);
+}
+
+bool ModuleBase_ParamSpinBox::eventFilter(QObject* theObj, QEvent* theEvent)
+{
+  if (theEvent->type() == QEvent::KeyRelease) {
+    keyReleaseEvent((QKeyEvent*)theEvent);
+  }
+  return QAbstractSpinBox::eventFilter(theObj, theEvent);
 }
 
 
@@ -239,7 +283,7 @@ QString ModuleBase_ParamSpinBox::getPrefix(int& theStart, int& theEnd) const
     if (myCompletePos > 0) {
       int aLastChar = myCompletePos - 1;
       QChar aChar = aText.at(aLastChar);
-      while (aChar.isLetter() || aChar.isDigit()) {
+      while (isVariableSymbol(aChar)) {
         aPrefix.prepend(aText.at(aLastChar));
         aLastChar--;
         if (aLastChar < 0)
@@ -251,7 +295,7 @@ QString ModuleBase_ParamSpinBox::getPrefix(int& theStart, int& theEnd) const
     if (myCompletePos < aLen) {
       int aLastChar = myCompletePos;
       QChar aChar = aText.at(aLastChar);
-      while (aChar.isLetter() || aChar.isDigit()) {
+      while (isVariableSymbol(aChar)) {
         aPrefix.append(aText.at(aLastChar));
         aLastChar++;
         if (aLastChar >= aLen)

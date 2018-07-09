@@ -1,4 +1,4 @@
-## Copyright (C) 2014-2017  CEA/DEN, EDF R&D
+## Copyright (C) 2018-20xx  CEA/DEN, EDF R&D
 ##
 ## This library is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU Lesser General Public
@@ -19,28 +19,21 @@
 ##
 
 from salome.shaper import model
+import math
 
 model.begin()
 partSet = model.moduleDocument()
 Part_1 = model.addPart(partSet)
 Part_1_doc = Part_1.document()
-Cylinder_1 = model.addCylinder(Part_1_doc, model.selection("VERTEX", "PartSet/Origin"), model.selection("EDGE", "PartSet/OZ"), 5, 10)
-Cylinder_1.result().setName("cylinder")
-Plane_4 = model.addPlane(Part_1_doc, model.selection("FACE", "cylinder/Face_2"), 10, False)
-Symmetry_1 = model.addSymmetry(Part_1_doc, [model.selection("SOLID", "cylinder")], model.selection("FACE", "Plane_1"))
+ParamR = model.addParameter(Part_1_doc, "R", "100")
+Sketch_1 = model.addSketch(Part_1_doc, model.defaultPlane("XOY"))
+SketchArc_1 = Sketch_1.addArc(-47.73523320343703, -72.31551328948351, 43.26553250145439, -30.85636904935887, -50.76060275488791, 27.63871192924931, False)
+SketchConstraintRadius_1 = Sketch_1.setRadius(SketchArc_1.results()[1], "R")
+model.do()
+Edge_1 = model.addEdge(Part_1_doc, [model.selection("EDGE", "Sketch_1/Edge-SketchArc_1_2")])
 model.do()
 
-# check the name of the Symmetry
-SymmetryName = Symmetry_1.result().name()
-assert(SymmetryName == Cylinder_1.result().name()), "Symmetry name '{}' != '{}'".format(SymmetryName, Cylinder_1.result().name())
-
-# recover original cylinder
-Recover_1 = model.addRecover(Part_1_doc, Symmetry_1, [Cylinder_1.result()])
-model.do()
-
-# check the name of the recovered result is not the cylinder name
-assert(Recover_1.result().name() != SymmetryName), "Recovered feature SHOULD NOT have the same name as original feature '{}'".format(SymmetryName)
+radius = model.measureRadius(Part_1_doc, model.selection("EDGE", "Edge_1_1"))
+assert(math.fabs(radius - ParamR.value()) < 1.e-7)
 
 model.end()
-
-assert(model.checkPythonDump())

@@ -416,10 +416,15 @@ void FeaturesPlugin_CompositeSketch::storeGenerationHistory(ResultBodyPtr theRes
             int aNumEdges = 0;
             int aNumClosed = 0;
             GeomShapePtr aNotClosedEdge;
+            GeomEdgePtr aDegenerateEdge;
             GeomAPI_DataMapOfShapeShape alreadyIterated;
             for(; aFaceEdgeExp.more(); aFaceEdgeExp.next()) {
               std::shared_ptr<GeomAPI_Edge> anEdge(new GeomAPI_Edge(aFaceEdgeExp.current()));
-              if (anEdge->isDegenerated() || alreadyIterated.isBound(anEdge))
+              if (anEdge->isDegenerated()) {
+                aDegenerateEdge = anEdge;
+                continue;
+              }
+              if (alreadyIterated.isBound(anEdge))
                 continue;
               alreadyIterated.bind(anEdge, anEdge);
               aNumEdges++;
@@ -433,6 +438,14 @@ void FeaturesPlugin_CompositeSketch::storeGenerationHistory(ResultBodyPtr theRes
               std::ostringstream aStream;
               aStream<<"Base_Edge_"<<theTag++;
               theResultBody->generated(aNotClosedEdge, aStream.str(), theTag++);
+              if (aDegenerateEdge.get()) { // export vertex of the degenerated edge (apex) #2520
+                GeomAPI_ShapeExplorer anEdgeExp(aDegenerateEdge, GeomAPI_Shape::VERTEX);
+                if (anEdgeExp.more()) {
+                  std::ostringstream aStream;
+                  aStream << "Base_Vertex_" << theTag++;
+                  theResultBody->generated(anEdgeExp.current(), aStream.str(), theTag++);
+                }
+              }
             }
           }
         }

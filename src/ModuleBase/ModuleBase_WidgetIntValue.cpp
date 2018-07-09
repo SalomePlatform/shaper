@@ -101,7 +101,7 @@ ModuleBase_WidgetIntValue::ModuleBase_WidgetIntValue(QWidget* theParent,
   myLabel->setToolTip(aTTip);
 
   aControlLay->addRow(myLabel, mySpinBox);
-  connect(mySpinBox, SIGNAL(valueChanged(int)), this, SIGNAL(valuesModified()));
+  connect(mySpinBox, SIGNAL(textChanged(const QString&)), this, SIGNAL(valuesModified()));
 }
 
 ModuleBase_WidgetIntValue::~ModuleBase_WidgetIntValue()

@@ -24,7 +24,6 @@
 #include <QAction>
 #include <QApplication>
 #include <QClipboard>
-#include <QListWidget>
 #include <QWidget>
 
 #ifndef WIN32
@@ -33,47 +32,6 @@
 #endif
 
 const int ATTRIBUTE_SELECTION_INDEX_ROLE = Qt::UserRole + 1;
-
-/**
-* Customization of a List Widget to make it to be placed on full width of container
-*/
-class CustomListWidget : public QListWidget
-{
-public:
-  /// Constructor
-  /// \param theParent a parent widget
-  CustomListWidget(QWidget* theParent)
-    : QListWidget(theParent)
-  {
-  }
-
-  /// Redefinition of virtual method
-  virtual QSize	sizeHint() const
-  {
-    int aHeight = 2*QFontMetrics(font()).height();
-    QSize aSize = QListWidget::sizeHint();
-    return QSize(aSize.width(), aHeight);
-  }
-
-  /// Redefinition of virtual method
-  virtual QSize	minimumSizeHint() const
-  {
-    int aHeight = 4/*2*/*QFontMetrics(font()).height();
-    QSize aSize = QListWidget::minimumSizeHint();
-    return QSize(aSize.width(), aHeight);
-  }
-
-#ifndef WIN32
-// The code is necessary only for Linux because
-//it can not update viewport on widget resize
-protected:
-  void resizeEvent(QResizeEvent* theEvent)
-  {
-    QListWidget::resizeEvent(theEvent);
-    QTimer::singleShot(5, viewport(), SLOT(repaint()));
-  }
-#endif
-};
 
 //********************************************************************
 ModuleBase_ListView::ModuleBase_ListView(QWidget* theParent, const QString& theObjectName,
@@ -98,6 +56,7 @@ ModuleBase_ListView::ModuleBase_ListView(QWidget* theParent, const QString& theO
 
   myListControl->setContextMenuPolicy(Qt::ActionsContextMenu);
   connect(myListControl, SIGNAL(itemSelectionChanged()), SLOT(onListSelection()));
+  connect(myListControl, SIGNAL(activated()), this, SIGNAL(listActivated()));
 }
 
 //********************************************************************

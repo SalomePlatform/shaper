@@ -17,7 +17,7 @@ ENDIF(WIN32)
 IF(UNIX)
   IF(CMAKE_COMPILER_IS_GNUCC)
     #C++11 is not supported on some platforms, disable it
-    MESSAGE(STATUS "Setting -std=c++0x flag for the gcc...")
+    #MESSAGE(STATUS "Setting -std=c++0x flag for the gcc...")
     SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x")
 
     #Supporting test coverage checks (gcov) in the DEBUG mode
@@ -36,7 +36,7 @@ IF(UNIX)
     ENDIF(USE_TEST_COVERAGE)
 
     #SET(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -E")
-    MESSAGE(STATUS "gcc flags are: " ${CMAKE_CXX_FLAGS})
-    MESSAGE(STATUS "linker flags are: " ${CMAKE_SHARED_LINKER_FLAGS})
+    #MESSAGE(STATUS "gcc flags are: " ${CMAKE_CXX_FLAGS})
+    #MESSAGE(STATUS "linker flags are: " ${CMAKE_SHARED_LINKER_FLAGS})
   ENDIF(CMAKE_COMPILER_IS_GNUCC)
 ENDIF(UNIX)

@@ -1096,6 +1096,8 @@ void XGUI_Workshop::processUndoRedo(const ModuleBase_ActionType theActionType, i
   // unblock the viewer update functionality and make update on purpose
   myDisplayer->enableUpdateViewer(isUpdateEnabled);
   myDisplayer->updateViewer();
+  // Clear messages in status bar from previous operations if exists
+  setStatusBarMessage("");
 }
 
 //******************************************************

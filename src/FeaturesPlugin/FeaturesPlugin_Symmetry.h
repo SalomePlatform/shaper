@@ -39,7 +39,7 @@ class FeaturesPlugin_Symmetry : public ModelAPI_Feature
   /// Symmetry kind.
   inline static const std::string& ID()
   {
-    static const std::string MY_SYMMETRY_ID("MirrorCopy");
+    static const std::string MY_SYMMETRY_ID("Symmetry");
     return MY_SYMMETRY_ID;
   }
 
@@ -97,6 +97,13 @@ class FeaturesPlugin_Symmetry : public ModelAPI_Feature
   {
     static const std::string MY_PLANE_OBJECT_ID("plane_object");
     return MY_PLANE_OBJECT_ID;
+  }
+
+  /// Attribute name of keeping original shape.
+  inline static const std::string& KEEP_ORIGINAL_RESULT()
+  {
+    static const std::string MY_KEEP_ORIGINAL_RESULT_ID("keep_original");
+    return MY_KEEP_ORIGINAL_RESULT_ID;
   }
 
   /// \return the kind of a feature.

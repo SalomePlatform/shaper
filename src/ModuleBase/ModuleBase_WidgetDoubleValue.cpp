@@ -169,7 +169,7 @@ bool ModuleBase_WidgetDoubleValue::storeValueCustom()
       } else {
         ModuleBase_Tools::editParameter(myParameter, aText);
       }
-      aText = aText.split('=').at(0) + "=";
+      aText = aText.split('=').at(0); // +"=";
     } else if (myParameter.get()){
       // Nullyfy the parameter reference without deletion of the created
       myParameter = FeaturePtr();
@@ -193,18 +193,18 @@ bool ModuleBase_WidgetDoubleValue::restoreValueCustom()
   std::string aTextRepr = aRef->text();
   if (!aTextRepr.empty()) {
     QString aText = QString::fromStdString(aTextRepr);
-    if (aText.endsWith('=')) {
-      if (!myParameter.get()) {
-        QString aName = aText.left(aText.indexOf('=')).trimmed();
-        myParameter = ModuleBase_Tools::findParameter(aName);
-      }
-      /// If myParameter is empty then it was not created because of an error
-      if (!myParameter.get())
-        return false;
+    //if (aText.endsWith('=')) {
+    //  if (!myParameter.get()) {
+    //    QString aName = aText.left(aText.indexOf('=')).trimmed();
+    //    myParameter = ModuleBase_Tools::findParameter(aName);
+    //  }
+    //  /// If myParameter is empty then it was not created because of an error
+    //  if (!myParameter.get())
+    //    return false;
 
-      AttributeStringPtr aExprAttr = myParameter->string("expression");
-      aText += aExprAttr->value().c_str();
-    }
+    //  AttributeStringPtr aExprAttr = myParameter->string("expression");
+    //  aText += aExprAttr->value().c_str();
+    //}
     ModuleBase_Tools::setSpinText(mySpinBox, aText);
   } else {
     ModuleBase_Tools::setSpinValue(mySpinBox, aRef->isInitialized() ? aRef->value() : 0);

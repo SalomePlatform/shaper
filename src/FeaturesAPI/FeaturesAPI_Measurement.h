@@ -55,4 +55,12 @@ std::list<double> measureAngle(const std::shared_ptr<ModelAPI_Document>& thePart
                                const ModelHighAPI_Selection& theFrom,
                                const ModelHighAPI_Selection& theTo);
 
+/// \ingroup CPPHighAPI
+/// \brief Calculate angle by 3 points.
+FEATURESAPI_EXPORT
+double measureAngle(const std::shared_ptr<ModelAPI_Document>& thePart,
+                    const ModelHighAPI_Selection& thePoint1,
+                    const ModelHighAPI_Selection& thePoint2,
+                    const ModelHighAPI_Selection& thePoint3);
+
 #endif // FeaturesAPI_Measurement_H_

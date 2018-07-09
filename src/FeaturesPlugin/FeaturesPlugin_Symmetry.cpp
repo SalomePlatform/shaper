@@ -30,6 +30,7 @@
 #include <GeomAPI_Pln.h>
 #include <GeomAPI_Trsf.h>
 
+#include <ModelAPI_AttributeBoolean.h>
 #include <ModelAPI_AttributeSelectionList.h>
 #include <ModelAPI_AttributeString.h>
 #include <ModelAPI_ResultBody.h>
@@ -60,6 +61,9 @@ void FeaturesPlugin_Symmetry::initAttributes()
 
   data()->addAttribute(FeaturesPlugin_Symmetry::PLANE_OBJECT_ID(),
                        ModelAPI_AttributeSelection::typeId());
+
+  data()->addAttribute(FeaturesPlugin_Symmetry::KEEP_ORIGINAL_RESULT(),
+                       ModelAPI_AttributeBoolean::typeId());
 }
 
 //=================================================================================================
@@ -337,10 +341,14 @@ void FeaturesPlugin_Symmetry::buildResult(GeomAlgoAPI_Symmetry& theSymmetryAlgo,
                                           int theResultIndex)
 {
   // Compose source shape and the result of symmetry.
-  ListOfShape aShapes;
-  aShapes.push_back(theBaseShape);
-  aShapes.push_back(theSymmetryAlgo.shape());
-  std::shared_ptr<GeomAPI_Shape> aCompound = GeomAlgoAPI_CompoundBuilder::compound(aShapes);
+  GeomShapePtr aCompound;
+  if (boolean(KEEP_ORIGINAL_RESULT())->value()) {
+    ListOfShape aShapes;
+    aShapes.push_back(theBaseShape);
+    aShapes.push_back(theSymmetryAlgo.shape());
+    aCompound = GeomAlgoAPI_CompoundBuilder::compound(aShapes);
+  } else
+    aCompound = theSymmetryAlgo.shape();
 
   // Store and name the result.
   ResultBodyPtr aResultBody = document()->createBody(data(), theResultIndex);
@@ -354,12 +362,13 @@ void FeaturesPlugin_Symmetry::buildResult(ResultPartPtr theOriginal,
                                           std::shared_ptr<GeomAPI_Trsf> theTrsf,
                                           int& theResultIndex)
 {
-  std::shared_ptr<GeomAPI_Trsf> anIdentity(new GeomAPI_Trsf());
-  ResultPartPtr aCopy = document()->copyPart(theOriginal, data(), theResultIndex);
-  aCopy->setTrsf(theOriginal, anIdentity);
-  setResult(aCopy, theResultIndex);
-
-  ++theResultIndex;
+  if (boolean(KEEP_ORIGINAL_RESULT())->value()) {
+    std::shared_ptr<GeomAPI_Trsf> anIdentity(new GeomAPI_Trsf());
+    ResultPartPtr aCopy = document()->copyPart(theOriginal, data(), theResultIndex);
+    aCopy->setTrsf(theOriginal, anIdentity);
+    setResult(aCopy, theResultIndex);
+    ++theResultIndex;
+  }
 
   ResultPartPtr aResultPart = document()->copyPart(theOriginal, data(), theResultIndex);
   aResultPart->setTrsf(theOriginal, theTrsf);

@@ -292,8 +292,10 @@ void PartSet_ResultSketchPrs::fillShapes(TopoDS_Shape& theResultShape,
           anAuxiliaryResults.push_back(aResult);
       }
     }
-    else {
-    /// append not-edges shapes, e.g. center of a circle, an arc, a point feature
+    else if (PartSet_Tools::isIncludeIntoSketchResult(aFeature)) {
+      // Append not-edges shapes, e.g. center of a circle, an arc, a point feature.
+      // Issue #2535: do not show elements produced by Projection or Intersection features,
+      // which should not be included into the sketch result.
       const std::list<std::shared_ptr<ModelAPI_Result> >& aRes = aFeature->results();
       std::list<std::shared_ptr<ModelAPI_Result> >::const_iterator aResIter = aRes.cbegin();
       for (; aResIter != aRes.cend(); aResIter++) {

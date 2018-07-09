@@ -102,6 +102,12 @@ protected:
   */
   virtual void keyReleaseEvent(QKeyEvent *event);
 
+  virtual bool eventFilter(QObject* theObj, QEvent* theEvent);
+
+  /// The virtual function is reimplemented in order to avoid extra increasing of value by StepBy
+  /// method
+  virtual void timerEvent(QTimerEvent *event) {}
+
   virtual StepEnabled stepEnabled() const { return StepUpEnabled | StepDownEnabled; }
 
    /// Returns True if the given text contains variable
@@ -139,13 +145,13 @@ private slots:
 
 private:
   QString getPrefix(int& theStart, int& theEnd) const;
+  void showCompletion(bool checkPrefix);
 
   bool myIsEquation;
   bool myAcceptVariables;
 
   QStringListModel* myCompleterModel;
   QCompleter* myCompleter;
-  int myPrecision;
 
   double myMinimum;
   double myMaximum;

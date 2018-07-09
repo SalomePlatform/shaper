@@ -27,7 +27,7 @@ IF(WIN32)
   CMAKE_POLICY(SET CMP0020 OLD) # disable automatic linking to qtmain.lib
 ENDIF(WIN32)
 
-SET (SHAPER_Version 3.0.0)
+SET (SHAPER_Version 8.5.0)
 
 SET(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/CMakeCommon" ${CMAKE_MODULE_PATH})
 
@@ -36,11 +36,40 @@ INCLUDE(SalomeMacros)
 INCLUDE(FindEclipse)
 INCLUDE(Common)
 INCLUDE(FindSalomeQt5)
-INCLUDE(FindPython)
 INCLUDE(FindSalome)
 INCLUDE(FindCAS)
 INCLUDE(FindSUIT)
 INCLUDE(FindTInspector)
+
+IF(${HAVE_SALOME})
+  SET(CONFIGURATION_ROOT_DIR $ENV{CONFIGURATION_ROOT_DIR} CACHE PATH "Path to the Salome CMake configuration files")
+  IF(EXISTS ${CONFIGURATION_ROOT_DIR})
+    LIST(APPEND CMAKE_MODULE_PATH "${CONFIGURATION_ROOT_DIR}/cmake")
+    INCLUDE(SalomeMacros)
+  ELSE()
+    MESSAGE(FATAL_ERROR "We absolutely need the Salome CMake configuration files, please define CONFIGURATION_ROOT_DIR !")
+  ENDIF()
+  SET(KERNEL_ROOT_DIR $ENV{KERNEL_ROOT_DIR} CACHE PATH "Path to the Salome KERNEL")
+  IF(EXISTS ${KERNEL_ROOT_DIR})
+    LIST(APPEND CMAKE_MODULE_PATH "${KERNEL_ROOT_DIR}/salome_adm/cmake_files")
+    FIND_PACKAGE(SalomeKERNEL REQUIRED)
+    ADD_DEFINITIONS(${KERNEL_DEFINITIONS})
+    INCLUDE_DIRECTORIES(${KERNEL_INCLUDE_DIRS})
+  ELSE(EXISTS ${KERNEL_ROOT_DIR})
+    MESSAGE(FATAL_ERROR "We absolutely need a Salome KERNEL, please define KERNEL_ROOT_DIR")
+  ENDIF(EXISTS ${KERNEL_ROOT_DIR})
+  INCLUDE(SalomeSetupPlatform)   # From CONFIGURATION
+
+  FIND_PACKAGE(SalomePythonInterp REQUIRED)
+  FIND_PACKAGE(SalomePythonLibs REQUIRED)
+
+ELSE(${HAVE_SALOME})
+  INCLUDE(FindPython)
+ENDIF(${HAVE_SALOME})
+
+# Common CMake macros
+# ===================
+
 
 # Find LibXml2
 IF(DEFINED ENV{LIBXML2_ROOT_DIR})

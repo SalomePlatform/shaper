@@ -155,6 +155,7 @@ ModuleBase_WidgetMultiSelector::ModuleBase_WidgetMultiSelector(QWidget* theParen
   myListView = new ModuleBase_ListView(this, anObjName, aToolTip);
   connect(myListView->getControl(), SIGNAL(itemSelectionChanged()), SLOT(onListSelection()));
   connect(myListView, SIGNAL(deleteActionClicked()), SLOT(onDeleteItem()));
+  connect(myListView, SIGNAL(listActivated()), SLOT(onListActivated()));
 
   aMainLay->addWidget(myListView->getControl(), 2, 0, 1, -1);
   aMainLay->setRowStretch(2, 1);
@@ -1018,4 +1019,10 @@ QList<ActionInfo>
 void ModuleBase_WidgetMultiSelector::onFeatureAccepted()
 {
   defaultValues[myFeatureId + attributeID()] = myDefMode;
+}
+
+void ModuleBase_WidgetMultiSelector::onListActivated()
+{
+  //focusTo();
+  emitFocusInWidget();
 }

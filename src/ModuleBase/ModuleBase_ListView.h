@@ -25,12 +25,67 @@
 
 #include <QModelIndex>
 #include <QObject>
+#include <QListWidget>
+#include <QTimer>
 
 #include <set>
 
 class QAction;
 class QListWidget;
 class QWidget;
+
+
+/**
+* Customization of a List Widget to make it to be placed on full width of container
+*/
+class CustomListWidget : public QListWidget
+{
+  Q_OBJECT
+public:
+  /// Constructor
+  /// \param theParent a parent widget
+  CustomListWidget(QWidget* theParent)
+    : QListWidget(theParent)
+  {
+  }
+
+  /// Redefinition of virtual method
+  virtual QSize	sizeHint() const
+  {
+    int aHeight = 2 * QFontMetrics(font()).height();
+    QSize aSize = QListWidget::sizeHint();
+    return QSize(aSize.width(), aHeight);
+  }
+
+  /// Redefinition of virtual method
+  virtual QSize	minimumSizeHint() const
+  {
+    int aHeight = 4/*2*/ * QFontMetrics(font()).height();
+    QSize aSize = QListWidget::minimumSizeHint();
+    return QSize(aSize.width(), aHeight);
+  }
+
+signals:
+  void activated();
+
+protected:
+  virtual void mouseReleaseEvent(QMouseEvent* e) {
+    QListWidget::mouseReleaseEvent(e);
+    emit activated();
+  }
+
+#ifndef WIN32
+  // The code is necessary only for Linux because
+  //it can not update viewport on widget resize
+protected:
+  void resizeEvent(QResizeEvent* theEvent)
+  {
+    QListWidget::resizeEvent(theEvent);
+    QTimer::singleShot(5, viewport(), SLOT(repaint()));
+  }
+#endif
+};
+
 
 /**
 * \ingroup GUI
@@ -85,9 +140,12 @@ protected slots:
   /// Slot is called on selection of list of selected items
   void onListSelection();
 
+
 signals:
   /// Signal about delete action click
   void deleteActionClicked();
+
+  void listActivated();
 
 protected:
   QListWidget* myListControl; ///< List control

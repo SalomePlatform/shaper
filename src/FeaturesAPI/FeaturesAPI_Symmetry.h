@@ -34,7 +34,7 @@ class ModelHighAPI_Selection;
 
 /// \class FeaturesAPI_Symmetry
 /// \ingroup CPPHighAPI
-/// \brief Interface for the Mirror Copy feature.
+/// \brief Interface for Symmetry feature.
 class FeaturesAPI_Symmetry: public ModelHighAPI_Interface
 {
 public:
@@ -46,13 +46,14 @@ public:
   FEATURESAPI_EXPORT
   explicit FeaturesAPI_Symmetry(const std::shared_ptr<ModelAPI_Feature>& theFeature,
                                 const std::list<ModelHighAPI_Selection>& theMainObjects,
-                                const ModelHighAPI_Selection& theObject);
+                                const ModelHighAPI_Selection& theObject,
+                                bool theKeepOriginal = true);
 
   /// Destructor.
   FEATURESAPI_EXPORT
   virtual ~FeaturesAPI_Symmetry();
 
-  INTERFACE_5(FeaturesPlugin_Symmetry::ID(),
+  INTERFACE_6(FeaturesPlugin_Symmetry::ID(),
               creationMethod, FeaturesPlugin_Symmetry::CREATION_METHOD(),
               ModelAPI_AttributeString, /** Creation method */,
               mainObjects, FeaturesPlugin_Symmetry::OBJECTS_LIST_ID(),
@@ -62,7 +63,9 @@ public:
               axisObject, FeaturesPlugin_Symmetry::AXIS_OBJECT_ID(),
               ModelAPI_AttributeSelection, /** Axis object */,
               planeObject, FeaturesPlugin_Symmetry::PLANE_OBJECT_ID(),
-              ModelAPI_AttributeSelection, /** Plane object */)
+              ModelAPI_AttributeSelection, /** Plane object */,
+              keepOriginal, FeaturesPlugin_Symmetry::KEEP_ORIGINAL_RESULT(),
+              ModelAPI_AttributeBoolean, /** Keep original shape */)
 
   /// Set main objects.
   FEATURESAPI_EXPORT
@@ -89,10 +92,11 @@ public:
 typedef std::shared_ptr<FeaturesAPI_Symmetry> SymmetryPtr;
 
 /// \ingroup CPPHighAPI
-/// \brief Create the Mirror Copy feature.
+/// \brief Create Symmetry feature.
 FEATURESAPI_EXPORT
-SymmetryPtr addMirror(const std::shared_ptr<ModelAPI_Document>& thePart,
-                      const std::list<ModelHighAPI_Selection>& theMainObjects,
-                      const ModelHighAPI_Selection& theObject);
+SymmetryPtr addSymmetry(const std::shared_ptr<ModelAPI_Document>& thePart,
+                        const std::list<ModelHighAPI_Selection>& theMainObjects,
+                        const ModelHighAPI_Selection& theObject,
+                        bool theKeepOriginal = true);
 
 #endif // FEATURESAPI_SYMMETRY_H_
