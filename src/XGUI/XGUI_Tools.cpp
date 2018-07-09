@@ -39,6 +39,9 @@
 #include <Events_InfoMessage.h>
 
 #include <GeomAPI_Shape.h>
+#include <GeomAlgoAPI_CompoundBuilder.h>
+
+#include <TopoDS_Shape.hxx>
 
 #include <QDir>
 #include <QMessageBox>
@@ -170,6 +173,65 @@ XGUI_Workshop* workshop(ModuleBase_IWorkshop* theWorkshop)
 {
   XGUI_ModuleConnector* aConnector = dynamic_cast<XGUI_ModuleConnector*>(theWorkshop);
   return aConnector ? aConnector->workshop() : 0;
+}
+
+
+//********************************************************************
+QString generateName(const ModuleBase_ViewerPrsPtr& thePrs)
+{
+  if (!thePrs.get() || !thePrs->object().get())
+    return "Undefined";
+
+  GeomShapePtr aContext;
+  ObjectPtr anObject = thePrs->object();
+  ResultPtr aResult = std::dynamic_pointer_cast<ModelAPI_Result>(anObject);
+  if (aResult.get())
+    aContext = aResult->shape();
+  else {
+    // TODO if there is this case
+  }
+
+  QString aName = anObject->data()->name().c_str();
+  if (aContext.get()) {
+    GeomShapePtr aSubShape(new GeomAPI_Shape());
+    TopoDS_Shape aShape = ModuleBase_Tools::getSelectedShape(thePrs);
+    aSubShape->setImpl(new TopoDS_Shape(aShape));
+    if (!aSubShape->isEqual(aContext)) {
+      QString aTypeName;
+      switch (aShape.ShapeType()) {
+      case TopAbs_COMPOUND:
+        aTypeName = "compound";
+        break;
+      case TopAbs_COMPSOLID:
+        aTypeName = "compsolid";
+        break;
+      case TopAbs_SOLID:
+        aTypeName = "solid";
+        break;
+      case TopAbs_SHELL:
+        aTypeName = "shell";
+        break;
+      case TopAbs_FACE:
+        aTypeName = "face";
+        break;
+      case TopAbs_WIRE:
+        aTypeName = "wire";
+        break;
+      case TopAbs_EDGE:
+        aTypeName = "edge";
+        break;
+      case TopAbs_VERTEX:
+        aTypeName = "vertex";
+        break;
+      case TopAbs_SHAPE:
+        aTypeName = "shape";
+        break;
+      }
+      int aId = GeomAlgoAPI_CompoundBuilder::id(aContext, aSubShape);
+      aName += QString("/%1_%2").arg(aTypeName).arg(aId);
+    }
+  }
+  return aName;
 }
 
 }

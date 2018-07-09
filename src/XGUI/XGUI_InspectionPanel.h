@@ -23,6 +23,8 @@
 
 #include "XGUI.h"
 
+#include <TopoDS_Shape.hxx>
+
 #include <QDockWidget>
 
 class XGUI_SelectionMgr;
@@ -57,6 +59,10 @@ public:
 
   virtual ~XGUI_InspectionPanel();
 
+private slots:
+  void onSelectionChanged();
+
+private:
   void setSubShapeValue(SudShape theId, int theVal);
 
   void setName(const QString& theName);
@@ -78,10 +84,36 @@ public:
   void setPlaneType(double theX, double theY, double theZ,
     double theDX, double theDY, double theDZ);
 
-  void setVertexType(double theX, double theY, double theZ);
+  void setVertexType(const gp_XYZ& theLoc);
 
-private slots:
-  void onSelectionChanged();
+  void setCircleType(const gp_XYZ& theLoc, const gp_XYZ& theDir, double theRadius);
+
+  void setArcType(const gp_XYZ& theLoc, const gp_XYZ& theDir, double theRadius,
+    const gp_XYZ& theP1, const gp_XYZ& theP2);
+
+  void setEllipseType(const gp_XYZ& theLoc, const gp_XYZ& theDir,
+    double theMajorRad, double theMinorRad);
+
+  void setEllipseArcType(const gp_XYZ& theLoc, const gp_XYZ& theDir,
+    double theMajorRad, double theMinorRad, const gp_XYZ& theP1, const gp_XYZ& theP2);
+
+  void setLineType(const gp_XYZ& theP1, const gp_XYZ& theP2);
+
+  void setShapeContent(const TopoDS_Shape& theShape);
+
+  void setShapeParams(const TopoDS_Shape& theShape);
+
+  void clearContent();
+
+  void fillVertex(const TopoDS_Shape& theShape);
+
+  void fillEdge(const TopoDS_Shape& theShape);
+
+  void fillFace(const TopoDS_Shape& theShape);
+
+  void fillSolid(const TopoDS_Shape& theShape);
+
+  void fillContainer(const TopoDS_Shape& theShape);
 
 private:
   XGUI_SelectionMgr* mySelectionMgr;

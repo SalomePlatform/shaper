@@ -26,6 +26,7 @@
 #include <QRect>
 
 #include <ModelAPI_Feature.h>
+#include <ModuleBase_ViewerPrs.h>
 
 #include <ModuleBase_Definitions.h>
 
@@ -116,6 +117,11 @@ bool canRename(const ObjectPtr& theObject, const QString& theName);
 */
 XGUI_EXPORT XGUI_Workshop* workshop(ModuleBase_IWorkshop* theWorkshop);
 
+
+/// Generates a presentation name in form: <object_name>/<face>_<face_index>
+/// \param thePrs a presentation
+/// \return string value
+XGUI_EXPORT QString generateName(const std::shared_ptr<ModuleBase_ViewerPrs>& thePrs);
 };
 
 #endif

@@ -229,7 +229,7 @@ void ModuleBase_WidgetShapeSelector::updateSelectionName()
       AttributeRefAttrPtr aRefAttr = aData->refattr(attributeID());
       if (aRefAttr && aRefAttr->attr().get() != NULL) {
         //myIsObject = aRefAttr->isObject();
-        std::string anAttrName = generateName(aRefAttr->attr(), myWorkshop);
+        std::string anAttrName = ModuleBase_Tools::generateName(aRefAttr->attr(), myWorkshop);
         myTextLine->setText(QString::fromStdString(anAttrName));
       }
       else {

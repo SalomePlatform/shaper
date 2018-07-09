@@ -1270,6 +1270,31 @@ FeaturePtr findParameter(const QString& theName)
 }
 
 
+//********************************************************************
+std::string generateName(const AttributePtr& theAttribute,
+  ModuleBase_IWorkshop* theWorkshop)
+{
+  std::string aName;
+  if (theAttribute.get() != NULL) {
+    ModuleBase_Operation* anOperation = theWorkshop->currentOperation();
+
+    FeaturePtr aFeature = ModelAPI_Feature::feature(theAttribute->owner());
+    if (aFeature.get()) {
+      std::string aXmlCfg, aDescription;
+      theWorkshop->module()->getXMLRepresentation(aFeature->getKind(), aXmlCfg, aDescription);
+
+      ModuleBase_WidgetFactory aFactory(aXmlCfg, theWorkshop);
+      std::string anAttributeTitle;
+      aFactory.getAttributeTitle(theAttribute->id(), anAttributeTitle);
+
+      std::stringstream aStreamName;
+      aStreamName << theAttribute->owner()->data()->name() << "/" << anAttributeTitle.c_str();
+      aName = aStreamName.str();
+    }
+  }
+  return aName;
+}
+
 } // namespace ModuleBase_Tools
 
 

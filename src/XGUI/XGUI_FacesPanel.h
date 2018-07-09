@@ -171,11 +171,6 @@ private:
   static void updateProcessedObjects(QMap<int, std::shared_ptr<ModuleBase_ViewerPrs> > theItems,
                                      std::set<std::shared_ptr<ModelAPI_Object> >& theObjects);
 
-  /// Generates a presentation name in form: <object_name>/<face>_<face_index>
-  /// \param thePrs a presentation
-  /// \return string value
-  static QString generateName(const std::shared_ptr<ModuleBase_ViewerPrs>& thePrs);
-
 protected slots:
   /// Deletes element in list of items
   void onDeleteItem();

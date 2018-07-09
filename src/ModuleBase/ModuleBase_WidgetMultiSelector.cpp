@@ -697,7 +697,7 @@ void ModuleBase_WidgetMultiSelector::updateSelectionList()
       AttributePtr anAttribute = aRefAttrListAttr->attribute(i);
       QString aName;
       if (anAttribute.get()) {
-        std::string anAttrName = generateName(anAttribute, myWorkshop);
+        std::string anAttrName = ModuleBase_Tools::generateName(anAttribute, myWorkshop);
         aName = QString::fromStdString(anAttrName);
       }
       else {

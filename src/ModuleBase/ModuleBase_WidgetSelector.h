@@ -126,14 +126,6 @@ protected:
                                 ObjectPtr& theObject,
                                 GeomShapePtr& theShape);
 
-  //----------- Class members -------------
-  /// Returns a name in the next form: attribute_feature_name/attribute_id
-  /// \param theAttribute a model attribute
-  /// \param theWorkshop a workshop class instance
-  /// \return string value
-  static std::string generateName(const AttributePtr& theAttribute,
-                                  ModuleBase_IWorkshop* theWorkshop);
-
 protected:
   bool myIsPointsFiltering;
 };

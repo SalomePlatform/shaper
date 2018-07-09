@@ -232,7 +232,7 @@ void XGUI_FacesPanel::processSelection()
       aPrs->interactive());
     if (aResultPrs.IsNull())
       continue;
-    QString aItemName = generateName(aPrs);
+    QString aItemName = XGUI_Tools::generateName(aPrs);
     if (myListView->hasItem(aItemName))
       return;
 
@@ -423,31 +423,6 @@ void XGUI_FacesPanel::closeEvent(QCloseEvent* theEvent)
 {
   QDockWidget::closeEvent(theEvent);
   emit closed();
-}
-
-//********************************************************************
-QString XGUI_FacesPanel::generateName(const ModuleBase_ViewerPrsPtr& thePrs)
-{
-  if (!thePrs.get() || !thePrs->object().get())
-    return "Undefined";
-
-  GeomShapePtr aContext;
-  ObjectPtr anObject = thePrs->object();
-  ResultPtr aResult = std::dynamic_pointer_cast<ModelAPI_Result>(anObject);
-  if (aResult.get())
-    aContext = aResult->shape();
-  else {
-    // TODO if there is this case
-  }
-
-  QString aName = anObject->data()->name().c_str();
-  if (aContext.get()) {
-    GeomShapePtr aSubShape(new GeomAPI_Shape());
-    aSubShape->setImpl(new TopoDS_Shape(ModuleBase_Tools::getSelectedShape(thePrs)));
-    if (!aSubShape->isEqual(aContext))
-      aName += QString("_%1").arg(GeomAlgoAPI_CompoundBuilder::id(aContext, aSubShape));
-  }
-  return aName;
 }
 
 //********************************************************************

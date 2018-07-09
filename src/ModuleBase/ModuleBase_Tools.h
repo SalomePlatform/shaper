@@ -380,6 +380,16 @@ bool MODULEBASE_EXPORT isNameExist(const QString& theName, FeaturePtr theIgnoreP
 /// Find parameter by its name
 /// \theName a name of parameter
 FeaturePtr MODULEBASE_EXPORT findParameter(const QString& theName);
+
+
+//----------- Class members -------------
+/// Returns a name in the next form: attribute_feature_name/attribute_id
+/// \param theAttribute a model attribute
+/// \param theWorkshop a workshop class instance
+/// \return string value
+std::string MODULEBASE_EXPORT generateName(const AttributePtr& theAttribute,
+  ModuleBase_IWorkshop* theWorkshop);
+
 }
 
 #endif
