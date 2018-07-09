@@ -26,6 +26,7 @@
 #include <QModelIndex>
 #include <QObject>
 #include <QListWidget>
+#include <QTimer>
 
 #include <set>
 
