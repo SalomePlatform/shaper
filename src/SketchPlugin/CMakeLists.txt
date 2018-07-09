@@ -235,7 +235,7 @@ ADD_UNIT_TESTS(TestSketchPointLine.py
                TestIntersectionWithLine.py
                TestIntersectionWithCircle.py
                TestIntersectionWithSpline.py
-               TestIntersectionChangeType.py
+               TestIntersectionChangeEdge.py
                Test2273.py
                Test2280.py
                Test2287.py
