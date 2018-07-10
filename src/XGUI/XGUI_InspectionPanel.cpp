@@ -174,7 +174,8 @@ void XGUI_InspectionPanel::onSelectionChanged()
 {
   clearContent();
   XGUI_Selection* aSelection = mySelectionMgr->selection();
-  QList<ModuleBase_ViewerPrsPtr> aSelectedList = aSelection->getSelected(ModuleBase_ISelection::Viewer);
+  QList<ModuleBase_ViewerPrsPtr> aSelectedList =
+    aSelection->getSelected(ModuleBase_ISelection::Viewer);
   if (aSelectedList.count() > 0) {
     ModuleBase_ViewerPrsPtr aPrs = aSelectedList.first();
     setName(XGUI_Tools::generateName(aPrs));

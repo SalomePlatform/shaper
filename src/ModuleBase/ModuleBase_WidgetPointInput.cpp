@@ -34,7 +34,8 @@
 #include <QFormLayout>
 #include <QLabel>
 
-ModuleBase_WidgetPointInput::ModuleBase_WidgetPointInput(QWidget* theParent, ModuleBase_IWorkshop* theWorkshop,
+ModuleBase_WidgetPointInput::ModuleBase_WidgetPointInput(QWidget* theParent,
+  ModuleBase_IWorkshop* theWorkshop,
   const Config_WidgetAPI* theData)
   : ModuleBase_WidgetSelector(theParent, theWorkshop, theData)
 {

@@ -71,9 +71,11 @@ ModuleBase_ResultPrs::ModuleBase_ResultPrs(ResultPtr theResult)
   TopoDS_Shape aShape = aShapePtr->impl<TopoDS_Shape>();
   Set(aShape);
 
-  // Set own free boundaries aspect in order to have free an unfree boundaries with different colors
+  // Set own free boundaries aspect in order to have free
+  // and unfree boundaries with different colors
   Handle(Prs3d_Drawer) aDrawer = Attributes();
-  Handle(Prs3d_LineAspect) aFreeBndAspect = new Prs3d_LineAspect(Quantity_NOC_GREEN, Aspect_TOL_SOLID, 1);
+  Handle(Prs3d_LineAspect) aFreeBndAspect =
+    new Prs3d_LineAspect(Quantity_NOC_GREEN, Aspect_TOL_SOLID, 1);
   aDrawer->SetFreeBoundaryAspect(aFreeBndAspect);
 
   if (aDrawer->HasOwnPointAspect())
