@@ -24,6 +24,7 @@
 #include "XGUI.h"
 
 #include <TopoDS_Shape.hxx>
+#include <TopoDS_Solid.hxx>
 
 #include <QDockWidget>
 
@@ -67,11 +68,17 @@ private:
 
   void setName(const QString& theName);
 
-  // Set of type parameters
-  void setCylinderType(double theX, double theY, double theZ,
-    double theDX, double theDY, double theDZ, double theRadius, double theHeight);
+  // Set type parameters
+  void setCylinderType(const gp_XYZ& theLoc, const gp_XYZ& theDir,
+    double theRadius, double theHeight);
 
-  void setSphereType(double theX, double theY, double theZ, double theRadius);
+  void setConeType(const gp_XYZ& theLoc, const gp_XYZ& theDir,
+    double theRad1, double theRad2, double theHeight);
+
+  void setTorusType(const gp_XYZ& theLoc, const gp_XYZ& theDir,
+    double theRad1, double theRad2);
+
+  void setSphereType(const gp_XYZ& theLoc, double theRadius);
 
   void setBoxType(double theX, double theY, double theZ,
     double theXsize, double theYsize, double theZsize);
@@ -81,8 +88,7 @@ private:
     double theXaxisX, double theXaxisY, double theXaxisZ,
     double theXsize, double theYsize, double theZsize);
 
-  void setPlaneType(double theX, double theY, double theZ,
-    double theDX, double theDY, double theDZ);
+  void setPlaneType(const gp_XYZ& theLoc, const gp_XYZ& theDir);
 
   void setVertexType(const gp_XYZ& theLoc);
 
@@ -114,6 +120,8 @@ private:
   void fillSolid(const TopoDS_Shape& theShape);
 
   void fillContainer(const TopoDS_Shape& theShape);
+
+  bool processSphere(const TopoDS_Solid& theSolid);
 
 private:
   XGUI_SelectionMgr* mySelectionMgr;
