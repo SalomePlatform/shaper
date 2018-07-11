@@ -49,6 +49,13 @@ class GeomData_Point : public GeomDataAPI_Point
   GEOMDATA_EXPORT virtual double y() const;
   /// Returns the Z double value
   GEOMDATA_EXPORT virtual double z() const;
+  /// Defines the X coordinate value
+  GEOMDATA_EXPORT void setX(const double theX);
+  /// Defines the Y coordinate value
+  GEOMDATA_EXPORT void setY(const double theY);
+  /// Defines the Z coordinate value
+  GEOMDATA_EXPORT void setZ(const double theZ);
+
   /// Returns the 3D point
   GEOMDATA_EXPORT virtual std::shared_ptr<GeomAPI_Pnt> pnt();
 
@@ -60,6 +67,12 @@ class GeomData_Point : public GeomDataAPI_Point
   GEOMDATA_EXPORT virtual void setText(const std::string& theX,
                                        const std::string& theY,
                                        const std::string& theZ);
+  /// Defines the X text value
+  GEOMDATA_EXPORT virtual void setTextX(const std::string& theX);
+  /// Defines the Y text value
+  GEOMDATA_EXPORT virtual void setTextY(const std::string& theY);
+  /// Defines the Z text value
+  GEOMDATA_EXPORT virtual void setTextZ(const std::string& theZ);
 
   /// Returns the X text value
   GEOMDATA_EXPORT virtual std::string textX();

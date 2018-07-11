@@ -21,6 +21,7 @@
 #include "ModelHighAPI_Double.h"
 
 #include <ModelAPI_AttributeDouble.h>
+#include <GeomDataAPI_Point.h>
 //--------------------------------------------------------------------------------------
 
 //--------------------------------------------------------------------------------------
@@ -53,5 +54,25 @@ void ModelHighAPI_Double::fillAttribute(
   switch(myVariantType) {
     case VT_DOUBLE: theAttribute->setValue(myDouble); return;
     case VT_STRING: theAttribute->setText(myString); return;
+  }
+}
+
+void ModelHighAPI_Double::fillAttribute(
+  const std::shared_ptr<GeomDataAPI_Point> & thePoint,
+  const ModelHighAPI_Double & theX,
+  const ModelHighAPI_Double & theY,
+  const ModelHighAPI_Double & theZ) const
+{
+  switch (theX.myVariantType) {
+  case VT_DOUBLE: thePoint->setX(theX.myDouble); break;
+  case VT_STRING: thePoint->setTextX(theX.myString);
+  }
+  switch (theY.myVariantType) {
+  case VT_DOUBLE: thePoint->setY(theY.myDouble); break;
+  case VT_STRING: thePoint->setTextY(theY.myString);
+  }
+  switch (theZ.myVariantType) {
+  case VT_DOUBLE: thePoint->setZ(theZ.myDouble); break;
+  case VT_STRING: thePoint->setTextZ(theZ.myString);
   }
 }

@@ -148,6 +148,12 @@ void fillAttribute(const std::list<ModelHighAPI_Integer> & theValue,
                    const std::shared_ptr<ModelAPI_AttributeIntArray> & theAttribute);
 
 MODELHIGHAPI_EXPORT
+void fillAttribute(const ModelHighAPI_Double & theX,
+                   const ModelHighAPI_Double & theY,
+                   const ModelHighAPI_Double & theZ,
+                   const std::shared_ptr<GeomDataAPI_Point> & theAttribute);
+
+MODELHIGHAPI_EXPORT
 GeomAPI_Shape::ShapeType shapeTypeByStr(std::string theShapeTypeStr);
 
 MODELHIGHAPI_EXPORT

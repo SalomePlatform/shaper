@@ -80,6 +80,38 @@ double GeomData_Point::z() const
   return myExpression[2]->value();
 }
 
+void GeomData_Point::setX(const double theX)
+{
+  if (!myIsInitialized) {
+    setCalculatedValue(theX, 0, 0);
+  } else if (x() != theX) {
+    myExpression[0]->setValue(theX);
+    owner()->data()->sendAttributeUpdated(this);
+  }
+}
+
+void GeomData_Point::setY(const double theY)
+{
+  if (!myIsInitialized) {
+    setCalculatedValue(0, theY, 0);
+  } else if (y() != theY) {
+    myExpression[1]->setValue(theY);
+    owner()->data()->sendAttributeUpdated(this);
+  }
+}
+
+void GeomData_Point::setZ(const double theZ)
+{
+  if (!myIsInitialized) {
+    setCalculatedValue(0, 0, theZ);
+  }
+  else if (z() != theZ) {
+    myExpression[2]->setValue(theZ);
+    owner()->data()->sendAttributeUpdated(this);
+  }
+}
+
+
 std::shared_ptr<GeomAPI_Pnt> GeomData_Point::pnt()
 {
   std::shared_ptr<GeomAPI_Pnt> aResult(new GeomAPI_Pnt(x(), y(), z()));
@@ -93,6 +125,48 @@ void GeomData_Point::setText(const std::string& theX,
   if (!myIsInitialized || textX() != theX || textY() != theY || textZ() != theZ) {
     myExpression[0]->setText(theX);
     myExpression[1]->setText(theY);
+    myExpression[2]->setText(theZ);
+    // Send it to evaluator to convert into the double and store in the attribute
+    ModelAPI_AttributeEvalMessage::send(owner()->data()->attribute(id()), this);
+    owner()->data()->sendAttributeUpdated(this);
+  }
+}
+
+void GeomData_Point::setTextX(const std::string& theX)
+{
+  if (!myIsInitialized) {
+    static const std::string aDefaultText = "0";
+    setText(theX, aDefaultText, aDefaultText);
+  }
+  else if (textX() != theX) {
+    myExpression[0]->setText(theX);
+    // Send it to evaluator to convert into the double and store in the attribute
+    ModelAPI_AttributeEvalMessage::send(owner()->data()->attribute(id()), this);
+    owner()->data()->sendAttributeUpdated(this);
+  }
+}
+
+void GeomData_Point::setTextY(const std::string& theY)
+{
+  if (!myIsInitialized) {
+    static const std::string aDefaultText = "0";
+    setText(aDefaultText, theY, aDefaultText);
+  }
+  else if (textY() != theY) {
+    myExpression[1]->setText(theY);
+    // Send it to evaluator to convert into the double and store in the attribute
+    ModelAPI_AttributeEvalMessage::send(owner()->data()->attribute(id()), this);
+    owner()->data()->sendAttributeUpdated(this);
+  }
+}
+
+void GeomData_Point::setTextZ(const std::string& theZ)
+{
+  if (!myIsInitialized) {
+    static const std::string aDefaultText = "0";
+    setText(aDefaultText, aDefaultText, theZ);
+  }
+  else if (textZ() != theZ) {
     myExpression[2]->setText(theZ);
     // Send it to evaluator to convert into the double and store in the attribute
     ModelAPI_AttributeEvalMessage::send(owner()->data()->attribute(id()), this);

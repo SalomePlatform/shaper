@@ -89,7 +89,7 @@ public:
     return MY_CREATION_METHOD_ID;
   }
 
-  inline static const std::string& point3d()
+  inline static const std::string& POINT3D()
   {
     static const std::string POINT_ATTR("point3d");
     return POINT_ATTR;

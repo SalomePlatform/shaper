@@ -28,6 +28,7 @@
 #include <string>
 //--------------------------------------------------------------------------------------
 class ModelAPI_AttributeDouble;
+class GeomDataAPI_Point;
 //--------------------------------------------------------------------------------------
 /**\class ModelHighAPI_Double
  * \ingroup CPPHighAPI
@@ -52,6 +53,13 @@ public:
   /// Fill attribute values
   MODELHIGHAPI_EXPORT
   virtual void fillAttribute(const std::shared_ptr<ModelAPI_AttributeDouble> & theAttribute) const;
+
+  /// Sets the zero-based coordinates of a point
+  MODELHIGHAPI_EXPORT virtual void fillAttribute(
+    const std::shared_ptr<GeomDataAPI_Point> & thePoint,
+    const ModelHighAPI_Double & theX,
+    const ModelHighAPI_Double & theY,
+    const ModelHighAPI_Double & theZ) const;
 
 private:
   enum VariantType { VT_DOUBLE, VT_STRING } myVariantType;

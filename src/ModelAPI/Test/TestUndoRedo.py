@@ -19,6 +19,8 @@
 ##
 
 from ModelAPI import *
+from GeomDataAPI import *
+
 aSession = ModelAPI_Session.get()
 aDoc = aSession.moduleDocument()
 assert(not aSession.canUndo())
@@ -26,12 +28,7 @@ assert(not aSession.canRedo())
 
 aSession.startOperation()
 aFeature = aDoc.addFeature("Point")
-# Since validators are introduced we have to initialize all
-# the feature's attributes
-# aFeature.string("creation_method").setValue("by_xyz")
-aFeature.real("x").setValue(1.)
-aFeature.real("y").setValue(-1.)
-aFeature.real("z").setValue(0.)
+geomDataAPI_Point(aFeature.attribute("point3d")).setValue(1., -1., 0.)
 aFeature.string("creation_method").setValue("by_xyz")
 aFeatureName = aFeature.name()
 # "2" is because Origin is the first point

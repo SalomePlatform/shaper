@@ -239,6 +239,15 @@ void fillAttribute(const std::list<ModelHighAPI_Integer> & theValue,
     theAttribute->setValue(anIndex, it->intValue()); // use only values, no text support in array
 }
 
+void fillAttribute(const ModelHighAPI_Double & theX,
+                   const ModelHighAPI_Double & theY,
+                   const ModelHighAPI_Double & theZ,
+                   const std::shared_ptr<GeomDataAPI_Point> & theAttribute)
+{
+  theX.fillAttribute(theAttribute, theX, theY, theZ);
+}
+
+
 //==================================================================================================
 GeomAPI_Shape::ShapeType shapeTypeByStr(std::string theShapeTypeStr)
 {

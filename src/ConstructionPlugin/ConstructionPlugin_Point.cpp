@@ -52,7 +52,7 @@ const std::string& ConstructionPlugin_Point::getKind()
 //==================================================================================================
 void ConstructionPlugin_Point::initAttributes()
 {
-  data()->addAttribute(point3d(), GeomDataAPI_Point::typeId());
+  data()->addAttribute(POINT3D(), GeomDataAPI_Point::typeId());
 
   data()->addAttribute(CREATION_METHOD(), ModelAPI_AttributeString::typeId());
 
@@ -162,7 +162,7 @@ bool ConstructionPlugin_Point::customisePresentation(ResultPtr theResult,
 std::shared_ptr<GeomAPI_Vertex> ConstructionPlugin_Point::createByXYZ()
 {
   AttributePointPtr aPoint =
-    std::dynamic_pointer_cast<GeomDataAPI_Point>(data()->attribute(point3d()));
+    std::dynamic_pointer_cast<GeomDataAPI_Point>(data()->attribute(POINT3D()));
   return GeomAlgoAPI_PointBuilder::vertex(aPoint->x(), aPoint->y(), aPoint->z());
 }
 

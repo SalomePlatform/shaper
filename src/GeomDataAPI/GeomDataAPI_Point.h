@@ -55,10 +55,24 @@ class GeomDataAPI_Point : public ModelAPI_Attribute
   GEOMDATAAPI_EXPORT virtual
     void setCalculatedValue(const double theX, const double theY, const double theZ) = 0;
 
+  /// Defines the X coordinate value
+  GEOMDATAAPI_EXPORT virtual void setX(const double theX) = 0;
+  /// Defines the Y coordinate value
+  GEOMDATAAPI_EXPORT virtual void setY(const double theY) = 0;
+  /// Defines the Z coordinate value
+  GEOMDATAAPI_EXPORT virtual void setZ(const double theZ) = 0;
+
   /// Defines the text values
   GEOMDATAAPI_EXPORT virtual void setText(const std::string& theX,
                                           const std::string& theY,
                                           const std::string& theZ) = 0;
+
+  /// Defines the X text value
+  GEOMDATAAPI_EXPORT virtual void setTextX(const std::string& theX) = 0;
+  /// Defines the Y text value
+  GEOMDATAAPI_EXPORT virtual void setTextY(const std::string& theY) = 0;
+  /// Defines the Z text value
+  GEOMDATAAPI_EXPORT virtual void setTextZ(const std::string& theZ) = 0;
 
   /// Returns the text value for X
   GEOMDATAAPI_EXPORT virtual std::string textX() = 0;

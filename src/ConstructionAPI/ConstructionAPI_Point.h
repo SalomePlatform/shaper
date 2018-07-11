@@ -81,7 +81,7 @@ public:
   virtual ~ConstructionAPI_Point();
 
   INTERFACE_25(ConstructionPlugin_Point::ID(),
-    point, ConstructionPlugin_Point::point3d(),
+    point, ConstructionPlugin_Point::POINT3D(),
     GeomDataAPI_Point, /** Point attribute */,
     creationMethod, ConstructionPlugin_Point::CREATION_METHOD(),
     ModelAPI_AttributeString, /** Creation method */,
