@@ -49,7 +49,7 @@ ModuleBase_ParamSpinBox::ModuleBase_ParamSpinBox(QWidget* theParent, int thePrec
   myIsEquation(false),
   myAcceptVariables(true),
   mySingleStep(1),
-  myMinimum(DBL_MIN),
+  myMinimum(-DBL_MAX),
   myMaximum(DBL_MAX)
 {
   myCompleter = new QCompleter(this);

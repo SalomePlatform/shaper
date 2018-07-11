@@ -72,6 +72,8 @@ protected:
   ModuleBase_ParamSpinBox* myXSpin;
   ModuleBase_ParamSpinBox* myYSpin;
   ModuleBase_ParamSpinBox* myZSpin;
+
+  double myDefaultValue[3];
 };
 
 

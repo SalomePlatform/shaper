@@ -39,15 +39,27 @@ ModuleBase_WidgetPointInput::ModuleBase_WidgetPointInput(QWidget* theParent,
   const Config_WidgetAPI* theData)
   : ModuleBase_WidgetSelector(theParent, theWorkshop, theData)
 {
+  myDefaultValue[0] = 0;
+  myDefaultValue[1] = 0;
+  myDefaultValue[2] = 0;
   bool aAcceptVariables = theData->getBooleanAttribute(DOUBLE_WDG_ACCEPT_EXPRESSIONS, true);
 
+  std::string aDefValuesStr = theData->getProperty(ATTR_DEFAULT);
+  if (!aDefValuesStr.empty()) {
+    QString aDefVal(aDefValuesStr.c_str());
+    QStringList aStrArray = aDefVal.split(';', QString::SkipEmptyParts);
+    if (aStrArray.length() == 3) {
+      for (int i = 0; i < 3; i++)
+        myDefaultValue[i] = aStrArray.at(i).toDouble();
+    }
+  }
   QFormLayout* aMainlayout = new QFormLayout(this);
   ModuleBase_Tools::adjustMargins(aMainlayout);
 
   myXSpin = new ModuleBase_ParamSpinBox(this);
   myXSpin->setAcceptVariables(aAcceptVariables);
   myXSpin->setToolTip("X coordinate");
-  myXSpin->setValue(0);
+  myXSpin->setValue(myDefaultValue[0]);
   QLabel* aXLbl = new QLabel(this);
   aXLbl->setPixmap(QPixmap(":pictures/x_size.png"));
   aMainlayout->addRow(aXLbl, myXSpin);
@@ -55,7 +67,7 @@ ModuleBase_WidgetPointInput::ModuleBase_WidgetPointInput(QWidget* theParent,
   myYSpin = new ModuleBase_ParamSpinBox(this);
   myYSpin->setAcceptVariables(aAcceptVariables);
   myYSpin->setToolTip("Y coordinate");
-  myYSpin->setValue(0);
+  myYSpin->setValue(myDefaultValue[1]);
   QLabel* aYLbl = new QLabel(this);
   aYLbl->setPixmap(QPixmap(":pictures/y_size.png"));
   aMainlayout->addRow(aYLbl, myYSpin);
@@ -63,10 +75,14 @@ ModuleBase_WidgetPointInput::ModuleBase_WidgetPointInput(QWidget* theParent,
   myZSpin = new ModuleBase_ParamSpinBox(this);
   myZSpin->setAcceptVariables(aAcceptVariables);
   myZSpin->setToolTip("Z coordinate");
-  myZSpin->setValue(0);
+  myZSpin->setValue(myDefaultValue[2]);
   QLabel* aZLbl = new QLabel(this);
   aZLbl->setPixmap(QPixmap(":pictures/z_size.png"));
   aMainlayout->addRow(aZLbl, myZSpin);
+
+  connect(myXSpin, SIGNAL(textChanged(const QString&)), this, SIGNAL(valuesModified()));
+  connect(myYSpin, SIGNAL(textChanged(const QString&)), this, SIGNAL(valuesModified()));
+  connect(myZSpin, SIGNAL(textChanged(const QString&)), this, SIGNAL(valuesModified()));
 }
 
 ModuleBase_WidgetPointInput::~ModuleBase_WidgetPointInput()
@@ -90,12 +106,17 @@ bool ModuleBase_WidgetPointInput::storeValueCustom()
 {
   AttributePointPtr aAttr = std::dynamic_pointer_cast<GeomDataAPI_Point>(attribute());
   if (aAttr.get()) {
-    if (myXSpin->hasVariable() || myYSpin->hasVariable() || myZSpin->hasVariable()) {
-      aAttr->setText(myXSpin->text().toStdString(),
-        myYSpin->text().toStdString(), myZSpin->text().toStdString());
+    if (aAttr->isInitialized()) {
+      if (myXSpin->hasVariable() || myYSpin->hasVariable() || myZSpin->hasVariable()) {
+        aAttr->setText(myXSpin->text().toStdString(),
+          myYSpin->text().toStdString(), myZSpin->text().toStdString());
+      } else {
+        aAttr->setValue(myXSpin->value(), myYSpin->value(), myZSpin->value());
+      }
     } else {
-      aAttr->setValue(myXSpin->value(), myYSpin->value(), myZSpin->value());
+      aAttr->setValue(myDefaultValue[0], myDefaultValue[1], myDefaultValue[2]);
     }
+    updateObject(myFeature);
     return true;
   }
   return false;
@@ -105,7 +126,7 @@ bool ModuleBase_WidgetPointInput::storeValueCustom()
 bool ModuleBase_WidgetPointInput::restoreValueCustom()
 {
   AttributePointPtr aAttr = std::dynamic_pointer_cast<GeomDataAPI_Point>(attribute());
-  if (aAttr.get()) {
+  if (aAttr.get() && aAttr->isInitialized()) {
     std::string aXText = aAttr->textX();
     if (aXText.empty()) {
       myXSpin->setValue(aAttr->x());
