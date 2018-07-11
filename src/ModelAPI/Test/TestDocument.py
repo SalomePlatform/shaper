@@ -27,6 +27,7 @@
 # Initialization of the test
 #=========================================================================
 from ModelAPI import *
+from GeomDataAPI import *
 
 __updated__ = "2014-12-26"
 
@@ -71,9 +72,7 @@ aSession.startOperation()
 aFeature = aPart.addFeature("Point")
 aFeatureData = aFeature.data()
 assert(aFeatureData is not None)
-aFeatureData.real("x").setValue(15.)
-aFeatureData.real("y").setValue(10.)
-aFeatureData.real("z").setValue(20.)
+geomDataAPI_Point(aFeatureData.attribute("point3d")).setValue(15., 10., 20.)
 aSession.finishOperation()
 assert(aPart.size("Features") == 1)
 # Duplicate the document

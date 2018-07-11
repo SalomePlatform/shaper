@@ -118,7 +118,7 @@ void Model_ExpressionDouble::setValue(const double theValue)
 
 double Model_ExpressionDouble::value()
 {
-  if (myIsInitialized)
+  if (myIsInitialized && !myReal.IsNull())
     return myReal->Get();
   return std::numeric_limits<double>::max(); // error
 }
@@ -166,7 +166,7 @@ void Model_ExpressionInteger::setValue(const int theValue)
 
 int Model_ExpressionInteger::value()
 {
-  if (myIsInitialized)
+  if (myIsInitialized && !myInteger.IsNull())
     return myInteger->Get();
   return std::numeric_limits<int>::max(); // error
 }

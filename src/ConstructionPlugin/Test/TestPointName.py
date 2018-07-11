@@ -19,6 +19,7 @@
 ##
 
 from ModelAPI import *
+from GeomDataAPI import *
 
 aSession = ModelAPI_Session.get()
 aDoc = aSession.moduleDocument()
@@ -27,10 +28,7 @@ aSession.startOperation()
 aFeature = aDoc.addFeature("Point")
 aFeatureData = aFeature.data()
 assert(aFeatureData is not None)
-# aFeatureData.string("creation_method").setValue("by_xyz")
-aFeatureData.real("x").setValue(0.)
-aFeatureData.real("y").setValue(0.)
-aFeatureData.real("z").setValue(0.)
+geomDataAPI_Point(aFeatureData.attribute("point3d")).setValue(0., 0., 0.)
 aFeatureData.string("creation_method").setValue("by_xyz")
 aFeatureName = aFeature.name()
 aFeature.execute()

@@ -24,6 +24,7 @@
 """
 
 from ModelAPI import *
+from GeomDataAPI import *
 
 __updated__ = "2017-11-30"
 
@@ -51,9 +52,7 @@ aSession.finishOperation()
 aSession.startOperation()
 aPoint = aPart.addFeature("Point")
 aPoint.string("creation_method").setValue("by_xyz")
-aPoint.real("x").setValue(20)
-aPoint.real("y").setValue(5)
-aPoint.real("z").setValue(0)
+geomDataAPI_Point(aFeature.attribute("point3d")).setValue(20, 5, 0)
 aSession.finishOperation()
 
 aSession.startOperation()

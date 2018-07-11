@@ -22,6 +22,7 @@
 # Initialization of the test
 #=========================================================================
 from ModelAPI import *
+from GeomDataAPI import *
 
 __updated__ = "2017-11-22"
 
@@ -35,9 +36,7 @@ aSession.startOperation()
 aPoint0 = aPartSetDoc.addFeature("Point")
 aPoint0Data = aPoint0.data()
 assert(aPoint0Data is not None)
-aPoint0Data.real("x").setValue(0.)
-aPoint0Data.real("y").setValue(0.)
-aPoint0Data.real("z").setValue(0.)
+geomDataAPI_Point(aPoint0Data.attribute("point3d")).setValue(0., 0., 0.)
 aPoint0Data.string("creation_method").setValue("by_xyz")
 aSession.finishOperation()
 
@@ -45,9 +44,7 @@ aSession.startOperation()
 aPoint1 = aPartSetDoc.addFeature("Point")
 aPoint1Data = aPoint1.data()
 assert(aPoint1Data is not None)
-aPoint1Data.real("x").setValue(0.)
-aPoint1Data.real("y").setValue(0.)
-aPoint1Data.real("z").setValue(0.)
+geomDataAPI_Point(aPoint1Data.attribute("point3d")).setValue(0., 0., 0.)
 aPoint1Data.string("creation_method").setValue("by_xyz")
 aSession.finishOperation()
 
@@ -87,9 +84,7 @@ aSession.startOperation()
 aPoint2 = aPartDoc.addFeature("Point")
 aPoint2Data = aPoint2.data()
 assert(aPoint2Data is not None)
-aPoint2Data.real("x").setValue(0.)
-aPoint2Data.real("y").setValue(0.)
-aPoint2Data.real("z").setValue(0.)
+geomDataAPI_Point(aPoint2Data.attribute("point3d")).setValue(0., 0., 0.)
 aPoint2Data.string("creation_method").setValue("by_xyz")
 aSession.finishOperation()
 

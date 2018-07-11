@@ -22,6 +22,7 @@
 # Test checks stability of the foldering mechanism due to incorrect input parameters
 #=========================================================================
 from ModelAPI import *
+from GeomDataAPI import *
 
 __updated__ = "2017-11-23"
 
@@ -33,9 +34,7 @@ def newPoint(theDocument, theX, theY, theZ):
     aPoint = theDocument.addFeature("Point")
     aPointData = aPoint.data()
     assert(aPointData is not None)
-    aPointData.real("x").setValue(theX)
-    aPointData.real("y").setValue(theY)
-    aPointData.real("z").setValue(theZ)
+    geomDataAPI_Point(aPointData.attribute("point3d")).setValue(theX, theY, theZ)
     aPointData.string("creation_method").setValue("by_xyz")
     aSession.finishOperation()
     return aPoint
