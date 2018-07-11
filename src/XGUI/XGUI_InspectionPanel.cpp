@@ -178,9 +178,10 @@ void XGUI_InspectionPanel::onSelectionChanged()
     aSelection->getSelected(ModuleBase_ISelection::Viewer);
   if (aSelectedList.count() > 0) {
     ModuleBase_ViewerPrsPtr aPrs = aSelectedList.first();
-    setName(XGUI_Tools::generateName(aPrs));
-
     TopoDS_Shape aShape = ModuleBase_Tools::getSelectedShape(aPrs);
+    if (aShape.IsNull())
+      return;
+    setName(XGUI_Tools::generateName(aPrs));
     setShapeContent(aShape);
     setShapeParams(aShape);
   }
