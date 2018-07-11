@@ -71,6 +71,7 @@
 #include <ModelAPI_AttributeSelectionList.h>
 #include <ModelAPI_Tools.h>
 #include <ModelAPI_ResultConstruction.h>
+#include <ModelAPI_AttributeIntArray.h>
 
 #include <GeomDataAPI_Point2D.h>
 #include <GeomDataAPI_Point.h>
@@ -1218,6 +1219,11 @@ bool PartSet_Module::afterCustomisePresentation(std::shared_ptr<ModelAPI_Result>
   // customize sketch dimension constraint presentation
   if (!aCustomized) {
     if (!aColor.empty()) { // otherwise presentation has the default color
+      AttributeIntArrayPtr aColorAttr = theResult->data()->intArray(ModelAPI_Result::COLOR_ID());
+      aColorAttr->setSize(3);
+      // Set the color attribute in order do not use default colors in the perasentation object
+      for (int i = 0; i < 3; i++)
+        aColorAttr->setValue(i, aColor[i]);
       aCustomized = thePrs->setColor(aColor[0], aColor[1], aColor[2]);
     }
   }
