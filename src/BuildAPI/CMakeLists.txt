@@ -32,6 +32,7 @@ SET(PROJECT_HEADERS
   BuildAPI_SubShapes.h
   BuildAPI_Vertex.h
   BuildAPI_Wire.h
+  BuildAPI_Polyline.h
 )
 
 SET(PROJECT_SOURCES
@@ -45,6 +46,7 @@ SET(PROJECT_SOURCES
   BuildAPI_SubShapes.cpp
   BuildAPI_Vertex.cpp
   BuildAPI_Wire.cpp
+  BuildAPI_Polyline.cpp
 )
 
 SET(PROJECT_LIBRARIES

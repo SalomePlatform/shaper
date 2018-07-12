@@ -33,5 +33,6 @@
   #include "BuildAPI_SubShapes.h"
   #include "BuildAPI_Vertex.h"
   #include "BuildAPI_Wire.h"
+  #include "BuildAPI_Polyline.h"
 
 #endif // FeaturesAPI_swig_H_

@@ -35,6 +35,7 @@ SET(PROJECT_HEADERS
     BuildPlugin_Vertex.h
     BuildPlugin_Edge.h
     BuildPlugin_Wire.h
+	BuildPlugin_Polyline.h
     BuildPlugin_Face.h
     BuildPlugin_Shell.h
     BuildPlugin_Solid.h
@@ -50,6 +51,7 @@ SET(PROJECT_SOURCES
     BuildPlugin_Vertex.cpp
     BuildPlugin_Edge.cpp
     BuildPlugin_Wire.cpp
+	BuildPlugin_Polyline.cpp
     BuildPlugin_Face.cpp
     BuildPlugin_Shell.cpp
     BuildPlugin_Solid.cpp
@@ -65,6 +67,7 @@ SET(XML_RESOURCES
     vertex_widget.xml
     edge_widget.xml
     wire_widget.xml
+	polyline_widget.xml
     face_widget.xml
     shell_widget.xml
     solid_widget.xml
@@ -101,6 +104,7 @@ INSTALL(DIRECTORY icons/ DESTINATION ${SHAPER_INSTALL_XML_RESOURCES}/icons/Build
 ADD_UNIT_TESTS(TestVertex.py
                TestEdge.py
                TestWire.py
+               TestPolyline.py
                TestFace.py
                TestShell.py
                TestSolid.py

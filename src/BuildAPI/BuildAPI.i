@@ -49,6 +49,7 @@
 %shared_ptr(BuildAPI_SubShapes)
 %shared_ptr(BuildAPI_Vertex)
 %shared_ptr(BuildAPI_Wire)
+%shared_ptr(BuildAPI_Polyline)
 
 // all supported interfaces
 %include "BuildAPI_Compound.h"
@@ -61,3 +62,4 @@
 %include "BuildAPI_SubShapes.h"
 %include "BuildAPI_Vertex.h"
 %include "BuildAPI_Wire.h"
+%include "BuildAPI_Polyline.h"

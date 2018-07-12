@@ -21,9 +21,11 @@ email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com
 
 <source>
   <multi_selector id="base_objects"
-                  label="Vertices:"
-                  tooltip="Select vertices on sketch or vertex objects."
+                  label="Points and vertices:"
+                  tooltip="Select points or vertices objects."
                   type_choice="vertices"
                   concealment="true">
   </multi_selector>
+  <boolvalue id="closed" label="Closed" tooltip="Makes the polyline closed." default="false"/>
+  <validator id="GeomValidators_MinObjectsSelected" parameters="base_objects,2"/>
 </source>

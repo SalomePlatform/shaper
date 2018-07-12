@@ -26,6 +26,7 @@
 #include <BuildPlugin_Vertex.h>
 #include <BuildPlugin_Edge.h>
 #include <BuildPlugin_Wire.h>
+#include <BuildPlugin_Polyline.h>
 #include <BuildPlugin_Face.h>
 #include <BuildPlugin_Shell.h>
 #include <BuildPlugin_Solid.h>
@@ -70,7 +71,11 @@ FeaturePtr BuildPlugin_Plugin::createFeature(std::string theFeatureID)
     return FeaturePtr(new BuildPlugin_Edge());
   } else if(theFeatureID == BuildPlugin_Wire::ID()) {
     return FeaturePtr(new BuildPlugin_Wire());
-  } else if(theFeatureID == BuildPlugin_Face::ID()) {
+  } else if (theFeatureID == BuildPlugin_Wire::ID()) {
+	return FeaturePtr(new BuildPlugin_Wire());
+  } else if (theFeatureID == BuildPlugin_Polyline::ID()) {
+	return FeaturePtr(new BuildPlugin_Polyline());
+  } else if (theFeatureID == BuildPlugin_Face::ID()) {
     return FeaturePtr(new BuildPlugin_Face());
   } else if(theFeatureID == BuildPlugin_Shell::ID()) {
     return FeaturePtr(new BuildPlugin_Shell());
