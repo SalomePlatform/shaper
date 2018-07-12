@@ -30,6 +30,7 @@
 #include <ModelAPI_Document.h>
 #include <ModelAPI_AttributeSelection.h>
 #include <ModelAPI_AttributeBoolean.h>
+#include <ModelAPI_AttributeIntArray.h>
 #include <GeomAPI_ICustomPrs.h>
 
 #include <Config_PropManager.h>
@@ -151,6 +152,13 @@ class SketchPlugin_SketchEntity : public SketchPlugin_Feature, public GeomAPI_IC
       aColor = Config_PropManager::color("Visualization", "sketch_entity_color");
     }
     if (!aColor.empty()) {
+      if (theResult.get()) {
+        AttributeIntArrayPtr aColorAttr = theResult->data()->intArray(ModelAPI_Result::COLOR_ID());
+        aColorAttr->setSize(3);
+        // Set the color attribute in order do not use default colors in the perasentation object
+        for (int i = 0; i < 3; i++)
+          aColorAttr->setValue(i, aColor[i]);
+      }
       thePrs->setColor(aColor[0], aColor[1], aColor[2]);
       for (int i = 0; i < 3 && !isCustomized; i++)
         isCustomized = aColor[i] != aPrevColor[i];
