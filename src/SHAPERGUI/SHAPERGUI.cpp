@@ -471,6 +471,7 @@ QAction* SHAPERGUI::addFeature(const QString& theWBName, const ActionInfo& theIn
                                const bool isAddSeparator)
 {
   return addFeature(theWBName,
+                    theInfo.toolBar,
                     theInfo.id,
                     theInfo.text,
                     //Issue #650: in the SALOME mode the tooltip should be same as text
@@ -483,8 +484,8 @@ QAction* SHAPERGUI::addFeature(const QString& theWBName, const ActionInfo& theIn
 }
 
 //******************************************************
-QAction* SHAPERGUI::addFeature(const QString& theWBName, const QString& theId,
-                               const QString& theTitle, const QString& theTip,
+QAction* SHAPERGUI::addFeature(const QString& theWBName, const QString& theTBName,
+                               const QString& theId, const QString& theTitle, const QString& theTip,
                                const QIcon& theIcon, const QKeySequence& theKeys,
                                bool isCheckable, const bool isAddSeparator,
                                const QString& theStatusTip)
@@ -519,7 +520,7 @@ QAction* SHAPERGUI::addFeature(const QString& theWBName, const QString& theId,
   if (isAddSeparator)
     createMenu(separator(), aWBMenu);
 
-  int aWBTool = createTool(theWBName, theWBName);
+  int aWBTool = createTool(theTBName, theTBName);
   int aToolId = createTool(aId, aWBTool);
   if (isAddSeparator)
     createTool(separator(), aWBTool);

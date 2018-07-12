@@ -66,8 +66,9 @@ Q_OBJECT
 
   //--- XGUI connector interface -----
 
-  virtual QAction* addFeature(const QString& theWBName, const QString& theId,
-                              const QString& theTitle, const QString& theTip, const QIcon& theIcon,
+  virtual QAction* addFeature(const QString& theWBName, const QString& theTBName,
+                              const QString& theId, const QString& theTitle,
+                              const QString& theTip, const QIcon& theIcon,
                               const QKeySequence& theKeys/* = QKeySequence()*/,
                               bool isCheckable /*= false*/, const bool isAddSeparator/* = false*/,
                               const QString& theStatusTip);

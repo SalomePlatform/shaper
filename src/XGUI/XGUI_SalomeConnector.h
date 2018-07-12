@@ -47,6 +47,7 @@ class XGUI_EXPORT XGUI_SalomeConnector
 
   //! Creates a feature (command) in SALOME desktop
   //! \param theWBName - a workbench name
+  //! \param theTBName - a toolbar name
   //! \param theId - an id of the feature
   //! \param theTitle - a menu item string
   //! \param theTip - a tooltip string (help)
@@ -55,7 +56,8 @@ class XGUI_EXPORT XGUI_SalomeConnector
   //! \param theKeys - hot keys
   //! \param isAddSeparator boolean flag about adding separator after the action
   //! returns created action
-  virtual QAction* addFeature(const QString& theWBName, const QString& theId,
+  virtual QAction* addFeature(const QString& theWBName, const QString& theTBName,
+                              const QString& theId,
                               const QString& theTitle, const QString& theTip,
                               const QIcon& theIcon,
                               const QKeySequence& theKeys, bool isCheckable,
