@@ -73,6 +73,7 @@ void Config_FeatureReader::processNode(xmlNodePtr theNode)
     //The m_last* variables always defined before fillFeature() call. XML is a tree.
   } else if (isNode(theNode, NODE_WORKBENCH, NODE_GROUP, NULL)) {
     storeAttribute(theNode, _ID);
+    storeAttribute(theNode, GROUP_TOOLBAR);
     storeAttribute(theNode, WORKBENCH_DOC, true);
   } else if (myIsProcessWidgets) {
     // widgets, like shape_selector or containers, like toolbox
@@ -180,11 +181,19 @@ void Config_FeatureReader::fillFeature(xmlNodePtr theFeatureNode,
   outFeatureMessage->setText(aText);
   std::string aToolTip = Config_Translator::translate(anId,
                                                       getProperty(theFeatureNode, FEATURE_TOOLTIP));
-  outFeatureMessage->setTooltip(aToolTip);
   outFeatureMessage->setIcon(getProperty(theFeatureNode, FEATURE_ICON));
   outFeatureMessage->setKeysequence(getProperty(theFeatureNode, FEATURE_KEYSEQUENCE));
-  outFeatureMessage->setGroupId(restoreAttribute(NODE_GROUP, _ID));
-  outFeatureMessage->setWorkbenchId(restoreAttribute(NODE_WORKBENCH, _ID));
+
+  std::string aGroupName = restoreAttribute(NODE_GROUP, _ID);
+  std::string aWBNName = restoreAttribute(NODE_WORKBENCH, _ID);
+  std::string isGroupToolbarId = restoreAttribute(NODE_GROUP, GROUP_TOOLBAR);
+  bool isGroupToolbar = false;
+  if (isGroupToolbarId.length() > 0)
+    isGroupToolbar = (isGroupToolbarId == "yes");
+  outFeatureMessage->setGroupId(aGroupName);
+  outFeatureMessage->setWorkbenchId(aWBNName);
+  outFeatureMessage->setToolBarId(isGroupToolbar ? aGroupName : aWBNName);
+
   // Get document kind of a feature, if empty set workbench's kind (might be empty too)
   std::string aDocKind = getProperty(theFeatureNode, FEATURE_DOC);
   if(aDocKind.empty()) {

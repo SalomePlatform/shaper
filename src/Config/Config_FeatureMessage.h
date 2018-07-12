@@ -45,6 +45,7 @@ class Config_FeatureMessage : public Events_Message
 
   std::string myGroupId;  ///<Id of feature's group
   std::string myWorkbenchId;  ///<Id of feature's workbench
+  std::string myToolBarId;  ///<Id of toolbar/ By default == myWorkbenchId
   std::string myDocumentKind;  ///< kind of the document of the workbench (all documents if empty)
   std::string myPluginLibrary;  ///<Name of feature's library
 
@@ -91,6 +92,8 @@ class Config_FeatureMessage : public Events_Message
   CONFIG_EXPORT const std::string& tooltip() const;
   /// Id of Feature's Group
   CONFIG_EXPORT const std::string& groupId() const;
+  /// Id of Feature's Toolbar
+  CONFIG_EXPORT const std::string& toolBarId() const;
   /// Id of Feature's Workbench
   CONFIG_EXPORT const std::string& workbenchId() const;
   /// Kind of a document which contains the feature
@@ -127,6 +130,8 @@ class Config_FeatureMessage : public Events_Message
   CONFIG_EXPORT void setTooltip(const std::string& tooltip);
   ///Set id of Feature's Group
   CONFIG_EXPORT void setGroupId(const std::string& groupId);
+  ///Set id of Feature's Group
+  CONFIG_EXPORT void setToolBarId(const std::string& aId);
   ///Set id of Feature's Workbench
   CONFIG_EXPORT void setWorkbenchId(const std::string& workbenchId);
   ///Set kind of a document which contains the feature

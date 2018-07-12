@@ -31,6 +31,7 @@ Config_FeatureMessage::Config_FeatureMessage(const Events_ID theId, const void* 
 
   myGroupId = "";
   myWorkbenchId = "";
+  myToolBarId = "";
   myPluginLibrary = "";
 
   myInternal = false;
@@ -98,6 +99,16 @@ const std::string& Config_FeatureMessage::groupId() const
 void Config_FeatureMessage::setGroupId(const std::string& groupId)
 {
   myGroupId = groupId;
+}
+
+const std::string& Config_FeatureMessage::toolBarId() const
+{
+  return myToolBarId;
+}
+
+void Config_FeatureMessage::setToolBarId(const std::string& aId)
+{
+  myToolBarId = aId;
 }
 
 const std::string& Config_FeatureMessage::workbenchId() const

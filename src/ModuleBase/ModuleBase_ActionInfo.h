@@ -49,6 +49,7 @@ struct MODULEBASE_EXPORT ModuleBase_ActionInfo
   QString iconText; //!< action's descriptive icon text
   QString iconFile; //!< path to icon's file. Can not be initialized from QAction
   QString toolTip; //!< action's tooltip
+  QString toolBar;  //!< A name of toolbar. By default = group of features name
   // QString statusTip;
   // QString whatsThis;
   QKeySequence shortcut; //!< action's primary shortcut key

@@ -53,7 +53,7 @@ email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com
         <source path="pipe_widget.xml"/>
       </feature>
     </group>
-    <group id="Boolean">
+    <group id="Boolean" toolbar="yes">
       <feature id="Cut" title="Cut" tooltip="Perform boolean cut operation with objects" icon="icons/Features/bool_cut.png"
                auto_preview="false">
           <source path="boolean_widget.xml"/>

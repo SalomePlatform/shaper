@@ -71,6 +71,7 @@ const static char* WORKBENCH_DOC = "document";
 const static char* SOURCE_FILE = "path";
 // NODE_FEATURE properties
 const static char* FEATURE_TOOLTIP = "tooltip";
+const static char* GROUP_TOOLBAR = "toolbar";
 const static char* FEATURE_ICON = "icon";
 const static char* FEATURE_TEXT = "title";
 const static char* FEATURE_KEYSEQUENCE = "keysequence";
