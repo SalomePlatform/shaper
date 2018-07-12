@@ -253,7 +253,12 @@ void ModuleBase_ResultPrs::Compute(
   }
   // change deviation coefficient to provide more precise circle
   //ModuleBase_Tools::setDefaultDeviationCoefficient(myResult, Attributes());
-  AIS_Shape::Compute(thePresentationManager, thePresentation, theMode);
+  try {
+    AIS_Shape::Compute(thePresentationManager, thePresentation, theMode);
+  }
+  catch (...) {
+    return;
+  }
 
   // visualize hidden sub-shapes transparent
   if (myTransparency < 1 && !myHiddenSubShapes.IsEmpty())
