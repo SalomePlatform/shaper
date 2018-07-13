@@ -58,6 +58,7 @@ class PartSet_MenuMgr;
 class PartSet_CustomPrs;
 class PartSet_SketcherMgr;
 class PartSet_SketcherReentrantMgr;
+class PartSet_DataModel;
 class ModelAPI_Result;
 
 class QAction;
@@ -393,6 +394,9 @@ public:
   /// \param theMessage a message of reentrant operation
   virtual void setReentrantPreSelection(const std::shared_ptr<Events_Message>& theMessage);
 
+  /// Returns root tree node which represents a data model
+  virtual ModuleBase_ITreeNode* rootNode() const;
+
   /// Returns the workshop
   XGUI_Workshop* getWorkshop() const;
 
@@ -490,6 +494,8 @@ private:
   /// redisplay and restore it after
   PartSet_SketcherMgr::FeatureToSelectionMap myCurrentSelection;
   QModelIndex myActivePartIndex;
+
+  PartSet_DataModel* myDataModel;
 };
 
 #endif

@@ -38,6 +38,7 @@
 #include "PartSet_CustomPrs.h"
 #include "PartSet_IconFactory.h"
 #include "PartSet_OverconstraintListener.h"
+#include "PartSet_DataModel.h"
 
 #include "PartSet_Filters.h"
 #include "PartSet_FilterInfinite.h"
@@ -156,6 +157,8 @@ PartSet_Module::PartSet_Module(ModuleBase_IWorkshop* theWshop)
 
   mySketchMgr = new PartSet_SketcherMgr(this);
   mySketchReentrantMgr = new PartSet_SketcherReentrantMgr(theWshop);
+
+  myDataModel = new PartSet_DataModel();
 
   XGUI_ModuleConnector* aConnector = dynamic_cast<XGUI_ModuleConnector*>(theWshop);
   XGUI_Workshop* aWorkshop = aConnector->workshop();
@@ -1219,11 +1222,6 @@ bool PartSet_Module::afterCustomisePresentation(std::shared_ptr<ModelAPI_Result>
   // customize sketch dimension constraint presentation
   if (!aCustomized) {
     if (!aColor.empty()) { // otherwise presentation has the default color
-      AttributeIntArrayPtr aColorAttr = theResult->data()->intArray(ModelAPI_Result::COLOR_ID());
-      aColorAttr->setSize(3);
-      // Set the color attribute in order do not use default colors in the perasentation object
-      for (int i = 0; i < 3; i++)
-        aColorAttr->setValue(i, aColor[i]);
       aCustomized = thePrs->setColor(aColor[0], aColor[1], aColor[2]);
     }
   }
@@ -1636,10 +1634,15 @@ XGUI_Workshop* PartSet_Module::getWorkshop() const
   return aConnector->workshop();
 }
 
-//******************************************************
 void PartSet_Module::setDefaultConstraintShown()
 {
   myHasConstraintShown[PartSet_Tools::Geometrical] = true;
   myHasConstraintShown[PartSet_Tools::Dimensional] = true;
   myHasConstraintShown[PartSet_Tools::Expressions] = false;
+}
+
+//******************************************************
+ModuleBase_ITreeNode* PartSet_Module::rootNode() const
+{
+  return myDataModel->root();
 }

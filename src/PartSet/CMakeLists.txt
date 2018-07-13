@@ -58,6 +58,8 @@ SET(PROJECT_HEADERS
     PartSet_WidgetSketchLabel.h
     PartSet_CenterPrs.h
     PartSet_ExternalPointsMgr.h
+	PartSet_DataModel.h
+	PartSet_TreeNodes.h
 )
 
 SET(PROJECT_MOC_HEADERS
@@ -106,6 +108,8 @@ SET(PROJECT_SOURCES
     PartSet_WidgetSketchLabel.cpp
     PartSet_CenterPrs.cpp
     PartSet_ExternalPointsMgr.cpp
+	PartSet_DataModel.cpp
+	PartSet_TreeNodes.cpp
 )
 
 SET(PROJECT_RESOURCES

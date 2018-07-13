@@ -103,6 +103,7 @@ SET(PROJECT_HEADERS
   ModuleBase_WidgetNameEdit.h
   ModuleBase_WidgetRadiobox.h
   ModuleBase_WidgetPointInput.h
+  ModuleBase_ITreeNode.h
 )
 
 SET(PROJECT_MOC_HEADERS

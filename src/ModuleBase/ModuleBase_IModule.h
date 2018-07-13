@@ -48,11 +48,13 @@ class QMouseEvent;
 class QKeyEvent;
 class QMenu;
 class Config_WidgetAPI;
+
 class ModuleBase_ModelWidget;
 class ModuleBase_Operation;
 class ModuleBase_ViewerPrs;
-
+class ModuleBase_ITreeNode;
 class ModuleBase_IWorkshop;
+
 class ModelAPI_Result;
 class Events_Message;
 
@@ -376,6 +378,9 @@ class MODULEBASE_EXPORT ModuleBase_IModule : public QObject
   /// \param theDescription feature description
   void getXMLRepresentation(const std::string& theFeatureId, std::string& theXmlCfg,
                             std::string& theDescription);
+
+  /// Returns root tree node which represents a data model
+  virtual ModuleBase_ITreeNode* rootNode() const = 0;
 
 signals:
   /// Segnal emitted when an operation is resumed
