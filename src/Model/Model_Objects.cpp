@@ -1732,14 +1732,25 @@ FolderPtr Model_Objects::findContainingFolder(const FeaturePtr& theFeature, int&
 
   for (int aRefIndex = aRefs->Lower(); aRefIndex <= aRefs->Upper(); ++aRefIndex) {
     TDF_Label aCurLabel = aRefs->Value(aRefIndex);
-    if (isSkippedFeature(feature(aCurLabel)))
-      continue;
 
     if (aFoundFolder)
       ++theIndexInFolder;
 
-    if (aCurLabel == aLabelToFind) // the feature is reached
+    if (aCurLabel == aLabelToFind) { // the feature is reached
+      if (aFoundFolder) {
+        if (isSkippedFeature(theFeature)) {
+          theIndexInFolder = -1;
+          return false;
+        }
+        // decrease the index of the feature in the folder by the number of skipped features
+        for (int anIndex = theIndexInFolder - 1; anIndex > 0; anIndex--) {
+          aCurLabel = aRefs->Value(aRefIndex - anIndex);
+          if (isSkippedFeature(feature(aCurLabel)))
+            theIndexInFolder--;
+        }
+      }
       return aFoundFolder;
+    }
 
     if (!aFoundFolder) {
       // if the current label refers to a folder, feel all necessary data
