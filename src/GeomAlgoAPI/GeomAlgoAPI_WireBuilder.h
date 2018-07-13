@@ -36,12 +36,12 @@ class GeomAlgoAPI_WireBuilder
    /// The edges are not to be consecutive.
    /// But they are to be all connected geometrically or topologically.
    /// \return wire created from theShapes. Empty in case of error or bad input.
-   GEOMALGOAPI_EXPORT static std::shared_ptr<GeomAPI_Shape> wire(const ListOfShape& theShapes);
+   GEOMALGOAPI_EXPORT static GeomShapePtr wire(const ListOfShape& theShapes);
 
    /// \brief Checks if the wire is self-intersected.
    /// \param[in] theWire the wire to be checked
    /// \return true if the wire is self-intersected, otherwise - false.
-   GEOMALGOAPI_EXPORT static bool isSelfIntersected(const std::shared_ptr<GeomAPI_Shape>& theWire);
+   GEOMALGOAPI_EXPORT static bool isSelfIntersected(const GeomShapePtr& theWire);
 };
 
 #endif

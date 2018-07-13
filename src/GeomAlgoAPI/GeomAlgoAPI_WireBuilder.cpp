@@ -31,11 +31,12 @@
 #include <TopExp_Explorer.hxx>
 
 //=================================================================================================
-std::shared_ptr<GeomAPI_Shape> GeomAlgoAPI_WireBuilder::wire(const ListOfShape& theShapes)
+GeomShapePtr GeomAlgoAPI_WireBuilder::wire(const ListOfShape& theShapes)
 {
   TopTools_ListOfShape aListOfEdges;
 
-  for(ListOfShape::const_iterator anIt = theShapes.cbegin(); anIt != theShapes.cend(); ++anIt) {
+  ListOfShape::const_iterator anIt = theShapes.cbegin();
+  for(; anIt != theShapes.cend(); ++anIt) {
     const TopoDS_Shape& aShape = (*anIt)->impl<TopoDS_Shape>();
     switch(aShape.ShapeType()) {
       case TopAbs_EDGE: {
@@ -66,25 +67,26 @@ std::shared_ptr<GeomAPI_Shape> GeomAlgoAPI_WireBuilder::wire(const ListOfShape& 
 }
 
 //=================================================================================================
-bool GeomAlgoAPI_WireBuilder::isSelfIntersected(const std::shared_ptr<GeomAPI_Shape>& theWire)
+bool GeomAlgoAPI_WireBuilder::isSelfIntersected(const GeomShapePtr& theWire)
 {
   // Collect edges.
   ListOfShape anEdges;
 
-  for (GeomAPI_ShapeExplorer anExp(theWire, GeomAPI_Shape::EDGE); anExp.more(); anExp.next()) {
+  GeomAPI_ShapeExplorer anExp(theWire, GeomAPI_Shape::EDGE);
+  for (; anExp.more(); anExp.next()) {
     GeomShapePtr anEdge = anExp.current();
     anEdges.push_back(anEdge);
   }
 
   // Check intersections between edges pair-wise
   int aNbEdges = (int)anEdges.size();
-  std::list<std::shared_ptr<GeomAPI_Shape> >::const_iterator anEdgesIt = anEdges.begin();
+  std::list<GeomShapePtr>::const_iterator anEdgesIt = anEdges.begin();
   for (int i = 0; anEdgesIt != anEdges.end(); ++anEdgesIt, i++) {
-    std::shared_ptr<GeomAPI_Edge> anEdge1(new GeomAPI_Edge(*anEdgesIt));
+    GeomEdgePtr anEdge1(new GeomAPI_Edge(*anEdgesIt));
 
-    std::list<std::shared_ptr<GeomAPI_Shape> >::const_iterator anOtherEdgesIt = std::next(anEdgesIt);
+    std::list<GeomShapePtr>::const_iterator anOtherEdgesIt = std::next(anEdgesIt);
     for (int j = i + 1; anOtherEdgesIt != anEdges.end(); ++anOtherEdgesIt, j++) {
-      std::shared_ptr<GeomAPI_Edge> anEdge2(new GeomAPI_Edge(*anOtherEdgesIt));
+      GeomEdgePtr anEdge2(new GeomAPI_Edge(*anOtherEdgesIt));
       GeomShapePtr anInter = anEdge1->intersect(anEdge2);
       if (!anInter.get()) {
         continue;
@@ -93,8 +95,8 @@ bool GeomAlgoAPI_WireBuilder::isSelfIntersected(const std::shared_ptr<GeomAPI_Sh
       bool isOk = false;
 
       if (anInter->isVertex()) {
-        std::shared_ptr<GeomAPI_Vertex> aVertex(new GeomAPI_Vertex(anInter));
-        std::shared_ptr<GeomAPI_Pnt> aPnt = aVertex->point();
+        GeomVertexPtr aVertex(new GeomAPI_Vertex(anInter));
+        GeomPointPtr aPnt = aVertex->point();
 
         GeomPointPtr aFirstPnt1 = anEdge1->orientation() == GeomAPI_Shape::FORWARD ?
                                   anEdge1->firstPoint() : anEdge1->lastPoint();
@@ -105,7 +107,7 @@ bool GeomAlgoAPI_WireBuilder::isSelfIntersected(const std::shared_ptr<GeomAPI_Sh
         GeomPointPtr aLastPnt2 = anEdge2->orientation() == GeomAPI_Shape::FORWARD ?
                                  anEdge2->lastPoint() : anEdge2->firstPoint();
 
-        std::shared_ptr<GeomAPI_Pnt> aCommonEndPnt;
+        GeomPointPtr aCommonEndPnt;
         if (aFirstPnt1->isEqual(aLastPnt2)) {
           aCommonEndPnt = aFirstPnt1;
         } else if(aLastPnt1->isEqual(aFirstPnt2)) {
