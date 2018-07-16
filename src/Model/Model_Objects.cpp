@@ -487,7 +487,7 @@ void Model_Objects::createHistory(const std::string& theGroupID)
 
         } else {
           // it may be a folder
-          ObjectPtr aFolder = folder(aRefs->Value(a));
+          const ObjectPtr& aFolder = folder(aRefs->Value(a));
           if (aFolder.get()) {
             // store folder information for the Features group only
             if (isFeature || isFolder) {
@@ -535,11 +535,12 @@ void Model_Objects::updateHistory(const std::string theGroup)
   }
 }
 
-ObjectPtr Model_Objects::folder(TDF_Label theLabel) const
+const ObjectPtr& Model_Objects::folder(TDF_Label theLabel) const
 {
   if (myFolders.IsBound(theLabel))
     return myFolders.Find(theLabel);
-  return ObjectPtr();
+  static ObjectPtr anEmptyResult;
+  return anEmptyResult;
 }
 
 FeaturePtr Model_Objects::feature(TDF_Label theLabel) const
@@ -1483,8 +1484,9 @@ std::shared_ptr<ModelAPI_Folder> Model_Objects::findFolder(
       continue;
     }
 
-    aFoundFolder = std::dynamic_pointer_cast<ModelAPI_Folder>(folder(aCurLabel));
-    if (aFoundFolder) {
+    const ObjectPtr& aFolderObj = folder(aCurLabel);
+    if (aFolderObj.get()) {
+      aFoundFolder = std::dynamic_pointer_cast<ModelAPI_Folder>(aFolderObj);
       AttributeReferencePtr aLastFeatAttr =
           aFoundFolder->reference(ModelAPI_Folder::LAST_FEATURE_ID());
       if (aLastFeatAttr) {
@@ -1740,7 +1742,7 @@ FolderPtr Model_Objects::findContainingFolder(const FeaturePtr& theFeature, int&
       if (aFoundFolder) {
         if (isSkippedFeature(theFeature)) {
           theIndexInFolder = -1;
-          return false;
+          return FolderPtr();
         }
         // decrease the index of the feature in the folder by the number of skipped features
         for (int anIndex = theIndexInFolder - 1; anIndex > 0; anIndex--) {
@@ -1754,8 +1756,9 @@ FolderPtr Model_Objects::findContainingFolder(const FeaturePtr& theFeature, int&
 
     if (!aFoundFolder) {
       // if the current label refers to a folder, feel all necessary data
-      aFoundFolder = std::dynamic_pointer_cast<ModelAPI_Folder>(folder(aCurLabel));
-      if (aFoundFolder) {
+      const ObjectPtr& aFolderObj = folder(aCurLabel);
+      if (aFolderObj.get()) {
+        aFoundFolder = std::dynamic_pointer_cast<ModelAPI_Folder>(aFolderObj);
         theIndexInFolder = -1;
 
         AttributeReferencePtr aLastRef =

@@ -292,7 +292,7 @@ class Model_Objects
                      std::string& theParentName) const;
 
   /// Return object representing a folder or empty pointer
-  ObjectPtr folder(TDF_Label theLabel) const;
+  const ObjectPtr& folder(TDF_Label theLabel) const;
 
  private:
   TDF_Label myMain; ///< main label of the data storage
