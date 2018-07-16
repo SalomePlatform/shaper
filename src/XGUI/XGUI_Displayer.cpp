@@ -590,11 +590,12 @@ ObjectPtr XGUI_Displayer::getObject(const AISObjectPtr& theIO) const
 ObjectPtr XGUI_Displayer::getObject(const Handle(AIS_InteractiveObject)& theIO) const
 {
   ObjectPtr anObject;
-  foreach (ObjectPtr anObj, myResult2AISObjectMap.keys()) {
-    AISObjectPtr aAIS = myResult2AISObjectMap[anObj];
+  ResultToAISMap::const_iterator aMapIter = myResult2AISObjectMap.cbegin();
+  for (; aMapIter != myResult2AISObjectMap.cend(); aMapIter++) {
+    const AISObjectPtr& aAIS = aMapIter.value();
     Handle(AIS_InteractiveObject) anAIS = aAIS->impl<Handle(AIS_InteractiveObject)>();
     if (anAIS == theIO)
-      anObject = anObj;
+      anObject = aMapIter.key();
     if (anObject.get())
       break;
   }
