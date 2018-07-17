@@ -208,7 +208,7 @@ void FeaturesPlugin_Boolean::execute()
 
             aBoolAlgo.reset(new GeomAlgoAPI_Partition(aListWithObject, aToolsWithPlanes));
             aResShape = aBoolAlgo->shape();
-            if(aResShape->shapeType() == GeomAPI_Shape::COMPOUND) {
+            if (aResShape.get() && aResShape->shapeType() == GeomAPI_Shape::COMPOUND) {
               int aSubResultsNb = 0;
               GeomAPI_ShapeIterator anIt(aResShape);
               for(; anIt.more(); anIt.next()) {
