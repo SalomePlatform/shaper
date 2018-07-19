@@ -132,6 +132,22 @@ public:
   virtual ModuleBase_ITreeNode* findParent(const DocumentPtr& theDoc, QString theGroup)
   { return 0; }
 
+  /// Returns root node of a data tree of the given document
+  /// \param theDoc a document
+  /// \return a tree node which is a root of the document structure
+  virtual ModuleBase_ITreeNode* findRoot(const DocumentPtr& theDoc)
+  {
+    if (document() == theDoc)
+      return this;
+    ModuleBase_ITreeNode* aRoot;
+    foreach(ModuleBase_ITreeNode* aNode, myChildren) {
+      aRoot = aNode->findRoot(theDoc);
+      if (aRoot)
+        return aRoot;
+    }
+    return 0;
+  }
+
 protected:
   ModuleBase_ITreeNode* myParent; //!< Parent of the node
   QTreeNodesList myChildren; //!< Children of the node

@@ -117,8 +117,10 @@ void XGUI_DataModel::processEvent(const std::shared_ptr<Events_Message>& theMess
     std::set<ObjectPtr> aObjects = aUpdMsg->objects();
     QObjectPtrList aCreated;
     std::set<ObjectPtr>::const_iterator aIt;
-    for (aIt = aObjects.cbegin(); aIt != aObjects.cend(); aIt++)
-      aCreated.append(*aIt);
+    for (aIt = aObjects.cbegin(); aIt != aObjects.cend(); aIt++) {
+      if ((*aIt)->isInHistory())
+        aCreated.append(*aIt);
+    }
     QTreeNodesList aNodes = myRoot->objectCreated(aCreated);
     ModuleBase_ITreeNode* aParent;
     int aRow = 0;
@@ -149,18 +151,16 @@ void XGUI_DataModel::processEvent(const std::shared_ptr<Events_Message>& theMess
       ModuleBase_ITreeNode* aNode = myRoot->findParent(aDoc, aGroup.c_str());
       if (aNode) {
         aNode->update();
-        int aRows = aNode->childrenCount();
-        if (aRows) {
-          QModelIndex aParent = getIndex(aNode, 0);
-          QModelIndex aFirstIdx = aParent.child(0, 0);
-          QModelIndex aLastIdx = aParent.child(aRows - 1, 2);
-          dataChanged(aFirstIdx, aLastIdx);
-        }
+        updateSubTree(aNode);
       }
     }
   }
   else if (theMessage->eventID() == Events_Loop::loop()->eventByName(EVENT_DOCUMENT_CHANGED)) {
     DocumentPtr aDoc = ModelAPI_Session::get()->activeDocument();
+    ModuleBase_ITreeNode* aRoot = myRoot->findRoot(aDoc);
+    if (aRoot) {
+      updateSubTree(aRoot);
+    }
   }
   //if (myIsEventsProcessingBlocked)
   //  return;
@@ -460,11 +460,10 @@ QModelIndex XGUI_DataModel::objectIndex(const ObjectPtr theObject, int theColumn
 {
   ModuleBase_ITreeNode* aNode = myRoot->subNode(theObject);
   if (aNode) {
-    ModuleBase_ITreeNode* aParent = aNode->parent();
-    assert(aParent);
     return getIndex(aNode, theColumn);
   }
   return QModelIndex();
+
   //std::string aType = theObject->groupName();
   //DocumentPtr aDoc = theObject->document();
   //int aRow = aDoc->index(theObject, true);
@@ -1336,6 +1335,20 @@ QModelIndex XGUI_DataModel::getParentIndex(ModuleBase_ITreeNode* theNode, int th
 
 QModelIndex XGUI_DataModel::getIndex(ModuleBase_ITreeNode* theNode, int thCol) const
 {
+  if (theNode == myRoot)
+    return QModelIndex();
   int aRow = theNode->parent()->nodeRow(theNode);
-  return createIndex(aRow, 0, theNode);
+  return createIndex(aRow, thCol, theNode);
+}
+
+
+void XGUI_DataModel::updateSubTree(ModuleBase_ITreeNode* theParent)
+{
+  int aRows = theParent->childrenCount();
+  if (aRows) {
+    QModelIndex aParent = getIndex(theParent, 0);
+    QModelIndex aFirstIdx = aParent.child(0, 0);
+    QModelIndex aLastIdx = aParent.child(aRows - 1, 2);
+    dataChanged(aFirstIdx, aLastIdx);
+  }
 }

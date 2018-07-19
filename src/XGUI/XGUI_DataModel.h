@@ -172,6 +172,8 @@ private:
 
   QModelIndex getIndex(ModuleBase_ITreeNode* theNode, int thCol) const;
 
+  void updateSubTree(ModuleBase_ITreeNode* theParent);
+
   /// Find a root index which contains objects of the given document
   /// \param theDoc the document object
   //QModelIndex findDocumentRootIndex(const ModelAPI_Document* theDoc, int aColumn = 1) const;
