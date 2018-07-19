@@ -413,7 +413,6 @@ bool removeFeatures(const std::set<FeaturePtr>& theFeatures,
 // \param theReferences an out container of references
 void addRefsToFeature(const FeaturePtr& theFeature,
                       const std::map<FeaturePtr, std::set<FeaturePtr> >& theReferencesMap,
-                      std::map<FeaturePtr, std::set<FeaturePtr> >& theProcessedReferences,
                       int theRecLevel,
                       std::set<FeaturePtr>& theReferences)
 {
@@ -421,34 +420,18 @@ void addRefsToFeature(const FeaturePtr& theFeature,
     return;
   theRecLevel++;
 
-  // if the feature is already processed, get the ready references from the map
-  if (theProcessedReferences.find(theFeature) != theProcessedReferences.end()) {
-    std::set<FeaturePtr> aReferences = theProcessedReferences.at(theFeature);
-    theReferences.insert(aReferences.begin(), aReferences.end());
-    return;
-  }
-
   if (theReferencesMap.find(theFeature) == theReferencesMap.end())
     return; // this feature is not in the selection list, so exists without references to it
   std::set<FeaturePtr> aMainReferences = theReferencesMap.at(theFeature);
 
   std::set<FeaturePtr>::const_iterator anIt = aMainReferences.begin(),
                                        aLast = aMainReferences.end();
-#ifdef DEBUG_REMOVE_FEATURES_RECURSE
-  std::string aSpacing;
-  for (int i = 0; i < theRecLevel; i++)
-    aSpacing.append(" ");
-#endif
-
   for (; anIt != aLast; anIt++) {
     FeaturePtr aRefFeature = *anIt;
-#ifdef DEBUG_REMOVE_FEATURES_RECURSE
-  std::cout << aSpacing << " Ref: " << getFeatureInfo(aRefFeature) << std::endl;
-#endif
-    if (theReferences.find(aRefFeature) == theReferences.end())
+    if (theReferences.find(aRefFeature) == theReferences.end()) {
+      addRefsToFeature(aRefFeature, theReferencesMap, theRecLevel, theReferences);
       theReferences.insert(aRefFeature);
-    addRefsToFeature(aRefFeature, theReferencesMap, theProcessedReferences,
-                     theRecLevel, theReferences);
+    }
   }
 }
 
@@ -556,7 +539,7 @@ void findAllReferences(const std::set<FeaturePtr>& theFeatures,
       std::cout << " Ref: " << getFeatureInfo(aFeature) << std::endl;
 #endif
       aRecLevel++;
-      addRefsToFeature(aFeature, aMainList, theReferences,
+      addRefsToFeature(aFeature, aMainList,
                        aRecLevel, aResultRefList/*aMainRefList*/);
     }
     theReferences[aMainListFeature] = aResultRefList;

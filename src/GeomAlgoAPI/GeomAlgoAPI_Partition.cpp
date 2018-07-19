@@ -30,6 +30,7 @@
 #include <TopExp_Explorer.hxx>
 #include <TopoDS_Builder.hxx>
 #include <TopTools_MapOfShape.hxx>
+#include <BRepTools_History.hxx>
 
 
 //=================================================================================================
@@ -45,25 +46,81 @@ static bool isSubShape(const TopoDS_Shape& theShape, const TopoDS_Shape& theSubS
 }
 
 //=================================================================================================
-static void sortCompound(TopoDS_Shape& theCompound)
+void getHistorySupportedType(const TopoDS_Shape& theShape, TopTools_ListOfShape& theResult) {
+  if (BRepTools_History::IsSupportedType(theShape)) {
+    theResult.Append(theShape);
+  } else {
+    for (TopoDS_Iterator aSubIter(theShape); aSubIter.More(); aSubIter.Next()) {
+      getHistorySupportedType(aSubIter.Value(), theResult);
+    }
+  }
+}
+
+//=================================================================================================
+// Operation is used for production of ordered sorting: generated/modified from the first argument
+// must be located in hte result first, etc. THis is for the issue #2517
+static void sortCompound(TopoDS_Shape& theCompound, GEOMAlgo_Splitter* theOperation)
 {
-  ListOfShape aCombiningShapes;
-  for (TopoDS_Iterator anIt(theCompound); anIt.More(); anIt.Next()) {
-    GeomShapePtr aSub(new GeomAPI_Shape);
-    aSub->setImpl(new TopoDS_Shape(anIt.Value()));
-    aCombiningShapes.push_back(aSub);
+  TopoDS_Compound aResCompound;
+  TopoDS_Builder aBuilder;
+  aBuilder.MakeCompound(aResCompound);
+
+  TopTools_MapOfShape anAlreadyThere; // to avoid duplications if it was produced by two arguments
+
+  bool aNotProduced = true;// flag to add to result also results that were not produced by any argument
+  TopTools_ListOfShape::Iterator anArgs(theOperation->Arguments());
+  while(aNotProduced || anArgs.More()) {
+    // collect shapes that were produced from the current argument
+    TopTools_MapOfShape aProducedByArg;
+    if (anArgs.More()) {
+      TopTools_ListOfShape allArgs;
+      getHistorySupportedType(anArgs.Value(), allArgs);
+      for (TopTools_ListOfShape::Iterator argsIter(allArgs); argsIter.More(); argsIter.Next()) {
+        aProducedByArg.Add(argsIter.Value()); // if argument was not modified, it is fully in the result
+        const TopTools_ListOfShape& aModified = theOperation->Modified(argsIter.Value());
+        for (TopTools_ListOfShape::Iterator aModIter(aModified); aModIter.More(); aModIter.Next()) {
+          aProducedByArg.Add(aModIter.Value());
+        }
+        const TopTools_ListOfShape& aGenerated = theOperation->Generated(argsIter.Value());
+        for (TopTools_ListOfShape::Iterator aGenIter(aGenerated); aGenIter.More(); aGenIter.Next()) {
+          aProducedByArg.Add(aGenIter.Value());
+        }
+      }
+      anArgs.Next();
+    }
+    else {
+      aNotProduced = false;
+    }
+
+    ListOfShape aCombiningShapes;
+    for (TopoDS_Iterator anIt(theCompound); anIt.More(); anIt.Next()) {
+      bool aProducedContains = false;
+      if (aNotProduced) { // collect all supported type-shapes of result
+        TopTools_ListOfShape allRes;
+        getHistorySupportedType(anIt.Value(), allRes);
+        for (TopTools_ListOfShape::Iterator aResIter(allRes); aResIter.More(); aResIter.Next()) {
+          if (aProducedByArg.Contains(aResIter.Value())) {
+            aProducedContains = true;
+            break;
+          }
+        }
+      }
+      if ((!aNotProduced || aProducedContains) && anAlreadyThere.Add(anIt.Value())) {
+        GeomShapePtr aSub(new GeomAPI_Shape);
+        aSub->setImpl(new TopoDS_Shape(anIt.Value()));
+        aCombiningShapes.push_back(aSub);
+      }
+    }
+
+    // sort sub-shapes of compound to stabilize the sequence of the Partition's results
+    GeomAlgoAPI_SortListOfShapes::sort(aCombiningShapes);
+
+    for (ListOfShape::iterator anIt = aCombiningShapes.begin();
+      anIt != aCombiningShapes.end(); ++anIt)
+      aBuilder.Add(aResCompound, (*anIt)->impl<TopoDS_Shape>());
   }
 
-  // sort sub-shapes of compound to stabilize the sequence of the Partition's results
-  GeomAlgoAPI_SortListOfShapes::sort(aCombiningShapes);
-
-  TopoDS_Compound aTempCompound;
-  TopoDS_Builder aBuilder;
-  aBuilder.MakeCompound(aTempCompound);
-  for (ListOfShape::iterator anIt = aCombiningShapes.begin();
-       anIt != aCombiningShapes.end(); ++anIt)
-    aBuilder.Add(aTempCompound, (*anIt)->impl<TopoDS_Shape>());
-  theCompound = aTempCompound;
+  theCompound = aResCompound;
 }
 
 //=================================================================================================
@@ -201,7 +258,7 @@ void GeomAlgoAPI_Partition::build(const ListOfShape& theObjects,
 
   if(aResult.ShapeType() == TopAbs_COMPOUND) {
     // sort sub-shapes of compound before creation of a compsolid
-    sortCompound(aResult);
+    sortCompound(aResult, anOperation);
 
     std::shared_ptr<GeomAPI_Shape> aGeomShape(new GeomAPI_Shape);
     aGeomShape->setImpl(new TopoDS_Shape(aResult));
