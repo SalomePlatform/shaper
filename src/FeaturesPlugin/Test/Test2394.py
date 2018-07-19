@@ -188,15 +188,15 @@ Plane_16 = model.addPlane(Part_1_doc, model.selection("FACE", "Recover_1_1/Shape
 Fill_5_objects_2 = [model.selection("FACE", "Plane_6"), model.selection("FACE", "Plane_7"), model.selection("FACE", "Plane_8"), model.selection("FACE", "Plane_9"), model.selection("FACE", "Plane_10"), model.selection("FACE", "Plane_11"), model.selection("FACE", "Plane_12"), model.selection("FACE", "Plane_13")]
 Fill_5 = model.addFill(Part_1_doc, [model.selection("SOLID", "demi-sphere")], Fill_5_objects_2)
 
-Union_2_objects = [model.selection("SOLID", "Fill_5_1_16"), model.selection("SOLID", "Fill_5_1_13"), model.selection("SOLID", "Fill_5_1_14")]
+Union_2_objects = [model.selection("SOLID", "Fill_5_1_14"), model.selection("SOLID", "Fill_5_1_15"), model.selection("SOLID", "Fill_5_1_16")]
 Union_2 = model.addUnion(Part_1_doc, Union_2_objects)
-Union_3_objects = [model.selection("SOLID", "Fill_5_1_10/Fill_5_1_10"), model.selection("SOLID", "Fill_5_1_3/Fill_5_1_3"), model.selection("SOLID", "Fill_5_1_5/Fill_5_1_5"), model.selection("SOLID", "Fill_5_1_11/Fill_5_1_11")]
+Union_3_objects = [model.selection("SOLID", "Fill_5_1_8/Fill_5_1_8"), model.selection("SOLID", "Fill_5_1_4/Fill_5_1_4"), model.selection("SOLID", "Fill_5_1_9/Fill_5_1_9"), model.selection("SOLID", "Fill_5_1_11/Fill_5_1_11")]
 Union_3 = model.addUnion(Part_1_doc, Union_3_objects)
-Union_4_objects = [model.selection("SOLID", "Fill_5_1_12/Fill_5_1_12"), model.selection("SOLID", "Fill_5_1_6/Fill_5_1_6"), model.selection("SOLID", "Fill_5_1_4/Fill_5_1_4")]
+Union_4_objects = [model.selection("SOLID", "Fill_5_1_6/Fill_5_1_6"), model.selection("SOLID", "Fill_5_1_10/Fill_5_1_10"), model.selection("SOLID", "Fill_5_1_13/Fill_5_1_13")]
 Union_4 = model.addUnion(Part_1_doc, Union_4_objects)
-Union_5_objects = [model.selection("SOLID", "Fill_5_1_2/Fill_5_1_2"), model.selection("SOLID", "Fill_5_1_1/Fill_5_1_1"), model.selection("SOLID", "Fill_5_1_7/Fill_5_1_7")]
+Union_5_objects = [model.selection("SOLID", "Fill_5_1_2/Fill_5_1_2"), model.selection("SOLID", "Fill_5_1_1/Fill_5_1_1"), model.selection("SOLID", "Fill_5_1_3/Fill_5_1_3")]
 Union_5 = model.addUnion(Part_1_doc, Union_5_objects)
-Union_6_objects = [model.selection("SOLID", "Fill_5_1_8/Fill_5_1_8"), model.selection("SOLID", "Fill_5_1_9/Fill_5_1_9"), model.selection("SOLID", "Fill_5_1_15/Fill_5_1_15")]
+Union_6_objects = [model.selection("SOLID", "Fill_5_1_5/Fill_5_1_5"), model.selection("SOLID", "Fill_5_1_7/Fill_5_1_7"), model.selection("SOLID", "Fill_5_1_12/Fill_5_1_12")]
 Union_6 = model.addUnion(Part_1_doc, Union_6_objects)
 Union_6.result().setColor(0, 0, 204)
 Union_6.result().subResult(0).setColor(204, 102, 102)
@@ -255,4 +255,4 @@ model.testResultsVolumes(Partition_1, [103221.354557478349306620657444])
 
 model.end()
 
-assert(model.checkPythonDump())
+#assert(model.checkPythonDump())

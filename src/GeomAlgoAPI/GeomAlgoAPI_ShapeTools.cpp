@@ -426,7 +426,7 @@ std::shared_ptr<GeomAPI_Shape> GeomAlgoAPI_ShapeTools::groupSharedTopology(
   }
 
   // Iterate over the map and group shapes.
-  NCollection_Vector<TopTools_ListOfShape> aGroups; // groups of shapes connected by vertices
+  NCollection_Vector<TopTools_MapOfShape> aGroups; // groups of shapes connected by vertices
   while (!allVertices.IsEmpty()) {
     // Get first group of shapes in map, and then unbind it.
     const TopoDS_Shape& aKey = allVertices.First();
@@ -467,12 +467,12 @@ std::shared_ptr<GeomAPI_Shape> GeomAlgoAPI_ShapeTools::groupSharedTopology(
       }
     }
     // Sort shapes from the most complicated to the simplest ones
-    TopTools_ListOfShape aSortedGroup;
+    TopTools_MapOfShape aSortedGroup;
     for (int aST = TopAbs_COMPOUND; aST <= TopAbs_SHAPE; ++aST) {
       TopTools_ListOfShape::Iterator anIt(aConnectedShapes);
       while (anIt.More()) {
         if (anIt.Value().ShapeType() == aST) {
-          aSortedGroup.Append(anIt.Value());
+          aSortedGroup.Add(anIt.Value());
           aConnectedShapes.Remove(anIt);
         }
         else {
@@ -487,14 +487,21 @@ std::shared_ptr<GeomAPI_Shape> GeomAlgoAPI_ShapeTools::groupSharedTopology(
   BRep_Builder aBuilder;
   aBuilder.MakeCompound(aCompound);
   ListOfShape aCompSolids, aFreeSolids;
-  for(NCollection_Vector<NCollection_List<TopoDS_Shape>>::Iterator
-      anIt(aGroups); anIt.More(); anIt.Next()) {
-    NCollection_List<TopoDS_Shape> aGroup = anIt.Value();
+  for (NCollection_Vector<TopTools_MapOfShape>::Iterator anIt(aGroups); anIt.More(); anIt.Next()) {
+    const TopTools_MapOfShape& aGroup = anIt.ChangeValue();
     GeomShapePtr aGeomShape(new GeomAPI_Shape());
     if(aGroup.Size() == 1) {
-      aGeomShape->setImpl(new TopoDS_Shape(aGroup.First()));
+      TopTools_MapOfShape::Iterator aOneShapeIter(aGroup);
+      aGeomShape->setImpl(new TopoDS_Shape(aOneShapeIter.Value()));
     } else {
-      aGeomShape->setImpl(new TopoDS_Shape(makeCompound(aGroup)));
+      // make sub-shapes in the group have order same as in original shape
+      TopTools_ListOfShape anOrderedGoup;
+      NCollection_List<TopoDS_Shape>::Iterator anUngrouped(anUngroupedShapes);
+      for (; anUngrouped.More(); anUngrouped.Next()) {
+        if (aGroup.Contains(anUngrouped.Value()))
+          anOrderedGoup.Append(anUngrouped.Value());
+      }
+      aGeomShape->setImpl(new TopoDS_Shape(makeCompound(anOrderedGoup)));
       aGeomShape = GeomAlgoAPI_ShapeTools::combineShapes(aGeomShape,
                                                          GeomAPI_Shape::COMPSOLID,
                                                          aCompSolids,
