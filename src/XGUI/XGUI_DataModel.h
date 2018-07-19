@@ -31,6 +31,7 @@
 
 class Config_DataModelReader;
 class XGUI_Workshop;
+class ModuleBase_ITreeNode;
 
 /**\class XGUI_DataModel
  * \ingroup GUI
@@ -54,6 +55,11 @@ public:
   /// Destructor
   virtual ~XGUI_DataModel();
 
+
+  void setRoot(ModuleBase_ITreeNode* theRoot) { myRoot = theRoot; }
+
+  ModuleBase_ITreeNode* root() const { return myRoot; }
+
   /// Event Listener method
   /// \param theMessage an event message
   virtual void processEvent(const std::shared_ptr<Events_Message>& theMessage);
@@ -71,7 +77,6 @@ public:
 
   //! Rebuild data tree
   virtual void rebuildDataTree();
-
 
   /// Returns the data stored under the given role for the item referred to by the index.
   /// \param theIndex a model index
@@ -134,10 +139,10 @@ public:
   QModelIndex documentRootIndex(DocumentPtr theDoc, int theColumn = 1) const;
 
   /// Returns last history object index
-  virtual QModelIndex lastHistoryIndex() const;
+  //virtual QModelIndex lastHistoryIndex() const;
 
   /// Initialises XML data model reader. It must be initialised before DataModel using.
-  void setXMLReader(Config_DataModelReader* theReader) { myXMLReader = theReader; }
+  //void setXMLReader(Config_DataModelReader* theReader) { myXMLReader = theReader; }
 
   /// Do not processing anymore events of model loop
   //bool blockEventsProcessing(const bool theState);
@@ -146,6 +151,10 @@ public:
   /// \param theIndex a tree model item
   /// \return boolean value
   bool hasHiddenState(const QModelIndex& theIndex);
+
+  /// Returns true if the given index exists in data tree
+  /// \param theIndex an index to check
+  bool hasIndex(const QModelIndex& theIndex) const;
 
 signals:
   /// Signal about tree had been rebuilt
@@ -158,69 +167,76 @@ private:
     SemiVisible,
     Hidden };
 
+
+  QModelIndex getParentIndex(ModuleBase_ITreeNode* theNode, int thCol) const;
+
+  QModelIndex getIndex(ModuleBase_ITreeNode* theNode, int thCol) const;
+
   /// Find a root index which contains objects of the given document
   /// \param theDoc the document object
-  QModelIndex findDocumentRootIndex(const ModelAPI_Document* theDoc, int aColumn = 1) const;
+  //QModelIndex findDocumentRootIndex(const ModelAPI_Document* theDoc, int aColumn = 1) const;
 
   /// Returns number of folders in document.
   /// Considered folders which has to be shown only if they are not empty.
   /// \param theDoc document which has to be checked. If 0 then Root document will be considered
-  int foldersCount(ModelAPI_Document* theDoc = 0) const;
+  //int foldersCount(ModelAPI_Document* theDoc = 0) const;
 
   /// Retrurns indexes of folders which can not be shown because they are empty
   /// \param theDoc document which has to be checked. If 0 then Root document will be considered
-  QIntList missedFolderIndexes(ModelAPI_Document* theDoc = 0) const;
+  //QIntList missedFolderIndexes(ModelAPI_Document* theDoc = 0) const;
 
   /// Returns Id (row) of a folder taking into consideration
   /// folders which can not be shown non empty
   /// \param theType Type of the folder
   /// \param theDoc a document which contains this folder
-  int folderId(std::string theType, ModelAPI_Document* theDoc = 0) const;
+  //int folderId(std::string theType, ModelAPI_Document* theDoc = 0) const;
 
   /// Removes a row from branch of tree
   /// \param theStart - start row to update indexes
   /// \param theSize - number of indexes in the folder
   /// \param theParent - index of parent folder
-  void rebuildBranch(int theRow, int theCount, const QModelIndex& theParent = QModelIndex());
+  //void rebuildBranch(int theRow, int theCount, const QModelIndex& theParent = QModelIndex());
 
   /// Returns list of folders types which can not be shown empty
   /// \param fromRoot - root document flag
-  QStringList listOfShowNotEmptyFolders(bool fromRoot = true) const;
+  //QStringList listOfShowNotEmptyFolders(bool fromRoot = true) const;
 
-  int getNumberOfFolderItems(const ModelAPI_Folder* theFolder) const;
-  ObjectPtr getObjectInFolder(const ModelAPI_Folder* theFolder, int theId) const;
+  //int getNumberOfFolderItems(const ModelAPI_Folder* theFolder) const;
+  //ObjectPtr getObjectInFolder(const ModelAPI_Folder* theFolder, int theId) const;
 
-  VisibilityState getVisibilityState(const QModelIndex& theIndex) const;
+  //VisibilityState getVisibilityState(const QModelIndex& theIndex) const;
 
-  void addShownFolder(DocumentPtr theDoc, QString theFolder)
-  {
-    if (!myShownFolders.contains(theDoc)) {
-      myShownFolders[theDoc] = QStringList();
-    }
-    myShownFolders[theDoc].append(theFolder);
-  }
+  //void addShownFolder(DocumentPtr theDoc, QString theFolder)
+  //{
+  //  if (!myShownFolders.contains(theDoc)) {
+  //    myShownFolders[theDoc] = QStringList();
+  //  }
+  //  myShownFolders[theDoc].append(theFolder);
+  //}
 
-  void removeShownFolder(DocumentPtr theDoc, QString theFolder)
-  {
-    if (myShownFolders.contains(theDoc)) {
-      myShownFolders[theDoc].removeAll(theFolder);
-      if (myShownFolders[theDoc].isEmpty())
-        myShownFolders.remove(theDoc);
-    }
-  }
+  //void removeShownFolder(DocumentPtr theDoc, QString theFolder)
+  //{
+  //  if (myShownFolders.contains(theDoc)) {
+  //    myShownFolders[theDoc].removeAll(theFolder);
+  //    if (myShownFolders[theDoc].isEmpty())
+  //      myShownFolders.remove(theDoc);
+  //  }
+  //}
 
-  bool hasShownFolder(DocumentPtr theDoc, QString theFolder) const
-  {
-    if (myShownFolders.contains(theDoc))
-      return myShownFolders[theDoc].contains(theFolder);
-    return false;
-  }
+  //bool hasShownFolder(DocumentPtr theDoc, QString theFolder) const
+  //{
+  //  if (myShownFolders.contains(theDoc))
+  //    return myShownFolders[theDoc].contains(theFolder);
+  //  return false;
+  //}
 
-  Config_DataModelReader* myXMLReader;
+  //Config_DataModelReader* myXMLReader;
 
   XGUI_Workshop* myWorkshop;
   QMap<DocumentPtr, QStringList> myShownFolders;
   //bool myIsEventsProcessingBlocked;
+
+  ModuleBase_ITreeNode* myRoot;
 };
 
 #endif

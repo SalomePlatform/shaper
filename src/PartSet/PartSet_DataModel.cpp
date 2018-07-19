@@ -19,6 +19,7 @@
 //
 
 #include "PartSet_DataModel.h"
+#include "PartSet_TreeNodes.h"
 
 #include <ModelAPI_Events.h>
 
@@ -26,12 +27,12 @@
 
 PartSet_DataModel::PartSet_DataModel()
 {
-  Events_Loop* aLoop = Events_Loop::loop();
-  aLoop->registerListener(this, Events_Loop::eventByName(EVENT_OBJECT_CREATED));
-  aLoop->registerListener(this, Events_Loop::eventByName(EVENT_OBJECT_DELETED));
-  aLoop->registerListener(this, Events_Loop::eventByName(EVENT_OBJECT_UPDATED));
-  aLoop->registerListener(this, Events_Loop::eventByName(EVENT_ORDER_UPDATED));
-  aLoop->registerListener(this, Events_Loop::eventByName(EVENT_DOCUMENT_CHANGED));
+//  Events_Loop* aLoop = Events_Loop::loop();
+//  aLoop->registerListener(this, Events_Loop::eventByName(EVENT_OBJECT_CREATED));
+//  aLoop->registerListener(this, Events_Loop::eventByName(EVENT_OBJECT_DELETED));
+//  aLoop->registerListener(this, Events_Loop::eventByName(EVENT_OBJECT_UPDATED));
+//  aLoop->registerListener(this, Events_Loop::eventByName(EVENT_ORDER_UPDATED));
+//  aLoop->registerListener(this, Events_Loop::eventByName(EVENT_DOCUMENT_CHANGED));
 }
 
 

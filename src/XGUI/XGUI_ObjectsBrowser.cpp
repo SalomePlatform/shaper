@@ -220,7 +220,6 @@ void XGUI_DataTree::processHistoryChange(const QModelIndex& theIndex)
     aDoc->setCurrentFeature(FeaturePtr(), true);
     aMgr->finishOperation();
   }
-  QModelIndex aNewIndex = aModel->lastHistoryIndex();
   QModelIndex aParent = theIndex.parent();
   int aSize = aModel->rowCount(aParent);
   for (int i = 0; i < aSize; i++) {
@@ -426,9 +425,10 @@ XGUI_ObjectsBrowser::~XGUI_ObjectsBrowser()
 {
 }
 
-void XGUI_ObjectsBrowser::setXMLReader(Config_DataModelReader* theReader)
+void XGUI_ObjectsBrowser::initialize(ModuleBase_ITreeNode* theRoot)
 {
-  myDocModel->setXMLReader(theReader);
+  //myDocModel->setXMLReader(theReader);
+  myDocModel->setRoot(theRoot);
   myTreeView->setModel(myDocModel);
 
   // It has to be done after setting of model
@@ -606,7 +606,8 @@ void XGUI_ObjectsBrowser::onBeforeReset()
 void XGUI_ObjectsBrowser::onAfterModelReset()
 {
   foreach(QModelIndex aIndex, myExpandedItems) {
-    myTreeView->setExpanded(aIndex, true);
+    if (myTreeView->dataModel()->hasIndex(aIndex))
+      myTreeView->setExpanded(aIndex, true);
   }
 }
 
@@ -646,9 +647,10 @@ void XGUI_ObjectsBrowser::updateAllIndexes(int theColumn, const QModelIndex& the
   int aNb = myDocModel->rowCount(theParent);
   for (int i = 0; i < aNb; i++) {
     QModelIndex aIdx = myDocModel->index(i, theColumn, theParent);
-    if (aIdx.isValid()) {
+    if (aIdx.isValid() && myDocModel->hasIndex(aIdx)) {
       myTreeView->update(aIdx);
-      updateAllIndexes(theColumn, aIdx);
+      if (myTreeView->isExpanded(aIdx))
+        updateAllIndexes(theColumn, aIdx);
     }
   }
 }

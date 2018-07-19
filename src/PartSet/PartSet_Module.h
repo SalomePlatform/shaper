@@ -58,7 +58,7 @@ class PartSet_MenuMgr;
 class PartSet_CustomPrs;
 class PartSet_SketcherMgr;
 class PartSet_SketcherReentrantMgr;
-class PartSet_DataModel;
+class PartSet_RootNode;
 class ModelAPI_Result;
 
 class QAction;
@@ -400,6 +400,9 @@ public:
   /// Returns the workshop
   XGUI_Workshop* getWorkshop() const;
 
+  /// Reads description of features from XML file
+  virtual void createFeatures();
+
 public slots:
   /// Slolt called on object display
   /// \param theObject a data object
@@ -495,7 +498,7 @@ private:
   PartSet_SketcherMgr::FeatureToSelectionMap myCurrentSelection;
   QModelIndex myActivePartIndex;
 
-  PartSet_DataModel* myDataModel;
+  PartSet_RootNode* myRoot;
 };
 
 #endif

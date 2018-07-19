@@ -37,6 +37,7 @@ class ModuleBase_IDocumentDataModel;
 class XGUI_DataModel;
 class Config_DataModelReader;
 class XGUI_Workshop;
+class ModuleBase_ITreeNode;
 
 //#define DEBUG_INDXES
 
@@ -175,7 +176,10 @@ Q_OBJECT
   //! Returns currently selected indexes
   QModelIndexList selectedIndexes() const
   {
-    return myTreeView->selectionModel()->selectedIndexes();
+    if (myTreeView->selectionModel())
+      return myTreeView->selectionModel()->selectedIndexes();
+    else
+      return QModelIndexList();
   }
 
   //! Returns TreeView widget
@@ -193,9 +197,8 @@ Q_OBJECT
   /// Resets the object browser into initial state
   void clearContent();
 
-  /// Set XML reader object for data model
-  /// \param theReader the reader object
-  void setXMLReader(Config_DataModelReader* theReader);
+  /// Initialize the Object browser
+  void initialize(ModuleBase_ITreeNode* theRoot);
 
   /// Returns list of folders opened state for the given document
   /// \param theDoc the document

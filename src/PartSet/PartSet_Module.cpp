@@ -38,7 +38,7 @@
 #include "PartSet_CustomPrs.h"
 #include "PartSet_IconFactory.h"
 #include "PartSet_OverconstraintListener.h"
-#include "PartSet_DataModel.h"
+#include "PartSet_TreeNodes.h"
 
 #include "PartSet_Filters.h"
 #include "PartSet_FilterInfinite.h"
@@ -151,14 +151,13 @@ extern "C" PARTSET_EXPORT ModuleBase_IModule* createModule(ModuleBase_IWorkshop*
 PartSet_Module::PartSet_Module(ModuleBase_IWorkshop* theWshop)
 : ModuleBase_IModule(theWshop),
   myVisualLayerId(0),
+  myRoot(0),
   myIsOperationIsLaunched(false)
 {
   new PartSet_IconFactory();
 
   mySketchMgr = new PartSet_SketcherMgr(this);
   mySketchReentrantMgr = new PartSet_SketcherReentrantMgr(theWshop);
-
-  myDataModel = new PartSet_DataModel();
 
   XGUI_ModuleConnector* aConnector = dynamic_cast<XGUI_ModuleConnector*>(theWshop);
   XGUI_Workshop* aWorkshop = aConnector->workshop();
@@ -222,7 +221,17 @@ PartSet_Module::~PartSet_Module()
   }
   delete myCustomPrs;
   delete myOverconstraintListener;
+  delete myRoot;
 }
+
+//******************************************************
+void PartSet_Module::createFeatures()
+{
+  ModuleBase_IModule::createFeatures();
+  myRoot = new PartSet_RootNode();
+  myRoot->setWorkshop(workshop());
+}
+
 
 //******************************************************
 void PartSet_Module::storeSelection()
@@ -1644,5 +1653,5 @@ void PartSet_Module::setDefaultConstraintShown()
 //******************************************************
 ModuleBase_ITreeNode* PartSet_Module::rootNode() const
 {
-  return myDataModel->root();
+  return myRoot;
 }

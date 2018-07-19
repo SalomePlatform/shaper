@@ -109,6 +109,13 @@ AISObjectPtr XGUI_ModuleConnector::findPresentation(const ObjectPtr& theObject) 
   return aDisp->getAISObject(theObject);
 }
 
+bool XGUI_ModuleConnector::isVisible(const ObjectPtr& theObject) const
+{
+  XGUI_Displayer* aDisp = myWorkshop->displayer();
+  return aDisp->isVisible(theObject);
+}
+
+
 ObjectPtr XGUI_ModuleConnector::findPresentedObject(const AISObjectPtr& theAIS) const
 {
   XGUI_Displayer* aDisp = myWorkshop->displayer();

@@ -1310,7 +1310,7 @@ QDockWidget* XGUI_Workshop::createObjectBrowser(QWidget* theParent)
   aObjDock->setStyleSheet(
       "::title { position: relative; padding-left: 5px; text-align: left center }");
   myObjectBrowser = new XGUI_ObjectsBrowser(aObjDock, this);
-  myObjectBrowser->setXMLReader(myDataModelXMLReader);
+  myObjectBrowser->initialize(myModule->rootNode());
   myModule->customizeObjectBrowser(myObjectBrowser);
   aObjDock->setWidget(myObjectBrowser);
 
@@ -1443,8 +1443,9 @@ void XGUI_Workshop::hidePanel(QDockWidget* theDockWidget)
 //******************************************************
 void XGUI_Workshop::showObjectBrowser()
 {
-  if (!isSalomeMode())
+  if (!isSalomeMode()) {
     myObjectBrowser->parentWidget()->show();
+  }
 }
 
 //******************************************************

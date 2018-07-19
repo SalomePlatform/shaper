@@ -112,6 +112,10 @@ Q_OBJECT
   //! \param theAIS a presentation
   virtual ObjectPtr findPresentedObject(const AISObjectPtr& theAIS) const = 0;
 
+  //! Returns true if the object is displayed
+  //! \param theObject a data object
+  virtual bool isVisible(const ObjectPtr& theObject) const = 0;
+
   //! Select features clearing previous selection.
   //! If the list is empty then selection will be cleared
   //! \param theValues a list of presentations
