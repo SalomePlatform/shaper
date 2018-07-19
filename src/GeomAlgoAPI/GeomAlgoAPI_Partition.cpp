@@ -67,7 +67,8 @@ static void sortCompound(TopoDS_Shape& theCompound, GEOMAlgo_Splitter* theOperat
 
   TopTools_MapOfShape anAlreadyThere; // to avoid duplications if it was produced by two arguments
 
-  bool aNotProduced = true;// flag to add to result also results that were not produced by any argument
+  // flag to add to result also results which were not produced by any argument
+  bool aNotProduced = true;
   TopTools_ListOfShape::Iterator anArgs(theOperation->Arguments());
   while(aNotProduced || anArgs.More()) {
     // collect shapes that were produced from the current argument
@@ -76,13 +77,15 @@ static void sortCompound(TopoDS_Shape& theCompound, GEOMAlgo_Splitter* theOperat
       TopTools_ListOfShape allArgs;
       getHistorySupportedType(anArgs.Value(), allArgs);
       for (TopTools_ListOfShape::Iterator argsIter(allArgs); argsIter.More(); argsIter.Next()) {
-        aProducedByArg.Add(argsIter.Value()); // if argument was not modified, it is fully in the result
+        // if argument was not modified, it is fully in the result
+        aProducedByArg.Add(argsIter.Value());
         const TopTools_ListOfShape& aModified = theOperation->Modified(argsIter.Value());
         for (TopTools_ListOfShape::Iterator aModIter(aModified); aModIter.More(); aModIter.Next()) {
           aProducedByArg.Add(aModIter.Value());
         }
         const TopTools_ListOfShape& aGenerated = theOperation->Generated(argsIter.Value());
-        for (TopTools_ListOfShape::Iterator aGenIter(aGenerated); aGenIter.More(); aGenIter.Next()) {
+        for (TopTools_ListOfShape::Iterator aGenIter(aGenerated); aGenIter.More(); aGenIter.Next())
+        {
           aProducedByArg.Add(aGenIter.Value());
         }
       }
