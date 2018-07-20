@@ -33,7 +33,7 @@ Plane_7 = model.addPlane(Part_1_doc, model.selection("FACE", "PartSet/YOZ"), 50,
 Partition_1 = model.addPartition(Part_1_doc, [model.selection("FACE", "Plane_1"), model.selection("FACE", "Plane_2"), model.selection("FACE", "Plane_3"), model.selection("FACE", "Plane_4"), model.selection("SOLID", "Box_1_1")])
 model.do()
 
-model.checkBooleansResult(Partition_1,model,1,[8],[8],[48],[192],[384])
+model.checkResult(Partition_1,model,1,[8],[8],[48],[192],[384])
 model.testHaveNamingSubshapes(Partition_1,model,Part_1_doc)
 
 model.end()

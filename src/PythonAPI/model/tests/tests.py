@@ -287,8 +287,8 @@ def assertSketchArc(theArcFeature):
   assert math.fabs(aDistCS - aDistCE) < TOLERANCE, "Wrong arc: center-start distance {}, center-end distance {}".format(aDistCS, aDistCE)
   assert math.fabs(aRadius.value() -aDistCS) < TOLERANCE, "Wrong arc: radius is {0}, expected {1}".format(aRadius.value(), aDistCS)
 
-def checkBooleansResult(theFeature,theModel,NbRes,NbSubRes,NbSolid,NbFace,NbEdge,NbVertex):
-  """ Tests numbers of sub-shapes in results (used in Boolean operations tests)
+def checkResult(theFeature,theModel,NbRes,NbSubRes,NbSolid,NbFace,NbEdge,NbVertex):
+  """ Tests numbers of sub-shapes in results
   """
   theModel.testNbResults(theFeature, NbRes)
   theModel.testNbSubResults(theFeature, NbSubRes)

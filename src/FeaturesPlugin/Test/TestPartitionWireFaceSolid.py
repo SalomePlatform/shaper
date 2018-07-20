@@ -52,7 +52,7 @@ Wire_1 = model.addWire(Part_1_doc, [model.selection("EDGE", "Sketch_2/Edge-Sketc
 Partition_1 = model.addPartition(Part_1_doc, [model.selection("FACE", "Face_1_1"), model.selection("SOLID", "Torus_1_1"), model.selection("WIRE", "Wire_1_1")])
 model.do()
 
-model.checkBooleansResult(Partition_1,model,1,[3],[1],[4],[22],[46])
+model.checkResult(Partition_1,model,1,[3],[1],[4],[22],[46])
 model.testHaveNamingSubshapes(Partition_1,model,Part_1_doc)
 
 model.end()

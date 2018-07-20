@@ -51,7 +51,7 @@ p_1, p_2, p_3, p_4, p_5 = [model.selection("VERTEX", base_name + str(i + 1)) for
 Polyline_1 = model.addPolyline3D(Part_1_doc, [p_1, p_2, p_3, p_4, p_5], False)
 model.do()
 
-model.checkBooleansResult(Polyline_1, model, 1, [0], [0], [0], [4], [4*2])
+model.checkResult(Polyline_1, model, 1, [0], [0], [0], [4], [4*2])
 
 # =============================================================================
 # Test 2. Create closed polyline 1-2-3-4-5-1
@@ -59,7 +59,7 @@ model.checkBooleansResult(Polyline_1, model, 1, [0], [0], [0], [4], [4*2])
 Polyline_2 = model.addPolyline3D(Part_1_doc, [p_1, p_2, p_3, p_4, p_5], True)
 model.do()
 
-model.checkBooleansResult(Polyline_2, model, 1, [0], [0], [0], [5], [5*2])
+model.checkResult(Polyline_2, model, 1, [0], [0], [0], [5], [5*2])
 
 # =============================================================================
 # Test 3. Try to create self-intersected unclosed polyline 2-5-4-1
@@ -113,7 +113,7 @@ points = [model.selection("VERTEX", name) for name in point_names]
 Polyline_7 = model.addPolyline3D(Part_2_doc, points, False)
 model.do()
 
-model.checkBooleansResult(Polyline_7, model, 1, [0], [0], [0], [7], [7*2])
+model.checkResult(Polyline_7, model, 1, [0], [0], [0], [7], [7*2])
 
 # =============================================================================
 # Test 8. Create closed polyline on box vertices
@@ -127,7 +127,7 @@ points = [model.selection("VERTEX", name) for name in point_names]
 Polyline_8 = model.addPolyline3D(Part_3_doc, points, True)
 model.do()
 
-model.checkBooleansResult(Polyline_8, model, 1, [0], [0], [0], [8], [8*2])
+model.checkResult(Polyline_8, model, 1, [0], [0], [0], [8], [8*2])
 
 # =============================================================================
 # Test 9. Create polyline using equal vertices

@@ -81,7 +81,7 @@ Face_1 = model.addFace(Part_1_doc, [model.selection("EDGE", "Sketch_3/Edge-Sketc
 Partition_1 = model.addPartition(Part_1_doc, [model.selection("FACE", "Face_1_1"), model.selection("SOLID", "Extrusion_2_1"), model.selection("SOLID", "Extrusion_1_1")])
 model.do()
 
-model.checkBooleansResult(Partition_1,model,1,[2],[4],[42],[198],[396])
+model.checkResult(Partition_1,model,1,[2],[4],[42],[198],[396])
 model.testHaveNamingSubshapes(Partition_1,model,Part_1_doc)
 
 model.end()

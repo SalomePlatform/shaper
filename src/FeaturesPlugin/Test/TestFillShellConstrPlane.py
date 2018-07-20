@@ -46,7 +46,7 @@ Shell_1 = model.addShell(Part_1_doc, [model.selection("SHELL", "Extrusion_1_1")]
 Boolean_1 = model.addFill(Part_1_doc, [model.selection("SHELL", "Shell_1_1")], [model.selection("FACE", "PartSet/XOZ")])
 model.do()
 
-model.checkBooleansResult(Boolean_1,model,1,[0],[0],[3],[12],[24])
+model.checkResult(Boolean_1,model,1,[0],[0],[3],[12],[24])
 model.testHaveNamingSubshapes(Boolean_1,model,Part_1_doc)
 
 model.end()

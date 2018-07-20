@@ -154,7 +154,7 @@ boundaries2 = [model.selection("FACE", "Face_1_1"),
 expectSolid2 = [False, False, False, False, False, False, False, False, True]
 Solid_2 = createSolidStepByStep(boundaries2, expectSolid2)
 
-model.checkBooleansResult(Solid_2, model, 1, [0], [1], [10], [44], [88])
+model.checkResult(Solid_2, model, 1, [0], [1], [10], [44], [88])
 model.testHaveNamingSubshapes(Solid_2, model, Part_1_doc)
 
 model.end()

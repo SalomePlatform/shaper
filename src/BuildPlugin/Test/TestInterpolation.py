@@ -58,7 +58,7 @@ Tangent_2 = model.selection("EDGE", "Sketch_1/Edge-SketchLine_2")
 Interpolation_1 = model.addInterpolation(Part_1_doc, [p_1, p_2, p_3, p_4, p_5], False, False)
 model.do()
 
-model.checkBooleansResult(Interpolation_1, model, 1, [0], [0], [0], [1], [2])
+model.checkResult(Interpolation_1, model, 1, [0], [0], [0], [1], [2])
 
 # # =============================================================================
 # # Test 2. Create curve 1-2-3-4-5-1, closed on, reorder off, without tangents
@@ -66,7 +66,7 @@ model.checkBooleansResult(Interpolation_1, model, 1, [0], [0], [0], [1], [2])
 Interpolation_2 = model.addInterpolation(Part_1_doc, [p_1, p_2, p_3, p_4, p_5], True, False)
 model.do()
 
-model.checkBooleansResult(Interpolation_2, model, 1, [0], [0], [0], [1], [2])
+model.checkResult(Interpolation_2, model, 1, [0], [0], [0], [1], [2])
 
 # # =============================================================================
 # # Test 3. Create curve 1-2-3-4, closed off, reorder on, without tangents
@@ -74,7 +74,7 @@ model.checkBooleansResult(Interpolation_2, model, 1, [0], [0], [0], [1], [2])
 Interpolation_3 = model.addInterpolation(Part_1_doc, [p_1, p_2, p_3, p_4], False, True)
 model.do()
 
-model.checkBooleansResult(Interpolation_3, model, 1, [0], [0], [0], [1], [2])
+model.checkResult(Interpolation_3, model, 1, [0], [0], [0], [1], [2])
 
 # =============================================================================
 # Test 4. Create curve 1-2-3-5, closed on, reorder on, without tangents
@@ -82,7 +82,7 @@ model.checkBooleansResult(Interpolation_3, model, 1, [0], [0], [0], [1], [2])
 Interpolation_4 = model.addInterpolation(Part_1_doc, [p_1, p_2, p_3, p_5], True, True)
 model.do()
 
-model.checkBooleansResult(Interpolation_4, model, 1, [0], [0], [0], [1], [2])
+model.checkResult(Interpolation_4, model, 1, [0], [0], [0], [1], [2])
 
 # =============================================================================
 # Test 5. Create curve 1-2-3-4-5, closed off, reorder off, with tangents
@@ -92,7 +92,7 @@ Interpolation_5 = model.addInterpolation(Part_1_doc, [p_1, p_2, p_3, p_4, p_5],
                                          Tangent_1, Tangent_2, False, False)
 model.do()
 
-model.checkBooleansResult(Interpolation_5, model, 1, [0], [0], [0], [1], [2])
+model.checkResult(Interpolation_5, model, 1, [0], [0], [0], [1], [2])
 
 # =============================================================================
 # Test 6. Try to create closed curve 1-2-1, closed off, reorder off, without tangents
@@ -130,7 +130,7 @@ points = [model.selection("VERTEX", name) for name in point_names]
 Interpolation_8 = model.addInterpolation(Part_2_doc, points, False, False)
 model.do()
 
-model.checkBooleansResult(Interpolation_8, model, 1, [0], [0], [0], [1], [2])
+model.checkResult(Interpolation_8, model, 1, [0], [0], [0], [1], [2])
 
 # =============================================================================
 # Test 9. Create curve on box vertices, closed off, reorder off, with tangents
@@ -147,7 +147,7 @@ Interpolation_9 = model.addInterpolation(Part_3_doc, points,
                                          Tangent_1, Tangent_2, False, False)
 model.do()
 
-model.checkBooleansResult(Interpolation_9, model, 1, [0], [0], [0], [1], [2])
+model.checkResult(Interpolation_9, model, 1, [0], [0], [0], [1], [2])
 
 # =============================================================================
 # Test 10. Create curve using equal vertices

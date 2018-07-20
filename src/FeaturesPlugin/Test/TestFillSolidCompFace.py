@@ -55,7 +55,7 @@ Boolean_1 = model.addFill(Part_1_doc, [model.selection("FACE", "Face_1_1")], [mo
 Boolean_2 = model.addFill(Part_1_doc, [model.selection("SOLID", "Box_1_1")], [model.selection("COMPOUND", "Fill_1_1")])
 model.do()
 
-model.checkBooleansResult(Boolean_2, model, 1, [2], [2], [14], [60], [120])
+model.checkResult(Boolean_2, model, 1, [2], [2], [14], [60], [120])
 model.testHaveNamingSubshapes(Boolean_2, model, Part_1_doc)
 
 model.end()

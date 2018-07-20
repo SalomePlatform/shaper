@@ -60,7 +60,7 @@ Face_2 = model.addFace(Part_1_doc, [model.selection("WIRE", "Sketch_2/Wire-Sketc
 Boolean_1 = model.addFill(Part_1_doc, [model.selection("FACE", "Face_1_1")], [model.selection("FACE", "Face_2_1")])
 model.do()
 
-model.checkBooleansResult(Boolean_1, model, 1, [2], [0], [2], [6], [12])
+model.checkResult(Boolean_1, model, 1, [2], [0], [2], [6], [12])
 model.testHaveNamingSubshapes(Boolean_1, model, Part_1_doc)
 
 model.end()

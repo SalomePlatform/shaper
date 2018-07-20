@@ -35,7 +35,7 @@ Edge_1 = model.addEdge(Part_1_doc, [model.selection("EDGE", "Sketch_1/Edge-Sketc
 Partition_1 = model.addPartition(Part_1_doc, [model.selection("SOLID", "Cone_1_1"), model.selection("EDGE", "Edge_1_1")])
 model.do()
 
-model.checkBooleansResult(Partition_1,model,1,[3],[1],[3],[9],[20])
+model.checkResult(Partition_1,model,1,[3],[1],[3],[9],[20])
 model.testHaveNamingSubshapes(Partition_1,model,Part_1_doc)
 
 model.end()
