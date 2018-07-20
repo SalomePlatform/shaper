@@ -47,13 +47,6 @@ public:
 class PartSet_ObjectNode : public PartSet_TreeNode
 {
 public:
-  enum VisibilityState {
-    NoneState,
-    Visible,
-    SemiVisible,
-    Hidden
-  };
-
   PartSet_ObjectNode(const ObjectPtr& theObj, ModuleBase_ITreeNode* theParent = 0)
     : PartSet_TreeNode(theParent), myObject(theObj) {}
 
@@ -77,7 +70,7 @@ public:
   /// Updates sub-nodes of the node
   virtual void update() {}
 
-  VisibilityState getVisibilityState() const;
+  virtual VisibilityState visibilityState() const;
 
 protected:
   ObjectPtr myObject;

@@ -40,6 +40,13 @@ typedef QList<ModuleBase_ITreeNode*> QTreeNodesList;
 class ModuleBase_ITreeNode
 {
 public:
+  enum VisibilityState {
+    NoneState,
+    Visible,
+    SemiVisible,
+    Hidden
+  };
+
   /// Default constructor
   ModuleBase_ITreeNode(ModuleBase_ITreeNode* theParent = 0) : myParent(theParent) {}
 
@@ -151,6 +158,9 @@ public:
     }
     return 0;
   }
+
+  /// Returns visibilitystate of the node in viewer 3d
+  virtual VisibilityState visibilityState() const { return NoneState; }
 
 protected:
 

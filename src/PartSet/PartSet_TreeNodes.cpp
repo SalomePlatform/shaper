@@ -109,7 +109,7 @@ QVariant PartSet_ObjectNode::data(int theColumn, int theRole) const
   case Qt::DecorationRole:
     switch (theColumn) {
     case 0:
-      switch (getVisibilityState()) {
+      switch (visibilityState()) {
       case NoneState:
         return QIcon();
       case Visible:
@@ -143,7 +143,7 @@ Qt::ItemFlags PartSet_ObjectNode::flags(int theColumn) const
   return aDefaultFlag;
 }
 
-PartSet_ObjectNode::VisibilityState PartSet_ObjectNode::getVisibilityState() const
+PartSet_ObjectNode::VisibilityState PartSet_ObjectNode::visibilityState() const
 {
   Qt::ItemFlags aFlags = flags(1);
   if (aFlags == Qt::ItemFlags())
