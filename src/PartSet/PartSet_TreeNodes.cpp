@@ -32,12 +32,12 @@
 #include <ModelAPI_ResultConstruction.h>
 #include <ModelAPI_ResultPart.h>
 #include <ModelAPI_ResultBody.h>
-#include <ModelAPI_Feature.h>
 #include <ModelAPI_Tools.h>
 #include <ModelAPI_ResultCompSolid.h>
 #include <ModelAPI_CompositeFeature.h>
 #include <ModelAPI_AttributeDouble.h>
-
+#include <ModelAPI_Folder.h>
+#include <ModelAPI_AttributeReference.h>
 
 #include <QBrush>
 
@@ -120,7 +120,10 @@ QVariant PartSet_ObjectNode::data(int theColumn, int theRole) const
         return QIcon(":pictures/eyeclosed.png");
       }
     case 1:
-      return ModuleBase_IconFactory::get()->getIcon(myObject);
+      if (myObject->groupName() == ModelAPI_Folder::group())
+        return QIcon(":pictures/features_folder.png");
+      else
+        return ModuleBase_IconFactory::get()->getIcon(myObject);
     case 2:
       if (isCurrentFeature(myObject))
         return QIcon(":pictures/arrow.png");
@@ -182,15 +185,6 @@ PartSet_FolderNode::PartSet_FolderNode(ModuleBase_ITreeNode* theParent,
   FolderType theType)
   : PartSet_TreeNode(theParent), myType(theType)
 {
-}
-
-PartSet_FolderNode::~PartSet_FolderNode()
-{
-  while (myChildren.length() > 0) {
-    ModuleBase_ITreeNode* aNode = myChildren.last();
-    myChildren.removeAll(aNode);
-    delete aNode;
-  }
 }
 
 QString PartSet_FolderNode::name() const
@@ -261,8 +255,12 @@ void PartSet_FolderNode::update()
 
   // Remove extra sub-nodes
   QTreeNodesList aDelList;
+  int aIndex;
+  int aId = -1;
   foreach(ModuleBase_ITreeNode* aNode, myChildren) {
-    if (aDoc->index(aNode->object()) == -1)
+    aId++;
+    aIndex = aDoc->index(aNode->object(), true);
+    if ((aIndex == -1) || (aId != aIndex))
       aDelList.append(aNode);
   }
   foreach(ModuleBase_ITreeNode* aNode, aDelList) {
@@ -272,9 +270,9 @@ void PartSet_FolderNode::update()
 
   // Add new nodes
   std::string aGroup = groupName();
-  int aSize = aDoc->size(aGroup);
+  int aSize = aDoc->size(aGroup, true);
   for (int i = 0; i < aSize; i++) {
-    ObjectPtr aObj = aDoc->object(aGroup, i);
+    ObjectPtr aObj = aDoc->object(aGroup, i, true);
     if (i < myChildren.size()) {
       if (myChildren.at(i)->object() != aObj) {
         PartSet_ObjectNode* aNode = new PartSet_ObjectNode(aObj, this);
@@ -314,7 +312,7 @@ QTreeNodesList PartSet_FolderNode::objectCreated(const QObjectPtrList& theObject
   int aIdx = -1;
   foreach(ObjectPtr aObj, theObjects) {
     if ((aObj->document() == aDoc) && (aObj->groupName() == aName)) {
-      aIdx = aDoc->index(aObj);
+      aIdx = aDoc->index(aObj, true);
       if (aIdx != -1) {
         bool aHasObject = (aIdx < myChildren.size()) && (myChildren.at(aIdx)->object() == aObj);
         if (!aHasObject) {
@@ -338,8 +336,12 @@ QTreeNodesList PartSet_FolderNode::objectsDeleted(const DocumentPtr& theDoc,
   QTreeNodesList aResult;
   if ((theGroup.toStdString() == groupName()) && (theDoc == aDoc)) {
     QTreeNodesList aDelList;
+    int aIndex;
+    int aId = -1;
     foreach(ModuleBase_ITreeNode* aNode, myChildren) {
-      if (aDoc->index(aNode->object()) == -1)
+      aId++;
+      aIndex = aDoc->index(aNode->object(), true);
+      if ((aIndex == -1) || (aId != aIndex))
         aDelList.append(aNode);
     }
     if (aDelList.size() > 0) {
@@ -376,9 +378,10 @@ QTreeNodesList PartSet_FeatureFolderNode::objectCreated(const QObjectPtrList& th
   int aNb = numberOfFolders();
   foreach(ObjectPtr aObj, theObjects) {
     if (aDoc == aObj->document()) {
-      if (aObj->groupName() == ModelAPI_Feature::group()) {
+      if ((aObj->groupName() == ModelAPI_Feature::group()) ||
+        (aObj->groupName() == ModelAPI_Folder::group())){
         ModuleBase_ITreeNode* aNode = createNode(aObj);
-        aIdx = aDoc->index(aObj) + aNb;
+        aIdx = aDoc->index(aObj, true) + aNb;
         bool aHasObject = (aIdx < myChildren.size()) && (myChildren.at(aIdx)->object() == aObj);
         if (!aHasObject) {
           if (aIdx < myChildren.size())
@@ -390,6 +393,12 @@ QTreeNodesList PartSet_FeatureFolderNode::objectCreated(const QObjectPtrList& th
       }
     }
   }
+  // Update sub-folders
+  foreach(ModuleBase_ITreeNode* aNode, myChildren) {
+    if ((aNode->type() == PartSet_ObjectFolderNode::typeId()) ||
+      (aNode->type() == PartSet_PartRootNode::typeId()))
+      aResult.append(aNode->objectCreated(theObjects));
+  }
   return aResult;
 }
 
@@ -397,6 +406,8 @@ QTreeNodesList PartSet_FeatureFolderNode::objectsDeleted(const DocumentPtr& theD
   const QString& theGroup)
 {
   QTreeNodesList aResult;
+
+  // Process sub-folders
   foreach(ModuleBase_ITreeNode* aNode, myChildren) {
     if (aNode->childrenCount() > 0) { // aFolder node
       QTreeNodesList aList = aNode->objectsDeleted(theDoc, theGroup);
@@ -404,12 +415,21 @@ QTreeNodesList PartSet_FeatureFolderNode::objectsDeleted(const DocumentPtr& theD
         aResult.append(aList);
     }
   }
+
+  // Process root
   DocumentPtr aDoc = document();
-  if ((theDoc == aDoc) && (theGroup.toStdString() == ModelAPI_Feature::group())) {
+  int aNb = numberOfFolders();
+  bool isGroup = ((theGroup.toStdString() == ModelAPI_Feature::group()) ||
+    (theGroup.toStdString() == ModelAPI_Folder::group()));
+  if ((theDoc == aDoc) && isGroup) {
     QTreeNodesList aDelList;
+    int aIndex;
+    int aId = -1;
     foreach(ModuleBase_ITreeNode* aNode, myChildren) {
+      aId++;
       if (aNode->object().get()) {
-        if (aDoc->index(aNode->object()) == -1)
+        aIndex = aDoc->index(aNode->object(), true);
+        if ((aIndex == -1) || (aId != aIndex))
           aDelList.append(aNode);
       }
     }
@@ -434,7 +454,9 @@ ModuleBase_ITreeNode* PartSet_FeatureFolderNode::findParent(const DocumentPtr& t
       return aResult;
     }
   }
-  if ((theDoc == document()) && (theGroup.toStdString() == ModelAPI_Feature::group()))
+  bool isGroup = ((theGroup.toStdString() == ModelAPI_Feature::group()) ||
+    (theGroup.toStdString() == ModelAPI_Folder::group()));
+  if ((theDoc == document()) && isGroup)
     return this;
   return 0;
 }
@@ -457,13 +479,6 @@ PartSet_RootNode::PartSet_RootNode() : PartSet_FeatureFolderNode(0), myWorkshop(
   update();
 }
 
-PartSet_RootNode::~PartSet_RootNode()
-{
-  delete myParamsFolder;
-  delete myConstrFolder;
-  delete myPartsFolder;
-}
-
 
 void PartSet_RootNode::update()
 {
@@ -473,12 +488,17 @@ void PartSet_RootNode::update()
 
   // Update features content
   DocumentPtr aDoc = document();
+  int aNb = numberOfFolders();
 
   // Remove extra sub-nodes
   QTreeNodesList aDelList;
+  int aIndex;
+  int aId = -1;
   foreach(ModuleBase_ITreeNode* aNode, myChildren) {
+    aId++;
     if (aNode->object().get()) {
-      if (aDoc->index(aNode->object()) == -1)
+      aIndex = aDoc->index(aNode->object(), true);
+      if ((aIndex == -1) || (aId != (aIndex + aNb)))
         aDelList.append(aNode);
     }
   }
@@ -489,39 +509,26 @@ void PartSet_RootNode::update()
 
   // Add new nodes
   std::string aGroup = ModelAPI_Feature::group();
-  int aSize = aDoc->size(aGroup);
-  int aId;
+  int aSize = aDoc->size(aGroup, true);
   FeaturePtr aFeature;
-  int aNb = numberOfFolders();
   for (int i = 0; i < aSize; i++) {
-    ObjectPtr aObj = aDoc->object(aGroup, i);
+    ObjectPtr aObj = aDoc->object(aGroup, i, true);
     aId = i + aNb; // Take into account existing folders
     if (aId < myChildren.size()) {
       if (myChildren.at(aId)->object() != aObj) {
-        aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(aObj);
-        ModuleBase_ITreeNode* aNode;
-        if (aFeature->getKind() == PartSetPlugin_Part::ID())
-          aNode = new PartSet_PartRootNode(aObj, this);
-        else
-          aNode = new PartSet_ObjectNode(aObj, this);
+        ModuleBase_ITreeNode* aNode = createNode(aObj);
         myChildren.insert(aId, aNode);
       }
     } else {
-      aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(aObj);
-      ModuleBase_ITreeNode* aNode;
-      if (aFeature->getKind() == PartSetPlugin_Part::ID())
-        aNode = new PartSet_PartRootNode(aObj, this);
-      else
-        aNode = new PartSet_ObjectNode(aObj, this);
+      ModuleBase_ITreeNode* aNode = createNode(aObj);
       myChildren.append(aNode);
     }
   }
   // Update sub-folders
-  ModuleBase_ITreeNode* aSubFolder = 0;
   foreach(ModuleBase_ITreeNode* aNode, myChildren) {
-    aSubFolder = dynamic_cast<PartSet_PartRootNode*>(aNode);
-    if (aSubFolder)
-      aSubFolder->update();
+    if ((aNode->type() == PartSet_ObjectFolderNode::typeId()) ||
+      (aNode->type() == PartSet_PartRootNode::typeId()))
+      aNode->update();
   }
 }
 
@@ -532,11 +539,14 @@ DocumentPtr PartSet_RootNode::document() const
 
 ModuleBase_ITreeNode* PartSet_RootNode::createNode(const ObjectPtr& theObj)
 {
+  if (theObj->groupName() == ModelAPI_Folder::group())
+    return new PartSet_ObjectFolderNode(theObj, this);
+
   FeaturePtr aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(theObj);
   if (aFeature->getKind() == PartSetPlugin_Part::ID())
     return new PartSet_PartRootNode(theObj, this);
-  else
-    return new PartSet_ObjectNode(theObj, this);
+
+  return new PartSet_ObjectNode(theObj, this);
 }
 
 //////////////////////////////////////////////////////////////////////////////////
@@ -556,13 +566,15 @@ PartSet_PartRootNode::PartSet_PartRootNode(const ObjectPtr& theObj, ModuleBase_I
   update();
 }
 
-PartSet_PartRootNode::~PartSet_PartRootNode()
+void PartSet_PartRootNode::deleteChildren()
 {
-  delete myParamsFolder;
-  delete myConstrFolder;
-  delete myResultsFolder;
-  delete myFieldsFolder;
-  delete myGroupsFolder;
+  if (!myFieldsFolder->childrenCount()) {
+    delete myFieldsFolder;
+  }
+  if (!myGroupsFolder->childrenCount()) {
+    delete myGroupsFolder;
+  }
+  PartSet_FeatureFolderNode::deleteChildren();
 }
 
 
@@ -597,7 +609,7 @@ void PartSet_PartRootNode::update()
   foreach(ModuleBase_ITreeNode* aNode, myChildren) {
     aId++;
     if (aNode->object().get()) {
-      aIndex = aDoc->index(aNode->object());
+      aIndex = aDoc->index(aNode->object(), true);
       if ((aIndex == -1) || (aId != (aIndex + aRows)))
         aDelList.append(aNode);
     }
@@ -608,20 +620,25 @@ void PartSet_PartRootNode::update()
   }
 
   std::string aGroup = ModelAPI_Feature::group();
-  int aSize = aDoc->size(aGroup);
+  int aSize = aDoc->size(aGroup, true);
   FeaturePtr aFeature;
   for (int i = 0; i < aSize; i++) {
-    ObjectPtr aObj = aDoc->object(aGroup, i);
+    ObjectPtr aObj = aDoc->object(aGroup, i, true);
     aId = i + aRows; // Take into account existing folders
     if (aId < myChildren.size()) {
       if (myChildren.at(aId)->object() != aObj) {
-        ModuleBase_ITreeNode* aNode = new PartSet_ObjectNode(aObj, this);
+        ModuleBase_ITreeNode* aNode = createNode(aObj);
         myChildren.insert(aId, aNode);
       }
     } else {
-      ModuleBase_ITreeNode* aNode = new PartSet_ObjectNode(aObj, this);
+      ModuleBase_ITreeNode* aNode = createNode(aObj);
       myChildren.append(aNode);
     }
+  }
+  // Update sub-folders
+  foreach(ModuleBase_ITreeNode* aNode, myChildren) {
+    if (aNode->type() == PartSet_ObjectFolderNode::typeId())
+      aNode->update();
   }
 }
 
@@ -662,6 +679,8 @@ Qt::ItemFlags PartSet_PartRootNode::flags(int theColumn) const
 
 ModuleBase_ITreeNode* PartSet_PartRootNode::createNode(const ObjectPtr& theObj)
 {
+  if (theObj->groupName() == ModelAPI_Folder::group())
+    return new PartSet_ObjectFolderNode(theObj, this);
   return new PartSet_ObjectNode(theObj, this);
 }
 
@@ -719,4 +738,153 @@ QTreeNodesList PartSet_PartRootNode::objectsDeleted(const DocumentPtr& theDoc,
   }
   aResult.append(PartSet_FeatureFolderNode::objectsDeleted(theDoc, theGroup));
   return aResult;
+}
+
+//////////////////////////////////////////////////////////////////////////////////
+void PartSet_ObjectFolderNode::update()
+{
+  int aFirst, aLast;
+  getFirstAndLastIndex(aFirst, aLast);
+  if ((aFirst == -1) || (aLast == -1)) {
+    deleteChildren();
+    return;
+  }
+
+  int aNbItems = aLast - aFirst + 1;
+  if (!aNbItems) {
+    deleteChildren();
+    return;
+  }
+
+  DocumentPtr aDoc = myObject->document();
+  // Delete obsolete nodes
+  QTreeNodesList aDelList;
+  int aId = -1;
+  foreach(ModuleBase_ITreeNode* aNode, myChildren) {
+    aId++;
+    if ((aFirst + aId) < aDoc->size(ModelAPI_Feature::group(), true)) {
+      if (aNode->object() != aDoc->object(ModelAPI_Feature::group(), aFirst + aId)) {
+        aDelList.append(aNode);
+      }
+    } else {
+      aDelList.append(aNode);
+    }
+  }
+  foreach(ModuleBase_ITreeNode* aNode, aDelList) {
+    myChildren.removeAll(aNode);
+    delete aNode;
+  }
+
+  // Add new nodes
+  ModuleBase_ITreeNode* aNode;
+  for (int i = 0; i < aNbItems; i++) {
+    ObjectPtr aObj = aDoc->object(ModelAPI_Feature::group(), aFirst + i);
+    if (i < myChildren.size()) {
+      if (aObj != myChildren.at(i)->object()) {
+        aNode = new PartSet_ObjectNode(aObj, this);
+        myChildren.insert(i, aNode);
+      }
+    } else {
+      aNode = new PartSet_ObjectNode(aObj, this);
+      myChildren.append(aNode);
+    }
+  }
+}
+
+QTreeNodesList PartSet_ObjectFolderNode::objectCreated(const QObjectPtrList& theObjects)
+{
+  QTreeNodesList aResult;
+  int aFirst, aLast;
+  getFirstAndLastIndex(aFirst, aLast);
+  if ((aFirst == -1) || (aLast == -1)) {
+    return aResult;
+  }
+  int aNbItems = aLast - aFirst + 1;
+  if (!aNbItems) {
+    return aResult;
+  }
+  DocumentPtr aDoc = myObject->document();
+  // Add new nodes
+  ModuleBase_ITreeNode* aNode;
+  for (int i = 0; i < aNbItems; i++) {
+    ObjectPtr aObj = aDoc->object(ModelAPI_Feature::group(), aFirst + i);
+    if (i < myChildren.size()) {
+      if (aObj != myChildren.at(i)->object()) {
+        aNode = new PartSet_ObjectNode(aObj, this);
+        myChildren.insert(i, aNode);
+        aResult.append(aNode);
+      }
+    } else {
+      aNode = new PartSet_ObjectNode(aObj, this);
+      myChildren.append(aNode);
+      aResult.append(aNode);
+    }
+  }
+  return aResult;
+}
+
+QTreeNodesList PartSet_ObjectFolderNode::objectsDeleted(const DocumentPtr& theDoc,
+  const QString& theGroup)
+{
+  QTreeNodesList aResult;
+  int aFirst, aLast;
+  getFirstAndLastIndex(aFirst, aLast);
+  if ((aFirst == -1) || (aLast == -1)) {
+    return aResult;
+  }
+  int aNbItems = aLast - aFirst + 1;
+  if (!aNbItems) {
+    return aResult;
+  }
+  DocumentPtr aDoc = myObject->document();
+  // Delete obsolete nodes
+  QTreeNodesList aDelList;
+  int aId = -1;
+  foreach(ModuleBase_ITreeNode* aNode, myChildren) {
+    aId++;
+    if ((aFirst + aId) < aDoc->size(ModelAPI_Feature::group(), true)) {
+      if (aNode->object() != aDoc->object(ModelAPI_Feature::group(), aFirst + aId)) {
+        aDelList.append(aNode);
+      }
+    } else {
+      aDelList.append(aNode);
+    }
+  }
+  if (aDelList.size() > 0) {
+    aResult.append(this);
+    foreach(ModuleBase_ITreeNode* aNode, aDelList) {
+      myChildren.removeAll(aNode);
+      delete aNode;
+    }
+  }
+  return aResult;
+}
+
+FeaturePtr PartSet_ObjectFolderNode::getFeature(const std::string& theId) const
+{
+  FolderPtr aFolder = std::dynamic_pointer_cast<ModelAPI_Folder>(myObject);
+  AttributeReferencePtr aFeatAttr = aFolder->data()->reference(theId);
+  if (aFeatAttr)
+    return ModelAPI_Feature::feature(aFeatAttr->value());
+  return FeaturePtr();
+}
+
+void PartSet_ObjectFolderNode::getFirstAndLastIndex(int& theFirst, int& theLast) const
+{
+  DocumentPtr aDoc = myObject->document();
+  FolderPtr aFolder = std::dynamic_pointer_cast<ModelAPI_Folder>(myObject);
+
+  FeaturePtr aFirstFeatureInFolder = getFeature(ModelAPI_Folder::FIRST_FEATURE_ID());
+  if (!aFirstFeatureInFolder.get()) {
+    theFirst = -1;
+    return;
+  }
+  FeaturePtr aLastFeatureInFolder = getFeature(ModelAPI_Folder::LAST_FEATURE_ID());
+  if (!aLastFeatureInFolder.get()) {
+    theLast = -1;
+    return;
+  }
+
+  theFirst = aDoc->index(aFirstFeatureInFolder);
+  theLast = aDoc->index(aLastFeatureInFolder);
 }

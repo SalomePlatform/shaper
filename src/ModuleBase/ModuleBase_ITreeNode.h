@@ -43,6 +43,10 @@ public:
   /// Default constructor
   ModuleBase_ITreeNode(ModuleBase_ITreeNode* theParent = 0) : myParent(theParent) {}
 
+  virtual ~ModuleBase_ITreeNode() { deleteChildren(); }
+
+  virtual std::string type() const = 0;
+
   /// Returns the node representation according to theRole.
   virtual QVariant data(int theColumn, int theRole) const { return QVariant(); }
 
@@ -149,6 +153,16 @@ public:
   }
 
 protected:
+
+  /// deletes all children nodes (called in destructor.)
+  virtual void deleteChildren()
+  {
+    while (myChildren.size()) {
+      ModuleBase_ITreeNode* aNode = myChildren.takeLast();
+      delete aNode;
+    }
+  }
+
   ModuleBase_ITreeNode* myParent; //!< Parent of the node
   QTreeNodesList myChildren; //!< Children of the node
 };

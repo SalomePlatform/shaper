@@ -24,6 +24,7 @@
 #include "PartSet.h"
 
 #include <ModuleBase_ITreeNode.h>
+#include <ModelAPI_Feature.h>
 
 
 /**
@@ -56,6 +57,14 @@ public:
   PartSet_ObjectNode(const ObjectPtr& theObj, ModuleBase_ITreeNode* theParent = 0)
     : PartSet_TreeNode(theParent), myObject(theObj) {}
 
+  static std::string typeId()
+  {
+    static std::string myType = "Object";
+    return myType;
+  }
+
+  virtual std::string type() const { return typeId(); }
+
   /// Returns the node representation according to theRole.
   virtual QVariant data(int theColumn, int theRole) const;
 
@@ -70,7 +79,7 @@ public:
 
   VisibilityState getVisibilityState() const;
 
-private:
+protected:
   ObjectPtr myObject;
 };
 
@@ -92,7 +101,13 @@ public:
 
   PartSet_FolderNode(ModuleBase_ITreeNode* theParent, FolderType theType);
 
-  virtual ~PartSet_FolderNode();
+  static std::string typeId()
+  {
+    static std::string myType = "Folder";
+    return myType;
+  }
+
+  virtual std::string type() const { return typeId(); }
 
   /// Returns the node representation according to theRole.
   virtual QVariant data(int theColumn, int theRole) const;
@@ -174,7 +189,14 @@ class PartSet_RootNode : public PartSet_FeatureFolderNode
 {
 public:
   PartSet_RootNode();
-  virtual ~PartSet_RootNode();
+
+  static std::string typeId()
+  {
+    static std::string myType = "PartSetRoot";
+    return myType;
+  }
+
+  virtual std::string type() const { return typeId(); }
 
   /// Updates sub-nodes of the node
   virtual void update();
@@ -209,7 +231,13 @@ class PartSet_PartRootNode : public PartSet_FeatureFolderNode
 public:
   PartSet_PartRootNode(const ObjectPtr& theObj, ModuleBase_ITreeNode* theParent);
 
-  virtual ~PartSet_PartRootNode();
+  static std::string typeId()
+  {
+    static std::string myType = "PartRoot";
+    return myType;
+  }
+
+  virtual std::string type() const { return typeId(); }
 
   /// Returns object referenced by the node (can be null)
   virtual ObjectPtr object() const { return myObject; }
@@ -241,6 +269,8 @@ protected:
 
   virtual int numberOfFolders() const;
 
+  virtual void deleteChildren();
+
 private:
   PartSet_FolderNode* myParamsFolder;
   PartSet_FolderNode* myConstrFolder;
@@ -249,6 +279,44 @@ private:
   PartSet_FolderNode* myGroupsFolder;
 
   ObjectPtr myObject;
+};
+
+/////////////////////////////////////////////////////////////////////
+/**
+* \ingroup Modules
+* Implementation of a folder which corresponds to ModelAPI_Folder object
+*/
+class PartSet_ObjectFolderNode : public PartSet_ObjectNode
+{
+public:
+  PartSet_ObjectFolderNode(const ObjectPtr& theObj, ModuleBase_ITreeNode* theParent)
+    : PartSet_ObjectNode(theObj, theParent) {}
+
+  static std::string typeId()
+  {
+    static std::string myType = "ObjectFolder";
+    return myType;
+  }
+
+  virtual std::string type() const { return typeId(); }
+
+  /// Updates sub-nodes of the node
+  virtual void update();
+
+  /// Process creation of objects.
+  /// \param theObjects a list of created objects
+  /// \return a list of nodes which corresponds to the created objects
+  virtual QTreeNodesList objectCreated(const QObjectPtrList& theObjects);
+
+  /// Process deletion of objects.
+  /// \param theDoc a document where objects were deleted
+  /// \param theGroup a name of group where objects were deleted
+  virtual QTreeNodesList objectsDeleted(const DocumentPtr& theDoc, const QString& theGroup);
+
+private:
+  FeaturePtr getFeature(const std::string& theId) const;
+
+  void getFirstAndLastIndex(int& theFirst, int& theLast) const;
 };
 
 #endif

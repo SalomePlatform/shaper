@@ -142,6 +142,39 @@ void XGUI_DataModel::processEvent(const std::shared_ptr<Events_Message>& theMess
         QTreeNodesList aList = myRoot->objectsDeleted(aDoc, (*aIt).c_str());
       rebuildDataTree();
   }
+  else if (theMessage->eventID() == Events_Loop::loop()->eventByName(EVENT_OBJECT_UPDATED)) {
+    std::shared_ptr<ModelAPI_ObjectUpdatedMessage> aUpdMsg =
+      std::dynamic_pointer_cast<ModelAPI_ObjectUpdatedMessage>(theMessage);
+    std::set<ObjectPtr> aObjects = aUpdMsg->objects();
+
+    QObjectPtrList aCreated;
+    std::set<ObjectPtr>::const_iterator aIt;
+    bool aRebuildAll = false;
+    for (aIt = aObjects.cbegin(); aIt != aObjects.cend(); aIt++) {
+      ObjectPtr aObj = (*aIt);
+      if (aObj->data()->isValid()) {
+        if (aObj->groupName() == ModelAPI_Folder::group()) {
+          aRebuildAll = true;
+          break;
+        }
+        if (aObj->isInHistory())
+          aCreated.append(*aIt);
+      }
+    }
+    if (aRebuildAll) {
+      myRoot->update();
+      rebuildDataTree();
+    } else {
+      foreach(ObjectPtr aObj, aCreated) {
+        ModuleBase_ITreeNode* aNode = myRoot->subNode(aObj);
+        if (aNode) {
+          QModelIndex aFirstIdx = getIndex(aNode, 0);
+          QModelIndex aLastIdx = getIndex(aNode, 2);
+          dataChanged(aFirstIdx, aLastIdx);
+        }
+      }
+    }
+  }
   else if (theMessage->eventID() == Events_Loop::loop()->eventByName(EVENT_ORDER_UPDATED)) {
     std::shared_ptr<ModelAPI_OrderUpdatedMessage> aUpdMsg =
       std::dynamic_pointer_cast<ModelAPI_OrderUpdatedMessage>(theMessage);
