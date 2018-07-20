@@ -100,8 +100,7 @@ model.checkBooleansResult(Interpolation_5, model, 1, [0], [0], [0], [1], [2])
 Interpolation_6 = model.addInterpolation(Part_1_doc, [p_1, p_2, p_1], False, False)
 model.do()
 
-# TODO uncomment
-#model.testNbResults(Interpolation_6, 0)
+model.testNbResults(Interpolation_6, 0)
 
 # =============================================================================
 # Test 7. Try to create curve on a single point 3
@@ -161,11 +160,10 @@ Point_2 = model.addPoint(Part_4_doc, 0, 0, 0)
 P_1 = model.selection("VERTEX", "Point_1")
 P_2 = model.selection("VERTEX", "Point_2")
 
-# TODO uncomment
-#Interpolation_10 = model.addInterpolation(Part_4_doc, [P_1, P_2],
-#                                          False, False)
-#model.do()
-#model.testNbResults(Interpolation_10, 0)
+Interpolation_10 = model.addInterpolation(Part_4_doc, [P_1, P_2],
+                                          False, False)
+model.do()
+model.testNbResults(Interpolation_10, 0)
 
 # =============================================================================
 # Test 11. Check subshapes naming

@@ -23,17 +23,76 @@
 #include <Events_InfoMessage.h>
 
 #include <ModelAPI_AttributeSelection.h>
+#include <ModelAPI_AttributeSelectionList.h>
 #include "ModelAPI_Object.h"
 
 #include <GeomAPI_Shape.h>
+#include <GeomAPI_Tools.h>
 
+//=================================================================================================
 bool GeomValidators_DifferentShapes::isValid(const AttributePtr& theAttribute,
                                       const std::list<std::string>& theArguments,
                                       Events_InfoMessage& theError) const
 {
-  FeaturePtr aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(theAttribute->owner());
+  bool isValid = false;
+
+  std::string anAttributeType = theAttribute->attributeType();
+  bool isList = anAttributeType == ModelAPI_AttributeSelectionList::typeId();
+
+  std::list<AttributePtr> anAttrs;
+  if (isList) {
+    AttributeSelectionListPtr aListAttr =
+      std::dynamic_pointer_cast<ModelAPI_AttributeSelectionList>(theAttribute);
+    // get all selection attributes from the list
+    for (int anIndex = 0; anIndex < aListAttr->size(); ++anIndex) {
+      anAttrs.push_back(aListAttr->value(anIndex));
+    }
+
+    isValid = checkEquals(anAttrs);
+  }
+  else {
+    // get all feature selection attributes
+    FeaturePtr aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(theAttribute->owner());
+    anAttrs = aFeature->data()->attributes(ModelAPI_AttributeSelection::typeId());
+
+    isValid = checkEqualToCurrent(anAttrs, theAttribute);
+  }
+
+  if (!isValid) {
+    theError = isList ? "The selection list contains equal shapes." :
+                        "The feature uses equal shapes.";
+    return false;
+  }
+
+  return true;
+}
+
+//=================================================================================================
+bool GeomValidators_DifferentShapes::checkEquals(std::list<AttributePtr>& theAttributes)
+{
+  std::list<AttributePtr>::iterator anIt = theAttributes.begin();
+  for (; anIt != theAttributes.end(); anIt++) {
+    AttributePtr anAttribute = *anIt;
+
+    std::list<AttributePtr>::iterator anOthersIt = std::next(anIt);
+    for (; anOthersIt != theAttributes.end(); anOthersIt++) {
+      AttributePtr anOtherAttribute = *anOthersIt;
+      if (isAttrShapesEqual(anAttribute, anOtherAttribute)) {
+        return false;
+      }
+    }
+  }
+
+  return true;
+}
+
+//=================================================================================================
+bool GeomValidators_DifferentShapes::checkEqualToCurrent(std::list<AttributePtr>& theAttributes,
+  const AttributePtr& theCurrentAttribute)
+{
   AttributeSelectionPtr aSelectionAttribute =
-                     std::dynamic_pointer_cast<ModelAPI_AttributeSelection>(theAttribute);
+    std::dynamic_pointer_cast<ModelAPI_AttributeSelection>(theCurrentAttribute);
+
   GeomShapePtr aShape = aSelectionAttribute->value();
   if (!aShape.get()) {
     ResultPtr aResult = aSelectionAttribute->context();
@@ -41,13 +100,10 @@ bool GeomValidators_DifferentShapes::isValid(const AttributePtr& theAttribute,
       aShape = aResult->shape();
   }
 
-  std::string aCurrentAttributeId = theAttribute->id();
-  // get all feature attributes
-  std::list<AttributePtr> anAttrs =
-      aFeature->data()->attributes(ModelAPI_AttributeSelection::typeId());
-  if (anAttrs.size() > 0 && aShape.get() != NULL) {
-    std::list<AttributePtr>::iterator anAttr = anAttrs.begin();
-    for(; anAttr != anAttrs.end(); anAttr++) {
+  std::string aCurrentAttributeId = theCurrentAttribute->id();
+  if (theAttributes.size() > 0 && aShape.get() != NULL) {
+    std::list<AttributePtr>::iterator anAttr = theAttributes.begin();
+    for (; anAttr != theAttributes.end(); anAttr++) {
       AttributePtr anAttribute = *anAttr;
       // take into concideration only other attributes
       if (anAttribute.get() != NULL && anAttribute->id() != aCurrentAttributeId) {
@@ -62,12 +118,39 @@ bool GeomValidators_DifferentShapes::isValid(const AttributePtr& theAttribute,
               anAttrShape = aResult->shape();
           }
           if (aShape->isEqual(anAttrShape)) {
-            theError = "The feature uses equal shapes.";
             return false;
           }
         }
       }
     }
   }
+
   return true;
+}
+
+bool GeomValidators_DifferentShapes::isAttrShapesEqual(const AttributePtr& theAttribute,
+                                                       const AttributePtr& theOtherAttribute)
+{
+  AttributeSelectionPtr aSelectionAttribute =
+    std::dynamic_pointer_cast<ModelAPI_AttributeSelection>(theAttribute);
+  AttributeSelectionPtr anOtherSelectionAttribute =
+    std::dynamic_pointer_cast<ModelAPI_AttributeSelection>(theOtherAttribute);
+
+  GeomShapePtr aShape = aSelectionAttribute->value();
+  if (!aShape.get()) {
+    ResultPtr aResult = aSelectionAttribute->context();
+    if (aResult.get())
+      aShape = aResult->shape();
+  }
+  GeomShapePtr aTypedShape = GeomAPI_Tools::getTypedShape(aShape);
+
+  GeomShapePtr anOtherShape = anOtherSelectionAttribute->value();
+  if (!anOtherShape.get()) {
+    ResultPtr aResult = anOtherSelectionAttribute->context();
+    if (aResult.get())
+      anOtherShape = aResult->shape();
+  }
+  GeomShapePtr aOtherTypedShape = GeomAPI_Tools::getTypedShape(anOtherShape);
+
+  return aTypedShape->isEqual(aOtherTypedShape);
 }

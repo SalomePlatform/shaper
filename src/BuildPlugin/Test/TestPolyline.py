@@ -140,11 +140,10 @@ Point_2 = model.addPoint(Part_4_doc, 0, 0, 0)
 P_1 = model.selection("VERTEX", "Point_1")
 P_2 = model.selection("VERTEX", "Point_2")
 
-# TODO uncomment
-#Polyline_9 = model.addPolyline3D(Part_4_doc, [P_1, P_2], False)
-#model.do()
+Polyline_9 = model.addPolyline3D(Part_4_doc, [P_1, P_2], False)
+model.do()
 
-#model.testNbResults(Polyline_9, 0)
+model.testNbResults(Polyline_9, 0)
 
 # =============================================================================
 # Test 10. Check subshapes naming
