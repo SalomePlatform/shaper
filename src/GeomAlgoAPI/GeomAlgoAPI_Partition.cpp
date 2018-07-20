@@ -196,6 +196,10 @@ void GeomAlgoAPI_Partition::build(const ListOfShape& theObjects,
     }
   }
 
+  // Set parallel processing mode (default is false)
+  Standard_Boolean bRunParallel = Standard_True;
+  anOperation->SetRunParallel(bRunParallel);
+
   // Building and getting result.
   anOperation->Perform();
   if (anOperation->HasErrors())
