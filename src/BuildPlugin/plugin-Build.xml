@@ -28,6 +28,9 @@ email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com
       <feature id="Edge" title="Edge" tooltip ="Create an edge from sketch edges and edge objects" icon="icons/Build/feature_edge.png">
         <source path="edge_widget.xml"/>
       </feature>
+      <feature id="Interpolation" title="Interpolation" tooltip ="Create an interpolation curve from points" icon="icons/Build/feature_interpolation.png">
+        <source path="interpolation_widget.xml"/>
+      </feature>
       <feature id="Wire" title="Wire" tooltip ="Create a wire from sketch edges, edges and wires objects" icon="icons/Build/feature_wire.png">
         <source path="wire_widget.xml"/>
       </feature>

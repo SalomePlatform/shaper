@@ -36,6 +36,7 @@ SET(PROJECT_HEADERS
     BuildPlugin_Edge.h
     BuildPlugin_Wire.h
 	BuildPlugin_Polyline.h
+	BuildPlugin_Interpolation.h
     BuildPlugin_Face.h
     BuildPlugin_Shell.h
     BuildPlugin_Solid.h
@@ -52,6 +53,7 @@ SET(PROJECT_SOURCES
     BuildPlugin_Edge.cpp
     BuildPlugin_Wire.cpp
 	BuildPlugin_Polyline.cpp
+	BuildPlugin_Interpolation.cpp
     BuildPlugin_Face.cpp
     BuildPlugin_Shell.cpp
     BuildPlugin_Solid.cpp
@@ -68,6 +70,7 @@ SET(XML_RESOURCES
     edge_widget.xml
     wire_widget.xml
 	polyline_widget.xml
+	interpolation_widget.xml
     face_widget.xml
     shell_widget.xml
     solid_widget.xml
@@ -105,6 +108,7 @@ ADD_UNIT_TESTS(TestVertex.py
                TestEdge.py
                TestWire.py
                TestPolyline.py
+			   TestInterpolation.py
                TestFace.py
                TestShell.py
                TestSolid.py

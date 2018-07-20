@@ -49,7 +49,7 @@ public:
 
   /// Returns true if the current edge is geometrically equal to the given edge.
   GEOMAPI_EXPORT
-  bool isEqual(const std::shared_ptr<GeomAPI_Shape> theVert) const;
+  virtual bool isEqual(const std::shared_ptr<GeomAPI_Shape> theVert) const;
 };
 
 //! Pointer on the object
