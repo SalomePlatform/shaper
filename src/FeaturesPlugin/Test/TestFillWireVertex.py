@@ -44,7 +44,7 @@ Wire_1 = model.addWire(Part_1_doc, [model.selection("EDGE", "Sketch_1/Edge-Sketc
 Boolean_1 = model.addFill(Part_1_doc, [model.selection("WIRE", "Wire_1_1")], [model.selection("VERTEX", "Vertex_1_1")])
 model.do()
 
-model.checkBooleansResult(Boolean_1,model,1,[0],[0],[0],[4],[8])
+model.checkResult(Boolean_1,model,1,[0],[0],[0],[4],[8])
 model.testHaveNamingSubshapes(Boolean_1,model,Part_1_doc)
 
 model.end()

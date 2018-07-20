@@ -84,7 +84,7 @@ Compound_1_objects = [model.selection("VERTEX", "Sketch_1/Vertex-SketchPoint_1")
 Compound_1 = model.addCompound(Part_1_doc, Compound_1_objects)
 model.do()
 
-model.checkBooleansResult(Compound_1, model, 1, [11], [3], [22], [92], [186])
+model.checkResult(Compound_1, model, 1, [11], [3], [22], [92], [186])
 
 model.end()
 

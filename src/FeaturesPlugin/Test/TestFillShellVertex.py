@@ -44,7 +44,7 @@ Vertex_1 = model.addVertex(Part_1_doc, [model.selection("VERTEX", "Point_1")])
 Boolean_1 = model.addFill(Part_1_doc, [model.selection("SHELL", "Shell_1_1")], [model.selection("VERTEX", "Vertex_1_1")])
 model.do()
 
-model.checkBooleansResult(Boolean_1,model,1,[0],[0],[2],[9],[18])
+model.checkResult(Boolean_1,model,1,[0],[0],[2],[9],[18])
 model.testHaveNamingSubshapes(Boolean_1,model,Part_1_doc)
 
 model.end()

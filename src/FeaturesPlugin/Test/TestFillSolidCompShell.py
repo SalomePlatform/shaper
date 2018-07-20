@@ -57,7 +57,7 @@ MultiTranslation_1 = model.addMultiTranslation(Part_1_doc, [model.selection("SHE
 Boolean_2 = model.addFill(Part_1_doc, [model.selection("SOLID", "Box_1_1")], [model.selection("COMPOUND", "LinearCopy_1_1")])
 model.do()
 
-model.checkBooleansResult(Boolean_2, model, 1, [4], [4], [30], [132], [264])
+model.checkResult(Boolean_2, model, 1, [4], [4], [30], [132], [264])
 model.testHaveNamingSubshapes(Boolean_2, model, Part_1_doc)
 
 model.end()

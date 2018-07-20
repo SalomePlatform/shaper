@@ -39,7 +39,7 @@ Edge_1 = model.addEdge(Part_1_doc, [model.selection("EDGE", "Sketch_1/Edge-Sketc
 Boolean_1 = model.addFill(Part_1_doc, [model.selection("EDGE", "Edge_1_1")], [model.selection("SOLID", "Box_1_1")])
 model.do()
 
-model.checkBooleansResult(Boolean_1, model, 1, [0], [0], [0], [1], [2])
+model.checkResult(Boolean_1, model, 1, [0], [0], [0], [1], [2])
 model.testHaveNamingSubshapes(Boolean_1, model, Part_1_doc)
 
 model.end()

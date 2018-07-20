@@ -29,7 +29,7 @@ Cone_1 = model.addCone(Part_1_doc, model.selection("VERTEX", "PartSet/Origin"), 
 Boolean_1 = model.addFill(Part_1_doc, [model.selection("SOLID", "Cone_1_1")], [model.selection("FACE", "PartSet/YOZ"), model.selection("FACE", "PartSet/XOZ")])
 model.do()
 
-model.checkBooleansResult(Boolean_1,model,1,[4],[4],[20],[72],[144])
+model.checkResult(Boolean_1,model,1,[4],[4],[20],[72],[144])
 model.testHaveNamingSubshapes(Boolean_1,model,Part_1_doc)
 
 model.end()

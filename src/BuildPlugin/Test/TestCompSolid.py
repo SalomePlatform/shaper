@@ -148,7 +148,7 @@ expectType1 = [GeomAPI_Shape.SHAPE,
                GeomAPI_Shape.COMPSOLID]
 CompSolid_1 = createCompSolidStepByStep(boundaries1, expectType1)
 
-model.checkBooleansResult(CompSolid_1, model, 1, [2], [2], [13], [54], [108])
+model.checkResult(CompSolid_1, model, 1, [2], [2], [13], [54], [108])
 model.testHaveNamingSubshapes(CompSolid_1, model, Part_1_doc)
 
 # =============================================================================
@@ -178,7 +178,7 @@ expectType2 = [GeomAPI_Shape.SHAPE,
                GeomAPI_Shape.COMPSOLID]
 CompSolid_2 = createCompSolidStepByStep(boundaries2, expectType2)
 
-model.checkBooleansResult(CompSolid_2, model, 1, [3], [3], [21], [88], [176])
+model.checkResult(CompSolid_2, model, 1, [3], [3], [21], [88], [176])
 model.testHaveNamingSubshapes(CompSolid_2, model, Part_1_doc)
 
 model.end()

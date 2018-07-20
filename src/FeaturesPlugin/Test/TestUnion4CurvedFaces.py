@@ -42,7 +42,7 @@ Partition_1 = model.addPartition(Part_1_doc, [model.selection("FACE", "PartSet/X
 Union_1 = model.addUnion(Part_1_doc, [model.selection("FACE", "Partition_1_1_1"), model.selection("FACE", "Partition_1_1_2")])
 model.do()
 
-model.checkBooleansResult(Union_1,model,1,[0],[0],[1],[4],[8])
+model.checkResult(Union_1,model,1,[0],[0],[1],[4],[8])
 model.testHaveNamingSubshapes(Union_1,model,Part_1_doc)
 
 model.end()

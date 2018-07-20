@@ -66,7 +66,7 @@ Face_1 = model.addFace(Part_1_doc, [model.selection("EDGE", "Sketch_2/Edge-Sketc
 Partition_1 = model.addPartition(Part_1_doc, [model.selection("SOLID", "Revolution_1_1"), model.selection("FACE", "Face_1_1")])
 model.do()
 
-model.checkBooleansResult(Partition_1,model,1,[4],[1],[16],[82],[164])
+model.checkResult(Partition_1,model,1,[4],[1],[16],[82],[164])
 model.testHaveNamingSubshapes(Partition_1,model,Part_1_doc)
 
 model.end()

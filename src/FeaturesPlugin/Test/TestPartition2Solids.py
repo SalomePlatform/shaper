@@ -61,7 +61,7 @@ Extrusion_2 = model.addExtrusion(Part_1_doc, [model.selection("FACE", "Sketch_2/
 Partition_1 = model.addPartition(Part_1_doc, [model.selection("SOLID", "Extrusion_1_1"), model.selection("SOLID", "Extrusion_2_1")])
 model.do()
 
-model.checkBooleansResult(Partition_1,model,1,[4],[4],[33],[150],[300])
+model.checkResult(Partition_1,model,1,[4],[4],[33],[150],[300])
 model.testHaveNamingSubshapes(Partition_1,model,Part_1_doc)
 
 model.end()
