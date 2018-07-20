@@ -40,6 +40,16 @@ public:
   GEOMVALIDATORS_EXPORT virtual bool isValid(const AttributePtr& theAttribute,
                                              const std::list<std::string>& theArguments,
                                              Events_InfoMessage& theError) const;
+
+private:
+  /// Check if the list contains equal shape selection.
+  static bool checkEquals(std::list<AttributePtr>& theAttributes);
+  /// Check if the list contains shape selection equal to the given one.
+  static bool checkEqualToCurrent(std::list<AttributePtr>& theAttributes,
+                                  const AttributePtr& theCurrentAttribute);
+  /// Check if shapes corresponding to the attributes are equal.
+  static bool isAttrShapesEqual(const AttributePtr& theAttribute,
+                                const AttributePtr& theOtherAttribute);
 };
 
 #endif

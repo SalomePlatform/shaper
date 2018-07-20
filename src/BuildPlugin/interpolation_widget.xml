@@ -25,6 +25,7 @@ email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com
                   tooltip="Select points or vertices objects."
                   type_choice="vertices"
                   concealment="true">
+    <validator id="GeomValidators_DifferentShapes"/>
   </multi_selector>
   <boolvalue id="closed" label="Closed" tooltip="Makes the curve closed." default="false"/>
   <boolvalue id="reorder" label="Reorder" tooltip="Changes the order of points to construct the shortest curve." default="false"/>
