@@ -28,7 +28,6 @@
 #include <Events_InfoMessage.h>
 
 #include <GeomAPI_ShapeExplorer.h>
-#include <GeomAlgoAPI_WireBuilder.h>
 
 #include <GeomAlgoAPI_ShapeTools.h>
 #include <GeomAlgoAPI_EdgeBuilder.h>

@@ -1,0 +1,50 @@
+<!--
+Copyright (C) 2014-2017  CEA/DEN, EDF R&D
+
+This library is free software; you can redistribute it and/or
+modify it under the terms of the GNU Lesser General Public
+License as published by the Free Software Foundation; either
+version 2.1 of the License, or (at your option) any later version.
+
+This library is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+Lesser General Public License for more details.
+
+You should have received a copy of the GNU Lesser General Public
+License along with this library; if not, write to the Free Software
+Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+
+See http:##www.salome-platform.org/ or
+email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com>
+-->
+
+<source>
+  <multi_selector id="base_objects"
+                  label="Points and vertices:"
+                  tooltip="Select points or vertices objects."
+                  type_choice="vertices"
+                  concealment="true">
+  </multi_selector>
+  <boolvalue id="closed" label="Closed" tooltip="Makes the curve closed." default="false"/>
+  <boolvalue id="reorder" label="Reorder" tooltip="Changes the order of points to construct the shortest curve." default="false"/>
+  <optionalbox id="use_tangents" title="Tangents" default="false">
+    <shape_selector id="tangent_start"
+                    icon="icons/Features/axis.png"
+                    label="Start"
+                    tooltip="Select vector tangent to the start of curve"
+                    shape_types="edge"
+                    default="&lt;start&gt;">
+      <validator id="GeomValidators_ShapeType" parameters="empty,line"/>
+    </shape_selector>
+    <shape_selector id="tangent_end"
+                    icon="icons/Features/axis.png"
+                    label="End"
+                    tooltip="Select vector tangent to the end of curve"
+                    shape_types="edge"
+                    default="&lt;end&gt;">
+      <validator id="GeomValidators_ShapeType" parameters="empty,line"/>
+    </shape_selector>
+  </optionalbox>
+  <validator id="GeomValidators_MinObjectsSelected" parameters="base_objects,2"/>
+</source>

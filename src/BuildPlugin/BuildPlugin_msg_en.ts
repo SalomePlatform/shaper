@@ -453,4 +453,11 @@
         <translation>Points list should contain at least 2 items</translation>
     </message>
   </context>
+  <context>
+    <name>Interpolation:GeomValidators_MinObjectsSelected</name>
+    <message>
+      <source>Error: Attribute "%1" should contain at least %2 items.</source>
+      <translation>Points list should contain at least 2 items</translation>
+    </message>
+  </context>
 </TS>

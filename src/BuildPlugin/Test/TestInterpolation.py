@@ -39,62 +39,80 @@ SketchPoint_2 = Sketch_1.addPoint(0, 50)
 SketchPoint_3 = Sketch_1.addPoint(25, 25)
 SketchPoint_4 = Sketch_1.addPoint(50, 50)
 SketchPoint_5 = Sketch_1.addPoint(50, 0)
+
+SketchLine_1 = Sketch_1.addLine(0, 0, -45, -45)
+SketchLine_2 = Sketch_1.addLine(0, 0, 45, 45)
 model.do()
 
 # Get sketch points
 base_name = "Sketch_1/Vertex-SketchPoint_"
 p_1, p_2, p_3, p_4, p_5 = [model.selection("VERTEX", base_name + str(i + 1)) for i in range(0, 5)]
 
+# Get sketch edges
+Tangent_1 = model.selection("EDGE", "Sketch_1/Edge-SketchLine_1")
+Tangent_2 = model.selection("EDGE", "Sketch_1/Edge-SketchLine_2")
+
 # =============================================================================
-# Test 1. Create unclosed polyline 1-2-3-4-5
+# Test 1. Create curve 1-2-3-4-5, closed off, reorder off, without tangents
 # =============================================================================
-Polyline_1 = model.addPolyline3D(Part_1_doc, [p_1, p_2, p_3, p_4, p_5], False)
+Interpolation_1 = model.addInterpolation(Part_1_doc, [p_1, p_2, p_3, p_4, p_5], False, False)
 model.do()
 
-model.checkBooleansResult(Polyline_1, model, 1, [0], [0], [0], [4], [4*2])
+model.checkBooleansResult(Interpolation_1, model, 1, [0], [0], [0], [1], [2])
 
-# =============================================================================
-# Test 2. Create closed polyline 1-2-3-4-5-1
-# =============================================================================
-Polyline_2 = model.addPolyline3D(Part_1_doc, [p_1, p_2, p_3, p_4, p_5], True)
+# # =============================================================================
+# # Test 2. Create curve 1-2-3-4-5-1, closed on, reorder off, without tangents
+# # =============================================================================
+Interpolation_2 = model.addInterpolation(Part_1_doc, [p_1, p_2, p_3, p_4, p_5], True, False)
 model.do()
 
-model.checkBooleansResult(Polyline_2, model, 1, [0], [0], [0], [5], [5*2])
+model.checkBooleansResult(Interpolation_2, model, 1, [0], [0], [0], [1], [2])
 
-# =============================================================================
-# Test 3. Try to create self-intersected unclosed polyline 2-5-4-1
-# =============================================================================
-Polyline_3 = model.addPolyline3D(Part_1_doc, [p_2, p_5, p_4, p_1], False)
+# # =============================================================================
+# # Test 3. Create curve 1-2-3-4, closed off, reorder on, without tangents
+# # =============================================================================
+Interpolation_3 = model.addInterpolation(Part_1_doc, [p_1, p_2, p_3, p_4], False, True)
 model.do()
 
-model.testNbResults(Polyline_3, 0)
+model.checkBooleansResult(Interpolation_3, model, 1, [0], [0], [0], [1], [2])
 
 # =============================================================================
-# Test 4. Try to create self-intersected closed polyline 2-4-1-5-2
+# Test 4. Create curve 1-2-3-5, closed on, reorder on, without tangents
 # =============================================================================
-Polyline_4 = model.addPolyline3D(Part_1_doc, [p_2, p_4, p_1, p_5], True)
+Interpolation_4 = model.addInterpolation(Part_1_doc, [p_1, p_2, p_3, p_5], True, True)
 model.do()
 
-model.testNbResults(Polyline_4, 0)
+model.checkBooleansResult(Interpolation_4, model, 1, [0], [0], [0], [1], [2])
 
 # =============================================================================
-# Test 5. Try to create closed polyline 1-2-1
+# Test 5. Create curve 1-2-3-4-5, closed off, reorder off, with tangents
 # =============================================================================
-Polyline_5 = model.addPolyline3D(Part_1_doc, [p_1, p_2], True)
+
+Interpolation_5 = model.addInterpolation(Part_1_doc, [p_1, p_2, p_3, p_4, p_5],
+                                         Tangent_1, Tangent_2, False, False)
 model.do()
 
-model.testNbResults(Polyline_5, 0)
+model.checkBooleansResult(Interpolation_5, model, 1, [0], [0], [0], [1], [2])
 
 # =============================================================================
-# Test 6. Try to create unclosed polyline on a single point 3
+# Test 6. Try to create closed curve 1-2-1, closed off, reorder off, without tangents
 # =============================================================================
-Polyline_6 = model.addPolyline3D(Part_1_doc, [p_3], False)
+Interpolation_6 = model.addInterpolation(Part_1_doc, [p_1, p_2, p_1], False, False)
 model.do()
 
-model.testNbResults(Polyline_6, 0)
+# TODO uncomment
+#model.testNbResults(Interpolation_6, 0)
 
 # =============================================================================
-# Test 7. Create unclosed polyline on box vertices
+# Test 7. Try to create curve on a single point 3
+# =============================================================================
+Interpolation_7 = model.addInterpolation(Part_1_doc, [p_3], False, False)
+model.do()
+
+model.testNbResults(Interpolation_7, 0)
+
+# =============================================================================
+# Test 8. Create curve on box vertices, closed off, reorder off, without tangents
 # =============================================================================
 Part_2 = model.addPart(partSet)
 Part_2_doc = Part_2.document()
@@ -110,27 +128,30 @@ point_names = ("Box_1_1/Back&Box_1_1/Left&Box_1_1/Bottom",
                "Box_1_1/Back&Box_1_1/Right&Box_1_1/Bottom")
 points = [model.selection("VERTEX", name) for name in point_names]
 
-Polyline_7 = model.addPolyline3D(Part_2_doc, points, False)
+Interpolation_8 = model.addInterpolation(Part_2_doc, points, False, False)
 model.do()
 
-model.checkBooleansResult(Polyline_7, model, 1, [0], [0], [0], [7], [7*2])
+model.checkBooleansResult(Interpolation_8, model, 1, [0], [0], [0], [1], [2])
 
 # =============================================================================
-# Test 8. Create closed polyline on box vertices
+# Test 9. Create curve on box vertices, closed off, reorder off, with tangents
 # =============================================================================
 Part_3 = model.addPart(partSet)
 Part_3_doc = Part_3.document()
-Box_1 = model.addBox(Part_3_doc, 10, 10, 10)
+Box_1 = model.addBox(Part_3_doc, 20, 30, 40)
 
 points = [model.selection("VERTEX", name) for name in point_names]
+Tangent_1 = model.selection("EDGE", "Box_1_1/Back&Box_1_1/Top")
+Tangent_2 = model.selection("EDGE", "Box_1_1/Left&Box_1_1/Top")
 
-Polyline_8 = model.addPolyline3D(Part_3_doc, points, True)
+Interpolation_9 = model.addInterpolation(Part_3_doc, points,
+                                         Tangent_1, Tangent_2, False, False)
 model.do()
 
-model.checkBooleansResult(Polyline_8, model, 1, [0], [0], [0], [8], [8*2])
+model.checkBooleansResult(Interpolation_9, model, 1, [0], [0], [0], [1], [2])
 
 # =============================================================================
-# Test 9. Create polyline using equal vertices
+# Test 10. Create curve using equal vertices
 # =============================================================================
 Part_4 = model.addPart(partSet)
 Part_4_doc = Part_4.document()
@@ -141,18 +162,19 @@ P_1 = model.selection("VERTEX", "Point_1")
 P_2 = model.selection("VERTEX", "Point_2")
 
 # TODO uncomment
-#Polyline_9 = model.addPolyline3D(Part_4_doc, [P_1, P_2], False)
+#Interpolation_10 = model.addInterpolation(Part_4_doc, [P_1, P_2],
+#                                          False, False)
 #model.do()
-
-#model.testNbResults(Polyline_9, 0)
+#model.testNbResults(Interpolation_10, 0)
 
 # =============================================================================
-# Test 10. Check subshapes naming
+# Test 11. Check subshapes naming
 # =============================================================================
-model.testHaveNamingSubshapes(Polyline_1, model, Part_1_doc)
+model.testHaveNamingSubshapes(Interpolation_5, model, Part_1_doc)
+model.testHaveNamingSubshapes(Interpolation_9, model, Part_3_doc)
 model.end()
 
 # =============================================================================
-# Test 11. Check Python dump
+# Test 12. Check Python dump
 # =============================================================================
 assert(model.checkPythonDump())
