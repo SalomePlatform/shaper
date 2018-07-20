@@ -1368,6 +1368,24 @@ void Model_AttributeSelection::updateInHistory()
           aValueShape = std::make_shared<GeomAPI_Shape>();
           aValueShape->setImpl<TopoDS_Shape>(new TopoDS_Shape(aNewValues.Value()));
         }
+
+        // Check that list has the same type of shape selection before adding.
+        GeomAPI_Shape::ShapeType aListShapeType = GeomAPI_Shape::SHAPE;
+        if (myParent->selectionType() == "VERTEX") aListShapeType = GeomAPI_Shape::VERTEX;
+        else if (myParent->selectionType() == "EDGE") aListShapeType = GeomAPI_Shape::EDGE;
+        else if (myParent->selectionType() == "FACE") aListShapeType = GeomAPI_Shape::FACE;
+
+        GeomAPI_Shape::ShapeType aShapeShapeType = GeomAPI_Shape::SHAPE;
+        if (aValueShape.get()) {
+          aShapeShapeType = aValueShape->shapeType();
+        } else {
+          (*aNewCont)->shape()->shapeType();
+        }
+
+        if (aListShapeType != GeomAPI_Shape::SHAPE && aListShapeType != aShapeShapeType) {
+          continue;
+        }
+
         myParent->append(*aNewCont, aValueShape);
       }
     }

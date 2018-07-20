@@ -23,10 +23,13 @@
 
 #include "FeaturesPlugin_Boolean.h"
 
+#include <ModelAPI_Feature.h>
+#include <ModelAPI_ResultBody.h>
+
 /// \class FeaturesPlugin_BooleanCut
 /// \ingroup Plugins
 /// \brief Feature for applying of Boolean Cut operation.
-class FeaturesPlugin_BooleanCut : public FeaturesPlugin_Boolean
+class FeaturesPlugin_BooleanCut: public FeaturesPlugin_Boolean
 {
 public:
 
@@ -44,10 +47,24 @@ public:
     return MY_KIND;
   }
 
+  /// Creates a new part document if needed.
+  FEATURESPLUGIN_EXPORT virtual void execute();
+
 public:
 
-    /// Use plugin manager for features creation.
-  FeaturesPlugin_BooleanCut(): FeaturesPlugin_Boolean(BOOL_CUT) {};
+  /// Use plugin manager for features creation.
+  FeaturesPlugin_BooleanCut();
+
+private:
+
+  /// Load Naming data structure of the feature to the document
+  void loadNamingDS(ResultBodyPtr theResultBody,
+                    const GeomShapePtr theBaseShape,
+                    const ListOfShape& theTools,
+                    const GeomShapePtr theResultShape,
+                    GeomAlgoAPI_MakeShape& theMakeShape,
+                    GeomAPI_DataMapOfShapeShape& theMapOfShapes,
+                    const bool theIsStoreAsGenerated = false);
 
 };
 

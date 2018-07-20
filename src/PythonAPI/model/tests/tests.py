@@ -203,6 +203,8 @@ def testHaveNamingByType(theFeature, theModel, thePartDoc, theSubshapeType) :
   :param theFeature: feature to test.
   :param theSubshapeType: type of sub-shape
   """
+  if not theFeature.results():
+    return
   aFirstRes = theFeature.results()[0]
   # Get number of sub-results
   hasSubs = True

@@ -617,7 +617,9 @@ bool FeaturesPlugin_ValidatorBooleanSelection::isValid(const AttributePtr& theAt
       anAllowedTypes.insert(GeomAPI_Shape::SOLID);
       anAllowedTypes.insert(GeomAPI_Shape::COMPSOLID);
       anAllowedTypes.insert(GeomAPI_Shape::COMPOUND);
-    } else if (anOperationType == FeaturesPlugin_Boolean::BOOL_FILL) {
+    } else if (anOperationType == FeaturesPlugin_Boolean::BOOL_FILL
+               || anOperationType == FeaturesPlugin_Boolean::BOOL_CUT)
+    {
       anAllowedTypes.insert(GeomAPI_Shape::VERTEX);
       anAllowedTypes.insert(GeomAPI_Shape::EDGE);
       anAllowedTypes.insert(GeomAPI_Shape::WIRE);
