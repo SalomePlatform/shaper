@@ -153,6 +153,13 @@ private:
   /// builds name for the shape kept at the specified tag
   void buildName(const int theTag, const std::string& theName);
 
+private:
+  int myDividedIndex;
+  int myVIndex;
+  int myEIndex;
+  int myFIndex;
+
+private:
   friend class Model_ResultBody;
   friend class Model_ResultCompSolid;
 };

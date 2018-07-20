@@ -68,6 +68,7 @@ SET(PROJECT_SOURCES
     FeaturesPlugin_Rotation.cpp
     FeaturesPlugin_Translation.cpp
     FeaturesPlugin_Boolean.cpp
+    FeaturesPlugin_BooleanCut.cpp
     FeaturesPlugin_Intersection.cpp
     FeaturesPlugin_Partition.cpp
     FeaturesPlugin_Pipe.cpp
@@ -272,4 +273,23 @@ ADD_UNIT_TESTS(TestExtrusion.py
                Test2495.py
                Test2514.py
                Test2520.py
+               TestBooleanCut_CompSolid_CompSolid.py
+               TestBooleanCut_CompSolidCompound_CompSolidCompound.py
+               TestBooleanCut_Edge_Edge.py
+               TestBooleanCut_Edge_Face.py
+               TestBooleanCut_EdgeCompound_EdgeCompound.py
+               TestBooleanCut_EdgeCompound_Solid.py
+               TestBooleanCut_Face_Face.py
+               TestBooleanCut_Face_Solid.py
+               TestBooleanCut_FaceCompound_FaceCompound.py
+               TestBooleanCut_Shell_Shell.py
+               TestBooleanCut_ShellCompound_ShellCompound.py
+               TestBooleanCut_Solid_Solid.py
+               TestBooleanCut_SolidCompound_SolidCompound.py
+               TestBooleanCut_Vertex_Vertex.py
+               TestBooleanCut_VertexCompound_Solid.py
+               TestBooleanCut_VertexCompound_VertexCompound.py
+               TestBooleanCut_Wire_Face.py
+               TestBooleanCut_Wire_Wire.py
+               TestBooleanCut_WireCompound_WireCompound.py
 )

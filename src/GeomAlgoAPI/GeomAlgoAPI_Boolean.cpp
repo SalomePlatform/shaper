@@ -27,6 +27,16 @@
 #include <TopTools_ListOfShape.hxx>
 
 //=================================================================================================
+GeomAlgoAPI_Boolean::GeomAlgoAPI_Boolean(const GeomShapePtr theObject,
+                                         const ListOfShape& theTools,
+                                         const OperationType theOperationType)
+{
+  ListOfShape aListWithObject;
+  aListWithObject.push_back(theObject);
+  build(aListWithObject, theTools, theOperationType);
+}
+
+//=================================================================================================
 GeomAlgoAPI_Boolean::GeomAlgoAPI_Boolean(const ListOfShape& theObjects,
                                          const ListOfShape& theTools,
                                          const OperationType theOperationType)

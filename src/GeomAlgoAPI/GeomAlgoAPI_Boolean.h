@@ -39,7 +39,13 @@ public:
     BOOL_COMMON ///< Take common part of objects
   };
 
- public:
+public:
+
+  /// Constructor.
+  GEOMALGOAPI_EXPORT GeomAlgoAPI_Boolean(const GeomShapePtr theObject,
+                                         const ListOfShape& theTools,
+                                         const OperationType theOperationType);
+
 
   /// Constructor.
   GEOMALGOAPI_EXPORT GeomAlgoAPI_Boolean(const ListOfShape& theObjects,
