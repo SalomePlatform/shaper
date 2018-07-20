@@ -77,7 +77,7 @@ SET(PROJECT_HEADERS
     GeomAlgoAPI_Fillet.h
     GeomAlgoAPI_SortListOfShapes.h
     GeomAlgoAPI_Filling.h
-	GeomAlgoAPI_CurveBuilder.h
+    GeomAlgoAPI_CurveBuilder.h
 )
 
 SET(PROJECT_SOURCES
@@ -133,7 +133,7 @@ SET(PROJECT_SOURCES
     GeomAlgoAPI_Fillet.cpp
     GeomAlgoAPI_SortListOfShapes.cpp
     GeomAlgoAPI_Filling.cpp
-	GeomAlgoAPI_CurveBuilder.cpp
+    GeomAlgoAPI_CurveBuilder.cpp
 )
 
 SET(PROJECT_LIBRARIES
