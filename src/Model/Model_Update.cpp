@@ -836,7 +836,7 @@ void Model_Update::updateArguments(FeaturePtr theFeature) {
       if (aSelAttr) {
         ObjectPtr aContext = aSelAttr->context();
         // update argument only if the referenced object is ready to use
-        if (aContext.get() && !aContext->isDisabled()) {
+        if (aContext.get() && !aContext->isDisabled() && !aSelAttr->isInvalid()) {
           if (isReason(theFeature, aContext)) {
             if (!aSelAttr->update()) {
               bool isObligatory = !aFactory->isNotObligatory(
@@ -846,7 +846,7 @@ void Model_Update::updateArguments(FeaturePtr theFeature) {
                 aState = ModelAPI_StateInvalidArgument;
             }
           }
-        } else if (aContext.get()) {
+        } else if (aContext.get() || aSelAttr->isInvalid()) {
           // here it may be not obligatory, but if the reference is wrong, it should not be correct
           bool isObligatory = aFactory->isCase(theFeature, theFeature->data()->id(aSel));
           if (isObligatory)
