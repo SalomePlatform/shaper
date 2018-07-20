@@ -115,15 +115,18 @@ void BuildAPI_Interpolation::dump(ModelHighAPI_Dumper& theDumper) const
 
   AttributeSelectionListPtr anAttrBaseObjects =
     aBase->selectionList(BuildPlugin_Interpolation::BASE_OBJECTS_ID());
-  AttributeSelectionPtr anAttrStartTangent =
-    aBase->selection(BuildPlugin_Interpolation::TANGENT_START_ID());
-  AttributeSelectionPtr anAttrEndTangent =
-    aBase->selection(BuildPlugin_Interpolation::TANGENT_END_ID());
 
   theDumper << aBase << " = model.addInterpolation(" << aPartName << ", "
             << anAttrBaseObjects << ", ";
 
-  if (anAttrStartTangent->isInitialized() && anAttrEndTangent->isInitialized()) {
+  AttributeStringPtr useTangentsAttr = useTangents();
+  std::string useTangents = useTangentsAttr->value();
+  if (!useTangents.empty()) {
+    AttributeSelectionPtr anAttrStartTangent =
+      aBase->selection(BuildPlugin_Interpolation::TANGENT_START_ID());
+    AttributeSelectionPtr anAttrEndTangent =
+      aBase->selection(BuildPlugin_Interpolation::TANGENT_END_ID());
+
     theDumper << anAttrStartTangent << ", " << anAttrEndTangent << ", ";
   }
 
