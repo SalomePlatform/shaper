@@ -88,16 +88,18 @@ void Model_ObjectUpdatedMessage::Join(const std::shared_ptr<Events_MessageGroup>
 /////////////////////// DELETED MESSAGE /////////////////////////////
 Model_ObjectDeletedMessage::Model_ObjectDeletedMessage(
     const std::shared_ptr<ModelAPI_Document>& theDoc, const std::string& theGroup)
-    : ModelAPI_ObjectDeletedMessage(messageId(), 0),
-      myDoc(theDoc)
+    : ModelAPI_ObjectDeletedMessage(messageId(), 0)
 {
-  if (!theGroup.empty())
-    myGroups.insert(theGroup);
+  if (!theGroup.empty()) {
+    myGroups.push_back(
+      std::pair<std::shared_ptr<ModelAPI_Document>, std::string>(theDoc, theGroup));
+  }
 }
 
 std::shared_ptr<Events_MessageGroup> Model_ObjectDeletedMessage::newEmpty()
 {
-  return std::shared_ptr<Model_ObjectDeletedMessage>(new Model_ObjectDeletedMessage(myDoc, ""));
+  static const std::shared_ptr<ModelAPI_Document> anEmpty;
+  return std::shared_ptr<Model_ObjectDeletedMessage>(new Model_ObjectDeletedMessage(anEmpty, ""));
 }
 
 const Events_ID Model_ObjectDeletedMessage::messageId()
@@ -110,9 +112,19 @@ void Model_ObjectDeletedMessage::Join(const std::shared_ptr<Events_MessageGroup>
 {
   std::shared_ptr<Model_ObjectDeletedMessage> aJoined =
     std::dynamic_pointer_cast<Model_ObjectDeletedMessage>(theJoined);
-  std::set<std::string>::iterator aGIter = aJoined->myGroups.begin();
-  for (; aGIter != aJoined->myGroups.end(); aGIter++) {
-    myGroups.insert(*aGIter);
+
+  const std::list<std::pair<std::shared_ptr<ModelAPI_Document>, std::string>>& aJGroups =
+    aJoined->groups();
+
+  std::list<std::pair<std::shared_ptr<ModelAPI_Document>, std::string>>::iterator aGIter;
+  std::list<std::pair<std::shared_ptr<ModelAPI_Document>, std::string>>::const_iterator aJIter;
+  for (aJIter = aJGroups.cbegin(); aJIter != aJGroups.cend(); aJIter++) {
+    for (aGIter = myGroups.begin(); aGIter != myGroups.end(); aGIter++) {
+      if (aGIter->first == aJIter->first && aGIter->second == aJIter->second)
+        break; // exists, so no need to insert
+    }
+    if (aGIter == myGroups.end())
+      myGroups.push_back(*aJIter);
   }
 }
 

@@ -163,14 +163,15 @@ void SketchSolver_Manager::processEvent(
   } else if (theMessage->eventID() == Events_Loop::loop()->eventByName(EVENT_OBJECT_DELETED)) {
     std::shared_ptr<ModelAPI_ObjectDeletedMessage> aDeleteMsg =
       std::dynamic_pointer_cast<ModelAPI_ObjectDeletedMessage>(theMessage);
-    const std::set<std::string>& aFeatureGroups = aDeleteMsg->groups();
+    const std::list<std::pair<std::shared_ptr<ModelAPI_Document>, std::string>>& aFeatureGroups =
+      aDeleteMsg->groups();
 
     // Find SketchPlugin_Sketch::ID() in groups.
     // The constraint groups should be updated when an object removed from Sketch
-    std::set<std::string>::const_iterator aFGrIter;
+    std::list<std::pair<std::shared_ptr<ModelAPI_Document>, std::string>>::const_iterator aFGrIter;
     for (aFGrIter = aFeatureGroups.begin(); aFGrIter != aFeatureGroups.end(); aFGrIter++)
-      if (aFGrIter->compare(ModelAPI_ResultConstruction::group()) == 0 ||
-          aFGrIter->compare(ModelAPI_Feature::group()) == 0)
+      if (aFGrIter->second == ModelAPI_ResultConstruction::group() ||
+        aFGrIter->second == ModelAPI_Feature::group())
         break;
 
     if (aFGrIter != aFeatureGroups.end()) {

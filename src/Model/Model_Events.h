@@ -69,8 +69,8 @@ class Model_ObjectUpdatedMessage : public ModelAPI_ObjectUpdatedMessage
 /// Message that feature was deleted (used for Object Browser update)
 class Model_ObjectDeletedMessage : public ModelAPI_ObjectDeletedMessage
 {
-  std::shared_ptr<ModelAPI_Document> myDoc;  ///< document owner of the feature
-  std::set<std::string> myGroups;  ///< group identifiers that contained the deleted feature
+  ///< group identifiers that contained the deleted feature and document where they are deleted
+  std::list<std::pair<std::shared_ptr<ModelAPI_Document>, std::string> > myGroups;
 
   /// Use ModelAPI for creation of this event.
   Model_ObjectDeletedMessage(const std::shared_ptr<ModelAPI_Document>& theDoc,
@@ -78,14 +78,9 @@ class Model_ObjectDeletedMessage : public ModelAPI_ObjectDeletedMessage
 
   friend class Model_EventCreator;
  public:
-  /// Returns the document that has been updated
-  virtual std::shared_ptr<ModelAPI_Document> document() const
-  {
-    return myDoc;
-  }
-
   /// Returns the group where the objects were deleted
-  virtual const std::set<std::string>& groups() const
+  virtual const std::list<std::pair<std::shared_ptr<ModelAPI_Document>, std::string> >&
+    groups() const
   {
     return myGroups;
   }

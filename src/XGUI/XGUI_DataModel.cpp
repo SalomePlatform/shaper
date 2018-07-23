@@ -81,11 +81,11 @@ void XGUI_DataModel::processEvent(const std::shared_ptr<Events_Message>& theMess
   else if (theMessage->eventID() == Events_Loop::loop()->eventByName(EVENT_OBJECT_DELETED)) {
       std::shared_ptr<ModelAPI_ObjectDeletedMessage> aUpdMsg =
           std::dynamic_pointer_cast<ModelAPI_ObjectDeletedMessage>(theMessage);
-      DocumentPtr aDoc = aUpdMsg->document();
-      std::set<std::string> aMsgGroups = aUpdMsg->groups();
-      std::set<std::string>::const_iterator aIt;
+      const std::list<std::pair<std::shared_ptr<ModelAPI_Document>, std::string>>& aMsgGroups =
+        aUpdMsg->groups();
+      std::list<std::pair<std::shared_ptr<ModelAPI_Document>, std::string>>::const_iterator aIt;
       for (aIt = aMsgGroups.cbegin(); aIt != aMsgGroups.cend(); aIt++)
-        QTreeNodesList aList = myRoot->objectsDeleted(aDoc, (*aIt).c_str());
+        QTreeNodesList aList = myRoot->objectsDeleted(aIt->first, aIt->second.c_str());
       rebuildDataTree();
   }
   else if (theMessage->eventID() == Events_Loop::loop()->eventByName(EVENT_OBJECT_UPDATED)) {
