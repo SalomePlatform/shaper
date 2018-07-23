@@ -134,7 +134,9 @@ QVariant PartSet_ObjectNode::data(int theColumn, int theRole) const
 
 Qt::ItemFlags PartSet_ObjectNode::flags(int theColumn) const
 {
-  if (!myObject->isDisabled()) {
+  if (myObject->isDisabled()) {
+    return (theColumn == 2) ? Qt::ItemIsSelectable : aNullFlag;
+  } else {
     DocumentPtr aDoc = myObject->document();
     SessionPtr aSession = ModelAPI_Session::get();
     if (aSession->activeDocument() == aDoc)
@@ -362,11 +364,8 @@ QTreeNodesList PartSet_FeatureFolderNode::objectCreated(const QObjectPtrList& th
   // Process all folders
   ModuleBase_ITreeNode* aFoder = 0;
   foreach(ModuleBase_ITreeNode* aNode, myChildren) {
-    aFoder = dynamic_cast<PartSet_FolderNode*>(aNode);
-    if (!aFoder)
-      aFoder = dynamic_cast<PartSet_FeatureFolderNode*>(aNode);
-
-    if (aFoder) { // aFolder node
+    if ((aNode->type() == PartSet_FolderNode::typeId()) ||
+      (aNode->type() == PartSet_PartRootNode::typeId())) { // aFolder node
       QTreeNodesList aList = aNode->objectCreated(theObjects);
       if (aList.size() > 0)
         aResult.append(aList);
@@ -381,14 +380,17 @@ QTreeNodesList PartSet_FeatureFolderNode::objectCreated(const QObjectPtrList& th
       if ((aObj->groupName() == ModelAPI_Feature::group()) ||
         (aObj->groupName() == ModelAPI_Folder::group())){
         ModuleBase_ITreeNode* aNode = createNode(aObj);
-        aIdx = aDoc->index(aObj, true) + aNb;
-        bool aHasObject = (aIdx < myChildren.size()) && (myChildren.at(aIdx)->object() == aObj);
-        if (!aHasObject) {
-          if (aIdx < myChildren.size())
-            myChildren.insert(aIdx, aNode);
-          else
-            myChildren.append(aNode);
-          aResult.append(aNode);
+        aIdx = aDoc->index(aObj, true);
+        if (aIdx != -1) {
+          aIdx += aNb;
+          bool aHasObject = (aIdx < myChildren.size()) && (myChildren.at(aIdx)->object() == aObj);
+          if (!aHasObject) {
+            if (aIdx < myChildren.size())
+              myChildren.insert(aIdx, aNode);
+            else
+              myChildren.append(aNode);
+            aResult.append(aNode);
+          }
         }
       }
     }
@@ -429,7 +431,7 @@ QTreeNodesList PartSet_FeatureFolderNode::objectsDeleted(const DocumentPtr& theD
       aId++;
       if (aNode->object().get()) {
         aIndex = aDoc->index(aNode->object(), true);
-        if ((aIndex == -1) || (aId != aIndex))
+        if ((aIndex == -1) || (aId != (aIndex + aNb)))
           aDelList.append(aNode);
       }
     }

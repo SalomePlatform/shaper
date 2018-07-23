@@ -98,13 +98,15 @@ void XGUI_DataModel::processEvent(const std::shared_ptr<Events_Message>& theMess
     bool aRebuildAll = false;
     for (aIt = aObjects.cbegin(); aIt != aObjects.cend(); aIt++) {
       ObjectPtr aObj = (*aIt);
+      if (!aObj->isInHistory())
+        continue;
+
       if (aObj->data()->isValid()) {
         if (aObj->groupName() == ModelAPI_Folder::group()) {
           aRebuildAll = true;
           break;
         }
-        if (aObj->isInHistory())
-          aCreated.append(*aIt);
+        aCreated.append(*aIt);
       }
     }
     if (aRebuildAll) {
