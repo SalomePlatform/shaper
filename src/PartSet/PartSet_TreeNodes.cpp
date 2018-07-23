@@ -256,18 +256,16 @@ void PartSet_FolderNode::update()
     return;
 
   // Remove extra sub-nodes
-  QTreeNodesList aDelList;
   int aIndex;
-  int aId = -1;
-  foreach(ModuleBase_ITreeNode* aNode, myChildren) {
-    aId++;
+  int aId = 0;
+  while (aId < myChildren.size()) {
+    ModuleBase_ITreeNode* aNode = myChildren.at(aId);
     aIndex = aDoc->index(aNode->object(), true);
-    if ((aIndex == -1) || (aId != aIndex))
-      aDelList.append(aNode);
-  }
-  foreach(ModuleBase_ITreeNode* aNode, aDelList) {
-    myChildren.removeAll(aNode);
-    delete aNode;
+    if ((aIndex == -1) || (aId != aIndex)) {
+      myChildren.removeAll(aNode);
+      delete aNode;
+    } else
+      aId++;
   }
 
   // Add new nodes
@@ -339,20 +337,20 @@ QTreeNodesList PartSet_FolderNode::objectsDeleted(const DocumentPtr& theDoc,
   if ((theGroup.toStdString() == groupName()) && (theDoc == aDoc)) {
     QTreeNodesList aDelList;
     int aIndex;
-    int aId = -1;
-    foreach(ModuleBase_ITreeNode* aNode, myChildren) {
-      aId++;
+    int aId = 0;
+    bool aRemoved = false;
+    while (aId < myChildren.size()) {
+      ModuleBase_ITreeNode* aNode = myChildren.at(aId);
       aIndex = aDoc->index(aNode->object(), true);
-      if ((aIndex == -1) || (aId != aIndex))
-        aDelList.append(aNode);
-    }
-    if (aDelList.size() > 0) {
-      foreach(ModuleBase_ITreeNode* aNode, aDelList) {
+      if ((aIndex == -1) || (aId != aIndex)) {
         myChildren.removeAll(aNode);
         delete aNode;
-      }
-      aResult.append(this);
+        aRemoved = true;
+      }  else
+        aId++;
     }
+    if (aRemoved)
+      aResult.append(this);
   }
   return aResult;
 }
@@ -424,24 +422,24 @@ QTreeNodesList PartSet_FeatureFolderNode::objectsDeleted(const DocumentPtr& theD
   bool isGroup = ((theGroup.toStdString() == ModelAPI_Feature::group()) ||
     (theGroup.toStdString() == ModelAPI_Folder::group()));
   if ((theDoc == aDoc) && isGroup) {
-    QTreeNodesList aDelList;
     int aIndex;
-    int aId = -1;
-    foreach(ModuleBase_ITreeNode* aNode, myChildren) {
-      aId++;
+    int aId = 0;
+    bool aRemoved = false;
+    while (aId < myChildren.size()) {
+      ModuleBase_ITreeNode* aNode = myChildren.at(aId);
       if (aNode->object().get()) {
         aIndex = aDoc->index(aNode->object(), true);
-        if ((aIndex == -1) || (aId != (aIndex + aNb)))
-          aDelList.append(aNode);
+        if ((aIndex == -1) || (aId != (aIndex + aNb))) {
+          myChildren.removeAll(aNode);
+          delete aNode;
+          aRemoved = true;
+          continue;
+        }
       }
+      aId++;
     }
-    if (aDelList.size() > 0) {
-      foreach(ModuleBase_ITreeNode* aNode, aDelList) {
-        myChildren.removeAll(aNode);
-        delete aNode;
-      }
+    if (aRemoved)
       aResult.append(this);
-    }
   }
   return aResult;
 }
@@ -493,20 +491,19 @@ void PartSet_RootNode::update()
   int aNb = numberOfFolders();
 
   // Remove extra sub-nodes
-  QTreeNodesList aDelList;
   int aIndex;
-  int aId = -1;
-  foreach(ModuleBase_ITreeNode* aNode, myChildren) {
-    aId++;
+  int aId = 0;
+  while (aId < myChildren.size()) {
+    ModuleBase_ITreeNode* aNode = myChildren.at(aId);
     if (aNode->object().get()) {
       aIndex = aDoc->index(aNode->object(), true);
-      if ((aIndex == -1) || (aId != (aIndex + aNb)))
-        aDelList.append(aNode);
+      if ((aIndex == -1) || (aId != (aIndex + aNb))) {
+        myChildren.removeAll(aNode);
+        delete aNode;
+        continue;
+      }
     }
-  }
-  foreach(ModuleBase_ITreeNode* aNode, aDelList) {
-    myChildren.removeAll(aNode);
-    delete aNode;
+    aId++;
   }
 
   // Add new nodes
@@ -605,20 +602,19 @@ void PartSet_PartRootNode::update()
   int aRows = numberOfFolders();
 
   // Remove extra sub-nodes
-  QTreeNodesList aDelList;
   int aIndex = -1;
-  int aId = -1;
-  foreach(ModuleBase_ITreeNode* aNode, myChildren) {
-    aId++;
+  int aId = 0;
+  while (aId < myChildren.size()) {
+    ModuleBase_ITreeNode* aNode = myChildren.at(aId);
     if (aNode->object().get()) {
       aIndex = aDoc->index(aNode->object(), true);
-      if ((aIndex == -1) || (aId != (aIndex + aRows)))
-        aDelList.append(aNode);
+      if ((aIndex == -1) || (aId != (aIndex + aRows))) {
+        myChildren.removeAll(aNode);
+        delete aNode;
+        continue;
+      }
     }
-  }
-  foreach(ModuleBase_ITreeNode* aNode, aDelList) {
-    myChildren.removeAll(aNode);
-    delete aNode;
+    aId++;
   }
 
   std::string aGroup = ModelAPI_Feature::group();
@@ -760,21 +756,17 @@ void PartSet_ObjectFolderNode::update()
 
   DocumentPtr aDoc = myObject->document();
   // Delete obsolete nodes
-  QTreeNodesList aDelList;
-  int aId = -1;
-  foreach(ModuleBase_ITreeNode* aNode, myChildren) {
-    aId++;
+  int aId = 0;
+  while (aId < myChildren.size()) {
+    ModuleBase_ITreeNode* aNode = myChildren.at(aId);
     if ((aFirst + aId) < aDoc->size(ModelAPI_Feature::group(), true)) {
       if (aNode->object() != aDoc->object(ModelAPI_Feature::group(), aFirst + aId)) {
-        aDelList.append(aNode);
+        myChildren.removeAll(aNode);
+        delete aNode;
+        continue;
       }
-    } else {
-      aDelList.append(aNode);
     }
-  }
-  foreach(ModuleBase_ITreeNode* aNode, aDelList) {
-    myChildren.removeAll(aNode);
-    delete aNode;
+    aId++;
   }
 
   // Add new nodes
@@ -840,24 +832,22 @@ QTreeNodesList PartSet_ObjectFolderNode::objectsDeleted(const DocumentPtr& theDo
   }
   DocumentPtr aDoc = myObject->document();
   // Delete obsolete nodes
-  QTreeNodesList aDelList;
-  int aId = -1;
-  foreach(ModuleBase_ITreeNode* aNode, myChildren) {
-    aId++;
+  bool aRemoved = false;
+  int aId = 0;
+  while (aId < myChildren.size()) {
+    ModuleBase_ITreeNode* aNode = myChildren.at(1);
     if ((aFirst + aId) < aDoc->size(ModelAPI_Feature::group(), true)) {
       if (aNode->object() != aDoc->object(ModelAPI_Feature::group(), aFirst + aId)) {
-        aDelList.append(aNode);
+        myChildren.removeAll(aNode);
+        delete aNode;
+        aRemoved = true;
+        continue;
       }
-    } else {
-      aDelList.append(aNode);
     }
+    aId++;
   }
-  if (aDelList.size() > 0) {
+  if (aRemoved) {
     aResult.append(this);
-    foreach(ModuleBase_ITreeNode* aNode, aDelList) {
-      myChildren.removeAll(aNode);
-      delete aNode;
-    }
   }
   return aResult;
 }
