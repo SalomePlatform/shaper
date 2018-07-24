@@ -47,6 +47,7 @@
 #include <TopExp.hxx>
 #include <BRepTools.hxx>
 #include <BRep_Tool.hxx>
+#include <BRepTools_History.hxx>
 #include <GeomAPI_Shape.h>
 #include <GeomAlgoAPI_MakeShape.h>
 #include <GeomAlgoAPI_SortListOfShapes.h>
@@ -369,7 +370,8 @@ void Model_BodyBuilder::loadDeletedShapes (GeomAlgoAPI_MakeShape* theMS,
     if (theMS->isDeleted (aRShape)) {
       if (!aResultShape->isSubShape(aRShape, false)) {
           ListOfShape aHist;
-          theMS->modified(aRShape, aHist);
+          if (BRepTools_History::IsSupportedType(aRoot)) // to avoid crash in #2572
+            theMS->modified(aRShape, aHist);
           if (aHist.size() == 0 || (aHist.size() == 1 && aHist.front()->isSame(aRShape)))
             builder(theTag)->Delete(aRoot);
       }
