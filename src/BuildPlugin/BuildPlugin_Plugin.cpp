@@ -72,10 +72,8 @@ FeaturePtr BuildPlugin_Plugin::createFeature(std::string theFeatureID)
     return FeaturePtr(new BuildPlugin_Edge());
   } else if(theFeatureID == BuildPlugin_Wire::ID()) {
     return FeaturePtr(new BuildPlugin_Wire());
-  } else if (theFeatureID == BuildPlugin_Wire::ID()) {
-	return FeaturePtr(new BuildPlugin_Wire());
   } else if (theFeatureID == BuildPlugin_Polyline::ID()) {
-	return FeaturePtr(new BuildPlugin_Polyline());
+    return FeaturePtr(new BuildPlugin_Polyline());
   } else if (theFeatureID == BuildPlugin_Interpolation::ID()) {
     return FeaturePtr(new BuildPlugin_Interpolation());
   } else if (theFeatureID == BuildPlugin_Face::ID()) {
