@@ -70,12 +70,14 @@ void XGUI_DataModel::processEvent(const std::shared_ptr<Events_Message>& theMess
     QTreeNodesList aNodes = myRoot->objectCreated(aCreated);
     ModuleBase_ITreeNode* aParent;
     int aRow = 0;
-    QModelIndex aParentIndex;
+    QModelIndex aParentIndex1, aParentIndex2;
     foreach(ModuleBase_ITreeNode* aNode, aNodes) {
       aParent = aNode->parent();
       aRow = aParent->nodeRow(aNode);
-      aParentIndex = getParentIndex(aNode, 0);
-      insertRows(aRow, 1, aParentIndex);
+      aParentIndex1 = getParentIndex(aNode, 0);
+      aParentIndex2 = getParentIndex(aNode, 2);
+      insertRows(aRow, 1, aParentIndex1);
+      dataChanged(aParentIndex1, aParentIndex2);
     }
   }
   else if (theMessage->eventID() == Events_Loop::loop()->eventByName(EVENT_OBJECT_DELETED)) {
