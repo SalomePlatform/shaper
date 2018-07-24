@@ -40,6 +40,7 @@
 #include <ModelAPI_AttributeReference.h>
 
 #include <QBrush>
+#include <QMap>
 
 
 #define ACTIVE_COLOR QColor(Qt::black)
@@ -322,6 +323,7 @@ QTreeNodesList PartSet_FolderNode::objectCreated(const QObjectPtrList& theObject
   std::string aName = groupName();
   DocumentPtr aDoc = document();
   int aIdx = -1;
+  QMap<int, ModuleBase_ITreeNode*> aNewNodes;
   foreach(ObjectPtr aObj, theObjects) {
     if ((aObj->document() == aDoc) && (aObj->groupName() == aName)) {
       aIdx = aDoc->index(aObj, true);
@@ -329,14 +331,24 @@ QTreeNodesList PartSet_FolderNode::objectCreated(const QObjectPtrList& theObject
         bool aHasObject = (aIdx < myChildren.size()) && (myChildren.at(aIdx)->object() == aObj);
         if (!aHasObject) {
           ModuleBase_ITreeNode* aNode = createNode(aObj);
+          aNewNodes[aIdx] = aNode;
           aResult.append(aNode);
-          if (aIdx < myChildren.size())
-            myChildren.insert(aIdx, aNode);
-          else
-            myChildren.append(aNode);
         }
       }
     }
+  }
+  // Add nodes in correct order
+  int i;
+  for (i = 0; i < myChildren.size(); i++) {
+    if (aNewNodes.contains(i)) {
+      myChildren.insert(i, aNewNodes[i]);
+      aNewNodes.remove(i);
+    }
+  }
+  while (aNewNodes.size()) {
+    i = myChildren.size();
+    myChildren.append(aNewNodes[i]);
+    aNewNodes.remove(i);
   }
   foreach(ModuleBase_ITreeNode* aNode, myChildren) {
     aResult.append(aNode->objectCreated(theObjects));
@@ -388,6 +400,7 @@ QTreeNodesList PartSet_FeatureFolderNode::objectCreated(const QObjectPtrList& th
   DocumentPtr aDoc = document();
   int aIdx = -1;
   int aNb = numberOfFolders();
+  QMap<int, ModuleBase_ITreeNode*> aNewNodes;
   foreach(ObjectPtr aObj, theObjects) {
     if (aDoc == aObj->document()) {
       if ((aObj->groupName() == ModelAPI_Feature::group()) ||
@@ -398,16 +411,27 @@ QTreeNodesList PartSet_FeatureFolderNode::objectCreated(const QObjectPtrList& th
           aIdx += aNb;
           bool aHasObject = (aIdx < myChildren.size()) && (myChildren.at(aIdx)->object() == aObj);
           if (!aHasObject) {
-            if (aIdx < myChildren.size())
-              myChildren.insert(aIdx, aNode);
-            else
-              myChildren.append(aNode);
+            aNewNodes[aIdx] = aNode;
             aResult.append(aNode);
           }
         }
       }
     }
   }
+  // To add in correct order
+  int i;
+  for (i = 0; i < myChildren.size(); i++) {
+    if (aNewNodes.contains(i)) {
+      myChildren.insert(i, aNewNodes[i]);
+      aNewNodes.remove(i);
+    }
+  }
+  while (aNewNodes.size()) {
+    i = myChildren.size();
+    myChildren.append(aNewNodes[i]);
+    aNewNodes.remove(i);
+  }
+
   // Update sub-folders
   foreach(ModuleBase_ITreeNode* aNode, myChildren) {
     if ((aNode->type() == PartSet_ObjectFolderNode::typeId()) ||
@@ -850,7 +874,7 @@ QTreeNodesList PartSet_ObjectFolderNode::objectsDeleted(const DocumentPtr& theDo
   bool aRemoved = false;
   int aId = 0;
   while (aId < myChildren.size()) {
-    ModuleBase_ITreeNode* aNode = myChildren.at(1);
+    ModuleBase_ITreeNode* aNode = myChildren.at(aId);
     if ((aFirst + aId) < aDoc->size(ModelAPI_Feature::group(), true)) {
       if (aNode->object() != aDoc->object(ModelAPI_Feature::group(), aFirst + aId)) {
         myChildren.removeAll(aNode);
