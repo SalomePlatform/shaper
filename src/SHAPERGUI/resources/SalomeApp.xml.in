@@ -31,10 +31,8 @@
     <parameter name="documentation" value="shaper_help"/>
   </section>
   <section name="shaper_help" >
-    <parameter name="sub_menu"          value="%1 module"/>
-    <parameter name="Developer's Guide" value="%SHAPER_ROOT_DIR%/share/doc/salome/tui/SHAPER/index.html"/>
-    <parameter name="User's Guide"      value="%SHAPER_ROOT_DIR%/share/doc/salome/gui/SHAPER/index.html"/>
-
+    <parameter name="Developer's Guide/Shaper module/Developer's Guide" value="%SHAPER_ROOT_DIR%/share/doc/salome/tui/SHAPER/index.html"/>
+    <parameter name="User's Guide/Shaper module/User's Guide" value="%SHAPER_ROOT_DIR%/share/doc/salome/gui/SHAPER/index.html"/>
   </section>
   <section name="resources">
     <!-- Module resources -->
