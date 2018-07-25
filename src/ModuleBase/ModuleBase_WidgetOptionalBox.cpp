@@ -94,7 +94,7 @@ void ModuleBase_WidgetOptionalBox::placeModelWidget(ModuleBase_ModelWidget* theW
     setOptionType(CheckBox);
 
     myCheckBoxWidget = theWidget; /// check box frame becomes filled
-    myCheckBoxLayout->addWidget(theWidget);
+    myCheckBoxLayout->addWidget(theWidget, 1);
   }
   else {
     createControl(GroupBox);
