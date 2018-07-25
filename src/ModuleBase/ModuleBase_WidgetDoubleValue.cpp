@@ -179,6 +179,10 @@ bool ModuleBase_WidgetDoubleValue::storeValueCustom()
     // it is important to set the empty text value to the attribute before set the value
     // because setValue tries to calculate the attribute value according to the
     // attribute current text
+    if (aReal->expressionInvalid()) {
+      aReal->setExpressionError("");
+      aReal->setExpressionInvalid(false);
+    }
     aReal->setText("");
     aReal->setValue(mySpinBox->value());
   }
@@ -208,6 +212,10 @@ bool ModuleBase_WidgetDoubleValue::restoreValueCustom()
     ModuleBase_Tools::setSpinText(mySpinBox, aText);
   } else {
     ModuleBase_Tools::setSpinValue(mySpinBox, aRef->isInitialized() ? aRef->value() : 0);
+    if (aRef->isInitialized() && aRef->expressionInvalid()) {
+      aRef->setExpressionError("");
+      aRef->setExpressionInvalid(false);
+    }
   }
   return true;
 }
