@@ -285,7 +285,7 @@ bool XGUI_Displayer::erase(ObjectPtr theObject, const bool theUpdateViewer)
   if (aContext.IsNull())
     return aErased;
 
-  AISObjectPtr anObject = myResult2AISObjectMap[theObject];
+  AISObjectPtr anObject = myResult2AISObjectMap.value(theObject);
   if (anObject) {
     Handle(AIS_InteractiveObject) anAIS = anObject->impl<Handle(AIS_InteractiveObject)>();
     if (!anAIS.IsNull()) {
@@ -503,7 +503,7 @@ void XGUI_Displayer::setSelected(const  QList<ModuleBase_ViewerPrsPtr>& theValue
       ObjectPtr anObject = aPrs->object();
       ResultPtr aResult = std::dynamic_pointer_cast<ModelAPI_Result>(anObject);
       if (aResult.get() && isVisible(aResult)) {
-        AISObjectPtr anObj = myResult2AISObjectMap[aResult];
+        AISObjectPtr anObj = myResult2AISObjectMap.value(aResult);
         Handle(AIS_InteractiveObject) anAIS = anObj->impl<Handle(AIS_InteractiveObject)>();
         if (!anAIS.IsNull()) {
           // The methods are replaced in order to provide multi-selection, e.g. restore selection
@@ -545,8 +545,8 @@ bool XGUI_Displayer::eraseAll(const bool theUpdateViewer)
   bool aErased = false;
   Handle(AIS_InteractiveContext) aContext = AISContext();
   if (!aContext.IsNull()) {
-    foreach (ObjectPtr aObj, myResult2AISObjectMap.keys()) {
-      AISObjectPtr aAISObj = myResult2AISObjectMap[aObj];
+    foreach (ObjectPtr aObj, myResult2AISObjectMap.objects()) {
+      AISObjectPtr aAISObj = myResult2AISObjectMap.value(aObj);
       // erase an object
       Handle(AIS_InteractiveObject) anIO = aAISObj->impl<Handle(AIS_InteractiveObject)>();
       if (!anIO.IsNull()) {
@@ -573,10 +573,7 @@ bool XGUI_Displayer::eraseAll(const bool theUpdateViewer)
 //**************************************************************
 AISObjectPtr XGUI_Displayer::getAISObject(ObjectPtr theObject) const
 {
-  AISObjectPtr anIO;
-  if (myResult2AISObjectMap.contains(theObject))
-    anIO = myResult2AISObjectMap[theObject];
-  return anIO;
+  return myResult2AISObjectMap.value(theObject);
 }
 
 //**************************************************************
@@ -589,16 +586,7 @@ ObjectPtr XGUI_Displayer::getObject(const AISObjectPtr& theIO) const
 //**************************************************************
 ObjectPtr XGUI_Displayer::getObject(const Handle(AIS_InteractiveObject)& theIO) const
 {
-  ObjectPtr anObject;
-  ResultToAISMap::const_iterator aMapIter = myResult2AISObjectMap.cbegin();
-  for (; aMapIter != myResult2AISObjectMap.cend(); aMapIter++) {
-    const AISObjectPtr& aAIS = aMapIter.value();
-    Handle(AIS_InteractiveObject) anAIS = aAIS->impl<Handle(AIS_InteractiveObject)>();
-    if (anAIS == theIO)
-      anObject = aMapIter.key();
-    if (anObject.get())
-      break;
-  }
+  ObjectPtr anObject = myResult2AISObjectMap.value(theIO);
   if (!anObject.get()) {
     std::shared_ptr<GeomAPI_AISObject> anAISObj = AISObjectPtr(new GeomAPI_AISObject());
     if (!theIO.IsNull()) {
@@ -861,7 +849,7 @@ void XGUI_Displayer::removeFilters()
 //**************************************************************
 void XGUI_Displayer::showOnly(const QObjectPtrList& theList)
 {
-  QObjectPtrList aDispList = myResult2AISObjectMap.keys();
+  QObjectPtrList aDispList = myResult2AISObjectMap.objects();
   foreach(ObjectPtr aObj, aDispList) {
     if (!theList.contains(aObj))
       erase(aObj, false);
@@ -940,7 +928,7 @@ QColor XGUI_Displayer::setObjectColor(ObjectPtr theObject,
 //**************************************************************
 void XGUI_Displayer::appendResultObject(ObjectPtr theObject, AISObjectPtr theAIS)
 {
-  myResult2AISObjectMap[theObject] = theAIS;
+  myResult2AISObjectMap.add(theObject, theAIS);
 
 #ifdef DEBUG_DISPLAY
   std::ostringstream aPtrStr;
@@ -955,8 +943,8 @@ void XGUI_Displayer::appendResultObject(ObjectPtr theObject, AISObjectPtr theAIS
 std::string XGUI_Displayer::getResult2AISObjectMapInfo() const
 {
   QStringList aContent;
-  foreach (ObjectPtr aObj, myResult2AISObjectMap.keys()) {
-    AISObjectPtr aAISObj = myResult2AISObjectMap[aObj];
+  foreach (ObjectPtr aObj, myResult2AISObjectMap.objects()) {
+    AISObjectPtr aAISObj = myResult2AISObjectMap.value(aObj);
     std::ostringstream aPtrStr;
     aPtrStr << "aObj = " << aObj.get() << ":";
     aPtrStr << "anAIS = " << aAISObj.get() << ":";

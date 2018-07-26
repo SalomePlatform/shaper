@@ -1132,10 +1132,8 @@ void PartSet_Module::onViewTransformed(int theTrsfType)
     const double aCurScale = aViewer->activeView()->Camera()->Scale();
     aViewer->SetScale(aViewer->activeView(), aCurScale);
     bool isModified = false;
-    QList<AISObjectPtr> aPrsList = aDisplayer->displayedPresentations();
-    foreach (AISObjectPtr aAIS, aPrsList) {
-      Handle(AIS_InteractiveObject) aAisObj = aAIS->impl<Handle(AIS_InteractiveObject)>();
-
+    QList<Handle(AIS_InteractiveObject)> aPrsList = aDisplayer->displayedPresentations();
+    foreach(Handle(AIS_InteractiveObject) aAisObj, aPrsList) {
       Handle(AIS_Dimension) aDim = Handle(AIS_Dimension)::DownCast(aAisObj);
       if (!aDim.IsNull()) {
         aDim->DimensionAspect()->ArrowAspect()->SetLength(aLen);
