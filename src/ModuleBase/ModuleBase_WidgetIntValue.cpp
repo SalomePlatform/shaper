@@ -167,6 +167,10 @@ bool ModuleBase_WidgetIntValue::storeValueCustom()
     // it is important to set the empty text value to the attribute before set the value
     // because setValue tries to calculate the attribute value according to the
     // attribute current text
+    if (anAttribute->expressionInvalid()) {
+      anAttribute->setExpressionError("");
+      anAttribute->setExpressionInvalid(false);
+    }
     anAttribute->setText("");
     anAttribute->setValue(mySpinBox->value());
   }
@@ -181,21 +185,26 @@ bool ModuleBase_WidgetIntValue::restoreValueCustom()
   std::string aTextRepr = anAttribute->text();
   if (!aTextRepr.empty()) {
     QString aText = QString::fromStdString(aTextRepr);
-    if (aText.endsWith('=')) {
-      if (!myParameter.get()) {
-        QString aName = aText.left(aText.indexOf('=')).trimmed();
-        myParameter = ModuleBase_Tools::findParameter(aName);
-      }
-      /// If myParameter is empty then it was not created because of an error
-      if (!myParameter.get())
-        return false;
+    //if (aText.endsWith('=')) {
+    //  if (!myParameter.get()) {
+    //    QString aName = aText.left(aText.indexOf('=')).trimmed();
+    //    myParameter = ModuleBase_Tools::findParameter(aName);
+    //  }
+    //  /// If myParameter is empty then it was not created because of an error
+    //  if (!myParameter.get())
+    //    return false;
 
-      AttributeStringPtr aExprAttr = myParameter->string("expression");
-      aText += aExprAttr->value().c_str();
-    }
+    //  AttributeStringPtr aExprAttr = myParameter->string("expression");
+    //  aText += aExprAttr->value().c_str();
+    //}
     ModuleBase_Tools::setSpinText(mySpinBox, aText);
   } else {
-    ModuleBase_Tools::setSpinValue(mySpinBox, anAttribute->value());
+    ModuleBase_Tools::setSpinValue(mySpinBox,
+      anAttribute->isInitialized() ? anAttribute->value() : 0);
+    if (anAttribute->isInitialized() && anAttribute->expressionInvalid()) {
+      anAttribute->setExpressionError("");
+      anAttribute->setExpressionInvalid(false);
+    }
   }
   return true;
 }
