@@ -111,11 +111,11 @@ void XGUI_SelectionMgr::onObjectBrowserSelection()
       if (aObject.get()) {
         aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(aObject);
         if (aFeature.get()) {
-          std::list<ResultPtr> allRes;
-          ModelAPI_Tools::allResults(aFeature, allRes);
-          for (std::list<ResultPtr>::iterator aRes = allRes.begin(); aRes != allRes.end(); aRes++) {
-            aTmpList.append(std::shared_ptr<ModuleBase_ViewerPrs>(
-              new ModuleBase_ViewerPrs(*aRes, GeomShapePtr(), NULL)));
+        std::list<ResultPtr> allRes;
+        ModelAPI_Tools::allResults(aFeature, allRes);
+        for(std::list<ResultPtr>::iterator aRes = allRes.begin(); aRes != allRes.end(); aRes++) {
+          aSelectedPrs.append(std::shared_ptr<ModuleBase_ViewerPrs>(
+            new ModuleBase_ViewerPrs(*aRes, GeomShapePtr(), NULL)));
           }
         }
       }

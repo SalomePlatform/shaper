@@ -414,7 +414,6 @@ void Model_AttributeSelection::setID(const std::string theID)
 }
 
 ResultPtr Model_AttributeSelection::context()
-{
   if (!ModelAPI_AttributeSelection::isInitialized() && !myTmpContext.get() && !myTmpSubShape.get())
     return ResultPtr();
 
