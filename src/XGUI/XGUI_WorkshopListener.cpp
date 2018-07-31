@@ -38,7 +38,6 @@
 #include <ModelAPI_Result.h>
 #include <ModelAPI_Feature.h>
 #include <ModelAPI_Data.h>
-#include <ModelAPI_ResultCompSolid.h>
 #include <ModelAPI_Tools.h>
 
 #include <ModuleBase_Events.h>

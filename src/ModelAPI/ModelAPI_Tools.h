@@ -28,7 +28,7 @@ class ModelAPI_Document;
 class ModelAPI_Feature;
 class ModelAPI_Result;
 class ModelAPI_ResultParameter;
-class ModelAPI_ResultCompSolid;
+class ModelAPI_ResultBody;
 
 class GeomAPI_Shape;
 
@@ -101,17 +101,17 @@ MODELAPI_EXPORT std::shared_ptr<ModelAPI_CompositeFeature> compositeOwner(
                                         const std::shared_ptr<ModelAPI_Feature>& theFeature);
 
 /*!
- * Returns the compsolid result - parent of this result.
- * \param theSub the sub-element of comp-solid
+ * Returns the result - parent of this result.
+ * \param theSub the sub-element of composit result
  * \returns null if it is not sub-element of composite
  */
-MODELAPI_EXPORT std::shared_ptr<ModelAPI_ResultCompSolid> compSolidOwner(
-                                            const std::shared_ptr<ModelAPI_Result>& theSub);
+MODELAPI_EXPORT std::shared_ptr<ModelAPI_ResultBody>
+  bodyOwner(const std::shared_ptr<ModelAPI_Result>& theSub);
 /*!
- * Returns index of this result in parent (if parent exists, returned by compSolidOwner)
+ * Returns index of this result in parent (if parent exists, returned by bodyOwner)
  * \returns zero-base index, or -1 if not found
  */
-MODELAPI_EXPORT int compSolidIndex(const std::shared_ptr<ModelAPI_Result>& theSub);
+MODELAPI_EXPORT int bodyIndex(const std::shared_ptr<ModelAPI_Result>& theSub);
 
 /*!
 * Returns true if the result contains a not empty list of sub results.
@@ -120,6 +120,12 @@ MODELAPI_EXPORT int compSolidIndex(const std::shared_ptr<ModelAPI_Result>& theSu
 * \returns boolean value
 */
 MODELAPI_EXPORT bool hasSubResults(const std::shared_ptr<ModelAPI_Result>& theResult);
+
+/*!
+*  collects recursively all subs of the given result
+*/
+MODELAPI_EXPORT void allSubs(const std::shared_ptr<ModelAPI_ResultBody>& theResult,
+                             std::list<std::shared_ptr<ModelAPI_Result> >& theResults);
 
 /*!
 * Adds the results of the given feature to theResults list: including disabled and sub-results
@@ -187,17 +193,12 @@ MODELAPI_EXPORT void findRefsToFeatures(
 MODELAPI_EXPORT void getConcealedResults(const std::shared_ptr<ModelAPI_Feature>& theFeature,
                                    std::list<std::shared_ptr<ModelAPI_Result> >& theResults);
 
-/*! Return the default name of the result according the features it depends.
+/*! Return the default name of the result according the features it depends or name of the feature.
  *  Return also whether the name is get from the concealing result of parent object
  *  (means that concealing result has user-defined name).
  */
 MODELAPI_EXPORT std::pair<std::string, bool> getDefaultName(
-    const std::shared_ptr<ModelAPI_Result>& theResult,
-    const int theResultIndex);
-
-/*! Return the default name of the result according to name of the feature.
- */
-MODELAPI_EXPORT std::string getDefaultName(const std::shared_ptr<ModelAPI_Result>& theResult);
+  const std::shared_ptr<ModelAPI_Result>& theResult);
 }
 
 #endif

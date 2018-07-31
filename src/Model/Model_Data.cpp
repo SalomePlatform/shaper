@@ -42,7 +42,6 @@
 #include <ModelAPI_Validator.h>
 #include <ModelAPI_Session.h>
 #include <ModelAPI_ResultPart.h>
-#include <ModelAPI_ResultCompSolid.h>
 #include <ModelAPI_Tools.h>
 #include <Model_Validator.h>
 
@@ -139,7 +138,7 @@ void Model_Data::setName(const std::string& theName)
       bool isUserDefined = true;
       ResultPtr aResult = std::dynamic_pointer_cast<ModelAPI_Result>(myObject);
       if (aResult) {
-        std::string aDefaultName = ModelAPI_Tools::getDefaultName(aResult);
+        std::string aDefaultName = ModelAPI_Tools::getDefaultName(aResult).first;
         isUserDefined = aDefaultName != theName;
       }
       if (isUserDefined) {

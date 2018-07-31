@@ -114,6 +114,11 @@ public:
   //! \param theAllowFolder take into account grouping feature by folders
   virtual int size(const std::string& theGroupID, const bool theAllowFolder = false) = 0;
 
+  //! Returns the parent object of this child. This may be result or feature, parent of a
+  //! top result. Fast method, that uses internal data structure specifics.
+  virtual std::shared_ptr<ModelAPI_Object> parent(
+    const std::shared_ptr<ModelAPI_Object> theChild) = 0;
+
   //! Returns the feature that is currently edited in this document, normally
   //! this is the latest created feature
   //! \param theVisible use visible features only: flag is true for Object Browser functionality

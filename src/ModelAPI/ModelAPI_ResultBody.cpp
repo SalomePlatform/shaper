@@ -19,12 +19,13 @@
 //
 
 #include "ModelAPI_ResultBody.h"
+
 #include <ModelAPI_BodyBuilder.h>
 #include <Events_Loop.h>
 #include <ModelAPI_Events.h>
 
 ModelAPI_ResultBody::ModelAPI_ResultBody()
-: myBuilder(0)
+  : myBuilder(0)
 {
   myConnect = ConnectionNotComputed;
 }
@@ -32,7 +33,7 @@ ModelAPI_ResultBody::ModelAPI_ResultBody()
 ModelAPI_ResultBody::~ModelAPI_ResultBody()
 {
   if (myBuilder)
-  delete myBuilder;
+    delete myBuilder;
 }
 
 std::string ModelAPI_ResultBody::groupName()
@@ -41,7 +42,7 @@ std::string ModelAPI_ResultBody::groupName()
 }
 
 void ModelAPI_ResultBody::store(const std::shared_ptr<GeomAPI_Shape>& theShape,
-                                const bool theIsStoreSameShapes)
+  const bool theIsStoreSameShapes)
 {
   myBuilder->store(theShape, theIsStoreSameShapes);
   myConnect = ConnectionNotComputed;
@@ -50,10 +51,12 @@ void ModelAPI_ResultBody::store(const std::shared_ptr<GeomAPI_Shape>& theShape,
   static Events_ID aRedispEvent = aLoop->eventByName(EVENT_OBJECT_TO_REDISPLAY);
   static const ModelAPI_EventCreator* aECreator = ModelAPI_EventCreator::get();
   aECreator->sendUpdated(data()->owner(), aRedispEvent);
+
+  updateSubs(theShape);
 }
 
 void ModelAPI_ResultBody::storeGenerated(const std::shared_ptr<GeomAPI_Shape>& theFromShape,
-	                          const std::shared_ptr<GeomAPI_Shape>& theToShape)
+  const std::shared_ptr<GeomAPI_Shape>& theToShape)
 {
   myBuilder->storeGenerated(theFromShape, theToShape);
   myConnect = ConnectionNotComputed;
@@ -62,11 +65,13 @@ void ModelAPI_ResultBody::storeGenerated(const std::shared_ptr<GeomAPI_Shape>& t
   static Events_ID aRedispEvent = aLoop->eventByName(EVENT_OBJECT_TO_REDISPLAY);
   static const ModelAPI_EventCreator* aECreator = ModelAPI_EventCreator::get();
   aECreator->sendUpdated(data()->owner(), aRedispEvent);
+
+  updateSubs(theToShape);
 }
 
 void ModelAPI_ResultBody::storeModified(const std::shared_ptr<GeomAPI_Shape>& theOldShape,
-	                          const std::shared_ptr<GeomAPI_Shape>& theNewShape,
-                            const int theDecomposeSolidsTag)
+  const std::shared_ptr<GeomAPI_Shape>& theNewShape,
+  const int theDecomposeSolidsTag)
 {
   myBuilder->storeModified(theOldShape, theNewShape, theDecomposeSolidsTag);
   myConnect = ConnectionNotComputed;
@@ -75,6 +80,8 @@ void ModelAPI_ResultBody::storeModified(const std::shared_ptr<GeomAPI_Shape>& th
   static Events_ID aRedispEvent = aLoop->eventByName(EVENT_OBJECT_TO_REDISPLAY);
   static const ModelAPI_EventCreator* aECreator = ModelAPI_EventCreator::get();
   aECreator->sendUpdated(data()->owner(), aRedispEvent);
+
+  updateSubs(theNewShape);
 }
 
 void ModelAPI_ResultBody::storeWithoutNaming(const std::shared_ptr<GeomAPI_Shape>& theShape)
@@ -94,74 +101,74 @@ std::shared_ptr<GeomAPI_Shape> ModelAPI_ResultBody::shape()
 }
 
 void ModelAPI_ResultBody::generated(const std::shared_ptr<GeomAPI_Shape>& theNewShape,
-    const std::string& theName, const int theTag)
+  const std::string& theName, const int theTag)
 {
   myBuilder->generated(theNewShape, theName, theTag);
 }
 
 void ModelAPI_ResultBody::generated(const std::shared_ptr<GeomAPI_Shape>& theOldShape,
-    const std::shared_ptr<GeomAPI_Shape>& theNewShape, const std::string& theName,
-    const int theTag)
+  const std::shared_ptr<GeomAPI_Shape>& theNewShape, const std::string& theName,
+  const int theTag)
 {
   myBuilder->generated(theOldShape, theNewShape, theName, theTag);
 }
 
 void ModelAPI_ResultBody::modified(const std::shared_ptr<GeomAPI_Shape>& theOldShape,
-    const std::shared_ptr<GeomAPI_Shape>& theNewShape, const std::string& theName,
-    const int theTag)
+  const std::shared_ptr<GeomAPI_Shape>& theNewShape, const std::string& theName,
+  const int theTag)
 {
   myBuilder->modified(theOldShape, theNewShape, theName, theTag);
 }
 
 
 void ModelAPI_ResultBody::deleted(
-    const std::shared_ptr<GeomAPI_Shape>& theOldShape, const int theTag)
+  const std::shared_ptr<GeomAPI_Shape>& theOldShape, const int theTag)
 {
   myBuilder->deleted(theOldShape, theTag);
 }
 
-void ModelAPI_ResultBody::loadDeletedShapes (GeomAlgoAPI_MakeShape* theMS,
-                                  std::shared_ptr<GeomAPI_Shape>  theShapeIn,
-                                  const int  theKindOfShape,
-                                  const int  theTag)
+void ModelAPI_ResultBody::loadDeletedShapes(GeomAlgoAPI_MakeShape* theMS,
+  std::shared_ptr<GeomAPI_Shape>  theShapeIn,
+  const int  theKindOfShape,
+  const int  theTag)
 {
   myBuilder->loadDeletedShapes(theMS, theShapeIn, theKindOfShape, theTag);
 }
 
-void ModelAPI_ResultBody::loadAndOrientModifiedShapes (GeomAlgoAPI_MakeShape* theMS,
-    std::shared_ptr<GeomAPI_Shape>  theShapeIn, const int  theKindOfShape, const int  theTag,
-    const std::string& theName, GeomAPI_DataMapOfShapeShape& theSubShapes,
-    const bool theIsStoreSeparate,
-    const bool theIsStoreAsGenerated,
-    const bool /*theSplitInSubs*/)
+void ModelAPI_ResultBody::loadAndOrientModifiedShapes(GeomAlgoAPI_MakeShape* theMS,
+  std::shared_ptr<GeomAPI_Shape>  theShapeIn, const int  theKindOfShape, const int  theTag,
+  const std::string& theName, GeomAPI_DataMapOfShapeShape& theSubShapes,
+  const bool theIsStoreSeparate,
+  const bool theIsStoreAsGenerated,
+  const bool /*theSplitInSubs*/)
 {
   myBuilder->loadAndOrientModifiedShapes(
     theMS, theShapeIn, theKindOfShape, theTag, theName, theSubShapes, theIsStoreSeparate,
     theIsStoreAsGenerated);
 }
 
-void ModelAPI_ResultBody::loadAndOrientGeneratedShapes (GeomAlgoAPI_MakeShape* theMS,
-    std::shared_ptr<GeomAPI_Shape>  theShapeIn, const int  theKindOfShape,
-    const int  theTag, const std::string& theName, GeomAPI_DataMapOfShapeShape& theSubShapes)
+void ModelAPI_ResultBody::loadAndOrientGeneratedShapes(GeomAlgoAPI_MakeShape* theMS,
+  std::shared_ptr<GeomAPI_Shape>  theShapeIn, const int  theKindOfShape,
+  const int  theTag, const std::string& theName, GeomAPI_DataMapOfShapeShape& theSubShapes)
 {
   myBuilder->loadAndOrientGeneratedShapes(
     theMS, theShapeIn, theKindOfShape, theTag, theName, theSubShapes);
 }
 
 void ModelAPI_ResultBody::loadFirstLevel(std::shared_ptr<GeomAPI_Shape> theShape,
-    const std::string& theName, int&  theTag)
+  const std::string& theName, int&  theTag)
 {
   myBuilder->loadFirstLevel(theShape, theName, theTag);
 }
 
 void ModelAPI_ResultBody::loadDisconnectedEdges(std::shared_ptr<GeomAPI_Shape> theShape,
-    const std::string& theName, int&  theTag)
+  const std::string& theName, int&  theTag)
 {
   myBuilder->loadDisconnectedEdges(theShape, theName, theTag);
 }
 
 void ModelAPI_ResultBody::loadDisconnectedVertexes(std::shared_ptr<GeomAPI_Shape> theShape,
-    const std::string& theName,int&  theTag)
+  const std::string& theName, int&  theTag)
 {
   myBuilder->loadDisconnectedVertexes(theShape, theName, theTag);
 }
@@ -172,4 +179,11 @@ bool ModelAPI_ResultBody::isConnectedTopology()
     myConnect = shape()->isConnectedTopology() ? IsConnected : IsNotConnected;
   }
   return myConnect == IsConnected;
+}
+
+void ModelAPI_ResultBody::setDisplayed(const bool theDisplay)
+{
+  ModelAPI_Result::setDisplayed(theDisplay);
+  for (int i = 0; i < numberOfSubs(); i++)
+    subResult(i)->setDisplayed(theDisplay);
 }

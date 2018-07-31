@@ -29,7 +29,7 @@
 #include <Model_ResultConstruction.h>
 #include <ModelAPI_Feature.h>
 #include <ModelAPI_ResultBody.h>
-#include <ModelAPI_ResultCompSolid.h>
+#include <ModelAPI_ResultBody.h>
 #include <ModelAPI_ResultConstruction.h>
 #include <ModelAPI_ResultPart.h>
 #include <ModelAPI_CompositeFeature.h>
@@ -409,10 +409,8 @@ void Model_AttributeSelection::setID(const std::string theID)
 }
 
 ResultPtr Model_AttributeSelection::context() {
-  /*
   if (!ModelAPI_AttributeSelection::isInitialized() && !myTmpContext.get() && !myTmpSubShape.get())
     return ResultPtr();
-  */
 
   if (myTmpContext.get() || myTmpSubShape.get()) {
     return myTmpContext;
@@ -682,8 +680,10 @@ void Model_AttributeSelection::selectBody(
     }
     if (!isFound) { // sub-shape is not found in the up-to-date instance of the context shape
       // if context is sub-result of compound/compsolid, selection of sub-shape better propagate to
-      // the main result (which is may be modified), case is in 1799
-      ResultCompSolidPtr aMain = ModelAPI_Tools::compSolidOwner(theContext);
+      // the main result (which is may be modified); the case is in 1799
+      ResultBodyPtr aMain = ModelAPI_Tools::bodyOwner(theContext);
+      while(ModelAPI_Tools::bodyOwner(aMain).get())
+        aMain = ModelAPI_Tools::bodyOwner(theContext);
       if (aMain.get()) {
         selectBody(aMain, theSubShape);
         return;
@@ -883,10 +883,13 @@ void Model_AttributeSelection::selectSubShape(
       }
       // if compsolid is context, try to take sub-solid as context: like in GUI and scripts
       if (aCont.get() && aShapeToBeSelected.get()) {
-        ResultCompSolidPtr aComp = std::dynamic_pointer_cast<ModelAPI_ResultCompSolid>(aCont);
+        ResultBodyPtr aComp = std::dynamic_pointer_cast<ModelAPI_ResultBody>(aCont);
         if (aComp && aComp->numberOfSubs()) {
-          for(int aSubNum = 0; aSubNum < aComp->numberOfSubs(); aSubNum++) {
-            ResultPtr aSub = aComp->subResult(aSubNum);
+          std::list<ResultPtr> allSubs;
+          ModelAPI_Tools::allSubs(aComp, allSubs);
+          std::list<ResultPtr>::reverse_iterator aS = allSubs.rbegin(); // iterate from lower level
+          for(; aS != allSubs.rend(); aS++) {
+            ResultPtr aSub = *aS;
             if (aSub && aSub->shape().get() && aSub->shape()->isSubShape(aShapeToBeSelected)) {
               aCont = aSub;
               break;
@@ -900,14 +903,13 @@ void Model_AttributeSelection::selectSubShape(
       while(aFindNewContext && aCont.get()) {
         aFindNewContext = false;
         // take references to all results: root one, any sub
-        ResultCompSolidPtr aCompContext = ModelAPI_Tools::compSolidOwner(aCont);
-        int aSubsSize = (aCompContext.get() ? aCompContext->numberOfSubs() : 0) + 1;
-        for(int aResultNum = 0; aResultNum < aSubsSize; aResultNum++) {
-          ResultPtr aResCont = aCont;
-          if (aCompContext.get())
-            if (aResultNum == aSubsSize - 1)
-              aResCont = aCompContext;
-            else aResCont = aCompContext->subResult(aResultNum);
+        ResultBodyPtr aCompContext = ModelAPI_Tools::bodyOwner(aCont);
+        std::list<ResultPtr> allRes;
+        if (aCompContext.get())
+          ModelAPI_Tools::allSubs(aCompContext, allRes);
+        allRes.push_back(aCont);
+        for(std::list<ResultPtr>::iterator aSub = allRes.begin(); aSub != allRes.end(); aSub++) {
+          ResultPtr aResCont = *aSub;
           const std::set<AttributePtr>& aRefs = aResCont->data()->refsToMe();
           std::set<AttributePtr>::const_iterator aRef = aRefs.begin();
           for(; !aFindNewContext && aRef != aRefs.end(); aRef++) {
@@ -922,20 +924,13 @@ void Model_AttributeSelection::selectSubShape(
             std::list<std::shared_ptr<ModelAPI_Result> > aResults;
 
             // take all sub-results or one result
-            const std::list<std::shared_ptr<ModelAPI_Result> >& aFResults = aRefFeat->results();
-            std::list<std::shared_ptr<ModelAPI_Result> >::const_iterator aRIter = aFResults.begin();
-            for (; aRIter != aFResults.cend(); aRIter++) {
-              // iterate sub-bodies of compsolid
-              ResultCompSolidPtr aComp =
-                std::dynamic_pointer_cast<ModelAPI_ResultCompSolid>(*aRIter);
-              if (aComp.get() && aComp->numberOfSubs() > 0) {
-                int aNumSub = aComp->numberOfSubs();
-                for(int a = 0; a < aNumSub; a++) {
-                  aResults.push_back(aComp->subResult(a));
-                }
-              } else {
-                aResults.push_back(*aRIter);
-              }
+            std::list<ResultPtr> aRefFeatResults;
+            ModelAPI_Tools::allResults(aRefFeat, aRefFeatResults);
+            std::list<ResultPtr>::iterator aRefResIter = aRefFeatResults.begin();
+            for(; aRefResIter != aRefFeatResults.end(); aRefResIter++) {
+              ResultBodyPtr aBody = std::dynamic_pointer_cast<ModelAPI_ResultBody>(*aRefResIter);
+              if (aBody.get() && aBody->numberOfSubs() == 0) // add only lower level subs
+                aResults.push_back(aBody);
             }
             std::list<std::shared_ptr<ModelAPI_Result> >::iterator aResIter = aResults.begin();
             for(; aResIter != aResults.end(); aResIter++) {
@@ -946,8 +941,6 @@ void Model_AttributeSelection::selectSubShape(
                 aShapeToBeSelected.get() ? aShapeToBeSelected : aCont->shape();
               if (aShape.get() && aShape->isSubShape(aSelectedShape, false)) {
                 aCont = *aResIter; // found new context (produced from this) with same subshape
-                //if (!aShape->isSubShape(aShapeToBeSelected, true)) // take context orientation
-                //  aShapeToBeSelected->setOrientation();
                 aFindNewContext = true; // continue searching futher
                 break;
               }
@@ -976,17 +969,18 @@ int Model_AttributeSelection::Id()
 {
   int anID = 0;
   std::shared_ptr<GeomAPI_Shape> aSelection = value();
-  std::shared_ptr<GeomAPI_Shape> aContext = context()->shape();
+  ResultPtr aContextRes = context();
   // support for compsolids:
-  if (context().get() && ModelAPI_Tools::compSolidOwner(context()).get())
-    aContext = ModelAPI_Tools::compSolidOwner(context())->shape();
+  while(ModelAPI_Tools::bodyOwner(aContextRes).get()) {
+    aContextRes = ModelAPI_Tools::bodyOwner(aContextRes);
+  }
+  std::shared_ptr<GeomAPI_Shape> aContext = aContextRes->shape();
 
 
   TopoDS_Shape aMainShape = aContext->impl<TopoDS_Shape>();
   const TopoDS_Shape& aSubShape = aSelection->impl<TopoDS_Shape>();
   // searching for the latest main shape
-  if (aSelection && !aSelection->isNull() &&
-    aContext   && !aContext->isNull())
+  if (aSelection && !aSelection->isNull() && aContext && !aContext->isNull())
   {
     std::shared_ptr<Model_Document> aDoc =
       std::dynamic_pointer_cast<Model_Document>(context()->document());
@@ -1006,21 +1000,21 @@ int Model_AttributeSelection::Id()
 
 void Model_AttributeSelection::setId(int theID)
 {
-  const ResultPtr& aContext = context();
   std::shared_ptr<GeomAPI_Shape> aSelection;
 
-  std::shared_ptr<GeomAPI_Shape> aContextShape = aContext->shape();
+  ResultPtr aContextRes = context();
   // support for compsolids:
-  if (aContext.get() && ModelAPI_Tools::compSolidOwner(aContext).get())
-    aContextShape = ModelAPI_Tools::compSolidOwner(aContext)->shape();
+  while(ModelAPI_Tools::bodyOwner(aContextRes).get()) {
+    aContextRes = ModelAPI_Tools::bodyOwner(aContextRes);
+  }
+  std::shared_ptr<GeomAPI_Shape> aContext = aContextRes->shape();
 
-  TopoDS_Shape aMainShape = aContextShape->impl<TopoDS_Shape>();
+  TopoDS_Shape aMainShape = aContext->impl<TopoDS_Shape>();
   // searching for the latest main shape
-  if (theID > 0 &&
-      aContextShape && !aContextShape->isNull())
+  if (theID > 0 && aContext && !aContext->isNull())
   {
     std::shared_ptr<Model_Document> aDoc =
-      std::dynamic_pointer_cast<Model_Document>(aContext->document());
+      std::dynamic_pointer_cast<Model_Document>(aContextRes->document());
     if (aDoc.get()) {
       Handle(TNaming_NamedShape) aNS = TNaming_Tool::NamedShape(aMainShape, aDoc->generalLabel());
       if (!aNS.IsNull()) {
@@ -1038,7 +1032,7 @@ void Model_AttributeSelection::setId(int theID)
     aSelection = aResult;
   }
 
-  setValue(aContext, aSelection);
+  setValue(aContextRes, aSelection);
 }
 
 std::string Model_AttributeSelection::contextName(const ResultPtr& theContext) const
@@ -1086,10 +1080,16 @@ void Model_AttributeSelection::computeValues(
   // if new context becomes compsolid, the resulting sub may be in sub-solids
   std::list<ResultPtr> aNewToIterate;
   aNewToIterate.push_back(theNewContext);
-  ResultCompSolidPtr aComp = std::dynamic_pointer_cast<ModelAPI_ResultCompSolid>(theNewContext);
+  ResultBodyPtr aComp = std::dynamic_pointer_cast<ModelAPI_ResultBody>(theNewContext);
   if (aComp.get()) {
-    for(int a = 0; a < aComp->numberOfSubs(); a++)
-      aNewToIterate.push_back(aComp->subResult(a, false));
+    std::list<ResultPtr> allNewContextSubs;
+    ModelAPI_Tools::allSubs(aComp, allNewContextSubs);
+    std::list<ResultPtr>::iterator aSub = allNewContextSubs.begin();
+    for(; aSub != allNewContextSubs.end(); aSub++) {
+      ResultBodyPtr aBody = std::dynamic_pointer_cast<ModelAPI_ResultBody>(*aSub);
+      if (aBody.get() && aBody->numberOfSubs() == 0) // add only lower level subs
+        aNewToIterate.push_back(aBody);
+    }
   }
 
   // first iteration: searching for the whole shape appearance (like face of the box)
@@ -1174,7 +1174,7 @@ bool Model_AttributeSelection::searchNewContext(std::shared_ptr<Model_Document> 
   TopTools_ListOfShape aContextList;
   aContextList.Append(theContShape);
   if (theContext.get()) {
-    ResultPtr aComposite = ModelAPI_Tools::compSolidOwner(theContext);
+    ResultPtr aComposite = ModelAPI_Tools::bodyOwner(theContext);
     if (aComposite.get() && aComposite->shape().get() && !aComposite->shape()->isNull())
       aContextList.Append(aComposite->shape()->impl<TopoDS_Shape>());
   }

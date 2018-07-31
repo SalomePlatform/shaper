@@ -44,7 +44,7 @@
 #include <ModelAPI_AttributeSelectionList.h>
 #include <ModelAPI_AttributeRefList.h>
 #include <ModelAPI_Object.h>
-#include <ModelAPI_ResultCompSolid.h>
+#include <ModelAPI_ResultBody.h>
 #include <ModelAPI_Session.h>
 #include <ModelAPI_Tools.h>
 
@@ -558,7 +558,7 @@ bool PartSet_DifferentObjectsValidator::isValid(const AttributePtr& theAttribute
           for(int i = 0; i < aCurSelList->size(); i++) {
             std::shared_ptr<ModelAPI_AttributeSelection> aCurSel = aCurSelList->value(i);
             ResultPtr aCurSelContext = aCurSel->context();
-            ResultCompSolidPtr aCurSelCompSolidPtr = ModelAPI_Tools::compSolidOwner(aCurSelContext);
+            ResultBodyPtr aCurSelCompSolidPtr = ModelAPI_Tools::bodyOwner(aCurSelContext);
             std::shared_ptr<GeomAPI_Shape> aCurSelCompSolid;
             if(aCurSelCompSolidPtr.get()) {
               aCurSelCompSolid = aCurSelCompSolidPtr->shape();
@@ -566,8 +566,8 @@ bool PartSet_DifferentObjectsValidator::isValid(const AttributePtr& theAttribute
             for(int j = 0; j < aRefSelList->size(); j++) {
               std::shared_ptr<ModelAPI_AttributeSelection> aRefSel = aRefSelList->value(j);
               ResultPtr aRefSelContext = aRefSel->context();
-              ResultCompSolidPtr aRefSelCompSolidPtr =
-                ModelAPI_Tools::compSolidOwner(aRefSelContext);
+              ResultBodyPtr aRefSelCompSolidPtr =
+                ModelAPI_Tools::bodyOwner(aRefSelContext);
               std::shared_ptr<GeomAPI_Shape> aRefSelCompSolid;
               if(aRefSelCompSolidPtr.get()) {
                 aRefSelCompSolid = aRefSelCompSolidPtr->shape();

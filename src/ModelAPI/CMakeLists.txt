@@ -57,7 +57,6 @@ SET(PROJECT_HEADERS
     ModelAPI_Plugin.h
     ModelAPI_Result.h
     ModelAPI_ResultBody.h
-    ModelAPI_ResultCompSolid.h
     ModelAPI_ResultConstruction.h
     ModelAPI_ResultField.h
     ModelAPI_ResultGroup.h
@@ -101,7 +100,6 @@ SET(PROJECT_SOURCES
     ModelAPI_Plugin.cpp
     ModelAPI_Result.cpp
     ModelAPI_ResultBody.cpp
-    ModelAPI_ResultCompSolid.cpp
     ModelAPI_ResultConstruction.cpp
     ModelAPI_ResultField.cpp
     ModelAPI_ResultGroup.cpp

@@ -32,7 +32,7 @@
 #include <ModelAPI_AttributeReference.h>
 #include <ModelAPI_AttributeRefList.h>
 #include <ModelAPI_Feature.h>
-#include <ModelAPI_ResultCompSolid.h>
+#include <ModelAPI_ResultBody.h>
 #include <ModelAPI_ResultConstruction.h>
 #include <ModelAPI_Tools.h>
 
@@ -671,7 +671,7 @@ bool FeaturesPlugin_ValidatorFilletSelection::isValid(const AttributePtr& theAtt
       return false;
     }
 
-    ResultCompSolidPtr aContextOwner = ModelAPI_Tools::compSolidOwner(aContext);
+    ResultBodyPtr aContextOwner = ModelAPI_Tools::bodyOwner(aContext);
     GeomShapePtr anOwner = aContextOwner.get() ? aContextOwner->shape() : aContext->shape();
 
     if (anOwner->shapeType() != GeomAPI_Shape::SOLID &&
@@ -724,9 +724,8 @@ bool FeaturesPlugin_ValidatorPartitionSelection::isValid(const AttributePtr& the
       return false;
     }
 
-    ResultCompSolidPtr aResultCompsolid =
-      std::dynamic_pointer_cast<ModelAPI_ResultCompSolid>(aContext);
-    if(aResultCompsolid.get()) {
+    ResultBodyPtr aResultBody = std::dynamic_pointer_cast<ModelAPI_ResultBody>(aContext);
+    if(aResultBody.get()) {
       continue;
     }
 
@@ -888,8 +887,8 @@ bool FeaturesPlugin_ValidatorUnionSelection::isValid(const AttributePtr& theAttr
       return false;
     }
 
-    ResultCompSolidPtr aResult =
-      std::dynamic_pointer_cast<ModelAPI_ResultCompSolid>(aContext);
+    ResultBodyPtr aResult =
+      std::dynamic_pointer_cast<ModelAPI_ResultBody>(aContext);
     if(!aResult.get()) {
       continue;
     }
@@ -1036,7 +1035,7 @@ bool FeaturesPlugin_ValidatorBooleanArguments::isValid(
   std::list<std::string>::const_iterator anIt = theArguments.begin(), aLast = theArguments.end();
 
   bool isAllInSameCompSolid = true;
-  ResultCompSolidPtr aCompSolid;
+  ResultBodyPtr aCompSolid;
 
   AttributeSelectionListPtr anAttrSelList = theFeature->selectionList(*anIt);
   if (anAttrSelList)
@@ -1046,7 +1045,7 @@ bool FeaturesPlugin_ValidatorBooleanArguments::isValid(
     {
       AttributeSelectionPtr anAttr = anAttrSelList->value(anIndex);
       ResultPtr aContext = anAttr->context();
-      ResultCompSolidPtr aResCompSolidPtr = ModelAPI_Tools::compSolidOwner(aContext);
+      ResultBodyPtr aResCompSolidPtr = ModelAPI_Tools::bodyOwner(aContext);
       if (aResCompSolidPtr.get())
       {
         if (aCompSolid.get())
@@ -1078,7 +1077,7 @@ bool FeaturesPlugin_ValidatorBooleanArguments::isValid(
       {
         AttributeSelectionPtr anAttr = anAttrSelList->value(anIndex);
         ResultPtr aContext = anAttr->context();
-        ResultCompSolidPtr aResCompSolidPtr = ModelAPI_Tools::compSolidOwner(aContext);
+        ResultBodyPtr aResCompSolidPtr = ModelAPI_Tools::bodyOwner(aContext);
         if (aResCompSolidPtr.get())
         {
           if (aCompSolid.get())

@@ -25,7 +25,6 @@
 #include <ModelAPI_AttributeSelectionList.h>
 #include <ModelAPI_AttributeString.h>
 #include <ModelAPI_ResultBody.h>
-#include <ModelAPI_ResultCompSolid.h>
 #include <ModelAPI_Session.h>
 #include <ModelAPI_Tools.h>
 #include <ModelAPI_Validator.h>
@@ -113,7 +112,7 @@ void FeaturesPlugin_Fillet::execute()
       return;
 
     ResultPtr aContext = anObjectAttr->context();
-    ResultCompSolidPtr aCtxOwner = ModelAPI_Tools::compSolidOwner(aContext);
+    ResultBodyPtr aCtxOwner = ModelAPI_Tools::bodyOwner(aContext);
     GeomShapePtr aParent = aCtxOwner ? aCtxOwner->shape() : aContext->shape();
     if (!aParent)
       return;

@@ -23,7 +23,6 @@
 #include <ModelAPI_AttributeSelectionList.h>
 #include <ModelAPI_AttributeString.h>
 #include <ModelAPI_ResultBody.h>
-#include <ModelAPI_ResultCompSolid.h>
 #include <ModelAPI_ResultConstruction.h>
 #include <ModelAPI_Session.h>
 #include <ModelAPI_Validator.h>
@@ -72,14 +71,14 @@ void FeaturesPlugin_RemoveSubShapes::attributeChanged(const std::string& theID)
   }
 
   ResultPtr aContext = aShapeAttrSelection->context();
-  ResultCompSolidPtr aResultCompSolid =
-    std::dynamic_pointer_cast<ModelAPI_ResultCompSolid>(aContext);
-  if(!aResultCompSolid.get()) {
+  ResultBodyPtr aResultBody =
+    std::dynamic_pointer_cast<ModelAPI_ResultBody>(aContext);
+  if (!aResultBody.get()) {
     aSubShapesToKeepAttrList->clear();
     aSubShapesToRemoveAttrList->clear();
     return;
   }
-  const int aNumOfSubs = aResultCompSolid->numberOfSubs();
+  const int aNumOfSubs = aResultBody->numberOfSubs();
 
   GeomShapePtr aBaseShape = aShapeAttrSelection->value();
   if(!aBaseShape.get()) {
@@ -101,8 +100,8 @@ void FeaturesPlugin_RemoveSubShapes::attributeChanged(const std::string& theID)
       if(aNumOfSubs == 0) {
         aSubShapesToKeepAttrList->append(aContext, aSubShape);
       } else {
-        for(int anIndex = 0; anIndex < aResultCompSolid->numberOfSubs(); ++anIndex) {
-          ResultBodyPtr aSubResult = aResultCompSolid->subResult(anIndex);
+        for (int anIndex = 0; anIndex < aResultBody->numberOfSubs(); ++anIndex) {
+          ResultBodyPtr aSubResult = aResultBody->subResult(anIndex);
           if(aSubResult->shape()->isEqual(aSubShape)) {
             aSubShapesToKeepAttrList->append(aSubResult, aSubShape);
             break;
@@ -135,8 +134,8 @@ void FeaturesPlugin_RemoveSubShapes::attributeChanged(const std::string& theID)
         if(aNumOfSubs == 0) {
           aSubShapesToRemoveAttrList->append(aContext, aSubShape);
         } else {
-          for(int anIndex = 0; anIndex < aResultCompSolid->numberOfSubs(); ++anIndex) {
-            ResultBodyPtr aSubResult = aResultCompSolid->subResult(anIndex);
+          for (int anIndex = 0; anIndex < aResultBody->numberOfSubs(); ++anIndex) {
+            ResultBodyPtr aSubResult = aResultBody->subResult(anIndex);
             if(aSubResult->shape()->isEqual(aSubShape)) {
               aSubShapesToRemoveAttrList->append(aSubResult, aSubShape);
               break;
@@ -170,8 +169,8 @@ void FeaturesPlugin_RemoveSubShapes::attributeChanged(const std::string& theID)
         if(aNumOfSubs == 0) {
           aSubShapesToKeepAttrList->append(aContext, aSubShape);
         } else {
-          for(int anIndex = 0; anIndex < aResultCompSolid->numberOfSubs(); ++anIndex) {
-            ResultBodyPtr aSubResult = aResultCompSolid->subResult(anIndex);
+          for (int anIndex = 0; anIndex < aResultBody->numberOfSubs(); ++anIndex) {
+            ResultBodyPtr aSubResult = aResultBody->subResult(anIndex);
             if(aSubResult->shape()->isEqual(aSubShape)) {
               aSubShapesToKeepAttrList->append(aSubResult, aSubShape);
               break;

@@ -26,7 +26,6 @@
 #include <Model_ResultPart.h>
 #include <Model_ResultConstruction.h>
 #include <Model_ResultBody.h>
-#include <Model_ResultCompSolid.h>
 #include <Model_ResultGroup.h>
 #include <Model_ResultField.h>
 #include <Model_ResultParameter.h>
@@ -556,41 +555,52 @@ ObjectPtr Model_Objects::object(TDF_Label theLabel)
   FeaturePtr aFeature = feature(theLabel);
   if (aFeature.get())
     return feature(theLabel);
-  TDF_Label aFeatureLabel = theLabel.Father().Father();  // let's suppose it is result
-  aFeature = feature(aFeatureLabel);
-  bool isSubResult = false;
-  if (!aFeature.get() && aFeatureLabel.Depth() > 1) { // let's suppose this is sub-result of result
+  TDF_Label aFeatureLabel = theLabel;  // let's suppose it is result of this feature
+  TDF_LabelList aSubLabs; // sub - labels from higher level to lower level of result
+  while(!aFeature.get() && aFeatureLabel.Depth() > 1) {
+    aSubLabs.Prepend(aFeatureLabel);
     aFeatureLabel = aFeatureLabel.Father().Father();
     aFeature = feature(aFeatureLabel);
-    isSubResult = true;
   }
   if (aFeature.get()) {
-    const std::list<std::shared_ptr<ModelAPI_Result> >& aResults = aFeature->results();
-    std::list<std::shared_ptr<ModelAPI_Result> >::const_iterator aRIter = aResults.cbegin();
-    for (; aRIter != aResults.cend(); aRIter++) {
-      if (isSubResult) {
-        ResultCompSolidPtr aCompRes = std::dynamic_pointer_cast<ModelAPI_ResultCompSolid>(*aRIter);
-        if (aCompRes.get()) {
-          int aNumSubs = aCompRes->numberOfSubs();
-          for(int a = 0; a < aNumSubs; a++) {
-            ResultPtr aSub = aCompRes->subResult(a);
-            if (aSub.get()) {
-              std::shared_ptr<Model_Data> aSubData = std::dynamic_pointer_cast<Model_Data>(
-                  aSub->data());
-              if (aSubData->label().Father().IsEqual(theLabel))
-                return aSub;
+    ResultPtr aCurrentResult;
+    // searching for results then sub-results label by label
+    for(TDF_ListIteratorOfLabelList aSubLab(aSubLabs); aSubLab.More(); aSubLab.Next()) {
+      if (aCurrentResult.get()) { // iterate sub-results of result
+        ResultBodyPtr anOwner = std::dynamic_pointer_cast<ModelAPI_ResultBody>(aCurrentResult);
+        if (!anOwner)
+          return ObjectPtr(); // only Body can have sub-results
+        int a, aNumSubs = anOwner->numberOfSubs();
+        for(a = 0; a < aNumSubs; a++) {
+          ResultPtr aSub = anOwner->subResult(a);
+          if (aSub.get()) {
+            std::shared_ptr<Model_Data> aSubData = std::dynamic_pointer_cast<Model_Data>(
+              aSub->data());
+            if (aSubData->label().Father().IsEqual(aSubLab.ChangeValue())) {
+              aCurrentResult = aSub;
+              break;
             }
           }
         }
-      } else {
-        std::shared_ptr<Model_Data> aResData = std::dynamic_pointer_cast<Model_Data>(
-            (*aRIter)->data());
-        if (aResData->label().Father().IsEqual(theLabel))
-          return *aRIter;
+        if (a == aNumSubs) // not found an appropriate sub-result of result
+          return ObjectPtr();
+      } else { // iterate results of feature
+        const std::list<ResultPtr>& aResults = aFeature->results();
+        std::list<std::shared_ptr<ModelAPI_Result> >::const_iterator aRIter = aResults.cbegin();
+        for(; aRIter != aResults.cend(); aRIter++) {
+          std::shared_ptr<Model_Data> aResData = std::dynamic_pointer_cast<Model_Data>((*aRIter)->data());
+          if (aResData->label().Father().IsEqual(aSubLab.ChangeValue())) {
+            aCurrentResult = *aRIter;
+            break;
+          }
+        }
+        if (aRIter == aResults.cend()) // not found an appropriate result of feature
+          return ObjectPtr();
       }
     }
+    return aCurrentResult;
   }
-  return FeaturePtr();  // not found
+  return ObjectPtr();  // not found
 }
 
 ObjectPtr Model_Objects::object(const std::string& theGroupID,
@@ -622,24 +632,12 @@ std::shared_ptr<ModelAPI_Object> Model_Objects::objectByName(
     std::list<std::shared_ptr<ModelAPI_Feature> > allObjs = allFeatures();
     std::list<std::shared_ptr<ModelAPI_Feature> >::iterator anObjIter = allObjs.begin();
     for(; anObjIter != allObjs.end(); anObjIter++) {
-      const std::list<std::shared_ptr<ModelAPI_Result> >& aResults = (*anObjIter)->results();
-      std::list<std::shared_ptr<ModelAPI_Result> >::const_iterator aRIter = aResults.cbegin();
-      for (; aRIter != aResults.cend(); aRIter++) {
-        if (aRIter->get() && (*aRIter)->groupName() == theGroupID) {
-          if ((*aRIter)->data()->name() == theName)
-            return *aRIter;
-          ResultCompSolidPtr aCompRes =
-            std::dynamic_pointer_cast<ModelAPI_ResultCompSolid>(*aRIter);
-          if (aCompRes.get()) {
-            int aNumSubs = aCompRes->numberOfSubs();
-            for(int a = 0; a < aNumSubs; a++) {
-              ResultPtr aSub = aCompRes->subResult(a);
-              if (aSub.get() && aSub->groupName() == theGroupID) {
-                if (aSub->data()->name() == theName)
-                  return aSub;
-              }
-            }
-          }
+      std::list<ResultPtr> allRes;
+      ModelAPI_Tools::allResults(*anObjIter, allRes);
+      for(std::list<ResultPtr>::iterator aRes = allRes.begin(); aRes != allRes.end(); aRes++) {
+        if (aRes->get() && (*aRes)->groupName() == theGroupID) {
+          if ((*aRes)->data()->name() == theName)
+            return *aRes;
         }
       }
     }
@@ -677,6 +675,21 @@ int Model_Objects::size(const std::string& theGroupID, const bool theAllowFolder
   const std::string& aGroupID = groupNameFoldering(theGroupID, theAllowFolder);
   return aGroupID.empty() ? int(myHistory[theGroupID].size()) : int(myHistory[aGroupID].size());
 }
+
+std::shared_ptr<ModelAPI_Object> Model_Objects::parent(
+  const std::shared_ptr<ModelAPI_Object> theChild)
+{
+  if (theChild.get()) {
+    std::shared_ptr<Model_Data> aData = std::dynamic_pointer_cast<Model_Data>(theChild->data());
+    TDF_Label aLab = aData->label();
+    if (!aLab.IsNull() && aLab.Depth() > 1) {
+      ObjectPtr anObj = object(aLab.Father().Father());
+      return anObj;
+    }
+  }
+  return ObjectPtr();
+}
+
 
 void Model_Objects::allResults(const std::string& theGroupID, std::list<ResultPtr>& theResults)
 {
@@ -1166,10 +1179,9 @@ bool Model_Objects::hasCustomName(DataPtr theFeatureData,
                                   int theResultIndex,
                                   std::string& theParentName) const
 {
-  ResultCompSolidPtr aCompSolidRes =
-      std::dynamic_pointer_cast<ModelAPI_ResultCompSolid>(theFeatureData->owner());
-  if (aCompSolidRes) {
-    FeaturePtr anOwner = ModelAPI_Feature::feature(theResult->data()->owner());
+  ResultBodyPtr aBodyRes = std::dynamic_pointer_cast<ModelAPI_ResultBody>(theFeatureData->owner());
+  if(aBodyRes) {
+    FeaturePtr anOwner = ModelAPI_Feature::feature(theResult);
 
     // names of sub-solids in CompSolid should be default (for example,
     // result of boolean operation 'Boolean_1' is a CompSolid which is renamed to 'MyBOOL',
@@ -1177,18 +1189,18 @@ bool Model_Objects::hasCustomName(DataPtr theFeatureData,
     std::ostringstream aDefaultName;
     aDefaultName << anOwner->name();
     // compute default name of CompSolid (name of feature + index of CompSolid's result)
-    int aCompSolidResultIndex = 0;
+    int aBodyResultIndex = 0;
     const std::list<ResultPtr>& aResults = anOwner->results();
-    for (std::list<ResultPtr>::const_iterator anIt = aResults.begin();
-         anIt != aResults.end(); ++anIt, ++aCompSolidResultIndex)
-      if (aCompSolidRes == *anIt)
+    std::list<ResultPtr>::const_iterator anIt = aResults.begin();
+    for(; anIt != aResults.end(); ++anIt, ++aBodyResultIndex)
+      if(aBodyRes == *anIt)
         break;
-    aDefaultName << "_" << (aCompSolidResultIndex + 1);
+    aDefaultName << "_" << (aBodyResultIndex + 1);
     theParentName = aDefaultName.str();
     return false;
   }
 
-  std::pair<std::string, bool> aName = ModelAPI_Tools::getDefaultName(theResult, theResultIndex);
+  std::pair<std::string, bool> aName = ModelAPI_Tools::getDefaultName(theResult);
   if (aName.second)
     theParentName = aName.first;
   return aName.second;
@@ -1242,27 +1254,14 @@ std::shared_ptr<ModelAPI_ResultBody> Model_Objects::createBody(
     const std::shared_ptr<ModelAPI_Data>& theFeatureData, const int theIndex)
 {
   TDF_Label aLab = resultLabel(theFeatureData, theIndex);
-  // for feature create compsolid, but for result sub create body:
-  // only one level of recursion is supported now
-  ResultPtr aResultOwner = std::dynamic_pointer_cast<ModelAPI_Result>(theFeatureData->owner());
-  ObjectPtr anOldObject;
-  if (aResultOwner.get()) {
-    TDataStd_Comment::Set(aLab, ModelAPI_ResultBody::group().c_str());
-  } else { // in compsolid (higher level result) old object probably may be found
-    TDataStd_Comment::Set(aLab, ModelAPI_ResultCompSolid::group().c_str());
-    anOldObject = object(aLab);
-  }
+  TDataStd_Comment::Set(aLab, ModelAPI_ResultBody::group().c_str());
+  ObjectPtr anOldObject = object(aLab);
   std::shared_ptr<ModelAPI_ResultBody> aResult;
   if (anOldObject.get()) {
     aResult = std::dynamic_pointer_cast<ModelAPI_ResultBody>(anOldObject);
   }
   if (!aResult.get()) {
-    // create compsolid anyway; if it is compsolid, it will create sub-bodies internally
-    if (aResultOwner.get()) {
-      aResult = std::shared_ptr<ModelAPI_ResultBody>(new Model_ResultBody);
-    } else {
-      aResult = std::shared_ptr<ModelAPI_ResultBody>(new Model_ResultCompSolid);
-    }
+    aResult = std::shared_ptr<ModelAPI_ResultBody>(new Model_ResultBody);
     storeResult(theFeatureData, aResult, theIndex);
   }
   return aResult;
@@ -1790,7 +1789,7 @@ std::shared_ptr<ModelAPI_Feature> Model_Objects::feature(
   if (aData.get()) {
     TDF_Label aFeatureLab = aData->label().Father().Father().Father();
     FeaturePtr aFeature = feature(aFeatureLab);
-    if (!aFeature.get() && aFeatureLab.Depth() > 1) { // this may be sub-result of result
+    while(!aFeature.get() && aFeatureLab.Depth() > 1) { // this may be sub-result of result
       aFeatureLab = aFeatureLab.Father().Father();
       aFeature = feature(aFeatureLab);
     }
@@ -1863,8 +1862,7 @@ void Model_Objects::updateResults(FeaturePtr theFeature, std::set<FeaturePtr>& t
       TDF_Label anArgLab = aLabIter.Value();
       Handle(TDataStd_Comment) aGroup;
       if (anArgLab.FindAttribute(TDataStd_Comment::GetID(), aGroup)) {
-        if (aGroup->Get() == ModelAPI_ResultBody::group().c_str() ||
-            aGroup->Get() == ModelAPI_ResultCompSolid::group().c_str()) {
+        if (aGroup->Get() == ModelAPI_ResultBody::group().c_str()) {
           aNewBody = createBody(theFeature->data(), aResIndex);
         } else if (aGroup->Get() == ModelAPI_ResultPart::group().c_str()) {
           std::shared_ptr<ModelAPI_ResultPart> aNewP = createPart(theFeature->data(), aResIndex);

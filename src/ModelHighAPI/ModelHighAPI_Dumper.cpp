@@ -49,7 +49,6 @@
 #include <ModelAPI_Folder.h>
 #include <ModelAPI_Result.h>
 #include <ModelAPI_ResultBody.h>
-#include <ModelAPI_ResultCompSolid.h>
 #include <ModelAPI_ResultConstruction.h>
 #include <ModelAPI_ResultPart.h>
 #include <ModelAPI_Tools.h>
@@ -216,32 +215,15 @@ void ModelHighAPI_Dumper::saveResultNames(const FeaturePtr& theFeature)
 
   // Save only names of results which is not correspond to default feature name
   const std::list<ResultPtr>& aResults = theFeature->results();
-  std::list<ResultPtr>::const_iterator aResIt = aResults.begin();
-  for (int i = 0; aResIt != aResults.end(); ++aResIt, ++i) {
-    std::pair<std::string, bool> aName = ModelAPI_Tools::getDefaultName(*aResIt, i);
+  std::list<ResultPtr> allRes;
+  ModelAPI_Tools::allResults(theFeature, allRes);
+  for(std::list<ResultPtr>::iterator aRes = allRes.begin(); aRes != allRes.end(); aRes++) {
+    std::pair<std::string, bool> aName = ModelAPI_Tools::getDefaultName(*aRes);
     std::string aDefaultName = aName.first;
-    std::string aResName = (*aResIt)->data()->name();
-
+    std::string aResName = (*aRes)->data()->name();
     bool isUserDefined = !(isFeatureDefaultName && aDefaultName == aResName);
-
-    myNames[*aResIt] = EntityName(aResName,
-        (isUserDefined ? aResName : std::string()), !isUserDefined);
-
-    // check names of sub-results for CompSolid
-    ResultCompSolidPtr aCompSolid = std::dynamic_pointer_cast<ModelAPI_ResultCompSolid>(*aResIt);
-    if (aCompSolid) {
-      int aNbSubs = aCompSolid->numberOfSubs();
-      for (int j = 0; j < aNbSubs; ++j) {
-        ResultPtr aSub = aCompSolid->subResult(j);
-        std::string aSubName = aSub->data()->name();
-        aName = ModelAPI_Tools::getDefaultName(aSub, j);
-        aDefaultName = aName.first;
-
-        bool isUserDefinedSubName = isUserDefined || aDefaultName != aSubName;
-        myNames[aSub] = EntityName(aSubName,
-            (isUserDefinedSubName ? aSubName : std::string()), !isUserDefinedSubName);
-      }
-    }
+    myNames[*aRes] =
+      EntityName(aResName, (isUserDefined ? aResName : std::string()), !isUserDefined);
   }
 }
 
@@ -783,24 +765,12 @@ ModelHighAPI_Dumper& ModelHighAPI_Dumper::operator<<(const FeaturePtr& theEntity
     bool isUserDefinedName = !myNames[theEntity].myIsDefault;
     // store results if they have user-defined names or colors
     std::list<ResultPtr> aResultsWithNameOrColor;
-    const std::list<ResultPtr>& aResults = theEntity->results();
-    std::list<ResultPtr>::const_iterator aResIt = aResults.begin();
-    for (; aResIt != aResults.end(); ++aResIt) {
-      if (!myNames[*aResIt].myIsDefault || !isDefaultColor(*aResIt) ||
-          !isDefaultDeflection(*aResIt) || !isDefaultTransparency(*aResIt))
-        aResultsWithNameOrColor.push_back(*aResIt);
-
-      ResultCompSolidPtr aCompSolid =
-          std::dynamic_pointer_cast<ModelAPI_ResultCompSolid>(*aResIt);
-      if (aCompSolid) {
-        int aNbSubs = aCompSolid->numberOfSubs();
-        for (int i = 0; i < aNbSubs; ++i) {
-          ResultPtr aCurRes = aCompSolid->subResult(i);
-          if (!myNames[aCurRes].myIsDefault || !isDefaultColor(aCurRes) ||
-              !isDefaultDeflection(aCurRes) || !isDefaultTransparency(aCurRes))
-            aResultsWithNameOrColor.push_back(aCurRes);
-        }
-      }
+    std::list<ResultPtr> allRes;
+    ModelAPI_Tools::allResults(theEntity, allRes);
+    for(std::list<ResultPtr>::iterator aRes = allRes.begin(); aRes != allRes.end(); aRes++) {
+      if(!myNames[*aRes].myIsDefault || !isDefaultColor(*aRes) ||
+         !isDefaultDeflection(*aRes) || !isDefaultTransparency(*aRes))
+        aResultsWithNameOrColor.push_back(*aRes);
     }
     // store just dumped entity to stack
     if (myEntitiesStack.empty() || myEntitiesStack.top().myEntity != theEntity)
@@ -815,37 +785,32 @@ ModelHighAPI_Dumper& ModelHighAPI_Dumper::operator<<(const FeaturePtr& theEntity
 
 ModelHighAPI_Dumper& ModelHighAPI_Dumper::operator<<(const ResultPtr& theResult)
 {
+  // iterate in the structure of sub-results to the parent
+  ResultPtr aCurRes = theResult;
+  std::list<int> anIndices; // indexes of results in the parent result, starting from topmost
+  while(aCurRes.get()) {
+    ResultBodyPtr aParent = ModelAPI_Tools::bodyOwner(aCurRes);
+    if (aParent) {
+      anIndices.push_front(ModelAPI_Tools::bodyIndex(aCurRes));
+    }
+    aCurRes = aParent;
+  }
+
   FeaturePtr aFeature = ModelAPI_Feature::feature(theResult);
-  int anIndex = 0;
-  int aSubIndex = -1;
-  std::list<ResultPtr> aResults = aFeature->results();
-  for(std::list<ResultPtr>::const_iterator
-      anIt = aResults.cbegin(); anIt != aResults.cend(); ++anIt, ++anIndex) {
-    if(theResult->isSame(*anIt)) {
-      break;
-    }
-
-    ResultCompSolidPtr aCompSolid = std::dynamic_pointer_cast<ModelAPI_ResultCompSolid>(*anIt);
-    if (aCompSolid) {
-      int aNbSubs = aCompSolid->numberOfSubs();
-      for (aSubIndex = 0; aSubIndex < aNbSubs; ++aSubIndex)
-        if (theResult->isSame(aCompSolid->subResult(aSubIndex)))
-          break;
-      if (aSubIndex < aNbSubs)
-        break;
-      aSubIndex = -1;
-    }
-  }
-
   myDumpBuffer << name(aFeature);
-  if(anIndex == 0) {
-    myDumpBuffer << ".result()";
-  } else {
-    myDumpBuffer << ".results()[" << anIndex << "]";
+  for (std::list<int>::iterator anI = anIndices.begin(); anI != anIndices.end(); anI++) {
+    if (anI == anIndices.begin()) {
+      if(*anI == 0) {
+        myDumpBuffer << ".result()";
+      }
+      else {
+        myDumpBuffer << ".results()[" << *anI << "]";
+      }
+    } else {
+      myDumpBuffer << ".subResult(" << *anI << ")";
+    }
   }
-  if (aSubIndex >= 0) {
-    myDumpBuffer << ".subResult(" << aSubIndex << ")";
-  }
+
   return *this;
 }
 

@@ -33,7 +33,7 @@
 #include <ModelAPI_ResultPart.h>
 #include <ModelAPI_ResultBody.h>
 #include <ModelAPI_Tools.h>
-#include <ModelAPI_ResultCompSolid.h>
+#include <ModelAPI_ResultBody.h>
 #include <ModelAPI_CompositeFeature.h>
 #include <ModelAPI_AttributeDouble.h>
 #include <ModelAPI_Folder.h>
@@ -157,7 +157,7 @@ PartSet_ObjectNode::VisibilityState PartSet_ObjectNode::visibilityState() const
   ResultPtr aResObj = std::dynamic_pointer_cast<ModelAPI_Result>(myObject);
   if (aResObj.get()) {
     ModuleBase_IWorkshop* aWork = workshop();
-    ResultCompSolidPtr aCompRes = std::dynamic_pointer_cast<ModelAPI_ResultCompSolid>(aResObj);
+    ResultBodyPtr aCompRes = std::dynamic_pointer_cast<ModelAPI_ResultBody>(aResObj);
     if (aCompRes.get()) {
       VisibilityState aState = aCompRes->numberOfSubs(true) == 0 ?
         (aWork->isVisible(aCompRes) ? Visible : Hidden) : NoneState;
@@ -252,7 +252,7 @@ Qt::ItemFlags PartSet_FolderNode::flags(int theColumn) const
 
 ModuleBase_ITreeNode* PartSet_FolderNode::createNode(const ObjectPtr& theObj)
 {
-  ResultCompSolidPtr aCompRes = std::dynamic_pointer_cast<ModelAPI_ResultCompSolid>(theObj);
+  ResultBodyPtr aCompRes = std::dynamic_pointer_cast<ModelAPI_ResultBody>(theObj);
   if (aCompRes.get())
     return new PartSet_CompsolidNode(theObj, this);
   return new PartSet_ObjectNode(theObj, this);
@@ -930,7 +930,7 @@ PartSet_CompsolidNode::PartSet_CompsolidNode(const ObjectPtr& theObj,
 
 void PartSet_CompsolidNode::update()
 {
-  ResultCompSolidPtr aCompRes = std::dynamic_pointer_cast<ModelAPI_ResultCompSolid>(myObject);
+  ResultBodyPtr aCompRes = std::dynamic_pointer_cast<ModelAPI_ResultBody>(myObject);
   int aNb = aCompRes->numberOfSubs(true);
   ModuleBase_ITreeNode* aNode;
   ResultBodyPtr aBody;
@@ -958,7 +958,7 @@ QTreeNodesList PartSet_CompsolidNode::objectCreated(const QObjectPtrList& theObj
 {
   QTreeNodesList aResult;
 
-  ResultCompSolidPtr aCompRes = std::dynamic_pointer_cast<ModelAPI_ResultCompSolid>(myObject);
+  ResultBodyPtr aCompRes = std::dynamic_pointer_cast<ModelAPI_ResultBody>(myObject);
   int aNb = aCompRes->numberOfSubs(true);
   ModuleBase_ITreeNode* aNode;
   ResultBodyPtr aBody;
@@ -983,7 +983,7 @@ QTreeNodesList PartSet_CompsolidNode::objectCreated(const QObjectPtrList& theObj
 QTreeNodesList PartSet_CompsolidNode::objectsDeleted(const DocumentPtr& theDoc, const QString& theGroup)
 {
   QTreeNodesList aResult;
-  ResultCompSolidPtr aCompRes = std::dynamic_pointer_cast<ModelAPI_ResultCompSolid>(myObject);
+  ResultBodyPtr aCompRes = std::dynamic_pointer_cast<ModelAPI_ResultBody>(myObject);
   int aNb = aCompRes->numberOfSubs(true);
   ModuleBase_ITreeNode* aNode;
   // Delete extra objects

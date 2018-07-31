@@ -37,7 +37,7 @@
 #include <ModelAPI_Object.h>
 #include <ModelAPI_Tools.h>
 #include <ModelAPI_AttributeIntArray.h>
-#include <ModelAPI_ResultCompSolid.h>
+#include <ModelAPI_ResultBody.h>
 
 #include <ModuleBase_BRepOwner.h>
 #include <ModuleBase_IModule.h>
@@ -435,9 +435,8 @@ bool XGUI_Displayer::isVisible(XGUI_Displayer* theDisplayer, const ObjectPtr& th
     // compsolid is not visualized in the viewer,
     // but should have presentation when all sub solids are
     // visible. It is useful for highlight presentation where compsolid shape is selectable
-    if (!aVisible && aResult.get() && aResult->groupName() == ModelAPI_ResultCompSolid::group()) {
-      ResultCompSolidPtr aCompsolidResult =
-        std::dynamic_pointer_cast<ModelAPI_ResultCompSolid>(aResult);
+    if (!aVisible && aResult.get() && aResult->groupName() == ModelAPI_ResultBody::group()) {
+      ResultBodyPtr aCompsolidResult = std::dynamic_pointer_cast<ModelAPI_ResultBody>(aResult);
       if (aCompsolidResult.get() != NULL) { // change colors for all sub-solids
         bool anAllSubsVisible = aCompsolidResult->numberOfSubs() > 0;
         for(int i = 0; i < aCompsolidResult->numberOfSubs() && anAllSubsVisible; i++) {
@@ -967,7 +966,7 @@ void XGUI_Displayer::getPresentations(const ObjectPtr& theObject,
     if (aAISObj.get() == NULL) {
       // if result is a result of a composite feature, it is visualized by visualization of
       // composite children, so we should get one of this presentations
-      ResultCompSolidPtr aCompSolid = std::dynamic_pointer_cast<ModelAPI_ResultCompSolid>(aResult);
+      ResultBodyPtr aCompSolid = std::dynamic_pointer_cast<ModelAPI_ResultBody>(aResult);
       if (aCompSolid.get() && aCompSolid->numberOfSubs() > 0) {
         aAISObj = getAISObject(aCompSolid->subResult(0));
       }

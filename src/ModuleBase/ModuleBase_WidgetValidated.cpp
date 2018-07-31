@@ -33,7 +33,7 @@
 #include <ModelAPI_Validator.h>
 #include <ModelAPI_AttributeValidator.h>
 #include <ModelAPI_Events.h>
-#include <ModelAPI_ResultCompSolid.h>
+#include <ModelAPI_ResultBody.h>
 #include <ModelAPI_Tools.h>
 
 #include <SelectMgr_ListIteratorOfListOfFilter.hxx>
@@ -415,7 +415,7 @@ void ModuleBase_WidgetValidated::filterPresentations(QList<ModuleBase_ViewerPrsP
 //********************************************************************
 void ModuleBase_WidgetValidated::filterCompSolids(QList<ModuleBase_ViewerPrsPtr>& theValues)
 {
-  std::set<ResultCompSolidPtr> aCompSolids;
+  std::set<ResultBodyPtr> aCompSolids;
   QList<ModuleBase_ViewerPrsPtr> aValidatedValues;
 
   // Collect compsolids.
@@ -423,9 +423,9 @@ void ModuleBase_WidgetValidated::filterCompSolids(QList<ModuleBase_ViewerPrsPtr>
   for (; anIt != aLast; anIt++) {
     const ModuleBase_ViewerPrsPtr& aViewerPrs = *anIt;
     ObjectPtr anObject = aViewerPrs->object();
-    ResultCompSolidPtr aResultCompSolid =
-      std::dynamic_pointer_cast<ModelAPI_ResultCompSolid>(anObject);
-    if(aResultCompSolid.get()) {
+    ResultBodyPtr aResultCompSolid =
+      std::dynamic_pointer_cast<ModelAPI_ResultBody>(anObject);
+    if(aResultCompSolid.get() && aResultCompSolid->numberOfSubs() > 0) {
       aCompSolids.insert(aResultCompSolid);
     }
   }
@@ -436,7 +436,7 @@ void ModuleBase_WidgetValidated::filterCompSolids(QList<ModuleBase_ViewerPrsPtr>
     const ModuleBase_ViewerPrsPtr& aViewerPrs = *anIt;
     ObjectPtr anObject = aViewerPrs->object();
     ResultPtr aResult = std::dynamic_pointer_cast<ModelAPI_Result>(anObject);
-    ResultCompSolidPtr aResCompSolidPtr = ModelAPI_Tools::compSolidOwner(aResult);
+    ResultBodyPtr aResCompSolidPtr = ModelAPI_Tools::bodyOwner(aResult);
     if(aResCompSolidPtr.get() && (aCompSolids.find(aResCompSolidPtr) != aCompSolids.end())) {
       // Skip sub-solid of compsolid.
       continue;

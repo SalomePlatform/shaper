@@ -49,7 +49,7 @@ bool GeomValidators_BodyShapes::isValid(const AttributePtr& theAttribute,
     }
     // additional check that the selected object is top-level result
     if (theArguments.size() > 0 && *(theArguments.rbegin()) == "toplevel") {
-      if (ModelAPI_Tools::compSolidOwner(aContext).get()) {
+      if (ModelAPI_Tools::bodyOwner(aContext).get()) {
         theError = "Error: Only higher level shape allowed.";
         return false;
       }

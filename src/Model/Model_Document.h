@@ -149,6 +149,11 @@ class Model_Document : public ModelAPI_Document
   //! \param theAllowFolder take into account grouping feature by folders
   MODEL_EXPORT virtual int size(const std::string& theGroupID, const bool theAllowFolder = false);
 
+  //! Returns the parent object of this child. This may be result or feature, parent of a
+  //! top result. Fast method, that uses internal data structure specifics.
+  MODEL_EXPORT virtual std::shared_ptr<ModelAPI_Object> parent(
+    const std::shared_ptr<ModelAPI_Object> theChild);
+
   //! Returns the feature that is currently edited in this document, normally
   //! this is the latest created feature
   //! \param theVisible use visible features only: flag is true for Object Browser functionality
@@ -383,7 +388,7 @@ class Model_Document : public ModelAPI_Document
   friend class Model_AttributeRefAttrList;
   friend class Model_AttributeSelection;
   friend class Model_ResultPart;
-  friend class Model_ResultCompSolid;
+  friend class Model_ResultBody;
   friend class Model_ResultConstruction;
   friend class Model_SelectionNaming;
   friend class DFBrowser;

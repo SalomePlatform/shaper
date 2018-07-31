@@ -25,7 +25,7 @@
 #include <ModelAPI_Events.h>
 #include <ModelAPI_Tools.h>
 #include <ModelAPI_ResultConstruction.h>
-#include <ModelAPI_ResultCompSolid.h>
+#include <ModelAPI_ResultBody.h>
 #include <ModelAPI_AttributeIntArray.h>
 
 #include "ModuleBase_Tools.h"
@@ -84,8 +84,8 @@ ModuleBase_ResultPrs::ModuleBase_ResultPrs(ResultPtr theResult)
     aDrawer->SetPointAspect(new Prs3d_PointAspect(Aspect_TOM_PLUS, Quantity_NOC_YELLOW, 1.));
 
   // Activate individual repaintng if this is a part of compsolid
-  ResultCompSolidPtr aCompSolid = ModelAPI_Tools::compSolidOwner(myResult);
-  SetAutoHilight(aCompSolid.get() == NULL);
+  ResultBodyPtr aResOwner = ModelAPI_Tools::bodyOwner(myResult);
+  SetAutoHilight(aResOwner.get() == NULL);
 
   myHiddenSubShapesDrawer = new AIS_ColoredDrawer (myDrawer);
   Handle(Prs3d_ShadingAspect) aShadingAspect = new Prs3d_ShadingAspect();
