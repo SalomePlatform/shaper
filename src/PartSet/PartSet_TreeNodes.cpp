@@ -161,8 +161,13 @@ PartSet_ObjectNode::VisibilityState PartSet_ObjectNode::visibilityState() const
     if (aCompRes.get()) {
       VisibilityState aState = aCompRes->numberOfSubs(true) == 0 ?
         (aWork->isVisible(aCompRes) ? Visible : Hidden) : NoneState;
-      for (int i = 0; i < aCompRes->numberOfSubs(true); i++) {
-        ResultPtr aSubRes = aCompRes->subResult(i, true);
+      std::list<ResultPtr> aResultsList;
+      ModelAPI_Tools::allSubs(aCompRes, aResultsList);
+
+      std::list<ResultPtr>::const_iterator aIt;
+      //for (int i = 0; i < aCompRes->numberOfSubs(true); i++) {
+      for (aIt = aResultsList.cbegin(); aIt != aResultsList.cend(); aIt++) {
+        ResultPtr aSubRes = (*aIt); // aCompRes->subResult(i, true);
         VisibilityState aS = aWork->isVisible(aSubRes) ? Visible : Hidden;
         if (aState == NoneState)
           aState = aS;
