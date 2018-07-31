@@ -207,6 +207,9 @@ void PartSet_ObjectNode::update()
       aNode = myChildren.takeLast();
       delete aNode;
     }
+    foreach(ModuleBase_ITreeNode* aNode, myChildren) {
+      aNode->update();
+    }
   }
 }
 
@@ -234,6 +237,9 @@ QTreeNodesList PartSet_ObjectNode::objectCreated(const QObjectPtrList& theObject
         aResult.append(aNode);
       }
     }
+    foreach(ModuleBase_ITreeNode* aNode, myChildren) {
+      aResult.append(aNode->objectCreated(theObjects));
+    }
   }
   return aResult;
 }
@@ -254,6 +260,12 @@ QTreeNodesList PartSet_ObjectNode::objectsDeleted(const DocumentPtr& theDoc, con
     }
     if (isDeleted)
       aResult.append(this);
+    int i = 0;
+    foreach(ModuleBase_ITreeNode* aNode, myChildren) {
+      ((PartSet_ObjectNode*)aNode)->setObject(aCompRes->subResult(i, true));
+      aResult.append(aNode->objectsDeleted(theDoc, theGroup));
+      i++;
+    }
   }
   return aResult;
 }
