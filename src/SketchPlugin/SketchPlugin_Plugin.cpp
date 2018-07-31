@@ -156,10 +156,6 @@ SketchPlugin_Plugin::SketchPlugin_Plugin()
                                    "Sketch auxiliary entity color",
                                    Config_Prop::Color, SKETCH_AUXILIARY_COLOR);
 
-  Config_PropManager::registerProp("Visualization", "sketch_dimension_color",
-                                   "Sketch dimension color",
-                                   Config_Prop::Color, SKETCH_DIMENSION_COLOR);
-
   Config_PropManager::registerProp("Visualization", "sketch_overconstraint_color",
                                    "Sketch overconstraint color",
                                    Config_Prop::Color, SKETCH_OVERCONSTRAINT_COLOR);
@@ -178,18 +174,6 @@ SketchPlugin_Plugin::SketchPlugin_Plugin()
                                    Config_Prop::Color, XY_PLANE_COLOR);
 #endif
 
-  Config_PropManager::registerProp(SKETCH_TAB_NAME, "dimension_font", "Dimension font",
-    Config_Prop::String, "Times-bold");
-  std::ostringstream aStream;
-  aStream << SketcherPrs_Tools::getDefaultTextHeight();
-
-  Config_PropManager::registerProp(SKETCH_TAB_NAME, "dimension_value_size",
-    "Dimension value size", Config_Prop::IntSpin, aStream.str());
-  aStream.str("");
-  aStream.clear();
-  aStream << SketcherPrs_Tools::getDefaultArrowSize();
-  Config_PropManager::registerProp(SKETCH_TAB_NAME, "dimension_arrow_size",
-    "Dimension arrow size", Config_Prop::IntSpin, aStream.str());
 }
 
 FeaturePtr SketchPlugin_Plugin::createFeature(std::string theFeatureID)

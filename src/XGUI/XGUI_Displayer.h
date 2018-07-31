@@ -25,6 +25,7 @@
 
 #include <GeomAPI_AISObject.h>
 #include <GeomAPI_ICustomPrs.h>
+#include <GeomAPI_Pln.h>
 
 #include <ModelAPI_Result.h>
 
@@ -237,6 +238,13 @@ class XGUI_EXPORT XGUI_Displayer: public QObject
   /// \param theObject an object
   /// \return a boolean value
   static bool isVisible(XGUI_Displayer* theDisplayer, const ObjectPtr& theObject);
+
+
+  /// Returns screen plane of active view
+  GeomPlanePtr getScreenPlane() const;
+
+  /// Returns scale of active view
+  double getViewScale() const;
 
 signals:
   /// Signal on object display

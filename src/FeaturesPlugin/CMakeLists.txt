@@ -133,6 +133,8 @@ INCLUDE_DIRECTORIES(
   ../GeomAlgoAPI
   ../GeomValidators
   ../Events
+  ../Config
+  ${CAS_INCLUDE_DIRS}
 )
 
 SET(PROJECT_LIBRARIES
@@ -141,6 +143,9 @@ SET(PROJECT_LIBRARIES
     GeomAPI
     GeomAlgoAPI
     GeomValidators
+    Config
+    ${CAS_VIEWER}
+    ${CAS_SHAPE}
 )
 
 ADD_DEFINITIONS(-DFEATURESPLUGIN_EXPORTS)

@@ -50,6 +50,8 @@
 #include <GeomAPI_Shape.h>
 #include <GeomAPI_IPresentable.h>
 #include <GeomAPI_ICustomPrs.h>
+#include <GeomAPI_Pnt.h>
+#include <GeomAPI_IScreenParams.h>
 
 #include <SUIT_ResourceMgr.h>
 
@@ -163,8 +165,13 @@ bool XGUI_Displayer::display(ObjectPtr theObject, bool theUpdateViewer)
     GeomPresentablePtr aPrs = std::dynamic_pointer_cast<GeomAPI_IPresentable>(theObject);
     bool isShading = false;
     if (aPrs.get() != NULL) {
+      GeomScreenParamsPtr aScreen = std::dynamic_pointer_cast<GeomAPI_IScreenParams>(theObject);
+      if (aScreen.get()) {
+        aScreen->setScreenPlane(getScreenPlane());
+        aScreen->setViewScale(getViewScale());
+      }
       anAIS = aPrs->getAISObject(anAIS);
-      if (anAIS.get()) {
+      //if (anAIS.get()) {
         // correct deviation coefficient for
         /*Handle(AIS_InteractiveObject) anAISPrs = anAIS->impl<Handle(AIS_InteractiveObject)>();
         if (!anAISPrs.IsNull()) {
@@ -175,7 +182,7 @@ bool XGUI_Displayer::display(ObjectPtr theObject, bool theUpdateViewer)
               //ModuleBase_Tools::setDefaultDeviationCoefficient(aShape, anAISPrs->Attributes());
           }
         }*/
-      }
+      //}
     } else {
       ResultPtr aResult = std::dynamic_pointer_cast<ModelAPI_Result>(theObject);
       if (aResult.get() != NULL) {
@@ -324,6 +331,11 @@ bool XGUI_Displayer::redisplay(ObjectPtr theObject, bool theUpdateViewer)
 
   GeomPresentablePtr aPrs = std::dynamic_pointer_cast<GeomAPI_IPresentable>(theObject);
   if (aPrs) {
+    GeomScreenParamsPtr aScreen = std::dynamic_pointer_cast<GeomAPI_IScreenParams>(theObject);
+    if (aScreen.get()) {
+      aScreen->setScreenPlane(getScreenPlane());
+      aScreen->setViewScale(getViewScale());
+    }
     AISObjectPtr aAIS_Obj = aPrs->getAISObject(aAISObj);
     if (!aAIS_Obj) {
       aRedisplayed = erase(theObject, theUpdateViewer);
@@ -1131,4 +1143,47 @@ void XGUI_Displayer::AddOrRemoveSelectedShapes(Handle(AIS_InteractiveContext) th
 XGUI_SelectionActivate* XGUI_Displayer::selectionActivate() const
 {
   return myWorkshop->selectionActivate();
+}
+
+//**************************************************************
+GeomPlanePtr XGUI_Displayer::getScreenPlane() const
+{
+  GeomPlanePtr aResult;
+  Handle(AIS_InteractiveContext) aContext = AISContext();
+  if (!aContext.IsNull()) {
+    Handle(V3d_Viewer) aViewer = aContext->CurrentViewer();
+    Handle(V3d_View) aView;
+    for (aViewer->InitActiveViews(); aViewer->MoreActiveViews(); aViewer->NextActiveViews()) {
+      aView = aViewer->ActiveView();
+      break;
+    }
+    if (!aView.IsNull()) {
+      double aEyeX, aEyeY, aEyeZ;
+      aView->Eye(aEyeX, aEyeY, aEyeZ);
+
+      double aProjX, aProjY, aProjZ;
+      aView->Proj(aProjX, aProjY, aProjZ);
+
+      GeomPointPtr aPnt = GeomPointPtr(new GeomAPI_Pnt(aEyeX, aEyeY, aEyeZ));
+      GeomDirPtr aDir = GeomDirPtr(new GeomAPI_Dir(aProjX, aProjY, aProjZ));
+
+      aResult = GeomPlanePtr(new GeomAPI_Pln(aPnt, aDir));
+    }
+  }
+  return aResult;
+}
+
+double XGUI_Displayer::getViewScale() const
+{
+  Handle(AIS_InteractiveContext) aContext = AISContext();
+  if (!aContext.IsNull()) {
+    Handle(V3d_Viewer) aViewer = aContext->CurrentViewer();
+    Handle(V3d_View) aView;
+    for (aViewer->InitActiveViews(); aViewer->MoreActiveViews(); aViewer->NextActiveViews()) {
+      aView = aViewer->ActiveView();
+      break;
+    }
+    return aView->Camera()->Scale();
+  }
+  return 1;
 }
