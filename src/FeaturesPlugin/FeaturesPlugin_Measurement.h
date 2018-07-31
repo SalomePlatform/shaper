@@ -24,6 +24,9 @@
 #include "FeaturesPlugin.h"
 #include <ModelAPI_Feature.h>
 
+#include <GeomAPI_IPresentable.h>
+#include <GeomAPI_IScreenParams.h>
+
 /// \class FeaturesPlugin_Measurement
 /// \ingroup Plugins
 /// \brief Feature for calculation metrics.
@@ -33,7 +36,9 @@
 /// * distance between shapes,
 /// * radius of arc or cylindrical faces,
 /// * angle between edges.
-class FeaturesPlugin_Measurement : public ModelAPI_Feature
+class FeaturesPlugin_Measurement : public ModelAPI_Feature,
+  public GeomAPI_IPresentable,
+  public GeomAPI_IScreenParams
 {
 public:
   /// Feature kind.
@@ -182,6 +187,23 @@ public:
   /// Reimplemented from ModelAPI_Feature::isMacro(). Returns true.
   virtual bool isMacro() const { return true; }
 
+  /** Returns the AIS preview
+  *   \param thePrevious - defines a presentation if it was created previously
+  */
+  FEATURESPLUGIN_EXPORT virtual AISObjectPtr getAISObject(AISObjectPtr thePrevious);
+
+  /// Set current screen plane
+  /// \param theScreenPlane the screen plane
+  virtual void setScreenPlane(GeomPlanePtr theScreenPlane) {
+    myScreenPlane = theScreenPlane;
+  }
+
+  /// Set current view scale
+  /// \param theScale the view scale
+  virtual void setViewScale(double theScale) {
+    mySceenScale = theScale;
+  }
+
   /// Use plugin manager for features creation
   FeaturesPlugin_Measurement();
 
@@ -196,6 +218,32 @@ private:
   void computeAngle();
   /// Compute angle by three points
   void computeAngleByPoints();
+
+  /// Create length dimension presentation
+  /// \param thePrevious previous version of presentation
+  AISObjectPtr lengthDimension(AISObjectPtr thePrevious);
+
+  /// Create distance dimension presentation
+  /// \param thePrevious previous version of presentation
+  AISObjectPtr distanceDimension(AISObjectPtr thePrevious);
+
+  /// Create radius dimension presentation
+  /// \param thePrevious previous version of presentation
+  AISObjectPtr radiusDimension(AISObjectPtr thePrevious);
+
+  /// Create angle dimension presentation
+  /// \param thePrevious previous version of presentation
+  AISObjectPtr angleDimension(AISObjectPtr thePrevious);
+
+  /// Create angle by points dimension presentation
+  /// \param thePrevious previous version of presentation
+  AISObjectPtr angleByPointsDimension(AISObjectPtr thePrevious);
+
+  /// Set dimension presentation parameters
+  void setupDimension(AISObjectPtr theDim);
+
+  GeomPlanePtr myScreenPlane; //< a plane of current screen
+  double mySceenScale; //< a scale of current view
 };
 
 #endif

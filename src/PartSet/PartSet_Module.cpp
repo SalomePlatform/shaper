@@ -207,6 +207,23 @@ PartSet_Module::PartSet_Module(ModuleBase_IWorkshop* theWshop)
                                    "Hidden faces transparency",
                                    Config_Prop::DblSpin,
                                    "0.8");
+  std::ostringstream aStream;
+  aStream << SketcherPrs_Tools::getDefaultArrowSize();
+  Config_PropManager::registerProp("Visualization", "dimension_arrow_size",
+    "Dimension arrow size", Config_Prop::IntSpin, aStream.str());
+
+  Config_PropManager::registerProp("Visualization", "dimension_font", "Dimension font",
+    Config_Prop::String, "Times-bold");
+
+  aStream.str("");
+  aStream.clear();
+  aStream << SketcherPrs_Tools::getDefaultTextHeight();
+  Config_PropManager::registerProp("Visualization", "dimension_value_size",
+    "Dimension value size", Config_Prop::IntSpin, aStream.str());
+
+  Config_PropManager::registerProp("Visualization", "sketch_dimension_color",
+    "Sketch dimension color",
+    Config_Prop::Color, SKETCH_DIMENSION_COLOR);
 }
 
 //******************************************************
@@ -1120,10 +1137,12 @@ void PartSet_Module::onViewTransformed(int theTrsfType)
   if (aView.IsNull())
     return;
 
+  bool isModified = false;
   ModuleBase_Operation* aCurrentOperation = myWorkshop->currentOperation();
   if (aCurrentOperation &&
     (PartSet_SketcherMgr::isSketchOperation(aCurrentOperation) ||
-     sketchMgr()->isNestedSketchOperation(aCurrentOperation)))
+     sketchMgr()->isNestedSketchOperation(aCurrentOperation) ||
+     (aCurrentOperation->id() == "Measurement")))
   {
     double aLen = aView->Convert(SketcherPrs_Tools::getConfigArrowSize());
 
@@ -1131,7 +1150,6 @@ void PartSet_Module::onViewTransformed(int theTrsfType)
     SketcherPrs_Tools::setArrowSize(aLen);
     const double aCurScale = aViewer->activeView()->Camera()->Scale();
     aViewer->SetScale(aViewer->activeView(), aCurScale);
-    bool isModified = false;
     QList<Handle(AIS_InteractiveObject)> aPrsList = aDisplayer->displayedPresentations();
     foreach(Handle(AIS_InteractiveObject) aAisObj, aPrsList) {
       Handle(AIS_Dimension) aDim = Handle(AIS_Dimension)::DownCast(aAisObj);
@@ -1144,6 +1162,7 @@ void PartSet_Module::onViewTransformed(int theTrsfType)
     if (isModified)
       aDisplayer->updateViewer();
   }
+
 }
 
 //******************************************************
