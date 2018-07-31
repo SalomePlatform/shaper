@@ -71,10 +71,20 @@ public:
   /// theObj a new object
   void setObject(ObjectPtr theObj) { myObject = theObj; }
 
-  /// Updates sub-nodes of the node
-  virtual void update() {}
-
   virtual VisibilityState visibilityState() const;
+
+  /// Updates sub-nodes of the node
+  virtual void update();
+
+  /// Process creation of objects.
+  /// \param theObjects a list of created objects
+  /// \return a list of nodes which corresponds to the created objects
+  virtual QTreeNodesList objectCreated(const QObjectPtrList& theObjects);
+
+  /// Process deletion of objects.
+  /// \param theDoc a document where objects were deleted
+  /// \param theGroup a name of group where objects were deleted
+  virtual QTreeNodesList objectsDeleted(const DocumentPtr& theDoc, const QString& theGroup);
 
 protected:
   ObjectPtr myObject;
@@ -324,32 +334,32 @@ private:
 * \ingroup Modules
 * Implementation of a node for compsolid representation
 */
-class PartSet_CompsolidNode : public PartSet_ObjectNode
-{
-public:
-  PartSet_CompsolidNode(const ObjectPtr& theObj, ModuleBase_ITreeNode* theParent);
-
-  static std::string typeId()
-  {
-    static std::string myType = "CompSolid";
-    return myType;
-  }
-
-  virtual std::string type() const { return typeId(); }
-
-  /// Updates sub-nodes of the node
-  virtual void update();
-
-  /// Process creation of objects.
-  /// \param theObjects a list of created objects
-  /// \return a list of nodes which corresponds to the created objects
-  virtual QTreeNodesList objectCreated(const QObjectPtrList& theObjects);
-
-  /// Process deletion of objects.
-  /// \param theDoc a document where objects were deleted
-  /// \param theGroup a name of group where objects were deleted
-  virtual QTreeNodesList objectsDeleted(const DocumentPtr& theDoc, const QString& theGroup);
-
-};
+//class PartSet_CompsolidNode : public PartSet_ObjectNode
+//{
+//public:
+//  PartSet_CompsolidNode(const ObjectPtr& theObj, ModuleBase_ITreeNode* theParent);
+//
+//  static std::string typeId()
+//  {
+//    static std::string myType = "CompSolid";
+//    return myType;
+//  }
+//
+//  virtual std::string type() const { return typeId(); }
+//
+//  /// Updates sub-nodes of the node
+//  virtual void update();
+//
+//  /// Process creation of objects.
+//  /// \param theObjects a list of created objects
+//  /// \return a list of nodes which corresponds to the created objects
+//  virtual QTreeNodesList objectCreated(const QObjectPtrList& theObjects);
+//
+//  /// Process deletion of objects.
+//  /// \param theDoc a document where objects were deleted
+//  /// \param theGroup a name of group where objects were deleted
+//  virtual QTreeNodesList objectsDeleted(const DocumentPtr& theDoc, const QString& theGroup);
+//
+//};
 
 #endif
