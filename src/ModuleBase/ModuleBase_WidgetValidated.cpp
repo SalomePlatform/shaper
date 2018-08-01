@@ -115,8 +115,14 @@ bool ModuleBase_WidgetValidated::isValidInFilters(const ModuleBase_ViewerPrsPtr&
       anOwner = new StdSelect_BRepOwner(aTDShape, anIO);
       myPresentedObject = aResult;
     }
-    else
-      aValid = false; // only results with a shape can be filtered
+    else {
+      FeaturePtr aFeature = ModelAPI_Feature::feature(thePrs->object());
+      if (aFeature.get()) {
+        // Use feature as a reference to all its results
+        myPresentedObject = aFeature;
+      } else
+        aValid = false; // only results with a shape can be filtered
+    }
   }
   // checks the owner by the AIS context activated filters
   if (!anOwner.IsNull()) {

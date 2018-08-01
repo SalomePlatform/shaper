@@ -98,27 +98,32 @@ void XGUI_SelectionMgr::setSelectedOwners(const SelectMgr_IndexedMapOfOwner& the
 void XGUI_SelectionMgr::onObjectBrowserSelection()
 {
   QList<ModuleBase_ViewerPrsPtr> aSelectedPrs =
-             myWorkshop->selector()->selection()->getSelected(ModuleBase_ISelection::Browser);
+    myWorkshop->selector()->selection()->getSelected(ModuleBase_ISelection::Browser);
+  XGUI_Displayer* aDisplayer = myWorkshop->displayer();
+  if (!myWorkshop->operationMgr()->hasOperation()) {
 
-  QList<ModuleBase_ViewerPrsPtr> aTmpList = aSelectedPrs;
-  ObjectPtr aObject;
-  FeaturePtr aFeature;
-  foreach(ModuleBase_ViewerPrsPtr aPrs, aTmpList) {
-    aObject = aPrs->object();
-    if (aObject.get()) {
-      aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(aObject);
-      if (aFeature.get()) {
-        std::list<ResultPtr> allRes;
-        ModelAPI_Tools::allResults(aFeature, allRes);
-        for(std::list<ResultPtr>::iterator aRes = allRes.begin(); aRes != allRes.end(); aRes++) {
-          aSelectedPrs.append(std::shared_ptr<ModuleBase_ViewerPrs>(
-            new ModuleBase_ViewerPrs(*aRes, GeomShapePtr(), NULL)));
+    QList<ModuleBase_ViewerPrsPtr> aTmpList = aSelectedPrs;
+    ObjectPtr aObject;
+    FeaturePtr aFeature;
+    // Select all results of a selected feature in viewer
+    foreach(ModuleBase_ViewerPrsPtr aPrs, aSelectedPrs) {
+      aObject = aPrs->object();
+      if (aObject.get()) {
+        aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(aObject);
+        if (aFeature.get()) {
+          std::list<ResultPtr> allRes;
+          ModelAPI_Tools::allResults(aFeature, allRes);
+          for (std::list<ResultPtr>::iterator aRes = allRes.begin(); aRes != allRes.end(); aRes++) {
+            aTmpList.append(std::shared_ptr<ModuleBase_ViewerPrs>(
+              new ModuleBase_ViewerPrs(*aRes, GeomShapePtr(), NULL)));
+          }
         }
       }
     }
+    aDisplayer->setSelected(aTmpList);
+  } else {
+    aDisplayer->setSelected(aSelectedPrs);
   }
-  XGUI_Displayer* aDisplayer = myWorkshop->displayer();
-  aDisplayer->setSelected(aSelectedPrs);
   emit selectionChanged();
 }
 

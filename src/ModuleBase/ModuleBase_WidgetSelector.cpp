@@ -64,6 +64,8 @@ void ModuleBase_WidgetSelector::getGeomSelection(const ModuleBase_ViewerPrsPtr& 
 {
   ModuleBase_ISelection* aSelection = myWorkshop->selection();
   theObject = aSelection->getResult(thePrs);
+  if (!theObject.get())
+    theObject = thePrs->object();
   theShape = aSelection->getShape(thePrs);
 }
 

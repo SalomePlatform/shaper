@@ -679,18 +679,16 @@ bool setObject(const AttributePtr& theAttribute, const ObjectPtr& theObject,
   } else if (aType == ModelAPI_AttributeSelection::typeId()) {
     AttributeSelectionPtr aSelectAttr =
                              std::dynamic_pointer_cast<ModelAPI_AttributeSelection>(theAttribute);
-    ResultPtr aResult = std::dynamic_pointer_cast<ModelAPI_Result>(theObject);
     if (aSelectAttr.get() != NULL) {
-      aSelectAttr->setValue(aResult, theShape, theTemporarily);
+      aSelectAttr->setValue(theObject, theShape, theTemporarily);
     }
   }
   if (aType == ModelAPI_AttributeSelectionList::typeId()) {
     AttributeSelectionListPtr aSelectionListAttr =
                          std::dynamic_pointer_cast<ModelAPI_AttributeSelectionList>(theAttribute);
-    ResultPtr aResult = std::dynamic_pointer_cast<ModelAPI_Result>(theObject);
     if (!theCheckIfAttributeHasObject ||
-        !aSelectionListAttr->isInList(aResult, theShape, theTemporarily))
-      aSelectionListAttr->append(aResult, theShape, theTemporarily);
+      !aSelectionListAttr->isInList(theObject, theShape, theTemporarily))
+      aSelectionListAttr->append(theObject, theShape, theTemporarily);
   }
   else if (aType == ModelAPI_AttributeRefList::typeId()) {
     AttributeRefListPtr aRefListAttr =
