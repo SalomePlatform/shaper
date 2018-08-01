@@ -49,13 +49,13 @@ class ModelAPI_AttributeSelection : public ModelAPI_Attribute
   ///           (used to remove immideately, without the following updates)
   /// \returns true if attribute was updated
   virtual bool setValue(
-    const ResultPtr& theContext, const std::shared_ptr<GeomAPI_Shape>& theSubShape,
+    const ObjectPtr& theContext, const std::shared_ptr<GeomAPI_Shape>& theSubShape,
     const bool theTemporarily = false) = 0;
 
   /// Same as SetValue, but it takes an edge (on circular or elliptical curve)
   /// and stores the vertex of the central point (for ellipse the first or the second focus point)
   virtual void setValueCenter(
-    const ResultPtr& theContext, const std::shared_ptr<GeomAPI_Edge>& theEdge,
+    const ObjectPtr& theContext, const std::shared_ptr<GeomAPI_Edge>& theEdge,
     const CenterType theCenterType,
     const bool theTemporarily = false) = 0;
 
@@ -71,6 +71,9 @@ class ModelAPI_AttributeSelection : public ModelAPI_Attribute
 
   /// Returns the context of the selection (the whole shape owner)
   virtual ResultPtr context() = 0;
+
+  /// Returns the context of the selection if the whole feature was selected
+  virtual std::shared_ptr<ModelAPI_Feature> contextFeature() = 0;
 
   /// Updates the underlied selection due to the changes in the referenced objects
   /// \returns false if update is failed

@@ -41,7 +41,7 @@
 #include <NCollection_List.hxx>
 
 void Model_AttributeSelectionList::append(
-    const ResultPtr& theContext, const std::shared_ptr<GeomAPI_Shape>& theSubShape,
+    const ObjectPtr& theContext, const std::shared_ptr<GeomAPI_Shape>& theSubShape,
     const bool theTemporarily)
 {
   // do not use the degenerated edge as a shape, a list is not incremented in this case
@@ -53,7 +53,9 @@ void Model_AttributeSelectionList::append(
   }
 
   if (myIsCashed && !theTemporarily) {
-    myCash[theContext].push_back(theSubShape);
+    ResultPtr aResContext = std::dynamic_pointer_cast<ModelAPI_Result>(theContext);
+    if (aResContext.get())
+      myCash[aResContext].push_back(theSubShape);
   }
 
   int aNewTag = mySize->Get() + 1;
@@ -225,28 +227,31 @@ int Model_AttributeSelectionList::size()
   return mySize->Get();
 }
 
-bool Model_AttributeSelectionList::isInList(const ResultPtr& theContext,
+bool Model_AttributeSelectionList::isInList(const ObjectPtr& theContext,
                                             const std::shared_ptr<GeomAPI_Shape>& theSubShape,
                                             const bool theTemporarily)
 {
+  ResultPtr aResCont = std::dynamic_pointer_cast<ModelAPI_Result>(theContext);
   if (myIsCashed) { // the cashing is active
-    std::map<ResultPtr, std::list<std::shared_ptr<GeomAPI_Shape> > >::iterator aContext =
-      myCash.find(theContext);
-    if (aContext != myCash.end()) {
-      // iterate shapes because "isSame" method must be called for each shape
-      std::list<std::shared_ptr<GeomAPI_Shape> >::iterator aShapes = aContext->second.begin();
-      for(; aShapes != aContext->second.end(); aShapes++) {
-        if (!theSubShape.get()) {
-          if (!aShapes->get() || (*aShapes)->isSame(aContext->first->shape()))
-            return true;
-        } else {
-          // we need to call here isSame instead of isEqual to do not check shapes orientation
-          if (theSubShape->isSame(*aShapes))
-            return true;
+    if (aResCont.get()) {
+      std::map<ResultPtr, std::list<std::shared_ptr<GeomAPI_Shape> > >::iterator aContext =
+        myCash.find(aResCont);
+      if (aContext != myCash.end()) {
+        // iterate shapes because "isSame" method must be called for each shape
+        std::list<std::shared_ptr<GeomAPI_Shape> >::iterator aShapes = aContext->second.begin();
+        for(; aShapes != aContext->second.end(); aShapes++) {
+          if (!theSubShape.get()) {
+            if (!aShapes->get() || (*aShapes)->isSame(aContext->first->shape()))
+              return true;
+          } else {
+            // we need to call here isSame instead of isEqual to do not check shapes orientation
+            if (theSubShape->isSame(*aShapes))
+              return true;
+          }
         }
       }
+      return false;
     }
-    return false;
   }
   // no-cash method
   for(int anIndex = size() - 1; anIndex >= 0; anIndex--) {
@@ -255,7 +260,7 @@ bool Model_AttributeSelectionList::isInList(const ResultPtr& theContext,
       if (anAttr->context() == theContext) { // contexts are equal, so, check that values are also
         std::shared_ptr<GeomAPI_Shape> aValue = anAttr->value();
         if (!theSubShape.get()) {
-          if (!aValue.get() || aValue->isSame(theContext->shape())) { // both are null
+          if (!aValue.get() || (aResCont.get() && aValue->isSame(aResCont->shape()))) {// both null
             return true;
           }
         } else {

@@ -91,11 +91,13 @@ Standard_GUID kELLIPSE_CENTER2("1395ae73-8e02-4cf8-b204-06ff35873a32");
 // TDataStd_IntPackedMap - indexes of edges in composite element (for construction)
 // TDataStd_Integer - type of the selected shape (for construction)
 // TDF_Reference - from ReferenceAttribute, the context
-bool Model_AttributeSelection::setValue(const ResultPtr& theContext,
+bool Model_AttributeSelection::setValue(const ObjectPtr& theContext,
   const std::shared_ptr<GeomAPI_Shape>& theSubShape, const bool theTemporarily)
 {
-  if (theTemporarily) { // just keep the stored without DF update
-    myTmpContext = theContext;
+  if (theTemporarily &&
+      (!theContext.get() || theContext->groupName() != ModelAPI_Feature::group())) {
+    // just keep the stored without DF update
+    myTmpContext = std::dynamic_pointer_cast<ModelAPI_Result>(theContext);
     myTmpSubShape = theSubShape;
     owner()->data()->sendAttributeUpdated(this);
     return true;
@@ -143,34 +145,37 @@ bool Model_AttributeSelection::setValue(const ResultPtr& theContext,
     return false;
   }
   if (theContext->groupName() == ModelAPI_ResultBody::group()) {
+    ResultBodyPtr aContextBody = std::dynamic_pointer_cast<ModelAPI_ResultBody>(theContext);
     // do not select the whole shape for body:it is already must be in the data framework
     // equal and null selected objects mean the same: object is equal to context,
-    if (theContext->shape().get() &&
-        (theContext->shape()->isEqual(theSubShape) || !theSubShape.get())) {
+    if (aContextBody->shape().get() &&
+        (aContextBody->shape()->isEqual(theSubShape) || !theSubShape.get())) {
       aSelLab.ForgetAllAttributes(true);
       TDataStd_UAttribute::Set(aSelLab, kSIMPLE_REF_ID);
     } else {
-      selectBody(theContext, theSubShape);
+      selectBody(aContextBody, theSubShape);
     }
   } else if (theContext->groupName() == ModelAPI_ResultConstruction::group()) {
+    ResultConstructionPtr aContextConstruction =
+      std::dynamic_pointer_cast<ModelAPI_ResultConstruction>(theContext);
     aSelLab.ForgetAllAttributes(true); // to remove old selection data
     std::shared_ptr<Model_ResultConstruction> aConstruction =
       std::dynamic_pointer_cast<Model_ResultConstruction>(theContext);
     std::shared_ptr<GeomAPI_Shape> aSubShape;
-    if (theSubShape.get() && !theContext->shape()->isEqual(theSubShape))
+    if (theSubShape.get() && !aContextConstruction->shape()->isEqual(theSubShape))
       aSubShape = theSubShape; // the whole context
     if (aConstruction->isInfinite()) {
       // For correct naming selection, put the shape into the naming structure.
       // It seems sub-shapes are not needed: only this shape is (and can be ) selected.
       TNaming_Builder aBuilder(aSelLab);
-      aBuilder.Generated(theContext->shape()->impl<TopoDS_Shape>());
+      aBuilder.Generated(aContextConstruction->shape()->impl<TopoDS_Shape>());
     }
     int anIndex = aConstruction->select(theSubShape, owner()->document());
     TDataStd_Integer::Set(aSelLab, anIndex);
   } else if (theContext->groupName() == ModelAPI_ResultPart::group()) {
     aSelLab.ForgetAllAttributes(true);
     TDataStd_UAttribute::Set(aSelLab, kPART_REF_ID);
-    selectPart(theContext, theSubShape);
+    selectPart(std::dynamic_pointer_cast<ModelAPI_Result>(theContext), theSubShape);
   }
 
   owner()->data()->sendAttributeUpdated(this);
@@ -182,7 +187,7 @@ bool Model_AttributeSelection::setValue(const ResultPtr& theContext,
 }
 
 void Model_AttributeSelection::setValueCenter(
-    const ResultPtr& theContext, const std::shared_ptr<GeomAPI_Edge>& theEdge,
+    const ObjectPtr& theContext, const std::shared_ptr<GeomAPI_Edge>& theEdge,
     const CenterType theCenterType, const bool theTemporarily)
 {
   bool anUpdated = setValue(theContext, theEdge, theTemporarily);
@@ -434,6 +439,15 @@ ResultPtr Model_AttributeSelection::context() {
   }
   return aResult;
 }
+
+FeaturePtr Model_AttributeSelection::contextFeature() {
+  if (myTmpContext.get() || myTmpSubShape.get()) {
+    return FeaturePtr(); // feature can not be selected temporarily
+  }
+  return std::dynamic_pointer_cast<ModelAPI_Feature>(myRef.value());
+
+}
+
 
 
 void Model_AttributeSelection::setObject(const std::shared_ptr<ModelAPI_Object>& theObject)

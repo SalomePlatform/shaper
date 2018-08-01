@@ -52,7 +52,7 @@ public:
   /// \param theTemporarily if it is true, do not store and name the added in the data framework
   ///           (used to remove immideately, without the following updates)
   MODEL_EXPORT virtual void append(
-    const ResultPtr& theContext, const std::shared_ptr<GeomAPI_Shape>& theSubShape,
+    const ObjectPtr& theContext, const std::shared_ptr<GeomAPI_Shape>& theSubShape,
     const bool theTemporarily = false);
 
   /// Adds the new reference to the end of the list by the naming name of the selected shape
@@ -78,7 +78,7 @@ public:
   /// \param theTemporarily if it is true, it checks also the temporary added item
   /// \returns true if the pair is found in the attirbute
   MODEL_EXPORT virtual bool isInList(
-    const ResultPtr& theContext, const std::shared_ptr<GeomAPI_Shape>& theSubShape,
+    const ObjectPtr& theContext, const std::shared_ptr<GeomAPI_Shape>& theSubShape,
     const bool theTemporarily = false);
 
   /// The type of all elements selection

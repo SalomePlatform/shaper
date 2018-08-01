@@ -55,13 +55,13 @@ public:
   ///           (used to remove immideately, without the following updates)
   /// \returns true if attribute was updated
   MODEL_EXPORT virtual bool setValue(
-    const ResultPtr& theContext, const std::shared_ptr<GeomAPI_Shape>& theSubShape,
+    const ObjectPtr& theContext, const std::shared_ptr<GeomAPI_Shape>& theSubShape,
     const bool theTemporarily = false);
 
   /// Same as SetValue, but it takes an edge (on circular or elliptical curve)
   /// and stores the vertex of the central point (for ellipse the first or the second focus point)
   MODEL_EXPORT virtual void setValueCenter(
-    const ResultPtr& theContext, const std::shared_ptr<GeomAPI_Edge>& theEdge,
+    const ObjectPtr& theContext, const std::shared_ptr<GeomAPI_Edge>& theEdge,
     const CenterType theCenterType,
     const bool theTemporarily = false);
 
@@ -77,6 +77,9 @@ public:
 
   /// Returns the context of the selection (the whole shape owner)
   MODEL_EXPORT virtual ResultPtr context();
+
+  /// Returns the context of the selection if the whole feature was selected
+  MODEL_EXPORT virtual FeaturePtr contextFeature();
 
   /// Sets the feature object
   MODEL_EXPORT virtual void setObject(const std::shared_ptr<ModelAPI_Object>& theObject);
