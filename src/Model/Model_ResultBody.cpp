@@ -136,58 +136,52 @@ void Model_ResultBody::setIsConcealed(const bool theValue)
   }
 }
 
+// recursively check all subs for concealment flag, returns true if everybody have "flag" state,
+// in theAll returns results with "flag" state
+static bool checkAllSubs(ResultBodyPtr theParent, bool theFlag, std::list<ResultBodyPtr>& theAll)
+{
+  if (theParent->isConcealed() != theFlag)
+    theAll.push_back(theParent);
+  bool aResult = theParent->ModelAPI_ResultBody::isConcealed() == theFlag;
+  for(int a = 0; a < theParent->numberOfSubs(); a++) {
+    bool aSubRes = checkAllSubs(theParent->subResult(a), theFlag, theAll);
+    if (theFlag)
+      aResult = aResult || aSubRes; // concealed: one makes concealed everyone
+    else
+      aResult = aResult && aSubRes; // not concealed: all must be not concealed
+  }
+  return aResult;
+}
+
 void Model_ResultBody::updateConcealment()
 {
   if (myLastConcealed != ModelAPI_ResultBody::isConcealed()) {
-    ResultPtr anOwner = std::dynamic_pointer_cast<ModelAPI_Result>(data()->owner());
-    std::shared_ptr<Model_ResultBody> aParent = std::dynamic_pointer_cast<Model_ResultBody>(
-      ModelAPI_Tools::bodyOwner(anOwner));
-
-    myLastConcealed = ModelAPI_ResultBody::isConcealed(); // set new value and check parent
-    if (myLastConcealed) { // this becomes concealed, so, update all: parent and children
-      if (aParent.get())
-        aParent->updateConcealment();
-      static Events_ID EVENT_DISP =
-        Events_Loop::loop()->eventByName(EVENT_OBJECT_TO_REDISPLAY);
-      ModelAPI_EventCreator::get()->sendDeleted(document(), groupName());
-      ModelAPI_EventCreator::get()->sendUpdated(data()->owner(), EVENT_DISP);
-      std::vector<ResultBodyPtr>::const_iterator aSubIter = mySubs.cbegin();
-      for (; aSubIter != mySubs.cend(); aSubIter++) {
-        std::dynamic_pointer_cast<Model_ResultBody>(*aSubIter)->updateConcealment();
-      }
-    } else {
-      // ask parent: if it is still concealed, nothing is changed
-      if (aParent.get()) {
-        aParent->updateConcealment();
-        if (aParent->isConcealed()) {
-          myLastConcealed = true;
-          return;
+    // check the whole tree of results: if one is concealed, everybody are concealed
+    ResultBodyPtr anOwner = std::dynamic_pointer_cast<ModelAPI_ResultBody>(data()->owner());
+    ResultBodyPtr aParent = ModelAPI_Tools::bodyOwner(anOwner);
+    while(aParent.get()) {
+      anOwner = aParent;
+      aParent = ModelAPI_Tools::bodyOwner(anOwner);
+    }
+    // iterate all results and collect all results whose state may be updated
+    std::list<ResultBodyPtr> anUpdated;
+    bool aNewFlag = !myLastConcealed;
+    if (checkAllSubs(anOwner, aNewFlag, anUpdated)) { // state of everyone must be updated
+      std::list<ResultBodyPtr>::iterator aRes = anUpdated.begin();
+      for(; aRes != anUpdated.end(); aRes++) {
+        bool aLastConcealed = (*aRes)->isConcealed();
+        if (aNewFlag != aLastConcealed) {
+          std::dynamic_pointer_cast<Model_ResultBody>(*aRes)->myLastConcealed = aNewFlag;
+          if (aNewFlag) { // become concealed, behaves like removed
+            ModelAPI_EventCreator::get()->sendDeleted(document(), groupName());
+          } else { // become not-concealed, behaves like created
+            static Events_ID anEvent = Events_Loop::eventByName(EVENT_OBJECT_CREATED);
+            ModelAPI_EventCreator::get()->sendUpdated(*aRes, anEvent);
+          }
+          static Events_ID EVENT_DISP = // must be redisplayed in any case
+            Events_Loop::loop()->eventByName(EVENT_OBJECT_TO_REDISPLAY);
+          ModelAPI_EventCreator::get()->sendUpdated(*aRes, EVENT_DISP);
         }
-      }
-      // iterate children: if they are concealed, nothing is changed
-      bool aChildConcealed = false;
-      std::vector<ResultBodyPtr>::const_iterator aSubIter = mySubs.cbegin();
-      for (; aSubIter != mySubs.cend(); aSubIter++) {
-        std::dynamic_pointer_cast<Model_ResultBody>(*aSubIter)->updateConcealment();
-        if ((*aSubIter)->isConcealed()) {
-          aChildConcealed = true;
-          break;
-        }
-      }
-      if (aChildConcealed) { // some child is concealed, so, update back
-        myLastConcealed = true;
-        if (aParent.get())
-          aParent->updateConcealment();
-        std::vector<ResultBodyPtr>::const_iterator aSubIter = mySubs.cbegin();
-        for (; aSubIter != mySubs.cend(); aSubIter++) {
-          std::dynamic_pointer_cast<Model_ResultBody>(*aSubIter)->updateConcealment();
-        }
-      } else { // so, it becomes unconcealed
-        static Events_ID anEvent = Events_Loop::eventByName(EVENT_OBJECT_CREATED);
-        ModelAPI_EventCreator::get()->sendUpdated(data()->owner(), anEvent);
-        static Events_ID EVENT_DISP =
-          Events_Loop::loop()->eventByName(EVENT_OBJECT_TO_REDISPLAY);
-        ModelAPI_EventCreator::get()->sendUpdated(data()->owner(), EVENT_DISP);
       }
     }
   }
@@ -229,8 +223,10 @@ void Model_ResultBody::updateSubs(const std::shared_ptr<GeomAPI_Shape>& theThisS
     // erase left, unused results
     while(mySubs.size() > aSubIndex) {
       ResultBodyPtr anErased = *(mySubs.rbegin());
-      if (anErased->ModelAPI_ResultBody::isConcealed())
+      if (anErased->ModelAPI_ResultBody::isConcealed()) {
+        anErased->ModelAPI_ResultBody::setIsConcealed(false);
         std::dynamic_pointer_cast<Model_ResultBody>(anErased)->updateConcealment();
+      }
       anErased->setDisabled(anErased, true);
       mySubsMap.erase(anErased);
       mySubs.pop_back();
@@ -242,8 +238,10 @@ void Model_ResultBody::updateSubs(const std::shared_ptr<GeomAPI_Shape>& theThisS
   } else if (!mySubs.empty()) { // erase all subs
     while(!mySubs.empty()) {
       ResultBodyPtr anErased = *(mySubs.rbegin());
-      if (anErased->ModelAPI_ResultBody::isConcealed())
+      if (anErased->ModelAPI_ResultBody::isConcealed()) {
+        anErased->ModelAPI_ResultBody::setIsConcealed(false);
         std::dynamic_pointer_cast<Model_ResultBody>(anErased)->updateConcealment();
+      }
       anErased->setDisabled(anErased, true); // even if it is invalid (to erase subs on abort/undo)
       mySubs.pop_back();
     }

@@ -682,8 +682,8 @@ std::shared_ptr<ModelAPI_Object> Model_Objects::parent(
   if (theChild.get()) {
     std::shared_ptr<Model_Data> aData = std::dynamic_pointer_cast<Model_Data>(theChild->data());
     TDF_Label aLab = aData->label();
-    if (!aLab.IsNull() && aLab.Depth() > 1) {
-      ObjectPtr anObj = object(aLab.Father().Father());
+    if (!aLab.IsNull() && aLab.Depth() > 2) {
+      ObjectPtr anObj = object(aLab.Father().Father().Father());
       return anObj;
     }
   }
@@ -1180,7 +1180,8 @@ bool Model_Objects::hasCustomName(DataPtr theFeatureData,
                                   std::string& theParentName) const
 {
   ResultBodyPtr aBodyRes = std::dynamic_pointer_cast<ModelAPI_ResultBody>(theFeatureData->owner());
-  if(aBodyRes) {
+  if (aBodyRes && std::dynamic_pointer_cast<Model_Data>(theFeatureData)->label().Depth() < 7) {
+    // only for top-results (works for the cases when results are not yet added to the feature)
     FeaturePtr anOwner = ModelAPI_Feature::feature(theResult);
 
     // names of sub-solids in CompSolid should be default (for example,
