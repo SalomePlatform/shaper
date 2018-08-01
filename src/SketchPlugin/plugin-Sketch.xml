@@ -604,12 +604,12 @@ email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com
           <validator id="SketchPlugin_ReplicationReference" parameters="ConstraintEntityB"/>
         </sketch_shape_selector>
         <toolbox id="AngleType">
-          <box id="SingleAngle" title="Single angle" icon="icons/Sketch/angle_up_32x32.png">
+          <box id="FullAngle" title="Full angle" icon="icons/Sketch/angle_up_full_32x32.png">
             <doublevalue id="MultiRotationAngle"
                          label="Angle"
                          icon="icons/Sketch/angle.png"
                          tooltip="Rotation angle"
-                         default="90" min="0" max="360"
+                         default="270" min="0" max="360"
                          use_reset="false">
               <validator id="SketchPlugin_MultiRotationAngleValidator" />
             </doublevalue>
@@ -619,12 +619,12 @@ email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com
                        default="false"
                        obligatory="0"/>
           </box>
-          <box id="FullAngle" title="Full angle" icon="icons/Sketch/angle_up_full_32x32.png">
+          <box id="SingleAngle" title="Single angle" icon="icons/Sketch/angle_up_32x32.png">
             <doublevalue id="MultiRotationAngle"
                          label="Angle"
                          icon="icons/Sketch/angle.png"
                          tooltip="Rotation angle"
-                         default="90" min="0" max="360"
+                         default="270" min="0" max="360"
                          use_reset="false">
               <validator id="SketchPlugin_MultiRotationAngleValidator" />
             </doublevalue>
@@ -638,7 +638,7 @@ email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com
         <integervalue id="MultiRotationObjects"
             label="Total number of objects"
             tooltip="Total number of objects"
-            default="2" min="2" use_reset="false">
+            default="4" min="2" use_reset="false">
           <validator id="GeomValidators_Positive" parameters="1"/>
         </integervalue>
         <validator id="PartSet_MultyTranslationSelection" />
