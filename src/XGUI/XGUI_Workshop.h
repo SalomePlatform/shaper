@@ -466,6 +466,9 @@ private:
   /// compute preview.
   void onPreviewActionClicked();
 
+  /// Called on help button clicked in the property panel.
+  void onHelpActionClicked();
+
  private:
   /// Init menu
   void initMenu();

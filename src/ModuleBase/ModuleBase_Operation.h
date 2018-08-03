@@ -100,6 +100,12 @@ Q_OBJECT
   /// \return Currently installed property panel
   ModuleBase_IPropertyPanel* propertyPanel() const { return myPropertyPanel; }
 
+  QString helpFileName() const { return myHelpFileName; }
+
+  void setHelpFileName(QString theName) {
+    myHelpFileName = theName;
+  }
+
 signals:
   /// The operation is started
   void beforeStarted();
@@ -202,6 +208,8 @@ private:
 
   /// Access to property panel
   ModuleBase_IPropertyPanel* myPropertyPanel;
+
+  QString myHelpFileName;
 };
 
 #endif
