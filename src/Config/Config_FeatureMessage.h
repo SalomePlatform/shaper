@@ -30,6 +30,7 @@
  * \class Config_FeatureMessage
  * \ingroup Config
  * \brief Class to pass a feature entry extracted from xml file.
+
  * Example of the feature entry:
  * \code
  * <feature id="Part" text="New part" tooltip="Creates a new part" icon=":pictures/part_ico.png"/>
@@ -42,6 +43,7 @@ class Config_FeatureMessage : public Events_Message
   std::string myTooltip;  ///<Represents action's tooltip
   std::string myIcon;  ///<Represents action's icon
   std::string myKeysequence;  ///<Represents action's key sequence
+  std::string myHelpFile;  ///<Contains name of help file
 
   std::string myGroupId;  ///<Id of feature's group
   std::string myWorkbenchId;  ///<Id of feature's workbench
@@ -94,6 +96,8 @@ class Config_FeatureMessage : public Events_Message
   CONFIG_EXPORT const std::string& groupId() const;
   /// Id of Feature's Toolbar
   CONFIG_EXPORT const std::string& toolBarId() const;
+  /// Returns help file name for the feature
+  CONFIG_EXPORT const std::string& helpFileName() const;
   /// Id of Feature's Workbench
   CONFIG_EXPORT const std::string& workbenchId() const;
   /// Kind of a document which contains the feature
@@ -132,6 +136,8 @@ class Config_FeatureMessage : public Events_Message
   CONFIG_EXPORT void setGroupId(const std::string& groupId);
   ///Set id of Feature's Group
   CONFIG_EXPORT void setToolBarId(const std::string& aId);
+  ///Set help file name
+  CONFIG_EXPORT void setHelpFileName(const std::string& aName);
   ///Set id of Feature's Workbench
   CONFIG_EXPORT void setWorkbenchId(const std::string& workbenchId);
   ///Set kind of a document which contains the feature

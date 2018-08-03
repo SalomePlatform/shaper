@@ -136,6 +136,7 @@
 #include <QToolButton>
 #include <QAction>
 #include <QDesktopWidget>
+#include <QProcess>
 
 #include <iterator>
 
@@ -559,6 +560,47 @@ void XGUI_Workshop::onPreviewActionClicked()
   Events_Loop::loop()->send(aMsg);
 }
 
+
+//******************************************************
+void XGUI_Workshop::onHelpActionClicked()
+{
+  XGUI_OperationMgr* anOperationMgr = operationMgr();
+  if (anOperationMgr) {
+    ModuleBase_Operation* aOperation = anOperationMgr->currentOperation();
+    if (aOperation) {
+      QString aDocDir;
+      const QChar aSep = QDir::separator();
+#ifdef HAVE_SALOME
+      QString aBrowserName("HelpBrowser");
+      QString aDir(getenv("SHAPER_ROOT_DIR"));
+      if (!aDir.isEmpty()) {
+        aDocDir = aDir + aSep + "share" + aSep + "doc" + aSep +
+          "salome" + aSep + "gui" + aSep + "SHAPER";
+      }
+      SUIT_ResourceMgr* aResMgr = ModuleBase_Preferences::resourceMgr();
+      bool aUseExtBrowser = aResMgr->booleanValue("ExternalBrowser", "use_external_browser", false);
+      if (aUseExtBrowser) {
+        QString platform;
+#ifdef WIN32
+        platform = "winapplication";
+#else
+        platform = "application";
+#endif
+        aBrowserName = aResMgr->stringValue("ExternalBrowser", platform);
+      }
+#else
+      QString aBrowserName("C:\\Program Files\\Internet Explorer\\iexplore.exe");
+      QString aDir(getenv("OPENPARTS_ROOT_DIR"));
+      aDocDir = aDir + aSep + "doc";
+#endif
+      QStringList aParams;
+      aParams << aDocDir + aSep + aOperation->helpFileName();
+      QProcess::startDetached(aBrowserName, aParams);
+    }
+  }
+}
+
+
 //******************************************************
 void XGUI_Workshop::deactivateActiveObject(const ObjectPtr& theObject, const bool theUpdateViewer)
 {
@@ -645,9 +687,10 @@ void XGUI_Workshop::fillPropertyPanel(ModuleBase_Operation* theOperation)
     aFeatureInfo = aCommand->featureMessage();
 #endif
   bool anIsAutoPreview = true;
-  if (aFeatureInfo.get())
+  if (aFeatureInfo.get()) {
     anIsAutoPreview = aFeatureInfo->isAutoPreview();
-  else {
+    theOperation->setHelpFileName(aFeatureInfo->helpFileName().c_str());
+  } else {
     std::string aXmlCfg, aDescription;
     module()->getXMLRepresentation(aFeatureKind, aXmlCfg, aDescription);
     ModuleBase_WidgetFactory aFactory(aXmlCfg, moduleConnector());
@@ -1394,6 +1437,9 @@ void XGUI_Workshop::createDockWidgets()
 
   QAction* aPreviewAct = myActionsMgr->operationStateAction(XGUI_ActionsMgr::Preview);
   connect(aPreviewAct, SIGNAL(triggered()), this, SLOT(onPreviewActionClicked()));
+
+  QAction* aHelpAct = myActionsMgr->operationStateAction(XGUI_ActionsMgr::Help);
+  connect(aHelpAct, SIGNAL(triggered()), this, SLOT(onHelpActionClicked()));
 
   connect(myPropertyPanel, SIGNAL(keyReleased(QObject*, QKeyEvent*)),
           myOperationMgr,  SLOT(onKeyReleased(QObject*, QKeyEvent*)));

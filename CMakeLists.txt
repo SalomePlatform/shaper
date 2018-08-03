@@ -30,6 +30,7 @@ ENDIF(WIN32)
 SET (SHAPER_Version 8.5.0)
 
 SET(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/CMakeCommon" ${CMAKE_MODULE_PATH})
+OPTION(SHAPER_BUILD_DOC "Generate SHAPER documentation" ON)
 
 INCLUDE(SalomeMacros)
 
@@ -173,6 +174,14 @@ IF(ADD_MODELS_TESTS)
   ADD_SUBDIRECTORY (test.models)
   ADD_CUSTOM_TARGET(run_unit_tests COMMAND ${CMAKE_CTEST_COMMAND} -C "${CMAKE_BUILD_TYPE}" -LE "models_tests")
 ENDIF(ADD_MODELS_TESTS)
+
+
+IF(SHAPER_BUILD_DOC)
+    INCLUDE(FindSphinx)
+    ADD_SUBDIRECTORY (doc)
+ENDIF(SHAPER_BUILD_DOC)
+
+
 
 # Add the uninstall target for eclipse IDE
 if (CMAKE_GENERATOR MATCHES "NMake Makefiles")

@@ -183,6 +183,7 @@ void Config_FeatureReader::fillFeature(xmlNodePtr theFeatureNode,
                                                       getProperty(theFeatureNode, FEATURE_TOOLTIP));
   outFeatureMessage->setIcon(getProperty(theFeatureNode, FEATURE_ICON));
   outFeatureMessage->setKeysequence(getProperty(theFeatureNode, FEATURE_KEYSEQUENCE));
+  outFeatureMessage->setHelpFileName(getProperty(theFeatureNode, HELP_FILE));
 
   std::string aGroupName = restoreAttribute(NODE_GROUP, _ID);
   std::string aWBNName = restoreAttribute(NODE_WORKBENCH, _ID);

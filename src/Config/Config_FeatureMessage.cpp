@@ -28,6 +28,7 @@ Config_FeatureMessage::Config_FeatureMessage(const Events_ID theId, const void* 
   myTooltip = "";
   myIcon = "";
   myKeysequence = "";
+  myHelpFile = "";
 
   myGroupId = "";
   myWorkbenchId = "";
@@ -215,4 +216,14 @@ void Config_FeatureMessage::setAutoPreview(bool isAutoPreview)
 void Config_FeatureMessage::setApplyContinue(bool isModal)
 {
   myIsApplyContinue = isModal;
+}
+
+const std::string& Config_FeatureMessage::helpFileName() const
+{
+  return myHelpFile;
+}
+
+void Config_FeatureMessage::setHelpFileName(const std::string& aName)
+{
+  myHelpFile = aName;
 }

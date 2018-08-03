@@ -18,14 +18,32 @@
 ## email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com>
 ##
 
-SET(HTML_RESOURCES
-  index.html
+SET(input ${CMAKE_CURRENT_SOURCE_DIR}/conf.py.in)
+
+SET(output ${CMAKE_CURRENT_BINARY_DIR}/conf.py)
+
+CONFIGURE_FILE(${input} ${output})
+
+
+#sphinx-build -b html -c doc -D latex_paper_size=a4 -d doc/doctree /dn23/PPGP/vsv/SALOME730/SOURCES/PPGP_SRC/doc doc/html
+
+INSTALL(CODE "
+EXECUTE_PROCESS(
+COMMAND ${SPHINX_EXECUTABLE} -Q -b html -c ${CMAKE_CURRENT_BINARY_DIR} -D latex_paper_size=a4 -d doctree ${CMAKE_CURRENT_SOURCE_DIR} html
+WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+)"
 )
 
-ADD_CUSTOM_TARGET(usr_docs
-    SOURCES ${HTML_RESOURCES}
-    WORKING_DIRECTORY "${CMAKE_BINARY_DIR}/doc/gui"
+IF(${HAVE_SALOME})
+INSTALL(CODE "
+EXECUTE_PROCESS(
+COMMAND ${PYTHON_EXECUTABLE} -c \"import shutil;shutil.rmtree('${CMAKE_INSTALL_PREFIX}/share/doc/salome/gui/SHAPER', True);shutil.copytree('${CMAKE_CURRENT_BINARY_DIR}/html', '${CMAKE_INSTALL_PREFIX}/share/doc/salome/gui/SHAPER')\"
 )
-INSTALL(FILES ${HTML_RESOURCES} DESTINATION ${SHAPER_INSTALL_GUI_DOC} OPTIONAL)
-
-INSTALL(CODE "EXECUTE_PROCESS(COMMAND \"${CMAKE_COMMAND}\" --build ${PROJECT_BINARY_DIR} --target usr_docs)")
+")
+ELSE(${HAVE_SALOME})
+INSTALL(CODE "
+EXECUTE_PROCESS(
+COMMAND ${PYTHON_EXECUTABLE} -c \"import shutil;shutil.rmtree('${CMAKE_INSTALL_PREFIX}/doc', True);shutil.copytree('${CMAKE_CURRENT_BINARY_DIR}/html', '${CMAKE_INSTALL_PREFIX}/doc')\"
+)
+")
+ENDIF(${HAVE_SALOME})

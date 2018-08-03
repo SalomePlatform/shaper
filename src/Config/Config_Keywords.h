@@ -74,6 +74,7 @@ const static char* FEATURE_TOOLTIP = "tooltip";
 const static char* GROUP_TOOLBAR = "toolbar";
 const static char* FEATURE_ICON = "icon";
 const static char* FEATURE_TEXT = "title";
+const static char* HELP_FILE = "helpfile";
 const static char* FEATURE_KEYSEQUENCE = "keysequence";
 const static char* FEATURE_NESTED = "nested";
 const static char* FEATURE_WHEN_NESTED = "when_nested";
