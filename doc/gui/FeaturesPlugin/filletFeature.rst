@@ -7,4 +7,11 @@ Fillet
   :align: center
 
 .. centered::
-  Fillet definition
+  Fillet by fixed radius
+
+
+.. image:: images/Fillet2.png
+  :align: center
+
+.. centered::
+  Fillet by varyable radius
