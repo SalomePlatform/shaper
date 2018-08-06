@@ -570,23 +570,19 @@ void XGUI_Workshop::onHelpActionClicked()
       QString aDocDir;
       const QChar aSep = QDir::separator();
 #ifdef HAVE_SALOME
-      QString aBrowserName("HelpBrowser");
       QString aDir(getenv("SHAPER_ROOT_DIR"));
       if (!aDir.isEmpty()) {
         aDocDir = aDir + aSep + "share" + aSep + "doc" + aSep +
           "salome" + aSep + "gui" + aSep + "SHAPER";
       }
       SUIT_ResourceMgr* aResMgr = ModuleBase_Preferences::resourceMgr();
-      bool aUseExtBrowser = aResMgr->booleanValue("ExternalBrowser", "use_external_browser", false);
-      if (aUseExtBrowser) {
-        QString platform;
+      QString platform;
 #ifdef WIN32
-        platform = "winapplication";
+      platform = "winapplication";
 #else
-        platform = "application";
+      platform = "application";
 #endif
-        aBrowserName = aResMgr->stringValue("ExternalBrowser", platform);
-      }
+      QString aBrowserName = aResMgr->stringValue("ExternalBrowser", platform);
 #else
       QString aBrowserName("C:\\Program Files\\Internet Explorer\\iexplore.exe");
       QString aDir(getenv("OPENPARTS_ROOT_DIR"));
