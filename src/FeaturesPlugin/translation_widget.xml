@@ -49,7 +49,7 @@ email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com
       </doublevalue>
     </box>
     <box id="ByDimensions"
-         title="By dimensions in X, in X and in Z"
+         title="By X, Y and Z dimensions"
          icon="icons/Features/translation_dxyz_32x32.png">
       <multi_selector id="main_objects"
                       label="Main objects"

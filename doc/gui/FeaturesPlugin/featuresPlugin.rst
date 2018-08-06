@@ -2,7 +2,7 @@
 .. _featuresPlugin:
 
 
-Fearures plug-in
+Features plug-in
 ================
 
 
