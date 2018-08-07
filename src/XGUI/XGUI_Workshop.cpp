@@ -568,30 +568,33 @@ void XGUI_Workshop::onHelpActionClicked()
   if (anOperationMgr) {
     ModuleBase_Operation* aOperation = anOperationMgr->currentOperation();
     if (aOperation) {
-      QString aDocDir;
-      const QChar aSep = QDir::separator();
-      QString platform;
-      SUIT_ResourceMgr* aResMgr = ModuleBase_Preferences::resourceMgr();
+      QString aHelpPage = aOperation->helpFileName();
+      if (!aHelpPage.isEmpty()) {
+        QString aDocDir;
+        const QChar aSep = QDir::separator();
+        QString platform;
+        SUIT_ResourceMgr* aResMgr = ModuleBase_Preferences::resourceMgr();
 #ifdef WIN32
-      platform = "winapplication";
+        platform = "winapplication";
 #else
-      platform = "application";
+        platform = "application";
 #endif
-      QString aBrowserName = aResMgr->stringValue("ExternalBrowser", platform);
+        QString aBrowserName = aResMgr->stringValue("ExternalBrowser", platform);
 
 #ifdef HAVE_SALOME
-      QString aDir(getenv("SHAPER_ROOT_DIR"));
-      if (!aDir.isEmpty()) {
-        aDocDir = aDir + aSep + "share" + aSep + "doc" + aSep +
-          "salome" + aSep + "gui" + aSep + "SHAPER";
-      }
+        QString aDir(getenv("SHAPER_ROOT_DIR"));
+        if (!aDir.isEmpty()) {
+          aDocDir = aDir + aSep + "share" + aSep + "doc" + aSep +
+            "salome" + aSep + "gui" + aSep + "SHAPER";
+        }
 #else
-      QString aDir(getenv("OPENPARTS_ROOT_DIR"));
-      aDocDir = aDir + aSep + "doc";
+        QString aDir(getenv("OPENPARTS_ROOT_DIR"));
+        aDocDir = aDir + aSep + "doc";
 #endif
-      QStringList aParams;
-      aParams << aDocDir + aSep + aOperation->helpFileName();
-      QProcess::startDetached(aBrowserName, aParams);
+        QStringList aParams;
+        aParams << aDocDir + aSep + aHelpPage;
+        QProcess::startDetached(aBrowserName, aParams);
+      }
     }
   }
 }
