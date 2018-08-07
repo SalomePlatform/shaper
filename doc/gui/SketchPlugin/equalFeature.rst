@@ -1,0 +1,3 @@
+
+Equal constraint
+================
