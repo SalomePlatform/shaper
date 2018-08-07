@@ -40,7 +40,8 @@ email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com
         when_nested="accept abort"
         title="Sketch"
         tooltip="Create sketch"
-        icon="icons/Sketch/sketch.png">
+        icon="icons/Sketch/sketch.png"
+        helpfile="SketchPlugin/sketchPlugin.html">
         <sketch-start-label id="External" title="Select a plane on which to create a sketch" tooltip="Select a plane on which to create a sketch">
           <validator id="GeomValidators_Face" parameters="plane"/>
         </sketch-start-label>
@@ -50,14 +51,16 @@ email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com
       </feature>
 
       <!-- SketchPoint -->
-      <feature id="SketchPoint" title="Point" tooltip="Create point" icon="icons/Sketch/point.png">
+      <feature id="SketchPoint" title="Point" tooltip="Create point" icon="icons/Sketch/point.png"
+                helpfile="SketchPlugin/pointFeature.html">
         <sketch-2dpoint_selector id="PointCoordinates" accept_expressions="0" title="Point" tooltip="Point coordinates"
                                  enable_value="enable_by_preferences"/>
         <boolvalue id="Auxiliary" label="Auxiliary" default="false" tooltip="Construction element" obligatory="0"/>
       </feature>
 
       <!-- SketchLine -->
-      <feature id="SketchLine" title="Line" tooltip="Create line" icon="icons/Sketch/line.png">
+      <feature id="SketchLine" title="Line" tooltip="Create line" icon="icons/Sketch/line.png"
+               helpfile="SketchPlugin/lineFeature.html">
         <sketch-2dpoint_selector id="StartPoint" accept_expressions="0" title="Start point" tooltip="Start point coordinates"
                                  enable_value="enable_by_preferences"/>
         <sketch-2dpoint_selector id="EndPoint" accept_expressions="0" title="End point" tooltip="End point coordinates"
@@ -94,7 +97,8 @@ email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com
       <feature id="SketchMacroCircle"
                icon="icons/Sketch/circle.png"
                title="Circle"
-               tooltip="Create circle">
+               tooltip="Create circle"
+               helpfile="SketchPlugin/circleFeature.html">
         <toolbox id="circle_type" modified_in_edit="edit_circle_type">
           <box id="circle_type_by_center_and_passed_points"
                icon="icons/Sketch/circle_pt_rad_32x32.png"
@@ -213,7 +217,8 @@ email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com
         id="SketchMacroArc"
         title="Arc"
         tooltip="Create arc"
-        icon="icons/Sketch/arc.png">
+        icon="icons/Sketch/arc.png"
+        helpfile="SketchPlugin/arcFeature.html">
         <toolbox id="arc_type" modified_in_edit="edit_arc_type">
           <box id="by_center_and_points"
                icon="icons/Sketch/arc_base_32x32.png"
@@ -318,7 +323,8 @@ email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com
       <feature id="SketchFillet"
                title="Fillet"
                tooltip="Create constraint defining fillet between two objects"
-               icon="icons/Sketch/fillet.png">
+               icon="icons/Sketch/fillet.png"
+               helpfile="SketchPlugin/filletFeature.html">
         <sketch_shape_selector id="fillet_point"
                                label="Point"
                                tooltip="Select point for fillet (should be shared by two entities only)"
@@ -330,7 +336,8 @@ email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com
       <!--  SketchSplit  -->
       <feature id="SketchSplit" title="Split"
                tooltip="Cut selected segment arc or circle on existing coincident points"
-               icon="icons/Sketch/split.png">
+               icon="icons/Sketch/split.png"
+               helpfile="SketchPlugin/splitFeature.html">
         <sketch_feature_point_selector
             id="SelectedObject"
             selection_attributes="SelectedObject SelectedPoint PreviewObject PreviewPoint"
@@ -345,7 +352,8 @@ email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com
       <!--  SketchTrim  -->
       <feature id="SketchTrim" title="Trim"
                tooltip="Trim selected segment arc or circle on intersection points nearest to the graphic selection"
-               icon="icons/Sketch/trim.png">
+               icon="icons/Sketch/trim.png"
+               helpfile="SketchPlugin/trimFeature.html">
         <sketch_feature_point_selector
             id="SelectedObject"
             selection_attributes="SelectedObject SelectedPoint PreviewObject PreviewPoint"
@@ -399,7 +407,8 @@ email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com
       <feature id="SketchMacroEllipse"
                icon="icons/Sketch/ellipse.png"
                title="Ellipse"
-               tooltip="Create ellipse">
+               tooltip="Create ellipse"
+               helpfile="SketchPlugin/ellipseFeature.html">
         <sketch-2dpoint_selector id="center_point"
                                  reference_attribute="center_point_ref"
                                  title="Center point"
@@ -456,7 +465,8 @@ email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com
         id="SketchProjection"
         title="Projection"
         tooltip="Project feature onto sketch plane"
-        icon="icons/Sketch/projection.png">
+        icon="icons/Sketch/projection.png"
+        helpfile="SketchPlugin/projectionFeature.html">
         <sketch_shape_selector
               id="ExternalFeature"
               label="Object"
@@ -476,7 +486,8 @@ email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com
         id="SketchIntersectionPoint"
         title="Intersection"
         tooltip="Intersect edge with sketch plane"
-        icon="icons/Sketch/intersection.png">
+        icon="icons/Sketch/intersection.png"
+        helpfile="SketchPlugin/intersectionFeature.html">
         <sketch_shape_selector
               id="ExternalFeature"
               label="Object"
@@ -497,7 +508,8 @@ email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com
       <feature
         id="SketchConstraintMirror"
         title="Mirror copy" icon="icons/Sketch/mirror.png"
-        tooltip="Create constraint, mirroring group of objects">
+        tooltip="Create constraint, mirroring group of objects"
+        helpfile="SketchPlugin/mirrorFeature.html">
         <sketch_shape_selector id="ConstraintEntityA"
             label="Mirror line" tooltip="Select mirror line" shape_types="edge">
           <validator id="GeomValidators_ShapeType" parameters="line"/>
@@ -518,7 +530,8 @@ email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com
       <feature
         id="SketchMultiTranslation"
         title="Linear copy" icon="icons/Sketch/translate.png"
-        tooltip="Copy objects and move">
+        tooltip="Copy objects and move"
+        helpfile="SketchPlugin/translationFeature.html">
         <sketch_multi_selector id="MultiTranslationList"
             label="Segments:"
             tooltip="Select list of objects to be translated"
@@ -586,7 +599,8 @@ email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com
       <feature
         id="SketchMultiRotation"
         title="Angular copy" icon="icons/Sketch/rotate.png"
-        tooltip="Copy objects and rotate">
+        tooltip="Copy objects and rotate"
+        helpfile="SketchPlugin/rotationFeature.html">
         <sketch_multi_selector id="MultiRotationList"
             label="Segments:"
             tooltip="Select list of objects to be rotated"
@@ -651,7 +665,8 @@ email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com
         id="SketchConstraintDistance"
         title="Distance"
         tooltip="Set fixed distance from a point to an object"
-        icon="icons/Sketch/distance.png">
+        icon="icons/Sketch/distance.png"
+        helpfile="SketchPlugin/distanceFeature.html">
         <label title="Select objects for distance definition. Following objects can be accepted: point, line or arc end point, center of circle or arc."/>
         <sketch_shape_selector
               id="ConstraintEntityA"
@@ -699,7 +714,8 @@ email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com
         id="SketchConstraintDistanceHorizontal"
         title="Horizontal Distance"
         tooltip="Set horizontal distance between two points"
-        icon="icons/Sketch/distance_h.png">
+        icon="icons/Sketch/distance_h.png"
+        helpfile="SketchPlugin/horizontalDistFeature.html">
         <label title="Select points for distance definition."/>
         <sketch_shape_selector
               id="ConstraintEntityA"
@@ -743,7 +759,8 @@ email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com
         id="SketchConstraintDistanceVertical"
         title="Vertical Distance"
         tooltip="Set vertical distance between two points"
-        icon="icons/Sketch/distance_v.png">
+        icon="icons/Sketch/distance_v.png"
+        helpfile="SketchPlugin/verticalDistFeature.html">
         <label title="Select points for distance definition."/>
         <sketch_shape_selector
               id="ConstraintEntityA"
@@ -783,7 +800,8 @@ email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com
       </feature>
 
       <!--  SketchConstraintLength  -->
-      <feature id="SketchConstraintLength" title="Length" tooltip="Set fixed length of a line segment" icon="icons/Sketch/length.png">
+      <feature id="SketchConstraintLength" title="Length" tooltip="Set fixed length of a line segment" icon="icons/Sketch/length.png"
+               helpfile="SketchPlugin/lengthFeature.html">
         <label title="Select a line on which to calculate length" tooltip="Select a line on which to calculate length"/>
         <shape_selector id="ConstraintEntityA" label="Line" tooltip="Select a line" shape_types="edge" >
           <validator id="GeomValidators_ShapeType" parameters="line"/>
@@ -806,7 +824,8 @@ email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com
       </feature>
 
       <!--  SketchConstraintAngle  -->
-      <feature id="SketchConstraintAngle" title="Angle" tooltip="Set fixed angle between two line segments" icon="icons/Sketch/angle_constr.png">
+      <feature id="SketchConstraintAngle" title="Angle" tooltip="Set fixed angle between two line segments" icon="icons/Sketch/angle_constr.png"
+               helpfile="SketchPlugin/angleFeature.html">
         <sketch_shape_selector id="ConstraintEntityA" label="Line 1" tooltip="Select a line" shape_types="edge" >
           <validator id="GeomValidators_ShapeType" parameters="line"/>
           <validator id="PartSet_DifferentObjects"/>
@@ -843,7 +862,8 @@ email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com
       </feature>
 
       <!--  SketchConstraintRadius  -->
-      <feature id="SketchConstraintRadius" title="Radius" tooltip="Set fixed radius of a circle or an arc" icon="icons/Sketch/radius_constr.png">
+      <feature id="SketchConstraintRadius" title="Radius" tooltip="Set fixed radius of a circle or an arc" icon="icons/Sketch/radius_constr.png"
+               helpfile="SketchPlugin/radiusFeature.html">
         <label title="Select a circle or an arc on which to calculate radius" tooltip="Select a circle or an arc on which to calculate radius"/>
         <shape_selector id="ConstraintEntityA" label="Circle or Arc" tooltip="Select a circle or an arc"
             shape_types="edge">
@@ -872,7 +892,8 @@ email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com
     <group id="Geometrical constraints">
 
       <!--  SketchConstraintHorizontal  -->
-      <feature id="SketchConstraintHorizontal" title="Horizontal" tooltip="Create constraint defining horizontal line" icon="icons/Sketch/horisontal.png">
+      <feature id="SketchConstraintHorizontal" title="Horizontal" tooltip="Create constraint defining horizontal line" icon="icons/Sketch/horisontal.png"
+               helpfile="SketchPlugin/horizontalFeature.html">
         <sketch_shape_selector id="ConstraintEntityA"
             label="Line" tooltip="Select a line" shape_types="edge" use_external="false">
           <validator id="GeomValidators_ShapeType" parameters="line"/>
@@ -882,7 +903,8 @@ email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com
       </feature>
 
       <!--  SketchConstraintVertical  -->
-      <feature id="SketchConstraintVertical" title="Vertical" tooltip="Create constraint defining vertical line" icon="icons/Sketch/vertical.png">
+      <feature id="SketchConstraintVertical" title="Vertical" tooltip="Create constraint defining vertical line" icon="icons/Sketch/vertical.png"
+               helpfile="SketchPlugin/verticalFeature.html">
         <sketch_shape_selector id="ConstraintEntityA"
             label="Line" tooltip="Select a line" shape_types="edge" use_external="false">
           <validator id="GeomValidators_ShapeType" parameters="line"/>
@@ -892,7 +914,8 @@ email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com
       </feature>
 
       <!--  SketchConstraintRigid  -->
-      <feature id="SketchConstraintRigid" title="Fixed" tooltip="Fix an object" icon="icons/Sketch/fixed.png">
+      <feature id="SketchConstraintRigid" title="Fixed" tooltip="Fix an object" icon="icons/Sketch/fixed.png"
+               helpfile="SketchPlugin/rigidFeature.html">
         <sketch_shape_selector id="ConstraintEntityA" label="Object"
                         tooltip="Select point, line end point, line, center of circle or arc."
                         shape_types="edge vertex">
@@ -904,7 +927,7 @@ email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com
 
       <!--  SketchConstraintParallel  -->
       <feature id="SketchConstraintParallel" title="Parallel" tooltip="Create constraint defining two parallel lines"
-               icon="icons/Sketch/parallel.png">
+               icon="icons/Sketch/parallel.png" helpfile="SketchPlugin/parallelFeature.html">
         <sketch_shape_selector id="ConstraintEntityA"
             label="First line" tooltip="Select a line" shape_types="edge">
           <validator id="GeomValidators_ShapeType" parameters="line"/>
@@ -923,8 +946,9 @@ email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com
 
     <!--  SketchConstraintPerpendicular  -->
       <feature id="SketchConstraintPerpendicular" title="Perpendicular"
-        tooltip="Create constraint defining two perpendicular lines"
-        icon="icons/Sketch/perpendicular.png">
+               tooltip="Create constraint defining two perpendicular lines"
+               icon="icons/Sketch/perpendicular.png"
+               helpfile="SketchPlugin/perpendicularFeature.html">
         <sketch_shape_selector id="ConstraintEntityA"
             label="First line" tooltip="Select a line"
             shape_types="edge">
@@ -944,7 +968,8 @@ email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com
       </feature>
 
       <!--  SketchConstraintTangent  -->
-      <feature id="SketchConstraintTangent" title="Tangent" tooltip="Create constraint defining tangency of two objects with common coincident point" icon="icons/Sketch/tangent.png">
+      <feature id="SketchConstraintTangent" title="Tangent" tooltip="Create constraint defining tangency of two objects with common coincident point" icon="icons/Sketch/tangent.png"
+               helpfile="SketchPlugin/tangentFeature.html">
         <sketch_shape_selector id="ConstraintEntityA"
             label="First object" tooltip="Select line or arc" shape_types="edge">
           <validator id="SketchPlugin_TangentAttr" parameters="ConstraintEntityB"/>
@@ -960,7 +985,8 @@ email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com
       </feature>
 
       <!--  SketchConstraintCoincidence  -->
-      <feature id="SketchConstraintCoincidence" title="Coincident" tooltip="Create constraint for the coincidence of two points or point on line or circle" icon="icons/Sketch/coincedence.png">
+      <feature id="SketchConstraintCoincidence" title="Coincident" tooltip="Create constraint for the coincidence of two points or point on line or circle" icon="icons/Sketch/coincedence.png"
+               helpfile="SketchPlugin/coincedenceFeature.html">
         <sketch_shape_selector id="ConstraintEntityA" label="First object" tooltip="Select a first object" shape_types="vertex edge">
           <validator id="PartSet_DifferentObjects"/>
           <validator id="SketchPlugin_ExternalValidator" parameters="ConstraintEntityB"/>
@@ -974,7 +1000,9 @@ email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com
       </feature>
 
       <!--  SketchConstraintMiddle  -->
-      <feature id="SketchConstraintMiddle" title="Middle point" tooltip="Create constraint for setting middle point on a line" icon="icons/Sketch/middlepoint.png">
+      <feature id="SketchConstraintMiddle" title="Middle point" tooltip="Create constraint for setting middle point on a line"
+               icon="icons/Sketch/middlepoint.png"
+               helpfile="SketchPlugin/middleFeature.html">
         <sketch_shape_selector id="ConstraintEntityA" label="First object" tooltip="Select a first object" shape_types="vertex edge">
           <validator id="PartSet_DifferentObjects"/>
           <validator id="SketchPlugin_ExternalValidator" parameters="ConstraintEntityB"/>
@@ -991,7 +1019,8 @@ email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com
       <!--  SketchConstraintEqual  -->
       <feature id="SketchConstraintEqual" title="Equal"
         tooltip="Create constraint defining equal lengths of two lines or line and arc or equal radii of two arcs or two circles or arc and circle"
-        icon="icons/Sketch/equal.png">
+        icon="icons/Sketch/equal.png"
+               helpfile="SketchPlugin/equalFeature.html">
         <sketch_shape_selector id="ConstraintEntityA"
             label="First object" tooltip="Select line, circle or arc" shape_types="edge">
           <validator id="PartSet_DifferentObjects"/>
@@ -1008,7 +1037,9 @@ email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com
       </feature>
 
     <!--  SketchConstraintCollinear  -->
-      <feature id="SketchConstraintCollinear" title="Collinear" tooltip="Create constraint defining collinearity of two lines" icon="icons/Sketch/collinear.png">
+      <feature id="SketchConstraintCollinear" title="Collinear" tooltip="Create constraint defining collinearity of two lines"
+               icon="icons/Sketch/collinear.png"
+               helpfile="SketchPlugin/collinearFeature.html">
         <sketch_shape_selector id="ConstraintEntityA"
             label="First line" tooltip="Select a line" shape_types="edge">
           <validator id="GeomValidators_ShapeType" parameters="line"/>

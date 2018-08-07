@@ -11,6 +11,7 @@ Welcome to SHAPER's documentation!
    :caption: Contents:
 
    FeaturesPlugin/featuresPlugin.rst
+   SketchPlugin/sketchPlugin.rst
 
 Indices and tables
 ==================

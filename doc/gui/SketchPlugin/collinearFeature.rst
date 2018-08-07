@@ -1,0 +1,3 @@
+
+Collinear constraint
+====================

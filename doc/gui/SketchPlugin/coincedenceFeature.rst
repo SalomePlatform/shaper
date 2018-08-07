@@ -1,0 +1,3 @@
+
+Coincidence constraint
+======================
