@@ -26,21 +26,24 @@ email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com
         id="Point"
         title="Point"
         tooltip="Create point"
-        icon="icons/Construction/point.png">
+        icon="icons/Construction/point.png"
+        helpfile="ConstructionPlugin/pointFeature.html">
         <source path="point_widget.xml" />
       </feature>
       <feature
         id="Axis"
         title="Axis"
         tooltip="Create axis"
-        icon="icons/Construction/axis.png">
+        icon="icons/Construction/axis.png"
+        helpfile="ConstructionPlugin/axisFeature.html">
         <source path="axis_widget.xml" />
       </feature>
       <feature
         id="Plane"
         title="Plane"
         tooltip="Create plane"
-        icon="icons/Construction/plane.png">
+        icon="icons/Construction/plane.png"
+        helpfile="ConstructionPlugin/planeFeature.html">
         <source path="plane_widget.xml" />
       </feature>
     </group>

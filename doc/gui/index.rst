@@ -12,6 +12,14 @@ Welcome to SHAPER's documentation!
 
    FeaturesPlugin/featuresPlugin.rst
    SketchPlugin/sketchPlugin.rst
+   BuildPlugin/buildPlugin.rst
+   CollectionPlugin/collectionPlugin.rst
+   ConstructionPlugin/constructionPlugin.rst
+   ExchangePlugin/exchangePlugin.rst
+   GDMLPlugin/GDMLPlugin.rst
+   ParametersPlugin/parametersPlugin.rst
+   PartPlugin/partPlugin.rst
+   PrimitivesPlugin/primitivesPlugin.rst
 
 Indices and tables
 ==================

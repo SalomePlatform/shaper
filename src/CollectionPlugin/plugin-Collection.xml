@@ -26,14 +26,16 @@ email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com
         title="Group"
         tooltip="Create named collection of geometry entities"
         icon="icons/Collection/shape_group.png"
-        apply_continue="true">
+        apply_continue="true"
+        helpfile="CollectionPlugin/groupFeature.html">
         <source path="group_widget.xml"/>
       </feature>
 
       <feature id="Field"
         title="Field"
         tooltip="Create fields for selected shapes"
-        icon="icons/Collection/field.png">
+        icon="icons/Collection/field.png"
+        helpfile="CollectionPlugin/fieldFeature.html">
         <field-panel id="selected"
           filter_points="false" >
           <validator id="GeomValidators_BodyShapes"/>

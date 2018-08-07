@@ -22,15 +22,18 @@ email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com
 <plugin>
   <workbench id="Part">
     <group id="Exchange">
-      <feature id="Import" title="Import" tooltip="Import a file" icon="icons/Exchange/import.png" document="Part">
+      <feature id="Import" title="Import" tooltip="Import a file" icon="icons/Exchange/import.png" document="Part"
+               helpfile="ExchangePlugin/importFeature.html">
         <file_selector id="file_path" title="Import file" path="">
           <validator id="ExchangePlugin_ImportFormat" parameters="BREP|BRP:BREP,STEP|STP:STEP,IGES|IGS:IGES,XAO:XAO" />
         </file_selector>
       </feature>
-      <feature id="Export" title="Export" tooltip="Export to file" icon="icons/Exchange/export.png">
+      <feature id="Export" title="Export" tooltip="Export to file" icon="icons/Exchange/export.png"
+               helpfile="ExchangePlugin/exportFeature.html">
         <source path="export_widget.xml" />
       </feature>
-      <feature id="Dump" title="Dump" tooltip="Dump python script" icon="icons/Exchange/dump.png">
+      <feature id="Dump" title="Dump" tooltip="Dump python script" icon="icons/Exchange/dump.png"
+               helpfile="ExchangePlugin/dumpFeature.html">
         <export_file_selector id="file_path"
                               type="save"
                               title="Dump to file"

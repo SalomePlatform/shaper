@@ -43,7 +43,7 @@ COMMAND ${PYTHON_EXECUTABLE} -c \"import shutil;shutil.rmtree('${CMAKE_INSTALL_P
 ELSE(${HAVE_SALOME})
 INSTALL(CODE "
 EXECUTE_PROCESS(
-COMMAND ${PYTHON_EXECUTABLE} -c \"import shutil;shutil.rmtree('${CMAKE_INSTALL_PREFIX}/doc', True);shutil.copytree('${CMAKE_CURRENT_BINARY_DIR}/html', '${CMAKE_INSTALL_PREFIX}/doc')\"
+COMMAND ${PYTHON_EXECUTABLE} -c \"import shutil;shutil.rmtree('${CMAKE_INSTALL_PREFIX}/doc/gui', True);shutil.copytree('${CMAKE_CURRENT_BINARY_DIR}/html', '${CMAKE_INSTALL_PREFIX}/doc/gui')\"
 )
 ")
 ENDIF(${HAVE_SALOME})
