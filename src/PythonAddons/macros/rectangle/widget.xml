@@ -28,7 +28,8 @@ email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com
         id="SketchRectangle"
         title="Rectangle"
         tooltip="Create rectangle"
-        icon="icons/Addons/rectangle.png">
+        icon="icons/Addons/rectangle.png"
+        helpfile="SketchPlugin/rectangleFeature.html">
         <sketch-2dpoint_selector id="RectStartPoint" accept_expressions="0" title="Start point" tooltip="Start point coordinates"
                                  enable_value="enable_by_preferences"/>
         <sketch-2dpoint_selector id="RectEndPoint" accept_expressions="0" title="End point" tooltip="End point coordinates"

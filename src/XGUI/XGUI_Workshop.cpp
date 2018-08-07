@@ -588,7 +588,7 @@ void XGUI_Workshop::onHelpActionClicked()
         }
 #else
         QString aDir(getenv("OPENPARTS_ROOT_DIR"));
-        aDocDir = aDir + aSep + "doc";
+        aDocDir = aDir + aSep + "doc" + aSep + "gui";
 #endif
         QStringList aParams;
         aParams << aDocDir + aSep + aHelpPage;
