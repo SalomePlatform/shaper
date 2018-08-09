@@ -23,8 +23,10 @@
 
 #include "XGUI.h"
 #include <ModuleBase_IViewer.h>
+#include <ModelAPI_Feature.h>
 
 #include <AIS_Trihedron.hxx>
+#include <AIS_ListOfInteractive.hxx>
 
 #ifndef HAVE_SALOME
   #include <AppElements_ViewWindow.h>
@@ -152,7 +154,12 @@ private slots:
 #endif
 
  private:
+   void displayHighlight();
+   void eraseHighlight();
+
   XGUI_Workshop* myWorkshop;
+  FeaturePtr myFeature;
+  AIS_ListOfInteractive myHighlights;
 };
 
 #endif

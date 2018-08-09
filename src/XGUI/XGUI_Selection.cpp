@@ -143,7 +143,6 @@ void XGUI_Selection::fillPresentation(ModuleBase_ViewerPrsPtr& thePrs,
                                       const Handle(SelectMgr_EntityOwner)& theOwner) const
 {
   thePrs->setOwner(theOwner);
-  Handle(SelectMgr_SelectableObject) aSelectable = theOwner->Selectable();
   Handle(AIS_InteractiveObject) anIO =
                            Handle(AIS_InteractiveObject)::DownCast(theOwner->Selectable());
   thePrs->setInteractive(anIO);
