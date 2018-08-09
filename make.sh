@@ -26,7 +26,11 @@ done
 ## Preserve PTHONPATH in order to avoid problems with Sphinx on Fedora26 because of Pigments in ParaView
 export PYTHONPATH_OLD=$PYTHONPATH
 source env.sh
-export PYTHONPATH=$PYTHONPATH_OLD
+
+if [[ ${OS_NAME} = Fedora26-64 ]]
+then
+  export PYTHONPATH=$PYTHONPATH_OLD
+fi
 
 CMAKE_ARGS=""
 CMAKE_ARGS="${CMAKE_ARGS} -DCMAKE_BUILD_TYPE=${BUILD_TYPE:-Release}"
