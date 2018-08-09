@@ -5,6 +5,7 @@ Build plug-in
 =============
 
 .. toctree::
+   :titlesonly:
    :maxdepth: 1
 
    compoundFeature.rst

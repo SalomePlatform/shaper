@@ -5,6 +5,7 @@ Primitives plug-in
 ==================
 
 .. toctree::
+   :titlesonly:
    :maxdepth: 1
 
    boxFeature.rst
