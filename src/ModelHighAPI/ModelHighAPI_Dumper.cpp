@@ -787,16 +787,24 @@ ModelHighAPI_Dumper& ModelHighAPI_Dumper::operator<<(const ResultPtr& theResult)
 {
   // iterate in the structure of sub-results to the parent
   ResultPtr aCurRes = theResult;
+  FeaturePtr aFeature = ModelAPI_Feature::feature(theResult);
   std::list<int> anIndices; // indexes of results in the parent result, starting from topmost
   while(aCurRes.get()) {
     ResultBodyPtr aParent = ModelAPI_Tools::bodyOwner(aCurRes);
     if (aParent) {
       anIndices.push_front(ModelAPI_Tools::bodyIndex(aCurRes));
+    } else { // index of the result in the feature
+      std::list<ResultPtr>::const_iterator aRes = aFeature->results().cbegin();
+      for(int anIndex = 0; aRes != aFeature->results().cend(); aRes++, anIndex++) {
+        if (*aRes == aCurRes) {
+          anIndices.push_front(anIndex);
+          break;
+        }
+      }
     }
     aCurRes = aParent;
   }
 
-  FeaturePtr aFeature = ModelAPI_Feature::feature(theResult);
   myDumpBuffer << name(aFeature);
   for (std::list<int>::iterator anI = anIndices.begin(); anI != anIndices.end(); anI++) {
     if (anI == anIndices.begin()) {

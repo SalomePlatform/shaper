@@ -45,12 +45,18 @@ bool GeomValidators_IntersectionSelection::isValid(const AttributePtr& theAttrib
       theError = "Error: empty attribute selection.";
       return false;
     }
+    FeaturePtr aFeature;
     ResultPtr aContext = anAttrSelection->context();
     if(!aContext.get()) {
-      theError = "Error: empty selection context.";
-      return false;
+      aFeature = anAttrSelection->contextFeature();
+      if (!aFeature.get()) {
+        theError = "Error: Empty selection context.";
+        return false;
+      }
+    } else {
+      aFeature = ModelAPI_Feature::feature(aContext);
     }
-    FeaturePtr aFeature = ModelAPI_Feature::feature(aContext);
+
     if(!aFeature.get()) {
       theError = "Error: empty feature.";
       return false;

@@ -484,10 +484,10 @@ int Model_Data::featureId() const
 void Model_Data::eraseBackReferences()
 {
   myRefsToMe.clear();
-  std::shared_ptr<ModelAPI_Result> aRes =
-    std::dynamic_pointer_cast<ModelAPI_Result>(myObject);
-  if (aRes)
+  std::shared_ptr<ModelAPI_Result> aRes = std::dynamic_pointer_cast<ModelAPI_Result>(myObject);
+  if (aRes) {
     aRes->setIsConcealed(false);
+  }
 }
 
 void Model_Data::removeBackReference(ObjectPtr theObject, std::string theAttrID)
@@ -518,8 +518,7 @@ void Model_Data::addBackReference(FeaturePtr theFeature, std::string theAttrID,
 
   if (theApplyConcealment &&  theFeature->isStable() &&
       ModelAPI_Session::get()->validators()->isConcealed(theFeature->getKind(), theAttrID)) {
-    std::shared_ptr<ModelAPI_Result> aRes =
-      std::dynamic_pointer_cast<ModelAPI_Result>(myObject);
+    std::shared_ptr<ModelAPI_Result> aRes = std::dynamic_pointer_cast<ModelAPI_Result>(myObject);
     // the second condition is for history upper than concealment causer, so the feature result may
     // be displayed and previewed; also for avoiding of quick show/hide on history
     // moving deep down
@@ -546,8 +545,7 @@ void Model_Data::updateConcealmentFlag()
       if (aFeature.get() && !aFeature->isDisabled() && aFeature->isStable()) {
         if (ModelAPI_Session::get()->validators()->isConcealed(
               aFeature->getKind(), (*aRefsIter)->id())) {
-          std::shared_ptr<ModelAPI_Result> aRes =
-            std::dynamic_pointer_cast<ModelAPI_Result>(myObject);
+          std::shared_ptr<ModelAPI_Result> aRes = std::dynamic_pointer_cast<ModelAPI_Result>(myObject);
           if (aRes.get()) {
             aRes->setIsConcealed(true); // set concealed
             return;
@@ -637,15 +635,34 @@ void Model_Data::referencesToObjects(
       }
     } else if (aType == ModelAPI_AttributeRefList::typeId()) { // list of references
       aReferenced = std::dynamic_pointer_cast<ModelAPI_AttributeRefList>(anAttr)->list();
-    } else if (aType == ModelAPI_AttributeSelection::typeId()) { // selection attribute
+    }
+    else if (aType == ModelAPI_AttributeSelection::typeId()) { // selection attribute
       std::shared_ptr<ModelAPI_AttributeSelection> aRef = std::dynamic_pointer_cast<
-          ModelAPI_AttributeSelection>(anAttr);
-      aReferenced.push_back(aRef->context());
+        ModelAPI_AttributeSelection>(anAttr);
+      FeaturePtr aRefFeat = aRef->contextFeature();
+      if (aRefFeat.get()) { // reference to all results of the referenced feature
+        const std::list<ResultPtr>& allRes = aRefFeat->results();
+        std::list<ResultPtr>::const_iterator aRefRes = allRes.cbegin();
+        for(; aRefRes != allRes.cend(); aRefRes++) {
+          aReferenced.push_back(*aRefRes);
+        }
+      } else {
+        aReferenced.push_back(aRef->context());
+      }
     } else if (aType == ModelAPI_AttributeSelectionList::typeId()) { // list of selection attributes
       std::shared_ptr<ModelAPI_AttributeSelectionList> aRef = std::dynamic_pointer_cast<
           ModelAPI_AttributeSelectionList>(anAttr);
       for(int a = 0, aSize = aRef->size(); a < aSize; ++a) {
-        aReferenced.push_back(aRef->value(a)->context());
+        FeaturePtr aRefFeat = aRef->value(a)->contextFeature();
+        if (aRefFeat.get()) { // reference to all results of the referenced feature
+          const std::list<ResultPtr>& allRes = aRefFeat->results();
+          std::list<ResultPtr>::const_iterator aRefRes = allRes.cbegin();
+          for (; aRefRes != allRes.cend(); aRefRes++) {
+            aReferenced.push_back(*aRefRes);
+          }
+        } else {
+          aReferenced.push_back(aRef->value(a)->context());
+        }
       }
     } else if (aType == ModelAPI_AttributeRefAttrList::typeId()) {
       std::shared_ptr<ModelAPI_AttributeRefAttrList> aRefAttr = std::dynamic_pointer_cast<

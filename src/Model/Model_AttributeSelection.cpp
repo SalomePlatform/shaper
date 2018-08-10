@@ -39,6 +39,7 @@
 #include <Events_InfoMessage.h>
 #include <GeomAPI_Edge.h>
 #include <GeomAPI_Vertex.h>
+#include <GeomAlgoAPI_CompoundBuilder.h>
 
 #include <TNaming_Selector.hxx>
 #include <TNaming_NamedShape.hxx>
@@ -84,6 +85,9 @@ Standard_GUID kCIRCLE_CENTER("d0d0e0f1-217a-4b95-8fbb-0c4132f23718");
 Standard_GUID kELLIPSE_CENTER1("f70df04c-3168-4dc9-87a4-f1f840c1275d");
 // identifier of the selection of the second focus point of ellipse on edge
 Standard_GUID kELLIPSE_CENTER2("1395ae73-8e02-4cf8-b204-06ff35873a32");
+
+// prefix for the whole feature context identification
+const static std::string kWHOLE_FEATURE = "all-in-";
 
 // on this label is stored:
 // TNaming_NamedShape - selected shape
@@ -349,6 +353,22 @@ std::shared_ptr<GeomAPI_Shape> Model_AttributeSelection::internalValue(CenterTyp
       if (aConstr->isInfinite())
         return aResult; // empty result
     }
+    // whole feature
+    FeaturePtr aFeature = contextFeature();
+    if (aFeature.get()) {
+      std::list<GeomShapePtr> allShapes;
+      std::list<ResultPtr>::const_iterator aRes = aFeature->results().cbegin();
+      for (; aRes != aFeature->results().cend(); aRes++) {
+        if (aRes->get() && !(*aRes)->isDisabled()) {
+          GeomShapePtr aShape = (*aRes)->shape();
+          if (aShape.get() && !aShape->isNull()) {
+            allShapes.push_back(aShape);
+          }
+        }
+      }
+      return GeomAlgoAPI_CompoundBuilder::compound(allShapes);
+    }
+
     Handle(TNaming_NamedShape) aSelection;
     if (aSelLab.FindAttribute(TNaming_NamedShape::GetID(), aSelection)) {
       TopoDS_Shape aSelShape = aSelection->Get();
@@ -394,6 +414,10 @@ bool Model_AttributeSelection::isInitialized()
             return true;
           }
         }
+        // for the whole feature, a feature object
+        FeaturePtr aFeat = contextFeature();
+        if (aFeat.get())
+          return true;
       }
     }
   }
@@ -795,8 +819,15 @@ std::string Model_AttributeSelection::namingName(const std::string& theDefaultNa
   std::shared_ptr<GeomAPI_Shape> aSubSh = internalValue(aCenterType);
   ResultPtr aCont = context();
 
-  if (!aCont.get()) // in case of selection of removed result
+  if (!aCont.get()) {
+    // selection of a full feature
+    FeaturePtr aFeatureCont = contextFeature();
+    if (aFeatureCont.get()) {
+      return kWHOLE_FEATURE + aFeatureCont->name();
+    }
+    // in case of selection of removed result
     return "";
+  }
 
   Model_SelectionNaming aSelNaming(selectionLabel());
   std::string aResult = aSelNaming.namingName(
@@ -867,9 +898,21 @@ void Model_AttributeSelection::selectSubShape(
       }
     }
 
-    Model_SelectionNaming aSelNaming(selectionLabel());
     std::shared_ptr<Model_Document> aDoc =
       std::dynamic_pointer_cast<Model_Document>(owner()->document());
+    // check this is a whole feature context
+    if (aSubShapeName.size() > kWHOLE_FEATURE.size() &&
+      aSubShapeName.substr(0, kWHOLE_FEATURE.size()) == kWHOLE_FEATURE) {
+      std::string aFeatureName = aSubShapeName.substr(kWHOLE_FEATURE.size());
+      ObjectPtr anObj = aDoc->objectByName(ModelAPI_Feature::group(), aFeatureName);
+      if (anObj.get()) {
+        static const GeomShapePtr anEmptyShape;
+        setValue(anObj, anEmptyShape);
+        return;
+      }
+    }
+
+    Model_SelectionNaming aSelNaming(selectionLabel());
     std::shared_ptr<GeomAPI_Shape> aShapeToBeSelected;
     ResultPtr aCont;
     if (aSelNaming.selectSubShape(aType, aSubShapeName, aDoc, aShapeToBeSelected, aCont)) {
