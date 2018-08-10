@@ -40,6 +40,9 @@ aDomObj = parse(aConfigPath)
 aPluginsList = aDomObj.getElementsByTagName("plugin")
 for plugin in aPluginsList:
     aLibName = plugin.getAttribute("library")
+    if not aLibName:
+        aLibName = plugin.getAttribute("script")
+
     if aLibName:
         aPluginDocDir = aSrcPath + os.sep + aLibName + os.sep + "doc"
         aDocDist = aBuildDir + os.sep + aLibName
