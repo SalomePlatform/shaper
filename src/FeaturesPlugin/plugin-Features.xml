@@ -80,7 +80,7 @@ email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com
       <feature id="Smash" title="Smash" tooltip="Perform boolean smash operation with objects"
                icon="icons/Features/bool_smash.png" helpfile="FeaturesPlugin/smashFeature.html"
                auto_preview="false">
-          <source path="boolean_widget.xml"/>
+          <source path="boolean_smash_widget.xml"/>
       </feature>
       <feature id="Intersection" title="Intersection" tooltip="Intersect objects with tools"
                icon="icons/Features/intersection.png" helpfile="FeaturesPlugin/intersectionFeature.html">

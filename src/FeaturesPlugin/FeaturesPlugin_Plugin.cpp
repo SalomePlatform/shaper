@@ -96,6 +96,8 @@ FeaturesPlugin_Plugin::FeaturesPlugin_Plugin()
                               new FeaturesPlugin_ValidatorCircular);
   aFactory->registerValidator("FeaturesPlugin_ValidatorBooleanArguments",
                               new FeaturesPlugin_ValidatorBooleanArguments);
+  aFactory->registerValidator("FeaturesPlugin_ValidatorBooleanSmashSelection",
+                              new FeaturesPlugin_ValidatorBooleanSmashSelection);
 
   // register this plugin
   ModelAPI_Session::get()->registerPlugin(this);

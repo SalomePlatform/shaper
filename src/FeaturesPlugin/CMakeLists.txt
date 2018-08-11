@@ -69,6 +69,7 @@ SET(PROJECT_SOURCES
     FeaturesPlugin_Translation.cpp
     FeaturesPlugin_Boolean.cpp
     FeaturesPlugin_BooleanCut.cpp
+    FeaturesPlugin_BooleanSmash.cpp
     FeaturesPlugin_Intersection.cpp
     FeaturesPlugin_Partition.cpp
     FeaturesPlugin_Pipe.cpp
@@ -105,6 +106,7 @@ SET(XML_RESOURCES
   rotation_widget.xml
   translation_widget.xml
   boolean_widget.xml
+  boolean_smash_widget.xml
   recover_widget.xml
   partition_widget.xml
   placement_widget.xml
@@ -292,4 +294,5 @@ ADD_UNIT_TESTS(TestExtrusion.py
                TestBooleanCut_Wire_Face.py
                TestBooleanCut_Wire_Wire.py
                TestBooleanCut_WireCompound_WireCompound.py
+               TestBooleanSmash_Face_Face.py
 )

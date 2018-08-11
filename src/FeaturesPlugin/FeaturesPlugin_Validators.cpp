@@ -21,6 +21,7 @@
 #include "FeaturesPlugin_Validators.h"
 
 #include "FeaturesPlugin_Boolean.h"
+#include "FeaturesPlugin_BooleanSmash.h"
 #include "FeaturesPlugin_Union.h"
 
 #include <Events_InfoMessage.h>
@@ -44,6 +45,7 @@
 #include <GeomAPI_DataMapOfShapeShape.h>
 #include <GeomAPI_Lin.h>
 #include <GeomAPI_PlanarEdges.h>
+#include <GeomAPI_Pln.h>
 #include <GeomAPI_ShapeExplorer.h>
 #include <GeomAPI_ShapeIterator.h>
 
@@ -1152,4 +1154,138 @@ bool FeaturesPlugin_ValidatorBooleanArguments::isNotObligatory(std::string theFe
   }
 
   return false;
+}
+
+//==================================================================================================
+bool FeaturesPlugin_ValidatorBooleanSmashSelection::isValid(
+  const AttributePtr& theAttribute,
+  const std::list<std::string>& theArguments,
+  Events_InfoMessage& theError) const
+{
+  std::shared_ptr<FeaturesPlugin_BooleanSmash> aFeature =
+    std::dynamic_pointer_cast<FeaturesPlugin_BooleanSmash>(theAttribute->owner());
+
+  AttributeSelectionListPtr anAttrSelectionList =
+    std::dynamic_pointer_cast<ModelAPI_AttributeSelectionList>(theAttribute);
+  if (!aFeature.get() || !anAttrSelectionList.get()) {
+    theError =
+      "Error: Validator used in wrong feature or attribute";
+    return false;
+  }
+
+  AttributeSelectionListPtr anOtherAttrSelectionList;
+  if (theAttribute->id() == FeaturesPlugin_BooleanSmash::OBJECT_LIST_ID()) {
+    anOtherAttrSelectionList =
+      aFeature->selectionList(FeaturesPlugin_BooleanSmash::TOOL_LIST_ID());
+  } else {
+    anOtherAttrSelectionList =
+      aFeature->selectionList(FeaturesPlugin_BooleanSmash::OBJECT_LIST_ID());
+  }
+
+  GeomAPI_Shape::ShapeType aSelectedShapesType = GeomAPI_Shape::SHAPE;
+  GeomAPI_DataMapOfShapeShape aSelectedCompSolidsInOtherList;
+  GeomPlanePtr aFacesPln;
+
+  for (int anIndex = 0; anIndex < anOtherAttrSelectionList->size(); ++anIndex) {
+    AttributeSelectionPtr anAttrSelection = anOtherAttrSelectionList->value(anIndex);
+    ResultPtr aContext = anAttrSelection->context();
+    std::shared_ptr<GeomAPI_Shape> aShape = anAttrSelection->value();
+    GeomShapePtr aContextShape = aContext->shape();
+    if (!aShape.get()) {
+      aShape = aContextShape;
+    }
+
+    if (aShape->isSolid() || aShape->isCompSolid()) {
+      aSelectedShapesType = GeomAPI_Shape::SOLID;
+      ResultCompSolidPtr aResCompSolidPtr = ModelAPI_Tools::compSolidOwner(aContext);
+      if (aResCompSolidPtr.get()) {
+        GeomShapePtr aCompSolidShape = aResCompSolidPtr->shape();
+        aSelectedCompSolidsInOtherList.bind(aCompSolidShape, aCompSolidShape);
+      }
+    } else {
+      aSelectedShapesType = GeomAPI_Shape::FACE;
+      GeomAPI_Face aFace(aShape);
+      aFacesPln = aFace.getPlane();
+      break;
+    }
+  }
+
+  for (int anIndex = 0; anIndex < anAttrSelectionList->size(); ++anIndex) {
+    AttributeSelectionPtr anAttrSelection = anAttrSelectionList->value(anIndex);
+    if (!anAttrSelection.get()) {
+      theError = "Error: Empty attribute selection.";
+      return false;
+    }
+    ResultPtr aContext = anAttrSelection->context();
+    if (!aContext.get()) {
+      theError = "Error: Empty selection context.";
+      return false;
+    }
+    ResultConstructionPtr aResultConstruction =
+      std::dynamic_pointer_cast<ModelAPI_ResultConstruction>(aContext);
+    if (aResultConstruction.get()) {
+      theError = "Error: Result construction not allowed for selection.";
+      return false;
+    }
+    std::shared_ptr<GeomAPI_Shape> aShape = anAttrSelection->value();
+    GeomShapePtr aContextShape = aContext->shape();
+    if (!aShape.get()) {
+      aShape = aContextShape;
+    }
+    if (!aShape.get()) {
+      theError = "Error: Empty shape.";
+      return false;
+    }
+    if (!aShape->isEqual(aContextShape)) {
+      theError = "Error: Local selection not allowed.";
+      return false;
+    }
+
+    if (aSelectedShapesType == GeomAPI_Shape::SHAPE) {
+      // Other list is empty.
+      if (aShape->isSolid() || aShape->isCompSolid()) {
+        aSelectedShapesType = GeomAPI_Shape::SOLID;
+      } else {
+        aSelectedShapesType = GeomAPI_Shape::FACE;
+        GeomAPI_Face aFace(aShape);
+        aFacesPln = aFace.getPlane();
+
+        if (!aFacesPln.get()) {
+          theError = "Error: Only planar faces allowed.";
+          return false;
+        }
+      }
+
+      continue;
+    } else if (aSelectedShapesType == GeomAPI_Shape::SOLID) {
+      if (!aShape->isSolid() && !aShape->isCompSolid()) {
+        theError = "Error: Selected shapes should have the same type.";
+        return false;
+      }
+
+      ResultCompSolidPtr aResCompSolidPtr = ModelAPI_Tools::compSolidOwner(aContext);
+      if (aResCompSolidPtr.get()) {
+        GeomShapePtr aCompSolidShape = aResCompSolidPtr->shape();
+        if (aSelectedCompSolidsInOtherList.isBound(aCompSolidShape)) {
+          theError = "Error: Solids from compsolid in other list not allowed.";
+          return false;
+        }
+      }
+    } else {
+      GeomAPI_Face aFace(aShape);
+      GeomPlanePtr aPln = aFace.getPlane();
+
+      if (!aPln.get()) {
+        theError = "Error: Only planar faces allowed.";
+        return false;
+      }
+
+      if (!aFacesPln->isCoincident(aPln)) {
+        theError = "Error: Only coincident faces allowed.";
+        return false;
+      }
+    }
+  }
+
+  return true;
 }

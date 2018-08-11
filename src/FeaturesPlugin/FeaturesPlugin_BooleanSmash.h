@@ -23,6 +23,8 @@
 
 #include "FeaturesPlugin_Boolean.h"
 
+#include <ModelAPI_ResultBody.h>
+
 /// \class FeaturesPlugin_BooleanSmash
 /// \ingroup Plugins
 /// \brief Feature for applying of Boolean Smash operation.
@@ -44,10 +46,40 @@ public:
     return MY_KIND;
   }
 
+  /// Attribute name of main objects.
+  inline static const std::string& OBJECT_LIST_ID()
+  {
+    static const std::string MY_OBJECT_LIST_ID("main_objects");
+    return MY_OBJECT_LIST_ID;
+  }
+
+  /// Attribute name of tool objects.
+  inline static const std::string& TOOL_LIST_ID()
+  {
+    static const std::string MY_TOOL_LIST_ID("tool_objects");
+    return MY_TOOL_LIST_ID;
+  }
+
+  /// Request for initialization of data model of the feature: adding all attributes.
+  FEATURESPLUGIN_EXPORT virtual void initAttributes();
+
+  /// Creates a new part document if needed.
+  FEATURESPLUGIN_EXPORT virtual void execute();
+
 public:
 
-    /// Use plugin manager for features creation.
-  FeaturesPlugin_BooleanSmash(): FeaturesPlugin_Boolean(BOOL_SMASH) {};
+  /// Use plugin manager for features creation.
+  FeaturesPlugin_BooleanSmash();
+
+private:
+
+  /// Load Naming data structure of the feature to the document
+  void loadNamingDS(ResultBodyPtr theResultBody,
+                    const GeomShapePtr theBaseShape,
+                    const ListOfShape& theTools,
+                    const GeomShapePtr theResultShape,
+                    GeomAlgoAPI_MakeShape& theMakeShape,
+                    GeomAPI_DataMapOfShapeShape& theMapOfShapes);
 
 };
 
