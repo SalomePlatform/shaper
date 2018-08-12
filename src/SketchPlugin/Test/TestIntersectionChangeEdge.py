@@ -75,7 +75,7 @@ SketchConstraintDistance_3 = Sketch_2.setDistance(SketchAPI_Point(SketchPoint_2)
 SketchConstraintDistance_4 = Sketch_2.setDistance(SketchAPI_Point(SketchPoint_2).coordinates(), SketchLine_6.result(), 70, True)
 model.do()
 Face_1 = model.addFace(Part_1_doc, [model.selection("FACE", "Sketch_2/Face-SketchLine_3r-SketchLine_4r-SketchLine_5r-SketchLine_6r")])
-Intersection_1 = model.addIntersection(Part_1_doc, [model.selection("FACE", "Filling_1_1")], [model.selection("FACE", "Face_1_1")])
+Intersection_1 = model.addIntersection(Part_1_doc, [model.selection("FACE", "Filling_1_1"), model.selection("FACE", "Face_1_1")])
 
 # set different edges used for intersection and check reference data: number of intersection points and their coordinates
 REF_DATA = [("Sketch_1/Edge-SketchArc_1_2", 1, [[30, 0]]),

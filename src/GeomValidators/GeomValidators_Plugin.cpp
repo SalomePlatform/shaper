@@ -29,7 +29,6 @@
 #include <GeomValidators_PartitionArguments.h>
 #include <GeomValidators_ShapeType.h>
 #include <GeomValidators_ZeroOffset.h>
-#include <GeomValidators_IntersectionSelection.h>
 #include <GeomValidators_FeatureKind.h>
 #include <GeomValidators_MinObjectsSelected.h>
 #include <GeomValidators_Intersected.h>
@@ -58,8 +57,6 @@ GeomValidators_Plugin::GeomValidators_Plugin()
                               new GeomValidators_PartitionArguments);
   aFactory->registerValidator("GeomValidators_ShapeType", new GeomValidators_ShapeType);
   aFactory->registerValidator("GeomValidators_ZeroOffset", new GeomValidators_ZeroOffset);
-  aFactory->registerValidator("GeomValidators_IntersectionSelection",
-                              new GeomValidators_IntersectionSelection);
   aFactory->registerValidator("GeomValidators_FeatureKind", new GeomValidators_FeatureKind);
   aFactory->registerValidator("GeomValidators_MinObjectsSelected",
                               new GeomValidators_MinObjectsSelected);

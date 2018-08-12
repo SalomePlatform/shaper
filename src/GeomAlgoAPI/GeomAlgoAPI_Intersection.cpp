@@ -21,33 +21,27 @@
 #include "GeomAlgoAPI_Intersection.h"
 
 #include <GeomAlgoAPI_DFLoader.h>
-#include <GeomAlgoAPI_ShapeTools.h>
 
-#include <BRepAlgoAPI_Section.hxx>
-#include <TopExp_Explorer.hxx>
-#include <TopoDS_Builder.hxx>
+#include <BOPAlgo_PaveFiller.hxx>
+#include <BOPAlgo_Section.hxx>
 
-//=================================================================================================
-GeomAlgoAPI_Intersection::GeomAlgoAPI_Intersection(const ListOfShape& theObjects,
-                                                   const ListOfShape& theTools)
+//==================================================================================================
+GeomAlgoAPI_Intersection::GeomAlgoAPI_Intersection(const ListOfShape& theObjects)
 {
-  build(theObjects, theTools);
+  build(theObjects);
 }
 
-//=================================================================================================
-void GeomAlgoAPI_Intersection::build(const ListOfShape& theObjects,
-                                     const ListOfShape& theTools)
+//==================================================================================================
+void GeomAlgoAPI_Intersection::build(const ListOfShape& theObjects)
 {
-  if (theObjects.empty() || theTools.empty()) {
+  if (theObjects.empty()) {
     return;
   }
 
   // Creating partition operation.
-  BRepAlgoAPI_Section* anOperation = new BRepAlgoAPI_Section;
+  BOPAlgo_Section* anOperation = new BOPAlgo_Section;
   this->setImpl(anOperation);
-  this->setBuilderType(OCCT_BRepBuilderAPI_MakeShape);
-
-  TopAbs_ShapeEnum aShapeType = TopAbs_COMPOUND;
+  this->setBuilderType(OCCT_BOPAlgo_Builder);
 
   // Getting objects.
   TopTools_ListOfShape anObjects;
@@ -58,25 +52,31 @@ void GeomAlgoAPI_Intersection::build(const ListOfShape& theObjects,
       anObjects.Append(aShape);
     }
   }
-  anOperation->SetArguments(anObjects);
 
-  // Getting tools.
-  TopTools_ListOfShape aTools;
-  for (ListOfShape::const_iterator
-    aToolsIt = theTools.begin(); aToolsIt != theTools.end(); aToolsIt++) {
-    const TopoDS_Shape& aShape = (*aToolsIt)->impl<TopoDS_Shape>();
-    if(!aShape.IsNull()) {
-      aTools.Append(aShape);
-    }
-  }
-  anOperation->SetTools(aTools);
+  BOPAlgo_PaveFiller aDSFiller;
+  aDSFiller.SetArguments(anObjects);
+
+  aDSFiller.SetRunParallel(false);
+  aDSFiller.SetNonDestructive(false);
+  aDSFiller.SetGlue(BOPAlgo_GlueOff);
+
   // optimization for the issue #2399
-  anOperation->Approximation(Standard_True);
-  anOperation->ComputePCurveOn1(Standard_True);
-  anOperation->ComputePCurveOn2(Standard_True);
-  // Building and getting result.
-  anOperation->Build();
-  if(!anOperation->IsDone()) {
+  BOPAlgo_SectionAttribute theSecAttr(Standard_True,
+                                      Standard_True,
+                                      Standard_True);
+  aDSFiller.SetSectionAttribute(theSecAttr);
+
+  aDSFiller.Perform();
+  if (aDSFiller.HasErrors()) {
+    return;
+  }
+
+  anOperation->SetArguments(anObjects);
+  anOperation->SetRunParallel(false);
+  anOperation->SetCheckInverted(true);
+
+  anOperation->PerformWithFiller(aDSFiller);
+  if(anOperation->HasErrors()) {
     return;
   }
   TopoDS_Shape aResult = anOperation->Shape();

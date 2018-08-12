@@ -54,7 +54,7 @@ SketchConstraintHorizontal_4 = Sketch_2.setHorizontal(SketchLine_7.result())
 SketchConstraintVertical_4 = Sketch_2.setVertical(SketchLine_8.result())
 model.do()
 Extrusion_2 = model.addExtrusion(Part_1_doc, [model.selection("FACE", "Sketch_2/Face-SketchLine_5f-SketchLine_6f-SketchLine_7f-SketchLine_8f")], model.selection(), 10, 110)
-Intersection_1 = model.addIntersection(Part_1_doc, [model.selection("SOLID", "Extrusion_1_1")], [model.selection("SOLID", "Extrusion_2_1")])
+Intersection_1 = model.addIntersection(Part_1_doc, [model.selection("SOLID", "Extrusion_1_1"), model.selection("SOLID", "Extrusion_2_1")])
 Rotation_1 = model.addRotation(Part_1_doc, [model.selection("COMPOUND", "Intersection_1_1")], model.selection("EDGE", "PartSet/OZ"), 45)
 model.end()
 

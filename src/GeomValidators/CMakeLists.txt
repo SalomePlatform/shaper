@@ -35,7 +35,6 @@ SET(PROJECT_HEADERS
     GeomValidators_Tools.h
     GeomValidators_ZeroOffset.h
     GeomValidators_Different.h
-    GeomValidators_IntersectionSelection.h
     GeomValidators_MinObjectsSelected.h
     GeomValidators_ValueOrder.h
     GeomValidators_Intersected.h
@@ -55,7 +54,6 @@ SET(PROJECT_SOURCES
     GeomValidators_Tools.cpp
     GeomValidators_ZeroOffset.cpp
     GeomValidators_Different.cpp
-    GeomValidators_IntersectionSelection.cpp
     GeomValidators_MinObjectsSelected.cpp
     GeomValidators_ValueOrder.cpp
     GeomValidators_Intersected.cpp

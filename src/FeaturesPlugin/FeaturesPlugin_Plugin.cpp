@@ -98,6 +98,8 @@ FeaturesPlugin_Plugin::FeaturesPlugin_Plugin()
                               new FeaturesPlugin_ValidatorBooleanArguments);
   aFactory->registerValidator("FeaturesPlugin_ValidatorBooleanSmashSelection",
                               new FeaturesPlugin_ValidatorBooleanSmashSelection);
+  aFactory->registerValidator("FeaturesPlugin_IntersectionSelection",
+                              new FeaturesPlugin_IntersectionSelection);
 
   // register this plugin
   ModelAPI_Session::get()->registerPlugin(this);

@@ -34,13 +34,11 @@ FeaturesAPI_Intersection::FeaturesAPI_Intersection(
 //==================================================================================================
 FeaturesAPI_Intersection::FeaturesAPI_Intersection(
   const std::shared_ptr<ModelAPI_Feature>& theFeature,
-  const std::list<ModelHighAPI_Selection>& theObjects,
-  const std::list<ModelHighAPI_Selection>& theTools)
+  const std::list<ModelHighAPI_Selection>& theObjects)
 : ModelHighAPI_Interface(theFeature)
 {
   if(initialize()) {
     fillAttribute(theObjects, myobjects);
-    fillAttribute(theTools, mytools);
 
     execute();
   }
@@ -61,14 +59,6 @@ void FeaturesAPI_Intersection::setObjects(const std::list<ModelHighAPI_Selection
 }
 
 //==================================================================================================
-void FeaturesAPI_Intersection::setTools(const std::list<ModelHighAPI_Selection>& theTools)
-{
-  fillAttribute(theTools, mytools);
-
-  execute();
-}
-
-//==================================================================================================
 void FeaturesAPI_Intersection::dump(ModelHighAPI_Dumper& theDumper) const
 {
   FeaturePtr aBase = feature();
@@ -76,18 +66,15 @@ void FeaturesAPI_Intersection::dump(ModelHighAPI_Dumper& theDumper) const
 
   AttributeSelectionListPtr anAttrObjects =
     aBase->selectionList(FeaturesPlugin_Intersection::OBJECT_LIST_ID());
-  AttributeSelectionListPtr anAttrTools =
-    aBase->selectionList(FeaturesPlugin_Intersection::TOOL_LIST_ID());
 
   theDumper << aBase << " = model.addIntersection(" << aDocName << ", "
-            << anAttrObjects << ", " << anAttrTools << ")" << std::endl;
+            << anAttrObjects << ")" << std::endl;
 }
 
 //==================================================================================================
 IntersectionPtr addIntersection(const std::shared_ptr<ModelAPI_Document>& thePart,
-                                const std::list<ModelHighAPI_Selection>& theObjects,
-                                const std::list<ModelHighAPI_Selection>& theTools)
+                                const std::list<ModelHighAPI_Selection>& theObjects)
 {
   std::shared_ptr<ModelAPI_Feature> aFeature = thePart->addFeature(FeaturesAPI_Intersection::ID());
-  return IntersectionPtr(new FeaturesAPI_Intersection(aFeature, theObjects, theTools));
+  return IntersectionPtr(new FeaturesAPI_Intersection(aFeature, theObjects));
 }

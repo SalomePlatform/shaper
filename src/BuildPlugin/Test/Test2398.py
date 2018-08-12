@@ -46,7 +46,7 @@ model.do()
 Extrusion_2 = model.addExtrusion(Part_1_doc, [model.selection("FACE", "Sketch_2/Face-SketchCircle_2_2f")], model.selection(), 100, 0)
 Rotation_1 = model.addRotation(Part_1_doc, [model.selection("SOLID", "Extrusion_1_1")], model.selection("EDGE", "PartSet/OX"), 90)
 
-Intersection_1 = model.addIntersection(Part_1_doc, [model.selection("SOLID", "Rotation_1_1")], [model.selection("SOLID", "Extrusion_2_1")])
+Intersection_1 = model.addIntersection(Part_1_doc, [model.selection("SOLID", "Rotation_1_1"), model.selection("SOLID", "Extrusion_2_1")])
 
 Sketch_3 = model.addSketch(Part_1_doc, model.defaultPlane("XOY"))
 SketchLine_1 = Sketch_3.addLine(7.903534676574237, 7.903534676574236, -7.903534676574236, 7.903534676574236)

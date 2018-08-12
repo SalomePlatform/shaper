@@ -44,26 +44,19 @@ public:
   /// Constructor with values.
   FEATURESAPI_EXPORT
   explicit FeaturesAPI_Intersection(const std::shared_ptr<ModelAPI_Feature>& theFeature,
-                                    const std::list<ModelHighAPI_Selection>& theObjects,
-                                    const std::list<ModelHighAPI_Selection>& theTools);
+                                    const std::list<ModelHighAPI_Selection>& theObjects);
 
   /// Destructor.
   FEATURESAPI_EXPORT
   virtual ~FeaturesAPI_Intersection();
 
-  INTERFACE_2(FeaturesPlugin_Intersection::ID(),
+  INTERFACE_1(FeaturesPlugin_Intersection::ID(),
               objects, FeaturesPlugin_Intersection::OBJECT_LIST_ID(),
-              ModelAPI_AttributeSelectionList, /** Objects */,
-              tools, FeaturesPlugin_Intersection::TOOL_LIST_ID(),
-              ModelAPI_AttributeSelectionList, /** Tools */)
+              ModelAPI_AttributeSelectionList, /** Objects */)
 
   /// Modify objects attribute of the feature.
   FEATURESAPI_EXPORT
   void setObjects(const std::list<ModelHighAPI_Selection>& theObjects);
-
-  /// Modify tools attribute of the feature.
-  FEATURESAPI_EXPORT
-  void setTools(const std::list<ModelHighAPI_Selection>& theTools);
 
   /// Dump wrapped feature
   FEATURESAPI_EXPORT
@@ -77,7 +70,6 @@ typedef std::shared_ptr<FeaturesAPI_Intersection> IntersectionPtr;
 /// \brief Create Intersection feature.
 FEATURESAPI_EXPORT
 IntersectionPtr addIntersection(const std::shared_ptr<ModelAPI_Document>& thePart,
-                                const std::list<ModelHighAPI_Selection>& theObjects,
-                                const std::list<ModelHighAPI_Selection>& theTools);
+                                const std::list<ModelHighAPI_Selection>& theObjects);
 
 #endif // FeaturesAPI_Intersection_H_

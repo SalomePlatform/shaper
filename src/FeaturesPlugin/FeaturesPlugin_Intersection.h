@@ -53,13 +53,6 @@ public:
     return MY_OBJECT_LIST_ID;
   }
 
-  /// Attribute name of tools.
-  inline static const std::string& TOOL_LIST_ID()
-  {
-    static const std::string MY_TOOL_LIST_ID("tool_objects");
-    return MY_TOOL_LIST_ID;
-  }
-
   /// Returns the kind of a feature.
   FEATURESPLUGIN_EXPORT virtual const std::string& getKind()
   {
@@ -79,8 +72,7 @@ public:
 private:
   /// Load Naming data structure of the feature to the document.
   void loadNamingDS(std::shared_ptr<ModelAPI_ResultBody> theResultBody,
-                    const std::shared_ptr<GeomAPI_Shape> theBaseShape,
-                    const ListOfShape& theTools,
+                    const ListOfShape& theObjects,
                     GeomAlgoAPI_MakeShape& theMakeShape);
 };
 

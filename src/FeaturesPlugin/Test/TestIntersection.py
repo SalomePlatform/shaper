@@ -154,7 +154,7 @@ aSession.startOperation()
 anIntersectionFt = aPart.addFeature("Intersection")
 assert (anIntersectionFt.getKind() == "Intersection")
 anIntersectionFt.selectionList("main_objects").append(anExtrusionResult1, None)
-anIntersectionFt.selectionList("tool_objects").append(anExtrusionResult2, None)
+anIntersectionFt.selectionList("main_objects").append(anExtrusionResult2, None)
 anIntersectionFt.execute()
 aSession.finishOperation()
 

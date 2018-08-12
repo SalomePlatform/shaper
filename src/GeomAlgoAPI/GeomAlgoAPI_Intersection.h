@@ -35,13 +35,11 @@ public:
   /// \brief Constructor.
   /// \param[in] theObjects list of objects.
   /// \param[in] theTools list of tools.
-  GEOMALGOAPI_EXPORT GeomAlgoAPI_Intersection(const ListOfShape& theObjects,
-                                              const ListOfShape& theTools);
+  GEOMALGOAPI_EXPORT GeomAlgoAPI_Intersection(const ListOfShape& theObjects);
 
 private:
   /// Builds resulting shape.
-  void build(const ListOfShape& theObjects,
-             const ListOfShape& theTools);
+  void build(const ListOfShape& theObjects);
 };
 
 #endif
