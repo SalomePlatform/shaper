@@ -35,6 +35,9 @@ public:
   /// Constructor.
   GEOMALGOAPI_EXPORT GeomAlgoAPI_UnifySameDomain(const ListOfShape& theShapes);
 
+  /// Constructor.
+  GEOMALGOAPI_EXPORT GeomAlgoAPI_UnifySameDomain(const GeomShapePtr& theShape);
+
   /// \return the list of shapes modified from the shape \a theShape.
   /// \param[in] theShape base shape.
   /// \param[out] theHistory modified shapes.
@@ -42,8 +45,11 @@ public:
                                            ListOfShape& theHistory);
 
 private:
-  /// Builds resulting shape.
+  /// Builds resulting shape from lisy of shapes.
   void build(const ListOfShape& theShapes);
+
+  /// Builds resulting shape from the shape.
+  void build(const GeomShapePtr& theShape, const bool theIsToSimplifyShell);
 };
 
 #endif
