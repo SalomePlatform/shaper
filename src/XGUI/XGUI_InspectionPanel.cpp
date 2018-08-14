@@ -28,6 +28,23 @@
 
 #include <ModelAPI_Result.h>
 
+#include <GeomAPI_Ax3.h>
+#include <GeomAPI_Box.h>
+#include <GeomAPI_Circ.h>
+#include <GeomAPI_Cone.h>
+#include <GeomAPI_Cylinder.h>
+#include <GeomAPI_Edge.h>
+#include <GeomAPI_Ellipse.h>
+#include <GeomAPI_Face.h>
+#include <GeomAPI_Pln.h>
+#include <GeomAPI_Pnt.h>
+#include <GeomAPI_Shell.h>
+#include <GeomAPI_Solid.h>
+#include <GeomAPI_Sphere.h>
+#include <GeomAPI_Torus.h>
+#include <GeomAPI_Vertex.h>
+#include <GeomAPI_Wire.h>
+
 #include <QLayout>
 #include <QScrollArea>
 #include <QLabel>
@@ -36,32 +53,58 @@
 #include <QHeaderView>
 #include <QTextBrowser>
 
-#include <BRep_Tool.hxx>
-#include <BRepTools.hxx>
-#include <BRepGProp.hxx>
-#include <GeomAbs_CurveType.hxx>
-#include <GeomAbs_SurfaceType.hxx>
-#include <GeomAdaptor_Curve.hxx>
-#include <GeomAdaptor_Surface.hxx>
-#include <Geom_BSplineCurve.hxx>
-#include <GProp_GProps.hxx>
-#include <gp_Circ.hxx>
-#include <gp_Elips.hxx>
-#include <gp_Sphere.hxx>
-#include <gp_Cylinder.hxx>
-#include <gp_Cone.hxx>
-#include <gp_Torus.hxx>
+#include <BRepBndLib.hxx>
+#include <TopoDS_Iterator.hxx>
 #include <TopTools_MapOfShape.hxx>
 #include <TopTools_ListOfShape.hxx>
-#include <TopExp.hxx>
-#include <TopExp_Explorer.hxx>
-#include <TopoDS_Iterator.hxx>
-#include <TopoDS.hxx>
-#include <TopoDS_Vertex.hxx>
-#include <TopoDS_Edge.hxx>
-#include <TopoDS_Face.hxx>
-#include <TopoDS_Wire.hxx>
 #include <Standard_ErrorHandler.hxx> // CAREFUL ! position of this file is critic
+
+// ================     Auxiliary functions     ================
+#define TITLE(val) ("<b>" + (val) + "</b>")
+
+static void appendPointToParameters(const QString& thePointTitle,
+                                    const GeomPointPtr& theCoord,
+                                          QString& theParams)
+{
+  theParams += TITLE(thePointTitle) +
+    "<br> X: " + QString::number(theCoord->x()) +
+    "<br> Y: " + QString::number(theCoord->y()) +
+    "<br> Z: " + QString::number(theCoord->z()) +
+    "<br>";
+}
+
+static void appendDirToParameters(const QString& theDirTitle,
+                                  const GeomDirPtr& theDirection,
+                                        QString& theParams)
+{
+  theParams += TITLE(theDirTitle) +
+    "<br> DX: " + QString::number(theDirection->x()) +
+    "<br> DY: " + QString::number(theDirection->y()) +
+    "<br> DZ: " + QString::number(theDirection->z()) +
+    "<br>";
+}
+
+static void appendGroupNameToParameters(const QString& theGroupTitle, QString& theParams)
+{
+  theParams += TITLE(theGroupTitle) + "<br>";
+}
+
+static void appendNamedValueToParameters(const QString& theName,
+                                         const double   theValue,
+                                               QString& theParams)
+{
+  theParams += theName + ": " + QString::number(theValue) + "<br>";
+}
+
+static void appendNamedValueToParameters(const QString& theName,
+                                         const bool     theValue,
+                                               QString& theParams)
+{
+  theParams += theName + ": " + (theValue ? "True" : "False") + "<br>";
+}
+
+
+// ================     XGUI_InspectionPanel    ================
 
 XGUI_InspectionPanel::XGUI_InspectionPanel(QWidget* theParent, XGUI_SelectionMgr* theMgr)
   : QDockWidget(theParent),
@@ -240,491 +283,391 @@ void XGUI_InspectionPanel::setShapeContent(const TopoDS_Shape& theShape)
 //********************************************************************
 void XGUI_InspectionPanel::setShapeParams(const TopoDS_Shape& theShape)
 {
-  switch (theShape.ShapeType()) {
-  case TopAbs_VERTEX:
-    fillVertex(theShape);
+  GeomShapePtr aShape(new GeomAPI_Shape);
+  aShape->setImpl(new TopoDS_Shape(theShape));
+
+  switch (aShape->shapeType()) {
+  case GeomAPI_Shape::VERTEX:
+    fillVertex(aShape->vertex());
     break;
-  case TopAbs_EDGE:
-    fillEdge(theShape);
+  case GeomAPI_Shape::EDGE:
+    fillEdge(aShape->edge());
     break;
-  case TopAbs_FACE:
-    fillFace(theShape);
+  case GeomAPI_Shape::FACE:
+    fillFace(aShape->face());
     break;
-  case TopAbs_SOLID:
-    fillSolid(theShape);
+  case GeomAPI_Shape::SOLID:
+    fillSolid(aShape->solid());
     break;
-  case TopAbs_WIRE:
-  case TopAbs_SHELL:
-  case TopAbs_COMPSOLID:
-  case TopAbs_COMPOUND:
-    fillContainer(theShape);
+  case GeomAPI_Shape::WIRE:
+    fillWire(aShape->wire());
+    break;
+  case GeomAPI_Shape::SHELL:
+    fillShell(aShape->shell());
+    break;
+  case GeomAPI_Shape::COMPSOLID:
+  case GeomAPI_Shape::COMPOUND:
+    fillContainer(aShape);
     break;
   }
 }
 
 //********************************************************************
-void XGUI_InspectionPanel::fillVertex(const TopoDS_Shape& theShape)
+void XGUI_InspectionPanel::fillVertex(const GeomVertexPtr& theVertex)
 {
-  TopoDS_Vertex aV = TopoDS::Vertex(theShape);
-  gp_Pnt aP = BRep_Tool::Pnt(aV);
-  setVertexType(aP.XYZ());
-}
+  GeomPointPtr aPoint = theVertex->point();
 
-//********************************************************************
-void XGUI_InspectionPanel::fillEdge(const TopoDS_Shape& theShape)
-{
-  TopoDS_Edge aE = TopoDS::Edge(theShape);
-
-  bool bDegenerated = BRep_Tool::Degenerated(aE);
-
-  double aT1, aT2;
-  Handle(Geom_Curve) aC3D = BRep_Tool::Curve(aE, aT1, aT2);
-  GeomAdaptor_Curve aGAC(aC3D);
-  GeomAbs_CurveType aCT = aGAC.GetType();
-
-  if (aCT == GeomAbs_Line) { // Line
-    gp_Pnt aP1, aP2;
-    aGAC.D0(aT1, aP1);
-    aGAC.D0(aT2, aP2);
-    setLineType(aP1.XYZ(), aP2.XYZ());
-
-  } else if (aCT == GeomAbs_Circle) {
-    gp_Circ aCirc = aGAC.Circle();
-    gp_Pnt aP = aCirc.Location();
-    gp_Ax2 aAx2 = aCirc.Position();
-    double aR1 = aCirc.Radius();
-    gp_Dir aDir = aAx2.Axis().Direction();
-
-    bool isArc = (Abs(aT2 - aT1 - aC3D->Period()) >= Precision::PConfusion());
-    if (isArc) {
-      gp_Pnt aP1, aP2;
-      aGAC.D0(aT1, aP1);
-      aGAC.D0(aT2, aP2);
-      setArcType(aP.XYZ(), aDir.XYZ(), aR1, aP1.XYZ(), aP2.XYZ());
-    } else
-      setCircleType(aP.XYZ(), aDir.XYZ(), aR1);
-
-  } else if (aCT == GeomAbs_Ellipse) {
-    gp_Elips aElips = aGAC.Ellipse();
-    gp_Pnt aP = aElips.Location();
-    gp_Ax2 aAx2 = aElips.Position();
-    double aR1 = aElips.MajorRadius();
-    double aR2 = aElips.MinorRadius();
-    gp_Dir aDir = aAx2.Axis().Direction();
-    gp_Pnt aP1, aP2;
-    aGAC.D0(aT1, aP1);
-    aGAC.D0(aT2, aP2);
-    bool isArc = aP1.Distance(aP2) > Precision::Confusion();
-    if (isArc)
-      setEllipseArcType(aP.XYZ(), aDir.XYZ(), aR1, aR2, aP1.XYZ(), aP2.XYZ());
-    else
-      setEllipseType(aP.XYZ(), aDir.XYZ(), aR1, aR2);
-  }
-}
-
-//********************************************************************
-void XGUI_InspectionPanel::fillFace(const TopoDS_Shape& theShape)
-{
-  TopoDS_Face aF = TopoDS::Face(theShape);
-  //
-  Handle(Geom_Surface) aSurf = BRep_Tool::Surface(aF);
-  GeomAdaptor_Surface aGAS(aSurf);
-  GeomAbs_SurfaceType aST = aGAS.GetType();
-
-  // 1. Plane
-  if (aST == GeomAbs_Plane) {
-    gp_Pln aPln = aGAS.Plane();
-    gp_Pnt aP0 = aPln.Location();
-    gp_Ax3 aAx3 = aPln.Position();
-
-    setPlaneType(aP0.XYZ(), aAx3.Direction().XYZ());
-  }
-  // 2. Sphere
-  else if (aST == GeomAbs_Sphere) {
-    gp_Sphere aSphere = aGAS.Sphere();
-    gp_Pnt aP0 = aSphere.Location();
-    double aR1 = aSphere.Radius();
-
-    setSphereType(aP0.XYZ(), aR1);
-  }
-  // 3. Cylinder
-  else if (aST == GeomAbs_Cylinder) {
-    gp_Cylinder aCyl = aGAS.Cylinder();
-    gp_Pnt aP0 = aCyl.Location();
-    gp_Ax3 aAx3 = aCyl.Position();
-    double aR1 = aCyl.Radius();
-
-    double aUMin, aUMax, aVMin, aVMax;
-    BRepTools::UVBounds(aF, aUMin, aUMax, aVMin, aVMax);
-    double dV = aVMax - aVMin;
-
-    setCylinderType(aP0.XYZ(), aAx3.Direction().XYZ(), aR1, dV);
-  }
-  // 4. Cone
-  else if (aST == GeomAbs_Cone) {
-    gp_Cone aCone = aGAS.Cone();
-    gp_Pnt aP0 = aCone.Location();
-    gp_Ax3 aAx3 = aCone.Position();
-    double aR1 = aCone.RefRadius();
-
-    double aUMin, aUMax, aVMin, aVMax;
-    BRepTools::UVBounds(aF, aUMin, aUMax, aVMin, aVMax);
-    double aSemiAngle = fabs(aCone.SemiAngle());
-    double dV = (aVMax - aVMin)*cos(aSemiAngle);
-    double aR2 = aR1 - (aVMax - aVMin)*sin(aSemiAngle);
-
-    setConeType(aP0.XYZ(), aAx3.Direction().XYZ(), aR1, aR2, dV);
-  }
-  // 5. Torus
-  else if (aST == GeomAbs_Torus) {
-    gp_Torus aTorus = aGAS.Torus();
-    gp_Pnt aP0 = aTorus.Location();
-    gp_Ax3 aAx3 = aTorus.Position();
-    double aR1 = aTorus.MajorRadius();
-    double aR2 = aTorus.MinorRadius();
-
-    setTorusType(aP0.XYZ(), aAx3.Direction().XYZ(), aR1, aR2);
-  }
-}
-
-//********************************************************************
-void XGUI_InspectionPanel::fillSolid(const TopoDS_Shape& theShape)
-{
-  myTypeLbl->setText(tr("Solid"));
-  TopoDS_Solid aSd = TopoDS::Solid(theShape);
-  processSphere(aSd);
-}
-
-
-
-//********************************************************************
-bool IsEqual(const gp_Sphere& aSp1, const gp_Sphere& aSp2, const Standard_Real aTolLin)
-{
-  double aR1 = aSp1.Radius();
-  double aR2 = aSp2.Radius();
-  if (fabs(aR1 - aR2) > aTolLin) {
-    return false;
-  }
-  const gp_Pnt& aPC1 = aSp1.Position().Location();
-  const gp_Pnt& aPC2 = aSp2.Position().Location();
-  double aD2 = aPC1.SquareDistance(aPC2);
-  return (aD2 < (aTolLin*aTolLin));
-}
-
-
-bool XGUI_InspectionPanel::processSphere(const TopoDS_Solid& theSolid)
-{
-  gp_Sphere aSphere[2];
-  GeomAbs_SurfaceType aST;
-  Handle(Geom_Surface) aS;
-  GeomAdaptor_Surface aGAS;
-
-  double aTol = Precision::Confusion();
-  double aTolAng = Precision::Angular();
-
-  TopExp_Explorer aExp(theSolid, TopAbs_FACE);
-  int j;
-  for (j = 0; aExp.More(); aExp.Next(), ++j) {
-    const TopoDS_Face& aF = *((TopoDS_Face*)&aExp.Current());
-    aS = BRep_Tool::Surface(aF);
-    aGAS.Load(aS);
-    aST = aGAS.GetType();
-    if (aST != GeomAbs_Sphere) {
-      return false;
-    }
-    aSphere[j] = aGAS.Sphere();
-  }
-  bool bIsEqual = IsEqual(aSphere[0], aSphere[1], aTol);
-  if (!bIsEqual) {
-    return false;
-  }
-  GProp_GProps aGProps;
-  bool bOnlyClosed = false;
-  double aVolume = aSphere[0].Volume();
-  BRepGProp::VolumeProperties(theSolid, aGProps, aTol, bOnlyClosed);
-
-  double aVolumeS = aGProps.Mass();
-  if (aVolumeS < 0.) {
-    aVolumeS = -aVolumeS;
-  }
-  double dV = fabs(aVolumeS - aVolume);
-  if (dV > aTol) {
-    return false;
-  }
-  double aArea = aSphere[0].Area();
-  BRepGProp::SurfaceProperties(theSolid, aGProps, aTol);
-  double aAreaS = aGProps.Mass();
-  double dA = fabs(aAreaS - aArea);
-  if (dA > aTol) {
-    return false;
-  }
-  gp_Pnt aP0 = aSphere[0].Location();
-  double aR1 = aSphere[0].Radius();
-
-  setSphereType(aP0.XYZ(), aR1);
-
-  return true;
-}
-
-
-//********************************************************************
-void XGUI_InspectionPanel::fillContainer(const TopoDS_Shape& theShape)
-{
-  TopAbs_ShapeEnum aType = theShape.ShapeType();
-  if (aType == TopAbs_SHELL) {
-    bool aIsClosed = BRep_Tool::IsClosed(theShape);
-    myTypeLbl->setText(tr("Shell"));
-    myTypeParams->setText(aIsClosed? tr("Closed") : tr("Non-closed"));
-  } else if (aType == TopAbs_WIRE) {
-    TopoDS_Wire aW = TopoDS::Wire(theShape);
-    bool isClosed = aW.Closed();
-    myTypeLbl->setText(tr("Wire"));
-    myTypeParams->setText(isClosed ? tr("Closed") : tr("Non-closed"));
-  }
-}
-
-//********************************************************************
-#define TITLE(val) ("<b>" + val + "</b>")
-
-void XGUI_InspectionPanel::setCylinderType(const gp_XYZ& theLoc,
-  const gp_XYZ& theDir, double theRadius, double theHeight)
-{
-  myTypeLbl->setText(tr("Cylinder"));
-  QString aParams = TITLE(tr("Center")) +
-    "<br> X: " + QString::number(theLoc.X()) +
-    "<br> Y: " + QString::number(theLoc.Y()) +
-    "<br> Z: " + QString::number(theLoc.Z()) +
-    "<br>" + TITLE(tr("Axis")) +
-    "<br> DX: " + QString::number(theDir.X()) +
-    "<br> DY: " + QString::number(theDir.Y()) +
-    "<br> DZ: " + QString::number(theDir.Z()) +
-    "<br>" + TITLE(tr("Dimensions")) +
-    "<br>" + tr("Radius: ") + QString::number(theRadius) +
-    "<br>" + tr("Height: ") + QString::number(theHeight);
-
-  myTypeParams->setText(aParams);
-}
-
-//********************************************************************
-void XGUI_InspectionPanel::setSphereType(const gp_XYZ& theLoc, double theRadius)
-{
-  myTypeLbl->setText(tr("Sphere"));
-  QString aParams = TITLE(tr("Center")) +
-    "<br> X: " + QString::number(theLoc.X()) +
-    "<br> Y: " + QString::number(theLoc.Y()) +
-    "<br> Z: " + QString::number(theLoc.Z()) +
-    "<br>" + TITLE(tr("Dimensions")) +
-    "<br>" + tr("Radius: ") + QString::number(theRadius);
-  myTypeParams->setText(aParams);
-}
-
-//********************************************************************
-void XGUI_InspectionPanel::setBoxType(double theX, double theY, double theZ,
-  double theXsize, double theYsize, double theZsize)
-{
-  myTypeLbl->setText(tr("Box"));
-  QString aParams = TITLE(tr("Position")) +
-    "<br> X: " + QString::number(theX) +
-    "<br> Y: " + QString::number(theY) +
-    "<br> Z: " + QString::number(theZ) +
-    "<br>" + TITLE(tr("Dimensions")) +
-    "<br>" + "Ax :" + QString::number(theXsize) +
-    "<br>" + "Ay :" + QString::number(theYsize) +
-    "<br>" + "Az :" + QString::number(theZsize);
-  myTypeParams->setText(aParams);
-}
-
-//********************************************************************
-void XGUI_InspectionPanel::setRotatedBoxType(double theX, double theY, double theZ,
-  double theZaxisX, double theZaxisY, double theZaxisZ,
-  double theXaxisX, double theXaxisY, double theXaxisZ,
-  double theXsize, double theYsize, double theZsize)
-{
-  myTypeLbl->setText(tr("Box"));
-  QString aParams = TITLE(tr("Position")) +
-    "<br> X: " + QString::number(theX) +
-    "<br> Y: " + QString::number(theY) +
-    "<br> Z: " + QString::number(theZ) +
-    "<br>" + TITLE(tr("Z axis")) +
-    "<br> DX: " + QString::number(theZaxisX) +
-    "<br> DY: " + QString::number(theZaxisY) +
-    "<br> DZ: " + QString::number(theZaxisZ) +
-    "<br>" + TITLE(tr("X axis")) +
-    "<br> DX: " + QString::number(theXaxisX) +
-    "<br> DY: " + QString::number(theXaxisY) +
-    "<br> DZ: " + QString::number(theXaxisZ) +
-    "<br>" + TITLE(tr("Dimensions")) +
-    "<br>" + "Ax :" + QString::number(theXsize) +
-    "<br>" + "Ay :" + QString::number(theYsize) +
-    "<br>" + "Az :" + QString::number(theZsize);
-  myTypeParams->setText(aParams);
-}
-
-//********************************************************************
-void XGUI_InspectionPanel::setPlaneType(const gp_XYZ& theLoc, const gp_XYZ& theDir)
-{
-  myTypeLbl->setText(tr("Plane"));
-  QString aParams = TITLE(tr("Center")) +
-    "<br> X: " + QString::number(theLoc.X()) +
-    "<br> Y: " + QString::number(theLoc.Y()) +
-    "<br> Z: " + QString::number(theLoc.Z()) +
-    "<br>" + TITLE(tr("Normal")) +
-    "<br> DX: " + QString::number(theDir.X()) +
-    "<br> DY: " + QString::number(theDir.Y()) +
-    "<br> DZ: " + QString::number(theDir.Z());
-  myTypeParams->setText(aParams);
-}
-
-//********************************************************************
-void XGUI_InspectionPanel::setVertexType(const gp_XYZ& theLoc)
-{
   myTypeLbl->setText(tr("Vertex"));
-  QString aParams = TITLE(tr("Coordinates")) +
-    "<br> X: " + QString::number(theLoc.X()) +
-    "<br> Y: " + QString::number(theLoc.Y()) +
-    "<br> Z: " + QString::number(theLoc.Z());
+
+  QString aParams;
+  appendPointToParameters(tr("Coordinates"), aPoint, aParams);
   myTypeParams->setText(aParams);
 }
 
 //********************************************************************
-void XGUI_InspectionPanel::setCircleType(const gp_XYZ& theLoc, const gp_XYZ& theDir,
-  double theRadius)
+void XGUI_InspectionPanel::fillEdge(const GeomEdgePtr& theEdge)
 {
-  myTypeLbl->setText(tr("Circle"));
-  QString aParams = TITLE(tr("Center")) +
-    "<br> X: " + QString::number(theLoc.X()) +
-    "<br> Y: " + QString::number(theLoc.Y()) +
-    "<br> Z: " + QString::number(theLoc.Z()) +
-    "<br>" + TITLE(tr("Normal")) +
-    "<br> DX: " + QString::number(theDir.X()) +
-    "<br> DY: " + QString::number(theDir.Y()) +
-    "<br> DZ: " + QString::number(theDir.Z()) +
-    "<br>" + TITLE(tr("Dimensions")) +
-    "<br>" + tr("Radius: ") + QString::number(theRadius);
+  QString aParams;
+  if (theEdge->isDegenerated())
+    appendNamedValueToParameters(tr("Degenerated"), true, aParams);
+
+  GeomPointPtr aStartPnt = theEdge->firstPoint();
+  GeomPointPtr aEndPnt = theEdge->lastPoint();
+  bool addStartEndPoints = false;
+
+  if (theEdge->isLine()) {
+    myTypeLbl->setText(tr("Line segment"));
+    addStartEndPoints = true;
+  }
+  else {
+    GeomCirclePtr aCircle = theEdge->circle();
+    if (aCircle) {
+      addStartEndPoints = aStartPnt->distance(aEndPnt) >= Precision::Confusion();
+      if (addStartEndPoints)
+        myTypeLbl->setText("Arc of circle");
+      else
+        myTypeLbl->setText("Circle");
+
+      appendPointToParameters(tr("Center"), aCircle->center(), aParams);
+      appendDirToParameters(tr("Normal"), aCircle->normal(), aParams);
+      appendGroupNameToParameters(tr("Dimensions"), aParams);
+      appendNamedValueToParameters(tr("Radius"), aCircle->radius(), aParams);
+    }
+    else {
+      GeomEllipsePtr anEllipse = theEdge->ellipse();
+      if (anEllipse) {
+        addStartEndPoints = aStartPnt->distance(aEndPnt) >= Precision::Confusion();
+        if (addStartEndPoints)
+          myTypeLbl->setText("Arc of ellipse");
+        else
+          myTypeLbl->setText("Ellipse");
+
+        appendPointToParameters(tr("Center"), anEllipse->center(), aParams);
+        appendDirToParameters(tr("Normal"), anEllipse->normal(), aParams);
+        appendGroupNameToParameters(tr("Dimensions"), aParams);
+        appendNamedValueToParameters(tr("Major radius"), anEllipse->majorRadius(), aParams);
+        appendNamedValueToParameters(tr("Minor radius"), anEllipse->minorRadius(), aParams);
+      }
+      else
+        // Common case
+        myTypeLbl->setText(tr("Edge"));
+    }
+  }
+
+  if (addStartEndPoints) {
+    appendPointToParameters(tr("Start point"), aStartPnt, aParams);
+    appendPointToParameters(tr("End point"), aEndPnt, aParams);
+  }
   myTypeParams->setText(aParams);
 }
 
 //********************************************************************
-void XGUI_InspectionPanel::setArcType(const gp_XYZ& theLoc, const gp_XYZ& theDir,
-  double theRadius, const gp_XYZ& theP1, const gp_XYZ& theP2)
+void XGUI_InspectionPanel::fillWire(const GeomWirePtr& theWire)
 {
-  myTypeLbl->setText(tr("Arc"));
-  QString aParams = TITLE(tr("Center")) +
-    "<br> X: " + QString::number(theLoc.X()) +
-    "<br> Y: " + QString::number(theLoc.Y()) +
-    "<br> Z: " + QString::number(theLoc.Z()) +
-    "<br>" + TITLE(tr("Normal")) +
-    "<br> DX: " + QString::number(theDir.X()) +
-    "<br> DY: " + QString::number(theDir.Y()) +
-    "<br> DZ: " + QString::number(theDir.Z()) +
-    "<br>" + TITLE(tr("Dimensions")) +
-    "<br>" + tr("Radius:") + QString::number(theRadius) +
-    "<br>" + TITLE(tr("Point 1")) +
-    "<br> X: " + QString::number(theP1.X()) +
-    "<br> Y: " + QString::number(theP1.Y()) +
-    "<br> Z: " + QString::number(theP1.Z()) +
-    "<br>" + TITLE(tr("Point 2")) +
-    "<br> X: " + QString::number(theP2.X()) +
-    "<br> Y: " + QString::number(theP2.Y()) +
-    "<br> Z: " + QString::number(theP2.Z());
+  QString aParams;
+  appendNamedValueToParameters(tr("Closed"), theWire->isClosed(), aParams);
+
+  // check the wire is a polygon
+  std::list<GeomPointPtr> aPolygonPoints;
+  if (theWire->isPolygon(aPolygonPoints)) {
+    myTypeLbl->setText(tr("Polygon"));
+    int aCornerIndex = 0;
+    for (std::list<GeomPointPtr>::const_iterator aPtIt = aPolygonPoints.begin();
+         aPtIt != aPolygonPoints.end(); ++aPtIt)
+       appendPointToParameters(tr("Point") + " " + QString::number(++aCornerIndex),
+                               *aPtIt, aParams);
+  }
+  else
+    myTypeLbl->setText(tr("Wire"));
+
   myTypeParams->setText(aParams);
 }
 
 //********************************************************************
-void XGUI_InspectionPanel::setEllipseType(const gp_XYZ& theLoc, const gp_XYZ& theDir,
-  double theMajorRad, double theMinorRad)
+void XGUI_InspectionPanel::fillFace(const GeomFacePtr& theFace)
 {
-  myTypeLbl->setText(tr("Ellipse"));
-  QString aParams = TITLE(tr("Center")) +
-    "<br> X: " + QString::number(theLoc.X()) +
-    "<br> Y: " + QString::number(theLoc.Y()) +
-    "<br> Z: " + QString::number(theLoc.Z()) +
-    "<br>" + TITLE(tr("Normal")) +
-    "<br> DX: " + QString::number(theDir.X()) +
-    "<br> DY: " + QString::number(theDir.Y()) +
-    "<br> DZ: " + QString::number(theDir.Z()) +
-    "<br>" + TITLE(tr("Dimensions")) +
-    "<br>" + tr("Major radius: ") + QString::number(theMajorRad) +
-    "<br>" + tr("Minor radius: ") + QString::number(theMinorRad);
-  myTypeParams->setText(aParams);
+  QString aParams;
+  // 1. Plane and planar faces
+  GeomPlanePtr aPlane = theFace->getPlane();
+  if (aPlane) {
+    bool isCommonCase = true;
+    // Check face bounded by circle or ellipse
+    std::list<GeomShapePtr> aSubs = theFace->subShapes(GeomAPI_Shape::EDGE);
+    if (aSubs.size() == 1) {
+      GeomEdgePtr anEdge = aSubs.front()->edge();
+      if (anEdge->isCircle() || anEdge->isEllipse()) {
+        fillEdge(anEdge);
+        isCommonCase = false;
+      }
+    }
+    else {
+      // Check face bounded by a single wire which is rectangle
+      aSubs = theFace->subShapes(GeomAPI_Shape::WIRE);
+      if (aSubs.size() == 1) {
+        GeomWirePtr aWire = aSubs.front()->wire();
+        std::list<GeomPointPtr> aCorners;
+        if (aWire->isRectangle(aCorners)) {
+          GeomPointPtr aBaseCorner = aCorners.front();
+          aCorners.pop_front();
+
+          double aWidth = aBaseCorner->distance(aCorners.front());
+          double aHeight = aBaseCorner->distance(aCorners.back());
+
+          myTypeLbl->setText(tr("Rectangle"));
+          appendPointToParameters(tr("Corner"), aBaseCorner, aParams);
+          appendDirToParameters(tr("Normal"), aPlane->direction(), aParams);
+          appendGroupNameToParameters(tr("Dimensions"), aParams);
+          appendNamedValueToParameters(tr("Width"), aWidth, aParams);
+          appendNamedValueToParameters(tr("Height"), aHeight, aParams);
+          myTypeParams->setText(aParams);
+
+          isCommonCase = false;
+        }
+      }
+    }
+
+    if (isCommonCase)
+      setPlaneType(tr("Plane"), aPlane);
+  }
+  else {
+    // 2. Sphere
+    GeomSpherePtr aSphere = theFace->getSphere();
+    if (aSphere)
+      setSphereType(tr("Sphere"), aSphere);
+    else {
+      // 3. Cylinder
+      GeomCylinderPtr aCylinder = theFace->getCylinder();
+      if (aCylinder)
+        setCylinderType(tr("Cylinder"), aCylinder);
+      else {
+        // 4. Cone
+        GeomConePtr aCone = theFace->getCone();
+        if (aCone)
+          setConeType(tr("Cone"), aCone);
+        else {
+          // 5. Torus
+          GeomTorusPtr aTorus = theFace->getTorus();
+          if (aTorus)
+            setTorusType(tr("Torus"), aTorus);
+          else
+            // 6. Common case
+            myTypeLbl->setText(tr("Face"));
+        }
+      }
+    }
+  }
 }
 
 //********************************************************************
-void XGUI_InspectionPanel::setEllipseArcType(const gp_XYZ& theLoc, const gp_XYZ& theDir,
-  double theMajorRad, double theMinorRad, const gp_XYZ& theP1, const gp_XYZ& theP2)
+void XGUI_InspectionPanel::fillShell(const GeomShellPtr& theShell)
 {
-  myTypeLbl->setText(tr("Elliptical arc"));
-  QString aParams = TITLE(tr("Center")) +
-    "<br> X: " + QString::number(theLoc.X()) +
-    "<br> Y: " + QString::number(theLoc.Y()) +
-    "<br> Z: " + QString::number(theLoc.Z()) +
-    "<br>" + TITLE(tr("Normal")) +
-    "<br> DX: " + QString::number(theDir.X()) +
-    "<br> DY: " + QString::number(theDir.Y()) +
-    "<br> DZ: " + QString::number(theDir.Z()) +
-    "<br>" + TITLE(tr("Dimensions")) +
-    "<br>" + tr("Major radius:") + QString::number(theMajorRad) +
-    "<br>" + tr("Minor radius:") + QString::number(theMinorRad) +
-    "<br>" + TITLE(tr("Point 1")) +
-    "<br> X: " + QString::number(theP1.X()) +
-    "<br> Y: " + QString::number(theP1.Y()) +
-    "<br> Z: " + QString::number(theP1.Z()) +
-    "<br>" + TITLE(tr("Point 2")) +
-    "<br> X: " + QString::number(theP2.X()) +
-    "<br> Y: " + QString::number(theP2.Y()) +
-    "<br> Z: " + QString::number(theP2.Z());
+  // 1. Sphere
+  GeomSpherePtr aSphere = theShell->getSphere();
+  if (aSphere)
+    setSphereType(tr("Sphere"), aSphere);
+  else {
+    // 2. Cylinder
+    GeomCylinderPtr aCylinder = theShell->getCylinder();
+    if (aCylinder)
+      setCylinderType(tr("Cylinder"), aCylinder);
+    else {
+      // 3. Cone
+      GeomConePtr aCone = theShell->getCone();
+      if (aCone)
+        setConeType(tr("Cone"), aCone);
+      else {
+        // 4. Torus
+        GeomTorusPtr aTorus = theShell->getTorus();
+        if (aTorus)
+          setTorusType(tr("Torus"), aTorus);
+        else {
+          // 5. Axis-aligned/Rotated Box
+          GeomBoxPtr aBox = theShell->getParallelepiped();
+          if (aBox) {
+            if (aBox->isAxesAligned())
+              setBoxType(tr("Box"), aBox);
+            else
+              setRotatedBoxType(tr("Rotated Box"), aBox);
+          }
+          else
+            // 6. Common case
+            myTypeLbl->setText(tr("Shell"));
+        }
+      }
+    }
+  }
+}
+
+//********************************************************************
+void XGUI_InspectionPanel::fillSolid(const GeomSolidPtr& theSolid)
+{
+  // 1. Sphere
+  GeomSpherePtr aSphere = theSolid->getSphere();
+  if (aSphere)
+    setSphereType(tr("Sphere"), aSphere);
+  else {
+    // 2. Cylinder
+    GeomCylinderPtr aCylinder = theSolid->getCylinder();
+    if (aCylinder)
+      setCylinderType(tr("Cylinder"), aCylinder);
+    else {
+      // 3. Cone
+      GeomConePtr aCone = theSolid->getCone();
+      if (aCone)
+        setConeType(tr("Cone"), aCone);
+      else {
+        // 4. Torus
+        GeomTorusPtr aTorus = theSolid->getTorus();
+        if (aTorus)
+          setTorusType(tr("Torus"), aTorus);
+        else {
+          // 5. Axis-aligned/Rotated Box
+          GeomBoxPtr aBox = theSolid->getParallelepiped();
+          if (aBox) {
+            if (aBox->isAxesAligned())
+              setBoxType(tr("Box"), aBox);
+            else
+              setRotatedBoxType(tr("Rotated Box"), aBox);
+          }
+          else
+            // 6. Common case
+            myTypeLbl->setText(tr("Solid"));
+        }
+      }
+    }
+  }
+}
+
+//********************************************************************
+void XGUI_InspectionPanel::fillContainer(const GeomShapePtr& theShape)
+{
+  if (theShape->shapeType() == GeomAPI_Shape::COMPSOLID)
+    myTypeLbl->setText("CompSolid");
+  else if (theShape->shapeType() == GeomAPI_Shape::COMPOUND)
+    myTypeLbl->setText("Compound");
+
+  // fill bounding box
+  Bnd_Box aBB;
+  BRepBndLib::Add(theShape->impl<TopoDS_Shape>(), aBB);
+
+  gp_Pnt aMinPnt = aBB.CornerMin();
+  GeomPointPtr aMinPoint(new GeomAPI_Pnt(aMinPnt.X(), aMinPnt.Y(), aMinPnt.Z()));
+
+  gp_Pnt aMaxPnt = aBB.CornerMax();
+  GeomPointPtr aMaxPoint(new GeomAPI_Pnt(aMaxPnt.X(), aMaxPnt.Y(), aMaxPnt.Z()));
+
+  QString aParams;
+  appendGroupNameToParameters(tr("Bounding box"), aParams);
+  appendPointToParameters(tr("Minimal corner"), aMinPoint, aParams);
+  appendPointToParameters(tr("Maximal corner"), aMaxPoint, aParams);
+}
+
+void XGUI_InspectionPanel::setPlaneType(const QString& theTitle,
+                                        const std::shared_ptr<GeomAPI_Pln>& thePlane)
+{
+  myTypeLbl->setText(theTitle);
+  QString aParams;
+  appendPointToParameters(tr("Origin"), thePlane->location(), aParams);
+  appendDirToParameters(tr("Normal"), thePlane->direction(), aParams);
   myTypeParams->setText(aParams);
 }
 
-void XGUI_InspectionPanel::setLineType(const gp_XYZ& theP1, const gp_XYZ& theP2)
+void XGUI_InspectionPanel::setSphereType(const QString& theTitle,
+                                         const std::shared_ptr<GeomAPI_Sphere>& theSphere)
 {
-  myTypeLbl->setText(tr("Line"));
-  QString aParams = TITLE(tr("Point 1")) +
-    "<br> X: " + QString::number(theP1.X()) +
-    "<br> Y: " + QString::number(theP1.Y()) +
-    "<br> Z: " + QString::number(theP1.Z()) +
-    "<br>" + TITLE(tr("Point 2")) +
-    "<br> X: " + QString::number(theP2.X()) +
-    "<br> Y: " + QString::number(theP2.Y()) +
-    "<br> Z: " + QString::number(theP2.Z());
+  myTypeLbl->setText(theTitle);
+  QString aParams;
+  appendPointToParameters(tr("Center"), theSphere->center(), aParams);
+  appendGroupNameToParameters(tr("Dimensions"), aParams);
+  appendNamedValueToParameters(tr("Radius"), theSphere->radius(), aParams);
   myTypeParams->setText(aParams);
 }
 
-void XGUI_InspectionPanel::setConeType(const gp_XYZ& theLoc, const gp_XYZ& theDir,
-  double theRad1, double theRad2, double theHeight)
+void XGUI_InspectionPanel::setCylinderType(const QString& theTitle,
+                                           const std::shared_ptr<GeomAPI_Cylinder>& theCyl)
 {
-  myTypeLbl->setText(tr("Cone"));
-  QString aParams = TITLE(tr("Center")) +
-    "<br> X: " + QString::number(theLoc.X()) +
-    "<br> Y: " + QString::number(theLoc.Y()) +
-    "<br> Z: " + QString::number(theLoc.Z()) +
-    "<br>" + TITLE(tr("Axis")) +
-    "<br> DX: " + QString::number(theDir.X()) +
-    "<br> DY: " + QString::number(theDir.Y()) +
-    "<br> DZ: " + QString::number(theDir.Z()) +
-    "<br>" + TITLE(tr("Dimensions")) +
-    "<br>" + tr("Radius 1: ") + QString::number(theRad1) +
-    "<br>" + tr("Radius 2: ") + QString::number(theRad2) +
-    "<br>" + tr("Height: ") + QString::number(theHeight);
-
+  myTypeLbl->setText(theTitle);
+  QString aParams;
+  appendPointToParameters(tr("Position"), theCyl->location(), aParams);
+  appendDirToParameters(tr("Axis"), theCyl->axis(), aParams);
+  appendGroupNameToParameters(tr("Dimensions"), aParams);
+  appendNamedValueToParameters(tr("Radius"), theCyl->radius(), aParams);
+  appendNamedValueToParameters(tr("Height"), theCyl->height(), aParams);
   myTypeParams->setText(aParams);
 }
 
-void XGUI_InspectionPanel::setTorusType(const gp_XYZ& theLoc, const gp_XYZ& theDir,
-  double theRad1, double theRad2)
+void XGUI_InspectionPanel::setConeType(const QString& theTitle,
+                                       const std::shared_ptr<GeomAPI_Cone>& theCone)
 {
-  myTypeLbl->setText(tr("Torus"));
-  QString aParams = TITLE(tr("Center")) +
-    "<br> X: " + QString::number(theLoc.X()) +
-    "<br> Y: " + QString::number(theLoc.Y()) +
-    "<br> Z: " + QString::number(theLoc.Z()) +
-    "<br>" + TITLE(tr("Axis")) +
-    "<br> DX: " + QString::number(theDir.X()) +
-    "<br> DY: " + QString::number(theDir.Y()) +
-    "<br> DZ: " + QString::number(theDir.Z()) +
-    "<br>" + TITLE(tr("Dimensions")) +
-    "<br>" + tr("Radius 1: ") + QString::number(theRad1) +
-    "<br>" + tr("Radius 2: ") + QString::number(theRad2);
+  myTypeLbl->setText(theTitle);
+  QString aParams;
+  appendPointToParameters(tr("Position"), theCone->location(), aParams);
+  appendDirToParameters(tr("Axis"), theCone->axis(), aParams);
+  appendGroupNameToParameters(tr("Dimensions"), aParams);
+  appendNamedValueToParameters(tr("Radius 1"), theCone->radius1(), aParams);
+  appendNamedValueToParameters(tr("Radius 2"), theCone->radius2(), aParams);
+  appendNamedValueToParameters(tr("Height"), theCone->height(), aParams);
+  myTypeParams->setText(aParams);
+}
 
+void XGUI_InspectionPanel::setTorusType(const QString& theTitle,
+                                        const std::shared_ptr<GeomAPI_Torus>& theTorus)
+{
+  myTypeLbl->setText(theTitle);
+  QString aParams;
+  appendPointToParameters(tr("Center"), theTorus->center(), aParams);
+  appendDirToParameters(tr("Axis"), theTorus->direction(), aParams);
+  appendGroupNameToParameters(tr("Dimensions"), aParams);
+  appendNamedValueToParameters(tr("Major radius"), theTorus->majorRadius(), aParams);
+  appendNamedValueToParameters(tr("Minor radius"), theTorus->minorRadius(), aParams);
+  myTypeParams->setText(aParams);
+}
+
+void XGUI_InspectionPanel::setBoxType(const QString& theTitle,
+                                      const std::shared_ptr<GeomAPI_Box>& theBox)
+{
+  myTypeLbl->setText(theTitle);
+  QString aParams;
+  appendPointToParameters(tr("Position"), theBox->axes()->origin(), aParams);
+  appendGroupNameToParameters(tr("Dimensions"), aParams);
+  appendNamedValueToParameters(tr("Width"), theBox->width(), aParams);
+  appendNamedValueToParameters(tr("Depth"), theBox->depth(), aParams);
+  appendNamedValueToParameters(tr("Height"), theBox->height(), aParams);
+  myTypeParams->setText(aParams);
+}
+
+void XGUI_InspectionPanel::setRotatedBoxType(const QString& theTitle,
+                                             const std::shared_ptr<GeomAPI_Box>& theBox)
+{
+  myTypeLbl->setText(theTitle);
+  QString aParams;
+  std::shared_ptr<GeomAPI_Ax3> anAxes = theBox->axes();
+  appendPointToParameters(tr("Position"), anAxes->origin(), aParams);
+  appendDirToParameters(tr("Z axis"), anAxes->normal(), aParams);
+  appendDirToParameters(tr("X axis"), anAxes->dirX(), aParams);
+  appendGroupNameToParameters(tr("Dimensions"), aParams);
+  appendNamedValueToParameters(tr("Width"), theBox->width(), aParams);
+  appendNamedValueToParameters(tr("Depth"), theBox->depth(), aParams);
+  appendNamedValueToParameters(tr("Height"), theBox->height(), aParams);
   myTypeParams->setText(aParams);
 }

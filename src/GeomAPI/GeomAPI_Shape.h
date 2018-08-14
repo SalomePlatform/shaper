@@ -27,6 +27,13 @@
 #include <memory>
 #include <list>
 
+class GeomAPI_Vertex;
+class GeomAPI_Edge;
+class GeomAPI_Wire;
+class GeomAPI_Face;
+class GeomAPI_Shell;
+class GeomAPI_Solid;
+
 /**\class GeomAPI_Shape
  * \ingroup DataModel
  * \brief Interface to the topological shape object
@@ -86,6 +93,10 @@ public:
   GEOMAPI_EXPORT
   virtual bool isFace() const;
 
+  /// Returns whether the shape is a shell
+  GEOMAPI_EXPORT
+  virtual bool isShell() const;
+
   /// Returns whether the shape is a compound
   GEOMAPI_EXPORT
   virtual bool isCompound() const;
@@ -109,6 +120,34 @@ public:
   /// Returns whether the shape is planar
   GEOMAPI_EXPORT
   virtual bool isPlanar() const;
+
+  /// Returns vertex or empty shape
+  GEOMAPI_EXPORT
+  std::shared_ptr<GeomAPI_Vertex> vertex() const;
+
+  /// Returns edge or empty shape
+  GEOMAPI_EXPORT
+  std::shared_ptr<GeomAPI_Edge> edge() const;
+
+  /// Returns wire or empty shape
+  GEOMAPI_EXPORT
+  std::shared_ptr<GeomAPI_Wire> wire() const;
+
+  /// Returns face or empty shape
+  GEOMAPI_EXPORT
+  std::shared_ptr<GeomAPI_Face> face() const;
+
+  /// Returns shell or empty shape
+  GEOMAPI_EXPORT
+  std::shared_ptr<GeomAPI_Shell> shell() const;
+
+  /// Returns solid or empty shape
+  GEOMAPI_EXPORT
+  std::shared_ptr<GeomAPI_Solid> solid() const;
+
+  /// Returns list of sub-shapes of the given type
+  GEOMAPI_EXPORT
+  std::list<std::shared_ptr<GeomAPI_Shape> > subShapes(ShapeType theSubShapeType) const;
 
   /// Returns the shape type
   GEOMAPI_EXPORT

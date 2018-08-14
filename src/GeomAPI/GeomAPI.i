@@ -63,6 +63,9 @@
 %shared_ptr(GeomAPI_XYZ)
 %shared_ptr(GeomAPI_Trsf)
 %shared_ptr(GeomAPI_Wire)
+%shared_ptr(GeomAPI_Shell)
+%shared_ptr(GeomAPI_Solid)
+%shared_ptr(GeomAPI_Box)
 
 
 // all supported interfaces
@@ -96,3 +99,6 @@
 %include "GeomAPI_XYZ.h"
 %include "GeomAPI_Trsf.h"
 %include "GeomAPI_Wire.h"
+%include "GeomAPI_Shell.h"
+%include "GeomAPI_Solid.h"
+%include "GeomAPI_Box.h"

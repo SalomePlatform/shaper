@@ -23,16 +23,32 @@
 
 #include "XGUI.h"
 
-#include <TopoDS_Shape.hxx>
-#include <TopoDS_Solid.hxx>
-
 #include <QDockWidget>
+
+#include <memory>
 
 class XGUI_SelectionMgr;
 class QLineEdit;
 class QTableWidget;
 class QLabel;
 class QTextBrowser;
+
+class TopoDS_Shape;
+
+class GeomAPI_Vertex;
+class GeomAPI_Edge;
+class GeomAPI_Wire;
+class GeomAPI_Face;
+class GeomAPI_Shell;
+class GeomAPI_Solid;
+class GeomAPI_Shape;
+
+class GeomAPI_Pln;
+class GeomAPI_Sphere;
+class GeomAPI_Cylinder;
+class GeomAPI_Cone;
+class GeomAPI_Torus;
+class GeomAPI_Box;
 
 /// Internal name of property panel widget
 const static char* INSPECTION_PANEL = "inspection_panel_dock";
@@ -68,60 +84,41 @@ private:
 
   void setName(const QString& theName);
 
-  // Set type parameters
-  void setCylinderType(const gp_XYZ& theLoc, const gp_XYZ& theDir,
-    double theRadius, double theHeight);
-
-  void setConeType(const gp_XYZ& theLoc, const gp_XYZ& theDir,
-    double theRad1, double theRad2, double theHeight);
-
-  void setTorusType(const gp_XYZ& theLoc, const gp_XYZ& theDir,
-    double theRad1, double theRad2);
-
-  void setSphereType(const gp_XYZ& theLoc, double theRadius);
-
-  void setBoxType(double theX, double theY, double theZ,
-    double theXsize, double theYsize, double theZsize);
-
-  void setRotatedBoxType(double theX, double theY, double theZ,
-    double theZaxisX, double theZaxisY, double theZaxisZ,
-    double theXaxisX, double theXaxisY, double theXaxisZ,
-    double theXsize, double theYsize, double theZsize);
-
-  void setPlaneType(const gp_XYZ& theLoc, const gp_XYZ& theDir);
-
-  void setVertexType(const gp_XYZ& theLoc);
-
-  void setCircleType(const gp_XYZ& theLoc, const gp_XYZ& theDir, double theRadius);
-
-  void setArcType(const gp_XYZ& theLoc, const gp_XYZ& theDir, double theRadius,
-    const gp_XYZ& theP1, const gp_XYZ& theP2);
-
-  void setEllipseType(const gp_XYZ& theLoc, const gp_XYZ& theDir,
-    double theMajorRad, double theMinorRad);
-
-  void setEllipseArcType(const gp_XYZ& theLoc, const gp_XYZ& theDir,
-    double theMajorRad, double theMinorRad, const gp_XYZ& theP1, const gp_XYZ& theP2);
-
-  void setLineType(const gp_XYZ& theP1, const gp_XYZ& theP2);
-
   void setShapeContent(const TopoDS_Shape& theShape);
 
   void setShapeParams(const TopoDS_Shape& theShape);
 
   void clearContent();
 
-  void fillVertex(const TopoDS_Shape& theShape);
 
-  void fillEdge(const TopoDS_Shape& theShape);
+  void fillVertex(const std::shared_ptr<GeomAPI_Vertex>& theVertex);
 
-  void fillFace(const TopoDS_Shape& theShape);
+  void fillEdge(const std::shared_ptr<GeomAPI_Edge>& theEdge);
 
-  void fillSolid(const TopoDS_Shape& theShape);
+  void fillWire(const std::shared_ptr<GeomAPI_Wire>& theWire);
 
-  void fillContainer(const TopoDS_Shape& theShape);
+  void fillFace(const std::shared_ptr<GeomAPI_Face>& theFace);
 
-  bool processSphere(const TopoDS_Solid& theSolid);
+  void fillShell(const std::shared_ptr<GeomAPI_Shell>& theShell);
+
+  void fillSolid(const std::shared_ptr<GeomAPI_Solid>& theSolid);
+
+  void fillContainer(const std::shared_ptr<GeomAPI_Shape>& theShape);
+
+
+  void setPlaneType(const QString& theTitle, const std::shared_ptr<GeomAPI_Pln>& thePlane);
+
+  void setSphereType(const QString& theTitle, const std::shared_ptr<GeomAPI_Sphere>& theSphere);
+
+  void setCylinderType(const QString& theTitle, const std::shared_ptr<GeomAPI_Cylinder>& theCyl);
+
+  void setConeType(const QString& theTitle, const std::shared_ptr<GeomAPI_Cone>& theCone);
+
+  void setTorusType(const QString& theTitle, const std::shared_ptr<GeomAPI_Torus>& theTorus);
+
+  void setBoxType(const QString& theTitle, const std::shared_ptr<GeomAPI_Box>& theBox);
+
+  void setRotatedBoxType(const QString& theTitle, const std::shared_ptr<GeomAPI_Box>& theBox);
 
 private:
   XGUI_SelectionMgr* mySelectionMgr;

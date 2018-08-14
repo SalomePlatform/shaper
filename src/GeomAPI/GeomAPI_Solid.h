@@ -1,4 +1,4 @@
-// Copyright (C) 2014-2017  CEA/DEN, EDF R&D
+// Copyright (C) 2018-20xx  CEA/DEN, EDF R&D
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -18,59 +18,49 @@
 // email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com>
 //
 
-#ifndef GeomAPI_Face_H_
-#define GeomAPI_Face_H_
+#ifndef GeomAPI_Solid_H_
+#define GeomAPI_Solid_H_
 
 #include <GeomAPI_Shape.h>
 
-class GeomAPI_Pln;
 class GeomAPI_Sphere;
 class GeomAPI_Cylinder;
 class GeomAPI_Cone;
 class GeomAPI_Torus;
+class GeomAPI_Box;
 
-/**\class GeomAPI_Face
-* \ingroup DataModel
- * \brief Interface to the face object
- */
-class GeomAPI_Face : public GeomAPI_Shape
+/// \class GeomAPI_Solid
+/// \ingroup DataModel
+/// \brief Interface to the solid object
+class GeomAPI_Solid: public GeomAPI_Shape
 {
 public:
-  /// Creation of empty (null) shape
-  GEOMAPI_EXPORT
-  GeomAPI_Face();
+  /// Makes an undefined solid.
+  GEOMAPI_EXPORT GeomAPI_Solid();
 
-  /// Creation of face by the face-shape
-  GEOMAPI_EXPORT
-  GeomAPI_Face(const std::shared_ptr<GeomAPI_Shape>& theShape);
+  /// Creation of solid by the solid-shape
+  GEOMAPI_EXPORT GeomAPI_Solid(const std::shared_ptr<GeomAPI_Shape>& theShape);
 
-  /// Returns true if the current face is geometrically equal to the given face
-  GEOMAPI_EXPORT
-  virtual bool isEqual(const std::shared_ptr<GeomAPI_Shape> theFace) const;
-
-  /// Returns true if the face is a cylindrical face
-  GEOMAPI_EXPORT
-  bool isCylindrical() const;
-
-  /// Returns the base plane of the face (if it is planar) with location in the center of the face
-  GEOMAPI_EXPORT
-  std::shared_ptr<GeomAPI_Pln> getPlane() const;
-
-  /// Returns sphere if the face is based on the spherical surface
+  /// Returns sphere if the solid is only bounded by faces
+  /// which are based on the same spherical surface
   GEOMAPI_EXPORT std::shared_ptr<GeomAPI_Sphere> getSphere() const;
 
-  /// Returns cylinder if the face is based on the cylindrical surface
+  /// Returns cylinder if the solid is bounded by faces based on the same cylindrical surface
+  /// and a pair of parallel planar faces
   GEOMAPI_EXPORT std::shared_ptr<GeomAPI_Cylinder> getCylinder() const;
 
-  /// Returns cone if the face is based on the conical surface
+  /// Returns cone if the solid is bounded by faces based on the same conical surface
+  /// and a pair of parallel planar faces
   GEOMAPI_EXPORT std::shared_ptr<GeomAPI_Cone> getCone() const;
 
-  /// Returns torus if the face is based on the toroidal surface
+  /// Returns torus if the shell solid is only bounded by faces
+  /// which are based on the same toroidal surface
   GEOMAPI_EXPORT std::shared_ptr<GeomAPI_Torus> getTorus() const;
+
+  /// Returns box if the solid is bounded by 6 rectangular faces composing a box
+  GEOMAPI_EXPORT std::shared_ptr<GeomAPI_Box> getParallelepiped() const;
 };
 
-//! Pointer on attribute object
-typedef std::shared_ptr<GeomAPI_Face> GeomFacePtr;
+typedef std::shared_ptr<GeomAPI_Solid> GeomSolidPtr;
 
 #endif
-

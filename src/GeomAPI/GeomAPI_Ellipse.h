@@ -28,8 +28,9 @@
 #include <GeomAPI_Interface.h>
 #include <memory>
 
-class GeomAPI_Pnt;
 class GeomAPI_Ax2;
+class GeomAPI_Dir;
+class GeomAPI_Pnt;
 
 
 /**\class GeomAPI_Ellipse
@@ -61,6 +62,9 @@ public:
 
   /// Returns second focus of the ellipse
   GEOMAPI_EXPORT std::shared_ptr<GeomAPI_Pnt> secondFocus() const;
+
+  /// Return orthogonal direction to the ellipse's plane
+  GEOMAPI_EXPORT std::shared_ptr<GeomAPI_Dir> normal() const;
 
   /// Returns minor radius of the ellipse
   GEOMAPI_EXPORT double minorRadius() const;

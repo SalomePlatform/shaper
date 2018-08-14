@@ -60,7 +60,14 @@ SET(PROJECT_HEADERS
     GeomAPI_Ellipse.h
     GeomAPI_Ellipse2d.h
     GeomAPI_Tools.h
-	GeomAPI_IScreenParams.h
+    GeomAPI_IScreenParams.h
+    GeomAPI_Shell.h
+    GeomAPI_Solid.h
+    GeomAPI_Sphere.h
+    GeomAPI_Cylinder.h
+    GeomAPI_Cone.h
+    GeomAPI_Torus.h
+    GeomAPI_Box.h
 )
 
 SET(PROJECT_SOURCES
@@ -99,6 +106,13 @@ SET(PROJECT_SOURCES
     GeomAPI_Ellipse.cpp
     GeomAPI_Ellipse2d.cpp
     GeomAPI_Tools.cpp
+    GeomAPI_Shell.cpp
+    GeomAPI_Solid.cpp
+    GeomAPI_Sphere.cpp
+    GeomAPI_Cylinder.cpp
+    GeomAPI_Cone.cpp
+    GeomAPI_Torus.cpp
+    GeomAPI_Box.cpp
 )
 
 SET(PROJECT_LIBRARIES

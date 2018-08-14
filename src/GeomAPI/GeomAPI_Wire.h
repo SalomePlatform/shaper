@@ -23,6 +23,8 @@
 
 #include "GeomAPI_Shape.h"
 
+class GeomAPI_Pnt;
+
 /// \class GeomAPI_Wire
 /// \ingroup DataModel
 /// \brief Interface to the wire object
@@ -34,6 +36,17 @@ public:
 
   /// Creation of wire by the wire-shape
   GEOMAPI_EXPORT GeomAPI_Wire(const std::shared_ptr<GeomAPI_Shape>& theShape);
+
+  /// Returns "closed" status of the wire
+  GEOMAPI_EXPORT bool isClosed() const;
+
+  /// Returns \c true if the wire is a polygon
+  /// \param[out] thePoints  vertices of the polygon
+  GEOMAPI_EXPORT bool isPolygon(std::list<std::shared_ptr<GeomAPI_Pnt> >& thePoints) const;
+
+  /// Returns \c true if the wire is a rectangle
+  /// \param[out] thePoints  corners of the rectangle
+  GEOMAPI_EXPORT bool isRectangle(std::list<std::shared_ptr<GeomAPI_Pnt> >& thePoints) const;
 };
 
 typedef std::shared_ptr<GeomAPI_Wire> GeomWirePtr;

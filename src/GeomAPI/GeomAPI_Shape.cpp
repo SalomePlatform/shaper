@@ -20,6 +20,13 @@
 
 #include "GeomAPI_Shape.h"
 
+#include <GeomAPI_Vertex.h>
+#include <GeomAPI_Edge.h>
+#include <GeomAPI_Wire.h>
+#include <GeomAPI_Face.h>
+#include <GeomAPI_Shell.h>
+#include <GeomAPI_Solid.h>
+
 #include <BRep_Tool.hxx>
 #include <BRepAlgoAPI_Section.hxx>
 #include <BRepBndLib.hxx>
@@ -113,6 +120,12 @@ bool GeomAPI_Shape::isFace() const
 {
   const TopoDS_Shape& aShape = const_cast<GeomAPI_Shape*>(this)->impl<TopoDS_Shape>();
   return !aShape.IsNull() && aShape.ShapeType() == TopAbs_FACE;
+}
+
+bool GeomAPI_Shape::isShell() const
+{
+  const TopoDS_Shape& aShape = const_cast<GeomAPI_Shape*>(this)->impl<TopoDS_Shape>();
+  return !aShape.IsNull() && aShape.ShapeType() == TopAbs_SHELL;
 }
 
 bool GeomAPI_Shape::isCompound() const
@@ -296,6 +309,89 @@ bool GeomAPI_Shape::isPlanar() const
   }
 
   return false;
+}
+
+std::shared_ptr<GeomAPI_Vertex> GeomAPI_Shape::vertex() const
+{
+  GeomVertexPtr aVertex;
+  if (isVertex()) {
+    const TopoDS_Shape& aShape = const_cast<GeomAPI_Shape*>(this)->impl<TopoDS_Shape>();
+    aVertex = GeomVertexPtr(new GeomAPI_Vertex);
+    aVertex->setImpl(new TopoDS_Shape(aShape));
+  }
+  return aVertex;
+}
+
+std::shared_ptr<GeomAPI_Edge> GeomAPI_Shape::edge() const
+{
+  GeomEdgePtr anEdge;
+  if (isEdge()) {
+    const TopoDS_Shape& aShape = const_cast<GeomAPI_Shape*>(this)->impl<TopoDS_Shape>();
+    anEdge = GeomEdgePtr(new GeomAPI_Edge);
+    anEdge->setImpl(new TopoDS_Shape(aShape));
+  }
+  return anEdge;
+}
+
+std::shared_ptr<GeomAPI_Wire> GeomAPI_Shape::wire() const
+{
+  GeomWirePtr aWire;
+  if (isWire()) {
+    const TopoDS_Shape& aShape = const_cast<GeomAPI_Shape*>(this)->impl<TopoDS_Shape>();
+    aWire = GeomWirePtr(new GeomAPI_Wire);
+    aWire->setImpl(new TopoDS_Shape(aShape));
+  }
+  return aWire;
+}
+
+std::shared_ptr<GeomAPI_Face> GeomAPI_Shape::face() const
+{
+  GeomFacePtr aFace;
+  if (isFace()) {
+    const TopoDS_Shape& aShape = const_cast<GeomAPI_Shape*>(this)->impl<TopoDS_Shape>();
+    aFace = GeomFacePtr(new GeomAPI_Face);
+    aFace->setImpl(new TopoDS_Shape(aShape));
+  }
+  return aFace;
+}
+
+std::shared_ptr<GeomAPI_Shell> GeomAPI_Shape::shell() const
+{
+  GeomShellPtr aShell;
+  if (isShell()) {
+    const TopoDS_Shape& aShape = const_cast<GeomAPI_Shape*>(this)->impl<TopoDS_Shape>();
+    aShell = GeomShellPtr(new GeomAPI_Shell);
+    aShell->setImpl(new TopoDS_Shape(aShape));
+  }
+  return aShell;
+}
+
+std::shared_ptr<GeomAPI_Solid> GeomAPI_Shape::solid() const
+{
+  GeomSolidPtr aSolid;
+  if (isSolid()) {
+    const TopoDS_Shape& aShape = const_cast<GeomAPI_Shape*>(this)->impl<TopoDS_Shape>();
+    aSolid = GeomSolidPtr(new GeomAPI_Solid);
+    aSolid->setImpl(new TopoDS_Shape(aShape));
+  }
+  return aSolid;
+}
+
+std::list<std::shared_ptr<GeomAPI_Shape> >
+GeomAPI_Shape::subShapes(ShapeType theSubShapeType) const
+{
+  ListOfShape aSubs;
+  const TopoDS_Shape& aShape = impl<TopoDS_Shape>();
+  if (aShape.IsNull())
+    return aSubs;
+
+  for (TopExp_Explorer anExp(aShape, (TopAbs_ShapeEnum)theSubShapeType);
+       anExp.More(); anExp.Next()) {
+    GeomShapePtr aSub(new GeomAPI_Shape);
+    aSub->setImpl(new TopoDS_Shape(anExp.Current()));
+    aSubs.push_back(aSub);
+  }
+  return aSubs;
 }
 
 GeomAPI_Shape::ShapeType GeomAPI_Shape::shapeType() const

@@ -54,6 +54,13 @@ GeomPointPtr GeomAPI_Ellipse::secondFocus() const
   return std::shared_ptr<GeomAPI_Pnt>(new GeomAPI_Pnt(aSecond.X(), aSecond.Y(), aSecond.Z()));
 }
 
+std::shared_ptr<GeomAPI_Dir> GeomAPI_Ellipse::normal() const
+{
+  const gp_Ax1& anAxis = MY_ELIPS->Axis();
+  const gp_Dir& aDir = anAxis.Direction();
+  return std::shared_ptr<GeomAPI_Dir>(new GeomAPI_Dir(aDir.X(), aDir.Y(), aDir.Z()));
+}
+
 double GeomAPI_Ellipse::minorRadius() const
 {
   return MY_ELIPS->MinorRadius();
