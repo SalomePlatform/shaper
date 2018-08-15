@@ -41,6 +41,7 @@ email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com
           <validator id="ExchangePlugin_ExportFormat"
                      parameters="py:Python" />
         </export_file_selector>
+        <boolvalue id="geometric_dump" label="By geometric selection"/>
       </feature>
     </group>
   </workbench>

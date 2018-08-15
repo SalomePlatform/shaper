@@ -27,6 +27,8 @@
 #include <ModelAPI_Feature.h>
 #include <ModelAPI_ResultBody.h>
 
+
+#include <GeomAPI_Pnt.h>
 //--------------------------------------------------------------------------------------
 
 //--------------------------------------------------------------------------------------
@@ -49,6 +51,13 @@ ModelHighAPI_Selection::ModelHighAPI_Selection(const std::string& theType,
 {
 }
 
+ModelHighAPI_Selection::ModelHighAPI_Selection(const std::string& theType,
+                                               const GeomPointPtr& theSubShapeInnerPoint)
+: myVariantType(VT_TypeInnerPointPair)
+, myTypeInnerPointPair(theType, theSubShapeInnerPoint)
+{
+}
+
 ModelHighAPI_Selection::~ModelHighAPI_Selection()
 {
 }
@@ -64,12 +73,16 @@ void ModelHighAPI_Selection::fillAttribute(
       return;
     case VT_TypeSubShapeNamePair:
       theAttribute->selectSubShape(myTypeSubShapeNamePair.first, myTypeSubShapeNamePair.second);
-      if(theAttribute->isInvalid()) {
-        FeaturePtr aFeature = ModelAPI_Feature::feature(theAttribute->owner());
-        aFeature->setError(
-          std::string("Error: attribute \"") + theAttribute->id() + std::string("\" is invalid."));
-      }
+      break;
+    case VT_TypeInnerPointPair:
+      theAttribute->selectSubShape(myTypeInnerPointPair.first, myTypeInnerPointPair.second);
       return;
+  }
+
+  if (theAttribute->isInvalid()) {
+    FeaturePtr aFeature = ModelAPI_Feature::feature(theAttribute->owner());
+    aFeature->setError(
+      std::string("Error: attribute \"") + theAttribute->id() + std::string("\" is invalid."));
   }
 }
 
@@ -85,6 +98,10 @@ void ModelHighAPI_Selection::appendToList(
     case VT_TypeSubShapeNamePair:
       // Note: the reverse order (first - type, second - sub-shape name)
       theAttribute->append(myTypeSubShapeNamePair.second, myTypeSubShapeNamePair.first);
+      return;
+    case VT_TypeInnerPointPair:
+      // Note: the reverse order (first - type, second - selected point)
+      theAttribute->append(myTypeInnerPointPair.second, myTypeInnerPointPair.first);
       return;
   }
 }
@@ -108,6 +125,12 @@ TypeSubShapeNamePair ModelHighAPI_Selection::typeSubShapeNamePair() const
 }
 
 //==================================================================================================
+TypeInnerPointPair ModelHighAPI_Selection::typeInnerPointPair() const
+{
+  return myTypeInnerPointPair;
+}
+
+//==================================================================================================
 std::string ModelHighAPI_Selection::shapeType() const
 {
   switch(myVariantType) {
@@ -115,6 +138,7 @@ std::string ModelHighAPI_Selection::shapeType() const
     return myResultSubShapePair.second.get() ? myResultSubShapePair.second->shapeTypeStr() :
                                                myResultSubShapePair.first->shape()->shapeTypeStr();
   case VT_TypeSubShapeNamePair: return myTypeSubShapeNamePair.first;
+  case VT_TypeInnerPointPair: return myTypeInnerPointPair.first;
   }
 
   return "SHAPE";

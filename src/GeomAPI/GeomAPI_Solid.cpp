@@ -33,6 +33,8 @@
 #include "GeomAPI_XYZ.h"
 
 #include <BRep_Builder.hxx>
+#include <BRepGProp.hxx>
+#include <GProp_GProps.hxx>
 #include <Precision.hxx>
 #include <TopExp_Explorer.hxx>
 #include <TopoDS_Wire.hxx>
@@ -297,4 +299,21 @@ std::shared_ptr<GeomAPI_Box> GeomAPI_Solid::getParallelepiped() const
   if (aShells.size() == 1)
     aBox = aShells.front()->shell()->getParallelepiped();
   return aBox;
+}
+
+//==================================================================================================
+GeomPointPtr GeomAPI_Solid::middlePoint() const
+{
+  GeomPointPtr anInnerPoint;
+
+  const TopoDS_Solid& aSolid = impl<TopoDS_Solid>();
+  if (aSolid.IsNull())
+    return anInnerPoint;
+
+  GProp_GProps aProps;
+  BRepGProp::SurfaceProperties(aSolid, aProps, 1.e-4);
+
+  gp_Pnt aPnt = aProps.CentreOfMass();
+  anInnerPoint = GeomPointPtr(new GeomAPI_Pnt(aPnt.X(), aPnt.Y(), aPnt.Z()));
+  return anInnerPoint;
 }

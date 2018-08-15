@@ -20,6 +20,7 @@
 
 #include "GeomAPI_Shape.h"
 
+#include <GeomAPI_Pnt.h>
 #include <GeomAPI_Vertex.h>
 #include <GeomAPI_Edge.h>
 #include <GeomAPI_Wire.h>
@@ -569,6 +570,41 @@ bool GeomAPI_Shape::computeSize(double& theXmin, double& theYmin, double& theZmi
   BRepBndLib::Add(aShape, aBndBox);
   aBndBox.Get(theXmin, theYmin, theZmin, theXmax, theYmax, theZmax);
   return true;
+}
+
+GeomPointPtr GeomAPI_Shape::middlePoint() const
+{
+  GeomPointPtr aMiddlePoint;
+
+  switch (shapeType()) {
+  case VERTEX:
+    aMiddlePoint = vertex()->point();
+    break;
+  case EDGE:
+    aMiddlePoint = edge()->middlePoint();
+    break;
+  case WIRE:
+    aMiddlePoint = wire()->middlePoint();
+    break;
+  case FACE:
+    aMiddlePoint = face()->middlePoint();
+    break;
+  case SHELL:
+    aMiddlePoint = shell()->middlePoint();
+    break;
+  case SOLID:
+    aMiddlePoint = solid()->middlePoint();
+    break;
+  default: {
+      // get middle point as center of the bounding box
+      double aMinX, aMinY, aMinZ, aMaxX, aMaxY, aMaxZ;
+      computeSize(aMinX, aMinY, aMinZ, aMaxX, aMaxY, aMaxZ);
+      aMiddlePoint = GeomPointPtr(new GeomAPI_Pnt(
+          (aMinX + aMaxX) * 0.5, (aMinY + aMaxY) * 0.5, (aMinZ + aMaxZ) * 0.5));
+    }
+  }
+
+  return aMiddlePoint;
 }
 
 std::string GeomAPI_Shape::getShapeStream() const

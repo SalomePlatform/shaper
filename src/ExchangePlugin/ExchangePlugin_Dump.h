@@ -51,6 +51,12 @@ public:
     static const std::string MY_FILE_FORMAT_ID("file_format");
     return MY_FILE_FORMAT_ID;
   }
+  /// attribute name of flag dumping by geometric selection (not by naming)
+  inline static const std::string& GEOMETRIC_DUMP_ID()
+  {
+    static const std::string MY_GEOM_DUMP_ID("geometric_dump");
+    return MY_GEOM_DUMP_ID;
+  }
 
   /// Default constructor
   EXCHANGEPLUGIN_EXPORT ExchangePlugin_Dump();

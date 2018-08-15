@@ -27,6 +27,7 @@
 #include <memory>
 #include <list>
 
+class GeomAPI_Pnt;
 class GeomAPI_Vertex;
 class GeomAPI_Edge;
 class GeomAPI_Wire;
@@ -180,6 +181,10 @@ public:
   GEOMAPI_EXPORT
   bool computeSize(double& theXmin, double& theYmin, double& theZmin,
                    double& theXmax, double& theYmax, double& theZmax) const;
+
+  /// Return middle point on the shape
+  GEOMAPI_EXPORT
+  virtual std::shared_ptr<GeomAPI_Pnt> middlePoint() const;
 
   /// Returns the shape as BRep stream
   GEOMAPI_EXPORT

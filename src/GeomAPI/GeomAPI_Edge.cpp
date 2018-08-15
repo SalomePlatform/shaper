@@ -35,6 +35,7 @@
 #include <BRep_Builder.hxx>
 #include <BRep_Tool.hxx>
 #include <ElCLib.hxx>
+#include <GCPnts_UniformAbscissa.hxx>
 #include <Geom_Curve.hxx>
 #include <Geom_Line.hxx>
 #include <Geom_Circle.hxx>
@@ -360,4 +361,26 @@ void GeomAPI_Edge::setLastPointTolerance(const double theTolerance)
   TopoDS_Vertex aVFirst, aVLast;
   TopExp::Vertices(anEdge, aVFirst, aVLast);
   BRep_Builder().UpdateVertex(aVLast, theTolerance);
+}
+
+GeomPointPtr GeomAPI_Edge::middlePoint() const
+{
+  GeomPointPtr aMiddlePoint;
+
+  const TopoDS_Edge& anEdge = impl<TopoDS_Edge>();
+  if (anEdge.IsNull())
+    return aMiddlePoint;
+  double aFirst, aLast;
+  Handle(Geom_Curve) aCurve = BRep_Tool::Curve(anEdge, aFirst, aLast);
+  if (aCurve.IsNull())
+    return aMiddlePoint;
+
+  static const int NB_POINTS = 3;
+  GeomAdaptor_Curve aCurveAdaptor(aCurve, aFirst, aLast);
+  GCPnts_UniformAbscissa anAlgo(aCurveAdaptor, NB_POINTS);
+  if (anAlgo.IsDone()) {
+    gp_Pnt aPnt = aCurveAdaptor.Value(anAlgo.Parameter(2));
+    aMiddlePoint = GeomPointPtr(new GeomAPI_Pnt(aPnt.X(), aPnt.Y(), aPnt.Z()));
+  }
+  return aMiddlePoint;
 }

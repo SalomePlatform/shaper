@@ -38,6 +38,7 @@
 #include <ModelAPI_Validator.h>
 #include <Events_InfoMessage.h>
 #include <GeomAPI_Edge.h>
+#include <GeomAPI_Pnt.h>
 #include <GeomAPI_Vertex.h>
 #include <GeomAlgoAPI_CompoundBuilder.h>
 
@@ -1057,6 +1058,89 @@ void Model_AttributeSelection::selectSubShape(
       } else
         setValue(aCont, aShapeToBeSelected);
       return;
+    }
+  }
+
+  TDF_Label aSelLab = selectionLabel();
+  setInvalidIfFalse(aSelLab, false);
+  reset();
+}
+
+
+// Check the point is within shape's bounding box
+static bool isPointWithinBB(const GeomPointPtr& thePoint, const GeomShapePtr& theShape)
+{
+  double aXMin, aXMax, aYMin, aYMax, aZMin, aZMax;
+  theShape->computeSize(aXMin, aYMin, aZMin, aXMax, aYMax, aZMax);
+  return thePoint->x() >= aXMin - Precision::Confusion() &&
+         thePoint->x() <= aXMax + Precision::Confusion() &&
+         thePoint->y() >= aYMin - Precision::Confusion() &&
+         thePoint->y() <= aYMax + Precision::Confusion() &&
+         thePoint->z() >= aZMin - Precision::Confusion() &&
+         thePoint->z() <= aZMax + Precision::Confusion();
+}
+
+// Select sub-shape of the given type, which contains the given point
+static GeomShapePtr findSubShape(const GeomShapePtr& theShape,
+                                   const GeomAPI_Shape::ShapeType& theType,
+                                   const GeomPointPtr& thePoint)
+{
+  std::list<GeomShapePtr> aSubs = theShape->subShapes(theType);
+  for (std::list<GeomShapePtr>::const_iterator aSubIt = aSubs.begin();
+    aSubIt != aSubs.end(); ++aSubIt) {
+    if ((*aSubIt)->middlePoint()->distance(thePoint) < Precision::Confusion())
+      return *aSubIt;
+  }
+
+  // not found
+  return GeomShapePtr();
+}
+
+void Model_AttributeSelection::selectSubShape(const std::string& theType,
+                                              const GeomPointPtr& thePoint)
+{
+  if (theType.empty() || !thePoint)
+    return;
+
+  GeomAPI_Shape::ShapeType aType = GeomAPI_Shape::shapeTypeByStr(theType);
+  GeomShapePtr aFoundSubShape;
+
+  std::list<FeaturePtr> aFeatures = owner()->document()->allFeatures();
+  // Process results of all features from the last to the first
+  // to find appropriate sub-shape
+  for (std::list<FeaturePtr>::const_reverse_iterator anIt = aFeatures.rbegin();
+       anIt != aFeatures.rend(); ++anIt) {
+    const std::list<ResultPtr>& aResults = (*anIt)->results();
+    for (std::list<ResultPtr>::const_iterator aResIt = aResults.begin();
+         aResIt != aResults.end(); ++aResIt) {
+      GeomShapePtr aCurShape = (*aResIt)->shape();
+      // first of all, check the point is within bounding box of the result
+      if (!isPointWithinBB(thePoint, aCurShape))
+        continue;
+      // now, process all sub-shapes of the given type and check their inner points
+      aFoundSubShape = findSubShape(aCurShape, aType, thePoint);
+      if (aFoundSubShape) {
+        setValue(*aResIt, aFoundSubShape);
+        return;
+      }
+
+      // special case for ResultConstruction if the FACE is selected
+      ResultConstructionPtr aResConstr =
+          std::dynamic_pointer_cast<ModelAPI_ResultConstruction>(*aResIt);
+      if (aResConstr && aType >= GeomAPI_Shape::FACE) {
+        int aNbFaces = aResConstr->facesNum();
+        for (int aFaceInd = 0; aFaceInd < aNbFaces; ++aFaceInd) {
+          GeomFacePtr aCurFace = aResConstr->face(aFaceInd);
+          // check the point is within bounding box of the face
+          if (!isPointWithinBB(thePoint, aCurFace))
+            continue;
+          aFoundSubShape = findSubShape(aCurFace, aType, thePoint);
+          if (aFoundSubShape) {
+            setValue(*aResIt, aFoundSubShape);
+            return;
+          }
+        }
+      }
     }
   }
 

@@ -117,6 +117,10 @@ public:
 
   GEOMAPI_EXPORT
   void setLastPointTolerance(const double theTolerance);
+
+  /// Return middle point on the edge
+  GEOMAPI_EXPORT
+  virtual std::shared_ptr<GeomAPI_Pnt> middlePoint() const;
 };
 
 //! Pointer on attribute object

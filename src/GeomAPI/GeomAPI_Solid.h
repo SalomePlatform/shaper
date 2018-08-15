@@ -59,6 +59,9 @@ public:
 
   /// Returns box if the solid is bounded by 6 rectangular faces composing a box
   GEOMAPI_EXPORT std::shared_ptr<GeomAPI_Box> getParallelepiped() const;
+
+  /// Return inner point in the solid
+  GEOMAPI_EXPORT virtual std::shared_ptr<GeomAPI_Pnt> middlePoint() const;
 };
 
 typedef std::shared_ptr<GeomAPI_Solid> GeomSolidPtr;

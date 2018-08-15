@@ -32,6 +32,8 @@
 #include "GeomAPI_XYZ.h"
 
 #include <BRep_Builder.hxx>
+#include <BRepGProp.hxx>
+#include <GProp_GProps.hxx>
 #include <Precision.hxx>
 #include <TopExp_Explorer.hxx>
 #include <TopoDS.hxx>
@@ -364,4 +366,21 @@ std::shared_ptr<GeomAPI_Box> GeomAPI_Shell::getParallelepiped() const
                                   aPlanes[anIndex].myDepth,
                                   aPlanes[anIndex].myHeight));
   return aBox;
+}
+
+//=================================================================================================
+GeomPointPtr GeomAPI_Shell::middlePoint() const
+{
+  GeomPointPtr anInnerPoint;
+
+  const TopoDS_Shell& aShell = impl<TopoDS_Shell>();
+  if (aShell.IsNull())
+    return anInnerPoint;
+
+  GProp_GProps aProps;
+  BRepGProp::SurfaceProperties(aShell, aProps, 1.e-4);
+
+  gp_Pnt aPnt = aProps.CentreOfMass();
+  anInnerPoint = GeomPointPtr(new GeomAPI_Pnt(aPnt.X(), aPnt.Y(), aPnt.Z()));
+  return anInnerPoint;
 }

@@ -20,6 +20,7 @@
 
 #include <ExchangePlugin_Dump.h>
 
+#include <ModelAPI_AttributeBoolean.h>
 #include <ModelAPI_AttributeString.h>
 #include <ModelAPI_Document.h>
 #include <ModelAPI_Session.h>
@@ -40,8 +41,11 @@ ExchangePlugin_Dump::~ExchangePlugin_Dump()
 
 void ExchangePlugin_Dump::initAttributes()
 {
-  data()->addAttribute(ExchangePlugin_Dump::FILE_PATH_ID(), ModelAPI_AttributeString::typeId());
-  data()->addAttribute(ExchangePlugin_Dump::FILE_FORMAT_ID(), ModelAPI_AttributeString::typeId());
+  data()->addAttribute(FILE_PATH_ID(), ModelAPI_AttributeString::typeId());
+  data()->addAttribute(FILE_FORMAT_ID(), ModelAPI_AttributeString::typeId());
+
+  data()->addAttribute(GEOMETRIC_DUMP_ID(), ModelAPI_AttributeBoolean::typeId());
+  boolean(GEOMETRIC_DUMP_ID())->setValue(false);
 }
 
 void ExchangePlugin_Dump::execute()
@@ -62,6 +66,8 @@ void ExchangePlugin_Dump::dump(const std::string& theFileName)
 
   ModelHighAPI_Dumper* aDumper = ModelHighAPI_Dumper::getInstance();
   aDumper->clear();
+  aDumper->setSelectionByGeometry(boolean(GEOMETRIC_DUMP_ID())->value());
+
   DocumentPtr aDoc = ModelAPI_Session::get()->moduleDocument();
 
   int aFeaturesNb = aDoc->size(ModelAPI_Feature::group());

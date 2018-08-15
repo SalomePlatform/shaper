@@ -86,6 +86,11 @@ public:
   /// Destructor
   virtual ~ModelHighAPI_Dumper() {}
 
+  /// Set/unset flag to dump selection attributes by geometrical properties:
+  /// inner point in the selected shape
+  void setSelectionByGeometry(bool theDumpByGeom = true)
+  { myGeometricalSelection = theDumpByGeom; }
+
   /// Dump given document into the file
   /// \return \c true, if succeed
   MODELHIGHAPI_EXPORT
@@ -354,6 +359,8 @@ private:
 
   std::list<EntityPtr> myPostponed; ///< list of postponed entities (sketch constraints or folders)
   bool myDumpPostponedInProgress; ///< processing postponed is in progress
+
+  bool myGeometricalSelection; ///< dump selection not by naming, but by coordinates of inner point
 
 protected:
   /// list of entities, used by other features but not dumped yet

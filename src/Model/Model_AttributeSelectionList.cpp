@@ -24,6 +24,7 @@
 #include "Model_Events.h"
 #include "Model_Data.h"
 
+#include <GeomAPI_Pnt.h>
 #include <GeomAPI_Shape.h>
 
 #include <TDF_AttributeIterator.hxx>
@@ -78,7 +79,7 @@ void Model_AttributeSelectionList::append(
 }
 
 void Model_AttributeSelectionList::append(
-  const std::string theNamingName, const std::string& theType)
+  const std::string& theNamingName, const std::string& theType)
 {
   int aNewTag = mySize->Get() + 1;
   TDF_Label aNewLab = mySize->Label().FindChild(aNewTag);
@@ -92,6 +93,23 @@ void Model_AttributeSelectionList::append(
   aNewAttr->setID(id());
   mySize->Set(aNewTag);
   aNewAttr->selectSubShape(theType.empty() ? selectionType() : theType, theNamingName);
+  owner()->data()->sendAttributeUpdated(this);
+}
+
+void Model_AttributeSelectionList::append(const GeomPointPtr& thePoint, const std::string& theType)
+{
+  int aNewTag = mySize->Get() + 1;
+  TDF_Label aNewLab = mySize->Label().FindChild(aNewTag);
+
+  std::shared_ptr<Model_AttributeSelection> aNewAttr =
+    std::shared_ptr<Model_AttributeSelection>(new Model_AttributeSelection(aNewLab));
+  if (owner()) {
+    aNewAttr->setObject(owner());
+    aNewAttr->setParent(this);
+  }
+  aNewAttr->setID(id());
+  mySize->Set(aNewTag);
+  aNewAttr->selectSubShape(theType, thePoint);
   owner()->data()->sendAttributeUpdated(this);
 }
 

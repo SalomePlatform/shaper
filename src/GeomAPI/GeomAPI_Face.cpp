@@ -31,6 +31,7 @@
 #include <BOPTools_AlgoTools.hxx>
 #include <BRep_Tool.hxx>
 #include <BRepAdaptor_Surface.hxx>
+#include <BRepGProp_Face.hxx>
 #include <BRepTools.hxx>
 #include <Geom_Surface.hxx>
 #include <Geom_SphericalSurface.hxx>
@@ -230,4 +231,25 @@ std::shared_ptr<GeomAPI_Torus> GeomAPI_Face::getTorus() const
     aTorus = GeomTorusPtr(new GeomAPI_Torus(aCenter, aDirection, aMajorRadius, aMinorRadius));
   }
   return aTorus;
+}
+
+GeomPointPtr GeomAPI_Face::middlePoint() const
+{
+  GeomPointPtr anInnerPoint;
+
+  const TopoDS_Face& aFace = impl<TopoDS_Face>();
+  if (aFace.IsNull())
+    return anInnerPoint;
+
+  BRepGProp_Face aProp(aFace);
+  double aUMin, aUMax, aVMin, aVMax;
+  aProp.Bounds(aUMin, aUMax, aVMin, aVMax);
+
+  Handle(Geom_Surface) aSurf = BRep_Tool::Surface(aFace);
+  if (aSurf.IsNull())
+    return anInnerPoint;
+
+  gp_Pnt aPnt = aSurf->Value((aUMin + aUMax) * 0.5, (aVMin + aVMax) * 0.5);
+  anInnerPoint = GeomPointPtr(new GeomAPI_Pnt(aPnt.X(), aPnt.Y(), aPnt.Z()));
+  return anInnerPoint;
 }

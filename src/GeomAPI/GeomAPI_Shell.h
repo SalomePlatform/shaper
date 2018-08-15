@@ -59,6 +59,9 @@ public:
 
   /// Returns box if the shell consists of 6 rectangular faces composing a box
   GEOMAPI_EXPORT std::shared_ptr<GeomAPI_Box> getParallelepiped() const;
+
+  /// Return middle point on the shell
+  GEOMAPI_EXPORT virtual std::shared_ptr<GeomAPI_Pnt> middlePoint() const;
 };
 
 typedef std::shared_ptr<GeomAPI_Shell> GeomShellPtr;

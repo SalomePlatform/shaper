@@ -57,7 +57,11 @@ public:
 
   /// Adds the new reference to the end of the list by the naming name of the selected shape
   /// The type of shape is taken from the current selection type if the given is empty
-  MODEL_EXPORT virtual void append(const std::string theNamingName, const std::string& theType="");
+  MODEL_EXPORT virtual void append(const std::string& theNamingName, const std::string& theType="");
+
+  /// Adds the new reference to the end of the list by inner point on the selected shape
+  MODEL_EXPORT virtual void append(const std::shared_ptr<GeomAPI_Pnt>& thePoint,
+                                   const std::string& theType);
 
   /// Reset temporary stored values
   virtual void removeTemporaryValues();

@@ -47,6 +47,9 @@ public:
   /// Returns \c true if the wire is a rectangle
   /// \param[out] thePoints  corners of the rectangle
   GEOMAPI_EXPORT bool isRectangle(std::list<std::shared_ptr<GeomAPI_Pnt> >& thePoints) const;
+
+  /// Return middle point on the wire
+  GEOMAPI_EXPORT virtual std::shared_ptr<GeomAPI_Pnt> middlePoint() const;
 };
 
 typedef std::shared_ptr<GeomAPI_Wire> GeomWirePtr;

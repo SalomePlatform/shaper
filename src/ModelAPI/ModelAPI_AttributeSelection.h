@@ -25,6 +25,7 @@
 #include <ModelAPI_Result.h>
 
 class GeomAPI_Edge;
+class GeomAPI_Pnt;
 
 /**\class ModelAPI_AttributeSelection
  * \ingroup DataModel
@@ -102,6 +103,10 @@ class ModelAPI_AttributeSelection : public ModelAPI_Attribute
 
   /// Selects sub-shape by the textual Name
   virtual void selectSubShape(const std::string& theType, const std::string& theSubShapeName) = 0;
+
+  /// Selects sub-shape by its inner point
+  virtual void selectSubShape(const std::string& theType,
+                              const std::shared_ptr<GeomAPI_Pnt>& thePoint) = 0;
 
   /// Returns true if recompute of selection become impossible
   virtual bool isInvalid() = 0;

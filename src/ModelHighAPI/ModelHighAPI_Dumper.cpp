@@ -64,6 +64,7 @@ static int gCompositeStackDepth = 0;
 ModelHighAPI_Dumper* ModelHighAPI_Dumper::mySelf = 0;
 
 ModelHighAPI_Dumper::ModelHighAPI_Dumper()
+  : myGeometricalSelection(false)
 {
   clear();
 }
@@ -954,8 +955,12 @@ ModelHighAPI_Dumper& ModelHighAPI_Dumper::operator<<(
     return *this;
   }
 
-  myDumpBuffer << "\"" << aShape->shapeTypeStr() << "\", \"" <<
-    theAttrSelect->namingName() << "\")";
+  myDumpBuffer << "\"" << aShape->shapeTypeStr() << "\", ";
+  if (myGeometricalSelection)
+    *this << aShape->middlePoint();
+  else
+    myDumpBuffer << "\"" << theAttrSelect->namingName() << "\"";
+  myDumpBuffer << ")";
   return *this;
 }
 
@@ -993,8 +998,7 @@ ModelHighAPI_Dumper& ModelHighAPI_Dumper::operator<<(
       } else {
         isAdded = true;
       }
-      myDumpBuffer << "model.selection(\"" <<
-        aShape->shapeTypeStr() << "\", \"" << anAttribute->namingName() << "\")";
+      *this << anAttribute;
     }
 
     myDumpBuffer << "]";

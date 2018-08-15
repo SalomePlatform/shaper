@@ -28,6 +28,7 @@
 #include <string>
 #include <utility>
 //--------------------------------------------------------------------------------------
+class GeomAPI_Pnt;
 class GeomAPI_Shape;
 class ModelAPI_AttributeSelection;
 class ModelAPI_AttributeSelectionList;
@@ -36,6 +37,7 @@ class ModelAPI_Result;
 typedef std::pair<std::shared_ptr<ModelAPI_Result>, std::shared_ptr<GeomAPI_Shape> >
   ResultSubShapePair;
 typedef std::pair<std::string, std::string> TypeSubShapeNamePair;
+typedef std::pair<std::string, std::shared_ptr<GeomAPI_Pnt> > TypeInnerPointPair;
 //--------------------------------------------------------------------------------------
 /**\class ModelHighAPI_Selection
  * \ingroup CPPHighAPI
@@ -47,7 +49,8 @@ public:
   enum VariantType {
     VT_Empty,
     VT_ResultSubShapePair,
-    VT_TypeSubShapeNamePair
+    VT_TypeSubShapeNamePair,
+    VT_TypeInnerPointPair
   };
 
 public:
@@ -64,6 +67,12 @@ public:
   MODELHIGHAPI_EXPORT
   ModelHighAPI_Selection(const std::string& theType,
                          const std::string& theSubShapeName);
+
+  /// Constructor for sub-shape by inner point coordinates
+  MODELHIGHAPI_EXPORT
+  ModelHighAPI_Selection(const std::string& theType,
+                         const std::shared_ptr<GeomAPI_Pnt>& theSubShapeInnerPoint);
+
   /// Destructor
   MODELHIGHAPI_EXPORT
   virtual ~ModelHighAPI_Selection();
@@ -87,6 +96,10 @@ public:
   /// \return pair of sub-shape type and name.
   MODELHIGHAPI_EXPORT
   virtual TypeSubShapeNamePair typeSubShapeNamePair() const;
+
+  /// \return pair of sub-shape type and inner point to identify sub-shape.
+  MODELHIGHAPI_EXPORT
+  virtual TypeInnerPointPair typeInnerPointPair() const;
 
   /// \return shape type.
   MODELHIGHAPI_EXPORT
@@ -124,6 +137,7 @@ private:
   VariantType myVariantType;
   ResultSubShapePair myResultSubShapePair;
   TypeSubShapeNamePair myTypeSubShapeNamePair;
+  TypeInnerPointPair myTypeInnerPointPair;
 };
 
 //--------------------------------------------------------------------------------------

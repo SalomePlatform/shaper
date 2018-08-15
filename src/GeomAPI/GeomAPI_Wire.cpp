@@ -113,3 +113,20 @@ bool GeomAPI_Wire::isRectangle(std::list<GeomPointPtr>& thePoints) const
   }
   return true;
 }
+
+//==================================================================================================
+GeomPointPtr GeomAPI_Wire::middlePoint() const
+{
+  // find middle edge in the wire
+  std::list<GeomShapePtr> aSubs = subShapes(EDGE);
+  size_t aNbSubs = aSubs.size();
+  if (aNbSubs == 0)
+    return GeomPointPtr();
+
+  aNbSubs /= 2;
+  for (; aNbSubs > 0; --aNbSubs)
+    aSubs.pop_front();
+
+  // compute middle point on the middle edge
+  return aSubs.front()->middlePoint();
+}
