@@ -411,31 +411,81 @@ std::string storeFeatures(const std::string& theDocName, DocumentPtr theDoc,
 }
 
 //==================================================================================================
-bool checkPythonDump()
+typedef std::map<std::string, std::map<std::string, ModelHighAPI_FeatureStore> > Storage;
+
+static bool dumpToPython(SessionPtr theSession,
+                         const char* theFilename,
+                         bool theDumpByGeom,
+                         const std::string& theErrorMsgContext)
 {
-  SessionPtr aSession = ModelAPI_Session::get();
   // 2431: set PartSet as a current document
-  aSession->setActiveDocument(aSession->moduleDocument(), true);
+  theSession->setActiveDocument(theSession->moduleDocument(), true);
   // dump all to the python file
-  aSession->startOperation("Check python dump");
-  FeaturePtr aDump = aSession->moduleDocument()->addFeature("Dump");
+  theSession->startOperation("Check python dump");
+  FeaturePtr aDump = theSession->moduleDocument()->addFeature("Dump");
   if (aDump.get()) {
-    aDump->string("file_path")->setValue("check_dump.py"); // to the current folder
-    aDump->string("file_format")->setValue("py"); // to the current folder
+    aDump->string("file_path")->setValue(theFilename);
+    aDump->string("file_format")->setValue("py");
+    aDump->boolean("geometric_dump")->setValue(theDumpByGeom);
     aDump->execute();
   }
   bool isProblem = !aDump.get() || !aDump->error().empty(); // after "finish" dump will be removed
   if (isProblem && aDump.get()) {
-    std::cout<<"Dump feature error "<<aDump->error()<<std::endl;
-    Events_InfoMessage anErrorMsg(std::string("checkPythonDump"), aDump->error());
+    std::cout << "Dump feature error " << aDump->error() << std::endl;
+    Events_InfoMessage anErrorMsg(theErrorMsgContext, aDump->error());
     anErrorMsg.send();
   }
-  aSession->finishOperation();
-  if (isProblem) {
-    return false; // something is wrong during dump
+  theSession->finishOperation();
+  return !isProblem;
+}
+
+static bool checkDump(SessionPtr theSession,
+                      char* theFilename,
+                      Storage& theStorage,
+                      const std::string& theErrorMsgContext)
+{
+
+  // close all before importation of the script
+  theSession->closeAll();
+
+
+  // execute the dumped
+  PyGILState_STATE gstate = PyGILState_Ensure(); /* acquire python thread */
+  static char aReadMode[] = "r";
+  PyObject* PyFileObject = PyFile_FromString(theFilename, aReadMode);
+  PyRun_SimpleFileEx(PyFile_AsFile(PyFileObject), theFilename, 1);
+  PyGILState_Release(gstate); /* release python thread */
+
+  // compare with the stored data
+  std::string anError = storeFeatures(
+    theSession->moduleDocument()->kind(), theSession->moduleDocument(), theStorage, true);
+  if (!anError.empty()) {
+    std::cout << anError << std::endl;
+    Events_InfoMessage anErrorMsg(theErrorMsgContext, anError);
+    anErrorMsg.send();
+    return false;
   }
 
-  // map from document name to feature name to feature data
+  return true;
+}
+
+bool checkPythonDump()
+{
+  static const std::string anErrorByNaming("checkPythonDump by naming");
+  static const std::string anErrorByGeometry("checkPythonDump by geometry");
+
+  static char aFileForNamingDump[] = "./check_dump_byname.py";
+  static char aFileForGeometryDump[] = "./check_dump_bygeom.py";
+
+  SessionPtr aSession = ModelAPI_Session::get();
+  // dump with the selection by names
+  if (!dumpToPython(aSession, aFileForNamingDump, false, anErrorByNaming))
+    return false;
+  // dump with the selection by geometry
+  if (!dumpToPython(aSession, aFileForGeometryDump, true, anErrorByGeometry))
+    return false;
+
+   // map from document name to feature name to feature data
   std::map<std::string, std::map<std::string, ModelHighAPI_FeatureStore> > aStore;
   std::string anError = storeFeatures(
     aSession->moduleDocument()->kind(), aSession->moduleDocument(), aStore, false);
@@ -445,28 +495,12 @@ bool checkPythonDump()
     return false;
   }
 
-  // close all before importation of the script
-  aSession->closeAll();
+  // check dump with the selection by names
+  bool isOk = checkDump(aSession, aFileForNamingDump, aStore, anErrorByNaming);
+  // check dump with the selection by geometry
+  isOk = isOk && checkDump(aSession, aFileForGeometryDump, aStore, anErrorByGeometry);
 
-  // execute the dumped
-  PyGILState_STATE gstate = PyGILState_Ensure(); /* acquire python thread */
-  static char aDumpName[] = "./check_dump.py";
-  static char aReadMode[] = "r";
-  FILE* aFile = _Py_fopen(aDumpName, aReadMode);
-  PyRun_SimpleFileEx(aFile, aDumpName, 1);
-  PyGILState_Release(gstate); /* release python thread */
-
-  // compare with the stored data
-  anError = storeFeatures(
-    aSession->moduleDocument()->kind(), aSession->moduleDocument(), aStore, true);
-  if (!anError.empty()) {
-    std::cout<<anError<<std::endl;
-    Events_InfoMessage anErrorMsg(std::string("checkPythonDump"), anError);
-    anErrorMsg.send();
-    return false;
-  }
-
-  return true;
+  return isOk;
 }
 
 //--------------------------------------------------------------------------------------
