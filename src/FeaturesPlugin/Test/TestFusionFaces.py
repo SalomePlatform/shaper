@@ -75,14 +75,63 @@ model.do()
 model.checkResult(FusionFaces_3, model, 1, [0], [0], [1], [4], [8])
 
 # =============================================================================
-# Test 4. Check subshapes naming
+# Test 4. Fusion faces for compsolid
+# =============================================================================
+Sketch_1 = model.addSketch(Part_1_doc, model.defaultPlane("XOY"))
+SketchLine_1 = Sketch_1.addLine(25, 40, -50, 40)
+SketchLine_2 = Sketch_1.addLine(-50, 40, -50, 0)
+SketchLine_3 = Sketch_1.addLine(-50, 0, 25, 0)
+SketchLine_4 = Sketch_1.addLine(25, 0, 25, 40)
+SketchLine_5 = Sketch_1.addLine(-20, 40, -20, 0)
+model.do()
+
+Extrusion_1 = model.addExtrusion(Part_1_doc, [model.selection("COMPOUND", "Sketch_1")], model.selection(), 10, 0)
+Box_3 = model.addBox(Part_1_doc, 10, 10, 10)
+
+Fuse_2 = model.addFuse(Part_1_doc, [model.selection("SOLID", "Extrusion_1_1_2"), model.selection("SOLID", "Box_3_1")], [])
+model.do()
+
+model.checkResult(Fuse_2, model, 1, [2], [2], [16], [72], [144])
+
+FusionFaces_4 = model.addFusionFaces(Part_1_doc, model.selection("COMPSOLID", "Fuse_2_1"))
+model.do()
+
+model.checkResult(FusionFaces_4, model, 1, [2], [2], [12], [48], [96])
+
+# =============================================================================
+# Test 5. Fusion faces for compound
+# =============================================================================
+Box_4 = model.addBox(Part_1_doc, 10, 10, 10)
+Box_5 = model.addBox(Part_1_doc, 10, 10, 10)
+Translation_2 = model.addTranslation(Part_1_doc, [model.selection("SOLID", "Box_5_1")], 0, 0, 5)
+Box_6 = model.addBox(Part_1_doc, 10, 10, 10)
+Translation_3 = model.addTranslation(Part_1_doc, [model.selection("SOLID", "Box_6_1")], 20, 0, 0)
+Box_7 = model.addBox(Part_1_doc, 10, 10, 10)
+Translation_4 = model.addTranslation(Part_1_doc, [model.selection("SOLID", "Box_7_1")], 20, 0, 5)
+Fuse_3 = model.addFuse(Part_1_doc, [model.selection("SOLID", "Box_4_1"), model.selection("SOLID", "Translation_2_1")], [])
+Fuse_4 = model.addFuse(Part_1_doc, [model.selection("SOLID", "Translation_3_1"), model.selection("SOLID", "Translation_4_1")], [])
+
+Compound_1 = model.addCompound(Part_1_doc, [model.selection("SOLID", "Fuse_3_1"), model.selection("SOLID", "Fuse_4_1")])
+model.do()
+
+model.checkResult(Compound_1, model, 1, [2], [2], [28], [112], [224])
+
+FusionFaces_5 = model.addFusionFaces(Part_1_doc, model.selection("COMPOUND", "Compound_1_1"))
+model.do()
+
+model.checkResult(FusionFaces_5, model, 1, [2], [2], [12], [48], [96])
+
+# =============================================================================
+# Test 6. Check subshapes naming
 # =============================================================================
 #model.testHaveNamingSubshapes(FusionFaces_1, model, Part_1_doc)
-#model.testHaveNamingSubshapes(FusionFaces_2, model, Part_1_doc)
+model.testHaveNamingSubshapes(FusionFaces_2, model, Part_1_doc)
 #model.testHaveNamingSubshapes(FusionFaces_3, model, Part_1_doc)
+model.testHaveNamingSubshapes(FusionFaces_4, model, Part_1_doc)
+model.testHaveNamingSubshapes(FusionFaces_5, model, Part_1_doc)
 model.end()
 
 # =============================================================================
-# Test 5. Check Python dump
+# Test 7. Check Python dump
 # =============================================================================
 assert(model.checkPythonDump())
