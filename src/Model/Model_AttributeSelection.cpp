@@ -38,6 +38,7 @@
 #include <ModelAPI_Validator.h>
 #include <Events_InfoMessage.h>
 #include <GeomAPI_Edge.h>
+#include <GeomAPI_PlanarEdges.h>
 #include <GeomAPI_Pnt.h>
 #include <GeomAPI_Vertex.h>
 #include <GeomAlgoAPI_CompoundBuilder.h>
@@ -1082,8 +1083,8 @@ static bool isPointWithinBB(const GeomPointPtr& thePoint, const GeomShapePtr& th
 
 // Select sub-shape of the given type, which contains the given point
 static GeomShapePtr findSubShape(const GeomShapePtr& theShape,
-                                   const GeomAPI_Shape::ShapeType& theType,
-                                   const GeomPointPtr& thePoint)
+                                 const GeomAPI_Shape::ShapeType& theType,
+                                 const GeomPointPtr& thePoint)
 {
   std::list<GeomShapePtr> aSubs = theShape->subShapes(theType);
   for (std::list<GeomShapePtr>::const_iterator aSubIt = aSubs.begin();
@@ -1105,20 +1106,46 @@ void Model_AttributeSelection::selectSubShape(const std::string& theType,
   GeomAPI_Shape::ShapeType aType = GeomAPI_Shape::shapeTypeByStr(theType);
   GeomShapePtr aFoundSubShape;
 
-  std::list<FeaturePtr> aFeatures = owner()->document()->allFeatures();
+  // collect features from PartSet and the current part
+  SessionPtr aSession = ModelAPI_Session::get();
+  std::list<FeaturePtr> aFeatures = aSession->moduleDocument()->allFeatures();
+  if (aSession->moduleDocument() != owner()->document()) {
+    std::list<FeaturePtr> aPartFeatures = owner()->document()->allFeatures();
+    aFeatures.insert(aFeatures.end(), aPartFeatures.begin(), aPartFeatures.end());
+  }
   // Process results of all features from the last to the first
   // to find appropriate sub-shape
   for (std::list<FeaturePtr>::const_reverse_iterator anIt = aFeatures.rbegin();
        anIt != aFeatures.rend(); ++anIt) {
+    // check the feature is a part of composite feature (like sketch elements),
+    // then do not process it, it will be processed in scope of composite feature
+    bool isSubOfComposite = false;
+    const std::set<AttributePtr>& aRefs = (*anIt)->data()->refsToMe();
+    for (std::set<AttributePtr>::const_iterator aRefIt = aRefs.begin();
+         aRefIt != aRefs.end() && !isSubOfComposite; ++aRefIt) {
+      FeaturePtr aFeature = ModelAPI_Feature::feature((*aRefIt)->owner());
+      CompositeFeaturePtr aCompFeature =
+          std::dynamic_pointer_cast<ModelAPI_CompositeFeature>(aFeature);
+      isSubOfComposite = aCompFeature && aCompFeature->isSub(*anIt);
+    }
+    if (isSubOfComposite)
+      continue;
+
+    // process results of the current feature
     const std::list<ResultPtr>& aResults = (*anIt)->results();
     for (std::list<ResultPtr>::const_iterator aResIt = aResults.begin();
          aResIt != aResults.end(); ++aResIt) {
       GeomShapePtr aCurShape = (*aResIt)->shape();
       // first of all, check the point is within bounding box of the result
-      if (!isPointWithinBB(thePoint, aCurShape))
+      if (!aCurShape || !isPointWithinBB(thePoint, aCurShape))
         continue;
-      // now, process all sub-shapes of the given type and check their inner points
-      aFoundSubShape = findSubShape(aCurShape, aType, thePoint);
+      // now, process all sub-shapes of the given type and check their inner points,
+      // but skip the case the selected type is COMPOUND and the shape is a list of sketch edges
+      // (it will be processed later)
+      std::shared_ptr<GeomAPI_PlanarEdges> aSketchEdges =
+          std::dynamic_pointer_cast<GeomAPI_PlanarEdges>(aCurShape);
+      if (aType != GeomAPI_Shape::COMPOUND || !aSketchEdges)
+        aFoundSubShape = findSubShape(aCurShape, aType, thePoint);
       if (aFoundSubShape) {
         setValue(*aResIt, aFoundSubShape);
         return;
@@ -1140,6 +1167,15 @@ void Model_AttributeSelection::selectSubShape(const std::string& theType,
             return;
           }
         }
+      }
+
+      // next special case: the full sketch is selected
+      // the selection type is a COMPOUND
+      if (aSketchEdges &&
+          aSketchEdges->middlePoint()->distance(thePoint) < Precision::Confusion()) {
+        // select whole result
+        setValue(*aResIt, GeomShapePtr());
+        return;
       }
     }
   }
