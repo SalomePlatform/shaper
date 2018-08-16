@@ -45,17 +45,22 @@ public:
   FEATURESAPI_EXPORT
   FeaturesAPI_BooleanFuse(const std::shared_ptr<ModelAPI_Feature>& theFeature,
                          const std::list<ModelHighAPI_Selection>& theMainObjects,
-                         const std::list<ModelHighAPI_Selection>& theToolObjects);
+                         const std::list<ModelHighAPI_Selection>& theToolObjects,
+                         const bool theRemoveEdges = false);
 
   /// Destructor.
   FEATURESAPI_EXPORT
   virtual ~FeaturesAPI_BooleanFuse();
 
-  INTERFACE_2(FeaturesPlugin_BooleanFuse::ID(),
+  INTERFACE_4(FeaturesPlugin_BooleanFuse::ID(),
+              creationMethod, FeaturesPlugin_BooleanFuse::CREATION_METHOD(),
+              ModelAPI_AttributeString, /** Creation method */,
               mainObjects, FeaturesPlugin_BooleanFuse::OBJECT_LIST_ID(),
               ModelAPI_AttributeSelectionList, /** Main objects */,
               toolObjects, FeaturesPlugin_BooleanFuse::TOOL_LIST_ID(),
-              ModelAPI_AttributeSelectionList, /** Tool objects*/)
+              ModelAPI_AttributeSelectionList, /** Tool objects*/,
+              removeEdges, FeaturesPlugin_BooleanFuse::REMOVE_INTERSECTION_EDGES_ID(),
+              ModelAPI_AttributeBoolean, /** Remove edges */)
 
   /// Set main objects.
   FEATURESAPI_EXPORT
@@ -64,6 +69,10 @@ public:
   /// Set tool objects.
   FEATURESAPI_EXPORT
   void setToolObjects(const std::list<ModelHighAPI_Selection>& theToolObjects);
+
+  /// Set remove edges.
+  FEATURESAPI_EXPORT
+  void setRemoveEdges(const bool theRemoveEdges);
 
   /// Dump wrapped feature
   FEATURESAPI_EXPORT
@@ -77,13 +86,15 @@ typedef std::shared_ptr<FeaturesAPI_BooleanFuse> BooleanFusePtr;
 /// \brief Create Boolean Fuse feature.
 FEATURESAPI_EXPORT
 BooleanFusePtr addFuse(const std::shared_ptr<ModelAPI_Document>& thePart,
-                       const std::list<ModelHighAPI_Selection>& theObjects);
+                       const std::list<ModelHighAPI_Selection>& theObjects,
+                       const bool theRemoveEdges = false);
 
 /// \ingroup CPPHighAPI
 /// \brief Create Boolean Fuse feature.
 FEATURESAPI_EXPORT
 BooleanFusePtr addFuse(const std::shared_ptr<ModelAPI_Document>& thePart,
                        const std::list<ModelHighAPI_Selection>& theMainObjects,
-                       const std::list<ModelHighAPI_Selection>& theToolObjects);
+                       const std::list<ModelHighAPI_Selection>& theToolObjects,
+                       const bool theRemoveEdges = false);
 
 #endif // FeaturesAPI_BooleanFuse_H_

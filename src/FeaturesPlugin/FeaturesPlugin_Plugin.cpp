@@ -101,6 +101,10 @@ FeaturesPlugin_Plugin::FeaturesPlugin_Plugin()
                               new FeaturesPlugin_ValidatorBooleanSmashSelection);
   aFactory->registerValidator("FeaturesPlugin_IntersectionSelection",
                               new FeaturesPlugin_IntersectionSelection);
+  aFactory->registerValidator("FeaturesPlugin_ValidatorBooleanFuseSelection",
+                              new FeaturesPlugin_ValidatorBooleanFuseSelection);
+  aFactory->registerValidator("FeaturesPlugin_ValidatorBooleanFuseArguments",
+                              new FeaturesPlugin_ValidatorBooleanFuseArguments);
 
   // register this plugin
   ModelAPI_Session::get()->registerPlugin(this);

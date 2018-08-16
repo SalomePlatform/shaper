@@ -21,6 +21,7 @@
 #include "FeaturesPlugin_Validators.h"
 
 #include "FeaturesPlugin_Boolean.h"
+#include "FeaturesPlugin_BooleanFuse.h"
 #include "FeaturesPlugin_BooleanSmash.h"
 #include "FeaturesPlugin_Union.h"
 
@@ -1353,4 +1354,145 @@ bool FeaturesPlugin_IntersectionSelection::isValid(const AttributePtr& theAttrib
   }
 
   return true;
+}
+
+//==================================================================================================
+bool FeaturesPlugin_ValidatorBooleanFuseSelection::isValid(
+  const AttributePtr& theAttribute,
+  const std::list<std::string>& theArguments,
+  Events_InfoMessage& theError) const
+{
+  AttributeSelectionListPtr anAttrSelectionList =
+    std::dynamic_pointer_cast<ModelAPI_AttributeSelectionList>(theAttribute);
+  if (!anAttrSelectionList.get()) {
+    theError =
+      "Error: This validator can only work with selection list attributes in \"Boolean\" feature.";
+    return false;
+  }
+
+  for (int anIndex = 0; anIndex < anAttrSelectionList->size(); ++anIndex) {
+    AttributeSelectionPtr anAttrSelection = anAttrSelectionList->value(anIndex);
+    if (!anAttrSelection.get()) {
+      theError = "Error: Empty attribute selection.";
+      return false;
+    }
+    ResultPtr aContext = anAttrSelection->context();
+    if (!aContext.get()) {
+      theError = "Error: Empty selection context.";
+      return false;
+    }
+    ResultConstructionPtr aResultConstruction =
+      std::dynamic_pointer_cast<ModelAPI_ResultConstruction>(aContext);
+    if (aResultConstruction.get()) {
+      theError = "Error: Result construction not allowed for selection.";
+      return false;
+    }
+    std::shared_ptr<GeomAPI_Shape> aShape = anAttrSelection->value();
+    GeomShapePtr aContextShape = aContext->shape();
+    if (!aShape.get()) {
+      aShape = aContextShape;
+    }
+    if (!aShape.get()) {
+      theError = "Error: Empty shape.";
+      return false;
+    }
+    if (!aShape->isEqual(aContextShape)) {
+      theError = "Error: Local selection not allowed.";
+      return false;
+    }
+  }
+
+  return true;
+}
+
+//=================================================================================================
+bool FeaturesPlugin_ValidatorBooleanFuseArguments::isValid(
+  const std::shared_ptr<ModelAPI_Feature>& theFeature,
+  const std::list<std::string>& theArguments,
+  Events_InfoMessage& theError) const
+{
+  if (theArguments.size() != 2) {
+    theError = "Wrong number of arguments (expected 2).";
+    return false;
+  }
+
+  std::shared_ptr<FeaturesPlugin_BooleanFuse> aFeature =
+    std::dynamic_pointer_cast<FeaturesPlugin_BooleanFuse>(theFeature);
+
+  int anObjectsNb = 0, aToolsNb = 0;
+
+  std::list<std::string>::const_iterator anIt = theArguments.begin(), aLast = theArguments.end();
+
+  bool isAllInSameCompSolid = true;
+  ResultCompSolidPtr aCompSolid;
+
+  AttributeSelectionListPtr anAttrSelList = theFeature->selectionList(*anIt);
+  if (anAttrSelList) {
+    anObjectsNb = anAttrSelList->size();
+    for (int anIndex = 0; anIndex < anObjectsNb; ++anIndex) {
+      AttributeSelectionPtr anAttr = anAttrSelList->value(anIndex);
+      ResultPtr aContext = anAttr->context();
+      ResultCompSolidPtr aResCompSolidPtr = ModelAPI_Tools::compSolidOwner(aContext);
+      if (aResCompSolidPtr.get()) {
+        if (aCompSolid.get()) {
+          isAllInSameCompSolid = aCompSolid == aResCompSolidPtr;
+        } else {
+          aCompSolid = aResCompSolidPtr;
+        }
+      } else {
+        isAllInSameCompSolid = false;
+        break;
+      }
+    }
+  }
+  anIt++;
+
+  if (aFeature->string(FeaturesPlugin_BooleanFuse::CREATION_METHOD())->value()
+      == FeaturesPlugin_BooleanFuse::CREATION_METHOD_ADVANCED()) {
+    anAttrSelList = theFeature->selectionList(*anIt);
+    if (anAttrSelList) {
+      aToolsNb = anAttrSelList->size();
+      if (isAllInSameCompSolid) {
+        for (int anIndex = 0; anIndex < aToolsNb; ++anIndex) {
+          AttributeSelectionPtr anAttr = anAttrSelList->value(anIndex);
+          ResultPtr aContext = anAttr->context();
+          ResultCompSolidPtr aResCompSolidPtr = ModelAPI_Tools::compSolidOwner(aContext);
+          if (aResCompSolidPtr.get()) {
+            if (aCompSolid.get()) {
+              isAllInSameCompSolid = aCompSolid == aResCompSolidPtr;
+            } else {
+              aCompSolid = aResCompSolidPtr;
+            }
+          } else {
+            isAllInSameCompSolid = false;
+            break;
+          }
+        }
+      }
+    }
+  }
+
+  anIt++;
+
+  if (anObjectsNb + aToolsNb < 2) {
+    theError = "Not enough arguments for Fuse operation.";
+    return false;
+  } else if (isAllInSameCompSolid) {
+    theError = "Operations only between sub-shapes of the same shape not allowed.";
+    return false;
+  }
+
+  return true;
+}
+
+//=================================================================================================
+bool FeaturesPlugin_ValidatorBooleanFuseArguments::isNotObligatory(
+  std::string theFeature,
+  std::string theAttribute)
+{
+  if (theAttribute == "main_objects" || theAttribute == "tool_objects") {
+    return true;
+  }
+
+  return false;
 }

@@ -318,4 +318,40 @@ public:
                        Events_InfoMessage& theError) const;
 };
 
+/// \class FeaturesPlugin_ValidatorBooleanFuseSelection
+/// \ingroup Validators
+/// \brief Verifies the selected object for boolean fuse feature
+class FeaturesPlugin_ValidatorBooleanFuseSelection: public ModelAPI_AttributeValidator
+{
+public:
+  //! \return True if the attribute is valid.
+  //! \param[in] theAttribute the checked attribute.
+  //! \param[in] theArguments arguments of the attribute.
+  //! \param[out] theError error message.
+  virtual bool isValid(const AttributePtr& theAttribute,
+                       const std::list<std::string>& theArguments,
+                       Events_InfoMessage& theError) const;
+};
+
+/** \class FeaturesPlugin_ValidatorBooleanFuseArguments
+*  \ingroup Validators
+*  \brief Validates that boolean operation have enough arguments.
+*/
+class FeaturesPlugin_ValidatorBooleanFuseArguments: public ModelAPI_FeatureValidator
+{
+public:
+  /** \brief Returns true if feature and/or attributes are valid.
+  *  \param[in] theFeature the validated feature.
+  *  \param[in] theArguments the arguments in the configuration file for this validator.
+  *  \param[out] theError error message.
+  *  \returns true if feature is valid.
+  */
+  virtual bool isValid(const std::shared_ptr<ModelAPI_Feature>& theFeature,
+                       const std::list<std::string>& theArguments,
+                       Events_InfoMessage& theError) const;
+
+  /// \return true if the attribute in feature is not obligatory for the feature execution.
+  virtual bool isNotObligatory(std::string theFeature, std::string theAttribute);
+};
+
 #endif

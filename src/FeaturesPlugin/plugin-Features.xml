@@ -70,7 +70,7 @@ email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com
       <feature id="Fuse" title="Fuse" tooltip="Perform boolean fuse operation with objects"
                icon="icons/Features/bool_fuse.png" helpfile="FeaturesPlugin/fuseFeature.html"
                auto_preview="false">
-          <source path="boolean_widget.xml"/>
+          <source path="boolean_fuse_widget.xml"/>
       </feature>
       <feature id="Common" title="Common" tooltip="Perform boolean common operation with objects"
                icon="icons/Features/bool_common.png"  helpfile="FeaturesPlugin/commonFeature.html"

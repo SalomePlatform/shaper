@@ -133,8 +133,10 @@ aSession.undo()
 #=========================================================================
 aSession.startOperation()
 aBooleanFt = aPart.addFeature("Fuse")
+aBooleanFt.string("creation_method").setValue("advanced")
 aBooleanFt.selectionList("main_objects").append(modelAPI_ResultCompSolid(extrudedObjects[0]).subResult(1), None)
 aBooleanFt.selectionList("tool_objects").append(extrudedObjects[1], None)
+aBooleanFt.boolean("remove_intersection_edges").setValue(False)
 aBooleanFt.execute()
 aSession.finishOperation()
 

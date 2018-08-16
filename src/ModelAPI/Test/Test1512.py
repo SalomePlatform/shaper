@@ -136,8 +136,10 @@ aSession.finishOperation()
 #=========================================================================
 aSession.startOperation()
 aFuse = aPart.addFeature("Fuse")
+aFuse.string("creation_method").setValue("advanced")
 aFuse.selectionList("main_objects").append(aTower.firstResult(), None)
 aFuse.selectionList("tool_objects").append(aCut1.firstResult(), None)
+aFuse.boolean("remove_intersection_edges").setValue(False)
 aSession.finishOperation()
 
 #=========================================================================
