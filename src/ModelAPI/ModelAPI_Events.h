@@ -128,11 +128,9 @@ protected:
   virtual ~ModelAPI_ObjectDeletedMessage();
 
 public:
-  /// Returns the document that has been updated
-  virtual std::shared_ptr<ModelAPI_Document> document() const = 0;
-
   /// Returns the groups where the objects were deleted
-  virtual const std::set<std::string>& groups() const = 0;
+  virtual const std::list<std::pair<std::shared_ptr<ModelAPI_Document>, std::string> >&
+    groups() const = 0;
 
   /// Creates the new empty message of this kind
   virtual std::shared_ptr<Events_MessageGroup> newEmpty() = 0;

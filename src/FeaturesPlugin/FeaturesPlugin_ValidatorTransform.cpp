@@ -25,7 +25,6 @@
 #include "ModelAPI_AttributeSelectionList.h"
 #include "ModelAPI_ResultPart.h"
 #include "ModelAPI_ResultBody.h"
-#include "ModelAPI_ResultCompSolid.h"
 #include "ModelAPI_Session.h"
 
 bool FeaturesPlugin_ValidatorTransform::isValid(const AttributePtr& theAttribute,
@@ -59,7 +58,7 @@ bool FeaturesPlugin_ValidatorTransform::isValid(const AttributePtr& theAttribute
     else { // Part document: Result CompSolid is valid
       aValid = aResult->groupName() == ModelAPI_ResultBody::group();
       if (aValid) {
-        ResultCompSolidPtr aComp = std::dynamic_pointer_cast<ModelAPI_ResultCompSolid>(aResult);
+        ResultBodyPtr aComp = std::dynamic_pointer_cast<ModelAPI_ResultBody>(aResult);
         aValid = aComp.get() != NULL;
       }
     }

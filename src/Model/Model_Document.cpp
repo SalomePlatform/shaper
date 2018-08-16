@@ -30,7 +30,6 @@
 #include <ModelAPI_AttributeSelectionList.h>
 #include <ModelAPI_Tools.h>
 #include <ModelAPI_ResultBody.h>
-#include <ModelAPI_ResultCompSolid.h>
 #include <Events_Loop.h>
 #include <Events_InfoMessage.h>
 
@@ -1055,6 +1054,14 @@ int Model_Document::size(const std::string& theGroupID, const bool theAllowFolde
   return myObjs->size(theGroupID, theAllowFolder);
 }
 
+std::shared_ptr<ModelAPI_Object> Model_Document::parent(
+  const std::shared_ptr<ModelAPI_Object> theChild)
+{
+  if(myObjs == 0) // may be on close
+    return ObjectPtr();
+  return myObjs->parent(theChild);
+}
+
 std::shared_ptr<ModelAPI_Feature> Model_Document::currentFeature(const bool theVisible)
 {
   if (!myObjs) // on close document feature destruction it may call this method
@@ -1567,21 +1574,11 @@ void Model_Document::setActive(const bool theFlag)
       FeaturePtr aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(
         object(ModelAPI_Feature::group(), a));
       if (aFeature.get() && aFeature->data()->isValid()) {
-        const std::list<std::shared_ptr<ModelAPI_Result> >& aResList = aFeature->results();
-        std::list<std::shared_ptr<ModelAPI_Result> >::const_iterator aRes = aResList.begin();
-        for(; aRes != aResList.end(); aRes++) {
+        std::list<ResultPtr> aResults;
+        ModelAPI_Tools::allResults(aFeature, aResults);
+        for (std::list<ResultPtr>::iterator aRes = aResults.begin();
+                                                aRes != aResults.end(); aRes++) {
           ModelAPI_EventCreator::get()->sendUpdated(*aRes, aRedispEvent);
-          // #issue 1048: sub-compsolids also
-          ResultCompSolidPtr aCompRes = std::dynamic_pointer_cast<ModelAPI_ResultCompSolid>(*aRes);
-          if (aCompRes.get()) {
-            int aNumSubs = aCompRes->numberOfSubs();
-            for(int a = 0; a < aNumSubs; a++) {
-              ResultPtr aSub = aCompRes->subResult(a);
-              if (aSub.get()) {
-                ModelAPI_EventCreator::get()->sendUpdated(aSub, aRedispEvent);
-              }
-            }
-          }
         }
       }
     }
@@ -1755,9 +1752,15 @@ std::shared_ptr<ModelAPI_Feature> Model_Document::producedByFeature(
   if (aShape.IsNull())
     return FeaturePtr();
 
-  // for comsolids and compounds all the naming is located in the main object, so, try to use
+  // for compsolids and compounds all the naming is located in the main object, so, try to use
   // it first
-  ResultCompSolidPtr aMain = ModelAPI_Tools::compSolidOwner(theResult);
+  ResultBodyPtr aMain = ModelAPI_Tools::bodyOwner(theResult);
+  while (aMain.get()) { // get the top-most main
+    ResultBodyPtr aNextMain = ModelAPI_Tools::bodyOwner(aMain);
+    if (aNextMain.get())
+      aMain = aNextMain;
+    else break;
+  }
   if (aMain.get()) {
     FeaturePtr aMainRes = producedByFeature(aMain, theShape);
     if (aMainRes)

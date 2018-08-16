@@ -141,10 +141,10 @@ std::string Model_SelectionNaming::getShapeName(
             !aNS->Label().IsDescendant(aContextData->label())) {
           isNeedContextName = false;
           TDF_Label aNSDataLab = aNS->Label();
-          while(aNSDataLab.Depth() != 7 && aNSDataLab.Depth() > 5)
+          if (aNSDataLab.Depth() % 2 == 0)
             aNSDataLab = aNSDataLab.Father();
           ObjectPtr aNewContext = theDoc->objects()->object(aNSDataLab);
-          if (!aNewContext.get() && aNSDataLab.Depth() == 7) {
+          while(!aNewContext.get() && aNSDataLab.Depth() > 5) {
             aNSDataLab = aNSDataLab.Father().Father();
             aNewContext = theDoc->objects()->object(aNSDataLab);
           }

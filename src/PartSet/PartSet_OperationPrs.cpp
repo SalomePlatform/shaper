@@ -42,7 +42,7 @@
 #include <ModelAPI_AttributeRefList.h>
 #include <ModelAPI_Validator.h>
 #include <ModelAPI_Session.h>
-#include <ModelAPI_ResultCompSolid.h>
+#include <ModelAPI_ResultBody.h>
 #include <ModelAPI_Tools.h>
 
 #include <Events_InfoMessage.h>
@@ -189,12 +189,12 @@ void PartSet_OperationPrs::addValue(const ObjectPtr& theObject, const GeomShapeP
   if (theObject.get()) {
     ResultPtr aResult = std::dynamic_pointer_cast<ModelAPI_Result>(theObject);
     if (aResult.get()) {
-      ResultCompSolidPtr aCompsolidResult =
-        std::dynamic_pointer_cast<ModelAPI_ResultCompSolid>(theObject);
-      if (aCompsolidResult.get()) {
-        if (aCompsolidResult->numberOfSubs() > 0) {
-          for(int i = 0; i < aCompsolidResult->numberOfSubs(); i++) {
-            ResultPtr aSubResult = aCompsolidResult->subResult(i);
+      ResultBodyPtr aBodyResult =
+        std::dynamic_pointer_cast<ModelAPI_ResultBody>(theObject);
+      if (aBodyResult.get()) {
+        if (aBodyResult->numberOfSubs() > 0) {
+          for(int i = 0; i < aBodyResult->numberOfSubs(); i++) {
+            ResultPtr aSubResult = aBodyResult->subResult(i);
             if (aSubResult.get()) {
               GeomShapePtr aShape;
               addValue(aSubResult, aShape, theFeature, theWorkshop, theObjectShapes);

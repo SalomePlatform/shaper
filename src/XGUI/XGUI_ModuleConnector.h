@@ -94,6 +94,10 @@ Q_OBJECT
   //! Returns data object by AIS
   virtual ObjectPtr findPresentedObject(const AISObjectPtr& theAIS) const;
 
+  //! Returns true if the object is displayed
+  //! \param theObject a data object
+  virtual bool isVisible(const ObjectPtr& theObject) const;
+
   //! Select features clearing previous selection.
   //! If the list is empty then selection will be cleared
   virtual void setSelected(const QList<std::shared_ptr<ModuleBase_ViewerPrs>>& theValues);

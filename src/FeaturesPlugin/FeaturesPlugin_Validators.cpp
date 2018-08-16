@@ -34,7 +34,7 @@
 #include <ModelAPI_AttributeReference.h>
 #include <ModelAPI_AttributeRefList.h>
 #include <ModelAPI_Feature.h>
-#include <ModelAPI_ResultCompSolid.h>
+#include <ModelAPI_ResultBody.h>
 #include <ModelAPI_ResultConstruction.h>
 #include <ModelAPI_Tools.h>
 
@@ -586,8 +586,11 @@ bool FeaturesPlugin_ValidatorBooleanSelection::isValid(const AttributePtr& theAt
     }
     ResultPtr aContext = anAttrSelection->context();
     if(!aContext.get()) {
-      theError = "Error: Empty selection context.";
-      return false;
+      FeaturePtr aContFeat = anAttrSelection->contextFeature();
+      if (!aContFeat.get()) {
+        theError = "Error: Empty selection context.";
+        return false;
+      }
     }
     ResultConstructionPtr aResultConstruction =
       std::dynamic_pointer_cast<ModelAPI_ResultConstruction>(aContext);
@@ -599,15 +602,15 @@ bool FeaturesPlugin_ValidatorBooleanSelection::isValid(const AttributePtr& theAt
       }
     }
     std::shared_ptr<GeomAPI_Shape> aShape = anAttrSelection->value();
-    GeomShapePtr aContextShape = aContext->shape();
     if(!aShape.get()) {
+      GeomShapePtr aContextShape = aContext->shape();
       aShape = aContextShape;
     }
     if(!aShape.get()) {
       theError = "Error: Empty shape.";
       return false;
     }
-    if(!aShape->isEqual(aContextShape)) {
+    if (aContext.get() && !aShape->isEqual(aContext->shape())) {
       theError = "Error: Local selection not allowed.";
       return false;
     }
@@ -676,7 +679,7 @@ bool FeaturesPlugin_ValidatorFilletSelection::isValid(const AttributePtr& theAtt
       return false;
     }
 
-    ResultCompSolidPtr aContextOwner = ModelAPI_Tools::compSolidOwner(aContext);
+    ResultBodyPtr aContextOwner = ModelAPI_Tools::bodyOwner(aContext);
     GeomShapePtr anOwner = aContextOwner.get() ? aContextOwner->shape() : aContext->shape();
 
     if (anOwner->shapeType() != GeomAPI_Shape::SOLID &&
@@ -729,10 +732,21 @@ bool FeaturesPlugin_ValidatorPartitionSelection::isValid(const AttributePtr& the
       return false;
     }
 
-    ResultCompSolidPtr aResultCompsolid =
-      std::dynamic_pointer_cast<ModelAPI_ResultCompSolid>(aContext);
-    if(aResultCompsolid.get()) {
+    ResultBodyPtr aResultBody = std::dynamic_pointer_cast<ModelAPI_ResultBody>(aContext);
+    if(aResultBody.get()) {
       continue;
+    }
+    FeaturePtr aResultFeature = aSelectAttr->contextFeature();
+    if(aResultFeature.get()) {
+      bool aOkRes = false;
+      std::list<ResultPtr>::const_iterator aFRes = aResultFeature->results().cbegin();
+      for(; aFRes != aResultFeature->results().cend() && !aOkRes; aFRes++) {
+        ResultBodyPtr aBody = std::dynamic_pointer_cast<ModelAPI_ResultBody>(*aFRes);
+        if (aBody.get() && !aBody->isDisabled())
+          aOkRes = true;
+      }
+      if (aOkRes)
+        continue;
     }
 
     theError = "Error: Only body shapes and construction planes are allowed for selection.";
@@ -893,8 +907,8 @@ bool FeaturesPlugin_ValidatorUnionSelection::isValid(const AttributePtr& theAttr
       return false;
     }
 
-    ResultCompSolidPtr aResult =
-      std::dynamic_pointer_cast<ModelAPI_ResultCompSolid>(aContext);
+    ResultBodyPtr aResult =
+      std::dynamic_pointer_cast<ModelAPI_ResultBody>(aContext);
     if(!aResult.get()) {
       continue;
     }
@@ -1041,7 +1055,7 @@ bool FeaturesPlugin_ValidatorBooleanArguments::isValid(
   std::list<std::string>::const_iterator anIt = theArguments.begin(), aLast = theArguments.end();
 
   bool isAllInSameCompSolid = true;
-  ResultCompSolidPtr aCompSolid;
+  ResultBodyPtr aCompSolid;
 
   AttributeSelectionListPtr anAttrSelList = theFeature->selectionList(*anIt);
   if (anAttrSelList)
@@ -1051,7 +1065,7 @@ bool FeaturesPlugin_ValidatorBooleanArguments::isValid(
     {
       AttributeSelectionPtr anAttr = anAttrSelList->value(anIndex);
       ResultPtr aContext = anAttr->context();
-      ResultCompSolidPtr aResCompSolidPtr = ModelAPI_Tools::compSolidOwner(aContext);
+      ResultBodyPtr aResCompSolidPtr = ModelAPI_Tools::bodyOwner(aContext);
       if (aResCompSolidPtr.get())
       {
         if (aCompSolid.get())
@@ -1083,7 +1097,7 @@ bool FeaturesPlugin_ValidatorBooleanArguments::isValid(
       {
         AttributeSelectionPtr anAttr = anAttrSelList->value(anIndex);
         ResultPtr aContext = anAttr->context();
-        ResultCompSolidPtr aResCompSolidPtr = ModelAPI_Tools::compSolidOwner(aContext);
+        ResultBodyPtr aResCompSolidPtr = ModelAPI_Tools::bodyOwner(aContext);
         if (aResCompSolidPtr.get())
         {
           if (aCompSolid.get())
@@ -1198,7 +1212,7 @@ bool FeaturesPlugin_ValidatorBooleanSmashSelection::isValid(
 
     if (aShape->isSolid() || aShape->isCompSolid()) {
       aSelectedShapesType = GeomAPI_Shape::SOLID;
-      ResultCompSolidPtr aResCompSolidPtr = ModelAPI_Tools::compSolidOwner(aContext);
+      ResultBodyPtr aResCompSolidPtr = ModelAPI_Tools::bodyOwner(aContext);
       if (aResCompSolidPtr.get()) {
         GeomShapePtr aCompSolidShape = aResCompSolidPtr->shape();
         aSelectedCompSolidsInOtherList.bind(aCompSolidShape, aCompSolidShape);
@@ -1264,7 +1278,7 @@ bool FeaturesPlugin_ValidatorBooleanSmashSelection::isValid(
         return false;
       }
 
-      ResultCompSolidPtr aResCompSolidPtr = ModelAPI_Tools::compSolidOwner(aContext);
+      ResultBodyPtr aResCompSolidPtr = ModelAPI_Tools::bodyOwner(aContext);
       if (aResCompSolidPtr.get()) {
         GeomShapePtr aCompSolidShape = aResCompSolidPtr->shape();
         if (aSelectedCompSolidsInOtherList.isBound(aCompSolidShape)) {
@@ -1424,7 +1438,7 @@ bool FeaturesPlugin_ValidatorBooleanFuseArguments::isValid(
   std::list<std::string>::const_iterator anIt = theArguments.begin(), aLast = theArguments.end();
 
   bool isAllInSameCompSolid = true;
-  ResultCompSolidPtr aCompSolid;
+  ResultBodyPtr aCompSolid;
 
   AttributeSelectionListPtr anAttrSelList = theFeature->selectionList(*anIt);
   if (anAttrSelList) {
@@ -1432,7 +1446,7 @@ bool FeaturesPlugin_ValidatorBooleanFuseArguments::isValid(
     for (int anIndex = 0; anIndex < anObjectsNb; ++anIndex) {
       AttributeSelectionPtr anAttr = anAttrSelList->value(anIndex);
       ResultPtr aContext = anAttr->context();
-      ResultCompSolidPtr aResCompSolidPtr = ModelAPI_Tools::compSolidOwner(aContext);
+      ResultBodyPtr aResCompSolidPtr = ModelAPI_Tools::bodyOwner(aContext);
       if (aResCompSolidPtr.get()) {
         if (aCompSolid.get()) {
           isAllInSameCompSolid = aCompSolid == aResCompSolidPtr;
@@ -1456,7 +1470,7 @@ bool FeaturesPlugin_ValidatorBooleanFuseArguments::isValid(
         for (int anIndex = 0; anIndex < aToolsNb; ++anIndex) {
           AttributeSelectionPtr anAttr = anAttrSelList->value(anIndex);
           ResultPtr aContext = anAttr->context();
-          ResultCompSolidPtr aResCompSolidPtr = ModelAPI_Tools::compSolidOwner(aContext);
+          ResultBodyPtr aResCompSolidPtr = ModelAPI_Tools::bodyOwner(aContext);
           if (aResCompSolidPtr.get()) {
             if (aCompSolid.get()) {
               isAllInSameCompSolid = aCompSolid == aResCompSolidPtr;

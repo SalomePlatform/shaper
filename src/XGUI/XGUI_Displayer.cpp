@@ -37,7 +37,7 @@
 #include <ModelAPI_Object.h>
 #include <ModelAPI_Tools.h>
 #include <ModelAPI_AttributeIntArray.h>
-#include <ModelAPI_ResultCompSolid.h>
+#include <ModelAPI_ResultBody.h>
 
 #include <ModuleBase_BRepOwner.h>
 #include <ModuleBase_IModule.h>
@@ -292,7 +292,7 @@ bool XGUI_Displayer::erase(ObjectPtr theObject, const bool theUpdateViewer)
   if (aContext.IsNull())
     return aErased;
 
-  AISObjectPtr anObject = myResult2AISObjectMap[theObject];
+  AISObjectPtr anObject = myResult2AISObjectMap.value(theObject);
   if (anObject) {
     Handle(AIS_InteractiveObject) anAIS = anObject->impl<Handle(AIS_InteractiveObject)>();
     if (!anAIS.IsNull()) {
@@ -447,9 +447,8 @@ bool XGUI_Displayer::isVisible(XGUI_Displayer* theDisplayer, const ObjectPtr& th
     // compsolid is not visualized in the viewer,
     // but should have presentation when all sub solids are
     // visible. It is useful for highlight presentation where compsolid shape is selectable
-    if (!aVisible && aResult.get() && aResult->groupName() == ModelAPI_ResultCompSolid::group()) {
-      ResultCompSolidPtr aCompsolidResult =
-        std::dynamic_pointer_cast<ModelAPI_ResultCompSolid>(aResult);
+    if (!aVisible && aResult.get() && aResult->groupName() == ModelAPI_ResultBody::group()) {
+      ResultBodyPtr aCompsolidResult = std::dynamic_pointer_cast<ModelAPI_ResultBody>(aResult);
       if (aCompsolidResult.get() != NULL) { // change colors for all sub-solids
         bool anAllSubsVisible = aCompsolidResult->numberOfSubs() > 0;
         for(int i = 0; i < aCompsolidResult->numberOfSubs() && anAllSubsVisible; i++) {
@@ -515,7 +514,7 @@ void XGUI_Displayer::setSelected(const  QList<ModuleBase_ViewerPrsPtr>& theValue
       ObjectPtr anObject = aPrs->object();
       ResultPtr aResult = std::dynamic_pointer_cast<ModelAPI_Result>(anObject);
       if (aResult.get() && isVisible(aResult)) {
-        AISObjectPtr anObj = myResult2AISObjectMap[aResult];
+        AISObjectPtr anObj = myResult2AISObjectMap.value(aResult);
         Handle(AIS_InteractiveObject) anAIS = anObj->impl<Handle(AIS_InteractiveObject)>();
         if (!anAIS.IsNull()) {
           // The methods are replaced in order to provide multi-selection, e.g. restore selection
@@ -557,8 +556,8 @@ bool XGUI_Displayer::eraseAll(const bool theUpdateViewer)
   bool aErased = false;
   Handle(AIS_InteractiveContext) aContext = AISContext();
   if (!aContext.IsNull()) {
-    foreach (ObjectPtr aObj, myResult2AISObjectMap.keys()) {
-      AISObjectPtr aAISObj = myResult2AISObjectMap[aObj];
+    foreach (ObjectPtr aObj, myResult2AISObjectMap.objects()) {
+      AISObjectPtr aAISObj = myResult2AISObjectMap.value(aObj);
       // erase an object
       Handle(AIS_InteractiveObject) anIO = aAISObj->impl<Handle(AIS_InteractiveObject)>();
       if (!anIO.IsNull()) {
@@ -585,10 +584,7 @@ bool XGUI_Displayer::eraseAll(const bool theUpdateViewer)
 //**************************************************************
 AISObjectPtr XGUI_Displayer::getAISObject(ObjectPtr theObject) const
 {
-  AISObjectPtr anIO;
-  if (myResult2AISObjectMap.contains(theObject))
-    anIO = myResult2AISObjectMap[theObject];
-  return anIO;
+  return myResult2AISObjectMap.value(theObject);
 }
 
 //**************************************************************
@@ -601,16 +597,7 @@ ObjectPtr XGUI_Displayer::getObject(const AISObjectPtr& theIO) const
 //**************************************************************
 ObjectPtr XGUI_Displayer::getObject(const Handle(AIS_InteractiveObject)& theIO) const
 {
-  ObjectPtr anObject;
-  ResultToAISMap::const_iterator aMapIter = myResult2AISObjectMap.cbegin();
-  for (; aMapIter != myResult2AISObjectMap.cend(); aMapIter++) {
-    const AISObjectPtr& aAIS = aMapIter.value();
-    Handle(AIS_InteractiveObject) anAIS = aAIS->impl<Handle(AIS_InteractiveObject)>();
-    if (anAIS == theIO)
-      anObject = aMapIter.key();
-    if (anObject.get())
-      break;
-  }
+  ObjectPtr anObject = myResult2AISObjectMap.value(theIO);
   if (!anObject.get()) {
     std::shared_ptr<GeomAPI_AISObject> anAISObj = AISObjectPtr(new GeomAPI_AISObject());
     if (!theIO.IsNull()) {
@@ -873,7 +860,7 @@ void XGUI_Displayer::removeFilters()
 //**************************************************************
 void XGUI_Displayer::showOnly(const QObjectPtrList& theList)
 {
-  QObjectPtrList aDispList = myResult2AISObjectMap.keys();
+  QObjectPtrList aDispList = myResult2AISObjectMap.objects();
   foreach(ObjectPtr aObj, aDispList) {
     if (!theList.contains(aObj))
       erase(aObj, false);
@@ -952,7 +939,7 @@ QColor XGUI_Displayer::setObjectColor(ObjectPtr theObject,
 //**************************************************************
 void XGUI_Displayer::appendResultObject(ObjectPtr theObject, AISObjectPtr theAIS)
 {
-  myResult2AISObjectMap[theObject] = theAIS;
+  myResult2AISObjectMap.add(theObject, theAIS);
 
 #ifdef DEBUG_DISPLAY
   std::ostringstream aPtrStr;
@@ -967,8 +954,8 @@ void XGUI_Displayer::appendResultObject(ObjectPtr theObject, AISObjectPtr theAIS
 std::string XGUI_Displayer::getResult2AISObjectMapInfo() const
 {
   QStringList aContent;
-  foreach (ObjectPtr aObj, myResult2AISObjectMap.keys()) {
-    AISObjectPtr aAISObj = myResult2AISObjectMap[aObj];
+  foreach (ObjectPtr aObj, myResult2AISObjectMap.objects()) {
+    AISObjectPtr aAISObj = myResult2AISObjectMap.value(aObj);
     std::ostringstream aPtrStr;
     aPtrStr << "aObj = " << aObj.get() << ":";
     aPtrStr << "anAIS = " << aAISObj.get() << ":";
@@ -991,7 +978,7 @@ void XGUI_Displayer::getPresentations(const ObjectPtr& theObject,
     if (aAISObj.get() == NULL) {
       // if result is a result of a composite feature, it is visualized by visualization of
       // composite children, so we should get one of this presentations
-      ResultCompSolidPtr aCompSolid = std::dynamic_pointer_cast<ModelAPI_ResultCompSolid>(aResult);
+      ResultBodyPtr aCompSolid = std::dynamic_pointer_cast<ModelAPI_ResultBody>(aResult);
       if (aCompSolid.get() && aCompSolid->numberOfSubs() > 0) {
         aAISObj = getAISObject(aCompSolid->subResult(0));
       }

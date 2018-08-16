@@ -129,7 +129,7 @@ static void evolutionToSelectionRec(TDF_Label theLab, const bool theFlag) {
 void Model_BodyBuilder::evolutionToSelection(const bool theFlag)
 {
   std::shared_ptr<Model_Data> aData = std::dynamic_pointer_cast<Model_Data>(data());
-  if (!aData) // unknown case
+  if (!aData || !aData->isValid()) // unknown case
     return;
   TDF_Label& aShapeLab = aData->shapeLab();
   evolutionToSelectionRec(aShapeLab, theFlag);
@@ -1107,7 +1107,7 @@ void Model_BodyBuilder::loadDisconnectedVertexes(std::shared_ptr<GeomAPI_Shape> 
 std::shared_ptr<GeomAPI_Shape> Model_BodyBuilder::shape()
 {
   std::shared_ptr<Model_Data> aData = std::dynamic_pointer_cast<Model_Data>(data());
-  if (aData) {
+  if (aData && aData->isValid()) {
     TDF_Label aShapeLab = aData->shapeLab();
     Handle(TDF_Reference) aRef;
     if (aShapeLab.FindAttribute(TDF_Reference::GetID(), aRef)) {

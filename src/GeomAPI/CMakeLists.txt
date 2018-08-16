@@ -60,7 +60,6 @@ SET(PROJECT_HEADERS
     GeomAPI_Ellipse.h
     GeomAPI_Ellipse2d.h
     GeomAPI_Tools.h
-    GeomAPI_IScreenParams.h
     GeomAPI_Shell.h
     GeomAPI_Solid.h
     GeomAPI_Sphere.h

@@ -24,7 +24,7 @@
 #include <ModelAPI_Document.h>
 #include <ModelAPI_Object.h>
 #include <ModelAPI_AttributeDouble.h>
-#include <ModelAPI_ResultCompSolid.h>
+#include <ModelAPI_ResultBody.h>
 #include <ModelAPI_ResultParameter.h>
 #include <ModelAPI_ResultPart.h>
 #include <ModelAPI_AttributeDocRef.h>
@@ -265,48 +265,52 @@ CompositeFeaturePtr compositeOwner(const FeaturePtr& theFeature)
   return CompositeFeaturePtr(); // not found
 }
 
-ResultCompSolidPtr compSolidOwner(const ResultPtr& theSub)
+ResultBodyPtr bodyOwner(const ResultPtr& theSub, const bool theRoot)
 {
-  int anIndex;
-  ResultBodyPtr aBody = std::dynamic_pointer_cast<ModelAPI_ResultBody>(theSub);
-  if (aBody.get()) {
-    FeaturePtr aFeatureOwner = aBody->document()->feature(aBody);
-    if (aFeatureOwner.get()) {
-      std::list<std::shared_ptr<ModelAPI_Result> >::const_iterator aResIter =
-        aFeatureOwner->results().cbegin();
-      for(; aResIter != aFeatureOwner->results().cend(); aResIter++) {
-        ResultCompSolidPtr aComp = std::dynamic_pointer_cast<ModelAPI_ResultCompSolid>(*aResIter);
-        if (aComp && aComp->isSub(aBody, anIndex))
-          return aComp;
+  if (theSub.get()) {
+    ObjectPtr aParent = theSub->document()->parent(theSub);
+    if (aParent.get()) {
+      if (theRoot) { // try to find parent of parent
+        ResultPtr aResultParent = std::dynamic_pointer_cast<ModelAPI_Result>(aParent);
+        ResultBodyPtr aGrandParent = bodyOwner(aResultParent, true);
+        if (aGrandParent.get())
+          aParent = aGrandParent;
       }
+      return std::dynamic_pointer_cast<ModelAPI_ResultBody>(aParent);
     }
   }
-  return ResultCompSolidPtr(); // not found
+  return ResultBodyPtr(); // not found
 }
 
-int compSolidIndex(const ResultPtr& theSub)
+int bodyIndex(const ResultPtr& theSub)
 {
   int anIndex = -1;
-  ResultBodyPtr aBody = std::dynamic_pointer_cast<ModelAPI_ResultBody>(theSub);
-  if (aBody.get()) {
-    FeaturePtr aFeatureOwner = aBody->document()->feature(aBody);
-    if (aFeatureOwner.get()) {
-      std::list<std::shared_ptr<ModelAPI_Result> >::const_iterator aResIter =
-        aFeatureOwner->results().cbegin();
-      for(; aResIter != aFeatureOwner->results().cend(); aResIter++) {
-        ResultCompSolidPtr aComp = std::dynamic_pointer_cast<ModelAPI_ResultCompSolid>(*aResIter);
-        if (aComp && aComp->isSub(aBody, anIndex))
-          return anIndex;
-      }
-    }
+  ResultBodyPtr aParent = bodyOwner(theSub);
+  if (aParent.get()) {
+    ResultBodyPtr aBody = std::dynamic_pointer_cast<ModelAPI_ResultBody>(theSub);
+    if (aBody.get() && aParent->isSub(aBody, anIndex))
+      return anIndex;
   }
   return anIndex; // not found
 }
 
 bool hasSubResults(const ResultPtr& theResult)
 {
-  ResultCompSolidPtr aCompSolid = std::dynamic_pointer_cast<ModelAPI_ResultCompSolid>(theResult);
+  ResultBodyPtr aCompSolid = std::dynamic_pointer_cast<ModelAPI_ResultBody>(theResult);
   return aCompSolid.get() && aCompSolid->numberOfSubs() > 0;
+}
+
+void allSubs(const ResultBodyPtr& theResult, std::list<ResultPtr>& theResults) {
+  // iterate sub-bodies of compsolid
+  ResultBodyPtr aComp = std::dynamic_pointer_cast<ModelAPI_ResultBody>(theResult);
+  if (aComp.get()) {
+    int aNumSub = aComp->numberOfSubs();
+    for (int a = 0; a < aNumSub; a++) {
+      ResultBodyPtr aSub = aComp->subResult(a);
+      theResults.push_back(aSub);
+      allSubs(aSub, theResults);
+    }
+  }
 }
 
 void allResults(const FeaturePtr& theFeature, std::list<ResultPtr>& theResults)
@@ -314,17 +318,11 @@ void allResults(const FeaturePtr& theFeature, std::list<ResultPtr>& theResults)
   if (!theFeature.get()) // safety: for empty feature no results
     return;
   const std::list<std::shared_ptr<ModelAPI_Result> >& aResults = theFeature->results();
-  std::list<std::shared_ptr<ModelAPI_Result> >::const_iterator aRIter = aResults.begin();
+  std::list<ResultPtr>::const_iterator aRIter = aResults.begin();
   for (; aRIter != aResults.cend(); aRIter++) {
     theResults.push_back(*aRIter);
-    // iterate sub-bodies of compsolid
-    ResultCompSolidPtr aComp = std::dynamic_pointer_cast<ModelAPI_ResultCompSolid>(*aRIter);
-    if (aComp.get()) {
-      int aNumSub = aComp->numberOfSubs();
-      for(int a = 0; a < aNumSub; a++) {
-        theResults.push_back(aComp->subResult(a));
-      }
-    }
+    ResultBodyPtr aResult = std::dynamic_pointer_cast<ModelAPI_ResultBody>(*aRIter);
+    allSubs(aResult, theResults);
   }
 }
 
@@ -606,57 +604,60 @@ void getConcealedResults(const FeaturePtr& theFeature,
   }
 }
 
-std::pair<std::string, bool> getDefaultName(
-    const std::shared_ptr<ModelAPI_Result>& theResult,
-    const int theResultIndex)
+std::pair<std::string, bool> getDefaultName(const std::shared_ptr<ModelAPI_Result>& theResult,
+                                            const bool theInherited)
 {
   typedef std::list< std::pair < std::string, std::list<ObjectPtr> > > ListOfReferences;
 
   SessionPtr aSession = ModelAPI_Session::get();
-  FeaturePtr anOwner = ModelAPI_Feature::feature(theResult->data()->owner());
 
-  ResultCompSolidPtr aCompSolidRes = compSolidOwner(theResult);
-  if (aCompSolidRes) {
+  ResultBodyPtr anOwnerRes = bodyOwner(theResult);
+  if (anOwnerRes) {
     // names of sub-solids in CompSolid should be default (for example,
     // result of boolean operation 'Boolean_1_1' is a CompSolid which is renamed to 'MyBOOL',
     // however, sub-elements of 'MyBOOL' should be named 'Boolean_1_1_1', 'Boolean_1_1_2' etc.)
     std::ostringstream aDefaultName;
-    aDefaultName << anOwner->name();
-    // compute default name of CompSolid (name of feature + index of CompSolid's result)
-    int aCompSolidResultIndex = 0;
-    const std::list<ResultPtr>& aResults = anOwner->results();
-    for (std::list<ResultPtr>::const_iterator anIt = aResults.begin();
-         anIt != aResults.end(); ++anIt, ++aCompSolidResultIndex)
-      if (aCompSolidRes == *anIt)
-        break;
-    aDefaultName << "_" << (aCompSolidResultIndex + 1) << "_" << (theResultIndex + 1);
+    aDefaultName << getDefaultName(anOwnerRes).first;
+    aDefaultName << "_" << (bodyIndex(theResult) + 1);
     return std::pair<std::string, bool>(aDefaultName.str(), false);
   }
 
+  FeaturePtr anOwner = ModelAPI_Feature::feature(theResult->data()->owner());
   DataPtr aData = anOwner->data();
 
   ListOfReferences aReferences;
-  aData->referencesToObjects(aReferences);
-
   // find first result with user-defined name
   ListOfReferences::const_iterator aFoundRef = aReferences.end();
-  for (ListOfReferences::const_iterator aRefIt = aReferences.begin();
-       aRefIt != aReferences.end(); ++aRefIt) {
-    bool isConcealed = aSession->validators()->isConcealed(anOwner->getKind(), aRefIt->first);
-    bool isMainArg = isConcealed &&
-                     aSession->validators()->isMainArgument(anOwner->getKind(), aRefIt->first);
-    if (isConcealed) {
-      // check the referred object is a Body
-      // (for example, ExtrusionCut has a sketch as a first attribute which is concealing)
-      bool isBody = aRefIt->second.size() > 1 || (aRefIt->second.size() == 1 &&
-                    aRefIt->second.front()->groupName() == ModelAPI_ResultBody::group());
-      if (isBody && (isMainArg || aFoundRef == aReferences.end() ||
-          aData->isPrecedingAttribute(aRefIt->first, aFoundRef->first)))
-        aFoundRef = aRefIt;
+  if (theInherited) {
+    aData->referencesToObjects(aReferences);
 
-      if (isMainArg)
-        break;
+    for (ListOfReferences::const_iterator aRefIt = aReferences.begin();
+         aRefIt != aReferences.end(); ++aRefIt) {
+      bool isConcealed = aSession->validators()->isConcealed(anOwner->getKind(), aRefIt->first);
+      bool isMainArg = isConcealed &&
+                       aSession->validators()->isMainArgument(anOwner->getKind(), aRefIt->first);
+      if (isConcealed) {
+        // check the referred object is a Body
+        // (for example, ExtrusionCut has a sketch as a first attribute which is concealing)
+        bool isBody = aRefIt->second.size() > 1 || (aRefIt->second.size() == 1 &&
+                      aRefIt->second.front()->groupName() == ModelAPI_ResultBody::group());
+        if (isBody && (isMainArg || aFoundRef == aReferences.end() ||
+            aData->isPrecedingAttribute(aRefIt->first, aFoundRef->first)))
+          aFoundRef = aRefIt;
+
+        if (isMainArg)
+          break;
+      }
     }
+  }
+  // get the result number in the feature
+  int anIndexInOwner = 0;
+  const std::list<ResultPtr>& anOwnerResults = anOwner->results();
+  std::list<ResultPtr>::const_iterator aResIt = anOwnerResults.cbegin();
+  for(; aResIt != anOwnerResults.cend(); aResIt++) {
+    if(*aResIt == theResult)
+      break;
+    anIndexInOwner++;
   }
 
   // find an object which is concealed by theResult
@@ -665,12 +666,12 @@ std::pair<std::string, bool> getDefaultName(
     std::map<ResultPtr, int> aNbRefToObject;
     // search the object by result index
     std::list<ObjectPtr>::const_iterator anObjIt = aFoundRef->second.begin();
-    int aResultIndex = theResultIndex;
+    int aResultIndex = anIndexInOwner;
     while (--aResultIndex >= 0) {
       ResultPtr aCurRes = std::dynamic_pointer_cast<ModelAPI_Result>(*anObjIt);
-      ResultCompSolidPtr aParentCompSolid = ModelAPI_Tools::compSolidOwner(aCurRes);
-      if (aParentCompSolid)
-        aCurRes = aParentCompSolid;
+      ResultBodyPtr aParentBody = ModelAPI_Tools::bodyOwner(aCurRes);
+      if (aParentBody)
+        aCurRes = aParentBody;
       if (aNbRefToObject.find(aCurRes) == aNbRefToObject.end())
         aNbRefToObject[aCurRes] = 1;
       else
@@ -686,9 +687,9 @@ std::pair<std::string, bool> getDefaultName(
     if ((*anObjIt)->groupName() == ModelAPI_ResultBody::group()) {
       // check the result is part of CompSolid
       ResultPtr anObjRes = std::dynamic_pointer_cast<ModelAPI_Result>(*anObjIt);
-      ResultCompSolidPtr aParentCompSolid = ModelAPI_Tools::compSolidOwner(anObjRes);
-      if (aParentCompSolid)
-        anObjRes = aParentCompSolid;
+      ResultBodyPtr aParentBody = ModelAPI_Tools::bodyOwner(anObjRes);
+      if (aParentBody)
+        anObjRes = aParentBody;
 
       // return name of reference result only if it has been renamed by the user,
       // in other case compose a default name
@@ -711,48 +712,9 @@ std::pair<std::string, bool> getDefaultName(
   aDefaultName << anOwner->name();
   // if there are several results (issue #899: any number of result),
   // add unique prefix starting from second
-  if (theResultIndex > 0 || theResult->groupName() == ModelAPI_ResultBody::group())
-    aDefaultName << "_" << theResultIndex + 1;
+  if (anIndexInOwner > 0 || theResult->groupName() == ModelAPI_ResultBody::group())
+    aDefaultName << "_" << anIndexInOwner + 1;
   return std::pair<std::string, bool>(aDefaultName.str(), false);
-}
-
-std::string getDefaultName(const ResultPtr& theResult)
-{
-  FeaturePtr anOwner = ModelAPI_Feature::feature(theResult->data()->owner());
-
-  // names of sub-solids in CompSolid should be default (for example,
-  // result of boolean operation 'Boolean_1_1' is a CompSolid which is renamed to 'MyBOOL',
-  // however, sub-elements of 'MyBOOL' should be named 'Boolean_1_1_1', 'Boolean_1_1_2' etc.)
-  std::ostringstream aDefaultName;
-  aDefaultName << anOwner->name();
-
-  ResultPtr aResToSearch = theResult;
-  ResultCompSolidPtr aCompSolidRes = compSolidOwner(theResult);
-  if (aCompSolidRes)
-    aResToSearch = aCompSolidRes;
-
-  // obtain index of result
-  int aResIndex = 1;
-  const std::list<ResultPtr>& aResults = anOwner->results();
-  for (std::list<ResultPtr>::const_iterator anIt = aResults.begin();
-       anIt != aResults.end(); ++anIt, ++aResIndex)
-    if (aResToSearch == *anIt)
-      break;
-
-  // compute default name of CompSolid (name of feature + index of CompSolid's result)
-  aDefaultName << "_" << aResIndex;
-
-  if (aCompSolidRes) {
-    // obtain index of result in compsolid and compose a default name
-    int aNbSubs = aCompSolidRes->numberOfSubs();
-    for (int anIndex = 0; anIndex < aNbSubs; ++anIndex)
-      if (aCompSolidRes->subResult(anIndex) == theResult) {
-        aDefaultName << "_" << (anIndex + 1);
-        break;
-      }
-  }
-
-  return aDefaultName.str();
 }
 
 } // namespace ModelAPI_Tools

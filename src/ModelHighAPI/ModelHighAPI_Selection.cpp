@@ -25,7 +25,8 @@
 #include <ModelAPI_AttributeSelection.h>
 #include <ModelAPI_AttributeSelectionList.h>
 #include <ModelAPI_Feature.h>
-#include <ModelAPI_ResultCompSolid.h>
+#include <ModelAPI_ResultBody.h>
+
 //--------------------------------------------------------------------------------------
 
 //--------------------------------------------------------------------------------------
@@ -181,12 +182,11 @@ int ModelHighAPI_Selection::numberOfSubs() const
   if (myVariantType != VT_ResultSubShapePair)
     return 0;
 
-  ResultCompSolidPtr aCompSolid =
-      std::dynamic_pointer_cast<ModelAPI_ResultCompSolid>(myResultSubShapePair.first);
-  if (!aCompSolid)
+  ResultBodyPtr aBody = std::dynamic_pointer_cast<ModelAPI_ResultBody>(myResultSubShapePair.first);
+  if (!aBody.get())
     return 0;
 
-  return aCompSolid->numberOfSubs();
+  return aBody->numberOfSubs();
 }
 
 ModelHighAPI_Selection ModelHighAPI_Selection::subResult(int theIndex) const
@@ -194,13 +194,12 @@ ModelHighAPI_Selection ModelHighAPI_Selection::subResult(int theIndex) const
   if (myVariantType != VT_ResultSubShapePair)
     return ModelHighAPI_Selection();
 
-  ResultCompSolidPtr aCompSolid =
-      std::dynamic_pointer_cast<ModelAPI_ResultCompSolid>(myResultSubShapePair.first);
-  if (!aCompSolid)
+  ResultBodyPtr aBody = std::dynamic_pointer_cast<ModelAPI_ResultBody>(myResultSubShapePair.first);
+  if (!aBody)
     return ModelHighAPI_Selection();
-  if (theIndex >= aCompSolid->numberOfSubs())
+  if (theIndex >= aBody->numberOfSubs())
     return ModelHighAPI_Selection();
 
-  ResultBodyPtr aResult = aCompSolid->subResult(theIndex);
+  ResultBodyPtr aResult = aBody->subResult(theIndex);
   return ModelHighAPI_Selection(aResult, aResult->shape());
 }

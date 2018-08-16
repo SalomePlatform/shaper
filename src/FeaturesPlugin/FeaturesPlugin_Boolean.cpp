@@ -24,7 +24,6 @@
 #include <ModelAPI_Document.h>
 #include <ModelAPI_AttributeReference.h>
 #include <ModelAPI_AttributeInteger.h>
-#include <ModelAPI_ResultCompSolid.h>
 #include <ModelAPI_ResultBody.h>
 #include <ModelAPI_AttributeSelectionList.h>
 #include <ModelAPI_Session.h>
@@ -100,7 +99,7 @@ void FeaturesPlugin_Boolean::execute()
       return;
     }
     ResultPtr aContext = anObjectAttr->context();
-    ResultCompSolidPtr aResCompSolidPtr = ModelAPI_Tools::compSolidOwner(aContext);
+    ResultBodyPtr aResCompSolidPtr = ModelAPI_Tools::bodyOwner(aContext);
     if(aResCompSolidPtr.get()
         && aResCompSolidPtr->shape()->shapeType() == GeomAPI_Shape::COMPSOLID) {
       std::shared_ptr<GeomAPI_Shape> aContextShape = aResCompSolidPtr->shape();

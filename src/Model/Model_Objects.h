@@ -109,6 +109,10 @@ class Model_Objects
   //! \param theAllowFolder take into account grouping feature by folders
   int size(const std::string& theGroupID, const bool theAllowFolder = false);
 
+  //! Returns the parent object of this child. This may be result or feature, parent of a
+  //! top result. Fast method, that uses internal data structure specifics.
+  std::shared_ptr<ModelAPI_Object> parent(const std::shared_ptr<ModelAPI_Object> theChild);
+
   //! Returns all (and disabled) results of the given type.
   //! Not fast method (iterates all features).
   void allResults(const std::string& theGroupID, std::list<ResultPtr>& theResults);

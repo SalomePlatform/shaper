@@ -504,8 +504,14 @@ void Model_Session::processEvent(const std::shared_ptr<Events_Message>& theMessa
     if (theMessage->eventID() == kDeletedEvent) {
       std::shared_ptr<ModelAPI_ObjectDeletedMessage> aDeleted =
         std::dynamic_pointer_cast<ModelAPI_ObjectDeletedMessage>(theMessage);
-      if (aDeleted &&
-          aDeleted->groups().find(ModelAPI_ResultPart::group()) != aDeleted->groups().end())
+
+      std::list<std::pair<std::shared_ptr<ModelAPI_Document>, std::string>>::const_iterator
+        aGIter = aDeleted->groups().cbegin();
+      for (; aGIter != aDeleted->groups().cend(); aGIter++) {
+        if (aGIter->second == ModelAPI_ResultPart::group())
+          break;
+      }
+      if (aGIter != aDeleted->groups().cend())
       {
          // check that the current feature of the session is still the active Part (even disabled)
         bool aFound = false;

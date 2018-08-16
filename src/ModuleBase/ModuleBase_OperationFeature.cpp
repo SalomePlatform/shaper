@@ -187,10 +187,10 @@ FeaturePtr ModuleBase_OperationFeature::createFeature(const bool theFlushMessage
      }*/
   }
 
-  if (theFlushMessage) {
-    Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_CREATED));
-    Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_UPDATED));
-  }
+  //if (theFlushMessage) {
+  //  Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_CREATED));
+  //  Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_UPDATED));
+  //}
   return myFeature;
 }
 

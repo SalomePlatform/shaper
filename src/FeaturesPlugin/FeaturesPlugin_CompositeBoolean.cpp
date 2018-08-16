@@ -21,7 +21,6 @@
 #include "FeaturesPlugin_CompositeBoolean.h"
 
 #include <ModelAPI_AttributeSelectionList.h>
-#include <ModelAPI_ResultCompSolid.h>
 #include <ModelAPI_Tools.h>
 
 #include <GeomAlgoAPI_Boolean.h>
@@ -123,7 +122,7 @@ bool FeaturesPlugin_CompositeBoolean::makeBoolean(const ListOfShape& theTools,
       return false;
     }
     ResultPtr aContext = anObjectAttr->context();
-    ResultCompSolidPtr aResCompSolidPtr = ModelAPI_Tools::compSolidOwner(aContext);
+    ResultBodyPtr aResCompSolidPtr = ModelAPI_Tools::bodyOwner(aContext);
     if(aResCompSolidPtr.get()) {
       GeomShapePtr aContextShape = aResCompSolidPtr->shape();
       std::map<GeomShapePtr, ListOfShape>::iterator anIt = aCompSolidsObjects.begin();

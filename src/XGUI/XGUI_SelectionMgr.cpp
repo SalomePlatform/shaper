@@ -38,7 +38,8 @@
 #include <ModelAPI_Data.h>
 #include <ModelAPI_Result.h>
 #include <ModelAPI_Object.h>
-#include <ModelAPI_ResultCompSolid.h>
+#include <ModelAPI_ResultBody.h>
+#include <ModelAPI_Tools.h>
 
 #include <ModuleBase_ViewerPrs.h>
 #include <ModuleBase_Tools.h>
@@ -97,38 +98,32 @@ void XGUI_SelectionMgr::setSelectedOwners(const SelectMgr_IndexedMapOfOwner& the
 void XGUI_SelectionMgr::onObjectBrowserSelection()
 {
   QList<ModuleBase_ViewerPrsPtr> aSelectedPrs =
-             myWorkshop->selector()->selection()->getSelected(ModuleBase_ISelection::Browser);
+    myWorkshop->selector()->selection()->getSelected(ModuleBase_ISelection::Browser);
+  XGUI_Displayer* aDisplayer = myWorkshop->displayer();
+  if (!myWorkshop->operationMgr()->hasOperation()) {
 
-  QList<ModuleBase_ViewerPrsPtr> aTmpList = aSelectedPrs;
-  ObjectPtr aObject;
-  FeaturePtr aFeature;
-  foreach(ModuleBase_ViewerPrsPtr aPrs, aTmpList) {
-    aObject = aPrs->object();
-    if (aObject.get()) {
-      aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(aObject);
-      if (aFeature.get()) {
-        const std::list<std::shared_ptr<ModelAPI_Result>> aResList = aFeature->results();
-        ResultPtr aResult;
-        ResultCompSolidPtr aCompSolid;
-        std::list<ResultPtr>::const_iterator aIt;
-        for (aIt = aResList.cbegin(); aIt != aResList.cend(); ++aIt) {
-          aResult = (*aIt);
+    QList<ModuleBase_ViewerPrsPtr> aTmpList = aSelectedPrs;
+    ObjectPtr aObject;
+    FeaturePtr aFeature;
+    // Select all results of a selected feature in viewer
+    foreach(ModuleBase_ViewerPrsPtr aPrs, aSelectedPrs) {
+      aObject = aPrs->object();
+      if (aObject.get()) {
+        aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(aObject);
+        if (aFeature.get()) {
+        std::list<ResultPtr> allRes;
+        ModelAPI_Tools::allResults(aFeature, allRes);
+        for(std::list<ResultPtr>::iterator aRes = allRes.begin(); aRes != allRes.end(); aRes++) {
           aSelectedPrs.append(std::shared_ptr<ModuleBase_ViewerPrs>(
-            new ModuleBase_ViewerPrs(aResult, GeomShapePtr(), NULL)));
-          aCompSolid = std::dynamic_pointer_cast<ModelAPI_ResultCompSolid>(aResult);
-          if (aCompSolid.get()) {
-            for (int i = 0; i < aCompSolid->numberOfSubs(); i++) {
-              ResultBodyPtr aResult = aCompSolid->subResult(i);
-              aSelectedPrs.append(std::shared_ptr<ModuleBase_ViewerPrs>(
-                new ModuleBase_ViewerPrs(aResult, aResult->shape(), NULL)));
-            }
+            new ModuleBase_ViewerPrs(*aRes, GeomShapePtr(), NULL)));
           }
         }
       }
     }
+    aDisplayer->setSelected(aTmpList);
+  } else {
+    aDisplayer->setSelected(aSelectedPrs);
   }
-  XGUI_Displayer* aDisplayer = myWorkshop->displayer();
-  aDisplayer->setSelected(aSelectedPrs);
   emit selectionChanged();
 }
 

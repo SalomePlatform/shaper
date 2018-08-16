@@ -836,8 +836,8 @@ bool ModuleBase_WidgetMultiSelector::removeUnusedAttributeObjects
     AttributeSelectionListPtr aSelectionListAttr = aData->selectionList(attributeID());
     for (int i = 0; i < aSelectionListAttr->size(); i++) {
       AttributeSelectionPtr anAttr = aSelectionListAttr->value(i);
-      bool aFound = findInSelection(anAttr->context(), anAttr->value(), aGeomSelection,
-                                    myWorkshop);
+      bool aFound = findInSelection(
+        anAttr->contextObject(), anAttr->value(), aGeomSelection, myWorkshop);
       if (!aFound)
         anIndicesToBeRemoved.insert(i);
     }

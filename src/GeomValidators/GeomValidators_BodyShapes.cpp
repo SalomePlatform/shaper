@@ -26,6 +26,7 @@
 #include <ModelAPI_Object.h>
 #include <ModelAPI_ResultConstruction.h>
 #include <ModelAPI_Tools.h>
+#include <ModelAPI_ResultBody.h>
 
 bool GeomValidators_BodyShapes::isValid(const AttributePtr& theAttribute,
                                         const std::list<std::string>& theArguments,
@@ -36,21 +37,36 @@ bool GeomValidators_BodyShapes::isValid(const AttributePtr& theAttribute,
     AttributeSelectionPtr anAttrSelection =
       std::dynamic_pointer_cast<ModelAPI_AttributeSelection>(theAttribute);
     ResultPtr aContext = anAttrSelection->context();
-    if(!aContext.get()) {
+    FeaturePtr aContextFeature = anAttrSelection->contextFeature();
+    if (!(aContext.get() || aContextFeature.get())) {
       theError = "Error: Context is empty.";
       return false;
     }
-
-    ResultConstructionPtr aResultConstruction =
-      std::dynamic_pointer_cast<ModelAPI_ResultConstruction>(aContext);
-    if(aResultConstruction.get()) {
-      theError = "Error: Result construction selected.";
-      return false;
-    }
-    // additional check that the selected object is top-level result
-    if (theArguments.size() > 0 && *(theArguments.rbegin()) == "toplevel") {
-      if (ModelAPI_Tools::compSolidOwner(aContext).get()) {
-        theError = "Error: Only higher level shape allowed.";
+    if (aContext.get()) {
+      ResultConstructionPtr aResultConstruction =
+        std::dynamic_pointer_cast<ModelAPI_ResultConstruction>(aContext);
+      if (aResultConstruction.get()) {
+        theError = "Error: Result construction selected.";
+        return false;
+      }
+      // additional check that the selected object is top-level result
+      if (theArguments.size() > 0 && *(theArguments.rbegin()) == "toplevel") {
+        if (ModelAPI_Tools::bodyOwner(aContext).get()) {
+          theError = "Error: Only higher level shape allowed.";
+          return false;
+        }
+      }
+    } else {
+      std::list<ResultPtr> aResList = aContextFeature->results();
+      std::list<ResultPtr>::const_iterator aIt;
+      for (aIt = aResList.cbegin(); aIt != aResList.cend(); aIt++) {
+        ResultPtr aRes = (*aIt);
+        ResultBodyPtr aBody = std::dynamic_pointer_cast<ModelAPI_ResultBody>(aRes);
+        if (aBody.get())
+          break;
+      }
+      if (aIt == aResList.cend()) {
+        theError = "Error: Feature doesn't creates body.";
         return false;
       }
     }

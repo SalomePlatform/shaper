@@ -72,7 +72,6 @@
 #include <ModelAPI_Feature.h>
 #include <ModelAPI_Object.h>
 #include <ModelAPI_ResultBody.h>
-#include <ModelAPI_ResultCompSolid.h>
 #include <ModelAPI_ResultConstruction.h>
 #include <ModelAPI_ResultGroup.h>
 #include <ModelAPI_ResultParameter.h>
@@ -1352,7 +1351,7 @@ QDockWidget* XGUI_Workshop::createObjectBrowser(QWidget* theParent)
   aObjDock->setStyleSheet(
       "::title { position: relative; padding-left: 5px; text-align: left center }");
   myObjectBrowser = new XGUI_ObjectsBrowser(aObjDock, this);
-  myObjectBrowser->setXMLReader(myDataModelXMLReader);
+  myObjectBrowser->initialize(myModule->rootNode());
   myModule->customizeObjectBrowser(myObjectBrowser);
   aObjDock->setWidget(myObjectBrowser);
 
@@ -1488,8 +1487,9 @@ void XGUI_Workshop::hidePanel(QDockWidget* theDockWidget)
 //******************************************************
 void XGUI_Workshop::showObjectBrowser()
 {
-  if (!isSalomeMode())
+  if (!isSalomeMode()) {
     myObjectBrowser->parentWidget()->show();
+  }
 }
 
 //******************************************************
@@ -1680,18 +1680,20 @@ bool XGUI_Workshop::prepareForDisplay(const std::set<ObjectPtr>& theObjects) con
   for (std::set<ObjectPtr>::const_iterator anObjectsIt = theObjects.begin();
     anObjectsIt != theObjects.end(); anObjectsIt++) {
     ObjectPtr anObject = *anObjectsIt;
-    ResultCompSolidPtr aCompRes = std::dynamic_pointer_cast<ModelAPI_ResultCompSolid>(anObject);
+    ResultBodyPtr aCompRes = std::dynamic_pointer_cast<ModelAPI_ResultBody>(anObject);
     if (aCompRes.get()) {
-      if (aCompRes->numberOfSubs(true) == 0)
+      std::list<ResultPtr> allRes;
+      ModelAPI_Tools::allSubs(aCompRes, allRes);
+      if (allRes.empty()) {
         anAllProcessedObjects.insert(anObject);
-      else {
-        for (int i = 0; i < aCompRes->numberOfSubs(true); i++) {
-          ResultPtr aSubRes = aCompRes->subResult(i, true);
-          anAllProcessedObjects.insert(aCompRes->subResult(i, true));
+      } else {
+        for(std::list<ResultPtr>::iterator aRes = allRes.begin(); aRes != allRes.end(); aRes++) {
+          ResultBodyPtr aBody = std::dynamic_pointer_cast<ModelAPI_ResultBody>(*aRes);
+          if (aBody.get() && aBody->numberOfSubs() == 0)
+            anAllProcessedObjects.insert(aBody);
         }
       }
-    }
-    else
+    } else
       anAllProcessedObjects.insert(anObject);
   }
 
@@ -2124,11 +2126,14 @@ bool XGUI_Workshop::canBeShaded(const ObjectPtr& theObject) const
 {
   bool aCanBeShaded = myDisplayer->canBeShaded(theObject);
   if (!aCanBeShaded) {
-    ResultCompSolidPtr aCompsolidResult =
-                std::dynamic_pointer_cast<ModelAPI_ResultCompSolid>(theObject);
-    if (aCompsolidResult.get() != NULL) { // change colors for all sub-solids
-      for(int i = 0; i < aCompsolidResult->numberOfSubs() && !aCanBeShaded; i++)
-        aCanBeShaded = myDisplayer->canBeShaded(aCompsolidResult->subResult(i));
+    ResultBodyPtr aCompRes = std::dynamic_pointer_cast<ModelAPI_ResultBody>(theObject);
+    if (aCompRes.get() != NULL) { // change colors for all sub-solids
+      std::list<ResultPtr> allRes;
+      ModelAPI_Tools::allSubs(aCompRes, allRes);
+      std::list<ResultPtr>::iterator aRes = allRes.begin();
+      for(; aRes != allRes.end() && !aCanBeShaded; aRes++) {
+        aCanBeShaded = myDisplayer->canBeShaded(*aRes);
+      }
     }
   }
   return aCanBeShaded;
@@ -2225,12 +2230,12 @@ void XGUI_Workshop::changeColor(const QObjectPtrList& theObjects)
   foreach(ObjectPtr anObj, theObjects) {
     ResultPtr aResult = std::dynamic_pointer_cast<ModelAPI_Result>(anObj);
     if (aResult.get() != NULL) {
-      ResultCompSolidPtr aCompsolidResult =
-        std::dynamic_pointer_cast<ModelAPI_ResultCompSolid>(aResult);
-      if (aCompsolidResult.get() != NULL) { // change colors for all sub-solids
-        for(int i = 0; i < aCompsolidResult->numberOfSubs(); i++) {
-          setColor(aCompsolidResult->subResult(i), !isRandomColor ? aColorResult :
-                                                                    aDlg->getRandomColor());
+      ResultBodyPtr aBodyResult = std::dynamic_pointer_cast<ModelAPI_ResultBody>(aResult);
+      if (aBodyResult.get() != NULL) { // change colors for all sub-solids
+        std::list<ResultPtr> allRes;
+        ModelAPI_Tools::allSubs(aBodyResult, allRes);
+        for(std::list<ResultPtr>::iterator aRes = allRes.begin(); aRes != allRes.end(); aRes++) {
+          setColor(*aRes, !isRandomColor ? aColorResult : aDlg->getRandomColor());
         }
       }
       setColor(aResult, !isRandomColor ? aColorResult : aDlg->getRandomColor());
@@ -2268,11 +2273,12 @@ void setTransparency(double theTransparency, const QObjectPtrList& theObjects)
   foreach(ObjectPtr anObj, theObjects) {
     ResultPtr aResult = std::dynamic_pointer_cast<ModelAPI_Result>(anObj);
     if (aResult.get() != NULL) {
-      ResultCompSolidPtr aCompsolidResult =
-        std::dynamic_pointer_cast<ModelAPI_ResultCompSolid>(aResult);
-      if (aCompsolidResult.get() != NULL) { // change property for all sub-solids
-        for(int i = 0; i < aCompsolidResult->numberOfSubs(); i++) {
-          setTransparency(aCompsolidResult->subResult(i), theTransparency);
+      ResultBodyPtr aBodyResult = std::dynamic_pointer_cast<ModelAPI_ResultBody>(aResult);
+      if (aBodyResult.get() != NULL) { // change property for all sub-solids
+        std::list<ResultPtr> allRes;
+        ModelAPI_Tools::allSubs(aBodyResult, allRes);
+        for(std::list<ResultPtr>::iterator aRes = allRes.begin(); aRes != allRes.end(); aRes++) {
+          setTransparency(*aRes, theTransparency);
         }
       }
       setTransparency(aResult, theTransparency);
@@ -2328,11 +2334,12 @@ void XGUI_Workshop::changeDeflection(const QObjectPtrList& theObjects)
   foreach(ObjectPtr anObj, theObjects) {
     ResultPtr aResult = std::dynamic_pointer_cast<ModelAPI_Result>(anObj);
     if (aResult.get() != NULL) {
-      ResultCompSolidPtr aCompsolidResult =
-        std::dynamic_pointer_cast<ModelAPI_ResultCompSolid>(aResult);
-      if (aCompsolidResult.get() != NULL) { // change property for all sub-solids
-        for(int i = 0; i < aCompsolidResult->numberOfSubs(); i++) {
-          setDeflection(aCompsolidResult->subResult(i), aDeflection);
+      ResultBodyPtr aBodyResult = std::dynamic_pointer_cast<ModelAPI_ResultBody>(aResult);
+      if (aBodyResult.get() != NULL) { // change property for all sub-solids
+        std::list<ResultPtr> allRes;
+        ModelAPI_Tools::allSubs(aBodyResult, allRes);
+        for(std::list<ResultPtr>::iterator aRes = allRes.begin(); aRes != allRes.end(); aRes++) {
+          setDeflection(*aRes, aDeflection);
         }
       }
       setDeflection(aResult, aDeflection);
@@ -2515,14 +2522,15 @@ void XGUI_Workshop::displayGroupResults(DocumentPtr theDoc, std::string theGroup
 //**************************************************************
 void XGUI_Workshop::setDisplayMode(const QObjectPtrList& theList, int theMode)
 {
-  foreach(ObjectPtr aObj, theList) {
-    myDisplayer->setDisplayMode(aObj, (XGUI_Displayer::DisplayMode)theMode, false);
+  foreach(ObjectPtr anObj, theList) {
+    myDisplayer->setDisplayMode(anObj, (XGUI_Displayer::DisplayMode)theMode, false);
 
-    ResultCompSolidPtr aCompsolidResult = std::dynamic_pointer_cast<ModelAPI_ResultCompSolid>(aObj);
-    if (aCompsolidResult.get() != NULL) { // change colors for all sub-solids
-      for(int i = 0; i < aCompsolidResult->numberOfSubs(); i++) {
-          myDisplayer->setDisplayMode(aCompsolidResult->subResult(i),
-                                      (XGUI_Displayer::DisplayMode)theMode, false);
+    ResultBodyPtr aBodyResult = std::dynamic_pointer_cast<ModelAPI_ResultBody>(anObj);
+    if (aBodyResult.get() != NULL) { // change display mode for all sub-solids
+      std::list<ResultPtr> allRes;
+      ModelAPI_Tools::allSubs(aBodyResult, allRes);
+      for(std::list<ResultPtr>::iterator aRes = allRes.begin(); aRes != allRes.end(); aRes++) {
+        myDisplayer->setDisplayMode(*aRes, (XGUI_Displayer::DisplayMode)theMode, false);
       }
     }
   }

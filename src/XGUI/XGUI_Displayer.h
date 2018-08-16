@@ -52,6 +52,116 @@ class XGUI_Workshop;
 class VInspectorAPI_CallBack;
 #endif
 
+
+class XGUI_TwoSidePresentationMap
+{
+public:
+  ~XGUI_TwoSidePresentationMap() { clear(); }
+
+  /// Add new values pair to the map
+  /// \param theObj an object
+  /// \param theAIS a corresponded presentation
+  bool add(const ObjectPtr& theObj, const AISObjectPtr& theAIS)
+  {
+    if (myResultToAISMap.contains(theObj))
+      return false;
+    Handle(AIS_InteractiveObject) anAIS = theAIS->impl<Handle(AIS_InteractiveObject)>();
+    myResultToAISMap[theObj] = anAIS;
+    myAIStoResultMap[anAIS] = theObj;
+    return true;
+  }
+
+  /// Removes values by object
+  /// \param theObj an object
+  bool remove(const ObjectPtr& theObj)
+  {
+    if (!myResultToAISMap.contains(theObj))
+      return false;
+    Handle(AIS_InteractiveObject) aAIS = myResultToAISMap[theObj];
+    myResultToAISMap.remove(theObj);
+    myAIStoResultMap.remove(aAIS);
+    return true;
+  }
+
+  /// Removes values by presentation
+  /// \param theAIS a presentation
+  bool remove(const AISObjectPtr& theAIS)
+  {
+    Handle(AIS_InteractiveObject) anAIS = theAIS->impl<Handle(AIS_InteractiveObject)>();
+    if (!myAIStoResultMap.contains(anAIS))
+      return false;
+    ObjectPtr aObj = myAIStoResultMap[anAIS];
+    myResultToAISMap.remove(aObj);
+    myAIStoResultMap.remove(anAIS);
+    return true;
+  }
+
+  /// Removes all values
+  void clear()
+  {
+    myResultToAISMap.clear();
+    myAIStoResultMap.clear();
+  }
+
+  /// Returns presentation by object
+  /// \param theObj an object
+  AISObjectPtr value(const ObjectPtr& theObj) const
+  {
+    if (myResultToAISMap.contains(theObj)) {
+      Handle(AIS_InteractiveObject) anAIS = myResultToAISMap[theObj];
+      AISObjectPtr anAISObj = AISObjectPtr(new GeomAPI_AISObject());
+      anAISObj->setImpl(new Handle(AIS_InteractiveObject)(anAIS));
+      return anAISObj;
+    }
+    return AISObjectPtr();
+  }
+
+  /// Returns object by presentation
+  /// \param theAIS a presentation
+  ObjectPtr value(const AISObjectPtr& theAIS) const
+  {
+    Handle(AIS_InteractiveObject) anAIS = theAIS->impl<Handle(AIS_InteractiveObject)>();
+    if (myAIStoResultMap.contains(anAIS))
+      return myAIStoResultMap[anAIS];
+    return ObjectPtr();
+  }
+
+  /// Returns object by presentation
+  /// \param theAIS a presentation
+  ObjectPtr value(const Handle(AIS_InteractiveObject)& theAIS) const
+  {
+    if (myAIStoResultMap.contains(theAIS))
+      return myAIStoResultMap[theAIS];
+    return ObjectPtr();
+  }
+
+  /// Returns number of values
+  int size() const { return myResultToAISMap.size(); }
+
+  /// Returns list of objects
+  QObjectPtrList objects() const { return myResultToAISMap.keys(); }
+
+  /// returns list of presentations
+  QList<Handle(AIS_InteractiveObject)> presentations() const { return myAIStoResultMap.keys(); }
+
+  /// Returns true if the Map contains the object
+  /// \param theObj an object
+  bool contains(const ObjectPtr& theObj) const { return myResultToAISMap.contains(theObj); }
+
+  /// Returns true if the Map contains the presentation
+  /// \param theAIS a presentation
+  bool contains(const AISObjectPtr& theAIS) const
+  {
+    Handle(AIS_InteractiveObject) anAIS = theAIS->impl<Handle(AIS_InteractiveObject)>();
+    return myAIStoResultMap.contains(anAIS);
+  }
+
+private:
+  QMap<ObjectPtr, Handle(AIS_InteractiveObject)> myResultToAISMap;
+  QMap<Handle(AIS_InteractiveObject), ObjectPtr> myAIStoResultMap;
+};
+
+
 /**\class XGUI_Displayer
  * \ingroup GUI
  * \brief Displayer. Provides mechanizm of display/erase of objects in the viewer
@@ -206,10 +316,13 @@ class XGUI_EXPORT XGUI_Displayer: public QObject
   int objectsCount() const { return myResult2AISObjectMap.size(); }
 
   /// Returns list of displayed objects
-  QObjectPtrList displayedObjects() const { return myResult2AISObjectMap.keys(); }
+  QObjectPtrList displayedObjects() const { return myResult2AISObjectMap.objects(); }
 
   /// Returns list of displayed objects
-  QList<AISObjectPtr> displayedPresentations() const { return myResult2AISObjectMap.values(); }
+  QList<Handle(AIS_InteractiveObject)> displayedPresentations() const
+  {
+    return myResult2AISObjectMap.presentations();
+  }
 
   /// Returns true if the given object can be shown in shaded mode
   /// \param theObject object to check
@@ -326,8 +439,7 @@ protected:
   GeomCustomPrsPtr myCustomPrs;
 
   /// Definition of a type of map which defines correspondance between objects and presentations
-  typedef QMap<ObjectPtr, AISObjectPtr> ResultToAISMap;
-  ResultToAISMap myResult2AISObjectMap; ///< A map of displayed objects
+  XGUI_TwoSidePresentationMap myResult2AISObjectMap; ///< A map of displayed objects
 
   /// Number of blocking of the viewer update. The viewer is updated only if it is zero
   int myViewerBlockedRecursiveCount;

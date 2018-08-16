@@ -165,7 +165,7 @@ Partition_1 = model.addPartition(Part_1_doc, [model.selection("EDGE", "Extrusion
 model.end()
 PartitionFeature = Partition_1.feature()
 assert(len(PartitionFeature.results()) == 1)
-PartitionResult = modelAPI_ResultCompSolid(modelAPI_ResultBody(PartitionFeature.firstResult()))
+PartitionResult = modelAPI_ResultBody(PartitionFeature.firstResult())
 assert(PartitionResult.numberOfSubs() == 22)
 
 assert(model.checkPythonDump())

@@ -40,7 +40,7 @@ class ModelAPI_AttributeSelectionList : public ModelAPI_Attribute
   /// \param theSubShape selected sub-shape (if null, the whole context is selected)
   /// \param theTemporarily if it is true, do not store and name the added in the data framework
   ///           (used to remove immediately, without the following updates)
-  virtual void append(const ResultPtr& theContext,
+  virtual void append(const ObjectPtr& theContext,
                       const std::shared_ptr<GeomAPI_Shape>& theSubShape,
                       const bool theTemporarily = false) = 0;
 
@@ -67,7 +67,7 @@ class ModelAPI_AttributeSelectionList : public ModelAPI_Attribute
   /// \param theTemporarily if it is true, it checks also the temporary added item
   /// \returns true if the pair is found in the attirbute
   virtual bool isInList(
-    const ResultPtr& theContext, const std::shared_ptr<GeomAPI_Shape>& theSubShape,
+    const ObjectPtr& theContext, const std::shared_ptr<GeomAPI_Shape>& theSubShape,
     const bool theTemporarily = false) = 0;
 
   /// The type of all elements selection

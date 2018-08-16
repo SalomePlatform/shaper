@@ -23,7 +23,6 @@
 #include <ModelAPI_AttributeSelectionList.h>
 #include <ModelAPI_AttributeString.h>
 #include <ModelAPI_ResultBody.h>
-#include <ModelAPI_ResultCompSolid.h>
 #include <ModelAPI_ResultConstruction.h>
 #include <ModelAPI_Session.h>
 #include <ModelAPI_Validator.h>

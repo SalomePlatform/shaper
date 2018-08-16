@@ -36,11 +36,27 @@ class GeomAlgoAPI_MakeShape;
 * Provides a shape that may be displayed in the viewer.
 * May provide really huge results, so, working with this kind
 * of result must be optimized.
+* Also provides a conainer of sub-body result in case it is compound or compsolid.
 */
 class ModelAPI_ResultBody : public ModelAPI_Result
 {
 public:
+  /// Iternal enumeration for storage the information of connected topology flag
+  enum ConnectedTopologyFlag {
+    ConnectionNotComputed, ///< not yet computed
+    IsConnected,           ///< the topology is connected
+    IsNotConnected         ///< the topology is connected
+  };
+
+protected:
+  /// Keeps (not persistently) the connected topology flag
+  ConnectedTopologyFlag myConnect;
+
+  ModelAPI_BodyBuilder* myBuilder; ///< provides the body processing in naming shape
+
+public:
   MODELAPI_EXPORT virtual ~ModelAPI_ResultBody();
+
   /// Returns the group identifier of this result
   MODELAPI_EXPORT virtual std::string groupName();
 
@@ -64,21 +80,23 @@ public:
     return "0.0001";
   }
 
-  /// Iternal enumeration for storage the information of connected topology flag
-  enum ConnectedTopologyFlag {
-    ConnectionNotComputed, ///< not yet computed
-    IsConnected,           ///< the topology is connected
-    IsNotConnected         ///< the topology is connected
-  };
-  /// Keeps (not persistently) the connected topology flag
-  ConnectedTopologyFlag myConnect;
+  /// Returns the number of sub-elements
+  MODELAPI_EXPORT virtual int numberOfSubs(bool forTree = false) const = 0;
+
+  /// Returns the sub-result by zero-base index
+  MODELAPI_EXPORT virtual std::shared_ptr<ModelAPI_ResultBody> subResult(
+    const int theIndex, bool forTree = false) const = 0;
+
+  /// Returns true if feature or reuslt belong to this composite feature as subs
+  /// Returns theIndex - zero based index of sub if found
+  MODELAPI_EXPORT virtual bool isSub(ObjectPtr theObject, int& theIndex) const = 0;
 
   /// \brief Stores the shape (called by the execution method).
   /// param[in] theShape shape to store.
   /// param[in] theIsStoreSameShapes if false stores reference to the same shape
   ///                                if it is already in document.
   MODELAPI_EXPORT virtual void store(const std::shared_ptr<GeomAPI_Shape>& theShape,
-                                     const bool theIsStoreSameShapes = true);
+    const bool theIsStoreSameShapes = true);
 
   /// Stores the generated shape (called by the execution method).
   MODELAPI_EXPORT virtual void storeGenerated(const std::shared_ptr<GeomAPI_Shape>& theFromShape,
@@ -119,19 +137,20 @@ public:
     const std::shared_ptr<GeomAPI_Shape>& theOldShape, const int theTag = 1);
 
   /// load deleted shapes
-  MODELAPI_EXPORT virtual void loadDeletedShapes (GeomAlgoAPI_MakeShape* theMS,
-                                  std::shared_ptr<GeomAPI_Shape>  theShapeIn,
-                                  const int  theKindOfShape,
-                                  const int  theTag);
+  MODELAPI_EXPORT virtual void loadDeletedShapes(GeomAlgoAPI_MakeShape* theMS,
+    std::shared_ptr<GeomAPI_Shape>  theShapeIn,
+    const int  theKindOfShape,
+    const int  theTag);
+
   /// load and orient modified shapes
-  MODELAPI_EXPORT virtual void loadAndOrientModifiedShapes (GeomAlgoAPI_MakeShape* theMS,
+  MODELAPI_EXPORT virtual void loadAndOrientModifiedShapes(GeomAlgoAPI_MakeShape* theMS,
     std::shared_ptr<GeomAPI_Shape>  theShapeIn, const int  theKindOfShape, const int  theTag,
     const std::string& theName, GeomAPI_DataMapOfShapeShape& theSubShapes,
-    const bool theIsStoreSeparate = false,
-    const bool theIsStoreAsGenerated = false,
+    const bool theIsStoreSeparate = false, const bool theIsStoreAsGenerated = false,
     const bool theSplitInSubs = false);
+
   /// load and orient generated shapes
-  MODELAPI_EXPORT virtual void loadAndOrientGeneratedShapes (GeomAlgoAPI_MakeShape* theMS,
+  MODELAPI_EXPORT virtual void loadAndOrientGeneratedShapes(GeomAlgoAPI_MakeShape* theMS,
     std::shared_ptr<GeomAPI_Shape>  theShapeIn, const int  theKindOfShape,
     const int  theTag, const std::string& theName, GeomAPI_DataMapOfShapeShape& theSubShapes);
 
@@ -145,7 +164,7 @@ public:
 
   /// load disconnected vetexes
   MODELAPI_EXPORT virtual void loadDisconnectedVertexes(std::shared_ptr<GeomAPI_Shape> theShape,
-    const std::string& theName,int&  theTag);
+    const std::string& theName, int&  theTag);
 
   /// Returns true if the latest modification of this body in the naming history
   // is equal to the given shape
@@ -155,11 +174,16 @@ public:
   /// so it is more effective to use this method than directly GeomAPI_Shape.
   MODELAPI_EXPORT virtual bool isConnectedTopology();
 
+  /// Set displayed flag to the result and all sub results
+  /// \param theDisplay a boolean value
+  MODELAPI_EXPORT virtual void setDisplayed(const bool theDisplay);
+
 protected:
   /// Default constructor accessible only from Model_Objects
   MODELAPI_EXPORT ModelAPI_ResultBody();
 
-  ModelAPI_BodyBuilder* myBuilder; ///< provides the body processing in naming shape
+  /// Updates the sub-bodies if shape of this object is compsolid or compound
+  virtual void updateSubs(const std::shared_ptr<GeomAPI_Shape>& theThisShape) = 0;
 };
 
 //! Pointer on feature object

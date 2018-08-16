@@ -20,7 +20,7 @@
 
 #include "FeaturesPlugin_BooleanSmash.h"
 
-#include <ModelAPI_ResultCompSolid.h>
+#include <ModelAPI_ResultBody.h>
 #include <ModelAPI_AttributeSelectionList.h>
 #include <ModelAPI_Tools.h>
 
@@ -60,7 +60,7 @@ void FeaturesPlugin_BooleanSmash::execute()
       return;
     }
     ResultPtr aContext = anObjectAttr->context();
-    ResultCompSolidPtr aResCompSolidPtr = ModelAPI_Tools::compSolidOwner(aContext);
+    ResultBodyPtr aResCompSolidPtr = ModelAPI_Tools::bodyOwner(aContext);
     if (aResCompSolidPtr.get())
     {
       std::shared_ptr<GeomAPI_Shape> aContextShape = aResCompSolidPtr->shape();

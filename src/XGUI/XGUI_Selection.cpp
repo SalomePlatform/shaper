@@ -31,7 +31,7 @@
 #include <ModelAPI_Feature.h>
 #include <ModelAPI_Tools.h>
 #include <ModelAPI_Session.h>
-#include <ModelAPI_ResultCompSolid.h>
+#include <ModelAPI_ResultBody.h>
 #include <ModelAPI_ResultConstruction.h>
 
 #include <AIS_InteractiveContext.hxx>
@@ -264,7 +264,7 @@ void XGUI_Selection::fillPresentation(ModuleBase_ViewerPrsPtr& thePrs,
     // is On and we have to use parent result which corresponds to the CompSolid shape
     ResultPtr aResult = std::dynamic_pointer_cast<ModelAPI_Result>(aFeature);
     if (aResult.get()) {
-      ResultCompSolidPtr aCompSolid = ModelAPI_Tools::compSolidOwner(aResult);
+      ResultBodyPtr aCompSolid = ModelAPI_Tools::bodyOwner(aResult);
       if (aCompSolid.get()) {
         GeomShapePtr aShape = aCompSolid->shape();
         if (aShape.get() && aShape->isEqual(thePrs->shape())) {

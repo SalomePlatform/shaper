@@ -198,6 +198,17 @@ def testHaveNamingEdges(theFeature, theModel, thePartDoc) :
     assert(shape.isEdge())
     assert(name != ""), "String empty"
 
+def lowerLevelSubResults(theResult, theList):
+  """ Collects in a list all lover level sub-results (without children).
+  Auxiliary method for context correct definition.
+  """
+  nbSubs = theResult.numberOfSubs()
+  if nbSubs == 0:
+    theList.append(theResult)
+  else:
+    for sub in range(0, nbSubs):
+      lowerLevelSubResults(theResult.subResult(sub), theList)
+
 def testHaveNamingByType(theFeature, theModel, thePartDoc, theSubshapeType) :
   """ Tests if all sub-shapes of result have a unique name
   :param theFeature: feature to test.
@@ -206,22 +217,14 @@ def testHaveNamingByType(theFeature, theModel, thePartDoc, theSubshapeType) :
   if not theFeature.results():
     return
   aFirstRes = theFeature.results()[0]
-  # Get number of sub-results
-  hasSubs = True
-  nbSubs = aFirstRes.numberOfSubs()
-  if nbSubs == 0:
-    # no sub-results => treat current result as a sub
-    hasSubs = False
-    nbSubs = 1
+  aResList = []
+  lowerLevelSubResults(aFirstRes, aResList)
 
   selectionList = []
   shapesList = [] # to append only unique shapes (not isSame)
-  for sub in range(0, nbSubs):
+  for aR in aResList:
     # Get feature result/sub-result
-    if hasSubs:
-      aResult = aFirstRes.subResult(sub).resultSubShapePair()[0]
-    else:
-      aResult = aFirstRes.resultSubShapePair()[0]
+    aResult = aR.resultSubShapePair()[0]
     # Get result/sub-result shape
     shape = aResult.shape()
     # Create shape explorer with desired shape type

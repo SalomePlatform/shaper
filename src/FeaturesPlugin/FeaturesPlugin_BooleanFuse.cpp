@@ -20,7 +20,7 @@
 
 #include "FeaturesPlugin_BooleanFuse.h"
 
-#include <ModelAPI_ResultCompSolid.h>
+#include <ModelAPI_ResultBody.h>
 #include <ModelAPI_AttributeBoolean.h>
 #include <ModelAPI_AttributeSelectionList.h>
 #include <ModelAPI_AttributeString.h>
@@ -79,7 +79,7 @@ void FeaturesPlugin_BooleanFuse::execute()
       return;
     }
     ResultPtr aContext = anObjectAttr->context();
-    ResultCompSolidPtr aResCompSolidPtr = ModelAPI_Tools::compSolidOwner(aContext);
+    ResultBodyPtr aResCompSolidPtr = ModelAPI_Tools::bodyOwner(aContext);
     if (!isSimpleCreation
         && aResCompSolidPtr.get()
         && aResCompSolidPtr->shape()->shapeType() == GeomAPI_Shape::COMPSOLID) {

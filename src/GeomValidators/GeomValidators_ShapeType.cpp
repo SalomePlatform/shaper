@@ -25,6 +25,7 @@
 #include <GeomDataAPI_Point2D.h>
 
 #include <ModelAPI_Result.h>
+#include <ModelAPI_Feature.h>
 #include <ModelAPI_ResultConstruction.h>
 #include <ModelAPI_AttributeRefAttr.h>
 #include <ModelAPI_AttributeSelectionList.h>
@@ -130,8 +131,12 @@ bool GeomValidators_ShapeType::isValidAttribute(const AttributePtr& theAttribute
     GeomShapePtr aShape = anAttr->value();
     if (aShape.get())
       aValid = isValidShape(aShape, theShapeType, theError);
-    else
-      aValid = isValidObject(anAttr->context(), theShapeType, theError);
+    else {
+      if (anAttr->context().get())
+        aValid = isValidObject(anAttr->context(), theShapeType, theError);
+      else
+        aValid = isValidObject(anAttr->contextFeature(), theShapeType, theError);
+    }
   }
   else if (anAttributeType == ModelAPI_AttributeRefAttr::typeId()) {
     AttributeRefAttrPtr anAttr = std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(theAttribute);
@@ -178,6 +183,8 @@ bool GeomValidators_ShapeType::isValidAttribute(const AttributePtr& theAttribute
     theError = "The attribute with the %1 type is not processed";
     theError.arg(anAttributeType);
   }
+  if (aValid)
+    theError = "";
   return aValid;
 }
 
@@ -194,20 +201,29 @@ bool GeomValidators_ShapeType::isValidObject(const ObjectPtr& theObject,
   }
   else {
     ResultPtr aResult = std::dynamic_pointer_cast<ModelAPI_Result>(theObject);
-    if( theShapeType==Plane )
-    {
-      ResultConstructionPtr aResultConstruction =
-        std::dynamic_pointer_cast<ModelAPI_ResultConstruction>(theObject);
-      FeaturePtr aFeature = ModelAPI_Feature::feature(theObject);
-      const std::string& aKind = aFeature->getKind();
-      return aResult.get() != NULL && aKind == "Plane";
-    }
-    if (!aResult.get()) {
-      aValid = false;
-      theError = "The result is empty";
-    }
-    else {
-      aValid = isValidShape(aResult->shape(), theShapeType, theError);
+    if (aResult.get()) {
+      if (theShapeType == Plane)
+      {
+        ResultConstructionPtr aResultConstruction =
+          std::dynamic_pointer_cast<ModelAPI_ResultConstruction>(theObject);
+        FeaturePtr aFeature = ModelAPI_Feature::feature(theObject);
+        const std::string& aKind = aFeature->getKind();
+        return aResult.get() != NULL && aKind == "Plane";
+      }
+      if (!aResult.get()) {
+        aValid = false;
+        theError = "The result is empty";
+      } else {
+        aValid = isValidShape(aResult->shape(), theShapeType, theError);
+      }
+    } else {
+      FeaturePtr aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(theObject);
+      if (aFeature.get() && (theShapeType == CompSolid))
+        return aValid;
+      else {
+        aValid = false;
+        theError = "The feature has to produce a compsolid";
+      }
     }
   }
   return aValid;

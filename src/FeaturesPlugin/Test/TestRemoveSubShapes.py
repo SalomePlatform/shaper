@@ -79,7 +79,7 @@ anExtrusionFeature.real("to_offset").setValue(0) #TODO: remove
 anExtrusionFeature.real("from_offset").setValue(0) #TODO: remove
 anExtrusionFeature.execute()
 aSession.finishOperation()
-anExtrusionResult = modelAPI_ResultCompSolid(modelAPI_ResultBody(anExtrusionFeature.firstResult()))
+anExtrusionResult = modelAPI_ResultBody(anExtrusionFeature.firstResult())
 
 #=========================================================================
 # Remove sub-shapes
@@ -91,7 +91,7 @@ aRemoveSubShapesFeature.string("creation_method").setValue("by_keep_subshapes")
 aRemoveSubShapesFeature.selectionList("subshapes_to_keep").removeLast();
 aSession.finishOperation()
 assert (len(aRemoveSubShapesFeature.results()) > 0)
-anUnionResult = modelAPI_ResultCompSolid(modelAPI_ResultBody(aRemoveSubShapesFeature.firstResult()))
+anUnionResult = modelAPI_ResultBody(aRemoveSubShapesFeature.firstResult())
 assert (anUnionResult.numberOfSubs() == 2)
 
 from salome.shaper import model

@@ -25,7 +25,7 @@
 #include <ModelAPI_Events.h>
 #include <ModelAPI_Tools.h>
 #include <ModelAPI_ResultConstruction.h>
-#include <ModelAPI_ResultCompSolid.h>
+#include <ModelAPI_ResultBody.h>
 #include <GeomAPI_PlanarEdges.h>
 
 #include <Events_InfoMessage.h>
@@ -74,8 +74,8 @@ PartSet_ResultSketchPrs::PartSet_ResultSketchPrs(ResultPtr theResult)
     aDrawer->SetPointAspect(new Prs3d_PointAspect(Aspect_TOM_PLUS, Quantity_NOC_YELLOW, 1.));
 
   // Activate individual repaintng if this is a part of compsolid
-  ResultCompSolidPtr aCompSolid = ModelAPI_Tools::compSolidOwner(myResult);
-  SetAutoHilight(aCompSolid.get() == NULL);
+  ResultBodyPtr anOwner = ModelAPI_Tools::bodyOwner(myResult);
+  SetAutoHilight(anOwner.get() == NULL);
 
   ModuleBase_Tools::setPointBallHighlighting(this);
 }

@@ -38,7 +38,7 @@
 #include "PartSet_CustomPrs.h"
 #include "PartSet_IconFactory.h"
 #include "PartSet_OverconstraintListener.h"
-#include "PartSet_DataModel.h"
+#include "PartSet_TreeNodes.h"
 
 #include "PartSet_Filters.h"
 #include "PartSet_FilterInfinite.h"
@@ -151,14 +151,13 @@ extern "C" PARTSET_EXPORT ModuleBase_IModule* createModule(ModuleBase_IWorkshop*
 PartSet_Module::PartSet_Module(ModuleBase_IWorkshop* theWshop)
 : ModuleBase_IModule(theWshop),
   myVisualLayerId(0),
+  myRoot(0),
   myIsOperationIsLaunched(false)
 {
   new PartSet_IconFactory();
 
   mySketchMgr = new PartSet_SketcherMgr(this);
   mySketchReentrantMgr = new PartSet_SketcherReentrantMgr(theWshop);
-
-  myDataModel = new PartSet_DataModel();
 
   XGUI_ModuleConnector* aConnector = dynamic_cast<XGUI_ModuleConnector*>(theWshop);
   XGUI_Workshop* aWorkshop = aConnector->workshop();
@@ -239,7 +238,17 @@ PartSet_Module::~PartSet_Module()
   }
   delete myCustomPrs;
   delete myOverconstraintListener;
+  delete myRoot;
 }
+
+//******************************************************
+void PartSet_Module::createFeatures()
+{
+  ModuleBase_IModule::createFeatures();
+  myRoot = new PartSet_RootNode();
+  myRoot->setWorkshop(workshop());
+}
+
 
 //******************************************************
 void PartSet_Module::storeSelection()
@@ -1141,10 +1150,8 @@ void PartSet_Module::onViewTransformed(int theTrsfType)
     SketcherPrs_Tools::setArrowSize(aLen);
     const double aCurScale = aViewer->activeView()->Camera()->Scale();
     aViewer->SetScale(aViewer->activeView(), aCurScale);
-    QList<AISObjectPtr> aPrsList = aDisplayer->displayedPresentations();
-    foreach (AISObjectPtr aAIS, aPrsList) {
-      Handle(AIS_InteractiveObject) aAisObj = aAIS->impl<Handle(AIS_InteractiveObject)>();
-
+    QList<Handle(AIS_InteractiveObject)> aPrsList = aDisplayer->displayedPresentations();
+    foreach(Handle(AIS_InteractiveObject) aAisObj, aPrsList) {
       Handle(AIS_Dimension) aDim = Handle(AIS_Dimension)::DownCast(aAisObj);
       if (!aDim.IsNull()) {
         aDim->DimensionAspect()->ArrowAspect()->SetLength(aLen);
@@ -1663,5 +1670,5 @@ void PartSet_Module::setDefaultConstraintShown()
 //******************************************************
 ModuleBase_ITreeNode* PartSet_Module::rootNode() const
 {
-  return myDataModel->root();
+  return myRoot;
 }
