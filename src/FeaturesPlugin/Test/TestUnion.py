@@ -79,7 +79,7 @@ anExtrusionFeature.real("to_offset").setValue(0) #TODO: remove
 anExtrusionFeature.real("from_offset").setValue(0) #TODO: remove
 anExtrusionFeature.execute()
 aSession.finishOperation()
-anExtrusionResult = modelAPI_ResultCompSolid(modelAPI_ResultBody(anExtrusionFeature.firstResult()))
+anExtrusionResult = modelAPI_ResultBody(anExtrusionFeature.firstResult())
 
 #=========================================================================
 # Make union on extrusion
@@ -91,7 +91,7 @@ aUnionFeature.selectionList("base_objects").append(anExtrusionResult.subResult(1
 aUnionFeature.selectionList("base_objects").append(anExtrusionResult.subResult(2), None);
 aSession.finishOperation()
 assert (len(aUnionFeature.results()) > 0)
-anUnionResult = modelAPI_ResultCompSolid(modelAPI_ResultBody(aUnionFeature.firstResult()))
+anUnionResult = modelAPI_ResultBody(aUnionFeature.firstResult())
 assert (anUnionResult.numberOfSubs() == 0)
 
 from salome.shaper import model

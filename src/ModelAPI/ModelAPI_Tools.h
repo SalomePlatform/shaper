@@ -103,10 +103,11 @@ MODELAPI_EXPORT std::shared_ptr<ModelAPI_CompositeFeature> compositeOwner(
 /*!
  * Returns the result - parent of this result.
  * \param theSub the sub-element of composit result
+ * \param theRoot if it is true, returns the root father
  * \returns null if it is not sub-element of composite
  */
 MODELAPI_EXPORT std::shared_ptr<ModelAPI_ResultBody>
-  bodyOwner(const std::shared_ptr<ModelAPI_Result>& theSub);
+  bodyOwner(const std::shared_ptr<ModelAPI_Result>& theSub, const bool theRoot = false);
 /*!
  * Returns index of this result in parent (if parent exists, returned by bodyOwner)
  * \returns zero-base index, or -1 if not found
@@ -198,7 +199,7 @@ MODELAPI_EXPORT void getConcealedResults(const std::shared_ptr<ModelAPI_Feature>
  *  (means that concealing result has user-defined name).
  */
 MODELAPI_EXPORT std::pair<std::string, bool> getDefaultName(
-  const std::shared_ptr<ModelAPI_Result>& theResult);
+  const std::shared_ptr<ModelAPI_Result>& theResult, const bool theInherited = true);
 }
 
 #endif

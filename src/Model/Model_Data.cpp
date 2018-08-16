@@ -138,7 +138,7 @@ void Model_Data::setName(const std::string& theName)
       bool isUserDefined = true;
       ResultPtr aResult = std::dynamic_pointer_cast<ModelAPI_Result>(myObject);
       if (aResult) {
-        std::string aDefaultName = ModelAPI_Tools::getDefaultName(aResult).first;
+        std::string aDefaultName = ModelAPI_Tools::getDefaultName(aResult, false).first;
         isUserDefined = aDefaultName != theName;
       }
       if (isUserDefined) {

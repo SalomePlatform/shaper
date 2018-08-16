@@ -733,6 +733,18 @@ bool FeaturesPlugin_ValidatorPartitionSelection::isValid(const AttributePtr& the
     if(aResultBody.get()) {
       continue;
     }
+    FeaturePtr aResultFeature = aSelectAttr->contextFeature();
+    if(aResultFeature.get()) {
+      bool aOkRes = false;
+      std::list<ResultPtr>::const_iterator aFRes = aResultFeature->results().cbegin();
+      for(; aFRes != aResultFeature->results().cend() && !aOkRes; aFRes++) {
+        ResultBodyPtr aBody = std::dynamic_pointer_cast<ModelAPI_ResultBody>(*aFRes);
+        if (aBody.get() && !aBody->isDisabled())
+          aOkRes = true;
+      }
+      if (aOkRes)
+        continue;
+    }
 
     theError = "Error: Only body shapes and construction planes are allowed for selection.";
     return false;

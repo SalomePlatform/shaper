@@ -438,6 +438,7 @@ void Model_AttributeSelection::setID(const std::string theID)
 }
 
 ResultPtr Model_AttributeSelection::context()
+{
   if (!ModelAPI_AttributeSelection::isInitialized() && !myTmpContext.get() && !myTmpSubShape.get())
     return ResultPtr();
 
@@ -469,9 +470,13 @@ FeaturePtr Model_AttributeSelection::contextFeature() {
     return FeaturePtr(); // feature can not be selected temporarily
   }
   return std::dynamic_pointer_cast<ModelAPI_Feature>(myRef.value());
-
 }
-
+ObjectPtr Model_AttributeSelection::contextObject() {
+  ResultPtr aRes = context();
+  if (aRes.get())
+    return aRes;
+  return contextFeature();
+}
 
 
 void Model_AttributeSelection::setObject(const std::shared_ptr<ModelAPI_Object>& theObject)
@@ -926,9 +931,14 @@ void Model_AttributeSelection::selectSubShape(
             aNS = TNaming_Tool::CurrentNamedShape(aNS);
             if (!aNS.IsNull() && scope().Contains(aNS->Label())) { // scope check is for 2228
               TDF_Label aLab = aNS->Label();
-              while(aLab.Depth() != 7 && aLab.Depth() > 5)
+              if (aLab.Depth() % 2 == 0)
                 aLab = aLab.Father();
               ObjectPtr anObj = aDoc->objects()->object(aLab);
+              while(!anObj.get() && aLab.Depth() > 5) {
+                aLab = aLab.Father().Father();
+                anObj = aDoc->objects()->object(aLab);
+              }
+
               if (anObj.get()) {
                 ResultPtr aRes = std::dynamic_pointer_cast<ModelAPI_Result>(anObj);
                 if (aRes)
@@ -944,10 +954,11 @@ void Model_AttributeSelection::selectSubShape(
         if (aComp && aComp->numberOfSubs()) {
           std::list<ResultPtr> allSubs;
           ModelAPI_Tools::allSubs(aComp, allSubs);
-          std::list<ResultPtr>::reverse_iterator aS = allSubs.rbegin(); // iterate from lower level
-          for(; aS != allSubs.rend(); aS++) {
-            ResultPtr aSub = *aS;
-            if (aSub && aSub->shape().get() && aSub->shape()->isSubShape(aShapeToBeSelected)) {
+          std::list<ResultPtr>::iterator aS = allSubs.begin();
+          for(; aS != allSubs.end(); aS++) {
+            ResultBodyPtr aSub = std::dynamic_pointer_cast<ModelAPI_ResultBody>(*aS);
+            if (aSub && aSub->numberOfSubs() == 0 && aSub->shape().get() &&
+                aSub->shape()->isSubShape(aShapeToBeSelected)) {
               aCont = aSub;
               break;
             }
@@ -960,13 +971,20 @@ void Model_AttributeSelection::selectSubShape(
       while(aFindNewContext && aCont.get()) {
         aFindNewContext = false;
         // take references to all results: root one, any sub
-        ResultBodyPtr aCompContext = ModelAPI_Tools::bodyOwner(aCont);
+        ResultBodyPtr aCompContext = ModelAPI_Tools::bodyOwner(aCont, true);
         std::list<ResultPtr> allRes;
-        if (aCompContext.get())
+        if (aCompContext.get()) {
           ModelAPI_Tools::allSubs(aCompContext, allRes);
-        allRes.push_back(aCont);
+          allRes.push_back(aCompContext);
+        } else {
+          allRes.push_back(aCont);
+        }
         for(std::list<ResultPtr>::iterator aSub = allRes.begin(); aSub != allRes.end(); aSub++) {
           ResultPtr aResCont = *aSub;
+          ResultBodyPtr aResBody = std::dynamic_pointer_cast<ModelAPI_ResultBody>(aResCont);
+          // only lower and higher level subs are counted
+          if (aResBody.get() && aResBody->numberOfSubs() > 0 && aResBody != aCompContext)
+            continue;
           const std::set<AttributePtr>& aRefs = aResCont->data()->refsToMe();
           std::set<AttributePtr>::const_iterator aRef = aRefs.begin();
           for(; !aFindNewContext && aRef != aRefs.end(); aRef++) {

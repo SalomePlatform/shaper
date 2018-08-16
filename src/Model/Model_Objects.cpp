@@ -576,7 +576,8 @@ ObjectPtr Model_Objects::object(TDF_Label theLabel)
           if (aSub.get()) {
             std::shared_ptr<Model_Data> aSubData = std::dynamic_pointer_cast<Model_Data>(
               aSub->data());
-            if (aSubData->label().Father().IsEqual(aSubLab.ChangeValue())) {
+            const TDF_Label& aSubLabVal = aSubLab.ChangeValue();
+            if (aSubData->label().Father().IsEqual(aSubLabVal)) {
               aCurrentResult = aSub;
               break;
             }

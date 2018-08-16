@@ -77,11 +77,12 @@ void Model_ResultBody::loadAndOrientModifiedShapes(GeomAlgoAPI_MakeShape* theMS,
       }*/
       (*aSubIter)->loadAndOrientModifiedShapes(
         theMS, theShapeIn, theKindOfShape, theTag, theName, theSubShapes, theIsStoreSeparate,
-        theIsStoreAsGenerated);
+        theIsStoreAsGenerated, theSplitInSubs);
     }
   } else { // do for this directly
-    myBuilder->loadAndOrientGeneratedShapes(
-      theMS, theShapeIn, theKindOfShape, theTag, theName, theSubShapes);
+    myBuilder->loadAndOrientModifiedShapes(
+      theMS, theShapeIn, theKindOfShape, theTag, theName, theSubShapes, theIsStoreSeparate,
+        theIsStoreAsGenerated);
   }
 }
 

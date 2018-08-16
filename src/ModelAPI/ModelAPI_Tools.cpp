@@ -265,11 +265,17 @@ CompositeFeaturePtr compositeOwner(const FeaturePtr& theFeature)
   return CompositeFeaturePtr(); // not found
 }
 
-ResultBodyPtr bodyOwner(const ResultPtr& theSub)
+ResultBodyPtr bodyOwner(const ResultPtr& theSub, const bool theRoot)
 {
   if (theSub.get()) {
     ObjectPtr aParent = theSub->document()->parent(theSub);
     if (aParent.get()) {
+      if (theRoot) { // try to find parent of parent
+        ResultPtr aResultParent = std::dynamic_pointer_cast<ModelAPI_Result>(aParent);
+        ResultBodyPtr aGrandParent = bodyOwner(aResultParent, true);
+        if (aGrandParent.get())
+          aParent = aGrandParent;
+      }
       return std::dynamic_pointer_cast<ModelAPI_ResultBody>(aParent);
     }
   }
@@ -598,7 +604,8 @@ void getConcealedResults(const FeaturePtr& theFeature,
   }
 }
 
-std::pair<std::string, bool> getDefaultName(const std::shared_ptr<ModelAPI_Result>& theResult)
+std::pair<std::string, bool> getDefaultName(const std::shared_ptr<ModelAPI_Result>& theResult,
+                                            const bool theInherited)
 {
   typedef std::list< std::pair < std::string, std::list<ObjectPtr> > > ListOfReferences;
 
@@ -619,26 +626,28 @@ std::pair<std::string, bool> getDefaultName(const std::shared_ptr<ModelAPI_Resul
   DataPtr aData = anOwner->data();
 
   ListOfReferences aReferences;
-  aData->referencesToObjects(aReferences);
-
   // find first result with user-defined name
   ListOfReferences::const_iterator aFoundRef = aReferences.end();
-  for (ListOfReferences::const_iterator aRefIt = aReferences.begin();
-       aRefIt != aReferences.end(); ++aRefIt) {
-    bool isConcealed = aSession->validators()->isConcealed(anOwner->getKind(), aRefIt->first);
-    bool isMainArg = isConcealed &&
-                     aSession->validators()->isMainArgument(anOwner->getKind(), aRefIt->first);
-    if (isConcealed) {
-      // check the referred object is a Body
-      // (for example, ExtrusionCut has a sketch as a first attribute which is concealing)
-      bool isBody = aRefIt->second.size() > 1 || (aRefIt->second.size() == 1 &&
-                    aRefIt->second.front()->groupName() == ModelAPI_ResultBody::group());
-      if (isBody && (isMainArg || aFoundRef == aReferences.end() ||
-          aData->isPrecedingAttribute(aRefIt->first, aFoundRef->first)))
-        aFoundRef = aRefIt;
+  if (theInherited) {
+    aData->referencesToObjects(aReferences);
 
-      if (isMainArg)
-        break;
+    for (ListOfReferences::const_iterator aRefIt = aReferences.begin();
+         aRefIt != aReferences.end(); ++aRefIt) {
+      bool isConcealed = aSession->validators()->isConcealed(anOwner->getKind(), aRefIt->first);
+      bool isMainArg = isConcealed &&
+                       aSession->validators()->isMainArgument(anOwner->getKind(), aRefIt->first);
+      if (isConcealed) {
+        // check the referred object is a Body
+        // (for example, ExtrusionCut has a sketch as a first attribute which is concealing)
+        bool isBody = aRefIt->second.size() > 1 || (aRefIt->second.size() == 1 &&
+                      aRefIt->second.front()->groupName() == ModelAPI_ResultBody::group());
+        if (isBody && (isMainArg || aFoundRef == aReferences.end() ||
+            aData->isPrecedingAttribute(aRefIt->first, aFoundRef->first)))
+          aFoundRef = aRefIt;
+
+        if (isMainArg)
+          break;
+      }
     }
   }
   // get the result number in the feature

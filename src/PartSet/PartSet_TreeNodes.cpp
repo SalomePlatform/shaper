@@ -161,8 +161,13 @@ PartSet_ObjectNode::VisibilityState PartSet_ObjectNode::visibilityState() const
     if (aCompRes.get()) {
       VisibilityState aState = aCompRes->numberOfSubs(true) == 0 ?
         (aWork->isVisible(aCompRes) ? Visible : Hidden) : NoneState;
-      for (int i = 0; i < aCompRes->numberOfSubs(true); i++) {
-        ResultPtr aSubRes = aCompRes->subResult(i, true);
+      std::list<ResultPtr> aResultsList;
+      ModelAPI_Tools::allSubs(aCompRes, aResultsList);
+
+      std::list<ResultPtr>::const_iterator aIt;
+      //for (int i = 0; i < aCompRes->numberOfSubs(true); i++) {
+      for (aIt = aResultsList.cbegin(); aIt != aResultsList.cend(); aIt++) {
+        ResultPtr aSubRes = (*aIt); // aCompRes->subResult(i, true);
         VisibilityState aS = aWork->isVisible(aSubRes) ? Visible : Hidden;
         if (aState == NoneState)
           aState = aS;
@@ -182,7 +187,93 @@ PartSet_ObjectNode::VisibilityState PartSet_ObjectNode::visibilityState() const
   return NoneState;
 }
 
+void PartSet_ObjectNode::update()
+{
+  ResultBodyPtr aCompRes = std::dynamic_pointer_cast<ModelAPI_ResultBody>(myObject);
+  if (aCompRes.get()) {
+    int aNb = aCompRes->numberOfSubs(true);
+    ModuleBase_ITreeNode* aNode;
+    ResultBodyPtr aBody;
+    int i;
+    for (i = 0; i < aNb; i++) {
+      aBody = aCompRes->subResult(i, true);
+      if (i < myChildren.size()) {
+        aNode = myChildren.at(i);
+        if (aNode->object() != aBody) {
+          ((PartSet_ObjectNode*)aNode)->setObject(aBody);
+        }
+      } else {
+        aNode = new PartSet_ObjectNode(aBody, this);
+        myChildren.append(aNode);
+      }
+    }
+    // Delete extra objects
+    while (myChildren.size() > aNb) {
+      aNode = myChildren.takeLast();
+      delete aNode;
+    }
+    foreach(ModuleBase_ITreeNode* aNode, myChildren) {
+      aNode->update();
+    }
+  }
+}
 
+QTreeNodesList PartSet_ObjectNode::objectCreated(const QObjectPtrList& theObjects)
+{
+  QTreeNodesList aResult;
+
+  ResultBodyPtr aCompRes = std::dynamic_pointer_cast<ModelAPI_ResultBody>(myObject);
+  if (aCompRes.get()) {
+    int aNb = aCompRes->numberOfSubs(true);
+    ModuleBase_ITreeNode* aNode;
+    ResultBodyPtr aBody;
+    int i;
+    for (i = 0; i < aNb; i++) {
+      aBody = aCompRes->subResult(i, true);
+      if (i < myChildren.size()) {
+        aNode = myChildren.at(i);
+        if (aNode->object() != aBody) {
+          ((PartSet_ObjectNode*)aNode)->setObject(aBody);
+          aResult.append(aNode);
+        }
+      } else {
+        aNode = new PartSet_ObjectNode(aBody, this);
+        myChildren.append(aNode);
+        aResult.append(aNode);
+      }
+    }
+    foreach(ModuleBase_ITreeNode* aNode, myChildren) {
+      aResult.append(aNode->objectCreated(theObjects));
+    }
+  }
+  return aResult;
+}
+
+QTreeNodesList PartSet_ObjectNode::objectsDeleted(const DocumentPtr& theDoc, const QString& theGroup)
+{
+  QTreeNodesList aResult;
+  ResultBodyPtr aCompRes = std::dynamic_pointer_cast<ModelAPI_ResultBody>(myObject);
+  if (aCompRes.get()) {
+    int aNb = aCompRes->numberOfSubs(true);
+    ModuleBase_ITreeNode* aNode;
+    // Delete extra objects
+    bool isDeleted = false;
+    while (myChildren.size() > aNb) {
+      aNode = myChildren.takeLast();
+      delete aNode;
+      isDeleted = true;
+    }
+    if (isDeleted)
+      aResult.append(this);
+    int i = 0;
+    foreach(ModuleBase_ITreeNode* aNode, myChildren) {
+      ((PartSet_ObjectNode*)aNode)->setObject(aCompRes->subResult(i, true));
+      aResult.append(aNode->objectsDeleted(theDoc, theGroup));
+      i++;
+    }
+  }
+  return aResult;
+}
 //////////////////////////////////////////////////////////////////////////////////
 PartSet_FolderNode::PartSet_FolderNode(ModuleBase_ITreeNode* theParent,
   FolderType theType)
@@ -252,9 +343,9 @@ Qt::ItemFlags PartSet_FolderNode::flags(int theColumn) const
 
 ModuleBase_ITreeNode* PartSet_FolderNode::createNode(const ObjectPtr& theObj)
 {
-  ResultBodyPtr aCompRes = std::dynamic_pointer_cast<ModelAPI_ResultBody>(theObj);
-  if (aCompRes.get())
-    return new PartSet_CompsolidNode(theObj, this);
+  //ResultCompSolidPtr aCompRes = std::dynamic_pointer_cast<ModelAPI_ResultCompSolid>(theObj);
+  //if (aCompRes.get())
+  //  return new PartSet_CompsolidNode(theObj, this);
   return new PartSet_ObjectNode(theObj, this);
 }
 
@@ -922,78 +1013,78 @@ void PartSet_ObjectFolderNode::getFirstAndLastIndex(int& theFirst, int& theLast)
 
 
 //////////////////////////////////////////////////////////////////////////////////
-PartSet_CompsolidNode::PartSet_CompsolidNode(const ObjectPtr& theObj,
-  ModuleBase_ITreeNode* theParent) : PartSet_ObjectNode(theObj, theParent)
-{
-  update();
-}
+//PartSet_CompsolidNode::PartSet_CompsolidNode(const ObjectPtr& theObj,
+//  ModuleBase_ITreeNode* theParent) : PartSet_ObjectNode(theObj, theParent)
+//{
+//  update();
+//}
 
-void PartSet_CompsolidNode::update()
-{
-  ResultBodyPtr aCompRes = std::dynamic_pointer_cast<ModelAPI_ResultBody>(myObject);
-  int aNb = aCompRes->numberOfSubs(true);
-  ModuleBase_ITreeNode* aNode;
-  ResultBodyPtr aBody;
-  int i;
-  for (i = 0; i < aNb; i++) {
-    aBody = aCompRes->subResult(i, true);
-    if (i < myChildren.size()) {
-      aNode = myChildren.at(i);
-      if (aNode->object() != aBody) {
-        ((PartSet_ObjectNode*)aNode)->setObject(aBody);
-      }
-    } else {
-      aNode = new PartSet_ObjectNode(aBody, this);
-      myChildren.append(aNode);
-    }
-  }
-  // Delete extra objects
-  while (myChildren.size() > aNb) {
-    aNode = myChildren.takeLast();
-    delete aNode;
-  }
-}
-
-QTreeNodesList PartSet_CompsolidNode::objectCreated(const QObjectPtrList& theObjects)
-{
-  QTreeNodesList aResult;
-
-  ResultBodyPtr aCompRes = std::dynamic_pointer_cast<ModelAPI_ResultBody>(myObject);
-  int aNb = aCompRes->numberOfSubs(true);
-  ModuleBase_ITreeNode* aNode;
-  ResultBodyPtr aBody;
-  int i;
-  for (i = 0; i < aNb; i++) {
-    aBody = aCompRes->subResult(i, true);
-    if (i < myChildren.size()) {
-      aNode = myChildren.at(i);
-      if (aNode->object() != aBody) {
-        ((PartSet_ObjectNode*)aNode)->setObject(aBody);
-        aResult.append(aNode);
-      }
-    } else {
-      aNode = new PartSet_ObjectNode(aBody, this);
-      myChildren.append(aNode);
-      aResult.append(aNode);
-    }
-  }
-  return aResult;
-}
-
-QTreeNodesList PartSet_CompsolidNode::objectsDeleted(const DocumentPtr& theDoc, const QString& theGroup)
-{
-  QTreeNodesList aResult;
-  ResultBodyPtr aCompRes = std::dynamic_pointer_cast<ModelAPI_ResultBody>(myObject);
-  int aNb = aCompRes->numberOfSubs(true);
-  ModuleBase_ITreeNode* aNode;
-  // Delete extra objects
-  bool isDeleted = false;
-  while (myChildren.size() > aNb) {
-    aNode = myChildren.takeLast();
-    delete aNode;
-    isDeleted = true;
-  }
-  if (isDeleted)
-    aResult.append(this);
-  return aResult;
-}
+//void PartSet_CompsolidNode::update()
+//{
+//  ResultCompSolidPtr aCompRes = std::dynamic_pointer_cast<ModelAPI_ResultCompSolid>(myObject);
+//  int aNb = aCompRes->numberOfSubs(true);
+//  ModuleBase_ITreeNode* aNode;
+//  ResultBodyPtr aBody;
+//  int i;
+//  for (i = 0; i < aNb; i++) {
+//    aBody = aCompRes->subResult(i, true);
+//    if (i < myChildren.size()) {
+//      aNode = myChildren.at(i);
+//      if (aNode->object() != aBody) {
+//        ((PartSet_ObjectNode*)aNode)->setObject(aBody);
+//      }
+//    } else {
+//      aNode = new PartSet_ObjectNode(aBody, this);
+//      myChildren.append(aNode);
+//    }
+//  }
+//  // Delete extra objects
+//  while (myChildren.size() > aNb) {
+//    aNode = myChildren.takeLast();
+//    delete aNode;
+//  }
+//}
+//
+//QTreeNodesList PartSet_CompsolidNode::objectCreated(const QObjectPtrList& theObjects)
+//{
+//  QTreeNodesList aResult;
+//
+//  ResultCompSolidPtr aCompRes = std::dynamic_pointer_cast<ModelAPI_ResultCompSolid>(myObject);
+//  int aNb = aCompRes->numberOfSubs(true);
+//  ModuleBase_ITreeNode* aNode;
+//  ResultBodyPtr aBody;
+//  int i;
+//  for (i = 0; i < aNb; i++) {
+//    aBody = aCompRes->subResult(i, true);
+//    if (i < myChildren.size()) {
+//      aNode = myChildren.at(i);
+//      if (aNode->object() != aBody) {
+//        ((PartSet_ObjectNode*)aNode)->setObject(aBody);
+//        aResult.append(aNode);
+//      }
+//    } else {
+//      aNode = new PartSet_ObjectNode(aBody, this);
+//      myChildren.append(aNode);
+//      aResult.append(aNode);
+//    }
+//  }
+//  return aResult;
+//}
+//
+//QTreeNodesList PartSet_CompsolidNode::objectsDeleted(const DocumentPtr& theDoc, const QString& theGroup)
+//{
+//  QTreeNodesList aResult;
+//  ResultCompSolidPtr aCompRes = std::dynamic_pointer_cast<ModelAPI_ResultCompSolid>(myObject);
+//  int aNb = aCompRes->numberOfSubs(true);
+//  ModuleBase_ITreeNode* aNode;
+//  // Delete extra objects
+//  bool isDeleted = false;
+//  while (myChildren.size() > aNb) {
+//    aNode = myChildren.takeLast();
+//    delete aNode;
+//    isDeleted = true;
+//  }
+//  if (isDeleted)
+//    aResult.append(this);
+//  return aResult;
+//}

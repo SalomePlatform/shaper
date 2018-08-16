@@ -80,6 +80,8 @@ public:
 
   /// Returns the context of the selection if the whole feature was selected
   MODEL_EXPORT virtual FeaturePtr contextFeature();
+  /// Returns the context of the selection : result or feature
+  MODEL_EXPORT virtual std::shared_ptr<ModelAPI_Object> contextObject();
 
   /// Sets the feature object
   MODEL_EXPORT virtual void setObject(const std::shared_ptr<ModelAPI_Object>& theObject);

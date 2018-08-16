@@ -74,6 +74,8 @@ class ModelAPI_AttributeSelection : public ModelAPI_Attribute
 
   /// Returns the context of the selection if the whole feature was selected
   virtual std::shared_ptr<ModelAPI_Feature> contextFeature() = 0;
+  /// Returns the context of the selection : result or feature
+  virtual std::shared_ptr<ModelAPI_Object> contextObject() = 0;
 
   /// Updates the underlied selection due to the changes in the referenced objects
   /// \returns false if update is failed
