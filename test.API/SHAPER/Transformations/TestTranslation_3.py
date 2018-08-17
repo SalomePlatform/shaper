@@ -530,16 +530,16 @@ model.testHaveNamingFaces(Translation_90, model, Part_1_doc)
 
 
 model.testNbResults(Translation_48, 0)
-assert(Translation_48.feature().error() == 'Translation axis is not selected.')
+assert(Translation_48.feature().error() == 'Attribute "axis_object" is not initialized.')
 
 model.testNbResults(Translation_57, 0)
-assert(Translation_57.feature().error() == 'Translation axis is not selected.')
+assert(Translation_57.feature().error() == 'Attribute "axis_object" is not initialized.')
 
 model.testNbResults(Translation_66, 0)
-assert(Translation_66.feature().error() == 'Translation axis is not selected.')
+assert(Translation_66.feature().error() == 'Attribute "axis_object" is not initialized.')
 
 model.testNbResults(Translation_75, 0)
-assert(Translation_75.feature().error() == 'Translation axis is not selected.')
+assert(Translation_75.feature().error() == 'Attribute "axis_object" is not initialized.')
 
 model.testNbResults(Translation_84, 0)
-assert(Translation_84.feature().error() == 'Translation axis is not selected.')
+assert(Translation_84.feature().error() == 'Attribute "axis_object" is not initialized.')
