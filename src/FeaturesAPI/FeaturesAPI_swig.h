@@ -48,6 +48,5 @@
   #include "FeaturesAPI_Symmetry.h"
   #include "FeaturesAPI_Translation.h"
   #include "FeaturesAPI_Union.h"
-  #include "FeaturesAPI_FusionFaces.h"
 
 #endif // FeaturesAPI_swig_H_
