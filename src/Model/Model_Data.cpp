@@ -545,7 +545,8 @@ void Model_Data::updateConcealmentFlag()
       if (aFeature.get() && !aFeature->isDisabled() && aFeature->isStable()) {
         if (ModelAPI_Session::get()->validators()->isConcealed(
               aFeature->getKind(), (*aRefsIter)->id())) {
-          std::shared_ptr<ModelAPI_Result> aRes = std::dynamic_pointer_cast<ModelAPI_Result>(myObject);
+          std::shared_ptr<ModelAPI_Result> aRes =
+            std::dynamic_pointer_cast<ModelAPI_Result>(myObject);
           if (aRes.get()) {
             aRes->setIsConcealed(true); // set concealed
             return;

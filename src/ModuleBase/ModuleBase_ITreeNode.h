@@ -58,7 +58,9 @@ public:
   virtual QVariant data(int theColumn, int theRole) const { return QVariant(); }
 
   /// Returns properties flag of the item
-  virtual Qt::ItemFlags flags(int theColumn) const { return Qt::ItemIsSelectable | Qt::ItemIsEnabled; }
+  virtual Qt::ItemFlags flags(int theColumn) const {
+    return Qt::ItemIsSelectable | Qt::ItemIsEnabled;
+  }
 
   /// Returns parent node of the current node
   ModuleBase_ITreeNode* parent() const { return myParent; }
@@ -121,7 +123,9 @@ public:
   /// Process creation of objects.
   /// \param theObjects a list of created objects
   /// \return a list of nodes which corresponds to the created objects
-  virtual QTreeNodesList objectCreated(const QObjectPtrList& theObjects) { return QTreeNodesList(); }
+  virtual QTreeNodesList objectCreated(const QObjectPtrList& theObjects) {
+    return QTreeNodesList();
+  }
 
   /// Process deletion of objects.
   /// \param theDoc a document where objects were deleted

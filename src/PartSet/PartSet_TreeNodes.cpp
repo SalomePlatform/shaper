@@ -249,7 +249,8 @@ QTreeNodesList PartSet_ObjectNode::objectCreated(const QObjectPtrList& theObject
   return aResult;
 }
 
-QTreeNodesList PartSet_ObjectNode::objectsDeleted(const DocumentPtr& theDoc, const QString& theGroup)
+QTreeNodesList PartSet_ObjectNode::objectsDeleted(
+  const DocumentPtr& theDoc, const QString& theGroup)
 {
   QTreeNodesList aResult;
   ResultBodyPtr aCompRes = std::dynamic_pointer_cast<ModelAPI_ResultBody>(myObject);
@@ -1071,7 +1072,8 @@ void PartSet_ObjectFolderNode::getFirstAndLastIndex(int& theFirst, int& theLast)
 //  return aResult;
 //}
 //
-//QTreeNodesList PartSet_CompsolidNode::objectsDeleted(const DocumentPtr& theDoc, const QString& theGroup)
+//QTreeNodesList PartSet_CompsolidNode::objectsDeleted(
+//  const DocumentPtr& theDoc, const QString& theGroup)
 //{
 //  QTreeNodesList aResult;
 //  ResultCompSolidPtr aCompRes = std::dynamic_pointer_cast<ModelAPI_ResultCompSolid>(myObject);

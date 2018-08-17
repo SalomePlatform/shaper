@@ -45,7 +45,8 @@ public:
                               const double theSemiAngle,
                               const double theRadius);
 
-  /// Creating of cone by location of reference circle, axis, semi-angle and radii of boundary circles
+  /// Creating of cone by location of reference circle, axis, semi-angle and
+  /// radii of boundary circles
   GEOMAPI_EXPORT GeomAPI_Cone(const std::shared_ptr<GeomAPI_Pnt>& theLocation,
                               const std::shared_ptr<GeomAPI_Dir>& theAxis,
                               const double theSemiAngle,

@@ -589,7 +589,8 @@ ObjectPtr Model_Objects::object(TDF_Label theLabel)
         const std::list<ResultPtr>& aResults = aFeature->results();
         std::list<std::shared_ptr<ModelAPI_Result> >::const_iterator aRIter = aResults.cbegin();
         for(; aRIter != aResults.cend(); aRIter++) {
-          std::shared_ptr<Model_Data> aResData = std::dynamic_pointer_cast<Model_Data>((*aRIter)->data());
+          std::shared_ptr<Model_Data> aResData =
+            std::dynamic_pointer_cast<Model_Data>((*aRIter)->data());
           if (aResData->label().Father().IsEqual(aSubLab.ChangeValue())) {
             aCurrentResult = *aRIter;
             break;
