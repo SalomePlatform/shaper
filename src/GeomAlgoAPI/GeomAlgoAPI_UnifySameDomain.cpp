@@ -33,6 +33,13 @@ GeomAlgoAPI_UnifySameDomain::GeomAlgoAPI_UnifySameDomain(const ListOfShape& theS
   build(theShapes);
 }
 
+//==================================================================================================
+GeomAlgoAPI_UnifySameDomain::GeomAlgoAPI_UnifySameDomain(const GeomShapePtr& theShape)
+{
+  build(theShape, false);
+}
+
+//==================================================================================================
 void GeomAlgoAPI_UnifySameDomain::build(const ListOfShape& theShapes)
 {
   if(theShapes.empty()) {
@@ -54,10 +61,20 @@ void GeomAlgoAPI_UnifySameDomain::build(const ListOfShape& theShapes)
 
   const TopoDS_Shape& aShell = aCombined.front()->impl<TopoDS_Shape>();
 
+  std::shared_ptr<GeomAPI_Shape> aShape(new GeomAPI_Shape());
+  aShape->setImpl(new TopoDS_Shape(aShell));
+  build(aShape, true);
+}
+
+//==================================================================================================
+void GeomAlgoAPI_UnifySameDomain::build(const GeomShapePtr& theShape,
+                                        const bool theIsToSimplifyShell)
+{
   ShapeUpgrade_UnifySameDomain* aUnifyAlgo = new ShapeUpgrade_UnifySameDomain();
   this->setImpl(aUnifyAlgo);
 
-  aUnifyAlgo->Initialize(aShell);
+  const TopoDS_Shape& aShape = theShape->impl<TopoDS_Shape>();
+  aUnifyAlgo->Initialize(aShape);
   aUnifyAlgo->Build();
 
   TopoDS_Shape aResult = aUnifyAlgo->Shape();
@@ -65,7 +82,7 @@ void GeomAlgoAPI_UnifySameDomain::build(const ListOfShape& theShapes)
     return;
   }
 
-  if (aResult.ShapeType() == TopAbs_SHELL) {
+  if (theIsToSimplifyShell && aResult.ShapeType() == TopAbs_SHELL) {
     int aNb = 0;
     TopoDS_Iterator anIt(aResult);
     for (; anIt.More(); anIt.Next()) {
@@ -78,9 +95,9 @@ void GeomAlgoAPI_UnifySameDomain::build(const ListOfShape& theShapes)
     }
   }
 
-  std::shared_ptr<GeomAPI_Shape> aShape(new GeomAPI_Shape());
-  aShape->setImpl(new TopoDS_Shape(aResult));
-  this->setShape(aShape);
+  std::shared_ptr<GeomAPI_Shape> aResShape(new GeomAPI_Shape());
+  aResShape->setImpl(new TopoDS_Shape(aResult));
+  this->setShape(aResShape);
   this->setDone(true);
 }
 
