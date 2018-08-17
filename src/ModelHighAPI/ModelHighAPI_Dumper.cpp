@@ -955,8 +955,19 @@ ModelHighAPI_Dumper& ModelHighAPI_Dumper::operator<<(
     return *this;
   }
 
+  // how to dump selection: construction features are dumped by name always
+  bool isDumpByGeom = myGeometricalSelection;
+  if (isDumpByGeom) {
+    ResultPtr aRes = theAttrSelect->context();
+    if (aRes) {
+      FeaturePtr aFeat = ModelAPI_Feature::feature(aRes->data()->owner());
+      if (aFeat)
+        isDumpByGeom = aFeat->isInHistory();
+    }
+  }
+
   myDumpBuffer << "\"" << aShape->shapeTypeStr() << "\", ";
-  if (myGeometricalSelection)
+  if (isDumpByGeom)
     *this << aShape->middlePoint();
   else
     myDumpBuffer << "\"" << theAttrSelect->namingName() << "\"";
