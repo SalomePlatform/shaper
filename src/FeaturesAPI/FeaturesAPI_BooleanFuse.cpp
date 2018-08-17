@@ -85,6 +85,7 @@ void FeaturesAPI_BooleanFuse::setMainObjects(
 void FeaturesAPI_BooleanFuse::setToolObjects(
   const std::list<ModelHighAPI_Selection>& theToolObjects)
 {
+  fillAttribute(FeaturesPlugin_BooleanFuse::CREATION_METHOD_ADVANCED(), mycreationMethod);
   fillAttribute(theToolObjects, mytoolObjects);
 
   execute();
@@ -106,6 +107,8 @@ void FeaturesAPI_BooleanFuse::setAdvancedMode(const bool theMode)
   } else {
     fillAttribute(FeaturesPlugin_BooleanFuse::CREATION_METHOD_SIMPLE(), mycreationMethod);
   }
+
+  execute();
 }
 
 //==================================================================================================
