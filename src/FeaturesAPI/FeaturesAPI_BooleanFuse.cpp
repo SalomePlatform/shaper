@@ -36,17 +36,28 @@ FeaturesAPI_BooleanFuse::FeaturesAPI_BooleanFuse(
 FeaturesAPI_BooleanFuse::FeaturesAPI_BooleanFuse(
   const std::shared_ptr<ModelAPI_Feature>& theFeature,
   const std::list<ModelHighAPI_Selection>& theMainObjects,
+  const bool theRemoveEdges)
+  : ModelHighAPI_Interface(theFeature)
+{
+  if (initialize()) {
+    fillAttribute(FeaturesPlugin_BooleanFuse::CREATION_METHOD_SIMPLE(), mycreationMethod);
+    fillAttribute(theMainObjects, mymainObjects);
+    fillAttribute(theRemoveEdges, myremoveEdges);
+
+    execute(false);
+  }
+}
+
+//==================================================================================================
+FeaturesAPI_BooleanFuse::FeaturesAPI_BooleanFuse(
+  const std::shared_ptr<ModelAPI_Feature>& theFeature,
+  const std::list<ModelHighAPI_Selection>& theMainObjects,
   const std::list<ModelHighAPI_Selection>& theToolObjects,
   const bool theRemoveEdges)
 : ModelHighAPI_Interface(theFeature)
 {
   if(initialize()) {
-    if (theToolObjects.empty()) {
-      fillAttribute(FeaturesPlugin_BooleanFuse::CREATION_METHOD_SIMPLE(), mycreationMethod);
-    } else {
-      fillAttribute(FeaturesPlugin_BooleanFuse::CREATION_METHOD_ADVANCED(), mycreationMethod);
-    }
-
+    fillAttribute(FeaturesPlugin_BooleanFuse::CREATION_METHOD_ADVANCED(), mycreationMethod);
     fillAttribute(theMainObjects, mymainObjects);
     fillAttribute(theToolObjects, mytoolObjects);
     fillAttribute(theRemoveEdges, myremoveEdges);
@@ -76,12 +87,6 @@ void FeaturesAPI_BooleanFuse::setToolObjects(
 {
   fillAttribute(theToolObjects, mytoolObjects);
 
-  if (theToolObjects.empty()) {
-    fillAttribute(FeaturesPlugin_BooleanFuse::CREATION_METHOD_SIMPLE(), mycreationMethod);
-  } else {
-    fillAttribute(FeaturesPlugin_BooleanFuse::CREATION_METHOD_ADVANCED(), mycreationMethod);
-  }
-
   execute();
 }
 
@@ -94,6 +99,16 @@ void FeaturesAPI_BooleanFuse::setRemoveEdges(const bool theRemoveEdges)
 }
 
 //==================================================================================================
+void FeaturesAPI_BooleanFuse::setAdvancedMode(const bool theMode)
+{
+  if (theMode) {
+    fillAttribute(FeaturesPlugin_BooleanFuse::CREATION_METHOD_ADVANCED(), mycreationMethod);
+  } else {
+    fillAttribute(FeaturesPlugin_BooleanFuse::CREATION_METHOD_SIMPLE(), mycreationMethod);
+  }
+}
+
+//==================================================================================================
 void FeaturesAPI_BooleanFuse::dump(ModelHighAPI_Dumper& theDumper) const
 {
   FeaturePtr aBase = feature();
@@ -101,6 +116,7 @@ void FeaturesAPI_BooleanFuse::dump(ModelHighAPI_Dumper& theDumper) const
   theDumper << aBase << " = model.addFuse";
 
   const std::string& aDocName = theDumper.name(aBase->document());
+  AttributeStringPtr aMode = aBase->string(FeaturesPlugin_BooleanFuse::CREATION_METHOD());
   AttributeSelectionListPtr anObjects =
     aBase->selectionList(FeaturesPlugin_BooleanFuse::OBJECT_LIST_ID());
   AttributeSelectionListPtr aTools =
@@ -110,7 +126,7 @@ void FeaturesAPI_BooleanFuse::dump(ModelHighAPI_Dumper& theDumper) const
 
   theDumper << "(" << aDocName << ", " << anObjects;
 
-  if (aTools->size() > 0) {
+  if (aMode->value() == FeaturesPlugin_BooleanFuse::CREATION_METHOD_ADVANCED()) {
     theDumper << ", " << aTools;
   }
 
@@ -127,10 +143,8 @@ BooleanFusePtr addFuse(const std::shared_ptr<ModelAPI_Document>& thePart,
                        const bool theRemoveEdges)
 {
   std::shared_ptr<ModelAPI_Feature> aFeature = thePart->addFeature(FeaturesAPI_BooleanFuse::ID());
-  std::list<ModelHighAPI_Selection> aToolObjects;
   return BooleanFusePtr(new FeaturesAPI_BooleanFuse(aFeature,
                                                     theObjects,
-                                                    aToolObjects,
                                                     theRemoveEdges));
 }
 

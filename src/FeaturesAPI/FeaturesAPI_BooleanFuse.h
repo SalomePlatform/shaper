@@ -43,10 +43,16 @@ public:
 
   /// Constructor with values.
   FEATURESAPI_EXPORT
+    FeaturesAPI_BooleanFuse(const std::shared_ptr<ModelAPI_Feature>& theFeature,
+                            const std::list<ModelHighAPI_Selection>& theMainObjects,
+                            const bool theRemoveEdges = false);
+
+  /// Constructor with values.
+  FEATURESAPI_EXPORT
   FeaturesAPI_BooleanFuse(const std::shared_ptr<ModelAPI_Feature>& theFeature,
-                         const std::list<ModelHighAPI_Selection>& theMainObjects,
-                         const std::list<ModelHighAPI_Selection>& theToolObjects,
-                         const bool theRemoveEdges = false);
+                          const std::list<ModelHighAPI_Selection>& theMainObjects,
+                          const std::list<ModelHighAPI_Selection>& theToolObjects,
+                          const bool theRemoveEdges = false);
 
   /// Destructor.
   FEATURESAPI_EXPORT
@@ -73,6 +79,10 @@ public:
   /// Set remove edges.
   FEATURESAPI_EXPORT
   void setRemoveEdges(const bool theRemoveEdges);
+
+  /// Set mode.
+  FEATURESAPI_EXPORT
+  void setAdvancedMode(const bool theMode);
 
   /// Dump wrapped feature
   FEATURESAPI_EXPORT
