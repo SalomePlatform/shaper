@@ -110,6 +110,8 @@ void Model_AttributeSelectionList::append(const GeomPointPtr& thePoint, const st
   aNewAttr->setID(id());
   mySize->Set(aNewTag);
   aNewAttr->selectSubShape(theType, thePoint);
+  if (selectionType().empty())
+    setSelectionType(aNewAttr->value()->shapeTypeStr());
   owner()->data()->sendAttributeUpdated(this);
 }
 

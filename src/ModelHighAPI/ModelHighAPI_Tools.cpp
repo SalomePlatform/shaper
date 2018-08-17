@@ -194,9 +194,11 @@ void fillAttribute(const std::list<ModelHighAPI_Selection> & theValue,
   theAttribute->clear();
 
   if(!theValue.empty()) {
-    std::string aSelectionType;
     const ModelHighAPI_Selection& aSelection = theValue.front();
-    theAttribute->setSelectionType(aSelection.shapeType());
+    std::string aSelectionType = aSelection.shapeType();
+    GeomAPI_Shape::ShapeType aType = GeomAPI_Shape::shapeTypeByStr(aSelectionType);
+    if (aType != GeomAPI_Shape::SHAPE || aSelectionType == "SHAPE")
+      theAttribute->setSelectionType(aSelectionType);
   }
 
   for (auto it = theValue.begin(); it != theValue.end(); ++it)

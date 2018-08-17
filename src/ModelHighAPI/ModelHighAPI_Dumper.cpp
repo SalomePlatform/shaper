@@ -53,6 +53,8 @@
 #include <ModelAPI_ResultPart.h>
 #include <ModelAPI_Tools.h>
 
+#include <ModelGeomAlgo_Shape.h>
+
 #include <PartSetPlugin_Part.h>
 
 #include <OSD_OpenFile.hxx>
@@ -935,6 +937,46 @@ ModelHighAPI_Dumper& ModelHighAPI_Dumper::operator<<(
   return *this;
 }
 
+static int possibleSelectionsByPoint(const GeomPointPtr& thePoint,
+                                     const GeomAPI_Shape::ShapeType& theType,
+                                     const FeaturePtr& theStartFeature,
+                                     const FeaturePtr& theEndFeature)
+{
+  DocumentPtr aDoc1 = theStartFeature->document();
+  DocumentPtr aDoc2 = theEndFeature->document();
+
+  std::list<FeaturePtr> aFeatures = aDoc1->allFeatures();
+  if (aDoc1 != aDoc2) {
+    std::list<FeaturePtr> anAdditionalFeatures = aDoc2->allFeatures();
+    aFeatures.insert(aFeatures.end(), anAdditionalFeatures.begin(), anAdditionalFeatures.end());
+  }
+
+  CompositeFeaturePtr aLastCompositeFeature;
+
+  std::list<FeaturePtr>::const_iterator aFIt = aFeatures.begin();
+  while (aFIt != aFeatures.end() && *aFIt != theStartFeature) {
+    CompositeFeaturePtr aCompFeat = std::dynamic_pointer_cast<ModelAPI_CompositeFeature>(*aFIt);
+    if (aCompFeat)
+      aLastCompositeFeature = aCompFeat;
+    ++aFIt;
+  }
+
+  ResultPtr aResult;
+  GeomShapePtr aSubshape;
+  int aNbPossibleSelections = 0;
+  for (; aFIt != aFeatures.end() && *aFIt != theEndFeature; ++aFIt) {
+    if (aLastCompositeFeature && aLastCompositeFeature->isSub(*aFIt))
+      continue;
+    CompositeFeaturePtr aCompFeat = std::dynamic_pointer_cast<ModelAPI_CompositeFeature>(*aFIt);
+    if (aCompFeat)
+      aLastCompositeFeature = aCompFeat;
+
+    if (ModelGeomAlgo_Shape::findSubshapeByPoint(*aFIt, thePoint, theType, aResult, aSubshape))
+      ++aNbPossibleSelections;
+  }
+  return aNbPossibleSelections;
+}
+
 ModelHighAPI_Dumper& ModelHighAPI_Dumper::operator<<(
     const std::shared_ptr<ModelAPI_AttributeSelection>& theAttrSelect)
 {
@@ -957,20 +999,37 @@ ModelHighAPI_Dumper& ModelHighAPI_Dumper::operator<<(
 
   // how to dump selection: construction features are dumped by name always
   bool isDumpByGeom = myGeometricalSelection;
+  FeaturePtr aSelectedFeature;
   if (isDumpByGeom) {
     ResultPtr aRes = theAttrSelect->context();
     if (aRes) {
-      FeaturePtr aFeat = ModelAPI_Feature::feature(aRes->data()->owner());
-      if (aFeat)
-        isDumpByGeom = aFeat->isInHistory();
+      aSelectedFeature = ModelAPI_Feature::feature(aRes->data()->owner());
+      if (aSelectedFeature)
+        isDumpByGeom = aSelectedFeature->isInHistory();
     }
   }
 
-  myDumpBuffer << "\"" << aShape->shapeTypeStr() << "\", ";
-  if (isDumpByGeom)
-    *this << aShape->middlePoint();
+  myDumpBuffer << "\"" << aShape->shapeTypeStr();
+  if (isDumpByGeom) {
+    GeomPointPtr aMiddlePoint = aShape->middlePoint();
+    // calculate number of features, which could be selected by the same point
+    FeaturePtr anOwner = ModelAPI_Feature::feature(theAttrSelect->owner());
+    int aNbPossibleSelections =
+        possibleSelectionsByPoint(aMiddlePoint, aShape->shapeType(), aSelectedFeature, anOwner);
+
+    // produce the index if the number of applicable features is greater than 1
+    std::string anIndex;
+    if (aNbPossibleSelections > 1) {
+      std::ostringstream anOutput;
+      anOutput << "_" << aNbPossibleSelections;
+      anIndex = anOutput.str();
+    }
+
+    myDumpBuffer << anIndex << "\", ";
+    *this << aMiddlePoint;
+  }
   else
-    myDumpBuffer << "\"" << theAttrSelect->namingName() << "\"";
+    myDumpBuffer << "\", \"" << theAttrSelect->namingName() << "\"";
   myDumpBuffer << ")";
   return *this;
 }
