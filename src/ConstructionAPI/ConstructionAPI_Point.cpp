@@ -20,8 +20,11 @@
 
 #include "ConstructionAPI_Point.h"
 
+#include <GeomAPI_Pnt.h>
 #include <GeomAPI_Shape.h>
+#include <GeomAPI_Vertex.h>
 
+#include <ModelHighAPI_Double.h>
 #include <ModelHighAPI_Dumper.h>
 #include <ModelHighAPI_Selection.h>
 #include <ModelHighAPI_Tools.h>
@@ -114,6 +117,38 @@ ConstructionAPI_Point::ConstructionAPI_Point(const std::shared_ptr<ModelAPI_Feat
   {
     if (theIsCircularEdge) {
       setByCenterOfCircle(theObject);
+    } else if (theObject.shapeType() == "VERTEX") {
+      // This is tricky way to get vertex shape.
+      fillAttribute(theObject, mypointToProject);
+      GeomShapePtr aShape = mypointToProject->value();
+      if (!aShape.get()) {
+        ResultPtr aContext = mypointToProject->context();
+        if (!aContext.get()) {
+          fillAttribute(ModelHighAPI_Selection(), mypointToProject);
+          return;
+        }
+        aShape = aContext->shape();
+      }
+
+      if (!aShape.get()) {
+        fillAttribute(ModelHighAPI_Selection(), mypointToProject);
+        return;
+      }
+
+      GeomVertexPtr aVertex = aShape->vertex();
+      if (!aVertex.get()) {
+        fillAttribute(ModelHighAPI_Selection(), mypointToProject);
+        return;
+      }
+
+      GeomPointPtr aPnt = aVertex->point();
+      if (!aPnt.get()) {
+        fillAttribute(ModelHighAPI_Selection(), mypointToProject);
+        return;
+      }
+
+      fillAttribute(ModelHighAPI_Selection(), mypointToProject);
+      setByXYZ(aPnt->x(), aPnt->y(), aPnt->z());
     } else {
       setByCenterOfGravity(theObject);
     }
@@ -173,7 +208,7 @@ void ConstructionAPI_Point::setByProjectionOnEdge(const ModelHighAPI_Selection& 
                 mycreationMethod);
   fillAttribute(ConstructionPlugin_Point::PROJECTION_TYPE_ON_EDGE(),
                 myprojectionType);
-  fillAttribute(theVertex, mypoinToProject);
+  fillAttribute(theVertex, mypointToProject);
   fillAttribute(theEdge, myedgeForPointProjection);
 
   execute();
@@ -187,7 +222,7 @@ void ConstructionAPI_Point::setByProjectionOnFace(const ModelHighAPI_Selection& 
                 mycreationMethod);
   fillAttribute(ConstructionPlugin_Point::PROJECTION_TYPE_ON_FACE(),
                 myprojectionType);
-  fillAttribute(theVertex, mypoinToProject);
+  fillAttribute(theVertex, mypointToProject);
   fillAttribute(theFace, myfaceForPointProjection);
 
   execute();
@@ -296,7 +331,7 @@ void ConstructionAPI_Point::dump(ModelHighAPI_Dumper& theDumper) const
     }
     theDumper << ", " << reverse()->value();
   } else if (aMeth == ConstructionPlugin_Point::CREATION_METHOD_BY_PROJECTION()) {
-    theDumper << poinToProject() << ", ";
+    theDumper << pointToProject() << ", ";
     if (projectionType()->value() == ConstructionPlugin_Point::PROJECTION_TYPE_ON_EDGE()) {
       theDumper << edgeForPointProjection();
     } else {
