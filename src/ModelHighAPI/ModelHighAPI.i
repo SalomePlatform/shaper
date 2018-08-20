@@ -32,7 +32,7 @@
   #include "ModelHighAPI_swig.h"
 
   // fix for SWIG v2.0.4
-  #define SWIGPY_SLICE_ARG(obj) ((PySliceObject*)(obj))
+  #define SWIGPY_SLICE_ARG(obj) ((PyObject*)(obj))
 %}
 
 %include "doxyhelp.i"
@@ -62,11 +62,11 @@
 // typemaps
 
 %typemap(in) const ModelHighAPI_Double & (ModelHighAPI_Double temp) {
-  if (PyFloat_Check($input) || PyInt_Check($input) || PyLong_Check($input)) {
+  if (PyFloat_Check($input) || PyLong_Check($input)) {
     temp = ModelHighAPI_Double(PyFloat_AsDouble($input));
     $1 = &temp;
-  } else if (PyString_Check($input)) {
-    temp = ModelHighAPI_Double(PyString_AsString($input));
+  } else if (PyUnicode_Check($input)) {
+    temp = ModelHighAPI_Double(PyUnicode_AsUTF8($input));
     $1 = &temp;
   } else if ((SWIG_ConvertPtr($input, (void **)&$1, $1_descriptor, SWIG_POINTER_EXCEPTION)) == 0) {
   } else {
@@ -75,15 +75,15 @@
   }
 }
 %typecheck(SWIG_TYPECHECK_POINTER) ModelHighAPI_Double, const ModelHighAPI_Double & {
-  $1 = ((PyFloat_Check($input) || PyInt_Check($input) || PyLong_Check($input) || PyString_Check($input)) && !PyBool_Check($input)) ? 1 : 0;
+  $1 = ((PyFloat_Check($input) || PyLong_Check($input) || PyUnicode_Check($input)) && !PyBool_Check($input)) ? 1 : 0;
 }
 
 %typemap(in) const ModelHighAPI_Integer & (ModelHighAPI_Integer temp) {
-  if (PyInt_Check($input)) {
-    temp = ModelHighAPI_Integer(static_cast<int>(PyInt_AsLong($input)));
+  if (PyLong_Check($input)) {
+    temp = ModelHighAPI_Integer(static_cast<int>(PyLong_AsLong($input)));
     $1 = &temp;
-  } else if (PyString_Check($input)) {
-    temp = ModelHighAPI_Integer(PyString_AsString($input));
+  } else if (PyUnicode_Check($input)) {
+    temp = ModelHighAPI_Integer(PyUnicode_AsUTF8($input));
     $1 = &temp;
   } else if ((SWIG_ConvertPtr($input, (void **)&$1, $1_descriptor, SWIG_POINTER_EXCEPTION)) == 0) {
   } else {
@@ -92,7 +92,7 @@
   }
 }
 %typecheck(SWIG_TYPECHECK_POINTER) ModelHighAPI_Integer, const ModelHighAPI_Integer & {
-  $1 = ((PyInt_Check($input) || PyString_Check($input)) && !PyBool_Check($input)) ? 1 : 0;
+  $1 = ((PyLong_Check($input) || PyUnicode_Check($input)) && !PyBool_Check($input)) ? 1 : 0;
 }
 
 %typemap(in) const ModelHighAPI_RefAttr & (ModelHighAPI_RefAttr temp) {

@@ -48,7 +48,7 @@
 # specified. In that case, make sure to set the (optional) 'regexp' argument
 # to True.
 
-import __builtin__
+import builtins
 
 @Given("Launch application in salome mode")
 def step(context):

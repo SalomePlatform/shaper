@@ -41,14 +41,15 @@ void BrepGeometryTest::cleanUp()
 
 void readBrep(Geometry* geom, const std::string& fileName)
 {
-    char* txt = TestUtils::readTextFile(TestUtils::getTestFilePath(fileName));
+    std::string filePath = "Shapes/Brep/" + fileName;
+    char* txt = TestUtils::readTextFile(TestUtils::getTestFilePath(filePath));
     geom->setShapeString(txt);
 }
 
 void BrepGeometryTest::testGetIDs()
 {
     BrepGeometry* geom = new BrepGeometry("box");
-    readBrep(geom, "Box_1.brep");
+    readBrep(geom, "box1.brep");
 
     CPPUNIT_ASSERT_EQUAL(8, geom->countElements(XAO::VERTEX));
     CPPUNIT_ASSERT_EQUAL(8, geom->countVertices());
@@ -78,7 +79,7 @@ void BrepGeometryTest::testGetIDs()
 void BrepGeometryTest::testGetReferences()
 {
     BrepGeometry* geom = new BrepGeometry("box");
-    readBrep(geom, "Box_1.brep");
+    readBrep(geom, "box1.brep");
 
     // vertex of index 1 has id = 7
     CPPUNIT_ASSERT_EQUAL(std::string("7"), geom->getElementReference(XAO::VERTEX, 1));
@@ -114,7 +115,7 @@ void BrepGeometryTest::testGetReferences()
 void BrepGeometryTest::testGetNames()
 {
     BrepGeometry* geom = new BrepGeometry("box");
-    readBrep(geom, "Box_1.brep");
+    readBrep(geom, "box1.brep");
 
     int id;
 
@@ -156,7 +157,7 @@ void BrepGeometryTest::testGetNames()
 void BrepGeometryTest::testGetEdgeVertices()
 {
     BrepGeometry* geom = new BrepGeometry("box");
-    readBrep(geom, "Box_2.brep");
+    readBrep(geom, "box2.brep");
 
     // edge of index 23, id = #63
     // vertex are 47 (#12), 59 (#15)
@@ -179,7 +180,7 @@ void printVector(std::vector<int>& v)
 void BrepGeometryTest::testGetFaceEdges()
 {
     BrepGeometry* geom = new BrepGeometry("box");
-    readBrep(geom, "Box_2.brep");
+    readBrep(geom, "box2.brep");
 
     CPPUNIT_ASSERT_EQUAL(2, geom->countFaceWires(1)); // face 13
     CPPUNIT_ASSERT_EQUAL(1, geom->countFaceWires(2)); // face 29
@@ -204,7 +205,7 @@ void BrepGeometryTest::testGetFaceEdges()
 void BrepGeometryTest::testSolidFaces()
 {
     BrepGeometry* geom = new BrepGeometry("box");
-    readBrep(geom, "Cut_2.brep");
+    readBrep(geom, "cut.brep");
 
     CPPUNIT_ASSERT_EQUAL(5, geom->countSolidShells(0));
 
@@ -226,7 +227,7 @@ void BrepGeometryTest::testSolidFaces()
 void BrepGeometryTest::testGetVertex()
 {
     BrepGeometry* geom = new BrepGeometry("box");
-    readBrep(geom, "Box_2.brep");
+    readBrep(geom, "box2.brep");
 
     double x, y, z;
     geom->getVertexXYZ(15, x, y, z);
@@ -240,7 +241,7 @@ void BrepGeometryTest::testGetVertex()
 void BrepGeometryTest::testGetEdgeLength()
 {
     BrepGeometry* geom = new BrepGeometry("box");
-    readBrep(geom, "Box_2.brep");
+    readBrep(geom, "box2.brep");
 
     // edges 0 (#5), 7 (#21)
     CPPUNIT_ASSERT_DOUBLES_EQUAL(200., geom->getEdgeLength(0), 0);
@@ -252,7 +253,7 @@ void BrepGeometryTest::testGetEdgeLength()
 void BrepGeometryTest::testGetFaceArea()
 {
     BrepGeometry* geom = new BrepGeometry("box");
-    readBrep(geom, "Box_2.brep");
+    readBrep(geom, "box2.brep");
 
     // faces 0 (#3), 1 (#13)
     CPPUNIT_ASSERT_DOUBLES_EQUAL(40000., geom->getFaceArea(0), 1e-9);
@@ -264,7 +265,7 @@ void BrepGeometryTest::testGetFaceArea()
 void BrepGeometryTest::testGetSolidVolume()
 {
     BrepGeometry* geom = new BrepGeometry("box");
-    readBrep(geom, "Box_2.brep");
+    readBrep(geom, "box2.brep");
 
     CPPUNIT_ASSERT_DOUBLES_EQUAL(7488000., geom->getSolidVolume(0), 1e-9);
 
@@ -274,7 +275,7 @@ void BrepGeometryTest::testGetSolidVolume()
 void BrepGeometryTest::testParse()
 {
     BrepGeometry* geom = new BrepGeometry("box");
-    readBrep(geom, "Box_2.brep");
+    readBrep(geom, "box2.brep");
     std::cout << std::endl;
 
     for (int solidIndex = 0; solidIndex < geom->countSolids(); ++solidIndex)

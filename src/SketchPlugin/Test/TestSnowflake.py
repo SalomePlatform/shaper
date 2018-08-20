@@ -81,7 +81,7 @@ def initContour(theNumLines):
     prevPoint = (35, 0)
     result = []
     deltaY = random.uniform(20, 25)
-    for i in xrange(1, theNumLines):
+    for i in range(1, theNumLines):
         rangeXMax = (prevPoint[1] + deltaY) * (30. / i if i % 2 != 0 else 2)
         newX = random.uniform(prevPoint[1] + deltaY,
                               max(rangeXMax, prevPoint[1] + deltaY + 25.))
@@ -102,9 +102,9 @@ def makeLinesCoincident(theSketch, allLines):
         anEndPointValue = (anEndPoint.x(), anEndPoint.y())
         allPoints[aStartPointValue].append(aStartPoint)
         allPoints[anEndPointValue].append(anEndPoint)
-    for keyPoint, valuePoints in allPoints.iteritems():
+    for keyPoint, valuePoints in allPoints.items():
         if len(valuePoints) != 2:
-            print "Strange point: ", keyPoint, "has in coincidence: ", len(valuePoints)
+            print("Strange point: ", keyPoint, "has in coincidence: ", len(valuePoints))
             continue
         aConstraint = theSketch.addFeature("SketchConstraintCoincidence")
         aConstraint.refattr("ConstraintEntityA").setAttr(valuePoints[0])

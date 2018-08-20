@@ -1,4 +1,4 @@
 """Package for dumping purposes.
 """
 
-from DumpAssistant import *
+from .DumpAssistant import *

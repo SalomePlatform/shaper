@@ -42,14 +42,14 @@ def generateTests(theFeature, theFeatureName, theTestsList = []):
   """
   if "testNbResults" in theTestsList or len(theTestsList) == 0:
     aNbResults = len(theFeature.results())
-    print "model.testNbResults({}, {})".format(theFeatureName, aNbResults)
+    print("model.testNbResults({}, {})".format(theFeatureName, aNbResults))
 
   if "testNbSubResults" in theTestsList or len(theTestsList) == 0:
     aNbResults = len(theFeature.results())
     aNbSubResults = []
     for anIndex in range(0, aNbResults):
       aNbSubResults.append(theFeature.results()[anIndex].numberOfSubs())
-    print "model.testNbSubResults({}, {})".format(theFeatureName, aNbSubResults)
+    print("model.testNbSubResults({}, {})".format(theFeatureName, aNbSubResults))
 
   if "testNbSubShapes" in theTestsList or len(theTestsList) == 0:
     aNbResults = len(theFeature.results())
@@ -61,16 +61,16 @@ def generateTests(theFeature, theFeatureName, theTestsList = []):
         aShapeExplorer = GeomAPI_ShapeExplorer(aShape, aShapeType)
         while aShapeExplorer.more():
           aNbResultSubShapes += 1
-          aShapeExplorer.next();
+          aShapeExplorer.next()
         aNbSubShapes.append(aNbResultSubShapes)
-      print "model.testNbSubShapes({}, {}, {})".format(theFeatureName, aShapeTypes[aShapeType], aNbSubShapes)
+      print("model.testNbSubShapes({}, {}, {})".format(theFeatureName, aShapeTypes[aShapeType], aNbSubShapes))
 
   if "testResultsVolumes" in theTestsList or len(theTestsList) == 0:
     aNbResults = len(theFeature.results())
     aResultsVolumes = []
     for anIndex in range(0, aNbResults):
       aResultsVolumes.append(GeomAlgoAPI_ShapeTools_volume(theFeature.results()[anIndex].resultSubShapePair()[0].shape()))
-    print "model.testResultsVolumes({}, [{}])".format(theFeatureName, ", ".join("{:0.27f}".format(i) for i in aResultsVolumes))
+    print("model.testResultsVolumes({}, [{}])".format(theFeatureName, ", ".join("{:0.27f}".format(i) for i in aResultsVolumes)))
 
 
 def testNbResults(theFeature, theExpectedNbResults):
@@ -112,7 +112,7 @@ def testNbSubShapes(theFeature, theShapeType, theExpectedNbSubShapes):
     aShapeExplorer = GeomAPI_ShapeExplorer(aShape, theShapeType)
     while aShapeExplorer.more():
       aNbResultSubShapes += 1
-      aShapeExplorer.next();
+      aShapeExplorer.next()
     assert (aNbResultSubShapes == anExpectedNbSubShapes), "Number of sub-shapes of type {} for result[{}]: {}. Expected: {}.".format(aShapeTypes[theShapeType], anIndex, aNbResultSubShapes, anExpectedNbSubShapes)
 
 

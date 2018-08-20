@@ -50,7 +50,7 @@ class PythonFeaturesPlugin(ModelAPI.ModelAPI_Plugin):
             aFeature = SketchPlugin_Rectangle().__disown__()
 
         else:
-            raise StandardError("No such feature %s" % theFeatureID)
+            raise Exception("No such feature %s" % theFeatureID)
 
         return aFeature
 

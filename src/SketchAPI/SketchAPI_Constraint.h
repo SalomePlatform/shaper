@@ -46,8 +46,8 @@ public:
 
   static std::string ID()
   {
-    static const std::string DUMMY;
-    return DUMMY;
+    static const std::string MY_SKETCH_CONSTRAINT_ID = "SketchConstraint";
+    return MY_SKETCH_CONSTRAINT_ID;
   }
   virtual std::string getID() { return ID(); }
 

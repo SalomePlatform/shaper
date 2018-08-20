@@ -68,8 +68,8 @@ InitializationPlugin_PyInterp::positions(const std::string& theExpression,
 
   std::string anExpression = adjustExpression(theExpression);
   // extend aContext with variables
-  PyDict_SetItemString(aContext, "expression", PyString_FromString(anExpression.c_str()));
-  PyDict_SetItemString(aContext, "name", PyString_FromString(theName.c_str()));
+  PyDict_SetItemString(aContext, "expression", PyUnicode_FromString(anExpression.c_str()));
+  PyDict_SetItemString(aContext, "name", PyUnicode_FromString(theName.c_str()));
   PyDict_SetItemString(aContext, "positions", Py_BuildValue("[]"));
 
   // run the search code
@@ -84,8 +84,8 @@ InitializationPlugin_PyInterp::positions(const std::string& theExpression,
     PyObject* aColOffset = PyTuple_GetItem(aPosition, 1);
 
     aResult.push_back(
-        std::pair<int, int>((int)PyInt_AsLong(aLineNo),
-                            (int)PyInt_AsLong(aColOffset)));
+        std::pair<int, int>((int)PyLong_AsLong(aLineNo),
+                            (int)PyLong_AsLong(aColOffset)));
   }
 
   // TODO(spo): after this refCount of the variable is not 0. Is there memory leak?
@@ -117,17 +117,18 @@ std::list<std::string> InitializationPlugin_PyInterp::compile(const std::string&
   }
 
   PyCodeObject* aCodeObj = (PyCodeObject*) aCodePyObj;
-  std::string aCodeName(PyString_AsString(aCodeObj->co_code));
+  std::string aCodeName(PyBytes_AsString(aCodeObj->co_code));
   // co_names should be tuple, but can be changed in modern versions of python (>2.7.3)
-  if(!PyTuple_Check(aCodeObj->co_names))
+  if(!PyTuple_Check(aCodeObj->co_names)) {
     return aResult;
+  }
 
   size_t params_size = PyTuple_Size(aCodeObj->co_names);
   if (params_size > 0) {
     for (size_t i = 0; i < params_size; i++) {
       PyObject* aParamObj = PyTuple_GetItem(aCodeObj->co_names, i);
       PyObject* aParamObjStr = PyObject_Str(aParamObj);
-      std::string aParamName(PyString_AsString(aParamObjStr));
+      std::string aParamName(PyUnicode_AsUTF8(aParamObjStr));
       aResult.push_back(aParamName);
       Py_XDECREF(aParamObjStr);
     }
@@ -171,7 +172,7 @@ double InitializationPlugin_PyInterp::evaluate(const std::string& theExpression,
     return 0.;
   }
 
-  PyObject* anEvalResult = PyEval_EvalCode(anExprCode, _global_context, _local_context);
+  PyObject* anEvalResult = PyEval_EvalCode((PyObject *)anExprCode, _global_context, _local_context);
   if(!anEvalResult) {
     theError = errorMessage();
     Py_XDECREF(anExprCode);
@@ -180,7 +181,7 @@ double InitializationPlugin_PyInterp::evaluate(const std::string& theExpression,
   }
 
   PyObject* anEvalStrObj = PyObject_Str(anEvalResult);
-  std::string anEvalStr(PyString_AsString(anEvalStrObj));
+  std::string anEvalStr(PyUnicode_AsUTF8(anEvalStrObj));
   Py_XDECREF(anExprCode);
   Py_XDECREF(anEvalResult);
   Py_XDECREF(anEvalStrObj);
@@ -207,7 +208,7 @@ std::string InitializationPlugin_PyInterp::errorMessage()
     PyErr_Fetch(&ptype, &pvalue, &ptraceback);
     PyErr_NormalizeException(&ptype, &pvalue, &ptraceback);
     pstr = PyObject_Str(pvalue);
-    aPyError = std::string(PyString_AsString(pstr));
+    aPyError = std::string(PyUnicode_AsUTF8(pstr));
     Py_XDECREF(pstr);
     Py_XDECREF(ptype);
     Py_XDECREF(pvalue);

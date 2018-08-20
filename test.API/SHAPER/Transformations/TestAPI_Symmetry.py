@@ -64,7 +64,7 @@ Symmetry_2 = shaperpy.makeSymmetry(Box_2, pnt1)
 
 try :
     Symmetry_6 = shaperpy.makeSymmetry(Box_2, None)
-except myExcept,ec :
+except myExcept as ec :
     assert(ec.what() == "Symmetry builder :: point is not valid.")
 
 Symmetry_7 = shaperpy.makeSymmetry(Box_7, axZ)

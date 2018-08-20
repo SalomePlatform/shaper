@@ -104,8 +104,8 @@ class ExportFeature(ModelAPI.ModelAPI_Feature):
         ## List of objects created in the old geom for later use
         self.geomObjects = []
         ## geomBuilder tool
-        salome.salome_init(0,1)
-        self.geompy = geomBuilder.New(salome.myStudy)
+        salome.salome_init(1)
+        self.geompy = geomBuilder.New()
 
         self.exportViaXAO()
 

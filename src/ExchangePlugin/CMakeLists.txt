@@ -84,23 +84,3 @@ ADD_UNIT_TESTS(TestImport.py
                Test2290.py
                Test2459.py
                TestExportToXAOWithGroupNotUpdated.py)
-
-SET(DATA_FILES
-  solid.brep
-  solid.brp
-  screw.step
-  screw.stp
-  bearing.iges
-  bearing.igs
-  Box_1.brep
-  test.xao
-  export_ref.xao
-)
-
-FOREACH(file ${DATA_FILES})
-  CONFIGURE_FILE(
-    ${CMAKE_CURRENT_SOURCE_DIR}/Test/Data/${file}
-    ${CMAKE_CURRENT_BINARY_DIR}/Data/${file}
-    COPYONLY)
-ENDFOREACH(file ${DATA_FIELS})
-

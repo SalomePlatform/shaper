@@ -67,8 +67,8 @@ radius = 95. / N / 2.
 
 aSession.startOperation()
 aSketchFeatures = []
-for i in xrange(0, N):
-    for j in xrange(0, N):
+for i in range(0, N):
+    for j in range(0, N):
         # Create circle
         aSketchFeature = featureToCompositeFeature(aPart.addFeature("Sketch"))
         origin = geomDataAPI_Point(aSketchFeature.attribute("Origin"))
@@ -95,7 +95,7 @@ aSession.finishOperation()
 aSession.startOperation()
 
 anExtrusions = []
-for i in xrange(0, N * N):
+for i in range(0, N * N):
     aSketchResult = aSketchFeatures[i].firstResult()
     aSketchEdges = modelAPI_ResultConstruction(aSketchResult).shape()
     origin = geomDataAPI_Point(aSketchFeatures[i].attribute("Origin")).pnt()
@@ -196,7 +196,7 @@ aSession.startOperation()
 
 aBooleanFt = aPart.addFeature("Cut")
 aBooleanFt.selectionList("main_objects").append(aCurrentResult, aCurrentResult.shape())
-for i in xrange(0, N * N):
+for i in range(0, N * N):
     anExtrusionResult = modelAPI_ResultBody(anExtrusions[i].firstResult())
     aBooleanFt.selectionList("tool_objects").append(anExtrusionResult, anExtrusionResult.shape())
 aBooleanFt.execute()

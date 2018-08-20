@@ -46,32 +46,32 @@ Cylinder_3 = shaperpy.makeCylinder(pnt2, edg1, 7., 12.)
 
 try:
   Cylinder_4 = shaperpy.makeCylinder(0., 10.)
-except myExcept,ec:
+except myExcept as ec:
   assert(ec.what() == "Cylinder builder :: radius is negative or null.")
 
 try:
   Cylinder_5 = shaperpy.makeCylinder(-5., 10.)
-except myExcept,ec:
+except myExcept as ec:
   assert(ec.what() == "Cylinder builder :: radius is negative or null.")
 
 try:
   Cylinder_6 = shaperpy.makeCylinder(5., 0.)
-except myExcept,ec:
+except myExcept as ec:
   assert(ec.what() == "Cylinder builder :: height is negative or null.")
 
 try:
   Cylinder_7 = shaperpy.makeCylinder(5., -10.)
-except myExcept,ec:
+except myExcept as ec:
   assert(ec.what() == "Cylinder builder :: height is negative or null.")
 
 try:
   Cylinder_8 = shaperpy.makeCylinder(None, edgz, 5., 10.)
-except myExcept,ec:
+except myExcept as ec:
   assert(ec.what() == "Cylinder builder :: the base point is not valid.")
 
 try:
   Cylinder_9 = shaperpy.makeCylinder(pnt1, None, 5., 10.)
-except myExcept,ec:
+except myExcept as ec:
   assert(ec.what() == "Cylinder builder :: the axis is not valid.")
 
 Cylinder_14 = shaperpy.makeCylinder(5., 10., 45.)
@@ -81,45 +81,45 @@ Cylinder_17 = shaperpy.makeCylinder(pnt2, edgy, 5., 10., 360.)
 
 try:
   Cylinder_18 = shaperpy.makeCylinder(0., 10., 45.)
-except myExcept,ec:
+except myExcept as ec:
   assert(ec.what() == "Cylinder builder :: radius is negative or null.")
 
 try:
   Cylinder_19 = shaperpy.makeCylinder(-5., 10., 45.)
-except myExcept,ec:
+except myExcept as ec:
   assert(ec.what() == "Cylinder builder :: radius is negative or null.")
 
 try:
   Cylinder_20 = shaperpy.makeCylinder(5., 0., 45.)
-except myExcept,ec:
+except myExcept as ec:
   assert(ec.what() == "Cylinder builder :: height is negative or null.")
 
 try:
   Cylinder_21 = shaperpy.makeCylinder(5., -10., 45.)
-except myExcept,ec:
+except myExcept as ec:
   assert(ec.what() == "Cylinder builder :: height is negative or null.")
 
 try:
   Cylinder_22 = shaperpy.makeCylinder(5., 10., 0.)
-except myExcept,ec:
+except myExcept as ec:
   assert(ec.what() == "Cylinder builder :: angle is negative or null.")
 
 try:
   Cylinder_23 = shaperpy.makeCylinder(5., 10., -45.)
-except myExcept,ec:
+except myExcept as ec:
   assert(ec.what() == "Cylinder builder :: angle is negative or null.")
 
 try:
   Cylinder_24 = shaperpy.makeCylinder(5., 10., 450.)
-except myExcept,ec:
+except myExcept as ec:
   assert(ec.what() == "Cylinder builder :: angle greater than 360 degrees.")
 
 try:
   Cylinder_25 = shaperpy.makeCylinder(None, edgz, 5., 10., 90.)
-except myExcept,ec:
+except myExcept as ec:
   assert(ec.what() == "Cylinder builder :: the base point is not valid.")
 
 try:
   Cylinder_26 = shaperpy.makeCylinder(pnt1, None, 5., 10., 90.)
-except myExcept,ec:
+except myExcept as ec:
   assert(ec.what() == "Cylinder builder :: the axis is not valid.")

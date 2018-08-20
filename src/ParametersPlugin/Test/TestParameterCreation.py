@@ -89,7 +89,7 @@ for name, expr in zip(ltNames, ltExpressions):
     assert(aResultAttr.data())
     assert(aResultAttr.data().real("Value"))
     aResultValue = aResultAttr.data().real("Value").value()
-    print aResultValue, " == ", float(expr)
+    print(aResultValue, " == ", float(expr))
     assert(aResultValue == float(expr))
 
 # Check referencing between parameters

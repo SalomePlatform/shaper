@@ -46,14 +46,14 @@ Scale_1 = shaperpy.makeScale(Box_1, pntOrigin, 2.)
 Scale_2 = shaperpy.makeScale(Box_2, pnt1, 2.)
 try :
     Scale_6 = shaperpy.makeScale(Box_3, pntOrigin, 0)
-except myExcept,ec :
+except myExcept as ec :
     assert(ec.what() == "Scale builder :: the scale factor is null.")
 
 Scale_7 = shaperpy.makeScale(Box_4, pntOrigin, -3.)
 
 try :
     Scale_8 = shaperpy.makeScale(Box_5, None, 2.)
-except myExcept,ec :
+except myExcept as ec :
     assert(ec.what() == "Scale builder :: center point is not valid.")
 
 Scale_9 = shaperpy.makeScale(Box_6, pntOrigin, 2., 3., 1.)
@@ -61,20 +61,20 @@ Scale_10 = shaperpy.makeScale(Box_7, pnt1, 2., 3., 1.)
 
 try :
     Scale_14 = shaperpy.makeScale(Box_8, pntOrigin, 0., 3., 1.)
-except myExcept,ec :
+except myExcept as ec :
     assert(ec.what() == "Scale builder :: the scale factor in X is null.")
 try :
     Scale_15 = shaperpy.makeScale(Box_9, pntOrigin, 2., 0., 1.)
-except myExcept,ec :
+except myExcept as ec :
     assert(ec.what() == "Scale builder :: the scale factor in Y is null.")
 try :
     Scale_16 = shaperpy.makeScale(Box_10, pntOrigin, 2., 3., 0.)
-except myExcept,ec :
+except myExcept as ec :
     assert(ec.what() == "Scale builder :: the scale factor in Z is null.")
 
 Scale_17 = shaperpy.makeScale(Box_11, pntOrigin, -2., -3., 0.5)
 
 try :
     Scale_18 = shaperpy.makeScale(Box_12, None, 2., 3., 1.)
-except myExcept,ec :
+except myExcept as ec :
     assert(ec.what() == "Scale builder :: center point is not valid.")

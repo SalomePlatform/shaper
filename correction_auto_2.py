@@ -40,14 +40,14 @@ from utils import *
 ### whitespace/semicolon ###
 
 def extra_space_before_last_semicolon(ligne, previous_ligne = None, warning=None):
-	liste=ligne.split(u';\n')
+	liste=ligne.split(';\n')
 	ligne2=liste[0]
 	ligne3=ligne2.rstrip()
-	ligne=ligne3 + u';\n' 
+	ligne=ligne3 + ';\n'
 	return ligne, previous_ligne, False
 
 def missing_space_after_semicolon(ligne, previous_ligne = None, warning=None):
-	ligne=ligne.replace(u';',u'; ')
+	ligne=ligne.replace(';','; ')
 	return ligne, previous_ligne, False
 	
 #########################
@@ -55,86 +55,86 @@ def missing_space_after_semicolon(ligne, previous_ligne = None, warning=None):
 ### whitespace/operators ###
 
 def missing_space_around_operator_egal(ligne, previous_ligne = None, warning=None):
-	i=ligne.find(u'=')
+	i=ligne.find('=')
 	nextchar=ligne[i+1]
 	previouschar=ligne[i-1]
 	if nextchar not in OPERATORS and previouschar not in OPERATORS:
 		if nextchar.isspace() == False and previouschar.isspace()==True:
-			ligne=ligne.replace(u'=', u'= ')
+			ligne=ligne.replace('=', '= ')
 		elif nextchar.isspace() == True and previouschar.isspace()==False:
-			ligne=ligne.replace(u'=', u' =')
+			ligne=ligne.replace('=', ' =')
 		elif nextchar.isspace() == False and previouschar.isspace()==False:
-			ligne=ligne.replace(u'=', u' = ')
+			ligne=ligne.replace('=', ' = ')
 		else:
 			pass
 	return ligne, previous_ligne, False	
 
 def extra_space_for_operator_add(ligne, previous_ligne = None, warning=None):			
-	while ligne.find(u'++ ') > -1:
-		ligne = ligne.replace(u'++ ',u'++')
-	while ligne.find(u' ++') > -1 and ligne.find(u'; ++') == -1:
-		ligne = ligne.replace(u' ++',u'++')
+	while ligne.find('++ ') > -1:
+		ligne = ligne.replace('++ ','++')
+	while ligne.find(' ++') > -1 and ligne.find('; ++') == -1:
+		ligne = ligne.replace(' ++','++')
 	return ligne, previous_ligne, False
 	
 def extra_space_for_operator_diff(ligne, previous_ligne = None, warning=None):			
-	while ligne.find(u'! ') > -1:
-		ligne = ligne.replace(u'! ',u'!')
+	while ligne.find('! ') > -1:
+		ligne = ligne.replace('! ','!')
 	return ligne, previous_ligne, False
 
 def missing_space_around_operator_double_chevron(ligne, previous_ligne = None, warning=None):
-	i=ligne.find(u'<<')
+	i=ligne.find('<<')
 	nextchar=ligne[i+1]
 	previouschar=ligne[i-1]
 	if nextchar.isspace() == False and previouschar.isspace()==True:
-		ligne=ligne.replace(u'<<', u'<< ')
+		ligne=ligne.replace('<<', '<< ')
 	elif nextchar.isspace() == True and previouschar.isspace()==False:
-		ligne=ligne.replace(u'<<', u' <<')
+		ligne=ligne.replace('<<', ' <<')
 	elif nextchar.isspace() == False and previouschar.isspace()==False:
-		ligne=ligne.replace(u'<<', u' << ')
+		ligne=ligne.replace('<<', ' << ')
 	else:
 		pass
 	return ligne, previous_ligne, False
 	
 def missing_space_around_operator_simple_chevron(ligne, previous_ligne = None, warning=None):
-	i=ligne.find(u'<')
+	i=ligne.find('<')
 	nextchar=ligne[i+1]
 	previouschar=ligne[i-1]
 	if nextchar not in OPERATORS and previouschar not in OPERATORS: 
 		if nextchar.isspace() == False and previouschar.isspace()==True:
-			ligne=ligne.replace(u'<', u'< ')
+			ligne=ligne.replace('<', '< ')
 		elif nextchar.isspace() == True and previouschar.isspace()==False:
-			ligne=ligne.replace(u'<', u' <')
+			ligne=ligne.replace('<', ' <')
 		elif nextchar.isspace() == False and previouschar.isspace()==False:
-			ligne=ligne.replace(u'<', u' < ')
+			ligne=ligne.replace('<', ' < ')
 		else:
 			pass
 	return ligne, previous_ligne, False
 	
 
 def missing_space_around_operator_diff_egal(ligne, previous_ligne = None, warning=None):
-	i=ligne.find(u'!=')
+	i=ligne.find('!=')
 	nextchar=ligne[i+1]
 	previouschar=ligne[i-1]
 	if nextchar.isspace() == False and previouschar.isspace()==True:
-		ligne=ligne.replace(u'!=', u'!= ')
+		ligne=ligne.replace('!=', '!= ')
 	elif nextchar.isspace() == True and previouschar.isspace()==False:
-		ligne=ligne.replace(u'!=', u' !=')
+		ligne=ligne.replace('!=', ' !=')
 	elif nextchar.isspace() == False and previouschar.isspace()==False:
-		ligne=ligne.replace(u'!=', u' != ')
+		ligne=ligne.replace('!=', ' != ')
 	else:
 		pass
 	return ligne, previous_ligne, False
 	
 def missing_space_around_operator_double_egal(ligne, previous_ligne = None, warning=None):
-	i=ligne.find(u'==')
+	i=ligne.find('==')
 	nextchar=ligne[i+1]
 	previouschar=ligne[i-1]
 	if nextchar.isspace() == False and previouschar.isspace()==True:
-		ligne=ligne.replace(u'==', u'== ')
+		ligne=ligne.replace('==', '== ')
 	elif nextchar.isspace() == True and previouschar.isspace()==False:
-		ligne=ligne.replace(u'==', u' ==')
+		ligne=ligne.replace('==', ' ==')
 	elif nextchar.isspace() == False and previouschar.isspace()==False:
-		ligne=ligne.replace(u'==', u' == ')
+		ligne=ligne.replace('==', ' == ')
 	else:
 		pass
 	return ligne, previous_ligne, False
@@ -145,16 +145,16 @@ def missing_space_around_operator_double_egal(ligne, previous_ligne = None, warn
 ### whitespace/comments ###
 
 def space_between_comments_and_code(ligne, previous_ligne = None, warning=None):
-	if ligne.find(u'//')>=0 :			
-		ligne=ligne.replace(u'//', u'  //')
-	elif ligne.find(u' //')>=0 :			
-		ligne=ligne.replace(u' //', u'  //')
+	if ligne.find('//')>=0 :
+		ligne=ligne.replace('//', '  //')
+	elif ligne.find(' //')>=0 :
+		ligne=ligne.replace(' //', '  //')
 	else:
 	    pass	
 	return ligne, previous_ligne, False
 
 def space_between_comments_and_double_slash(ligne, previous_ligne = None, warning=None):			
-	return ligne.replace(u'//', u'// '), previous_ligne, False
+	return ligne.replace('//', '// '), previous_ligne, False
 	
 #########################
 
@@ -175,11 +175,11 @@ def ifndef_header(ficpath, ficline, warning):
 #	replace_fic_ifndef(ficpath, ficline, warning, "no_guard_found")
 		
 def endif_line(ligne, previous_ligne = None, warning=None):
-	liste1=warning.split(u'// ')
+	liste1=warning.split('// ')
 	ligne1=liste1[1]
-	liste2=ligne1.split(u'"')
+	liste2=ligne1.split('"')
 	header_guard=liste2[0]
-	ligne= u'#endif  // ' + header_guard +u'\n'		
+	ligne= '#endif  // ' + header_guard +'\n'
 	return ligne, previous_ligne, False
 
 #########################
@@ -196,7 +196,7 @@ def whitespace_end_of_line(ligne, previous_ligne = None, warning=None):
 ### whitespace/comma ###
 
 def missing_space_after_comma(ligne, previous_ligne = None, warning=None):
-	ligne=ligne.replace(u',',u', ')
+	ligne=ligne.replace(',',', ')
 	return ligne, previous_ligne, False
 
 #########################
@@ -204,18 +204,18 @@ def missing_space_after_comma(ligne, previous_ligne = None, warning=None):
 ### readability/namespace ###
 
 def namespace_should_be_terminated(ligne, previous_ligne = None, warning=None):
-	ligne2=ligne.rstrip(u'\n')
-	liste = warning.split(u'"')
+	ligne2=ligne.rstrip('\n')
+	liste = warning.split('"')
 	namespace=liste[1]
-	if ligne.find(u'\r')>=0:
-		ligne=ligne2+u'  '+namespace+u'\r\n'
+	if ligne.find('\r')>=0:
+		ligne=ligne2+'  '+namespace+'\r\n'
 	else:
-		ligne=ligne2+u'  '+namespace+u'\n'
+		ligne=ligne2+'  '+namespace+'\n'
 	return ligne, previous_ligne, False
 
 def anonymous_namespace_should_be_terminated(ligne, previous_ligne = None, warning=None):
-	ligne2=ligne.rstrip(u'\n')
-	ligne=ligne2+u'  // namespace\n'
+	ligne2=ligne.rstrip('\n')
+	ligne=ligne2+'  // namespace\n'
 	return ligne, previous_ligne, False
 	
 #########################
@@ -223,37 +223,37 @@ def anonymous_namespace_should_be_terminated(ligne, previous_ligne = None, warni
 ### whitespace/parens ###
 
 def extra_space_after_opening_paranthesis(ligne, previous_ligne = None, warning=None):
-	while ligne.find(u'( ') > -1:
-		ligne = ligne.replace(u'( ',u'(')
+	while ligne.find('( ') > -1:
+		ligne = ligne.replace('( ','(')
 	return ligne, previous_ligne, False
 
 def extra_space_before_closing_paranthesis(ligne, previous_ligne = None, warning=None):
-	while ligne.find(u' )') > -1:
-		ligne = ligne.replace(u' )',u')')
+	while ligne.find(' )') > -1:
+		ligne = ligne.replace(' )',')')
 	return ligne, previous_ligne, False
 	
 def extra_space_before_opening_paranthesis_in_function_call(ligne, previous_ligne = None, warning=None):
-	while ligne.find(u' (') > -1 and ligne.find(u', (')==-1:
-		ligne = ligne.replace(u' (',u'(')
+	while ligne.find(' (') > -1 and ligne.find(', (')==-1:
+		ligne = ligne.replace(' (','(')
 	return ligne, previous_ligne, False
 
 def missing_space_before_opening_parenthesis_in_for(ligne, previous_ligne = None, warning=None):
-	return ligne.replace(u'for(',u'for ('), previous_ligne, False
+	return ligne.replace('for(','for ('), previous_ligne, False
 
 def missing_space_before_opening_parenthesis_in_if(ligne, previous_ligne = None, warning=None):
-	return ligne.replace(u'if(',u'if ('), previous_ligne, False
+	return ligne.replace('if(','if ('), previous_ligne, False
 
 def missing_space_before_opening_parenthesis_in_switch(ligne, previous_ligne = None, warning=None):
-	return ligne.replace(u'switch(',u'switch ('), previous_ligne, False
+	return ligne.replace('switch(','switch ('), previous_ligne, False
 
 def missing_space_before_opening_parenthesis_in_while(ligne, previous_ligne = None, warning=None):
-	return ligne.replace(u'while(',u'while ('), previous_ligne, False
+	return ligne.replace('while(','while ('), previous_ligne, False
 
 def mismatching_spaces_inside_paranthesis(ligne, previous_ligne = None, warning=None):
-	while ligne.find(u'( ') > -1:
-		ligne = ligne.replace(u'( ',u'(')
-	while ligne.find(u' )') > -1:
-		ligne = ligne.replace(u' )',u')')
+	while ligne.find('( ') > -1:
+		ligne = ligne.replace('( ','(')
+	while ligne.find(' )') > -1:
+		ligne = ligne.replace(' )',')')
 	return ligne, previous_ligne, False
 	
 #########################
@@ -322,7 +322,7 @@ def use_spaces_instead_of_tab(ligne, previous_ligne = None, warning=None):
 ### readability/braces ###
 
 def no_semicolon_after_brace(ligne, previous_ligne = None, warning=None):
-	return ligne.replace(u'};',u'}'), previous_ligne, False
+	return ligne.replace('};','}'), previous_ligne, False
 
 def position_of_else(ligne, previous_ligne=None, warning=None):
 	'''Remonte une ligne du type } else {'''
@@ -347,21 +347,21 @@ def position_of_opening_brace(ligne, previous_ligne=None, warning=None):
 	m = re.match("(\s*){(.*)", ligne)
 	
 	# On ne fait rien si on trouve un commentaire sur la ligne précédente (ce sera une correction manuelle)
-	if previous_ligne.find(u'//') == -1:
+	if previous_ligne.find('//') == -1:
 		previous_ligne = previous_ligne.rstrip("\n") + ' {' + m.group(2) + '\n'
 		ligne = ''
 	else:
-		print "The previous line contains a comment, fixing has to be manual."
+		print("The previous line contains a comment, fixing has to be manual.")
 
 	return ligne, previous_ligne, False
 
 def missing_space_before_opening_brace(ligne, previous_ligne = None, warning=None):
 	m = re.match("(.+)(\S){(.*)", ligne)
 	if(m):
-		print 'group_0', m.group(0)
-		print 'group_1', m.group(1)
-		print 'group_2', m.group(2)
-		print 'group_3', m.group(3)
+		print('group_0', m.group(0))
+		print('group_1', m.group(1))
+		print('group_2', m.group(2))
+		print('group_3', m.group(3))
 		ligne = m.group(1) + m.group(2) + ' {' + m.group(3) + '\n'
 
 	return ligne, previous_ligne, False
@@ -373,10 +373,10 @@ def missing_space_before_opening_brace(ligne, previous_ligne = None, warning=Non
 def missing_space_before_else(ligne, previous_ligne = None, warning=None):
 	m = re.match("(.+)(\S)else(.*)", ligne)
 	if(m):
-		print 'group_0', m.group(0)
-		print 'group_1', m.group(1)
-		print 'group_2', m.group(2)
-		print 'group_3', m.group(3)
+		print('group_0', m.group(0))
+		print('group_1', m.group(1))
+		print('group_2', m.group(2))
+		print('group_3', m.group(3))
 		ligne = m.group(1) + m.group(2) + ' else' + m.group(3) + '\n'
 
 	return ligne, previous_ligne, False
@@ -385,15 +385,15 @@ def missing_space_before_else(ligne, previous_ligne = None, warning=None):
 
 def make_const_reference(ficpath, ligne, previous_ligne = None, warning=None):
 	""" Adding keyword 'const' """
-	print "ficpath = ", ficpath
-	print "ligne = ", ligne
-	print "warning = ", warning
+	print("ficpath = ", ficpath)
+	print("ligne = ", ligne)
+	print("warning = ", warning)
 	m = re.match("(.+)Is this a non-const reference\? If so, make const or use a pointer: (.+)  (.+)", warning)
 	if(m):
-		print 'group_0', m.group(0)
-		print 'group_1', m.group(1)
-		print 'group_2', m.group(2)
-		print 'group_3', m.group(3)
+		print('group_0', m.group(0))
+		print('group_1', m.group(1))
+		print('group_2', m.group(2))
+		print('group_3', m.group(3))
 		arg_to_modify = m.group(2)
 		ligne = ligne.replace(arg_to_modify, "const "+arg_to_modify)
 		
@@ -404,13 +404,13 @@ def make_const_reference(ficpath, ligne, previous_ligne = None, warning=None):
 			global H_FILE_MAKE_CONST_REFERENCE_MODIFIED
 			H_FILE_MAKE_CONST_REFERENCE_MODIFIED = True
 	else:
-		print "ERROR : The following pattern was not found : 'Is this a non-const reference? If so, make const or use a pointer:'"
+		print("ERROR : The following pattern was not found : 'Is this a non-const reference? If so, make const or use a pointer:'")
 
 	return ligne, previous_ligne, False
 
 def make_const_reference_cpp_file(ficpath, arg_to_modify):
 	if not os.path.isfile(ficpath):
-		print "WARNING : The file ", ficpath, " doesn't exist, manual fixing is required in methods of the file ", ficpath.replace('.cpp', '.h'), " in which arguments have been declared 'const'"
+		print("WARNING : The file ", ficpath, " doesn't exist, manual fixing is required in methods of the file ", ficpath.replace('.cpp', '.h'), " in which arguments have been declared 'const'")
 		return
 
 	fic = open(get_src_path(ficpath),'r')
@@ -436,12 +436,12 @@ def make_const_reference_cpp_file(ficpath, arg_to_modify):
 ### runtime/int ###
 
 def replace_short_by_int16(ligne, previous_ligne = None, warning=None):
-	ligne = ligne.replace(u'short', u'int16_t')
+	ligne = ligne.replace('short', 'int16_t')
 
 	return ligne, None, False
 
 def replace_long_by_int64(ligne, previous_ligne = None, warning=None):
-	ligne = ligne.replace(u'long', u'int64_t')
+	ligne = ligne.replace('long', 'int64_t')
 
 	return ligne, None, False
 
@@ -452,10 +452,10 @@ def replace_long_by_int64(ligne, previous_ligne = None, warning=None):
 def make_constructor_explicit(ligne, previous_ligne = None, warning=None):
 	m = re.match("(\s*)(.+)", ligne)
 	if(m):
-		print 'group_0', m.group(0)
-		print 'group_1', m.group(1)
-		print 'group_2', m.group(2)
-		ligne = ligne.replace(m.group(2), u'explicit '+m.group(2))
+		print('group_0', m.group(0))
+		print('group_1', m.group(1))
+		print('group_2', m.group(2))
+		ligne = ligne.replace(m.group(2), 'explicit '+m.group(2))
 
 	return ligne, None, False
 
@@ -470,9 +470,9 @@ def cpp_file_should_include_h_file(ficpath, ficline, warning):
 
 	m = re.match("(.+) should include its header file (.+)  (.+)", warning)
 	if(m):
-		print 'group_0', m.group(0)
-		print 'group_1', m.group(1)
-		print 'group_2', m.group(2)
+		print('group_0', m.group(0))
+		print('group_1', m.group(1))
+		print('group_2', m.group(2))
 		# Nouveau chemin du fichier .h
 		new_h_file_path = m.group(2)
 
@@ -483,13 +483,13 @@ def cpp_file_should_include_h_file(ficpath, ficline, warning):
 		for ligne in liste:
 			m2 = re.match("#include.*"+h_file_name+".*", ligne)
 			if(m2):
-				print "FOUND : ", ligne
+				print("FOUND : ", ligne)
 				new_liste.append("#include \""+new_h_file_path+"\"\n")
 			else:
-				print "NOT FOUND : ", ligne
+				print("NOT FOUND : ", ligne)
 				new_liste.append(ligne)
 	else:
-		print "ERROR : Pattern not found : \"should include its header file\""
+		print("ERROR : Pattern not found : \"should include its header file\"")
 
 	newliste=fic_writelines(new_liste)
 	fichier = open(get_src_path(ficpath), "w")
@@ -515,7 +515,7 @@ def do_not_leave_blank_line_after_public_protected_private(ficpath, ficline, war
 			flag = True
 		if flag and ligne.isspace():
 			# Supprimer les lignes vides après public:, protected: et :private
-			print "Deleting empty line"
+			print("Deleting empty line")
 			new_liste.append("")
 			continue
 		if not ligne.isspace() and not re.match(".*public.*:|.*protected.*:|.*private.*:", ligne):
@@ -538,7 +538,7 @@ def do_not_leave_blank_line_at_the_start_of_code_block(ficpath, ficline, warning
 			flag = True
 		if flag and ligne.isspace():
 			# Supprimer les lignes vides après un début de bloc
-			print "Deleting empty line"
+			print("Deleting empty line")
 			new_liste.append("")
 			continue
 		if not ligne.isspace() and not re.match(".*{", ligne):
@@ -599,8 +599,8 @@ def add_include_what_you_use(ficpath, ficline, warning):
 	
 	m = re.match("\s*Add (.+) for (.+)", warning)
 	if(m):
-		print 'group_0', m.group(0)
-		print 'group_1', m.group(1)
+		print('group_0', m.group(0))
+		print('group_1', m.group(1))
 		include = m.group(1)
 
 		# Recherche la ligne dans laquelle ajouter le #include
@@ -617,7 +617,7 @@ def add_include_what_you_use(ficpath, ficline, warning):
 		
 		num_ligne_include = max(num_ligne_include_system, num_ligne_include_local)
 		if num_ligne_include == 0:
-			print "WARNING : #include not found in file ", ficpath
+			print("WARNING : #include not found in file ", ficpath)
 			return
 
 		new_liste = []
@@ -634,75 +634,75 @@ def add_include_what_you_use(ficpath, ficline, warning):
 		fichier = open(get_src_path(ficpath), "w")
 		fichier.writelines(newliste)
 	else:
-		print "ERROR : Pattern of include_what_you_use not found"
+		print("ERROR : Pattern of include_what_you_use not found")
 		return
 
 ##################################
 
 
 HOOKS_DICT = {
-        extra_space_before_last_semicolon:{'pattern':u'whitespace/semicolon', 'pattern_AND':u'Extra space before last semicolon'},
-        missing_space_after_semicolon:{'pattern':u'whitespace/semicolon', 'pattern_AND':u'Missing space after'},
-        missing_space_around_operator_egal:{'pattern':u'whitespace/operators', 'pattern_AND':u'Missing spaces around = '},
-        extra_space_for_operator_add:{'pattern':u'whitespace/operators', 'pattern_AND':u'Extra space for operator  ++'},
-        extra_space_for_operator_diff:{'pattern':u'whitespace/operators', 'pattern_AND':u'Extra space for operator !'},
-        missing_space_around_operator_double_chevron:{'pattern':u'whitespace/operators', 'pattern_AND':u'Missing spaces around << '},
-        missing_space_around_operator_simple_chevron:{'pattern':u'whitespace/operators', 'pattern_AND':u'Missing spaces around < '},
-        missing_space_around_operator_diff_egal:{'pattern':u'whitespace/operators', 'pattern_AND':u'Missing spaces around !='},
-        missing_space_around_operator_double_egal:{'pattern':u'whitespace/operators', 'pattern_AND':u'Missing spaces around =='},
-        space_between_comments_and_code:{'pattern':u'whitespace/comments', 'pattern_AND':u'At least two spaces is best between code and comments'},
-        space_between_comments_and_double_slash:{'pattern':u'whitespace/comments', 'pattern_AND':u'Should have a space between // and comment '},
-        legal_copyright:{'pattern':u'legal/copyright'}, # Script à n'executer qu'une fois
-        ifndef_header:{'pattern':u'build/header_guard', 'pattern_AND':u'#ifndef header guard has wrong style, please use'}, 
+        extra_space_before_last_semicolon:{'pattern':'whitespace/semicolon', 'pattern_AND':'Extra space before last semicolon'},
+        missing_space_after_semicolon:{'pattern':'whitespace/semicolon', 'pattern_AND':'Missing space after'},
+        missing_space_around_operator_egal:{'pattern':'whitespace/operators', 'pattern_AND':'Missing spaces around = '},
+        extra_space_for_operator_add:{'pattern':'whitespace/operators', 'pattern_AND':'Extra space for operator  ++'},
+        extra_space_for_operator_diff:{'pattern':'whitespace/operators', 'pattern_AND':'Extra space for operator !'},
+        missing_space_around_operator_double_chevron:{'pattern':'whitespace/operators', 'pattern_AND':'Missing spaces around << '},
+        missing_space_around_operator_simple_chevron:{'pattern':'whitespace/operators', 'pattern_AND':'Missing spaces around < '},
+        missing_space_around_operator_diff_egal:{'pattern':'whitespace/operators', 'pattern_AND':'Missing spaces around !='},
+        missing_space_around_operator_double_egal:{'pattern':'whitespace/operators', 'pattern_AND':'Missing spaces around =='},
+        space_between_comments_and_code:{'pattern':'whitespace/comments', 'pattern_AND':'At least two spaces is best between code and comments'},
+        space_between_comments_and_double_slash:{'pattern':'whitespace/comments', 'pattern_AND':'Should have a space between // and comment '},
+        legal_copyright:{'pattern':'legal/copyright'}, # Script à n'executer qu'une fois
+        ifndef_header:{'pattern':'build/header_guard', 'pattern_AND':'#ifndef header guard has wrong style, please use'},
 #        no_ifndef_header:{'pattern':u'build/header_guard', 'pattern_AND':u'No #ifndef header guard found'}, 
-        endif_line:{'pattern':u'build/header_guard', 'pattern_AND':u'#endif line should be'},
-        whitespace_end_of_line:{'pattern':u'whitespace/end_of_line', 'pattern_AND':u'Line ends in whitespace'},
-        missing_space_after_comma:{'pattern':u'whitespace/comma'},
-        namespace_should_be_terminated:{'pattern':u'readability/namespace', 'pattern_AND':u'Namespace should be terminated with'},
-        anonymous_namespace_should_be_terminated:{'pattern':u'readability/namespace', 'pattern_AND':u'Anonymous namespace should be terminated with'},
-		extra_space_after_opening_paranthesis:{'pattern':u'whitespace/parens', 'pattern_AND':u'Extra space after ('},
-		extra_space_before_closing_paranthesis:{'pattern':u'whitespace/parens', 'pattern_AND':u'Extra space before )'},
-		extra_space_before_opening_paranthesis_in_function_call:{'pattern':u'whitespace/parens', 'pattern':u'Extra space before ( in function call'},
-		missing_space_before_opening_parenthesis_in_for:{'pattern':u'whitespace/parens', 'pattern_AND':u'Missing space before ( in for('},
-		missing_space_before_opening_parenthesis_in_if:{'pattern':u'whitespace/parens', 'pattern_AND':u'Missing space before ( in if('},
-		missing_space_before_opening_parenthesis_in_switch:{'pattern':u'whitespace/parens', 'pattern_AND':u'Missing space before ( in switch('},
-		missing_space_before_opening_parenthesis_in_while:{'pattern':u'whitespace/parens', 'pattern_AND':u'Missing space before ( in while('},
-		mismatching_spaces_inside_paranthesis:{'pattern':u'whitespace/parens', 'pattern_AND':u'Mismatching spaces inside ()'},
-		missing_space_before_public_protected_private:{'pattern':u'whitespace/indent', 'pattern_AND':u' should be indented +1 space inside class'},
+        endif_line:{'pattern':'build/header_guard', 'pattern_AND':'#endif line should be'},
+        whitespace_end_of_line:{'pattern':'whitespace/end_of_line', 'pattern_AND':'Line ends in whitespace'},
+        missing_space_after_comma:{'pattern':'whitespace/comma'},
+        namespace_should_be_terminated:{'pattern':'readability/namespace', 'pattern_AND':'Namespace should be terminated with'},
+        anonymous_namespace_should_be_terminated:{'pattern':'readability/namespace', 'pattern_AND':'Anonymous namespace should be terminated with'},
+		extra_space_after_opening_paranthesis:{'pattern':'whitespace/parens', 'pattern_AND':'Extra space after ('},
+		extra_space_before_closing_paranthesis:{'pattern':'whitespace/parens', 'pattern_AND':'Extra space before )'},
+		extra_space_before_opening_paranthesis_in_function_call:{'pattern':'whitespace/parens', 'pattern':'Extra space before ( in function call'},
+		missing_space_before_opening_parenthesis_in_for:{'pattern':'whitespace/parens', 'pattern_AND':'Missing space before ( in for('},
+		missing_space_before_opening_parenthesis_in_if:{'pattern':'whitespace/parens', 'pattern_AND':'Missing space before ( in if('},
+		missing_space_before_opening_parenthesis_in_switch:{'pattern':'whitespace/parens', 'pattern_AND':'Missing space before ( in switch('},
+		missing_space_before_opening_parenthesis_in_while:{'pattern':'whitespace/parens', 'pattern_AND':'Missing space before ( in while('},
+		mismatching_spaces_inside_paranthesis:{'pattern':'whitespace/parens', 'pattern_AND':'Mismatching spaces inside ()'},
+		missing_space_before_public_protected_private:{'pattern':'whitespace/indent', 'pattern_AND':' should be indented +1 space inside class'},
 		
-		wrong_number_of_spaces_while_indenting:{'pattern':u'whitespace/indent', 'pattern_AND':u'Weird number of spaces at line-start'},
+		wrong_number_of_spaces_while_indenting:{'pattern':'whitespace/indent', 'pattern_AND':'Weird number of spaces at line-start'},
 
-		no_newline_at_the_end_of_file:{'pattern':u'whitespace/ending_newline'},
+		no_newline_at_the_end_of_file:{'pattern':'whitespace/ending_newline'},
 
-		order_of_storage_class_specifier:{'pattern':u'build/storage_class'},
+		order_of_storage_class_specifier:{'pattern':'build/storage_class'},
 
-		use_spaces_instead_of_tab:{'pattern':u'whitespace/tab'},
+		use_spaces_instead_of_tab:{'pattern':'whitespace/tab'},
 
-		no_semicolon_after_brace:{'pattern':u'readability/braces', 'pattern_AND':u'You don\'t need a ; after a }'},
+		no_semicolon_after_brace:{'pattern':'readability/braces', 'pattern_AND':'You don\'t need a ; after a }'},
 #		position_of_else:{'pattern':u'readability/braces', 'pattern_AND':u'If an else has a brace on one side'},
 #		else_should_be_previous_line:{'pattern':u'whitespace/newline', 'pattern_AND':u'An else should appear on the same line as the preceding'},
-		position_of_opening_brace:{'pattern':u'whitespace/braces', 'pattern_AND':u'{ should almost always be at the end of the previous line'},
-		missing_space_before_opening_brace:{'pattern':u'whitespace/braces', 'pattern_AND':u'Missing space before {'},
-		missing_space_before_else:{'pattern':u'whitespace/braces', 'pattern_AND':u'Missing space before else'},
+		position_of_opening_brace:{'pattern':'whitespace/braces', 'pattern_AND':'{ should almost always be at the end of the previous line'},
+		missing_space_before_opening_brace:{'pattern':'whitespace/braces', 'pattern_AND':'Missing space before {'},
+		missing_space_before_else:{'pattern':'whitespace/braces', 'pattern_AND':'Missing space before else'},
 		
-		make_const_reference:{'pattern':u'runtime/references', 'pattern_AND':u'Is this a non-const reference? If so, make const or use a pointer'},
+		make_const_reference:{'pattern':'runtime/references', 'pattern_AND':'Is this a non-const reference? If so, make const or use a pointer'},
 
-		make_constructor_explicit:{'pattern':u'runtime/explicit'},
+		make_constructor_explicit:{'pattern':'runtime/explicit'},
 
-		cpp_file_should_include_h_file:{'pattern':u'build/include', 'pattern_AND':u'should include its header file'},
-		_h_file_already_included:{'pattern':u'build/include', 'pattern_AND':u'already included at'},
+		cpp_file_should_include_h_file:{'pattern':'build/include', 'pattern_AND':'should include its header file'},
+		_h_file_already_included:{'pattern':'build/include', 'pattern_AND':'already included at'},
 
-		replace_short_by_int16:{'pattern':u'runtime/int', 'pattern_AND':u'Use int16/int64/etc, rather than the C type short'},
-		replace_long_by_int64:{'pattern':u'runtime/int', 'pattern_AND':u'Use int16/int64/etc, rather than the C type long'},
+		replace_short_by_int16:{'pattern':'runtime/int', 'pattern_AND':'Use int16/int64/etc, rather than the C type short'},
+		replace_long_by_int64:{'pattern':'runtime/int', 'pattern_AND':'Use int16/int64/etc, rather than the C type long'},
 
-		do_not_leave_blank_line_after_public_protected_private:{'pattern':u'whitespace/blank_line', 'pattern_AND':u'Do not leave a blank line after'},
-		do_not_leave_blank_line_at_the_start_of_code_block:{'pattern':u'whitespace/blank_line', 'pattern_AND':u'Redundant blank line at the start of a code block should be deleted'},
-		do_not_leave_blank_line_at_the_end_of_code_block:{'pattern':u'whitespace/blank_line', 'pattern_AND':u'Redundant blank line at the end of a code block should be deleted'},
-		add_blank_line_before_public:{'pattern':u'whitespace/blank_line', 'pattern_AND':u'"public:" should be preceded by a blank line'},
-		add_blank_line_before_protected:{'pattern':u'whitespace/blank_line', 'pattern_AND':u'"protected:" should be preceded by a blank line'},
-		add_blank_line_before_private:{'pattern':u'whitespace/blank_line', 'pattern_AND':u'"private:" should be preceded by a blank line'},
+		do_not_leave_blank_line_after_public_protected_private:{'pattern':'whitespace/blank_line', 'pattern_AND':'Do not leave a blank line after'},
+		do_not_leave_blank_line_at_the_start_of_code_block:{'pattern':'whitespace/blank_line', 'pattern_AND':'Redundant blank line at the start of a code block should be deleted'},
+		do_not_leave_blank_line_at_the_end_of_code_block:{'pattern':'whitespace/blank_line', 'pattern_AND':'Redundant blank line at the end of a code block should be deleted'},
+		add_blank_line_before_public:{'pattern':'whitespace/blank_line', 'pattern_AND':'"public:" should be preceded by a blank line'},
+		add_blank_line_before_protected:{'pattern':'whitespace/blank_line', 'pattern_AND':'"protected:" should be preceded by a blank line'},
+		add_blank_line_before_private:{'pattern':'whitespace/blank_line', 'pattern_AND':'"private:" should be preceded by a blank line'},
 
-		add_include_what_you_use:{'pattern':u'build/include_what_you_use'},
+		add_include_what_you_use:{'pattern':'build/include_what_you_use'},
 
 }
 
@@ -716,14 +716,14 @@ def replace_line_no(path, nol, oldline, newline):
 	Remplace, la ligne No nol du fichier path (relatif à SRCROOTDIR) par la chaîne newline (un unicode)
 	oldline sert uniquement pour vérifier que tout est ok
 	"""
-	print "replace_line_no : ", oldline, " by ", newline
+	print("replace_line_no : ", oldline, " by ", newline)
 	# récupérer le contenu du fichier
 	fic = open(get_src_path(path), "r")
 	liste = fic.readlines()
 	fic.close()
 	# test de corruption
 	if liste[nol-1].decode(ENCODING) != oldline :
-		raise Exception(u"Le fichier source %s semble être corrompu" %path)
+		raise Exception("Le fichier source %s semble être corrompu" %path)
 	# remplacement de la ligne
 	liste[nol-1] = newline.encode(ENCODING)
 	# recréation du fichier corrigé
@@ -740,8 +740,8 @@ def replace_fic_copyright(ficpath, warning=None):
 	liste=fic_readlines(fic)
 	fic.close()
 	new_liste = []
-	if liste[0].find(u'/ Copyright (C) 2014-20xx CEA/DEN, EDF R&D\n\n')== -1:			
-		newliste=[u'// Copyright (C) 2014-20xx CEA/DEN, EDF R&D\n\n']+liste	
+	if liste[0].find('/ Copyright (C) 2014-20xx CEA/DEN, EDF R&D\n\n')== -1:
+		newliste=['// Copyright (C) 2014-20xx CEA/DEN, EDF R&D\n\n']+liste
 		newliste=fic_writelines(newliste)
 		fic = open(get_src_path(ficpath), "w")
 		fic.writelines(newliste)
@@ -762,9 +762,9 @@ def replace_fic_ifndef(ficpath, ficline, warning, mode):
 	        m = re.match("(.*)ifndef header guard has wrong style, please use: (.+)  (.+)", warning)
 
         if(m):
-                print 'group_0', m.group(0)
-                print 'group_1', m.group(1)
-                print 'group_2', m.group(2)
+                print('group_0', m.group(0))
+                print('group_1', m.group(1))
+                print('group_2', m.group(2))
 
                 # Header à changer
 		header_guard=m.group(2)
@@ -775,24 +775,24 @@ def replace_fic_ifndef(ficpath, ficline, warning, mode):
                 for ligne in liste:
 			i += 1
 			if i == ficline:
-				if ligne.find(u'#ifndef') >= 0:
+				if ligne.find('#ifndef') >= 0:
 					new_liste.append("#ifndef "+header_guard+"\n")
 					trouve = True
 				else:
-					print "ERROR : Pattern #ifndef not found in line ", ficline
+					print("ERROR : Pattern #ifndef not found in line ", ficline)
 					return
 			else:
 				if trouve == True:
-					if ligne.find(u'#define') >= 0:
+					if ligne.find('#define') >= 0:
 						new_liste.append("#define "+header_guard+"\n")
 						trouve = False
 					else:
-						print "WARNING : Pattern #define not found in the line following the pattern #ifndef, we abandon."
+						print("WARNING : Pattern #define not found in the line following the pattern #ifndef, we abandon.")
 						return
 				else:
 					new_liste.append(ligne)
         else:
-                print "ERROR : Pattern not found : \"#ifndef header guard has wrong style, please use\""
+                print("ERROR : Pattern not found : \"#ifndef header guard has wrong style, please use\"")
 
         newliste=fic_writelines(new_liste)
         fichier = open(get_src_path(ficpath), "w")
@@ -848,33 +848,33 @@ def main_routine(cpplint_output_file):
 			previous_oldline = get_line_no(ficpath, ficline-1)
 		else:
 			previous_oldline = None
-		print "===\nNew warning:"
-		print "\tFile = "+ficpath
-		print "\tlast_ficpath_with_modified_nb_lines = "+last_ficpath_with_modified_nb_lines
-		print "\tNo ligne =" , ficline
+		print("===\nNew warning:")
+		print("\tFile = "+ficpath)
+		print("\tlast_ficpath_with_modified_nb_lines = "+last_ficpath_with_modified_nb_lines)
+		print("\tNo ligne =" , ficline)
 		if VERBOSE_FLAG == "True":
-			print "\tWarning ='"+warning+"'"
-			print "\tOld text of current line = '"+oldline+"'"
+			print("\tWarning ='"+warning+"'")
+			print("\tOld text of current line = '"+oldline+"'")
 			if previous_oldline:
-				print "\tOld text of previous line = '"+previous_oldline+"'"
+				print("\tOld text of previous line = '"+previous_oldline+"'")
 			if ficpath == last_ficpath_with_modified_nb_lines:
-				print "File ", ficpath, "already modified. Waiting next cpplint run to process it."
+				print("File ", ficpath, "already modified. Waiting next cpplint run to process it.")
 				continue
 		hook = get_hook(warning, ficpath)
-		print "hook = ", hook
+		print("hook = ", hook)
 		if hook is None:
-			print u"No hook found"
+			print("No hook found")
 			continue
 
 		if VERBOSE_FLAG == "True":
-			print "\t=> Processing with hook", hook
+			print("\t=> Processing with hook", hook)
 
 		if hook in HOOKS_DELETING_OR_ADDING_LINES:
 			last_ficpath_with_modified_nb_lines = ficpath
 			
 		if hook in HOOKS_PARSING_THE_WHOLE_FILE:
 			hook(ficpath, ficline, warning)
-			print "Done"
+			print("Done")
 			continue
 				
 		# Cas particulier pour le hook make_const_reference : il faut faire un traitement sur le fichier .cpp associé au fichier .h concerné par le hook
@@ -890,31 +890,31 @@ def main_routine(cpplint_output_file):
 			newline, previous_newline, huchk = hook(oldline, previous_oldline, warning)
 
 		if VERBOSE_FLAG == "True":
-			print "\tNew text = '"+newline+"'"
+			print("\tNew text = '"+newline+"'")
 		if huchk:
 			if previous_newline:
-				print "Replace line : \n'%s'\n with line \n'%s'\n O/N ? :"%(previous_oldline, previous_newline)
-				reponse = raw_input()
+				print("Replace line : \n'%s'\n with line \n'%s'\n O/N ? :"%(previous_oldline, previous_newline))
+				reponse = input()
 				if reponse in ['O', 'o']:
 					replace_line_no(ficpath, ficline-1, previous_oldline, previous_newline)	
-					print "Replacement done."		
+					print("Replacement done.")
 				else :
-					print "Replacement aborted."
+					print("Replacement aborted.")
 
-				print "Replace line : \n'%s'\n with line \n'%s'\n O/N ? :"%(oldline, newline)
-				reponse = raw_input()
+				print("Replace line : \n'%s'\n with line \n'%s'\n O/N ? :"%(oldline, newline))
+				reponse = input()
 				if reponse in ['O', 'o']:
 					replace_line_no(ficpath, ficline, oldline, newline)	
-				print "Replacement done."		
+				print("Replacement done.")
 			else :
-				print "Replacement aborted."
+				print("Replacement aborted.")
 
 
 		else :
 			if previous_newline:
 				replace_line_no(ficpath, ficline-1, previous_oldline, previous_newline)
 			replace_line_no(ficpath, ficline, oldline, newline)
-		print "Done"
+		print("Done")
 	logfile.close()
 		
 if __name__ == '__main__':

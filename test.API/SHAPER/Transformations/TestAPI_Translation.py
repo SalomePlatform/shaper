@@ -69,7 +69,7 @@ Translation_3 = shaperpy.makeTranslation(Box_3, ax1, -15.)
 
 try:
     Translation_4 = shaperpy.makeTranslation(Box_4, None, 15.)
-except myExcept,ec:
+except myExcept as ec:
     assert(ec.what() == "Translation builder :: axis is not valid.")
 
 Translation_9 = shaperpy.makeTranslation(Box_5, ax4, 15.)
@@ -86,7 +86,7 @@ Translation_12 = shaperpy.makeTranslation(MultiTranslation_3, ax3, -15.)
 MultiTranslation_4 = shaperpy.makeMultiTranslation(Box_9, ax1, 15., 3, ax2, 15., 3)
 try:
     Translation_13 = shaperpy.makeTranslation(MultiTranslation_4, None, 15.)
-except myExcept,ec:
+except myExcept as ec:
     assert(ec.what() == "Translation builder :: axis is not valid.")
 
 MultiTranslation_5 = shaperpy.makeMultiTranslation(Box_10, ax1, 15., 3, ax2, 15., 3)
@@ -106,15 +106,15 @@ Translation_99 = shaperpy.makeTranslation(Box_11, pnt1, pnt2)
 
 try:
     Translation_100 = shaperpy.makeTranslation(Box_11, pnt1, pnt1)
-except myExcept,ec:
+except myExcept as ec:
     assert(ec.what() == "Translation builder :: start point and end point coincide.")
 
 try:
     Translation_101 = shaperpy.makeTranslation(Box_11, None, pnt1)
-except myExcept,ec:
+except myExcept as ec:
     assert(ec.what() == "Translation builder :: start point is not valid.")
 
 try:
     Translation_102 = shaperpy.makeTranslation(Box_11, pnt1, None)
-except myExcept,ec:
+except myExcept as ec:
     assert(ec.what() == "Translation builder :: end point is not valid.")

@@ -44,7 +44,7 @@ def createNAngle(theSketch, theN, theRadius, theEdgeLength=0):
     # Create an N-Angle at (0,0)
     rad = 2. * math.pi / theN
     points = []
-    for a in xrange(theN):
+    for a in range(theN):
         x = round(math.cos(rad * a), 10) * theRadius
         y = round(math.sin(rad * a), 10) * theRadius
         points.append((x, y))
@@ -126,8 +126,8 @@ aDOF = 0
 deltaX = deltaY = 50.
 n = 5
 aSession.startOperation()
-for i in xrange(4):
-    for j in xrange(4):
+for i in range(4):
+    for j in range(4):
         allNangleLines = createNAngle(aSketchFeature, n, 50)
         fixLineLength(aSketchFeature, allNangleLines)
         moveTo(allNangleLines, deltaX, deltaY)

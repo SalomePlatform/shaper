@@ -39,7 +39,7 @@ class ConnectorPlugin(ModelAPI.ModelAPI_Plugin):
         if theFeatureID == ExportFeature.ID():
             return ExportFeature().__disown__()
         else:
-            print "ConnectorPlugin: No such feature %s" % theFeatureID
+            print("ConnectorPlugin: No such feature %s" % theFeatureID)
 
 ## The plugin created on module importing (from c++)
 plugin = ConnectorPlugin()

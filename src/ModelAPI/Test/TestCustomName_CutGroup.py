@@ -94,7 +94,7 @@ model.do()
 
 Extrusions = [Extrusion_1, Extrusion_2, Extrusion_3]
 BooleanResults = Boolean_1.results()
-for i in xrange(len(BooleanResults)):
+for i in range(len(BooleanResults)):
   assert(BooleanResults[i].name() == Extrusions[i].result().name()), "Name of result {} of Boolean CUT '{}' != '{}'".format(i, BooleanResults[i].name(), Extrusions[i].result().name())
   BooleanName = Boolean_1.name() + "_" + str(i + 1)
   for sub in range(0, BooleanResults[i].numberOfSubs()):

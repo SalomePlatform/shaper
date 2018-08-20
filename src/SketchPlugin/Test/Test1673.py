@@ -248,7 +248,7 @@ SketchConstraintVertical_11.setName("SketchConstraintVertical_12")
 model.do()
 
 sketchTime = timer() - sketchTime
-print "Sketch creation time: {0}".format(sketchTime)
+print("Sketch creation time: {0}".format(sketchTime))
 expectedTime = MOVE_BUILD_RATIO * sketchTime
 averageTime = 0
 nbMoves = 0
@@ -289,7 +289,7 @@ for ang in range(0, 50):
     nbMoves += 1
     aDeltaX = aEndPoint.x() - aCenter.x()
     aDeltaY = aEndPoint.y() - aCenter.y()
-print "Movement average time: {0}".format(averageTime / nbMoves)
+print("Movement average time: {0}".format(averageTime / nbMoves))
 
 model.end()
 

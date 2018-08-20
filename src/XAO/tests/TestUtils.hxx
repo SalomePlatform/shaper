@@ -28,11 +28,10 @@ namespace XAO
     class TestUtils
     {
     public:
-        static std::string getTestFilePath(const std::string& fileName)
+        static std::string getTestFilePath(const std::string& filePath)
         {
-            std::string dataDir = getenv("GEOM_SRC_DIR");
-            dataDir += "/src/XAO/tests/data/";
-            dataDir += fileName;
+            std::string dataDir = getenv("DATA_DIR");
+            dataDir += filePath;
             return dataDir;
         }
 

@@ -122,13 +122,13 @@ void ImportExportTest::testGeometryError()
 void ImportExportTest::testImportXao()
 {
     Xao xao;
-    xao.importXAO(TestUtils::getTestFilePath("test.xao"));
+    xao.importXAO(TestUtils::getTestFilePath("Shapes/Xao/box1.xao"));
     checkImport(xao);
 }
 
 void ImportExportTest::testImportXaoFromText()
 {
-    char* txt = TestUtils::readTextFile(TestUtils::getTestFilePath("test.xao"));
+    char* txt = TestUtils::readTextFile(TestUtils::getTestFilePath("Shapes/Xao/box1.xao"));
 
     Xao xao;
     xao.setXML(txt);

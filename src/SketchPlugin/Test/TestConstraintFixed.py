@@ -92,8 +92,8 @@ kLineCEnd = (aLineCEndPoint.x(),   aLineCEndPoint.y())
 #=========================================================================
 # Link triange lines with concidence
 #=========================================================================
-concidenceLinks = zip([aLineBStartPoint, aLineCStartPoint, aLineAStartPoint],
-                      [aLineAEndPoint, aLineBEndPoint, aLineCEndPoint])
+concidenceLinks = list(zip([aLineBStartPoint, aLineCStartPoint, aLineAStartPoint],
+                      [aLineAEndPoint, aLineBEndPoint, aLineCEndPoint]))
 aSession.startOperation()
 for eachLink in concidenceLinks:
     aConstraint = aSketchFeature.addFeature("SketchConstraintCoincidence")

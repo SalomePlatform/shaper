@@ -267,7 +267,7 @@ SketchConstraintMiddle_3 = Sketch_1.setMiddlePoint(SketchLine_17.startPoint(), S
 model.do()
 
 sketchTime = timer() - sketchTime
-print "Sketch creation time: {0}".format(sketchTime)
+print("Sketch creation time: {0}".format(sketchTime))
 expectedTime = MOVE_BUILD_RATIO * sketchTime
 averageTime = 0
 nbMoves = 0
@@ -290,7 +290,7 @@ for deltaX, deltaY in deltas:
     averageTime += movementTime
     nbMoves += 1
 
-print "Movement average time: {0}".format(averageTime / nbMoves)
+print("Movement average time: {0}".format(averageTime / nbMoves))
 
 model.end()
 

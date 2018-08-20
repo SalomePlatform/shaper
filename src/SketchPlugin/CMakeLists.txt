@@ -258,13 +258,3 @@ if(${SKETCHER_CHANGE_RADIUS_WHEN_MOVE})
                TestMovementComplex.py
   )
 endif()
-
-# Copy data-files to corresponding directory
-file(GLOB DATA_FILES "${CMAKE_CURRENT_SOURCE_DIR}/Test/Data/*")
-foreach(data_file ${DATA_FILES})
-  get_filename_component(data_file_name "${data_file}" NAME)
-  configure_file(
-    ${data_file}
-    ${CMAKE_CURRENT_BINARY_DIR}/Data/${data_file_name}
-    COPYONLY)
-endforeach()

@@ -93,22 +93,22 @@
 %shared_ptr(ModelAPI_ResultCompSolid)
 
 %typecheck(SWIG_TYPECHECK_POINTER) const ModelAPI_AttributeTables::Value {
-  $1 = (PyFloat_Check($input) || PyInt_Check($input) || PyLong_Check($input) || PyString_Check($input) || PyBool_Check($input)) ? 1 : 0;
+  $1 = (PyFloat_Check($input) || PyLong_Check($input) || PyUnicode_Check($input) || PyBool_Check($input)) ? 1 : 0;
 }
 
 // Tables Value reading as int, double, boolean or string
 %typemap(in) const ModelAPI_AttributeTables::Value {
-  if (PyInt_Check($input)) {
-    $1.myInt = int(PyInt_AsLong($input));
-    $1.myDouble = double(PyInt_AsLong($input));
-    $1.myBool = PyInt_AsLong($input) != 0;
+  if (PyLong_Check($input)) {
+    $1.myInt = int(PyLong_AsLong($input));
+    $1.myDouble = double(PyLong_AsLong($input));
+    $1.myBool = PyLong_AsLong($input) != 0;
   } else if (PyFloat_Check($input)) {
     $1.myInt = int(PyFloat_AsDouble($input));
     $1.myDouble = PyFloat_AsDouble($input);
   } else if (PyBool_Check($input)) {
     $1.myBool = $input == Py_True;
-  } else if (PyString_Check($input)) {
-    $1.myStr = PyString_AsString($input);
+  } else if (PyUnicode_Check($input)) {
+    $1.myStr = PyUnicode_AsUTF8($input);
   } else if ((SWIG_ConvertPtr($input, (void **)&$1, $1_descriptor, SWIG_POINTER_EXCEPTION)) == 0) {
   } else {
     PyErr_SetString(PyExc_ValueError, "Tables value must be int, double, string or bool.");

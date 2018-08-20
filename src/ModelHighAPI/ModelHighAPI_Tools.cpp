@@ -435,7 +435,7 @@ bool checkPythonDump()
     return false; // something is wrong during dump
   }
 
-   // map from document name to feature name to feature data
+  // map from document name to feature name to feature data
   std::map<std::string, std::map<std::string, ModelHighAPI_FeatureStore> > aStore;
   std::string anError = storeFeatures(
     aSession->moduleDocument()->kind(), aSession->moduleDocument(), aStore, false);
@@ -444,14 +444,16 @@ bool checkPythonDump()
     anErrorMsg.send();
     return false;
   }
+
   // close all before importation of the script
   aSession->closeAll();
+
   // execute the dumped
   PyGILState_STATE gstate = PyGILState_Ensure(); /* acquire python thread */
   static char aDumpName[] = "./check_dump.py";
   static char aReadMode[] = "r";
-  PyObject* PyFileObject = PyFile_FromString(aDumpName, aReadMode);
-  PyRun_SimpleFileEx(PyFile_AsFile(PyFileObject), aDumpName, 1);
+  FILE* aFile = _Py_fopen(aDumpName, aReadMode);
+  PyRun_SimpleFileEx(aFile, aDumpName, 1);
   PyGILState_Release(gstate); /* release python thread */
 
   // compare with the stored data

@@ -245,7 +245,7 @@ refAttrA.setAttr(anArcStartPoint)
 refAttrB.setAttr(aMirroredArcStartPoint)
 aConstraint.real("ConstraintValue").setValue(200.)
 aSession.finishOperation()
-print "Sketch error : {}".format(aSketchErrorAttr.value())
+print("Sketch error : {}".format(aSketchErrorAttr.value()))
 assert len(aSketchErrorAttr.value()) != 0, "ERROR: Sketch has not been failed as expected"
 aSession.startOperation()
 aDocument.removeFeature(aConstraint)

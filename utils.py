@@ -26,8 +26,8 @@ import os, os.path
 SHAPER_SRC = os.environ['PWD']
 # VERBOSE_FLAG = os.environ['VERBOSE_FLAG']
 VERBOSE_FLAG = ""
-ENCODING = u"utf-8"
-OPERATORS=[u">", u"<", u"+", u"=", u"-", u"*", u"/"]
+ENCODING = "utf-8"
+OPERATORS=[">", "<", "+", "=", "-", "*", "/"]
 
 def create_warning_generator(fichier):
 	"""
@@ -40,14 +40,14 @@ def create_warning_generator(fichier):
 	while ligne.strip("\n") :
 		ligne = ligne.decode(ENCODING)
 		liste = ligne.split(":")
-		print "Size of liste = ", len(liste)
-		print "ligne = ", ligne
-		print "n° ligne = ", i
-		print "XXX : ", ligne.find(u'Done processing ')
+		print("Size of liste = ", len(liste))
+		print("ligne = ", ligne)
+		print("n° ligne = ", i)
+		print("XXX : ", ligne.find('Done processing '))
 
 		if len(liste) < 3:
-			if ligne.find(u'Done processing ') == -1 and ligne.find(u'Category ') == -1 and ligne.find(u'Total errors found: ') == -1:
-				raise Exception(u"Fichier de log mal formé")
+			if ligne.find('Done processing ') == -1 and ligne.find('Category ') == -1 and ligne.find('Total errors found: ') == -1:
+				raise Exception("Fichier de log mal formé")
 			else:
 				ligne = fichier.readline()
 				i += 1
@@ -55,12 +55,12 @@ def create_warning_generator(fichier):
 		elif len(liste) != 3:
 			item1=liste[0]
 			item2=liste[1]
-			merge = u""
-			sep = u""
+			merge = ""
+			sep = ""
 			for item in liste[2:]:
 				merge += sep
 				merge += item
-				sep = u":"
+				sep = ":"
 			liste = [item1, item2, merge]
 		ligne = fichier.readline()
 		i += 1
@@ -73,7 +73,7 @@ def get_line_no(path, nol):
 	"""retourne la ligne No nol du fichier path (relatif à DST_SRC_PARENT) sous forme d'un unicode"""
 	ligne = ""
 	fic = open(get_src_path(path), "r")
-	for i in xrange(nol):
+	for i in range(nol):
 		ligne = fic .readline()
 	fic.close()
 	ligne_u = ligne.decode(ENCODING)

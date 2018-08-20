@@ -373,11 +373,14 @@ void XGUI_Selection::entityOwners(const Handle(AIS_InteractiveObject)& theObject
       continue;
 
     Handle(SelectMgr_Selection) aSelection = theObject->Selection(aMode);
-    for (aSelection->Init(); aSelection->More(); aSelection->Next()) {
-      Handle(SelectMgr_SensitiveEntity) anEntity = aSelection->Sensitive();
+    NCollection_Vector<Handle(SelectMgr_SensitiveEntity)> anEntities = aSelection->Entities();
+    for (NCollection_Vector<Handle(SelectMgr_SensitiveEntity)>::Iterator anIt(anEntities);
+	 anIt.More();
+	 anIt.Next()) {
+      Handle(SelectMgr_SensitiveEntity) anEntity = anIt.Value();
       if (anEntity.IsNull())
         continue;
-      Handle(SelectMgr_EntityOwner) anOwner =
+       Handle(SelectMgr_EntityOwner) anOwner =
         Handle(SelectMgr_EntityOwner)::DownCast(anEntity->BaseSensitive()->OwnerId());
       if (!anOwner.IsNull())
         theOwners.Add(anOwner);

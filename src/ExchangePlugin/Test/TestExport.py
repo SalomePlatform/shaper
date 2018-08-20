@@ -27,6 +27,7 @@
 #=========================================================================
 import os
 import math
+from tempfile import TemporaryDirectory
 
 from ModelAPI import *
 
@@ -58,7 +59,8 @@ def testExport(theType, theFormat, theFile, theVolume, theDelta):
 
     aSession.startOperation("Import screw")
     anImportFeature = aPart.addFeature("Import")
-    anImportFeature.string("file_path").setValue("Data/screw.step")
+    aShapePath = os.path.join(os.getenv("DATA_DIR"), "Shapes", "Step", "screw.step")
+    anImportFeature.string("file_path").setValue(aShapePath)
     aSession.finishOperation()
 
     removeFile(theFile)
@@ -66,7 +68,7 @@ def testExport(theType, theFormat, theFile, theVolume, theDelta):
     aSession.startOperation("Export part")
     anExportFeature = aPart.addFeature("Export")
     anExportFeature.string("file_format").setValue(theFormat)
-    print "theFile=",theFile
+    print("theFile=",theFile)
     anExportFeature.string("file_path").setValue(theFile)
     anExportFeature.string("ExportType").setValue("Regular")
     aSelectionListAttr = anExportFeature.selectionList("selection_list")
@@ -79,7 +81,7 @@ def testExport(theType, theFormat, theFile, theVolume, theDelta):
     # Test exported file by importing
     testImport(theType, theFile, theVolume, theDelta)
 
-def testExportXAO():
+def testExportXAO(theFile):
     # Import a reference part
     aSession.startOperation("Add part")
     aPartFeature = aSession.moduleDocument().addFeature("Part")
@@ -88,7 +90,8 @@ def testExportXAO():
 
     aSession.startOperation("Import Box_1")
     anImportFeature = aPart.addFeature("Import")
-    anImportFeature.string("file_path").setValue("Data/Box_1.brep")
+    aShapePath = os.path.join(os.getenv("DATA_DIR"), "Shapes", "Brep", "box1.brep")
+    anImportFeature.string("file_path").setValue(aShapePath)
     aSession.finishOperation()
 
     # Create groups
@@ -105,16 +108,16 @@ def testExportXAO():
     aGroupFeature.data().setName("")
     aSelectionListAttr = aGroupFeature.selectionList("group_list")
     aSelectionListAttr.setSelectionType("face")
-    aSelectionListAttr.append("Box_1_1/Shape1")
-    aSelectionListAttr.append("Box_1_1/Shape2")
+    aSelectionListAttr.append("box1_1/Shape1")
+    aSelectionListAttr.append("box1_1/Shape2")
     aSession.finishOperation()
 
     aSession.startOperation("Create a field")
     aField = aSession.activeDocument().addFeature("Field")
     aSelectionListAttr = aField.selectionList("selected")
     aSelectionListAttr.setSelectionType("face")
-    aSelectionListAttr.append("Box_1_1/Shape1")
-    aSelectionListAttr.append("Box_1_1/Shape2")
+    aSelectionListAttr.append("box1_1/Shape1")
+    aSelectionListAttr.append("box1_1/Shape2")
     aComponentNames = aField.stringArray("components_names")
     aComponentNames.setSize(2) # two components
     aComponentNames.setValue(0, "temperatue")
@@ -136,7 +139,7 @@ def testExportXAO():
     # Export
     aSession.startOperation("Export to XAO")
     anExportFeature = aPart.addFeature("Export")
-    anExportFeature.string("xao_file_path").setValue("Data/export.xao")
+    anExportFeature.string("xao_file_path").setValue(theFile)
     anExportFeature.string("file_format").setValue("XAO")
     anExportFeature.string("ExportType").setValue("XAO")
     anExportFeature.string("xao_author").setValue("me")
@@ -144,34 +147,36 @@ def testExportXAO():
     aSession.finishOperation()
 
     # Check exported file
+    aRefPath = os.path.join(os.getenv("DATA_DIR"), "Shapes", "Xao", "box2.xao")
     import filecmp
-    assert filecmp.cmp("Data/export.xao", "Data/export_ref.xao")
+    assert filecmp.cmp(theFile, aRefPath)
 
 if __name__ == '__main__':
-#=========================================================================
-# Export a shape into BREP
-#=========================================================================
-    aRealVolume = 3.78827401738e-06
-    testExport("BREP", "BREP", os.path.join(os.getcwd(), "Data", "screw_export.brep"), aRealVolume, 10 ** -17)
-    testExport("BRP", "BREP", os.path.join(os.getcwd(), "Data", "screw_export.brp"), aRealVolume, 10 ** -17)
-#=========================================================================
-# Export a shape into STEP
-#=========================================================================
-    testExport("STEP", "STEP", os.path.join(os.getcwd(), "Data", "screw_export.step"), 3.78825807533e-06, 10 ** -17)
-    testExport("STP", "STEP", os.path.join(os.getcwd(), "Data", "screw_export.stp"), 3.78825807533e-06, 10 ** -17)
-#=========================================================================
-# Export a shape into IGES
-#=========================================================================
-    testExport("IGES-5.1", "IGES-5.1", os.path.join(os.getcwd(), "Data", "screw_export-5.1.iges"), 3.78829613776e-06, 10 ** -17)
-    testExport("IGS-5.1", "IGES-5.1", os.path.join(os.getcwd(), "Data", "screw_export-5.1.igs"), 3.78829613776e-06, 10 ** -17)
-    testExport("IGES-5.3", "IGES-5.3", os.path.join(os.getcwd(), "Data", "screw_export-5.3.iges"), 3.78827401651e-06, 10 ** -17)
-    testExport("IGS-5.3", "IGES-5.3", os.path.join(os.getcwd(), "Data", "screw_export-5.3.igs"), 3.78827401651e-06, 10 ** -17)
-#=========================================================================
-# Export a shape into XAO
-#=========================================================================
-    testExportXAO()
-#=========================================================================
-# End of test
-#=========================================================================
+    with TemporaryDirectory() as tmp_dir:
+        #=========================================================================
+        # Export a shape into BREP
+        #=========================================================================
+        aRealVolume = 3.78827401738e-06
+        testExport("BREP", "BREP", os.path.join(tmp_dir, "screw_export.brep"), aRealVolume, 10 ** -17)
+        testExport("BRP", "BREP", os.path.join(tmp_dir, "screw_export.brp"), aRealVolume, 10 ** -17)
+        #=========================================================================
+        # Export a shape into STEP
+        #=========================================================================
+        testExport("STEP", "STEP", os.path.join(tmp_dir, "screw_export.step"), 3.78825807533e-06, 10 ** -17)
+        testExport("STP", "STEP", os.path.join(tmp_dir, "screw_export.stp"), 3.78825807533e-06, 10 ** -17)
+        #=========================================================================
+        # Export a shape into IGES
+        #=========================================================================
+        testExport("IGES-5.1", "IGES-5.1", os.path.join(tmp_dir, "screw_export-5.1.iges"), 3.78829613776e-06, 10 ** -17)
+        testExport("IGS-5.1", "IGES-5.1", os.path.join(tmp_dir, "screw_export-5.1.igs"), 3.78829613776e-06, 10 ** -17)
+        testExport("IGES-5.3", "IGES-5.3", os.path.join(tmp_dir, "screw_export-5.3.iges"), 3.78827401651e-06, 10 ** -17)
+        testExport("IGS-5.3", "IGES-5.3", os.path.join(tmp_dir, "screw_export-5.3.igs"), 3.78827401651e-06, 10 ** -17)
+        #=========================================================================
+        # Export a shape into XAO
+        #=========================================================================
+        testExportXAO(os.path.join(tmp_dir, "export.xao"))
+        #=========================================================================
+        # End of test
+        #=========================================================================
 
-assert(model.checkPythonDump())
+        assert(model.checkPythonDump())

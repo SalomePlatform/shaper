@@ -27,14 +27,23 @@
 #=========================================================================
 from ModelAPI import *
 from GeomAlgoAPI import *
+
+import os
 import math
+import shutil
+from tempfile import TemporaryDirectory
 
 __updated__ = "2015-05-22"
 
 aSession = ModelAPI_Session.get()
+
 #=========================================================================
 # Common test function
 #=========================================================================
+def getShapePath(path):
+    shapes_dir = os.path.join(os.getenv("DATA_DIR"), "Shapes")
+    return os.path.join(shapes_dir, path)
+
 def testImport(theType, theFile, theVolume, theDelta):
     # Create a part for import
     aSession.startOperation("Create part for import")
@@ -74,7 +83,7 @@ def testImportXAO():
 
     aSession.startOperation("Import XAO")
     anImportFeature = aPart.addFeature("Import")
-    anImportFeature.string("file_path").setValue("Data/test.xao")
+    anImportFeature.string("file_path").setValue(getShapePath("Xao/box1.xao"))
     aSession.finishOperation()
 
     # Check results
@@ -104,7 +113,7 @@ def testImportXAO():
     assert aSelectionList.selectionType() == "face"
     assert aSelectionList.size() == 2
     assert aSelectionList.value(0).namingName("") == "mygeom_1/Shape1"
-    print aSelectionList.value(1).namingName("")
+    print(aSelectionList.value(1).namingName(""))
     assert aSelectionList.value(1).namingName("") == "mygeom_1/Shape2"
 
     aFeature3 = aCompositeFeature.subFeature(2, False)
@@ -118,28 +127,37 @@ def testImportXAO():
     assert aFeature3.selectionList("selected").size() == 1
 
 if __name__ == '__main__':
-#=========================================================================
-# Create a shape imported from BREP
-#=========================================================================
-    testImport("BREP", "Data/solid.brep", 259982.297176, 10 ** -5)
-    testImport("BRP", "Data/solid.brp", 259982.297176, 10 ** -5)
-#=========================================================================
-# Create a shape imported from STEP
-#=========================================================================
-    testImport("STP", "Data/screw.stp", 3.78827401738e-06, 10 ** -17)
-    testImport("STEP", "Data/screw.step", 3.78827401738e-06, 10 ** -17)
-#=========================================================================
-# Create a shape imported from IGES
-#=========================================================================
-    testImport("IGES", "Data/bearing.iges", 6.86970803067e-14, 10 ** -25)
-    testImport("IGS", "Data/bearing.igs", 6.86970803067e-14, 10 ** -25)
-#=========================================================================
-# Create a shape imported from XAO
-#=========================================================================
-    testImportXAO()
-#=========================================================================
-# End of test
-#=========================================================================
+    with TemporaryDirectory() as tmp_dir:
+        #=========================================================================
+        # Create a shape imported from BREP
+        #=========================================================================
+        shape_path = getShapePath("Brep/solid.brep")
+        testImport("BREP", shape_path, 259982.297176, 10 ** -5)
+        shape_path = shutil.copyfile(shape_path, os.path.join(tmp_dir, "solid.brp"))
+        testImport("BRP", shape_path, 259982.297176, 10 ** -5)
+        #=========================================================================
+        # Create a shape imported from STEP
+        #=========================================================================
+        shape_path = getShapePath("Step/screw.step")
+        testImport("STP", shape_path, 3.78827401738e-06, 10 ** -17)
+        shape_path = shutil.copyfile(shape_path, os.path.join(tmp_dir, "screw.stp"))
+        testImport("STEP", shape_path, 3.78827401738e-06, 10 ** -17)
+        #=========================================================================
+        # Create a shape imported from IGES
+        #=========================================================================
+        shape_path = getShapePath("Iges/bearing.igs")
+        testImport("IGES", shape_path, 6.86970803067e-14, 10 ** -25)
+        shape_path = shutil.copyfile(shape_path, os.path.join(tmp_dir, "bearing.iges"))
+        testImport("IGS", shape_path, 6.86970803067e-14, 10 ** -25)
 
-from salome.shaper import model
-assert(model.checkPythonDump())
+        #=========================================================================
+        # Create a shape imported from XAO
+        #=========================================================================
+        testImportXAO()
+
+        #=========================================================================
+        # End of test
+        #=========================================================================
+
+        from salome.shaper import model
+        assert(model.checkPythonDump())

@@ -30,11 +30,14 @@ from salome.shaper import model
 
 from math import fabs
 
+import os
+
 model.begin()
 partSet = model.moduleDocument()
 Part_1 = model.addPart(partSet)
 Part_1_doc = Part_1.document()
-Import_1 = model.addImport(Part_1_doc, "Data/profile_top.brep")
+shape_path = os.path.join(os.getenv("DATA_DIR"), "Shapes", "Brep", "profile_top.brep")
+Import_1 = model.addImport(Part_1_doc, shape_path)
 model.do()
 Import_1.setName("profile_top")
 Import_1.result().setName("profile_top_1")

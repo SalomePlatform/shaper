@@ -68,7 +68,7 @@ def dof(sketch):
     aSketch = sketch
     if issubclass(type(aSketch), ModelHighAPI.ModelHighAPI_Interface):
         aSketch = sketch.feature()
-    return int(filter(str.isdigit, aSketch.string("SolverDOF").value()))
+    return int(''.join(filter(str.isdigit, aSketch.string("SolverDOF").value())))
 
 def distancePointPoint(thePoint1, thePoint2):
     aPnt1 = toList(thePoint1)

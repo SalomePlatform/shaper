@@ -288,7 +288,7 @@ SketchConstraintLength_8 = Sketch_1.setLength(SketchLine_37.result(), 0.088)
 model.do()
 
 sketchTime = timer() - sketchTime
-print "Sketch creation time: {0}".format(sketchTime)
+print("Sketch creation time: {0}".format(sketchTime))
 expectedTime = MOVE_BUILD_RATIO * sketchTime
 averageTime = 0
 nbMoves = 0
@@ -310,7 +310,7 @@ for deltaX, deltaY in deltas:
     assert math.fabs(aPoint.x() - X) < TOLERANCE and math.fabs(aPoint.y() - Y) < TOLERANCE, "({0}, {1}) != ({2}, {3})".format(aPoint.x(), aPoint.y(), X, Y)
     averageTime += movementTime
     nbMoves += 1
-print "Movement average time: {0}".format(averageTime / nbMoves)
+print("Movement average time: {0}".format(averageTime / nbMoves))
 
 #=========================================================================
 # Change value of SketchConstraintAngle_6 and check execution time.
@@ -329,7 +329,7 @@ for ang in range(12, 30):
     assert math.fabs(curAngle - ang) < TOLERANCE, "angle {0} != {1} expected".format(curAngle, ang)
     averageTime += movementTime
     nbMoves += 1
-print "Changing angle average time: {0}".format(averageTime / nbMoves)
+print("Changing angle average time: {0}".format(averageTime / nbMoves))
 
 model.end()
 

@@ -84,7 +84,11 @@ class FeaturesTestCase(FeaturesFixture):
         ExchangeAPI.ExchangeAPI_Import(self.part.addFeature("Import"))
 
         import FeaturesAPI
-        FeaturesAPI.FeaturesAPI_Boolean(self.part.addFeature("Boolean"))
+        FeaturesAPI.FeaturesAPI_BooleanCut(self.part.addFeature("BooleanCut"))
+        FeaturesAPI.FeaturesAPI_BooleanFuse(self.part.addFeature("BooleanFuse"))
+        FeaturesAPI.FeaturesAPI_BooleanCommon(self.part.addFeature("BooleanCommon"))
+        FeaturesAPI.FeaturesAPI_BooleanFill(self.part.addFeature("BooleanFill"))
+        FeaturesAPI.FeaturesAPI_BooleanSmash(self.part.addFeature("BooleanSmash"))
         FeaturesAPI.FeaturesAPI_Extrusion(self.part.addFeature("Extrusion"))
         FeaturesAPI.FeaturesAPI_ExtrusionCut(self.part.addFeature("ExtrusionCut"))
         FeaturesAPI.FeaturesAPI_ExtrusionFuse(self.part.addFeature("ExtrusionFuse"))

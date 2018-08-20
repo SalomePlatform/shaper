@@ -58,22 +58,22 @@ Rotation_4 = shaperpy.makeRotation(Box_4, ax1, -360)
 
 try:
     Rotation_5 = shaperpy.makeRotation(Box_5, ax1, 450)
-except myExcept,ec:
+except myExcept as ec:
     assert(ec.what() == "Rotation builder :: angle greater than 360 degrees.")
 
 try:
     Rotation_6 = shaperpy.makeRotation(Box_6, ax1, -450)
-except myExcept,ec:
+except myExcept as ec:
     assert(ec.what() == "Rotation builder :: angle smaller than -360 degrees.")
 
 try:
     Rotation_7 = shaperpy.makeRotation(Box_7, None, 180)
-except myExcept,ec:
+except myExcept as ec:
     assert(ec.what() == "Rotation builder :: axis is not valid.")
 
 try:
     Rotation_8 = shaperpy.makeRotation(None, ax1, 180)
-except myExcept,ec:
+except myExcept as ec:
     assert(ec.what() == "Rotation builder :: source shape is not valid.")
 
 Rotation_9 = shaperpy.makeRotation(Box_8, pntOrigin, pnt1, pnt2)
@@ -81,35 +81,35 @@ Rotation_10 = shaperpy.makeRotation(Box_9, pnt3, pnt1, pnt2)
 
 try:
     Rotation_11 = shaperpy.makeRotation(Box_10, pnt3, pnt1, pnt1)
-except myExcept,ec:
+except myExcept as ec:
     assert(ec.what() == "Rotation builder :: start point and end point coincide.")
 
 try:
     Rotation_12 = shaperpy.makeRotation(Box_11, pnt3, pnt3, pnt1)
-except myExcept,ec:
+except myExcept as ec:
     assert(ec.what() == "Rotation builder :: center point and start point coincide.")
 
 try:
     Rotation_13 = shaperpy.makeRotation(Box_12, pnt3, pnt1, pnt3)
-except myExcept,ec:
+except myExcept as ec:
     assert(ec.what() == "Rotation builder :: center point and end point coincide.")
 
 try:
     Rotation_14 = shaperpy.makeRotation(Box_13, pntOrigin, pnt1, None)
-except myExcept,ec:
+except myExcept as ec:
     assert(ec.what() == "Rotation builder :: end point is not valid.")
 
 try:
     Rotation_15 = shaperpy.makeRotation(Box_14, None, pnt3, pnt2)
-except myExcept,ec:
+except myExcept as ec:
     assert(ec.what() == "Rotation builder :: center point is not valid.")
 
 try:
     Rotation_16 = shaperpy.makeRotation(Box_15, pntOrigin, None, pnt1)
-except myExcept,ec:
+except myExcept as ec:
     assert(ec.what() == "Rotation builder :: start point is not valid.")
 
 try:
     Rotation_17 = shaperpy.makeRotation(None, pntOrigin, pnt3, pnt2)
-except myExcept,ec:
+except myExcept as ec:
     assert(ec.what() == "Rotation builder :: source shape is not valid.")

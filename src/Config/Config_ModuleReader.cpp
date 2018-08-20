@@ -211,7 +211,7 @@ void Config_ModuleReader::loadScript(const std::string& theFileName, bool theSen
       PyErr_Fetch(&ptype, &pvalue, &ptraceback);
       PyErr_NormalizeException(&ptype, &pvalue, &ptraceback);
       pstr = PyObject_Str(pvalue);
-      std::string aPyError = std::string(PyString_AsString(pstr));
+      std::string aPyError = std::string(PyUnicode_AsUTF8(pstr));
       if (!aPyError.empty()) {
         anErrorMsg += ":\n" + aPyError;
       }

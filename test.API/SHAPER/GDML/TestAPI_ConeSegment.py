@@ -32,40 +32,40 @@ CS7 = shaperpy.makeConeSegment(7.,11.,5.,8.,12.,0.,360.)
 
 try :
     CS8 = shaperpy.makeConeSegment(-5.,11.,5.,8.,12.,0.,270.)
-except myExcept,ec:
+except myExcept as ec:
     assert(ec.what() == "Cone Segment builder :: rmin1 is negative.")
 
 try :
     CS9 = shaperpy.makeConeSegment(11.,7.,5.,8.,12.,0.,270.)
-except myExcept,ec:
+except myExcept as ec:
     assert(ec.what() == "Cone Segment builder :: rmin1 is larger than rmax1.")
 
 try :
     CS10 = shaperpy.makeConeSegment(7.,11.,8.,5.,12.,0.,270.)
-except myExcept,ec:
+except myExcept as ec:
     assert(ec.what() == "Cone Segment builder :: rmin2 is larger than rmax2.")
 
 try :
     CS11 = shaperpy.makeConeSegment(7.,11.,-3.,5.,12.,0.,270.)
-except myExcept,ec:
+except myExcept as ec:
     assert(ec.what() == "Cone Segment builder :: rmin2 is negative.")
 
 try :
     CS12 = shaperpy.makeConeSegment(7.,11.,5.,8.,0.,0.,270.)
-except myExcept,ec:
+except myExcept as ec:
     assert(ec.what() == "Cone Segment builder :: z is negative or null.")
 
 try :
     CS13 = shaperpy.makeConeSegment(7.,11.,5.,8.,-10.,0.,270.)
-except myExcept,ec:
+except myExcept as ec:
     assert(ec.what() == "Cone Segment builder :: z is negative or null.")
 
 try :
     CS14 = shaperpy.makeConeSegment(7.,11.,5.,8.,12.,-45.,-45.)
-except myExcept,ec:
+except myExcept as ec:
     assert(ec.what() == "Cone Segment builder :: deltaphi is negative or null.")
 
 try :
     CS15 = shaperpy.makeConeSegment(7.,11.,5.,8.,12.,45.,450.)
-except myExcept,ec:
+except myExcept as ec:
     assert(ec.what() == "Cone Segment builder :: deltaphi is larger than 360 degree.")

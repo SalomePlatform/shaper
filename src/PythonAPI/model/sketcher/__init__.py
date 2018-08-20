@@ -2,5 +2,5 @@
 """
 
 from SketchAPI import addSketch
-from tools import *
-from tests import *
+from .tools import *
+from .tests import *

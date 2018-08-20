@@ -371,9 +371,12 @@ void ModuleBase_ResultPrs::ComputeSelection(const Handle(SelectMgr_Selection)& a
   AIS_Shape::ComputeSelection(aSelection, theMode);
 
   if (myAdditionalSelectionPriority > 0) {
-    for (aSelection->Init(); aSelection->More(); aSelection->Next()) {
-      Handle(SelectBasics_EntityOwner) aBasicsOwner =
-        aSelection->Sensitive()->BaseSensitive()->OwnerId();
+    NCollection_Vector<Handle(SelectMgr_SensitiveEntity)> anEntities = aSelection->Entities();
+    for (NCollection_Vector<Handle(SelectMgr_SensitiveEntity)>::Iterator anIt(anEntities);
+	 anIt.More();
+	 anIt.Next()) {
+      Handle(SelectMgr_SensitiveEntity) anEntity = anIt.Value();
+      Handle(SelectBasics_EntityOwner) aBasicsOwner = anEntity->BaseSensitive()->OwnerId();
       if (!aBasicsOwner.IsNull())
         aBasicsOwner->Set(aBasicsOwner->Priority() + myAdditionalSelectionPriority);
     }
@@ -397,12 +400,18 @@ bool ModuleBase_ResultPrs::appendVertexSelection(const Handle(SelectMgr_Selectio
     StdSelect_BRepSelectionTool::ComputeSensitive(aShape, aOwner, aSelection,
                                                   aDeflection, myDrawer->HLRAngle(), 9, 500);
 
-    for (aSelection->Init(); aSelection->More(); aSelection->Next()) {
+
+    NCollection_Vector<Handle(SelectMgr_SensitiveEntity)> anEntities = aSelection->Entities();
+    for (NCollection_Vector<Handle(SelectMgr_SensitiveEntity)>::Iterator anIt(anEntities);
+	 anIt.More();
+	 anIt.Next()) {
+      Handle(SelectMgr_SensitiveEntity) anEntity = anIt.Value();
       Handle(SelectMgr_EntityOwner) anOwner =
         Handle(SelectMgr_EntityOwner)
-        ::DownCast(aSelection->Sensitive()->BaseSensitive()->OwnerId());
+        ::DownCast(anEntity->BaseSensitive()->OwnerId());
       anOwner->Set(this);
     }
+
     return true;
   }
   return false;

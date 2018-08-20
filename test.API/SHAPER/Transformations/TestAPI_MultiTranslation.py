@@ -51,7 +51,7 @@ MultiTranslation_2 = shaperpy.makeMultiTranslation(Box_2, ax1, -15., 5)
 
 try:
     MultiTranslation_3 = shaperpy.makeMultiTranslation(Box_3, ax1, 15., -2)
-except myExcept,ec:
+except myExcept as ec:
     assert(ec.what() == "Multitranslation builder :: the number of copies for the first direction is null or negative.")
 
 MultiTranslation_5 = shaperpy.makeMultiTranslation(Box_5, ax1, 10., 5, ax2, 10., 5)
@@ -66,7 +66,7 @@ MultiTranslation_6 = shaperpy.makeMultiTranslation(Box_6, ax1, 15., 5, ax2, -10.
 # Pas d'exception levee alors qu'une devrait y en avoir une
 try:
     MultiTranslation_7 = shaperpy.makeMultiTranslation(Box_7, ax1, 15., 5, ax2, 10., -2)
-except myExcept,ec:
+except myExcept as ec:
     assert(ec.what() == "Multitranslation builder :: the number of copies for the second direction is null or negative.")
 
 #try:

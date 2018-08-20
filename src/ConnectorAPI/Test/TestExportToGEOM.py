@@ -26,8 +26,8 @@ from salome.geom import geomBuilder
 import os
 import tempfile
 
-salome.salome_init(0,1)
-geompy = geomBuilder.New(salome.myStudy)
+salome.salome_init(1)
+geompy = geomBuilder.New()
 
 ## Get the last object published in the GEOM section of the object browser
 def getLastGEOMShape():
@@ -124,10 +124,10 @@ def testSeveralExportsToGEOM():
   dumpShaper(dumpFileShaper)
 
   # Load SHAPER dump
-  execfile(dumpFileShaper)
+  exec(compile(open(dumpFileShaper).read(), dumpFileShaper, 'exec'))
 
   # Load GEOM dump
-  execfile(dumpFileGeom)
+  exec(compile(open(dumpFileGeom).read(), dumpFileGeom, 'exec'))
 
   # Clean files
   files = [dumpFileGeom, dumpFileShaper]
