@@ -117,7 +117,7 @@ public:
     ModelAPI_AttributeDouble, /** Ratio */,
     reverse, ConstructionPlugin_Point::REVERSE(),
     ModelAPI_AttributeBoolean, /** Reverse */,
-    poinToProject, ConstructionPlugin_Point::POINT_TO_PROJECT(),
+    pointToProject, ConstructionPlugin_Point::POINT_TO_PROJECT(),
     ModelAPI_AttributeSelection, /** Point to project*/,
     projectionType, ConstructionPlugin_Point::PROJECTION_TYPE(),
     ModelAPI_AttributeString, /** Type of the point projection */,
