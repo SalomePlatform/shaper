@@ -301,4 +301,26 @@ ADD_UNIT_TESTS(TestExtrusion.py
                TestBooleanSmash_Face_Face.py
                TestBooleanFuse_SimpleMode.py
                TestBooleanFuse_RemoveEdges.py
+               TestBooleanCommon_Vertex_Vertex.py
+               TestBooleanCommon_VertexCompound_VertexCompound.py
+               TestBooleanCommon_Edge_Edge.py
+               TestBooleanCommon_EdgeCompound_EdgeCompound.py
+               TestBooleanCommon_Wire_Wire.py
+               TestBooleanCommon_WireCompound_WireCompound.py
+               TestBooleanCommon_Face_Face.py
+               TestBooleanCommon_FaceCompound_FaceCompound.py
+               TestBooleanCommon_Shell_Shell.py
+               TestBooleanCommon_ShellCompound_ShellCompound.py
+               TestBooleanCommon_Solid_Face.py
+               TestBooleanCommon_Solid_Shell.py
+               TestBooleanCommon_Solid_Solid.py
+               TestBooleanCommon_SolidCompound_Face.py
+               TestBooleanCommon_SolidCompound_Shell.py
+               TestBooleanCommon_SolidCompound_SolidCompound.py
+               TestBooleanCommon_CompSolid_Face.py
+               TestBooleanCommon_CompSolid_Shell.py
+               TestBooleanCommon_CompSolid_CompSolid.py
+               TestBooleanCommon_CompSolidCompound_Face.py
+               TestBooleanCommon_CompSolidCompound_Shell.py
+               TestBooleanCommon_CompSolidCompound_CompSolidCompound.py
 )
