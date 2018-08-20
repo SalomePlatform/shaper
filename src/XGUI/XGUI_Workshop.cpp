@@ -592,7 +592,6 @@ void XGUI_Workshop::onHelpActionClicked()
 #endif
         QStringList aParams;
         aParams << aDocDir + aSep + aHelpPage;
-        QProcess::startDetached(aBrowserName, aParams);
       }
     }
   }

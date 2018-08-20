@@ -26,30 +26,30 @@ CONFIGURE_FILE(${input} ${output})
 
 #sphinx-build -b html -c doc -D latex_paper_size=a4 -d doc/doctree /dn23/PPGP/vsv/SALOME730/SOURCES/PPGP_SRC/doc doc/html
 
-INSTALL(CODE "
-EXECUTE_PROCESS(
-COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/build_index.py ${CMAKE_CURRENT_BINARY_DIR} ${CMAKE_CURRENT_SOURCE_DIR}
-)
-")
+# INSTALL(CODE "
+# EXECUTE_PROCESS(
+# COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/build_index.py ${CMAKE_CURRENT_BINARY_DIR} ${CMAKE_CURRENT_SOURCE_DIR}
+# )
+# ")
 
 
-INSTALL(CODE "
-EXECUTE_PROCESS(
-COMMAND ${SPHINX_EXECUTABLE} -Q -b html -c ${CMAKE_CURRENT_BINARY_DIR} -d doctree ${CMAKE_CURRENT_BINARY_DIR} html
-WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
-)"
-)
+# INSTALL(CODE "
+# EXECUTE_PROCESS(
+# COMMAND ${SPHINX_EXECUTABLE} -Q -b html -c ${CMAKE_CURRENT_BINARY_DIR} -d doctree ${CMAKE_CURRENT_BINARY_DIR} html
+# WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+# )"
+# )
 
-IF(${HAVE_SALOME})
-    INSTALL(CODE "
-    EXECUTE_PROCESS(
-    COMMAND ${PYTHON_EXECUTABLE} -c \"import shutil;shutil.rmtree('${CMAKE_INSTALL_PREFIX}/share/doc/salome/gui/SHAPER', True);shutil.copytree('${CMAKE_CURRENT_BINARY_DIR}/html', '${CMAKE_INSTALL_PREFIX}/share/doc/salome/gui/SHAPER')\"
-    )
-    ")
-ELSE(${HAVE_SALOME})
-    INSTALL(CODE "
-    EXECUTE_PROCESS(
-    COMMAND ${PYTHON_EXECUTABLE} -c \"import shutil;shutil.rmtree('${CMAKE_INSTALL_PREFIX}/doc/gui', True);shutil.copytree('${CMAKE_CURRENT_BINARY_DIR}/html', '${CMAKE_INSTALL_PREFIX}/doc/gui')\"
-    )
-    ")
-ENDIF(${HAVE_SALOME})
+# IF(${HAVE_SALOME})
+    # INSTALL(CODE "
+    # EXECUTE_PROCESS(
+    # COMMAND ${PYTHON_EXECUTABLE} -c \"import shutil;shutil.rmtree('${CMAKE_INSTALL_PREFIX}/share/doc/salome/gui/SHAPER', True);shutil.copytree('${CMAKE_CURRENT_BINARY_DIR}/html', '${CMAKE_INSTALL_PREFIX}/share/doc/salome/gui/SHAPER')\"
+    # )
+    # ")
+# ELSE(${HAVE_SALOME})
+    # INSTALL(CODE "
+    # EXECUTE_PROCESS(
+    # COMMAND ${PYTHON_EXECUTABLE} -c \"import shutil;shutil.rmtree('${CMAKE_INSTALL_PREFIX}/doc/gui', True);shutil.copytree('${CMAKE_CURRENT_BINARY_DIR}/html', '${CMAKE_INSTALL_PREFIX}/doc/gui')\"
+    # )
+    # ")
+# ENDIF(${HAVE_SALOME})
