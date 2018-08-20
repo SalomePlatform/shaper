@@ -556,8 +556,13 @@ bool XGUI_Displayer::eraseAll(const bool theUpdateViewer)
   bool aErased = false;
   Handle(AIS_InteractiveContext) aContext = AISContext();
   if (!aContext.IsNull()) {
-    foreach (ObjectPtr aObj, myResult2AISObjectMap.objects()) {
+#ifdef OPTIMIZE_PRS
+    foreach(ObjectPtr aObj, myResult2AISObjectMap.objects()) {
       AISObjectPtr aAISObj = myResult2AISObjectMap.value(aObj);
+#else
+    foreach(ObjectPtr aObj, myResult2AISObjectMap.keys()) {
+      AISObjectPtr aAISObj = myResult2AISObjectMap[aObj];
+#endif
       // erase an object
       Handle(AIS_InteractiveObject) anIO = aAISObj->impl<Handle(AIS_InteractiveObject)>();
       if (!anIO.IsNull()) {
@@ -584,7 +589,14 @@ bool XGUI_Displayer::eraseAll(const bool theUpdateViewer)
 //**************************************************************
 AISObjectPtr XGUI_Displayer::getAISObject(ObjectPtr theObject) const
 {
+#ifdef OPTIMIZE_PRS
   return myResult2AISObjectMap.value(theObject);
+#else
+  AISObjectPtr anIO;
+  if (myResult2AISObjectMap.contains(theObject))
+    anIO = myResult2AISObjectMap[theObject];
+  return anIO;
+#endif
 }
 
 //**************************************************************
@@ -597,7 +609,20 @@ ObjectPtr XGUI_Displayer::getObject(const AISObjectPtr& theIO) const
 //**************************************************************
 ObjectPtr XGUI_Displayer::getObject(const Handle(AIS_InteractiveObject)& theIO) const
 {
+#ifdef OPTIMIZE_PRS
   ObjectPtr anObject = myResult2AISObjectMap.value(theIO);
+#else
+  ObjectPtr anObject;
+  ResultToAISMap::const_iterator aMapIter = myResult2AISObjectMap.cbegin();
+  for (; aMapIter != myResult2AISObjectMap.cend(); aMapIter++) {
+    const AISObjectPtr& aAIS = aMapIter.value();
+    Handle(AIS_InteractiveObject) anAIS = aAIS->impl<Handle(AIS_InteractiveObject)>();
+    if (anAIS == theIO)
+      anObject = aMapIter.key();
+    if (anObject.get())
+      break;
+  }
+#endif
   if (!anObject.get()) {
     std::shared_ptr<GeomAPI_AISObject> anAISObj = AISObjectPtr(new GeomAPI_AISObject());
     if (!theIO.IsNull()) {
@@ -860,7 +885,11 @@ void XGUI_Displayer::removeFilters()
 //**************************************************************
 void XGUI_Displayer::showOnly(const QObjectPtrList& theList)
 {
+#ifdef OPTIMIZE_PRS
   QObjectPtrList aDispList = myResult2AISObjectMap.objects();
+#else
+  QObjectPtrList aDispList = myResult2AISObjectMap.keys();
+#endif
   foreach(ObjectPtr aObj, aDispList) {
     if (!theList.contains(aObj))
       erase(aObj, false);
@@ -939,7 +968,11 @@ QColor XGUI_Displayer::setObjectColor(ObjectPtr theObject,
 //**************************************************************
 void XGUI_Displayer::appendResultObject(ObjectPtr theObject, AISObjectPtr theAIS)
 {
+#ifdef OPTIMIZE_PRS
   myResult2AISObjectMap.add(theObject, theAIS);
+#else
+  myResult2AISObjectMap[theObject] = theAIS;
+#endif
 
 #ifdef DEBUG_DISPLAY
   std::ostringstream aPtrStr;
@@ -954,8 +987,13 @@ void XGUI_Displayer::appendResultObject(ObjectPtr theObject, AISObjectPtr theAIS
 std::string XGUI_Displayer::getResult2AISObjectMapInfo() const
 {
   QStringList aContent;
-  foreach (ObjectPtr aObj, myResult2AISObjectMap.objects()) {
+#ifdef OPTIMIZE_PRS
+  foreach(ObjectPtr aObj, myResult2AISObjectMap.objects()) {
     AISObjectPtr aAISObj = myResult2AISObjectMap.value(aObj);
+#else
+  foreach(ObjectPtr aObj, myResult2AISObjectMap.keys()) {
+    AISObjectPtr aAISObj = myResult2AISObjectMap[aObj];
+#endif
     std::ostringstream aPtrStr;
     aPtrStr << "aObj = " << aObj.get() << ":";
     aPtrStr << "anAIS = " << aAISObj.get() << ":";

@@ -53,6 +53,7 @@ class VInspectorAPI_CallBack;
 #endif
 
 
+#ifdef OPTIMIZE_PRS
 class XGUI_TwoSidePresentationMap
 {
 public:
@@ -160,22 +161,23 @@ private:
   QMap<ObjectPtr, Handle(AIS_InteractiveObject)> myResultToAISMap;
   QMap<Handle(AIS_InteractiveObject), ObjectPtr> myAIStoResultMap;
 };
+#endif
 
 
 /**\class XGUI_Displayer
  * \ingroup GUI
  * \brief Displayer. Provides mechanizm of display/erase of objects in the viewer
  */
-class XGUI_EXPORT XGUI_Displayer: public QObject
+class XGUI_EXPORT XGUI_Displayer : public QObject
 {
   Q_OBJECT
- public:
-   /// \enum DisplayMode display mode
-   enum DisplayMode {
-     NoMode = -1, ///< Mode is not defined
-     Wireframe, ///< Wireframe display mode
-     Shading ///< Shading display mode
-   };
+public:
+  /// \enum DisplayMode display mode
+  enum DisplayMode {
+    NoMode = -1, ///< Mode is not defined
+    Wireframe, ///< Wireframe display mode
+    Shading ///< Shading display mode
+  };
 
   /// Constructor
   /// \param theWorkshop a workshop instance
@@ -205,7 +207,7 @@ class XGUI_EXPORT XGUI_Displayer: public QObject
   /// \param theUpdateViewer the parameter whether the viewer should be update immediatelly
   /// \return true if the object visibility state is changed
   bool displayAIS(AISObjectPtr theAIS, const bool toActivateInSelectionModes,
-                  const Standard_Integer theDisplayMode = 0, bool theUpdateViewer = true);
+    const Standard_Integer theDisplayMode = 0, bool theUpdateViewer = true);
 
   /// Redisplay the shape if it was displayed
   /// \param theObject an object instance
@@ -222,7 +224,7 @@ class XGUI_EXPORT XGUI_Displayer: public QObject
   /// \param theValues a list of presentation to be selected
   /// \param theUpdateViewer the parameter whether the viewer should be update immediatelly
   void setSelected(const  QList<std::shared_ptr<ModuleBase_ViewerPrs>>& theValues,
-                   bool theUpdateViewer = true);
+    bool theUpdateViewer = true);
 
   /// Unselect all objects
   /// \param theUpdateViewer the parameter whether the viewer should be update immediatelly
@@ -298,7 +300,7 @@ class XGUI_EXPORT XGUI_Displayer: public QObject
   /// \param theObjList - list of objects which has to be deactivated.
   /// \param theUpdateViewer update viewer flag
   void deactivateObjects(const QObjectPtrList& theObjList,
-                         const bool theUpdateViewer = true);
+    const bool theUpdateViewer = true);
 
   /// Sets display mode for the given object if this object is displayed
   void setDisplayMode(ObjectPtr theObject, DisplayMode theMode, bool theUpdateViewer = true);
@@ -316,13 +318,26 @@ class XGUI_EXPORT XGUI_Displayer: public QObject
   int objectsCount() const { return myResult2AISObjectMap.size(); }
 
   /// Returns list of displayed objects
-  QObjectPtrList displayedObjects() const { return myResult2AISObjectMap.objects(); }
+  QObjectPtrList displayedObjects() const {
+#ifdef OPTIMIZE_PRS
+    return myResult2AISObjectMap.objects();
+#else
+    return myResult2AISObjectMap.keys();
+#endif
+  }
 
   /// Returns list of displayed objects
+#ifdef OPTIMIZE_PRS
   QList<Handle(AIS_InteractiveObject)> displayedPresentations() const
   {
     return myResult2AISObjectMap.presentations();
   }
+#else
+  QList<AISObjectPtr> displayedPresentations() const
+  {
+    return myResult2AISObjectMap.values();
+  }
+#endif
 
   /// Returns true if the given object can be shown in shaded mode
   /// \param theObject object to check
@@ -439,7 +454,12 @@ protected:
   GeomCustomPrsPtr myCustomPrs;
 
   /// Definition of a type of map which defines correspondance between objects and presentations
+#ifdef OPTIMIZE_PRS
   XGUI_TwoSidePresentationMap myResult2AISObjectMap; ///< A map of displayed objects
+#else
+  typedef QMap<ObjectPtr, AISObjectPtr> ResultToAISMap;
+  ResultToAISMap myResult2AISObjectMap; ///< A map of displayed objects
+#endif
 
   /// Number of blocking of the viewer update. The viewer is updated only if it is zero
   int myViewerBlockedRecursiveCount;

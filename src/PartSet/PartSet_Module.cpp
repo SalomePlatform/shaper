@@ -1150,8 +1150,14 @@ void PartSet_Module::onViewTransformed(int theTrsfType)
     SketcherPrs_Tools::setArrowSize(aLen);
     const double aCurScale = aViewer->activeView()->Camera()->Scale();
     aViewer->SetScale(aViewer->activeView(), aCurScale);
+#ifdef OPTIMIZE_PRS
     QList<Handle(AIS_InteractiveObject)> aPrsList = aDisplayer->displayedPresentations();
     foreach(Handle(AIS_InteractiveObject) aAisObj, aPrsList) {
+#else
+    QList<AISObjectPtr> aPrsList = aDisplayer->displayedPresentations();
+    foreach(AISObjectPtr aAIS, aPrsList) {
+      Handle(AIS_InteractiveObject) aAisObj = aAIS->impl<Handle(AIS_InteractiveObject)>();
+#endif
       Handle(AIS_Dimension) aDim = Handle(AIS_Dimension)::DownCast(aAisObj);
       if (!aDim.IsNull()) {
         aDim->DimensionAspect()->ArrowAspect()->SetLength(aLen);
