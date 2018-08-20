@@ -201,4 +201,6 @@ ADD_UNIT_TESTS(TestConstants.py
                Test2413.py
                Test2496.py
                Test2510.py
+               TestFeatureSelection_1.py
+               TestFeatureSelection_2.py
 )

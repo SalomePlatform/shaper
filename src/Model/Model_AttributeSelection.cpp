@@ -448,19 +448,26 @@ ResultPtr Model_AttributeSelection::context()
 
   ResultPtr aResult = std::dynamic_pointer_cast<ModelAPI_Result>(myRef.value());
   // for parts there could be same-data result, so take the last enabled
-  if (aResult.get() && aResult->groupName() == ModelAPI_ResultPart::group()) {
-    int aSize = aResult->document()->size(ModelAPI_ResultPart::group());
-    for(int a = aSize - 1; a >= 0; a--) {
-      ObjectPtr aPart = aResult->document()->object(ModelAPI_ResultPart::group(), a);
-      if (aPart.get() && aPart->data() == aResult->data()) {
-        ResultPtr aPartResult = std::dynamic_pointer_cast<ModelAPI_Result>(aPart);
-        FeaturePtr anOwnerFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(owner());
-        // check that this result is not this-feature result (it is forbidden t oselect itself)
-        if (anOwnerFeature.get() && anOwnerFeature->firstResult() != aPartResult) {
-          return aPartResult;
+  if (aResult.get()) {
+    if(aResult->groupName() == ModelAPI_ResultPart::group()) {
+      int aSize = aResult->document()->size(ModelAPI_ResultPart::group());
+      for(int a = aSize - 1; a >= 0; a--) {
+        ObjectPtr aPart = aResult->document()->object(ModelAPI_ResultPart::group(), a);
+        if(aPart.get() && aPart->data() == aResult->data()) {
+          ResultPtr aPartResult = std::dynamic_pointer_cast<ModelAPI_Result>(aPart);
+          FeaturePtr anOwnerFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(owner());
+          // check that this result is not this-feature result (it is forbidden t oselect itself)
+          if(anOwnerFeature.get() && anOwnerFeature->firstResult() != aPartResult) {
+            return aPartResult;
+          }
         }
       }
     }
+  } else { // if feature - construction is selected, it has only one result, return this result
+    FeaturePtr aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(myRef.value());
+    if (aFeature.get() && aFeature->results().size() == 1 &&
+        aFeature->firstResult()->groupName() == ModelAPI_ResultConstruction::group())
+      return aFeature->firstResult();
   }
   return aResult;
 }
@@ -587,6 +594,10 @@ void Model_AttributeSelection::split(
 
 bool Model_AttributeSelection::update()
 {
+  FeaturePtr aContextFeature = contextFeature();
+  if (aContextFeature.get()) {
+    return true;
+  }
   TDF_Label aSelLab = selectionLabel();
   ResultPtr aContext = context();
   if (!aContext.get())
@@ -824,7 +835,8 @@ std::string Model_AttributeSelection::namingName(const std::string& theDefaultNa
   std::shared_ptr<GeomAPI_Shape> aSubSh = internalValue(aCenterType);
   ResultPtr aCont = context();
 
-  if (!aCont.get()) {
+  if (!aCont.get() ||
+      (aCont->groupName() == ModelAPI_ResultConstruction::group() && contextFeature().get())) {
     // selection of a full feature
     FeaturePtr aFeatureCont = contextFeature();
     if (aFeatureCont.get()) {
