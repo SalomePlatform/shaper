@@ -353,20 +353,22 @@ std::shared_ptr<GeomAPI_Shape> Model_AttributeSelection::internalValue(CenterTyp
       if (aConstr->isInfinite())
         return aResult; // empty result
     }
-    // whole feature
-    FeaturePtr aFeature = contextFeature();
-    if (aFeature.get()) {
-      std::list<GeomShapePtr> allShapes;
-      std::list<ResultPtr>::const_iterator aRes = aFeature->results().cbegin();
-      for (; aRes != aFeature->results().cend(); aRes++) {
-        if (aRes->get() && !(*aRes)->isDisabled()) {
-          GeomShapePtr aShape = (*aRes)->shape();
-          if (aShape.get() && !aShape->isNull()) {
-            allShapes.push_back(aShape);
+    if (!aConstr.get()) { // for construction context, return empty result as usual even
+      // the whole feature is selected
+      FeaturePtr aFeature = contextFeature();
+      if (aFeature.get()) {
+        std::list<GeomShapePtr> allShapes;
+        std::list<ResultPtr>::const_iterator aRes = aFeature->results().cbegin();
+        for (; aRes != aFeature->results().cend(); aRes++) {
+          if (aRes->get() && !(*aRes)->isDisabled()) {
+            GeomShapePtr aShape = (*aRes)->shape();
+            if (aShape.get() && !aShape->isNull()) {
+              allShapes.push_back(aShape);
+            }
           }
         }
+        return GeomAlgoAPI_CompoundBuilder::compound(allShapes);
       }
-      return GeomAlgoAPI_CompoundBuilder::compound(allShapes);
     }
 
     Handle(TNaming_NamedShape) aSelection;
