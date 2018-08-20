@@ -23,6 +23,8 @@
 
 #include "FeaturesPlugin_Boolean.h"
 
+#include <ModelAPI_ResultBody.h>
+
 /// \class FeaturesPlugin_BooleanCommon
 /// \ingroup Plugins
 /// \brief Feature for applying of Boolean Common operation.
@@ -44,10 +46,61 @@ public:
     return MY_KIND;
   }
 
+  /// Attribute name for creation method.
+  inline static const std::string& CREATION_METHOD()
+  {
+    static const std::string MY_CREATION_METHOD_ID("creation_method");
+    return MY_CREATION_METHOD_ID;
+  }
+
+  /// Attribute name for creation method.
+  inline static const std::string& CREATION_METHOD_SIMPLE()
+  {
+    static const std::string MY_CREATION_METHOD_ID("simple");
+    return MY_CREATION_METHOD_ID;
+  }
+
+  /// Attribute name for creation method.
+  inline static const std::string& CREATION_METHOD_ADVANCED()
+  {
+    static const std::string MY_CREATION_METHOD_ID("advanced");
+    return MY_CREATION_METHOD_ID;
+  }
+
+  /// Attribute name of main objects.
+  inline static const std::string& OBJECT_LIST_ID()
+  {
+    static const std::string MY_OBJECT_LIST_ID("main_objects");
+    return MY_OBJECT_LIST_ID;
+  }
+
+  /// Attribute name of tool objects.
+  inline static const std::string& TOOL_LIST_ID()
+  {
+    static const std::string MY_TOOL_LIST_ID("tool_objects");
+    return MY_TOOL_LIST_ID;
+  }
+
+  /// Request for initialization of data model of the feature: adding all attributes.
+  FEATURESPLUGIN_EXPORT virtual void initAttributes();
+
+  /// Creates a new part document if needed.
+  FEATURESPLUGIN_EXPORT virtual void execute();
+
 public:
 
-    /// Use plugin manager for features creation.
-  FeaturesPlugin_BooleanCommon(): FeaturesPlugin_Boolean(BOOL_COMMON) {};
+  /// Use plugin manager for features creation.
+  FeaturesPlugin_BooleanCommon();
+
+private:
+
+  /// Load Naming data structure of the feature to the document
+  void loadNamingDS(ResultBodyPtr theResultBody,
+                    const GeomShapePtr theBaseShape,
+                    const ListOfShape& theTools,
+                    const GeomShapePtr theResultShape,
+                    GeomAlgoAPI_MakeShape& theMakeShape,
+                    GeomAPI_DataMapOfShapeShape& theMapOfShapes);
 
 };
 

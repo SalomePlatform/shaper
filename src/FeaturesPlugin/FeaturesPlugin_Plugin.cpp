@@ -104,6 +104,10 @@ FeaturesPlugin_Plugin::FeaturesPlugin_Plugin()
                               new FeaturesPlugin_ValidatorBooleanFuseSelection);
   aFactory->registerValidator("FeaturesPlugin_ValidatorBooleanFuseArguments",
                               new FeaturesPlugin_ValidatorBooleanFuseArguments);
+  aFactory->registerValidator("FeaturesPlugin_ValidatorBooleanCommonSelection",
+                              new FeaturesPlugin_ValidatorBooleanCommonSelection);
+  aFactory->registerValidator("FeaturesPlugin_ValidatorBooleanCommonArguments",
+                              new FeaturesPlugin_ValidatorBooleanCommonArguments);
 
   // register this plugin
   ModelAPI_Session::get()->registerPlugin(this);

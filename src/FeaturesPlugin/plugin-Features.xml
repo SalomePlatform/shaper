@@ -75,7 +75,7 @@ email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com
       <feature id="Common" title="Common" tooltip="Perform boolean common operation with objects"
                icon="icons/Features/bool_common.png"  helpfile="FeaturesPlugin/commonFeature.html"
                auto_preview="false">
-          <source path="boolean_widget.xml"/>
+          <source path="boolean_common_widget.xml"/>
       </feature>
       <feature id="Smash" title="Smash" tooltip="Perform boolean smash operation with objects"
                icon="icons/Features/bool_smash.png" helpfile="FeaturesPlugin/smashFeature.html"

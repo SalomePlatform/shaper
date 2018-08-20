@@ -22,6 +22,7 @@
 
 #include "FeaturesPlugin_Boolean.h"
 #include "FeaturesPlugin_BooleanFuse.h"
+#include "FeaturesPlugin_BooleanCommon.h"
 #include "FeaturesPlugin_BooleanSmash.h"
 #include "FeaturesPlugin_Union.h"
 
@@ -1508,5 +1509,112 @@ bool FeaturesPlugin_ValidatorBooleanFuseArguments::isNotObligatory(
     return true;
   }
 
+  return false;
+}
+
+//==================================================================================================
+bool FeaturesPlugin_ValidatorBooleanCommonSelection::isValid(
+  const AttributePtr& theAttribute,
+  const std::list<std::string>& theArguments,
+  Events_InfoMessage& theError) const
+{
+  AttributeSelectionListPtr anAttrSelectionList =
+    std::dynamic_pointer_cast<ModelAPI_AttributeSelectionList>(theAttribute);
+  if (!anAttrSelectionList.get()) {
+    theError =
+      "Error: This validator can only work with selection list attributes in \"Boolean\" feature.";
+    return false;
+  }
+
+  for (int anIndex = 0; anIndex < anAttrSelectionList->size(); ++anIndex) {
+    AttributeSelectionPtr anAttrSelection = anAttrSelectionList->value(anIndex);
+    if (!anAttrSelection.get()) {
+      theError = "Error: Empty attribute selection.";
+      return false;
+    }
+    ResultPtr aContext = anAttrSelection->context();
+    if (!aContext.get()) {
+      theError = "Error: Empty selection context.";
+      return false;
+    }
+    ResultConstructionPtr aResultConstruction =
+      std::dynamic_pointer_cast<ModelAPI_ResultConstruction>(aContext);
+    if (aResultConstruction.get()) {
+      if (theAttribute->id() != FeaturesPlugin_BooleanCommon::TOOL_LIST_ID()) {
+        theError = "Error: Result construction not allowed for selection.";
+        return false;
+      }
+    }
+    std::shared_ptr<GeomAPI_Shape> aShape = anAttrSelection->value();
+    GeomShapePtr aContextShape = aContext->shape();
+    if (!aShape.get()) {
+      aShape = aContextShape;
+    }
+    if (!aShape.get()) {
+      theError = "Error: Empty shape.";
+      return false;
+    }
+    if (!aShape->isEqual(aContextShape)) {
+      theError = "Error: Local selection not allowed.";
+      return false;
+    }
+
+    if (aResultConstruction.get() && aShape->shapeType() != GeomAPI_Shape::FACE) {
+      theError = "Error: Result construction should be plane.";
+      return false;
+    }
+  }
+
+  return true;
+}
+
+//=================================================================================================
+bool FeaturesPlugin_ValidatorBooleanCommonArguments::isValid(
+  const std::shared_ptr<ModelAPI_Feature>& theFeature,
+  const std::list<std::string>& theArguments,
+  Events_InfoMessage& theError) const
+{
+  if (theArguments.size() != 2) {
+    theError = "Wrong number of arguments (expected 2).";
+    return false;
+  }
+
+  std::shared_ptr<FeaturesPlugin_BooleanCommon> aFeature =
+    std::dynamic_pointer_cast<FeaturesPlugin_BooleanCommon>(theFeature);
+
+  int anObjectsNb = 0, aToolsNb = 0;
+
+  std::list<std::string>::const_iterator anIt = theArguments.begin(), aLast = theArguments.end();
+
+  bool isAllInSameCompSolid = true;
+  ResultBodyPtr aCompSolid;
+
+  AttributeSelectionListPtr anAttrSelList = theFeature->selectionList(*anIt);
+  if (anAttrSelList) {
+    anObjectsNb = anAttrSelList->size();
+  }
+
+  bool isSimpleMode = aFeature->string(FeaturesPlugin_BooleanCommon::CREATION_METHOD())->value()
+                      == FeaturesPlugin_BooleanCommon::CREATION_METHOD_SIMPLE();
+
+  if (!isSimpleMode) {
+    anAttrSelList = theFeature->selectionList(*anIt);
+    if (anAttrSelList) {
+      aToolsNb = anAttrSelList->size();
+    }
+  }
+
+  if ((isSimpleMode && anObjectsNb < 2)
+      || (!isSimpleMode && (anObjectsNb == 0 || aToolsNb == 0))) {
+    theError = "Not enough arguments for Fuse operation.";
+    return false;
+  }
+}
+
+//=================================================================================================
+bool FeaturesPlugin_ValidatorBooleanCommonArguments::isNotObligatory(
+  std::string theFeature,
+  std::string theAttribute)
+{
   return false;
 }

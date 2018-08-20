@@ -70,6 +70,7 @@ SET(PROJECT_SOURCES
     FeaturesPlugin_Boolean.cpp
     FeaturesPlugin_BooleanCut.cpp
     FeaturesPlugin_BooleanFuse.cpp
+    FeaturesPlugin_BooleanCommon.cpp
     FeaturesPlugin_BooleanSmash.cpp
     FeaturesPlugin_Intersection.cpp
     FeaturesPlugin_Partition.cpp
@@ -108,6 +109,7 @@ SET(XML_RESOURCES
   translation_widget.xml
   boolean_widget.xml
   boolean_fuse_widget.xml
+  boolean_common_widget.xml
   boolean_smash_widget.xml
   recover_widget.xml
   partition_widget.xml

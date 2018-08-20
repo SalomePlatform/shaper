@@ -28,6 +28,17 @@
 
 //=================================================================================================
 GeomAlgoAPI_Boolean::GeomAlgoAPI_Boolean(const GeomShapePtr theObject,
+                                         const GeomShapePtr theTool,
+                                         const OperationType theOperationType)
+{
+  ListOfShape aListWithObject, aListWithTool;
+  aListWithObject.push_back(theObject);
+  aListWithTool.push_back(theTool);
+  build(aListWithObject, aListWithTool, theOperationType);
+}
+
+//=================================================================================================
+GeomAlgoAPI_Boolean::GeomAlgoAPI_Boolean(const GeomShapePtr theObject,
                                          const ListOfShape& theTools,
                                          const OperationType theOperationType)
 {

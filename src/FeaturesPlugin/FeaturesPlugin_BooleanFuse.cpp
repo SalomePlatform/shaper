@@ -58,7 +58,7 @@ void FeaturesPlugin_BooleanFuse::initAttributes()
 //==================================================================================================
 void FeaturesPlugin_BooleanFuse::execute()
 {
-  ListOfShape anObjects, aTools, anEdgesAndFaces, aPlanes;
+  ListOfShape anObjects, aTools, anEdgesAndFaces;
   std::map<std::shared_ptr<GeomAPI_Shape>, ListOfShape> aCompSolidsObjects;
 
   bool isSimpleCreation = false;
@@ -111,12 +111,9 @@ void FeaturesPlugin_BooleanFuse::execute()
     for (int aToolsIndex = 0; aToolsIndex < aToolsSelList->size(); aToolsIndex++) {
       AttributeSelectionPtr aToolAttr = aToolsSelList->value(aToolsIndex);
       GeomShapePtr aTool = aToolAttr->value();
-      if (!aTool.get()) {
-        // It could be a construction plane.
-        ResultPtr aContext = aToolAttr->context();
-        aPlanes.push_back(aToolAttr->context()->shape());
-      } else if (aTool->shapeType() == GeomAPI_Shape::EDGE
-                 || aTool->shapeType() == GeomAPI_Shape::FACE) {
+      if (aTool->shapeType() == GeomAPI_Shape::EDGE
+          || aTool->shapeType() == GeomAPI_Shape::FACE)
+      {
         anEdgesAndFaces.push_back(aTool);
       } else {
         aTools.push_back(aTool);

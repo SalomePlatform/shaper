@@ -43,6 +43,11 @@ public:
 
   /// Constructor.
   GEOMALGOAPI_EXPORT GeomAlgoAPI_Boolean(const GeomShapePtr theObject,
+                                         const GeomShapePtr theTool,
+                                         const OperationType theOperationType);
+
+  /// Constructor.
+  GEOMALGOAPI_EXPORT GeomAlgoAPI_Boolean(const GeomShapePtr theObject,
                                          const ListOfShape& theTools,
                                          const OperationType theOperationType);
 

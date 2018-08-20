@@ -35,11 +35,26 @@ FeaturesAPI_BooleanCommon::FeaturesAPI_BooleanCommon(
 //==================================================================================================
 FeaturesAPI_BooleanCommon::FeaturesAPI_BooleanCommon(
   const std::shared_ptr<ModelAPI_Feature>& theFeature,
+  const std::list<ModelHighAPI_Selection>& theMainObjects)
+: ModelHighAPI_Interface(theFeature)
+{
+  if(initialize()) {
+    fillAttribute(FeaturesPlugin_BooleanCommon::CREATION_METHOD_SIMPLE(), mycreationMethod);
+    fillAttribute(theMainObjects, mymainObjects);
+
+    execute(false);
+  }
+}
+
+//==================================================================================================
+FeaturesAPI_BooleanCommon::FeaturesAPI_BooleanCommon(
+  const std::shared_ptr<ModelAPI_Feature>& theFeature,
   const std::list<ModelHighAPI_Selection>& theMainObjects,
   const std::list<ModelHighAPI_Selection>& theToolObjects)
 : ModelHighAPI_Interface(theFeature)
 {
   if(initialize()) {
+    fillAttribute(FeaturesPlugin_BooleanCommon::CREATION_METHOD_ADVANCED(), mycreationMethod);
     fillAttribute(theMainObjects, mymainObjects);
     fillAttribute(theToolObjects, mytoolObjects);
 
@@ -66,7 +81,20 @@ void FeaturesAPI_BooleanCommon::setMainObjects(
 void FeaturesAPI_BooleanCommon::setToolObjects(
   const std::list<ModelHighAPI_Selection>& theToolObjects)
 {
+  fillAttribute(FeaturesPlugin_BooleanCommon::CREATION_METHOD_ADVANCED(), mycreationMethod);
   fillAttribute(theToolObjects, mytoolObjects);
+
+  execute();
+}
+
+//==================================================================================================
+void FeaturesAPI_BooleanCommon::setAdvancedMode(const bool theMode)
+{
+  if (theMode) {
+    fillAttribute(FeaturesPlugin_BooleanCommon::CREATION_METHOD_ADVANCED(), mycreationMethod);
+  } else {
+    fillAttribute(FeaturesPlugin_BooleanCommon::CREATION_METHOD_SIMPLE(), mycreationMethod);
+  }
 
   execute();
 }
@@ -79,12 +107,27 @@ void FeaturesAPI_BooleanCommon::dump(ModelHighAPI_Dumper& theDumper) const
   theDumper << aBase << " = model.addCommon";
 
   const std::string& aDocName = theDumper.name(aBase->document());
+  AttributeStringPtr aMode = aBase->string(FeaturesPlugin_BooleanCommon::CREATION_METHOD());
   AttributeSelectionListPtr anObjects =
     aBase->selectionList(FeaturesPlugin_BooleanCommon::OBJECT_LIST_ID());
   AttributeSelectionListPtr aTools =
     aBase->selectionList(FeaturesPlugin_BooleanCommon::TOOL_LIST_ID());
 
-  theDumper << "(" << aDocName << ", " << anObjects << ", " << aTools << ")" << std::endl;
+  theDumper << "(" << aDocName << ", " << anObjects;
+
+  if (aMode->value() == FeaturesPlugin_BooleanCommon::CREATION_METHOD_ADVANCED()) {
+    theDumper << ", " << aTools;
+  }
+
+  theDumper << ")" << std::endl;
+}
+
+//==================================================================================================
+BooleanCommonPtr addCommon(const std::shared_ptr<ModelAPI_Document>& thePart,
+                           const std::list<ModelHighAPI_Selection>& theMainObjects)
+{
+  std::shared_ptr<ModelAPI_Feature> aFeature = thePart->addFeature(FeaturesAPI_BooleanCommon::ID());
+  return BooleanCommonPtr(new FeaturesAPI_BooleanCommon(aFeature, theMainObjects));
 }
 
 //==================================================================================================

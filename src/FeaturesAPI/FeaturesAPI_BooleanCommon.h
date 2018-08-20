@@ -41,6 +41,11 @@ public:
   FEATURESAPI_EXPORT
   explicit FeaturesAPI_BooleanCommon(const std::shared_ptr<ModelAPI_Feature>& theFeature);
 
+    /// Constructor with values.
+  FEATURESAPI_EXPORT
+  FeaturesAPI_BooleanCommon(const std::shared_ptr<ModelAPI_Feature>& theFeature,
+                            const std::list<ModelHighAPI_Selection>& theMainObjects);
+
   /// Constructor with values.
   FEATURESAPI_EXPORT
   FeaturesAPI_BooleanCommon(const std::shared_ptr<ModelAPI_Feature>& theFeature,
@@ -51,7 +56,9 @@ public:
   FEATURESAPI_EXPORT
   virtual ~FeaturesAPI_BooleanCommon();
 
-  INTERFACE_2(FeaturesPlugin_BooleanCommon::ID(),
+  INTERFACE_3(FeaturesPlugin_BooleanCommon::ID(),
+              creationMethod, FeaturesPlugin_BooleanCommon::CREATION_METHOD(),
+              ModelAPI_AttributeString, /** Creation method */,
               mainObjects, FeaturesPlugin_BooleanCommon::OBJECT_LIST_ID(),
               ModelAPI_AttributeSelectionList, /** Main objects */,
               toolObjects, FeaturesPlugin_BooleanCommon::TOOL_LIST_ID(),
@@ -65,6 +72,10 @@ public:
   FEATURESAPI_EXPORT
   void setToolObjects(const std::list<ModelHighAPI_Selection>& theToolObjects);
 
+  /// Set mode.
+  FEATURESAPI_EXPORT
+  void setAdvancedMode(const bool theMode);
+
   /// Dump wrapped feature
   FEATURESAPI_EXPORT
   virtual void dump(ModelHighAPI_Dumper& theDumper) const;
@@ -72,6 +83,12 @@ public:
 
 /// Pointer on Boolean object.
 typedef std::shared_ptr<FeaturesAPI_BooleanCommon> BooleanCommonPtr;
+
+/// \ingroup CPPHighAPI
+/// \brief Create Boolean Common feature.
+FEATURESAPI_EXPORT
+BooleanCommonPtr addCommon(const std::shared_ptr<ModelAPI_Document>& thePart,
+                           const std::list<ModelHighAPI_Selection>& theMainObjects);
 
 /// \ingroup CPPHighAPI
 /// \brief Create Boolean Common feature.
