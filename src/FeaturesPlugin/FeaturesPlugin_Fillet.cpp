@@ -112,8 +112,16 @@ void FeaturesPlugin_Fillet::execute()
       return;
 
     ResultPtr aContext = anObjectAttr->context();
-    ResultBodyPtr aCtxOwner = ModelAPI_Tools::bodyOwner(aContext);
-    GeomShapePtr aParent = aCtxOwner ? aCtxOwner->shape() : aContext->shape();
+    GeomShapePtr aParent;
+    if (aContext.get()) {
+      ResultBodyPtr aCtxOwner = ModelAPI_Tools::bodyOwner(aContext);
+      aParent = aCtxOwner ? aCtxOwner->shape() : aContext->shape();
+    } else { // get it from a feature
+      FeaturePtr aFeature = anObjectAttr->contextFeature();
+      if (aFeature.get()) {
+        aParent = aFeature->firstResult()->shape();
+      }
+    }
     if (!aParent)
       return;
 

@@ -588,7 +588,7 @@ bool FeaturesPlugin_ValidatorBooleanSelection::isValid(const AttributePtr& theAt
     ResultPtr aContext = anAttrSelection->context();
     if(!aContext.get()) {
       FeaturePtr aContFeat = anAttrSelection->contextFeature();
-      if (!aContFeat.get()) {
+      if (!aContFeat.get() || !aContFeat->results().size()) {
         theError = "Error: Empty selection context.";
         return false;
       }
@@ -603,7 +603,7 @@ bool FeaturesPlugin_ValidatorBooleanSelection::isValid(const AttributePtr& theAt
       }
     }
     std::shared_ptr<GeomAPI_Shape> aShape = anAttrSelection->value();
-    if(!aShape.get()) {
+    if(!aShape.get() && aContext.get()) {
       GeomShapePtr aContextShape = aContext->shape();
       aShape = aContextShape;
     }
@@ -676,8 +676,18 @@ bool FeaturesPlugin_ValidatorFilletSelection::isValid(const AttributePtr& theAtt
     }
     ResultPtr aContext = anAttrSelection->context();
     if(!aContext.get()) {
-      theError = "Error: Empty selection context.";
-      return false;
+      FeaturePtr aContFeat = anAttrSelection->contextFeature();
+      if (!aContFeat.get() || !aContFeat->results().size() ||
+          aContFeat->firstResult()->groupName() != ModelAPI_ResultBody::group()) {
+        theError = "Error: Empty selection context.";
+        return false;
+      }
+      if (aContFeat->results().size() == 1)
+        aContext = aContFeat->firstResult();
+      else {
+        theError = "Error: Too many shapes selected.";
+        return false;
+      }
     }
 
     ResultBodyPtr aContextOwner = ModelAPI_Tools::bodyOwner(aContext);
@@ -685,7 +695,7 @@ bool FeaturesPlugin_ValidatorFilletSelection::isValid(const AttributePtr& theAtt
 
     if (anOwner->shapeType() != GeomAPI_Shape::SOLID &&
         anOwner->shapeType() != GeomAPI_Shape::COMPSOLID) {
-      theError = "Error: Not all selected shapes are sub-shapes of solids";
+      theError = "Error: Not all selected shapes are sub-shapes of solids.";
       return false;
     }
 
@@ -1233,9 +1243,13 @@ bool FeaturesPlugin_ValidatorBooleanSmashSelection::isValid(
       return false;
     }
     ResultPtr aContext = anAttrSelection->context();
-    if (!aContext.get()) {
-      theError = "Error: Empty selection context.";
-      return false;
+    if(!aContext.get()) {
+      FeaturePtr aContFeat = anAttrSelection->contextFeature();
+      if (!aContFeat.get() || !aContFeat->results().size() ||
+          aContFeat->firstResult()->groupName() != ModelAPI_ResultBody::group()) {
+        theError = "Error: Empty selection context.";
+        return false;
+      }
     }
     ResultConstructionPtr aResultConstruction =
       std::dynamic_pointer_cast<ModelAPI_ResultConstruction>(aContext);
@@ -1325,11 +1339,16 @@ bool FeaturesPlugin_IntersectionSelection::isValid(const AttributePtr& theAttrib
       return false;
     }
     ResultPtr aContext = anAttrSelection->context();
-    if (!aContext.get()) {
-      theError = "Error: empty selection context.";
-      return false;
+    if(!aContext.get()) {
+      FeaturePtr aContFeat = anAttrSelection->contextFeature();
+      if (!aContFeat.get() || !aContFeat->results().size() ||
+          aContFeat->firstResult()->groupName() != ModelAPI_ResultBody::group()) {
+        theError = "Error: Empty selection context.";
+        return false;
+      }
     }
-    FeaturePtr aFeature = ModelAPI_Feature::feature(aContext);
+    FeaturePtr aFeature = anAttrSelection->contextFeature().get() ?
+      anAttrSelection->contextFeature() : ModelAPI_Feature::feature(aContext);
     if (!aFeature.get()) {
       theError = "Error: empty feature.";
       return false;
@@ -1343,15 +1362,15 @@ bool FeaturesPlugin_IntersectionSelection::isValid(const AttributePtr& theAttrib
       return false;
     }
     std::shared_ptr<GeomAPI_Shape> aShape = anAttrSelection->value();
-    GeomShapePtr aContextShape = aContext->shape();
     if (!aShape.get()) {
+      GeomShapePtr aContextShape = aContext->shape();
       aShape = aContextShape;
     }
     if (!aShape.get()) {
       theError = "Error: empty shape.";
       return false;
     }
-    if (!aShape->isEqual(aContextShape)) {
+    if (aContext.get() && !aShape->isEqual(aContext->shape())) {
       theError = "Error: Local selection not allowed.";
       return false;
     }
@@ -1392,9 +1411,13 @@ bool FeaturesPlugin_ValidatorBooleanFuseSelection::isValid(
       return false;
     }
     ResultPtr aContext = anAttrSelection->context();
-    if (!aContext.get()) {
-      theError = "Error: Empty selection context.";
-      return false;
+    if(!aContext.get()) {
+      FeaturePtr aContFeat = anAttrSelection->contextFeature();
+      if (!aContFeat.get() || !aContFeat->results().size() ||
+          aContFeat->firstResult()->groupName() != ModelAPI_ResultBody::group()) {
+        theError = "Error: Empty selection context.";
+        return false;
+      }
     }
     ResultConstructionPtr aResultConstruction =
       std::dynamic_pointer_cast<ModelAPI_ResultConstruction>(aContext);
@@ -1403,15 +1426,15 @@ bool FeaturesPlugin_ValidatorBooleanFuseSelection::isValid(
       return false;
     }
     std::shared_ptr<GeomAPI_Shape> aShape = anAttrSelection->value();
-    GeomShapePtr aContextShape = aContext->shape();
     if (!aShape.get()) {
+      GeomShapePtr aContextShape = aContext->shape();
       aShape = aContextShape;
     }
     if (!aShape.get()) {
       theError = "Error: Empty shape.";
       return false;
     }
-    if (!aShape->isEqual(aContextShape)) {
+    if (aContext.get() && !aShape->isEqual(aContext->shape())) {
       theError = "Error: Local selection not allowed.";
       return false;
     }
