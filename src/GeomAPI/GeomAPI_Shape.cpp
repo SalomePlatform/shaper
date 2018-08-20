@@ -568,6 +568,8 @@ bool GeomAPI_Shape::computeSize(double& theXmin, double& theYmin, double& theZmi
     return false;
   Bnd_Box aBndBox;
   BRepBndLib::Add(aShape, aBndBox);
+  if (aBndBox.IsVoid())
+    return false;
   aBndBox.Get(theXmin, theYmin, theZmin, theXmax, theYmax, theZmax);
   return true;
 }

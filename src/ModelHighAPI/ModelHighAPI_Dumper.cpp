@@ -51,6 +51,7 @@
 #include <ModelAPI_ResultBody.h>
 #include <ModelAPI_ResultConstruction.h>
 #include <ModelAPI_ResultPart.h>
+#include <ModelAPI_Session.h>
 #include <ModelAPI_Tools.h>
 
 #include <ModelGeomAlgo_Shape.h>
@@ -961,16 +962,64 @@ static int possibleSelectionsByPoint(const GeomPointPtr& thePoint,
     ++aFIt;
   }
 
-  ResultPtr aResult;
-  GeomShapePtr aSubshape;
+  // collect the list of composite features, containing the last feature;
+  // these features should be excluded from searching,
+  // because the feature cannot select sub-shapes from its parent
+  std::set<CompositeFeaturePtr> aEndFeatureParents;
+  for (FeaturePtr aCurFeat = theEndFeature; aCurFeat;) {
+    CompositeFeaturePtr aFoundComposite;
+    const std::set<AttributePtr>& aRefs = aCurFeat->data()->refsToMe();
+    for (std::set<AttributePtr>::const_iterator anIt = aRefs.begin();
+         anIt != aRefs.end(); ++anIt) {
+      FeaturePtr aF = ModelAPI_Feature::feature((*anIt)->owner());
+      aFoundComposite = std::dynamic_pointer_cast<ModelAPI_CompositeFeature>(aF);
+      if (aFoundComposite && aFoundComposite->isSub(aCurFeat))
+        break;
+      else
+        aFoundComposite = CompositeFeaturePtr();
+    }
+
+    if (aFoundComposite) {
+      aEndFeatureParents.insert(aFoundComposite);
+      aCurFeat = aFoundComposite;
+    }
+    else {
+      // add the part containing high-level feature
+      SessionPtr aSession = ModelAPI_Session::get();
+      DocumentPtr aPartSetDoc = aSession->moduleDocument();
+      std::list<FeaturePtr> aPartSetFeatures = aPartSetDoc->allFeatures();
+      for (std::list<FeaturePtr>::const_iterator anIt = aPartSetFeatures.begin();
+           anIt != aPartSetFeatures.end(); ++anIt) {
+        aFoundComposite = std::dynamic_pointer_cast<ModelAPI_CompositeFeature>(*anIt);
+        if (aFoundComposite && aFoundComposite->isSub(aCurFeat)) {
+          aEndFeatureParents.insert(aFoundComposite);
+          break;
+        }
+      }
+
+      aCurFeat = FeaturePtr();
+    }
+  }
+
   int aNbPossibleSelections = 0;
   for (; aFIt != aFeatures.end() && *aFIt != theEndFeature; ++aFIt) {
+    bool isSkipFeature = false;
     if (aLastCompositeFeature && aLastCompositeFeature->isSub(*aFIt))
-      continue;
+      isSkipFeature = true;
     CompositeFeaturePtr aCompFeat = std::dynamic_pointer_cast<ModelAPI_CompositeFeature>(*aFIt);
-    if (aCompFeat)
+    if (aCompFeat) {
       aLastCompositeFeature = aCompFeat;
+      if (aEndFeatureParents.find(aLastCompositeFeature) != aEndFeatureParents.end()) {
+        // do not process the parent for the last feature,
+        // because it cannot select objects from its parent
+        isSkipFeature = true;
+      }
+    }
+    if (isSkipFeature)
+      continue;
 
+    ResultPtr aResult;
+    GeomShapePtr aSubshape;
     if (ModelGeomAlgo_Shape::findSubshapeByPoint(*aFIt, thePoint, theType, aResult, aSubshape))
       ++aNbPossibleSelections;
   }
@@ -1011,6 +1060,13 @@ ModelHighAPI_Dumper& ModelHighAPI_Dumper::operator<<(
 
   myDumpBuffer << "\"" << aShape->shapeTypeStr();
   if (isDumpByGeom) {
+    // check the selected item is a ResultPart;
+    // in this case it is necessary to get shape with full transformation
+    // for correct calculation of the middle point
+    ResultPartPtr aResPart =
+        std::dynamic_pointer_cast<ModelAPI_ResultPart>(theAttrSelect->context());
+    if (aResPart)
+      aShape = aResPart->shape();
     GeomPointPtr aMiddlePoint = aShape->middlePoint();
     // calculate number of features, which could be selected by the same point
     FeaturePtr anOwner = ModelAPI_Feature::feature(theAttrSelect->owner());

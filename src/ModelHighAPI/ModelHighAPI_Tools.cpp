@@ -305,6 +305,13 @@ GeomAPI_Shape::ShapeType getShapeType(const ModelHighAPI_Selection& theSelection
       aShapeType = shapeTypeByStr(aType);
       break;
     }
+    case ModelHighAPI_Selection::VT_TypeInnerPointPair: {
+      TypeInnerPointPair aPair = theSelection.typeInnerPointPair();
+      std::string aType = aPair.first;
+      aType = aType.substr(0, aType.find_first_of('_'));
+      aShapeType = shapeTypeByStr(aType);
+      break;
+    }
   }
 
   return aShapeType;

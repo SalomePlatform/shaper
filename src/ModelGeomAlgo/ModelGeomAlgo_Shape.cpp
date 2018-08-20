@@ -22,8 +22,10 @@
 
 #include "ModelGeomAlgo_Shape.h"
 
+#include <ModelAPI_CompositeFeature.h>
 #include <ModelAPI_Feature.h>
 #include <ModelAPI_Result.h>
+#include <ModelAPI_ResultCompSolid.h>
 #include <ModelAPI_ResultConstruction.h>
 
 #include <GeomAPI_PlanarEdges.h>
@@ -57,8 +59,8 @@ namespace ModelGeomAlgo_Shape
                               const double theTolerance)
   {
     double aXMin, aXMax, aYMin, aYMax, aZMin, aZMax;
-    theShape->computeSize(aXMin, aYMin, aZMin, aXMax, aYMax, aZMax);
-    return thePoint->x() >= aXMin - theTolerance && thePoint->x() <= aXMax + theTolerance &&
+    return theShape->computeSize(aXMin, aYMin, aZMin, aXMax, aYMax, aZMax) &&
+           thePoint->x() >= aXMin - theTolerance && thePoint->x() <= aXMax + theTolerance &&
            thePoint->y() >= aYMin - theTolerance && thePoint->y() <= aYMax + theTolerance &&
            thePoint->z() >= aZMin - theTolerance && thePoint->z() <= aZMax + theTolerance;
   }
@@ -71,8 +73,9 @@ namespace ModelGeomAlgo_Shape
   {
     std::list<GeomShapePtr> aSubs = theShape->subShapes(theType);
     for (std::list<GeomShapePtr>::const_iterator aSubIt = aSubs.begin();
-      aSubIt != aSubs.end(); ++aSubIt) {
-      if ((*aSubIt)->middlePoint()->distance(thePoint) < theTolerance)
+         aSubIt != aSubs.end(); ++aSubIt) {
+      GeomPointPtr aMiddlePoint = (*aSubIt)->middlePoint();
+      if (aMiddlePoint && aMiddlePoint->distance(thePoint) < theTolerance)
         return *aSubIt;
     }
 
@@ -89,6 +92,7 @@ namespace ModelGeomAlgo_Shape
     static const double TOLERANCE = 1.e-7;
 
     theResult = ResultPtr();
+    theSubshape = GeomShapePtr();
     const std::list<ResultPtr>& aResults = theFeature->results();
     for (std::list<ResultPtr>::const_iterator aResIt = aResults.begin();
          aResIt != aResults.end(); ++aResIt) {
@@ -101,11 +105,31 @@ namespace ModelGeomAlgo_Shape
       // (it will be processed later)
       std::shared_ptr<GeomAPI_PlanarEdges> aSketchEdges =
           std::dynamic_pointer_cast<GeomAPI_PlanarEdges>(aCurShape);
-      if (theShapeType != GeomAPI_Shape::COMPOUND || !aSketchEdges)
-        theSubshape = findSubShape(aCurShape, theShapeType, thePoint, TOLERANCE);
-      if (theSubshape) {
-        theResult = *aResIt;
-        break;
+      if (theShapeType != GeomAPI_Shape::COMPOUND || !aSketchEdges) {
+        ResultCompSolidPtr aCompSolid =
+            std::dynamic_pointer_cast<ModelAPI_ResultCompSolid>(*aResIt);
+        if (aCompSolid) {
+          // process solids
+          int aNbSolids = aCompSolid->numberOfSubs();
+          for (int i = 0; i < aNbSolids && !theSubshape; ++i) {
+            ResultPtr aSubResult = aCompSolid->subResult(i);
+            GeomShapePtr aSubSolid = aSubResult->shape();
+            if (aSubSolid && isPointWithinBB(thePoint, aSubSolid, TOLERANCE)) {
+              theSubshape = findSubShape(aSubSolid, theShapeType, thePoint, TOLERANCE);
+              if (theSubshape)
+                theResult = aSubResult;
+            }
+          }
+          if (theSubshape)
+            break;
+        }
+
+        if (!theSubshape)
+          theSubshape = findSubShape(aCurShape, theShapeType, thePoint, TOLERANCE);
+        if (theSubshape) {
+          theResult = *aResIt;
+          break;
+        }
       }
 
       // special case for ResultConstruction if the FACE is selected
@@ -136,6 +160,34 @@ namespace ModelGeomAlgo_Shape
         theResult = *aResIt;
         theSubshape = GeomShapePtr();
         break;
+      }
+    }
+
+    // one more special case: a vertex selected is a sketch point;
+    // it is not included into sketch result; thus, it is necessary
+    // to pass through the sketch sub-features and verify all points
+    if (!theResult && theShapeType == GeomAPI_Shape::VERTEX && !aResults.empty()) {
+      CompositeFeaturePtr aCF = std::dynamic_pointer_cast<ModelAPI_CompositeFeature>(theFeature);
+      std::shared_ptr<GeomAPI_PlanarEdges> aSketchEdges =
+          std::dynamic_pointer_cast<GeomAPI_PlanarEdges>(aResults.front()->shape());
+
+      if (aSketchEdges && aCF) {
+        bool isContinue = true;
+        int aNbSubs = aCF->numberOfSubs();
+        for (int aSubInd = 0; aSubInd < aNbSubs && isContinue; ++aSubInd) {
+          FeaturePtr aSub = aCF->subFeature(aSubInd);
+          const std::list<ResultPtr>& aSubResults = aSub->results();
+          for (std::list<ResultPtr>::const_iterator aSRIt = aSubResults.begin();
+               aSRIt != aSubResults.end(); ++aSRIt) {
+            GeomShapePtr aCurShape = (*aSRIt)->shape();
+            theSubshape = findSubShape(aCurShape, theShapeType, thePoint, TOLERANCE);
+            if (theSubshape) {
+              theResult = aResults.front();
+              isContinue = false;
+              break;
+            }
+          }
+        }
       }
     }
 
