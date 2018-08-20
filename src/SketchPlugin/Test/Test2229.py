@@ -38,6 +38,6 @@ SketchConstraintVertical_1 = Sketch_1.setVertical(SketchLine_2.result())
 SketchConstraintDistance_1 = Sketch_1.setDistance(SketchPoint_1.coordinates(), SketchLine_2.result(), "Wall_R+Wall_T1")
 model.end()
 
-# check that resulting sketch is valid
+# check that resulting sketch is not valid (since PlanGCS 0.18)
 aFactory = ModelAPI_Session.get().validators()
-assert(aFactory.validate(Sketch_1.feature()))
+assert(aFactory.validate(Sketch_1.feature()) == False)

@@ -92,10 +92,10 @@ model.do()
 from GeomAPI import *
 
 # check fillings
-REF_DATA = [(Filling_1, 718.953888643813570524798706174),
-            (Filling_2, 910.698815675366518007649574429),
-            (Filling_3, 718.953684242875738164002541453),
-            (Filling_4, 910.697703817550063831731677055)]
+REF_DATA = [(Filling_1, 719.149788883378505488508380949),
+            (Filling_2, 910.894041506332769131404347718),
+            (Filling_3, 719.149788883378505488508380949),
+            (Filling_4, 910.894530912501409147807862610)]
 for ref in REF_DATA:
     model.testNbResults(ref[0], 1)
     model.testNbSubResults(ref[0], [0])
