@@ -200,30 +200,39 @@ void FeaturesPlugin_BooleanSmash::execute()
   aMapOfShapes.merge(aBoolAlgo->mapOfSubShapes());
 
   // Put all (cut result, tools and not used solids) to PaveFiller.
-  aShapesToAdd.push_back(aBoolAlgo->shape());
+  GeomShapePtr aShape = aBoolAlgo->shape();
+  GeomAPI_ShapeIterator anIt(aShape);
+  if (anIt.more() || aShape->shapeType() == GeomAPI_Shape::VERTEX) {
+    aShapesToAdd.push_back(aShape);
+  }
   aShapesToAdd.insert(aShapesToAdd.end(), aTools.begin(), aTools.end());
 
-  std::shared_ptr<GeomAlgoAPI_PaveFiller> aFillerAlgo(
-    new GeomAlgoAPI_PaveFiller(aShapesToAdd, true));
-  if (!aFillerAlgo->isDone()) {
-    std::string aFeatureError = "Error: PaveFiller algorithm failed.";
-    setError(aFeatureError);
-    return;
+  if (aShapesToAdd.size() == 1) {
+    aShape = aShapesToAdd.front();
   }
-  if (aFillerAlgo->shape()->isNull()) {
-    static const std::string aShapeError = "Error: Resulting shape is Null.";
-    setError(aShapeError);
-    return;
-  }
-  if (!aFillerAlgo->isValid()) {
-    std::string aFeatureError = "Error: Resulting shape is not valid.";
-    setError(aFeatureError);
-    return;
-  }
+  else {
+    std::shared_ptr<GeomAlgoAPI_PaveFiller> aFillerAlgo(
+      new GeomAlgoAPI_PaveFiller(aShapesToAdd, true));
+    if (!aFillerAlgo->isDone()) {
+      std::string aFeatureError = "Error: PaveFiller algorithm failed.";
+      setError(aFeatureError);
+      return;
+    }
+    if (aFillerAlgo->shape()->isNull()) {
+      static const std::string aShapeError = "Error: Resulting shape is Null.";
+      setError(aShapeError);
+      return;
+    }
+    if (!aFillerAlgo->isValid()) {
+      std::string aFeatureError = "Error: Resulting shape is not valid.";
+      setError(aFeatureError);
+      return;
+    }
 
-  std::shared_ptr<GeomAPI_Shape> aShape = aFillerAlgo->shape();
-  aMakeShapeList.appendAlgo(aFillerAlgo);
-  aMapOfShapes.merge(aFillerAlgo->mapOfSubShapes());
+    aShape = aFillerAlgo->shape();
+    aMakeShapeList.appendAlgo(aFillerAlgo);
+    aMapOfShapes.merge(aFillerAlgo->mapOfSubShapes());
+  }
 
   std::shared_ptr<GeomAPI_Shape> aFrontShape = anOriginalShapes.front();
   anOriginalShapes.pop_front();
@@ -251,7 +260,9 @@ void FeaturesPlugin_BooleanSmash::loadNamingDS(ResultBodyPtr theResultBody,
                                              GeomAPI_DataMapOfShapeShape& theMapOfShapes)
 {
   //load result
-  if(theBaseShape->isEqual(theResultShape)) {
+  if (theBaseShape->isEqual(theResultShape)) {
+    theResultBody->store(theResultShape, false);
+  } else if (theResultShape->isEqual(theTools.front())) {
     theResultBody->store(theResultShape, false);
   } else {
     const int aModifyVTag = 1;
