@@ -21,7 +21,7 @@ email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com
 
 <source>
   <multi_selector id="main_objects"
-    label="Main objects"
+    label="Objects"
     icon="icons/Features/cut_shape.png"
     tooltip="Select objects(compounds, compsolids, solids, shells, faces or edges)"
     type_choice="edges faces shells solids compsolids compounds"
