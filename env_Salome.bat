@@ -1,6 +1,6 @@
 @echo off
 
-IF NOT EXIST "%VS100COMNTOOLS%..\..\VC\vcvarsall.bat" GOTO ERROR1
+IF NOT EXIST "%VS140COMNTOOLS%..\..\VC\vcvarsall.bat" GOTO ERROR1
 
 @REM Load local settings from file localenv.bat that should be located in the root directory
 if "%ROOT_DIR%" == "" (
@@ -24,7 +24,7 @@ if "%SOLVESPACE_ROOT_DIR%" == "" (
 SET PATH=%SOLVESPACE_ROOT_DIR%\lib;%PATH%
 
 if "%PLANEGCS_ROOT_DIR%" == "" (
-  SET PLANEGCS_ROOT_DIR=%SALOME_ROOT_DIR%\PRODUCTS%OCC_LIB_PREFIX%\planegcs-0.16
+  SET PLANEGCS_ROOT_DIR=%SALOME_ROOT_DIR%\PRODUCTS%OCC_LIB_PREFIX%\planegcs-0.18
 )
 SET PATH=%PLANEGCS_ROOT_DIR%\lib;%PATH%
 
@@ -34,9 +34,9 @@ if "%EIGEN_ROOT_DIR%" == "" (
 
 if "%BOOST_ROOT_DIR%" == "" (
   if "SALOME_ROOT_DIR" == "" (
-    SET BOOST_ROOT_DIR=%ROOT_DIR%\products\boost-1.52.0
+    SET BOOST_ROOT_DIR=%ROOT_DIR%\products\boost-1.67.0
   ) else (
-    SET BOOST_ROOT_DIR=%SALOME_ROOT_DIR%\PRODUCTS%OCC_LIB_PREFIX%\boost-1.52.0
+    SET BOOST_ROOT_DIR=%SALOME_ROOT_DIR%\PRODUCTS%OCC_LIB_PREFIX%\boost-1.67.0
   )
 )
 
@@ -53,8 +53,8 @@ cd /d %ROOT_DIR%
 
 @REM -------------------------
 @REM CASCADE
-@SET PATH=%CASROOT%;%CASROOT%\win32\bin%OCC_LIB_PREFIX%;%PATH%
-@SET LIB=%CASROOT%\win32\lib%OCC_LIB_PREFIX%;%LIB%
+@SET PATH=%CASROOT%;%CASROOT%\win64\vc14\bin%OCC_LIB_PREFIX%;%PATH%
+@SET LIB=%CASROOT%\win64\vc14\lib%OCC_LIB_PREFIX%;%LIB%
 @set CSF_MDTVFontDirectory=%CASROOT%\src\FontMFT
 @set CSF_LANGUAGE=us
 @set MMGT_CLEAR=1
@@ -78,10 +78,9 @@ cd /d %ROOT_DIR%
 @SET PYTHON_INCLUDE=%PYTHONHOME%\include
 @REM -------------------------
 
-
 @REM -------------------------
 @REM Some OCCT headers include FREETYPE headers
-@SET FREETYPE_ROOT_DIR=%PDIR%\freetype-2.4.11
+@SET FREETYPE_ROOT_DIR=%PDIR%\freetype-2.9.0
 @REM -------------------------
 
 @SET PATH=%GEOM_ROOT_DIR%\lib\salome;%PATH%
@@ -89,10 +88,10 @@ cd /d %ROOT_DIR%
 @SET _NO_DEBUG_HEAP=1
 
 IF "%ARCH%" == "Win64" (
-  call "%VS100COMNTOOLS%..\..\VC\vcvarsall.bat" x64
+  call "%VS140COMNTOOLS%..\..\VC\vcvarsall.bat" x64
 ) ELSE (
   IF "%ARCH%" == "Win32" (
-    call "%VS100COMNTOOLS%..\..\VC\vcvarsall.bat" x86
+    call "%VS140COMNTOOLS%..\..\VC\vcvarsall.bat" x86
   ) ELSE (
     echo Wrong architecture is used. Win32 or Win64 architecture is allowed only.
     echo Refer to the set_env.bat script.

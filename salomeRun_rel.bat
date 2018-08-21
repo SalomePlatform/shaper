@@ -1,5 +1,12 @@
 @ECHO OFF
 
+REM Find absolute path to ROOT_DIR
+@SET PARENT_DIR=%~dp0..
+@SET ROOT_DIR=
+pushd %PARENT_DIR%\..
+@SET ROOT_DIR=%CD%
+popd
+
 call env_Salome.bat
 
 @SET SHAPER_ROOT_DIR=%ROOT_DIR%\install

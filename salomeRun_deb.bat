@@ -1,5 +1,12 @@
 @ECHO OFF
 
+REM Find absolute path to ROOT_DIR
+@SET PARENT_DIR=%~dp0..
+@SET ROOT_DIR=
+pushd %PARENT_DIR%\..
+@SET ROOT_DIR=%CD%
+popd
+
 @SET OCC_LIB_PREFIX=d
 call env_Salome.bat d
 
