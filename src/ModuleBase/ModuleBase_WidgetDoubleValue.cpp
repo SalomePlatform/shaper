@@ -169,7 +169,7 @@ bool ModuleBase_WidgetDoubleValue::storeValueCustom()
       } else {
         ModuleBase_Tools::editParameter(myParameter, aText);
       }
-      aText = aText.split('=').at(0); // +"=";
+      aText = aText.split('=').at(0);
     } else if (myParameter.get()){
       // Nullyfy the parameter reference without deletion of the created
       myParameter = FeaturePtr();
