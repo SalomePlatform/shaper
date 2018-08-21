@@ -47,13 +47,15 @@ namespace ModelGeomAlgo_Shape {
   /// \param[in]  theShapeType  type of the selected shape
   /// \param[out] theResult     applicable result
   /// \param[out] theSubshape   sub-shape of the found result
+  /// \param[out] theCenterType type of the point if it is a center of circle or a focus of ellipse
   /// \return \c true if the result and its applicable sub-shape are found
   MODELGEOMALGO_EXPORT bool findSubshapeByPoint(
                               const std::shared_ptr<ModelAPI_Feature>& theFeature,
                               const std::shared_ptr<GeomAPI_Pnt>& thePoint,
                               const GeomAPI_Shape::ShapeType& theShapeType,
                               std::shared_ptr<ModelAPI_Result>& theResult,
-                              std::shared_ptr<GeomAPI_Shape>& theSubshape);
+                              std::shared_ptr<GeomAPI_Shape>& theSubshape,
+                              int& theCenterType);
 }
 
 #endif

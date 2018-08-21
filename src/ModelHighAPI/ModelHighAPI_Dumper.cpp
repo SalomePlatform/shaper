@@ -1020,7 +1020,9 @@ static int possibleSelectionsByPoint(const GeomPointPtr& thePoint,
 
     ResultPtr aResult;
     GeomShapePtr aSubshape;
-    if (ModelGeomAlgo_Shape::findSubshapeByPoint(*aFIt, thePoint, theType, aResult, aSubshape))
+    int theCenterType;
+    if (ModelGeomAlgo_Shape::findSubshapeByPoint(*aFIt, thePoint, theType,
+                                                 aResult, aSubshape, theCenterType))
       ++aNbPossibleSelections;
   }
   return aNbPossibleSelections;

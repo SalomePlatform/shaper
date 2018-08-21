@@ -22,12 +22,15 @@
 
 #include "ModelGeomAlgo_Shape.h"
 
+#include <ModelAPI_AttributeSelection.h>
 #include <ModelAPI_CompositeFeature.h>
 #include <ModelAPI_Feature.h>
 #include <ModelAPI_Result.h>
 #include <ModelAPI_ResultCompSolid.h>
 #include <ModelAPI_ResultConstruction.h>
 
+#include <GeomAPI_Circ.h>
+#include <GeomAPI_Ellipse.h>
 #include <GeomAPI_PlanarEdges.h>
 #include <GeomAPI_Pnt.h>
 
@@ -83,16 +86,56 @@ namespace ModelGeomAlgo_Shape
     return GeomShapePtr();
   }
 
+  // Find circular/elliptical edge, which center/focus coincide with the given point
+  static GeomShapePtr findEdgeByCenter(const GeomShapePtr& theBaseShape,
+                                       const GeomPointPtr& theCenter,
+                                       const double theTolerance,
+                                       int& theCenterType)
+  {
+    theCenterType = (int)ModelAPI_AttributeSelection::NOT_CENTER;
+    std::list<GeomShapePtr> anEdges = theBaseShape->subShapes(GeomAPI_Shape::EDGE);
+    for (std::list<GeomShapePtr>::const_iterator anIt = anEdges.begin();
+         anIt != anEdges.end(); ++anIt) {
+      GeomEdgePtr anEdge = (*anIt)->edge();
+      if (!anEdge)
+        continue;
+
+      if (anEdge->isCircle()) {
+        GeomCirclePtr aCircle = anEdge->circle();
+        if (aCircle->center()->distance(theCenter) < theTolerance) {
+          theCenterType = (int)ModelAPI_AttributeSelection::CIRCLE_CENTER;
+          return *anIt;
+        }
+      }
+      else if (anEdge->isEllipse()) {
+        GeomEllipsePtr anEllipse = anEdge->ellipse();
+        if (anEllipse->firstFocus()->distance(theCenter) < theTolerance)
+          theCenterType = (int)ModelAPI_AttributeSelection::ELLIPSE_FIRST_FOCUS;
+        else if (anEllipse->secondFocus()->distance(theCenter) < theTolerance)
+          theCenterType = (int)ModelAPI_AttributeSelection::ELLIPSE_SECOND_FOCUS;
+
+        if (theCenterType != (int)ModelAPI_AttributeSelection::NOT_CENTER)
+          return *anIt;
+      }
+    }
+
+    // not found
+    return GeomShapePtr();
+  }
+
   bool findSubshapeByPoint(const std::shared_ptr<ModelAPI_Feature>& theFeature,
                            const std::shared_ptr<GeomAPI_Pnt>& thePoint,
                            const GeomAPI_Shape::ShapeType& theShapeType,
                            std::shared_ptr<ModelAPI_Result>& theResult,
-                           std::shared_ptr<GeomAPI_Shape>& theSubshape)
+                           std::shared_ptr<GeomAPI_Shape>& theSubshape,
+                           int& theCenterType)
   {
     static const double TOLERANCE = 1.e-7;
 
     theResult = ResultPtr();
     theSubshape = GeomShapePtr();
+    theCenterType = (int)ModelAPI_AttributeSelection::NOT_CENTER;
+
     const std::list<ResultPtr>& aResults = theFeature->results();
     for (std::list<ResultPtr>::const_iterator aResIt = aResults.begin();
          aResIt != aResults.end(); ++aResIt) {
@@ -160,6 +203,16 @@ namespace ModelGeomAlgo_Shape
         theResult = *aResIt;
         theSubshape = GeomShapePtr();
         break;
+      }
+
+      // another special case: the center of circle or the focus of ellipse is selected;
+      // return the corresponding edge and a status of the center
+      if (theShapeType == GeomAPI_Shape::VERTEX) {
+        theSubshape = findEdgeByCenter(aCurShape, thePoint, TOLERANCE, theCenterType);
+        if (theSubshape) {
+          theResult = *aResIt;
+          break;
+        }
       }
     }
 

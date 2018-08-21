@@ -157,6 +157,9 @@ MODELHIGHAPI_EXPORT
 GeomAPI_Shape::ShapeType shapeTypeByStr(std::string theShapeTypeStr);
 
 MODELHIGHAPI_EXPORT
+std::string strByShapeType(GeomAPI_Shape::ShapeType theShapeType);
+
+MODELHIGHAPI_EXPORT
 GeomAPI_Shape::ShapeType getShapeType(const ModelHighAPI_Selection& theSelection);
 
 MODELHIGHAPI_EXPORT

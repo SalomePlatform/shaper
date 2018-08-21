@@ -195,10 +195,8 @@ void fillAttribute(const std::list<ModelHighAPI_Selection> & theValue,
 
   if(!theValue.empty()) {
     const ModelHighAPI_Selection& aSelection = theValue.front();
-    std::string aSelectionType = aSelection.shapeType();
-    GeomAPI_Shape::ShapeType aType = GeomAPI_Shape::shapeTypeByStr(aSelectionType);
-    if (aType != GeomAPI_Shape::SHAPE || aSelectionType == "SHAPE")
-      theAttribute->setSelectionType(aSelectionType);
+    GeomAPI_Shape::ShapeType aSelectionType = getShapeType(aSelection);
+    theAttribute->setSelectionType(strByShapeType(aSelectionType));
   }
 
   for (auto it = theValue.begin(); it != theValue.end(); ++it)
@@ -279,6 +277,41 @@ GeomAPI_Shape::ShapeType shapeTypeByStr(std::string theShapeTypeStr)
   }
 
   return aShapeType;
+}
+
+std::string strByShapeType(GeomAPI_Shape::ShapeType theShapeType)
+{
+  std::string aShapeTypeStr;
+  switch (theShapeType) {
+  case GeomAPI_Shape::COMPOUND:
+    aShapeTypeStr = "COMPOUND";
+    break;
+  case GeomAPI_Shape::COMPSOLID:
+    aShapeTypeStr = "COMPSOLID";
+    break;
+  case GeomAPI_Shape::SOLID:
+    aShapeTypeStr = "SOLID";
+    break;
+  case GeomAPI_Shape::SHELL:
+    aShapeTypeStr = "SHELL";
+    break;
+  case GeomAPI_Shape::FACE:
+    aShapeTypeStr = "FACE";
+    break;
+  case GeomAPI_Shape::WIRE:
+    aShapeTypeStr = "WIRE";
+    break;
+  case GeomAPI_Shape::EDGE:
+    aShapeTypeStr = "EDGE";
+    break;
+  case GeomAPI_Shape::VERTEX:
+    aShapeTypeStr = "VERTEX";
+    break;
+  default:
+    aShapeTypeStr = "SHAPE";
+    break;
+  }
+  return aShapeTypeStr;
 }
 
 //==================================================================================================
