@@ -360,26 +360,37 @@ AISObjectPtr FeaturesPlugin_Measurement::lengthDimension(AISObjectPtr thePreviou
     gp_Pnt aPnt2(aPoint2->impl<gp_Pnt>());
 
     double aLength = aPnt1.Distance(aPnt2);
-    gp_Pln aPlane = myScreenPlane->impl<gp_Pln>(); // gce_MP.Value();
-    aPlane.SetLocation(aPnt1);
+    if (aLength > 0) {
+      gp_Pln aPlane = myScreenPlane->impl<gp_Pln>(); // gce_MP.Value();
+      aPlane.SetLocation(aPnt1);
 
-    Handle(AIS_LengthDimension) aDim;
-    if (thePrevious.get()) {
-      aAISObj = thePrevious;
-      Handle(AIS_InteractiveObject) aAIS = aAISObj->impl<Handle(AIS_InteractiveObject)>();
-      aDim = Handle(AIS_LengthDimension)::DownCast(aAIS);
-      if (aDim.IsNull()) {
-        aDim = new AIS_LengthDimension(aTEdge, aPlane);
-        aAISObj->setImpl(new Handle(AIS_InteractiveObject)(aDim));
-      } else {
-        aDim->SetMeasuredGeometry(aTEdge, aPlane);
+      gp_XYZ aNormal = aPlane.Axis().Direction().XYZ();
+      gp_XYZ aVec(aPnt2.X() - aPnt1.X(), aPnt2.Y() - aPnt1.Y(), aPnt2.Z() - aPnt1.Z());
+      double aDot = aNormal.Dot(aVec);
+      if (fabs(aDot - aLength) <= Precision::Confusion()) {
+        aPlane = gp_Pln(aPnt1, aPlane.XAxis().Direction());
       }
-    } else {
-      aDim = new AIS_LengthDimension(aTEdge, aPlane);
-      aAISObj = AISObjectPtr(new GeomAPI_AISObject());
-      aAISObj->setImpl(new Handle(AIS_InteractiveObject)(aDim));
+
+      Handle(AIS_LengthDimension) aDim;
+      if (thePrevious.get()) {
+        aAISObj = thePrevious;
+        Handle(AIS_InteractiveObject) aAIS = aAISObj->impl<Handle(AIS_InteractiveObject)>();
+        aDim = Handle(AIS_LengthDimension)::DownCast(aAIS);
+        if (aDim.IsNull()) {
+          aDim = new AIS_LengthDimension(aTEdge, aPlane);
+          aAISObj->setImpl(new Handle(AIS_InteractiveObject)(aDim));
+        }
+        else {
+          aDim->SetMeasuredGeometry(aTEdge, aPlane);
+        }
+      }
+      else {
+        aDim = new AIS_LengthDimension(aTEdge, aPlane);
+        aAISObj = AISObjectPtr(new GeomAPI_AISObject());
+        aAISObj->setImpl(new Handle(AIS_InteractiveObject)(aDim));
+      }
+      aDim->SetFlyout(aLength / 3.);
     }
-    aDim->SetFlyout(aLength / 3.);
   }
   return aAISObj;
 }
@@ -413,27 +424,38 @@ AISObjectPtr FeaturesPlugin_Measurement::distanceDimension(AISObjectPtr thePrevi
         gp_Pnt aPnt1 = aDist.PointOnShape1(1);
         gp_Pnt aPnt2 = aDist.PointOnShape2(1);
         double aDistance = aDist.Value();
-        gp_Pln aPlane = myScreenPlane->impl<gp_Pln>();
-        aPlane.SetLocation(aPnt1);
+        if (aDistance > 0) {
+          gp_Pln aPlane = myScreenPlane->impl<gp_Pln>();
+          aPlane.SetLocation(aPnt1);
 
-        Handle(AIS_LengthDimension) aDim;
-        if (thePrevious.get()) {
-          aAISObj = thePrevious;
-          Handle(AIS_InteractiveObject) aAIS = aAISObj->impl<Handle(AIS_InteractiveObject)>();
-          aDim = Handle(AIS_LengthDimension)::DownCast(aAIS);
-          if (aDim.IsNull()) {
+          gp_XYZ aNormal = aPlane.Axis().Direction().XYZ();
+          gp_XYZ aVec(aPnt2.X() - aPnt1.X(), aPnt2.Y() - aPnt1.Y(), aPnt2.Z() - aPnt1.Z());
+          double aDot = aNormal.Dot(aVec);
+          if (fabs(aDot - aDistance) <= Precision::Confusion()) {
+            aPlane = gp_Pln(aPnt1, aPlane.XAxis().Direction());
+          }
+
+          Handle(AIS_LengthDimension) aDim;
+          if (thePrevious.get()) {
+            aAISObj = thePrevious;
+            Handle(AIS_InteractiveObject) aAIS = aAISObj->impl<Handle(AIS_InteractiveObject)>();
+            aDim = Handle(AIS_LengthDimension)::DownCast(aAIS);
+            if (aDim.IsNull()) {
+              aDim = new AIS_LengthDimension(aPnt1, aPnt2, aPlane);
+              aAISObj->setImpl(new Handle(AIS_InteractiveObject)(aDim));
+            }
+            else {
+              aDim->SetMeasuredGeometry(aPnt1, aPnt2, aPlane);
+              aDim->SetFlyout(aDistance / 3.);
+            }
+          }
+          else {
+            aAISObj = AISObjectPtr(new GeomAPI_AISObject());
             aDim = new AIS_LengthDimension(aPnt1, aPnt2, aPlane);
             aAISObj->setImpl(new Handle(AIS_InteractiveObject)(aDim));
-          } else {
-            aDim->SetMeasuredGeometry(aPnt1, aPnt2, aPlane);
-            aDim->SetFlyout(aDistance / 3.);
           }
-        } else {
-          aAISObj = AISObjectPtr(new GeomAPI_AISObject());
-          aDim = new AIS_LengthDimension(aPnt1, aPnt2, aPlane);
-          aAISObj->setImpl(new Handle(AIS_InteractiveObject)(aDim));
+          aDim->SetFlyout(aDistance / 3.);
         }
-        aDim->SetFlyout(aDistance / 3.);
       }
     }
   }
