@@ -86,6 +86,11 @@ public:
   /// \param theGroup a name of group where objects were deleted
   virtual QTreeNodesList objectsDeleted(const DocumentPtr& theDoc, const QString& theGroup);
 
+  /// Returns number of sub-objects of the current object
+  virtual int numberOfSubs() const;
+
+  virtual ObjectPtr subObject(int theId) const;
+
 protected:
   ObjectPtr myObject;
 };
@@ -334,32 +339,33 @@ private:
 * \ingroup Modules
 * Implementation of a node for compsolid representation
 */
-//class PartSet_CompsolidNode : public PartSet_ObjectNode
-//{
-//public:
-//  PartSet_CompsolidNode(const ObjectPtr& theObj, ModuleBase_ITreeNode* theParent);
-//
-//  static std::string typeId()
-//  {
-//    static std::string myType = "CompSolid";
-//    return myType;
-//  }
-//
-//  virtual std::string type() const { return typeId(); }
-//
-//  /// Updates sub-nodes of the node
-//  virtual void update();
-//
-//  /// Process creation of objects.
-//  /// \param theObjects a list of created objects
-//  /// \return a list of nodes which corresponds to the created objects
-//  virtual QTreeNodesList objectCreated(const QObjectPtrList& theObjects);
-//
-//  /// Process deletion of objects.
-//  /// \param theDoc a document where objects were deleted
-//  /// \param theGroup a name of group where objects were deleted
-//  virtual QTreeNodesList objectsDeleted(const DocumentPtr& theDoc, const QString& theGroup);
-//
-//};
+class PartSet_StepNode : public PartSet_TreeNode
+{
+public:
+  PartSet_StepNode(ModelAPI_Entity* theEnt, ModuleBase_ITreeNode* theParent) :
+    PartSet_TreeNode(theParent), myEntity(theEnt) {}
+
+  static std::string typeId()
+  {
+    static std::string myType = "FieldStep";
+    return myType;
+  }
+
+  virtual std::string type() const { return typeId(); }
+
+  /// Returns the node representation according to theRole.
+  virtual QVariant data(int theColumn, int theRole) const;
+
+  ModelAPI_Entity* entity() const {
+    return myEntity;
+  }
+
+  void setEntity(ModelAPI_Entity* theEnt) {
+    myEntity = theEnt;
+  }
+
+private:
+  ModelAPI_Entity* myEntity;
+};
 
 #endif

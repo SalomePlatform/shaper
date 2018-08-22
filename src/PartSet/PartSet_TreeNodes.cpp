@@ -187,37 +187,84 @@ PartSet_ObjectNode::VisibilityState PartSet_ObjectNode::visibilityState() const
   return NoneState;
 }
 
+int PartSet_ObjectNode::numberOfSubs() const
+{
+  ResultBodyPtr aCompRes = std::dynamic_pointer_cast<ModelAPI_ResultBody>(myObject);
+  if (aCompRes.get())
+   return aCompRes->numberOfSubs(true);
+  else {
+    CompositeFeaturePtr aCompFeature =
+      std::dynamic_pointer_cast<ModelAPI_CompositeFeature>(myObject);
+    if (aCompFeature.get())
+      return aCompFeature->numberOfSubs(true);
+    else {
+      ResultFieldPtr aFieldRes = std::dynamic_pointer_cast<ModelAPI_ResultField>(myObject);
+      if (aFieldRes.get())
+        return aFieldRes->stepsSize();
+    }
+  }
+  return 0;
+}
+
+
+ObjectPtr PartSet_ObjectNode::subObject(int theId) const
+{
+  ResultBodyPtr aCompRes = std::dynamic_pointer_cast<ModelAPI_ResultBody>(myObject);
+  if (aCompRes.get())
+    return aCompRes->subResult(theId, true);
+  else {
+    CompositeFeaturePtr aCompFeature =
+      std::dynamic_pointer_cast<ModelAPI_CompositeFeature>(myObject);
+    if (aCompFeature.get())
+      return aCompFeature->subFeature(theId, true);
+  }
+  return ObjectPtr();
+}
+
 void PartSet_ObjectNode::update()
 {
-  CompositeFeaturePtr aCompFeature;
-  ResultBodyPtr aCompRes = std::dynamic_pointer_cast<ModelAPI_ResultBody>(myObject);
-  int aNb = 0;
-  if (aCompRes.get())
-    aNb = aCompRes->numberOfSubs(true);
-  else {
-    aCompFeature = std::dynamic_pointer_cast<ModelAPI_CompositeFeature>(myObject);
-    if (aCompFeature.get())
-      aNb = aCompFeature->numberOfSubs(true);
-  }
-
+  int aNb = numberOfSubs();
   if (aNb > 0) {
+    ResultFieldPtr aFieldRes = std::dynamic_pointer_cast<ModelAPI_ResultField>(myObject);
+
+    // If the object is a field result then delete extra sub-objects
+    if (aFieldRes.get()) {
+      while (myChildren.size() > aNb) {
+        ModuleBase_ITreeNode* aNode = myChildren.last();
+        myChildren.removeAll(aNode);
+        delete aNode;
+      }
+    }
+
     ModuleBase_ITreeNode* aNode;
     ObjectPtr aBody;
     int i;
     for (i = 0; i < aNb; i++) {
-      if (aCompRes.get())
-        aBody = aCompRes->subResult(i, true);
-      else
-        aBody = aCompFeature->subFeature(i, true);
-
-      if (i < myChildren.size()) {
-        aNode = myChildren.at(i);
-        if (aNode->object() != aBody) {
-          ((PartSet_ObjectNode*)aNode)->setObject(aBody);
+      aBody = subObject(i);
+      if (aBody.get()) {
+        if (i < myChildren.size()) {
+          aNode = myChildren.at(i);
+          if (aNode->object() != aBody) {
+            ((PartSet_ObjectNode*)aNode)->setObject(aBody);
+          }
         }
-      } else {
-        aNode = new PartSet_ObjectNode(aBody, this);
-        myChildren.append(aNode);
+        else {
+          aNode = new PartSet_ObjectNode(aBody, this);
+          myChildren.append(aNode);
+        }
+      }
+      else if (aFieldRes.get()) {
+        ModelAPI_ResultField::ModelAPI_FieldStep* aStep = aFieldRes->step(i);
+        if (i < myChildren.size()) {
+          PartSet_StepNode* aStepNode = static_cast<PartSet_StepNode*>(myChildren.at(i));
+          if (aStepNode->entity() != aStep) {
+            aStepNode->setEntity(aStep);
+          }
+        }
+        else {
+          aNode = new PartSet_StepNode(aStep, this);
+          myChildren.append(aNode);
+        }
       }
     }
     // Delete extra objects
@@ -237,39 +284,41 @@ void PartSet_ObjectNode::update()
 QTreeNodesList PartSet_ObjectNode::objectCreated(const QObjectPtrList& theObjects)
 {
   QTreeNodesList aResult;
-
-  CompositeFeaturePtr aCompFeature;
-  ResultBodyPtr aCompRes = std::dynamic_pointer_cast<ModelAPI_ResultBody>(myObject);
-  int aNb = 0;
-  if (aCompRes.get())
-    aNb = aCompRes->numberOfSubs(true);
-  else {
-    aCompFeature = std::dynamic_pointer_cast<ModelAPI_CompositeFeature>(myObject);
-    if (aCompFeature.get())
-      aNb = aCompFeature->numberOfSubs(true);
-  }
-
+  int aNb = numberOfSubs();
   if (aNb > 0) {
     ModuleBase_ITreeNode* aNode;
+    ResultFieldPtr aFieldRes = std::dynamic_pointer_cast<ModelAPI_ResultField>(myObject);
     ObjectPtr aBody;
     int i;
     for (i = 0; i < aNb; i++) {
-      if (aCompRes.get())
-        aBody = aCompRes->subResult(i, true);
-      else
-        aBody = aCompFeature->subFeature(i, true);
-
-      if (i < myChildren.size()) {
-        aNode = myChildren.at(i);
-        if (aNode->object() != aBody) {
-          ((PartSet_ObjectNode*)aNode)->setObject(aBody);
-          aResult.append(aNode);
+      aBody = subObject(i);
+      if (aBody.get()) {
+        if (i < myChildren.size()) {
+          aNode = myChildren.at(i);
+          if (aNode->object() != aBody) {
+            ((PartSet_ObjectNode*)aNode)->setObject(aBody);
+            aResult.append(aNode);
+          }
         }
-      } else {
-        aNode = new PartSet_ObjectNode(aBody, this);
-        myChildren.append(aNode);
-        aResult.append(aNode);
-        aNode->update();
+        else {
+          aNode = new PartSet_ObjectNode(aBody, this);
+          myChildren.append(aNode);
+          aResult.append(aNode);
+          aNode->update();
+        }
+      }
+      else {
+        ModelAPI_ResultField::ModelAPI_FieldStep* aStep = aFieldRes->step(i);
+        if (i < myChildren.size()) {
+          PartSet_StepNode* aStepNode = static_cast<PartSet_StepNode*>(myChildren.at(i));
+          if (aStepNode->entity() != aStep) {
+            aStepNode->setEntity(aStep);
+          }
+        }
+        else {
+          aNode = new PartSet_StepNode(aStep, this);
+          myChildren.append(aNode);
+        }
       }
     }
     foreach(ModuleBase_ITreeNode* aNode, myChildren) {
@@ -283,17 +332,7 @@ QTreeNodesList PartSet_ObjectNode::objectsDeleted(
   const DocumentPtr& theDoc, const QString& theGroup)
 {
   QTreeNodesList aResult;
-  CompositeFeaturePtr aCompFeature;
-  ResultBodyPtr aCompRes = std::dynamic_pointer_cast<ModelAPI_ResultBody>(myObject);
-  int aNb = 0;
-  if (aCompRes.get())
-    aNb = aCompRes->numberOfSubs(true);
-  else {
-    aCompFeature = std::dynamic_pointer_cast<ModelAPI_CompositeFeature>(myObject);
-    if (aCompFeature.get())
-      aNb = aCompFeature->numberOfSubs(true);
-  }
-
+  int aNb = numberOfSubs();
   if (aNb > 0) {
     ModuleBase_ITreeNode* aNode;
     // Delete extra objects
@@ -308,11 +347,7 @@ QTreeNodesList PartSet_ObjectNode::objectsDeleted(
     int i = 0;
     ObjectPtr aBody;
     foreach(ModuleBase_ITreeNode* aNode, myChildren) {
-      if (aCompRes.get())
-        aBody = aCompRes->subResult(i, true);
-      else
-        aBody = aCompFeature->subFeature(i, true);
-
+      aBody = subObject(i);
       ((PartSet_ObjectNode*)aNode)->setObject(aBody);
       aResult.append(aNode->objectsDeleted(theDoc, theGroup));
       i++;
@@ -1049,4 +1084,18 @@ void PartSet_ObjectFolderNode::getFirstAndLastIndex(int& theFirst, int& theLast)
 
   theFirst = aDoc->index(aFirstFeatureInFolder);
   theLast = aDoc->index(aLastFeatureInFolder);
+}
+
+
+//////////////////////////////////////////////////////////////////////////////////
+QVariant PartSet_StepNode::data(int theColumn, int theRole) const
+{
+  if ((theColumn == 1) && (theRole == Qt::DisplayRole)) {
+    ModelAPI_ResultField::ModelAPI_FieldStep* aStep =
+      dynamic_cast<ModelAPI_ResultField::ModelAPI_FieldStep*>(myEntity);
+
+    return "Step " + QString::number(aStep->id() + 1) + " " +
+      aStep->field()->textLine(aStep->id()).c_str();
+  }
+  return PartSet_TreeNode::data(theColumn, theRole);
 }

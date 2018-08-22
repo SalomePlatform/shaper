@@ -25,6 +25,7 @@
 #include <ModuleBase_ITreeNode.h>
 
 #include <ModelAPI_Session.h>
+#include <ModelAPI_ResultField.h>
 
 #include <Config_FeatureMessage.h>
 
@@ -47,6 +48,7 @@ XGUI_DataModel::XGUI_DataModel(QObject* theParent) : QAbstractItemModel(theParen
   aLoop->registerListener(this, Events_Loop::eventByName(EVENT_OBJECT_UPDATED));
   aLoop->registerListener(this, Events_Loop::eventByName(EVENT_ORDER_UPDATED));
   aLoop->registerListener(this, Events_Loop::eventByName(EVENT_DOCUMENT_CHANGED));
+  aLoop->registerListener(this, Events_Loop::eventByName(EVENT_OBJECT_TO_REDISPLAY));
 }
 
 XGUI_DataModel::~XGUI_DataModel()
@@ -59,7 +61,7 @@ void XGUI_DataModel::processEvent(const std::shared_ptr<Events_Message>& theMess
 {
   if (theMessage->eventID() == Events_Loop::loop()->eventByName(EVENT_OBJECT_CREATED)) {
     std::shared_ptr<ModelAPI_ObjectUpdatedMessage> aUpdMsg =
-        std::dynamic_pointer_cast<ModelAPI_ObjectUpdatedMessage>(theMessage);
+      std::dynamic_pointer_cast<ModelAPI_ObjectUpdatedMessage>(theMessage);
     std::set<ObjectPtr> aObjects = aUpdMsg->objects();
     QObjectPtrList aCreated;
     std::set<ObjectPtr>::const_iterator aIt;
@@ -81,14 +83,14 @@ void XGUI_DataModel::processEvent(const std::shared_ptr<Events_Message>& theMess
     }
   }
   else if (theMessage->eventID() == Events_Loop::loop()->eventByName(EVENT_OBJECT_DELETED)) {
-      std::shared_ptr<ModelAPI_ObjectDeletedMessage> aUpdMsg =
-          std::dynamic_pointer_cast<ModelAPI_ObjectDeletedMessage>(theMessage);
-      const std::list<std::pair<std::shared_ptr<ModelAPI_Document>, std::string>>& aMsgGroups =
-        aUpdMsg->groups();
-      std::list<std::pair<std::shared_ptr<ModelAPI_Document>, std::string>>::const_iterator aIt;
-      for (aIt = aMsgGroups.cbegin(); aIt != aMsgGroups.cend(); aIt++)
-        QTreeNodesList aList = myRoot->objectsDeleted(aIt->first, aIt->second.c_str());
-      rebuildDataTree();
+    std::shared_ptr<ModelAPI_ObjectDeletedMessage> aUpdMsg =
+      std::dynamic_pointer_cast<ModelAPI_ObjectDeletedMessage>(theMessage);
+    const std::list<std::pair<std::shared_ptr<ModelAPI_Document>, std::string>>& aMsgGroups =
+      aUpdMsg->groups();
+    std::list<std::pair<std::shared_ptr<ModelAPI_Document>, std::string>>::const_iterator aIt;
+    for (aIt = aMsgGroups.cbegin(); aIt != aMsgGroups.cend(); aIt++)
+      QTreeNodesList aList = myRoot->objectsDeleted(aIt->first, aIt->second.c_str());
+    rebuildDataTree();
   }
   else if (theMessage->eventID() == Events_Loop::loop()->eventByName(EVENT_OBJECT_UPDATED)) {
     std::shared_ptr<ModelAPI_ObjectUpdatedMessage> aUpdMsg =
@@ -114,12 +116,24 @@ void XGUI_DataModel::processEvent(const std::shared_ptr<Events_Message>& theMess
     if (aRebuildAll) {
       myRoot->update();
       rebuildDataTree();
-    } else {
+    }
+    else {
       foreach(ObjectPtr aObj, aCreated) {
         ModuleBase_ITreeNode* aNode = myRoot->subNode(aObj);
         if (aNode) {
+          int aOldNb = aNode->childrenCount();
+          aNode->update();
+          int aNewNb = aNode->childrenCount();
+
           QModelIndex aFirstIdx = getIndex(aNode, 0);
           QModelIndex aLastIdx = getIndex(aNode, 2);
+
+          if (aNewNb > aOldNb) {
+            insertRows(aOldNb - 1, aNewNb - aOldNb, aFirstIdx);
+          }
+          else if (aNewNb < aOldNb) {
+            removeRows(aNewNb - 1, aOldNb - aNewNb, aFirstIdx);
+          }
           dataChanged(aFirstIdx, aLastIdx);
         }
       }
@@ -143,6 +157,40 @@ void XGUI_DataModel::processEvent(const std::shared_ptr<Events_Message>& theMess
     ModuleBase_ITreeNode* aRoot = myRoot->findRoot(aDoc);
     if (aRoot) {
       updateSubTree(aRoot);
+    }
+  }
+  else if (theMessage->eventID() == Events_Loop::loop()->eventByName(EVENT_OBJECT_TO_REDISPLAY)) {
+    std::shared_ptr<ModelAPI_ObjectUpdatedMessage> aUpdMsg =
+      std::dynamic_pointer_cast<ModelAPI_ObjectUpdatedMessage>(theMessage);
+    std::set<ObjectPtr> aObjects = aUpdMsg->objects();
+
+    QObjectPtrList aCreated;
+    std::set<ObjectPtr>::const_iterator aIt;
+    bool aRebuildAll = false;
+    for (aIt = aObjects.cbegin(); aIt != aObjects.cend(); aIt++) {
+      ObjectPtr aObj = (*aIt);
+      if (aObj->groupName() == ModelAPI_ResultField::group()) {
+        aCreated.append(aObj);
+      }
+    }
+    foreach(ObjectPtr aObj, aCreated) {
+      ModuleBase_ITreeNode* aNode = myRoot->subNode(aObj);
+      if (aNode) {
+        int aOldNb = aNode->childrenCount();
+        aNode->update();
+        int aNewNb = aNode->childrenCount();
+
+        QModelIndex aFirstIdx = getIndex(aNode, 0);
+        QModelIndex aLastIdx = getIndex(aNode, 2);
+
+        if (aNewNb > aOldNb) {
+          insertRows(aOldNb - 1, aNewNb - aOldNb, aFirstIdx);
+        }
+        else if (aNewNb < aOldNb) {
+          removeRows(aNewNb - 1, aOldNb - aNewNb, aFirstIdx);
+        }
+        dataChanged(aFirstIdx, aLastIdx);
+      }
     }
   }
 }
