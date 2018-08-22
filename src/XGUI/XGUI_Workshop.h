@@ -393,6 +393,8 @@ signals:
 
   /// Open preferences dialog box
   void onPreferences();
+
+  void onFileExec();
 #endif
 
   /// Activates/deactivates the trihedron in the viewer AIS context
