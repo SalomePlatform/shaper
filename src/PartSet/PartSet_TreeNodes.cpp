@@ -195,7 +195,7 @@ int PartSet_ObjectNode::numberOfSubs() const
   else {
     CompositeFeaturePtr aCompFeature =
       std::dynamic_pointer_cast<ModelAPI_CompositeFeature>(myObject);
-    if (aCompFeature.get())
+    if (aCompFeature.get() && aCompFeature->data()->isValid())
       return aCompFeature->numberOfSubs(true);
     else {
       ResultFieldPtr aFieldRes = std::dynamic_pointer_cast<ModelAPI_ResultField>(myObject);
