@@ -135,7 +135,7 @@ void FeaturesPlugin_MultiRotation::performRotation1D()
   for(ListOfShape::iterator anObjectsIt = anObjects.begin(); anObjectsIt != anObjects.end();
         anObjectsIt++, aContext++) {
     std::shared_ptr<GeomAPI_Shape> aBaseShape = *anObjectsIt;
-    bool isPart = (*aContext)->groupName() == ModelAPI_ResultPart::group();
+    bool isPart = aContext->get() && (*aContext)->groupName() == ModelAPI_ResultPart::group();
 
     // Setting result.
     if (isPart) {
@@ -277,7 +277,7 @@ void FeaturesPlugin_MultiRotation::performRotation2D()
   for(ListOfShape::iterator anObjectsIt = anObjects.begin(); anObjectsIt != anObjects.end();
         anObjectsIt++, aContext++) {
     std::shared_ptr<GeomAPI_Shape> aBaseShape = *anObjectsIt;
-    bool isPart = (*aContext)->groupName() == ModelAPI_ResultPart::group();
+    bool isPart = aContext->get() && (*aContext)->groupName() == ModelAPI_ResultPart::group();
 
     std::shared_ptr<GeomAPI_Dir> aDir =
       GeomAlgoAPI_ShapeTools::buildDirFromAxisAndShape(aBaseShape, anAxis);

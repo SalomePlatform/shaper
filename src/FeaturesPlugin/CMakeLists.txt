@@ -325,4 +325,5 @@ ADD_UNIT_TESTS(TestExtrusion.py
                TestBooleanCommon_CompSolidCompound_CompSolidCompound.py
                Test2596.py
                Test2592.py
+               Test2588.py
 )

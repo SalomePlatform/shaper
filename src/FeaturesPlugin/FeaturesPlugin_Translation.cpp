@@ -136,7 +136,7 @@ void FeaturesPlugin_Translation::performTranslationByAxisAndDistance()
   for(ListOfShape::iterator anObjectsIt = anObjects.begin(); anObjectsIt != anObjects.end();
         anObjectsIt++, aContext++) {
     std::shared_ptr<GeomAPI_Shape> aBaseShape = *anObjectsIt;
-    bool isPart = (*aContext)->groupName() == ModelAPI_ResultPart::group();
+    bool isPart = aContext->get() && (*aContext)->groupName() == ModelAPI_ResultPart::group();
 
     // Setting result.
     if (isPart) {
@@ -218,7 +218,7 @@ void FeaturesPlugin_Translation::performTranslationByDimensions()
   for(ListOfShape::iterator anObjectsIt = anObjects.begin(); anObjectsIt != anObjects.end();
         anObjectsIt++, aContext++) {
     std::shared_ptr<GeomAPI_Shape> aBaseShape = *anObjectsIt;
-    bool isPart = (*aContext)->groupName() == ModelAPI_ResultPart::group();
+    bool isPart = aContext->get() && (*aContext)->groupName() == ModelAPI_ResultPart::group();
 
     // Setting result.
     if (isPart) {
@@ -313,7 +313,7 @@ void FeaturesPlugin_Translation::performTranslationByTwoPoints()
   for(ListOfShape::iterator anObjectsIt = anObjects.begin(); anObjectsIt != anObjects.end();
         anObjectsIt++, aContext++) {
     std::shared_ptr<GeomAPI_Shape> aBaseShape = *anObjectsIt;
-    bool isPart = (*aContext)->groupName() == ModelAPI_ResultPart::group();
+    bool isPart = aContext->get() && (*aContext)->groupName() == ModelAPI_ResultPart::group();
 
     // Setting result.
     if (isPart) {

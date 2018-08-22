@@ -160,7 +160,7 @@ void FeaturesPlugin_Placement::execute()
       anObjectsIt++, aContext++) {
 
     // for part results just set transformation
-    if ((*aContext)->groupName() == ModelAPI_ResultPart::group()) {
+    if (aContext->get() && (*aContext)->groupName() == ModelAPI_ResultPart::group()) {
       ResultPartPtr anOrigin = std::dynamic_pointer_cast<ModelAPI_ResultPart>(*aContext);
       ResultPartPtr aResultPart = document()->copyPart(anOrigin, data(), aResultIndex);
       aResultPart->setTrsf(aContextRes, aTrsf);

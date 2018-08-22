@@ -51,9 +51,20 @@ bool FeaturesPlugin_ValidatorTransform::isValid(const AttributePtr& theAttribute
     std::shared_ptr<ModelAPI_AttributeSelection> aSelAttribute = aCurSelList->value(i);
     ResultPtr aResult = aSelAttribute->context();
     if (!aResult) {
+      // this could be a whole feature selected
+      FeaturePtr aFeature = aSelAttribute->contextFeature();
+      if (aFeature.get() && aFeature->results().size() > 0) {
+        if (aFeature->firstResult()->groupName() != ModelAPI_ResultBody::group()) {
+          anErrorGroupName = aFeature->firstResult()->groupName();
+          aValid = false;
+          break;
+        }
+        continue;
+      }
       theError = "Invalid selection.";
       return false;
-    } if (isPartSetDocument) // PartSet document: Result Part is valid
+    }
+    if (isPartSetDocument) // PartSet document: Result Part is valid
       aValid = aResult->groupName() == ModelAPI_ResultPart::group();
     else { // Part document: Result CompSolid is valid
       aValid = aResult->groupName() == ModelAPI_ResultBody::group();

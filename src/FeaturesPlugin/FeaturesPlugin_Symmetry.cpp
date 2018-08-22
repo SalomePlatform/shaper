@@ -139,7 +139,7 @@ void FeaturesPlugin_Symmetry::performSymmetryByPoint()
   for(ListOfShape::iterator anObjectsIt = anObjects.begin(); anObjectsIt != anObjects.end();
         anObjectsIt++, aContext++) {
     std::shared_ptr<GeomAPI_Shape> aBaseShape = *anObjectsIt;
-    bool isPart = (*aContext)->groupName() == ModelAPI_ResultPart::group();
+    bool isPart = aContext->get() && (*aContext)->groupName() == ModelAPI_ResultPart::group();
 
     // Setting result.
     if (isPart) {
@@ -216,7 +216,7 @@ void FeaturesPlugin_Symmetry::performSymmetryByAxis()
   for(ListOfShape::iterator anObjectsIt = anObjects.begin(); anObjectsIt != anObjects.end();
         anObjectsIt++, aContext++) {
     std::shared_ptr<GeomAPI_Shape> aBaseShape = *anObjectsIt;
-    bool isPart = (*aContext)->groupName() == ModelAPI_ResultPart::group();
+    bool isPart = aContext->get() && (*aContext)->groupName() == ModelAPI_ResultPart::group();
 
     // Setting result.
     if (isPart) {
@@ -295,7 +295,7 @@ void FeaturesPlugin_Symmetry::performSymmetryByPlane()
   for(ListOfShape::iterator anObjectsIt = anObjects.begin(); anObjectsIt != anObjects.end();
         anObjectsIt++, aContext++) {
     std::shared_ptr<GeomAPI_Shape> aBaseShape = *anObjectsIt;
-    bool isPart = (*aContext)->groupName() == ModelAPI_ResultPart::group();
+    bool isPart = aContext->get() && (*aContext)->groupName() == ModelAPI_ResultPart::group();
 
     // Setting result.
     if (isPart) {
