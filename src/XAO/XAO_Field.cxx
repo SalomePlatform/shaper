@@ -34,18 +34,17 @@ using namespace XAO;
 // -------------------------------------------------------
 
 Field::Field(const XAO::Dimension& dimension,
-        const int& nbElements, const int& nbComponents, const std::string& name)
-    : m_name(name), m_dimension(dimension), m_nbElements(nbElements), m_nbComponents(nbComponents)
+             const int& nbElements, const int& nbComponents, const std::string& name)
+  : m_name(name), m_dimension(dimension),
+    m_nbComponents(nbComponents), m_components(nbComponents, ""),
+    m_nbElements(nbElements)
 {
-    m_components.reserve(nbComponents);
-    for (int i = 0; i < nbComponents; ++i)
-        m_components.push_back("");
 }
 
 Field::~Field()
 {
-    for (unsigned int i = 0; i < m_steps.size(); ++i)
-        delete m_steps[i];
+  for (unsigned int i = 0; i < m_steps.size(); ++i)
+    delete m_steps[i];
 }
 
 Field* Field::createField(const XAO::Type& type, const XAO::Dimension& dimension,
@@ -83,7 +82,7 @@ throw (XAO_Exception)
 {
     for (unsigned int  i = 0; i < names.size(); ++i)
     {
-        if (i < m_nbComponents)
+      if ((int)i < m_nbComponents)
             m_components[i] = names[i];
     }
 }
@@ -130,7 +129,7 @@ throw (XAO_Exception)
 void Field::checkStepIndex(const int& step)
 throw (XAO_Exception)
 {
-    if (step < m_steps.size() && step >= 0)
+  if (step < (int)m_steps.size() && step >= 0)
         return;
 
     throw XAO_Exception(MsgBuilder() << "Step index is out of range [0, "

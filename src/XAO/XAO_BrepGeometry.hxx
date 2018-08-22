@@ -75,6 +75,18 @@ namespace XAO
          */
         virtual void setShapeString(const std::string& shape);
 
+        /**
+         * Writes shape to a file
+         * @param fileName the path to the file
+         */
+        virtual void writeShapeFile(const std::string& fileName) throw (XAO_Exception);
+
+        /**
+         * Reads shape from a file
+         * @param fileName the path to the file
+         */
+        virtual void readShapeFile(const std::string& fileName) throw (XAO_Exception);
+
 #ifdef SWIG
         %pythoncode %{
         def setShape(self, shape):

@@ -47,7 +47,7 @@ namespace XAO
     protected:
         /**
          * Constructor.
-         * @param dimension the dimension ot the field.
+         * @param dimension the dimension of the field.
          * @param nbElements the number of elements.
          * @param nbComponents the number of components.
          * @param name the name of the field.
@@ -56,7 +56,6 @@ namespace XAO
               const int& nbElements, const int& nbComponents, const std::string& name);
 
     public:
-        /**
         /**
          * Creates a Field of the given type.
          * @param type the type of the field to create.

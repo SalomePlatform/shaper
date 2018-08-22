@@ -43,7 +43,7 @@ Group::~Group()
 void Group::checkIndex(const int& element)
 throw (XAO_Exception)
 {
-    if (element < m_elements.size() && element >= 0)
+  if (element < (int)m_elements.size() && element >= 0)
         return;
 
     throw XAO_Exception(MsgBuilder() << "Index of element is out of range [0, "

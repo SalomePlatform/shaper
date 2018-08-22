@@ -44,9 +44,10 @@ namespace XAO
          * Saves the XAO object to a file.
          * @param xaoObject the object to export.
          * @param fileName the path of the file to create.
+         * @param shapeFileName if not empty save the shape in an this external file.
          * @return true if the export was successful, false otherwise.
          */
-        static const bool saveToFile(Xao* xaoObject, const std::string& fileName)
+        static const bool saveToFile(Xao* xaoObject, const std::string& fileName, const std::string& shapeFileName)
         throw (XAO_Exception);
 
         /**

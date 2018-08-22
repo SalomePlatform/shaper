@@ -65,6 +65,25 @@ void BrepGeometry::setShapeString(const std::string& shape)
     initIds();
 }
 
+void BrepGeometry::writeShapeFile(const std::string& fileName)
+throw (XAO_Exception)
+{
+    bool res = BRepTools::Write(m_shape, fileName.c_str());
+    if (!res)
+        throw XAO_Exception(MsgBuilder() << "Cannot write BRep file: " << fileName);
+}
+
+void BrepGeometry::readShapeFile(const std::string& fileName)
+throw (XAO_Exception)
+ {
+    BRep_Builder builder;
+    bool res = BRepTools::Read(m_shape, fileName.c_str(), builder);
+    if (!res)
+        throw XAO_Exception(MsgBuilder() << "Cannot read BRep file: " << fileName);
+
+    initIds();
+}
+
 TopoDS_Shape BrepGeometry::getTopoDS_Shape()
 {
     return m_shape;
@@ -78,7 +97,7 @@ void BrepGeometry::setTopoDS_Shape(const TopoDS_Shape& shape)
 
 void BrepGeometry::initIds()
 {
-    // intialization of Ids
+    // initialization of Ids
     initListIds(TopAbs_VERTEX, m_vertices);
     initListIds(TopAbs_EDGE, m_edges);
     initListIds(TopAbs_FACE, m_faces);

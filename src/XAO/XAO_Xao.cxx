@@ -241,9 +241,9 @@ bool Xao::removeField(Field* field)
     return res;
 }
 
-const bool Xao::exportXAO(const std::string& fileName)
+const bool Xao::exportXAO(const std::string& fileName, const std::string& shapeFileName)
 {
-    return XaoExporter::saveToFile(this, fileName);
+    return XaoExporter::saveToFile(this, fileName, shapeFileName);
 }
 
 const std::string Xao::getXML()

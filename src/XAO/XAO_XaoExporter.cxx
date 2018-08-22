@@ -28,6 +28,12 @@
 #include "XAO_Step.hxx"
 #include "XAO_XaoUtils.hxx"
 
+#ifdef WIN32
+# define _separator_ '\\'
+#else
+# define _separator_ '/'
+#endif
+
 namespace XAO
 {
     const xmlChar* C_TAG_XAO = (xmlChar*)"XAO";
@@ -39,6 +45,7 @@ namespace XAO
 
     const xmlChar* C_TAG_SHAPE = (xmlChar*)"shape";
     const xmlChar* C_ATTR_SHAPE_FORMAT = (xmlChar*)"format";
+    const xmlChar* C_ATTR_SHAPE_FILE = (xmlChar*)"file";
 
     const xmlChar* C_TAG_TOPOLOGY = (xmlChar*)"topology";
     const xmlChar* C_TAG_VERTICES = (xmlChar*)"vertices";
@@ -83,8 +90,8 @@ namespace XAO
 using namespace XAO;
 
 namespace {
-    xmlDocPtr exportXMLDoc(Xao* xaoObject);
-    void exportGeometry(Geometry* xaoGeometry, xmlDocPtr doc, xmlNodePtr xao);
+    xmlDocPtr exportXMLDoc(Xao* xaoObject, const std::string& shapeFileName);
+    void exportGeometry(Geometry* xaoGeometry, xmlDocPtr doc, xmlNodePtr xao, const std::string& shapeFileName);
     void exportGeometricElements(Geometry* xaoGeometry, xmlNodePtr topology,
                                  XAO::Dimension dim, const xmlChar* colTag, const xmlChar* eltTag);
     void exportGroups(Xao* xaoObject, xmlNodePtr xao);
@@ -109,13 +116,15 @@ namespace {
     void parseStepElementNode(xmlNodePtr eltNode, Step* step);
 
     std::string readStringProp(xmlNodePtr node, const xmlChar* attribute,
-                               const bool& required, const std::string& defaultValue, const std::string& exception = std::string(""));
+                               const bool& required, const std::string& defaultValue,
+                               const std::string& exception = std::string(""));
     int readIntegerProp(xmlNodePtr node, const xmlChar* attribute,
-                        const bool& required, const int& defaultValue, const std::string& exception = std::string(""));
+                        const bool& required, const int& defaultValue,
+                        const std::string& exception = std::string(""));
 
-  std::string readStringProp(xmlNodePtr node, const xmlChar* attribute,
-                             const bool& required, const std::string& defaultValue,
-                             const std::string& exception /*= std::string() */)
+    std::string readStringProp(xmlNodePtr node, const xmlChar* attribute,
+                               const bool& required, const std::string& defaultValue,
+                               const std::string& exception /*= std::string() */)
   {
     xmlChar* strAttr = xmlGetProp(node, attribute);
     if (strAttr == NULL)
@@ -161,7 +170,7 @@ namespace {
     return res;
   }
 
-  xmlDocPtr exportXMLDoc(Xao* xaoObject)
+  xmlDocPtr exportXMLDoc(Xao* xaoObject, const std::string& shapeFileName)
   {
     // Creating the Xml document
     xmlDocPtr masterDocument = xmlNewDoc(BAD_CAST "1.0");
@@ -173,7 +182,7 @@ namespace {
 
     if (xaoObject->getGeometry() != NULL)
     {
-        exportGeometry(xaoObject->getGeometry(), masterDocument, xao);
+        exportGeometry(xaoObject->getGeometry(), masterDocument, xao, shapeFileName);
     }
 
     exportGroups(xaoObject, xao);
@@ -199,7 +208,8 @@ namespace {
     }
   }
 
-  void exportGeometry(Geometry* xaoGeometry, xmlDocPtr doc, xmlNodePtr xao)
+  void exportGeometry(Geometry* xaoGeometry, xmlDocPtr doc, xmlNodePtr xao,
+                      const std::string& shapeFileName)
   {
     // Geometric part
     xmlNodePtr geometry = xmlNewChild(xao, 0, C_TAG_GEOMETRY, 0);
@@ -207,9 +217,20 @@ namespace {
 
     xmlNodePtr shape = xmlNewChild(geometry, 0, C_TAG_SHAPE, 0);
     xmlNewProp(shape, C_ATTR_SHAPE_FORMAT, BAD_CAST XaoUtils::shapeFormatToString(xaoGeometry->getFormat()).c_str());
-    std::string txtShape = xaoGeometry->getShapeString();
-    xmlNodePtr cdata = xmlNewCDataBlock(doc, BAD_CAST txtShape.c_str(), txtShape.size());
-    xmlAddChild(shape, cdata);
+
+    if (shapeFileName == "")
+    {
+        // export the shape in the XAO file
+        std::string txtShape = xaoGeometry->getShapeString();
+        xmlNodePtr cdata = xmlNewCDataBlock(doc, BAD_CAST txtShape.c_str(), txtShape.size());
+        xmlAddChild(shape, cdata);
+    }
+    else
+    {
+        // export the shape in an external file
+        xmlNewProp(shape, C_ATTR_SHAPE_FILE, BAD_CAST shapeFileName.c_str());
+        xaoGeometry->writeShapeFile(shapeFileName);
+    }
 
     xmlNodePtr topology = xmlNewChild(geometry, 0, C_TAG_TOPOLOGY, 0);
 
@@ -361,11 +382,20 @@ namespace {
   {
     if (geometry->getFormat() == XAO::BREP)
     {
-        xmlChar* data = xmlNodeGetContent(shapeNode->children);
-        if (data == NULL)
-            throw XAO_Exception("Missing BREP");
-        geometry->setShapeString((char*)data);
-        xmlFree(data);
+        std::string strFile = readStringProp(shapeNode, C_ATTR_SHAPE_FILE, false, "");
+        if (strFile != "")
+        {
+            geometry->readShapeFile(strFile);
+        }
+        else
+        {
+            // read brep from node content
+            xmlChar* data = xmlNodeGetContent(shapeNode->children);
+            if (data == NULL)
+                throw XAO_Exception("Missing BREP");
+            geometry->setShapeString((char*)data);
+            xmlFree(data);
+        }
     }
     else
     {
@@ -608,10 +638,10 @@ namespace {
   }
 }
 
-const bool XaoExporter::saveToFile(Xao* xaoObject, const std::string& fileName)
+const bool XaoExporter::saveToFile(Xao* xaoObject, const std::string& fileName, const std::string& shapeFileName)
 throw (XAO_Exception)
 {
-    xmlDocPtr doc = exportXMLDoc(xaoObject);
+    xmlDocPtr doc = exportXMLDoc(xaoObject, shapeFileName);
     xmlSaveFormatFileEnc(fileName.c_str(), doc, "UTF-8", 1); // format = 1 for node indentation
     xmlFreeDoc(doc);
 
@@ -621,7 +651,7 @@ throw (XAO_Exception)
 const std::string XaoExporter::saveToXml(Xao* xaoObject)
 throw (XAO_Exception)
 {
-    xmlDocPtr doc = exportXMLDoc(xaoObject);
+    xmlDocPtr doc = exportXMLDoc(xaoObject, "");
 
     xmlChar *xmlbuff;
     int buffersize;

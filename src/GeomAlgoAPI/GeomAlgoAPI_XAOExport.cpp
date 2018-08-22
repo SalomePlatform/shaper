@@ -68,7 +68,7 @@ bool XAOExport(const std::string& theFileName,
   }
 
   try {
-    XAO::XaoExporter::saveToFile(theXao, theFileName);
+    XAO::XaoExporter::saveToFile(theXao, theFileName, "");
   } catch (XAO::XAO_Exception& e) {
     theError = e.what();
     return false;

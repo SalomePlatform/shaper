@@ -215,9 +215,10 @@ namespace XAO
         /**
          * Exports this XAO object to a file.
          * \param fileName the name of the file to create.
+         * \param shapeFileName if not empty, export the shape to this external file.
          * \return true is the export is successful.
          */
-        const bool exportXAO(const std::string& fileName);
+        const bool exportXAO(const std::string& fileName, const std::string& shapeFileName);
         /**
          * Gets the XML corresponding to this XAO.
          * \return the XML as a string.

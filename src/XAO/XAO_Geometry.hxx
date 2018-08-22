@@ -94,6 +94,8 @@ namespace XAO
 
         virtual const std::string getShapeString() = 0;
         virtual void setShapeString(const std::string& shape) = 0;
+        virtual void writeShapeFile(const std::string& fileName) = 0;
+        virtual void readShapeFile(const std::string& fileName) = 0;
 
         const int countElements(const XAO::Dimension& dim) const throw (XAO_Exception);
         const int countVertices() const { return m_vertices.getSize(); }
