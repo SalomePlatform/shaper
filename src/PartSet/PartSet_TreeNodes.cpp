@@ -159,21 +159,24 @@ PartSet_ObjectNode::VisibilityState PartSet_ObjectNode::visibilityState() const
     ModuleBase_IWorkshop* aWork = workshop();
     ResultBodyPtr aCompRes = std::dynamic_pointer_cast<ModelAPI_ResultBody>(aResObj);
     if (aCompRes.get()) {
-      VisibilityState aState = aCompRes->numberOfSubs(true) == 0 ?
-        (aWork->isVisible(aCompRes) ? Visible : Hidden) : NoneState;
       std::list<ResultPtr> aResultsList;
       ModelAPI_Tools::allSubs(aCompRes, aResultsList);
+      VisibilityState aState = aResultsList.size() == 0 ?
+        (aWork->isVisible(aCompRes) ? Visible : Hidden) : NoneState;
 
       std::list<ResultPtr>::const_iterator aIt;
-      //for (int i = 0; i < aCompRes->numberOfSubs(true); i++) {
+      ResultBodyPtr aCompSub;
       for (aIt = aResultsList.cbegin(); aIt != aResultsList.cend(); aIt++) {
-        ResultPtr aSubRes = (*aIt); // aCompRes->subResult(i, true);
-        VisibilityState aS = aWork->isVisible(aSubRes) ? Visible : Hidden;
-        if (aState == NoneState)
-          aState = aS;
-        else if (aState != aS) {
-          aState = SemiVisible;
-          break;
+        ResultPtr aSubRes = (*aIt);
+        aCompSub = std::dynamic_pointer_cast<ModelAPI_ResultBody>(aSubRes);
+        if (!(aCompSub.get() && aCompSub->numberOfSubs() > 0)) {
+          VisibilityState aS = aWork->isVisible(aSubRes) ? Visible : Hidden;
+          if (aState == NoneState)
+            aState = aS;
+          else if (aState != aS) {
+            aState = SemiVisible;
+            break;
+          }
         }
       }
       return aState;
