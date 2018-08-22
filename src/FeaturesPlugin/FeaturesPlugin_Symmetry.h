@@ -26,6 +26,7 @@
 #include <ModelAPI_Feature.h>
 
 #include <GeomAlgoAPI_Symmetry.h>
+#include <GeomAlgoAPI_MakeShapeList.h>
 
 class GeomAPI_Trsf;
 
@@ -137,12 +138,12 @@ private:
   void performSymmetryByPlane();
 
   /// Perform the naming
-  void loadNamingDS(GeomAlgoAPI_Symmetry& theSymmetryAlgo,
+  void loadNamingDS(GeomAlgoAPI_MakeShapeList& theSymmetryAlgo,
                     std::shared_ptr<ModelAPI_ResultBody> theResultBody,
                     std::shared_ptr<GeomAPI_Shape> theBaseShape);
 
   /// Create new result on given shapes and the index of result
-  void buildResult(GeomAlgoAPI_Symmetry& theSymmetryAlgo,
+  void buildResult(std::shared_ptr<GeomAlgoAPI_Symmetry>& theSymmetryAlgo,
                    std::shared_ptr<GeomAPI_Shape> theBaseShape,
                    int theResultIndex);
 

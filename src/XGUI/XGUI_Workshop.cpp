@@ -1623,7 +1623,7 @@ void XGUI_Workshop::onContextMenuCommand(const QString& theId, bool isChecked)
 #ifdef DEBUG_WITH_MESSAGE_REPORT
         MyTCommunicator->RegisterPlugin("TKMessageView");
 #endif
-        MyTCommunicator->RegisterPlugin("SMBrowser"); // custom plugin to view ModelAPI
+        //MyTCommunicator->RegisterPlugin("SMBrowser"); // custom plugin to view ModelAPI
         //MyTCommunicator->RegisterPlugin("TKSMBrowser"); // custom plugin to view ModelAPI
 
         MyTCommunicator->Init(aParameters);

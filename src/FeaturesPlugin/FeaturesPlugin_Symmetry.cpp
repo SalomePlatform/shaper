@@ -23,6 +23,8 @@
 #include <GeomAlgoAPI_CompoundBuilder.h>
 #include <GeomAlgoAPI_PointBuilder.h>
 #include <GeomAlgoAPI_FaceBuilder.h>
+#include <GeomAlgoAPI_Copy.h>
+#include <GeomAlgoAPI_MakeShapeList.h>
 
 #include <GeomAPI_Edge.h>
 #include <GeomAPI_Face.h>
@@ -147,27 +149,28 @@ void FeaturesPlugin_Symmetry::performSymmetryByPoint()
       buildResult(anOrigin, aTrsf, aResultIndex);
     }
     else {
-      GeomAlgoAPI_Symmetry aSymmetryAlgo(aBaseShape, aPoint);
+      std::shared_ptr<GeomAlgoAPI_Symmetry> aSymmetryAlgo(
+        new GeomAlgoAPI_Symmetry(aBaseShape, aPoint));
 
-      if (!aSymmetryAlgo.check()) {
-        setError(aSymmetryAlgo.getError());
+      if (!aSymmetryAlgo->check()) {
+        setError(aSymmetryAlgo->getError());
         return;
       }
 
-      aSymmetryAlgo.build();
+      aSymmetryAlgo->build();
 
       // Checking that the algorithm worked properly.
-      if(!aSymmetryAlgo.isDone()) {
+      if(!aSymmetryAlgo->isDone()) {
         static const std::string aFeatureError = "Error: Symmetry algorithm failed.";
         setError(aFeatureError);
         break;
       }
-      if(aSymmetryAlgo.shape()->isNull()) {
+      if(aSymmetryAlgo->shape()->isNull()) {
         static const std::string aShapeError = "Error: Resulting shape is Null.";
         setError(aShapeError);
         break;
       }
-      if(!aSymmetryAlgo.isValid()) {
+      if(!aSymmetryAlgo->isValid()) {
         std::string aFeatureError = "Error: Resulting shape is not valid.";
         setError(aFeatureError);
         break;
@@ -223,27 +226,28 @@ void FeaturesPlugin_Symmetry::performSymmetryByAxis()
       buildResult(anOrigin, aTrsf, aResultIndex);
     }
     else {
-      GeomAlgoAPI_Symmetry aSymmetryAlgo(aBaseShape, anAxis);
+      std::shared_ptr<GeomAlgoAPI_Symmetry> aSymmetryAlgo(
+        new GeomAlgoAPI_Symmetry(aBaseShape, anAxis));
 
-      if (!aSymmetryAlgo.check()) {
-        setError(aSymmetryAlgo.getError());
+      if (!aSymmetryAlgo->check()) {
+        setError(aSymmetryAlgo->getError());
         return;
       }
 
-      aSymmetryAlgo.build();
+      aSymmetryAlgo->build();
 
       // Checking that the algorithm worked properly.
-      if(!aSymmetryAlgo.isDone()) {
+      if(!aSymmetryAlgo->isDone()) {
         static const std::string aFeatureError = "Error: Symmetry algorithm failed.";
         setError(aFeatureError);
         break;
       }
-      if(aSymmetryAlgo.shape()->isNull()) {
+      if(aSymmetryAlgo->shape()->isNull()) {
         static const std::string aShapeError = "Error: Resulting shape is Null.";
         setError(aShapeError);
         break;
       }
-      if(!aSymmetryAlgo.isValid()) {
+      if(!aSymmetryAlgo->isValid()) {
         std::string aFeatureError = "Error: Resulting shape is not valid.";
         setError(aFeatureError);
         break;
@@ -300,27 +304,28 @@ void FeaturesPlugin_Symmetry::performSymmetryByPlane()
       ResultPartPtr anOrigin = std::dynamic_pointer_cast<ModelAPI_ResultPart>(*aContext);
       buildResult(anOrigin, aTrsf, aResultIndex);
     } else {
-      GeomAlgoAPI_Symmetry aSymmetryAlgo(aBaseShape, aPlane);
+      std::shared_ptr<GeomAlgoAPI_Symmetry> aSymmetryAlgo(
+        new GeomAlgoAPI_Symmetry(aBaseShape, aPlane));
 
-      if (!aSymmetryAlgo.check()) {
-        setError(aSymmetryAlgo.getError());
+      if (!aSymmetryAlgo->check()) {
+        setError(aSymmetryAlgo->getError());
         return;
       }
 
-      aSymmetryAlgo.build();
+      aSymmetryAlgo->build();
 
       // Checking that the algorithm worked properly.
-      if(!aSymmetryAlgo.isDone()) {
+      if(!aSymmetryAlgo->isDone()) {
         static const std::string aFeatureError = "Error: Symmetry algorithm failed.";
         setError(aFeatureError);
         break;
       }
-      if(aSymmetryAlgo.shape()->isNull()) {
+      if(aSymmetryAlgo->shape()->isNull()) {
         static const std::string aShapeError = "Error: Resulting shape is Null.";
         setError(aShapeError);
         break;
       }
-      if(!aSymmetryAlgo.isValid()) {
+      if(!aSymmetryAlgo->isValid()) {
         std::string aFeatureError = "Error: Resulting shape is not valid.";
         setError(aFeatureError);
         break;
@@ -336,24 +341,30 @@ void FeaturesPlugin_Symmetry::performSymmetryByPlane()
 }
 
 //=================================================================================================
-void FeaturesPlugin_Symmetry::buildResult(GeomAlgoAPI_Symmetry& theSymmetryAlgo,
-                                          std::shared_ptr<GeomAPI_Shape> theBaseShape,
-                                          int theResultIndex)
+void FeaturesPlugin_Symmetry::buildResult(
+  std::shared_ptr<GeomAlgoAPI_Symmetry>& theSymmetryAlgo,
+  std::shared_ptr<GeomAPI_Shape> theBaseShape, int theResultIndex)
 {
+  GeomAlgoAPI_MakeShapeList anAlgoList;
+  anAlgoList.appendAlgo(theSymmetryAlgo);
   // Compose source shape and the result of symmetry.
   GeomShapePtr aCompound;
   if (boolean(KEEP_ORIGINAL_RESULT())->value()) {
     ListOfShape aShapes;
-    aShapes.push_back(theBaseShape);
-    aShapes.push_back(theSymmetryAlgo.shape());
+    // add a copy of a base shape otherwise selection of this base shape is bad (2592)
+    std::shared_ptr<GeomAlgoAPI_Copy> aCopyAlgo(new GeomAlgoAPI_Copy(theBaseShape));
+    aShapes.push_back(aCopyAlgo->shape());
+    anAlgoList.appendAlgo(aCopyAlgo);
+
+    aShapes.push_back(theSymmetryAlgo->shape());
     aCompound = GeomAlgoAPI_CompoundBuilder::compound(aShapes);
   } else
-    aCompound = theSymmetryAlgo.shape();
+    aCompound = theSymmetryAlgo->shape();
 
   // Store and name the result.
   ResultBodyPtr aResultBody = document()->createBody(data(), theResultIndex);
   aResultBody->storeModified(theBaseShape, aCompound);
-  loadNamingDS(theSymmetryAlgo, aResultBody, theBaseShape);
+  loadNamingDS(anAlgoList, aResultBody, theBaseShape);
   setResult(aResultBody, theResultIndex);
 }
 
@@ -376,14 +387,14 @@ void FeaturesPlugin_Symmetry::buildResult(ResultPartPtr theOriginal,
 }
 
 //=================================================================================================
-void FeaturesPlugin_Symmetry::loadNamingDS(GeomAlgoAPI_Symmetry& theSymmetryAlgo,
+void FeaturesPlugin_Symmetry::loadNamingDS(GeomAlgoAPI_MakeShapeList& theAlgo,
                                            std::shared_ptr<ModelAPI_ResultBody> theResultBody,
                                            std::shared_ptr<GeomAPI_Shape> theBaseShape)
 {
   // Name the faces
-  std::shared_ptr<GeomAPI_DataMapOfShapeShape> aSubShapes = theSymmetryAlgo.mapOfSubShapes();
+  std::shared_ptr<GeomAPI_DataMapOfShapeShape> aSubShapes = theAlgo.mapOfSubShapes();
   std::string aReflectedName = "Symmetried";
-  FeaturesPlugin_Tools::storeModifiedShapes(theSymmetryAlgo, theResultBody,
+  FeaturesPlugin_Tools::storeModifiedShapes(theAlgo, theResultBody,
                                             theBaseShape, 1, 2, 3, aReflectedName,
                                             *aSubShapes.get());
 }
