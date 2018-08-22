@@ -69,21 +69,20 @@ namespace ModelGeomAlgo_Shape
   }
 
   // Select sub-shape of the given type, which contains the given point
-  static GeomShapePtr findSubShape(const GeomShapePtr& theShape,
-                                   const GeomAPI_Shape::ShapeType& theType,
-                                   const GeomPointPtr& thePoint,
-                                   const double theTolerance)
+  static std::list<GeomShapePtr> findSubShape(const GeomShapePtr& theShape,
+                                              const GeomAPI_Shape::ShapeType& theType,
+                                              const GeomPointPtr& thePoint,
+                                              const double theTolerance)
   {
+    std::list<GeomShapePtr> aFoundSubs;
     std::list<GeomShapePtr> aSubs = theShape->subShapes(theType);
     for (std::list<GeomShapePtr>::const_iterator aSubIt = aSubs.begin();
          aSubIt != aSubs.end(); ++aSubIt) {
       GeomPointPtr aMiddlePoint = (*aSubIt)->middlePoint();
       if (aMiddlePoint && aMiddlePoint->distance(thePoint) < theTolerance)
-        return *aSubIt;
+        aFoundSubs.push_back(*aSubIt);
     }
-
-    // not found
-    return GeomShapePtr();
+    return aFoundSubs;
   }
 
   // Find circular/elliptical edge, which center/focus coincide with the given point
@@ -123,22 +122,45 @@ namespace ModelGeomAlgo_Shape
     return GeomShapePtr();
   }
 
+  static void appendSubshapeOfResult(std::list<SubshapeOfResult>& theList,
+      const ResultPtr& theResult,
+      const GeomShapePtr& theSubshape,
+      int theCenterType = (int)ModelAPI_AttributeSelection::NOT_CENTER)
+  {
+    SubshapeOfResult aSR;
+    aSR.myResult = theResult;
+    aSR.mySubshape = theSubshape;
+    aSR.myCenterType = theCenterType;
+    theList.push_back(aSR);
+  }
+
+  static void appendSubshapeOfResult(std::list<SubshapeOfResult>& theList,
+      const ResultPtr& theResult,
+      const std::list<GeomShapePtr>& theSubshape)
+  {
+    for (std::list<GeomShapePtr>::const_iterator anIt = theSubshape.begin();
+         anIt != theSubshape.end(); ++anIt) {
+      SubshapeOfResult aSR;
+      aSR.myResult = theResult;
+      aSR.mySubshape = *anIt;
+      aSR.myCenterType = (int)ModelAPI_AttributeSelection::NOT_CENTER;
+      theList.push_back(aSR);
+    }
+  }
+
   bool findSubshapeByPoint(const std::shared_ptr<ModelAPI_Feature>& theFeature,
                            const std::shared_ptr<GeomAPI_Pnt>& thePoint,
                            const GeomAPI_Shape::ShapeType& theShapeType,
-                           std::shared_ptr<ModelAPI_Result>& theResult,
-                           std::shared_ptr<GeomAPI_Shape>& theSubshape,
-                           int& theCenterType)
+                           std::list<SubshapeOfResult>& theSelected)
   {
     static const double TOLERANCE = 1.e-7;
 
-    theResult = ResultPtr();
-    theSubshape = GeomShapePtr();
-    theCenterType = (int)ModelAPI_AttributeSelection::NOT_CENTER;
+    theSelected.clear();
 
     const std::list<ResultPtr>& aResults = theFeature->results();
     for (std::list<ResultPtr>::const_iterator aResIt = aResults.begin();
          aResIt != aResults.end(); ++aResIt) {
+      bool isSubshapeFound = false;
       GeomShapePtr aCurShape = (*aResIt)->shape();
       // first of all, check the point is within bounding box of the result
       if (!aCurShape || !isPointWithinBB(thePoint, aCurShape, TOLERANCE))
@@ -154,26 +176,31 @@ namespace ModelGeomAlgo_Shape
         if (aCompSolid) {
           // process solids
           int aNbSolids = aCompSolid->numberOfSubs();
-          for (int i = 0; i < aNbSolids && !theSubshape; ++i) {
+          for (int i = 0; i < aNbSolids; ++i) {
             ResultPtr aSubResult = aCompSolid->subResult(i);
             GeomShapePtr aSubSolid = aSubResult->shape();
             if (aSubSolid && isPointWithinBB(thePoint, aSubSolid, TOLERANCE)) {
-              theSubshape = findSubShape(aSubSolid, theShapeType, thePoint, TOLERANCE);
-              if (theSubshape)
-                theResult = aSubResult;
+              std::list<GeomShapePtr> aSubshapes =
+                  findSubShape(aSubSolid, theShapeType, thePoint, TOLERANCE);
+              if (!aSubshapes.empty()) {
+                appendSubshapeOfResult(theSelected, aSubResult, aSubshapes);
+                isSubshapeFound = true;
+              }
             }
           }
-          if (theSubshape)
-            break;
         }
 
-        if (!theSubshape)
-          theSubshape = findSubShape(aCurShape, theShapeType, thePoint, TOLERANCE);
-        if (theSubshape) {
-          theResult = *aResIt;
-          break;
+        if (!isSubshapeFound) {
+          std::list<GeomShapePtr> aSubshapes =
+              findSubShape(aCurShape, theShapeType, thePoint, TOLERANCE);
+          if (!aSubshapes.empty()) {
+            appendSubshapeOfResult(theSelected, *aResIt, aSubshapes);
+            isSubshapeFound = true;
+          }
         }
       }
+      if (isSubshapeFound)
+        continue;
 
       // special case for ResultConstruction if the FACE is selected
       ResultConstructionPtr aResConstr =
@@ -185,33 +212,34 @@ namespace ModelGeomAlgo_Shape
           // check the point is within bounding box of the face
           if (!isPointWithinBB(thePoint, aCurFace, TOLERANCE))
             continue;
-          theSubshape = findSubShape(aCurFace, theShapeType, thePoint, TOLERANCE);
-          if (theSubshape) {
-            theResult = *aResIt;
-            break;
+          std::list<GeomShapePtr> aSubshapes =
+              findSubShape(aCurFace, theShapeType, thePoint, TOLERANCE);
+          if (!aSubshapes.empty()) {
+            appendSubshapeOfResult(theSelected, *aResIt, aSubshapes);
+            isSubshapeFound = true;
           }
         }
       }
-      if (theResult)
-        break;
+      if (isSubshapeFound)
+        continue;
 
       // next special case: the full sketch is selected
       // the selection type is a COMPOUND
       if (aSketchEdges &&
           aSketchEdges->middlePoint()->distance(thePoint) < TOLERANCE) {
         // select whole result
-        theResult = *aResIt;
-        theSubshape = GeomShapePtr();
-        break;
+        appendSubshapeOfResult(theSelected, *aResIt, GeomShapePtr());
+        continue;
       }
 
       // another special case: the center of circle or the focus of ellipse is selected;
       // return the corresponding edge and a status of the center
       if (theShapeType == GeomAPI_Shape::VERTEX) {
-        theSubshape = findEdgeByCenter(aCurShape, thePoint, TOLERANCE, theCenterType);
-        if (theSubshape) {
-          theResult = *aResIt;
-          break;
+        int aCenterType;
+        GeomShapePtr aSubshape = findEdgeByCenter(aCurShape, thePoint, TOLERANCE, aCenterType);
+        if (aSubshape) {
+          appendSubshapeOfResult(theSelected, *aResIt, aSubshape, aCenterType);
+          continue;
         }
       }
     }
@@ -219,7 +247,7 @@ namespace ModelGeomAlgo_Shape
     // one more special case: a vertex selected is a sketch point;
     // it is not included into sketch result; thus, it is necessary
     // to pass through the sketch sub-features and verify all points
-    if (!theResult && theShapeType == GeomAPI_Shape::VERTEX && !aResults.empty()) {
+    if (theSelected.empty() && theShapeType == GeomAPI_Shape::VERTEX && !aResults.empty()) {
       CompositeFeaturePtr aCF = std::dynamic_pointer_cast<ModelAPI_CompositeFeature>(theFeature);
       std::shared_ptr<GeomAPI_PlanarEdges> aSketchEdges =
           std::dynamic_pointer_cast<GeomAPI_PlanarEdges>(aResults.front()->shape());
@@ -233,9 +261,10 @@ namespace ModelGeomAlgo_Shape
           for (std::list<ResultPtr>::const_iterator aSRIt = aSubResults.begin();
                aSRIt != aSubResults.end(); ++aSRIt) {
             GeomShapePtr aCurShape = (*aSRIt)->shape();
-            theSubshape = findSubShape(aCurShape, theShapeType, thePoint, TOLERANCE);
-            if (theSubshape) {
-              theResult = aResults.front();
+            std::list<GeomShapePtr> aSubshapes =
+                findSubShape(aCurShape, theShapeType, thePoint, TOLERANCE);
+            if (!aSubshapes.empty()) {
+              appendSubshapeOfResult(theSelected, aResults.front(), aSubshapes);
               isContinue = false;
               break;
             }
@@ -244,6 +273,6 @@ namespace ModelGeomAlgo_Shape
       }
     }
 
-    return (bool)theResult;
+    return !theSelected.empty();
   }
 } // namespace ModelGeomAlgo_Shape

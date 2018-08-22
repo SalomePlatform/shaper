@@ -40,22 +40,26 @@ namespace ModelGeomAlgo_Shape {
                               const GeomAPI_Shape::ShapeType& theType,
                               std::set<std::shared_ptr<ModelAPI_Result> >& theShapeResults);
 
+  struct SubshapeOfResult
+  {
+    std::shared_ptr<ModelAPI_Result> myResult;
+    std::shared_ptr<GeomAPI_Shape> mySubshape;
+    int myCenterType;
+  };
+
   /// Searches a sub-shape in the results of the given features,
   /// which contains the given point.
   /// \param[in]  theFeature    feature, which results are being processed
   /// \param[in]  thePoint      selected point which identifies the shape
   /// \param[in]  theShapeType  type of the selected shape
-  /// \param[out] theResult     applicable result
-  /// \param[out] theSubshape   sub-shape of the found result
-  /// \param[out] theCenterType type of the point if it is a center of circle or a focus of ellipse
+  /// \param[out] theSelected   applicable result, sub-shape of the found result and
+  ///                           type of the point if it is a center of circle or a focus of ellipse
   /// \return \c true if the result and its applicable sub-shape are found
   MODELGEOMALGO_EXPORT bool findSubshapeByPoint(
                               const std::shared_ptr<ModelAPI_Feature>& theFeature,
                               const std::shared_ptr<GeomAPI_Pnt>& thePoint,
                               const GeomAPI_Shape::ShapeType& theShapeType,
-                              std::shared_ptr<ModelAPI_Result>& theResult,
-                              std::shared_ptr<GeomAPI_Shape>& theSubshape,
-                              int& theCenterType);
+                              std::list<SubshapeOfResult>& theSelected);
 }
 
 #endif

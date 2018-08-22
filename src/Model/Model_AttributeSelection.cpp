@@ -1073,6 +1073,10 @@ void Model_AttributeSelection::selectSubShape(const std::string& theType,
   if (theType.empty() || !thePoint)
     return;
 
+  // list of parent features
+  FeaturePtr anOwner = ModelAPI_Feature::feature(owner());
+  std::set<FeaturePtr> aParents = ModelAPI_Tools::getParents(anOwner);
+
   int aSelectionIndex = 0;
   GeomAPI_Shape::ShapeType aType = GeomAPI_Shape::shapeTypeByStr(theType);
   if (aType == GeomAPI_Shape::SHAPE) {
@@ -1095,9 +1099,8 @@ void Model_AttributeSelection::selectSubShape(const std::string& theType,
       aSelectionIndex -= 1;
     }
   }
-  ResultPtr aFoundResult;
-  GeomShapePtr aFoundSubShape;
-  int aFoundCenterType;
+
+  std::list<ModelGeomAlgo_Shape::SubshapeOfResult> anAppropriate;
 
   // collect features from PartSet and the current part
   SessionPtr aSession = ModelAPI_Session::get();
@@ -1110,6 +1113,9 @@ void Model_AttributeSelection::selectSubShape(const std::string& theType,
   // to find appropriate sub-shape
   for (std::list<FeaturePtr>::const_reverse_iterator anIt = aFeatures.rbegin();
        anIt != aFeatures.rend(); ++anIt) {
+    // selection cannot be linked to the parent features
+    if (aParents.find(*anIt) != aParents.end())
+      continue;
     // check the feature is a part of composite feature (like sketch elements),
     // then do not process it, it will be processed in scope of composite feature
     bool isSubOfComposite = false;
@@ -1125,17 +1131,17 @@ void Model_AttributeSelection::selectSubShape(const std::string& theType,
       continue;
 
     // process results of the current feature to find appropriate sub-shape
-    aFoundCenterType = (int)ModelAPI_AttributeSelection::NOT_CENTER;
-    if (ModelGeomAlgo_Shape::findSubshapeByPoint(*anIt, thePoint, aType,
-                                                 aFoundResult, aFoundSubShape, aFoundCenterType)) {
-      if (aSelectionIndex > 0)
-        --aSelectionIndex; // skip this shape, because one of the previous is selected
-      else {
-        if (aFoundCenterType == (int)ModelAPI_AttributeSelection::NOT_CENTER)
-          setValue(aFoundResult, aFoundSubShape);
+    if (ModelGeomAlgo_Shape::findSubshapeByPoint(*anIt, thePoint, aType, anAppropriate)) {
+      std::list<ModelGeomAlgo_Shape::SubshapeOfResult>::iterator anApIt = anAppropriate.begin();
+      for (; aSelectionIndex > 0 && anApIt != anAppropriate.end(); --aSelectionIndex)
+        ++anApIt; // skip this shape, because one of the previous is selected
+
+      if (anApIt != anAppropriate.end()) {
+        if (anApIt->myCenterType == (int)ModelAPI_AttributeSelection::NOT_CENTER)
+          setValue(anApIt->myResult, anApIt->mySubshape);
         else
-          setValueCenter(aFoundResult, aFoundSubShape->edge(),
-                         (ModelAPI_AttributeSelection::CenterType)aFoundCenterType);
+          setValueCenter(anApIt->myResult, anApIt->mySubshape->edge(),
+                         (ModelAPI_AttributeSelection::CenterType)anApIt->myCenterType);
         return;
       }
     }

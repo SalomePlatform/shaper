@@ -717,4 +717,44 @@ std::pair<std::string, bool> getDefaultName(const std::shared_ptr<ModelAPI_Resul
   return std::pair<std::string, bool>(aDefaultName.str(), false);
 }
 
+std::set<FeaturePtr> getParents(const FeaturePtr& theFeature)
+{
+  std::set<FeaturePtr> aParents;
+  for (FeaturePtr aCurFeat = theFeature; aCurFeat; ) {
+    CompositeFeaturePtr aFoundComposite;
+    const std::set<AttributePtr>& aRefs = aCurFeat->data()->refsToMe();
+    for (std::set<AttributePtr>::const_iterator anIt = aRefs.begin();
+      anIt != aRefs.end(); ++anIt) {
+      FeaturePtr aF = ModelAPI_Feature::feature((*anIt)->owner());
+      aFoundComposite = std::dynamic_pointer_cast<ModelAPI_CompositeFeature>(aF);
+      if (aFoundComposite && aFoundComposite->isSub(aCurFeat))
+        break;
+      else
+        aFoundComposite = CompositeFeaturePtr();
+    }
+
+    if (aFoundComposite) {
+      aParents.insert(aFoundComposite);
+      aCurFeat = aFoundComposite;
+    }
+    else {
+      // add the part containing high-level feature
+      SessionPtr aSession = ModelAPI_Session::get();
+      DocumentPtr aPartSetDoc = aSession->moduleDocument();
+      std::list<FeaturePtr> aPartSetFeatures = aPartSetDoc->allFeatures();
+      for (std::list<FeaturePtr>::const_iterator anIt = aPartSetFeatures.begin();
+        anIt != aPartSetFeatures.end(); ++anIt) {
+        aFoundComposite = std::dynamic_pointer_cast<ModelAPI_CompositeFeature>(*anIt);
+        if (aFoundComposite && aFoundComposite->isSub(aCurFeat)) {
+          aParents.insert(aFoundComposite);
+          break;
+        }
+      }
+
+      aCurFeat = FeaturePtr();
+    }
+  }
+  return aParents;
+}
+
 } // namespace ModelAPI_Tools

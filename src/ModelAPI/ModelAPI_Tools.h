@@ -200,6 +200,11 @@ MODELAPI_EXPORT void getConcealedResults(const std::shared_ptr<ModelAPI_Feature>
  */
 MODELAPI_EXPORT std::pair<std::string, bool> getDefaultName(
   const std::shared_ptr<ModelAPI_Result>& theResult, const bool theInherited = true);
+
+/*! Collect all parents for the given feature, including the Part
+ */
+MODELAPI_EXPORT std::set<std::shared_ptr<ModelAPI_Feature> >
+    getParents(const std::shared_ptr<ModelAPI_Feature>& theFeature);
 }
 
 #endif
