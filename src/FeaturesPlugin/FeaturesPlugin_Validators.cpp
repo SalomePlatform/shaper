@@ -1214,6 +1214,12 @@ bool FeaturesPlugin_ValidatorBooleanSmashSelection::isValid(
 
   for (int anIndex = 0; anIndex < anOtherAttrSelectionList->size(); ++anIndex) {
     AttributeSelectionPtr anAttrSelection = anOtherAttrSelectionList->value(anIndex);
+
+    if (anAttrSelection->contextFeature().get()) {
+      theError = "Error: Features not allowed for selection.";
+      return false;
+    }
+
     ResultPtr aContext = anAttrSelection->context();
     std::shared_ptr<GeomAPI_Shape> aShape = anAttrSelection->value();
     GeomShapePtr aContextShape = aContext->shape();
@@ -1242,6 +1248,12 @@ bool FeaturesPlugin_ValidatorBooleanSmashSelection::isValid(
       theError = "Error: Empty attribute selection.";
       return false;
     }
+
+    if (anAttrSelection->contextFeature().get()) {
+      theError = "Error: Features not allowed for selection.";
+      return false;
+    }
+
     ResultPtr aContext = anAttrSelection->context();
     if(!aContext.get()) {
       FeaturePtr aContFeat = anAttrSelection->contextFeature();
