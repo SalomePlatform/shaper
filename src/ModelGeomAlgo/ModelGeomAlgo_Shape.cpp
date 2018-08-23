@@ -26,7 +26,7 @@
 #include <ModelAPI_CompositeFeature.h>
 #include <ModelAPI_Feature.h>
 #include <ModelAPI_Result.h>
-#include <ModelAPI_ResultCompSolid.h>
+#include <ModelAPI_ResultBody.h>
 #include <ModelAPI_ResultConstruction.h>
 
 #include <GeomAPI_Circ.h>
@@ -171,8 +171,7 @@ namespace ModelGeomAlgo_Shape
       std::shared_ptr<GeomAPI_PlanarEdges> aSketchEdges =
           std::dynamic_pointer_cast<GeomAPI_PlanarEdges>(aCurShape);
       if (theShapeType != GeomAPI_Shape::COMPOUND || !aSketchEdges) {
-        ResultCompSolidPtr aCompSolid =
-            std::dynamic_pointer_cast<ModelAPI_ResultCompSolid>(*aResIt);
+        ResultBodyPtr aCompSolid = std::dynamic_pointer_cast<ModelAPI_ResultBody>(*aResIt);
         if (aCompSolid) {
           // process solids
           int aNbSolids = aCompSolid->numberOfSubs();
