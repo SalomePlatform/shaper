@@ -244,10 +244,11 @@ namespace ModelGeomAlgo_Shape
       }
     }
 
-    // one more special case: a vertex selected is a sketch point;
-    // it is not included into sketch result; thus, it is necessary
-    // to pass through the sketch sub-features and verify all points
-    if (theSelected.empty() && theShapeType == GeomAPI_Shape::VERTEX && !aResults.empty()) {
+    // one more special case: the selected entity is a separated sketch point
+    // or an auxiliary sketch edge; they are not included into the sketch result;
+    // thus, it is necessary to pass through the sketch sub-features and find selected.
+    if (theSelected.empty() && !aResults.empty() &&
+       (theShapeType == GeomAPI_Shape::VERTEX || theShapeType == GeomAPI_Shape::EDGE)) {
       CompositeFeaturePtr aCF = std::dynamic_pointer_cast<ModelAPI_CompositeFeature>(theFeature);
       std::shared_ptr<GeomAPI_PlanarEdges> aSketchEdges =
           std::dynamic_pointer_cast<GeomAPI_PlanarEdges>(aResults.front()->shape());
