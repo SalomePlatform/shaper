@@ -238,6 +238,21 @@ void PartSet_ObjectNode::update()
         delete aNode;
       }
     }
+    else {
+      ObjectPtr aObj;
+      ModuleBase_ITreeNode* aNode;
+      int aId = 0;
+      while (aId < myChildren.size()) {
+        aNode = myChildren.at(aId);
+        aObj = subObject(aId);
+        if (aNode->object() != aObj) {
+          myChildren.removeAll(aNode);
+          delete aNode;
+        }
+        else
+          aId++;
+      }
+    }
 
     ModuleBase_ITreeNode* aNode;
     ObjectPtr aBody;
@@ -336,24 +351,38 @@ QTreeNodesList PartSet_ObjectNode::objectsDeleted(
 {
   QTreeNodesList aResult;
   int aNb = numberOfSubs();
-  if (aNb > 0) {
-    ModuleBase_ITreeNode* aNode;
-    // Delete extra objects
-    bool isDeleted = false;
-    while (myChildren.size() > aNb) {
-      aNode = myChildren.takeLast();
-      delete aNode;
-      isDeleted = true;
-    }
-    if (isDeleted)
+  if (aNb != myChildren.size()) {
+    if (aNb == 0) {
+      deleteChildren();
       aResult.append(this);
-    int i = 0;
-    ObjectPtr aBody;
-    foreach(ModuleBase_ITreeNode* aNode, myChildren) {
-      aBody = subObject(i);
-      ((PartSet_ObjectNode*)aNode)->setObject(aBody);
-      aResult.append(aNode->objectsDeleted(theDoc, theGroup));
-      i++;
+    }
+    else {
+      // Delete extra objects
+      bool isDeleted = false;
+      ObjectPtr aObj;
+      ModuleBase_ITreeNode* aNode;
+      int aId = 0;
+      while (aId < myChildren.size()) {
+        aNode = myChildren.at(aId);
+        aObj = subObject(aId);
+        if (aNode->object() != aObj) {
+          myChildren.removeAll(aNode);
+          delete aNode;
+          isDeleted = true;
+        }
+        else
+          aId++;
+      }
+      if (isDeleted)
+        aResult.append(this);
+      int i = 0;
+      ObjectPtr aBody;
+      foreach(ModuleBase_ITreeNode* aNode, myChildren) {
+        aBody = subObject(i);
+        ((PartSet_ObjectNode*)aNode)->setObject(aBody);
+        aResult.append(aNode->objectsDeleted(theDoc, theGroup));
+        i++;
+      }
     }
   }
   return aResult;
