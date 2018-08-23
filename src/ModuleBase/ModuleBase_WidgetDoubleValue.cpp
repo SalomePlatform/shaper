@@ -101,10 +101,11 @@ ModuleBase_WidgetDoubleValue::ModuleBase_WidgetDoubleValue(QWidget* theParent,
     mySpinBox->setSingleStep(aStepVal);
   }
 
-  double aDefVal = QString::fromStdString(getDefaultValue()).toDouble(&isOk);
-  if (isOk) {
-    mySpinBox->setValue(aDefVal);
-  }
+  myDefaultVal = QString::fromStdString(getDefaultValue()).toDouble(&isOk);
+  if (isOk)
+    mySpinBox->setValue(myDefaultVal);
+  else
+    myDefaultVal = 0;
 
   QString aTTip = translate(theData->widgetTooltip());
   mySpinBox->setToolTip(aTTip);
@@ -210,12 +211,15 @@ bool ModuleBase_WidgetDoubleValue::restoreValueCustom()
     //  aText += aExprAttr->value().c_str();
     //}
     ModuleBase_Tools::setSpinText(mySpinBox, aText);
-  } else {
-    ModuleBase_Tools::setSpinValue(mySpinBox, aRef->isInitialized() ? aRef->value() : 0);
+  }
+  else {
+    ModuleBase_Tools::setSpinValue(mySpinBox, aRef->isInitialized() ? aRef->value() : myDefaultVal);
     if (aRef->isInitialized() && aRef->expressionInvalid()) {
       aRef->setExpressionError("");
       aRef->setExpressionInvalid(false);
     }
+    if (!aRef->isInitialized())
+      aRef->setValue(myDefaultVal);
   }
   return true;
 }

@@ -126,24 +126,35 @@ bool ModuleBase_WidgetPointInput::storeValueCustom()
 bool ModuleBase_WidgetPointInput::restoreValueCustom()
 {
   AttributePointPtr aAttr = std::dynamic_pointer_cast<GeomDataAPI_Point>(attribute());
-  if (aAttr.get() && aAttr->isInitialized()) {
-    std::string aXText = aAttr->textX();
-    if (aXText.empty()) {
-      myXSpin->setValue(aAttr->x());
-    } else {
-      myXSpin->setText(aXText.c_str());
+  if (aAttr.get()) {
+    if (aAttr->isInitialized()) {
+      std::string aXText = aAttr->textX();
+      if (aXText.empty()) {
+        myXSpin->setValue(aAttr->x());
+      }
+      else {
+        myXSpin->setText(aXText.c_str());
+      }
+      std::string aYText = aAttr->textY();
+      if (aYText.empty()) {
+        myYSpin->setValue(aAttr->y());
+      }
+      else {
+        myYSpin->setText(aYText.c_str());
+      }
+      std::string aZText = aAttr->textZ();
+      if (aZText.empty()) {
+        myZSpin->setValue(aAttr->z());
+      }
+      else {
+        myZSpin->setText(aZText.c_str());
+      }
     }
-    std::string aYText = aAttr->textY();
-    if (aYText.empty()) {
-      myYSpin->setValue(aAttr->y());
-    } else {
-      myYSpin->setText(aYText.c_str());
-    }
-    std::string aZText = aAttr->textZ();
-    if (aZText.empty()) {
-      myZSpin->setValue(aAttr->z());
-    } else {
-      myZSpin->setText(aZText.c_str());
+    else {
+      aAttr->setValue(myDefaultValue[0], myDefaultValue[1], myDefaultValue[2]);
+      myXSpin->setValue(myDefaultValue[0]);
+      myYSpin->setValue(myDefaultValue[1]);
+      myZSpin->setValue(myDefaultValue[2]);
     }
     return true;
   }

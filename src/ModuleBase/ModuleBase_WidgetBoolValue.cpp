@@ -40,11 +40,11 @@ ModuleBase_WidgetBoolValue::ModuleBase_WidgetBoolValue(QWidget* theParent,
 {
   QString aText = translate(theData->widgetLabel());
   QString aToolTip = translate(theData->widgetTooltip());
-  bool isChecked = theData->getBooleanAttribute(ATTR_DEFAULT, false);
+  myDefVal = theData->getBooleanAttribute(ATTR_DEFAULT, false);
 
   myCheckBox = new QCheckBox(aText, this);
   myCheckBox->setToolTip(aToolTip);
-  myCheckBox->setChecked(isChecked);
+  myCheckBox->setChecked(myDefVal);
 
   QVBoxLayout* aMainLayout = new QVBoxLayout(this);
   ModuleBase_Tools::adjustMargins(aMainLayout);
@@ -73,9 +73,14 @@ bool ModuleBase_WidgetBoolValue::restoreValueCustom()
   std::shared_ptr<ModelAPI_AttributeBoolean> aRef = aData->boolean(attributeID());
 
   bool isBlocked = myCheckBox->blockSignals(true);
-  myCheckBox->setChecked(aRef->value());
+  if (aRef->isInitialized()) {
+    myCheckBox->setChecked(aRef->value());
+  }
+  else {
+    myCheckBox->setChecked(myDefVal);
+    aRef->setValue(myDefVal);
+  }
   myCheckBox->blockSignals(isBlocked);
-
   return true;
 }
 

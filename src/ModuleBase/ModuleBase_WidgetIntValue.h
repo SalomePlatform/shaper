@@ -83,6 +83,8 @@ protected:
   ModuleBase_ParamSpinBox* mySpinBox;
 
   FeaturePtr myParameter;
+
+  int myDefVal;
 };
 
 #endif

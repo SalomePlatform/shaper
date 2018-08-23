@@ -59,6 +59,8 @@ protected:
  private:
    /// The check box
   QCheckBox* myCheckBox;
+
+  bool myDefVal;
 };
 
 #endif

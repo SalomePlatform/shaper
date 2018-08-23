@@ -101,16 +101,25 @@ bool ModuleBase_PagedContainer::restoreValueCustom()
   DataPtr aData = myFeature->data();
   AttributeStringPtr aStringAttr = aData->string(attributeID());
   QString aCaseId;
-  if (myIsEditing)
-    aCaseId = QString::fromStdString(aStringAttr->value());
-  else
-    aCaseId = QString::fromStdString(aDefVal.empty()? aStringAttr->value() : aDefVal);
-
-  myIsFirst = false;
-  int idx = myCaseIds.indexOf(aCaseId);
-  if (idx == -1)
-    idx = currentPageIndex();
-  setCurrentPageIndex(idx);
+  if (aStringAttr->isInitialized()) {
+    if (myIsEditing)
+      aCaseId = QString::fromStdString(aStringAttr->value());
+    else
+      aCaseId = QString::fromStdString(aDefVal.empty() ? aStringAttr->value() : aDefVal);
+    myIsFirst = false;
+    int idx = myCaseIds.indexOf(aCaseId);
+    if (idx == -1)
+      idx = currentPageIndex();
+    setCurrentPageIndex(idx);
+  }
+  else {
+    // It is added because if user edits the feature created from Python
+    // and switches his choice
+    // it will not be stored in the attribute while apply not pressed.
+    // But this button will be disabled because of not initialized attribute
+    aStringAttr->setValue(myCaseIds.at(0).toStdString());
+    setCurrentPageIndex(0);
+  }
   return true;
 }
 

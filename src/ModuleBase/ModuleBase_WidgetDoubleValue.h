@@ -88,6 +88,8 @@ protected:
   ModuleBase_ParamSpinBox* mySpinBox;
 
   FeaturePtr myParameter;
+
+  double myDefaultVal;
 };
 
 #endif
