@@ -85,6 +85,7 @@ protected:
   FeaturePtr myParameter;
 
   int myDefVal;
+  bool myHasDefault;
 };
 
 #endif

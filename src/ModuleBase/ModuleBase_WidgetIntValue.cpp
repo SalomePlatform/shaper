@@ -52,7 +52,7 @@
 
 ModuleBase_WidgetIntValue::ModuleBase_WidgetIntValue(QWidget* theParent,
                                                      const Config_WidgetAPI* theData)
-: ModuleBase_ModelWidget(theParent, theData)
+: ModuleBase_ModelWidget(theParent, theData), myHasDefault(false)
 {
   QFormLayout* aControlLay = new QFormLayout(this);
   ModuleBase_Tools::adjustMargins(aControlLay);
@@ -91,11 +91,9 @@ ModuleBase_WidgetIntValue::ModuleBase_WidgetIntValue(QWidget* theParent,
     mySpinBox->setSingleStep(aStepVal);
   }
 
-  myDefVal = QString::fromStdString(getDefaultValue()).toInt(&isOk);
+  myDefVal = QString::fromStdString(getDefaultValue()).toInt(&myHasDefault);
   if (isOk)
     mySpinBox->setValue(myDefVal);
-  else
-    myDefVal = 0;
 
   QString aTTip = translate(theData->widgetTooltip());
   mySpinBox->setToolTip(aTTip);
@@ -206,7 +204,7 @@ bool ModuleBase_WidgetIntValue::restoreValueCustom()
       anAttribute->setExpressionError("");
       anAttribute->setExpressionInvalid(false);
     }
-    if (!anAttribute->isInitialized())
+    if ((!anAttribute->isInitialized()) && myHasDefault)
       anAttribute->setValue(myDefVal);
   }
   return true;
