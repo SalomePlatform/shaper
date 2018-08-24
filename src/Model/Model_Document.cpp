@@ -91,7 +91,7 @@ static const int TAG_NODES_STATE = 4; ///< array, tag of the Object Browser node
 static const int TAG_EXTERNAL_CONSTRUCTIONS = 5;
 
 Model_Document::Model_Document(const int theID, const std::string theKind)
-    : myID(theID), myKind(theKind), myIsActive(false),
+    : myID(theID), myKind(theKind), myIsActive(false), myIsSetCurrentFeature(false),
       myDoc(new TDocStd_Document("BinOcaf"))  // binary OCAF format
 {
 #ifdef TINSPECTOR
@@ -1084,6 +1084,9 @@ std::shared_ptr<ModelAPI_Feature> Model_Document::currentFeature(const bool theV
 void Model_Document::setCurrentFeature(
   std::shared_ptr<ModelAPI_Feature> theCurrent, const bool theVisible)
 {
+  if (myIsSetCurrentFeature)
+    return;
+  myIsSetCurrentFeature = true;
   // blocks the flush signals to avoid each objects visualization in the viewer
   // they should not be shown once after all modifications are performed
   Events_Loop* aLoop = Events_Loop::loop();
@@ -1120,6 +1123,7 @@ void Model_Document::setCurrentFeature(
     std::shared_ptr<Model_Data> aData = std::static_pointer_cast<Model_Data>(theCurrent->data());
     if (!aData.get() || !aData->isValid()) {
       aLoop->activateFlushes(isActive);
+      myIsSetCurrentFeature = false;
       return;
     }
     TDF_Label aFeatureLabel = aData->label().Father();
@@ -1192,6 +1196,7 @@ void Model_Document::setCurrentFeature(
       }
     }
   }
+  myIsSetCurrentFeature = false;
   // unblock  the flush signals and up them after this
   aLoop->activateFlushes(isActive);
 }

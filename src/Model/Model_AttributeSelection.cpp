@@ -180,6 +180,17 @@ bool Model_AttributeSelection::setValue(const ObjectPtr& theContext,
     aSelLab.ForgetAllAttributes(true);
     TDataStd_UAttribute::Set(aSelLab, kPART_REF_ID);
     selectPart(std::dynamic_pointer_cast<ModelAPI_Result>(theContext), theSubShape);
+  } else { // check the feature context: parent-Part of this feature should not be used
+    FeaturePtr aFeatureContext = std::dynamic_pointer_cast<ModelAPI_Feature>(theContext);
+    if (aFeatureContext.get()) {
+      if (owner()->document() != aFeatureContext->document()) {
+        aSelLab.ForgetAllAttributes(true);
+        myRef.setValue(ObjectPtr());
+        if (aToUnblock)
+          owner()->data()->blockSendAttributeUpdated(false);
+        return false;
+      }
+    }
   }
 
   owner()->data()->sendAttributeUpdated(this);

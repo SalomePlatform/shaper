@@ -430,6 +430,8 @@ class Model_Document : public ModelAPI_Document
 
   //! The selection feature, if needed
   FeaturePtr mySelectionFeature;
+
+  bool myIsSetCurrentFeature; ///< flag that my current feature is changed right now (recursion)
 };
 
 #endif

@@ -213,6 +213,18 @@ void Model_BodyBuilder::storeGenerated(const std::shared_ptr<GeomAPI_Shape>& the
   }
 }
 
+TNaming_Builder* Model_BodyBuilder::builder(const int theTag)
+{
+  std::map<int, TNaming_Builder*>::iterator aFind = myBuilders.find(theTag);
+  if (aFind == myBuilders.end()) {
+    std::shared_ptr<Model_Data> aData = std::dynamic_pointer_cast<Model_Data>(data());
+    myBuilders[theTag] = new TNaming_Builder(
+      theTag == 0 ? aData->shapeLab() : aData->shapeLab().FindChild(theTag));
+    aFind = myBuilders.find(theTag);
+  }
+  return aFind->second;
+}
+
 void Model_BodyBuilder::storeModified(const std::shared_ptr<GeomAPI_Shape>& theOldShape,
   const std::shared_ptr<GeomAPI_Shape>& theNewShape, const int theDecomposeSolidsTag)
 {
@@ -223,7 +235,7 @@ void Model_BodyBuilder::storeModified(const std::shared_ptr<GeomAPI_Shape>& theO
     if (theDecomposeSolidsTag != -2)
       clean();
     // store the new shape as primitive
-    TNaming_Builder aBuilder(aShapeLab);
+    TNaming_Builder* aBuilder = builder(0);
     if (!theOldShape || !theNewShape)
       return;  // bad shape
     TopoDS_Shape aShapeOld = theOldShape->impl<TopoDS_Shape>();
@@ -232,15 +244,15 @@ void Model_BodyBuilder::storeModified(const std::shared_ptr<GeomAPI_Shape>& theO
     TopoDS_Shape aShapeNew = theNewShape->impl<TopoDS_Shape>();
     if (aShapeNew.IsNull())
       return;  // null shape inside
-    aBuilder.Modify(aShapeOld, aShapeNew);
-    if(!aBuilder.NamedShape()->IsEmpty()) {
+    aBuilder->Modify(aShapeOld, aShapeNew);
+    if(!aBuilder->NamedShape()->IsEmpty()) {
       Handle(TDataStd_Name) anAttr;
-      if(aBuilder.NamedShape()->Label().FindAttribute(TDataStd_Name::GetID(),anAttr)) {
+      if(aBuilder->NamedShape()->Label().FindAttribute(TDataStd_Name::GetID(),anAttr)) {
         std::string aName (TCollection_AsciiString(anAttr->Get()).ToCString());
         if(!aName.empty()) {
           std::shared_ptr<Model_Document> aDoc =
             std::dynamic_pointer_cast<Model_Document>(document());
-          aDoc->addNamingName(aBuilder.NamedShape()->Label(), aName);
+          aDoc->addNamingName(aBuilder->NamedShape()->Label(), aName);
         }
       }
     }
@@ -288,18 +300,6 @@ void Model_BodyBuilder::clean()
 Model_BodyBuilder::~Model_BodyBuilder()
 {
   clean();
-}
-
-TNaming_Builder* Model_BodyBuilder::builder(const int theTag)
-{
-  std::map<int, TNaming_Builder*>::iterator aFind = myBuilders.find(theTag);
-  if (aFind == myBuilders.end()) {
-    std::shared_ptr<Model_Data> aData = std::dynamic_pointer_cast<Model_Data>(data());
-    myBuilders[theTag] = new TNaming_Builder(
-      theTag == 0 ? aData->shapeLab() : aData->shapeLab().FindChild(theTag));
-    aFind = myBuilders.find(theTag);
-  }
-  return aFind->second;
 }
 
 void Model_BodyBuilder::buildName(const int theTag, const std::string& theName)
@@ -687,8 +687,18 @@ void Model_BodyBuilder::loadAndOrientModifiedShapes (
         // Store only in case if it does not have reference.
         if (!aShapeLab.FindAttribute(TDF_Reference::GetID(), aRef)) {
           if (theIsStoreAsGenerated) {
+            TNaming_Builder* aBuilder = builder(0);
+            if (!aBuilder->NamedShape().IsNull() &&
+                aBuilder->NamedShape()->Evolution() != TNaming_GENERATED) {
+              myBuilders.erase(0); // clear old builder to avoid different evolutions crash
+            }
             builder(0)->Generated(aRoot, aNewShape);
           } else {
+            TNaming_Builder* aBuilder = builder(0);
+            if (!aBuilder->NamedShape().IsNull() &&
+              aBuilder->NamedShape()->Evolution() != TNaming_MODIFY) {
+              myBuilders.erase(0); // clear old builder to avoid different evolutions crash
+            }
             builder(0)->Modify(aRoot, aNewShape);
           }
         }
