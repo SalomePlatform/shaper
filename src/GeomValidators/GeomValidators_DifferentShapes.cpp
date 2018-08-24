@@ -94,11 +94,13 @@ bool GeomValidators_DifferentShapes::checkEqualToCurrent(std::list<AttributePtr>
     std::dynamic_pointer_cast<ModelAPI_AttributeSelection>(theCurrentAttribute);
 
   GeomShapePtr aShape = aSelectionAttribute->value();
+  ResultPtr aResultContext = aSelectionAttribute->context();
   if (!aShape.get()) {
-    ResultPtr aResult = aSelectionAttribute->context();
-    if (aResult.get())
-      aShape = aResult->shape();
+    if (aResultContext.get())
+      aShape = aResultContext->shape();
   }
+  // whole feature selection
+  FeaturePtr aFeature = aSelectionAttribute->contextFeature();
 
   std::string aCurrentAttributeId = theCurrentAttribute->id();
   if (theAttributes.size() > 0 && aShape.get() != NULL) {
@@ -112,13 +114,30 @@ bool GeomValidators_DifferentShapes::checkEqualToCurrent(std::list<AttributePtr>
         // the shape of the attribute should be not the same
         if (aSelectionAttribute.get() != NULL) {
           GeomShapePtr anAttrShape = aSelectionAttribute->value();
+          ResultPtr aResult = aSelectionAttribute->context();
           if (!anAttrShape.get()) {
-            ResultPtr aResult = aSelectionAttribute->context();
             if (aResult.get())
               anAttrShape = aResult->shape();
           }
           if (aShape->isEqual(anAttrShape)) {
             return false;
+          }
+          if (aFeature.get()) {
+            if (aResult.get()) { // check result is in feature
+              if (aResult->document()->feature(aResult) == aFeature)
+                return false;
+            }
+            else { // check selection of the same features
+              if (aFeature == aSelectionAttribute->contextFeature())
+                return false;
+            }
+          }
+          else {
+            if (!aResult.get() && aResultContext.get()) {
+              FeaturePtr aSelectedFeature = aSelectionAttribute->contextFeature();
+              if (aResultContext->document()->feature(aResultContext) == aSelectedFeature)
+                return false;
+            }
           }
         }
       }

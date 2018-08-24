@@ -500,6 +500,7 @@ bool PartSet_DifferentObjectsValidator::isValid(const AttributePtr& theAttribute
     AttributeSelectionPtr anAttr =
       std::dynamic_pointer_cast<ModelAPI_AttributeSelection>(theAttribute);
     ResultPtr aContext = anAttr->context();
+    FeaturePtr aContextFeature = anAttr->contextFeature();
     GeomShapePtr aShape = anAttr->value();
 
     // Check selection attributes
@@ -514,6 +515,24 @@ bool PartSet_DifferentObjectsValidator::isValid(const AttributePtr& theAttribute
           if (aRef->context() == aContext) {
             bool aHasShape = aShape.get() != NULL;
             if (!aHasShape || aRef->value()->isEqual(aShape)) {
+              theError = errorMessage(EqualShapes, "", theAttribute->id(), aRef->id());
+              return false;
+            }
+          }
+          // check the whole selected feature contains the result
+          if (aContextFeature.get()) {
+            if (aRef->contextFeature().get()) {
+              if (aContextFeature == aRef->contextFeature()) {
+                theError = errorMessage(EqualShapes, "", theAttribute->id(), aRef->id());
+                return false;
+              }
+            } else if (aRef->context().get() &&
+                aRef->context()->document()->feature(aRef->context()) == aContextFeature) {
+              theError = errorMessage(EqualShapes, "", theAttribute->id(), aRef->id());
+              return false;
+            }
+          } else if (aRef->contextFeature().get() && aContext.get()) {
+            if (aContext->document()->feature(aContext) == aRef->contextFeature()) {
               theError = errorMessage(EqualShapes, "", theAttribute->id(), aRef->id());
               return false;
             }
@@ -558,6 +577,7 @@ bool PartSet_DifferentObjectsValidator::isValid(const AttributePtr& theAttribute
           for(int i = 0; i < aCurSelList->size(); i++) {
             std::shared_ptr<ModelAPI_AttributeSelection> aCurSel = aCurSelList->value(i);
             ResultPtr aCurSelContext = aCurSel->context();
+            FeaturePtr aCurSelFeature = aCurSel->contextFeature();
             ResultBodyPtr aCurSelCompSolidPtr = ModelAPI_Tools::bodyOwner(aCurSelContext);
             std::shared_ptr<GeomAPI_Shape> aCurSelCompSolid;
             if(aCurSelCompSolidPtr.get()) {
@@ -566,27 +586,47 @@ bool PartSet_DifferentObjectsValidator::isValid(const AttributePtr& theAttribute
             for(int j = 0; j < aRefSelList->size(); j++) {
               std::shared_ptr<ModelAPI_AttributeSelection> aRefSel = aRefSelList->value(j);
               ResultPtr aRefSelContext = aRefSel->context();
+              FeaturePtr aRefSelFeature = aRefSel->contextFeature();
               ResultBodyPtr aRefSelCompSolidPtr =
                 ModelAPI_Tools::bodyOwner(aRefSelContext);
               std::shared_ptr<GeomAPI_Shape> aRefSelCompSolid;
-              if(aRefSelCompSolidPtr.get()) {
+              if (aRefSelCompSolidPtr.get()) {
                 aRefSelCompSolid = aRefSelCompSolidPtr->shape();
               }
               if ((aCurSelCompSolid.get() && aCurSelCompSolid->isEqual(aRefSel->value()))
                 || (aRefSelCompSolid.get() && aRefSelCompSolid->isEqual(aCurSel->value()))) {
-                  theError = errorMessage(EqualShapes, "", theAttribute->id(),
-                                          aRefSel->id());
-                  return false;
+                theError = errorMessage(EqualShapes, "", theAttribute->id(),
+                  aRefSel->id());
+                return false;
               }
-              if(aCurSelContext == aRefSelContext) {
+              if (aCurSelContext == aRefSelContext) {
                 if (aCurSel->value().get() == NULL || aRefSel->value().get() == NULL) {
-                  theError = errorMessage(EmptyShapes, "", theAttribute->id(),
-                                          aRefSel->id());
+                  theError = errorMessage(EmptyShapes, "", theAttribute->id(), aRefSel->id());
                   return false;
                 }
                 if (aCurSel->value()->isEqual(aRefSel->value())) {
-                  theError = errorMessage(EqualShapes, "", theAttribute->id(),
-                                          aRefSel->id());
+                  theError = errorMessage(EqualShapes, "", theAttribute->id(), aRefSel->id());
+                  return false;
+                }
+              }
+
+              // check the whole selected feature contains the result
+              if (aCurSelFeature.get()) {
+                if (aRefSelFeature.get()) {
+                  if (aCurSelFeature == aRefSelFeature) {
+                    theError = errorMessage(EqualShapes, "", theAttribute->id(), aRefSel->id());
+                    return false;
+                  }
+                }
+                else if (aRefSelContext.get() &&
+                  aRefSelContext->document()->feature(aRefSelContext) == aCurSelFeature) {
+                  theError = errorMessage(EqualShapes, "", theAttribute->id(), aRefSel->id());
+                  return false;
+                }
+              }
+              else if (aRefSelFeature.get() && aCurSelContext.get()) {
+                if (aCurSelContext->document()->feature(aCurSelContext) == aRefSelFeature) {
+                  theError = errorMessage(EqualShapes, "", theAttribute->id(), aRefSel->id());
                   return false;
                 }
               }

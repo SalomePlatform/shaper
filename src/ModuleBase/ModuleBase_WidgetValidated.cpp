@@ -421,31 +421,42 @@ void ModuleBase_WidgetValidated::filterPresentations(QList<ModuleBase_ViewerPrsP
 //********************************************************************
 void ModuleBase_WidgetValidated::filterCompSolids(QList<ModuleBase_ViewerPrsPtr>& theValues)
 {
-  std::set<ResultBodyPtr> aCompSolids;
+  std::set<ResultPtr> aFilterOut; // all objects that must be filtered out with their children
   QList<ModuleBase_ViewerPrsPtr> aValidatedValues;
 
   // Collect compsolids.
   QList<ModuleBase_ViewerPrsPtr>::const_iterator anIt = theValues.begin(), aLast = theValues.end();
-  for (; anIt != aLast; anIt++) {
+  for(; anIt != aLast; anIt++) {
     const ModuleBase_ViewerPrsPtr& aViewerPrs = *anIt;
     ObjectPtr anObject = aViewerPrs->object();
     ResultBodyPtr aResultCompSolid =
       std::dynamic_pointer_cast<ModelAPI_ResultBody>(anObject);
-    if(aResultCompSolid.get() && aResultCompSolid->numberOfSubs() > 0) {
-      aCompSolids.insert(aResultCompSolid);
+    if (aResultCompSolid.get()) {
+      for(int aSubIndex = 0; aSubIndex < aResultCompSolid->numberOfSubs(); aSubIndex++)
+        aFilterOut.insert(aResultCompSolid->subResult(aSubIndex));
+    } else { // it could be a whole feature selected, so, add all results of this feature
+      FeaturePtr aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(anObject);
+      if (aFeature.get()) {
+        std::list<ResultPtr>::const_iterator aRes = aFeature->results().cbegin();
+        for(; aRes != aFeature->results().cend(); aRes++)
+          aFilterOut.insert(*aRes);
+      }
     }
   }
 
   // Filter sub-solids of compsolids.
   anIt = theValues.begin();
-  for (; anIt != aLast; anIt++) {
+  for(; anIt != aLast; anIt++) {
     const ModuleBase_ViewerPrsPtr& aViewerPrs = *anIt;
     ObjectPtr anObject = aViewerPrs->object();
     ResultPtr aResult = std::dynamic_pointer_cast<ModelAPI_Result>(anObject);
-    ResultBodyPtr aResCompSolidPtr = ModelAPI_Tools::bodyOwner(aResult);
-    if(aResCompSolidPtr.get() && (aCompSolids.find(aResCompSolidPtr) != aCompSolids.end())) {
-      // Skip sub-solid of compsolid.
-      continue;
+    while(aResult.get()) {
+      if (aFilterOut.find(aResult) != aFilterOut.end()) // skip if parent is filtered out
+        break;
+      aResult = ModelAPI_Tools::bodyOwner(aResult); // iterate all parents
+    }
+    if (aResult.get()) {
+      continue; // skip
     } else {
       aValidatedValues.append(*anIt);
     }
