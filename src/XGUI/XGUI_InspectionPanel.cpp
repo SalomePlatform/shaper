@@ -52,6 +52,7 @@
 #include <QTableWidget>
 #include <QHeaderView>
 #include <QTextBrowser>
+#include <QResizeEvent>
 
 #include <BRepBndLib.hxx>
 #include <TopoDS_Iterator.hxx>
@@ -118,12 +119,12 @@ XGUI_InspectionPanel::XGUI_InspectionPanel(QWidget* theParent, XGUI_SelectionMgr
   setWidget(aScrollArea);
 
   // Create an internal widget
-  QWidget* aMainWidget = new QWidget(aScrollArea);
+  myMainWidget = new QWidget(aScrollArea);
 
-  QVBoxLayout* aMainLayout = new QVBoxLayout(aMainWidget);
-  aMainLayout->setContentsMargins(5, 5, 5, 5);
+  myMainLayout = new QVBoxLayout(myMainWidget);
+  myMainLayout->setContentsMargins(5, 5, 5, 5);
 
-  QWidget* aNameWgt = new QWidget(aMainWidget);
+  QWidget* aNameWgt = new QWidget(myMainWidget);
   QHBoxLayout* aNameLayout = new QHBoxLayout(aNameWgt);
   aNameLayout->setContentsMargins(0, 0, 0, 0);
   aNameLayout->addWidget(new QLabel(tr("Object"), aNameWgt));
@@ -131,10 +132,10 @@ XGUI_InspectionPanel::XGUI_InspectionPanel(QWidget* theParent, XGUI_SelectionMgr
   myNameEdt->setReadOnly(true);
   aNameLayout->addWidget(myNameEdt);
 
-  aMainLayout->addWidget(aNameWgt);
+  myMainLayout->addWidget(aNameWgt);
 
   // Table with sub-shapes
-  mySubShapesTab = new QTableWidget(9, 2, aMainWidget);
+  mySubShapesTab = new QTableWidget(9, 2, myMainWidget);
   mySubShapesTab->setFocusPolicy(Qt::NoFocus);
   mySubShapesTab->verticalHeader()->hide();
   QStringList aTitles;
@@ -162,10 +163,10 @@ XGUI_InspectionPanel::XGUI_InspectionPanel(QWidget* theParent, XGUI_SelectionMgr
   mySubShapesTab->setMaximumWidth(170);
   mySubShapesTab->setMinimumHeight(300);
 
-  aMainLayout->addWidget(mySubShapesTab);
+  myMainLayout->addWidget(mySubShapesTab);
 
   // Type of object
-  QWidget* aTypeWgt = new QWidget(aMainWidget);
+  QWidget* aTypeWgt = new QWidget(myMainWidget);
   QHBoxLayout* aTypeLayout = new QHBoxLayout(aTypeWgt);
   aTypeLayout->setContentsMargins(0, 0, 0, 0);
 
@@ -173,19 +174,18 @@ XGUI_InspectionPanel::XGUI_InspectionPanel(QWidget* theParent, XGUI_SelectionMgr
   myTypeLbl = new QLabel("", aTypeWgt);
   aTypeLayout->addWidget(myTypeLbl);
 
-  aMainLayout->addWidget(aTypeWgt);
+  myMainLayout->addWidget(aTypeWgt);
 
-  myTypeParams = new QTextBrowser(aMainWidget);
-  myTypeParams->setMaximumWidth(170);
-  myTypeParams->setMaximumHeight(160);
+  myTypeParams = new QTextBrowser(myMainWidget);
+  myTypeParams->setFixedWidth(170);
   myTypeParams->setReadOnly(true);
   myTypeParams->setFocusPolicy(Qt::NoFocus);
   myTypeParams->setFrameStyle(QFrame::NoFrame);
   myTypeParams->viewport()->setBackgroundRole(QPalette::Window);
 
-  aMainLayout->addWidget(myTypeParams);
+  myMainLayout->addWidget(myTypeParams, 1);
 
-  aScrollArea->setWidget(aMainWidget);
+  aScrollArea->setWidget(myMainWidget);
 
   connect(mySelectionMgr, SIGNAL(selectionChanged()), SLOT(onSelectionChanged()));
 }
@@ -209,7 +209,7 @@ void XGUI_InspectionPanel::clearContent()
     mySubShapesTab->item((SudShape)i, 1)->setText("");
   }
   myTypeLbl->setText("");
-  myTypeParams->setText("");
+  setParamsText("");
 }
 
 //********************************************************************
@@ -275,8 +275,6 @@ void XGUI_InspectionPanel::setShapeContent(const TopoDS_Shape& theShape)
     setSubShapeValue(ShapeId, aMapOfShape.Extent());
   }
   catch (Standard_Failure) {
-    Handle(Standard_Failure) aFail = Standard_Failure::Caught();
-    //SetErrorCode(aFail->GetMessageString());
   }
 }
 
@@ -321,7 +319,7 @@ void XGUI_InspectionPanel::fillVertex(const GeomVertexPtr& theVertex)
 
   QString aParams;
   appendPointToParameters(tr("Coordinates"), aPoint, aParams);
-  myTypeParams->setText(aParams);
+  setParamsText(aParams);
 }
 
 //********************************************************************
@@ -378,7 +376,7 @@ void XGUI_InspectionPanel::fillEdge(const GeomEdgePtr& theEdge)
     appendPointToParameters(tr("Start point"), aStartPnt, aParams);
     appendPointToParameters(tr("End point"), aEndPnt, aParams);
   }
-  myTypeParams->setText(aParams);
+  setParamsText(aParams);
 }
 
 //********************************************************************
@@ -400,7 +398,7 @@ void XGUI_InspectionPanel::fillWire(const GeomWirePtr& theWire)
   else
     myTypeLbl->setText(tr("Wire"));
 
-  myTypeParams->setText(aParams);
+  setParamsText(aParams);
 }
 
 //********************************************************************
@@ -439,7 +437,7 @@ void XGUI_InspectionPanel::fillFace(const GeomFacePtr& theFace)
           appendGroupNameToParameters(tr("Dimensions"), aParams);
           appendNamedValueToParameters(tr("Width"), aWidth, aParams);
           appendNamedValueToParameters(tr("Height"), aHeight, aParams);
-          myTypeParams->setText(aParams);
+          setParamsText(aParams);
 
           isCommonCase = false;
         }
@@ -589,7 +587,7 @@ void XGUI_InspectionPanel::setPlaneType(const QString& theTitle,
   QString aParams;
   appendPointToParameters(tr("Origin"), thePlane->location(), aParams);
   appendDirToParameters(tr("Normal"), thePlane->direction(), aParams);
-  myTypeParams->setText(aParams);
+  setParamsText(aParams);
 }
 
 void XGUI_InspectionPanel::setSphereType(const QString& theTitle,
@@ -600,7 +598,7 @@ void XGUI_InspectionPanel::setSphereType(const QString& theTitle,
   appendPointToParameters(tr("Center"), theSphere->center(), aParams);
   appendGroupNameToParameters(tr("Dimensions"), aParams);
   appendNamedValueToParameters(tr("Radius"), theSphere->radius(), aParams);
-  myTypeParams->setText(aParams);
+  setParamsText(aParams);
 }
 
 void XGUI_InspectionPanel::setCylinderType(const QString& theTitle,
@@ -613,7 +611,7 @@ void XGUI_InspectionPanel::setCylinderType(const QString& theTitle,
   appendGroupNameToParameters(tr("Dimensions"), aParams);
   appendNamedValueToParameters(tr("Radius"), theCyl->radius(), aParams);
   appendNamedValueToParameters(tr("Height"), theCyl->height(), aParams);
-  myTypeParams->setText(aParams);
+  setParamsText(aParams);
 }
 
 void XGUI_InspectionPanel::setConeType(const QString& theTitle,
@@ -627,7 +625,7 @@ void XGUI_InspectionPanel::setConeType(const QString& theTitle,
   appendNamedValueToParameters(tr("Radius 1"), theCone->radius1(), aParams);
   appendNamedValueToParameters(tr("Radius 2"), theCone->radius2(), aParams);
   appendNamedValueToParameters(tr("Height"), theCone->height(), aParams);
-  myTypeParams->setText(aParams);
+  setParamsText(aParams);
 }
 
 void XGUI_InspectionPanel::setTorusType(const QString& theTitle,
@@ -640,7 +638,7 @@ void XGUI_InspectionPanel::setTorusType(const QString& theTitle,
   appendGroupNameToParameters(tr("Dimensions"), aParams);
   appendNamedValueToParameters(tr("Major radius"), theTorus->majorRadius(), aParams);
   appendNamedValueToParameters(tr("Minor radius"), theTorus->minorRadius(), aParams);
-  myTypeParams->setText(aParams);
+  setParamsText(aParams);
 }
 
 void XGUI_InspectionPanel::setBoxType(const QString& theTitle,
@@ -653,7 +651,7 @@ void XGUI_InspectionPanel::setBoxType(const QString& theTitle,
   appendNamedValueToParameters(tr("Width"), theBox->width(), aParams);
   appendNamedValueToParameters(tr("Depth"), theBox->depth(), aParams);
   appendNamedValueToParameters(tr("Height"), theBox->height(), aParams);
-  myTypeParams->setText(aParams);
+  setParamsText(aParams);
 }
 
 void XGUI_InspectionPanel::setRotatedBoxType(const QString& theTitle,
@@ -669,5 +667,21 @@ void XGUI_InspectionPanel::setRotatedBoxType(const QString& theTitle,
   appendNamedValueToParameters(tr("Width"), theBox->width(), aParams);
   appendNamedValueToParameters(tr("Depth"), theBox->depth(), aParams);
   appendNamedValueToParameters(tr("Height"), theBox->height(), aParams);
-  myTypeParams->setText(aParams);
+  setParamsText(aParams);
+}
+
+
+void XGUI_InspectionPanel::setParamsText(const QString& theText)
+{
+  myTypeParams->setText(theText);
+}
+
+void XGUI_InspectionPanel::resizeEvent(QResizeEvent* theEvent)
+{
+  QSize aSize = theEvent->size();
+
+  int aHeight = aSize.height();
+
+  if (aHeight > 450) // 450 is a a minimal height
+    myMainWidget->setFixedHeight(aHeight - 30);
 }

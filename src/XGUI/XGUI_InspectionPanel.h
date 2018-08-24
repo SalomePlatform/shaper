@@ -32,6 +32,8 @@ class QLineEdit;
 class QTableWidget;
 class QLabel;
 class QTextBrowser;
+class QVBoxLayout;
+class QResizeEvent;
 
 class TopoDS_Shape;
 
@@ -53,10 +55,15 @@ class GeomAPI_Box;
 /// Internal name of property panel widget
 const static char* INSPECTION_PANEL = "inspection_panel_dock";
 
+/**
+* \ingroup GUI
+* A class which represents an inspection panel: to show content of currently selected objects
+*/
 class XGUI_EXPORT XGUI_InspectionPanel : public QDockWidget
 {
   Q_OBJECT
 public:
+  /// Type of selected objects
   enum SudShape {
     ShapeId,
     CompoundId,
@@ -74,59 +81,118 @@ public:
   /// \param theMgr operation manager
   XGUI_InspectionPanel(QWidget* theParent, XGUI_SelectionMgr* theMgr);
 
+  // Destructor
   virtual ~XGUI_InspectionPanel();
 
+
+protected:
+  /// Vitrual method is redefined in order to adjust size of internal wirdet to size of
+  /// the whole whindow
+  /// \param theEvent an event with resize parameters
+  virtual void resizeEvent(QResizeEvent* theEvent);
+
 private slots:
+  /// A slot to react on selection changed
   void onSelectionChanged();
 
 private:
+  /// Set counts of a sub-shapes
+  /// \param theId an id of sub-shape type
+  /// \param theVal a number of sub-shapes of corresponded type
   void setSubShapeValue(SudShape theId, int theVal);
 
+  /// Set name of current selection
+  /// \param theName the name
   void setName(const QString& theName);
 
+  /// Set content of selected shape into table
+  /// \param theShape the shape
   void setShapeContent(const TopoDS_Shape& theShape);
 
+  /// Set parameters of the selected shape
+  /// \param theShape the shape
   void setShapeParams(const TopoDS_Shape& theShape);
 
+  /// Clear content of the window
   void clearContent();
 
-
+  /// Show parameters of a vertex
+  /// \param theVertex the vertex
   void fillVertex(const std::shared_ptr<GeomAPI_Vertex>& theVertex);
 
+  /// Show parameters of a edge
+  /// \param theEdge the edge
   void fillEdge(const std::shared_ptr<GeomAPI_Edge>& theEdge);
 
+  /// Show parameters of a wire
+  /// \param theWire the wire
   void fillWire(const std::shared_ptr<GeomAPI_Wire>& theWire);
 
+  /// Show parameters of a face
+  /// \param theFace the face
   void fillFace(const std::shared_ptr<GeomAPI_Face>& theFace);
 
+  /// Show parameters of a shell
+  /// \param theShell the shell
   void fillShell(const std::shared_ptr<GeomAPI_Shell>& theShell);
 
+  /// Show parameters of a solid
+  /// \param theSolid the solid
   void fillSolid(const std::shared_ptr<GeomAPI_Solid>& theSolid);
 
+  /// Show parameters of a compound
+  /// \param theShape the compound
   void fillContainer(const std::shared_ptr<GeomAPI_Shape>& theShape);
 
-
+  /// Show parameters of a plane
+  /// \param theTitle a title of the object
+  /// \param thePlane the plane
   void setPlaneType(const QString& theTitle, const std::shared_ptr<GeomAPI_Pln>& thePlane);
 
+  /// Show parameters of a sphere
+  /// \param theTitle a title of the object
+  /// \param theSphere the sphere
   void setSphereType(const QString& theTitle, const std::shared_ptr<GeomAPI_Sphere>& theSphere);
 
+  /// Show parameters of a cylinder
+  /// \param theTitle a title of the object
+  /// \param theCyl the cylinder
   void setCylinderType(const QString& theTitle, const std::shared_ptr<GeomAPI_Cylinder>& theCyl);
 
+  /// Show parameters of a cone
+  /// \param theTitle a title of the object
+  /// \param theCone the cone
   void setConeType(const QString& theTitle, const std::shared_ptr<GeomAPI_Cone>& theCone);
 
+  /// Show parameters of a torus
+  /// \param theTitle a title of the object
+  /// \param theTorus the torus
   void setTorusType(const QString& theTitle, const std::shared_ptr<GeomAPI_Torus>& theTorus);
 
+  /// Show parameters of a box
+  /// \param theTitle a title of the object
+  /// \param theBox the box
   void setBoxType(const QString& theTitle, const std::shared_ptr<GeomAPI_Box>& theBox);
 
+  /// Show parameters of a rotated box
+  /// \param theTitle a title of the object
+  /// \param theBox the box
   void setRotatedBoxType(const QString& theTitle, const std::shared_ptr<GeomAPI_Box>& theBox);
 
-private:
-  XGUI_SelectionMgr* mySelectionMgr;
 
-  QLineEdit* myNameEdt;
-  QTableWidget* mySubShapesTab;
-  QLabel* myTypeLbl;
-  QTextBrowser* myTypeParams;
+  /// Set text into parameters area
+  /// \param theText the text
+  void setParamsText(const QString& theText);
+
+private:
+  XGUI_SelectionMgr* mySelectionMgr; //> selection manager
+
+  QLineEdit* myNameEdt; //> Name field
+  QTableWidget* mySubShapesTab; //> table of sub-shapes
+  QLabel* myTypeLbl; //> label of a type
+  QTextBrowser* myTypeParams; //> parameters area
+  QVBoxLayout* myMainLayout; //> main layout
+  QWidget* myMainWidget;  //> main widget
 };
 
 #endif
