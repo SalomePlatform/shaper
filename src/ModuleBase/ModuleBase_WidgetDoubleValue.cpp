@@ -56,7 +56,7 @@
 
 ModuleBase_WidgetDoubleValue::ModuleBase_WidgetDoubleValue(QWidget* theParent,
                                                            const Config_WidgetAPI* theData)
-    : ModuleBase_ModelWidget(theParent, theData)
+    : ModuleBase_ModelWidget(theParent, theData), myHasDefault(false)
 {
   QFormLayout* aControlLay = new QFormLayout(this);
   ModuleBase_Tools::adjustMargins(aControlLay);
@@ -101,11 +101,9 @@ ModuleBase_WidgetDoubleValue::ModuleBase_WidgetDoubleValue(QWidget* theParent,
     mySpinBox->setSingleStep(aStepVal);
   }
 
-  myDefaultVal = QString::fromStdString(getDefaultValue()).toDouble(&isOk);
-  if (isOk)
+  myDefaultVal = QString::fromStdString(getDefaultValue()).toDouble(&myHasDefault);
+  if (myHasDefault)
     mySpinBox->setValue(myDefaultVal);
-  else
-    myDefaultVal = 0;
 
   QString aTTip = translate(theData->widgetTooltip());
   mySpinBox->setToolTip(aTTip);
@@ -218,7 +216,7 @@ bool ModuleBase_WidgetDoubleValue::restoreValueCustom()
       aRef->setExpressionError("");
       aRef->setExpressionInvalid(false);
     }
-    if (!aRef->isInitialized())
+    if ((!aRef->isInitialized()) && myHasDefault)
       aRef->setValue(myDefaultVal);
   }
   return true;

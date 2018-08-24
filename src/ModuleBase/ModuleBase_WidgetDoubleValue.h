@@ -90,6 +90,7 @@ protected:
   FeaturePtr myParameter;
 
   double myDefaultVal;
+  bool myHasDefault;
 };
 
 #endif
