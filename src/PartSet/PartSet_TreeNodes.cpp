@@ -571,19 +571,23 @@ QTreeNodesList PartSet_FolderNode::objectsDeleted(const DocumentPtr& theDoc,
     int aIndex;
     int aId = 0;
     bool aRemoved = false;
+    bool aToSort = false;
     while (aId < myChildren.size()) {
       ModuleBase_ITreeNode* aNode = myChildren.at(aId);
       aIndex = aDoc->index(aNode->object(), true);
-      if ((aIndex == -1) || (aId != aIndex)) {
+      aToSort |= ((aIndex != -1) && (aId != aIndex));
+      if (aIndex == -1) {
         myChildren.removeAll(aNode);
         delete aNode;
         aRemoved = true;
-      }  else
+      }
+      else
         aId++;
     }
     if (aRemoved)
       aResult.append(this);
-
+    if (aToSort)
+      sortChildren();
     foreach(ModuleBase_ITreeNode* aNode, myChildren) {
       aResult.append(aNode->objectsDeleted(theDoc, theGroup));
     }
@@ -662,11 +666,13 @@ QTreeNodesList PartSet_FeatureFolderNode::objectsDeleted(const DocumentPtr& theD
     int aIndex;
     int aId = 0;
     bool aRemoved = false;
+    bool aToSort = false;
     while (aId < myChildren.size()) {
       ModuleBase_ITreeNode* aNode = myChildren.at(aId);
       if (aNode->object().get()) {
         aIndex = aDoc->index(aNode->object(), true);
-        if ((aIndex == -1) || (aId != (aIndex + aNb))) {
+        aToSort |= ((aIndex != -1) && (aId != (aIndex + aNb)));
+        if (aIndex == -1) {
           myChildren.removeAll(aNode);
           delete aNode;
           aRemoved = true;
@@ -677,6 +683,8 @@ QTreeNodesList PartSet_FeatureFolderNode::objectsDeleted(const DocumentPtr& theD
     }
     if (aRemoved)
       aResult.append(this);
+    if (aToSort)
+      sortChildren();
   }
   return aResult;
 }

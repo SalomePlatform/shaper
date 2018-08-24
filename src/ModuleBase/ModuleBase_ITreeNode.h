@@ -177,6 +177,27 @@ protected:
     }
   }
 
+  void sortChildren() {
+    int i = 0;
+    ModuleBase_ITreeNode* aNode = 0;
+    ObjectPtr aObject;
+    int aIdx;
+    while (i < myChildren.size()) {
+      aNode = myChildren.at(i);
+      aObject = aNode->object();
+      if (aObject.get()) {
+        aIdx = aObject->document()->index(aObject, true);
+        if (aIdx != i) {
+          myChildren.removeAll(aNode);
+          myChildren.insert(aIdx, aNode);
+          i = 0;
+          continue;
+        }
+      }
+      i++;
+    }
+  }
+
   ModuleBase_ITreeNode* myParent; //!< Parent of the node
   QTreeNodesList myChildren; //!< Children of the node
 };
