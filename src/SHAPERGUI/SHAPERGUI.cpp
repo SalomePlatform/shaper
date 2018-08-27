@@ -207,6 +207,13 @@ bool SHAPERGUI::activateModule(SUIT_Study* theStudy)
       desktop()->tabifyDockWidget(aObjDoc, myWorkshop->propertyPanel());
     }
 
+    DockWidget* aInspection = myWorkshop->inspectionPanel();
+    if (aInspection) {
+      QAction* aViewAct = aInspection->toggleViewAction();
+      aViewAct->setEnabled(true);
+      aInspection->setVisible(true);
+    }
+
     if (!mySelector) {
       ViewManagerList OCCViewManagers;
       application()->viewManagers(OCCViewer_Viewer::Type(), OCCViewManagers);
@@ -304,6 +311,12 @@ bool SHAPERGUI::deactivateModule(SUIT_Study* theStudy)
     aObjDoc->setVisible(false);
     myWorkshop->objectBrowser()->setVisible(false);
     QAction* aViewAct = aObjDoc->toggleViewAction();
+    aViewAct->setEnabled(false);
+  }
+  DockWidget* aInspection = myWorkshop->inspectionPanel();
+  if (aInspection) {
+    aInspection->setVisible(false);
+    QAction* aViewAct = aInspection->toggleViewAction();
     aViewAct->setEnabled(false);
   }
 
