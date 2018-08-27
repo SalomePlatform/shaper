@@ -499,7 +499,6 @@ bool CollectionPlugin_WidgetField::storeValueCustom()
       }
     }
   }
-  updateObject(myFeature);
   return true;
 }
 
