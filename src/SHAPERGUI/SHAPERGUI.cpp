@@ -32,6 +32,7 @@
 #include <XGUI_MenuMgr.h>
 #include <XGUI_FacesPanel.h>
 #include <XGUI_SelectionActivate.h>
+#include <XGUI_InspectionPanel.h>
 
 #include <ModuleBase_Operation.h>
 #include <ModuleBase_Preferences.h>
