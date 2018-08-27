@@ -207,7 +207,7 @@ bool SHAPERGUI::activateModule(SUIT_Study* theStudy)
       desktop()->tabifyDockWidget(aObjDoc, myWorkshop->propertyPanel());
     }
 
-    DockWidget* aInspection = myWorkshop->inspectionPanel();
+    QDockWidget* aInspection = myWorkshop->inspectionPanel();
     if (aInspection) {
       QAction* aViewAct = aInspection->toggleViewAction();
       aViewAct->setEnabled(true);
@@ -313,7 +313,7 @@ bool SHAPERGUI::deactivateModule(SUIT_Study* theStudy)
     QAction* aViewAct = aObjDoc->toggleViewAction();
     aViewAct->setEnabled(false);
   }
-  DockWidget* aInspection = myWorkshop->inspectionPanel();
+  QDockWidget* aInspection = myWorkshop->inspectionPanel();
   if (aInspection) {
     aInspection->setVisible(false);
     QAction* aViewAct = aInspection->toggleViewAction();
