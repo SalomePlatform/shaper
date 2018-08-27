@@ -126,8 +126,7 @@ SET(PROJECT_LIBRARIES
     GeomDataAPI
     SketcherPrs
     ${QT_LIBRARIES}
-    ${CAS_KERNEL}
-    ${CAS_SHAPE}
+    ${OpenCASCADE_FoundationClasses_LIBRARIES}
 )
 
 # sources / moc wrappings
@@ -162,7 +161,7 @@ INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR}/src/XGUI
                     ${PROJECT_SOURCE_DIR}/src/PartSetPlugin
                     ${PROJECT_SOURCE_DIR}/src/GeomAPI
                     ${PROJECT_SOURCE_DIR}/src/CollectionPlugin
-                    ${CAS_INCLUDE_DIRS}
+                    ${OpenCASCADE_INCLUDE_DIR}
                     ${SUIT_INCLUDE}
 )
 
@@ -173,7 +172,7 @@ ELSE(${HAVE_SALOME})
 ENDIF(${HAVE_SALOME})
 
 
-ADD_DEFINITIONS(-DPARTSET_EXPORTS ${CAS_DEFINITIONS})
+ADD_DEFINITIONS(-DPARTSET_EXPORTS ${OpenCASCADE_DEFINITIONS})
 ADD_LIBRARY(PartSet SHARED
     ${PROJECT_SOURCES}
     ${PROJECT_HEADERS}

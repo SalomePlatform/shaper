@@ -27,15 +27,16 @@ INCLUDE(Common)
 INCLUDE(XMLProcessing)
 
 # additional include directories
-INCLUDE_DIRECTORIES(${CAS_INCLUDE_DIRS})
+INCLUDE_DIRECTORIES(${OpenCASCADE_INCLUDE_DIR})
 
 # additional preprocessor / compiler flags
-ADD_DEFINITIONS(-DXAO_EXPORTS ${CAS_DEFINITIONS})
+ADD_DEFINITIONS(-DXAO_EXPORTS ${OpenCASCADE_DEFINITIONS})
 
 # libraries to link to
 SET(PROJECT_LIBRARIES
   ${LIBXML2_LIBRARIES}
-  ${CAS_TKBRep} ${CAS_TKTopAlgo} ${CAS_TKG2d} ${CAS_TKG3d}
+  ${OpenCASCADE_ModelingData_LIBRARIES}
+  ${OpenCASCADE_ModelingAlgorithms_LIBRARIES}
   )
 
 # --- headers ---

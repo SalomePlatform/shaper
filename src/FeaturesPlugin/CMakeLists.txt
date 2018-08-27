@@ -141,7 +141,7 @@ INCLUDE_DIRECTORIES(
   ../GeomValidators
   ../Events
   ../Config
-  ${CAS_INCLUDE_DIRS}
+  ${OpenCASCADE_INCLUDE_DIR}
 )
 
 SET(PROJECT_LIBRARIES
@@ -151,8 +151,7 @@ SET(PROJECT_LIBRARIES
     GeomAlgoAPI
     GeomValidators
     Config
-    ${CAS_VIEWER}
-    ${CAS_SHAPE}
+    ${OpenCASCADE_Visualization_LIBRARIES}
 )
 
 ADD_DEFINITIONS(-DFEATURESPLUGIN_EXPORTS)

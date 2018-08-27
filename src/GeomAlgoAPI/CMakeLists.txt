@@ -141,26 +141,12 @@ SET(PROJECT_LIBRARIES
     GeomAlgoImpl
     ModelAPI
     XAOShaper
-    ${CAS_OCAF}
-    ${CAS_SHAPE}
-    ${CAS_TKBO}
-    ${CAS_TKBool}
-    ${CAS_TKBRep}
-    ${CAS_TKCAF}
-    ${CAS_TKCAF}
-    ${CAS_TKFillet}
-    ${CAS_TKLCAF}
-    ${CAS_TKPrim}
-    ${CAS_TKSTEP}
-    ${CAS_TKSTEPBase}
-    ${CAS_TKIGES}
-    ${CAS_TKTopAlgo}
-    ${CAS_TKXSBase}
-    ${CAS_TKOffset}
-    ${CAS_TKShHealing}
+    ${OpenCASCADE_DataExchange_LIBRARIES}
+    ${OpenCASCADE_ModelingAlgorithms_LIBRARIES}
+    ${OpenCASCADE_ApplicationFramework_LIBRARIES}
 )
 
-ADD_DEFINITIONS(-DGEOMALGOAPI_EXPORTS ${CAS_DEFINITIONS})
+ADD_DEFINITIONS(-DGEOMALGOAPI_EXPORTS ${OpenCASCADE_DEFINITIONS})
 ADD_LIBRARY(GeomAlgoAPI SHARED ${PROJECT_SOURCES} ${PROJECT_HEADERS})
 
 SET(CMAKE_SWIG_FLAGS "-Wall")
@@ -173,7 +159,7 @@ INCLUDE_DIRECTORIES(
   ../GeomAlgoImpl
   ../ModelAPI
   ../XAO
-  ${CAS_INCLUDE_DIRS}
+  ${OpenCASCADE_INCLUDE_DIR}
 )
 
 TARGET_LINK_LIBRARIES(GeomAlgoAPI ${PROJECT_LIBRARIES})

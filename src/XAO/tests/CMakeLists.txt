@@ -22,13 +22,13 @@
 # additional include directories
 INCLUDE_DIRECTORIES(
   ${PTHREAD_INCLUDE_DIR}
-  ${CAS_INCLUDE_DIRS}
+  ${OpenCASCADE_INCLUDE_DIR}
   ${CPPUNIT_INCLUDE_DIRS}
   )
 
 # additional preprocessor / compiler flags
 ADD_DEFINITIONS(
-  ${CAS_DEFINITIONS}
+  ${OpenCASCADE_DEFINITIONS}
   ${CPPUNIT_DEFINITIONS}
   )
 

@@ -49,7 +49,7 @@ INCLUDE_DIRECTORIES(
   ../Events
   ../Config
   ../ModuleBase
-  ${CAS_INCLUDE_DIRS}
+  ${OpenCASCADE_INCLUDE_DIR}
 )
 
 SET(PROJECT_LIBRARIES

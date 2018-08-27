@@ -54,7 +54,7 @@ SET(PROJECT_LIBRARIES
     ModelAPI
     GeomAPI
     GeomAlgoAPI
-	GeomDataAPI
+    GeomDataAPI
 )
 
 SOURCE_GROUP ("Resource Files" FILES ${TEXT_RESOURCES})

@@ -235,7 +235,7 @@ void Config_ModuleReader::loadLibrary(const std::string& theLibName)
     return;
 
   #ifdef WIN32
-  HINSTANCE aModLib = ::LoadLibrary(aFileName.c_str());
+  HINSTANCE aModLib = ::LoadLibraryA(aFileName.c_str());
   #else
   void* aModLib = dlopen( aFileName.c_str(), RTLD_LAZY | RTLD_GLOBAL );
   #endif
@@ -245,12 +245,12 @@ void Config_ModuleReader::loadLibrary(const std::string& theLibName)
     DWORD   dwLastError = ::GetLastError();
     LPSTR messageBuffer = NULL;
     size_t size = ::FormatMessageA(FORMAT_MESSAGE_ALLOCATE_BUFFER |
-                                 FORMAT_MESSAGE_FROM_SYSTEM |
-                                 FORMAT_MESSAGE_IGNORE_INSERTS,
-                                 NULL,
-                                 dwLastError,
-                                 MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
-                                 (LPSTR)&messageBuffer, 0, NULL);
+                                   FORMAT_MESSAGE_FROM_SYSTEM |
+                                   FORMAT_MESSAGE_IGNORE_INSERTS,
+                                   NULL,
+                                   dwLastError,
+                                   MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
+                                   (LPSTR)&messageBuffer, 0, NULL);
     anErrorMsg += ": " +  std::string(messageBuffer, size);
     #else
     anErrorMsg += ": " + std::string(dlerror());

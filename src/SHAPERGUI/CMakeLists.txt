@@ -71,11 +71,10 @@ SET(PROJECT_LIBRARIES
     ${CAM}
     ${OCCViewer}
     ${qtx}
-    ${CAS_SHAPE}
     ${SalomeObject}
 )
 
-ADD_DEFINITIONS( -DSHAPERGUI_EXPORTS ${CAS_DEFINITIONS} )
+ADD_DEFINITIONS( -DSHAPERGUI_EXPORTS ${OpenCASCADE_DEFINITIONS} )
 
 INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR}/src/XGUI
                     ${PROJECT_SOURCE_DIR}/src/Events
@@ -86,7 +85,7 @@ INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR}/src/XGUI
                     ${PROJECT_SOURCE_DIR}/src/ExchangePlugin
                     ${SALOME_GUI_INCLUDE}
                     ${SALOME_KERNEL_INCLUDE}
-                    ${CAS_INCLUDE_DIRS}
+                    ${OpenCASCADE_INCLUDE_DIR}
 )
 
 IF(${HAVE_SALOME})

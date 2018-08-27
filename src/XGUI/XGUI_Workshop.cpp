@@ -1201,7 +1201,7 @@ ModuleBase_IModule* XGUI_Workshop::loadModule(const QString& theModule)
   CREATE_FUNC crtInst = 0;
 
 #ifdef WIN32
-  HINSTANCE modLib = ::LoadLibrary((LPTSTR) qPrintable(libName));
+  HINSTANCE modLib = ::LoadLibraryA(qPrintable(libName));
   if (!modLib) {
     LPVOID lpMsgBuf;
     ::FormatMessage(

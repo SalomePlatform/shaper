@@ -38,7 +38,6 @@ INCLUDE(FindEclipse)
 INCLUDE(Common)
 INCLUDE(FindSalomeQt5)
 INCLUDE(FindSalome)
-INCLUDE(FindCAS)
 INCLUDE(FindSUIT)
 INCLUDE(FindTInspector)
 
@@ -64,8 +63,11 @@ IF(${HAVE_SALOME})
   FIND_PACKAGE(SalomePythonInterp REQUIRED)
   FIND_PACKAGE(SalomePythonLibs REQUIRED)
 
+  FIND_PACKAGE(SalomeOpenCASCADE REQUIRED)
+
 ELSE(${HAVE_SALOME})
   INCLUDE(FindPython)
+  INCLUDE(FindSalomeOpenCASCADE)
 ENDIF(${HAVE_SALOME})
 
 # Common CMake macros

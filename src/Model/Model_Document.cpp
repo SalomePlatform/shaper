@@ -272,7 +272,7 @@ bool Model_Document::save(
   Handle(Model_Application) anApp = Model_Application::getApplication();
   if (isRoot()) {
 #ifdef WIN32
-    CreateDirectory(theDirName, NULL);
+    CreateDirectory((LPTSTR) theDirName, NULL);
 #else
     mkdir(theDirName, 0x1ff);
 #endif
