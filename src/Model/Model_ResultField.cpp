@@ -109,7 +109,7 @@ void Model_ResultField::updateSteps()
       mySteps.pop_back();
     }
     while(mySteps.size() < aNbSteps) {
-      mySteps.push_back(new Model_ResultField::Model_FieldStep(this, mySteps.size()));
+      mySteps.push_back(new Model_ResultField::Model_FieldStep(this, int(mySteps.size())));
     }
   }
 }

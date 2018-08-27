@@ -86,6 +86,7 @@ void GeomData_Point::setX(const double theX)
     setCalculatedValue(theX, 0, 0);
   } else if (x() != theX) {
     myExpression[0]->setValue(theX);
+    myExpression[0]->setText(""); // uninitialize the text
     owner()->data()->sendAttributeUpdated(this);
   }
 }
@@ -96,6 +97,7 @@ void GeomData_Point::setY(const double theY)
     setCalculatedValue(0, theY, 0);
   } else if (y() != theY) {
     myExpression[1]->setValue(theY);
+    myExpression[1]->setText(""); // uninitialize the text
     owner()->data()->sendAttributeUpdated(this);
   }
 }
@@ -107,6 +109,7 @@ void GeomData_Point::setZ(const double theZ)
   }
   else if (z() != theZ) {
     myExpression[2]->setValue(theZ);
+    myExpression[2]->setText(""); // uninitialize the text
     owner()->data()->sendAttributeUpdated(this);
   }
 }

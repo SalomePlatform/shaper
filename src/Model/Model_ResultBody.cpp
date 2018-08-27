@@ -159,6 +159,8 @@ void Model_ResultBody::updateConcealment()
   if (myLastConcealed != ModelAPI_ResultBody::isConcealed()) {
     // check the whole tree of results: if one is concealed, everybody are concealed
     ResultBodyPtr anOwner = std::dynamic_pointer_cast<ModelAPI_ResultBody>(data()->owner());
+    if (!anOwner.get())
+      return; // "this" is invalid
     ResultBodyPtr aParent = ModelAPI_Tools::bodyOwner(anOwner);
     while(aParent.get()) {
       anOwner = aParent;

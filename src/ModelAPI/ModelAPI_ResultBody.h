@@ -178,12 +178,13 @@ public:
   /// \param theDisplay a boolean value
   MODELAPI_EXPORT virtual void setDisplayed(const bool theDisplay);
 
+  /// Updates the sub-bodies if shape of this object is compsolid or compound
+  MODELAPI_EXPORT virtual void updateSubs(const std::shared_ptr<GeomAPI_Shape>& theThisShape) = 0;
+
 protected:
   /// Default constructor accessible only from Model_Objects
   MODELAPI_EXPORT ModelAPI_ResultBody();
 
-  /// Updates the sub-bodies if shape of this object is compsolid or compound
-  virtual void updateSubs(const std::shared_ptr<GeomAPI_Shape>& theThisShape) = 0;
 };
 
 //! Pointer on feature object
