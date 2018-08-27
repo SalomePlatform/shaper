@@ -301,6 +301,12 @@ bool ModuleBase_WidgetMultiSelector::setSelection(QList<ModuleBase_ViewerPrsPtr>
     // if there is at least one set, the result is true
     isDone = isDone || aProcessed;
   }
+  // Check the selection with validators
+  QString aError = getError();
+  if (aError.length() > 0) {
+    aSelectionListAttr->clear();
+    isDone = false;
+  }
   // updateObject - to update/redisplay feature
   // it is commented in order to perfom it outside the method
   //if (isDone) {
