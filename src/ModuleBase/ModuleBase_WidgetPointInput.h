@@ -68,6 +68,9 @@ protected:
   /// \return a list of shapes
   virtual QIntList shapeTypes() const;
 
+  /// Returns true if the event is processed.
+  virtual bool processEnter();
+
 protected:
   ModuleBase_ParamSpinBox* myXSpin;
   ModuleBase_ParamSpinBox* myYSpin;

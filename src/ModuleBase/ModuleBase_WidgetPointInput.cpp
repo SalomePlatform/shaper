@@ -191,3 +191,13 @@ bool ModuleBase_WidgetPointInput
   }
   return false;
 }
+
+//********************************************************************
+bool ModuleBase_WidgetPointInput::processEnter()
+{
+  bool isModified = getValueState() == ModifiedInPP;
+  if (isModified) {
+    emit valuesChanged();
+  }
+  return isModified;
+}
