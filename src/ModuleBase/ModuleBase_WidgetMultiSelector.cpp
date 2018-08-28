@@ -222,7 +222,7 @@ bool ModuleBase_WidgetMultiSelector::storeValueCustom()
   std::string aType = anAttribute->attributeType();
   if (aType == ModelAPI_AttributeSelectionList::typeId()) {
     AttributeSelectionListPtr aSelectionListAttr = myFeature->data()->selectionList(attributeID());
-
+    int aa = aSelectionListAttr->size();
     std::string aMode = myTypeCtrl->textValue().toStdString();
     if (myTypeCtrl->isVisible() && myIsFirst && (!myDefMode.empty()))
       aMode = myDefMode;
@@ -787,7 +787,7 @@ void ModuleBase_WidgetMultiSelector::convertIndicesToViewerSelection(std::set<in
       if (!theAttributeIds.empty() && theAttributeIds.find(i) == theAttributeIds.end())
         continue;
       AttributeSelectionPtr anAttr = aSelectionListAttr->value(i);
-      ResultPtr anObject = anAttr->context();
+      ObjectPtr anObject = anAttr->contextObject();
       if (anObject.get())
         theValues.append(std::shared_ptr<ModuleBase_ViewerPrs>(
                new ModuleBase_ViewerPrs(anObject, anAttr->value(), NULL)));
@@ -837,18 +837,23 @@ bool ModuleBase_WidgetMultiSelector::removeUnusedAttributeObjects
   std::string aType = anAttribute->attributeType();
   std::set<GeomShapePtr> aShapes;
   std::set<int> anIndicesToBeRemoved;
+  FeaturePtr aFeature;
   if (aType == ModelAPI_AttributeSelectionList::typeId()) {
     // iteration through data model to find not selected elements to remove them
     AttributeSelectionListPtr aSelectionListAttr = aData->selectionList(attributeID());
     for (int i = 0; i < aSelectionListAttr->size(); i++) {
       AttributeSelectionPtr anAttr = aSelectionListAttr->value(i);
-      bool aFound = findInSelection(
-        anAttr->contextObject(), anAttr->value(), aGeomSelection, myWorkshop);
-      if (!aFound)
-        anIndicesToBeRemoved.insert(i);
+      //aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(anAttr->contextObject());
+      //if (!aFeature.get()) { // Feature can not be found as geometry selection
+        bool aFound = findInSelection(
+          anAttr->contextObject(), anAttr->value(), aGeomSelection, myWorkshop);
+        if (!aFound)
+          anIndicesToBeRemoved.insert(i);
+//      }
     }
     isDone = anIndicesToBeRemoved.size() > 0;
-    aSelectionListAttr->remove(anIndicesToBeRemoved);
+    if (isDone)
+      aSelectionListAttr->remove(anIndicesToBeRemoved);
   }
   else if (aType == ModelAPI_AttributeRefList::typeId()) {
     AttributeRefListPtr aRefListAttr = aData->reflist(attributeID());
