@@ -309,8 +309,8 @@ SketchConstraintAngle_5 = Sketch_3.setAngle(SketchLine_51.result(), SketchLine_4
 SketchConstraintDistanceHorizontal_15 = Sketch_3.setHorizontalDistance(SketchAPI_Line(SketchLine_50).endPoint(), SketchLine_42.startPoint(), "Slot_Width")
 SketchConstraintDistanceVertical_5 = Sketch_3.setVerticalDistance(SketchLine_39.startPoint(), SketchLine_39.endPoint(), 8)
 SketchConstraintDistanceHorizontal_16 = Sketch_3.setHorizontalDistance(SketchLine_39.endPoint(), SketchAPI_Line(SketchLine_50).startPoint(), 3)
-model.do()
 ExtrusionCut_2.setNestedSketch(Sketch_3)
+model.do()
 # check Sketch_3
 model.checkSketch(Sketch_3, 0)
 # check ExtrusionCut_2
@@ -401,8 +401,8 @@ SketchConstraintVertical_18 = Sketch_5.setVertical(SketchLine_63.result())
 SketchConstraintHorizontal_12 = Sketch_5.setHorizontal(SketchLine_65.result())
 SketchConstraintDistanceVertical_7 = Sketch_5.setVerticalDistance(SketchLine_65.startPoint(), SketchLine_61.startPoint(), "Chamfer/2")
 SketchConstraintDistanceVertical_8 = Sketch_5.setVerticalDistance(SketchLine_61.startPoint(), SketchLine_63.endPoint(), "Chamfer*1.5")
-model.do()
 RevolutionCut_2.setNestedSketch(Sketch_5)
+model.do()
 # check Sketch_5
 model.checkSketch(Sketch_5, 0)
 # check RevolutionCut_2
@@ -437,7 +437,7 @@ model.testNbSubShapes(Result, GeomAPI_Shape.EDGE, [366])
 model.testNbSubShapes(Result, GeomAPI_Shape.VERTEX, [732])
 model.testResultsVolumes(Result, [14144.443128843522572424262762070])
 
-Group_1 = model.addGroup(Part_1_doc, [model.selection("FACE", "Plug/Modified_Face_3_1"), model.selection("FACE", "Plug/Modified_Face_5_1"), model.selection("FACE", "Plug/Modified_Face_46_1"), model.selection("FACE", "Plug/Modified_Face_48_1")])
+Group_1 = model.addGroup(Part_1_doc, [model.selection("FACE", "Plug/Modified_Face_27_1"), model.selection("FACE", "Plug/Modified_Face_26_1"), model.selection("FACE", "Plug/Modified_Face_28_1"), model.selection("FACE", "Plug/Modified_Face_32_1")])
 Group_1.result().setColor(68, 68, 68)
 # check Group_1
 model.checkGroup(Group_1, GeomAPI_Shape.FACE)

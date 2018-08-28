@@ -93,6 +93,8 @@ int Model_ResultBody::numberOfSubs(bool forTree) const
 
 ResultBodyPtr Model_ResultBody::subResult(const int theIndex, bool forTree) const
 {
+  if (theIndex >= int(mySubs.size()))
+    return ResultBodyPtr();
   return mySubs.at(theIndex);
 }
 
