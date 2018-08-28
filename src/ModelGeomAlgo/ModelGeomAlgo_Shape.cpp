@@ -153,7 +153,7 @@ namespace ModelGeomAlgo_Shape
                            const GeomAPI_Shape::ShapeType& theShapeType,
                            std::list<SubshapeOfResult>& theSelected)
   {
-    static const double TOLERANCE = 1.e-7;
+    static const double TOLERANCE = 1.e-6;
 
     theSelected.clear();
 
@@ -224,7 +224,7 @@ namespace ModelGeomAlgo_Shape
 
       // next special case: the full sketch is selected
       // the selection type is a COMPOUND
-      if (aSketchEdges &&
+      if (aSketchEdges && theShapeType == GeomAPI_Shape::COMPOUND &&
           aSketchEdges->middlePoint()->distance(thePoint) < TOLERANCE) {
         // select whole result
         appendSubshapeOfResult(theSelected, *aResIt, GeomShapePtr());
@@ -253,9 +253,8 @@ namespace ModelGeomAlgo_Shape
           std::dynamic_pointer_cast<GeomAPI_PlanarEdges>(aResults.front()->shape());
 
       if (aSketchEdges && aCF) {
-        bool isContinue = true;
         int aNbSubs = aCF->numberOfSubs();
-        for (int aSubInd = 0; aSubInd < aNbSubs && isContinue; ++aSubInd) {
+        for (int aSubInd = 0; aSubInd < aNbSubs; ++aSubInd) {
           FeaturePtr aSub = aCF->subFeature(aSubInd);
           const std::list<ResultPtr>& aSubResults = aSub->results();
           for (std::list<ResultPtr>::const_iterator aSRIt = aSubResults.begin();
@@ -265,7 +264,6 @@ namespace ModelGeomAlgo_Shape
                 findSubShape(aCurShape, theShapeType, thePoint, TOLERANCE);
             if (!aSubshapes.empty()) {
               appendSubshapeOfResult(theSelected, aResults.front(), aSubshapes);
-              isContinue = false;
               break;
             }
           }

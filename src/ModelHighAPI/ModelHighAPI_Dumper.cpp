@@ -1033,11 +1033,13 @@ ModelHighAPI_Dumper& ModelHighAPI_Dumper::operator<<(
   FeaturePtr aSelectedFeature;
   if (isDumpByGeom) {
     ResultPtr aRes = theAttrSelect->context();
-    if (aRes) {
+    if (aRes)
       aSelectedFeature = ModelAPI_Feature::feature(aRes->data()->owner());
-      if (aSelectedFeature)
-        isDumpByGeom = aSelectedFeature->isInHistory();
-    }
+    else
+      aSelectedFeature = theAttrSelect->contextFeature();
+
+    if (aSelectedFeature)
+      isDumpByGeom = aSelectedFeature->isInHistory();
   }
 
   myDumpBuffer << "\"" << aShape->shapeTypeStr();
@@ -1047,7 +1049,7 @@ ModelHighAPI_Dumper& ModelHighAPI_Dumper::operator<<(
     // for correct calculation of the middle point
     ResultPartPtr aResPart =
         std::dynamic_pointer_cast<ModelAPI_ResultPart>(theAttrSelect->context());
-    if (aResPart)
+    if (aResPart && aShape->shapeType() == GeomAPI_Shape::COMPOUND)
       aShape = aResPart->shape();
     GeomPointPtr aMiddlePoint = aShape->middlePoint();
     // calculate number of features, which could be selected by the same point
