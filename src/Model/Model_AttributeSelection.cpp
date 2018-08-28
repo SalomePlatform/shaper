@@ -492,10 +492,10 @@ FeaturePtr Model_AttributeSelection::contextFeature() {
   return std::dynamic_pointer_cast<ModelAPI_Feature>(myRef.value());
 }
 ObjectPtr Model_AttributeSelection::contextObject() {
-  ResultPtr aRes = context();
+  FeaturePtr aRes = contextFeature();
   if (aRes.get())
     return aRes;
-  return contextFeature();
+  return context();
 }
 
 
