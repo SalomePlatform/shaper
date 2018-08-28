@@ -47,6 +47,8 @@ for n in ["Part_1", "Part_3", "Part_2", "Part_4"]:
 
 # Remove the middle Part
 model.removePart(Copy_2)
+# move the history line to the end, because remove makes the current feature up
+PartSet.setCurrentFeature(Copy_3.feature(), False)
 model.do()
 
 # check the intermediate result
@@ -58,6 +60,8 @@ for n in ["Part_1", "Part_2", "Part_4"]:
 
 # Remove a first copy
 model.removePart(Copy_1)
+# move the history line to the end, because remove makes the current feature up
+PartSet.setCurrentFeature(Copy_3.feature(), False)
 model.end()
 
 # Undo the last remove

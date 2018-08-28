@@ -81,7 +81,7 @@ class ModelAPI_AttributeSelectionList : public ModelAPI_Attribute
   /// Returns the attribute selection by the index (zero based)
   virtual std::shared_ptr<ModelAPI_AttributeSelection> value(const int theIndex) = 0;
 
-  /// Returns all attributes
+  /// Removes all attributes of the list.
   virtual void clear() = 0;
 
   /// Starts or stops cashing of the values in the attribute (the cash may become invalid
