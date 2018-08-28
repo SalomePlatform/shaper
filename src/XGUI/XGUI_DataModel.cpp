@@ -132,7 +132,10 @@ void XGUI_DataModel::processEvent(const std::shared_ptr<Events_Message>& theMess
             insertRows(aOldNb - 1, aNewNb - aOldNb, aFirstIdx);
           }
           else if (aNewNb < aOldNb) {
-            removeRows(aNewNb - 1, aOldNb - aNewNb, aFirstIdx);
+            if (aNewNb)
+              removeRows(aNewNb - 1, aOldNb - aNewNb, aFirstIdx);
+            else if (aOldNb)
+              removeRows(0, aOldNb, aFirstIdx);
           }
           dataChanged(aFirstIdx, aLastIdx);
         }
@@ -187,7 +190,10 @@ void XGUI_DataModel::processEvent(const std::shared_ptr<Events_Message>& theMess
           insertRows(aOldNb - 1, aNewNb - aOldNb, aFirstIdx);
         }
         else if (aNewNb < aOldNb) {
-          removeRows(aNewNb - 1, aOldNb - aNewNb, aFirstIdx);
+          if (aNewNb)
+            removeRows(aNewNb - 1, aOldNb - aNewNb, aFirstIdx);
+          else if (aOldNb)
+            removeRows(0, aOldNb, aFirstIdx);
         }
         dataChanged(aFirstIdx, aLastIdx);
       }
