@@ -219,12 +219,31 @@ void XGUI_InspectionPanel::onSelectionChanged()
   XGUI_Selection* aSelection = mySelectionMgr->selection();
   QList<ModuleBase_ViewerPrsPtr> aSelectedList =
     aSelection->getSelected(ModuleBase_ISelection::Viewer);
+
+  QList<ModuleBase_ViewerPrsPtr> anOBSelected =
+    aSelection->getSelected(ModuleBase_ISelection::Browser);
+  if (!anOBSelected.isEmpty())
+    ModuleBase_ISelection::appendSelected(anOBSelected, aSelectedList);
+
   if (aSelectedList.count() > 0) {
     ModuleBase_ViewerPrsPtr aPrs = aSelectedList.first();
     TopoDS_Shape aShape = ModuleBase_Tools::getSelectedShape(aPrs);
+    if (aShape.IsNull()) {
+      ResultPtr aRes = std::dynamic_pointer_cast<ModelAPI_Result>(aPrs->object());
+      if (aRes.get()) {
+        GeomShapePtr aShpPtr = aRes->shape();
+        if (aShpPtr.get()) {
+          aShape = aShpPtr->impl<TopoDS_Shape>();
+        }
+      }
+    }
     if (aShape.IsNull())
       return;
-    setName(XGUI_Tools::generateName(aPrs));
+    GeomShapePtr aShapePtr(new GeomAPI_Shape());
+    aShapePtr->setImpl(new TopoDS_Shape(aShape));
+
+    ModuleBase_ViewerPrsPtr aPrsCopy(new ModuleBase_ViewerPrs(aPrs->object(), aShapePtr));
+    setName(XGUI_Tools::generateName(aPrsCopy));
     setShapeContent(aShape);
     setShapeParams(aShape);
   }
@@ -565,8 +584,12 @@ void XGUI_InspectionPanel::fillContainer(const GeomShapePtr& theShape)
     myTypeLbl->setText("Compound");
 
   // fill bounding box
+  TopoDS_Shape aShape = theShape->impl<TopoDS_Shape>();
   Bnd_Box aBB;
-  BRepBndLib::Add(theShape->impl<TopoDS_Shape>(), aBB);
+  BRepBndLib::Add(aShape, aBB);
+
+  if (aBB.IsVoid())
+    return;
 
   gp_Pnt aMinPnt = aBB.CornerMin();
   GeomPointPtr aMinPoint(new GeomAPI_Pnt(aMinPnt.X(), aMinPnt.Y(), aMinPnt.Z()));

@@ -41,7 +41,7 @@ class SelectMgr_EntityOwner;
 /// \ingroup GUI
 /// A class which provides access to selection.
 /// A selection can be obtained as from a viewer as from Object browser in various forms
-class ModuleBase_ISelection
+class MODULEBASE_EXPORT ModuleBase_ISelection
 {
  public:
    /// Types of the selection place, where the selection is obtained
@@ -82,29 +82,28 @@ class ModuleBase_ISelection
   /// If the shape is equal to the shape of selected object, it returns an empty shape
   /// \param thePrs a selected object
   /// \return a shape
-  MODULEBASE_EXPORT ResultPtr getResult(const std::shared_ptr<ModuleBase_ViewerPrs>& thePrs);
+  ResultPtr getResult(const std::shared_ptr<ModuleBase_ViewerPrs>& thePrs);
 
   /// Return the shape from the viewer presentation.
   /// If the shape is equal to the shape of selected object, it returns an empty shape
   /// \param thePrs a selected object
   /// \return a shape
-  MODULEBASE_EXPORT GeomShapePtr getShape(const std::shared_ptr<ModuleBase_ViewerPrs>& thePrs);
+  GeomShapePtr getShape(const std::shared_ptr<ModuleBase_ViewerPrs>& thePrs);
 
   /// Return the IO from the viewer presentation.
   /// \param thePrs a selected object
   /// \return an interactive object
-  virtual MODULEBASE_EXPORT
-    Handle(AIS_InteractiveObject) getIO(const std::shared_ptr<ModuleBase_ViewerPrs>& thePrs) = 0;
+  virtual Handle(AIS_InteractiveObject) getIO(const std::shared_ptr<ModuleBase_ViewerPrs>& thePrs) = 0;
 
   /// Wraps the object list into the viewer prs list
   /// \param theObjects a list of objects
   /// \return a list of prs, where only object is not empty
-  static MODULEBASE_EXPORT QList<std::shared_ptr<ModuleBase_ViewerPrs>> getViewerPrs(
+  static QList<std::shared_ptr<ModuleBase_ViewerPrs>> getViewerPrs(
                                                        const QObjectPtrList& theObjects);
 
   /// Removes selection items where owners have equal vertices. The first
   /// owner with the qual vertex stays in the list.
-  static MODULEBASE_EXPORT void filterSelectionOnEqualPoints
+  static void filterSelectionOnEqualPoints
                                       (QList<std::shared_ptr<ModuleBase_ViewerPrs>>& theSelected);
 protected:
   /// Returns list of currently selected QModelIndexes
