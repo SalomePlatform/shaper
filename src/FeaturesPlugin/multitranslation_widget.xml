@@ -34,7 +34,8 @@ email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com
                     label="Axis"
                     tooltip="Select an edge for the first direction"
                     shape_types="edge"
-                    default="">
+                    default=""
+                    geometrical_selection="true">
       <validator id="GeomValidators_ShapeType" parameters="line"/>
     </shape_selector>
     <doublevalue id="step_first_dir"
@@ -58,7 +59,8 @@ email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com
                     label="Axis"
                     tooltip="Select an edge for the second direction"
                     shape_types="edge"
-                    default="">
+                    default=""
+                    geometrical_selection="true">
       <validator id="GeomValidators_ShapeType" parameters="line"/>
     </shape_selector>
     <doublevalue id="step_second_dir"

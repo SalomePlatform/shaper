@@ -33,6 +33,7 @@
 #include <GeomAPI_Edge.h>
 #include <GeomAPI_Lin.h>
 #include <GeomAPI_Pln.h>
+#include <GeomAPI_ShapeIterator.h>
 #include <GeomAPI_Vertex.h>
 #include <GeomAlgoAPI_EdgeBuilder.h>
 #include <GeomAlgoAPI_PointBuilder.h>
@@ -162,16 +163,26 @@ void ConstructionPlugin_Axis::createAxisByPointAndDirection()
 
 void ConstructionPlugin_Axis::createAxisByCylindricalFace()
 {
-    std::shared_ptr<GeomAPI_Shape> aSelection = data()->selection(CYLINDRICAL_FACE())->value();
-     // update arguments due to the selection value
-    if (aSelection && !aSelection->isNull() && aSelection->isFace()) {
-      std::shared_ptr<GeomAPI_Edge> anEdge = GeomAlgoAPI_EdgeBuilder::cylinderAxis(aSelection);
+  std::shared_ptr<GeomAPI_Shape> aSelection = data()->selection(CYLINDRICAL_FACE())->value();
+    // update arguments due to the selection value
 
-      ResultConstructionPtr aConstr = document()->createConstruction(data());
-      aConstr->setInfinite(true);
-      aConstr->setShape(anEdge);
-      setResult(aConstr);
-    }
+  if (!aSelection.get() || aSelection->isNull()) {
+    return;
+  }
+
+  if (aSelection->isCompound()) {
+    GeomAPI_ShapeIterator anIt(aSelection);
+    aSelection = anIt.current();
+  }
+
+  if (aSelection->isFace()) {
+    std::shared_ptr<GeomAPI_Edge> anEdge = GeomAlgoAPI_EdgeBuilder::cylinderAxis(aSelection);
+
+    ResultConstructionPtr aConstr = document()->createConstruction(data());
+    aConstr->setInfinite(true);
+    aConstr->setShape(anEdge);
+    setResult(aConstr);
+  }
 }
 
 void ConstructionPlugin_Axis::createAxisByDimensions()
@@ -203,7 +214,14 @@ void ConstructionPlugin_Axis::createAxisByLine()
   if(!aLineShape.get()) {
     aLineShape = anEdgeSelection->context()->shape();
   }
-  std::shared_ptr<GeomAPI_Edge> anEdge(new GeomAPI_Edge(aLineShape));
+  GeomEdgePtr anEdge;
+  if (aLineShape->isEdge()) {
+    anEdge = aLineShape->edge();
+  }
+  else if (aLineShape->isCompound()) {
+    GeomAPI_ShapeIterator anIt(aLineShape);
+    anEdge = anIt.current()->edge();
+  }
 
   ResultConstructionPtr aConstr = document()->createConstruction(data());
   aConstr->setInfinite(true);
@@ -219,7 +237,14 @@ void ConstructionPlugin_Axis::createAxisByPlaneAndPoint()
   if(!aFaceShape.get()) {
     aFaceShape = aFaceSelection->context()->shape();
   }
-  std::shared_ptr<GeomAPI_Face> aFace(new GeomAPI_Face(aFaceShape));
+  GeomFacePtr aFace;
+  if (aFaceShape->isFace()) {
+    aFace = aFaceShape->face();
+  }
+  else if (aFaceShape->isCompound()) {
+    GeomAPI_ShapeIterator anIt(aFaceShape);
+    aFace = anIt.current()->face();
+  }
   std::shared_ptr<GeomAPI_Pln> aPln = aFace->getPlane();
 
   // Get point.
@@ -253,7 +278,14 @@ void ConstructionPlugin_Axis::createAxisByTwoPlanes()
   if(!aFaceShape1.get()) {
     aFaceShape1 = aFaceSelection1->context()->shape();
   }
-  std::shared_ptr<GeomAPI_Face> aFace1(new GeomAPI_Face(aFaceShape1));
+  std::shared_ptr<GeomAPI_Face> aFace1;
+  if (aFaceShape1->isFace()) {
+    aFace1 = aFaceShape1->face();
+  }
+  else if (aFaceShape1->isCompound()) {
+    GeomAPI_ShapeIterator anIt(aFaceShape1);
+    aFace1 = anIt.current()->face();
+  }
   std::shared_ptr<GeomAPI_Pln> aPln1 = aFace1->getPlane();
 
   std::string useOffset1 = string(USE_OFFSET1())->value();
@@ -272,7 +304,14 @@ void ConstructionPlugin_Axis::createAxisByTwoPlanes()
   if(!aFaceShape2.get()) {
     aFaceShape2 = aFaceSelection2->context()->shape();
   }
-  std::shared_ptr<GeomAPI_Face> aFace2(new GeomAPI_Face(aFaceShape2));
+  std::shared_ptr<GeomAPI_Face> aFace2;
+  if (aFaceShape2->isFace()) {
+    aFace2 = aFaceShape2->face();
+  }
+  else if (aFaceShape2->isCompound()) {
+    GeomAPI_ShapeIterator anIt(aFaceShape2);
+    aFace2 = anIt.current()->face();
+  }
   std::shared_ptr<GeomAPI_Pln> aPln2 = aFace2->getPlane();
 
   std::string useOffset2 = string(USE_OFFSET2())->value();

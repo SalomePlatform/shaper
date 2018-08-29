@@ -547,6 +547,11 @@ bool FeaturesPlugin_ValidatorExtrusionDir::isValid(
       if(aContext.get()) {
         aDirShape = aContext->shape();
       }
+
+      if (aDirShape.get() && aDirShape->isCompound()) {
+        GeomAPI_ShapeIterator anIt(aDirShape);
+        aDirShape = anIt.current();
+      }
     }
   }
 

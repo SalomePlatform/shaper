@@ -39,6 +39,7 @@
 #include <Events_InfoMessage.h>
 #include <GeomAPI_Edge.h>
 #include <GeomAPI_Pnt.h>
+#include <GeomAPI_ShapeIterator.h>
 #include <GeomAPI_Vertex.h>
 #include <GeomAPI_ShapeExplorer.h>
 #include <GeomAlgoAPI_CompoundBuilder.h>
@@ -456,6 +457,10 @@ void Model_AttributeSelection::setID(const std::string theID)
 {
   myRef.setID(theID);
   ModelAPI_AttributeSelection::setID(theID);
+  FeaturePtr aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(owner());
+  // TODO: check if parent list have geometrical selection flag.
+  myIsGeometricalSelection =
+    ModelAPI_Session::get()->validators()->isGeometricalSelection(aFeature->getKind(), id());
 }
 
 ResultPtr Model_AttributeSelection::context()

@@ -37,6 +37,7 @@ email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com
           label="axis"
           default=""
           shape_types="edge"
+          geometrical_selection="true"
           icon="icons/Primitives/axis.png"
           tooltip="Select the axis of the cylinder">
         <validator id="GeomValidators_ConstructionComposite"/>
@@ -75,6 +76,7 @@ email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com
           label="axis"
           default=""
           shape_types="edge"
+          geometrical_selection="true"
           icon="icons/Primitives/axis.png"
           tooltip="Select the axis of the cylinder">
         <validator id="GeomValidators_ConstructionComposite"/>

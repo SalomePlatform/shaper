@@ -53,7 +53,8 @@ email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com
                       label="Axis"
                       tooltip="Select an axis"
                       shape_types="edge"
-                      default="">
+                      default=""
+                      geometrical_selection="true">
         <validator id="GeomValidators_ShapeType" parameters="line"/>
       </shape_selector>
     </box>

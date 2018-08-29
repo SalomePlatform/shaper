@@ -115,6 +115,9 @@ class ModelAPI_AttributeSelection : public ModelAPI_Attribute
   /// Returns true if recompute of selection become impossible
   virtual bool isInvalid() = 0;
 
+  /// Returns true if is geometrical selection.
+  virtual bool isGeometricalSelection() const = 0;
+
   /// To virtually destroy the fields of successors
   MODELAPI_EXPORT virtual ~ModelAPI_AttributeSelection();
 

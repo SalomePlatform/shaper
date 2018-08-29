@@ -30,6 +30,7 @@
 #include <GeomAPI_Face.h>
 #include <GeomAPI_Lin.h>
 #include <GeomAPI_Pln.h>
+#include <GeomAPI_ShapeIterator.h>
 #include <GeomAPI_Trsf.h>
 
 #include <ModelAPI_AttributeBoolean.h>
@@ -195,20 +196,44 @@ void FeaturesPlugin_Symmetry::performSymmetryByAxis()
     return;
 
   //Getting axis.
-  std::shared_ptr<GeomAPI_Ax1> anAxis;
-  std::shared_ptr<GeomAPI_Edge> anEdge;
-  std::shared_ptr<ModelAPI_AttributeSelection> anObjRef =
-    selection(FeaturesPlugin_Symmetry::AXIS_OBJECT_ID());
-  if(anObjRef && anObjRef->value() && anObjRef->value()->isEdge()) {
-    anEdge = std::shared_ptr<GeomAPI_Edge>(new GeomAPI_Edge(anObjRef->value()));
-  } else if (anObjRef && !anObjRef->value() && anObjRef->context() &&
-             anObjRef->context()->shape() && anObjRef->context()->shape()->isEdge()) {
-    anEdge = std::shared_ptr<GeomAPI_Edge>(new GeomAPI_Edge(anObjRef->context()->shape()));
+  static const std::string aSelectionError = "Error: The axis shape selection is bad.";
+  AttributeSelectionPtr anObjRef = selection(AXIS_OBJECT_ID());
+  GeomShapePtr aShape = anObjRef->value();
+  if (!aShape.get()) {
+    if (anObjRef->context().get()) {
+      aShape = anObjRef->context()->shape();
+    }
   }
-  if(anEdge) {
-    anAxis = std::shared_ptr<GeomAPI_Ax1>(new GeomAPI_Ax1(anEdge->line()->location(),
-                                                          anEdge->line()->direction()));
+  if (!aShape.get()) {
+    setError(aSelectionError);
+    return;
   }
+
+  GeomEdgePtr anEdge;
+  if (aShape->isEdge())
+  {
+    anEdge = aShape->edge();
+  }
+  else if (aShape->isCompound())
+  {
+    GeomAPI_ShapeIterator anIt(aShape);
+    anEdge = anIt.current()->edge();
+  }
+  else
+  {
+    setError(aSelectionError);
+    return;
+  }
+
+  if (!anEdge.get())
+  {
+    setError(aSelectionError);
+    return;
+  }
+
+  std::shared_ptr<GeomAPI_Ax1> anAxis (new GeomAPI_Ax1(anEdge->line()->location(),
+                                                       anEdge->line()->direction()));
+
 
   // Moving each object.
   int aResultIndex = 0;
@@ -271,23 +296,45 @@ void FeaturesPlugin_Symmetry::performSymmetryByPlane()
   if (!collectSourceObjects(anObjects, aContextes))
     return;
 
-  //Getting axis.
-  std::shared_ptr<GeomAPI_Ax2> aPlane;
-  std::shared_ptr<GeomAPI_Pln> aPln;
-  std::shared_ptr<ModelAPI_AttributeSelection> anObjRef =
-    selection(FeaturesPlugin_Symmetry::PLANE_OBJECT_ID());
-  if (anObjRef && anObjRef->value() && anObjRef->value()->isFace()) {
-    aPln = std::shared_ptr<GeomAPI_Face>(new GeomAPI_Face(anObjRef->value()))->getPlane();
+  //Getting plane.
+  static const std::string aSelectionError = "Error: The plane shape selection is bad.";
+  AttributeSelectionPtr anObjRef = selection(PLANE_OBJECT_ID());
+  GeomShapePtr aShape = anObjRef->value();
+  if (!aShape.get()) {
+    if (anObjRef->context().get()) {
+      aShape = anObjRef->context()->shape();
+    }
   }
-  else if (anObjRef && !anObjRef->value() && anObjRef->context() &&
-             anObjRef->context()->shape() && anObjRef->context()->shape()->isFace()) {
-    aPln =
-      std::shared_ptr<GeomAPI_Face>(new GeomAPI_Face(anObjRef->context()->shape()))->getPlane();
+  if (!aShape.get()) {
+    setError(aSelectionError);
+    return;
   }
-  if (aPln) {
-    aPlane = std::shared_ptr<GeomAPI_Ax2>(new GeomAPI_Ax2(aPln->location(),
-                                                          aPln->direction()));
+
+  GeomFacePtr aFace;
+  if (aShape->isFace())
+  {
+    aFace = aShape->face();
   }
+  else if (aShape->isCompound())
+  {
+    GeomAPI_ShapeIterator anIt(aShape);
+    aFace = anIt.current()->face();
+  }
+  else
+  {
+    setError(aSelectionError);
+    return;
+  }
+
+  if (!aFace.get())
+  {
+    setError(aSelectionError);
+    return;
+  }
+
+  std::shared_ptr<GeomAPI_Ax2> aPlane(new GeomAPI_Ax2(aFace->getPlane()->location(),
+                                                      aFace->getPlane()->direction()));
+
 
   // Moving each object.
   int aResultIndex = 0;

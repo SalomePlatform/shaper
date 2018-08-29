@@ -15,7 +15,8 @@
                     label="Axis"
                     tooltip="Select an edge for the axis of rotation"
                     shape_types="edge"
-                    default="">
+                    default=""
+                    geometrical_selection="true">
       <validator id="GeomValidators_ShapeType" parameters="line"/>
     </shape_selector>
     <optionalbox id="use_step_angular" title="Angular step">

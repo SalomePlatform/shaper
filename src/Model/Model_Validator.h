@@ -58,6 +58,7 @@ class Model_ValidatorsFactory : public ModelAPI_ValidatorsFactory
           std::map<std::string, std::set<std::string> > > > myCases;
   /// Stores main attribute for each feature
   std::map<std::string, std::string> myMainArgument;
+  std::map<std::string, std::set<std::string> > myGeometricalSelection;
 
  public:
   /// Registers the instance of the validator by the ID
@@ -122,6 +123,12 @@ class Model_ValidatorsFactory : public ModelAPI_ValidatorsFactory
 
   /// Returns true is the attribute is a main argument of the feature
   virtual bool isMainArgument(std::string theFeature, std::string theAttribute);
+
+  /// Register the selection attribute as geometrical selection
+  virtual void registerGeometricalSelection(std::string theFeature, std::string theAttribute);
+
+  /// Returns true if the attribute is a geometrical selection
+  virtual bool isGeometricalSelection(std::string theFeature, std::string theAttribute);
 
 
 protected:

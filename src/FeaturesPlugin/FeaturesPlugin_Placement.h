@@ -95,6 +95,9 @@ class FeaturesPlugin_Placement : public ModelAPI_Feature
 
   /// Use plugin manager for features creation
   FeaturesPlugin_Placement();
+private:
+  /// Checks validity of passed shape.
+  bool isShapeValid(GeomShapePtr theShape);
 };
 
 #endif

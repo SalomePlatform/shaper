@@ -475,6 +475,10 @@ void Model_Session::processEvent(const std::shared_ptr<Events_Message>& theMessa
         if (!aCases.empty()) {
           validators()->registerCase(aMsgAttr->featureId(), aMsgAttr->attributeId(), aCases);
         }
+        if (aMsgAttr->isGeometricalSelection()) {
+          validators()->registerGeometricalSelection(aMsgAttr->featureId(),
+                                                     aMsgAttr->attributeId());
+        }
       }
     }
     // plugins information was started to load, so, it will be loaded

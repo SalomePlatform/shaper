@@ -25,6 +25,7 @@
 
 #include <GeomAPI_Dir.h>
 #include <GeomAPI_PlanarEdges.h>
+#include <GeomAPI_ShapeIterator.h>
 #include <GeomAPI_Vertex.h>
 
 #include <GeomDataAPI_Point2D.h>
@@ -255,7 +256,14 @@ void SketchPlugin_Sketch::attributeChanged(const std::string& theID) {
       std::shared_ptr<GeomAPI_Shape> aSelection = aSelAttr->value();
       if (!aSelection.get()) aSelection = aSelAttr->context()->shape();
       // update the sketch plane
-      std::shared_ptr<GeomAPI_Face> aFace(new GeomAPI_Face(aSelection));
+      std::shared_ptr<GeomAPI_Face> aFace;
+      if (aSelection->isFace()) {
+        aFace = aSelection->face();
+      } else if (aSelection->isCompound()) {
+        GeomAPI_ShapeIterator anIt(aSelection);
+        aFace = anIt.current()->face();
+      }
+
       std::shared_ptr<GeomAPI_Pln> aPlane = aFace->getPlane();
       if (aPlane) {
         double anA, aB, aC, aD;

@@ -42,6 +42,7 @@ class Config_AttributeMessage : public Events_Message
   bool myIsObligatory; ///< Required to be set by user, else it's feature is invalid.
   bool myIsConcealment; ///< If true, conceals features used as input
   bool myIsMainArgument; ///< Mark attribute as a main argument of the feature
+  bool myIsGeometricalSelection; ///< If true selects geometry instead of shape;
   ///< a list of pairs, if the attribute is placed inside paged containers: (case, switch)
   std::list<std::pair<std::string, std::string> > myCases;
 
@@ -69,6 +70,8 @@ public:
   CONFIG_EXPORT bool isConcealment() const;
   /// Returns true if attribute is a main argument of the feature
   CONFIG_EXPORT bool isMainArgument() const;
+  /// Returns true if attribute selects geometry instead of shape;
+  CONFIG_EXPORT bool isGeometricalSelection() const;
   /// Returns container of ids of pair of a case and switches
   CONFIG_EXPORT const std::list<std::pair<std::string, std::string> >& getCases() const;
   /// Sets ids of pair of a case and switches
@@ -84,6 +87,8 @@ public:
   CONFIG_EXPORT void setObligatory(bool isObligatory);
   /// Set a state that the attribute is a main argument of the feature
   CONFIG_EXPORT void setMainArgument(bool isMainArg);
+  /// Set attribute's geometrical selection state
+  CONFIG_EXPORT void setGeometricalSelection(bool isGeometricalSelection);
 };
 
 #endif // ATTRIBUTE_MESSAGE_H

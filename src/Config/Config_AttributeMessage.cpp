@@ -27,6 +27,7 @@ Config_AttributeMessage::Config_AttributeMessage(const Events_ID theId, const vo
   myFeatureId = std::string(); // Feature unique id
   myIsObligatory = true;
   myIsConcealment = false;
+  myIsGeometricalSelection = false;
 }
 
 Config_AttributeMessage::~Config_AttributeMessage()
@@ -93,4 +94,14 @@ bool Config_AttributeMessage::isMainArgument() const
 void Config_AttributeMessage::setMainArgument(bool isMainArg)
 {
   myIsMainArgument = isMainArg;
+}
+
+bool Config_AttributeMessage::isGeometricalSelection() const
+{
+  return myIsGeometricalSelection;
+}
+
+void Config_AttributeMessage::setGeometricalSelection(bool isGeometricalSelection)
+{
+  myIsGeometricalSelection = isGeometricalSelection;
 }

@@ -83,6 +83,7 @@ protected:
   /// \param[out] theError error message.
   bool isValidObject(const ObjectPtr& theObject,
                      const TypeOfShape theShapeType,
+                     const bool theIsGeometricalSelection,
                      Events_InfoMessage& theError) const;
 
   /// Returns true if the attibute's object type satisfies the argument value
@@ -91,6 +92,7 @@ protected:
   /// \param[out] theError error message.
   bool isValidShape(const GeomShapePtr theShape,
                     const TypeOfShape theShapeType,
+                    const bool theIsGeometricalSelection,
                     Events_InfoMessage& theError) const;
 
 };

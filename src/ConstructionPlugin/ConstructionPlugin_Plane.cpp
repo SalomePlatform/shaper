@@ -33,6 +33,7 @@
 #include <GeomAPI_Pln.h>
 #include <GeomAPI_Pnt.h>
 #include <GeomAPI_Pnt2d.h>
+#include <GeomAPI_ShapeIterator.h>
 #include <GeomAPI_Vertex.h>
 #include <GeomAPI_XYZ.h>
 
@@ -231,7 +232,14 @@ std::shared_ptr<GeomAPI_Shape> ConstructionPlugin_Plane::createByLineAndPoint()
   if(!aLineShape.get()) {
     aLineShape = anEdgeSelection->context()->shape();
   }
-  std::shared_ptr<GeomAPI_Edge> anEdge(new GeomAPI_Edge(aLineShape));
+  std::shared_ptr<GeomAPI_Edge> anEdge;
+  if (aLineShape->isEdge()) {
+    anEdge = aLineShape->edge();
+  }
+  else if (aLineShape->isCompound()) {
+    GeomAPI_ShapeIterator anIt(aLineShape);
+    anEdge = anIt.current()->edge();
+  }
 
   // Get point.
   AttributeSelectionPtr aPointSelection = selection(POINT());
@@ -285,7 +293,14 @@ std::shared_ptr<GeomAPI_Shape> ConstructionPlugin_Plane::createByDistanceFromOth
       return aPlane;
     }
 
-    std::shared_ptr<GeomAPI_Face> aFace(new GeomAPI_Face(aShape));
+    std::shared_ptr<GeomAPI_Face> aFace;
+    if (aShape->isFace()) {
+      aFace = aShape->face();
+    }
+    else if (aShape->isCompound()) {
+      GeomAPI_ShapeIterator anIt(aShape);
+      aFace = anIt.current()->face();
+    }
 
     std::shared_ptr<GeomAPI_Pln> aPln = aFace->getPlane();
     std::shared_ptr<GeomAPI_Pnt> aOrig = aPln->location();
@@ -308,7 +323,14 @@ std::shared_ptr<GeomAPI_Shape> ConstructionPlugin_Plane::createByCoincidentPoint
   if(!aFaceShape.get()) {
     aFaceShape = aFaceSelection->context()->shape();
   }
-  std::shared_ptr<GeomAPI_Face> aFace(new GeomAPI_Face(aFaceShape));
+  std::shared_ptr<GeomAPI_Face> aFace;
+  if (aFaceShape->isFace()) {
+    aFace = aFaceShape->face();
+  }
+  else if (aFaceShape->isCompound()) {
+    GeomAPI_ShapeIterator anIt(aFaceShape);
+    aFace = anIt.current()->face();
+  }
 
   // Get point.
   AttributeSelectionPtr aPointSelection = selection(COINCIDENT_POINT());
@@ -336,7 +358,14 @@ std::shared_ptr<GeomAPI_Shape> ConstructionPlugin_Plane::createByRotation()
   if(!aFaceShape.get()) {
     aFaceShape = aFaceSelection->context()->shape();
   }
-  std::shared_ptr<GeomAPI_Face> aFace(new GeomAPI_Face(aFaceShape));
+  std::shared_ptr<GeomAPI_Face> aFace;
+  if (aFaceShape->isFace()) {
+    aFace = aFaceShape->face();
+  }
+  else if (aFaceShape->isCompound()) {
+    GeomAPI_ShapeIterator anIt(aFaceShape);
+    aFace = anIt.current()->face();
+  }
   aFace = makeRectangularFace(aFace, aFace->getPlane());
 
   // Get axis.
@@ -345,7 +374,14 @@ std::shared_ptr<GeomAPI_Shape> ConstructionPlugin_Plane::createByRotation()
   if(!anAxisShape.get()) {
     anAxisShape = anAxisSelection->context()->shape();
   }
-  std::shared_ptr<GeomAPI_Edge> anEdge(new GeomAPI_Edge(anAxisShape));
+  std::shared_ptr<GeomAPI_Edge> anEdge;
+  if (anAxisShape->isEdge()) {
+    anEdge = anAxisShape->edge();
+  }
+  else if (anAxisShape->isCompound()) {
+    GeomAPI_ShapeIterator anIt(anAxisShape);
+    anEdge = anIt.current()->edge();
+  }
 
   std::shared_ptr<GeomAPI_Ax1> anAxis =
     std::shared_ptr<GeomAPI_Ax1>(new GeomAPI_Ax1(anEdge->line()->location(),
@@ -378,7 +414,14 @@ std::shared_ptr<GeomAPI_Shape> ConstructionPlugin_Plane::createByTwoParallelPlan
   if(!aFaceShape1.get()) {
     aFaceShape1 = aFaceSelection1->context()->shape();
   }
-  std::shared_ptr<GeomAPI_Face> aFace1(new GeomAPI_Face(aFaceShape1));
+  std::shared_ptr<GeomAPI_Face> aFace1;
+  if (aFaceShape1->isFace()) {
+    aFace1 = aFaceShape1->face();
+  }
+  else if (aFaceShape1->isCompound()) {
+    GeomAPI_ShapeIterator anIt(aFaceShape1);
+    aFace1 = anIt.current()->face();
+  }
   std::shared_ptr<GeomAPI_Pln> aPln1 = aFace1->getPlane();
 
   // Get plane 2.
@@ -387,7 +430,14 @@ std::shared_ptr<GeomAPI_Shape> ConstructionPlugin_Plane::createByTwoParallelPlan
   if(!aFaceShape2.get()) {
     aFaceShape2 = aFaceSelection2->context()->shape();
   }
-  std::shared_ptr<GeomAPI_Face> aFace2(new GeomAPI_Face(aFaceShape2));
+  std::shared_ptr<GeomAPI_Face> aFace2;
+  if (aFaceShape2->isFace()) {
+    aFace2 = aFaceShape2->face();
+  }
+  else if (aFaceShape2->isCompound()) {
+    GeomAPI_ShapeIterator anIt(aFaceShape2);
+    aFace2 = anIt.current()->face();
+  }
   std::shared_ptr<GeomAPI_Pln> aPln2 = aFace2->getPlane();
 
   std::shared_ptr<GeomAPI_Pnt> anOrig1 = aPln1->location();

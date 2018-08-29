@@ -31,6 +31,7 @@
 #include <GeomAPI_Dir.h>
 #include <GeomAPI_Edge.h>
 #include <GeomAPI_Lin.h>
+#include <GeomAPI_ShapeIterator.h>
 
 //=================================================================================================
 FeaturesPlugin_Extrusion::FeaturesPlugin_Extrusion()
@@ -95,16 +96,29 @@ bool FeaturesPlugin_Extrusion::makeExtrusions(ListOfShape& theBaseShapes,
   getBaseShapes(theBaseShapes);
 
   //Getting direction.
-  std::shared_ptr<GeomAPI_Dir> aDir;
-  std::shared_ptr<GeomAPI_Edge> anEdge;
+  static const std::string aSelectionError = "Error: The direction shape selection is bad.";
   AttributeSelectionPtr aSelection = selection(DIRECTION_OBJECT_ID());
-  if(aSelection.get() && aSelection->value().get() && aSelection->value()->isEdge()) {
-    anEdge = std::shared_ptr<GeomAPI_Edge>(new GeomAPI_Edge(aSelection->value()));
-  } else if(aSelection->context().get() &&
-            aSelection->context()->shape().get() &&
-            aSelection->context()->shape()->isEdge()) {
-    anEdge = std::shared_ptr<GeomAPI_Edge>(new GeomAPI_Edge(aSelection->context()->shape()));
+  GeomShapePtr aShape = aSelection->value();
+  if (!aShape.get()) {
+    if (aSelection->context().get()) {
+      aShape = aSelection->context()->shape();
+    }
   }
+
+  GeomEdgePtr anEdge;
+  if (aShape.get()) {
+    if (aShape->isEdge())
+    {
+      anEdge = aShape->edge();
+    }
+    else if (aShape->isCompound())
+    {
+      GeomAPI_ShapeIterator anIt(aShape);
+      anEdge = anIt.current()->edge();
+    }
+  }
+
+  std::shared_ptr<GeomAPI_Dir> aDir;
   if(anEdge.get()) {
     if(anEdge->isLine()) {
       aDir = anEdge->line()->direction();
@@ -134,12 +148,20 @@ bool FeaturesPlugin_Extrusion::makeExtrusions(ListOfShape& theBaseShapes,
       if(!aToShape.get() && aSelection->context().get()) {
         aToShape = aSelection->context()->shape();
       }
+      if (aToShape->isCompound()) {
+        GeomAPI_ShapeIterator anIt(aToShape);
+        aToShape = anIt.current();
+      }
     }
     aSelection = selection(FROM_OBJECT_ID());
     if(aSelection.get()) {
       aFromShape = std::dynamic_pointer_cast<GeomAPI_Shape>(aSelection->value());
       if(!aFromShape.get() && aSelection->context().get()) {
         aFromShape = aSelection->context()->shape();
+      }
+      if (aFromShape->isCompound()) {
+        GeomAPI_ShapeIterator anIt(aFromShape);
+        aFromShape = anIt.current();
       }
     }
   }
