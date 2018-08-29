@@ -233,7 +233,6 @@ M_REF_DATA = [(1.5, 14094.989002197671652538701891899),
 for m in M_REF_DATA:
     Param_m.setValue(m[0])
     model.do()
-    model.generateTests(Boolean_1, "Boolean_1")
 
     model.testNbResults(Boolean_1, 1)
     model.testNbSubResults(Boolean_1, [0])

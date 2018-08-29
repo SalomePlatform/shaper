@@ -46,7 +46,6 @@ SketchConstraintCoincidence_8 = Sketch_1.setCoincident(SketchLine_6.endPoint(), 
 SketchConstraintHorizontal_1 = Sketch_1.setHorizontal(SketchLine_4.result())
 SketchConstraintVertical_1 = Sketch_1.setVertical(SketchLine_3.result())
 SketchConstraintVertical_2 = Sketch_1.setVertical(SketchLine_5.result())
-SketchConstraintVertical_3 = Sketch_1.setVertical(SketchLine_8.result())
 SketchConstraintHorizontal_2 = Sketch_1.setHorizontal(SketchLine_6.result())
 SketchConstraintDistance_1 = Sketch_1.setDistance(SketchLine_1.endPoint(), SketchLine_8.result(), 30)
 SketchConstraintLength_1 = Sketch_1.setLength(SketchLine_3.result(), 37.5)

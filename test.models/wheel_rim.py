@@ -264,6 +264,6 @@ model.testNbSubShapes(Boolean_1, GeomAPI_Shape.SOLID, [1])
 model.testNbSubShapes(Boolean_1, GeomAPI_Shape.FACE, [35])
 model.testNbSubShapes(Boolean_1, GeomAPI_Shape.EDGE, [162])
 model.testNbSubShapes(Boolean_1, GeomAPI_Shape.VERTEX, [324])
-model.testResultsVolumes(Boolean_1, [2053931.913933836854994297027587891])
+model.testResultsVolumes(Boolean_1, [2053931.558882251149043440818786621])
 
 assert(model.checkPythonDump())
