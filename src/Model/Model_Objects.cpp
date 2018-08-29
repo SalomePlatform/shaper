@@ -1182,24 +1182,28 @@ bool Model_Objects::hasCustomName(DataPtr theFeatureData,
                                   std::string& theParentName) const
 {
   ResultBodyPtr aBodyRes = std::dynamic_pointer_cast<ModelAPI_ResultBody>(theFeatureData->owner());
-  if (aBodyRes && std::dynamic_pointer_cast<Model_Data>(theFeatureData)->label().Depth() < 7) {
+  if (aBodyRes) {
     // only for top-results (works for the cases when results are not yet added to the feature)
     FeaturePtr anOwner = ModelAPI_Feature::feature(theResult);
 
     // names of sub-solids in CompSolid should be default (for example,
     // result of boolean operation 'Boolean_1' is a CompSolid which is renamed to 'MyBOOL',
     // however, sub-elements of 'MyBOOL' should be named 'Boolean_1_1', 'Boolean_1_2' etc.)
-    std::ostringstream aDefaultName;
-    aDefaultName << anOwner->name();
-    // compute default name of CompSolid (name of feature + index of CompSolid's result)
-    int aBodyResultIndex = 0;
-    const std::list<ResultPtr>& aResults = anOwner->results();
-    std::list<ResultPtr>::const_iterator anIt = aResults.begin();
-    for(; anIt != aResults.end(); ++anIt, ++aBodyResultIndex)
-      if(aBodyRes == *anIt)
-        break;
-    aDefaultName << "_" << (aBodyResultIndex + 1);
-    theParentName = aDefaultName.str();
+    if (std::dynamic_pointer_cast<Model_Data>(aBodyRes->data())->label().Depth() == 6) {
+      std::ostringstream aDefaultName;
+      // compute default name of CompSolid (name of feature + index of CompSolid's result)
+      int aBodyResultIndex = 0;
+      const std::list<ResultPtr>& aResults = anOwner->results();
+      std::list<ResultPtr>::const_iterator anIt = aResults.begin();
+      for (; anIt != aResults.end(); ++anIt, ++aBodyResultIndex)
+        if (aBodyRes == *anIt)
+          break;
+      aDefaultName << anOwner->name();
+      aDefaultName << "_" << (aBodyResultIndex + 1);
+      theParentName = aDefaultName.str();
+    } else { // just name of the parent result if it is deeper than just a sub-result
+      theParentName = aBodyRes->data()->name();
+    }
     return false;
   }
 
