@@ -24,7 +24,7 @@ email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com
     label="Main objects"
     icon=""
     tooltip="Select objects"
-    type_choice="vertices edges wires faces shells solids compsolids"
+    type_choice="vertices edges wires faces shells solids compsolids compounds"
     use_choice="false"
     concealment="true">
     <validator id="PartSet_DifferentObjects"/>
@@ -34,7 +34,7 @@ email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com
     label="Tool objects"
     icon=""
     tooltip="Select tools"
-    type_choice="vertices edges wires faces shells solids compsolids"
+    type_choice="vertices edges wires faces shells solids compsolids compounds"
     use_choice="false"
     concealment="true" >
     <validator id="PartSet_DifferentObjects"/>
