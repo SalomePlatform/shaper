@@ -141,7 +141,8 @@ email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com
                           label="Line"
                           tooltip="Line for intersection."
                           icon="icons/Construction/edge.png"
-                          shape_types="edge">
+                          shape_types="edge"
+                          geometrical_selection="true">
             <validator id="ConstructionPlugin_ValidatorPointEdgeAndPlaneNotParallel"
                        parameters="intersection_plane"/>
           </shape_selector>
@@ -149,7 +150,8 @@ email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com
                           label="Plane"
                           tooltip="Plane for intersection."
                           icon="icons/Construction/face.png"
-                          shape_types="face">
+                          shape_types="face"
+                          geometrical_selection="true">
             <validator id="GeomValidators_Face" parameters="plane"/>
             <validator id="ConstructionPlugin_ValidatorPointEdgeAndPlaneNotParallel"
                        parameters="intersection_line"/>

@@ -55,7 +55,8 @@ email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com
                       label="Line"
                       tooltip="Select line."
                       icon="icons/Construction/edge.png"
-                      shape_types="edge">
+                      shape_types="edge"
+                      geometrical_selection="true">
         <validator id="GeomValidators_ShapeType" parameters="line"/>
         <validator id="ConstructionPlugin_ValidatorPlaneLinePoint" parameters="point,perpendicular"/>
       </shape_selector>
@@ -79,7 +80,8 @@ email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com
                       label="Plane"
                       tooltip="Select a planar face."
                       icon="icons/Construction/face.png"
-                      shape_types="face">
+                      shape_types="face"
+                      geometrical_selection="true">
         <validator id="GeomValidators_Face" parameters="plane"/>
       </shape_selector>
       <toolbox id="by_other_plane_option">
@@ -118,7 +120,8 @@ email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com
                           label="Axis"
                           tooltip="Select line for axis."
                           icon="icons/Construction/axis.png"
-                          shape_types="edge">
+                          shape_types="edge"
+                          geometrical_selection="true">
             <validator id="GeomValidators_ShapeType" parameters="line"/>
           </shape_selector>
           <doublevalue id="angle"
@@ -140,7 +143,8 @@ email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com
                       label="1st plane"
                       tooltip="Select a planar face."
                       icon="icons/Construction/face.png"
-                      shape_types="face">
+                      shape_types="face"
+                      geometrical_selection="true">
         <validator id="GeomValidators_Face" parameters="plane"/>
         <validator id="ConstructionPlugin_ValidatorPlaneTwoParallelPlanes" parameters="plane2"/>
       </shape_selector>
@@ -148,7 +152,8 @@ email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com
                       label="2nd plane"
                       tooltip="Select a planar face."
                       icon="icons/Construction/face.png"
-                      shape_types="face">
+                      shape_types="face"
+                      geometrical_selection="true">
         <validator id="GeomValidators_Face" parameters="plane"/>
         <validator id="ConstructionPlugin_ValidatorPlaneTwoParallelPlanes" parameters="plane1"/>
       </shape_selector>

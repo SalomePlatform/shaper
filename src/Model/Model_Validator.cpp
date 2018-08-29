@@ -377,3 +377,27 @@ bool Model_ValidatorsFactory::isMainArgument(std::string theFeature, std::string
   std::map<std::string, std::string>::iterator aFound = myMainArgument.find(theFeature);
   return aFound != myMainArgument.end() && aFound->second == theAttribute;
 }
+
+void Model_ValidatorsFactory::registerGeometricalSelection(std::string theFeature,
+                                                           std::string theAttribute)
+{
+  std::map<std::string, std::set<std::string> >::iterator aFind =
+    myGeometricalSelection.find(theFeature);
+  if (aFind == myGeometricalSelection.end()) {
+    std::set<std::string> aNewSet;
+    aNewSet.insert(theAttribute);
+    myGeometricalSelection[theFeature] = aNewSet;
+  }
+  else {
+    aFind->second.insert(theAttribute);
+  }
+}
+
+bool Model_ValidatorsFactory::isGeometricalSelection(std::string theFeature,
+                                                     std::string theAttribute)
+{
+  std::map<std::string, std::set<std::string> >::iterator aFind =
+    myGeometricalSelection.find(theFeature);
+  return aFind != myGeometricalSelection.end()
+         && aFind->second.find(theAttribute) != aFind->second.end();
+}

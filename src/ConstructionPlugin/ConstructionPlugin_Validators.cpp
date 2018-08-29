@@ -27,6 +27,7 @@
 #include <GeomAPI_Pln.h>
 #include <GeomAPI_Vertex.h>
 #include <GeomAPI_Pnt.h>
+#include <GeomAPI_ShapeIterator.h>
 #include <GeomAlgoAPI_ShapeTools.h>
 
 #include <ModelAPI_AttributeSelection.h>
@@ -35,6 +36,7 @@
 #include <Events_InfoMessage.h>
 
 static std::shared_ptr<GeomAPI_Edge> getEdge(const GeomShapePtr theShape);
+static std::shared_ptr<GeomAPI_Face> getFace(const GeomShapePtr theShape);
 static std::shared_ptr<GeomAPI_Lin> getLin(const GeomShapePtr theShape);
 static std::shared_ptr<GeomAPI_Pln> getPln(const GeomShapePtr theShape);
 static std::shared_ptr<GeomAPI_Pnt> getPnt(const GeomShapePtr theShape);
@@ -114,7 +116,7 @@ bool ConstructionPlugin_ValidatorPointEdgeAndPlaneNotParallel::isValid(
   AttributeSelectionPtr anAttribute2 = aFeature->selection(theArguments.front());
 
   std::shared_ptr<GeomAPI_Edge> anEdge;
-  std::shared_ptr<GeomAPI_Pln> aPln;
+  std::shared_ptr<GeomAPI_Face> aFace;
 
   GeomShapePtr aShape1 = anAttribute1->value();
   ResultPtr aContext1 = anAttribute1->context();
@@ -137,20 +139,20 @@ bool ConstructionPlugin_ValidatorPointEdgeAndPlaneNotParallel::isValid(
 
   bool isPlaneFirst = false;
   anEdge = getEdge(aShape1);
-  aPln = getPln(aShape2);
-  if(!anEdge.get() || !aPln.get()) {
+
+  aFace = getFace(aShape2);
+  if(!anEdge.get() || !aFace.get()) {
     anEdge = getEdge(aShape2);
-    aPln = getPln(aShape1);
+    aFace = getFace(aShape1);
     isPlaneFirst = true;
   }
 
-  if(!anEdge.get() || !aPln.get()) {
+  if(!anEdge.get() || !aFace.get()) {
     theError = "Wrong shape types selected.";
     return false;
   }
 
-  std::shared_ptr<GeomAPI_Face> aPlaneFace(new GeomAPI_Face(isPlaneFirst ? aShape1 : aShape2));
-  if(GeomAlgoAPI_ShapeTools::isParallel(anEdge, aPlaneFace)) {
+  if(GeomAlgoAPI_ShapeTools::isParallel(anEdge, aFace)) {
     theError = "Plane and edge are parallel.";
     return false;
   }
@@ -474,24 +476,50 @@ bool ConstructionPlugin_ValidatorPointThreeNonParallelPlanes::isValid(
 
 std::shared_ptr<GeomAPI_Edge> getEdge(const GeomShapePtr theShape)
 {
-  if(!theShape->isEdge()) {
-    return std::shared_ptr<GeomAPI_Edge>();
+  GeomEdgePtr anEdge;
+
+  if(theShape->isEdge()) {
+    anEdge = theShape->edge();
+  }
+  else if (theShape->isCompound()) {
+    GeomAPI_ShapeIterator anIt(theShape);
+    anEdge = anIt.current()->edge();
   }
 
-  std::shared_ptr<GeomAPI_Edge> anEdge(new GeomAPI_Edge(theShape));
-
   return anEdge;
+}
+
+GeomFacePtr getFace(const GeomShapePtr theShape)
+{
+  GeomFacePtr aFace;
+
+  if (theShape->isFace()) {
+    aFace = theShape->face();
+  }
+  else if (theShape->isCompound()) {
+    GeomAPI_ShapeIterator anIt(theShape);
+    aFace = anIt.current()->face();
+  }
+
+  return aFace;
 }
 
 std::shared_ptr<GeomAPI_Lin> getLin(const GeomShapePtr theShape)
 {
   std::shared_ptr<GeomAPI_Lin> aLin;
 
-  if(!theShape->isEdge()) {
+  GeomEdgePtr anEdge;
+
+  if (theShape->isEdge()) {
+    anEdge = theShape->edge();
+  }
+  else if (theShape->isCompound()) {
+    GeomAPI_ShapeIterator anIt(theShape);
+    anEdge = anIt.current()->edge();
+  }
+  else {
     return aLin;
   }
-
-  std::shared_ptr<GeomAPI_Edge> anEdge(new GeomAPI_Edge(theShape));
 
   if(!anEdge->isLine()) {
     return aLin;
@@ -506,11 +534,18 @@ std::shared_ptr<GeomAPI_Pln> getPln(const GeomShapePtr theShape)
 {
   std::shared_ptr<GeomAPI_Pln> aPln;
 
-  if(!theShape->isFace()) {
+  GeomFacePtr aFace;
+
+  if(theShape->isFace()) {
+    aFace = theShape->face();
+  }
+  else if (theShape->isCompound()) {
+    GeomAPI_ShapeIterator anIt(theShape);
+    aFace = anIt.current()->face();
+  }
+  else {
     return aPln;
   }
-
-  std::shared_ptr<GeomAPI_Face> aFace(new GeomAPI_Face(theShape));
 
   if(!aFace->isPlanar()) {
     return aPln;

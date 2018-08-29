@@ -9,6 +9,7 @@
 #include <GeomAPI_Edge.h>
 #include <GeomAPI_Lin.h>
 #include <GeomAPI_ShapeExplorer.h>
+#include <GeomAPI_ShapeIterator.h>
 
 #include <GeomAlgoAPI_PointBuilder.h>
 
@@ -80,20 +81,42 @@ void PrimitivesPlugin_Torus::execute()
   }
 
   // Getting axis.
-  std::shared_ptr<GeomAPI_Ax2> anAxis;
+  static const std::string aSelectionError = "Error: The axis shape selection is bad.";
+  std::shared_ptr<ModelAPI_AttributeSelection> anEdgeRef = selection(AXIS_ID());
+  GeomShapePtr aShape = anEdgeRef->value();
+  if (!aShape.get()) {
+    if (anEdgeRef->context().get()) {
+      aShape = anEdgeRef->context()->shape();
+    }
+  }
+  if (!aShape.get()) {
+    setError(aSelectionError);
+    return;
+  }
   std::shared_ptr<GeomAPI_Edge> anEdge;
-  std::shared_ptr<ModelAPI_AttributeSelection> anEdgeRef =
-    selection(PrimitivesPlugin_Torus::AXIS_ID());
-  if(anEdgeRef && anEdgeRef->value() && anEdgeRef->value()->isEdge()) {
-    anEdge = std::shared_ptr<GeomAPI_Edge>(new GeomAPI_Edge(anEdgeRef->value()));
-  } else if (anEdgeRef && !anEdgeRef->value() && anEdgeRef->context() &&
-             anEdgeRef->context()->shape() && anEdgeRef->context()->shape()->isEdge()) {
-    anEdge = std::shared_ptr<GeomAPI_Edge>(new GeomAPI_Edge(anEdgeRef->context()->shape()));
+  if (aShape->isEdge())
+  {
+    anEdge = aShape->edge();
   }
-  if(anEdge) {
-    anAxis = std::shared_ptr<GeomAPI_Ax2>(new GeomAPI_Ax2(aBasePoint,
-                                                          anEdge->line()->direction()));
+  else if (aShape->isCompound())
+  {
+    GeomAPI_ShapeIterator anIt(aShape);
+    anEdge = anIt.current()->edge();
   }
+  else
+  {
+    setError(aSelectionError);
+    return;
+  }
+
+  if (!anEdge.get())
+  {
+    setError(aSelectionError);
+    return;
+  }
+
+  std::shared_ptr<GeomAPI_Ax2> anAxis(new GeomAPI_Ax2(aBasePoint,
+                                                      anEdge->line()->direction()));
 
   // Getting radius and ring radius
   double aRadius = real(PrimitivesPlugin_Torus::RADIUS_ID())->value();

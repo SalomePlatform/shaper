@@ -25,6 +25,7 @@
 #include <GeomAPI_Pnt.h>
 #include <GeomAPI_Dir.h>
 #include <GeomAPI_ShapeExplorer.h>
+#include <GeomAPI_ShapeIterator.h>
 #include <GeomAlgoAPI_NExplode.h>
 
 #include <GeomDataAPI_Dir.h>
@@ -1065,6 +1066,11 @@ ModelHighAPI_Dumper& ModelHighAPI_Dumper::operator<<(
     if (aRes && !aFeature)
       aSelectedFeature = ModelAPI_Feature::feature(aRes->data()->owner());
     isDumpByGeom = aSelectedFeature && aSelectedFeature->isInHistory();
+  }
+
+  if (theAttrSelect->isGeometricalSelection() && aShape->shapeType() == GeomAPI_Shape::COMPOUND) {
+    GeomAPI_ShapeIterator anIt(aShape);
+    aShape = anIt.current();
   }
 
   myDumpBuffer << "\"" << aShape->shapeTypeStr();

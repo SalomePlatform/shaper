@@ -31,6 +31,7 @@
 #include <GeomAPI_Dir.h>
 #include <GeomAPI_Face.h>
 #include <GeomAPI_Shape.h>
+#include <GeomAPI_ShapeIterator.h>
 #include <GeomAPI_Pln.h>
 #include <GeomAPI_Pnt.h>
 
@@ -131,6 +132,10 @@ bool GeomValidators_ZeroOffset::isValid(const std::shared_ptr<ModelAPI_Feature>&
     if(aToShape.get() == NULL && anAttrSel->context().get() != NULL) {
       aToShape =  anAttrSel->context()->shape();
     }
+    if (aToShape->isCompound()) {
+      GeomAPI_ShapeIterator anIt(aToShape);
+      aToShape = anIt.current();
+    }
   }
   anIt++;
 
@@ -145,6 +150,10 @@ bool GeomValidators_ZeroOffset::isValid(const std::shared_ptr<ModelAPI_Feature>&
     aFromShape = std::dynamic_pointer_cast<GeomAPI_Shape>(anAttrSel->value());
     if(aFromShape.get() == NULL && anAttrSel->context().get() != NULL) {
       aFromShape = anAttrSel->context()->shape();
+    }
+    if (aFromShape->isCompound()) {
+      GeomAPI_ShapeIterator anIt(aFromShape);
+      aFromShape = anIt.current();
     }
   }
   anIt++;
