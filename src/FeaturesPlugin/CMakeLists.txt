@@ -236,6 +236,7 @@ ADD_UNIT_TESTS(TestExtrusion.py
                TestPartitionInclinedFaceSolid.py
                TestPartitionWireFaceSolid.py
                TestUnion4CurvedFaces.py
+               TestUnion4CurvedFaces_2.py
                TestUnion4Faces.py
                TestUnionOfUnion.py
                TestMeasurementLength.py

@@ -183,10 +183,10 @@ void FeaturesPlugin_Union::execute()
   for(ListOfShape::const_iterator anIter = anObjects.begin(); anIter != anObjects.end(); ++anIter) {
     aResultBody->loadAndOrientModifiedShapes(&aMakeShapeList, *anIter, GeomAPI_Shape::EDGE,
                                              aModifyEdgeTag, aModEName, aMapOfShapes,
-                                             true, false, true);
+                                             false, true, true);
     aResultBody->loadAndOrientModifiedShapes(&aMakeShapeList, *anIter, GeomAPI_Shape::FACE,
                                              aModifyFaceTag, aModFName, aMapOfShapes,
-                                             true, false, true);
+                                             false, true, true);
     //aResultBody->loadDeletedShapes(&aMakeShapeList, *anIter, GeomAPI_Shape::FACE, aDeletedTag);
   }
 
