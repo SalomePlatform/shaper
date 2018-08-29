@@ -313,7 +313,7 @@ void SketchSolver_Group::computeDoF()
 
   if (aDoF > 0 && myDOF == 0)
     sendMessage(EVENT_SKETCH_UNDER_CONSTRAINED, mySketch, aDoF);
-  else if (aDoF == 0 && myDOF > 0)
+  else if (aDoF == 0/* && myDOF > 0*/)
     sendMessage(EVENT_SKETCH_FULLY_CONSTRAINED, mySketch, aDoF);
   else if (aDoF < 0)
     sendMessage(EVENT_SKETCH_OVER_CONSTRAINED, mySketch, aDoF);
