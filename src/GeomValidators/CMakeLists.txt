@@ -38,6 +38,7 @@ SET(PROJECT_HEADERS
     GeomValidators_MinObjectsSelected.h
     GeomValidators_ValueOrder.h
     GeomValidators_Intersected.h
+    GeomValidators_NotSelfIntersected.h
 )
 
 SET(PROJECT_SOURCES
@@ -57,6 +58,7 @@ SET(PROJECT_SOURCES
     GeomValidators_MinObjectsSelected.cpp
     GeomValidators_ValueOrder.cpp
     GeomValidators_Intersected.cpp
+    GeomValidators_NotSelfIntersected.cpp
 )
 
 SET(PROJECT_LIBRARIES

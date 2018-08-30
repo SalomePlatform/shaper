@@ -41,4 +41,5 @@ email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com
     <validator id="FeaturesPlugin_ValidatorBooleanSelection"/>
   </multi_selector>
   <validator id="FeaturesPlugin_ValidatorBooleanArguments" parameters="main_objects,tool_objects"/>
+  <validator id="GeomValidators_NotSelfIntersected" parameters="main_objects,tool_objects"/>
 </source>

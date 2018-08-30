@@ -50,6 +50,9 @@
 #include <TopoDS_Shape.hxx>
 #include <NCollection_List.hxx>
 
+#include <BOPAlgo_CheckerSI.hxx>
+#include <BOPDS_DS.hxx>
+
 #include <sstream>
 #include <algorithm> // for std::transform
 
@@ -627,4 +630,20 @@ void GeomAPI_Shape::translate(const std::shared_ptr<GeomAPI_Dir> theDir, const d
   aTranslation.SetTranslation(aTrsfVec);
   TopoDS_Shape aResult = MY_SHAPE->Moved(aTranslation);
   setImpl(new TopoDS_Shape(aResult));
+}
+
+bool GeomAPI_Shape::isSelfIntersected(const int theLevelOfCheck) const
+{
+  BOPAlgo_CheckerSI aCSI;  // checker of self-interferences
+  aCSI.SetLevelOfCheck(theLevelOfCheck);
+  TopTools_ListOfShape aList;
+  const TopoDS_Shape& aThisShape = const_cast<GeomAPI_Shape*>(this)->impl<TopoDS_Shape>();
+  aList.Append(aThisShape);
+  aCSI.SetArguments(aList);
+  aCSI.Perform();
+  if (aCSI.HasErrors() || aCSI.DS().Interferences().Extent() > 0) {
+    return true;
+  }
+
+  return false;
 }
