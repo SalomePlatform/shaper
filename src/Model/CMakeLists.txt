@@ -102,6 +102,7 @@ SET(PROJECT_LIBRARIES
     GeomData
     GeomAPI
     GeomAlgoAPI
+    ModelGeomAlgo
     ${OpenCASCADE_ApplicationFramework_LIBRARIES}
 )
 SET(PROJECT_INCLUDES
@@ -112,6 +113,7 @@ SET(PROJECT_INCLUDES
   ../GeomDataAPI
   ../GeomAlgoAPI
   ../GeomAPI
+  ../ModelGeomAlgo
   ${OpenCASCADE_INCLUDE_DIR}
 )
 
