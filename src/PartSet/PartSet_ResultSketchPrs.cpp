@@ -107,8 +107,12 @@ void PartSet_ResultSketchPrs::Compute(
 
   // change deviation coefficient to provide more precise circle
   //ModuleBase_Tools::setDefaultDeviationCoefficient(myResult, Attributes());
-  AIS_Shape::Compute(thePresentationManager, thePresentation, theMode);
-
+  try {
+    AIS_Shape::Compute(thePresentationManager, thePresentation, theMode);
+  }
+  catch (...) {
+    return;
+  }
   if (!myAuxiliaryCompound.IsNull()) {
     setAuxiliaryPresentationStyle(true);
 
