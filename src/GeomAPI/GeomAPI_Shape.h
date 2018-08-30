@@ -200,6 +200,20 @@ public:
   /// Returns type of shapes in the compound.
   // If shapes are of different type then it will return SHAPE type
   GEOMAPI_EXPORT ShapeType typeOfCompoundShapes() const;
+
+  /// Returns true if shape have self-intersections.
+  /// \param[in] theLevelOfCheck defines which interferences will be checked:<br>
+  /// 0 - only V/V;<br>
+  /// 1 - V/V and V/E;<br>
+  /// 2 - V/V, V/E and E/E;<br>
+  /// 3 - V/V, V/E, E/E and V/F;<br>
+  /// 4 - V/V, V/E, E/E, V/F and E/F;<br>
+  /// 5 - V/V, V/E, E/E, V/F, E/F and F/F;<br>
+  /// 6 - V/V, V/E, E/E, V/F, E/F, F/F and V/S;<br>
+  /// 7 - V/V, V/E, E/E, V/F, E/F, F/F, V/S and E/S;<br>
+  /// 8 - V/V, V/E, E/E, V/F, E/F, F/F, V/S, E/S and F/S;<br>
+  /// 9 - V/V, V/E, E/E, V/F, E/F, F/F, V/S, E/S, F/S and S/S - all interferences (Default value)
+  GEOMAPI_EXPORT bool isSelfIntersected(const int theLevelOfCheck = 9) const;
 };
 
 //! Pointer on list of shapes

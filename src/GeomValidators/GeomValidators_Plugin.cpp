@@ -32,6 +32,7 @@
 #include <GeomValidators_FeatureKind.h>
 #include <GeomValidators_MinObjectsSelected.h>
 #include <GeomValidators_Intersected.h>
+#include <GeomValidators_NotSelfIntersected.h>
 
 #include <ModelAPI_Session.h>
 #include <ModelAPI_Validator.h>
@@ -61,6 +62,8 @@ GeomValidators_Plugin::GeomValidators_Plugin()
   aFactory->registerValidator("GeomValidators_MinObjectsSelected",
                               new GeomValidators_MinObjectsSelected);
   aFactory->registerValidator("GeomValidators_Intersected", new GeomValidators_Intersected);
+  aFactory->registerValidator("GeomValidators_NotSelfIntersected",
+                              new GeomValidators_NotSelfIntersected);
 
   // register this plugin
   ModelAPI_Session::get()->registerPlugin(this);
