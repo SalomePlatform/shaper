@@ -3692,4 +3692,11 @@
       <translation>"Base objects" should contain at least 2 items.</translation>
     </message>
   </context>
+  <context>
+    <name>FusionFaces:Model_FeatureValidator</name>
+    <message>
+      <source>Attribute "base_shape" is not initialized.</source >
+      <translation>Base shape is not selected.</translation >
+    </message>
+  </context>
 </TS>

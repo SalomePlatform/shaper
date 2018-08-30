@@ -60,17 +60,17 @@ model.do()
 
 model.checkResult(Interpolation_1, model, 1, [0], [0], [0], [1], [2])
 
-# # =============================================================================
-# # Test 2. Create curve 1-2-3-4-5-1, closed on, reorder off, without tangents
-# # =============================================================================
+# =============================================================================
+# Test 2. Create curve 1-2-3-4-5-1, closed on, reorder off, without tangents
+# =============================================================================
 Interpolation_2 = model.addInterpolation(Part_1_doc, [p_1, p_2, p_3, p_4, p_5], True, False)
 model.do()
 
 model.checkResult(Interpolation_2, model, 1, [0], [0], [0], [1], [2])
 
-# # =============================================================================
-# # Test 3. Create curve 1-2-3-4, closed off, reorder on, without tangents
-# # =============================================================================
+# =============================================================================
+# Test 3. Create curve 1-2-3-4, closed off, reorder on, without tangents
+# =============================================================================
 Interpolation_3 = model.addInterpolation(Part_1_doc, [p_1, p_2, p_3, p_4], False, True)
 model.do()
 

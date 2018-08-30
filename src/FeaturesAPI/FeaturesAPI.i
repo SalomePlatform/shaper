@@ -66,6 +66,7 @@
 %shared_ptr(FeaturesAPI_Symmetry)
 %shared_ptr(FeaturesAPI_Translation)
 %shared_ptr(FeaturesAPI_Union)
+%shared_ptr(FeaturesAPI_FusionFaces)
 
 // all supported interfaces
 %include "FeaturesAPI_BooleanCut.h"
@@ -92,3 +93,4 @@
 %include "FeaturesAPI_Symmetry.h"
 %include "FeaturesAPI_Translation.h"
 %include "FeaturesAPI_Union.h"
+%include "FeaturesAPI_FusionFaces.h"
