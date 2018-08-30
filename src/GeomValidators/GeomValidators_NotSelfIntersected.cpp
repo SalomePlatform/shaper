@@ -74,17 +74,19 @@ bool GeomValidators_NotSelfIntersected::isValid(const std::shared_ptr<ModelAPI_F
           return false;
         }
 
-        if (aShape->isSelfIntersected()) {
+        if (aShape->isSelfIntersected(4)) {
           theError = "Error: One of selected shapes are self-intersected.";
           return false;
         }
       }
-    }
-    else {
+    } else {
       theError = std::string("Error: validator does not support attribute with type: ")
         + anAttribute->attributeType();
+      return false;
     }
   }
+
+  return true;
 }
 
 bool GeomValidators_NotSelfIntersected::isNotObligatory(std::string /*theFeature*/,

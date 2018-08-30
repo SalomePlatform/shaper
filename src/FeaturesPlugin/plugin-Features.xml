@@ -94,7 +94,7 @@ email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com
       <feature id="Fill" title="Fill" tooltip="Perform boolean fill operation with objects"
                icon="icons/Features/bool_fill.png" helpfile="FeaturesPlugin/fillFeature.html"
                auto_preview="false">
-          <source path="boolean_widget.xml"/>
+          <source path="boolean_fill_widget.xml"/>
       </feature>
       <feature id="Union" title="Union" tooltip="Perform union operations with shapes"
                icon="icons/Features/union.png" helpfile="FeaturesPlugin/unionFeature.html">
