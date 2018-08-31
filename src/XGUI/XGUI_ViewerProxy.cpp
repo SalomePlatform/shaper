@@ -297,8 +297,8 @@ void XGUI_ViewerProxy::displayHighlight()
     aRes = (*aIt);
     TopoDS_Shape aTShape = aRes->shape()->impl<TopoDS_Shape>();
     aAis = new AIS_Shape(aTShape);
-    aAis->SetColor(Quantity_NOC_CYAN3);
-    aAis->SetZLayer(Graphic3d_ZLayerId_Topmost);
+    aAis->SetColor(Quantity_NOC_CYAN4);
+    aAis->SetZLayer(1); //Graphic3d_ZLayerId_Topmost
     myHighlights.Append(aAis);
     aContext->Display(aAis, false);
     aContext->Deactivate(aAis);
