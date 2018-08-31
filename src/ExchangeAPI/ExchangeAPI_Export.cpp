@@ -72,10 +72,28 @@ ExchangeAPI_Export::~ExchangeAPI_Export()
 {
 }
 
+// this method is needed on Windows because back-slashes in python may cause error
+static void correctSeparators(std::string& thePath) {
+  // replace single "\" or triple "\\\" or more by double "\"
+  for (std::size_t aFind = thePath.find('\\'); aFind != std::string::npos;
+    aFind = thePath.find('\\', aFind)) {
+    // search the next
+    std::size_t aFind2 = thePath.find('\\', aFind + 1);
+    if (aFind2 == std::string::npos || aFind2 > aFind + 1) { // single, so add one more
+      thePath.replace(aFind, 1, 2, '\\');
+    } else { // if there is more than double "\", remove them
+      for (aFind2 = thePath.find('\\', aFind2 + 1);
+           aFind2 != std::string::npos && aFind2 <= aFind + 2;
+           aFind2 = thePath.find('\\', aFind2)) {
+        thePath.erase(aFind2, 1);
+      }
+    }
+    aFind += 2;
+  }
+}
 
 void ExchangeAPI_Export::dump(ModelHighAPI_Dumper& theDumper) const
 {
-
   FeaturePtr aBase = feature();
   const std::string& aDocName = theDumper.name(aBase->document());
 
@@ -84,9 +102,10 @@ void ExchangeAPI_Export::dump(ModelHighAPI_Dumper& theDumper) const
   std::string exportType = aBase->string(ExchangePlugin_ExportFeature::EXPORT_TYPE_ID())->value();
 
   if (exportType == "XAO") {
-    std::string tmpXAOFile =
+    std::string aTmpXAOFile =
                 aBase->string(ExchangePlugin_ExportFeature::XAO_FILE_PATH_ID())->value();
-    theDumper << "exportToXAO(" << aDocName << ", '" << tmpXAOFile << "'" ;
+    correctSeparators(aTmpXAOFile);
+    theDumper << "exportToXAO(" << aDocName << ", '" << aTmpXAOFile << "'" ;
     std::string theAuthor = aBase->string(ExchangePlugin_ExportFeature::XAO_AUTHOR_ID())->value();
     if (! theAuthor.empty())
       theDumper << ", '" << theAuthor << "'";
@@ -97,14 +116,15 @@ void ExchangeAPI_Export::dump(ModelHighAPI_Dumper& theDumper) const
     theDumper << ")" << std::endl;
   }
   else {
-      theDumper << "exportToFile(" << aDocName << ", " <<
-          aBase->string(ExchangePlugin_ExportFeature::FILE_PATH_ID()) << ", " <<
-          aBase->selectionList(ExchangePlugin_ExportFeature::SELECTION_LIST_ID()) ;
-      std::string theFileFormat =
-                  aBase->string(ExchangePlugin_ExportFeature::FILE_FORMAT_ID())->value();
-      if (! theFileFormat.empty())
-        theDumper << ", '" << theFileFormat << "'";
-      theDumper << ")" << std::endl;
+    std::string aFilePath = aBase->string(ExchangePlugin_ExportFeature::FILE_PATH_ID())->value();
+    correctSeparators(aFilePath);
+      theDumper << "exportToFile(" << aDocName << ", \"" << aFilePath << "\", " <<
+      aBase->selectionList(ExchangePlugin_ExportFeature::SELECTION_LIST_ID());
+    std::string theFileFormat =
+      aBase->string(ExchangePlugin_ExportFeature::FILE_FORMAT_ID())->value();
+    if (!theFileFormat.empty())
+      theDumper << ", '" << theFileFormat << "'";
+    theDumper << ")" << std::endl;
   }
 }
 
