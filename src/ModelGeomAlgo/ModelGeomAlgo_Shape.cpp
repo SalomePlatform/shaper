@@ -148,6 +148,38 @@ namespace ModelGeomAlgo_Shape
     }
   }
 
+  static bool findSubshapeInCompsolid(const ResultBodyPtr& theCompsolid,
+                                      const std::shared_ptr<GeomAPI_Pnt>& thePoint,
+                                      const GeomAPI_Shape::ShapeType& theShapeType,
+                                      const double theTolerance,
+                                      std::list<SubshapeOfResult>& theSelected)
+  {
+    bool isSubshapeFound = false;
+    int aNbSolids = theCompsolid->numberOfSubs();
+    for (int i = 0; i < aNbSolids; ++i) {
+      ResultPtr aSubResult = theCompsolid->subResult(i);
+
+      // process subs of compsolid
+      ResultBodyPtr aSubCompSolid = std::dynamic_pointer_cast<ModelAPI_ResultBody>(aSubResult);
+      if (aSubCompSolid && aSubCompSolid->numberOfSubs() > 0) {
+        isSubshapeFound = findSubshapeInCompsolid(aSubCompSolid,
+            thePoint, theShapeType, theTolerance, theSelected);
+      }
+      else {
+        GeomShapePtr aSubSolid = aSubResult->shape();
+        if (aSubSolid && isPointWithinBB(thePoint, aSubSolid, theTolerance)) {
+          std::list<GeomShapePtr> aSubshapes =
+              findSubShape(aSubSolid, theShapeType, thePoint, theTolerance);
+          if (!aSubshapes.empty()) {
+            appendSubshapeOfResult(theSelected, aSubResult, aSubshapes);
+            isSubshapeFound = true;
+          }
+        }
+      }
+    }
+    return isSubshapeFound;
+  }
+
   bool findSubshapeByPoint(const std::shared_ptr<ModelAPI_Feature>& theFeature,
                            const std::shared_ptr<GeomAPI_Pnt>& thePoint,
                            const GeomAPI_Shape::ShapeType& theShapeType,
@@ -173,20 +205,8 @@ namespace ModelGeomAlgo_Shape
       if (theShapeType != GeomAPI_Shape::COMPOUND || !aSketchEdges) {
         ResultBodyPtr aCompSolid = std::dynamic_pointer_cast<ModelAPI_ResultBody>(*aResIt);
         if (aCompSolid) {
-          // process solids
-          int aNbSolids = aCompSolid->numberOfSubs();
-          for (int i = 0; i < aNbSolids; ++i) {
-            ResultPtr aSubResult = aCompSolid->subResult(i);
-            GeomShapePtr aSubSolid = aSubResult->shape();
-            if (aSubSolid && isPointWithinBB(thePoint, aSubSolid, TOLERANCE)) {
-              std::list<GeomShapePtr> aSubshapes =
-                  findSubShape(aSubSolid, theShapeType, thePoint, TOLERANCE);
-              if (!aSubshapes.empty()) {
-                appendSubshapeOfResult(theSelected, aSubResult, aSubshapes);
-                isSubshapeFound = true;
-              }
-            }
-          }
+          isSubshapeFound = findSubshapeInCompsolid(aCompSolid,
+              thePoint, theShapeType, TOLERANCE, theSelected);
         }
 
         if (!isSubshapeFound) {

@@ -1033,13 +1033,10 @@ ModelHighAPI_Dumper& ModelHighAPI_Dumper::operator<<(
   FeaturePtr aSelectedFeature;
   if (isDumpByGeom) {
     ResultPtr aRes = theAttrSelect->context();
-    if (aRes)
+    FeaturePtr aFeature = theAttrSelect->contextFeature();
+    if (aRes && !aFeature)
       aSelectedFeature = ModelAPI_Feature::feature(aRes->data()->owner());
-    else
-      aSelectedFeature = theAttrSelect->contextFeature();
-
-    if (aSelectedFeature)
-      isDumpByGeom = aSelectedFeature->isInHistory();
+    isDumpByGeom = aSelectedFeature && aSelectedFeature->isInHistory();
   }
 
   myDumpBuffer << "\"" << aShape->shapeTypeStr();

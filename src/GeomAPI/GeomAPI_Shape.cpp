@@ -567,7 +567,7 @@ bool GeomAPI_Shape::computeSize(double& theXmin, double& theYmin, double& theZmi
   if (aShape.IsNull())
     return false;
   Bnd_Box aBndBox;
-  BRepBndLib::Add(aShape, aBndBox);
+  BRepBndLib::Add(aShape, aBndBox, false);
   if (aBndBox.IsVoid())
     return false;
   aBndBox.Get(theXmin, theYmin, theZmin, theXmax, theYmax, theZmax);
