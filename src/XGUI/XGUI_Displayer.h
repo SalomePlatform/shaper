@@ -48,6 +48,8 @@ class ModelAPI_Feature;
 class XGUI_SelectionActivate;
 class XGUI_Workshop;
 
+#define OPTIMIZE_PRS
+
 #ifdef TINSPECTOR
 class VInspectorAPI_CallBack;
 #endif

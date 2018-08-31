@@ -319,37 +319,36 @@ void XGUI_ViewerProxy::eraseHighlight()
 
 void XGUI_ViewerProxy::onMouseMove(AppElements_ViewWindow* theWnd, QMouseEvent* theEvent)
 {
-  // vsv: Display prehighlighting of detected object
-  //Handle(AIS_InteractiveContext) aContext = AISContext();
-  //if (!aContext.IsNull()) {
-  //  Handle(SelectMgr_EntityOwner) aOwner;
-  //  Handle(AIS_InteractiveObject) anIO;
-  //  ObjectPtr aObj;
-  //  bool isDisplayed = false;
-  //  XGUI_Displayer* aDisplayer = myWorkshop->displayer();
-  //  for (aContext->InitDetected(); aContext->MoreDetected(); aContext->NextDetected()) {
-  //    aOwner = aContext->DetectedOwner();
-  //    anIO = Handle(AIS_InteractiveObject)::DownCast(aOwner->Selectable());
-  //    aObj = aDisplayer->getObject(anIO);
-  //    if (aObj.get()) {
-  //      FeaturePtr aFeature = ModelAPI_Feature::feature(aObj);
-  //      if (aFeature.get()) {
-  //        if (aFeature != myFeature) {
-  //          eraseHighlight();
-  //          myFeature = aFeature;
-  //          displayHighlight();
-  //          aContext->UpdateCurrentViewer();
-  //        }
-  //        isDisplayed = true;
-  //      }
-  //    }
-  //  }
-  //  if (!isDisplayed) {
-  //    eraseHighlight();
-  //    aContext->UpdateCurrentViewer();
-  //    myFeature = FeaturePtr();
-  //  }
-  //}
+  Handle(AIS_InteractiveContext) aContext = AISContext();
+  if (!aContext.IsNull()) {
+    Handle(SelectMgr_EntityOwner) aOwner;
+    Handle(AIS_InteractiveObject) anIO;
+    ObjectPtr aObj;
+    bool isDisplayed = false;
+    XGUI_Displayer* aDisplayer = myWorkshop->displayer();
+    for (aContext->InitDetected(); aContext->MoreDetected(); aContext->NextDetected()) {
+      aOwner = aContext->DetectedOwner();
+      anIO = Handle(AIS_InteractiveObject)::DownCast(aOwner->Selectable());
+      aObj = aDisplayer->getObject(anIO);
+      if (aObj.get()) {
+        FeaturePtr aFeature = ModelAPI_Feature::feature(aObj);
+        if (aFeature.get()) {
+          if (aFeature != myFeature) {
+            eraseHighlight();
+            myFeature = aFeature;
+            displayHighlight();
+            aContext->UpdateCurrentViewer();
+          }
+          isDisplayed = true;
+        }
+      }
+    }
+    if (!isDisplayed) {
+      eraseHighlight();
+      aContext->UpdateCurrentViewer();
+      myFeature = FeaturePtr();
+    }
+  }
   emit mouseMove(theWnd, theEvent);
 }
 
