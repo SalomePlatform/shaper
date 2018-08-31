@@ -37,7 +37,7 @@ SketchConstraintCoincidence_1 = Sketch_1.setCoincident(SketchCircle_1.center(), 
 SketchConstraintRadius_1 = Sketch_1.setRadius(SketchCircle_1.results()[1], 2)
 model.do()
 Extrusion_1 = model.addExtrusion(Part_1_doc, [model.selection("FACE", "Sketch_1/Face-SketchCircle_1_2f")], model.selection(), 10, 0)
-Symmetry_1 = model.addSymmetry(Part_1_doc, [model.selection("COMPOUND", "all-in-Extrusion_1")], model.selection("VERTEX", "Sketch_1/Vertex-SketchCircle_1-SketchProjection_1-SketchPoint_1"), True)
+Symmetry_1 = model.addSymmetry(Part_1_doc, [model.selection("COMPOUND", "all-in-Extrusion_1")], model.selection("VERTEX", "Sketch_1/Edge-SketchCircle_1_2__cc"), True)
 LinearCopy_1 = model.addMultiTranslation(Part_1_doc, [model.selection("COMPOUND", "all-in-Symmetry_1")], model.selection("EDGE", "PartSet/OY"), 5, 3)
 AngularCopy_1 = model.addMultiRotation(Part_1_doc, [model.selection("COMPOUND", "all-in-LinearCopy_1")], model.selection("EDGE", "PartSet/OZ"), 45, 8)
 model.end()
