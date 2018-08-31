@@ -55,6 +55,7 @@
 #include <Geom_Line.hxx>
 #include <Geom_Plane.hxx>
 #include <GeomAPI_ProjectPointOnCurve.hxx>
+#include <GeomAPI_ShapeIterator.h>
 #include <GeomLib_IsPlanarSurface.hxx>
 #include <GeomLib_Tool.hxx>
 #include <GeomAPI_IntCS.hxx>
@@ -1063,4 +1064,26 @@ std::shared_ptr<GeomAPI_Edge> GeomAlgoAPI_ShapeTools::wireToEdge(
     anEdge->setImpl(new TopoDS_Edge(aNewEdge));
   }
   return anEdge;
+}
+
+ListOfShape GeomAlgoAPI_ShapeTools::getLowLevelSubShapes(const GeomShapePtr& theShape)
+{
+  ListOfShape aSubShapes;
+
+  if (!theShape->isCompound() && !theShape->isCompSolid() &&
+      !theShape->isShell() && !theShape->isWire()) {
+    return aSubShapes;
+  }
+
+  for (GeomAPI_ShapeIterator anIt(theShape); anIt.more(); anIt.next()) {
+    GeomShapePtr aSubShape = anIt.current();
+    if (aSubShape->isVertex() || aSubShape->isEdge() ||
+        aSubShape->isFace() || aSubShape->isSolid()) {
+      aSubShapes.push_back(aSubShape);
+    } else {
+      aSubShapes.splice(aSubShapes.end(), getLowLevelSubShapes(aSubShape));
+    }
+  }
+
+  return aSubShapes;
 }

@@ -805,17 +805,18 @@ bool FeaturesPlugin_ValidatorRemoveSubShapesSelection::isValid(const AttributePt
     return false;
   }
 
+  std::list<GeomShapePtr> aSubShapes = GeomAlgoAPI_ShapeTools::getLowLevelSubShapes(aBaseShape);
   for(int anIndex = 0; anIndex < aSubShapesAttrList->size(); ++anIndex) {
     bool isSameFound = false;
     AttributeSelectionPtr anAttrSelectionInList = aSubShapesAttrList->value(anIndex);
     GeomShapePtr aShapeToAdd = anAttrSelectionInList->value();
-    for(GeomAPI_ShapeIterator anIt(aBaseShape); anIt.more(); anIt.next()) {
-      if(anIt.current()->isEqual(aShapeToAdd)) {
+    for (ListOfShape::const_iterator anIt = aSubShapes.cbegin(); anIt != aSubShapes.cend(); ++anIt) {
+      if ((*anIt)->isEqual(aShapeToAdd)) {
         isSameFound = true;
         break;
       }
     }
-    if(!isSameFound) {
+    if (!isSameFound) {
       theError = "Error: Only sub-shapes of selected shape is allowed for selection.";
       return false;
     }

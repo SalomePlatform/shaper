@@ -187,6 +187,11 @@ public:
   /// \brief Reapproximate a wire to build a single edge
   GEOMALGOAPI_EXPORT static std::shared_ptr<GeomAPI_Edge> wireToEdge(
       const std::shared_ptr<GeomAPI_Wire>& theWire);
+
+  /// \brief Get non-composite sub-shapes of the given shape.
+  /// \param[in] theShape shape that should be exploded
+  /// \return list of sub-shapes (vertices, edges, faces, solids)
+  GEOMALGOAPI_EXPORT static ListOfShape getLowLevelSubShapes(const GeomShapePtr& theShape);
 };
 
 #endif

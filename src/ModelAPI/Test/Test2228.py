@@ -58,14 +58,21 @@ Face_1 = model.addFace(Part_1_doc, [model.selection("EDGE", "Sketch_2/Edge-Sketc
 Extrusion_4 = model.addExtrusion(Part_1_doc, [model.selection("WIRE", "Sketch_1/Wire-SketchCircle_2_2f")], model.selection(), model.selection("FACE", "Extrusion_2_1/From_Face_1"), 0, model.selection(), 0)
 Boolean_2 = model.addCut(Part_1_doc, [model.selection("SOLID", "Extrusion_1_1")], [model.selection("SOLID", "Extrusion_4_1")])
 Partition_1 = model.addPartition(Part_1_doc, [model.selection("SOLID", "Cut_1_1"), model.selection("SOLID", "Cut_2_1"), model.selection("FACE", "Face_1_1")])
+Remove_SubShapes_1_objects = [model.selection("SOLID", "Partition_1_1_1_1"), model.selection("SOLID", "Partition_1_1_1_2"), model.selection("SOLID", "Partition_1_1_1_3"), model.selection("SOLID", "Partition_1_1_1_4")]
 Remove_SubShapes_1 = model.addRemoveSubShapes(Part_1_doc, model.selection("COMPOUND", "Partition_1_1"))
-Remove_SubShapes_1.setSubShapesToKeep([model.selection("COMPSOLID", "Partition_1_1_1")])
-model.end()
+Remove_SubShapes_1.setSubShapesToKeep(Remove_SubShapes_1_objects)
 
+
+model.end()
 
 # check that remove sub-shapes contains correct selection
 from ModelAPI import *
 aFactory = ModelAPI_Session.get().validators()
 assert(aFactory.validate(Remove_SubShapes_1.feature()))
-assert(Remove_SubShapes_1.subshapesToKeep().size() == 1)
-assert(Remove_SubShapes_1.subshapesToKeep().value(0).namingName() == "Partition_1_1_1")
+assert(Remove_SubShapes_1.subshapesToKeep().size() == 4)
+assert(Remove_SubShapes_1.subshapesToKeep().value(0).namingName() == "Partition_1_1_1_1")
+assert(Remove_SubShapes_1.subshapesToKeep().value(1).namingName() == "Partition_1_1_1_2")
+assert(Remove_SubShapes_1.subshapesToKeep().value(2).namingName() == "Partition_1_1_1_3")
+assert(Remove_SubShapes_1.subshapesToKeep().value(3).namingName() == "Partition_1_1_1_4")
+assert(Remove_SubShapes_1.subshapesToRemove().size() == 1)
+assert(Remove_SubShapes_1.subshapesToRemove().value(0).namingName() == "Partition_1_1_2")
