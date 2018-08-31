@@ -623,7 +623,7 @@ email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com
                          label="Angle"
                          icon="icons/Sketch/angle.png"
                          tooltip="Rotation angle"
-                         default="270" min="0" max="360"
+                         default="360" min="0" max="360"
                          use_reset="false">
               <validator id="SketchPlugin_MultiRotationAngleValidator" />
             </doublevalue>
@@ -638,7 +638,7 @@ email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com
                          label="Angle"
                          icon="icons/Sketch/angle.png"
                          tooltip="Rotation angle"
-                         default="270" min="0" max="360"
+                         default="90" min="0" max="360"
                          use_reset="false">
               <validator id="SketchPlugin_MultiRotationAngleValidator" />
             </doublevalue>

@@ -58,6 +58,7 @@ SET(PROJECT_HEADERS
     FeaturesPlugin_MultiRotation.h
     FeaturesPlugin_Fillet.h
     FeaturesPlugin_Measurement.h
+    FeaturesPlugin_FusionFaces.h
 )
 
 SET(PROJECT_SOURCES
@@ -95,6 +96,7 @@ SET(PROJECT_SOURCES
     FeaturesPlugin_MultiRotation.cpp
     FeaturesPlugin_Fillet.cpp
     FeaturesPlugin_Measurement.cpp
+    FeaturesPlugin_FusionFaces.cpp
 )
 
 SET(XML_RESOURCES
@@ -110,6 +112,7 @@ SET(XML_RESOURCES
   boolean_widget.xml
   boolean_fuse_widget.xml
   boolean_common_widget.xml
+  boolean_fill_widget.xml
   boolean_smash_widget.xml
   recover_widget.xml
   partition_widget.xml
@@ -124,6 +127,7 @@ SET(XML_RESOURCES
   multirotation_widget.xml
   fillet_widget.xml
   measurement_widget.xml
+  fusion_faces_widget.xml
 )
 
 SET(TEXT_RESOURCES
@@ -243,6 +247,7 @@ ADD_UNIT_TESTS(TestExtrusion.py
                TestMeasurementDistance.py
                TestMeasurementRadius.py
                TestMeasurementAngle.py
+               TestFusionFaces.py
                Test1379.py
                Test1922.py
                Test1942.py

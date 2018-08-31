@@ -94,7 +94,7 @@ email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com
       <feature id="Fill" title="Fill" tooltip="Perform boolean fill operation with objects"
                icon="icons/Features/bool_fill.png" helpfile="FeaturesPlugin/fillFeature.html"
                auto_preview="false">
-          <source path="boolean_widget.xml"/>
+          <source path="boolean_fill_widget.xml"/>
       </feature>
       <feature id="Union" title="Union" tooltip="Perform union operations with shapes"
                icon="icons/Features/union.png" helpfile="FeaturesPlugin/unionFeature.html">
@@ -118,6 +118,12 @@ email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com
       <feature id="Fillet" title="Fillet" tooltip="Perform fillet on face or edge"
                icon="icons/Features/fillet.png" auto_preview="true" helpfile="FeaturesPlugin/filletFeature.html">
         <source path="fillet_widget.xml"/>
+      </feature>
+    </group>
+    <group id="Fusion">
+      <feature id="FusionFaces" title="Fusion of faces" tooltip="Performs fusion of connected faces"
+               icon="icons/Features/fusion_faces.png" auto_preview="true" helpfile="FeaturesPlugin/fusionFacesFeature.html">
+        <source path="fusion_faces_widget.xml"/>
       </feature>
     </group>
   </workbench>

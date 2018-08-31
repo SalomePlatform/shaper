@@ -11,11 +11,12 @@ export AUT_DIR=$(pwd)
 export TOOLS_DIR=$(pwd)
 
 export HOME_OLD=$HOME
-source /dn46/SALOME/series9x/current-2018-08-22/start.sh
+source /dn46/SALOME/series9x/current-2018-08-30/start.sh
 export HOME=$HOME_OLD
 
-# Path to solvespace-2
+# Path to special products dir (lcov, cpplint)
 export SHAPER_PDIR=/dn48/newgeom/common/products
+
 # Path to install directory
 export SHAPER_ROOT_DIR=$(cd ${SOURCES_DIR}/.. && pwd)/install
 
