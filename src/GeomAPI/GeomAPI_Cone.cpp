@@ -61,11 +61,19 @@ GeomAPI_Cone::GeomAPI_Cone(const std::shared_ptr<GeomAPI_Pnt>& theLocation,
                            const double theSemiAngle,
                            const double theRadius1,
                            const double theRadius2)
-  : GeomAPI_Interface(
-      newCone(theLocation->impl<gp_Pnt>(), theAxis->impl<gp_Dir>(), theSemiAngle, theRadius1)),
-    myRadius1(theRadius1),
+  : myRadius1(theRadius1),
     myRadius2(theRadius2)
 {
+  gp_Pnt aLoc = theLocation->impl<gp_Pnt>();
+  gp_Dir aDir = theAxis->impl<gp_Dir>();
+  if (theRadius1 > theRadius2) {
+    aLoc.ChangeCoord() += aDir.XYZ() * (theRadius1 - theRadius2) / Tan(theSemiAngle);
+    aDir.Reverse();
+    myRadius1 = theRadius2;
+    myRadius2 = theRadius1;
+  }
+
+  setImpl(newCone(aLoc, aDir, theSemiAngle, myRadius1));
 }
 
 //=================================================================================================

@@ -196,15 +196,17 @@ std::shared_ptr<GeomAPI_Cone> GeomAPI_Face::getCone() const
   Handle(Geom_Surface) aSurf = BRep_Tool::Surface(aFace);
   if (aSurf->IsKind(STANDARD_TYPE(Geom_ConicalSurface))) {
     gp_Cone aCon = Handle(Geom_ConicalSurface)::DownCast(aSurf)->Cone();
-    const gp_Pnt& aLoc = aCon.Location();
-    const gp_Dir& aDir = aCon.Position().Direction();
-    double aRadius1 = aCon.RefRadius();
+    gp_Pnt aLoc = aCon.Location();
+    gp_Dir aDir = aCon.Position().Direction();
 
     double aUMin, aUMax, aVMin, aVMax;
     BRepTools::UVBounds(aFace, aUMin, aUMax, aVMin, aVMax);
 
     double aSemiAngle = Abs(aCon.SemiAngle());
-    double aRadius2 = aRadius1 - (aVMax - aVMin) * Sin(aSemiAngle);
+    double aRadius1 = aCon.RefRadius() + aVMin * Sin(aCon.SemiAngle());
+    double aRadius2 = aCon.RefRadius() + aVMax * Sin(aCon.SemiAngle());
+
+    aLoc.ChangeCoord() += aDir.XYZ() * aVMin * Cos(aCon.SemiAngle());
 
     GeomPointPtr aLocation(new GeomAPI_Pnt(aLoc.X(), aLoc.Y(), aLoc.Z()));
     GeomDirPtr aDirection(new GeomAPI_Dir(aDir.X(), aDir.Y(), aDir.Z()));

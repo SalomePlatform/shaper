@@ -76,6 +76,13 @@ class GeomAPI_Pnt : public GeomAPI_Interface
   GEOMAPI_EXPORT
   bool isEqual(const std::shared_ptr<GeomAPI_Pnt>& theOther) const;
 
+  /// Returns \c true, if the current point is less than theOther.
+  /// The point is less than other, if X coordinate is less.
+  /// In case of X's are equal, if Y is less than other.
+  /// If Y's are equal too, compare Z's.
+  GEOMAPI_EXPORT
+  bool isLess(const std::shared_ptr<GeomAPI_Pnt>& theOther) const;
+
   /// Projects a point to the plane defined by the origin and 2 axes vectors in this plane
   GEOMAPI_EXPORT
   std::shared_ptr<GeomAPI_Pnt2d> to2D(const std::shared_ptr<GeomAPI_Pnt>& theOrigin,

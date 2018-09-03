@@ -176,7 +176,7 @@ std::shared_ptr<GeomAPI_Cone> GeomAPI_Shell::getCone() const
 
   GeomPointPtr anApex;
   GeomDirPtr anAxis;
-  double aSemiAngle, aCosSemiAngle;
+  double aSemiAngle, aTanSemiAngle;
   double aHeight1, aHeight2;
 
   for (TopExp_Explorer anExp(impl<TopoDS_Shape>(), TopAbs_FACE); anExp.More(); anExp.Next()) {
@@ -193,9 +193,9 @@ std::shared_ptr<GeomAPI_Cone> GeomAPI_Shell::getCone() const
       anApex = aCurCone->apex();
       anAxis = aCurCone->axis();
       aSemiAngle = aCurCone->semiAngle();
-      aCosSemiAngle = Cos(aSemiAngle);
-      aHeight1 = aCurCone->radius1() * aCosSemiAngle;
-      aHeight2 = aCurCone->radius2() * aCosSemiAngle;
+      aTanSemiAngle = Tan(aSemiAngle);
+      aHeight1 = aCurCone->radius1() / aTanSemiAngle;
+      aHeight2 = aCurCone->radius2() / aTanSemiAngle;
       isFirstFace = false;
     }
     else {
@@ -211,15 +211,15 @@ std::shared_ptr<GeomAPI_Cone> GeomAPI_Shell::getCone() const
 
       double aSign = anAxis->dot(aCurCone->axis());
       double aCurSemiAngle = aCurCone->semiAngle();
-      double aCosCurSemiAngle = Cos(aSemiAngle);
+      double aTanCurSemiAngle = Tan(aSemiAngle);
 
-      double aH = aCurCone->radius1() * aCosCurSemiAngle * aSign;
+      double aH = aCurCone->radius1() / aTanCurSemiAngle * aSign;
       if (aH < aHeight1)
         aHeight1 = aH;
       else if (aH > aHeight2)
         aHeight2 = aH;
 
-      aH = aCurCone->radius2() * aCosCurSemiAngle * aSign;
+      aH = aCurCone->radius2() / aTanCurSemiAngle * aSign;
       if (aH < aHeight1)
         aHeight1 = aH;
       else if (aH > aHeight2)
@@ -231,8 +231,8 @@ std::shared_ptr<GeomAPI_Cone> GeomAPI_Shell::getCone() const
   if (isCone) {
     GeomPointPtr aLocation(new GeomAPI_Pnt(
       anApex->xyz()->added(anAxis->xyz()->multiplied(aHeight1))));
-    double aRadius1 = aHeight1 * Tan(aSemiAngle);
-    double aRadius2 = aHeight2 * Tan(aSemiAngle);
+    double aRadius1 = aHeight1 * aTanSemiAngle;
+    double aRadius2 = aHeight2 * aTanSemiAngle;
 
     aCone = GeomConePtr(new GeomAPI_Cone(aLocation, anAxis, aSemiAngle, aRadius1, aRadius2));
   }
@@ -298,11 +298,25 @@ std::shared_ptr<GeomAPI_Box> GeomAPI_Shell::getParallelepiped() const
     std::list<GeomPointPtr> aCorners;
     if (aWire->isRectangle(aCorners)) {
       // convert rectangle to plane with dimensions
-      GeomPointPtr anOrigin = aCorners.front();
-      aCorners.pop_front();
 
-      GeomPointPtr aFront = aCorners.front();
-      GeomPointPtr aBack = aCorners.back();
+      // find corner with the smallest coordinates
+      std::list<GeomPointPtr>::const_iterator aPrev = --aCorners.end();
+      std::list<GeomPointPtr>::const_iterator aCur = aPrev--;
+      std::list<GeomPointPtr>::const_iterator aNext = aCorners.begin();
+      GeomPointPtr anOrigin = *aCur;
+      GeomPointPtr aFront = *aNext;
+      GeomPointPtr aBack = *aPrev;
+      aPrev = aCur;
+      aCur = aNext++;
+      while (aNext != aCorners.end()) {
+        if ((*aCur)->isLess(anOrigin)) {
+          anOrigin = *aCur;
+          aFront = *aNext;
+          aBack = *aPrev;
+        }
+        aPrev = aCur;
+        aCur = aNext++;
+      }
 
       aPlanes[aNbPlanes].myWidth = aBack->distance(anOrigin);
       aPlanes[aNbPlanes].myDepth = aFront->distance(anOrigin);
