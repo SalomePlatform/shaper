@@ -25,7 +25,7 @@
 #include <Events_InfoMessage.h>
 
 #include <ModelAPI_AttributeSelection.h>
-#include <ModelAPI_AttributeSelectionList.h>>
+#include <ModelAPI_AttributeSelectionList.h>
 #include <ModelAPI_Feature.h>
 
 bool GeomValidators_NotSelfIntersected::isValid(const std::shared_ptr<ModelAPI_Feature>& theFeature,
