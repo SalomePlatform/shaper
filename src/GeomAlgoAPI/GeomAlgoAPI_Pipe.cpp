@@ -27,6 +27,7 @@
 #include <GeomAPI_Lin.h>
 
 #include <BRep_Tool.hxx>
+#include <BRepExtrema_DistShapeShape.hxx>
 #include <BRepOffsetAPI_MakePipe.hxx>
 #include <BRepOffsetAPI_MakePipeShell.hxx>
 #include <BRepBuilderAPI_MakeWire.hxx>
@@ -37,12 +38,15 @@
 #include <TopExp_Explorer.hxx>
 #include <TopoDS.hxx>
 #include <TopoDS_Shape.hxx>
+#include <Precision.hxx>
 
 static bool getBase(TopoDS_Shape& theBaseOut,
                     TopAbs_ShapeEnum& theBaseTypeOut,
                     const GeomShapePtr theBaseShape);
 static bool getPath(TopoDS_Wire& thePathOut,
                     const GeomShapePtr thePathShape);
+static gp_Trsf getPathToBaseTranslation(const TopoDS_Shape& theBase,
+                                        const TopoDS_Shape& thePath);
 static bool buildPipe(BRepOffsetAPI_MakePipeShell* thePipeBuilder);
 static ListOfShape getListFromShape(const TopoDS_Shape& theShape);
 
@@ -93,6 +97,7 @@ void GeomAlgoAPI_Pipe::build(const GeomShapePtr theBaseShape,
   if(!getPath(aPathWire, thePathShape)) {
     return;
   }
+  aPathWire.Move(getPathToBaseTranslation(aBaseShape, aPathWire));
 
   // Making pipe.
   BRepOffsetAPI_MakePipe* aPipeBuilder = new BRepOffsetAPI_MakePipe(aPathWire, aBaseShape);
@@ -138,6 +143,8 @@ void GeomAlgoAPI_Pipe::build(const GeomShapePtr theBaseShape,
   if(!getPath(aPathWire, thePathShape)) {
     return;
   }
+
+  aPathWire.Move(getPathToBaseTranslation(aBaseShape, aPathWire));
 
   // Getting Bi-Normal.
   if(!theBiNormal.get()) {
@@ -208,10 +215,19 @@ void GeomAlgoAPI_Pipe::build(const ListOfShape& theBaseShapes,
   }
 
   // Getting path.
+  TopoDS_Shape aBaseShape;
+  TopAbs_ShapeEnum aBaseShapeType;
+  if (!getBase(aBaseShape, aBaseShapeType, theBaseShapes.front())) {
+    return;
+  }
+
   TopoDS_Wire aPathWire;
   if(!getPath(aPathWire, thePathShape)) {
     return;
   }
+
+  gp_Trsf aTrsf = getPathToBaseTranslation(aBaseShape, aPathWire);
+  aPathWire.Move(aTrsf);
 
   // Making pipe.
   Standard_Boolean isDone = Standard_False;
@@ -226,8 +242,6 @@ void GeomAlgoAPI_Pipe::build(const ListOfShape& theBaseShapes,
     ListOfShape::const_iterator aLocIt = theLocations.cbegin();
     while(aBaseIt != theBaseShapes.cend()) {
       GeomShapePtr aBase = *aBaseIt;
-      TopoDS_Shape aBaseShape;
-      TopAbs_ShapeEnum aBaseShapeType;
       if(!getBase(aBaseShape, aBaseShapeType, aBase)) {
         delete aPipeBuilder;
         return;
@@ -244,6 +258,7 @@ void GeomAlgoAPI_Pipe::build(const ListOfShape& theBaseShapes,
           return;
         }
         TopoDS_Vertex aLocationVertex = aLocation->impl<TopoDS_Vertex>();
+        aLocationVertex.Move(aTrsf);
         ++aLocIt;
         aPipeBuilder->Add(aBaseShape, aLocationVertex);
       } else {
@@ -341,8 +356,7 @@ bool getBase(TopoDS_Shape& theBaseOut,
 }
 
 //==================================================================================================
-bool getPath(TopoDS_Wire& thePathOut,
-             const GeomShapePtr thePathShape)
+bool getPath(TopoDS_Wire& thePathOut, const GeomShapePtr thePathShape)
 {
   if(!thePathShape.get()) {
     return false;
@@ -363,6 +377,22 @@ bool getPath(TopoDS_Wire& thePathOut,
   }
 
   return true;
+}
+
+//==================================================================================================
+gp_Trsf getPathToBaseTranslation(const TopoDS_Shape& theBase, const TopoDS_Shape& thePath)
+{
+  gp_Trsf aTranslation;
+
+  BRepExtrema_DistShapeShape aDist(theBase, thePath);
+  aDist.Perform();
+  if (aDist.IsDone() && aDist.Value() > Precision::Confusion()) {
+    gp_Pnt aPntBase = aDist.PointOnShape1(1);
+    gp_Pnt aPntPath = aDist.PointOnShape2(1);
+    aTranslation.SetTranslation(aPntPath, aPntBase);
+  }
+
+  return aTranslation;
 }
 
 //==================================================================================================
