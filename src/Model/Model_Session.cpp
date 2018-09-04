@@ -424,6 +424,7 @@ Model_Session::Model_Session()
   myPluginsInfoLoaded = false;
   myCheckTransactions = true;
   myOperationAttachedToNext = false;
+  myIsAutoUpdateBlocked = false;
   ModelAPI_Session::setSession(std::shared_ptr<ModelAPI_Session>(this));
   // register the configuration reading listener
   Events_Loop* aLoop = Events_Loop::loop();
@@ -576,4 +577,20 @@ ModelAPI_ValidatorsFactory* Model_Session::validators()
 int Model_Session::transactionID()
 {
   return ROOT_DOC->transactionID();
+}
+
+void Model_Session::blockAutoUpdate(const bool theBlock)
+{
+  if (myIsAutoUpdateBlocked != theBlock) {
+    static Events_Loop* aLoop = Events_Loop::loop();
+    if (theBlock) {
+      static const Events_ID kAutoOff = aLoop->eventByName(EVENT_AUTOMATIC_RECOMPUTATION_DISABLE);
+      std::shared_ptr<Events_Message> aMsg(new Events_Message(kAutoOff));
+      aLoop->send(aMsg);
+    } else {
+      static const Events_ID kAutoOn = aLoop->eventByName(EVENT_AUTOMATIC_RECOMPUTATION_ENABLE);
+      std::shared_ptr<Events_Message> aMsg(new Events_Message(kAutoOn));
+      aLoop->send(aMsg);
+    }
+  }
 }

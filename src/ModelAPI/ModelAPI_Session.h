@@ -129,6 +129,12 @@ class MODELAPI_EXPORT ModelAPI_Session
   /// Returns the global identifier of the current transaction (needed for the update algo)
   virtual int transactionID() = 0;
 
+  /// Returns true if auto-update in the application is blocked
+  virtual bool isAutoUpdateBlocked() const = 0;
+
+  /// Set state of the auto-update of features result in the application
+  virtual void blockAutoUpdate(const bool theBlock) = 0;
+
  protected:
   /// Sets the session interface implementation (once per application launch)
   static void setSession(std::shared_ptr<ModelAPI_Session> theManager);
