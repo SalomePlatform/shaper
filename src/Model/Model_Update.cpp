@@ -80,6 +80,7 @@ Model_Update::Model_Update()
   myIsFinish = false;
   myIsProcessed = false;
   myIsPreviewBlocked = false;
+  myUpdateBlocked = false;
 }
 
 bool Model_Update::addModified(FeaturePtr theFeature, FeaturePtr theReason) {
@@ -105,7 +106,7 @@ bool Model_Update::addModified(FeaturePtr theFeature, FeaturePtr theReason) {
   }
 
   // update arguments for "apply button" state change
-  if ((!theFeature->isPreviewNeeded() && !myIsFinish) || myIsPreviewBlocked) {
+  if ((!theFeature->isPreviewNeeded() && !myIsFinish) || myIsPreviewBlocked || myUpdateBlocked) {
     if (theReason.get())
       myProcessOnFinish[theFeature].insert(theReason);
     else if (myProcessOnFinish.find(theFeature) == myProcessOnFinish.end())
@@ -135,7 +136,7 @@ bool Model_Update::addModified(FeaturePtr theFeature, FeaturePtr theReason) {
       aLoop->flush(kRedisplayEvent);
     }
 
-    if (!myIsPreviewBlocked)
+    if (!myIsPreviewBlocked && !myUpdateBlocked)
       return true;
   }
   if (myModified.find(theFeature) != myModified.end()) {
@@ -161,7 +162,7 @@ bool Model_Update::addModified(FeaturePtr theFeature, FeaturePtr theReason) {
       if (theReason.get())
         aNewSet.insert(theReason);
     }
-      myModified[theFeature] = aNewSet;
+    myModified[theFeature] = aNewSet;
 #ifdef DEB_UPDATE
     if (theReason.get()) {
       //std::cout<<"*** Add modified "<<theFeature->name()
@@ -232,6 +233,8 @@ void Model_Update::processEvent(const std::shared_ptr<Events_Message>& theMessag
   static const Events_ID kReorderEvent = aLoop->eventByName(EVENT_ORDER_UPDATED);
   static const Events_ID kRedisplayEvent = aLoop->eventByName(EVENT_OBJECT_TO_REDISPLAY);
   static const Events_ID kUpdatedSel = aLoop->eventByName(EVENT_UPDATE_SELECTION);
+  static const Events_ID kAutomaticOff = aLoop->eventByName(EVENT_AUTOMATIC_RECOMPUTATION_DISABLE);
+  static const Events_ID kAutomaticOn = aLoop->eventByName(EVENT_AUTOMATIC_RECOMPUTATION_ENABLE);
 
 #ifdef DEB_UPDATE
   std::cout<<"****** Event "<<theMessage->eventID().eventText()<<std::endl;
@@ -246,10 +249,25 @@ void Model_Update::processEvent(const std::shared_ptr<Events_Message>& theMessag
   }
   if (theMessage->eventID() == kPreviewRequestedEvent) {
     if (myIsPreviewBlocked) {
+      bool anUpdateState = myUpdateBlocked;
+      myUpdateBlocked = false;
       myIsPreviewBlocked = false;
       processFeatures();
       myIsPreviewBlocked = true;
+      myUpdateBlocked = anUpdateState;
     }
+    return;
+  }
+  if (theMessage->eventID() == kAutomaticOff) {
+    myUpdateBlocked = true;
+    return;
+  }
+  if (theMessage->eventID() == kAutomaticOn) {
+    myUpdateBlocked = false; // then process all modified features, even if preview is blocked
+    bool aPreviewBlockedState = myIsPreviewBlocked; // to update the selected arguments
+    myIsPreviewBlocked = false;
+    processFeatures();
+    myIsPreviewBlocked = myIsPreviewBlocked;
     return;
   }
   if (theMessage->eventID() == kUpdatedSel) {
@@ -325,7 +343,7 @@ void Model_Update::processEvent(const std::shared_ptr<Events_Message>& theMessag
       theMessage->eventID() == kOpStartEvent) {
     myIsPreviewBlocked = false;
 
-    if (theMessage->eventID() == kOpFinishEvent) {
+    if (theMessage->eventID() == kOpFinishEvent && !myUpdateBlocked) {// if update is blocked, skip
       myIsFinish = true;
       // add features that wait for finish as modified
       std::map<std::shared_ptr<ModelAPI_Feature>, std::set<std::shared_ptr<ModelAPI_Feature> > >::
@@ -337,7 +355,7 @@ void Model_Update::processEvent(const std::shared_ptr<Events_Message>& theMessag
             continue;
           }
           std::set<std::shared_ptr<ModelAPI_Feature> >::iterator aReasons;
-          for(aReasons = aFeature->second.begin(); aReasons != aFeature->second.end(); aReasons++) {
+          for(aReasons = aFeature->second.begin(); aReasons != aFeature->second.end(); aReasons++){
             addModified(aFeature->first, *aReasons);
           }
         }
@@ -345,21 +363,23 @@ void Model_Update::processEvent(const std::shared_ptr<Events_Message>& theMessag
       myIsFinish = false;
     }
     // processed features must be only on finish, so clear anyway (to avoid reimport on load)
-    myProcessOnFinish.clear();
+    if (!myUpdateBlocked) {
+      myProcessOnFinish.clear();
 
-    // #2156: current must be sketch, left after the macro execution
-    DocumentPtr anActiveDoc = ModelAPI_Session::get()->activeDocument();
-    FeaturePtr aCurrent;
-    if (anActiveDoc.get())
-      aCurrent = anActiveDoc->currentFeature(false);
+      // #2156: current must be sketch, left after the macro execution
+      DocumentPtr anActiveDoc = ModelAPI_Session::get()->activeDocument();
+      FeaturePtr aCurrent;
+      if (anActiveDoc.get())
+        aCurrent = anActiveDoc->currentFeature(false);
 
-    if (!(theMessage->eventID() == kOpStartEvent)) {
-      processFeatures(false);
-    }
+      if (!(theMessage->eventID() == kOpStartEvent)) {
+        processFeatures(false);
+      }
 
-    if (anActiveDoc.get() && aCurrent.get() && aCurrent->data()->isValid()) {
-      if (anActiveDoc->currentFeature(false) != aCurrent)
-        anActiveDoc->setCurrentFeature(aCurrent, false); // #2156 make the current feature back
+      if (anActiveDoc.get() && aCurrent.get() && aCurrent->data()->isValid()) {
+        if (anActiveDoc->currentFeature(false) != aCurrent)
+          anActiveDoc->setCurrentFeature(aCurrent, false); // #2156 make the current feature back
+      }
     }
 
 
@@ -403,7 +423,7 @@ void Model_Update::processEvent(const std::shared_ptr<Events_Message>& theMessag
 void Model_Update::processFeatures(const bool theFlushRedisplay)
 {
    // perform update of everything if it is not performed right now or any preview is blocked
-  if (!myIsProcessed && !myIsPreviewBlocked) {
+  if (!myIsProcessed && !myIsPreviewBlocked && !myUpdateBlocked) {
     myIsProcessed = true;
     #ifdef DEB_UPDATE
       std::cout<<"****** Start processing"<<std::endl;

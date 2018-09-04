@@ -79,6 +79,10 @@ static const char * EVENT_EMPTY_OPERATION_PRESENTATION = "EmptyOperationPresenta
 static const char * EVENT_PREVIEW_BLOCKED = "PreviewBlocked";
 /// To preview the current feature in the viewer (to compute the result)
 static const char * EVENT_PREVIEW_REQUESTED = "PreviewRequested";
+/// To block automatic recomputation of any feature (by the GUI button press)
+static const char * EVENT_AUTOMATIC_RECOMPUTATION_DISABLE = "DisableAutomaticRecomputation";
+/// To unblock block automatic recomputation (default state: the GUI button unpressed)
+static const char * EVENT_AUTOMATIC_RECOMPUTATION_ENABLE = "EnableAutomaticRecomputation";
 
 /// Event ID that solver has conflicting constraints (comes with ModelAPI_SolverFailedMessage)
 static const char * EVENT_SOLVER_FAILED = "SolverFailed";
