@@ -38,6 +38,8 @@
 #include <ModelAPI_CompositeFeature.h>
 #include <ModelAPI_Session.h>
 #include <ModelAPI_Tools.h>
+#include <ModelAPI_ResultBody.h>
+#include <ModelAPI_ResultPart.h>
 #include <GeomAPI_Shape.h>
 #include <GeomDataAPI_Point.h>
 #include <GeomDataAPI_Point2D.h>
@@ -74,6 +76,10 @@ Model_Update::Model_Update()
   aLoop->registerListener(this, kReorderEvent);
   static const Events_ID kUpdatedSel = aLoop->eventByName(EVENT_UPDATE_SELECTION);
   aLoop->registerListener(this, kUpdatedSel);
+  static const Events_ID kAutomaticOff = aLoop->eventByName(EVENT_AUTOMATIC_RECOMPUTATION_DISABLE);
+  aLoop->registerListener(this, kAutomaticOff);
+  static const Events_ID kAutomaticOn = aLoop->eventByName(EVENT_AUTOMATIC_RECOMPUTATION_ENABLE);
+  aLoop->registerListener(this, kAutomaticOn);
 
   //  Config_PropManager::findProp("Model update", "automatic_rebuild")->value() == "true";
   myIsParamUpdated = false;
@@ -106,7 +112,7 @@ bool Model_Update::addModified(FeaturePtr theFeature, FeaturePtr theReason) {
   }
 
   // update arguments for "apply button" state change
-  if ((!theFeature->isPreviewNeeded() && !myIsFinish) || myIsPreviewBlocked || myUpdateBlocked) {
+  if ((!theFeature->isPreviewNeeded() && !myIsFinish) || myIsPreviewBlocked) {
     if (theReason.get())
       myProcessOnFinish[theFeature].insert(theReason);
     else if (myProcessOnFinish.find(theFeature) == myProcessOnFinish.end())
@@ -136,7 +142,7 @@ bool Model_Update::addModified(FeaturePtr theFeature, FeaturePtr theReason) {
       aLoop->flush(kRedisplayEvent);
     }
 
-    if (!myIsPreviewBlocked && !myUpdateBlocked)
+    if (!myIsPreviewBlocked)
       return true;
   }
   if (myModified.find(theFeature) != myModified.end()) {
@@ -222,6 +228,7 @@ bool Model_Update::addModified(FeaturePtr theFeature, FeaturePtr theReason) {
 void Model_Update::processEvent(const std::shared_ptr<Events_Message>& theMessage)
 {
   static Events_Loop* aLoop = Events_Loop::loop();
+  static ModelAPI_ValidatorsFactory* aFactory = ModelAPI_Session::get()->validators();
   static const Events_ID kCreatedEvent = aLoop->eventByName(EVENT_OBJECT_CREATED);
   static const Events_ID kUpdatedEvent = aLoop->eventByName(EVENT_OBJECT_UPDATED);
   static const Events_ID kOpFinishEvent = aLoop->eventByName("FinishOperation");
@@ -266,6 +273,20 @@ void Model_Update::processEvent(const std::shared_ptr<Events_Message>& theMessag
     myUpdateBlocked = false; // then process all modified features, even if preview is blocked
     bool aPreviewBlockedState = myIsPreviewBlocked; // to update the selected arguments
     myIsPreviewBlocked = false;
+    // iterate everything and add efatures in state "MustBeUpdated" into modified
+    std::list<std::shared_ptr<ModelAPI_Document> > allDocs =
+      ModelAPI_Session::get()->allOpenedDocuments();
+    std::list<std::shared_ptr<ModelAPI_Document> >::iterator aDoc = allDocs.begin();
+    for(; aDoc != allDocs.end(); aDoc++) {
+      std::list<std::shared_ptr<ModelAPI_Feature> > allFeats = (*aDoc)->allFeatures();
+      std::list<std::shared_ptr<ModelAPI_Feature> >::iterator aFeat = allFeats.begin();
+      for(; aFeat != allFeats.end(); aFeat++) {
+        if ((*aFeat)->data()->isValid() &&
+            (*aFeat)->data()->execState() == ModelAPI_StateMustBeUpdated) {
+          addModified(*aFeat, FeaturePtr());
+        }
+      }
+    }
     processFeatures();
     myIsPreviewBlocked = myIsPreviewBlocked;
     return;
@@ -315,6 +336,18 @@ void Model_Update::processEvent(const std::shared_ptr<Events_Message>& theMessag
       if (anUpdated.get()) {
         if (addModified(anUpdated, FeaturePtr()))
           aSomeModified = true;
+        if (myUpdateBlocked) { // execute this feature anyway to show the current result
+          /*if (!anUpdated->isStable() && anUpdated->results().size() && (
+              anUpdated->firstResult()->groupName() == ModelAPI_ResultBody::group() ||
+              anUpdated->firstResult()->groupName() == ModelAPI_ResultPart::group())) {
+            if (aFactory->validate(anUpdated)) {
+              executeFeature(anUpdated);
+              redisplayWithResults(anUpdated, ModelAPI_StateNothing, false);
+              static Events_ID EVENT_DISP = aLoop->eventByName(EVENT_OBJECT_TO_REDISPLAY);
+              aLoop->flush(EVENT_DISP);
+            }
+          }*/
+        }
       } else {
         // process the updated result as update of features that refers to this result
         const std::set<std::shared_ptr<ModelAPI_Attribute> >&
@@ -343,7 +376,7 @@ void Model_Update::processEvent(const std::shared_ptr<Events_Message>& theMessag
       theMessage->eventID() == kOpStartEvent) {
     myIsPreviewBlocked = false;
 
-    if (theMessage->eventID() == kOpFinishEvent && !myUpdateBlocked) {// if update is blocked, skip
+    if (theMessage->eventID() == kOpFinishEvent) {// if update is blocked, skip
       myIsFinish = true;
       // add features that wait for finish as modified
       std::map<std::shared_ptr<ModelAPI_Feature>, std::set<std::shared_ptr<ModelAPI_Feature> > >::
@@ -363,25 +396,22 @@ void Model_Update::processEvent(const std::shared_ptr<Events_Message>& theMessag
       myIsFinish = false;
     }
     // processed features must be only on finish, so clear anyway (to avoid reimport on load)
-    if (!myUpdateBlocked) {
-      myProcessOnFinish.clear();
+    myProcessOnFinish.clear();
 
-      // #2156: current must be sketch, left after the macro execution
-      DocumentPtr anActiveDoc = ModelAPI_Session::get()->activeDocument();
-      FeaturePtr aCurrent;
-      if (anActiveDoc.get())
-        aCurrent = anActiveDoc->currentFeature(false);
+    // #2156: current must be sketch, left after the macro execution
+    DocumentPtr anActiveDoc = ModelAPI_Session::get()->activeDocument();
+    FeaturePtr aCurrent;
+    if (anActiveDoc.get())
+      aCurrent = anActiveDoc->currentFeature(false);
 
-      if (!(theMessage->eventID() == kOpStartEvent)) {
-        processFeatures(false);
-      }
-
-      if (anActiveDoc.get() && aCurrent.get() && aCurrent->data()->isValid()) {
-        if (anActiveDoc->currentFeature(false) != aCurrent)
-          anActiveDoc->setCurrentFeature(aCurrent, false); // #2156 make the current feature back
-      }
+    if (!(theMessage->eventID() == kOpStartEvent)) {
+      processFeatures(false);
     }
 
+    if (anActiveDoc.get() && aCurrent.get() && aCurrent->data()->isValid()) {
+      if (anActiveDoc->currentFeature(false) != aCurrent)
+        anActiveDoc->setCurrentFeature(aCurrent, false); // #2156 make the current feature back
+    }
 
     // remove all macros before clearing all created
     std::set<FeaturePtr>::iterator anUpdatedIter = myWaitForFinish.begin();
@@ -423,7 +453,7 @@ void Model_Update::processEvent(const std::shared_ptr<Events_Message>& theMessag
 void Model_Update::processFeatures(const bool theFlushRedisplay)
 {
    // perform update of everything if it is not performed right now or any preview is blocked
-  if (!myIsProcessed && !myIsPreviewBlocked && !myUpdateBlocked) {
+  if (!myIsProcessed && !myIsPreviewBlocked) {
     myIsProcessed = true;
     #ifdef DEB_UPDATE
       std::cout<<"****** Start processing"<<std::endl;
@@ -677,7 +707,23 @@ bool Model_Update::processFeature(FeaturePtr theFeature)
   ModelAPI_ExecState aState = theFeature->data()->execState();
   if (aFactory->validate(theFeature)) {
     if (!isPostponedMain) {
-      executeFeature(theFeature);
+      bool aDoExecute = true;
+      if (myUpdateBlocked) {
+        if (!theFeature->isStable()) {
+          aDoExecute = true;
+        } else if (theFeature->results().size()) { // execute only not-results features
+          aDoExecute = !(theFeature->firstResult()->groupName() == ModelAPI_ResultBody::group() ||
+                         theFeature->firstResult()->groupName() == ModelAPI_ResultPart::group());
+        } else {
+          aDoExecute = aState != ModelAPI_StateInvalidArgument;
+        }
+      }
+      if (aDoExecute) {
+        executeFeature(theFeature);
+      } else {
+        // store information that this feature must be executed later
+        theFeature->data()->execState(ModelAPI_StateMustBeUpdated);
+      }
     }
   } else {
     #ifdef DEB_UPDATE

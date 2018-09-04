@@ -582,6 +582,7 @@ int Model_Session::transactionID()
 void Model_Session::blockAutoUpdate(const bool theBlock)
 {
   if (myIsAutoUpdateBlocked != theBlock) {
+    myIsAutoUpdateBlocked = theBlock;
     static Events_Loop* aLoop = Events_Loop::loop();
     if (theBlock) {
       static const Events_ID kAutoOff = aLoop->eventByName(EVENT_AUTOMATIC_RECOMPUTATION_DISABLE);
