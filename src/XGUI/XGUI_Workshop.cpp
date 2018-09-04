@@ -412,7 +412,7 @@ void XGUI_Workshop::initMenu()
                                                         QKeySequence::Undo, false,
                                                         "MEN_DESK_EDIT");
   QString aToolBarTitle = tr( "INF_DESK_TOOLBAR_STANDARD" );
-  salomeConnector()->addActionInToolbar( aAction,aToolBarTitle  );
+  salomeConnector()->addActionInToolbar( aAction,aToolBarTitle );
 
   connect(aAction, SIGNAL(triggered(bool)), this, SLOT(onUndo()));
   addHistoryMenu(aAction, SIGNAL(updateUndoHistory(const QList<ActionInfo>&)), SLOT(onUndo(int)));
@@ -427,6 +427,18 @@ void XGUI_Workshop::initMenu()
 
   salomeConnector()->addDesktopMenuSeparator("MEN_DESK_EDIT");
 
+  aAction = salomeConnector()->addDesktopCommand("AUTOCOMPUTE_CMD", tr("Block auto-apply"),
+                                              tr("Blocks immediate apply of modifications"),
+                                              QIcon(":pictures/autoapply.png"), QKeySequence(),
+                                              true, "MEN_DESK_EDIT");
+  salomeConnector()->addActionInToolbar( aAction, aToolBarTitle );
+
+  connect(aAction, SIGNAL(toggled(bool)), this, SLOT(onAutoApply(bool)));
+
+  salomeConnector()->addDesktopMenuSeparator("MEN_DESK_EDIT");
+
+
+  // Add commands to a file menu
   aAction = salomeConnector()->addDesktopCommand("SAVEAS_CMD", tr("Export native..."),
                                              tr("Export the current document into a native file"),
                                               QIcon(), QKeySequence(),
@@ -477,7 +489,16 @@ void XGUI_Workshop::initMenu()
                                 QIcon(":pictures/open.png"), QKeySequence::Open);
   aCommand->connectTo(this, SLOT(onOpen()));
 
-  aCommand = aGroup->addFeature("EXEC_CMD", tr("Launch Script"), tr("Launch Python script file"),
+
+  aCommand = aGroup->addFeature("AUTOCOMPUTE_CMD", tr("Block auto-apply"),
+                                tr("Blocks immediate apply of modifications"),
+                                QIcon(":pictures/autoapply.png"), QString(),
+                                QKeySequence(), true, true);
+  aCommand->setChecked(ModelAPI_Session::get()->isAutoUpdateBlocked());
+  aCommand->connectTo(this, SLOT(onAutoApply(bool)));
+
+
+  aCommand = aGroup->addFeature("EXEC_CMD", tr("Launch script"), tr("Launch Python script file"),
                                 QIcon(":pictures/assembly.png"), QKeySequence());
   aCommand->connectTo(this, SLOT(onFileExec()));
 
@@ -2810,3 +2831,9 @@ void XGUI_Workshop::onFileExec()
   }
 }
 #endif
+
+void XGUI_Workshop::onAutoApply(bool isToggle)
+{
+  SessionPtr aMgr = ModelAPI_Session::get();
+  aMgr->blockAutoUpdate(isToggle);
+}

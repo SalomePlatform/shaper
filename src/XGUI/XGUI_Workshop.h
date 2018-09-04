@@ -397,6 +397,9 @@ signals:
   void onFileExec();
 #endif
 
+  /// A slot calleon toggle of auto-compute button
+  void onAutoApply(bool isToggle);
+
   /// Activates/deactivates the trihedron in the viewer AIS context
   void onTrihedronVisibilityChanged(bool theState);
 
