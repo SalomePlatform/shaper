@@ -22,6 +22,7 @@
 #define SketcherPrs_Factory_H_
 
 #include "SketcherPrs.h"
+#include <SketchPlugin_Sketch.h>
 
 #include <ModelAPI_Feature.h>
 #include <ModelAPI_CompositeFeature.h>
@@ -31,8 +32,7 @@
 
 #define GET_CONSTRAINT_PRS(NAME) \
   static AISObjectPtr NAME(ModelAPI_Feature* theConstraint, \
-                           ModelAPI_CompositeFeature* theSketcher, \
-                           const std::shared_ptr<GeomAPI_Ax3>& thePlane, \
+                           SketchPlugin_Sketch* theSketcher, \
                            AISObjectPtr thePrevious);
 
 /**
@@ -113,16 +113,16 @@ public:
   /// \param thePrevious the previous presentation
   GET_CONSTRAINT_PRS(rotateConstraint)
 
-#define GET_CONSTRAINT2_PRS(NAME) \
-  static AISObjectPtr NAME(ModelAPI_Feature* theConstraint, \
-                           const std::shared_ptr<GeomAPI_Ax3>& thePlane, \
-                           AISObjectPtr thePrevious);
-
   /// Creates coincedent constraint presentation
   /// \param theConstraint the constraint
   /// \param thePlane the current sketch plane
   /// \param thePrevious the previous presentation
-  GET_CONSTRAINT2_PRS(coincidentConstraint)
+  GET_CONSTRAINT_PRS(coincidentConstraint)
+
+#define GET_CONSTRAINT2_PRS(NAME) \
+  static AISObjectPtr NAME(ModelAPI_Feature* theConstraint, \
+                           const std::shared_ptr<GeomAPI_Ax3>& thePlane, \
+                           AISObjectPtr thePrevious);
 
   /// Creates angle constraint presentation
   /// \param theConstraint the constraint

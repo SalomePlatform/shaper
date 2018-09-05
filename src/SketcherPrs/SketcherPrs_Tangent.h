@@ -38,10 +38,8 @@ public:
   /// Constructor
   /// \param theConstraint a constraint feature
   /// \param theSketcher a sketcher object
-  /// \param thePlane a coordinate plane of current sketch
   Standard_EXPORT SketcherPrs_Tangent(ModelAPI_Feature* theConstraint,
-                                      ModelAPI_CompositeFeature* theSketcher,
-                                       const std::shared_ptr<GeomAPI_Ax3>& thePlane);
+    SketchPlugin_Sketch* theSketcher);
 
   DEFINE_STANDARD_RTTIEXT(SketcherPrs_Tangent, SketcherPrs_SymbolPrs)
 

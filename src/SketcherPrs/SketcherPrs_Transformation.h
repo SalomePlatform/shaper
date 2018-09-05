@@ -38,12 +38,9 @@ public:
   /// Constructor
   /// \param theConstraint a constraint feature
   /// \param theSketcher a sketcher object
-  /// \param thePlane a coordinate plane of current sketch
   /// \param isTranslation a flag is it translation or rotation
   Standard_EXPORT SketcherPrs_Transformation(ModelAPI_Feature* theConstraint,
-                                            ModelAPI_CompositeFeature* theSketcher,
-                                         const std::shared_ptr<GeomAPI_Ax3>& thePlane,
-                                         bool isTranslation);
+    SketchPlugin_Sketch* theSketcher, bool isTranslation);
 
   DEFINE_STANDARD_RTTIEXT(SketcherPrs_Transformation, SketcherPrs_SymbolPrs)
 

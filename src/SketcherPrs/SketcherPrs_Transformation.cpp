@@ -42,10 +42,9 @@ IMPLEMENT_STANDARD_RTTIEXT(SketcherPrs_Transformation, SketcherPrs_SymbolPrs);
 static Handle(Image_AlienPixMap) MyPixMap;
 
 SketcherPrs_Transformation::SketcherPrs_Transformation(ModelAPI_Feature* theConstraint,
-                                           ModelAPI_CompositeFeature* theSketcher,
-                                           const std::shared_ptr<GeomAPI_Ax3>& thePlane,
+  SketchPlugin_Sketch* theSketcher,
                                            bool isTranslation)
- : SketcherPrs_SymbolPrs(theConstraint, theSketcher, thePlane), myIsTranslation(isTranslation)
+ : SketcherPrs_SymbolPrs(theConstraint, theSketcher), myIsTranslation(isTranslation)
 {
 }
 

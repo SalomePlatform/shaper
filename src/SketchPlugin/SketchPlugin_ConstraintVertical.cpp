@@ -50,7 +50,6 @@ AISObjectPtr SketchPlugin_ConstraintVertical::getAISObject(AISObjectPtr thePrevi
     return thePrevious;
 
   AISObjectPtr anAIS = SketcherPrs_Factory::verticalConstraint(this, sketch(),
-                                                               sketch()->coordinatePlane(),
                                                                thePrevious);
   return anAIS;
 }

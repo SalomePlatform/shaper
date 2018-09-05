@@ -22,9 +22,9 @@
 #define SketcherPrs_SymbolPrs_H
 
 #include "SketcherPrs_SensitivePoint.h"
+#include <SketchPlugin_Sketch.h>
 #include <ModelAPI_Feature.h>
 #include <ModelAPI_AttributeRefList.h>
-#include <ModelAPI_CompositeFeature.h>
 
 #include <AIS_InteractiveObject.hxx>
 #include <GeomAPI_Ax3.h>
@@ -56,8 +56,7 @@ public:
   /// \param theConstraint a constraint feature
   /// \param thePlane a coordinate plane of current sketch
   Standard_EXPORT SketcherPrs_SymbolPrs(ModelAPI_Feature* theConstraint,
-                        ModelAPI_CompositeFeature* theSketcher,
-                        const std::shared_ptr<GeomAPI_Ax3>& thePlane);
+                                        SketchPlugin_Sketch* theSketcher);
 
   virtual ~SketcherPrs_SymbolPrs();
 
@@ -66,7 +65,6 @@ public:
                                                const SelectMgr_SequenceOfOwner& theOwners);
 
   //! Method which hilight an owner belonging to
-  //! this selectable object  ( for fast presentation draw )
   Standard_EXPORT virtual void HilightOwnerWithColor(
     const Handle(PrsMgr_PresentationManager3d)& thePM,
     const Handle(Prs3d_Drawer)& theStyle,

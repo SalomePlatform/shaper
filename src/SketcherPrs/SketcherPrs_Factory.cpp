@@ -38,17 +38,16 @@
 // Macros for constraint presentation definition
 #define CONSTRAINT_PRS_IMPL(NAME, CLASS) \
 AISObjectPtr SketcherPrs_Factory::NAME(ModelAPI_Feature* theConstraint, \
-                                       ModelAPI_CompositeFeature* theSketcher, \
-                                       const std::shared_ptr<GeomAPI_Ax3>& thePlane, \
+                                       SketchPlugin_Sketch* theSketcher, \
                                        AISObjectPtr thePrevious) \
 { \
   std::shared_ptr<GeomAPI_AISObject> anAISObj; \
-  if (CLASS::IsReadyToDisplay(theConstraint, thePlane)) { \
+  if (CLASS::IsReadyToDisplay(theConstraint, theSketcher->coordinatePlane())) { \
     if (thePrevious.get()) \
       anAISObj = thePrevious; \
     else { \
       anAISObj = AISObjectPtr(new GeomAPI_AISObject()); \
-      Handle(CLASS) aPrs = new CLASS(theConstraint, theSketcher, thePlane); \
+      Handle(CLASS) aPrs = new CLASS(theConstraint, theSketcher); \
       anAISObj->setImpl(new Handle(AIS_InteractiveObject)(aPrs)); \
     } \
   } \
@@ -64,6 +63,7 @@ CONSTRAINT_PRS_IMPL(equalConstraint, SketcherPrs_Equal);
 CONSTRAINT_PRS_IMPL(tangentConstraint, SketcherPrs_Tangent);
 CONSTRAINT_PRS_IMPL(middleConstraint, SketcherPrs_Middle);
 CONSTRAINT_PRS_IMPL(mirrorConstraint, SketcherPrs_Mirror);
+CONSTRAINT_PRS_IMPL(coincidentConstraint, SketcherPrs_Coincident);
 
 
 
@@ -86,25 +86,22 @@ AISObjectPtr SketcherPrs_Factory::NAME(ModelAPI_Feature* theConstraint, \
 }
 
 
-CONSTRAINT2_PRS_IMPL(coincidentConstraint, SketcherPrs_Coincident);
 CONSTRAINT2_PRS_IMPL(angleConstraint, SketcherPrs_Angle);
 CONSTRAINT2_PRS_IMPL(radiusConstraint, SketcherPrs_Radius);
 CONSTRAINT2_PRS_IMPL(lengthDimensionConstraint, SketcherPrs_LengthDimension);
 
 // Non-standard constraints definition
 AISObjectPtr SketcherPrs_Factory::horisontalConstraint(ModelAPI_Feature* theConstraint,
-                                        ModelAPI_CompositeFeature* theSketcher,
-                                       const std::shared_ptr<GeomAPI_Ax3>& thePlane,
-                                       AISObjectPtr thePrevious)
+  SketchPlugin_Sketch* theSketcher, AISObjectPtr thePrevious)
 {
   std::shared_ptr<GeomAPI_AISObject> anAISObj;
-  if (SketcherPrs_HVDirection::IsReadyToDisplay(theConstraint, thePlane)) {
+  if (SketcherPrs_HVDirection::IsReadyToDisplay(theConstraint, theSketcher->coordinatePlane())) {
     if (thePrevious.get())
       anAISObj = thePrevious;
     else {
       anAISObj = AISObjectPtr(new GeomAPI_AISObject());
       Handle(SketcherPrs_HVDirection) aPrs =
-        new SketcherPrs_HVDirection(theConstraint, theSketcher, thePlane, true);
+        new SketcherPrs_HVDirection(theConstraint, theSketcher, true);
       anAISObj->setImpl(new Handle(AIS_InteractiveObject)(aPrs));
     }
   }
@@ -112,18 +109,16 @@ AISObjectPtr SketcherPrs_Factory::horisontalConstraint(ModelAPI_Feature* theCons
 }
 
 AISObjectPtr SketcherPrs_Factory::verticalConstraint(ModelAPI_Feature* theConstraint,
-                                        ModelAPI_CompositeFeature* theSketcher,
-                                       const std::shared_ptr<GeomAPI_Ax3>& thePlane,
-                                       AISObjectPtr thePrevious)
+  SketchPlugin_Sketch* theSketcher, AISObjectPtr thePrevious)
 {
   std::shared_ptr<GeomAPI_AISObject> anAISObj;
-  if (SketcherPrs_HVDirection::IsReadyToDisplay(theConstraint, thePlane)) {
+  if (SketcherPrs_HVDirection::IsReadyToDisplay(theConstraint, theSketcher->coordinatePlane())) {
     if (thePrevious.get())
       anAISObj = thePrevious;
     else {
       anAISObj = AISObjectPtr(new GeomAPI_AISObject());
       Handle(SketcherPrs_HVDirection) aPrs =
-        new SketcherPrs_HVDirection(theConstraint, theSketcher, thePlane, false);
+        new SketcherPrs_HVDirection(theConstraint, theSketcher, false);
       anAISObj->setImpl(new Handle(AIS_InteractiveObject)(aPrs));
     }
   }
@@ -131,18 +126,17 @@ AISObjectPtr SketcherPrs_Factory::verticalConstraint(ModelAPI_Feature* theConstr
 }
 
 AISObjectPtr SketcherPrs_Factory::translateConstraint(ModelAPI_Feature* theConstraint,
-                                        ModelAPI_CompositeFeature* theSketcher,
-                                       const std::shared_ptr<GeomAPI_Ax3>& thePlane,
-                                       AISObjectPtr thePrevious)
+  SketchPlugin_Sketch* theSketcher, AISObjectPtr thePrevious)
 {
   std::shared_ptr<GeomAPI_AISObject> anAISObj;
-  if (SketcherPrs_Transformation::IsReadyToDisplay(theConstraint, thePlane)) {
+  if (SketcherPrs_Transformation::IsReadyToDisplay(theConstraint,
+    theSketcher->coordinatePlane())) {
     if (thePrevious.get())
       anAISObj = thePrevious;
     else {
       anAISObj = AISObjectPtr(new GeomAPI_AISObject());
       Handle(SketcherPrs_Transformation) aPrs =
-        new SketcherPrs_Transformation(theConstraint, theSketcher, thePlane, true);
+        new SketcherPrs_Transformation(theConstraint, theSketcher, true);
       anAISObj->setImpl(new Handle(AIS_InteractiveObject)(aPrs));
     }
   }
@@ -150,18 +144,17 @@ AISObjectPtr SketcherPrs_Factory::translateConstraint(ModelAPI_Feature* theConst
 }
 
 AISObjectPtr SketcherPrs_Factory::rotateConstraint(ModelAPI_Feature* theConstraint,
-                                        ModelAPI_CompositeFeature* theSketcher,
-                                       const std::shared_ptr<GeomAPI_Ax3>& thePlane,
-                                       AISObjectPtr thePrevious)
+  SketchPlugin_Sketch* theSketcher, AISObjectPtr thePrevious)
 {
   std::shared_ptr<GeomAPI_AISObject> anAISObj;
-  if (SketcherPrs_Transformation::IsReadyToDisplay(theConstraint, thePlane)) {
+  if (SketcherPrs_Transformation::IsReadyToDisplay(theConstraint,
+    theSketcher->coordinatePlane())) {
     if (thePrevious.get())
       anAISObj = thePrevious;
     else {
       anAISObj = AISObjectPtr(new GeomAPI_AISObject());
       Handle(SketcherPrs_Transformation) aPrs =
-        new SketcherPrs_Transformation(theConstraint, theSketcher, thePlane, false);
+        new SketcherPrs_Transformation(theConstraint, theSketcher, false);
       anAISObj->setImpl(new Handle(AIS_InteractiveObject)(aPrs));
     }
   }

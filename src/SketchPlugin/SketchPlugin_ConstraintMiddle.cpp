@@ -42,7 +42,6 @@ AISObjectPtr SketchPlugin_ConstraintMiddle::getAISObject(AISObjectPtr thePreviou
     return thePrevious;
 
   AISObjectPtr anAIS = SketcherPrs_Factory::middleConstraint(this, sketch(),
-                                                             sketch()->coordinatePlane(),
                                                              thePrevious);
   return anAIS;
 }

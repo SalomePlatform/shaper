@@ -22,6 +22,7 @@
 #define SketcherPrs_Coincident_H
 
 #include <GeomAPI_Ax3.h>
+#include <SketchPlugin_Sketch.h>
 #include <ModelAPI_Feature.h>
 
 #include <AIS_InteractiveObject.hxx>
@@ -42,7 +43,7 @@ public:
   /// \param theConstraint a constraint object
   /// \param thePlane plane of a sketch
   Standard_EXPORT SketcherPrs_Coincident(ModelAPI_Feature* theConstraint,
-                                         const std::shared_ptr<GeomAPI_Ax3>& thePlane);
+    SketchPlugin_Sketch* theSketch);
 
   /// Defines color for the presentation
   /// \param aColor a color object
@@ -82,7 +83,7 @@ private:
 
 private:
   ModelAPI_Feature* myConstraint;
-  std::shared_ptr<GeomAPI_Ax3> mySketcherPlane;
+  SketchPlugin_Sketch* mySketch;
   gp_Pnt myPoint;
   bool myIsCustomColor; /// state if the presentation is visualized in custom color
   Quantity_Color myCustomColor; /// the color of mid ring if there is a conflict

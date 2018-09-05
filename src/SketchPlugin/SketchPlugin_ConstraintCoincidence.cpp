@@ -52,8 +52,7 @@ AISObjectPtr SketchPlugin_ConstraintCoincidence::getAISObject(AISObjectPtr thePr
   if (!sketch())
     return thePrevious;
 
-  AISObjectPtr anAIS = SketcherPrs_Factory::coincidentConstraint(this, sketch()->coordinatePlane(),
-                                                                 thePrevious);
+  AISObjectPtr anAIS = SketcherPrs_Factory::coincidentConstraint(this, sketch(), thePrevious);
   return anAIS;
 }
 

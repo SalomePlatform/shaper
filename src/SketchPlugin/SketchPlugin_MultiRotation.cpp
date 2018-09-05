@@ -233,7 +233,6 @@ AISObjectPtr SketchPlugin_MultiRotation::getAISObject(AISObjectPtr thePrevious)
     return thePrevious;
 
   AISObjectPtr anAIS = SketcherPrs_Factory::rotateConstraint(this, sketch(),
-                                                             sketch()->coordinatePlane(),
                                                              thePrevious);
   return anAIS;
 }

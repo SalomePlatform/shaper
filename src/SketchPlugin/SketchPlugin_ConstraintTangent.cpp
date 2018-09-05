@@ -51,7 +51,6 @@ AISObjectPtr SketchPlugin_ConstraintTangent::getAISObject(AISObjectPtr thePrevio
     return thePrevious;
 
   AISObjectPtr anAIS = SketcherPrs_Factory::tangentConstraint(this, sketch(),
-                                                              sketch()->coordinatePlane(),
                                                               thePrevious);
   return anAIS;
 }

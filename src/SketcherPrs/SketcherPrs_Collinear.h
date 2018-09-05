@@ -37,10 +37,9 @@ public:
   /// Constructor
   /// \param theConstraint a constraint feature
   /// \param theSketcher a sketcher object
-  /// \param thePlane a coordinate plane of current sketch
   Standard_EXPORT SketcherPrs_Collinear(ModelAPI_Feature* theConstraint,
-                                        ModelAPI_CompositeFeature* theSketcher,
-                                       const std::shared_ptr<GeomAPI_Ax3>& thePlane);
+    SketchPlugin_Sketch* theSketcher);
+
   DEFINE_STANDARD_RTTIEXT(SketcherPrs_Collinear, SketcherPrs_SymbolPrs)
 
   /// Returns true if the constraint feature arguments are correcly filled to build AIS presentation

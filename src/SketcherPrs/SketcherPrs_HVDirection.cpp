@@ -33,10 +33,8 @@ IMPLEMENT_STANDARD_RTTIEXT(SketcherPrs_HVDirection, SketcherPrs_SymbolPrs);
 static Handle(Image_AlienPixMap) MyPixMap;
 
 SketcherPrs_HVDirection::SketcherPrs_HVDirection(ModelAPI_Feature* theConstraint,
-                                           ModelAPI_CompositeFeature* theSketcher,
-                                           const std::shared_ptr<GeomAPI_Ax3>& thePlane,
-                                           bool isHorisontal)
- : SketcherPrs_SymbolPrs(theConstraint, theSketcher, thePlane),
+  SketchPlugin_Sketch* theSketcher, bool isHorisontal)
+ : SketcherPrs_SymbolPrs(theConstraint, theSketcher),
  myIsHorisontal(isHorisontal)
 {
 }

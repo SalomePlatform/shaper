@@ -56,7 +56,7 @@ AISObjectPtr SketchPlugin_ConstraintPerpendicular::getAISObject(AISObjectPtr the
     return thePrevious;
 
   AISObjectPtr anAIS = SketcherPrs_Factory::perpendicularConstraint(this, sketch(),
-    sketch()->coordinatePlane(), thePrevious);
+    thePrevious);
   return anAIS;
 }
 
