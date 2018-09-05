@@ -899,7 +899,14 @@ QVariant PartSet_PartRootNode::data(int theColumn, int theRole) const
   case 1:
     switch (theRole) {
     case Qt::DisplayRole:
+    {
+      ResultPartPtr aPartRes = getPartResult(myObject);
+      if (aPartRes.get()) {
+        if (aPartRes->partDoc().get() == NULL)
+          return QString(myObject->data()->name().c_str()) + " (Not loaded)";
+      }
       return QString(myObject->data()->name().c_str());
+    }
     case Qt::DecorationRole:
       return ModuleBase_IconFactory::get()->getIcon(myObject);
     }
