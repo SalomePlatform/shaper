@@ -33,6 +33,7 @@
 #include <GeomAPI_Pnt2d.h>
 
 #include <SketchPlugin_Constraint.h>
+#include <SketchPlugin_ConstraintCoincidence.h>
 
 #include <Graphic3d_AspectMarker3d.hxx>
 #include <Graphic3d_ArrayOfPoints.hxx>
@@ -59,23 +60,52 @@ bool SketcherPrs_Coincident::IsReadyToDisplay(ModelAPI_Feature* theConstraint,
   return readyToDisplay(theConstraint, thePlane, aPoint);
 }
 
+std::shared_ptr<GeomAPI_Pnt2d> getCoincidencePoint(ModelAPI_Feature* theConstraint)
+{
+  std::shared_ptr<GeomAPI_Pnt2d> aPnt = SketcherPrs_Tools::getPoint(theConstraint,
+    SketchPlugin_Constraint::ENTITY_A());
+  if (aPnt.get() == NULL)
+    aPnt = SketcherPrs_Tools::getPoint(theConstraint, SketchPlugin_Constraint::ENTITY_B());
+
+  return aPnt;
+}
+
+
 bool SketcherPrs_Coincident::readyToDisplay(ModelAPI_Feature* theConstraint,
                                             const std::shared_ptr<GeomAPI_Ax3>& thePlane,
                                             gp_Pnt& thePoint)
 {
   bool aReadyToDisplay = false;
   // Get point of the presentation
-  std::shared_ptr<GeomAPI_Pnt2d> aPnt = SketcherPrs_Tools::getPoint(theConstraint,
-                                                              SketchPlugin_Constraint::ENTITY_A());
-  if (aPnt.get() == NULL)
-    aPnt = SketcherPrs_Tools::getPoint(theConstraint, SketchPlugin_Constraint::ENTITY_B());
-
+  std::shared_ptr<GeomAPI_Pnt2d> aPnt = getCoincidencePoint(theConstraint);
   aReadyToDisplay = aPnt.get() != NULL;
   if (aReadyToDisplay) {
     std::shared_ptr<GeomAPI_Pnt> aPoint = thePlane->to3D(aPnt->x(), aPnt->y());
     thePoint = aPoint->impl<gp_Pnt>();
   }
   return aReadyToDisplay;
+}
+
+
+bool hasEdge(ModelAPI_Feature* theConstraint)
+{
+  ObjectPtr aObjA =
+    SketcherPrs_Tools::getResult(theConstraint, SketchPlugin_Constraint::ENTITY_A());
+  ObjectPtr aObjB =
+    SketcherPrs_Tools::getResult(theConstraint, SketchPlugin_Constraint::ENTITY_B());
+  ResultPtr aResA = std::dynamic_pointer_cast<ModelAPI_Result>(aObjA);
+  ResultPtr aResB = std::dynamic_pointer_cast<ModelAPI_Result>(aObjB);
+  if (aResA.get()) {
+    GeomAPI_Shape::ShapeType aTypeA = aResA->shape()->shapeType();
+    if (aTypeA == GeomAPI_Shape::EDGE)
+      return true;
+  }
+  if (aResB.get()) {
+    GeomAPI_Shape::ShapeType aTypeB = aResB->shape()->shapeType();
+    if (aTypeB == GeomAPI_Shape::EDGE)
+      return true;
+  }
+  return false;
 }
 
 
@@ -89,13 +119,34 @@ void SketcherPrs_Coincident::Compute(
   if (aReadyToDisplay)
     myPoint = aPoint;
 
+  bool aIsEdge = hasEdge(myConstraint);
+  if (!aIsEdge) {
+    std::shared_ptr<GeomAPI_Pnt2d> aPnt = getCoincidencePoint(myConstraint);
+    std::shared_ptr<GeomAPI_Pnt2d> aP;
+    FeaturePtr aSub;
+    for (int i = 0; i < mySketch->numberOfSubs(); i++) {
+      aSub = mySketch->subFeature(i);
+      if (aSub->getKind() == SketchPlugin_ConstraintCoincidence::ID() &&
+        aSub.get() != myConstraint) {
+        aP = getCoincidencePoint(aSub.get());
+        if (aP->isEqual(aPnt)) {
+          aIsEdge = hasEdge(aSub.get());
+          if (aIsEdge)
+            break;
+        }
+      }
+    }
+  }
+  Quantity_Color aExternalColor = aIsEdge ? Quantity_NOC_BLACK : Quantity_NOC_YELLOW;
+  Quantity_Color aInternalColor = aIsEdge ? Quantity_NOC_YELLOW : Quantity_NOC_BLACK;
+
   // Create the presentation as a combination of standard point markers
   bool aCustomColor = myIsCustomColor;
   // The external yellow contour
   Handle(Graphic3d_AspectMarker3d) aPtA = new Graphic3d_AspectMarker3d();
   aPtA->SetType(Aspect_TOM_RING3);
   aPtA->SetScale(2.);
-  aPtA->SetColor(!aCustomColor ? Quantity_NOC_YELLOW : myCustomColor);
+  aPtA->SetColor(!aCustomColor ? aExternalColor : myCustomColor);
 
   Handle(Graphic3d_Group) aGroup = Prs3d_Root::CurrentGroup(thePresentation);
   aGroup->SetPrimitivesAspect(aPtA);
@@ -107,7 +158,7 @@ void SketcherPrs_Coincident::Compute(
   aPtA = new Graphic3d_AspectMarker3d();
   aPtA->SetType(Aspect_TOM_RING1);
   aPtA->SetScale(1.);
-  aPtA->SetColor(!aCustomColor ? Quantity_NOC_BLACK : myCustomColor);
+  aPtA->SetColor(!aCustomColor ? aInternalColor : myCustomColor);
   aGroup->SetPrimitivesAspect(aPtA);
   aGroup->AddPrimitiveArray (aPntArray);
 
@@ -115,7 +166,7 @@ void SketcherPrs_Coincident::Compute(
   aPtA = new Graphic3d_AspectMarker3d();
   aPtA->SetType(Aspect_TOM_POINT);
   aPtA->SetScale(5.);
-  aPtA->SetColor(!aCustomColor ? Quantity_NOC_BLACK : myCustomColor);
+  aPtA->SetColor(!aCustomColor ? aInternalColor : myCustomColor);
   aGroup->SetPrimitivesAspect(aPtA);
   aGroup->AddPrimitiveArray (aPntArray);
 

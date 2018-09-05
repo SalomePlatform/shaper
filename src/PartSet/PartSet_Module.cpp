@@ -47,6 +47,8 @@
 #include <PartSetPlugin_Part.h>
 #include <PartSetPlugin_Duplicate.h>
 
+#include <SketchPlugin_ConstraintCoincidence.h>
+
 #include <ModuleBase_Operation.h>
 #include <ModuleBase_OperationAction.h>
 #include <ModuleBase_IViewer.h>
@@ -1089,7 +1091,10 @@ void PartSet_Module::onObjectDisplayed(ObjectPtr theObject, AISObjectPtr theAIS)
       }
       if (aToUseZLayer) {
         Handle(AIS_InteractiveContext) aCtx = anAIS->GetContext();
-        aCtx->SetZLayer(anAIS, myVisualLayerId);
+        if (aFeature->getKind() == SketchPlugin_ConstraintCoincidence::ID())
+          aCtx->SetZLayer(anAIS, Graphic3d_ZLayerId_Top);
+        else
+          aCtx->SetZLayer(anAIS, myVisualLayerId);
       }
     }
   }
