@@ -23,6 +23,8 @@
 
   #include "GeomAPI.h"
   #include "GeomAPI_AISObject.h"
+  #include "GeomAPI_Angle.h"
+  #include "GeomAPI_Angle2d.h"
   #include "GeomAPI_Ax1.h"
   #include "GeomAPI_Ax2.h"
   #include "GeomAPI_Ax3.h"
@@ -37,6 +39,8 @@
   #include "GeomAPI_Dir.h"
   #include "GeomAPI_Dir2d.h"
   #include "GeomAPI_Edge.h"
+  #include "GeomAPI_Ellipse.h"
+  #include "GeomAPI_Ellipse2d.h"
   #include "GeomAPI_Face.h"
   #include "GeomAPI_ICustomPrs.h"
   #include "GeomAPI_Interface.h"
@@ -54,11 +58,11 @@
   #include "GeomAPI_Solid.h"
   #include "GeomAPI_Sphere.h"
   #include "GeomAPI_Torus.h"
+  #include "GeomAPI_Trsf.h"
   #include "GeomAPI_Vertex.h"
+  #include "GeomAPI_Wire.h"
   #include "GeomAPI_XY.h"
   #include "GeomAPI_XYZ.h"
-  #include "GeomAPI_Trsf.h"
-  #include "GeomAPI_Wire.h"
 
   #include <memory>
   #include <string>

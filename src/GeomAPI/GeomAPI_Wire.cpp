@@ -81,6 +81,8 @@ bool GeomAPI_Wire::isPolygon(std::list<GeomPointPtr>& thePoints) const
 //==================================================================================================
 bool GeomAPI_Wire::isRectangle(std::list<GeomPointPtr>& thePoints) const
 {
+  thePoints.clear();
+
   const TopoDS_Wire& aWire = TopoDS::Wire(impl<TopoDS_Shape>());
   const Handle(Standard_Type)& aLineType = STANDARD_TYPE(Geom_Line);
 

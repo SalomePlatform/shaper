@@ -92,7 +92,7 @@ ModuleBase_WidgetIntValue::ModuleBase_WidgetIntValue(QWidget* theParent,
   }
 
   myDefVal = QString::fromStdString(getDefaultValue()).toInt(&myHasDefault);
-  if (isOk)
+  if (myHasDefault)
     mySpinBox->setValue(myDefVal);
 
   QString aTTip = translate(theData->widgetTooltip());
@@ -199,7 +199,7 @@ bool ModuleBase_WidgetIntValue::restoreValueCustom()
     ModuleBase_Tools::setSpinText(mySpinBox, aText);
   } else {
     ModuleBase_Tools::setSpinValue(mySpinBox,
-      anAttribute->isInitialized() ? anAttribute->value() : 0);
+      anAttribute->isInitialized() ? anAttribute->value() : myDefVal);
     if (anAttribute->isInitialized() && anAttribute->expressionInvalid()) {
       anAttribute->setExpressionError("");
       anAttribute->setExpressionInvalid(false);

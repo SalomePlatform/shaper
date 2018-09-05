@@ -271,8 +271,8 @@ std::shared_ptr<GeomAPI_Cone> GeomAPI_Solid::getCone() const
         anApex->z() + aParam0 * anAxis->z()));
 
     // calculate radii of caps
-    aParam0 /= Cos(aSemiAngle);
-    aParam1 /= Cos(aSemiAngle);
+    aParam0 *= Tan(aSemiAngle);
+    aParam1 *= Tan(aSemiAngle);
 
     aCone = GeomConePtr(new GeomAPI_Cone(aLocation, anAxis, aSemiAngle, aParam0, aParam1));
   }

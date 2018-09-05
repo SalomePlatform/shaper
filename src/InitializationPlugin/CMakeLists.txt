@@ -19,7 +19,6 @@
 ##
 
 INCLUDE(Common)
-INCLUDE(FindPython)
 
 INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR}/src/Events
                     ${PROJECT_SOURCE_DIR}/src/Config
