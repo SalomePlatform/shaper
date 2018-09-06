@@ -441,17 +441,19 @@ QVariant PartSet_FolderNode::data(int theColumn, int theRole) const
     }
   }
   if ((theColumn == 2) && (theRole == Qt::DecorationRole)) {
-    FeaturePtr aFeature = document()->currentFeature(true);
-    if (!aFeature.get()) { // There is no current feature
-      ModuleBase_ITreeNode* aLastFolder = 0;
-      foreach(ModuleBase_ITreeNode* aNode, parent()->children()) {
-        if (aNode->type() == PartSet_FolderNode::typeId())
-          aLastFolder = aNode;
-        else
-          break;
+    if (document().get()) {
+      FeaturePtr aFeature = document()->currentFeature(true);
+      if (!aFeature.get()) { // There is no current feature
+        ModuleBase_ITreeNode* aLastFolder = 0;
+        foreach(ModuleBase_ITreeNode* aNode, parent()->children()) {
+          if (aNode->type() == PartSet_FolderNode::typeId())
+            aLastFolder = aNode;
+          else
+            break;
+        }
+        if (aLastFolder == this)
+          return QIcon(":pictures/arrow.png");
       }
-      if (aLastFolder == this)
-        return QIcon(":pictures/arrow.png");
     }
   }
   return PartSet_TreeNode::data(theColumn, theRole);
