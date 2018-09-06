@@ -864,7 +864,7 @@ void PartSet_PartRootNode::update()
 
   // Remove extra sub-nodes
   int aIndex = -1;
-  int aId = 0;
+  int aId = aRows;
   while (aId < myChildren.size()) {
     ModuleBase_ITreeNode* aNode = myChildren.at(aId);
     if (aNode->object().get()) {

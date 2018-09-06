@@ -151,7 +151,7 @@ void XGUI_DataModel::processEvent(const std::shared_ptr<Events_Message>& theMess
       ModuleBase_ITreeNode* aNode = myRoot->findParent(aDoc, aGroup.c_str());
       if (aNode) {
         aNode->update();
-        updateSubTree(aNode);
+        rebuildDataTree();
       }
     }
   }
