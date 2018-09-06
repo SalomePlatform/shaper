@@ -133,16 +133,23 @@ bool ModuleBase_WidgetChoice::restoreValueCustom()
         myChoiceCtrl->setChoiceList(aChoiceList);
       }
     }
-    if (aIntAttr->isInitialized())
+    if (aIntAttr->isInitialized()) {
       myChoiceCtrl->setValue(aIntAttr->value());
+
+      myChoiceCtrl->blockSignals(isBlocked);
+      emit itemSelected(this, aIntAttr->value());
+      myDefValue = aIntAttr->value();
+    }
     else {
       bool aHasDefaultValue;
       int aDefaultVal = QString::fromStdString(getDefaultValue()).toInt(&aHasDefaultValue);
-      myChoiceCtrl->setValue(aHasDefaultValue ? aDefaultVal : 0);
+      int aVal = aHasDefaultValue ? aDefaultVal : 0;
+      myChoiceCtrl->setValue(aVal);
+
+      myChoiceCtrl->blockSignals(isBlocked);
+      emit itemSelected(this, aVal);
+      myDefValue = aVal;
     }
-    myChoiceCtrl->blockSignals(isBlocked);
-    emit itemSelected(this, aIntAttr->value());
-    myDefValue = aIntAttr->value();
     myIsFirst = false;
   }
   return true;
