@@ -246,6 +246,32 @@ void Model_Update::processEvent(const std::shared_ptr<Events_Message>& theMessag
 #ifdef DEB_UPDATE
   std::cout<<"****** Event "<<theMessage->eventID().eventText()<<std::endl;
 #endif
+  // check the automatic update flag on any event
+  bool aNewAutomaticState = ModelAPI_Session::get()->isAutoUpdateBlocked();
+  if (myUpdateBlocked != aNewAutomaticState) {
+    myUpdateBlocked = aNewAutomaticState;
+    if (!myUpdateBlocked) { // process all modified features, even if preview is blocked
+      bool aPreviewBlockedState = myIsPreviewBlocked; // to update the selected arguments
+      myIsPreviewBlocked = false;
+      // iterate everything and add efatures in state "MustBeUpdated" into modified
+      std::list<std::shared_ptr<ModelAPI_Document> > allDocs =
+        ModelAPI_Session::get()->allOpenedDocuments();
+      std::list<std::shared_ptr<ModelAPI_Document> >::iterator aDoc = allDocs.begin();
+      for(; aDoc != allDocs.end(); aDoc++) {
+        std::list<std::shared_ptr<ModelAPI_Feature> > allFeats = (*aDoc)->allFeatures();
+        std::list<std::shared_ptr<ModelAPI_Feature> >::iterator aFeat = allFeats.begin();
+        for(; aFeat != allFeats.end(); aFeat++) {
+          if ((*aFeat)->data()->isValid() &&
+            (*aFeat)->data()->execState() == ModelAPI_StateMustBeUpdated) {
+            addModified(*aFeat, FeaturePtr());
+          }
+        }
+      }
+      processFeatures();
+      myIsPreviewBlocked = myIsPreviewBlocked;
+    }
+  }
+
   if (theMessage->eventID() == kStabilityEvent) {
     updateStability(theMessage->sender());
     return;
@@ -263,32 +289,6 @@ void Model_Update::processEvent(const std::shared_ptr<Events_Message>& theMessag
       myIsPreviewBlocked = true;
       myUpdateBlocked = anUpdateState;
     }
-    return;
-  }
-  if (theMessage->eventID() == kAutomaticOff) {
-    myUpdateBlocked = true;
-    return;
-  }
-  if (theMessage->eventID() == kAutomaticOn) {
-    myUpdateBlocked = false; // then process all modified features, even if preview is blocked
-    bool aPreviewBlockedState = myIsPreviewBlocked; // to update the selected arguments
-    myIsPreviewBlocked = false;
-    // iterate everything and add efatures in state "MustBeUpdated" into modified
-    std::list<std::shared_ptr<ModelAPI_Document> > allDocs =
-      ModelAPI_Session::get()->allOpenedDocuments();
-    std::list<std::shared_ptr<ModelAPI_Document> >::iterator aDoc = allDocs.begin();
-    for(; aDoc != allDocs.end(); aDoc++) {
-      std::list<std::shared_ptr<ModelAPI_Feature> > allFeats = (*aDoc)->allFeatures();
-      std::list<std::shared_ptr<ModelAPI_Feature> >::iterator aFeat = allFeats.begin();
-      for(; aFeat != allFeats.end(); aFeat++) {
-        if ((*aFeat)->data()->isValid() &&
-            (*aFeat)->data()->execState() == ModelAPI_StateMustBeUpdated) {
-          addModified(*aFeat, FeaturePtr());
-        }
-      }
-    }
-    processFeatures();
-    myIsPreviewBlocked = myIsPreviewBlocked;
     return;
   }
   if (theMessage->eventID() == kUpdatedSel) {
