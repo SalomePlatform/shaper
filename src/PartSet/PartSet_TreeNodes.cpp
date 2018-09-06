@@ -1018,6 +1018,11 @@ void PartSet_ObjectFolderNode::update()
         continue;
       }
     }
+    else {
+      myChildren.removeAll(aNode);
+      delete aNode;
+      continue;
+    }
     aId++;
   }
 
@@ -1095,6 +1100,12 @@ QTreeNodesList PartSet_ObjectFolderNode::objectsDeleted(const DocumentPtr& theDo
         aRemoved = true;
         continue;
       }
+    }
+    else {
+      myChildren.removeAll(aNode);
+      delete aNode;
+      aRemoved = true;
+      continue;
     }
     aId++;
   }
