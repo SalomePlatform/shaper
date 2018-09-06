@@ -424,7 +424,6 @@ Model_Session::Model_Session()
   myPluginsInfoLoaded = false;
   myCheckTransactions = true;
   myOperationAttachedToNext = false;
-  myIsAutoUpdateBlocked = false;
   ModelAPI_Session::setSession(std::shared_ptr<ModelAPI_Session>(this));
   // register the configuration reading listener
   Events_Loop* aLoop = Events_Loop::loop();
@@ -579,19 +578,41 @@ int Model_Session::transactionID()
   return ROOT_DOC->transactionID();
 }
 
+bool Model_Session::isAutoUpdateBlocked()
+{
+  Handle(Model_Application) anApp = Model_Application::getApplication();
+  if (!anApp->hasRoot()) // when document is not yet created, do not create it by such simple call
+    return false;
+  return !ROOT_DOC->autoRecomutationState();
+}
+
 void Model_Session::blockAutoUpdate(const bool theBlock)
 {
-  if (myIsAutoUpdateBlocked != theBlock) {
-    myIsAutoUpdateBlocked = theBlock;
+  bool aCurrentState = isAutoUpdateBlocked();
+  if (aCurrentState != theBlock) {
+    // if there is no operation, start it to avoid modifications outside of transaction
+    bool isOperation = this->isOperation();
+    if (!isOperation)
+      startOperation("Auto update");
+    ROOT_DOC->setAutoRecomutationState(!theBlock);
     static Events_Loop* aLoop = Events_Loop::loop();
     if (theBlock) {
       static const Events_ID kAutoOff = aLoop->eventByName(EVENT_AUTOMATIC_RECOMPUTATION_DISABLE);
       std::shared_ptr<Events_Message> aMsg(new Events_Message(kAutoOff));
       aLoop->send(aMsg);
     } else {
+      // if there is no operation, start it to avoid modifications outside of transaction
+      bool isOperation = this->isOperation();
+      if (!isOperation)
+        startOperation("Auto update enabling");
       static const Events_ID kAutoOn = aLoop->eventByName(EVENT_AUTOMATIC_RECOMPUTATION_ENABLE);
       std::shared_ptr<Events_Message> aMsg(new Events_Message(kAutoOn));
       aLoop->send(aMsg);
+    }
+    if (!isOperation) {
+      finishOperation();
+      // append this transaction to the previous one: ne don't need this separated operation in list
+      ROOT_DOC->appendTransactionToPrevious();
     }
   }
 }

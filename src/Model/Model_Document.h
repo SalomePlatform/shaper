@@ -379,6 +379,14 @@ class Model_Document : public ModelAPI_Document
   /// returns true if theThis is later in the features trre and dependencies than theOther
   bool isLaterByDep(FeaturePtr theThis, FeaturePtr theOther);
 
+  /// appends the latest transaction to the previous one (used for AutoUpdate enabling transaction)
+  void appendTransactionToPrevious();
+
+  /// Sets the automatic recomutation flag: true means enabled
+  void setAutoRecomutationState(const bool theState);
+  /// Returns the current automatic recomutation flag: true means enabled
+  bool autoRecomutationState() const;
+
   friend class Model_Application;
   friend class Model_Session;
   friend class Model_Update;

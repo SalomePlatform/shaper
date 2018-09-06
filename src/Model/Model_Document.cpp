@@ -52,6 +52,7 @@
 #include <TDF_ListIteratorOfLabelList.hxx>
 #include <TDF_LabelMap.hxx>
 #include <TDF_DeltaOnAddition.hxx>
+#include <TDataStd_UAttribute.hxx>
 #include <TNaming_Builder.hxx>
 #include <TNaming_SameShapeIterator.hxx>
 #include <TNaming_Iterator.hxx>
@@ -84,7 +85,8 @@ static const int TAG_GENERAL = 1;  // general properties tag
 // general sub-labels
 /// where the reference to the current feature label is located (or no attribute if null feature)
 static const int TAG_CURRENT_FEATURE = 1; ///< reference to the current feature
-static const int TAG_CURRENT_TRANSACTION = 2; ///< integer, index of the transaction
+/// integer, index of the transaction + GUID for auto recomutation blocking
+static const int TAG_CURRENT_TRANSACTION = 2;
 static const int TAG_SELECTION_FEATURE = 3; ///< integer, tag of the selection feature label
 static const int TAG_NODES_STATE = 4; ///< array, tag of the Object Browser nodes states
 ///< naming structures constructions selected from other document
@@ -1902,4 +1904,35 @@ void Model_Document::setExecuteFeatures(const bool theFlag)
       continue;
     subDoc(*aSubIter)->setExecuteFeatures(theFlag);
   }
+}
+
+void Model_Document::appendTransactionToPrevious()
+{
+  Transaction anAppended =  myTransactions.back();
+  myTransactions.pop_back();
+  if (!myTransactions.empty()) { // if it is empty, just forget the appended
+    myTransactions.back().myOCAFNum += anAppended.myOCAFNum;
+  }
+  // propagate the same action to sub-documents
+  const std::set<int> aSubs = subDocuments();
+  for (std::set<int>::iterator aSubIter = aSubs.begin(); aSubIter != aSubs.end(); aSubIter++) {
+    subDoc(*aSubIter)->appendTransactionToPrevious();
+  }
+}
+
+/// GUID for keeping information about the auto-recomputation state
+static const Standard_GUID kAutoRecomputationID("8493fb74-0674-4912-a100-1cf46c7cfab3");
+
+void Model_Document::setAutoRecomutationState(const bool theState)
+{
+  if (theState)
+    generalLabel().FindChild(TAG_CURRENT_TRANSACTION).ForgetAttribute(kAutoRecomputationID);
+  else
+    TDataStd_UAttribute::Set(
+      generalLabel().FindChild(TAG_CURRENT_TRANSACTION), kAutoRecomputationID);
+}
+
+bool Model_Document::autoRecomutationState() const
+{
+  return !generalLabel().FindChild(TAG_CURRENT_TRANSACTION).IsAttribute(kAutoRecomputationID);
 }

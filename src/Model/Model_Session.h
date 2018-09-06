@@ -50,7 +50,6 @@ class Model_Session : public ModelAPI_Session, public Events_Listener
   /// if true, generates error if document is updated outside of transaction
   bool myCheckTransactions;
   bool myOperationAttachedToNext; ///< the current operation must be committed twice, with nested
-  bool myIsAutoUpdateBlocked; ///< the current state of the auto-update flag in the application
  public:
 
   //! Loads the OCAF document from the file.
@@ -147,9 +146,7 @@ class Model_Session : public ModelAPI_Session, public Events_Listener
 
 
   /// Returns true if auto-update in the application is blocked
-  MODEL_EXPORT virtual bool isAutoUpdateBlocked() const {
-    return myIsAutoUpdateBlocked;
-  }
+  MODEL_EXPORT virtual bool isAutoUpdateBlocked();
 
   /// Set state of the auto-update of features result in the application
   MODEL_EXPORT virtual void blockAutoUpdate(const bool theBlock);

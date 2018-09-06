@@ -130,7 +130,7 @@ class MODELAPI_EXPORT ModelAPI_Session
   virtual int transactionID() = 0;
 
   /// Returns true if auto-update in the application is blocked
-  virtual bool isAutoUpdateBlocked() const = 0;
+  virtual bool isAutoUpdateBlocked() = 0;
 
   /// Set state of the auto-update of features result in the application
   virtual void blockAutoUpdate(const bool theBlock) = 0;
