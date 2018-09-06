@@ -1052,6 +1052,10 @@ bool XGUI_Workshop::onSave()
   if (myCurrentDir.isEmpty()) {
     return onSaveAs();
   }
+  SessionPtr aMgr = ModelAPI_Session::get();
+  if (aMgr->isAutoUpdateBlocked())
+    aMgr->blockAutoUpdate(false);
+
   std::list<std::string> aFiles;
   saveDocument(myCurrentDir, aFiles);
   updateCommandStatus();
@@ -1323,6 +1327,9 @@ void XGUI_Workshop::updateCommandStatus()
           aCmd->setEnabled(isActionEnabled);
         else
           aCmd->setEnabled(myModule->canRedo());
+      }
+      else if (aId == "AUTOCOMPUTE_CMD") {
+        aCmd->setChecked(aMgr->isAutoUpdateBlocked());
       }
       else
         // Enable all commands
