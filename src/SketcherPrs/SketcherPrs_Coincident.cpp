@@ -156,7 +156,7 @@ void SketcherPrs_Coincident::Compute(
 
   // Make a black mid ring
   aPtA = new Graphic3d_AspectMarker3d();
-  aPtA->SetType(Aspect_TOM_RING1);
+  aPtA->SetType(aIsEdge ? Aspect_TOM_STAR : Aspect_TOM_RING1);
   aPtA->SetScale(1.);
   aPtA->SetColor(!aCustomColor ? aInternalColor : myCustomColor);
   aGroup->SetPrimitivesAspect(aPtA);
