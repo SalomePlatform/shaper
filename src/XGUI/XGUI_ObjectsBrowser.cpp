@@ -211,7 +211,7 @@ void XGUI_DataTree::processHistoryChange(const QModelIndex& theIndex)
     if ((theIndex.internalId() == 0) && (aDoc != aMgr->moduleDocument()))
       // Clicked folder under root but active document is another
       return;
-    if ((theIndex.internalId() != 0) && (aDoc.get() != theIndex.internalPointer()))
+    if ((theIndex.internalId() != 0) && (aDoc != aModel->document(theIndex)))
       // Cliced not on active document folder
       return;
 

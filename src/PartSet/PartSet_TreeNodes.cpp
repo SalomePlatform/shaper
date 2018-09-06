@@ -440,6 +440,20 @@ QVariant PartSet_FolderNode::data(int theColumn, int theRole) const
       }
     }
   }
+  if ((theColumn == 2) && (theRole == Qt::DecorationRole)) {
+    FeaturePtr aFeature = document()->currentFeature(true);
+    if (!aFeature.get()) { // There is no current feature
+      ModuleBase_ITreeNode* aLastFolder = 0;
+      foreach(ModuleBase_ITreeNode* aNode, parent()->children()) {
+        if (aNode->type() == PartSet_FolderNode::typeId())
+          aLastFolder = aNode;
+        else
+          break;
+      }
+      if (aLastFolder == this)
+        return QIcon(":pictures/arrow.png");
+    }
+  }
   return PartSet_TreeNode::data(theColumn, theRole);
 }
 
@@ -910,10 +924,6 @@ QVariant PartSet_PartRootNode::data(int theColumn, int theRole) const
     case Qt::DecorationRole:
       return ModuleBase_IconFactory::get()->getIcon(myObject);
     }
-  case 2:
-    if (theRole == Qt::DecorationRole)
-      if (isCurrentFeature(myObject))
-        return QIcon(":pictures/arrow.png");
   }
   return PartSet_TreeNode::data(theColumn, theRole);
 }
@@ -1007,37 +1017,42 @@ void PartSet_ObjectFolderNode::update()
   }
 
   DocumentPtr aDoc = myObject->document();
-  // Delete obsolete nodes
-  int aId = 0;
-  while (aId < myChildren.size()) {
-    ModuleBase_ITreeNode* aNode = myChildren.at(aId);
-    if ((aFirst + aId) < aDoc->size(ModelAPI_Feature::group(), true)) {
-      if (aNode->object() != aDoc->object(ModelAPI_Feature::group(), aFirst + aId)) {
+  if (aNbItems < myChildren.size()) {
+    // Delete obsolete nodes
+    int aId = 0;
+    int aNbOfFeatures = aDoc->size(ModelAPI_Feature::group(), true);
+    while (aId < myChildren.size()) {
+      ModuleBase_ITreeNode* aNode = myChildren.at(aId);
+      if ((aFirst + aId) < aNbOfFeatures) {
+        if (aNode->object() != aDoc->object(ModelAPI_Feature::group(), aFirst + aId)) {
+          myChildren.removeAll(aNode);
+          delete aNode;
+          continue;
+        }
+      }
+      else {
         myChildren.removeAll(aNode);
         delete aNode;
         continue;
       }
+      aId++;
     }
-    else {
-      myChildren.removeAll(aNode);
-      delete aNode;
-      continue;
-    }
-    aId++;
   }
-
-  // Add new nodes
-  ModuleBase_ITreeNode* aNode;
-  for (int i = 0; i < aNbItems; i++) {
-    ObjectPtr aObj = aDoc->object(ModelAPI_Feature::group(), aFirst + i);
-    if (i < myChildren.size()) {
-      if (aObj != myChildren.at(i)->object()) {
-        aNode = new PartSet_ObjectNode(aObj, this);
-        myChildren.insert(i, aNode);
+  if (aNbItems > myChildren.size()) {
+    // Add new nodes
+    ModuleBase_ITreeNode* aNode;
+    for (int i = 0; i < aNbItems; i++) {
+      ObjectPtr aObj = aDoc->object(ModelAPI_Feature::group(), aFirst + i);
+      if (i < myChildren.size()) {
+        if (aObj != myChildren.at(i)->object()) {
+          aNode = new PartSet_ObjectNode(aObj, this);
+          myChildren.insert(i, aNode);
+        }
       }
-    } else {
-      aNode = new PartSet_ObjectNode(aObj, this);
-      myChildren.append(aNode);
+      else {
+        aNode = new PartSet_ObjectNode(aObj, this);
+        myChildren.append(aNode);
+      }
     }
   }
 }
@@ -1087,13 +1102,17 @@ QTreeNodesList PartSet_ObjectFolderNode::objectsDeleted(const DocumentPtr& theDo
   if (!aNbItems) {
     return aResult;
   }
+  if (aNbItems >= myChildren.size()) // Nothing was deleted here
+    return aResult;
+
   DocumentPtr aDoc = myObject->document();
   // Delete obsolete nodes
   bool aRemoved = false;
   int aId = 0;
+  int aNbOfFeatures = aDoc->size(ModelAPI_Feature::group(), true);
   while (aId < myChildren.size()) {
     ModuleBase_ITreeNode* aNode = myChildren.at(aId);
-    if ((aFirst + aId) < aDoc->size(ModelAPI_Feature::group(), true)) {
+    if ((aFirst + aId) < aNbOfFeatures) {
       if (aNode->object() != aDoc->object(ModelAPI_Feature::group(), aFirst + aId)) {
         myChildren.removeAll(aNode);
         delete aNode;

@@ -392,3 +392,11 @@ void XGUI_DataModel::updateSubTree(ModuleBase_ITreeNode* theParent)
     dataChanged(aFirstIdx, aLastIdx);
   }
 }
+
+
+//******************************************************
+DocumentPtr XGUI_DataModel::document(const QModelIndex& theIndex) const
+{
+  ModuleBase_ITreeNode* aNode = (ModuleBase_ITreeNode*)theIndex.internalPointer();
+  return aNode->document();
+}

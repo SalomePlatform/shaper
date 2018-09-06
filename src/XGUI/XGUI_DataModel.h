@@ -156,6 +156,8 @@ public:
   /// \param theIndex an index to check
   bool hasIndex(const QModelIndex& theIndex) const;
 
+  DocumentPtr document(const QModelIndex& theIndex) const;
+
 signals:
   /// Signal about tree had been rebuilt
   void treeRebuilt();
