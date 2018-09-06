@@ -208,4 +208,5 @@ ADD_UNIT_TESTS(TestConstants.py
                TestFeatureSelection_1.py
                TestFeatureSelection_2.py
                Test2607.py
+               TestBlockRecalculation.py
 )
