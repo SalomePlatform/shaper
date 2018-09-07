@@ -21,6 +21,9 @@
 #include <PlaneGCSSolver_Solver.h>
 #include <Events_LongOp.h>
 
+// Multiplier to correlate IDs of SketchPlugin constraint and primitive PlaneGCS constraints
+static const int THE_CONSTRAINT_MULT = 10;
+
 
 PlaneGCSSolver_Solver::PlaneGCSSolver_Solver()
   : myEquationSystem(new GCS::System),
@@ -48,26 +51,46 @@ void PlaneGCSSolver_Solver::clear()
   removeFictiveConstraint();
 }
 
-void PlaneGCSSolver_Solver::addConstraint(GCSConstraintPtr theConstraint)
+void PlaneGCSSolver_Solver::addConstraint(const ConstraintID& theMultiConstraintID,
+                                          const std::list<GCSConstraintPtr>& theConstraints)
 {
-  myEquationSystem->addConstraint(theConstraint.get());
-  myConstraints[theConstraint->getTag()].insert(theConstraint);
-  if (theConstraint->getTag() >= 0)
+  int anID = theMultiConstraintID > CID_UNKNOWN ?
+             theMultiConstraintID * THE_CONSTRAINT_MULT :
+             theMultiConstraintID;
+
+  for (std::list<GCSConstraintPtr>::const_iterator anIt = theConstraints.begin();
+       anIt != theConstraints.end(); ++anIt) {
+    GCSConstraintPtr aConstraint = *anIt;
+    aConstraint->setTag(anID);
+    myEquationSystem->addConstraint(aConstraint.get());
+    myConstraints[theMultiConstraintID].insert(aConstraint);
+
+    if (anID > CID_UNKNOWN)
+      ++anID;
+  }
+
+  if (theMultiConstraintID >= CID_UNKNOWN)
     myDOF = -1;
   myInitilized = false;
 }
 
-void PlaneGCSSolver_Solver::removeConstraint(ConstraintID theID)
+void PlaneGCSSolver_Solver::removeConstraint(const ConstraintID& theID)
 {
-  myConstraints.erase(theID);
+  ConstraintMap::iterator aFound = myConstraints.find(theID);
+  if (aFound != myConstraints.end()) {
+    for (std::set<GCSConstraintPtr>::iterator anIt = aFound->second.begin();
+         anIt != aFound->second.end(); ++anIt)
+      myEquationSystem->clearByTag((*anIt)->getTag());
+
+    myConstraints.erase(aFound);
+  }
+
   if (myConstraints.empty()) {
     myEquationSystem->clear();
     myDOF = (int)myParameters.size();
-  } else {
-    myEquationSystem->clearByTag(theID);
-    if (theID >= 0)
-      myDOF = -1;
-  }
+  } else if (theID >= CID_UNKNOWN)
+    myDOF = -1;
+
   myInitilized = false;
 }
 
@@ -206,10 +229,14 @@ void PlaneGCSSolver_Solver::collectConflicting()
 {
   GCS::VEC_I aConflict;
   myEquationSystem->getConflicting(aConflict);
-  myConflictingIDs.insert(aConflict.begin(), aConflict.end());
+  // convert PlaneGCS constraint IDs to SketchPlugin's ID
+  for (GCS::VEC_I::const_iterator anIt = aConflict.begin(); anIt != aConflict.end(); ++anIt)
+    myConflictingIDs.insert((*anIt) / THE_CONSTRAINT_MULT);
 
   myEquationSystem->getRedundant(aConflict);
-  myConflictingIDs.insert(aConflict.begin(), aConflict.end());
+  // convert PlaneGCS constraint IDs to SketchPlugin's ID
+  for (GCS::VEC_I::const_iterator anIt = aConflict.begin(); anIt != aConflict.end(); ++anIt)
+    myConflictingIDs.insert((*anIt) / THE_CONSTRAINT_MULT);
 
   myConfCollected = true;
 }

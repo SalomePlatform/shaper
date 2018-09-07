@@ -46,10 +46,14 @@ public:
   void clear();
 
   /// \brief Add constraint to the system of equations
-  void addConstraint(GCSConstraintPtr theConstraint);
+  /// \param[in] theMultiConstraintID  ID of the multi constraint which may consists of
+  ///                                  several primitive constraints
+  /// \param[in] theConstraints        list of primitive constraints
+  void addConstraint(const ConstraintID& theMultiConstraintID,
+                     const std::list<GCSConstraintPtr>& theConstraints);
 
-  /// \brief Remove constraint from the system of equations
-  void removeConstraint(ConstraintID theID);
+  /// \brief Remove constraints from the system of equations
+  void removeConstraint(const ConstraintID& theID);
 
   /// \brief Initialize memory for new solver's parameter
   double* createParameter();

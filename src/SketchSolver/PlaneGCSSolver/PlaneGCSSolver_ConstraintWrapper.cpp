@@ -41,9 +41,6 @@ PlaneGCSSolver_ConstraintWrapper::PlaneGCSSolver_ConstraintWrapper(
 void PlaneGCSSolver_ConstraintWrapper::setId(const ConstraintID& theID)
 {
   myID = theID;
-  std::list<GCSConstraintPtr>::iterator anIt = myGCSConstraints.begin();
-  for (; anIt != myGCSConstraints.end(); ++anIt)
-    (*anIt)->setTag((int)theID);
 }
 
 void PlaneGCSSolver_ConstraintWrapper::setValueParameter(const ScalarWrapperPtr& theValue)

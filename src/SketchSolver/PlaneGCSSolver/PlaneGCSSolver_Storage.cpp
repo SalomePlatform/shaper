@@ -44,9 +44,7 @@ static void constraintsToSolver(const ConstraintWrapperPtr& theConstraint,
 {
   const std::list<GCSConstraintPtr>& aConstraints =
       std::dynamic_pointer_cast<PlaneGCSSolver_ConstraintWrapper>(theConstraint)->constraints();
-  std::list<GCSConstraintPtr>::const_iterator anIt = aConstraints.begin();
-  for (; anIt != aConstraints.end(); ++anIt)
-    theSolver->addConstraint(*anIt);
+  theSolver->addConstraint(theConstraint->id(), aConstraints);
 }
 
 
