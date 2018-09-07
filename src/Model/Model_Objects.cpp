@@ -378,6 +378,9 @@ void Model_Objects::moveFeature(FeaturePtr theMoved, FeaturePtr theAfterThis)
   if (theAfterThis.get())
     anAfterLab = std::dynamic_pointer_cast<Model_Data>(theAfterThis->data())->label().Father();
 
+  // check whether some folder refers to the moved feature by start or end: if yes, remove from it
+  removeFromFolder(std::list<FeaturePtr>(1, theMoved));
+
   Handle(TDataStd_HLabelArray1) aNewArray =
     new TDataStd_HLabelArray1(aRefs->Lower(), aRefs->Upper());
   int aPassedMovedFrom = 0; // the prev feature location is found and passed
