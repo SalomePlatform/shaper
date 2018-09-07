@@ -178,23 +178,25 @@ protected:
   }
 
   void sortChildren() {
-    int i = 0;
-    ModuleBase_ITreeNode* aNode = 0;
-    ObjectPtr aObject;
-    int aIdx;
-    while (i < myChildren.size()) {
-      aNode = myChildren.at(i);
-      aObject = aNode->object();
-      if (aObject.get()) {
-        aIdx = aObject->document()->index(aObject, true);
-        if (aIdx != i) {
-          myChildren.removeAll(aNode);
-          myChildren.insert(aIdx, aNode);
-          i = 0;
-          continue;
+    if (myChildren.size() > 1) {
+      int i = 0;
+      ModuleBase_ITreeNode* aNode = 0;
+      ObjectPtr aObject;
+      int aIdx;
+      while (i < myChildren.size()) {
+        aNode = myChildren.at(i);
+        aObject = aNode->object();
+        if (aObject.get()) {
+          aIdx = aObject->document()->index(aObject, true);
+          if (aIdx != i) {
+            myChildren.removeAll(aNode);
+            myChildren.insert(aIdx, aNode);
+            i = 0;
+            continue;
+          }
         }
+        i++;
       }
-      i++;
     }
   }
 
