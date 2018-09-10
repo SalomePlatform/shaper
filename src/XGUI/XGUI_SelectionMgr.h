@@ -104,6 +104,8 @@ private:
   void convertToObjectBrowserSelection(
        const QList<std::shared_ptr<ModuleBase_ViewerPrs> >& theValues, QObjectPtrList& theObjects);
 
+  QList<TopoDS_Shape> findAllShapes(const ResultPtr& theResult) const;
+
 private:
    /// Reference to workshop
   XGUI_Workshop* myWorkshop;

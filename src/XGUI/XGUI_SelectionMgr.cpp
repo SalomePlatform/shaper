@@ -27,6 +27,7 @@
 #include "XGUI_Displayer.h"
 #include "XGUI_Selection.h"
 #include "XGUI_OperationMgr.h"
+#include "XGUI_SelectionActivate.h"
 
 #ifndef HAVE_SALOME
 #include <AppElements_MainWindow.h>
@@ -41,14 +42,22 @@
 #include <ModelAPI_ResultBody.h>
 #include <ModelAPI_Tools.h>
 
+#include <GeomAPI_Shape.h>
+
 #include <ModuleBase_ViewerPrs.h>
 #include <ModuleBase_Tools.h>
 
 #include <SelectMgr_ListIteratorOfListOfFilter.hxx>
+#include <TopExp_Explorer.hxx>
+#include <TopoDS_Shape.hxx>
+#include <TopTools_MapOfShape.hxx>
 
 #ifdef TINSPECTOR
 #include <inspector/VInspectorAPI_CallBack.hxx>
 #endif
+
+#define OPTIMIZATION_LEVEL 50
+
 
 XGUI_SelectionMgr::XGUI_SelectionMgr(XGUI_Workshop* theParent)
     : QObject(theParent),
@@ -209,6 +218,7 @@ void XGUI_SelectionMgr::setSelected(const QList<ModuleBase_ViewerPrsPtr>& theVal
   myWorkshop->objectBrowser()->setObjectsSelected(anObjects);
   myWorkshop->objectBrowser()->blockSignals(aBlocked);
 }
+
 //**************************************************************
 void XGUI_SelectionMgr::convertToObjectBrowserSelection(
                                    const QList<ModuleBase_ViewerPrsPtr>& theValues,
@@ -222,6 +232,11 @@ void XGUI_SelectionMgr::convertToObjectBrowserSelection(
   SessionPtr aMgr = ModelAPI_Session::get();
   DocumentPtr anActiveDocument = aMgr->activeDocument();
 
+  TopTools_MapOfShape aShapeMap;
+  bool aToOptimize = (theValues.size() > OPTIMIZATION_LEVEL);
+
+  GeomShapePtr aShape;
+  TopoDS_Shape aTShape;
   foreach(ModuleBase_ViewerPrsPtr aPrs, theValues) {
     if (aPrs->object().get()) {
       if (!theObjects.contains(aPrs->object()))
@@ -229,7 +244,23 @@ void XGUI_SelectionMgr::convertToObjectBrowserSelection(
       if (aPrs->shape().get() && (!aHasOperation)) {
         aResult = std::dynamic_pointer_cast<ModelAPI_Result>(aPrs->object());
         if (aResult.get()) {
-          aFeature = anActiveDocument->producedByFeature(aResult, aPrs->shape());
+          aShape = aPrs->shape();
+          aTShape = aShape->impl<TopoDS_Shape>();
+          if (aToOptimize) {
+            if (!aShapeMap.Contains(aTShape)) {
+              aFeature = anActiveDocument->producedByFeature(aResult, aShape);
+              if (aFeature.get()) {
+                QList<TopoDS_Shape> aResList = findAllShapes(aResult);
+                foreach(TopoDS_Shape aShape, aResList) {
+                  if (!aShapeMap.Contains(aShape))
+                    aShapeMap.Add(aShape);
+                }
+              }
+            }
+          }
+          else {
+            aFeature = anActiveDocument->producedByFeature(aResult, aShape);
+          }
           if (aFeature.get() && (!theObjects.contains(aFeature)))
             theObjects.append(aFeature);
         }
@@ -256,4 +287,21 @@ std::list<FeaturePtr> XGUI_SelectionMgr::getSelectedFeatures()
     }
   }
   return aFeatures;
+}
+
+QList<TopoDS_Shape> XGUI_SelectionMgr::findAllShapes(const ResultPtr& theResult) const
+{
+  QIntList aModes = myWorkshop->selectionActivate()->activeSelectionModes();
+  GeomShapePtr aResShape = theResult->shape();
+  TopoDS_Shape aShape = aResShape->impl<TopoDS_Shape>();
+  QList<TopoDS_Shape> aResult;
+  foreach(int aShapeType, aModes) {
+    if (aShapeType < TopAbs_SHAPE) {
+      TopExp_Explorer aExp(aShape, (TopAbs_ShapeEnum)aShapeType);
+      for (; aExp.More(); aExp.Next()) {
+        aResult.append(aExp.Current());
+      }
+    }
+  }
+  return aResult;
 }
