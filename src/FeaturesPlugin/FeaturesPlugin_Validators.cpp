@@ -1592,7 +1592,7 @@ bool FeaturesPlugin_ValidatorBooleanCommonSelection::isValid(
       return false;
     }
     ResultPtr aContext = anAttrSelection->context();
-    if (!aContext.get()) {
+    if (!aContext.get() && !anAttrSelection->contextFeature().get()) {
       theError = "Error: Empty selection context.";
       return false;
     }
@@ -1605,15 +1605,16 @@ bool FeaturesPlugin_ValidatorBooleanCommonSelection::isValid(
       }
     }
     std::shared_ptr<GeomAPI_Shape> aShape = anAttrSelection->value();
-    GeomShapePtr aContextShape = aContext->shape();
-    if (!aShape.get()) {
+    GeomShapePtr aContextShape;
+    if (!aShape.get() && aContext.get()) {
+      aContextShape = aContext->shape();
       aShape = aContextShape;
     }
     if (!aShape.get()) {
       theError = "Error: Empty shape.";
       return false;
     }
-    if (!aShape->isEqual(aContextShape)) {
+    if (aContextShape.get() && !aShape->isEqual(aContextShape)) {
       theError = "Error: Local selection not allowed.";
       return false;
     }
