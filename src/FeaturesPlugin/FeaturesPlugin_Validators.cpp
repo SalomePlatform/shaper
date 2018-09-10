@@ -163,7 +163,7 @@ bool FeaturesPlugin_ValidatorBaseForGeneration::isValid(const AttributePtr& theA
     for(int anIndex = 0; anIndex < aListAttr->size(); ++anIndex) {
       AttributeSelectionPtr aSelectionAttr = aListAttr->value(anIndex);
       ResultPtr aContext = aSelectionAttr->context();
-      if(!aContext.get()) {
+      if(!aContext.get() && !aSelectionAttr->contextFeature().get()) {
         theError = "Error: Empty context.";
         return false;
       }
@@ -175,7 +175,12 @@ bool FeaturesPlugin_ValidatorBaseForGeneration::isValid(const AttributePtr& theA
         // If shape is compound check that it contains only faces and edges.
         GeomShapePtr aShape = aSelectionAttr->value();
         if(!aShape.get()) {
-          aShape = aContext->shape();
+          if (aContext.get()) {
+            aShape = aContext->shape();
+          } else {
+            theError = "Error: Empty context.";
+            return false;
+          }
         }
 
         if(aShape->shapeType() == GeomAPI_Shape::COMPOUND) {
@@ -243,8 +248,13 @@ bool FeaturesPlugin_ValidatorBaseForGenerationSketchOrSketchObjects::isValid(
     AttributeSelectionPtr aSelectionAttr = aListAttr->value(anIndex);
     ResultPtr aContext = aSelectionAttr->context();
     if(!aContext.get()) {
-      theError = "Error: Empty context.";
-      return false;
+      FeaturePtr aFeature = aSelectionAttr->contextFeature();
+      if (!aFeature.get() || aFeature->results().empty()) {
+        theError = "Error: Empty context.";
+        return false;
+      } else {
+        aContext = aFeature->firstResult();
+      }
     }
 
     ResultConstructionPtr aResultConstruction =
@@ -305,14 +315,15 @@ bool FeaturesPlugin_ValidatorBaseForGeneration::isValidAttribute(const Attribute
     AttributeSelectionPtr anAttr =
       std::dynamic_pointer_cast<ModelAPI_AttributeSelection>(theAttribute);
     ResultPtr aContext = anAttr->context();
-    if(!aContext.get()) {
+    if(!aContext.get() && !anAttr->contextFeature().get()) {
       theError = "Error: Attribute have empty context.";
       return false;
     }
 
     GeomShapePtr aShape = anAttr->value();
-    GeomShapePtr aContextShape = aContext->shape();
-    if(!aShape.get()) {
+    GeomShapePtr aContextShape;
+    if(!aShape.get() && aContext.get()) {
+      aContextShape = aContext->shape();
       aShape = aContextShape;
     }
     if(!aShape.get()) {
@@ -320,8 +331,12 @@ bool FeaturesPlugin_ValidatorBaseForGeneration::isValidAttribute(const Attribute
       return false;
     }
 
-    ResultConstructionPtr aConstruction =
-      std::dynamic_pointer_cast<ModelAPI_ResultConstruction>(aContext);
+    ResultConstructionPtr aConstruction;
+    if (!aContext.get() && anAttr->contextFeature()->results().size() == 1) {
+      aContext = anAttr->contextFeature()->firstResult();
+    }
+    if (aContext.get())
+      aConstruction = std::dynamic_pointer_cast<ModelAPI_ResultConstruction>(aContext);
     if(aConstruction.get()) {
       // Construciotn selected. Check that is is not infinite.
       if(aConstruction->isInfinite()) {
@@ -329,6 +344,7 @@ bool FeaturesPlugin_ValidatorBaseForGeneration::isValidAttribute(const Attribute
         return false;
       }
 
+      GeomShapePtr aContextShape = aContext->shape();
       if(aShape->isEqual(aContextShape)) {
         // Whole construction selected. Check that it have faces.
         if(aConstruction->facesNum() > 0) {
@@ -345,7 +361,7 @@ bool FeaturesPlugin_ValidatorBaseForGeneration::isValidAttribute(const Attribute
       return false;
     }
 
-    if(!aShape->isEqual(aContextShape)) {
+    if(aContextShape.get() && !aShape->isEqual(aContextShape)) {
       // Local selection on body does not allowed.
       theError =
         "Error: Selected shape is in the local selection. Only global selection is allowed.";
@@ -448,6 +464,13 @@ bool FeaturesPlugin_ValidatorExtrusionDir::isValid(
     aDirShape = aSelAttr->value();
     if(!aDirShape.get()) {
       ResultPtr aContext = aSelAttr->context();
+      if(!aContext.get()) {
+        FeaturePtr aFeature = aSelAttr->contextFeature();
+        if (aFeature.get() && !aFeature->results().empty()) {
+          aContext = aFeature->firstResult();
+        }
+      }
+
       if(aContext.get()) {
         aDirShape = aContext->shape();
       }
@@ -538,13 +561,13 @@ bool FeaturesPlugin_ValidatorExtrusionDir::isShapesCanBeEmpty(const AttributePtr
     AttributeSelectionPtr anAttr =
       std::dynamic_pointer_cast<ModelAPI_AttributeSelection>(theAttribute);
     ResultPtr aContext = anAttr->context();
-    if(!aContext.get()) {
+    if(!aContext.get() && !anAttr->contextFeature().get()) {
       return false;
     }
 
     GeomShapePtr aShape = anAttr->value();
-    GeomShapePtr aContextShape = aContext->shape();
-    if(!aShape.get()) {
+    if(!aShape.get() && aContext.get()) {
+      GeomShapePtr aContextShape = aContext->shape();
       aShape = aContextShape;
     }
     if(!aShape.get()) {
@@ -1645,6 +1668,7 @@ bool FeaturesPlugin_ValidatorBooleanCommonArguments::isValid(
     theError = "Not enough arguments for Fuse operation.";
     return false;
   }
+  return true;
 }
 
 //=================================================================================================
