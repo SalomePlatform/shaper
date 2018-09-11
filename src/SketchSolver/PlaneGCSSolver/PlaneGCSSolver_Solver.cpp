@@ -165,6 +165,12 @@ PlaneGCSSolver_Solver::SolveStatus PlaneGCSSolver_Solver::solve()
     diagnose();
     aResult = (GCS::SolveStatus)myEquationSystem->solve(myParameters);
   }
+
+  if (aResult == GCS::Failed) {
+    // DogLeg solver failed without conflicting constraints, try to use Levenberg-Marquardt solver
+    aResult = (GCS::SolveStatus)myEquationSystem->solve(myParameters, true,
+                                                        GCS::LevenbergMarquardt);
+  }
   Events_LongOp::end(this);
 
   // collect information about conflicting constraints every time,
@@ -173,30 +179,6 @@ PlaneGCSSolver_Solver::SolveStatus PlaneGCSSolver_Solver::solve()
   collectConflicting();
   if (!myConflictingIDs.empty())
     aResult = GCS::Failed;
-  else if (aResult == GCS::Failed) {
-    // DogLeg solver failed without conflicting constraints, try to use Levenberg-Marquardt solver
-    // if there are point-line distance constraints
-    ConstraintMap::iterator aCIt = myConstraints.begin();
-    for (; aCIt != myConstraints.end(); ++aCIt) {
-      if (aCIt->second.size() <= 1)
-        continue;
-      std::set<GCSConstraintPtr>::const_iterator anIt = aCIt->second.begin();
-      for (; anIt != aCIt->second.end(); ++anIt)
-        if ((*anIt)->getTypeId() == GCS::P2LDistance)
-          break;
-      if (anIt != aCIt->second.end())
-        break;
-    }
-
-    if (aCIt != myConstraints.end()) {
-      aResult = (GCS::SolveStatus)myEquationSystem->solve(
-          myParameters, true, GCS::LevenbergMarquardt);
-      myConfCollected = false;
-      collectConflicting();
-      if (!myConflictingIDs.empty())
-        aResult = GCS::Failed;
-    }
-  }
 
   SolveStatus aStatus;
   if (aResult == GCS::Failed)
@@ -225,7 +207,7 @@ bool PlaneGCSSolver_Solver::isConflicting(const ConstraintID& theConstraint) con
   return myConflictingIDs.find((int)theConstraint) != myConflictingIDs.end();
 }
 
-void PlaneGCSSolver_Solver::collectConflicting()
+void PlaneGCSSolver_Solver::collectConflicting(bool withRedundant)
 {
   GCS::VEC_I aConflict;
   myEquationSystem->getConflicting(aConflict);
@@ -233,10 +215,12 @@ void PlaneGCSSolver_Solver::collectConflicting()
   for (GCS::VEC_I::const_iterator anIt = aConflict.begin(); anIt != aConflict.end(); ++anIt)
     myConflictingIDs.insert((*anIt) / THE_CONSTRAINT_MULT);
 
-  myEquationSystem->getRedundant(aConflict);
-  // convert PlaneGCS constraint IDs to SketchPlugin's ID
-  for (GCS::VEC_I::const_iterator anIt = aConflict.begin(); anIt != aConflict.end(); ++anIt)
-    myConflictingIDs.insert((*anIt) / THE_CONSTRAINT_MULT);
+  if (withRedundant) {
+    myEquationSystem->getRedundant(aConflict);
+    // convert PlaneGCS constraint IDs to SketchPlugin's ID
+    for (GCS::VEC_I::const_iterator anIt = aConflict.begin(); anIt != aConflict.end(); ++anIt)
+      myConflictingIDs.insert((*anIt) / THE_CONSTRAINT_MULT);
+  }
 
   myConfCollected = true;
 }

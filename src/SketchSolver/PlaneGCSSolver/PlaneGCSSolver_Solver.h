@@ -83,7 +83,7 @@ public:
   int dof();
 
 private:
-  void collectConflicting();
+  void collectConflicting(bool withRedundant = true);
 
   /// \brief Add fictive constraint if the sketch contains temporary constraints only
   void addFictiveConstraintIfNecessary();
