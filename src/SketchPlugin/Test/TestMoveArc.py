@@ -51,17 +51,17 @@ class TestMoveArc(unittest.TestCase):
     self.assertEqual(model.dof(self.mySketch), self.myDOF)
 
   def checkPointCoordinates(self, thePoint, theCoordinates):
-    self.assertAlmostEqual(thePoint.x(), theCoordinates[0])
-    self.assertAlmostEqual(thePoint.y(), theCoordinates[1])
+    self.assertAlmostEqual(thePoint.x(), theCoordinates[0], 6)
+    self.assertAlmostEqual(thePoint.y(), theCoordinates[1], 6)
 
   def checkPointOnArc(self, theCoordinates):
     distPC = model.distancePointPoint(self.myArc.center(),  theCoordinates)
     radius = model.distancePointPoint(self.myArc.center(), self.myArc.startPoint())
-    self.assertAlmostEqual(distPC, radius)
+    self.assertAlmostEqual(distPC, radius, 6)
 
   def checkArcRadius(self):
     radius = model.distancePointPoint(self.myArc.center(), self.myArc.startPoint())
-    self.assertAlmostEqual(radius, self.myRadius)
+    self.assertAlmostEqual(radius, self.myRadius, 6)
 
   def fixArcRadius(self):
     self.myRadius = 20.

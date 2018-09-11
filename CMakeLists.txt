@@ -114,7 +114,7 @@ ELSE(${HAVE_SALOME})
 ENDIF(${HAVE_SALOME})
 
 # Sketcher: Change radius of circular edges while dragging a point on the edge
-SET(SKETCHER_CHANGE_RADIUS_WHEN_MOVE FALSE)
+SET(SKETCHER_CHANGE_RADIUS_WHEN_MOVE TRUE)
 
 ADD_SUBDIRECTORY (src/Config)
 ADD_SUBDIRECTORY (src/Events)
