@@ -101,14 +101,14 @@ void XGUI_Selection::getSelectedInViewer(QList<ModuleBase_ViewerPrsPtr>& thePres
 {
   Handle(AIS_InteractiveContext) aContext = myWorkshop->viewer()->AISContext();
   if (!aContext.IsNull()) {
-    QList<long> aSelectedIds; // Remember of selected address in order to avoid duplicates
+    QList<size_t> aSelectedIds; // Remember of selected address in order to avoid duplicates
     for (aContext->InitSelected(); aContext->MoreSelected(); aContext->NextSelected()) {
       ModuleBase_ViewerPrsPtr aPrs(new ModuleBase_ViewerPrs());
       Handle(SelectMgr_EntityOwner) anOwner = aContext->SelectedOwner();
 
-      if (aSelectedIds.contains((long)anOwner.get()))
+      if (aSelectedIds.contains((size_t)anOwner.get()))
         continue;
-      aSelectedIds.append((long)anOwner.get());
+      aSelectedIds.append((size_t)anOwner.get());
 
       fillPresentation(aPrs, anOwner);
 
@@ -284,14 +284,14 @@ QList<ModuleBase_ViewerPrsPtr> XGUI_Selection::getHighlighted() const
   if (aContext.IsNull())
     return aPresentations;
 
-  QList<long> aSelectedIds; // Remember of selected address in order to avoid duplicates
+  QList<size_t> aSelectedIds; // Remember of selected address in order to avoid duplicates
   XGUI_Displayer* aDisplayer = myWorkshop->displayer();
   for (aContext->InitDetected(); aContext->MoreDetected(); aContext->NextDetected()) {
     Handle(SelectMgr_EntityOwner) anOwner = aContext->DetectedOwner();
     if (!anOwner.IsNull()) {
-      if (aSelectedIds.contains((long)anOwner.get()))
+      if (aSelectedIds.contains((size_t)anOwner.get()))
         continue;
-      aSelectedIds.append((long)anOwner.get());
+      aSelectedIds.append((size_t)anOwner.get());
 
       ModuleBase_ViewerPrsPtr aPrs(new ModuleBase_ViewerPrs());
       fillPresentation(aPrs, anOwner);

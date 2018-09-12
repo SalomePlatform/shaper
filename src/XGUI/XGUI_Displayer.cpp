@@ -1107,12 +1107,12 @@ void XGUI_Displayer::AddOrRemoveSelectedShapes(Handle(AIS_InteractiveContext) th
   /// If count of calls setSelectec is even, the object stays in the previous state
   /// (selected, deselected)
   /// OCCT: to write about the problem that active owners method returns one owner several times
-  QList<long> aSelectedIds; // Remember of selected address in order to avoid duplicates
+  QList<size_t> aSelectedIds; // Remember of selected address in order to avoid duplicates
   for (; anOwnersIt.More(); anOwnersIt.Next()) {
     anOwner = Handle(SelectMgr_EntityOwner)::DownCast (anOwnersIt.Value());
-    if (aSelectedIds.contains((long)anOwner.get()))
+    if (aSelectedIds.contains((size_t)anOwner.get()))
       continue;
-    aSelectedIds.append((long)anOwner.get());
+    aSelectedIds.append((size_t)anOwner.get());
 
     Handle(StdSelect_BRepOwner) BROwnr = Handle(StdSelect_BRepOwner)::DownCast(anOwner);
     if (!BROwnr.IsNull() && BROwnr->HasShape()) {
