@@ -24,6 +24,7 @@
 #include "XGUI.h"
 #include <ModuleBase_IViewer.h>
 #include <ModelAPI_Feature.h>
+#include <ModelAPI_Result.h>
 
 #include <AIS_Trihedron.hxx>
 #include <AIS_ListOfInteractive.hxx>
@@ -158,7 +159,7 @@ private slots:
    void eraseHighlight();
 
   XGUI_Workshop* myWorkshop;
-  FeaturePtr myFeature;
+  ResultPtr myResult;
   AIS_ListOfInteractive myHighlights;
 };
 

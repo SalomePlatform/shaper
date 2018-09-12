@@ -32,6 +32,7 @@
 
 #include <ModuleBase_IViewWindow.h>
 #include <GeomAPI_Shape.h>
+#include <ModelAPI_ResultConstruction.h>
 
 #include <AIS_Shape.hxx>
 
@@ -289,14 +290,29 @@ void XGUI_ViewerProxy::onMouseDoubleClick(AppElements_ViewWindow* theWnd, QMouse
 void XGUI_ViewerProxy::displayHighlight()
 {
   Handle(AIS_InteractiveContext) aContext = AISContext();
-  std::list<ResultPtr> aResults = myFeature->results();
-  std::list<ResultPtr>::const_iterator aIt;
-  ResultPtr aRes;
-  Handle(AIS_Shape) aAis;
-  for (aIt = aResults.cbegin(); aIt != aResults.cend(); aIt++) {
-    aRes = (*aIt);
-    TopoDS_Shape aTShape = aRes->shape()->impl<TopoDS_Shape>();
-    aAis = new AIS_Shape(aTShape);
+
+  if (myResult->groupName() == ModelAPI_ResultConstruction::group()) {
+    FeaturePtr aFeature = ModelAPI_Feature::feature(myResult);
+    if (aFeature.get()) {
+      std::list<ResultPtr> aResults = aFeature->results();
+      std::list<ResultPtr>::const_iterator aIt;
+      ResultPtr aRes;
+      Handle(AIS_Shape) aAis;
+      for (aIt = aResults.cbegin(); aIt != aResults.cend(); aIt++) {
+        aRes = (*aIt);
+        TopoDS_Shape aTShape = aRes->shape()->impl<TopoDS_Shape>();
+        aAis = new AIS_Shape(aTShape);
+        aAis->SetColor(Quantity_NOC_CYAN4);
+        aAis->SetZLayer(1); //Graphic3d_ZLayerId_Topmost
+        myHighlights.Append(aAis);
+        aContext->Display(aAis, false);
+        aContext->Deactivate(aAis);
+      }
+    }
+  }
+  else {
+    TopoDS_Shape aTShape = myResult->shape()->impl<TopoDS_Shape>();
+    Handle(AIS_Shape) aAis = new AIS_Shape(aTShape);
     aAis->SetColor(Quantity_NOC_CYAN4);
     aAis->SetZLayer(1); //Graphic3d_ZLayerId_Topmost
     myHighlights.Append(aAis);
@@ -323,30 +339,25 @@ void XGUI_ViewerProxy::onMouseMove(AppElements_ViewWindow* theWnd, QMouseEvent* 
   if (!aContext.IsNull()) {
     Handle(SelectMgr_EntityOwner) aOwner;
     Handle(AIS_InteractiveObject) anIO;
-    ObjectPtr aObj;
     bool isDisplayed = false;
+    ResultPtr aRes;
     XGUI_Displayer* aDisplayer = myWorkshop->displayer();
     for (aContext->InitDetected(); aContext->MoreDetected(); aContext->NextDetected()) {
       aOwner = aContext->DetectedOwner();
       anIO = Handle(AIS_InteractiveObject)::DownCast(aOwner->Selectable());
-      aObj = aDisplayer->getObject(anIO);
-      if (aObj.get()) {
-        FeaturePtr aFeature = ModelAPI_Feature::feature(aObj);
-        if (aFeature.get()) {
-          if (aFeature != myFeature) {
-            eraseHighlight();
-            myFeature = aFeature;
-            displayHighlight();
-            aContext->UpdateCurrentViewer();
-          }
-          isDisplayed = true;
-        }
+      aRes = std::dynamic_pointer_cast<ModelAPI_Result>(aDisplayer->getObject(anIO));
+      if (aRes.get() && (aRes != myResult)) {
+        eraseHighlight();
+        myResult = aRes;
+        displayHighlight();
+        aContext->UpdateCurrentViewer();
       }
+      isDisplayed = aRes.get();
     }
     if (!isDisplayed) {
       eraseHighlight();
       aContext->UpdateCurrentViewer();
-      myFeature = FeaturePtr();
+      myResult = ResultPtr();
     }
   }
   emit mouseMove(theWnd, theEvent);
