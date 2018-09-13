@@ -85,12 +85,6 @@ public:
   virtual ~XGUI_InspectionPanel();
 
 
-protected:
-  /// Vitrual method is redefined in order to adjust size of internal wirdet to size of
-  /// the whole whindow
-  /// \param theEvent an event with resize parameters
-  virtual void resizeEvent(QResizeEvent* theEvent);
-
 private slots:
   /// A slot to react on selection changed
   void onSelectionChanged();
@@ -192,7 +186,7 @@ private:
   QLabel* myTypeLbl; //> label of a type
   QTextBrowser* myTypeParams; //> parameters area
   QVBoxLayout* myMainLayout; //> main layout
-  QWidget* myMainWidget;  //> main widget
+  //QWidget* myMainWidget;  //> main widget
 };
 
 #endif

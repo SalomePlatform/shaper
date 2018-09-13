@@ -1423,6 +1423,8 @@ void XGUI_Workshop::createDockWidgets()
     Qt::RightDockWidgetArea);
   aDesktop->addDockWidget(Qt::RightDockWidgetArea, myInspectionPanel);
 
+  myInspectionPanel->hide();
+
   aDesktop->addDockWidget(
 #ifdef HAVE_SALOME
     Qt::RightDockWidgetArea,

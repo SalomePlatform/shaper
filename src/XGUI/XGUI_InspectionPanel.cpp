@@ -53,6 +53,7 @@
 #include <QHeaderView>
 #include <QTextBrowser>
 #include <QResizeEvent>
+#include <QSplitter>
 
 #include <BRepBndLib.hxx>
 #include <TopoDS_Iterator.hxx>
@@ -115,27 +116,21 @@ XGUI_InspectionPanel::XGUI_InspectionPanel(QWidget* theParent, XGUI_SelectionMgr
   setObjectName(INSPECTION_PANEL);
   setStyleSheet("::title { position: relative; padding-left: 5px; text-align: left center }");
 
-  QScrollArea* aScrollArea = new QScrollArea(this);
-  setWidget(aScrollArea);
+  QSplitter* aSplitter = new QSplitter(Qt::Vertical, this);
 
   // Create an internal widget
-  myMainWidget = new QWidget(aScrollArea);
-
-  myMainLayout = new QVBoxLayout(myMainWidget);
-  myMainLayout->setContentsMargins(5, 5, 5, 5);
-
-  QWidget* aNameWgt = new QWidget(myMainWidget);
+  QWidget* aNameWgt = new QWidget(aSplitter);
   QHBoxLayout* aNameLayout = new QHBoxLayout(aNameWgt);
-  aNameLayout->setContentsMargins(0, 0, 0, 0);
+  aNameLayout->setContentsMargins(3, 0, 3, 0);
   aNameLayout->addWidget(new QLabel(tr("Object"), aNameWgt));
   myNameEdt = new QLineEdit(aNameWgt);
   myNameEdt->setReadOnly(true);
   aNameLayout->addWidget(myNameEdt);
 
-  myMainLayout->addWidget(aNameWgt);
+  aSplitter->addWidget(aNameWgt);
 
   // Table with sub-shapes
-  mySubShapesTab = new QTableWidget(9, 2, myMainWidget);
+  mySubShapesTab = new QTableWidget(9, 2, aSplitter);
   mySubShapesTab->setFocusPolicy(Qt::NoFocus);
   mySubShapesTab->verticalHeader()->hide();
   QStringList aTitles;
@@ -160,32 +155,41 @@ XGUI_InspectionPanel::XGUI_InspectionPanel(QWidget* theParent, XGUI_SelectionMgr
   mySubShapesTab->setColumnWidth(0, 90);
   mySubShapesTab->setColumnWidth(1, 70);
 
-  mySubShapesTab->setMaximumWidth(170);
-  mySubShapesTab->setMinimumHeight(300);
+  //mySubShapesTab->setMaximumWidth(170);
+  //mySubShapesTab->setMinimumHeight(300);
 
-  myMainLayout->addWidget(mySubShapesTab);
+  aSplitter->addWidget(mySubShapesTab);
 
   // Type of object
-  QWidget* aTypeWgt = new QWidget(myMainWidget);
+  QWidget* aTypeWgt = new QWidget(aSplitter);
   QHBoxLayout* aTypeLayout = new QHBoxLayout(aTypeWgt);
-  aTypeLayout->setContentsMargins(0, 0, 0, 0);
+  aTypeLayout->setContentsMargins(3, 0, 3, 0);
 
   aTypeLayout->addWidget(new QLabel(tr("Type:"), aTypeWgt));
   myTypeLbl = new QLabel("", aTypeWgt);
   aTypeLayout->addWidget(myTypeLbl);
 
-  myMainLayout->addWidget(aTypeWgt);
+  aSplitter->addWidget(aTypeWgt);
 
-  myTypeParams = new QTextBrowser(myMainWidget);
+  myTypeParams = new QTextBrowser(aSplitter);
   myTypeParams->setFixedWidth(170);
   myTypeParams->setReadOnly(true);
   myTypeParams->setFocusPolicy(Qt::NoFocus);
   myTypeParams->setFrameStyle(QFrame::NoFrame);
   myTypeParams->viewport()->setBackgroundRole(QPalette::Window);
 
-  myMainLayout->addWidget(myTypeParams, 1);
+  aSplitter->addWidget(myTypeParams);
 
-  aScrollArea->setWidget(myMainWidget);
+  aSplitter->setCollapsible(0, false);
+  aSplitter->setCollapsible(1, false);
+  aSplitter->setCollapsible(2, false);
+  aSplitter->setCollapsible(3, false);
+
+  QList<int> aSizes;
+  aSizes << 10 << 140 << 10;
+  aSplitter->setSizes(aSizes);
+
+  setWidget(aSplitter);
 
   connect(mySelectionMgr, SIGNAL(selectionChanged()), SLOT(onSelectionChanged()));
 }
@@ -697,14 +701,4 @@ void XGUI_InspectionPanel::setRotatedBoxType(const QString& theTitle,
 void XGUI_InspectionPanel::setParamsText(const QString& theText)
 {
   myTypeParams->setText(theText);
-}
-
-void XGUI_InspectionPanel::resizeEvent(QResizeEvent* theEvent)
-{
-  QSize aSize = theEvent->size();
-
-  int aHeight = aSize.height();
-
-  if (aHeight > 450) // 450 is a a minimal height
-    myMainWidget->setFixedHeight(aHeight - 30);
 }
