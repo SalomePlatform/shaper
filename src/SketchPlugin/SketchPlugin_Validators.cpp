@@ -468,6 +468,8 @@ static bool hasSameTangentFeature(const std::set<AttributePtr>& theRefsList,
       anIt = theRefsList.cbegin(); anIt != theRefsList.cend(); ++anIt) {
     std::shared_ptr<ModelAPI_Attribute> aAttr = (*anIt);
     FeaturePtr aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(aAttr->owner());
+    if (!aFeature)
+      continue;
     if (aFeature->getKind() == SketchPlugin_ConstraintTangent::ID()) {
       AttributeRefAttrPtr anAttrRefA = std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(
         aFeature->attribute(SketchPlugin_ConstraintTangent::ENTITY_A()));

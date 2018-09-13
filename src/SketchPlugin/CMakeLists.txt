@@ -190,6 +190,7 @@ ADD_UNIT_TESTS(TestSketchPointLine.py
                TestMultiRotation04.py
                TestMultiRotation05.py
                TestFillet.py
+               TestFilletAfterFolder.py
                TestFilletInteracting.py
                TestRectangle.py
                TestProjection.py
