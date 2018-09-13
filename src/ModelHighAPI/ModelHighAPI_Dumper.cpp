@@ -164,6 +164,17 @@ const std::string& ModelHighAPI_Dumper::name(const EntityPtr& theEntity,
       if (aNbFeatures.first == anId && aNbFeatures.second < anId) {
         // name is not user-defined
         isDefaultName = true;
+
+        // check there are postponed features of this kind,
+        // dump their names, because the sequence of features may be changed
+        for (std::list<EntityPtr>::const_iterator aPpIt = myPostponed.begin();
+            aPpIt != myPostponed.end(); ++aPpIt) {
+          FeaturePtr aCurFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(*aPpIt);
+          if (aCurFeature && aCurFeature->getKind() == aKind) {
+            myNames[*aPpIt].myIsDefault = false;
+            isDefaultName = false;
+          }
+        }
       }
 
       if (anId > aNbFeatures.second)
