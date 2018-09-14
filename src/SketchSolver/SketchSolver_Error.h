@@ -109,6 +109,15 @@ class SketchSolver_Error
     static const std::string MY_ERROR_VALUE("Unsupported type of constraint");
     return MY_ERROR_VALUE;
   }
+  /// Sketch contains degenerated geometry
+  inline static const std::string& DEGENERATED_GEOMETRY()
+  {
+    static const std::string MY_ERROR_VALUE(
+      "The set of constraints lead to degenerated geometry. "
+      "To fix this, you can either undo your operation or "
+      "remove a constraint or the degenerated geometry.");
+    return MY_ERROR_VALUE;
+  }
 };
 
 #endif

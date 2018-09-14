@@ -488,3 +488,14 @@ void PlaneGCSSolver_Storage::refresh() const
   for (; aFIt != anUpdatedFeatures.end(); ++aFIt)
     notify(*aFIt);
 }
+
+PlaneGCSSolver_Solver::SolveStatus PlaneGCSSolver_Storage::checkDegeneratedGeometry() const
+{
+  std::map<FeaturePtr, EntityWrapperPtr>::const_iterator aFIt = myFeatureMap.begin();
+  for (; aFIt != myFeatureMap.end(); ++aFIt) {
+    EdgeWrapperPtr anEdge = std::dynamic_pointer_cast<PlaneGCSSolver_EdgeWrapper>(aFIt->second);
+    if (anEdge && anEdge->isDegenerated())
+      return PlaneGCSSolver_Solver::STATUS_DEGENERATED;
+  }
+  return PlaneGCSSolver_Solver::STATUS_OK;
+}

@@ -253,6 +253,10 @@ ADD_UNIT_TESTS(TestSketchPointLine.py
                Test2034_2.py
                Test2034_3.py
                Test2134.py
+               TestDegeneratedGeometry.py
+               Test2119.py
+               Test2224.py
+               Test2427.py
 )
 
 if(${SKETCHER_CHANGE_RADIUS_WHEN_MOVE})

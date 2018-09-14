@@ -15,6 +15,10 @@
       <source>Caution: SolveSpace crash! Constraints are wrong</source>
       <translation>Caution: SolveSpace crash! Constraints are wrong</translation>
     </message>
+    <message>
+      <source>The set of constraints lead to degenerated geometry. To fix this, you can either undo your operation or remove a constraint or the degenerated geometry.</source>
+      <translation>The set of constraints lead to degenerated geometry. To fix this, you can either undo your operation or remove a constraint or the degenerated geometry.</translation>
+    </message>
   </context>
 </TS>
 

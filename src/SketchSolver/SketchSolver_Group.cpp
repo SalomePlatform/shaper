@@ -217,6 +217,9 @@ bool SketchSolver_Group::resolveConstraints()
         removeTemporaryConstraints();
         aResult = mySketchSolver->solve();
       }
+      // check degenerated geometry after constraints resolving
+      if (aResult == PlaneGCSSolver_Solver::STATUS_OK)
+        aResult = myStorage->checkDegeneratedGeometry();
     } catch (...) {
       getWorkplane()->string(SketchPlugin_Sketch::SOLVER_ERROR())
         ->setValue(SketchSolver_Error::SOLVESPACE_CRASH());
@@ -262,8 +265,10 @@ bool SketchSolver_Group::resolveConstraints()
       mySketchSolver->undo();
       if (!myConstraints.empty()) {
         // the error message should be changed before sending the message
-        getWorkplane()->string(SketchPlugin_Sketch::SOLVER_ERROR())
-          ->setValue(SketchSolver_Error::CONSTRAINTS());
+        const std::string& aErrorMsg = aResult == PlaneGCSSolver_Solver::STATUS_DEGENERATED ?
+                                       SketchSolver_Error::DEGENERATED_GEOMETRY() :
+                                       SketchSolver_Error::CONSTRAINTS();
+        getWorkplane()->string(SketchPlugin_Sketch::SOLVER_ERROR())->setValue(aErrorMsg);
         if (myPrevResult != aResult ||
             myPrevResult == PlaneGCSSolver_Solver::STATUS_UNKNOWN ||
             myPrevResult == PlaneGCSSolver_Solver::STATUS_FAILED) {
@@ -287,8 +292,19 @@ bool SketchSolver_Group::resolveConstraints()
       }
     }
 
-  } else if (isGroupEmpty && isWorkplaneValid())
+  }
+  else if (isGroupEmpty && isWorkplaneValid()) {
+    // clear error related to previously degenerated entities
+    if (myPrevResult == PlaneGCSSolver_Solver::STATUS_DEGENERATED) {
+      getWorkplane()->string(SketchPlugin_Sketch::SOLVER_ERROR())->setValue("");
+      myPrevResult = PlaneGCSSolver_Solver::STATUS_OK;
+      // the error message should be changed before sending the message
+      myConflictingConstraints.clear();
+      sendMessage(EVENT_SOLVER_REPAIRED, myConflictingConstraints);
+    }
+
     computeDoF();
+  }
   removeTemporaryConstraints();
   myStorage->setNeedToResolve(false);
   return aResolved;

@@ -302,15 +302,6 @@ def checkResult(theFeature,theModel,NbRes,NbSubRes,NbSolid,NbFace,NbEdge,NbVerte
   theModel.testNbSubShapes(theFeature, GeomAPI_Shape.EDGE, NbEdge)
   theModel.testNbSubShapes(theFeature, GeomAPI_Shape.VERTEX, NbVertex)
 
-def checkSketch(theSketch, theDOF = -1):
-  """ Tests the sketch is valid and DoF is equal to the given
-  """
-  assert(theSketch.feature().error() == ""), "Sketch failed: {}".format(theSketch.feature().error())
-  assert(theSketch.solverError().value() == ""), "Sketch solver failed: {}".format(theSketch.solverError().value())
-  if theDOF != -1:
-    aDOF = sketcher.tools.dof(theSketch)
-    assert(aDOF == theDOF), "Sketch DoF {} is wrong. Expected {}".format(aDOF, theDOF)
-
 def checkGroup(theGroup, theShapeType):
   """ Check that all selected shapes in group have correct shape type and unique name
   """

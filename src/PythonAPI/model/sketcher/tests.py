@@ -91,3 +91,21 @@ def assertArcValidity(theArc):
     aDistCE = tools.distancePointPoint(aCenterPnt, aEndPnt)
     assert math.fabs(aDistCS - aDistCE) < TOLERANCE, "Wrong arc: center-start distance {}, center-end distance {}".format(aDistCS, aDistCE)
     assert math.fabs(aRadius.value() - aDistCS) < TOLERANCE, "Wrong arc: radius is {}, expected {}".format(aRadius.value(), aDistCS)
+
+
+def checkSketch(theSketch, theDOF = -1):
+    """ Tests the sketch is valid and DoF is equal to the given
+    """
+    assert(theSketch.feature().error() == ""), "Sketch failed: {}".format(theSketch.feature().error())
+    assert(theSketch.solverError().value() == ""), "Sketch solver failed: {}".format(theSketch.solverError().value())
+    if theDOF != -1:
+        aDOF = sketcher.tools.dof(theSketch)
+        assert(aDOF == theDOF), "Sketch DoF {} is wrong. Expected {}".format(aDOF, theDOF)
+
+
+def checkSketchErrorDegenerated(theSketch):
+    """ Verify the sketch reports error about degenerated geometry
+    """
+    errorValue = theSketch.solverError().value()
+    assert(errorValue != "")
+    assert(errorValue.find("degenerated") >= 0)

@@ -35,6 +35,7 @@ public:
     STATUS_OK,
     STATUS_INCONSISTENT,
     STATUS_EMPTYSET,
+    STATUS_DEGENERATED,
     STATUS_FAILED, // set if no one other status is applicable
     STATUS_UNKNOWN // set for newly created groups
   };

@@ -129,6 +129,11 @@ public:
   /// \brief Return list of conflicting constraints
   std::set<ObjectPtr> getConflictingConstraints(SolverPtr theSolver) const;
 
+  /// \brief Verify, the sketch contains degenerated geometry
+  ///        after resolving the set of constraints
+  /// \return STATUS_OK if the geometry is valid, STATUS_DEGENERATED otherwise.
+  virtual PlaneGCSSolver_Solver::SolveStatus checkDegeneratedGeometry() const = 0;
+
   /// \brief Update SketchPlugin features after resolving constraints
   virtual void refresh() const = 0;
 

@@ -71,6 +71,11 @@ public:
   /// \return \c true if the constraint and all its parameters are removed successfully
   virtual bool removeConstraint(ConstraintPtr theConstraint);
 
+  /// \brief Verify, the sketch contains degenerated geometry
+  ///        after resolving the set of constraints
+  /// \return STATUS_OK if the geometry is valid, STATUS_DEGENERATED otherwise.
+  virtual PlaneGCSSolver_Solver::SolveStatus checkDegeneratedGeometry() const;
+
   /// \brief Update SketchPlugin features after resolving constraints
   virtual void refresh() const;
 

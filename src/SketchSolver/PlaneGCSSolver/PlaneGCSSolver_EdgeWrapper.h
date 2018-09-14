@@ -43,6 +43,8 @@ public:
   virtual SketchSolver_EntityType type() const
   { return myType; }
 
+  bool isDegenerated() const;
+
 private:
   SketchSolver_EntityType myType;
   GCSCurvePtr myEntity;
