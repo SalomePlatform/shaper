@@ -136,6 +136,8 @@ bool ModuleBase_WidgetValidated::isValidInFilters(const ModuleBase_ViewerPrsPtr&
           }
           aSelectAttr->setValue(ObjectPtr(), GeomShapePtr(), true);
         }
+        else
+          aValid = false; // only results with a shape can be filtered
       } else
         aValid = false; // only results with a shape can be filtered
     }
