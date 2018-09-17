@@ -35,6 +35,7 @@
 #include <ModelAPI_Events.h>
 #include <ModelAPI_ResultBody.h>
 #include <ModelAPI_Tools.h>
+#include <ModelAPI_AttributeSelection.h>
 
 #include <SelectMgr_ListIteratorOfListOfFilter.hxx>
 #include <SelectMgr_EntityOwner.hxx>
@@ -120,6 +121,21 @@ bool ModuleBase_WidgetValidated::isValidInFilters(const ModuleBase_ViewerPrsPtr&
       if (aFeature.get()) {
         // Use feature as a reference to all its results
         myPresentedObject = aFeature;
+        AttributePtr anAttr = attribute();
+        std::string aType = anAttr->attributeType();
+        // Check that results of Feature is acceptable by filters for selection attribute
+        if (aType == ModelAPI_AttributeSelection::typeId()) {
+          AttributeSelectionPtr aSelectAttr =
+            std::dynamic_pointer_cast<ModelAPI_AttributeSelection>(anAttr);
+          aSelectAttr->setValue(myPresentedObject, GeomShapePtr(), true);
+          GeomShapePtr aShape = aSelectAttr->value();
+          if (aShape.get()) {
+            const TopoDS_Shape aTDShape = aShape->impl<TopoDS_Shape>();
+            Handle(AIS_InteractiveObject) anIO = myWorkshop->selection()->getIO(thePrs);
+            anOwner = new StdSelect_BRepOwner(aTDShape, anIO);
+          }
+          aSelectAttr->setValue(ObjectPtr(), GeomShapePtr(), true);
+        }
       } else
         aValid = false; // only results with a shape can be filtered
     }
