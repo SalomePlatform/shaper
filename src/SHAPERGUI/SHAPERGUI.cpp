@@ -212,7 +212,6 @@ bool SHAPERGUI::activateModule(SUIT_Study* theStudy)
     if (aInspection) {
       QAction* aViewAct = aInspection->toggleViewAction();
       aViewAct->setEnabled(true);
-      aInspection->setVisible(true);
     }
 
     if (!mySelector) {
