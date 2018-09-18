@@ -582,6 +582,7 @@ void FeaturesPlugin_Measurement::setupDimension(AISObjectPtr theDim)
     Handle(AIS_Dimension) aDim = Handle(AIS_Dimension)::DownCast(aAIS);
     int aSize = Config_PropManager::integer("Visualization", "dimension_arrow_size");
     int aTextSize = Config_PropManager::integer("Visualization", "dimension_value_size");
+    std::string aFont = Config_PropManager::string("Visualization", "dimension_font");
 
     Handle(Prs3d_DimensionAspect) anAspect = aDim->DimensionAspect();
     anAspect->MakeArrows3d(false);
@@ -589,9 +590,8 @@ void FeaturesPlugin_Measurement::setupDimension(AISObjectPtr theDim)
     anAspect->MakeTextShaded(false);
     anAspect->MakeUnitsDisplayed(false);
     anAspect->MakeUnitsDisplayed(false);
-    anAspect->TextAspect()->SetFont(Config_PropManager::string("Visualization",
-      "dimension_font").c_str());
-    anAspect->TextAspect()->SetHeight(aTextSize / mySceenScale);
+    anAspect->TextAspect()->SetFont(aFont.c_str());
+    anAspect->TextAspect()->SetHeight(aTextSize);
     anAspect->ArrowAspect()->SetLength(aSize / mySceenScale);
     anAspect->SetExtensionSize((aTextSize / mySceenScale + aSize) / 2.0);
     aDim->SetDimensionAspect(anAspect);
