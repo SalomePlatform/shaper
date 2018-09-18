@@ -279,6 +279,9 @@ bool PartSet_WidgetSketchLabel::setSelectionInternal(
 
 void PartSet_WidgetSketchLabel::updateByPlaneSelected(const ModuleBase_ViewerPrsPtr& thePrs)
 {
+  GeomPlanePtr aPlane = plane();
+  if (!aPlane.get())
+    return;
   // 1. hide main planes if they have been displayed and display sketch preview plane
   myPreviewPlanes->erasePreviewPlanes(myWorkshop);
 
@@ -301,77 +304,34 @@ void PartSet_WidgetSketchLabel::updateByPlaneSelected(const ModuleBase_ViewerPrs
       aModule->sketchMgr()->previewSketchPlane()->setSizeOfView(aSizeOfView, false);
   }
   // 2. if the planes were displayed, change the view projection
-  const GeomShapePtr& aShape = thePrs->shape();
-  std::shared_ptr<GeomAPI_Shape> aGShape;
 
-  DataPtr aData = feature()->data();
-  AttributeSelectionPtr aSelAttr = std::dynamic_pointer_cast<ModelAPI_AttributeSelection>
-                            (aData->attribute(SketchPlugin_SketchEntity::EXTERNAL_ID()));
+  std::shared_ptr<GeomAPI_Dir> aDir = aPlane->direction();
+  gp_XYZ aXYZ = aDir->impl<gp_Dir>().XYZ();
+  double aTwist = 0.0;
 
-  // selection happens in OCC viewer
-  if (aShape.get() && !aShape->isNull()) {
-    aGShape = aShape;
+  // Rotate view if the sketcher plane is selected only from preview planes
+  // Preview planes are created only if there is no any shape
+  bool aRotate = Config_PropManager::boolean(SKETCH_TAB_NAME, "rotate_to_plane");
+  if (aRotate) {
+    myWorkshop->viewer()->setViewProjection(aXYZ.X(), aXYZ.Y(), aXYZ.Z(), aTwist);
   }
-  else { // selection happens in OCC viewer(on body) of in the OB browser
-    if (aSelAttr) {
-      aGShape = aSelAttr->value();
-    }
-  }
-  // If the selected object is a sketch then use its plane
-  std::shared_ptr<GeomAPI_Pln> aPlane;
-  ObjectPtr aObj = thePrs->object();
-  // obsolete as selected sketch is stored in external attribute
-  /*if (aObj.get()) {
-    FeaturePtr aFeature = ModelAPI_Feature::feature(aObj);
-    if (aFeature.get() && (aFeature != feature())) {
-      if (aFeature->getKind() == SketchPlugin_Sketch::ID()) {
-        CompositeFeaturePtr aSketch =
-          std::dynamic_pointer_cast<ModelAPI_CompositeFeature>(aFeature);
-        aPlane = PartSet_Tools::sketchPlane(aSketch);
+  QString aSizeOfViewStr = mySizeOfView->text();
+  if (!aSizeOfViewStr.isEmpty()) {
+    bool isOk;
+    double aSizeOfView = aSizeOfViewStr.toDouble(&isOk);
+    if (isOk && aSizeOfView > 0) {
+      Handle(V3d_View) aView3d = myWorkshop->viewer()->activeView();
+      if (!aView3d.IsNull()) {
+        Bnd_Box aBndBox;
+        double aHalfSize = aSizeOfView/2.0;
+        aBndBox.Update(-aHalfSize, -aHalfSize, -aHalfSize, aHalfSize, aHalfSize, aHalfSize);
+        aView3d->FitAll(aBndBox, 0.01, false);
       }
     }
-  }*/
-  if (aGShape.get() != NULL) {
-    // get plane parameters
-    if (!aPlane.get()) {
-      std::shared_ptr<GeomAPI_Face> aFace(new GeomAPI_Face(aGShape));
-      aPlane = aFace->getPlane();
-    }
-    if (!aPlane.get())
-      return;
-    std::shared_ptr<GeomAPI_Dir> aDir = aPlane->direction();
-    gp_XYZ aXYZ = aDir->impl<gp_Dir>().XYZ();
-    double aTwist = 0.0;
-
-    // orienting projection is not needed: it is done in GeomAlgoAPI_FaceBuilder::plane
-    /*if (aGShape->impl<TopoDS_Shape>().Orientation() == TopAbs_REVERSED) {
-      aXYZ.Reverse();
-    }*/
-
-    // Rotate view if the sketcher plane is selected only from preview planes
-    // Preview planes are created only if there is no any shape
-    bool aRotate = Config_PropManager::boolean(SKETCH_TAB_NAME, "rotate_to_plane");
-    if (aRotate) {
-      myWorkshop->viewer()->setViewProjection(aXYZ.X(), aXYZ.Y(), aXYZ.Z(), aTwist);
-    }
-    QString aSizeOfViewStr = mySizeOfView->text();
-    if (!aSizeOfViewStr.isEmpty()) {
-      bool isOk;
-      double aSizeOfView = aSizeOfViewStr.toDouble(&isOk);
-      if (isOk && aSizeOfView > 0) {
-        Handle(V3d_View) aView3d = myWorkshop->viewer()->activeView();
-        if (!aView3d.IsNull()) {
-          Bnd_Box aBndBox;
-          double aHalfSize = aSizeOfView/2.0;
-          aBndBox.Update(-aHalfSize, -aHalfSize, -aHalfSize, aHalfSize, aHalfSize, aHalfSize);
-          aView3d->FitAll(aBndBox, 0.01, false);
-        }
-      }
-    }
-    PartSet_Module* aModule = dynamic_cast<PartSet_Module*>(myWorkshop->module());
-    if (aModule)
-      aModule->onViewTransformed();
   }
+  if (aModule)
+    aModule->onViewTransformed();
+
   // 3. Clear text in the label
   myStackWidget->setCurrentIndex(1);
   //myLabel->setText("");
@@ -474,33 +434,29 @@ bool PartSet_WidgetSketchLabel::fillSketchPlaneBySelection(const ModuleBase_View
   const GeomShapePtr& aShape = thePrs->shape();
   std::shared_ptr<GeomAPI_Dir> aDir;
 
+  if (aShape.get() && !aShape->isNull()) {
+    const TopoDS_Shape& aTDShape = aShape->impl<TopoDS_Shape>();
+    aDir = setSketchPlane(aTDShape);
+    isOwnerSet = aDir.get();
+  }
   if (thePrs->object() && (feature() != thePrs->object())) {
     FeaturePtr aFeature = ModelAPI_Feature::feature(thePrs->object());
     DataPtr aData = feature()->data();
     AttributeSelectionPtr aSelAttr =
       std::dynamic_pointer_cast<ModelAPI_AttributeSelection>
       (aData->attribute(SketchPlugin_SketchEntity::EXTERNAL_ID()));
-    if (aSelAttr) {
+    if (aSelAttr.get()) {
       ResultPtr aRes = std::dynamic_pointer_cast<ModelAPI_Result>(thePrs->object());
-      if (aRes) {
-        GeomShapePtr aShapePtr(new GeomAPI_Shape());
-        if (!aShape.get() || aShape->isNull()) {  // selection happens in the OCC viewer
-          aShapePtr = ModelAPI_Tools::shape(aRes);
-        }
-        else { // selection happens in OB browser
-          aShapePtr = aShape;
-        }
-        if (aShapePtr.get() != NULL) {
+      if (aRes.get()) {
+        GeomShapePtr aShapePtr = ModelAPI_Tools::shape(aRes);
+        if (aShapePtr.get() && aShapePtr->isFace()) {
+          const TopoDS_Shape& aTDShape = aShapePtr->impl<TopoDS_Shape>();
+          setSketchPlane(aTDShape);
           aSelAttr->setValue(aRes, aShapePtr);
           isOwnerSet = true;
         }
       }
     }
-  }
-  else if (aShape.get() && !aShape->isNull()) {
-    const TopoDS_Shape& aTDShape = aShape->impl<TopoDS_Shape>();
-    aDir = setSketchPlane(aTDShape);
-    isOwnerSet = aDir.get();
   }
   return isOwnerSet;
 }
