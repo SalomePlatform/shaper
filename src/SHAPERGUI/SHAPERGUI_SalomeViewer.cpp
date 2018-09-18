@@ -376,6 +376,8 @@ void SHAPERGUI_SalomeViewer::fitAll()
 void SHAPERGUI_SalomeViewer::eraseAll()
 {
   Handle(AIS_InteractiveContext) aContext = AISContext();
+  if (aContext.IsNull())
+    return;
   AIS_ListOfInteractive aList;
   aContext->DisplayedObjects(aList);
   AIS_ListIteratorOfListOfInteractive aLIt;
