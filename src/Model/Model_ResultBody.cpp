@@ -27,11 +27,17 @@
 #include <ModelAPI_Object.h>
 #include <ModelAPI_Events.h>
 #include <ModelAPI_Tools.h>
+#include <Model_Data.h>
 #include <Events_Loop.h>
 
 #include <TopoDS_Shape.hxx>
 #include <TopExp_Explorer.hxx>
+#include <TDataStd_UAttribute.hxx>
 
+// if this attribute exists, the shape is connected topology
+Standard_GUID kIsConnectedTopology("e51392e0-3a4d-405d-8e36-bbfe19858ef5");
+// if this attribute exists, the connected topology flag must be recomputed
+Standard_GUID kUpdateConnectedTopology("01ef7a45-0bec-4266-b0b4-4aa570921818");
 
 Model_ResultBody::Model_ResultBody() : ModelAPI_ResultBody()
 {
@@ -121,7 +127,7 @@ bool Model_ResultBody::setDisabled(std::shared_ptr<ModelAPI_Result> theThis, con
   bool aChanged = ModelAPI_ResultBody::setDisabled(theThis, theFlag);
   if (aChanged) { // state is changed, so modifications are needed
     myBuilder->evolutionToSelection(theFlag);
-    updateSubs(shape()); // to set disabled/enabled
+    updateSubs(shape(), false); // to set disabled/enabled
   }
   return aChanged;
 }
@@ -192,12 +198,20 @@ void Model_ResultBody::updateConcealment()
   }
 }
 
-void Model_ResultBody::updateSubs(const std::shared_ptr<GeomAPI_Shape>& theThisShape)
+void Model_ResultBody::updateSubs(const std::shared_ptr<GeomAPI_Shape>& theThisShape,
+                                  const bool theShapeChanged)
 {
   static Events_Loop* aLoop = Events_Loop::loop();
   static Events_ID EVENT_DISP = aLoop->eventByName(EVENT_OBJECT_TO_REDISPLAY);
   static Events_ID EVENT_UPD = aLoop->eventByName(EVENT_OBJECT_UPDATED);
   static const ModelAPI_EventCreator* aECreator = ModelAPI_EventCreator::get();
+  // erase flag that topology is connected: the shape is new
+  if (theShapeChanged && data().get()) {
+    TDF_Label aDataLab = std::dynamic_pointer_cast<Model_Data>(data())->label();
+    if (!aDataLab.IsNull()) {
+      TDataStd_UAttribute::Set(aDataLab, kUpdateConnectedTopology);
+    }
+  }
   // iterate all sub-solids of compsolid to make sub-results synchronized with them
   TopoDS_Shape aThisShape;
   if (theThisShape.get()) aThisShape = theThisShape->impl<TopoDS_Shape>();
@@ -268,4 +282,22 @@ bool Model_ResultBody::isLatestEqual(const std::shared_ptr<GeomAPI_Shape>& theSh
     }
   }
   return false;
+}
+
+bool Model_ResultBody::isConnectedTopology()
+{
+  TDF_Label aDataLab = std::dynamic_pointer_cast<Model_Data>(data())->label();
+  if (!aDataLab.IsNull()) {
+    if (aDataLab.IsAttribute(kUpdateConnectedTopology)) { // recompute state
+      aDataLab.ForgetAttribute(kUpdateConnectedTopology);
+      GeomShapePtr aShape = shape();
+      if (aShape.get() && aShape->isConnectedTopology()) {
+        TDataStd_UAttribute::Set(aDataLab, kIsConnectedTopology);
+      } else {
+        aDataLab.ForgetAttribute(kIsConnectedTopology);
+      }
+    }
+    return aDataLab.IsAttribute(kIsConnectedTopology);
+  }
+  return false; // invalid case
 }

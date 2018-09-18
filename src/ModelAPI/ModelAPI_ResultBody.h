@@ -170,16 +170,16 @@ public:
   // is equal to the given shape
   MODELAPI_EXPORT virtual bool isLatestEqual(const std::shared_ptr<GeomAPI_Shape>& theShape) = 0;
 
-  /// Returns true is the topology is connected. Cashes this information for the current shape,
-  /// so it is more effective to use this method than directly GeomAPI_Shape.
-  MODELAPI_EXPORT virtual bool isConnectedTopology();
+  /// Returns true is the topology is connected.
+  MODELAPI_EXPORT virtual bool isConnectedTopology() = 0;
 
   /// Set displayed flag to the result and all sub results
   /// \param theDisplay a boolean value
   MODELAPI_EXPORT virtual void setDisplayed(const bool theDisplay);
 
   /// Updates the sub-bodies if shape of this object is compsolid or compound
-  MODELAPI_EXPORT virtual void updateSubs(const std::shared_ptr<GeomAPI_Shape>& theThisShape) = 0;
+  MODELAPI_EXPORT virtual void updateSubs(const std::shared_ptr<GeomAPI_Shape>& theThisShape,
+    const bool theShapeChanged = true) = 0;
 
 protected:
   /// Default constructor accessible only from Model_Objects

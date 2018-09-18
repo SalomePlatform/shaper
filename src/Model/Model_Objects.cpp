@@ -1903,7 +1903,7 @@ void Model_Objects::updateResults(FeaturePtr theFeature, std::set<FeaturePtr>& t
     for (; aResSize && aRes != theFeature->results().cend(); aRes++, aResSize++) {
       if ((*aRes)->data()->isValid() && (*aRes)->groupName() == ModelAPI_ResultBody::group()) {
         ResultBodyPtr aBody = std::dynamic_pointer_cast<ModelAPI_ResultBody>(*aRes);
-        aBody->updateSubs(aBody->shape());
+        aBody->updateSubs(aBody->shape(), false);
       }
     }
   }

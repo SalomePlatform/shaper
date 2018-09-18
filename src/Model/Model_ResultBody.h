@@ -87,12 +87,16 @@ public:
   // is equal to the given shape
   MODEL_EXPORT virtual bool isLatestEqual(const std::shared_ptr<GeomAPI_Shape>& theShape);
 
+  /// Returns true is the topology is connected.
+  MODEL_EXPORT virtual bool isConnectedTopology();
+
 protected:
   /// Makes a body on the given feature
   Model_ResultBody();
 
   /// Updates the sub-bodies if shape of this object is composite-solid
-  void updateSubs(const std::shared_ptr<GeomAPI_Shape>& theThisShape);
+  void updateSubs(const std::shared_ptr<GeomAPI_Shape>& theThisShape,
+                  const bool theShapeChanged = true);
 
   // Checks the state of children and partents to send events of creation/erase when needed
   void updateConcealment();
