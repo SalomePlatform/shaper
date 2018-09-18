@@ -1,7 +1,5 @@
 @echo off
 
-IF NOT EXIST "%VS140COMNTOOLS%..\..\VC\vcvarsall.bat" GOTO ERROR1
-
 @REM Load local settings from file localenv.bat that should be located in the root directory
 if "%ROOT_DIR%" == "" (
   set ROOT_DIR=%~dp0..
@@ -87,16 +85,19 @@ cd /d %ROOT_DIR%
 
 @SET _NO_DEBUG_HEAP=1
 
-IF "%ARCH%" == "Win64" (
-  call "%VS140COMNTOOLS%..\..\VC\vcvarsall.bat" x64
-) ELSE (
-  IF "%ARCH%" == "Win32" (
-    call "%VS140COMNTOOLS%..\..\VC\vcvarsall.bat" x86
-  ) ELSE (
-    echo Wrong architecture is used. Win32 or Win64 architecture is allowed only.
-    echo Refer to the set_env.bat script.
-  )
+if "%VS140COMNTOOLS%" == "" (
+    echo Could not find MS Visual Studio: variable VS140COMNTOOLS is not defined!
+    exit 1
+) else if exist "%VS140COMNTOOLS%\..\IDE\devenv.exe" (
+    set MSVC_EXE="%VS140COMNTOOLS%\..\IDE\devenv.exe"
+) else if exist "%VS140COMNTOOLS%\..\IDE\VCExpress.exe" (
+    set MSVC_EXE="%VS140COMNTOOLS%\..\IDE\VCExpress.exe"
+) else (
+    echo "Could not find MS Visual Studio in %VS140COMNTOOLS%\..\IDE"
+    echo Check environment variable VS140COMNTOOLS!
+    exit 1
 )
+call "%VS140COMNTOOLS%..\Tools\vsvars32.bat"
 
 @SET SHAPER_ROOT_DIR=%ROOT_DIR%\install
 @SET PATH=%SHAPER_ROOT_DIR%\lib\salome;%PATH%
