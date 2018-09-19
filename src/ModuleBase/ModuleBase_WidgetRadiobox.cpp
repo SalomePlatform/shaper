@@ -53,7 +53,11 @@ int ModuleBase_WidgetRadiobox::addPage(ModuleBase_PageBase* thePage,
   QVBoxLayout* aLay = new QVBoxLayout(aWgt);
   aLay->setContentsMargins(0, 0, 0, 0);
 
-  QRadioButton* aButton = new QRadioButton(aWgt);
+  QRadioButton* aButton;
+  if (theIcon.isNull())
+    aButton = new QRadioButton(theName, aWgt);
+  else
+    aButton = new QRadioButton(aWgt);
   aButton->setToolTip(theName);
   aLay->addStretch();
   aLay->addWidget(aButton);
