@@ -229,6 +229,10 @@ void Model_ResultBody::updateSubs(const std::shared_ptr<GeomAPI_Shape>& theThisS
         aSub = anObjects->createBody(this->data(), aSubIndex);
         mySubs.push_back(aSub);
         mySubsMap[aSub] = int(mySubs.size() - 1);
+        if (isConcealed()) { // for issue #2579 note7
+          aSub->ModelAPI_ResultBody::setIsConcealed(true);
+          std::dynamic_pointer_cast<Model_ResultBody>(aSub)->updateConcealment();
+        }
       } else { // just update shape of this result
         aSub = mySubs[aSubIndex];
       }
