@@ -75,5 +75,6 @@
      <file>pictures/move_out_before.png</file>
      <file>pictures/selection.png</file>
      <file>pictures/autoapply.png</file>
+     <file>pictures/whatis.png</file>
  </qresource>
  </RCC>

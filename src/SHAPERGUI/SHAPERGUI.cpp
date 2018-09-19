@@ -149,6 +149,22 @@ void SHAPERGUI::initialize(CAM_Application* theApp)
   {
     connect(anApp, SIGNAL(preferenceResetToDefaults()), this, SLOT(onDefaultPreferences()));
   }
+
+  int aMenu = createMenu(tr("Inspection"), -1, -1, 30);
+  int aSubMenu = createMenu(tr("Information"), aMenu);
+
+  int aId = myActionsList.size();
+  myActionsList.append("INSPECTION_CMD");
+  SUIT_Desktop* aDesk = application()->desktop();
+  QString aTip = tr("Show inspection window");
+  myWhatIsAction = createAction(aId, aTip, QIcon(":pictures/whatis.png"), tr("What Is"),
+    aTip, QKeySequence(), aDesk, true, this, SLOT(onWhatIs(bool)));
+  myWhatIsAction->setStatusTip(aTip);
+  myWhatIsAction->setData("INSPECTION_CMD");
+  createMenu(aId, aSubMenu, 0);
+
+  int aTool = createTool("INSPWCTION_TOOL", "INSPWCTION_TOOL");
+  int aToolId = createTool(myWhatIsAction, aTool);
 }
 
 //******************************************************
@@ -212,6 +228,7 @@ bool SHAPERGUI::activateModule(SUIT_Study* theStudy)
     if (aInspection) {
       QAction* aViewAct = aInspection->toggleViewAction();
       aViewAct->setEnabled(true);
+      connect(aViewAct, SIGNAL(toggled(bool)), this, SLOT(onWhatIs(bool)));
     }
 
     if (!mySelector) {
@@ -749,4 +766,21 @@ bool SHAPERGUI::abortAllOperations()
 void SHAPERGUI::createFeatureActions()
 {
   myWorkshop->menuMgr()->createFeatureActions();
+}
+
+void SHAPERGUI::onWhatIs(bool isToggled)
+{
+  QDockWidget* aInspection = myWorkshop->inspectionPanel();
+  if (sender() == myWhatIsAction) {
+    QAction* aViewAct = aInspection->toggleViewAction();
+    aViewAct->blockSignals(true);
+    aViewAct->setChecked(isToggled);
+    aViewAct->blockSignals(false);
+    aInspection->setVisible(isToggled);
+  }
+  else {
+    myWhatIsAction->blockSignals(true);
+    myWhatIsAction->setChecked(isToggled);
+    myWhatIsAction->blockSignals(false);
+  }
 }

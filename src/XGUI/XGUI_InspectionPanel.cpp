@@ -172,10 +172,8 @@ XGUI_InspectionPanel::XGUI_InspectionPanel(QWidget* theParent, XGUI_SelectionMgr
   aSplitter->addWidget(aTypeWgt);
 
   myTypeParams = new QTextBrowser(aSplitter);
-  myTypeParams->setFixedWidth(170);
   myTypeParams->setReadOnly(true);
   myTypeParams->setFocusPolicy(Qt::NoFocus);
-  myTypeParams->setFrameStyle(QFrame::NoFrame);
   myTypeParams->viewport()->setBackgroundRole(QPalette::Window);
 
   aSplitter->addWidget(myTypeParams);

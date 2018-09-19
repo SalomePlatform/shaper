@@ -202,6 +202,9 @@ Q_OBJECT
   /// Abort all operations
   virtual bool abortAllOperations();
 
+private slots:
+  void onWhatIs(bool isToggled);
+
  private:
    /// Create selector for OCC Viewer
    /// \param theMgr view manager
@@ -238,6 +241,8 @@ Q_OBJECT
 
   /// Popup manager
   QtxPopupMgr* myPopupMgr;
+
+  QAction* myWhatIsAction;
 };
 
 #endif
