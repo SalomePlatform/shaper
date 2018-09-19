@@ -50,7 +50,8 @@ ModuleBase_PagedContainer::~ModuleBase_PagedContainer()
 
 int ModuleBase_PagedContainer::addPage(ModuleBase_PageBase* thePage,
                                       const QString& theName, const QString& theCaseId,
-                                      const QPixmap& theIcon )
+                                      const QPixmap& theIcon,
+                                      const QString& theTooltip)
 {
   if (!myPages.count()) {
     setDefaultValue(theCaseId.toStdString());

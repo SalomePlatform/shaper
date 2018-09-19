@@ -67,9 +67,10 @@ ModuleBase_WidgetToolbox::~ModuleBase_WidgetToolbox()
 int ModuleBase_WidgetToolbox::addPage(ModuleBase_PageBase* thePage,
                                       const QString& theName,
                                       const QString& theCaseId,
-                                      const QPixmap& theIcon )
+                                      const QPixmap& theIcon,
+                                      const QString& theTooltip)
 {
-  ModuleBase_PagedContainer::addPage(thePage, theName, theCaseId, theIcon);
+  ModuleBase_PagedContainer::addPage(thePage, theName, theCaseId, theIcon, theTooltip);
   QFrame* aFrame = dynamic_cast<QFrame*>(thePage);
   myToolBox->addItem(aFrame, theName, theIcon );
   return myToolBox->count();

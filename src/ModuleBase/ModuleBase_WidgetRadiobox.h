@@ -47,7 +47,8 @@ public:
   virtual int addPage(ModuleBase_PageBase* theWidget,
     const QString& theName,
     const QString& theCaseId,
-    const QPixmap& theIcon);
+    const QPixmap& theIcon,
+    const QString& theTooltip);
 
 protected:
   /// Implements ModuleBase_PagedContainer

@@ -53,7 +53,8 @@ class MODULEBASE_EXPORT ModuleBase_WidgetToolbox : public ModuleBase_PagedContai
   virtual int addPage( ModuleBase_PageBase* theWidget,
                        const QString& theName,
                        const QString& theCaseId,
-                       const QPixmap& theIcon );
+                       const QPixmap& theIcon,
+                       const QString& theTooltip);
 
  protected:
   /// Implements ModuleBase_PagedContainer

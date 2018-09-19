@@ -54,7 +54,8 @@ class MODULEBASE_EXPORT ModuleBase_WidgetSwitch : public ModuleBase_PagedContain
   virtual int addPage( ModuleBase_PageBase* theWidget,
                        const QString& theName,
                        const QString& theCaseId,
-                       const QPixmap& theIcon );
+                       const QPixmap& theIcon,
+                       const QString& theTooltip);
 
  protected:
    /// Returns index of the current page

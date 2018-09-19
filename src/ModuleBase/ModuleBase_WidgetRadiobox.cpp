@@ -46,19 +46,23 @@ ModuleBase_WidgetRadiobox::~ModuleBase_WidgetRadiobox()
 int ModuleBase_WidgetRadiobox::addPage(ModuleBase_PageBase* thePage,
                                         const QString& theName,
                                         const QString& theCaseId,
-                                        const QPixmap& theIcon)
+                                        const QPixmap& theIcon,
+                                        const QString& theTooltip)
 {
-  ModuleBase_PagedContainer::addPage(thePage, theName, theCaseId, theIcon);
+  ModuleBase_PagedContainer::addPage(thePage, theName, theCaseId, theIcon, theTooltip);
   QWidget* aWgt = new QWidget(this);
   QVBoxLayout* aLay = new QVBoxLayout(aWgt);
   aLay->setContentsMargins(0, 0, 0, 0);
 
   QRadioButton* aButton;
-  if (theIcon.isNull())
+  if (theIcon.isNull()) {
     aButton = new QRadioButton(theName, aWgt);
-  else
+    aButton->setToolTip(theTooltip);
+  }
+  else {
     aButton = new QRadioButton(aWgt);
-  aButton->setToolTip(theName);
+    aButton->setToolTip(theName);
+  }
   aLay->addStretch();
   aLay->addWidget(aButton);
   aLay->addStretch();

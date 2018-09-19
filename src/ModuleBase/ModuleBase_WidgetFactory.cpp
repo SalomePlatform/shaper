@@ -132,6 +132,7 @@ void ModuleBase_WidgetFactory::createWidget(ModuleBase_PageBase* thePage, bool a
         if (myWidgetApi->toChildWidget()) {
           do {
             QString aPageName = qs(myWidgetApi->getProperty(CONTAINER_PAGE_NAME));
+            QString aTooltip = qs(myWidgetApi->getProperty(FEATURE_TOOLTIP));
             QString aCaseId = qs(myWidgetApi->getProperty(_ID));
             ModuleBase_PageBase* aPage = new ModuleBase_PageWidget(aWidget);
             createWidget(aPage);
@@ -141,7 +142,7 @@ void ModuleBase_WidgetFactory::createWidget(ModuleBase_PageBase* thePage, bool a
 
               QString anIconPath = qs( myWidgetApi->getProperty( CONTAINER_PAGE_ICON ) );
               QPixmap anIcon = ModuleBase_IconFactory::loadPixmap( anIconPath );
-              aContainer->addPage( aPage, aPageName, aCaseId, anIcon );
+              aContainer->addPage( aPage, aPageName, aCaseId, anIcon, aTooltip);
             }
           } while (myWidgetApi->toNextWidget());
         }
