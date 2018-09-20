@@ -123,6 +123,7 @@ bool ModuleBase_WidgetValidated::isValidInFilters(const ModuleBase_ViewerPrsPtr&
         myPresentedObject = aFeature;
         AttributePtr anAttr = attribute();
         std::string aType = anAttr->attributeType();
+
         // Check that results of Feature is acceptable by filters for selection attribute
         if (aType == ModelAPI_AttributeSelection::typeId()) {
           AttributeSelectionPtr aSelectAttr =
@@ -136,8 +137,18 @@ bool ModuleBase_WidgetValidated::isValidInFilters(const ModuleBase_ViewerPrsPtr&
           }
           aSelectAttr->setValue(ObjectPtr(), GeomShapePtr(), true);
         }
-        else
-          aValid = false; // only results with a shape can be filtered
+        else {
+          ResultPtr aResult = aFeature->firstResult();
+          if (aResult.get()) {
+            GeomShapePtr aShapePtr = ModelAPI_Tools::shape(aResult);
+            if (aShapePtr.get()) {
+              const TopoDS_Shape aTDShape = aShapePtr->impl<TopoDS_Shape>();
+              Handle(AIS_InteractiveObject) anIO = myWorkshop->selection()->getIO(thePrs);
+              anOwner = new StdSelect_BRepOwner(aTDShape, anIO);
+            }
+          }
+          aValid = !anOwner.IsNull(); // only results with a shape can be filtered
+        }
       } else
         aValid = false; // only results with a shape can be filtered
     }
