@@ -27,25 +27,27 @@ email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com
                   concealment="true">
     <validator id="GeomValidators_DifferentShapes"/>
   </multi_selector>
-  <boolvalue id="closed" label="Closed" tooltip="Makes the curve closed." default="false"/>
   <boolvalue id="reorder" label="Reorder" tooltip="Changes the order of points to construct the shortest curve." default="false"/>
-  <optionalbox id="use_tangents" title="Tangents" default="false">
-    <shape_selector id="tangent_start"
-                    icon="icons/Features/axis.png"
-                    label="Start"
-                    tooltip="Select vector tangent to the start of curve"
-                    shape_types="edge"
-                    default="&lt;start&gt;">
-      <validator id="GeomValidators_ShapeType" parameters="empty,line"/>
-    </shape_selector>
-    <shape_selector id="tangent_end"
-                    icon="icons/Features/axis.png"
-                    label="End"
-                    tooltip="Select vector tangent to the end of curve"
-                    shape_types="edge"
-                    default="&lt;end&gt;">
-      <validator id="GeomValidators_ShapeType" parameters="empty,line"/>
-    </shape_selector>
+  <optionalbox id="closed" title="Closed" tooltip="Makes the curve closed or not." default="false"
+               has_frame="false" enable_on_check="false">
+    <optionalbox id="use_tangents" title="Tangents" default="false">
+      <shape_selector id="tangent_start"
+                      icon="icons/Features/axis.png"
+                      label="Start"
+                      tooltip="Select vector tangent to the start of curve"
+                      shape_types="edge"
+                      default="&lt;start&gt;">
+        <validator id="GeomValidators_ShapeType" parameters="empty,line"/>
+      </shape_selector>
+      <shape_selector id="tangent_end"
+                      icon="icons/Features/axis.png"
+                      label="End"
+                      tooltip="Select vector tangent to the end of curve"
+                      shape_types="edge"
+                      default="&lt;end&gt;">
+        <validator id="GeomValidators_ShapeType" parameters="empty,line"/>
+      </shape_selector>
+    </optionalbox>
   </optionalbox>
   <validator id="GeomValidators_MinObjectsSelected" parameters="base_objects,2"/>
 </source>

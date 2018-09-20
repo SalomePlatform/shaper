@@ -86,7 +86,7 @@ void BuildPlugin_Interpolation::execute()
   bool isToReorder = boolean(REORDER_ID())->value();
 
   // Get use tangents flag value
-  bool isToUseTangents = !string(USE_TANGENTS_ID())->value().empty();
+  bool isToUseTangents = isClosed? false : (!string(USE_TANGENTS_ID())->value().empty());
 
   // Get tangent for start and end points
   GeomDirPtr aDirStart, aDirEnd;

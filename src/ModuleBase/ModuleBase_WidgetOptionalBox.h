@@ -113,6 +113,8 @@ private:
   /// Makes model widget controls either disabled(for check box mode) or hidden(for group box mode)
   void updateControlsVisibility();
 
+  bool toEnableWidgets() const;
+
 private:
   std::string myToolTip; ///< tool tip defined in XML
   std::string myGroupTitle; ///< a title for group box
@@ -120,13 +122,21 @@ private:
   OptionType myOptionType; ///< current option state
   QVBoxLayout* myMainLayout; ///< the main layout
   // controls to fill check box frame
-  QFrame* myCheckBoxFrame; ///< frame with check box, to be hidden when group box is used
+  QWidget* myCheckBoxFrame; ///< frame with check box, to be hidden when group box is used
   QCheckBox* myCheckBox; ///< control used if only one model widget is placed inside
   QHBoxLayout* myCheckBoxLayout; ///< layout of check box frame
   ModuleBase_ModelWidget* myCheckBoxWidget; /// model widget, placed in the check box frame
   // controls to fill group box frame
   QGroupBox* myGroupBox; ///< control used if more than model widget is placed inside
   QGridLayout* myGroupBoxLayout; ///< page's layout
+
+  QWidget* myCheckGroup;
+  QCheckBox* myCheckGroupBtn;
+  QWidget* myCheckContent;
+  QVBoxLayout* myCheckGroupLayout;
+
+  bool myHaveFrame;
+  bool myEnableOnCheck;
 };
 
 #endif /* ModuleBase_WidgetOptionalBox_H_ */

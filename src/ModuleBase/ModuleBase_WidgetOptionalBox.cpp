@@ -20,6 +20,7 @@
 
 #include <ModuleBase_WidgetOptionalBox.h>
 #include <ModelAPI_AttributeString.h>
+#include <ModelAPI_AttributeBoolean.h>
 
 #include <Config_WidgetAPI.h>
 #include <Config_Keywords.h>
@@ -42,10 +43,18 @@ ModuleBase_WidgetOptionalBox::ModuleBase_WidgetOptionalBox(QWidget* theParent,
   myCheckBoxLayout(0),
   myCheckBoxWidget(0),
   myGroupBox(0),
-  myGroupBoxLayout(0)
+  myGroupBoxLayout(0),
+  myCheckGroup(0),
+  myCheckGroupLayout(0),
+  myCheckContent(0),
+  myCheckGroupBtn(0),
+  myEnableOnCheck(true)
 {
   myToolTip = theData->widgetTooltip();
   myGroupTitle = theData->getProperty(CONTAINER_PAGE_NAME);
+
+  myHaveFrame = theData->getBooleanAttribute("has_frame", true);
+  myEnableOnCheck = theData->getBooleanAttribute("enable_on_check", true);
 
   bool isChecked = theData->getBooleanAttribute(ATTR_DEFAULT, false);
   setDefaultValue(isChecked ? "true" : "false");
@@ -60,14 +69,19 @@ ModuleBase_WidgetOptionalBox::~ModuleBase_WidgetOptionalBox()
 
 QWidget* ModuleBase_WidgetOptionalBox::pageWidget()
 {
-  return myOptionType == GroupBox ? myGroupBox : (QWidget*)myCheckBoxFrame;
+  return myOptionType == GroupBox ? (myGroupBox? myGroupBox : myCheckGroup) :
+    (QWidget*)myCheckBoxFrame;
 }
 
 QList<QWidget*> ModuleBase_WidgetOptionalBox::getControls() const
 {
   QList<QWidget*> aControls;
-  if (myOptionType == GroupBox)
-    aControls.append(myGroupBox);
+  if (myOptionType == GroupBox) {
+    if (myGroupBox)
+      aControls.append(myGroupBox);
+    else
+      aControls.append(myCheckGroup);
+  }
   else
     aControls.append(myCheckBoxFrame);
 
@@ -129,10 +143,15 @@ void ModuleBase_WidgetOptionalBox::placeWidget(QWidget* theWidget)
 #endif
     return;
   }
-  const int kCol = 0;
-  const int kRow = myGroupBoxLayout->count();
-  myGroupBoxLayout->addWidget(theWidget, kRow, kCol);
-  myGroupBoxLayout->setRowStretch(kRow, 0);
+  if (myGroupBoxLayout) {
+    const int kCol = 0;
+    const int kRow = myGroupBoxLayout->count();
+    myGroupBoxLayout->addWidget(theWidget, kRow, kCol);
+    myGroupBoxLayout->setRowStretch(kRow, 0);
+  }
+  else {
+    myCheckGroupLayout->addWidget(theWidget);
+  }
 }
 
 QLayout* ModuleBase_WidgetOptionalBox::pageLayout()
@@ -144,20 +163,38 @@ void ModuleBase_WidgetOptionalBox::createControl(const OptionType& theType)
 {
   if (theType == GroupBox && !myGroupBox) {
     // group box: more than one model widget is inside
-    myGroupBox = new QGroupBox(this);
-    myGroupBox->setTitle(translate(myGroupTitle));
-    myGroupBox->setVisible(false);
-    myGroupBox->setCheckable(true);
-    myGroupBox->setChecked(getDefaultValue() == "true");
-    myGroupBox->setToolTip(translate(myToolTip));
+    if (myHaveFrame) {
+      myGroupBox = new QGroupBox(this);
+      myGroupBox->setTitle(translate(myGroupTitle));
+      myGroupBox->setVisible(false);
+      myGroupBox->setCheckable(true);
+      myGroupBox->setChecked(getDefaultValue() == "true");
+      myGroupBox->setToolTip(translate(myToolTip));
 
-    myGroupBoxLayout = new QGridLayout(myGroupBox);
-    ModuleBase_Tools::zeroMargins(myGroupBoxLayout);
-    myGroupBox->setLayout(myGroupBoxLayout);
+      myGroupBoxLayout = new QGridLayout(myGroupBox);
+      ModuleBase_Tools::zeroMargins(myGroupBoxLayout);
+      myGroupBox->setLayout(myGroupBoxLayout);
 
-    // default vertical size policy is preferred
-    myMainLayout->addWidget(myGroupBox);
-    connect(myGroupBox, SIGNAL(clicked(bool)), this, SLOT(onPageClicked()));
+      // default vertical size policy is preferred
+      myMainLayout->addWidget(myGroupBox);
+      connect(myGroupBox, SIGNAL(clicked(bool)), this, SLOT(onPageClicked()));
+    }
+    else {
+      myCheckGroup = new QWidget(this);
+      QVBoxLayout* aLayout = new QVBoxLayout(myCheckGroup);
+      ModuleBase_Tools::zeroMargins(aLayout);
+
+      myCheckGroupBtn = new QCheckBox(translate(myGroupTitle), myCheckGroup);
+      aLayout->addWidget(myCheckGroupBtn);
+
+      myCheckContent = new QWidget(myCheckGroup);
+      myCheckGroupLayout = new QVBoxLayout(myCheckContent);
+      ModuleBase_Tools::zeroMargins(myCheckGroupLayout);
+      aLayout->addWidget(myCheckContent);
+
+      myMainLayout->addWidget(myCheckGroup);
+      connect(myCheckGroupBtn, SIGNAL(toggled(bool)), this, SLOT(onPageClicked()));
+    }
   }
   else if (theType == CheckBox && !myCheckBoxFrame) {
     myCheckBoxFrame = new QFrame(this);
@@ -177,7 +214,12 @@ bool ModuleBase_WidgetOptionalBox::storeValueCustom()
 {
   DataPtr aData = myFeature->data();
   AttributeStringPtr aStringAttr = aData->string(attributeID());
-  aStringAttr->setValue(getCurrentValue() ? attributeID() : "");
+  if (aStringAttr.get())
+    aStringAttr->setValue(getCurrentValue() ? attributeID() : "");
+  else {
+    AttributeBooleanPtr aBoolAtr = aData->boolean(attributeID());
+    aBoolAtr->setValue(getCurrentValue());
+  }
 
   updateObject(myFeature);
 
@@ -188,8 +230,12 @@ bool ModuleBase_WidgetOptionalBox::restoreValueCustom()
 {
   DataPtr aData = myFeature->data();
   AttributeStringPtr aStringAttr = aData->string(attributeID());
-  setCurrentValue(!aStringAttr->value().empty());
-
+  if (aStringAttr.get())
+    setCurrentValue(!aStringAttr->value().empty());
+  else {
+    AttributeBooleanPtr aBoolAtr = aData->boolean(attributeID());
+    setCurrentValue(aBoolAtr->value());
+  }
   return true;
 }
 
@@ -203,6 +249,8 @@ void ModuleBase_WidgetOptionalBox::setOptionType(
     myCheckBoxFrame->setVisible(!isGroupBox);
   if (myGroupBox)
     myGroupBox->setVisible(isGroupBox);
+  else if (myCheckContent)
+    myCheckGroup->setVisible(isGroupBox);
 }
 
 bool ModuleBase_WidgetOptionalBox::isCheckBoxFilled() const
@@ -213,16 +261,24 @@ bool ModuleBase_WidgetOptionalBox::isCheckBoxFilled() const
 bool ModuleBase_WidgetOptionalBox::getCurrentValue() const
 {
   bool isGroupBox = myOptionType == GroupBox;
-  return isGroupBox ? myGroupBox->isChecked() : myCheckBox->isChecked();
+  return isGroupBox ? (myGroupBox? myGroupBox->isChecked() : myCheckGroupBtn->isChecked()) :
+    myCheckBox->isChecked();
 }
 
 void ModuleBase_WidgetOptionalBox::setCurrentValue(const bool& theValue)
 {
   bool isGroupBox = myOptionType == GroupBox;
   if (isGroupBox) {
-    bool isBlocked = myGroupBox->blockSignals(true);
-    myGroupBox->setChecked(theValue);
-    myGroupBox->blockSignals(isBlocked);
+    if (myGroupBox) {
+      bool isBlocked = myGroupBox->blockSignals(true);
+      myGroupBox->setChecked(theValue);
+      myGroupBox->blockSignals(isBlocked);
+    }
+    else {
+      bool isBlocked = myCheckGroupBtn->blockSignals(true);
+      myCheckGroupBtn->setChecked(theValue);
+      myCheckGroupBtn->blockSignals(isBlocked);
+    }
   }
   else {
     bool isBlocked = myCheckBox->blockSignals(true);
@@ -235,18 +291,33 @@ void ModuleBase_WidgetOptionalBox::setCurrentValue(const bool& theValue)
 void ModuleBase_WidgetOptionalBox::updateControlsVisibility()
 {
   if (myOptionType == GroupBox) {
-    bool aChecked = myGroupBox->isChecked();
+    bool aChecked = toEnableWidgets();
     ModuleBase_Tools::adjustMargins(myGroupBoxLayout);
 
-    int aNbSubControls = myGroupBoxLayout->count();
+    QLayout* aLayout = myGroupBoxLayout ? myGroupBoxLayout : (QLayout*)myCheckGroupLayout;
+
+    int aNbSubControls = aLayout->count();
     for (int i = 0; i < aNbSubControls; i++) {
-      QWidget* aWidget = myGroupBoxLayout->itemAt(i)->widget();
+      QWidget* aWidget = aLayout->itemAt(i)->widget();
       if (aWidget)
         aWidget->setEnabled(aChecked);
     }
   }
   else {
-    bool aChecked = myCheckBox->isChecked();
-    myCheckBoxWidget->setEnabled(aChecked);
+    myCheckBoxWidget->setEnabled(toEnableWidgets());
   }
+}
+
+bool ModuleBase_WidgetOptionalBox::toEnableWidgets() const
+{
+  bool aChecked;
+  if (myOptionType == GroupBox)
+    aChecked = myGroupBox ? myGroupBox->isChecked() : myCheckGroupBtn->isChecked();
+  else
+    aChecked = myCheckBox->isChecked();
+
+  if (myEnableOnCheck)
+    return aChecked;
+  else
+    return !aChecked;
 }
