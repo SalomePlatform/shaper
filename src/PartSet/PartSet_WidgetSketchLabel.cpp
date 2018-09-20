@@ -448,7 +448,13 @@ bool PartSet_WidgetSketchLabel::fillSketchPlaneBySelection(const ModuleBase_View
     if (aSelAttr.get()) {
       ResultPtr aRes = std::dynamic_pointer_cast<ModelAPI_Result>(thePrs->object());
       if (aRes.get()) {
-        GeomShapePtr aShapePtr = ModelAPI_Tools::shape(aRes);
+        GeomShapePtr aShapePtr;
+        if (!aShape.get() || aShape->isNull()) {  // selection happens in the OCC viewer
+          aShapePtr = ModelAPI_Tools::shape(aRes);
+        }
+        else { // selection happens in OB browser
+          aShapePtr = aShape;
+        }
         if (aShapePtr.get() && aShapePtr->isFace()) {
           const TopoDS_Shape& aTDShape = aShapePtr->impl<TopoDS_Shape>();
           setSketchPlane(aTDShape);
