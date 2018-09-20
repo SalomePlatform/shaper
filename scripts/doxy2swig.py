@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 """doxy2swig.py [options] index.xml output.i
 
 Doxygen XML to SWIG docstring converter (improved version).

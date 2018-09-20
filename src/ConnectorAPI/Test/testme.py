@@ -17,7 +17,7 @@
 # See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 #
 
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 import unittest, sys, os
 
