@@ -774,6 +774,8 @@ void Model_AttributeSelection::selectBody(
         aFeatureOwner->removeResults(0, false, false);
     }
     aSel.Select(aNewSub, aNewContext);
+    // face may become divided after the model update, so, new labels may be added to the scope
+    myScope.Clear();
 
     if (aEraseResults) { // flash after Select : in Groups it makes selection with shift working
       static Events_Loop* aLoop = Events_Loop::loop();
