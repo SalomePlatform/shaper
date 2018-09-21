@@ -99,7 +99,7 @@ def checkSketch(theSketch, theDOF = -1):
     assert(theSketch.feature().error() == ""), "Sketch failed: {}".format(theSketch.feature().error())
     assert(theSketch.solverError().value() == ""), "Sketch solver failed: {}".format(theSketch.solverError().value())
     if theDOF != -1:
-        aDOF = sketcher.tools.dof(theSketch)
+        aDOF = tools.dof(theSketch)
         assert(aDOF == theDOF), "Sketch DoF {} is wrong. Expected {}".format(aDOF, theDOF)
 
 

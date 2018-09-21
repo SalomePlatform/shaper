@@ -60,7 +60,7 @@ aSketchLine = aSketchFeature.addFeature("SketchLine")
 aLineStartPoint = geomDataAPI_Point2D(aSketchLine.attribute("StartPoint"))
 aLineEndPoint = geomDataAPI_Point2D(aSketchLine.attribute("EndPoint"))
 aLineStartPoint.setValue(0., 15.)
-aLineEndPoint.setValue(20., 25.)
+aLineEndPoint.setValue(20., 30.)
 aSession.finishOperation()
 assert (model.dof(aSketchFeature) == 4)
 #=========================================================================
