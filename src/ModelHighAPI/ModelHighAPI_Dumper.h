@@ -91,6 +91,10 @@ public:
   void setSelectionByGeometry(bool theDumpByGeom = true)
   { myGeometricalSelection = theDumpByGeom; }
 
+  /// Set/unset flag to dump selection attributes by weak naming
+  void setSelectionWeakNaming(bool theDumpByWeakNaming = true)
+  { myWeakNamingSelection = theDumpByWeakNaming; }
+
   /// Dump given document into the file
   /// \return \c true, if succeed
   MODELHIGHAPI_EXPORT
@@ -361,6 +365,7 @@ private:
   bool myDumpPostponedInProgress; ///< processing postponed is in progress
 
   bool myGeometricalSelection; ///< dump selection not by naming, but by coordinates of inner point
+  bool myWeakNamingSelection; ///< dump selection by weak naming
 
 protected:
   /// list of entities, used by other features but not dumped yet

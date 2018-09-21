@@ -58,6 +58,14 @@ ModelHighAPI_Selection::ModelHighAPI_Selection(const std::string& theType,
 {
 }
 
+ModelHighAPI_Selection::ModelHighAPI_Selection(const std::string& theType,
+  const std::string& theContextName, const int theIndex)
+  : myVariantType(VT_WeakNamingPair)
+  , myWeakNamingPair(theType, std::pair<std::string, int>(theContextName, theIndex))
+{
+}
+
+
 ModelHighAPI_Selection::~ModelHighAPI_Selection()
 {
 }
@@ -77,6 +85,10 @@ void ModelHighAPI_Selection::fillAttribute(
     case VT_TypeInnerPointPair:
       theAttribute->selectSubShape(myTypeInnerPointPair.first, myTypeInnerPointPair.second);
       return;
+    case VT_WeakNamingPair:
+      theAttribute->selectSubShape(
+        myWeakNamingPair.first, myWeakNamingPair.second.first, myWeakNamingPair.second.second);
+      break;
   }
 
   if (theAttribute->isInvalid()) {
@@ -102,6 +114,11 @@ void ModelHighAPI_Selection::appendToList(
     case VT_TypeInnerPointPair:
       // Note: the reverse order (first - type, second - selected point)
       theAttribute->append(myTypeInnerPointPair.second, myTypeInnerPointPair.first);
+      return;
+    case VT_WeakNamingPair:
+      // Note: the reverse order (first - type, second - selected point)
+      theAttribute->append(
+        myWeakNamingPair.first, myWeakNamingPair.second.first, myWeakNamingPair.second.second);
       return;
   }
 }

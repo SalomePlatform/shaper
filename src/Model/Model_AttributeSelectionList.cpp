@@ -113,6 +113,24 @@ void Model_AttributeSelectionList::append(const GeomPointPtr& thePoint, const st
   owner()->data()->sendAttributeUpdated(this);
 }
 
+void Model_AttributeSelectionList::append(const std::string& theType,
+  const std::string& theContextName, const int theIndex)
+{
+  int aNewTag = mySize->Get() + 1;
+  TDF_Label aNewLab = mySize->Label().FindChild(aNewTag);
+
+  std::shared_ptr<Model_AttributeSelection> aNewAttr =
+    std::shared_ptr<Model_AttributeSelection>(new Model_AttributeSelection(aNewLab));
+  if (owner()) {
+    aNewAttr->setObject(owner());
+    aNewAttr->setParent(this);
+  }
+  aNewAttr->setID(id());
+  mySize->Set(aNewTag);
+  aNewAttr->selectSubShape(theType, theContextName, theIndex);
+  owner()->data()->sendAttributeUpdated(this);
+}
+
 void Model_AttributeSelectionList::removeTemporaryValues()
 {
   if (myTmpAttr.get()) {

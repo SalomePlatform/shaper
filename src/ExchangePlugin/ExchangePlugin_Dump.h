@@ -51,11 +51,31 @@ public:
     static const std::string MY_FILE_FORMAT_ID("file_format");
     return MY_FILE_FORMAT_ID;
   }
-  /// attribute name of flag dumping by geometric selection (not by naming)
+  /// attribute name of selection type string (GUI radio button) of dumping by topological naming
+  inline static const std::string& SELECTION_TYPE_ID()
+  {
+    static const std::string MY_SELECTION_TYPE_ID("selection_type");
+    return MY_SELECTION_TYPE_ID;
+  }
+
+  /// string identifier of dumping by topological naming
+  inline static const std::string& TOPOLOGICAL_NAMING_DUMP_ID()
+  {
+    static const std::string MY_TOOPNAMING_DUMP_ID("topological_naming");
+    return MY_TOOPNAMING_DUMP_ID;
+  }
+  /// string identifier of dumping by geometric selection
   inline static const std::string& GEOMETRIC_DUMP_ID()
   {
-    static const std::string MY_GEOM_DUMP_ID("geometric_dump");
+    static const std::string MY_GEOM_DUMP_ID("geometric_selection");
     return MY_GEOM_DUMP_ID;
+  }
+
+  /// string identifier of dumping by using weak naming identifiers of selection
+  inline static const std::string& WEAK_NAMING_DUMP_ID()
+  {
+    static const std::string MY_WEAK_NAMING_DUMP_ID("weak_naming");
+    return MY_WEAK_NAMING_DUMP_ID;
   }
 
   /// Default constructor

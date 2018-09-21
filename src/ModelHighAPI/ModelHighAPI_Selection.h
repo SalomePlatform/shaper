@@ -38,6 +38,7 @@ typedef std::pair<std::shared_ptr<ModelAPI_Result>, std::shared_ptr<GeomAPI_Shap
   ResultSubShapePair;
 typedef std::pair<std::string, std::string> TypeSubShapeNamePair;
 typedef std::pair<std::string, std::shared_ptr<GeomAPI_Pnt> > TypeInnerPointPair;
+typedef std::pair<std::string, std::pair<std::string, int> > TypeWeakNamingPair;
 //--------------------------------------------------------------------------------------
 /**\class ModelHighAPI_Selection
  * \ingroup CPPHighAPI
@@ -50,7 +51,8 @@ public:
     VT_Empty,
     VT_ResultSubShapePair,
     VT_TypeSubShapeNamePair,
-    VT_TypeInnerPointPair
+    VT_TypeInnerPointPair,
+    VT_WeakNamingPair
   };
 
 public:
@@ -72,6 +74,12 @@ public:
   MODELHIGHAPI_EXPORT
   ModelHighAPI_Selection(const std::string& theType,
                          const std::shared_ptr<GeomAPI_Pnt>& theSubShapeInnerPoint);
+
+
+  /// Constructor for sub-shape by weak naming identifier
+  MODELHIGHAPI_EXPORT
+    ModelHighAPI_Selection(const std::string& theType,
+      const std::string& theContextName, const int theIndex);
 
   /// Destructor
   MODELHIGHAPI_EXPORT
@@ -138,6 +146,7 @@ private:
   ResultSubShapePair myResultSubShapePair;
   TypeSubShapeNamePair myTypeSubShapeNamePair;
   TypeInnerPointPair myTypeInnerPointPair;
+  TypeWeakNamingPair myWeakNamingPair;
 };
 
 //--------------------------------------------------------------------------------------

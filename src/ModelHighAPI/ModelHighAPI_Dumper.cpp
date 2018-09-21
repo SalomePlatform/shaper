@@ -25,6 +25,7 @@
 #include <GeomAPI_Pnt.h>
 #include <GeomAPI_Dir.h>
 #include <GeomAPI_ShapeExplorer.h>
+#include <GeomAlgoAPI_NExplode.h>
 
 #include <GeomDataAPI_Dir.h>
 #include <GeomDataAPI_Point.h>
@@ -1067,6 +1068,7 @@ ModelHighAPI_Dumper& ModelHighAPI_Dumper::operator<<(
   }
 
   myDumpBuffer << "\"" << aShape->shapeTypeStr();
+  bool aStandardDump = true;
   if (isDumpByGeom) {
     // check the selected item is a ResultPart;
     // in this case it is necessary to get shape with full transformation
@@ -1091,8 +1093,17 @@ ModelHighAPI_Dumper& ModelHighAPI_Dumper::operator<<(
 
     myDumpBuffer << anIndex << "\", ";
     *this << aMiddlePoint;
+    aStandardDump = false;
+  } if (myWeakNamingSelection && aShape.get() && theAttrSelect->context().get() &&
+       aShape != theAttrSelect->context()->shape()) { // weak naming for local selection only
+    GeomAlgoAPI_NExplode aNExplode(theAttrSelect->context()->shape(), aShape->shapeType());
+    int anIndex = aNExplode.index(aShape);
+    if (anIndex != 0) { // found a week-naming index, so, export it
+      myDumpBuffer<<"\", \""<<theAttrSelect->context()->data()->name()<<"\", "<<anIndex;
+      aStandardDump = false;
+    }
   }
-  else
+  if (aStandardDump)
     myDumpBuffer << "\", \"" << theAttrSelect->namingName() << "\"";
   myDumpBuffer << ")";
   return *this;

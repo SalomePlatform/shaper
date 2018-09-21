@@ -108,6 +108,10 @@ class ModelAPI_AttributeSelection : public ModelAPI_Attribute
   virtual void selectSubShape(const std::string& theType,
                               const std::shared_ptr<GeomAPI_Pnt>& thePoint) = 0;
 
+  /// Selects sub-shape by weak naming index
+  virtual void selectSubShape(const std::string& theType,
+    const std::string& theContextName, const int theIndex) = 0;
+
   /// Returns true if recompute of selection become impossible
   virtual bool isInvalid() = 0;
 

@@ -53,6 +53,10 @@ class ModelAPI_AttributeSelectionList : public ModelAPI_Attribute
   virtual void append(const std::shared_ptr<GeomAPI_Pnt>& thePoint,
                       const std::string& theType) = 0;
 
+  /// Adds the new reference to the end of the list by weak naming index
+  virtual void append(const std::string& theType, const std::string& theContextName,
+                      const int theIndex) = 0;
+
   /// Reset temporary stored values
   virtual void removeTemporaryValues() = 0;
 

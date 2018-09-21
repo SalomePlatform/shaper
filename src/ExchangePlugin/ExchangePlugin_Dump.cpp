@@ -44,8 +44,8 @@ void ExchangePlugin_Dump::initAttributes()
   data()->addAttribute(FILE_PATH_ID(), ModelAPI_AttributeString::typeId());
   data()->addAttribute(FILE_FORMAT_ID(), ModelAPI_AttributeString::typeId());
 
-  data()->addAttribute(GEOMETRIC_DUMP_ID(), ModelAPI_AttributeBoolean::typeId());
-  boolean(GEOMETRIC_DUMP_ID())->setValue(false);
+  data()->addAttribute(SELECTION_TYPE_ID(), ModelAPI_AttributeString::typeId());
+  //string(SELECTION_TYPE_ID())->setValue(TOPOLOGICAL_NAMING_DUMP_ID()); // default value
 }
 
 void ExchangePlugin_Dump::execute()
@@ -66,7 +66,8 @@ void ExchangePlugin_Dump::dump(const std::string& theFileName)
 
   ModelHighAPI_Dumper* aDumper = ModelHighAPI_Dumper::getInstance();
   aDumper->clear();
-  aDumper->setSelectionByGeometry(boolean(GEOMETRIC_DUMP_ID())->value());
+  aDumper->setSelectionByGeometry(string(SELECTION_TYPE_ID())->value() == GEOMETRIC_DUMP_ID());
+  aDumper->setSelectionWeakNaming(string(SELECTION_TYPE_ID())->value() == WEAK_NAMING_DUMP_ID());
 
   DocumentPtr aDoc = ModelAPI_Session::get()->moduleDocument();
 
