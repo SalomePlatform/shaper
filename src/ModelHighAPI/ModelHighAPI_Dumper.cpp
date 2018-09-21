@@ -576,11 +576,27 @@ bool ModelHighAPI_Dumper::isDumped(const AttributeRefListPtr& theRefList) const
   return true;
 }
 
+static bool isSketchSub(const FeaturePtr& theFeature)
+{
+  static const std::string SKETCH("Sketch");
+  CompositeFeaturePtr anOwner = ModelAPI_Tools::compositeOwner(theFeature);
+  return anOwner && anOwner->getKind() == SKETCH;
+}
+
 bool ModelHighAPI_Dumper::isDefaultColor(const ResultPtr& theResult) const
 {
   AttributeIntArrayPtr aColor = theResult->data()->intArray(ModelAPI_Result::COLOR_ID());
   if (!aColor || !aColor->isInitialized())
     return true;
+
+  // check the result belongs to sketch entity, do not dump color in this way
+  ResultConstructionPtr aResConstr =
+      std::dynamic_pointer_cast<ModelAPI_ResultConstruction>(theResult);
+  if (aResConstr) {
+    FeaturePtr aFeature = ModelAPI_Feature::feature(theResult->data()->owner());
+    if (isSketchSub(aFeature))
+      return true;
+  }
 
   std::string aSection, aName, aDefault;
   theResult->colorConfigInfo(aSection, aName, aDefault);
