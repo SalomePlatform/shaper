@@ -1882,6 +1882,9 @@ void Model_Objects::updateResults(FeaturePtr theFeature, std::set<FeaturePtr>& t
             theFeature->execute();
         } else if (aGroup->Get() == ModelAPI_ResultConstruction::group().c_str()) {
           theFeature->execute(); // construction shapes are needed for sketch solver
+          if (!theFeature->results().empty()) // to fix #2640 : update sketch, but not naming
+            std::dynamic_pointer_cast<ModelAPI_ResultConstruction>(theFeature->firstResult())
+              ->facesNum(false);
         } else if (aGroup->Get() == ModelAPI_ResultGroup::group().c_str()) {
           aNewBody = createGroup(theFeature->data(), aResIndex);
         } else if (aGroup->Get() == ModelAPI_ResultField::group().c_str()) {

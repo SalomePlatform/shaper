@@ -68,12 +68,12 @@ void Model_ResultConstruction::setShape(std::shared_ptr<GeomAPI_Shape> theShape)
     if (!theShape.get() || !theShape->isEqual(myShape)) {
         static const Events_ID anEvent = Events_Loop::eventByName(EVENT_OBJECT_UPDATED);
         ModelAPI_EventCreator::get()->sendUpdated(data()->owner(), anEvent);
+        if (theShape.get()) {
+          myFacesUpToDate = false;
+          myFaces.clear();
+        }
     }
     myShape = theShape;
-    if (theShape.get()) {
-      myFacesUpToDate = false;
-      myFaces.clear();
-    }
   }
 }
 
@@ -94,7 +94,7 @@ void Model_ResultConstruction::setIsInHistory(const bool isInHistory)
   myIsInHistory = isInHistory;
 }
 
-int Model_ResultConstruction::facesNum()
+int Model_ResultConstruction::facesNum(const bool theUpdateNaming)
 {
   if (!myFacesUpToDate) {
     std::shared_ptr<GeomAPI_PlanarEdges> aWirePtr =
@@ -113,17 +113,19 @@ int Model_ResultConstruction::facesNum()
     myFacesUpToDate = true;
 
     // update all the faces and sub-elements in the naming structure
-    DocumentPtr anEmptyExt;
-    bool aNotExt = false;
-    TDF_Label aDataLab = startLabel(anEmptyExt, aNotExt);
-    TDF_ChildIterator aSubsIter(aDataLab, Standard_False);
-    for(; aSubsIter.More(); aSubsIter.Next()) {
-      const TDF_Label aLab = aSubsIter.Value();
-      if (aLab.Tag() == 1) // skip the root shape label
-        continue;
-      Handle(TNaming_NamedShape) aNS;
-      if (aLab.FindAttribute(TNaming_NamedShape::GetID(), aNS)) {
-        update(aLab.Tag() - 1, anEmptyExt, aNotExt);
+    if (theUpdateNaming) {
+      DocumentPtr anEmptyExt;
+      bool aNotExt = false;
+      TDF_Label aDataLab = startLabel(anEmptyExt, aNotExt);
+      TDF_ChildIterator aSubsIter(aDataLab, Standard_False);
+      for(; aSubsIter.More(); aSubsIter.Next()) {
+        const TDF_Label aLab = aSubsIter.Value();
+        if (aLab.Tag() == 1) // skip the root shape label
+          continue;
+        Handle(TNaming_NamedShape) aNS;
+        if (aLab.FindAttribute(TNaming_NamedShape::GetID(), aNS)) {
+          update(aLab.Tag() - 1, anEmptyExt, aNotExt);
+        }
       }
     }
   }

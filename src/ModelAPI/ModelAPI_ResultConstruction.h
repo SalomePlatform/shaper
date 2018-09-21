@@ -67,7 +67,8 @@ class ModelAPI_ResultConstruction : public ModelAPI_Result
   virtual void setIsInHistory(const bool isInHistory) = 0;
 
   /// if the construction result may be used as faces, this method returns not zero number of faces
-  virtual int facesNum() = 0;
+  /// \param theUpdateNaming is false of keeping the naming structure untouched (on load)
+  virtual int facesNum(const bool theUpdateNaming = true) = 0;
   /// if the construction result may be used as faces, this method returns face by zero based index
   virtual std::shared_ptr<GeomAPI_Face> face(const int theIndex) = 0;
 
