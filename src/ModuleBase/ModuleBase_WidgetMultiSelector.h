@@ -37,6 +37,7 @@
 #include <QMap>
 
 class QWidget;
+class QCheckBox;
 //class QComboBox;
 class ModuleBase_ListView;
 class ModuleBase_IWorkshop;
@@ -131,6 +132,8 @@ protected slots:
   void onListSelection();
 
   void onListActivated();
+
+  void onSameTopology(bool theOn);
 
 protected:
   /// Returns true if the event is processed. The default implementation is empty, returns false.
@@ -247,6 +250,8 @@ protected:
 
   bool myIsFirst;
   std::string myDefMode;
+
+  QCheckBox* myGeomCheck;
 };
 
 #endif /* MODULEBASE_WIDGETFILESELECTOR_H_ */

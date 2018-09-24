@@ -62,6 +62,7 @@
 #include <QClipboard>
 #include <QTimer>
 #include <QMainWindow>
+#include <QCheckBox>
 
 #include <memory>
 #include <string>
@@ -163,6 +164,15 @@ ModuleBase_WidgetMultiSelector::ModuleBase_WidgetMultiSelector(QWidget* theParen
   //aMainLay->setRowMinimumHeight(3, 20);
   //this->setLayout(aMainLay);
   connect(myTypeCtrl, SIGNAL(valueChanged(int)), this, SLOT(onSelectionTypeChanged()));
+
+  bool aSameTop = theData->getBooleanAttribute("same_topology", false);
+  if (aSameTop) {
+    myGeomCheck = new QCheckBox(tr("Add elements that share the same topology"), this);
+    aMainLay->addWidget(myGeomCheck);
+    connect(myGeomCheck, SIGNAL(toggled(bool)), SLOT(onSameTopology(bool)));
+  }
+  else
+    myGeomCheck = 0;
 
   myIsNeutralPointClear = theData->getBooleanAttribute("clear_in_neutral_point", true);
   if (myShapeTypes.size() > 1 || myIsUseChoice) {
@@ -1040,4 +1050,15 @@ void ModuleBase_WidgetMultiSelector::onListActivated()
 {
   //focusTo();
   emitFocusInWidget();
+}
+
+void ModuleBase_WidgetMultiSelector::onSameTopology(bool theOn)
+{
+  AttributePtr anAttribute = myFeature->data()->attribute(attributeID());
+  std::string aType = anAttribute->attributeType();
+  if (aType == ModelAPI_AttributeSelectionList::typeId()) {
+    AttributeSelectionListPtr aSelectionListAttr = myFeature->data()->selectionList(attributeID());
+    //TODO: set same topology flag
+    updateObject(myFeature);
+  }
 }

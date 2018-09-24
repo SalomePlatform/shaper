@@ -29,7 +29,8 @@ email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com
     type_choice="Vertices Edges Faces Solids"
     use_choice="true"
     clear_in_neutral_point="false"
-    filter_points="false" >
+    filter_points="false"
+    same_topology="true">
     <validator id="GeomValidators_BodyShapes"/>
   </multi_selector>
 </source>
