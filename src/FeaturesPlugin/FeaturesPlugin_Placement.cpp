@@ -31,7 +31,6 @@
 #include <GeomAPI_Edge.h>
 #include <GeomAPI_Face.h>
 #include <GeomAPI_Pln.h>
-#include <GeomAPI_ShapeIterator.h>
 #include <GeomAlgoAPI_Placement.h>
 #include <GeomAlgoAPI_Transform.h>
 
@@ -122,8 +121,21 @@ void FeaturesPlugin_Placement::execute()
   // Verify planarity of faces and linearity of edges
   std::shared_ptr<GeomAPI_Shape> aShapes[2] = {aStartShape, anEndShape};
   for (int i = 0; i < 2; i++) {
-    if (!isShapeValid(aShapes[i])) {
-      return;
+    if (aShapes[i]->isFace()) {
+      std::shared_ptr<GeomAPI_Face> aFace(new GeomAPI_Face(aShapes[i]));
+      if (!aFace->isPlanar()) {
+        static const std::string aPlanarityError = "Error: One of selected faces is not planar.";
+        setError(aPlanarityError);
+        return;
+      }
+    }
+    else if (aShapes[i]->isEdge()) {
+      std::shared_ptr<GeomAPI_Edge> anEdge(new GeomAPI_Edge(aShapes[i]));
+      if (!anEdge->isLine()) {
+        static const std::string aLinearityError = "Error: One of selected endges is not linear.";
+        setError(aLinearityError);
+        return;
+      }
     }
   }
 
@@ -185,48 +197,6 @@ void FeaturesPlugin_Placement::execute()
 
   // Remove the rest results if there were produced in the previous pass.
   removeResults(aResultIndex);
-}
-
-//==================================================================================================
-bool FeaturesPlugin_Placement::isShapeValid(GeomShapePtr theShape)
-{
-  if (theShape->isCompound()) {
-    GeomAPI_Shape::ShapeType aShapeType = GeomAPI_Shape::SHAPE;
-    for (GeomAPI_ShapeIterator anIt(theShape); anIt.more(); anIt.next()) {
-      GeomShapePtr aCurrentShape = anIt.current();
-      if (aShapeType == GeomAPI_Shape::SHAPE) {
-        aShapeType = aCurrentShape->shapeType();
-      }
-      else if (aShapeType != aCurrentShape->shapeType()) {
-        static const std::string aLinearityError =
-          "Error: Selected compound contains shapes with different types.";
-        setError(aLinearityError);
-        return false;
-      }
-
-      if (!isShapeValid(aCurrentShape)) {
-        return false;
-      }
-    }
-  }
-  else if (theShape->isFace()) {
-    std::shared_ptr<GeomAPI_Face> aFace(new GeomAPI_Face(theShape));
-    if (!aFace->isPlanar()) {
-      static const std::string aPlanarityError = "Error: One of selected faces is not planar.";
-      setError(aPlanarityError);
-      return false;
-    }
-  }
-  else if (theShape->isEdge()) {
-    std::shared_ptr<GeomAPI_Edge> anEdge(new GeomAPI_Edge(theShape));
-    if (!anEdge->isLine()) {
-      static const std::string aLinearityError = "Error: One of selected edges is not linear.";
-      setError(aLinearityError);
-      return false;
-    }
-  }
-
-  return true;
 }
 
 //============================================================================

@@ -128,12 +128,6 @@ class MODELAPI_EXPORT ModelAPI_ValidatorsFactory
  /// Returns true if the attribute must be checked (the case is selected)
   virtual bool isCase(FeaturePtr theFeature, std::string theAttribute) = 0;
 
-  /// Register the selection attribute as geometrical selection
-  virtual void registerGeometricalSelection(std::string theFeature, std::string theAttribute) = 0;
-
-  /// Returns true if the attribute is a geometrical selection
-  virtual bool isGeometricalSelection(std::string theFeature, std::string theAttribute) = 0;
-
  protected:
   /// Get instance from Session
   ModelAPI_ValidatorsFactory()

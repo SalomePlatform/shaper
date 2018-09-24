@@ -40,7 +40,6 @@
 #include <Events_InfoMessage.h>
 #include <GeomAPI_Edge.h>
 #include <GeomAPI_Pnt.h>
-#include <GeomAPI_ShapeIterator.h>
 #include <GeomAPI_Vertex.h>
 #include <GeomAlgoAPI_CompoundBuilder.h>
 #include <GeomAlgoAPI_NExplode.h>
@@ -452,10 +451,6 @@ void Model_AttributeSelection::setID(const std::string theID)
 {
   myRef.setID(theID);
   ModelAPI_AttributeSelection::setID(theID);
-  FeaturePtr aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(owner());
-  // TODO: check if parent list have geometrical selection flag.
-  myIsGeometricalSelection =
-    ModelAPI_Session::get()->validators()->isGeometricalSelection(aFeature->getKind(), id());
 }
 
 ResultPtr Model_AttributeSelection::context()
@@ -779,7 +774,7 @@ void Model_AttributeSelection::selectBody(
       if (aEraseResults) // erase results without flash deleted and redisplay: do it after Select
         aFeatureOwner->removeResults(0, false, false);
     }
-    aSel.Select(aNewSub, aNewContext, myIsGeometricalSelection);
+    aSel.Select(aNewSub, aNewContext);
     // face may become divided after the model update, so, new labels may be added to the scope
     myScope.Clear();
 
@@ -867,14 +862,6 @@ std::string Model_AttributeSelection::namingName(const std::string& theDefaultNa
     }
     // in case of selection of removed result
     return "";
-  }
-
-  if (myIsGeometricalSelection
-      && aSubSh.get()
-      && aSubSh->isCompound())
-  {
-    GeomAPI_ShapeIterator anIt(aSubSh);
-    aSubSh = anIt.current();
   }
 
   Model_SelectionNaming aSelNaming(selectionLabel());

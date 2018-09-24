@@ -16,7 +16,6 @@
       label="axis"
       default=""
       shape_types="edge"
-      geometrical_selection="true"
       icon="icons/Primitives/axis.png"
       tooltip="Select the axis of the cone">
     <validator id="GeomValidators_ConstructionComposite"/>

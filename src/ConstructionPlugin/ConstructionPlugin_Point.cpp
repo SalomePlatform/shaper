@@ -36,7 +36,6 @@
 #include <GeomAPI_Pnt.h>
 #include <GeomAPI_Vertex.h>
 #include <GeomAPI_Pln.h>
-#include <GeomAPI_ShapeIterator.h>
 
 //==================================================================================================
 ConstructionPlugin_Point::ConstructionPlugin_Point()
@@ -271,14 +270,7 @@ std::list<std::shared_ptr<GeomAPI_Vertex> >
   if(!aLineShape.get()) {
     aLineShape = aLineSelection->context()->shape();
   }
-  GeomEdgePtr anEdge;
-  if (aLineShape->isEdge()) {
-    anEdge = aLineShape->edge();
-  }
-  else if (aLineShape->isCompound()) {
-    GeomAPI_ShapeIterator anIt(aLineShape);
-    anEdge = anIt.current()->edge();
-  }
+  std::shared_ptr<GeomAPI_Edge> anEdge(new GeomAPI_Edge(aLineShape));
 
   // Get plane.
   AttributeSelectionPtr aPlaneSelection= selection(INTERSECTION_PLANE());
@@ -286,14 +278,7 @@ std::list<std::shared_ptr<GeomAPI_Vertex> >
   if(!aPlaneShape.get()) {
     aPlaneShape = aPlaneSelection->context()->shape();
   }
-  GeomFacePtr aFace;
-  if (aPlaneShape->isFace()) {
-    aFace = aPlaneShape->face();
-  }
-  else if (aPlaneShape->isCompound()) {
-    GeomAPI_ShapeIterator anIt(aPlaneShape);
-    aFace = anIt.current()->face();
-  }
+  std::shared_ptr<GeomAPI_Face> aFace(new GeomAPI_Face(aPlaneShape));
 
   if (!string(USE_OFFSET())->value().empty()) {
     double anOffset = real(OFFSET())->value();

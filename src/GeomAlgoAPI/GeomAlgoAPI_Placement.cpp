@@ -21,7 +21,6 @@
 #include "GeomAlgoAPI_Placement.h"
 
 #include <GeomAlgoAPI_DFLoader.h>
-#include <GeomAlgoAPI_ShapeTools.h>
 
 #include <GeomAPI_Dir.h>
 #include <GeomAPI_Edge.h>
@@ -29,7 +28,6 @@
 #include <GeomAPI_Lin.h>
 #include <GeomAPI_Pnt.h>
 #include <GeomAPI_Pln.h>
-#include <GeomAPI_ShapeIterator.h>
 #include <GeomAPI_Vertex.h>
 #include <GeomAPI_XYZ.h>
 
@@ -72,48 +70,29 @@ void GeomAlgoAPI_Placement::build(const std::shared_ptr<GeomAPI_Shape>& theSourc
 
   GProp_GProps aProps;
   static const double aPropEps = 1.e-4;
-  GeomShapePtr aShape;
-  bool isCompound = false;
   for (int i = 0; i < aNbObjects; i++) {
-    aShape = aShapes[i];
-    isCompound = false;
-    if (aShapes[i]->isCompound()) {
-      isCompound = true;
-      GeomAPI_ShapeIterator anIt(aShapes[i]);
-      aShape = anIt.current();
-
-      GeomPointPtr aPnt = GeomAlgoAPI_ShapeTools::centreOfMass(aShapes[i]);
-      aSrcDstPoints[i].SetCoord(aPnt->x(), aPnt->y(), aPnt->z());
-    }
-
-    if (aShape->isFace()) {
-      std::shared_ptr<GeomAPI_Face> aFace(new GeomAPI_Face(aShape));
+    if (aShapes[i]->isFace()) {
+      std::shared_ptr<GeomAPI_Face> aFace(new GeomAPI_Face(aShapes[i]));
       std::shared_ptr<GeomAPI_Pln> aPlane = aFace->getPlane();
       std::shared_ptr<GeomAPI_Dir> aDir = aPlane->direction();
       aSrcDstNormals[i].SetCoord(aDir->x(), aDir->y(), aDir->z());
 
-      if (!isCompound) {
-        BRepGProp::SurfaceProperties(aFace->impl<TopoDS_Face>(), aProps, aPropEps);
-        gp_Pnt aLoc = aProps.CentreOfMass();
-        aSrcDstPoints[i].SetCoord(aLoc.X(), aLoc.Y(), aLoc.Z());
-      }
+      BRepGProp::SurfaceProperties(aFace->impl<TopoDS_Face>(), aProps, aPropEps);
+      gp_Pnt aLoc = aProps.CentreOfMass();
+      aSrcDstPoints[i].SetCoord(aLoc.X(), aLoc.Y(), aLoc.Z());
     }
-    else if (aShape->isEdge()) {
-      std::shared_ptr<GeomAPI_Edge> anEdge(new GeomAPI_Edge(aShape));
+    else if (aShapes[i]->isEdge()) {
+      std::shared_ptr<GeomAPI_Edge> anEdge(new GeomAPI_Edge(aShapes[i]));
       std::shared_ptr<GeomAPI_Lin> aLine = anEdge->line();
       std::shared_ptr<GeomAPI_Dir> aDir = aLine->direction();
+      std::shared_ptr<GeomAPI_Pnt> aFirstPnt = anEdge->firstPoint();
+      std::shared_ptr<GeomAPI_Pnt> aLastPnt = anEdge->lastPoint();
+      std::shared_ptr<GeomAPI_XYZ> aLoc = aFirstPnt->xyz()->added(aLastPnt->xyz())->multiplied(0.5);
+      aSrcDstPoints[i].SetCoord(aLoc->x(), aLoc->y(), aLoc->z());
       aSrcDstDirections[i].SetCoord(aDir->x(), aDir->y(), aDir->z());
-
-      if (!isCompound) {
-        std::shared_ptr<GeomAPI_Pnt> aFirstPnt = anEdge->firstPoint();
-        std::shared_ptr<GeomAPI_Pnt> aLastPnt = anEdge->lastPoint();
-        std::shared_ptr<GeomAPI_XYZ> aLoc = aFirstPnt->xyz()->added(aLastPnt->xyz())
-                                                            ->multiplied(0.5);
-        aSrcDstPoints[i].SetCoord(aLoc->x(), aLoc->y(), aLoc->z());
-      }
     }
-    else if (aShape->isVertex()) {
-      std::shared_ptr<GeomAPI_Vertex> aVertex(new GeomAPI_Vertex(aShape));
+    else if (aShapes[i]->isVertex()) {
+      std::shared_ptr<GeomAPI_Vertex> aVertex(new GeomAPI_Vertex(aShapes[i]));
       std::shared_ptr<GeomAPI_Pnt> aPnt = aVertex->point();
       aSrcDstPoints[i].SetCoord(aPnt->x(), aPnt->y(), aPnt->z());
     } else // something goes wrong

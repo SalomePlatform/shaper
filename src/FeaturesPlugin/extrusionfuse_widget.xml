@@ -43,7 +43,6 @@ email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com
                     label="Direction"
                     tooltip="Select an edge for direction"
                     shape_types="edge"
-                    geometrical_selection="true"
                     default="&lt;base normal&gt;">
       <validator id="GeomValidators_ShapeType" parameters="empty,line"/>
     </shape_selector>
@@ -77,7 +76,6 @@ email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com
                           label="Plane face"
                           tooltip="Bounding plane (select a planar face)"
                           shape_types="face"
-                          geometrical_selection="true"
                           default="&lt;base sketch&gt;">
             <validator id="GeomValidators_Face" parameters="plane"/>
           </shape_selector>
@@ -93,7 +91,6 @@ email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com
                           label="Plane face"
                           tooltip="Bounding plane (select a planar face)"
                           shape_types="face"
-                          geometrical_selection="true"
                           default="&lt;base sketch&gt;">
             <validator id="GeomValidators_Face" parameters="plane"/>
           </shape_selector>

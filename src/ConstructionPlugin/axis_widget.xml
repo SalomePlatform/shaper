@@ -50,8 +50,7 @@ email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com
                       label="Line"
                       tooltip="Select line."
                       icon="icons/Construction/edge.png"
-                      shape_types="edge"
-                      geometrical_selection="true">
+                      shape_types="edge">
         <validator id="GeomValidators_ShapeType" parameters="line"/>
       </shape_selector>
     </box>
@@ -60,8 +59,7 @@ email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com
         label="Main object"
         icon="icons/Construction/circle.png"
         tooltip="Select a cylindrical object"
-        shape_types="face"
-        geometrical_selection="true">
+        shape_types="face">
         <validator id="GeomValidators_Face" parameters="cylinder"/>
       </shape_selector>
     </box>
@@ -70,8 +68,7 @@ email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com
                       label="Plane"
                       tooltip="Select a planar face."
                       icon="icons/Construction/face.png"
-                      shape_types="face"
-                      geometrical_selection="true">
+                      shape_types="face">
         <validator id="GeomValidators_Face" parameters="plane"/>
       </shape_selector>
       <shape_selector id="point"
@@ -86,8 +83,7 @@ email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com
                       label="1st plane"
                       tooltip="Select a planar face."
                       icon="icons/Construction/face.png"
-                      shape_types="face"
-                      geometrical_selection="true">
+                      shape_types="face">
         <validator id="GeomValidators_Face" parameters="plane"/>
         <validator id="ConstructionPlugin_ValidatorAxisTwoNotParallelPlanes" parameters="plane2"/>
       </shape_selector>
@@ -99,8 +95,7 @@ email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com
                       label="2nd plane"
                       tooltip="Select a planar face."
                       icon="icons/Construction/face.png"
-                      shape_types="face"
-                      geometrical_selection="true">
+                      shape_types="face">
         <validator id="GeomValidators_Face" parameters="plane"/>
         <validator id="ConstructionPlugin_ValidatorAxisTwoNotParallelPlanes" parameters="plane1"/>
       </shape_selector>

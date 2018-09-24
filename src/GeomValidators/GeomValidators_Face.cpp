@@ -24,7 +24,6 @@
 #include "ModelAPI_AttributeSelection.h"
 
 #include <GeomAPI_Face.h>
-#include <GeomAPI_ShapeIterator.h>
 
 #include <GeomAbs_SurfaceType.hxx>
 
@@ -45,40 +44,6 @@ GeomAbs_SurfaceType faceType(const std::string& theType)
 
   Events_InfoMessage("GeomValidators_Face", "Face type defined in XML is not implemented!").send();
   return GeomAbs_Plane;
-}
-
-bool isValidFace(const GeomShapePtr theShape,
-                 const GeomAbs_SurfaceType theFaceType,
-                 Events_InfoMessage& theError)
-{
-  GeomFacePtr aGeomFace = theShape->face();
-
-  if (!aGeomFace.get()) {
-    theError = "The shape is not a face.";
-      return false;
-  }
-
-  bool aValid = true;
-
-  switch (theFaceType) {
-    case GeomAbs_Plane: {
-      aValid = aGeomFace->isPlanar();
-      if (!aValid) theError = "The shape is not a plane.";
-      break;
-    }
-    case GeomAbs_Cylinder: {
-      aValid = aGeomFace->isCylindrical();
-      if (!aValid) theError = "The shape is not a cylinder.";
-      break;
-    }
-    default: {
-      aValid = false;
-      theError = "The shape is not an available face.";
-      break;
-    }
-  }
-
-  return aValid;
 }
 
 bool GeomValidators_Face::isValid(const AttributePtr& theAttribute,
@@ -113,21 +78,35 @@ bool GeomValidators_Face::isValid(const AttributePtr& theAttribute,
       theError = "The shape is not a face.";
     }
     else {
-      GeomAbs_SurfaceType aFaceType = GeomAbs_Plane;
-      if (theArguments.size() == 1) aFaceType = faceType(theArguments.front());
-      if (aGeomShape->isFace()) {
-        isValidFace(aGeomShape, aFaceType, theError);
+      std::shared_ptr<GeomAPI_Face> aGeomFace(new GeomAPI_Face(aGeomShape));
+      if (!aGeomFace.get()) {
+        aValid = false;
+        theError = "The shape is not a face.";
       }
-      else if (aSelectionAttr->isGeometricalSelection() && aGeomShape->isCompound()) {
-        for (GeomAPI_ShapeIterator anIt(aGeomShape); anIt.more(); anIt.next()) {
-          if (!isValidFace(anIt.current(), aFaceType, theError)) {
+      else {
+        GeomAbs_SurfaceType aFaceType = GeomAbs_Plane;
+        if (theArguments.size() == 1)
+          aFaceType = faceType(theArguments.front());
+
+        switch (aFaceType) {
+          case GeomAbs_Plane: {
+            aValid = aGeomFace->isPlanar();
+            if (!aValid)
+              theError = "The shape is not a plane.";
+          }
+          break;
+          case GeomAbs_Cylinder:{
+            aValid = aGeomFace->isCylindrical();
+            if (!aValid)
+              theError = "The shape is not a cylinder.";
+          }
+          break;
+          default: {
+            aValid = false;
+            theError = "The shape is not an available face.";
             break;
           }
         }
-      }
-      else {
-        aValid = false;
-        theError = "The shape is not a face.";
       }
     }
   }

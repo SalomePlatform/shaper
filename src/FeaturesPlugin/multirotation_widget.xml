@@ -15,8 +15,7 @@
                     label="Axis"
                     tooltip="Select an edge for the angular direction"
                     shape_types="edge"
-                    default=""
-                    geometrical_selection="true">
+                    default="">
       <validator id="GeomValidators_ShapeType" parameters="line"/>
     </shape_selector>
     <optionalbox id="use_step_angular" title="Angular step">

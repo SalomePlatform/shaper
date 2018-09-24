@@ -22,7 +22,6 @@
 #include "GeomValidators_Tools.h"
 
 #include <GeomAPI_Curve.h>
-#include <GeomAPI_ShapeIterator.h>
 #include <GeomDataAPI_Point2D.h>
 
 #include <ModelAPI_Result.h>
@@ -131,27 +130,18 @@ bool GeomValidators_ShapeType::isValidAttribute(const AttributePtr& theAttribute
       std::dynamic_pointer_cast<ModelAPI_AttributeSelection>(theAttribute);
     GeomShapePtr aShape = anAttr->value();
     if (aShape.get())
-      aValid = isValidShape(aShape, theShapeType, anAttr->isGeometricalSelection(), theError);
+      aValid = isValidShape(aShape, theShapeType, theError);
     else {
       if (anAttr->context().get())
-        aValid = isValidObject(anAttr->context(),
-                               theShapeType,
-                               anAttr->isGeometricalSelection(),
-                               theError);
+        aValid = isValidObject(anAttr->context(), theShapeType, theError);
       else
-        aValid = isValidObject(anAttr->contextFeature(),
-                               theShapeType,
-                               anAttr->isGeometricalSelection(),
-                               theError);
+        aValid = isValidObject(anAttr->contextFeature(), theShapeType, theError);
     }
   }
   else if (anAttributeType == ModelAPI_AttributeRefAttr::typeId()) {
     AttributeRefAttrPtr anAttr = std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(theAttribute);
     if (anAttr->isObject()) {
-      aValid = isValidObject(anAttr->object(),
-                             theShapeType,
-                             false,
-                             theError);
+      aValid = isValidObject(anAttr->object(), theShapeType, theError);
     }
     else if (theShapeType == Vertex) {
       AttributePtr aRefAttr = anAttr->attr();
@@ -172,7 +162,7 @@ bool GeomValidators_ShapeType::isValidAttribute(const AttributePtr& theAttribute
   else if (anAttributeType == ModelAPI_AttributeReference::typeId()) {
     AttributeReferencePtr anAttr =
                               std::dynamic_pointer_cast<ModelAPI_AttributeReference>(theAttribute);
-    aValid = isValidObject(anAttr->value(), theShapeType, false, theError);
+    aValid = isValidObject(anAttr->value(), theShapeType, theError);
   }
   else if (anAttributeType == ModelAPI_AttributeSelectionList::typeId()) {
     AttributeSelectionListPtr aListAttr =
@@ -200,7 +190,6 @@ bool GeomValidators_ShapeType::isValidAttribute(const AttributePtr& theAttribute
 
 bool GeomValidators_ShapeType::isValidObject(const ObjectPtr& theObject,
                                              const TypeOfShape theShapeType,
-                                             const bool theIsGeometricalSelection,
                                              Events_InfoMessage& theError) const
 {
   bool aValid = true;
@@ -225,7 +214,7 @@ bool GeomValidators_ShapeType::isValidObject(const ObjectPtr& theObject,
         aValid = false;
         theError = "The result is empty";
       } else {
-        aValid = isValidShape(aResult->shape(), theShapeType, theIsGeometricalSelection, theError);
+        aValid = isValidShape(aResult->shape(), theShapeType, theError);
       }
     } else {
       FeaturePtr aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(theObject);
@@ -242,7 +231,6 @@ bool GeomValidators_ShapeType::isValidObject(const ObjectPtr& theObject,
 
 bool GeomValidators_ShapeType::isValidShape(const GeomShapePtr theShape,
                                             const TypeOfShape theShapeType,
-                                            const bool theIsGeometricalSelection,
                                             Events_InfoMessage& theError) const
 {
   bool aValid = true;
@@ -259,21 +247,9 @@ bool GeomValidators_ShapeType::isValidShape(const GeomShapePtr theShape,
     case Edge:
       aValid = theShape->isEdge();
       break;
-    case Line: {
-      if (theIsGeometricalSelection && theShape->isCompound()) {
-        aValid = true;
-        for (GeomAPI_ShapeIterator anIt(theShape); anIt.more(); anIt.next()) {
-          if (!anIt.current()->isEdge() || !GeomAPI_Curve(anIt.current()).isLine()) {
-            aValid = false;
-            break;
-          }
-        }
-      }
-      else {
-        aValid = theShape->isEdge() && GeomAPI_Curve(theShape).isLine();
-      }
+    case Line:
+      aValid = theShape->isEdge() && GeomAPI_Curve(theShape).isLine();
       break;
-    }
     case Circle:
       aValid = theShape->isEdge() && GeomAPI_Curve(theShape).isCircle();
       break;

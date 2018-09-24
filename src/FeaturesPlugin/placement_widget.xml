@@ -32,16 +32,14 @@ email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com
     label="Select an object"
     icon="icons/Features/placement_from.png"
     tooltip="Select a start face, edge or vertex"
-    shape_types="face edge vertex"
-    geometrical_selection="true">
+    shape_types="face edge vertex">
     <validator id="GeomValidators_BodyShapes"/>
   </shape_selector>
   <shape_selector id="placement_end_shape"
     label="Select an object"
     icon="icons/Features/placement_to.png"
     tooltip="Select an end face, edge or vertex"
-    shape_types="face edge vertex"
-    geometrical_selection="true">
+    shape_types="face edge vertex">
     <validator id="PartSet_DifferentObjects"/>
     <validator id="GeomValidators_BodyShapes"/>
   </shape_selector>

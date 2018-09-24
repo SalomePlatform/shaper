@@ -89,9 +89,6 @@ void Config_FeatureReader::processNode(xmlNodePtr theNode)
         aMessage->setConcealment(isConcealment);
         bool isMainArg = isConcealment && getBooleanAttribute(theNode, ATTR_MAIN_ARG, false);
         aMessage->setMainArgument(isMainArg);
-        aMessage->setGeometricalSelection(getBooleanAttribute(theNode,
-                                                              ATTR_GEOMETRICAL_SELECTION,
-                                                              false));
 
         std::list<std::pair<std::string, std::string> > aCases;
         xmlNodePtr aCaseNode = hasParentRecursive(theNode,

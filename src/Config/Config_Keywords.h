@@ -100,8 +100,6 @@ const static char* ATTR_USE_RESET = "use_reset";
 const static char* ATTR_GREED = "greed";
 const static char* ATTR_MODIFIED_IN_EDIT = "modified_in_edit";
 const static char* ATTR_MAIN_ARG = "main_argument";
-const static char* ATTR_GEOMETRICAL_SELECTION = "geometrical_selection";
-
 
 // WDG_INFO properties
 const static char* INFO_WDG_TEXT = FEATURE_TEXT;

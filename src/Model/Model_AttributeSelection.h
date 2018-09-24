@@ -47,9 +47,6 @@ class Model_AttributeSelection : public ModelAPI_AttributeSelection
   CenterType myTmpCenterType;
   /// Reference to the partent attribute, if any (to split selection compounds in issue 1799)
   Model_AttributeSelectionList* myParent;
-  /// If true attribute selects geometry instead of shape.
-  bool myIsGeometricalSelection;
-
 public:
   /// Defines the result and its selected sub-shape
   /// \param theContext object where the sub-shape was selected
@@ -182,11 +179,6 @@ protected:
   /// during creation from new to old context
   void computeValues(ResultPtr theOldContext, ResultPtr theNewContext, TopoDS_Shape theValShape,
     TopTools_ListOfShape& theShapes);
-
-  /// Returns true if is geometrical selection.
-  virtual bool isGeometricalSelection() const {
-    return myIsGeometricalSelection;
-  };
 
   friend class Model_Data;
   friend class Model_AttributeSelectionList;
