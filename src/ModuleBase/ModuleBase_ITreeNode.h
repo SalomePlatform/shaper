@@ -183,7 +183,10 @@ protected:
       ModuleBase_ITreeNode* aNode = 0;
       ObjectPtr aObject;
       int aIdx;
-      while (i < myChildren.size()) {
+      int aCount = 0;
+      int aSize = myChildren.size();
+      while (i < aSize) {
+        aCount++;
         aNode = myChildren.at(i);
         aObject = aNode->object();
         if (aObject.get()) {
@@ -196,6 +199,9 @@ protected:
           }
         }
         i++;
+        // To avoid unlimited cycling
+        if (aCount > aSize * aSize)
+          break;
       }
     }
   }
