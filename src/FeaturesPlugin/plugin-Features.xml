@@ -23,85 +23,85 @@ email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com
   <workbench id="Features" document="Part">
     <group id="Transformation">
       <feature id="Scale" title="Scale" tooltip="Perform scale objects"
-               icon="icons/Features/scale.png" helpfile="FeaturesPlugin/transformationFeature.html">
+               icon="icons/Features/scale.png" helpfile="transformationFeature.html">
         <source path="scale_widget.xml"/>
       </feature>
     </group>
     <group id="Extrusion">
       <feature id="Extrusion" title="Extrusion" tooltip="Create a solid by extrusion of a face"
-               icon="icons/Features/extrusion.png" helpfile="FeaturesPlugin/extrusionFeature.html">
+               icon="icons/Features/extrusion.png" helpfile="extrusionFeature.html">
           <source path="extrusion_widget.xml"/>
       </feature>
       <feature id="ExtrusionCut" title="ExtrusionCut" tooltip=""
-               icon="icons/Features/extrusion_cut.png" helpfile="FeaturesPlugin/extrusionCutFeature.html">
+               icon="icons/Features/extrusion_cut.png" helpfile="extrusionCutFeature.html">
         <source path="extrusioncut_widget.xml"/>
       </feature>
       <feature id="ExtrusionFuse" title="ExtrusionFuse" tooltip=""
-               icon="icons/Features/extrusion_fuse.png" helpfile="FeaturesPlugin/extrusionFuseFeature.html">
+               icon="icons/Features/extrusion_fuse.png" helpfile="extrusionFuseFeature.html">
         <source path="extrusionfuse_widget.xml"/>
       </feature>
     </group>
     <group id="Revolution">
       <feature id="Revolution" title="Revolution" tooltip="Create a solid by revolution of a face"
-               icon="icons/Features/revol.png" helpfile="FeaturesPlugin/revolutionFeature.html">
+               icon="icons/Features/revol.png" helpfile="revolutionFeature.html">
           <source path="revolution_widget.xml"/>
       </feature>
       <feature id="RevolutionCut" title="RevolutionCut" tooltip=""
-               icon="icons/Features/revol_cut.png" helpfile="FeaturesPlugin/revolutionCutFeature.html">
+               icon="icons/Features/revol_cut.png" helpfile="revolutionCutFeature.html">
         <source path="revolutioncut_widget.xml"/>
       </feature>
       <feature id="RevolutionFuse" title="RevolutionFuse" tooltip=""
-               icon="icons/Features/revol_fuse.png" helpfile="FeaturesPlugin/revolutionFuseFeature.html">
+               icon="icons/Features/revol_fuse.png" helpfile="revolutionFuseFeature.html">
         <source path="revolutionfuse_widget.xml"/>
       </feature>
     </group>
     <group id="Pipe">
       <feature id="Pipe" title="Pipe" tooltip="Generates extrusion along a path"
-               icon="icons/Features/pipe.png" helpfile="FeaturesPlugin/pipeFeature.html">
+               icon="icons/Features/pipe.png" helpfile="pipeFeature.html">
         <source path="pipe_widget.xml"/>
       </feature>
     </group>
     <group id="Boolean" toolbar="yes">
       <feature id="Cut" title="Cut" tooltip="Perform boolean cut operation with objects"
-               icon="icons/Features/bool_cut.png" helpfile="FeaturesPlugin/cutFeature.html"
+               icon="icons/Features/bool_cut.png" helpfile="cutFeature.html"
                auto_preview="false">
           <source path="boolean_widget.xml"/>
       </feature>
       <feature id="Fuse" title="Fuse" tooltip="Perform boolean fuse operation with objects"
-               icon="icons/Features/bool_fuse.png" helpfile="FeaturesPlugin/fuseFeature.html"
+               icon="icons/Features/bool_fuse.png" helpfile="fuseFeature.html"
                auto_preview="false">
           <source path="boolean_fuse_widget.xml"/>
       </feature>
       <feature id="Common" title="Common" tooltip="Perform boolean common operation with objects"
-               icon="icons/Features/bool_common.png"  helpfile="FeaturesPlugin/commonFeature.html"
+               icon="icons/Features/bool_common.png"  helpfile="commonFeature.html"
                auto_preview="false">
           <source path="boolean_common_widget.xml"/>
       </feature>
       <feature id="Smash" title="Smash" tooltip="Perform boolean smash operation with objects"
-               icon="icons/Features/bool_smash.png" helpfile="FeaturesPlugin/smashFeature.html"
+               icon="icons/Features/bool_smash.png" helpfile="smashFeature.html"
                auto_preview="false">
           <source path="boolean_smash_widget.xml"/>
       </feature>
       <feature id="Intersection" title="Intersection" tooltip="Intersect objects with tools"
-               icon="icons/Features/intersection.png" helpfile="FeaturesPlugin/intersectionFeature.html">
+               icon="icons/Features/intersection.png" helpfile="intersectionFeature.html">
         <source path="intersection_widget.xml"/>
       </feature>
       <feature id="Partition" title="Partition" tooltip="Perform partition operations with solids"
-               icon="icons/Features/partition.png" helpfile="FeaturesPlugin/partitionFeature.html"
+               icon="icons/Features/partition.png" helpfile="partitionFeature.html"
                auto_preview="false">
           <source path="partition_widget.xml"/>
       </feature>
       <feature id="Fill" title="Fill" tooltip="Perform boolean fill operation with objects"
-               icon="icons/Features/bool_fill.png" helpfile="FeaturesPlugin/fillFeature.html"
+               icon="icons/Features/bool_fill.png" helpfile="fillFeature.html"
                auto_preview="false">
           <source path="boolean_fill_widget.xml"/>
       </feature>
       <feature id="Union" title="Union" tooltip="Perform union operations with shapes"
-               icon="icons/Features/union.png" helpfile="FeaturesPlugin/unionFeature.html">
+               icon="icons/Features/union.png" helpfile="unionFeature.html">
           <source path="union_widget.xml"/>
       </feature>
       <feature id="Remove_SubShapes" title="Remove Sub-Shapes" tooltip="Allows to remove sub-shapes from wires, shells, compsolids and compounds"
-               icon="icons/Features/remove_subshapes.png" helpfile="FeaturesPlugin/removeSubShapesFeature.html">
+               icon="icons/Features/remove_subshapes.png" helpfile="removeSubShapesFeature.html">
           <source path="remove_subshapes_widget.xml"/>
       </feature>
     </group>
@@ -110,13 +110,13 @@ email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com
         title="Recover"
         tooltip="Visualize concealed objects"
         icon="icons/Features/recover.png"
-        helpfile="FeaturesPlugin/recoverFeature.html">
+        helpfile="recoverFeature.html">
         <source path="recover_widget.xml"/>
       </feature>
     </group>
     <group id="Fillet">
       <feature id="Fillet" title="Fillet" tooltip="Perform fillet on face or edge"
-               icon="icons/Features/fillet.png" auto_preview="true" helpfile="FeaturesPlugin/filletFeature.html">
+               icon="icons/Features/fillet.png" auto_preview="true" helpfile="filletFeature.html">
         <source path="fillet_widget.xml"/>
       </feature>
       <feature id="FusionFaces" title="Fuse Faces" tooltip="Performs fusion of connected faces"
@@ -128,33 +128,33 @@ email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com
   <workbench id="Part">
     <group id="Movement">
       <feature id="Placement" title="Placement" tooltip="Place an objects relatively to another one"
-               icon="icons/Features/placement.png" helpfile="FeaturesPlugin/placementFeature.html">
+               icon="icons/Features/placement.png" helpfile="placementFeature.html">
         <source path="placement_widget.xml"/>
       </feature>
       <feature id="Translation" title="Translation" tooltip="Perform translation of an objects along the axis to specified distance"
-               icon="icons/Features/movement.png" helpfile="FeaturesPlugin/translationFeature.html">
+               icon="icons/Features/movement.png" helpfile="translationFeature.html">
         <source path="translation_widget.xml"/>
       </feature>
       <feature id="Rotation" title="Rotation" tooltip="Perform rotation of an objects around the axis to specified angle"
-               icon="icons/Features/rotation.png" helpfile="FeaturesPlugin/rotationFeature.html">
+               icon="icons/Features/rotation.png" helpfile="rotationFeature.html">
         <source path="rotation_widget.xml"/>
       </feature>
       <feature id="Symmetry" title="Symmetry" tooltip="Perform symmetry with respect to a point, an axis or a plane"
-               icon="icons/Features/symmetry.png" helpfile="FeaturesPlugin/symmetryFeature.html">
+               icon="icons/Features/symmetry.png" helpfile="symmetryFeature.html">
         <source path="symmetry_widget.xml"/>
       </feature>
       <feature id="LinearCopy" title="Linear copy" tooltip="Perform copy and translate"
-               icon="icons/Features/multitranslation.png" helpfile="FeaturesPlugin/linearCopyFeature.html">
+               icon="icons/Features/multitranslation.png" helpfile="linearCopyFeature.html">
         <source path="multitranslation_widget.xml"/>
       </feature>
       <feature id="AngularCopy" title="Angular Copy" tooltip="Perform copy and rotate"
-               icon="icons/Features/multirotation.png" helpfile="FeaturesPlugin/angularCopyFeature.html">
+               icon="icons/Features/multirotation.png" helpfile="angularCopyFeature.html">
         <source path="multirotation_widget.xml"/>
       </feature>
     </group>
     <group id="Measurement">
       <feature id="Measurement" title="Measurement" tooltip="Calculate properties of objects"
-               icon="icons/Features/measurement.png" helpfile="FeaturesPlugin/measurementFeature.html">
+               icon="icons/Features/measurement.png" helpfile="measurementFeature.html">
         <source path="measurement_widget.xml"/>
       </feature>
     </group>

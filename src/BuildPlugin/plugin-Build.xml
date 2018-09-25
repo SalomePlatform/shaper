@@ -23,55 +23,55 @@ email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com
   <workbench id="Build" document="Part">
     <group id="Generate">
       <feature id="Vertex" title="Vertex" tooltip ="Create a vertex from sketch vertex and vertex objects" icon="icons/Build/feature_vertex.png"
-               helpfile="BuildPlugin/vertexFeature.html">
+               helpfile="vertexFeature.html">
         <source path="vertex_widget.xml"/>
       </feature>
       <feature id="Edge" title="Edge" tooltip ="Create an edge from sketch edges and edge objects" icon="icons/Build/feature_edge.png"
-               helpfile="BuildPlugin/edgeFeature.html">
+               helpfile="edgeFeature.html">
         <source path="edge_widget.xml"/>
       </feature>
       <feature id="Interpolation" title="Interpolation" tooltip ="Create an interpolation curve from points" icon="icons/Build/feature_interpolation.png"
-               helpfile="BuildPlugin/interpolationFeature.html">
+               helpfile="interpolationFeature.html">
         <source path="interpolation_widget.xml"/>
       </feature>
       <feature id="Wire" title="Wire" tooltip ="Create a wire from sketch edges, edges and wires objects" icon="icons/Build/feature_wire.png"
-               helpfile="BuildPlugin/wireFeature.html">
+               helpfile="wireFeature.html">
         <source path="wire_widget.xml"/>
       </feature>
       <feature id="Polyline" title="Polyline" tooltip ="Create a polyline from points" icon="icons/Build/feature_polyline.png"
-               helpfile="BuildPlugin/polylineFeature.html">
+               helpfile="polylineFeature.html">
         <source path="polyline_widget.xml"/>
       </feature>
       <feature id="Face" title="Face" tooltip ="Create a face from sketch edges, edges and wires objects" icon="icons/Build/feature_face.png"
-               helpfile="BuildPlugin/faceFeature.html">
+               helpfile="faceFeature.html">
         <source path="face_widget.xml"/>
       </feature>
       <feature id="Shell" title="Shell" tooltip ="Create a shell from faces or shells objects" icon="icons/Build/feature_shell.png"
-               helpfile="BuildPlugin/shellFeature.html">
+               helpfile="shellFeature.html">
         <source path="shell_widget.xml"/>
       </feature>
       <feature id="Solid" title="Solid" tooltip ="Create a solid from faces or shells" icon="icons/Build/feature_solid.png"
-               helpfile="BuildPlugin/solidFeature.html">
+               helpfile="solidFeature.html">
         <source path="solid_widget.xml"/>
       </feature>
       <feature id="CompSolid" title="CompSolid" tooltip ="Create a compsolid from solids or another compsolids" icon="icons/Build/feature_compsolid.png"
-               helpfile="BuildPlugin/compsolidFeature.html">
+               helpfile="compsolidFeature.html">
         <source path="compsolid_widget.xml"/>
       </feature>
       <feature id="Compound" title="Compound" tooltip ="Create a compound of objects" icon="icons/Build/feature_compound.png"
-               helpfile="BuildPlugin/compoundFeature.html">
+               helpfile="compoundFeature.html">
         <source path="compound_widget.xml"/>
       </feature>
     </group>
     <group id="Modify">
       <feature id="SubShapes" title="Sub-Shapes" tooltip ="Allows to add or to remove sub-shapes of the selected shape" icon="icons/Build/feature_subshapes.png"
-               helpfile="BuildPlugin/subShapesFeature.html">
+               helpfile="subShapesFeature.html">
         <source path="subshapes_widget.xml"/>
       </feature>
     </group>
     <group id="Advanced">
       <feature id="Filling" title="Filling" tooltip="Create face from list of edges" icon="icons/Build/feature_filling.png"
-               helpfile="BuildPlugin/fillingFeature.html">
+               helpfile="fillingFeature.html">
         <source path="filling_widget.xml"/>
       </feature>
     </group>

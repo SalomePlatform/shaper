@@ -23,11 +23,11 @@ email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com
   <workbench id="GDML" document="Part">
     <group id="GDML">
       <feature id="ConeSegment" title="Cone segment" tooltip="Create a GDML Cone Segment" icon="icons/GDML/cone_segment.png"
-               helpfile="GDMLPlugin/coneFeature.html">
+               helpfile="coneFeature.html">
         <source path="conesegment_widget.xml"/>
       </feature>
       <feature id="Ellipsoid" title="Ellipsoid" tooltip="Create a GDML Ellipsoid" icon="icons/GDML/ellipsoid.png"
-               helpfile="GDMLPlugin/ellipsoidFeature.html">
+               helpfile="ellipsoidFeature.html">
         <source path="ellipsoid_widget.xml"/>
       </feature>
     </group>

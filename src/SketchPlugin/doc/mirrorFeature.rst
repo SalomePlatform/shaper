@@ -1,10 +1,49 @@
 
-Mirror
-======
+Mirror copy
+===========
 
+Mirror copy operation mirrors sketch entities across a line.
 
-.. image:: images/Mirror.png
+To create Mirror copy in the active Sketch:
+
+#. select in the Main Menu *Sketch - > Mirror copy* item  or
+#. click **Mirror copy** button in Sketch toolbar:
+
+.. image:: images/mirror.png
+   :align: center
+
+.. centered::
+   **Mirror copy**  button
+
+Property panel:
+
+.. image:: images/Mirror_panel.png
   :align: center
 
 .. centered::
-  Create a mirror
+   Mirror copy
+
+Input fields:
+
+- **Mirror line** is the mirror line selected in the view.
+- **Segments** is the list of segments (lines, circles, arcs) selected in the view.
+
+**TUI Command**: *Sketch_1.addMirror(MirrorLine, Objects)*
+
+**Arguments**:   Mirror line and a list of objects
+
+Result
+""""""
+
+Created Mirror copy appears in the view.
+
+| The original and a mirror copy objects are marked with the special sign.
+| Copy object is drawn with a thinner line.
+
+.. image:: images/Mirror_res.png
+	   :align: center
+
+.. centered::
+   Mirror copy created
+
+**See Also** a sample TUI Script of a :ref:`tui_create_mirror` operation.

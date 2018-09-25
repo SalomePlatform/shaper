@@ -27,7 +27,7 @@ email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com
         title="Point"
         tooltip="Create point"
         icon="icons/Construction/point.png"
-        helpfile="ConstructionPlugin/pointFeature.html">
+        helpfile="pointFeature.html">
         <source path="point_widget.xml" />
       </feature>
       <feature
@@ -35,7 +35,7 @@ email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com
         title="Axis"
         tooltip="Create axis"
         icon="icons/Construction/axis.png"
-        helpfile="ConstructionPlugin/axisFeature.html">
+        helpfile="axisFeature.html">
         <source path="axis_widget.xml" />
       </feature>
       <feature
@@ -43,7 +43,7 @@ email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com
         title="Plane"
         tooltip="Create plane"
         icon="icons/Construction/plane.png"
-        helpfile="ConstructionPlugin/planeFeature.html">
+        helpfile="planeFeature.html">
         <source path="plane_widget.xml" />
       </feature>
     </group>

@@ -615,9 +615,12 @@ void XGUI_Workshop::onHelpActionClicked()
         QString aDir(getenv("OPENPARTS_ROOT_DIR"));
         aDocDir = aDir + aSep + "doc" + aSep + "gui";
 #endif
-        QStringList aParams;
-        aParams << aDocDir + aSep + aHelpPage;
-        QProcess::startDetached(aBrowserName, aParams);
+        QString aFileName = aDocDir + aSep + aHelpPage;
+        if (QFile::exists(aFileName)) {
+          QStringList aParams;
+          aParams << aFileName;
+          QProcess::startDetached(aBrowserName, aParams);
+        }
       }
     }
   }

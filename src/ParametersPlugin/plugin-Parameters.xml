@@ -23,7 +23,7 @@ email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com
   <workbench id="Part">
     <group id="Parameters">
       <feature id="Parameter" title="Parameter" tooltip="Create a parameter" icon=":icons/expression.png"
-               helpfile="ParametersPlugin/parameterFeature.html">
+               helpfile="parameterFeature.html">
         <stringvalue id="variable" label="Name" icon=":icons/expression.png" placeholder="Please input the parameter name">
           <validator id="Parameters_VariableValidator"/>
         </stringvalue>
@@ -34,7 +34,7 @@ email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com
       </feature>
 
       <feature id="ParametersMgr" title="Parameters" tooltip="Manage parameters" icon=":icons/paper_roll.png" modal="true"
-               helpfile="ParametersPlugin/managerFeature.html">
+               helpfile="managerFeature.html">
         <parameters-manager/>
       </feature>
     </group>

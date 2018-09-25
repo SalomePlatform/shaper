@@ -1,17 +1,74 @@
+.. _box_feature:
 
 Box
 ===
 
+The feature Box creates a box solid.
 
-.. image:: images/Box1.png
-  :align: center
+To create a Box in the active part:
+
+#. select in the Main Menu *Primitives - > Box* item  or
+#. click **Box** button in the toolbar:
+
+.. image:: images/box.png
+   :align: center
 
 .. centered::
-  Create a box by dimensions
+   **Box**  button 
+
+There are 2 algorithms for creation of a Box:
+
+.. image:: images/box_2pt_32x32.png
+   :align: left
+**By dimensions** 
+
+.. image:: images/box_dxyz_32x32.png
+   :align: left
+**By two points** 
 
 
-.. image:: images/Box2.png
-  :align: center
+By dimensions
+"""""""""""""
 
+Box is created by dimensions along X, Y, Z axis starting from the origin.
+
+.. image:: images/Box_dimensions.png
+   :align: center
+
+Input fields:
+
+- **DX**, **DY**, **DZ** define sizes of the box along corresponding coordinate axes. 
+
+**TUI Command**:  *model.addBox(Part_doc, DX, DY, DZ)*
+  
+**Arguments**:    Part + 3 real values (dimensions at origin).
+
+
+By two points
+"""""""""""""
+
+Box is created by two points of the box diagonal.
+
+.. image:: images/Box_2points.png
+	 :align: center
+
+Input fields:
+
+- **Point 1** and **Point 2**  define diagonal points of the box selected in 3D OCC  viewer or object browser.
+  
+**TUI Command**:  *model.addBox(Part_doc, point1, point2)*
+
+**Arguments**:   Part + 2 selected points (opposite vertices of the box)
+
+Result
+""""""
+
+The edges of the created boxes are parallel to the coordinate axes.
+
+.. image:: images/Boxes.png
+	   :align: center
+		   
 .. centered::
-  Create a box by two points
+   Boxes created  
+
+**See Also** a sample TUI Script of a :ref:`tui_create_box` operation.

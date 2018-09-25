@@ -27,7 +27,7 @@ email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com
         tooltip="Create named collection of geometry entities"
         icon="icons/Collection/shape_group.png"
         apply_continue="true"
-        helpfile="CollectionPlugin/groupFeature.html">
+        helpfile="groupFeature.html">
         <source path="group_widget.xml"/>
       </feature>
 
@@ -35,7 +35,7 @@ email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com
         title="Field"
         tooltip="Create fields for selected shapes"
         icon="icons/Collection/field.png"
-        helpfile="CollectionPlugin/fieldFeature.html">
+        helpfile="fieldFeature.html">
         <field-panel id="selected"
           filter_points="false" >
           <validator id="GeomValidators_BodyShapes"/>

@@ -23,31 +23,31 @@ email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com
   <workbench id="Primitives" document="Part">
     <group id="Primitives">
       <feature id="Box" title="Box" tooltip="Create a box" icon="icons/Primitives/box.png"
-               helpfile="PrimitivesPlugin/boxFeature.html">
+               helpfile="boxFeature.html">
         <source path="box_widget.xml"/>
       </feature>
     </group>
     <group id="Primitives">
       <feature id="Cylinder" title="Cylinder" tooltip="Create a cylinder" icon="icons/Primitives/cylinder.png"
-               helpfile="PrimitivesPlugin/cylinderFeature.html">
+               helpfile="cylinderFeature.html">
         <source path="cylinder_widget.xml"/>
       </feature>
     </group>
     <group id="Primitives">
       <feature id="Sphere" title="Sphere" tooltip="Create a sphere" icon="icons/Primitives/sphere.png"
-               helpfile="PrimitivesPlugin/sphereFeature.html">
+               helpfile="sphereFeature.html">
         <source path="sphere_widget.xml"/>
       </feature>
     </group>
     <group id="Primitives">
       <feature id="Torus" title="Torus" tooltip="Create a Torus" icon="icons/Primitives/torus.png"
-               helpfile="PrimitivesPlugin/torusFeature.html">
+               helpfile="torusFeature.html">
         <source path="torus_widget.xml"/>
       </feature>
     </group>
     <group id="Primitives">
       <feature id="Cone" title="Cone" tooltip="Create a Cone" icon="icons/Primitives/cone.png"
-               helpfile="PrimitivesPlugin/coneFeature.html">
+               helpfile="coneFeature.html">
         <source path="cone_widget.xml"/>
       </feature>
     </group>
