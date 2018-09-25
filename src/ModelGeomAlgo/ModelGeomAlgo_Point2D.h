@@ -132,6 +132,14 @@ public:
                                           const std::shared_ptr<GeomAPI_Pnt>& thePoint,
                                           std::shared_ptr<GeomAPI_Pnt>& theProjectedPoint);
 
+  /// Finds projected point to the given shape, which does not placed on the shape boundaries
+  /// \param theBaseShape a shape of check
+  /// \param thePoint [in] a point to project
+  /// \param theProjectedPoint [out] a projected point
+  static MODELGEOMALGO_EXPORT bool isInnerPointOnEdge(
+                                          const std::shared_ptr<GeomAPI_Shape> theBaseShape,
+                                          const std::shared_ptr<GeomAPI_Pnt>& thePoint,
+                                          std::shared_ptr<GeomAPI_Pnt>& theProjectedPoint);
 
 #ifdef _DEBUG
   /// Return feature name, kind and point values united in a string info
