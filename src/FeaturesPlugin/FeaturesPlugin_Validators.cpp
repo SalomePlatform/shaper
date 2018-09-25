@@ -838,7 +838,8 @@ bool FeaturesPlugin_ValidatorRemoveSubShapesSelection::isValid(const AttributePt
     bool isSameFound = false;
     AttributeSelectionPtr anAttrSelectionInList = aSubShapesAttrList->value(anIndex);
     GeomShapePtr aShapeToAdd = anAttrSelectionInList->value();
-    for (ListOfShape::const_iterator anIt = aSubShapes.cbegin(); anIt != aSubShapes.cend(); ++anIt) {
+    for (ListOfShape::const_iterator anIt = aSubShapes.cbegin(); anIt != aSubShapes.cend(); ++anIt)
+    {
       if ((*anIt)->isEqual(aShapeToAdd)) {
         isSameFound = true;
         break;

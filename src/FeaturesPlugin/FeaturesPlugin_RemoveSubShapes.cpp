@@ -97,7 +97,8 @@ void FeaturesPlugin_RemoveSubShapes::attributeChanged(const std::string& theID)
     }
 
     std::list<GeomShapePtr> aSubShapes = GeomAlgoAPI_ShapeTools::getLowLevelSubShapes(aBaseShape);
-    for (ListOfShape::const_iterator anIt = aSubShapes.cbegin(); anIt != aSubShapes.cend(); ++anIt) {
+    for (ListOfShape::const_iterator anIt = aSubShapes.cbegin(); anIt != aSubShapes.cend(); ++anIt)
+    {
       GeomShapePtr aSubShape = *anIt;
       if(!isHasSubs) {
         aSubShapesToKeepAttrList->append(aContext, aSubShape);
@@ -126,7 +127,8 @@ void FeaturesPlugin_RemoveSubShapes::attributeChanged(const std::string& theID)
     int anIndex;
     const int aSubsToKeepNb = aSubShapesToKeepAttrList->size();
     std::list<GeomShapePtr> aSubShapes = GeomAlgoAPI_ShapeTools::getLowLevelSubShapes(aBaseShape);
-    for (ListOfShape::const_iterator anIt = aSubShapes.cbegin(); anIt != aSubShapes.cend(); ++anIt) {
+    for (ListOfShape::const_iterator anIt = aSubShapes.cbegin(); anIt != aSubShapes.cend(); ++anIt)
+    {
       GeomShapePtr aSubShape = *anIt;
       for(anIndex = 0; anIndex < aSubsToKeepNb; ++anIndex) {
         AttributeSelectionPtr anAttrSelectionInList = aSubShapesToKeepAttrList->value(anIndex);
@@ -165,7 +167,8 @@ void FeaturesPlugin_RemoveSubShapes::attributeChanged(const std::string& theID)
     int anIndex;
     const int aSubsToRemoveNb = aSubShapesToRemoveAttrList->size();
     std::list<GeomShapePtr> aSubShapes = GeomAlgoAPI_ShapeTools::getLowLevelSubShapes(aBaseShape);
-    for (ListOfShape::const_iterator anIt = aSubShapes.cbegin(); anIt != aSubShapes.cend(); ++anIt) {
+    for (ListOfShape::const_iterator anIt = aSubShapes.cbegin(); anIt != aSubShapes.cend(); ++anIt)
+    {
       GeomShapePtr aSubShape = *anIt;
       for(anIndex = 0; anIndex < aSubsToRemoveNb; ++anIndex) {
         AttributeSelectionPtr anAttrSelectionInList = aSubShapesToRemoveAttrList->value(anIndex);

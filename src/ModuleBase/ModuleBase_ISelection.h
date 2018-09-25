@@ -93,7 +93,8 @@ class MODULEBASE_EXPORT ModuleBase_ISelection
   /// Return the IO from the viewer presentation.
   /// \param thePrs a selected object
   /// \return an interactive object
-  virtual Handle(AIS_InteractiveObject) getIO(const std::shared_ptr<ModuleBase_ViewerPrs>& thePrs) = 0;
+  virtual Handle(AIS_InteractiveObject)
+    getIO(const std::shared_ptr<ModuleBase_ViewerPrs>& thePrs) = 0;
 
   /// Wraps the object list into the viewer prs list
   /// \param theObjects a list of objects
