@@ -168,8 +168,13 @@ PlaneGCSSolver_Solver::SolveStatus PlaneGCSSolver_Solver::solve()
 
   if (aResult == GCS::Failed) {
     // DogLeg solver failed without conflicting constraints, try to use Levenberg-Marquardt solver
+    diagnose(GCS::LevenbergMarquardt);
     aResult = (GCS::SolveStatus)myEquationSystem->solve(myParameters, true,
                                                         GCS::LevenbergMarquardt);
+    if (aResult == GCS::Failed) {
+      diagnose(GCS::BFGS);
+      aResult = (GCS::SolveStatus)myEquationSystem->solve(myParameters, true, GCS::BFGS);
+    }
   }
   Events_LongOp::end(this);
 
@@ -232,10 +237,10 @@ int PlaneGCSSolver_Solver::dof()
   return myDOF;
 }
 
-void PlaneGCSSolver_Solver::diagnose()
+void PlaneGCSSolver_Solver::diagnose(const GCS::Algorithm& theAlgo)
 {
   myEquationSystem->declareUnknowns(myParameters);
-  myDOF = myEquationSystem->diagnose();
+  myDOF = myEquationSystem->diagnose(theAlgo);
   myDiagnoseBeforeSolve = false;
 }
 

@@ -78,7 +78,7 @@ public:
   bool isConflicting(const ConstraintID& theConstraint) const;
 
   /// \brief Check conflicting/redundant constraints and DoF
-  void diagnose();
+  void diagnose(const GCS::Algorithm& theAlgo = GCS::DogLeg);
 
   /// \brief Degrees of freedom
   int dof();
