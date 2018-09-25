@@ -40,6 +40,7 @@
 #include <GeomAPI_Edge.h>
 #include <GeomAPI_Lin.h>
 #include <GeomAPI_Circ.h>
+#include <GeomAPI_ShapeExplorer.h>
 
 //#define DEBUG_POINT_INSIDE_SHAPE
 #ifdef DEBUG_POINT_INSIDE_SHAPE
@@ -295,7 +296,7 @@ void ModelGeomAlgo_Point2D::getPointsInsideShape(
     std::shared_ptr<GeomAPI_Pnt2d> aPnt2d = anAttribute->pnt();
     std::shared_ptr<GeomAPI_Pnt> aPoint = aPnt2d->to3D(theOrigin, theDirX, theDirY);
     std::shared_ptr<GeomAPI_Pnt> aProjectedPoint;
-    if (isPointOnEdge(theBaseShape, aPoint, aProjectedPoint)) {
+    if (isInnerPointOnEdge(theBaseShape, aPoint, aProjectedPoint)) {
       if (thePointToAttributeOrObject.find(aProjectedPoint) != thePointToAttributeOrObject.end())
         thePointToAttributeOrObject.at(aProjectedPoint).first.push_back(anAttribute);
       else {
@@ -336,7 +337,7 @@ void ModelGeomAlgo_Point2D::getPointsInsideShape_p(
     std::shared_ptr<GeomAPI_Pnt2d> aPnt2d = anAttribute->pnt();
     std::shared_ptr<GeomAPI_Pnt> aPoint = aPnt2d->to3D(theOrigin, theDirX, theDirY);
     std::shared_ptr<GeomAPI_Pnt> aProjectedPoint;
-    if (isPointOnEdge(theBaseShape, aPoint, aProjectedPoint)) {
+    if (isInnerPointOnEdge(theBaseShape, aPoint, aProjectedPoint)) {
       thePoints.push_back(aProjectedPoint);
       theAttributeToPoint[anAttribute] = aProjectedPoint;
     }
@@ -362,6 +363,28 @@ bool ModelGeomAlgo_Point2D::isPointOnEdge(const std::shared_ptr<GeomAPI_Shape> t
       std::shared_ptr<GeomAPI_Vertex> aVertexShape(new GeomAPI_Vertex(theProjectedPoint->x(),
                                                 theProjectedPoint->y(), theProjectedPoint->z()));
       isInside = GeomAlgoAPI_ShapeTools::isSubShapeInsideShape(aVertexShape, theBaseShape);
+    }
+  }
+  return isInside;
+}
+
+
+bool ModelGeomAlgo_Point2D::isInnerPointOnEdge(const std::shared_ptr<GeomAPI_Shape> theBaseShape,
+                     const std::shared_ptr<GeomAPI_Pnt>& thePoint,
+                     std::shared_ptr<GeomAPI_Pnt>& theProjectedPoint)
+{
+  bool isInside = isPointOnEdge(theBaseShape, thePoint, theProjectedPoint);
+  if (isInside) {
+    std::shared_ptr<GeomAPI_Edge> anEdge(new GeomAPI_Edge(theBaseShape));
+    if (!anEdge->isCircle()) {
+      // check the point is not on the boundary
+      GeomVertexPtr aVertex(new GeomAPI_Vertex(theProjectedPoint->x(),
+          theProjectedPoint->y(), theProjectedPoint->z()));
+      GeomAPI_ShapeExplorer anExp(anEdge, GeomAPI_Shape::VERTEX);
+      for (; anExp.more(); anExp.next()) {
+        GeomVertexPtr aCurV = anExp.current()->vertex();
+        isInside = !GeomAlgoAPI_ShapeTools::isSubShapeInsideShape(aVertex, aCurV);
+      }
     }
   }
   return isInside;
