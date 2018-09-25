@@ -1,5 +1,8 @@
 #!/bin/bash -x
 
+export SALOME_DIR=/dn46/SALOME/series9x/current-2018-09-25
+
+
 # Path to sources
 export SOURCES_DIR=$(pwd)
 # Path to build directory
@@ -10,9 +13,7 @@ export AUT_DIR=$(pwd)
 # Path to env_*.sh files
 export TOOLS_DIR=$(pwd)
 
-export HOME_OLD=$HOME
-source /dn46/SALOME/series9x/current-2018-08-30/start.sh
-export HOME=$HOME_OLD
+source ${SALOME_DIR}/start.sh
 
 # Path to special products dir (lcov, cpplint)
 export SHAPER_PDIR=/dn48/newgeom/common/products
