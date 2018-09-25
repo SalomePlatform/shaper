@@ -457,7 +457,7 @@ typedef std::map<std::string, std::map<std::string, ModelHighAPI_FeatureStore> >
 
 static bool dumpToPython(SessionPtr theSession,
                          const char* theFilename,
-                         bool theDumpByGeom,
+                         const char* theSelectionType,
                          const std::string& theErrorMsgContext)
 {
   // 2431: set PartSet as a current document
@@ -468,7 +468,7 @@ static bool dumpToPython(SessionPtr theSession,
   if (aDump.get()) {
     aDump->string("file_path")->setValue(theFilename);
     aDump->string("file_format")->setValue("py");
-    aDump->boolean("geometric_dump")->setValue(theDumpByGeom);
+    aDump->string("selection_type")->setValue(theSelectionType);
     aDump->execute();
   }
   bool isProblem = !aDump.get() || !aDump->error().empty(); // after "finish" dump will be removed
@@ -521,10 +521,10 @@ bool checkPythonDump()
 
   SessionPtr aSession = ModelAPI_Session::get();
   // dump with the selection by names
-  if (!dumpToPython(aSession, aFileForNamingDump, false, anErrorByNaming))
+  if (!dumpToPython(aSession, aFileForNamingDump, "topological_naming", anErrorByNaming))
     return false;
   // dump with the selection by geometry
-  if (!dumpToPython(aSession, aFileForGeometryDump, true, anErrorByGeometry))
+  if (!dumpToPython(aSession, aFileForGeometryDump, "geometric_selection", anErrorByGeometry))
     return false;
 
    // map from document name to feature name to feature data
