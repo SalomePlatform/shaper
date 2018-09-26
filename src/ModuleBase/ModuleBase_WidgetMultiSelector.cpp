@@ -399,6 +399,11 @@ bool ModuleBase_WidgetMultiSelector::isValidSelectionCustom(const ModuleBase_Vie
   bool aValid = ModuleBase_WidgetSelector::isValidSelectionCustom(thePrs);
   if (aValid) {
     ResultPtr aResult = myWorkshop->selection()->getResult(thePrs);
+    if (!aResult.get()) { // In case if a feature was selected
+      FeaturePtr aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(thePrs->object());
+      if (aFeature.get())
+        aResult = aFeature->firstResult();
+    }
     aValid = aResult.get() != NULL;
     if (aValid) {
       if (myFeature) {
