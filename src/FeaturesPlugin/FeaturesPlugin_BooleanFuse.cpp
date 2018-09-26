@@ -317,54 +317,63 @@ void FeaturesPlugin_BooleanFuse::execute()
 }
 
 //==================================================================================================
-void FeaturesPlugin_BooleanFuse::loadNamingDS(std::shared_ptr<ModelAPI_ResultBody> theResultBody,
-                                          const std::shared_ptr<GeomAPI_Shape> theBaseShape,
-                                          const ListOfShape& theTools,
-                                          const std::shared_ptr<GeomAPI_Shape> theResultShape,
-                                          GeomAlgoAPI_MakeShape& theMakeShape,
-                                          GeomAPI_DataMapOfShapeShape& theMapOfShapes)
+void FeaturesPlugin_BooleanFuse::loadNamingDS(ResultBodyPtr theResultBody,
+                                              const GeomShapePtr theBaseShape,
+                                              const ListOfShape& theTools,
+                                              const GeomShapePtr theResultShape,
+                                              GeomAlgoAPI_MakeShape& theMakeShape,
+                                              GeomAPI_DataMapOfShapeShape& theMapOfShapes)
 {
   //load result
   if (theBaseShape->isEqual(theResultShape)) {
     theResultBody->store(theResultShape, false);
   } else {
-    const int aModifyTag = 1;
-    const int aModifyEdgeTag = 2;
-    const int aModifyFaceTag = 3;
+    const int aModifyVTag = 1;
+    const int aModifyETag = 2;
+    const int aModifyFTag = 3;
     const int aDeletedTag = 4;
     /// sub solids will be placed at labels 5, 6, etc. if result is compound of solids
     const int aSubsolidsTag = 5;
 
     theResultBody->storeModified(theBaseShape, theResultShape, aSubsolidsTag);
 
-    const std::string aModName = "Modified";
+    const std::string aModVName = "Modified_Vertex";
     const std::string aModEName = "Modified_Edge";
     const std::string aModFName = "Modified_Face";
 
+    theResultBody->loadAndOrientModifiedShapes(&theMakeShape, theBaseShape, GeomAPI_Shape::VERTEX,
+                                               aModifyVTag, aModVName, theMapOfShapes, false,
+                                               false, true);
     theResultBody->loadAndOrientModifiedShapes(&theMakeShape, theBaseShape, GeomAPI_Shape::EDGE,
-                                               aModifyEdgeTag, aModEName, theMapOfShapes, false,
+                                               aModifyETag, aModEName, theMapOfShapes, false,
                                                false, true);
     theResultBody->loadAndOrientModifiedShapes(&theMakeShape, theBaseShape, GeomAPI_Shape::FACE,
-                                               aModifyFaceTag, aModFName, theMapOfShapes, false,
+                                               aModifyFTag, aModFName, theMapOfShapes, false,
                                                false, true);
+
+    theResultBody->loadDeletedShapes(&theMakeShape, theBaseShape,
+                                     GeomAPI_Shape::VERTEX, aDeletedTag);
+    theResultBody->loadDeletedShapes(&theMakeShape, theBaseShape,
+                                     GeomAPI_Shape::EDGE, aDeletedTag);
     theResultBody->loadDeletedShapes(&theMakeShape, theBaseShape,
                                      GeomAPI_Shape::FACE, aDeletedTag);
 
-    int aTag;
-    std::string aName;
-    for (ListOfShape::const_iterator
-         anIter = theTools.begin(); anIter != theTools.end(); anIter++) {
-      if ((*anIter)->shapeType() <= GeomAPI_Shape::FACE) {
-        aTag = aModifyFaceTag;
-        aName = aModFName;
-      } else {
-        aTag = aModifyEdgeTag;
-        aName = aModEName;
-      }
-      theResultBody->loadAndOrientModifiedShapes(&theMakeShape, *anIter,
-                                                 aName == aModEName ? GeomAPI_Shape::EDGE
-                                                                    : GeomAPI_Shape::FACE,
-                                                 aTag, aName, theMapOfShapes, false, false, true);
+    for (ListOfShape::const_iterator anIter = theTools.begin(); anIter != theTools.end(); anIter++)
+    {
+      theResultBody->loadAndOrientModifiedShapes(&theMakeShape, *anIter, GeomAPI_Shape::VERTEX,
+                                                 aModifyVTag, aModVName, theMapOfShapes, false,
+                                                 false, true);
+
+      theResultBody->loadAndOrientModifiedShapes(&theMakeShape, *anIter, GeomAPI_Shape::EDGE,
+                                                 aModifyETag, aModEName, theMapOfShapes, false,
+                                                 false, true);
+
+      theResultBody->loadAndOrientModifiedShapes(&theMakeShape, *anIter, GeomAPI_Shape::FACE,
+                                                 aModifyFTag, aModFName, theMapOfShapes, false,
+                                                 false, true);
+
+      theResultBody->loadDeletedShapes(&theMakeShape, *anIter, GeomAPI_Shape::VERTEX, aDeletedTag);
+      theResultBody->loadDeletedShapes(&theMakeShape, *anIter, GeomAPI_Shape::EDGE, aDeletedTag);
       theResultBody->loadDeletedShapes(&theMakeShape, *anIter, GeomAPI_Shape::FACE, aDeletedTag);
     }
   }
