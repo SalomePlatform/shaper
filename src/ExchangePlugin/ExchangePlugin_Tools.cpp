@@ -43,7 +43,7 @@ std::string ExchangePlugin_Tools::selectionType2xaoDimension(const std::string& 
   else if (theType == "Solids" || theType == "solid" || theType == "SOLID")
     return "solid";
   else if (theType == "Part" || theType == "part" || theType == "PART")
-    return "part";
+    return "whole";
 
   return std::string();
 }
