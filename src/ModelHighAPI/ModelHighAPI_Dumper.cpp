@@ -1094,8 +1094,9 @@ ModelHighAPI_Dumper& ModelHighAPI_Dumper::operator<<(
     myDumpBuffer << anIndex << "\", ";
     *this << aMiddlePoint;
     aStandardDump = false;
-  } if (myWeakNamingSelection && aShape.get() && theAttrSelect->context().get() &&
-       aShape != theAttrSelect->context()->shape()) { // weak naming for local selection only
+  } if (theAttrSelect->isWeakNaming() ||
+    (myWeakNamingSelection && aShape.get() && theAttrSelect->context().get() &&
+       aShape != theAttrSelect->context()->shape())) { // weak naming for local selection only
     GeomAlgoAPI_NExplode aNExplode(theAttrSelect->context()->shape(), aShape->shapeType());
     int anIndex = aNExplode.index(aShape);
     if (anIndex != 0) { // found a week-naming index, so, export it

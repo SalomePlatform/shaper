@@ -88,6 +88,10 @@ Standard_GUID kCIRCLE_CENTER("d0d0e0f1-217a-4b95-8fbb-0c4132f23718");
 Standard_GUID kELLIPSE_CENTER1("f70df04c-3168-4dc9-87a4-f1f840c1275d");
 // identifier of the selection of the second focus point of ellipse on edge
 Standard_GUID kELLIPSE_CENTER2("1395ae73-8e02-4cf8-b204-06ff35873a32");
+// identifier of the weak naming index
+Standard_GUID kWEAK_NAMING("9dcdd9be-a3a9-46eb-9b16-1c957ab20142");
+// identifier of the weak naming sub-shape type
+Standard_GUID kWEAK_NAMING_SHAPETYPE("6b9cc709-e320-4a1f-9c42-df5622369ea7");
 
 // prefix for the whole feature context identification
 const static std::string kWHOLE_FEATURE = "all-in-";
@@ -134,6 +138,8 @@ bool Model_AttributeSelection::setValue(const ObjectPtr& theContext,
   aSelLab.ForgetAttribute(kCIRCLE_CENTER);
   aSelLab.ForgetAttribute(kELLIPSE_CENTER1);
   aSelLab.ForgetAttribute(kELLIPSE_CENTER2);
+  aSelLab.ForgetAttribute(kWEAK_NAMING);
+  aSelLab.ForgetAttribute(kWEAK_NAMING_SHAPETYPE);
 
   bool isDegeneratedEdge = false;
   // do not use the degenerated edge as a shape, a null context and shape is used in the case
@@ -385,6 +391,29 @@ std::shared_ptr<GeomAPI_Shape> Model_AttributeSelection::internalValue(CenterTyp
       }
     }
 
+    if (aSelLab.IsAttribute(kWEAK_NAMING)) { // a weak naming is used
+      Handle(TDataStd_Integer) aWeakId;
+      aSelLab.FindAttribute(kWEAK_NAMING, aWeakId);
+      // get the context shape
+      GeomShapePtr aContextShape;
+      ResultBodyPtr aBody = std::dynamic_pointer_cast<ModelAPI_ResultBody>(context());
+      if (aBody.get()) {
+        aContextShape = aBody->shape();
+      } else {
+        ResultPtr aResult = std::dynamic_pointer_cast<ModelAPI_Result>(myRef.value());
+        if (aResult) {
+          aContextShape = aResult->shape();
+        }
+      }
+      if (!aContextShape.get())
+        return GeomShapePtr();
+      Handle(TDataStd_Integer) aWeakShapeType;
+      aSelLab.FindAttribute(kWEAK_NAMING_SHAPETYPE, aWeakShapeType);
+      GeomAlgoAPI_NExplode aNExplode(aContextShape, GeomAPI_Shape::ShapeType(aWeakShapeType->Get()));
+      GeomShapePtr aValue = aNExplode.shape(aWeakId->Get());
+      return aValue;
+    }
+
     Handle(TNaming_NamedShape) aSelection;
     if (aSelLab.FindAttribute(TNaming_NamedShape::GetID(), aSelection)) {
       TopoDS_Shape aSelShape = aSelection->Get();
@@ -633,6 +662,28 @@ bool Model_AttributeSelection::update()
   }
 
   if (aContext->groupName() == ModelAPI_ResultBody::group()) {
+    if (aSelLab.IsAttribute(kWEAK_NAMING)) { // a weak naming is used
+      Handle(TDataStd_Integer) aWeakId;
+      aSelLab.FindAttribute(kWEAK_NAMING, aWeakId);
+      // get the context shape
+      GeomShapePtr aContextShape;
+      ResultBodyPtr aBody = std::dynamic_pointer_cast<ModelAPI_ResultBody>(aContext);
+      if (aBody.get()) {
+        aContextShape = aBody->shape();
+      } else {
+        ResultPtr aResult = std::dynamic_pointer_cast<ModelAPI_Result>(myRef.value());
+        if (aResult) {
+          aContextShape = aResult->shape();
+        }
+      }
+      if (!setInvalidIfFalse(aSelLab, aContextShape.get() != NULL)) // context shape not found
+        return false;
+      Handle(TDataStd_Integer) aWeakShapeType;
+      aSelLab.FindAttribute(kWEAK_NAMING_SHAPETYPE, aWeakShapeType);
+      GeomAlgoAPI_NExplode aNExplode(aContextShape, GeomAPI_Shape::ShapeType(aWeakShapeType->Get()));
+      GeomShapePtr aValue = aNExplode.shape(aWeakId->Get());
+      return setInvalidIfFalse(aSelLab, aValue.get() != NULL);
+    }
     // body: just a named shape, use selection mechanism from OCCT
     TNaming_Selector aSelector(aSelLab);
     TopoDS_Shape anOldShape;
@@ -774,9 +825,38 @@ void Model_AttributeSelection::selectBody(
       if (aEraseResults) // erase results without flash deleted and redisplay: do it after Select
         aFeatureOwner->removeResults(0, false, false);
     }
-    aSel.Select(aNewSub, aNewContext);
+    bool aSelectorOk = true;
+    try {
+      aSel.Select(aNewSub, aNewContext);
+    } catch(...) {
+      aSelectorOk = false;
+    }
     // face may become divided after the model update, so, new labels may be added to the scope
     myScope.Clear();
+
+    // check that selection is correct, otherwise use weak naming solution
+    TDF_Label aSelLab = selectionLabel();
+    aSelLab.ForgetAttribute(kWEAK_NAMING);
+    Handle(TNaming_NamedShape) aSelectorShape;
+    if (aSelectorOk && aSelLab.FindAttribute(TNaming_NamedShape::GetID(), aSelectorShape))
+    {
+      TopoDS_Shape aShape = aSelectorShape->Get();
+      if (aShape.IsNull() || aShape.ShapeType() != aNewSub.ShapeType())
+        aSelectorOk = false;
+    }
+    if (!aSelectorOk) { // weak naming identifier instead
+      GeomShapePtr aContextShape(new GeomAPI_Shape);
+      aContextShape->setImpl<TopoDS_Shape>(new TopoDS_Shape(aNewContext));
+      GeomShapePtr aValueShape(new GeomAPI_Shape);
+      aValueShape->setImpl<TopoDS_Shape>(new TopoDS_Shape(aNewSub));
+
+      GeomAlgoAPI_NExplode aNExplode(aContextShape, aValueShape->shapeType());
+      int anId = aNExplode.index(aValueShape);
+      if (anId) {
+        TDataStd_Integer::Set(aSelLab, kWEAK_NAMING, anId);
+        TDataStd_Integer::Set(aSelLab, kWEAK_NAMING_SHAPETYPE, int(aValueShape->shapeType()));
+      }
+    }
 
     if (aEraseResults) { // flash after Select : in Groups it makes selection with shift working
       static Events_Loop* aLoop = Events_Loop::loop();
@@ -864,7 +944,15 @@ std::string Model_AttributeSelection::namingName(const std::string& theDefaultNa
     return "";
   }
 
-  Model_SelectionNaming aSelNaming(selectionLabel());
+  TDF_Label aSelLab = selectionLabel();
+  Handle(TDataStd_Integer) aWeakId;
+  if (aSelLab.FindAttribute(kWEAK_NAMING, aWeakId)) { // a weak naming is used
+    std::ostringstream aNameStream;
+    aNameStream<<aCont->data()->name()<<"/weak_name_"<<aWeakId->Get();
+    return aNameStream.str();
+  }
+
+  Model_SelectionNaming aSelNaming(aSelLab);
   std::string aResult = aSelNaming.namingName(
     aCont, aSubSh, theDefaultName, owner()->document() != aCont->document());
   if (aCenterType != NOT_CENTER) {
@@ -1596,4 +1684,9 @@ void Model_AttributeSelection::updateInHistory()
 void Model_AttributeSelection::setParent(Model_AttributeSelectionList* theParent)
 {
   myParent = theParent;
+}
+
+bool Model_AttributeSelection::isWeakNaming()
+{
+  return selectionLabel().IsAttribute(kWEAK_NAMING);
 }

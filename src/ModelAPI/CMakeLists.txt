@@ -210,4 +210,17 @@ ADD_UNIT_TESTS(TestConstants.py
                Test2607.py
                TestBlockRecalculation.py
                TestSelectionScope.py
+               TestWeakNaming2125.py
+               TestWeakNaming2222.py
+               TestWeakNaming2245.py
+               TestWeakNaming2247.py
+               TestWeakNaming2248.py
+               TestWeakNaming2261.py
+               TestWeakNaming2291.py
+               TestWeakNaming2335.py
+               TestWeakNaming2375.py
+               TestWeakNaming2437.py
+               TestWeakNaming2445.py
+               TestWeakNaming2446.py
+               TestWeakNaming2452.py
 )

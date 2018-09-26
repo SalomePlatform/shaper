@@ -125,6 +125,10 @@ public:
   /// or reorder of features upper in the history line (issue #1757)
   MODEL_EXPORT virtual void updateInHistory();
 
+  /// Returns true if the name was stored using weak naming principle
+  MODEL_EXPORT virtual bool isWeakNaming();
+
+
 protected:
   /// Objects are created for features automatically
   MODEL_EXPORT Model_AttributeSelection(TDF_Label& theLabel);
