@@ -28,7 +28,7 @@ There are 2 algorithms for creation of a Box:
 
 
 By dimensions
-"""""""""""""
+-------------
 
 Box is created by dimensions along X, Y, Z axis starting from the origin.
 
@@ -43,9 +43,18 @@ Input fields:
   
 **Arguments**:    Part + 3 real values (dimensions at origin).
 
+Result
+""""""
+
+A solid box based on origin and with edges parallel to the coordinate axes.
+
+.. image:: images/Box1.png
+	   :align: center
+
+**See Also** a sample TUI Script of a :ref:`tui_create_boxdim` operation.
 
 By two points
-"""""""""""""
+-------------
 
 Box is created by two points of the box diagonal.
 
@@ -63,12 +72,12 @@ Input fields:
 Result
 """"""
 
-The edges of the created boxes are parallel to the coordinate axes.
+A solid box based on two points and with edges parallel to the coordinate axes.
 
-.. image:: images/Boxes.png
+.. image:: images/Box2.png
 	   :align: center
 		   
 .. centered::
    Boxes created  
 
-**See Also** a sample TUI Script of a :ref:`tui_create_box` operation.
+**See Also** a sample TUI Script of a :ref:`tui_create_boxpnt` operation.

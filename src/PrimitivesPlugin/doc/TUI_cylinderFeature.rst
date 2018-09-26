@@ -1,12 +1,12 @@
 
   .. _tui_create_cylinder:
 
-Create /Cylinder
+Create cylinder
 ================
 
-.. literalinclude:: examples/cylinder.py
+.. literalinclude:: examples/cylinder1.py
     :linenos:
     :language: python
 
-:download:`Download this script <examples/cylinder.py>` 
+:download:`Download this script <examples/cylinder1.py>` 
    
