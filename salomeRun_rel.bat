@@ -3,7 +3,7 @@
 REM Find absolute path to ROOT_DIR
 @SET PARENT_DIR=%~dp0..
 @SET ROOT_DIR=
-pushd %PARENT_DIR%\..
+pushd %PARENT_DIR%
 @SET ROOT_DIR=%CD%
 popd
 
