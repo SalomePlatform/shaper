@@ -86,8 +86,8 @@ from GeomAPI import  GeomAPI_Shape
 model.testNbResults(Fuse_1, 1)
 model.testNbSubResults(Fuse_1, [4])
 model.testNbSubShapes(Fuse_1, GeomAPI_Shape.SOLID, [0])
-model.testNbSubShapes(Fuse_1, GeomAPI_Shape.FACE, [8])
-model.testNbSubShapes(Fuse_1, GeomAPI_Shape.EDGE, [5])
-model.testNbSubShapes(Fuse_1, GeomAPI_Shape.VERTEX, [2])
+model.testNbSubShapes(Fuse_1, GeomAPI_Shape.FACE, [12])
+model.testNbSubShapes(Fuse_1, GeomAPI_Shape.EDGE, [44])
+model.testNbSubShapes(Fuse_1, GeomAPI_Shape.VERTEX, [88])
 
 assert(model.checkPythonDump())
