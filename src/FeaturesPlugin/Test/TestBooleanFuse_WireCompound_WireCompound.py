@@ -18,6 +18,7 @@
 ## email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com>
 ##
 
+
 from salome.shaper import model
 
 model.begin()
@@ -25,19 +26,19 @@ partSet = model.moduleDocument()
 Part_1 = model.addPart(partSet)
 Part_1_doc = Part_1.document()
 Sketch_1 = model.addSketch(Part_1_doc, model.defaultPlane("XOY"))
-SketchLine_1 = Sketch_1.addLine(-64.96569468267583, 22.00171526586621, -41.05831903945112, 55.95711835334479)
-SketchLine_2 = Sketch_1.addLine(-41.05831903945112, 55.95711835334479, -23.04116638078903, 21.65523156089195)
+SketchLine_1 = Sketch_1.addLine(-74.539241607565, 22.811578250591, -50.12121418439715, 49.79992434988179)
+SketchLine_2 = Sketch_1.addLine(-50.12121418439715, 49.79992434988179, -29.55866477541372, 23.45415791962174)
 SketchConstraintCoincidence_1 = Sketch_1.setCoincident(SketchLine_1.endPoint(), SketchLine_2.startPoint())
-SketchLine_3 = Sketch_1.addLine(14.72555746140652, 19.92281303602059, 33.43567753001715, 55.95711835334479)
-SketchLine_4 = Sketch_1.addLine(33.43567753001715, 55.95711835334479, 50.75986277873073, 22.69468267581476)
+SketchLine_3 = Sketch_1.addLine(15.42191205673757, 24.09673758865247, 34.69930212765959, 49.15734468085105)
+SketchLine_4 = Sketch_1.addLine(34.69930212765959, 49.15734468085105, 59.75990921985817, 26.02447659574467)
 SketchConstraintCoincidence_2 = Sketch_1.setCoincident(SketchLine_3.endPoint(), SketchLine_4.startPoint())
 model.do()
 Sketch_2 = model.addSketch(Part_1_doc, model.defaultPlane("XOY"))
-SketchLine_5 = Sketch_2.addLine(-67.39108061749573, 66.6981132075472, -42.44425385934821, 35.51457975986279)
-SketchLine_6 = Sketch_2.addLine(-42.44425385934821, 35.51457975986279, -16.1114922813036, 69.1234991423671)
+SketchLine_5 = Sketch_2.addLine(-79.03729929078014, 52.37024302600472, -50.76379385342788, 26.6670562647754)
+SketchLine_6 = Sketch_2.addLine(-50.76379385342788, 26.6670562647754, -25.70318676122931, 53.65540236406619)
 SketchConstraintCoincidence_3 = Sketch_2.setCoincident(SketchLine_5.endPoint(), SketchLine_6.startPoint())
-SketchLine_7 = Sketch_2.addLine(12.64665523156088, 66.6981132075472, 35.16809605488852, 36.5540308747856)
-SketchLine_8 = Sketch_2.addLine(35.16809605488852, 36.5540308747856, 52.49228130360206, 66.35162950257292)
+SketchLine_7 = Sketch_2.addLine(13.49417304964538, 51.08508368794326, 35.98446146572105, 27.95221560283687)
+SketchLine_8 = Sketch_2.addLine(35.98446146572105, 27.95221560283687, 53.3341125295508, 47.87218534278959)
 SketchConstraintCoincidence_4 = Sketch_2.setCoincident(SketchLine_7.endPoint(), SketchLine_8.startPoint())
 model.do()
 Wire_1 = model.addWire(Part_1_doc, [model.selection("EDGE", "Sketch_1/Edge-SketchLine_1"), model.selection("EDGE", "Sketch_1/Edge-SketchLine_2")])
@@ -46,18 +47,18 @@ Wire_3 = model.addWire(Part_1_doc, [model.selection("EDGE", "Sketch_2/Edge-Sketc
 Wire_4 = model.addWire(Part_1_doc, [model.selection("EDGE", "Sketch_2/Edge-SketchLine_7"), model.selection("EDGE", "Sketch_2/Edge-SketchLine_8")])
 Compound_1 = model.addCompound(Part_1_doc, [model.selection("WIRE", "Wire_1_1"), model.selection("WIRE", "Wire_2_1")])
 Compound_2 = model.addCompound(Part_1_doc, [model.selection("WIRE", "Wire_3_1"), model.selection("WIRE", "Wire_4_1")])
-Cut_1 = model.addCut(Part_1_doc, [model.selection("COMPOUND", "Compound_1_1")], [model.selection("COMPOUND", "Compound_2_1")])
-model.testHaveNamingSubshapes(Cut_1, model, Part_1_doc)
+Fuse_1 = model.addFuse(Part_1_doc, [model.selection("COMPOUND", "Compound_1_1"), model.selection("COMPOUND", "Compound_2_1")])
+model.testHaveNamingSubshapes(Fuse_1, model, Part_1_doc)
 model.do()
 model.end()
 
 from GeomAPI import  GeomAPI_Shape
 
-model.testNbResults(Cut_1, 1)
-model.testNbSubResults(Cut_1, [2])
-model.testNbSubShapes(Cut_1, GeomAPI_Shape.SOLID, [0])
-model.testNbSubShapes(Cut_1, GeomAPI_Shape.FACE, [0])
-model.testNbSubShapes(Cut_1, GeomAPI_Shape.EDGE, [8])
-model.testNbSubShapes(Cut_1, GeomAPI_Shape.VERTEX, [16])
+model.testNbResults(Fuse_1, 1)
+model.testNbSubResults(Fuse_1, [4])
+model.testNbSubShapes(Fuse_1, GeomAPI_Shape.SOLID, [0])
+model.testNbSubShapes(Fuse_1, GeomAPI_Shape.FACE, [0])
+model.testNbSubShapes(Fuse_1, GeomAPI_Shape.EDGE, [16])
+model.testNbSubShapes(Fuse_1, GeomAPI_Shape.VERTEX, [32])
 
 assert(model.checkPythonDump())

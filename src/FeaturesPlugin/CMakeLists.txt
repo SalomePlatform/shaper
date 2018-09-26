@@ -351,4 +351,18 @@ ADD_UNIT_TESTS(TestExtrusion.py
                TestPartitionSubCompsolidWithPlane3.py
                TestPartitionSubCompsolidWithPlane4.py
                TestPartitionSubCompsolidWithPlane5.py
+               TestBooleanFuse_Vertex_Vertex.py
+               TestBooleanFuse_VertexCompound_VertexCompound.py
+               TestBooleanFuse_Edge_Edge.py
+               TestBooleanFuse_EdgeCompound_EdgeCompound.py
+               TestBooleanFuse_Wire_Wire.py
+               TestBooleanFuse_WireCompound_WireCompound.py
+               TestBooleanFuse_Face_Face.py
+               TestBooleanFuse_FaceCompound_FaceCompound.py
+               TestBooleanFuse_Shell_Shell.py
+               TestBooleanFuse_ShellCompound_ShellCompound.py
+               TestBooleanFuse_Solid_Solid.py
+               TestBooleanFuse_SolidCompound_SolidCompound.py
+               TestBooleanFuse_CompSolid_CompSolid.py
+               TestBooleanFuse_CompSolidCompound_CompSolidCompound.py
 )
