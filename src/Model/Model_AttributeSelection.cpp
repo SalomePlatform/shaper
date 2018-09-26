@@ -409,7 +409,8 @@ std::shared_ptr<GeomAPI_Shape> Model_AttributeSelection::internalValue(CenterTyp
         return GeomShapePtr();
       Handle(TDataStd_Integer) aWeakShapeType;
       aSelLab.FindAttribute(kWEAK_NAMING_SHAPETYPE, aWeakShapeType);
-      GeomAlgoAPI_NExplode aNExplode(aContextShape, GeomAPI_Shape::ShapeType(aWeakShapeType->Get()));
+      GeomAlgoAPI_NExplode aNExplode(
+        aContextShape, GeomAPI_Shape::ShapeType(aWeakShapeType->Get()));
       GeomShapePtr aValue = aNExplode.shape(aWeakId->Get());
       return aValue;
     }
@@ -680,7 +681,8 @@ bool Model_AttributeSelection::update()
         return false;
       Handle(TDataStd_Integer) aWeakShapeType;
       aSelLab.FindAttribute(kWEAK_NAMING_SHAPETYPE, aWeakShapeType);
-      GeomAlgoAPI_NExplode aNExplode(aContextShape, GeomAPI_Shape::ShapeType(aWeakShapeType->Get()));
+      GeomAlgoAPI_NExplode aNExplode(
+        aContextShape, GeomAPI_Shape::ShapeType(aWeakShapeType->Get()));
       GeomShapePtr aValue = aNExplode.shape(aWeakId->Get());
       return setInvalidIfFalse(aSelLab, aValue.get() != NULL);
     }
