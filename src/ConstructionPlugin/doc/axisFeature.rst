@@ -42,7 +42,7 @@ There are 6 algorithms for creation of an Axis:
 **By two planes** creates an axis as intersection of two planes.
 
 By three dimensions
-"""""""""""""""""""
+-------------------
 
 .. image:: images/Axis1.png
    :align: center
@@ -56,8 +56,22 @@ In this case user has to define dX, dY, dZ values of a vector.
 
 **Arguments**: Part + 3 values (dX, dY, dZ values).
 
+Result
+""""""
+
+The Result of the operation will be an axis defined by vector from origin:
+
+.. image:: images/CreatedAxis1.png
+	   :align: center
+
+.. centered::
+   **Axis by three dimensions**
+
+**See Also** a sample TUI Script of a :ref:`tui_create_axis_xyz` operation.
+
+
 By two points
-"""""""""""""
+-------------
 
 .. image:: images/Axis2.png
    :align: center
@@ -71,8 +85,24 @@ In this case user has to select two points or vertices.
 
 **Arguments**: Part + 2 vertices.
 
+**See Also** a sample TUI Script of a :ref:`tui_create_axis_points` operation.
+
+Result
+""""""
+
+The Result of the operation will be an axis based on two points:
+
+.. image:: images/CreatedAxis2.png
+	   :align: center
+
+.. centered::
+   **Axis by two points**
+
+**See Also** a sample TUI Script of a :ref:`tui_create_axis_points` operation.
+
+
 By line
-"""""""
+-------
 
 .. image:: images/Axis3.png
    :align: center
@@ -86,8 +116,22 @@ In this case user has to select a linear edge.
 
 **Arguments**: Part + edge.
 
+Result
+""""""
+
+The Result of the operation will be an axis based on selected line:
+
+.. image:: images/CreatedAxis3.png
+	   :align: center
+
+.. centered::
+   **Axis by line**
+
+**See Also** a sample TUI Script of a :ref:`tui_create_axis_line` operation.
+
+
 As an axis of cilindrical face
-""""""""""""""""""""""""""""""
+------------------------------
 
 .. image:: images/Axis4.png
    :align: center
@@ -101,8 +145,22 @@ In this case user has to select a cylindrical face. Axis of the cylinder will de
 
 **Arguments**: Part + cylindrical face.
 
+Result
+""""""
+
+The Result of the operation will be an axis by selected cylinder:
+
+.. image:: images/CreatedAxis4.png
+	   :align: center
+
+.. centered::
+   **Axis cylindrical face**
+
+**See Also** a sample TUI Script of a :ref:`tui_create_axis_cylinder` operation.
+
+
 By plane and point
-""""""""""""""""""
+------------------
 
 .. image:: images/Axis5.png
    :align: center
@@ -116,8 +174,22 @@ In this case user has to select a point or vertex and plane (or planar face). Ax
 
 **Arguments**: Part + plane + point.
 
+Result
+""""""
+
+The Result of the operation will be an axis:
+
+.. image:: images/CreatedAxis5.png
+	   :align: center
+
+.. centered::
+   **Axis by plane and point**
+
+**See Also** a sample TUI Script of a :ref:`tui_create_axis_plane` operation.
+
+
 By two planes
-"""""""""""""
+-------------
 
 .. image:: images/Axis6.png
    :align: center
@@ -136,10 +208,10 @@ Result
 
 The Result of the operation will be an axis:
 
-.. image:: images/CreatedAxis.png
+.. image:: images/CreatedAxis6.png
 	   :align: center
 
 .. centered::
-   Axis created  
+   **Axis by two planes**
 
-**See Also** a sample TUI Script of a :ref:`tui_create_axis` operation.
+**See Also** a sample TUI Script of a :ref:`tui_create_axis_twoplanes` operation.

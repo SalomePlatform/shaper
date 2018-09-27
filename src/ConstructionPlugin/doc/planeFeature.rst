@@ -4,7 +4,7 @@ Plane
 
 The feature Plane creates a new constructive plane.
 
-Plane is a construction object and it can be created as in a part as in part set. To create a plane:
+Plane is a construction object and it can be created as in a part as in a part set. To create a plane:
 
 #. select in the Main Menu *Construction - > Plane* item  or
 #. click **Point** button in the toolbar
@@ -33,8 +33,9 @@ There are 4 algorithms for creation of a Plane:
    :align: left
 **By two parallel planes** creates a plane between two parallel planes.
 
+
 By three points
-"""""""""""""""
+---------------
 
 .. image:: images/Plane1.png
    :align: center
@@ -48,8 +49,22 @@ In this case user has to select three points in a viewer to define a new plane.
 
 **Arguments**: Part + 3 vertices.
 
+Result
+""""""
+
+The Result of the operation will be a plane:
+
+.. image:: images/CreatedPlane1.png
+	   :align: center
+
+.. centered::
+   **A plane by three points**
+
+**See Also** a sample TUI Script of a :ref:`tui_create_plane_points` operation.
+
+
 By line and point
-"""""""""""""""""
+-----------------
 
 .. image:: images/Plane2.png
    :align: center
@@ -63,8 +78,22 @@ In this case user has to select a linear edge and point to define a plane. It is
 
 **Arguments**: Part + line + point + is perpendicular to line flag.
 
+Result
+""""""
+
+The Result of the operation will be a plane:
+
+.. image:: images/CreatedPlane2.png
+	   :align: center
+
+.. centered::
+   Plane created  
+
+**See Also** a sample TUI Script of a :ref:`tui_create_plane_line` operation.
+
+
 By other plane
-""""""""""""""
+--------------
 
 .. image:: images/Plane3.png
    :align: center
@@ -93,9 +122,22 @@ By rotation around an edge on a specified angle.
 
 **Arguments**: Part + a plane + offset + is reverse flag.
 
-   
+Result
+""""""
+
+The Result of the operation will be a plane parallel to already existing one:
+
+.. image:: images/CreatedPlane3.png
+	   :align: center
+
+.. centered::
+   **Plane parallel to a planar face**
+
+**See Also** a sample TUI Script of a :ref:`tui_create_plane_plane` operation.
+
+
 By two parallel planes
-""""""""""""""""""""""
+----------------------
    
 .. image:: images/Plane4.png
    :align: center
@@ -112,12 +154,12 @@ In this case user has to select two parallel planes. A new plane will be defined
 Result
 """"""
 
-The Result of the operation will be a plane:
+The Result of the operation will be a plane created between two selected planes:
 
-.. image:: images/CreatedPlane.png
+.. image:: images/CreatedPlane4.png
 	   :align: center
 
 .. centered::
-   Plane created  
+   **Plane created between others**
 
-**See Also** a sample TUI Script of a :ref:`tui_create_plane` operation.
+**See Also** a sample TUI Script of a :ref:`tui_create_plane_parallel` operation.

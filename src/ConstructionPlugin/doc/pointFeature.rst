@@ -2,7 +2,7 @@
 Point
 =====
 
-The feature Point creates a new constructive point.
+The feature Point creates a new construction point.
 
 Point is a construction object and it can be created as in a part as in part set. To create a point:
 
@@ -38,7 +38,7 @@ There are 5 algorithms for creation of a Point:
 **By geometrical property of object** creates a point in COG or center of arc or circle.
 
 By X,Y,Z
-""""""""
+--------
 
 .. image:: images/Point1.png
    :align: center
@@ -52,8 +52,21 @@ In this case user has to input X, Y, and Z coordinates.
 
 **Arguments**: Part + 3 values (X, Y, Z coordinates).
 
+Result
+""""""
+
+The Result of the operation will be a construction point:
+
+.. image:: images/CreatePoint1.png
+	   :align: center
+
+.. centered::
+   **Point by coordinates**
+
+**See Also** a sample TUI Script of a :ref:`tui_create_point_xyz` operation.
+
 By distance on edge
-"""""""""""""""""""
+-------------------
 
 .. image:: images/Point2.png
    :align: center
@@ -67,8 +80,21 @@ In this case user has to select an edge in a viewer and to define a distance alo
 
 **Arguments**: Part + edge + value + is by ratio flag + to reverce flag.
 
+Result
+""""""
+
+The Result of the operation will be a construction point create on edge:
+
+.. image:: images/CreatePoint2.png
+	   :align: center
+
+.. centered::
+   **Point created on edge**
+
+**See Also** a sample TUI Script of a :ref:`tui_create_point_edge` operation.
+
 By projection on edge or plane
-""""""""""""""""""""""""""""""
+------------------------------
 
 .. image:: images/Point3.png
    :align: center
@@ -82,8 +108,21 @@ In this case user has to select an existing point or vertex and an edge or face.
 
 **Arguments**: Part + vertex + edge (or plane).
 
+Result
+""""""
+
+The Result of the operation will be a construction point created by projection on a plane or an edge:
+
+.. image:: images/CreatePoint3.png
+	   :align: center
+
+.. centered::
+   **Point created by projection on a plane**
+
+**See Also** a sample TUI Script of a :ref:`tui_create_point_projection` operation.
+
 By intersection of objects
-""""""""""""""""""""""""""
+--------------------------
 
 .. image:: images/Point4.png
    :align: center
@@ -103,8 +142,21 @@ The new point will be defined by intersection of selected objects.
 
 **Arguments**: Part + edge + plane (planar face) + offset value + is offcet reversed.
 
+Result
+""""""
+
+The Result of the operation will be a construction point created by intersection of objects:
+
+.. image:: images/CreatePoint4.png
+	   :align: center
+
+.. centered::
+   **Point created by intersection of axis**
+
+**See Also** a sample TUI Script of a :ref:`tui_create_point_intersection` operation.
+
 By geometrical property of object
-"""""""""""""""""""""""""""""""""
+---------------------------------
 
 .. image:: images/Point5.png
    :align: center
@@ -121,12 +173,12 @@ In this case the new point can be defined as a center of gravity of selected obj
 Result
 """"""
 
-The Result of the operation will be a construction point:
+The Result of the operation will be a construction point defined by object property:
 
-.. image:: images/CreatePoint.png
+.. image:: images/CreatePoint5.png
 	   :align: center
 
 .. centered::
-   Point created  
+   **Point created in COG of a cylinder**
 
-**See Also** a sample TUI Script of a :ref:`tui_create_point` operation.
+**See Also** a sample TUI Script of a :ref:`tui_create_point_object` operation.
