@@ -32,7 +32,7 @@ The Vector of translation can be defined in three different ways:
 Translation by axis and distance
 --------------------------------
 
-.. image:: images/Translation1.png
+.. image:: images/Translation2.png
   :align: center
 
 .. centered::
@@ -53,7 +53,7 @@ Result
 
 Result of operation is shifted initial shape.
 
-.. image:: images/translation_vector.png
+.. image:: images/translation_XYZ.png
    :align: center
 
 .. centered::
@@ -64,7 +64,7 @@ Result of operation is shifted initial shape.
 Translation by vector
 ---------------------
 
-.. image:: images/Translation2.png
+.. image:: images/Translation1.png
   :align: center
 
 .. centered::
@@ -117,7 +117,7 @@ Result
 
 Result of operation is shifted initial shape.
 
-.. image:: images/translation_vector.png
+.. image:: images/translation_2points.png
    :align: center
 
 .. centered::

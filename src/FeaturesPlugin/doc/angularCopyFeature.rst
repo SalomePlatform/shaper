@@ -17,7 +17,7 @@ To create Angular copy in the active part:
 
 The following property panel appears.
 
-.. image:: images/AngularCopy.png
+.. image:: images/angularcopy.png
   :align: center
 
 .. centered::
@@ -38,7 +38,7 @@ Result
 """"""
 Result of cylinder rotation is compound.
 
-.. image:: images/angularcopy.png
+.. image:: images/angularcopycyl.png
    :align: center
 
 .. centered::

@@ -92,7 +92,7 @@ Result of extrusion of rectangular face along  arc.
    :align: center
 
 .. centered::
-   Pipe by object and path
+   Pipe by object, path and Bi-normal
 
 **See Also** a sample TUI Script of a :ref:`tui_binormal_pipe` operation.
 
