@@ -128,9 +128,10 @@ void ModelAPI_ResultBody::deleted(
 void ModelAPI_ResultBody::loadDeletedShapes(GeomAlgoAPI_MakeShape* theMS,
   std::shared_ptr<GeomAPI_Shape>  theShapeIn,
   const int  theKindOfShape,
-  const int  theTag)
+  const int  theTag,
+  const GeomShapePtr theShapes)
 {
-  myBuilder->loadDeletedShapes(theMS, theShapeIn, theKindOfShape, theTag);
+  myBuilder->loadDeletedShapes(theMS, theShapeIn, theKindOfShape, theTag, theShapes);
 }
 
 void ModelAPI_ResultBody::loadAndOrientModifiedShapes(GeomAlgoAPI_MakeShape* theMS,

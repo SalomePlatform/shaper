@@ -140,7 +140,8 @@ public:
   MODELAPI_EXPORT virtual void loadDeletedShapes(GeomAlgoAPI_MakeShape* theMS,
     std::shared_ptr<GeomAPI_Shape>  theShapeIn,
     const int  theKindOfShape,
-    const int  theTag);
+    const int  theTag,
+    const GeomShapePtr theShapes = GeomShapePtr());
 
   /// load and orient modified shapes
   MODELAPI_EXPORT virtual void loadAndOrientModifiedShapes(GeomAlgoAPI_MakeShape* theMS,
