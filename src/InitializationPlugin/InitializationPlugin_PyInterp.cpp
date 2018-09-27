@@ -63,8 +63,7 @@ InitializationPlugin_PyInterp::positions(const std::string& theExpression,
 
   // prepare a context
   PyObject* aContext = PyDict_New();
-  PyObject* aBuiltinModule = PyImport_AddModule("__builtin__");
-  PyDict_SetItemString(aContext, "__builtins__", aBuiltinModule);
+  PyDict_SetItemString(aContext, "__builtins__", PyEval_GetBuiltins());
 
   std::string anExpression = adjustExpression(theExpression);
   // extend aContext with variables

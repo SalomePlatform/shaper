@@ -49,7 +49,7 @@ Input fields:
 Result
 """"""
 
-Result of operation is transformed initial shape.
+Result of operation is transformed initial shape shown in wireframe mode together  with initial shape in shading mode.
 
 .. image:: images/Scale_common_factor.png
    :align: center
@@ -85,7 +85,7 @@ Result
 
 Result of operation is transformed initial shape.
 
-.. image:: images/Scale_common_factor.png
+.. image:: images/Scale_XYZ.png
    :align: center
 
 .. centered::

@@ -46,7 +46,7 @@ Result
 """"""
 Result of operation is compound.
 
-.. image:: images/linearcopy.png
+.. image:: images/linearcopyres.png
    :align: center
 
 .. centered::

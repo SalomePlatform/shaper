@@ -88,7 +88,8 @@ public:
   virtual void loadDeletedShapes (GeomAlgoAPI_MakeShape* theMS,
                                                std::shared_ptr<GeomAPI_Shape>  theShapeIn,
                                                const int  theKindOfShape,
-                                               const int  theTag) = 0;
+                                               const int  theTag,
+                                               const GeomShapePtr theShapes = GeomShapePtr()) = 0;
   /// load and orient modified shapes
   virtual void loadAndOrientModifiedShapes (
 	                                           GeomAlgoAPI_MakeShape* theMS,

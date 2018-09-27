@@ -343,6 +343,11 @@ void unusedSubsOfComposolid(const CompsolidSubs& theObjects, CompsolidSubs& theN
     if (aCSIt->first->shapeType() != GeomAPI_Shape::COMPSOLID)
       continue;
 
+    // check the compsolid is selected
+    if (aCSIt->second.size() == 1 && aCSIt->first->isEqual(aCSIt->second.front()))
+      continue;
+
+    // process all sub-solids of compsolid
     ListOfShape aNotUsedSolids;
     for (GeomAPI_ShapeExplorer anExp(aCSIt->first, GeomAPI_Shape::SOLID);
          anExp.more(); anExp.next()) {

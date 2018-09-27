@@ -364,7 +364,8 @@ void Model_BodyBuilder::deleted(const std::shared_ptr<GeomAPI_Shape>& theOldShap
 void Model_BodyBuilder::loadDeletedShapes (GeomAlgoAPI_MakeShape* theMS,
   std::shared_ptr<GeomAPI_Shape>  theShapeIn,
   const int  theKindOfShape,
-  const int  theTag)
+  const int  theTag,
+  const GeomShapePtr theShapes)
 {
   TopoDS_Shape aShapeIn = theShapeIn->impl<TopoDS_Shape>();
   TopTools_MapOfShape aView;
@@ -375,15 +376,17 @@ void Model_BodyBuilder::loadDeletedShapes (GeomAlgoAPI_MakeShape* theMS,
     if (!aView.Add(aRoot)) continue;
     std::shared_ptr<GeomAPI_Shape> aRShape(new GeomAPI_Shape());
     aRShape->setImpl((new TopoDS_Shape(aRoot)));
-    if (theMS->isDeleted (aRShape)) {
-      if (!aResultShape->isSubShape(aRShape, false)) {
-          ListOfShape aHist;
-          if (BRepTools_History::IsSupportedType(aRoot)) // to avoid crash in #2572
-            theMS->modified(aRShape, aHist);
-          if (aHist.size() == 0 || (aHist.size() == 1 && aHist.front()->isSame(aRShape)))
-            builder(theTag)->Delete(aRoot);
-      }
+    if (!theMS->isDeleted(aRShape)
+        || aResultShape->isSubShape(aRShape, false)
+        || (theShapes.get() && theShapes->isSubShape(aRShape, false))) {
+      continue;
     }
+
+    ListOfShape aHist;
+    if (BRepTools_History::IsSupportedType(aRoot)) // to avoid crash in #2572
+      theMS->modified(aRShape, aHist);
+    if (aHist.size() == 0 || (aHist.size() == 1 && aHist.front()->isSame(aRShape)))
+      builder(theTag)->Delete(aRoot);
   }
 }
 
