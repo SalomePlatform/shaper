@@ -134,7 +134,7 @@ class CompareShapes
     std::map<TopoDS_TShape*, Bnd_Box>::iterator aFound = myShapes.find(aS);
     if (aFound == myShapes.end()) {
       Bnd_Box aBB;
-      BRepBndLib::AddOptimal(aShape, aBB);
+      BRepBndLib::AddOptimal(aShape, aBB, false);
       myShapes[aS] = aBB;
       aFound = myShapes.find(aS);
     }
