@@ -13,7 +13,7 @@
     <shape_selector id="axis_angular"
                     icon="icons/Features/axis.png"
                     label="Axis"
-                    tooltip="Select an edge for the angular direction"
+                    tooltip="Select an edge for the axis of rotation"
                     shape_types="edge"
                     default="">
       <validator id="GeomValidators_ShapeType" parameters="line"/>
@@ -31,7 +31,7 @@
                   step="1"
                   default="2"
                   icon=""
-                  tooltip="Number of copies for the first direction">
+                  tooltip="Number of copies for the angular copy">
     </integervalue>
   </groupbox>
   <!--<optionalbox id="use_radial_dir" title="Radial direction">
