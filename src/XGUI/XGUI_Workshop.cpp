@@ -2498,11 +2498,14 @@ void XGUI_Workshop::showObjects(const QObjectPtrList& theList, bool isVisible)
 //**************************************************************
 void XGUI_Workshop::showOnlyObjects(const QObjectPtrList& theList)
 {
+  QObjectPtrList aSrcList = theList;
   // Hide all displayed objects
   QObjectPtrList aList = myDisplayer->displayedObjects();
   foreach (ObjectPtr aObj, aList) {
-    if (module()->canEraseObject(aObj))
+    if ((!aSrcList.contains(aObj)) && (module()->canEraseObject(aObj)))
       aObj->setDisplayed(false);
+    else
+      aSrcList.removeAll(aObj);
   }
   //Do not use eraseAll if you didn't send Redisplay event:
   //all objects are erased from viewer, but considered as displayed in displayer
@@ -2514,7 +2517,7 @@ void XGUI_Workshop::showOnlyObjects(const QObjectPtrList& theList)
 #endif
 
   std::set<ObjectPtr> anObjects;
-  foreach (ObjectPtr aObj, theList) {
+  foreach (ObjectPtr aObj, aSrcList) {
     anObjects.insert(aObj);
   }
 
@@ -2522,7 +2525,7 @@ void XGUI_Workshop::showOnlyObjects(const QObjectPtrList& theList)
     return;
 
   // Show only objects from the list
-  foreach (ObjectPtr aObj, theList) {
+  foreach (ObjectPtr aObj, aSrcList) {
     aObj->setDisplayed(true);
   }
   Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_TO_REDISPLAY));
