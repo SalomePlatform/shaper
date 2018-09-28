@@ -113,6 +113,10 @@ bool SHAPERGUI_DataModel::save(QStringList& theFiles)
   //std::string aTmpDir = aStudy->GetTmpDir("", false);//true );
   theFiles.append(QString(aTmpDir.c_str()));
 
+  SessionPtr aMgr = ModelAPI_Session::get();
+  if (aMgr->isAutoUpdateBlocked())
+    aMgr->blockAutoUpdate(false);
+
   aWorkShop->saveDocument(QString(aTmpDir.c_str()), aFileNames);
   std::list<std::string>::iterator aIt;
   for (aIt = aFileNames.begin(); aIt != aFileNames.end(); ++aIt) {
