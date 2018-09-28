@@ -209,11 +209,6 @@ void GeomAlgoAPI_Pipe::build(const ListOfShape& theBaseShapes,
     return;
   }
 
-  bool aHasLocations = false;
-  if(!theLocations.empty()) {
-    aHasLocations = true;
-  }
-
   // Getting path.
   TopoDS_Shape aBaseShape;
   TopAbs_ShapeEnum aBaseShapeType;
@@ -229,6 +224,37 @@ void GeomAlgoAPI_Pipe::build(const ListOfShape& theBaseShapes,
   gp_Trsf aTrsf = getPathToBaseTranslation(aBaseShape, aPathWire);
   aPathWire.Move(aTrsf);
 
+  // Get locations after moving path shape.
+  std::list<TopoDS_Vertex> aLocations;
+  for (ListOfShape::const_iterator aLocIt = theLocations.cbegin();
+       aLocIt != theLocations.cend();
+       ++aLocIt)
+  {
+    GeomShapePtr aLocation = *aLocIt;
+    if (!aLocation.get() || aLocation->shapeType() != GeomAPI_Shape::VERTEX) {
+      return;
+    }
+
+    TopoDS_Vertex aLocationVertex = aLocation->impl<TopoDS_Vertex>();
+    TopoDS_Vertex aMovedVertex;
+    for (TopExp_Explorer anExp(aPathWire, TopAbs_VERTEX); anExp.More(); anExp.Next()) {
+      if (anExp.Current().IsPartner(aLocationVertex)) {
+        aMovedVertex = TopoDS::Vertex(anExp.Current());
+        aLocations.push_back(aMovedVertex);
+        break;
+      }
+    }
+    if (aMovedVertex.IsNull()) {
+      return;
+    }
+  }
+
+  if (theLocations.size() != aLocations.size()) {
+    return;
+  }
+
+  bool aHasLocations = !aLocations.empty();
+
   // Making pipe.
   Standard_Boolean isDone = Standard_False;
   bool anIsSolidNeeded = false;
@@ -239,7 +265,7 @@ void GeomAlgoAPI_Pipe::build(const ListOfShape& theBaseShapes,
       return;
     }
     ListOfShape::const_iterator aBaseIt = theBaseShapes.cbegin();
-    ListOfShape::const_iterator aLocIt = theLocations.cbegin();
+    std::list<TopoDS_Vertex>::const_iterator aLocationsIt = aLocations.cbegin();
     while(aBaseIt != theBaseShapes.cend()) {
       GeomShapePtr aBase = *aBaseIt;
       if(!getBase(aBaseShape, aBaseShapeType, aBase)) {
@@ -252,15 +278,8 @@ void GeomAlgoAPI_Pipe::build(const ListOfShape& theBaseShapes,
       }
 
       if(aHasLocations) {
-        GeomShapePtr aLocation = *aLocIt;
-        if(!aLocation.get() || aLocation->shapeType() != GeomAPI_Shape::VERTEX) {
-          delete aPipeBuilder;
-          return;
-        }
-        TopoDS_Vertex aLocationVertex = aLocation->impl<TopoDS_Vertex>();
-        aLocationVertex.Move(aTrsf);
-        ++aLocIt;
-        aPipeBuilder->Add(aBaseShape, aLocationVertex);
+        aPipeBuilder->Add(aBaseShape, *aLocationsIt);
+        ++aLocationsIt;
       } else {
         aPipeBuilder->Add(aBaseShape);
       }

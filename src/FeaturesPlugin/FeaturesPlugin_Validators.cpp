@@ -141,12 +141,6 @@ bool FeaturesPlugin_ValidatorPipeLocations::isValid(const AttributePtr& theAttri
         return false;
       }
     }
-    ResultConstructionPtr aResultConstruction =
-      std::dynamic_pointer_cast<ModelAPI_ResultConstruction>(aContext);
-    if (aResultConstruction.get()) {
-      theError = "Error: Result construction not allowed for selection.";
-      return false;
-    }
     std::shared_ptr<GeomAPI_Shape> aShape = anAttrSelection->value();
     if (!aShape.get() && aContext.get()) {
       GeomShapePtr aContextShape = aContext->shape();
