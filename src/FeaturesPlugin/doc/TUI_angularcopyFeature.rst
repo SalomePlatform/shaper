@@ -8,5 +8,5 @@ Create Angular copy
     :linenos:
     :language: python
 
-:download:`Download this script <examples/angularcopy.py >` 
+:download:`Download this script <examples/angularcopy.py>`
    
