@@ -76,7 +76,7 @@ static void sendMessage(const char* theMessageName,
 SketchSolver_Group::SketchSolver_Group(const CompositeFeaturePtr& theWorkplane)
   : mySketch(theWorkplane),
     myPrevResult(PlaneGCSSolver_Solver::STATUS_UNKNOWN),
-    myDOF(0),
+    myDOF(-1),
     myIsEventsBlocked(false),
     myMultiConstraintUpdateStack(0)
 {
