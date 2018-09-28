@@ -260,6 +260,7 @@ ADD_UNIT_TESTS(TestSketchPointLine.py
                Test1577.py
                Test1578.py
                Test2654.py
+               Test1779.py
 )
 
 if(${SKETCHER_CHANGE_RADIUS_WHEN_MOVE})
