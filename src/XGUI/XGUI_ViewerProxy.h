@@ -152,11 +152,14 @@ private slots:
   void onKeyRelease(AppElements_ViewWindow*, QKeyEvent*);
 
   void onViewTransformed(AppElements_ViewWindow::OperationType);
+#else
+  void onMouseMove(ModuleBase_IViewWindow*, QMouseEvent*);
 #endif
 
  private:
    void displayHighlight();
    void eraseHighlight();
+   void updateHighlight();
 
   XGUI_Workshop* myWorkshop;
   ResultPtr myResult;

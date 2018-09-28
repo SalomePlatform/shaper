@@ -167,7 +167,7 @@ void XGUI_ViewerProxy::connectToViewer()
           SIGNAL(mouseDoubleClick(ModuleBase_IViewWindow*, QMouseEvent*)));
 
   connect(aViewer, SIGNAL(mouseMove(ModuleBase_IViewWindow*, QMouseEvent*)),
-    this, SIGNAL(mouseMove(ModuleBase_IViewWindow*, QMouseEvent*)));
+    this, SLOT(onMouseMove(ModuleBase_IViewWindow*, QMouseEvent*)));
 
   connect(aViewer, SIGNAL(keyPress(ModuleBase_IViewWindow*, QKeyEvent*)),
     this, SIGNAL(keyPress(ModuleBase_IViewWindow*, QKeyEvent*)));
@@ -287,79 +287,9 @@ void XGUI_ViewerProxy::onMouseDoubleClick(AppElements_ViewWindow* theWnd, QMouse
   emit mouseDoubleClick(theWnd, theEvent);
 }
 
-void XGUI_ViewerProxy::displayHighlight()
-{
-  Handle(AIS_InteractiveContext) aContext = AISContext();
-
-  if (myResult->groupName() == ModelAPI_ResultConstruction::group()) {
-    FeaturePtr aFeature = ModelAPI_Feature::feature(myResult);
-    if (aFeature.get()) {
-      std::list<ResultPtr> aResults = aFeature->results();
-      std::list<ResultPtr>::const_iterator aIt;
-      ResultPtr aRes;
-      Handle(AIS_Shape) aAis;
-      for (aIt = aResults.cbegin(); aIt != aResults.cend(); aIt++) {
-        aRes = (*aIt);
-        TopoDS_Shape aTShape = aRes->shape()->impl<TopoDS_Shape>();
-        aAis = new AIS_Shape(aTShape);
-        aAis->SetColor(Quantity_NOC_CYAN4);
-        aAis->SetZLayer(1); //Graphic3d_ZLayerId_Topmost
-        myHighlights.Append(aAis);
-        aContext->Display(aAis, false);
-        aContext->Deactivate(aAis);
-      }
-    }
-  }
-  else {
-    TopoDS_Shape aTShape = myResult->shape()->impl<TopoDS_Shape>();
-    Handle(AIS_Shape) aAis = new AIS_Shape(aTShape);
-    aAis->SetColor(Quantity_NOC_CYAN4);
-    aAis->SetZLayer(1); //Graphic3d_ZLayerId_Topmost
-    myHighlights.Append(aAis);
-    aContext->Display(aAis, false);
-    aContext->Deactivate(aAis);
-  }
-}
-
-void XGUI_ViewerProxy::eraseHighlight()
-{
-  Handle(AIS_InteractiveContext) aContext = AISContext();
-  Handle(AIS_InteractiveObject) anAISIO;
-  AIS_ListIteratorOfListOfInteractive aLIt;
-  for (aLIt.Initialize(myHighlights); aLIt.More(); aLIt.Next()) {
-    anAISIO = aLIt.Value();
-    aContext->Remove(anAISIO, false);
-  }
-  myHighlights.Clear();
-}
-
 void XGUI_ViewerProxy::onMouseMove(AppElements_ViewWindow* theWnd, QMouseEvent* theEvent)
 {
-  Handle(AIS_InteractiveContext) aContext = AISContext();
-  if (!aContext.IsNull()) {
-    Handle(SelectMgr_EntityOwner) aOwner;
-    Handle(AIS_InteractiveObject) anIO;
-    bool isDisplayed = false;
-    ResultPtr aRes;
-    XGUI_Displayer* aDisplayer = myWorkshop->displayer();
-    for (aContext->InitDetected(); aContext->MoreDetected(); aContext->NextDetected()) {
-      aOwner = aContext->DetectedOwner();
-      anIO = Handle(AIS_InteractiveObject)::DownCast(aOwner->Selectable());
-      aRes = std::dynamic_pointer_cast<ModelAPI_Result>(aDisplayer->getObject(anIO));
-      if (aRes.get() && (aRes != myResult)) {
-        eraseHighlight();
-        myResult = aRes;
-        displayHighlight();
-        aContext->UpdateCurrentViewer();
-      }
-      isDisplayed = aRes.get();
-    }
-    if (!isDisplayed) {
-      eraseHighlight();
-      aContext->UpdateCurrentViewer();
-      myResult = ResultPtr();
-    }
-  }
+  updateHighlight();
   emit mouseMove(theWnd, theEvent);
 }
 
@@ -472,6 +402,89 @@ bool XGUI_ViewerProxy::canDragByMouse() const
   }
 }
 
+//***************************************
+void XGUI_ViewerProxy::displayHighlight()
+{
+  Handle(AIS_InteractiveContext) aContext = AISContext();
+
+  if (myResult->groupName() == ModelAPI_ResultConstruction::group()) {
+    FeaturePtr aFeature = ModelAPI_Feature::feature(myResult);
+    if (aFeature.get()) {
+      std::list<ResultPtr> aResults = aFeature->results();
+      std::list<ResultPtr>::const_iterator aIt;
+      ResultPtr aRes;
+      Handle(AIS_Shape) aAis;
+      for (aIt = aResults.cbegin(); aIt != aResults.cend(); aIt++) {
+        aRes = (*aIt);
+        TopoDS_Shape aTShape = aRes->shape()->impl<TopoDS_Shape>();
+        aAis = new AIS_Shape(aTShape);
+        aAis->SetColor(Quantity_NOC_CYAN4);
+        aAis->SetZLayer(1); //Graphic3d_ZLayerId_Topmost
+        myHighlights.Append(aAis);
+        aContext->Display(aAis, false);
+        aContext->Deactivate(aAis);
+      }
+    }
+  }
+  else {
+    TopoDS_Shape aTShape = myResult->shape()->impl<TopoDS_Shape>();
+    Handle(AIS_Shape) aAis = new AIS_Shape(aTShape);
+    aAis->SetColor(Quantity_NOC_CYAN4);
+    aAis->SetZLayer(1); //Graphic3d_ZLayerId_Topmost
+    myHighlights.Append(aAis);
+    aContext->Display(aAis, false);
+    aContext->Deactivate(aAis);
+  }
+}
+
+void XGUI_ViewerProxy::eraseHighlight()
+{
+  Handle(AIS_InteractiveContext) aContext = AISContext();
+  Handle(AIS_InteractiveObject) anAISIO;
+  AIS_ListIteratorOfListOfInteractive aLIt;
+  for (aLIt.Initialize(myHighlights); aLIt.More(); aLIt.Next()) {
+    anAISIO = aLIt.Value();
+    aContext->Remove(anAISIO, false);
+  }
+  myHighlights.Clear();
+}
+
+void XGUI_ViewerProxy::updateHighlight()
+{
+  Handle(AIS_InteractiveContext) aContext = AISContext();
+  if (!aContext.IsNull()) {
+    Handle(SelectMgr_EntityOwner) aOwner;
+    Handle(AIS_InteractiveObject) anIO;
+    bool isDisplayed = false;
+    ResultPtr aRes;
+    XGUI_Displayer* aDisplayer = myWorkshop->displayer();
+    for (aContext->InitDetected(); aContext->MoreDetected(); aContext->NextDetected()) {
+      aOwner = aContext->DetectedOwner();
+      anIO = Handle(AIS_InteractiveObject)::DownCast(aOwner->Selectable());
+      aRes = std::dynamic_pointer_cast<ModelAPI_Result>(aDisplayer->getObject(anIO));
+      if (aRes.get() && (aRes != myResult)) {
+        eraseHighlight();
+        myResult = aRes;
+        displayHighlight();
+        aContext->UpdateCurrentViewer();
+      }
+      isDisplayed = aRes.get();
+    }
+    if (!isDisplayed) {
+      eraseHighlight();
+      aContext->UpdateCurrentViewer();
+      myResult = ResultPtr();
+    }
+  }
+}
+
+#ifdef HAVE_SALOME
+void XGUI_ViewerProxy::onMouseMove(ModuleBase_IViewWindow* theWnd, QMouseEvent* theEvent)
+{
+  updateHighlight();
+  emit mouseMove(theWnd, theEvent);
+}
+#endif
 
 //***************************************
 //void XGUI_ViewerProxy::Zfitall()
