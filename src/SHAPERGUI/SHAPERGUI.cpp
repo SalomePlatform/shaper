@@ -163,7 +163,7 @@ void SHAPERGUI::initialize(CAM_Application* theApp)
   myWhatIsAction->setData("INSPECTION_CMD");
   createMenu(aId, aSubMenu, 0);
 
-  int aTool = createTool("INSPWCTION_TOOL", "INSPWCTION_TOOL");
+  int aTool = createTool(tr("Inspection tool"));
   int aToolId = createTool(myWhatIsAction, aTool);
 }
 
