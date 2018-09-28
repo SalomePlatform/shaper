@@ -49,9 +49,10 @@ email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com
                       label="Locations:"
                       tooltip="Select one or more vertices to specify the locations"
                       type_choice="vertex">
+        <validator id="FeaturesPlugin_ValidatorPipeLocations"/>
       </multi_selector>
     </box>
   </toolbox>
-  <validator id="FeaturesPlugin_ValidatorPipeLocations"/>
+  <validator id="FeaturesPlugin_ValidatorPipeLocationsNumber"/>
   <validator id="FeaturesPlugin_ValidatorBaseForGenerationSketchOrSketchObjects" parameters="base_objects"/>
 </source>

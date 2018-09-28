@@ -24,6 +24,7 @@
 #include "FeaturesPlugin_BooleanFuse.h"
 #include "FeaturesPlugin_BooleanCommon.h"
 #include "FeaturesPlugin_BooleanSmash.h"
+#include "FeaturesPlugin_Pipe.h"
 #include "FeaturesPlugin_Union.h"
 
 #include <Events_InfoMessage.h>
@@ -88,7 +89,85 @@ bool FeaturesPlugin_ValidatorPipePath::isValid(const AttributePtr& theAttribute,
 }
 
 //==================================================================================================
-bool FeaturesPlugin_ValidatorPipeLocations::isValid(
+bool FeaturesPlugin_ValidatorPipeLocations::isValid(const AttributePtr& theAttribute,
+                                                    const std::list<std::string>& theArguments,
+                                                    Events_InfoMessage& theError) const
+{
+  AttributeSelectionListPtr anAttrSelectionList =
+    std::dynamic_pointer_cast<ModelAPI_AttributeSelectionList>(theAttribute);
+  if(!anAttrSelectionList.get()) {
+    theError =
+      "Error: This validator can only work with selection list attributes in \"Pipe\" feature.";
+    return false;
+  }
+  std::shared_ptr<FeaturesPlugin_Pipe> aFeature =
+    std::dynamic_pointer_cast<FeaturesPlugin_Pipe>(theAttribute->owner());
+
+  AttributeSelectionPtr aPathSelection = aFeature->selection(FeaturesPlugin_Pipe::PATH_OBJECT_ID());
+  if (!aPathSelection.get()) {
+    theError = "Error: Path not selected.";
+    return false;
+  }
+
+  GeomShapePtr aPathShape = aPathSelection->value();
+  if (!aPathShape.get()) {
+    ResultPtr aContext = aPathSelection->context();
+    if (!aContext.get()) {
+      FeaturePtr aContFeat = aPathSelection->contextFeature();
+      if (!aContFeat.get() || !aContFeat->results().size()) {
+        theError = "Error: Empty selection context.";
+        return false;
+      }
+    }
+    aPathShape = aContext->shape();
+  }
+
+  if (!aPathShape.get()) {
+    theError = "Error: Empty path shape.";
+    return false;
+  }
+
+  for (int anIndex = 0; anIndex < anAttrSelectionList->size(); ++anIndex) {
+    AttributeSelectionPtr anAttrSelection = anAttrSelectionList->value(anIndex);
+    if (!anAttrSelection.get()) {
+      theError = "Error: Empty attribute selection.";
+      return false;
+    }
+    ResultPtr aContext = anAttrSelection->context();
+    if (!aContext.get()) {
+      FeaturePtr aContFeat = anAttrSelection->contextFeature();
+      if (!aContFeat.get() || !aContFeat->results().size()) {
+        theError = "Error: Empty selection context.";
+        return false;
+      }
+    }
+    ResultConstructionPtr aResultConstruction =
+      std::dynamic_pointer_cast<ModelAPI_ResultConstruction>(aContext);
+    if (aResultConstruction.get()) {
+      theError = "Error: Result construction not allowed for selection.";
+      return false;
+    }
+    std::shared_ptr<GeomAPI_Shape> aShape = anAttrSelection->value();
+    if (!aShape.get() && aContext.get()) {
+      GeomShapePtr aContextShape = aContext->shape();
+      aShape = aContextShape;
+    }
+    if (!aShape.get()) {
+      theError = "Error: Empty shape.";
+      return false;
+    }
+
+    if (!aPathShape->isSubShape(aShape)) {
+      theError = "Error: Location should be a vertex subshape from path shape.";
+      return false;
+    }
+  }
+
+  return true;
+}
+
+//==================================================================================================
+bool FeaturesPlugin_ValidatorPipeLocationsNumber::isValid(
   const std::shared_ptr<ModelAPI_Feature>& theFeature,
   const std::list<std::string>& theArguments,
   Events_InfoMessage& theError) const
