@@ -1,3 +1,4 @@
+.. _featureAngularCopy:
 
 Angular copy
 ============

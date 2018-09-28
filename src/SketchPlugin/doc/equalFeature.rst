@@ -1,3 +1,4 @@
+.. _sketchEqual:
 
 Equal constraint
 ================

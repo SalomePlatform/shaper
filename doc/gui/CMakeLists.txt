@@ -24,6 +24,8 @@ SET(output ${CMAKE_CURRENT_BINARY_DIR}/conf.py)
 
 SET(DOC_FILES
   Introduction.rst
+  Tutorial.rst
+  TUI_tutorial.rst
   )
 
 CONFIGURE_FILE(${input} ${output})

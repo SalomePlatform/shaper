@@ -1,3 +1,4 @@
+.. _sketchAngularCopy:
 
 Angular copy
 ============

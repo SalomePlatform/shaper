@@ -1,3 +1,4 @@
+.. _featureExtrusion:
 
 Extrusion
 =========

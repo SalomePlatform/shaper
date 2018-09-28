@@ -4,6 +4,8 @@
 Part plug-in
 ============
 
+.. _new-part:
+
 New Part
 --------
 
