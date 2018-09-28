@@ -318,6 +318,11 @@ void FeaturesPlugin_Measurement::computeAngleByPoints()
 
 AISObjectPtr FeaturesPlugin_Measurement::getAISObject(AISObjectPtr thePrevious)
 {
+  AttributeDoubleArrayPtr aValues =
+    std::dynamic_pointer_cast<ModelAPI_AttributeDoubleArray>(attribute(RESULT_VALUES_ID()));
+  if ((aValues->size() == 0) || (aValues->value(0) <= Precision::Confusion()))
+    return thePrevious;
+
   AISObjectPtr anAIS;
   std::string aKind = string(MEASURE_KIND())->value();
   if (aKind == MEASURE_LENGTH())
@@ -522,6 +527,7 @@ AISObjectPtr FeaturesPlugin_Measurement::angleDimension(AISObjectPtr thePrevious
   if (anEdge1.get() && anEdge2.get()) {
     TopoDS_Edge aTEdge1 = TopoDS::Edge(anEdge1->impl<TopoDS_Shape>());
     TopoDS_Edge aTEdge2 = TopoDS::Edge(anEdge2->impl<TopoDS_Shape>());
+
     Handle(AIS_AngleDimension) aDim;
     if (thePrevious.get()) {
       aAISObj = thePrevious;
@@ -555,6 +561,11 @@ AISObjectPtr FeaturesPlugin_Measurement::angleByPointsDimension(AISObjectPtr the
     gp_Pnt aPnt1(aPoint1->impl<gp_Pnt>());
     gp_Pnt aPnt2(aPoint2->impl<gp_Pnt>());
     gp_Pnt aPnt3(aPoint3->impl<gp_Pnt>());
+
+    if (aPnt1.IsEqual(aPnt2, Precision::Confusion()) ||
+      aPnt1.IsEqual(aPnt3, Precision::Confusion()) ||
+      aPnt2.IsEqual(aPnt3, Precision::Confusion()))
+      return thePrevious;
 
     if (thePrevious.get()) {
       aAISObj = thePrevious;
