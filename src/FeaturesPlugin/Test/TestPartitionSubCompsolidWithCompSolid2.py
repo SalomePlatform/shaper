@@ -47,7 +47,7 @@ model.do()
 model.testNbResults(Partition_2, 1)
 model.testNbSubResults(Partition_2, [8])
 model.testNbSubShapes(Partition_2, GeomAPI_Shape.SOLID, [8])
-model.testNbSubShapes(Partition_2, GeomAPI_Shape.FACE, [55])
+model.testNbSubShapes(Partition_2, GeomAPI_Shape.FACE, [57])
 model.testResultsVolumes(Partition_2, [82157.197962275837198831140995026])
 
 # change box height and check partition
@@ -57,7 +57,7 @@ model.do()
 model.testNbResults(Partition_2, 1)
 model.testNbSubResults(Partition_2, [9])
 model.testNbSubShapes(Partition_2, GeomAPI_Shape.SOLID, [9])
-model.testNbSubShapes(Partition_2, GeomAPI_Shape.FACE, [70])
+model.testNbSubShapes(Partition_2, GeomAPI_Shape.FACE, [76])
 model.testResultsVolumes(Partition_2, [146157.197962169535458087921142578])
 
 # update extrusion and check partition
@@ -68,7 +68,7 @@ model.do()
 model.testNbResults(Partition_2, 1)
 model.testNbSubResults(Partition_2, [10])
 model.testNbSubShapes(Partition_2, GeomAPI_Shape.SOLID, [10])
-model.testNbSubShapes(Partition_2, GeomAPI_Shape.FACE, [85])
+model.testNbSubShapes(Partition_2, GeomAPI_Shape.FACE, [95])
 model.testResultsVolumes(Partition_2, [146157.197962103120516985654830933])
 
 # change radius of a circle and check partition
@@ -78,7 +78,7 @@ model.do()
 model.testNbResults(Partition_2, 1)
 model.testNbSubResults(Partition_2, [11])
 model.testNbSubShapes(Partition_2, GeomAPI_Shape.SOLID, [11])
-model.testNbSubShapes(Partition_2, GeomAPI_Shape.FACE, [86])
+model.testNbSubShapes(Partition_2, GeomAPI_Shape.FACE, [98])
 model.testResultsVolumes(Partition_2, [156418.58182917608064599335193634])
 
 # check naming

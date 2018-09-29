@@ -366,38 +366,58 @@ void unusedSubsOfComposolid(const CompsolidSubs& theObjects, CompsolidSubs& theN
   }
 }
 
-bool cutUnusedSubs(CompsolidSubs& theObjects, CompsolidSubs& theNotUsed,
-                   std::shared_ptr<GeomAlgoAPI_MakeShapeList>& theMakeShapeList,
-                   std::string& theError)
+static bool cutSubs(const GeomShapePtr& theFirstArgument,
+                    CompsolidSubs& theSubsToCut,
+                    const ListOfShape& theTools,
+                    std::shared_ptr<GeomAlgoAPI_MakeShapeList>& theMakeShapeList,
+                    std::string& theError)
 {
+  if (theTools.empty())
+    return true;
+
   std::shared_ptr<GeomAlgoAPI_MakeShape> aCutAlgo;
 
-  for (CompsolidSubs::iterator anObjIt = theObjects.begin();
-       anObjIt != theObjects.end(); ++anObjIt) {
-    // get list of unused subs of composolids except the current
-    ListOfShape aTools;
-    for (CompsolidSubs::const_iterator aUIt = theNotUsed.begin();
-         aUIt != theNotUsed.end(); ++aUIt) {
-      if (aUIt->first != anObjIt->first)
-        aTools.insert(aTools.end(), aUIt->second.begin(), aUIt->second.end());
-    }
-    if (aTools.empty())
-      continue;
+  for (CompsolidSubs::iterator aUIt= theSubsToCut.begin(); aUIt != theSubsToCut.end(); ++aUIt) {
+    if (aUIt->first == theFirstArgument)
+      continue; // no need to split unused subs of the first compsolid
 
     // cut from current list of solids
     aCutAlgo.reset(
-        new GeomAlgoAPI_Boolean(anObjIt->second, aTools, GeomAlgoAPI_Boolean::BOOL_CUT));
+        new GeomAlgoAPI_Boolean(aUIt->second, theTools, GeomAlgoAPI_Boolean::BOOL_CUT));
     if (isAlgoFailed(aCutAlgo, theError))
       return false;
     theMakeShapeList->appendAlgo(aCutAlgo);
 
-    // update list of objects of the partition
-    GeomAPI_Shape::ShapeType aType = anObjIt->second.front()->shapeType();
-    anObjIt->second.clear();
+    // update list of un-selected objects of the partition
+    GeomAPI_Shape::ShapeType aType = aUIt->second.front()->shapeType();
+    aUIt->second.clear();
     for (GeomAPI_ShapeExplorer anExp(aCutAlgo->shape(), aType); anExp.more(); anExp.next())
-      anObjIt->second.push_back(anExp.current());
+      aUIt->second.push_back(anExp.current());
   }
   return true;
+}
+
+bool cutUnusedSubs(CompsolidSubs& theObjects, CompsolidSubs& theNotUsed,
+                   std::shared_ptr<GeomAlgoAPI_MakeShapeList>& theMakeShapeList,
+                   std::string& theError)
+{
+  GeomShapePtr aFirstArgument = theObjects.front().first;
+
+  // compose a set of tools for the CUT operation:
+  // find the list of unused subs of the first argument or use itself
+  ListOfShape aToolsForUsed;
+  CompsolidSubs::iterator aUIt = theNotUsed.begin();
+  for (; aUIt != theNotUsed.end(); ++aUIt)
+    if (aUIt->first == aFirstArgument) {
+      aToolsForUsed.insert(aToolsForUsed.end(), aUIt->second.begin(), aUIt->second.end());
+      break;
+    }
+  ListOfShape aToolsForUnused;
+  aToolsForUnused.push_back(aFirstArgument);
+
+  // cut subs
+  return cutSubs(aFirstArgument, theObjects, aToolsForUsed, theMakeShapeList, theError)
+      && cutSubs(aFirstArgument, theNotUsed, aToolsForUnused, theMakeShapeList, theError);
 }
 
 bool isAlgoFailed(const std::shared_ptr<GeomAlgoAPI_MakeShape>& theAlgo, std::string& theError)

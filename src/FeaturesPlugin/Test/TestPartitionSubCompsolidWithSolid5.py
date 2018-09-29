@@ -53,7 +53,7 @@ model.do()
 model.testNbResults(Partition_1, 1)
 model.testNbSubResults(Partition_1, [6])
 model.testNbSubShapes(Partition_1, GeomAPI_Shape.SOLID, [6])
-model.testNbSubShapes(Partition_1, GeomAPI_Shape.FACE, [43])
+model.testNbSubShapes(Partition_1, GeomAPI_Shape.FACE, [41])
 model.testResultsVolumes(Partition_1, [138456.153365848527755588293075562])
 
 # update extrusion and check partition
@@ -64,7 +64,7 @@ model.do()
 model.testNbResults(Partition_1, 1)
 model.testNbSubResults(Partition_1, [6])
 model.testNbSubShapes(Partition_1, GeomAPI_Shape.SOLID, [6])
-model.testNbSubShapes(Partition_1, GeomAPI_Shape.FACE, [47])
+model.testNbSubShapes(Partition_1, GeomAPI_Shape.FACE, [43])
 model.testResultsVolumes(Partition_1, [138456.153365848527755588293075562])
 
 # change radius of a circle and check partition

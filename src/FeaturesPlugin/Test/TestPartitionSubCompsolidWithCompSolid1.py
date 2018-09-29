@@ -45,9 +45,9 @@ model.do()
 
 # check partition
 model.testNbResults(Partition_2, 1)
-model.testNbSubResults(Partition_2, [9])
-model.testNbSubShapes(Partition_2, GeomAPI_Shape.SOLID, [9])
-model.testNbSubShapes(Partition_2, GeomAPI_Shape.FACE, [61])
+model.testNbSubResults(Partition_2, [7])
+model.testNbSubShapes(Partition_2, GeomAPI_Shape.SOLID, [7])
+model.testNbSubShapes(Partition_2, GeomAPI_Shape.FACE, [53])
 model.testResultsVolumes(Partition_2, [82157.197962046673637814819812775])
 
 # change box height and check partition
@@ -55,8 +55,8 @@ Param_BoxH.setValue(20)
 model.do()
 
 model.testNbResults(Partition_2, 1)
-model.testNbSubResults(Partition_2, [10])
-model.testNbSubShapes(Partition_2, GeomAPI_Shape.SOLID, [10])
+model.testNbSubResults(Partition_2, [8])
+model.testNbSubShapes(Partition_2, GeomAPI_Shape.SOLID, [8])
 model.testNbSubShapes(Partition_2, GeomAPI_Shape.FACE, [73])
 model.testResultsVolumes(Partition_2, [146157.197962002450367435812950134])
 
@@ -66,9 +66,9 @@ Param_ExtrusionMax.setValue(15)
 model.do()
 
 model.testNbResults(Partition_2, 1)
-model.testNbSubResults(Partition_2, [11])
-model.testNbSubShapes(Partition_2, GeomAPI_Shape.SOLID, [11])
-model.testNbSubShapes(Partition_2, GeomAPI_Shape.FACE, [85])
+model.testNbSubResults(Partition_2, [9])
+model.testNbSubShapes(Partition_2, GeomAPI_Shape.SOLID, [9])
+model.testNbSubShapes(Partition_2, GeomAPI_Shape.FACE, [93])
 model.testResultsVolumes(Partition_2, [146157.197961971396580338478088379])
 
 # change radius of a circle and check partition
@@ -76,9 +76,9 @@ Param_Radius.setValue(50)
 model.do()
 
 model.testNbResults(Partition_2, 1)
-model.testNbSubResults(Partition_2, [11])
-model.testNbSubShapes(Partition_2, GeomAPI_Shape.SOLID, [11])
-model.testNbSubShapes(Partition_2, GeomAPI_Shape.FACE, [82])
+model.testNbSubResults(Partition_2, [9])
+model.testNbSubShapes(Partition_2, GeomAPI_Shape.SOLID, [9])
+model.testNbSubShapes(Partition_2, GeomAPI_Shape.FACE, [92])
 model.testResultsVolumes(Partition_2, [156418.581829168775584548711776733])
 
 # check naming
