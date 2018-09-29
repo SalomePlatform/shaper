@@ -26,14 +26,14 @@ from salome.shaper.model.sketcher import tools
 
 TOLERANCE = 1.e-7
 
-def assertPoint(thePoint, theCoords):
+def assertPoint(thePoint, theCoords, theTolerance = TOLERANCE):
     """ Verifies coordinates of the point
     """
     aPoint = tools.toList(thePoint)
-    assert aPoint[0] == theCoords[0] and aPoint[1] == theCoords[1], "Wrong '{}' point {}, expected {}".format(thePoint.id(), aPoint, theCoords)
+    assert((aPoint[0]-theCoords[0])**2 + (aPoint[1]-theCoords[1])**2 < theTolerance**2), "Wrong '{}' point {}, expected {}".format(thePoint.id(), aPoint, theCoords)
 
 
-def assertLine(theLine, theStart, theEnd):
+def assertLine(theLine, theStart, theEnd, theTolerance = TOLERANCE):
     """ Verifies coordinates of line extremities
     """
     aLine = tools.toSketchFeature(theLine)
@@ -41,25 +41,25 @@ def assertLine(theLine, theStart, theEnd):
     aStartPnt = geomDataAPI_Point2D(aLine.attribute("StartPoint"))
     aEndPnt = geomDataAPI_Point2D(aLine.attribute("EndPoint"))
     if len(theStart):
-        assertPoint(aStartPnt, theStart)
+        assertPoint(aStartPnt, theStart, theTolerance)
     if len(theEnd):
-        assertPoint(aEndPnt, theEnd)
+        assertPoint(aEndPnt, theEnd, theTolerance)
 
 
-def assertCircle(theCircle, theCenter, theRadius):
+def assertCircle(theCircle, theCenter, theRadius, theTolerance = TOLERANCE):
     """ Verifies attributes of circle
     """
     aCircle = tools.toSketchFeature(theCircle)
 
     aCenter = geomDataAPI_Point2D(aCircle.attribute("circle_center"))
     if len(theCenter):
-        assertPoint(aCenter, theCenter)
+        assertPoint(aCenter, theCenter, theTolerance)
 
     aRadius = aCircle.real("circle_radius")
     assert aRadius.value() == theRadius, "Wrong circle radius {}, expected {}".format(aRadius.value(), theRadius)
 
 
-def assertArc(theArc, theCenter, theStart, theEnd):
+def assertArc(theArc, theCenter, theStart, theEnd, theTolerance = TOLERANCE):
     """ Verifies coordinates of arc points and the consistency of the arc.
         Some of points may be empty lists.
     """
@@ -69,11 +69,11 @@ def assertArc(theArc, theCenter, theStart, theEnd):
     aStartPnt = geomDataAPI_Point2D(anArc.attribute("start_point"))
     aEndPnt = geomDataAPI_Point2D(anArc.attribute("end_point"))
     if len(theCenter):
-        assertPoint(aCenterPnt, theCenter)
+        assertPoint(aCenterPnt, theCenter, theTolerance)
     if len(theStart):
-        assertPoint(aStartPnt, theStart)
+        assertPoint(aStartPnt, theStart, theTolerance)
     if len(theEnd):
-        assertPoint(aEndPnt, theEnd)
+        assertPoint(aEndPnt, theEnd, theTolerance)
 
     assertArcValidity(anArc)
 
