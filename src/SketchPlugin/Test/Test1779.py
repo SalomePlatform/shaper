@@ -25,6 +25,7 @@
 
 from salome.shaper import model
 from SketchAPI import *
+from ModelAPI import *
 
 model.begin()
 partSet = model.moduleDocument()
