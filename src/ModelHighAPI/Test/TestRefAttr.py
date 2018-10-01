@@ -45,8 +45,8 @@ class RefAttrTestCase(FeaturesFixture):
         ModelHighAPI.ModelHighAPI_RefAttr()
 
     def test_create_from_attribute(self):
-        print(self.feature.x())
-        ModelHighAPI.ModelHighAPI_RefAttr(self.feature.x())
+        print(self.feature.point())
+        ModelHighAPI.ModelHighAPI_RefAttr(self.feature.point())
 
     def test_create_from_object(self):
         ModelHighAPI.ModelHighAPI_RefAttr(self.feature.feature())

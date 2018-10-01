@@ -45,14 +45,13 @@ class PointTestCase(unittest.TestCase):
 
     def test_setValue(self):
         point = ConstructionAPI.ConstructionAPI_Point(self.feature)
-        assert(point.x().isInitialized() == False)
-        assert(point.y().isInitialized() == False)
-        assert(point.z().isInitialized() == False)
+        assert(point.point().isInitialized() == False)
 
         point.setByXYZ(10, "20", "x + 30")
-        self.assertEqual(10, point.x().value())
-        self.assertEqual("20", point.y().text())
-        self.assertEqual("x + 30", point.z().text())
+        print(dir(point.point()))
+        self.assertEqual(10, point.point().x())
+        self.assertEqual("20", point.point().textY())
+        self.assertEqual("x + 30", point.point().textZ())
 
 if __name__ == "__main__":
     test_program = unittest.main(exit=False)
