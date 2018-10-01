@@ -161,7 +161,8 @@ namespace ModelGeomAlgo_Shape
 
       // process subs of compsolid
       ResultBodyPtr aSubCompSolid = std::dynamic_pointer_cast<ModelAPI_ResultBody>(aSubResult);
-      if (aSubCompSolid && aSubCompSolid->numberOfSubs() > 0) {
+      if (theShapeType != GeomAPI_Shape::COMPSOLID &&
+          aSubCompSolid && aSubCompSolid->numberOfSubs() > 0) {
         isSubshapeFound = findSubshapeInCompsolid(aSubCompSolid,
             thePoint, theShapeType, theTolerance, theSelected);
       }

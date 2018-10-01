@@ -133,7 +133,8 @@ void FeaturesPlugin_RemoveSubShapes::attributeChanged(const std::string& theID)
       for(anIndex = 0; anIndex < aSubsToKeepNb; ++anIndex) {
         AttributeSelectionPtr anAttrSelectionInList = aSubShapesToKeepAttrList->value(anIndex);
         GeomShapePtr aSubShapeToKeep = anAttrSelectionInList->value();
-        if (aSubShapeToKeep.get() && aSubShapeToKeep->isEqual(aSubShape)) {
+        if (aSubShapeToKeep.get() &&
+           (aSubShapeToKeep->isEqual(aSubShape) || aSubShapeToKeep->isSubShape(aSubShape))) {
           break;
         }
       }
@@ -173,7 +174,8 @@ void FeaturesPlugin_RemoveSubShapes::attributeChanged(const std::string& theID)
       for(anIndex = 0; anIndex < aSubsToRemoveNb; ++anIndex) {
         AttributeSelectionPtr anAttrSelectionInList = aSubShapesToRemoveAttrList->value(anIndex);
         GeomShapePtr aSubShapeToRemove = anAttrSelectionInList->value();
-        if (aSubShapeToRemove.get() && aSubShapeToRemove->isEqual(aSubShape)) {
+        if (aSubShapeToRemove.get() &&
+           (aSubShapeToRemove->isEqual(aSubShape) || aSubShapeToRemove->isSubShape(aSubShape))) {
           break;
         }
       }
