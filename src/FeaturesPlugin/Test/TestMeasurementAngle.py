@@ -73,13 +73,13 @@ TOLERANCE = 1.e-6
 
 # reference data
 REF_DATA = [("Sketch_1/Edge-SketchLine_3", "Sketch_1/Edge-SketchLine_6", [90]),
-            ("Extrusion_1_1/Generated_Face_5", "Extrusion_1_1/Generated_Face_5&Extrusion_1_1/To_Face_1", [135]),
-            ("Sketch_1/Edge-SketchCircle_1_2", "Extrusion_1_1/Generated_Face_5&Extrusion_1_1/To_Face_1", [180]),
+            ("Extrusion_1_1/Generated_Face_5", "Extrusion_1_1/Generated_Face_5&Extrusion_1_1/To_Face_1", [45]),
+            ("Sketch_1/Edge-SketchCircle_1_2", "Extrusion_1_1/Generated_Face_5&Extrusion_1_1/To_Face_1", [0]),
             ("Sketch_1/Edge-SketchLine_3", "Sketch_1/Edge-SketchCircle_1_2", []),
             ("Extrusion_1_1/Generated_Face_5&Extrusion_1_1/From_Face_1", "Extrusion_1_1/Generated_Face_5&Extrusion_1_1/To_Face_1", []),
             ("Sketch_2/Edge-SketchLine_7", "Extrusion_1_1/To_Face_1&Extrusion_1_1/Generated_Face_4", [130]),
-            ("Sketch_2/Edge-SketchLine_7", "Extrusion_1_1/To_Face_1&Extrusion_1_1/Generated_Face_1", [140]),
-            ("Sketch_2/Edge-SketchLine_7", "Extrusion_1_1/Generated_Face_5&Extrusion_1_1/To_Face_1", [58.78794626, 95.19768874])
+            ("Sketch_2/Edge-SketchLine_7", "Extrusion_1_1/To_Face_1&Extrusion_1_1/Generated_Face_1", [40]),
+            ("Sketch_2/Edge-SketchLine_7", "Extrusion_1_1/Generated_Face_5&Extrusion_1_1/To_Face_1", [121.21205374, 84.80231126])
            ]
 
 for ref in REF_DATA:

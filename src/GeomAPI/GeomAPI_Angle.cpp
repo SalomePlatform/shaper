@@ -58,12 +58,18 @@ GeomAPI_Angle::GeomAPI_Angle(const std::shared_ptr<GeomAPI_Edge>& theEdge1,
   gp_Pnt aP;
 
   GeomAPI_ProjectPointOnCurve aProj1(aPoint, aCurve1);
-  if (aProj1.NbPoints() > 0)
+  if (aProj1.NbPoints() > 0) {
     aCurve1->D1(aProj1.LowerDistanceParameter(), aP, anAngle->myDir1);
+    if (aCurve1->Value(aF1).SquareDistance(aPoint) < aCurve1->Value(aL1).SquareDistance(aPoint))
+      anAngle->myDir1.Reverse();
+  }
 
   GeomAPI_ProjectPointOnCurve aProj2(aPoint, aCurve2);
-  if (aProj2.NbPoints() > 0)
+  if (aProj2.NbPoints() > 0) {
     aCurve2->D1(aProj2.LowerDistanceParameter(), aP, anAngle->myDir2);
+    if (aCurve2->Value(aF2).SquareDistance(aPoint) < aCurve2->Value(aL2).SquareDistance(aPoint))
+      anAngle->myDir2.Reverse();
+  }
 
   setImpl(anAngle);
 }
