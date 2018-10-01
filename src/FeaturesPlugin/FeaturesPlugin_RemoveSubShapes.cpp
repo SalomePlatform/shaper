@@ -269,6 +269,18 @@ void FeaturesPlugin_RemoveSubShapes::execute()
   aResultShape = aCopy->shape();
   aMakeShapeList.appendAlgo(aCopy);
 
+  if (aResultShape->shapeType() == GeomAPI_Shape::COMPOUND) {
+    aResultShape = GeomAlgoAPI_ShapeTools::groupSharedTopology(aResultShape);
+    if (aResultShape->shapeType() == GeomAPI_Shape::COMPOUND) {
+      // if the result has only one sub-shape, discard the compound
+      GeomAPI_ShapeIterator aSubIt(aResultShape);
+      GeomShapePtr aSub = aSubIt.current();
+      aSubIt.next();
+      if (!aSubIt.more())
+        aResultShape = aSub;
+    }
+  }
+
   // Store result.
   ResultBodyPtr aResultBody = document()->createBody(data());
   aResultBody->storeModified(aBaseShape, aResultShape, 1);
@@ -276,10 +288,10 @@ void FeaturesPlugin_RemoveSubShapes::execute()
   for(; aTypeIter != aTypes.end(); aTypeIter++)
     aResultBody->loadDeletedShapes(&aMakeShapeList, aBaseShape, *aTypeIter, 1);
   aResultBody->loadAndOrientModifiedShapes(&aMakeShapeList, aBaseShape, GeomAPI_Shape::FACE,
-	  2, "Modified_Face", *aMakeShapeList.mapOfSubShapes().get(), true, false, true);
+      2, "Modified_Face", *aMakeShapeList.mapOfSubShapes().get(), true, false, true);
   aResultBody->loadAndOrientModifiedShapes(&aMakeShapeList, aBaseShape, GeomAPI_Shape::EDGE,
-	  3, "Modified_Edge", *aMakeShapeList.mapOfSubShapes().get(), false, false, true);
+      3, "Modified_Edge", *aMakeShapeList.mapOfSubShapes().get(), false, false, true);
   aResultBody->loadAndOrientModifiedShapes(&aMakeShapeList, aBaseShape, GeomAPI_Shape::VERTEX,
-	  4, "Modified_Vertex", *aMakeShapeList.mapOfSubShapes().get());
+      4, "Modified_Vertex", *aMakeShapeList.mapOfSubShapes().get());
   setResult(aResultBody);
 }
