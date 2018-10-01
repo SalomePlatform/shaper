@@ -76,6 +76,10 @@ protected:
   ModuleBase_ParamSpinBox* myYSpin;
   ModuleBase_ParamSpinBox* myZSpin;
 
+  FeaturePtr myXParam;
+  FeaturePtr myYParam;
+  FeaturePtr myZParam;
+
   double myDefaultValue[3];
 };
 

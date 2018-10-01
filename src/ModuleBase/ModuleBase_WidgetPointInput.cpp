@@ -34,6 +34,9 @@
 #include <QFormLayout>
 #include <QLabel>
 
+
+#define ERR_STRING "ERROR"
+
 ModuleBase_WidgetPointInput::ModuleBase_WidgetPointInput(QWidget* theParent,
   ModuleBase_IWorkshop* theWorkshop,
   const Config_WidgetAPI* theData)
@@ -101,6 +104,24 @@ QList<QWidget*> ModuleBase_WidgetPointInput::getControls() const
   return aList;
 }
 
+std::string getParmText(ModuleBase_ParamSpinBox* theSpin, FeaturePtr& theParam)
+{
+  QString aText = theSpin->text();
+  if (aText.contains('=')) {
+    if (!theParam.get()) {
+      theParam = ModuleBase_Tools::createParameter(aText);
+      if (!theParam.get()) {
+        return ERR_STRING;
+      }
+    }
+    else {
+      ModuleBase_Tools::editParameter(theParam, aText);
+    }
+    aText = aText.split('=').at(0);
+  }
+  return aText.toStdString();
+}
+
 //********************************************************************
 bool ModuleBase_WidgetPointInput::storeValueCustom()
 {
@@ -108,8 +129,28 @@ bool ModuleBase_WidgetPointInput::storeValueCustom()
   if (aAttr.get()) {
     if (aAttr->isInitialized()) {
       if (myXSpin->hasVariable() || myYSpin->hasVariable() || myZSpin->hasVariable()) {
-        aAttr->setText(myXSpin->text().toStdString(),
-          myYSpin->text().toStdString(), myZSpin->text().toStdString());
+        std::string aXText = getParmText(myXSpin, myXParam);
+        if (aXText == ERR_STRING) {
+          aAttr->setExpressionError(0, "Parameter cannot be created");
+          aAttr->setExpressionInvalid(0, true);
+          updateObject(myFeature);
+          return false;
+        }
+        std::string aYText = getParmText(myYSpin, myYParam);
+        if (aYText == ERR_STRING) {
+          aAttr->setExpressionError(1, "Parameter cannot be created");
+          aAttr->setExpressionInvalid(1, true);
+          updateObject(myFeature);
+          return false;
+        }
+        std::string aZText = getParmText(myZSpin, myZParam);
+        if (aZText == ERR_STRING) {
+          aAttr->setExpressionError(2, "Parameter cannot be created");
+          aAttr->setExpressionInvalid(2, true);
+          updateObject(myFeature);
+          return false;
+        }
+        aAttr->setText(aXText, aYText, aZText);
       } else {
         aAttr->setValue(myXSpin->value(), myYSpin->value(), myZSpin->value());
       }

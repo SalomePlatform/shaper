@@ -177,6 +177,12 @@ void ModuleBase_ParamSpinBox::setText(const QString& value)
     lineEdit()->setText(value);
     emit textChanged(value);
   }
+  else {
+    bool isConv = false;
+    double aVal = value.toDouble(&isConv);
+    if (isConv)
+      setValue(aVal);
+  }
 }
 
 /*!
