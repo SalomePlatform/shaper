@@ -94,7 +94,7 @@ At this step we will create a regular hexagon.
    Regular hexagon
 - Select the upper side of the hexagon
 - Start creation of :ref:`Length <sketchLength>` constraint via **Length** button in Sketch toolbar
-- Set length value equal to 115.4 and press **Enter**
+- Set length expression equal to "a=115.4" and press **Enter**
 .. image:: images/tutorial1_11.png
    :align: center
 
@@ -106,10 +106,24 @@ At this step we will create a regular hexagon.
 
 .. centered::
    Finished Sketch
+- Check item corresponding to the created parameter **a** under **Part_1 / Parameters** node
+.. image:: images/tutorial1_13.png
+   :align: center
+
+.. centered::
+   Parameter created during the Sketch operation
 
 Step2. Polyline.
 ----------------
 
+- Start :ref:`Parameter <parameter>` creation via Main Menu *Part - > Parameter*
+- Set parameter name = "h", set parameter expression = "90", set comment = "nut height"
+.. image:: images/tutorial2_0.png
+   :align: center
+
+.. centered::
+   Creation of parameter h = 90
+- Click **Apply** button to finish parameter creation
 - Start :ref:`Point <constructionPoint>` creation via Main Menu *Construction - > Point*
 - Set x = 50, y = 0, z = 0
 .. image:: images/tutorial2_1.png
@@ -118,7 +132,7 @@ Step2. Polyline.
 .. centered::
    Construction of point (50, 0, 0)
 - Click **Apply** button to finish point creation
-- Create points (80, 0, 0), (112, 0, 13), (112, 0, 48), (80, 0, 63), (80, 0, 90), (50, 0, 90) in the same way
+- Create points (80, 0, 0), (112, 0, 13), (112, 0, 48), (80, 0, 63), (80, 0, h), (50, 0, h) in the same way
 - Select the created points in the object browser under **Part_1 / Constructions** node
 - Click right mouse button and select **Color...** item in the popup menu
 - Select blue color and click **OK** button
@@ -183,12 +197,14 @@ Step5. Extrusion.
 - Start :ref:`Extrusion <featureExtrusion>` creation via Main Menu *Features - > Extrusion*
 - Select the hexagon created at step 1
 - Click on axis input field in the property panel and select **OZ** axis in the view
-- Set **To size** parameter equal to 100
+- Check **By bounding planes and offsets option**
+- Select the bottom face of the revolution shape as **From** plane
+- Select the top face of the revolution shape as **To** plane
 .. image:: images/tutorial5_1.png
    :align: center
 
 .. centered::
-   Extrusion along OZ axis from 0 to 100
+   Extrusion along OZ axis by bounding planes
 - Click **Apply** button in the property panel
 .. image:: images/tutorial5_2.png
    :align: center
