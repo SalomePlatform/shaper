@@ -60,4 +60,5 @@ class PrimitivesAddBoxTestCase(PrimitivesAddBox):
         self.assertEqual(box.secondPoint().context().shape().isVertex(),True)
 
 if __name__ == "__main__":
-    unittest.main(exit=False)
+    test_program = unittest.main(exit=False)
+    assert test_program.result.wasSuccessful(), "Test failed"

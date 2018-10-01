@@ -37,4 +37,5 @@ class SketcherAddPoint(SketcherTestCase):
         self.assertEqual(point.coordinates().y(), 2.0)
 
 if __name__ == "__main__":
-    unittest.main(verbosity=2, exit=False)
+    test_program = unittest.main(verbosity=2, exit=False)
+    assert test_program.result.wasSuccessful(), "Test failed"

@@ -47,4 +47,5 @@ class ExchangeTestCase(unittest.TestCase):
         self.session.finishOperation()
 
 if __name__ == "__main__":
-    unittest.main(exit=False)
+    test_program = unittest.main(exit=False)
+    assert test_program.result.wasSuccessful(), "Test failed"

@@ -38,4 +38,5 @@ class SketcherSetFillet(SketcherTestCase):
         model.do()
 
 if __name__ == "__main__":
-    unittest.main(verbosity=2, exit=False)
+    test_program = unittest.main(verbosity=2, exit=False)
+    assert test_program.result.wasSuccessful(), "Test failed"

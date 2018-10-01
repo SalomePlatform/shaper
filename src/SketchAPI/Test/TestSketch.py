@@ -35,4 +35,5 @@ class SketchTestCase(unittest.TestCase):
 # TODO(spo): add tests.
 
 if __name__ == "__main__":
-    unittest.main(exit=False)
+    test_program = unittest.main(exit=False)
+    assert test_program.result.wasSuccessful(), "Test failed"

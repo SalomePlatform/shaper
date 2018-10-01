@@ -104,5 +104,6 @@ class TestMovePoint(unittest.TestCase):
     self.assertAlmostEqual(self.myPointCoordinates.y(), coord[1])
 
 
-if __name__ == '__main__':
-  unittest.main(exit=False)
+if __name__ == "__main__":
+    test_program = unittest.main(exit=False)
+    assert test_program.result.wasSuccessful(), "Test failed"

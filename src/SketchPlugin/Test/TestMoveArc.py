@@ -345,5 +345,6 @@ class TestMoveArc(unittest.TestCase):
     self.checkPointCoordinates(self.myArc.endPoint(), self.myEnd)
 
 
-if __name__ == '__main__':
-  unittest.main(exit=False)
+if __name__ == "__main__":
+    test_program = unittest.main(exit=False)
+    assert test_program.result.wasSuccessful(), "Test failed"

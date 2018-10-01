@@ -175,8 +175,9 @@ class TestParameterRename(unittest.TestCase):
         self.assertEqual(self.anCircleCentr.y(), 220.)
         self.assertEqual(self.aRadiusAttr.value(), 200.)
 
-if __name__ == '__main__':
-    unittest.main(exit=False)
+if __name__ == "__main__":
+    test_program = unittest.main(exit=False)
+    assert test_program.result.wasSuccessful(), "Test failed"
 #=========================================================================
 # End of test
 #=========================================================================

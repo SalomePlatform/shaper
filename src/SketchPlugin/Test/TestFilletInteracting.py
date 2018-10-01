@@ -632,5 +632,6 @@ class TestFilletInteracting(unittest.TestCase):
     model.testNbSubShapes(self.mySketch, GeomAPI_Shape.VERTEX, [6])
 
 
-if __name__ == '__main__':
-  unittest.main(exit=False)
+if __name__ == "__main__":
+    test_program = unittest.main(exit=False)
+    assert test_program.result.wasSuccessful(), "Test failed"
