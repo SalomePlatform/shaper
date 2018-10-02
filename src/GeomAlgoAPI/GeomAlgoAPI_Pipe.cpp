@@ -144,7 +144,7 @@ void GeomAlgoAPI_Pipe::build(const GeomShapePtr theBaseShape,
     return;
   }
 
-  aPathWire.Move(getPathToBaseTranslation(aBaseShape, aPathWire));
+  aPathWire.Move(getPathToBaseTranslation(theBaseShape->impl<TopoDS_Shape>(), aPathWire));
 
   // Getting Bi-Normal.
   if(!theBiNormal.get()) {
@@ -221,7 +221,8 @@ void GeomAlgoAPI_Pipe::build(const ListOfShape& theBaseShapes,
     return;
   }
 
-  gp_Trsf aTrsf = getPathToBaseTranslation(aBaseShape, aPathWire);
+  TopoDS_Shape aReallyBase = theBaseShapes.front()->impl<TopoDS_Shape>();
+  gp_Trsf aTrsf = getPathToBaseTranslation(aReallyBase, aPathWire);
   aPathWire.Move(aTrsf);
 
   // Get locations after moving path shape.
