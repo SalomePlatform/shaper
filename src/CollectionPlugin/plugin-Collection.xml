@@ -40,6 +40,7 @@ email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com
           filter_points="false" >
           <validator id="GeomValidators_BodyShapes"/>
         </field-panel>
+        <validator id="CollectionPlugin_FieldValidator"/>
       </feature>
     </group>
   </workbench>

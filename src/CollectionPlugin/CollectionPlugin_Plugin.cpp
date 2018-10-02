@@ -22,6 +22,7 @@
 
 #include <CollectionPlugin_Group.h>
 #include <CollectionPlugin_Field.h>
+#include <CollectionPlugin_Validators.h>
 #include <ModelAPI_Session.h>
 
 #include <ModuleBase_WidgetCreatorFactory.h>
@@ -41,6 +42,11 @@ CollectionPlugin_Plugin::CollectionPlugin_Plugin()
    std::shared_ptr<CollectionPlugin_WidgetCreator>(new CollectionPlugin_WidgetCreator()));
 
   SessionPtr aMgr = ModelAPI_Session::get();
+
+  ModelAPI_ValidatorsFactory* aFactory = aMgr->validators();
+  aFactory->registerValidator("CollectionPlugin_FieldValidator",
+    new CollectionPlugin_FieldValidator);
+
   // register this plugin
   ModelAPI_Session::get()->registerPlugin(this);
 }

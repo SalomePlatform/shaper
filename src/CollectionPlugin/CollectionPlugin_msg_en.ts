@@ -30,5 +30,12 @@
       <translation>Objects not selected.</translation>
     </message>
   </context>
+  <context>
+    <name>Field:Model_FeatureValidator</name>
+    <message>
+      <source>Attribute "components_names" is not initialized.</source>
+      <translation>Components are not selected</translation>
+    </message>
+  </context>
 
 </TS>

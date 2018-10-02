@@ -35,6 +35,7 @@ SET(PROJECT_HEADERS
     CollectionPlugin_Field.h
     CollectionPlugin_WidgetCreator.h
     CollectionPlugin_WidgetField.h
+	CollectionPlugin_Validators.h
 )
 
 SET(PROJECT_MOC_HEADERS
@@ -47,6 +48,7 @@ SET(PROJECT_SOURCES
     CollectionPlugin_Field.cpp
     CollectionPlugin_WidgetCreator.cpp
     CollectionPlugin_WidgetField.cpp
+	CollectionPlugin_Validators.cpp
 )
 
 SET(XML_RESOURCES

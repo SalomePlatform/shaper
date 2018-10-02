@@ -37,7 +37,7 @@ CollectionPlugin_Field::CollectionPlugin_Field()
 void CollectionPlugin_Field::initAttributes()
 {
   data()->addAttribute(SELECTED_ID(), ModelAPI_AttributeSelectionList::typeId());
-  // for the whole part result it is not obligatory
+  // for the whole part result is not obligatory
   ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(), SELECTED_ID());
 
   data()->addAttribute(COMPONENTS_NAMES_ID(), ModelAPI_AttributeStringArray::typeId());
