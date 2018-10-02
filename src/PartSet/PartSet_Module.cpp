@@ -224,7 +224,7 @@ PartSet_Module::PartSet_Module(ModuleBase_IWorkshop* theWshop)
     "Dimension value size", Config_Prop::IntSpin, aStream.str());
 
   Config_PropManager::registerProp("Visualization", "sketch_dimension_color",
-    "Sketch dimension color",
+    "Dimension color",
     Config_Prop::Color, SKETCH_DIMENSION_COLOR);
 }
 
