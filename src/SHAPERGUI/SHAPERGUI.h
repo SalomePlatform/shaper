@@ -154,6 +154,8 @@ Q_OBJECT
   /// \brief Set flag about opened document state
   void setIsOpened(bool theOpened) { myIsOpened = theOpened; }
 
+  virtual void updateModuleVisibilityState();
+
  public slots:
   /// \brief The method is redefined to connect to the study viewer before the data
   /// model is filled by opened file. This file open will flush redisplay signals for,
@@ -243,6 +245,10 @@ private slots:
   QtxPopupMgr* myPopupMgr;
 
   QAction* myWhatIsAction;
+
+  bool myIsInspectionVisible;
+  QDockWidget* myInspectionPanel;
+
 };
 
 #endif

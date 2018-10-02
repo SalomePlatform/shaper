@@ -121,7 +121,8 @@ private:
 //******************************************************
 SHAPERGUI::SHAPERGUI()
     : LightApp_Module("SHAPER"),
-      mySelector(0), myIsOpened(0), myPopupMgr(0)
+      mySelector(0), myIsOpened(0), myPopupMgr(0), myIsInspectionVisible(false),
+  myInspectionPanel(0)
 {
   myWorkshop = new XGUI_Workshop(this);
   connect(myWorkshop, SIGNAL(commandStatusUpdated()),
@@ -224,12 +225,12 @@ bool SHAPERGUI::activateModule(SUIT_Study* theStudy)
       desktop()->tabifyDockWidget(aObjDoc, myWorkshop->propertyPanel());
     }
 
-    QDockWidget* aInspection = myWorkshop->inspectionPanel();
-    if (aInspection) {
-      QAction* aViewAct = aInspection->toggleViewAction();
-      aViewAct->setEnabled(true);
+    if (!myInspectionPanel) {
+      myInspectionPanel = myWorkshop->inspectionPanel();
+      QAction* aViewAct = myInspectionPanel->toggleViewAction();
       connect(aViewAct, SIGNAL(toggled(bool)), this, SLOT(onWhatIs(bool)));
     }
+    myInspectionPanel->toggleViewAction()->setEnabled(true);
 
     if (!mySelector) {
       ViewManagerList OCCViewManagers;
@@ -330,12 +331,10 @@ bool SHAPERGUI::deactivateModule(SUIT_Study* theStudy)
     QAction* aViewAct = aObjDoc->toggleViewAction();
     aViewAct->setEnabled(false);
   }
-  QDockWidget* aInspection = myWorkshop->inspectionPanel();
-  if (aInspection) {
-    aInspection->setVisible(false);
-    QAction* aViewAct = aInspection->toggleViewAction();
-    aViewAct->setEnabled(false);
-  }
+
+  myIsInspectionVisible = myInspectionPanel->isVisible();
+  QAction* aViewAct = myInspectionPanel->toggleViewAction();
+  aViewAct->setEnabled(false);
 
   // the active operation should be stopped for the next activation.
   // There should not be active operation and visualized preview.
@@ -770,17 +769,23 @@ void SHAPERGUI::createFeatureActions()
 
 void SHAPERGUI::onWhatIs(bool isToggled)
 {
-  QDockWidget* aInspection = myWorkshop->inspectionPanel();
   if (sender() == myWhatIsAction) {
-    QAction* aViewAct = aInspection->toggleViewAction();
+    QAction* aViewAct = myInspectionPanel->toggleViewAction();
     aViewAct->blockSignals(true);
     aViewAct->setChecked(isToggled);
     aViewAct->blockSignals(false);
-    aInspection->setVisible(isToggled);
+    myInspectionPanel->setVisible(isToggled);
   }
   else {
     myWhatIsAction->blockSignals(true);
     myWhatIsAction->setChecked(isToggled);
     myWhatIsAction->blockSignals(false);
+    myInspectionPanel->setVisible(isToggled);
   }
+}
+
+void SHAPERGUI::updateModuleVisibilityState()
+{
+  LightApp_Module::updateModuleVisibilityState();
+  onWhatIs(myIsInspectionVisible);
 }
