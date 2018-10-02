@@ -53,13 +53,16 @@ Model_ResultBody::~Model_ResultBody()
 }
 
 void Model_ResultBody::loadAndOrientModifiedShapes(GeomAlgoAPI_MakeShape* theMS,
-    std::shared_ptr<GeomAPI_Shape>  theShapeIn, const int  theKindOfShape, const int  theTag,
+    std::shared_ptr<GeomAPI_Shape> theShapeIn, const int  theKindOfShape, const int  theTag,
     const std::string& theName, GeomAPI_DataMapOfShapeShape& theSubShapes,
     const bool theIsStoreSeparate,
     const bool theIsStoreAsGenerated,
     const bool theSplitInSubs)
 {
   if (theSplitInSubs && mySubs.size()) { // consists of subs
+    // optimization of getting of new shapes for specific sub-result
+    if (!theMS->newShapesCollected(theShapeIn, theKindOfShape))
+      theMS->collectNewShapes(theShapeIn, theKindOfShape);
     std::vector<ResultBodyPtr>::const_iterator aSubIter = mySubs.cbegin();
     for(; aSubIter != mySubs.cend(); aSubIter++) {
       // check that sub-shape was also created as modification of ShapeIn

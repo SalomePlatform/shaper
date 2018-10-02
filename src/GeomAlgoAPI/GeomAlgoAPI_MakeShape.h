@@ -46,6 +46,9 @@ public:
   /// \brief Empty constructor.
   GEOMALGOAPI_EXPORT GeomAlgoAPI_MakeShape();
 
+  /// Destructor for remove myHist
+  GEOMALGOAPI_EXPORT ~GeomAlgoAPI_MakeShape();
+
   /// \brief Constructor by builder and builder type.
   /// \param[in] theBuilder pointer to the builder.
   /// \param[in] theBuilderType builder type.
@@ -115,6 +118,29 @@ public:
   /// \brief Check the validity of the produced shape.
   GEOMALGOAPI_EXPORT bool checkValid(std::string theMessage);
 
+  /// Optimization of access the new shapes by old shapes for the limited set of needed new shapes.
+  /// \param theWholeOld the whole old shape
+  /// \param theShapeType type of the sub-shapes that is used for optimization
+  /// \returns true if optimization containers are already filled
+  GEOMALGOAPI_EXPORT bool newShapesCollected(
+    std::shared_ptr<GeomAPI_Shape> theWholeOld, const int theShapeType);
+
+  /// Optimization of access the new shapes by old shapes for the limited set of needed new shapes.
+  /// \param theWholeOld the whole old shape
+  /// \param theShapeType type of the sub-shapes that is used for optimization
+  /// \returns true if optimization containers are already filled
+  GEOMALGOAPI_EXPORT void collectNewShapes(
+    std::shared_ptr<GeomAPI_Shape> theWholeOld, const int theShapeType);
+
+  /// Optimization of access the new shapes by old shapes for the limited set of needed new shapes.
+  /// \param theWholeOld the whole old shape
+  /// \param theNewShape the whole new shape
+  /// \param theShapeType type of the old sub-shapes
+  /// \returns compound of all old shapes that were used for creation of the given new
+  GEOMALGOAPI_EXPORT std::shared_ptr<GeomAPI_Shape> oldShapesForNew(
+    std::shared_ptr<GeomAPI_Shape> theWholeOld,
+    std::shared_ptr<GeomAPI_Shape> theNewShape, const int theShapeType);
+
 protected:
   /// \brief Sets builder type.
   /// \param[in] theBuilderType new builder type.
@@ -144,6 +170,10 @@ private:
   GeomAlgoAPI_MakeShape::BuilderType myBuilderType; ///< Type of make shape builder.
   bool myDone; ///< Builder status.
   std::shared_ptr<GeomAPI_Shape> myShape; ///< Resulting shape.
+
+  /// map that is used to keep the optimization structure for access to the history
+  /// kind of sub-shapes -> whole old shape -> new shape -> list of old shapes that create this new
+  void* myHist;
 };
 
 typedef std::list<std::shared_ptr<GeomAlgoAPI_MakeShape> > ListOfMakeShape;

@@ -30,12 +30,29 @@
 #include <TopTools_ListOfShape.hxx>
 #include <TopTools_ListIteratorOfListOfShape.hxx>
 #include <GeomAPI_ShapeExplorer.h>
+#include <GeomAPI_ShapeIterator.h>
+#include <TopoDS_Builder.hxx>
+
+// new shape -> old shapes -> index in the old shape
+typedef NCollection_DataMap<TopoDS_Shape,
+  NCollection_DataMap<TopoDS_Shape, int, TopTools_ShapeMapHasher>, TopTools_ShapeMapHasher>
+  MapNewToOld;
+typedef
+  NCollection_DataMap<int, NCollection_DataMap<TopoDS_Shape, MapNewToOld, TopTools_ShapeMapHasher> >
+  HistoryMap;
 
 //=================================================================================================
 GeomAlgoAPI_MakeShape::GeomAlgoAPI_MakeShape()
 : myBuilderType(Unknown),
   myDone(false)
 {
+  myHist = 0;
+}
+
+GeomAlgoAPI_MakeShape::~GeomAlgoAPI_MakeShape() {
+  if (myHist) {
+    delete (HistoryMap*)myHist;
+  }
 }
 
 //=================================================================================================
@@ -220,6 +237,7 @@ void GeomAlgoAPI_MakeShape::initialize() {
     aCurrentShape->setImpl(new TopoDS_Shape(anExp.Current()));
     myMap->bind(aCurrentShape, aCurrentShape);
   }
+  myHist = 0;
 }
 
 
@@ -260,3 +278,93 @@ bool GeomAlgoAPI_MakeShape::checkValid(std::string theMessage){
   return true ;
 }
 
+bool GeomAlgoAPI_MakeShape::newShapesCollected(
+  std::shared_ptr<GeomAPI_Shape> theWholeOld, const int theShapeType)
+{
+  if (!myHist)
+    return false;
+  HistoryMap* aHist = (HistoryMap*)myHist;
+  if (!aHist->IsBound(theShapeType))
+    return false;
+  return aHist->Find(theShapeType).IsBound(theWholeOld->impl<TopoDS_Shape>());
+}
+
+void GeomAlgoAPI_MakeShape::collectNewShapes(
+  std::shared_ptr<GeomAPI_Shape> theWholeOld, const int theShapeType)
+{
+  if (!myHist)
+    myHist = new HistoryMap;
+  HistoryMap* aHist = (HistoryMap*)myHist;
+  if (!aHist->IsBound(theShapeType))
+    aHist->Bind(
+      theShapeType, NCollection_DataMap<TopoDS_Shape, MapNewToOld, TopTools_ShapeMapHasher>());
+  aHist->ChangeFind(theShapeType). // add a new in anyway
+    Bind(theWholeOld->impl<TopoDS_Shape>(), MapNewToOld());
+  MapNewToOld& aCurrent =
+    aHist->ChangeFind(theShapeType).ChangeFind(theWholeOld->impl<TopoDS_Shape>());
+  ListOfShape aNewList;
+  TopTools_MapOfShape aViewed; //avoid same shapes
+  GeomAPI_ShapeExplorer anExp(theWholeOld, GeomAPI_Shape::ShapeType(theShapeType));
+  for(int anIndexInWholeOld = 0; anExp.more(); anExp.next(), anIndexInWholeOld++) {
+    if (!aViewed.Add(anExp.current()->impl<TopoDS_Shape>()))
+      continue;
+    aNewList.clear();
+    modified(anExp.current(), aNewList);
+    for(ListOfShape::iterator aNew = aNewList.begin(); aNew != aNewList.end(); aNew++) {
+      const TopoDS_Shape& aNewShape = (*aNew)->impl<TopoDS_Shape>();
+      if (!aCurrent.IsBound(aNewShape)) {
+        aCurrent.Bind(
+          aNewShape, NCollection_DataMap<TopoDS_Shape, int, TopTools_ShapeMapHasher>());
+      }
+      aCurrent.ChangeFind(aNewShape).Bind(anExp.current()->impl<TopoDS_Shape>(), anIndexInWholeOld);
+    }
+  }
+}
+
+static void addAllSubs(const TopoDS_Shape& theNewShape,
+  MapNewToOld& theCurrent, std::map<int, TopoDS_Shape>& theResMap)
+{
+  if (theCurrent.IsBound(theNewShape)) {
+    NCollection_DataMap<TopoDS_Shape, int, TopTools_ShapeMapHasher>::Iterator
+      anOldIter(theCurrent.Find(theNewShape));
+    for(; anOldIter.More(); anOldIter.Next()) {
+      theResMap[anOldIter.Value()] = anOldIter.Key();
+    }
+  }
+
+  TopoDS_Iterator anIter(theNewShape);
+  for(; anIter.More(); anIter.Next()) {
+    //if (anIter.Value().ShapeType() != TopAbs_VERTEX)
+    addAllSubs(anIter.Value(), theCurrent, theResMap); // add recursively
+  }
+}
+
+std::shared_ptr<GeomAPI_Shape> GeomAlgoAPI_MakeShape::oldShapesForNew(
+  std::shared_ptr<GeomAPI_Shape> theWholeOld,
+  std::shared_ptr<GeomAPI_Shape> theNewShape, const int theShapeType)
+{
+  GeomShapePtr aResult(new GeomAPI_Shape);
+  TopoDS_Compound aResComp;
+  TopoDS_Builder aBuilder;
+  aBuilder.MakeCompound(aResComp);
+  aResult->setImpl<TopoDS_Shape>(new TopoDS_Shape(aResComp));
+
+  HistoryMap* aHist = (HistoryMap*)myHist;
+  if (!aHist->IsBound(theShapeType))
+    return aResult; // not found, empty compound
+  const TopoDS_Shape& aWholeOld = theWholeOld->impl<TopoDS_Shape>();
+  if (!aHist->Find(theShapeType).IsBound(aWholeOld))
+    return aResult; // not found, empty compound
+  std::map<int, TopoDS_Shape> aResMap; // map with all results, ordered by index in whole old
+  MapNewToOld& aCurrent = aHist->ChangeFind(theShapeType).ChangeFind(aWholeOld);
+  // we don't know what type of new shapes were produced by the old theShapeType, so, iterate all
+  addAllSubs(theNewShape->impl<TopoDS_Shape>(), aCurrent, aResMap);
+
+  std::map<int, TopoDS_Shape>::iterator anOldIter = aResMap.begin();
+  for(; anOldIter != aResMap.end(); anOldIter++) {
+    if (anOldIter->second.ShapeType() == (TopAbs_ShapeEnum)theShapeType)
+      aBuilder.Add(aResComp, anOldIter->second);
+  }
+  aResult->setImpl<TopoDS_Shape>(new TopoDS_Shape(aResComp));
+  return aResult;
+}

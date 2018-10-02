@@ -206,13 +206,9 @@ bool ModuleBase_OperationFeature::hasObject(ObjectPtr theObj) const
   if (aFeature) {
     if (aFeature == theObj)
       return true;
-    std::list<ResultPtr> aResults;
-    ModelAPI_Tools::allResults(aFeature, aResults);
-    std::list<ResultPtr>::const_iterator aIt;
-    for (aIt = aResults.cbegin(); aIt != aResults.cend(); ++aIt) {
-      ResultPtr aResult = *aIt;
-      if (theObj == aResult)
-         return true;
+    ResultPtr anObjRes = std::dynamic_pointer_cast<ModelAPI_Result>(theObj);
+    if (anObjRes.get() && aFeature == aFeature->document()->feature(anObjRes)) {
+      return true;
     }
 #ifdef DEBUG_DO_NOT_ACTIVATE_SUB_FEATURE
     if (aFeature->isMacro()) {
