@@ -51,6 +51,14 @@ public:
   FEATURESPLUGIN_EXPORT virtual void executeCompositeBoolean();
 
 protected:
+  struct ResultBaseAlgo {
+    ResultBodyPtr resultBody;
+    GeomShapePtr baseShape;
+    std::shared_ptr<GeomAlgoAPI_MakeShape> makeShape;
+    int delTag;
+  };
+
+protected:
   FeaturesPlugin_CompositeBoolean(){};
 
   /// Initializes boolean attributes.
@@ -81,6 +89,11 @@ protected:
                                 const ListOfShape& theTools,
                                 const std::shared_ptr<GeomAlgoAPI_MakeShape> theMakeShape,
                                 int& theTag);
+
+  /// Stores deleted shapes.
+  void storeDeletedShapes(std::vector<ResultBaseAlgo>& theResultBaseAlgoList,
+                          const ListOfShape& theTools,
+                          const GeomShapePtr theResultShapesCompound);
 
 protected:
   ModelAPI_Feature* myFeature;

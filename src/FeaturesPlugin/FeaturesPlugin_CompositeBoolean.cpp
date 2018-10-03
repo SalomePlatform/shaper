@@ -24,6 +24,7 @@
 #include <ModelAPI_Tools.h>
 
 #include <GeomAlgoAPI_Boolean.h>
+#include <GeomAlgoAPI_CompoundBuilder.h>
 #include <GeomAlgoAPI_MakeShapeList.h>
 #include <GeomAlgoAPI_PaveFiller.h>
 #include <GeomAlgoAPI_ShapeTools.h>
@@ -69,6 +70,8 @@ void FeaturesPlugin_CompositeBoolean::executeCompositeBoolean()
 
   // Store result.
   int aResultIndex = 0;
+  std::vector<ResultBaseAlgo> aResultBaseAlgoList;
+  ListOfShape aResultShapesList;
   ListOfShape::const_iterator aBoolObjIt = aBooleanObjects.cbegin();
   ListOfMakeShape::const_iterator aBoolMSIt = aBooleanMakeShapes.cbegin();
   for(; aBoolObjIt != aBooleanObjects.cend() && aBoolMSIt != aBooleanMakeShapes.cend();
@@ -97,10 +100,23 @@ void FeaturesPlugin_CompositeBoolean::executeCompositeBoolean()
 
       int aModTag = aTag;
       storeModificationHistory(aResultBody, *aBoolObjIt, aTools, *aBoolMSIt, aModTag);
+
+      ResultBaseAlgo aRBA;
+      aRBA.resultBody = aResultBody;
+      aRBA.baseShape = *aBoolObjIt;
+      aRBA.makeShape = *aBoolMSIt;
+      aRBA.delTag = aModTag;
+      aResultBaseAlgoList.push_back(aRBA);
+      aResultShapesList.push_back((*aBoolMSIt)->shape());
     }
 
     myFeature->setResult(aResultBody, aResultIndex++);
   }
+
+  // Store deleted shapes after all results has been proceeded. This is to avoid issue when in one
+  // result shape has been deleted, but in another it was modified or stayed.
+  GeomShapePtr aResultShapesCompound = GeomAlgoAPI_CompoundBuilder::compound(aResultShapesList);
+  storeDeletedShapes(aResultBaseAlgoList, aTools, aResultShapesCompound);
 
   myFeature->removeResults(aResultIndex);
 }
@@ -396,6 +412,33 @@ void FeaturesPlugin_CompositeBoolean::storeModificationHistory(ResultBodyPtr the
     theResultBody->loadAndOrientModifiedShapes(theMakeShape.get(), *anIt,
       (*anIt)->shapeType() == GeomAPI_Shape::EDGE ?
       GeomAPI_Shape::EDGE : GeomAPI_Shape::FACE, aTag, aName, *aMap.get(), false, false, true);
-    theResultBody->loadDeletedShapes(theMakeShape.get(), *anIt, GeomAPI_Shape::FACE, aDelTag);
+  }
+}
+
+//==================================================================================================
+void FeaturesPlugin_CompositeBoolean::storeDeletedShapes(
+  std::vector<ResultBaseAlgo>& theResultBaseAlgoList,
+  const ListOfShape& theTools,
+  const GeomShapePtr theResultShapesCompound)
+{
+  for (std::vector<ResultBaseAlgo>::iterator anIt = theResultBaseAlgoList.begin();
+    anIt != theResultBaseAlgoList.end();
+    ++anIt)
+  {
+    ResultBaseAlgo& aRCA = *anIt;
+    aRCA.resultBody->loadDeletedShapes(aRCA.makeShape.get(),
+      aRCA.baseShape,
+      GeomAPI_Shape::FACE,
+      aRCA.delTag,
+      theResultShapesCompound);
+
+    for (ListOfShape::const_iterator anIter = theTools.begin(); anIter != theTools.end(); anIter++)
+    {
+      aRCA.resultBody->loadDeletedShapes(aRCA.makeShape.get(),
+        *anIter,
+        GeomAPI_Shape::FACE,
+        aRCA.delTag,
+        theResultShapesCompound);
+    }
   }
 }

@@ -1688,8 +1688,10 @@ bool FeaturesPlugin_ValidatorBooleanCommonSelection::isValid(
     }
     std::shared_ptr<GeomAPI_Shape> aShape = anAttrSelection->value();
     GeomShapePtr aContextShape;
-    if (!aShape.get() && aContext.get()) {
+    if (aContext.get()) {
       aContextShape = aContext->shape();
+    }
+    if (!aShape.get()) {
       aShape = aContextShape;
     }
     if (!aShape.get()) {
