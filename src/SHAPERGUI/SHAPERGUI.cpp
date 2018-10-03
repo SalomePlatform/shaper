@@ -333,7 +333,7 @@ bool SHAPERGUI::deactivateModule(SUIT_Study* theStudy)
   }
 
   myIsInspectionVisible = myInspectionPanel->isVisible();
-  myInspectionPanel->setVisible(false);
+  myInspectionPanel->hide();
   QAction* aViewAct = myInspectionPanel->toggleViewAction();
   aViewAct->setEnabled(false);
 
