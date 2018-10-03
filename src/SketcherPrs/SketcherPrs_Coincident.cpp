@@ -129,7 +129,7 @@ void SketcherPrs_Coincident::Compute(
       if (aSub->getKind() == SketchPlugin_ConstraintCoincidence::ID() &&
         aSub.get() != myConstraint) {
         aP = getCoincidencePoint(aSub.get());
-        if (aP->isEqual(aPnt)) {
+        if (aP && aP->isEqual(aPnt)) {
           aIsEdge = hasEdge(aSub.get());
           if (aIsEdge)
             break;
