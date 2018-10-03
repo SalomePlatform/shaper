@@ -118,6 +118,8 @@ Q_OBJECT
   /// by mouse drugging. If this is impossible thet it has to return False.
   virtual bool canDragByMouse() const;
 
+  virtual void updateHighlight();
+
   // Fit all along Z (perpendicular to display)
   //virtual void Zfitall();
 
@@ -159,7 +161,6 @@ private slots:
  private:
    void displayHighlight();
    void eraseHighlight();
-   void updateHighlight();
 
   XGUI_Workshop* myWorkshop;
   ResultPtr myResult;

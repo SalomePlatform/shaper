@@ -129,6 +129,9 @@ Q_OBJECT
   /// Fit all along Z (perpendicular to display)
   //virtual void Zfitall() = 0;
 
+  /// Show highlight for pre-highlighted sub-shape
+  virtual void updateHighlight() {}
+
   static Handle(Prs3d_Drawer) DefaultHighlightDrawer;
 
 signals:

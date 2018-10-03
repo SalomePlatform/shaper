@@ -644,9 +644,10 @@ void XGUI_OperationMgr::onOperationStopped()
 
 bool XGUI_OperationMgr::onKeyReleased(QObject *theObject, QKeyEvent* theEvent)
 {
+  bool isAccepted = false;
+
   // Let the manager decide what to do with the given key combination.
   ModuleBase_Operation* anOperation = currentOperation();
-  bool isAccepted = false;
   switch (theEvent->key()) {
     case Qt::Key_Tab:
     case Qt::Key_Backtab:
@@ -684,6 +685,8 @@ bool XGUI_OperationMgr::onKeyReleased(QObject *theObject, QKeyEvent* theEvent)
             aContext->HilightNextDetected(aView);
           else if ((theEvent->key() == Qt::Key_P))
             aContext->HilightPreviousDetected(aView);
+          aViewer->updateHighlight();
+          isAccepted = true;
         }
       }
     }
