@@ -135,6 +135,8 @@ bool ModuleBase_WidgetValidated::isValidInFilters(const ModuleBase_ViewerPrsPtr&
             Handle(AIS_InteractiveObject) anIO = myWorkshop->selection()->getIO(thePrs);
             anOwner = new StdSelect_BRepOwner(aTDShape, anIO);
           }
+          else
+            aValid = false;
           aSelectAttr->setValue(ObjectPtr(), GeomShapePtr(), true);
         }
         else {
