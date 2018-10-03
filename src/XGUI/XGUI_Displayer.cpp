@@ -342,6 +342,7 @@ bool XGUI_Displayer::redisplay(ObjectPtr theObject, bool theUpdateViewer)
       return aRedisplayed;
     }
     if (aAIS_Obj != aAISObj) {
+      erase(theObject, theUpdateViewer);
       appendResultObject(theObject, aAIS_Obj);
     }
     aAISIO = aAIS_Obj->impl<Handle(AIS_InteractiveObject)>();
@@ -385,7 +386,10 @@ bool XGUI_Displayer::redisplay(ObjectPtr theObject, bool theUpdateViewer)
 #ifdef CLEAR_OUTDATED_SELECTION_BEFORE_REDISPLAY
       myWorkshop->selector()->deselectPresentation(aAISIO);
 #endif
-      aContext->Redisplay(aAISIO, false);
+      if (aContext->IsDisplayed(aAISIO))
+        aContext->Redisplay(aAISIO, false);
+      else
+        aContext->Display(aAISIO, false);
 
       #ifdef TINSPECTOR
       if (getCallBack()) getCallBack()->Redisplay(aAISIO);
