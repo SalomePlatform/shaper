@@ -28,6 +28,7 @@
 #include <ModelAPI_Tools.h>
 
 #include <ModuleBase_Tools.h>
+#include <ModuleBase_ITreeNode.h>
 
 #include <XGUI_Workshop.h>
 
@@ -524,6 +525,7 @@ QModelIndexList XGUI_ObjectsBrowser::expandedItems(const QModelIndex& theParent)
 //***************************************************
 void XGUI_ObjectsBrowser::rebuildDataTree()
 {
+  myDocModel->root()->update();
   myDocModel->rebuildDataTree();
   update();
 }
