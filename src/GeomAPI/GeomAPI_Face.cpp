@@ -203,8 +203,8 @@ std::shared_ptr<GeomAPI_Cone> GeomAPI_Face::getCone() const
     BRepTools::UVBounds(aFace, aUMin, aUMax, aVMin, aVMax);
 
     double aSemiAngle = Abs(aCon.SemiAngle());
-    double aRadius1 = aCon.RefRadius() + aVMin * Sin(aCon.SemiAngle());
-    double aRadius2 = aCon.RefRadius() + aVMax * Sin(aCon.SemiAngle());
+    double aRadius1 = Abs(aCon.RefRadius() + aVMin * Sin(aCon.SemiAngle()));
+    double aRadius2 = Abs(aCon.RefRadius() + aVMax * Sin(aCon.SemiAngle()));
 
     aLoc.ChangeCoord() += aDir.XYZ() * aVMin * Cos(aCon.SemiAngle());
 

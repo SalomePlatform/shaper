@@ -166,4 +166,5 @@ ADD_UNIT_TESTS(
   TestPolygon.py
   TestSphere.py
   TestTorus.py
+  Test2675.py
 )
