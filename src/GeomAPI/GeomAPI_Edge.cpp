@@ -217,14 +217,14 @@ bool GeomAPI_Edge::isEqual(const std::shared_ptr<GeomAPI_Shape> theEdge) const
   double aInStart, aInEnd;
   Handle(Geom_Curve) aInCurve = BRep_Tool::Curve(TopoDS::Edge(aInShape), aInStart, aInEnd);
 
+  // Check that end point parameters are the same
+  if ((aMyStart != aInStart) || (aMyEnd != aInEnd))
+    return false;
+
   // Check that curves a the same type
   GeomAdaptor_Curve aMyAdaptor(aMyCurve);
   GeomAdaptor_Curve aInAdaptor(aInCurve);
   if (aMyAdaptor.GetType() != aInAdaptor.GetType())
-    return false;
-
-  // Check that end point parameters are the same
-  if ((aMyStart != aInStart) || (aMyEnd != aInEnd))
     return false;
 
   // Check that end points are equal

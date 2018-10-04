@@ -30,6 +30,7 @@
 #include <ModelAPI_CompositeFeature.h>
 #include <ModelAPI_ResultBody.h>
 #include <GeomAPI_Wire.h>
+#include <GeomAPI_Edge.h>
 
 #include <TopoDS_Iterator.hxx>
 #include <TopoDS.hxx>
@@ -50,6 +51,7 @@
 #include <TNaming_SameShapeIterator.hxx>
 #include <TDataStd_Name.hxx>
 #include <TColStd_MapOfTransient.hxx>
+#include <Precision.hxx>
 #include <algorithm>
 #include <stdexcept>
 
@@ -700,9 +702,67 @@ int Model_SelectionNaming::edgeOrientation(const TopoDS_Shape& theContext, TopoD
   return 0; // unknown
 }
 
+int Model_CurvesHasher::HashCode(const Handle(Geom_Curve)& theCurve, const Standard_Integer Upper)
+{
+  double aFirstParam = theCurve->FirstParameter();
+  if (aFirstParam < -1.e+100 || aFirstParam > 1.e+100)
+    aFirstParam = 0;
+  double aLastParam = theCurve->LastParameter();
+  if (aLastParam < -1.e+100 || aLastParam > 1.e+100)
+    aLastParam = 2;
+  else aLastParam = (aLastParam + aFirstParam) / 2.; // to avoid in periodic same first and last
+
+  gp_XYZ aCoordSum = theCurve->Value(aFirstParam).XYZ() + theCurve->Value(aLastParam).XYZ();
+  return ::HashCode(aCoordSum.X() + aCoordSum.Y() / 123. + aCoordSum.Z() / 123456., Upper);
+}
+bool Model_CurvesHasher::IsEqual(const Handle(Geom_Curve)& theC1, const Handle(Geom_Curve)& theC2)
+{
+  if (theC1->DynamicType() != theC2->DynamicType())
+    return false;
+  double aFirstParam1 = theC1->FirstParameter();
+  if (aFirstParam1 < -1.e+100 || aFirstParam1 > 1.e+100)
+    aFirstParam1 = 0;
+  double aFirstParam2 = theC2->FirstParameter();
+  if (aFirstParam2 < -1.e+100 || aFirstParam2 > 1.e+100)
+    aFirstParam2 = 0;
+  if (fabs(aFirstParam1 - aFirstParam2) > 1.e-9)
+    return false;
+
+  double aLastParam1 = theC1->LastParameter();
+  if (aLastParam1 < -1.e+100 || aLastParam1 > 1.e+100)
+    aLastParam1 = 2.;
+  else aLastParam1 = (aLastParam1 + aFirstParam1) / 2.; // to avoid in periodic same first and last
+  double aLastParam2 = theC2->LastParameter();
+  if (aLastParam2 < -1.e+100 || aLastParam2 > 1.e+100)
+    aLastParam2 = 2.;
+  else aLastParam2 = (aLastParam2 + aFirstParam2) / 2.; // to avoid in periodic same first and last
+
+  if (fabs(aLastParam1 - aLastParam2) > 1.e-9)
+    return false;
+
+  return theC1->Value(aFirstParam1).IsEqual(theC2->Value(aFirstParam2), Precision::Confusion()) &&
+    theC1->Value(aLastParam1).IsEqual(theC2->Value(aLastParam2), Precision::Confusion());
+}
+
+int Model_EdgesHasher::HashCode(const TopoDS_Edge& theEdge, const Standard_Integer Upper)
+{
+  Standard_Real aFirst, aLast;
+  Handle(Geom_Curve) aCurve = BRep_Tool::Curve(theEdge, aFirst, aLast);
+  return Model_CurvesHasher::HashCode(aCurve, Upper);
+}
+
+bool Model_EdgesHasher::IsEqual(const TopoDS_Edge& theE1, const TopoDS_Edge& theE2)
+{
+  GeomEdgePtr aSh1(new GeomAPI_Edge);
+  aSh1->setImpl(new TopoDS_Shape(theE1));
+  GeomEdgePtr aSh2(new GeomAPI_Edge);
+  aSh2->setImpl(new TopoDS_Shape(theE2));
+  return aSh1->isEqual(aSh2);
+}
+
 std::shared_ptr<GeomAPI_Shape> Model_SelectionNaming::findAppropriateFace(
   std::shared_ptr<ModelAPI_Result>& theConstr,
-  NCollection_DataMap<Handle(Geom_Curve), int>& theCurves, const bool theIsWire)
+  NCollection_DataMap<Handle(Geom_Curve), int, Model_CurvesHasher>& theCurves, const bool theIsWire)
 {
   int aBestFound = 0; // best number of found edges (not percentage: issue 1019)
   int aBestOrient = 0; // for the equal "BestFound" additional parameter is orientation
@@ -726,7 +786,7 @@ std::shared_ptr<GeomAPI_Shape> Model_SelectionNaming::findAppropriateFace(
     std::list<TopoDS_Shape>::iterator aFW = aFacesWires.begin();
     for(; aFW != aFacesWires.end(); aFW++) {
       TopExp_Explorer anEdgesExp(*aFW, TopAbs_EDGE);
-      TColStd_MapOfTransient alreadyProcessed; // to avoid counting edges with same curved (841)
+      TColStd_MapOfTransient alreadyProcessed; // to avoid counting edges with same curves (841)
       for(; anEdgesExp.More(); anEdgesExp.Next()) {
         TopoDS_Edge anEdge = TopoDS::Edge(anEdgesExp.Current());
         if (!anEdge.IsNull()) {
@@ -1048,7 +1108,7 @@ bool Model_SelectionNaming::selectSubShape(const std::string& theType,
             return false;
 
           // curves and orientations of edges
-          NCollection_DataMap<Handle(Geom_Curve), int> allCurves;
+          NCollection_DataMap<Handle(Geom_Curve), int, Model_CurvesHasher> allCurves;
           const int aSubNum = aComposite->numberOfSubs();
           for(int a = 0; a < aSubNum; a++) {
             int aSubID = aComposite->subFeatureId(a);
@@ -1084,7 +1144,7 @@ bool Model_SelectionNaming::selectSubShape(const std::string& theType,
             return false;
 
            // curves and orientations of edges
-          NCollection_DataMap<Handle(Geom_Curve), int> allCurves;
+          NCollection_DataMap<Handle(Geom_Curve), int, Model_CurvesHasher> allCurves;
           const int aSubNum = aComposite->numberOfSubs();
           for(int a = 0; a < aSubNum; a++) {
             int aSubID = aComposite->subFeatureId(a);

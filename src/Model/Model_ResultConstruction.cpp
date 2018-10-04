@@ -177,12 +177,16 @@ std::string fullName(CompositeFeaturePtr theComposite, const TopoDS_Shape& theSu
 {
   TopAbs_ShapeEnum aShapeType = theSubShape.ShapeType();
   gp_Pnt aVertexPos;
-  TColStd_MapOfTransient allCurves;
+  NCollection_Map<TopoDS_Edge> allExactEdges;
+  NCollection_Map<TopoDS_Edge, Model_EdgesHasher> allEdges;
+  NCollection_Map<Handle(Geom_Curve), Model_CurvesHasher> allCurves;
   if (aShapeType == TopAbs_VERTEX) { // compare positions
     aVertexPos = BRep_Tool::Pnt(TopoDS::Vertex(theSubShape));
   } else {
     for(TopExp_Explorer anEdgeExp(theSubShape, TopAbs_EDGE); anEdgeExp.More(); anEdgeExp.Next()) {
       TopoDS_Edge anEdge = TopoDS::Edge(anEdgeExp.Current());
+      allExactEdges.Add(anEdge);
+      allEdges.Add(anEdge);
       Standard_Real aFirst, aLast;
       Handle(Geom_Curve) aCurve = BRep_Tool::Curve(anEdge, aFirst, aLast);
       allCurves.Add(aCurve);
@@ -193,47 +197,58 @@ std::string fullName(CompositeFeaturePtr theComposite, const TopoDS_Shape& theSu
   TColStd_PackedMapOfInteger aRefs; // indixes of sub-elements in composite
 
   const int aSubNum = theComposite->numberOfSubs();
-  for(int a = 0; a < aSubNum; a++) {
-    FeaturePtr aSub = theComposite->subFeature(a);
-    const std::list<std::shared_ptr<ModelAPI_Result> >& aResults = aSub->results();
-    std::list<std::shared_ptr<ModelAPI_Result> >::const_iterator aRes = aResults.cbegin();
-    // there may be many shapes (circle and center): register if at least one is in selection
-    for(; aRes != aResults.cend(); aRes++) {
-      ResultConstructionPtr aConstr =
-        std::dynamic_pointer_cast<ModelAPI_ResultConstruction>(*aRes);
-      if (!aConstr->shape()) {
-        continue;
-      }
-      if (aShapeType == TopAbs_VERTEX) {
-        if (aConstr->shape()->isVertex()) { // compare vertices positions
-          const TopoDS_Shape& aVertex = aConstr->shape()->impl<TopoDS_Shape>();
-          gp_Pnt aPnt = BRep_Tool::Pnt(TopoDS::Vertex(aVertex));
-          if (aPnt.IsEqual(aVertexPos, Precision::Confusion())) {
-            aRefs.Add(theComposite->subFeatureId(a));
-            aSubNames[theComposite->subFeatureId(a)] = Model_SelectionNaming::shortName(aConstr);
-          }
-        } else { // get first or last vertex of the edge: last is stored with additional delta
-          const TopoDS_Shape& anEdge = aConstr->shape()->impl<TopoDS_Shape>();
-          int aDelta = kSTART_VERTEX_DELTA;
-          for(TopExp_Explorer aVExp(anEdge, TopAbs_VERTEX); aVExp.More(); aVExp.Next()) {
-            gp_Pnt aPnt = BRep_Tool::Pnt(TopoDS::Vertex(aVExp.Current()));
-            if (aPnt.IsEqual(aVertexPos, Precision::Confusion())) {
-              aRefs.Add(aDelta + theComposite->subFeatureId(a));
-              aSubNames[aDelta + theComposite->subFeatureId(a)] =
-                Model_SelectionNaming::shortName(aConstr, aDelta / kSTART_VERTEX_DELTA);
-              break;
-            }
-            aDelta += kSTART_VERTEX_DELTA;
-          }
+  // reduce equality criteria from strong to weak
+  for(int aTypeOfIdentification = 0; aTypeOfIdentification < 3; aTypeOfIdentification++) {
+    for(int a = 0; a < aSubNum; a++) {
+      FeaturePtr aSub = theComposite->subFeature(a);
+      const std::list<std::shared_ptr<ModelAPI_Result> >& aResults = aSub->results();
+      std::list<std::shared_ptr<ModelAPI_Result> >::const_iterator aRes = aResults.cbegin();
+      // there may be many shapes (circle and center): register if at least one is in selection
+      for(; aRes != aResults.cend(); aRes++) {
+        ResultConstructionPtr aConstr =
+          std::dynamic_pointer_cast<ModelAPI_ResultConstruction>(*aRes);
+        if (!aConstr->shape()) {
+          continue;
         }
-      } else {
-        if (aConstr->shape()->isEdge()) {
-          const TopoDS_Shape& aResShape = aConstr->shape()->impl<TopoDS_Shape>();
-          TopoDS_Edge anEdge = TopoDS::Edge(aResShape);
-          if (!anEdge.IsNull()) {
-            Standard_Real aFirst, aLast;
-            Handle(Geom_Curve) aCurve = BRep_Tool::Curve(anEdge, aFirst, aLast);
-            if (allCurves.Contains(aCurve)) {
+        if (aShapeType == TopAbs_VERTEX) {
+          if (aConstr->shape()->isVertex()) { // compare vertices positions
+            const TopoDS_Shape& aVertex = aConstr->shape()->impl<TopoDS_Shape>();
+            gp_Pnt aPnt = BRep_Tool::Pnt(TopoDS::Vertex(aVertex));
+            if (aPnt.IsEqual(aVertexPos, Precision::Confusion())) {
+              aRefs.Add(theComposite->subFeatureId(a));
+              aSubNames[theComposite->subFeatureId(a)] = Model_SelectionNaming::shortName(aConstr);
+            }
+          } else { // get first or last vertex of the edge: last is stored with additional delta
+            const TopoDS_Shape& anEdge = aConstr->shape()->impl<TopoDS_Shape>();
+            int aDelta = kSTART_VERTEX_DELTA;
+            for(TopExp_Explorer aVExp(anEdge, TopAbs_VERTEX); aVExp.More(); aVExp.Next()) {
+              gp_Pnt aPnt = BRep_Tool::Pnt(TopoDS::Vertex(aVExp.Current()));
+              if (aPnt.IsEqual(aVertexPos, Precision::Confusion())) {
+                aRefs.Add(aDelta + theComposite->subFeatureId(a));
+                aSubNames[aDelta + theComposite->subFeatureId(a)] =
+                  Model_SelectionNaming::shortName(aConstr, aDelta / kSTART_VERTEX_DELTA);
+                break;
+              }
+              aDelta += kSTART_VERTEX_DELTA;
+            }
+          }
+        } else {
+          if (aConstr->shape()->isEdge()) {
+            const TopoDS_Shape& aResShape = aConstr->shape()->impl<TopoDS_Shape>();
+            TopoDS_Edge anEdge = TopoDS::Edge(aResShape);
+            if (anEdge.IsNull())
+              continue;
+            bool aIsEqual = false;
+            if (aTypeOfIdentification == 0) { // check equality of curves
+              aIsEqual = allExactEdges.Contains(anEdge);
+            } else if (aTypeOfIdentification == 1) { // check EdgesHash equality of edges
+              aIsEqual = allEdges.Contains(anEdge);
+            } else { // check CurvesHash equality of curves
+              Standard_Real aFirst, aLast;
+              Handle(Geom_Curve) aCurve = BRep_Tool::Curve(anEdge, aFirst, aLast);
+              aIsEqual = allCurves.Contains(aCurve);
+            }
+            if (aIsEqual) {
               int anID = theComposite->subFeatureId(a);
               aRefs.Add(anID);
               aSubNames[anID] = Model_SelectionNaming::shortName(aConstr);
@@ -241,11 +256,20 @@ std::string fullName(CompositeFeaturePtr theComposite, const TopoDS_Shape& theSu
                 // add edges to sub-label to support naming for edges selection
                 TopExp_Explorer anEdgeExp(theSubShape, TopAbs_EDGE);
                 for(; anEdgeExp.More(); anEdgeExp.Next()) {
-                  TopoDS_Edge anEdge = TopoDS::Edge(anEdgeExp.Current());
-                  Standard_Real aFirst, aLast;
-                  Handle(Geom_Curve) aFaceCurve = BRep_Tool::Curve(anEdge, aFirst, aLast);
-                  if (aFaceCurve == aCurve) {
-                    int anOrient = Model_SelectionNaming::edgeOrientation(theSubShape, anEdge);
+                  TopoDS_Edge aFaceEdge = TopoDS::Edge(anEdgeExp.Current());
+                  bool aIsEqual = false;
+                  if (aTypeOfIdentification == 0) { // check equality of curves
+                    aIsEqual = anEdge.IsSame(aFaceEdge);
+                  } else if (aTypeOfIdentification == 1) { // check EdgesHash equality of edges
+                    aIsEqual = Model_EdgesHasher::IsEqual(aFaceEdge, anEdge);
+                  } else { // check CurvesHash equality of curves
+                    Standard_Real aFirst, aLast;
+                    Handle(Geom_Curve) aFaceCurve = BRep_Tool::Curve(aFaceEdge, aFirst, aLast);
+                    Handle(Geom_Curve) aCurve = BRep_Tool::Curve(anEdge, aFirst, aLast);
+                    aIsEqual = Model_CurvesHasher::IsEqual(aFaceCurve, aCurve);
+                  }
+                  if (aIsEqual) {
+                    int anOrient = Model_SelectionNaming::edgeOrientation(theSubShape, aFaceEdge);
                     anOrientations[anID] = anOrient;
                   }
                 }
@@ -255,6 +279,8 @@ std::string fullName(CompositeFeaturePtr theComposite, const TopoDS_Shape& theSu
         }
       }
     }
+    if (!aRefs.IsEmpty() || aShapeType == TopAbs_VERTEX)
+      break;
   }
   std::stringstream aName;
   // #1839 : do not store name of the feature in the tree, since this name could be changed
@@ -303,7 +329,7 @@ static void saveSubName(CompositeFeaturePtr theComposite,
           TopoDS_Edge anEdge = TopoDS::Edge(anExp.Current());
           Standard_Real aFirst, aLast;
           Handle(Geom_Curve) aCurve = BRep_Tool::Curve(anEdge, aFirst, aLast);
-          if (aCurve == aSubCurve &&
+          if (Model_CurvesHasher::IsEqual(aCurve, aSubCurve) &&
               ((fabs(aFirst - aSubFirst) < 1.e-9 &&  fabs(aLast - aSubLast) < 1.e-9)) ||
               (fabs(aFirst - aSubLast) < 1.e-9 &&  fabs(aLast - aSubFirst) < 1.e-9)) {
             aSub = anEdge;
@@ -474,7 +500,7 @@ int Model_ResultConstruction::select(const std::shared_ptr<GeomAPI_Shape>& theSu
   TopAbs_ShapeEnum aShapeType = aSubShape.ShapeType();
   TDataStd_Integer::Set(aLab, (int)aShapeType);
   gp_Pnt aVertexPos;
-  TColStd_MapOfTransient allCurves;
+  TColStd_MapOfTransient allCurves; // curves of the sketc hsub-elements are used, so, edges are not equal
   if (aShapeType == TopAbs_VERTEX) { // compare positions
     aVertexPos = BRep_Tool::Pnt(TopoDS::Vertex(aSubShape));
   } else {
@@ -521,7 +547,7 @@ int Model_ResultConstruction::select(const std::shared_ptr<GeomAPI_Shape>& theSu
                   TopoDS_Edge anEdge = TopoDS::Edge(anEdgeExp.Current());
                   Standard_Real aFirst, aLast;
                   Handle(Geom_Curve) aFaceCurve = BRep_Tool::Curve(anEdge, aFirst, aLast);
-                  if (aFaceCurve == aCurve) {
+                  if (Model_CurvesHasher::IsEqual(aFaceCurve, aCurve)) {
                     while(aUsedIDMap.Contains(anID))
                       anID += 100000;
                     aUsedIDMap.Add(anID);
@@ -700,7 +726,7 @@ bool Model_ResultConstruction::update(const int theIndex,
       } else { // searching for most looks-like initial face by the indexes
         // prepare edges of the current result for the fast searching
         // curves and orientations of edges
-        NCollection_DataMap<Handle(Geom_Curve), int> allCurves;
+        NCollection_DataMap<Handle(Geom_Curve), int, Model_CurvesHasher> allCurves;
         const int aSubNum = aComposite->numberOfSubs();
         for(int a = 0; a < aSubNum; a++) {
           int aSubID = aComposite->subFeatureId(a);

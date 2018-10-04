@@ -30,11 +30,33 @@
 #include <Geom_Curve.hxx>
 #include <TopoDS_Edge.hxx>
 
+// class to compare curves in the same way as in GeomAPI_Edge
+class Model_CurvesHasher
+{
+public:
+  DEFINE_STANDARD_ALLOC
+  /// standard hash code
+  static int HashCode (const Handle(Geom_Curve)& theCurve, const Standard_Integer Upper);
+  /// comapre curves by parameters and points on them
+  static bool IsEqual (const Handle(Geom_Curve)& theC1, const Handle(Geom_Curve)& theC2);
+};
+
+// class to compare edges in the same way as in GeomAPI_Edge
+class Model_EdgesHasher
+{
+public:
+  DEFINE_STANDARD_ALLOC
+  /// standard hash code
+  static int HashCode (const TopoDS_Edge& theEdge, const Standard_Integer Upper);
+  /// comapre curves by parameters and points on them
+  static bool IsEqual (const TopoDS_Edge& theE1, const TopoDS_Edge& theE2);
+};
+
+
 /**\class Model_SelectionNaming
  * \ingroup DataModel
  * \brief The set of methods that allow to generate a string-name for the selection attribute.
  */
-
 class Model_SelectionNaming
 {
   TDF_Label myLab; ///< Selection label of the selection attribute
@@ -66,7 +88,8 @@ public:
   /// \returns faces fron this construction if found
   static std::shared_ptr<GeomAPI_Shape> findAppropriateFace(
     std::shared_ptr<ModelAPI_Result>& theConstr,
-    NCollection_DataMap<Handle(Geom_Curve), int>& theCurves, const bool theIsWire);
+    NCollection_DataMap<Handle(Geom_Curve), int, Model_CurvesHasher>& theCurves,
+    const bool theIsWire);
 
   /// Returns orientation of the edge in the context shape
   static int edgeOrientation(const TopoDS_Shape& theContext, TopoDS_Edge& theEdge);
