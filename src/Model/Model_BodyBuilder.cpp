@@ -467,7 +467,18 @@ void Model_BodyBuilder::loadAndOrientModifiedShapes (
   TopoDS_Shape aShapeIn = theShapeIn->impl<TopoDS_Shape>();
   TopTools_MapOfShape aView;
   std::shared_ptr<Model_Data> aData = std::dynamic_pointer_cast<Model_Data>(data());
-  TopExp_Explorer aShapeExplorer (aShapeIn, (TopAbs_ShapeEnum)theKindOfShape);
+
+  TopoDS_Shape aShapeToIterate;
+  if (theMS->newShapesCollected(theShapeIn, theKindOfShape)) {
+    // use optimized set of old shapes for this
+    GeomShapePtr aCompound = theMS->oldShapesForNew(theShapeIn, aResultShape, theKindOfShape);
+    if (aCompound.get())
+      aShapeToIterate = aCompound->impl<TopoDS_Shape>();
+  } else {
+    aShapeToIterate = aShapeIn;
+  }
+
+  TopExp_Explorer aShapeExplorer (aShapeToIterate, (TopAbs_ShapeEnum)theKindOfShape);
   for (; aShapeExplorer.More(); aShapeExplorer.Next ()) {
     const TopoDS_Shape& aRoot = aShapeExplorer.Current ();
     if (!aView.Add(aRoot)) continue;
@@ -482,6 +493,7 @@ void Model_BodyBuilder::loadAndOrientModifiedShapes (
     std::shared_ptr<GeomAPI_Shape> aRShape(new GeomAPI_Shape());
     aRShape->setImpl((new TopoDS_Shape(aRoot)));
     theMS->modified(aRShape, aList);
+
     if (!theIsStoreSeparate) {
       //keepTopLevelShapes(aList, aRoot, aResultShape);
       removeBadShapes(aList);
