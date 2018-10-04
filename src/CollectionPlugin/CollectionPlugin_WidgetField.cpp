@@ -982,6 +982,7 @@ void CollectionPlugin_WidgetField::onShapeTypeChanged(int theType)
   aSelList->clear();
   AttributeTablesPtr aTablesAttr = myFeature->data()->tables(CollectionPlugin_Field::VALUES_ID());
   aTablesAttr->setSize(1, myNbComponentsSpn->value(), myDataTblList.size());
+  updateObject(myFeature);
   emit valuesChanged();
 }
 
