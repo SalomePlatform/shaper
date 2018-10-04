@@ -906,10 +906,7 @@ bool FeaturesPlugin_ValidatorRemoveSubShapesSelection::isValid(const AttributePt
     return false;
   }
 
-  ListOfShape aSubShapes = GeomAlgoAPI_ShapeTools::getLowLevelSubShapes(aBaseShape);
-  // add to the list all sub-shapes of the compound due to they can be selected as a shapes to keep
-  for (GeomAPI_ShapeIterator anIt(aBaseShape); anIt.more(); anIt.next())
-    aSubShapes.push_back(anIt.current());
+  std::list<GeomShapePtr> aSubShapes = GeomAlgoAPI_ShapeTools::getLowLevelSubShapes(aBaseShape);
   for(int anIndex = 0; anIndex < aSubShapesAttrList->size(); ++anIndex) {
     bool isSameFound = false;
     AttributeSelectionPtr anAttrSelectionInList = aSubShapesAttrList->value(anIndex);

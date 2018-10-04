@@ -55,6 +55,14 @@ Remove_SubShapes_1 = model.addRemoveSubShapes(Part_1_doc, model.selection("COMPO
 Remove_SubShapes_1.setSubShapesToKeep([model.selection("COMPSOLID", "Partition_1_1_1")])
 model.do()
 
+# check error when compsolid is selected
+assert(Remove_SubShapes_1.feature().error() != "")
+
+# fix the problematic feature
+Remove_SubShapes_1.setSubShapesToKeep([model.selection("SOLID", "Partition_1_1_1_1"), model.selection("SOLID", "Partition_1_1_1_2"), model.selection("SOLID", "Partition_1_1_1_3")])
+model.do()
+assert(Remove_SubShapes_1.feature().error() == "")
+
 # check number of sub-shapes
 model.testNbResults(Remove_SubShapes_1, 1)
 model.testNbSubResults(Remove_SubShapes_1, [3])
