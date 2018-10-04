@@ -341,6 +341,18 @@ void SketcherPrs_SymbolPrs::SetCustomColor(const std::vector<int>& theColor)
 
   if (!myAspect.IsNull())
     myAspect->SetColor (myCustomColor);
+
+  Handle(Prs3d_Presentation) aPrs = Presentation();
+  if (!aPrs.IsNull()) {
+    if (myIsCustomColor) {
+      Handle(Graphic3d_PresentationAttributes) aAttr = new Graphic3d_PresentationAttributes();
+      aAttr->SetColor(myCustomColor);
+      aPrs->Highlight(aAttr);
+    }
+    else {
+      aPrs->UnHighlight();
+    }
+  }
 }
 
 //*********************************************************************************
@@ -348,8 +360,6 @@ void SketcherPrs_SymbolPrs::drawShape(const std::shared_ptr<GeomAPI_Shape>& theS
                                       const Handle(Prs3d_Presentation)& thePrs,
                                       Quantity_Color theColor) const
 {
-  int aColNam = theColor.Name();
-  //cout<<"### SketcherPrs_SymbolPrs::drawShape "<<theColor.Name()<<endl;
   Handle(Graphic3d_AspectLine3d) aLineAspect =
     new Graphic3d_AspectLine3d(theColor, Aspect_TOL_SOLID, 2);
 
