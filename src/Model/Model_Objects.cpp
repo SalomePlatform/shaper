@@ -1988,11 +1988,12 @@ FeaturePtr Model_Objects::lastFeature()
 {
   Handle(TDataStd_ReferenceArray) aRefs;
   if (featuresLabel().FindAttribute(TDataStd_ReferenceArray::GetID(), aRefs)) {
-    FeaturePtr aLast = feature(aRefs->Value(aRefs->Upper()));
+    // comment this because of #2674 - features are removed from array on deactivation of Part
+    /*FeaturePtr aLast = feature(aRefs->Value(aRefs->Upper()));
     if (!aLast.get() && aRefs->Length() != 0) { // erase the invalid feature from the array
       RemoveFromRefArray(featuresLabel(), aRefs->Value(aRefs->Upper()));
       return lastFeature(); // try once again, after the last was removed
-    }
+    }*/
     return feature(aRefs->Value(aRefs->Upper()));
   }
   return FeaturePtr(); // no features at all
