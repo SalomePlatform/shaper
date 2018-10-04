@@ -136,6 +136,7 @@
 #include <QAction>
 #include <QDesktopWidget>
 #include <QProcess>
+#include <QDesktopServices>
 
 #include <iterator>
 
@@ -596,14 +597,14 @@ void XGUI_Workshop::onHelpActionClicked()
       if (!aHelpPage.isEmpty()) {
         QString aDocDir;
         const QChar aSep = QDir::separator();
-        QString platform;
-        SUIT_ResourceMgr* aResMgr = ModuleBase_Preferences::resourceMgr();
-#ifdef WIN32
-        platform = "winapplication";
-#else
-        platform = "application";
-#endif
-        QString aBrowserName = aResMgr->stringValue("ExternalBrowser", platform);
+//        QString platform;
+//        SUIT_ResourceMgr* aResMgr = ModuleBase_Preferences::resourceMgr();
+//#ifdef WIN32
+//        platform = "winapplication";
+//#else
+//        platform = "application";
+//#endif
+//        QString aBrowserName = aResMgr->stringValue("ExternalBrowser", platform);
 
 #ifdef HAVE_SALOME
         QString aDir(getenv("SHAPER_ROOT_DIR"));
@@ -617,9 +618,8 @@ void XGUI_Workshop::onHelpActionClicked()
 #endif
         QString aFileName = aDocDir + aSep + aHelpPage;
         if (QFile::exists(aFileName)) {
-          QStringList aParams;
-          aParams << aFileName;
-          QProcess::startDetached(aBrowserName, aParams);
+          QUrl aUrl = QUrl::fromLocalFile(aFileName);
+          QDesktopServices::openUrl(aUrl);
         }
       }
     }
