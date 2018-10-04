@@ -500,7 +500,8 @@ int Model_ResultConstruction::select(const std::shared_ptr<GeomAPI_Shape>& theSu
   TopAbs_ShapeEnum aShapeType = aSubShape.ShapeType();
   TDataStd_Integer::Set(aLab, (int)aShapeType);
   gp_Pnt aVertexPos;
-  TColStd_MapOfTransient allCurves; // curves of the sketc hsub-elements are used, so, edges are not equal
+  // curves of the sketch sub-elements are used, so, edges are not equal
+  TColStd_MapOfTransient allCurves;
   if (aShapeType == TopAbs_VERTEX) { // compare positions
     aVertexPos = BRep_Tool::Pnt(TopoDS::Vertex(aSubShape));
   } else {

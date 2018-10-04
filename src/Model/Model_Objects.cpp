@@ -364,7 +364,7 @@ void Model_Objects::eraseAllFeatures()
   }
   kCreator->sendDeleted(myDoc, ModelAPI_Feature::group());
   myFeatures.Clear(); // just remove features without modification of DS
-  updateHistory(ModelAPI_Feature::group());
+  myHistory.clear();
 }
 
 void Model_Objects::moveFeature(FeaturePtr theMoved, FeaturePtr theAfterThis)
