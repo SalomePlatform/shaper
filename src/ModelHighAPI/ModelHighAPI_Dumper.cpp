@@ -1094,7 +1094,7 @@ ModelHighAPI_Dumper& ModelHighAPI_Dumper::operator<<(
     myDumpBuffer << anIndex << "\", ";
     *this << aMiddlePoint;
     aStandardDump = false;
-  } if (theAttrSelect->isWeakNaming() ||
+  } else if (theAttrSelect->isWeakNaming() ||
     (myWeakNamingSelection && aShape.get() && theAttrSelect->context().get() &&
        aShape != theAttrSelect->context()->shape())) { // weak naming for local selection only
     GeomAlgoAPI_NExplode aNExplode(theAttrSelect->context()->shape(), aShape->shapeType());
