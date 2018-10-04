@@ -4,7 +4,7 @@ Fill
 
 The feature Fill implements a boolean operation for filling of main objects by parts of tool objects.
 
-To perform a boolean opration Fill in the active part:
+To perform a boolean operation Fill in the active part:
 
 #. select in the Main Menu *Features - > Fill* item  or
 #. click **Fill** button in the toolbar

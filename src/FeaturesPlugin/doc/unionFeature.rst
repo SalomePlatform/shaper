@@ -2,9 +2,9 @@
 Union
 =====
 
-The feature Union implements a boolean operation for creation of a uniono of selected objects.
+The feature Union implements a boolean operation for creation of a union of selected objects.
 
-To a create boolean opration Union in the active part:
+To a create boolean operation Union in the active part:
 
 #. select in the Main Menu *Features - > Union* item  or
 #. click **Union** button in the toolbar
@@ -23,7 +23,7 @@ The following property panel will be opened:
 .. centered::
    **Union operation**
 
-Here it is necessary to select some objects.
+Here it is necessary to select some objects. Only faces with shared edges or solids with shared faces are allowed for selection.
 
 **Apply** button creates the union shape.
   
