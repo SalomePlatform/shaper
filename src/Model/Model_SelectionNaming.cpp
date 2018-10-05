@@ -765,6 +765,7 @@ std::shared_ptr<GeomAPI_Shape> Model_SelectionNaming::findAppropriateFace(
   NCollection_DataMap<Handle(Geom_Curve), int, Model_CurvesHasher>& theCurves, const bool theIsWire)
 {
   int aBestFound = 0; // best number of found edges (not percentage: issue 1019)
+  int aBestNotFound = 1000000; // best number of not found edges (must be minimum)
   int aBestOrient = 0; // for the equal "BestFound" additional parameter is orientation
   std::shared_ptr<GeomAPI_Shape> aResult;
   ResultConstructionPtr aConstructionContext =
@@ -807,18 +808,29 @@ std::shared_ptr<GeomAPI_Shape> Model_SelectionNaming::findAppropriateFace(
           }
         }
       }
+      if (theIsWire && aFound + aNotFound != 0) {
+        if (aBestNotFound > aNotFound || (aBestNotFound == aNotFound && aFound > aBestFound) ||
+          (aBestNotFound == aNotFound && aFound == aBestFound && aSameOrientation > aBestOrient)) {
+          aBestFound = aFound;
+          aBestOrient = aSameOrientation;
+          aBestNotFound = aNotFound;
+          std::shared_ptr<GeomAPI_Wire> aWire(new GeomAPI_Wire);
+          aWire->setImpl(new TopoDS_Shape(*aFW));
+          aResult = aWire;
+        }
+        aFound = 0;
+        aNotFound = 0;
+        aSameOrientation = 0;
+      }
+    }
+    if (!theIsWire) {
       if (aFound + aNotFound != 0) {
-        if (aFound > aBestFound ||
-          (aFound == aBestFound && aSameOrientation > aBestOrient)) {
-            aBestFound = aFound;
-            aBestOrient = aSameOrientation;
-            if (theIsWire) {
-              std::shared_ptr<GeomAPI_Wire> aWire(new GeomAPI_Wire);
-              aWire->setImpl(new TopoDS_Shape(*aFW));
-              aResult = aWire;
-            } else {
-              aResult = aConstructionContext->face(aFaceIndex);
-            }
+        if (aBestNotFound > aNotFound || (aBestNotFound == aNotFound && aFound > aBestFound) ||
+          (aBestNotFound == aNotFound && aFound == aBestFound && aSameOrientation > aBestOrient)) {
+          aBestFound = aFound;
+          aBestOrient = aSameOrientation;
+          aBestNotFound = aNotFound;
+          aResult = aConstructionContext->face(aFaceIndex);
         }
       }
     }
