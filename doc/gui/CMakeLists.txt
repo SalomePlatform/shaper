@@ -26,6 +26,7 @@ SET(DOC_FILES
   Introduction.rst
   Tutorial.rst
   TUI_tutorial.rst
+  tutorial.py
   )
 
 CONFIGURE_FILE(${input} ${output})
