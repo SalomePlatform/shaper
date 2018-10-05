@@ -2,9 +2,9 @@
 Linear copy
 ===========
 
-The feature **Linear copy** makes several translations of a selected shape in one or two directions.
+**Linear copy** feature makes several translations of a selected shape in one or two directions.
 
-To create Linear copy in the active part:
+To create a Linear copy in the active part:
 
 #. select in the Main Menu *Part - > Linear copy* item  or
 #. click **Linear copy** button in the toolbar
@@ -44,7 +44,7 @@ Input fields:
 
 Result
 """"""
-Result of operation is compound.
+Result of operation is a compound.
 
 .. image:: images/linearcopyres.png
    :align: center
@@ -52,4 +52,4 @@ Result of operation is compound.
 .. centered::
    Linear copy
 
-**See Also** a sample TUI Script of a :ref:`tui_create_linearcopy` operation.
+**See Also** a sample TUI Script of :ref:`tui_create_linearcopy` operation.

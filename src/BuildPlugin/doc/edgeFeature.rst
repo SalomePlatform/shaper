@@ -2,7 +2,7 @@
 Edge
 ====
 
-The Edge feature creates one or several edges using already existing edges in other objects.
+Edge feature creates one or several edges using shapes already existing in other objects.
 
 To create edges in the active part:
 
@@ -23,11 +23,11 @@ The following property panel will be opened:
 .. centered::
   Create edges
 
-Select one or several edges in viewer.
+Select one or several edges in the viewer.
 
 **Apply** button creates edges.
 
-**Cancel** button cancels operation. 
+**Cancel** button cancels the operation. 
 
 **TUI Command**:  *model.addEdge(Part_doc, Shapes)*
 
@@ -36,7 +36,7 @@ Select one or several edges in viewer.
 Result
 """"""
 
-The result of the operation will be set of edges created from selected shapes:
+The result of the operation will be a set of edges created from the selected shapes:
 
 .. image:: images/CreateEdge.png
   :align: center
@@ -44,4 +44,4 @@ The result of the operation will be set of edges created from selected shapes:
 .. centered::
   Result of the operation.
 
-**See Also** a sample TUI Script of a :ref:`tui_create_edge` operation.
+**See Also** a sample TUI Script of :ref:`tui_create_edge` operation.

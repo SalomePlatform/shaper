@@ -3,7 +3,7 @@
 Box
 ===
 
-The feature Box creates a box solid.
+Box feature creates a box solid.
 
 To create a Box in the active part:
 
@@ -37,7 +37,7 @@ Box is created by dimensions along X, Y, Z axis starting from the origin.
 
 Input fields:
 
-- **DX**, **DY**, **DZ** define sizes of the box along corresponding coordinate axes. 
+- **DX**, **DY**, **DZ** define dimensions of the box along the corresponding coordinate axes. 
 
 **TUI Command**:  *model.addBox(Part_doc, DX, DY, DZ)*
   
@@ -46,7 +46,7 @@ Input fields:
 Result
 """"""
 
-A solid box based on origin and with edges parallel to the coordinate axes.
+A solid box based on the origin of coordinates and with edges parallel to the coordinate axes.
 
 .. image:: images/Box1.png
 	   :align: center
@@ -63,7 +63,7 @@ Box is created by two points of the box diagonal.
 
 Input fields:
 
-- **Point 1** and **Point 2**  define diagonal points of the box selected in 3D OCC  viewer or object browser.
+- **Point 1** and **Point 2**  define diagonal points of the box selected in 3D OCC viewer or object browser.
   
 **TUI Command**:  *model.addBox(Part_doc, point1, point2)*
 
@@ -78,6 +78,6 @@ A solid box based on two points and with edges parallel to the coordinate axes.
 	   :align: center
 		   
 .. centered::
-   Boxes created  
+   Created boxes
 
-**See Also** a sample TUI Script of a :ref:`tui_create_boxpnt` operation.
+**See Also** a sample TUI Script of :ref:`tui_create_boxpnt` operation.

@@ -6,7 +6,7 @@ Trim
 | The curve should have points lying on it or intersections with other curves.
 | Open curves (line or arc) require one or more points; closed curves (circle) require two or more points.
 
-To create Trim in the active Sketch:
+To create a Trim in the active Sketch:
 
 #. select in the Main Menu *Sketch - > Trim* item  or
 #. click **Trim** button in Sketch toolbar:
@@ -50,6 +50,6 @@ Created Trim appears in the view.
 	   :align: center
 
 .. centered::
-   Trim created
+   Created trim
 
-**See Also** a sample TUI Script of a :ref:`tui_create_trim` operation.
+**See Also** a sample TUI Script of :ref:`tui_create_trim` operation.

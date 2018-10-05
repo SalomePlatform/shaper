@@ -2,7 +2,7 @@
 Cylinder
 ========
 
-The feature Cylinder creates a cylinder solid.
+Cylinder feature creates a cylinder solid.
 
 To create a Cylinder in the active part:
 
@@ -23,7 +23,7 @@ There are 2 algorithms for creation of a Cylinder:
 
 .. image:: images/cylinder_portion_32x32.png
    :align: left
-**Portion of cylinder** creates one segment of cylinder.
+**Portion of cylinder** creates one segment of a cylinder.
 
 Cylinder
 --------
@@ -36,7 +36,7 @@ Cylinder
 
 Input fields:
 
-- **Point** defines center of the cylinder base selected in 3D OCC  viewer or object browser; 
+- **Point** defines the center of the cylinder base selected in 3D OCC  viewer or object browser; 
 - **Vector** defines the axis of the cylinder selected in 3D OCC  viewer or object browser;
 - Dimensions:      
    - **Radius**;
@@ -49,7 +49,7 @@ Input fields:
 Result
 """"""
 
-Example is shown below.
+An example is shown below.
 
 .. image:: images/Cylinder1.png
 	   :align: center
@@ -57,7 +57,7 @@ Example is shown below.
 .. centered::
    Cylinder  
 
-**See Also** a sample TUI Script of a :ref:`tui_create_cylinder` operation.
+**See Also** a sample TUI Script of :ref:`tui_create_cylinder` operation.
 
 Portion of cylinder
 -------------------
@@ -68,7 +68,7 @@ Portion of cylinder
 .. centered::
    **Portion of cylinder**  property panel 
 
-Input fields for ***Portion of cylinder** tab includes in addition **Angle** to create a portion of cylinder.
+Input fields for ***Portion of cylinder** tab include **Angle** defining a portion of cylinder.
 
 **TUI Commands**: *model.addCylinder(Part_doc, Point, Axis, Radius, Height,Angle)*
   
@@ -77,7 +77,7 @@ Input fields for ***Portion of cylinder** tab includes in addition **Angle** to 
 Result
 """"""
 
-Example is shown below.
+An example is shown below.
 
 .. image:: images/Cylinder2.png
 	   :align: center
@@ -85,4 +85,4 @@ Example is shown below.
 .. centered::
    Portion of cylinder  
 
-**See Also** a sample TUI Script of a :ref:`tui_create_cylportion` operation.
+**See Also** a sample TUI Script of :ref:`tui_create_cylportion` operation.

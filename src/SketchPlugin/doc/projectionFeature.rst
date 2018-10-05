@@ -2,10 +2,10 @@
 Projection
 ==========
 
-| The Projection operation creates projection of 3D edge or vertex onto the sketch plane.
+| The Projection operation creates a projection of 3D edge or vertex onto the sketch plane.
 | The result of projection is a line.
 
-To create Projection in the active Sketch:
+To create a Projection in the active Sketch:
 
 #. select in the Main Menu *Sketch - > Projection* item  or
 #. click **Projection** button in Sketch toolbar:
@@ -48,6 +48,6 @@ Created Projection appears in the view.
 	   :align: center
 
 .. centered::
-   Projection created (purple line)
+   Created projection (purple line)
 
-**See Also** a sample TUI Script of a :ref:`tui_create_projection` operation.
+**See Also** a sample TUI Script of :ref:`tui_create_projection` operation.

@@ -2,9 +2,9 @@
 Remove Sub-Shapes
 =================
 
-Remove Sub-Shapes allows to remove sub shapes from wires, shells, compsolids, compounds.
+Remove Sub-Shapes allows removing sub shapes from wires, shells, compsolids and compounds.
 
-To perform Remove Sub-Shapes in the active part:
+To Remove Sub-Shapes in the active part:
 
 #. select in the Main Menu *Features - > Remove Sub-Shapes* item  or
 #. click **Remove Sub-Shapes** button in the toolbar
@@ -23,15 +23,15 @@ The following property panel will be opened:
 .. centered::
   Remove Sub-Shapes
 
-- **Shape** shape from which sub-shapes should be removed. Only wires, shells, compsolids, compounds allowed for selection.
+- **Shape** shape from which sub-shapes should be removed. Only wires, shells, compsolids or compounds are allowed for selection.
 
 There are 2 options for removing sub-shapes:
 
 .. image:: images/remove_subshapes_32x32.png
    :align: left
-**By removing** allows to select which sub-shapes will be removed.
+**By removing** allows selecting sub-shapes to be removed.
 
-- **Sub-Shapes to remove** list of sub-shapes which should be removed.
+- **Sub-Shapes to remove** the list of sub-shapes which should be removed.
 
 **TUI Command**:
  | *Remove_SubShapes_1 = model.addRemoveSubShapes(Part_1_doc, object)*
@@ -42,9 +42,9 @@ There are 2 options for removing sub-shapes:
 
 .. image:: images/keep_subshapes_32x32.png
    :align: left
-**By keeping** allows to select which sub-shapes will be kept.
+**By keeping** allows select sub-shapes to be kept.
 
-- **Sub-Shapes to keep** list of sub-shapes which should be kept.
+- **Sub-Shapes to keep** the list of sub-shapes which should be kept.
 
 **TUI Command**:
  | *Remove_SubShapes_1 = model.addRemoveSubShapes(Part_1_doc, object)*
@@ -62,6 +62,6 @@ The Result of the operation will be a shape without removed sub-shapes:
 	   :align: center
 
 .. centered::
-   **Remove Sub-Shapes created**
+   **Remove Sub-Shapes**
 
-**See Also** a sample TUI Script of a :ref:`tui_create_remove_subshapes` operation.
+**See Also** a sample TUI Script of :ref:`tui_create_remove_subshapes` operation.

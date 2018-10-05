@@ -2,7 +2,7 @@
 Box
 ===
 
-Custom files for feature **Box** are:
+Custom files for  **Box** feature are:
 
 -  empty __init__.py,
 - :ref:`create_custom_box_py`,
@@ -15,7 +15,7 @@ Custom files for feature **Box** are:
 .. centered::
    File icon.png
 
-The custom feature **Box** creates a box solid by extrusion of rectangle.
+The custom  **Box** feature creates a box solid by extrusion of rectangle.
 
 To create a Box in the active part:
 
@@ -32,7 +32,7 @@ The following property panel appears.
 
 Input fields: 
 
-- **Width**, **Length**, **Height** are sizes of the box along corresponding coordinate axes. The box will be created starting from the origin.   
+- **Width**, **Length**, **Height** are sizes of the box along the corresponding coordinate axes. The box will be created starting from the origin.   
 
 Result
 """"""
@@ -45,4 +45,4 @@ The edges of the box will be parallel to the coordinate axes.
 	   :align: center
 		   
 .. centered::
-   Box created 
+   Created box

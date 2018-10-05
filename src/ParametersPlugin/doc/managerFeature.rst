@@ -4,7 +4,7 @@
 Parameters manager
 ==================
 
-To create/edit a set of parameters in the active partset or part instead of multiply call:
+To create/edit simultaneously a set of parameters  in the active partset or part instead of calling them one by one:
 
 #. select in the Main Menu *Part - > Parameters* item or
 #. click **Parameters** button in the toolbar:
@@ -25,8 +25,8 @@ The following dialog box with parameter table appears:
 
 **Input fields**:
 
-- **Name**  defines parameter name. Name follows the naming rules of the python language for variables;
-- **Expression** inputs manually python expression; 
+- **Name** defines parameter name. Name follows the naming rules of the python language for variables;
+- **Expression** allows manual input of python expression; 
 - **Result** evaluates expression as real number by python *eval()* function;
 - **Comment** contains any text. This field is optional;
 - **Add** button adds a new empty string in the end of table. Default  **Name** is *<NoName>*, **Expression** is   *<NoValue>* 
@@ -35,18 +35,18 @@ The following dialog box with parameter table appears:
 - **Modify parameter position** button moves the selected parameter
     .. image:: images/parameters_up.png
       :align: left
-    up on 1 string in the table,
+    one string higher in the table,
   
     .. image:: images/parameters_down.png
       :align: left
-    down on 1 string in the table.
+    one string lower in the table.
 
   
 **TUI Command**: *model.addParameter(Part_doc, Name, Value, Comment)*
 
 **Arguments**:  1 Part + 1 string + 1 value + 1 string
 
-**See Also** a sample TUI Script of a :ref:`tui_parametersFeature` operation.
+**See Also** a sample TUI Script of :ref:`tui_parametersFeature` operation.
 
 Result
 ------

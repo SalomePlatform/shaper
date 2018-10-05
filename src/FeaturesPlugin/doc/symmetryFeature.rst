@@ -2,9 +2,9 @@
 Symmetry
 ========
 
-The feature **Symmetry** makes symmetrical copy of a selected shape.
+**Symmetry** feature makes a symmetrical copy of the selected shape.
 
-To create Symmetry in the active part:
+To create a Symmetry in the active part:
 
 #. select in the Main Menu *Part - > Symmetry* item  or
 #. click **Symmetry** button in the toolbar
@@ -41,8 +41,8 @@ Symmetry through a Point of symmetry
 Input fields:
 
 - **Main objects** panel contains shapes to be translated. Shapes are selected in 3D OCC viewer or object browser;
-- **Point**  defines point of symmetry selected in 3D OCC viewer or object browser;
-- **Create a copy** checkbox turns on/off preservation of the initial object.
+- **Point**  defines a point of symmetry selected in 3D OCC viewer or object browser;
+- **Create a copy** checkbox preserves/removes the initial object.
 
 **TUI Command**:  *model.addSymmetry(Part_doc, [shape], point, copy)*
 
@@ -51,7 +51,7 @@ Input fields:
 Result
 """"""
 
-Result of operation is mirrored initial shape with **Create a copy** = *True*.
+The result of operation is a mirrored initial shape with **Create a copy** = *True*.
 
 .. image:: images/symmetryPointres.png
    :align: center
@@ -59,7 +59,7 @@ Result of operation is mirrored initial shape with **Create a copy** = *True*.
 .. centered::
    Symmetry through a Point of symmetry
 
-**See Also** a sample TUI Script of a :ref:`tui_symmetry_point` operation.
+**See Also** a sample TUI Script of :ref:`tui_symmetry_point` operation.
 
 Symmetry through an Axis of symmetry
 ------------------------------------
@@ -73,8 +73,8 @@ Symmetry through an Axis of symmetry
 Input fields:
 
 - **Main objects** panel contains shapes to be translated. Shapes are selected in 3D OCC viewer or object browser;
-- **Axis**  defines axis of symmetry selected in 3D OCC viewer or object browser;
-- **Create a copy** checkbox turns on/off preservation of the initial object.
+- **Axis**  defines an axis of symmetry selected in 3D OCC viewer or object browser;
+- **Create a copy** checkbox preserves/removes the initial object.
 
 **TUI Command**:  *model.addSymmetry(Part_doc, [shape], axis, copy)*
 
@@ -83,7 +83,7 @@ Input fields:
 Result
 """"""
 
-Result of operation is mirrored initial shape with **Create a copy** = *False*.
+The result of operation is a mirrored initial shape with **Create a copy** = *False*.
 
 .. image:: images/symmetryAxisres.png
    :align: center
@@ -91,7 +91,7 @@ Result of operation is mirrored initial shape with **Create a copy** = *False*.
 .. centered::
    Symmetry through an Axis of symmetry
 
-**See Also** a sample TUI Script of a :ref:`tui_symmetry_axis` operation.  
+**See Also** a sample TUI Script of :ref:`tui_symmetry_axis` operation.  
 
 Symmetry through a Plane of symmetry
 ------------------------------------
@@ -105,8 +105,8 @@ Symmetry through a Plane of symmetry
 Input fields:
 
 - **Main objects** panel contains shapes to be translated. Shapes are selected in 3D OCC viewer or object browser;
-- **Plane**  defines plane of symmetry selected in 3D OCC viewer or object browser;
-- **Create a copy** checkbox turns on/off preservation of the initial object.
+- **Plane**  defines a plane of symmetry selected in 3D OCC viewer or object browser;
+- **Create a copy** checkbox preserves/removes the initial object.
 
 **TUI Command**:  *model.addSymmetry(Part_doc, [shape], plane, copy)*
 
@@ -115,7 +115,7 @@ Input fields:
 Result
 """"""
 
-Result of operation is mirrored initial shape with **Create a copy** = *False*.
+The result of operation is a mirrored initial shape with **Create a copy** = *False*.
 
 .. image:: images/symmetryPlaneres.png
    :align: center
@@ -123,4 +123,4 @@ Result of operation is mirrored initial shape with **Create a copy** = *False*.
 .. centered::
    Symmetry through a Plane of symmetry
 
-**See Also** a sample TUI Script of a :ref:`tui_symmetry_plane` operation.   
+**See Also** a sample TUI Script of :ref:`tui_symmetry_plane` operation.   

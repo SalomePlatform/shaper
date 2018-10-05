@@ -4,7 +4,7 @@ Circle
 
 The feature Circle creates a circle in the current Sketch.
 
-To add new Circle to the Sketch:
+To add a new Circle to the Sketch:
 
 #. select in the Main Menu *Sketch - > Circle* item  or
 #. click **Circle** button in Sketch toolbar:
@@ -65,12 +65,12 @@ The following property panel appears when the user selects an existing circle.
 .. image:: images/Circle_panel_edit.png
    :align: center
 
-Note that the edition property panel doesn't show the creation algorithm used.
+Note that the edition property panel does not show the used creation algorithm.
 
 The panel shows:
 
 - center coordinates and radius (read-only).
-- auxiliary flag (could be modified).
+- auxiliary flag (can be modified).
 
 Result
 """"""
@@ -83,4 +83,4 @@ Created circle appears in the view.
 .. centered::
    Circle created
 
-**See Also** a sample TUI Script of a :ref:`tui_create_circle` operation.
+**See Also** a sample TUI Script of :ref:`tui_create_circle` operation.

@@ -2,9 +2,9 @@
 Linear copy
 ===========
 
-Linear copy operation creates one or multiple copies of the skecth entities along a vector defined by two points.
+Linear copy operation creates one or multiple copies of the sketch entities along a vector defined by two points.
 
-To create Linear copy in the active Sketch:
+To create a Linear copy in the active Sketch:
 
 #. select in the Main Menu *Sketch - > Linear copy* item  or
 #. click **Linear copy** button in Sketch toolbar:
@@ -49,7 +49,7 @@ Result
 
 Created Linear copy appears in the view.
 
-| The original and a linear copy objects are marked with the special sign.
+| The original and a linear copy objects are marked with a special sign.
 | Copy objects are drawn with a thinner line.
 
 .. image:: images/Linear_res.png
@@ -58,4 +58,4 @@ Created Linear copy appears in the view.
 .. centered::
    Linear copy created
 
-**See Also** a sample TUI Script of a :ref:`tui_create_translation` operation.
+**See Also** a sample TUI Script of :ref:`tui_create_translation` operation.

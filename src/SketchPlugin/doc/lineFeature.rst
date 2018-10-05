@@ -3,9 +3,9 @@
 Line
 ====
 
-The feature Line creates a line segment by two points in the current Sketch.
+Line feature creates a line segment by two points in the current Sketch.
 
-To add new Line to the Sketch:
+To add a new Line to the Sketch:
 
 #. select in the Main Menu *Sketch - > Line* item  or
 #. click **Line** button in Sketch toolbar:
@@ -16,7 +16,7 @@ To add new Line to the Sketch:
 .. centered::
    **Line**  button
 
-The following property panel appears.
+The following property panel appears:
 
 .. image:: images/Line_panel.png
   :align: center
@@ -24,8 +24,7 @@ The following property panel appears.
 .. centered::
    Line
 
-Pick 2 points (start and end) in the view to create a Line. In the case of click on an existing object constraint for
-the point will be created automatically.
+Pick 2 points (start and end) in the view to create a Line. If an existing object is clicked, a constraint for the point will be created automatically.
 
 Start and end points coordinates are displayed in the property panel.
 
@@ -44,4 +43,4 @@ Created line appears in the view.
 .. centered::
    Line created
 
-**See Also** a sample TUI Script of a :ref:`tui_create_line` operation.
+**See Also** a sample TUI Script of :ref:`tui_create_line` operation.

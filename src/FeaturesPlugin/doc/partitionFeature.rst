@@ -2,9 +2,9 @@
 Partition
 =========
 
-The feature Partition implements a boolean operation for partitioning of a set of selected objects.
+Partition feature implements a boolean operation for partitioning of a set of selected objects.
 
-To perform a boolean operation Partition in the active part:
+To perform a Partition in the active part:
 
 #. select in the Main Menu *Features - > Partition* item  or
 #. click **Partition** button in the toolbar
@@ -40,4 +40,4 @@ The Result of the operation will be a shape which is a partition of selected obj
 .. centered::
    **Partition created**
 
-**See Also** a sample TUI Script of a :ref:`tui_create_partition` operation.
+**See Also** a sample TUI Script of :ref:`tui_create_partition` operation.

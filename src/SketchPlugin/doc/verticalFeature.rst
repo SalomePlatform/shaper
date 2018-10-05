@@ -2,9 +2,9 @@
 Vertical constraint
 ===================
 
-Vertical constraint fixes lines to lie parallel to the vertical axis.
+Vertical constraint fixes lines as parallel to the vertical axis.
 
-To create Vertical constraint in the active Sketch:
+To create a Vertical constraint in the active Sketch:
 
 #. select in the Main Menu *Sketch - > Vertical* item  or
 #. click **Vertical** button in Sketch toolbar:
@@ -25,7 +25,7 @@ Input fields:
 - **Line** is the line selected in the view.
 
 | After the line is selected it becomes parallel to the vertical axis in the view.
-| **V** sign added above the line.
+| **V** sign is added above the line.
 
 **TUI Command**: *Sketch_1.setVertical(LineObject)*
 
@@ -42,4 +42,4 @@ Created Vertical constraint appears in the view.
 .. centered::
    Vertical constraint created
 
-**See Also** a sample TUI Script of a :ref:`tui_create_vertical` operation.
+**See Also** a sample TUI Script of :ref:`tui_create_vertical` operation.

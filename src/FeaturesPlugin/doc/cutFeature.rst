@@ -3,9 +3,9 @@
 Cut
 ===
 
-The feature Cut implements a boolean operation to cut tool objects from a main objects.
+Cut feature implements a Boolean operation to cut tool objects from main objects.
 
-To perform a boolean operation Cut in the active part:
+To perform a Cut operationin the active part:
 
 #. select in the Main Menu *Features - > Cut* item  or
 #. click **Cut** button in the toolbar
@@ -25,10 +25,10 @@ The following property panel will be opened:
   **Cut operation**
 
 - **Main Objects** contains a list of objects selected in the Object Browser or in the Viewer, which will be cut by tool objects.
-  Any kind of shape can be selected. Also allows selection of compsolids/compound subshapes.
-  In this case only selected subshapes will be cut, other will stay untoched (as much as possible).
-- **Tool Objects** contains a list of objects selected in the Object Browser or in the Viewer, which will be cut main objects.
-  Any kind of shape can be selected. Also allows selection of compsolids/compounds subshapes.
+  Any kind of shape can be selected, including subshapes of compsolids/compounds.
+  In this case only selected subshapes will be cut, others will stay untouched (as much as possible).
+- **Tool Objects** contains a list of objects selected in the Object Browser or in the Viewer, which will cut main objects.
+  Any kind of shape can be selected, including subshapes of compsolids/compounds.
   Non-selected subshapes from compsolids/compounds will be ignored.
 - **See preview** button shows a result of the operation.
 
@@ -39,15 +39,15 @@ The following property panel will be opened:
 Result
 """"""
 
-For each selected object will be produced a result shape which is a cut of tool objects from main object:
+A result shape which is a cut by tool objects from main object, will be produced for each selected object:
 
 .. image:: images/CreatedCut.png
    :align: center
 
 .. centered::
-   **Cut created**
+   **Created cut**
 
-In case if subsolid (yellow wireframe) of compsolid was selected:
+If a subsolid (yellow wireframe) of a compsolid was selected:
 
 .. image:: images/boolean_cut_subsolids_arguments.png
    :align: center
@@ -55,7 +55,7 @@ In case if subsolid (yellow wireframe) of compsolid was selected:
 .. centered::
    **Cut arguments**
 
-then it will be cut in result and not selected subsolids will be added to it:
+it will be cut in the result and not selected subsolids will be added to it:
 
 .. image:: images/boolean_cut_subsolids_result.png
    :align: center
@@ -64,4 +64,4 @@ then it will be cut in result and not selected subsolids will be added to it:
    **Cut subsolid result**
 
 
-**See Also** a sample TUI Script of a :ref:`tui_create_cut` operation.
+**See Also** a sample TUI Script of :ref:`tui_create_cut` operation.

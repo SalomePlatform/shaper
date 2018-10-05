@@ -2,9 +2,9 @@
 Fuse
 ====
 
-The feature Fuse implements a boolean operation for fusion of a set of main objects with a set of tool objects.
+Fuse feature implements a Boolean operation for fusion of a set of main objects with a set of tool objects.
 
-To perform a boolean operation Fuse in the active part:
+To perform Fuse in the active part:
 
 #. select in the Main Menu *Features - > Fuse* item  or
 #. click **Fuse** button in the toolbar
@@ -35,10 +35,10 @@ Simple
 .. centered::
    **Simple**
 
-- **Objects** contains a list of objects selected in the Object Browser or in the Viewer, which will be fused with tool objects.
-  In case if subshape from compsolid/compound was selected then other shapes from this compsolid/compound will be ignored.
-- **Remove intersection edges** if enabled edges that lie on the same surface will be removed.
-- **See preview** button shows a result of the operation.
+- **Objects** - contains a list of objects selected in the Object Browser or in the Viewer, which will be fused with tool objects.
+  If a subshape that belongs to a compsolid/compound was selected, other shapes of this compsolid/compound will be ignored.
+- **Remove intersection edges** -  if enabled, edges that lie on the same surface will be removed.
+- **See preview** - button shows a result of the operation.
 
 **TUI Command**:  *model.addFuse(Part_doc, objects, isRemoveEdges)*
 
@@ -55,7 +55,7 @@ The Result of the operation will be a single shape which is a fuse of selected o
 .. centered::
    **Fuse created**
 
-**See Also** a sample TUI Script of a :ref:`tui_create_fuse` operation.
+**See Also** a sample TUI Script of :ref:`tui_create_fuse` operation.
 
 Advanced
 --------
@@ -66,13 +66,13 @@ Advanced
 .. centered::
    **Advanced**
 
-- **Objects** contains a list of objects selected in the Object Browser or in the Viewer, which will be fused with tool objects.
-  In case if subshape from compsolid/compound was selected then other shapes from this compsolid/compound will be cut from
+- **Objects** - contains a list of objects selected in the Object Browser or in the Viewer, which will be fused with tool objects.
+  If a subshape that belongs to a compsolid/compound was selected, other shapes of this compsolid/compound will be cut from
   other objects (to avoid self intersection) and added to the result.
-- **Tools** contains a list of objects selected in the Object Browser or in the Viewer, which will be fused with tool objects.
-  In case if subshape from compsolid/compound was selected then other shapes from this compsolid/compound will be ignored.
-- **Remove intersection edges** if enabled edges that lie on the same surface will be removed.
-- **See preview** button shows a result of the operation.
+- **Tools** - contains a list of objects selected in the Object Browser or in the Viewer, which will be fused with tool objects.
+  If a subshape that belongs to a compsolid/compound was selected, other shapes of this compsolid/compound will be ignored.
+- **Remove intersection edges** - if enabled, edges that lie on the same surface will be removed.
+- **See preview** - button shows a result of the operation.
 
 **TUI Command**:  *model.addFuse(Part_doc, objects, tools, isRemoveEdges)*
 
@@ -89,4 +89,4 @@ The Result of the operation will be a single shape which is a fuse of selected o
 .. centered::
    **Fuse created**
 
-**See Also** a sample TUI Script of a :ref:`tui_create_fuse` operation.
+**See Also** a sample TUI Script of :ref:`tui_create_fuse` operation.

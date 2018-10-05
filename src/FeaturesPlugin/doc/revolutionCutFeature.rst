@@ -2,9 +2,9 @@
 Revolution Cut
 ==============
 
-Revolution Cut feature revolves selected objects around selected axis and cuts result from other objects.
+Revolution Cut feature revolves the selected objects around the selected axis and cuts the result from other objects.
 
-To perform Revolution Cut in the active part:
+To perform a Revolution Cut in the active part:
 
 #. select in the Main Menu *Features - > Revolution Cut* item  or
 #. click **Revolution Cut** button in the toolbar
@@ -23,7 +23,7 @@ The following property panel will be opened:
 .. centered::
   Start sketch
 
-After selecting one of the options property panel for Revolution Cut will be opened with two variants:
+There are two variants of the property panel for Revolution Cut depending on the chosen option:
 
 .. image:: images/revolution_by_angles.png
    :align: left
@@ -43,11 +43,11 @@ By angles
 .. centered::
   Revolution Cut: definition by angles
 
-- **Base objects** contains a list of objects selected in the Object Browser or in the Viewer, which will be revolved.
-- **Axis** axis of revolution.
-- **To angle** end angle of revolution.
-- **From angle** start angle of revolution.
-- **Cut from** contains a list of objects which will but cut with the result of revolution.
+- **Base objects** - contains a list of objects selected in the Object Browser or in the Viewer, which will be revolved.
+- **Axis** - axis of revolution.
+- **To angle** - end angle of revolution.
+- **From angle** - start angle of revolution.
+- **Cut from** - contains a list of objects which will but cut with the result of revolution.
 
 **TUI Command**:  *model.addRevolutionCut(part, objectsToRevolve, axis, angle, objectToCut);*
 
@@ -60,7 +60,7 @@ By angles
 Result
 """"""
 
-The Result of the operation will be an revolved shape:
+The Result of the operation will be a revolved shape:
 
 .. image:: images/revolution_cut_by_angles_result.png
 	   :align: center
@@ -68,7 +68,7 @@ The Result of the operation will be an revolved shape:
 .. centered::
    **Revolution Cut created**
 
-**See Also** a sample TUI Script of a :ref:`tui_create_revolution_cut_by_angles` operation.
+**See Also** a sample TUI Script of :ref:`tui_create_revolution_cut_by_angles` operation.
 
 By bounding planes
 ------------------
@@ -79,13 +79,13 @@ By bounding planes
 .. centered::
   Revolution Cut: definition by bounding planes
 
-- **Base objects** contains a list of objects selected in the Object Browser or in the Viewer, which will be revolved.
-- **Axis** axis of revolution.
-- **To plane** planar face can be selected to bound revolution from one side.
-- **To offset** offset for revolution or for bounding plane if selected.
-- **From plane** planar face can be selected to bound revolution from other side.
-- **From offset** offset for revolution or for bounding plane if selected.
-- **Cut from** contains a list of objects which will but cut with the result of revolution.
+- **Base objects** - contains a list of objects selected in the Object Browser or in the Viewer, which will be revolved.
+- **Axis** - axis of revolution.
+- **To plane** - a planar face can be selected to bound revolution from one side.
+- **To offset** - offset for revolution or for bounding plane, if selected.
+- **From plane** - a planar face can be selected to bound revolution from the other side.
+- **From offset** - offset for revolution or for bounding plane, if selected.
+- **Cut from** - contains a list of objects from which the result of revolution will be cut.
 
 **TUI Command**:  *model.addRevolutionCut(part, objectsToRevolve, axis, toObject, toOffset, fromObject, fromOffset, objectToCut);*
 
@@ -94,7 +94,7 @@ By bounding planes
 Result
 """"""
 
-The Result of the operation will be an revolved shape:
+The Result of the operation will be a revolved shape:
 
 .. image:: images/revolution_cut_by_bounding_planes_result.png
 	   :align: center
@@ -102,4 +102,4 @@ The Result of the operation will be an revolved shape:
 .. centered::
    **Revolution Cut created**
 
-**See Also** a sample TUI Script of a :ref:`tui_create_revolution_cut_by_bounding_planes` operation.
+**See Also** a sample TUI Script of :ref:`tui_create_revolution_cut_by_bounding_planes` operation.

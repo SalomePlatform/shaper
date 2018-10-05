@@ -4,7 +4,7 @@ Tangent constraint
 
 Tangent constraint fixes a circle (or an arc) and a line so that a line is tangent to a circle (or an arc).
 
-To create Tangent in the active Sketch:
+To create a Tangent in the active Sketch:
 
 #. select in the Main Menu *Sketch - > Tangent* item  or
 #. click **Tangent** button in Sketch toolbar:
@@ -27,7 +27,7 @@ Input fields:
 
 Note that one of two objects should be a line.
 
-After the objects are selected the special sign will be added close to the tangency point in the view.
+After the objects are selected, a special sign will be added close to the tangency point in the view.
 
 **TUI Command**: *Sketch_1.setTangent(Line, CircleOrArc)*
 
@@ -42,6 +42,6 @@ Created Tangent constraint appears in the view.
 	   :align: center
 
 .. centered::
-   Tangent constraint created
+   Created tangent constraint
 
-**See Also** a sample TUI Script of a :ref:`tui_create_tangent` operation.
+**See Also** a sample TUI Script of :ref:`tui_create_tangent` operation.

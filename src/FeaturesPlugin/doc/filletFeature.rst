@@ -4,9 +4,9 @@
 Fillet
 ======
 
-The feature **Fillet** creates fillets on the edges of a shape. 
+**Fillet** feature creates fillets on the edges of a shape. 
 
-To create Fillet in the active part:
+To create a Fillet in the active part:
 
 #. select in the Main Menu *Feature - > Fillet* item  or
 #. click **Fillet** button in the toolbar
@@ -40,12 +40,12 @@ The  property panel is shown below.
 
 Input fields:
 
-- **Faces or/and edges** panel contains faces and edges on which fillet is done. All edges of face are subjected to fillet operation. Faces and edges are selected in 3D OCC viewer;
+- **Faces or/and edges** panel contains filleted faces and edges. All edges of a face are subject to fillet operation. Faces and edges are selected in 3D OCC viewer;
 - **Radius** defines fillet radius.
 
 **TUI Command**:  *model.addFillet(Part_doc, [face,edge], radius)*
 
-**Arguments**: 1 part + list of faces and edges subjected to fillet operation in format *model.selection(TYPE, shape)* + real (radius value).
+**Arguments**: 1 part + list of faces and edges subject to fillet operation in format *model.selection(TYPE, shape)* + real (radius value).
 
 Result
 """"""
@@ -58,7 +58,7 @@ Result of **Fillet by fixed radius** is shown below.
 .. centered::
    Fillet by fixed radius
 
-**See Also** a sample TUI Script of a :ref:`tui_create_fillet1` operation.
+**See Also** a sample TUI Script of :ref:`tui_create_fillet1` operation.
 
 Fillet by variable radius
 -------------------------
@@ -73,7 +73,7 @@ Alternatively, there is a possibility to create a fillet with a variable radius.
 
 Input fields:
 
-- **Faces or/and edges** panel contains faces and edges on which fillet is done. All edges of face are subjected to fillet operation. Faces and edges are selected in 3D OCC viewer;
+- **Faces or/and edges** panel contains filleted faces and edges. All edges of a face are subject to fillet operation. Faces and edges are selected in 3D OCC viewer;
 - **Start radius** defines  the  fillet radius at the start of the selected edge(s);  
 - **End radius** defines  the  fillet radius at the end of the selected edge(s).
 
@@ -92,4 +92,4 @@ Result of **Fillet by variable radius** is shown below.
 .. centered::
    Fillet by variable radius
 
-**See Also** a sample TUI Script of a :ref:`tui_create_fillet2` operation.
+**See Also** a sample TUI Script of :ref:`tui_create_fillet2` operation.

@@ -3,7 +3,7 @@
 Polyline
 ========
 
-The feature **Polyline** creates a wire.
+Polyline feature creates a wire.
 
 To create a Polyline in the active part:
 
@@ -26,16 +26,16 @@ The following property panel appears.
 
 Input fields:
 
-- **Points and vertices** panel contains list of points and vertices selected in 3D OCC viewer. Polyline consequently connects points;
+- **Points and vertices** panel contains a list of points and vertices selected in 3D OCC viewer. The Polyline consequently connects points;
 - **Closed** check-box turns on/off connection of the start and end points to make polyline closed/opened.
 
 **TUI Commands**:  *model.addPolyline3D(Part_1_doc, Polyline_objects, Key)*
 
-**Arguments**: 1 part+ list of vertices selected in format *model.selection("VERTEX", "Point")* + boolean key defining presence of connection between the start and end points.
+**Arguments**: 1 part+ list of vertices selected in format *model.selection("VERTEX", "Point")* + Boolean key defining  connection between the start and end points.
 
 Result
 """"""
-Result of operation is closed or open  Polyline.
+The result of the operation is a closed or open Polyline.
 
 .. image:: images/CreatePolyline.png
    :align: center
@@ -43,4 +43,4 @@ Result of operation is closed or open  Polyline.
 .. centered::
    Polyline
 
-**See Also** a sample TUI Script of a :ref:`tui_create_polyline` operation.
+**See Also** a sample TUI Script of :ref:`tui_create_polyline` operation.

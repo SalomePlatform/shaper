@@ -2,7 +2,7 @@
 Rectangle
 =========
 
-Custom files for feature **Rectangle** are:
+Custom files for  **Rectangle** feature are:
 
 -  empty __init__.py,
 - :ref:`create_custom_rectangle_py`,
@@ -15,4 +15,4 @@ Custom files for feature **Rectangle** are:
 .. centered::
    File icon.png
 
-Description of custom feature :ref:`create_sketch_rectangle` is given in Sketch plug-in.
+The description of custom feature :ref:`create_sketch_rectangle` is given in Sketch plug-in.

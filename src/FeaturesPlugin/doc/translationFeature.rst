@@ -3,9 +3,9 @@
 Translation
 ===========
 
-The feature **Translation** makes translation of a selected shape.
+**Translation** feature translates a selected shape.
 
-To create Translation in the active part:
+To create a Translation in the active part:
 
 #. select in the Main Menu *Part - > Translation* item  or
 #. click **Translation** button in the toolbar
@@ -41,8 +41,8 @@ Translation by axis and distance
 
 Input fields:
 
-- **Main objects** panel contains shapes to be translated. Shapes are selected in 3D OCC viewer or object browser;
-- **Axis**  defines vector along which the object will be translated. Vector is edge, axis selected in 3D OCC viewer or object browser;
+- **Main objects** panel contains shapes to be translated. The shapes are selected in 3D OCC viewer or object browser;
+- **Axis**  defines a vector along which the object will be translated. The vector is an edge or axis selected in 3D OCC viewer or object browser;
 - **Distance** defines the distance along the **Vector of translation**.
 
 **TUI Command**:  *model.addTranslation(Part_doc, [shape], axis, dist)*
@@ -52,7 +52,7 @@ Input fields:
 Result
 """"""
 
-Result of operation is shifted initial shape.
+The result of operation is a shifted initial shape.
 
 .. image:: images/translation_XYZ.png
    :align: center
@@ -73,7 +73,7 @@ Translation by vector
 
 Input fields:
 
-- **Main objects** panel contains shapes to be translated. Shapes are selected in 3D OCC viewer or object browser;
+- **Main objects** panel contains shapes to be translated. The shapes are selected in 3D OCC viewer or object browser;
 - **DX**, **DY**, **DZ**  define vector using coordinates along the axis.
 
 **TUI Command**:  *model.addTranslation(Part_1_doc, [shape], DX, DY, DZ)*
@@ -83,7 +83,7 @@ Input fields:
 Result
 """"""
 
-Result of operation is shifted initial shape.
+The result of operation is a shifted initial shape.
 
 .. image:: images/translation_vector.png
    :align: center
@@ -91,7 +91,7 @@ Result of operation is shifted initial shape.
 .. centered::
    Translation by vector
 
-**See Also** a sample TUI Script of a :ref:`tui_translation_DXDYDZ` operation.
+**See Also** a sample TUI Script of :ref:`tui_translation_DXDYDZ` operation.
 
 
 Translation by two points
@@ -116,7 +116,7 @@ Input fields:
 Result
 """"""
 
-Result of operation is shifted initial shape.
+The result of operation is a shifted initial shape.
 
 .. image:: images/translation_2points.png
    :align: center
@@ -124,5 +124,5 @@ Result of operation is shifted initial shape.
 .. centered::
    Translation by two points
 
-**See Also** a sample TUI Script of a :ref:`tui_translation_2points` operation.
+**See Also** a sample TUI Script of :ref:`tui_translation_2points` operation.
   

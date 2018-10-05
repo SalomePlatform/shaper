@@ -3,7 +3,7 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome to SHAPER's documentation!
+Welcome to SHAPER documentation!
 ==================================
 
 - :ref:`introduction`
@@ -11,4 +11,4 @@ Welcome to SHAPER's documentation!
 
 .. toctree::
    :titlesonly:
-   :maxdepth: 1
+   :maxdepth: 3

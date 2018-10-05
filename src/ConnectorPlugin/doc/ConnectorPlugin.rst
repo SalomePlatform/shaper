@@ -2,7 +2,7 @@
 Connector plug-in
 =================
 
-To export Results, Groups, Fields created in active part into GEOM module:
+Connector plug-in is used to export Results, Groups, Fields created in active part into GEOM module:
 
 #. select in the Main Menu *Feature - > Export to GEOM* item  or
 #. click **Export to GEOM** button in Shaper toolbar:
@@ -17,4 +17,4 @@ To export Results, Groups, Fields created in active part into GEOM module:
 
 **Arguments**:  1 part
 
-Result can be checked in GEOM module.
+The result can be checked in GEOM module.

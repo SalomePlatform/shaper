@@ -2,9 +2,9 @@
 Collinear constraint
 ====================
 
-Collinear constraint makes to lines collinear.
+Collinear constraint forces lines to be collinear.
 
-To create Collinear in the active Sketch:
+To create a Collinear constraint in the active Sketch:
 
 #. select in the Main Menu *Sketch - > Collinear* item  or
 #. click **Collinear** button in Sketch toolbar:
@@ -25,8 +25,8 @@ Input fields:
 - **First line** is the first line selected in the view.
 - **Second line** is the second line selected in the view.
 
-| After the lines are selected they becomes translated as to be collinear.
-| The lines are marked with the special sign.
+| After the lines are selected, they are translated to become collinear.
+| The lines are marked with a special sign.
 
 **TUI Command**: *Sketch_1.setCollinear(Line1, Line2)*
 
@@ -41,6 +41,6 @@ Created Collinear constraint appears in the view.
 	   :align: center
 
 .. centered::
-   Collinear constraint created
+   Created collinear constraint
 
-**See Also** a sample TUI Script of a :ref:`tui_create_collinear` operation.
+**See Also** a sample TUI Script of :ref:`tui_create_collinear` operation.

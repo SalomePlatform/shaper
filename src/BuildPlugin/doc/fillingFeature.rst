@@ -2,9 +2,9 @@
 Filling
 =======
 
-The Filling feature creates one or several faces using already existing edges or wires in other objects.
+Filling feature creates one or several faces using shapes already existing in other objects.
 
-To create filling in the active part:
+To create a filling in the active part:
 
 #. select in the Main Menu *Build - > Filling* item  or
 #. click **Filling** button in the toolbar
@@ -23,13 +23,13 @@ The following property panel will be opened:
 .. centered::
   Create a filling
 
-Select two or more edges in a viewer.
+Select two or more edges in the viewer.
 
-**Advanced options** lets to manage filling process.
+**Advanced options** manage filling process.
 
 **Apply** button creates a filling.
 
-**Cancel** button cancels operation.
+**Cancel** button cancels the operation.
 
 **TUI Command**:  *model.addFilling(Part_doc, Edges)*
 
@@ -38,7 +38,7 @@ Select two or more edges in a viewer.
 Result
 """"""
 
-The result of the operation will be set of faces created from selected shapes:
+The result of the operation will be a set of faces created from the selected shapes:
 
 .. image:: images/CreateFilling.png
   :align: center
@@ -46,4 +46,4 @@ The result of the operation will be set of faces created from selected shapes:
 .. centered::
   Result of the operation.
 
-**See Also** a sample TUI Script of a :ref:`tui_create_filling` operation.
+**See Also** a sample TUI Script of :ref:`tui_create_filling` operation.

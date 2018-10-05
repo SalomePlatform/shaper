@@ -8,7 +8,7 @@ Introduction to SHAPER
 SHAPER module of SALOME is destined for:
 
 - import and export of geometrical models in IGES, BREP, STEP and XAO formats;
-- parametric construction of geometrical objects using a wide range of functions;
+- parametric construction of geometrical objects using a wide range of functions:
     
   - creation of complex 2D sections using :ref:`sketchPlugin` with consequent extrusion or revolution (see :ref:`featuresPlugin`);
   - construction of model using primitives defined in :ref:`primitivesPlugin`;
@@ -30,17 +30,17 @@ SHAPER module works with one study containing several documents:
 
 Only one document can be active.
   
-New study contains only partset with 7 default constructions which cannot be deleted:
+A new study contains only a partset with 7 default constructions, which cannot be deleted:
   
-- one point **Origin** coinciding with origin of coordinate system;
+- one point **Origin** coinciding with the origin of the coordinate system;
 - three axes **OX**, **OY**, **OZ**  coinciding with coordinate axes;
 - three planes **YOZ**, **XOZ**, **XOY**  coinciding with coordinate planes.    
 
-Only  points, axis and planes (see  :ref:`constructionPlugin`) and sketches (see  :ref:`sketchPlugin`) can be added into Partset to be used in any part later.
+Only  points, axis, planes (see  :ref:`constructionPlugin`) and sketches (see  :ref:`sketchPlugin`) can be added into Partset to be used in any part later.
 :ref:`parameter_usage` can be used both in Partset and any Part.
 
      
-New Part can be created as described in :ref:`partPlugin`.
+A new Part can be created as described in :ref:`partPlugin`.
 
 Double click or pop-up menu can be used to activate existing document.
 
@@ -113,7 +113,7 @@ Application toolbar contains:
 .. centered::
    Toolbars
   
-SHAPER toolbar duplicates main menu and  provides access to all commands of the application.
+SHAPER toolbar duplicates the main menu and  provides access to all commands of the application.
 
 SHAPER toolbar is separated into sections:
 
@@ -146,19 +146,19 @@ Standard dock windows are:
 - :ref:`python console`
 - :ref:`property_panel`
 
-Dock windows can be placed in three dock areas using drag-and -drop:
+Dock windows can be placed in three dock areas using drag-and-drop:
   
 - left, 
 - right, 
 - bottom.
 
-By default object browser window is placed at the left dock area, Inspection panel at the right dock area and Python console at the bottom dock area of the main window.
+By default Object browser window is placed at the left dock area, Inspection panel at the right dock area and Python console at the bottom dock area of the main window.
 
 Property Panel is hidden.
 
-The Property Panel is shown on operation start at left dock area of the main window by default.
+Property Panel is shown on operation start in left dock area of the main window by default.
 
-If Object Browser is shown at the same side then they will be tabbed.
+If Object browser is shown at the same side then they will be tabbed.
 
 Each dock window can be closed using **Cross** window button and opened again using a corresponding command from *View - Windows* :ref:`main_menu` or alternatively using pop-up menu.
 
@@ -210,14 +210,14 @@ New part contains only 3 empty branches:
 
 Features are placed one after another in the active document with default names and their results are placed into the corresponding branch.
 
-Example of default names assigned automatically for :ref:`box_feature` are:
+Examples of default names assigned automatically for :ref:`box_feature` are:
  
-* **Box_1**, **Box_2**, ... to Feature;
-* **Box_1_1**, **Box_2_1**, ... to Result.
+* **Box_1**, **Box_2**, ... for Feature;
+* **Box_1_1**, **Box_2_1**, ... for Result.
 
-Not default branch is added into Tree View when the first feature of this type is created.
+Note, that a default branch is added into Tree View when the first feature of this type is created.
 
-Note, that result used in feature as argument is removed.
+Note, that the result used in feature as argument is removed.
 
 This child result can be restored using **Recover** feature.
 
@@ -241,7 +241,7 @@ Each feature, result, construction, group, field, parameter can be renamed using
 .. centered::
    Construction pop-up menu
 
-Order of features can be changed using *Move to the end* pop-up menu command. Selected feature will be moved to the end of feature list.
+The order of features can be changed using *Move to the end* pop-up menu command. The selected feature will be moved to the end of feature list.
 
 Folders can be used to arrange long Tree View for features.
 
@@ -251,17 +251,17 @@ Folders can be used to arrange long Tree View for features.
 .. centered::
    Object browser with folder Dome. Part_1 active
 
-*Insert a folder before* pop-up menu command creates a new empty folder before the selected feature. Folder can be renamed.
+*Insert a folder before* pop-up menu command creates a new empty folder before the selected feature. The folder can be renamed.
 
 Features placed after/before the created folder can be moved into the folder using *Move into the previous folder* / *Move into the next folder* pop-up menu command.
 
-This allows to decrease length of feature list.
+This allows to decrease the length of feature list.
 
-Features can be removed from folder back using *Move out before the folder* / *Move out after the folder* pop-up menu command.
+Features can be removed from the folder using *Move out before the folder* / *Move out after the folder* pop-up menu command.
 
 *Clean history* pop-up menu command looks for features that do not participate in other features.
 
-**Clean history** dialog box shows list of unused features. After confirmation by click **Yes** button unused features are removed.
+**Clean history** dialog box shows a list of unused features. After confirmation by click **Yes** button unused features are removed.
 
 .. image:: images/clean_history.png
    :align: center
@@ -273,11 +273,11 @@ Features can be removed from folder back using *Move out before the folder* / *M
 *Select result* and *Select parent feature* pop-up menu commands help to navigate along Tree View.
 
 
-Feature together with its result can be deleted using *Delete* pop-up menu command.
+A feature and its result can be deleted using *Delete* pop-up menu command.
 
-Note that all features using removed feature and their results will be removed simultaneously.
+Note that all features using the removed feature and their results will be removed simultaneously.
 
-**Delete feature** dialog box shows list of features to be removed. After confirmation by click **Yes** button all these features are removed.
+**Delete feature** dialog box shows the list of features to be removed. After confirmation by click **Yes** button all these features are removed.
 
 
 .. image:: images/delete_feature.png
@@ -293,7 +293,7 @@ Property panel
 
 Property panel consists of two parts:
 
-- controls container for input of parameters for the current operation;
+- controls a container for input of parameters for the current operation;
 - buttons panel containing standard buttons:
  
   .. image:: images/button_ok.png
@@ -361,14 +361,14 @@ Python console
 
 Python console interpreters Python commands entered manually.
 
-In particular, it is possible to load python script:
+In particular, it is possible to load the python script:
 
 *execfile(r"/dn48/newgeom/data/example.py")*
 
-Pop-up menu allows:
+Pop-up menu gives the possibility to:
 
-- Copy selected text to clipboard;
-- Paste text from clipboard to Python console ;
+- Copy the selected text to clipboard;
+- Paste the text from clipboard to Python console ;
 - Clear Python console;
 - Dump commands from console into the specified file;
 - Start/Stop writing log into the specified file.    
@@ -385,13 +385,13 @@ Pop-up menu allows:
 Viewer
 ------
 
-The application supports one OCC 3D viewer and is able to show only one 3D space.
+The application supports one instance of OCC 3D viewer and is able to show only one 3D space.
 
 This 3D space can be represented in several view windows. New view window can be created using **Clone view** button in viewer toolbar.
 
-Each of view windows represents its own point of view on the 3D scene.
+Each view windows shows its own point of view on the 3D scene.
 
-This point of view can be modified by user with help of viewer commands like **Panning**, **Zooming**, **Scaling** and so on.
+This point of view can be modified using viewer commands: **Panning**, **Zooming**, **Scaling**, etc.
 
 
 .. image:: images/2_viewers.png
@@ -400,7 +400,7 @@ This point of view can be modified by user with help of viewer commands like **P
 .. centered::
    Two view windows
 
-Description of OCC 3D Viewer architecture and functionality is provided in GUI module user's guide in chapter **OCC 3D Viewer**.
+The description of OCC 3D Viewer architecture and functionality is provided in GUI module user's guide in chapter **OCC 3D Viewer**.
 
 
 .. _parameter_usage:
@@ -410,15 +410,14 @@ Parameters
 
 Model parametrization can be done using parameters.
 
-Parameter can be created in the active partset or part by:
-
+A parameter can be created in the active partset or part by:
 - :ref:`parameter`;
 - :ref:`parameters`;
 - :ref:`parameter_expression`.
 
 Any argument in features can be defined as parameter or expression containing parameters.
 
-List of features using parameters is given in **Parameters** dialog box:
+The list of features using parameters is given in **Parameters** dialog box:
 
  .. image:: images/parameters_feature.png
    :align: center
@@ -426,13 +425,13 @@ List of features using parameters is given in **Parameters** dialog box:
 .. centered::
    Parameters dialog box
   
-If parameter value is changed, then all features where it is used are rebuilt.
+If a parameter value is changed, then all features where it is used are rebuilt.
 
-Parameter name should be unique in the active document.
+A parameter name should be unique in the active document.
 
-However, partset and part can have parameters with the same name. If parameter name in Partset and Part are identical, then Part parameter has higher priority and its value will be used in the features of this part.
+However, partset and part can have parameters with the same name. If parameter names in Partset and Part are identical, then Part parameter has a higher priority and its value will be used in the features of this part.
 
-In contrast to features (see :ref:`object_browser`), there is an additional option  when Delete parameters.   
+In contrast to features (see :ref:`object_browser`), there is an additional option when parameters are deleted.   
 
 .. image:: images/delete_parameter.png
    :align: center
@@ -440,16 +439,16 @@ In contrast to features (see :ref:`object_browser`), there is an additional opti
 .. centered::
    Delete parameter
 
-After click **Replace** button. selected parameter is removed but parent parameters and features are not removed. Deleted parameter is replaced by its value.
+After clicking **Replace** button, the selected parameter is removed but its parent parameters and features are not removed. The deleted parameter is replaced by its value.
 
 .. _parameter_expression:
 
 Create parameter on fly
 ^^^^^^^^^^^^^^^^^^^^^^^
 
-Parameter can be created during feature creation simply writing *variable=expression* in any editbox.
+Parameter can be created during feature creation simply by writing *variable=expression* in any editbox.
 
-After validation of feature a new parameter with given name **variable** and value equal to evaluated expression appears in object browser under **Parameters** in the active partset or part.
+After feature validation a new parameter with the given name **variable** and value equal to the evaluated expression appears in object browser under **Parameters** in the active partset or part.
 
 .. _preferences:
 
@@ -472,7 +471,7 @@ SHAPER preferences include 4 tabs:
 - :ref:`sketch_preferences`;
 - :ref:`viewer_preferences`.
 
-Visualization tab is activated by default when **Preferences** dialog box is opened in active SHAPER module.
+Visualization tab is activated by default when **Preferences** dialog box is opened in the active SHAPER module.
 
 Other tabs are activated by click on tab header.
   
@@ -512,8 +511,8 @@ This tab defines presentation of objects displayed in OCC 3D viewer.
 - **Sketch entity color** selects default color for sketch objects;
 - **Sketch external entity color** selects default color for external objects selected as reference during sketch creation/edition;
 - **Sketch auxiliary entity color** selects default color for sketch auxiliary objects;
-- **Sketch overconsrtaint color** selects default color for sketch with redundant constraints;
-- **Sketch fully constraint color** selects default color for sketch with zero degrees of freedom.
+- **Sketch overconstraint color** selects default color for a sketch with redundant constraints;
+- **Sketch fully constraint color** selects default color for a sketch with zero degrees of freedom.
   
 To redefine any color click on the corresponding line to access **Select color** dialog box
 

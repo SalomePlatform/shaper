@@ -6,7 +6,7 @@ Split
 | The curve should have points lying on it.
 | Open curves (line or arc) require one or more points to split with; closed curves (circle) require two or more points.
 
-To create Split in the active Sketch:
+To create a Split in the active Sketch:
 
 #. select in the Main Menu *Sketch - > Split* item  or
 #. click **Split** button in Sketch toolbar:
@@ -39,7 +39,7 @@ The selected segment is highlighted in the view:
 
 **TUI Command**: *Sketch_1.addSplit(Feature, PositionPoint)*
 
-**Arguments**:   feature (line, arc or circle) and position point (a point on or closest to the segment to split off)
+**Arguments**:   feature (line, arc or circle) and position point (a point on the segment to split off or closest to it)
 
 Result
 """"""
@@ -50,6 +50,6 @@ Created Split appears in the view.
 	   :align: center
 
 .. centered::
-   Split created
+   Created split 
 
-**See Also** a sample TUI Script of a :ref:`tui_create_split` operation.
+**See Also** a sample TUI Script of :ref:`tui_create_split` operation.

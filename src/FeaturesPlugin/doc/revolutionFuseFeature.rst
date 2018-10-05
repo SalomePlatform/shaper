@@ -2,7 +2,7 @@
 Revolution Fuse
 ===============
 
-Revolution Fuse feature revolves selected objects around selected axis and fuses result from other objects.
+Revolution Fuse feature revolves the selected objects around the selected axis and fuses the result with other objects.
 
 To perform Revolution Fuse in the active part:
 
@@ -22,8 +22,8 @@ The following property panel will be opened:
 
 .. centered::
   Start sketch
-
-After selecting one of the options property panel for Revolution Fuse will be opened with two variants:
+  
+There are two variants of the property panel for Revolution Fuse depending on the chosen option:
 
 .. image:: images/revolution_by_angles.png
    :align: left
@@ -43,11 +43,11 @@ By angles
 .. centered::
   Revolution Fuse: definition by angles
 
-- **Base objects** contains a list of objects selected in the Object Browser or in the Viewer, which will be revolved.
-- **Axis** axis of revolution.
-- **To angle** end angle of revolution.
-- **From angle** start angle of revolution.
-- **Fuse with** contains a list of objects which will but fuse with the result of revolution.
+- **Base objects** - contains a list of objects selected in the Object Browser or in the Viewer, which will be revolved.
+- **Axis** - axis of revolution.
+- **To angle** - end angle of revolution.
+- **From angle**-  start angle of revolution.
+- **Fuse with** contains a list of objects which will be fused with the result of revolution.
 
 **TUI Command**:  *model.addRevolutionFuse(part, objectsToRevolve, axis, angle, objectToFuse);*
 
@@ -60,7 +60,7 @@ By angles
 Result
 """"""
 
-The Result of the operation will be an revolved shape:
+The Result of the operation will be a revolved shape:
 
 .. image:: images/revolution_fuse_by_angles_result.png
 	   :align: center
@@ -68,7 +68,7 @@ The Result of the operation will be an revolved shape:
 .. centered::
    **Revolution Fuse created**
 
-**See Also** a sample TUI Script of a :ref:`tui_create_revolution_fuse_by_angles` operation.
+**See Also** a sample TUI Script of :ref:`tui_create_revolution_fuse_by_angles` operation.
 
 By bounding planes
 ------------------
@@ -79,13 +79,13 @@ By bounding planes
 .. centered::
   Revolution Fuse: definition by bounding planes
 
-- **Base objects** contains a list of objects selected in the Object Browser or in the Viewer, which will be revolved.
-- **Axis** axis of revolution.
-- **To plane** planar face can be selected to bound revolution from one side.
-- **To offset** offset for revolution or for bounding plane if selected.
-- **From plane** planar face can be selected to bound revolution from other side.
-- **From offset** offset for revolution or for bounding plane if selected.
-- **Fuse with** contains a list of objects which will but fuse with the result of revolution.
+- **Base objects** - contains a list of objects selected in the Object Browser or in the Viewer, which will be revolved.
+- **Axis** - axis of revolution.
+- **To plane** - a planar face can be selected to bound revolution from one side.
+- **To offset** - offset for revolution or for bounding plane, if selected.
+- **From plane** - a planar face can be selected to bound revolution from other side.
+- **From offset** - offset for revolution or for bounding plane, if selected.
+- **Fuse with** - contains a list of objects which will be fused with the result of revolution.
 
 **TUI Command**:  *model.addRevolutionFuse(part, objectsToRevolve, axis, toObject, toOffset, fromObject, fromOffset, objectToFuse);*
 
@@ -94,7 +94,7 @@ By bounding planes
 Result
 """"""
 
-The Result of the operation will be an revolved shape:
+The Result of the operation will be a revolved shape:
 
 .. image:: images/revolution_fuse_by_bounding_planes_result.png
 	   :align: center
@@ -102,4 +102,4 @@ The Result of the operation will be an revolved shape:
 .. centered::
    **Revolution Fuse created**
 
-**See Also** a sample TUI Script of a :ref:`tui_create_revolution_fuse_by_bounding_planes` operation.
+**See Also** a sample TUI Script of :ref:`tui_create_revolution_fuse_by_bounding_planes` operation.

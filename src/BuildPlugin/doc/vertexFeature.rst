@@ -2,7 +2,7 @@
 Vertex
 ======
 
-The Vertex feature creates one or several vertices using already existing vertices in other objects.
+Vertex feature creates one or several vertices using vertices already existing in other objects.
 
 To create vertices in the active part:
 
@@ -23,7 +23,7 @@ The following property panel will be opened:
 .. centered::
   Create vertices
 
-Select one or several vertices in viewer.
+Select one or several vertices in the viewer.
 
 **Apply** button creates vertices.
 
@@ -36,7 +36,7 @@ Select one or several vertices in viewer.
 Result
 """"""
 
-The result of the operation will be set of vertices created from selected shapes:
+The result of the operation will be a set of vertices created from the selected shapes:
 
 .. image:: images/CreateVertex.png
   :align: center
@@ -44,4 +44,4 @@ The result of the operation will be set of vertices created from selected shapes
 .. centered::
   Result of the operation.
 
-**See Also** a sample TUI Script of a :ref:`tui_create_vertex` operation.
+**See Also** a sample TUI Script of :ref:`tui_create_vertex` operation.

@@ -3,10 +3,10 @@
 Equal constraint
 ================
 
-| Equal constraint makes lines, circles or arcs of equal size.
-| Lines becomes of equal length, circles and arcs - of equal radius.
+| Equal constraint makes lines, circles or arcs equal.
+| Lines become equal in length, circles and arcs - equal in radius.
 
-To create Equal in the active Sketch:
+To create an Equal constraint in the active Sketch:
 
 #. select in the Main Menu *Sketch - > Equal* item  or
 #. click **Equal** button in Sketch toolbar:
@@ -27,9 +27,9 @@ Input fields:
 - **First object** is a line, a circle or an arc selected in the view.
 - **Second object** is a line, a circle or an arc selected in the view.
 
-Note that a line could be equal to a line only, a circle - to a circle or an arc.
+Note that a line can be equal to a line only, a circle - to a circle or an arc.
 
-| After the objects are selected the object sizes become equal.
+| After the objects are selected, the object sizes become equal.
 | The equal objects are marked with **=** sign.
 
 **TUI Command**: *Sketch_1.setEqual(Object1, Object2)*
@@ -45,6 +45,6 @@ Created Equal constraint appears in the view.
 	   :align: center
 
 .. centered::
-   Equal constraint created
+   Created equal constraint
 
-**See Also** a sample TUI Script of a :ref:`tui_create_equal` operation.
+**See Also** a sample TUI Script of :ref:`tui_create_equal` operation.

@@ -4,7 +4,7 @@
 Primitives plug-in
 ==================
 
-The Primitives plug-in contains features dedicated to creation of geometrical primitives. Result of each feature is a solid. The plug-in includes the following features:
+The Primitives plug-in contains features for creation of geometrical primitives. Result of each feature is a solid. The plug-in includes the following features:
 
 .. toctree::
    :titlesonly:

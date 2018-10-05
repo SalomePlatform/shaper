@@ -2,7 +2,7 @@
 Intersection
 ============
 
-The feature Intersection implements a boolean operation for intersection of a set of main objects with a set of tool objects.
+Intersection feature a boolean operation for intersection of a set of main objects with a set of tool objects.
 
 To perform a boolean operation Intersection in the active part:
 
@@ -23,7 +23,7 @@ The following property panel will be opened:
 .. centered::
    **Intersection operation**
 
-**Objects** contains a list of objects selected in the Object Browser or in the Viewer, which will be intersected.
+**Objects** - contains a list of objects selected in the Object Browser or in the Viewer, which will be intersected.
 
 **TUI Command**:  *model.addIntersection(Part_doc, Objects)*
 
@@ -40,4 +40,4 @@ The Result of the operation will be a shape which is an intersection of selected
 .. centered::
    **Intersection created**
 
-**See Also** a sample TUI Script of a :ref:`tui_create_intersection` operation.
+**See Also** a sample TUI Script of :ref:`tui_create_intersection` operation.

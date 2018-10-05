@@ -4,7 +4,7 @@
 Exchange plug-in
 ================
 
-Exchange plug-in implements features for data exchange. It provides following:
+Exchange plug-in implements features for data exchange. It provides the following features:
 
 .. toctree::
    :titlesonly:

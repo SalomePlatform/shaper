@@ -3,9 +3,9 @@
 Angular copy
 ============
 
-Angular copy operation creates one or multiple copies of the skecth entities by rotation relative to a specified center point.
+Angular copy operation creates one or multiple copies of the sketch entities by rotation relative to a specified center point.
 
-To create Angular copy in the active Sketch:
+To create an Angular copy in the active Sketch:
 
 #. select in the Main Menu *Sketch - > Angular copy* item  or
 #. click **Angular copy** button in Sketch toolbar:
@@ -26,8 +26,8 @@ Property panel:
 
 Input fields:
 
-- **Segments** is the list of segments (lines, circles, arcs) selected in the view.
-- **Center of rotation** is the center point selected in the view.
+- **Segments** is the list of segments (lines, circles, arcs) selected in the view;
+- **Center of rotation** is the center point selected in the view;
 - **Full angle/Single angle** option:
 
   .. image:: images/angle_up_full_32x32.png
@@ -39,7 +39,7 @@ Input fields:
   **Single angle**: angle step of rotation is equal to the defined angle.
 
 - **Angle** is the angle of rotation.
-- **Reversed** defines rotation direction. If checked - in clockwise direction, otherwise - in a counterclockwise direction.
+- **Reversed** defines rotation direction. If checked - in a clockwise direction, otherwise - in a counterclockwise direction.
 - **Total number of objects** is the total number of objects including the original one.
 
 
@@ -52,13 +52,13 @@ Result
 
 Created Angular copy appears in the view.
 
-| The original and an angular copy objects are marked with the special sign.
+| The original and an angular copy objects are marked with a special sign.
 | Copy objects are drawn with a thinner line.
 
 .. image:: images/Rotation_res.png
 	   :align: center
 
 .. centered::
-   Angular copy created
+   Created angular copy
 
-**See Also** a sample TUI Script of a :ref:`tui_create_rotation` operation.
+**See Also** a sample TUI Script of :ref:`tui_create_rotation` operation.

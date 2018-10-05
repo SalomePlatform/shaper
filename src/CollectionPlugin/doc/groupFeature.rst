@@ -2,7 +2,8 @@
 Group
 =====
 
-To create Group in the active part:
+A groups is a set of geometrical entities created by selection.
+To create a Group in the active part:
 
 #. select in the Main Menu *Features - > Group* item  or
 #. click **Group** button in Shaper toolbar:
@@ -42,7 +43,7 @@ Input fields:
          :align: left	       
     Solids;
  
-- List of selected entities of given type.  Multiply selection can be done  manually in OCC 3D Viewer by mouse click with Shift button pressed or by rectangle selection.
+- The list of selected entities of the given type.  Multiple selection can be done manually in OCC 3D Viewer by mouse click with Shift button pressed or by rectangle selection.
 
 To delete entities from the list, select them and call pop-up menu *Delete* item.
 
@@ -61,6 +62,6 @@ Created Group appears in the view.
 	   :align: center
 
 .. centered::
-   Group created
+   Created group
 
-**See Also** a sample TUI Script of a :ref:`tui_create_group` operation.
+**See Also** a sample TUI Script of :ref:`tui_create_group` operation.

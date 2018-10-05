@@ -29,12 +29,12 @@ Result
 
 Created empty part is activated and appears in the object browser.
 
-**See Also** a sample TUI Script of a :ref:`tui_create_part` operation.
+**See Also** a sample TUI Script of :ref:`tui_create_part` operation.
 
 Duplicate Part
 --------------
 
-To duplicate active Part:
+To duplicate an active Part:
 
 #. select in the Main Menu *Part - > Duplicate part* item  or
 #. click **Duplicate part** button in Shaper toolbar:
@@ -55,7 +55,7 @@ Copied part contains all objects existing in the source part.
 Remove Part
 -----------
 
-To remove active Part:
+To remove an active Part:
 
 #. select in the Main Menu *Part - > Remove part* item  or
 #. click **Remove part** button in Shaper toolbar:

@@ -4,6 +4,8 @@
 
 Collection plug-in
 ==================
+Collection plug-in deals with groups of geometrical entities created by selection and fields used to assign values to geometrical entities.
+
 
 .. toctree::
    :titlesonly:

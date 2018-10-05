@@ -2,7 +2,7 @@
 Torus
 =====
 
-The feature Torus creates a torus solid.
+Torus feature creates a torus solid.
 
 To create a Torus in the active part:
 
@@ -25,7 +25,7 @@ The following property panel appears.
 
 Input fields:
 
-- **Point** defines center of the torus base selected in 3D OCC  viewer or object browser; 
+- **Point** defines the center of the torus base selected in 3D OCC  viewer or object browser; 
 - **Vector** defines the axis of the torus selected in 3D OCC  viewer or object browser;
 - Dimensions:      
    - **Radius**;
@@ -38,7 +38,7 @@ Input fields:
 Result
 """"""
 
-Example is shown below.
+An example is shown below.
 
 .. image:: images/Torus_res.png
 	   :align: center
@@ -46,5 +46,5 @@ Example is shown below.
 .. centered::
    Torus created  
 
-**See Also** a sample TUI Script of a :ref:`tui_create_torus` operation.
+**See Also** a sample TUI Script of :ref:`tui_create_torus` operation.
   

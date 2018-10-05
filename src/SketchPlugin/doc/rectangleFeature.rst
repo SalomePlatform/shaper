@@ -3,12 +3,12 @@
 Rectangle
 =========
 
-The feature Rectangle creates a rectangle by two opposite points in the current Sketch.
+Rectangle feature creates a rectangle by two opposite points in the current Sketch.
 
-The result is represented in the form of four Lines which compose a rectangle.
-Two of the lines have Vertical constraint and two others have Horizontal constraint.
+The result is represented in form of four Lines which compose a rectangle.
+Two lines have Vertical constraint and two others have Horizontal constraint.
 
-To add new Rectangle to the Sketch:
+To add a new Rectangle to the Sketch:
 
 #. select in the Main Menu *Sketch - > Rectangle* item  or
 #. click **Rectangle** button in Sketch toolbar:
@@ -19,7 +19,7 @@ To add new Rectangle to the Sketch:
 .. centered::
    **Rectangle**  button
 
-The following property panel appears.
+The following property panel appears:
 
 .. image:: images/Rectangle_panel.png
   :align: center
@@ -28,7 +28,7 @@ The following property panel appears.
    Rectangle
 
 Click in the view once to set the first corner, then move the mouse and click a second time to set the opposite corner.
-In the case of click on an existing object constraint for the point will be created automatically.
+If an existing object is clicked, a constraint for the point will be created automatically.
 
 Start and end points coordinates are displayed in the property panel.
 
@@ -47,4 +47,4 @@ Created rectangle appears in the view.
 .. centered::
    Rectangle created
 
-**See Also** a sample TUI Script of a :ref:`tui_create_rectangle` operation.
+**See Also** a sample TUI Script of :ref:`tui_create_rectangle` operation.

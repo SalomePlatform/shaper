@@ -4,7 +4,7 @@
 Features plug-in
 ================
 
-Features plug-in implements a set of common topological operations. It implements following features:
+Features plug-in provides a set of common topological operations. It implements the following features:
 
 .. toctree::
    :titlesonly:

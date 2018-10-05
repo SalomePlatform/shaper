@@ -4,7 +4,7 @@ Mirror copy
 
 Mirror copy operation mirrors sketch entities across a line.
 
-To create Mirror copy in the active Sketch:
+To create a Mirror copy in the active Sketch:
 
 #. select in the Main Menu *Sketch - > Mirror copy* item  or
 #. click **Mirror copy** button in Sketch toolbar:
@@ -37,7 +37,7 @@ Result
 
 Created Mirror copy appears in the view.
 
-| The original and a mirror copy objects are marked with the special sign.
+| The original and the mirror copy objects are marked with a special sign.
 | Copy object is drawn with a thinner line.
 
 .. image:: images/Mirror_res.png
@@ -46,4 +46,4 @@ Created Mirror copy appears in the view.
 .. centered::
    Mirror copy created
 
-**See Also** a sample TUI Script of a :ref:`tui_create_mirror` operation.
+**See Also** a sample TUI Script of :ref:`tui_create_mirror` operation.

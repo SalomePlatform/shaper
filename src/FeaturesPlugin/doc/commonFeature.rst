@@ -1,9 +1,9 @@
 Common
 ======
 
-The feature Common implements a boolean operation for extraction of a common part from a set of selected shapes.
+Common feature implements a Boolean operation for extraction of a common part from a set of selected shapes.
 
-To perform a boolean operation Common in the active part:
+To perform a Common operation in the active part:
 
 #. select in the Main Menu *Features - > Common* item  or
 #. click **Common** button in the toolbar
@@ -35,7 +35,7 @@ Simple
    **Simple**
 
 - **Objects** contains a list of objects selected in the Object Browser or in the Viewer.
-  In case if subshape from compsolid/compound was selected then other shapes from this compsolid/compound will be ignored.
+  If a subshape that belongs to a compsolid/compound was selected, other shapes of this compsolid/compound will be ignored.
 - **See preview** button shows a result of the operation.
 
 **TUI Command**:  *model.addCommon(Part_doc, objects)*
@@ -53,7 +53,7 @@ The Result of the operation will be a shape which is a common for all selected s
 .. centered::
    **Common created**
 
-**See Also** a sample TUI Script of a :ref:`tui_create_common` operation.
+**See Also** a sample TUI Script of :ref:`tui_create_common` operation.
 
 Advanced
 --------
@@ -65,10 +65,10 @@ Advanced
    **Advanced**
 
 - **Objects** contains a list of objects selected in the Object Browser or in the Viewer.
-  In case if subshape from compsolid/compound was selected then other shapes from this compsolid/compound will be cut from
-  other objects (to avoid self intersection) and added to the result.
+  If a subshape that belongs to a compsolid/compound was selected, other shapes of this compsolid/compound will be cut from
+  other objects (to avoid self-intersection) and added to the result.
 - **Tools** contains a list of objects selected in the Object Browser or in the Viewer, which will be fused with tool objects.
-  In case if subshape from compsolid/compound was selected then other shapes from this compsolid/compound will be ignored.
+  If a subshape that belongs to a compsolid/compound was selected, other shapes of this compsolid/compound  will be ignored.
 - **See preview** button shows a result of the operation.
 
 **TUI Command**:  *model.addCommon(Part_doc, objects, tools)*
@@ -78,12 +78,12 @@ Advanced
 Result
 """"""
 
-For each selected object result will be produced, which are common part between this object and all tools:
+For each selected object, the common part between this object and all tools will be found:
 
 .. image:: images/boolean_common_result.png
 	   :align: center
 
 .. centered::
-   **Common created**
+   **Created common**
 
-**See Also** a sample TUI Script of a :ref:`tui_create_common` operation.
+**See Also** a sample TUI Script of :ref:`tui_create_common` operation.

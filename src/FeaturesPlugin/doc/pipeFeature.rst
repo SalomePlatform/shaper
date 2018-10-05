@@ -2,9 +2,9 @@
 Pipe
 ====
 
-The feature **Pipe** makes an extruded Pipe shape.
+**Pipe** feature makes an extruded Pipe shape.
 
-To create Pipe in the active part:
+To create a Pipe in the active part:
 
 #. select in the Main Menu *Features - > Pipe* item  or
 #. click **Pipe** button in the toolbar
@@ -43,7 +43,7 @@ Base Objects are extruded along the Path Object so that the angle between the no
 Input fields:
 
 - **Base objects** panel contains shapes to be extruded. Several Base Objects generate several pipes. Shapes (edges, faces, shells) are selected in 3D OCC viewer or object browser;
-- **Path object**  defines path along which the Base Object will be extruded.  **Path object** (edge or wire) is selected in 3D OCC viewer or object browser;
+- **Path object**  defines the path along which the Base Object will be extruded.  **Path object** (edge or wire) is selected in 3D OCC viewer or object browser;
 
 **TUI Command**:  *model.addPipe(Part_doc, [shape], path)*
  
@@ -52,7 +52,7 @@ Input fields:
 Result
 """"""
 
-Result of extrusion of arc along another arc.
+Result of extrusion of an arc along another arc.
 
 .. image:: images/simplePipe.png
    :align: center
@@ -60,7 +60,7 @@ Result of extrusion of arc along another arc.
 .. centered::
    Pipe by object and path
 
-**See Also** a sample TUI Script of a :ref:`tui_simple_pipe` operation.
+**See Also** a sample TUI Script of ref:`tui_simple_pipe` operation.
 
 Pipe by object, path and Bi-normal
 ----------------------------------
@@ -76,7 +76,7 @@ The pipe is generated to preserve the constant angle between the normal vector t
 Input fields:
 
 - **Base objects** panel contains shapes to be extruded. Several Base Objects generate several pipes. Shapes (edges, faces, shells) are selected in 3D OCC viewer or object browser;
-- **Path object**  defines path along which the Base Object will be extruded.  **Path object** (edge or wire) is selected in 3D OCC viewer or object browser;
+- **Path object**  defines the path along which the Base Object will be extruded.  **Path object** (edge or wire) is selected in 3D OCC viewer or object browser;
 - **Bi-Normal** defines the BiNormal Vector. **Bi-Normal** (edge or wire) is selected in 3D OCC viewer or object browser.
 
 **TUI Command**:  *model.addPipe(Part_doc, [shape], path, binormal)*
@@ -86,7 +86,7 @@ Input fields:
 Result
 """"""
 
-Result of extrusion of rectangular face along  arc.
+Result of extrusion of a rectangular face along  arc.
 
 .. image:: images/binormalPipe.png
    :align: center
@@ -94,12 +94,12 @@ Result of extrusion of rectangular face along  arc.
 .. centered::
    Pipe by object, path and Bi-normal
 
-**See Also** a sample TUI Script of a :ref:`tui_binormal_pipe` operation.
+**See Also** a sample TUI Script of :ref:`tui_binormal_pipe` operation.
 
 Pipe by object, path and locations
 ----------------------------------
 
-The pipe is generated to preserve selected profiles at the specified locations along path.
+The pipe is generated to preserve selected profiles at the specified locations along the path.
 
 .. image:: images/Pipe3.png
   :align: center
@@ -110,8 +110,8 @@ The pipe is generated to preserve selected profiles at the specified locations a
 Input fields:
 
 - **Base objects** panel contains shapes to be extruded.  Shapes (edges, faces, shells) are selected in 3D OCC viewer or object browser;
-- **Path object**  defines path along which the Base Object will be extruded.  **Path object** (edge or wire) is selected in 3D OCC viewer or object browser;
-- **Locations** define list of vertices that specify the locations of extruded Base Objects on the resulting Path Object. The number of Base Objects should be equal to the number of Locations.
+- **Path object**  defines the path along which the Base Object will be extruded.  **Path object** (edge or wire) is selected in 3D OCC viewer or object browser;
+- **Locations** define the list of vertices that specify the locations of extruded Base Objects on the resulting Path Object. The number of Base Objects should be equal to the number of Locations.
 
 **TUI Command**:  *model.addPipe(Part_doc, [shape], path, locations)*
  
@@ -128,4 +128,4 @@ Result of extrusion of 3 circles along arc with specified locations.
 .. centered::
    Pipe by object, path and locations
 
-**See Also** a sample TUI Script of a :ref:`tui_locations_pipe` operation.
+**See Also** a sample TUI Script of :ref:`tui_locations_pipe` operation.

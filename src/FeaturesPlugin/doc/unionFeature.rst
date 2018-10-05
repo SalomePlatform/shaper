@@ -2,9 +2,9 @@
 Union
 =====
 
-The feature Union implements a boolean operation for creation of a union of selected objects.
+Union feature implements a Boolean operation for creation of a union of selected objects.
 
-To a create boolean operation Union in the active part:
+To create a Union in the active part:
 
 #. select in the Main Menu *Features - > Union* item  or
 #. click **Union** button in the toolbar
@@ -25,9 +25,9 @@ The following property panel will be opened:
 
 Here it is necessary to select some objects. Only faces with shared edges or solids with shared faces are allowed for selection.
 
-**Apply** button creates the union shape.
+**Apply** button creates a union shape.
   
-**Cancel** button cancels operation.
+**Cancel** button cancels the operation.
 
 **TUI Command**:  *model.addUnion(Part_doc, objects)*
 
@@ -44,4 +44,4 @@ The Result of the operation will be a shape which is a union of selected objects
 .. centered::
    **Union created**
 
-**See Also** a sample TUI Script of a :ref:`tui_create_union` operation.
+**See Also** a sample TUI Script of :ref:`tui_create_union` operation.

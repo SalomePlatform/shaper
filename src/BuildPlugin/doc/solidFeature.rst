@@ -2,9 +2,9 @@
 Solid
 =====
 
-The Solid feature creates a solid using already existing faces in other objects.
+Solid feature creates a solid using faces already existing in other objects.
 
-To create solid in the active part:
+To create a solid in the active part:
 
 #. select in the Main Menu *Build - > Solid* item  or
 #. click **Solid** button in the toolbar
@@ -23,11 +23,11 @@ The following property panel will be opened:
 .. centered::
   Create a solid
   
-Select one or several faces in viewer. Selected faces have to define a closed volume
+Select one or several faces in the viewer. The selected faces have to define a closed volume.
 
-**Apply** button creates solid.
+**Apply** button creates a solid.
 
-**Cancel** button cancels operation. 
+**Cancel** button cancels the operation. 
 
 **TUI Command**:  *model.addSolid(Part_doc, Shapes)*
 
@@ -36,7 +36,7 @@ Select one or several faces in viewer. Selected faces have to define a closed vo
 Result
 """"""
 
-The result of the operation will be a solid created from selected shapes:
+The result of the operation will be a solid created from the selected shapes:
 
 .. image:: images/CreateSolid.png
   :align: center
@@ -44,4 +44,4 @@ The result of the operation will be a solid created from selected shapes:
 .. centered::
   Result of the operation.
 
-**See Also** a sample TUI Script of a :ref:`tui_create_solid` operation.
+**See Also** a sample TUI Script of :ref:`tui_create_solid` operation.

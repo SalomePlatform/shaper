@@ -2,9 +2,9 @@
 Wire
 ====
 
-The Wire feature creates a wire using already existing edges in other objects.
+Wire feature creates a wire using edges already existing in other objects.
 
-To create wire in the active part:
+To create a wire in the active part:
 
 #. select in the Main Menu *Build - > Wire* item  or
 #. click **Wire** button in the toolbar
@@ -23,11 +23,11 @@ The following property panel will be opened:
 .. centered::
   Create a wire
   
-Select one or several edges in viewer. For automatic selection of closed contour starting from a selected edge it is necessary to press **Add contour** button.
+Select one or several edges in the viewer. For automatic selection of a closed contour starting from the selected edge it is necessary to press **Add contour** button.
 
-**Apply** button creates wire.
+**Apply** button creates a wire.
 
-**Cancel** button cancels operation. 
+**Cancel** button cancels the operation. 
 
 **TUI Command**:  *model.addWire(Part_doc, Shapes)*
 
@@ -36,7 +36,7 @@ Select one or several edges in viewer. For automatic selection of closed contour
 Result
 """"""
 
-The result of the operation will be a wire created from selected shapes:
+The result of the operation will be a wire created from the selected shapes:
 
 .. image:: images/CreateWire.png
   :align: center
@@ -44,4 +44,4 @@ The result of the operation will be a wire created from selected shapes:
 .. centered::
   Result of the operation.
 
-**See Also** a sample TUI Script of a :ref:`tui_create_wire` operation.
+**See Also** a sample TUI Script of :ref:`tui_create_wire` operation.

@@ -7,14 +7,14 @@ Sketch plug-in
 
 Sketch plug-in includes features for creation of 2D shapes.
 
-The process of sketch creation is comprised of:
+The sketch creation takes the following steps:
 
-- definition of sketch plane
-- creation of sketch objects from scratch
-- generation of sketch objects via operations on the existing operations
-- definition of constraints
+- definition of sketch plane;
+- creation of sketch objects from scratch;
+- generation of sketch objects via operations on the existing operations;
+- definition of constraints.
 
-Sketch could be created both in active part and a part set (if there is no active part).
+Sketch can be created in the active part or in a partset (if there is no active part).
 
 To create a Sketch:
 
@@ -27,21 +27,20 @@ To create a Sketch:
 .. centered::
    **Sketch**  button
 
-First define a plane on which to create a sketch:
+First define a plane for the sketch:
 
 .. image:: images/PlaneDefinition.png
    :align: center
 
-- specify plane size (equal to 25 in the example above)
-- then select the appropriate plane in the viewer
+- specify plane size (equal to 25 in the example above);
+- select the appropriate plane in the viewer.
 
-Note that in case if there are no convenient objects for plane selection are
-displayed in the viewer - coordinate planes will be suggested for selection:
+Note that coordinate planes will be suggested for selection if no convenient objects for plane selection are displayed in the viewer:
 
 .. image:: images/CoordinatePlanes.png
    :align: center
 
-After the plane for sketch is selected the following property panel will be opened:
+After the plane for sketch is selected, the following property panel will be opened:
 
 .. image:: images/SketchPanel.png
    :align: center
@@ -49,25 +48,25 @@ After the plane for sketch is selected the following property panel will be open
 .. centered::
   Sketch general panel
 
-- **Reversed** check box - allows reversing the sketch plane normal
-- **Set plane view** button - switches the viewer to the top view for the sketch plane
-- **Show geometrical constraints** check box - turns on/off geometrical constraints displaying
-- **Show dimensional constraints** check box - turns on/off dimensional constraints displaying
-- **Show existing expressions** check box - turns on/off expressions displaying
+- **Reversed** check box - allows reversing the sketch plane normal;
+- **Set plane view** button - switches the viewer to the top view for the sketch plane;
+- **Show geometrical constraints** check box - displays/hides geometrical constraints:
+- **Show dimensional constraints** check box - displays/hides dimensional constraints; 
+- **Show existing expressions** check box - displays/hides expressions.
 
-Now it is possible:
+Now it is possible to:
 
 - create :ref:`sketch objects <sketch_objects>`
 - create :ref:`constraints <sketch_constraints>`
 - perform :ref:`sketch operations <sketch_operations>`
 
-To apply or cancel sketch creation use apply and cancel buttons from the
+To apply or cancel sketch creation use Apply and Cancel buttons from the
 Sketch panel as well as equivalent buttons from Sketch toolbar.
 
-The Result of operation will be a COMPOUND. Result node in the object tree is located in
+The Result of operation will be a COMPOUND. In the object tree, Result node is located in
 **Constructions** folder.
 
-Name is assigned automatically: **Sketch_1**, **Sketch_2**, ... both for Feature and Result.
+The Name is assigned automatically: **Sketch_1**, **Sketch_2**, ... both for Feature and Result.
 
 **TUI Command**:  *Sketch_1 = model.addSketch(PartOrPartSet, plane)*
 
@@ -96,7 +95,7 @@ Constraints
 
 Constraints are available and viewable during sketch creation or editing.
 
-The goal of constrains creation is to fix a sketch geometry, i.e. set degrees of freedom to zero.
+The goal of constraints creation is to fix sketch geometry, i.e. set degrees of freedom to zero.
 
 If all degrees of freedom are eliminated, the sketch is fixed and displayed with green color.
 
@@ -140,6 +139,7 @@ The plug-in includes the following constraints:
 
 Operations
 ----------
+Operations modify existing features of the sketch or create new ones by copying them.
 
 The plug-in includes the following operations:
 

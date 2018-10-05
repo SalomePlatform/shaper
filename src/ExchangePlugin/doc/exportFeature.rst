@@ -2,9 +2,9 @@
 Export
 ======
 
-The feature export allows to export objects from the current study to an external file.
+The  export feature allows exporting objects from the current study to an external file.
 
-It is possible to export objects into files in following formats: BREP, STEP, IGES, XAO. To export objects to a file:
+It is possible to export objects to files in the following formats: BREP, STEP, IGES, XAO. To export objects to a file:
 
 #. select in the Main Menu *Part - > Export* item  or
 #. click **Export** button in the toolbar.
@@ -23,7 +23,7 @@ The following property panel will be opened:
 .. centered::
    **Export property panel**
 
-In this panel it is necessary to select desirable format of export file. It can be **'BREP, STEP, IGES'** or **'XAO'**. In case of first choice the format of exported file will be defined according to file extension. File name and path can be defined in **Export file** field. It can be typed or browsed with help of **'...'** button which opens **Export file** dialog box:
+In this panel, it is necessary to select desirable format of export file. It can be **'BREP, STEP, IGES'** or **'XAO'**. In case of first choice the format of exported file will be defined according to file extension. The file name and path can be defined in **Export file** field by direct input or browsing with **'...'** button, which opens **Export file** dialog box:
 
 .. image:: images/ExportFileDlg.png
    :align: center
@@ -31,11 +31,11 @@ In this panel it is necessary to select desirable format of export file. It can 
 .. centered::
    **Export file dialog box**
 
-Selection list in property panel should contain a list of exporting objects which can be selected in a viewer or objects browser.
+Selection list in the property panel contains a list of exported objects which can be selected in a viewer or object browser.
 
 **Apply** button exports the file.
   
-**Cancel** button cancels operation.
+**Cancel** button cancels the operation.
 
 **TUI Command**: *model.exportToFile(Part_doc, FileNameString, ObjectsList)*
 
@@ -44,6 +44,6 @@ Selection list in property panel should contain a list of exporting objects whic
 Result
 """"""
 
-The Result of operation is exported file. There are no any changes in object browser or viewer.
+The Result of operation is an exported file.
 
-**See Also** a sample TUI Script of a :ref:`tui_export_file` operation.
+**See Also** a sample TUI Script of :ref:`tui_export_file` operation.

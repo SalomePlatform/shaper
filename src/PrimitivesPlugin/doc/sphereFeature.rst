@@ -2,7 +2,7 @@
 Sphere
 ======
 
-The feature Sphere creates a sphere solid.
+Sphere feature creates a sphere solid.
 
 To create a Sphere in the active part:
 
@@ -25,7 +25,7 @@ The following property panel appears.
    
 Input fields:
 
-- **Point** defines center of the sphere selected in 3D OCC  viewer or object browser; 
+- **Point** defines the center of the sphere selected in 3D OCC  viewer or object browser; 
 - **Radius** defines the radius.
   
 **TUI Command**: *model.addSphere(Part_doc, Point, Radius)*.
@@ -35,7 +35,7 @@ Input fields:
 Result
 """"""
 
-Example is shown below.
+An example is shown below.
 
 .. image:: images/Sphere_res.png
 	   :align: center
@@ -43,4 +43,4 @@ Example is shown below.
 .. centered::
    Sphere created  
 
-**See Also** a sample TUI Script of a :ref:`tui_create_sphere` operation.
+**See Also** a sample TUI Script of :ref:`tui_create_sphere` operation.

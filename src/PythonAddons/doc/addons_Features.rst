@@ -2,18 +2,18 @@
 Python addons
 =============
 
-User can create his own custom features.
+It is possible to create custom features.
 
-Corresponding folder should be created for each feature at *../sources/src/PythonAddons/macros*.
+The corresponding folder should be created for each feature at *../sources/src/PythonAddons/macros*.
 
-Feature description includes 4 files:
+A feature description includes 4 files:
 
-- widget.xml with description of property panel,
+- widget.xml with a description of the property panel,
 -  __init__.py,
 - feature.py with python commands, 
-- icon.png with image of button in toolbar (file is located at sub-folder /icons).
+- icon.png with image of button in the toolbar (the file is located at sub-folder /icons).
 
-Two examples of custom features already created are:
+Two examples of already created custom features are:
 
 .. toctree::
    :titlesonly:

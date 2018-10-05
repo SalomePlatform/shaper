@@ -2,9 +2,9 @@
 Arc
 ===
 
-The feature Arc creates an arc segment in the current Sketch.
+Arc feature creates an arc segment in the current Sketch.
 
-To add new Arc to the Sketch:
+To add a new Arc to the Sketch:
 
 #. select in the Main Menu *Sketch - > Arc* item  or
 #. click **Arc** button in Sketch toolbar:
@@ -19,11 +19,11 @@ There are 3 algorithms for creation of an Arc:
 
 .. image:: images/arc_base_32x32.png
    :align: left
-**By center and two points** creates an arc segment with the given center passing from the start point to the end point on the circumference.
+**By center and two points** creates an arc segment with the given center passing from the start point to the end point on the circle.
 
 .. image:: images/arc_3pt_32x32.png
    :align: left
-**By three points** creates an arc segment passing from the start point to end point through another point on the circumference.
+**By three points** creates an arc segment passing from the start point to end point through another point on the circle.
 
 .. image:: images/arc_tang_32x32.png
    :align: left
@@ -69,8 +69,8 @@ By tangent point and point
 .. image:: images/Arc_panel_tang.png
    :align: center
 
-Select point on segement in the view to set the tangent point, then move the mouse and click to set the end point.
-Tangent point by itself is a start point. The edge on which it lies will be tangent to the arc.
+Select a point on segment in the view to set the tangent point, then move the mouse and click to set the end point.
+The tangent point by itself is a start point. The edge on which it lies will be tangent to the arc.
 
 - When entering a tangent point by selecting a point on segment, a Tangent constraint is created.
 - When entering an end point by selecting a segment, a Coincident constraint is created.
@@ -91,4 +91,4 @@ Created arc appears in the view.
 .. centered::
    Circle created
 
-**See Also** a sample TUI Script of a :ref:`tui_create_arc` operation.
+**See Also** a sample TUI Script of :ref:`tui_create_arc` operation.

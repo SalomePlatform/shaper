@@ -3,9 +3,9 @@
 Coincident constraint
 =====================
 
-Coincident constraint makes two points to be coincident, or one point to lie on a line or circumference of a circle (or an arc).
+Coincident constraint forces two points to be coincident, or one point to lie on a line, a circle or an arc.
 
-To create Coincident in the active Sketch:
+To create a Coincident constraint in the active Sketch:
 
 #. select in the Main Menu *Sketch - > Coincident* item  or
 #. click **Coincident** button in Sketch toolbar:
@@ -28,7 +28,7 @@ Input fields:
 
 Note that one of two objects should be a point (i.e. a point, a line or an arc end point, a center of a circle or an arc).
 
-After the objects are selected the point becomes yellow colored in the view.
+After the objects are selected, the point is highlighted in yellow in the view.
 
 **TUI Command**: *Sketch_1.setCoincident(Object1, Object2)*
 
@@ -43,6 +43,6 @@ Created Coincident constraint appears in the view.
 	   :align: center
 
 .. centered::
-   Coincident constraint created
+   Created coincident constraint
 
-**See Also** a sample TUI Script of a :ref:`tui_create_coincident` operation.
+**See Also** a sample TUI Script of :ref:`tui_create_coincident` operation.

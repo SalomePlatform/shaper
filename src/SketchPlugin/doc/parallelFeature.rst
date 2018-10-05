@@ -2,9 +2,9 @@
 Parallel constraint
 ===================
 
-Parallel constraint fixes two lines to lie parallel to one another.
+Parallel constraint fixes two lines as parallel to one another.
 
-To create Parallel in the active Sketch:
+To create a Parallel constraint in the active Sketch:
 
 #. select in the Main Menu *Sketch - > Parallel* item  or
 #. click **Parallel** button in Sketch toolbar:
@@ -40,6 +40,6 @@ Created Parallel constraint appears in the view.
 	   :align: center
 
 .. centered::
-   Parallel constraint created
+   Created parallel constraint
 
-**See Also** a sample TUI Script of a :ref:`tui_create_parallel` operation.
+**See Also** a sample TUI Script of :ref:`tui_create_parallel` operation.

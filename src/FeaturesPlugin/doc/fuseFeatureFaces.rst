@@ -2,9 +2,9 @@
 Fuse Faces
 ==========
 
-The feature **Fuse Faces** eliminates the edges between adjacent same-domain faces lying on the same geometrical surface. This feature is useful for processing the results of **Fuse**, **Union** or **Partition** operations.
+**Fuse Faces** feature eliminates the edges between adjacent same-domain faces lying on the same geometrical surface. This feature is useful for processing the results of **Fuse**, **Union** or **Partition** operations.
 
-To perform operation **Fuse Faces** in the active part:
+To perform **Fuse Faces** in the active part:
 
 #. select in the Main Menu *Features - > Fuse Faces* item  or
 #. click **Fuse Faces** button in the toolbar
@@ -25,7 +25,7 @@ The following property panel appears:
 
 Input fields:  
 
-- **Shape** contains object selected in the Object Browser or in the Viewer, on which faces will be fused.
+- **Shape** - contains object selected in the Object Browser or in the Viewer, on which faces will be fused.
 
 **TUI Command**:  *model.addFusionFaces(Part_doc, shape)*
 
@@ -42,4 +42,4 @@ The Result of the operation will be a shape with eliminated edges:
 .. centered::
    Shape before and after operation **Fuse Faces**
 
-**See Also** a sample TUI Script of a :ref:`tui_create_fuse_faces` operation.
+**See Also** a sample TUI Script of :ref:`tui_create_fuse_faces` operation.

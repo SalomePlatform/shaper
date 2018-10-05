@@ -4,6 +4,8 @@
 Build plug-in
 =============
 
+Build plug-in includes features for creation of various topological entities. It provides the following features:
+
 .. toctree::
    :titlesonly:
    :maxdepth: 1

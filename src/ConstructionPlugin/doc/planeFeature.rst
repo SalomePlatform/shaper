@@ -2,9 +2,9 @@
 Plane
 =====
 
-The feature Plane creates a new constructive plane.
+Plane feature creates a new constructive plane.
 
-Plane is a construction object and it can be created as in a part as in a part set. To create a plane:
+Plane is a construction object that can be created in a part or in a partset. To create a plane:
 
 #. select in the Main Menu *Construction - > Plane* item  or
 #. click **Point** button in the toolbar
@@ -43,7 +43,7 @@ By three points
 .. centered::
    **By three points**
 
-In this case user has to select three points in a viewer to define a new plane.
+A plane is created by selecting three points in a viewer.
 
 **TUI Commands**: *model.addPlane(Part_doc, model.selection("VERTEX", "Box_1_1/Back&Box_1_1/Left&Box_1_1/Top"), model.selection("VERTEX", "Box_1_1/Front&Box_1_1/Right&Box_1_1/Top"), model.selection("VERTEX", "Box_1_1/Front&Box_1_1/Left&Box_1_1/Bottom"))*
 
@@ -60,7 +60,7 @@ The Result of the operation will be a plane:
 .. centered::
    **A plane by three points**
 
-**See Also** a sample TUI Script of a :ref:`tui_create_plane_points` operation.
+**See Also** a sample TUI Script of :ref:`tui_create_plane_points` operation.
 
 
 By line and point
@@ -72,7 +72,7 @@ By line and point
 .. centered::
    **Line and point**
 
-In this case user has to select a linear edge and point to define a plane. It is possible to make the new plane perpendicular to the selected edge.
+A plane is created by selecting  a linear edge and point. It is possible to create a new plane perpendicular to the selected edge.
 
 **TUI Commands**: *model.addPlane(Part_doc, model.selection("EDGE", "Box_1_1/Left&Box_1_1/Top"), model.selection("VERTEX", "Box_1_1/Front&Box_1_1/Right&Box_1_1/Bottom"), False)*
 
@@ -89,7 +89,7 @@ The Result of the operation will be a plane:
 .. centered::
    Plane created  
 
-**See Also** a sample TUI Script of a :ref:`tui_create_plane_line` operation.
+**See Also** a sample TUI Script of :ref:`tui_create_plane_line` operation.
 
 
 By other plane
@@ -101,7 +101,7 @@ By other plane
 .. centered::
    **By other plane**
 
-In this case user has to select an already existing plane (planar face). There are following possibilities to define a new plane:
+A plane is created by selecting an already existing plane (planar face). There are following possibilities to define a new plane:
 
 .. image:: images/plane_by_distance_from_other_24x24.png
    :align: left
@@ -111,12 +111,12 @@ By distance from the selected plane.
 .. image:: images/plane_by_coincident_to_point_24x24.png
    :align: left
 
-By coincidence to a point.
+By coincidence with a point.
 
 .. image:: images/plane_by_rotation_24x24.png
    :align: left
 
-By rotation around an edge on a specified angle.
+By rotation around an edge by a specified angle.
 
 **TUI Commands**: *model.addPlane(Part_doc, model.selection("FACE", "Box_1_1/Front"), 10, False)*
 
@@ -133,7 +133,7 @@ The Result of the operation will be a plane parallel to already existing one:
 .. centered::
    **Plane parallel to a planar face**
 
-**See Also** a sample TUI Script of a :ref:`tui_create_plane_plane` operation.
+**See Also** a sample TUI Script of :ref:`tui_create_plane_plane` operation.
 
 
 By two parallel planes
@@ -145,7 +145,7 @@ By two parallel planes
 .. centered::
    **By two parallel planes**
 
-In this case user has to select two parallel planes. A new plane will be defined between them.
+A plane is created by selecting two parallel planes. A new plane will be defined between them.
 
 **TUI Commands**: *model.addPlane(Part_doc, model.selection("FACE", "Box_1_1/Left"), model.selection("FACE", "Box_1_1/Right"))*
 
@@ -162,4 +162,4 @@ The Result of the operation will be a plane created between two selected planes:
 .. centered::
    **Plane created between others**
 
-**See Also** a sample TUI Script of a :ref:`tui_create_plane_parallel` operation.
+**See Also** a sample TUI Script of :ref:`tui_create_plane_parallel` operation.

@@ -2,9 +2,9 @@
 Scale
 =====
 
-The feature **Scale** makes a scaled shape basing on the initial shape.
+**Scale** feature makes a scaled shape basing on the initial shape.
 
-To create Scale in the active part:
+To create a Scale in the active part:
 
 #. select in the Main Menu *Features - > Scale* item  or
 #. click **Scale** button in the toolbar
@@ -57,7 +57,7 @@ Result of operation is transformed initial shape shown in wireframe mode togethe
 .. centered::
    Scale by one common factor
 
-**See Also** a sample TUI Script of a :ref:`tui_Scale_common_factor` operation.  
+**See Also** a sample TUI Script of :ref:`tui_Scale_common_factor` operation.  
 
 Scale by different factors along axes
 -------------------------------------
@@ -91,4 +91,4 @@ Result of operation is transformed initial shape.
 .. centered::
    Scale by different factors
 
-**See Also** a sample TUI Script of a :ref:`tui_Scale_XYZ` operation.
+**See Also** a sample TUI Script of :ref:`tui_Scale_XYZ` operation.

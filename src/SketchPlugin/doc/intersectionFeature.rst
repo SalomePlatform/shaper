@@ -2,10 +2,10 @@
 Intersection
 ============
 
-| The Intersection operation creates intersection of a 3D edge and the sketch plane.
-| The result of intersection is a point.
+| The Intersection operation creates an intersection of a 3D edge and the sketch plane.
+| The result of the intersection is a point.
 
-To create Intersection in the active Sketch:
+To create an Intersection in the active Sketch:
 
 #. select in the Main Menu *Sketch - > Intersection* item  or
 #. click **Intersection** button in Sketch toolbar:
@@ -48,6 +48,6 @@ Created Intersection appears in the view.
 	   :align: center
 
 .. centered::
-   Intersection created (purple point)
+   Created intersection (purple point)
 
-**See Also** a sample TUI Script of a :ref:`tui_create_intersection` operation.
+**See Also** a sample TUI Script of :ref:`tui_create_intersection` operation.

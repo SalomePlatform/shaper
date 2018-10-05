@@ -2,7 +2,7 @@
 Cone
 ====
 
-The feature Cone creates a cone solid.
+Cone feature creates a cone solid.
 
 To create a Cone in the active part:
 
@@ -25,7 +25,7 @@ The following property panel appears.
 
 Input fields:
 
-- **Point** defines center of the cone base selected in 3D OCC  viewer or object browser; 
+- **Point** defines the center of the cone base selected in 3D OCC  viewer or object browser; 
 - **Vector** defines the axis of the cone selected in 3D OCC  viewer or object browser;
 - Dimensions:      
    - **Base Radius**;
@@ -49,4 +49,4 @@ If the radii are equal, the Cylinder will be created instead of cone.
 .. centered::
    Cone created  
 
-**See Also** a sample TUI Script of a :ref:`tui_create_cone` operation.
+**See Also** a sample TUI Script of :ref:`tui_create_cone` operation.

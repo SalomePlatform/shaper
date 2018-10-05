@@ -2,9 +2,9 @@
 Interpolation
 =============
 
-The Interpolation feature creates curve (wire) using already existing vertices in other objects.
+Interpolation feature creates a curve (wire) using vertices already existing in other objects.
 
-To create interpolation in the active part:
+To create an interpolation in the active part:
 
 #. select in the Main Menu *Build - > Interpolation* item  or
 #. click **Interpolation** button in the toolbar
@@ -23,17 +23,17 @@ The following property panel will be opened:
 .. centered::
   Create an interpolation
 
-Select one or several vertices or points in a viewer.
+Select one or several vertices or points in the viewer.
 
 - **Closed** makes the interpolation curve closed.
 
-- **Reorder** reorders selected points to minimize length of the curve.
+- **Reorder** reorders the selected points to minimize the length of curve.
 
-- **Tangents** makes start and end of the curve tangent to selected edges. User has to select edges for start and end in corresponded fields.
+- **Tangents** makes start and end of the curve tangent to the selected edges. The user has to select start and end edges in the corresponding fields.
 
 **Apply** button creates an interpolation.
 
-**Cancel** button cancels operation. 
+**Cancel** button cancels the operation. 
 
 **TUI Command**:
 
@@ -48,7 +48,7 @@ Select one or several vertices or points in a viewer.
 Result
 """"""
 
-The result of the operation will be a curve created from selected shapes:
+The result of the operation will be a curve created from the selected shapes:
 
 .. image:: images/CreateInterpolation.png
   :align: center
@@ -56,4 +56,4 @@ The result of the operation will be a curve created from selected shapes:
 .. centered::
   Result of the operation.
 
-**See Also** a sample TUI Script of a :ref:`tui_create_interpolation` operation.
+**See Also** a sample TUI Script of :ref:`tui_create_interpolation` operation.

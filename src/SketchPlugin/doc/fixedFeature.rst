@@ -6,7 +6,7 @@ Fixed constraint fixes objects position and size.
 
 The constraint can be defined for such objects as point, line, line or arc end point, center of circle or arc, whole circle or arc.
 
-To create Fixed constraint in the active Sketch:
+To create a Fixed constraint in the active Sketch:
 
 #. select in the Main Menu *Sketch - > Fixed* item  or
 #. click **Fixed** button in Sketch toolbar:
@@ -26,7 +26,7 @@ Input fields:
 
 - **Object** is the object selected in the view.
 
-After the object is selected anchor sign will be added close to it in the view.
+After the object is selected, anchor sign will be added next to it in the view.
 
 Selection rules:
 
@@ -47,6 +47,6 @@ Created Fixed constraint appears in the view.
 	   :align: center
 
 .. centered::
-   Fixed constraint created
+   Created fixed constraint 
 
-**See Also** a sample TUI Script of a :ref:`tui_create_fixed` operation.
+**See Also** a sample TUI Script of :ref:`tui_create_fixed` operation.

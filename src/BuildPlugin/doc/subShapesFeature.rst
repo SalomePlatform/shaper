@@ -2,10 +2,10 @@
 Sub-shapes
 ==========
 
-The feature **Sub-shapes** lets to modify selected entity creating a non-manifold topology. It provides:
+The feature **Sub-shapes** modifies the selected entity by creating a non-manifold topology. It gives the possibility to:
 
-* add/remove vertices laying on edges of a wire;
-* add/remove edges and vertices laying on a face.
+* add/remove vertices lying on edges of a wire;
+* add/remove edges and vertices lying on a face.
 
 To create Sub-shapes in the active part:
 
@@ -28,8 +28,8 @@ The following property panel appears.
 
 Input fields:
 
-- **Shape** panel contains a shape to be modified. Shape is selected in 3D OCC viewer or object browser. For today it has to be wire or face;
-- **Sub-shapes** panel contains list of sub-shapes which are already included into result. A sub-shape can be deleted from the list or the list can be extended with new shapes selected in the view.
+- **Shape** panel contains the shape to be modified. The shape is selected in 3D OCC viewer or object browser. For today it has to be a wire or a face;
+- **Sub-shapes** panel contains the list of sub-shapes which are already included into result. A sub-shape can be deleted from the list or the list can be extended with new shapes selected in the view.
 
 **TUI Command**:  *model.addSubShapes(Part_doc, shape, sub-shapes)*
 
@@ -37,7 +37,7 @@ Input fields:
 
 Result
 """"""
-Result replaces original shape with the same one with added/removed sub-shapes.
+The result replaces the original shape with its copy with added/removed sub-shapes.
 
 .. image:: images/CreateSubShapes.png
    :align: center
@@ -45,7 +45,7 @@ Result replaces original shape with the same one with added/removed sub-shapes.
 .. centered::
    Sub-shapes
 
-**See Also** a sample TUI Script of a :ref:`tui_create_subshape` operation.
+**See Also** a sample TUI Script of :ref:`tui_create_subshape` operation.
 
 
   

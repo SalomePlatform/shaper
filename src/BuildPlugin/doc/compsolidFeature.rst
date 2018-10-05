@@ -2,9 +2,9 @@
 CompSolid
 =========
 
-The Compsolid feature creates a compsolid using already existing shapes in other objects.
+Compsolid feature creates a compsolid using shapes already existing in other objects.
 
-To create compsolid in the active part:
+To create a compsolid in the active part:
 
 #. select in the Main Menu *Build - > CompSolid* item  or
 #. click **CompSolid** button in the toolbar
@@ -23,11 +23,11 @@ The following property panel will be opened:
 .. centered::
   Create a compsolid
 
-Select one or several shapes in a viewer.
+Select one or several shapes in the viewer.
 
-**Apply** button creates compsolid.
+**Apply** button creates a compsolid.
 
-**Cancel** button cancels operation. 
+**Cancel** button cancels the operation. 
 
 **TUI Command**:  *model.addCompSolid(Part_doc, Shapes)*
 
@@ -44,4 +44,4 @@ The result of the operation will be a compsolid created from the selected shapes
 .. centered::
   Result of the operation.
 
-**See Also** a sample TUI Script of a :ref:`tui_create_compsolid` operation.
+**See Also** a sample TUI Script of :ref:`tui_create_compsolid` operation.

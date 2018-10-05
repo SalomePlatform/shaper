@@ -2,9 +2,9 @@
 Compound
 ========
 
-The Compound feature creates a compound using already existing shapes in other objects.
+Compound feature creates a compound using shapes already existing in other objects.
 
-To create compound in the active part:
+To create a compound in the active part:
 
 #. select in the Main Menu *Build - > Compound* item  or
 #. click **Compound** button in the toolbar
@@ -23,20 +23,20 @@ The following property panel will be opened:
 .. centered::
   Create a compound
 
-Select one or several shapes in a viewer. Selected shapes can be of any type (vertex, edge, face and so on).
+Select one or several shapes in the viewer. The selected shapes can be of any type (vertex, edge, face, etc.)
 
-**Apply** button creates compound.
+**Apply** button creates a compound.
 
-**Cancel** button cancels operation. 
+**Cancel** button cancels the operation. 
 
 **TUI Command**:  *model.addCompound(Part_doc, Shapes)*
 
-**Arguments**:   Part document + list of shapes.
+**Arguments**:   Part document + a list of shapes.
 
 Result
 """"""
 
-The result of the operation will be a compound created from selected shapes:
+The result of the operation will be a compound created from the selected shapes:
 
 .. image:: images/CreateCompound.png
   :align: center
@@ -44,4 +44,4 @@ The result of the operation will be a compound created from selected shapes:
 .. centered::
   Result of the operation.
 
-**See Also** a sample TUI Script of a :ref:`tui_create_compound` operation.
+**See Also** a sample TUI Script of :ref:`tui_create_compound` operation.
