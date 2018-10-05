@@ -28,7 +28,7 @@ SHAPER module works with one study containing several documents:
 - partset
 - one or several parts.
 
-Only one document can be active.
+Only one document can be active. In complicated models partset consists of several parts. Parts in partset may be copied, positioned relatively to each other, or simply translated.
   
 A new study contains only a partset with 7 default constructions, which cannot be deleted:
   
