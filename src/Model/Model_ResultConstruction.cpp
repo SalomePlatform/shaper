@@ -316,7 +316,7 @@ std::string fullName(CompositeFeaturePtr theComposite, const TopoDS_Shape& theSu
         aRefs.Add(anID);
         aSubNames[anID] = Model_SelectionNaming::shortName(aBestConstr);
         if (aShapeType != TopAbs_EDGE) { // face needs the sub-edges on sub-labels
-                                         // add edges to sub-label to support naming for edges selection
+          // add edges to sub-label to support naming for edges selection
           int anOrient = Model_SelectionNaming::edgeOrientation(theSubShape, anOrig);
           anOrientations[anID] = anOrient;
         }
