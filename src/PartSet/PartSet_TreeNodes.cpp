@@ -128,6 +128,8 @@ QVariant PartSet_ObjectNode::data(int theColumn, int theRole) const
     case 2:
       if (isCurrentFeature(myObject))
         return QIcon(":pictures/arrow.png");
+      else
+        return QIcon();
     }
   }
   return PartSet_TreeNode::data(theColumn, theRole);
@@ -442,6 +444,10 @@ QVariant PartSet_FolderNode::data(int theColumn, int theRole) const
   }
   if ((theColumn == 2) && (theRole == Qt::DecorationRole)) {
     if (document().get()) {
+      SessionPtr aSession = ModelAPI_Session::get();
+      if (document() != aSession->activeDocument())
+          return QIcon();
+
       FeaturePtr aFeature = document()->currentFeature(true);
       if (!aFeature.get()) { // There is no current feature
         ModuleBase_ITreeNode* aLastFolder = 0;
@@ -453,6 +459,8 @@ QVariant PartSet_FolderNode::data(int theColumn, int theRole) const
         }
         if (aLastFolder == this)
           return QIcon(":pictures/arrow.png");
+        else
+          return QIcon();
       }
     }
   }
@@ -926,12 +934,22 @@ QVariant PartSet_PartRootNode::data(int theColumn, int theRole) const
     case Qt::DecorationRole:
       return ModuleBase_IconFactory::get()->getIcon(myObject);
     }
+  case 2:
+    if (theRole == Qt::DecorationRole) {
+      if (isCurrentFeature(myObject))
+        return QIcon(":pictures/arrow.png");
+      else
+        return QIcon();
+    }
   }
   return PartSet_TreeNode::data(theColumn, theRole);
 }
 
 Qt::ItemFlags PartSet_PartRootNode::flags(int theColumn) const
 {
+  if (myObject->isDisabled())
+    return (theColumn == 2) ? Qt::ItemIsSelectable : aNullFlag;
+
   SessionPtr aSession = ModelAPI_Session::get();
   DocumentPtr aActiveDoc = aSession->activeDocument();
   if ((aActiveDoc == document()) || (myObject->document() == aActiveDoc))

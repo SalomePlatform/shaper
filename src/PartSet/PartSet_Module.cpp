@@ -1447,6 +1447,7 @@ void PartSet_Module::processEvent(const std::shared_ptr<Events_Message>& theMess
     //  aTreeView->setExpanded(myActivePartIndex, false);
 
     XGUI_DataModel* aDataModel = aWorkshop->objectBrowser()->dataModel();
+    QModelIndex aOldActive = myActivePartIndex;
     myActivePartIndex = aDataModel->documentRootIndex(aActiveDoc, 0);
     bool needUpdate = false;
     if (myActivePartIndex.isValid()) {
@@ -1454,6 +1455,8 @@ void PartSet_Module::processEvent(const std::shared_ptr<Events_Message>& theMess
       if (!needUpdate)
         aTreeView->setExpanded(myActivePartIndex, true);
     }
+    if ((aOldActive != myActivePartIndex) && (aOldActive.isValid()))
+      aTreeView->setExpanded(aOldActive, false);
 
     aLabel->setPalette(aPalet);
     aWorkshop->updateCommandStatus();
