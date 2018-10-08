@@ -222,7 +222,6 @@ bool ModuleBase_WidgetMultiSelector::storeValueCustom()
   std::string aType = anAttribute->attributeType();
   if (aType == ModelAPI_AttributeSelectionList::typeId()) {
     AttributeSelectionListPtr aSelectionListAttr = myFeature->data()->selectionList(attributeID());
-    int aa = aSelectionListAttr->size();
     std::string aMode = myTypeCtrl->textValue().toStdString();
     if (myTypeCtrl->isVisible() && myIsFirst && (!myDefMode.empty()))
       aMode = myDefMode;

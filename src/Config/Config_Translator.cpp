@@ -201,7 +201,7 @@ void Config_Translator::saveMissedTranslations()
   std::ofstream oFStream;
 
   // Delete old file
-  int aa = remove(aFile.c_str());
+  remove(aFile.c_str());
 
   oFStream.open(aFile, std::ofstream::out | std::ofstream::app);
   if (oFStream.is_open()) {

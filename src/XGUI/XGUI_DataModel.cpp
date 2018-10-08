@@ -269,7 +269,6 @@ int XGUI_DataModel::columnCount(const QModelIndex& theParent) const
 //******************************************************
 QModelIndex XGUI_DataModel::index(int theRow, int theColumn, const QModelIndex &theParent) const
 {
-  int aa = theParent.row();
   ModuleBase_ITreeNode* aParentNode = (theParent.isValid()) ?
     (ModuleBase_ITreeNode*)theParent.internalPointer() : myRoot;
   ModuleBase_ITreeNode* aSubNode = aParentNode->subNode(theRow);

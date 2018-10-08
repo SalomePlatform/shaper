@@ -162,7 +162,6 @@ void ModuleBase_ParamSpinBox::setValue(double value)
 
 double ModuleBase_ParamSpinBox::value() const
 {
-  std::string aa = lineEdit()->text().toStdString();
   return lineEdit()->text().toDouble();
 }
 
