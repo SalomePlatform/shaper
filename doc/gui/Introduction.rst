@@ -411,6 +411,7 @@ Parameters
 Model parametrization can be done using parameters.
 
 A parameter can be created in the active partset or part by:
+
 - :ref:`parameter`;
 - :ref:`parameters`;
 - :ref:`parameter_expression`.
