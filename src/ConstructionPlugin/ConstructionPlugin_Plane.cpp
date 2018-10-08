@@ -45,6 +45,7 @@
 #include <ModelAPI_Session.h>
 #include <ModelAPI_Validator.h>
 
+
 static GeomShapePtr faceByThreeVertices(const std::shared_ptr<GeomAPI_Vertex> theV1,
                                         const std::shared_ptr<GeomAPI_Vertex> theV2,
                                         const std::shared_ptr<GeomAPI_Vertex> theV3);
@@ -180,7 +181,9 @@ std::shared_ptr<GeomAPI_Shape> ConstructionPlugin_Plane::createByGeneralEquation
            aC = anAttrC->value(), aD = anAttrD->value();
     std::shared_ptr<GeomAPI_Pln> aPlane =
       std::shared_ptr<GeomAPI_Pln>(new GeomAPI_Pln(aA, aB, aC, aD));
-    double aSize = Config_PropManager::integer(SKETCH_TAB_NAME, "planes_size");
+    double aSize = Config_PropManager::real(SKETCH_TAB_NAME, "planes_size");
+    if (aSize <= 1.e-7)
+      aSize = 200;  // Set default value
     aSize *= 4.;
     aPlaneFace = GeomAlgoAPI_FaceBuilder::squareFace(aPlane, aSize);
   }

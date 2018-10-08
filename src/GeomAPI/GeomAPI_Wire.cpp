@@ -106,6 +106,9 @@ bool GeomAPI_Wire::isRectangle(std::list<GeomPointPtr>& thePoints) const
     gp_Pnt aStart = aC3D->Value(aT1);
     gp_Pnt aEnd = aC3D->Value(aT2);
 
+    if (aStart.Distance(aEnd) <= Precision::Confusion())
+      return false;
+
     // check the edge is orthogonal to the previous
     gp_XYZ aCurDir = (aEnd.XYZ() - aStart.XYZ()).Normalized();
     if (aPrevDir.Dot(aCurDir) < Precision::Confusion())

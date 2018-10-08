@@ -147,12 +147,15 @@ AISObjectPtr PartSet_PreviewPlanes::createPreviewPlane(std::shared_ptr<GeomAPI_P
                                                        std::shared_ptr<GeomAPI_Dir> theNorm,
                                                        const int theRGB[3])
 {
-  double aSize = Config_PropManager::integer(SKETCH_TAB_NAME, "planes_size");
+  double aSize = Config_PropManager::real(SKETCH_TAB_NAME, "planes_size");
+  if (aSize <= Precision::Confusion())
+    aSize = 200;   // Set default value
+
   std::shared_ptr<GeomAPI_Shape> aFace =
     GeomAlgoAPI_FaceBuilder::squareFace(theOrigin, theNorm, aSize);
   AISObjectPtr aAIS = AISObjectPtr(new GeomAPI_AISObject());
   aAIS->createShape(aFace);
-  aAIS->setWidth(Config_PropManager::integer(SKETCH_TAB_NAME, "planes_thickness"));
+  aAIS->setWidth(Config_PropManager::real(SKETCH_TAB_NAME, "planes_thickness"));
   aAIS->setColor(theRGB[0], theRGB[1], theRGB[2]);
   return aAIS;
 }

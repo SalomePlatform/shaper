@@ -93,7 +93,9 @@ void PartSet_PreviewSketchPlane::createSketchPlane(const CompositeFeaturePtr& th
           theSketch->data()->attribute(SketchPlugin_Sketch::NORM_ID()));
 
       double aFaceSize = myIsUseSizeOfView ? mySizeOfView
-        : Config_PropManager::integer(SKETCH_TAB_NAME, "planes_size");
+        : Config_PropManager::real(SKETCH_TAB_NAME, "planes_size");
+      if (aFaceSize <= Precision::Confusion())
+        aFaceSize = 200;   // Set default value
 
       myShape = GeomAlgoAPI_FaceBuilder::squareFace(
         myViewCentralPoint.get() ? myViewCentralPoint : anOrigin->pnt(), aNormal->dir(), aFaceSize);
