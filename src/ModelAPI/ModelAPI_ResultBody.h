@@ -116,7 +116,7 @@ public:
   /// Records the subshape newShape which was generated during a topological construction.
   /// As an example, consider the case of a face generated in construction of a box.
   MODELAPI_EXPORT virtual void generated(const std::shared_ptr<GeomAPI_Shape>& theNewShape,
-    const std::string& theName, const int theTag = 1);
+                                         const std::string& theName);
 
   /// Records the shape newShape which was generated from the shape oldShape during a topological
   /// construction. As an example, consider the case of a face generated from an edge in

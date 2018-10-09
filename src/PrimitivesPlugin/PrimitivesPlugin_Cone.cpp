@@ -145,26 +145,27 @@ void PrimitivesPlugin_Cone::loadNamingDS(std::shared_ptr<GeomAlgoAPI_Cone> theCo
   theConeAlgo->prepareNamingFaces();
 
   // Insert to faces
-  int num = 1;
   std::map< std::string, std::shared_ptr<GeomAPI_Shape> > listOfFaces =
       theConeAlgo->getCreatedFaces();
   int nbFaces = 0;
   for (std::map< std::string, std::shared_ptr<GeomAPI_Shape> >::iterator
        it=listOfFaces.begin(); it!=listOfFaces.end(); ++it) {
-    std::shared_ptr<GeomAPI_Shape> aFace = (*it).second;
-    theResultCone->generated(aFace, (*it).first, num++);
+    theResultCone->generated((*it).second, (*it).first);
     nbFaces++;
   }
 
   if (nbFaces == 2) {
     // Naming vertices
     GeomAPI_DataMapOfShapeShape aVertices;
-    GeomAPI_ShapeExplorer aVertExp(theConeAlgo->shape(), GeomAPI_Shape::VERTEX);
-    for(int anIndex = 1; aVertExp.more(); aVertExp.next()) {
+    int anIndex = 1;
+    for (GeomAPI_ShapeExplorer aVertExp(theConeAlgo->shape(), GeomAPI_Shape::VERTEX);
+         aVertExp.more();
+         aVertExp.next())
+    {
       if (!aVertices.isBound(aVertExp.current())) {
         std::ostringstream aStream;
         aStream<<"Vertex_"<<anIndex++;
-        theResultCone->generated(aVertExp.current(), aStream.str(), num++);
+        theResultCone->generated(aVertExp.current(), aStream.str());
         aVertices.bind(aVertExp.current(), aVertExp.current());
       }
     }

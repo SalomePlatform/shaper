@@ -94,13 +94,13 @@ void GDMLPlugin_ConeSegment::loadNamingDS(
   theConeSegmentAlgo->prepareNamingFaces();
 
   // Insert to faces
-  int num = 1;
   std::map< std::string, std::shared_ptr<GeomAPI_Shape> > listOfFaces =
     theConeSegmentAlgo->getCreatedFaces();
-  for (std::map< std::string, std::shared_ptr<GeomAPI_Shape> >::iterator
-       it=listOfFaces.begin(); it!=listOfFaces.end(); ++it) {
-    std::shared_ptr<GeomAPI_Shape> aFace = (*it).second;
-    theResultConeSegment->generated(aFace, (*it).first, num++);
+  for (std::map< std::string, std::shared_ptr<GeomAPI_Shape> >::iterator it = listOfFaces.begin();
+       it != listOfFaces.end();
+       ++it)
+  {
+    theResultConeSegment->generated((*it).second, (*it).first);
   }
 }
 

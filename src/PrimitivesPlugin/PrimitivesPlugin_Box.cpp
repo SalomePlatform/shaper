@@ -163,10 +163,11 @@ void PrimitivesPlugin_Box::loadNamingDS(std::shared_ptr<GeomAlgoAPI_Box> theBoxA
   int num = 1;
   std::map< std::string, std::shared_ptr<GeomAPI_Shape> > listOfFaces =
     theBoxAlgo->getCreatedFaces();
-  for (std::map< std::string, std::shared_ptr<GeomAPI_Shape> >::iterator
-       it=listOfFaces.begin(); it!=listOfFaces.end(); ++it) {
-    std::shared_ptr<GeomAPI_Shape> aFace = (*it).second;
-    theResultBox->generated(aFace, (*it).first, num++);
+  for (std::map< std::string, std::shared_ptr<GeomAPI_Shape> >::iterator it = listOfFaces.begin();
+       it != listOfFaces.end();
+       ++it)
+  {
+    theResultBox->generated((*it).second, (*it).first);
   }
 }
 

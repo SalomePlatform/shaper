@@ -184,12 +184,12 @@ void PrimitivesPlugin_Cylinder::loadNamingDS(std::shared_ptr<GeomAlgoAPI_Cylinde
   theCylinderAlgo->prepareNamingFaces();
 
   // Insert to faces
-  int num = 1;
   std::map< std::string, std::shared_ptr<GeomAPI_Shape> > listOfFaces =
     theCylinderAlgo->getCreatedFaces();
-  for (std::map< std::string, std::shared_ptr<GeomAPI_Shape> >::iterator
-       it=listOfFaces.begin(); it!=listOfFaces.end(); ++it) {
-    std::shared_ptr<GeomAPI_Shape> aFace = (*it).second;
-    theResultCylinder->generated(aFace, (*it).first, num++);
+  for (std::map< std::string, std::shared_ptr<GeomAPI_Shape> >::iterator it = listOfFaces.begin();
+       it != listOfFaces.end();
+       ++it)
+  {
+    theResultCylinder->generated((*it).second, (*it).first);
   }
 }

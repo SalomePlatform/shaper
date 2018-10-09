@@ -107,7 +107,7 @@ void BuildPlugin_Face::execute()
     int anEdgeIndex = 1;
     for(GeomAPI_ShapeExplorer anExp(aShape, GeomAPI_Shape::EDGE); anExp.more(); anExp.next()) {
       GeomShapePtr anEdge = anExp.current();
-      aResultBody->generated(anEdge, "Edge_" + std::to_string((long long)anEdgeIndex), anEdgeIndex);
+      aResultBody->generated(anEdge, "Edge_" + std::to_string((long long)anEdgeIndex));
       ++anEdgeIndex;
     }
 

@@ -99,9 +99,9 @@ std::shared_ptr<GeomAPI_Shape> ModelAPI_ResultBody::shape()
 }
 
 void ModelAPI_ResultBody::generated(const std::shared_ptr<GeomAPI_Shape>& theNewShape,
-  const std::string& theName, const int theTag)
+                                    const std::string& theName)
 {
-  myBuilder->generated(theNewShape, theName, theTag);
+  myBuilder->generated(theNewShape, theName);
 }
 
 void ModelAPI_ResultBody::generated(const std::shared_ptr<GeomAPI_Shape>& theOldShape,

@@ -133,7 +133,7 @@ void BuildPlugin_Interpolation::execute()
   int aVertexIndex = 1;
   for (GeomAPI_ShapeExplorer anExp(anEdge, GeomAPI_Shape::VERTEX); anExp.more(); anExp.next()) {
     std::string aVertexName = "Vertex_" + std::to_string((long long)aVertexIndex);
-    aResultBody->generated(anExp.current(), aVertexName, aVertexIndex++);
+    aResultBody->generated(anExp.current(), aVertexName);
   }
 
   setResult(aResultBody);

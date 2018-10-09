@@ -150,12 +150,12 @@ void FeaturesPlugin_Intersection::loadNamingDS(std::shared_ptr<ModelAPI_ResultBo
                                                       : aModifiedEdgeIndex++)),
           aTag++);
       } else {
-        theResultBody->generated(aSubShape,
+        theResultBody->generated(
+          aSubShape,
           std::string("Generated_")
             + (anIndex == 0 ? "Vertex_" : "Edge_")
             + std::to_string((long long)(anIndex == 0 ? aGeneratedVertexIndex++
-                                                      : aGeneratedEdgeIndex++)),
-          aTag++);
+                                                      : aGeneratedEdgeIndex++)));
       }
       aStoredShapes.bind(aSubShape, aSubShape);
     }

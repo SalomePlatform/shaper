@@ -44,8 +44,7 @@ static void storeSubShape(ResultBodyPtr theResultBody,
                           const GeomAPI_Shape::ShapeType theType,
                           const std::shared_ptr<GeomAPI_DataMapOfShapeShape> theMapOfSubShapes,
                           const std::string theName,
-                          int& theShapeIndex,
-                          int& theTag);
+                          int& theShapeIndex);
 
 //=================================================================================================
 void FeaturesPlugin_CompositeSketch::initCompositeSketchAttribtues(const int theInitFlags)
@@ -367,8 +366,8 @@ void FeaturesPlugin_CompositeSketch::storeGenerationHistory(ResultBodyPtr theRes
           if (anEdgesFromVertices.isBound(aGenerated)) // already here
             continue;
           std::ostringstream aStream;
-          aStream<<"Lateral_"<<theTag++;
-          theResultBody->generated(aGenerated, aStream.str(), theTag++);
+          aStream << "Lateral_" << theTag++;
+          theResultBody->generated(aGenerated, aStream.str());
 
           anEdgesFromVertices.bind(aGenerated, aVertExp.current());
           std::shared_ptr<GeomAPI_Edge> anEdge(new GeomAPI_Edge(aGenerated));
@@ -381,8 +380,8 @@ void FeaturesPlugin_CompositeSketch::storeGenerationHistory(ResultBodyPtr theRes
           if (!anEdgesFromVertices.isBound(anEdgesExp.current())) {
             // found a base edge
             std::ostringstream aStream;
-            aStream<<"Base_Edge_"<<theTag++;
-            theResultBody->generated(anEdgesExp.current(), aStream.str(), theTag++);
+            aStream << "Base_Edge_" << theTag++;
+            theResultBody->generated(anEdgesExp.current(), aStream.str());
             // only one orientation is needed
             anEdgesFromVertices.bind(anEdgesExp.current(), anEdgesExp.current());
           }
@@ -395,8 +394,8 @@ void FeaturesPlugin_CompositeSketch::storeGenerationHistory(ResultBodyPtr theRes
           if (!aVertices.isBound(aVertExp.current())) {
             // found a base edge
             std::ostringstream aStream;
-            aStream<<"Vertex_"<<theTag++;
-            theResultBody->generated(aVertExp.current(), aStream.str(), theTag++);
+            aStream << "Vertex_" << theTag++;
+            theResultBody->generated(aVertExp.current(), aStream.str());
             // only one orientation is needed
             aVertices.bind(aVertExp.current(), aVertExp.current());
           }
@@ -436,14 +435,14 @@ void FeaturesPlugin_CompositeSketch::storeGenerationHistory(ResultBodyPtr theRes
             }
             if (aNumEdges == 2 && aNumClosed == 1) {
               std::ostringstream aStream;
-              aStream<<"Base_Edge_"<<theTag++;
-              theResultBody->generated(aNotClosedEdge, aStream.str(), theTag++);
+              aStream << "Base_Edge_" << theTag++;
+              theResultBody->generated(aNotClosedEdge, aStream.str());
               if (aDegenerateEdge.get()) { // export vertex of the degenerated edge (apex) #2520
                 GeomAPI_ShapeExplorer anEdgeExp(aDegenerateEdge, GeomAPI_Shape::VERTEX);
                 if (anEdgeExp.more()) {
                   std::ostringstream aStream;
                   aStream << "Base_Vertex_" << theTag++;
-                  theResultBody->generated(anEdgeExp.current(), aStream.str(), theTag++);
+                  theResultBody->generated(anEdgeExp.current(), aStream.str());
                 }
               }
             }
@@ -513,16 +512,15 @@ void FeaturesPlugin_CompositeSketch::storeShapes(ResultBodyPtr theResultBody,
                     aShape->shapeType(),
                     theMapOfSubShapes,
                     aName,
-                    aShape->shapeType() == GeomAPI_Shape::EDGE ? aShapeIndex : aFaceIndex,
-                    theTag);
+                    aShape->shapeType() == GeomAPI_Shape::EDGE ? aShapeIndex : aFaceIndex);
     } else {
       std::string aName = theName + aShapeTypeStr;
       storeSubShape(theResultBody, aShape, aShapeTypeToExplore,
-                    theMapOfSubShapes, aName, aShapeIndex, theTag);
+                    theMapOfSubShapes, aName, aShapeIndex);
       if (theBaseShapeType == GeomAPI_Shape::WIRE) { // issue 2289: special names also for vertices
         aName = theName + "Vertex";
         storeSubShape(theResultBody, aShape, GeomAPI_Shape::VERTEX,
-                      theMapOfSubShapes, aName, aShapeIndex, theTag);
+                      theMapOfSubShapes, aName, aShapeIndex);
       }
     }
   }
@@ -533,8 +531,7 @@ void storeSubShape(ResultBodyPtr theResultBody,
                    const GeomAPI_Shape::ShapeType theType,
                    const std::shared_ptr<GeomAPI_DataMapOfShapeShape> theMapOfSubShapes,
                    const std::string theName,
-                   int& theShapeIndex,
-                   int& theTag)
+                   int& theShapeIndex)
 {
   for(GeomAPI_ShapeExplorer anExp(theShape, theType); anExp.more(); anExp.next()) {
     GeomShapePtr aSubShape = anExp.current();
@@ -543,6 +540,6 @@ void storeSubShape(ResultBodyPtr theResultBody,
     }
     std::ostringstream aStr;
     aStr << theName << "_" << theShapeIndex++;
-    theResultBody->generated(aSubShape, aStr.str(), theTag++);
+    theResultBody->generated(aSubShape, aStr.str());
   }
 }

@@ -57,8 +57,15 @@
 //#include <TDF_Tool.hxx>
 //#define DEB_IMPORT 1
 
+static const int VERTICES_TAG = 1;
+static const int EDGES_TAG = 2;
+static const int FACES_TAG = 3;
+static const int DELETED_TAG = 4;
+static const int PRIMITIVES_START_TAG = 11;
+
 Model_BodyBuilder::Model_BodyBuilder(ModelAPI_Object* theOwner)
 : ModelAPI_BodyBuilder(theOwner),
+  myPrimitiveTag(PRIMITIVES_START_TAG),
   myDividedIndex(1),
   myVIndex(1),
   myEIndex(1),
@@ -291,6 +298,7 @@ void Model_BodyBuilder::clean()
   myBuilders.clear();
   // remove the old reference (if any)
   aLab.ForgetAttribute(TDF_Reference::GetID());
+  myPrimitiveTag = PRIMITIVES_START_TAG;
   myDividedIndex = 1;
   myVIndex = 1;
   myEIndex = 1;
@@ -308,13 +316,16 @@ void Model_BodyBuilder::buildName(const int theTag, const std::string& theName)
   //aDoc->addNamingName(builder(theTag)->NamedShape()->Label(), theName);
   TDataStd_Name::Set(builder(theTag)->NamedShape()->Label(), theName.c_str());
 }
-void Model_BodyBuilder::generated(
-  const std::shared_ptr<GeomAPI_Shape>& theNewShape, const std::string& theName, const int theTag)
+void Model_BodyBuilder::generated(const std::shared_ptr<GeomAPI_Shape>& theNewShape,
+                                  const std::string& theName)
 {
   TopoDS_Shape aShape = theNewShape->impl<TopoDS_Shape>();
-  builder(theTag)->Generated(aShape);
-  if(!theName.empty())
-    buildName(theTag, theName);
+  builder(myPrimitiveTag)->Generated(aShape);
+  if (!theName.empty()) {
+    buildName(myPrimitiveTag, theName);
+  }
+
+  ++myPrimitiveTag;
 }
 
 void Model_BodyBuilder::generated(const std::shared_ptr<GeomAPI_Shape>& theOldShape,

@@ -41,8 +41,7 @@ static void storeSubShape(ResultBodyPtr theResultBody,
                           const GeomAPI_Shape::ShapeType theType,
                           const std::shared_ptr<GeomAPI_DataMapOfShapeShape> theMapOfSubShapes,
                           const std::string theName,
-                          int& theShapeIndex,
-                          int& theTag);
+                          int& theShapeIndex);
 
 //==================================================================================================
 FeaturesPlugin_Pipe::FeaturesPlugin_Pipe()
@@ -463,12 +462,11 @@ void FeaturesPlugin_Pipe::storeShapes(ResultBodyPtr theResultBody,
                     aShape->shapeType(),
                     theMapOfSubShapes,
                     aName,
-                    aShape->shapeType() == GeomAPI_Shape::EDGE ? aShapeIndex : aFaceIndex,
-                    theTag);
+                    aShape->shapeType() == GeomAPI_Shape::EDGE ? aShapeIndex : aFaceIndex);
     } else {
       std::string aName = theName + aShapeTypeStr;
       storeSubShape(theResultBody, aShape, aShapeTypeToExplore,
-                    theMapOfSubShapes, aName, aShapeIndex, theTag);
+                    theMapOfSubShapes, aName, aShapeIndex);
     }
   }
 }
@@ -479,8 +477,7 @@ void storeSubShape(ResultBodyPtr theResultBody,
                    const GeomAPI_Shape::ShapeType theType,
                    const std::shared_ptr<GeomAPI_DataMapOfShapeShape> theMapOfSubShapes,
                    const std::string theName,
-                   int& theShapeIndex,
-                   int& theTag)
+                   int& theShapeIndex)
 {
   for(GeomAPI_ShapeExplorer anExp(theShape, theType); anExp.more(); anExp.next()) {
     GeomShapePtr aSubShape = anExp.current();
@@ -489,6 +486,6 @@ void storeSubShape(ResultBodyPtr theResultBody,
     }
     std::ostringstream aStr;
     aStr << theName << "_" << theShapeIndex++;
-    theResultBody->generated(aSubShape, aStr.str(), theTag++);
+    theResultBody->generated(aSubShape, aStr.str());
   }
 }

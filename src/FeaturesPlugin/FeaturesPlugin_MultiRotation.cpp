@@ -425,7 +425,6 @@ void FeaturesPlugin_MultiRotation::loadNamingDS3(
     std::shared_ptr<ModelAPI_ResultBody> theResultBody,
     std::shared_ptr<GeomAPI_Shape> theBaseShape, int nb)
 {
-  int aTag = 6*nb+1;
   int anIndex = nb+1;
   std::string aRotatedName;
 
@@ -438,7 +437,7 @@ void FeaturesPlugin_MultiRotation::loadNamingDS3(
     for(; anExp.more(); anExp.next()) {
        aRotatedName = "Rotated_Face_" + std::to_string((long long) anIndex);
        aRotatedName = aRotatedName + "_" + std::to_string((long long) numFace);
-       theResultBody->generated(anExp.current(), aRotatedName, aTag++);
+       theResultBody->generated(anExp.current(), aRotatedName);
        ++numFace;
     }
     ++anIndex;

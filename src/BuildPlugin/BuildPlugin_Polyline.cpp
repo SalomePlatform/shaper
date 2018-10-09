@@ -125,8 +125,8 @@ void BuildPlugin_Polyline::execute()
       aResPoints.push_back(anExp.current());
     }
 
-    aResultBody->generated(aResPoints.front(), "FirstVertex", 2);
-    aResultBody->generated(aResPoints.back(), "LastVertex", 3);
+    aResultBody->generated(aResPoints.front(), "FirstVertex");
+    aResultBody->generated(aResPoints.back(), "LastVertex");
   }
 
   setResult(aResultBody);

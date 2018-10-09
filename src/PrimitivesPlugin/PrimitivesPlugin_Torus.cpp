@@ -145,20 +145,24 @@ void PrimitivesPlugin_Torus::loadNamingDS(std::shared_ptr<GeomAlgoAPI_Torus> the
   int num = 1;
   std::map< std::string, std::shared_ptr<GeomAPI_Shape> > listOfFaces =
       theTorusAlgo->getCreatedFaces();
-  for (std::map< std::string, std::shared_ptr<GeomAPI_Shape> >::iterator
-       it=listOfFaces.begin(); it!=listOfFaces.end(); ++it) {
-    std::shared_ptr<GeomAPI_Shape> aFace = (*it).second;
-    theResultTorus->generated(aFace, (*it).first, num++);
+  for (std::map< std::string, std::shared_ptr<GeomAPI_Shape> >::iterator it = listOfFaces.begin();
+       it != listOfFaces.end();
+       ++it)
+  {
+    theResultTorus->generated((*it).second, (*it).first);
   }
 
   // Naming of edges
   GeomAPI_DataMapOfShapeShape anEdges;
-  GeomAPI_ShapeExplorer anEdgeExp(theTorusAlgo->shape(), GeomAPI_Shape::EDGE);
-  for(int anIndex = 1; anEdgeExp.more(); anEdgeExp.next()) {
+  int anIndex = 1;
+  for (GeomAPI_ShapeExplorer anEdgeExp(theTorusAlgo->shape(), GeomAPI_Shape::EDGE);
+       anEdgeExp.more();
+       anEdgeExp.next())
+  {
     if (!anEdges.isBound(anEdgeExp.current())) {
       std::ostringstream aStream;
       aStream<<"Edge_"<<anIndex++;
-      theResultTorus->generated(anEdgeExp.current(), aStream.str(), num++);
+      theResultTorus->generated(anEdgeExp.current(), aStream.str());
       anEdges.bind(anEdgeExp.current(), anEdgeExp.current());
     }
   }
