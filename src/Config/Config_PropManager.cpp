@@ -31,7 +31,9 @@ Config_Prop* Config_PropManager::registerProp(const std::string& theSection,
                                               const std::string& theName,
                                               const std::string& theTitle,
                                               Config_Prop::PropType theType,
-                                              const std::string& theDefaultValue)
+                                              const std::string& theDefaultValue,
+                                              const std::string& theMin,
+                                              const std::string& theMax)
 {
   Config_Prop* aProp = findProp(theSection, theName);
 
@@ -46,9 +48,12 @@ Config_Prop* Config_PropManager::registerProp(const std::string& theSection,
       aProp->setType(theType);
       aProp->setTitle(theTitle);
     }
+    aProp->setMin(theMin);
+    aProp->setMax(theMax);
   }
   else {
-    aProp = new Config_Prop(theSection, theName, theTitle, theType, theDefaultValue);
+    aProp =
+      new Config_Prop(theSection, theName, theTitle, theType, theDefaultValue, theMin, theMax);
     myProps.push_back(aProp);
   }
   return aProp;

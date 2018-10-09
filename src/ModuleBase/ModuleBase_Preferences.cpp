@@ -188,6 +188,16 @@ void ModuleBase_Preferences::createCustomPage(ModuleBase_IPrefMgr* thePref, int 
         if(aProp->type() == Config_Prop::Directory) {
           thePref->setItemProperty("path_type", Qtx::PT_Directory, anId);
         }
+        if (aPrefType == SUIT_PreferenceMgr::DblSpin) {
+          if (aProp->min() != "") {
+            double aMin = QString(aProp->min().c_str()).toDouble();
+            thePref->setItemProperty("min", aMin, anId);
+          }
+          if (aProp->max() != "") {
+            double aMax = QString(aProp->max().c_str()).toDouble();
+            thePref->setItemProperty("max", aMax, anId);
+          }
+        }
       }
     }
   }

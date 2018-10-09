@@ -73,7 +73,9 @@ class Config_Prop
    * \param theDefaultValue - default value of the property. This is an initial property value
    */
   Config_Prop(const std::string& theSection, const std::string& theName,
-              const std::string& theTitle, PropType theType, const std::string& theDefaultValue)
+              const std::string& theTitle, PropType theType,
+              const std::string& theDefaultValue,
+              const std::string& theMin, const std::string& theMax)
   {
     mySection = theSection;
     myName = theName;
@@ -81,6 +83,8 @@ class Config_Prop
     myType = theType;
     myValue = theDefaultValue;
     myDefaultValue = theDefaultValue;
+    myMin = theMin;
+    myMax = theMax;
   }
 
   /// Get name of section
@@ -133,6 +137,20 @@ class Config_Prop
     return (mySection == theProp->section()) && (myName == theProp->name());
   }
 
+  /// Returns minimal value
+  std::string min() const { return myMin; }
+
+  void setMin(const std::string& theMin) {
+    myMin = theMin;
+  }
+
+  /// Returns maximal value
+  std::string max() const { return myMax; }
+
+  void setMax(const std::string& theMax) {
+    myMax = theMax;
+  }
+
  private:
   std::string mySection; ///< Name of section
   std::string myName; ///< Name of property
@@ -140,6 +158,8 @@ class Config_Prop
   PropType myType; ///< Type of property
   std::string myValue; // Value in string format
   std::string myDefaultValue; // Default value
+  std::string myMin; // Minimal value
+  std::string myMax; // Maximal value
 };
 
 typedef std::list<Config_Prop*> Config_Properties;

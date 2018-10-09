@@ -44,19 +44,27 @@ class Config_PropManager
    * \param theTitle - title of the value.
    * \param theType - type of the value.
    * \param theDefValue - default and initial value of the property
+   * \param theMin - minimal value
+   * \param theMax - minimal value
    * Returns True if the property succesfully registered
    */
   CONFIG_EXPORT static Config_Prop* registerProp(const std::string& theSection,
     const std::string& theName,
     const std::string& theTitle, Config_Prop::PropType theType,
-    const std::string& theDefValue = "");
+    const std::string& theDefValue = "",
+    const std::string& theMin = "",
+    const std::string& theMax = "");
+
   //! Finds property in the given section by the given name, if property not found returns NULL
   CONFIG_EXPORT static Config_Prop* findProp(
     const std::string& theSection, const std::string& theName);
+
   //! Returns std::list of all existing properies
   CONFIG_EXPORT static Config_Properties getProperties();
+
   //! Returns list of registered section names.
   CONFIG_EXPORT static std::list<std::string> getSections();
+
   //! Returns list of properties by its owner and section.
   CONFIG_EXPORT static Config_Properties getProperties(const std::string& theSection);
 
@@ -74,7 +82,8 @@ class Config_PropManager
                                    const std::string& theName);
   //! Returns boolean by given section and name
   CONFIG_EXPORT static bool boolean(const std::string& theSection,
-                                   const std::string& theName);
+                                    const std::string& theName);
+
   //! Returns convertion of the string to double value. Temporary changes locale to process
   //! values contained "," or "." separator.
   //! \param theDouble a value to be converted

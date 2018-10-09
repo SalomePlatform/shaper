@@ -56,7 +56,7 @@ ConstructionPlugin_Plugin::ConstructionPlugin_Plugin()
                               new ConstructionPlugin_ValidatorPointThreeNonParallelPlanes());
 
   Config_PropManager::registerProp(SKETCH_TAB_NAME, "planes_size", "Size", Config_Prop::DblSpin,
-                                   PLANE_SIZE);
+                                   PLANE_SIZE, "0", "1000");
   Config_PropManager::registerProp(SKETCH_TAB_NAME, "planes_thickness", "Thickness",
     Config_Prop::IntSpin, SKETCH_WIDTH);
   Config_PropManager::registerProp(SKETCH_TAB_NAME, "rotate_to_plane",
