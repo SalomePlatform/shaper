@@ -27,6 +27,8 @@
 #include <TDF_LabelList.hxx>
 #include <TopoDS_Shape.hxx>
 
+#include <list>
+
 /**\class Selector_Selector
  * \ingroup DataModel
  * \brief Main object for selection of the sub-shapes in the parametrically updated
@@ -46,6 +48,7 @@ class Selector_Selector
 
   Selector_Type myType; ///< Type of this selector.
   TopAbs_ShapeEnum myShapeType; ///< type of this shape: container or result of intersection
+  std::list<Selector_Selector> mySubSelList; // list of sub-selectors if needed
   TDF_Label myFinal; ///< final label of the primitive or generation, where the value is
   TDF_LabelList myBases; ///< initial labels that contain shapes that produce the modification
 
@@ -53,19 +56,32 @@ class Selector_Selector
 
  public:
   /// Initializes selector on the label
-  Selector_Selector(TDF_Label theLab);
+   SELECTOR_EXPORT Selector_Selector(TDF_Label theLab);
   /// Returns label of this selector
-  TDF_Label label();
+   SELECTOR_EXPORT TDF_Label label();
 
   /// Initializes the selector structure on the label.
   /// Stores the name data to restore after modification.
-  bool Select(const TopoDS_Shape theContext, const TopoDS_Shape theValue);
+   SELECTOR_EXPORT bool select(const TopoDS_Shape theContext, const TopoDS_Shape theValue);
 
   /// Stores the name to the label and sub-labels tree
-  void Store();
+   SELECTOR_EXPORT void store();
 
   /// Restores the selected shape by the topological naming kept in the data structure
-  //TopoDS_Shape Restore();
+  /// Returns true if it can restore structure correctly
+   SELECTOR_EXPORT bool restore();
+
+  /// Updates the current shape by the stored topological name
+   SELECTOR_EXPORT bool solve();
+
+  /// Returns the current sub-shape value (null if can not resolve)
+   SELECTOR_EXPORT TopoDS_Shape value();
+
+private:
+
+  /// Create and keep in the list the sub-sulector that select the given value.
+  /// Returns true if selection is correct.
+  bool selectBySubSelector(const TopoDS_Shape theContext, const TopoDS_Shape theValue);
 };
 
 #endif

@@ -43,6 +43,7 @@
 #include <GeomAPI_Vertex.h>
 #include <GeomAlgoAPI_CompoundBuilder.h>
 #include <GeomAlgoAPI_NExplode.h>
+#include <Selector_Selector.h>
 
 #include <TNaming_Selector.hxx>
 #include <TNaming_NamedShape.hxx>
@@ -686,21 +687,30 @@ bool Model_AttributeSelection::update()
       GeomShapePtr aValue = aNExplode.shape(aWeakId->Get());
       return setInvalidIfFalse(aSelLab, aValue.get() != NULL);
     }
-    // body: just a named shape, use selection mechanism from OCCT
-    TNaming_Selector aSelector(aSelLab);
+    // body: just a named shape, use topological selection mechanism
+    bool aResult = false;
     TopoDS_Shape anOldShape;
-    if (!aSelector.NamedShape().IsNull()) {
-      anOldShape = aSelector.NamedShape()->Get();
+    Handle(TNaming_NamedShape) aNS;
+    if (aSelLab.FindAttribute(TNaming_NamedShape::GetID(), aNS))
+      anOldShape = aNS->Get();
+
+    Selector_Selector aSelector(aSelLab);
+    if (!aSelector.restore()) { // it is stored in old OCCT format, use TNaming_Selector
+      TNaming_Selector aSelector(aSelLab);
+      if (!aSelector.NamedShape().IsNull()) {
+        anOldShape = aSelector.NamedShape()->Get();
+      }
+      aResult = aSelector.Solve(scope()) == Standard_True;
+    } else {
+      aResult = aSelector.solve();
     }
-    bool aResult = aSelector.Solve(scope()) == Standard_True;
-    // must be before sending of updated attribute (1556)
     aResult = setInvalidIfFalse(aSelLab, aResult);
+
     TopoDS_Shape aNewShape;
-    if (!aSelector.NamedShape().IsNull()) {
-      aNewShape = aSelector.NamedShape()->Get();
-    }
-    if (anOldShape.IsNull() || aNewShape.IsNull() ||
-        !anOldShape.IsEqual(aSelector.NamedShape()->Get())) {
+    if (aSelLab.FindAttribute(TNaming_NamedShape::GetID(), aNS))
+      aNewShape = aNS->Get();
+
+    if (anOldShape.IsNull() || aNewShape.IsNull() || !anOldShape.IsEqual(aNewShape)) {
       // shape type shoud not not changed: if shape becomes compound of such shapes, then split
       if (myParent && !anOldShape.IsNull() && !aNewShape.IsNull() &&
           anOldShape.ShapeType() != aNewShape.ShapeType() &&
@@ -738,7 +748,6 @@ void Model_AttributeSelection::selectBody(
   const ResultPtr& theContext, const std::shared_ptr<GeomAPI_Shape>& theSubShape)
 {
   // perform the selection
-  TNaming_Selector aSel(selectionLabel());
   TopoDS_Shape aContext;
 
   ResultBodyPtr aBody = std::dynamic_pointer_cast<ModelAPI_ResultBody>(theContext);//myRef.value()
@@ -828,8 +837,12 @@ void Model_AttributeSelection::selectBody(
         aFeatureOwner->removeResults(0, false, false);
     }
     bool aSelectorOk = true;
+    //TNaming_Selector aSel(aSelLab);
+    Selector_Selector aSel(aSelLab);
     try {
-      aSel.Select(aNewSub, aNewContext);
+      //aSel.Select(aNewSub, aNewContext);
+      aSelectorOk = aSel.select(aNewContext, aNewSub);
+      aSel.store();
     } catch(...) {
       aSelectorOk = false;
     }

@@ -99,6 +99,7 @@ SET(PROJECT_LIBRARIES
     ModelAPI
     Events
     Config
+    Selector
     GeomData
     GeomAPI
     GeomAlgoAPI
@@ -109,6 +110,7 @@ SET(PROJECT_INCLUDES
   ../ModelAPI
   ../Events
   ../Config
+  ../Selector
   ../GeomData
   ../GeomDataAPI
   ../GeomAlgoAPI
