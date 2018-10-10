@@ -702,7 +702,8 @@ bool Model_AttributeSelection::update()
       }
       aResult = aSelector.Solve(scope()) == Standard_True;
     } else {
-      aResult = aSelector.solve();
+      TopoDS_Shape aContextShape = aContext->shape()->impl<TopoDS_Shape>();
+      aResult = aSelector.solve(aContextShape);
     }
     aResult = setInvalidIfFalse(aSelLab, aResult);
 

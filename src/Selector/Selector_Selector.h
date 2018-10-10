@@ -26,7 +26,6 @@
 #include <TDF_Label.hxx>
 #include <TDF_LabelList.hxx>
 #include <TopoDS_Shape.hxx>
-
 #include <list>
 
 /**\class Selector_Selector
@@ -43,14 +42,17 @@ class Selector_Selector
     SELTYPE_CONTAINER, ///< just a container of sub-elements, keeps the shape type of container
     SELTYPE_INTERSECT, ///< sub-shape is intersection of higher level objects
     SELTYPE_PRIMITIVE, ///< sub-shape found as a primitive on some label
-    SELTYPE_MODIFICATION,
+    SELTYPE_MODIFICATION, ///< modification of base shapes to the final label
+    SELTYPE_FILTER_BY_NEIGHBOR,  ///< identification by neighbor shapes in context
   };
 
   Selector_Type myType; ///< Type of this selector.
-  TopAbs_ShapeEnum myShapeType; ///< type of this shape: container or result of intersection
-  std::list<Selector_Selector> mySubSelList; // list of sub-selectors if needed
+  TopAbs_ShapeEnum myShapeType; ///< type of this shape: in container, intersection or neighbors
+  std::list<Selector_Selector> mySubSelList; ///< list of sub-selectors if needed
   TDF_Label myFinal; ///< final label of the primitive or generation, where the value is
   TDF_LabelList myBases; ///< initial labels that contain shapes that produce the modification
+
+  std::list<int> myNBLevel; ///< list of integers corresponding to subsellist neighborhood level
 
   TDF_Label myLab; ///< main label where selector is performed
 
@@ -62,7 +64,8 @@ class Selector_Selector
 
   /// Initializes the selector structure on the label.
   /// Stores the name data to restore after modification.
-   SELECTOR_EXPORT bool select(const TopoDS_Shape theContext, const TopoDS_Shape theValue);
+   SELECTOR_EXPORT bool select(const TopoDS_Shape theContext, const TopoDS_Shape theValue,
+     const bool theUseNeighbors = false);
 
   /// Stores the name to the label and sub-labels tree
    SELECTOR_EXPORT void store();
@@ -72,7 +75,7 @@ class Selector_Selector
    SELECTOR_EXPORT bool restore();
 
   /// Updates the current shape by the stored topological name
-   SELECTOR_EXPORT bool solve();
+   SELECTOR_EXPORT bool solve(const TopoDS_Shape& theContext);
 
   /// Returns the current sub-shape value (null if can not resolve)
    SELECTOR_EXPORT TopoDS_Shape value();

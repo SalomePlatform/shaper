@@ -34,6 +34,7 @@
 
 #include <TDataStd_Integer.hxx>
 #include <TDataStd_ReferenceArray.hxx>
+#include <TDataStd_IntegerArray.hxx>
 
 #include <list>
 
@@ -44,6 +45,8 @@ static const Standard_GUID kSHAPE_TYPE("864b3267-cb9d-4107-bf58-c3ce1775b171");
 //  reference attribute that contains the reference to labels where the "from" or "base" shapes
 // of selection are located
 static const Standard_GUID kBASE_ARRAY("7c515b1a-9549-493d-9946-a4933a22f45f");
+// array of the neighbor levels
+static const Standard_GUID kLEVELS_ARRAY("ee4c4b45-e859-4e86-aa4f-6eac68e0ca1f");
 
 Selector_Selector::Selector_Selector(TDF_Label theLab) : myLab(theLab)
 {
@@ -56,35 +59,179 @@ TDF_Label Selector_Selector::label()
 
 // adds to theResult all labels that contain initial shapes for theValue located in theFinal
 static void findBases(Handle(TNaming_NamedShape) theFinal, const TopoDS_Shape& theValue,
-  TDF_LabelList& theResult)
+  bool aMustBeAtFinal, TDF_LabelList& theResult)
 {
-  for(TNaming_Iterator aThisIter(theFinal); aThisIter.More(); aThisIter.Next()) {
-    if (aThisIter.NewShape().IsSame(theValue)) {
-      const TopoDS_Shape& anOldShape = aThisIter.OldShape();
-      // searching for all old shapes in this sequence of modification
-      TNaming_OldShapeIterator anOldIter(anOldShape, theFinal->Label());
-      for(; anOldIter.More(); anOldIter.Next()) {
-        TNaming_Evolution anEvolution = anOldIter.NamedShape()->Evolution();
-        if (anEvolution == TNaming_PRIMITIVE) { // found a good candidate, a base shape
-          // check that this is not in the results already
-          const TDF_Label aResult = anOldIter.NamedShape()->Label();
-          TDF_LabelList::Iterator aResIter(theResult);
-          for(; aResIter.More(); aResIter.Next()) {
-            if (aResIter.Value().IsEqual(aResult))
-              break;
-          }
-          if (!aResIter.More()) // not found, so add this new
-            theResult.Append(aResult);
-        } else if (anEvolution == TNaming_GENERATED || anEvolution == TNaming_MODIFY) {
-          // continue recursively
-          findBases(anOldIter.NamedShape(), anOldShape, theResult);
+  TNaming_SameShapeIterator aLabIter(theValue, theFinal->Label());
+  for(; aLabIter.More(); aLabIter.Next()) {
+    Handle(TNaming_NamedShape) aNS;
+    aLabIter.Label().FindAttribute(TNaming_NamedShape::GetID(), aNS);
+    if (aMustBeAtFinal && aNS != theFinal)
+      continue; // looking for old at the same final label only
+    TNaming_Evolution anEvolution = aNS->Evolution();
+    if (anEvolution == TNaming_PRIMITIVE) {
+      // check that this is not in the results already
+      const TDF_Label aResult = aNS->Label();
+      TDF_LabelList::Iterator aResIter(theResult);
+      for(; aResIter.More(); aResIter.Next()) {
+        if (aResIter.Value().IsEqual(aResult))
+          break;
+      }
+      if (!aResIter.More()) // not found, so add this new
+        theResult.Append(aResult);
+    }
+    if (anEvolution == TNaming_GENERATED || anEvolution == TNaming_MODIFY) {
+      for(TNaming_Iterator aThisIter(aNS); aThisIter.More(); aThisIter.Next()) {
+        if (aThisIter.NewShape().IsSame(theValue)) {
+          // continue recursively, null NS means that any NS are ok
+          findBases(theFinal, aThisIter.OldShape(), false, theResult);
         }
       }
     }
   }
 }
 
-bool Selector_Selector::select(const TopoDS_Shape theContext, const TopoDS_Shape theValue)
+// returns the sub-shapes of theSubType which belong to all theShapes (so, common or intersection)
+static void commonShapes(const TopoDS_ListOfShape& theShapes, TopAbs_ShapeEnum theSubType,
+  TopoDS_ListOfShape& theResults)
+{
+  TopoDS_ListOfShape::iterator aSubSel = theShapes.begin();
+  for(; aSubSel != theShapes.end(); aSubSel++) {
+    TopTools_MapOfShape aCurrentMap;
+    for(TopExp_Explorer anExp(*aSubSel, theSubType); anExp.More(); anExp.Next()) {
+      if (aCurrentMap.Add(anExp.Current()) && aSubSel == theShapes.begin())
+        theResults.Append(anExp.Current());
+    }
+    if (aSubSel != theShapes.begin()) { // remove from common shapes not in aCurrentMap
+      for(TopoDS_ListOfShape::Iterator aComIter(theResults); aComIter.More(); ) {
+        if (aCurrentMap.Contains(aComIter.Value()))
+          aComIter.Next();
+        else
+          theResults.Remove(aComIter);
+      }
+    }
+  }
+}
+
+/// Searches neighbor of theLevel of neighborhood to theValue in theContex
+static void findNeighbors(const TopoDS_Shape theContext, const TopoDS_Shape theValue,
+  const int theLevel, TopTools_MapOfShape& theResult)
+{
+  TopAbs_ShapeEnum aConnectorType = TopAbs_VERTEX; // type of the connector sub-shapes
+  if (theValue.ShapeType() == TopAbs_FACE)
+    aConnectorType = TopAbs_EDGE;
+  TopTools_MapOfShape aNBConnectors; // connector shapes that already belong to neighbors
+  for(TopExp_Explorer aValExp(theValue, aConnectorType); aValExp.More(); aValExp.Next()) {
+    aNBConnectors.Add(aValExp.Current());
+  }
+
+  for(int aLevel = 1; aLevel <= theLevel; aLevel++) {
+    TopoDS_ListOfShape aGoodCandidates;
+    TopExp_Explorer aCandidate(theContext, theValue.ShapeType());
+    for(; aCandidate.More(); aCandidate.Next()) {
+      TopExp_Explorer aCandConnector(aCandidate.Current(), aConnectorType);
+      for(; aCandConnector.More(); aCandConnector.Next()) {
+        if (aNBConnectors.Contains(aCandConnector.Current())) // candidate is neighbor
+          break;
+      }
+      if (aCandConnector.More()) {
+        if (aLevel == theLevel) { // add a NB into result: it is connected to other neighbors
+          theResult.Add(aCandidate.Current());
+        } else { // add to the NB of the current level
+          aGoodCandidates.Append(aCandidate.Current());
+        }
+      }
+    }
+    if (aLevel != theLevel) { // good candidates are added to neighbor of this level by connectors
+      for(TopoDS_ListOfShape::Iterator aGood(aGoodCandidates); aGood.More(); aGood.Next()) {
+        TopExp_Explorer aGoodConnector(aGood.Value(), aConnectorType);
+        for(; aGoodConnector.More(); aGoodConnector.Next()) {
+          aNBConnectors.Add(aGoodConnector.Current());
+        }
+      }
+    }
+  }
+}
+
+/// Searches the neighbor shape by neighbors defined in theNB in theContext shape
+static const TopoDS_Shape findNeighbor(const TopoDS_Shape theContext,
+  const std::list<std::pair<TopoDS_Shape, int> >& theNB)
+{
+  // searching for neighbors with minimum level
+  int aMinLevel = 0;
+  std::list<std::pair<TopoDS_Shape, int> >::const_iterator aNBIter = theNB.cbegin();
+  for(; aNBIter != theNB.cend(); aNBIter++) {
+    if (aMinLevel == 0 || aNBIter->second < aMinLevel) {
+      aMinLevel = aNBIter->second;
+    }
+  }
+  // collect all neighbors which are neighbors of sub-shapes with minimum level
+  bool aFirst = true;
+  TopoDS_ListOfShape aMatches;
+  for(aNBIter = theNB.cbegin(); aNBIter != theNB.cend(); aNBIter++) {
+    if (aNBIter->second == aMinLevel) {
+      TopTools_MapOfShape aThisNBs;
+      findNeighbors(theContext, aNBIter->first, aMinLevel, aThisNBs);
+      // aMatches must contain common part of all NBs lists
+      for(TopTools_MapOfShape::Iterator aThisNB(aThisNBs); aThisNB.More(); aThisNB.Next()) {
+        if (aFirst) {
+          aMatches.Append(aThisNB.Value());
+        } else {
+          // remove all in aMatches which are not in this NBs
+          for(TopoDS_ListOfShape::Iterator aMatch(aMatches); aMatch.More(); ) {
+            if (aThisNBs.Contains(aMatch.Value())) {
+              aMatch.Next();
+            } else {
+              aMatches.Remove(aMatch);
+            }
+          }
+        }
+      }
+    }
+  }
+  if (aMatches.IsEmpty())
+    return TopoDS_Shape(); // not found any candidate
+  if (aMatches.Extent() == 1)
+    return aMatches.First(); // already found good candidate
+  // iterate all matches to find by other (higher level) neighbors the best candidate
+  TopoDS_Shape aGoodCandidate;
+  for(TopoDS_ListOfShape::Iterator aCandidate(aMatches); aCandidate.More(); aCandidate.Next()) {
+    bool aValidCadidate = true;
+    for(int aLevel = aMinLevel + 1; true; aLevel++) {
+      bool aFooundHigherLevel = false;
+      TopoDS_ListOfShape aLevelNBs;
+      for(aNBIter = theNB.cbegin(); aNBIter != theNB.cend(); aNBIter++) {
+        if (aNBIter->second == aLevel)
+          aLevelNBs.Append(aNBIter->first);
+        else if (aNBIter->second >= aLevel)
+          aFooundHigherLevel = true;
+      }
+      if (!aFooundHigherLevel && aLevelNBs.IsEmpty()) { // iterated all, so, good candidate
+        if (aGoodCandidate.IsNull()) {
+          aGoodCandidate = aCandidate.Value();
+        } else { // too many good candidates
+          return TopoDS_Shape();
+        }
+      }
+      if (!aLevelNBs.IsEmpty()) {
+        TopTools_MapOfShape aNBsOfCandidate;
+        findNeighbors(theContext, aCandidate.Value(), aLevel, aNBsOfCandidate);
+        // check all stored neighbors are in the map of real neighbors
+        for(TopoDS_ListOfShape::Iterator aLevIter(aLevelNBs); aLevIter.More(); aLevIter.Next()) {
+          if (!aNBsOfCandidate.Contains(aLevIter.Value())) {
+            aValidCadidate = false;
+            break;
+          }
+        }
+      }
+      if (!aValidCadidate) // candidate is not valid, break the checking
+        break;
+    }
+  }
+  return aGoodCandidate;
+}
+
+bool Selector_Selector::select(const TopoDS_Shape theContext, const TopoDS_Shape theValue,
+  const bool theUseNeighbors)
 {
   if (theValue.IsNull() || theContext.IsNull())
     return false;
@@ -110,6 +257,7 @@ bool Selector_Selector::select(const TopoDS_Shape theContext, const TopoDS_Shape
       if (aSelectionType == TopAbs_VERTEX) aSelectionType = TopAbs_EDGE;
       else if (aSelectionType == TopAbs_EDGE) aSelectionType = TopAbs_FACE;
       TopTools_MapOfShape anIntersectors; // shapes of aSelectionType that contain theValue
+      TopoDS_ListOfShape anIntList; // same as anIntersectors
       for(TopExp_Explorer aSelExp(theContext, aSelectionType); aSelExp.More(); aSelExp.Next()) {
         TopExp_Explorer aSubExp(aSelExp.Current(), theValue.ShapeType());
         for(; aSubExp.More(); aSubExp.Next()) {
@@ -119,25 +267,59 @@ bool Selector_Selector::select(const TopoDS_Shape theContext, const TopoDS_Shape
           }
         }
       }
-      //TODO: check if intersectors produce several subs, try to remove one of the intersector
-
-      //TODO: check that solution is only one
-
-      // name the intersectors
-      std::list<Selector_Selector> aSubSelList;
-      TopTools_MapOfShape::Iterator anInt(anIntersectors);
-      for (; anInt.More(); anInt.Next()) {
-        if (!selectBySubSelector(theContext, anInt.Value())) {
-          break; // if some selector is failed, stop and search another solution
+      // check that solution is only one
+      TopoDS_ListOfShape aCommon;
+      commonShapes(anIntList, theValue.ShapeType(), aCommon);
+      if (aCommon.Extent() == 1 && aCommon.First().IsSame(theValue)) {
+        // name the intersectors
+        std::list<Selector_Selector> aSubSelList;
+        TopTools_MapOfShape::Iterator anInt(anIntersectors);
+        for (; anInt.More(); anInt.Next()) {
+          if (!selectBySubSelector(theContext, anInt.Value())) {
+            break; // if some selector is failed, stop and search another solution
+          }
         }
-      }
-      if (!anInt.More()) { // all intersectors were correctly named
-        myType = SELTYPE_INTERSECT;
-        return true;
+        if (!anInt.More()) { // all intersectors were correctly named
+          myType = SELTYPE_INTERSECT;
+          return true;
+        }
       }
     }
 
-    // TODO: searching by neighbours
+    if (!theUseNeighbors)
+      return false;
+
+    // searching by neighbours
+    std::list<std::pair<TopoDS_Shape, int> > aNBs; /// neighbor sub-shape -> level of neighborhood
+    for(int aLevel = 1; true; aLevel++) {
+      TopTools_MapOfShape aNewNB;
+      findNeighbors(theContext, theValue, aLevel, aNewNB);
+      if (aNewNB.Extent() == 0) { // there are no neighbors of the given level, stop iteration
+        break;
+      }
+      // check which can be named correctly, without by neighbors type
+      for(TopTools_MapOfShape::Iterator aNBIter(aNewNB); aNBIter.More(); ) {
+        Selector_Selector aSelector(myLab.FindChild(1));
+        if (aSelector.select(theContext, aNBIter.Value(), false)) { // add to the list of good NBs
+          aNBs.push_back(std::pair<TopoDS_Shape, int>(aNBIter.Value(), aLevel));
+        }
+        aNewNB.Remove(aNBIter.Key());
+        aNBIter.Initialize(aNewNB);
+      }
+      TopoDS_Shape aResult = findNeighbor(theContext, aNBs);
+      if (!aResult.IsNull() && aResult.IsSame(theValue)) {
+        std::list<std::pair<TopoDS_Shape, int> >::iterator aNBIter = aNBs.begin();
+        for(; aNBIter != aNBs.end(); aNBIter++) {
+          if (!selectBySubSelector(theContext, aNBIter->first)) {
+            return false; // something is wrong because before this selection was ok
+          }
+          myNBLevel.push_back(aNBIter->second);
+
+        }
+        myType = SELTYPE_FILTER_BY_NEIGHBOR;
+        return true;
+      }
+    }
     return false;
   }
   // searching for the base shapes of the value
@@ -192,10 +374,12 @@ bool Selector_Selector::select(const TopoDS_Shape theContext, const TopoDS_Shape
 
   if (!aModifList.IsEmpty()) {
     // searching for all the base shapes of this modification
-    findBases(aModifList.First(), theValue, myBases);
-    myFinal = aModifList.First()->Label();
-    myType = SELTYPE_MODIFICATION;
-    return !myBases.IsEmpty();
+    findBases(aModifList.First(), theValue, true, myBases);
+    if (!myBases.IsEmpty()) {
+      myFinal = aModifList.First()->Label();
+      myType = SELTYPE_MODIFICATION;
+      return !myBases.IsEmpty();
+    }
   }
 
   // not found a good result
@@ -232,6 +416,21 @@ void Selector_Selector::store()
     }
     anArray->SetValue(myBases.Extent(), myFinal); // final is in the end of array
     break;
+  }
+  case SELTYPE_FILTER_BY_NEIGHBOR: {
+    TDataStd_Integer::Set(myLab, kSHAPE_TYPE, (int)myShapeType);
+    // store numbers of levels corresponded to the neighbors in sub-selectors
+    Handle(TDataStd_IntegerArray) anArray =
+      TDataStd_IntegerArray::Set(myLab, kLEVELS_ARRAY, 0, int(myNBLevel.size()) - 1);
+    std::list<int>::iterator aLevel = myNBLevel.begin();
+    for(int anIndex = 0; aLevel != myNBLevel.end(); aLevel++, anIndex++) {
+      anArray->SetValue(anIndex, *aLevel);
+    }
+    // store all sub-selectors
+    std::list<Selector_Selector>::iterator aSubSel = mySubSelList.begin();
+    for(; aSubSel != mySubSelList.end(); aSubSel++) {
+      aSubSel->store();
+    }
   }
   default: { // unknown case
     break;
@@ -282,6 +481,28 @@ bool Selector_Selector::restore()
     }
     return false;
   }
+  case SELTYPE_FILTER_BY_NEIGHBOR: {
+    Handle(TDataStd_Integer) aShapeTypeAttr;
+    if (!myLab.FindAttribute(kSHAPE_TYPE, aShapeTypeAttr))
+      return false;
+    myShapeType = TopAbs_ShapeEnum(aShapeTypeAttr->Get());
+    // restore sub-selectors
+    bool aSubResult = true;
+    mySubSelList.clear();
+    for(TDF_ChildIDIterator aSub(myLab, kSEL_TYPE, false); aSub.More(); aSub.Next()) {
+      mySubSelList.push_back(Selector_Selector(aSub.Value()->Label()));
+      if (!mySubSelList.back().restore())
+        aSubResult = false;
+    }
+    // restore levels indices
+    Handle(TDataStd_IntegerArray) anArray;
+    if (!myLab.FindAttribute(kLEVELS_ARRAY, anArray))
+      return false;
+    for(int anIndex = 0; anIndex <= anArray->Upper(); anIndex++) {
+      myNBLevel.push_back(anArray->Value(anIndex));
+    }
+    return true;
+  }
   default: { // unknown case
   }
   }
@@ -305,7 +526,7 @@ static void findFinals(const TopoDS_Shape& theBase, const TDF_Label& theFinal,
 
 }
 
-bool Selector_Selector::solve()
+bool Selector_Selector::solve(const TopoDS_Shape& theContext)
 {
   TopoDS_Shape aResult; // null if invalid
   switch(myType) {
@@ -339,7 +560,7 @@ bool Selector_Selector::solve()
     }
     std::list<Selector_Selector>::iterator aSubSel = mySubSelList.begin();
     for(; aSubSel != mySubSelList.end(); aSubSel++) {
-      if (!aSubSel->solve()) {
+      if (!aSubSel->solve(theContext)) {
         return false;
       }
       aBuilder.Add(aResult, aSubSel->value());
@@ -347,27 +568,16 @@ bool Selector_Selector::solve()
     break;
   }
   case SELTYPE_INTERSECT: {
-    TopoDS_ListOfShape aCommon; // common sub shapes in each sub-selector (a result)
+    TopoDS_ListOfShape aSubSelectorShapes;
     std::list<Selector_Selector>::iterator aSubSel = mySubSelList.begin();
     for(; aSubSel != mySubSelList.end(); aSubSel++) {
-      if (!aSubSel->solve()) {
+      if (!aSubSel->solve(theContext)) {
         return false;
       }
-      TopoDS_Shape anArg = aSubSel->value();
-      TopTools_MapOfShape aCurrentMap;
-      for(TopExp_Explorer anExp(anArg, myShapeType); anExp.More(); anExp.Next()) {
-        if (aCurrentMap.Add(anExp.Current()) && aSubSel == mySubSelList.begin())
-          aCommon.Append(anExp.Current());
-      }
-      if (aSubSel != mySubSelList.begin()) { // remove from common shapes not in aCurrentMap
-        for(TopoDS_ListOfShape::Iterator aComIter(aCommon); aComIter.More(); ) {
-          if (aCurrentMap.Contains(aComIter.Value()))
-            aComIter.Next();
-          else
-            aCommon.Remove(aComIter);
-        }
-      }
+      aSubSelectorShapes.Append(aSubSel->value());
     }
+    TopoDS_ListOfShape aCommon; // common sub shapes in each sub-selector (a result)
+    commonShapes(aSubSelectorShapes, myShapeType, aCommon);
     if (aCommon.Extent() != 1)
       return false;
     aResult = aCommon.First();
@@ -381,8 +591,7 @@ bool Selector_Selector::solve()
   }
   case SELTYPE_MODIFICATION: {
     TopoDS_ListOfShape aFinalsCommon; // final shapes presented in all results from bases
-    TDF_LabelList::Iterator aBase(myBases);
-    for(; aBase.More(); aBase.Value()) {
+    for(TDF_LabelList::Iterator aBase(myBases); aBase.More(); aBase.Next()) {
       TopTools_MapOfShape aFinals;
       for(TNaming_Iterator aBaseShape(aBase.Value()); aBaseShape.More(); aBaseShape.Next())
         findFinals(aBaseShape.NewShape(), myFinal, aFinals);
@@ -392,8 +601,7 @@ bool Selector_Selector::solve()
             aFinalsCommon.Append(aFinal.Key());
           }
         } else { // keep only shapes presented in both lists
-          TopoDS_ListOfShape::Iterator aCommon(aFinalsCommon);
-          for(; aCommon.More(); aCommon.Next()) {
+          for(TopoDS_ListOfShape::Iterator aCommon(aFinalsCommon); aCommon.More(); ) {
             if (aFinals.Contains(aCommon.Value())) {
               aCommon.Next();
             } else { // common is not found, remove it
@@ -405,6 +613,18 @@ bool Selector_Selector::solve()
     }
     if (aFinalsCommon.Extent() == 1) // only in this case result is valid: found only one shape
       aResult = aFinalsCommon.First();
+  }
+  case SELTYPE_FILTER_BY_NEIGHBOR: {
+    std::list<std::pair<TopoDS_Shape, int> > aNBs; /// neighbor sub-shape -> level of neighborhood
+    std::list<int>::iterator aLevel = myNBLevel.begin();
+    std::list<Selector_Selector>::iterator aSubSel = mySubSelList.begin();
+    for(; aSubSel != mySubSelList.end(); aSubSel++, aLevel++) {
+      if (!aSubSel->solve(theContext)) {
+        return false;
+      }
+      aNBs.push_back(std::pair<TopoDS_Shape, int>(aSubSel->value(), *aLevel));
+    }
+    aResult = findNeighbor(theContext, aNBs);
   }
   default: { // unknown case
   }
