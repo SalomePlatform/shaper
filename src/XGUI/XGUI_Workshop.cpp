@@ -498,11 +498,6 @@ void XGUI_Workshop::initMenu()
   aCommand->setChecked(ModelAPI_Session::get()->isAutoUpdateBlocked());
   aCommand->connectTo(this, SLOT(onAutoApply(bool)));
 
-
-  aCommand = aGroup->addFeature("EXEC_CMD", tr("Launch script"), tr("Launch Python script file"),
-                                QIcon(":pictures/assembly.png"), QKeySequence());
-  aCommand->connectTo(this, SLOT(onFileExec()));
-
   aCommand = aGroup->addFeature("PREF_CMD", tr("Preferences"), tr("Edit preferences"),
                                 QIcon(":pictures/preferences.png"), QKeySequence::Preferences);
   aCommand->connectTo(this, SLOT(onPreferences()));
@@ -2828,24 +2823,6 @@ void XGUI_Workshop::moveOutFolder(bool isBefore)
 
   updateCommandStatus();
 }
-
-#ifndef HAVE_SALOME
-#include <PyConsole_Console.h>
-void XGUI_Workshop::onFileExec()
-{
-  QString aScript = QFileDialog::getOpenFileName(myMainWindow, tr("Open script"),
-      QString(), "Python script (*.py)");
-
-  if (!aScript.isNull()) {
-    PyConsole_Console* aConsole = myMainWindow->pythonConsole();
-    aConsole->execAndWait(QString("f = open('%1', 'rb')").arg(aScript));
-    QString aExecStr =
-      QString("exec(compile(f.read(), '%1', 'exec'))").arg(aScript);
-    aConsole->execAndWait(aExecStr);
-    aConsole->execAndWait("f.close()");
-  }
-}
-#endif
 
 void XGUI_Workshop::onAutoApply(bool isToggle)
 {

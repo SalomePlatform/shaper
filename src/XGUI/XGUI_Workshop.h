@@ -393,8 +393,6 @@ signals:
 
   /// Open preferences dialog box
   void onPreferences();
-
-  void onFileExec();
 #endif
 
   /// A slot calleon toggle of auto-compute button
