@@ -1442,9 +1442,12 @@ void PartSet_Module::processEvent(const std::shared_ptr<Events_Message>& theMess
 
     SessionPtr aMgr = ModelAPI_Session::get();
     DocumentPtr aActiveDoc = aMgr->activeDocument();
-    // workaround for #2431 (SISGSEGV when launching some unit tests from GUI)
-    //if (myActivePartIndex.isValid())
-    //  aTreeView->setExpanded(myActivePartIndex, false);
+
+    // Clear active part index if there is no Part documents
+    // It could be not null if document was closed and opened a new
+    // without closeDocument call
+    if (aMgr->allOpenedDocuments().size() <= 1)
+      myActivePartIndex = QModelIndex();
 
     XGUI_DataModel* aDataModel = aWorkshop->objectBrowser()->dataModel();
     QModelIndex aOldActive = myActivePartIndex;

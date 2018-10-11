@@ -948,7 +948,7 @@ QVariant PartSet_PartRootNode::data(int theColumn, int theRole) const
 Qt::ItemFlags PartSet_PartRootNode::flags(int theColumn) const
 {
   if (myObject->isDisabled())
-    return (theColumn == 2) ? Qt::ItemIsSelectable : aNullFlag;
+    return (theColumn == 2) ? Qt::ItemIsSelectable : aDefaultFlag;
 
   SessionPtr aSession = ModelAPI_Session::get();
   DocumentPtr aActiveDoc = aSession->activeDocument();

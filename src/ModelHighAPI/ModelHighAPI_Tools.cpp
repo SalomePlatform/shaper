@@ -46,6 +46,7 @@
 #include <ModelAPI_Session.h>
 #include <ModelAPI_Tools.h>
 #include <ModelAPI_ResultPart.h>
+#include <ModelAPI_Events.h>
 //--------------------------------------------------------------------------------------
 #include <Config_ModuleReader.h>
 //--------------------------------------------------------------------------------------
@@ -489,7 +490,6 @@ static bool checkDump(SessionPtr theSession,
 
   // close all before importation of the script
   theSession->closeAll();
-
 
   // execute the dumped
   PyGILState_STATE gstate = PyGILState_Ensure(); /* acquire python thread */
