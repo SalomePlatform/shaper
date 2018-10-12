@@ -258,46 +258,6 @@ const TopoDS_Shape findCommonShape(
   return aSharedShape;
 }
 
-// searches theType shape that contains theConnectionType sub-shapes in each shape from the List,
-// so, implements the neighbours searching
-/*
-const TopoDS_Shape findCommonShapeByNB(const TopAbs_ShapeEnum theType,
-  const TopAbs_ShapeEnum theConnectionType, const TopTools_ListOfShape& theList)
-{
-TopTools_MapOfShape aCheckedShapes; // already checked shapes of type theType
-  TopoDS_Shape aResult; // theType result shape
-  for(TopTools_ListIteratorOfListOfShape anIt(theList); anIt.More(); anIt.Next()) { // iterate all
-    for(TopExp_Explorer anExp(anIt.ChangeValue(), theType); anExp.More(); anExp.Next()) {
-      if (aCheckedShapes.Contains(anExp.Current()))
-        continue; // already checked
-      aCheckedShapes.Add(anExp.Current());
-      TopTools_MapOfShape aConnectors; // all connectors of the checked theType shape
-      for(TopExp_Explorer aCExp(anExp.Current(), theConnectionType); aCExp.More(); aCExp.Next()) {
-        aConnectors.Add(aCExp.Current());
-      }
-      // check that all shapes from the List contain the connector sub-shapes
-      bool aFound = true;
-      for(TopTools_ListIteratorOfListOfShape anIt2(theList); anIt2.More() && aFound; anIt2.Next()) {
-        if (anIt2.Value().IsSame(anIt.Value()))
-          continue;
-        aFound = false;
-        for(TopExp_Explorer anE(anIt2.ChangeValue(), theConnectionType); anE.More(); anE.Next()) {
-          if (aConnectors.Contains(anE.Current())) {
-            aFound = true;
-            break;
-          }
-        }
-      }
-      if (aFound) {
-        if (!aResult.IsNull()) // more than one result
-          return TopoDS_Shape();
-        aResult = anExp.Current();
-      }
-    }
-  }
-  return aResult;
-}*/
-
 std::string Model_SelectionNaming::vertexNameByEdges(TopoDS_Shape theContext, TopoDS_Shape theSub,
   std::shared_ptr<Model_Document> theDoc, ResultPtr& theContextRes, const bool theAnotherDoc)
 {

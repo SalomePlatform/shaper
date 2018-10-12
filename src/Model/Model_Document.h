@@ -375,6 +375,8 @@ class Model_Document : public ModelAPI_Document
 
   /// searches in this document feature that contains this label
   FeaturePtr featureByLab(const TDF_Label& theLab);
+  /// searches in this document result that contains this label
+  ResultPtr resultByLab(const TDF_Label& theLab);
 
   /// returns true if theThis is later in the features trre and dependencies than theOther
   bool isLaterByDep(FeaturePtr theThis, FeaturePtr theOther);

@@ -28,12 +28,13 @@
 #include <TopoDS_Shape.hxx>
 #include <list>
 
+class Selector_NameGenerator;
+
 /**\class Selector_Selector
  * \ingroup DataModel
  * \brief Main object for selection of the sub-shapes in the parametrically updated
  * shapes using topological naming mechanism.
  */
-
 class Selector_Selector
 {
   /// Type of a selector: on this type depends what is stored in this label and how to
@@ -77,8 +78,11 @@ class Selector_Selector
   /// Updates the current shape by the stored topological name
    SELECTOR_EXPORT bool solve(const TopoDS_Shape& theContext);
 
-  /// Returns the current sub-shape value (null if can not resolve)
+   /// Returns the current sub-shape value (null if can not resolve)
    SELECTOR_EXPORT TopoDS_Shape value();
+
+   /// Returns the naming name of the selection
+   SELECTOR_EXPORT std::string name(Selector_NameGenerator* theNameGenerator);
 
 private:
 

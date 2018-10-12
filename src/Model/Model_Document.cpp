@@ -1334,13 +1334,26 @@ Standard_Boolean IsEqual(const TDF_Label& theLab1, const TDF_Label& theLab2)
   return TDF_LabelMapHasher::IsEqual(theLab1, theLab2);
 }
 
-// searches in this document feature that contains this label
 FeaturePtr Model_Document::featureByLab(const TDF_Label& theLab) {
   TDF_Label aCurrentLab = theLab;
   while(aCurrentLab.Depth() > 3)
     aCurrentLab = aCurrentLab.Father();
   return myObjs->feature(aCurrentLab);
 }
+
+ResultPtr Model_Document::resultByLab(const TDF_Label& theLab)
+{
+  TDF_Label aCurrentLab = theLab;
+  while(aCurrentLab.Depth() > 3) {
+    ObjectPtr aResultObj = myObjs->object(aCurrentLab);
+    if (aResultObj.get()) {
+      return std::dynamic_pointer_cast<ModelAPI_Result>(aResultObj); // this may be null if feature
+    }
+    aCurrentLab = aCurrentLab.Father();
+  }
+  return ResultPtr(); // not found
+}
+
 
 void Model_Document::addNamingName(const TDF_Label theLabel, std::string theName)
 {

@@ -20,6 +20,8 @@
 
 #include <Selector_Selector.h>
 
+#include <Selector_NameGenerator.h>
+
 #include <TDF_ChildIDIterator.hxx>
 #include <TopoDS_Iterator.hxx>
 #include <TopoDS_Builder.hxx>
@@ -35,6 +37,7 @@
 #include <TDataStd_Integer.hxx>
 #include <TDataStd_ReferenceArray.hxx>
 #include <TDataStd_IntegerArray.hxx>
+#include <TDataStd_Name.hxx>
 
 #include <list>
 
@@ -253,16 +256,21 @@ bool Selector_Selector::select(const TopoDS_Shape theContext, const TopoDS_Shape
     }
 
     // try to find the shape of the higher level type in the context shape
-    while(aSelectionType != TopAbs_FACE) {
-      if (aSelectionType == TopAbs_VERTEX) aSelectionType = TopAbs_EDGE;
-      else if (aSelectionType == TopAbs_EDGE) aSelectionType = TopAbs_FACE;
+    bool aFacesTried = false; // for identification of vertices, faces are tried, then edges
+    while(aSelectionType != TopAbs_FACE || !aFacesTried) {
+      if (aSelectionType == TopAbs_FACE && theValue.ShapeType() == TopAbs_VERTEX) {
+        aFacesTried = true;
+        aSelectionType = TopAbs_EDGE;
+      } else
+        aSelectionType = TopAbs_FACE;
       TopTools_MapOfShape anIntersectors; // shapes of aSelectionType that contain theValue
       TopoDS_ListOfShape anIntList; // same as anIntersectors
       for(TopExp_Explorer aSelExp(theContext, aSelectionType); aSelExp.More(); aSelExp.Next()) {
         TopExp_Explorer aSubExp(aSelExp.Current(), theValue.ShapeType());
         for(; aSubExp.More(); aSubExp.Next()) {
           if (aSubExp.Current().IsSame(theValue)) {
-            anIntersectors.Add(aSelExp.Current());
+            if (anIntersectors.Add(aSelExp.Current()))
+              anIntList.Append(aSelExp.Current());
             break;
           }
         }
@@ -613,6 +621,7 @@ bool Selector_Selector::solve(const TopoDS_Shape& theContext)
     }
     if (aFinalsCommon.Extent() == 1) // only in this case result is valid: found only one shape
       aResult = aFinalsCommon.First();
+    break;
   }
   case SELTYPE_FILTER_BY_NEIGHBOR: {
     std::list<std::pair<TopoDS_Shape, int> > aNBs; /// neighbor sub-shape -> level of neighborhood
@@ -646,7 +655,67 @@ TopoDS_Shape Selector_Selector::value()
   return TopoDS_Shape(); // empty, error shape
 }
 
-bool Selector_Selector::selectBySubSelector(const TopoDS_Shape theContext, const TopoDS_Shape theValue)
+std::string Selector_Selector::name(Selector_NameGenerator* theNameGenerator) {
+  switch(myType) {
+  case SELTYPE_CONTAINER:
+  case SELTYPE_INTERSECT: {
+    std::string aResult;
+    // add names of sub-components one by one separated by "&"
+    std::list<Selector_Selector>::iterator aSubSel = mySubSelList.begin();
+    for(; aSubSel != mySubSelList.end(); aSubSel++) {
+      if (aSubSel != mySubSelList.begin())
+        aResult += "&";
+      aResult += aSubSel->name(theNameGenerator);
+    }
+    return aResult;
+  }
+  case SELTYPE_PRIMITIVE: {
+    Handle(TDataStd_Name) aName;
+    if (!myFinal.FindAttribute(TDataStd_Name::GetID(), aName))
+      return "";
+    return theNameGenerator->contextName(myFinal) + "/" +
+      std::string(TCollection_AsciiString(aName->Get()).ToCString());
+  }
+  case SELTYPE_MODIFICATION: {
+    // final&/base1&base2
+    std::string aResult;
+    Handle(TDataStd_Name) aName;
+    if (!myFinal.FindAttribute(TDataStd_Name::GetID(), aName))
+      return "";
+    aResult += theNameGenerator->contextName(myFinal) + "/" +
+      std::string(TCollection_AsciiString(aName->Get()).ToCString()) + "&/";
+    for(TDF_LabelList::iterator aBase = myBases.begin(); aBase != myBases.end(); aBase++) {
+      if (aBase != myBases.begin())
+        aResult += "&";
+      if (aBase->FindAttribute(TDataStd_Name::GetID(), aName))
+        return "";
+      aResult += theNameGenerator->contextName(*aBase) + "/" +
+        std::string(TCollection_AsciiString(aName->Get()).ToCString());
+    }
+    return aResult;
+  }
+  case SELTYPE_FILTER_BY_NEIGHBOR: {
+    // (nb1)level_if_more_than_1&(nb2)level_if_more_than_1&(nb3)level_if_more_than_1
+    std::string aResult;
+    std::list<int>::iterator aLevel = myNBLevel.begin();
+    std::list<Selector_Selector>::iterator aSubSel = mySubSelList.begin();
+    for(; aSubSel != mySubSelList.end(); aSubSel++, aLevel++) {
+      if (aSubSel != mySubSelList.begin())
+        aResult += "&";
+      aResult += "(" + aSubSel->name(theNameGenerator) + ")";
+      if (*aLevel > 1)
+        aResult += *aLevel;
+    }
+    return aResult;
+  }
+  default: { // unknown case
+  }
+  };
+  return "";
+}
+
+bool Selector_Selector::selectBySubSelector(
+  const TopoDS_Shape theContext, const TopoDS_Shape theValue)
 {
   mySubSelList.push_back(Selector_Selector(myLab.FindChild(int(mySubSelList.size()) + 1)));
   if (!mySubSelList.back().select(theContext, theValue)) {

@@ -24,6 +24,7 @@
 #include "Model.h"
 #include "Model_AttributeReference.h"
 #include <ModelAPI_AttributeSelection.h>
+#include <Selector_NameGenerator.h>
 #include <TDF_LabelMap.hxx>
 #include <TopoDS_Shape.hxx>
 #include <TopTools_ListOfShape.hxx>
@@ -35,7 +36,8 @@ class Model_Document;
  * \ingroup DataModel
  * \brief Attribute that contains reference to the sub-shape of some result, the selected shape.
  */
-class Model_AttributeSelection : public ModelAPI_AttributeSelection
+class Model_AttributeSelection : public ModelAPI_AttributeSelection,
+                                 public Selector_NameGenerator
 {
   Model_AttributeReference myRef;  ///< The reference functionality reusage
   TDF_LabelMap myScope; ///< the map of valid labels for naming selection solving
@@ -128,6 +130,9 @@ public:
   /// Returns true if the name was stored using weak naming principle
   MODEL_EXPORT virtual bool isWeakNaming();
 
+  // Implementation of the name generator method from the Selector package
+  // This method returns the context name by the label of the sub-selected shape
+  MODEL_EXPORT virtual std::string contextName(const TDF_Label theSelectionLab) override;
 
 protected:
   /// Objects are created for features automatically

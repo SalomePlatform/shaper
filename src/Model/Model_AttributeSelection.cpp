@@ -843,7 +843,10 @@ void Model_AttributeSelection::selectBody(
     try {
       //aSel.Select(aNewSub, aNewContext);
       aSelectorOk = aSel.select(aNewContext, aNewSub);
-      aSel.store();
+      if (aSelectorOk) {
+        aSel.store();
+        aSelectorOk = aSel.solve(aNewContext);
+      }
     } catch(...) {
       aSelectorOk = false;
     }
@@ -968,9 +971,15 @@ std::string Model_AttributeSelection::namingName(const std::string& theDefaultNa
     return aNameStream.str();
   }
 
+  Selector_Selector aSelector(aSelLab);
+  std::string aResult;
+  if (aSelector.restore())
+    aResult = aSelector.name(this);
+  /*
   Model_SelectionNaming aSelNaming(aSelLab);
   std::string aResult = aSelNaming.namingName(
     aCont, aSubSh, theDefaultName, owner()->document() != aCont->document());
+    */
   if (aCenterType != NOT_CENTER) {
     aResult += centersMap()[aCenterType];
   }
@@ -1705,4 +1714,32 @@ void Model_AttributeSelection::setParent(Model_AttributeSelectionList* theParent
 bool Model_AttributeSelection::isWeakNaming()
 {
   return selectionLabel().IsAttribute(kWEAK_NAMING);
+}
+
+std::string Model_AttributeSelection::contextName(const TDF_Label theSelectionLab)
+{
+  DocumentPtr aMyDoc = owner()->document();
+  std::shared_ptr<Model_Document> aDoc = std::dynamic_pointer_cast<Model_Document>(aMyDoc);
+  FeaturePtr aFeatureOwner = aDoc->featureByLab(theSelectionLab);
+  if (aFeatureOwner.get()) {
+    // searching also for result - real context
+    ResultPtr aResult = aDoc->resultByLab(theSelectionLab);
+    if (aResult.get()) {
+      // this is to avoid duplicated names of results problem
+      std::string aContextName = aResult->data()->name();
+      // myLab corresponds to the current time
+      TDF_Label aCurrentLab = selectionLabel();
+      while(aCurrentLab.Depth() > 3)
+        aCurrentLab = aCurrentLab.Father();
+
+      int aNumInHistoryNames =
+        aDoc->numberOfNameInHistory(aResult, aCurrentLab);
+      while(aNumInHistoryNames > 1) { // add "_" before name the needed number of times
+        aContextName = "_" + aContextName;
+        aNumInHistoryNames--;
+      }
+      return aContextName;
+    }
+  }
+  return ""; // invalid case
 }

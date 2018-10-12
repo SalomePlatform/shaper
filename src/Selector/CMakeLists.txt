@@ -23,10 +23,12 @@ INCLUDE(Common)
 SET(PROJECT_HEADERS
     Selector.h
     Selector_Selector.h
+    Selector_NameGenerator.h
 )
 
 SET(PROJECT_SOURCES
     Selector_Selector.cpp
+    Selector_NameGenerator.cpp
 )
 
 SET(PROJECT_LIBRARIES
