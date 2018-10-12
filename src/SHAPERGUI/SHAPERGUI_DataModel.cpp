@@ -206,6 +206,11 @@ bool SHAPERGUI_DataModel::dumpPython(const QString& thePath, CAM_Study* theStudy
     aAttr = aFeature->string(ExchangePlugin_Dump::FILE_FORMAT_ID());
     if (aAttr.get())
       aAttr->setValue(".py");
+
+    AttributeStringPtr aTypeAttr = aFeature->string(ExchangePlugin_Dump::SELECTION_TYPE_ID());
+    if (aTypeAttr.get())
+      aTypeAttr->setValue(ExchangePlugin_Dump::TOPOLOGICAL_NAMING_DUMP_ID());
+
     ModelAPI_Session::get()->finishOperation();
 
     if (QFile::exists(aFileName.c_str())) {
