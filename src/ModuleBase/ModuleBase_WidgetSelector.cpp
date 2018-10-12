@@ -135,7 +135,9 @@ bool ModuleBase_WidgetSelector::acceptSubShape(const GeomShapePtr& theShape,
     return aValid;
   }
   // when the SHAPE type is provided by XML as Object, the whole result shape should be selected.
-  if (!aShape.get() && aShapeTypes.contains(ModuleBase_ResultPrs::Sel_Result)) {
+  //if (!aShape.get() && aShapeTypes.contains(ModuleBase_ResultPrs::Sel_Result)) {
+  // In case of selection of a feature aShape could be not NULL, but result has to be selected
+  if (aShapeTypes.contains(ModuleBase_ResultPrs::Sel_Result)) {
     aValid = true;
     return aValid;
   }
