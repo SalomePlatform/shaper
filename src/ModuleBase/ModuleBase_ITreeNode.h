@@ -185,12 +185,13 @@ protected:
       int aIdx;
       int aCount = 0;
       int aSize = myChildren.size();
+      int aShift = 0;
       while (i < aSize) {
         aCount++;
         aNode = myChildren.at(i);
         aObject = aNode->object();
         if (aObject.get()) {
-          aIdx = aObject->document()->index(aObject, true);
+          aIdx = aObject->document()->index(aObject, true) + aShift;
           if (aIdx != i) {
             myChildren.removeAll(aNode);
             myChildren.insert(aIdx, aNode);
@@ -198,6 +199,8 @@ protected:
             continue;
           }
         }
+        else
+          aShift++;
         i++;
         // To avoid unlimited cycling
         if (aCount > aSize * aSize)
