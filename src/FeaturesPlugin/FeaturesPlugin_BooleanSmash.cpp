@@ -20,6 +20,8 @@
 
 #include "FeaturesPlugin_BooleanSmash.h"
 
+#include "FeaturesPlugin_Tools.h"
+
 #include <ModelAPI_ResultBody.h>
 #include <ModelAPI_AttributeSelectionList.h>
 #include <ModelAPI_Tools.h>
@@ -144,8 +146,7 @@ void FeaturesPlugin_BooleanSmash::execute()
     }
   }
 
-  GeomAlgoAPI_MakeShapeList aMakeShapeList;
-  GeomAPI_DataMapOfShapeShape aMapOfShapes;
+  std::shared_ptr<GeomAlgoAPI_MakeShapeList> aMakeShapeList(new GeomAlgoAPI_MakeShapeList());
   if (!aShapesToAdd.empty()) {
     // Cut objects with not used solids.
     std::shared_ptr<GeomAlgoAPI_Boolean> anObjectsCutAlgo(
@@ -156,8 +157,7 @@ void FeaturesPlugin_BooleanSmash::execute()
     if (GeomAlgoAPI_ShapeTools::volume(anObjectsCutAlgo->shape()) > 1.e-27) {
       aShapesToSmash.clear();
       aShapesToSmash.push_back(anObjectsCutAlgo->shape());
-      aMakeShapeList.appendAlgo(anObjectsCutAlgo);
-      aMapOfShapes.merge(anObjectsCutAlgo->mapOfSubShapes());
+      aMakeShapeList->appendAlgo(anObjectsCutAlgo);
     }
 
     // Cut tools with not used solids.
@@ -169,8 +169,7 @@ void FeaturesPlugin_BooleanSmash::execute()
     if (GeomAlgoAPI_ShapeTools::volume(aToolsCutAlgo->shape()) > 1.e-27) {
       aTools.clear();
       aTools.push_back(aToolsCutAlgo->shape());
-      aMakeShapeList.appendAlgo(aToolsCutAlgo);
-      aMapOfShapes.merge(aToolsCutAlgo->mapOfSubShapes());
+      aMakeShapeList->appendAlgo(aToolsCutAlgo);
     }
   }
 
@@ -196,8 +195,7 @@ void FeaturesPlugin_BooleanSmash::execute()
     setError(aFeatureError);
     return;
   }
-  aMakeShapeList.appendAlgo(aBoolAlgo);
-  aMapOfShapes.merge(aBoolAlgo->mapOfSubShapes());
+  aMakeShapeList->appendAlgo(aBoolAlgo);
 
   // Put all (cut result, tools and not used solids) to PaveFiller.
   GeomShapePtr aShape = aBoolAlgo->shape();
@@ -230,88 +228,28 @@ void FeaturesPlugin_BooleanSmash::execute()
     }
 
     aShape = aFillerAlgo->shape();
-    aMakeShapeList.appendAlgo(aFillerAlgo);
-    aMapOfShapes.merge(aFillerAlgo->mapOfSubShapes());
+    aMakeShapeList->appendAlgo(aFillerAlgo);
   }
 
   std::shared_ptr<GeomAPI_Shape> aFrontShape = anOriginalShapes.front();
   anOriginalShapes.pop_front();
   std::shared_ptr<ModelAPI_ResultBody> aResultBody = document()->createBody(data(), aResultIndex);
-  loadNamingDS(aResultBody,
-               aFrontShape,
-               anOriginalShapes,
-               aShape,
-               aMakeShapeList,
-               aMapOfShapes);
+
+  FeaturesPlugin_Tools::loadModifiedShapes(aResultBody,
+                                           aFrontShape,
+                                           anOriginalShapes,
+                                           aMakeShapeList,
+                                           aShape);
 
   setResult(aResultBody, aResultIndex);
   aResultIndex++;
 
+  FeaturesPlugin_Tools::loadDeletedShapes(aResultBody,
+                                          aFrontShape,
+                                          anOriginalShapes,
+                                          aMakeShapeList,
+                                          aShape);
+
   // remove the rest results if there were produced in the previous pass
   removeResults(aResultIndex);
-}
-
-//==================================================================================================
-void FeaturesPlugin_BooleanSmash::loadNamingDS(ResultBodyPtr theResultBody,
-                                             const GeomShapePtr theBaseShape,
-                                             const ListOfShape& theTools,
-                                             const GeomShapePtr theResultShape,
-                                             GeomAlgoAPI_MakeShape& theMakeShape,
-                                             GeomAPI_DataMapOfShapeShape& theMapOfShapes)
-{
-  //load result
-  if (theBaseShape->isEqual(theResultShape)) {
-    theResultBody->store(theResultShape, false);
-  } else if (theResultShape->isEqual(theTools.front())) {
-    theResultBody->store(theResultShape, false);
-  } else {
-    const int aModifyVTag = 1;
-    const int aModifyETag = 2;
-    const int aModifyFTag = 3;
-    const int aDeletedTag = 4;
-    /// sub solids will be placed at labels 5, 6, etc. if result is compound of solids
-    const int aSubsolidsTag = 5;
-
-    theResultBody->storeModified(theBaseShape, theResultShape, aSubsolidsTag);
-
-    const std::string aModVName = "Modified_Vertex";
-    const std::string aModEName = "Modified_Edge";
-    const std::string aModFName = "Modified_Face";
-
-    theResultBody->loadAndOrientModifiedShapes(&theMakeShape, theBaseShape, GeomAPI_Shape::VERTEX,
-                                               aModifyVTag, aModVName, theMapOfShapes, false,
-                                               true, true);
-    theResultBody->loadAndOrientModifiedShapes(&theMakeShape, theBaseShape, GeomAPI_Shape::EDGE,
-                                               aModifyETag, aModEName, theMapOfShapes, false,
-                                               true, true);
-    theResultBody->loadAndOrientModifiedShapes(&theMakeShape, theBaseShape, GeomAPI_Shape::FACE,
-                                               aModifyFTag, aModFName, theMapOfShapes, false,
-                                               true, true);
-
-    theResultBody->loadDeletedShapes(&theMakeShape, theBaseShape,
-                                     GeomAPI_Shape::VERTEX, aDeletedTag);
-    theResultBody->loadDeletedShapes(&theMakeShape, theBaseShape,
-                                     GeomAPI_Shape::EDGE, aDeletedTag);
-    theResultBody->loadDeletedShapes(&theMakeShape, theBaseShape,
-                                     GeomAPI_Shape::FACE, aDeletedTag);
-
-    for (ListOfShape::const_iterator anIter = theTools.begin(); anIter != theTools.end(); anIter++)
-    {
-      theResultBody->loadAndOrientModifiedShapes(&theMakeShape, *anIter, GeomAPI_Shape::VERTEX,
-                                                 aModifyVTag, aModVName, theMapOfShapes, false,
-                                                 true, true);
-
-      theResultBody->loadAndOrientModifiedShapes(&theMakeShape, *anIter, GeomAPI_Shape::EDGE,
-                                                 aModifyETag, aModEName, theMapOfShapes, false,
-                                                 true, true);
-
-      theResultBody->loadAndOrientModifiedShapes(&theMakeShape, *anIter, GeomAPI_Shape::FACE,
-                                                 aModifyFTag, aModFName, theMapOfShapes, false,
-                                                 true, true);
-
-      theResultBody->loadDeletedShapes(&theMakeShape, *anIter, GeomAPI_Shape::VERTEX, aDeletedTag);
-      theResultBody->loadDeletedShapes(&theMakeShape, *anIter, GeomAPI_Shape::EDGE, aDeletedTag);
-      theResultBody->loadDeletedShapes(&theMakeShape, *anIter, GeomAPI_Shape::FACE, aDeletedTag);
-    }
-  }
 }

@@ -78,9 +78,7 @@ private:
                     const std::shared_ptr<GeomAPI_Shape> theBaseShape,
                     const ListOfShape& theTools,
                     const std::shared_ptr<GeomAPI_Shape> theResultShape,
-                    GeomAlgoAPI_MakeShape& theMakeShape,
-                    GeomAPI_DataMapOfShapeShape& theMapOfShapes,
-                    const bool theIsStoreAsGenerated = false);
+                    const GeomMakeShapePtr& theMakeShape);
 
 private:
   OperationType myOperationType;

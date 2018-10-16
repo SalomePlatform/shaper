@@ -204,26 +204,18 @@ void FeaturesPlugin_Partition::storeResult(
     return;
   }
 
-  const int aDelTag = 1;
-  /// sub solids will be placed at labels 3, 4, etc. if result is compound of solids
-  const int aSubTag = 2;
-  int aModTag = aSubTag + 10000;
-  const std::string aModName = "Modified";
-
-  aResultBody->storeModified(aBaseShape, theResultShape, aSubTag);
+  aResultBody->storeModified(aBaseShape, theResultShape);
 
   std::shared_ptr<GeomAPI_DataMapOfShapeShape> aMapOfSubShapes = theMakeShape->mapOfSubShapes();
   theObjects.insert(theObjects.end(), thePlanes.begin(), thePlanes.end());
-  int anIndex = 1;
-  for(ListOfShape::const_iterator anIt = theObjects.cbegin(); anIt != theObjects.cend(); ++anIt) {
+  for (ListOfShape::const_iterator anIt = theObjects.cbegin();
+       anIt != theObjects.cend();
+       ++anIt)
+  {
     GeomShapePtr aShape = *anIt;
-    std::string aModEdgeName = aModName + "_Edge_" + std::to_string((long long)anIndex);
-    aResultBody->loadAndOrientModifiedShapes(theMakeShape.get(), aShape, GeomAPI_Shape::EDGE,
-      aModTag, aModEdgeName, *aMapOfSubShapes.get(), false, true, true);
-    std::string aModFaceName = aModName + "_Face_" + std::to_string((long long)anIndex++);
-    aResultBody->loadAndOrientModifiedShapes(theMakeShape.get(), aShape, GeomAPI_Shape::FACE,
-      aModTag + 1, aModFaceName, *aMapOfSubShapes.get(), false, true, true);
-    aResultBody->loadDeletedShapes(theMakeShape.get(), aShape, GeomAPI_Shape::FACE, aDelTag);
+    aResultBody->loadModifiedShapes(theMakeShape, aShape, GeomAPI_Shape::EDGE, "Modified_Edge");
+    aResultBody->loadModifiedShapes(theMakeShape, aShape, GeomAPI_Shape::FACE, "Modified_Face");
+    aResultBody->loadDeletedShapes(theMakeShape, aShape, GeomAPI_Shape::FACE);
   }
 
   setResult(aResultBody, theIndex);

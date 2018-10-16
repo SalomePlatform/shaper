@@ -21,20 +21,42 @@
 #ifndef FeaturesPlugin_Tools_H_
 #define FeaturesPlugin_Tools_H_
 
-#include <GeomAlgoAPI_Translation.h>
+#include <GeomAlgoAPI_MakeShape.h>
+#include <ModelAPI_ResultBody.h>
 
-class ModelAPI_ResultBody;
+#include <vector>
 
 class FeaturesPlugin_Tools {
 public:
-  static void storeModifiedShapes(GeomAlgoAPI_MakeShape& theAlgo,
-                                  std::shared_ptr<ModelAPI_ResultBody> theResultBody,
-                                  std::shared_ptr<GeomAPI_Shape> theBaseShape,
-                                  const int theFaceTag,
-                                  const int theEdgeTag,
-                                  const int theVertexTag,
-                                  const std::string theName,
-                                  GeomAPI_DataMapOfShapeShape& theSubShapes);
+  struct ResultBaseAlgo {
+    ResultBodyPtr resultBody;
+    GeomShapePtr baseShape;
+    GeomMakeShapePtr makeShape;
+  };
+
+public:
+  static void loadModifiedShapes(ResultBodyPtr theResultBody,
+                                 const GeomShapePtr theBaseShape,
+                                 const ListOfShape& theTools,
+                                 const GeomMakeShapePtr& theMakeShape,
+                                 const GeomShapePtr theResultShape);
+
+  static void loadModifiedShapes(ResultBodyPtr theResultBody,
+                                 const GeomShapePtr theBaseShape,
+                                 const GeomMakeShapePtr& theMakeShape,
+                                 const std::string theName);
+
+    /// Stores deleted shapes.
+  static void loadDeletedShapes(ResultBodyPtr theResultBody,
+                                const GeomShapePtr theBaseShape,
+                                const ListOfShape& theTools,
+                                const GeomMakeShapePtr& theMakeShape,
+                                const GeomShapePtr theResultShapesCompound);
+
+  /// Stores deleted shapes.
+  static void loadDeletedShapes(std::vector<ResultBaseAlgo>& theResultBaseAlgoList,
+                                const ListOfShape& theTools,
+                                const GeomShapePtr theResultShapesCompound);
 };
 
 #endif /* FeaturesPlugin_Tools_H_ */

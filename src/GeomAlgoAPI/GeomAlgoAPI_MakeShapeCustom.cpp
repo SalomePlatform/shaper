@@ -20,58 +20,64 @@
 
 #include <GeomAlgoAPI_MakeShapeCustom.h>
 
-//=================================================================================================
+//==================================================================================================
 GeomAlgoAPI_MakeShapeCustom::GeomAlgoAPI_MakeShapeCustom()
 {}
 
-//=================================================================================================
-void GeomAlgoAPI_MakeShapeCustom::setResult(const std::shared_ptr<GeomAPI_Shape> theShape)
+//==================================================================================================
+void GeomAlgoAPI_MakeShapeCustom::setResult(const GeomShapePtr theShape)
 {
   setShape(theShape);
 }
 
-//=================================================================================================
-bool GeomAlgoAPI_MakeShapeCustom::addModified(const std::shared_ptr<GeomAPI_Shape> theBase,
-                                              const std::shared_ptr<GeomAPI_Shape> theResult)
+//==================================================================================================
+bool GeomAlgoAPI_MakeShapeCustom::addModified(const GeomShapePtr theOldShape,
+                                              const GeomShapePtr theNewShape)
 {
-  return myModified.add(theBase, theResult);
+  if (!isValidForHistory(theNewShape)) return false;
+  GeomShapePtr aNewShape = theNewShape;
+  fixOrientation(aNewShape);
+  return myModified.add(theOldShape, aNewShape);
 }
 
-//=================================================================================================
-bool GeomAlgoAPI_MakeShapeCustom::addGenerated(const std::shared_ptr<GeomAPI_Shape> theBase,
-                                               const std::shared_ptr<GeomAPI_Shape> theResult)
+//==================================================================================================
+bool GeomAlgoAPI_MakeShapeCustom::addGenerated(const GeomShapePtr theOldShape,
+                                               const GeomShapePtr theNewShape)
 {
-  return myGenerated.add(theBase, theResult);
+  if (!isValidForHistory(theNewShape)) return false;
+  GeomShapePtr aNewShape = theNewShape;
+  fixOrientation(aNewShape);
+  return myGenerated.add(theOldShape, aNewShape);
 }
 
-//=================================================================================================
-bool GeomAlgoAPI_MakeShapeCustom::addDeleted(const std::shared_ptr<GeomAPI_Shape> theShape)
+//==================================================================================================
+bool GeomAlgoAPI_MakeShapeCustom::addDeleted(const GeomShapePtr theOldShape)
 {
-  return myDeleted.bind(theShape, theShape);
+  return myDeleted.bind(theOldShape, theOldShape);
 }
 
-//=================================================================================================
-void GeomAlgoAPI_MakeShapeCustom::generated(const std::shared_ptr<GeomAPI_Shape> theShape,
-                                            ListOfShape& theHistory)
+//==================================================================================================
+void GeomAlgoAPI_MakeShapeCustom::generated(const GeomShapePtr theOldShape,
+                                            ListOfShape& theNewShapes)
 {
   ListOfShape aGenerated;
-  if(myGenerated.find(theShape, aGenerated)) {
-    theHistory.insert(theHistory.end(), aGenerated.begin(), aGenerated.end());
+  if(myGenerated.find(theOldShape, aGenerated)) {
+    theNewShapes.insert(theNewShapes.end(), aGenerated.begin(), aGenerated.end());
   }
 }
 
-//=================================================================================================
-void GeomAlgoAPI_MakeShapeCustom::modified(const std::shared_ptr<GeomAPI_Shape> theShape,
-                                           ListOfShape& theHistory)
+//==================================================================================================
+void GeomAlgoAPI_MakeShapeCustom::modified(const GeomShapePtr theOldShape,
+                                           ListOfShape& theNewShapes)
 {
   ListOfShape aModified;
-  if(myModified.find(theShape, aModified)) {
-    theHistory.insert(theHistory.end(), aModified.begin(), aModified.end());
+  if(myModified.find(theOldShape, aModified)) {
+    theNewShapes.insert(theNewShapes.end(), aModified.begin(), aModified.end());
   }
 }
 
-//=================================================================================================
-bool GeomAlgoAPI_MakeShapeCustom::isDeleted(const std::shared_ptr<GeomAPI_Shape> theShape)
+//==================================================================================================
+bool GeomAlgoAPI_MakeShapeCustom::isDeleted(const GeomShapePtr theOldShape)
 {
-  return myDeleted.isBound(theShape);
+  return myDeleted.isBound(theOldShape);
 }

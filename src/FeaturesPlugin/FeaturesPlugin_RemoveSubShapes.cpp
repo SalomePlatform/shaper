@@ -232,7 +232,7 @@ void FeaturesPlugin_RemoveSubShapes::execute()
     aResultShape = anAttrSelectionInList->value();
   }
   // deleted and copied must be jointed to one list which keeps all the history
-  GeomAlgoAPI_MakeShapeList aMakeShapeList;
+  std::shared_ptr<GeomAlgoAPI_MakeShapeList> aMakeShapeList(new GeomAlgoAPI_MakeShapeList());
 
   // find all removed shapes
   std::shared_ptr<GeomAlgoAPI_MakeShapeCustom> aDeletedSubs(new GeomAlgoAPI_MakeShapeCustom);
@@ -263,11 +263,11 @@ void FeaturesPlugin_RemoveSubShapes::execute()
       }
     }
   }
-  aMakeShapeList.appendAlgo(aDeletedSubs);
+  aMakeShapeList->appendAlgo(aDeletedSubs);
 
   std::shared_ptr<GeomAlgoAPI_Copy> aCopy(new GeomAlgoAPI_Copy(aResultShape));
   aResultShape = aCopy->shape();
-  aMakeShapeList.appendAlgo(aCopy);
+  aMakeShapeList->appendAlgo(aCopy);
 
   if (aResultShape->shapeType() == GeomAPI_Shape::COMPOUND) {
     aResultShape = GeomAlgoAPI_ShapeTools::groupSharedTopology(aResultShape);
@@ -283,15 +283,25 @@ void FeaturesPlugin_RemoveSubShapes::execute()
 
   // Store result.
   ResultBodyPtr aResultBody = document()->createBody(data());
-  aResultBody->storeModified(aBaseShape, aResultShape, 1);
-  std::set<GeomAPI_Shape::ShapeType>::iterator aTypeIter = aTypes.begin();
-  for(; aTypeIter != aTypes.end(); aTypeIter++)
-    aResultBody->loadDeletedShapes(&aMakeShapeList, aBaseShape, *aTypeIter, 1);
-  aResultBody->loadAndOrientModifiedShapes(&aMakeShapeList, aBaseShape, GeomAPI_Shape::FACE,
-      2, "Modified_Face", *aMakeShapeList.mapOfSubShapes().get(), true, false, true);
-  aResultBody->loadAndOrientModifiedShapes(&aMakeShapeList, aBaseShape, GeomAPI_Shape::EDGE,
-      3, "Modified_Edge", *aMakeShapeList.mapOfSubShapes().get(), false, false, true);
-  aResultBody->loadAndOrientModifiedShapes(&aMakeShapeList, aBaseShape, GeomAPI_Shape::VERTEX,
-      4, "Modified_Vertex", *aMakeShapeList.mapOfSubShapes().get());
+  aResultBody->storeModified(aBaseShape, aResultShape);
+  for (std::set<GeomAPI_Shape::ShapeType>::iterator aTypeIter = aTypes.begin();
+       aTypeIter != aTypes.end();
+       ++aTypeIter)
+  {
+    aResultBody->loadDeletedShapes(aMakeShapeList, aBaseShape, *aTypeIter);
+  }
+
+  aResultBody->loadModifiedShapes(aMakeShapeList,
+                                  aBaseShape,
+                                  GeomAPI_Shape::FACE,
+                                  "Modified_Face");
+  aResultBody->loadModifiedShapes(aMakeShapeList,
+                                  aBaseShape,
+                                  GeomAPI_Shape::EDGE,
+                                  "Modified_Edge");
+  aResultBody->loadModifiedShapes(aMakeShapeList,
+                                  aBaseShape,
+                                  GeomAPI_Shape::VERTEX,
+                                  "Modified_Vertex");
   setResult(aResultBody);
 }

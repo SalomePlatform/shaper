@@ -56,29 +56,28 @@ void BuildPlugin_Shell::execute()
   }
 
   // Sew faces.
-  GeomAlgoAPI_Sewing aSewingAlgo(aShapes);
+  GeomMakeShapePtr aSewingAlgo(new GeomAlgoAPI_Sewing(aShapes));
 
   // Check that algo is done.
-  if(!aSewingAlgo.isDone()) {
+  if(!aSewingAlgo->isDone()) {
     setError("Error: " + getKind() + " algorithm failed.");
     return;
   }
 
   // Check if shape is not null.
-  if(!aSewingAlgo.shape().get() || aSewingAlgo.shape()->isNull()) {
+  if(!aSewingAlgo->shape().get() || aSewingAlgo->shape()->isNull()) {
     setError("Error: Resulting shape is null.");
     return;
   }
 
   // Check that resulting shape is valid.
-  if(!aSewingAlgo.isValid()) {
+  if(!aSewingAlgo->isValid()) {
     setError("Error: Resulting shape is not valid.");
     return;
   }
 
   // Store result.
-  GeomShapePtr aResult = aSewingAlgo.shape();
-  std::shared_ptr<GeomAPI_DataMapOfShapeShape> aMapOfShapes = aSewingAlgo.mapOfSubShapes();
+  GeomShapePtr aResult = aSewingAlgo->shape();
 
   int anIndex = 0;
   for(GeomAPI_ShapeExplorer anExp(aResult, GeomAPI_Shape::SHELL); anExp.more(); anExp.next()) {
@@ -86,23 +85,27 @@ void BuildPlugin_Shell::execute()
     ResultBodyPtr aResultBody = document()->createBody(data(), anIndex);
     aResultBody->store(aShell);
     for(ListOfShape::const_iterator anIt = aShapes.cbegin(); anIt != aShapes.cend(); ++anIt) {
-      for(GeomAPI_ShapeExplorer
-          aFaceExp(*anIt, GeomAPI_Shape::FACE); aFaceExp.more(); aFaceExp.next()) {
+      for (GeomAPI_ShapeExplorer aFaceExp(*anIt, GeomAPI_Shape::FACE);
+           aFaceExp.more();
+           aFaceExp.next())
+      {
         GeomShapePtr aFace = aFaceExp.current();
         ListOfShape aHistory;
-        aSewingAlgo.modified(aFace, aHistory);
-        for(ListOfShape::const_iterator aHistoryIt = aHistory.cbegin();
-            aHistoryIt != aHistory.cend();
-            ++aHistoryIt) {
+        aSewingAlgo->modified(aFace, aHistory);
+        for (ListOfShape::const_iterator aHistoryIt = aHistory.cbegin();
+             aHistoryIt != aHistory.cend();
+             ++aHistoryIt)
+        {
           GeomShapePtr aHistoryShape = *aHistoryIt;
-          if(aMapOfShapes->isBound(aHistoryShape)) {
-            aHistoryShape = aMapOfShapes->find(aHistoryShape);
-          }
-          if(aShell->isSubShape(aHistoryShape)) {
-            aResultBody->loadAndOrientModifiedShapes(&aSewingAlgo, aFace, GeomAPI_Shape::EDGE,
-                                                     1, "Modified_Edge", *aMapOfShapes.get());
-            aResultBody->loadAndOrientModifiedShapes(&aSewingAlgo, aFace, GeomAPI_Shape::FACE,
-                                                     2, "Modified_Face", *aMapOfShapes.get());
+          if (aShell->isSubShape(aHistoryShape, false)) {
+            aResultBody->loadModifiedShapes(aSewingAlgo,
+                                            aFace,
+                                            GeomAPI_Shape::EDGE,
+                                            "Modified_Edge");
+            aResultBody->loadModifiedShapes(aSewingAlgo,
+                                            aFace,
+                                            GeomAPI_Shape::FACE,
+                                            "Modified_Face");
             break;
           }
         }

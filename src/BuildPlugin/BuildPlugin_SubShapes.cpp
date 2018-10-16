@@ -105,9 +105,9 @@ void BuildPlugin_SubShapes::execute()
   if(!aBaseShape.get()) {
     return;
   }
-  GeomAlgoAPI_ShapeBuilder aBuilder;
-  aBuilder.removeInternal(aBaseShape);
-  GeomShapePtr aResultShape = aBuilder.shape();
+  std::shared_ptr<GeomAlgoAPI_ShapeBuilder> aBuilder(new GeomAlgoAPI_ShapeBuilder());
+  aBuilder->removeInternal(aBaseShape);
+  GeomShapePtr aResultShape = aBuilder->shape();
 
   // Get list of shapes.
   ListOfShape aShapesToAdd;
@@ -118,8 +118,8 @@ void BuildPlugin_SubShapes::execute()
 
   // Copy sub-shapes from list to new shape.
   if(!aShapesToAdd.empty()) {
-    aBuilder.addInternal(aResultShape, aShapesToAdd);
-    aResultShape = aBuilder.shape();
+    aBuilder->addInternal(aResultShape, aShapesToAdd);
+    aResultShape = aBuilder->shape();
   }
 
   // Store result.
@@ -127,15 +127,17 @@ void BuildPlugin_SubShapes::execute()
   const int aModEdgeTag = 2;
   ResultBodyPtr aResultBody = document()->createBody(data());
   aResultBody->storeModified(aBaseShape, aResultShape);
-  aResultBody->loadAndOrientModifiedShapes(&aBuilder, aBaseShape, GeomAPI_Shape::EDGE, aModEdgeTag,
-                                          "Modified_Edge", *aBuilder.mapOfSubShapes().get());
-  for(ListOfShape::const_iterator
-      anIt = aShapesToAdd.cbegin(); anIt != aShapesToAdd.cend(); ++anIt) {
+  aResultBody->loadModifiedShapes(aBuilder, aBaseShape, GeomAPI_Shape::EDGE, "Modified_Edge");
+  for (ListOfShape::const_iterator anIt = aShapesToAdd.cbegin();
+       anIt != aShapesToAdd.cend();
+       ++anIt)
+  {
     GeomAPI_Shape::ShapeType aShType = (*anIt)->shapeType();
-    aResultBody->loadAndOrientModifiedShapes(&aBuilder, *anIt, aShType,
-                        aShType == GeomAPI_Shape::VERTEX ? aModVertexTag : aModEdgeTag,
-                        aShType == GeomAPI_Shape::VERTEX ? "Modified_Vertex" : "Modified_Edge",
-                        *aBuilder.mapOfSubShapes().get());
+    aResultBody->loadModifiedShapes(aBuilder,
+                                    *anIt,
+                                    aShType,
+                                    aShType == GeomAPI_Shape::VERTEX ? "Modified_Vertex"
+                                                                     : "Modified_Edge");
   }
   setResult(aResultBody);
 }

@@ -95,11 +95,6 @@ class FeaturesPlugin_Placement : public ModelAPI_Feature
 
   /// Use plugin manager for features creation
   FeaturesPlugin_Placement();
-private:
-  /// Load Naming data structure of the feature to the document
-  void loadNamingDS(GeomAlgoAPI_Transform& theTransformAlgo,
-                    std::shared_ptr<ModelAPI_ResultBody> theResultBody,
-                    std::shared_ptr<GeomAPI_Shape> theBaseShape);
 };
 
 #endif

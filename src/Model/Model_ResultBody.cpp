@@ -52,17 +52,16 @@ Model_ResultBody::~Model_ResultBody()
   delete myBuilder;
 }
 
-void Model_ResultBody::loadAndOrientModifiedShapes(GeomAlgoAPI_MakeShape* theMS,
-    std::shared_ptr<GeomAPI_Shape> theShapeIn, const int  theKindOfShape, const int  theTag,
-    const std::string& theName, GeomAPI_DataMapOfShapeShape& theSubShapes,
-    const bool theIsStoreSeparate,
-    const bool theIsStoreAsGenerated,
-    const bool theSplitInSubs)
+void Model_ResultBody::loadModifiedShapes(
+  const std::shared_ptr<GeomAlgoAPI_MakeShape>& theAlgo,
+  const GeomShapePtr& theOldShape,
+  const GeomAPI_Shape::ShapeType theShapeTypeToExplore,
+  const std::string& theName)
 {
-  if (theSplitInSubs && mySubs.size()) { // consists of subs
+  if (/*theSplitInSubs &&*/ mySubs.size()) { // consists of subs
     // optimization of getting of new shapes for specific sub-result
-    if (!theMS->newShapesCollected(theShapeIn, theKindOfShape))
-      theMS->collectNewShapes(theShapeIn, theKindOfShape);
+    if (!theAlgo->isNewShapesCollected(theOldShape, theShapeTypeToExplore))
+      theAlgo->collectNewShapes(theOldShape, theShapeTypeToExplore);
     std::vector<ResultBodyPtr>::const_iterator aSubIter = mySubs.cbegin();
     for(; aSubIter != mySubs.cend(); aSubIter++) {
       // check that sub-shape was also created as modification of ShapeIn
@@ -84,14 +83,10 @@ void Model_ResultBody::loadAndOrientModifiedShapes(GeomAlgoAPI_MakeShape* theMS,
           }
         }
       }*/
-      (*aSubIter)->loadAndOrientModifiedShapes(
-        theMS, theShapeIn, theKindOfShape, theTag, theName, theSubShapes, theIsStoreSeparate,
-        theIsStoreAsGenerated, theSplitInSubs);
+      (*aSubIter)->loadModifiedShapes(theAlgo, theOldShape, theShapeTypeToExplore, theName);
     }
   } else { // do for this directly
-    myBuilder->loadAndOrientModifiedShapes(
-      theMS, theShapeIn, theKindOfShape, theTag, theName, theSubShapes, theIsStoreSeparate,
-        theIsStoreAsGenerated);
+    myBuilder->loadModifiedShapes(theAlgo, theOldShape, theShapeTypeToExplore, theName);
   }
 }
 

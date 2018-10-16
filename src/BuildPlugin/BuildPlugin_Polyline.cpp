@@ -107,7 +107,7 @@ void BuildPlugin_Polyline::execute()
   ResultBodyPtr aResultBody = document()->createBody(data());
   std::set<GeomShapePtr>::const_iterator aContextIt = aContexts.begin();
   for (; aContextIt != aContexts.end(); aContextIt++) {
-    aResultBody->storeModified(*aContextIt, aWire, aContextIt == aContexts.begin() ? 0 : -2);
+    aResultBody->storeModified(*aContextIt, aWire, aContextIt == aContexts.begin());
   }
 
   aPointsIt = aPoints.cbegin();
@@ -115,7 +115,7 @@ void BuildPlugin_Polyline::execute()
   for (; anExp.more() && aPointsIt != aPoints.cend(); anExp.next(), ++aPointsIt) {
     GeomShapePtr aPoint = *aPointsIt;
     GeomShapePtr anEdge = anExp.current();
-    aResultBody->generated(aPoint, anEdge, "Edge", 1);
+    aResultBody->generated(aPoint, anEdge, "Edge");
   }
 
   if (!isClosed) {

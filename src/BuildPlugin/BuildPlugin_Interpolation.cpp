@@ -128,7 +128,7 @@ void BuildPlugin_Interpolation::execute()
   ResultBodyPtr aResultBody = document()->createBody(data());
   std::set<GeomShapePtr>::const_iterator aContextIt = aContexts.begin();
   for (; aContextIt != aContexts.end(); aContextIt++) {
-    aResultBody->storeModified(*aContextIt, anEdge, aContextIt == aContexts.begin() ? 0 : -2);
+    aResultBody->storeModified(*aContextIt, anEdge, aContextIt == aContexts.begin());
   }
   int aVertexIndex = 1;
   for (GeomAPI_ShapeExplorer anExp(anEdge, GeomAPI_Shape::VERTEX); anExp.more(); anExp.next()) {

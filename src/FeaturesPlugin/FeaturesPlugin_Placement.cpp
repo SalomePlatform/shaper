@@ -167,29 +167,30 @@ void FeaturesPlugin_Placement::execute()
       setResult(aResultPart, aResultIndex);
     } else {
       std::shared_ptr<GeomAPI_Shape> aBaseShape = *anObjectsIt;
-      GeomAlgoAPI_Transform aTransformAlgo(aBaseShape, aTrsf);
+      std::shared_ptr<GeomAlgoAPI_Transform> aTransformAlgo(new GeomAlgoAPI_Transform(aBaseShape,
+                                                                                      aTrsf));
 
       // Checking that the algorithm worked properly.
-      if(!aTransformAlgo.isDone()) {
+      if(!aTransformAlgo->isDone()) {
         static const std::string aFeatureError = "Error: Transform algorithm failed.";
         setError(aFeatureError);
         break;
       }
-      if(aTransformAlgo.shape()->isNull()) {
+      if(aTransformAlgo->shape()->isNull()) {
         static const std::string aShapeError = "Error: Resulting shape is Null.";
         setError(aShapeError);
         break;
       }
-      if(!aTransformAlgo.isValid()) {
+      if(!aTransformAlgo->isValid()) {
         std::string aFeatureError = "Error: Resulting shape is not valid.";
         setError(aFeatureError);
         break;
       }
 
       //LoadNamingDS
-      std::shared_ptr<ModelAPI_ResultBody> aResultBody =
-        document()->createBody(data(), aResultIndex);
-      loadNamingDS(aTransformAlgo, aResultBody, aBaseShape);
+      ResultBodyPtr aResultBody = document()->createBody(data(), aResultIndex);
+      aResultBody->storeModified(aBaseShape, aTransformAlgo->shape());
+      FeaturesPlugin_Tools::loadModifiedShapes(aResultBody, aBaseShape, aTransformAlgo, "Placed");
       setResult(aResultBody, aResultIndex);
     }
     aResultIndex++;
@@ -197,20 +198,4 @@ void FeaturesPlugin_Placement::execute()
 
   // Remove the rest results if there were produced in the previous pass.
   removeResults(aResultIndex);
-}
-
-//============================================================================
-void FeaturesPlugin_Placement::loadNamingDS(GeomAlgoAPI_Transform& theTransformAlgo,
-                                            std::shared_ptr<ModelAPI_ResultBody> theResultBody,
-                                            std::shared_ptr<GeomAPI_Shape> theBaseShape)
-{
-  //load result
-  theResultBody->storeModified(theBaseShape, theTransformAlgo.shape());
-
-  std::string aPlacedName = "Placed";
-  std::shared_ptr<GeomAPI_DataMapOfShapeShape> aSubShapes = theTransformAlgo.mapOfSubShapes();
-
-  FeaturesPlugin_Tools::storeModifiedShapes(theTransformAlgo, theResultBody,
-                                            theBaseShape, 1, 2, 3, aPlacedName,
-                                            *aSubShapes.get());
 }

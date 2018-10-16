@@ -51,24 +51,24 @@ public:
 
   /// \brief Adds algo to the end of list.
   /// \param[in] theMakeShape algo to be added.
-  GEOMALGOAPI_EXPORT void appendAlgo(const std::shared_ptr<GeomAlgoAPI_MakeShape> theMakeShape);
+  GEOMALGOAPI_EXPORT void appendAlgo(const GeomMakeShapePtr theMakeShape);
 
   /// \return a shape built by the shape construction algorithms
-  GEOMALGOAPI_EXPORT virtual const std::shared_ptr<GeomAPI_Shape> shape() const;
+  GEOMALGOAPI_EXPORT virtual const GeomShapePtr shape() const;
 
   /// \return the list of shapes generated from the shape \a theShape
-  GEOMALGOAPI_EXPORT virtual void generated(const std::shared_ptr<GeomAPI_Shape> theShape,
+  GEOMALGOAPI_EXPORT virtual void generated(const GeomShapePtr theShape,
                                             ListOfShape& theHistory);
 
   /// \return the list of shapes modified from the shape \a theShape
-  GEOMALGOAPI_EXPORT virtual void modified(const std::shared_ptr<GeomAPI_Shape> theShape,
+  GEOMALGOAPI_EXPORT virtual void modified(const GeomShapePtr theShape,
                                            ListOfShape& theHistory);
 
   /// \return whether the shape is deleted
-  GEOMALGOAPI_EXPORT virtual bool isDeleted(const std::shared_ptr<GeomAPI_Shape> theShape);
+  GEOMALGOAPI_EXPORT virtual bool isDeleted(const GeomShapePtr theShape);
 
 private:
-  void result(const std::shared_ptr<GeomAPI_Shape> theShape,
+  void result(const GeomShapePtr theShape,
               OperationType theOperationType,
               ListOfShape& theHistory);
 

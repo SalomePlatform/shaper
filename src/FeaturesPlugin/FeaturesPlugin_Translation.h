@@ -149,10 +149,6 @@ private:
 
   ///Perform the translation usind two points
   void performTranslationByTwoPoints();
-
-  void loadNamingDS(GeomAlgoAPI_Translation& theTranslationAlgo,
-                    std::shared_ptr<ModelAPI_ResultBody> theResultBody,
-                    std::shared_ptr<GeomAPI_Shape> theBaseShape);
 };
 
 #endif

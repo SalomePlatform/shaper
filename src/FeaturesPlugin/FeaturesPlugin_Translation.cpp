@@ -147,34 +147,39 @@ void FeaturesPlugin_Translation::performTranslationByAxisAndDistance()
       aResultPart->setTrsf(*aContext, aTrsf);
       setResult(aResultPart, aResultIndex);
     } else {
-      GeomAlgoAPI_Translation aTranslationAlgo(aBaseShape, anAxis, aDistance);
+      std::shared_ptr<GeomAlgoAPI_Translation> aTranslationAlgo(
+        new GeomAlgoAPI_Translation(aBaseShape, anAxis, aDistance));
 
-      if (!aTranslationAlgo.check()) {
-        setError(aTranslationAlgo.getError());
+      if (!aTranslationAlgo->check()) {
+        setError(aTranslationAlgo->getError());
         return;
       }
 
-      aTranslationAlgo.build();
+      aTranslationAlgo->build();
 
       // Checking that the algorithm worked properly.
-      if(!aTranslationAlgo.isDone()) {
+      if(!aTranslationAlgo->isDone()) {
         static const std::string aFeatureError = "Error: Translation algorithm failed.";
         setError(aFeatureError);
         break;
       }
-      if(aTranslationAlgo.shape()->isNull()) {
+      if(aTranslationAlgo->shape()->isNull()) {
         static const std::string aShapeError = "Error: Resulting shape is Null.";
         setError(aShapeError);
         break;
       }
-      if(!aTranslationAlgo.isValid()) {
+      if(!aTranslationAlgo->isValid()) {
         std::string aFeatureError = "Error: Resulting shape is not valid.";
         setError(aFeatureError);
         break;
       }
 
       ResultBodyPtr aResultBody = document()->createBody(data(), aResultIndex);
-      loadNamingDS(aTranslationAlgo, aResultBody, aBaseShape);
+      aResultBody->storeModified(aBaseShape, aTranslationAlgo->shape());
+      FeaturesPlugin_Tools::loadModifiedShapes(aResultBody,
+                                               aBaseShape,
+                                               aTranslationAlgo,
+                                               "Translated");
       setResult(aResultBody, aResultIndex);
     }
     aResultIndex++;
@@ -229,34 +234,39 @@ void FeaturesPlugin_Translation::performTranslationByDimensions()
       aResultPart->setTrsf(*aContext, aTrsf);
       setResult(aResultPart, aResultIndex);
     } else {
-      GeomAlgoAPI_Translation aTranslationAlgo(aBaseShape, aDX, aDY, aDZ);
+      std::shared_ptr<GeomAlgoAPI_Translation> aTranslationAlgo(
+        new GeomAlgoAPI_Translation(aBaseShape, aDX, aDY, aDZ));
 
-      if (!aTranslationAlgo.check()) {
-        setError(aTranslationAlgo.getError());
+      if (!aTranslationAlgo->check()) {
+        setError(aTranslationAlgo->getError());
         return;
       }
 
-      aTranslationAlgo.build();
+      aTranslationAlgo->build();
 
       // Checking that the algorithm worked properly.
-      if(!aTranslationAlgo.isDone()) {
+      if(!aTranslationAlgo->isDone()) {
         static const std::string aFeatureError = "Error: Translation algorithm failed.";
         setError(aFeatureError);
         break;
       }
-      if(aTranslationAlgo.shape()->isNull()) {
+      if(aTranslationAlgo->shape()->isNull()) {
         static const std::string aShapeError = "Error: Resulting shape is Null.";
         setError(aShapeError);
         break;
       }
-      if(!aTranslationAlgo.isValid()) {
+      if(!aTranslationAlgo->isValid()) {
         std::string aFeatureError = "Error: Resulting shape is not valid.";
         setError(aFeatureError);
         break;
       }
 
       ResultBodyPtr aResultBody = document()->createBody(data(), aResultIndex);
-      loadNamingDS(aTranslationAlgo, aResultBody, aBaseShape);
+      aResultBody->storeModified(aBaseShape, aTranslationAlgo->shape());
+      FeaturesPlugin_Tools::loadModifiedShapes(aResultBody,
+                                               aBaseShape,
+                                               aTranslationAlgo,
+                                               "Translated");
       setResult(aResultBody, aResultIndex);
     }
     aResultIndex++;
@@ -324,34 +334,39 @@ void FeaturesPlugin_Translation::performTranslationByTwoPoints()
       aResultPart->setTrsf(*aContext, aTrsf);
       setResult(aResultPart, aResultIndex);
     } else {
-      GeomAlgoAPI_Translation aTranslationAlgo(aBaseShape, aFirstPoint, aSecondPoint);
+      std::shared_ptr<GeomAlgoAPI_Translation> aTranslationAlgo(
+        new GeomAlgoAPI_Translation(aBaseShape, aFirstPoint, aSecondPoint));
 
-      if (!aTranslationAlgo.check()) {
-        setError(aTranslationAlgo.getError());
+      if (!aTranslationAlgo->check()) {
+        setError(aTranslationAlgo->getError());
         return;
       }
 
-      aTranslationAlgo.build();
+      aTranslationAlgo->build();
 
       // Checking that the algorithm worked properly.
-      if(!aTranslationAlgo.isDone()) {
+      if(!aTranslationAlgo->isDone()) {
         static const std::string aFeatureError = "Error: Translation algorithm failed.";
         setError(aFeatureError);
         break;
       }
-      if(aTranslationAlgo.shape()->isNull()) {
+      if(aTranslationAlgo->shape()->isNull()) {
         static const std::string aShapeError = "Error: Resulting shape is Null.";
         setError(aShapeError);
         break;
       }
-      if(!aTranslationAlgo.isValid()) {
+      if(!aTranslationAlgo->isValid()) {
         std::string aFeatureError = "Error: Resulting shape is not valid.";
         setError(aFeatureError);
         break;
       }
 
       ResultBodyPtr aResultBody = document()->createBody(data(), aResultIndex);
-      loadNamingDS(aTranslationAlgo, aResultBody, aBaseShape);
+      aResultBody->storeModified(aBaseShape, aTranslationAlgo->shape());
+      FeaturesPlugin_Tools::loadModifiedShapes(aResultBody,
+                                               aBaseShape,
+                                               aTranslationAlgo,
+                                               "Translated");
       setResult(aResultBody, aResultIndex);
     }
     aResultIndex++;
@@ -359,20 +374,4 @@ void FeaturesPlugin_Translation::performTranslationByTwoPoints()
 
   // Remove the rest results if there were produced in the previous pass.
   removeResults(aResultIndex);
-}
-
-//=================================================================================================
-void FeaturesPlugin_Translation::loadNamingDS(GeomAlgoAPI_Translation& theTranslationAlgo,
-                                              std::shared_ptr<ModelAPI_ResultBody> theResultBody,
-                                              std::shared_ptr<GeomAPI_Shape> theBaseShape)
-{
-  // Store result.
-  theResultBody->storeModified(theBaseShape, theTranslationAlgo.shape());
-
-  std::string aTranslatedName = "Translated";
-  std::shared_ptr<GeomAPI_DataMapOfShapeShape> aSubShapes = theTranslationAlgo.mapOfSubShapes();
-
-  FeaturesPlugin_Tools::storeModifiedShapes(theTranslationAlgo, theResultBody,
-                                            theBaseShape, 1, 2, 3, aTranslatedName,
-                                            *aSubShapes.get());
 }

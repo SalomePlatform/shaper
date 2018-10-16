@@ -24,47 +24,114 @@
 
 #include <GeomAPI_ShapeIterator.h>
 
-void FeaturesPlugin_Tools::storeModifiedShapes(GeomAlgoAPI_MakeShape& theAlgo,
-                                               std::shared_ptr<ModelAPI_ResultBody> theResultBody,
-                                               std::shared_ptr<GeomAPI_Shape> theBaseShape,
-                                               const int theFaceTag,
-                                               const int theEdgeTag,
-                                               const int theVertexTag,
-                                               const std::string theName,
-                                               GeomAPI_DataMapOfShapeShape& theSubShapes)
+//==================================================================================================
+void FeaturesPlugin_Tools::loadModifiedShapes(ResultBodyPtr theResultBody,
+                                              const GeomShapePtr theBaseShape,
+                                              const ListOfShape& theTools,
+                                              const GeomMakeShapePtr& theMakeShape,
+                                              const GeomShapePtr theResultShape)
+{
+  if (theBaseShape->isEqual(theResultShape)) {
+    theResultBody->store(theResultShape, false);
+    return;
+  }
+
+  theResultBody->storeModified(theBaseShape, theResultShape);
+
+  ListOfShape aShapes = theTools;
+  aShapes.push_front(theBaseShape);
+
+  for (ListOfShape::const_iterator anIter = aShapes.begin(); anIter != aShapes.end(); ++anIter)
+  {
+    theResultBody->loadModifiedShapes(theMakeShape, *anIter, GeomAPI_Shape::VERTEX);
+    theResultBody->loadModifiedShapes(theMakeShape, *anIter, GeomAPI_Shape::EDGE);
+    theResultBody->loadModifiedShapes(theMakeShape, *anIter, GeomAPI_Shape::FACE);
+  }
+}
+
+//==================================================================================================
+void FeaturesPlugin_Tools::loadModifiedShapes(ResultBodyPtr theResultBody,
+                                              const GeomShapePtr theBaseShape,
+                                              const GeomMakeShapePtr& theMakeShape,
+                                              const std::string theName)
 {
   switch(theBaseShape->shapeType()) {
     case GeomAPI_Shape::COMPOUND: {
       for(GeomAPI_ShapeIterator anIt(theBaseShape); anIt.more(); anIt.next())
       {
-        storeModifiedShapes(theAlgo,
-                            theResultBody,
-                            anIt.current(),
-                            theFaceTag,
-                            theEdgeTag,
-                            theVertexTag,
-                            theName,
-                            theSubShapes);
+        loadModifiedShapes(theResultBody,
+                           anIt.current(),
+                           theMakeShape,
+                           theName);
       }
       break;
     }
     case GeomAPI_Shape::COMPSOLID:
     case GeomAPI_Shape::SOLID:
     case GeomAPI_Shape::SHELL: {
-      theResultBody->loadAndOrientModifiedShapes(&theAlgo,
-                                theBaseShape, GeomAPI_Shape::FACE,
-                                theFaceTag, theName + "_Face", theSubShapes, false, true);
+      theResultBody->loadModifiedShapes(theMakeShape,
+                                        theBaseShape,
+                                        GeomAPI_Shape::FACE,
+                                        theName + "_Face");
     }
     case GeomAPI_Shape::FACE:
     case GeomAPI_Shape::WIRE: {
-      theResultBody->loadAndOrientModifiedShapes(&theAlgo,
-                                theBaseShape, GeomAPI_Shape::EDGE,
-                                theEdgeTag, theName + "_Edge", theSubShapes, false, true);
+      theResultBody->loadModifiedShapes(theMakeShape,
+                                        theBaseShape,
+                                        GeomAPI_Shape::EDGE,
+                                        theName + "_Edge");
     }
     case GeomAPI_Shape::EDGE: {
-      theResultBody->loadAndOrientModifiedShapes(&theAlgo,
-                              theBaseShape, GeomAPI_Shape::VERTEX,
-                              theVertexTag, theName + "_Vertex", theSubShapes, false, true);
+      theResultBody->loadModifiedShapes(theMakeShape,
+                                        theBaseShape,
+                                        GeomAPI_Shape::VERTEX,
+                                        theName + "_Vertex");
     }
+  }
+}
+
+//==================================================================================================
+void FeaturesPlugin_Tools::loadDeletedShapes(ResultBodyPtr theResultBody,
+  const GeomShapePtr theBaseShape,
+  const ListOfShape& theTools,
+  const GeomMakeShapePtr& theMakeShape,
+  const GeomShapePtr theResultShapesCompound)
+{
+  ListOfShape aShapes = theTools;
+  aShapes.push_front(theBaseShape);
+
+  for (ListOfShape::const_iterator anIter = aShapes.begin(); anIter != aShapes.end(); anIter++)
+  {
+    theResultBody->loadDeletedShapes(theMakeShape,
+                                     *anIter,
+                                     GeomAPI_Shape::VERTEX,
+                                     theResultShapesCompound);
+    theResultBody->loadDeletedShapes(theMakeShape,
+                                     *anIter,
+                                     GeomAPI_Shape::EDGE,
+                                     theResultShapesCompound);
+    theResultBody->loadDeletedShapes(theMakeShape,
+                                     *anIter,
+                                     GeomAPI_Shape::FACE,
+                                     theResultShapesCompound);
+  }
+}
+
+//==================================================================================================
+void FeaturesPlugin_Tools::loadDeletedShapes(
+  std::vector<ResultBaseAlgo>& theResultBaseAlgoList,
+  const ListOfShape& theTools,
+  const GeomShapePtr theResultShapesCompound)
+{
+  for (std::vector<ResultBaseAlgo>::iterator anIt = theResultBaseAlgoList.begin();
+       anIt != theResultBaseAlgoList.end();
+       ++anIt)
+  {
+    ResultBaseAlgo& aRCA = *anIt;
+    loadDeletedShapes(aRCA.resultBody,
+                      aRCA.baseShape,
+                      theTools,
+                      aRCA.makeShape,
+                      theResultShapesCompound);
   }
 }

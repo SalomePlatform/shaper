@@ -70,24 +70,16 @@ void BuildPlugin_Compound::execute()
   // Build compound.
   GeomShapePtr aCompound = GeomAlgoAPI_CompoundBuilder::compound(anOriginalShapes);
   // Copy shape.
-  GeomAlgoAPI_Copy aCopyAlgo(aCompound);
-  GeomShapePtr aCopyCompound = aCopyAlgo.shape();
+  GeomMakeShapePtr aCopyAlgo(new GeomAlgoAPI_Copy(aCompound));
+  GeomShapePtr aCopyCompound = aCopyAlgo->shape();
 
   int anIndexToRemove = 0;
   if (aCopyCompound) {
-    std::shared_ptr<GeomAPI_DataMapOfShapeShape> aMapOfShapes = aCopyAlgo.mapOfSubShapes();
-
     ResultBodyPtr aResultBody = document()->createBody(data(), anIndexToRemove++);
     aResultBody->store(aCopyCompound);
-    aResultBody->loadAndOrientModifiedShapes(&aCopyAlgo, aCompound, GeomAPI_Shape::VERTEX,
-                                              1, "Modified_Vertex", *aMapOfShapes.get(),
-                                              true, false, true);
-    aResultBody->loadAndOrientModifiedShapes(&aCopyAlgo, aCompound, GeomAPI_Shape::EDGE,
-                                              100000, "Modified_Edge", *aMapOfShapes.get(),
-                                              true, false, true);
-    aResultBody->loadAndOrientModifiedShapes(&aCopyAlgo, aCompound, GeomAPI_Shape::FACE,
-                                              200000, "Modified_Face", *aMapOfShapes.get(),
-                                              true, false, true);
+    aResultBody->loadModifiedShapes(aCopyAlgo, aCompound, GeomAPI_Shape::VERTEX, "Modified_Vertex");
+    aResultBody->loadModifiedShapes(aCopyAlgo, aCompound, GeomAPI_Shape::EDGE, "Modified_Edge");
+    aResultBody->loadModifiedShapes(aCopyAlgo, aCompound, GeomAPI_Shape::FACE, "Modified_Face");
     setResult(aResultBody);
   }
   removeResults(anIndexToRemove);

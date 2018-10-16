@@ -314,10 +314,10 @@ void FeaturesPlugin_Pipe::storeResult(const std::shared_ptr<GeomAPI_Shape> theBa
       thePipeAlgo.generated(aV1, aV1History);
       thePipeAlgo.generated(aV2, aV2History);
       if(!aV1History.empty()) {
-        aResultBody->generated(aV1, aV1History.front(), aGenName + "Edge_1", aGenTag++);
+        aResultBody->generated(aV1, aV1History.front(), aGenName + "Edge_1");
       }
       if(!aV2History.empty()) {
-        aResultBody->generated(aV2, aV2History.front(), aGenName + "Edge_2", aGenTag++);
+        aResultBody->generated(aV2, aV2History.front(), aGenName + "Edge_2");
       }
     }
     case GeomAPI_Shape::FACE:
@@ -387,8 +387,8 @@ void FeaturesPlugin_Pipe::storeResult(const ListOfShape& theBaseShapes,
         ListOfShape aV1History, aV2History;
         thePipeAlgo.generated(aV1, aV1History);
         thePipeAlgo.generated(aV2, aV2History);
-        aResultBody->generated(aV1, aV1History.front(), aGenName + "Edge_1", aGenTag++);
-        aResultBody->generated(aV2, aV2History.front(), aGenName + "Edge_2", aGenTag++);
+        aResultBody->generated(aV1, aV1History.front(), aGenName + "Edge_1");
+        aResultBody->generated(aV2, aV2History.front(), aGenName + "Edge_2");
       }
       case GeomAPI_Shape::FACE:
       case GeomAPI_Shape::SHELL: {

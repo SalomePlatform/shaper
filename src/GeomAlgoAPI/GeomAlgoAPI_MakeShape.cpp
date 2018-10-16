@@ -21,6 +21,7 @@
 #include "GeomAlgoAPI_MakeShape.h"
 
 #include <BOPAlgo_Builder.hxx>
+#include <BRep_Tool.hxx>
 #include <BRepBuilderAPI_MakeShape.hxx>
 #include <BRepCheck_Analyzer.hxx>
 #include <BRepGProp.hxx>
@@ -31,7 +32,9 @@
 #include <TopTools_ListIteratorOfListOfShape.hxx>
 #include <GeomAPI_ShapeExplorer.h>
 #include <GeomAPI_ShapeIterator.h>
+#include <TopoDS.hxx>
 #include <TopoDS_Builder.hxx>
+#include <TopoDS_Edge.hxx>
 
 // new shape -> old shapes -> index in the old shape
 typedef NCollection_DataMap<TopoDS_Shape,
@@ -41,7 +44,7 @@ typedef
   NCollection_DataMap<int, NCollection_DataMap<TopoDS_Shape, MapNewToOld, TopTools_ShapeMapHasher> >
   HistoryMap;
 
-//=================================================================================================
+//==================================================================================================
 GeomAlgoAPI_MakeShape::GeomAlgoAPI_MakeShape()
 : myBuilderType(Unknown),
   myDone(false)
@@ -49,32 +52,34 @@ GeomAlgoAPI_MakeShape::GeomAlgoAPI_MakeShape()
   myHist = 0;
 }
 
-GeomAlgoAPI_MakeShape::~GeomAlgoAPI_MakeShape() {
+//==================================================================================================
+GeomAlgoAPI_MakeShape::~GeomAlgoAPI_MakeShape()
+{
   if (myHist) {
     delete (HistoryMap*)myHist;
   }
 }
 
-//=================================================================================================
+//==================================================================================================
 bool GeomAlgoAPI_MakeShape::isDone() const
 {
   return myDone;
 }
 
-//=================================================================================================
-const std::shared_ptr<GeomAPI_Shape> GeomAlgoAPI_MakeShape::shape() const
+//==================================================================================================
+const GeomShapePtr GeomAlgoAPI_MakeShape::shape() const
 {
   return myShape;
 }
 
-//=================================================================================================
+//==================================================================================================
 bool GeomAlgoAPI_MakeShape::isValid() const
 {
   BRepCheck_Analyzer aChecker(myShape->impl<TopoDS_Shape>());
   return (aChecker.IsValid() == Standard_True);
 }
 
-//=================================================================================================
+//==================================================================================================
 bool GeomAlgoAPI_MakeShape::hasVolume() const
 {
   bool hasVolume = false;
@@ -88,88 +93,86 @@ bool GeomAlgoAPI_MakeShape::hasVolume() const
   return hasVolume;
 }
 
-//=================================================================================================
+//==================================================================================================
 std::shared_ptr<GeomAPI_DataMapOfShapeShape> GeomAlgoAPI_MakeShape::mapOfSubShapes() const
 {
   return myMap;
 }
 
-//=================================================================================================
-void GeomAlgoAPI_MakeShape::generated(const std::shared_ptr<GeomAPI_Shape> theShape,
-                                      ListOfShape& theHistory)
+//==================================================================================================
+void GeomAlgoAPI_MakeShape::generated(const GeomShapePtr theOldShape,
+                                      ListOfShape& theNewShapes)
 {
   TopTools_ListOfShape aList;
   if(myBuilderType == OCCT_BRepBuilderAPI_MakeShape) {
     BRepBuilderAPI_MakeShape* aMakeShape = implPtr<BRepBuilderAPI_MakeShape>();
-    aList = aMakeShape->Generated(theShape->impl<TopoDS_Shape>());
+    aList = aMakeShape->Generated(theOldShape->impl<TopoDS_Shape>());
   } else if(myBuilderType == OCCT_BOPAlgo_Builder) {
     BOPAlgo_Builder* aBOPBuilder = implPtr<BOPAlgo_Builder>();
-    aList = aBOPBuilder->Generated(theShape->impl<TopoDS_Shape>());
+    aList = aBOPBuilder->Generated(theOldShape->impl<TopoDS_Shape>());
   }
   for(TopTools_ListIteratorOfListOfShape anIt(aList); anIt.More(); anIt.Next()) {
-    if(anIt.Value().IsNull()) {
-      continue;
-    }
-    std::shared_ptr<GeomAPI_Shape> aShape(new GeomAPI_Shape());
+    GeomShapePtr aShape(new GeomAPI_Shape());
     aShape->setImpl(new TopoDS_Shape(anIt.Value()));
-    theHistory.push_back(aShape);
+    if (!isValidForHistory(aShape)) continue;
+    fixOrientation(aShape);
+    theNewShapes.push_back(aShape);
   }
 }
 
-//=================================================================================================
-void GeomAlgoAPI_MakeShape::modified(const std::shared_ptr<GeomAPI_Shape> theShape,
-                                     ListOfShape& theHistory)
+//==================================================================================================
+void GeomAlgoAPI_MakeShape::modified(const GeomShapePtr theOldShape,
+                                     ListOfShape& theNewShapes)
 {
   TopTools_ListOfShape aList;
   if(myBuilderType == OCCT_BRepBuilderAPI_MakeShape) {
     BRepBuilderAPI_MakeShape* aMakeShape = implPtr<BRepBuilderAPI_MakeShape>();
     try {
-      aList = aMakeShape->Modified(theShape->impl<TopoDS_Shape>());
+      aList = aMakeShape->Modified(theOldShape->impl<TopoDS_Shape>());
     } catch(Standard_NoSuchObject) {
     }
   } else if(myBuilderType == OCCT_BOPAlgo_Builder) {
     BOPAlgo_Builder* aBOPBuilder = implPtr<BOPAlgo_Builder>();
-    aList = aBOPBuilder->Modified(theShape->impl<TopoDS_Shape>());
+    aList = aBOPBuilder->Modified(theOldShape->impl<TopoDS_Shape>());
   }
   for(TopTools_ListIteratorOfListOfShape anIt(aList); anIt.More(); anIt.Next()) {
-    if(anIt.Value().IsNull()) {
-      continue;
-    }
-    std::shared_ptr<GeomAPI_Shape> aShape(new GeomAPI_Shape());
+    GeomShapePtr aShape(new GeomAPI_Shape());
     aShape->setImpl(new TopoDS_Shape(anIt.Value()));
-    theHistory.push_back(aShape);
+    if (!isValidForHistory(aShape)) continue;
+    fixOrientation(aShape);
+    theNewShapes.push_back(aShape);
   }
 }
 
-//=================================================================================================
-bool GeomAlgoAPI_MakeShape::isDeleted(const std::shared_ptr<GeomAPI_Shape> theShape)
+//==================================================================================================
+bool GeomAlgoAPI_MakeShape::isDeleted(const GeomShapePtr theOldShape)
 {
   bool isDeleted = false;
   if(myBuilderType == OCCT_BRepBuilderAPI_MakeShape) {
     BRepBuilderAPI_MakeShape* aMakeShape = implPtr<BRepBuilderAPI_MakeShape>();
-    isDeleted = aMakeShape->IsDeleted(theShape->impl<TopoDS_Shape>()) == Standard_True;
+    isDeleted = aMakeShape->IsDeleted(theOldShape->impl<TopoDS_Shape>()) == Standard_True;
   } else if(myBuilderType == OCCT_BOPAlgo_Builder) {
     BOPAlgo_Builder* aBOPBuilder = implPtr<BOPAlgo_Builder>();
-    isDeleted = aBOPBuilder->IsDeleted(theShape->impl<TopoDS_Shape>()) == Standard_True;
+    isDeleted = aBOPBuilder->IsDeleted(theOldShape->impl<TopoDS_Shape>()) == Standard_True;
   }
 
   return isDeleted;
 }
 
-//=================================================================================================
+//==================================================================================================
 void GeomAlgoAPI_MakeShape::setBuilderType(const BuilderType theBuilderType)
 {
   myBuilderType = theBuilderType;
 }
 
-//=================================================================================================
+//==================================================================================================
 void GeomAlgoAPI_MakeShape::setDone(const bool theFlag)
 {
   myDone = theFlag;
 }
 
-//=================================================================================================
-void GeomAlgoAPI_MakeShape::setShape(const std::shared_ptr<GeomAPI_Shape> theShape)
+//==================================================================================================
+void GeomAlgoAPI_MakeShape::setShape(const GeomShapePtr theShape)
 {
   if(myShape.get() && myShape->isEqual(theShape)) {
     return;
@@ -187,17 +190,17 @@ void GeomAlgoAPI_MakeShape::setShape(const std::shared_ptr<GeomAPI_Shape> theSha
 
     const TopoDS_Shape& aTopoDSShape = myShape->impl<TopoDS_Shape>();
     for(TopExp_Explorer anExp(aTopoDSShape,TopAbs_VERTEX); anExp.More(); anExp.Next()) {
-      std::shared_ptr<GeomAPI_Shape> aCurrentShape(new GeomAPI_Shape());
+      GeomShapePtr aCurrentShape(new GeomAPI_Shape());
       aCurrentShape->setImpl(new TopoDS_Shape(anExp.Current()));
       myMap->bind(aCurrentShape, aCurrentShape);
     }
     for(TopExp_Explorer anExp(aTopoDSShape,TopAbs_EDGE); anExp.More(); anExp.Next()) {
-      std::shared_ptr<GeomAPI_Shape> aCurrentShape(new GeomAPI_Shape());
+      GeomShapePtr aCurrentShape(new GeomAPI_Shape());
       aCurrentShape->setImpl(new TopoDS_Shape(anExp.Current()));
       myMap->bind(aCurrentShape, aCurrentShape);
     }
     for(TopExp_Explorer anExp(aTopoDSShape,TopAbs_FACE); anExp.More(); anExp.Next()) {
-      std::shared_ptr<GeomAPI_Shape> aCurrentShape(new GeomAPI_Shape());
+      GeomShapePtr aCurrentShape(new GeomAPI_Shape());
       aCurrentShape->setImpl(new TopoDS_Shape(anExp.Current()));
       myMap->bind(aCurrentShape, aCurrentShape);
     }
@@ -208,8 +211,30 @@ void GeomAlgoAPI_MakeShape::setShape(const std::shared_ptr<GeomAPI_Shape> theSha
   }
 }
 
-//=================================================================================================
-void GeomAlgoAPI_MakeShape::initialize() {
+//==================================================================================================
+bool GeomAlgoAPI_MakeShape::isValidForHistory(const GeomShapePtr theShape)
+{
+  if (!theShape.get()) return false;
+
+  const TopoDS_Shape& aShape_ = theShape->impl<TopoDS_Shape>();
+  if (aShape_.IsNull()) return false;
+
+  if (aShape_.ShapeType() == TopAbs_EDGE) {
+    TopoDS_Edge anEdge_ = TopoDS::Edge(aShape_);
+    if (BRep_Tool::Degenerated(anEdge_)) return false;
+  }
+
+  return true;
+}
+
+//==================================================================================================
+void GeomAlgoAPI_MakeShape::fixOrientation(GeomShapePtr& theShape) {
+  if (myMap->isBound(theShape)) theShape = myMap->find(theShape);
+}
+
+//==================================================================================================
+void GeomAlgoAPI_MakeShape::initialize()
+{
   switch (myBuilderType) {
     case OCCT_BRepBuilderAPI_MakeShape: {
       myDone = implPtr<BRepBuilderAPI_MakeShape>()->IsDone() == Standard_True;
@@ -233,7 +258,7 @@ void GeomAlgoAPI_MakeShape::initialize() {
 
   const TopoDS_Shape& aTopoDSShape = myShape->impl<TopoDS_Shape>();
   for(TopExp_Explorer anExp(aTopoDSShape,TopAbs_FACE); anExp.More(); anExp.Next()) {
-    std::shared_ptr<GeomAPI_Shape> aCurrentShape(new GeomAPI_Shape());
+    GeomShapePtr aCurrentShape(new GeomAPI_Shape());
     aCurrentShape->setImpl(new TopoDS_Shape(anExp.Current()));
     myMap->bind(aCurrentShape, aCurrentShape);
   }
@@ -241,21 +266,21 @@ void GeomAlgoAPI_MakeShape::initialize() {
 }
 
 
-//=================================================================================================
+//==================================================================================================
 void GeomAlgoAPI_MakeShape::prepareNamingFaces()
 {
   long long index = 1;
   GeomAPI_ShapeExplorer anExp(shape(), GeomAPI_Shape::FACE);
   for(GeomAPI_ShapeExplorer anExp(shape(), GeomAPI_Shape::FACE); anExp.more(); anExp.next()) {
-    std::shared_ptr<GeomAPI_Shape> aFace = anExp.current();
+    GeomShapePtr aFace = anExp.current();
     myCreatedFaces["Face_" + std::to_string(index++)] = aFace;
   }
 }
 
 
-//=================================================================================================
-bool GeomAlgoAPI_MakeShape::checkValid(std::string theMessage){
-
+//==================================================================================================
+bool GeomAlgoAPI_MakeShape::checkValid(std::string theMessage)
+{
   // isValid() is called from this method
   if (!isValid()) {
     myError = theMessage + " :: resulting shape is not valid.";
@@ -278,8 +303,9 @@ bool GeomAlgoAPI_MakeShape::checkValid(std::string theMessage){
   return true ;
 }
 
-bool GeomAlgoAPI_MakeShape::newShapesCollected(
-  std::shared_ptr<GeomAPI_Shape> theWholeOld, const int theShapeType)
+//==================================================================================================
+bool GeomAlgoAPI_MakeShape::isNewShapesCollected(GeomShapePtr theWholeOld,
+                                                 const int theShapeType)
 {
   if (!myHist)
     return false;
@@ -290,7 +316,7 @@ bool GeomAlgoAPI_MakeShape::newShapesCollected(
 }
 
 void GeomAlgoAPI_MakeShape::collectNewShapes(
-  std::shared_ptr<GeomAPI_Shape> theWholeOld, const int theShapeType)
+  GeomShapePtr theWholeOld, const int theShapeType)
 {
   if (!myHist)
     myHist = new HistoryMap;
@@ -339,9 +365,10 @@ static void addAllSubs(const TopoDS_Shape& theNewShape,
   }
 }
 
-std::shared_ptr<GeomAPI_Shape> GeomAlgoAPI_MakeShape::oldShapesForNew(
-  std::shared_ptr<GeomAPI_Shape> theWholeOld,
-  std::shared_ptr<GeomAPI_Shape> theNewShape, const int theShapeType)
+//==================================================================================================
+GeomShapePtr GeomAlgoAPI_MakeShape::oldShapesForNew(GeomShapePtr theWholeOld,
+                                                    GeomShapePtr theNewShape,
+                                                    const int theShapeType)
 {
   GeomShapePtr aResult(new GeomAPI_Shape);
   TopoDS_Compound aResComp;

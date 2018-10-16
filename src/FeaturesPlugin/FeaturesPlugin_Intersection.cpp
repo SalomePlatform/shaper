@@ -147,8 +147,7 @@ void FeaturesPlugin_Intersection::loadNamingDS(std::shared_ptr<ModelAPI_ResultBo
           std::string("Modified_")
             + (anIndex == 0 ? "Vertex_" : "Edge_")
             + std::to_string((long long)(anIndex == 0 ? aModifiedVertexIndex++
-                                                      : aModifiedEdgeIndex++)),
-          aTag++);
+                                                      : aModifiedEdgeIndex++)));
       } else {
         theResultBody->generated(
           aSubShape,

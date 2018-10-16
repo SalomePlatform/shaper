@@ -137,11 +137,6 @@ private:
   /// Perform symmetry with respect to a plane.
   void performSymmetryByPlane();
 
-  /// Perform the naming
-  void loadNamingDS(GeomAlgoAPI_MakeShapeList& theSymmetryAlgo,
-                    std::shared_ptr<ModelAPI_ResultBody> theResultBody,
-                    std::shared_ptr<GeomAPI_Shape> theBaseShape);
-
   /// Create new result on given shapes and the index of result
   void buildResult(std::shared_ptr<GeomAlgoAPI_Symmetry>& theSymmetryAlgo,
                    std::shared_ptr<GeomAPI_Shape> theBaseShape,

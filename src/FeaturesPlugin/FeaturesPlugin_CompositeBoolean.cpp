@@ -86,7 +86,7 @@ void FeaturesPlugin_CompositeBoolean::executeCompositeBoolean()
     }
     else
     {
-      aResultBody->storeModified(*aBoolObjIt, (*aBoolMSIt)->shape(), aTag);
+      aResultBody->storeModified(*aBoolObjIt, (*aBoolMSIt)->shape());
 
       aTag += 5000;
 
@@ -393,25 +393,21 @@ void FeaturesPlugin_CompositeBoolean::storeModificationHistory(ResultBodyPtr the
   ListOfShape aTools = theTools;
   aTools.push_back(theObject);
 
-  std::shared_ptr<GeomAPI_DataMapOfShapeShape> aMap = theMakeShape->mapOfSubShapes();
-
-  int aTag;
   std::string aName;
   for(ListOfShape::const_iterator anIt = aTools.begin(); anIt != aTools.end(); anIt++) {
     if((*anIt)->shapeType() == GeomAPI_Shape::EDGE) {
-      aTag = anEdgesAndFacesTag;
       aName = aModName + "_Edge";
     }
     else if((*anIt)->shapeType() == GeomAPI_Shape::FACE) {
-      aTag = anEdgesAndFacesTag;
       aName = aModName + "_Face";
     } else {
-      aTag = aModTag;
       aName = aModName;
     }
-    theResultBody->loadAndOrientModifiedShapes(theMakeShape.get(), *anIt,
-      (*anIt)->shapeType() == GeomAPI_Shape::EDGE ?
-      GeomAPI_Shape::EDGE : GeomAPI_Shape::FACE, aTag, aName, *aMap.get(), false, false, true);
+    theResultBody->loadModifiedShapes(theMakeShape, *anIt,
+                                      (*anIt)->shapeType() == GeomAPI_Shape::EDGE ?
+                                                              GeomAPI_Shape::EDGE :
+                                                              GeomAPI_Shape::FACE,
+                                      aName);
   }
 }
 
@@ -426,18 +422,16 @@ void FeaturesPlugin_CompositeBoolean::storeDeletedShapes(
     ++anIt)
   {
     ResultBaseAlgo& aRCA = *anIt;
-    aRCA.resultBody->loadDeletedShapes(aRCA.makeShape.get(),
+    aRCA.resultBody->loadDeletedShapes(aRCA.makeShape,
       aRCA.baseShape,
       GeomAPI_Shape::FACE,
-      aRCA.delTag,
       theResultShapesCompound);
 
     for (ListOfShape::const_iterator anIter = theTools.begin(); anIter != theTools.end(); anIter++)
     {
-      aRCA.resultBody->loadDeletedShapes(aRCA.makeShape.get(),
+      aRCA.resultBody->loadDeletedShapes(aRCA.makeShape,
         *anIter,
         GeomAPI_Shape::FACE,
-        aRCA.delTag,
         theResultShapesCompound);
     }
   }

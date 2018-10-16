@@ -121,7 +121,7 @@ void FeaturesPlugin_Union::execute()
   }
 
   // Checking that the algorithm worked properly.
-  GeomAlgoAPI_MakeShapeList aMakeShapeList;
+  std::shared_ptr<GeomAlgoAPI_MakeShapeList> aMakeShapeList(new GeomAlgoAPI_MakeShapeList());
   GeomAPI_DataMapOfShapeShape aMapOfShapes;
   if(!anAlgo->isDone()) {
     setError("Error: Boolean algorithm failed.");
@@ -137,7 +137,7 @@ void FeaturesPlugin_Union::execute()
   }
 
   GeomShapePtr aShape = anAlgo->shape();
-  aMakeShapeList.appendAlgo(anAlgo);
+  aMakeShapeList->appendAlgo(anAlgo);
   aMapOfShapes.merge(anAlgo->mapOfSubShapes());
 
   // Store original shapes for naming.
@@ -163,30 +163,21 @@ void FeaturesPlugin_Union::execute()
     }
 
     aShape = aFillerAlgo->shape();
-    aMakeShapeList.appendAlgo(aFillerAlgo);
+    aMakeShapeList->appendAlgo(aFillerAlgo);
     aMapOfShapes.merge(aFillerAlgo->mapOfSubShapes());
   }
   // workaround: make copy to name edges correctly
 
   // Store result and naming.
-  const int aModifyEdgeTag = 1;
-  const int aModifyFaceTag = 2;
-  const int aDeletedTag = 3;
-  /// sub solids will be placed at labels 4, 5 etc. if result is compound of solids
-  const int aSubsolidsTag = 4;
   const std::string aModEName = "Modified_Edge";
   const std::string aModFName = "Modified_Face";
 
   std::shared_ptr<ModelAPI_ResultBody> aResultBody = document()->createBody(data());
-  aResultBody->storeModified(anObjects.front(), aShape, aSubsolidsTag);
+  aResultBody->storeModified(anObjects.front(), aShape);
 
   for(ListOfShape::const_iterator anIter = anObjects.begin(); anIter != anObjects.end(); ++anIter) {
-    aResultBody->loadAndOrientModifiedShapes(&aMakeShapeList, *anIter, GeomAPI_Shape::EDGE,
-                                             aModifyEdgeTag, aModEName, aMapOfShapes,
-                                             false, true, true);
-    aResultBody->loadAndOrientModifiedShapes(&aMakeShapeList, *anIter, GeomAPI_Shape::FACE,
-                                             aModifyFaceTag, aModFName, aMapOfShapes,
-                                             false, true, true);
+    aResultBody->loadModifiedShapes(aMakeShapeList, *anIter, GeomAPI_Shape::EDGE, aModEName);
+    aResultBody->loadModifiedShapes(aMakeShapeList, *anIter, GeomAPI_Shape::FACE, aModFName);
     //aResultBody->loadDeletedShapes(&aMakeShapeList, *anIter, GeomAPI_Shape::FACE, aDeletedTag);
   }
 

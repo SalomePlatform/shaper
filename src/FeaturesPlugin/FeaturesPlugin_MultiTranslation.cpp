@@ -368,32 +368,24 @@ void FeaturesPlugin_MultiTranslation::loadNamingDS(
     std::shared_ptr<ModelAPI_ResultBody> theResultBody,
     std::shared_ptr<GeomAPI_Shape> theBaseShape)
 {
-  int aTag = 1;
-  int anIndex = 1;
-  std::string aTranslatedName;
-
   for (std::list<std::shared_ptr<GeomAlgoAPI_Translation> >::const_iterator anIt =
     theListOfTranslationAlgo.begin(); anIt != theListOfTranslationAlgo.cend(); ++anIt) {
-    std::shared_ptr<GeomAPI_DataMapOfShapeShape> aSubShapes = (*anIt)->mapOfSubShapes();
-
     // naming of faces
-    aTranslatedName = "Translated_Face_" + std::to_string((long long) anIndex);
-    theResultBody->loadAndOrientModifiedShapes((*anIt).get(), theBaseShape, GeomAPI_Shape::FACE,
-                                               aTag++, aTranslatedName, *aSubShapes.get(),
-                                               false, true);
+    theResultBody->loadModifiedShapes(*anIt,
+                                      theBaseShape,
+                                      GeomAPI_Shape::FACE,
+                                      "Translated_Face");
 
     // naming of edges
-    aTranslatedName = "Translated_Edge_" + std::to_string((long long) anIndex);
-    theResultBody->loadAndOrientModifiedShapes((*anIt).get(), theBaseShape, GeomAPI_Shape::EDGE,
-                                               aTag++, aTranslatedName, *aSubShapes.get(),
-                                               false, true);
+    theResultBody->loadModifiedShapes(*anIt,
+                                      theBaseShape,
+                                      GeomAPI_Shape::EDGE,
+                                      "Translated_Edge");
 
     // naming of vertex
-    aTranslatedName = "Translated_Vertex_" + std::to_string((long long) anIndex);
-    theResultBody->loadAndOrientModifiedShapes((*anIt).get(), theBaseShape, GeomAPI_Shape::VERTEX,
-                                               aTag++, aTranslatedName, *aSubShapes.get(),
-                                               false, true);
-
-    ++anIndex;
+    theResultBody->loadModifiedShapes(*anIt,
+                                      theBaseShape,
+                                      GeomAPI_Shape::VERTEX,
+                                      "Translated_Vertex");
   }
 }

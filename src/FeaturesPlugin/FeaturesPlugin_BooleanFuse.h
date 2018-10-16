@@ -96,15 +96,6 @@ public:
 
   /// Use plugin manager for features creation.
   FeaturesPlugin_BooleanFuse();
-
-private:
-  /// Load Naming data structure of the feature to the document
-  void loadNamingDS(std::shared_ptr<ModelAPI_ResultBody> theResultBody,
-                    const std::shared_ptr<GeomAPI_Shape> theBaseShape,
-                    const ListOfShape& theTools,
-                    const std::shared_ptr<GeomAPI_Shape> theResultShape,
-                    GeomAlgoAPI_MakeShape& theMakeShape,
-                    GeomAPI_DataMapOfShapeShape& theMapOfShapes);
 };
 
 #endif

@@ -120,34 +120,36 @@ void FeaturesPlugin_Scale::performScaleByFactor()
   for(ListOfShape::iterator anObjectsIt = anObjects.begin(); anObjectsIt != anObjects.end();
         anObjectsIt++, aContext++) {
     std::shared_ptr<GeomAPI_Shape> aBaseShape = *anObjectsIt;
-    GeomAlgoAPI_Scale aScaleAlgo(aBaseShape, aCenterPoint, aScaleFactor);
+    std::shared_ptr<GeomAlgoAPI_Scale> aScaleAlgo(
+      new GeomAlgoAPI_Scale(aBaseShape, aCenterPoint, aScaleFactor));
 
-    if (!aScaleAlgo.check()) {
-      setError(aScaleAlgo.getError());
+    if (!aScaleAlgo->check()) {
+      setError(aScaleAlgo->getError());
       return;
     }
 
-    aScaleAlgo.build();
+    aScaleAlgo->build();
 
     // Checking that the algorithm worked properly.
-    if(!aScaleAlgo.isDone()) {
+    if(!aScaleAlgo->isDone()) {
       static const std::string aFeatureError = "Error: Symmetry algorithm failed.";
       setError(aFeatureError);
       break;
     }
-    if(aScaleAlgo.shape()->isNull()) {
+    if(aScaleAlgo->shape()->isNull()) {
       static const std::string aShapeError = "Error: Resulting shape is Null.";
       setError(aShapeError);
       break;
     }
-    if(!aScaleAlgo.isValid()) {
+    if(!aScaleAlgo->isValid()) {
       std::string aFeatureError = "Error: Resulting shape is not valid.";
       setError(aFeatureError);
       break;
     }
 
     ResultBodyPtr aResultBody = document()->createBody(data(), aResultIndex);
-    loadNamingDS(aScaleAlgo, aResultBody, aBaseShape);
+    aResultBody->storeModified(aBaseShape, aScaleAlgo->shape());
+    FeaturesPlugin_Tools::loadModifiedShapes(aResultBody, aBaseShape, aScaleAlgo, "Scaled");
     setResult(aResultBody, aResultIndex);
     aResultIndex++;
   }
@@ -204,55 +206,43 @@ void FeaturesPlugin_Scale::performScaleByDimensions()
   for(ListOfShape::iterator anObjectsIt = anObjects.begin(); anObjectsIt != anObjects.end();
         anObjectsIt++, aContext++) {
     std::shared_ptr<GeomAPI_Shape> aBaseShape = *anObjectsIt;
-    GeomAlgoAPI_Scale aScaleAlgo(aBaseShape, aCenterPoint,
-                                 aScaleFactorX, aScaleFactorY, aScaleFactorZ);
+    std::shared_ptr<GeomAlgoAPI_Scale> aScaleAlgo(new GeomAlgoAPI_Scale(aBaseShape,
+                                                                        aCenterPoint,
+                                                                        aScaleFactorX,
+                                                                        aScaleFactorY,
+                                                                        aScaleFactorZ));
 
-    if (!aScaleAlgo.check()) {
-      setError(aScaleAlgo.getError());
+    if (!aScaleAlgo->check()) {
+      setError(aScaleAlgo->getError());
       return;
     }
 
-    aScaleAlgo.build();
+    aScaleAlgo->build();
 
     // Checking that the algorithm worked properly.
-    if(!aScaleAlgo.isDone()) {
+    if(!aScaleAlgo->isDone()) {
       static const std::string aFeatureError = "Error: Symmetry algorithm failed.";
       setError(aFeatureError);
       break;
     }
-    if(aScaleAlgo.shape()->isNull()) {
+    if(aScaleAlgo->shape()->isNull()) {
       static const std::string aShapeError = "Error: Resulting shape is Null.";
       setError(aShapeError);
       break;
     }
-    if(!aScaleAlgo.isValid()) {
+    if(!aScaleAlgo->isValid()) {
       std::string aFeatureError = "Error: Resulting shape is not valid.";
       setError(aFeatureError);
       break;
     }
 
     ResultBodyPtr aResultBody = document()->createBody(data(), aResultIndex);
-    loadNamingDS(aScaleAlgo, aResultBody, aBaseShape);
+    aResultBody->storeModified(aBaseShape, aScaleAlgo->shape());
+    FeaturesPlugin_Tools::loadModifiedShapes(aResultBody, aBaseShape, aScaleAlgo, "Scaled");
     setResult(aResultBody, aResultIndex);
     aResultIndex++;
   }
 
   // Remove the rest results if there were produced in the previous pass.
   removeResults(aResultIndex);
-}
-
-//=================================================================================================
-void FeaturesPlugin_Scale::loadNamingDS(GeomAlgoAPI_Scale& theScaleAlgo,
-                                        std::shared_ptr<ModelAPI_ResultBody> theResultBody,
-                                        std::shared_ptr<GeomAPI_Shape> theBaseShape)
-{
-  // Store and name the result.
-  theResultBody->storeModified(theBaseShape, theScaleAlgo.shape());
-
-  // Name the faces
-  std::shared_ptr<GeomAPI_DataMapOfShapeShape> aSubShapes = theScaleAlgo.mapOfSubShapes();
-  std::string aScaledName = "Scaled";
-  FeaturesPlugin_Tools::storeModifiedShapes(theScaleAlgo, theResultBody,
-                                            theBaseShape, 1, 2, 3, aScaledName,
-                                            *aSubShapes.get());
 }

@@ -208,20 +208,15 @@ void FeaturesPlugin_Fillet::loadNamingDS(
 
   std::shared_ptr<GeomAPI_DataMapOfShapeShape> aMapOfShapes = theMakeShape->mapOfSubShapes();
 
-  const int aDeletedTag = 1;
-  const int aModifyTag = 2;
   const int aGeneratedTag = 3;
-  /// sub solids will be placed at labels 4, 5, etc. if result is compound of solids
-  const int aSubsolidsTag = 4;
 
-  theResultBody->storeModified(theBaseShape, theResultShape, aSubsolidsTag);
+  theResultBody->storeModified(theBaseShape, theResultShape);
 
   const std::string aModFaceName = "Modified_Face";
   const std::string aFilletFaceName = "Fillet_Face";
 
   // Store modified faces
-  theResultBody->loadAndOrientModifiedShapes(theMakeShape.get(), theBaseShape,
-      GeomAPI_Shape::FACE, aModifyTag, aModFaceName, *aMapOfShapes);
+  theResultBody->loadModifiedShapes(theMakeShape, theBaseShape, GeomAPI_Shape::FACE, aModFaceName);
 
   // Store new faces generated from edges and vertices
   theResultBody->loadAndOrientGeneratedShapes(theMakeShape.get(), theBaseShape,
@@ -230,8 +225,6 @@ void FeaturesPlugin_Fillet::loadNamingDS(
       GeomAPI_Shape::VERTEX, aGeneratedTag, aFilletFaceName, *aMapOfShapes);
 
   // Deleted shapes
-  theResultBody->loadDeletedShapes(theMakeShape.get(), theBaseShape,
-                                   GeomAPI_Shape::EDGE, aDeletedTag);
-  theResultBody->loadDeletedShapes(theMakeShape.get(), theBaseShape,
-                                   GeomAPI_Shape::FACE, aDeletedTag);
+  theResultBody->loadDeletedShapes(theMakeShape, theBaseShape, GeomAPI_Shape::EDGE);
+  theResultBody->loadDeletedShapes(theMakeShape, theBaseShape, GeomAPI_Shape::FACE);
 }

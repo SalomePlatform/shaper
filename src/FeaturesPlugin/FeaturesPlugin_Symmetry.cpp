@@ -345,8 +345,8 @@ void FeaturesPlugin_Symmetry::buildResult(
   std::shared_ptr<GeomAlgoAPI_Symmetry>& theSymmetryAlgo,
   std::shared_ptr<GeomAPI_Shape> theBaseShape, int theResultIndex)
 {
-  GeomAlgoAPI_MakeShapeList anAlgoList;
-  anAlgoList.appendAlgo(theSymmetryAlgo);
+  std::shared_ptr<GeomAlgoAPI_MakeShapeList> anAlgoList(new GeomAlgoAPI_MakeShapeList());
+  anAlgoList->appendAlgo(theSymmetryAlgo);
   // Compose source shape and the result of symmetry.
   GeomShapePtr aCompound;
   if (boolean(KEEP_ORIGINAL_RESULT())->value()) {
@@ -354,7 +354,7 @@ void FeaturesPlugin_Symmetry::buildResult(
     // add a copy of a base shape otherwise selection of this base shape is bad (2592)
     std::shared_ptr<GeomAlgoAPI_Copy> aCopyAlgo(new GeomAlgoAPI_Copy(theBaseShape));
     aShapes.push_back(aCopyAlgo->shape());
-    anAlgoList.appendAlgo(aCopyAlgo);
+    anAlgoList->appendAlgo(aCopyAlgo);
 
     aShapes.push_back(theSymmetryAlgo->shape());
     aCompound = GeomAlgoAPI_CompoundBuilder::compound(aShapes);
@@ -364,7 +364,7 @@ void FeaturesPlugin_Symmetry::buildResult(
   // Store and name the result.
   ResultBodyPtr aResultBody = document()->createBody(data(), theResultIndex);
   aResultBody->storeModified(theBaseShape, aCompound);
-  loadNamingDS(anAlgoList, aResultBody, theBaseShape);
+  FeaturesPlugin_Tools::loadModifiedShapes(aResultBody, theBaseShape, anAlgoList, "Symmetried");
   setResult(aResultBody, theResultIndex);
 }
 
@@ -384,17 +384,4 @@ void FeaturesPlugin_Symmetry::buildResult(ResultPartPtr theOriginal,
   ResultPartPtr aResultPart = document()->copyPart(theOriginal, data(), theResultIndex);
   aResultPart->setTrsf(theOriginal, theTrsf);
   setResult(aResultPart, theResultIndex);
-}
-
-//=================================================================================================
-void FeaturesPlugin_Symmetry::loadNamingDS(GeomAlgoAPI_MakeShapeList& theAlgo,
-                                           std::shared_ptr<ModelAPI_ResultBody> theResultBody,
-                                           std::shared_ptr<GeomAPI_Shape> theBaseShape)
-{
-  // Name the faces
-  std::shared_ptr<GeomAPI_DataMapOfShapeShape> aSubShapes = theAlgo.mapOfSubShapes();
-  std::string aReflectedName = "Symmetried";
-  FeaturesPlugin_Tools::storeModifiedShapes(theAlgo, theResultBody,
-                                            theBaseShape, 1, 2, 3, aReflectedName,
-                                            *aSubShapes.get());
 }

@@ -91,17 +91,6 @@ public:
 
   /// Use plugin manager for features creation.
   FeaturesPlugin_BooleanCommon();
-
-private:
-
-  /// Load Naming data structure of the feature to the document
-  void loadNamingDS(ResultBodyPtr theResultBody,
-                    const GeomShapePtr theBaseShape,
-                    const ListOfShape& theTools,
-                    const GeomShapePtr theResultShape,
-                    GeomAlgoAPI_MakeShape& theMakeShape,
-                    GeomAPI_DataMapOfShapeShape& theMapOfShapes);
-
 };
 
 #endif

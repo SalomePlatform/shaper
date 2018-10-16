@@ -50,11 +50,11 @@ public:
   MODEL_EXPORT virtual ~Model_ResultBody();
 
   /// load and orient modified shapes for sub-objects
-  MODEL_EXPORT virtual void loadAndOrientModifiedShapes (GeomAlgoAPI_MakeShape* theMS,
-    std::shared_ptr<GeomAPI_Shape>  theShapeIn, const int  theKindOfShape, const int  theTag,
-    const std::string& theName, GeomAPI_DataMapOfShapeShape& theSubShapes,
-    const bool theIsStoreSeparate = false, const bool theIsStoreAsGenerated = false,
-    const bool theSplitInSubs = false);
+  MODEL_EXPORT
+  virtual void loadModifiedShapes(const std::shared_ptr<GeomAlgoAPI_MakeShape>& theAlgo,
+                                  const GeomShapePtr& theOldShape,
+                                  const GeomAPI_Shape::ShapeType theShapeTypeToExplore,
+                                  const std::string& theName) override;
 
 
   /// Returns the number of sub-elements

@@ -55,30 +55,6 @@ public:
   /// Use plugin manager for features creation.
   FeaturesPlugin_BooleanCut();
 
-private:
-
-  struct ResultBaseAlgo {
-    ResultBodyPtr resultBody;
-    GeomShapePtr baseShape;
-    std::shared_ptr<GeomAlgoAPI_MakeShape> makeShape;
-  };
-
-private:
-
-  /// Load Naming data structure of the feature to the document
-  void loadNamingDS(ResultBodyPtr theResultBody,
-                    const GeomShapePtr theBaseShape,
-                    const ListOfShape& theTools,
-                    const GeomShapePtr theResultShape,
-                    GeomAlgoAPI_MakeShape& theMakeShape,
-                    GeomAPI_DataMapOfShapeShape& theMapOfShapes,
-                    const bool theIsStoreAsGenerated = false);
-
-  /// Stores deleted shapes.
-  void storeDeletedShapes(std::vector<ResultBaseAlgo>& theResultBaseAlgoList,
-                          const ListOfShape& theTools,
-                          const GeomShapePtr theResultShapesCompound);
-
 };
 
 #endif

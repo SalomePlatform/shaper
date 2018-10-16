@@ -60,19 +60,18 @@ void BuildPlugin_Solid::execute()
 
 void BuildPlugin_Solid::storeResult(const ListOfShape& theOriginalShapes,
                                     const GeomShapePtr& theResultShape,
-                                    const std::shared_ptr<GeomAlgoAPI_MakeShape>& theAlgorithm)
+                                    const GeomMakeShapePtr& theAlgorithm)
 {
   ResultBodyPtr aResultBody = document()->createBody(data());
   aResultBody->store(theResultShape);
 
   // Store faces
-  std::shared_ptr<GeomAPI_DataMapOfShapeShape> aMapOfSubs = theAlgorithm->mapOfSubShapes();
-  int aModifiedTag = 1;
-  for(ListOfShape::const_iterator anIt = theOriginalShapes.cbegin();
-      anIt != theOriginalShapes.cend(); ++anIt) {
+  for (ListOfShape::const_iterator anIt = theOriginalShapes.cbegin();
+       anIt != theOriginalShapes.cend();
+       ++anIt)
+  {
     GeomShapePtr aShape = *anIt;
-    aResultBody->loadAndOrientModifiedShapes(theAlgorithm.get(), aShape, GeomAPI_Shape::FACE,
-        aModifiedTag, "Modified_Face", *aMapOfSubs.get(), false, true, true);
+    aResultBody->loadModifiedShapes(theAlgorithm, aShape, GeomAPI_Shape::FACE, "Modified_Face");
   }
   setResult(aResultBody);
 }

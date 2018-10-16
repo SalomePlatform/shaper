@@ -134,34 +134,36 @@ void FeaturesPlugin_Rotation::performTranslationByAxisAndAngle()
       aResultPart->setTrsf(*aContext, aTrsf);
       setResult(aResultPart, aResultIndex);
     } else {
-      GeomAlgoAPI_Rotation aRotationAlgo(aBaseShape, anAxis, anAngle);
+      std::shared_ptr<GeomAlgoAPI_Rotation> aRotationAlgo(new GeomAlgoAPI_Rotation(aBaseShape,
+                                                                                   anAxis,
+                                                                                   anAngle));
 
-      if (!aRotationAlgo.check()) {
-        setError(aRotationAlgo.getError());
+      if (!aRotationAlgo->check()) {
+        setError(aRotationAlgo->getError());
         return;
       }
 
-      aRotationAlgo.build();
+      aRotationAlgo->build();
 
       // Checking that the algorithm worked properly.
-      if(!aRotationAlgo.isDone()) {
+      if(!aRotationAlgo->isDone()) {
         static const std::string aFeatureError = "Error: Rotation algorithm failed.";
         setError(aFeatureError);
         break;
       }
-      if(aRotationAlgo.shape()->isNull()) {
+      if(aRotationAlgo->shape()->isNull()) {
         static const std::string aShapeError = "Error: Resulting shape is Null.";
         setError(aShapeError);
         break;
       }
-      if(!aRotationAlgo.isValid()) {
+      if(!aRotationAlgo->isValid()) {
         std::string aFeatureError = "Error: Resulting shape is not valid.";
         setError(aFeatureError);
         break;
       }
 
       ResultBodyPtr aResultBody = document()->createBody(data(), aResultIndex);
-      loadNamingDS(aRotationAlgo, aResultBody, aBaseShape);
+      FeaturesPlugin_Tools::loadModifiedShapes(aResultBody, aBaseShape, aRotationAlgo, "Rotated");
       setResult(aResultBody, aResultIndex);
     }
     aResultIndex++;
@@ -238,52 +240,40 @@ void FeaturesPlugin_Rotation::performTranslationByThreePoints()
        aResultPart->setTrsf(*aContext, aTrsf);
        setResult(aResultPart, aResultIndex);
     } else {
-      GeomAlgoAPI_Rotation aRotationAlgo(aBaseShape, aCenterPoint, aStartPoint, anEndPoint);
+      std::shared_ptr<GeomAlgoAPI_Rotation> aRotationAlgo(new GeomAlgoAPI_Rotation(aBaseShape,
+                                                                                   aCenterPoint,
+                                                                                   aStartPoint,
+                                                                                   anEndPoint));
 
-      if (!aRotationAlgo.check()) {
-        setError(aRotationAlgo.getError());
+      if (!aRotationAlgo->check()) {
+        setError(aRotationAlgo->getError());
         return;
       }
 
-      aRotationAlgo.build();
+      aRotationAlgo->build();
 
       // Checking that the algorithm worked properly.
-      if(!aRotationAlgo.isDone()) {
+      if(!aRotationAlgo->isDone()) {
         static const std::string aFeatureError = "Error: Rotation algorithm failed.";
         setError(aFeatureError);
         break;
       }
-      if(aRotationAlgo.shape()->isNull()) {
+      if(aRotationAlgo->shape()->isNull()) {
         static const std::string aShapeError = "Error : Resulting shape is Null.";
         setError(aShapeError);
         break;
       }
-      if(!aRotationAlgo.isValid()) {
+      if(!aRotationAlgo->isValid()) {
         std::string aFeatureError = "Error: Resulting shape is not valid.";
         setError(aFeatureError);
         break;
       }
 
       ResultBodyPtr aResultBody = document()->createBody(data(), aResultIndex);
-      loadNamingDS(aRotationAlgo, aResultBody, aBaseShape);
+      aResultBody->storeModified(aBaseShape, aRotationAlgo->shape());
+      FeaturesPlugin_Tools::loadModifiedShapes(aResultBody, aBaseShape, aRotationAlgo, "Rotated");
       setResult(aResultBody, aResultIndex);
     }
     aResultIndex++;
   }
-}
-
-//=================================================================================================
-void FeaturesPlugin_Rotation::loadNamingDS(GeomAlgoAPI_Rotation& theRotaionAlgo,
-                                           std::shared_ptr<ModelAPI_ResultBody> theResultBody,
-                                           std::shared_ptr<GeomAPI_Shape> theBaseShape)
-{
-  // Store result.
-  theResultBody->storeModified(theBaseShape, theRotaionAlgo.shape());
-
-  std::string aRotatedName = "Rotated";
-  std::shared_ptr<GeomAPI_DataMapOfShapeShape> aSubShapes = theRotaionAlgo.mapOfSubShapes();
-
-  FeaturesPlugin_Tools::storeModifiedShapes(theRotaionAlgo, theResultBody,
-                                            theBaseShape, 1, 2, 3, aRotatedName,
-                                            *aSubShapes.get());
 }

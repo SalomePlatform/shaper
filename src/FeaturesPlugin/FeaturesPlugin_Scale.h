@@ -126,11 +126,6 @@ private:
 
   /// Perform symmetry using a central point and three dimensions
   void performScaleByDimensions();
-
-  /// Perform the naming
-  void loadNamingDS(GeomAlgoAPI_Scale& theScaleAlgo,
-                    std::shared_ptr<ModelAPI_ResultBody> theResultBody,
-                    std::shared_ptr<GeomAPI_Shape> theBaseShape);
 };
 
 #endif // FEATURESPLUGIN_SCALE_H_

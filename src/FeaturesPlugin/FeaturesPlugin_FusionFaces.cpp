@@ -81,15 +81,10 @@ void FeaturesPlugin_FusionFaces::execute()
   } else {
     aResultBody->storeModified(aBaseShape, aResultShape);
 
-    const int aModifyEdgeTag = 1;
-    const int aModifyFaceTag = 2;
     const std::string aModEName = "Modified_Edge";
     const std::string aModFName = "Modified_Face";
-    std::shared_ptr<GeomAPI_DataMapOfShapeShape> aMapOfShapes = anAlgo->mapOfSubShapes();
-    aResultBody->loadAndOrientModifiedShapes(anAlgo.get(), aBaseShape, GeomAPI_Shape::EDGE,
-      aModifyEdgeTag, aModEName, *aMapOfShapes.get(), true);
-    aResultBody->loadAndOrientModifiedShapes(anAlgo.get(), aBaseShape, GeomAPI_Shape::FACE,
-      aModifyFaceTag, aModFName, *aMapOfShapes.get(), true);
+    aResultBody->loadModifiedShapes(anAlgo, aBaseShape, GeomAPI_Shape::EDGE, aModEName);
+    aResultBody->loadModifiedShapes(anAlgo, aBaseShape, GeomAPI_Shape::FACE, aModFName);
   }
   setResult(aResultBody);
 }

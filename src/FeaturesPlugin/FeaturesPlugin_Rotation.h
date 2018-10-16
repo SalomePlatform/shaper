@@ -125,10 +125,6 @@ private:
 
   ///Perform the rotation using a center and two points.
   void performTranslationByThreePoints();
-
-  void loadNamingDS(GeomAlgoAPI_Rotation& theRotaionAlgo,
-                    std::shared_ptr<ModelAPI_ResultBody> theResultBody,
-                    std::shared_ptr<GeomAPI_Shape> theBaseShape);
 };
 
 #endif

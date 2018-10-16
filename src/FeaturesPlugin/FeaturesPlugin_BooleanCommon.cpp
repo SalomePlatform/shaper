@@ -20,6 +20,8 @@
 
 #include "FeaturesPlugin_BooleanCommon.h"
 
+#include "FeaturesPlugin_Tools.h"
+
 #include <ModelAPI_ResultBody.h>
 #include <ModelAPI_AttributeSelectionList.h>
 #include <ModelAPI_AttributeString.h>
@@ -125,8 +127,9 @@ void FeaturesPlugin_BooleanCommon::execute()
   }
 
   int aResultIndex = 0;
-  GeomAlgoAPI_MakeShapeList aMakeShapeList;
-  GeomAPI_DataMapOfShapeShape aMapOfShapes;
+  std::shared_ptr<GeomAlgoAPI_MakeShapeList> aMakeShapeList(new GeomAlgoAPI_MakeShapeList());
+  std::vector<FeaturesPlugin_Tools::ResultBaseAlgo> aResultBaseAlgoList;
+  ListOfShape aResultShapesList;
 
   if (isSimpleMode)
   {
@@ -155,8 +158,7 @@ void FeaturesPlugin_BooleanCommon::execute()
       }
 
       aShape = aCommonAlgo->shape();
-      aMakeShapeList.appendAlgo(aCommonAlgo);
-      aMapOfShapes.merge(aCommonAlgo->mapOfSubShapes());
+      aMakeShapeList->appendAlgo(aCommonAlgo);
     }
 
     GeomAPI_ShapeIterator aShapeIt(aShape);
@@ -164,9 +166,23 @@ void FeaturesPlugin_BooleanCommon::execute()
       std::shared_ptr<ModelAPI_ResultBody> aResultBody =
         document()->createBody(data(), aResultIndex);
 
-      loadNamingDS(aResultBody, anObjects.front(), anObjects, aShape, aMakeShapeList, aMapOfShapes);
+      GeomShapePtr aBaseShape = anObjects.front();
+      anObjects.pop_front();
+      FeaturesPlugin_Tools::loadModifiedShapes(aResultBody,
+                                               aBaseShape,
+                                               anObjects,
+                                               aMakeShapeList,
+                                               aShape);
       setResult(aResultBody, aResultIndex);
       aResultIndex++;
+
+      aTools = anObjects;
+      FeaturesPlugin_Tools::ResultBaseAlgo aRBA;
+      aRBA.resultBody = aResultBody;
+      aRBA.baseShape = aBaseShape;
+      aRBA.makeShape = aMakeShapeList;
+      aResultBaseAlgoList.push_back(aRBA);
+      aResultShapesList.push_back(aShape);
     }
   } else {
     for (ListOfShape::iterator anObjectsIt = anObjects.begin();
@@ -176,7 +192,7 @@ void FeaturesPlugin_BooleanCommon::execute()
       std::shared_ptr<GeomAPI_Shape> anObject = *anObjectsIt;
       ListOfShape aListWithObject;
       aListWithObject.push_back(anObject);
-      GeomAlgoAPI_MakeShapeList aMakeShapeList;
+      std::shared_ptr<GeomAlgoAPI_MakeShapeList> aMakeShapeList(new GeomAlgoAPI_MakeShapeList());
       std::shared_ptr<GeomAlgoAPI_MakeShape> aBoolAlgo;
       GeomShapePtr aResShape;
 
@@ -193,7 +209,7 @@ void FeaturesPlugin_BooleanCommon::execute()
         std::shared_ptr<GeomAlgoAPI_MakeShapeCustom> aMkShCustom(
           new GeomAlgoAPI_MakeShapeCustom);
         aMkShCustom->addModified(aPlane, aTool);
-        aMakeShapeList.appendAlgo(aMkShCustom);
+        aMakeShapeList->appendAlgo(aMkShCustom);
         aToolsWithPlanes.push_back(aTool);
       }
 
@@ -219,17 +235,27 @@ void FeaturesPlugin_BooleanCommon::execute()
         return;
       }
 
-      aMakeShapeList.appendAlgo(aBoolAlgo);
+      aMakeShapeList->appendAlgo(aBoolAlgo);
 
       GeomAPI_ShapeIterator aShapeIt(aResShape);
       if (aShapeIt.more() || aResShape->shapeType() == GeomAPI_Shape::VERTEX) {
         std::shared_ptr<ModelAPI_ResultBody> aResultBody =
           document()->createBody(data(), aResultIndex);
 
-        loadNamingDS(aResultBody, anObject, aTools, aResShape,
-                     aMakeShapeList, *(aBoolAlgo->mapOfSubShapes()));
+        FeaturesPlugin_Tools::loadModifiedShapes(aResultBody,
+                                                 anObject,
+                                                 aTools,
+                                                 aMakeShapeList,
+                                                 aResShape);
         setResult(aResultBody, aResultIndex);
         aResultIndex++;
+
+        FeaturesPlugin_Tools::ResultBaseAlgo aRBA;
+        aRBA.resultBody = aResultBody;
+        aRBA.baseShape = anObject;
+        aRBA.makeShape = aMakeShapeList;
+        aResultBaseAlgoList.push_back(aRBA);
+        aResultShapesList.push_back(aResShape);
       }
     }
 
@@ -284,8 +310,6 @@ void FeaturesPlugin_BooleanCommon::execute()
       }
 
       aMakeShapeList->appendAlgo(aCommonAlgo);
-      GeomAPI_DataMapOfShapeShape aMapOfShapes;
-      aMapOfShapes.merge(aCommonAlgo->mapOfSubShapes());
       GeomShapePtr aResultShape = aCommonAlgo->shape();
 
       // Add result to not used solids from compsolid.
@@ -301,7 +325,6 @@ void FeaturesPlugin_BooleanCommon::execute()
         }
 
         aMakeShapeList->appendAlgo(aFillerAlgo);
-        aMapOfShapes.merge(aFillerAlgo->mapOfSubShapes());
         aResultShape = aFillerAlgo->shape();
       }
 
@@ -311,14 +334,20 @@ void FeaturesPlugin_BooleanCommon::execute()
         std::shared_ptr<ModelAPI_ResultBody> aResultBody =
           document()->createBody(data(), aResultIndex);
 
-        loadNamingDS(aResultBody,
-          aCompSolid,
-          aTools,
-          aResultShape,
-          *aMakeShapeList,
-          aMapOfShapes);
+        FeaturesPlugin_Tools::loadModifiedShapes(aResultBody,
+                                                 aCompSolid,
+                                                 aTools,
+                                                 aMakeShapeList,
+                                                 aResultShape);
         setResult(aResultBody, aResultIndex);
         aResultIndex++;
+
+        FeaturesPlugin_Tools::ResultBaseAlgo aRBA;
+        aRBA.resultBody = aResultBody;
+        aRBA.baseShape = aCompSolid;
+        aRBA.makeShape = aMakeShapeList;
+        aResultBaseAlgoList.push_back(aRBA);
+        aResultShapesList.push_back(aResultShape);
       }
     }
 
@@ -373,8 +402,6 @@ void FeaturesPlugin_BooleanCommon::execute()
       }
 
       aMakeShapeList->appendAlgo(aCommonAlgo);
-      GeomAPI_DataMapOfShapeShape aMapOfShapes;
-      aMapOfShapes.merge(aCommonAlgo->mapOfSubShapes());
       GeomShapePtr aResultShape = aCommonAlgo->shape();
 
       // Add result to not used shape from compound.
@@ -402,82 +429,30 @@ void FeaturesPlugin_BooleanCommon::execute()
         std::shared_ptr<ModelAPI_ResultBody> aResultBody =
           document()->createBody(data(), aResultIndex);
 
-        loadNamingDS(aResultBody,
-          aCompound,
-          aTools,
-          aResultShape,
-          *aMakeShapeList,
-          aMapOfShapes);
+        FeaturesPlugin_Tools::loadModifiedShapes(aResultBody,
+                                                 aCompound,
+                                                 aTools,
+                                                 aMakeShapeList,
+                                                 aResultShape);
         setResult(aResultBody, aResultIndex);
         aResultIndex++;
+
+        FeaturesPlugin_Tools::ResultBaseAlgo aRBA;
+        aRBA.resultBody = aResultBody;
+        aRBA.baseShape = aCompound;
+        aRBA.makeShape = aMakeShapeList;
+        aResultBaseAlgoList.push_back(aRBA);
+        aResultShapesList.push_back(aResultShape);
       }
     }
 
   }
 
+  // Store deleted shapes after all results has been proceeded. This is to avoid issue when in one
+  // result shape has been deleted, but in another it was modified or stayed.
+  GeomShapePtr aResultShapesCompound = GeomAlgoAPI_CompoundBuilder::compound(aResultShapesList);
+  FeaturesPlugin_Tools::loadDeletedShapes(aResultBaseAlgoList, aTools, aResultShapesCompound);
+
   // remove the rest results if there were produced in the previous pass
   removeResults(aResultIndex);
-}
-
-//==================================================================================================
-void FeaturesPlugin_BooleanCommon::loadNamingDS(ResultBodyPtr theResultBody,
-                                                const GeomShapePtr theBaseShape,
-                                                const ListOfShape& theTools,
-                                                const GeomShapePtr theResultShape,
-                                                GeomAlgoAPI_MakeShape& theMakeShape,
-                                                GeomAPI_DataMapOfShapeShape& theMapOfShapes)
-{
-  //load result
-  if (theBaseShape->isEqual(theResultShape)) {
-    theResultBody->store(theResultShape, false);
-  } else {
-    const int aModifyVTag = 1;
-    const int aModifyETag = 2;
-    const int aModifyFTag = 3;
-    const int aDeletedTag = 4;
-    /// sub solids will be placed at labels 5, 6, etc. if result is compound of solids
-    const int aSubsolidsTag = 5;
-
-    theResultBody->storeModified(theBaseShape, theResultShape, aSubsolidsTag);
-
-    const std::string aModVName = "Modified_Vertex";
-    const std::string aModEName = "Modified_Edge";
-    const std::string aModFName = "Modified_Face";
-
-    theResultBody->loadAndOrientModifiedShapes(&theMakeShape, theBaseShape, GeomAPI_Shape::VERTEX,
-                                               aModifyVTag, aModVName, theMapOfShapes, false,
-                                               false, true);
-    theResultBody->loadAndOrientModifiedShapes(&theMakeShape, theBaseShape, GeomAPI_Shape::EDGE,
-                                               aModifyETag, aModEName, theMapOfShapes, false,
-                                               false, true);
-    theResultBody->loadAndOrientModifiedShapes(&theMakeShape, theBaseShape, GeomAPI_Shape::FACE,
-                                               aModifyFTag, aModFName, theMapOfShapes, false,
-                                               false, true);
-
-    theResultBody->loadDeletedShapes(&theMakeShape, theBaseShape,
-                                     GeomAPI_Shape::VERTEX, aDeletedTag);
-    theResultBody->loadDeletedShapes(&theMakeShape, theBaseShape,
-                                     GeomAPI_Shape::EDGE, aDeletedTag);
-    theResultBody->loadDeletedShapes(&theMakeShape, theBaseShape,
-                                     GeomAPI_Shape::FACE, aDeletedTag);
-
-    for (ListOfShape::const_iterator anIter = theTools.begin(); anIter != theTools.end(); anIter++)
-    {
-      theResultBody->loadAndOrientModifiedShapes(&theMakeShape, *anIter, GeomAPI_Shape::VERTEX,
-                                                 aModifyVTag, aModVName, theMapOfShapes, false,
-                                                 false, true);
-
-      theResultBody->loadAndOrientModifiedShapes(&theMakeShape, *anIter, GeomAPI_Shape::EDGE,
-                                                 aModifyETag, aModEName, theMapOfShapes, false,
-                                                 false, true);
-
-      theResultBody->loadAndOrientModifiedShapes(&theMakeShape, *anIter, GeomAPI_Shape::FACE,
-                                                 aModifyFTag, aModFName, theMapOfShapes, false,
-                                                 false, true);
-
-      theResultBody->loadDeletedShapes(&theMakeShape, *anIter, GeomAPI_Shape::VERTEX, aDeletedTag);
-      theResultBody->loadDeletedShapes(&theMakeShape, *anIter, GeomAPI_Shape::EDGE, aDeletedTag);
-      theResultBody->loadDeletedShapes(&theMakeShape, *anIter, GeomAPI_Shape::FACE, aDeletedTag);
-    }
-  }
 }

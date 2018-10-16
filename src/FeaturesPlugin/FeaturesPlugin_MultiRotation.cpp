@@ -388,34 +388,16 @@ void FeaturesPlugin_MultiRotation::loadNamingDS2(
     std::shared_ptr<ModelAPI_ResultBody> theResultBody,
     std::shared_ptr<GeomAPI_Shape> theBaseShape)
 {
-  int aTag = 1;
-  int anIndex = 1;
-  std::string aRotatedName;
-
   for (std::list<std::shared_ptr<GeomAlgoAPI_Translation> >::const_iterator anIt =
     theListOfTranslationAlgo.begin(); anIt != theListOfTranslationAlgo.cend(); ++anIt) {
-    std::cout << "LOAD" << std::endl;
-    std::shared_ptr<GeomAPI_DataMapOfShapeShape> aSubShapes = (*anIt)->mapOfSubShapes();
-
     // naming of faces
-    aRotatedName = "Rotated_Face_" + std::to_string((long long) anIndex);
-    theResultBody->loadAndOrientModifiedShapes((*anIt).get(), theBaseShape, GeomAPI_Shape::FACE,
-                                               aTag++, aRotatedName, *aSubShapes.get(),
-                                               false, true);
+    theResultBody->loadModifiedShapes(*anIt, theBaseShape, GeomAPI_Shape::FACE, "Rotated_Face");
 
     // naming of edges
-    aRotatedName = "Rotated_Edge_" + std::to_string((long long) anIndex);
-    theResultBody->loadAndOrientModifiedShapes((*anIt).get(), theBaseShape, GeomAPI_Shape::EDGE,
-                                               aTag++, aRotatedName, *aSubShapes.get(),
-                                               false, true);
+    theResultBody->loadModifiedShapes(*anIt, theBaseShape, GeomAPI_Shape::EDGE, "Rotated_Edge");
 
     // naming of vertex
-    aRotatedName = "Rotated_Vertex_" + std::to_string((long long) anIndex);
-    theResultBody->loadAndOrientModifiedShapes((*anIt).get(), theBaseShape, GeomAPI_Shape::VERTEX,
-                                               aTag++, aRotatedName, *aSubShapes.get(),
-                                               false, true);
-
-    ++anIndex;
+    theResultBody->loadModifiedShapes(*anIt, theBaseShape, GeomAPI_Shape::VERTEX, "Rotated_Vertex");
   }
 }
 
@@ -450,31 +432,15 @@ void FeaturesPlugin_MultiRotation::loadNamingDS(
     std::shared_ptr<ModelAPI_ResultBody> theResultBody,
     std::shared_ptr<GeomAPI_Shape> theBaseShape)
 {
-  int aTag = 1;
-  int anIndex = 1;
-  std::string aRotatedName;
-
   for (std::list<std::shared_ptr<GeomAlgoAPI_Rotation> >::const_iterator anIt =
     theListOfRotationAlgo.begin(); anIt != theListOfRotationAlgo.cend(); ++anIt) {
-    std::shared_ptr<GeomAPI_DataMapOfShapeShape> aSubShapes = (*anIt)->mapOfSubShapes();
-
     // naming of faces
-    aRotatedName = "Rotated_Face_" + std::to_string((long long) anIndex);
-    theResultBody->loadAndOrientModifiedShapes((*anIt).get(), theBaseShape, GeomAPI_Shape::FACE,
-                                               aTag++, aRotatedName, *aSubShapes.get(),
-                                               false, true);
+    theResultBody->loadModifiedShapes(*anIt, theBaseShape, GeomAPI_Shape::FACE, "Rotated_Face");
 
     // naming of edges
-    aRotatedName = "Rotated_Edge_" + std::to_string((long long) anIndex);
-    theResultBody->loadAndOrientModifiedShapes((*anIt).get(), theBaseShape, GeomAPI_Shape::EDGE,
-                                               aTag++, aRotatedName, *aSubShapes.get(),
-                                               false, true);
+    theResultBody->loadModifiedShapes(*anIt, theBaseShape, GeomAPI_Shape::EDGE, "Rotated_Edge");
 
     // naming of vertex
-    aRotatedName = "Rotated_Vertex_" + std::to_string((long long) anIndex);
-    theResultBody->loadAndOrientModifiedShapes((*anIt).get(), theBaseShape, GeomAPI_Shape::VERTEX,
-                                               aTag++, aRotatedName, *aSubShapes.get(),
-                                               false, true);
-    ++anIndex;
+    theResultBody->loadModifiedShapes(*anIt, theBaseShape, GeomAPI_Shape::VERTEX, "Rotated_Vertex");
   }
 }
