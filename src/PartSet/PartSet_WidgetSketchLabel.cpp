@@ -462,6 +462,18 @@ bool PartSet_WidgetSketchLabel::fillSketchPlaneBySelection(const ModuleBase_View
           isOwnerSet = true;
         }
       }
+      else {
+        aSelAttr->setValue(aFeature, GeomShapePtr());
+        GeomShapePtr aShape = aSelAttr->value();
+        if (!aShape.get() && aSelAttr->contextFeature()->firstResult().get()) {
+          aShape = aSelAttr->contextFeature()->firstResult()->shape();
+        }
+        if (aShape.get()) {
+          const TopoDS_Shape& aTDShape = aShape->impl<TopoDS_Shape>();
+          setSketchPlane(aTDShape);
+          isOwnerSet = true;
+        }
+      }
     }
   }
   return isOwnerSet;

@@ -130,6 +130,9 @@ bool ModuleBase_WidgetValidated::isValidInFilters(const ModuleBase_ViewerPrsPtr&
             std::dynamic_pointer_cast<ModelAPI_AttributeSelection>(anAttr);
           aSelectAttr->setValue(myPresentedObject, GeomShapePtr(), true);
           GeomShapePtr aShape = aSelectAttr->value();
+          if (!aShape.get() && aSelectAttr->contextFeature()->firstResult().get()) {
+            aShape = aSelectAttr->contextFeature()->firstResult()->shape();
+          }
           if (aShape.get()) {
             const TopoDS_Shape aTDShape = aShape->impl<TopoDS_Shape>();
             Handle(AIS_InteractiveObject) anIO = myWorkshop->selection()->getIO(thePrs);
