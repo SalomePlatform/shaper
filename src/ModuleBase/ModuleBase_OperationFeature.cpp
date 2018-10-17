@@ -352,15 +352,16 @@ bool ModuleBase_OperationFeature::commit()
 
     myFeature->setStable(true);
 
-    SessionPtr aMgr = ModelAPI_Session::get();
-    /// Set current feature and remeber old current feature
-
     commitOperation();
-    aMgr->finishOperation();
 
     stopOperation();
     emit stopped();
     emit committed();
+
+    // finishOperation has to be after commited because in signal commited
+    // there is a modification of attribures (color)
+    SessionPtr aMgr = ModelAPI_Session::get();
+    aMgr->finishOperation();
 
     afterCommitOperation();
 #ifdef DEBUG_OPERATION_START
