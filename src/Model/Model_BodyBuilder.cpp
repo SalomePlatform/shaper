@@ -225,7 +225,6 @@ void Model_BodyBuilder::storeModified(const GeomShapePtr& theOldShape,
 {
   std::shared_ptr<Model_Data> aData = std::dynamic_pointer_cast<Model_Data>(data());
   if (aData) {
-    TDF_Label& aShapeLab = aData->shapeLab();
     // clean builders
     if (theIsCleanStored) clean();
     // store the new shape as primitive
@@ -295,7 +294,6 @@ Model_BodyBuilder::~Model_BodyBuilder()
 
 void Model_BodyBuilder::buildName(const int theTag, const std::string& theName)
 {
-  std::shared_ptr<Model_Document> aDoc = std::dynamic_pointer_cast<Model_Document>(document());
   std::string aName = theName;
   std::string aPrefix = "";
   switch (theTag) {
@@ -318,7 +316,6 @@ void Model_BodyBuilder::generated(const GeomShapePtr& theNewShape,
   if (!theName.empty()) {
     buildName(myFreePrimitiveTag, theName);
   }
-
   ++myFreePrimitiveTag;
 }
 

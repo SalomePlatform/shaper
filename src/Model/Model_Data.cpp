@@ -111,7 +111,7 @@ void Model_Data::setLabel(TDF_Label theLab)
 std::string Model_Data::name()
 {
   Handle(TDataStd_Name) aName;
-  if (myLab.FindAttribute(TDataStd_Name::GetID(), aName)) {
+  if (shapeLab().FindAttribute(TDataStd_Name::GetID(), aName)) {
 #ifdef DEBUG_NAMES
     myObject->myName = TCollection_AsciiString(aName->Get()).ToCString();
 #endif
@@ -125,8 +125,8 @@ void Model_Data::setName(const std::string& theName)
   bool isModified = false;
   std::string anOldName = name();
   Handle(TDataStd_Name) aName;
-  if (!myLab.FindAttribute(TDataStd_Name::GetID(), aName)) {
-    TDataStd_Name::Set(myLab, theName.c_str());
+  if (!shapeLab().FindAttribute(TDataStd_Name::GetID(), aName)) {
+    TDataStd_Name::Set(shapeLab(), theName.c_str());
     isModified = true;
   } else {
     isModified = !aName->Get().IsEqual(theName.c_str());
@@ -143,7 +143,7 @@ void Model_Data::setName(const std::string& theName)
       }
       if (isUserDefined) {
         // name is user-defined, thus special attribute is set
-        TDataStd_UAttribute::Set(myLab, kUSER_DEFINED_NAME);
+        TDataStd_UAttribute::Set(shapeLab(), kUSER_DEFINED_NAME);
       }
     }
   }
@@ -151,7 +151,7 @@ void Model_Data::setName(const std::string& theName)
     ModelAPI_ObjectRenamedMessage::send(myObject, anOldName, theName, this);
   if (isModified && myObject && myObject->document()) {
     std::dynamic_pointer_cast<Model_Document>(myObject->document())->
-      changeNamingName(anOldName, theName, myLab);
+      changeNamingName(anOldName, theName, shapeLab());
   }
 #ifdef DEBUG_NAMES
   myObject->myName = theName;
@@ -160,7 +160,7 @@ void Model_Data::setName(const std::string& theName)
 
 bool Model_Data::hasUserDefinedName() const
 {
-  return myLab.IsAttribute(kUSER_DEFINED_NAME);
+  return shapeLab().IsAttribute(kUSER_DEFINED_NAME);
 }
 
 AttributePtr Model_Data::addAttribute(const std::string& theID, const std::string theAttrType)

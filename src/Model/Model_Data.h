@@ -172,7 +172,7 @@ class Model_Data : public ModelAPI_Data
   MODEL_EXPORT virtual bool isValid();
 
   /// Returns the label where the shape must be stored (used in ResultBody)
-  TDF_Label shapeLab()
+  TDF_Label shapeLab() const
   {
     return myLab.IsNull() ? myLab : myLab.Father().FindChild(2);
   }

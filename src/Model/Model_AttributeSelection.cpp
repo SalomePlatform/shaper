@@ -955,172 +955,85 @@ void Model_AttributeSelection::selectSubShape(
   CenterType aCenterType = theType[0] == 'v' || theType[0] == 'V' ? // only for vertex-type
     centerTypeByName(aSubShapeName) : NOT_CENTER;
   std::string aType = aCenterType == NOT_CENTER ? theType : "EDGE"; // search for edge now
+  static const GeomShapePtr anEmptyShape;
 
   // first iteration is selection by name without center prefix, second - in case of problem,
   // try with initial name
-  for(int aUseCenter = 1; aUseCenter >= 0; aUseCenter--) {
+  for(int aUseCenter = 1; aUseCenter >= 0; aUseCenter--)  {
+    std::string aSubShapeName = theSubShapeName;
     if (aUseCenter == 0 && aCenterType != NOT_CENTER) {
-      aSubShapeName = theSubShapeName;
       aCenterType = NOT_CENTER;
       aType = theType;
     } else if (aUseCenter != 1) continue;
 
+    std::shared_ptr<Model_Document> aDoc =
+      std::dynamic_pointer_cast<Model_Document>(owner()->document());
     // check this is Part-name: 2 delimiters in the name
     std::size_t aPartEnd = aSubShapeName.find('/');
-    if (aPartEnd != std::string::npos && aPartEnd != aSubShapeName.rfind('/')) {
+    if (aPartEnd != std::string::npos) {
       std::string aPartName = aSubShapeName.substr(0, aPartEnd);
-      ObjectPtr aFound = owner()->document()->objectByName(ModelAPI_ResultPart::group(), aPartName);
-      if (aFound.get()) { // found such part, so asking it for the name
-        ResultPartPtr aPart = std::dynamic_pointer_cast<ModelAPI_ResultPart>(aFound);
-        std::string aNameInPart = aSubShapeName.substr(aPartEnd + 1);
-        int anIndex;
-        std::shared_ptr<GeomAPI_Shape> aSelected = aPart->shapeInPart(aNameInPart, aType, anIndex);
-        if (aSelected.get()) {
-          if (aCenterType != NOT_CENTER) {
-            if (!aSelected->isEdge())
-              continue;
-            std::shared_ptr<GeomAPI_Edge> aSelectedEdge(new GeomAPI_Edge(aSelected));
-            setValueCenter(aPart, aSelectedEdge, aCenterType);
-          } else
-            setValue(aPart, aSelected);
-          TDataStd_Integer::Set(selectionLabel(), anIndex);
-          return;
+      DocumentPtr aRootDoc = ModelAPI_Session::get()->moduleDocument();
+      if (aPartName == aRootDoc->kind()) {
+        aDoc = std::dynamic_pointer_cast<Model_Document>(aRootDoc);
+        aSubShapeName = aSubShapeName.substr(aPartEnd + 1);
+      } else {
+        ObjectPtr aFound = owner()->document()->objectByName(ModelAPI_ResultPart::group(), aPartName);
+        if (aFound.get()) { // found such part, so asking it for the name
+          ResultPartPtr aPart = std::dynamic_pointer_cast<ModelAPI_ResultPart>(aFound);
+          aDoc = std::dynamic_pointer_cast<Model_Document>(aPart->partDoc());
+          aSubShapeName = aSubShapeName.substr(aPartEnd +1);
         }
       }
     }
 
-    std::shared_ptr<Model_Document> aDoc =
-      std::dynamic_pointer_cast<Model_Document>(owner()->document());
     // check this is a whole feature context
     if (aSubShapeName.size() > kWHOLE_FEATURE.size() &&
       aSubShapeName.substr(0, kWHOLE_FEATURE.size()) == kWHOLE_FEATURE) {
       std::string aFeatureName = aSubShapeName.substr(kWHOLE_FEATURE.size());
       ObjectPtr anObj = aDoc->objectByName(ModelAPI_Feature::group(), aFeatureName);
       if (anObj.get()) {
-        static const GeomShapePtr anEmptyShape;
         setValue(anObj, anEmptyShape);
         return;
       }
     }
 
-    Model_SelectionNaming aSelNaming(selectionLabel());
-    std::shared_ptr<GeomAPI_Shape> aShapeToBeSelected;
-    ResultPtr aCont;
-    if (aSelNaming.selectSubShape(aType, aSubShapeName, aDoc, aShapeToBeSelected, aCont)) {
-      // try to find the last context to find the up to date shape
-      if (aCont->shape().get() && !aCont->shape()->isNull() &&
-        aCont->groupName() == ModelAPI_ResultBody::group() && aDoc == owner()->document()) {
-        const TopoDS_Shape aConShape = aCont->shape()->impl<TopoDS_Shape>();
-        if (!aConShape.IsNull()) {
-          Handle(TNaming_NamedShape) aNS = TNaming_Tool::NamedShape(aConShape, selectionLabel());
-          if (!aNS.IsNull()) {
-            aNS = TNaming_Tool::CurrentNamedShape(aNS);
-            if (!aNS.IsNull() && scope().Contains(aNS->Label())) { // scope check is for 2228
-              TDF_Label aLab = aNS->Label();
-              if (aLab.Depth() % 2 == 0)
-                aLab = aLab.Father();
-              ObjectPtr anObj = aDoc->objects()->object(aLab);
-              while(!anObj.get() && aLab.Depth() > 5) {
-                aLab = aLab.Father().Father();
-                anObj = aDoc->objects()->object(aLab);
-              }
-
-              if (anObj.get()) {
-                ResultPtr aRes = std::dynamic_pointer_cast<ModelAPI_Result>(anObj);
-                if (aRes)
-                  aCont = aRes;
-              }
-            }
-          }
-        }
+    // the whole result selection check
+    if (aSubShapeName.find('/') == std::string::npos) {
+      ObjectPtr aRes = aDoc->objectByName(ModelAPI_ResultConstruction::group(), aSubShapeName);
+      if (!aRes.get())
+        aRes = aDoc->objectByName(ModelAPI_ResultBody::group(), aSubShapeName);
+      if (aRes.get()) {
+        setValue(aRes, anEmptyShape);
+        return;
       }
-      // if compsolid is context, try to take sub-solid as context: like in GUI and scripts
-      if (aCont.get() && aShapeToBeSelected.get()) {
-        ResultBodyPtr aComp = std::dynamic_pointer_cast<ModelAPI_ResultBody>(aCont);
-        if (aComp && aComp->numberOfSubs()) {
-          std::list<ResultPtr> allSubs;
-          ModelAPI_Tools::allSubs(aComp, allSubs);
-          std::list<ResultPtr>::iterator aS = allSubs.begin();
-          for(; aS != allSubs.end(); aS++) {
-            ResultBodyPtr aSub = std::dynamic_pointer_cast<ModelAPI_ResultBody>(*aS);
-            if (aSub && aSub->numberOfSubs() == 0 && aSub->shape().get() &&
-                aSub->shape()->isSubShape(aShapeToBeSelected)) {
-              aCont = aSub;
-              break;
-            }
-          }
-        }
-      }
-      // try to find the latest active result that must be used instead of the selected
-      // to set the active context (like in GUI selection), not concealed one
-      bool aFindNewContext = true;
-      while(aFindNewContext && aCont.get()) {
-        aFindNewContext = false;
-        // take references to all results: root one, any sub
-        ResultBodyPtr aCompContext = ModelAPI_Tools::bodyOwner(aCont, true);
-        std::list<ResultPtr> allRes;
-        if (aCompContext.get()) {
-          ModelAPI_Tools::allSubs(aCompContext, allRes);
-          allRes.push_back(aCompContext);
-        } else {
-          allRes.push_back(aCont);
-        }
-        for(std::list<ResultPtr>::iterator aSub = allRes.begin(); aSub != allRes.end(); aSub++) {
-          ResultPtr aResCont = *aSub;
-          ResultBodyPtr aResBody = std::dynamic_pointer_cast<ModelAPI_ResultBody>(aResCont);
-          // only lower and higher level subs are counted
-          if (aResBody.get() && aResBody->numberOfSubs() > 0 && aResBody != aCompContext)
-            continue;
-          const std::set<AttributePtr>& aRefs = aResCont->data()->refsToMe();
-          std::set<AttributePtr>::const_iterator aRef = aRefs.begin();
-          for(; !aFindNewContext && aRef != aRefs.end(); aRef++) {
-            if (!aRef->get() || !(*aRef)->owner().get())
-              continue;
-            // concealed attribute only
-            FeaturePtr aRefFeat = std::dynamic_pointer_cast<ModelAPI_Feature>((*aRef)->owner());
-            if (!ModelAPI_Session::get()->validators()->isConcealed(
-              aRefFeat->getKind(), (*aRef)->id()))
-              continue;
-            // search the feature result that contains sub-shape selected
-            std::list<std::shared_ptr<ModelAPI_Result> > aResults;
-
-            // take all sub-results or one result
-            std::list<ResultPtr> aRefFeatResults;
-            ModelAPI_Tools::allResults(aRefFeat, aRefFeatResults);
-            std::list<ResultPtr>::iterator aRefResIter = aRefFeatResults.begin();
-            for(; aRefResIter != aRefFeatResults.end(); aRefResIter++) {
-              ResultBodyPtr aBody = std::dynamic_pointer_cast<ModelAPI_ResultBody>(*aRefResIter);
-              if (aBody.get() && aBody->numberOfSubs() == 0) // add only lower level subs
-                aResults.push_back(aBody);
-            }
-            std::list<std::shared_ptr<ModelAPI_Result> >::iterator aResIter = aResults.begin();
-            for(; aResIter != aResults.end(); aResIter++) {
-              if (!aResIter->get() || !(*aResIter)->data()->isValid() || (*aResIter)->isDisabled())
-                continue;
-              GeomShapePtr aShape = (*aResIter)->shape();
-              GeomShapePtr aSelectedShape =
-                aShapeToBeSelected.get() ? aShapeToBeSelected : aCont->shape();
-              if (aShape.get() && aShape->isSubShape(aSelectedShape, false)) {
-                aCont = *aResIter; // found new context (produced from this) with same subshape
-                aFindNewContext = true; // continue searching futher
-                break;
-              }
-            }
-          }
-        }
-      }
-
-      if (aCenterType != NOT_CENTER) {
-        if (!aShapeToBeSelected->isEdge())
-          continue;
-        std::shared_ptr<GeomAPI_Edge> aSelectedEdge(new GeomAPI_Edge(aShapeToBeSelected));
-        setValueCenter(aCont, aSelectedEdge, aCenterType);
-      } else
-        setValue(aCont, aShapeToBeSelected);
-      return;
     }
-  }
 
+    Selector_Selector aSelector(aDoc->generalLabel());
+    myRestoreDocument = aDoc;
+    TDF_Label aContextLabel = aSelector.restoreByName(aSubShapeName, this);
+    myRestoreDocument.reset();
+    if (!aContextLabel.IsNull()) {
+      ResultPtr aContext = aDoc->resultByLab(aContextLabel); // any label for document access
+      if (aContext.get() && aContext->shape().get()) {
+        TopoDS_Shape aContextShape = aContext->shape()->impl<TopoDS_Shape>();
+        if (aSelector.solve(aContextShape)) {
+          GeomShapePtr aShapeToBeSelected(new GeomAPI_Shape);
+          aShapeToBeSelected->setImpl<TopoDS_Shape>(new TopoDS_Shape(aSelector.value()));
+          if (aCenterType != NOT_CENTER) {
+            if (!aShapeToBeSelected->isEdge())
+              continue;
+            std::shared_ptr<GeomAPI_Edge> aSelectedEdge(new GeomAPI_Edge(aShapeToBeSelected));
+            setValueCenter(aContext, aSelectedEdge, aCenterType);
+          }
+          else
+            setValue(aContext, aShapeToBeSelected);
+          return;
+        }
+      }
+    }
+    aSubShapeName = theSubShapeName;
+  }
+  // invalid
   TDF_Label aSelLab = selectionLabel();
   setInvalidIfFalse(aSelLab, false);
   reset();
@@ -1694,4 +1607,140 @@ std::string Model_AttributeSelection::contextName(const TDF_Label theSelectionLa
     }
   }
   return ""; // invalid case
+}
+
+/// This method restores by the context and value name the context label and
+/// sub-label where the value is. Returns true if it is valid.
+bool Model_AttributeSelection::restoreContext(std::string theName,
+  TDF_Label& theContext, TDF_Label& theValue)
+{
+  static const GeomShapePtr anEmptyShape; // to store context only
+  std::string aName = theName;
+  std::shared_ptr<Model_Document> aDoc = myRestoreDocument.get() ? myRestoreDocument :
+    std::dynamic_pointer_cast<Model_Document>(owner()->document());
+
+  // remove the sub-value part if exists
+  std::string aSubShapeName = aName;
+  std::string::size_type n = aName.find('/');
+  if (n != std::string::npos) {
+    aName = aName.substr(0, n);
+  }
+
+  if (aName.empty()) return false;
+  bool anUniqueContext = false;
+  ResultPtr aCont = aDoc->findByName(aName, aSubShapeName, anUniqueContext);
+  if (!aCont.get() || !aCont->shape().get() || aCont->shape()->isNull())
+    return false;
+
+  // searching the sub-shape
+  static const ResultPtr anEmpty;
+  theValue = aDoc->findNamingName(aSubShapeName, anUniqueContext ? aCont : anEmpty);
+
+  /* to find the latest lower result that keeps given shape
+  bool aFindNewContext = true;
+  while(aFindNewContext && aCont.get()) {
+    aFindNewContext = false;
+    // try to find the last context to find the up to date shape
+    TopoDS_Shape aConShape = aCont->shape()->impl<TopoDS_Shape>();
+    Handle(TNaming_NamedShape) aNS = TNaming_Tool::NamedShape(aConShape, selectionLabel());
+    if (!aNS.IsNull()) {
+      aNS = TNaming_Tool::CurrentNamedShape(aNS);
+      if (!aNS.IsNull() && isOlderThanMe(aNS->Label())) { // scope check is for 2228
+        TDF_Label aLab = aNS->Label();
+        if (aLab.Depth() % 2 == 0)
+          aLab = aLab.Father();
+        ObjectPtr anObj = aDoc->objects()->object(aLab);
+        while (!anObj.get() && aLab.Depth() > 5) {
+          aLab = aLab.Father().Father();
+          anObj = aDoc->objects()->object(aLab);
+        }
+
+        if (anObj.get()) {
+          ResultPtr aRes = std::dynamic_pointer_cast<ModelAPI_Result>(anObj);
+          if (aRes) {
+            aCont = aRes;
+            aFindNewContext = true;
+          }
+        }
+      }
+    } else if (aCont->groupName() == ModelAPI_ResultBody::group()) {
+      // try to search newer context by the concealment references
+      // take references to all results: root one, any sub
+      std::list<ResultPtr> allRes;
+      ResultPtr aCompContext;
+      if (aCont->groupName() == ModelAPI_ResultBody::group()) {
+        ResultBodyPtr aCompBody = ModelAPI_Tools::bodyOwner(aCont, true);
+        if (aCompBody.get()) {
+          ModelAPI_Tools::allSubs(aCompBody, allRes);
+          allRes.push_back(aCompBody);
+          aCompContext = aCompBody;
+        }
+      }
+      if (allRes.empty())
+        allRes.push_back(aCont);
+
+      for(std::list<ResultPtr>::iterator aSub = allRes.begin(); aSub != allRes.end(); aSub++) {
+        ResultPtr aResCont = *aSub;
+        ResultBodyPtr aResBody = std::dynamic_pointer_cast<ModelAPI_ResultBody>(aResCont);
+        if (aResBody.get() && aResBody->numberOfSubs() > 0 && aResBody != aCompContext)
+          continue; // only lower and higher level subs are counted
+        const std::set<AttributePtr>& aRefs = aResCont->data()->refsToMe();
+        std::set<AttributePtr>::const_iterator aRef = aRefs.begin();
+        for(; !aFindNewContext && aRef != aRefs.end(); aRef++) {
+          if (!aRef->get() || !(*aRef)->owner().get())
+            continue;
+          // concealed attribute only
+          FeaturePtr aRefFeat = std::dynamic_pointer_cast<ModelAPI_Feature>((*aRef)->owner());
+          if (!ModelAPI_Session::get()->validators()->isConcealed(
+            aRefFeat->getKind(), (*aRef)->id()))
+            continue;
+          // search the feature result that contains sub-shape selected
+          std::list<std::shared_ptr<ModelAPI_Result> > aResults;
+
+          // take all sub-results or one result
+          std::list<ResultPtr> aRefFeatResults;
+          ModelAPI_Tools::allResults(aRefFeat, aRefFeatResults);
+          std::list<ResultPtr>::iterator aRefResIter = aRefFeatResults.begin();
+          for(; aRefResIter != aRefFeatResults.end(); aRefResIter++) {
+            ResultBodyPtr aBody = std::dynamic_pointer_cast<ModelAPI_ResultBody>(*aRefResIter);
+            if (aBody.get() && aBody->numberOfSubs() == 0) // add only lower level subs
+              aResults.push_back(aBody);
+          }
+          std::list<std::shared_ptr<ModelAPI_Result> >::iterator aResIter = aResults.begin();
+          for(; aResIter != aResults.end(); aResIter++) {
+            if (!aResIter->get() || !(*aResIter)->data()->isValid() || (*aResIter)->isDisabled())
+              continue;
+            GeomShapePtr aShape = (*aResIter)->shape();
+            GeomShapePtr aSelectedShape =
+              aShapeToBeSelected.get() ? aShapeToBeSelected : aCont->shape();
+            if (aShape.get() && aShape->isSubShape(aSelectedShape, false)) {
+              aCont = *aResIter; // found new context (produced from this) with same subshape
+              aFindNewContext = true; // continue searching futher
+              break;
+            }
+          }
+        }
+      }
+    }
+  }
+  // if compsolid is context, try to take sub-solid as context: like in GUI and scripts
+  ResultBodyPtr aComp = std::dynamic_pointer_cast<ModelAPI_ResultBody>(aCont);
+  if (aComp && aComp->numberOfSubs()) {
+    std::list<ResultPtr> allSubs;
+    ModelAPI_Tools::allSubs(aComp, allSubs);
+    std::list<ResultPtr>::iterator aS = allSubs.begin();
+    for (; aS != allSubs.end(); aS++) {
+      ResultBodyPtr aSub = std::dynamic_pointer_cast<ModelAPI_ResultBody>(*aS);
+      if (aSub && aSub->numberOfSubs() == 0 && aSub->shape().get() &&
+        aSub->shape()->isSubShape(aShapeToBeSelected)) {
+        aCont = aSub;
+        break;
+      }
+    }
+  }
+  */
+  if (aCont.get()) {
+    theContext = std::dynamic_pointer_cast<Model_Data>(aCont->data())->label();
+  }
+  return true;
 }

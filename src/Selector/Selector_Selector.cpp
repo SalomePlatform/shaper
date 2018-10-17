@@ -793,6 +793,21 @@ std::string Selector_Selector::name(Selector_NameGenerator* theNameGenerator) {
   return "";
 }
 
+TDF_Label Selector_Selector::restoreByName(std::string theName,
+  Selector_NameGenerator* theNameGenerator)
+{
+  if (theName.find('&') == std::string::npos) { // wihtout '&' it can be only primitive
+    myType = SELTYPE_PRIMITIVE;
+    TDF_Label aContext;
+    if (theNameGenerator->restoreContext(theName, aContext, myFinal)) {
+      if (!myFinal.IsNull())
+        return aContext;
+    }
+  } else {
+  }
+  return TDF_Label();
+}
+
 bool Selector_Selector::selectBySubSelector(
   const TopoDS_Shape theContext, const TopoDS_Shape theValue, const bool theUseNeighbors)
 {

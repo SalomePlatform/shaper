@@ -584,11 +584,11 @@ size_t ParseName(const std::string& theSubShapeName,   std::list<std::string>& t
 
 std::string getContextName(const std::string& theSubShapeName)
 {
-  std::string aName;
-  std::string::size_type n = theSubShapeName.find('/');
-  if (n == std::string::npos) return theSubShapeName;
-  aName = theSubShapeName.substr(0, n);
-  return aName;
+    std::string aName;
+    std::string::size_type n = theSubShapeName.find('/');
+    if (n == std::string::npos) return theSubShapeName;
+    aName = theSubShapeName.substr(0, n);
+    return aName;
 }
 
 /// Parses naming name of sketch sub-elements: takes indices and orientation

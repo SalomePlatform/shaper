@@ -76,6 +76,11 @@ class Selector_Selector
   /// Returns true if it can restore structure correctly
    SELECTOR_EXPORT bool restore();
 
+   /// Restores the selected shape by the topological name string.
+   /// Returns not empty label of the context.
+   SELECTOR_EXPORT TDF_Label restoreByName(std::string theName,
+     Selector_NameGenerator* theNameGenerator);
+
   /// Updates the current shape by the stored topological name
    SELECTOR_EXPORT bool solve(const TopoDS_Shape& theContext);
 

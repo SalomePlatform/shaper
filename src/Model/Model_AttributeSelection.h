@@ -49,6 +49,8 @@ class Model_AttributeSelection : public ModelAPI_AttributeSelection,
   CenterType myTmpCenterType;
   /// Reference to the partent attribute, if any (to split selection compounds in issue 1799)
   Model_AttributeSelectionList* myParent;
+
+  std::shared_ptr<Model_Document> myRestoreDocument; // current document to restore by name
 public:
   /// Defines the result and its selected sub-shape
   /// \param theContext object where the sub-shape was selected
@@ -133,6 +135,11 @@ public:
   // Implementation of the name generator method from the Selector package
   // This method returns the context name by the label of the sub-selected shape
   MODEL_EXPORT virtual std::string contextName(const TDF_Label theSelectionLab) override;
+
+  /// This method restores by the context and value name the context label and
+  /// sub-label where the value is. Returns true if it is valid.
+  MODEL_EXPORT virtual bool restoreContext(std::string theName,
+    TDF_Label& theContext, TDF_Label& theValue) override;
 
 protected:
   /// Objects are created for features automatically

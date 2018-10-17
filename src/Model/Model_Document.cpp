@@ -1549,7 +1549,7 @@ ResultPtr Model_Document::findByName(
   std::string aName = theName;
   ResultPtr aRes = myObjs->findByName(aName);
   theUniqueContext = !(aRes.get() && myNamingNames.find(aName) != myNamingNames.end());
-  while(!aRes.get() && aName[0] == '_') { // this may be thecontext with the history index
+  while(!aRes.get() && aName[0] == '_') { // this may be theContext with the history index
     aNumInHistory++;
     aName = aName.substr(1);
     aRes = myObjs->findByName(aName);

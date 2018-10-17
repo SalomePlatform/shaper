@@ -41,7 +41,6 @@
 #include <TDF_ChildIDIterator.hxx>
 #include <TDataStd_ReferenceArray.hxx>
 #include <TDataStd_HLabelArray1.hxx>
-#include <TDataStd_Name.hxx>
 #include <TDF_Reference.hxx>
 #include <TDF_ChildIDIterator.hxx>
 #include <TDF_LabelMapHasher.hxx>
