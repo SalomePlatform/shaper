@@ -213,8 +213,8 @@ void FeaturesPlugin_Partition::storeResult(
        ++anIt)
   {
     GeomShapePtr aShape = *anIt;
-    aResultBody->loadModifiedShapes(theMakeShape, aShape, GeomAPI_Shape::EDGE, "Modified_Edge");
-    aResultBody->loadModifiedShapes(theMakeShape, aShape, GeomAPI_Shape::FACE, "Modified_Face");
+    aResultBody->loadModifiedShapes(theMakeShape, aShape, GeomAPI_Shape::EDGE);
+    aResultBody->loadModifiedShapes(theMakeShape, aShape, GeomAPI_Shape::FACE);
     aResultBody->loadDeletedShapes(theMakeShape, aShape, GeomAPI_Shape::FACE);
   }
 

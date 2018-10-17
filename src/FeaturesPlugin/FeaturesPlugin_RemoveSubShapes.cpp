@@ -293,15 +293,12 @@ void FeaturesPlugin_RemoveSubShapes::execute()
 
   aResultBody->loadModifiedShapes(aMakeShapeList,
                                   aBaseShape,
-                                  GeomAPI_Shape::FACE,
-                                  "Modified_Face");
+                                  GeomAPI_Shape::FACE);
   aResultBody->loadModifiedShapes(aMakeShapeList,
                                   aBaseShape,
-                                  GeomAPI_Shape::EDGE,
-                                  "Modified_Edge");
+                                  GeomAPI_Shape::EDGE);
   aResultBody->loadModifiedShapes(aMakeShapeList,
                                   aBaseShape,
-                                  GeomAPI_Shape::VERTEX,
-                                  "Modified_Vertex");
+                                  GeomAPI_Shape::VERTEX);
   setResult(aResultBody);
 }

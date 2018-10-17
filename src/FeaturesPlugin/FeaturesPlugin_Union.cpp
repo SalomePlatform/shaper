@@ -169,15 +169,13 @@ void FeaturesPlugin_Union::execute()
   // workaround: make copy to name edges correctly
 
   // Store result and naming.
-  const std::string aModEName = "Modified_Edge";
-  const std::string aModFName = "Modified_Face";
 
   std::shared_ptr<ModelAPI_ResultBody> aResultBody = document()->createBody(data());
   aResultBody->storeModified(anObjects.front(), aShape);
 
   for(ListOfShape::const_iterator anIter = anObjects.begin(); anIter != anObjects.end(); ++anIter) {
-    aResultBody->loadModifiedShapes(aMakeShapeList, *anIter, GeomAPI_Shape::EDGE, aModEName);
-    aResultBody->loadModifiedShapes(aMakeShapeList, *anIter, GeomAPI_Shape::FACE, aModFName);
+    aResultBody->loadModifiedShapes(aMakeShapeList, *anIter, GeomAPI_Shape::EDGE);
+    aResultBody->loadModifiedShapes(aMakeShapeList, *anIter, GeomAPI_Shape::FACE);
     //aResultBody->loadDeletedShapes(&aMakeShapeList, *anIter, GeomAPI_Shape::FACE, aDeletedTag);
   }
 

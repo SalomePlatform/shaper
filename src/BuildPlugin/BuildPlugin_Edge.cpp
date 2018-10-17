@@ -99,7 +99,7 @@ void BuildPlugin_Edge::execute()
     // Store result.
     ResultBodyPtr aResultBody = document()->createBody(data(), aResultIndex);
     aResultBody->storeModified(aShape, aCopyAlgo->shape());
-    aResultBody->loadModifiedShapes(aCopyAlgo, aShape, GeomAPI_Shape::VERTEX, "Modified_Vertex");
+    aResultBody->loadModifiedShapes(aCopyAlgo, aShape, GeomAPI_Shape::VERTEX);
 
     setResult(aResultBody, aResultIndex);
     ++aResultIndex;

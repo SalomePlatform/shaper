@@ -142,12 +142,7 @@ void FeaturesPlugin_Intersection::loadNamingDS(std::shared_ptr<ModelAPI_ResultBo
         continue;
       }
       if(aShapesMap.isBound(aSubShape)) {
-        theResultBody->modified(aShapesMap.find(aSubShape),
-          aSubShape,
-          std::string("Modified_")
-            + (anIndex == 0 ? "Vertex_" : "Edge_")
-            + std::to_string((long long)(anIndex == 0 ? aModifiedVertexIndex++
-                                                      : aModifiedEdgeIndex++)));
+        theResultBody->modified(aShapesMap.find(aSubShape), aSubShape);
       } else {
         theResultBody->generated(
           aSubShape,

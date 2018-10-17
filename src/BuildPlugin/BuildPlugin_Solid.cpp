@@ -71,7 +71,7 @@ void BuildPlugin_Solid::storeResult(const ListOfShape& theOriginalShapes,
        ++anIt)
   {
     GeomShapePtr aShape = *anIt;
-    aResultBody->loadModifiedShapes(theAlgorithm, aShape, GeomAPI_Shape::FACE, "Modified_Face");
+    aResultBody->loadModifiedShapes(theAlgorithm, aShape, GeomAPI_Shape::FACE);
   }
   setResult(aResultBody);
 }

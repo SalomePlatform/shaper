@@ -127,7 +127,7 @@ void BuildPlugin_SubShapes::execute()
   const int aModEdgeTag = 2;
   ResultBodyPtr aResultBody = document()->createBody(data());
   aResultBody->storeModified(aBaseShape, aResultShape);
-  aResultBody->loadModifiedShapes(aBuilder, aBaseShape, GeomAPI_Shape::EDGE, "Modified_Edge");
+  aResultBody->loadModifiedShapes(aBuilder, aBaseShape, GeomAPI_Shape::EDGE);
   for (ListOfShape::const_iterator anIt = aShapesToAdd.cbegin();
        anIt != aShapesToAdd.cend();
        ++anIt)
@@ -135,9 +135,7 @@ void BuildPlugin_SubShapes::execute()
     GeomAPI_Shape::ShapeType aShType = (*anIt)->shapeType();
     aResultBody->loadModifiedShapes(aBuilder,
                                     *anIt,
-                                    aShType,
-                                    aShType == GeomAPI_Shape::VERTEX ? "Modified_Vertex"
-                                                                     : "Modified_Edge");
+                                    aShType);
   }
   setResult(aResultBody);
 }

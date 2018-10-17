@@ -380,8 +380,6 @@ void FeaturesPlugin_CompositeBoolean::storeModificationHistory(ResultBodyPtr the
                                 const ListOfShape& theTools,
                                 const std::shared_ptr<GeomAlgoAPI_MakeShape> theMakeShape)
 {
-  const std::string aModName = "Modfied";
-
   ListOfShape aTools = theTools;
   aTools.push_back(theObject);
 

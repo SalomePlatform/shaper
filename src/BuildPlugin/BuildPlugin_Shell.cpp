@@ -100,12 +100,10 @@ void BuildPlugin_Shell::execute()
           if (aShell->isSubShape(aHistoryShape, false)) {
             aResultBody->loadModifiedShapes(aSewingAlgo,
                                             aFace,
-                                            GeomAPI_Shape::EDGE,
-                                            "Modified_Edge");
+                                            GeomAPI_Shape::EDGE);
             aResultBody->loadModifiedShapes(aSewingAlgo,
                                             aFace,
-                                            GeomAPI_Shape::FACE,
-                                            "Modified_Face");
+                                            GeomAPI_Shape::FACE);
             break;
           }
         }
