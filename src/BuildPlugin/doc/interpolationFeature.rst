@@ -2,7 +2,7 @@
 Interpolation
 =============
 
-Interpolation feature creates a curve (wire) using vertices already existing in other objects.
+Interpolation feature creates a curve (edge) using vertices already existing in other objects.
 
 To create an interpolation in the active part:
 
