@@ -83,7 +83,7 @@ void FeaturesPlugin_Recover::execute()
     // like in import: forget any history
     int aTag(1);
     std::string aNameMS = "Shape";
-    aResultBody->loadFirstLevel(aCopyAlgo.shape(), aNameMS, aTag);
+    aResultBody->loadFirstLevel(aCopyAlgo.shape(), aNameMS);
 
     setResult(aResultBody, aResultIndex);
     ++aResultIndex;

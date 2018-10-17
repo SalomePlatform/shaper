@@ -149,24 +149,21 @@ void ModelAPI_ResultBody::loadGeneratedShapes(const GeomMakeShapePtr& theAlgo,
 }
 
 void ModelAPI_ResultBody::loadFirstLevel(GeomShapePtr theShape,
-                                         const std::string& theName,
-                                         int& theTag)
+                                         const std::string& theName)
 {
-  myBuilder->loadFirstLevel(theShape, theName, theTag);
+  myBuilder->loadFirstLevel(theShape, theName);
 }
 
 void ModelAPI_ResultBody::loadDisconnectedEdges(GeomShapePtr theShape,
-                                                const std::string& theName,
-                                                int& theTag)
+                                                const std::string& theName)
 {
-  myBuilder->loadDisconnectedEdges(theShape, theName, theTag);
+  myBuilder->loadDisconnectedEdges(theShape, theName);
 }
 
 void ModelAPI_ResultBody::loadDisconnectedVertexes(GeomShapePtr theShape,
-                                                   const std::string& theName,
-                                                    int& theTag)
+                                                   const std::string& theName)
 {
-  myBuilder->loadDisconnectedVertexes(theShape, theName, theTag);
+  myBuilder->loadDisconnectedVertexes(theShape, theName);
 }
 
 bool ModelAPI_ResultBody::isConnectedTopology()

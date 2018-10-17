@@ -125,11 +125,7 @@ static bool isAlreadyStored(const TNaming_Builder* theBuilder,
 
 Model_BodyBuilder::Model_BodyBuilder(ModelAPI_Object* theOwner)
 : ModelAPI_BodyBuilder(theOwner),
-  myPrimitiveTag(PRIMITIVES_START_TAG),
-  myDividedIndex(1),
-  myVIndex(1),
-  myEIndex(1),
-  myFIndex(1)
+  myFreePrimitiveTag(PRIMITIVES_START_TAG)
 {
 }
 
@@ -289,11 +285,7 @@ void Model_BodyBuilder::clean()
   myBuilders.clear();
   // remove the old reference (if any)
   aLab.ForgetAttribute(TDF_Reference::GetID());
-  myPrimitiveTag = PRIMITIVES_START_TAG;
-  myDividedIndex = 1;
-  myVIndex = 1;
-  myEIndex = 1;
-  myFIndex = 1;
+  myFreePrimitiveTag = PRIMITIVES_START_TAG;
 }
 
 Model_BodyBuilder::~Model_BodyBuilder()
@@ -322,12 +314,12 @@ void Model_BodyBuilder::generated(const GeomShapePtr& theNewShape,
                                   const std::string& theName)
 {
   TopoDS_Shape aShape = theNewShape->impl<TopoDS_Shape>();
-  builder(myPrimitiveTag)->Generated(aShape);
+  builder(myFreePrimitiveTag)->Generated(aShape);
   if (!theName.empty()) {
-    buildName(myPrimitiveTag, theName);
+    buildName(myFreePrimitiveTag, theName);
   }
 
-  ++myPrimitiveTag;
+  ++myFreePrimitiveTag;
 }
 
 void Model_BodyBuilder::generated(const GeomShapePtr& theOldShape,
@@ -640,7 +632,7 @@ void loadGeneratedDangleShapes(
 
 //=======================================================================
 void Model_BodyBuilder::loadNextLevels(GeomShapePtr theShape,
-  const std::string& theName, int&  theTag)
+                                       const std::string& theName)
 {
   if(theShape->isNull()) return;
   TopoDS_Shape aShape = theShape->impl<TopoDS_Shape>();
@@ -648,11 +640,11 @@ void Model_BodyBuilder::loadNextLevels(GeomShapePtr theShape,
   if (aShape.ShapeType() == TopAbs_SOLID) {
     TopExp_Explorer expl(aShape, TopAbs_FACE);
     for (; expl.More(); expl.Next()) {
-      builder(theTag)->Generated(expl.Current());
-      TCollection_AsciiString aStr(theTag);
-      aName = theName + aStr.ToCString();
-      buildName(theTag, aName);
-      theTag++;
+      builder(myFreePrimitiveTag)->Generated(expl.Current());
+      TCollection_AsciiString aStr(myFreePrimitiveTag - PRIMITIVES_START_TAG + 1);
+      aName = theName + "_" + aStr.ToCString();
+      buildName(myFreePrimitiveTag, aName);
+      ++myFreePrimitiveTag;
     }
   }
   else if (aShape.ShapeType() == TopAbs_SHELL || aShape.ShapeType() == TopAbs_FACE) {
@@ -662,11 +654,11 @@ void Model_BodyBuilder::loadNextLevels(GeomShapePtr theShape,
     if (Faces.Extent() > 1 || (aShape.ShapeType() == TopAbs_SHELL && Faces.Extent() == 1)) {
       TopExp_Explorer expl(aShape, TopAbs_FACE);
       for (; expl.More(); expl.Next()) {
-        builder(theTag)->Generated(expl.Current());
-        TCollection_AsciiString aStr(theTag);
-        aName = theName + aStr.ToCString();
-        buildName(theTag, aName);
-        theTag++;
+        builder(myFreePrimitiveTag)->Generated(expl.Current());
+        TCollection_AsciiString aStr(myFreePrimitiveTag - PRIMITIVES_START_TAG + 1);
+        aName = theName + "_" + aStr.ToCString();
+        buildName(myFreePrimitiveTag, aName);
+        ++myFreePrimitiveTag;
       }
     }
     TopTools_IndexedDataMapOfShapeListOfShape anEdgeAndNeighbourFaces;
@@ -677,21 +669,21 @@ void Model_BodyBuilder::loadNextLevels(GeomShapePtr theShape,
       if (aLL.Extent() < 2) {
         if (BRep_Tool::Degenerated(TopoDS::Edge(anEdgeAndNeighbourFaces.FindKey(i))))
           continue;
-        builder(theTag)->Generated(anEdgeAndNeighbourFaces.FindKey(i));
-        TCollection_AsciiString aStr(theTag);
-        aName = theName + aStr.ToCString();
-        buildName(theTag, aName);
-        theTag++;
+        builder(myFreePrimitiveTag)->Generated(anEdgeAndNeighbourFaces.FindKey(i));
+        TCollection_AsciiString aStr(myFreePrimitiveTag - PRIMITIVES_START_TAG + 1);
+        aName = theName + "_" + aStr.ToCString();
+        buildName(myFreePrimitiveTag, aName);
+        ++myFreePrimitiveTag;
       } else {
         TopTools_ListIteratorOfListOfShape anIter(aLL);
         const TopoDS_Face& aFace = TopoDS::Face(anIter.Value());
         anIter.Next();
         if(aFace.IsEqual(anIter.Value())) {
-          builder(theTag)->Generated(anEdgeAndNeighbourFaces.FindKey(i));
-          TCollection_AsciiString aStr(theTag);
-          aName = theName + aStr.ToCString();
-          buildName(theTag, aName);
-          theTag++;
+          builder(myFreePrimitiveTag)->Generated(anEdgeAndNeighbourFaces.FindKey(i));
+          TCollection_AsciiString aStr(myFreePrimitiveTag - PRIMITIVES_START_TAG + 1);
+          aName = theName + "_" + aStr.ToCString();
+          buildName(myFreePrimitiveTag, aName);
+          ++myFreePrimitiveTag;
         }
       }
     }
@@ -699,40 +691,40 @@ void Model_BodyBuilder::loadNextLevels(GeomShapePtr theShape,
     TopTools_IndexedMapOfShape Edges;
     BRepTools::Map3DEdges(aShape, Edges);
     if (Edges.Extent() == 1) {
-      builder(theTag++)->Generated(Edges.FindKey(1));
+      builder(myFreePrimitiveTag++)->Generated(Edges.FindKey(1));
       TopExp_Explorer expl(aShape, TopAbs_VERTEX);
       for (; expl.More(); expl.Next()) {
-        builder(theTag)->Generated(expl.Current());
-        TCollection_AsciiString aStr(theTag);
-        aName = theName + aStr.ToCString();
-        buildName(theTag, aName);
-        theTag++;
+        builder(myFreePrimitiveTag)->Generated(expl.Current());
+        TCollection_AsciiString aStr(myFreePrimitiveTag - PRIMITIVES_START_TAG + 1);
+        aName = theName + "_" + aStr.ToCString();
+        buildName(myFreePrimitiveTag, aName);
+        ++myFreePrimitiveTag;
       }
     } else {
       TopExp_Explorer expl(aShape, TopAbs_EDGE);
       for (; expl.More(); expl.Next()) {
-        builder(theTag)->Generated(expl.Current());
-        TCollection_AsciiString aStr(theTag);
-        aName = theName + aStr.ToCString();
-        buildName(theTag, aName);
-        theTag++;
+        builder(myFreePrimitiveTag)->Generated(expl.Current());
+        TCollection_AsciiString aStr(myFreePrimitiveTag - PRIMITIVES_START_TAG + 1);
+        aName = theName + "_" + aStr.ToCString();
+        buildName(myFreePrimitiveTag, aName);
+        ++myFreePrimitiveTag;
       }
       // and load generated vertices.
       TopTools_DataMapOfShapeShape generated;
       if (getDangleShapes(aShape, TopAbs_EDGE, generated))
       {
-        TNaming_Builder* pBuilder = builder(theTag++);
+        TNaming_Builder* pBuilder = builder(myFreePrimitiveTag++);
         loadGeneratedDangleShapes(aShape, TopAbs_EDGE, pBuilder);
       }
     }
   } else if (aShape.ShapeType() == TopAbs_EDGE) {
     TopExp_Explorer expl(aShape, TopAbs_VERTEX);
     for (; expl.More(); expl.Next()) {
-      builder(theTag)->Generated(expl.Current());
-      TCollection_AsciiString aStr(theTag);
-      aName = theName + aStr.ToCString();
-      buildName(theTag, aName);
-      theTag++;
+      builder(myFreePrimitiveTag)->Generated(expl.Current());
+      TCollection_AsciiString aStr(myFreePrimitiveTag - PRIMITIVES_START_TAG + 1);
+      aName = theName + "_" + aStr.ToCString();
+      buildName(myFreePrimitiveTag, aName);
+      ++myFreePrimitiveTag;
     }
   }
 }
@@ -795,8 +787,7 @@ int findAmbiguities(const TopoDS_Shape&           theShapeIn,
 }
 
 //=======================================================================
-void Model_BodyBuilder::loadFirstLevel(
-  GeomShapePtr theShape, const std::string& theName, int&  theTag)
+void Model_BodyBuilder::loadFirstLevel(GeomShapePtr theShape, const std::string& theName)
 {
   if(theShape->isNull()) return;
   TopoDS_Shape aShape = theShape->impl<TopoDS_Shape>();
@@ -804,44 +795,42 @@ void Model_BodyBuilder::loadFirstLevel(
   if (aShape.ShapeType() == TopAbs_COMPOUND || aShape.ShapeType() == TopAbs_COMPSOLID) {
     TopoDS_Iterator itr(aShape);
     for (; itr.More(); itr.Next()) {
-      builder(theTag)->Generated(itr.Value());
-      TCollection_AsciiString aStr(theTag);
-      aName = theName + aStr.ToCString();
-      buildName(theTag, aName);
-      if(!theName.empty()) buildName(theTag, aName);
-      theTag++;
+      builder(myFreePrimitiveTag)->Generated(itr.Value());
+      TCollection_AsciiString aStr(myFreePrimitiveTag - PRIMITIVES_START_TAG + 1);
+      aName = theName + "_" + aStr.ToCString();
+      buildName(myFreePrimitiveTag, aName);
+      ++myFreePrimitiveTag;
       if (itr.Value().ShapeType() == TopAbs_COMPOUND ||
         itr.Value().ShapeType() == TopAbs_COMPSOLID)
       {
         GeomShapePtr itrShape(new GeomAPI_Shape());
         itrShape->setImpl(new TopoDS_Shape(itr.Value()));
-        loadFirstLevel(itrShape, theName, theTag);
+        loadFirstLevel(itrShape, theName);
       } else {
         GeomShapePtr itrShape(new GeomAPI_Shape());
         itrShape->setImpl(new TopoDS_Shape(itr.Value()));
-        loadNextLevels(itrShape, theName, theTag);
+        loadNextLevels(itrShape, theName);
       }
     }
   } else {
     GeomShapePtr itrShape(new GeomAPI_Shape());
     itrShape->setImpl(new TopoDS_Shape(aShape));
-    loadNextLevels(itrShape, theName, theTag);
+    loadNextLevels(itrShape, theName);
   }
   TopTools_ListOfShape   aList;
   if(findAmbiguities(aShape, aList)) {
     TopTools_ListIteratorOfListOfShape it(aList);
-    for (; it.More(); it.Next(),theTag++) {
-      builder(theTag)->Generated(it.Value());
-      TCollection_AsciiString aStr(theTag);
-      aName = theName + aStr.ToCString();
-      buildName(theTag, aName);
+    for (; it.More(); it.Next(), ++myFreePrimitiveTag) {
+      builder(myFreePrimitiveTag)->Generated(it.Value());
+      TCollection_AsciiString aStr(myFreePrimitiveTag - PRIMITIVES_START_TAG + 1);
+      aName = theName + "_" + aStr.ToCString();
+      buildName(myFreePrimitiveTag, aName);
     }
   }
 }
 
 //=======================================================================
-void Model_BodyBuilder::loadDisconnectedEdges(
-  GeomShapePtr theShape, const std::string& theName, int&  theTag)
+void Model_BodyBuilder::loadDisconnectedEdges(GeomShapePtr theShape, const std::string& theName)
 {
   if(theShape->isNull()) return;
   TopoDS_Shape aShape = theShape->impl<TopoDS_Shape>();
@@ -890,12 +879,12 @@ void Model_BodyBuilder::loadDisconnectedEdges(
               if (aLIter1.Value().IsSame(aLIter2.Value())) aMatches++;
           if (aMatches == aList1.Extent()) {
             aC0=Standard_True;
-            builder(theTag)->Generated(anEdge2);
+            builder(myFreePrimitiveTag)->Generated(anEdge2);
             anEdgesToDelete.Add(anEdge2);
-            TCollection_AsciiString aStr(theTag);
-            aName = theName + aStr.ToCString();
-            buildName(theTag, aName);
-            theTag++;
+            TCollection_AsciiString aStr(myFreePrimitiveTag - PRIMITIVES_START_TAG + 1);
+            aName = theName + "_" + aStr.ToCString();
+            buildName(myFreePrimitiveTag, aName);
+            ++myFreePrimitiveTag;
           }
         }
       }
@@ -905,17 +894,17 @@ void Model_BodyBuilder::loadDisconnectedEdges(
       edgeNaborFaces.UnBind(anEdge1);
     }
     if (aC0) {
-      builder(theTag)->Generated(anEdge1);
-      TCollection_AsciiString aStr(theTag);
-      aName = theName + aStr.ToCString();
-      buildName(theTag, aName);
-      theTag++;
+      builder(myFreePrimitiveTag)->Generated(anEdge1);
+      TCollection_AsciiString aStr(myFreePrimitiveTag - PRIMITIVES_START_TAG + 1);
+      aName = theName + "_" + aStr.ToCString();
+      buildName(myFreePrimitiveTag, aName);
+      ++myFreePrimitiveTag;
     }
   }
 }
 
 void Model_BodyBuilder::loadDisconnectedVertexes(GeomShapePtr theShape,
-                                                 const std::string& theName, int&  theTag)
+                                                 const std::string& theName)
 {
   if(theShape->isNull()) return;
   TopoDS_Shape aShape = theShape->impl<TopoDS_Shape>();
@@ -946,11 +935,11 @@ void Model_BodyBuilder::loadDisconnectedVertexes(GeomShapePtr theShape,
   for (; itr.More(); itr.Next()) {
     const TopTools_ListOfShape& naborEdges = itr.Value();
     if (naborEdges.Extent() < 2) {
-      builder(theTag)->Generated(itr.Key());
-      TCollection_AsciiString aStr(theTag);
-      aName = theName + aStr.ToCString();
-      buildName(theTag, aName);
-      theTag++;
+      builder(myFreePrimitiveTag)->Generated(itr.Key());
+      TCollection_AsciiString aStr(myFreePrimitiveTag - PRIMITIVES_START_TAG + 1);
+      aName = theName + "_" + aStr.ToCString();
+      buildName(myFreePrimitiveTag, aName);
+      ++myFreePrimitiveTag;
     }
   }
 }

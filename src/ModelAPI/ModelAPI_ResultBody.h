@@ -158,18 +158,15 @@ public:
 
   /// load shapes of the first level (to be used during shape import)
   MODELAPI_EXPORT virtual void loadFirstLevel(GeomShapePtr theShape,
-                                              const std::string& theName,
-                                              int& theTag);
+                                              const std::string& theName);
 
   /// load disconnected edges
   MODELAPI_EXPORT virtual void loadDisconnectedEdges(GeomShapePtr theShape,
-                                                     const std::string& theName,
-                                                     int& theTag);
+                                                     const std::string& theName);
 
   /// load disconnected vetexes
   MODELAPI_EXPORT virtual void loadDisconnectedVertexes(GeomShapePtr theShape,
-                                                        const std::string& theName,
-                                                        int& theTag);
+                                                        const std::string& theName);
 
   /// Returns true if the latest modification of this body in the naming history
   // is equal to the given shape

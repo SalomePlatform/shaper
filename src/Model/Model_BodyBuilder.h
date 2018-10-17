@@ -110,18 +110,15 @@ public:
 
   /// Loads shapes of the first level (to be used during shape import)
   MODEL_EXPORT virtual void loadFirstLevel(GeomShapePtr theShape,
-                                           const std::string& theName,
-                                           int& theTag);
+                                           const std::string& theName) override;
 
   /// Loads disconnected edges
   MODEL_EXPORT virtual void loadDisconnectedEdges(GeomShapePtr theShape,
-                                                  const std::string& theName,
-                                                  int& theTag);
+                                                  const std::string& theName) override;
 
   /// Loads disconnected vetexes
   MODEL_EXPORT virtual void loadDisconnectedVertexes(GeomShapePtr theShape,
-                                                     const std::string& theName,
-                                                     int& theTag);
+                                                     const std::string& theName) override;
 
   /// Removes the stored builders
   MODEL_EXPORT virtual ~Model_BodyBuilder();
@@ -143,17 +140,13 @@ protected:
 private:
   /// Loads shapes of the next level (to be used during shape import)
   void loadNextLevels(GeomShapePtr theShape,
-                      const std::string& theName, int&  theTag);
+                      const std::string& theName);
 
   /// builds name for the shape kept at the specified tag
   void buildName(const int theTag, const std::string& theName);
 
 private:
-  int myPrimitiveTag;
-  int myDividedIndex;
-  int myVIndex;
-  int myEIndex;
-  int myFIndex;
+  int myFreePrimitiveTag;
 
 private:
   friend class Model_ResultBody;
