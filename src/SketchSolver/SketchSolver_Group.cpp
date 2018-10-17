@@ -290,6 +290,10 @@ bool SketchSolver_Group::resolveConstraints()
           myPrevResult = aResult;
         }
       }
+
+      // show degrees of freedom only if the degenerated geometry appears
+      if (aResult == PlaneGCSSolver_Solver::STATUS_DEGENERATED)
+        computeDoF();
     }
 
   }
