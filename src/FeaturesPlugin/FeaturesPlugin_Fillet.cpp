@@ -165,7 +165,7 @@ void FeaturesPlugin_Fillet::execute()
     std::shared_ptr<ModelAPI_ResultBody> aResultBody =
         document()->createBody(data(), aResultIndex);
 
-    loadNamingDS(aResultBody, aSolid, aFilletEdgesAndVertices, aResult, aFilletBuilder);
+    loadNamingDS(aResultBody, aSolid, aResult, aFilletBuilder);
     setResult(aResultBody, aResultIndex);
     aResultIndex++;
   }
@@ -196,7 +196,6 @@ bool FeaturesPlugin_Fillet::isFailed(
 void FeaturesPlugin_Fillet::loadNamingDS(
     std::shared_ptr<ModelAPI_ResultBody> theResultBody,
     const std::shared_ptr<GeomAPI_Shape> theBaseShape,
-    const ListOfShape& theFilletShapes,
     const std::shared_ptr<GeomAPI_Shape> theResultShape,
     const std::shared_ptr<GeomAlgoAPI_MakeShape>& theMakeShape)
 {
@@ -206,23 +205,22 @@ void FeaturesPlugin_Fillet::loadNamingDS(
     return;
   }
 
-  std::shared_ptr<GeomAPI_DataMapOfShapeShape> aMapOfShapes = theMakeShape->mapOfSubShapes();
-
-  const int aGeneratedTag = 3;
-
   theResultBody->storeModified(theBaseShape, theResultShape);
 
-  const std::string aModFaceName = "Modified_Face";
   const std::string aFilletFaceName = "Fillet_Face";
 
   // Store modified faces
-  theResultBody->loadModifiedShapes(theMakeShape, theBaseShape, GeomAPI_Shape::FACE, aModFaceName);
+  theResultBody->loadModifiedShapes(theMakeShape, theBaseShape, GeomAPI_Shape::FACE);
 
   // Store new faces generated from edges and vertices
-  theResultBody->loadAndOrientGeneratedShapes(theMakeShape.get(), theBaseShape,
-      GeomAPI_Shape::EDGE, aGeneratedTag, aFilletFaceName, *aMapOfShapes);
-  theResultBody->loadAndOrientGeneratedShapes(theMakeShape.get(), theBaseShape,
-      GeomAPI_Shape::VERTEX, aGeneratedTag, aFilletFaceName, *aMapOfShapes);
+  theResultBody->loadGeneratedShapes(theMakeShape,
+                                     theBaseShape,
+                                     GeomAPI_Shape::EDGE,
+                                     aFilletFaceName);
+  theResultBody->loadGeneratedShapes(theMakeShape,
+                                     theBaseShape,
+                                     GeomAPI_Shape::VERTEX,
+                                     aFilletFaceName);
 
   // Deleted shapes
   theResultBody->loadDeletedShapes(theMakeShape, theBaseShape, GeomAPI_Shape::EDGE);

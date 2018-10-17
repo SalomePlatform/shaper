@@ -72,20 +72,20 @@ void FeaturesPlugin_Tools::loadModifiedShapes(ResultBodyPtr theResultBody,
       theResultBody->loadModifiedShapes(theMakeShape,
                                         theBaseShape,
                                         GeomAPI_Shape::FACE,
-                                        theName + "_Face");
+                                        theName);
     }
     case GeomAPI_Shape::FACE:
     case GeomAPI_Shape::WIRE: {
       theResultBody->loadModifiedShapes(theMakeShape,
                                         theBaseShape,
                                         GeomAPI_Shape::EDGE,
-                                        theName + "_Edge");
+                                        theName);
     }
     case GeomAPI_Shape::EDGE: {
       theResultBody->loadModifiedShapes(theMakeShape,
                                         theBaseShape,
                                         GeomAPI_Shape::VERTEX,
-                                        theName + "_Vertex");
+                                        theName);
     }
   }
 }

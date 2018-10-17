@@ -42,7 +42,6 @@
 static void storeSubShape(ResultBodyPtr theResultBody,
                           const GeomShapePtr theShape,
                           const GeomAPI_Shape::ShapeType theType,
-                          const std::shared_ptr<GeomAPI_DataMapOfShapeShape> theMapOfSubShapes,
                           const std::string theName,
                           int& theShapeIndex);
 
@@ -273,8 +272,7 @@ void FeaturesPlugin_CompositeSketch::storeResult(const GeomShapePtr theBaseShape
   aResultBody->storeGenerated(theBaseShape, theMakeShape->shape());
 
   // Store generated edges/faces.
-  int aGenTag = 1;
-  storeGenerationHistory(aResultBody, theBaseShape, theMakeShape, aGenTag);
+  storeGenerationHistory(aResultBody, theBaseShape, theMakeShape);
 
   setResult(aResultBody, theIndex);
 }
@@ -282,31 +280,17 @@ void FeaturesPlugin_CompositeSketch::storeResult(const GeomShapePtr theBaseShape
 //=================================================================================================
 void FeaturesPlugin_CompositeSketch::storeGenerationHistory(ResultBodyPtr theResultBody,
                                         const GeomShapePtr theBaseShape,
-                                        const std::shared_ptr<GeomAlgoAPI_MakeShape> theMakeShape,
-                                        int& theTag)
+                                        const std::shared_ptr<GeomAlgoAPI_MakeShape> theMakeShape)
 {
   GeomAPI_Shape::ShapeType aBaseShapeType = theBaseShape->shapeType();
   GeomAPI_Shape::ShapeType aShapeTypeToExplode = GeomAPI_Shape::SHAPE;
-  std::string aGenName = "Generated_";
 
-  std::shared_ptr<GeomAPI_DataMapOfShapeShape> aMapOfSubShapes = theMakeShape->mapOfSubShapes();
   switch(aBaseShapeType) {
     case GeomAPI_Shape::EDGE: {
             aShapeTypeToExplode = GeomAPI_Shape::VERTEX;
       break;
     }
     case GeomAPI_Shape::WIRE: {
-      //std::shared_ptr<GeomAPI_Vertex> aV1, aV2;
-      //GeomAlgoAPI_ShapeTools::findBounds(theBaseShape, aV1, aV2);
-      //ListOfShape aV1History, aV2History;
-      //theMakeShape->generated(aV1, aV1History);
-      //theMakeShape->generated(aV2, aV2History);
-      //if(!aV1History.empty()) {
-      //  theResultBody->generated(aV1, aV1History.front(), aGenName + "Edge_1", theTag++);
-      //}
-      //if(!aV2History.empty()) {
-      //  theResultBody->generated(aV2, aV2History.front(), aGenName + "Edge_2", theTag++);
-      //}
       aShapeTypeToExplode = GeomAPI_Shape::COMPOUND;
       break;
     }
@@ -320,19 +304,18 @@ void FeaturesPlugin_CompositeSketch::storeGenerationHistory(ResultBodyPtr theRes
     }
   }
 
+  int aLateralIndex = 1;
+  int aBaseEdgeIndex = 1;
+  int aVertexIndex = 1;
+  int aBaseVertexIndex = 1;
+
   if(aShapeTypeToExplode == GeomAPI_Shape::VERTEX ||
       aShapeTypeToExplode == GeomAPI_Shape::COMPOUND) {
-    theResultBody->loadAndOrientGeneratedShapes(theMakeShape.get(), theBaseShape,
-                                                GeomAPI_Shape::VERTEX,
-                                                theTag++, aGenName + "Edge",
-                                                *aMapOfSubShapes.get());
+    theResultBody->loadGeneratedShapes(theMakeShape, theBaseShape, GeomAPI_Shape::VERTEX);
   }
   if(aShapeTypeToExplode == GeomAPI_Shape::EDGE ||
       aShapeTypeToExplode == GeomAPI_Shape::COMPOUND) {
-    theResultBody->loadAndOrientGeneratedShapes(theMakeShape.get(),
-                                                theBaseShape, GeomAPI_Shape::EDGE,
-                                                theTag++, aGenName + "Face",
-                                                *aMapOfSubShapes.get());
+    theResultBody->loadGeneratedShapes(theMakeShape, theBaseShape, GeomAPI_Shape::EDGE);
   }
   // issue #2197: make naming of edges generated from vertices
   if (aShapeTypeToExplode == GeomAPI_Shape::EDGE) {
@@ -366,7 +349,7 @@ void FeaturesPlugin_CompositeSketch::storeGenerationHistory(ResultBodyPtr theRes
           if (anEdgesFromVertices.isBound(aGenerated)) // already here
             continue;
           std::ostringstream aStream;
-          aStream << "Lateral_" << theTag++;
+          aStream << "Lateral_" << aLateralIndex++;
           theResultBody->generated(aGenerated, aStream.str());
 
           anEdgesFromVertices.bind(aGenerated, aVertExp.current());
@@ -380,7 +363,7 @@ void FeaturesPlugin_CompositeSketch::storeGenerationHistory(ResultBodyPtr theRes
           if (!anEdgesFromVertices.isBound(anEdgesExp.current())) {
             // found a base edge
             std::ostringstream aStream;
-            aStream << "Base_Edge_" << theTag++;
+            aStream << "Base_Edge_" << aBaseEdgeIndex++;
             theResultBody->generated(anEdgesExp.current(), aStream.str());
             // only one orientation is needed
             anEdgesFromVertices.bind(anEdgesExp.current(), anEdgesExp.current());
@@ -394,7 +377,7 @@ void FeaturesPlugin_CompositeSketch::storeGenerationHistory(ResultBodyPtr theRes
           if (!aVertices.isBound(aVertExp.current())) {
             // found a base edge
             std::ostringstream aStream;
-            aStream << "Vertex_" << theTag++;
+            aStream << "Vertex_" << aVertexIndex++;
             theResultBody->generated(aVertExp.current(), aStream.str());
             // only one orientation is needed
             aVertices.bind(aVertExp.current(), aVertExp.current());
@@ -435,13 +418,13 @@ void FeaturesPlugin_CompositeSketch::storeGenerationHistory(ResultBodyPtr theRes
             }
             if (aNumEdges == 2 && aNumClosed == 1) {
               std::ostringstream aStream;
-              aStream << "Base_Edge_" << theTag++;
+              aStream << "Base_Edge_" << aBaseEdgeIndex++;
               theResultBody->generated(aNotClosedEdge, aStream.str());
               if (aDegenerateEdge.get()) { // export vertex of the degenerated edge (apex) #2520
                 GeomAPI_ShapeExplorer anEdgeExp(aDegenerateEdge, GeomAPI_Shape::VERTEX);
                 if (anEdgeExp.more()) {
                   std::ostringstream aStream;
-                  aStream << "Base_Vertex_" << theTag++;
+                  aStream << "Base_Vertex_" << aBaseVertexIndex++;
                   theResultBody->generated(anEdgeExp.current(), aStream.str());
                 }
               }
@@ -456,22 +439,18 @@ void FeaturesPlugin_CompositeSketch::storeGenerationHistory(ResultBodyPtr theRes
     std::dynamic_pointer_cast<GeomAlgoAPI_MakeSweep>(theMakeShape);
   if(aMakeSweep.get()) {
     // Store from shapes.
-    storeShapes(theResultBody, aBaseShapeType, aMapOfSubShapes,
-                aMakeSweep->fromShapes(), "From_", theTag);
+    storeShapes(theResultBody, aBaseShapeType, aMakeSweep->fromShapes(), "From_");
 
     // Store to shapes.
-    storeShapes(theResultBody, aBaseShapeType, aMapOfSubShapes,
-                aMakeSweep->toShapes(), "To_", theTag);
+    storeShapes(theResultBody, aBaseShapeType, aMakeSweep->toShapes(), "To_");
   }
 }
 
 //=================================================================================================
 void FeaturesPlugin_CompositeSketch::storeShapes(ResultBodyPtr theResultBody,
                               const GeomAPI_Shape::ShapeType theBaseShapeType,
-                              const std::shared_ptr<GeomAPI_DataMapOfShapeShape> theMapOfSubShapes,
                               const ListOfShape& theShapes,
-                              const std::string theName,
-                              int& theTag)
+                              const std::string theName)
 {
   GeomAPI_Shape::ShapeType aShapeTypeToExplore = GeomAPI_Shape::FACE;
   std::string aShapeTypeStr = "Face";
@@ -510,17 +489,22 @@ void FeaturesPlugin_CompositeSketch::storeShapes(ResultBodyPtr theResultBody,
       storeSubShape(theResultBody,
                     aShape,
                     aShape->shapeType(),
-                    theMapOfSubShapes,
                     aName,
                     aShape->shapeType() == GeomAPI_Shape::EDGE ? aShapeIndex : aFaceIndex);
     } else {
       std::string aName = theName + aShapeTypeStr;
-      storeSubShape(theResultBody, aShape, aShapeTypeToExplore,
-                    theMapOfSubShapes, aName, aShapeIndex);
+      storeSubShape(theResultBody,
+                    aShape,
+                    aShapeTypeToExplore,
+                    aName,
+                    aShapeIndex);
       if (theBaseShapeType == GeomAPI_Shape::WIRE) { // issue 2289: special names also for vertices
         aName = theName + "Vertex";
-        storeSubShape(theResultBody, aShape, GeomAPI_Shape::VERTEX,
-                      theMapOfSubShapes, aName, aShapeIndex);
+        storeSubShape(theResultBody,
+                      aShape,
+                      GeomAPI_Shape::VERTEX,
+                      aName,
+                      aShapeIndex);
       }
     }
   }
@@ -529,15 +513,11 @@ void FeaturesPlugin_CompositeSketch::storeShapes(ResultBodyPtr theResultBody,
 void storeSubShape(ResultBodyPtr theResultBody,
                    const GeomShapePtr theShape,
                    const GeomAPI_Shape::ShapeType theType,
-                   const std::shared_ptr<GeomAPI_DataMapOfShapeShape> theMapOfSubShapes,
                    const std::string theName,
                    int& theShapeIndex)
 {
   for(GeomAPI_ShapeExplorer anExp(theShape, theType); anExp.more(); anExp.next()) {
     GeomShapePtr aSubShape = anExp.current();
-    if(theMapOfSubShapes->isBound(aSubShape)) {
-      aSubShape = theMapOfSubShapes->find(aSubShape);
-    }
     std::ostringstream aStr;
     aStr << theName << "_" << theShapeIndex++;
     theResultBody->generated(aSubShape, aStr.str());

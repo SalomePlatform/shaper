@@ -140,15 +140,12 @@ void ModelAPI_ResultBody::loadModifiedShapes(const GeomMakeShapePtr& theAlgo,
   myBuilder->loadModifiedShapes(theAlgo, theOldShape, theShapeTypeToExplore, theName);
 }
 
-void ModelAPI_ResultBody::loadAndOrientGeneratedShapes(GeomAlgoAPI_MakeShape* theMS,
-                                                       GeomShapePtr theShapeIn,
-                                                       const int theKindOfShape,
-                                                       const int theTag,
-                                                       const std::string& theName,
-                                                       GeomAPI_DataMapOfShapeShape& theSubShapes)
+void ModelAPI_ResultBody::loadGeneratedShapes(const GeomMakeShapePtr& theAlgo,
+                                              const GeomShapePtr& theOldShape,
+                                              const GeomAPI_Shape::ShapeType theShapeTypeToExplore,
+                                              const std::string& theName)
 {
-  myBuilder->loadAndOrientGeneratedShapes(
-    theMS, theShapeIn, theKindOfShape, theTag, theName, theSubShapes);
+  myBuilder->loadGeneratedShapes(theAlgo, theOldShape, theShapeTypeToExplore, theName);
 }
 
 void ModelAPI_ResultBody::loadFirstLevel(GeomShapePtr theShape,

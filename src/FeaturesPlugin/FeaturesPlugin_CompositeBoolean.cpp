@@ -95,17 +95,15 @@ void FeaturesPlugin_CompositeBoolean::executeCompositeBoolean()
       ListOfMakeShape::const_iterator aGenMSIt = aGenMakeShapes.cbegin();
       for(; aGenBaseIt != aGenBaseShapes.cend() && aGenMSIt != aGenMakeShapes.cend();
           ++aGenBaseIt, ++aGenMSIt) {
-        storeGenerationHistory(aResultBody, *aGenBaseIt, *aGenMSIt, aTag);
+        storeGenerationHistory(aResultBody, *aGenBaseIt, *aGenMSIt);
       }
 
-      int aModTag = aTag;
-      storeModificationHistory(aResultBody, *aBoolObjIt, aTools, *aBoolMSIt, aModTag);
+      storeModificationHistory(aResultBody, *aBoolObjIt, aTools, *aBoolMSIt);
 
       ResultBaseAlgo aRBA;
       aRBA.resultBody = aResultBody;
       aRBA.baseShape = *aBoolObjIt;
       aRBA.makeShape = *aBoolMSIt;
-      aRBA.delTag = aModTag;
       aResultBaseAlgoList.push_back(aRBA);
       aResultShapesList.push_back((*aBoolMSIt)->shape());
     }
@@ -380,14 +378,8 @@ bool FeaturesPlugin_CompositeBoolean::makeBoolean(const ListOfShape& theTools,
 void FeaturesPlugin_CompositeBoolean::storeModificationHistory(ResultBodyPtr theResultBody,
                                 const GeomShapePtr theObject,
                                 const ListOfShape& theTools,
-                                const std::shared_ptr<GeomAlgoAPI_MakeShape> theMakeShape,
-                                int& theTag)
+                                const std::shared_ptr<GeomAlgoAPI_MakeShape> theMakeShape)
 {
-  int aModTag = theTag;
-  int anEdgesAndFacesTag = ++aModTag;
-  int aDelTag = ++anEdgesAndFacesTag;
-  theTag = aDelTag;
-
   const std::string aModName = "Modfied";
 
   ListOfShape aTools = theTools;
@@ -395,19 +387,10 @@ void FeaturesPlugin_CompositeBoolean::storeModificationHistory(ResultBodyPtr the
 
   std::string aName;
   for(ListOfShape::const_iterator anIt = aTools.begin(); anIt != aTools.end(); anIt++) {
-    if((*anIt)->shapeType() == GeomAPI_Shape::EDGE) {
-      aName = aModName + "_Edge";
-    }
-    else if((*anIt)->shapeType() == GeomAPI_Shape::FACE) {
-      aName = aModName + "_Face";
-    } else {
-      aName = aModName;
-    }
     theResultBody->loadModifiedShapes(theMakeShape, *anIt,
                                       (*anIt)->shapeType() == GeomAPI_Shape::EDGE ?
                                                               GeomAPI_Shape::EDGE :
-                                                              GeomAPI_Shape::FACE,
-                                      aName);
+                                                              GeomAPI_Shape::FACE);
   }
 }
 

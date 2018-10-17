@@ -94,16 +94,13 @@ protected:
   /// Stores generation history.
   void storeGenerationHistory(ResultBodyPtr theResultBody,
                               const GeomShapePtr theBaseShape,
-                              const std::shared_ptr<GeomAlgoAPI_MakeShape> theMakeShape,
-                              int& theTag);
+                              const std::shared_ptr<GeomAlgoAPI_MakeShape> theMakeShape);
 
   /// Used to store from and to shapes.
   void storeShapes(ResultBodyPtr theResultBody,
                    const GeomAPI_Shape::ShapeType theBaseShapeType,
-                   const std::shared_ptr<GeomAPI_DataMapOfShapeShape> theMapOfSubShapes,
                    const ListOfShape& theShapes,
-                   const std::string theName,
-                   int& theTag);
+                   const std::string theName);
 
 };
 

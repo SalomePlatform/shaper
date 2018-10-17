@@ -115,7 +115,7 @@ void BuildPlugin_Polyline::execute()
   for (; anExp.more() && aPointsIt != aPoints.cend(); anExp.next(), ++aPointsIt) {
     GeomShapePtr aPoint = *aPointsIt;
     GeomShapePtr anEdge = anExp.current();
-    aResultBody->generated(aPoint, anEdge, "Edge");
+    aResultBody->generated(aPoint, anEdge);
   }
 
   if (!isClosed) {

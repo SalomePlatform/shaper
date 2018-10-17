@@ -55,7 +55,6 @@ protected:
     ResultBodyPtr resultBody;
     GeomShapePtr baseShape;
     std::shared_ptr<GeomAlgoAPI_MakeShape> makeShape;
-    int delTag;
   };
 
 protected:
@@ -80,15 +79,13 @@ protected:
   /// Stores generation history.
   virtual void storeGenerationHistory(ResultBodyPtr theResultBody,
                                       const GeomShapePtr theBaseShape,
-                                      const std::shared_ptr<GeomAlgoAPI_MakeShape> theMakeShape,
-                                      int& theTag) = 0;
+                                      const GeomMakeShapePtr theMakeShape) = 0;
 
   /// Stores modification history.
   void storeModificationHistory(ResultBodyPtr theResultBody,
                                 const GeomShapePtr theObject,
                                 const ListOfShape& theTools,
-                                const std::shared_ptr<GeomAlgoAPI_MakeShape> theMakeShape,
-                                int& theTag);
+                                const std::shared_ptr<GeomAlgoAPI_MakeShape> theMakeShape);
 
   /// Stores deleted shapes.
   void storeDeletedShapes(std::vector<ResultBaseAlgo>& theResultBaseAlgoList,

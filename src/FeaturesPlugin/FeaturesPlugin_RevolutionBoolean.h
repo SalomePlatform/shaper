@@ -44,8 +44,7 @@ protected:
   /// Stores generation history.
   void storeGenerationHistory(ResultBodyPtr theResultBody,
                               const GeomShapePtr theBaseShape,
-                              const std::shared_ptr<GeomAlgoAPI_MakeShape> theMakeShape,
-                              int& theTag);
+                              const std::shared_ptr<GeomAlgoAPI_MakeShape> theMakeShape);
 };
 
 #endif

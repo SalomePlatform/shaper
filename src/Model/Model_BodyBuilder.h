@@ -103,12 +103,10 @@ public:
 
   /// load and orient generated shapes
   MODEL_EXPORT
-  virtual void loadAndOrientGeneratedShapes(GeomAlgoAPI_MakeShape* theMS,
-                                            GeomShapePtr  theShapeIn,
-                                            const int theKindOfShape,
-                                            const int theTag,
-                                            const std::string& theName,
-                                            GeomAPI_DataMapOfShapeShape& theSubShapes);
+  virtual void loadGeneratedShapes(const GeomMakeShapePtr& theAlgo,
+                                   const GeomShapePtr& theOldShape,
+                                   const GeomAPI_Shape::ShapeType theShapeTypeToExplore,
+                                   const std::string& theName = "") override;
 
   /// Loads shapes of the first level (to be used during shape import)
   MODEL_EXPORT virtual void loadFirstLevel(GeomShapePtr theShape,

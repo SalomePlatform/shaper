@@ -121,19 +121,17 @@ public:
 
 private:
   void storeResult(const std::shared_ptr<GeomAPI_Shape> theBaseShape,
-                   GeomAlgoAPI_Pipe& thePipeAlgo,
+                   const std::shared_ptr<GeomAlgoAPI_Pipe> thePipeAlgo,
                    const int theResultIndex = 0);
 
   void storeResult(const ListOfShape& theBaseShapes,
-                   GeomAlgoAPI_Pipe& thePipeAlgo,
+                   const std::shared_ptr<GeomAlgoAPI_Pipe> thePipeAlgo,
                    const int theResultIndex = 0);
 
   void storeShapes(ResultBodyPtr theResultBody,
                    const GeomAPI_Shape::ShapeType theBaseShapeType,
-                   const std::shared_ptr<GeomAPI_DataMapOfShapeShape> theMapOfSubShapes,
                    const ListOfShape& theShapes,
-                   const std::string theName,
-                   int& theTag);
+                   const std::string theName);
 };
 
 #endif

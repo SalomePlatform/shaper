@@ -305,14 +305,16 @@ void Model_BodyBuilder::buildName(const int theTag, const std::string& theName)
 {
   std::shared_ptr<Model_Document> aDoc = std::dynamic_pointer_cast<Model_Document>(document());
   std::string aName = theName;
+  std::string aPrefix = "";
   switch (theTag) {
-    case GENERATED_VERTICES_TAG: aName += aName.empty() ? "Generated_Vertex" : "_GV"; break;
-    case GENERATED_EDGES_TAG:    aName += aName.empty() ? "Generated_Edge"   : "_GE"; break;
-    case GENERATED_FACES_TAG:    aName += aName.empty() ? "Generated_Face"   : "_GF"; break;
-    case MODIFIED_VERTICES_TAG:  aName += aName.empty() ? "Modified_Vertex"  : "_MV"; break;
-    case MODIFIED_EDGES_TAG:     aName += aName.empty() ? "Modified_Edge"    : "_ME"; break;
-    case MODIFIED_FACES_TAG:     aName += aName.empty() ? "Modified_Face"    : "_MF"; break;
+    case GENERATED_VERTICES_TAG: aPrefix = aName.empty() ? "Generated_Vertex" : "GV:"; break;
+    case GENERATED_EDGES_TAG:    aPrefix = aName.empty() ? "Generated_Edge"   : "GE:"; break;
+    case GENERATED_FACES_TAG:    aPrefix = aName.empty() ? "Generated_Face"   : "GF:"; break;
+    case MODIFIED_VERTICES_TAG:  aPrefix = aName.empty() ? "Modified_Vertex"  : "MV:"; break;
+    case MODIFIED_EDGES_TAG:     aPrefix = aName.empty() ? "Modified_Edge"    : "ME:"; break;
+    case MODIFIED_FACES_TAG:     aPrefix = aName.empty() ? "Modified_Face"    : "MF:"; break;
   }
+  aName.insert(0, aPrefix);
 
   TDataStd_Name::Set(builder(theTag)->NamedShape()->Label(), aName.c_str());
 }
@@ -338,12 +340,12 @@ void Model_BodyBuilder::generated(const GeomShapePtr& theOldShape,
   int aTag;
   if (aNewShapeType == TopAbs_WIRE || aNewShapeType == TopAbs_SHELL) {
     // TODO: This is a workaround. New shape should be only vertex, edge or face.
-    TopAbs_ShapeEnum anExplodeShapeType = aNewShapeType == TopAbs_WIRE ? TopAbs_EDGE : TopAbs_FACE;
+    TopAbs_ShapeEnum aShapeTypeToExplore = aNewShapeType == TopAbs_WIRE ? TopAbs_EDGE : TopAbs_FACE;
     aTag = TopAbs_WIRE ? GENERATED_EDGES_TAG : GENERATED_FACES_TAG;
-    for (TopExp_Explorer anExp(aNewShape, anExplodeShapeType); anExp.More(); anExp.Next()) {
+    for (TopExp_Explorer anExp(aNewShape, aShapeTypeToExplore); anExp.More(); anExp.Next()) {
       builder(aTag)->Generated(anOldShape, anExp.Current());
-      buildName(aTag, theName);
     }
+    buildName(aTag, theName);
   } else {
     aTag = getGenerationTag(aNewShape);
     if (aTag == INVALID_TAG) return;
@@ -420,8 +422,9 @@ static void removeBadShapes(ListOfShape& theShapes)
 }
 
 // Keep only the shapes with minimal shape type
-static void keepTopLevelShapes(ListOfShape& theShapes, const TopoDS_Shape& theRoot,
-  const GeomShapePtr& theResultShape = GeomShapePtr())
+static void keepTopLevelShapes(ListOfShape& theShapes,
+                               const TopoDS_Shape& theRoot,
+                               const GeomShapePtr& theResultShape = GeomShapePtr())
 {
   GeomAPI_Shape::ShapeType aKeepShapeType = GeomAPI_Shape::SHAPE;
   ListOfShape::iterator anIt = theShapes.begin();
@@ -552,58 +555,51 @@ void Model_BodyBuilder::loadModifiedShapes(const GeomMakeShapePtr& theAlgo,
   }
 }
 
-void Model_BodyBuilder::loadAndOrientGeneratedShapes (
-  GeomAlgoAPI_MakeShape* theMS,
-  GeomShapePtr  theShapeIn,
-  const int  theKindOfShape,
-  const int  theTag,
-  const std::string& theName,
-  GeomAPI_DataMapOfShapeShape& theSubShapes)
+void Model_BodyBuilder::loadGeneratedShapes(const GeomMakeShapePtr& theAlgo,
+                                            const GeomShapePtr& theOldShape,
+                                            const GeomAPI_Shape::ShapeType theShapeTypeToExplore,
+                                            const std::string& theName)
 {
-  TopoDS_Shape aShapeIn = theShapeIn->impl<TopoDS_Shape>();
-  TopTools_MapOfShape aView;
-  bool isBuilt = !theName.empty();
-  TopExp_Explorer aShapeExplorer (aShapeIn, (TopAbs_ShapeEnum)theKindOfShape);
-  for (; aShapeExplorer.More(); aShapeExplorer.Next ()) {
-    const TopoDS_Shape& aRoot = aShapeExplorer.Current ();
-    if (!aView.Add(aRoot)) continue;
-    //if (TNaming_Tool::NamedShape(aRoot, builder(theTag)->NamedShape()->Label()).IsNull())
-    //  continue; // there is no sense to write history if old shape does not exist in the document
-    ListOfShape aList;
-    GeomShapePtr aRShape(new GeomAPI_Shape());
-    aRShape->setImpl((new TopoDS_Shape(aRoot)));
-    theMS->generated(aRShape, aList);
-    keepTopLevelShapes(aList, aRoot);
-    std::list<GeomShapePtr >::const_iterator
-      anIt = aList.begin(), aLast = aList.end();
-    for (; anIt != aLast; anIt++) {
-      TopoDS_Shape aNewShape = (*anIt)->impl<TopoDS_Shape>();
-      if (theSubShapes.isBound(*anIt)) {
-        GeomShapePtr aMapShape(theSubShapes.find(*anIt));
-        aNewShape.Orientation(aMapShape->impl<TopoDS_Shape>().Orientation());
-      }
-      if (!aRoot.IsSame (aNewShape)) {
-        builder(theTag)->Generated(aRoot,aNewShape);
-        if(isBuilt)
-          buildName(theTag, theName);
-      }
-      TopAbs_ShapeEnum aGenShapeType = aNewShape.ShapeType();
-      if(aGenShapeType == TopAbs_WIRE || aGenShapeType == TopAbs_SHELL) {
-        TopAbs_ShapeEnum anExplodeShapeType =
-          aGenShapeType == TopAbs_WIRE ? TopAbs_EDGE : TopAbs_FACE;
-        const TDF_Label aLabel = builder(theTag)->NamedShape()->Label();
-        int aTag = 1;
-        std::shared_ptr<Model_Document> aDoc =
-          std::dynamic_pointer_cast<Model_Document>(document());
-        for(TopExp_Explorer anExp(aNewShape, anExplodeShapeType); anExp.More(); anExp.Next()) {
-          TDF_Label aChildLabel = aLabel.FindChild(aTag);
-          TNaming_Builder aBuilder(aChildLabel);
-          aBuilder.Generated(aRoot, anExp.Current());
-          TCollection_AsciiString aChildName =
-            TCollection_AsciiString((theName + "_").c_str()) + aTag;
-          TDataStd_Name::Set(aChildLabel, aChildName.ToCString());
-          aTag++;
+  TopTools_MapOfShape anAlreadyProcessedShapes;
+  for (GeomAPI_ShapeExplorer anOldShapeExp(theOldShape, theShapeTypeToExplore);
+       anOldShapeExp.more();
+       anOldShapeExp.next())
+  {
+    GeomShapePtr anOldSubShape = anOldShapeExp.current();
+    const TopoDS_Shape& anOldSubShape_ = anOldSubShape->impl<TopoDS_Shape>();
+
+    // There is no sense to write history if shape already processed.
+    if (!anAlreadyProcessedShapes.Add(anOldSubShape_)) continue;
+
+    // Get new shapes.
+    ListOfShape aNewShapes;
+    theAlgo->generated(anOldSubShape, aNewShapes);
+
+    keepTopLevelShapes(aNewShapes, anOldSubShape_);
+
+    for (ListOfShape::const_iterator aNewShapesIt = aNewShapes.cbegin();
+         aNewShapesIt != aNewShapes.cend();
+         ++aNewShapesIt)
+    {
+      GeomShapePtr aNewShape = *aNewShapesIt;
+      const TopoDS_Shape& aNewShape_ = aNewShape->impl<TopoDS_Shape>();
+
+      TopAbs_ShapeEnum aNewShapeType = aNewShape_.ShapeType();
+      if (aNewShapeType == TopAbs_WIRE || aNewShapeType == TopAbs_SHELL) {
+        // TODO: This is a workaround. New shape should be only edge or face.
+        TopAbs_ShapeEnum aShapeTypeToExplore = aNewShapeType == TopAbs_WIRE ? TopAbs_EDGE
+                                                                            : TopAbs_FACE;
+        int aTag = TopAbs_WIRE ? GENERATED_EDGES_TAG : GENERATED_FACES_TAG;
+        for (TopExp_Explorer anExp(aNewShape_, aShapeTypeToExplore); anExp.More(); anExp.Next()) {
+          builder(aTag)->Generated(anOldSubShape_, anExp.Current());
         }
+        buildName(aTag, theName);
+      }
+      else {
+        int aTag = getGenerationTag(aNewShape_);
+        if (aTag == INVALID_TAG) return;
+        builder(aTag)->Generated(anOldSubShape_, aNewShape_);
+        buildName(aTag, theName);
       }
     }
   }
