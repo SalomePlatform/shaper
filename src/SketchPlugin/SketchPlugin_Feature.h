@@ -65,9 +65,6 @@ class SketchPlugin_Feature : public ModelAPI_Feature
     return true;
   }
 
-  /// Construction result is allways recomuted on the fly
-  SKETCHPLUGIN_EXPORT virtual bool isPersistentResult() {return false;}
-
   /// Returns true is sketch element is under the rigid constraint
   SKETCHPLUGIN_EXPORT virtual bool isFixed() {return false;}
 

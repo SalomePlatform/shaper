@@ -122,6 +122,8 @@ bool GeomAPI_PlanarEdges::isEqual(const std::shared_ptr<GeomAPI_Shape> theShape)
     return false;
   TopoDS_Shape& aMyShape = const_cast<TopoDS_Shape&>(impl<TopoDS_Shape>());
   TopoDS_Shape aTheShape = theShape->impl<TopoDS_Shape>();
+  if (aMyShape.ShapeType() != aTheShape.ShapeType()) // to don't confuse by the face of same edges
+    return false;
   TopExp_Explorer aMyExp(aMyShape, TopAbs_EDGE);
   TopExp_Explorer aTheExp(aTheShape, TopAbs_EDGE);
   for (; aMyExp.More() && aTheExp.More(); aMyExp.Next(), aTheExp.Next()) {

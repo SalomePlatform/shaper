@@ -22,16 +22,17 @@
 
 #include <Model_Data.h>
 #include <ModelAPI_CompositeFeature.h>
+#include <GeomAlgoAPI_SketchBuilder.h>
 #include <Model_SelectionNaming.h>
 #include <ModelAPI_Events.h>
 #include <Config_PropManager.h>
 #include <GeomAPI_PlanarEdges.h>
 #include <GeomAPI_Shape.h>
-#include <GeomAlgoAPI_SketchBuilder.h>
 #include <Events_Loop.h>
 
 #include <TDF_Reference.hxx>
 #include <TDF_ChildIterator.hxx>
+#include <TDF_ChildIDIterator.hxx>
 #include <TNaming_NamedShape.hxx>
 #include <TNaming_Builder.hxx>
 #include <TDataStd_Integer.hxx>
@@ -46,12 +47,16 @@
 #include <TopoDS_Shape.hxx>
 #include <TopoDS_Edge.hxx>
 #include <TopoDS_Vertex.hxx>
+#include <TopoDS_ListOfShape.hxx>
 #include <TopExp_Explorer.hxx>
 #include <TNaming_Tool.hxx>
 #include <Precision.hxx>
+#include <TopTools_MapOfShape.hxx>
 
-// identifier that it is full result selected, but in external document (for internal index is 0)
-Standard_GUID kFULL_RESULT_ID("ee87e529-da6f-46af-be25-5e0fefde52f7");
+// identifier of the infinite result
+Standard_GUID kIS_INFINITE("dea8cc5a-53f2-49c1-94e8-a947bed20a9f");
+// identifier of the result not in history
+Standard_GUID kIS_IN_HISTORY("a9aec01c-805e-44d1-b5d2-a63f06522f8a");
 
 
 void Model_ResultConstruction::colorConfigInfo(std::string& theSection, std::string& theName,
@@ -65,14 +70,10 @@ void Model_ResultConstruction::colorConfigInfo(std::string& theSection, std::str
 void Model_ResultConstruction::setShape(std::shared_ptr<GeomAPI_Shape> theShape)
 {
   if (myShape != theShape) {
-    if (!theShape.get() || !theShape->isEqual(myShape)) {
-        static const Events_ID anEvent = Events_Loop::eventByName(EVENT_OBJECT_UPDATED);
-        ModelAPI_EventCreator::get()->sendUpdated(data()->owner(), anEvent);
-        if (theShape.get()) {
-          myFacesUpToDate = false;
-          myFaces.clear();
-        }
-    }
+    if (!isInfinite())
+      storeShape(theShape);
+    static const Events_ID anEvent = Events_Loop::eventByName(EVENT_OBJECT_UPDATED);
+    ModelAPI_EventCreator::get()->sendUpdated(data()->owner(), anEvent);
     myShape = theShape;
   }
 }
@@ -82,69 +83,104 @@ std::shared_ptr<GeomAPI_Shape> Model_ResultConstruction::shape()
   return myShape;
 }
 
+bool Model_ResultConstruction::updateShape()
+{
+  std::shared_ptr<Model_Data> aData = std::dynamic_pointer_cast<Model_Data>(data());
+  if (aData && aData->isValid()) {
+    TDF_Label& aShapeLab = aData->shapeLab();
+    Handle(TNaming_NamedShape) aNS;
+    if (aShapeLab.FindAttribute(TNaming_NamedShape::GetID(), aNS)) {
+      TopoDS_Shape aShape = aNS->Get();
+      if (!aShape.IsNull()) {
+        GeomShapePtr aGShape(new GeomAPI_Shape);
+        aGShape->setImpl<TopoDS_Shape>(new TopoDS_Shape(aShape));
+        myShape = aGShape; // restore the sketch sub-components
+        return true;
+      }
+    }
+  }
+  return false;
+}
+
 Model_ResultConstruction::Model_ResultConstruction()
 {
-  myIsInHistory = true;
-  myIsInfinite = false;
-  myFacesUpToDate = false;
+}
+
+
+bool Model_ResultConstruction::isInHistory()
+{
+  std::shared_ptr<Model_Data> aData = std::dynamic_pointer_cast<Model_Data>(data());
+  if (aData.get() && aData->isValid()) {
+    return !aData->label().IsAttribute(kIS_IN_HISTORY); // by default no attribute, but in history
+  }
+  return true;  // unknown case
 }
 
 void Model_ResultConstruction::setIsInHistory(const bool isInHistory)
 {
-  myIsInHistory = isInHistory;
-}
-
-int Model_ResultConstruction::facesNum(const bool theUpdateNaming)
-{
-  if (!myFacesUpToDate) {
-    std::shared_ptr<GeomAPI_PlanarEdges> aWirePtr =
-      std::dynamic_pointer_cast<GeomAPI_PlanarEdges>(myShape);
-    if (aWirePtr.get()) {
-      std::list<std::shared_ptr<GeomAPI_Shape> > aFaces;
-      GeomAlgoAPI_SketchBuilder::createFaces(aWirePtr->origin(), aWirePtr->dirX(),
-        aWirePtr->norm(), aWirePtr, aFaces);
-      std::list<std::shared_ptr<GeomAPI_Shape> >::iterator aFIter = aFaces.begin();
-      for(; aFIter != aFaces.end(); aFIter++) {
-        std::shared_ptr<GeomAPI_Face> aFace(new GeomAPI_Face(*aFIter));
-        if (aFace.get() && !aFace->isNull())
-          myFaces.push_back(aFace);
-      }
-    }
-    myFacesUpToDate = true;
-
-    // update all the faces and sub-elements in the naming structure
-    if (theUpdateNaming) {
-      DocumentPtr anEmptyExt;
-      bool aNotExt = false;
-      TDF_Label aDataLab = startLabel(anEmptyExt, aNotExt);
-      TDF_ChildIterator aSubsIter(aDataLab, Standard_False);
-      for(; aSubsIter.More(); aSubsIter.Next()) {
-        const TDF_Label aLab = aSubsIter.Value();
-        if (aLab.Tag() == 1) // skip the root shape label
-          continue;
-        Handle(TNaming_NamedShape) aNS;
-        if (aLab.FindAttribute(TNaming_NamedShape::GetID(), aNS)) {
-          update(aLab.Tag() - 1, anEmptyExt, aNotExt);
-        }
-      }
-    }
+  std::shared_ptr<Model_Data> aData = std::dynamic_pointer_cast<Model_Data>(data());
+  if (aData.get() && aData->isValid()) {
+    if (!isInHistory)
+      TDataStd_UAttribute::Set(aData->label(), kIS_IN_HISTORY);
+    else
+      aData->label().ForgetAttribute(kIS_IN_HISTORY);
   }
-  return int(myFaces.size());
-}
-
-std::shared_ptr<GeomAPI_Face> Model_ResultConstruction::face(const int theIndex)
-{
-  return myFaces[theIndex];
 }
 
 bool Model_ResultConstruction::isInfinite()
 {
-  return myIsInfinite;
+  std::shared_ptr<Model_Data> aData = std::dynamic_pointer_cast<Model_Data>(data());
+  if (aData.get() && aData->isValid()) {
+    return aData->label().IsAttribute(kIS_INFINITE);
+  }
+  return false;  // unknown case
 }
 
 void Model_ResultConstruction::setInfinite(const bool theInfinite)
 {
-  myIsInfinite = theInfinite;
+  std::shared_ptr<Model_Data> aData = std::dynamic_pointer_cast<Model_Data>(data());
+  if (aData.get() && aData->isValid()) {
+    if (theInfinite)
+      TDataStd_UAttribute::Set(aData->label(), kIS_INFINITE);
+    else
+      aData->label().ForgetAttribute(kIS_INFINITE);
+  }
+}
+
+int Model_ResultConstruction::facesNum(const bool theUpdateNaming)
+{
+  int aResult = 0;
+  std::shared_ptr<Model_Data> aData = std::dynamic_pointer_cast<Model_Data>(data());
+  if (aData.get() && aData->isValid()) {
+    TDF_Label& aShapeLab = aData->shapeLab();
+    TDF_ChildIDIterator anOldIter(aShapeLab, TDataStd_IntPackedMap::GetID());
+    for (; anOldIter.More(); anOldIter.Next()) {
+      aResult++;
+    }
+  }
+  return aResult;
+}
+
+std::shared_ptr<GeomAPI_Face> Model_ResultConstruction::face(const int theIndex)
+{
+  std::shared_ptr<GeomAPI_Face> aResult;
+  int anIndex = 0;
+  std::shared_ptr<Model_Data> aData = std::dynamic_pointer_cast<Model_Data>(data());
+  if (aData.get() && aData->isValid()) {
+    TDF_Label& aShapeLab = aData->shapeLab();
+    TDF_ChildIDIterator anOldIter(aShapeLab, TDataStd_IntPackedMap::GetID());
+    for (; anOldIter.More(); anOldIter.Next()) {
+      if (anIndex == theIndex) {
+        Handle(TNaming_NamedShape) aNS;
+        anOldIter.Value()->Label().FindAttribute(TNaming_NamedShape::GetID(), aNS);
+        aResult.reset(new GeomAPI_Face);
+        aResult->setImpl(new TopoDS_Shape(aNS->Get()));
+        break;
+      }
+      anIndex++;
+    }
+  }
+  return aResult;
 }
 
 void Model_ResultConstruction::setIsConcealed(const bool theValue)
@@ -152,733 +188,200 @@ void Model_ResultConstruction::setIsConcealed(const bool theValue)
   // do nothing: the construction element is never concealed
 }
 
-static const int kSTART_VERTEX_DELTA = 1000000;
-
-static void registerSubShape(TDF_Label theMainLabel, TopoDS_Shape theShape, std::string theFullName,
-  const int theID, std::shared_ptr<Model_Document> theDoc,
-  bool theSelectionMode)
+void Model_ResultConstruction::storeShape(std::shared_ptr<GeomAPI_Shape> theShape)
 {
-  TDF_Label aLab = theID == 0 ? theMainLabel : theMainLabel.FindChild(theID);
-  TNaming_Builder aBuilder(aLab);
-  // wire never happens as sub, it must be generated to be found
-  // by SelectionNaming TNaming_Tool::NamedShape
-  if (theSelectionMode && theShape.ShapeType() != TopAbs_WIRE)
-    aBuilder.Select(theShape, theShape);
-  else
-    aBuilder.Generated(theShape);
-
-  theDoc->addNamingName(aLab, theFullName);
-  TDataStd_Name::Set(aLab, theFullName.c_str());
-}
-
-#include <TopTools_OrientedShapeMapHasher.hxx>
-
-// generates a full-name for sub-element of the composite feature (sketch)
-std::string fullName(CompositeFeaturePtr theComposite, const TopoDS_Shape& theSubShape,
-  Handle(TDataStd_IntPackedMap) theRefs = Handle(TDataStd_IntPackedMap)())
-{
-  TopAbs_ShapeEnum aShapeType = theSubShape.ShapeType();
-  gp_Pnt aVertexPos;
-  NCollection_Map<TopoDS_Edge> allExactEdges;
-  NCollection_DataMap<TopoDS_Edge, TopoDS_Edge, Model_EdgesHasher> allEdges;
-  NCollection_DataMap<Handle(Geom_Curve), TopoDS_Edge, Model_CurvesHasher> allCurves;
-  /// map from edges from theSubShape to the found corresponded indices of the sub-components
-  NCollection_DataMap<TopoDS_Edge, NCollection_List<int>, TopTools_OrientedShapeMapHasher>
-    anEdgesCorrespondence;
-  if (aShapeType == TopAbs_VERTEX) { // compare positions
-    aVertexPos = BRep_Tool::Pnt(TopoDS::Vertex(theSubShape));
-  } else {
-    for(TopExp_Explorer anEdgeExp(theSubShape, TopAbs_EDGE); anEdgeExp.More(); anEdgeExp.Next()) {
-      TopoDS_Edge anEdge = TopoDS::Edge(anEdgeExp.Current());
-      allExactEdges.Add(anEdge);
-      allEdges.Bind(anEdge, anEdge);
-      Standard_Real aFirst, aLast;
-      Handle(Geom_Curve) aCurve = BRep_Tool::Curve(anEdge, aFirst, aLast);
-      allCurves.Bind(aCurve, anEdge);
-      anEdgesCorrespondence.Bind(anEdge, NCollection_List<int>());
-    }
-  }
-  std::map<int, int> anOrientations; //map from edges IDs to orientations of these edges in face
-  std::map<int, std::string> aSubNames; //map from edges IDs to names of edges
-  TColStd_PackedMapOfInteger aRefs; // indixes of sub-elements in composite
-
-
-  const int aSubNum = theComposite->numberOfSubs();
-  for(int a = 0; a < aSubNum; a++) {
-    FeaturePtr aSub = theComposite->subFeature(a);
-    const std::list<std::shared_ptr<ModelAPI_Result> >& aResults = aSub->results();
-    std::list<std::shared_ptr<ModelAPI_Result> >::const_iterator aRes = aResults.cbegin();
-    // there may be many shapes (circle and center): register if at least one is in selection
-    for(; aRes != aResults.cend(); aRes++) {
-      ResultConstructionPtr aConstr =
-        std::dynamic_pointer_cast<ModelAPI_ResultConstruction>(*aRes);
-      if (!aConstr->shape()) {
-        continue;
-      }
-      if (aShapeType == TopAbs_VERTEX) {
-        if (aConstr->shape()->isVertex()) { // compare vertices positions
-          const TopoDS_Shape& aVertex = aConstr->shape()->impl<TopoDS_Shape>();
-          gp_Pnt aPnt = BRep_Tool::Pnt(TopoDS::Vertex(aVertex));
-          if (aPnt.IsEqual(aVertexPos, Precision::Confusion())) {
-            aRefs.Add(theComposite->subFeatureId(a));
-            aSubNames[theComposite->subFeatureId(a)] = Model_SelectionNaming::shortName(aConstr);
-          }
-        } else { // get first or last vertex of the edge: last is stored with additional delta
-          const TopoDS_Shape& anEdge = aConstr->shape()->impl<TopoDS_Shape>();
-          int aDelta = kSTART_VERTEX_DELTA;
-          for(TopExp_Explorer aVExp(anEdge, TopAbs_VERTEX); aVExp.More(); aVExp.Next()) {
-            gp_Pnt aPnt = BRep_Tool::Pnt(TopoDS::Vertex(aVExp.Current()));
-            if (aPnt.IsEqual(aVertexPos, Precision::Confusion())) {
-              aRefs.Add(aDelta + theComposite->subFeatureId(a));
-              aSubNames[aDelta + theComposite->subFeatureId(a)] =
-                Model_SelectionNaming::shortName(aConstr, aDelta / kSTART_VERTEX_DELTA);
-              break;
-            }
-            aDelta += kSTART_VERTEX_DELTA;
-          }
-        }
-      } else {
-        if (aConstr->shape()->isEdge()) {
-          const TopoDS_Shape& aResShape = aConstr->shape()->impl<TopoDS_Shape>();
-          TopoDS_Edge anEdge = TopoDS::Edge(aResShape);
-          if (anEdge.IsNull())
-            continue;
-          if (allEdges.IsBound(anEdge)) {
-            anEdgesCorrespondence.ChangeFind(allEdges.Find(anEdge)).Append(a);
-          } else {
-            Standard_Real aFirst, aLast;
-            Handle(Geom_Curve) aCurve = BRep_Tool::Curve(anEdge, aFirst, aLast);
-            if (allCurves.IsBound(aCurve)) {
-              anEdgesCorrespondence.ChangeFind(allCurves.Find(aCurve)).Append(a);
-            }
-          }
-        }
-      }
-    }
-  }
-
-  if (aShapeType != TopAbs_VERTEX) { // get best candidates from the correspondances
-    NCollection_DataMap<TopoDS_Edge, NCollection_List<int>, TopTools_OrientedShapeMapHasher>
-      ::Iterator aCorIter(anEdgesCorrespondence);
-    for(; aCorIter.More(); aCorIter.Next()) {
-      TopoDS_Edge anOrig = aCorIter.Key();
-      NCollection_List<int>::Iterator aCandidate(aCorIter.Value());
-      int aBestScore = 0;
-      int aBestIndex = -1;
-      ResultConstructionPtr aBestConstr;
-      for(; aCandidate.More(); aCandidate.Next()) {
-        FeaturePtr aSub = theComposite->subFeature(aCandidate.Value());
-        const std::list<std::shared_ptr<ModelAPI_Result> >& aResults = aSub->results();
-        std::list<std::shared_ptr<ModelAPI_Result> >::const_iterator aRes = aResults.cbegin();
-        // there may be many shapes (circle and center): register if at least one is in selection
-        for(; aRes != aResults.cend(); aRes++) {
-          ResultConstructionPtr aConstr =
-            std::dynamic_pointer_cast<ModelAPI_ResultConstruction>(*aRes);
-          if (!aConstr->shape() || !aConstr->shape()->isEdge())
-            continue;
-          const TopoDS_Shape& aResShape = aConstr->shape()->impl<TopoDS_Shape>();
-          TopoDS_Edge anEdge = TopoDS::Edge(aResShape);
-          if (anEdge.IsNull())
-            continue;
-          // detect score of the candidate
-          int aScore = 0;
-          if (anEdge.IsEqual(anOrig))
-            aScore = 10;
-          else if (anEdge.IsSame(anOrig))
-            aScore = 9;
-          else {
-            Standard_Real aFirst, aLast;
-            Handle(Geom_Curve) anOrigCurve = BRep_Tool::Curve(anOrig, aFirst, aLast);
-            Handle(Geom_Curve) aCurve = BRep_Tool::Curve(anEdge, aFirst, aLast);
-            if (anOrigCurve == aCurve) {
-              if (Model_EdgesHasher::IsEqual(anEdge, anOrig)) {
-                aScore = 8;
-              } else {
-                aScore = 6;
-              }
-            } else {
-              if (Model_EdgesHasher::IsEqual(anEdge, anOrig)) {
-                aScore = 7;
-              } else if (Model_CurvesHasher::IsEqual(aCurve, anOrigCurve)) {
-                aScore = 5;
-              }
-            }
-          }
-          if (aScore > aBestScore) {
-            aBestIndex = aCandidate.Value();
-            aBestScore = aScore;
-            aBestConstr = aConstr;
-          }
-        }
-      }
-      if (aBestIndex >= 0) {
-        int anID = theComposite->subFeatureId(aBestIndex);
-        aRefs.Add(anID);
-        aSubNames[anID] = Model_SelectionNaming::shortName(aBestConstr);
-        if (aShapeType != TopAbs_EDGE) { // face needs the sub-edges on sub-labels
-          // add edges to sub-label to support naming for edges selection
-          int anOrient = Model_SelectionNaming::edgeOrientation(theSubShape, anOrig);
-          anOrientations[anID] = anOrient;
-        }
-      }
-    }
-  }
-  std::stringstream aName;
-  // #1839 : do not store name of the feature in the tree, since this name could be changed
-  if (theSubShape.ShapeType() != TopAbs_COMPOUND) { // compound means the whole construction result
-    if (theSubShape.ShapeType() == TopAbs_FACE) aName<<"Face";
-    else if (theSubShape.ShapeType() == TopAbs_WIRE) aName<<"Wire";
-    else if (theSubShape.ShapeType() == TopAbs_EDGE) aName<<"Edge";
-    else if (theSubShape.ShapeType() == TopAbs_VERTEX) aName<<"Vertex";
-
-    // make a composite name from all sub-elements indexes: "1_2_3_4"
-    TColStd_MapIteratorOfPackedMapOfInteger aRef(aRefs);
-    for(; aRef.More(); aRef.Next()) {
-      aName<<"-"<<aSubNames[aRef.Key()];
-      if (anOrientations.find(aRef.Key()) != anOrientations.end()) {
-        if (anOrientations[aRef.Key()] == 1)
-          aName<<"f";
-        else if (anOrientations[aRef.Key()] == -1)
-          aName<<"r";
-      }
-    }
-  }
-  if (!theRefs.IsNull()) {
-    Handle(TColStd_HPackedMapOfInteger) aMap = new TColStd_HPackedMapOfInteger(aRefs);
-    theRefs->ChangeMap(aMap);
-  }
-  return aName.str();
-}
-
-// stores shape and name on sub-label of the main stored shape
-static void saveSubName(CompositeFeaturePtr theComposite,
-  TDF_Label& theLab, const bool isSelectionMode, TopoDS_Shape aSub,
-  std::shared_ptr<Model_Document> theDoc, std::string theFullName)
-{
-  // trying to store the edge of composite result, not sketch sub as it is
-  if (aSub.ShapeType() == TopAbs_EDGE) {
-    ResultPtr aRes = theComposite->firstResult();
-    ResultConstructionPtr aConstr = std::dynamic_pointer_cast<Model_ResultConstruction>(aRes);
-    if (aConstr.get()) {
-      Standard_Real aSubFirst, aSubLast;
-      TopoDS_Edge aSubEdge = TopoDS::Edge(aSub);
-      Handle(Geom_Curve) aSubCurve = BRep_Tool::Curve(aSubEdge, aSubFirst, aSubLast);
-      for(int aFaceIndex = 0; aFaceIndex < aConstr->facesNum(); aFaceIndex++) {
-        GeomShapePtr aGFace = aConstr->face(aFaceIndex);
-        TopoDS_Shape aFace = aGFace->impl<TopoDS_Shape>();
-        for(TopExp_Explorer anExp(aFace, TopAbs_EDGE); anExp.More(); anExp.Next()) {
-          TopoDS_Edge anEdge = TopoDS::Edge(anExp.Current());
-          Standard_Real aFirst, aLast;
-          Handle(Geom_Curve) aCurve = BRep_Tool::Curve(anEdge, aFirst, aLast);
-          if (Model_CurvesHasher::IsEqual(aCurve, aSubCurve) &&
-              ((fabs(aFirst - aSubFirst) < 1.e-9 &&  fabs(aLast - aSubLast) < 1.e-9)) ||
-              (fabs(aFirst - aSubLast) < 1.e-9 &&  fabs(aLast - aSubFirst) < 1.e-9)) {
-            aSub = anEdge;
-            break;
-          }
-        }
-      }
-    }
-  }
-
-  TNaming_Builder aBuilder(theLab);
-  if (isSelectionMode)
-    aBuilder.Select(aSub, aSub);
-  else
-    aBuilder.Generated(aSub);
-  theDoc->addNamingName(theLab, theFullName.c_str());
-  TDataStd_Name::Set(theLab, theFullName.c_str());
-}
-
-
-TDF_Label Model_ResultConstruction::startLabel(
-  const std::shared_ptr<ModelAPI_Document> theExtDoc, bool& theExternal)
-{
-  theExternal = theExtDoc.get() && theExtDoc != document();
-  if (theExternal) { // external document is used
-    std::shared_ptr<Model_Document> aDoc = std::dynamic_pointer_cast<Model_Document>(theExtDoc);
-    return aDoc->extConstructionsLabel();
-  }
   std::shared_ptr<Model_Data> aData = std::dynamic_pointer_cast<Model_Data>(data());
-  return aData->label();
-}
-
-int Model_ResultConstruction::select(const std::shared_ptr<GeomAPI_Shape>& theSubShape,
-  const std::shared_ptr<ModelAPI_Document> theExtDoc, const int theIndex)
-{
-  int anIndex; // resulting index of the sub-label
-  TopoDS_Shape aSubShape;
-  if (theSubShape.get()) {
-    aSubShape = theSubShape->impl<TopoDS_Shape>();
-  } else if (shape().get()) {
-    aSubShape = shape()->impl<TopoDS_Shape>();
-  }
-  // if external document requires this selection, put the naming structures to this doc
-  // to support the naming mechanism in this document correctly
-  bool anExternal;
-  TDF_Label aDataLab = startLabel(theExtDoc, anExternal);
-  if (theIndex == -1) {
-    anIndex = anExternal ? 2 : 1; // for the external doc don't mind about the main shape
-
-    if (theSubShape.get() || anExternal) { // searching for already selected sub (or whole for ext)
-      // iterate all the already presented shapes to see the same
-      TDF_ChildIterator aSubsIter(aDataLab, Standard_False);
-      for(; aSubsIter.More(); aSubsIter.Next()) {
-        const TDF_Label aLab = aSubsIter.Value();
-        if (aLab.Tag() == 1) // skip the root shape label
-          continue;
-        Handle(TNaming_NamedShape) aNS;
-        if (aLab.FindAttribute(TNaming_NamedShape::GetID(), aNS)) {
-          if (aNS->Get().IsSame(aSubShape)) {
-            return aLab.Tag() - 1; // found exactly the needed shape, nothing else to do
-          }
-        }
-        anIndex = aLab.Tag(); // searching for the latest index
-      }
-      anIndex = (anIndex == 1) ? 2 : (anIndex + 1); // next after 1-root, or next after all
+  if (aData && aData->isValid()) {
+    TDF_Label& aShapeLab = aData->shapeLab();
+    if (!theShape.get() || theShape->isNull()) {
+      aShapeLab.ForgetAllAttributes();
+      return;
     }
-  } else {
-    anIndex = theIndex + 1;
-  }
+    std::shared_ptr<Model_Document> aMyDoc =
+      std::dynamic_pointer_cast<Model_Document>(document());
+    const TopoDS_Shape& aShape = theShape->impl<TopoDS_Shape>();
+    if (aShape.ShapeType() == TopAbs_VERTEX) {
+      aShapeLab.ForgetAllAttributes(); // clear all previously stored
+      TNaming_Builder aBuilder(aShapeLab);
+      aBuilder.Generated(aShape);
+      std::string aMyName = data()->name();
+      TDataStd_Name::Set(aShapeLab, aMyName.c_str());
+      aMyDoc->addNamingName(aShapeLab, aMyName);
+    } else if (aShape.ShapeType() == TopAbs_EDGE) { // store sub-vertices on sub-labels
+      aShapeLab.ForgetAllAttributes(); // clear all previously stored
+      TNaming_Builder aBuilder(aShapeLab);
+      aBuilder.Generated(aShape);
 
-  // set the naming structure at index
-  TDF_Label aLab = aDataLab.FindChild(anIndex, Standard_True);
-
-  // if the subshape is part of a result face, select the whole face (#1997)
-  bool isSelectionMode = false; // and other don't set shapes - all the naming is in face label
-  if (!aSubShape.IsNull() && aSubShape.ShapeType() > TopAbs_FACE) {
-    // but before check that sub-vertex correctly detected as intersection of sketch edges (#2389)
-    int anEdgesNum = 2;
-    if (aSubShape.ShapeType() == TopAbs_VERTEX) {
-      anEdgesNum = 0;
+      TopExp_Explorer anExp(aShape, TopAbs_VERTEX);
+      for(int anIndex = 1; anExp.More(); anExp.Next(), anIndex++) {
+        TDF_Label aSubLab = aShapeLab.FindChild(anIndex);;
+        TNaming_Builder aBuilder(aSubLab);
+        aBuilder.Generated(anExp.Current());
+        std::string aVertexName = anIndex == 1 ? "StartVertex" : "EndVertex";
+        TDataStd_Name::Set(aSubLab, aVertexName.c_str());
+        aMyDoc->addNamingName(aSubLab, aVertexName);
+      }
+      std::string aMyName = data()->name();
+      TDataStd_Name::Set(aShapeLab, aMyName.c_str());
+      aMyDoc->addNamingName(aShapeLab, aMyName);
+    } else { // this is probably sketch, so, work with it as with composite
+      std::shared_ptr<GeomAPI_PlanarEdges> aWirePtr =
+        std::dynamic_pointer_cast<GeomAPI_PlanarEdges>(theShape);
+      if (!aWirePtr.get())
+        return; // unknown case
       ResultPtr aThisPtr = std::dynamic_pointer_cast<ModelAPI_Result>(data()->owner());
-      FeaturePtr aThisFeature = document()->feature(aThisPtr);
+      FeaturePtr aThisFeature = aMyDoc->feature(aThisPtr);
       CompositeFeaturePtr aComposite =
         std::dynamic_pointer_cast<ModelAPI_CompositeFeature>(aThisFeature);
-      if (aComposite.get()) {
-        const int aSubNum = aComposite->numberOfSubs();
-        for(int a = 0; a < aSubNum; a++) {
-          int aSubID = aComposite->subFeatureId(a);
-          FeaturePtr aSub = aComposite->subFeature(a);
-          const std::list<std::shared_ptr<ModelAPI_Result> >& aResults = aSub->results();
-          std::list<std::shared_ptr<ModelAPI_Result> >::const_iterator aRes;
-          for(aRes = aResults.cbegin(); aRes != aResults.cend(); aRes++) {
-            ResultConstructionPtr aConstr =
-              std::dynamic_pointer_cast<ModelAPI_ResultConstruction>(*aRes);
-            if (aConstr->shape() && aConstr->shape()->isEdge()) {
-              TopoDS_Shape aResShape = aConstr->shape()->impl<TopoDS_Shape>();
-              for(TopExp_Explorer anExp(aResShape, TopAbs_VERTEX); anExp.More(); anExp.Next()) {
-                if (aSubShape.IsSame(anExp.Current())) {
-                  anEdgesNum++;
-                  break;
-                }
-              }
-            }
-          }
-        }
-      }
-    }
-    if (anEdgesNum > 1) {
-      for(int aFaceIndex = 0; aFaceIndex < facesNum(); aFaceIndex++) {
-        TopExp_Explorer anExp(face(aFaceIndex)->impl<TopoDS_Shape>(), aSubShape.ShapeType());
-        for(; anExp.More(); anExp.Next()) {
-          if (aSubShape.IsSame(anExp.Current())) { // this is the case: select the whole face
-            // here just store the face index (to update face if update of edge is needed)
-            TNaming_Builder aBuilder(aLab);
-            aBuilder.Select(aSubShape, aSubShape);
-            int aFaceSelID = select(face(aFaceIndex), theExtDoc, -1);
-            TDF_Reference::Set(aLab, aLab.Father().FindChild(aFaceSelID));
-            isSelectionMode = true;
-            break;
-          }
-        }
-      }
-    }
-  }
-
-  // external full result is not identified by index == 0, so, add here the ID
-  if (!theSubShape.get()) {
-    TDataStd_UAttribute::Set(aLab, kFULL_RESULT_ID);
-    // empty NS
-    TNaming_Builder aBuilder(aLab);
-    // store all sub-faces naming since faces may be used for extrusion, where all edges are needed
-    Handle(TDataStd_IntPackedMap) anIndices = TDataStd_IntPackedMap::Set(aLab);
-    std::list<int> aFacesIndexes;
-    for(int a = 0; a < facesNum(); a++) {
-      anIndices->Add(select(face(a), theExtDoc, -1));
-    }
-    return anIndex - 1;
-  }
-
-  { // this to have erased Builder after the shape was generated (NS on this label may be changed)
-    TNaming_Builder aBuilder(aLab);
-    if (aSubShape.IsNull()) {
-      return anIndex - 1; // just keep empty named shape
-    }
-    // wire never happens as sub, it must be generated to be found
-    // by SelectionNaming TNaming_Tool::NamedShape
-    if (isSelectionMode && aSubShape.ShapeType() != TopAbs_WIRE) {
-      aBuilder.Select(aSubShape, aSubShape);
-    } else {
-      aBuilder.Generated(aSubShape);
-    }
-  }
-
-  if (anIndex == 1 && isInfinite()) { // infinitive results has no sub-selection
-    return anIndex - 1;
-  }
-  ResultPtr aThisPtr = std::dynamic_pointer_cast<ModelAPI_Result>(data()->owner());
-  FeaturePtr aThisFeature = document()->feature(aThisPtr);
-  CompositeFeaturePtr aComposite =
-    std::dynamic_pointer_cast<ModelAPI_CompositeFeature>(aThisFeature);
-  if (!aComposite || aComposite->numberOfSubs() == 0) {
-    // saving of context is enough: result construction contains exactly the needed shape
-    return anIndex - 1;
-  }
-
-  // identify the results of sub-object of the composite by edges
-  // save type of the selected shape in integer attribute
-  TopAbs_ShapeEnum aShapeType = aSubShape.ShapeType();
-  TDataStd_Integer::Set(aLab, (int)aShapeType);
-  gp_Pnt aVertexPos;
-  // curves of the sketch sub-elements are used, so, edges are not equal
-  TColStd_MapOfTransient allCurves;
-  if (aShapeType == TopAbs_VERTEX) { // compare positions
-    aVertexPos = BRep_Tool::Pnt(TopoDS::Vertex(aSubShape));
-  } else {
-    for(TopExp_Explorer anEdgeExp(aSubShape, TopAbs_EDGE); anEdgeExp.More(); anEdgeExp.Next()) {
-      TopoDS_Edge anEdge = TopoDS::Edge(anEdgeExp.Current());
-      Standard_Real aFirst, aLast;
-      Handle(Geom_Curve) aCurve = BRep_Tool::Curve(anEdge, aFirst, aLast);
-      allCurves.Add(aCurve);
-    }
-  }
-  std::shared_ptr<Model_Document> aMyDoc =
-    std::dynamic_pointer_cast<Model_Document>(document());
-  // iterate and store the result ids of sub-elements and sub-elements to sub-labels
-  Handle(TDataStd_IntPackedMap) aRefs = TDataStd_IntPackedMap::Set(aLab);
-  const int aSubNum = aComposite->numberOfSubs();
-  // subs are placed on unique labels because of #2248: sketch curve may produce several edges,
-  // but #2401 - on stable labels
-  NCollection_Map<int> aUsedIDMap; // already used lab tags for placement of shapes
-
-  for(int a = 0; a < aSubNum; a++) {
-    FeaturePtr aSub = aComposite->subFeature(a);
-    const std::list<std::shared_ptr<ModelAPI_Result> >& aResults = aSub->results();
-    std::list<std::shared_ptr<ModelAPI_Result> >::const_iterator aRes = aResults.cbegin();
-    // there may be many shapes (circle and center): register if at least one is in selection
-    for(; aRes != aResults.cend(); aRes++) {
-      ResultConstructionPtr aConstr =
-        std::dynamic_pointer_cast<ModelAPI_ResultConstruction>(*aRes);
-      if (!aConstr->shape()) {
-        continue;
-      }
-      if (aShapeType != TopAbs_VERTEX) {
-        if (aConstr->shape()->isEdge()) {
-          const TopoDS_Shape& aResShape = aConstr->shape()->impl<TopoDS_Shape>();
-          TopoDS_Edge anEdge = TopoDS::Edge(aResShape);
-          if (!anEdge.IsNull()) {
+      if (!aComposite || aComposite->numberOfSubs() == 0)
+        return; // unknown case
+      // collect indices of curves of current composite
+      NCollection_DataMap<Handle(Geom_Curve), int> aCurvesIndices;
+      NCollection_DataMap<int, TopoDS_Edge> anEdgeIndices;
+      std::map<int, std::string> aComponentsNames; // names of components that lay on index
+      const int aSubNum = aComposite->numberOfSubs();
+      for (int a = 0; a < aSubNum; a++) {
+        FeaturePtr aSub = aComposite->subFeature(a);
+        const std::list<std::shared_ptr<ModelAPI_Result> >& aResults = aSub->results();
+        std::list<std::shared_ptr<ModelAPI_Result> >::const_iterator aRes = aResults.cbegin();
+        for (; aRes != aResults.cend(); aRes++) {
+          ResultConstructionPtr aConstr =
+            std::dynamic_pointer_cast<ModelAPI_ResultConstruction>(*aRes);
+          if (aConstr->shape() && aConstr->shape()->isEdge()) {
+            TopoDS_Edge anEdge = TopoDS::Edge(aConstr->shape()->impl<TopoDS_Shape>());
             Standard_Real aFirst, aLast;
             Handle(Geom_Curve) aCurve = BRep_Tool::Curve(anEdge, aFirst, aLast);
-            if (allCurves.Contains(aCurve)) {
-              int anID = aComposite->subFeatureId(a);
-              if (aShapeType != TopAbs_EDGE) { // face needs the sub-edges on sub-labels
-                // add edges to sub-label to support naming for edges selection
-                TopExp_Explorer anEdgeExp(aSubShape, TopAbs_EDGE);
-                for(; anEdgeExp.More(); anEdgeExp.Next()) {
-                  TopoDS_Edge anEdge = TopoDS::Edge(anEdgeExp.Current());
-                  Standard_Real aFirst, aLast;
-                  Handle(Geom_Curve) aFaceCurve = BRep_Tool::Curve(anEdge, aFirst, aLast);
-                  if (Model_CurvesHasher::IsEqual(aFaceCurve, aCurve)) {
-                    while(aUsedIDMap.Contains(anID))
-                      anID += 100000;
-                    aUsedIDMap.Add(anID);
-                    TDF_Label aSubLab = aLab.FindChild(anID);
-                    std::string aFullNameSub = fullName(aComposite, anEdge);
-                    saveSubName(aComposite, aSubLab, isSelectionMode, anEdge, aMyDoc, aFullNameSub);
+            aCurvesIndices.Bind(aCurve, a);
+            anEdgeIndices.Bind(a, anEdge);
+            aComponentsNames[a] = Model_SelectionNaming::shortName(aConstr);
+          }
+        }
+      }
 
-                    int anOrient = Model_SelectionNaming::edgeOrientation(aSubShape, anEdge);
-                    if (anOrient != 0) {
-                      // store the orientation of edge relatively to face if needed
-                      TDataStd_Integer::Set(aSubLab, anOrient);
-                    }
-                  }
-                }
-              } else { // put vertices of the selected edge to sub-labels
-                // add edges to sub-label to support naming for edges selection
-                for(TopExp_Explorer anEdgeExp(aSubShape, TopAbs_VERTEX);
-                      anEdgeExp.More(); anEdgeExp.Next()) {
-                    TopoDS_Vertex aV = TopoDS::Vertex(anEdgeExp.Current());
-                    while(aUsedIDMap.Contains(anID))
-                      anID += 100000;
-                    aUsedIDMap.Add(anID);
-                    TDF_Label aSubLab = aLab.FindChild(anID);
-                    std::string aFullNameSub = fullName(aComposite, aV);
-                    saveSubName(aComposite, aSubLab, isSelectionMode, aV, aMyDoc, aFullNameSub);
-                }
+      std::list<std::shared_ptr<GeomAPI_Shape> > aFaces;
+      GeomAlgoAPI_SketchBuilder::createFaces(aWirePtr->origin(), aWirePtr->dirX(),
+        aWirePtr->norm(), aWirePtr, aFaces);
+      NCollection_DataMap<TopoDS_Face, TColStd_ListOfInteger> aNewIndices; // edges indices
+      std::list<std::shared_ptr<GeomAPI_Shape> >::iterator aFIter = aFaces.begin();
+      for (; aFIter != aFaces.end(); aFIter++) {
+        std::shared_ptr<GeomAPI_Face> aFace(new GeomAPI_Face(*aFIter));
+        // put them to a label, trying to keep the same faces on the same labels
+        if (aFace.get() && !aFace->isNull()) {
+          TopoDS_Face aTopoFace = TopoDS::Face(aFace->impl<TopoDS_Shape>());
+          aNewIndices.Bind(aTopoFace, TColStd_ListOfInteger());
+          // keep new indices of sub-elements used in this face
+          for (TopExp_Explorer anEdges(aTopoFace, TopAbs_EDGE); anEdges.More(); anEdges.Next()) {
+            TopoDS_Edge anEdge = TopoDS::Edge(anEdges.Current());
+            Standard_Real aFirst, aLast;
+            Handle(Geom_Curve) aCurve = BRep_Tool::Curve(anEdge, aFirst, aLast);
+            if (aCurvesIndices.IsBound(aCurve)) {
+              int anIndex = aCurvesIndices.Find(aCurve);
+              if ((aFirst > aLast) != (anEdge.Orientation() == TopAbs_REVERSED))
+                anIndex = -anIndex;
+              aNewIndices.ChangeFind(aTopoFace).Append(anIndex);
+            }
+          }
+        }
+      }
+      NCollection_DataMap<int, TopoDS_Face> aFacesOrder; // faces -> tag where they must be set
+      NCollection_List<TopoDS_Face> anUnorderedFaces; // faces that may be located at any index
+      // searching for the best new candidate to old location
+      NCollection_DataMap<TopoDS_Face, TColStd_ListOfInteger>::Iterator aNewIter(aNewIndices);
+      for (; aNewIter.More(); aNewIter.Next()) {
+        double aBestFound = 0, aBestNotFound = 1.e+100;
+        int aBestTag = 0;
+        const TColStd_ListOfInteger& aNewInd = aNewIter.Value();
+        // old faces indices where they where located
+        TDF_ChildIDIterator anOldIter(aShapeLab, TDataStd_IntPackedMap::GetID());
+        for (; anOldIter.More(); anOldIter.Next()) {
+          int aTag = anOldIter.Value()->Label().Tag();
+          if (aFacesOrder.IsBound(aTag))
+            continue; // already found a best candidate
+          Handle(TDataStd_IntPackedMap) anOldIndices =
+            Handle(TDataStd_IntPackedMap)::DownCast(anOldIter.Value());
+          double aFound = 0, aNotFound = 0;
+          TColStd_ListOfInteger::Iterator aNewIndIter(aNewInd);
+          for (; aNewIndIter.More(); aNewIndIter.Next()) {
+            if (anOldIndices->Contains(aNewIndIter.Value())) {
+              aFound += 1.;
+            }
+            else if (anOldIndices->Contains(-aNewIndIter.Value())) { // different orientation
+              aFound += 0.001;
+            }
+            else {
+              aNotFound += 1.;
+            }
+          }
+          if (aNotFound < aBestNotFound) {
+            if (aFound > aBestFound) {
+              aBestNotFound = aNotFound;
+              aBestFound = aFound;
+              aBestTag = aTag;
+            }
+          }
+        }
+        if (aBestTag != 0) { // found an appropriate face
+          aFacesOrder.Bind(aBestTag, aNewIter.Key());
+        } else {
+          anUnorderedFaces.Append(aNewIter.Key());
+        }
+      }
+      aShapeLab.ForgetAllAttributes(); // clear all previously stored
+      TNaming_Builder aBuilder(aShapeLab); // store the compound to get it ready on open of document
+      aBuilder.Generated(aShape);
+      // set new faces to the labels
+      int aCurrentTag = 1;
+      NCollection_List<TopoDS_Face>::Iterator anUnordered(anUnorderedFaces);
+      for(int aCurrentTag = 1; !aFacesOrder.IsEmpty() || anUnordered.More(); aCurrentTag++) {
+        TopoDS_Face aFaceToPut;
+        if (aFacesOrder.IsBound(aCurrentTag)) {
+          aFaceToPut = aFacesOrder.Find(aCurrentTag);
+          aFacesOrder.UnBind(aCurrentTag);
+        } else if (anUnordered.More()){
+          aFaceToPut = anUnordered.Value();
+          anUnordered.Next();
+        }
+
+        if (!aFaceToPut.IsNull()) {
+          TopTools_MapOfShape aFaceEdges;
+          for(TopExp_Explorer anEdges(aFaceToPut, TopAbs_EDGE); anEdges.More(); anEdges.Next()) {
+            aFaceEdges.Add(anEdges.Current());
+          }
+
+          TDF_Label aLab = aShapeLab.FindChild(aCurrentTag);
+          TNaming_Builder aFaceBuilder(aLab);
+          aFaceBuilder.Generated(aFaceToPut);
+          // store also indices of the new face edges
+          Handle(TDataStd_IntPackedMap) aNewMap = TDataStd_IntPackedMap::Set(aLab);
+          const TColStd_ListOfInteger& aNewInd = aNewIndices.Find(aFaceToPut);
+          std::stringstream aName;
+          aName<<"Face";
+          TopExp_Explorer aPutEdges(aFaceToPut, TopAbs_EDGE);
+          TNaming_Builder* anEdgesBuilder = 0;
+          for(TColStd_ListOfInteger::Iterator anIter(aNewInd); anIter.More(); anIter.Next()) {
+            int anIndex = anIter.Value();
+            aNewMap->Add(anIndex);
+            aName<<"-"<<aComponentsNames[anIndex > 0 ? anIndex : -anIndex];
+            if (anIter.Value() > 0)
+              aName<<"f";
+            else
+              aName<<"r";
+            // collect all edges of the face which are modified in sub-label of the face
+            if (anEdgeIndices.IsBound(anIndex) &&
+                !aFaceEdges.Contains(anEdgeIndices.Find(anIndex))) {
+              if (!anEdgesBuilder) {
+                TDF_Label anEdgesLabel = aLab.FindChild(1);
+                anEdgesBuilder = new TNaming_Builder(anEdgesLabel);
+                TDataStd_Name::Set(anEdgesLabel, "SubEdge");
               }
+              anEdgesBuilder->Modify(anEdgeIndices.Find(anIndex), aPutEdges.Current());
             }
+            aPutEdges.Next();
           }
+          TDataStd_Name::Set(aLab, TCollection_ExtendedString(aName.str().c_str()));
+          aMyDoc->addNamingName(aLab, aName.str());
         }
       }
     }
   }
-  std::string aFullName = fullName(aComposite, aSubShape, aRefs);
-  // store the selected as primitive
-  registerSubShape(aLab, aSubShape, aFullName, 0, aMyDoc, isSelectionMode);
-  return anIndex - 1;
-}
-
-std::shared_ptr<GeomAPI_Shape> Model_ResultConstruction::shape(const int theIndex,
-  const std::shared_ptr<ModelAPI_Document> theExtDoc)
-{
-  std::shared_ptr<GeomAPI_Shape> aResult;
-  if (theIndex == 0)
-    return aResult; // the whole shape, so, NULL
-
-  bool isExt;
-  TDF_Label aLab = startLabel(theExtDoc, isExt).FindChild(theIndex + 1);
-  if (!aLab.IsNull()) { // index is not bad
-    Handle(TNaming_NamedShape) aSelection;
-    if (aLab.FindAttribute(TNaming_NamedShape::GetID(), aSelection)) {
-      TopoDS_Shape aSelShape = aSelection->Get();
-      if (aSelShape.IsNull())
-        return aResult; // shape equal to context => null
-      aResult = std::shared_ptr<GeomAPI_Shape>(new GeomAPI_Shape);
-      aResult->setImpl(new TopoDS_Shape(aSelShape));
-    }
-  }
-
-  return aResult;
-}
-
-bool Model_ResultConstruction::update(const int theIndex,
-  const std::shared_ptr<ModelAPI_Document> theExtDoc, bool& theModified)
-{
-  theModified = false;
-  bool anExt;
-  TDF_Label aLab = startLabel(theExtDoc, anExt).FindChild(theIndex + 1, Standard_True);
-  if (theIndex == 0 || aLab.IsAttribute(kFULL_RESULT_ID)) { // full for external same as index == 0
-    // it is just reference to construction, not sub-shape
-    // if there is a sketch, the sketch-naming must be updated
-    if (!isInfinite()) {
-      // update all faces named by the whole result
-      bool aRes = true;
-      Handle(TDataStd_IntPackedMap) anIndices;
-      if (aLab.FindAttribute(TDataStd_IntPackedMap::GetID(), anIndices)) {
-        NCollection_Map<TopoDS_Shape> aFaces; // collect faces, updated in the tree
-        TColStd_MapIteratorOfPackedMapOfInteger anIndexIter(anIndices->GetMap());
-        Handle(TColStd_HPackedMapOfInteger) aNewPackedMap =
-          new TColStd_HPackedMapOfInteger; // with only faces that are ok
-        // iterate to find existing faces, updated
-        for(; anIndexIter.More(); anIndexIter.Next()) {
-          if (update(anIndexIter.Key(), theExtDoc, theModified)) {
-            GeomShapePtr aFace = shape(anIndexIter.Key(), theExtDoc);
-            if (!aFaces.Contains(aFace->impl<TopoDS_Shape>())) {
-              aNewPackedMap->ChangeMap().Add(anIndexIter.Key());
-              aFaces.Add(aFace->impl<TopoDS_Shape>());
-            }
-          }
-        }
-        // then iterate all existing faces to find new faces
-        int aCurrentFacesNum = facesNum();
-        for(int a = 0; a < aCurrentFacesNum; a++) {
-          GeomShapePtr aFace = face(a);
-          if (!aFaces.Contains(aFace->impl<TopoDS_Shape>())) {
-            // add this one
-            int aNewFaceIndex = select(aFace, theExtDoc, -1);
-            if (aNewFaceIndex > 0) {
-              aNewPackedMap->ChangeMap().Add(aNewFaceIndex);
-            }
-          }
-        }
-        anIndices->ChangeMap(aNewPackedMap);
-      }
-      return aRes;
-    } else {
-      // check is this modified or not
-      std::shared_ptr<GeomAPI_Shape> aNewShape = shape();
-      TopoDS_Shape anOldSh;
-      Handle(TNaming_NamedShape) aNS;
-      if (aLab.FindAttribute(TNaming_NamedShape::GetID(), aNS)) {
-        anOldSh = aNS->Get();
-      }
-      if (aNewShape.get()) {
-        if (anOldSh.IsNull())
-          theModified = true;
-        else {
-          std::shared_ptr<GeomAPI_Shape> anOldShape(new GeomAPI_Shape);
-          anOldShape->setImpl<TopoDS_Shape>(new TopoDS_Shape(anOldSh));
-          theModified = !anOldShape->isEqual(aNewShape);
-        }
-      }
-      else if (!anOldSh.IsNull()) {
-        theModified = true;
-      }
-
-      // For correct naming selection, put the shape into the naming structure.
-      // It seems sub-shapes are not needed: only this shape is (and can be ) selected.
-      TNaming_Builder aBuilder(aLab);
-      aBuilder.Generated(aNewShape->impl<TopoDS_Shape>());
-    }
-    return shape() && !shape()->isNull();
-  }
-  // construction: identification by the results indexes, recompute faces and
-  // take the face that more close by the indexes
-  ResultPtr aThisPtr = std::dynamic_pointer_cast<ModelAPI_Result>(data()->owner());
-  FeaturePtr aContextFeature = document()->feature(aThisPtr);
-
-  // sketch sub-element
-  if (std::dynamic_pointer_cast<ModelAPI_CompositeFeature>(aContextFeature).get())
-  {
-    // update the referenced object if it is sub
-    Handle(TDF_Reference) aRef;
-    if (aLab.FindAttribute(TDF_Reference::GetID(), aRef)) {
-      int aFaceIndex = aRef->Get().Tag();
-      // don't check selection since face may disappear, but the shape stays correct
-      Model_ResultConstruction::update(aFaceIndex, theExtDoc, theModified);
-    }
-    // getting a type of selected shape
-    Handle(TDataStd_Integer) aTypeAttr;
-    if (!aLab.FindAttribute(TDataStd_Integer::GetID(), aTypeAttr)) {
-      return false;
-    }
-    TopAbs_ShapeEnum aShapeType = (TopAbs_ShapeEnum)(aTypeAttr->Get());
-    // selected indexes will be needed in each "if"
-    Handle(TDataStd_IntPackedMap) aSubIds;
-    std::shared_ptr<GeomAPI_Shape> aNewSelected;
-    bool aNoIndexes =
-      !aLab.FindAttribute(TDataStd_IntPackedMap::GetID(), aSubIds) || aSubIds->Extent() == 0;
-    // for now working only with composite features
-    CompositeFeaturePtr aComposite =
-      std::dynamic_pointer_cast<ModelAPI_CompositeFeature>(aContextFeature);
-    if (!aComposite.get() || aComposite->numberOfSubs() == 0) {
-      return false;
-    }
-
-    if (aShapeType == TopAbs_FACE || aShapeType == TopAbs_WIRE) {
-      // compound is for the whole sketch selection
-      // If this is a wire with plane defined then it is a sketch-like object
-      if (!facesNum()) // no faces, update can not work correctly
-        return false;
-      // if there is no edges indexes, any face can be used: take the first
-      std::shared_ptr<GeomAPI_Shape> aNewSelected;
-      if (aNoIndexes) {
-        aNewSelected = face(0);
-      } else { // searching for most looks-like initial face by the indexes
-        // prepare edges of the current result for the fast searching
-        // curves and orientations of edges
-        NCollection_DataMap<Handle(Geom_Curve), int, Model_CurvesHasher> allCurves;
-        const int aSubNum = aComposite->numberOfSubs();
-        for(int a = 0; a < aSubNum; a++) {
-          int aSubID = aComposite->subFeatureId(a);
-          if (aSubIds->Contains(aSubID)) {
-            FeaturePtr aSub = aComposite->subFeature(a);
-            const std::list<std::shared_ptr<ModelAPI_Result> >& aResults = aSub->results();
-            std::list<std::shared_ptr<ModelAPI_Result> >::const_iterator aRes;
-            for(aRes = aResults.cbegin(); aRes != aResults.cend(); aRes++) {
-              ResultConstructionPtr aConstr =
-                std::dynamic_pointer_cast<ModelAPI_ResultConstruction>(*aRes);
-              if (aConstr->shape() && aConstr->shape()->isEdge()) {
-                const TopoDS_Shape& aResShape = aConstr->shape()->impl<TopoDS_Shape>();
-                TopoDS_Edge anEdge = TopoDS::Edge(aResShape);
-                if (!anEdge.IsNull()) {
-                  Standard_Real aFirst, aLast;
-                  Handle(Geom_Curve) aCurve = BRep_Tool::Curve(anEdge, aFirst, aLast);
-                  // searching for orientation information
-                  int anOrient = 0;
-                  Handle(TDataStd_Integer) anInt;
-                  if (aLab.FindChild(aSubID).FindAttribute(TDataStd_Integer::GetID(), anInt)) {
-                    anOrient = anInt->Get();
-                  }
-                  allCurves.Bind(aCurve, anOrient);
-                }
-              }
-            }
-          }
-        }
-        aNewSelected = Model_SelectionNaming::findAppropriateFace(
-          aThisPtr, allCurves, aShapeType == TopAbs_WIRE);
-      }
-      if (aNewSelected) { // store this new selection
-        select(aNewSelected, theExtDoc, theIndex);
-        theModified = true;
-        return true;
-      } else {
-        // if the selection is not found, put the empty shape:
-        // it's better to have disappeared shape, than the old, the lost one
-        TNaming_Builder anEmptyBuilder(aLab);
-        return false;
-      }
-    } else if (aShapeType == TopAbs_EDGE) {
-      // just reselect the edge by the id
-      const int aSubNum = aComposite->numberOfSubs();
-      for(int a = 0; a < aSubNum; a++) {
-        // if aSubIds take any, the first appropriate
-        if (aSubIds->IsEmpty() || aSubIds->Contains(aComposite->subFeatureId(a))) {
-          // found the appropriate feature
-          FeaturePtr aFeature = aComposite->subFeature(a);
-          std::list<std::shared_ptr<ModelAPI_Result> >::const_iterator aResIter =
-            aFeature->results().cbegin();
-          for(;aResIter != aFeature->results().cend(); aResIter++) {
-            ResultConstructionPtr aRes =
-              std::dynamic_pointer_cast<ModelAPI_ResultConstruction>(*aResIter);
-            if (aRes && aRes->shape() && aRes->shape()->isEdge()) { // found!
-              select(aRes->shape(), theExtDoc, theIndex);
-              theModified = true;
-              return true;
-            }
-          }
-        }
-      }
-    } else if (aShapeType == TopAbs_VERTEX) {
-      // just reselect the vertex by the id of edge
-      const int aSubNum = aComposite->numberOfSubs();
-      for(int a = 0; a < aSubNum; a++) {
-        // if aSubIds take any, the first appropriate
-        int aFeatureID = aComposite->subFeatureId(a);
-        if (aSubIds->IsEmpty() || aSubIds->Contains(aFeatureID) ||
-          aSubIds->Contains(aFeatureID + kSTART_VERTEX_DELTA) ||
-          aSubIds->Contains(aFeatureID + kSTART_VERTEX_DELTA * 2)) {
-            // searching for deltas
-            int aVertexNum = 0;
-            if (aSubIds->Contains(aFeatureID + kSTART_VERTEX_DELTA)) aVertexNum = 1;
-            else if (aSubIds->Contains(aFeatureID + kSTART_VERTEX_DELTA * 2)) aVertexNum = 2;
-            // found the feature with appropriate edge
-            FeaturePtr aFeature = aComposite->subFeature(a);
-            std::list<std::shared_ptr<ModelAPI_Result> >::const_iterator aResIter =
-              aFeature->results().cbegin();
-            for(;aResIter != aFeature->results().cend(); aResIter++) {
-              ResultConstructionPtr aRes =
-                std::dynamic_pointer_cast<ModelAPI_ResultConstruction>(*aResIter);
-              if (aRes && aRes->shape()) {
-                if (aRes->shape()->isVertex() && aVertexNum == 0) { // found!
-                  select(aRes->shape(), theExtDoc, theIndex);
-                  theModified = true;
-                  return true;
-                } else if (aRes->shape()->isEdge() && aVertexNum > 0) {
-                  const TopoDS_Shape& anEdge = aRes->shape()->impl<TopoDS_Shape>();
-                  int aVIndex = 1;
-                  for(TopExp_Explorer aVExp(anEdge, TopAbs_VERTEX); aVExp.More(); aVExp.Next()) {
-                    if (aVIndex == aVertexNum) { // found!
-                      std::shared_ptr<GeomAPI_Shape> aVertex(new GeomAPI_Shape);
-                      aVertex->setImpl(new TopoDS_Shape(aVExp.Current()));
-                      select(aVertex, theExtDoc, theIndex);
-                      theModified = true;
-                      return true;
-                    }
-                    aVIndex++;
-                  }
-                }
-              }
-            }
-        }
-      }
-    }
-  } else { // simple construction element: the selected is that needed
-    select(shape(), theExtDoc, theIndex);
-    theModified = true;
-    return true;
-  }
-  return false; // unknown case
 }

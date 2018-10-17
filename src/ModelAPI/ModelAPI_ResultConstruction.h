@@ -63,6 +63,10 @@ class ModelAPI_ResultConstruction : public ModelAPI_Result
   /// Sets the result
   virtual void setShape(std::shared_ptr<GeomAPI_Shape> theShape) = 0;
 
+  /// Updates the shape taking the current value from the data structure, returns true
+  /// if update has been correctly done
+  virtual bool updateShape() = 0;
+
   /// Sets the flag that it must be displayed in history (default is true)
   virtual void setIsInHistory(const bool isInHistory) = 0;
 

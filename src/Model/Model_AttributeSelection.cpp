@@ -158,34 +158,36 @@ bool Model_AttributeSelection::setValue(const ObjectPtr& theContext,
       owner()->data()->blockSendAttributeUpdated(false);
     return false;
   }
-  if (theContext->groupName() == ModelAPI_ResultBody::group()) {
-    ResultBodyPtr aContextBody = std::dynamic_pointer_cast<ModelAPI_ResultBody>(theContext);
+  bool isSelectBody = theContext->groupName() == ModelAPI_ResultBody::group();
+  if (!isSelectBody) {
+    ResultConstructionPtr aContextConstruction =
+      std::dynamic_pointer_cast<ModelAPI_ResultConstruction>(theContext);
+    isSelectBody = aContextConstruction.get() && !aContextConstruction->isInfinite();
+  }
+  if (isSelectBody) {
+    ResultPtr aContextResult = std::dynamic_pointer_cast<ModelAPI_Result>(theContext);
+    GeomShapePtr aContextShape = aContextResult->shape();
     // do not select the whole shape for body:it is already must be in the data framework
     // equal and null selected objects mean the same: object is equal to context,
-    if (aContextBody->shape().get() &&
-        (aContextBody->shape()->isEqual(theSubShape) || !theSubShape.get())) {
+    if (aContextShape.get() && (aContextShape->isEqual(theSubShape) || !theSubShape.get())) {
       aSelLab.ForgetAllAttributes(true);
       TDataStd_UAttribute::Set(aSelLab, kSIMPLE_REF_ID);
     } else {
-      selectBody(aContextBody, theSubShape);
+      selectBody(aContextResult, theSubShape);
     }
   } else if (theContext->groupName() == ModelAPI_ResultConstruction::group()) {
-    ResultConstructionPtr aContextConstruction =
-      std::dynamic_pointer_cast<ModelAPI_ResultConstruction>(theContext);
     aSelLab.ForgetAllAttributes(true); // to remove old selection data
     std::shared_ptr<Model_ResultConstruction> aConstruction =
       std::dynamic_pointer_cast<Model_ResultConstruction>(theContext);
     std::shared_ptr<GeomAPI_Shape> aSubShape;
-    if (theSubShape.get() && !aContextConstruction->shape()->isEqual(theSubShape))
+    if (theSubShape.get() && !aConstruction->shape()->isEqual(theSubShape))
       aSubShape = theSubShape; // the whole context
     if (aConstruction->isInfinite()) {
       // For correct naming selection, put the shape into the naming structure.
-      // It seems sub-shapes are not needed: only this shape is (and can be ) selected.
+      // It seems sub-shapes are not needed: only this shape is (and can be) selected.
       TNaming_Builder aBuilder(aSelLab);
-      aBuilder.Generated(aContextConstruction->shape()->impl<TopoDS_Shape>());
+      aBuilder.Generated(aConstruction->shape()->impl<TopoDS_Shape>());
     }
-    int anIndex = aConstruction->select(theSubShape, owner()->document());
-    TDataStd_Integer::Set(aSelLab, anIndex);
   } else if (theContext->groupName() == ModelAPI_ResultPart::group()) {
     aSelLab.ForgetAllAttributes(true);
     TDataStd_UAttribute::Set(aSelLab, kPART_REF_ID);
@@ -422,12 +424,7 @@ std::shared_ptr<GeomAPI_Shape> Model_AttributeSelection::internalValue(CenterTyp
       aResult = std::shared_ptr<GeomAPI_Shape>(new GeomAPI_Shape);
       aResult->setImpl(new TopoDS_Shape(aSelShape));
     } else if (aConstr) { // simple construction element: just shape of this construction element
-      Handle(TDataStd_Integer) anIndex;
-      if (aSelLab.FindAttribute(TDataStd_Integer::GetID(), anIndex)) {
-        if (anIndex->Get() == 0) // it is just reference to construction, nothing is in value
-          return aResult;
-        return aConstr->shape(anIndex->Get(), owner()->document());
-      }
+      aResult = aConstr->shape();
     }
   }
   return aResult;
@@ -455,11 +452,7 @@ bool Model_AttributeSelection::isInitialized()
         std::shared_ptr<Model_ResultConstruction> aConstr =
           std::dynamic_pointer_cast<Model_ResultConstruction>(context());
         if (aConstr.get()) {
-          Handle(TDataStd_Integer) anIndex;
-          if (aSelLab.FindAttribute(TDataStd_Integer::GetID(), anIndex)) {
-            // for the whole shape it may return null, so, if index exists, returns true
             return true;
-          }
         }
         // for the whole feature, a feature object
         FeaturePtr aFeat = contextFeature();
@@ -725,22 +718,19 @@ bool Model_AttributeSelection::update()
   }
 
   if (aContext->groupName() == ModelAPI_ResultConstruction::group()) {
-    Handle(TDataStd_Integer) anIndex;
-    if (aSelLab.FindAttribute(TDataStd_Integer::GetID(), anIndex)) {
-      std::shared_ptr<Model_ResultConstruction> aConstructionContext =
-        std::dynamic_pointer_cast<Model_ResultConstruction>(aContext);
-      bool aModified = true;
-      bool aValid = aConstructionContext->update(anIndex->Get(), owner()->document(), aModified);
-      setInvalidIfFalse(aSelLab, aValid);
-      if (aConstructionContext->isInfinite()) {
-        // Update the selected shape.
-        TNaming_Builder aBuilder(aSelLab);
-        aBuilder.Generated(aConstructionContext->shape()->impl<TopoDS_Shape>());
+    bool aResult = true;
+    std::shared_ptr<Model_ResultConstruction> aConstructionContext =
+      std::dynamic_pointer_cast<Model_ResultConstruction>(aContext);
+    if (!aConstructionContext->isInfinite()) {
+      Selector_Selector aSelector(aSelLab);
+      aResult = aSelector.restore();
+      if (aResult) {
+        TopoDS_Shape aContextShape = aContext->shape()->impl<TopoDS_Shape>();
+        aResult = aSelector.solve(aContextShape);
       }
-      if (aModified)
-        owner()->data()->sendAttributeUpdated(this);
-      return aValid;
+      aResult = setInvalidIfFalse(aSelLab, aResult);
     }
+    return aResult;
   }
   return setInvalidIfFalse(aSelLab, false); // unknown case
 }
@@ -751,7 +741,7 @@ void Model_AttributeSelection::selectBody(
   // perform the selection
   TopoDS_Shape aContext;
 
-  ResultBodyPtr aBody = std::dynamic_pointer_cast<ModelAPI_ResultBody>(theContext);//myRef.value()
+  ResultPtr aBody = std::dynamic_pointer_cast<ModelAPI_Result>(theContext);//myRef.value()
   if (aBody) {
     aContext = aBody->shape()->impl<TopoDS_Shape>();
   } else {
@@ -766,67 +756,8 @@ void Model_AttributeSelection::selectBody(
   }
 
   // with "recover" feature the selected context may be not up to date (issue 1710)
-  Handle(TNaming_NamedShape) aResult;
   TDF_Label aSelLab = selectionLabel();
-  TopoDS_Shape aNewContext = aContext;
-  bool isUpdated = true;
-  while(!aNewContext.IsNull() && isUpdated) {
-    // searching for the very last shape that was produced from this one
-    isUpdated = false;
-    if (!TNaming_Tool::HasLabel(aSelLab, aNewContext))
-      // to avoid crash of TNaming_SameShapeIterator if pure shape does not exists
-      break;
-    for(TNaming_SameShapeIterator anIter(aNewContext, aSelLab); anIter.More(); anIter.Next()) {
-      TDF_Label aNSLab = anIter.Label();
-      if (!scope().Contains(aNSLab))
-        continue;
-      Handle(TNaming_NamedShape) aNS;
-      if (aNSLab.FindAttribute(TNaming_NamedShape::GetID(), aNS)) {
-        for(TNaming_Iterator aShapesIter(aNS); aShapesIter.More(); aShapesIter.Next()) {
-          if (aShapesIter.Evolution() == TNaming_SELECTED)
-            continue; // don't use the selection evolution
-          if (!aShapesIter.OldShape().IsNull() && aShapesIter.OldShape().IsSame(aNewContext)) {
-             // found the original shape
-            aNewContext = aShapesIter.NewShape(); // go to the newer shape
-            isUpdated = true;
-            break;
-          }
-        }
-      }
-    }
-  }
-  if (aNewContext.IsNull()) { // a context is already deleted
-    setInvalidIfFalse(aSelLab, false);
-    Events_InfoMessage("Model_AttributeSelection", "Failed to select shape already deleted").send();
-    return;
-  }
-
   TopoDS_Shape aNewSub = theSubShape ? theSubShape->impl<TopoDS_Shape>() : aContext;
-  if (!aNewSub.IsEqual(aContext)) { // searching for subshape in the new context
-    bool isFound = false;
-    TopExp_Explorer anExp(aNewContext, aNewSub.ShapeType());
-    for(; anExp.More(); anExp.Next()) {
-      if (anExp.Current().IsSame(aNewSub)) {
-        isFound = true;
-        break;
-      }
-    }
-    if (!isFound) { // sub-shape is not found in the up-to-date instance of the context shape
-      // if context is sub-result of compound/compsolid, selection of sub-shape better propagate to
-      // the main result (which is may be modified); the case is in 1799
-      ResultBodyPtr aMain = ModelAPI_Tools::bodyOwner(theContext);
-      while(ModelAPI_Tools::bodyOwner(aMain).get())
-        aMain = ModelAPI_Tools::bodyOwner(theContext);
-      if (aMain.get()) {
-        selectBody(aMain, theSubShape);
-        return;
-      }
-      setInvalidIfFalse(aSelLab, false);
-      Events_InfoMessage("Model_AttributeSelection",
-        "Failed to select sub-shape already modified").send();
-      return;
-    }
-  }
 
   /// fix for issue 411: result modified shapes must not participate in this selection mechanism
   if (!aContext.IsNull()) {
@@ -842,10 +773,10 @@ void Model_AttributeSelection::selectBody(
     Selector_Selector aSel(aSelLab);
     try {
       //aSel.Select(aNewSub, aNewContext);
-      aSelectorOk = aSel.select(aNewContext, aNewSub);
+      aSelectorOk = aSel.select(aContext, aNewSub);
       if (aSelectorOk) {
         aSel.store();
-        aSelectorOk = aSel.solve(aNewContext);
+        aSelectorOk = aSel.solve(aContext);
       }
     } catch(...) {
       aSelectorOk = false;
@@ -865,7 +796,7 @@ void Model_AttributeSelection::selectBody(
     }
     if (!aSelectorOk) { // weak naming identifier instead
       GeomShapePtr aContextShape(new GeomAPI_Shape);
-      aContextShape->setImpl<TopoDS_Shape>(new TopoDS_Shape(aNewContext));
+      aContextShape->setImpl<TopoDS_Shape>(new TopoDS_Shape(aContext));
       GeomShapePtr aValueShape(new GeomAPI_Shape);
       aValueShape->setImpl<TopoDS_Shape>(new TopoDS_Shape(aNewSub));
 
@@ -964,11 +895,23 @@ std::string Model_AttributeSelection::namingName(const std::string& theDefaultNa
   }
 
   TDF_Label aSelLab = selectionLabel();
+  if (aSelLab.IsAttribute(kSIMPLE_REF_ID)) { // whole context, no value
+    return contextName(aCont);
+  }
+
   Handle(TDataStd_Integer) aWeakId;
   if (aSelLab.FindAttribute(kWEAK_NAMING, aWeakId)) { // a weak naming is used
     std::ostringstream aNameStream;
-    aNameStream<<aCont->data()->name()<<"/weak_name_"<<aWeakId->Get();
+    aNameStream<<contextName(aCont)<<"/weak_name_"<<aWeakId->Get();
     return aNameStream.str();
+  }
+
+  // whole infinitive construction
+  if (aCont->groupName() == ModelAPI_ResultConstruction::group()) {
+    ResultConstructionPtr aConstr = std::dynamic_pointer_cast<Model_ResultConstruction>(aCont);
+    if (aConstr->isInfinite()) {
+      return contextName(aCont);
+    }
   }
 
   Selector_Selector aSelector(aSelLab);
@@ -1722,8 +1665,17 @@ std::string Model_AttributeSelection::contextName(const TDF_Label theSelectionLa
   std::shared_ptr<Model_Document> aDoc = std::dynamic_pointer_cast<Model_Document>(aMyDoc);
   FeaturePtr aFeatureOwner = aDoc->featureByLab(theSelectionLab);
   if (aFeatureOwner.get()) {
+    // if it is sub-element of the sketch, the context name is the name of the sketch
     // searching also for result - real context
-    ResultPtr aResult = aDoc->resultByLab(theSelectionLab);
+    ResultPtr aResult;
+    FeaturePtr aComposite = ModelAPI_Tools::compositeOwner(aFeatureOwner);
+    if (aComposite.get() && aComposite->results().size() == 1 &&
+        aComposite->firstResult()->groupName() == ModelAPI_ResultConstruction::group()) {
+      aFeatureOwner = aComposite;
+      aResult = aFeatureOwner->firstResult();
+    } else {
+      aResult = aDoc->resultByLab(theSelectionLab);
+    }
     if (aResult.get()) {
       // this is to avoid duplicated names of results problem
       std::string aContextName = aResult->data()->name();

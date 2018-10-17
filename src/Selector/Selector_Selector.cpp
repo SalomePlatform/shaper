@@ -21,6 +21,7 @@
 #include <Selector_Selector.h>
 
 #include <Selector_NameGenerator.h>
+#include <Selector_NExplode.h>
 
 #include <TDF_ChildIDIterator.hxx>
 #include <TopoDS_Iterator.hxx>
@@ -50,9 +51,12 @@ static const Standard_GUID kSHAPE_TYPE("864b3267-cb9d-4107-bf58-c3ce1775b171");
 static const Standard_GUID kBASE_ARRAY("7c515b1a-9549-493d-9946-a4933a22f45f");
 // array of the neighbor levels
 static const Standard_GUID kLEVELS_ARRAY("ee4c4b45-e859-4e86-aa4f-6eac68e0ca1f");
+// weak index (integer) of the sub-shape
+static const Standard_GUID kWEAK_INDEX("e9373a61-cabc-4ee8-aabf-aea47c62ed87");
 
 Selector_Selector::Selector_Selector(TDF_Label theLab) : myLab(theLab)
 {
+  myWeakIndex = -1;
 }
 
 TDF_Label Selector_Selector::label()
@@ -127,10 +131,15 @@ static void findNeighbors(const TopoDS_Shape theContext, const TopoDS_Shape theV
     aNBConnectors.Add(aValExp.Current());
   }
 
+  TopTools_MapOfShape alreadyProcessed;
+  alreadyProcessed.Add(theValue);
+
   for(int aLevel = 1; aLevel <= theLevel; aLevel++) {
     TopoDS_ListOfShape aGoodCandidates;
     TopExp_Explorer aCandidate(theContext, theValue.ShapeType());
     for(; aCandidate.More(); aCandidate.Next()) {
+      if (alreadyProcessed.Contains(aCandidate.Current()))
+        continue;
       TopExp_Explorer aCandConnector(aCandidate.Current(), aConnectorType);
       for(; aCandConnector.More(); aCandConnector.Next()) {
         if (aNBConnectors.Contains(aCandConnector.Current())) // candidate is neighbor
@@ -150,6 +159,7 @@ static void findNeighbors(const TopoDS_Shape theContext, const TopoDS_Shape theV
         for(; aGoodConnector.More(); aGoodConnector.Next()) {
           aNBConnectors.Add(aGoodConnector.Current());
         }
+        alreadyProcessed.Add(aGood.Value());
       }
     }
   }
@@ -189,6 +199,7 @@ static const TopoDS_Shape findNeighbor(const TopoDS_Shape theContext,
           }
         }
       }
+      aFirst = false;
     }
   }
   if (aMatches.IsEmpty())
@@ -258,7 +269,9 @@ bool Selector_Selector::select(const TopoDS_Shape theContext, const TopoDS_Shape
     // try to find the shape of the higher level type in the context shape
     bool aFacesTried = false; // for identification of vertices, faces are tried, then edges
     while(aSelectionType != TopAbs_FACE || !aFacesTried) {
-      if (aSelectionType == TopAbs_FACE && theValue.ShapeType() == TopAbs_VERTEX) {
+      if (aSelectionType == TopAbs_FACE) {
+        if (theValue.ShapeType() != TopAbs_VERTEX)
+          break;
         aFacesTried = true;
         aSelectionType = TopAbs_EDGE;
       } else
@@ -318,7 +331,7 @@ bool Selector_Selector::select(const TopoDS_Shape theContext, const TopoDS_Shape
       if (!aResult.IsNull() && aResult.IsSame(theValue)) {
         std::list<std::pair<TopoDS_Shape, int> >::iterator aNBIter = aNBs.begin();
         for(; aNBIter != aNBs.end(); aNBIter++) {
-          if (!selectBySubSelector(theContext, aNBIter->first)) {
+          if (!selectBySubSelector(theContext, aNBIter->first, false)) {
             return false; // something is wrong because before this selection was ok
           }
           myNBLevel.push_back(aNBIter->second);
@@ -385,9 +398,55 @@ bool Selector_Selector::select(const TopoDS_Shape theContext, const TopoDS_Shape
     findBases(aModifList.First(), theValue, true, myBases);
     if (!myBases.IsEmpty()) {
       myFinal = aModifList.First()->Label();
-      myType = SELTYPE_MODIFICATION;
-      return !myBases.IsEmpty();
+      TopoDS_ListOfShape aCommon;
+      findModificationResult(aCommon);
+      // trying to search by neighbours
+      if (aCommon.Extent() > 1) { // more complicated selection
+        if (!theUseNeighbors)
+          return false;
+
+        // searching by neighbours
+        std::list<std::pair<TopoDS_Shape, int> > aNBs; /// neighbor sub-shape -> level of neighborhood
+        for(int aLevel = 1; true; aLevel++) {
+          TopTools_MapOfShape aNewNB;
+          findNeighbors(theContext, theValue, aLevel, aNewNB);
+          if (aNewNB.Extent() == 0) { // there are no neighbors of the given level, stop iteration
+            break;
+          }
+          // check which can be named correctly, without by neighbors type
+          for(TopTools_MapOfShape::Iterator aNBIter(aNewNB); aNBIter.More(); ) {
+            Selector_Selector aSelector(myLab.FindChild(1));
+            if (aSelector.select(theContext, aNBIter.Value(), false)) { // add to the list of good NBs
+              aNBs.push_back(std::pair<TopoDS_Shape, int>(aNBIter.Value(), aLevel));
+            }
+            aNewNB.Remove(aNBIter.Key());
+            aNBIter.Initialize(aNewNB);
+          }
+          TopoDS_Shape aResult = findNeighbor(theContext, aNBs);
+          if (!aResult.IsNull() && aResult.IsSame(theValue)) {
+            std::list<std::pair<TopoDS_Shape, int> >::iterator aNBIter = aNBs.begin();
+            for(; aNBIter != aNBs.end(); aNBIter++) {
+              if (!selectBySubSelector(theContext, aNBIter->first)) {
+                return false; // something is wrong because before this selection was ok
+              }
+              myNBLevel.push_back(aNBIter->second);
+
+            }
+            myType = SELTYPE_FILTER_BY_NEIGHBOR;
+            return true;
+          }
+        }
+        // filter by neighbours did not help
+        if (aCommon.Extent() > 1) { // weak naming between the common results
+          Selector_NExplode aNexp(aCommon);
+          myWeakIndex = aNexp.index(theValue);
+          if (myWeakIndex == -1)
+            return false;
+        }
+      }
     }
+    myType = SELTYPE_MODIFICATION;
+    return !myBases.IsEmpty();
   }
 
   // not found a good result
@@ -423,6 +482,9 @@ void Selector_Selector::store()
       anArray->SetValue(anIndex, aBIter.Value());
     }
     anArray->SetValue(myBases.Extent(), myFinal); // final is in the end of array
+    if (myWeakIndex != -1) {
+      TDataStd_Integer::Set(myLab, kWEAK_INDEX, myWeakIndex);
+    }
     break;
   }
   case SELTYPE_FILTER_BY_NEIGHBOR: {
@@ -485,6 +547,10 @@ bool Selector_Selector::restore()
         myBases.Append(anArray->Value(anIndex));
       }
       myFinal = anArray->Value(anUpper);
+      Handle(TDataStd_Integer) aWeakInt;
+      if (myLab.FindAttribute(kWEAK_INDEX, aWeakInt)) {
+        myWeakIndex = aWeakInt->Get();
+      }
       return true;
     }
     return false;
@@ -531,7 +597,29 @@ static void findFinals(const TopoDS_Shape& theBase, const TDF_Label& theFinal,
       }
     }
   }
+}
 
+void Selector_Selector::findModificationResult(TopoDS_ListOfShape& theCommon) {
+  for(TDF_LabelList::Iterator aBase(myBases); aBase.More(); aBase.Next()) {
+    TopTools_MapOfShape aFinals;
+    for(TNaming_Iterator aBaseShape(aBase.Value()); aBaseShape.More(); aBaseShape.Next())
+      findFinals(aBaseShape.NewShape(), myFinal, aFinals);
+    if (!aFinals.IsEmpty()) {
+      if (theCommon.IsEmpty()) { // just copy all to common
+        for(TopTools_MapOfShape::Iterator aFinal(aFinals); aFinal.More(); aFinal.Next()) {
+          theCommon.Append(aFinal.Key());
+        }
+      } else { // keep only shapes presented in both lists
+        for(TopoDS_ListOfShape::Iterator aCommon(theCommon); aCommon.More(); ) {
+          if (aFinals.Contains(aCommon.Value())) {
+            aCommon.Next();
+          } else { // common is not found, remove it
+            theCommon.Remove(aCommon);
+          }
+        }
+      }
+    }
+  }
 }
 
 bool Selector_Selector::solve(const TopoDS_Shape& theContext)
@@ -599,28 +687,14 @@ bool Selector_Selector::solve(const TopoDS_Shape& theContext)
   }
   case SELTYPE_MODIFICATION: {
     TopoDS_ListOfShape aFinalsCommon; // final shapes presented in all results from bases
-    for(TDF_LabelList::Iterator aBase(myBases); aBase.More(); aBase.Next()) {
-      TopTools_MapOfShape aFinals;
-      for(TNaming_Iterator aBaseShape(aBase.Value()); aBaseShape.More(); aBaseShape.Next())
-        findFinals(aBaseShape.NewShape(), myFinal, aFinals);
-      if (!aFinals.IsEmpty()) {
-        if (aFinalsCommon.IsEmpty()) { // just copy all to common
-          for(TopTools_MapOfShape::Iterator aFinal(aFinals); aFinal.More(); aFinal.Next()) {
-            aFinalsCommon.Append(aFinal.Key());
-          }
-        } else { // keep only shapes presented in both lists
-          for(TopoDS_ListOfShape::Iterator aCommon(aFinalsCommon); aCommon.More(); ) {
-            if (aFinals.Contains(aCommon.Value())) {
-              aCommon.Next();
-            } else { // common is not found, remove it
-              aFinalsCommon.Remove(aCommon);
-            }
-          }
-        }
-      }
-    }
+    findModificationResult(aFinalsCommon);
     if (aFinalsCommon.Extent() == 1) // only in this case result is valid: found only one shape
       aResult = aFinalsCommon.First();
+    else if (aFinalsCommon.Extent() > 1 && myWeakIndex) {
+      Selector_NExplode aNExp(aFinalsCommon);
+      aResult = aNExp.shape(myWeakIndex);
+
+    }
     break;
   }
   case SELTYPE_FILTER_BY_NEIGHBOR: {
@@ -687,10 +761,15 @@ std::string Selector_Selector::name(Selector_NameGenerator* theNameGenerator) {
     for(TDF_LabelList::iterator aBase = myBases.begin(); aBase != myBases.end(); aBase++) {
       if (aBase != myBases.begin())
         aResult += "&";
-      if (aBase->FindAttribute(TDataStd_Name::GetID(), aName))
+      if (!aBase->FindAttribute(TDataStd_Name::GetID(), aName))
         return "";
       aResult += theNameGenerator->contextName(*aBase) + "/" +
         std::string(TCollection_AsciiString(aName->Get()).ToCString());
+      if (myWeakIndex != -1) {
+        std::ostringstream aWeakStr;
+        aWeakStr<<"&weak_name_"<<myWeakIndex;
+        aResult += aWeakStr.str();
+      }
     }
     return aResult;
   }
@@ -715,10 +794,10 @@ std::string Selector_Selector::name(Selector_NameGenerator* theNameGenerator) {
 }
 
 bool Selector_Selector::selectBySubSelector(
-  const TopoDS_Shape theContext, const TopoDS_Shape theValue)
+  const TopoDS_Shape theContext, const TopoDS_Shape theValue, const bool theUseNeighbors)
 {
   mySubSelList.push_back(Selector_Selector(myLab.FindChild(int(mySubSelList.size()) + 1)));
-  if (!mySubSelList.back().select(theContext, theValue)) {
+  if (!mySubSelList.back().select(theContext, theValue, theUseNeighbors)) {
     mySubSelList.clear(); // if one of the selector is failed, all become invalid
     return false;
   }

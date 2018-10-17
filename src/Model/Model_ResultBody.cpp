@@ -124,7 +124,6 @@ bool Model_ResultBody::setDisabled(std::shared_ptr<ModelAPI_Result> theThis, con
 {
   bool aChanged = ModelAPI_ResultBody::setDisabled(theThis, theFlag);
   if (aChanged) { // state is changed, so modifications are needed
-    myBuilder->evolutionToSelection(theFlag);
     updateSubs(shape(), false); // to set disabled/enabled
   }
   return aChanged;

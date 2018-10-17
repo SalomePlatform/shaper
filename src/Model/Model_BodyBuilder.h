@@ -128,10 +128,6 @@ public:
   /// Removes the stored builders
   MODEL_EXPORT virtual ~Model_BodyBuilder();
 
-  /// Converts evolution of sub-shapes stored in naming structure to selection
-  /// (theFlag = true) and back (theFlag = false)
-  MODEL_EXPORT virtual void evolutionToSelection(const bool theFlag);
-
   /// Returns true if the latest modification of this body in the naming history
   // is equal to the given shape
   MODEL_EXPORT virtual bool isLatestEqual(const GeomShapePtr& theShape);

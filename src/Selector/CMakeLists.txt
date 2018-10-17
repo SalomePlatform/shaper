@@ -24,11 +24,13 @@ SET(PROJECT_HEADERS
     Selector.h
     Selector_Selector.h
     Selector_NameGenerator.h
+    Selector_NExplode.h
 )
 
 SET(PROJECT_SOURCES
     Selector_Selector.cpp
     Selector_NameGenerator.cpp
+    Selector_NExplode.cpp
 )
 
 SET(PROJECT_LIBRARIES

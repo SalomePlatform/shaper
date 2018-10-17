@@ -204,9 +204,6 @@ class SketchPlugin_Sketch : public ModelAPI_CompositeFeature, public GeomAPI_ICu
   /// Returns true if feature or reuslt belong to this composite feature as subs
   SKETCHPLUGIN_EXPORT virtual bool isSub(ObjectPtr theObject) const;
 
-  /// Construction result is allways recomuted on the fly
-  SKETCHPLUGIN_EXPORT virtual bool isPersistentResult() {return false;}
-
   SKETCHPLUGIN_EXPORT virtual void attributeChanged(const std::string& theID);
 
   /// Exchanges IDs of two given features: needed for fillet feature better naming (issue 769)

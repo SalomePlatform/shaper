@@ -52,6 +52,7 @@ class Selector_Selector
   std::list<Selector_Selector> mySubSelList; ///< list of sub-selectors if needed
   TDF_Label myFinal; ///< final label of the primitive or generation, where the value is
   TDF_LabelList myBases; ///< initial labels that contain shapes that produce the modification
+  int myWeakIndex; ///< index of the shape among commons for the modification type (-1 - not set)
 
   std::list<int> myNBLevel; ///< list of integers corresponding to subsellist neighborhood level
 
@@ -66,7 +67,7 @@ class Selector_Selector
   /// Initializes the selector structure on the label.
   /// Stores the name data to restore after modification.
    SELECTOR_EXPORT bool select(const TopoDS_Shape theContext, const TopoDS_Shape theValue,
-     const bool theUseNeighbors = false);
+     const bool theUseNeighbors = true);
 
   /// Stores the name to the label and sub-labels tree
    SELECTOR_EXPORT void store();
@@ -88,7 +89,10 @@ private:
 
   /// Create and keep in the list the sub-sulector that select the given value.
   /// Returns true if selection is correct.
-  bool selectBySubSelector(const TopoDS_Shape theContext, const TopoDS_Shape theValue);
+  bool selectBySubSelector(const TopoDS_Shape theContext, const TopoDS_Shape theValue,
+    const bool theUseNeighbors = true);
+  /// Searches the final shapes presented in all results from bases basing on the modification fields
+  void findModificationResult(TopoDS_ListOfShape& theCommon);
 };
 
 #endif

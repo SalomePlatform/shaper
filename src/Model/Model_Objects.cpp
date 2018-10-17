@@ -1840,8 +1840,6 @@ void Model_Objects::updateResults(FeaturePtr theFeature, std::set<FeaturePtr>& t
     }
   }
 
-  // for not persistent is will be done by parametric updater automatically
-  //if (!theFeature->isPersistentResult()) return;
   // check the existing results and remove them if there is nothing on the label
   std::list<ResultPtr>::const_iterator aResIter = theFeature->results().cbegin();
   while(aResIter != theFeature->results().cend()) {
@@ -1881,10 +1879,11 @@ void Model_Objects::updateResults(FeaturePtr theFeature, std::set<FeaturePtr>& t
             // create the part result: it is better to restore the previous result if it is possible
             theFeature->execute();
         } else if (aGroup->Get() == ModelAPI_ResultConstruction::group().c_str()) {
-          theFeature->execute(); // construction shapes are needed for sketch solver
-          if (!theFeature->results().empty()) // to fix #2640 : update sketch, but not naming
-            std::dynamic_pointer_cast<ModelAPI_ResultConstruction>(theFeature->firstResult())
-              ->facesNum(false);
+          ResultConstructionPtr aConstr = createConstruction(theFeature->data(), aResIndex);
+          if (!aConstr->updateShape())
+            theFeature->execute(); // not stored shape in the data structure, execute to have it
+          else
+            theFeature->setResult(aConstr, aResIndex); // result is ready without execution
         } else if (aGroup->Get() == ModelAPI_ResultGroup::group().c_str()) {
           aNewBody = createGroup(theFeature->data(), aResIndex);
         } else if (aGroup->Get() == ModelAPI_ResultField::group().c_str()) {

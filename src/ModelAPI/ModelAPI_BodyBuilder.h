@@ -117,10 +117,6 @@ public:
                                         const std::string& theName,
                                         int& theTag) = 0;
 
-  /// Converts evolution of sub-shapes stored in naming structure to selection
-  /// (theFlag = true) and back (theFlag = false)
-  virtual void evolutionToSelection(const bool theFlag) = 0;
-
   /// Returns true if the latest modification of this body in the naming history
   // is equal to the given shape
   virtual bool isLatestEqual(const GeomShapePtr& theShape) = 0;
