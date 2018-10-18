@@ -50,7 +50,7 @@ class XGUI_EXPORT XGUI_WorkshopListener : public QObject, public Events_Listener
 public:
   /// Constructor. Used only if the workshop is launched in Salome environment
   /// \param theWorkshop a reference to workshop.
-   XGUI_WorkshopListener(ModuleBase_IWorkshop* theWorkshop);
+   XGUI_WorkshopListener(XGUI_Workshop* theWorkshop);
   virtual ~XGUI_WorkshopListener();
 
   /// Register this class in the events loop for several types of events
@@ -104,7 +104,7 @@ protected:
   XGUI_Workshop* workshop() const;
 
 private:
-  ModuleBase_IWorkshop* myWorkshop; // the current workshop
+  XGUI_Workshop* myWorkshop; // the current workshop
 
   bool myUpdatePrefs;
 };

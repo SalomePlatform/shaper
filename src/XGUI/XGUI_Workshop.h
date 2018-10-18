@@ -320,6 +320,8 @@ Q_OBJECT
   /// \param theDirectory a path to directory
   void openDirectory(const QString& theDirectory);
 
+  void updateAutoComputeState();
+
 signals:
   /// Emitted when selection happens in Salome viewer
   void salomeViewerSelection();
@@ -396,7 +398,7 @@ signals:
 #endif
 
   /// A slot calleon toggle of auto-compute button
-  void onAutoApply(bool isToggle);
+  void onAutoApply();
 
   /// Activates/deactivates the trihedron in the viewer AIS context
   void onTrihedronVisibilityChanged(bool theState);

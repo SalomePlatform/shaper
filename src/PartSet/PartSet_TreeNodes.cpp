@@ -22,6 +22,7 @@
 
 #include <ModuleBase_IconFactory.h>
 #include <ModuleBase_IWorkshop.h>
+#include <ModuleBase_Tools.h>
 
 #include <PartSetPlugin_Part.h>
 
@@ -1181,6 +1182,32 @@ void PartSet_ObjectFolderNode::getFirstAndLastIndex(int& theFirst, int& theLast)
 
   theFirst = aDoc->index(aFirstFeatureInFolder);
   theLast = aDoc->index(aLastFeatureInFolder);
+}
+
+
+QVariant PartSet_ObjectFolderNode::data(int theColumn, int theRole) const
+{
+  const QImage anAditional(":icons/hasWarning.png");
+
+  if ((theRole == Qt::DecorationRole) && (theColumn == 1)) {
+    ObjectPtr aObject;
+    bool aHasWarning = false;
+    foreach(ModuleBase_ITreeNode* aNode, myChildren) {
+      aObject = aNode->object();
+      if (aObject.get()) {
+        ModelAPI_ExecState aState = aObject->data()->execState();
+        if ((aState == ModelAPI_StateExecFailed) || (aState == ModelAPI_StateMustBeUpdated)) {
+          aHasWarning = true;
+          break;
+        }
+      }
+    }
+    if (aHasWarning) {
+      return QIcon(ModuleBase_Tools::composite(":icons/hasWarning.png",
+                                               ":pictures/features_folder.png"));
+    }
+  }
+  return PartSet_ObjectNode::data(theColumn, theRole);
 }
 
 

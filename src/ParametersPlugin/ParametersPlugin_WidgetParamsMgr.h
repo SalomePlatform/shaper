@@ -71,6 +71,10 @@ public:
   /// \return a control list
   virtual QList<QWidget*> getControls() const;
 
+  /// Set general buttons from dialog
+  /// \param theButtons the dialog buttons
+  virtual void setDialogButtons(QDialogButtonBox* theButtons);
+
 protected:
   /// Saves the internal parameters to the given feature
   /// \return True in success
@@ -81,6 +85,10 @@ protected:
 
   /// The method called when widget is activated
   virtual void activateCustom();
+
+  virtual void showEvent(QShowEvent* theEvent);
+
+  virtual void hideEvent(QHideEvent* theEvent);
 
 private slots:
   /// Slot for reaction on double click in the table (start editing)
@@ -112,6 +120,9 @@ private slots:
 
   /// Slot for reaction on selection in the table
   void onSelectionChanged();
+
+  // A slot for show preview button
+  void onShowPreview();
 
 private:
   /// Creates a new parameter feature
@@ -162,6 +173,8 @@ private:
   QPushButton* myRemoveBtn;
   QToolButton* myUpBtn;
   QToolButton* myDownBtn;
+
+  bool isUpplyBlocked;
 };
 
 

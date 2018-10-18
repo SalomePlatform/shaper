@@ -96,6 +96,15 @@ MODULEBASE_EXPORT void setShadowEffect(QWidget* theWidget, const bool isSetEffec
 /// \return resulting pixmap
 MODULEBASE_EXPORT QPixmap composite(const QString& theAdditionalIcon, const QString& theIcon);
 
+/// Create composite pixmap.
+/// Pixmap \a theAdditionalIcon is drawn over pixmap \a dest with coordinates
+/// specified relatively to the upper left corner of \a theIcon.
+
+/// \param theAdditionalIcon additional pixmap
+/// \param theIcon background pixmap
+/// \return resulting pixmap
+MODULEBASE_EXPORT QPixmap composite(const QImage& theAdditionalIcon, QImage& theIcon);
+
 /// Generates the pixmap lighter than the resources pixmap.
 /// Pixmap \a theIcon is lighted according to the given value.
 /// If the lighter value is greater than 100, this functions returns a lighter pixmap.

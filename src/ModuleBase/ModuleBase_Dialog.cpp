@@ -75,7 +75,7 @@ ModuleBase_Dialog::ModuleBase_Dialog(ModuleBase_IWorkshop* theParent, const QStr
   aFrame->setFrameStyle(QFrame::WinPanel | QFrame::Raised);
   aLayout->addWidget(aFrame);
 
-  QVBoxLayout* aBtnLayout = new QVBoxLayout(aFrame);
+  QHBoxLayout* aBtnLayout = new QHBoxLayout(aFrame);
   ModuleBase_Tools::adjustMargins(aBtnLayout);
 
   myButtonsBox = new QDialogButtonBox(

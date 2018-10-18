@@ -82,7 +82,7 @@
 const std::string DebugFeatureKind = "";//"Extrusion";
 #endif
 
-XGUI_WorkshopListener::XGUI_WorkshopListener(ModuleBase_IWorkshop* theWorkshop)
+XGUI_WorkshopListener::XGUI_WorkshopListener(XGUI_Workshop* theWorkshop)
   : myWorkshop(theWorkshop),
     myUpdatePrefs(false)
 {
@@ -113,6 +113,8 @@ void XGUI_WorkshopListener::initializeEventListening()
 
   aLoop->registerListener(this, Events_Loop::eventByName("FinishOperation"));
   aLoop->registerListener(this, Events_Loop::eventByName("AbortOperation"));
+  aLoop->registerListener(this, Events_Loop::eventByName(EVENT_AUTOMATIC_RECOMPUTATION_ENABLE));
+  aLoop->registerListener(this, Events_Loop::eventByName(EVENT_AUTOMATIC_RECOMPUTATION_DISABLE));
 }
 
 //******************************************************
@@ -184,6 +186,11 @@ void XGUI_WorkshopListener::processEvent(const std::shared_ptr<Events_Message>& 
     // the viewer's update context is unblocked, the viewer's update works
     XGUI_Displayer* aDisplayer = workshop()->displayer();
     aDisplayer->enableUpdateViewer(true);
+  } else if ((theMessage->eventID() ==
+    Events_Loop::eventByName(EVENT_AUTOMATIC_RECOMPUTATION_ENABLE)) ||
+    (theMessage->eventID() ==
+      Events_Loop::eventByName(EVENT_AUTOMATIC_RECOMPUTATION_DISABLE))) {
+    myWorkshop->updateAutoComputeState();
   } else {
     //Show error dialog if error message received.
     std::shared_ptr<Events_InfoMessage> anIngfoMsg =
@@ -524,6 +531,5 @@ bool XGUI_WorkshopListener::customizeCurrentObject(const std::set<ObjectPtr>& th
 
 XGUI_Workshop* XGUI_WorkshopListener::workshop() const
 {
-  XGUI_ModuleConnector* aConnector = dynamic_cast<XGUI_ModuleConnector*>(myWorkshop);
-  return aConnector->workshop();
+  return myWorkshop;
 }

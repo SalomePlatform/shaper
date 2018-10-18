@@ -64,11 +64,12 @@ QIcon PartSet_IconFactory::getIcon(ObjectPtr theObj)
       }
       break;
       case ModelAPI_StateMustBeUpdated: {
-        anIcon = ModuleBase_Tools::lighter(anIconString);
+        anIcon = ModuleBase_Tools::composite(":icons/toWork.png", anIconString);
+        //anIcon = ModuleBase_Tools::lighter(anIconString);
       }
       break;
       case ModelAPI_StateExecFailed: {
-        anIcon = ModuleBase_Tools::composite(":icons/exec_state_failed.png", anIconString);
+        anIcon = ModuleBase_Tools::composite(":icons/isFailed.png", anIconString);
       }
       break;
       case ModelAPI_StateInvalidArgument: {
@@ -80,8 +81,8 @@ QIcon PartSet_IconFactory::getIcon(ObjectPtr theObj)
     }
   }
 
-  if (theObj->data() && theObj->data()->execState() == ModelAPI_StateMustBeUpdated)
-    return QIcon(":pictures/constr_object_modified.png");
+  //if (theObj->data() && theObj->data()->execState() == ModelAPI_StateMustBeUpdated)
+  //  return QIcon(":pictures/constr_object_modified.png");
 
   std::string aGroup = theObj->groupName();
   if (aGroup == ModelAPI_ResultPart::group())

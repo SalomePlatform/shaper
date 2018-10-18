@@ -42,7 +42,7 @@ public:
 
   /// Set general buttons from dialog
   /// \param theButtons the dialog buttons
-  void setDialogButtons(QDialogButtonBox* theButtons) { myOkCancelBtn = theButtons; }
+  virtual void setDialogButtons(QDialogButtonBox* theButtons) { myOkCancelBtn = theButtons; }
 
 protected:
 

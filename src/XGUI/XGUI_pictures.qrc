@@ -74,7 +74,8 @@
      <file>pictures/move_out_after.png</file>
      <file>pictures/move_out_before.png</file>
      <file>pictures/selection.png</file>
-     <file>pictures/autoapply.png</file>
+     <file>pictures/autoapply_start.png</file>
+     <file>pictures/autoapply_stop.png</file>
      <file>pictures/whatis.png</file>
  </qresource>
  </RCC>

@@ -176,7 +176,8 @@ void ParametersPlugin_TreeWidget::closeEditor(QWidget* theEditor,
 
 ParametersPlugin_WidgetParamsMgr::ParametersPlugin_WidgetParamsMgr(QWidget* theParent,
   const Config_WidgetAPI* theData)
-  : ModuleBase_ModelDialogWidget(theParent, theData)
+  : ModuleBase_ModelDialogWidget(theParent, theData),
+  isUpplyBlocked(false)
 {
   QVBoxLayout* aLayout = new QVBoxLayout(this);
 
@@ -247,6 +248,20 @@ ParametersPlugin_WidgetParamsMgr::ParametersPlugin_WidgetParamsMgr(QWidget* theP
 
   onSelectionChanged();
 }
+
+void ParametersPlugin_WidgetParamsMgr::setDialogButtons(QDialogButtonBox* theButtons)
+{
+  ModuleBase_ModelDialogWidget::setDialogButtons(theButtons);
+
+  QWidget* aBtnParentWgt = myOkCancelBtn->parentWidget();
+  QHBoxLayout* aBtnParentLayout = dynamic_cast<QHBoxLayout*>(aBtnParentWgt->layout());
+
+  QPushButton* aPreviewBtn = new QPushButton(tr("See preview"), aBtnParentWgt);
+  aBtnParentLayout->insertWidget(0, aPreviewBtn);
+  aBtnParentLayout->insertStretch(1, 1);
+  connect(aPreviewBtn, SIGNAL(clicked(bool)), SLOT(onShowPreview()));
+}
+
 
 QList<QWidget*> ParametersPlugin_WidgetParamsMgr::getControls() const
 {
@@ -783,3 +798,26 @@ bool ParametersPlugin_WidgetParamsMgr::isValid()
   return true;
 }
 
+void ParametersPlugin_WidgetParamsMgr::showEvent(QShowEvent* theEvent)
+{
+  ModuleBase_ModelDialogWidget::showEvent(theEvent);
+  SessionPtr aMgr = ModelAPI_Session::get();
+  isUpplyBlocked = aMgr->isAutoUpdateBlocked();
+  aMgr->blockAutoUpdate(true);
+  Events_Loop* aLoop = Events_Loop::loop();
+  aLoop->flush(aLoop->eventByName(EVENT_AUTOMATIC_RECOMPUTATION_DISABLE));
+}
+
+void ParametersPlugin_WidgetParamsMgr::hideEvent(QHideEvent* theEvent)
+{
+  ModuleBase_ModelDialogWidget::hideEvent(theEvent);
+  SessionPtr aMgr = ModelAPI_Session::get();
+  aMgr->blockAutoUpdate(isUpplyBlocked);
+}
+
+void ParametersPlugin_WidgetParamsMgr::onShowPreview()
+{
+  SessionPtr aMgr = ModelAPI_Session::get();
+  aMgr->blockAutoUpdate(false);
+  aMgr->blockAutoUpdate(true);
+}

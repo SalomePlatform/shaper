@@ -182,28 +182,32 @@ QPixmap composite(const QString& theAdditionalIcon, const QString& theIcon)
 {
   QImage anIcon = ModuleBase_IconFactory::loadImage(theIcon);
   QImage anAditional(theAdditionalIcon);
+  return composite(anAditional, anIcon);
+}
 
-  if (anIcon.isNull())
+QPixmap composite(const QImage& theAdditionalIcon, QImage& theIcon)
+{
+  if (theIcon.isNull())
     return QPixmap();
 
-  int anAddWidth = anAditional.width();
-  int anAddHeight = anAditional.height();
+  int anAddWidth = theAdditionalIcon.width();
+  int anAddHeight = theAdditionalIcon.height();
 
-  int aWidth = anIcon.width();
-  int aHeight = anIcon.height();
+  int aWidth = theIcon.width();
+  int aHeight = theIcon.height();
 
-  int aStartWidthPos = aWidth - anAddWidth - 1;
-  int aStartHeightPos = aHeight - anAddHeight - 1;
+  int aStartWidthPos = aWidth - anAddWidth;
+  int aStartHeightPos = aHeight - anAddHeight;
 
   for (int i = 0; i < anAddWidth && i + aStartWidthPos < aWidth; i++)
   {
     for (int j = 0; j < anAddHeight && j + aStartHeightPos < aHeight; j++)
     {
-      if (qAlpha(anAditional.pixel(i, j)) > 0)
-        anIcon.setPixel(i + aStartWidthPos, j + aStartHeightPos, anAditional.pixel(i, j));
+      if (qAlpha(theAdditionalIcon.pixel(i, j)) > 0)
+        theIcon.setPixel(i + aStartWidthPos, j + aStartHeightPos, theAdditionalIcon.pixel(i, j));
     }
   }
-  return QPixmap::fromImage(anIcon);
+  return QPixmap::fromImage(theIcon);
 }
 
 QPixmap lighter(const QString& theIcon, const int theLighterValue)

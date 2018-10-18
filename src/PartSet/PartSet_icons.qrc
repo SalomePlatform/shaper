@@ -19,5 +19,8 @@
      <file>icons/group_face.png</file>
      <file>icons/group_solid.png</file>
      <file>icons/group_vertex.png</file>
+     <file>icons/toWork.png</file>
+     <file>icons/isFailed.png</file>
+     <file>icons/hasWarning.png</file>
  </qresource>
  </RCC>

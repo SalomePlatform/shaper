@@ -187,7 +187,7 @@ XGUI_Workshop::XGUI_Workshop(XGUI_SalomeConnector* theConnector)
   myOperationMgr = new XGUI_OperationMgr(this, 0);
   ModuleBase_IWorkshop* aWorkshop = moduleConnector();
   // Has to be defined first in order to get errors and messages from other components
-  myEventsListener = new XGUI_WorkshopListener(aWorkshop);
+  myEventsListener = new XGUI_WorkshopListener(this);
   mySelectionActivate = new XGUI_SelectionActivate(aWorkshop);
 
   SUIT_ResourceMgr* aResMgr = ModuleBase_Preferences::resourceMgr();
@@ -491,12 +491,11 @@ void XGUI_Workshop::initMenu()
   aCommand->connectTo(this, SLOT(onOpen()));
 
 
-  aCommand = aGroup->addFeature("AUTOCOMPUTE_CMD", tr("Block auto-apply"),
+  aCommand = aGroup->addFeature("AUTOCOMPUTE_CMD", tr("Auto rebuild"),
                                 tr("Blocks immediate apply of modifications"),
-                                QIcon(":pictures/autoapply.png"), QString(),
-                                QKeySequence(), true, true);
-  aCommand->setChecked(ModelAPI_Session::get()->isAutoUpdateBlocked());
-  aCommand->connectTo(this, SLOT(onAutoApply(bool)));
+                                QIcon(":pictures/autoapply_start.png"), QKeySequence());
+  //aCommand->setChecked(ModelAPI_Session::get()->isAutoUpdateBlocked());
+  aCommand->connectTo(this, SLOT(onAutoApply()));
 
   aCommand = aGroup->addFeature("PREF_CMD", tr("Preferences"), tr("Edit preferences"),
                                 QIcon(":pictures/preferences.png"), QKeySequence::Preferences);
@@ -1327,7 +1326,10 @@ void XGUI_Workshop::updateCommandStatus()
           aCmd->setEnabled(myModule->canRedo());
       }
       else if (aId == "AUTOCOMPUTE_CMD") {
-        aCmd->setChecked(aMgr->isAutoUpdateBlocked());
+        //aCmd->setChecked(aMgr->isAutoUpdateBlocked());
+        aCmd->setIcon(aMgr->isAutoUpdateBlocked() ?
+          QIcon(":pictures/autoapply_stop.png") :
+          QIcon(":pictures/autoapply_start.png"));
       }
       else
         // Enable all commands
@@ -2824,8 +2826,32 @@ void XGUI_Workshop::moveOutFolder(bool isBefore)
   updateCommandStatus();
 }
 
-void XGUI_Workshop::onAutoApply(bool isToggle)
+void XGUI_Workshop::onAutoApply()
 {
   SessionPtr aMgr = ModelAPI_Session::get();
-  aMgr->blockAutoUpdate(isToggle);
+  bool isBlocked = aMgr->isAutoUpdateBlocked();
+  aMgr->blockAutoUpdate(!isBlocked);
+}
+
+void XGUI_Workshop::updateAutoComputeState()
+{
+  SessionPtr aMgr = ModelAPI_Session::get();
+  bool isComputeBlocked = aMgr->isAutoUpdateBlocked();
+#ifdef HAVE_SALOME
+  QAction* aUpdateCmd;
+  QList<QAction*> aCommands = workshop()->salomeConnector()->commandList();
+  foreach(QAction* aCmd, aCommands) {
+    if (aCmd->data().toString() == "AUTOCOMPUTE_CMD") {
+      aUpdateCmd = aCmd;
+      break;
+    }
+  }
+  aUpdateCmd->setIcon(isComputeBlocked? QIcon(":pictures/autoapply_stop.png") :
+    QIcon(":pictures/autoapply_start.png"));
+#else
+  AppElements_MainMenu* aMenuBar = myMainWindow->menuObject();
+  AppElements_Command* aUpdateCmd = aMenuBar->feature("AUTOCOMPUTE_CMD");
+  aUpdateCmd->button()->setIcon(isComputeBlocked? QIcon(":pictures/autoapply_stop.png") :
+    QIcon(":pictures/autoapply_start.png"));
+#endif
 }
