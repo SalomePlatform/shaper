@@ -970,7 +970,8 @@ void PartSet_SketcherMgr::startSketch(ModuleBase_Operation* theOperation)
   // Remove invalid sketch entities
   std::set<FeaturePtr> anInvalidFeatures;
   ModelAPI_ValidatorsFactory* aFactory = ModelAPI_Session::get()->validators();
-  for (int i = 0; i < myCurrentSketch->numberOfSubs(); i++) {
+  int aNumberOfSubs = myCurrentSketch->numberOfSubs();
+  for (int i = 0; i < aNumberOfSubs; i++) {
     FeaturePtr aFeature = myCurrentSketch->subFeature(i);
     if (aFeature.get()) {
       if (!aFactory->validate(aFeature))
@@ -1011,7 +1012,8 @@ void PartSet_SketcherMgr::startSketch(ModuleBase_Operation* theOperation)
   QStringList anInfo;
   Events_ID EVENT_DISP = Events_Loop::loop()->eventByName(EVENT_OBJECT_TO_REDISPLAY);
   const ModelAPI_EventCreator* aECreator = ModelAPI_EventCreator::get();
-  for (int i = 0; i < myCurrentSketch->numberOfSubs(); i++) {
+  aNumberOfSubs = myCurrentSketch->numberOfSubs();
+  for (int i = 0; i < aNumberOfSubs; i++) {
     FeaturePtr aFeature = myCurrentSketch->subFeature(i);
 #ifdef DEBUG_SKETCHER_ENTITIES
     anInfo.append(ModuleBase_Tools::objectInfo(aFeature));
@@ -1081,7 +1083,8 @@ void PartSet_SketcherMgr::stopSketch(ModuleBase_Operation* theOperation)
   }
   else {
     // Hide all sketcher sub-Objects
-    for (int i = 0; i < myCurrentSketch->numberOfSubs(); i++) {
+    int aNumberOfSubs = myCurrentSketch->numberOfSubs();
+    for (int i = 0; i < aNumberOfSubs; i++) {
       FeaturePtr aFeature = myCurrentSketch->subFeature(i);
       std::list<ResultPtr> aResults = aFeature->results();
       std::list<ResultPtr>::const_iterator aIt;
@@ -1479,7 +1482,7 @@ bool PartSet_SketcherMgr::isObjectOfSketch(const ObjectPtr& theObject) const
   FeaturePtr anObjectFeature = ModelAPI_Feature::feature(theObject);
   if (anObjectFeature.get()) {
     int aSize = myCurrentSketch->numberOfSubs();
-    for (int i = 0; i < myCurrentSketch->numberOfSubs() && !isFoundObject; i++) {
+    for (int i = 0; i < aSize && !isFoundObject; i++) {
       FeaturePtr aCurrentFeature = myCurrentSketch->subFeature(i);
       isFoundObject = myCurrentSketch->subFeature(i) == anObjectFeature;
     }
@@ -1900,7 +1903,8 @@ void PartSet_SketcherMgr::updateBySketchParameters(
       if (aPrevState != theState) {
         ModuleBase_IWorkshop* aWorkshop = myModule->workshop();
         XGUI_ModuleConnector* aConnector = dynamic_cast<XGUI_ModuleConnector*>(aWorkshop);
-        for (int i = 0; i < myCurrentSketch->numberOfSubs(); i++) {
+        int aNumberOfSubs = myCurrentSketch->numberOfSubs();
+        for (int i = 0; i < aNumberOfSubs; i++) {
           FeaturePtr aSubFeature = myCurrentSketch->subFeature(i);
           bool aProcessed = false;
           bool aConstraintDisplayed = canDisplayConstraint(aSubFeature, theType, aProcessed);

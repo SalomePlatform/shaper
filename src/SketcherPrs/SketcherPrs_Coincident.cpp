@@ -124,7 +124,8 @@ void SketcherPrs_Coincident::Compute(
     std::shared_ptr<GeomAPI_Pnt2d> aPnt = getCoincidencePoint(myConstraint);
     std::shared_ptr<GeomAPI_Pnt2d> aP;
     FeaturePtr aSub;
-    for (int i = 0; i < mySketch->numberOfSubs(); i++) {
+    int aNumberOfSubs = mySketch->numberOfSubs();
+    for (int i = 0; i < aNumberOfSubs; i++) {
       aSub = mySketch->subFeature(i);
       if (aSub->getKind() == SketchPlugin_ConstraintCoincidence::ID() &&
         aSub.get() != myConstraint) {

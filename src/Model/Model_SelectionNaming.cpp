@@ -806,6 +806,8 @@ std::string Model_SelectionNaming::shortName(
   aName.erase(std::remove(aName.begin(), aName.end(), '-'), aName.end());
   aName.erase(std::remove(aName.begin(), aName.end(), '/'), aName.end());
   aName.erase(std::remove(aName.begin(), aName.end(), '&'), aName.end());
+  if (aName.empty())
+    return "";
   // remove the last 's', 'e', 'f' and 'r' symbols:
   // they are used as markers of start/end/forward/rewersed indicators
   static const std::string aSyms("sefr");

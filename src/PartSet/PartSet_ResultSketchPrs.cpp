@@ -285,7 +285,8 @@ void PartSet_ResultSketchPrs::fillShapes(TopoDS_Shape& theResultShape,
   CompositeFeaturePtr aSketchFeature = std::dynamic_pointer_cast<ModelAPI_CompositeFeature>
                                                                           (aResultFeature);
   std::list<ResultPtr> anAuxiliaryResults;
-  for (int i = 0; i < aSketchFeature->numberOfSubs(); i++) {
+  int aNumberOfSubs = aSketchFeature->numberOfSubs();
+  for (int i = 0; i < aNumberOfSubs; i++) {
     FeaturePtr aFeature = aSketchFeature->subFeature(i);
     if (PartSet_Tools::isAuxiliarySketchEntity(aFeature)) {
       std::list<ResultPtr> aResults = aFeature->results();

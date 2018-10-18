@@ -192,9 +192,11 @@ void Model_ResultConstruction::storeShape(std::shared_ptr<GeomAPI_Shape> theShap
 {
   std::shared_ptr<Model_Data> aData = std::dynamic_pointer_cast<Model_Data>(data());
   if (aData && aData->isValid()) {
+    std::string aMyName = data()->name();
     TDF_Label& aShapeLab = aData->shapeLab();
     if (!theShape.get() || theShape->isNull()) {
       aShapeLab.ForgetAllAttributes();
+      TDataStd_Name::Set(aShapeLab, aMyName.c_str()); // restore name forgotten
       return;
     }
     std::shared_ptr<Model_Document> aMyDoc =
@@ -204,7 +206,6 @@ void Model_ResultConstruction::storeShape(std::shared_ptr<GeomAPI_Shape> theShap
       aShapeLab.ForgetAllAttributes(); // clear all previously stored
       TNaming_Builder aBuilder(aShapeLab);
       aBuilder.Generated(aShape);
-      std::string aMyName = data()->name();
       TDataStd_Name::Set(aShapeLab, aMyName.c_str());
       aMyDoc->addNamingName(aShapeLab, aMyName);
     } else if (aShape.ShapeType() == TopAbs_EDGE) { // store sub-vertices on sub-labels
@@ -221,7 +222,6 @@ void Model_ResultConstruction::storeShape(std::shared_ptr<GeomAPI_Shape> theShap
         TDataStd_Name::Set(aSubLab, aVertexName.c_str());
         aMyDoc->addNamingName(aSubLab, aVertexName);
       }
-      std::string aMyName = data()->name();
       TDataStd_Name::Set(aShapeLab, aMyName.c_str());
       aMyDoc->addNamingName(aShapeLab, aMyName);
     } else { // this is probably sketch, so, work with it as with composite
@@ -327,8 +327,10 @@ void Model_ResultConstruction::storeShape(std::shared_ptr<GeomAPI_Shape> theShap
         }
       }
       aShapeLab.ForgetAllAttributes(); // clear all previously stored
+      TDataStd_Name::Set(aShapeLab, aMyName.c_str()); // restore name forgotten
       TNaming_Builder aBuilder(aShapeLab); // store the compound to get it ready on open of document
       aBuilder.Generated(aShape);
+      aMyDoc->addNamingName(aShapeLab, aMyName);
       // set new faces to the labels
       int aCurrentTag = 1;
       NCollection_List<TopoDS_Face>::Iterator anUnordered(anUnorderedFaces);

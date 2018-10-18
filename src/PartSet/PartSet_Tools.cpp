@@ -664,7 +664,8 @@ void PartSet_Tools::sendSubFeaturesEvent(const CompositeFeaturePtr& theComposite
     return;
 
   static Events_Loop* aLoop = Events_Loop::loop();
-  for (int i = 0; i < theComposite->numberOfSubs(); i++) {
+  int aNumberOfSubs = theComposite->numberOfSubs();
+  for (int i = 0; i < aNumberOfSubs; i++) {
     FeaturePtr aSubFeature = theComposite->subFeature(i);
     static const ModelAPI_EventCreator* aECreator = ModelAPI_EventCreator::get();
     aECreator->sendUpdated(aSubFeature, theEventId);

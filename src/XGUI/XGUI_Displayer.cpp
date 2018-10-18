@@ -454,8 +454,9 @@ bool XGUI_Displayer::isVisible(XGUI_Displayer* theDisplayer, const ObjectPtr& th
     if (!aVisible && aResult.get() && aResult->groupName() == ModelAPI_ResultBody::group()) {
       ResultBodyPtr aCompsolidResult = std::dynamic_pointer_cast<ModelAPI_ResultBody>(aResult);
       if (aCompsolidResult.get() != NULL) { // change colors for all sub-solids
-        bool anAllSubsVisible = aCompsolidResult->numberOfSubs() > 0;
-        for(int i = 0; i < aCompsolidResult->numberOfSubs() && anAllSubsVisible; i++) {
+        int aNumberOfSubs = aCompsolidResult->numberOfSubs();
+        bool anAllSubsVisible = aNumberOfSubs > 0;
+        for(int i = 0; i < aNumberOfSubs && anAllSubsVisible; i++) {
           anAllSubsVisible = theDisplayer->isVisible(aCompsolidResult->subResult(i));
         }
         aVisible = anAllSubsVisible;

@@ -1636,6 +1636,29 @@ bool Model_AttributeSelection::restoreContext(std::string theName,
   static const ResultPtr anEmpty;
   theValue = aDoc->findNamingName(aSubShapeName, anUniqueContext ? aCont : anEmpty);
 
+  // sketch sub-component shape and name is located in separated feature label, try the sub-name
+  if (theValue.IsNull() && aCont->groupName() == ModelAPI_ResultConstruction::group()) {
+    std::string::size_type aSlash = aSubShapeName.rfind('/');
+    if (aSlash != std::string::npos) {
+      std::string aCompName = aSubShapeName.substr(aSlash + 1);
+      CompositeFeaturePtr aComposite =
+        std::dynamic_pointer_cast<ModelAPI_CompositeFeature>(aDoc->feature(aCont));
+      if (aComposite.get() && aComposite->numberOfSubs()) {
+        const int aSubNum = aComposite->numberOfSubs();
+        for (int a = 0; a < aSubNum; a++) {
+          FeaturePtr aSub = aComposite->subFeature(a);
+          const std::list<std::shared_ptr<ModelAPI_Result> >& aResults = aSub->results();
+          std::list<std::shared_ptr<ModelAPI_Result> >::const_iterator aRes = aResults.cbegin();
+          for (; aRes != aResults.cend(); aRes++) {
+            if ((*aRes)->data()->name() == aCompName) {
+              theValue = std::dynamic_pointer_cast<Model_Data>((*aRes)->data())->shapeLab();
+            }
+          }
+        }
+      }
+    }
+  }
+
   /* to find the latest lower result that keeps given shape
   bool aFindNewContext = true;
   while(aFindNewContext && aCont.get()) {

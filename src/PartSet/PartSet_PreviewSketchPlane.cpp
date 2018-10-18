@@ -143,7 +143,8 @@ bool PartSet_PreviewSketchPlane::getDefaultSizeOfView(
     return false;
 
   Bnd_Box aBox;
-  for (int aSubFeatureId = 0; aSubFeatureId < theSketch->numberOfSubs(); aSubFeatureId++) {
+  int aNumberOfSubs = theSketch->numberOfSubs();
+  for (int aSubFeatureId = 0; aSubFeatureId < aNumberOfSubs; aSubFeatureId++) {
     FeaturePtr aFeature = theSketch->subFeature(aSubFeatureId);
     if (!aFeature.get())
       continue;

@@ -162,7 +162,8 @@ void PartSet_OverconstraintListener::processEvent(
       PartSet_Module* aModule = dynamic_cast<PartSet_Module*>(myWorkshop->module());
       CompositeFeaturePtr aSketch = aModule->sketchMgr()->activeSketch();
       if (aSketch.get()) {
-        for (int i = 0; i < aSketch->numberOfSubs(); i++) {
+        int aNumberOfSubs = aSketch->numberOfSubs();
+        for (int i = 0; i < aNumberOfSubs; i++) {
           FeaturePtr aFeature = aSketch->subFeature(i);
           aModifiedObjects.insert(aFeature); // is necessary to redisplay presentations
           std::list<ResultPtr> aResults = aFeature->results();
