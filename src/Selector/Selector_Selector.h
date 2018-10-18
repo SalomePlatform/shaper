@@ -78,7 +78,8 @@ class Selector_Selector
 
    /// Restores the selected shape by the topological name string.
    /// Returns not empty label of the context.
-   SELECTOR_EXPORT TDF_Label restoreByName(std::string theName,
+   SELECTOR_EXPORT TDF_Label restoreByName(
+     std::string theName, const TopAbs_ShapeEnum theShapeType,
      Selector_NameGenerator* theNameGenerator);
 
   /// Updates the current shape by the stored topological name

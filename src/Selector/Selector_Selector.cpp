@@ -734,12 +734,12 @@ std::string Selector_Selector::name(Selector_NameGenerator* theNameGenerator) {
   case SELTYPE_CONTAINER:
   case SELTYPE_INTERSECT: {
     std::string aResult;
-    // add names of sub-components one by one separated by "&"
+    // add names of sub-components one by one in "[]"
     std::list<Selector_Selector>::iterator aSubSel = mySubSelList.begin();
     for(; aSubSel != mySubSelList.end(); aSubSel++) {
-      if (aSubSel != mySubSelList.begin())
-        aResult += "&";
+      aResult += '[';
       aResult += aSubSel->name(theNameGenerator);
+      aResult += ']';
     }
     return aResult;
   }
@@ -751,13 +751,13 @@ std::string Selector_Selector::name(Selector_NameGenerator* theNameGenerator) {
       std::string(TCollection_AsciiString(aName->Get()).ToCString());
   }
   case SELTYPE_MODIFICATION: {
-    // final&/base1&base2
+    // final&base1&base2
     std::string aResult;
     Handle(TDataStd_Name) aName;
     if (!myFinal.FindAttribute(TDataStd_Name::GetID(), aName))
       return "";
     aResult += theNameGenerator->contextName(myFinal) + "/" +
-      std::string(TCollection_AsciiString(aName->Get()).ToCString()) + "&/";
+      std::string(TCollection_AsciiString(aName->Get()).ToCString()) + "&";
     for(TDF_LabelList::iterator aBase = myBases.begin(); aBase != myBases.end(); aBase++) {
       if (aBase != myBases.begin())
         aResult += "&";
@@ -774,13 +774,11 @@ std::string Selector_Selector::name(Selector_NameGenerator* theNameGenerator) {
     return aResult;
   }
   case SELTYPE_FILTER_BY_NEIGHBOR: {
-    // (nb1)level_if_more_than_1&(nb2)level_if_more_than_1&(nb3)level_if_more_than_1
+    // (nb1)level_if_more_than_1(nb2)level_if_more_than_1(nb3)level_if_more_than_1
     std::string aResult;
     std::list<int>::iterator aLevel = myNBLevel.begin();
     std::list<Selector_Selector>::iterator aSubSel = mySubSelList.begin();
     for(; aSubSel != mySubSelList.end(); aSubSel++, aLevel++) {
-      if (aSubSel != mySubSelList.begin())
-        aResult += "&";
       aResult += "(" + aSubSel->name(theNameGenerator) + ")";
       if (*aLevel > 1)
         aResult += *aLevel;
@@ -793,17 +791,112 @@ std::string Selector_Selector::name(Selector_NameGenerator* theNameGenerator) {
   return "";
 }
 
-TDF_Label Selector_Selector::restoreByName(std::string theName,
+TDF_Label Selector_Selector::restoreByName(
+  std::string theName, const TopAbs_ShapeEnum theShapeType,
   Selector_NameGenerator* theNameGenerator)
 {
-  if (theName.find('&') == std::string::npos) { // wihtout '&' it can be only primitive
+  if (theName[0] == '[') { // intersection or container
+    switch(theShapeType) {
+    case TopAbs_COMPOUND:
+    case TopAbs_COMPSOLID:
+    case TopAbs_SHELL:
+    case TopAbs_WIRE:
+      myType = SELTYPE_CONTAINER;
+      break;
+    case TopAbs_EDGE:
+    case TopAbs_FACE:
+      myType = SELTYPE_INTERSECT;
+      break;
+    default:
+      return TDF_Label(); // unknown case
+    }
+    myShapeType = theShapeType;
+    TDF_Label aContext;
+    for(size_t aStart = 0; aStart != std::string::npos;
+        aStart = theName.find('[', aStart + 1)) {
+      size_t anEndPos = theName.find(']', aStart + 1);
+      if (anEndPos != std::string::npos) {
+        std::string aSubStr = theName.substr(aStart + 1, anEndPos - aStart - 1);
+        mySubSelList.push_back(Selector_Selector(myLab.FindChild(int(mySubSelList.size()) + 1)));
+        TDF_Label aSubContext =
+          mySubSelList.back().restoreByName(aSubStr, theShapeType, theNameGenerator);
+        if (aSubContext.IsNull())
+          return aSubContext; // invalid sub-selection parsing
+        if (!aContext.IsNull() && !aContext.IsEqual(aSubContext)) {
+          if (theNameGenerator->isLater(aSubContext, aContext))
+            aContext = aSubContext;
+        } else {
+          aContext = aSubContext;
+        }
+      } else
+        return TDF_Label(); // invalid parentheses
+    }
+    return aContext;
+  } else if (theName[0] == '(') { // filter by neighbours
+    myType = SELTYPE_FILTER_BY_NEIGHBOR;
+    TDF_Label aContext;
+    for(size_t aStart = 0; aStart != std::string::npos;
+      aStart = theName.find('(', aStart + 1)) {
+      size_t anEndPos = theName.find(')', aStart + 1);
+      if (anEndPos != std::string::npos) {
+        std::string aSubStr = theName.substr(aStart + 1, anEndPos - aStart - 1);
+        mySubSelList.push_back(Selector_Selector(myLab.FindChild(int(mySubSelList.size()) + 1)));
+        TDF_Label aSubContext =
+          mySubSelList.back().restoreByName(aSubStr, theShapeType, theNameGenerator);
+        if (aSubContext.IsNull())
+          return aSubContext; // invalid sub-selection parsing
+        if (!aContext.IsNull() && !aContext.IsEqual(aSubContext)) {
+          if (theNameGenerator->isLater(aSubContext, aContext))
+            aContext = aSubContext;
+        } else {
+          aContext = aSubContext;
+        }
+        // searching for the level index
+        std::string aLevel;
+        for(anEndPos++; anEndPos != std::string::npos &&
+                        theName[anEndPos] != '(' && theName[anEndPos] != 0;
+            anEndPos++) {
+          aLevel += theName[anEndPos];
+        }
+        if (aLevel.empty())
+          myNBLevel.push_back(1); // by default it is 1
+        else {
+          int aNum = atoi(aLevel.c_str());
+          if (aNum > 0)
+            myNBLevel.push_back(aNum);
+          else
+            return TDF_Label(); // invalid number
+        }
+      } else
+        return TDF_Label(); // invalid parentheses
+    }
+    return aContext;
+  } else if (theName.find('&') == std::string::npos) { // wihtout '&' it can be only primitive
     myType = SELTYPE_PRIMITIVE;
     TDF_Label aContext;
     if (theNameGenerator->restoreContext(theName, aContext, myFinal)) {
       if (!myFinal.IsNull())
         return aContext;
     }
-  } else {
+  } else { // modification
+    myType = SELTYPE_MODIFICATION;
+    TDF_Label aContext;
+    for(size_t anEnd, aStart = 0; aStart != std::string::npos; aStart = anEnd) {
+      anEnd = theName.find('&', aStart + 1);
+      std::string aSubStr = theName.substr(aStart == 0 ? 0 : aStart + 1,
+        anEnd == std::string::npos ? anEnd : anEnd - aStart);
+      TDF_Label aSubContext, aValue;
+      if (!theNameGenerator->restoreContext(aSubStr, aSubContext, aValue))
+        return TDF_Label(); // can not restore
+      if(aSubContext.IsNull() || aValue.IsNull())
+        return TDF_Label(); // can not restore
+      if (myFinal.IsNull()) {
+        myFinal = aValue;
+        aContext = aSubContext;
+      } else
+        myBases.Append(aValue);
+    }
+    return aContext;
   }
   return TDF_Label();
 }

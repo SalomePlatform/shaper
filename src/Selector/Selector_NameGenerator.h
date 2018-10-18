@@ -44,6 +44,9 @@ public:
   /// sub-label where the value is. Returns true if it is valid.
   virtual bool restoreContext(std::string theName,
     TDF_Label& theContext, TDF_Label& theValue) = 0;
+
+  /// Returns true if the first result is older than the second one in the tree of features
+  virtual bool isLater(const TDF_Label theResult1, const TDF_Label theResult2) const = 0;
 };
 
 #endif

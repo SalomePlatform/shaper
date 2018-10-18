@@ -141,6 +141,10 @@ public:
   MODEL_EXPORT virtual bool restoreContext(std::string theName,
     TDF_Label& theContext, TDF_Label& theValue) override;
 
+  /// Returns true if the first result is newer than the second one in the tree of features
+  MODEL_EXPORT virtual bool isLater(const TDF_Label theResult1, const TDF_Label theResult2)
+    const override;
+
 protected:
   /// Objects are created for features automatically
   MODEL_EXPORT Model_AttributeSelection(TDF_Label& theLabel);

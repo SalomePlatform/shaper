@@ -342,8 +342,8 @@ std::shared_ptr<GeomAPI_Shape> Model_AttributeSelection::internalValue(CenterTyp
   if (myRef.isInitialized()) {
     if (aSelLab.IsAttribute(kSIMPLE_REF_ID)) { // it is just reference to shape, not sub-shape
       ResultPtr aContext = context();
-      if (!aContext.get())
-        return aResult; // empty result
+      if (!aContext.get() || aContext->groupName() == ModelAPI_ResultConstruction::group())
+        return aResult; // empty result, for whole construction selection also
       return aContext->shape();
     }
     if (aSelLab.IsAttribute(kPART_REF_ID)) {
@@ -955,6 +955,7 @@ void Model_AttributeSelection::selectSubShape(
   CenterType aCenterType = theType[0] == 'v' || theType[0] == 'V' ? // only for vertex-type
     centerTypeByName(aSubShapeName) : NOT_CENTER;
   std::string aType = aCenterType == NOT_CENTER ? theType : "EDGE"; // search for edge now
+  TopAbs_ShapeEnum aShapeType =  TopAbs_ShapeEnum(GeomAPI_Shape::shapeTypeByStr(theType));
   static const GeomShapePtr anEmptyShape;
 
   // first iteration is selection by name without center prefix, second - in case of problem,
@@ -1010,7 +1011,7 @@ void Model_AttributeSelection::selectSubShape(
 
     Selector_Selector aSelector(aDoc->generalLabel());
     myRestoreDocument = aDoc;
-    TDF_Label aContextLabel = aSelector.restoreByName(aSubShapeName, this);
+    TDF_Label aContextLabel = aSelector.restoreByName(aSubShapeName, aShapeType, this);
     myRestoreDocument.reset();
     if (!aContextLabel.IsNull()) {
       ResultPtr aContext = aDoc->resultByLab(aContextLabel); // any label for document access
@@ -1766,4 +1767,18 @@ bool Model_AttributeSelection::restoreContext(std::string theName,
     theContext = std::dynamic_pointer_cast<Model_Data>(aCont->data())->label();
   }
   return true;
+}
+
+bool Model_AttributeSelection::isLater(
+  const TDF_Label theResult1, const TDF_Label theResult2) const
+{
+  std::shared_ptr<Model_Document> aDoc = myRestoreDocument.get() ? myRestoreDocument :
+    std::dynamic_pointer_cast<Model_Document>(owner()->document());
+  FeaturePtr aFeat1 = aDoc->featureByLab(theResult1);
+  if (!aFeat1.get())
+    return false;
+  FeaturePtr aFeat2 = aDoc->featureByLab(theResult2);
+  if (!aFeat2.get())
+    return false;
+  return aDoc->isLater(aFeat1, aFeat2);
 }
