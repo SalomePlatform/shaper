@@ -171,4 +171,6 @@ void SketchSolver_ConstraintDistance::removeConstraintsKeepingSign()
   aGCSConstraints.pop_back();
   aConstraint->setConstraints(aGCSConstraints);
   aStorage->addConstraint(myBaseConstraint, aConstraint);
+
+  myIsSigned = false;
 }
