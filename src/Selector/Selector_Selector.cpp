@@ -729,6 +729,8 @@ TopoDS_Shape Selector_Selector::value()
   return TopoDS_Shape(); // empty, error shape
 }
 
+static const std::string kWEAK_NAME_IDENTIFIER = "weak_name_";
+
 std::string Selector_Selector::name(Selector_NameGenerator* theNameGenerator) {
   switch(myType) {
   case SELTYPE_CONTAINER:
@@ -751,7 +753,7 @@ std::string Selector_Selector::name(Selector_NameGenerator* theNameGenerator) {
       std::string(TCollection_AsciiString(aName->Get()).ToCString());
   }
   case SELTYPE_MODIFICATION: {
-    // final&base1&base2
+    // final&base1&base2 +optionally: [weak_name_1]
     std::string aResult;
     Handle(TDataStd_Name) aName;
     if (!myFinal.FindAttribute(TDataStd_Name::GetID(), aName))
@@ -767,7 +769,7 @@ std::string Selector_Selector::name(Selector_NameGenerator* theNameGenerator) {
         std::string(TCollection_AsciiString(aName->Get()).ToCString());
       if (myWeakIndex != -1) {
         std::ostringstream aWeakStr;
-        aWeakStr<<"&weak_name_"<<myWeakIndex;
+        aWeakStr<<"&"<<kWEAK_NAME_IDENTIFIER<<myWeakIndex;
         aResult += aWeakStr.str();
       }
     }
@@ -882,9 +884,16 @@ TDF_Label Selector_Selector::restoreByName(
     myType = SELTYPE_MODIFICATION;
     TDF_Label aContext;
     for(size_t anEnd, aStart = 0; aStart != std::string::npos; aStart = anEnd) {
-      anEnd = theName.find('&', aStart + 1);
-      std::string aSubStr = theName.substr(aStart == 0 ? 0 : aStart + 1,
-        anEnd == std::string::npos ? anEnd : anEnd - aStart);
+      if (aStart != 0)
+        aStart++;
+      anEnd = theName.find('&', aStart);
+      std::string aSubStr =
+        theName.substr(aStart, anEnd == std::string::npos ? anEnd : anEnd - aStart);
+      if (aSubStr.find(kWEAK_NAME_IDENTIFIER) == 0) { // weak name identifier
+        std::string aWeakIndex = aSubStr.substr(kWEAK_NAME_IDENTIFIER.size());
+        myWeakIndex = atoi(aWeakIndex.c_str());
+        continue;
+      }
       TDF_Label aSubContext, aValue;
       if (!theNameGenerator->restoreContext(aSubStr, aSubContext, aValue))
         return TDF_Label(); // can not restore
