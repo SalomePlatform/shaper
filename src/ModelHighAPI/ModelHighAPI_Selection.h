@@ -24,6 +24,7 @@
 //--------------------------------------------------------------------------------------
 #include "ModelHighAPI.h"
 
+#include <list>
 #include <memory>
 #include <string>
 #include <utility>
@@ -74,6 +75,11 @@ public:
   MODELHIGHAPI_EXPORT
   ModelHighAPI_Selection(const std::string& theType,
                          const std::shared_ptr<GeomAPI_Pnt>& theSubShapeInnerPoint);
+
+  /// Constructor for sub-shape by inner point coordinates given by a tuple
+  MODELHIGHAPI_EXPORT
+  ModelHighAPI_Selection(const std::string& theType,
+                         const std::list<double>& theSubShapeInnerPoint);
 
 
   /// Constructor for sub-shape by weak naming identifier

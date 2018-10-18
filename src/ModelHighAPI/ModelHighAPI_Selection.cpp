@@ -59,6 +59,20 @@ ModelHighAPI_Selection::ModelHighAPI_Selection(const std::string& theType,
 }
 
 ModelHighAPI_Selection::ModelHighAPI_Selection(const std::string& theType,
+                                               const std::list<double>& theSubShapeInnerPoint)
+: myVariantType(VT_TypeInnerPointPair)
+{
+  double aCoordinates[3] = { 0.0, 0.0, 0.0 };
+  double* aCIt = aCoordinates;
+  std::list<double>::const_iterator aPIt = theSubShapeInnerPoint.begin();
+  for (; aPIt != theSubShapeInnerPoint.end(); ++aPIt, ++aCIt)
+    *aCIt = *aPIt;
+
+  GeomPointPtr anInnerPoint(new GeomAPI_Pnt(aCoordinates[0], aCoordinates[1], aCoordinates[2]));
+  myTypeInnerPointPair = std::pair<std::string, GeomPointPtr>(theType, anInnerPoint);
+}
+
+ModelHighAPI_Selection::ModelHighAPI_Selection(const std::string& theType,
   const std::string& theContextName, const int theIndex)
   : myVariantType(VT_WeakNamingPair)
   , myWeakNamingPair(theType, std::pair<std::string, int>(theContextName, theIndex))

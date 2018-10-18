@@ -344,6 +344,47 @@
   }
 }
 
+%typemap(in) const std::list<double> & (std::list<double> temp) {
+  double * temp_attribute;
+  int newmem = 0;
+  if (PyTuple_Check($input)) {
+    for (Py_ssize_t i = 0; i < PyTuple_Size($input); ++i) {
+      PyObject * item = PySequence_GetItem($input, i);
+      if (PyNumber_Check(item)) {
+        temp.push_back((double)PyFloat_AsDouble(item));
+      } else {
+        PyErr_SetString(PyExc_TypeError, "argument must double value.");
+        return NULL;
+      }
+      Py_DECREF(item);
+    }
+    $1 = &temp;
+  } else {
+    PyErr_SetString(PyExc_ValueError, "argument must be a tuple of double values.");
+    return NULL;
+  }
+}
+
+%typecheck(SWIG_TYPECHECK_POINTER) std::list<double>, const std::list<double>& {
+  double * temp_object;
+  std::shared_ptr<ModelHighAPI_Interface> * temp_interface;
+  int newmem = 0;
+  if (PyTuple_Check($input)) {
+    for (Py_ssize_t i = 0; i < PyTuple_Size($input); ++i) {
+      PyObject * item = PySequence_GetItem($input, i);
+      if (PyNumber_Check(item)) {
+        $1 = 1;
+      } else {
+        $1 = 0;
+        break;
+      }
+      Py_DECREF(item);
+    }
+  } else {
+    $1 = 0;
+  }
+}
+
 // all supported interfaces
 %include "ModelHighAPI_Double.h"
 %include "ModelHighAPI_Dumper.h"

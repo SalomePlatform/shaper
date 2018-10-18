@@ -1091,8 +1091,10 @@ ModelHighAPI_Dumper& ModelHighAPI_Dumper::operator<<(
       anIndex = anOutput.str();
     }
 
-    myDumpBuffer << anIndex << "\", ";
-    *this << aMiddlePoint;
+    myDumpBuffer << anIndex << "\", ("
+                 << aMiddlePoint->x() << ", "
+                 << aMiddlePoint->y() << ", "
+                 << aMiddlePoint->z() << ")";
     aStandardDump = false;
   } else if (theAttrSelect->isWeakNaming() ||
     (myWeakNamingSelection && aShape.get() && theAttrSelect->context().get() &&
