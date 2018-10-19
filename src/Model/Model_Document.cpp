@@ -1494,7 +1494,7 @@ bool Model_Document::isLaterByDep(FeaturePtr theThis, FeaturePtr theOther) {
           aRefFeat = feature(std::dynamic_pointer_cast<ModelAPI_Result>(aRefObj));
         }
         if (aRefFeat.get() && aRefFeat == theThis) {
-          return false; // other references to this, so this later than other
+          return false; // other references to this, so other later than this
         }
       }
     }

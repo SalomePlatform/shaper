@@ -23,7 +23,6 @@
 #include "Model_Events.h"
 #include "Model_Data.h"
 #include "Model_Document.h"
-#include "Model_SelectionNaming.h"
 #include <Model_Objects.h>
 #include <Model_AttributeSelectionList.h>
 #include <Model_ResultConstruction.h>
@@ -45,7 +44,6 @@
 #include <GeomAlgoAPI_NExplode.h>
 #include <Selector_Selector.h>
 
-#include <TNaming_Selector.hxx>
 #include <TNaming_NamedShape.hxx>
 #include <TNaming_Tool.hxx>
 #include <TNaming_Builder.hxx>
@@ -60,6 +58,7 @@
 #include <TopExp_Explorer.hxx>
 #include <BRep_Tool.hxx>
 #include <TopoDS.hxx>
+#include <TopoDS_Edge.hxx>
 #include <TopExp.hxx>
 #include <TDF_ChildIterator.hxx>
 #include <TDF_ChildIDIterator.hxx>
@@ -532,69 +531,6 @@ void Model_AttributeSelection::setObject(const std::shared_ptr<ModelAPI_Object>&
   myRef.setObject(theObject);
 }
 
-TDF_LabelMap& Model_AttributeSelection::scope()
-{
-  if (myScope.IsEmpty()) { // create a new scope if not yet done
-    // gets all features with named shapes that are before this feature label (before in history)
-    DocumentPtr aMyDoc = owner()->document();
-    std::list<std::shared_ptr<ModelAPI_Feature> > allFeatures = aMyDoc->allFeatures();
-    std::list<std::shared_ptr<ModelAPI_Feature> >::iterator aFIter = allFeatures.begin();
-    bool aMePassed = false;
-    CompositeFeaturePtr aComposite =
-      std::dynamic_pointer_cast<ModelAPI_CompositeFeature>(owner());
-    FeaturePtr aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(owner());
-    CompositeFeaturePtr aCompositeOwner, aCompositeOwnerOwner;
-    if (aFeature.get()) {
-      aCompositeOwner = ModelAPI_Tools::compositeOwner(aFeature);
-      if (aCompositeOwner.get()) {
-         aCompositeOwnerOwner = ModelAPI_Tools::compositeOwner(aCompositeOwner);
-      }
-    }
-    // for group Scope is not limitet: this is always up to date objects
-    // this causes problem in galeries.py
-    //bool isGroup = aFeature.get() && aFeature->getKind() == "Group";
-    for(; aFIter != allFeatures.end(); aFIter++) {
-      if (*aFIter == owner()) {  // the left features are created later (except subs of composite)
-        aMePassed = true;
-        continue;
-      }
-      //if (isGroup) aMePassed = false;
-      bool isInScope = !aMePassed;
-      if (!isInScope && aComposite.get()) {
-        // try to add sub-elements of composite if this is composite
-        if (aComposite->isSub(*aFIter))
-          isInScope = true;
-      }
-      // remove the composite-owner of this feature (sketch in extrusion-cut)
-      if (isInScope && (aCompositeOwner == *aFIter || aCompositeOwnerOwner == *aFIter))
-        isInScope = false;
-
-      if (isInScope && aFIter->get() && (*aFIter)->data()->isValid()) {
-        TDF_Label aFeatureLab = std::dynamic_pointer_cast<Model_Data>(
-          (*aFIter)->data())->label().Father();
-        TDF_ChildIDIterator aNSIter(aFeatureLab, TNaming_NamedShape::GetID(), true);
-        for(; aNSIter.More(); aNSIter.Next()) {
-          Handle(TNaming_NamedShape) aNS = Handle(TNaming_NamedShape)::DownCast(aNSIter.Value());
-          if (!aNS.IsNull() && aNS->Evolution() != TNaming_SELECTED) {
-            myScope.Add(aNS->Label());
-          }
-        }
-      }
-    }
-    // also add all naming labels created for external constructions
-    std::shared_ptr<Model_Document> aDoc = std::dynamic_pointer_cast<Model_Document>(aMyDoc);
-    TDF_Label anExtDocLab = aDoc->extConstructionsLabel();
-    TDF_ChildIDIterator aNSIter(anExtDocLab, TNaming_NamedShape::GetID(), true);
-    for(; aNSIter.More(); aNSIter.Next()) {
-      Handle(TNaming_NamedShape) aNS = Handle(TNaming_NamedShape)::DownCast(aNSIter.Value());
-      if (!aNS.IsNull() && aNS->Evolution() != TNaming_SELECTED) {
-        myScope.Add(aNS->Label());
-      }
-    }
-  }
-  return myScope;
-}
-
 /// Sets the invalid flag if flag is false, or removes it if "true"
 /// Returns theFlag
 static bool setInvalidIfFalse(TDF_Label& theLab, const bool theFlag) {
@@ -636,6 +572,7 @@ bool Model_AttributeSelection::update()
 {
   FeaturePtr aContextFeature = contextFeature();
   if (aContextFeature.get()) {
+    owner()->data()->sendAttributeUpdated(this);  // send updated if "update" called in any way
     return true;
   }
   TDF_Label aSelLab = selectionLabel();
@@ -688,13 +625,7 @@ bool Model_AttributeSelection::update()
       anOldShape = aNS->Get();
 
     Selector_Selector aSelector(aSelLab);
-    if (!aSelector.restore()) { // it is stored in old OCCT format, use TNaming_Selector
-      TNaming_Selector aSelector(aSelLab);
-      if (!aSelector.NamedShape().IsNull()) {
-        anOldShape = aSelector.NamedShape()->Get();
-      }
-      aResult = aSelector.Solve(scope()) == Standard_True;
-    } else {
+    if (aSelector.restore()) { // it is stored in old OCCT format, use TNaming_Selector
       TopoDS_Shape aContextShape = aContext->shape()->impl<TopoDS_Shape>();
       aResult = aSelector.solve(aContextShape);
     }
@@ -724,11 +655,16 @@ bool Model_AttributeSelection::update()
     if (!aConstructionContext->isInfinite()) {
       Selector_Selector aSelector(aSelLab);
       aResult = aSelector.restore();
+      TopoDS_Shape anOldShape = aSelector.value();
       if (aResult) {
         TopoDS_Shape aContextShape = aContext->shape()->impl<TopoDS_Shape>();
         aResult = aSelector.solve(aContextShape);
       }
       aResult = setInvalidIfFalse(aSelLab, aResult);
+      if (aResult && !anOldShape.IsEqual(aSelector.value()))
+        owner()->data()->sendAttributeUpdated(this);  // send updated if shape is changed
+    } else {
+      owner()->data()->sendAttributeUpdated(this);  // send updated if "update" called in any way
     }
     return aResult;
   }
@@ -759,20 +695,11 @@ void Model_AttributeSelection::selectBody(
   TDF_Label aSelLab = selectionLabel();
   TopoDS_Shape aNewSub = theSubShape ? theSubShape->impl<TopoDS_Shape>() : aContext;
 
-  /// fix for issue 411: result modified shapes must not participate in this selection mechanism
   if (!aContext.IsNull()) {
     FeaturePtr aFeatureOwner = std::dynamic_pointer_cast<ModelAPI_Feature>(owner());
-    bool aEraseResults = false;
-    if (aFeatureOwner.get()) {
-      aEraseResults = !aFeatureOwner->results().empty();
-      if (aEraseResults) // erase results without flash deleted and redisplay: do it after Select
-        aFeatureOwner->removeResults(0, false, false);
-    }
     bool aSelectorOk = true;
-    //TNaming_Selector aSel(aSelLab);
     Selector_Selector aSel(aSelLab);
     try {
-      //aSel.Select(aNewSub, aNewContext);
       aSelectorOk = aSel.select(aContext, aNewSub);
       if (aSelectorOk) {
         aSel.store();
@@ -781,9 +708,6 @@ void Model_AttributeSelection::selectBody(
     } catch(...) {
       aSelectorOk = false;
     }
-    // face may become divided after the model update, so, new labels may be added to the scope
-    myScope.Clear();
-
     // check that selection is correct, otherwise use weak naming solution
     TDF_Label aSelLab = selectionLabel();
     aSelLab.ForgetAttribute(kWEAK_NAMING);
@@ -806,12 +730,6 @@ void Model_AttributeSelection::selectBody(
         TDataStd_Integer::Set(aSelLab, kWEAK_NAMING, anId);
         TDataStd_Integer::Set(aSelLab, kWEAK_NAMING_SHAPETYPE, int(aValueShape->shapeType()));
       }
-    }
-
-    if (aEraseResults) { // flash after Select : in Groups it makes selection with shift working
-      static Events_Loop* aLoop = Events_Loop::loop();
-      static const Events_ID kDeletedEvent = aLoop->eventByName(EVENT_OBJECT_DELETED);
-      aLoop->flush(kDeletedEvent);
     }
   }
 }
@@ -1288,7 +1206,7 @@ void Model_AttributeSelection::computeValues(
     for(; aNewContIter != aNewToIterate.end(); aNewContIter++) {
       std::shared_ptr<Model_Data> aNewData =
         std::dynamic_pointer_cast<Model_Data>((*aNewContIter)->data());
-      TDF_Label aNewLab = aNewData->label();
+      TDF_Label aNewLab = aNewData->shapeLab();
       // searching for produced sub-shape fully on some label
       TDF_ChildIDIterator aNSIter(aNewLab, TNaming_NamedShape::GetID(), Standard_True);
       for(; aNSIter.More(); aNSIter.Next()) {
@@ -1382,11 +1300,11 @@ bool Model_AttributeSelection::searchNewContext(std::shared_ptr<Model_Document> 
       if (!aModifierFeat.get())
         continue;
       FeaturePtr aThisFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(owner());
-      if (aModifierFeat == aThisFeature || theDoc->objects()->isLater(aModifierFeat, aThisFeature))
+      if (aModifierFeat == aThisFeature || !theDoc->isLaterByDep(aThisFeature, aModifierFeat))
         continue; // the modifier feature is later than this, so, should not be used
       FeaturePtr aCurrentModifierFeat = theDoc->feature(theContext);
       if (aCurrentModifierFeat == aModifierFeat ||
-        theDoc->objects()->isLater(aCurrentModifierFeat, aModifierFeat))
+        !theDoc->isLaterByDep(aModifierFeat, aCurrentModifierFeat))
         continue; // the current modifier is later than the found, so, useless
       Handle(TNaming_NamedShape) aNewNS;
       aModifIter.Label().FindAttribute(TNaming_NamedShape::GetID(), aNewNS);
@@ -1397,7 +1315,7 @@ bool Model_AttributeSelection::searchNewContext(std::shared_ptr<Model_Document> 
         aResContShapes.Append(aModifierObj->shape()->impl<TopoDS_Shape>());
       } else if (aNewNS->Evolution() == TNaming_DELETE) { // a shape was deleted => result is empty
         aResults.insert(ResultPtr());
-      } else { // not-precessed modification => don't support it
+      } else { // not-processed modification => don't support it
         continue;
       }
     }
@@ -1452,7 +1370,7 @@ void Model_AttributeSelection::updateInHistory()
   std::shared_ptr<Model_Data> aContData = std::dynamic_pointer_cast<Model_Data>(aContext->data());
   if (!aContData.get() || !aContData->isValid())
     return;
-  TDF_Label aContLab = aContData->label(); // named shape where the selected context is located
+  TDF_Label aContLab = aContData->shapeLab(); // named shape where the selected context is located
   Handle(TNaming_NamedShape) aContNS;
   if (!aContLab.FindAttribute(TNaming_NamedShape::GetID(), aContNS)) {
     bool aFoundNewContext = true;
@@ -1475,7 +1393,7 @@ void Model_AttributeSelection::updateInHistory()
             FeaturePtr aRefFeat = std::dynamic_pointer_cast<ModelAPI_Feature>((*aRef)->owner());
             if (aRefFeat.get() && aRefFeat != owner()) {
               FeaturePtr aThisFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(owner());
-              if (aDoc->objects()->isLater(aThisFeature, aRefFeat)) { // found better feature
+              if (!aDoc->isLaterByDep(aRefFeat, aThisFeature)) { // found better feature
                 aFoundNewContext = true;
                 aNewContext = aRefFeat->firstResult();
               }
@@ -1512,9 +1430,6 @@ void Model_AttributeSelection::updateInHistory()
   TopTools_ListOfShape aValShapes;
   if (searchNewContext(aDoc, aNewCShape, aContext, aValShape, aContLab, aNewContexts, aValShapes))
   {
-    // update scope to reset to a new one
-    myScope.Clear();
-
     std::list<ResultPtr>::iterator aNewCont = aNewContexts.begin();
     TopTools_ListIteratorOfListOfShape aNewValues(aValShapes);
     if (aNewCont == aNewContexts.end()) { // all results were deleted
@@ -1780,5 +1695,5 @@ bool Model_AttributeSelection::isLater(
   FeaturePtr aFeat2 = aDoc->featureByLab(theResult2);
   if (!aFeat2.get())
     return false;
-  return aDoc->isLater(aFeat1, aFeat2);
+  return aDoc->isLaterByDep(aFeat1, aFeat2);
 }

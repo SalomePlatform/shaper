@@ -40,7 +40,6 @@ class Model_AttributeSelection : public ModelAPI_AttributeSelection,
                                  public Selector_NameGenerator
 {
   Model_AttributeReference myRef;  ///< The reference functionality reusage
-  TDF_LabelMap myScope; ///< the map of valid labels for naming selection solving
   /// temporarily storages to avoid keeping in the data structure if not needed
   ResultPtr myTmpContext;
   /// temporarily storages to avoid keeping in the data structure if not needed
@@ -174,9 +173,6 @@ protected:
   /// Returns the label where TNaming_Selection results are stored
   /// Note: there must be no attributes stored at the same label because Selector clears this lab
   TDF_Label selectionLabel();
-
-  /// Returns the prepared map of valid labels for naming selection solving (creates if not exists)
-  TDF_LabelMap& scope();
 
   /// Sets the ID of the attribute in Data (called from Data): here it is used for myRef ID setting
   MODEL_EXPORT virtual void setID(const std::string theID);

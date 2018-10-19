@@ -805,6 +805,7 @@ TDF_Label Selector_Selector::restoreByName(
     case TopAbs_WIRE:
       myType = SELTYPE_CONTAINER;
       break;
+    case TopAbs_VERTEX:
     case TopAbs_EDGE:
     case TopAbs_FACE:
       myType = SELTYPE_INTERSECT;
@@ -825,7 +826,7 @@ TDF_Label Selector_Selector::restoreByName(
         if (aSubContext.IsNull())
           return aSubContext; // invalid sub-selection parsing
         if (!aContext.IsNull() && !aContext.IsEqual(aSubContext)) {
-          if (theNameGenerator->isLater(aSubContext, aContext))
+          if (!theNameGenerator->isLater(aContext, aSubContext))
             aContext = aSubContext;
         } else {
           aContext = aSubContext;
@@ -848,7 +849,7 @@ TDF_Label Selector_Selector::restoreByName(
         if (aSubContext.IsNull())
           return aSubContext; // invalid sub-selection parsing
         if (!aContext.IsNull() && !aContext.IsEqual(aSubContext)) {
-          if (theNameGenerator->isLater(aSubContext, aContext))
+          if (!theNameGenerator->isLater(aContext, aSubContext))
             aContext = aSubContext;
         } else {
           aContext = aSubContext;

@@ -1902,9 +1902,16 @@ void Model_Objects::updateResults(FeaturePtr theFeature, std::set<FeaturePtr>& t
   if (aResSize > 0) { // check there exist a body that must be updated
     std::list<ResultPtr>::const_iterator aRes = theFeature->results().cbegin();
     for (; aResSize && aRes != theFeature->results().cend(); aRes++, aResSize++) {
-      if ((*aRes)->data()->isValid() && (*aRes)->groupName() == ModelAPI_ResultBody::group()) {
-        ResultBodyPtr aBody = std::dynamic_pointer_cast<ModelAPI_ResultBody>(*aRes);
-        aBody->updateSubs(aBody->shape(), false);
+      if ((*aRes)->data()->isValid()) {
+        if ((*aRes)->groupName() == ModelAPI_ResultBody::group()) {
+          ResultBodyPtr aBody = std::dynamic_pointer_cast<ModelAPI_ResultBody>(*aRes);
+          aBody->updateSubs(aBody->shape(), false);
+        } else if ((*aRes)->groupName() == ModelAPI_ResultConstruction::group()) {
+          // update the cashed myShape presented in construction
+          ResultConstructionPtr aConstr =
+            std::dynamic_pointer_cast<ModelAPI_ResultConstruction>(*aRes);
+          aConstr->updateShape();
+        }
       }
     }
   }

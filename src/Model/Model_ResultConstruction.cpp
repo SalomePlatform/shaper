@@ -23,35 +23,28 @@
 #include <Model_Data.h>
 #include <ModelAPI_CompositeFeature.h>
 #include <GeomAlgoAPI_SketchBuilder.h>
-#include <Model_SelectionNaming.h>
 #include <ModelAPI_Events.h>
-#include <Config_PropManager.h>
+#include <Model_Document.h>
 #include <GeomAPI_PlanarEdges.h>
 #include <GeomAPI_Shape.h>
 #include <Events_Loop.h>
 
-#include <TDF_Reference.hxx>
-#include <TDF_ChildIterator.hxx>
 #include <TDF_ChildIDIterator.hxx>
 #include <TNaming_NamedShape.hxx>
 #include <TNaming_Builder.hxx>
-#include <TDataStd_Integer.hxx>
 #include <TDataStd_IntPackedMap.hxx>
 #include <TDataStd_Name.hxx>
 #include <TDataStd_UAttribute.hxx>
-#include <TColStd_MapOfTransient.hxx>
-#include <TColStd_MapIteratorOfPackedMapOfInteger.hxx>
-#include <BRep_Tool.hxx>
 #include <BRep_Builder.hxx>
 #include <TopoDS.hxx>
-#include <TopoDS_Shape.hxx>
 #include <TopoDS_Edge.hxx>
 #include <TopoDS_Vertex.hxx>
 #include <TopoDS_ListOfShape.hxx>
 #include <TopExp_Explorer.hxx>
-#include <TNaming_Tool.hxx>
-#include <Precision.hxx>
 #include <TopTools_MapOfShape.hxx>
+
+#include <algorithm>
+
 
 // identifier of the infinite result
 Standard_GUID kIS_INFINITE("dea8cc5a-53f2-49c1-94e8-a947bed20a9f");
@@ -83,6 +76,26 @@ std::shared_ptr<GeomAPI_Shape> Model_ResultConstruction::shape()
   return myShape;
 }
 
+static std::string shortName(
+  std::shared_ptr<ModelAPI_ResultConstruction>& theConstr)
+{
+  std::string aName = theConstr->data()->name();
+  // remove "-", "/" and "&" command-symbols
+  aName.erase(std::remove(aName.begin(), aName.end(), '-'), aName.end());
+  aName.erase(std::remove(aName.begin(), aName.end(), '/'), aName.end());
+  aName.erase(std::remove(aName.begin(), aName.end(), '&'), aName.end());
+  // remove the last 's', 'e', 'f' and 'r' symbols:
+  // they are used as markers of start/end/forward/rewersed indicators
+  static const std::string aSyms("sefr");
+  std::string::iterator aSuffix = aName.end() - 1;
+  while(aSyms.find(*aSuffix) != std::string::npos) {
+    --aSuffix;
+  }
+  aName.erase(aSuffix + 1, aName.end());
+  return aName;
+}
+
+
 bool Model_ResultConstruction::updateShape()
 {
   std::shared_ptr<Model_Data> aData = std::dynamic_pointer_cast<Model_Data>(data());
@@ -105,7 +118,6 @@ bool Model_ResultConstruction::updateShape()
 Model_ResultConstruction::Model_ResultConstruction()
 {
 }
-
 
 bool Model_ResultConstruction::isInHistory()
 {
@@ -253,7 +265,7 @@ void Model_ResultConstruction::storeShape(std::shared_ptr<GeomAPI_Shape> theShap
             Handle(Geom_Curve) aCurve = BRep_Tool::Curve(anEdge, aFirst, aLast);
             aCurvesIndices.Bind(aCurve, a);
             anEdgeIndices.Bind(a, anEdge);
-            aComponentsNames[a] = Model_SelectionNaming::shortName(aConstr);
+            aComponentsNames[a] = shortName(aConstr);
           }
         }
       }
