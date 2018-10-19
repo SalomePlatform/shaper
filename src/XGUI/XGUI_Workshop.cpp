@@ -2839,7 +2839,7 @@ void XGUI_Workshop::updateAutoComputeState()
   bool isComputeBlocked = aMgr->isAutoUpdateBlocked();
 #ifdef HAVE_SALOME
   QAction* aUpdateCmd;
-  QList<QAction*> aCommands = workshop()->salomeConnector()->commandList();
+  QList<QAction*> aCommands = mySalomeConnector->commandList();
   foreach(QAction* aCmd, aCommands) {
     if (aCmd->data().toString() == "AUTOCOMPUTE_CMD") {
       aUpdateCmd = aCmd;
