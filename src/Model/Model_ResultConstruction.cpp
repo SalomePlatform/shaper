@@ -65,8 +65,10 @@ void Model_ResultConstruction::setShape(std::shared_ptr<GeomAPI_Shape> theShape)
   if (myShape != theShape) {
     if (!isInfinite())
       storeShape(theShape);
-    static const Events_ID anEvent = Events_Loop::eventByName(EVENT_OBJECT_UPDATED);
-    ModelAPI_EventCreator::get()->sendUpdated(data()->owner(), anEvent);
+    if (!theShape.get() || !theShape->isEqual(myShape)) {
+      static const Events_ID anEvent = Events_Loop::eventByName(EVENT_OBJECT_UPDATED);
+      ModelAPI_EventCreator::get()->sendUpdated(data()->owner(), anEvent);
+    }
     myShape = theShape;
   }
 }

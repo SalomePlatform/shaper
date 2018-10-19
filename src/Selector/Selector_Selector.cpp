@@ -446,7 +446,22 @@ bool Selector_Selector::select(const TopoDS_Shape theContext, const TopoDS_Shape
       }
     }
     myType = SELTYPE_MODIFICATION;
-    return !myBases.IsEmpty();
+    if (myBases.IsEmpty()) { // selection based on the external shape, weak name by finals compound
+      TopoDS_ListOfShape aCommon;
+      myFinal = aModifList.First()->Label();
+      Handle(TNaming_NamedShape) aNS;
+      myFinal.FindAttribute(TNaming_NamedShape::GetID(), aNS);
+      for(TNaming_Iterator aFinalIter(aNS); aFinalIter.More(); aFinalIter.Next()) {
+        const TopoDS_Shape& aNewShape = aFinalIter.NewShape();
+        if (!aNewShape.IsNull())
+          aCommon.Append(aNewShape);
+      }
+      Selector_NExplode aNexp(aCommon);
+      myWeakIndex = aNexp.index(theValue);
+      if (myWeakIndex == -1)
+        return false;
+    }
+    return true;
   }
 
   // not found a good result
@@ -684,16 +699,29 @@ bool Selector_Selector::solve(const TopoDS_Shape& theContext)
     if (myFinal.FindAttribute(TNaming_NamedShape::GetID(), aNS)) {
       aResult = aNS->Get();
     }
+    break;
   }
   case SELTYPE_MODIFICATION: {
-    TopoDS_ListOfShape aFinalsCommon; // final shapes presented in all results from bases
-    findModificationResult(aFinalsCommon);
-    if (aFinalsCommon.Extent() == 1) // only in this case result is valid: found only one shape
-      aResult = aFinalsCommon.First();
-    else if (aFinalsCommon.Extent() > 1 && myWeakIndex) {
-      Selector_NExplode aNExp(aFinalsCommon);
-      aResult = aNExp.shape(myWeakIndex);
-
+    if (myBases.IsEmpty() && myWeakIndex) { // weak name by the final shapes index
+      TopoDS_ListOfShape aCommon;
+      Handle(TNaming_NamedShape) aNS;
+      myFinal.FindAttribute(TNaming_NamedShape::GetID(), aNS);
+      for(TNaming_Iterator aFinalIter(aNS); aFinalIter.More(); aFinalIter.Next()) {
+        const TopoDS_Shape& aNewShape = aFinalIter.NewShape();
+        if (!aNewShape.IsNull())
+          aCommon.Append(aNewShape);
+      }
+      Selector_NExplode aNexp(aCommon);
+      aResult = aNexp.shape(myWeakIndex);
+    } else { // standard case
+      TopoDS_ListOfShape aFinalsCommon; // final shapes presented in all results from bases
+      findModificationResult(aFinalsCommon);
+      if (aFinalsCommon.Extent() == 1) // only in this case result is valid: found only one shape
+        aResult = aFinalsCommon.First();
+      else if (aFinalsCommon.Extent() > 1 && myWeakIndex) {
+        Selector_NExplode aNExp(aFinalsCommon);
+        aResult = aNExp.shape(myWeakIndex);
+      }
     }
     break;
   }
@@ -759,19 +787,17 @@ std::string Selector_Selector::name(Selector_NameGenerator* theNameGenerator) {
     if (!myFinal.FindAttribute(TDataStd_Name::GetID(), aName))
       return "";
     aResult += theNameGenerator->contextName(myFinal) + "/" +
-      std::string(TCollection_AsciiString(aName->Get()).ToCString()) + "&";
+      std::string(TCollection_AsciiString(aName->Get()).ToCString());
     for(TDF_LabelList::iterator aBase = myBases.begin(); aBase != myBases.end(); aBase++) {
-      if (aBase != myBases.begin())
-        aResult += "&";
       if (!aBase->FindAttribute(TDataStd_Name::GetID(), aName))
         return "";
       aResult += theNameGenerator->contextName(*aBase) + "/" +
         std::string(TCollection_AsciiString(aName->Get()).ToCString());
-      if (myWeakIndex != -1) {
-        std::ostringstream aWeakStr;
-        aWeakStr<<"&"<<kWEAK_NAME_IDENTIFIER<<myWeakIndex;
-        aResult += aWeakStr.str();
-      }
+    }
+    if (myWeakIndex != -1) {
+      std::ostringstream aWeakStr;
+      aWeakStr<<"&"<<kWEAK_NAME_IDENTIFIER<<myWeakIndex;
+      aResult += aWeakStr.str();
     }
     return aResult;
   }
