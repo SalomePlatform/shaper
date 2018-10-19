@@ -292,6 +292,8 @@ public:
                                                bool theTemporary,
                                                FeaturePtr& theCreatedFeature);
 
+
+  static void getFirstAndLastIndexInFolder(const ObjectPtr& theFolder, int& theFirst, int& theLast);
 };
 
 #endif

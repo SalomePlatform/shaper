@@ -19,6 +19,13 @@
 //
 
 #include "PartSet_IconFactory.h"
+#include "PartSet_Tools.h"
+#include "PartSet_Module.h"
+#include "XGUI_DataModel.h"
+
+#include <XGUI_Workshop.h>
+#include <XGUI_ObjectsBrowser.h>
+
 #include <ModuleBase_ActionInfo.h>
 #include <ModuleBase_Tools.h>
 
@@ -33,7 +40,8 @@
 
 QMap<QString, QString> PartSet_IconFactory::myIcons;
 
-PartSet_IconFactory::PartSet_IconFactory():ModuleBase_IconFactory()
+PartSet_IconFactory::PartSet_IconFactory(PartSet_Module* theModule)
+  : ModuleBase_IconFactory(), myModule(theModule)
 {
   Events_Loop::loop()->registerListener(this,
     Events_Loop::eventByName(Config_FeatureMessage::GUI_EVENT()));
@@ -42,54 +50,78 @@ PartSet_IconFactory::PartSet_IconFactory():ModuleBase_IconFactory()
 
 QIcon PartSet_IconFactory::getIcon(ObjectPtr theObj)
 {
-  QIcon anIcon;
-
   if (!theObj.get())
-    return anIcon;
+    return QIcon();
 
+  std::string aGroup = theObj->groupName();
   FeaturePtr aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(theObj);
   if (aFeature.get()) {
     std::string aKind = aFeature->getKind();
     QString aId(aKind.c_str());
     if (!myIcons.contains(aId))
-      return anIcon;
+      return QIcon();
 
     QString anIconString = myIcons[aId];
 
     ModelAPI_ExecState aState = aFeature->data()->execState();
-    switch(aState) {
-      case ModelAPI_StateDone:
-      case ModelAPI_StateNothing: {
-        anIcon = loadIcon(anIconString);
-      }
+    switch (aState) {
+    case ModelAPI_StateMustBeUpdated:
+      return ModuleBase_Tools::composite(":icons/toWork.png", anIconString);
+      //anIcon = ModuleBase_Tools::lighter(anIconString);
       break;
-      case ModelAPI_StateMustBeUpdated: {
-        anIcon = ModuleBase_Tools::composite(":icons/toWork.png", anIconString);
-        //anIcon = ModuleBase_Tools::lighter(anIconString);
-      }
+    case ModelAPI_StateExecFailed:
+      return ModuleBase_Tools::composite(":icons/isFailed.png", anIconString);
       break;
-      case ModelAPI_StateExecFailed: {
-        anIcon = ModuleBase_Tools::composite(":icons/isFailed.png", anIconString);
-      }
+    case ModelAPI_StateInvalidArgument:
+      return ModuleBase_Tools::composite(":icons/exec_state_invalid_parameters.png",
+        anIconString);
       break;
-      case ModelAPI_StateInvalidArgument: {
-        anIcon = ModuleBase_Tools::composite(":icons/exec_state_invalid_parameters.png",
-                                             anIconString);
-      }
+    default:
+      return loadIcon(anIconString);
       break;
-      default: break;
     }
   }
 
   //if (theObj->data() && theObj->data()->execState() == ModelAPI_StateMustBeUpdated)
   //  return QIcon(":pictures/constr_object_modified.png");
 
-  std::string aGroup = theObj->groupName();
   if (aGroup == ModelAPI_ResultPart::group())
     return QIcon(":pictures/part_ico.png");
 
   if (aGroup == ModelAPI_ResultConstruction::group())
     return QIcon(":pictures/constr_object.png");
+
+  if (aGroup == ModelAPI_Folder::group()) {
+    static QString anIconString(":pictures/features_folder.png");
+    int aFirst = -1, aLast = -1;
+    PartSet_Tools::getFirstAndLastIndexInFolder(theObj, aFirst, aLast);
+    if ((aFirst != -1) && (aLast != -1)) {
+      int aNbItems = aLast - aFirst + 1;
+      if (aNbItems) {
+        XGUI_ObjectsBrowser* aObBrowser = myModule->getWorkshop()->objectBrowser();
+        XGUI_DataTree* aTree = aObBrowser->treeView();
+        QModelIndex aIndex = aTree->dataModel()->objectIndex(theObj, 0);
+        if (!aTree->isExpanded(aIndex)) {
+          DocumentPtr aDoc = theObj->document();
+          ObjectPtr aSubObj;
+          ModelAPI_ExecState aState;
+          bool aHasWarning = false;
+          for (int i = aFirst; i < aLast + 1; i++) {
+            aSubObj = aDoc->object(ModelAPI_Feature::group(), i);
+            aState = aSubObj->data()->execState();
+            if ((aState == ModelAPI_StateExecFailed) || (aState == ModelAPI_StateMustBeUpdated)) {
+              aHasWarning = true;
+              break;
+            }
+          }
+          if (aHasWarning) {
+            return QIcon(ModuleBase_Tools::composite(":icons/hasWarning.png", anIconString));
+          }
+        }
+      }
+    }
+    return loadIcon(anIconString);
+  }
 
   ResultPtr aResult = std::dynamic_pointer_cast<ModelAPI_Result>(theObj);
   if (aResult.get()) {
@@ -125,7 +157,7 @@ QIcon PartSet_IconFactory::getIcon(ObjectPtr theObj)
       }
     }
   }
-  return anIcon;
+  return QIcon();
 }
 
 void PartSet_IconFactory::processEvent(const std::shared_ptr<Events_Message>& theMessage)

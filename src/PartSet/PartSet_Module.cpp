@@ -156,7 +156,7 @@ PartSet_Module::PartSet_Module(ModuleBase_IWorkshop* theWshop)
   myRoot(0),
   myIsOperationIsLaunched(false)
 {
-  new PartSet_IconFactory();
+  new PartSet_IconFactory(this);
 
   mySketchMgr = new PartSet_SketcherMgr(this);
   mySketchReentrantMgr = new PartSet_SketcherReentrantMgr(theWshop);

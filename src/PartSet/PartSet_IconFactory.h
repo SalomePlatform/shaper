@@ -28,6 +28,8 @@
 #include <QMap>
 
 
+class PartSet_Module;
+
 /**\class PartSet_IconFactory
  * \ingroup GUI
  * \brief This is a class is redefined in order to provide
@@ -37,7 +39,7 @@ class PARTSET_EXPORT PartSet_IconFactory : public ModuleBase_IconFactory, public
 {
 public:
   /// Constructor
-  PartSet_IconFactory();
+  PartSet_IconFactory(PartSet_Module* theModule);
 
   /// Returns Icon for the given object
   /// \param theObj an object
@@ -49,6 +51,7 @@ public:
 
 private:
   static QMap<QString, QString> myIcons;
+  PartSet_Module* myModule;
 };
 
 #endif

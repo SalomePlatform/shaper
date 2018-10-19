@@ -752,3 +752,29 @@ ResultPtr PartSet_Tools::createFixedByExternalCenter(
 
   return ResultPtr();
 }
+
+void PartSet_Tools::getFirstAndLastIndexInFolder(const ObjectPtr& theFolder,
+  int& theFirst, int& theLast)
+{
+  DocumentPtr aDoc = theFolder->document();
+  FolderPtr aFolder = std::dynamic_pointer_cast<ModelAPI_Folder>(theFolder);
+  if (!aFolder.get())
+    return;
+
+  AttributeReferencePtr aFirstFeatAttr = aFolder->data()->reference(ModelAPI_Folder::FIRST_FEATURE_ID());
+  FeaturePtr aFirstFeatureInFolder = ModelAPI_Feature::feature(aFirstFeatAttr->value());
+  if (!aFirstFeatureInFolder.get()) {
+    theFirst = -1;
+    return;
+  }
+  AttributeReferencePtr aLastFeatAttr =
+    aFolder->data()->reference(ModelAPI_Folder::LAST_FEATURE_ID());
+  FeaturePtr aLastFeatureInFolder = ModelAPI_Feature::feature(aLastFeatAttr->value());
+  if (!aLastFeatureInFolder.get()) {
+    theLast = -1;
+    return;
+  }
+
+  theFirst = aDoc->index(aFirstFeatureInFolder);
+  theLast = aDoc->index(aLastFeatureInFolder);
+}

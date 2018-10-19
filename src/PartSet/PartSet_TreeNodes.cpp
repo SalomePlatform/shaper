@@ -19,6 +19,7 @@
 //
 
 #include "PartSet_TreeNodes.h"
+#include "PartSet_Tools.h"
 
 #include <ModuleBase_IconFactory.h>
 #include <ModuleBase_IWorkshop.h>
@@ -122,10 +123,7 @@ QVariant PartSet_ObjectNode::data(int theColumn, int theRole) const
         return QIcon(":pictures/eyeclosed.png");
       }
     case 1:
-      if (myObject->groupName() == ModelAPI_Folder::group())
-        return QIcon(":pictures/features_folder.png");
-      else
-        return ModuleBase_IconFactory::get()->getIcon(myObject);
+      return ModuleBase_IconFactory::get()->getIcon(myObject);
     case 2:
       if (isCurrentFeature(myObject))
         return QIcon(":pictures/arrow.png");
@@ -1024,8 +1022,8 @@ QTreeNodesList PartSet_PartRootNode::objectsDeleted(const DocumentPtr& theDoc,
 //////////////////////////////////////////////////////////////////////////////////
 void PartSet_ObjectFolderNode::update()
 {
-  int aFirst, aLast;
-  getFirstAndLastIndex(aFirst, aLast);
+  int aFirst = -1, aLast = -1;
+  PartSet_Tools::getFirstAndLastIndexInFolder(myObject, aFirst, aLast);
   if ((aFirst == -1) || (aLast == -1)) {
     deleteChildren();
     return;
@@ -1081,8 +1079,8 @@ void PartSet_ObjectFolderNode::update()
 QTreeNodesList PartSet_ObjectFolderNode::objectCreated(const QObjectPtrList& theObjects)
 {
   QTreeNodesList aResult;
-  int aFirst, aLast;
-  getFirstAndLastIndex(aFirst, aLast);
+  int aFirst = -1, aLast = -1;
+  PartSet_Tools::getFirstAndLastIndexInFolder(myObject, aFirst, aLast);
   if ((aFirst == -1) || (aLast == -1)) {
     return aResult;
   }
@@ -1114,8 +1112,8 @@ QTreeNodesList PartSet_ObjectFolderNode::objectsDeleted(const DocumentPtr& theDo
   const QString& theGroup)
 {
   QTreeNodesList aResult;
-  int aFirst, aLast;
-  getFirstAndLastIndex(aFirst, aLast);
+  int aFirst = -1, aLast = -1;
+  PartSet_Tools::getFirstAndLastIndexInFolder(myObject, aFirst, aLast);
   if ((aFirst == -1) || (aLast == -1)) {
     return aResult;
   }
@@ -1155,60 +1153,6 @@ QTreeNodesList PartSet_ObjectFolderNode::objectsDeleted(const DocumentPtr& theDo
   return aResult;
 }
 
-FeaturePtr PartSet_ObjectFolderNode::getFeature(const std::string& theId) const
-{
-  FolderPtr aFolder = std::dynamic_pointer_cast<ModelAPI_Folder>(myObject);
-  AttributeReferencePtr aFeatAttr = aFolder->data()->reference(theId);
-  if (aFeatAttr)
-    return ModelAPI_Feature::feature(aFeatAttr->value());
-  return FeaturePtr();
-}
-
-void PartSet_ObjectFolderNode::getFirstAndLastIndex(int& theFirst, int& theLast) const
-{
-  DocumentPtr aDoc = myObject->document();
-  FolderPtr aFolder = std::dynamic_pointer_cast<ModelAPI_Folder>(myObject);
-
-  FeaturePtr aFirstFeatureInFolder = getFeature(ModelAPI_Folder::FIRST_FEATURE_ID());
-  if (!aFirstFeatureInFolder.get()) {
-    theFirst = -1;
-    return;
-  }
-  FeaturePtr aLastFeatureInFolder = getFeature(ModelAPI_Folder::LAST_FEATURE_ID());
-  if (!aLastFeatureInFolder.get()) {
-    theLast = -1;
-    return;
-  }
-
-  theFirst = aDoc->index(aFirstFeatureInFolder);
-  theLast = aDoc->index(aLastFeatureInFolder);
-}
-
-
-QVariant PartSet_ObjectFolderNode::data(int theColumn, int theRole) const
-{
-  const QImage anAditional(":icons/hasWarning.png");
-
-  if ((theRole == Qt::DecorationRole) && (theColumn == 1)) {
-    ObjectPtr aObject;
-    bool aHasWarning = false;
-    foreach(ModuleBase_ITreeNode* aNode, myChildren) {
-      aObject = aNode->object();
-      if (aObject.get()) {
-        ModelAPI_ExecState aState = aObject->data()->execState();
-        if ((aState == ModelAPI_StateExecFailed) || (aState == ModelAPI_StateMustBeUpdated)) {
-          aHasWarning = true;
-          break;
-        }
-      }
-    }
-    if (aHasWarning) {
-      return QIcon(ModuleBase_Tools::composite(":icons/hasWarning.png",
-                                               ":pictures/features_folder.png"));
-    }
-  }
-  return PartSet_ObjectNode::data(theColumn, theRole);
-}
 
 
 //////////////////////////////////////////////////////////////////////////////////

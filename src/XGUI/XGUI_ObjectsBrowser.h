@@ -90,7 +90,7 @@ private:
 * \ingroup GUI
 * Implementation of Data Tree object for Object Browser
 */
-class XGUI_DataTree : public QTreeView
+class XGUI_EXPORT XGUI_DataTree : public QTreeView
 {
 Q_OBJECT
  public:
