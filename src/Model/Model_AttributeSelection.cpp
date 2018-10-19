@@ -92,6 +92,8 @@ Standard_GUID kELLIPSE_CENTER2("1395ae73-8e02-4cf8-b204-06ff35873a32");
 Standard_GUID kWEAK_NAMING("9dcdd9be-a3a9-46eb-9b16-1c957ab20142");
 // identifier of the weak naming sub-shape type
 Standard_GUID kWEAK_NAMING_SHAPETYPE("6b9cc709-e320-4a1f-9c42-df5622369ea7");
+// reference to the external sketch face
+Standard_GUID kEXT_SKETCH_FACE("ba32aa31-bde7-422f-80b4-79c757c77b49");
 
 // prefix for the whole feature context identification
 const static std::string kWHOLE_FEATURE = "all-in-";
@@ -140,6 +142,7 @@ bool Model_AttributeSelection::setValue(const ObjectPtr& theContext,
   aSelLab.ForgetAttribute(kELLIPSE_CENTER2);
   aSelLab.ForgetAttribute(kWEAK_NAMING);
   aSelLab.ForgetAttribute(kWEAK_NAMING_SHAPETYPE);
+  aSelLab.ForgetAttribute(kEXT_SKETCH_FACE);
 
   bool isDegeneratedEdge = false;
   // do not use the degenerated edge as a shape, a null context and shape is used in the case
@@ -374,6 +377,11 @@ std::shared_ptr<GeomAPI_Shape> Model_AttributeSelection::internalValue(CenterTyp
     if (aConstr) {
       if (aConstr->isInfinite())
         return aResult; // empty result
+      // external sketch face
+      Handle(TDataStd_Integer) aFaceIndex;
+      if (aSelLab.FindAttribute(kEXT_SKETCH_FACE, aFaceIndex)) {
+        return aConstr->face(aFaceIndex->Get());
+      }
     }
     if (!aConstr.get()) { // for construction context, return empty result as usual even
       // the whole feature is selected
@@ -653,6 +661,11 @@ bool Model_AttributeSelection::update()
     std::shared_ptr<Model_ResultConstruction> aConstructionContext =
       std::dynamic_pointer_cast<Model_ResultConstruction>(aContext);
     if (!aConstructionContext->isInfinite()) {
+      // external sketch face
+      Handle(TDataStd_Integer) anIndex;
+      if (aSelLab.FindAttribute(kEXT_SKETCH_FACE, anIndex)) {
+        return setInvalidIfFalse(aSelLab, anIndex->Get() < aConstructionContext->facesNum());
+      }
       Selector_Selector aSelector(aSelLab);
       aResult = aSelector.restore();
       TopoDS_Shape anOldShape = aSelector.value();
@@ -691,12 +704,25 @@ void Model_AttributeSelection::selectBody(
     }
   }
 
-  // with "recover" feature the selected context may be not up to date (issue 1710)
-  TDF_Label aSelLab = selectionLabel();
-  TopoDS_Shape aNewSub = theSubShape ? theSubShape->impl<TopoDS_Shape>() : aContext;
-
   if (!aContext.IsNull()) {
+    TDF_Label aSelLab = selectionLabel();
+    TopoDS_Shape aNewSub = theSubShape->impl<TopoDS_Shape>();
     FeaturePtr aFeatureOwner = std::dynamic_pointer_cast<ModelAPI_Feature>(owner());
+    if (aFeatureOwner->document() != theContext->document()) { // reference to the sketch face
+      ResultConstructionPtr aConstr =
+        std::dynamic_pointer_cast<ModelAPI_ResultConstruction>(theContext);
+      int aFaceIndex = -1, aFacesNum = aConstr->facesNum();
+      for(int a = 0; a < aFacesNum; a++) {
+        if (aConstr->face(a)->isEqual(theSubShape)) {
+          aFaceIndex = a;
+          break;
+        }
+      }
+      if (aFaceIndex >= 0) {
+        TDataStd_Integer::Set(aSelLab, kEXT_SKETCH_FACE, aFaceIndex); // store index of the face
+        return;
+      }
+    }
     bool aSelectorOk = true;
     Selector_Selector aSel(aSelLab);
     try {
@@ -709,7 +735,6 @@ void Model_AttributeSelection::selectBody(
       aSelectorOk = false;
     }
     // check that selection is correct, otherwise use weak naming solution
-    TDF_Label aSelLab = selectionLabel();
     aSelLab.ForgetAttribute(kWEAK_NAMING);
     Handle(TNaming_NamedShape) aSelectorShape;
     if (aSelectorOk && aSelLab.FindAttribute(TNaming_NamedShape::GetID(), aSelectorShape))
@@ -829,6 +854,21 @@ std::string Model_AttributeSelection::namingName(const std::string& theDefaultNa
     ResultConstructionPtr aConstr = std::dynamic_pointer_cast<Model_ResultConstruction>(aCont);
     if (aConstr->isInfinite()) {
       return contextName(aCont);
+    } else {
+      // external sketch face
+      Handle(TDataStd_Integer) aFaceIndex;
+      if (aSelLab.FindAttribute(kEXT_SKETCH_FACE, aFaceIndex)) {
+        std::shared_ptr<Model_Document> anExtDoc =
+          std::dynamic_pointer_cast<Model_Document>(aCont->document());
+        Selector_Selector aSelector(anExtDoc->extConstructionsLabel());
+        TopoDS_Shape aContShape = aConstr->shape()->impl<TopoDS_Shape>();
+        TopoDS_Shape aValShape = value()->impl<TopoDS_Shape>();
+        aSelector.select(aContShape, aValShape);
+        myRestoreDocument = anExtDoc;
+        std::string aName = anExtDoc->kind() + "/" + aSelector.name(this);
+        myRestoreDocument.reset();
+        return aName;
+      }
     }
   }
 
@@ -1490,8 +1530,8 @@ bool Model_AttributeSelection::isWeakNaming()
 
 std::string Model_AttributeSelection::contextName(const TDF_Label theSelectionLab)
 {
-  DocumentPtr aMyDoc = owner()->document();
-  std::shared_ptr<Model_Document> aDoc = std::dynamic_pointer_cast<Model_Document>(aMyDoc);
+  std::shared_ptr<Model_Document> aDoc = myRestoreDocument.get() ? myRestoreDocument :
+    std::dynamic_pointer_cast<Model_Document>(owner()->document());
   FeaturePtr aFeatureOwner = aDoc->featureByLab(theSelectionLab);
   if (aFeatureOwner.get()) {
     // if it is sub-element of the sketch, the context name is the name of the sketch

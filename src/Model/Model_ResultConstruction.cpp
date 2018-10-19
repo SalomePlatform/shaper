@@ -374,21 +374,22 @@ void Model_ResultConstruction::storeShape(std::shared_ptr<GeomAPI_Shape> theShap
           TNaming_Builder* anEdgesBuilder = 0;
           for(TColStd_ListOfInteger::Iterator anIter(aNewInd); anIter.More(); anIter.Next()) {
             int anIndex = anIter.Value();
+            int aModIndex = anIndex > 0 ? anIndex : -anIndex;
             aNewMap->Add(anIndex);
-            aName<<"-"<<aComponentsNames[anIndex > 0 ? anIndex : -anIndex];
+            aName<<"-"<<aComponentsNames[aModIndex];
             if (anIter.Value() > 0)
               aName<<"f";
             else
               aName<<"r";
             // collect all edges of the face which are modified in sub-label of the face
-            if (anEdgeIndices.IsBound(anIndex) &&
-                !aFaceEdges.Contains(anEdgeIndices.Find(anIndex))) {
+            if (anEdgeIndices.IsBound(aModIndex) &&
+                !aFaceEdges.Contains(anEdgeIndices.Find(aModIndex))) {
               if (!anEdgesBuilder) {
                 TDF_Label anEdgesLabel = aLab.FindChild(1);
                 anEdgesBuilder = new TNaming_Builder(anEdgesLabel);
                 TDataStd_Name::Set(anEdgesLabel, "SubEdge");
               }
-              anEdgesBuilder->Modify(anEdgeIndices.Find(anIndex), aPutEdges.Current());
+              anEdgesBuilder->Modify(anEdgeIndices.Find(aModIndex), aPutEdges.Current());
             }
             aPutEdges.Next();
           }
