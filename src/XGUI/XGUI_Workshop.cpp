@@ -1081,11 +1081,14 @@ bool XGUI_Workshop::onSaveAs()
     return false;
   myCurrentFile = QFileDialog::getSaveFileName(desktop(), tr("Select name to save file..."),
     QString(), MyFilter);
-#ifndef HAVE_SALOME
   if (!myCurrentFile.isNull()) {
+    if (!myCurrentFile.endsWith(".opp")) {
+      myCurrentFile += ".opp";
+    }
+  }
+#ifndef HAVE_SALOME
     myMainWindow->setCurrentDir(myCurrentFile, false);
     myMainWindow->setModifiedState(false);
-  }
 #endif
   return onSave();
 }
