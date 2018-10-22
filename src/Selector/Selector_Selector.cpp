@@ -251,7 +251,22 @@ bool Selector_Selector::select(const TopoDS_Shape theContext, const TopoDS_Shape
     return false;
   // check the value shape can be named as it is, or it is needed to construct it from the
   // higher level shapes (like a box vertex by faces that form this vertex)
-  if (!TNaming_Tool::HasLabel(myLab, theValue)) {
+  bool aIsFound = TNaming_Tool::HasLabel(myLab, theValue);
+  if (aIsFound) { // additional check for selection and delete evolution only: also could not be used
+    aIsFound = false;
+    for(TNaming_SameShapeIterator aShapes(theValue, myLab); aShapes.More(); aShapes.Next())
+    {
+      Handle(TNaming_NamedShape) aNS;
+      if (aShapes.Label().FindAttribute(TNaming_NamedShape::GetID(), aNS)) {
+        if (aNS->Evolution() == TNaming_MODIFY || aNS->Evolution() == TNaming_GENERATED ||
+            aNS->Evolution() == TNaming_PRIMITIVE) {
+          aIsFound = true;
+          break;
+        }
+      }
+    }
+  }
+  if (!aIsFound) {
     TopAbs_ShapeEnum aSelectionType = theValue.ShapeType();
     myShapeType = aSelectionType;
     if (aSelectionType == TopAbs_COMPOUND || aSelectionType == TopAbs_COMPSOLID ||
