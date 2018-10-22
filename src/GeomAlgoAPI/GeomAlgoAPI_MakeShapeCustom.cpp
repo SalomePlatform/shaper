@@ -22,7 +22,8 @@
 
 //==================================================================================================
 GeomAlgoAPI_MakeShapeCustom::GeomAlgoAPI_MakeShapeCustom()
-{}
+{
+}
 
 //==================================================================================================
 void GeomAlgoAPI_MakeShapeCustom::setResult(const GeomShapePtr theShape)
@@ -36,7 +37,6 @@ bool GeomAlgoAPI_MakeShapeCustom::addModified(const GeomShapePtr theOldShape,
 {
   if (!isValidForHistory(theNewShape)) return false;
   GeomShapePtr aNewShape = theNewShape;
-  fixOrientation(aNewShape);
   return myModified.add(theOldShape, aNewShape);
 }
 
@@ -46,7 +46,6 @@ bool GeomAlgoAPI_MakeShapeCustom::addGenerated(const GeomShapePtr theOldShape,
 {
   if (!isValidForHistory(theNewShape)) return false;
   GeomShapePtr aNewShape = theNewShape;
-  fixOrientation(aNewShape);
   return myGenerated.add(theOldShape, aNewShape);
 }
 

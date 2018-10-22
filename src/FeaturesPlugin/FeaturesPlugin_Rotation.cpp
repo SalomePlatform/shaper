@@ -163,6 +163,7 @@ void FeaturesPlugin_Rotation::performTranslationByAxisAndAngle()
       }
 
       ResultBodyPtr aResultBody = document()->createBody(data(), aResultIndex);
+      aResultBody->storeModified(aBaseShape, aRotationAlgo->shape());
       FeaturesPlugin_Tools::loadModifiedShapes(aResultBody, aBaseShape, aRotationAlgo, "Rotated");
       setResult(aResultBody, aResultIndex);
     }
