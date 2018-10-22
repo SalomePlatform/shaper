@@ -289,8 +289,6 @@ XGUI_Workshop::XGUI_Workshop(XGUI_SalomeConnector* theConnector)
   //IMP: an attempt to use result selection with other selection modes
   myViewerSelMode.append(ModuleBase_ResultPrs::Sel_Result);//TopAbs_VERTEX);
   myViewerSelMode.append(TopAbs_COMPSOLID);
-
-  qDebug("### Tmp: %s", qPrintable(myTmpDir.path()));
 }
 
 //******************************************************

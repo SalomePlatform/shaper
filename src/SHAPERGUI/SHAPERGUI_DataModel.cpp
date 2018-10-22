@@ -76,20 +76,23 @@ bool SHAPERGUI_DataModel::open(const QString& thePath, CAM_Study* theStudy, QStr
     QString aFileName = *anIt;
 
     QString aCurrentFile = SUIT_Tools::addSlash(aTmpDir) + aFileName;
-    QString aNewFile = SUIT_Tools::addSlash(aNewTmpDir) + aFileName;
-    if (!QFile::copy(aCurrentFile, aNewFile))
-      isDone = false;
+    XGUI_Workshop* aWorkShop = myModule->workshop();
+    aWorkShop->openFile(aCurrentFile);
+    //QString aNewFile = SUIT_Tools::addSlash(aNewTmpDir) + aFileName;
+    //if (!QFile::copy(aCurrentFile, aNewFile))
+    //  isDone = false;
   }
-  if (isDone) {
-    myTmpDirectory = aNewTmpDir;
-  }
-  else {
-    removeDirectory(aNewTmpDir);
-    myTmpDirectory = "";
-  }
+  //if (isDone) {
+  //  myTmpDirectory = aNewTmpDir;
+  //}
+  //else {
+  //  removeDirectory(aNewTmpDir);
+  //  myTmpDirectory = "";
+  //}
 
-  SessionPtr aMgr = ModelAPI_Session::get();
-  aMgr->load(qPrintable(aNewTmpDir));
+  //SessionPtr aMgr = ModelAPI_Session::get();
+  //aMgr->load(qPrintable(aNewTmpDir));
+
   myModule->setIsOpened(true);
   return true;
 }
@@ -111,20 +114,29 @@ bool SHAPERGUI_DataModel::save(QStringList& theFiles)
 
   std::string aTmpDir = aStudy->GetTmpDir(qPrintable(myStudyPath), isMultiFile);
   //std::string aTmpDir = aStudy->GetTmpDir("", false);//true );
-  theFiles.append(QString(aTmpDir.c_str()));
+  QString aTmp = QString(aTmpDir.c_str());
+  theFiles.append(aTmp);
 
   SessionPtr aMgr = ModelAPI_Session::get();
   if (aMgr->isAutoUpdateBlocked())
     aMgr->blockAutoUpdate(false);
 
-  aWorkShop->saveDocument(QString(aTmpDir.c_str()), aFileNames);
-  std::list<std::string>::iterator aIt;
-  for (aIt = aFileNames.begin(); aIt != aFileNames.end(); ++aIt) {
-    QString aName((*aIt).c_str());
-    aName.replace(QChar('\\'), QChar('/'));
-    int aN = aName.lastIndexOf('/');
-    theFiles.append(aName.right(aName.length() - aN - 1));
-  }
+  //aWorkShop->saveDocument(QString(aTmpDir.c_str()), aFileNames);
+  aWorkShop->setCurrentDataFile(aTmp + "shaper.opp");
+  aWorkShop->onSave();
+  QString aName = aWorkShop->currentDataFile();
+  std::string aa = aName.toStdString();
+  aName.replace(QChar('\\'), QChar('/'));
+  int aN = aName.lastIndexOf('/');
+  theFiles.append(aName.right(aName.length() - aN - 1));
+
+  //std::list<std::string>::iterator aIt;
+  //for (aIt = aFileNames.begin(); aIt != aFileNames.end(); ++aIt) {
+  //  QString aName((*aIt).c_str());
+  //  aName.replace(QChar('\\'), QChar('/'));
+  //  int aN = aName.lastIndexOf('/');
+  //  theFiles.append(aName.right(aName.length() - aN - 1));
+  //}
   return true;
 }
 
@@ -137,8 +149,8 @@ bool SHAPERGUI_DataModel::saveAs(const QString& thePath, CAM_Study* theStudy, QS
 bool SHAPERGUI_DataModel::close()
 {
   myModule->workshop()->closeDocument();
-  removeDirectory(myTmpDirectory);
-  myTmpDirectory = "";
+  //removeDirectory(myTmpDirectory);
+  //myTmpDirectory = "";
   return LightApp_DataModel::close();
 }
 

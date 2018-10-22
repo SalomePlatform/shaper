@@ -137,6 +137,8 @@ SHAPERGUI::SHAPERGUI()
 //******************************************************
 SHAPERGUI::~SHAPERGUI()
 {
+  delete myWorkshop;
+  delete myProxyViewer;
 }
 
 //******************************************************
