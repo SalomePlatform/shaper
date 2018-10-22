@@ -1079,9 +1079,9 @@ bool XGUI_Workshop::onSaveAs()
 {
   if(!myOperationMgr->abortAllOperations(XGUI_OperationMgr::XGUI_InformationMessage))
     return false;
-#ifndef HAVE_SALOME
   myCurrentFile = QFileDialog::getSaveFileName(desktop(), tr("Select name to save file..."),
     QString(), MyFilter);
+#ifndef HAVE_SALOME
   if (!myCurrentFile.isNull()) {
     myMainWindow->setCurrentDir(myCurrentFile, false);
     myMainWindow->setModifiedState(false);
