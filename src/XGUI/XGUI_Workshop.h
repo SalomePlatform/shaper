@@ -36,6 +36,7 @@
 #include <QObject>
 #include <QKeySequence>
 #include <QMap>
+#include <QTemporaryDir>
 
 #ifndef HAVE_SALOME
 class AppElements_Command;
@@ -233,11 +234,11 @@ Q_OBJECT
   /// Returns current module
   ModuleBase_IModule* module() const { return myModule; }
 
-  /// Returns current directory which contains data files
-  QString currentDataDir() const { return myCurrentDir; }
+  /// Returns current file
+  QString currentDataFile() const { return myCurrentFile; }
 
-  /// Returns current directory which contains data files
-  void setCurrentDataDir(const QString& theDir) { myCurrentDir = theDir; }
+  /// Returns current file
+  void setCurrentDataFile(const QString& theDir) { myCurrentFile = theDir; }
 
   /// Save the current document into a directory
   /// \param theName - path to the directory
@@ -318,7 +319,7 @@ Q_OBJECT
 
   /// Closes all in the current session and load the directory
   /// \param theDirectory a path to directory
-  void openDirectory(const QString& theDirectory);
+  void openFile(const QString& theDirectory);
 
   void updateAutoComputeState();
 
@@ -510,6 +511,9 @@ private:
   /// \param theTimes number of applies the given action
   void processUndoRedo(const ModuleBase_ActionType theActionType, int theTimes);
 
+  /// Clear content of temporary directory
+  void clearTemporaryDir();
+
 private:
 #ifndef HAVE_SALOME
   AppElements_MainWindow* myMainWindow; ///< desktop window
@@ -533,10 +537,11 @@ private:
   XGUI_ContextMenuMgr* myContextMenuMgr; ///< manager of context menu build
   XGUI_ModuleConnector* myModuleConnector; ///< implementation of ModuleBase_IWorkshop
   XGUI_WorkshopListener* myEventsListener; ///< processing of events
-  QString myCurrentDir; ///< cached the last open directory
+  QString myCurrentFile; ///< cached the last open directory
   QIntList myViewerSelMode; ///< selection modes set in the viewer
   Config_DataModelReader* myDataModelXMLReader; ///< XML reader of data model
   XGUI_InspectionPanel* myInspectionPanel; ///< container of feature attributes widgets
+  QTemporaryDir myTmpDir; ///< a direcory for uncompressed files
 };
 
 #endif

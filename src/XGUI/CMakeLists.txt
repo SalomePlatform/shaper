@@ -63,6 +63,7 @@ SET(PROJECT_HEADERS
     XGUI_Workshop.h
     XGUI_WorkshopListener.h
 	XGUI_InspectionPanel.h
+	XGUI_CompressFiles.h
 )
 
 SET(PROJECT_MOC_HEADERS
@@ -130,6 +131,7 @@ SET(PROJECT_SOURCES
     XGUI_Workshop.cpp
     XGUI_WorkshopListener.cpp
 	XGUI_InspectionPanel.cpp
+	XGUI_CompressFiles.cpp
 )
 
 SET(PROJECT_RESOURCES

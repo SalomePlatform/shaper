@@ -51,6 +51,7 @@
 #include <XGUI_QtEvents.h>
 #include <XGUI_DataModel.h>
 #include <XGUI_InspectionPanel.h>
+#include <XGUI_CompressFiles.h>
 
 #ifndef HAVE_SALOME
 #include <AppElements_Button.h>
@@ -169,10 +170,13 @@ QString XGUI_Workshop::MOVE_TO_END_COMMAND = QObject::tr("Move to the end");
 //#define DEBUG_FEATURE_NAME
 //#define DEBUG_CLEAN_HISTORY
 
+
+static QString MyFilter(QObject::tr("OpenParts files (*.opp)"));
+
+
 //******************************************************
 XGUI_Workshop::XGUI_Workshop(XGUI_SalomeConnector* theConnector)
     : QObject(),
-      myCurrentDir(QString()),
       myModule(NULL),
       mySalomeConnector(theConnector),
       myPropertyPanel(0),
@@ -285,6 +289,8 @@ XGUI_Workshop::XGUI_Workshop(XGUI_SalomeConnector* theConnector)
   //IMP: an attempt to use result selection with other selection modes
   myViewerSelMode.append(ModuleBase_ResultPrs::Sel_Result);//TopAbs_VERTEX);
   myViewerSelMode.append(TopAbs_COMPSOLID);
+
+  qDebug("### Tmp: %s", qPrintable(myTmpDir.path()));
 }
 
 //******************************************************
@@ -299,6 +305,7 @@ XGUI_Workshop::~XGUI_Workshop(void)
 
   delete myDisplayer;
   delete myDataModelXMLReader;
+  clearTemporaryDir();
 }
 
 //******************************************************
@@ -913,25 +920,26 @@ void XGUI_Workshop::onOpen()
     } else if (anAnswer == QMessageBox::Cancel) {
       return;
     }
-    myCurrentDir = "";
+    myCurrentFile = QString();
   }
 
   //show file dialog, check if readable and open
-  QString aDirectory = QFileDialog::getExistingDirectory(desktop(), tr("Select directory"));
-  openDirectory(aDirectory);
+  QString aFile = QFileDialog::getOpenFileName(desktop(), tr("Open file"), QString(), MyFilter);
+  if (!aFile.isNull())
+    openFile(aFile);
 }
 
 //******************************************************
-void XGUI_Workshop::openDirectory(const QString& theDirectory)
+void XGUI_Workshop::openFile(const QString& theDirectory)
 {
-  myCurrentDir = theDirectory;
-  if (myCurrentDir.isEmpty())
+  myCurrentFile = theDirectory;
+  if (myCurrentFile.isEmpty())
     return;
 
-  QFileInfo aFileInfo(myCurrentDir);
+  QFileInfo aFileInfo(myCurrentFile);
   if (!aFileInfo.exists() || !aFileInfo.isReadable()) {
     QMessageBox::critical(desktop(), tr("Warning"), tr("Unable to open the file."));
-    myCurrentDir = "";
+    myCurrentFile = QString();
     return;
   }
 
@@ -939,7 +947,11 @@ void XGUI_Workshop::openDirectory(const QString& theDirectory)
   module()->closeDocument();
   SessionPtr aSession = ModelAPI_Session::get();
   aSession->closeAll();
-  aSession->load(myCurrentDir.toLatin1().constData());
+
+  clearTemporaryDir();
+  XGUI_CompressFiles::uncompress(myCurrentFile, myTmpDir.path());
+
+  aSession->load(myTmpDir.path().toLatin1().constData());
   myObjectBrowser->rebuildDataTree();
 
   // Open first level of data tree
@@ -950,7 +962,7 @@ void XGUI_Workshop::openDirectory(const QString& theDirectory)
 
   updateCommandStatus();
 #ifndef HAVE_SALOME
-  myMainWindow->setCurrentDir(myCurrentDir, true);
+  myMainWindow->setCurrentDir(myCurrentFile, true);
 #endif
 
 #ifdef _DEBUG
@@ -1046,7 +1058,7 @@ bool XGUI_Workshop::onSave()
 {
   if(!myOperationMgr->abortAllOperations(XGUI_OperationMgr::XGUI_InformationMessage))
     return false;
-  if (myCurrentDir.isEmpty()) {
+  if (myCurrentFile.isEmpty()) {
     return onSaveAs();
   }
   SessionPtr aMgr = ModelAPI_Session::get();
@@ -1054,7 +1066,9 @@ bool XGUI_Workshop::onSave()
     aMgr->blockAutoUpdate(false);
 
   std::list<std::string> aFiles;
-  saveDocument(myCurrentDir, aFiles);
+  saveDocument(myTmpDir.path(), aFiles);
+  XGUI_CompressFiles::compress(myCurrentFile, aFiles);
+
   updateCommandStatus();
 #ifndef HAVE_SALOME
     myMainWindow->setModifiedState(false);
@@ -1067,35 +1081,13 @@ bool XGUI_Workshop::onSaveAs()
 {
   if(!myOperationMgr->abortAllOperations(XGUI_OperationMgr::XGUI_InformationMessage))
     return false;
-  QFileDialog dialog(desktop());
-  dialog.setWindowTitle(tr("Select directory to save files..."));
-  dialog.setFileMode(QFileDialog::Directory);
-  dialog.setFilter(QDir::AllDirs);
-  dialog.setOptions(QFileDialog::HideNameFilterDetails | QFileDialog::ShowDirsOnly);
-  dialog.setViewMode(QFileDialog::Detail);
-
-  if (!dialog.exec()) {
-    return false;
-  }
-
-  QString aTempDir = dialog.selectedFiles().first();
-  QDir aDir(aTempDir);
-  if (aDir.exists() && !aDir.entryInfoList(QDir::NoDotAndDotDot | QDir::AllEntries).isEmpty()) {
-    int answer = QMessageBox::question(
-        desktop(),
-        // Title of the dialog which asks user if he wants to save study
-        // in existing non-empty folder
-        tr("Save"),
-        tr("The directory already contains some files, save anyway?"),
-        QMessageBox::Save | QMessageBox::Cancel);
-    if (answer == QMessageBox::Cancel) {
-      return false;
-    }
-  }
-  myCurrentDir = aTempDir;
 #ifndef HAVE_SALOME
-    myMainWindow->setCurrentDir(myCurrentDir, false);
+  myCurrentFile = QFileDialog::getSaveFileName(desktop(), tr("Select name to save file..."),
+    QString(), MyFilter);
+  if (!myCurrentFile.isNull()) {
+    myMainWindow->setCurrentDir(myCurrentFile, false);
     myMainWindow->setModifiedState(false);
+  }
 #endif
   return onSave();
 }
@@ -2854,4 +2846,17 @@ void XGUI_Workshop::updateAutoComputeState()
   aUpdateCmd->button()->setIcon(isComputeBlocked? QIcon(":pictures/autoapply_stop.png") :
     QIcon(":pictures/autoapply_start.png"));
 #endif
+}
+
+
+void XGUI_Workshop::clearTemporaryDir()
+{
+  QDir aDir(myTmpDir.path());
+  if (!aDir.isEmpty()) {
+    QStringList aEntries;
+    aDir.entryList(aEntries);
+    foreach(QString aFile, aEntries) {
+      aDir.remove(aFile);
+    }
+  }
 }
