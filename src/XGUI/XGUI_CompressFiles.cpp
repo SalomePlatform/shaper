@@ -38,14 +38,13 @@ bool XGUI_CompressFiles::compress(const QString& theFile, std::list<std::string>
     for (aIt = theFiles.cbegin(); aIt != theFiles.cend(); ++aIt) {
       QString aPathName((*aIt).c_str());
       QFile aSrcFile(aPathName);
+      QFileInfo aInfo(aSrcFile);
+      quint64 aSize = aInfo.size();
       if (aSrcFile.open(QIODevice::ReadOnly)) {
-        QFileInfo aInfo(aSrcFile);
-        quint64 aSize = aInfo.size();
         QString aName =
           aPathName.right(aPathName.length() - aPathName.lastIndexOf(QDir::separator()) - 1);
 
-        aOutStream << aName << aSize;
-        aOutStream << qCompress(aSrcFile.readAll());
+        aOutStream << aName << aSize << qCompress(aSrcFile.readAll());
         aSrcFile.close();
       }
       else {

@@ -947,7 +947,8 @@ void XGUI_Workshop::openFile(const QString& theDirectory)
   aSession->closeAll();
 
   clearTemporaryDir();
-  XGUI_CompressFiles::uncompress(myCurrentFile, myTmpDir.path());
+  if (!XGUI_CompressFiles::uncompress(myCurrentFile, myTmpDir.path()))
+    return;
 
   aSession->load(myTmpDir.path().toLatin1().constData());
   myObjectBrowser->rebuildDataTree();
@@ -1065,7 +1066,8 @@ bool XGUI_Workshop::onSave()
 
   std::list<std::string> aFiles;
   saveDocument(myTmpDir.path(), aFiles);
-  XGUI_CompressFiles::compress(myCurrentFile, aFiles);
+  if (!XGUI_CompressFiles::compress(myCurrentFile, aFiles))
+    return false;
 
   updateCommandStatus();
 #ifndef HAVE_SALOME
