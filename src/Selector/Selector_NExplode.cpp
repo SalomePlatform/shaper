@@ -152,6 +152,26 @@ Selector_NExplode::Selector_NExplode(const TopoDS_ListOfShape& theShapes)
   }
 }
 
+Selector_NExplode::Selector_NExplode(const TopoDS_Shape& theShape, const TopAbs_ShapeEnum theType)
+{
+  std::vector<TopoDS_Shape> aShapesVec;
+  TopTools_MapOfShape anAdded; // to avoid same shapes duplication
+  for(TopExp_Explorer anExp(theShape, theType); anExp.More(); anExp.Next()) {
+    if (anAdded.Add(anExp.Current()))
+     aShapesVec.push_back(anExp.Current());
+  }
+
+  CompareShapes::DataMapOfShapeDouble aCash;
+  CompareShapes shComp(&aCash);
+  std::stable_sort(aShapesVec.begin(), aShapesVec.end(), shComp);
+
+  std::vector<TopoDS_Shape>::const_iterator anIter = aShapesVec.begin();
+  for (; anIter != aShapesVec.end(); ++anIter) {
+    mySorted.Append(*anIter);
+  }
+}
+
+
 int Selector_NExplode::index(const TopoDS_Shape& theSubShape)
 {
   TopoDS_ListOfShape::Iterator anIter(mySorted);

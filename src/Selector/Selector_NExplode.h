@@ -34,8 +34,10 @@
 class Selector_NExplode
 {
  public:
-   /// \brief Initializes the sorted list of shapes by the context shape and type of sub-shapes.
+   /// \brief Initializes the sorted list of shapes by the shapes list.
    SELECTOR_EXPORT Selector_NExplode(const TopoDS_ListOfShape& theShapes);
+   /// \brief Initializes the sorted list of shapes by the context shape and type of sub-shapes.
+   SELECTOR_EXPORT Selector_NExplode(const TopoDS_Shape& theShape, const TopAbs_ShapeEnum theType);
 
    /// Returns an index (started from one) of sub-shape in the sorted list. Returns 0 if not found.
    SELECTOR_EXPORT int index(const TopoDS_Shape& theSubShape);

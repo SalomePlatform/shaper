@@ -45,6 +45,7 @@ class Selector_Selector
     SELTYPE_PRIMITIVE, ///< sub-shape found as a primitive on some label
     SELTYPE_MODIFICATION, ///< modification of base shapes to the final label
     SELTYPE_FILTER_BY_NEIGHBOR,  ///< identification by neighbor shapes in context
+    SELTYPE_WEAK_NAMING, ///< pure weak naming by weak index in context
   };
 
   Selector_Type myType; ///< Type of this selector.

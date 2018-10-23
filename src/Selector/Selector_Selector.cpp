@@ -283,6 +283,8 @@ bool Selector_Selector::select(const TopoDS_Shape theContext, const TopoDS_Shape
 
     // try to find the shape of the higher level type in the context shape
     bool aFacesTried = false; // for identification of vertices, faces are tried, then edges
+    TopoDS_ListOfShape aLastCommon; // to store the commons not good, but may be used for weak
+    TopTools_MapOfShape aLastIntersectors;
     while(aSelectionType != TopAbs_FACE || !aFacesTried) {
       if (aSelectionType == TopAbs_FACE) {
         if (theValue.ShapeType() != TopAbs_VERTEX)
@@ -308,7 +310,7 @@ bool Selector_Selector::select(const TopoDS_Shape theContext, const TopoDS_Shape
       commonShapes(anIntList, theValue.ShapeType(), aCommon);
       if (aCommon.Extent() == 1 && aCommon.First().IsSame(theValue)) {
         // name the intersectors
-        std::list<Selector_Selector> aSubSelList;
+        mySubSelList.clear();
         TopTools_MapOfShape::Iterator anInt(anIntersectors);
         for (; anInt.More(); anInt.Next()) {
           if (!selectBySubSelector(theContext, anInt.Value())) {
@@ -318,7 +320,10 @@ bool Selector_Selector::select(const TopoDS_Shape theContext, const TopoDS_Shape
         if (!anInt.More()) { // all intersectors were correctly named
           myType = SELTYPE_INTERSECT;
           return true;
-        }
+          }
+      } else if (aCommon.Extent() > 1 && aLastCommon.IsEmpty())  {
+        aLastCommon = aCommon;
+        aLastIntersectors = anIntersectors;
       }
     }
 
@@ -356,6 +361,36 @@ bool Selector_Selector::select(const TopoDS_Shape theContext, const TopoDS_Shape
         return true;
       }
     }
+
+    // weak naming to distinguish commons coming from intersection
+    if (aLastCommon.Extent() > 1) {
+      Selector_NExplode aNexp(aLastCommon);
+      myWeakIndex = aNexp.index(theValue);
+      if (myWeakIndex != -1) {
+        // name the intersectors
+        mySubSelList.clear();
+        TopTools_MapOfShape::Iterator anInt(aLastIntersectors);
+        for (; anInt.More(); anInt.Next()) {
+          if (!selectBySubSelector(theContext, anInt.Value())) {
+            break; // if some selector is failed, stop and search another solution
+          }
+        }
+        if (!anInt.More()) { // all intersectors were correctly named
+          myType = SELTYPE_INTERSECT;
+          return true;
+        }
+      }
+    }
+
+    // pure weak naming
+    myType = SELTYPE_WEAK_NAMING;
+    Selector_NExplode aNexp(theContext, theValue.ShapeType());
+    myWeakIndex = aNexp.index(theValue);
+    if (myWeakIndex != -1) {
+      myShapeType = theValue.ShapeType();
+      return true;
+    }
+
     return false;
   }
   // searching for the base shapes of the value
@@ -496,6 +531,9 @@ void Selector_Selector::store()
     for(; aSubSel != mySubSelList.end(); aSubSel++) {
       aSubSel->store();
     }
+    if (myWeakIndex != -1) {
+      TDataStd_Integer::Set(myLab, kWEAK_INDEX, myWeakIndex);
+    }
     break;
   }
   case SELTYPE_PRIMITIVE: {
@@ -531,6 +569,12 @@ void Selector_Selector::store()
     for(; aSubSel != mySubSelList.end(); aSubSel++) {
       aSubSel->store();
     }
+    break;
+  }
+  case SELTYPE_WEAK_NAMING: {
+    TDataStd_Integer::Set(myLab, kWEAK_INDEX, myWeakIndex);
+    TDataStd_Integer::Set(myLab, kSHAPE_TYPE, (int)myShapeType);
+    break;
   }
   default: { // unknown case
     break;
@@ -558,6 +602,10 @@ bool Selector_Selector::restore()
       mySubSelList.push_back(Selector_Selector(aSub.Value()->Label()));
       if (!mySubSelList.back().restore())
         aSubResult = false;
+    }
+    Handle(TDataStd_Integer) aWeakInt;
+    if (myLab.FindAttribute(kWEAK_INDEX, aWeakInt)) {
+      myWeakIndex = aWeakInt->Get();
     }
     return aSubResult;
   }
@@ -606,6 +654,17 @@ bool Selector_Selector::restore()
       myNBLevel.push_back(anArray->Value(anIndex));
     }
     return true;
+  }
+  case SELTYPE_WEAK_NAMING: {
+    Handle(TDataStd_Integer) aWeakInt;
+    if (!myLab.FindAttribute(kWEAK_INDEX, aWeakInt))
+      return false;
+    myWeakIndex = aWeakInt->Get();
+    Handle(TDataStd_Integer) aShapeTypeAttr;
+    if (!myLab.FindAttribute(kSHAPE_TYPE, aShapeTypeAttr))
+      return false;
+    myShapeType = TopAbs_ShapeEnum(aShapeTypeAttr->Get());
+    return myWeakIndex != -1;
   }
   default: { // unknown case
   }
@@ -704,9 +763,16 @@ bool Selector_Selector::solve(const TopoDS_Shape& theContext)
     }
     TopoDS_ListOfShape aCommon; // common sub shapes in each sub-selector (a result)
     commonShapes(aSubSelectorShapes, myShapeType, aCommon);
-    if (aCommon.Extent() != 1)
-      return false;
-    aResult = aCommon.First();
+    if (aCommon.Extent() != 1) {
+      if (myWeakIndex != -1) {
+        Selector_NExplode aNexp(aCommon);
+        aResult = aNexp.shape(myWeakIndex);
+      } else {
+        return false;
+      }
+    } else {
+      aResult = aCommon.First();
+    }
     break;
   }
   case SELTYPE_PRIMITIVE: {
@@ -751,6 +817,11 @@ bool Selector_Selector::solve(const TopoDS_Shape& theContext)
       aNBs.push_back(std::pair<TopoDS_Shape, int>(aSubSel->value(), *aLevel));
     }
     aResult = findNeighbor(theContext, aNBs);
+    break;
+  }
+  case SELTYPE_WEAK_NAMING: {
+    Selector_NExplode aNexp(theContext, myShapeType);
+    aResult = aNexp.shape(myWeakIndex);
   }
   default: { // unknown case
   }
@@ -779,12 +850,17 @@ std::string Selector_Selector::name(Selector_NameGenerator* theNameGenerator) {
   case SELTYPE_CONTAINER:
   case SELTYPE_INTERSECT: {
     std::string aResult;
-    // add names of sub-components one by one in "[]"
+    // add names of sub-components one by one in "[]" +optionally [weak_name_1]
     std::list<Selector_Selector>::iterator aSubSel = mySubSelList.begin();
     for(; aSubSel != mySubSelList.end(); aSubSel++) {
       aResult += '[';
       aResult += aSubSel->name(theNameGenerator);
       aResult += ']';
+    }
+    if (myWeakIndex != -1) {
+      std::ostringstream aWeakStr;
+      aWeakStr<<"["<<kWEAK_NAME_IDENTIFIER<<myWeakIndex<<"]";
+      aResult += aWeakStr.str();
     }
     return aResult;
   }
@@ -806,6 +882,7 @@ std::string Selector_Selector::name(Selector_NameGenerator* theNameGenerator) {
     for(TDF_LabelList::iterator aBase = myBases.begin(); aBase != myBases.end(); aBase++) {
       if (!aBase->FindAttribute(TDataStd_Name::GetID(), aName))
         return "";
+      aResult += "&";
       aResult += theNameGenerator->contextName(*aBase) + "/" +
         std::string(TCollection_AsciiString(aName->Get()).ToCString());
     }
@@ -826,6 +903,13 @@ std::string Selector_Selector::name(Selector_NameGenerator* theNameGenerator) {
       if (*aLevel > 1)
         aResult += *aLevel;
     }
+    return aResult;
+  }
+  case SELTYPE_WEAK_NAMING: {
+    // weak_naming_1
+    std::ostringstream aWeakStr;
+    aWeakStr<<kWEAK_NAME_IDENTIFIER<<myWeakIndex;
+    std::string aResult = aWeakStr.str();
     return aResult;
   }
   default: { // unknown case
@@ -861,6 +945,11 @@ TDF_Label Selector_Selector::restoreByName(
       size_t anEndPos = theName.find(']', aStart + 1);
       if (anEndPos != std::string::npos) {
         std::string aSubStr = theName.substr(aStart + 1, anEndPos - aStart - 1);
+        if (aSubStr.find(kWEAK_NAME_IDENTIFIER) == 0) { // weak name identifier
+          std::string aWeakIndex = aSubStr.substr(kWEAK_NAME_IDENTIFIER.size());
+          myWeakIndex = atoi(aWeakIndex.c_str());
+          continue;
+        }
         mySubSelList.push_back(Selector_Selector(myLab.FindChild(int(mySubSelList.size()) + 1)));
         TDF_Label aSubContext =
           mySubSelList.back().restoreByName(aSubStr, theShapeType, theNameGenerator);
@@ -922,6 +1011,12 @@ TDF_Label Selector_Selector::restoreByName(
       if (!myFinal.IsNull())
         return aContext;
     }
+  } if (theName.find(kWEAK_NAME_IDENTIFIER) == 0) { // weak naming identifier
+    myType = SELTYPE_WEAK_NAMING;
+    std::string aWeakIndex = theName.substr(kWEAK_NAME_IDENTIFIER.size());
+    myWeakIndex = atoi(aWeakIndex.c_str());
+    myShapeType = theShapeType;
+    return myLab;
   } else { // modification
     myType = SELTYPE_MODIFICATION;
     TDF_Label aContext;
