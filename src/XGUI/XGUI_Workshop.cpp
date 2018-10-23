@@ -1088,6 +1088,8 @@ bool XGUI_Workshop::onSaveAs()
       myCurrentFile += ".opp";
     }
   }
+  else
+    return false;
 #ifndef HAVE_SALOME
     myMainWindow->setCurrentDir(myCurrentFile, false);
     myMainWindow->setModifiedState(false);
