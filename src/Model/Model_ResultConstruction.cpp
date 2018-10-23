@@ -229,10 +229,10 @@ void Model_ResultConstruction::storeShape(std::shared_ptr<GeomAPI_Shape> theShap
 
       TopExp_Explorer anExp(aShape, TopAbs_VERTEX);
       for(int anIndex = 1; anExp.More(); anExp.Next(), anIndex++) {
-        TDF_Label aSubLab = aShapeLab.FindChild(anIndex);;
+        TDF_Label aSubLab = aShapeLab.FindChild(anIndex);
         TNaming_Builder aBuilder(aSubLab);
         aBuilder.Generated(anExp.Current());
-        std::string aVertexName = anIndex == 1 ? "StartVertex" : "EndVertex";
+        std::string aVertexName = aMyName + "_" + (anIndex == 1 ? "StartVertex" : "EndVertex");
         TDataStd_Name::Set(aSubLab, aVertexName.c_str());
         aMyDoc->addNamingName(aSubLab, aVertexName);
       }

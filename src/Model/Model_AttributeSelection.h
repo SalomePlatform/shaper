@@ -128,9 +128,6 @@ public:
   /// or reorder of features upper in the history line (issue #1757)
   MODEL_EXPORT virtual void updateInHistory();
 
-  /// Returns true if the name was stored using weak naming principle
-  MODEL_EXPORT virtual bool isWeakNaming();
-
   // Implementation of the name generator method from the Selector package
   // This method returns the context name by the label of the sub-selected shape
   MODEL_EXPORT virtual std::string contextName(const TDF_Label theSelectionLab) override;

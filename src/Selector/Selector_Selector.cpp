@@ -388,7 +388,28 @@ bool Selector_Selector::select(const TopoDS_Shape theContext, const TopoDS_Shape
     myWeakIndex = aNexp.index(theValue);
     if (myWeakIndex != -1) {
       myShapeType = theValue.ShapeType();
-      return true;
+      // searching for context shape label to store in myFinal
+      myFinal.Nullify();
+      if (TNaming_Tool::HasLabel(myLab, theContext)) {
+        for(TNaming_SameShapeIterator aShapes(theContext, myLab); aShapes.More(); aShapes.Next())
+        {
+          Handle(TNaming_NamedShape) aNS;
+          if (aShapes.Label().FindAttribute(TNaming_NamedShape::GetID(), aNS)) {
+            TNaming_Evolution anEvolution = aNS->Evolution();
+            if (anEvolution == TNaming_PRIMITIVE || anEvolution == TNaming_GENERATED ||
+                anEvolution == TNaming_MODIFY) {
+              // check this is a new shape
+              for(TNaming_Iterator aNSIter(aNS); aNSIter.More(); aNSIter.Next()) {
+                if (aNSIter.NewShape().IsSame(theContext)) {
+                  myFinal = aNS->Label();
+                  break;
+                }
+              }
+            }
+          }
+        }
+      }
+      return true; // could be final empty (in case it is called recursively) or not
     }
 
     return false;
@@ -574,6 +595,12 @@ void Selector_Selector::store()
   case SELTYPE_WEAK_NAMING: {
     TDataStd_Integer::Set(myLab, kWEAK_INDEX, myWeakIndex);
     TDataStd_Integer::Set(myLab, kSHAPE_TYPE, (int)myShapeType);
+    // store myFinal in the base array
+    if (!myFinal.IsNull()) {
+      Handle(TDataStd_ReferenceArray) anArray =
+        TDataStd_ReferenceArray::Set(myLab, kBASE_ARRAY, 0, 0);
+      anArray->SetValue(0, myFinal);
+    }
     break;
   }
   default: { // unknown case
@@ -664,7 +691,11 @@ bool Selector_Selector::restore()
     if (!myLab.FindAttribute(kSHAPE_TYPE, aShapeTypeAttr))
       return false;
     myShapeType = TopAbs_ShapeEnum(aShapeTypeAttr->Get());
-    return myWeakIndex != -1;
+    Handle(TDataStd_ReferenceArray) anArray;
+    if (myLab.FindAttribute(kBASE_ARRAY, anArray)) {
+      myFinal = anArray->Value(0);
+    }
+    return true;
   }
   default: { // unknown case
   }
@@ -820,8 +851,19 @@ bool Selector_Selector::solve(const TopoDS_Shape& theContext)
     break;
   }
   case SELTYPE_WEAK_NAMING: {
-    Selector_NExplode aNexp(theContext, myShapeType);
-    aResult = aNexp.shape(myWeakIndex);
+    TopoDS_Shape aContext;
+    if (myFinal.IsNull()) {
+      aContext = theContext;
+    } else {
+      Handle(TNaming_NamedShape) aNS;
+      if (myFinal.FindAttribute(TNaming_NamedShape::GetID(), aNS)) {
+        aContext = aNS->Get();
+      }
+    }
+    if (!aContext.IsNull()) {
+      Selector_NExplode aNexp(aContext, myShapeType);
+      aResult = aNexp.shape(myWeakIndex);
+    }
   }
   default: { // unknown case
   }
@@ -844,6 +886,7 @@ TopoDS_Shape Selector_Selector::value()
 }
 
 static const std::string kWEAK_NAME_IDENTIFIER = "weak_name_";
+static const std::string kPUREWEAK_NAME_IDENTIFIER = "_weak_name_";
 
 std::string Selector_Selector::name(Selector_NameGenerator* theNameGenerator) {
   switch(myType) {
@@ -906,10 +949,12 @@ std::string Selector_Selector::name(Selector_NameGenerator* theNameGenerator) {
     return aResult;
   }
   case SELTYPE_WEAK_NAMING: {
-    // weak_naming_1
+    // _weak_naming_1_Context
     std::ostringstream aWeakStr;
-    aWeakStr<<kWEAK_NAME_IDENTIFIER<<myWeakIndex;
+    aWeakStr<<kPUREWEAK_NAME_IDENTIFIER<<myWeakIndex;
     std::string aResult = aWeakStr.str();
+    if (!myFinal.IsNull())
+      aResult += "_" + theNameGenerator->contextName(myFinal);
     return aResult;
   }
   default: { // unknown case
@@ -1004,6 +1049,18 @@ TDF_Label Selector_Selector::restoreByName(
         return TDF_Label(); // invalid parentheses
     }
     return aContext;
+  } if (theName.find(kPUREWEAK_NAME_IDENTIFIER) == 0) { // weak naming identifier
+    myType = SELTYPE_WEAK_NAMING;
+    std::string aWeakIndex = theName.substr(kPUREWEAK_NAME_IDENTIFIER.size());
+    std::size_t aContextPosition = aWeakIndex.find("_");
+    myWeakIndex = atoi(aWeakIndex.c_str());
+    myShapeType = theShapeType;
+    TDF_Label aContext;
+    if (aContextPosition != std::string::npos) { // context is also defined
+      std::string aContextName = aWeakIndex.substr(aContextPosition + 1);
+      theNameGenerator->restoreContext(aContextName, aContext, myFinal);
+    }
+    return aContext;
   } else if (theName.find('&') == std::string::npos) { // wihtout '&' it can be only primitive
     myType = SELTYPE_PRIMITIVE;
     TDF_Label aContext;
@@ -1011,12 +1068,6 @@ TDF_Label Selector_Selector::restoreByName(
       if (!myFinal.IsNull())
         return aContext;
     }
-  } if (theName.find(kWEAK_NAME_IDENTIFIER) == 0) { // weak naming identifier
-    myType = SELTYPE_WEAK_NAMING;
-    std::string aWeakIndex = theName.substr(kWEAK_NAME_IDENTIFIER.size());
-    myWeakIndex = atoi(aWeakIndex.c_str());
-    myShapeType = theShapeType;
-    return myLab;
   } else { // modification
     myType = SELTYPE_MODIFICATION;
     TDF_Label aContext;

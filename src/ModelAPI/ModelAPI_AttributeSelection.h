@@ -115,9 +115,6 @@ class ModelAPI_AttributeSelection : public ModelAPI_Attribute
   /// Returns true if recompute of selection become impossible
   virtual bool isInvalid() = 0;
 
-  /// Returns true if the name was stored using weak naming principle
-  MODELAPI_EXPORT virtual bool isWeakNaming() = 0;
-
   /// To virtually destroy the fields of successors
   MODELAPI_EXPORT virtual ~ModelAPI_AttributeSelection();
 

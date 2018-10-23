@@ -40,6 +40,7 @@
 #include <GeomAPI_Edge.h>
 #include <GeomAPI_Pnt.h>
 #include <GeomAPI_Vertex.h>
+#include <GeomAPI_ShapeExplorer.h>
 #include <GeomAlgoAPI_CompoundBuilder.h>
 #include <GeomAlgoAPI_NExplode.h>
 #include <Selector_Selector.h>
@@ -88,12 +89,12 @@ Standard_GUID kCIRCLE_CENTER("d0d0e0f1-217a-4b95-8fbb-0c4132f23718");
 Standard_GUID kELLIPSE_CENTER1("f70df04c-3168-4dc9-87a4-f1f840c1275d");
 // identifier of the selection of the second focus point of ellipse on edge
 Standard_GUID kELLIPSE_CENTER2("1395ae73-8e02-4cf8-b204-06ff35873a32");
-// identifier of the weak naming index
-Standard_GUID kWEAK_NAMING("9dcdd9be-a3a9-46eb-9b16-1c957ab20142");
-// identifier of the weak naming sub-shape type
-Standard_GUID kWEAK_NAMING_SHAPETYPE("6b9cc709-e320-4a1f-9c42-df5622369ea7");
 // reference to the external sketch face
 Standard_GUID kEXT_SKETCH_FACE("ba32aa31-bde7-422f-80b4-79c757c77b49");
+// reference to the external sketch edge
+Standard_GUID kEXT_SKETCH_EDGE("ba32aa31-bde7-422f-80b4-79c757c77b48");
+// reference to the external sketch vertex
+Standard_GUID kEXT_SKETCH_VERT("ba32aa31-bde7-422f-80b4-79c757c77b47");
 
 // prefix for the whole feature context identification
 const static std::string kWHOLE_FEATURE = "all-in-";
@@ -140,9 +141,9 @@ bool Model_AttributeSelection::setValue(const ObjectPtr& theContext,
   aSelLab.ForgetAttribute(kCIRCLE_CENTER);
   aSelLab.ForgetAttribute(kELLIPSE_CENTER1);
   aSelLab.ForgetAttribute(kELLIPSE_CENTER2);
-  aSelLab.ForgetAttribute(kWEAK_NAMING);
-  aSelLab.ForgetAttribute(kWEAK_NAMING_SHAPETYPE);
   aSelLab.ForgetAttribute(kEXT_SKETCH_FACE);
+  aSelLab.ForgetAttribute(kEXT_SKETCH_EDGE);
+  aSelLab.ForgetAttribute(kEXT_SKETCH_VERT);
 
   bool isDegeneratedEdge = false;
   // do not use the degenerated edge as a shape, a null context and shape is used in the case
@@ -378,9 +379,42 @@ std::shared_ptr<GeomAPI_Shape> Model_AttributeSelection::internalValue(CenterTyp
       if (aConstr->isInfinite())
         return aResult; // empty result
       // external sketch face
-      Handle(TDataStd_Integer) aFaceIndex;
-      if (aSelLab.FindAttribute(kEXT_SKETCH_FACE, aFaceIndex)) {
-        return aConstr->face(aFaceIndex->Get());
+      Handle(TDataStd_Integer) anIndex;
+      if (aSelLab.FindAttribute(kEXT_SKETCH_FACE, anIndex)) {
+        return aConstr->face(anIndex->Get());
+      }
+      if (aSelLab.FindAttribute(kEXT_SKETCH_EDGE, anIndex) ||
+          aSelLab.FindAttribute(kEXT_SKETCH_VERT, anIndex)) {
+        bool isVert = anIndex->ID() == kEXT_SKETCH_VERT; // vertex is selected
+        CompositeFeaturePtr aComposite = std::dynamic_pointer_cast<ModelAPI_CompositeFeature>(
+          aConstr->document()->feature(aConstr));
+        if (aComposite.get()) {
+          int aSubNum = anIndex->Get() % 1000000;
+          int aVertShape = (anIndex->Get() - aSubNum) / 1000000;
+          FeaturePtr aSubFeat = aComposite->subFeature(aSubNum);
+          if (aSubFeat.get()) {
+            const std::list<std::shared_ptr<ModelAPI_Result> >& aResults = aSubFeat->results();
+            std::list<std::shared_ptr<ModelAPI_Result> >::const_iterator aRes = aResults.cbegin();
+            for (; aRes != aResults.cend(); aRes++) {
+              ResultConstructionPtr aConstr =
+                std::dynamic_pointer_cast<ModelAPI_ResultConstruction>(*aRes);
+              if (aConstr->shape()) {
+                if (!isVert && aConstr->shape()->isEdge())
+                  return aConstr->shape();
+                else if (isVert && aVertShape == 0 && aConstr->shape()->isVertex())
+                  return aConstr->shape();
+                else if (isVert && aVertShape > 1 && aConstr->shape()->isEdge()) {
+                  GeomAPI_ShapeExplorer anExp(aConstr->shape(), GeomAPI_Shape::VERTEX);
+                  for(; anExp.more(); anExp.next()) {
+                    if (aVertShape == 1)
+                      return anExp.current();
+                    aVertShape--;
+                  }
+                }
+              }
+            }
+          }
+        }
       }
     }
     if (!aConstr.get()) { // for construction context, return empty result as usual even
@@ -399,30 +433,6 @@ std::shared_ptr<GeomAPI_Shape> Model_AttributeSelection::internalValue(CenterTyp
         }
         return GeomAlgoAPI_CompoundBuilder::compound(allShapes);
       }
-    }
-
-    if (aSelLab.IsAttribute(kWEAK_NAMING)) { // a weak naming is used
-      Handle(TDataStd_Integer) aWeakId;
-      aSelLab.FindAttribute(kWEAK_NAMING, aWeakId);
-      // get the context shape
-      GeomShapePtr aContextShape;
-      ResultBodyPtr aBody = std::dynamic_pointer_cast<ModelAPI_ResultBody>(context());
-      if (aBody.get()) {
-        aContextShape = aBody->shape();
-      } else {
-        ResultPtr aResult = std::dynamic_pointer_cast<ModelAPI_Result>(myRef.value());
-        if (aResult) {
-          aContextShape = aResult->shape();
-        }
-      }
-      if (!aContextShape.get())
-        return GeomShapePtr();
-      Handle(TDataStd_Integer) aWeakShapeType;
-      aSelLab.FindAttribute(kWEAK_NAMING_SHAPETYPE, aWeakShapeType);
-      GeomAlgoAPI_NExplode aNExplode(
-        aContextShape, GeomAPI_Shape::ShapeType(aWeakShapeType->Get()));
-      GeomShapePtr aValue = aNExplode.shape(aWeakId->Get());
-      return aValue;
     }
 
     Handle(TNaming_NamedShape) aSelection;
@@ -602,29 +612,6 @@ bool Model_AttributeSelection::update()
   }
 
   if (aContext->groupName() == ModelAPI_ResultBody::group()) {
-    if (aSelLab.IsAttribute(kWEAK_NAMING)) { // a weak naming is used
-      Handle(TDataStd_Integer) aWeakId;
-      aSelLab.FindAttribute(kWEAK_NAMING, aWeakId);
-      // get the context shape
-      GeomShapePtr aContextShape;
-      ResultBodyPtr aBody = std::dynamic_pointer_cast<ModelAPI_ResultBody>(aContext);
-      if (aBody.get()) {
-        aContextShape = aBody->shape();
-      } else {
-        ResultPtr aResult = std::dynamic_pointer_cast<ModelAPI_Result>(myRef.value());
-        if (aResult) {
-          aContextShape = aResult->shape();
-        }
-      }
-      if (!setInvalidIfFalse(aSelLab, aContextShape.get() != NULL)) // context shape not found
-        return false;
-      Handle(TDataStd_Integer) aWeakShapeType;
-      aSelLab.FindAttribute(kWEAK_NAMING_SHAPETYPE, aWeakShapeType);
-      GeomAlgoAPI_NExplode aNExplode(
-        aContextShape, GeomAPI_Shape::ShapeType(aWeakShapeType->Get()));
-      GeomShapePtr aValue = aNExplode.shape(aWeakId->Get());
-      return setInvalidIfFalse(aSelLab, aValue.get() != NULL);
-    }
     // body: just a named shape, use topological selection mechanism
     bool aResult = false;
     TopoDS_Shape anOldShape;
@@ -665,6 +652,16 @@ bool Model_AttributeSelection::update()
       Handle(TDataStd_Integer) anIndex;
       if (aSelLab.FindAttribute(kEXT_SKETCH_FACE, anIndex)) {
         return setInvalidIfFalse(aSelLab, anIndex->Get() < aConstructionContext->facesNum());
+      }
+      if (aSelLab.FindAttribute(kEXT_SKETCH_EDGE, anIndex) ||
+          aSelLab.FindAttribute(kEXT_SKETCH_VERT, anIndex)) {
+        CompositeFeaturePtr aComposite = std::dynamic_pointer_cast<ModelAPI_CompositeFeature>(
+          aConstructionContext->document()->feature(aConstructionContext));
+        if (aComposite.get()) {
+          FeaturePtr aSubFeat = aComposite->subFeature(anIndex->Get() % 1000000);
+          return setInvalidIfFalse(aSelLab, aSubFeat.get() != NULL);
+        }
+        return setInvalidIfFalse(aSelLab, false); // composite sub-feature is not found
       }
       Selector_Selector aSelector(aSelLab);
       aResult = aSelector.restore();
@@ -709,18 +706,67 @@ void Model_AttributeSelection::selectBody(
     TopoDS_Shape aNewSub = theSubShape->impl<TopoDS_Shape>();
     FeaturePtr aFeatureOwner = std::dynamic_pointer_cast<ModelAPI_Feature>(owner());
     if (aFeatureOwner->document() != theContext->document()) { // reference to the sketch face
-      ResultConstructionPtr aConstr =
-        std::dynamic_pointer_cast<ModelAPI_ResultConstruction>(theContext);
-      int aFaceIndex = -1, aFacesNum = aConstr->facesNum();
-      for(int a = 0; a < aFacesNum; a++) {
-        if (aConstr->face(a)->isEqual(theSubShape)) {
-          aFaceIndex = a;
-          break;
+      if (theSubShape->shapeType() == TopAbs_FACE) { // sketch face
+        ResultConstructionPtr aConstr =
+          std::dynamic_pointer_cast<ModelAPI_ResultConstruction>(theContext);
+        int aFaceIndex = -1, aFacesNum = aConstr->facesNum();
+        for(int a = 0; a < aFacesNum; a++) {
+          if (aConstr->face(a)->isEqual(theSubShape)) {
+            aFaceIndex = a;
+            break;
+          }
         }
-      }
-      if (aFaceIndex >= 0) {
-        TDataStd_Integer::Set(aSelLab, kEXT_SKETCH_FACE, aFaceIndex); // store index of the face
-        return;
+        if (aFaceIndex >= 0) {
+          TDataStd_Integer::Set(aSelLab, kEXT_SKETCH_FACE, aFaceIndex); // store index of the face
+          return;
+        }
+      } else if (theSubShape->shapeType() == TopAbs_EDGE ||  // sketch result edge (full one)
+                 theSubShape->shapeType() == TopAbs_VERTEX) { // or start/end vertex
+        bool isVertex = theSubShape->shapeType() == TopAbs_VERTEX;
+        CompositeFeaturePtr aComposite = std::dynamic_pointer_cast<ModelAPI_CompositeFeature>(
+          theContext->document()->feature(theContext));
+        if (aComposite.get()) { // iterate edges of composite to find index of matched with value
+          int aSub, anEdgeIndex = -1, aSubNum = aComposite->numberOfSubs();
+          int aVertIndex = -1, aVertShape = -1; // shape: 0 full, 1 start, 2 end
+          for(aSub = 0; aSub < aSubNum && anEdgeIndex == -1; aSub++) {
+            FeaturePtr aSubFeat = aComposite->subFeature(aSub);
+            const std::list<std::shared_ptr<ModelAPI_Result> >& aResults = aSubFeat->results();
+            std::list<std::shared_ptr<ModelAPI_Result> >::const_iterator aRes = aResults.cbegin();
+            for (; aRes != aResults.cend(); aRes++) {
+              ResultConstructionPtr aConstr =
+                std::dynamic_pointer_cast<ModelAPI_ResultConstruction>(*aRes);
+              if (aConstr->shape() && aConstr->shape()->isEdge()) {
+                if (isVertex) {
+                  GeomAPI_ShapeExplorer aVertExp(aConstr->shape(), GeomAPI_Shape::VERTEX);
+                  for(int aNum = 1; aVertExp.more(); aVertExp.next(), aNum++) {
+                    if (aVertExp.current()->isSame(theSubShape) && aVertShape != 0) {
+                      aVertIndex = aSub;
+                      aVertShape = aNum;
+                    }
+                  }
+                } else {
+                  if (aConstr->shape()->isSame(theSubShape)) {
+                    anEdgeIndex = aSub;
+                    break;
+                  }
+                }
+              } else if (isVertex && aConstr->shape() && aConstr->shape()->isVertex()) {
+                if (aConstr->shape()->isSame(theSubShape)) {
+                  aVertIndex = aSub;
+                  aVertShape = 0;
+                }
+              }
+            }
+          }
+          if (anEdgeIndex >= 0) {
+            TDataStd_Integer::Set(aSelLab, kEXT_SKETCH_EDGE, anEdgeIndex); // store index of edge
+            return;
+          } else if (aVertIndex >= 0) {
+            aVertIndex += aVertShape * 1000000; // to store both integers: index and shape
+            TDataStd_Integer::Set(aSelLab, kEXT_SKETCH_VERT, aVertIndex); // store index of edge
+            return;
+          }
+        }
       }
     }
     bool aSelectorOk = true;
@@ -734,8 +780,6 @@ void Model_AttributeSelection::selectBody(
     } catch(...) {
       aSelectorOk = false;
     }
-    // check that selection is correct, otherwise use weak naming solution
-    aSelLab.ForgetAttribute(kWEAK_NAMING);
     Handle(TNaming_NamedShape) aSelectorShape;
     if (aSelectorOk && aSelLab.FindAttribute(TNaming_NamedShape::GetID(), aSelectorShape))
     {
@@ -743,18 +787,8 @@ void Model_AttributeSelection::selectBody(
       if (aShape.IsNull() || aShape.ShapeType() != aNewSub.ShapeType())
         aSelectorOk = false;
     }
-    if (!aSelectorOk) { // weak naming identifier instead
-      GeomShapePtr aContextShape(new GeomAPI_Shape);
-      aContextShape->setImpl<TopoDS_Shape>(new TopoDS_Shape(aContext));
-      GeomShapePtr aValueShape(new GeomAPI_Shape);
-      aValueShape->setImpl<TopoDS_Shape>(new TopoDS_Shape(aNewSub));
-
-      GeomAlgoAPI_NExplode aNExplode(aContextShape, aValueShape->shapeType());
-      int anId = aNExplode.index(aValueShape);
-      if (anId) {
-        TDataStd_Integer::Set(aSelLab, kWEAK_NAMING, anId);
-        TDataStd_Integer::Set(aSelLab, kWEAK_NAMING_SHAPETYPE, int(aValueShape->shapeType()));
-      }
+    if (!aSelectorOk) {
+      setInvalidIfFalse(aSelLab, false);
     }
   }
 }
@@ -842,13 +876,6 @@ std::string Model_AttributeSelection::namingName(const std::string& theDefaultNa
     return contextName(aCont);
   }
 
-  Handle(TDataStd_Integer) aWeakId;
-  if (aSelLab.FindAttribute(kWEAK_NAMING, aWeakId)) { // a weak naming is used
-    std::ostringstream aNameStream;
-    aNameStream<<contextName(aCont)<<"/weak_name_"<<aWeakId->Get();
-    return aNameStream.str();
-  }
-
   // whole infinitive construction
   if (aCont->groupName() == ModelAPI_ResultConstruction::group()) {
     ResultConstructionPtr aConstr = std::dynamic_pointer_cast<Model_ResultConstruction>(aCont);
@@ -856,8 +883,10 @@ std::string Model_AttributeSelection::namingName(const std::string& theDefaultNa
       return contextName(aCont);
     } else {
       // external sketch face
-      Handle(TDataStd_Integer) aFaceIndex;
-      if (aSelLab.FindAttribute(kEXT_SKETCH_FACE, aFaceIndex)) {
+      Handle(TDataStd_Integer) anIndex;
+      if (aSelLab.FindAttribute(kEXT_SKETCH_FACE, anIndex) ||
+          aSelLab.FindAttribute(kEXT_SKETCH_EDGE, anIndex) ||
+          aSelLab.FindAttribute(kEXT_SKETCH_VERT, anIndex)) {
         std::shared_ptr<Model_Document> anExtDoc =
           std::dynamic_pointer_cast<Model_Document>(aCont->document());
         Selector_Selector aSelector(anExtDoc->extConstructionsLabel());
@@ -1523,11 +1552,6 @@ void Model_AttributeSelection::setParent(Model_AttributeSelectionList* theParent
   myParent = theParent;
 }
 
-bool Model_AttributeSelection::isWeakNaming()
-{
-  return selectionLabel().IsAttribute(kWEAK_NAMING);
-}
-
 std::string Model_AttributeSelection::contextName(const TDF_Label theSelectionLab)
 {
   std::shared_ptr<Model_Document> aDoc = myRestoreDocument.get() ? myRestoreDocument :
@@ -1601,13 +1625,24 @@ bool Model_AttributeSelection::restoreContext(std::string theName,
         std::dynamic_pointer_cast<ModelAPI_CompositeFeature>(aDoc->feature(aCont));
       if (aComposite.get() && aComposite->numberOfSubs()) {
         const int aSubNum = aComposite->numberOfSubs();
-        for (int a = 0; a < aSubNum; a++) {
+        for (int a = 0; a < aSubNum && theValue.IsNull(); a++) {
           FeaturePtr aSub = aComposite->subFeature(a);
           const std::list<std::shared_ptr<ModelAPI_Result> >& aResults = aSub->results();
           std::list<std::shared_ptr<ModelAPI_Result> >::const_iterator aRes = aResults.cbegin();
-          for (; aRes != aResults.cend(); aRes++) {
+          for (; aRes != aResults.cend() && theValue.IsNull(); aRes++) {
             if ((*aRes)->data()->name() == aCompName) {
               theValue = std::dynamic_pointer_cast<Model_Data>((*aRes)->data())->shapeLab();
+              break;
+            } else if (aCompName.find((*aRes)->data()->name()) != std::string::npos) {// sub-vertex
+              TDF_Label aLab = std::dynamic_pointer_cast<Model_Data>((*aRes)->data())->shapeLab();
+              TDF_ChildIDIterator aSubNames(aLab, TDataStd_Name::GetID());
+              for(; aSubNames.More(); aSubNames.Next()) {
+                if (Handle(TDataStd_Name)::DownCast(aSubNames.Value())->Get().
+                  IsEqual(aCompName.c_str())) {
+                  theValue = aSubNames.Value()->Label();
+                  break;
+                }
+              }
             }
           }
         }
