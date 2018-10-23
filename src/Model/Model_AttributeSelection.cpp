@@ -706,7 +706,7 @@ void Model_AttributeSelection::selectBody(
     TopoDS_Shape aNewSub = theSubShape->impl<TopoDS_Shape>();
     FeaturePtr aFeatureOwner = std::dynamic_pointer_cast<ModelAPI_Feature>(owner());
     if (aFeatureOwner->document() != theContext->document()) { // reference to the sketch face
-      if (theSubShape->shapeType() == TopAbs_FACE) { // sketch face
+      if (theSubShape->shapeType() == GeomAPI_Shape::FACE) { // sketch face
         ResultConstructionPtr aConstr =
           std::dynamic_pointer_cast<ModelAPI_ResultConstruction>(theContext);
         int aFaceIndex = -1, aFacesNum = aConstr->facesNum();
@@ -720,9 +720,9 @@ void Model_AttributeSelection::selectBody(
           TDataStd_Integer::Set(aSelLab, kEXT_SKETCH_FACE, aFaceIndex); // store index of the face
           return;
         }
-      } else if (theSubShape->shapeType() == TopAbs_EDGE ||  // sketch result edge (full one)
-                 theSubShape->shapeType() == TopAbs_VERTEX) { // or start/end vertex
-        bool isVertex = theSubShape->shapeType() == TopAbs_VERTEX;
+      } else if (theSubShape->shapeType() == GeomAPI_Shape::EDGE ||// sketch result edge (full one)
+                 theSubShape->shapeType() == GeomAPI_Shape::VERTEX) { // or start/end vertex
+        bool isVertex = theSubShape->shapeType() == GeomAPI_Shape::VERTEX;
         CompositeFeaturePtr aComposite = std::dynamic_pointer_cast<ModelAPI_CompositeFeature>(
           theContext->document()->feature(theContext));
         if (aComposite.get()) { // iterate edges of composite to find index of matched with value

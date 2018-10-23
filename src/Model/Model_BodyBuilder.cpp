@@ -134,7 +134,7 @@ void Model_BodyBuilder::store(const GeomShapePtr& theShape,
 {
   std::shared_ptr<Model_Data> aData = std::dynamic_pointer_cast<Model_Data>(data());
   if (aData) {
-    TDF_Label& aShapeLab = aData->shapeLab();
+    TDF_Label aShapeLab = aData->shapeLab();
     // clean builders
     clean();
     // store the new shape as primitive
@@ -178,7 +178,7 @@ void Model_BodyBuilder::storeGenerated(const GeomShapePtr& theFromShape,
 {
   std::shared_ptr<Model_Data> aData = std::dynamic_pointer_cast<Model_Data>(data());
   if (aData) {
-    TDF_Label& aShapeLab = aData->shapeLab();
+    TDF_Label aShapeLab = aData->shapeLab();
     // clean builders
     clean();
     // store the new shape as primitive
@@ -969,7 +969,7 @@ bool Model_BodyBuilder::isLatestEqual(const GeomShapePtr& theShape)
     TopoDS_Shape aShape = theShape->impl<TopoDS_Shape>();
     std::shared_ptr<Model_Data> aData = std::dynamic_pointer_cast<Model_Data>(data());
     if (aData) {
-      TDF_Label& aShapeLab = aData->shapeLab();
+      TDF_Label aShapeLab = aData->shapeLab();
       Handle(TNaming_NamedShape) aName;
       if (aShapeLab.FindAttribute(TNaming_NamedShape::GetID(), aName)) {
         TopoDS_Shape aLatest = TNaming_Tool::CurrentShape(aName);
