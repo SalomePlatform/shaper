@@ -102,7 +102,7 @@ bool Model_ResultConstruction::updateShape()
 {
   std::shared_ptr<Model_Data> aData = std::dynamic_pointer_cast<Model_Data>(data());
   if (aData && aData->isValid()) {
-    TDF_Label& aShapeLab = aData->shapeLab();
+    TDF_Label aShapeLab = aData->shapeLab();
     Handle(TNaming_NamedShape) aNS;
     if (aShapeLab.FindAttribute(TNaming_NamedShape::GetID(), aNS)) {
       TopoDS_Shape aShape = aNS->Get();
@@ -166,7 +166,7 @@ int Model_ResultConstruction::facesNum(const bool theUpdateNaming)
   int aResult = 0;
   std::shared_ptr<Model_Data> aData = std::dynamic_pointer_cast<Model_Data>(data());
   if (aData.get() && aData->isValid()) {
-    TDF_Label& aShapeLab = aData->shapeLab();
+    TDF_Label aShapeLab = aData->shapeLab();
     TDF_ChildIDIterator anOldIter(aShapeLab, TDataStd_IntPackedMap::GetID());
     for (; anOldIter.More(); anOldIter.Next()) {
       aResult++;
@@ -181,7 +181,7 @@ std::shared_ptr<GeomAPI_Face> Model_ResultConstruction::face(const int theIndex)
   int anIndex = 0;
   std::shared_ptr<Model_Data> aData = std::dynamic_pointer_cast<Model_Data>(data());
   if (aData.get() && aData->isValid()) {
-    TDF_Label& aShapeLab = aData->shapeLab();
+    TDF_Label aShapeLab = aData->shapeLab();
     TDF_ChildIDIterator anOldIter(aShapeLab, TDataStd_IntPackedMap::GetID());
     for (; anOldIter.More(); anOldIter.Next()) {
       if (anIndex == theIndex) {
@@ -207,7 +207,7 @@ void Model_ResultConstruction::storeShape(std::shared_ptr<GeomAPI_Shape> theShap
   std::shared_ptr<Model_Data> aData = std::dynamic_pointer_cast<Model_Data>(data());
   if (aData && aData->isValid()) {
     std::string aMyName = data()->name();
-    TDF_Label& aShapeLab = aData->shapeLab();
+    TDF_Label aShapeLab = aData->shapeLab();
     if (!theShape.get() || theShape->isNull()) {
       aShapeLab.ForgetAllAttributes();
       TDataStd_Name::Set(aShapeLab, aMyName.c_str()); // restore name forgotten
