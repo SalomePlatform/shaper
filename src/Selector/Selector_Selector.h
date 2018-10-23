@@ -98,7 +98,7 @@ private:
   /// Returns true if selection is correct.
   bool selectBySubSelector(const TopoDS_Shape theContext, const TopoDS_Shape theValue,
     const bool theUseNeighbors = true);
-  /// Searches the final shapes presented in all results from bases basing on the modification fields
+  /// Searches the final shapes presented in all results from bases basing on modification fields
   void findModificationResult(TopoDS_ListOfShape& theCommon);
 };
 

@@ -965,7 +965,8 @@ void Model_AttributeSelection::selectSubShape(
         aDoc = std::dynamic_pointer_cast<Model_Document>(aRootDoc);
         aSubShapeName = aSubShapeName.substr(aPartEnd + 1);
       } else {
-        ObjectPtr aFound = owner()->document()->objectByName(ModelAPI_ResultPart::group(), aPartName);
+        ObjectPtr aFound =
+          owner()->document()->objectByName(ModelAPI_ResultPart::group(), aPartName);
         if (aFound.get()) { // found such part, so asking it for the name
           ResultPartPtr aPart = std::dynamic_pointer_cast<ModelAPI_ResultPart>(aFound);
           aDoc = std::dynamic_pointer_cast<Model_Document>(aPart->partDoc());

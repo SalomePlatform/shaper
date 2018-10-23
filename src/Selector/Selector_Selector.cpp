@@ -252,7 +252,7 @@ bool Selector_Selector::select(const TopoDS_Shape theContext, const TopoDS_Shape
   // check the value shape can be named as it is, or it is needed to construct it from the
   // higher level shapes (like a box vertex by faces that form this vertex)
   bool aIsFound = TNaming_Tool::HasLabel(myLab, theValue);
-  if (aIsFound) { // additional check for selection and delete evolution only: also could not be used
+  if (aIsFound) { // additional check for selection and delete evolution only: also could not use
     aIsFound = false;
     for(TNaming_SameShapeIterator aShapes(theValue, myLab); aShapes.More(); aShapes.Next())
     {
@@ -477,7 +477,7 @@ bool Selector_Selector::select(const TopoDS_Shape theContext, const TopoDS_Shape
           return false;
 
         // searching by neighbours
-        std::list<std::pair<TopoDS_Shape, int> > aNBs; /// neighbor sub-shape -> level of neighborhood
+        std::list<std::pair<TopoDS_Shape, int> > aNBs;//neighbor sub-shape -> level of neighborhood
         for(int aLevel = 1; true; aLevel++) {
           TopTools_MapOfShape aNewNB;
           findNeighbors(theContext, theValue, aLevel, aNewNB);
@@ -487,7 +487,7 @@ bool Selector_Selector::select(const TopoDS_Shape theContext, const TopoDS_Shape
           // check which can be named correctly, without by neighbors type
           for(TopTools_MapOfShape::Iterator aNBIter(aNewNB); aNBIter.More(); ) {
             Selector_Selector aSelector(myLab.FindChild(1));
-            if (aSelector.select(theContext, aNBIter.Value(), false)) { // add to the list of good NBs
+            if (aSelector.select(theContext, aNBIter.Value(), false)) {// add to list of good NBs
               aNBs.push_back(std::pair<TopoDS_Shape, int>(aNBIter.Value(), aLevel));
             }
             aNewNB.Remove(aNBIter.Key());
