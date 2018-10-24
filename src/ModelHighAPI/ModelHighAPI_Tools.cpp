@@ -513,8 +513,6 @@ static bool checkDump(SessionPtr theSession,
 
 bool checkPythonDump()
 {
-  return true;
-
   static const std::string anErrorByNaming("checkPythonDump by naming");
   static const std::string anErrorByGeometry("checkPythonDump by geometry");
 
