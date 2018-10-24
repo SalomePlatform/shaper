@@ -323,6 +323,8 @@ void GeomAlgoAPI_Pipe::build(const ListOfShape& theBaseShapes,
   GeomShapePtr aFromShape(new GeomAPI_Shape), aToShape(new GeomAPI_Shape);
   aFromShape->setImpl(new TopoDS_Shape(aPipeBuilder->FirstShape()));
   aToShape->setImpl(new TopoDS_Shape(aPipeBuilder->LastShape()));
+  fixOrientation(aFromShape);
+  fixOrientation(aToShape);
   this->addFromShape(aFromShape);
   this->addToShape(aToShape);
 

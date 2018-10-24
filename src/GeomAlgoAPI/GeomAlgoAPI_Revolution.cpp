@@ -418,6 +418,7 @@ void GeomAlgoAPI_Revolution::build(const GeomShapePtr&                 theBaseSh
       for(TopTools_ListIteratorOfListOfShape anIt(aBndShapes); anIt.More(); anIt.Next()) {
         GeomShapePtr aShape(new GeomAPI_Shape());
         aShape->setImpl(new TopoDS_Shape(anIt.Value()));
+        fixOrientation(aShape);
         isFromFaceSet ? this->addFromShape(aShape) : this->addToShape(aShape);
       }
     }
@@ -482,6 +483,7 @@ void GeomAlgoAPI_Revolution::build(const GeomShapePtr&                 theBaseSh
           for(TopTools_ListIteratorOfListOfShape anIt(aBsShapes); anIt.More(); anIt.Next()) {
             GeomShapePtr aShape(new GeomAPI_Shape());
             aShape->setImpl(new TopoDS_Shape(anIt.Value()));
+            fixOrientation(aShape);
             isFromFaceSet ? this->addToShape(aShape) : this->addFromShape(aShape);
           }
         }
@@ -612,6 +614,8 @@ void storeGenerationHistory(GeomAlgoAPI_Revolution* theRevolutionAlgo,
     GeomShapePtr aFromShape(new GeomAPI_Shape), aToShape(new GeomAPI_Shape);
     aFromShape->setImpl(new TopoDS_Shape(theRevolBuilder->FirstShape(aShape)));
     aToShape->setImpl(new TopoDS_Shape(theRevolBuilder->LastShape(aShape)));
+    theRevolutionAlgo->fixOrientation(aFromShape);
+    theRevolutionAlgo->fixOrientation(aToShape);
     theRevolutionAlgo->addFromShape(aFromShape);
     theRevolutionAlgo->addToShape(aToShape);
   }
@@ -633,11 +637,13 @@ void storeGenerationHistory(GeomAlgoAPI_Revolution* theRevolutionAlgo,
       if(anIntTools.IsValidPointForFace(aPnt, TopoDS::Face(theToFace),
           Precision::Confusion()) == Standard_True) {
         aGeomSh->setImpl(new TopoDS_Shape(aShape));
+        theRevolutionAlgo->fixOrientation(aGeomSh);
         theRevolutionAlgo->addToShape(aGeomSh);
       }
       if(anIntTools.IsValidPointForFace(aPnt, TopoDS::Face(theFromFace),
           Precision::Confusion()) == Standard_True) {
         aGeomSh->setImpl(new TopoDS_Shape(aShape));
+        theRevolutionAlgo->fixOrientation(aGeomSh);
         theRevolutionAlgo->addFromShape(aGeomSh);
       }
     } else if(theType == TopAbs_EDGE) {
@@ -646,12 +652,14 @@ void storeGenerationHistory(GeomAlgoAPI_Revolution* theRevolutionAlgo,
       anEdgeCheck.Perform();
       if(anEdgeCheck.MaxDistance() < Precision::Confusion()) {
         aGeomSh->setImpl(new TopoDS_Shape(aShape));
+        theRevolutionAlgo->fixOrientation(aGeomSh);
         theRevolutionAlgo->addToShape(aGeomSh);
       }
       anEdgeCheck.Init(anEdge, TopoDS::Face(theFromFace));
       anEdgeCheck.Perform();
       if(anEdgeCheck.MaxDistance() < Precision::Confusion()) {
         aGeomSh->setImpl(new TopoDS_Shape(aShape));
+        theRevolutionAlgo->fixOrientation(aGeomSh);
         theRevolutionAlgo->addFromShape(aGeomSh);
       }
     } else {
@@ -660,10 +668,12 @@ void storeGenerationHistory(GeomAlgoAPI_Revolution* theRevolutionAlgo,
       Handle(Geom_Surface) aToSurface = BRep_Tool::Surface(TopoDS::Face(theToFace));
       if(aFaceSurface == aFromSurface) {
         aGeomSh->setImpl(new TopoDS_Shape(aShape));
+        theRevolutionAlgo->fixOrientation(aGeomSh);
         theRevolutionAlgo->addFromShape(aGeomSh);
       }
       if(aFaceSurface == aToSurface) {
         aGeomSh->setImpl(new TopoDS_Shape(aShape));
+        theRevolutionAlgo->fixOrientation(aGeomSh);
         theRevolutionAlgo->addToShape(aGeomSh);
       }
     }
@@ -686,12 +696,14 @@ void storeGenerationHistory(GeomAlgoAPI_Revolution* theRevolutionAlgo,
       if(anIntTools.IsValidPointForFace(aPnt, TopoDS::Face(theRotatedBoundingFace),
           Precision::Confusion()) == Standard_True) {
         aGeomSh->setImpl(new TopoDS_Shape(aShape));
+        theRevolutionAlgo->fixOrientation(aGeomSh);
         theIsFromFaceSet ? theRevolutionAlgo->addFromShape(aGeomSh) :
                            theRevolutionAlgo->addToShape(aGeomSh);
       }
       if(anIntTools.IsValidPointForFace(aPnt, TopoDS::Face(theModifiedBaseShape),
          Precision::Confusion()) == Standard_True) {
         aGeomSh->setImpl(new TopoDS_Shape(aShape));
+        theRevolutionAlgo->fixOrientation(aGeomSh);
         theIsFromFaceSet ? theRevolutionAlgo->addToShape(aGeomSh) :
                            theRevolutionAlgo->addFromShape(aGeomSh);
       }
@@ -701,6 +713,7 @@ void storeGenerationHistory(GeomAlgoAPI_Revolution* theRevolutionAlgo,
       anEdgeCheck.Perform();
       if(anEdgeCheck.MaxDistance() < Precision::Confusion()) {
         aGeomSh->setImpl(new TopoDS_Shape(aShape));
+        theRevolutionAlgo->fixOrientation(aGeomSh);
         theIsFromFaceSet ? theRevolutionAlgo->addFromShape(aGeomSh) :
                            theRevolutionAlgo->addToShape(aGeomSh);
       }
@@ -708,6 +721,7 @@ void storeGenerationHistory(GeomAlgoAPI_Revolution* theRevolutionAlgo,
       anEdgeCheck.Perform();
       if(anEdgeCheck.MaxDistance() < Precision::Confusion()) {
         aGeomSh->setImpl(new TopoDS_Shape(aShape));
+        theRevolutionAlgo->fixOrientation(aGeomSh);
         theIsFromFaceSet ? theRevolutionAlgo->addToShape(aGeomSh) :
                            theRevolutionAlgo->addFromShape(aGeomSh);
       }
@@ -718,11 +732,13 @@ void storeGenerationHistory(GeomAlgoAPI_Revolution* theRevolutionAlgo,
       Handle(Geom_Surface) aBaseSurface = BRep_Tool::Surface(TopoDS::Face(theModifiedBaseShape));
       if(aFaceSurface == aBoundingSurface) {
         aGeomSh->setImpl(new TopoDS_Shape(aShape));
+        theRevolutionAlgo->fixOrientation(aGeomSh);
         theIsFromFaceSet ? theRevolutionAlgo->addFromShape(aGeomSh) :
                            theRevolutionAlgo->addToShape(aGeomSh);
       }
       if(aFaceSurface == aBaseSurface) {
         aGeomSh->setImpl(new TopoDS_Shape(aShape));
+        theRevolutionAlgo->fixOrientation(aGeomSh);
         theIsFromFaceSet ? theRevolutionAlgo->addToShape(aGeomSh) :
                            theRevolutionAlgo->addFromShape(aGeomSh);
       }

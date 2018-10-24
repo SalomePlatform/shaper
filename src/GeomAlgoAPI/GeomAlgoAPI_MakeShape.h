@@ -144,6 +144,9 @@ public:
                                                   GeomShapePtr theNewShape,
                                                   const int theShapeType);
 
+  /// Replaces \a theShape with shape from \a myMap.
+  GEOMALGOAPI_EXPORT void fixOrientation(GeomShapePtr& theShape);
+
 protected:
   /// \brief Sets builder type.
   /// \param[in] theBuilderType new builder type.
@@ -159,9 +162,6 @@ protected:
 
   /// \return true if passed shape is valid for history.
   bool isValidForHistory(const GeomShapePtr theShape);
-
-  /// Replaces \a theShape with shape from \a myMap.
-  void fixOrientation(GeomShapePtr& theShape);
 
 protected:
    /// Data map to keep correct orientation of sub-shapes.

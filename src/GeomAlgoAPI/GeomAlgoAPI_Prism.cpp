@@ -411,6 +411,7 @@ void GeomAlgoAPI_Prism::build(const GeomShapePtr&                theBaseShape,
       for(TopTools_ListIteratorOfListOfShape anIt(aToShapes); anIt.More(); anIt.Next()) {
         GeomShapePtr aGeomSh(new GeomAPI_Shape());
         aGeomSh->setImpl(new TopoDS_Shape(anIt.Value()));
+        fixOrientation(aGeomSh);
         this->addToShape(aGeomSh);
       }
     }
@@ -436,6 +437,7 @@ void GeomAlgoAPI_Prism::build(const GeomShapePtr&                theBaseShape,
       for(TopTools_ListIteratorOfListOfShape anIt(aFromShapes); anIt.More(); anIt.Next()) {
         GeomShapePtr aGeomSh(new GeomAPI_Shape());
         aGeomSh->setImpl(new TopoDS_Shape(anIt.Value()));
+        fixOrientation(aGeomSh);
         this->addFromShape(aGeomSh);
       }
     }
@@ -483,6 +485,8 @@ void storeGenerationHistory(GeomAlgoAPI_Prism* thePrismAlgo,
     GeomShapePtr aFromShape(new GeomAPI_Shape), aToShape(new GeomAPI_Shape);
     aFromShape->setImpl(new TopoDS_Shape(thePrismBuilder->FirstShape(aShape)));
     aToShape->setImpl(new TopoDS_Shape(thePrismBuilder->LastShape(aShape)));
+    thePrismAlgo->fixOrientation(aFromShape);
+    thePrismAlgo->fixOrientation(aToShape);
     thePrismAlgo->addFromShape(aFromShape);
     thePrismAlgo->addToShape(aToShape);
   }
@@ -504,11 +508,13 @@ void storeGenerationHistory(GeomAlgoAPI_Prism* thePrismAlgo,
       if(anIntTools.IsValidPointForFace(aPnt,
           theToFace, Precision::Confusion()) == Standard_True) {
         aGeomSh->setImpl(new TopoDS_Shape(aShape));
+        thePrismAlgo->fixOrientation(aGeomSh);
         thePrismAlgo->addToShape(aGeomSh);
       }
       if(anIntTools.IsValidPointForFace(aPnt,
           theFromFace, Precision::Confusion()) == Standard_True) {
         aGeomSh->setImpl(new TopoDS_Shape(aShape));
+        thePrismAlgo->fixOrientation(aGeomSh);
         thePrismAlgo->addFromShape(aGeomSh);
       }
     } else if(theType == TopAbs_EDGE) {
@@ -517,12 +523,14 @@ void storeGenerationHistory(GeomAlgoAPI_Prism* thePrismAlgo,
       anEdgeCheck.Perform();
       if(anEdgeCheck.MaxDistance() < Precision::Confusion()) {
         aGeomSh->setImpl(new TopoDS_Shape(aShape));
+        thePrismAlgo->fixOrientation(aGeomSh);
         thePrismAlgo->addToShape(aGeomSh);
       }
       anEdgeCheck.Init(anEdge, theFromFace);
       anEdgeCheck.Perform();
       if(anEdgeCheck.MaxDistance() < Precision::Confusion()) {
         aGeomSh->setImpl(new TopoDS_Shape(aShape));
+        thePrismAlgo->fixOrientation(aGeomSh);
         thePrismAlgo->addFromShape(aGeomSh);
       }
     } else {
