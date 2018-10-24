@@ -207,6 +207,7 @@ void Model_ResultBody::updateSubs(const std::shared_ptr<GeomAPI_Shape>& theThisS
     TDF_Label aDataLab = std::dynamic_pointer_cast<Model_Data>(data())->label();
     if (!aDataLab.IsNull()) {
       TDataStd_UAttribute::Set(aDataLab, kUpdateConnectedTopology);
+      isConnectedTopology(); // to store this flag in transaction, #2630
     }
   }
   // iterate all sub-solids of compsolid to make sub-results synchronized with them
