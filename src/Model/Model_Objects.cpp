@@ -1872,11 +1872,14 @@ void Model_Objects::updateResults(FeaturePtr theFeature, std::set<FeaturePtr>& t
         if (aGroup->Get() == ModelAPI_ResultBody::group().c_str()) {
           aNewBody = createBody(theFeature->data(), aResIndex);
         } else if (aGroup->Get() == ModelAPI_ResultPart::group().c_str()) {
-          std::shared_ptr<ModelAPI_ResultPart> aNewP = createPart(theFeature->data(), aResIndex);
-          theFeature->setResult(aNewP, aResIndex);
-          if (!aNewP->partDoc().get())
-            // create the part result: it is better to restore the previous result if it is possible
-            theFeature->execute();
+          if (aResIndex <= theFeature->results().size()) { // to avoid crash if previous execute
+            // for index = 0 erases result
+            std::shared_ptr<ModelAPI_ResultPart> aNewP = createPart(theFeature->data(), aResIndex);
+            theFeature->setResult(aNewP, aResIndex);
+            if (!aNewP->partDoc().get())
+              // create the part result: it is better to restore the previous result if it is possible
+              theFeature->execute();
+          }
         } else if (aGroup->Get() == ModelAPI_ResultConstruction::group().c_str()) {
           ResultConstructionPtr aConstr = createConstruction(theFeature->data(), aResIndex);
           if (!aConstr->updateShape())

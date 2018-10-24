@@ -169,6 +169,8 @@ std::shared_ptr<GeomAPI_Shape> Model_ResultPart::shape()
 {
   std::shared_ptr<GeomAPI_Shape> aResult(new GeomAPI_Shape);
   if (myShape.IsNull()) { // shape is not produced yet, create it
+    SessionPtr aMgr = ModelAPI_Session::get();
+    bool aToSendUpdate = aMgr->isOperation(); // inside of operation may send an update evnet
     if (myTrsf.get()) { // get shape of the base result and apply the transformation
       ResultPtr anOrigResult = baseRef();
       std::shared_ptr<GeomAPI_Shape> anOrigShape = anOrigResult->shape();
@@ -179,6 +181,10 @@ std::shared_ptr<GeomAPI_Shape> Model_ResultPart::shape()
           myShape = aShape;
           aResult->setImpl(new TopoDS_Shape(aShape));
         }
+      }
+      if (!myShape.IsNull() && aToSendUpdate) {
+        static const Events_ID anEvent = Events_Loop::eventByName(EVENT_OBJECT_UPDATED);
+        ModelAPI_EventCreator::get()->sendUpdated(data()->owner(), anEvent);
       }
       return aResult;
     } else {
@@ -205,9 +211,14 @@ std::shared_ptr<GeomAPI_Shape> Model_ResultPart::shape()
         }
       }
     }
+    if (!myShape.IsNull() && aToSendUpdate) {
+      static const Events_ID anEvent = Events_Loop::eventByName(EVENT_OBJECT_UPDATED);
+      ModelAPI_EventCreator::get()->sendUpdated(data()->owner(), anEvent);
+    }
   }
-  if (!myShape.IsNull())
+  if (!myShape.IsNull()) {
     aResult->setImpl(new TopoDS_Shape(myShape));
+  }
   return aResult;
 }
 

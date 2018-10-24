@@ -954,17 +954,17 @@ void Model_AttributeSelection::selectSubShape(
   CenterType aCenterType = theType[0] == 'v' || theType[0] == 'V' ? // only for vertex-type
     centerTypeByName(aSubShapeName) : NOT_CENTER;
   std::string aType = aCenterType == NOT_CENTER ? theType : "EDGE"; // search for edge now
-  TopAbs_ShapeEnum aShapeType =  TopAbs_ShapeEnum(GeomAPI_Shape::shapeTypeByStr(theType));
   static const GeomShapePtr anEmptyShape;
 
   // first iteration is selection by name without center prefix, second - in case of problem,
   // try with initial name
   for(int aUseCenter = 1; aUseCenter >= 0; aUseCenter--)  {
-    std::string aSubShapeName = theSubShapeName;
     if (aUseCenter == 0 && aCenterType != NOT_CENTER) {
+      aSubShapeName = theSubShapeName;
       aCenterType = NOT_CENTER;
       aType = theType;
     } else if (aUseCenter != 1) continue;
+    TopAbs_ShapeEnum aShapeType =  TopAbs_ShapeEnum(GeomAPI_Shape::shapeTypeByStr(aType));
 
     std::shared_ptr<Model_Document> aDoc =
       std::dynamic_pointer_cast<Model_Document>(owner()->document());
@@ -1036,7 +1036,6 @@ void Model_AttributeSelection::selectSubShape(
         }
       }
     }
-    aSubShapeName = theSubShapeName;
   }
   // invalid
   TDF_Label aSelLab = selectionLabel();
@@ -1473,7 +1472,8 @@ void Model_AttributeSelection::updateInHistory()
             // to avoid detection of part changes by local selection only
             AttributeSelectionPtr aSel =
               std::dynamic_pointer_cast<ModelAPI_AttributeSelection>(*aRef);
-            if (aSel.get() && !aSel->value()->isSame(aSel->context()->shape()))
+            if (aSel.get() && aSel->value().get() &&
+                !aSel->value()->isSame(aSel->context()->shape()))
               continue;
 
             FeaturePtr aRefFeat = std::dynamic_pointer_cast<ModelAPI_Feature>((*aRef)->owner());
