@@ -876,6 +876,18 @@ std::string Model_AttributeSelection::namingName(const std::string& theDefaultNa
     return contextName(aCont);
   }
 
+  // if it is in result of another part
+  if (aCont->groupName() == ModelAPI_ResultPart::group()) {
+    ResultPartPtr aPart = std::dynamic_pointer_cast<ModelAPI_ResultPart>(aCont);
+    int anIndex;
+    GeomShapePtr aValue = value();
+    if (aValue.get())
+      return aPart->data()->name() + "/" + aPart->nameInPart(aValue, anIndex);
+    else
+      return aPart->data()->name();
+  }
+
+
   // whole infinitive construction
   if (aCont->groupName() == ModelAPI_ResultConstruction::group()) {
     ResultConstructionPtr aConstr = std::dynamic_pointer_cast<Model_ResultConstruction>(aCont);
@@ -971,6 +983,10 @@ void Model_AttributeSelection::selectSubShape(
           ResultPartPtr aPart = std::dynamic_pointer_cast<ModelAPI_ResultPart>(aFound);
           aDoc = std::dynamic_pointer_cast<Model_Document>(aPart->partDoc());
           aSubShapeName = aSubShapeName.substr(aPartEnd +1);
+          if (aSubShapeName.empty()) { // the whole Part result
+            setValue(aPart, anEmptyShape);
+            return;
+          }
         }
       }
     }
