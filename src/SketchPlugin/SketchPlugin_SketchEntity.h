@@ -25,6 +25,7 @@
 #include "SketchPlugin_Feature.h"
 
 #include <ModelAPI_CompositeFeature.h>
+#include <ModelAPI_Session.h>
 #include <GeomAPI_Shape.h>
 #include <GeomAPI_AISObject.h>
 #include <ModelAPI_Document.h>
@@ -152,7 +153,7 @@ class SketchPlugin_SketchEntity : public SketchPlugin_Feature, public GeomAPI_IC
       aColor = Config_PropManager::color("Visualization", "sketch_entity_color");
     }
     if (!aColor.empty()) {
-      if (theResult.get()) {
+      if (theResult.get() && ModelAPI_Session::get()->isOperation()) {
         AttributeIntArrayPtr aColorAttr = theResult->data()->intArray(ModelAPI_Result::COLOR_ID());
         aColorAttr->setSize(3);
         // Set the color attribute in order do not use default colors in the perasentation object

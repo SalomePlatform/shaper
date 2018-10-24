@@ -355,13 +355,13 @@ bool ModuleBase_OperationFeature::commit()
     commitOperation();
 
     stopOperation();
-    emit stopped();
-    emit committed();
 
-    // finishOperation has to be after commited because in signal commited
-    // there is a modification of attribures (color)
     SessionPtr aMgr = ModelAPI_Session::get();
     aMgr->finishOperation();
+    // Finish operation has to be before stopped because stopped caused update of Object browser
+    // If it will be done before of cleaning of obsolete objects it will cause crash
+    emit stopped();
+    emit committed();
 
     afterCommitOperation();
 #ifdef DEBUG_OPERATION_START
