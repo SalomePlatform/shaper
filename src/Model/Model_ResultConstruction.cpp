@@ -42,6 +42,7 @@
 #include <TopoDS_ListOfShape.hxx>
 #include <TopExp_Explorer.hxx>
 #include <TopTools_MapOfShape.hxx>
+#include <NCollection_IndexedDataMap.hxx>
 
 #include <algorithm>
 
@@ -275,14 +276,15 @@ void Model_ResultConstruction::storeShape(std::shared_ptr<GeomAPI_Shape> theShap
       std::list<std::shared_ptr<GeomAPI_Shape> > aFaces;
       GeomAlgoAPI_SketchBuilder::createFaces(aWirePtr->origin(), aWirePtr->dirX(),
         aWirePtr->norm(), aWirePtr, aFaces);
-      NCollection_DataMap<TopoDS_Face, TColStd_ListOfInteger> aNewIndices; // edges indices
+      // order is important to store faces in the same order if sketch is created from scratch
+      NCollection_IndexedDataMap<TopoDS_Face, TColStd_ListOfInteger> aNewIndices; // edges indices
       std::list<std::shared_ptr<GeomAPI_Shape> >::iterator aFIter = aFaces.begin();
       for (; aFIter != aFaces.end(); aFIter++) {
         std::shared_ptr<GeomAPI_Face> aFace(new GeomAPI_Face(*aFIter));
         // put them to a label, trying to keep the same faces on the same labels
         if (aFace.get() && !aFace->isNull()) {
           TopoDS_Face aTopoFace = TopoDS::Face(aFace->impl<TopoDS_Shape>());
-          aNewIndices.Bind(aTopoFace, TColStd_ListOfInteger());
+          aNewIndices.Add(aTopoFace, TColStd_ListOfInteger());
           // keep new indices of sub-elements used in this face
           for (TopExp_Explorer anEdges(aTopoFace, TopAbs_EDGE); anEdges.More(); anEdges.Next()) {
             TopoDS_Edge anEdge = TopoDS::Edge(anEdges.Current());
@@ -292,7 +294,7 @@ void Model_ResultConstruction::storeShape(std::shared_ptr<GeomAPI_Shape> theShap
               int anIndex = aCurvesIndices.Find(aCurve);
               if ((aFirst > aLast) != (anEdge.Orientation() == TopAbs_REVERSED))
                 anIndex = -anIndex;
-              aNewIndices.ChangeFind(aTopoFace).Append(anIndex);
+              aNewIndices.ChangeFromKey(aTopoFace).Append(anIndex);
             }
           }
         }
@@ -300,7 +302,8 @@ void Model_ResultConstruction::storeShape(std::shared_ptr<GeomAPI_Shape> theShap
       NCollection_DataMap<int, TopoDS_Face> aFacesOrder; // faces -> tag where they must be set
       NCollection_List<TopoDS_Face> anUnorderedFaces; // faces that may be located at any index
       // searching for the best new candidate to old location
-      NCollection_DataMap<TopoDS_Face, TColStd_ListOfInteger>::Iterator aNewIter(aNewIndices);
+      NCollection_IndexedDataMap<TopoDS_Face, TColStd_ListOfInteger>::Iterator
+        aNewIter(aNewIndices);
       for (; aNewIter.More(); aNewIter.Next()) {
         double aBestFound = 0, aBestNotFound = 1.e+100;
         int aBestTag = 0;
@@ -369,7 +372,7 @@ void Model_ResultConstruction::storeShape(std::shared_ptr<GeomAPI_Shape> theShap
           aFaceBuilder.Generated(aFaceToPut);
           // store also indices of the new face edges
           Handle(TDataStd_IntPackedMap) aNewMap = TDataStd_IntPackedMap::Set(aLab);
-          const TColStd_ListOfInteger& aNewInd = aNewIndices.Find(aFaceToPut);
+          const TColStd_ListOfInteger& aNewInd = aNewIndices.FindFromKey(aFaceToPut);
           std::stringstream aName;
           aName<<"Face";
           TopExp_Explorer aPutEdges(aFaceToPut, TopAbs_EDGE);

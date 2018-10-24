@@ -943,8 +943,11 @@ std::string Selector_Selector::name(Selector_NameGenerator* theNameGenerator) {
     std::list<Selector_Selector>::iterator aSubSel = mySubSelList.begin();
     for(; aSubSel != mySubSelList.end(); aSubSel++, aLevel++) {
       aResult += "(" + aSubSel->name(theNameGenerator) + ")";
-      if (*aLevel > 1)
-        aResult += *aLevel;
+      if (*aLevel > 1) {
+        std::ostringstream aLevelStr;
+        aLevelStr<<*aLevel;
+        aResult += aLevelStr.str();
+      }
     }
     return aResult;
   }
