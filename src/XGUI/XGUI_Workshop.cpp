@@ -436,10 +436,10 @@ void XGUI_Workshop::initMenu()
   aAction = salomeConnector()->addDesktopCommand("AUTOCOMPUTE_CMD", tr("Block auto-apply"),
                                               tr("Blocks immediate apply of modifications"),
                                               QIcon(":pictures/autoapply.png"), QKeySequence(),
-                                              true, "MEN_DESK_EDIT");
+                                              false, "MEN_DESK_EDIT");
   salomeConnector()->addActionInToolbar( aAction, aToolBarTitle );
 
-  connect(aAction, SIGNAL(toggled(bool)), this, SLOT(onAutoApply(bool)));
+  connect(aAction, SIGNAL(triggered(bool)), this, SLOT(onAutoApply()));
 
   salomeConnector()->addDesktopMenuSeparator("MEN_DESK_EDIT");
 
