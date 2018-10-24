@@ -42,8 +42,7 @@
 static void storeSubShape(ResultBodyPtr theResultBody,
                           const GeomShapePtr theShape,
                           const GeomAPI_Shape::ShapeType theType,
-                          const std::string theName,
-                          int& theShapeIndex);
+                          const std::string& theName);
 
 //=================================================================================================
 void FeaturesPlugin_CompositeSketch::initCompositeSketchAttribtues(const int theInitFlags)
@@ -362,32 +361,18 @@ void FeaturesPlugin_CompositeSketch::storeShapes(ResultBodyPtr theResultBody,
   }
 
   // Store shapes.
-  int aShapeIndex = 1;
-  int aFaceIndex = 1;
   for(ListOfShape::const_iterator anIt = theShapes.cbegin(); anIt != theShapes.cend(); ++anIt) {
     GeomShapePtr aShape = *anIt;
 
     if(aShapeTypeToExplore == GeomAPI_Shape::COMPOUND) {
       std::string aName = theName + (aShape->shapeType() == GeomAPI_Shape::EDGE ? "Edge" : "Face");
-      storeSubShape(theResultBody,
-                    aShape,
-                    aShape->shapeType(),
-                    aName,
-                    aShape->shapeType() == GeomAPI_Shape::EDGE ? aShapeIndex : aFaceIndex);
+      storeSubShape(theResultBody, aShape, aShape->shapeType(), aName);
     } else {
       std::string aName = theName + aShapeTypeStr;
-      storeSubShape(theResultBody,
-                    aShape,
-                    aShapeTypeToExplore,
-                    aName,
-                    aShapeIndex);
+      storeSubShape(theResultBody, aShape, aShapeTypeToExplore, aName);
       if (theBaseShapeType == GeomAPI_Shape::WIRE) { // issue 2289: special names also for vertices
         aName = theName + "Vertex";
-        storeSubShape(theResultBody,
-                      aShape,
-                      GeomAPI_Shape::VERTEX,
-                      aName,
-                      aShapeIndex);
+        storeSubShape(theResultBody, aShape, GeomAPI_Shape::VERTEX, aName);
       }
     }
   }
@@ -396,13 +381,10 @@ void FeaturesPlugin_CompositeSketch::storeShapes(ResultBodyPtr theResultBody,
 void storeSubShape(ResultBodyPtr theResultBody,
                    const GeomShapePtr theShape,
                    const GeomAPI_Shape::ShapeType theType,
-                   const std::string theName,
-                   int& theShapeIndex)
+                   const std::string& theName)
 {
   for(GeomAPI_ShapeExplorer anExp(theShape, theType); anExp.more(); anExp.next()) {
     GeomShapePtr aSubShape = anExp.current();
-    std::ostringstream aStr;
-    aStr << theName << "_" << theShapeIndex++;
-    theResultBody->generated(aSubShape, aStr.str());
+    theResultBody->generated(aSubShape, theName);
   }
 }

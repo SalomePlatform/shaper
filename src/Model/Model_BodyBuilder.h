@@ -146,7 +146,14 @@ private:
   void buildName(const int theTag, const std::string& theName);
 
 private:
+  struct IndexTags {
+    int index;
+    std::vector<int> tags;
+  };
+
+private:
   int myFreePrimitiveTag;
+  std::map<std::string, IndexTags> myPrimitivesNamesIndexMap;
 
 private:
   friend class Model_ResultBody;

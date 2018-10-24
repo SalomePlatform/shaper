@@ -314,7 +314,23 @@ void Model_BodyBuilder::generated(const GeomShapePtr& theNewShape,
   TopoDS_Shape aShape = theNewShape->impl<TopoDS_Shape>();
   builder(myFreePrimitiveTag)->Generated(aShape);
   if (!theName.empty()) {
-    buildName(myFreePrimitiveTag, theName);
+    std::string aName = theName;
+    if (myPrimitivesNamesIndexMap.find(theName) != myPrimitivesNamesIndexMap.end()) {
+      IndexTags& anIndexTags = myPrimitivesNamesIndexMap.find(theName)->second;
+      aName += "_" + std::to_string(++(anIndexTags.index));
+      anIndexTags.tags.push_back(myFreePrimitiveTag);
+      if (anIndexTags.index == 2) {
+        buildName(anIndexTags.tags.front(), theName + "_1");
+      }
+    }
+    else {
+      IndexTags anIndexTags;
+      anIndexTags.index = 1;
+      anIndexTags.tags.push_back(myFreePrimitiveTag);
+      myPrimitivesNamesIndexMap[theName] = anIndexTags;
+    }
+
+    buildName(myFreePrimitiveTag, aName);
   }
   ++myFreePrimitiveTag;
 }
