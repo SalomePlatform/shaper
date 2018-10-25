@@ -85,24 +85,16 @@ aSession.finishOperation()
 #=========================================================================
 # Make extrusion on circle
 #=========================================================================
-# Build shape from sketcher results
-aCircleSketchResult = aCircleSketchFeature.firstResult()
-aCircleSketchEdges = modelAPI_ResultConstruction(aCircleSketchResult).shape()
-origin = geomDataAPI_Point(aCircleSketchFeature.attribute("Origin")).pnt()
-dirX = geomDataAPI_Dir(aCircleSketchFeature.attribute("DirX")).dir()
-norm = geomDataAPI_Dir(aCircleSketchFeature.attribute("Norm")).dir()
-aCircleSketchFaces = ShapeList()
-GeomAlgoAPI_SketchBuilder.createFaces(
-    origin, dirX, norm, aCircleSketchEdges, aCircleSketchFaces)
-assert (len(aCircleSketchFaces) > 0)
-assert (aCircleSketchFaces[0] is not None)
+# Build face from sketcher results
+aCircleSketchResult = modelAPI_ResultConstruction(aCircleSketchFeature.firstResult())
+assert (aCircleSketchResult.facesNum() > 0)
 # Create extrusion
 aSession.startOperation()
 anExtrusionFt = aPart.addFeature("Extrusion")
 assert (anExtrusionFt.getKind() == "Extrusion")
 # selection type FACE=4
 anExtrusionFt.selectionList("base").append(
-    aCircleSketchResult, aCircleSketchFaces[0])
+    aCircleSketchResult, aCircleSketchResult.face(0))
 anExtrusionFt.string("CreationMethod").setValue("BySizes")
 anExtrusionFt.real("to_size").setValue(50)
 anExtrusionFt.real("from_size").setValue(0)
@@ -147,8 +139,7 @@ aSession.startOperation()
 anExtrusionFt = aPart.addFeature("Extrusion")
 assert (anExtrusionFt.getKind() == "Extrusion")
 # selection type FACE=4
-anExtrusionFt.selectionList("base").append(
-    aCircleSketchResult, aCircleSketchFaces[0])
+anExtrusionFt.selectionList("base").append(aCircleSketchResult, aCircleSketchResult.face(0))
 anExtrusionFt.string("CreationMethod").setValue("ByPlanesAndOffsets")
 anExtrusionFt.real("to_size").setValue(0) #TODO: remove
 anExtrusionFt.real("from_size").setValue(0) #TODO: remove
@@ -213,20 +204,13 @@ aLineEEndPoint.setValue(0., -50.)
 aSession.finishOperation()
 
 # Extrude clamp
-aClampSketchResult = aClampSketchFeature.firstResult()
-aClampSketchEdges = modelAPI_ResultConstruction(aClampSketchResult).shape()
-origin = geomDataAPI_Point(aClampSketchFeature.attribute("Origin")).pnt()
-dirX = geomDataAPI_Dir(aClampSketchFeature.attribute("DirX")).dir()
-norm = geomDataAPI_Dir(aClampSketchFeature.attribute("Norm")).dir()
-aClampSketchFaces = ShapeList()
-GeomAlgoAPI_SketchBuilder.createFaces(
-    origin, dirX, norm, aClampSketchEdges, aClampSketchFaces)
+aClampSketchResult = modelAPI_ResultConstruction(aClampSketchFeature.firstResult())
 aSession.startOperation()
 aClampExtrusionFt = aPart.addFeature("Extrusion")
 assert (aClampExtrusionFt.getKind() == "Extrusion")
 # selection type FACE=4
 aClampExtrusionFt.selectionList("base").append(
-    aClampSketchResult, aClampSketchFaces[0])
+    aClampSketchResult, aClampSketchResult.face(0))
 aClampExtrusionFt.string("CreationMethod").setValue("BySizes")
 aClampExtrusionFt.real("to_size").setValue(70)
 aClampExtrusionFt.real("from_size").setValue(0)
@@ -245,8 +229,7 @@ aSession.startOperation()
 anExtrusionFt = aPart.addFeature("Extrusion")
 assert (anExtrusionFt.getKind() == "Extrusion")
 # selection type FACE=4
-anExtrusionFt.selectionList("base").append(
-    aCircleSketchResult, aCircleSketchFaces[0])
+anExtrusionFt.selectionList("base").append(aCircleSketchResult, aCircleSketchResult.face(0))
 anExtrusionFt.string("CreationMethod").setValue("ByPlanesAndOffsets")
 anExtrusionFt.real("to_size").setValue(0) #TODO: remove
 anExtrusionFt.real("from_size").setValue(0) #TODO: remove

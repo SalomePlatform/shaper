@@ -284,7 +284,7 @@ bool Selector_Selector::select(const TopoDS_Shape theContext, const TopoDS_Shape
     // try to find the shape of the higher level type in the context shape
     bool aFacesTried = false; // for identification of vertices, faces are tried, then edges
     TopoDS_ListOfShape aLastCommon; // to store the commons not good, but may be used for weak
-    TopTools_MapOfShape aLastIntersectors;
+    TopoDS_ListOfShape aLastIntersectors;
     while(aSelectionType != TopAbs_FACE || !aFacesTried) {
       if (aSelectionType == TopAbs_FACE) {
         if (theValue.ShapeType() != TopAbs_VERTEX)
@@ -311,7 +311,7 @@ bool Selector_Selector::select(const TopoDS_Shape theContext, const TopoDS_Shape
       if (aCommon.Extent() == 1 && aCommon.First().IsSame(theValue)) {
         // name the intersectors
         mySubSelList.clear();
-        TopTools_MapOfShape::Iterator anInt(anIntersectors);
+        TopoDS_ListOfShape::Iterator anInt(anIntList);
         for (; anInt.More(); anInt.Next()) {
           if (!selectBySubSelector(theContext, anInt.Value())) {
             break; // if some selector is failed, stop and search another solution
@@ -323,7 +323,7 @@ bool Selector_Selector::select(const TopoDS_Shape theContext, const TopoDS_Shape
           }
       } else if (aCommon.Extent() > 1 && aLastCommon.IsEmpty())  {
         aLastCommon = aCommon;
-        aLastIntersectors = anIntersectors;
+        aLastIntersectors = anIntList;
       }
     }
 
@@ -369,7 +369,7 @@ bool Selector_Selector::select(const TopoDS_Shape theContext, const TopoDS_Shape
       if (myWeakIndex != -1) {
         // name the intersectors
         mySubSelList.clear();
-        TopTools_MapOfShape::Iterator anInt(aLastIntersectors);
+        TopoDS_ListOfShape::Iterator anInt(aLastIntersectors);
         for (; anInt.More(); anInt.Next()) {
           if (!selectBySubSelector(theContext, anInt.Value())) {
             break; // if some selector is failed, stop and search another solution
