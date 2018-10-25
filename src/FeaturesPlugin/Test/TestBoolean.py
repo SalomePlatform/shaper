@@ -100,18 +100,11 @@ aSession.startOperation()
 extrudedObjects = []
 for eachSketchFeature in [aCircleSketchFeature, aTriangleSketchFeature]:
     # Build sketch faces
-    aSketchResult = eachSketchFeature.firstResult()
-    aSketchEdges = modelAPI_ResultConstruction(aSketchResult).shape()
-    origin = geomDataAPI_Point(eachSketchFeature.attribute("Origin")).pnt()
-    dirX = geomDataAPI_Dir(eachSketchFeature.attribute("DirX")).dir()
-    norm = geomDataAPI_Dir(eachSketchFeature.attribute("Norm")).dir()
-    aSketchFaces = ShapeList()
-    GeomAlgoAPI_SketchBuilder.createFaces(
-        origin, dirX, norm, aSketchEdges, aSketchFaces)
+    aSketchResult = modelAPI_ResultConstruction(eachSketchFeature.firstResult())
     # Create extrusion on them
     anExtrusionFt = aPart.addFeature("Extrusion")
     anExtrusionFt.selectionList("base").append(
-        aSketchResult, aSketchFaces[0])
+        aSketchResult, aSketchResult.face(0))
     anExtrusionFt.string("CreationMethod").setValue("BySizes")
     anExtrusionFt.real("from_size").setValue(0)
     anExtrusionFt.real("to_size").setValue(50)

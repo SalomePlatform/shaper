@@ -39,7 +39,6 @@ model.do()
 Edge_1 = model.addEdge(Part_1_doc, [model.selection("EDGE", "Sketch_1/SketchLine_1")])
 Fill_1 = model.addFill(Part_1_doc, [model.selection("EDGE", "Edge_1_1")], [model.selection("VERTEX", "Vertex_1_1")])
 model.do()
-
 model.checkResult(Fill_1,model,1,[2],[0],[0],[2],[4])
 model.testHaveNamingSubshapes(Fill_1,model,Part_1_doc)
 

@@ -86,16 +86,8 @@ aCircleRadius.setValue(30.)
 aSession.finishOperation()
 
 # Build shape from sketcher results
-aCircleSketchResult = aCircleSketchFeature.firstResult()
-aCircleSketchEdges = modelAPI_ResultConstruction(aCircleSketchResult).shape()
-origin = geomDataAPI_Point(aCircleSketchFeature.attribute("Origin")).pnt()
-dirX = geomDataAPI_Dir(aCircleSketchFeature.attribute("DirX")).dir()
-norm = geomDataAPI_Dir(aCircleSketchFeature.attribute("Norm")).dir()
-aCircleSketchFaces = ShapeList()
-GeomAlgoAPI_SketchBuilder.createFaces(
-    origin, dirX, norm, aCircleSketchEdges, aCircleSketchFaces)
-assert (len(aCircleSketchFaces) > 0)
-assert (aCircleSketchFaces[0] is not None)
+aCircleSketchResult = modelAPI_ResultConstruction(aCircleSketchFeature.firstResult())
+assert (aCircleSketchResult.facesNum() > 0)
 
 #=========================================================================
 # Create a sketch line to revol
@@ -130,7 +122,7 @@ aRevolFt = aPart.addFeature("Revolution")
 assert (aRevolFt.getKind() == "Revolution")
 # selection type FACE=4
 aRevolFt.selectionList("base").append(
-    aCircleSketchResult, aCircleSketchFaces[0])
+    aCircleSketchResult, aCircleSketchResult.face(0))
 aRevolFt.selection("axis_object").setValue(aLineSketchResult, aLineEdge)
 aRevolFt.string("CreationMethod").setValue("ByAngles")
 aRevolFt.real("from_angle").setValue(10)
@@ -184,7 +176,7 @@ aRevolFt = aPart.addFeature("Revolution")
 assert (aRevolFt.getKind() == "Revolution")
 # selection type FACE=4
 aRevolFt.selectionList("base").append(
-    aCircleSketchResult, aCircleSketchFaces[0])
+    aCircleSketchResult, aCircleSketchResult.face(0))
 aRevolFt.selection("axis_object").setValue(aLineSketchResult, aLineEdge)
 aRevolFt.string("CreationMethod").setValue("ByPlanesAndOffsets")
 aRevolFt.real("from_angle").setValue(0) #TODO: remove
@@ -210,7 +202,7 @@ aRevolFt = aPart.addFeature("Revolution")
 assert (aRevolFt.getKind() == "Revolution")
 # selection type FACE=4
 aRevolFt.selectionList("base").append(
-    aCircleSketchResult, aCircleSketchFaces[0])
+    aCircleSketchResult, aCircleSketchResult.face(0))
 aRevolFt.selection("axis_object").setValue(aLineSketchResult, aLineEdge)
 aRevolFt.string("CreationMethod").setValue("ByPlanesAndOffsets")
 aRevolFt.real("from_angle").setValue(0) #TODO: remove

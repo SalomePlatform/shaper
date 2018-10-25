@@ -96,30 +96,17 @@ aSession.startOperation()
 
 anExtrusions = []
 for i in range(0, N * N):
-    aSketchResult = aSketchFeatures[i].firstResult()
-    aSketchEdges = modelAPI_ResultConstruction(aSketchResult).shape()
-    origin = geomDataAPI_Point(aSketchFeatures[i].attribute("Origin")).pnt()
-    dirX = geomDataAPI_Dir(aSketchFeatures[i].attribute("DirX")).dir()
-    norm = geomDataAPI_Dir(aSketchFeatures[i].attribute("Norm")).dir()
-    aSketchFaces = ShapeList()
-    GeomAlgoAPI_SketchBuilder.createFaces(
-        origin, dirX, norm, aSketchEdges, aSketchFaces)
-
+    aSketchResult = modelAPI_ResultConstruction(aSketchFeatures[i].firstResult())
     anExtrusionFt = aPart.addFeature("Extrusion")
     assert (anExtrusionFt.getKind() == "Extrusion")
 
     anExtrusionFt.selectionList("base").append(
-        aSketchResult, aSketchFaces[0])
+        aSketchResult, aSketchResult.face(0))
     anExtrusionFt.string("CreationMethod").setValue("BySizes")
     anExtrusionFt.real("from_size").setValue(0)
     anExtrusionFt.real("to_size").setValue(10)
     anExtrusionFt.real("to_offset").setValue(0) #TODO: remove
     anExtrusionFt.real("from_offset").setValue(0) #TODO: remove
-    # v1.0.2 from master
-    # anExtrusionFt.selection("extrusion_face").setValue(
-    #    aSketchResult, aSketchFaces[0])
-    # anExtrusionFt.real("extrusion_size").setValue(10)
-    # anExtrusionFt.boolean("extrusion_reverse").setValue(False)
     anExtrusions.append(anExtrusionFt)
 
 aSession.finishOperation()
@@ -162,28 +149,16 @@ aSession.startOperation()
 #=========================================================================
 # Build a big box extrusion
 #=========================================================================
-aSketchResult = aQuadrangleSketchFeature.firstResult()
-aSketchEdges = modelAPI_ResultConstruction(aSketchResult).shape()
-origin = geomDataAPI_Point(aQuadrangleSketchFeature.attribute("Origin")).pnt()
-dirX = geomDataAPI_Dir(aQuadrangleSketchFeature.attribute("DirX")).dir()
-norm = geomDataAPI_Dir(aQuadrangleSketchFeature.attribute("Norm")).dir()
-aSketchFaces = ShapeList()
-GeomAlgoAPI_SketchBuilder.createFaces(
-    origin, dirX, norm, aSketchEdges, aSketchFaces)
+aSketchResult = modelAPI_ResultConstruction(aQuadrangleSketchFeature.firstResult())
 # Create extrusion on them
 aBox = aPart.addFeature("Extrusion")
 aBox.selectionList("base").append(
-    aSketchResult, aSketchFaces[0])
+    aSketchResult, aSketchResult.face(0))
 aBox.string("CreationMethod").setValue("BySizes")
 aBox.real("from_size").setValue(0)
 aBox.real("to_size").setValue(10)
 aBox.real("to_offset").setValue(0) #TODO: remove
 aBox.real("from_offset").setValue(0) #TODO: remove
-# v 1.0.2 from master
-# aBox.selection("extrusion_face").setValue(
-#     aSketchResult, aSketchFaces[0])
-# aBox.real("extrusion_size").setValue(10)
-# aBox.boolean("extrusion_reverse").setValue(False)
 
 aSession.finishOperation()
 
