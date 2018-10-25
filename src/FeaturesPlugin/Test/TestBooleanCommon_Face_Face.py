@@ -18,6 +18,8 @@
 ## email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com>
 ##
 
+# -*- coding: utf-8 -*-
+
 from salome.shaper import model
 
 model.begin()
@@ -52,7 +54,7 @@ SketchConstraintVertical_3 = Sketch_2.setVertical(SketchLine_6.result())
 SketchConstraintHorizontal_4 = Sketch_2.setHorizontal(SketchLine_7.result())
 SketchConstraintVertical_4 = Sketch_2.setVertical(SketchLine_8.result())
 model.do()
-Face_1 = model.addFace(Part_1_doc, [model.selection("FACE", "Sketch_1/Face-SketchLine_1f-SketchLine_2f-SketchLine_3f-SketchLine_4f"), model.selection("FACE", "Sketch_2/Face-SketchLine_5f-SketchLine_6f-SketchLine_7f-SketchLine_8f")])
+Face_1 = model.addFace(Part_1_doc, [model.selection("FACE", "Sketch_1/Face-SketchLine_1r-SketchLine_2f-SketchLine_3f-SketchLine_4f"), model.selection("FACE", "Sketch_2/Face-SketchLine_5r-SketchLine_6f-SketchLine_7f-SketchLine_8f")])
 Common_1 = model.addCommon(Part_1_doc, [model.selection("FACE", "Face_1_1"), model.selection("FACE", "Face_1_2")])
 model.testHaveNamingSubshapes(Common_1, model, Part_1_doc)
 model.do()

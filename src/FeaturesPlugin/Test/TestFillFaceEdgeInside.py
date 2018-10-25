@@ -1,4 +1,4 @@
-## Copyright (C) 2017  CEA/DEN, EDF R&D
+## Copyright (C) 2014-2017  CEA/DEN, EDF R&D
 ##
 ## This library is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU Lesser General Public
@@ -18,6 +18,7 @@
 ## email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com>
 ##
 
+# -*- coding: utf-8 -*-
 
 from salome.shaper import model
 
@@ -35,19 +36,20 @@ SketchLine_3 = Sketch_1.addLine(-34.74165457184325, -28.87808417997097, -49.4005
 SketchConstraintCoincidence_3 = Sketch_1.setCoincident(SketchLine_2.endPoint(), SketchLine_3.startPoint())
 SketchConstraintCoincidence_4 = Sketch_1.setCoincident(SketchArc_1.startPoint(), SketchLine_3.endPoint())
 model.do()
-Sketch_2 = model.addSketch(Part_1_doc, model.selection("FACE", "Sketch_1/Face-SketchArc_1_2f-SketchLine_1r-SketchLine_2r-SketchLine_3r"))
+Sketch_2 = model.addSketch(Part_1_doc, model.selection("FACE", "Sketch_1/Face-SketchArc_1_2r-SketchLine_3r-SketchLine_2r-SketchLine_1r"))
 SketchLine_4 = Sketch_2.addLine(-17.59187701681758, -17.53169787967194, -23.97073271029336, 4.338664497959301)
-SketchProjection_1 = Sketch_2.addProjection(model.selection("EDGE", "Sketch_1/Edge-SketchLine_2"), False)
+SketchProjection_1 = Sketch_2.addProjection(model.selection("EDGE", "Sketch_1/SketchLine_2"), False)
 SketchLine_5 = SketchProjection_1.createdFeature()
 SketchConstraintPerpendicular_1 = Sketch_2.setPerpendicular(SketchLine_4.result(), SketchLine_5.result())
 model.do()
-Edge_1 = model.addEdge(Part_1_doc, [model.selection("EDGE", "Sketch_2/Edge-SketchLine_4")])
-Face_1 = model.addFace(Part_1_doc, [model.selection("EDGE", "Sketch_1/Edge-SketchLine_2"), model.selection("EDGE", "Sketch_1/Edge-SketchLine_3"), model.selection("EDGE", "Sketch_1/Edge-SketchArc_1_2"), model.selection("EDGE", "Sketch_1/Edge-SketchLine_1")])
-Boolean_1 = model.addFill(Part_1_doc, [model.selection("FACE", "Face_1_1")], [model.selection("EDGE", "Edge_1_1")])
+Edge_1 = model.addEdge(Part_1_doc, [model.selection("EDGE", "Sketch_2/SketchLine_4")])
+Face_1_objects = [model.selection("EDGE", "Sketch_1/SketchLine_2"), model.selection("EDGE", "Sketch_1/SketchLine_3"), model.selection("EDGE", "Sketch_1/SketchArc_1_2"), model.selection("EDGE", "Sketch_1/SketchLine_1")]
+Face_1 = model.addFace(Part_1_doc, Face_1_objects)
+Fill_1 = model.addFill(Part_1_doc, [model.selection("FACE", "Face_1_1")], [model.selection("EDGE", "Edge_1_1")])
 model.do()
 
-model.checkResult(Boolean_1,model,1,[0],[0],[1],[5],[10])
-model.testHaveNamingSubshapes(Boolean_1,model,Part_1_doc)
+model.checkResult(Fill_1,model,1,[0],[0],[1],[5],[10])
+model.testHaveNamingSubshapes(Fill_1,model,Part_1_doc)
 
 model.end()
 

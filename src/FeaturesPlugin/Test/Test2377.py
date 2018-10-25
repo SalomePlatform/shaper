@@ -18,6 +18,8 @@
 ## email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com>
 ##
 
+# -*- coding: utf-8 -*-
+
 from salome.shaper import model
 
 model.begin()
@@ -32,11 +34,11 @@ SketchLine_3 = Sketch_1.addLine(46.08233276157804, -21.30874785591767, -1.039451
 SketchConstraintCoincidence_2 = Sketch_1.setCoincident(SketchLine_2.endPoint(), SketchLine_3.startPoint())
 SketchConstraintCoincidence_3 = Sketch_1.setCoincident(SketchLine_1.startPoint(), SketchLine_3.endPoint())
 model.do()
-Extrusion_1 = model.addExtrusion(Part_1_doc, [model.selection("FACE", "Sketch_1/Face-SketchLine_1f-SketchLine_2f-SketchLine_3f")], model.selection(), 100, 0)
-Sketch_2 = model.addSketch(Part_1_doc, model.selection("FACE", "Extrusion_1_1/Generated_Face_3"))
+Extrusion_1 = model.addExtrusion(Part_1_doc, [model.selection("FACE", "Sketch_1/Face-SketchLine_1r-SketchLine_2f-SketchLine_3f")], model.selection(), 100, 0)
+Sketch_2 = model.addSketch(Part_1_doc, model.selection("FACE", "Extrusion_1_1/Generated_Face&Sketch_1/SketchLine_1"))
 SketchCircle_1 = Sketch_2.addCircle(-10.74792845018279, -51.46099937127247, 20.55678647017868)
 model.do()
-Extrusion_2 = model.addExtrusion(Part_1_doc, [model.selection("FACE", "Sketch_2/Face-SketchCircle_1_2f")], model.selection("EDGE", "PartSet/OX"), model.selection("FACE", "PartSet/YOZ"), 0, model.selection(), 0)
+Extrusion_2 = model.addExtrusion(Part_1_doc, [model.selection("FACE", "Sketch_2/Face-SketchCircle_1_2r")], model.selection("EDGE", "PartSet/OX"), model.selection("FACE", "PartSet/YOZ"), 0, model.selection(), 0)
 model.do()
 model.end()
 

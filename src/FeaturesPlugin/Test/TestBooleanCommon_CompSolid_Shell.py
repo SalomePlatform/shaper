@@ -18,6 +18,8 @@
 ## email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com>
 ##
 
+# -*- coding: utf-8 -*-
+
 from salome.shaper import model
 
 model.begin()
@@ -42,9 +44,9 @@ SketchConstraintCoincidence_5 = Sketch_1.setCoincident(SketchLine_5.startPoint()
 SketchConstraintCoincidence_6 = Sketch_1.setCoincident(SketchLine_5.endPoint(), SketchLine_3.result())
 model.do()
 Sketch_2 = model.addSketch(Part_1_doc, model.defaultPlane("XOY"))
-SketchLine_6 = Sketch_2.addLine(26.29086071781277, 6.827405438264643, 9.220324256871813, 6.827405438264643)
-SketchLine_7 = Sketch_2.addLine(9.220324256871813, 6.827405438264643, 9.220324256871813, -3.640935176083419)
-SketchLine_8 = Sketch_2.addLine(9.220324256871813, -3.640935176083419, 26.29086071781277, -3.640935176083419)
+SketchLine_6 = Sketch_2.addLine(26.29086071781277, 6.827405438264643, 9.220324256871812, 6.827405438264643)
+SketchLine_7 = Sketch_2.addLine(9.220324256871812, 6.827405438264643, 9.220324256871812, -3.640935176083419)
+SketchLine_8 = Sketch_2.addLine(9.220324256871812, -3.640935176083419, 26.29086071781277, -3.640935176083419)
 SketchLine_9 = Sketch_2.addLine(26.29086071781277, -3.640935176083419, 26.29086071781277, 6.827405438264643)
 SketchConstraintCoincidence_7 = Sketch_2.setCoincident(SketchLine_9.endPoint(), SketchLine_6.startPoint())
 SketchConstraintCoincidence_8 = Sketch_2.setCoincident(SketchLine_6.endPoint(), SketchLine_7.startPoint())
@@ -59,7 +61,7 @@ SketchConstraintCoincidence_11 = Sketch_2.setCoincident(SketchLine_10.startPoint
 SketchConstraintCoincidence_12 = Sketch_2.setCoincident(SketchLine_10.endPoint(), SketchLine_8.result())
 model.do()
 Extrusion_1 = model.addExtrusion(Part_1_doc, [model.selection("COMPOUND", "Sketch_1")], model.selection(), 10, 10)
-Shell_1 = model.addShell(Part_1_doc, [model.selection("FACE", "Sketch_2/Face-SketchLine_6f-SketchLine_7f-SketchLine_8f-SketchLine_10r"), model.selection("FACE", "Sketch_2/Face-SketchLine_6f-SketchLine_8f-SketchLine_9f-SketchLine_10f")])
+Shell_1 = model.addShell(Part_1_doc, [model.selection("FACE", "Sketch_2/Face-SketchLine_6r-SketchLine_7f-SketchLine_8f-SketchLine_10r"), model.selection("FACE", "Sketch_2/Face-SketchLine_6r-SketchLine_10f-SketchLine_8f-SketchLine_9f")])
 Common_1 = model.addCommon(Part_1_doc, [model.selection("SHELL", "Shell_1_1"), model.selection("COMPSOLID", "Extrusion_1_1")])
 model.testHaveNamingSubshapes(Common_1, model, Part_1_doc)
 model.do()

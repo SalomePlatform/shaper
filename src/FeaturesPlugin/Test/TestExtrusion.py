@@ -250,9 +250,9 @@ anExtrusionFt.selectionList("base").append(
 anExtrusionFt.string("CreationMethod").setValue("ByPlanesAndOffsets")
 anExtrusionFt.real("to_size").setValue(0) #TODO: remove
 anExtrusionFt.real("from_size").setValue(0) #TODO: remove
-anExtrusionFt.selection("to_object").selectSubShape("face", "Extrusion_3_1/Generated_Face_3")
+anExtrusionFt.selection("to_object").selectSubShape("face", "Extrusion_3_1/Generated_Face&Sketch_2/SketchLine_3")
 anExtrusionFt.real("to_offset").setValue(0)
-anExtrusionFt.selection("from_object").selectSubShape("face", "Extrusion_3_1/Generated_Face_4")
+anExtrusionFt.selection("from_object").selectSubShape("face", "Extrusion_3_1/Generated_Face&Sketch_2/SketchLine_4")
 anExtrusionFt.real("from_offset").setValue(0)
 anExtrusionFt.execute()
 aSession.finishOperation()

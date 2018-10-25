@@ -18,6 +18,8 @@
 ## email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com>
 ##
 
+# -*- coding: utf-8 -*-
+
 from salome.shaper import model
 
 model.begin()
@@ -25,9 +27,9 @@ partSet = model.moduleDocument()
 Part_1 = model.addPart(partSet)
 Part_1_doc = Part_1.document()
 Sketch_1 = model.addSketch(Part_1_doc, model.defaultPlane("XOY"))
-SketchCircle_1 = Sketch_1.addCircle(-6.063464837049752, 0.8662092624356818, 32.2304349637617)
+SketchCircle_1 = Sketch_1.addCircle(-6.063464837049752, 0.8662092624356817, 32.2304349637617)
 model.do()
-Face_1 = model.addFace(Part_1_doc, [model.selection("EDGE", "Sketch_1/Edge-SketchCircle_1_2")])
+Face_1 = model.addFace(Part_1_doc, [model.selection("EDGE", "Sketch_1/SketchCircle_1_2")])
 Sketch_2 = model.addSketch(Part_1_doc, model.standardPlane("XOY"))
 SketchProjection_1 = Sketch_2.addProjection(model.selection("VERTEX", "PartSet/Origin"), False)
 SketchPoint_1 = SketchProjection_1.createdFeature()

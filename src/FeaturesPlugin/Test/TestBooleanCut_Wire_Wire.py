@@ -18,6 +18,8 @@
 ## email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com>
 ##
 
+# -*- coding: utf-8 -*-
+
 from salome.shaper import model
 
 model.begin()
@@ -34,9 +36,9 @@ SketchLine_4 = Sketch_1.addLine(-58.79960075346089, 25.5711331765356, 3.50824445
 SketchLine_5 = Sketch_1.addLine(3.508244452542322, 60.3323520809374, 63.1926014393454, 22.94764495733547)
 SketchConstraintCoincidence_3 = Sketch_1.setCoincident(SketchLine_4.endPoint(), SketchLine_5.startPoint())
 model.do()
-Wire_1_objects = [model.selection("EDGE", "Sketch_1/Edge-SketchLine_1"), model.selection("EDGE", "Sketch_1/Edge-SketchLine_2"), model.selection("EDGE", "Sketch_1/Edge-SketchLine_3")]
+Wire_1_objects = [model.selection("EDGE", "Sketch_1/SketchLine_1"), model.selection("EDGE", "Sketch_1/SketchLine_2"), model.selection("EDGE", "Sketch_1/SketchLine_3")]
 Wire_1 = model.addWire(Part_1_doc, Wire_1_objects)
-Wire_2 = model.addWire(Part_1_doc, [model.selection("EDGE", "Sketch_1/Edge-SketchLine_4"), model.selection("EDGE", "Sketch_1/Edge-SketchLine_5")])
+Wire_2 = model.addWire(Part_1_doc, [model.selection("EDGE", "Sketch_1/SketchLine_4"), model.selection("EDGE", "Sketch_1/SketchLine_5")])
 Cut_1 = model.addCut(Part_1_doc, [model.selection("WIRE", "Wire_1_1")], [model.selection("WIRE", "Wire_2_1")])
 model.testHaveNamingSubshapes(Cut_1, model, Part_1_doc)
 model.do()

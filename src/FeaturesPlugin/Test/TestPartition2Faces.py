@@ -1,4 +1,4 @@
-## Copyright (C) 2017  CEA/DEN, EDF R&D
+## Copyright (C) 2014-2017  CEA/DEN, EDF R&D
 ##
 ## This library is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU Lesser General Public
@@ -18,6 +18,7 @@
 ## email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com>
 ##
 
+# -*- coding: utf-8 -*-
 
 from salome.shaper import model
 
@@ -42,8 +43,9 @@ model.do()
 Sketch_2 = model.addSketch(Part_1_doc, model.defaultPlane("XOY"))
 SketchCircle_1 = Sketch_2.addCircle(64.38749999999999, 45.44999999999999, 41.86298795836804)
 model.do()
-Face_1 = model.addFace(Part_1_doc, [model.selection("EDGE", "Sketch_1/Edge-SketchLine_1"), model.selection("EDGE", "Sketch_1/Edge-SketchLine_4"), model.selection("EDGE", "Sketch_1/Edge-SketchLine_3"), model.selection("EDGE", "Sketch_1/Edge-SketchLine_2")])
-Face_2 = model.addFace(Part_1_doc, [model.selection("EDGE", "Sketch_2/Edge-SketchCircle_1_2")])
+Face_1_objects = [model.selection("EDGE", "Sketch_1/SketchLine_1"), model.selection("EDGE", "Sketch_1/SketchLine_4"), model.selection("EDGE", "Sketch_1/SketchLine_3"), model.selection("EDGE", "Sketch_1/SketchLine_2")]
+Face_1 = model.addFace(Part_1_doc, Face_1_objects)
+Face_2 = model.addFace(Part_1_doc, [model.selection("EDGE", "Sketch_2/SketchCircle_1_2")])
 Partition_1 = model.addPartition(Part_1_doc, [model.selection("FACE", "Face_1_1"), model.selection("FACE", "Face_2_1")])
 model.do()
 

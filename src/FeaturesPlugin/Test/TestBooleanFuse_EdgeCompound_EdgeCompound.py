@@ -18,6 +18,8 @@
 ## email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com>
 ##
 
+# -*- coding: utf-8 -*-
+
 from salome.shaper import model
 
 model.begin()
@@ -32,7 +34,7 @@ Sketch_2 = model.addSketch(Part_1_doc, model.defaultPlane("XOY"))
 SketchLine_3 = Sketch_2.addLine(-70.53968253968257, 29.92592592592593, -31.52910052910054, -5.343915343915344)
 SketchLine_4 = Sketch_2.addLine(14.96296296296294, 26.18518518518519, 50.23280423280426, -8.015873015873021)
 model.do()
-Edge_1_objects = [model.selection("EDGE", "Sketch_1/Edge-SketchLine_1"), model.selection("EDGE", "Sketch_1/Edge-SketchLine_2"), model.selection("EDGE", "Sketch_2/Edge-SketchLine_3"), model.selection("EDGE", "Sketch_2/Edge-SketchLine_4")]
+Edge_1_objects = [model.selection("EDGE", "Sketch_1/SketchLine_1"), model.selection("EDGE", "Sketch_1/SketchLine_2"), model.selection("EDGE", "Sketch_2/SketchLine_3"), model.selection("EDGE", "Sketch_2/SketchLine_4")]
 Edge_1 = model.addEdge(Part_1_doc, Edge_1_objects)
 Compound_1 = model.addCompound(Part_1_doc, [model.selection("EDGE", "Edge_1_1"), model.selection("EDGE", "Edge_1_2")])
 Compound_2 = model.addCompound(Part_1_doc, [model.selection("EDGE", "Edge_1_3"), model.selection("EDGE", "Edge_1_4")])

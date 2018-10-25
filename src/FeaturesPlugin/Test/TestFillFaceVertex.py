@@ -1,4 +1,4 @@
-## Copyright (C) 2017  CEA/DEN, EDF R&D
+## Copyright (C) 2014-2017  CEA/DEN, EDF R&D
 ##
 ## This library is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU Lesser General Public
@@ -18,6 +18,7 @@
 ## email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com>
 ##
 
+# -*- coding: utf-8 -*-
 
 from salome.shaper import model
 
@@ -40,13 +41,14 @@ SketchConstraintVertical_1 = Sketch_1.setVertical(SketchLine_2.result())
 SketchConstraintHorizontal_2 = Sketch_1.setHorizontal(SketchLine_3.result())
 SketchConstraintVertical_2 = Sketch_1.setVertical(SketchLine_4.result())
 model.do()
-Face_1 = model.addFace(Part_1_doc, [model.selection("EDGE", "Sketch_1/Edge-SketchLine_1"), model.selection("EDGE", "Sketch_1/Edge-SketchLine_4"), model.selection("EDGE", "Sketch_1/Edge-SketchLine_3"), model.selection("EDGE", "Sketch_1/Edge-SketchLine_2")])
+Face_1_objects = [model.selection("EDGE", "Sketch_1/SketchLine_1"), model.selection("EDGE", "Sketch_1/SketchLine_4"), model.selection("EDGE", "Sketch_1/SketchLine_3"), model.selection("EDGE", "Sketch_1/SketchLine_2")]
+Face_1 = model.addFace(Part_1_doc, Face_1_objects)
 Vertex_1 = model.addVertex(Part_1_doc, [model.selection("VERTEX", "Point_1")])
-Boolean_1 = model.addFill(Part_1_doc, [model.selection("FACE", "Face_1_1")], [model.selection("VERTEX", "Vertex_1_1")])
+Fill_1 = model.addFill(Part_1_doc, [model.selection("FACE", "Face_1_1")], [model.selection("VERTEX", "Vertex_1_1")])
 model.do()
 
-model.checkResult(Boolean_1,model,1,[0],[0],[1],[4],[9])
-model.testHaveNamingSubshapes(Boolean_1,model,Part_1_doc)
+model.checkResult(Fill_1,model,1,[0],[0],[1],[4],[9])
+model.testHaveNamingSubshapes(Fill_1,model,Part_1_doc)
 
 model.end()
 

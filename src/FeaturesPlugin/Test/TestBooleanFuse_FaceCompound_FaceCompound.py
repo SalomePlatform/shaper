@@ -18,6 +18,8 @@
 ## email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com>
 ##
 
+# -*- coding: utf-8 -*-
+
 from salome.shaper import model
 
 model.begin()
@@ -32,9 +34,9 @@ Sketch_2 = model.addSketch(Part_1_doc, model.defaultPlane("XOY"))
 SketchCircle_3 = Sketch_2.addCircle(-36.12101408450705, -7.148950704225357, 25.24032590912034)
 SketchCircle_4 = Sketch_2.addCircle(51.92395774647893, -12.41659859154929, 31.3630728131964)
 model.do()
-Face_1 = model.addFace(Part_1_doc, [model.selection("FACE", "Sketch_1/Face-SketchCircle_1_2f")])
+Face_1 = model.addFace(Part_1_doc, [model.selection("FACE", "Sketch_1/Face-SketchCircle_1_2r")])
 Face_2 = model.addFace(Part_1_doc, [model.selection("FACE", "Sketch_1/Face-SketchCircle_2_2f")])
-Face_3 = model.addFace(Part_1_doc, [model.selection("FACE", "Sketch_2/Face-SketchCircle_3_2f")])
+Face_3 = model.addFace(Part_1_doc, [model.selection("FACE", "Sketch_2/Face-SketchCircle_3_2r")])
 Face_4 = model.addFace(Part_1_doc, [model.selection("FACE", "Sketch_2/Face-SketchCircle_4_2f")])
 Compound_1 = model.addCompound(Part_1_doc, [model.selection("FACE", "Face_1_1"), model.selection("FACE", "Face_2_1")])
 Compound_2 = model.addCompound(Part_1_doc, [model.selection("FACE", "Face_3_1"), model.selection("FACE", "Face_4_1")])

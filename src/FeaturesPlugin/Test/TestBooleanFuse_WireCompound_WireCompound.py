@@ -18,6 +18,7 @@
 ## email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com>
 ##
 
+# -*- coding: utf-8 -*-
 
 from salome.shaper import model
 
@@ -41,10 +42,10 @@ SketchLine_7 = Sketch_2.addLine(13.49417304964538, 51.08508368794326, 35.9844614
 SketchLine_8 = Sketch_2.addLine(35.98446146572105, 27.95221560283687, 53.3341125295508, 47.87218534278959)
 SketchConstraintCoincidence_4 = Sketch_2.setCoincident(SketchLine_7.endPoint(), SketchLine_8.startPoint())
 model.do()
-Wire_1 = model.addWire(Part_1_doc, [model.selection("EDGE", "Sketch_1/Edge-SketchLine_1"), model.selection("EDGE", "Sketch_1/Edge-SketchLine_2")])
-Wire_2 = model.addWire(Part_1_doc, [model.selection("EDGE", "Sketch_1/Edge-SketchLine_3"), model.selection("EDGE", "Sketch_1/Edge-SketchLine_4")])
-Wire_3 = model.addWire(Part_1_doc, [model.selection("EDGE", "Sketch_2/Edge-SketchLine_5"), model.selection("EDGE", "Sketch_2/Edge-SketchLine_6")])
-Wire_4 = model.addWire(Part_1_doc, [model.selection("EDGE", "Sketch_2/Edge-SketchLine_7"), model.selection("EDGE", "Sketch_2/Edge-SketchLine_8")])
+Wire_1 = model.addWire(Part_1_doc, [model.selection("EDGE", "Sketch_1/SketchLine_1"), model.selection("EDGE", "Sketch_1/SketchLine_2")])
+Wire_2 = model.addWire(Part_1_doc, [model.selection("EDGE", "Sketch_1/SketchLine_3"), model.selection("EDGE", "Sketch_1/SketchLine_4")])
+Wire_3 = model.addWire(Part_1_doc, [model.selection("EDGE", "Sketch_2/SketchLine_5"), model.selection("EDGE", "Sketch_2/SketchLine_6")])
+Wire_4 = model.addWire(Part_1_doc, [model.selection("EDGE", "Sketch_2/SketchLine_7"), model.selection("EDGE", "Sketch_2/SketchLine_8")])
 Compound_1 = model.addCompound(Part_1_doc, [model.selection("WIRE", "Wire_1_1"), model.selection("WIRE", "Wire_2_1")])
 Compound_2 = model.addCompound(Part_1_doc, [model.selection("WIRE", "Wire_3_1"), model.selection("WIRE", "Wire_4_1")])
 Fuse_1 = model.addFuse(Part_1_doc, [model.selection("COMPOUND", "Compound_1_1"), model.selection("COMPOUND", "Compound_2_1")])

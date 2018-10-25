@@ -18,6 +18,8 @@
 ## email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com>
 ##
 
+# -*- coding: utf-8 -*-
+
 from salome.shaper import model
 
 model.begin()
@@ -30,8 +32,8 @@ SketchLine_2 = Sketch_1.addLine(-13.21145377197118, 31.16583469441819, 14.897138
 SketchLine_3 = Sketch_1.addLine(-5.074756009927738, 49.65832960815328, -4.828189411077946, 26.48106931627197)
 SketchLine_4 = Sketch_1.addLine(7.993273729111718, 49.41176300930348, 8.23984032796152, 26.48106931627197)
 model.do()
-Compound_1 = model.addCompound(Part_1_doc, [model.selection("EDGE", "Sketch_1/Edge-SketchLine_1"), model.selection("EDGE", "Sketch_1/Edge-SketchLine_2")])
-Compound_2 = model.addCompound(Part_1_doc, [model.selection("EDGE", "Sketch_1/Edge-SketchLine_3"), model.selection("EDGE", "Sketch_1/Edge-SketchLine_4")])
+Compound_1 = model.addCompound(Part_1_doc, [model.selection("EDGE", "Sketch_1/SketchLine_1"), model.selection("EDGE", "Sketch_1/SketchLine_2")])
+Compound_2 = model.addCompound(Part_1_doc, [model.selection("EDGE", "Sketch_1/SketchLine_3"), model.selection("EDGE", "Sketch_1/SketchLine_4")])
 Cut_1 = model.addCut(Part_1_doc, [model.selection("COMPOUND", "Compound_1_1")], [model.selection("COMPOUND", "Compound_2_1")])
 model.testHaveNamingSubshapes(Cut_1, model, Part_1_doc)
 model.do()

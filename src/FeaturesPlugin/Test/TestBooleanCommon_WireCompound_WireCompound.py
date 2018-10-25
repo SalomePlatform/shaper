@@ -18,6 +18,8 @@
 ## email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com>
 ##
 
+# -*- coding: utf-8 -*-
+
 from SketchAPI import *
 
 from salome.shaper import model
@@ -36,30 +38,30 @@ SketchConstraintCoincidence_2 = Sketch_1.setCoincident(SketchLine_3.endPoint(), 
 model.do()
 Sketch_2 = model.addSketch(Part_1_doc, model.defaultPlane("XOY"))
 SketchLine_5 = Sketch_2.addLine(-75.23467769579756, 14.76574658950986, -60.62456998069012, -7.998839850308684)
-SketchProjection_1 = Sketch_2.addProjection(model.selection("EDGE", "Sketch_1/Edge-SketchLine_1"), False)
+SketchProjection_1 = Sketch_2.addProjection(model.selection("EDGE", "Sketch_1/SketchLine_1"), False)
 SketchLine_6 = SketchProjection_1.createdFeature()
 SketchConstraintCoincidence_3 = Sketch_2.setCoincident(SketchLine_5.startPoint(), SketchLine_6.result())
 SketchConstraintCoincidence_4 = Sketch_2.setCoincident(SketchAPI_Line(SketchLine_6).endPoint(), SketchLine_5.endPoint())
 SketchLine_7 = Sketch_2.addLine(-60.62456998069012, -7.998839850308684, -47.51524103341781, 13.8500417284785)
 SketchConstraintCoincidence_5 = Sketch_2.setCoincident(SketchLine_5.endPoint(), SketchLine_7.startPoint())
-SketchProjection_2 = Sketch_2.addProjection(model.selection("EDGE", "Sketch_1/Edge-SketchLine_2"), False)
+SketchProjection_2 = Sketch_2.addProjection(model.selection("EDGE", "Sketch_1/SketchLine_2"), False)
 SketchLine_8 = SketchProjection_2.createdFeature()
 SketchConstraintCoincidence_6 = Sketch_2.setCoincident(SketchLine_7.endPoint(), SketchLine_8.result())
 SketchLine_9 = Sketch_2.addLine(35.74952364371219, 12.81217486039606, 47.60078384600371, -9.954719738742909)
-SketchProjection_3 = Sketch_2.addProjection(model.selection("EDGE", "Sketch_1/Edge-SketchLine_3"), False)
+SketchProjection_3 = Sketch_2.addProjection(model.selection("EDGE", "Sketch_1/SketchLine_3"), False)
 SketchLine_10 = SketchProjection_3.createdFeature()
 SketchConstraintCoincidence_7 = Sketch_2.setCoincident(SketchLine_9.startPoint(), SketchLine_10.result())
 SketchConstraintCoincidence_8 = Sketch_2.setCoincident(SketchAPI_Line(SketchLine_10).endPoint(), SketchLine_9.endPoint())
 SketchLine_11 = Sketch_2.addLine(47.60078384600371, -9.954719738742909, 64.13719888777418, 18.68151118724985)
 SketchConstraintCoincidence_9 = Sketch_2.setCoincident(SketchLine_9.endPoint(), SketchLine_11.startPoint())
-SketchProjection_4 = Sketch_2.addProjection(model.selection("EDGE", "Sketch_1/Edge-SketchLine_4"), False)
+SketchProjection_4 = Sketch_2.addProjection(model.selection("EDGE", "Sketch_1/SketchLine_4"), False)
 SketchLine_12 = SketchProjection_4.createdFeature()
 SketchConstraintCoincidence_10 = Sketch_2.setCoincident(SketchLine_11.endPoint(), SketchLine_12.result())
 model.do()
-Wire_1 = model.addWire(Part_1_doc, [model.selection("EDGE", "Sketch_1/Edge-SketchLine_1"), model.selection("EDGE", "Sketch_1/Edge-SketchLine_2")])
-Wire_2 = model.addWire(Part_1_doc, [model.selection("EDGE", "Sketch_1/Edge-SketchLine_3"), model.selection("EDGE", "Sketch_1/Edge-SketchLine_4")])
-Wire_3 = model.addWire(Part_1_doc, [model.selection("EDGE", "Sketch_2/Edge-SketchLine_5"), model.selection("EDGE", "Sketch_2/Edge-SketchLine_7")])
-Wire_4 = model.addWire(Part_1_doc, [model.selection("EDGE", "Sketch_2/Edge-SketchLine_9"), model.selection("EDGE", "Sketch_2/Edge-SketchLine_11")])
+Wire_1 = model.addWire(Part_1_doc, [model.selection("EDGE", "Sketch_1/SketchLine_1"), model.selection("EDGE", "Sketch_1/SketchLine_2")])
+Wire_2 = model.addWire(Part_1_doc, [model.selection("EDGE", "Sketch_1/SketchLine_3"), model.selection("EDGE", "Sketch_1/SketchLine_4")])
+Wire_3 = model.addWire(Part_1_doc, [model.selection("EDGE", "Sketch_2/SketchLine_5"), model.selection("EDGE", "Sketch_2/SketchLine_7")])
+Wire_4 = model.addWire(Part_1_doc, [model.selection("EDGE", "Sketch_2/SketchLine_9"), model.selection("EDGE", "Sketch_2/SketchLine_11")])
 Compound_1 = model.addCompound(Part_1_doc, [model.selection("WIRE", "Wire_1_1"), model.selection("WIRE", "Wire_2_1")])
 Compound_2 = model.addCompound(Part_1_doc, [model.selection("WIRE", "Wire_3_1"), model.selection("WIRE", "Wire_4_1")])
 Common_1 = model.addCommon(Part_1_doc, [model.selection("COMPOUND", "Compound_1_1"), model.selection("COMPOUND", "Compound_2_1")])

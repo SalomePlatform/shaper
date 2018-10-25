@@ -18,6 +18,8 @@
 ## email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com>
 ##
 
+# -*- coding: utf-8 -*-
+
 from salome.shaper import model
 
 model.begin()
@@ -72,7 +74,7 @@ SketchLine_20 = Sketch_2.addLine(31.63598289786226, 11.9441976247031, 52.2962166
 SketchConstraintCoincidence_23 = Sketch_2.setCoincident(SketchLine_16.startPoint(), SketchLine_20.startPoint())
 SketchConstraintCoincidence_24 = Sketch_2.setCoincident(SketchLine_17.endPoint(), SketchLine_20.endPoint())
 model.do()
-Shell_1_objects = [model.selection("FACE", "Sketch_1/Face-SketchLine_1r-SketchLine_4r-SketchLine_5r"), model.selection("FACE", "Sketch_1/Face-SketchLine_2r-SketchLine_3r-SketchLine_5f"), model.selection("FACE", "Sketch_1/Face-SketchLine_6r-SketchLine_9r-SketchLine_10r"), model.selection("FACE", "Sketch_1/Face-SketchLine_7r-SketchLine_8r-SketchLine_10f"), model.selection("FACE", "Sketch_2/Face-SketchLine_11r-SketchLine_12r-SketchLine_15f"), model.selection("FACE", "Sketch_2/Face-SketchLine_13r-SketchLine_14r-SketchLine_15r"), model.selection("FACE", "Sketch_2/Face-SketchLine_16r-SketchLine_17r-SketchLine_20f"), model.selection("FACE", "Sketch_2/Face-SketchLine_18r-SketchLine_19r-SketchLine_20r")]
+Shell_1_objects = [model.selection("FACE", "Sketch_1/Face-SketchLine_4r-SketchLine_5r-SketchLine_1r"), model.selection("FACE", "Sketch_1/Face-SketchLine_5f-SketchLine_3r-SketchLine_2r"), model.selection("FACE", "Sketch_1/Face-SketchLine_9r-SketchLine_10r-SketchLine_6r"), model.selection("FACE", "Sketch_1/Face-SketchLine_10f-SketchLine_8r-SketchLine_7r"), model.selection("FACE", "Sketch_2/Face-SketchLine_15f-SketchLine_12r-SketchLine_11r"), model.selection("FACE", "Sketch_2/Face-SketchLine_15r-SketchLine_14r-SketchLine_13r"), model.selection("FACE", "Sketch_2/Face-SketchLine_20f-SketchLine_17r-SketchLine_16r"), model.selection("FACE", "Sketch_2/Face-SketchLine_20r-SketchLine_19r-SketchLine_18r")]
 Shell_1 = model.addShell(Part_1_doc, Shell_1_objects)
 Compound_1 = model.addCompound(Part_1_doc, [model.selection("SHELL", "Shell_1_1"), model.selection("SHELL", "Shell_1_2")])
 Compound_2 = model.addCompound(Part_1_doc, [model.selection("SHELL", "Shell_1_3"), model.selection("SHELL", "Shell_1_4")])

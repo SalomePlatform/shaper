@@ -1,4 +1,4 @@
-## Copyright (C) 2017  CEA/DEN, EDF R&D
+## Copyright (C) 2014-2017  CEA/DEN, EDF R&D
 ##
 ## This library is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU Lesser General Public
@@ -18,6 +18,7 @@
 ## email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com>
 ##
 
+# -*- coding: utf-8 -*-
 
 from salome.shaper import model
 
@@ -26,11 +27,11 @@ partSet = model.moduleDocument()
 Part_1 = model.addPart(partSet)
 Part_1_doc = Part_1.document()
 Cone_1 = model.addCone(Part_1_doc, model.selection("VERTEX", "PartSet/Origin"), model.selection("EDGE", "PartSet/OZ"), 10, 5, 10)
-Boolean_1 = model.addFill(Part_1_doc, [model.selection("SOLID", "Cone_1_1")], [model.selection("FACE", "PartSet/YOZ"), model.selection("FACE", "PartSet/XOZ")])
+Fill_1 = model.addFill(Part_1_doc, [model.selection("SOLID", "Cone_1_1")], [model.selection("FACE", "PartSet/YOZ"), model.selection("FACE", "PartSet/XOZ")])
 model.do()
 
-model.checkResult(Boolean_1,model,1,[4],[4],[20],[72],[144])
-model.testHaveNamingSubshapes(Boolean_1,model,Part_1_doc)
+model.checkResult(Fill_1,model,1,[4],[4],[20],[72],[144])
+model.testHaveNamingSubshapes(Fill_1,model,Part_1_doc)
 
 model.end()
 

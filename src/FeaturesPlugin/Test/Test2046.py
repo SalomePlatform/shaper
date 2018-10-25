@@ -18,6 +18,8 @@
 ## email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com>
 ##
 
+# -*- coding: utf-8 -*-
+
 from salome.shaper import model
 
 model.begin()
@@ -31,9 +33,11 @@ SketchConstraintCoincidence_2 = Sketch_1.setCoincident(SketchLine_2.endPoint(), 
 model.do()
 Part_1 = model.addPart(partSet)
 Part_1_doc = Part_1.document()
-Wire_1 = model.addWire(Part_1_doc, [model.selection("EDGE", "PartSet/Sketch_1/Edge-SketchLine_1"), model.selection("EDGE", "PartSet/Sketch_1/Edge-SketchLine_2"), model.selection("EDGE", "PartSet/Sketch_1/Edge-SketchLine_3")])
+Wire_1_objects = [model.selection("EDGE", "PartSet/Sketch_1/SketchLine_1"), model.selection("EDGE", "PartSet/Sketch_1/SketchLine_2"), model.selection("EDGE", "PartSet/Sketch_1/SketchLine_3")]
+Wire_1 = model.addWire(Part_1_doc, Wire_1_objects)
 Extrusion_1 = model.addExtrusion(Part_1_doc, [model.selection("WIRE", "Wire_1_1")], model.selection(), 100, 0)
-Group_1 = model.addGroup(Part_1_doc, [model.selection("FACE", "Extrusion_1_1/Generated_Face_3"), model.selection("FACE", "Extrusion_1_1/Generated_Face_2"), model.selection("FACE", "Extrusion_1_1/Generated_Face_1")])
+Group_1_objects = [model.selection("FACE", "Extrusion_1_1/Generated_Face&weak_name_1"), model.selection("FACE", "Extrusion_1_1/Generated_Face&weak_name_2"), model.selection("FACE", "Extrusion_1_1/Generated_Face&weak_name_3")]
+Group_1 = model.addGroup(Part_1_doc, Group_1_objects)
 model.do()
 model.end()
 

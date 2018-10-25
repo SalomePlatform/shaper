@@ -18,6 +18,8 @@
 ## email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com>
 ##
 
+# -*- coding: utf-8 -*-
+
 from salome.shaper import model
 
 model.begin()
@@ -74,8 +76,8 @@ SketchConstraintCoincidence_24 = Sketch_2.setCoincident(SketchLine_17.endPoint()
 model.do()
 Extrusion_1 = model.addExtrusion(Part_1_doc, [model.selection("COMPOUND", "Sketch_1")], model.selection(), 100, 0)
 Extrusion_2 = model.addExtrusion(Part_1_doc, [model.selection("COMPOUND", "Sketch_2")], model.selection(), 50, -20)
-Compound_1 = model.addCompound(Part_1_doc, [model.selection("COMPSOLID", "Extrusion_1_1"), model.selection("COMPSOLID", "Extrusion_1_2")])
-Compound_2 = model.addCompound(Part_1_doc, [model.selection("COMPSOLID", "Extrusion_2_1"), model.selection("COMPSOLID", "Extrusion_2_2")])
+Compound_1 = model.addCompound(Part_1_doc, [model.selection("COMPSOLID", "Extrusion_1_2"), model.selection("COMPSOLID", "Extrusion_1_1")])
+Compound_2 = model.addCompound(Part_1_doc, [model.selection("COMPSOLID", "Extrusion_2_2"), model.selection("COMPSOLID", "Extrusion_2_1")])
 Fuse_1 = model.addFuse(Part_1_doc, [model.selection("COMPOUND", "Compound_1_1"), model.selection("COMPOUND", "Compound_2_1")], True)
 model.testHaveNamingSubshapes(Fuse_1, model, Part_1_doc)
 model.do()

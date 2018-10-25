@@ -18,6 +18,8 @@
 ## email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com>
 ##
 
+# -*- coding: utf-8 -*-
+
 from salome.shaper import model
 
 model.begin()
@@ -26,7 +28,8 @@ Part_1 = model.addPart(partSet)
 Part_1_doc = Part_1.document()
 Ellipsoid_1 = model.addEllipsoid(Part_1_doc, 10, 20, 40)
 Torus_1 = model.addTorus(Part_1_doc, model.selection("VERTEX", "PartSet/Origin"), model.selection("EDGE", "PartSet/OZ"), 15, 3)
-LinearCopy_1 = model.addMultiTranslation(Part_1_doc, [model.selection("SOLID", "Ellipsoid_1_1")], model.selection("EDGE", "Ellipsoid_1_1/Face_1"), 10, 2)
+LinearCopy_1 = model.addMultiTranslation(Part_1_doc, [model.selection("SOLID", "Ellipsoid_1_1")], model.selection("EDGE", "[Ellipsoid_1_1/Face_1][weak_name_3]"), 10, 2)
+model.do()
 model.end()
 
 # check that for the linear copy direction the elliptical edge is invalid

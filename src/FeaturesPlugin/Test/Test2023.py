@@ -18,6 +18,8 @@
 ## email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com>
 ##
 
+# -*- coding: utf-8 -*-
+
 from salome.shaper import model
 
 model.begin()
@@ -38,8 +40,8 @@ SketchConstraintVertical_1 = Sketch_1.setVertical(SketchLine_2.result())
 SketchConstraintHorizontal_2 = Sketch_1.setHorizontal(SketchLine_3.result())
 SketchConstraintVertical_2 = Sketch_1.setVertical(SketchLine_4.result())
 model.do()
-Extrusion_1 = model.addExtrusion(Part_1_doc, [model.selection("FACE", "Sketch_1/Face-SketchLine_1f-SketchLine_2f-SketchLine_3f-SketchLine_4f")], model.selection(), 100, 0)
-Sketch_2 = model.addSketch(Part_1_doc, model.selection("FACE", "Extrusion_1_1/To_Face_1"))
+Extrusion_1 = model.addExtrusion(Part_1_doc, [model.selection("FACE", "Sketch_1/Face-SketchLine_1r-SketchLine_2f-SketchLine_3f-SketchLine_4f")], model.selection(), 100, 0)
+Sketch_2 = model.addSketch(Part_1_doc, model.selection("FACE", "Extrusion_1_1/To_Face"))
 SketchLine_5 = Sketch_2.addLine(99.48542024013722, 69.46826758147516, -34.30531732418524, 69.46826758147516)
 SketchLine_6 = Sketch_2.addLine(-34.30531732418524, 69.46826758147516, -34.30531732418524, -62.60720411663805)
 SketchLine_7 = Sketch_2.addLine(-34.30531732418524, -62.60720411663805, 99.48542024013722, -62.60720411663805)
@@ -53,9 +55,10 @@ SketchConstraintVertical_3 = Sketch_2.setVertical(SketchLine_6.result())
 SketchConstraintHorizontal_4 = Sketch_2.setHorizontal(SketchLine_7.result())
 SketchConstraintVertical_4 = Sketch_2.setVertical(SketchLine_8.result())
 model.do()
-Extrusion_2 = model.addExtrusion(Part_1_doc, [model.selection("FACE", "Sketch_2/Face-SketchLine_5f-SketchLine_6f-SketchLine_7f-SketchLine_8f")], model.selection(), 10, 110)
+Extrusion_2 = model.addExtrusion(Part_1_doc, [model.selection("FACE", "Sketch_2/Face-SketchLine_5r-SketchLine_6f-SketchLine_7f-SketchLine_8f")], model.selection(), 10, 110)
 Intersection_1 = model.addIntersection(Part_1_doc, [model.selection("SOLID", "Extrusion_1_1"), model.selection("SOLID", "Extrusion_2_1")])
 Rotation_1 = model.addRotation(Part_1_doc, [model.selection("COMPOUND", "Intersection_1_1")], model.selection("EDGE", "PartSet/OZ"), 45)
+model.do()
 model.end()
 
 assert(model.checkPythonDump())

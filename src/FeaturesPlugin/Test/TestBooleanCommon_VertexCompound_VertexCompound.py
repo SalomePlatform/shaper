@@ -18,6 +18,8 @@
 ## email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com>
 ##
 
+# -*- coding: utf-8 -*-
+
 from salome.shaper import model
 
 model.begin()
@@ -29,8 +31,8 @@ SketchPoint_1 = Sketch_1.addPoint(-28.13426853707415, 23.27655310621242)
 SketchPoint_2 = Sketch_1.addPoint(10.32264529058116, 23.27655310621242)
 SketchPoint_3 = Sketch_1.addPoint(47.56513026052106, 23.27655310621242)
 model.do()
-Vertex_1 = model.addVertex(Part_1_doc, [model.selection("VERTEX", "Sketch_1/Vertex-SketchPoint_1"), model.selection("VERTEX", "Sketch_1/Vertex-SketchPoint_2")])
-Vertex_2 = model.addVertex(Part_1_doc, [model.selection("VERTEX", "Sketch_1/Vertex-SketchPoint_2"), model.selection("VERTEX", "Sketch_1/Vertex-SketchPoint_3")])
+Vertex_1 = model.addVertex(Part_1_doc, [model.selection("VERTEX", "Sketch_1/SketchPoint_1"), model.selection("VERTEX", "Sketch_1/SketchPoint_2")])
+Vertex_2 = model.addVertex(Part_1_doc, [model.selection("VERTEX", "Sketch_1/SketchPoint_2"), model.selection("VERTEX", "Sketch_1/SketchPoint_3")])
 Compound_1 = model.addCompound(Part_1_doc, [model.selection("VERTEX", "Vertex_1_1"), model.selection("VERTEX", "Vertex_1_2")])
 Compound_2 = model.addCompound(Part_1_doc, [model.selection("VERTEX", "Vertex_2_1"), model.selection("VERTEX", "Vertex_2_2")])
 Common_1 = model.addCommon(Part_1_doc, [model.selection("COMPOUND", "Compound_1_1"), model.selection("COMPOUND", "Compound_2_1")])

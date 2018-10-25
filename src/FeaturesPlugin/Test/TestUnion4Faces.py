@@ -1,4 +1,4 @@
-## Copyright (C) 2017  CEA/DEN, EDF R&D
+## Copyright (C) 2014-2017  CEA/DEN, EDF R&D
 ##
 ## This library is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU Lesser General Public
@@ -18,6 +18,7 @@
 ## email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com>
 ##
 
+# -*- coding: utf-8 -*-
 
 from salome.shaper import model
 
@@ -37,9 +38,9 @@ SketchLine_5 = Sketch_1.addLine(31.85610465116278, -38.16860465116279, -44.48110
 SketchConstraintCoincidence_4 = Sketch_1.setCoincident(SketchLine_4.endPoint(), SketchLine_5.startPoint())
 SketchConstraintCoincidence_5 = Sketch_1.setCoincident(SketchLine_5.endPoint(), SketchLine_1.startPoint())
 model.do()
-Sketch_2 = model.addSketch(Part_1_doc, model.selection("FACE", "Sketch_1/Face-SketchLine_1r-SketchLine_2r-SketchLine_3r-SketchLine_4r-SketchLine_5r"))
+Sketch_2 = model.addSketch(Part_1_doc, model.selection("FACE", "Sketch_1/Face-SketchLine_5r-SketchLine_4r-SketchLine_3r-SketchLine_2r-SketchLine_1r"))
 SketchLine_6 = Sketch_2.addLine(31.85610465116278, -38.16860465116279, -40.43276493886778, -56.03425756438362)
-SketchProjection_1 = Sketch_2.addProjection(model.selection("VERTEX", "Sketch_1/Vertex-SketchLine_5s-SketchLine_4e"), False)
+SketchProjection_1 = Sketch_2.addProjection(model.selection("VERTEX", "Sketch_1/SketchLine_4_EndVertex"), False)
 SketchPoint_1 = SketchProjection_1.createdFeature()
 SketchConstraintCoincidence_6 = Sketch_2.setCoincident(SketchLine_6.startPoint(), SketchPoint_1.result())
 SketchLine_7 = Sketch_2.addLine(-40.43276493886778, -56.03425756438362, -115.5003601973775, -26.06900348999911)
@@ -48,14 +49,18 @@ SketchLine_8 = Sketch_2.addLine(-115.5003601973775, -26.06900348999911, -106.232
 SketchConstraintCoincidence_8 = Sketch_2.setCoincident(SketchLine_7.endPoint(), SketchLine_8.startPoint())
 SketchLine_9 = Sketch_2.addLine(-106.2327558444751, 34.47934494896344, -44.48110465116279, 12.33139534883721)
 SketchConstraintCoincidence_9 = Sketch_2.setCoincident(SketchLine_8.endPoint(), SketchLine_9.startPoint())
-SketchProjection_2 = Sketch_2.addProjection(model.selection("VERTEX", "Sketch_1/Vertex-SketchLine_1s-SketchLine_5e"), False)
+SketchProjection_2 = Sketch_2.addProjection(model.selection("VERTEX", "Sketch_1/SketchLine_1_StartVertex"), False)
 SketchPoint_2 = SketchProjection_2.createdFeature()
 SketchConstraintCoincidence_10 = Sketch_2.setCoincident(SketchLine_9.endPoint(), SketchPoint_2.result())
 model.do()
-Face_1 = model.addFace(Part_1_doc, [model.selection("EDGE", "Sketch_1/Edge-SketchLine_1"), model.selection("EDGE", "Sketch_1/Edge-SketchLine_2"), model.selection("EDGE", "Sketch_1/Edge-SketchLine_3"), model.selection("EDGE", "Sketch_1/Edge-SketchLine_4"), model.selection("EDGE", "Sketch_1/Edge-SketchLine_5")])
-Face_2 = model.addFace(Part_1_doc, [model.selection("EDGE", "Sketch_2/Edge-SketchLine_9"), model.selection("EDGE", "Sketch_1/Edge-SketchLine_5"), model.selection("EDGE", "Sketch_2/Edge-SketchLine_6"), model.selection("EDGE", "Sketch_2/Edge-SketchLine_7"), model.selection("EDGE", "Sketch_2/Edge-SketchLine_8")])
-Partition_1 = model.addPartition(Part_1_doc, [model.selection("FACE", "Face_2_1"), model.selection("FACE", "Face_1_1"), model.selection("FACE", "PartSet/YOZ")])
-Union_1 = model.addUnion(Part_1_doc, [model.selection("FACE", "Partition_1_1_1"), model.selection("FACE", "Partition_1_1_3"), model.selection("FACE", "Partition_1_1_4")])
+Face_1_objects = [model.selection("EDGE", "Sketch_1/SketchLine_1"), model.selection("EDGE", "Sketch_1/SketchLine_2"), model.selection("EDGE", "Sketch_1/SketchLine_3"), model.selection("EDGE", "Sketch_1/SketchLine_4"), model.selection("EDGE", "Sketch_1/SketchLine_5")]
+Face_1 = model.addFace(Part_1_doc, Face_1_objects)
+Face_2_objects = [model.selection("EDGE", "Sketch_2/SketchLine_9"), model.selection("EDGE", "Sketch_1/SketchLine_5"), model.selection("EDGE", "Sketch_2/SketchLine_6"), model.selection("EDGE", "Sketch_2/SketchLine_7"), model.selection("EDGE", "Sketch_2/SketchLine_8")]
+Face_2 = model.addFace(Part_1_doc, Face_2_objects)
+Partition_1_objects = [model.selection("FACE", "Face_2_1"), model.selection("FACE", "Face_1_1"), model.selection("FACE", "PartSet/YOZ")]
+Partition_1 = model.addPartition(Part_1_doc, Partition_1_objects)
+Union_1_objects = [model.selection("FACE", "Partition_1_1_1"), model.selection("FACE", "Partition_1_1_3"), model.selection("FACE", "Partition_1_1_4")]
+Union_1 = model.addUnion(Part_1_doc, Union_1_objects)
 model.do()
 
 model.checkResult(Union_1,model,1,[2],[0],[2],[13],[26])

@@ -18,6 +18,8 @@
 ## email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com>
 ##
 
+# -*- coding: utf-8 -*-
+
 from salome.shaper import model
 
 model.begin()
@@ -76,8 +78,8 @@ SketchConstraintVertical_7 = Sketch_2.setVertical(SketchLine_14.result())
 SketchConstraintHorizontal_8 = Sketch_2.setHorizontal(SketchLine_15.result())
 SketchConstraintVertical_8 = Sketch_2.setVertical(SketchLine_16.result())
 model.do()
-Face_1 = model.addFace(Part_1_doc, [model.selection("FACE", "Sketch_1/Face-SketchLine_1f-SketchLine_2f-SketchLine_3f-SketchLine_4f"), model.selection("FACE", "Sketch_1/Face-SketchLine_5f-SketchLine_6f-SketchLine_7f-SketchLine_8f")])
-Face_2 = model.addFace(Part_1_doc, [model.selection("FACE", "Sketch_2/Face-SketchLine_9f-SketchLine_10f-SketchLine_11f-SketchLine_12f"), model.selection("FACE", "Sketch_2/Face-SketchLine_13f-SketchLine_14f-SketchLine_15f-SketchLine_16f")])
+Face_1 = model.addFace(Part_1_doc, [model.selection("FACE", "Sketch_1/Face-SketchLine_1r-SketchLine_2f-SketchLine_3f-SketchLine_4f"), model.selection("FACE", "Sketch_1/Face-SketchLine_5f-SketchLine_6f-SketchLine_7f-SketchLine_8f")])
+Face_2 = model.addFace(Part_1_doc, [model.selection("FACE", "Sketch_2/Face-SketchLine_9r-SketchLine_10f-SketchLine_11f-SketchLine_12f"), model.selection("FACE", "Sketch_2/Face-SketchLine_13f-SketchLine_14f-SketchLine_15f-SketchLine_16f")])
 Compound_1 = model.addCompound(Part_1_doc, [model.selection("FACE", "Face_1_1"), model.selection("FACE", "Face_1_2")])
 Compound_2 = model.addCompound(Part_1_doc, [model.selection("FACE", "Face_2_1"), model.selection("FACE", "Face_2_2")])
 Common_1 = model.addCommon(Part_1_doc, [model.selection("COMPOUND", "Compound_1_1"), model.selection("COMPOUND", "Compound_2_1")])

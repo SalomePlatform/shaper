@@ -18,6 +18,8 @@
 ## email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com>
 ##
 
+# -*- coding: utf-8 -*-
+
 from salome.shaper import model
 
 model.begin()
@@ -37,7 +39,7 @@ SketchLine_5 = Sketch_2.addLine(64.54729867171925, -32.684941224703, 20.69511709
 SketchConstraintCoincidence_3 = Sketch_2.setCoincident(SketchLine_4.endPoint(), SketchLine_5.startPoint())
 SketchConstraintCoincidence_4 = Sketch_2.setCoincident(SketchLine_2.startPoint(), SketchLine_5.endPoint())
 model.do()
-Plane_4 = model.addPlane(Part_1_doc, model.selection("FACE", "PartSet/XOY"), model.selection("VERTEX", "Sketch_1/Vertex-SketchLine_1e"))
+Plane_4 = model.addPlane(Part_1_doc, model.selection("FACE", "PartSet/XOY"), model.selection("VERTEX", "Sketch_1/SketchLine_1_EndVertex"))
 Sketch_3 = model.addSketch(Part_1_doc, model.selection("FACE", "Plane_1"))
 SketchLine_6 = Sketch_3.addLine(18.78449167586506, 11.40320166178118, 18.60732592394469, -15.47067574876233)
 SketchLine_7 = Sketch_3.addLine(18.60732592394469, -15.47067574876233, 57.06415928764967, -9.455161348995592)
@@ -48,7 +50,7 @@ SketchLine_9 = Sketch_3.addLine(56.5687276408287, 11.2362868340608, 18.784491675
 SketchConstraintCoincidence_7 = Sketch_3.setCoincident(SketchLine_8.endPoint(), SketchLine_9.startPoint())
 SketchConstraintCoincidence_8 = Sketch_3.setCoincident(SketchLine_6.startPoint(), SketchLine_9.endPoint())
 model.do()
-Pipe_1 = model.addPipe(Part_1_doc, [model.selection("FACE", "Sketch_2/Face-SketchLine_2r-SketchLine_3r-SketchLine_4r-SketchLine_5r"), model.selection("FACE", "Sketch_3/Face-SketchLine_6f-SketchLine_7f-SketchLine_8f-SketchLine_9f")], model.selection("EDGE", "Sketch_1/Edge-SketchLine_1"), [model.selection("VERTEX", "Sketch_1/Vertex-SketchLine_1s"), model.selection("VERTEX", "Sketch_1/Vertex-SketchLine_1e")])
+Pipe_1 = model.addPipe(Part_1_doc, [model.selection("FACE", "Sketch_2/Face-SketchLine_5r-SketchLine_4r-SketchLine_3r-SketchLine_2r"), model.selection("FACE", "Sketch_3/Face-SketchLine_6r-SketchLine_7f-SketchLine_8f-SketchLine_9f")], model.selection("EDGE", "Sketch_1/SketchLine_1"), [model.selection("VERTEX", "Sketch_1/SketchLine_1_StartVertex"), model.selection("VERTEX", "Sketch_1/SketchLine_1_EndVertex")])
 model.do()
 model.end()
 

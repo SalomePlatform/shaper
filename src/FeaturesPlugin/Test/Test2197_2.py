@@ -18,6 +18,8 @@
 ## email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com>
 ##
 
+# -*- coding: utf-8 -*-
+
 from salome.shaper import model
 
 model.begin()
@@ -27,11 +29,12 @@ Part_1_doc = Part_1.document()
 Sketch_1 = model.addSketch(Part_1_doc, model.defaultPlane("YOZ"))
 SketchCircle_1 = Sketch_1.addCircle(-150, 80, 100)
 model.do()
-Face_1 = model.addFace(Part_1_doc, [model.selection("EDGE", "Sketch_1/Edge-SketchCircle_1_2")])
+Face_1 = model.addFace(Part_1_doc, [model.selection("EDGE", "Sketch_1/SketchCircle_1_2")])
 Revolution_1 = model.addRevolution(Part_1_doc, [model.selection("FACE", "Face_1_1")], model.selection("EDGE", "PartSet/OZ"), 360, 0)
-Group_1 = model.addGroup(Part_1_doc, [model.selection("EDGE", "Revolution_1_1/Base_Edge_4")])
-Group_2 = model.addGroup(Part_1_doc, [model.selection("EDGE", "Revolution_1_1/Lateral_2")])
-Group_3 = model.addGroup(Part_1_doc, [model.selection("VERTEX", "Revolution_1_1/Lateral_2&Revolution_1_1/Base_Edge_4")])
+Group_1 = model.addGroup(Part_1_doc, [model.selection("EDGE", "[Revolution_1_1/Generated_Face&Face_1_1/Edge_1][weak_name_1]")])
+Group_2 = model.addGroup(Part_1_doc, [model.selection("EDGE", "[Revolution_1_1/Generated_Face&Face_1_1/Edge_1][weak_name_2]")])
+Group_3 = model.addGroup(Part_1_doc, [model.selection("VERTEX", "[Revolution_1_1/Generated_Face&Face_1_1/Edge_1]")])
+model.do()
 model.end()
 
 # check that resulting group selection is valid

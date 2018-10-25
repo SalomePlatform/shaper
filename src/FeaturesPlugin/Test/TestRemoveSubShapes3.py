@@ -18,6 +18,8 @@
 ## email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com>
 ##
 
+# -*- coding: utf-8 -*-
+
 from salome.shaper import model
 
 model.begin()
@@ -36,7 +38,7 @@ Translation_1 = model.addTranslation(Part_1_doc, [model.selection("FACE", "Face_
 Shell_1 = model.addShell(Part_1_doc, [model.selection("FACE", "Translation_1_1"), model.selection("FACE", "Face_1_1")])
 
 Remove_SubShapes_1 = model.addRemoveSubShapes(Part_1_doc, model.selection("SHELL", "Shell_1_1"))
-Remove_SubShapes_1.setSubShapesToRemove([model.selection("FACE", "Shell_1_1/Modified_Face_2")])
+Remove_SubShapes_1.setSubShapesToRemove([model.selection("FACE", "Shell_1_1/Modified_Face&Face_2_1/Face_2_1")])
 model.do()
 
 model.checkResult(Remove_SubShapes_1, model, 1, [0], [0], [1], [4], [8])

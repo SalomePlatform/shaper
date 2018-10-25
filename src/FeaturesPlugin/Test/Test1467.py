@@ -18,15 +18,14 @@
 ## email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com>
 ##
 
+# -*- coding: utf-8 -*-
+
 from salome.shaper import model
 
-# Create document
 model.begin()
 partSet = model.moduleDocument()
 Part_1 = model.addPart(partSet)
 Part_1_doc = Part_1.document()
-
-# Create base and path for pipe
 Point_2 = model.addPoint(Part_1_doc, 5, 20, 0)
 Point_3 = model.addPoint(Part_1_doc, 0, 40, 30)
 Point_4 = model.addPoint(Part_1_doc, 10, 50, 70)
@@ -59,7 +58,7 @@ SketchConstraintTangent_2 = Sketch_1.setTangent(SketchArc_2.results()[1], Sketch
 SketchConstraintRigid_1 = Sketch_1.setFixed(SketchArc_1.startPoint())
 SketchConstraintRigid_2 = Sketch_1.setFixed(SketchLine_2.endPoint())
 model.do()
-Wire_1_objects = [model.selection("EDGE", "Sketch_1/Edge-SketchArc_2_2"), model.selection("EDGE", "Sketch_1/Edge-SketchLine_1"), model.selection("EDGE", "Sketch_1/Edge-SketchLine_3"), model.selection("EDGE", "Sketch_1/Edge-SketchLine_4"), model.selection("EDGE", "Sketch_1/Edge-SketchArc_1_2")]
+Wire_1_objects = [model.selection("EDGE", "Sketch_1/SketchArc_2_2"), model.selection("EDGE", "Sketch_1/SketchLine_1"), model.selection("EDGE", "Sketch_1/SketchLine_3"), model.selection("EDGE", "Sketch_1/SketchLine_4"), model.selection("EDGE", "Sketch_1/SketchArc_1_2")]
 Wire_1 = model.addWire(Part_1_doc, Wire_1_objects)
 Sketch_2 = model.addSketch(Part_1_doc, model.standardPlane("XOY"))
 SketchLine_4 = Sketch_2.addLine(9.525599451781, 2.539525405208, -21.231656152164, 2.539525405208)
@@ -87,18 +86,11 @@ SketchConstraintVertical_1 = Sketch_2.setVertical(SketchLine_5.result())
 SketchConstraintHorizontal_2 = Sketch_2.setHorizontal(SketchLine_6.result())
 SketchConstraintVertical_2 = Sketch_2.setVertical(SketchLine_7.result())
 model.do()
-
-# Create pipe on the entire path (big pipe)
 Pipe_1 = model.addPipe(Part_1_doc, [model.selection("COMPOUND", "Sketch_2")], model.selection("WIRE", "Wire_1_1"))
-
-# Create pipe on the fisrt segment of the path (small pipe)
-Pipe_2 = model.addPipe(Part_1_doc, [model.selection("COMPOUND", "Sketch_2")], model.selection("EDGE", "Sketch_1/Edge-SketchArc_2_2"))
-
-# Cut big pipe from the small pipe
+Pipe_2 = model.addPipe(Part_1_doc, [model.selection("COMPOUND", "Sketch_2")], model.selection("EDGE", "Sketch_1/SketchArc_2_2"))
 Cut_1 = model.addCut(Part_1_doc, [model.selection("SOLID", "Pipe_2_1")], [model.selection("SOLID", "Pipe_1_1")])
 model.do()
+model.end()
 
 # Check that the small pipe is a part of the big one
 assert(len(Cut_1.results()) == 0)
-
-model.end()

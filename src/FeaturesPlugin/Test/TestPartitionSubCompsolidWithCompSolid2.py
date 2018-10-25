@@ -1,4 +1,4 @@
-## Copyright (C) 2018-20xx  CEA/DEN, EDF R&D
+## Copyright (C) 2014-2017  CEA/DEN, EDF R&D
 ##
 ## This library is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU Lesser General Public
@@ -17,6 +17,8 @@
 ## See http:##www.salome-platform.org/ or
 ## email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com>
 ##
+
+# -*- coding: utf-8 -*-
 
 from salome.shaper import model
 from GeomAPI import *
@@ -40,7 +42,8 @@ Plane_4 = model.addPlane(Part_1_doc, model.selection("FACE", "Box_1_1/Left"), mo
 Plane_5 = model.addPlane(Part_1_doc, model.selection("FACE", "Box_1_1/Back"), model.selection("FACE", "Box_1_1/Front"))
 Partition_1_objects = [model.selection("SOLID", "Box_1_1"), model.selection("FACE", "Plane_1"), model.selection("FACE", "Plane_2")]
 Partition_1 = model.addPartition(Part_1_doc, Partition_1_objects)
-Partition_2 = model.addPartition(Part_1_doc, [model.selection("SOLID", "Extrusion_1_1_2"), model.selection("SOLID", "Partition_1_1_1"), model.selection("SOLID", "Partition_1_1_3")])
+Partition_2_objects = [model.selection("SOLID", "Extrusion_1_1_3"), model.selection("SOLID", "Partition_1_1_1"), model.selection("SOLID", "Partition_1_1_3")]
+Partition_2 = model.addPartition(Part_1_doc, Partition_2_objects)
 model.do()
 
 # check partition

@@ -18,6 +18,8 @@
 ## email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com>
 ##
 
+# -*- coding: utf-8 -*-
+
 from salome.shaper import model
 
 model.begin()
@@ -131,11 +133,11 @@ SketchConstraintAngle_2 = Sketch_1.setAngleComplementary(SketchLine_6.result(), 
 SketchConstraintDistance_3 = Sketch_1.setDistance(SketchLine_5.startPoint(), SketchLine_12.endPoint(), 8.1, False)
 SketchConstraintAngle_3 = Sketch_1.setAngle(SketchLine_3.result(), SketchLine_12.result(), 45)
 model.do()
-Edge_1_objects = [model.selection("EDGE", "Sketch_1/Edge-SketchLine_3"), model.selection("EDGE", "Sketch_1/Edge-SketchLine_4"), model.selection("EDGE", "Sketch_1/Edge-SketchLine_1"), model.selection("EDGE", "Sketch_1/Edge-SketchLine_2")]
+Edge_1_objects = [model.selection("EDGE", "Sketch_1/SketchLine_3"), model.selection("EDGE", "Sketch_1/SketchLine_4"), model.selection("EDGE", "Sketch_1/SketchLine_1"), model.selection("EDGE", "Sketch_1/SketchLine_2")]
 Edge_1 = model.addEdge(Part_1_doc, Edge_1_objects)
 Face_1_objects = [model.selection("EDGE", "Edge_1_1"), model.selection("EDGE", "Edge_1_2"), model.selection("EDGE", "Edge_1_3"), model.selection("EDGE", "Edge_1_4")]
 Face_1 = model.addFace(Part_1_doc, Face_1_objects)
-Edge_2_objects = [model.selection("EDGE", "Sketch_1/Edge-SketchLine_7"), model.selection("EDGE", "Sketch_1/Edge-SketchLine_6"), model.selection("EDGE", "Sketch_1/Edge-SketchLine_16"), model.selection("EDGE", "Sketch_1/Edge-SketchCircle_3_2"), model.selection("EDGE", "Sketch_1/Edge-SketchLine_15"), model.selection("EDGE", "Sketch_1/Edge-SketchCircle_2_2"), model.selection("EDGE", "Sketch_1/Edge-SketchLine_5"), model.selection("EDGE", "Sketch_1/Edge-SketchLine_13"), model.selection("EDGE", "Sketch_1/Edge-SketchLine_14"), model.selection("EDGE", "Sketch_1/Edge-SketchLine_8"), model.selection("EDGE", "Sketch_1/Edge-SketchLine_9")]
+Edge_2_objects = [model.selection("EDGE", "Sketch_1/SketchLine_7"), model.selection("EDGE", "Sketch_1/SketchLine_6"), model.selection("EDGE", "Sketch_1/SketchLine_16"), model.selection("EDGE", "Sketch_1/SketchCircle_3_2"), model.selection("EDGE", "Sketch_1/SketchLine_15"), model.selection("EDGE", "Sketch_1/SketchCircle_2_2"), model.selection("EDGE", "Sketch_1/SketchLine_5"), model.selection("EDGE", "Sketch_1/SketchLine_13"), model.selection("EDGE", "Sketch_1/SketchLine_14"), model.selection("EDGE", "Sketch_1/SketchLine_8"), model.selection("EDGE", "Sketch_1/SketchLine_9")]
 Edge_2 = model.addEdge(Part_1_doc, Edge_2_objects)
 Partition_1_objects = [model.selection("FACE", "Face_1_1"), model.selection("EDGE", "Edge_2_1"), model.selection("EDGE", "Edge_2_2"), model.selection("EDGE", "Edge_2_3"), model.selection("EDGE", "Edge_2_4"), model.selection("EDGE", "Edge_2_5"), model.selection("EDGE", "Edge_2_6"), model.selection("EDGE", "Edge_2_7"), model.selection("EDGE", "Edge_2_8"), model.selection("EDGE", "Edge_2_9"), model.selection("EDGE", "Edge_2_10"), model.selection("EDGE", "Edge_2_11")]
 Partition_1 = model.addPartition(Part_1_doc, Partition_1_objects)

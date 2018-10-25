@@ -18,6 +18,8 @@
 ## email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com>
 ##
 
+# -*- coding: utf-8 -*-
+
 from salome.shaper import model
 
 model.begin()
@@ -50,7 +52,7 @@ SketchLine_10 = Sketch_2.addLine(-84.57783182897859, 11.29856532066509, -60.6894
 SketchConstraintCoincidence_11 = Sketch_2.setCoincident(SketchLine_6.startPoint(), SketchLine_10.startPoint())
 SketchConstraintCoincidence_12 = Sketch_2.setCoincident(SketchLine_7.endPoint(), SketchLine_10.endPoint())
 model.do()
-Shell_1_objects = [model.selection("FACE", "Sketch_1/Face-SketchLine_1r-SketchLine_4r-SketchLine_5r"), model.selection("FACE", "Sketch_1/Face-SketchLine_2r-SketchLine_3r-SketchLine_5f"), model.selection("FACE", "Sketch_2/Face-SketchLine_6r-SketchLine_7r-SketchLine_10f"), model.selection("FACE", "Sketch_2/Face-SketchLine_8r-SketchLine_9r-SketchLine_10r")]
+Shell_1_objects = [model.selection("FACE", "Sketch_1/Face-SketchLine_4r-SketchLine_5r-SketchLine_1r"), model.selection("FACE", "Sketch_1/Face-SketchLine_5f-SketchLine_3r-SketchLine_2r"), model.selection("FACE", "Sketch_2/Face-SketchLine_10f-SketchLine_7r-SketchLine_6r"), model.selection("FACE", "Sketch_2/Face-SketchLine_10r-SketchLine_9r-SketchLine_8r")]
 Shell_1 = model.addShell(Part_1_doc, Shell_1_objects)
 Fuse_1 = model.addFuse(Part_1_doc, [model.selection("SHELL", "Shell_1_1"), model.selection("SHELL", "Shell_1_2")], True)
 model.testHaveNamingSubshapes(Fuse_1, model, Part_1_doc)

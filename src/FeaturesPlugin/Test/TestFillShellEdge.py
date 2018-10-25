@@ -1,4 +1,4 @@
-## Copyright (C) 2017  CEA/DEN, EDF R&D
+## Copyright (C) 2014-2017  CEA/DEN, EDF R&D
 ##
 ## This library is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU Lesser General Public
@@ -18,6 +18,7 @@
 ## email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com>
 ##
 
+# -*- coding: utf-8 -*-
 
 from SketchAPI import *
 
@@ -40,19 +41,19 @@ SketchArc_2 = Sketch_1.addArc(38.14157263904823, 16.22495851193372, 56.770542089
 SketchConstraintCoincidence_3 = Sketch_1.setCoincident(SketchArc_1.endPoint(), SketchArc_2.startPoint())
 SketchConstraintTangent_1 = Sketch_1.setTangent(SketchArc_1.results()[1], SketchArc_2.results()[1])
 model.do()
-Wire_1 = model.addWire(Part_1_doc, [model.selection("EDGE", "Sketch_1/Edge-SketchArc_1_2"), model.selection("EDGE", "Sketch_1/Edge-SketchArc_2_2")])
+Wire_1 = model.addWire(Part_1_doc, [model.selection("EDGE", "Sketch_1/SketchArc_1_2"), model.selection("EDGE", "Sketch_1/SketchArc_2_2")])
 Extrusion_1 = model.addExtrusion(Part_1_doc, [model.selection("WIRE", "Wire_1_1")], model.selection(), 70, 0)
 Shell_1 = model.addShell(Part_1_doc, [model.selection("SHELL", "Extrusion_1_1")])
 Plane_4 = model.addPlane(Part_1_doc, model.selection("FACE", "PartSet/YOZ"), 30, False)
 Sketch_2 = model.addSketch(Part_1_doc, model.selection("FACE", "Plane_1"))
 SketchLine_3 = Sketch_2.addLine(-64.49168769733997, 17.16789081864163, 146.7677170722727, 22.9901626941168)
 model.do()
-Edge_1 = model.addEdge(Part_1_doc, [model.selection("EDGE", "Sketch_2/Edge-SketchLine_3")])
-Boolean_1 = model.addFill(Part_1_doc, [model.selection("SHELL", "Shell_1_1")], [model.selection("EDGE", "Edge_1_1")])
+Edge_1 = model.addEdge(Part_1_doc, [model.selection("EDGE", "Sketch_2/SketchLine_3")])
+Fill_1 = model.addFill(Part_1_doc, [model.selection("SHELL", "Shell_1_1")], [model.selection("EDGE", "Edge_1_1")])
 model.do()
 
-model.checkResult(Boolean_1,model,1,[0],[0],[2],[8],[18])
-model.testHaveNamingSubshapes(Boolean_1,model,Part_1_doc)
+model.checkResult(Fill_1,model,1,[0],[0],[2],[8],[18])
+model.testHaveNamingSubshapes(Fill_1,model,Part_1_doc)
 
 model.end()
 

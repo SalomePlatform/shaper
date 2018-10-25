@@ -18,6 +18,8 @@
 ## email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com>
 ##
 
+# -*- coding: utf-8 -*-
+
 from salome.shaper import model
 
 model.begin()
@@ -30,7 +32,7 @@ SketchCircle_2 = Sketch_1.addCircle(-117.8044596912521, -0.1732418524871385, 54.
 model.do()
 Extrusion_1 = model.addExtrusion(Part_1_doc, [model.selection("COMPOUND", "Sketch_1")], model.selection(), 10, 0)
 Remove_SubShapes_1 = model.addRemoveSubShapes(Part_1_doc, model.selection("COMPSOLID", "Extrusion_1_1"))
-Remove_SubShapes_1.setSubShapesToRemove([model.selection("SOLID", "Extrusion_1_1_3")])
+Remove_SubShapes_1.setSubShapesToRemove([model.selection("SOLID", "Extrusion_1_1_2")])
 model.do()
 model.end()
 

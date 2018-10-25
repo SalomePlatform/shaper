@@ -18,6 +18,8 @@
 ## email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com>
 ##
 
+# -*- coding: utf-8 -*-
+
 from salome.shaper import model
 
 model.begin()
@@ -28,10 +30,10 @@ Sketch_1 = model.addSketch(Part_1_doc, model.defaultPlane("XOY"))
 SketchPoint_1 = Sketch_1.addPoint(0, 50)
 SketchPoint_2 = Sketch_1.addPoint(0, 25)
 model.do()
-Vertex_1 = model.addVertex(Part_1_doc, [model.selection("VERTEX", "Sketch_1/Vertex-SketchPoint_1")])
-Vertex_2 = model.addVertex(Part_1_doc, [model.selection("VERTEX", "Sketch_1/Vertex-SketchPoint_1")])
-Vertex_3 = model.addVertex(Part_1_doc, [model.selection("VERTEX", "Sketch_1/Vertex-SketchPoint_1")])
-Vertex_4 = model.addVertex(Part_1_doc, [model.selection("VERTEX", "Sketch_1/Vertex-SketchPoint_2")])
+Vertex_1 = model.addVertex(Part_1_doc, [model.selection("VERTEX", "Sketch_1/SketchPoint_1")])
+Vertex_2 = model.addVertex(Part_1_doc, [model.selection("VERTEX", "Sketch_1/SketchPoint_1")])
+Vertex_3 = model.addVertex(Part_1_doc, [model.selection("VERTEX", "Sketch_1/SketchPoint_1")])
+Vertex_4 = model.addVertex(Part_1_doc, [model.selection("VERTEX", "Sketch_1/SketchPoint_2")])
 Cut_1 = model.addCut(Part_1_doc, [model.selection("VERTEX", "Vertex_1_1")], [model.selection("VERTEX", "Vertex_2_1")])
 Cut_2 = model.addCut(Part_1_doc, [model.selection("VERTEX", "Vertex_3_1")], [model.selection("VERTEX", "Vertex_4_1")])
 model.testHaveNamingSubshapes(Cut_1, model, Part_1_doc)

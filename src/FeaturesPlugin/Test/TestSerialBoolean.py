@@ -18,15 +18,9 @@
 ## email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com>
 ##
 
-"""
-      TestExtrusion.py
-      Unit test of FeaturesPlugin_Boolean class: many Boolean operations performance
+# -*- coding: utf-8 -*-
 
-      class FeaturesPlugin_Extrusion : public ModelAPI_Feature
-        static const std::string MY_EXTRUSION_ID("Extrusion");
-        static const std::string MY_FACE_ID("base");
-        static const std::string MY_SIZE_ID("size");
-        static const std::string MY_REVERSE_ID("reverse");
+from salome.shaper import model
 
         data()->addAttribute(FeaturesPlugin_Extrusion::FACE_ID(), ModelAPI_AttributeSelection::typeId());
         data()->addAttribute(FeaturesPlugin_Extrusion::SIZE_ID(), ModelAPI_AttributeDouble::typeId());

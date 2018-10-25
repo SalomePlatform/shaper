@@ -1,3 +1,8 @@
+## Copyright (C) 2014-2017  CEA/DEN, EDF R&D
+##
+## This library is free software; you can redistribute it and/or
+## modify it under the terms of the GNU Lesser General Public
+## License as published by the Free Software Foundation; either
 ## version 2.1 of the License, or (at your option) any later version.
 ##
 ## This library is distributed in the hope that it will be useful,
@@ -12,6 +17,8 @@
 ## See http:##www.salome-platform.org/ or
 ## email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com>
 ##
+
+# -*- coding: utf-8 -*-
 
 from salome.shaper import model
 
@@ -30,10 +37,12 @@ SketchConstraintCoincidence_2 = Sketch_1.setCoincident(SketchArc_1.startPoint(),
 SketchConstraintCoincidence_3 = Sketch_1.setCoincident(SketchArc_1.endPoint(), SketchLine_1.endPoint())
 SketchConstraintVertical_1 = Sketch_1.setVertical(SketchLine_1.result())
 model.do()
-Edge_1 = model.addEdge(Part_1_doc, [model.selection("EDGE", "Sketch_1/Edge-SketchArc_1_2")])
+Edge_1 = model.addEdge(Part_1_doc, [model.selection("EDGE", "Sketch_1/SketchArc_1_2")])
 Revolution_1 = model.addRevolution(Part_1_doc, [model.selection("EDGE", "Edge_1_1")], model.selection("EDGE", "PartSet/OY"), 360, 0)
-Partition_1 = model.addPartition(Part_1_doc, [model.selection("FACE", "PartSet/YOZ"), model.selection("FACE", "PartSet/XOZ"), model.selection("FACE", "PartSet/XOY"), model.selection("FACE", "Revolution_1_1")])
-Union_1 = model.addUnion(Part_1_doc, [model.selection("FACE", "Partition_1_1_1"), model.selection("FACE", "Partition_1_1_2"), model.selection("FACE", "Partition_1_1_3"), model.selection("FACE", "Partition_1_1_4")])
+Partition_1_objects = [model.selection("FACE", "PartSet/YOZ"), model.selection("FACE", "PartSet/XOZ"), model.selection("FACE", "PartSet/XOY"), model.selection("FACE", "Revolution_1_1")]
+Partition_1 = model.addPartition(Part_1_doc, Partition_1_objects)
+Union_1_objects = [model.selection("FACE", "Partition_1_1_1"), model.selection("FACE", "Partition_1_1_2"), model.selection("FACE", "Partition_1_1_3"), model.selection("FACE", "Partition_1_1_4")]
+Union_1 = model.addUnion(Part_1_doc, Union_1_objects)
 model.testHaveNamingSubshapes(Union_1,model,Part_1_doc)
 model.do()
 model.end()

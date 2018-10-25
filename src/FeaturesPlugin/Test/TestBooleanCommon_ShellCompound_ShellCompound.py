@@ -18,6 +18,8 @@
 ## email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com>
 ##
 
+# -*- coding: utf-8 -*-
+
 from salome.shaper import model
 
 model.begin()
@@ -88,9 +90,9 @@ SketchLine_20 = Sketch_2.addLine(62.43123950606181, 3.491482965931855, 86.073169
 SketchConstraintCoincidence_23 = Sketch_2.setCoincident(SketchLine_20.startPoint(), SketchLine_17.result())
 SketchConstraintCoincidence_24 = Sketch_2.setCoincident(SketchLine_20.endPoint(), SketchLine_19.result())
 model.do()
-Shell_1_objects = [model.selection("FACE", "Sketch_1/Face-SketchLine_1f-SketchLine_2f-SketchLine_3f-SketchLine_9r"), model.selection("FACE", "Sketch_1/Face-SketchLine_1f-SketchLine_3f-SketchLine_4f-SketchLine_9f"), model.selection("FACE", "Sketch_1/Face-SketchLine_5f-SketchLine_6f-SketchLine_7f-SketchLine_10f"), model.selection("FACE", "Sketch_1/Face-SketchLine_5f-SketchLine_7f-SketchLine_8f-SketchLine_10r")]
+Shell_1_objects = [model.selection("FACE", "Sketch_1/Face-SketchLine_1r-SketchLine_2f-SketchLine_3f-SketchLine_9r"), model.selection("FACE", "Sketch_1/Face-SketchLine_1r-SketchLine_9f-SketchLine_3f-SketchLine_4f"), model.selection("FACE", "Sketch_1/Face-SketchLine_5f-SketchLine_6f-SketchLine_7f-SketchLine_10f"), model.selection("FACE", "Sketch_1/Face-SketchLine_5f-SketchLine_10r-SketchLine_7f-SketchLine_8f")]
 Shell_1 = model.addShell(Part_1_doc, Shell_1_objects)
-Shell_2_objects = [model.selection("FACE", "Sketch_2/Face-SketchLine_11f-SketchLine_12f-SketchLine_14f-SketchLine_15f"), model.selection("FACE", "Sketch_2/Face-SketchLine_12f-SketchLine_13f-SketchLine_14f-SketchLine_15r"), model.selection("FACE", "Sketch_2/Face-SketchLine_16f-SketchLine_17f-SketchLine_19f-SketchLine_20f"), model.selection("FACE", "Sketch_2/Face-SketchLine_17f-SketchLine_18f-SketchLine_19f-SketchLine_20r")]
+Shell_2_objects = [model.selection("FACE", "Sketch_2/Face-SketchLine_11r-SketchLine_12f-SketchLine_15f-SketchLine_14f"), model.selection("FACE", "Sketch_2/Face-SketchLine_12f-SketchLine_13f-SketchLine_14f-SketchLine_15r"), model.selection("FACE", "Sketch_2/Face-SketchLine_16f-SketchLine_17f-SketchLine_20f-SketchLine_19f"), model.selection("FACE", "Sketch_2/Face-SketchLine_17f-SketchLine_18f-SketchLine_19f-SketchLine_20r")]
 Shell_2 = model.addShell(Part_1_doc, Shell_2_objects)
 Compound_1 = model.addCompound(Part_1_doc, [model.selection("SHELL", "Shell_1_1"), model.selection("SHELL", "Shell_1_2")])
 Compound_2 = model.addCompound(Part_1_doc, [model.selection("SHELL", "Shell_2_1"), model.selection("SHELL", "Shell_2_2")])

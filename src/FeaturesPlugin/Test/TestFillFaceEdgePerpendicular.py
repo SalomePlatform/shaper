@@ -1,4 +1,4 @@
-## Copyright (C) 2017  CEA/DEN, EDF R&D
+## Copyright (C) 2014-2017  CEA/DEN, EDF R&D
 ##
 ## This library is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU Lesser General Public
@@ -18,6 +18,7 @@
 ## email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com>
 ##
 
+# -*- coding: utf-8 -*-
 
 from salome.shaper import model
 
@@ -42,13 +43,14 @@ model.do()
 Sketch_2 = model.addSketch(Part_1_doc, model.defaultPlane("YOZ"))
 SketchLine_7 = Sketch_2.addLine(24.33758278426026, -52.48127186534471, 29.40566289183227, 59.45054433956496)
 model.do()
-Edge_1 = model.addEdge(Part_1_doc, [model.selection("EDGE", "Sketch_2/Edge-SketchLine_7")])
-Face_1 = model.addFace(Part_1_doc, [model.selection("EDGE", "Sketch_1/Edge-SketchLine_1"), model.selection("EDGE", "Sketch_1/Edge-SketchLine_6"), model.selection("EDGE", "Sketch_1/Edge-SketchLine_5"), model.selection("EDGE", "Sketch_1/Edge-SketchLine_4"), model.selection("EDGE", "Sketch_1/Edge-SketchLine_3"), model.selection("EDGE", "Sketch_1/Edge-SketchLine_2")])
-Boolean_1 = model.addFill(Part_1_doc, [model.selection("FACE", "Face_1_1")], [model.selection("EDGE", "Edge_1_1")])
+Edge_1 = model.addEdge(Part_1_doc, [model.selection("EDGE", "Sketch_2/SketchLine_7")])
+Face_1_objects = [model.selection("EDGE", "Sketch_1/SketchLine_1"), model.selection("EDGE", "Sketch_1/SketchLine_6"), model.selection("EDGE", "Sketch_1/SketchLine_5"), model.selection("EDGE", "Sketch_1/SketchLine_4"), model.selection("EDGE", "Sketch_1/SketchLine_3"), model.selection("EDGE", "Sketch_1/SketchLine_2")]
+Face_1 = model.addFace(Part_1_doc, Face_1_objects)
+Fill_1 = model.addFill(Part_1_doc, [model.selection("FACE", "Face_1_1")], [model.selection("EDGE", "Edge_1_1")])
 model.do()
 
-model.checkResult(Boolean_1,model,1,[0],[0],[1],[6],[13])
-model.testHaveNamingSubshapes(Boolean_1,model,Part_1_doc)
+model.checkResult(Fill_1,model,1,[0],[0],[1],[6],[13])
+model.testHaveNamingSubshapes(Fill_1,model,Part_1_doc)
 
 model.end()
 

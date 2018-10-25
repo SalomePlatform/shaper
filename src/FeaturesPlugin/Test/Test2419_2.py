@@ -18,6 +18,8 @@
 ## email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com>
 ##
 
+# -*- coding: utf-8 -*-
+
 from salome.shaper import model
 
 model.begin()
@@ -93,11 +95,11 @@ SketchCircle_10 = Sketch_2.addCircle(49.58498153094326, 15.18789884296047, 2.552
 SketchCircle_11 = Sketch_2.addCircle(66.22695092615982, 10.77677442495125, 4.536925074373645)
 SketchCircle_12 = Sketch_2.addCircle(50.98852111849166, 6.165144351577979, 3.547307159201085)
 model.do()
-Face_1 = model.addFace(Part_1_doc, [model.selection("WIRE", "Sketch_1/Wire-SketchLine_1f-SketchLine_3f-SketchLine_4f-SketchLine_5f-SketchLine_6f-SketchLine_7f-SketchLine_9f-SketchLine_10r-SketchArc_2_2f")])
-Face_2 = model.addFace(Part_1_doc, [model.selection("WIRE", "Sketch_1/Wire-SketchLine_9f-SketchLine_10r-SketchArc_1_2f-SketchArc_2_2r")])
-Face_3_objects = [model.selection("EDGE", "Sketch_2/Edge-SketchCircle_1_2"), model.selection("EDGE", "Sketch_2/Edge-SketchCircle_2_2"), model.selection("EDGE", "Sketch_2/Edge-SketchCircle_3_2"), model.selection("EDGE", "Sketch_2/Edge-SketchCircle_4_2"), model.selection("EDGE", "Sketch_2/Edge-SketchCircle_5_2"), model.selection("EDGE", "Sketch_2/Edge-SketchCircle_6_2"), model.selection("EDGE", "Sketch_2/Edge-SketchCircle_7_2"), model.selection("EDGE", "Sketch_2/Edge-SketchCircle_9_2"), model.selection("EDGE", "Sketch_2/Edge-SketchCircle_8_2"), model.selection("EDGE", "Sketch_2/Edge-SketchCircle_10_2"), model.selection("EDGE", "Sketch_2/Edge-SketchCircle_12_2"), model.selection("EDGE", "Sketch_2/Edge-SketchCircle_11_2")]
+Face_1 = model.addFace(Part_1_doc, [model.selection("WIRE", "[Sketch_1/SubEdge&Sketch_1/SketchLine_1][Sketch_1/SubEdge&Sketch_1/SketchLine_3][Sketch_1/SubEdge&Sketch_1/SketchLine_4][Sketch_1/SubEdge&Sketch_1/SketchLine_5][Sketch_1/SubEdge&Sketch_1/SketchLine_6][Sketch_1/SubEdge&Sketch_1/SketchLine_7][Sketch_1/SubEdge&Sketch_1/SketchLine_9][Sketch_1/SketchArc_2_2][Sketch_1/SubEdge&Sketch_1/SketchLine_10]")])
+Face_2 = model.addFace(Part_1_doc, [model.selection("WIRE", "[Sketch_1/SubEdge&Sketch_1/SketchLine_9][Sketch_1/SubEdge&Sketch_1/SketchArc_1_2][Sketch_1/SubEdge&Sketch_1/SketchLine_10][Sketch_1/SketchArc_2_2]")])
+Face_3_objects = [model.selection("EDGE", "Sketch_2/SketchCircle_1_2"), model.selection("EDGE", "Sketch_2/SketchCircle_2_2"), model.selection("EDGE", "Sketch_2/SketchCircle_3_2"), model.selection("EDGE", "Sketch_2/SketchCircle_4_2"), model.selection("EDGE", "Sketch_2/SketchCircle_5_2"), model.selection("EDGE", "Sketch_2/SketchCircle_6_2"), model.selection("EDGE", "Sketch_2/SketchCircle_7_2"), model.selection("EDGE", "Sketch_2/SketchCircle_9_2"), model.selection("EDGE", "Sketch_2/SketchCircle_8_2"), model.selection("EDGE", "Sketch_2/SketchCircle_10_2"), model.selection("EDGE", "Sketch_2/SketchCircle_12_2"), model.selection("EDGE", "Sketch_2/SketchCircle_11_2")]
 Face_3 = model.addFace(Part_1_doc, Face_3_objects)
-Face_4_objects = [model.selection("EDGE", "Sketch_2/Edge-SketchCircle_1_2"), model.selection("EDGE", "Sketch_2/Edge-SketchCircle_2_2"), model.selection("EDGE", "Sketch_2/Edge-SketchCircle_3_2"), model.selection("EDGE", "Sketch_2/Edge-SketchCircle_4_2"), model.selection("EDGE", "Sketch_2/Edge-SketchCircle_5_2"), model.selection("EDGE", "Sketch_2/Edge-SketchCircle_7_2"), model.selection("EDGE", "Sketch_2/Edge-SketchCircle_6_2"), model.selection("EDGE", "Sketch_2/Edge-SketchCircle_9_2"), model.selection("EDGE", "Sketch_2/Edge-SketchCircle_8_2"), model.selection("EDGE", "Sketch_2/Edge-SketchCircle_10_2"), model.selection("EDGE", "Sketch_2/Edge-SketchCircle_12_2"), model.selection("EDGE", "Sketch_2/Edge-SketchCircle_11_2"), model.selection("WIRE", "Sketch_1/Wire-SketchLine_1f-SketchLine_3f-SketchLine_4f-SketchLine_5f-SketchLine_6f-SketchLine_7f-SketchLine_9f-SketchLine_10r-SketchArc_2_2f")]
+Face_4_objects = [model.selection("EDGE", "Sketch_2/SketchCircle_1_2"), model.selection("EDGE", "Sketch_2/SketchCircle_2_2"), model.selection("EDGE", "Sketch_2/SketchCircle_3_2"), model.selection("EDGE", "Sketch_2/SketchCircle_4_2"), model.selection("EDGE", "Sketch_2/SketchCircle_5_2"), model.selection("EDGE", "Sketch_2/SketchCircle_7_2"), model.selection("EDGE", "Sketch_2/SketchCircle_6_2"), model.selection("EDGE", "Sketch_2/SketchCircle_9_2"), model.selection("EDGE", "Sketch_2/SketchCircle_8_2"), model.selection("EDGE", "Sketch_2/SketchCircle_10_2"), model.selection("EDGE", "Sketch_2/SketchCircle_12_2"), model.selection("EDGE", "Sketch_2/SketchCircle_11_2"), model.selection("WIRE", "[Sketch_1/SubEdge&Sketch_1/SketchLine_1][Sketch_1/SubEdge&Sketch_1/SketchLine_3][Sketch_1/SubEdge&Sketch_1/SketchLine_4][Sketch_1/SubEdge&Sketch_1/SketchLine_5][Sketch_1/SubEdge&Sketch_1/SketchLine_6][Sketch_1/SubEdge&Sketch_1/SketchLine_7][Sketch_1/SubEdge&Sketch_1/SketchLine_9][Sketch_1/SketchArc_2_2][Sketch_1/SubEdge&Sketch_1/SketchLine_10]")]
 Face_4 = model.addFace(Part_1_doc, Face_4_objects)
 Group_1_objects = [model.selection("FACE", "Face_2_1"), model.selection("FACE", "Face_3_7"), model.selection("FACE", "Face_3_5"), model.selection("FACE", "Face_3_3"), model.selection("FACE", "Face_3_4"), model.selection("FACE", "Face_3_1"), model.selection("FACE", "Face_3_2"), model.selection("FACE", "Face_3_6"), model.selection("FACE", "Face_3_11"), model.selection("FACE", "Face_3_10"), model.selection("FACE", "Face_3_8"), model.selection("FACE", "Face_3_9"), model.selection("FACE", "Face_3_12")]
 Group_1 = model.addGroup(Part_1_doc, Group_1_objects)
@@ -108,15 +110,19 @@ Group_2.result().setName("acier")
 Group_2.result().setColor(170, 85, 0)
 Sketch_3 = model.addSketch(Part_1_doc, model.standardPlane("XOY"))
 SketchLine_11 = Sketch_3.addLine(40, 0, 30, 0)
-SketchProjection_1 = Sketch_3.addProjection(model.selection("VERTEX", "Face_4_1/Edge_6&Face_4_1/Edge_7"), False)
+SketchProjection_1 = Sketch_3.addProjection(model.selection("VERTEX", "[Face_4_1/Edge_7][Face_4_1/Edge_6]"), False)
 SketchPoint_1 = SketchProjection_1.createdFeature()
 SketchConstraintCoincidence_19 = Sketch_3.setCoincident(SketchLine_11.endPoint(), SketchPoint_1.result())
+SketchConstraintCoincidence_19.setName("SketchConstraintCoincidence_19")
 SketchLine_12 = Sketch_3.addLine(30, 0, 30, 10)
 SketchLine_13 = Sketch_3.addLine(30, 10, 40, 10)
 SketchLine_14 = Sketch_3.addLine(40, 10, 40, 0)
 SketchConstraintCoincidence_20 = Sketch_3.setCoincident(SketchLine_14.endPoint(), SketchLine_11.startPoint())
+SketchConstraintCoincidence_20.setName("SketchConstraintCoincidence_20")
 SketchConstraintCoincidence_21 = Sketch_3.setCoincident(SketchLine_11.endPoint(), SketchLine_12.startPoint())
+SketchConstraintCoincidence_21.setName("SketchConstraintCoincidence_21")
 SketchConstraintCoincidence_22 = Sketch_3.setCoincident(SketchLine_12.endPoint(), SketchLine_13.startPoint())
+SketchConstraintCoincidence_22.setName("SketchConstraintCoincidence_22")
 SketchConstraintCoincidence_23 = Sketch_3.setCoincident(SketchLine_13.endPoint(), SketchLine_14.startPoint())
 SketchConstraintCoincidence_23.setName("SketchConstraintCoincidence_26")
 SketchConstraintHorizontal_4 = Sketch_3.setHorizontal(SketchLine_11.result())
@@ -128,33 +134,33 @@ SketchConstraintLength_3.setName("SketchConstraintLength_1")
 SketchConstraintEqual_5 = Sketch_3.setEqual(SketchLine_13.result(), SketchLine_14.result())
 SketchConstraintEqual_5.setName("SketchConstraintEqual_1")
 model.do()
-Face_5 = model.addFace(Part_1_doc, [model.selection("WIRE", "Sketch_3/Wire-SketchLine_11r-SketchLine_12r-SketchLine_13r-SketchLine_14r")])
-LinearCopy_1 = model.addMultiTranslation(Part_1_doc, [model.selection("FACE", "Face_5_1")], model.selection("EDGE", "Sketch_1/Edge-SketchLine_9"), "length_assemblage", 4, model.selection("EDGE", "PartSet/OY"), "length_assemblage", 2)
+Face_5 = model.addFace(Part_1_doc, [model.selection("WIRE", "[Sketch_3/SubEdge&Sketch_3/SketchLine_14][Sketch_3/SubEdge&Sketch_3/SketchLine_13][Sketch_3/SubEdge&Sketch_3/SketchLine_12][Sketch_3/SubEdge&Sketch_3/SketchLine_11]")])
+LinearCopy_1 = model.addMultiTranslation(Part_1_doc, [model.selection("FACE", "Face_5_1")], model.selection("EDGE", "Sketch_1/SketchLine_9"), "length_assemblage", 4, model.selection("EDGE", "PartSet/OY"), "length_assemblage", 2)
 Recover_1 = model.addRecover(Part_1_doc, LinearCopy_1, [Face_5.result()])
-Translation_1 = model.addTranslation(Part_1_doc, [model.selection("FACE", "Recover_1_1")], model.selection("VERTEX", "Sketch_3/Vertex-SketchProjection_1-SketchPoint_1-SketchLine_12s-SketchLine_11e"), model.selection("VERTEX", "Sketch_1/Vertex-SketchLine_6s-SketchLine_5e"))
+Translation_1 = model.addTranslation(Part_1_doc, [model.selection("FACE", "Recover_1_1")], model.selection("VERTEX", "Sketch_3/SketchLine_11_EndVertex"), model.selection("VERTEX", "Sketch_1/SketchLine_5_EndVertex"))
 LinearCopy_2 = model.addMultiTranslation(Part_1_doc, [model.selection("FACE", "Translation_1_1")], model.selection("EDGE", "PartSet/OX"), "length_assemblage", 4, model.selection("EDGE", "PartSet/OY"), "length_assemblage", 2)
 Recover_2 = model.addRecover(Part_1_doc, LinearCopy_1, [Face_5.result()])
-Translation_2 = model.addTranslation(Part_1_doc, [model.selection("FACE", "Recover_2_1")], model.selection("VERTEX", "Sketch_3/Vertex-SketchProjection_1-SketchPoint_1-SketchLine_12s-SketchLine_11e"), model.selection("VERTEX", "Sketch_1/Vertex-SketchLine_4s-SketchLine_3e"))
+Translation_2 = model.addTranslation(Part_1_doc, [model.selection("FACE", "Recover_2_1")], model.selection("VERTEX", "Sketch_3/SketchLine_11_EndVertex"), model.selection("VERTEX", "Sketch_1/SketchLine_3_EndVertex"))
 LinearCopy_3 = model.addMultiTranslation(Part_1_doc, [model.selection("FACE", "Translation_2_1")], model.selection("EDGE", "PartSet/OX"), "length_assemblage", 4)
 Recover_3 = model.addRecover(Part_1_doc, LinearCopy_1, [Face_5.result()])
-Translation_3 = model.addTranslation(Part_1_doc, [model.selection("FACE", "Recover_3_1")], model.selection("VERTEX", "Sketch_1/Vertex-SketchLine_9s-SketchLine_7e"), model.selection("VERTEX", "LinearCopy_3_1/Translated_Edge_1_4&LinearCopy_3_1/Translated_Edge_1_1"))
+Translation_3 = model.addTranslation(Part_1_doc, [model.selection("FACE", "Recover_3_1")], model.selection("VERTEX", "Sketch_1/SketchLine_7_EndVertex"), model.selection("VERTEX", "[LinearCopy_3_1_1/ME:Translated_Edge&Recover_2_1/Shape_4][LinearCopy_3_1_1/ME:Translated_Edge&Recover_2_1/Shape_1]"))
 LinearCopy_4 = model.addMultiTranslation(Part_1_doc, [model.selection("FACE", "Translation_3_1")], model.selection("EDGE", "PartSet/OX"), "length_assemblage", 3)
 Recover_4 = model.addRecover(Part_1_doc, LinearCopy_1, [Face_5.result()])
-Translation_4 = model.addTranslation(Part_1_doc, [model.selection("FACE", "Recover_4_1")], model.selection("VERTEX", "Sketch_1/Vertex-SketchLine_9s-SketchLine_7e"), model.selection("VERTEX", "Sketch_1/Vertex-SketchLine_1s-SketchLine_10s"))
+Translation_4 = model.addTranslation(Part_1_doc, [model.selection("FACE", "Recover_4_1")], model.selection("VERTEX", "Sketch_1/SketchLine_7_EndVertex"), model.selection("VERTEX", "Sketch_1/SketchLine_1_StartVertex"))
 LinearCopy_5 = model.addMultiTranslation(Part_1_doc, [model.selection("FACE", "Translation_4_1")], model.selection("EDGE", "PartSet/OX"), "length_assemblage", 2)
 Partition_1 = model.addPartition(Part_1_doc, [model.selection("FACE", "Face_1_1"), model.selection("FACE", "Face_2_1")])
-Boolean_1_objects_2 = [model.selection("FACE", "Face_3_1"), model.selection("FACE", "Face_3_2"), model.selection("FACE", "Face_3_3"), model.selection("FACE", "Face_3_4"), model.selection("FACE", "Face_3_5"), model.selection("FACE", "Face_3_6"), model.selection("FACE", "Face_3_7"), model.selection("FACE", "Face_3_8"), model.selection("FACE", "Face_3_9"), model.selection("FACE", "Face_3_10"), model.selection("FACE", "Face_3_11"), model.selection("FACE", "Face_3_12"), model.selection("FACE", "Face_4_1"), model.selection("COMPOUND", "LinearCopy_1_1"), model.selection("COMPOUND", "LinearCopy_2_1"), model.selection("COMPOUND", "LinearCopy_3_1"), model.selection("COMPOUND", "LinearCopy_4_1"), model.selection("COMPOUND", "LinearCopy_5_1")]
-Boolean_1 = model.addFill(Part_1_doc, [model.selection("COMPOUND", "Partition_1_1")], Boolean_1_objects_2)
+Fill_1_objects_2 = [model.selection("FACE", "Face_3_1"), model.selection("FACE", "Face_3_2"), model.selection("FACE", "Face_3_3"), model.selection("FACE", "Face_3_4"), model.selection("FACE", "Face_3_5"), model.selection("FACE", "Face_3_6"), model.selection("FACE", "Face_3_7"), model.selection("FACE", "Face_3_8"), model.selection("FACE", "Face_3_9"), model.selection("FACE", "Face_3_10"), model.selection("FACE", "Face_3_11"), model.selection("FACE", "Face_3_12"), model.selection("FACE", "Face_4_1"), model.selection("COMPOUND", "LinearCopy_1_1"), model.selection("COMPOUND", "LinearCopy_2_1"), model.selection("COMPOUND", "LinearCopy_3_1"), model.selection("COMPOUND", "LinearCopy_4_1"), model.selection("COMPOUND", "LinearCopy_5_1")]
+Fill_1 = model.addFill(Part_1_doc, [model.selection("COMPOUND", "Partition_1_1")], Fill_1_objects_2)
 model.do()
 model.end()
 
 from GeomAPI import  GeomAPI_Shape
 
-model.testNbResults(Boolean_1, 1)
-model.testNbSubResults(Boolean_1, [60])
-model.testNbSubShapes(Boolean_1, GeomAPI_Shape.SOLID, [0])
-model.testNbSubShapes(Boolean_1, GeomAPI_Shape.FACE, [60])
-model.testNbSubShapes(Boolean_1, GeomAPI_Shape.EDGE, [273])
-model.testNbSubShapes(Boolean_1, GeomAPI_Shape.VERTEX, [546])
+model.testNbResults(Fill_1, 1)
+model.testNbSubResults(Fill_1, [60])
+model.testNbSubShapes(Fill_1, GeomAPI_Shape.SOLID, [0])
+model.testNbSubShapes(Fill_1, GeomAPI_Shape.FACE, [60])
+model.testNbSubShapes(Fill_1, GeomAPI_Shape.EDGE, [273])
+model.testNbSubShapes(Fill_1, GeomAPI_Shape.VERTEX, [546])
 
 assert(model.checkPythonDump())

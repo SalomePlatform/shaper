@@ -1,4 +1,4 @@
-## Copyright (C) 2017  CEA/DEN, EDF R&D
+## Copyright (C) 2014-2017  CEA/DEN, EDF R&D
 ##
 ## This library is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU Lesser General Public
@@ -18,6 +18,7 @@
 ## email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com>
 ##
 
+# -*- coding: utf-8 -*-
 
 from salome.shaper import model
 
@@ -26,12 +27,12 @@ partSet = model.moduleDocument()
 Part_1 = model.addPart(partSet)
 Part_1_doc = Part_1.document()
 Cone_1 = model.addCone(Part_1_doc, model.selection("VERTEX", "PartSet/Origin"), model.selection("EDGE", "PartSet/OZ"), 10, 5, 10)
-Point_1 = model.addPoint(Part_1_doc, 4, 5, 11)
+Point_2 = model.addPoint(Part_1_doc, 4, 5, 11)
 Plane_4 = model.addPlane(Part_1_doc, model.selection("EDGE", "PartSet/OX"), model.selection("VERTEX", "Point_1"), False)
 Sketch_1 = model.addSketch(Part_1_doc, model.selection("FACE", "Plane_1"))
 SketchLine_1 = Sketch_1.addLine(1.156555510724249, 12.03812858614785, 0.5812800089239156, -4.87167684997945)
 model.do()
-Edge_1 = model.addEdge(Part_1_doc, [model.selection("EDGE", "Sketch_1/Edge-SketchLine_1")])
+Edge_1 = model.addEdge(Part_1_doc, [model.selection("EDGE", "Sketch_1/SketchLine_1")])
 Partition_1 = model.addPartition(Part_1_doc, [model.selection("SOLID", "Cone_1_1"), model.selection("EDGE", "Edge_1_1")])
 model.do()
 

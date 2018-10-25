@@ -40,10 +40,12 @@ SketchConstraintVertical_1 = Sketch_1.setVertical(SketchLine_2.result())
 SketchConstraintHorizontal_2 = Sketch_1.setHorizontal(SketchLine_3.result())
 SketchConstraintVertical_2 = Sketch_1.setVertical(SketchLine_4.result())
 model.do()
-Face_1 = model.addFace(Part_1_doc, [model.selection("EDGE", "Sketch_1/Edge-SketchLine_2"), model.selection("EDGE", "Sketch_1/Edge-SketchLine_3"), model.selection("EDGE", "Sketch_1/Edge-SketchLine_1"), model.selection("EDGE", "Sketch_1/Edge-SketchLine_4")])
+Face_1_objects = [model.selection("EDGE", "Sketch_1/SketchLine_2"), model.selection("EDGE", "Sketch_1/SketchLine_3"), model.selection("EDGE", "Sketch_1/SketchLine_1"), model.selection("EDGE", "Sketch_1/SketchLine_4")]
+Face_1 = model.addFace(Part_1_doc, Face_1_objects)
 Plane_4 = model.addPlane(Part_1_doc, model.selection("FACE", "PartSet/YOZ"), 1, False)
 Partition_1 = model.addPartition(Part_1_doc, [model.selection("FACE", "Face_1_1"), model.selection("FACE", "Plane_1")])
-Group_1 = model.addGroup(Part_1_doc, [model.selection("EDGE", "Partition_1_1_2/Modified_Edge_1_1")])
+Group_1 = model.addGroup(Part_1_doc, [model.selection("EDGE", "Partition_1_1_2/Modified_Edge&Face_1_1/Edge_4")])
+model.do()
 model.end()
 
 # check that resulting group selection is valid

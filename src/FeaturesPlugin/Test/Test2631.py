@@ -18,6 +18,8 @@
 ## email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com>
 ##
 
+# -*- coding: utf-8 -*-
+
 from SketchAPI import *
 
 from salome.shaper import model
@@ -33,18 +35,18 @@ SketchConstraintCoincidence_1 = Sketch_1.setCoincident(SketchLine_1.endPoint(), 
 model.do()
 Sketch_2 = model.addSketch(Part_1_doc, model.defaultPlane("XOY"))
 SketchLine_3 = Sketch_2.addLine(31.90519577166173, 58.11303515552675, 60.012153951459, 58.11303515552675)
-SketchProjection_1 = Sketch_2.addProjection(model.selection("EDGE", "Sketch_1/Edge-SketchLine_1"), False)
+SketchProjection_1 = Sketch_2.addProjection(model.selection("EDGE", "Sketch_1/SketchLine_1"), False)
 SketchLine_4 = SketchProjection_1.createdFeature()
 SketchConstraintCoincidence_2 = Sketch_2.setCoincident(SketchLine_3.startPoint(), SketchLine_4.result())
 SketchConstraintCoincidence_3 = Sketch_2.setCoincident(SketchAPI_Line(SketchLine_4).endPoint(), SketchLine_3.endPoint())
 SketchLine_5 = Sketch_2.addLine(60.012153951459, 58.11303515552675, 60.012153951459, 33.0446670492211)
 SketchConstraintCoincidence_4 = Sketch_2.setCoincident(SketchLine_3.endPoint(), SketchLine_5.startPoint())
-SketchProjection_2 = Sketch_2.addProjection(model.selection("EDGE", "Sketch_1/Edge-SketchLine_2"), False)
+SketchProjection_2 = Sketch_2.addProjection(model.selection("EDGE", "Sketch_1/SketchLine_2"), False)
 SketchLine_6 = SketchProjection_2.createdFeature()
 SketchConstraintCoincidence_5 = Sketch_2.setCoincident(SketchLine_5.endPoint(), SketchLine_6.result())
 model.do()
-Edge_1 = model.addEdge(Part_1_doc, [model.selection("EDGE", "Sketch_1/Edge-SketchLine_1"), model.selection("EDGE", "Sketch_1/Edge-SketchLine_2")])
-Edge_2 = model.addEdge(Part_1_doc, [model.selection("EDGE", "Sketch_2/Edge-SketchLine_3"), model.selection("EDGE", "Sketch_2/Edge-SketchLine_5")])
+Edge_1 = model.addEdge(Part_1_doc, [model.selection("EDGE", "Sketch_1/SketchLine_1"), model.selection("EDGE", "Sketch_1/SketchLine_2")])
+Edge_2 = model.addEdge(Part_1_doc, [model.selection("EDGE", "Sketch_2/SketchLine_3"), model.selection("EDGE", "Sketch_2/SketchLine_5")])
 Cut_1 = model.addCut(Part_1_doc, [model.selection("EDGE", "Edge_1_1"), model.selection("EDGE", "Edge_1_2")], [model.selection("EDGE", "Edge_2_1"), model.selection("EDGE", "Edge_2_2")])
 model.testHaveNamingSubshapes(Cut_1, model, Part_1_doc)
 model.do()

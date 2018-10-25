@@ -1,4 +1,4 @@
-## Copyright (C) 2017  CEA/DEN, EDF R&D
+## Copyright (C) 2014-2017  CEA/DEN, EDF R&D
 ##
 ## This library is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU Lesser General Public
@@ -18,6 +18,7 @@
 ## email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com>
 ##
 
+# -*- coding: utf-8 -*-
 
 from salome.shaper import model
 
@@ -41,7 +42,7 @@ SketchConstraintRadius_1 = Sketch_1.setRadius(SketchArc_1.results()[1], "R")
 model.do()
 Sketch_2 = model.addSketch(Part_1_doc, model.defaultPlane("YOZ"))
 SketchLine_4 = Sketch_2.addLine(29.74624907439609, 30.07487215963349, 31.08202242513997, 0)
-SketchProjection_2 = Sketch_2.addProjection(model.selection("VERTEX", "Sketch_1/Vertex-SketchArc_1"), False)
+SketchProjection_2 = Sketch_2.addProjection(model.selection("VERTEX", "Sketch_1/SketchArc_1"), False)
 SketchPoint_1 = SketchProjection_2.createdFeature()
 SketchConstraintCoincidence_6 = Sketch_2.setCoincident(SketchLine_4.endPoint(), SketchPoint_1.result())
 SketchLine_5 = Sketch_2.addLine(31.08202242513997, 0, 45.45797599933665, 0)
@@ -57,13 +58,13 @@ SketchLine_9 = Sketch_2.addLine(70.40999925541598, 30.039147749218, 29.746249074
 SketchConstraintCoincidence_11 = Sketch_2.setCoincident(SketchLine_8.endPoint(), SketchLine_9.startPoint())
 SketchConstraintCoincidence_12 = Sketch_2.setCoincident(SketchLine_4.startPoint(), SketchLine_9.endPoint())
 model.do()
-Face_1 = model.addFace(Part_1_doc, [model.selection("WIRE", "Sketch_1/Wire-SketchLine_1f-SketchLine_3f-SketchArc_1_2f")])
-Wire_1 = model.addWire(Part_1_doc, [model.selection("WIRE", "Sketch_2/Wire-SketchLine_4f-SketchLine_5f-SketchLine_7f-SketchLine_8f-SketchLine_9f")])
-Boolean_1 = model.addFill(Part_1_doc, [model.selection("WIRE", "Wire_1_1")], [model.selection("FACE", "Face_1_1")])
+Face_1 = model.addFace(Part_1_doc, [model.selection("WIRE", "[Sketch_1/SubEdge&Sketch_1/SketchLine_1][Sketch_1/SubEdge&Sketch_1/SketchLine_3][Sketch_1/SubEdge&Sketch_1/SketchArc_1_2]")])
+Wire_1 = model.addWire(Part_1_doc, [model.selection("WIRE", "[Sketch_2/SubEdge&Sketch_2/SketchLine_4][Sketch_2/SubEdge&Sketch_2/SketchLine_5][Sketch_2/SubEdge&Sketch_2/SketchLine_7][Sketch_2/SubEdge&Sketch_2/SketchLine_8][Sketch_2/SubEdge&Sketch_2/SketchLine_9]")])
+Fill_1 = model.addFill(Part_1_doc, [model.selection("WIRE", "Wire_1_1")], [model.selection("FACE", "Face_1_1")])
 model.do()
 
-model.checkResult(Boolean_1, model, 1, [0], [0], [0], [6], [12])
-model.testHaveNamingSubshapes(Boolean_1, model, Part_1_doc)
+model.checkResult(Fill_1, model, 1, [0], [0], [0], [6], [12])
+model.testHaveNamingSubshapes(Fill_1, model, Part_1_doc)
 
 model.end()
 

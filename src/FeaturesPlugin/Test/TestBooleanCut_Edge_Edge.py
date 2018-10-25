@@ -18,6 +18,8 @@
 ## email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com>
 ##
 
+# -*- coding: utf-8 -*-
+
 from salome.shaper import model
 
 model.begin()
@@ -28,7 +30,7 @@ Sketch_1 = model.addSketch(Part_1_doc, model.defaultPlane("XOY"))
 SketchLine_1 = Sketch_1.addLine(-25.12006861063466, 20.61578044596912, 27.54545454545454, 58.72898799313897)
 SketchLine_2 = Sketch_1.addLine(-19.22984562607204, 56.30360205831907, 22.69468267581474, 22.00171526586621)
 model.do()
-Edge_1 = model.addEdge(Part_1_doc, [model.selection("EDGE", "Sketch_1/Edge-SketchLine_2"), model.selection("EDGE", "Sketch_1/Edge-SketchLine_1")])
+Edge_1 = model.addEdge(Part_1_doc, [model.selection("EDGE", "Sketch_1/SketchLine_2"), model.selection("EDGE", "Sketch_1/SketchLine_1")])
 Cut_1 = model.addCut(Part_1_doc, [model.selection("EDGE", "Edge_1_1")], [model.selection("EDGE", "Edge_1_2")])
 model.testHaveNamingSubshapes(Cut_1, model, Part_1_doc)
 model.do()

@@ -18,6 +18,8 @@
 ## email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com>
 ##
 
+# -*- coding: utf-8 -*-
+
 from salome.shaper import model
 
 model.begin()
@@ -27,7 +29,7 @@ Part_1_doc = Part_1.document()
 Sketch_1 = model.addSketch(Part_1_doc, model.defaultPlane("XOY"))
 SketchCircle_1 = Sketch_1.addCircle(-8.850181926352695, 1.062021831162306, 46.73432400996293)
 model.do()
-Face_1 = model.addFace(Part_1_doc, [model.selection("EDGE", "Sketch_1/Edge-SketchCircle_1_2")])
+Face_1 = model.addFace(Part_1_doc, [model.selection("EDGE", "Sketch_1/SketchCircle_1_2")])
 Sketch_2 = model.addSketch(Part_1_doc, model.standardPlane("XOY"))
 SketchLine_1 = Sketch_2.addLine(64.95207814695526, 55.29739830292169, -8.272875875352462, 55.29739830292169)
 SketchLine_2 = Sketch_2.addLine(-8.272875875352462, 55.29739830292169, -8.272875875352462, -5.036618941767999)
@@ -42,11 +44,11 @@ SketchConstraintVertical_1 = Sketch_2.setVertical(SketchLine_2.result())
 SketchConstraintHorizontal_2 = Sketch_2.setHorizontal(SketchLine_3.result())
 SketchConstraintVertical_2 = Sketch_2.setVertical(SketchLine_4.result())
 model.do()
-Extrusion_1 = model.addExtrusion(Part_1_doc, [model.selection("FACE", "Sketch_2/Face-SketchLine_1f-SketchLine_2f-SketchLine_3f-SketchLine_4f")], model.selection(), 10, 10)
+Extrusion_1 = model.addExtrusion(Part_1_doc, [model.selection("FACE", "Sketch_2/Face-SketchLine_1r-SketchLine_2f-SketchLine_3f-SketchLine_4f")], model.selection(), 10, 10)
 Cut_1 = model.addCut(Part_1_doc, [model.selection("FACE", "Face_1_1")], [model.selection("SOLID", "Extrusion_1_1")])
-Group_1_objects = [model.selection("VERTEX", "Cut_1_1/Modified_Edge_divided_2_v_2_1"), model.selection("FACE", "Cut_1_1"), model.selection("FACE", "Cut_1_1"), model.selection("VERTEX", "Cut_1_1/Modified_Face_divided_4_v_3_1")]
+Group_1_objects = [model.selection("VERTEX", "Cut_1_1/Generated_Vertex&Sketch_2/SketchLine_3&Face_1_1/Edge_1"), model.selection("FACE", "Cut_1_1"), model.selection("FACE", "Cut_1_1"), model.selection("VERTEX", "Cut_1_1/Generated_Vertex&Face_1_1/Face_1_1")]
 Group_1 = model.addGroup(Part_1_doc, Group_1_objects)
-Group_2_objects = [model.selection("FACE", "Cut_1_1"), model.selection("EDGE", "Cut_1_1/Modified_Face_divided_3_e_2_1"), model.selection("VERTEX", "Cut_1_1/Modified_Face_divided_4_v_3_1"), model.selection("FACE", "Cut_1_1")]
+Group_2_objects = [model.selection("FACE", "Cut_1_1"), model.selection("EDGE", "Cut_1_1/Generated_Edge&Sketch_2/SketchLine_3&Face_1_1/Face_1_1"), model.selection("VERTEX", "Cut_1_1/Generated_Vertex&Face_1_1/Face_1_1"), model.selection("FACE", "Cut_1_1")]
 Group_2 = model.addGroup(Part_1_doc, Group_2_objects)
 Group_3 = model.addGroup(Part_1_doc, [model.selection("FACE", "Cut_1_1")])
 model.testHaveNamingSubshapes(Cut_1, model, Part_1_doc)

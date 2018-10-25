@@ -1,4 +1,4 @@
-## Copyright (C) 2018-20xx  CEA/DEN, EDF R&D
+## Copyright (C) 2014-2017  CEA/DEN, EDF R&D
 ##
 ## This library is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU Lesser General Public
@@ -18,6 +18,8 @@
 ## email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com>
 ##
 
+# -*- coding: utf-8 -*-
+
 from salome.shaper import model
 import math
 
@@ -30,7 +32,7 @@ Sketch_1 = model.addSketch(Part_1_doc, model.defaultPlane("XOY"))
 SketchArc_1 = Sketch_1.addArc(-47.73523320343703, -72.31551328948351, 43.26553250145439, -30.85636904935887, -50.76060275488791, 27.63871192924931, False)
 SketchConstraintRadius_1 = Sketch_1.setRadius(SketchArc_1.results()[1], "R")
 model.do()
-Edge_1 = model.addEdge(Part_1_doc, [model.selection("EDGE", "Sketch_1/Edge-SketchArc_1_2")])
+Edge_1 = model.addEdge(Part_1_doc, [model.selection("EDGE", "Sketch_1/SketchArc_1_2")])
 model.do()
 
 radius = model.measureRadius(Part_1_doc, model.selection("EDGE", "Edge_1_1"))

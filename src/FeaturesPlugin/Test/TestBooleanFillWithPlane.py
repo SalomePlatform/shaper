@@ -18,6 +18,10 @@
 ## email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com>
 ##
 
+# -*- coding: utf-8 -*-
+
+from GeomAPI import GeomAPI_Pnt
+
 from salome.shaper import model
 
 model.begin()
@@ -50,22 +54,20 @@ SketchConstraintVertical_3 = Sketch_1.setVertical(SketchLine_6.result())
 SketchConstraintHorizontal_4 = Sketch_1.setHorizontal(SketchLine_7.result())
 SketchConstraintVertical_4 = Sketch_1.setVertical(SketchLine_8.result())
 model.do()
-Extrusion_1 = model.addExtrusion(Part_1_doc, [model.selection("COMPOUND", "Sketch_1")], model.selection(), 100, 0)
-Boolean_1 = model.addFill(Part_1_doc, [model.selection("SOLID", "Extrusion_1_1_2")], [model.selection("FACE", "PartSet/YOZ")])
+Extrusion_1 = model.addExtrusion(Part_1_doc, [model.selection("COMPOUND", GeomAPI_Pnt(17.35551764280096, -11.01190794150899, 0))], model.selection(), 100, 0)
+Fill_1 = model.addFill(Part_1_doc, [model.selection("SOLID", GeomAPI_Pnt(-0.3180832609141306, -28.0220443670531, 50.00000000000001))], [model.selection("FACE", "PartSet/YOZ")])
 model.do()
-
-model.testHaveNamingSubshapes(Boolean_1, model, Part_1_doc)
-
+model.testHaveNamingSubshapes(Fill_1, model, Part_1_doc)
 model.end()
 
 from GeomAPI import  GeomAPI_Shape
 
-model.testNbResults(Boolean_1, 1)
-model.testNbSubResults(Boolean_1, [4])
-model.testNbSubShapes(Boolean_1, GeomAPI_Shape.SOLID, [4])
-model.testNbSubShapes(Boolean_1, GeomAPI_Shape.FACE, [30])
-model.testNbSubShapes(Boolean_1, GeomAPI_Shape.EDGE, [132])
-model.testNbSubShapes(Boolean_1, GeomAPI_Shape.VERTEX, [264])
-model.testResultsVolumes(Boolean_1, [11003613.329450136050581932067871094])
+model.testNbResults(Fill_1, 1)
+model.testNbSubResults(Fill_1, [4])
+model.testNbSubShapes(Fill_1, GeomAPI_Shape.SOLID, [4])
+model.testNbSubShapes(Fill_1, GeomAPI_Shape.FACE, [30])
+model.testNbSubShapes(Fill_1, GeomAPI_Shape.EDGE, [132])
+model.testNbSubShapes(Fill_1, GeomAPI_Shape.VERTEX, [264])
+model.testResultsVolumes(Fill_1, [11003613.329450136050581932067871094])
 
 assert(model.checkPythonDump())

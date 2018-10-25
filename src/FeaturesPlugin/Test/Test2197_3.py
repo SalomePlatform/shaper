@@ -19,6 +19,7 @@
 ##
 
 # revolution of 3-edges contour (4th is used as axis of rotation) is checking for naming of edges
+
 from salome.shaper import model
 
 model.begin()
@@ -35,8 +36,10 @@ SketchLine_4 = Sketch_1.addLine(138, 234, 138, 47)
 SketchConstraintCoincidence_3 = Sketch_1.setCoincident(SketchLine_3.endPoint(), SketchLine_4.startPoint())
 SketchConstraintCoincidence_4 = Sketch_1.setCoincident(SketchLine_1.startPoint(), SketchLine_4.endPoint())
 model.do()
-Revolution_1 = model.addRevolution(Part_1_doc, [model.selection("FACE", "Sketch_1/Face-SketchLine_1f-SketchLine_2f-SketchLine_3f-SketchLine_4f")], model.selection("EDGE", "Sketch_1/Edge-SketchLine_4"), 360, 0)
-Group_1 = model.addGroup(Part_1_doc, [model.selection("EDGE", "Revolution_1_1/Lateral_4"), model.selection("EDGE", "Revolution_1_1/Base_Edge_10"), model.selection("EDGE", "Revolution_1_1/Lateral_6"), model.selection("EDGE", "Revolution_1_1/Base_Edge_12"), model.selection("EDGE", "Revolution_1_1/Base_Edge_14")])
+Revolution_1 = model.addRevolution(Part_1_doc, [model.selection("FACE", "Sketch_1/Face-SketchLine_1r-SketchLine_2f-SketchLine_3f-SketchLine_4f")], model.selection("EDGE", "Sketch_1/SketchLine_4"), 360, 0)
+Group_1_objects = [model.selection("EDGE", "[Revolution_1_1/Generated_Face&Sketch_1/SketchLine_1][Revolution_1_1/Generated_Face&Sketch_1/SketchLine_2]"), model.selection("EDGE", "[Revolution_1_1/Generated_Face&Sketch_1/SketchLine_1][weak_name_3]"), model.selection("EDGE", "[Revolution_1_1/Generated_Face&Sketch_1/SketchLine_3][Revolution_1_1/Generated_Face&Sketch_1/SketchLine_2]"), model.selection("EDGE", "([Revolution_1_1/Generated_Face&Sketch_1/SketchLine_1][Revolution_1_1/Generated_Face&Sketch_1/SketchLine_2])([Revolution_1_1/Generated_Face&Sketch_1/SketchLine_3][Revolution_1_1/Generated_Face&Sketch_1/SketchLine_2])"), model.selection("EDGE", "[Revolution_1_1/Generated_Face&Sketch_1/SketchLine_3][weak_name_3]")]
+Group_1 = model.addGroup(Part_1_doc, Group_1_objects)
+model.do()
 model.end()
 
 # check that resulting group selection is valid

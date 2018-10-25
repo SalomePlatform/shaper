@@ -1,4 +1,4 @@
-## Copyright (C) 2017  CEA/DEN, EDF R&D
+## Copyright (C) 2014-2017  CEA/DEN, EDF R&D
 ##
 ## This library is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU Lesser General Public
@@ -18,6 +18,7 @@
 ## email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com>
 ##
 
+# -*- coding: utf-8 -*-
 
 from salome.shaper import model
 
@@ -28,19 +29,19 @@ Part_1_doc = Part_1.document()
 Box_1 = model.addBox(Part_1_doc, 10, 10, 10)
 Sketch_1 = model.addSketch(Part_1_doc, model.selection("FACE", "Box_1_1/Front"))
 SketchLine_1 = Sketch_1.addLine(4, 10, 7, 0)
-SketchProjection_1 = Sketch_1.addProjection(model.selection("EDGE", "Box_1_1/Front&Box_1_1/Top"), False)
+SketchProjection_1 = Sketch_1.addProjection(model.selection("EDGE", "[Box_1_1/Front][Box_1_1/Top]"), False)
 SketchLine_2 = SketchProjection_1.createdFeature()
 SketchConstraintCoincidence_1 = Sketch_1.setCoincident(SketchLine_1.startPoint(), SketchLine_2.result())
-SketchProjection_2 = Sketch_1.addProjection(model.selection("EDGE", "Box_1_1/Front&Box_1_1/Bottom"), False)
+SketchProjection_2 = Sketch_1.addProjection(model.selection("EDGE", "[Box_1_1/Front][Box_1_1/Bottom]"), False)
 SketchLine_3 = SketchProjection_2.createdFeature()
 SketchConstraintCoincidence_2 = Sketch_1.setCoincident(SketchLine_1.endPoint(), SketchLine_3.result())
 model.do()
-Edge_1 = model.addEdge(Part_1_doc, [model.selection("EDGE", "Sketch_1/Edge-SketchLine_1")])
-Boolean_1 = model.addFill(Part_1_doc, [model.selection("EDGE", "Edge_1_1")], [model.selection("SOLID", "Box_1_1")])
+Edge_1 = model.addEdge(Part_1_doc, [model.selection("EDGE", "Sketch_1/SketchLine_1")])
+Fill_1 = model.addFill(Part_1_doc, [model.selection("EDGE", "Edge_1_1")], [model.selection("SOLID", "Box_1_1")])
 model.do()
 
-model.checkResult(Boolean_1, model, 1, [0], [0], [0], [1], [2])
-model.testHaveNamingSubshapes(Boolean_1, model, Part_1_doc)
+model.checkResult(Fill_1, model, 1, [0], [0], [0], [1], [2])
+model.testHaveNamingSubshapes(Fill_1, model, Part_1_doc)
 
 model.end()
 

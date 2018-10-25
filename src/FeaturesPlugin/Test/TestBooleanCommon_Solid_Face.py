@@ -18,6 +18,8 @@
 ## email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com>
 ##
 
+# -*- coding: utf-8 -*-
+
 from salome.shaper import model
 
 model.begin()
@@ -27,7 +29,7 @@ Part_1_doc = Part_1.document()
 Sketch_1 = model.addSketch(Part_1_doc, model.defaultPlane("XOY"))
 SketchCircle_1 = Sketch_1.addCircle(-19.01903137581643, 2.528314065029049, 44.55011038017909)
 model.do()
-Face_1 = model.addFace(Part_1_doc, [model.selection("FACE", "Sketch_1/Face-SketchCircle_1_2f")])
+Face_1 = model.addFace(Part_1_doc, [model.selection("FACE", "Sketch_1/Face-SketchCircle_1_2r")])
 Sphere_1 = model.addSphere(Part_1_doc, model.selection("VERTEX", "PartSet/Origin"), 10)
 Common_1 = model.addCommon(Part_1_doc, [model.selection("FACE", "Face_1_1"), model.selection("SOLID", "Sphere_1_1")])
 model.testHaveNamingSubshapes(Common_1, model, Part_1_doc)

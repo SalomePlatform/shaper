@@ -1,4 +1,4 @@
-## Copyright (C) 2017  CEA/DEN, EDF R&D
+## Copyright (C) 2014-2017  CEA/DEN, EDF R&D
 ##
 ## This library is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU Lesser General Public
@@ -18,6 +18,7 @@
 ## email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com>
 ##
 
+# -*- coding: utf-8 -*-
 
 from salome.shaper import model
 
@@ -37,7 +38,8 @@ SketchConstraintCoincidence_3 = Sketch_1.setCoincident(SketchLine_3.endPoint(), 
 SketchConstraintCoincidence_4 = Sketch_1.setCoincident(SketchLine_1.startPoint(), SketchLine_4.endPoint())
 SketchCircle_1 = Sketch_1.addCircle(14.49765103937751, 9.678507230150521, 3.831444106492329)
 model.do()
-Face_1 = model.addFace(Part_1_doc, [model.selection("EDGE", "Sketch_1/Edge-SketchLine_1"), model.selection("EDGE", "Sketch_1/Edge-SketchLine_4"), model.selection("EDGE", "Sketch_1/Edge-SketchLine_3"), model.selection("EDGE", "Sketch_1/Edge-SketchLine_2"), model.selection("EDGE", "Sketch_1/Edge-SketchCircle_1_2")])
+Face_1_objects = [model.selection("EDGE", "Sketch_1/SketchLine_1"), model.selection("EDGE", "Sketch_1/SketchLine_4"), model.selection("EDGE", "Sketch_1/SketchLine_3"), model.selection("EDGE", "Sketch_1/SketchLine_2"), model.selection("EDGE", "Sketch_1/SketchCircle_1_2")]
+Face_1 = model.addFace(Part_1_doc, Face_1_objects)
 Sketch_2 = model.addSketch(Part_1_doc, model.defaultPlane("XOZ"))
 SketchLine_5 = Sketch_2.addLine(-15.11211565655763, 11.99814589971457, -14.79635576556081, -11.77064279967296)
 SketchLine_6 = Sketch_2.addLine(-14.79635576556081, -11.77064279967296, -3.043616368139293, -11.46189011940212)
@@ -48,8 +50,10 @@ SketchLine_8 = Sketch_2.addLine(-3.922197168000547, 15.83568871823551, -15.11211
 SketchConstraintCoincidence_7 = Sketch_2.setCoincident(SketchLine_7.endPoint(), SketchLine_8.startPoint())
 SketchConstraintCoincidence_8 = Sketch_2.setCoincident(SketchLine_5.startPoint(), SketchLine_8.endPoint())
 model.do()
-Wire_1 = model.addWire(Part_1_doc, [model.selection("EDGE", "Sketch_2/Edge-SketchLine_8"), model.selection("EDGE", "Sketch_2/Edge-SketchLine_5"), model.selection("EDGE", "Sketch_2/Edge-SketchLine_6"), model.selection("EDGE", "Sketch_2/Edge-SketchLine_7")])
-Partition_1 = model.addPartition(Part_1_doc, [model.selection("FACE", "Face_1_1"), model.selection("SOLID", "Torus_1_1"), model.selection("WIRE", "Wire_1_1")])
+Wire_1_objects = [model.selection("EDGE", "Sketch_2/SketchLine_8"), model.selection("EDGE", "Sketch_2/SketchLine_5"), model.selection("EDGE", "Sketch_2/SketchLine_6"), model.selection("EDGE", "Sketch_2/SketchLine_7")]
+Wire_1 = model.addWire(Part_1_doc, Wire_1_objects)
+Partition_1_objects = [model.selection("FACE", "Face_1_1"), model.selection("SOLID", "Torus_1_1"), model.selection("WIRE", "Wire_1_1")]
+Partition_1 = model.addPartition(Part_1_doc, Partition_1_objects)
 model.do()
 
 model.checkResult(Partition_1,model,1,[3],[1],[4],[22],[46])

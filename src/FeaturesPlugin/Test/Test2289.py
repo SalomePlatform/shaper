@@ -18,6 +18,8 @@
 ## email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com>
 ##
 
+# -*- coding: utf-8 -*-
+
 from salome.shaper import model
 
 model.begin()
@@ -45,7 +47,8 @@ SketchConstraintAngle_1 = Sketch_1.setAngleBackward(SketchLine_2.result(), Sketc
 SketchConstraintEqual_1 = Sketch_1.setEqual(SketchLine_2.result(), SketchLine_3.result())
 SketchConstraintEqual_2 = Sketch_1.setEqual(SketchLine_1.result(), SketchLine_4.result())
 model.do()
-Wire_1 = model.addWire(Part_1_doc, [model.selection("EDGE", "Sketch_1/Edge-SketchLine_3"), model.selection("EDGE", "Sketch_1/Edge-SketchLine_2"), model.selection("EDGE", "Sketch_1/Edge-SketchLine_4"), model.selection("EDGE", "Sketch_1/Edge-SketchLine_1"), model.selection("EDGE", "Sketch_1/Edge-SketchLine_5")])
+Wire_1_objects = [model.selection("EDGE", "Sketch_1/SketchLine_3"), model.selection("EDGE", "Sketch_1/SketchLine_2"), model.selection("EDGE", "Sketch_1/SketchLine_4"), model.selection("EDGE", "Sketch_1/SketchLine_1"), model.selection("EDGE", "Sketch_1/SketchLine_5")]
+Wire_1 = model.addWire(Part_1_doc, Wire_1_objects)
 Extrusion_1 = model.addExtrusion(Part_1_doc, [model.selection("WIRE", "Wire_1_1")], model.selection(), 10, 0)
 model.do()
 

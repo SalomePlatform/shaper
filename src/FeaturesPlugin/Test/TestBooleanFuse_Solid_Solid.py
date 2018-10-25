@@ -18,6 +18,8 @@
 ## email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com>
 ##
 
+# -*- coding: utf-8 -*-
+
 from salome.shaper import model
 
 model.begin()
@@ -38,7 +40,7 @@ SketchConstraintVertical_1 = Sketch_1.setVertical(SketchLine_2.result())
 SketchConstraintHorizontal_2 = Sketch_1.setHorizontal(SketchLine_3.result())
 SketchConstraintVertical_2 = Sketch_1.setVertical(SketchLine_4.result())
 model.do()
-Extrusion_1 = model.addExtrusion(Part_1_doc, [model.selection("FACE", "Sketch_1/Face-SketchLine_1f-SketchLine_2f-SketchLine_3f-SketchLine_4f")], model.selection(), 50, 0)
+Extrusion_1 = model.addExtrusion(Part_1_doc, [model.selection("FACE", "Sketch_1/Face-SketchLine_1r-SketchLine_2f-SketchLine_3f-SketchLine_4f")], model.selection(), 50, 0)
 Sketch_2 = model.addSketch(Part_1_doc, model.standardPlane("XOY"))
 SketchLine_5 = Sketch_2.addLine(-38.01624011480907, 11.11021000825241, -18.03083750064881, 11.11021000825241)
 SketchLine_6 = Sketch_2.addLine(-18.03083750064881, 11.11021000825241, -18.03083750064881, 22.05701811772883)
@@ -53,7 +55,7 @@ SketchConstraintVertical_3 = Sketch_2.setVertical(SketchLine_6.result())
 SketchConstraintHorizontal_4 = Sketch_2.setHorizontal(SketchLine_7.result())
 SketchConstraintVertical_4 = Sketch_2.setVertical(SketchLine_8.result())
 model.do()
-Extrusion_2 = model.addExtrusion(Part_1_doc, [model.selection("WIRE", "Sketch_2/Wire-SketchLine_5f-SketchLine_6f-SketchLine_7f-SketchLine_8f")], model.selection(), 30, -20)
+Extrusion_2 = model.addExtrusion(Part_1_doc, [model.selection("WIRE", "[Sketch_2/SubEdge&Sketch_2/SketchLine_5][Sketch_2/SubEdge&Sketch_2/SketchLine_6][Sketch_2/SubEdge&Sketch_2/SketchLine_7][Sketch_2/SubEdge&Sketch_2/SketchLine_8]")], model.selection(), 30, -20)
 Fuse_1 = model.addFuse(Part_1_doc, [model.selection("SOLID", "Extrusion_1_1"), model.selection("SOLID", "Extrusion_2_1")])
 model.testHaveNamingSubshapes(Fuse_1, model, Part_1_doc)
 model.do()

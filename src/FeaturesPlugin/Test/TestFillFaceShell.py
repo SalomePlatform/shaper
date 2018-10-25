@@ -1,4 +1,4 @@
-## Copyright (C) 2017  CEA/DEN, EDF R&D
+## Copyright (C) 2014-2017  CEA/DEN, EDF R&D
 ##
 ## This library is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU Lesser General Public
@@ -18,6 +18,7 @@
 ## email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com>
 ##
 
+# -*- coding: utf-8 -*-
 
 from SketchAPI import *
 
@@ -97,15 +98,15 @@ SketchLine_15.result().setName("SketchLine_16")
 SketchConstraintCoincidence_13 = Sketch_2.setCoincident(SketchAPI_Line(SketchLine_12).startPoint(), SketchLine_15.startPoint())
 SketchConstraintCoincidence_14 = Sketch_2.setCoincident(SketchLine_15.endPoint(), SketchLine_8.startPoint())
 model.do()
-Face_1 = model.addFace(Part_1_doc, [model.selection("WIRE", "Sketch_1/Wire-SketchLine_1f-SketchLine_5f-SketchLine_6r")])
-Face_2 = model.addFace(Part_1_doc, [model.selection("WIRE", "Sketch_1/Wire-SketchLine_3f-SketchLine_4f-SketchLine_6f")])
+Face_1 = model.addFace(Part_1_doc, [model.selection("WIRE", "[Sketch_1/SubEdge&Sketch_1/SketchLine_1][Sketch_1/SubEdge&Sketch_1/SketchLine_6][Sketch_1/SubEdge&Sketch_1/SketchLine_5]")])
+Face_2 = model.addFace(Part_1_doc, [model.selection("WIRE", "[Sketch_1/SubEdge&Sketch_1/SketchLine_3][Sketch_1/SubEdge&Sketch_1/SketchLine_4][Sketch_1/SubEdge&Sketch_1/SketchLine_6]")])
 Shell_1 = model.addShell(Part_1_doc, [model.selection("FACE", "Face_1_1"), model.selection("FACE", "Face_2_1")])
-Face_3 = model.addFace(Part_1_doc, [model.selection("WIRE", "Sketch_2/Wire-SketchLine_9f-SketchLine_11f-SketchLine_12f-SketchLine_13r-SketchLine_14r-SketchLine_15r-SketchLine_16f")])
-Boolean_1 = model.addFill(Part_1_doc, [model.selection("FACE", "Face_3_1")], [model.selection("SHELL", "Shell_1_1")])
+Face_3 = model.addFace(Part_1_doc, [model.selection("WIRE", "[Sketch_2/SubEdge&Sketch_2/SketchLine_9][Sketch_2/SubEdge&Sketch_2/SketchLine_11][Sketch_2/SubEdge&Sketch_2/SketchLine_12][Sketch_2/SubEdge&Sketch_2/SketchLine_15][Sketch_2/SubEdge&Sketch_2/SketchLine_14][Sketch_2/SubEdge&Sketch_2/SketchLine_13][Sketch_2/SubEdge&Sketch_2/SketchLine_16]")])
+Fill_1 = model.addFill(Part_1_doc, [model.selection("FACE", "Face_3_1")], [model.selection("SHELL", "Shell_1_1")])
 model.do()
 
-model.checkResult(Boolean_1, model, 1, [3], [0], [3], [14], [28])
-model.testHaveNamingSubshapes(Boolean_1, model, Part_1_doc)
+model.checkResult(Fill_1, model, 1, [3], [0], [3], [14], [28])
+model.testHaveNamingSubshapes(Fill_1, model, Part_1_doc)
 
 model.end()
 

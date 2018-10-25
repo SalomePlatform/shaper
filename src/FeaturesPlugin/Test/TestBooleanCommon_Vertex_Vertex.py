@@ -18,6 +18,8 @@
 ## email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com>
 ##
 
+# -*- coding: utf-8 -*-
+
 from salome.shaper import model
 
 model.begin()
@@ -28,16 +30,16 @@ Sketch_1 = model.addSketch(Part_1_doc, model.standardPlane("XOY"))
 SketchPoint_1 = Sketch_1.addPoint(15.05904629113425, 12.50050543761873)
 SketchPoint_2 = Sketch_1.addPoint(47.25352258215165, 31.63008715695855)
 model.do()
-Vertex_1 = model.addVertex(Part_1_doc, [model.selection("VERTEX", "Sketch_1/Vertex-SketchPoint_1"), model.selection("VERTEX", "Sketch_1/Vertex-SketchPoint_2")])
+Vertex_1 = model.addVertex(Part_1_doc, [model.selection("VERTEX", "Sketch_1/SketchPoint_1"), model.selection("VERTEX", "Sketch_1/SketchPoint_2")])
 Common_1 = model.addCommon(Part_1_doc, [model.selection("VERTEX", "Vertex_1_1"), model.selection("VERTEX", "Vertex_1_2")])
 Sketch_2 = model.addSketch(Part_1_doc, model.defaultPlane("XOY"))
 SketchPoint_3 = Sketch_2.addPoint(15.05904629113425, 12.50050543761873)
-SketchProjection_1 = Sketch_2.addProjection(model.selection("VERTEX", "Sketch_1/Vertex-SketchPoint_1"), False)
+SketchProjection_1 = Sketch_2.addProjection(model.selection("VERTEX", "Sketch_1/SketchPoint_1"), False)
 SketchPoint_4 = SketchProjection_1.createdFeature()
 SketchConstraintCoincidence_1 = Sketch_2.setCoincident(SketchPoint_3.coordinates(), SketchPoint_4.result())
 model.do()
-Vertex_2 = model.addVertex(Part_1_doc, [model.selection("VERTEX", "Sketch_2/Vertex-SketchPoint_3-SketchProjection_1-SketchPoint_4")])
-Vertex_3 = model.addVertex(Part_1_doc, [model.selection("VERTEX", "Sketch_1/Vertex-SketchPoint_1")])
+Vertex_2 = model.addVertex(Part_1_doc, [model.selection("VERTEX", "Sketch_2/SketchPoint_3")])
+Vertex_3 = model.addVertex(Part_1_doc, [model.selection("VERTEX", "Sketch_1/SketchPoint_1")])
 Common_2 = model.addCommon(Part_1_doc, [model.selection("VERTEX", "Vertex_2_1"), model.selection("VERTEX", "Vertex_3_1")])
 model.testHaveNamingSubshapes(Common_2, model, Part_1_doc)
 model.do()

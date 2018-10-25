@@ -1,4 +1,4 @@
-## Copyright (C) 2017  CEA/DEN, EDF R&D
+## Copyright (C) 2014-2017  CEA/DEN, EDF R&D
 ##
 ## This library is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU Lesser General Public
@@ -18,6 +18,7 @@
 ## email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com>
 ##
 
+# -*- coding: utf-8 -*-
 
 from SketchAPI import *
 
@@ -71,15 +72,16 @@ SketchProjection_2 = Sketch_2.addProjection(model.selection("VERTEX", "PartSet/O
 SketchPoint_1 = SketchProjection_2.createdFeature()
 SketchConstraintDistance_2 = Sketch_2.setDistance(SketchAPI_Point(SketchPoint_1).coordinates(), SketchLine_9.result(), "L", True)
 model.do()
-Face_1 = model.addFace(Part_1_doc, [model.selection("WIRE", "Sketch_1/Wire-SketchLine_1f-SketchLine_5f-SketchLine_6r")])
-Face_2 = model.addFace(Part_1_doc, [model.selection("WIRE", "Sketch_1/Wire-SketchLine_3f-SketchLine_4f-SketchLine_6f")])
+Face_1 = model.addFace(Part_1_doc, [model.selection("WIRE", "[Sketch_1/SubEdge&Sketch_1/SketchLine_1][Sketch_1/SubEdge&Sketch_1/SketchLine_6][Sketch_1/SubEdge&Sketch_1/SketchLine_5]")])
+Face_2 = model.addFace(Part_1_doc, [model.selection("WIRE", "[Sketch_1/SubEdge&Sketch_1/SketchLine_3][Sketch_1/SubEdge&Sketch_1/SketchLine_4][Sketch_1/SubEdge&Sketch_1/SketchLine_6]")])
 Shell_1 = model.addShell(Part_1_doc, [model.selection("FACE", "Face_1_1"), model.selection("FACE", "Face_2_1")])
-Wire_1 = model.addWire(Part_1_doc, [model.selection("EDGE", "Sketch_2/Edge-SketchLine_7"), model.selection("EDGE", "Sketch_2/Edge-SketchLine_8"), model.selection("EDGE", "Sketch_2/Edge-SketchLine_9"), model.selection("EDGE", "Sketch_2/Edge-SketchLine_10")])
-Boolean_1 = model.addFill(Part_1_doc, [model.selection("SHELL", "Shell_1_1")], [model.selection("WIRE", "Wire_1_1")])
+Wire_1_objects = [model.selection("EDGE", "Sketch_2/SketchLine_7"), model.selection("EDGE", "Sketch_2/SketchLine_8"), model.selection("EDGE", "Sketch_2/SketchLine_9"), model.selection("EDGE", "Sketch_2/SketchLine_10")]
+Wire_1 = model.addWire(Part_1_doc, Wire_1_objects)
+Fill_1 = model.addFill(Part_1_doc, [model.selection("SHELL", "Shell_1_1")], [model.selection("WIRE", "Wire_1_1")])
 model.do()
 
-model.checkResult(Boolean_1, model, 1, [0], [0], [8], [30], [60])
-model.testHaveNamingSubshapes(Boolean_1, model, Part_1_doc)
+model.checkResult(Fill_1, model, 1, [0], [0], [8], [30], [60])
+model.testHaveNamingSubshapes(Fill_1, model, Part_1_doc)
 
 model.end()
 

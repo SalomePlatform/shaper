@@ -1,4 +1,4 @@
-## Copyright (C) 2017  CEA/DEN, EDF R&D
+## Copyright (C) 2014-2017  CEA/DEN, EDF R&D
 ##
 ## This library is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU Lesser General Public
@@ -18,6 +18,7 @@
 ## email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com>
 ##
 
+# -*- coding: utf-8 -*-
 
 from salome.shaper import model
 
@@ -30,7 +31,7 @@ SketchCircle_1 = Sketch_1.addCircle(-18.11540697674418, -21.53002906976744, 69.9
 SketchCircle_2 = Sketch_1.addCircle(-18.11540697674418, -21.53002906976744, 31.60961705559024)
 SketchConstraintCoincidence_1 = Sketch_1.setCoincident(SketchCircle_1.center(), SketchCircle_2.center())
 model.do()
-Extrusion_1 = model.addExtrusion(Part_1_doc, [model.selection("FACE", "Sketch_1/Face-SketchCircle_1_2f-SketchCircle_2_2r")], model.selection(), 100, 0)
+Extrusion_1 = model.addExtrusion(Part_1_doc, [model.selection("FACE", "Sketch_1/Face-SketchCircle_1_2r-SketchCircle_2_2r")], model.selection(), 100, 0)
 Point_2 = model.addPoint(Part_1_doc, 100, 40, 80)
 Point_3 = model.addPoint(Part_1_doc, 100, -40, 80)
 Point_4 = model.addPoint(Part_1_doc, 20, 40, -80)
@@ -45,7 +46,8 @@ SketchLine_4 = Sketch_2.addLine(-102.5665996005733, 115.6113578178721, 98.506500
 SketchConstraintCoincidence_4 = Sketch_2.setCoincident(SketchLine_3.endPoint(), SketchLine_4.startPoint())
 SketchConstraintCoincidence_5 = Sketch_2.setCoincident(SketchLine_1.startPoint(), SketchLine_4.endPoint())
 model.do()
-Face_1 = model.addFace(Part_1_doc, [model.selection("EDGE", "Sketch_2/Edge-SketchLine_4"), model.selection("EDGE", "Sketch_2/Edge-SketchLine_1"), model.selection("EDGE", "Sketch_2/Edge-SketchLine_2"), model.selection("EDGE", "Sketch_2/Edge-SketchLine_3")])
+Face_1_objects = [model.selection("EDGE", "Sketch_2/SketchLine_4"), model.selection("EDGE", "Sketch_2/SketchLine_1"), model.selection("EDGE", "Sketch_2/SketchLine_2"), model.selection("EDGE", "Sketch_2/SketchLine_3")]
+Face_1 = model.addFace(Part_1_doc, Face_1_objects)
 Partition_1 = model.addPartition(Part_1_doc, [model.selection("SOLID", "Extrusion_1_1"), model.selection("FACE", "Face_1_1")])
 model.do()
 

@@ -18,6 +18,8 @@
 ## email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com>
 ##
 
+# -*- coding: utf-8 -*-
+
 from salome.shaper import model
 
 model.begin()
@@ -68,7 +70,7 @@ SketchConstraintCoincidence_15 = Sketch_2.setCoincident(SketchLine_13.endPoint()
 SketchConstraintCoincidence_16 = Sketch_2.setCoincident(SketchLine_10.endPoint(), SketchLine_15.endPoint())
 model.do()
 Extrusion_1 = model.addExtrusion(Part_1_doc, [model.selection("COMPOUND", "Sketch_1")], model.selection(), 10, 10)
-Shell_1 = model.addShell(Part_1_doc, [model.selection("FACE", "Sketch_2/Face-SketchLine_9r-SketchLine_10r-SketchLine_14r-SketchLine_15f"), model.selection("FACE", "Sketch_2/Face-SketchLine_11r-SketchLine_12r-SketchLine_13r-SketchLine_15r")])
+Shell_1 = model.addShell(Part_1_doc, [model.selection("FACE", "Sketch_2/Face-SketchLine_14r-SketchLine_15f-SketchLine_10r-SketchLine_9r"), model.selection("FACE", "Sketch_2/Face-SketchLine_15r-SketchLine_13r-SketchLine_12r-SketchLine_11r")])
 Compound_1 = model.addCompound(Part_1_doc, [model.selection("SOLID", "Extrusion_1_1"), model.selection("SOLID", "Extrusion_1_2")])
 Common_1 = model.addCommon(Part_1_doc, [model.selection("SHELL", "Shell_1_1"), model.selection("COMPOUND", "Compound_1_1")])
 model.testHaveNamingSubshapes(Common_1, model, Part_1_doc)

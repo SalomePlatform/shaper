@@ -1,4 +1,4 @@
-## Copyright (C) 2017  CEA/DEN, EDF R&D
+## Copyright (C) 2014-2017  CEA/DEN, EDF R&D
 ##
 ## This library is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU Lesser General Public
@@ -18,16 +18,14 @@
 ## email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com>
 ##
 
+# -*- coding: utf-8 -*-
 
 from salome.shaper import model
-from GeomAPI import GeomAPI_Shape
 
 model.begin()
-#Create part
 partSet = model.moduleDocument()
 Part_1 = model.addPart(partSet)
 Part_1_doc = Part_1.document()
-#Create Sketch_1 - closed polyline from 5 segments
 Sketch_1 = model.addSketch(Part_1_doc, model.defaultPlane("YOZ"))
 SketchLine_1 = Sketch_1.addLine(-43.90694444444443, 28.05555555555554, 19.21805555555554, 72.66388888888889)
 SketchLine_2 = Sketch_1.addLine(19.21805555555554, 72.66388888888889, 82.06249999999999, -36.19166666666666)
@@ -40,10 +38,8 @@ SketchLine_5 = Sketch_1.addLine(-45.87083333333333, -45.44999999999999, -43.9069
 SketchConstraintCoincidence_4 = Sketch_1.setCoincident(SketchLine_4.endPoint(), SketchLine_5.startPoint())
 SketchConstraintCoincidence_5 = Sketch_1.setCoincident(SketchLine_1.startPoint(), SketchLine_5.endPoint())
 model.do()
-#Create Extrusion_1 on Sketch_1
-Extrusion_1 = model.addExtrusion(Part_1_doc, [model.selection("FACE", "Sketch_1/Face-SketchLine_1r-SketchLine_2r-SketchLine_3r-SketchLine_4r-SketchLine_5r")], model.selection(), 100, 0)
-#Create Sketch_2 from 5 segments
-Sketch_2 = model.addSketch(Part_1_doc, model.selection("FACE", "Extrusion_1_1/Generated_Face_3"))
+Extrusion_1 = model.addExtrusion(Part_1_doc, [model.selection("FACE", "Sketch_1/Face-SketchLine_5r-SketchLine_4r-SketchLine_3r-SketchLine_2r-SketchLine_1r")], model.selection(), 100, 0)
+Sketch_2 = model.addSketch(Part_1_doc, model.selection("FACE", "Extrusion_1_1/Generated_Face&Sketch_1/SketchLine_3"))
 SketchLine_6 = Sketch_2.addLine(74.07000206783135, -18.10965884648514, 62.37497281453477, -31.70853007124862)
 SketchLine_7 = Sketch_2.addLine(62.37497281453477, -31.70853007124862, 37.35304976096997, -31.43655264675337)
 SketchConstraintCoincidence_6 = Sketch_2.setCoincident(SketchLine_6.endPoint(), SketchLine_7.startPoint())
@@ -55,9 +51,7 @@ SketchLine_10 = Sketch_2.addLine(69.44638585141178, 6.640286782584385, 74.070002
 SketchConstraintCoincidence_9 = Sketch_2.setCoincident(SketchLine_9.endPoint(), SketchLine_10.startPoint())
 SketchConstraintCoincidence_10 = Sketch_2.setCoincident(SketchLine_6.startPoint(), SketchLine_10.endPoint())
 model.do()
-#Create Extrusion_2 on Sketch_2
-Extrusion_2 = model.addExtrusion(Part_1_doc, [model.selection("FACE", "Sketch_2/Face-SketchLine_6r-SketchLine_7r-SketchLine_8r-SketchLine_9r-SketchLine_10r")], model.selection(), 10, 160)
-#Create Partition on objects Extrusion_1 and Extrusion_2
+Extrusion_2 = model.addExtrusion(Part_1_doc, [model.selection("FACE", "Sketch_2/Face-SketchLine_10r-SketchLine_9r-SketchLine_8r-SketchLine_7r-SketchLine_6r")], model.selection(), 10, 160)
 Partition_1 = model.addPartition(Part_1_doc, [model.selection("SOLID", "Extrusion_1_1"), model.selection("SOLID", "Extrusion_2_1")])
 model.do()
 

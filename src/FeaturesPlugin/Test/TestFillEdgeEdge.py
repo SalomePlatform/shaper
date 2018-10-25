@@ -1,4 +1,4 @@
-## Copyright (C) 2017  CEA/DEN, EDF R&D
+## Copyright (C) 2014-2017  CEA/DEN, EDF R&D
 ##
 ## This library is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU Lesser General Public
@@ -18,6 +18,7 @@
 ## email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com>
 ##
 
+# -*- coding: utf-8 -*-
 
 from salome.shaper import model
 
@@ -30,18 +31,18 @@ SketchLine_1 = Sketch_1.addLine(-43.24383164005806, 13.92597968069667, 63.179970
 model.do()
 Sketch_2 = model.addSketch(Part_1_doc, model.defaultPlane("XOY"))
 SketchLine_2 = Sketch_2.addLine(-21.12944291883177, 24.09981691608177, 39.13933236574746, 51.82677414066782)
-SketchProjection_1 = Sketch_2.addProjection(model.selection("EDGE", "Sketch_1/Edge-SketchLine_1"), False)
+SketchProjection_1 = Sketch_2.addProjection(model.selection("EDGE", "Sketch_1/SketchLine_1"), False)
 SketchLine_3 = SketchProjection_1.createdFeature()
 SketchConstraintCoincidence_1 = Sketch_2.setCoincident(SketchLine_2.startPoint(), SketchLine_3.result())
 SketchConstraintCoincidence_2 = Sketch_2.setCoincident(SketchLine_2.endPoint(), SketchLine_3.result())
 model.do()
-Edge_1 = model.addEdge(Part_1_doc, [model.selection("EDGE", "Sketch_1/Edge-SketchLine_1")])
-Edge_2 = model.addEdge(Part_1_doc, [model.selection("EDGE", "Sketch_2/Edge-SketchLine_2")])
-Boolean_1 = model.addFill(Part_1_doc, [model.selection("EDGE", "Edge_1_1")], [model.selection("EDGE", "Edge_2_1")])
+Edge_1 = model.addEdge(Part_1_doc, [model.selection("EDGE", "Sketch_1/SketchLine_1")])
+Edge_2 = model.addEdge(Part_1_doc, [model.selection("EDGE", "Sketch_2/SketchLine_2")])
+Fill_1 = model.addFill(Part_1_doc, [model.selection("EDGE", "Edge_1_1")], [model.selection("EDGE", "Edge_2_1")])
 model.do()
 
-model.checkResult(Boolean_1,model,1,[3],[0],[0],[3],[6])
-model.testHaveNamingSubshapes(Boolean_1,model,Part_1_doc)
+model.checkResult(Fill_1,model,1,[3],[0],[0],[3],[6])
+model.testHaveNamingSubshapes(Fill_1,model,Part_1_doc)
 
 model.end()
 

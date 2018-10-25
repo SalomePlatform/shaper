@@ -1,4 +1,4 @@
-## Copyright (C) 2018-20xx  CEA/DEN, EDF R&D
+## Copyright (C) 2014-2017  CEA/DEN, EDF R&D
 ##
 ## This library is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU Lesser General Public
@@ -17,6 +17,8 @@
 ## See http:##www.salome-platform.org/ or
 ## email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com>
 ##
+
+# -*- coding: utf-8 -*-
 
 from salome.shaper import model
 from GeomAPI import *
@@ -40,9 +42,9 @@ SketchLine_1 = Sketch_2.addLine(58.22303949051827, 32.8176179844255, 7.898114670
 SketchConstraintCoincidence_1 = Sketch_2.setCoincident(SketchArc_1.endPoint(), SketchLine_1.startPoint())
 SketchConstraintCoincidence_2 = Sketch_2.setCoincident(SketchArc_1.startPoint(), SketchLine_1.endPoint())
 model.do()
-Revolution_1 = model.addRevolution(Part_1_doc, [model.selection("COMPOUND", "Sketch_2")], model.selection("EDGE", "Sketch_2/Edge-SketchLine_1"), 90, 0)
-Face_1 = model.addFace(Part_1_doc, [model.selection("FACE", "Revolution_1_1/Generated_Face_2")])
-Partition_1 = model.addPartition(Part_1_doc, [model.selection("SOLID", "Extrusion_1_1_1"), model.selection("FACE", "Face_1_1")])
+Revolution_1 = model.addRevolution(Part_1_doc, [model.selection("COMPOUND", "Sketch_2")], model.selection("EDGE", "Sketch_2/SketchLine_1"), 90, 0)
+Face_1 = model.addFace(Part_1_doc, [model.selection("FACE", "Revolution_1_1/Generated_Face&Sketch_2/SketchArc_1_2")])
+Partition_1 = model.addPartition(Part_1_doc, [model.selection("SOLID", "Extrusion_1_1_2"), model.selection("FACE", "Face_1_1")])
 model.do()
 
 # check partition

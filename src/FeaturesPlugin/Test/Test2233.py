@@ -37,8 +37,9 @@ SketchLine_2 = Sketch_1.addLine(0, 50, 0, -50)
 SketchConstraintCoincidence_4 = Sketch_1.setCoincident(SketchArc_1.startPoint(), SketchLine_2.startPoint())
 SketchConstraintCoincidence_5 = Sketch_1.setCoincident(SketchLine_2.endPoint(), SketchArc_1.endPoint())
 model.do()
-Revolution_1 = model.addRevolution(Part_1_doc, [model.selection("FACE", "Sketch_1/Face-SketchArc_1_2f-SketchLine_2f")], model.selection("EDGE", "Sketch_1/Edge-SketchLine_2"), 360, 0)
-Group_1 = model.addGroup(Part_1_doc, [model.selection("VERTEX", "Revolution_1_1/Vertex_6"), model.selection("VERTEX", "Revolution_1_1/Vertex_8")])
+Revolution_1 = model.addRevolution(Part_1_doc, [model.selection("FACE", "Sketch_1/Face-SketchArc_1_2f-SketchLine_2f")], model.selection("EDGE", "Sketch_1/SketchLine_2"), 360, 0)
+Group_1 = model.addGroup(Part_1_doc, [model.selection("VERTEX", "[[Revolution_1_1/Generated_Face&Sketch_1/SketchArc_1_2][weak_name_3]][[Revolution_1_1/Generated_Face&Sketch_1/SketchArc_1_2][weak_name_1]]"), model.selection("VERTEX", "[[Revolution_1_1/Generated_Face&Sketch_1/SketchArc_1_2][weak_name_2]][[Revolution_1_1/Generated_Face&Sketch_1/SketchArc_1_2][weak_name_3]]")])
+model.do()
 model.end()
 
 # check that resulting group selection is valid and names are different

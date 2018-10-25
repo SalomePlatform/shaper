@@ -18,6 +18,8 @@
 ## email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com>
 ##
 
+# -*- coding: utf-8 -*-
+
 from salome.shaper import model
 
 model.begin()
@@ -72,7 +74,8 @@ SketchConstraintVertical_6 = Sketch_1.setVertical(SketchLine_12.result())
 SketchConstraintHorizontal_7 = Sketch_1.setHorizontal(SketchLine_13.result())
 SketchConstraintVertical_7 = Sketch_1.setVertical(SketchLine_14.result())
 model.do()
-Extrusion_1 = model.addExtrusion(Part_1_doc, [model.selection("FACE", "Sketch_1/Face-SketchLine_2f-SketchLine_5f-SketchLine_6f-SketchLine_7f"), model.selection("FACE", "Sketch_1/Face-SketchLine_1r-SketchLine_2r-SketchLine_3r-SketchLine_4r"), model.selection("FACE", "Sketch_1/Face-SketchLine_7r-SketchLine_8r-SketchLine_9r-SketchLine_10r"), model.selection("FACE", "Sketch_1/Face-SketchLine_11f-SketchLine_12f-SketchLine_13f-SketchLine_14f")], model.selection(), 10, 0)
+Extrusion_1_objects = [model.selection("FACE", "Sketch_1/Face-SketchLine_2f-SketchLine_5f-SketchLine_6f-SketchLine_7f"), model.selection("FACE", "Sketch_1/Face-SketchLine_4r-SketchLine_3r-SketchLine_2r-SketchLine_1r"), model.selection("FACE", "Sketch_1/Face-SketchLine_10r-SketchLine_9r-SketchLine_8r-SketchLine_7r"), model.selection("FACE", "Sketch_1/Face-SketchLine_11f-SketchLine_12f-SketchLine_13f-SketchLine_14f")]
+Extrusion_1 = model.addExtrusion(Part_1_doc, Extrusion_1_objects, model.selection(), 10, 0)
 Partition_1 = model.addPartition(Part_1_doc, [model.selection("SOLID", "Extrusion_1_1"), model.selection("COMPSOLID", "Extrusion_1_2")])
 model.do()
 model.end()

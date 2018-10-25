@@ -18,6 +18,8 @@
 ## email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com>
 ##
 
+# -*- coding: utf-8 -*-
+
 from salome.shaper import model
 
 model.begin()
@@ -42,12 +44,13 @@ SketchConstraintVertical_2 = Sketch_1.setVertical(SketchLine_4.result())
 SketchCircle_1 = Sketch_1.addCircle(0, 0, 24.97092001270093)
 SketchConstraintCoincidence_6 = Sketch_1.setCoincident(SketchLine_1.endPoint(), SketchCircle_1.center())
 model.do()
-Wire_1 = model.addWire(Part_1_doc, [model.selection("EDGE", "Sketch_1/Edge-SketchLine_2"), model.selection("EDGE", "Sketch_1/Edge-SketchLine_3"), model.selection("EDGE", "Sketch_1/Edge-SketchLine_4"), model.selection("EDGE", "Sketch_1/Edge-SketchLine_1")])
-Wire_2 = model.addWire(Part_1_doc, [model.selection("EDGE", "Sketch_1/Edge-SketchCircle_1_2")])
+Wire_1_objects = [model.selection("EDGE", "Sketch_1/SketchLine_2"), model.selection("EDGE", "Sketch_1/SketchLine_3"), model.selection("EDGE", "Sketch_1/SketchLine_4"), model.selection("EDGE", "Sketch_1/SketchLine_1")]
+Wire_1 = model.addWire(Part_1_doc, Wire_1_objects)
+Wire_2 = model.addWire(Part_1_doc, [model.selection("EDGE", "Sketch_1/SketchCircle_1_2")])
 Face_1 = model.addFace(Part_1_doc, [model.selection("WIRE", "Wire_1_1")])
 Face_2 = model.addFace(Part_1_doc, [model.selection("WIRE", "Wire_2_1")])
 Extrusion_1 = model.addExtrusion(Part_1_doc, [model.selection("FACE", "Face_1_1"), model.selection("FACE", "Face_2_1")], model.selection(), 50, 0)
-Sketch_2 = model.addSketch(Part_1_doc, model.selection("FACE", "PartSet/YOZ"))
+Sketch_2 = model.addSketch(Part_1_doc, model.standardPlane("YOZ"))
 SketchLine_5 = Sketch_2.addLine(49.62901186301215, 25.3130971701971, 39.15939470736273, 25.3130971701971)
 SketchLine_6 = Sketch_2.addLine(39.15939470736273, 25.3130971701971, 39.15939470736273, 38.96586914453801)
 SketchLine_7 = Sketch_2.addLine(39.15939470736273, 38.96586914453801, 49.62901186301215, 38.96586914453801)
@@ -61,7 +64,7 @@ SketchConstraintVertical_3 = Sketch_2.setVertical(SketchLine_6.result())
 SketchConstraintHorizontal_4 = Sketch_2.setHorizontal(SketchLine_7.result())
 SketchConstraintVertical_4 = Sketch_2.setVertical(SketchLine_8.result())
 model.do()
-ExtrusionCut_1 = model.addExtrusionCut(Part_1_doc, [model.selection("FACE", "Sketch_2/Face-SketchLine_5r-SketchLine_6r-SketchLine_7r-SketchLine_8r")], model.selection(), 50, 50, [model.selection("SOLID", "Extrusion_1_1"), model.selection("SOLID", "Extrusion_1_2")])
+ExtrusionCut_1 = model.addExtrusionCut(Part_1_doc, [model.selection("FACE", "Sketch_2/Face-SketchLine_8r-SketchLine_7r-SketchLine_6r-SketchLine_5r")], model.selection(), 50, 50, [model.selection("SOLID", "Extrusion_1_1"), model.selection("SOLID", "Extrusion_1_2")])
 model.do()
 model.end()
 

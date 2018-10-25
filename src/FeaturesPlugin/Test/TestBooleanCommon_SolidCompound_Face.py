@@ -18,6 +18,8 @@
 ## email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com>
 ##
 
+# -*- coding: utf-8 -*-
+
 from salome.shaper import model
 
 model.begin()
@@ -65,8 +67,8 @@ SketchConstraintVertical_5 = Sketch_2.setVertical(SketchLine_10.result())
 SketchConstraintHorizontal_6 = Sketch_2.setHorizontal(SketchLine_11.result())
 SketchConstraintVertical_6 = Sketch_2.setVertical(SketchLine_12.result())
 model.do()
-Face_1 = model.addFace(Part_1_doc, [model.selection("FACE", "Sketch_2/Face-SketchLine_9f-SketchLine_10f-SketchLine_11f-SketchLine_12f")])
-Compound_1 = model.addCompound(Part_1_doc, [model.selection("SOLID", "Extrusion_1_1"), model.selection("SOLID", "Extrusion_1_2")])
+Face_1 = model.addFace(Part_1_doc, [model.selection("FACE", "Sketch_2/Face-SketchLine_9r-SketchLine_10f-SketchLine_11f-SketchLine_12f")])
+Compound_1 = model.addCompound(Part_1_doc, [model.selection("SOLID", "Extrusion_1_2"), model.selection("SOLID", "Extrusion_1_1")])
 Common_1 = model.addCommon(Part_1_doc, [model.selection("FACE", "Face_1_1"), model.selection("COMPOUND", "Compound_1_1")])
 model.testHaveNamingSubshapes(Common_1, model, Part_1_doc)
 model.do()

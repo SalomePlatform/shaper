@@ -1,4 +1,4 @@
-## Copyright (C) 2018-20xx  CEA/DEN, EDF R&D
+## Copyright (C) 2014-2017  CEA/DEN, EDF R&D
 ##
 ## This library is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU Lesser General Public
@@ -17,6 +17,8 @@
 ## See http:##www.salome-platform.org/ or
 ## email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com>
 ##
+
+# -*- coding: utf-8 -*-
 
 from salome.shaper import model
 
@@ -47,7 +49,7 @@ SketchConstraintVertical_2 = Sketch_1.setVertical(SketchLine_4.result())
 SketchConstraintEqual_1 = Sketch_1.setEqual(SketchLine_1.result(), SketchLine_4.result())
 SketchConstraintLength_1 = Sketch_1.setLength(SketchLine_1.result(), 20)
 model.do()
-Face_1 = model.addFace(Part_1_doc, [model.selection("FACE", "Sketch_1/Face-SketchLine_1f-SketchLine_2f-SketchLine_3f-SketchLine_4f")])
+Face_1 = model.addFace(Part_1_doc, [model.selection("FACE", "Sketch_1/Face-SketchLine_1r-SketchLine_2f-SketchLine_3f-SketchLine_4f")])
 LinearCopy_1 = model.addMultiTranslation(Part_1_doc, [model.selection("FACE", "Face_1_1")], model.selection("EDGE", "PartSet/OZ"), 2, 2)
 Partition_1_objects = [model.selection("SOLID", "Box_1_1"), model.selection("FACE", "LinearCopy_1_1_1"), model.selection("FACE", "LinearCopy_1_1_2")]
 Partition_1 = model.addPartition(Part_1_doc, Partition_1_objects)

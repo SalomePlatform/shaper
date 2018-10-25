@@ -1,4 +1,4 @@
-## Copyright (C) 2017  CEA/DEN, EDF R&D
+## Copyright (C) 2014-2017  CEA/DEN, EDF R&D
 ##
 ## This library is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU Lesser General Public
@@ -18,6 +18,7 @@
 ## email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com>
 ##
 
+# -*- coding: utf-8 -*-
 
 from salome.shaper import model
 
@@ -38,13 +39,14 @@ SketchLine_5 = Sketch_2.addLine(55.26415094339622, -34.15529753265602, -40.60522
 SketchConstraintCoincidence_3 = Sketch_2.setCoincident(SketchLine_4.endPoint(), SketchLine_5.startPoint())
 SketchConstraintCoincidence_4 = Sketch_2.setCoincident(SketchLine_5.endPoint(), SketchLine_2.startPoint())
 model.do()
-Edge_1 = model.addEdge(Part_1_doc, [model.selection("EDGE", "Sketch_1/Edge-SketchLine_1")])
-Wire_1 = model.addWire(Part_1_doc, [model.selection("EDGE", "Sketch_2/Edge-SketchLine_5"), model.selection("EDGE", "Sketch_2/Edge-SketchLine_2"), model.selection("EDGE", "Sketch_2/Edge-SketchLine_3"), model.selection("EDGE", "Sketch_2/Edge-SketchLine_4")])
-Boolean_1 = model.addFill(Part_1_doc, [model.selection("WIRE", "Wire_1_1")], [model.selection("EDGE", "Edge_1_1")])
+Edge_1 = model.addEdge(Part_1_doc, [model.selection("EDGE", "Sketch_1/SketchLine_1")])
+Wire_1_objects = [model.selection("EDGE", "Sketch_2/SketchLine_5"), model.selection("EDGE", "Sketch_2/SketchLine_2"), model.selection("EDGE", "Sketch_2/SketchLine_3"), model.selection("EDGE", "Sketch_2/SketchLine_4")]
+Wire_1 = model.addWire(Part_1_doc, Wire_1_objects)
+Fill_1 = model.addFill(Part_1_doc, [model.selection("WIRE", "Wire_1_1")], [model.selection("EDGE", "Edge_1_1")])
 model.do()
 
-model.checkResult(Boolean_1,model,1,[0],[0],[0],[6],[12])
-model.testHaveNamingSubshapes(Boolean_1,model,Part_1_doc)
+model.checkResult(Fill_1,model,1,[0],[0],[0],[6],[12])
+model.testHaveNamingSubshapes(Fill_1,model,Part_1_doc)
 
 model.end()
 

@@ -1,4 +1,4 @@
-## Copyright (C) 2017  CEA/DEN, EDF R&D
+## Copyright (C) 2014-2017  CEA/DEN, EDF R&D
 ##
 ## This library is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU Lesser General Public
@@ -18,6 +18,7 @@
 ## email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com>
 ##
 
+# -*- coding: utf-8 -*-
 
 from SketchAPI import *
 
@@ -73,7 +74,9 @@ SketchLine_10 = Sketch_2.addLine(64.99999999999999, 12.18920647716607, 50, 12.18
 SketchLine_10.setName("SketchLine_12")
 SketchLine_10.result().setName("SketchLine_12")
 SketchConstraintCoincidence_9 = Sketch_2.setCoincident(SketchLine_9.endPoint(), SketchLine_10.startPoint())
+SketchConstraintCoincidence_9.setName("SketchConstraintCoincidence_10")
 SketchConstraintCoincidence_10 = Sketch_2.setCoincident(SketchLine_10.endPoint(), SketchLine_7.result())
+SketchConstraintCoincidence_10.setName("SketchConstraintCoincidence_11")
 SketchConstraintDistance_4 = Sketch_2.setDistance(SketchLine_8.endPoint(), SketchLine_7.result(), "L", True)
 SketchConstraintDistance_5 = Sketch_2.setDistance(SketchLine_9.endPoint(), SketchLine_7.result(), "L/2", True)
 SketchConstraintHorizontal_1 = Sketch_2.setHorizontal(SketchLine_10.result())
@@ -86,20 +89,22 @@ SketchLine_12.setName("SketchLine_14")
 SketchLine_12.result().setName("SketchLine_14")
 SketchLine_11.setName("SketchLine_13")
 SketchLine_11.result().setName("SketchLine_13")
-SketchProjection_3 = Sketch_2.addProjection(model.selection("VERTEX", "Sketch_1/Vertex-SketchLine_4s-SketchLine_3e"), False)
+SketchProjection_3 = Sketch_2.addProjection(model.selection("VERTEX", "Sketch_1/SketchLine_3_EndVertex"), False)
 SketchPoint_2 = SketchProjection_3.createdFeature()
 SketchConstraintCoincidence_11 = Sketch_2.setCoincident(SketchAPI_Point(SketchPoint_2).coordinates(), SketchLine_9.result())
+SketchConstraintCoincidence_11.setName("SketchConstraintCoincidence_12")
 SketchConstraintCoincidence_12 = Sketch_2.setCoincident(SketchLine_8.startPoint(), SketchLine_7.result())
+SketchConstraintCoincidence_12.setName("SketchConstraintCoincidence_13")
 model.do()
-Face_1 = model.addFace(Part_1_doc, [model.selection("WIRE", "Sketch_1/Wire-SketchLine_1f-SketchLine_5f-SketchLine_6r")])
-Face_2 = model.addFace(Part_1_doc, [model.selection("WIRE", "Sketch_1/Wire-SketchLine_3f-SketchLine_4f-SketchLine_6f")])
+Face_1 = model.addFace(Part_1_doc, [model.selection("WIRE", "[Sketch_1/SubEdge&Sketch_1/SketchLine_1][Sketch_1/SubEdge&Sketch_1/SketchLine_6][Sketch_1/SubEdge&Sketch_1/SketchLine_5]")])
+Face_2 = model.addFace(Part_1_doc, [model.selection("WIRE", "[Sketch_1/SubEdge&Sketch_1/SketchLine_3][Sketch_1/SubEdge&Sketch_1/SketchLine_4][Sketch_1/SubEdge&Sketch_1/SketchLine_6]")])
 Shell_1 = model.addShell(Part_1_doc, [model.selection("FACE", "Face_1_1"), model.selection("FACE", "Face_2_1")])
-Face_3 = model.addFace(Part_1_doc, [model.selection("WIRE", "Sketch_2/Wire-SketchLine_9f-SketchLine_11f-SketchLine_12f-SketchLine_13r-SketchLine_14r-SketchLine_15r")])
-Boolean_1 = model.addFill(Part_1_doc, [model.selection("SHELL", "Shell_1_1")], [model.selection("FACE", "Face_3_1")])
+Face_3 = model.addFace(Part_1_doc, [model.selection("WIRE", "[Sketch_2/SubEdge&Sketch_2/SketchLine_9][Sketch_2/SubEdge&Sketch_2/SketchLine_11][Sketch_2/SubEdge&Sketch_2/SketchLine_12][Sketch_2/SubEdge&Sketch_2/SketchLine_15][Sketch_2/SubEdge&Sketch_2/SketchLine_14][Sketch_2/SubEdge&Sketch_2/SketchLine_13]")])
+Fill_1 = model.addFill(Part_1_doc, [model.selection("SHELL", "Shell_1_1")], [model.selection("FACE", "Face_3_1")])
 model.do()
 
-model.checkResult(Boolean_1, model, 1, [0], [0], [4], [13], [26])
-model.testHaveNamingSubshapes(Boolean_1, model, Part_1_doc)
+model.checkResult(Fill_1, model, 1, [0], [0], [4], [13], [26])
+model.testHaveNamingSubshapes(Fill_1, model, Part_1_doc)
 
 model.end()
 

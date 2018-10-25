@@ -18,6 +18,8 @@
 ## email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com>
 ##
 
+# -*- coding: utf-8 -*-
+
 from salome.shaper import model
 
 model.begin()
@@ -32,7 +34,7 @@ SketchConstraintCoincidence_2 = Sketch_1.setCoincident(SketchLine_1.endPoint(), 
 model.do()
 Sketch_2 = model.addSketch(Part_1_doc, model.defaultPlane("XOY"))
 SketchCircle_2 = Sketch_2.addCircle(32.08143103297851, 1.286314091165838, 40.2404383217231)
-SketchLine_2 = Sketch_2.addLine(-8.153954725266397, 0.6486549270159857, 72.23884334545456, 3.869938036363647)
+SketchLine_2 = Sketch_2.addLine(-8.153954725266397, 0.6486549270159857, 72.23884334545455, 3.869938036363647)
 SketchConstraintCoincidence_3 = Sketch_2.setCoincident(SketchLine_2.startPoint(), SketchCircle_2.results()[1])
 SketchConstraintCoincidence_4 = Sketch_2.setCoincident(SketchLine_2.endPoint(), SketchCircle_2.results()[1])
 model.do()

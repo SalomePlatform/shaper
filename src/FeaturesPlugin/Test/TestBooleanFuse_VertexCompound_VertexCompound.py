@@ -18,6 +18,8 @@
 ## email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com>
 ##
 
+# -*- coding: utf-8 -*-
+
 from salome.shaper import model
 
 model.begin()
@@ -30,7 +32,7 @@ SketchPoint_2 = Sketch_1.addPoint(18.16931216931219, 17.1005291005291)
 SketchPoint_3 = Sketch_1.addPoint(-19.77248677248678, -16.03174603174603)
 SketchPoint_4 = Sketch_1.addPoint(21.37566137566138, -16.03174603174603)
 model.do()
-Vertex_1_objects = [model.selection("VERTEX", "Sketch_1/Vertex-SketchPoint_3"), model.selection("VERTEX", "Sketch_1/Vertex-SketchPoint_1"), model.selection("VERTEX", "Sketch_1/Vertex-SketchPoint_4"), model.selection("VERTEX", "Sketch_1/Vertex-SketchPoint_2")]
+Vertex_1_objects = [model.selection("VERTEX", "Sketch_1/SketchPoint_3"), model.selection("VERTEX", "Sketch_1/SketchPoint_1"), model.selection("VERTEX", "Sketch_1/SketchPoint_4"), model.selection("VERTEX", "Sketch_1/SketchPoint_2")]
 Vertex_1 = model.addVertex(Part_1_doc, Vertex_1_objects)
 Compound_1 = model.addCompound(Part_1_doc, [model.selection("VERTEX", "Vertex_1_1"), model.selection("VERTEX", "Vertex_1_2")])
 Compound_2 = model.addCompound(Part_1_doc, [model.selection("VERTEX", "Vertex_1_3"), model.selection("VERTEX", "Vertex_1_4")])

@@ -1,4 +1,4 @@
-## Copyright (C) 2017  CEA/DEN, EDF R&D
+## Copyright (C) 2014-2017  CEA/DEN, EDF R&D
 ##
 ## This library is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU Lesser General Public
@@ -18,6 +18,7 @@
 ## email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com>
 ##
 
+# -*- coding: utf-8 -*-
 
 from salome.shaper import model
 
@@ -30,7 +31,8 @@ Plane_4 = model.addPlane(Part_1_doc, model.selection("FACE", "PartSet/XOY"), 100
 Plane_5 = model.addPlane(Part_1_doc, model.selection("FACE", "Plane_1"), 100, False)
 Plane_6 = model.addPlane(Part_1_doc, model.selection("FACE", "Plane_2"), 100, False)
 Plane_7 = model.addPlane(Part_1_doc, model.selection("FACE", "PartSet/YOZ"), 50, False)
-Partition_1 = model.addPartition(Part_1_doc, [model.selection("FACE", "Plane_1"), model.selection("FACE", "Plane_2"), model.selection("FACE", "Plane_3"), model.selection("FACE", "Plane_4"), model.selection("SOLID", "Box_1_1")])
+Partition_1_objects = [model.selection("FACE", "Plane_1"), model.selection("FACE", "Plane_2"), model.selection("FACE", "Plane_3"), model.selection("FACE", "Plane_4"), model.selection("SOLID", "Box_1_1")]
+Partition_1 = model.addPartition(Part_1_doc, Partition_1_objects)
 model.do()
 
 model.checkResult(Partition_1,model,1,[8],[8],[48],[192],[384])

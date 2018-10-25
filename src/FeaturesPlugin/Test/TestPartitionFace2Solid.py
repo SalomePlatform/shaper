@@ -1,4 +1,4 @@
-## Copyright (C) 2017  CEA/DEN, EDF R&D
+## Copyright (C) 2014-2017  CEA/DEN, EDF R&D
 ##
 ## This library is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU Lesser General Public
@@ -18,9 +18,11 @@
 ## email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com>
 ##
 
+# -*- coding: utf-8 -*-
+
+from SketchAPI import *
 
 from salome.shaper import model
-from SketchAPI import *
 
 model.begin()
 partSet = model.moduleDocument()
@@ -48,8 +50,7 @@ SketchConstraintMirror_2 = Sketch_1.addMirror(SketchLine_1.result(), SketchConst
 [SketchArc_5, SketchArc_6, SketchArc_7, SketchArc_8] = SketchConstraintMirror_2.mirrored()
 model.do()
 Extrusion_1 = model.addExtrusion(Part_1_doc, [model.selection("COMPOUND", "Sketch_1")], model.selection(), 12, 12)
-
-Sketch_2 = model.addSketch(Part_1_doc, model.selection("FACE", "Extrusion_1_1/To_Face_1"))
+Sketch_2 = model.addSketch(Part_1_doc, model.selection("FACE", "Extrusion_1_1/To_Face"))
 SketchLine_3 = Sketch_2.addLine(7.498934040825037, 4.111344571723496, -7.530337532973568, 4.111344571723496)
 SketchLine_4 = Sketch_2.addLine(-7.530337532973568, 4.111344571723496, -7.530337532973568, -4.489390918751097)
 SketchLine_5 = Sketch_2.addLine(-7.530337532973568, -4.489390918751097, 7.498934040825037, -4.489390918751097)
@@ -64,8 +65,7 @@ SketchConstraintHorizontal_2 = Sketch_2.setHorizontal(SketchLine_5.result())
 SketchConstraintVertical_2 = Sketch_2.setVertical(SketchLine_6.result())
 SketchCircle_1 = Sketch_2.addCircle(-0.133117930244568, 0.08984026389066591, 1.099112071963378)
 model.do()
-Extrusion_2 = model.addExtrusion(Part_1_doc, [model.selection("FACE", "Sketch_2/Face-SketchLine_3f-SketchLine_4f-SketchLine_5f-SketchLine_6f-SketchCircle_1_2r")], model.selection(), model.selection(), 5, model.selection(), 10)
-
+Extrusion_2 = model.addExtrusion(Part_1_doc, [model.selection("FACE", "Sketch_2/Face-SketchLine_3r-SketchLine_4f-SketchLine_5f-SketchLine_6f-SketchCircle_1_2r")], model.selection(), model.selection(), 5, model.selection(), 10)
 Sketch_3 = model.addSketch(Part_1_doc, model.defaultPlane("XOY"))
 SketchLine_7 = Sketch_3.addLine(21.55890075100801, 30.21822825485694, -17.43219636481839, 31.63011070278906)
 SketchLine_8 = Sketch_3.addLine(-17.43219636481839, 31.63011070278906, -12.33809712604348, -45.93749869468675)
@@ -76,9 +76,10 @@ SketchLine_10 = Sketch_3.addLine(30.10255255530162, -25.9120009302625, 21.558900
 SketchConstraintCoincidence_12 = Sketch_3.setCoincident(SketchLine_9.endPoint(), SketchLine_10.startPoint())
 SketchConstraintCoincidence_13 = Sketch_3.setCoincident(SketchLine_7.startPoint(), SketchLine_10.endPoint())
 model.do()
-Face_1 = model.addFace(Part_1_doc, [model.selection("EDGE", "Sketch_3/Edge-SketchLine_7"), model.selection("EDGE", "Sketch_3/Edge-SketchLine_8"), model.selection("EDGE", "Sketch_3/Edge-SketchLine_9"), model.selection("EDGE", "Sketch_3/Edge-SketchLine_10")])
-
-Partition_1 = model.addPartition(Part_1_doc, [model.selection("FACE", "Face_1_1"), model.selection("SOLID", "Extrusion_2_1"), model.selection("SOLID", "Extrusion_1_1")])
+Face_1_objects = [model.selection("EDGE", "Sketch_3/SketchLine_7"), model.selection("EDGE", "Sketch_3/SketchLine_8"), model.selection("EDGE", "Sketch_3/SketchLine_9"), model.selection("EDGE", "Sketch_3/SketchLine_10")]
+Face_1 = model.addFace(Part_1_doc, Face_1_objects)
+Partition_1_objects = [model.selection("FACE", "Face_1_1"), model.selection("SOLID", "Extrusion_2_1"), model.selection("SOLID", "Extrusion_1_1")]
+Partition_1 = model.addPartition(Part_1_doc, Partition_1_objects)
 model.do()
 
 model.checkResult(Partition_1,model,1,[2],[4],[42],[198],[396])

@@ -18,6 +18,8 @@
 ## email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com>
 ##
 
+# -*- coding: utf-8 -*-
+
 from salome.shaper import model
 
 model.begin()
@@ -25,8 +27,9 @@ partSet = model.moduleDocument()
 Part_1 = model.addPart(partSet)
 Part_1_doc = Part_1.document()
 Box_1 = model.addBox(Part_1_doc, 10, 10, 10)
-Symmetry_1 = model.addSymmetry(Part_1_doc, [model.selection("SOLID", "Box_1_1")], model.selection("VERTEX", "Box_1_1/Back&Box_1_1/Left&Box_1_1/Bottom"), True)
+Symmetry_1 = model.addSymmetry(Part_1_doc, [model.selection("SOLID", "Box_1_1")], model.selection("VERTEX", "[Box_1_1/Bottom][Box_1_1/Left][Box_1_1/Back]"), True)
 Symmetry_2 = model.addSymmetry(Part_1_doc, [model.selection("SOLID", "Symmetry_1_1_1")], model.selection("EDGE", "PartSet/OX"), True)
+model.do()
 model.end()
 
 # check python dump failed before the bug fix: selection in symmetry 2 changed to the whole symmetry 1 compound

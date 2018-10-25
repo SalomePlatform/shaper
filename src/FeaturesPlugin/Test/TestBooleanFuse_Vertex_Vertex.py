@@ -18,6 +18,8 @@
 ## email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com>
 ##
 
+# -*- coding: utf-8 -*-
+
 from salome.shaper import model
 
 model.begin()
@@ -28,7 +30,7 @@ Sketch_1 = model.addSketch(Part_1_doc, model.defaultPlane("XOY"))
 SketchPoint_1 = Sketch_1.addPoint(-6.078627161807992, -0.4501231771005025)
 SketchPoint_2 = Sketch_1.addPoint(7.482208269631659, 3.929326826374309)
 model.do()
-Vertex_1 = model.addVertex(Part_1_doc, [model.selection("VERTEX", "Sketch_1/Vertex-SketchPoint_2"), model.selection("VERTEX", "Sketch_1/Vertex-SketchPoint_1")])
+Vertex_1 = model.addVertex(Part_1_doc, [model.selection("VERTEX", "Sketch_1/SketchPoint_2"), model.selection("VERTEX", "Sketch_1/SketchPoint_1")])
 Fuse_1 = model.addFuse(Part_1_doc, [model.selection("VERTEX", "Vertex_1_1"), model.selection("VERTEX", "Vertex_1_2")])
 model.testHaveNamingSubshapes(Fuse_1, model, Part_1_doc)
 model.do()

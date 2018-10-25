@@ -1,4 +1,4 @@
-## Copyright (C) 2017  CEA/DEN, EDF R&D
+## Copyright (C) 2014-2017  CEA/DEN, EDF R&D
 ##
 ## This library is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU Lesser General Public
@@ -18,6 +18,7 @@
 ## email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com>
 ##
 
+# -*- coding: utf-8 -*-
 
 from salome.shaper import model
 
@@ -49,8 +50,10 @@ SketchLine_9 = Sketch_2.addLine(30.30743587791019, -67.62202818906478, 1.8947624
 SketchConstraintCoincidence_9 = Sketch_2.setCoincident(SketchLine_8.endPoint(), SketchLine_9.startPoint())
 SketchConstraintCoincidence_10 = Sketch_2.setCoincident(SketchArc_1.endPoint(), SketchLine_9.endPoint())
 model.do()
-Wire_1 = model.addWire(Part_1_doc, [model.selection("EDGE", "Sketch_2/Edge-SketchLine_7"), model.selection("EDGE", "Sketch_2/Edge-SketchLine_8"), model.selection("EDGE", "Sketch_2/Edge-SketchLine_9"), model.selection("EDGE", "Sketch_2/Edge-SketchArc_1_2")])
-Wire_2 = model.addWire(Part_1_doc, [model.selection("EDGE", "Sketch_1/Edge-SketchLine_1"), model.selection("EDGE", "Sketch_1/Edge-SketchLine_2"), model.selection("EDGE", "Sketch_1/Edge-SketchLine_3"), model.selection("EDGE", "Sketch_1/Edge-SketchLine_4"), model.selection("EDGE", "Sketch_1/Edge-SketchLine_5"), model.selection("EDGE", "Sketch_1/Edge-SketchLine_6")])
+Wire_1_objects = [model.selection("EDGE", "Sketch_2/SketchLine_7"), model.selection("EDGE", "Sketch_2/SketchLine_8"), model.selection("EDGE", "Sketch_2/SketchLine_9"), model.selection("EDGE", "Sketch_2/SketchArc_1_2")]
+Wire_1 = model.addWire(Part_1_doc, Wire_1_objects)
+Wire_2_objects = [model.selection("EDGE", "Sketch_1/SketchLine_1"), model.selection("EDGE", "Sketch_1/SketchLine_2"), model.selection("EDGE", "Sketch_1/SketchLine_3"), model.selection("EDGE", "Sketch_1/SketchLine_4"), model.selection("EDGE", "Sketch_1/SketchLine_5"), model.selection("EDGE", "Sketch_1/SketchLine_6")]
+Wire_2 = model.addWire(Part_1_doc, Wire_2_objects)
 Partition_1 = model.addPartition(Part_1_doc, [model.selection("WIRE", "Wire_2_1"), model.selection("WIRE", "Wire_1_1")])
 model.do()
 

@@ -18,6 +18,8 @@
 ## email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com>
 ##
 
+# -*- coding: utf-8 -*-
+
 from salome.shaper import model
 
 model.begin()
@@ -41,8 +43,8 @@ SketchConstraintVertical_1 = Sketch_2.setVertical(SketchLine_3.result())
 SketchConstraintHorizontal_2 = Sketch_2.setHorizontal(SketchLine_4.result())
 SketchConstraintVertical_2 = Sketch_2.setVertical(SketchLine_5.result())
 model.do()
-Edge_1 = model.addEdge(Part_1_doc, [model.selection("EDGE", "Sketch_1/Edge-SketchLine_1")])
-Face_1 = model.addFace(Part_1_doc, [model.selection("WIRE", "Sketch_2/Wire-SketchLine_2f-SketchLine_3f-SketchLine_4f-SketchLine_5f")])
+Edge_1 = model.addEdge(Part_1_doc, [model.selection("EDGE", "Sketch_1/SketchLine_1")])
+Face_1 = model.addFace(Part_1_doc, [model.selection("WIRE", "[Sketch_2/SubEdge&Sketch_2/SketchLine_2][Sketch_2/SubEdge&Sketch_2/SketchLine_3][Sketch_2/SubEdge&Sketch_2/SketchLine_4][Sketch_2/SubEdge&Sketch_2/SketchLine_5]")])
 Cut_1 = model.addCut(Part_1_doc, [model.selection("EDGE", "Edge_1_1")], [model.selection("FACE", "Face_1_1")])
 model.testHaveNamingSubshapes(Cut_1, model, Part_1_doc)
 model.do()

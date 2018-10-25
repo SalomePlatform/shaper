@@ -51,8 +51,10 @@ SketchConstraintCoincidence_4.setName("SketchConstraintCoincidence_6")
 SketchConstraintCoincidence_5 = Sketch_1.setCoincident(SketchLine_1.endPoint(), SketchLine_5.endPoint())
 SketchConstraintCoincidence_5.setName("SketchConstraintCoincidence_7")
 model.do()
-Revolution_1 = model.addRevolution(Part_1_doc, [model.selection("FACE", "Sketch_1/Face-SketchLine_1f-SketchLine_3f-SketchLine_4f-SketchLine_5r-SketchLine_6r")], model.selection("EDGE", "Sketch_1/Edge-SketchLine_4"), 360, 0)
-Group_1 = model.addGroup(Part_1_doc, [model.selection("EDGE", "Revolution_1_1/Generated_Face_5&Revolution_1_1/Generated_Face_4"), model.selection("EDGE", "Revolution_1_1/Generated_Face_4&Revolution_1_1/Generated_Face_3"), model.selection("EDGE", "Revolution_1_1/Generated_Face_3&Revolution_1_1/Generated_Face_2"), model.selection("EDGE", "Revolution_1_1/Base_Edge_6"), model.selection("EDGE", "Revolution_1_1/Base_Edge_2"), model.selection("EDGE", "Revolution_1_1/Generated_Face_4"), model.selection("EDGE", "Revolution_1_1/Generated_Face_3")])
+Revolution_1 = model.addRevolution(Part_1_doc, [model.selection("FACE", "Sketch_1/Face-SketchLine_1r-SketchLine_6r-SketchLine_5r-SketchLine_3f-SketchLine_4f")], model.selection("EDGE", "Sketch_1/SketchLine_4"), 360, 0)
+Group_1_objects = [model.selection("EDGE", "[Revolution_1_1/Generated_Face&Sketch_1/SketchLine_1][Revolution_1_1/Generated_Face&Sketch_1/SketchLine_6]"), model.selection("EDGE", "[Revolution_1_1/Generated_Face&Sketch_1/SketchLine_6][Revolution_1_1/Generated_Face&Sketch_1/SketchLine_5]"), model.selection("EDGE", "[Revolution_1_1/Generated_Face&Sketch_1/SketchLine_3][Revolution_1_1/Generated_Face&Sketch_1/SketchLine_5]"), model.selection("EDGE", "[Revolution_1_1/Generated_Face&Sketch_1/SketchLine_3][weak_name_3]"), model.selection("EDGE", "[Revolution_1_1/Generated_Face&Sketch_1/SketchLine_1][weak_name_3]"), model.selection("EDGE", "([Revolution_1_1/Generated_Face&Sketch_1/SketchLine_6][Revolution_1_1/Generated_Face&Sketch_1/SketchLine_5])([Revolution_1_1/Generated_Face&Sketch_1/SketchLine_1][Revolution_1_1/Generated_Face&Sketch_1/SketchLine_6])"), model.selection("EDGE", "([Revolution_1_1/Generated_Face&Sketch_1/SketchLine_3][Revolution_1_1/Generated_Face&Sketch_1/SketchLine_5])([Revolution_1_1/Generated_Face&Sketch_1/SketchLine_6][Revolution_1_1/Generated_Face&Sketch_1/SketchLine_5])")]
+Group_1 = model.addGroup(Part_1_doc, Group_1_objects)
+model.do()
 model.end()
 
 # check that resulting group selection is valid

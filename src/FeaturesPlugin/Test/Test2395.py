@@ -18,6 +18,8 @@
 ## email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com>
 ##
 
+# -*- coding: utf-8 -*-
+
 from salome.shaper import model
 
 model.begin()
@@ -43,11 +45,11 @@ SketchConstraintVertical_2 = Sketch_1.setVertical(SketchLine_4.result())
 model.do()
 Sketch_2 = model.addSketch(Part_1_doc, model.defaultPlane("YOZ"))
 SketchLine_5 = Sketch_2.addLine(0, 0, -37.87650574447493, 64.03712943185892)
-SketchProjection_2 = Sketch_2.addProjection(model.selection("VERTEX", "Sketch_1/Vertex-SketchProjection_1-SketchPoint_1-SketchLine_2s-SketchLine_1e"), False)
+SketchProjection_2 = Sketch_2.addProjection(model.selection("VERTEX", "Sketch_1/SketchLine_1_EndVertex"), False)
 SketchPoint_2 = SketchProjection_2.createdFeature()
 SketchConstraintCoincidence_6 = Sketch_2.setCoincident(SketchLine_5.startPoint(), SketchPoint_2.result())
 model.do()
-Extrusion_1 = model.addExtrusion(Part_1_doc, [model.selection("WIRE", "Sketch_1/Wire-SketchLine_1r-SketchLine_2r-SketchLine_3r-SketchLine_4r")], model.selection("EDGE", "Sketch_2/Edge-SketchLine_5"), 100, 0)
+Extrusion_1 = model.addExtrusion(Part_1_doc, [model.selection("WIRE", "[Sketch_1/SubEdge&Sketch_1/SketchLine_4][Sketch_1/SubEdge&Sketch_1/SketchLine_3][Sketch_1/SubEdge&Sketch_1/SketchLine_2][Sketch_1/SubEdge&Sketch_1/SketchLine_1]")], model.selection("EDGE", "Sketch_2/SketchLine_5"), 100, 0)
 model.do()
 model.end()
 

@@ -18,6 +18,8 @@
 ## email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com>
 ##
 
+# -*- coding: utf-8 -*-
+
 from salome.shaper import model
 
 model.begin()
@@ -28,7 +30,7 @@ Sketch_1 = model.addSketch(Part_1_doc, model.defaultPlane("XOY"))
 SketchLine_1 = Sketch_1.addLine(-28.62948623265935, 53.77363153293705, 40.23707952134417, 53.11775947813702)
 SketchLine_2 = Sketch_1.addLine(-26.66187006825925, 26.22700523133564, 40.89295157614425, 26.22700523133564)
 model.do()
-Compound_1 = model.addCompound(Part_1_doc, [model.selection("EDGE", "Sketch_1/Edge-SketchLine_1"), model.selection("EDGE", "Sketch_1/Edge-SketchLine_2")])
+Compound_1 = model.addCompound(Part_1_doc, [model.selection("EDGE", "Sketch_1/SketchLine_1"), model.selection("EDGE", "Sketch_1/SketchLine_2")])
 Extrusion_1 = model.addExtrusion(Part_1_doc, [], model.selection(), 10, 10)
 Sketch_2 = model.addSketch(Part_1_doc, model.defaultPlane("XOY"))
 SketchLine_3 = Sketch_2.addLine(14.6580693841429, 60.98822413573743, -10.2650686982584, 60.98822413573743)

@@ -18,6 +18,8 @@
 ## email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com>
 ##
 
+# -*- coding: utf-8 -*-
+
 from salome.shaper import model
 
 # Create document
@@ -33,7 +35,7 @@ Box_1 = model.addBox(Part_1_doc, 10, 10, 10)
 Box_2 = model.addBox(Part_1_doc, 10, 10, 10)
 Translation_1 = model.addTranslation(Part_1_doc, [model.selection("SOLID", "Box_2_1")], model.selection("EDGE", "PartSet/OX"), 10)
 
-Shell_1 = model.addShell(Part_1_doc, [model.selection("FACE", "Box_1_1/Top"), model.selection("FACE", "Translation_1_1/Translated_Face_1")])
+Shell_1 = model.addShell(Part_1_doc, [model.selection("FACE", "Box_1_1/Top"), model.selection("FACE", "Translation_1_1/MF:Translated&Box_2_1/Top")])
 model.do()
 
 model.checkResult(Shell_1, model, 1, [0], [0], [2], [8], [16])
