@@ -311,6 +311,13 @@ void Model_BodyBuilder::buildName(const int theTag, const std::string& theName)
 void Model_BodyBuilder::generated(const GeomShapePtr& theNewShape,
                                   const std::string& theName)
 {
+  GeomShapePtr aResultShape = shape();
+
+  bool aNewShapeIsNotInResultShape = !aResultShape->isSubShape(theNewShape, false);
+  if (aNewShapeIsNotInResultShape) {
+    return;
+  }
+
   TopoDS_Shape aShape = theNewShape->impl<TopoDS_Shape>();
   builder(myFreePrimitiveTag)->Generated(aShape);
   if (!theName.empty()) {
@@ -565,7 +572,9 @@ void Model_BodyBuilder::loadGeneratedShapes(const GeomMakeShapePtr& theAlgo,
                                             const GeomAPI_Shape::ShapeType theShapeTypeToExplore,
                                             const std::string& theName)
 {
+  GeomShapePtr aResultShape = shape();
   TopTools_MapOfShape anAlreadyProcessedShapes;
+  std::shared_ptr<Model_Data> aData = std::dynamic_pointer_cast<Model_Data>(data());
   for (GeomAPI_ShapeExplorer anOldShapeExp(theOldShape, theShapeTypeToExplore);
        anOldShapeExp.more();
        anOldShapeExp.next())
@@ -573,8 +582,16 @@ void Model_BodyBuilder::loadGeneratedShapes(const GeomMakeShapePtr& theAlgo,
     GeomShapePtr anOldSubShape = anOldShapeExp.current();
     const TopoDS_Shape& anOldSubShape_ = anOldSubShape->impl<TopoDS_Shape>();
 
-    // There is no sense to write history if shape already processed.
-    if (!anAlreadyProcessedShapes.Add(anOldSubShape_)) continue;
+    // There is no sense to write history if shape already processed
+    // or old shape does not exist in the document.
+    bool anOldSubShapeAlreadyProcessed = !anAlreadyProcessedShapes.Add(anOldSubShape_);
+    bool anOldSubShapeNotInTree = TNaming_Tool::NamedShape(anOldSubShape_, aData->shapeLab())
+                                  .IsNull();
+    if (anOldSubShapeAlreadyProcessed
+        || anOldSubShapeNotInTree)
+    {
+      continue;
+    }
 
     // Get new shapes.
     ListOfShape aNewShapes;
@@ -588,6 +605,14 @@ void Model_BodyBuilder::loadGeneratedShapes(const GeomMakeShapePtr& theAlgo,
     {
       GeomShapePtr aNewShape = *aNewShapesIt;
       const TopoDS_Shape& aNewShape_ = aNewShape->impl<TopoDS_Shape>();
+
+      bool aNewShapeIsSameAsOldShape = anOldSubShape->isSame(aNewShape);
+      bool aNewShapeIsNotInResultShape = !aResultShape->isSubShape(aNewShape, false);
+      if (aNewShapeIsSameAsOldShape
+        || aNewShapeIsNotInResultShape)
+      {
+        continue;
+      }
 
       TopAbs_ShapeEnum aNewShapeType = aNewShape_.ShapeType();
       if (aNewShapeType == TopAbs_WIRE || aNewShapeType == TopAbs_SHELL) {

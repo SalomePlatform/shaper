@@ -52,11 +52,44 @@ Model_ResultBody::~Model_ResultBody()
   delete myBuilder;
 }
 
-void Model_ResultBody::loadModifiedShapes(
-  const std::shared_ptr<GeomAlgoAPI_MakeShape>& theAlgo,
-  const GeomShapePtr& theOldShape,
-  const GeomAPI_Shape::ShapeType theShapeTypeToExplore,
-  const std::string& theName)
+void Model_ResultBody::generated(const GeomShapePtr& theNewShape,
+                                 const std::string& theName)
+{
+  if (mySubs.size()) { // consists of subs
+    for (std::vector<ResultBodyPtr>::const_iterator aSubIter = mySubs.cbegin();
+         aSubIter != mySubs.cend();
+         ++aSubIter)
+    {
+      const ResultBodyPtr& aSub = *aSubIter;
+      aSub->generated(theNewShape, theName);
+    }
+  } else { // do for this directly
+    myBuilder->generated(theNewShape, theName);
+  }
+}
+
+void Model_ResultBody::loadGeneratedShapes(const std::shared_ptr<GeomAlgoAPI_MakeShape>& theAlgo,
+                                           const GeomShapePtr& theOldShape,
+                                           const GeomAPI_Shape::ShapeType theShapeTypeToExplore,
+                                           const std::string& theName)
+{
+  if (mySubs.size()) { // consists of subs
+    for (std::vector<ResultBodyPtr>::const_iterator aSubIter = mySubs.cbegin();
+         aSubIter != mySubs.cend();
+         ++aSubIter)
+    {
+      const ResultBodyPtr& aSub = *aSubIter;
+      aSub->loadGeneratedShapes(theAlgo, theOldShape, theShapeTypeToExplore, theName);
+    }
+  } else { // do for this directly
+    myBuilder->loadGeneratedShapes(theAlgo, theOldShape, theShapeTypeToExplore, theName);
+  }
+}
+
+void Model_ResultBody::loadModifiedShapes(const std::shared_ptr<GeomAlgoAPI_MakeShape>& theAlgo,
+                                          const GeomShapePtr& theOldShape,
+                                          const GeomAPI_Shape::ShapeType theShapeTypeToExplore,
+                                          const std::string& theName)
 {
   if (/*theSplitInSubs &&*/ mySubs.size()) { // consists of subs
     // optimization of getting of new shapes for specific sub-result

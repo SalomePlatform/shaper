@@ -49,12 +49,24 @@ public:
   /// Removes the stored builders
   MODEL_EXPORT virtual ~Model_ResultBody();
 
-  /// load and orient modified shapes for sub-objects
+  /// Records the subshape newShape which was generated during a topological construction.
+  /// As an example, consider the case of a face generated in construction of a box.
+  MODELAPI_EXPORT virtual void generated(const GeomShapePtr& theNewShape,
+                                         const std::string& theName);
+
+  /// load generated shapes
+  MODELAPI_EXPORT
+  virtual void loadGeneratedShapes(const std::shared_ptr<GeomAlgoAPI_MakeShape>& theAlgo,
+                                   const GeomShapePtr& theOldShape,
+                                   const GeomAPI_Shape::ShapeType theShapeTypeToExplore,
+                                   const std::string& theName = "") override;
+
+  /// load modified shapes for sub-objects
   MODEL_EXPORT
   virtual void loadModifiedShapes(const std::shared_ptr<GeomAlgoAPI_MakeShape>& theAlgo,
                                   const GeomShapePtr& theOldShape,
                                   const GeomAPI_Shape::ShapeType theShapeTypeToExplore,
-                                  const std::string& theName) override;
+                                  const std::string& theName = "") override;
 
 
   /// Returns the number of sub-elements
