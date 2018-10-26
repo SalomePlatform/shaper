@@ -167,7 +167,7 @@ SketchConstraintDistance_7 = Sketch_2.setDistance(SketchLine_18.result(), Sketch
 model.do()
 Extrusion_1 = model.addExtrusion(Part_1_doc, [model.selection("FACE", "Sketch_1/Face-SketchLine_1r-SketchArc_1_2f-SketchLine_3f-SketchLine_4f")], model.selection(), 0.008999999999999999, 0.008999999999999999)
 Fuse_1 = model.addFuse(Part_1_doc, [model.selection("SOLID", "Revolution_1_1")], [model.selection("SOLID", "Extrusion_1_1")])
-Axis_4 = model.addAxis(Part_1_doc, model.selection("FACE", "Revolution_1_1/Generated_Face&weak_name_4"))
+Axis_4 = model.addAxis(Part_1_doc, model.selection("FACE", "(Extrusion_1_1/From_Face)7(Fuse_1_1/Modified_Face&Sketch_1/SketchArc_1_2)7(Extrusion_1_1/To_Face)7"))
 RevolutionCut_1 = model.addRevolutionCut(Part_1_doc, [], model.selection("EDGE", "PartSet/OZ"), 10, 28, [model.selection("SOLID", "Fuse_1_1")])
 Sketch_3 = model.addSketch(Part_1_doc, model.standardPlane("XOZ"))
 SketchLine_19 = Sketch_3.addLine(0.029, 0.042, 0.029, 0.03267384683690003)
