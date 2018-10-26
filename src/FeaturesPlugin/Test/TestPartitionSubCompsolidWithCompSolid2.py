@@ -42,7 +42,7 @@ Plane_4 = model.addPlane(Part_1_doc, model.selection("FACE", "Box_1_1/Left"), mo
 Plane_5 = model.addPlane(Part_1_doc, model.selection("FACE", "Box_1_1/Back"), model.selection("FACE", "Box_1_1/Front"))
 Partition_1_objects = [model.selection("SOLID", "Box_1_1"), model.selection("FACE", "Plane_1"), model.selection("FACE", "Plane_2")]
 Partition_1 = model.addPartition(Part_1_doc, Partition_1_objects)
-Partition_2_objects = [model.selection("SOLID", "Extrusion_1_1_3"), model.selection("SOLID", "Partition_1_1_1"), model.selection("SOLID", "Partition_1_1_3")]
+Partition_2_objects = [model.selection("SOLID", "Extrusion_1_1_2"), model.selection("SOLID", "Partition_1_1_1"), model.selection("SOLID", "Partition_1_1_3")]
 Partition_2 = model.addPartition(Part_1_doc, Partition_2_objects)
 model.do()
 
