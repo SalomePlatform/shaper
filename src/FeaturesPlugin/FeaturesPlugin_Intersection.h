@@ -73,7 +73,7 @@ private:
   /// Load Naming data structure of the feature to the document.
   void loadNamingDS(std::shared_ptr<ModelAPI_ResultBody> theResultBody,
                     const ListOfShape& theObjects,
-                    GeomAlgoAPI_MakeShape& theMakeShape);
+                    const std::shared_ptr<GeomAlgoAPI_MakeShape>& theMakeShape);
 };
 
 #endif

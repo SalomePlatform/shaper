@@ -68,20 +68,20 @@ void FeaturesPlugin_Intersection::execute()
   int aResultIndex = 0;
 
   // Create result.
-  GeomAlgoAPI_Intersection anIntersectionAlgo(anObjects);
+  GeomMakeShapePtr anIntersectionAlgo(new GeomAlgoAPI_Intersection(anObjects));
 
   // Checking that the algorithm worked properly.
-  if (!anIntersectionAlgo.isDone()) {
+  if (!anIntersectionAlgo->isDone()) {
     static const std::string aFeatureError = "Error: Intersection algorithm failed.";
     setError(aFeatureError);
     return;
   }
-  if (anIntersectionAlgo.shape()->isNull()) {
+  if (anIntersectionAlgo->shape()->isNull()) {
     static const std::string aShapeError = "Error: Resulting shape is Null.";
     setError(aShapeError);
     return;
   }
-  if (!anIntersectionAlgo.isValid()) {
+  if (!anIntersectionAlgo->isValid()) {
     std::string aFeatureError = "Error: Resulting shape is not valid.";
     setError(aFeatureError);
     return;
@@ -98,60 +98,22 @@ void FeaturesPlugin_Intersection::execute()
 }
 
 //=================================================================================================
-void FeaturesPlugin_Intersection::loadNamingDS(std::shared_ptr<ModelAPI_ResultBody> theResultBody,
+void FeaturesPlugin_Intersection::loadNamingDS(ResultBodyPtr theResultBody,
                                                const ListOfShape& theObjects,
-                                               GeomAlgoAPI_MakeShape& theMakeShape)
+                                               const GeomMakeShapePtr& theMakeShape)
 {
-  std::shared_ptr<GeomAPI_Shape> aResultShape = theMakeShape.shape();
+  std::shared_ptr<GeomAPI_Shape> aResultShape = theMakeShape->shape();
   theResultBody->storeModified(theObjects.front(), aResultShape);
 
-  GeomAPI_DataMapOfShapeShape aShapesMap; // Map to store {result_shape, original_shape}
-  const int aShapeTypesNb = 2;
-  const GeomAPI_Shape::ShapeType aShapeTypes[aShapeTypesNb] =
-    {GeomAPI_Shape::VERTEX, GeomAPI_Shape::EDGE};
+  const int aShapeTypesNb = 3;
+  const GeomAPI_Shape::ShapeType aShapeTypes[aShapeTypesNb] = {GeomAPI_Shape::VERTEX,
+                                                               GeomAPI_Shape::EDGE,
+                                                               GeomAPI_Shape::FACE };
   for (ListOfShape::const_iterator anIt = theObjects.cbegin(); anIt != theObjects.cend(); ++anIt) {
     const GeomShapePtr aShape = *anIt;
     for(int anIndex = 0; anIndex < aShapeTypesNb; ++anIndex) {
-      for(GeomAPI_ShapeExplorer anOrigShapeExp(aShape, aShapeTypes[anIndex]);
-          anOrigShapeExp.more();
-          anOrigShapeExp.next()) {
-        ListOfShape aHistory;
-        const GeomShapePtr aSubShape = anOrigShapeExp.current();
-        theMakeShape.modified(aSubShape, aHistory);
-        for(ListOfShape::const_iterator aHistoryIt = aHistory.cbegin();
-            aHistoryIt != aHistory.cend();
-            ++aHistoryIt) {
-          aShapesMap.bind(*aHistoryIt, aSubShape);
-        }
-      }
-    }
-  }
-
-  int aModifiedVertexIndex(1),
-      aGeneratedVertexIndex(1),
-      aModifiedEdgeIndex(1),
-      aGeneratedEdgeIndex(1);
-  int aTag = 4;
-  GeomAPI_DataMapOfShapeShape aStoredShapes;
-  for(int anIndex = 0; anIndex < aShapeTypesNb; ++anIndex) {
-    for(GeomAPI_ShapeExplorer aShapeExp(aResultShape, aShapeTypes[anIndex]);
-        aShapeExp.more();
-        aShapeExp.next()) {
-      const GeomShapePtr aSubShape = aShapeExp.current();
-      if(aStoredShapes.isBound(aSubShape)) {
-        continue;
-      }
-      if(aShapesMap.isBound(aSubShape)) {
-        theResultBody->modified(aShapesMap.find(aSubShape), aSubShape);
-      } else {
-        theResultBody->generated(
-          aSubShape,
-          std::string("Generated_")
-            + (anIndex == 0 ? "Vertex_" : "Edge_")
-            + std::to_string((long long)(anIndex == 0 ? aGeneratedVertexIndex++
-                                                      : aGeneratedEdgeIndex++)));
-      }
-      aStoredShapes.bind(aSubShape, aSubShape);
+      theResultBody->loadModifiedShapes(theMakeShape, aShape, aShapeTypes[anIndex]);
+      theResultBody->loadGeneratedShapes(theMakeShape, aShape, aShapeTypes[anIndex]);
     }
   }
 }
