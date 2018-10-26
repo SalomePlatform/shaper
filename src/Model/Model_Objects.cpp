@@ -1877,7 +1877,7 @@ void Model_Objects::updateResults(FeaturePtr theFeature, std::set<FeaturePtr>& t
             std::shared_ptr<ModelAPI_ResultPart> aNewP = createPart(theFeature->data(), aResIndex);
             theFeature->setResult(aNewP, aResIndex);
             if (!aNewP->partDoc().get())
-              // create the part result: it is better to restore the previous result if it is possible
+              // create the part result: it is better to restore the previous result if possible
               theFeature->execute();
           }
         } else if (aGroup->Get() == ModelAPI_ResultConstruction::group().c_str()) {
