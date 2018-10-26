@@ -26,6 +26,7 @@
 #include <TDF_ChildIDIterator.hxx>
 #include <TopoDS_Iterator.hxx>
 #include <TopoDS_Builder.hxx>
+#include <TopoDS.hxx>
 #include <TopExp_Explorer.hxx>
 #include <TNaming_Tool.hxx>
 #include <TNaming_NewShapeIterator.hxx>
@@ -34,6 +35,7 @@
 #include <TNaming_Iterator.hxx>
 #include <TNaming_Builder.hxx>
 #include <TopTools_MapOfShape.hxx>
+#include <BRep_Tool.hxx>
 
 #include <TDataStd_Integer.hxx>
 #include <TDataStd_ReferenceArray.hxx>
@@ -296,6 +298,8 @@ bool Selector_Selector::select(const TopoDS_Shape theContext, const TopoDS_Shape
       TopTools_MapOfShape anIntersectors; // shapes of aSelectionType that contain theValue
       TopoDS_ListOfShape anIntList; // same as anIntersectors
       for(TopExp_Explorer aSelExp(theContext, aSelectionType); aSelExp.More(); aSelExp.Next()) {
+        if (aSelectionType == TopAbs_EDGE && BRep_Tool::Degenerated(TopoDS::Edge(aSelExp.Current())))
+          continue;
         TopExp_Explorer aSubExp(aSelExp.Current(), theValue.ShapeType());
         for(; aSubExp.More(); aSubExp.Next()) {
           if (aSubExp.Current().IsSame(theValue)) {
@@ -905,6 +909,20 @@ std::string Selector_Selector::name(Selector_NameGenerator* theNameGenerator) {
       aResult += '[';
       aResult += aSubSel->name(theNameGenerator);
       aResult += ']';
+      TopAbs_ShapeEnum aSubType = aSubSel->value().ShapeType();
+      if (aSubType != TopAbs_FACE) { // in case the sub shape type must be stored
+        switch(aSubType) {
+        case TopAbs_COMPOUND: aResult += "c"; break;
+        case TopAbs_COMPSOLID: aResult += "o"; break;
+        case TopAbs_SOLID: aResult += "s"; break;
+        case TopAbs_SHELL: aResult += "h"; break;
+        case TopAbs_WIRE: aResult += "w"; break;
+        case TopAbs_EDGE: aResult += "e"; break;
+        case TopAbs_VERTEX: aResult += "v"; break;
+        default:
+          ;
+        }
+      }
     }
     if (myWeakIndex != -1) {
       std::ostringstream aWeakStr;
@@ -1004,9 +1022,25 @@ TDF_Label Selector_Selector::restoreByName(
           myWeakIndex = atoi(aWeakIndex.c_str());
           continue;
         }
+        TopAbs_ShapeEnum aSubShapeType = TopAbs_FACE;
+        if (anEndPos != std::string::npos && anEndPos + 1 > theName.size()) {
+          char aShapeChar = theName[anEndPos + 1];
+          if (theName[anEndPos + 1] != '[') {
+            switch(aShapeChar) {
+            case 'c': aSubShapeType = TopAbs_COMPOUND; break;
+            case 'o': aSubShapeType = TopAbs_COMPSOLID; break;
+            case 's': aSubShapeType = TopAbs_SOLID; break;
+            case 'h': aSubShapeType = TopAbs_SHELL; break;
+            case 'w': aSubShapeType = TopAbs_WIRE; break;
+            case 'e': aSubShapeType = TopAbs_EDGE; break;
+            case 'v': aSubShapeType = TopAbs_VERTEX; break;
+            default:;
+            }
+          }
+        }
         mySubSelList.push_back(Selector_Selector(myLab.FindChild(int(mySubSelList.size()) + 1)));
         TDF_Label aSubContext =
-          mySubSelList.back().restoreByName(aSubStr, theShapeType, theNameGenerator);
+          mySubSelList.back().restoreByName(aSubStr, aSubShapeType, theNameGenerator);
         if (aSubContext.IsNull())
           return aSubContext; // invalid sub-selection parsing
         if (!aContext.IsNull() && !aContext.IsEqual(aSubContext)) {

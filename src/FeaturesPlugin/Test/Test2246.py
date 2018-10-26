@@ -39,7 +39,7 @@ SketchConstraintCoincidence_5 = Sketch_1.setCoincident(SketchArc_1.startPoint(),
 model.do()
 Revolution_1 = model.addRevolution(Part_1_doc, [model.selection("FACE", "Sketch_1/Face-SketchArc_1_2f-SketchLine_2f")], model.selection("EDGE", "Sketch_1/SketchLine_2"), 360, 0)
 Translation_1 = model.addTranslation(Part_1_doc, [model.selection("SOLID", "Revolution_1_1")], model.selection("EDGE", "PartSet/OY"), 150)
-Group_1 = model.addGroup(Part_1_doc, [model.selection("VERTEX", "[[Translation_1_1/MF:Translated&Sketch_1/SketchArc_1_2][weak_name_2]][[Translation_1_1/MF:Translated&Sketch_1/SketchArc_1_2][weak_name_1]]"), model.selection("VERTEX", "[[Translation_1_1/MF:Translated&Sketch_1/SketchArc_1_2][weak_name_3]][[Translation_1_1/MF:Translated&Sketch_1/SketchArc_1_2][weak_name_1]]")])
+Group_1 = model.addGroup(Part_1_doc, [model.selection("VERTEX", "[Translation_1_1/MF:Translated&Sketch_1/SketchArc_1_2][weak_name_1]"), model.selection("VERTEX", "[Translation_1_1/MF:Translated&Sketch_1/SketchArc_1_2][weak_name_2]")])
 model.do()
 model.end()
 
