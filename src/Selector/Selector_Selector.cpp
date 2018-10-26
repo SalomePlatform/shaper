@@ -1032,6 +1032,9 @@ TDF_Label Selector_Selector::restoreByName(
         } else {
           aContext = aSubContext;
         }
+        if (!aContext.IsNull()) // for filters by neighbour the latest context shape is vital
+          aContext = theNameGenerator->newestContext(aContext);
+
         // searching for the level index
         std::string aLevel;
         for(anEndPos++; anEndPos != std::string::npos &&

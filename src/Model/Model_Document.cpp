@@ -1000,12 +1000,14 @@ void Model_Document::moveFeature(FeaturePtr theMoved, FeaturePtr theAfterThis)
 
 void Model_Document::updateHistory(const std::shared_ptr<ModelAPI_Object> theObject)
 {
-  myObjs->updateHistory(theObject);
+  if (myObjs)
+    myObjs->updateHistory(theObject);
 }
 
 void Model_Document::updateHistory(const std::string theGroup)
 {
-  myObjs->updateHistory(theGroup);
+  if (myObjs)
+    myObjs->updateHistory(theGroup);
 }
 
 const std::set<int> Model_Document::subDocuments() const

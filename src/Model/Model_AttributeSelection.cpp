@@ -1682,6 +1682,18 @@ bool Model_AttributeSelection::restoreContext(std::string theName,
   return true;
 }
 
+TDF_Label Model_AttributeSelection::newestContext(const TDF_Label theCurrentContext) {
+  std::shared_ptr<Model_Document> aDoc = myRestoreDocument.get() ? myRestoreDocument :
+    std::dynamic_pointer_cast<Model_Document>(owner()->document());
+  ResultPtr aContext = aDoc->resultByLab(theCurrentContext);
+  if (aContext.get()) {
+    aContext = newestContext(aContext, GeomShapePtr(), true);
+    if (aContext.get())
+      return std::dynamic_pointer_cast<Model_Data>(aContext->data())->label();
+  }
+  return theCurrentContext; // nothing is changed
+}
+
 bool Model_AttributeSelection::isLater(
   const TDF_Label theResult1, const TDF_Label theResult2) const
 {
@@ -1697,7 +1709,7 @@ bool Model_AttributeSelection::isLater(
 }
 
 ResultPtr Model_AttributeSelection::newestContext(
-  const ResultPtr theCurrent, const GeomShapePtr theValue)
+  const ResultPtr theCurrent, const GeomShapePtr theValue, const bool theAnyValue)
 {
   ResultPtr aResult = theCurrent;
   GeomShapePtr aSelectedShape = theValue.get() ? theValue : theCurrent->shape();
@@ -1716,7 +1728,7 @@ ResultPtr Model_AttributeSelection::newestContext(
         TDF_Label aLab = aNS->Label();
         ResultPtr aRes = aDoc->resultByLab(aLab);
         if (aRes.get()) {
-          if (aRes->shape()->isSubShape(aSelectedShape)) {
+          if (theAnyValue || aRes->shape()->isSubShape(aSelectedShape)) {
             aResult = aRes;
             aFindNewContext = true;
             continue;
@@ -1724,57 +1736,57 @@ ResultPtr Model_AttributeSelection::newestContext(
         }
       }
     }
-    if (aResult->groupName() == ModelAPI_ResultBody::group()) {
+    // TestFillWireVertex.py - sketch constructions for wire may participate too
+    //if (aResult->groupName() == ModelAPI_ResultBody::group()) {
       // try to search newer context by the concealment references
       // take references to all results: root one, any sub
-      std::list<ResultPtr> allRes;
-      ResultPtr aCompContext;
-      ResultBodyPtr aCompBody = ModelAPI_Tools::bodyOwner(aResult, true);
-      if (aCompBody.get()) {
-        ModelAPI_Tools::allSubs(aCompBody, allRes);
-        allRes.push_back(aCompBody);
-        aCompContext = aCompBody;
-      }
-      if (allRes.empty())
-        allRes.push_back(aResult);
+    std::list<ResultPtr> allRes;
+    ResultPtr aCompContext;
+    ResultBodyPtr aCompBody = ModelAPI_Tools::bodyOwner(aResult, true);
+    if (aCompBody.get()) {
+      ModelAPI_Tools::allSubs(aCompBody, allRes);
+      allRes.push_back(aCompBody);
+      aCompContext = aCompBody;
+    }
+    if (allRes.empty())
+      allRes.push_back(aResult);
 
-      for (std::list<ResultPtr>::iterator aSub = allRes.begin(); aSub != allRes.end(); aSub++) {
-        ResultPtr aResCont = *aSub;
-        ResultBodyPtr aResBody = std::dynamic_pointer_cast<ModelAPI_ResultBody>(aResCont);
-        if (aResBody.get() && aResBody->numberOfSubs() > 0 && aResBody != aCompContext)
-          continue; // only lower and higher level subs are counted
-        const std::set<AttributePtr>& aRefs = aResCont->data()->refsToMe();
-        std::set<AttributePtr>::const_iterator aRef = aRefs.begin();
-        for (; !aFindNewContext && aRef != aRefs.end(); aRef++) {
-          if (!aRef->get() || !(*aRef)->owner().get())
-            continue;
-          // concealed attribute only
-          FeaturePtr aRefFeat = std::dynamic_pointer_cast<ModelAPI_Feature>((*aRef)->owner());
-          if (!ModelAPI_Session::get()->validators()->isConcealed(
-            aRefFeat->getKind(), (*aRef)->id()))
-            continue;
-          // search the feature result that contains sub-shape selected
-          std::list<std::shared_ptr<ModelAPI_Result> > aResults;
+    for (std::list<ResultPtr>::iterator aSub = allRes.begin(); aSub != allRes.end(); aSub++) {
+      ResultPtr aResCont = *aSub;
+      ResultBodyPtr aResBody = std::dynamic_pointer_cast<ModelAPI_ResultBody>(aResCont);
+      if (aResBody.get() && aResBody->numberOfSubs() > 0 && aResBody != aCompContext)
+        continue; // only lower and higher level subs are counted
+      const std::set<AttributePtr>& aRefs = aResCont->data()->refsToMe();
+      std::set<AttributePtr>::const_iterator aRef = aRefs.begin();
+      for (; !aFindNewContext && aRef != aRefs.end(); aRef++) {
+        if (!aRef->get() || !(*aRef)->owner().get())
+          continue;
+        // concealed attribute only
+        FeaturePtr aRefFeat = std::dynamic_pointer_cast<ModelAPI_Feature>((*aRef)->owner());
+        if (!ModelAPI_Session::get()->validators()->isConcealed(
+          aRefFeat->getKind(), (*aRef)->id()))
+          continue;
+        // search the feature result that contains sub-shape selected
+        std::list<std::shared_ptr<ModelAPI_Result> > aResults;
 
-          // take all sub-results or one result
-          std::list<ResultPtr> aRefFeatResults;
-          ModelAPI_Tools::allResults(aRefFeat, aRefFeatResults);
-          std::list<ResultPtr>::iterator aRefResIter = aRefFeatResults.begin();
-          for (; aRefResIter != aRefFeatResults.end(); aRefResIter++) {
-            ResultBodyPtr aBody = std::dynamic_pointer_cast<ModelAPI_ResultBody>(*aRefResIter);
-            if (aBody.get() && aBody->numberOfSubs() == 0) // add only lower level subs
-              aResults.push_back(aBody);
-          }
-          std::list<std::shared_ptr<ModelAPI_Result> >::iterator aResIter = aResults.begin();
-          for (; aResIter != aResults.end(); aResIter++) {
-            if (!aResIter->get() || !(*aResIter)->data()->isValid() || (*aResIter)->isDisabled())
-              continue;
-            GeomShapePtr aShape = (*aResIter)->shape();
-            if (aShape.get() && aShape->isSubShape(aSelectedShape, false)) {
-              aResult = *aResIter; // found new context (produced from this) with same subshape
-              aFindNewContext = true; // continue searching futher
-              break;
-            }
+        // take all sub-results or one result
+        std::list<ResultPtr> aRefFeatResults;
+        ModelAPI_Tools::allResults(aRefFeat, aRefFeatResults);
+        std::list<ResultPtr>::iterator aRefResIter = aRefFeatResults.begin();
+        for (; aRefResIter != aRefFeatResults.end(); aRefResIter++) {
+          ResultBodyPtr aBody = std::dynamic_pointer_cast<ModelAPI_ResultBody>(*aRefResIter);
+          if (aBody.get() && aBody->numberOfSubs() == 0) // add only lower level subs
+            aResults.push_back(aBody);
+        }
+        std::list<std::shared_ptr<ModelAPI_Result> >::iterator aResIter = aResults.begin();
+        for (; aResIter != aResults.end(); aResIter++) {
+          if (!aResIter->get() || !(*aResIter)->data()->isValid() || (*aResIter)->isDisabled())
+            continue;
+          GeomShapePtr aShape = (*aResIter)->shape();
+          if (aShape.get() && (theAnyValue || aShape->isSubShape(aSelectedShape, false))) {
+            aResult = *aResIter; // found new context (produced from this) with same subshape
+            aFindNewContext = true; // continue searching futher
+            break;
           }
         }
       }
@@ -1789,11 +1801,15 @@ ResultPtr Model_AttributeSelection::newestContext(
     for (; aS != allSubs.end(); aS++) {
       ResultBodyPtr aSub = std::dynamic_pointer_cast<ModelAPI_ResultBody>(*aS);
       if (aSub && aSub->numberOfSubs() == 0 && aSub->shape().get() &&
-        aSub->shape()->isSubShape(aSelectedShape)) {
+        (theAnyValue || aSub->shape()->isSubShape(aSelectedShape))) {
         aResult = aSub;
         break;
       }
     }
   }
+  // in case sketch line was selected for wire, but wire was concealed and not such line anymore,
+  // so, actually, the sketch element was selected (which is never concealed)
+  if (aResult != theCurrent && aResult->isConcealed())
+    aResult = theCurrent;
   return aResult;
 }
