@@ -31,15 +31,20 @@
 /// \brief Performs the intersection operations.
 class GeomAlgoAPI_Intersection : public GeomAlgoAPI_MakeShape
 {
+  void* myFiller; ///< store filler to avoid memory leaks
 public:
   /// \brief Constructor.
   /// \param[in] theObjects list of objects.
   /// \param[in] theTools list of tools.
   GEOMALGOAPI_EXPORT GeomAlgoAPI_Intersection(const ListOfShape& theObjects);
 
+  /// Destructor to erase the filler
+  GEOMALGOAPI_EXPORT virtual ~GeomAlgoAPI_Intersection();
+
 private:
   /// Builds resulting shape.
   void build(const ListOfShape& theObjects);
+
 };
 
 #endif

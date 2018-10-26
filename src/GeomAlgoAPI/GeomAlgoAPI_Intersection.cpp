@@ -27,10 +27,15 @@
 
 //==================================================================================================
 GeomAlgoAPI_Intersection::GeomAlgoAPI_Intersection(const ListOfShape& theObjects)
+  : myFiller(0)
 {
   build(theObjects);
 }
 
+GeomAlgoAPI_Intersection::~GeomAlgoAPI_Intersection() {
+  if (myFiller)
+    delete (BOPAlgo_PaveFiller*)myFiller;
+}
 //==================================================================================================
 void GeomAlgoAPI_Intersection::build(const ListOfShape& theObjects)
 {
@@ -53,21 +58,22 @@ void GeomAlgoAPI_Intersection::build(const ListOfShape& theObjects)
     }
   }
 
-  BOPAlgo_PaveFiller aDSFiller;
-  aDSFiller.SetArguments(anObjects);
+  BOPAlgo_PaveFiller* aDSFiller = new BOPAlgo_PaveFiller;
+  myFiller = aDSFiller;
+  aDSFiller->SetArguments(anObjects);
 
-  aDSFiller.SetRunParallel(false);
-  aDSFiller.SetNonDestructive(false);
-  aDSFiller.SetGlue(BOPAlgo_GlueOff);
+  aDSFiller->SetRunParallel(false);
+  aDSFiller->SetNonDestructive(false);
+  aDSFiller->SetGlue(BOPAlgo_GlueOff);
 
   // optimization for the issue #2399
   BOPAlgo_SectionAttribute theSecAttr(Standard_True,
                                       Standard_True,
                                       Standard_True);
-  aDSFiller.SetSectionAttribute(theSecAttr);
+  aDSFiller->SetSectionAttribute(theSecAttr);
 
-  aDSFiller.Perform();
-  if (aDSFiller.HasErrors()) {
+  aDSFiller->Perform();
+  if (aDSFiller->HasErrors()) {
     return;
   }
 
@@ -75,7 +81,7 @@ void GeomAlgoAPI_Intersection::build(const ListOfShape& theObjects)
   anOperation->SetRunParallel(false);
   anOperation->SetCheckInverted(true);
 
-  anOperation->PerformWithFiller(aDSFiller);
+  anOperation->PerformWithFiller(*aDSFiller); // it references a filler fields, so keep the filler
   if(anOperation->HasErrors()) {
     return;
   }
