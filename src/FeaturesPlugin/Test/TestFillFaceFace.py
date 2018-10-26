@@ -55,8 +55,8 @@ SketchConstraintCoincidence_9 = Sketch_2.setCoincident(SketchLine_5.endPoint(), 
 SketchConstraintCoincidence_10 = Sketch_2.setCoincident(SketchArc_2.endPoint(), SketchLine_4.startPoint())
 SketchConstraintRadius_2 = Sketch_2.setRadius(SketchArc_2.results()[1], "R")
 model.do()
-Face_1 = model.addFace(Part_1_doc, [model.selection("WIRE", "[Sketch_1/SubEdge&Sketch_1/SketchLine_1][Sketch_1/SubEdge&Sketch_1/SketchLine_3][Sketch_1/SubEdge&Sketch_1/SketchArc_1_2]")])
-Face_2 = model.addFace(Part_1_doc, [model.selection("WIRE", "[Sketch_2/SubEdge&Sketch_2/SketchLine_4][Sketch_2/SubEdge&Sketch_2/SketchLine_5][Sketch_2/SubEdge&Sketch_2/SketchArc_2_2]")])
+Face_1 = model.addFace(Part_1_doc, [model.selection("WIRE", "Sketch_1/Face-SketchLine_1r-SketchLine_3f-SketchArc_1_2f_wire")])
+Face_2 = model.addFace(Part_1_doc, [model.selection("WIRE", "Sketch_2/Face-SketchLine_4r-SketchLine_5f-SketchArc_2_2f_wire")])
 Fill_1 = model.addFill(Part_1_doc, [model.selection("FACE", "Face_1_1")], [model.selection("FACE", "Face_2_1")])
 model.do()
 

@@ -52,8 +52,8 @@ SketchLine_8 = Sketch_2.addLine(38.20105433548567, 71.93732104572751, -42.388338
 SketchConstraintCoincidence_9 = Sketch_2.setCoincident(SketchLine_7.endPoint(), SketchLine_8.startPoint())
 SketchConstraintCoincidence_10 = Sketch_2.setCoincident(SketchLine_4.startPoint(), SketchLine_8.endPoint())
 model.do()
-Face_1 = model.addFace(Part_1_doc, [model.selection("WIRE", "[Sketch_1/SubEdge&Sketch_1/SketchLine_1][Sketch_1/SubEdge&Sketch_1/SketchLine_3][Sketch_1/SubEdge&Sketch_1/SketchArc_1_2]")])
-Wire_1 = model.addWire(Part_1_doc, [model.selection("WIRE", "[Sketch_2/SubEdge&Sketch_2/SketchLine_4][Sketch_2/SubEdge&Sketch_2/SketchLine_5][Sketch_2/SubEdge&Sketch_2/SketchLine_6][Sketch_2/SubEdge&Sketch_2/SketchLine_7][Sketch_2/SubEdge&Sketch_2/SketchLine_8]")])
+Face_1 = model.addFace(Part_1_doc, [model.selection("WIRE", "Sketch_1/Face-SketchLine_1r-SketchLine_3f-SketchArc_1_2f_wire")])
+Wire_1 = model.addWire(Part_1_doc, [model.selection("WIRE", "Sketch_2/Face-SketchLine_4r-SketchLine_5f-SketchLine_6f-SketchLine_7f-SketchLine_8f_wire")])
 Fill_1 = model.addFill(Part_1_doc, [model.selection("FACE", "Face_1_1")], [model.selection("WIRE", "Wire_1_1")])
 model.do()
 

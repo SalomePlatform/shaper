@@ -51,7 +51,7 @@ SketchConstraintDistanceVertical_1 = Sketch_1.setVerticalDistance(SketchAPI_Line
 SketchConstraintDistance_1 = Sketch_1.setDistance(SketchAPI_Line(SketchLine_1).startPoint(), SketchLine_3.startPoint(), "Shift", True)
 model.do()
 Plane_5 = model.addPlane(Part_1_doc, model.selection("FACE", "Box_1_1/Left"), "Shift/3", True)
-Face_1 = model.addFace(Part_1_doc, [model.selection("WIRE", "[Sketch_1/SubEdge&Sketch_1/SketchArc_1_2][Sketch_1/SubEdge&Sketch_1/SketchLine_2][Sketch_1/SubEdge&Sketch_1/SketchLine_3]")])
+Face_1 = model.addFace(Part_1_doc, [model.selection("WIRE", "Sketch_1/Face-SketchArc_1_2f-SketchLine_2f-SketchLine_3f_wire")])
 Fill_1 = model.addFill(Part_1_doc, [model.selection("FACE", "Face_1_1")], [model.selection("FACE", "Plane_2")])
 Shell_1 = model.addShell(Part_1_doc, [model.selection("FACE", "Fill_1_1_2"), model.selection("FACE", "Fill_1_1_1")])
 LinearCopy_1 = model.addMultiTranslation(Part_1_doc, [model.selection("SHELL", "Shell_1_1")], model.selection("EDGE", "PartSet/OZ"), 1, 3)

@@ -392,7 +392,10 @@ void Model_ResultConstruction::storeShape(std::shared_ptr<GeomAPI_Shape> theShap
               if (!anEdgesBuilder) {
                 TDF_Label anEdgesLabel = aLab.FindChild(1);
                 anEdgesBuilder = new TNaming_Builder(anEdgesLabel);
-                TDataStd_Name::Set(anEdgesLabel, "SubEdge");
+                std::ostringstream aSubName;
+                // tag is needed for Test1922 to distinguish subedges of different faces
+                aSubName<<"SubEdge_"<<aCurrentTag;
+                TDataStd_Name::Set(anEdgesLabel, aSubName.str().c_str());
               }
               anEdgesBuilder->Modify(anEdgeIndices.Find(aModIndex), aPutEdges.Current());
             }
@@ -400,6 +403,20 @@ void Model_ResultConstruction::storeShape(std::shared_ptr<GeomAPI_Shape> theShap
           }
           TDataStd_Name::Set(aLab, TCollection_ExtendedString(aName.str().c_str()));
           aMyDoc->addNamingName(aLab, aName.str());
+          // put also wires to sub-labels to correctly select them instead of collection by edges
+          int aWireTag = 2; // first tag is for SubEdge-s
+          for(TopExp_Explorer aWires(aFaceToPut, TopAbs_WIRE); aWires.More(); aWires.Next()) {
+            TDF_Label aWireLab = aLab.FindChild(aWireTag);
+            TNaming_Builder aWireBuilder(aWireLab);
+            aWireBuilder.Generated(aWires.Current());
+            std::ostringstream aWireName;
+            aWireName<<aName.str()<<"_wire";
+            if (aWireTag > 2)
+              aWireName<<"_"<<aWireTag - 1;
+            TDataStd_Name::Set(aWireLab, aWireName.str().c_str());
+            aMyDoc->addNamingName(aWireLab, aWireName.str());
+            aWireTag++;
+          }
         }
       }
     }

@@ -49,7 +49,7 @@ SketchProjection_2 = Sketch_2.addProjection(model.selection("VERTEX", "Sketch_1/
 SketchPoint_2 = SketchProjection_2.createdFeature()
 SketchConstraintCoincidence_6 = Sketch_2.setCoincident(SketchLine_5.startPoint(), SketchPoint_2.result())
 model.do()
-Extrusion_1 = model.addExtrusion(Part_1_doc, [model.selection("WIRE", "[Sketch_1/SubEdge&Sketch_1/SketchLine_4][Sketch_1/SubEdge&Sketch_1/SketchLine_3][Sketch_1/SubEdge&Sketch_1/SketchLine_2][Sketch_1/SubEdge&Sketch_1/SketchLine_1]")], model.selection("EDGE", "Sketch_2/SketchLine_5"), 100, 0)
+Extrusion_1 = model.addExtrusion(Part_1_doc, [model.selection("WIRE", "Sketch_1/Face-SketchLine_4r-SketchLine_3r-SketchLine_2r-SketchLine_1r_wire")], model.selection("EDGE", "Sketch_2/SketchLine_5"), 100, 0)
 model.do()
 model.end()
 

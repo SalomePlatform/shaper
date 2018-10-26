@@ -72,8 +72,8 @@ SketchProjection_2 = Sketch_2.addProjection(model.selection("VERTEX", "PartSet/O
 SketchPoint_1 = SketchProjection_2.createdFeature()
 SketchConstraintDistance_2 = Sketch_2.setDistance(SketchAPI_Point(SketchPoint_1).coordinates(), SketchLine_9.result(), "L", True)
 model.do()
-Face_1 = model.addFace(Part_1_doc, [model.selection("WIRE", "[Sketch_1/SubEdge&Sketch_1/SketchLine_1][Sketch_1/SubEdge&Sketch_1/SketchLine_6][Sketch_1/SubEdge&Sketch_1/SketchLine_5]")])
-Face_2 = model.addFace(Part_1_doc, [model.selection("WIRE", "[Sketch_1/SubEdge&Sketch_1/SketchLine_3][Sketch_1/SubEdge&Sketch_1/SketchLine_4][Sketch_1/SubEdge&Sketch_1/SketchLine_6]")])
+Face_1 = model.addFace(Part_1_doc, [model.selection("WIRE", "Sketch_1/Face-SketchLine_1r-SketchLine_6r-SketchLine_5f_wire")])
+Face_2 = model.addFace(Part_1_doc, [model.selection("WIRE", "Sketch_1/Face-SketchLine_3f-SketchLine_4f-SketchLine_6f_wire")])
 Shell_1 = model.addShell(Part_1_doc, [model.selection("FACE", "Face_1_1"), model.selection("FACE", "Face_2_1")])
 Wire_1_objects = [model.selection("EDGE", "Sketch_2/SketchLine_7"), model.selection("EDGE", "Sketch_2/SketchLine_8"), model.selection("EDGE", "Sketch_2/SketchLine_9"), model.selection("EDGE", "Sketch_2/SketchLine_10")]
 Wire_1 = model.addWire(Part_1_doc, Wire_1_objects)
