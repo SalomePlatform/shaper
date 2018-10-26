@@ -273,7 +273,7 @@ bool Selector_Selector::select(const TopoDS_Shape theContext, const TopoDS_Shape
         aSelectionType == TopAbs_SHELL || aSelectionType == TopAbs_WIRE)
     { // iterate all sub-shapes and select them on sublabels
       for(TopoDS_Iterator aSubIter(theValue); aSubIter.More(); aSubIter.Next()) {
-        if (!selectBySubSelector(theContext, aSubIter.Value())) {
+        if (!selectBySubSelector(theContext, aSubIter.Value(), theUseNeighbors)) {
           return false; // if some selector is failed, everything is failed
         }
       }
@@ -313,7 +313,7 @@ bool Selector_Selector::select(const TopoDS_Shape theContext, const TopoDS_Shape
         mySubSelList.clear();
         TopoDS_ListOfShape::Iterator anInt(anIntList);
         for (; anInt.More(); anInt.Next()) {
-          if (!selectBySubSelector(theContext, anInt.Value())) {
+          if (!selectBySubSelector(theContext, anInt.Value(), theUseNeighbors)) {
             break; // if some selector is failed, stop and search another solution
           }
         }
@@ -338,14 +338,17 @@ bool Selector_Selector::select(const TopoDS_Shape theContext, const TopoDS_Shape
       if (aNewNB.Extent() == 0) { // there are no neighbors of the given level, stop iteration
         break;
       }
-      // check which can be named correctly, without by neighbors type
-      for(TopTools_MapOfShape::Iterator aNBIter(aNewNB); aNBIter.More(); ) {
-        Selector_Selector aSelector(myLab.FindChild(1));
-        if (aSelector.select(theContext, aNBIter.Value(), false)) { // add to the list of good NBs
-          aNBs.push_back(std::pair<TopoDS_Shape, int>(aNBIter.Value(), aLevel));
+      // iterate by the order in theContext to keep same naming names
+      TopExp_Explorer anOrder(theContext, theValue.ShapeType());
+      for (; anOrder.More(); anOrder.Next()) {
+        if (aNewNB.Contains(anOrder.Current())) {
+          TopoDS_Shape aNewNBShape = anOrder.Current();
+          // check which can be named correctly, without "by neighbors" type
+          Selector_Selector aSelector(myLab.FindChild(1));
+          if (aSelector.select(theContext, aNewNBShape, false)) { // add to the list of good NBs
+            aNBs.push_back(std::pair<TopoDS_Shape, int>(aNewNBShape, aLevel));
+          }
         }
-        aNewNB.Remove(aNBIter.Key());
-        aNBIter.Initialize(aNewNB);
       }
       TopoDS_Shape aResult = findNeighbor(theContext, aNBs);
       if (!aResult.IsNull() && aResult.IsSame(theValue)) {
@@ -371,7 +374,7 @@ bool Selector_Selector::select(const TopoDS_Shape theContext, const TopoDS_Shape
         mySubSelList.clear();
         TopoDS_ListOfShape::Iterator anInt(aLastIntersectors);
         for (; anInt.More(); anInt.Next()) {
-          if (!selectBySubSelector(theContext, anInt.Value())) {
+          if (!selectBySubSelector(theContext, anInt.Value(), theUseNeighbors)) {
             break; // if some selector is failed, stop and search another solution
           }
         }
@@ -484,20 +487,23 @@ bool Selector_Selector::select(const TopoDS_Shape theContext, const TopoDS_Shape
           if (aNewNB.Extent() == 0) { // there are no neighbors of the given level, stop iteration
             break;
           }
-          // check which can be named correctly, without by neighbors type
-          for(TopTools_MapOfShape::Iterator aNBIter(aNewNB); aNBIter.More(); ) {
-            Selector_Selector aSelector(myLab.FindChild(1));
-            if (aSelector.select(theContext, aNBIter.Value(), false)) {// add to list of good NBs
-              aNBs.push_back(std::pair<TopoDS_Shape, int>(aNBIter.Value(), aLevel));
+          // iterate by the order in theContext to keep same naming names
+          TopExp_Explorer anOrder(theContext, theValue.ShapeType());
+          for (; anOrder.More(); anOrder.Next()) {
+            if (aNewNB.Contains(anOrder.Current())) {
+              TopoDS_Shape aNewNBShape = anOrder.Current();
+              // check which can be named correctly, without "by neighbors" type
+              Selector_Selector aSelector(myLab.FindChild(1));
+              if (aSelector.select(theContext, aNewNBShape, false)) {// add to list of good NBs
+                aNBs.push_back(std::pair<TopoDS_Shape, int>(aNewNBShape, aLevel));
+              }
             }
-            aNewNB.Remove(aNBIter.Key());
-            aNBIter.Initialize(aNewNB);
           }
           TopoDS_Shape aResult = findNeighbor(theContext, aNBs);
           if (!aResult.IsNull() && aResult.IsSame(theValue)) {
             std::list<std::pair<TopoDS_Shape, int> >::iterator aNBIter = aNBs.begin();
             for(; aNBIter != aNBs.end(); aNBIter++) {
-              if (!selectBySubSelector(theContext, aNBIter->first)) {
+              if (!selectBySubSelector(theContext, aNBIter->first, theUseNeighbors)) {
                 return false; // something is wrong because before this selection was ok
               }
               myNBLevel.push_back(aNBIter->second);
