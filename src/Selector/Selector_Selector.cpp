@@ -298,7 +298,8 @@ bool Selector_Selector::select(const TopoDS_Shape theContext, const TopoDS_Shape
       TopTools_MapOfShape anIntersectors; // shapes of aSelectionType that contain theValue
       TopoDS_ListOfShape anIntList; // same as anIntersectors
       for(TopExp_Explorer aSelExp(theContext, aSelectionType); aSelExp.More(); aSelExp.Next()) {
-        if (aSelectionType == TopAbs_EDGE && BRep_Tool::Degenerated(TopoDS::Edge(aSelExp.Current())))
+        if (aSelectionType == TopAbs_EDGE &&
+            BRep_Tool::Degenerated(TopoDS::Edge(aSelExp.Current())))
           continue;
         TopExp_Explorer aSubExp(aSelExp.Current(), theValue.ShapeType());
         for(; aSubExp.More(); aSubExp.Next()) {
