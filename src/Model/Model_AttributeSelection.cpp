@@ -1720,18 +1720,23 @@ ResultPtr Model_AttributeSelection::newestContext(
     aFindNewContext = false;
     // try to find the last context to find the up to date shape
     TopoDS_Shape aConShape = aResult->shape()->impl<TopoDS_Shape>();
-    Handle(TNaming_NamedShape) aNS = TNaming_Tool::NamedShape(aConShape, selectionLabel());
-    if (!aNS.IsNull()) {
-      aNS = TNaming_Tool::CurrentNamedShape(aNS);
-      if (!aNS.IsNull() && isLater(selectionLabel(), aNS->Label()) &&
-          isLater(aNS->Label(), std::dynamic_pointer_cast<Model_Data>(aResult->data())->label())) {
-        TDF_Label aLab = aNS->Label();
-        ResultPtr aRes = aDoc->resultByLab(aLab);
-        if (aRes.get()) {
-          if (theAnyValue || aRes->shape()->isSubShape(aSelectedShape)) {
-            aResult = aRes;
-            aFindNewContext = true;
-            continue;
+    if (TNaming_Tool::HasLabel(selectionLabel(), aConShape)) {
+      Handle(TNaming_NamedShape) aNS = TNaming_Tool::NamedShape(aConShape, selectionLabel());
+      if (!aNS.IsNull()) {
+        aNS = TNaming_Tool::CurrentNamedShape(aNS);
+        if (!aNS.IsNull()
+            && isLater(selectionLabel(), aNS->Label())
+            && isLater(aNS->Label(),
+                       std::dynamic_pointer_cast<Model_Data>(aResult->data())->label()))
+        {
+          TDF_Label aLab = aNS->Label();
+          ResultPtr aRes = aDoc->resultByLab(aLab);
+          if (aRes.get()) {
+            if (theAnyValue || aRes->shape()->isSubShape(aSelectedShape)) {
+              aResult = aRes;
+              aFindNewContext = true;
+              continue;
+            }
           }
         }
       }
