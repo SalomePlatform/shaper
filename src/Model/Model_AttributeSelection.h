@@ -188,6 +188,10 @@ protected:
                         ResultPtr theContext, TopoDS_Shape theValShape, TDF_Label theAccessLabel,
                         std::list<ResultPtr>& theResults, TopTools_ListOfShape& theValShapes);
 
+  /// Searches for the newest context, modification of the current, that contains theValue
+  ResultPtr newestContext(const ResultPtr theCurrent,
+    const std::shared_ptr<GeomAPI_Shape> theValue);
+
   /// computes theShapes list - shapes that were generated/modified/deleted the theValShape
   /// during creation from new to old context
   void computeValues(ResultPtr theOldContext, ResultPtr theNewContext, TopoDS_Shape theValShape,
