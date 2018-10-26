@@ -21,7 +21,8 @@
 #include "SHAPERGUI.h"
 #include "SHAPERGUI_DataModel.h"
 #include "SHAPERGUI_OCCSelector.h"
-#include <SHAPERGUI_NestedButton.h>
+#include "SHAPERGUI_NestedButton.h"
+#include "SHAPERGUI_ToolbarsMgr.h"
 
 #include <XGUI_Workshop.h>
 #include <XGUI_PropertyPanel.h>
@@ -156,8 +157,8 @@ void SHAPERGUI::initialize(CAM_Application* theApp)
   int aMenu = createMenu(tr("Inspection"), -1, -1, 30);
   int aSubMenu = createMenu(tr("Information"), aMenu);
 
-  int aId = myActionsList.size();
-  myActionsList.append("INSPECTION_CMD");
+  int aId = getNextCommandId();
+  myActionsList.append(aId);
   SUIT_Desktop* aDesk = application()->desktop();
   QString aTip = tr("Show inspection window");
   myWhatIsAction = createAction(aId, aTip, QIcon(":pictures/whatis.png"), tr("What Is"),
@@ -166,8 +167,19 @@ void SHAPERGUI::initialize(CAM_Application* theApp)
   myWhatIsAction->setData("INSPECTION_CMD");
   createMenu(aId, aSubMenu, 0);
 
-  int aTool = createTool(tr("Inspection tool"));
+  QString aToolName = tr("Inspection tool");
+  int aTool = createTool(aToolName);
   int aToolId = createTool(myWhatIsAction, aTool);
+  registerCommandToolbar(aToolName, aId);
+
+  // Define Edit toolbars command
+  aId = getNextCommandId();
+  myActionsList.append(aId);
+  aTip = tr("Edit toolbars of the module");
+  QAction* aAction = createAction(aId, aTip, QIcon(), tr("Edit toolbars..."),
+    aTip, QKeySequence(), aDesk, false, this, SLOT(onEditToolbars()));
+  int aEditMenu = createMenu(tr("MEN_DESK_EDIT"), -1, -1, 30);
+  int aEditItem = createMenu(aId, aEditMenu);
 }
 
 //******************************************************
@@ -535,8 +547,8 @@ QAction* SHAPERGUI::addFeature(const QString& theWBName, const QString& theTBNam
   }
   aNb++;
 
-  int aId = myActionsList.size();
-  myActionsList.append(theId);
+  int aId = getNextCommandId();
+  myActionsList.append(aId);
   SUIT_Desktop* aDesk = application()->desktop();
   int aKeys = 0;
   for (int i = 0; i < theKeys.count(); i++)
@@ -554,8 +566,11 @@ QAction* SHAPERGUI::addFeature(const QString& theWBName, const QString& theTBNam
 
   int aWBTool = createTool(theTBName, theTBName);
   int aToolId = createTool(aId, aWBTool);
-  if (isAddSeparator)
+  registerCommandToolbar(theTBName, aId);
+  if (isAddSeparator) {
     createTool(separator(), aWBTool);
+    registerCommandToolbar(theTBName, -1);
+  }
 
   return aAction;
 }
@@ -569,7 +584,6 @@ QAction* SHAPERGUI::addFeatureOfNested(const QString& theWBName,
                                        const ActionInfo& theInfo,
                                        const QList<QAction*>& theNestedActions)
 {
-  myActionsList.append(theInfo.id);
   SUIT_Desktop* aDesk = application()->desktop();
   SHAPERGUI_NestedButton* anAction = new SHAPERGUI_NestedButton(aDesk, theNestedActions);
   anAction->setData(theInfo.id);
@@ -585,11 +599,14 @@ QAction* SHAPERGUI::addFeatureOfNested(const QString& theWBName,
 
   int aWBMenu = createMenu(theWBName, -1, -1, 30);
   int aItemId = createMenu(anAction, aWBMenu);
+  myActionsList.append(aItemId);
   createMenu(separator(), aWBMenu); /// nested action is always separated of others
 
   int aWBTool = createTool(theWBName, theWBName);
   int aToolId = createTool(anAction, aWBTool);
+  registerCommandToolbar(theWBName, aItemId);
   createTool(separator(), aWBTool); /// nested action is always separated of others
+  registerCommandToolbar(theWBName, -1);
 
   return anAction;
 }
@@ -603,8 +620,8 @@ QAction* SHAPERGUI::addDesktopCommand(const QString& theId, const QString& theTi
 {
   int aMenu = createMenu(tr(theMenuSourceText), -1, -1);
 
-  int aId = myActionsList.size();
-  myActionsList.append(theId);
+  int aId = getNextCommandId();
+  myActionsList.append(aId);
   SUIT_Desktop* aDesk = application()->desktop();
   int aKeys = 0;
   for (int i = 0; i < theKeys.count(); i++)
@@ -645,9 +662,9 @@ bool SHAPERGUI::addActionInToolbar( QAction* theAction, const QString& theToolBa
 QList<QAction*> SHAPERGUI::commandList() const
 {
   QList<QAction*> aActions;
-  for (int i = 0; i < myActionsList.size(); i++) {
-    QAction* aCmd = action(i);
-    if (aCmd && myActionsList.contains(aCmd->data().toString()))
+  foreach (int aId, myActionsList) {
+    QAction* aCmd = action(aId);
+    if (aCmd)
       aActions.append(aCmd);
   }
 
@@ -791,4 +808,27 @@ void SHAPERGUI::updateModuleVisibilityState()
 {
   LightApp_Module::updateModuleVisibilityState();
   onWhatIs(myIsInspectionVisible);
+}
+
+void SHAPERGUI::onEditToolbars()
+{
+  SHAPERGUI_ToolbarsDlg aDlg(this, myActionsList, myToolbars);
+  aDlg.exec();
+}
+
+void SHAPERGUI::registerCommandToolbar(const QString& theToolName, int theCommandId)
+{
+  if (!myToolbars.contains(theToolName))
+    myToolbars[theToolName] = QList<int>();
+  myToolbars[theToolName].append(theCommandId);
+}
+
+int SHAPERGUI::getNextCommandId() const
+{
+  QtxActionMenuMgr* aMenuMgr = menuMgr();
+  QIntList aIds = aMenuMgr->idList();
+  int aId = aIds.count();
+  while (aIds.contains(aId))
+    aId++;
+  return aId;
 }

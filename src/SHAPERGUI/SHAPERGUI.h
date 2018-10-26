@@ -29,7 +29,7 @@
 
 #include <ModuleBase_ActionInfo.h>
 
-#include <QStringList>
+#include <QList>
 #include <QMap>
 
 class XGUI_Workshop;
@@ -207,13 +207,17 @@ Q_OBJECT
 private slots:
   void onWhatIs(bool isToggled);
 
+  void onEditToolbars();
+
  private:
    /// Create selector for OCC Viewer
    /// \param theMgr view manager
   SHAPERGUI_OCCSelector* createSelector(SUIT_ViewManager* theMgr);
 
-  /// List of registered actions
-  QStringList myActionsList;
+  void registerCommandToolbar(const QString& theToolName, int theCommandId);
+
+  int getNextCommandId() const;
+
 
   /// List of registered nested actions
   QStringList myNestedActionsList;
@@ -249,6 +253,9 @@ private slots:
   bool myIsInspectionVisible;
   QDockWidget* myInspectionPanel;
 
+  /// List of registered actions
+  QIntList myActionsList;
+  QMap<QString, QIntList> myToolbars;
 };
 
 #endif
