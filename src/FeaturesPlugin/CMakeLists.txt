@@ -183,7 +183,9 @@ ADD_UNIT_TESTS(TestExtrusion.py
                TestPlacement_Face_Face.py
                TestTranslation.py
                TestRotation.py
-               TestBoolean.py
+               TestBoolean1.py
+               TestBoolean2.py
+               TestBoolean3.py
                TestBooleanCompSolids.py
                TestBooleanSmash.py
                TestBooleanFill.py
