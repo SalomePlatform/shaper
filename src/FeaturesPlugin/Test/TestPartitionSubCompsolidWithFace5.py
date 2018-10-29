@@ -44,7 +44,7 @@ SketchConstraintCoincidence_2 = Sketch_2.setCoincident(SketchArc_1.startPoint(),
 model.do()
 Revolution_1 = model.addRevolution(Part_1_doc, [model.selection("COMPOUND", "Sketch_2")], model.selection("EDGE", "Sketch_2/SketchLine_1"), 90, 0)
 Face_1 = model.addFace(Part_1_doc, [model.selection("FACE", "Revolution_1_1/Generated_Face&Sketch_2/SketchArc_1_2")])
-Partition_1_objects = [model.selection("SOLID", "Extrusion_1_1_2"), model.selection("FACE", "Face_1_1"), model.selection("SOLID", "Extrusion_1_1_3")]
+Partition_1_objects = [model.selection("SOLID", "Extrusion_1_1_1"), model.selection("FACE", "Face_1_1"), model.selection("SOLID", "Extrusion_1_1_3")]
 Partition_1 = model.addPartition(Part_1_doc, Partition_1_objects)
 model.do()
 

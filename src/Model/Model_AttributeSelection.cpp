@@ -49,6 +49,7 @@
 #include <TNaming_Tool.hxx>
 #include <TNaming_Builder.hxx>
 #include <TNaming_SameShapeIterator.hxx>
+#include <TNaming_NewShapeIterator.hxx>
 #include <TNaming_Iterator.hxx>
 #include <TDataStd_Integer.hxx>
 #include <TDataStd_UAttribute.hxx>
@@ -1741,6 +1742,48 @@ ResultPtr Model_AttributeSelection::newestContext(
         }
       }
     }
+    if (theAnyValue) { // only for neighbours for now
+      // try to find modification of sub-shapes: the best number of matches
+      std::map<ResultPtr, int> aMatches; // result -> number of matches of shapes to find the best
+      TDF_Label aResLab = std::dynamic_pointer_cast<Model_Data>(aResult->data())->shapeLab();
+      TDF_ChildIDIterator aModifIter(aResLab, TNaming_NamedShape::GetID());
+      for(; aModifIter.More(); aModifIter.Next()) {
+        Handle(TNaming_NamedShape) aNS = Handle(TNaming_NamedShape)::DownCast(aModifIter.Value());
+        if (aNS->Evolution() == TNaming_MODIFY || aNS->Evolution() == TNaming_GENERATED) {
+          for(TNaming_Iterator aNSIter(aNS); aNSIter.More(); aNSIter.Next()) {
+            TNaming_NewShapeIterator aNewIter(aNSIter.NewShape(), aNS->Label());
+            for(; aNewIter.More(); aNewIter.Next()) {
+              TDF_Label aLab = aNewIter.Label();
+              if (isLater(aLab, aNS->Label()) && isLater(selectionLabel(), aLab)) {
+                ResultPtr aRes = aDoc->resultByLab(aLab);
+                if (aRes.get()) {
+                  if (aMatches.find(aRes) == aMatches.end())
+                    aMatches[aRes] = 0;
+                  aMatches[aRes]++; // found result, add matches
+                }
+              }
+            }
+          }
+        }
+      }
+      // searching for the best result-candidate
+      int aBest = 0;
+      ResultPtr aBestResult;
+      std::map<ResultPtr, int>::iterator aMatchIter = aMatches.begin();
+      for(; aMatchIter != aMatches.end(); aMatchIter++) {
+        if (aMatchIter->second > aBest) {
+          aBest = aMatchIter->second;
+          aBestResult = aMatchIter->first;
+        }
+      }
+      if (aBestResult.get()) {
+        aResult = aBestResult;
+        aFindNewContext = true;
+        continue;
+      }
+    }
+
+
     // TestFillWireVertex.py - sketch constructions for wire may participate too
     //if (aResult->groupName() == ModelAPI_ResultBody::group()) {
       // try to search newer context by the concealment references

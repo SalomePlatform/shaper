@@ -36,7 +36,7 @@ SketchCircle_2 = Sketch_1.addCircle(55, 30, 40)
 SketchConstraintRadius_1 = Sketch_1.setRadius(SketchCircle_2.results()[1], "Radius")
 model.do()
 Extrusion_1 = model.addExtrusion(Part_1_doc, [model.selection("COMPOUND", "Sketch_1")], model.selection(), "ExtrusionMax", "ExtrusionMin")
-Partition_1 = model.addPartition(Part_1_doc, [model.selection("SOLID", "Extrusion_1_1_2"), model.selection("FACE", "PartSet/XOZ")])
+Partition_1 = model.addPartition(Part_1_doc, [model.selection("SOLID", "Extrusion_1_1_1"), model.selection("FACE", "PartSet/XOZ")])
 model.do()
 
 # check partition

@@ -627,15 +627,17 @@ std::shared_ptr<ModelAPI_Object> Model_Objects::objectByName(
   createHistory(theGroupID);
   if (theGroupID == ModelAPI_Feature::group()) { // searching among features (in history or not)
     std::list<std::shared_ptr<ModelAPI_Feature> > allObjs = allFeatures();
-    std::list<std::shared_ptr<ModelAPI_Feature> >::iterator anObjIter = allObjs.begin();
-    for(; anObjIter != allObjs.end(); anObjIter++) {
+    // from the end to find the latest result with such name
+    std::list<std::shared_ptr<ModelAPI_Feature> >::reverse_iterator anObjIter = allObjs.rbegin();
+    for(; anObjIter != allObjs.rend(); anObjIter++) {
       if ((*anObjIter)->data()->name() == theName)
         return *anObjIter;
     }
   } else { // searching among results (concealed or not)
     std::list<std::shared_ptr<ModelAPI_Feature> > allObjs = allFeatures();
-    std::list<std::shared_ptr<ModelAPI_Feature> >::iterator anObjIter = allObjs.begin();
-    for(; anObjIter != allObjs.end(); anObjIter++) {
+    // from the end to find the latest result with such name
+    std::list<std::shared_ptr<ModelAPI_Feature> >::reverse_iterator anObjIter = allObjs.rbegin();
+    for(; anObjIter != allObjs.rend(); anObjIter++) {
       std::list<ResultPtr> allRes;
       ModelAPI_Tools::allResults(*anObjIter, allRes);
       for(std::list<ResultPtr>::iterator aRes = allRes.begin(); aRes != allRes.end(); aRes++) {

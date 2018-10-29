@@ -38,7 +38,7 @@ SketchConstraintRadius_1 = Sketch_1.setRadius(SketchCircle_2.results()[1], "Radi
 model.do()
 Extrusion_1 = model.addExtrusion(Part_1_doc, [model.selection("COMPOUND", "Sketch_1")], model.selection(), "ExtrusionMax", "ExtrusionMin")
 Box_1 = model.addBox(Part_1_doc, 50, 100, "BoxHeight")
-Partition_1_objects = [model.selection("SOLID", "Extrusion_1_1_2"), model.selection("SOLID", "Box_1_1"), model.selection("SOLID", "Extrusion_1_1_3")]
+Partition_1_objects = [model.selection("SOLID", "Extrusion_1_1_2"), model.selection("SOLID", "Box_1_1"), model.selection("SOLID", "Extrusion_1_1_1")]
 Partition_1 = model.addPartition(Part_1_doc, Partition_1_objects)
 model.do()
 
