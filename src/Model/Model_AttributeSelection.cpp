@@ -92,6 +92,8 @@ Standard_GUID kELLIPSE_CENTER1("f70df04c-3168-4dc9-87a4-f1f840c1275d");
 Standard_GUID kELLIPSE_CENTER2("1395ae73-8e02-4cf8-b204-06ff35873a32");
 // reference to the external sketch face
 Standard_GUID kEXT_SKETCH_FACE("ba32aa31-bde7-422f-80b4-79c757c77b49");
+// reference to the external sketch wire
+Standard_GUID kEXT_SKETCH_WIRE("ba32aa31-bde7-422f-80b4-79c757c77b46");
 // reference to the external sketch edge
 Standard_GUID kEXT_SKETCH_EDGE("ba32aa31-bde7-422f-80b4-79c757c77b48");
 // reference to the external sketch vertex
@@ -143,6 +145,7 @@ bool Model_AttributeSelection::setValue(const ObjectPtr& theContext,
   aSelLab.ForgetAttribute(kELLIPSE_CENTER1);
   aSelLab.ForgetAttribute(kELLIPSE_CENTER2);
   aSelLab.ForgetAttribute(kEXT_SKETCH_FACE);
+  aSelLab.ForgetAttribute(kEXT_SKETCH_WIRE);
   aSelLab.ForgetAttribute(kEXT_SKETCH_EDGE);
   aSelLab.ForgetAttribute(kEXT_SKETCH_VERT);
 
@@ -389,6 +392,15 @@ std::shared_ptr<GeomAPI_Shape> Model_AttributeSelection::internalValue(CenterTyp
       Handle(TDataStd_Integer) anIndex;
       if (aSelLab.FindAttribute(kEXT_SKETCH_FACE, anIndex)) {
         return aConstr->face(anIndex->Get());
+      }
+      if (aSelLab.FindAttribute(kEXT_SKETCH_WIRE, anIndex)) {
+        GeomShapePtr aFace = aConstr->face(anIndex->Get());
+        if (aFace.get()) {
+          GeomAPI_ShapeExplorer aFaceExp(aFace, GeomAPI_Shape::WIRE);
+          if (aFaceExp.more()) {
+            return aFaceExp.current();
+          }
+        }
       }
       if (aSelLab.FindAttribute(kEXT_SKETCH_EDGE, anIndex) ||
           aSelLab.FindAttribute(kEXT_SKETCH_VERT, anIndex)) {
@@ -661,7 +673,8 @@ bool Model_AttributeSelection::update()
     if (!aConstructionContext->isInfinite()) {
       // external sketch face
       Handle(TDataStd_Integer) anIndex;
-      if (aSelLab.FindAttribute(kEXT_SKETCH_FACE, anIndex)) {
+      if (aSelLab.FindAttribute(kEXT_SKETCH_FACE, anIndex) ||
+          aSelLab.FindAttribute(kEXT_SKETCH_WIRE, anIndex)) {
         return setInvalidIfFalse(aSelLab, anIndex->Get() < aConstructionContext->facesNum());
       }
       if (aSelLab.FindAttribute(kEXT_SKETCH_EDGE, anIndex) ||
@@ -717,20 +730,35 @@ void Model_AttributeSelection::selectBody(
     TopoDS_Shape aNewSub = theSubShape->impl<TopoDS_Shape>();
     FeaturePtr aFeatureOwner = std::dynamic_pointer_cast<ModelAPI_Feature>(owner());
     if (aFeatureOwner->document() != theContext->document()) { // reference to the sketch face
-      if (theSubShape->shapeType() == GeomAPI_Shape::FACE) { // sketch face
+      if (theSubShape->shapeType() == GeomAPI_Shape::FACE ||
+          theSubShape->shapeType() == GeomAPI_Shape::WIRE) { // sketch face or sketch face wire
         ResultConstructionPtr aConstr =
           std::dynamic_pointer_cast<ModelAPI_ResultConstruction>(theContext);
         int aFaceIndex = -1, aFacesNum = aConstr->facesNum();
         for(int a = 0; a < aFacesNum; a++) {
-          if (aConstr->face(a)->isEqual(theSubShape)) {
+          bool isEqual = false;
+          GeomShapePtr aFace = aConstr->face(a);
+          if (!aFace.get() || aFace->isNull())
+            continue;
+          if (theSubShape->shapeType() == GeomAPI_Shape::FACE) {
+            isEqual = aFace->isEqual(theSubShape);
+          } else {
+            GeomAPI_ShapeExplorer anExp(aFace, GeomAPI_Shape::WIRE);
+            if (anExp.more())
+              isEqual = anExp.current()->isEqual(theSubShape);
+          }
+          if (isEqual) {
             aFaceIndex = a;
             break;
           }
         }
         if (aFaceIndex >= 0) {
-          TDataStd_Integer::Set(aSelLab, kEXT_SKETCH_FACE, aFaceIndex); // store index of the face
+          TDataStd_Integer::Set(aSelLab, theSubShape->shapeType() == GeomAPI_Shape::FACE ?
+            kEXT_SKETCH_FACE : kEXT_SKETCH_WIRE, aFaceIndex); // store index of the face
           return;
         }
+      } else if (theSubShape->shapeType() == GeomAPI_Shape::WIRE) {
+
       } else if (theSubShape->shapeType() == GeomAPI_Shape::EDGE ||// sketch result edge (full one)
                  theSubShape->shapeType() == GeomAPI_Shape::VERTEX) { // or start/end vertex
         bool isVertex = theSubShape->shapeType() == GeomAPI_Shape::VERTEX;
@@ -908,6 +936,7 @@ std::string Model_AttributeSelection::namingName(const std::string& theDefaultNa
       // external sketch face
       Handle(TDataStd_Integer) anIndex;
       if (aSelLab.FindAttribute(kEXT_SKETCH_FACE, anIndex) ||
+          aSelLab.FindAttribute(kEXT_SKETCH_WIRE, anIndex) ||
           aSelLab.FindAttribute(kEXT_SKETCH_EDGE, anIndex) ||
           aSelLab.FindAttribute(kEXT_SKETCH_VERT, anIndex)) {
         std::shared_ptr<Model_Document> anExtDoc =
@@ -1737,7 +1766,7 @@ ResultPtr Model_AttributeSelection::newestContext(
         }
       }
     }
-    if (theAnyValue) { // only for neighbours for now
+    if (theAnyValue) { // only for neighbors for now
       // try to find modification of sub-shapes: the best number of matches
       std::map<ResultPtr, int> aMatches; // result -> number of matches of shapes to find the best
       TDF_Label aResLab = std::dynamic_pointer_cast<Model_Data>(aResult->data())->shapeLab();
@@ -1828,7 +1857,7 @@ ResultPtr Model_AttributeSelection::newestContext(
           GeomShapePtr aShape = (*aResIter)->shape();
           if (aShape.get() && (theAnyValue || aShape->isSubShape(aSelectedShape, false))) {
             aResult = *aResIter; // found new context (produced from this) with same subshape
-            aFindNewContext = true; // continue searching futher
+            aFindNewContext = true; // continue searching further
             break;
           }
         }

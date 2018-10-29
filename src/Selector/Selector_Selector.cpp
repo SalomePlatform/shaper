@@ -44,7 +44,7 @@
 
 #include <list>
 
-/// type of the selection, integerm keeps the Selector_Type value
+/// type of the selection, integer keeps the Selector_Type value
 static const Standard_GUID kSEL_TYPE("db174d59-c2e3-4a90-955e-55544df090d6");
 /// type of the shape, stored in case it is intersection or container
 static const Standard_GUID kSHAPE_TYPE("864b3267-cb9d-4107-bf58-c3ce1775b171");
@@ -482,12 +482,12 @@ bool Selector_Selector::select(const TopoDS_Shape theContext, const TopoDS_Shape
       myFinal = aModifList.First()->Label();
       TopoDS_ListOfShape aCommon;
       findModificationResult(aCommon);
-      // trying to search by neighbours
+      // trying to search by neighbors
       if (aCommon.Extent() > 1) { // more complicated selection
         if (!theUseNeighbors)
           return false;
 
-        // searching by neighbours
+        // searching by neighbors
         std::list<std::pair<TopoDS_Shape, int> > aNBs;//neighbor sub-shape -> level of neighborhood
         for(int aLevel = 1; true; aLevel++) {
           TopTools_MapOfShape aNewNB;
@@ -522,7 +522,7 @@ bool Selector_Selector::select(const TopoDS_Shape theContext, const TopoDS_Shape
             return true;
           }
         }
-        // filter by neighbours did not help
+        // filter by neighbors did not help
         if (aCommon.Extent() > 1) { // weak naming between the common results
           Selector_NExplode aNexp(aCommon);
           myWeakIndex = aNexp.index(theValue);
@@ -1058,7 +1058,7 @@ TDF_Label Selector_Selector::restoreByName(
         return TDF_Label(); // invalid parentheses
     }
     return aContext;
-  } else if (theName[0] == '(') { // filter by neighbours
+  } else if (theName[0] == '(') { // filter by neighbors
     myType = SELTYPE_FILTER_BY_NEIGHBOR;
     TDF_Label aContext;
     for(size_t aStart = 0; aStart != std::string::npos;
@@ -1077,7 +1077,7 @@ TDF_Label Selector_Selector::restoreByName(
         } else {
           aContext = aSubContext;
         }
-        if (!aContext.IsNull()) // for filters by neighbour the latest context shape is vital
+        if (!aContext.IsNull()) // for filters by neighbor the latest context shape is vital
           aContext = theNameGenerator->newestContext(aContext);
 
         // searching for the level index
@@ -1112,7 +1112,7 @@ TDF_Label Selector_Selector::restoreByName(
       theNameGenerator->restoreContext(aContextName, aContext, myFinal);
     }
     return aContext;
-  } else if (theName.find('&') == std::string::npos) { // wihtout '&' it can be only primitive
+  } else if (theName.find('&') == std::string::npos) { // without '&' it can be only primitive
     myType = SELTYPE_PRIMITIVE;
     TDF_Label aContext;
     if (theNameGenerator->restoreContext(theName, aContext, myFinal)) {
