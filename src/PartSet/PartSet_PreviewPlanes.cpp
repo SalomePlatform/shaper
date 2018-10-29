@@ -24,6 +24,7 @@
 
 #include <ModelAPI_ResultBody.h>
 #include <ModelAPI_ResultConstruction.h>
+#include <ModelAPI_ResultPart.h>
 
 #include <XGUI_Tools.h>
 #include <XGUI_Displayer.h>
@@ -49,7 +50,9 @@ bool PartSet_PreviewPlanes::hasVisualizedBodies(ModuleBase_IWorkshop* theWorksho
   foreach (ObjectPtr anObj, aDisplayed) {
     ResultPtr aResult = std::dynamic_pointer_cast<ModelAPI_Result>(anObj);
     // result constructions should not be taken as a body
-    if (aResult.get() != NULL && aResult->groupName() == ModelAPI_ResultBody::group()) {
+    if (aResult.get() != NULL &&
+      ((aResult->groupName() == ModelAPI_ResultBody::group()) ||
+      ((aResult->groupName() == ModelAPI_ResultPart::group()))) ) {
       GeomShapePtr aShape = aResult->shape();
       if (aShape.get()) {
         // vertices, edges should not be taken as a body
