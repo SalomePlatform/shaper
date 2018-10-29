@@ -185,9 +185,14 @@ protected:
       int aIdx;
       int aCount = 0;
       int aSize = myChildren.size();
+      int aMaxCount = aSize * aSize;
       int aShift = 0;
       while (i < aSize) {
         aCount++;
+        // To avoid unlimited cycling
+        if (aCount > aMaxCount)
+          break;
+
         aNode = myChildren.at(i);
         aObject = aNode->object();
         if (aObject.get()) {
@@ -202,9 +207,6 @@ protected:
         else
           aShift++;
         i++;
-        // To avoid unlimited cycling
-        if (aCount > aSize * aSize)
-          break;
       }
     }
   }
