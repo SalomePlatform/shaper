@@ -368,6 +368,7 @@ QTreeNodesList PartSet_ObjectNode::objectsDeleted(
         aObj = subObject(aId);
         if (aNode->object() != aObj) {
           myChildren.removeAll(aNode);
+          aResult.removeAll(aNode);
           delete aNode;
           isDeleted = true;
         }
@@ -601,6 +602,7 @@ QTreeNodesList PartSet_FolderNode::objectsDeleted(const DocumentPtr& theDoc,
       aToSort |= ((aIndex != -1) && (aId != aIndex));
       if (aIndex == -1) {
         myChildren.removeAll(aNode);
+        aResult.removeAll(aNode);
         delete aNode;
         aRemoved = true;
       }
@@ -697,6 +699,7 @@ QTreeNodesList PartSet_FeatureFolderNode::objectsDeleted(const DocumentPtr& theD
         aToSort |= ((aIndex != -1) && (aId != (aIndex + aNb)));
         if (aIndex == -1) {
           myChildren.removeAll(aNode);
+          aResult.removeAll(aNode);
           delete aNode;
           aRemoved = true;
           continue;
@@ -1134,6 +1137,7 @@ QTreeNodesList PartSet_ObjectFolderNode::objectsDeleted(const DocumentPtr& theDo
     if ((aFirst + aId) < aNbOfFeatures) {
       if (aNode->object() != aDoc->object(ModelAPI_Feature::group(), aFirst + aId)) {
         myChildren.removeAll(aNode);
+        aResult.removeAll(aNode);
         delete aNode;
         aRemoved = true;
         continue;
@@ -1141,6 +1145,7 @@ QTreeNodesList PartSet_ObjectFolderNode::objectsDeleted(const DocumentPtr& theDo
     }
     else {
       myChildren.removeAll(aNode);
+      aResult.removeAll(aNode);
       delete aNode;
       aRemoved = true;
       continue;
