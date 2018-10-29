@@ -282,6 +282,7 @@ void Model_BodyBuilder::clean()
     }
   }
   myBuilders.clear();
+  myPrimitivesNamesIndexMap.clear();
   // remove the old reference (if any)
   aLab.ForgetAttribute(TDF_Reference::GetID());
   myFreePrimitiveTag = PRIMITIVES_START_TAG;
