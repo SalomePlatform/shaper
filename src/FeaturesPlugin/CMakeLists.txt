@@ -175,7 +175,12 @@ ADD_UNIT_TESTS(TestExtrusion.py
                TestRevolutionFuse.py
                TestCompositeFeaturesOnCompSolids.py
                TestPartition.py
-               TestPlacement.py
+               TestPlacement_Vertex_Vertex.py
+               TestPlacement_Edge_Vertex.py
+               TestPlacement_Edge_Edge.py
+               TestPlacement_Face_Vertex.py
+               TestPlacement_Face_Edge.py
+               TestPlacement_Face_Face.py
                TestTranslation.py
                TestRotation.py
                TestBoolean.py

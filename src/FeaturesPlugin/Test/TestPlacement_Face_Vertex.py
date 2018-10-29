@@ -118,51 +118,13 @@ anExtrusionResult = modelAPI_ResultBody(anExtrusionFt.firstResult())
 assert (anExtrusionResult is not None)
 
 #=========================================================================
-# Test placement by face - face
-#=========================================================================
-aSession.startOperation()
-aPlacementFt = aPart.addFeature("Placement")
-aPlacementFt.selectionList("placement_objects_list").append(anExtrusionResult, anExtrusionResult.shape())
-aPlacementFt.selection("placement_start_shape").selectSubShape("face", "Extrusion_1_1/Generated_Face_1")
-aPlacementFt.selection("placement_end_shape").selectSubShape("face", "Extrusion_1_2/Generated_Face_3")
-aPlacementFt.boolean("placement_reverse_direction").setValue(False)
-aPlacementFt.boolean("placement_centering").setValue(True)
-aPlacementFt.execute()
-aSession.finishOperation()
-
-# Check placement results
-assert (len(aPlacementFt.results()) > 0)
-aPlacementResult = modelAPI_ResultBody(aPlacementFt.firstResult())
-assert (aPlacementResult is not None)
-aSession.undo()
-
-#=========================================================================
-# Test placement by face - edge
-#=========================================================================
-aSession.startOperation()
-aPlacementFt = aPart.addFeature("Placement")
-aPlacementFt.selectionList("placement_objects_list").append(anExtrusionResult, anExtrusionResult.shape())
-aPlacementFt.selection("placement_start_shape").selectSubShape("face", "Extrusion_1_1/Generated_Face_1")
-aPlacementFt.selection("placement_end_shape").selectSubShape("edge", "Extrusion_1_2/To_Face_1_1&Extrusion_1_2/Generated_Face_3")
-aPlacementFt.boolean("placement_reverse_direction").setValue(False)
-aPlacementFt.boolean("placement_centering").setValue(True)
-aPlacementFt.execute()
-aSession.finishOperation()
-
-# Check placement results
-assert (len(aPlacementFt.results()) > 0)
-aPlacementResult = modelAPI_ResultBody(aPlacementFt.firstResult())
-assert (aPlacementResult is not None)
-aSession.undo()
-
-#=========================================================================
 # Test placement by face - vertex
 #=========================================================================
 aSession.startOperation()
 aPlacementFt = aPart.addFeature("Placement")
 aPlacementFt.selectionList("placement_objects_list").append(anExtrusionResult, anExtrusionResult.shape())
-aPlacementFt.selection("placement_start_shape").selectSubShape("face", "Extrusion_1_1/Generated_Face_1")
-aPlacementFt.selection("placement_end_shape").selectSubShape("vertex", "Extrusion_1_2/To_Face_1_1&Extrusion_1_2/Generated_Face_3&Extrusion_1_2/Generated_Face_2")
+aPlacementFt.selection("placement_start_shape").selectSubShape("face", "Extrusion_1_1/Generated_Face&Sketch_1/SketchLine_4")
+aPlacementFt.selection("placement_end_shape").selectSubShape("vertex", "[Extrusion_1_2/Generated_Face&Sketch_1/SketchLine_7][Extrusion_1_2/Generated_Face&Sketch_1/SketchLine_6][Extrusion_1_2/To_Face]")
 aPlacementFt.boolean("placement_reverse_direction").setValue(False)
 aPlacementFt.boolean("placement_centering").setValue(True)
 aPlacementFt.execute()
@@ -172,63 +134,7 @@ aSession.finishOperation()
 assert (len(aPlacementFt.results()) > 0)
 aPlacementResult = modelAPI_ResultBody(aPlacementFt.firstResult())
 assert (aPlacementResult is not None)
-aSession.undo()
-
-#=========================================================================
-# Test placement by edge - edge
-#=========================================================================
-aSession.startOperation()
-aPlacementFt = aPart.addFeature("Placement")
-aPlacementFt.selectionList("placement_objects_list").append(anExtrusionResult, anExtrusionResult.shape())
-aPlacementFt.selection("placement_start_shape").selectSubShape("edge", "Extrusion_1_1/To_Face_1_1&Extrusion_1_1/Generated_Face_1")
-aPlacementFt.selection("placement_end_shape").selectSubShape("edge", "Extrusion_1_2/To_Face_1_1&Extrusion_1_2/Generated_Face_3")
-aPlacementFt.boolean("placement_reverse_direction").setValue(False)
-aPlacementFt.boolean("placement_centering").setValue(True)
-aPlacementFt.execute()
 aSession.finishOperation()
-
-# Check placement results
-assert (len(aPlacementFt.results()) > 0)
-aPlacementResult = modelAPI_ResultBody(aPlacementFt.firstResult())
-assert (aPlacementResult is not None)
-aSession.undo()
-
-#=========================================================================
-# Test placement by edge - vertex
-#=========================================================================
-aSession.startOperation()
-aPlacementFt = aPart.addFeature("Placement")
-aPlacementFt.selectionList("placement_objects_list").append(anExtrusionResult, anExtrusionResult.shape())
-aPlacementFt.selection("placement_start_shape").selectSubShape("edge", "Extrusion_1_1/To_Face_1_1&Extrusion_1_1/Generated_Face_1")
-aPlacementFt.selection("placement_end_shape").selectSubShape("vertex", "Extrusion_1_2/To_Face_1_1&Extrusion_1_2/Generated_Face_3&Extrusion_1_2/Generated_Face_2")
-aPlacementFt.boolean("placement_reverse_direction").setValue(False)
-aPlacementFt.boolean("placement_centering").setValue(True)
-aPlacementFt.execute()
-aSession.finishOperation()
-
-# Check placement results
-assert (len(aPlacementFt.results()) > 0)
-aPlacementResult = modelAPI_ResultBody(aPlacementFt.firstResult())
-assert (aPlacementResult is not None)
-aSession.undo()
-
-#=========================================================================
-# Test placement by vertex - vertex
-#=========================================================================
-aSession.startOperation()
-aPlacementFt = aPart.addFeature("Placement")
-aPlacementFt.selectionList("placement_objects_list").append(anExtrusionResult, anExtrusionResult.shape())
-aPlacementFt.selection("placement_start_shape").selectSubShape("vertex", "Extrusion_1_1/Generated_Face_4&Extrusion_1_1/From_Face_1_1&Extrusion_1_1/Generated_Face_1")
-aPlacementFt.selection("placement_end_shape").selectSubShape("vertex", "Extrusion_1_2/To_Face_1_1&Extrusion_1_2/Generated_Face_3&Extrusion_1_2/Generated_Face_2")
-aPlacementFt.boolean("placement_reverse_direction").setValue(False)
-aPlacementFt.boolean("placement_centering").setValue(True)
-aPlacementFt.execute()
-aSession.finishOperation()
-
-# Check placement results
-assert (len(aPlacementFt.results()) > 0)
-aPlacementResult = modelAPI_ResultBody(aPlacementFt.firstResult())
-assert (aPlacementResult is not None)
 
 from salome.shaper import model
 assert(model.checkPythonDump())
