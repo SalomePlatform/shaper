@@ -380,7 +380,8 @@ bool Selector_Selector::select(const TopoDS_Shape theContext, const TopoDS_Shape
         mySubSelList.clear();
         TopoDS_ListOfShape::Iterator anInt(aLastIntersectors);
         for (; anInt.More(); anInt.Next()) {
-          if (!selectBySubSelector(theContext, anInt.Value(), theUseNeighbors, theUseIntersections)) {
+          if (!selectBySubSelector(
+              theContext, anInt.Value(), theUseNeighbors, theUseIntersections)) {
             break; // if some selector is failed, stop and search another solution
           }
         }
