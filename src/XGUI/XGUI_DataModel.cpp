@@ -73,13 +73,21 @@ void XGUI_DataModel::processEvent(const std::shared_ptr<Events_Message>& theMess
     ModuleBase_ITreeNode* aParent;
     int aRow = 0;
     QModelIndex aParentIndex1, aParentIndex2;
+    ObjectPtr aObj;
     foreach(ModuleBase_ITreeNode* aNode, aNodes) {
+      aObj = aNode->object();
       aParent = aNode->parent();
-      aRow = aParent->nodeRow(aNode);
-      aParentIndex1 = getParentIndex(aNode, 0);
-      aParentIndex2 = getParentIndex(aNode, 2);
-      insertRows(aRow, 1, aParentIndex1);
-      dataChanged(aParentIndex1, aParentIndex2);
+      if (aObj.get() && (aObj->groupName() == ModelAPI_Folder::group())) {
+        aParent->update();
+        rebuildDataTree();
+      }
+      else {
+        aRow = aParent->nodeRow(aNode);
+        aParentIndex1 = getParentIndex(aNode, 0);
+        aParentIndex2 = getParentIndex(aNode, 2);
+        insertRows(aRow, 1, aParentIndex1);
+        dataChanged(aParentIndex1, aParentIndex2);
+      }
     }
   }
   else if (theMessage->eventID() == Events_Loop::loop()->eventByName(EVENT_OBJECT_DELETED)) {
