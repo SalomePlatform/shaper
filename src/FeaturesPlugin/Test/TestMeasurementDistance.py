@@ -1,4 +1,4 @@
-## Copyright (C) 2018-20xx  CEA/DEN, EDF R&D
+## Copyright (C) 2014-2017  CEA/DEN, EDF R&D
 ##
 ## This library is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU Lesser General Public
@@ -18,6 +18,8 @@
 ## email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com>
 ##
 
+# -*- coding: utf-8 -*-
+
 from salome.shaper import model
 
 import math
@@ -26,9 +28,9 @@ model.begin()
 partSet = model.moduleDocument()
 Part_1 = model.addPart(partSet)
 Part_1_doc = Part_1.document()
-ParamR = model.addParameter(Part_1_doc, "R", "50")
-ParamL = model.addParameter(Part_1_doc, "L", "40")
-ParamH = model.addParameter(Part_1_doc, "H", "20")
+model.addParameter(Part_1_doc, "R", "50")
+model.addParameter(Part_1_doc, "L", "40")
+model.addParameter(Part_1_doc, "H", "20")
 Point_2 = model.addPoint(Part_1_doc, 0, 100, 100)
 Plane_4 = model.addPlane(Part_1_doc, model.selection("EDGE", "PartSet/OX"), model.selection("VERTEX", "Point_1"), False)
 Sketch_1 = model.addSketch(Part_1_doc, model.defaultPlane("XOY"))
@@ -57,7 +59,7 @@ SketchConstraintLength_2 = Sketch_1.setLength(SketchLine_4.result(), "H")
 SketchConstraintDistanceHorizontal_1 = Sketch_1.setHorizontalDistance(SketchLine_4.startPoint(), SketchCircle_1.center(), "L/2")
 SketchConstraintDistanceVertical_1 = Sketch_1.setVerticalDistance(SketchLine_4.startPoint(), SketchCircle_1.center(), "H/2")
 model.do()
-Extrusion_1 = model.addExtrusion(Part_1_doc, [model.selection("FACE", "Sketch_1/Face-SketchCircle_1_2f-SketchLine_3f-SketchLine_4f-SketchLine_5f-SketchLine_6f")], model.selection(), model.selection("FACE", "Plane_1"), 0, model.selection(), 10)
+Extrusion_1 = model.addExtrusion(Part_1_doc, [model.selection("FACE", "Sketch_1/Face-SketchCircle_1_2r-SketchLine_3f-SketchLine_4f-SketchLine_5f-SketchLine_6f")], model.selection(), model.selection("FACE", "Plane_1"), 0, model.selection(), 10)
 Sketch_2 = model.addSketch(Part_1_doc, model.standardPlane("YOZ"))
 SketchArc_1 = Sketch_2.addArc(100, 48.41229182762603, 87.5, 0, 87.5, 96.82458365525073, False)
 SketchArc_2 = Sketch_2.addArc(0, 48.41229182762603, 87.5, 0, 87.5, 96.82458365525073, False)
@@ -87,34 +89,34 @@ TOLERANCE = 1.e-6
 
 # reference data
 REF_DATA = [(model.selection("VERTEX", "PartSet/Origin"),
-             model.selection("VERTEX", "Extrusion_1_1/Generated_Face_5&Extrusion_1_1/To_Face_1"),
+             model.selection("VERTEX", "[Extrusion_1_1/Generated_Face&Sketch_1/SketchCircle_1_2][Extrusion_1_1/To_Face]"),
              122.4744871),
-            (model.selection("EDGE", "Extrusion_1_1/Generated_Face_5&Extrusion_1_1/To_Face_1"),
-             model.selection("VERTEX", "Sketch_2/Vertex-SketchArc_1-SketchLine_7e"),
+            (model.selection("EDGE", "[Extrusion_1_1/Generated_Face&Sketch_1/SketchCircle_1_2][Extrusion_1_1/To_Face]"),
+             model.selection("VERTEX", "Sketch_2/SketchArc_1"),
              36.94403089),
-            (model.selection("EDGE", "Extrusion_1_1/Generated_Face_5&Extrusion_1_1/From_Face_1"),
-             model.selection("EDGE", "Extrusion_1_1/Generated_Face_5"),
+            (model.selection("EDGE", "[Extrusion_1_1/Generated_Face&Sketch_1/SketchCircle_1_2][Extrusion_1_1/From_Face]"),
+             model.selection("EDGE", "([Extrusion_1_1/Generated_Face&Sketch_1/SketchCircle_1_2][Extrusion_1_1/From_Face])([Extrusion_1_1/Generated_Face&Sketch_1/SketchCircle_1_2][Extrusion_1_1/To_Face])([Extrusion_1_1/Generated_Face&Sketch_1/SketchCircle_1_2][Extrusion_1_1/From_Face])([Extrusion_1_1/Generated_Face&Sketch_1/SketchCircle_1_2][Extrusion_1_1/To_Face])"),
              0),
-            (model.selection("EDGE", "Extrusion_1_1/Generated_Face_5&Extrusion_1_1/From_Face_1"),
-             model.selection("EDGE", "Extrusion_2_1/Generated_Face_2&Extrusion_2_1/To_Face_1"),
+            (model.selection("EDGE", "[Extrusion_1_1/Generated_Face&Sketch_1/SketchCircle_1_2][Extrusion_1_1/From_Face]"),
+             model.selection("EDGE", "[Extrusion_2_1/Generated_Face&Sketch_2/SketchArc_1_2][Extrusion_2_1/To_Face]"),
              16.00781059),
-            (model.selection("EDGE", "Extrusion_1_1/Generated_Face_5&Extrusion_1_1/From_Face_1"),
-             model.selection("FACE", "Extrusion_2_1/Generated_Face_2"),
+            (model.selection("EDGE", "[Extrusion_1_1/Generated_Face&Sketch_1/SketchCircle_1_2][Extrusion_1_1/From_Face]"),
+             model.selection("FACE", "Extrusion_2_1/Generated_Face&Sketch_2/SketchArc_1_2"),
              8.412291828),
-            (model.selection("VERTEX", "Sketch_1/Vertex-SketchCircle_1"),
+            (model.selection("VERTEX", "Sketch_1/SketchCircle_1_2__cc"),
              model.selection("FACE", "Plane_1"),
              35.35533906),
-            (model.selection("FACE", "Extrusion_2_2/From_Face_1"),
-             model.selection("FACE", "Extrusion_2_2/To_Face_1"),
+            (model.selection("FACE", "Extrusion_2_2/From_Face"),
+             model.selection("FACE", "Extrusion_2_2/To_Face"),
              100),
-            (model.selection("FACE", "Extrusion_1_1/Generated_Face_5"),
-             model.selection("FACE", "Extrusion_2_1/Generated_Face_2"),
+            (model.selection("FACE", "Extrusion_1_1/Generated_Face&Sketch_1/SketchCircle_1_2"),
+             model.selection("FACE", "Extrusion_2_1/Generated_Face&Sketch_2/SketchArc_1_2"),
              0),
-            (model.selection("FACE", "Extrusion_1_1/Generated_Face_5"),
-             model.selection("FACE", "Extrusion_1_1/Generated_Face_2"),
+            (model.selection("FACE", "Extrusion_1_1/Generated_Face&Sketch_1/SketchCircle_1_2"),
+             model.selection("FACE", "Extrusion_1_1/Generated_Face&Sketch_1/SketchLine_5"),
              27.63932023),
             (model.selection("SOLID", "Extrusion_1_1"),
-             model.selection("FACE", "Extrusion_2_1/To_Face_1"),
+             model.selection("FACE", "Extrusion_2_1/To_Face"),
              12.5),
             (model.selection("SOLID", "Extrusion_1_1"),
              model.selection("SOLID", "Extrusion_2_1"),

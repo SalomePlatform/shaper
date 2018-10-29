@@ -1,4 +1,4 @@
-## Copyright (C) 2018-20xx  CEA/DEN, EDF R&D
+## Copyright (C) 2014-2017  CEA/DEN, EDF R&D
 ##
 ## This library is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU Lesser General Public
@@ -18,6 +18,8 @@
 ## email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com>
 ##
 
+# -*- coding: utf-8 -*-
+
 from SketchAPI import *
 
 from salome.shaper import model
@@ -28,9 +30,9 @@ model.begin()
 partSet = model.moduleDocument()
 Part_1 = model.addPart(partSet)
 Part_1_doc = Part_1.document()
-ParamR = model.addParameter(Part_1_doc, "R", "50")
-ParamL = model.addParameter(Part_1_doc, "L", "40")
-ParamH = model.addParameter(Part_1_doc, "H", "20")
+model.addParameter(Part_1_doc, "R", "50")
+model.addParameter(Part_1_doc, "L", "40")
+model.addParameter(Part_1_doc, "H", "20")
 Point_2 = model.addPoint(Part_1_doc, 0, 100, 100)
 Plane_4 = model.addPlane(Part_1_doc, model.selection("EDGE", "PartSet/OX"), model.selection("VERTEX", "Point_1"), False)
 Sketch_1 = model.addSketch(Part_1_doc, model.defaultPlane("XOY"))
@@ -59,8 +61,8 @@ SketchConstraintLength_2 = Sketch_1.setLength(SketchLine_4.result(), "H")
 SketchConstraintDistanceHorizontal_1 = Sketch_1.setHorizontalDistance(SketchLine_4.startPoint(), SketchCircle_1.center(), "L/2")
 SketchConstraintDistanceVertical_1 = Sketch_1.setVerticalDistance(SketchLine_4.startPoint(), SketchCircle_1.center(), "H/2")
 model.do()
-Extrusion_1 = model.addExtrusion(Part_1_doc, [model.selection("FACE", "Sketch_1/Face-SketchCircle_1_2f-SketchLine_3f-SketchLine_4f-SketchLine_5f-SketchLine_6f")], model.selection(), model.selection("FACE", "Plane_1"), 0, model.selection(), 10)
-Sketch_2 = model.addSketch(Part_1_doc, model.selection("FACE", "Extrusion_1_1/To_Face_1"))
+Extrusion_1 = model.addExtrusion(Part_1_doc, [model.selection("FACE", "Sketch_1/Face-SketchCircle_1_2r-SketchLine_3f-SketchLine_4f-SketchLine_5f-SketchLine_6f")], model.selection(), model.selection("FACE", "Plane_1"), 0, model.selection(), 10)
+Sketch_2 = model.addSketch(Part_1_doc, model.selection("FACE", "Extrusion_1_1/To_Face"))
 SketchLine_7 = Sketch_2.addLine(119.1454520140253, 130.0744845530344, 10, 0)
 SketchProjection_3 = Sketch_2.addProjection(model.selection("EDGE", "PartSet/OX"), False)
 SketchLine_8 = SketchProjection_3.createdFeature()
@@ -72,14 +74,14 @@ model.do()
 TOLERANCE = 1.e-6
 
 # reference data
-REF_DATA = [("Sketch_1/Edge-SketchLine_3", "Sketch_1/Edge-SketchLine_6", [90]),
-            ("Extrusion_1_1/Generated_Face_5", "Extrusion_1_1/Generated_Face_5&Extrusion_1_1/To_Face_1", [45]),
-            ("Sketch_1/Edge-SketchCircle_1_2", "Extrusion_1_1/Generated_Face_5&Extrusion_1_1/To_Face_1", [0]),
-            ("Sketch_1/Edge-SketchLine_3", "Sketch_1/Edge-SketchCircle_1_2", []),
-            ("Extrusion_1_1/Generated_Face_5&Extrusion_1_1/From_Face_1", "Extrusion_1_1/Generated_Face_5&Extrusion_1_1/To_Face_1", []),
-            ("Sketch_2/Edge-SketchLine_7", "Extrusion_1_1/To_Face_1&Extrusion_1_1/Generated_Face_4", [130]),
-            ("Sketch_2/Edge-SketchLine_7", "Extrusion_1_1/To_Face_1&Extrusion_1_1/Generated_Face_1", [40]),
-            ("Sketch_2/Edge-SketchLine_7", "Extrusion_1_1/Generated_Face_5&Extrusion_1_1/To_Face_1", [121.21205374, 84.80231126])
+REF_DATA = [("Sketch_1/SketchLine_3", "Sketch_1/SketchLine_6", [90]),
+            ("([Extrusion_1_1/Generated_Face&Sketch_1/SketchCircle_1_2][Extrusion_1_1/From_Face])([Extrusion_1_1/Generated_Face&Sketch_1/SketchCircle_1_2][Extrusion_1_1/To_Face])([Extrusion_1_1/Generated_Face&Sketch_1/SketchCircle_1_2][Extrusion_1_1/From_Face])([Extrusion_1_1/Generated_Face&Sketch_1/SketchCircle_1_2][Extrusion_1_1/To_Face])", "[Extrusion_1_1/Generated_Face&Sketch_1/SketchCircle_1_2][Extrusion_1_1/To_Face]", [45]),
+            ("Sketch_1/SketchCircle_1_2", "[Extrusion_1_1/Generated_Face&Sketch_1/SketchCircle_1_2][Extrusion_1_1/To_Face]", [0]),
+            ("Sketch_1/SketchLine_3", "Sketch_1/SketchCircle_1_2", []),
+            ("[Extrusion_1_1/Generated_Face&Sketch_1/SketchCircle_1_2][Extrusion_1_1/From_Face]", "[Extrusion_1_1/Generated_Face&Sketch_1/SketchCircle_1_2][Extrusion_1_1/To_Face]", []),
+            ("Sketch_2/SketchLine_7", "[Extrusion_1_1/To_Face][Extrusion_1_1/Generated_Face&Sketch_1/SketchLine_3]", [130]),
+            ("Sketch_2/SketchLine_7", "[Extrusion_1_1/To_Face][Extrusion_1_1/Generated_Face&Sketch_1/SketchLine_6]", [40]),
+            ("Sketch_2/SketchLine_7", "[Extrusion_1_1/Generated_Face&Sketch_1/SketchCircle_1_2][Extrusion_1_1/To_Face]", [121.21205374, 84.80231126])
            ]
 
 for ref in REF_DATA:
@@ -89,7 +91,7 @@ for ref in REF_DATA:
         assert(math.fabs(a - r) < TOLERANCE), "Angle {} differs from expected value {}".format(a, r)
 
 # select incorrect data
-angle = model.measureAngle(Part_1_doc, model.selection("FACE", "Extrusion_1_1/To_Face_1"), model.selection("EDGE", "Sketch_2/Edge-SketchLine_7"))
+angle = model.measureAngle(Part_1_doc, model.selection("FACE", "Extrusion_1_1/To_Face"), model.selection("EDGE", "Sketch_2/SketchLine_7"))
 assert(angle.size() == 0)
 
 model.end()

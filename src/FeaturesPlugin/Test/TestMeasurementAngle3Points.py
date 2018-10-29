@@ -1,4 +1,4 @@
-## Copyright (C) 2018-20xx  CEA/DEN, EDF R&D
+## Copyright (C) 2014-2017  CEA/DEN, EDF R&D
 ##
 ## This library is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU Lesser General Public
@@ -17,6 +17,8 @@
 ## See http:##www.salome-platform.org/ or
 ## email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com>
 ##
+
+# -*- coding: utf-8 -*-
 
 from SketchAPI import *
 
@@ -55,43 +57,43 @@ SketchProjection_1 = Sketch_1.addProjection(model.selection("VERTEX", "PartSet/O
 SketchPoint_1 = SketchProjection_1.createdFeature()
 SketchConstraintCoincidence_7 = Sketch_1.setCoincident(SketchLine_1.startPoint(), SketchAPI_Point(SketchPoint_1).coordinates())
 model.do()
-Extrusion_1 = model.addExtrusion(Part_1_doc, [model.selection("FACE", "Sketch_1/Face-SketchLine_1f-SketchLine_2f-SketchLine_3f-SketchLine_4f-SketchLine_5f-SketchLine_6f")], model.selection(), 100, 0)
+Extrusion_1 = model.addExtrusion(Part_1_doc, [model.selection("FACE", "Sketch_1/Face-SketchLine_1r-SketchLine_2f-SketchLine_3f-SketchLine_4f-SketchLine_5f-SketchLine_6f")], model.selection(), 100, 0)
 model.do()
 
 TOLERANCE = 1.e-6
 
 # reference data
-REF_DATA = [("Extrusion_1_1/Generated_Face_6&Extrusion_1_1/Generated_Face_1&Extrusion_1_1/From_Face_1",
-             "Extrusion_1_1/Generated_Face_6&Extrusion_1_1/Generated_Face_5&Extrusion_1_1/From_Face_1",
-             "Extrusion_1_1/Generated_Face_5&Extrusion_1_1/Generated_Face_4&Extrusion_1_1/From_Face_1",
+REF_DATA = [("[Extrusion_1_1/Generated_Face&Sketch_1/SketchLine_1][Extrusion_1_1/Generated_Face&Sketch_1/SketchLine_6][Extrusion_1_1/From_Face]",
+             "[Extrusion_1_1/Generated_Face&Sketch_1/SketchLine_1][Extrusion_1_1/Generated_Face&Sketch_1/SketchLine_2][Extrusion_1_1/From_Face]",
+             "[Extrusion_1_1/Generated_Face&Sketch_1/SketchLine_2][Extrusion_1_1/Generated_Face&Sketch_1/SketchLine_3][Extrusion_1_1/From_Face]",
              120),
-            ("Extrusion_1_1/Generated_Face_5&Extrusion_1_1/Generated_Face_4&Extrusion_1_1/From_Face_1",
-             "Extrusion_1_1/Generated_Face_6&Extrusion_1_1/Generated_Face_5&Extrusion_1_1/From_Face_1",
-             "Extrusion_1_1/Generated_Face_6&Extrusion_1_1/Generated_Face_1&Extrusion_1_1/From_Face_1",
+            ("[Extrusion_1_1/Generated_Face&Sketch_1/SketchLine_2][Extrusion_1_1/Generated_Face&Sketch_1/SketchLine_3][Extrusion_1_1/From_Face]",
+             "[Extrusion_1_1/Generated_Face&Sketch_1/SketchLine_1][Extrusion_1_1/Generated_Face&Sketch_1/SketchLine_2][Extrusion_1_1/From_Face]",
+             "[Extrusion_1_1/Generated_Face&Sketch_1/SketchLine_1][Extrusion_1_1/Generated_Face&Sketch_1/SketchLine_6][Extrusion_1_1/From_Face]",
              120),
-            ("Extrusion_1_1/Generated_Face_6&Extrusion_1_1/Generated_Face_5&Extrusion_1_1/From_Face_1",
-             "Extrusion_1_1/Generated_Face_4&Extrusion_1_1/Generated_Face_3&Extrusion_1_1/From_Face_1",
-             "Extrusion_1_1/Generated_Face_2&Extrusion_1_1/Generated_Face_1&Extrusion_1_1/From_Face_1",
+            ("[Extrusion_1_1/Generated_Face&Sketch_1/SketchLine_1][Extrusion_1_1/Generated_Face&Sketch_1/SketchLine_2][Extrusion_1_1/From_Face]",
+             "[Extrusion_1_1/Generated_Face&Sketch_1/SketchLine_3][Extrusion_1_1/Generated_Face&Sketch_1/SketchLine_4][Extrusion_1_1/From_Face]",
+             "[Extrusion_1_1/Generated_Face&Sketch_1/SketchLine_5][Extrusion_1_1/Generated_Face&Sketch_1/SketchLine_6][Extrusion_1_1/From_Face]",
              60),
-            ("Extrusion_1_1/Generated_Face_6&Extrusion_1_1/Generated_Face_5&Extrusion_1_1/To_Face_1",
-             "Extrusion_1_1/Generated_Face_5&Extrusion_1_1/Generated_Face_4&Extrusion_1_1/To_Face_1",
-             "Extrusion_1_1/Generated_Face_4&Extrusion_1_1/Generated_Face_3&Extrusion_1_1/To_Face_1",
+            ("[Extrusion_1_1/Generated_Face&Sketch_1/SketchLine_1][Extrusion_1_1/Generated_Face&Sketch_1/SketchLine_2][Extrusion_1_1/To_Face]",
+             "[Extrusion_1_1/Generated_Face&Sketch_1/SketchLine_2][Extrusion_1_1/Generated_Face&Sketch_1/SketchLine_3][Extrusion_1_1/To_Face]",
+             "[Extrusion_1_1/Generated_Face&Sketch_1/SketchLine_3][Extrusion_1_1/Generated_Face&Sketch_1/SketchLine_4][Extrusion_1_1/To_Face]",
              120),
-            ("Extrusion_1_1/Generated_Face_6&Extrusion_1_1/Generated_Face_5&Extrusion_1_1/From_Face_1",
-             "Extrusion_1_1/Generated_Face_5&Extrusion_1_1/Generated_Face_4&Extrusion_1_1/From_Face_1",
-             "Extrusion_1_1/Generated_Face_4&Extrusion_1_1/Generated_Face_3&Extrusion_1_1/To_Face_1",
+            ("[Extrusion_1_1/Generated_Face&Sketch_1/SketchLine_1][Extrusion_1_1/Generated_Face&Sketch_1/SketchLine_2][Extrusion_1_1/From_Face]",
+             "[Extrusion_1_1/Generated_Face&Sketch_1/SketchLine_2][Extrusion_1_1/Generated_Face&Sketch_1/SketchLine_3][Extrusion_1_1/From_Face]",
+             "[Extrusion_1_1/Generated_Face&Sketch_1/SketchLine_3][Extrusion_1_1/Generated_Face&Sketch_1/SketchLine_4][Extrusion_1_1/To_Face]",
              104.9068234),
-            ("Extrusion_1_1/Generated_Face_6&Extrusion_1_1/Generated_Face_5&Extrusion_1_1/From_Face_1",
-             "Extrusion_1_1/Generated_Face_4&Extrusion_1_1/Generated_Face_3&Extrusion_1_1/From_Face_1",
-             "Extrusion_1_1/Generated_Face_4&Extrusion_1_1/Generated_Face_3&Extrusion_1_1/To_Face_1",
+            ("[Extrusion_1_1/Generated_Face&Sketch_1/SketchLine_1][Extrusion_1_1/Generated_Face&Sketch_1/SketchLine_2][Extrusion_1_1/From_Face]",
+             "[Extrusion_1_1/Generated_Face&Sketch_1/SketchLine_3][Extrusion_1_1/Generated_Face&Sketch_1/SketchLine_4][Extrusion_1_1/From_Face]",
+             "[Extrusion_1_1/Generated_Face&Sketch_1/SketchLine_3][Extrusion_1_1/Generated_Face&Sketch_1/SketchLine_4][Extrusion_1_1/To_Face]",
              90),
-            ("Extrusion_1_1/Generated_Face_6&Extrusion_1_1/Generated_Face_5&Extrusion_1_1/From_Face_1",
-             "Extrusion_1_1/Generated_Face_5&Extrusion_1_1/Generated_Face_4&Extrusion_1_1/To_Face_1",
-             "Extrusion_1_1/Generated_Face_4&Extrusion_1_1/Generated_Face_3&Extrusion_1_1/From_Face_1",
+            ("[Extrusion_1_1/Generated_Face&Sketch_1/SketchLine_1][Extrusion_1_1/Generated_Face&Sketch_1/SketchLine_2][Extrusion_1_1/From_Face]",
+             "[Extrusion_1_1/Generated_Face&Sketch_1/SketchLine_2][Extrusion_1_1/Generated_Face&Sketch_1/SketchLine_3][Extrusion_1_1/To_Face]",
+             "[Extrusion_1_1/Generated_Face&Sketch_1/SketchLine_3][Extrusion_1_1/Generated_Face&Sketch_1/SketchLine_4][Extrusion_1_1/From_Face]",
              52.91916441),
-            ("Extrusion_1_1/Generated_Face_5&Extrusion_1_1/Generated_Face_4&Extrusion_1_1/To_Face_1",
-             "Extrusion_1_1/Generated_Face_6&Extrusion_1_1/Generated_Face_5&Extrusion_1_1/From_Face_1",
-             "Extrusion_1_1/Generated_Face_5&Extrusion_1_1/Generated_Face_4&Extrusion_1_1/To_Face_1",
+            ("[Extrusion_1_1/Generated_Face&Sketch_1/SketchLine_2][Extrusion_1_1/Generated_Face&Sketch_1/SketchLine_3][Extrusion_1_1/To_Face]",
+             "[Extrusion_1_1/Generated_Face&Sketch_1/SketchLine_1][Extrusion_1_1/Generated_Face&Sketch_1/SketchLine_2][Extrusion_1_1/From_Face]",
+             "[Extrusion_1_1/Generated_Face&Sketch_1/SketchLine_2][Extrusion_1_1/Generated_Face&Sketch_1/SketchLine_3][Extrusion_1_1/To_Face]",
              0)
            ]
 
@@ -100,7 +102,7 @@ for ref in REF_DATA:
     assert(math.fabs(angle - ref[3]) < TOLERANCE), "Angle {} differs from expected value {}".format(angle, ref[3])
 
 # select incorrect data
-angle = model.measureAngle(Part_1_doc, model.selection("FACE", "Extrusion_1_1/To_Face_1"), model.selection("VERTEX", "Extrusion_1_1/Generated_Face_5&Extrusion_1_1/Generated_Face_4&Extrusion_1_1/To_Face_1"), model.selection("VERTEX", "Extrusion_1_1/Generated_Face_6&Extrusion_1_1/Generated_Face_5&Extrusion_1_1/From_Face_1"))
+angle = model.measureAngle(Part_1_doc, model.selection("FACE", "Extrusion_1_1/To_Face"), model.selection("VERTEX", "[Extrusion_1_1/Generated_Face&Sketch_1/SketchLine_2][Extrusion_1_1/Generated_Face&Sketch_1/SketchLine_3][Extrusion_1_1/To_Face]"), model.selection("VERTEX", "[Extrusion_1_1/Generated_Face&Sketch_1/SketchLine_1][Extrusion_1_1/Generated_Face&Sketch_1/SketchLine_2][Extrusion_1_1/From_Face]"))
 assert(angle == -1.0)
 
 angle = model.measureAngle(Part_1_doc, model.selection("VERTEX", ""), model.selection("VERTEX", ""), model.selection("VERTEX", ""))

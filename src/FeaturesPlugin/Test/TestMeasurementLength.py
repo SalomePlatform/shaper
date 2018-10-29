@@ -1,4 +1,4 @@
-## Copyright (C) 2018-20xx  CEA/DEN, EDF R&D
+## Copyright (C) 2014-2017  CEA/DEN, EDF R&D
 ##
 ## This library is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU Lesser General Public
@@ -17,6 +17,8 @@
 ## See http:##www.salome-platform.org/ or
 ## email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com>
 ##
+
+# -*- coding: utf-8 -*-
 
 from salome.shaper import model
 
@@ -57,20 +59,20 @@ SketchConstraintLength_2 = Sketch_1.setLength(SketchLine_4.result(), "H")
 SketchConstraintDistanceHorizontal_1 = Sketch_1.setHorizontalDistance(SketchLine_4.startPoint(), SketchCircle_1.center(), "L/2")
 SketchConstraintDistanceVertical_1 = Sketch_1.setVerticalDistance(SketchLine_4.startPoint(), SketchCircle_1.center(), "H/2")
 model.do()
-Extrusion_1 = model.addExtrusion(Part_1_doc, [model.selection("FACE", "Sketch_1/Face-SketchCircle_1_2f-SketchLine_3f-SketchLine_4f-SketchLine_5f-SketchLine_6f")], model.selection(), model.selection("FACE", "Plane_1"), 0, model.selection(), 10)
+Extrusion_1 = model.addExtrusion(Part_1_doc, [model.selection("FACE", "Sketch_1/Face-SketchCircle_1_2r-SketchLine_3f-SketchLine_4f-SketchLine_5f-SketchLine_6f")], model.selection(), model.selection("FACE", "Plane_1"), 0, model.selection(), 10)
 model.do()
 
 TOLERANCE = 1.e-6
 
 # reference data
-REF_DATA = [("Extrusion_1_1/From_Face_1&Extrusion_1_1/Generated_Face_1", ParamH.value()),
-            ("Extrusion_1_1/From_Face_1&Extrusion_1_1/Generated_Face_4", ParamL.value()),
-            ("Extrusion_1_1/Generated_Face_5&Extrusion_1_1/From_Face_1", ParamR.value() * 2.0 * math.pi),
-            ("Extrusion_1_1/Generated_Face_5&Extrusion_1_1/To_Face_1", 381.981436664),
-            ("Extrusion_1_1/Generated_Face_5", 60),
-            ("Sketch_1/Edge-SketchLine_3", ParamL.value()),
-            ("Sketch_1/Edge-SketchLine_4", ParamH.value()),
-            ("Sketch_1/Edge-SketchCircle_1_2", ParamR.value() * 2.0 * math.pi)
+REF_DATA = [("[Extrusion_1_1/From_Face][Extrusion_1_1/Generated_Face&Sketch_1/SketchLine_6]", ParamH.value()),
+            ("[Extrusion_1_1/From_Face][Extrusion_1_1/Generated_Face&Sketch_1/SketchLine_3]", ParamL.value()),
+            ("[Extrusion_1_1/Generated_Face&Sketch_1/SketchCircle_1_2][Extrusion_1_1/From_Face]", ParamR.value() * 2.0 * math.pi),
+            ("[Extrusion_1_1/Generated_Face&Sketch_1/SketchCircle_1_2][Extrusion_1_1/To_Face]", 381.981436664),
+            ("([Extrusion_1_1/Generated_Face&Sketch_1/SketchCircle_1_2][Extrusion_1_1/From_Face])([Extrusion_1_1/Generated_Face&Sketch_1/SketchCircle_1_2][Extrusion_1_1/To_Face])([Extrusion_1_1/Generated_Face&Sketch_1/SketchCircle_1_2][Extrusion_1_1/From_Face])([Extrusion_1_1/Generated_Face&Sketch_1/SketchCircle_1_2][Extrusion_1_1/To_Face])", 60),
+            ("Sketch_1/SketchLine_3", ParamL.value()),
+            ("Sketch_1/SketchLine_4", ParamH.value()),
+            ("Sketch_1/SketchCircle_1_2", ParamR.value() * 2.0 * math.pi)
            ]
 
 for ref in REF_DATA:
@@ -78,7 +80,7 @@ for ref in REF_DATA:
     assert(math.fabs(length - ref[1]) < TOLERANCE), "Length {} differs from expected value {}".format(length, ref[1])
 
 # select incorrect data
-length = model.measureLength(Part_1_doc, model.selection("FACE", "Extrusion_1_1/Generated_Face_5"))
+length = model.measureLength(Part_1_doc, model.selection("FACE", "Extrusion_1_1/Generated_Face&Sketch_1/SketchCircle_1_2"))
 assert(length == -1)
 
 model.end()
