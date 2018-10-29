@@ -440,6 +440,10 @@ std::shared_ptr<GeomAPI_Shape> Model_AttributeSelection::internalValue(CenterTyp
         }
         return GeomAlgoAPI_CompoundBuilder::compound(allShapes);
       }
+    } else {
+      if (contextFeature().get()) {
+        return aResult; // for the whole sketch feature selected return null => all faces
+      }
     }
 
     Handle(TNaming_NamedShape) aSelection;
