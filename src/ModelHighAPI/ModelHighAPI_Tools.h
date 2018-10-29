@@ -172,7 +172,7 @@ std::string strByValueType(const ModelAPI_AttributeTables::ValueType theType);
 /// model must be recreated fully, with all attributes
 /// \returns true if check is well done
 MODELHIGHAPI_EXPORT
-bool checkPythonDump();
+bool checkPythonDump(const bool theWeakNameCheck = false);
 
 //--------------------------------------------------------------------------------------
 //--------------------------------------------------------------------------------------

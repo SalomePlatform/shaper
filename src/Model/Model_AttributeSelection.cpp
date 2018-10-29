@@ -1146,24 +1146,15 @@ void Model_AttributeSelection::selectSubShape(const std::string& theType,
   const std::string& theContextName, const int theIndex)
 {
   // selection of context by name
-  //std::string aNamingContextName = theContextName + "/";
-  //selectSubShape(theType, aNamingContextName);
-  std::shared_ptr<Model_Document> aDoc =
-    std::dynamic_pointer_cast<Model_Document>(owner()->document());
-  if (aDoc.get()) {
-    bool aUnique = true;
-    std::string aContextName = theContextName;
-    std::string anEmptySub = "";
-    ResultPtr aContext = aDoc->findByName(aContextName, anEmptySub, aUnique);
-    //ResultPtr aContext = context();
-    if (aContext.get()) {
-      GeomShapePtr aContShape = aContext->shape();
-      if (aContShape.get()) {
-        GeomAlgoAPI_NExplode aNExp(aContShape, GeomAPI_Shape::shapeTypeByStr(theType));
-        GeomShapePtr aValue = aNExp.shape(theIndex);
-        if (aValue.get())
-          setValue(aContext, aValue);
-      }
+  selectSubShape(theType, theContextName);
+  ResultPtr aContext = context();
+  if (aContext.get()) {
+    GeomShapePtr aContShape = aContext->shape();
+    if (aContShape.get()) {
+      GeomAlgoAPI_NExplode aNExp(aContShape, GeomAPI_Shape::shapeTypeByStr(theType));
+      GeomShapePtr aValue = aNExp.shape(theIndex);
+      if (aValue.get())
+        setValue(aContext, aValue);
     }
   }
 }

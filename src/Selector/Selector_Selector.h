@@ -68,7 +68,7 @@ class Selector_Selector
   /// Initializes the selector structure on the label.
   /// Stores the name data to restore after modification.
    SELECTOR_EXPORT bool select(const TopoDS_Shape theContext, const TopoDS_Shape theValue,
-     const bool theUseNeighbors = true);
+     const bool theUseNeighbors = true, const bool theUseIntersections = true);
 
   /// Stores the name to the label and sub-labels tree
    SELECTOR_EXPORT void store();
@@ -97,7 +97,7 @@ private:
   /// Create and keep in the list the sub-sulector that select the given value.
   /// Returns true if selection is correct.
   bool selectBySubSelector(const TopoDS_Shape theContext, const TopoDS_Shape theValue,
-    const bool theUseNeighbors = true);
+    const bool theUseNeighbors = true, const bool theUseIntersections = true);
   /// Searches the final shapes presented in all results from bases basing on modification fields
   void findModificationResult(TopoDS_ListOfShape& theCommon);
 };

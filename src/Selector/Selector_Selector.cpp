@@ -247,7 +247,7 @@ static const TopoDS_Shape findNeighbor(const TopoDS_Shape theContext,
 }
 
 bool Selector_Selector::select(const TopoDS_Shape theContext, const TopoDS_Shape theValue,
-  const bool theUseNeighbors)
+  const bool theUseNeighbors, const bool theUseIntersections)
 {
   if (theValue.IsNull() || theContext.IsNull())
     return false;
@@ -275,7 +275,8 @@ bool Selector_Selector::select(const TopoDS_Shape theContext, const TopoDS_Shape
         aSelectionType == TopAbs_SHELL || aSelectionType == TopAbs_WIRE)
     { // iterate all sub-shapes and select them on sublabels
       for(TopoDS_Iterator aSubIter(theValue); aSubIter.More(); aSubIter.Next()) {
-        if (!selectBySubSelector(theContext, aSubIter.Value(), theUseNeighbors)) {
+        if (!selectBySubSelector(
+            theContext, aSubIter.Value(), theUseNeighbors, theUseIntersections)) {
           return false; // if some selector is failed, everything is failed
         }
       }
@@ -287,7 +288,7 @@ bool Selector_Selector::select(const TopoDS_Shape theContext, const TopoDS_Shape
     bool aFacesTried = false; // for identification of vertices, faces are tried, then edges
     TopoDS_ListOfShape aLastCommon; // to store the commons not good, but may be used for weak
     TopoDS_ListOfShape aLastIntersectors;
-    while(aSelectionType != TopAbs_FACE || !aFacesTried) {
+    while(theUseIntersections && (aSelectionType != TopAbs_FACE || !aFacesTried)) {
       if (aSelectionType == TopAbs_FACE) {
         if (theValue.ShapeType() != TopAbs_VERTEX)
           break;
@@ -318,7 +319,7 @@ bool Selector_Selector::select(const TopoDS_Shape theContext, const TopoDS_Shape
         mySubSelList.clear();
         TopoDS_ListOfShape::Iterator anInt(anIntList);
         for (; anInt.More(); anInt.Next()) {
-          if (!selectBySubSelector(theContext, anInt.Value(), theUseNeighbors)) {
+          if (!selectBySubSelector(theContext, anInt.Value(), theUseNeighbors, false)) {
             break; // if some selector is failed, stop and search another solution
           }
         }
@@ -335,7 +336,7 @@ bool Selector_Selector::select(const TopoDS_Shape theContext, const TopoDS_Shape
     if (!theUseNeighbors)
       return false;
 
-    // searching by neighbours
+    // searching by neighbors
     std::list<std::pair<TopoDS_Shape, int> > aNBs; /// neighbor sub-shape -> level of neighborhood
     for(int aLevel = 1; true; aLevel++) {
       TopTools_MapOfShape aNewNB;
@@ -350,7 +351,7 @@ bool Selector_Selector::select(const TopoDS_Shape theContext, const TopoDS_Shape
           TopoDS_Shape aNewNBShape = anOrder.Current();
           // check which can be named correctly, without "by neighbors" type
           Selector_Selector aSelector(myLab.FindChild(1));
-          if (aSelector.select(theContext, aNewNBShape, false)) { // add to the list of good NBs
+          if (aSelector.select(theContext, aNewNBShape, false, false)) { // add to list of good NBs
             aNBs.push_back(std::pair<TopoDS_Shape, int>(aNewNBShape, aLevel));
           }
         }
@@ -359,7 +360,7 @@ bool Selector_Selector::select(const TopoDS_Shape theContext, const TopoDS_Shape
       if (!aResult.IsNull() && aResult.IsSame(theValue)) {
         std::list<std::pair<TopoDS_Shape, int> >::iterator aNBIter = aNBs.begin();
         for(; aNBIter != aNBs.end(); aNBIter++) {
-          if (!selectBySubSelector(theContext, aNBIter->first, false)) {
+          if (!selectBySubSelector(theContext, aNBIter->first, false, false)) {
             return false; // something is wrong because before this selection was ok
           }
           myNBLevel.push_back(aNBIter->second);
@@ -379,7 +380,7 @@ bool Selector_Selector::select(const TopoDS_Shape theContext, const TopoDS_Shape
         mySubSelList.clear();
         TopoDS_ListOfShape::Iterator anInt(aLastIntersectors);
         for (; anInt.More(); anInt.Next()) {
-          if (!selectBySubSelector(theContext, anInt.Value(), theUseNeighbors)) {
+          if (!selectBySubSelector(theContext, anInt.Value(), theUseNeighbors, theUseIntersections)) {
             break; // if some selector is failed, stop and search another solution
           }
         }
@@ -390,34 +391,36 @@ bool Selector_Selector::select(const TopoDS_Shape theContext, const TopoDS_Shape
       }
     }
 
-    // pure weak naming
-    myType = SELTYPE_WEAK_NAMING;
-    Selector_NExplode aNexp(theContext, theValue.ShapeType());
-    myWeakIndex = aNexp.index(theValue);
-    if (myWeakIndex != -1) {
-      myShapeType = theValue.ShapeType();
-      // searching for context shape label to store in myFinal
-      myFinal.Nullify();
-      if (TNaming_Tool::HasLabel(myLab, theContext)) {
-        for(TNaming_SameShapeIterator aShapes(theContext, myLab); aShapes.More(); aShapes.Next())
-        {
-          Handle(TNaming_NamedShape) aNS;
-          if (aShapes.Label().FindAttribute(TNaming_NamedShape::GetID(), aNS)) {
-            TNaming_Evolution anEvolution = aNS->Evolution();
-            if (anEvolution == TNaming_PRIMITIVE || anEvolution == TNaming_GENERATED ||
-                anEvolution == TNaming_MODIFY) {
-              // check this is a new shape
-              for(TNaming_Iterator aNSIter(aNS); aNSIter.More(); aNSIter.Next()) {
-                if (aNSIter.NewShape().IsSame(theContext)) {
-                  myFinal = aNS->Label();
-                  break;
+    // pure weak naming: there is no sense to use pure weak naming for neighbors selection
+    if (theUseNeighbors) {
+      myType = SELTYPE_WEAK_NAMING;
+      Selector_NExplode aNexp(theContext, theValue.ShapeType());
+      myWeakIndex = aNexp.index(theValue);
+      if (myWeakIndex != -1) {
+        myShapeType = theValue.ShapeType();
+        // searching for context shape label to store in myFinal
+        myFinal.Nullify();
+        if (TNaming_Tool::HasLabel(myLab, theContext)) {
+          for(TNaming_SameShapeIterator aShapes(theContext, myLab); aShapes.More(); aShapes.Next())
+          {
+            Handle(TNaming_NamedShape) aNS;
+            if (aShapes.Label().FindAttribute(TNaming_NamedShape::GetID(), aNS)) {
+              TNaming_Evolution anEvolution = aNS->Evolution();
+              if (anEvolution == TNaming_PRIMITIVE || anEvolution == TNaming_GENERATED ||
+                  anEvolution == TNaming_MODIFY) {
+                // check this is a new shape
+                for(TNaming_Iterator aNSIter(aNS); aNSIter.More(); aNSIter.Next()) {
+                  if (aNSIter.NewShape().IsSame(theContext)) {
+                    myFinal = aNS->Label();
+                    break;
+                  }
                 }
               }
             }
           }
         }
+        return true; // could be final empty (in case it is called recursively) or not
       }
-      return true; // could be final empty (in case it is called recursively) or not
     }
 
     return false;
@@ -508,7 +511,8 @@ bool Selector_Selector::select(const TopoDS_Shape theContext, const TopoDS_Shape
           if (!aResult.IsNull() && aResult.IsSame(theValue)) {
             std::list<std::pair<TopoDS_Shape, int> >::iterator aNBIter = aNBs.begin();
             for(; aNBIter != aNBs.end(); aNBIter++) {
-              if (!selectBySubSelector(theContext, aNBIter->first, theUseNeighbors)) {
+              if (!selectBySubSelector(
+                  theContext, aNBIter->first, theUseNeighbors, theUseIntersections)) {
                 return false; // something is wrong because before this selection was ok
               }
               myNBLevel.push_back(aNBIter->second);
@@ -1024,7 +1028,7 @@ TDF_Label Selector_Selector::restoreByName(
           continue;
         }
         TopAbs_ShapeEnum aSubShapeType = TopAbs_FACE;
-        if (anEndPos != std::string::npos && anEndPos + 1 > theName.size()) {
+        if (anEndPos != std::string::npos && anEndPos + 1 < theName.size()) {
           char aShapeChar = theName[anEndPos + 1];
           if (theName[anEndPos + 1] != '[') {
             switch(aShapeChar) {
@@ -1146,10 +1150,11 @@ TDF_Label Selector_Selector::restoreByName(
 }
 
 bool Selector_Selector::selectBySubSelector(
-  const TopoDS_Shape theContext, const TopoDS_Shape theValue, const bool theUseNeighbors)
+  const TopoDS_Shape theContext, const TopoDS_Shape theValue,
+  const bool theUseNeighbors, const bool theUseIntersections)
 {
   mySubSelList.push_back(Selector_Selector(myLab.FindChild(int(mySubSelList.size()) + 1)));
-  if (!mySubSelList.back().select(theContext, theValue, theUseNeighbors)) {
+  if (!mySubSelList.back().select(theContext, theValue, theUseNeighbors, theUseIntersections)) {
     mySubSelList.clear(); // if one of the selector is failed, all become invalid
     return false;
   }

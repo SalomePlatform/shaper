@@ -511,21 +511,29 @@ static bool checkDump(SessionPtr theSession,
   return true;
 }
 
-bool checkPythonDump()
+bool checkPythonDump(const bool theWeakNameCheck)
 {
   static const std::string anErrorByNaming("checkPythonDump by naming");
   static const std::string anErrorByGeometry("checkPythonDump by geometry");
+  static const std::string anErrorByWeak("checkPythonDump by weak naming");
 
   static char aFileForNamingDump[] = "./check_dump_byname.py";
   static char aFileForGeometryDump[] = "./check_dump_bygeom.py";
+  static char aFileForWeakDump[] = "./check_dump_weak.py";
 
   SessionPtr aSession = ModelAPI_Session::get();
-  // dump with the selection by names
-  if (!dumpToPython(aSession, aFileForNamingDump, "topological_naming", anErrorByNaming))
-    return false;
-  // dump with the selection by geometry
-  if (!dumpToPython(aSession, aFileForGeometryDump, "geometric_selection", anErrorByGeometry))
-    return false;
+  if (!theWeakNameCheck) {
+    // dump with the selection by names
+    if (!dumpToPython(aSession, aFileForNamingDump, "topological_naming", anErrorByNaming))
+      return false;
+    // dump with the selection by geometry
+    if (!dumpToPython(aSession, aFileForGeometryDump, "geometric_selection", anErrorByGeometry))
+      return false;
+  } else {
+    // dump with the selection by weak naming
+    if (!dumpToPython(aSession, aFileForWeakDump, "weak_naming", anErrorByWeak))
+      return false;
+  }
 
    // map from document name to feature name to feature data
   std::map<std::string, std::map<std::string, ModelHighAPI_FeatureStore> > aStore;
@@ -537,10 +545,15 @@ bool checkPythonDump()
     return false;
   }
 
-  // check dump with the selection by names
-  bool isOk = checkDump(aSession, aFileForNamingDump, aStore, anErrorByNaming);
-  // check dump with the selection by geometry
-  isOk = isOk && checkDump(aSession, aFileForGeometryDump, aStore, anErrorByGeometry);
+  bool isOk;
+  if (!theWeakNameCheck) {
+    // check dump with the selection by names
+    isOk = checkDump(aSession, aFileForNamingDump, aStore, anErrorByNaming);
+    // check dump with the selection by geometry
+    isOk = isOk && checkDump(aSession, aFileForGeometryDump, aStore, anErrorByGeometry);
+  } else {
+    isOk = checkDump(aSession, aFileForWeakDump, aStore, anErrorByWeak);
+  }
 
   return isOk;
 }
