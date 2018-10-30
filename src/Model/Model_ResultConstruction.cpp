@@ -73,10 +73,6 @@ void Model_ResultConstruction::setShape(std::shared_ptr<GeomAPI_Shape> theShape)
       ModelAPI_EventCreator::get()->sendUpdated(data()->owner(), anEvent);
     }
     myShape = theShape;
-    if (myShape.get() && myShape->shapeType() == GeomAPI_Shape::COMPOUND &&
-      std::dynamic_pointer_cast<GeomAPI_PlanarEdges>(myShape).get() == NULL) {
-      int a= 10;
-    }
   }
 }
 

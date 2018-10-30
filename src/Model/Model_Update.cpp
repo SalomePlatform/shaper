@@ -253,7 +253,7 @@ void Model_Update::processEvent(const std::shared_ptr<Events_Message>& theMessag
     if (!myUpdateBlocked) { // process all modified features, even if preview is blocked
       bool aPreviewBlockedState = myIsPreviewBlocked; // to update the selected arguments
       myIsPreviewBlocked = false;
-      // iterate everything and add efatures in state "MustBeUpdated" into modified
+      // iterate everything and add features in state "MustBeUpdated" into modified
       std::list<std::shared_ptr<ModelAPI_Document> > allDocs =
         ModelAPI_Session::get()->allOpenedDocuments();
       std::list<std::shared_ptr<ModelAPI_Document> >::iterator aDoc = allDocs.begin();
@@ -331,7 +331,7 @@ void Model_Update::processEvent(const std::shared_ptr<Events_Message>& theMessag
       if ((*anObjIter)->groupName() == ModelAPI_ResultParameter::group()) {
         myIsParamUpdated = true;
       }
-      // on undo/redo, abort do not update persisten features
+      // on undo/redo, abort do not update persistent features
       FeaturePtr anUpdated = std::dynamic_pointer_cast<ModelAPI_Feature>(*anObjIter);
       if (anUpdated.get()) {
         if (addModified(anUpdated, FeaturePtr()))
@@ -395,7 +395,7 @@ void Model_Update::processEvent(const std::shared_ptr<Events_Message>& theMessag
       }
       myIsFinish = false;
     }
-    // processed features must be only on finish, so clear anyway (to avoid reimport on load)
+    // processed features must be only on finish, so clear anyway (to avoid re-import on load)
     myProcessOnFinish.clear();
 
     // #2156: current must be sketch, left after the macro execution
@@ -483,7 +483,7 @@ void Model_Update::processFeatures(const bool theFlushRedisplay)
   }
 }
 
-// collects all the feautres this feature depends on: reasons
+// collects all the features this feature depends on: reasons
 static void allReasons(FeaturePtr theFeature, std::set<FeaturePtr>& theReasons) {
   std::list<std::pair<std::string, std::list<std::shared_ptr<ModelAPI_Object> > > > aDeps;
   theFeature->data()->referencesToObjects(aDeps);
@@ -690,7 +690,7 @@ bool Model_Update::processFeature(FeaturePtr theFeature)
     theFeature->data()->execState(ModelAPI_StateDone);
 
   // this checking must be after the composite feature sub-elements processing:
-  // composite feature status may depend on it's subelements
+  // composite feature status may depend on it's sub-elements
   if ((theFeature->data()->execState() == ModelAPI_StateInvalidArgument || isReferencedInvalid) &&
     theFeature->getKind() != "Part") {
       // don't disable Part because it will make disabled all the features

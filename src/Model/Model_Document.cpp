@@ -85,7 +85,7 @@ static const int TAG_GENERAL = 1;  // general properties tag
 // general sub-labels
 /// where the reference to the current feature label is located (or no attribute if null feature)
 static const int TAG_CURRENT_FEATURE = 1; ///< reference to the current feature
-/// integer, index of the transaction + GUID for auto recomutation blocking
+/// integer, index of the transaction + GUID for auto recomputation blocking
 static const int TAG_CURRENT_TRANSACTION = 2;
 static const int TAG_SELECTION_FEATURE = 3; ///< integer, tag of the selection feature label
 static const int TAG_NODES_STATE = 4; ///< array, tag of the Object Browser nodes states
@@ -220,7 +220,7 @@ bool Model_Document::load(const char* theDirName, const char* theFileName, Docum
     aSession->setCheckTransactions(false);
     if (myObjs)
       delete myObjs;
-    myObjs = new Model_Objects(myDoc->Main()); // synchronisation is inside
+    myObjs = new Model_Objects(myDoc->Main()); // synchronization is inside
     myObjs->setOwner(theThis);
     // update the current features status
     setCurrentFeature(currentFeature(false), false);
@@ -240,7 +240,7 @@ bool Model_Document::load(const char* theDirName, const char* theFileName, Docum
           aPart->data()->document(ModelAPI_ResultPart::DOC_REF())->docId());
     }
 
-  } else { // open failed, but new documnet was created to work with it: inform the model
+  } else { // open failed, but new document was created to work with it: inform the model
     aSession->setActiveDocument(Model_Session::get()->moduleDocument(), false);
   }
   return !isError;
@@ -369,10 +369,10 @@ void Model_Document::close(const bool theForever)
       aSub->close(theForever);
   }
 
-  // close for thid document needs no transaction in this document
+  // close for this document needs no transaction in this document
   std::static_pointer_cast<Model_Session>(Model_Session::get())->setCheckTransactions(false);
 
-  // close all only if it is really asked, otherwise it can be undoed/redoed
+  // close all only if it is really asked, otherwise it can be undone/redone
   if (theForever) {
     // flush everything to avoid messages with bad objects
     delete myObjs;
@@ -425,7 +425,7 @@ void Model_Document::compactNested()
       aSumOfTransaction += myTransactions.rbegin()->myOCAFNum;
       myTransactions.pop_back();
     }
-    // the latest transaction is the start of lower-level operation which startes the nested
+    // the latest transaction is the start of lower-level operation which starts the nested
     myTransactions.rbegin()->myOCAFNum += aSumOfTransaction;
     myNestedNum.pop_back();
   }
@@ -521,7 +521,7 @@ static bool isEqualContent(Handle(TDF_Attribute) theAttr1, Handle(TDF_Attribute)
   return false;
 }
 
-/// Returns true if the last transaction is actually empty: modification to te same values
+/// Returns true if the last transaction is actually empty: modification to the same values
 /// were performed only
 static bool isEmptyTransaction(const Handle(TDocStd_Document)& theDoc) {
   Handle(TDF_Delta) aDelta;
@@ -568,7 +568,7 @@ bool Model_Document::finishOperation()
   // do it before flashes to enable and recompute nesting features correctly
   if (myNestedNum.empty() || (isNestedClosed && myNestedNum.size() == 1)) {
     // if all nested operations are closed, make current the higher level objects (to perform
-    // it in the python scripts correctly): sketch become current after creation ofsub-elements
+    // it in the python scripts correctly): sketch become current after creation of sub-elements
     FeaturePtr aCurrent = currentFeature(false);
     CompositeFeaturePtr aMain, aNext = ModelAPI_Tools::compositeOwner(aCurrent);
     while(aNext.get()) {
@@ -627,7 +627,7 @@ bool Model_Document::finishOperation()
 
   // transaction may be empty if this document was created during this transaction (create part)
   if (!myTransactions.empty() && myDoc->CommitCommand()) {
-    // if commit is successfull, just increment counters
+    // if commit is successful, just increment counters
     if (isEmptyTransaction(myDoc)) { // erase this transaction
       myDoc->Undo();
       myDoc->ClearRedos();
@@ -647,7 +647,7 @@ bool Model_Document::finishOperation()
     // nothing inside in all documents, so remove this transaction from the transactions list
     undoInternal(true, false);
   }
-  // on finish clear redos in any case (issue 446) and for all subs (issue 408)
+  // on finish clear redo in any case (issue 446) and for all subs (issue 408)
   myDoc->ClearRedos();
   myRedos.clear();
   for (aSubIter = aSubs.begin(); aSubIter != aSubs.end(); aSubIter++) {
@@ -683,7 +683,7 @@ static void modifiedLabels(const Handle(TDocStd_Document)& theDoc, TDF_LabelList
     if (anAttr.Value()->Attribute()->ID() == TNaming_NamedShape::GetID()) {
       anExcludedInt.Add(anAttr.Value()->Label());
       // named shape evolution is changed in history update => skip them,
-      // they are not the features arguents
+      // they are not the features arguments
       continue;
     }
     if (anAttr.Value()->Attribute()->ID() == TDataStd_Integer::GetID()) {
@@ -755,7 +755,7 @@ bool Model_Document::isOperation() const
 
 bool Model_Document::isModified()
 {
-  // is modified if at least one operation was commited and not undoed
+  // is modified if at least one operation was committed and not undone
   return myTransactions.size() != myTransactionSave || isOperation();
 }
 
@@ -768,7 +768,7 @@ bool Model_Document::canUndo()
       (myNestedNum.empty() || *myNestedNum.rbegin() - aCurrentNum > 0) &&
       myTransactions.size() - aCurrentNum > 0 /* for omitting the first useless transaction */)
     return true;
-  // check other subs contains operation that can be undoed
+  // check other subs contains operation that can be undone
   const std::set<int> aSubs = subDocuments();
   std::set<int>::iterator aSubIter = aSubs.begin();
   for (; aSubIter != aSubs.end(); aSubIter++) {
@@ -826,7 +826,7 @@ bool Model_Document::canRedo()
 {
   if (!myRedos.empty())
     return true;
-  // check other subs contains operation that can be redoed
+  // check other subs contains operation that can be redone
   const std::set<int> aSubs = subDocuments();
   std::set<int>::iterator aSubIter = aSubs.begin();
   for (; aSubIter != aSubs.end(); aSubIter++) {
@@ -952,6 +952,22 @@ void Model_Document::refsToFeature(FeaturePtr theFeature,
 void Model_Document::removeFeature(FeaturePtr theFeature)
 {
   myObjs->removeFeature(theFeature);
+  // fix for #2723: send signal that part is updated
+  if (!isRoot()) {
+    std::shared_ptr<Model_Document> aRoot =
+      std::dynamic_pointer_cast<Model_Document>(ModelAPI_Session::get()->moduleDocument());
+    std::list<ResultPtr> allParts;
+    aRoot->objects()->allResults(ModelAPI_ResultPart::group(), allParts);
+    std::list<ResultPtr>::iterator aParts = allParts.begin();
+    for(; aParts != allParts.end(); aParts++) {
+      ResultPartPtr aPart = std::dynamic_pointer_cast<ModelAPI_ResultPart>(*aParts);
+      if (aPart->partDoc().get() == this) {
+        static Events_ID anEvent = Events_Loop::eventByName(EVENT_OBJECT_UPDATED);
+        ModelAPI_EventCreator::get()->sendUpdated(aRoot->feature(aPart), anEvent);
+        break;
+      }
+    }
+  }
 }
 
 // recursive function to check if theSub is a child of theMain composite feature
@@ -1142,7 +1158,7 @@ void Model_Document::setCurrentFeature(
     aRefLab.ForgetAttribute(TDF_Reference::GetID());
   }
   // make all features after this feature disabled in reversed order
-  // (to remove results without deps)
+  // (to remove results without dependencies)
   static Events_ID aRedispEvent = aLoop->eventByName(EVENT_OBJECT_TO_REDISPLAY);
 
   bool aPassed = false; // flag that the current object is already passed in cycle
@@ -1169,7 +1185,7 @@ void Model_Document::setCurrentFeature(
       //if (!isCurrentParameter)
         aDisabledFlag = false;
     } else if (isCurrentParameter) {
-      // if paramater is active, all other features become enabled (issue 1307)
+      // if parameter is active, all other features become enabled (issue 1307)
       aDisabledFlag = false;
     }
 
@@ -1184,7 +1200,7 @@ void Model_Document::setCurrentFeature(
       ModelAPI_EventCreator::get()->sendUpdated(anIter, aRedispEvent /*, false*/);
       aWasChanged = true;
     }
-    // update for everyone the concealment flag immideately: on edit feature in the midle of history
+    // update for everyone concealment flag immediately: on edit feature in the middle of history
     if (aWasChanged) {
       std::list<ResultPtr> aResults;
       ModelAPI_Tools::allResults(anIter, aResults);
@@ -1193,7 +1209,7 @@ void Model_Document::setCurrentFeature(
         if ((*aRes).get() && (*aRes)->data()->isValid() && !(*aRes)->isDisabled())
           std::dynamic_pointer_cast<Model_Data>((*aRes)->data())->updateConcealmentFlag();
       }
-      // update the concealment status for disply in isConcealed of ResultBody
+      // update the concealment status for display in isConcealed of ResultBody
       for(aRes = aResults.begin(); aRes != aResults.end(); aRes++) {
         if ((*aRes).get() && (*aRes)->data()->isValid() && !(*aRes)->isDisabled())
           (*aRes)->isConcealed();
@@ -1216,7 +1232,7 @@ void Model_Document::setCurrentFeatureUp()
     if (aPrev.get()) {
       FeaturePtr aComp = ModelAPI_Tools::compositeOwner(aPrev);
       // without cycle (issue 1555): otherwise extrusion fuse
-      // will be enabled and displayed whaen inside sketch
+      // will be enabled and displayed when inside sketch
       if (aComp.get())
           aPrev = aComp;
     }
@@ -1362,7 +1378,7 @@ void Model_Document::addNamingName(const TDF_Label theLabel, std::string theName
   std::map<std::string, std::list<TDF_Label> >::iterator aFind = myNamingNames.find(theName);
 
   if (aFind != myNamingNames.end()) { // to avoid duplicate-labels
-    // to keep correct order inspite of history line management
+    // to keep correct order in spite of history line management
     std::list<TDF_Label>::iterator anAddAfterThis = aFind->second.end();
     FeaturePtr anAddedFeature = featureByLab(theLabel);
     std::list<TDF_Label>::iterator aLabIter = aFind->second.begin();
@@ -1424,7 +1440,7 @@ TDF_Label Model_Document::findNamingName(std::string theName, ResultPtr theConte
             return *aLabIter;
         }
       }
-      return *(aFind->second.rbegin()); // no more variannts, so, return the last
+      return *(aFind->second.rbegin()); // no more variants, so, return the last
   }
   // not found exact name, try to find by sub-components
   std::string::size_type aSlash = theName.rfind('/');
@@ -1668,17 +1684,17 @@ void Model_Document::synchronizeTransactions()
   Model_Document* aRoot =
     std::dynamic_pointer_cast<Model_Document>(ModelAPI_Session::get()->moduleDocument()).get();
   if (aRoot == this)
-    return; // don't need to synchronise root with root
+    return; // don't need to synchronize root with root
 
   std::shared_ptr<Model_Session> aSession =
     std::dynamic_pointer_cast<Model_Session>(Model_Session::get());
-  while(myRedos.size() > aRoot->myRedos.size()) { // remove redos in this
+  while(myRedos.size() > aRoot->myRedos.size()) { // remove redo in this
     aSession->setCheckTransactions(false);
     redo();
     aSession->setCheckTransactions(true);
   }
   /* this case can not be reproduced in any known case for the current moment, so, just comment
-  while(myRedos.size() < aRoot->myRedos.size()) { // add more redos in this
+  while(myRedos.size() < aRoot->myRedos.size()) { // add more redo in this
     undoInternal(false, true);
   }*/
 }
@@ -1798,11 +1814,11 @@ std::shared_ptr<ModelAPI_Feature> Model_Document::producedByFeature(
   if (!aBodyData.get() || !aBodyData->isValid())
     return FeaturePtr();
 
-  TopoDS_Shape anOldShape; // old shape in the pair oldshape->theShape in the named shape
+  TopoDS_Shape anOldShape; // old shape in the pair old shape->theShape in the named shape
   TopoDS_Shape aShapeContainer; // old shape of the shape that contains aShape as sub-element
   Handle(TNaming_NamedShape) aCandidatInThis, aCandidatContainer;
   TDF_Label aBodyLab = aBodyData->label();
-  // use childs and this label (the lowest priority)
+  // use child and this label (the lowest priority)
   TDF_ChildIDIterator aNSIter(aBodyLab, TNaming_NamedShape::GetID(), Standard_True);
   bool aUseThis = !aNSIter.More();
   while(anOldShape.IsNull() && (aNSIter.More() || aUseThis)) {
