@@ -137,7 +137,7 @@ bool Model_AttributeSelection::setValue(const ObjectPtr& theContext,
     myRef.setValue(theContext);
   }
 
-  // do noth use naming if selected shape is result shape itself, but not sub-shape
+  // do not use naming if selected shape is result shape itself, but not sub-shape
   TDF_Label aSelLab = selectionLabel();
   aSelLab.ForgetAttribute(kSIMPLE_REF_ID);
   aSelLab.ForgetAttribute(kINVALID_SELECTION);
@@ -536,7 +536,7 @@ ResultPtr Model_AttributeSelection::context()
         if(aPart.get() && aPart->data() == aResult->data()) {
           ResultPtr aPartResult = std::dynamic_pointer_cast<ModelAPI_Result>(aPart);
           FeaturePtr anOwnerFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(owner());
-          // check that this result is not this-feature result (it is forbidden t oselect itself)
+          // check that this result is not this-feature result (it is forbidden to select itself)
           if(anOwnerFeature.get() && anOwnerFeature->firstResult() != aPartResult) {
             return aPartResult;
           }
@@ -654,7 +654,7 @@ bool Model_AttributeSelection::update()
       aNewShape = aNS->Get();
 
     if (anOldShape.IsNull() || aNewShape.IsNull() || !anOldShape.IsEqual(aNewShape)) {
-      // shape type shoud not not changed: if shape becomes compound of such shapes, then split
+      // shape type should not be changed: if shape becomes compound of such shapes, then split
       if (myParent && !anOldShape.IsNull() && !aNewShape.IsNull() &&
           anOldShape.ShapeType() != aNewShape.ShapeType() &&
           (aNewShape.ShapeType() == TopAbs_COMPOUND || aNewShape.ShapeType() == TopAbs_COMPSOLID))
@@ -1358,7 +1358,7 @@ void Model_AttributeSelection::computeValues(
     }
   }
   if (aToFindPart == 2 && !aNewToOld.IsEmpty()) {
-    // map of sub-shapes -> number of occurences of these shapes in containers
+    // map of sub-shapes -> number of occurrences of these shapes in containers
     NCollection_DataMap<TopoDS_Shape, TopTools_MapOfShape, TopTools_ShapeMapHasher> aSubs;
     TopTools_DataMapOfShapeShape::Iterator aContIter(aNewToOld);
     for(; aContIter.More(); aContIter.Next()) {
@@ -1441,11 +1441,11 @@ bool Model_AttributeSelection::searchNewContext(std::shared_ptr<Model_Document> 
   }
   if (aResults.empty())
     return false; // no modifications found, must stay the same
-  // iterate all results to find futher modifications
+  // iterate all results to find further modifications
   std::set<ResultPtr>::iterator aResIter = aResults.begin();
   for(; aResIter != aResults.end(); aResIter++) {
     if (aResIter->get() != NULL) {
-      // compute new values by two contextes: the old and the new
+      // compute new values by two contexts: the old and the new
       TopTools_ListOfShape aValShapes;
       computeValues(theContext, *aResIter, theValShape, aValShapes);
 
@@ -1460,7 +1460,7 @@ bool Model_AttributeSelection::searchNewContext(std::shared_ptr<Model_Document> 
         if (searchNewContext(theDoc, aNewContShape, *aResIter, aNewValSh,
                              theAccessLabel, aNewRes, aNewUpdatedVal))
         {
-          // appeand new results instead of the current ones
+          // append new results instead of the current ones
           std::list<ResultPtr>::iterator aNewIter = aNewRes.begin();
           TopTools_ListIteratorOfListOfShape aNewUpdVal(aNewUpdatedVal);
           for(; aNewIter != aNewRes.end(); aNewIter++, aNewUpdVal.Next()) {

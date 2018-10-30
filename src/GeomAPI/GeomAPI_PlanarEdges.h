@@ -35,7 +35,7 @@
  * \ingroup DataModel
  * \brief Interface to the set of edges located in one plane
  *
- * Normally this interface corresponds to theedges of the sketch
+ * Normally this interface corresponds to the edges of the sketch
  */
 class GeomAPI_PlanarEdges : public GeomAPI_Shape
 {

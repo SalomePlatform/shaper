@@ -28,6 +28,8 @@
 #include <GeomAPI_PlanarEdges.h>
 #include <GeomAPI_Shape.h>
 #include <Events_Loop.h>
+#include <GeomDataAPI_Point.h>
+#include <GeomDataAPI_Dir.h>
 
 #include <TDF_ChildIDIterator.hxx>
 #include <TNaming_NamedShape.hxx>
@@ -71,6 +73,10 @@ void Model_ResultConstruction::setShape(std::shared_ptr<GeomAPI_Shape> theShape)
       ModelAPI_EventCreator::get()->sendUpdated(data()->owner(), anEvent);
     }
     myShape = theShape;
+    if (myShape.get() && myShape->shapeType() == GeomAPI_Shape::COMPOUND &&
+      std::dynamic_pointer_cast<GeomAPI_PlanarEdges>(myShape).get() == NULL) {
+      int a= 10;
+    }
   }
 }
 
@@ -88,7 +94,7 @@ static std::string shortName(
   aName.erase(std::remove(aName.begin(), aName.end(), '/'), aName.end());
   aName.erase(std::remove(aName.begin(), aName.end(), '&'), aName.end());
   // remove the last 's', 'e', 'f' and 'r' symbols:
-  // they are used as markers of start/end/forward/rewersed indicators
+  // they are used as markers of start/end/forward/reversed indicators
   static const std::string aSyms("sefr");
   std::string::iterator aSuffix = aName.end() - 1;
   while(aSyms.find(*aSuffix) != std::string::npos) {
@@ -97,7 +103,6 @@ static std::string shortName(
   aName.erase(aSuffix + 1, aName.end());
   return aName;
 }
-
 
 bool Model_ResultConstruction::updateShape()
 {
@@ -108,6 +113,25 @@ bool Model_ResultConstruction::updateShape()
     if (aShapeLab.FindAttribute(TNaming_NamedShape::GetID(), aNS)) {
       TopoDS_Shape aShape = aNS->Get();
       if (!aShape.IsNull()) {
+        if (aShape.ShapeType() == TopAbs_COMPOUND) {
+          // restore the sketch planar edges object
+          std::shared_ptr<GeomAPI_PlanarEdges> aBigWire(new GeomAPI_PlanarEdges);
+          aBigWire->setImpl<TopoDS_Shape>(new TopoDS_Shape(aShape));
+          FeaturePtr aSketch =
+            document()->feature(std::dynamic_pointer_cast<ModelAPI_Result>(data()->owner()));
+          std::shared_ptr<GeomDataAPI_Point> anOrigin =
+            std::dynamic_pointer_cast<GeomDataAPI_Point>(aSketch->data()->attribute("Origin"));
+          std::shared_ptr<GeomDataAPI_Dir> aDirX =
+            std::dynamic_pointer_cast<GeomDataAPI_Dir>(aSketch->data()->attribute("DirX"));
+          std::shared_ptr<GeomDataAPI_Dir> aNorm =
+            std::dynamic_pointer_cast<GeomDataAPI_Dir>(aSketch->data()->attribute("Norm"));
+          if (anOrigin.get() && aDirX.get() && aNorm.get()) {
+            aBigWire->setPlane(anOrigin->pnt(), aDirX->dir(), aNorm->dir());
+            myShape = aBigWire;
+            return true;
+          }
+        }
+        // just restore shape
         GeomShapePtr aGShape(new GeomAPI_Shape);
         aGShape->setImpl<TopoDS_Shape>(new TopoDS_Shape(aShape));
         myShape = aGShape; // restore the sketch sub-components
@@ -393,7 +417,7 @@ void Model_ResultConstruction::storeShape(std::shared_ptr<GeomAPI_Shape> theShap
                 TDF_Label anEdgesLabel = aLab.FindChild(1);
                 anEdgesBuilder = new TNaming_Builder(anEdgesLabel);
                 std::ostringstream aSubName;
-                // tag is needed for Test1922 to distinguish subedges of different faces
+                // tag is needed for Test1922 to distinguish sub-edges of different faces
                 aSubName<<"SubEdge_"<<aCurrentTag;
                 TDataStd_Name::Set(anEdgesLabel, aSubName.str().c_str());
               }
