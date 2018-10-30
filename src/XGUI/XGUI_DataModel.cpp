@@ -135,22 +135,11 @@ void XGUI_DataModel::processEvent(const std::shared_ptr<Events_Message>& theMess
       foreach(ObjectPtr aObj, aCreated) {
         ModuleBase_ITreeNode* aNode = myRoot->subNode(aObj);
         if (aNode) {
-          int aOldNb = aNode->childrenCount();
           aNode->update();
-          int aNewNb = aNode->childrenCount();
-
+          rebuildDataTree();
           QModelIndex aFirstIdx = getIndex(aNode, 0);
           QModelIndex aLastIdx = getIndex(aNode, 2);
 
-          if (aNewNb > aOldNb) {
-            insertRows(aOldNb - 1, aNewNb - aOldNb, aFirstIdx);
-          }
-          else if (aNewNb < aOldNb) {
-            if (aNewNb)
-              removeRows(aNewNb - 1, aOldNb - aNewNb, aFirstIdx);
-            else if (aOldNb)
-              removeRows(0, aOldNb, aFirstIdx);
-          }
           dataChanged(aFirstIdx, aLastIdx);
         }
       }
