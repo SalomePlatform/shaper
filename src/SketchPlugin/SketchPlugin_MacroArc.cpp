@@ -491,6 +491,9 @@ void SketchPlugin_MacroArc::fillByCenterAndTwoPassed()
     return;
 
   GeomAPI_Circ2d aCircleForArc(myCenter, myStart);
+  // avoid degerated arc, when the center and the start points are equal
+  if (!aCircleForArc.implPtr<void*>())
+    return;
 
   bool aWasBlocked = data()->blockSendAttributeUpdated(true);
   // check the end point is referred to another feature
