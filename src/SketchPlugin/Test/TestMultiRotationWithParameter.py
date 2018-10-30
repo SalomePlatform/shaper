@@ -47,7 +47,7 @@ SketchProjection_1 = Sketch_1.addProjection(model.selection("VERTEX", "PartSet/O
 SketchPoint_1 = SketchProjection_1.createdFeature()
 model.do()
 SketchMultiRotation_1 = Sketch_1.addRotation([SketchLine_2.result()], SketchAPI_Point(SketchPoint_1).coordinates(), "360/N", "N")
-Extrusion_1 = model.addExtrusion(Part_1_doc, [model.selection("FACE", "Sketch_1/Face-SketchLine_1r-SketchLine_2r-SketchLine_3r-SketchLine_4r")], model.selection(), 10, 0)
+Extrusion_1 = model.addExtrusion(Part_1_doc, [model.selection("FACE", "Sketch_1/Face-SketchLine_4r-SketchLine_3r-SketchLine_2r-SketchLine_1r")], model.selection(), 10, 0)
 model.do()
 
 # change parameters

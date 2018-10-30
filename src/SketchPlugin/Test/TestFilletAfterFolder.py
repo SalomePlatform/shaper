@@ -48,7 +48,7 @@ SketchConstraintVertical_2 = Sketch_1.setVertical(SketchLine_4.result())
 SketchConstraintLength_1 = Sketch_1.setLength(SketchLine_1.result(), "Size")
 SketchConstraintLength_2 = Sketch_1.setLength(SketchLine_2.result(), "Size")
 model.do()
-Extrusion_1 = model.addExtrusion(Part_1_doc, [model.selection("FACE", "Sketch_1/Face-SketchLine_1r-SketchLine_2r-SketchLine_3r-SketchLine_4r")], model.selection(), "Size", 0)
+Extrusion_1 = model.addExtrusion(Part_1_doc, [model.selection("FACE", "Sketch_1/Face-SketchLine_4r-SketchLine_3r-SketchLine_2r-SketchLine_1r")], model.selection(), "Size", 0)
 
 Folder_1 = model.addFolder(Part_1_doc, Sketch_1, Extrusion_1)
 model.do()

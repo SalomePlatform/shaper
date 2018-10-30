@@ -51,11 +51,11 @@ SketchConstraintCoincidence_7 = Sketch_1.setCoincident(SketchArc_2.center(), Ske
 SketchConstraintRadius_2 = Sketch_1.setRadius(SketchArc_2.results()[1], 60)
 SketchConstraintLength_1 = Sketch_1.setLength(SketchLine_1.result(), 40)
 model.do()
-Extrusion_1 = model.addExtrusion(Part_1_doc, [model.selection("FACE", "Sketch_1/Face-SketchArc_1_2r-SketchArc_2_2f-SketchLine_1f-SketchLine_2r")], model.selection(), 50, 50)
-Filling_1 = model.addFilling(Part_1_doc, [model.selection("EDGE", "Extrusion_1_1/Generated_Face_4&Extrusion_1_1/From_Face_1"), model.selection("EDGE", "Extrusion_1_1/Generated_Face_3&Extrusion_1_1/To_Face_1")])
-Plane_4 = model.addPlane(Part_1_doc, model.selection("EDGE", "Extrusion_1_1/Generated_Face_4&Extrusion_1_1/To_Face_1"), model.selection("VERTEX", "Extrusion_1_1/Generated_Face_2&Extrusion_1_1/Generated_Face_1&Extrusion_1_1/From_Face_1"), False)
+Extrusion_1 = model.addExtrusion(Part_1_doc, [model.selection("FACE", "Sketch_1/Face-SketchLine_1f-SketchArc_2_2f-SketchLine_2r-SketchArc_1_2r")], model.selection(), 50, 50)
+Filling_1 = model.addFilling(Part_1_doc, [model.selection("EDGE", "[Extrusion_1_1/Generated_Face&Sketch_1/SketchLine_1][Extrusion_1_1/From_Face]"), model.selection("EDGE", "[Extrusion_1_1/Generated_Face&Sketch_1/SketchArc_2_2][Extrusion_1_1/To_Face]")])
+Plane_4 = model.addPlane(Part_1_doc, model.selection("EDGE", "[Extrusion_1_1/Generated_Face&Sketch_1/SketchLine_1][Extrusion_1_1/To_Face]"), model.selection("VERTEX", "[Extrusion_1_1/Generated_Face&Sketch_1/SketchLine_2][Extrusion_1_1/Generated_Face&Sketch_1/SketchArc_1_2][Extrusion_1_1/From_Face]"), False)
 Sketch_2 = model.addSketch(Part_1_doc, model.selection("FACE", "Plane_1"))
-SketchProjection_2 = Sketch_2.addProjection(model.selection("VERTEX", "Sketch_1/Vertex-SketchArc_1-SketchArc_2-SketchProjection_1-SketchPoint_1"), False)
+SketchProjection_2 = Sketch_2.addProjection(model.selection("VERTEX", "Sketch_1/SketchArc_1"), False)
 SketchPoint_2 = SketchProjection_2.createdFeature()
 SketchLine_3 = Sketch_2.addLine(-70, 60, 70, 60)
 SketchLine_4 = Sketch_2.addLine(70, 60, 70, -60)
@@ -74,19 +74,19 @@ SketchConstraintDistance_2 = Sketch_2.setDistance(SketchAPI_Point(SketchPoint_2)
 SketchConstraintDistance_3 = Sketch_2.setDistance(SketchAPI_Point(SketchPoint_2).coordinates(), SketchLine_4.result(), 70, True)
 SketchConstraintDistance_4 = Sketch_2.setDistance(SketchAPI_Point(SketchPoint_2).coordinates(), SketchLine_6.result(), 70, True)
 model.do()
-Face_1 = model.addFace(Part_1_doc, [model.selection("FACE", "Sketch_2/Face-SketchLine_3r-SketchLine_4r-SketchLine_5r-SketchLine_6r")])
+Face_1 = model.addFace(Part_1_doc, [model.selection("FACE", "Sketch_2/Face-SketchLine_6r-SketchLine_5r-SketchLine_4r-SketchLine_3r")])
 Intersection_1 = model.addIntersection(Part_1_doc, [model.selection("FACE", "Filling_1_1"), model.selection("FACE", "Face_1_1")])
 
 # set different edges used for intersection and check reference data: number of intersection points and their coordinates
-REF_DATA = [("Sketch_1/Edge-SketchArc_1_2", 1, [[30, 0]]),
-            ("Sketch_1/Edge-SketchLine_2", 1, [[-36.024358588836, 0]]),
-            ("Sketch_1/Edge-SketchArc_2_2", 2, [[60, 0], [-60, 0]]),
-            ("Sketch_1/Edge-SketchLine_1", 0, []),
-            ("Extrusion_1_1/Generated_Face_1&Extrusion_1_1/To_Face_1", 1, [[30, 50]]),
-            ("Extrusion_1_1/Generated_Face_2&Extrusion_1_1/To_Face_1", 1, [[-36.024358588836, 50]]),
-            ("Extrusion_1_1/Generated_Face_3&Extrusion_1_1/To_Face_1", 2, [[60, 50], [-60, 50]]),
-            ("Extrusion_1_1/Generated_Face_4&Extrusion_1_1/To_Face_1", 0, []),
-            ("Intersection_1_1", 2, [[-0.0515933488223, -11.6181750315], [41.6438615258, -11.6181750315]])]
+REF_DATA = [("Sketch_1/SketchArc_1_2", 1, [[30, 0]]),
+            ("Sketch_1/SketchLine_2", 1, [[-36.024358588836, 0]]),
+            ("Sketch_1/SketchArc_2_2", 2, [[60, 0], [-60, 0]]),
+            ("Sketch_1/SketchLine_1", 0, []),
+            ("[Extrusion_1_1/Generated_Face&Sketch_1/SketchArc_1_2][Extrusion_1_1/To_Face]", 1, [[30, 50]]),
+            ("[Extrusion_1_1/Generated_Face&Sketch_1/SketchLine_2][Extrusion_1_1/To_Face]", 1, [[-36.024358588836, 50]]),
+            ("[Extrusion_1_1/Generated_Face&Sketch_1/SketchArc_2_2][Extrusion_1_1/To_Face]", 2, [[60, 50], [-60, 50]]),
+            ("[Extrusion_1_1/Generated_Face&Sketch_1/SketchLine_1][Extrusion_1_1/To_Face]", 0, []),
+            ("Intersection_1_1", 2, [[41.6438615258, -11.6181750315], [-0.0515933488223, -11.6181750315]])]
 TOLERANCE = 1.e-7
 
 Sketch_3 = model.addSketch(Part_1_doc, model.defaultPlane("XOZ"))

@@ -28,13 +28,13 @@ Sketch_1 = model.addSketch(Part_1_doc, model.defaultPlane("XOZ"))
 SketchLine_1 = Sketch_1.addLine(-20, -62, 81, 60)
 model.do()
 Sketch_2 = model.addSketch(Part_1_doc, model.defaultPlane("YOZ"))
-SketchProjection_1 = Sketch_2.addProjection(model.selection("EDGE", "Sketch_1/Edge-SketchLine_1"), True)
+SketchProjection_1 = Sketch_2.addProjection(model.selection("EDGE", "Sketch_1/SketchLine_1"), True)
 SketchLine_2 = SketchProjection_1.createdFeature()
 model.do()
-Edge_1 = model.addEdge(Part_1_doc, [model.selection("EDGE", "Sketch_2/Edge-SketchProjection_1")])
+Edge_1 = model.addEdge(Part_1_doc, [model.selection("EDGE", "Sketch_2/SketchProjection_1")])
 model.end()
 
 # before bug fix it was "Sketch_2"
-assert(Edge_1.baseObjects().value(0).namingName() == "Sketch_2/Edge-SketchProjection_1")
+assert(Edge_1.baseObjects().value(0).namingName() == "Sketch_2/SketchProjection_1")
 
 assert(model.checkPythonDump())

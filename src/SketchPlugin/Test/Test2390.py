@@ -93,11 +93,11 @@ SketchConstraintVertical_15 = Sketch_4.setVertical(SketchLine_52.result())
 SketchConstraintVertical_16 = Sketch_4.setVertical(SketchLine_55.result())
 SketchConstraintVertical_17 = Sketch_4.setVertical(SketchLine_58.result())
 SketchConstraintHorizontal_11 = Sketch_4.setHorizontal(SketchLine_56.result())
-SketchProjection_13 = Sketch_4.addProjection(model.selection("VERTEX", "Sketch_1/Vertex-SketchLine_5e"), False)
+SketchProjection_13 = Sketch_4.addProjection(model.selection("VERTEX", "Sketch_1/SketchLine_5_EndVertex"), False)
 SketchPoint_4 = SketchProjection_13.createdFeature()
 SketchConstraintDistanceHorizontal_17 = Sketch_4.setHorizontalDistance(SketchAPI_Point(SketchPoint_4).coordinates(), SketchLine_52.endPoint(), "Drill2_Loc")
 SketchConstraintLength_3 = Sketch_4.setLength(SketchLine_54.result(), "Drill2_InnerRadius")
-SketchProjection_14 = Sketch_4.addProjection(model.selection("EDGE", "Sketch_1/Edge-SketchLine_3"), False)
+SketchProjection_14 = Sketch_4.addProjection(model.selection("EDGE", "Sketch_1/SketchLine_3"), False)
 SketchLine_59 = SketchProjection_14.createdFeature()
 SketchConstraintAngle_6 = Sketch_4.setAngle(SketchLine_57.result(), SketchLine_56.result(), 45)
 SketchConstraintLength_4 = Sketch_4.setLength(SketchLine_56.result(), "Drill2_Radius")
@@ -111,7 +111,7 @@ SketchConstraintDistance_14 = Sketch_4.setDistance(SketchLine_57.endPoint(), Ske
 SketchConstraintTangent_3 = Sketch_4.setTangent(SketchLine_58.result(), SketchArc_2.results()[1])
 model.do()
 
-Revolution_1 = model.addRevolution(Part_1_doc, [model.selection("FACE", "Sketch_2/Face-SketchLine_7r-SketchLine_9r-SketchLine_10r-SketchLine_11f-SketchLine_12f-SketchLine_13f-SketchArc_1_2f")], model.selection("EDGE", "Sketch_2/Edge-SketchLine_7"), 360, 0)
+Revolution_1 = model.addRevolution(Part_1_doc, [model.selection("FACE", "Sketch_2/Face-SketchLine_11f-SketchLine_12f-SketchLine_13f-SketchArc_1_2f-SketchLine_10r-SketchLine_9r-SketchLine_7r")], model.selection("EDGE", "Sketch_2/SketchLine_7"), 360, 0)
 model.do()
 
 from GeomAPI import GeomAPI_Shape

@@ -44,7 +44,7 @@ Import_1.result().setName("profile_top_1")
 
 Sketch_1 = model.addSketch(Part_1_doc, model.defaultPlane("YOZ"))
 SketchLine_1 = Sketch_1.addLine(-0.5, 0, -0.1, 0.5)
-SketchProjection_1 = Sketch_1.addProjection(model.selection("VERTEX", "profile_top_1/Shape2"), False)
+SketchProjection_1 = Sketch_1.addProjection(model.selection("VERTEX", "profile_top_1/Shape_2"), False)
 SketchPoint_1 = SketchProjection_1.createdFeature()
 model.do()
 

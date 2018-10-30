@@ -1,3 +1,28 @@
+## Copyright (C) 2014-2017  CEA/DEN, EDF R&D
+##
+## This library is free software; you can redistribute it and/or
+## modify it under the terms of the GNU Lesser General Public
+## License as published by the Free Software Foundation; either
+## version 2.1 of the License, or (at your option) any later version.
+##
+## This library is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+## Lesser General Public License for more details.
+##
+## You should have received a copy of the GNU Lesser General Public
+## License along with this library; if not, write to the Free Software
+## Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+##
+## See http:##www.salome-platform.org/ or
+## email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com>
+##
+
+"""
+    TestProjectionIntoResult.py
+    Unit test of SketchPlugin_Projection class
+"""
+
 from salome.shaper import model
 from GeomAPI import *
 
@@ -66,75 +91,75 @@ SketchConstraintCoincidence_6 = Sketch_2.setCoincident(SketchLine_6.endPoint(), 
 SketchConstraintCoincidence_7 = Sketch_2.setCoincident(SketchLine_2.startPoint(), SketchLine_7.endPoint())
 SketchConstraintHorizontal_1 = Sketch_2.setHorizontal(SketchLine_7.result())
 model.do()
-Extrusion_1 = model.addExtrusion(Part_1_doc, [model.selection("FACE", "Sketch_2/Face-SketchLine_2r-SketchLine_5r-SketchLine_6r-SketchLine_7r")], model.selection(), 100, 0)
+Extrusion_1 = model.addExtrusion(Part_1_doc, [model.selection("FACE", "Sketch_2/Face-SketchLine_7r-SketchLine_6r-SketchLine_5r-SketchLine_2r")], model.selection(), 100, 0)
 model.do()
 
 #==============================================================================
 # Tests
 #==============================================================================
 
-aProjectedList = [("EDGE", "Sketch_1/Edge-SketchCircle_1_2"),
-                  ("EDGE", "Sketch_1/Edge-SketchArc_1_2"),
-                  ("EDGE", "Sketch_1/Edge-SketchLine_1"),
-                  ("VERTEX", "Sketch_1/Vertex-SketchPoint_1"),
+aProjectedList = [("EDGE", "Sketch_1/SketchCircle_1_2"),
+                  ("EDGE", "Sketch_1/SketchArc_1_2"),
+                  ("EDGE", "Sketch_1/SketchLine_1"),
+                  ("VERTEX", "Sketch_1/SketchPoint_1"),
                   #
-                  ("VERTEX", "Sketch_1/Vertex-SketchCircle_1"),
-                  ("VERTEX", "Sketch_1/Vertex-SketchLine_1e"),
-                  ("VERTEX", "Sketch_1/Vertex-SketchLine_1s"),
-                  ("VERTEX", "Sketch_1/Vertex-SketchArc_1_2s"),
-                  ("VERTEX", "Sketch_1/Vertex-SketchArc_1_2e"),
-                  ("VERTEX", "Sketch_1/Vertex-SketchArc_1"),
+                  ("VERTEX", "Sketch_1/SketchCircle_1_2__cc"),
+                  ("VERTEX", "Sketch_1/SketchLine_1_EndVertex"),
+                  ("VERTEX", "Sketch_1/SketchLine_1_StartVertex"),
+                  ("VERTEX", "Sketch_1/SketchArc_1_2_StartVertex"),
+                  ("VERTEX", "Sketch_1/SketchArc_1_2_EndVertex"),
+                  ("VERTEX", "Sketch_1/SketchArc_1"),
                   #
-                  ("VERTEX", "Extrusion_1_1/Generated_Face_2&Extrusion_1_1/Generated_Face_1&Extrusion_1_1/From_Face_1"),
-                  ("VERTEX", "Extrusion_1_1/Generated_Face_3&Extrusion_1_1/Generated_Face_2&Extrusion_1_1/From_Face_1"),
-                  ("VERTEX", "Extrusion_1_1/Generated_Face_4&Extrusion_1_1/Generated_Face_3&Extrusion_1_1/From_Face_1"),
-                  ("VERTEX", "Extrusion_1_1/Generated_Face_4&Extrusion_1_1/Generated_Face_1&Extrusion_1_1/From_Face_1"),
-                  ("VERTEX", "Extrusion_1_1/Generated_Face_2&Extrusion_1_1/Generated_Face_1&Extrusion_1_1/To_Face_1"),
-                  ("VERTEX", "Extrusion_1_1/Generated_Face_4&Extrusion_1_1/Generated_Face_1&Extrusion_1_1/To_Face_1"),
-                  ("VERTEX", "Extrusion_1_1/Generated_Face_4&Extrusion_1_1/Generated_Face_3&Extrusion_1_1/To_Face_1"),
-                  ("VERTEX", "Extrusion_1_1/Generated_Face_3&Extrusion_1_1/Generated_Face_2&Extrusion_1_1/To_Face_1"),
+                  ("VERTEX", "[Extrusion_1_1/Generated_Face&Sketch_2/SketchLine_5][Extrusion_1_1/Generated_Face&Sketch_2/SketchLine_2][Extrusion_1_1/From_Face]"),
+                  ("VERTEX", "[Extrusion_1_1/Generated_Face&Sketch_2/SketchLine_6][Extrusion_1_1/Generated_Face&Sketch_2/SketchLine_5][Extrusion_1_1/From_Face]"),
+                  ("VERTEX", "[Extrusion_1_1/Generated_Face&Sketch_2/SketchLine_7][Extrusion_1_1/Generated_Face&Sketch_2/SketchLine_6][Extrusion_1_1/From_Face]"),
+                  ("VERTEX", "[Extrusion_1_1/Generated_Face&Sketch_2/SketchLine_7][Extrusion_1_1/Generated_Face&Sketch_2/SketchLine_2][Extrusion_1_1/From_Face]"),
+                  ("VERTEX", "[Extrusion_1_1/Generated_Face&Sketch_2/SketchLine_5][Extrusion_1_1/Generated_Face&Sketch_2/SketchLine_2][Extrusion_1_1/To_Face]"),
+                  ("VERTEX", "[Extrusion_1_1/Generated_Face&Sketch_2/SketchLine_7][Extrusion_1_1/Generated_Face&Sketch_2/SketchLine_2][Extrusion_1_1/To_Face]"),
+                  ("VERTEX", "[Extrusion_1_1/Generated_Face&Sketch_2/SketchLine_7][Extrusion_1_1/Generated_Face&Sketch_2/SketchLine_6][Extrusion_1_1/To_Face]"),
+                  ("VERTEX", "[Extrusion_1_1/Generated_Face&Sketch_2/SketchLine_6][Extrusion_1_1/Generated_Face&Sketch_2/SketchLine_5][Extrusion_1_1/To_Face]"),
                   #
-                  ("EDGE", "Extrusion_1_1/Generated_Face_2&Extrusion_1_1/From_Face_1"),
-                  ("EDGE", "Extrusion_1_1/Generated_Face_1&Extrusion_1_1/From_Face_1"),
-                  ("EDGE", "Extrusion_1_1/Generated_Face_4&Extrusion_1_1/From_Face_1"),
-                  ("EDGE", "Extrusion_1_1/Generated_Face_3&Extrusion_1_1/To_Face_1"),
+                  ("EDGE", "[Extrusion_1_1/Generated_Face&Sketch_2/SketchLine_5][Extrusion_1_1/From_Face]"),
+                  ("EDGE", "[Extrusion_1_1/Generated_Face&Sketch_2/SketchLine_2][Extrusion_1_1/From_Face]"),
+                  ("EDGE", "[Extrusion_1_1/Generated_Face&Sketch_2/SketchLine_7][Extrusion_1_1/From_Face]"),
+                  ("EDGE", "[Extrusion_1_1/Generated_Face&Sketch_2/SketchLine_6][Extrusion_1_1/From_Face]"),
                   #
-                  ("EDGE", "Extrusion_1_1/Generated_Face_2&Extrusion_1_1/Generated_Face_3"),
-                  ("EDGE", "Extrusion_1_1/Generated_Face_1&Extrusion_1_1/Generated_Face_2"),
-                  ("EDGE", "Extrusion_1_1/Generated_Face_4&Extrusion_1_1/Generated_Face_1"),
-                  ("EDGE", "Extrusion_1_1/Generated_Face_4&Extrusion_1_1/Generated_Face_3"),
+                  ("EDGE", "[Extrusion_1_1/Generated_Face&Sketch_2/SketchLine_6][Extrusion_1_1/Generated_Face&Sketch_2/SketchLine_5]"),
+                  ("EDGE", "[Extrusion_1_1/Generated_Face&Sketch_2/SketchLine_5][Extrusion_1_1/Generated_Face&Sketch_2/SketchLine_2]"),
+                  ("EDGE", "[Extrusion_1_1/Generated_Face&Sketch_2/SketchLine_7][Extrusion_1_1/Generated_Face&Sketch_2/SketchLine_2]"),
+                  ("EDGE", "[Extrusion_1_1/Generated_Face&Sketch_2/SketchLine_7][Extrusion_1_1/Generated_Face&Sketch_2/SketchLine_6]"),
                   #
-                  ("EDGE", "Extrusion_1_1/Generated_Face_2&Extrusion_1_1/To_Face_1"),
-                  ("EDGE", "Extrusion_1_1/Generated_Face_1&Extrusion_1_1/To_Face_1"),
-                  ("EDGE", "Extrusion_1_1/Generated_Face_4&Extrusion_1_1/To_Face_1"),
-                  ("EDGE", "Extrusion_1_1/Generated_Face_3&Extrusion_1_1/From_Face_1")
+                  ("EDGE", "[Extrusion_1_1/Generated_Face&Sketch_2/SketchLine_5][Extrusion_1_1/To_Face]"),
+                  ("EDGE", "[Extrusion_1_1/Generated_Face&Sketch_2/SketchLine_2][Extrusion_1_1/To_Face]"),
+                  ("EDGE", "[Extrusion_1_1/Generated_Face&Sketch_2/SketchLine_7][Extrusion_1_1/To_Face]"),
+                  ("EDGE", "[Extrusion_1_1/Generated_Face&Sketch_2/SketchLine_6][Extrusion_1_1/To_Face]")
                   ]
 
 # Test projection to the same plane
-Sketch_3 = model.addSketch(Part_1_doc, model.selection("FACE", "Extrusion_1_1/Generated_Face_2"))
+Sketch_3 = model.addSketch(Part_1_doc, model.selection("FACE", "Extrusion_1_1/Generated_Face&Sketch_2/SketchLine_5"))
 aFailedIDs = set([21, 29])
 testProjections(Part_1_doc, Sketch_3, aProjectedList, aFailedIDs)
 
 # Test projection to parallel plane
-Sketch_4 = model.addSketch(Part_1_doc, model.selection("FACE", "Extrusion_1_1/Generated_Face_4"))
+Sketch_4 = model.addSketch(Part_1_doc, model.selection("FACE", "Extrusion_1_1/Generated_Face&Sketch_2/SketchLine_7"))
 testProjections(Part_1_doc, Sketch_4, aProjectedList, aFailedIDs)
 
 # Test projection to lower base of the prism
-Sketch_5 = model.addSketch(Part_1_doc, model.selection("FACE", "Extrusion_1_1/From_Face_1"))
+Sketch_5 = model.addSketch(Part_1_doc, model.selection("FACE", "Extrusion_1_1/From_Face"))
 aFailedIDs = set([0, 1, 22, 23, 24, 25])
 testProjections(Part_1_doc, Sketch_5, aProjectedList, aFailedIDs)
 
 # Test projection to upper base of the prism
-Sketch_6 = model.addSketch(Part_1_doc, model.selection("FACE", "Extrusion_1_1/To_Face_1"))
+Sketch_6 = model.addSketch(Part_1_doc, model.selection("FACE", "Extrusion_1_1/To_Face"))
 testProjections(Part_1_doc, Sketch_6, aProjectedList, aFailedIDs)
 
 # Test projection to orthogonal side face of the prism
-Sketch_7 = model.addSketch(Part_1_doc, model.selection("FACE", "Extrusion_1_1/Generated_Face_3"))
+Sketch_7 = model.addSketch(Part_1_doc, model.selection("FACE", "Extrusion_1_1/Generated_Face&Sketch_2/SketchLine_6"))
 aFailedIDs = set([0, 1, 18, 20, 26, 28])
 testProjections(Part_1_doc, Sketch_7, aProjectedList, aFailedIDs)
 
 # Test projection to slope side face of the prism
-Sketch_8 = model.addSketch(Part_1_doc, model.selection("FACE", "Extrusion_1_1/Generated_Face_1"))
+Sketch_8 = model.addSketch(Part_1_doc, model.selection("FACE", "Extrusion_1_1/Generated_Face&Sketch_2/SketchLine_2"))
 aFailedIDs = set([0, 1])
 testProjections(Part_1_doc, Sketch_8, aProjectedList, aFailedIDs)
 
