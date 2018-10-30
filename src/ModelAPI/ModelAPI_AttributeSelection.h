@@ -47,7 +47,7 @@ class ModelAPI_AttributeSelection : public ModelAPI_Attribute
   /// \param theContext object where the sub-shape was selected
   /// \param theSubShape selected sub-shape (if null, the whole context is selected)
   /// \param theTemporarily if it is true, do not store and name the added in the data framework
-  ///           (used to remove immideately, without the following updates)
+  ///           (used to remove immediately, without the following updates)
   /// \returns true if attribute was updated
   virtual bool setValue(
     const ObjectPtr& theContext, const std::shared_ptr<GeomAPI_Shape>& theSubShape,
@@ -78,7 +78,7 @@ class ModelAPI_AttributeSelection : public ModelAPI_Attribute
   /// Returns the context of the selection : result or feature
   virtual std::shared_ptr<ModelAPI_Object> contextObject() = 0;
 
-  /// Updates the underlied selection due to the changes in the referenced objects
+  /// Updates the selection due to the changes in the referenced objects
   /// \returns false if update is failed
   virtual bool update() = 0;
 
@@ -117,6 +117,9 @@ class ModelAPI_AttributeSelection : public ModelAPI_Attribute
 
   /// To virtually destroy the fields of successors
   MODELAPI_EXPORT virtual ~ModelAPI_AttributeSelection();
+
+  /// Returns the name by context. Adds the part name if the context is located in other document
+  MODELAPI_EXPORT virtual std::string contextName(const ResultPtr& theContext) const = 0;
 
 
  protected:

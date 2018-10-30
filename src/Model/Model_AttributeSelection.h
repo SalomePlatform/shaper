@@ -144,6 +144,9 @@ public:
   MODEL_EXPORT virtual bool isLater(const TDF_Label theResult1, const TDF_Label theResult2)
     const override;
 
+  /// Returns the name by context. Adds the part name if the context is located in other document
+  MODEL_EXPORT virtual std::string contextName(const ResultPtr& theContext) const;
+
 protected:
   /// Objects are created for features automatically
   MODEL_EXPORT Model_AttributeSelection(TDF_Label& theLabel);
@@ -176,9 +179,6 @@ protected:
 
   /// Sets the ID of the attribute in Data (called from Data): here it is used for myRef ID setting
   MODEL_EXPORT virtual void setID(const std::string theID);
-
-  /// Returns the name by context. Adds the part name if the context is located in other document
-  std::string contextName(const ResultPtr& theContext) const;
 
   /// Sets the parent attribute
   void setParent(Model_AttributeSelectionList* theParent);

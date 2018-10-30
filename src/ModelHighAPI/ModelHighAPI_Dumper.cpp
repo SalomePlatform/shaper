@@ -1101,7 +1101,8 @@ ModelHighAPI_Dumper& ModelHighAPI_Dumper::operator<<(
     GeomAlgoAPI_NExplode aNExplode(theAttrSelect->context()->shape(), aShape->shapeType());
     int anIndex = aNExplode.index(aShape);
     if (anIndex != 0) { // found a week-naming index, so, export it
-      myDumpBuffer<<"\", \""<<theAttrSelect->context()->data()->name()<<"\", "<<anIndex;
+      myDumpBuffer<<"\", \""<<
+        theAttrSelect->contextName(theAttrSelect->context())<<"\", "<<anIndex;
       aStandardDump = false;
     }
   }
