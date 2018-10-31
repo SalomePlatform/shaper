@@ -76,7 +76,7 @@ ParamR = model.addParameter(Part_1_doc, "R", "10")
 ParamAngle = model.addParameter(Part_1_doc, "Angle", "30")
 Cylinder_1 = model.addCylinder(Part_1_doc, model.selection("VERTEX", "PartSet/Origin"), model.selection("EDGE", "PartSet/OZ"), "2*R", "H")
 Sketch_1 = model.addSketch(Part_1_doc, model.selection("FACE", "Cylinder_1_1/Face_2"))
-SketchProjection_1 = Sketch_1.addProjection(model.selection("VERTEX", "Cylinder_1_1/Face_1&Cylinder_1_1/Face_2__cc"), False)
+SketchProjection_1 = Sketch_1.addProjection(model.selection("VERTEX", "[Cylinder_1_1/Face_1][Cylinder_1_1/Face_2]__cc"), False)
 SketchPoint_1 = SketchProjection_1.createdFeature()
 SketchCircle_1 = Sketch_1.addCircle(0, 0, 10)
 SketchConstraintCoincidence_1 = Sketch_1.setCoincident(SketchPoint_1.result(), SketchCircle_1.center())
@@ -98,14 +98,14 @@ SketchConstraintHorizontal_2 = Sketch_2.setHorizontal(SketchLine_3.result())
 SketchConstraintVertical_2 = Sketch_2.setVertical(SketchLine_4.result())
 SketchConstraintLength_1 = Sketch_2.setLength(SketchLine_1.result(), "R/2")
 SketchConstraintLength_2 = Sketch_2.setLength(SketchLine_2.result(), "H")
-SketchIntersectionPoint_1 = Sketch_2.addIntersectionPoint(model.selection("EDGE", "Extrusion_1_1/Generated_Face_1&Extrusion_1_1/To_Face_1"), False)
+SketchIntersectionPoint_1 = Sketch_2.addIntersectionPoint(model.selection("EDGE", "[Extrusion_1_1/Generated_Face&Sketch_1/SketchCircle_1_2][Extrusion_1_1/To_Face]"), False)
 [SketchPoint_2, SketchPoint_3] = SketchIntersectionPoint_1.intersectionPoints()
 SketchConstraintCoincidence_6 = Sketch_2.setCoincident(SketchAPI_Point(SketchPoint_2).coordinates(), SketchLine_1.result())
 SketchProjection_2 = Sketch_2.addProjection(model.selection("EDGE", "PartSet/OZ"), False)
 SketchLine_5 = SketchProjection_2.createdFeature()
 SketchConstraintCoincidence_7 = Sketch_2.setCoincident(SketchLine_2.endPoint(), SketchLine_5.result())
 model.do()
-Revolution_1 = model.addRevolution(Part_1_doc, [model.selection("FACE", "Sketch_2/Face-SketchLine_1r-SketchLine_2r-SketchLine_3r-SketchLine_4r")], model.selection("EDGE", "PartSet/OZ"), 270, 0)
+Revolution_1 = model.addRevolution(Part_1_doc, [model.selection("FACE", "Sketch_2/Face-SketchLine_4r-SketchLine_3r-SketchLine_2r-SketchLine_1r")], model.selection("EDGE", "PartSet/OZ"), 270, 0)
 model.do()
 
 # Test 1. Check cylinders
@@ -114,10 +114,10 @@ aLoc2 = GeomAPI.GeomAPI_Pnt(0, 0, 2 * ParamH.value())
 aLoc3 = GeomAPI.GeomAPI_Pnt(0, 0, 3 * ParamH.value())
 anAxis = GeomAPI.GeomAPI_Dir(0, 0, 1)
 checkCylinderAll(Part_1_doc, Cylinder_1, "Cylinder_1_1/Face_1", aLoc1, anAxis, 2 * ParamR.value(), ParamH.value())
-checkCylinderAll(Part_1_doc, Extrusion_1, "Extrusion_1_1/Generated_Face_1", aLoc2, anAxis, ParamR.value(), ParamH.value())
+checkCylinderAll(Part_1_doc, Extrusion_1, "Extrusion_1_1/Generated_Face&Sketch_1/SketchCircle_1_2", aLoc2, anAxis, ParamR.value(), ParamH.value())
 checkNonCylinder(Revolution_1)
-checkCylinderShell(Part_1_doc, ["Revolution_1_1/Generated_Face_4"], aLoc3, anAxis, 0.5 * ParamR.value(), ParamH.value())
-checkCylinderFace(Part_1_doc, "Revolution_1_1/Generated_Face_4", aLoc3, anAxis, 0.5 * ParamR.value(), ParamH.value())
+checkCylinderShell(Part_1_doc, ["Revolution_1_1/Generated_Face&Sketch_2/SketchLine_4"], aLoc3, anAxis, 0.5 * ParamR.value(), ParamH.value())
+checkCylinderFace(Part_1_doc, "Revolution_1_1/Generated_Face&Sketch_2/SketchLine_4", aLoc3, anAxis, 0.5 * ParamR.value(), ParamH.value())
 
 # Test 2. Rotate cylinders
 Rotation_1 = model.addRotation(Part_1_doc, [model.selection("SOLID", "Cylinder_1_1")], model.selection("EDGE", "PartSet/OX"), "Angle")
@@ -131,11 +131,11 @@ anAxis = GeomAPI.GeomAPI_Dir(0, anAxis.y() * aCosAngle - anAxis.z() * aSinAngle,
 aLoc1 = GeomAPI.GeomAPI_Pnt(0, aLoc1.y() * aCosAngle - aLoc1.z() * aSinAngle, aLoc1.y() * aSinAngle + aLoc1.z() * aCosAngle)
 aLoc2 = GeomAPI.GeomAPI_Pnt(0, aLoc2.y() * aCosAngle - aLoc2.z() * aSinAngle, aLoc2.y() * aSinAngle + aLoc2.z() * aCosAngle)
 aLoc3 = GeomAPI.GeomAPI_Pnt(0, aLoc3.y() * aCosAngle - aLoc3.z() * aSinAngle, aLoc3.y() * aSinAngle + aLoc3.z() * aCosAngle)
-checkCylinderAll(Part_1_doc, Rotation_1, "Rotation_1_1/Rotated_Face_3", aLoc1, anAxis, 2 * ParamR.value(), ParamH.value())
-checkCylinderAll(Part_1_doc, Rotation_2, "Rotation_2_1/Rotated_Face_3", aLoc2, anAxis, ParamR.value(), ParamH.value())
+checkCylinderAll(Part_1_doc, Rotation_1, "Rotation_1_1/MF:Rotated&Cylinder_1_1/Face_1", aLoc1, anAxis, 2 * ParamR.value(), ParamH.value())
+checkCylinderAll(Part_1_doc, Rotation_2, "Rotation_2_1/MF:Rotated&Sketch_1/SketchCircle_1_2", aLoc2, anAxis, ParamR.value(), ParamH.value())
 checkNonCylinder(Rotation_3)
-checkCylinderShell(Part_1_doc, ["Rotation_3_1/Rotated_Face_5"], aLoc3, anAxis, 0.5 * ParamR.value(), ParamH.value())
-checkCylinderFace(Part_1_doc, "Rotation_3_1/Rotated_Face_5", aLoc3, anAxis, 0.5 * ParamR.value(), ParamH.value())
+checkCylinderShell(Part_1_doc, ["Rotation_3_1/MF:Rotated&Sketch_2/SketchLine_4"], aLoc3, anAxis, 0.5 * ParamR.value(), ParamH.value())
+checkCylinderFace(Part_1_doc, "Rotation_3_1/MF:Rotated&Sketch_2/SketchLine_4", aLoc3, anAxis, 0.5 * ParamR.value(), ParamH.value())
 
 # Test 3. Split cylinder and compose a shell
 Plane_4 = model.addPlane(Part_1_doc, model.selection("FACE", "PartSet/XOY"), "2.2*H", False)
@@ -143,7 +143,9 @@ Plane_5 = model.addPlane(Part_1_doc, model.selection("FACE", "PartSet/XOZ"), "H"
 Partition_1_objects = [model.selection("SOLID", "Rotation_3_1"), model.selection("FACE", "Plane_1"), model.selection("FACE", "Plane_2")]
 Partition_1 = model.addPartition(Part_1_doc, Partition_1_objects)
 
-Shell_1_objects = ["Partition_1_1_1/Modified_Face_3_5", "Partition_1_1_4/Modified_Face_3_3", "Partition_1_1_2/Modified_Face_1_divided_2_1"]
+Shell_1_objects = ["Partition_1_1_1/Modified_Face&Sketch_2/SketchLine_4",
+                   "Partition_1_1_4/Modified_Face&Sketch_2/SketchLine_4",
+                   "(Partition_1_1_2/Modified_Face&Revolution_1_1/To_Face)(Partition_1_1_2/Modified_Face&Sketch_2/SketchLine_1)"]
 checkCylinderShell(Part_1_doc, Shell_1_objects, aLoc3, anAxis, 0.5 * ParamR.value(), ParamH.value())
 
 model.end()

@@ -91,7 +91,7 @@ ParamHeight = model.addParameter(Part_1_doc, "Height", "25")
 ParamAngle = model.addParameter(Part_1_doc, "Angle", "30")
 Box_1 = model.addBox(Part_1_doc, "BoxSize", "BoxSize", "BoxSize")
 Sketch_1 = model.addSketch(Part_1_doc, model.selection("FACE", "Box_1_1/Top"))
-SketchProjection_1 = Sketch_1.addProjection(model.selection("VERTEX", "Box_1_1/Front&Box_1_1/Right&Box_1_1/Top"), False)
+SketchProjection_1 = Sketch_1.addProjection(model.selection("VERTEX", "[Box_1_1/Front][Box_1_1/Right][Box_1_1/Top]"), False)
 SketchPoint_1 = SketchProjection_1.createdFeature()
 SketchLine_1 = Sketch_1.addLine(30, 10, 10, 10)
 SketchLine_2 = Sketch_1.addLine(10, 10, 10, 20)
@@ -109,7 +109,7 @@ SketchConstraintVertical_2 = Sketch_1.setVertical(SketchLine_4.result())
 SketchConstraintLength_1 = Sketch_1.setLength(SketchLine_1.result(), "Width")
 SketchConstraintLength_2 = Sketch_1.setLength(SketchLine_2.result(), "Depth")
 model.do()
-Extrusion_1 = model.addExtrusion(Part_1_doc, [model.selection("FACE", "Sketch_1/Face-SketchLine_1r-SketchLine_2r-SketchLine_3r-SketchLine_4r")], model.selection(), "Height", 0)
+Extrusion_1 = model.addExtrusion(Part_1_doc, [model.selection("FACE", "Sketch_1/Face-SketchLine_4r-SketchLine_3r-SketchLine_2r-SketchLine_1r")], model.selection(), "Height", 0)
 model.do()
 
 # Test 1. Check boxes
@@ -119,13 +119,13 @@ aCornerPara = GeomAPI.GeomAPI_Pnt(ParamSize.value(), ParamSize.value(), ParamSiz
 checkBox(Extrusion_1, aCornerPara, ParamWidth.value(), ParamDepth.value(), ParamHeight.value())
 
 # Test 2. Rotate box to keep it still axes-aligned
-Rotation_1 = model.addRotation(Part_1_doc, [model.selection("SOLID", "Extrusion_1_1")], model.selection("EDGE", "Extrusion_1_1/Generated_Face_4&Extrusion_1_1/Generated_Face_1"), 90)
+Rotation_1 = model.addRotation(Part_1_doc, [model.selection("SOLID", "Extrusion_1_1")], model.selection("EDGE", "[Extrusion_1_1/Generated_Face&Sketch_1/SketchLine_4][Extrusion_1_1/Generated_Face&Sketch_1/SketchLine_1]"), 90)
 aCornerPara.setX(aCornerPara.x() + ParamWidth.value() - ParamDepth.value())
 aCornerPara.setY(aCornerPara.y() - ParamWidth.value())
 checkBox(Rotation_1, aCornerPara, ParamDepth.value(), ParamWidth.value(), ParamHeight.value())
 
 # Test 3. Rotate boxes
-Axis_4 = model.addAxis(Part_1_doc, model.selection("VERTEX", "Box_1_1/Back&Box_1_1/Left&Box_1_1/Bottom"), model.selection("VERTEX", "Box_1_1/Front&Box_1_1/Right&Box_1_1/Top"))
+Axis_4 = model.addAxis(Part_1_doc, model.selection("VERTEX", "[Box_1_1/Back][Box_1_1/Left][Box_1_1/Bottom]"), model.selection("VERTEX", "[Box_1_1/Front][Box_1_1/Right][Box_1_1/Top]"))
 Rotation_2 = model.addRotation(Part_1_doc, [model.selection("SOLID", "Box_1_1")], model.selection("EDGE", "Axis_1"), "Angle")
 Rotation_3 = model.addRotation(Part_1_doc, [model.selection("SOLID", "Rotation_1_1")], model.selection("EDGE", "Axis_1"), "Angle")
 
@@ -155,11 +155,11 @@ aCornerPara1 = GeomAPI.GeomAPI_Pnt(aCornerPara1.x() * (aCosAngle + (1 - aCosAngl
 checkRotatedBox(Rotation_3, aCornerPara, aCornerPara1)
 
 # Test 4. Compose a non-closed shell of the box faces and check it is not a box
-Shell_objects = ["Rotation_3_1/Rotated_Face_1", "Rotation_3_1/Rotated_Face_2", "Rotation_3_1/Rotated_Face_3", "Rotation_3_1/Rotated_Face_4"]
+Shell_objects = ["Rotation_3_1/MF:Rotated&Extrusion_1_1/To_Face", "Rotation_3_1/MF:Rotated&Extrusion_1_1/From_Face", "Rotation_3_1/MF:Rotated&Sketch_1/SketchLine_1", "Rotation_3_1/MF:Rotated&Sketch_1/SketchLine_2"]
 checkShellNotBox(Part_1_doc, Shell_objects)
 
 # Test 5. Compose a shell of all box faces
-Shell_objects = ["Rotation_3_1/Rotated_Face_1", "Rotation_3_1/Rotated_Face_2", "Rotation_3_1/Rotated_Face_3", "Rotation_3_1/Rotated_Face_4", "Rotation_3_1/Rotated_Face_5", "Rotation_3_1/Rotated_Face_6"]
+Shell_objects = ["Rotation_3_1/MF:Rotated&Extrusion_1_1/To_Face", "Rotation_3_1/MF:Rotated&Extrusion_1_1/From_Face", "Rotation_3_1/MF:Rotated&Sketch_1/SketchLine_1", "Rotation_3_1/MF:Rotated&Sketch_1/SketchLine_2", "Rotation_3_1/MF:Rotated&Sketch_1/SketchLine_3", "Rotation_3_1/MF:Rotated&Sketch_1/SketchLine_4"]
 checkShellRotatedBox(Part_1_doc, Shell_objects, aCornerPara, aCornerPara1)
 
 model.end()

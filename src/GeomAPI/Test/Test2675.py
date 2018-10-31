@@ -77,8 +77,8 @@ SketchConstraintDistance_3 = Sketch_1.setDistance(SketchCircle_2.center(), Sketc
 SketchConstraintCoincidence_15 = Sketch_1.setCoincident(SketchPoint_2.coordinates(), SketchCircle_1.results()[1])
 SketchConstraintDistance_4 = Sketch_1.setDistance(SketchCircle_1.center(), SketchLine_2.endPoint(), 325)
 model.do()
-Revolution_1 = model.addRevolution(Part_1_doc, [model.selection("FACE", "Sketch_1/Face-SketchCircle_2_2f-SketchLine_7r")], model.selection("EDGE", "PartSet/OZ"), 360, 0)
-Face_1 = model.addFace(Part_1_doc, [model.selection("FACE", "Revolution_1_1/Generated_Face_1")])
+Revolution_1 = model.addRevolution(Part_1_doc, [model.selection("FACE", "Sketch_1/Face-SketchCircle_2_2f-SketchCircle_2_2f-SketchLine_7r")], model.selection("EDGE", "PartSet/OZ"), 360, 0)
+Face_1 = model.addFace(Part_1_doc, [model.selection("FACE", "Revolution_1_1/Generated_Face&Sketch_1/SketchLine_7")])
 
 from GeomAPI import *
 

@@ -88,15 +88,15 @@ model.do()
 
 # Test 1. Check face/wire of box is a rectangle
 checkRectangleFace(Part_1_doc, "Box_1_1/Top")
-Wire_edges = ["Box_1_1/Left&Box_1_1/Top", "Box_1_1/Front&Box_1_1/Top", "Box_1_1/Right&Box_1_1/Top", "Box_1_1/Back&Box_1_1/Top"]
+Wire_edges = ["[Box_1_1/Left][Box_1_1/Top]", "[Box_1_1/Front][Box_1_1/Top]", "[Box_1_1/Right][Box_1_1/Top]", "[Box_1_1/Back][Box_1_1/Top]"]
 checkRectangleWire(Part_1_doc, Wire_edges)
 
 # Test 2. Build a polygon from edges
-Wire_edges = ["Box_1_1/Left&Box_1_1/Bottom", "Box_1_1/Front&Box_1_1/Left", "Box_1_1/Left&Box_1_1/Top", "Box_1_1/Back&Box_1_1/Top", "Box_1_1/Right&Box_1_1/Top"]
+Wire_edges = ["[Box_1_1/Left][Box_1_1/Bottom]", "[Box_1_1/Front][Box_1_1/Left]", "[Box_1_1/Left][Box_1_1/Top]", "[Box_1_1/Back][Box_1_1/Top]", "[Box_1_1/Right][Box_1_1/Top]"]
 checkPolygonWire(Part_1_doc, Wire_edges)
 
 # Test 3. Build a polygon from vertices
-Poly_vertices = ["Box_1_1/Back&Box_1_1/Left&Box_1_1/Bottom", "Box_1_1/Front&Box_1_1/Left&Box_1_1/Bottom", "Box_1_1/Front&Box_1_1/Right&Box_1_1/Bottom", "Box_1_1/Front&Box_1_1/Right&Box_1_1/Top", "Box_1_1/Front&Box_1_1/Left&Box_1_1/Top", "Box_1_1/Back&Box_1_1/Right&Box_1_1/Top"]
+Poly_vertices = ["[Box_1_1/Back][Box_1_1/Left][Box_1_1/Bottom]", "[Box_1_1/Front][Box_1_1/Left][Box_1_1/Bottom]", "[Box_1_1/Front][Box_1_1/Right][Box_1_1/Bottom]", "[Box_1_1/Front][Box_1_1/Right][Box_1_1/Top]", "[Box_1_1/Front][Box_1_1/Left][Box_1_1/Top]", "[Box_1_1/Back][Box_1_1/Right][Box_1_1/Top]"]
 checkPolyline(Part_1_doc, Poly_vertices)
 
 model.end()

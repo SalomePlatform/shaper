@@ -84,12 +84,15 @@ aCosAngle = math.cos(anAngle)
 aSinAngle = math.sin(anAngle)
 aCenter = GeomAPI.GeomAPI_Pnt(0, aCenter.y() * aCosAngle - aCenter.z() * aSinAngle, aCenter.y() * aSinAngle + aCenter.z() * aCosAngle)
 anAxis = GeomAPI.GeomAPI_Dir(0, anAxis.y() * aCosAngle - anAxis.z() * aSinAngle, anAxis.y() * aSinAngle + anAxis.z() * aCosAngle)
-checkTorusAll(Part_1_doc, Rotation_1, "Rotation_1_1/Rotated_Face_1", aCenter, anAxis, ParamRMax.value(), ParamRMin.value())
+checkTorusAll(Part_1_doc, Rotation_1, "Rotation_1_1/MF:Rotated&Torus_1_1/Face_1", aCenter, anAxis, ParamRMax.value(), ParamRMin.value())
 
 # Test 3. Split torus and compose a shell
 Partition_1_objects = [model.selection("SOLID", "Rotation_1_1"), model.selection("FACE", "PartSet/YOZ"), model.selection("FACE", "PartSet/XOZ"), model.selection("FACE", "PartSet/XOY")]
 Partition_1 = model.addPartition(Part_1_doc, Partition_1_objects)
-Shell_1_objects = ["Partition_1_1_6/Modified_Face_4_4", "Partition_1_1_7/Modified_Face_4_3", "Partition_1_1_7/Modified_Face_1_divided_2_1", "Partition_1_1_5/Modified_Face_4_4"]
+Shell_1_objects = ["Partition_1_1_6/Modified_Face&Torus_1_1/Face_1",
+                   "Partition_1_1_7/Modified_Face&Torus_1_1/Face_1&weak_name_2",
+                   "Partition_1_1_7/Modified_Face&Torus_1_1/Face_1&weak_name_1",
+                   "Partition_1_1_5/Modified_Face&Torus_1_1/Face_1"]
 checkTorusShell(Part_1_doc, Shell_1_objects, aCenter, anAxis, ParamRMax.value(), ParamRMin.value())
 
 model.end()

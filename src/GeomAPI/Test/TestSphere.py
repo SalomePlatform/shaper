@@ -68,7 +68,9 @@ def checkSphereAll(theDocument, theFeature, theFaceName, theCenter, theRadius):
 
     checkSphereShell(theDocument, theFaceName, theCenter, theRadius)
     checkSphereFace(theDocument, theFaceName, theCenter, theRadius)
-    checkArc(theDocument, theFaceName, theCenter, theRadius)
+
+    anArcName = "[" + theFaceName + "][weak_name_3]"
+    checkArc(theDocument, anArcName, theCenter, theRadius)
 
 
 model.begin()
@@ -93,32 +95,32 @@ SketchConstraintRadius_1 = Sketch_1.setRadius(SketchArc_1.results()[1], "R")
 model.do()
 
 # Test 1. Compose sphere
-Revolution_1 = model.addRevolution(Part_1_doc, [model.selection("FACE", "Sketch_1/Face-SketchArc_1_2f-SketchLine_1f")], model.selection("EDGE", "Sketch_1/Edge-SketchLine_1"), "Aperture", 0)
+Revolution_1 = model.addRevolution(Part_1_doc, [model.selection("FACE", "Sketch_1/Face-SketchArc_1_2r-SketchLine_1f")], model.selection("EDGE", "Sketch_1/SketchLine_1"), "Aperture", 0)
 aCenter = GeomAPI.GeomAPI_Pnt(0, 0, 0)
-checkSphereAll(Part_1_doc, Revolution_1, "Revolution_1_1/Generated_Face_2", aCenter, ParamR.value())
+checkSphereAll(Part_1_doc, Revolution_1, "Revolution_1_1/Generated_Face&Sketch_1/SketchArc_1_2", aCenter, ParamR.value())
 
 # Test 2. Translate sphere
 Translation_1 = model.addTranslation(Part_1_doc, [model.selection("SOLID", "Revolution_1_1")], model.selection("EDGE", "PartSet/OX"), "Shift")
 aCenter.setX(aCenter.x() + ParamShift.value())
-checkSphereAll(Part_1_doc, Translation_1, "Translation_1_1/Translated_Face_1", aCenter, ParamR.value())
+checkSphereAll(Part_1_doc, Translation_1, "Translation_1_1/MF:Translated&Sketch_1/SketchArc_1_2", aCenter, ParamR.value())
 
 # Test 3. Rotate sphere
 Rotation_1 = model.addRotation(Part_1_doc, [model.selection("SOLID", "Translation_1_1")], model.selection("EDGE", "PartSet/OY"), "Angle")
 anAngle = ParamAngle.value() * math.pi / 180.0
 aCenter.setX(ParamShift.value() * math.cos(anAngle))
 aCenter.setZ(-ParamShift.value() * math.sin(anAngle))
-checkSphereAll(Part_1_doc, Rotation_1, "Rotation_1_1/Rotated_Face_1", aCenter, ParamR.value())
+checkSphereAll(Part_1_doc, Rotation_1, "Rotation_1_1/MF:Rotated&Sketch_1/SketchArc_1_2", aCenter, ParamR.value())
 
 # Test 4. Check result by changing parameters
 ParamR.setValue(100)
 model.do()
-checkSphereAll(Part_1_doc, Rotation_1, "Rotation_1_1/Rotated_Face_1", aCenter, ParamR.value())
+checkSphereAll(Part_1_doc, Rotation_1, "Rotation_1_1/MF:Rotated&Sketch_1/SketchArc_1_2", aCenter, ParamR.value())
 
 ParamAperture.setValue(270)
 model.do()
-checkSphereFace(Part_1_doc, "Rotation_1_1/Rotated_Face_3", aCenter, ParamR.value())
-checkSphereShell(Part_1_doc, "Rotation_1_1/Rotated_Face_3", aCenter, ParamR.value())
-checkArc(Part_1_doc, "Rotation_1_1/Rotated_Face_3&Rotation_1_1/Rotated_Face_1", aCenter, ParamR.value())
-checkArc(Part_1_doc, "Rotation_1_1/Rotated_Face_3&Rotation_1_1/Rotated_Face_2", aCenter, ParamR.value())
+checkSphereFace(Part_1_doc, "Rotation_1_1/MF:Rotated&Sketch_1/SketchArc_1_2", aCenter, ParamR.value())
+checkSphereShell(Part_1_doc, "Rotation_1_1/MF:Rotated&Sketch_1/SketchArc_1_2", aCenter, ParamR.value())
+checkArc(Part_1_doc, "[Rotation_1_1/MF:Rotated&Sketch_1/SketchArc_1_2][Rotation_1_1/MF:Rotated&Revolution_1_1/From_Face]", aCenter, ParamR.value())
+checkArc(Part_1_doc, "[Rotation_1_1/MF:Rotated&Sketch_1/SketchArc_1_2][Rotation_1_1/MF:Rotated&Revolution_1_1/To_Face]", aCenter, ParamR.value())
 
 model.end()
