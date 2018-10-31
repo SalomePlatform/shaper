@@ -161,6 +161,18 @@ void PartSet_OverconstraintListener::processEvent(
       std::set<ObjectPtr> aModifiedObjects;
       PartSet_Module* aModule = dynamic_cast<PartSet_Module*>(myWorkshop->module());
       CompositeFeaturePtr aSketch = aModule->sketchMgr()->activeSketch();
+
+      // check the sketch in the message and the active sketch are the same
+      std::shared_ptr<ModelAPI_SolverFailedMessage> anErrorMsg =
+          std::dynamic_pointer_cast<ModelAPI_SolverFailedMessage>(theMessage);
+      if (aSketch && anErrorMsg && !anErrorMsg->objects().empty()) {
+        ObjectPtr anObject = *anErrorMsg->objects().begin();
+        CompositeFeaturePtr aSketchFromMsg =
+            std::dynamic_pointer_cast<ModelAPI_CompositeFeature>(anObject);
+        if (!aSketchFromMsg || aSketchFromMsg != aSketch)
+          aSketch = CompositeFeaturePtr();
+      }
+
       if (aSketch.get()) {
         int aNumberOfSubs = aSketch->numberOfSubs();
         for (int i = 0; i < aNumberOfSubs; i++) {
