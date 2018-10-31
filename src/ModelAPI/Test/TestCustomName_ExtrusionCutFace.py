@@ -18,6 +18,8 @@
 ## email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com>
 ##
 
+# -*- coding: utf-8 -*-
+
 from salome.shaper import model
 
 model.begin()
@@ -29,7 +31,7 @@ Box_1.result().setName("box")
 Sketch_1 = model.addSketch(Part_1_doc, model.selection("FACE", "box/Front"))
 SketchCircle_1 = Sketch_1.addCircle(7, 6, 2)
 model.do()
-Face_1 = model.addFace(Part_1_doc, [model.selection("EDGE", "Sketch_1/Edge-SketchCircle_1_2")])
+Face_1 = model.addFace(Part_1_doc, [model.selection("EDGE", "Sketch_1/SketchCircle_1_2")])
 Face_1.result().setName("circle")
 ExtrusionCut_1 = model.addExtrusionCut(Part_1_doc, [model.selection("FACE", "circle")], model.selection(), 0, 3, [model.selection("SOLID", "box")])
 model.do()

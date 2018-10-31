@@ -18,7 +18,10 @@
 ## email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com>
 ##
 
+# -*- coding: utf-8 -*-
+
 from SketchAPI import *
+
 from salome.shaper import model
 
 model.begin()
@@ -167,7 +170,7 @@ SketchConstraintTangent_1 = Sketch_1.setTangent(SketchArc_1.results()[1], Sketch
 SketchConstraintTangent_2 = Sketch_1.setTangent(SketchArc_1.results()[1], SketchLine_6.result())
 SketchConstraintRadius_1 = Sketch_1.setRadius(SketchArc_1.results()[1], "Fillet1")
 SketchConstraintDistance_5 = Sketch_1.setDistance(SketchLine_7.endPoint(), SketchLine_35.result(), "D1_in/2", True)
-SketchConstraintAngle_4 = Sketch_1.setAngleComplementary(SketchLine_23.result(), SketchLine_22.result(), 44.99999999999992)
+SketchConstraintAngle_4 = Sketch_1.setAngleComplementary(SketchLine_23.result(), SketchLine_22.result(), 44.99999999999991)
 SketchConstraintCollinear_4 = Sketch_1.setCollinear(SketchLine_14.result(), SketchLine_9.result())
 SketchConstraintDistanceHorizontal_4 = Sketch_1.setHorizontalDistance(SketchLine_34.startPoint(), SketchLine_23.startPoint(), "Width/32*11")
 SketchConstraintDistanceHorizontal_5 = Sketch_1.setHorizontalDistance(SketchLine_23.startPoint(), SketchLine_22.startPoint(), "Chamfer")
@@ -195,19 +198,19 @@ SketchConstraintDistanceHorizontal_14 = Sketch_1.setHorizontalDistance(SketchLin
 SketchConstraintDistance_11 = Sketch_1.setDistance(SketchLine_23.startPoint(), SketchLine_35.result(), "(D4_out+D2_in)/2", True)
 model.do()
 Revolution_1 = model.addRevolution(Part_1_doc, [model.selection("COMPOUND", "Sketch_1")], model.selection("EDGE", "PartSet/OX"), 360, 0)
-Plane_4 = model.addPlane(Part_1_doc, model.selection("EDGE", "PartSet/OY"), model.selection("VERTEX", "Sketch_1/Vertex-SketchPoint_2"), True)
+Plane_4 = model.addPlane(Part_1_doc, model.selection("EDGE", "PartSet/OY"), model.selection("VERTEX", "Sketch_1/SketchPoint_2"), True)
 Sketch_2 = model.addSketch(Part_1_doc, model.selection("FACE", "Plane_1"))
-SketchProjection_3 = Sketch_2.addProjection(model.selection("VERTEX", "Sketch_1/Vertex-SketchPoint_2"), False)
+SketchProjection_3 = Sketch_2.addProjection(model.selection("VERTEX", "Sketch_1/SketchPoint_2"), False)
 SketchPoint_3 = SketchProjection_3.createdFeature()
-SketchProjection_4 = Sketch_2.addProjection(model.selection("EDGE", "Revolution_1_1/Generated_Face_28"), False)
+SketchProjection_4 = Sketch_2.addProjection(model.selection("EDGE", "[Revolution_1_1/Generated_Face&Sketch_1/SketchLine_7][weak_name_2]"), False)
 SketchLine_36 = SketchProjection_4.createdFeature()
 SketchCircle_1 = Sketch_2.addCircle(14.5, 0, 2.25)
 SketchConstraintCoincidence_38 = Sketch_2.setCoincident(SketchPoint_3.result(), SketchCircle_1.center())
 SketchConstraintRadius_2 = Sketch_2.setRadius(SketchCircle_1.results()[1], "Drill1_Radius")
 model.do()
 ExtrusionCut_1 = model.addExtrusionCut(Part_1_doc, [model.selection("FACE", "Sketch_2/Face-SketchCircle_1_2f")], model.selection(), model.selection("FACE", "PartSet/XOZ"), 0, model.selection(), 0, [model.selection("SOLID", "Revolution_1_1")])
-Fillet_1 = model.addFillet(Part_1_doc, [model.selection("EDGE", "Revolution_1_1/Generated_Face_14&Revolution_1_1/Generated_Face_15")], "Fillet1")
-Fillet_2_objects = [model.selection("FACE", "Revolution_1_1/Generated_Face_4"), model.selection("FACE", "Revolution_1_1/Generated_Face_6"), model.selection("FACE", "Revolution_1_1/Generated_Face_8"), model.selection("FACE", "Revolution_1_1/Generated_Face_10")]
+Fillet_1 = model.addFillet(Part_1_doc, [model.selection("EDGE", "[Revolution_1_1/Generated_Face&Sketch_1/SketchLine_21][Revolution_1_1/Generated_Face&Sketch_1/SketchLine_20]")], "Fillet1")
+Fillet_2_objects = [model.selection("FACE", "Revolution_1_1/Generated_Face&Sketch_1/SketchLine_31"), model.selection("FACE", "Revolution_1_1/Generated_Face&Sketch_1/SketchLine_29"), model.selection("FACE", "Revolution_1_1/Generated_Face&Sketch_1/SketchLine_27"), model.selection("FACE", "Revolution_1_1/Generated_Face&Sketch_1/SketchLine_25")]
 Fillet_2 = model.addFillet(Part_1_doc, Fillet_2_objects, "Fillet2")
 model.do()
 

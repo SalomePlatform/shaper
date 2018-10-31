@@ -18,6 +18,8 @@
 ## email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com>
 ##
 
+# -*- coding: utf-8 -*-
+
 from salome.shaper import model
 
 model.begin()
@@ -47,7 +49,7 @@ SketchConstraintCoincidence_5 = Sketch_1.setCoincident(SketchLine_2.startPoint()
 SketchConstraintCoincidence_5.setName("SketchConstraintCoincidence_6")
 SketchConstraintLength_1 = Sketch_1.setLength(SketchLine_3.result(), 200)
 SketchConstraintLength_2 = Sketch_1.setLength(SketchLine_1.result(), 200)
-SketchArc_2 = Sketch_1.addArc(250, 0, 1.232595164407831e-032, 0, 500, 0, False)
+SketchArc_2 = Sketch_1.addArc(250, 0, 1.232595164407831e-32, 0, 500, 0, False)
 SketchConstraintCoincidence_6 = Sketch_1.setCoincident(SketchLine_2.endPoint(), SketchArc_2.center())
 SketchConstraintCoincidence_6.setName("SketchConstraintCoincidence_7")
 SketchConstraintCoincidence_7 = Sketch_1.setCoincident(SketchLine_1.endPoint(), SketchArc_2.startPoint())
@@ -63,10 +65,11 @@ SketchConstraintCoincidence_11.setName("SketchConstraintCoincidence_12")
 model.do()
 Sketch_1.setName("toto")
 Sketch_1.result().setName("tutu")
-Extrusion_1 = model.addExtrusion(Part_1_doc, [model.selection("FACE", "tutu/Face-SketchLine_1f-SketchLine_3f-SketchArc_1_2f-SketchArc_2_2f")], model.selection(), 10, 0)
-Edge_1 = model.addEdge(Part_1_doc, [model.selection("EDGE", "tutu/Edge-SketchLine_2")])
+Extrusion_1 = model.addExtrusion(Part_1_doc, [model.selection("FACE", "tutu/Face-SketchLine_1r-SketchArc_2_2f-SketchLine_3f-SketchArc_1_2f")], model.selection(), 10, 0)
+Edge_1 = model.addEdge(Part_1_doc, [model.selection("EDGE", "tutu/SketchLine_2")])
 Extrusion_2 = model.addExtrusion(Part_1_doc, [model.selection("EDGE", "Edge_1_1")], model.selection("EDGE", "PartSet/OZ"), 100, 0)
-Group_1 = model.addGroup(Part_1_doc, [model.selection("VERTEX", "Extrusion_2_1/Generated_Edge_2&Extrusion_2_1/To_Edge_1"), model.selection("VERTEX", "Extrusion_2_1/Generated_Edge_1&Extrusion_2_1/To_Edge_1")])
+Group_1 = model.addGroup(Part_1_doc, [model.selection("VERTEX", "[Extrusion_2_1/Generated_Edge&tutu/SketchLine_2_StartVertex]e[Extrusion_2_1/To_Edge]e"), model.selection("VERTEX", "[Extrusion_2_1/Generated_Edge&tutu/SketchLine_2_EndVertex]e[Extrusion_2_1/To_Edge]e")])
+model.do()
 model.end()
 
 # check that resulting group selection is valid

@@ -18,6 +18,8 @@
 ## email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com>
 ##
 
+# -*- coding: utf-8 -*-
+
 from salome.shaper import model
 
 model.begin()
@@ -38,7 +40,8 @@ SketchConstraintHorizontal_1 = Sketch_1.setHorizontal(SketchLine_1.result())
 SketchConstraintVertical_1 = Sketch_1.setVertical(SketchLine_3.result())
 SketchConstraintEqual_1 = Sketch_1.setEqual(SketchLine_3.result(), SketchLine_1.result())
 model.do()
-Face_1 = model.addFace(Part_1_doc, [model.selection("EDGE", "Sketch_1/Edge-SketchLine_1"), model.selection("EDGE", "Sketch_1/Edge-SketchLine_2"), model.selection("EDGE", "Sketch_1/Edge-SketchLine_3")])
+Face_1_objects = [model.selection("EDGE", "Sketch_1/SketchLine_1"), model.selection("EDGE", "Sketch_1/SketchLine_2"), model.selection("EDGE", "Sketch_1/SketchLine_3")]
+Face_1 = model.addFace(Part_1_doc, Face_1_objects)
 Face_1.result().setName("triangle")
 Extrusion_1 = model.addExtrusion(Part_1_doc, [model.selection("FACE", "triangle")], model.selection(), 10, 0)
 model.do()

@@ -18,6 +18,8 @@
 ## email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com>
 ##
 
+# -*- coding: utf-8 -*-
+
 from SketchAPI import *
 
 from salome.shaper import model
@@ -61,17 +63,17 @@ SketchConstraintLength_3 = Sketch_1.setLength(SketchLine_7.result(), 35)
 SketchConstraintDistanceHorizontal_2 = Sketch_1.setHorizontalDistance(SketchLine_5.endPoint(), SketchLine_2.startPoint(), 30)
 SketchConstraintDistanceVertical_1 = Sketch_1.setVerticalDistance(SketchLine_5.endPoint(), SketchLine_2.startPoint(), 15)
 model.do()
-Extrusion_1 = model.addExtrusion(Part_1_doc, [model.selection("FACE", "Sketch_1/Face-SketchLine_1r-SketchLine_2r-SketchLine_3r-SketchLine_4r")], model.selection(), 10, 0)
+Extrusion_1 = model.addExtrusion(Part_1_doc, [model.selection("FACE", "Sketch_1/Face-SketchLine_4r-SketchLine_3r-SketchLine_2r-SketchLine_1r")], model.selection(), 10, 0)
 Extrusion_1.result().setName("box")
-Extrusion_2 = model.addExtrusion(Part_1_doc, [model.selection("FACE", "Sketch_1/Face-SketchLine_5r-SketchLine_6r-SketchLine_7r")], model.selection(), 20, 20)
+Extrusion_2 = model.addExtrusion(Part_1_doc, [model.selection("FACE", "Sketch_1/Face-SketchLine_7r-SketchLine_6r-SketchLine_5r")], model.selection(), 20, 20)
 Extrusion_2.result().setName("prism")
 Extrusion_3 = model.addExtrusion(Part_1_doc, [model.selection("FACE", "Sketch_1/Face-SketchCircle_1_2f")], model.selection(), 10, 0)
 Extrusion_3.result().setName("cylinder")
-Sketch_2 = model.addSketch(Part_1_doc, model.selection("FACE", "box/From_Face_1"))
-SketchLine_8 = Sketch_2.addLine(45, 30, 25, 30)
-SketchLine_9 = Sketch_2.addLine(25, 30, 25, -100)
-SketchLine_10 = Sketch_2.addLine(25, -100, 45, -100)
-SketchLine_11 = Sketch_2.addLine(45, -100, 45, 30)
+Sketch_2 = model.addSketch(Part_1_doc, model.selection("FACE", "box/From_Face"))
+SketchLine_8 = Sketch_2.addLine(45, -10, 25, -10)
+SketchLine_9 = Sketch_2.addLine(25, -10, 25, -140)
+SketchLine_10 = Sketch_2.addLine(25, -140, 45, -140)
+SketchLine_11 = Sketch_2.addLine(45, -140, 45, -10)
 SketchConstraintCoincidence_9 = Sketch_2.setCoincident(SketchLine_11.endPoint(), SketchLine_8.startPoint())
 SketchConstraintCoincidence_10 = Sketch_2.setCoincident(SketchLine_8.endPoint(), SketchLine_9.startPoint())
 SketchConstraintCoincidence_11 = Sketch_2.setCoincident(SketchLine_9.endPoint(), SketchLine_10.startPoint())
@@ -82,21 +84,22 @@ SketchConstraintHorizontal_5 = Sketch_2.setHorizontal(SketchLine_10.result())
 SketchConstraintVertical_4 = Sketch_2.setVertical(SketchLine_11.result())
 SketchConstraintLength_4 = Sketch_2.setLength(SketchLine_10.result(), 20)
 SketchConstraintLength_5 = Sketch_2.setLength(SketchLine_9.result(), 130)
-SketchProjection_2 = Sketch_2.addProjection(model.selection("VERTEX", "box/Generated_Face_3&box/Generated_Face_2&box/From_Face_1"), False)
+SketchProjection_2 = Sketch_2.addProjection(model.selection("VERTEX", "[box/Generated_Face&Sketch_1/SketchLine_3][box/Generated_Face&Sketch_1/SketchLine_2][box/From_Face]"), False)
 SketchPoint_2 = SketchProjection_2.createdFeature()
 SketchConstraintDistanceVertical_2 = Sketch_2.setVerticalDistance(SketchLine_8.endPoint(), SketchAPI_Point(SketchPoint_2).coordinates(), 30)
 SketchConstraintDistanceHorizontal_3 = Sketch_2.setHorizontalDistance(SketchLine_8.endPoint(), SketchAPI_Point(SketchPoint_2).coordinates(), 25)
 model.do()
-Extrusion_4 = model.addExtrusion(Part_1_doc, [model.selection("FACE", "Sketch_2/Face-SketchLine_8f-SketchLine_9f-SketchLine_10f-SketchLine_11f")], model.selection(), 5, 15)
+Extrusion_4 = model.addExtrusion(Part_1_doc, [model.selection("FACE", "Sketch_2/Face-SketchLine_8r-SketchLine_9f-SketchLine_10f-SketchLine_11f")], model.selection(), 5, 15)
 Extrusion_4.result().setName("cut_tool")
-Boolean_1 = model.addCut(Part_1_doc, [model.selection("SOLID", "box"), model.selection("SOLID", "prism"), model.selection("SOLID", "cylinder")], [model.selection("SOLID", "cut_tool")])
+Cut_1_objects_1 = [model.selection("SOLID", "box"), model.selection("SOLID", "prism"), model.selection("SOLID", "cylinder")]
+Cut_1 = model.addCut(Part_1_doc, Cut_1_objects_1, [model.selection("SOLID", "cut_tool")])
 model.do()
 
 Extrusions = [Extrusion_1, Extrusion_2, Extrusion_3]
-BooleanResults = Boolean_1.results()
+BooleanResults = Cut_1.results()
 for i in range(len(BooleanResults)):
   assert(BooleanResults[i].name() == Extrusions[i].result().name()), "Name of result {} of Boolean CUT '{}' != '{}'".format(i, BooleanResults[i].name(), Extrusions[i].result().name())
-  BooleanName = Boolean_1.name() + "_" + str(i + 1)
+  BooleanName = Cut_1.name() + "_" + str(i + 1)
   for sub in range(0, BooleanResults[i].numberOfSubs()):
     refName = BooleanName + '_' + str(sub + 1)
     subResult = BooleanResults[i].subResult(sub)

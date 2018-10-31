@@ -18,6 +18,8 @@
 ## email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com>
 ##
 
+# -*- coding: utf-8 -*-
+
 from salome.shaper import model
 
 model.begin()
@@ -31,7 +33,7 @@ model.addParameter(Part_1_doc, "Drill2_InnerRadius", "0.5")
 model.addParameter(Part_1_doc, "Drill2_DepthMin", "6.5")
 model.addParameter(Part_1_doc, "Drill2_DepthMax", "7.5")
 Sketch_1 = model.addSketch(Part_1_doc, model.defaultPlane("XOY"))
-SketchLine_1 = Sketch_1.addLine(64., 0, 0, 0)
+SketchLine_1 = Sketch_1.addLine(64, 0, 0, 0)
 SketchProjection_1 = Sketch_1.addProjection(model.selection("VERTEX", "PartSet/Origin"), False)
 SketchPoint_1 = SketchProjection_1.createdFeature()
 SketchConstraintCoincidence_1 = Sketch_1.setCoincident(SketchLine_1.endPoint(), SketchPoint_1.result())
@@ -50,7 +52,7 @@ SketchConstraintDistanceHorizontal_1 = Sketch_1.setHorizontalDistance(SketchLine
 SketchConstraintLength_1 = Sketch_1.setLength(SketchLine_2.result(), 36)
 SketchLine_5 = Sketch_1.addLine(22, 36, 22, 0)
 SketchConstraintCoincidence_6 = Sketch_1.setCoincident(SketchLine_5.startPoint(), SketchLine_3.result())
-SketchLine_6 = Sketch_1.addLine(32., 36., 32., 0)
+SketchLine_6 = Sketch_1.addLine(32, 36, 32, 0)
 SketchConstraintCoincidence_7 = Sketch_1.setCoincident(SketchLine_6.startPoint(), SketchLine_3.result())
 SketchConstraintCoincidence_8 = Sketch_1.setCoincident(SketchLine_6.endPoint(), SketchLine_1.result())
 SketchConstraintCoincidence_9 = Sketch_1.setCoincident(SketchLine_5.endPoint(), SketchLine_1.result())
@@ -60,8 +62,10 @@ SketchConstraintDistanceHorizontal_2 = Sketch_1.setHorizontalDistance(SketchLine
 SketchConstraintDistanceHorizontal_3 = Sketch_1.setHorizontalDistance(SketchLine_6.startPoint(), SketchLine_3.endPoint(), "Width/2")
 model.do()
 Sketch_2 = model.addSketch(Part_1_doc, model.defaultPlane("XOY"))
-SketchProjection_2 = Sketch_2.addProjection(model.selection("VERTEX", "Sketch_1/Vertex-SketchLine_5s"), True)
+SketchProjection_2 = Sketch_2.addProjection(model.selection("VERTEX", "Sketch_1/SketchLine_5_StartVertex"), True)
 SketchPoint_2 = SketchProjection_2.createdFeature()
+model.do()
+model.do()
 model.end()
 
 assert(SketchProjection_2.external().namingName() != "")

@@ -155,13 +155,13 @@ def check_owner(selection, topology_type, feature):
   aSession.abortOperation()
 
 # check faces
-check_owner("Extrusion_1_1/Generated_Face_1", "face", aBox)
-check_owner("Fuse_1_1/Modified_Face_2", "face", aBox)
-check_owner("Cut_1_1/Modified_Face_1", "face", aHoleExt)
-check_owner("Fuse_1_1/Modified_Face_1", "face", aTower)
+check_owner("Extrusion_1_1/Generated_Face&Sketch_1/SketchLine_4", "face", aBox)
+check_owner("Fuse_1_1/Modified_Face&Extrusion_1_1/To_Face", "face", aBox)
+check_owner("Cut_1_1/Modified_Face&Sketch_2/SketchCircle_1_2", "face", aHoleExt)
+check_owner("Fuse_1_1/Modified_Face&Sketch_3/SketchCircle_2_2", "face", aTower)
 # check edges without ambiguity
-check_owner("Fuse_1_1/Modified_Face_2&Extrusion_1_1/Generated_Face_2", "edge", aBox)
-check_owner("Fuse_1_1/Modified_Face_1&Extrusion_3_1/To_Face_1", "edge", aTower)
+check_owner("[Fuse_1_1/Modified_Face&Extrusion_1_1/To_Face][Extrusion_1_1/Generated_Face&Sketch_1/SketchLine_3]", "edge", aBox)
+check_owner("[Fuse_1_1/Modified_Face&Sketch_3/SketchCircle_2_2][Extrusion_3_1/To_Face]", "edge", aTower)
 
 # check the connected topology method: solid is not a compound of connected topology
 assert(aFuse.firstResult().shape().isConnectedTopology() == False)

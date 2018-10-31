@@ -18,7 +18,7 @@
 ## email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com>
 ##
 
-__updated__ = "2018-01-16"
+# -*- coding: utf-8 -*-
 
 from salome.shaper import model
 
@@ -43,8 +43,8 @@ SketchConstraintParallel_1 = Sketch_1.setParallel(SketchLine_1.result(), SketchL
 SketchConstraintParallel_2 = Sketch_1.setParallel(SketchLine_2.result(), SketchLine_4.result())
 SketchConstraintPerpendicular_1 = Sketch_1.setPerpendicular(SketchLine_1.result(), SketchLine_4.result())
 model.do()
-Extrusion_1 = model.addExtrusion(Part_1_doc, [model.selection("FACE", "Sketch_1/Face-SketchLine_1r-SketchLine_2r-SketchLine_3r-SketchLine_4r")], model.selection(), 50, 0)
-Fillet_1 = model.addFillet(Part_1_doc, [model.selection("EDGE", "Extrusion_1_1/Generated_Face_4&Extrusion_1_1/To_Face_1")], 2)
+Extrusion_1 = model.addExtrusion(Part_1_doc, [model.selection("FACE", "Sketch_1/Face-SketchLine_4r-SketchLine_3r-SketchLine_2r-SketchLine_1r")], model.selection(), 50, 0)
+Fillet_1 = model.addFillet(Part_1_doc, [model.selection("EDGE", "[Extrusion_1_1/Generated_Face&Sketch_1/SketchLine_4][Extrusion_1_1/To_Face]")], 2)
 model.do()
 
 Folder_1 = model.addFolder(Part_1_doc, Sketch_1, Extrusion_1)

@@ -18,6 +18,8 @@
 ## email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com>
 ##
 
+# -*- coding: utf-8 -*-
+
 from salome.shaper import model
 
 model.begin()
@@ -28,30 +30,30 @@ Box_1 = model.addBox(Part_1_doc, 100, 100, 10)
 Box_1.result().setName("plate")
 Plane_4 = model.addPlane(Part_1_doc, model.selection("FACE", "plate/Front"), 50, True)
 Plane_5 = model.addPlane(Part_1_doc, model.selection("FACE", "plate/Left"), 50, True)
-Partition_1 = model.addPartition(Part_1_doc, [model.selection("SOLID", "plate"), model.selection("FACE", "Plane_1"), model.selection("FACE", "Plane_2")])
-#Partition_1.result().setName("plate")
+Partition_1_objects = [model.selection("SOLID", "plate"), model.selection("FACE", "Plane_1"), model.selection("FACE", "Plane_2")]
+Partition_1 = model.addPartition(Part_1_doc, Partition_1_objects)
 Partition_1.result().subResult(0).setName("Partition_1_1_1")
 Partition_1.result().subResult(1).setName("top_left")
 Partition_1.result().subResult(2).setName("bottom_right")
 Partition_1.result().subResult(3).setName("Partition_1_1_4")
-Sketch_1 = model.addSketch(Part_1_doc, model.selection("FACE", "Partition_1_1_1/Modified_Face_3_3"))
-SketchProjection_1 = Sketch_1.addProjection(model.selection("VERTEX", "Partition_1_1_1/Modified_Face_3_3&top_left/Modified_Face_3_1&bottom_right/Modified_Face_3_2"), False)
+Sketch_1 = model.addSketch(Part_1_doc, model.selection("FACE", "Partition_1_1_1/Modified_Face&_plate/Top"))
+SketchProjection_1 = Sketch_1.addProjection(model.selection("VERTEX", "[Partition_1_1_1/Modified_Face&_plate/Top][_weak_name_5_Partition_1_1_1][_weak_name_6_Partition_1_1_1]"), False)
 SketchPoint_1 = SketchProjection_1.createdFeature()
 SketchCircle_1 = Sketch_1.addCircle(50, 50, 40)
 SketchConstraintCoincidence_1 = Sketch_1.setCoincident(SketchPoint_1.result(), SketchCircle_1.center())
 SketchConstraintRadius_1 = Sketch_1.setRadius(SketchCircle_1.results()[1], 40)
 model.do()
-Extrusion_1 = model.addExtrusion(Part_1_doc, [model.selection("COMPOUND", "Sketch_1")], model.selection(), model.selection(), 10, model.selection("FACE", "Partition_1_1_1/Modified_Face_3_4"), 10)
+Extrusion_1 = model.addExtrusion(Part_1_doc, [model.selection("COMPOUND", "Sketch_1")], model.selection(), model.selection(), 10, model.selection("FACE", "Partition_1_1_1/Modified_Face&_plate/Bottom"), 10)
 Extrusion_1.result().setName("cylinder")
-Boolean_1 = model.addCommon(Part_1_doc, [model.selection("COMPSOLID", "plate")], [model.selection("SOLID", "cylinder")])
+Common_1 = model.addCommon(Part_1_doc, [model.selection("COMPSOLID", "plate")], [model.selection("SOLID", "cylinder")])
 model.do()
 
 # check the name of result is kept
-CommonResult = Boolean_1.result()
+CommonResult = Common_1.result()
 CommonResultName = CommonResult.name()
 assert(CommonResultName == Partition_1.result().name()), "Name of Boolean COMMON result '{}' != '{}'".format(CommonResultName, Partition_1.result().name())
 # check sub-result names are lost
-BooleanName = Boolean_1.name() + "_1"
+BooleanName = Common_1.name() + "_1"
 for i in range(0, CommonResult.numberOfSubs()):
   refName = BooleanName + '_' + str(i + 1)
   subResult = CommonResult.subResult(i)

@@ -18,6 +18,8 @@
 ## email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com>
 ##
 
+# -*- coding: utf-8 -*-
+
 from salome.shaper import model
 
 model.begin()
@@ -41,7 +43,7 @@ SketchConstraintRigid_1 = Sketch_1.setFixed(SketchLine_1.startPoint())
 SketchConstraintRadius_1 = Sketch_1.setRadius(SketchArc_1.results()[1], 5)
 SketchConstraintDistance_1 = Sketch_1.setDistance(SketchLine_1.startPoint(), SketchLine_1.endPoint(), 8, True)
 model.do()
-Extrusion_1 = model.addExtrusion(Part_1_doc, [model.selection("FACE", "Sketch_1/Face-SketchArc_1_2f-SketchArc_2_2f")], model.selection(), 10, 0)
+Extrusion_1 = model.addExtrusion(Part_1_doc, [model.selection("FACE", "Sketch_1/Face-SketchArc_1_2r-SketchArc_2_2f")], model.selection(), 10, 0)
 Extrusion_1.result().setName("prism")
 Rotation_1 = model.addRotation(Part_1_doc, [model.selection("SOLID", "prism"), model.selection("SOLID", "cylinder")], model.selection("EDGE", "PartSet/OX"), 30)
 model.do()

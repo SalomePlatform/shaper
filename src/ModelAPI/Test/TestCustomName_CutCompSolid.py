@@ -18,6 +18,8 @@
 ## email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com>
 ##
 
+# -*- coding: utf-8 -*-
+
 from SketchAPI import *
 
 from salome.shaper import model
@@ -26,7 +28,6 @@ model.begin()
 partSet = model.moduleDocument()
 Part_1 = model.addPart(partSet)
 Part_1_doc = Part_1.document()
-
 Sketch_1 = model.addSketch(Part_1_doc, model.defaultPlane("XOY"))
 SketchLine_1 = Sketch_1.addLine(80, 0, 0, 0)
 SketchProjection_1 = Sketch_1.addProjection(model.selection("VERTEX", "PartSet/Origin"), False)
@@ -58,27 +59,26 @@ SketchConstraintDistanceVertical_2 = Sketch_1.setVerticalDistance(SketchLine_6.e
 model.do()
 Extrusion_1 = model.addExtrusion(Part_1_doc, [model.selection("COMPOUND", "Sketch_1")], model.selection(), 50, 0)
 Extrusion_1.result().setName("compsolid")
-
-Sketch_2 = model.addSketch(Part_1_doc, model.selection("FACE", "compsolid/Generated_Face_5"))
+Sketch_2 = model.addSketch(Part_1_doc, model.selection("FACE", "Extrusion_1_1_4/Generated_Face&Sketch_1/SketchLine_5"))
 SketchCircle_1 = Sketch_2.addCircle(65, -30, 10)
 SketchConstraintRadius_1 = Sketch_2.setRadius(SketchCircle_1.results()[1], 10)
-SketchProjection_2 = Sketch_2.addProjection(model.selection("VERTEX", "compsolid/Generated_Face_5&compsolid/Generated_Face_4&compsolid/To_Face_3"), False)
+SketchProjection_2 = Sketch_2.addProjection(model.selection("VERTEX", "[Extrusion_1_1_3/Generated_Face&Sketch_1/SketchLine_5][Extrusion_1_1_3/Generated_Face&Sketch_1/SketchLine_3][Extrusion_1_1_3/To_Face]"), False)
 SketchPoint_2 = SketchProjection_2.createdFeature()
 SketchConstraintDistanceVertical_3 = Sketch_2.setVerticalDistance(SketchAPI_Point(SketchPoint_2).coordinates(), SketchCircle_1.center(), 20)
 SketchConstraintDistanceHorizontal_2 = Sketch_2.setHorizontalDistance(SketchCircle_1.center(), SketchAPI_Point(SketchPoint_2).coordinates(), 15)
 model.do()
-Extrusion_2 = model.addExtrusion(Part_1_doc, [model.selection("FACE", "Sketch_2/Face-SketchCircle_1_2f")], model.selection(), model.selection(), 10, model.selection("FACE", "compsolid/Generated_Face_1"), 10)
+Extrusion_2 = model.addExtrusion(Part_1_doc, [model.selection("FACE", "Sketch_2/Face-SketchCircle_1_2r")], model.selection(), model.selection(), 10, model.selection("FACE", "Extrusion_1_1_4/Generated_Face&Sketch_1/SketchLine_3"), 10)
 Extrusion_2.result().setName("cyl")
+Cut_1 = model.addCut(Part_1_doc, [model.selection("SOLID", "Extrusion_1_1_3")], [model.selection("SOLID", "cyl")])
 
-Boolean_1 = model.addCut(Part_1_doc, [model.selection("SOLID", "Extrusion_1_1_3")], [model.selection("SOLID", "cyl")])
 model.do()
 
 # check the name of Extrusion_1 is kept
-CutResult = Boolean_1.result()
+CutResult = Cut_1.result()
 CutResultName = CutResult.name()
 assert(CutResultName == Extrusion_1.result().name()), "Name of Boolean CUT result '{}' != '{}'".format(CutResultName, Extrusion_1.result().name())
 # check sub-result names are lost
-BooleanName = Boolean_1.name() + "_1"
+BooleanName = Cut_1.name() + "_1"
 for i in range(0, CutResult.numberOfSubs()):
   refName = BooleanName + '_' + str(i + 1)
   subResult = CutResult.subResult(i)

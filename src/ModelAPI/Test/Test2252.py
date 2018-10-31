@@ -18,6 +18,8 @@
 ## email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com>
 ##
 
+# -*- coding: utf-8 -*-
+
 from salome.shaper import model
 from ModelAPI import *
 from GeomAlgoAPI import *
@@ -44,7 +46,7 @@ SketchConstraintVertical_2 = Sketch_1.setVertical(SketchLine_4.result())
 SketchConstraintLength_1 = Sketch_1.setLength(SketchLine_3.result(), 60)
 SketchConstraintEqual_1 = Sketch_1.setEqual(SketchLine_3.result(), SketchLine_4.result())
 model.do()
-Extrusion_1 = model.addExtrusion(Part_1_doc, [model.selection("FACE", "Sketch_1/Face-SketchLine_1r-SketchLine_2r-SketchLine_3r-SketchLine_4r")], model.selection(), 90, 0)
+Extrusion_1 = model.addExtrusion(Part_1_doc, [model.selection("FACE", "Sketch_1/Face-SketchLine_4r-SketchLine_3r-SketchLine_2r-SketchLine_1r")], model.selection(), 90, 0)
 model.do()
 aSession = ModelAPI_Session.get()
 aSession.setActiveDocument(partSet, False)

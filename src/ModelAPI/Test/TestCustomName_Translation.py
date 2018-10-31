@@ -18,6 +18,8 @@
 ## email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com>
 ##
 
+# -*- coding: utf-8 -*-
+
 from salome.shaper import model
 
 model.begin()
@@ -26,7 +28,7 @@ Part_1 = model.addPart(partSet)
 Part_1_doc = Part_1.document()
 Cylinder_1 = model.addCylinder(Part_1_doc, model.selection("VERTEX", "PartSet/Origin"), model.selection("EDGE", "PartSet/OZ"), 5, 10)
 Cylinder_1.result().setName("cylinder")
-Translation_1 = model.addTranslation(Part_1_doc, [model.selection("SOLID", "cylinder")], model.selection("EDGE", "cylinder/Face_1"), 20)
+Translation_1 = model.addTranslation(Part_1_doc, [model.selection("SOLID", "cylinder")], model.selection("EDGE", "[cylinder/Face_1][weak_name_3]"), 20)
 model.do()
 
 assert(Translation_1.result().name() == Cylinder_1.result().name()), "Translation name '{}' != '{}'".format(Translation_1.result().name(), Cylinder_1.result().name())

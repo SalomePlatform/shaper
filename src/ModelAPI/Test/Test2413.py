@@ -18,6 +18,8 @@
 ## email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com>
 ##
 
+# -*- coding: utf-8 -*-
+
 from salome.shaper import model
 
 model.begin()
@@ -47,9 +49,9 @@ SketchConstraintCoincidence_7 = Sketch_1.setCoincident(SketchArc_1.startPoint(),
 SketchConstraintCoincidence_7.setName("SketchConstraintCoincidence_8")
 SketchConstraintRadius_1 = Sketch_1.setRadius(SketchArc_1.results()[1], 50)
 model.do()
-Extrusion_1 = model.addExtrusion(Part_1_doc, [model.selection("FACE", "Sketch_1/Face-SketchLine_1r-SketchArc_1_2f-SketchLine_3f")], model.selection(), 100, 0)
+Extrusion_1 = model.addExtrusion(Part_1_doc, [model.selection("FACE", "Sketch_1/Face-SketchLine_3f-SketchArc_1_2f-SketchLine_1r")], model.selection(), 100, 0)
 model.do()
-Solid_1_objects = [model.selection("FACE", "Extrusion_1_1/Generated_Face_3")]
+Solid_1_objects = [model.selection("FACE", "Extrusion_1_1/Generated_Face&Sketch_1/SketchLine_3")]
 Solid_1 = model.addSolid(Part_1_doc, Solid_1_objects)
 # check that resulting build-solid feature is invalid: only one not-closed face is used
 from ModelAPI import *
@@ -58,7 +60,7 @@ assert(aFactory.validate(Solid_1.feature()) == False)
 ModelAPI_Session.get().abortOperation()
 # another try: to make a solid with a face inside
 model.begin()
-Plane_4 = model.addPlane(Part_1_doc, model.selection("FACE", "Extrusion_1_1/To_Face_1"), 70, True)
+Plane_4 = model.addPlane(Part_1_doc, model.selection("FACE", "Extrusion_1_1/To_Face"), 70, True)
 Sketch_2 = model.addSketch(Part_1_doc, model.selection("FACE", "Plane_1"))
 SketchLine_5 = Sketch_2.addLine(14.9039069695087, 8.923908092675951, 26.86805702948195, 11.13714035991706)
 SketchLine_6 = Sketch_2.addLine(26.86805702948195, 11.13714035991706, 18.50962242738747, 32.13572332177004)
@@ -70,11 +72,10 @@ SketchConstraintCoincidence_9.setName("SketchConstraintCoincidence_10")
 SketchConstraintCoincidence_10 = Sketch_2.setCoincident(SketchLine_5.startPoint(), SketchLine_7.endPoint())
 SketchConstraintCoincidence_10.setName("SketchConstraintCoincidence_11")
 model.do()
-Face_1 = model.addFace(Part_1_doc, [model.selection("FACE", "Sketch_2/Face-SketchLine_5f-SketchLine_6f-SketchLine_7f")])
-Solid_2_objects = [model.selection("FACE", "Extrusion_1_1/Generated_Face_3"), model.selection("FACE", "Extrusion_1_1/Generated_Face_2"), model.selection("FACE", "Extrusion_1_1/To_Face_1"), model.selection("FACE", "Extrusion_1_1/From_Face_1"), model.selection("FACE", "Extrusion_1_1/Generated_Face_1"), model.selection("FACE", "Face_1_1")]
-Solid_2 = model.addSolid(Part_1_doc, Solid_2_objects)
+Face_1 = model.addFace(Part_1_doc, [model.selection("FACE", "Sketch_2/Face-SketchLine_5r-SketchLine_6f-SketchLine_7f")])
+Solid_1_objects = [model.selection("FACE", "Extrusion_1_1/Generated_Face&Sketch_1/SketchLine_3"), model.selection("FACE", "Extrusion_1_1/Generated_Face&Sketch_1/SketchArc_1_2"), model.selection("FACE", "Extrusion_1_1/To_Face"), model.selection("FACE", "Extrusion_1_1/From_Face"), model.selection("FACE", "Extrusion_1_1/Generated_Face&Sketch_1/SketchLine_1"), model.selection("FACE", "Face_1_1")]
+Solid_1 = model.addSolid(Part_1_doc, Solid_1_objects)
+model.do()
 model.end()
-
-assert(aFactory.validate(Solid_2.feature()) == False)
 
 assert(model.checkPythonDump())

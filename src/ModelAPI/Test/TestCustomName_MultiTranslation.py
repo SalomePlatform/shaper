@@ -18,6 +18,8 @@
 ## email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com>
 ##
 
+# -*- coding: utf-8 -*-
+
 from salome.shaper import model
 from ModelAPI import *
 
@@ -29,15 +31,15 @@ Part_1 = model.addPart(partSet)
 Part_1_doc = Part_1.document()
 Cylinder_1 = model.addCylinder(Part_1_doc, model.selection("VERTEX", "PartSet/Origin"), model.selection("EDGE", "PartSet/OZ"), 5, 10)
 Cylinder_1.result().setName("cylinder")
-MultiTranslation_1 = model.addMultiTranslation(Part_1_doc, [model.selection("SOLID", "cylinder")], model.selection("EDGE", "cylinder/Face_1"), 10, NB_COPIES)
+LinearCopy_1 = model.addMultiTranslation(Part_1_doc, [model.selection("SOLID", "cylinder")], model.selection("EDGE", "[cylinder/Face_1][weak_name_3]"), 10, NB_COPIES)
 model.do()
 
-TransResult = MultiTranslation_1.result()
+TransResult = LinearCopy_1.result()
 TransResultName = TransResult.name()
 assert(TransResultName == Cylinder_1.result().name()), "MultiTranslation name '{}' != '{}'".format(TransResultName, Cylinder_1.result().name())
 # check sub-result names
 assert(NB_COPIES == TransResult.numberOfSubs()), "Number of results {} is not equal to reference {}".format(TransResult.numberOfSubs(), NB_COPIES)
-MultiTranslationName = MultiTranslation_1.name() + "_1"
+MultiTranslationName = LinearCopy_1.name() + "_1"
 for i in range(0, NB_COPIES):
   refName = MultiTranslationName + '_' + str(i + 1)
   subResult = TransResult.subResult(i)

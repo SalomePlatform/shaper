@@ -18,6 +18,8 @@
 ## email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com>
 ##
 
+# -*- coding: utf-8 -*-
+
 from salome.shaper import model
 
 model.begin()
@@ -33,7 +35,7 @@ SketchConstraintCoincidence_2 = Sketch_1.setCoincident(SketchLine_2.endPoint(), 
 SketchConstraintCoincidence_3 = Sketch_1.setCoincident(SketchLine_1.startPoint(), SketchLine_3.endPoint())
 SketchConstraintVertical_1 = Sketch_1.setVertical(SketchLine_1.result())
 SketchConstraintPerpendicular_1 = Sketch_1.setPerpendicular(SketchLine_2.result(), SketchLine_3.result())
-SketchConstraintAngle_1 = Sketch_1.setAngle(SketchLine_1.result(), SketchLine_3.result(), 30)
+SketchConstraintAngle_1 = Sketch_1.setAngle(SketchLine_1.result(), SketchLine_3.result(), 30.00000000000014)
 SketchConstraintLength_1 = Sketch_1.setLength(SketchLine_1.result(), 60)
 SketchProjection_1 = Sketch_1.addProjection(model.selection("EDGE", "PartSet/OY"), False)
 SketchLine_4 = SketchProjection_1.createdFeature()
@@ -42,11 +44,11 @@ SketchConstraintMirror_1 = Sketch_1.addMirror(SketchLine_4.result(), SketchConst
 [SketchLine_5, SketchLine_6, SketchLine_7] = SketchConstraintMirror_1.mirrored()
 SketchConstraintDistance_1 = Sketch_1.setDistance(SketchLine_2.startPoint(), SketchLine_4.result(), 30, True)
 model.do()
-Extrusion_1 = model.addExtrusion(Part_1_doc, [model.selection("FACE", "Sketch_1/Face-SketchLine_1f-SketchLine_2f-SketchLine_3f")], model.selection(), 20, 0)
+Extrusion_1 = model.addExtrusion(Part_1_doc, [model.selection("FACE", "Sketch_1/Face-SketchLine_1r-SketchLine_2f-SketchLine_3f")], model.selection(), 20, 0)
 Extrusion_1.result().setName("prism")
-Revolution_1 = model.addRevolution(Part_1_doc, [model.selection("FACE", "Sketch_1/Face-SketchLine_5r-SketchLine_6r-SketchLine_7r")], model.selection("EDGE", "Sketch_1/Edge-SketchLine_6"), 360, 0)
+Revolution_1 = model.addRevolution(Part_1_doc, [model.selection("FACE", "Sketch_1/Face-SketchLine_6r-SketchLine_7r-SketchLine_5r")], model.selection("EDGE", "Sketch_1/SketchLine_6"), 360, 0)
 Revolution_1.result().setName("spinner")
-Placement_1 = model.addPlacement(Part_1_doc, [model.selection("SOLID", "spinner")], model.selection("VERTEX", "spinner/Lateral_6&spinner/Base_Edge_10"), model.selection("FACE", "prism/Generated_Face_2"), False, True)
+Placement_1 = model.addPlacement(Part_1_doc, [model.selection("SOLID", "spinner")], model.selection("VERTEX", "[spinner/Generated_Face&Sketch_1/SketchLine_7][spinner/Generated_Face&Sketch_1/SketchLine_5]"), model.selection("FACE", "prism/Generated_Face&Sketch_1/SketchLine_2"), False, True)
 model.do()
 
 assert(Placement_1.result().name() == Revolution_1.result().name()), "Placement name '{}' != '{}'".format(Placement_1.result().name(), Revolution_1.result().name())

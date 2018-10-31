@@ -18,6 +18,8 @@
 ## email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com>
 ##
 
+# -*- coding: utf-8 -*-
+
 from GeomAPI import *
 
 from salome.shaper import model
@@ -41,7 +43,7 @@ SketchConstraintVertical_1 = Sketch_1.setVertical(SketchLine_2.result())
 SketchConstraintHorizontal_2 = Sketch_1.setHorizontal(SketchLine_3.result())
 SketchConstraintVertical_2 = Sketch_1.setVertical(SketchLine_4.result())
 model.do()
-Extrusion_1 = model.addExtrusion(Part_1_doc, [model.selection("FACE", "Sketch_1/Face-SketchLine_1f-SketchLine_2f-SketchLine_3f-SketchLine_4f")], model.selection(), 10, 0)
+Extrusion_1 = model.addExtrusion(Part_1_doc, [model.selection("FACE", "Sketch_1/Face-SketchLine_1r-SketchLine_2f-SketchLine_3f-SketchLine_4f")], model.selection(), 10, 0)
 ExtrusionCut_1 = model.addExtrusionCut(Part_1_doc, [], model.selection(), 5, 5, [model.selection("SOLID", "Extrusion_1_1")])
 Sketch_2_origin = GeomAPI_Pnt(0, -10, 0)
 Sketch_2_norm = GeomAPI_Dir(0, -1, 0)
@@ -60,20 +62,20 @@ SketchConstraintVertical_3 = Sketch_2.setVertical(SketchLine_6.result())
 SketchConstraintHorizontal_4 = Sketch_2.setHorizontal(SketchLine_7.result())
 SketchConstraintVertical_4 = Sketch_2.setVertical(SketchLine_8.result())
 SketchConstraintLength_1 = Sketch_2.setLength(SketchLine_8.result(), "len")
-SketchProjection_1 = Sketch_2.addProjection(model.selection("EDGE", "Extrusion_1_1/Generated_Face_4&Extrusion_1_1/To_Face_1"), False)
+SketchProjection_1 = Sketch_2.addProjection(model.selection("EDGE", "[Extrusion_1_1/Generated_Face&Sketch_1/SketchLine_1][Extrusion_1_1/To_Face]"), False)
 SketchLine_9 = SketchProjection_1.createdFeature()
 SketchConstraintDistance_1 = Sketch_2.setDistance(SketchLine_5.startPoint(), SketchLine_9.result(), 20, True)
 ExtrusionCut_1.setNestedSketch(Sketch_2)
-Cylinder_1 = model.addCylinder(Part_1_doc, model.selection("VERTEX", "ExtrusionCut_1_1/Modfied_2&ExtrusionCut_1_1/Modfied_1&Extrusion_1_1/Generated_Face_1"), model.selection("EDGE", "PartSet/OZ"), 5, 10)
-Cylinder_2 = model.addCylinder(Part_1_doc, model.selection("VERTEX", "ExtrusionCut_1_1/Modfied_2&Extrusion_1_1/Generated_Face_3&ExtrusionCut_1_1/Modfied_1"), model.selection("EDGE", "PartSet/OZ"), 5, 10)
+Cylinder_1 = model.addCylinder(Part_1_doc, model.selection("VERTEX", "[ExtrusionCut_1_1/Modified_Face&Sketch_1/SketchLine_1][ExtrusionCut_1_1/Modified_Face&Extrusion_1_1/To_Face][Extrusion_1_1/Generated_Face&Sketch_1/SketchLine_4]"), model.selection("EDGE", "PartSet/OZ"), 5, 10)
+Cylinder_2 = model.addCylinder(Part_1_doc, model.selection("VERTEX", "[ExtrusionCut_1_1/Modified_Face&Sketch_1/SketchLine_1][Extrusion_1_1/Generated_Face&Sketch_1/SketchLine_2][ExtrusionCut_1_1/Modified_Face&Extrusion_1_1/To_Face]"), model.selection("EDGE", "PartSet/OZ"), 5, 10)
 model.do()
 # make sketch_2 cut the whole top face of the initial extrusion, so, one of the cylinder becomes invalid
 lenParam.setValue(100)
 Part_1_doc.setCurrentFeature(Cylinder_2.feature(), True)
 model.do()
 # update selection of cylinder base points
-model.selection("VERTEX", "ExtrusionCut_1_1/Modfied_3&Extrusion_1_1/Generated_Face_3&ExtrusionCut_1_1/Modfied_1").fillAttribute(Cylinder_1.basePoint())
-model.selection("VERTEX", "ExtrusionCut_1_1/Modfied_3&ExtrusionCut_1_1/Modfied_divided_1_1&Extrusion_1_1/Generated_Face_1").fillAttribute(Cylinder_2.basePoint())
+model.selection("VERTEX", "[ExtrusionCut_1_1/Modified_Face&Sketch_1/SketchLine_1][Extrusion_1_1/Generated_Face&Sketch_1/SketchLine_2][ExtrusionCut_1_1/Modified_Face&Extrusion_1_1/To_Face&weak_name_1]").fillAttribute(Cylinder_1.basePoint())
+model.selection("VERTEX", "[ExtrusionCut_1_1/Modified_Face&Sketch_1/SketchLine_1][ExtrusionCut_1_1/Modified_Face&Extrusion_1_1/To_Face&weak_name_2][Extrusion_1_1/Generated_Face&Sketch_1/SketchLine_4]").fillAttribute(Cylinder_2.basePoint())
 model.end()
 
 # check that both cylinders are valid and have correct results

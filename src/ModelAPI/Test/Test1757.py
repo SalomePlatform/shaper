@@ -54,13 +54,13 @@ SketchConstraintVertical_1 = Sketch_1.setVertical(SketchLine_2.result())
 SketchConstraintHorizontal_2 = Sketch_1.setHorizontal(SketchLine_3.result())
 SketchConstraintVertical_2 = Sketch_1.setVertical(SketchLine_4.result())
 model.do()
-Extrusion_1 = model.addExtrusion(Part_1_doc, [model.selection("FACE", "Sketch_1/Face-SketchLine_1f-SketchLine_2f-SketchLine_3f-SketchLine_4f")], model.selection(), 300, 0)
+Extrusion_1 = model.addExtrusion(Part_1_doc, [model.selection("FACE", "Sketch_1/Face-SketchLine_1r-SketchLine_2f-SketchLine_3f-SketchLine_4f")], model.selection(), 300, 0)
 
 #=========================================================================
 # Cut another rectangle to make a groove
 #=========================================================================
-ExtrusionCut_1 = model.addExtrusionCut(Part_1_doc, [], model.selection(), model.selection(), 0, model.selection("FACE", "Extrusion_1_1/To_Face_1"), 0, [model.selection("SOLID", "Extrusion_1_1")])
-Sketch_2 = model.addSketch(Part_1_doc, model.selection("FACE", "Extrusion_1_1/From_Face_1"))
+ExtrusionCut_1 = model.addExtrusionCut(Part_1_doc, [], model.selection(), model.selection(), 0, model.selection("FACE", "Extrusion_1_1/To_Face"), 0, [model.selection("SOLID", "Extrusion_1_1")])
+Sketch_2 = model.addSketch(Part_1_doc, model.selection("FACE", "Extrusion_1_1/From_Face"))
 SketchLine_5 = Sketch_2.addLine(-47.794137712106, -188.943752610533, 90.842718875892, -188.943752610533)
 SketchLine_6 = Sketch_2.addLine(90.842718875892, -188.943752610533, 90.842718875892, -51.567231082425)
 SketchLine_7 = Sketch_2.addLine(90.842718875892, -51.567231082425, -47.794137712106, -51.567231082425)
@@ -79,8 +79,8 @@ model.do()
 #=========================================================================
 # Make a cylindrical hole using one of the produced faces
 #=========================================================================
-ExtrusionCut_2 = model.addExtrusionCut(Part_1_doc, [], model.selection(), model.selection(), 0, model.selection("FACE", "Extrusion_1_1/Generated_Face_2"), 0, [model.selection("SOLID", "ExtrusionCut_1_1")])
-Sketch_3 = model.addSketch(Part_1_doc, model.selection("FACE", "ExtrusionCut_1_1/Modfied_3"))
+ExtrusionCut_2 = model.addExtrusionCut(Part_1_doc, [], model.selection(), model.selection(), 0, model.selection("FACE", "Extrusion_1_1/Generated_Face&Sketch_1/SketchLine_3"), 0, [model.selection("SOLID", "ExtrusionCut_1_1")])
+Sketch_3 = model.addSketch(Part_1_doc, model.selection("FACE", "ExtrusionCut_1_1/Modified_Face&Sketch_1/SketchLine_1&weak_name_2"))
 SketchCircle_1 = Sketch_3.addCircle(143.412751420315, -228.52745656314, 32.158435160764)
 ExtrusionCut_2.setNestedSketch(Sketch_3)
 
@@ -92,8 +92,8 @@ Part_1.document().setCurrentFeature(ExtrusionCut_1.feature(), True)
 #=========================================================================
 # Modify the cylindrical hole base face by another groove in the history before the hole is created
 #=========================================================================
-ExtrusionCut_3 = model.addExtrusionCut(Part_1_doc, [], model.selection(), model.selection(), 0, model.selection("FACE", "Extrusion_1_1/Generated_Face_1"), -50, [model.selection("SOLID", "ExtrusionCut_1_1")])
-Sketch_4 = model.addSketch(Part_1_doc, model.selection("FACE", "Extrusion_1_1/Generated_Face_3"))
+ExtrusionCut_3 = model.addExtrusionCut(Part_1_doc, [], model.selection(), model.selection(), 0, model.selection("FACE", "Extrusion_1_1/Generated_Face&Sketch_1/SketchLine_4"), -50, [model.selection("SOLID", "ExtrusionCut_1_1")])
+Sketch_4 = model.addSketch(Part_1_doc, model.selection("FACE", "Extrusion_1_1/Generated_Face&Sketch_1/SketchLine_2"))
 SketchLine_9 = Sketch_4.addLine(-176.701443076057, -151.212050129331, -91.83965287802501, -151.212050129331)
 SketchLine_10 = Sketch_4.addLine(-91.83965287802501, -151.212050129331, -91.83965287802501, -84.473709256573)
 SketchLine_11 = Sketch_4.addLine(-91.83965287802501, -84.473709256573, -176.701443076057, -84.473709256573)
@@ -125,6 +125,6 @@ import ModelAPI
 
 assert(ModelAPI.ModelAPI_Session.get().validators().validate(Sketch_4.feature()))
 assert(ModelAPI.ModelAPI_Session.get().validators().validate(ExtrusionCut_2.feature()))
-assert(Sketch_3.feature().selection("External").namingName() == "ExtrusionCut_3_1/Modfied_5")
+assert(Sketch_3.feature().selection("External").namingName() == "ExtrusionCut_3_1/Modified_Face&Sketch_1/SketchLine_1&weak_name_3")
 
 assert(model.checkPythonDump())

@@ -18,6 +18,8 @@
 ## email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com>
 ##
 
+# -*- coding: utf-8 -*-
+
 from salome.shaper import model
 
 model.begin()
@@ -31,16 +33,16 @@ SketchConstraintCoincidence_2 = Sketch_1.setCoincident(SketchPoint_1.coordinates
 model.do()
 Part_1 = model.addPart(partSet)
 Part_1_doc = Part_1.document()
-Extrusion_1 = model.addExtrusion(Part_1_doc, [model.selection("FACE", "PartSet/Sketch_1/Face-SketchCircle_1_2r-SketchCircle_2_2f")], model.selection(), 5, 0)
-Sketch_2 = model.addSketch(Part_1_doc, model.selection("FACE", "PartSet/YOZ"))
+Extrusion_1 = model.addExtrusion(Part_1_doc, [model.selection("FACE", "PartSet/Sketch_1/Face-SketchCircle_2_2f-SketchCircle_1_2r")], model.selection(), 5, 0)
+Sketch_2 = model.addSketch(Part_1_doc, model.standardPlane("YOZ"))
 SketchCircle_3 = Sketch_2.addCircle(-0.01730125245914903, 1.175069067120482, 0.2787321880802174)
 SketchCircle_4 = Sketch_2.addCircle(-0.01730125245914903, 1.175069067120482, 0.3197841740766353)
 SketchConstraintCoincidence_3 = Sketch_2.setCoincident(SketchCircle_3.center(), SketchCircle_4.center())
 model.do()
-Extrusion_2 = model.addExtrusion(Part_1_doc, [model.selection("FACE", "Sketch_1/Face-SketchCircle_1_2r-SketchCircle_2_2f")], model.selection(), 0, 3)
-Extrusion_3 = model.addExtrusion(Part_1_doc, [model.selection("FACE", "PartSet/Sketch_1/Face-SketchCircle_1_2f")], model.selection(), model.selection("FACE", "Extrusion_1_1/To_Face_1"), 0, model.selection(), 0)
-Boolean_1 = model.addCut(Part_1_doc, [model.selection("SOLID", "Extrusion_2_1")], [model.selection("SOLID", "Extrusion_3_1")])
-Sketch_3 = model.addSketch(Part_1_doc, model.selection("FACE", "PartSet/XOZ"))
+Extrusion_2 = model.addExtrusion(Part_1_doc, [model.selection("FACE", "Sketch_1/Face-SketchCircle_2_2f-SketchCircle_1_2r")], model.selection(), 0, 3)
+Extrusion_3 = model.addExtrusion(Part_1_doc, [model.selection("FACE", "PartSet/Sketch_1/Face-SketchCircle_1_2f")], model.selection(), model.selection("FACE", "Extrusion_1_1/To_Face"), 0, model.selection(), 0)
+Cut_1 = model.addCut(Part_1_doc, [model.selection("SOLID", "Extrusion_2_1")], [model.selection("SOLID", "Extrusion_3_1")])
+Sketch_3 = model.addSketch(Part_1_doc, model.standardPlane("XOZ"))
 SketchLine_1 = Sketch_3.addLine(-3.362323990279312, -0.5188129046480872, 0.8318943090987101, -0.5188129046480872)
 SketchLine_2 = Sketch_3.addLine(0.8318943090987101, -0.5188129046480872, 0.8318943090987101, 7.155729512171993)
 SketchLine_3 = Sketch_3.addLine(0.8318943090987101, 7.155729512171993, -3.362323990279312, 7.155729512171993)
@@ -54,15 +56,16 @@ SketchConstraintVertical_1 = Sketch_3.setVertical(SketchLine_2.result())
 SketchConstraintHorizontal_2 = Sketch_3.setHorizontal(SketchLine_3.result())
 SketchConstraintVertical_2 = Sketch_3.setVertical(SketchLine_4.result())
 model.do()
-Face_1 = model.addFace(Part_1_doc, [model.selection("EDGE", "Sketch_2/Edge-SketchLine_2"), model.selection("EDGE", "Sketch_2/Edge-SketchLine_3"), model.selection("EDGE", "Sketch_2/Edge-SketchLine_4"), model.selection("EDGE", "Sketch_2/Edge-SketchLine_1")])
-Extrusion_4 = model.addExtrusion(Part_1_doc, [model.selection("WIRE", "Sketch_1/Wire-SketchCircle_2_2f")], model.selection(), model.selection("FACE", "Extrusion_2_1/From_Face_1"), 0, model.selection(), 0)
-Boolean_2 = model.addCut(Part_1_doc, [model.selection("SOLID", "Extrusion_1_1")], [model.selection("SOLID", "Extrusion_4_1")])
-Partition_1 = model.addPartition(Part_1_doc, [model.selection("SOLID", "Cut_1_1"), model.selection("SOLID", "Cut_2_1"), model.selection("FACE", "Face_1_1")])
-Remove_SubShapes_1_objects = [model.selection("SOLID", "Partition_1_1_1_1"), model.selection("SOLID", "Partition_1_1_1_2"), model.selection("SOLID", "Partition_1_1_1_3"), model.selection("SOLID", "Partition_1_1_1_4")]
+Face_1_objects = [model.selection("EDGE", "Sketch_2/SketchLine_2"), model.selection("EDGE", "Sketch_2/SketchLine_3"), model.selection("EDGE", "Sketch_2/SketchLine_4"), model.selection("EDGE", "Sketch_2/SketchLine_1")]
+Face_1 = model.addFace(Part_1_doc, Face_1_objects)
+Extrusion_4 = model.addExtrusion(Part_1_doc, [model.selection("WIRE", "Sketch_1/Face-SketchCircle_2_2f-SketchCircle_1_2r_wire")], model.selection(), model.selection("FACE", "Extrusion_2_1/From_Face"), 0, model.selection(), 0)
+Cut_2 = model.addCut(Part_1_doc, [model.selection("SOLID", "Extrusion_1_1")], [model.selection("SOLID", "Extrusion_4_1")])
+Partition_1_objects = [model.selection("SOLID", "Cut_1_1"), model.selection("SOLID", "Cut_2_1"), model.selection("FACE", "Face_1_1")]
+Partition_1 = model.addPartition(Part_1_doc, Partition_1_objects)
+Remove_SubShapes_1_objects_1 = [model.selection("SOLID", "Partition_1_1_1_1"), model.selection("SOLID", "Partition_1_1_1_2"), model.selection("SOLID", "Partition_1_1_1_3"), model.selection("SOLID", "Partition_1_1_1_4")]
 Remove_SubShapes_1 = model.addRemoveSubShapes(Part_1_doc, model.selection("COMPOUND", "Partition_1_1"))
-Remove_SubShapes_1.setSubShapesToKeep(Remove_SubShapes_1_objects)
-
-
+Remove_SubShapes_1.setSubShapesToKeep(Remove_SubShapes_1_objects_1)
+model.do()
 model.end()
 
 # check that remove sub-shapes contains correct selection

@@ -18,6 +18,8 @@
 ## email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com>
 ##
 
+# -*- coding: utf-8 -*-
+
 from salome.shaper import model
 
 model.begin()
@@ -43,15 +45,15 @@ SketchConstraintVertical_2 = Sketch_1.setVertical(SketchLine_4.result())
 SketchConstraintLength_1 = Sketch_1.setLength(SketchLine_1.result(), 50)
 SketchConstraintEqual_1 = Sketch_1.setEqual(SketchLine_2.result(), SketchLine_1.result())
 model.do()
-Extrusion_1 = model.addExtrusion(Part_1_doc, [model.selection("FACE", "Sketch_1/Face-SketchLine_1r-SketchLine_2r-SketchLine_3r-SketchLine_4r")], model.selection(), 20, 0)
+Extrusion_1 = model.addExtrusion(Part_1_doc, [model.selection("FACE", "Sketch_1/Face-SketchLine_4r-SketchLine_3r-SketchLine_2r-SketchLine_1r")], model.selection(), 20, 0)
 Extrusion_1.result().setName("plate")
 ExtrusionCut_1 = model.addExtrusionCut(Part_1_doc, [], model.selection(), 0, 10, [model.selection("SOLID", "plate")])
-Sketch_2 = model.addSketch(Part_1_doc, model.selection("FACE", "plate/To_Face_1"))
-SketchCircle_1 = Sketch_2.addCircle(30, 35, 10)
-SketchProjection_2 = Sketch_2.addProjection(model.selection("EDGE", "plate/Generated_Face_4&plate/To_Face_1"), False)
+Sketch_2 = model.addSketch(Part_1_doc, model.selection("FACE", "plate/To_Face"))
+SketchCircle_1 = Sketch_2.addCircle(30.00000000000001, 15, 10)
+SketchProjection_2 = Sketch_2.addProjection(model.selection("EDGE", "[plate/Generated_Face&Sketch_1/SketchLine_4][plate/To_Face]"), False)
 SketchLine_5 = SketchProjection_2.createdFeature()
 SketchConstraintDistance_1 = Sketch_2.setDistance(SketchCircle_1.center(), SketchLine_5.result(), 20, True)
-SketchProjection_3 = Sketch_2.addProjection(model.selection("EDGE", "plate/Generated_Face_1&plate/To_Face_1"), False)
+SketchProjection_3 = Sketch_2.addProjection(model.selection("EDGE", "[plate/Generated_Face&Sketch_1/SketchLine_1][plate/To_Face]"), False)
 SketchLine_6 = SketchProjection_3.createdFeature()
 SketchConstraintDistance_2 = Sketch_2.setDistance(SketchCircle_1.center(), SketchLine_6.result(), 15, True)
 SketchConstraintRadius_1 = Sketch_2.setRadius(SketchCircle_1.results()[1], 10)

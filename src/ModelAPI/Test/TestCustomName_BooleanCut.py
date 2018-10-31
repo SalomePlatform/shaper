@@ -18,6 +18,8 @@
 ## email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com>
 ##
 
+# -*- coding: utf-8 -*-
+
 from SketchAPI import *
 
 from salome.shaper import model
@@ -45,9 +47,9 @@ SketchConstraintVertical_2 = Sketch_1.setVertical(SketchLine_4.result())
 SketchConstraintLength_1 = Sketch_1.setLength(SketchLine_3.result(), 70)
 SketchConstraintLength_2 = Sketch_1.setLength(SketchLine_2.result(), 50)
 model.do()
-Extrusion_1 = model.addExtrusion(Part_1_doc, [model.selection("FACE", "Sketch_1/Face-SketchLine_1r-SketchLine_2r-SketchLine_3r-SketchLine_4r")], model.selection(), 10, 0)
+Extrusion_1 = model.addExtrusion(Part_1_doc, [model.selection("FACE", "Sketch_1/Face-SketchLine_4r-SketchLine_3r-SketchLine_2r-SketchLine_1r")], model.selection(), 10, 0)
 Extrusion_1.result().setName("box")
-Sketch_2 = model.addSketch(Part_1_doc, model.selection("FACE", "Sketch_1/Face-SketchLine_1r-SketchLine_2r-SketchLine_3r-SketchLine_4r"))
+Sketch_2 = model.addSketch(Part_1_doc, model.selection("FACE", "Sketch_1/Face-SketchLine_4r-SketchLine_3r-SketchLine_2r-SketchLine_1r"))
 SketchLine_5 = Sketch_2.addLine(10, 55, 50, 55)
 SketchLine_6 = Sketch_2.addLine(50, 55, 50, -5)
 SketchLine_7 = Sketch_2.addLine(50, -5, 10, -5)
@@ -67,12 +69,12 @@ SketchConstraintDistanceHorizontal_1 = Sketch_2.setHorizontalDistance(SketchLine
 SketchConstraintLength_3 = Sketch_2.setLength(SketchLine_8.result(), 60)
 SketchConstraintLength_4 = Sketch_2.setLength(SketchLine_7.result(), 40)
 model.do()
-Extrusion_2 = model.addExtrusion(Part_1_doc, [model.selection("FACE", "Sketch_2/Face-SketchLine_5r-SketchLine_6r-SketchLine_7r-SketchLine_8r")], model.selection(), 15, 5)
+Extrusion_2 = model.addExtrusion(Part_1_doc, [model.selection("FACE", "Sketch_2/Face-SketchLine_8r-SketchLine_7r-SketchLine_6r-SketchLine_5r")], model.selection(), 15, 5)
 Extrusion_2.result().setName("tool")
-Boolean_1 = model.addCut(Part_1_doc, [model.selection("SOLID", "box")], [model.selection("SOLID", "tool")])
+Cut_1 = model.addCut(Part_1_doc, [model.selection("SOLID", "box")], [model.selection("SOLID", "tool")])
 model.do()
 
-assert(Boolean_1.result().name() == Extrusion_1.result().name()), "Boolean CUT name '{}' != '{}'".format(Boolean_1.result().name(), Extrusion_1.result().name())
+assert(Cut_1.result().name() == Extrusion_1.result().name()), "Boolean CUT name '{}' != '{}'".format(Cut_1.result().name(), Extrusion_1.result().name())
 
 model.end()
 

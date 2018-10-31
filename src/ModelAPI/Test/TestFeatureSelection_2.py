@@ -50,7 +50,7 @@ SketchLine_2 = SketchProjection_2.createdFeature()
 SketchConstraintDistance_2 = Sketch_2.setDistance(SketchLine_2.result(), SketchCircle_4.center(), 5, True)
 SketchConstraintDistanceHorizontal_1 = Sketch_2.setHorizontalDistance(SketchAPI_Line(SketchLine_2).startPoint(), SketchCircle_4.center(), 25)
 model.do()
-Revolution_1 = model.addRevolution(Part_1_doc, [model.selection("FACE", "Sketch_2/Face-SketchCircle_4_2f")], model.selection("EDGE", "PartSet/OZ"), 360, 0)
+Revolution_1 = model.addRevolution(Part_1_doc, [model.selection("FACE", "Sketch_2/Face-SketchCircle_4_2r")], model.selection("EDGE", "PartSet/OZ"), 360, 0)
 Cut_1 = model.addCut(Part_1_doc, [model.selection("COMPOUND", "all-in-Extrusion_1")], [model.selection("COMPOUND", "all-in-Revolution_1")])
 model.do()
 

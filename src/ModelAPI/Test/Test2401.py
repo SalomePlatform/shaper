@@ -18,6 +18,8 @@
 ## email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com>
 ##
 
+# -*- coding: utf-8 -*-
+
 from salome.shaper import model
 
 model.begin()
@@ -51,8 +53,8 @@ SketchConstraintEqual_2 = Sketch_1.setEqual(SketchLine_5.result(), SketchLine_1.
 SketchConstraintLength_1 = Sketch_1.setLength(SketchLine_1.result(), 3)
 SketchConstraintLength_2 = Sketch_1.setLength(SketchLine_7.result(), 8)
 model.do()
-Extrusion_1 = model.addExtrusion(Part_1_doc, [model.selection("FACE", "Sketch_1/Face-SketchLine_1r-SketchLine_3r-SketchLine_4r-SketchLine_5r-SketchLine_7r")], model.selection(), 5, 0)
-Plane_4 = model.addPlane(Part_1_doc, model.selection("FACE", "Extrusion_1_1/Generated_Face_4"), 5, True)
+Extrusion_1 = model.addExtrusion(Part_1_doc, [model.selection("FACE", "Sketch_1/Face-SketchLine_7r-SketchLine_5r-SketchLine_4r-SketchLine_3r-SketchLine_1r")], model.selection(), 5, 0)
+Plane_4 = model.addPlane(Part_1_doc, model.selection("FACE", "Extrusion_1_1/Generated_Face&Sketch_1/SketchLine_5"), 5, True)
 Sketch_2 = model.addSketch(Part_1_doc, model.selection("FACE", "Plane_1"))
 SketchLine_8 = Sketch_2.addLine(7.560741003605092, 9.43062705614625, -1.095841663628257, 9.43062705614625)
 SketchLine_9 = Sketch_2.addLine(-1.095841663628257, 9.43062705614625, -1.095841663628257, -5.449377136847041)
@@ -67,8 +69,8 @@ SketchConstraintVertical_2 = Sketch_2.setVertical(SketchLine_9.result())
 SketchConstraintHorizontal_2 = Sketch_2.setHorizontal(SketchLine_10.result())
 SketchConstraintVertical_3 = Sketch_2.setVertical(SketchLine_11.result())
 model.do()
-Face_1 = model.addFace(Part_1_doc, [model.selection("FACE", "Sketch_2/Face-SketchLine_8f-SketchLine_9f-SketchLine_10f-SketchLine_11f")])
-Boolean_1 = model.addFill(Part_1_doc, [model.selection("SOLID", "Extrusion_1_1")], [model.selection("FACE", "Face_1_1")])
+Face_1 = model.addFace(Part_1_doc, [model.selection("FACE", "Sketch_2/Face-SketchLine_8r-SketchLine_9f-SketchLine_10f-SketchLine_11f")])
+Fill_1 = model.addFill(Part_1_doc, [model.selection("SOLID", "Extrusion_1_1")], [model.selection("FACE", "Face_1_1")])
 model.do()
 
 # now add an additional edge to the first sketch as it is described in the issue
@@ -76,10 +78,10 @@ SketchLine_8 = Sketch_1.addLine(0, 3, 8, 3)
 SketchConstraintCoincidence_9 = Sketch_1.setCoincident(SketchLine_1.endPoint(), SketchLine_8.startPoint())
 SketchConstraintCoincidence_10 = Sketch_1.setCoincident(SketchLine_4.endPoint(), SketchLine_8.endPoint())
 model.do()
-Part_1_doc.setCurrentFeature(Boolean_1.feature(), True)
+Part_1_doc.setCurrentFeature(Fill_1.feature(), True)
 model.end()
 
 # check that the plane is located as previously
-model.testNbSubResults(Boolean_1, [2])
-model.testResultsVolumes(Boolean_1, [120])
+model.testNbSubResults(Fill_1, [2])
+model.testResultsVolumes(Fill_1, [120])
 assert(model.checkPythonDump())

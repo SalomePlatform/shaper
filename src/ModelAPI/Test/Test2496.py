@@ -1,4 +1,4 @@
-## Copyright (C) 2018-20xx  CEA/DEN, EDF R&D
+## Copyright (C) 2014-2017  CEA/DEN, EDF R&D
 ##
 ## This library is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU Lesser General Public
@@ -17,6 +17,8 @@
 ## See http:##www.salome-platform.org/ or
 ## email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com>
 ##
+
+# -*- coding: utf-8 -*-
 
 from salome.shaper import model
 
@@ -38,13 +40,13 @@ SketchConstraintVertical_1 = Sketch_1.setVertical(SketchLine_2.result())
 SketchConstraintHorizontal_2 = Sketch_1.setHorizontal(SketchLine_3.result())
 SketchConstraintVertical_2 = Sketch_1.setVertical(SketchLine_4.result())
 model.do()
-Face_1 = model.addFace(Part_1_doc, [model.selection("FACE", "Sketch_1/Face-SketchLine_1r-SketchLine_2r-SketchLine_3r-SketchLine_4r")])
-Sketch_2 = model.addSketch(Part_1_doc, model.selection("FACE", "Sketch_1/Face-SketchLine_1r-SketchLine_2r-SketchLine_3r-SketchLine_4r"))
+Face_1 = model.addFace(Part_1_doc, [model.selection("FACE", "Sketch_1/Face-SketchLine_4r-SketchLine_3r-SketchLine_2r-SketchLine_1r")])
+Sketch_2 = model.addSketch(Part_1_doc, model.selection("FACE", "Sketch_1/Face-SketchLine_4r-SketchLine_3r-SketchLine_2r-SketchLine_1r"))
 SketchCircle_1 = Sketch_2.addCircle(0, -10, 25)
 model.do()
-Face_2 = model.addFace(Part_1_doc, [model.selection("FACE", "Sketch_2/Face-SketchCircle_1_2f")])
+Face_2 = model.addFace(Part_1_doc, [model.selection("FACE", "Sketch_2/Face-SketchCircle_1_2r")])
 Partition_1 = model.addPartition(Part_1_doc, [model.selection("FACE", "Face_2_1"), model.selection("FACE", "Face_1_1")])
-Group_1 = model.addGroup(Part_1_doc, [model.selection("FACE", "Face_2_1/Face_2_1"), model.selection("FACE", "Partition_1_1_1")])
+Group_1 = model.addGroup(Part_1_doc, [model.selection("FACE", "Partition_1_1_1"), model.selection("COMPOUND", "Partition_1_1")])
 model.do()
 
 assert(Group_1.feature().error() == "")
