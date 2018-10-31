@@ -705,6 +705,44 @@ bool Model_AttributeSelection::update()
   return setInvalidIfFalse(aSelLab, false); // unknown case
 }
 
+/// integer that contains the tag number of external construction shape naming
+static Standard_GUID kEXTERNAL_CONSTRUCTION_TAG("f7d0726f-e848-4d22-9101-def16d0eff2c");
+
+void Model_AttributeSelection::storeExternalConstruction(
+  const ResultConstructionPtr& theConstruction, const GeomShapePtr& theSubShape)
+{
+  std::string aName = namingName();
+  if (aName.empty()) // unknown error
+    return;
+  std::shared_ptr<Model_Document> aMyDoc =
+    std::dynamic_pointer_cast<Model_Document>(owner()->document());
+  TDF_Label anExternalLab = aMyDoc->extConstructionsLabel();
+  Handle(TDataStd_Integer) anExtTag;
+  if (selectionLabel().FindAttribute(kEXTERNAL_CONSTRUCTION_TAG, anExtTag)) {
+    anExternalLab = anExternalLab.FindChild(anExtTag->Get()); // use existing label
+  } else {
+    // search label with the same name
+    TDF_ChildIDIterator aNamesIter(anExternalLab, TDataStd_Name::GetID());
+    for(; aNamesIter.More(); aNamesIter.Next()) {
+      if (aName == TCollection_AsciiString(Handle(TDataStd_Name)::DownCast(
+        aNamesIter.Value())->Get()).ToCString()) {
+        anExternalLab = aNamesIter.Value()->Label();
+        break;
+      }
+    }
+    if (aNamesIter.More()) {
+    } else {
+      anExternalLab = anExternalLab.NewChild(); // create new label
+      TDataStd_Integer::Set(selectionLabel(), kEXTERNAL_CONSTRUCTION_TAG,
+        anExternalLab.Tag()); // store this tag in the data model
+    }
+  }
+  anExternalLab.ForgetAllAttributes();
+  TopoDS_Shape aSubShape = theSubShape->impl<TopoDS_Shape>();
+  TNaming_Builder aBuilder(anExternalLab);
+  aBuilder.Generated(aSubShape);
+}
+
 void Model_AttributeSelection::selectBody(
   const ResultPtr& theContext, const std::shared_ptr<GeomAPI_Shape>& theSubShape)
 {
@@ -755,10 +793,9 @@ void Model_AttributeSelection::selectBody(
         if (aFaceIndex >= 0) {
           TDataStd_Integer::Set(aSelLab, theSubShape->shapeType() == GeomAPI_Shape::FACE ?
             kEXT_SKETCH_FACE : kEXT_SKETCH_WIRE, aFaceIndex); // store index of the face
+          //storeExternalConstruction(aConstr, theSubShape);
           return;
         }
-      } else if (theSubShape->shapeType() == GeomAPI_Shape::WIRE) {
-
       } else if (theSubShape->shapeType() == GeomAPI_Shape::EDGE ||// sketch result edge (full one)
                  theSubShape->shapeType() == GeomAPI_Shape::VERTEX) { // or start/end vertex
         bool isVertex = theSubShape->shapeType() == GeomAPI_Shape::VERTEX;
@@ -1684,7 +1721,7 @@ bool Model_AttributeSelection::restoreContext(std::string theName,
             if ((*aRes)->data()->name() == aCompName) {
               theValue = std::dynamic_pointer_cast<Model_Data>((*aRes)->data())->shapeLab();
               break;
-            } else if (aCompName.find((*aRes)->data()->name()) != std::string::npos) {// sub-vertex
+            } else { // any sub-label because the sketch line may be renamed, but not sub-vertices
               TDF_Label aLab = std::dynamic_pointer_cast<Model_Data>((*aRes)->data())->shapeLab();
               TDF_ChildIDIterator aSubNames(aLab, TDataStd_Name::GetID());
               for(; aSubNames.More(); aSubNames.Next()) {

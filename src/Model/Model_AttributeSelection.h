@@ -31,6 +31,7 @@
 
 class Model_AttributeSelectionList;
 class Model_Document;
+class ModelAPI_ResultConstruction;
 
 /**\class Model_AttributeSelection
  * \ingroup DataModel
@@ -39,14 +40,14 @@ class Model_Document;
 class Model_AttributeSelection : public ModelAPI_AttributeSelection,
                                  public Selector_NameGenerator
 {
-  Model_AttributeReference myRef;  ///< The reference functionality reusage
+  Model_AttributeReference myRef;  ///< The reference functionality re-usage
   /// temporarily storages to avoid keeping in the data structure if not needed
   ResultPtr myTmpContext;
   /// temporarily storages to avoid keeping in the data structure if not needed
   std::shared_ptr<GeomAPI_Shape> myTmpSubShape;
   /// temporarily storages to avoid keeping in the data structure if not needed
   CenterType myTmpCenterType;
-  /// Reference to the partent attribute, if any (to split selection compounds in issue 1799)
+  /// Reference to the parent attribute, if any (to split selection compounds in issue 1799)
   Model_AttributeSelectionList* myParent;
 
   std::shared_ptr<Model_Document> myRestoreDocument; // current document to restore by name
@@ -55,7 +56,7 @@ public:
   /// \param theContext object where the sub-shape was selected
   /// \param theSubShape selected sub-shape (if null, the whole context is selected)
   /// \param theTemporarily if it is true, do not store and name the added in the data framework
-  ///           (used to remove immideately, without the following updates)
+  ///           (used to remove immediately, without the following updates)
   /// \returns true if attribute was updated
   MODEL_EXPORT virtual bool setValue(
     const ObjectPtr& theContext, const std::shared_ptr<GeomAPI_Shape>& theSubShape,
@@ -89,7 +90,7 @@ public:
   /// Sets the feature object
   MODEL_EXPORT virtual void setObject(const std::shared_ptr<ModelAPI_Object>& theObject);
 
-  /// Updates the underlied selection due to the changes in the referenced objects
+  /// Updates the selection due to the changes in the referenced objects
   /// \returns false if update is failed
   MODEL_EXPORT virtual bool update();
 
@@ -107,7 +108,7 @@ public:
   /// NOTE: This method is opposite to Id() method.
   MODEL_EXPORT virtual void setId(int theID);
 
-  /// Selects (i.e. creates Naming data structure) of sub-shape specifed by textual name
+  /// Selects (i.e. creates Naming data structure) of sub-shape specified by textual name
   MODEL_EXPORT virtual void selectSubShape(const std::string& theType,
                                            const std::string& theSubShapeName);
 
@@ -121,7 +122,7 @@ public:
   /// Returns true if attribute was  initialized by some value
   MODEL_EXPORT virtual bool isInitialized();
 
-  /// Returns true if recomute of selection become impossible
+  /// Returns true if recompute of selection become impossible
   MODEL_EXPORT virtual bool isInvalid();
 
   /// Updates the arguments of selection if something was affected by creation
@@ -157,8 +158,11 @@ protected:
   /// Returns theType type of the center, or NOT_CENTER if it is not.
   std::shared_ptr<GeomAPI_Shape> internalValue(CenterType& theType);
 
-
-  /// Performs the selection for the body result (TNaming Selection)
+  /// stores the naming structure of external construction (sketch element) in the data
+  /// tree of this document with name equal to selection-name in external document
+  void storeExternalConstruction(
+    const std::shared_ptr<ModelAPI_ResultConstruction>& theConstruction,
+    const std::shared_ptr<GeomAPI_Shape>& theSubShape);
 
   /// Performs the selection for the body result (TNaming selection)
   virtual void selectBody(
@@ -168,7 +172,7 @@ protected:
   /// \param theContext the result - owner of the selection
   /// \param theSubShape selected shape
   /// \param theUpdate flag that shows that it must be just update, theShape is null
-  /// \returns true if eveything is selected correctly
+  /// \returns true if everything is selected correctly
   virtual bool selectPart(
     const ResultPtr& theContext, const std::shared_ptr<GeomAPI_Shape>& theSubShape,
     const bool theUpdate = false);
