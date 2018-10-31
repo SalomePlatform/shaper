@@ -31,7 +31,6 @@
 
 class Model_AttributeSelectionList;
 class Model_Document;
-class ModelAPI_ResultConstruction;
 
 /**\class Model_AttributeSelection
  * \ingroup DataModel
@@ -157,12 +156,6 @@ protected:
   /// method calls this and makes additional processing).
   /// Returns theType type of the center, or NOT_CENTER if it is not.
   std::shared_ptr<GeomAPI_Shape> internalValue(CenterType& theType);
-
-  /// stores the naming structure of external construction (sketch element) in the data
-  /// tree of this document with name equal to selection-name in external document
-  void storeExternalConstruction(
-    const std::shared_ptr<ModelAPI_ResultConstruction>& theConstruction,
-    const std::shared_ptr<GeomAPI_Shape>& theSubShape);
 
   /// Performs the selection for the body result (TNaming selection)
   virtual void selectBody(

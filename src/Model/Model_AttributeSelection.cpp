@@ -705,51 +705,13 @@ bool Model_AttributeSelection::update()
   return setInvalidIfFalse(aSelLab, false); // unknown case
 }
 
-/// integer that contains the tag number of external construction shape naming
-static Standard_GUID kEXTERNAL_CONSTRUCTION_TAG("f7d0726f-e848-4d22-9101-def16d0eff2c");
-
-void Model_AttributeSelection::storeExternalConstruction(
-  const ResultConstructionPtr& theConstruction, const GeomShapePtr& theSubShape)
-{
-  std::string aName = namingName();
-  if (aName.empty()) // unknown error
-    return;
-  std::shared_ptr<Model_Document> aMyDoc =
-    std::dynamic_pointer_cast<Model_Document>(owner()->document());
-  TDF_Label anExternalLab = aMyDoc->extConstructionsLabel();
-  Handle(TDataStd_Integer) anExtTag;
-  if (selectionLabel().FindAttribute(kEXTERNAL_CONSTRUCTION_TAG, anExtTag)) {
-    anExternalLab = anExternalLab.FindChild(anExtTag->Get()); // use existing label
-  } else {
-    // search label with the same name
-    TDF_ChildIDIterator aNamesIter(anExternalLab, TDataStd_Name::GetID());
-    for(; aNamesIter.More(); aNamesIter.Next()) {
-      if (aName == TCollection_AsciiString(Handle(TDataStd_Name)::DownCast(
-        aNamesIter.Value())->Get()).ToCString()) {
-        anExternalLab = aNamesIter.Value()->Label();
-        break;
-      }
-    }
-    if (aNamesIter.More()) {
-    } else {
-      anExternalLab = anExternalLab.NewChild(); // create new label
-      TDataStd_Integer::Set(selectionLabel(), kEXTERNAL_CONSTRUCTION_TAG,
-        anExternalLab.Tag()); // store this tag in the data model
-    }
-  }
-  anExternalLab.ForgetAllAttributes();
-  TopoDS_Shape aSubShape = theSubShape->impl<TopoDS_Shape>();
-  TNaming_Builder aBuilder(anExternalLab);
-  aBuilder.Generated(aSubShape);
-}
-
 void Model_AttributeSelection::selectBody(
   const ResultPtr& theContext, const std::shared_ptr<GeomAPI_Shape>& theSubShape)
 {
   // perform the selection
   TopoDS_Shape aContext;
 
-  ResultPtr aBody = std::dynamic_pointer_cast<ModelAPI_Result>(theContext);//myRef.value()
+  ResultPtr aBody = std::dynamic_pointer_cast<ModelAPI_Result>(theContext);
   if (aBody) {
     aContext = aBody->shape()->impl<TopoDS_Shape>();
   } else {
@@ -767,7 +729,9 @@ void Model_AttributeSelection::selectBody(
     TDF_Label aSelLab = selectionLabel();
     TopoDS_Shape aNewSub = theSubShape->impl<TopoDS_Shape>();
     FeaturePtr aFeatureOwner = std::dynamic_pointer_cast<ModelAPI_Feature>(owner());
-    if (aFeatureOwner->document() != theContext->document()) { // reference to the sketch face
+    if (aFeatureOwner->document() != theContext->document() &&
+        theContext->groupName() == ModelAPI_ResultConstruction::group()) {// condition for parts
+      // reference to the sketch face
       if (theSubShape->shapeType() == GeomAPI_Shape::FACE ||
           theSubShape->shapeType() == GeomAPI_Shape::WIRE) { // sketch face or sketch face wire
         ResultConstructionPtr aConstr =
@@ -793,7 +757,6 @@ void Model_AttributeSelection::selectBody(
         if (aFaceIndex >= 0) {
           TDataStd_Integer::Set(aSelLab, theSubShape->shapeType() == GeomAPI_Shape::FACE ?
             kEXT_SKETCH_FACE : kEXT_SKETCH_WIRE, aFaceIndex); // store index of the face
-          //storeExternalConstruction(aConstr, theSubShape);
           return;
         }
       } else if (theSubShape->shapeType() == GeomAPI_Shape::EDGE ||// sketch result edge (full one)
@@ -1058,10 +1021,23 @@ void Model_AttributeSelection::selectSubShape(
           owner()->document()->objectByName(ModelAPI_ResultPart::group(), aPartName);
         if (aFound.get()) { // found such part, so asking it for the name
           ResultPartPtr aPart = std::dynamic_pointer_cast<ModelAPI_ResultPart>(aFound);
-          aDoc = std::dynamic_pointer_cast<Model_Document>(aPart->partDoc());
-          aSubShapeName = aSubShapeName.substr(aPartEnd +1);
-          if (aSubShapeName.empty()) { // the whole Part result
+          std::string aNameInPart = aSubShapeName.substr(aPartEnd + 1);
+          if (aNameInPart.empty()) { // whole part
             setValue(aPart, anEmptyShape);
+            return;
+          }
+          int anIndex;
+          std::shared_ptr<GeomAPI_Shape> aSelected =
+            aPart->shapeInPart(aNameInPart, aType, anIndex);
+          if (aSelected.get()) {
+            if (aCenterType != NOT_CENTER) {
+              if (!aSelected->isEdge())
+                continue;
+              std::shared_ptr<GeomAPI_Edge> aSelectedEdge(new GeomAPI_Edge(aSelected));
+              setValueCenter(aPart, aSelectedEdge, aCenterType);
+            } else
+              setValue(aPart, aSelected);
+            TDataStd_Integer::Set(selectionLabel(), anIndex);
             return;
           }
         }
@@ -1319,16 +1295,9 @@ void Model_AttributeSelection::computeValues(
 {
   bool aWasWholeContext = theValShape.IsNull();
   if (aWasWholeContext) {
-    //theShapes.Append(theValShape);
-    //return;
     theValShape = theOldContext->shape()->impl<TopoDS_Shape>();
   }
-  //TopoDS_Shape anOldContShape = theOldContext->shape()->impl<TopoDS_Shape>();
   TopoDS_Shape aNewContShape = theNewContext->shape()->impl<TopoDS_Shape>();
-  //if (anOldContShape.IsSame(theValShape)) { // full context shape substituted by new full context
-    //theShapes.Append(aNewContShape);
-    //return;
-  //}
   // if a new value is unchanged in the new context, do nothing: value is correct
   TopExp_Explorer aSubExp(aNewContShape, theValShape.ShapeType());
   for(; aSubExp.More(); aSubExp.Next()) {
@@ -1466,8 +1435,6 @@ bool Model_AttributeSelection::searchNewContext(std::shared_ptr<Model_Document> 
       aModifIter.Label().FindAttribute(TNaming_NamedShape::GetID(), aNewNS);
       if (aNewNS->Evolution() == TNaming_MODIFY || aNewNS->Evolution() == TNaming_GENERATED) {
         aResults.insert(aModifierObj);
-        //TNaming_Iterator aPairIter(aNewNS);
-        //aResContShapes.Append(aPairIter.NewShape());
         aResContShapes.Append(aModifierObj->shape()->impl<TopoDS_Shape>());
       } else if (aNewNS->Evolution() == TNaming_DELETE) { // a shape was deleted => result is empty
         aResults.insert(ResultPtr());
