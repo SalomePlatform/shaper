@@ -23,7 +23,6 @@ Test case for Construction Point feature by projection point on face.
 """
 
 from salome.shaper import model
-from GeomAPI import *
 
 model.begin()
 partSet = model.moduleDocument()
@@ -33,10 +32,12 @@ Sketch_1 = model.addSketch(Part_1_doc, model.defaultPlane("XOZ"))
 SketchPoint_1 = Sketch_1.addPoint(50, 50)
 model.do()
 Box_1 = model.addBox(Part_1_doc, 10, 100, 100)
-Point_2 = model.addPoint(Part_1_doc, model.selection("VERTEX", "Sketch_1/Vertex-SketchPoint_1"), model.selection("FACE", "Box_1_1/Front"))
-Point_3 = model.addPoint(Part_1_doc, model.selection("VERTEX", "Sketch_1/Vertex-SketchPoint_1"), model.selection("FACE", "PartSet/XOY"))
+Point_2 = model.addPoint(Part_1_doc, model.selection("VERTEX", "Sketch_1/SketchPoint_1"), model.selection("FACE", "Box_1_1/Front"))
+Point_3 = model.addPoint(Part_1_doc, model.selection("VERTEX", "Sketch_1/SketchPoint_1"), model.selection("FACE", "PartSet/XOY"))
 model.do()
 model.end()
+
+from GeomAPI import GeomAPI_Vertex
 
 assert (len(Point_2.results()) > 0)
 rightPosition = GeomAPI_Vertex(10, 0, 50)

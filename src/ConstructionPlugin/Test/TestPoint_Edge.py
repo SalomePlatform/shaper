@@ -23,7 +23,6 @@ Test case for Construction Point feature by coordinates.
 """
 
 from salome.shaper import model
-from GeomAPI import *
 
 model.begin()
 partSet = model.moduleDocument()
@@ -35,14 +34,16 @@ SketchProjection_1 = Sketch_1.addProjection(model.selection("VERTEX", "PartSet/O
 SketchPoint_1 = SketchProjection_1.createdFeature()
 SketchConstraintCoincidence_1 = Sketch_1.setCoincident(SketchLine_1.startPoint(), SketchPoint_1.result())
 model.do()
-Point_2 = model.addPoint(Part_1_doc, model.selection("EDGE", "Sketch_1/Edge-SketchLine_1"), 50, False, False)
-Point_3 = model.addPoint(Part_1_doc, model.selection("EDGE", "Sketch_1/Edge-SketchLine_1"), 0.4, True, False)
-Point_4 = model.addPoint(Part_1_doc, model.selection("EDGE", "Sketch_1/Edge-SketchLine_1"), 0.4, True, True)
+Point_2 = model.addPoint(Part_1_doc, model.selection("EDGE", "Sketch_1/SketchLine_1"), 50, False, False)
+Point_3 = model.addPoint(Part_1_doc, model.selection("EDGE", "Sketch_1/SketchLine_1"), 0.4, True, False)
+Point_4 = model.addPoint(Part_1_doc, model.selection("EDGE", "Sketch_1/SketchLine_1"), 0.4, True, True)
 Cylinder_1 = model.addCylinder(Part_1_doc, model.selection("VERTEX", "PartSet/Origin"), model.selection("EDGE", "PartSet/OZ"), 50, 10)
-Point_5 = model.addPoint(Part_1_doc, model.selection("EDGE", "Cylinder_1_1/Face_1&Cylinder_1_1/Face_2"), 0.25, True, False)
-Point_6 = model.addPoint(Part_1_doc, model.selection("EDGE", "Cylinder_1_1/Face_1&Cylinder_1_1/Face_2"), 0.25, True, True)
+Point_5 = model.addPoint(Part_1_doc, model.selection("EDGE", "[Cylinder_1_1/Face_1][Cylinder_1_1/Face_2]"), 0.25, True, False)
+Point_6 = model.addPoint(Part_1_doc, model.selection("EDGE", "[Cylinder_1_1/Face_1][Cylinder_1_1/Face_2]"), 0.25, True, True)
 model.do()
 model.end()
+
+from GeomAPI import GeomAPI_Vertex
 
 assert (len(Point_2.results()) > 0)
 rightPosition = GeomAPI_Vertex(35.3553390593, 35.3553390593, 0)

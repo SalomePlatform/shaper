@@ -23,7 +23,6 @@ Test case for Construction Point feature by coordinates.
 """
 
 from salome.shaper import model
-from GeomAPI import *
 
 model.begin()
 partSet = model.moduleDocument()
@@ -34,10 +33,12 @@ SketchCircle_1 = Sketch_1.addCircle(0, 0, 100)
 SketchPoint_1 = Sketch_1.addPoint(100, 100)
 model.do()
 Box_1 = model.addBox(Part_1_doc, 50, 50, 50)
-Point_2 = model.addPoint(Part_1_doc, model.selection("VERTEX", "Sketch_1/Vertex-SketchPoint_1"), model.selection("EDGE", "Sketch_1/Edge-SketchCircle_1_2"))
-Point_3 = model.addPoint(Part_1_doc, model.selection("VERTEX", "Sketch_1/Vertex-SketchPoint_1"), model.selection("EDGE", "Box_1_1/Front&Box_1_1/Right"))
+Point_2 = model.addPoint(Part_1_doc, model.selection("VERTEX", "Sketch_1/SketchPoint_1"), model.selection("EDGE", "Sketch_1/SketchCircle_1_2"))
+Point_3 = model.addPoint(Part_1_doc, model.selection("VERTEX", "Sketch_1/SketchPoint_1"), model.selection("EDGE", "[Box_1_1/Front][Box_1_1/Right]"))
 model.do()
 model.end()
+
+from GeomAPI import GeomAPI_Vertex
 
 assert (len(Point_2.results()) > 0)
 rightPosition = GeomAPI_Vertex(70.7106781187, 70.7106781187, 0)

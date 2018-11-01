@@ -107,22 +107,15 @@ aSession.finishOperation()
 # Make extrusion on circle
 #=========================================================================
 # Build shape from sketcher results
-aCircleSketchResult = aCircleSketchFeature.firstResult()
-aCircleSketchEdges = modelAPI_ResultConstruction(aCircleSketchResult).shape()
-origin = geomDataAPI_Point(aCircleSketchFeature.attribute("Origin")).pnt()
-dirX = geomDataAPI_Dir(aCircleSketchFeature.attribute("DirX")).dir()
-norm = geomDataAPI_Dir(aCircleSketchFeature.attribute("Norm")).dir()
-aCircleSketchFaces = ShapeList()
-GeomAlgoAPI_SketchBuilder.createFaces(origin, dirX, norm, aCircleSketchEdges, aCircleSketchFaces)
-assert (len(aCircleSketchFaces) > 0)
-assert (aCircleSketchFaces[0] is not None)
+aCircleSketchResult = modelAPI_ResultConstruction(aCircleSketchFeature.firstResult())
+assert (aCircleSketchResult.facesNum() > 0)
 
 # Create extrusion
 aSession.startOperation()
 anExtrusionFt = aPart.addFeature("Extrusion")
 assert (anExtrusionFt.getKind() == "Extrusion")
 # selection type FACE=4
-anExtrusionFt.selectionList("base").append(aCircleSketchResult, aCircleSketchFaces[0])
+anExtrusionFt.selectionList("base").append(aCircleSketchResult, aCircleSketchResult.face(0))
 anExtrusionFt.string("CreationMethod").setValue("BySizes")
 anExtrusionFt.real("to_size").setValue(100)
 anExtrusionFt.real("from_size").setValue(0)
@@ -145,7 +138,7 @@ anAxisFeature = aPart.addFeature("Axis")
 anAxisFeatureData = anAxisFeature.data()
 assert(anAxisFeatureData is not None)
 anAxisFeatureData.string("CreationMethod").setValue("AxisByCylindricalFaceCase")
-anAxisFeatureData.selection("CylindricalFace").selectSubShape("face", "Extrusion_1_1/Generated_Face_1")
+anAxisFeatureData.selection("CylindricalFace").selectSubShape("face", "Extrusion_1_1/Generated_Face&Sketch_1/SketchCircle_1_2")
 anAxisFeature.execute()
 aSession.finishOperation()
 

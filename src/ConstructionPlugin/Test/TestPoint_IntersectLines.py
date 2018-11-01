@@ -23,7 +23,6 @@ Test case for Construction Point feature by lines intersection.
 """
 
 from salome.shaper import model
-from GeomAPI import *
 
 model.begin()
 partSet = model.moduleDocument()
@@ -35,10 +34,12 @@ SketchPoint_1 = SketchProjection_1.createdFeature()
 SketchLine_1 = Sketch_1.addLine(-50, 50, 50, 50)
 model.do()
 Box_1 = model.addBox(Part_1_doc, 25, 100, 100)
-Point_2 = model.addPoint(Part_1_doc, model.selection("EDGE", "Box_1_1/Back&Box_1_1/Bottom"), model.selection("EDGE", "Sketch_1/Edge-SketchLine_1"))
-Point_3 = model.addPoint(Part_1_doc, model.selection("EDGE", "Sketch_1/Edge-SketchLine_1"), model.selection("EDGE", "Box_1_1/Front&Box_1_1/Bottom"))
+Point_2 = model.addPoint(Part_1_doc, model.selection("EDGE", "[Box_1_1/Back][Box_1_1/Bottom]"), model.selection("EDGE", "Sketch_1/SketchLine_1"))
+Point_3 = model.addPoint(Part_1_doc, model.selection("EDGE", "Sketch_1/SketchLine_1"), model.selection("EDGE", "[Box_1_1/Front][Box_1_1/Bottom]"))
 model.do()
 model.end()
+
+from GeomAPI import GeomAPI_Vertex
 
 assert (len(Point_2.results()) > 0)
 rightPosition = GeomAPI_Vertex(0, 50, 0)

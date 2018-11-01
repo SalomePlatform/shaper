@@ -23,7 +23,6 @@ Test case for Construction Point feature by center of gravity.
 """
 
 from salome.shaper import model
-from GeomAPI import *
 
 model.begin()
 partSet = model.moduleDocument()
@@ -34,11 +33,13 @@ SketchCircle_1 = Sketch_1.addCircle(-50, 25, 25)
 SketchArc_1 = Sketch_1.addArc(50, 25, 25, 25, 75, 25, True)
 model.do()
 Cylinder_1 = model.addCylinder(Part_1_doc, model.selection("VERTEX", "PartSet/Origin"), model.selection("EDGE", "PartSet/OZ"), 10, 100)
-Point_2 = model.addPoint(Part_1_doc, model.selection("EDGE", "Sketch_1/Edge-SketchCircle_1_2"), True)
-Point_3 = model.addPoint(Part_1_doc, model.selection("EDGE", "Sketch_1/Edge-SketchArc_1_2"), True)
-Point_4 = model.addPoint(Part_1_doc, model.selection("EDGE", "Cylinder_1_1/Face_1&Cylinder_1_1/Face_2"), True)
+Point_2 = model.addPoint(Part_1_doc, model.selection("EDGE", "Sketch_1/SketchCircle_1_2"), True)
+Point_3 = model.addPoint(Part_1_doc, model.selection("EDGE", "Sketch_1/SketchArc_1_2"), True)
+Point_4 = model.addPoint(Part_1_doc, model.selection("EDGE", "[Cylinder_1_1/Face_1][Cylinder_1_1/Face_2]"), True)
 model.do()
 model.end()
+
+from GeomAPI import GeomAPI_Vertex
 
 assert (len(Point_2.results()) > 0)
 rightPosition = GeomAPI_Vertex(-50, 25, 0)

@@ -38,14 +38,14 @@ SketchArc_1 = Sketch_2.addArc(0, 0, -65.89631323066888, 61.2998850129882, -90, 0
 model.do()
 
 # point by sketch face and a line
-Point_1 = model.addPoint(partSet, model.selection("EDGE", "Sketch_2/Edge-SketchLine_1"), model.selection("FACE", "Sketch_1/Face-SketchCircle_1_2f"))
+Point_1 = model.addPoint(partSet, model.selection("EDGE", "Sketch_2/SketchLine_1"), model.selection("FACE", "Sketch_1/Face-SketchCircle_1_2f"))
 model.do()
 # check the point position
 rightPosition = GeomAPI_Vertex(-15, 0, 0)
 assert(rightPosition.isEqual(Point_1.results()[0].resultSubShapePair()[0].shape()))
 
 # point by sketch face and an arc, intersection outside of the face, offset is defined
-Point_2 = model.addPoint(partSet, model.selection("EDGE", "Sketch_2/Edge-SketchArc_1"), model.selection("FACE", "Sketch_1/Face-SketchCircle_1_2f"), 10, True)
+Point_2 = model.addPoint(partSet, model.selection("EDGE", "Sketch_2/SketchArc_1_2"), model.selection("FACE", "Sketch_1/Face-SketchCircle_1_2f"), 10, True)
 # check the point position
 rightPosition = GeomAPI_Vertex(-89.442719099991606, 0, -10)
 assert(rightPosition.isEqual(Point_2.results()[0].resultSubShapePair()[0].shape()))

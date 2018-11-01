@@ -18,17 +18,20 @@
 ## email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com>
 ##
 
+# -*- coding: utf-8 -*-
+
 from salome.shaper import model
-from GeomAPI import *
 
 model.begin()
 partSet = model.moduleDocument()
 Part_1 = model.addPart(partSet)
 Part_1_doc = Part_1.document()
 Box_1 = model.addBox(Part_1_doc, 10, 10, 10)
-Point_2 = model.addPoint(Part_1_doc, model.selection("VERTEX", "Box_1_1/Front&Box_1_1/Left&Box_1_1/Top"))
+Point_2 = model.addPoint(Part_1_doc, 10, 0, 10)
 model.do()
 model.end()
+
+from GeomAPI import GeomAPI_Vertex
 
 assert (len(Point_2.results()) > 0)
 rightPosition = GeomAPI_Vertex(10, 0, 10)
