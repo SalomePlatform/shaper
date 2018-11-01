@@ -1828,7 +1828,7 @@ std::shared_ptr<ModelAPI_Feature> Model_Document::producedByFeature(
   TopoDS_Shape anOldShape; // old shape in the pair old shape->theShape in the named shape
   TopoDS_Shape aShapeContainer; // old shape of the shape that contains aShape as sub-element
   Handle(TNaming_NamedShape) aCandidatInThis, aCandidatContainer;
-  TDF_Label aBodyLab = aBodyData->label();
+  TDF_Label aBodyLab = aBodyData->shapeLab();
   // use child and this label (the lowest priority)
   TDF_ChildIDIterator aNSIter(aBodyLab, TNaming_NamedShape::GetID(), Standard_True);
   bool aUseThis = !aNSIter.More();
