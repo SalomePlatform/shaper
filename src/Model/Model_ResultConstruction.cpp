@@ -254,6 +254,15 @@ void Model_ResultConstruction::storeShape(std::shared_ptr<GeomAPI_Shape> theShap
         TNaming_Builder aBuilder(aSubLab);
         aBuilder.Generated(anExp.Current());
         std::string aVertexName = aMyName + "_" + (anIndex == 1 ? "StartVertex" : "EndVertex");
+        // check this name is already used
+        ResultPtr aThisRes;
+        do {
+          static std::string anEmpty;
+          static bool aUnique;
+          aThisRes = aMyDoc->findByName(aVertexName, anEmpty, aUnique);
+          if (aThisRes.get() && aThisRes.get() != this)
+            aVertexName += "x";
+        } while(aThisRes.get() && aThisRes.get() != this);
         TDataStd_Name::Set(aSubLab, aVertexName.c_str());
         aMyDoc->addNamingName(aSubLab, aVertexName);
       }
