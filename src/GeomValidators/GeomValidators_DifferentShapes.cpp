@@ -171,5 +171,7 @@ bool GeomValidators_DifferentShapes::isAttrShapesEqual(const AttributePtr& theAt
   }
   GeomShapePtr aOtherTypedShape = GeomAPI_Tools::getTypedShape(anOtherShape);
 
+  if (!aTypedShape.get())
+    return !aTypedShape.get() && !aOtherTypedShape.get();
   return aTypedShape->isEqual(aOtherTypedShape);
 }

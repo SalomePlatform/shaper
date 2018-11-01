@@ -370,7 +370,7 @@ class Model_Document : public ModelAPI_Document
   /// Appends the values to theStates list.
   virtual void restoreNodesState(std::list<bool>& theStates) const;
 
-  /// Label that constains structures for selection of constructions of another document
+  /// Label that contains structures for selection of constructions of another document
   TDF_Label extConstructionsLabel() const;
 
   /// searches in this document feature that contains this label

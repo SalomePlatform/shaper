@@ -198,7 +198,7 @@ bool Model_Update::addModified(FeaturePtr theFeature, FeaturePtr theReason) {
       }
     }
   }
-  // proccess also results
+  // process also results
   std::list<ResultPtr> allResults; // list of this feature and results
   ModelAPI_Tools::allResults(theFeature, allResults);
   std::list<ResultPtr>::iterator aRes = allResults.begin();

@@ -73,26 +73,27 @@ static void findBases(Handle(TNaming_NamedShape) theFinal, const TopoDS_Shape& t
   TNaming_SameShapeIterator aLabIter(theValue, theFinal->Label());
   for(; aLabIter.More(); aLabIter.Next()) {
     Handle(TNaming_NamedShape) aNS;
-    aLabIter.Label().FindAttribute(TNaming_NamedShape::GetID(), aNS);
-    if (aMustBeAtFinal && aNS != theFinal)
-      continue; // looking for old at the same final label only
-    TNaming_Evolution anEvolution = aNS->Evolution();
-    if (anEvolution == TNaming_PRIMITIVE) {
-      // check that this is not in the results already
-      const TDF_Label aResult = aNS->Label();
-      TDF_LabelList::Iterator aResIter(theResult);
-      for(; aResIter.More(); aResIter.Next()) {
-        if (aResIter.Value().IsEqual(aResult))
-          break;
+    if (aLabIter.Label().FindAttribute(TNaming_NamedShape::GetID(), aNS)) {
+      if (aMustBeAtFinal && aNS != theFinal)
+        continue; // looking for old at the same final label only
+      TNaming_Evolution anEvolution = aNS->Evolution();
+      if (anEvolution == TNaming_PRIMITIVE) {
+        // check that this is not in the results already
+        const TDF_Label aResult = aNS->Label();
+        TDF_LabelList::Iterator aResIter(theResult);
+        for(; aResIter.More(); aResIter.Next()) {
+          if (aResIter.Value().IsEqual(aResult))
+            break;
+        }
+        if (!aResIter.More()) // not found, so add this new
+          theResult.Append(aResult);
       }
-      if (!aResIter.More()) // not found, so add this new
-        theResult.Append(aResult);
-    }
-    if (anEvolution == TNaming_GENERATED || anEvolution == TNaming_MODIFY) {
-      for(TNaming_Iterator aThisIter(aNS); aThisIter.More(); aThisIter.Next()) {
-        if (aThisIter.NewShape().IsSame(theValue)) {
-          // continue recursively, null NS means that any NS are ok
-          findBases(theFinal, aThisIter.OldShape(), false, theResult);
+      if (anEvolution == TNaming_GENERATED || anEvolution == TNaming_MODIFY) {
+        for(TNaming_Iterator aThisIter(aNS); aThisIter.More(); aThisIter.Next()) {
+          if (aThisIter.NewShape().IsSame(theValue)) {
+            // continue recursively, null NS means that any NS are ok
+            findBases(theFinal, aThisIter.OldShape(), false, theResult);
+          }
         }
       }
     }
@@ -537,11 +538,12 @@ bool Selector_Selector::select(const TopoDS_Shape theContext, const TopoDS_Shape
       TopoDS_ListOfShape aCommon;
       myFinal = aModifList.First()->Label();
       Handle(TNaming_NamedShape) aNS;
-      myFinal.FindAttribute(TNaming_NamedShape::GetID(), aNS);
-      for(TNaming_Iterator aFinalIter(aNS); aFinalIter.More(); aFinalIter.Next()) {
-        const TopoDS_Shape& aNewShape = aFinalIter.NewShape();
-        if (!aNewShape.IsNull())
-          aCommon.Append(aNewShape);
+      if (myFinal.FindAttribute(TNaming_NamedShape::GetID(), aNS)) {
+        for(TNaming_Iterator aFinalIter(aNS); aFinalIter.More(); aFinalIter.Next()) {
+          const TopoDS_Shape& aNewShape = aFinalIter.NewShape();
+          if (!aNewShape.IsNull())
+            aCommon.Append(aNewShape);
+        }
       }
       Selector_NExplode aNexp(aCommon);
       myWeakIndex = aNexp.index(theValue);
@@ -833,11 +835,12 @@ bool Selector_Selector::solve(const TopoDS_Shape& theContext)
     if (myBases.IsEmpty() && myWeakIndex) { // weak name by the final shapes index
       TopoDS_ListOfShape aCommon;
       Handle(TNaming_NamedShape) aNS;
-      myFinal.FindAttribute(TNaming_NamedShape::GetID(), aNS);
-      for(TNaming_Iterator aFinalIter(aNS); aFinalIter.More(); aFinalIter.Next()) {
-        const TopoDS_Shape& aNewShape = aFinalIter.NewShape();
-        if (!aNewShape.IsNull())
-          aCommon.Append(aNewShape);
+      if (myFinal.FindAttribute(TNaming_NamedShape::GetID(), aNS)) {
+        for(TNaming_Iterator aFinalIter(aNS); aFinalIter.More(); aFinalIter.Next()) {
+          const TopoDS_Shape& aNewShape = aFinalIter.NewShape();
+          if (!aNewShape.IsNull())
+            aCommon.Append(aNewShape);
+        }
       }
       Selector_NExplode aNexp(aCommon);
       aResult = aNexp.shape(myWeakIndex);
@@ -915,18 +918,21 @@ std::string Selector_Selector::name(Selector_NameGenerator* theNameGenerator) {
       aResult += '[';
       aResult += aSubSel->name(theNameGenerator);
       aResult += ']';
-      TopAbs_ShapeEnum aSubType = aSubSel->value().ShapeType();
-      if (aSubType != TopAbs_FACE) { // in case the sub shape type must be stored
-        switch(aSubType) {
-        case TopAbs_COMPOUND: aResult += "c"; break;
-        case TopAbs_COMPSOLID: aResult += "o"; break;
-        case TopAbs_SOLID: aResult += "s"; break;
-        case TopAbs_SHELL: aResult += "h"; break;
-        case TopAbs_WIRE: aResult += "w"; break;
-        case TopAbs_EDGE: aResult += "e"; break;
-        case TopAbs_VERTEX: aResult += "v"; break;
-        default:
-          ;
+      TopoDS_Shape aSubVal = aSubSel->value();
+      if (!aSubVal.IsNull()) {
+        TopAbs_ShapeEnum aSubType = aSubVal.ShapeType();
+        if (aSubType != TopAbs_FACE) { // in case the sub shape type must be stored
+          switch(aSubType) {
+          case TopAbs_COMPOUND: aResult += "c"; break;
+          case TopAbs_COMPSOLID: aResult += "o"; break;
+          case TopAbs_SOLID: aResult += "s"; break;
+          case TopAbs_SHELL: aResult += "h"; break;
+          case TopAbs_WIRE: aResult += "w"; break;
+          case TopAbs_EDGE: aResult += "e"; break;
+          case TopAbs_VERTEX: aResult += "v"; break;
+          default:
+            ;
+          }
         }
       }
     }

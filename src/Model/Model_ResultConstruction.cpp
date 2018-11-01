@@ -23,6 +23,7 @@
 #include <Model_Data.h>
 #include <ModelAPI_CompositeFeature.h>
 #include <GeomAlgoAPI_SketchBuilder.h>
+#include <GeomAPI_Tools.h>
 #include <ModelAPI_Events.h>
 #include <Model_Document.h>
 #include <GeomAPI_PlanarEdges.h>
@@ -130,7 +131,7 @@ bool Model_ResultConstruction::updateShape()
         // just restore shape
         GeomShapePtr aGShape(new GeomAPI_Shape);
         aGShape->setImpl<TopoDS_Shape>(new TopoDS_Shape(aShape));
-        myShape = aGShape; // restore the sketch sub-components
+        myShape = GeomAPI_Tools::getTypedShape(aGShape); // restore the sketch sub-components
         return true;
       }
     }

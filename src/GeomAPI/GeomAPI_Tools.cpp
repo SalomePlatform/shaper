@@ -28,6 +28,9 @@
 //==================================================================================================
 GeomShapePtr GeomAPI_Tools::getTypedShape(const GeomShapePtr& theShape)
 {
+  if (!theShape.get())
+    return GeomShapePtr();
+
   GeomShapePtr aTypedShape = theShape;
 
   GeomAPI_Shape::ShapeType aType = theShape->shapeType();
