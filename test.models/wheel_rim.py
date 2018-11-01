@@ -187,7 +187,7 @@ SketchConstraintDistance_4 = Sketch_1.setDistance(SketchLine_10.startPoint(), Sk
 SketchConstraintDistance_5 = Sketch_1.setDistance(SketchLine_10.startPoint(), SketchLine_22.result(), 1, True)
 SketchConstraintRadius_4 = Sketch_1.setRadius(SketchArc_6.results()[1], 15)
 model.do()
-Revolution_1 = model.addRevolution(Part_1_doc, [model.selection("FACE", "Sketch_1/Face-SketchLine_2r-SketchArc_1_2r-SketchLine_3r-SketchArc_2_2r-SketchArc_3_2f-SketchLine_8f-SketchLine_10f-SketchArc_5_2f-SketchLine_12f-SketchArc_6_2r-SketchLine_14r-SketchLine_16r-SketchArc_7_2r-SketchLine_17r-SketchLine_18r-SketchLine_20f-SketchArc_8_2f-SketchLine_23r-SketchArc_10_2f-SketchLine_24r")], model.selection("EDGE", "PartSet/OX"), 360, 0)
+Revolution_1 = model.addRevolution(Part_1_doc, [model.selection("FACE", "Sketch_1/Face-SketchLine_8f-SketchLine_10f-SketchLine_24r-SketchLine_23r-SketchArc_8_2f-SketchLine_19r-SketchLine_18r-SketchLine_17r-SketchArc_7_2r-SketchLine_16r-SketchArc_10_2f-SketchLine_12f-SketchArc_5_2f-SketchArc_6_2r-SketchLine_14r-SketchArc_3_2f-SketchArc_2_2r-SketchLine_3r-SketchArc_1_2r-SketchLine_2r")], model.selection("EDGE", "PartSet/OX"), 360, 0)
 Sketch_2 = model.addSketch(Part_1_doc, model.defaultPlane("YOZ"))
 SketchCircle_1 = Sketch_2.addCircle(0, 120, 7.5)
 SketchLine_24 = Sketch_2.addLine(model.selection("EDGE", "PartSet/OZ"))

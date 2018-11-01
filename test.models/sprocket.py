@@ -114,7 +114,7 @@ model.testNbSubShapes(Extrusion_1, GeomAPI_Shape.EDGE, [1080])
 model.testNbSubShapes(Extrusion_1, GeomAPI_Shape.VERTEX, [2160])
 model.testResultsVolumes(Extrusion_1, [10398.453966298400700907222926617])
 
-Sketch_2 = model.addSketch(Part_1_doc, model.selection("FACE", "Extrusion_1_1/To_Face_1"))
+Sketch_2 = model.addSketch(Part_1_doc, model.selection("FACE", "Extrusion_1_1/To_Face"))
 SketchCircle_3 = Sketch_2.addCircle(0, 0, 4.5)
 SketchLine_125 = Sketch_2.addLine(0, 0, -24.375, 0)
 SketchLine_125.setAuxiliary(True)
