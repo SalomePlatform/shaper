@@ -1422,6 +1422,17 @@ void Model_Document::changeNamingName(const std::string theOldName,
         } else { // remove from the list
           aFind->second.erase(aLabIter);
         }
+        // check the sketch vertex name located under renamed sketch line
+        TDF_ChildIDIterator aChild(theLabel, TDataStd_Name::GetID());
+        for(; aChild.More(); aChild.Next()) {
+          Handle(TDataStd_Name) aSubName = Handle(TDataStd_Name)::DownCast(aChild.Value());
+          std::string aName = TCollection_AsciiString(aSubName->Get()).ToCString();
+          if (aName.find(theOldName) == 0) { // started from parent name
+            std::string aNewSubName = theNewName + aName.substr(theNewName.size());
+            changeNamingName(aName, aNewSubName, aSubName->Label());
+            aSubName->Set(aNewSubName.c_str());
+          }
+        }
         return;
       }
     }

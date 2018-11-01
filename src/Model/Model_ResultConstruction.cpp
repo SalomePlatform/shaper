@@ -255,15 +255,6 @@ void Model_ResultConstruction::storeShape(std::shared_ptr<GeomAPI_Shape> theShap
         TNaming_Builder aBuilder(aSubLab);
         aBuilder.Generated(anExp.Current());
         std::string aVertexName = aMyName + "_" + (anIndex == 1 ? "StartVertex" : "EndVertex");
-        // check this name is already used
-        ResultPtr aThisRes;
-        do {
-          static std::string anEmpty;
-          static bool aUnique;
-          aThisRes = aMyDoc->findByName(aVertexName, anEmpty, aUnique);
-          if (aThisRes.get() && aThisRes.get() != this)
-            aVertexName += "x";
-        } while(aThisRes.get() && aThisRes.get() != this);
         TDataStd_Name::Set(aSubLab, aVertexName.c_str());
         aMyDoc->addNamingName(aSubLab, aVertexName);
       }
@@ -406,7 +397,7 @@ void Model_ResultConstruction::storeShape(std::shared_ptr<GeomAPI_Shape> theShap
           std::stringstream aName;
           aName<<"Face";
           TopExp_Explorer aPutEdges(aFaceToPut, TopAbs_EDGE);
-          TNaming_Builder* anEdgesBuilder = 0;
+          TNaming_Builder *anEdgesBuilder = 0, *aVerticesBuilder = 0;
           for(TColStd_ListOfInteger::Iterator anIter(aNewInd); anIter.More(); anIter.Next()) {
             int anIndex = anIter.Value();
             int aModIndex = anIndex > 0 ? anIndex : -anIndex;
@@ -429,20 +420,43 @@ void Model_ResultConstruction::storeShape(std::shared_ptr<GeomAPI_Shape> theShap
               }
               anEdgesBuilder->Modify(anEdgeIndices.Find(aModIndex), aPutEdges.Current());
             }
+            // put also modified vertices, otherwise vertex of original edge has no history
+            if (anEdgeIndices.IsBound(aModIndex)) {
+              TopExp_Explorer aVExpOld(anEdgeIndices.Find(aModIndex), TopAbs_VERTEX);
+              TopExp_Explorer aVExpNew(aPutEdges.Current(), TopAbs_VERTEX);
+              for(; aVExpNew.More() && aVExpOld.More(); aVExpNew.Next(), aVExpOld.Next()) {
+                if (!aVExpOld.Current().IsSame(aVExpNew.Current())) {
+                  if (!aVerticesBuilder) {
+                    TDF_Label aVertLabel = aLab.FindChild(2);
+                    aVerticesBuilder = new TNaming_Builder(aVertLabel);
+                    std::ostringstream aSubName;
+                    // tag is needed for Test1922 to distinguish sub-edges of different faces
+                    aSubName<<"SubVertex_"<<aCurrentTag;
+                    TDataStd_Name::Set(aVertLabel, aSubName.str().c_str());
+                  }
+                  aVerticesBuilder->Modify(aVExpOld.Current(), aVExpNew.Current());
+
+                }
+              }
+            }
             aPutEdges.Next();
           }
+          if (anEdgesBuilder)
+            delete anEdgesBuilder;
+          if (aVerticesBuilder)
+            delete aVerticesBuilder;
           TDataStd_Name::Set(aLab, TCollection_ExtendedString(aName.str().c_str()));
           aMyDoc->addNamingName(aLab, aName.str());
           // put also wires to sub-labels to correctly select them instead of collection by edges
-          int aWireTag = 2; // first tag is for SubEdge-s
+          int aWireTag = 3; // first tag is for SubEdge-s, second - for vertices
           for(TopExp_Explorer aWires(aFaceToPut, TopAbs_WIRE); aWires.More(); aWires.Next()) {
             TDF_Label aWireLab = aLab.FindChild(aWireTag);
             TNaming_Builder aWireBuilder(aWireLab);
             aWireBuilder.Generated(aWires.Current());
             std::ostringstream aWireName;
             aWireName<<aName.str()<<"_wire";
-            if (aWireTag > 2)
-              aWireName<<"_"<<aWireTag - 1;
+            if (aWireTag > 3)
+              aWireName<<"_"<<aWireTag - 2;
             TDataStd_Name::Set(aWireLab, aWireName.str().c_str());
             aMyDoc->addNamingName(aWireLab, aWireName.str());
             aWireTag++;
