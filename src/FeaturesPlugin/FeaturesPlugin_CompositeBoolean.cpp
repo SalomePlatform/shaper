@@ -77,8 +77,6 @@ void FeaturesPlugin_CompositeBoolean::executeCompositeBoolean()
   for(; aBoolObjIt != aBooleanObjects.cend() && aBoolMSIt != aBooleanMakeShapes.cend();
       ++aBoolObjIt, ++aBoolMSIt) {
 
-    int aTag = 1;
-
     ResultBodyPtr aResultBody = myFeature->document()->createBody(myFeature->data(), aResultIndex);
 
     if((*aBoolObjIt)->isEqual((*aBoolMSIt)->shape())) {
@@ -88,14 +86,15 @@ void FeaturesPlugin_CompositeBoolean::executeCompositeBoolean()
     {
       aResultBody->storeModified(*aBoolObjIt, (*aBoolMSIt)->shape());
 
-      aTag += 5000;
-
       // Store generation history.
       ListOfShape::const_iterator aGenBaseIt = aGenBaseShapes.cbegin();
       ListOfMakeShape::const_iterator aGenMSIt = aGenMakeShapes.cbegin();
       for(; aGenBaseIt != aGenBaseShapes.cend() && aGenMSIt != aGenMakeShapes.cend();
           ++aGenBaseIt, ++aGenMSIt) {
-        storeGenerationHistory(aResultBody, *aGenBaseIt, *aGenMSIt);
+        std::shared_ptr<GeomAlgoAPI_MakeShapeList> aMSList(new GeomAlgoAPI_MakeShapeList());
+        aMSList->appendAlgo(*aGenMSIt);
+        aMSList->appendAlgo(*aBoolMSIt);
+        storeGenerationHistory(aResultBody, *aGenBaseIt, aMSList);
       }
 
       storeModificationHistory(aResultBody, *aBoolObjIt, aTools, *aBoolMSIt);
@@ -383,7 +382,6 @@ void FeaturesPlugin_CompositeBoolean::storeModificationHistory(ResultBodyPtr the
   ListOfShape aTools = theTools;
   aTools.push_back(theObject);
 
-  std::string aName;
   for(ListOfShape::const_iterator anIt = aTools.begin(); anIt != aTools.end(); anIt++) {
     theResultBody->loadModifiedShapes(theMakeShape, *anIt,
                                       (*anIt)->shapeType() == GeomAPI_Shape::EDGE ?
