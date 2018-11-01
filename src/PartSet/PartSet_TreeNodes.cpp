@@ -865,8 +865,14 @@ void PartSet_PartRootNode::update()
   if (aHasFields && (!myChildren.contains(myFieldsFolder))) {
     myChildren.insert(3, myFieldsFolder);
   }
+  else if (myChildren.contains(myFieldsFolder)) {
+    myChildren.removeAll(myFieldsFolder);
+  }
   if (aHasGroups && (!myChildren.contains(myGroupsFolder))) {
     myChildren.insert(aHasFields ? 4 : 3, myGroupsFolder);
+  }
+  else if (myChildren.contains(myGroupsFolder)) {
+    myChildren.removeAll(myGroupsFolder);
   }
 
   // Update features content
