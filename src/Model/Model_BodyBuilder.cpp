@@ -608,9 +608,7 @@ void Model_BodyBuilder::loadGeneratedShapes(const GeomMakeShapePtr& theAlgo,
       const TopoDS_Shape& aNewShape_ = aNewShape->impl<TopoDS_Shape>();
 
       bool aNewShapeIsSameAsOldShape = anOldSubShape->isSame(aNewShape);
-      bool aNewShapeIsNotInResultShape = !aResultShape->isSubShape(aNewShape, false);
-      if (aNewShapeIsSameAsOldShape
-        || aNewShapeIsNotInResultShape)
+      if (aNewShapeIsSameAsOldShape)
       {
         continue;
       }
