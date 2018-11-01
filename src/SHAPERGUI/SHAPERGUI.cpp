@@ -67,6 +67,7 @@
 #include <QAction>
 #include <QTimer>
 #include <QMenu>
+#include <QToolBar>
 
 #define SALOME_PATCH_FOR_CTRL_WHEEL
 
@@ -571,7 +572,6 @@ QAction* SHAPERGUI::addFeature(const QString& theWBName, const QString& theTBNam
     createTool(separator(), aWBTool);
     registerCommandToolbar(theTBName, -1);
   }
-
   return aAction;
 }
 
@@ -641,6 +641,7 @@ void SHAPERGUI::addDesktopMenuSeparator(const char* theMenuSourceText, const int
   createMenu(separator(), aMenu, -1, theMenuPosition);
 }
 
+//******************************************************
 bool SHAPERGUI::addActionInToolbar( QAction* theAction, const QString& theToolBarTitle )
 {
   if( !theAction )
@@ -812,8 +813,10 @@ void SHAPERGUI::updateModuleVisibilityState()
 
 void SHAPERGUI::onEditToolbars()
 {
-  SHAPERGUI_ToolbarsDlg aDlg(this, myActionsList, myToolbars);
-  aDlg.exec();
+  SHAPERGUI_ToolbarsDlg aDlg(this);
+  if (aDlg.exec() == QDialog::Accepted) {
+    updateToolbars(aDlg.result());
+  }
 }
 
 void SHAPERGUI::registerCommandToolbar(const QString& theToolName, int theCommandId)
@@ -828,7 +831,67 @@ int SHAPERGUI::getNextCommandId() const
   QtxActionMenuMgr* aMenuMgr = menuMgr();
   QIntList aIds = aMenuMgr->idList();
   int aId = aIds.count();
-  while (aIds.contains(aId))
+  while (action(aId) || myActionsList.contains(aId))
     aId++;
   return aId;
+}
+
+void SHAPERGUI::updateToolbars(const QMap<QString, QIntList>& theNewToolbars)
+{
+  QtxActionToolMgr* aMgr = toolMgr();
+  QStringList aToolbars = theNewToolbars.keys();
+  QIntList aCommands, aOldCmd;
+  int aToolbarId;
+  QAction* aAction;
+  int aActionId;
+  foreach(QString aName, aToolbars) {
+    aCommands = theNewToolbars[aName];
+    // Find or create toolbar
+    if (aMgr->hasToolBar(aName)) {
+      aToolbarId = aMgr->find(aMgr->toolBar(aName));
+      aOldCmd = myToolbars[aName];
+    }
+    else {
+      aToolbarId = aMgr->createToolBar(aName);
+    }
+    int aPos = 0;
+    foreach (int aCmd, aCommands) {
+      // Find action
+      if (aCmd == -1)
+        aAction = separator();
+      else
+        aAction = action(aCmd);
+      aActionId = aMgr->actionId(aAction);
+      if (aActionId == -1) {
+        // Add new action
+        aMgr->insert(aAction, aToolbarId, aPos);
+      }
+      else {
+        // Change position of action
+        if (aMgr->index(aActionId, aToolbarId) != aPos) {
+          if (aMgr->containsAction(aActionId, aToolbarId))
+            aMgr->remove(aActionId, aToolbarId);
+          aMgr->insert(aActionId, aToolbarId, aPos);
+        }
+      }
+      aOldCmd.removeAll(aCmd);
+      aPos++;
+    }
+    // remove extra actions
+    foreach(int aCmd, aOldCmd) {
+      aAction = action(aCmd);
+      aActionId = aMgr->actionId(aAction);
+      aMgr->remove(aActionId, aToolbarId);
+    }
+    myToolbars.remove(aName);
+  }
+  // Remove extra toolbars
+  aToolbars = myToolbars.keys();
+  QToolBar* aToolbar = 0;
+  QList<QAction*> aActionList;
+  foreach(QString aName, aToolbars) {
+    aMgr->removeToolBar(aName);
+  }
+  // Set new toolbars structure
+  myToolbars = theNewToolbars;
 }

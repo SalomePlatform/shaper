@@ -156,6 +156,11 @@ Q_OBJECT
 
   virtual void updateModuleVisibilityState();
 
+
+  QIntList shaperActions() const { return myActionsList; }
+  QMap<QString, QIntList> shaperToolbars() const { return myToolbars; }
+
+
  public slots:
   /// \brief The method is redefined to connect to the study viewer before the data
   /// model is filled by opened file. This file open will flush redisplay signals for,
@@ -218,6 +223,8 @@ private slots:
 
   int getNextCommandId() const;
 
+  // Update current toolbars
+  void updateToolbars(const QMap<QString, QIntList>& theNewToolbars);
 
   /// List of registered nested actions
   QStringList myNestedActionsList;

@@ -23,6 +23,7 @@
 
 #include <CAM_Application.h>
 #include <SUIT_Desktop.h>
+#include <QtxActionToolMgr.h>
 
 #include <QLayout>
 #include <QDialogButtonBox>
@@ -31,7 +32,11 @@
 #include <QPushButton>
 #include <QInputDialog>
 #include <QMessageBox>
+#include <QMouseEvent>
 
+
+#define SEPARATOR "------"
+#define LIST_WIDTH 180
 
 class SHAPERGUI_CommandIdItem : public QListWidgetItem
 {
@@ -41,16 +46,27 @@ public:
 
 
   virtual QVariant data(int theRole) const {
-    if (theRole == Qt::DisplayRole) {
-      if (myId == -1)
-        return "------";
-      QAction* aAction = myModule->action(myId);
+    QAction* aAction = 0;
+    if (myId != -1)
+      aAction = myModule->action(myId);
+
+    switch (theRole) {
+    case Qt::DisplayRole:
       if (aAction)
         return aAction->text();
+      else
+        return SEPARATOR;
+    case Qt::DecorationRole:
+      if (aAction)
+        return aAction->icon();
+      else
+        return QIcon();
     }
     return QListWidgetItem::data(theRole);
   }
 
+
+  int id() const { return myId; }
 
 private:
   SHAPERGUI* myModule;
@@ -61,14 +77,13 @@ private:
 //************************************************************************************
 //************************************************************************************
 //************************************************************************************
-SHAPERGUI_ToolbarsDlg::SHAPERGUI_ToolbarsDlg(SHAPERGUI* theModule,
-  const QIntList& theActionsList,
-  const QMap<QString, QIntList>& theToolbars)
+SHAPERGUI_ToolbarsDlg::SHAPERGUI_ToolbarsDlg(SHAPERGUI* theModule)
   : QDialog(theModule->application()->desktop()),
   myModule(theModule),
-  myActionsList(theActionsList),
-  myToolbars(theToolbars)
+  myResult(theModule->shaperToolbars())
 {
+  myFreeCommands = getModuleFreeCommands();
+
   setWindowTitle(tr("Toolbars"));
   QVBoxLayout* aMailLayout = new QVBoxLayout(this);
 
@@ -87,8 +102,18 @@ SHAPERGUI_ToolbarsDlg::SHAPERGUI_ToolbarsDlg(SHAPERGUI* theModule,
   aListLayout->addWidget(new QLabel(tr("Toolbars:"), aListWgt));
 
   myToolbarsList = new QListWidget(aListWgt);
-  myToolbarsList->addItems(theToolbars.keys());
+  connect(myToolbarsList, SIGNAL(doubleClicked(const QModelIndex&)),
+    SLOT(onDoubleClick(const QModelIndex&)));
   aListLayout->addWidget(myToolbarsList);
+
+  QWidget* aFreeItemsWgt = new QWidget(aListWgt);
+  QHBoxLayout* aFreeLayout = new QHBoxLayout(aFreeItemsWgt);
+  aFreeLayout->setContentsMargins(0, 0, 0, 0);
+  aListLayout->addWidget(aFreeItemsWgt);
+
+  aFreeLayout->addWidget(new QLabel(tr("Number of commands out of toolbars:"), aFreeItemsWgt));
+  myFreeNbLbl = new QLabel(aFreeItemsWgt);
+  aFreeLayout->addWidget(myFreeNbLbl);
 
   // Left controls
   QWidget* aButtonsWgt = new QWidget(aControlsWgt);
@@ -115,6 +140,9 @@ SHAPERGUI_ToolbarsDlg::SHAPERGUI_ToolbarsDlg(SHAPERGUI* theModule,
   aMailLayout->addWidget(aButtons);
   connect(aButtons, SIGNAL(accepted()), SLOT(accept()));
   connect(aButtons, SIGNAL(rejected()), SLOT(reject()));
+
+  updateToolbarsList();
+  updateNumber();
 }
 
 void SHAPERGUI_ToolbarsDlg::onAdd()
@@ -122,8 +150,8 @@ void SHAPERGUI_ToolbarsDlg::onAdd()
   QString aNewToolbar =
     QInputDialog::getText(this, tr("Create toolbar"), tr("Name of a new toolbar"));
   if (!(aNewToolbar.isNull() || aNewToolbar.isEmpty())) {
-    if (!myToolbars.contains(aNewToolbar)) {
-      myToolbars[aNewToolbar] = QIntList();
+    if (!myResult.contains(aNewToolbar)) {
+      myResult[aNewToolbar] = QIntList();
       updateToolbarsList();
     }
     else {
@@ -138,10 +166,17 @@ void SHAPERGUI_ToolbarsDlg::onEdit()
   QList<QListWidgetItem*> aSelected = myToolbarsList->selectedItems();
   if (aSelected.size() == 1) {
     QString aToolbarName = aSelected.first()->text();
-    QIntList aFreeItems = getFreeCommands();
+    int aPos = aToolbarName.lastIndexOf(" (");
+    aToolbarName = aToolbarName.left(aPos);
+
     SHAPERGUI_ToolbarItemsDlg aDlg(this, myModule,
-      aToolbarName, aFreeItems, myToolbars[aToolbarName]);
-    aDlg.exec();
+      aToolbarName, myFreeCommands, myResult[aToolbarName]);
+    if (aDlg.exec() == QDialog::Accepted) {
+      myFreeCommands = aDlg.freeItems();
+      myResult[aToolbarName] = aDlg.toolbarItems();
+      updateNumber();
+      updateToolbarsList();
+    }
   }
 }
 
@@ -150,10 +185,17 @@ void SHAPERGUI_ToolbarsDlg::onDelete()
   QList<QListWidgetItem*> aSelected = myToolbarsList->selectedItems();
   if (aSelected.size() == 1) {
     QString aToolbarName = aSelected.first()->text();
+    int aPos = aToolbarName.lastIndexOf(" (");
+    aToolbarName = aToolbarName.left(aPos);
+
     QString aMsg = tr("Toolbar %1 will be deleted. Continue?").arg(aToolbarName);
     if (QMessageBox::question(this, tr("Delete toolbar"), aMsg) == QMessageBox::Yes) {
-      myToolbars.remove(aToolbarName);
+      myFreeCommands.append(myResult[aToolbarName]);
+      // remove separators from free items
+      myFreeCommands.removeAll(-1);
+      myResult.remove(aToolbarName);
       updateToolbarsList();
+      updateNumber();
     }
   }
 }
@@ -161,27 +203,42 @@ void SHAPERGUI_ToolbarsDlg::onDelete()
 void SHAPERGUI_ToolbarsDlg::updateToolbarsList()
 {
   myToolbarsList->clear();
-  myToolbarsList->addItems(myToolbars.keys());
+  QStringList aItems;
+  QMap<QString, QIntList>::const_iterator aIt;
+  for (aIt = myResult.cbegin(); aIt != myResult.cend(); aIt++) {
+    aItems.append(aIt.key() + tr(" (%1 items)").arg(aIt.value().size() - aIt.value().count(-1)));
+  }
+  myToolbarsList->addItems(aItems);
 }
 
-QIntList SHAPERGUI_ToolbarsDlg::getFreeCommands() const
+QIntList SHAPERGUI_ToolbarsDlg::getModuleFreeCommands() const
 {
   QIntList aFreeCommands;
+  QtxActionToolMgr* aMgr = myModule->toolMgr();
+  QAction* anAction;
+  int aId;
   QMap<QString, QIntList>::const_iterator aIt;
-  foreach(int aCmd, myActionsList) {
-    bool aIsFree = true;
-    for (aIt = myToolbars.cbegin(); aIt != myToolbars.cend(); aIt++) {
-      if (aIt.value().contains(aCmd)) {
-        aIsFree = false;
-        break;
-      }
-    }
-    if (aIsFree)
+  QIntList aShaperActions = myModule->shaperActions();
+  foreach(int aCmd, aShaperActions) {
+    anAction = myModule->action(aCmd);
+    aId = aMgr->actionId(anAction);
+    if (!aMgr->containsAction(aId))
       aFreeCommands.append(aCmd);
   }
   return aFreeCommands;
 }
 
+
+void SHAPERGUI_ToolbarsDlg::onDoubleClick(const QModelIndex& theIdx)
+{
+  if (theIdx.isValid())
+    onEdit();
+}
+
+void SHAPERGUI_ToolbarsDlg::updateNumber()
+{
+  myFreeNbLbl->setText(QString::number(myFreeCommands.size()));
+}
 
 //************************************************************************************
 //************************************************************************************
@@ -192,9 +249,7 @@ SHAPERGUI_ToolbarItemsDlg::SHAPERGUI_ToolbarItemsDlg(QWidget* theParent,
   const QIntList& theFreeItems,
   const QIntList& theItemsList)
   : QDialog(theParent),
-  myModule(theModule),
-  myFreeItems(theFreeItems),
-  myToolItems(theItemsList)
+  myModule(theModule)
 {
   setWindowTitle(tr("Edit toolbar items"));
 
@@ -228,10 +283,13 @@ SHAPERGUI_ToolbarItemsDlg::SHAPERGUI_ToolbarItemsDlg(QWidget* theParent,
 
   aCommandsLay->addWidget(new QLabel(tr("Out of toolbars:"), aCommandsWgt));
   myCommandsList = new QListWidget(aCommandsWgt);
-  foreach(int aId, myFreeItems) {
+  myCommandsList->setSortingEnabled(false);
+
+  myCommandsList->addItem(new SHAPERGUI_CommandIdItem(myCommandsList, -1, myModule));
+  foreach(int aId, theFreeItems) {
     myCommandsList->addItem(new SHAPERGUI_CommandIdItem(myCommandsList, aId, myModule));
   }
-  myCommandsList->setMaximumWidth(150);
+  myCommandsList->setMaximumWidth(LIST_WIDTH);
   aCommandsLay->addWidget(myCommandsList);
 
   // Middle buttons
@@ -241,13 +299,13 @@ SHAPERGUI_ToolbarItemsDlg::SHAPERGUI_ToolbarItemsDlg(QWidget* theParent,
   aCtrlLayout->addWidget(aButtonsWgt);
 
   aBtnLayout->addStretch(1);
-  QPushButton* aAddButton = new QPushButton("--->", aButtonsWgt);
+  QPushButton* aAddButton = new QPushButton(QIcon(":pictures/arrow-right.png"), "", aButtonsWgt);
   connect(aAddButton, SIGNAL(clicked(bool)), SLOT(onAddItem()));
   aBtnLayout->addWidget(aAddButton);
 
   aBtnLayout->addSpacing(20);
 
-  QPushButton* aDelButton = new QPushButton("<---", aButtonsWgt);
+  QPushButton* aDelButton = new QPushButton(QIcon(":pictures/arrow-left.png"), "", aButtonsWgt);
   connect(aDelButton, SIGNAL(clicked(bool)), SLOT(onDelItem()));
   aBtnLayout->addWidget(aDelButton);
   aBtnLayout->addStretch(1);
@@ -260,11 +318,31 @@ SHAPERGUI_ToolbarItemsDlg::SHAPERGUI_ToolbarItemsDlg(QWidget* theParent,
 
   aItemsLay->addWidget(new QLabel(tr("In the toolbar:"), aItemsWgt));
   myItemsList = new QListWidget(aItemsWgt);
-  foreach(int aId, myToolItems) {
+  myItemsList->setSortingEnabled(false);
+  foreach(int aId, theItemsList) {
     myItemsList->addItem(new SHAPERGUI_CommandIdItem(myItemsList, aId, myModule));
   }
-  myItemsList->setMaximumWidth(150);
+  myItemsList->setMaximumWidth(LIST_WIDTH);
+  myItemsList->viewport()->installEventFilter(this);
   aItemsLay->addWidget(myItemsList);
+
+  // Buttons of right list
+  QWidget* aBtnWgt = new QWidget(aControlsWgt);
+  QVBoxLayout* aBtnLay = new QVBoxLayout(aBtnWgt);
+  aBtnLay->setContentsMargins(0, 0, 0, 0);
+  aCtrlLayout->addWidget(aBtnWgt);
+
+  aBtnLay->addStretch(1);
+  QPushButton* aUpButton = new QPushButton(QIcon(":pictures/arrow-up.png"), "", aBtnWgt);
+  connect(aUpButton, SIGNAL(clicked(bool)), SLOT(onUp()));
+  aBtnLay->addWidget(aUpButton);
+
+  aBtnLay->addSpacing(20);
+
+  QPushButton* aDownButton = new QPushButton(QIcon(":pictures/arrow-down.png"), "", aBtnWgt);
+  connect(aDownButton, SIGNAL(clicked(bool)), SLOT(onDown()));
+  aBtnLay->addWidget(aDownButton);
+  aBtnLay->addStretch(1);
 
   // Buttons part of the dialog
   QDialogButtonBox* aButtons =
@@ -276,10 +354,101 @@ SHAPERGUI_ToolbarItemsDlg::SHAPERGUI_ToolbarItemsDlg(QWidget* theParent,
 
 void SHAPERGUI_ToolbarItemsDlg::onAddItem()
 {
-
+  QList<QListWidgetItem*> aCurrentList = myCommandsList->selectedItems();
+  if (aCurrentList.size() > 0) {
+    SHAPERGUI_CommandIdItem* aItem = dynamic_cast<SHAPERGUI_CommandIdItem*>(aCurrentList.first());
+    int aId = aItem->id();
+    if (aId != -1) {
+      myCommandsList->removeItemWidget(aItem);
+      delete aItem;
+    }
+    QModelIndex aIdx = myItemsList->currentIndex();
+    aItem = new SHAPERGUI_CommandIdItem(0, aId, myModule);
+    if (aIdx.isValid()) {
+      int aRow = aIdx.row();
+      myItemsList->insertItem(aRow, aItem);
+    }
+    else {
+      myItemsList->addItem(aItem);
+    }
+  }
 }
 
 void SHAPERGUI_ToolbarItemsDlg::onDelItem()
 {
+  QList<QListWidgetItem*> aCurrentList = myItemsList->selectedItems();
+  if (aCurrentList.size() > 0) {
+    SHAPERGUI_CommandIdItem* aItem = dynamic_cast<SHAPERGUI_CommandIdItem*>(aCurrentList.first());
+    int aId = aItem->id();
+    myItemsList->removeItemWidget(aItem);
+    delete aItem;
+    if (aId != -1) {
+      aItem = new SHAPERGUI_CommandIdItem(myCommandsList, aId, myModule);
+      myCommandsList->addItem(aItem);
+    }
+  }
+}
 
+
+bool SHAPERGUI_ToolbarItemsDlg::eventFilter(QObject* theObj, QEvent* theEvent)
+{
+  if (theEvent->type() == QEvent::MouseButtonRelease) {
+    QMouseEvent* aMouseEvent = (QMouseEvent*)theEvent;
+    QModelIndex aIdx = myItemsList->indexAt(aMouseEvent->pos());
+    if (!aIdx.isValid() || aMouseEvent->button() == Qt::RightButton) {
+      myItemsList->setCurrentIndex(QModelIndex());
+    }
+  }
+  return QDialog::eventFilter(theObj, theEvent);
+}
+
+void SHAPERGUI_ToolbarItemsDlg::onUp()
+{
+  QModelIndex aCurrentIdx = myItemsList->currentIndex();
+  if (aCurrentIdx.isValid()) {
+    int aRow = aCurrentIdx.row();
+    if (aRow > 0) {
+      QListWidgetItem* aItem = myItemsList->takeItem(aRow);
+      aRow--;
+      myItemsList->insertItem(aRow, aItem);
+      myItemsList->setCurrentRow(aRow);
+    }
+  }
+}
+
+void SHAPERGUI_ToolbarItemsDlg::onDown()
+{
+  QModelIndex aCurrentIdx = myItemsList->currentIndex();
+  if (aCurrentIdx.isValid()) {
+    int aNb = myItemsList->count();
+    int aRow = aCurrentIdx.row();
+    if (aRow < (aNb - 1)) {
+      QListWidgetItem* aItem = myItemsList->takeItem(aRow);
+      aRow++;
+      myItemsList->insertItem(aRow, aItem);
+      myItemsList->setCurrentRow(aRow);
+    }
+  }
+}
+
+QIntList SHAPERGUI_ToolbarItemsDlg::freeItems() const
+{
+  return getItems(myCommandsList, 1);
+}
+
+QIntList SHAPERGUI_ToolbarItemsDlg::toolbarItems() const
+{
+  return getItems(myItemsList, 0);
+}
+
+QIntList SHAPERGUI_ToolbarItemsDlg::getItems(QListWidget* theWidget, int theStart) const
+{
+  QIntList aList;
+  SHAPERGUI_CommandIdItem* aItem = 0;
+  int aNb = theWidget->count();
+  for (int i = theStart; i < aNb; i++) {
+    aItem = (SHAPERGUI_CommandIdItem*)theWidget->item(i);
+    aList.append(aItem->id());
+  }
+  return aList;
 }
