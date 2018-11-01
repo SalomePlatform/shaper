@@ -100,7 +100,14 @@ void XGUI_DataModel::processEvent(const std::shared_ptr<Events_Message>& theMess
     for (aIt = aMsgGroups.cbegin(); aIt != aMsgGroups.cend(); aIt++) {
       aList.append(myRoot->objectsDeleted(aIt->first, aIt->second.c_str()));
     }
+    // Remove obsolete nodes
+    QTreeNodesList aRemaining;
     foreach(ModuleBase_ITreeNode* aNode, aList) {
+      if (myRoot->hasSubNode(aNode))
+        aRemaining.append(aNode);
+    }
+    // Update remaining nodes
+    foreach(ModuleBase_ITreeNode* aNode, aRemaining) {
       if (aNode->parent())
         aNode->parent()->update();
     }
