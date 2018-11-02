@@ -41,6 +41,7 @@
 #include <TDataStd_ReferenceArray.hxx>
 #include <TDataStd_IntegerArray.hxx>
 #include <TDataStd_Name.hxx>
+#include <TDataStd_UAttribute.hxx>
 
 #include <list>
 
@@ -55,6 +56,14 @@ static const Standard_GUID kBASE_ARRAY("7c515b1a-9549-493d-9946-a4933a22f45f");
 static const Standard_GUID kLEVELS_ARRAY("ee4c4b45-e859-4e86-aa4f-6eac68e0ca1f");
 // weak index (integer) of the sub-shape
 static const Standard_GUID kWEAK_INDEX("e9373a61-cabc-4ee8-aabf-aea47c62ed87");
+// geometrical naming indicator
+static const Standard_GUID kGEOMETRICAL_NAMING("a5322d02-50fb-43ed-9255-75c7b93f6657");
+
+// string identifier of the weak name in modification or intersection types of algorithm
+static const std::string kWEAK_NAME_IDENTIFIER = "weak_name_";
+// string identifier of the pure weak name algorithm
+static const std::string kPUREWEAK_NAME_IDENTIFIER = "_weak_name_";
+
 
 Selector_Selector::Selector_Selector(TDF_Label theLab) : myLab(theLab)
 {
@@ -264,10 +273,11 @@ static const TopoDS_Shape findNeighbor(const TopoDS_Shape theContext,
 }
 
 bool Selector_Selector::select(const TopoDS_Shape theContext, const TopoDS_Shape theValue,
-  const bool theUseNeighbors, const bool theUseIntersections)
+  const bool theGeometricalNaming, const bool theUseNeighbors, const bool theUseIntersections)
 {
   if (theValue.IsNull() || theContext.IsNull())
     return false;
+  myGeometricalNaming = theGeometricalNaming;
   // check the value shape can be named as it is, or it is needed to construct it from the
   // higher level shapes (like a box vertex by faces that form this vertex)
   bool aIsFound = TNaming_Tool::HasLabel(myLab, theValue);
@@ -309,8 +319,8 @@ bool Selector_Selector::select(const TopoDS_Shape theContext, const TopoDS_Shape
         aSelectionType == TopAbs_SHELL || aSelectionType == TopAbs_WIRE)
     { // iterate all sub-shapes and select them on sublabels
       for(TopoDS_Iterator aSubIter(theValue); aSubIter.More(); aSubIter.Next()) {
-        if (!selectBySubSelector(
-            theContext, aSubIter.Value(), theUseNeighbors, theUseIntersections)) {
+        if (!selectBySubSelector(theContext, aSubIter.Value(),
+            theGeometricalNaming, theUseNeighbors, theUseIntersections)) {
           return false; // if some selector is failed, everything is failed
         }
       }
@@ -353,7 +363,8 @@ bool Selector_Selector::select(const TopoDS_Shape theContext, const TopoDS_Shape
         mySubSelList.clear();
         TopoDS_ListOfShape::Iterator anInt(anIntList);
         for (; anInt.More(); anInt.Next()) {
-          if (!selectBySubSelector(theContext, anInt.Value(), theUseNeighbors, false)) {
+          if (!selectBySubSelector(theContext, anInt.Value(),
+              theGeometricalNaming, theUseNeighbors, false)) {
             break; // if some selector is failed, stop and search another solution
           }
         }
@@ -386,7 +397,8 @@ bool Selector_Selector::select(const TopoDS_Shape theContext, const TopoDS_Shape
           // check which can be named correctly, without "by neighbors" type
           Selector_Selector aSelector(myLab.FindChild(1));
           aSelector.setBaseDocument(myBaseDocumentLab);
-          if (aSelector.select(theContext, aNewNBShape, false, false)) { // add to list of good NBs
+          if (aSelector.select(theContext, aNewNBShape, theGeometricalNaming, false, false)) {
+            // add to list of good NBs
             aNBs.push_back(std::pair<TopoDS_Shape, int>(aNewNBShape, aLevel));
           }
         }
@@ -395,7 +407,8 @@ bool Selector_Selector::select(const TopoDS_Shape theContext, const TopoDS_Shape
       if (!aResult.IsNull() && aResult.IsSame(theValue)) {
         std::list<std::pair<TopoDS_Shape, int> >::iterator aNBIter = aNBs.begin();
         for(; aNBIter != aNBs.end(); aNBIter++) {
-          if (!selectBySubSelector(theContext, aNBIter->first, false, false)) {
+          if (!selectBySubSelector(theContext, aNBIter->first,
+              theGeometricalNaming, false, false)) {
             return false; // something is wrong because before this selection was ok
           }
           myNBLevel.push_back(aNBIter->second);
@@ -415,8 +428,8 @@ bool Selector_Selector::select(const TopoDS_Shape theContext, const TopoDS_Shape
         mySubSelList.clear();
         TopoDS_ListOfShape::Iterator anInt(aLastIntersectors);
         for (; anInt.More(); anInt.Next()) {
-          if (!selectBySubSelector(
-              theContext, anInt.Value(), theUseNeighbors, theUseIntersections)) {
+          if (!selectBySubSelector(theContext, anInt.Value(),
+              theGeometricalNaming, theUseNeighbors, theUseIntersections)) {
             break; // if some selector is failed, stop and search another solution
           }
         }
@@ -545,7 +558,8 @@ bool Selector_Selector::select(const TopoDS_Shape theContext, const TopoDS_Shape
               Selector_Selector aSelector(myLab.FindChild(1));
               if (!myBaseDocumentLab.IsNull())
                 aSelector.setBaseDocument(myBaseDocumentLab);
-              if (aSelector.select(theContext, aNewNBShape, false)) {// add to list of good NBs
+              if (aSelector.select(theContext, aNewNBShape, theGeometricalNaming, false)) {
+                // add to list of good NBs
                 aNBs.push_back(std::pair<TopoDS_Shape, int>(aNewNBShape, aLevel));
               }
             }
@@ -554,8 +568,8 @@ bool Selector_Selector::select(const TopoDS_Shape theContext, const TopoDS_Shape
           if (!aResult.IsNull() && aResult.IsSame(theValue)) {
             std::list<std::pair<TopoDS_Shape, int> >::iterator aNBIter = aNBs.begin();
             for(; aNBIter != aNBs.end(); aNBIter++) {
-              if (!selectBySubSelector(
-                  theContext, aNBIter->first, theUseNeighbors, theUseIntersections)) {
+              if (!selectBySubSelector(theContext, aNBIter->first,
+                  theGeometricalNaming, theUseNeighbors, theUseIntersections)) {
                 return false; // something is wrong because before this selection was ok
               }
               myNBLevel.push_back(aNBIter->second);
@@ -602,6 +616,8 @@ void Selector_Selector::store()
 {
   myLab.ForgetAllAttributes(true); // remove old naming data
   TDataStd_Integer::Set(myLab, kSEL_TYPE, (int)myType);
+  if (myGeometricalNaming)
+    TDataStd_UAttribute::Set(myLab, kGEOMETRICAL_NAMING);
   switch(myType) {
   case SELTYPE_CONTAINER:
   case SELTYPE_INTERSECT: {
@@ -673,6 +689,7 @@ bool Selector_Selector::restore()
   Handle(TDataStd_Integer) aTypeAttr;
   if (!myLab.FindAttribute(kSEL_TYPE, aTypeAttr))
     return false;
+  myGeometricalNaming = myLab.IsAttribute(kGEOMETRICAL_NAMING);
   myType = Selector_Type(aTypeAttr->Get());
   switch(myType) {
   case SELTYPE_CONTAINER:
@@ -960,9 +977,6 @@ TopoDS_Shape Selector_Selector::value()
   return TopoDS_Shape(); // empty, error shape
 }
 
-static const std::string kWEAK_NAME_IDENTIFIER = "weak_name_";
-static const std::string kPUREWEAK_NAME_IDENTIFIER = "_weak_name_";
-
 std::string Selector_Selector::name(Selector_NameGenerator* theNameGenerator) {
   switch(myType) {
   case SELTYPE_CONTAINER:
@@ -1060,8 +1074,9 @@ std::string Selector_Selector::name(Selector_NameGenerator* theNameGenerator) {
 
 TDF_Label Selector_Selector::restoreByName(
   std::string theName, const TopAbs_ShapeEnum theShapeType,
-  Selector_NameGenerator* theNameGenerator)
+  Selector_NameGenerator* theNameGenerator, const bool theGeometricalNaming)
 {
+  myGeometricalNaming = theGeometricalNaming;
   if (theName[0] == '[') { // intersection or container
     switch(theShapeType) {
     case TopAbs_COMPOUND:
@@ -1108,8 +1123,8 @@ TDF_Label Selector_Selector::restoreByName(
         }
         mySubSelList.push_back(Selector_Selector(myLab.FindChild(int(mySubSelList.size()) + 1)));
         mySubSelList.back().setBaseDocument(myBaseDocumentLab);
-        TDF_Label aSubContext =
-          mySubSelList.back().restoreByName(aSubStr, aSubShapeType, theNameGenerator);
+        TDF_Label aSubContext = mySubSelList.back().restoreByName(
+          aSubStr, aSubShapeType, theNameGenerator, theGeometricalNaming);
         if (aSubContext.IsNull())
           return aSubContext; // invalid sub-selection parsing
         if (!aContext.IsNull() && !aContext.IsEqual(aSubContext)) {
@@ -1132,8 +1147,8 @@ TDF_Label Selector_Selector::restoreByName(
         std::string aSubStr = theName.substr(aStart + 1, anEndPos - aStart - 1);
         mySubSelList.push_back(Selector_Selector(myLab.FindChild(int(mySubSelList.size()) + 1)));
         mySubSelList.back().setBaseDocument(myBaseDocumentLab);
-        TDF_Label aSubContext =
-          mySubSelList.back().restoreByName(aSubStr, theShapeType, theNameGenerator);
+        TDF_Label aSubContext = mySubSelList.back().restoreByName(
+          aSubStr, theShapeType, theNameGenerator, theGeometricalNaming);
         if (aSubContext.IsNull())
           return aSubContext; // invalid sub-selection parsing
         if (!aContext.IsNull() && !aContext.IsEqual(aSubContext)) {
@@ -1214,14 +1229,15 @@ TDF_Label Selector_Selector::restoreByName(
   return TDF_Label();
 }
 
-bool Selector_Selector::selectBySubSelector(
-  const TopoDS_Shape theContext, const TopoDS_Shape theValue,
+bool Selector_Selector::selectBySubSelector(const TopoDS_Shape theContext,
+  const TopoDS_Shape theValue, const bool theGeometricalNaming,
   const bool theUseNeighbors, const bool theUseIntersections)
 {
   mySubSelList.push_back(Selector_Selector(myLab.FindChild(int(mySubSelList.size()) + 1)));
   if (!myBaseDocumentLab.IsNull())
     mySubSelList.back().setBaseDocument(myBaseDocumentLab);
-  if (!mySubSelList.back().select(theContext, theValue, theUseNeighbors, theUseIntersections)) {
+  if (!mySubSelList.back().select(theContext, theValue,
+      theGeometricalNaming, theUseNeighbors, theUseIntersections)) {
     mySubSelList.clear(); // if one of the selector is failed, all become invalid
     return false;
   }

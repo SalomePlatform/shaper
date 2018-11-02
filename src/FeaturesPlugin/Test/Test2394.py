@@ -164,10 +164,10 @@ Plane_10 = model.addPlane(Part_1_doc, model.selection("VERTEX", "[Extrusion_2_1_
 Plane_11 = model.addPlane(Part_1_doc, model.selection("VERTEX", "[Extrusion_2_1_2/Generated_Face&Sketch_3/SketchCircle_1_2&weak_name_1][Extrusion_2_1_2/Generated_Face&Sketch_3/SketchLine_17][Extrusion_2_1_2/To_Face]"), model.selection("VERTEX", "[Extrusion_2_1_2/Generated_Face&Sketch_3/SketchLine_17][Extrusion_2_1_2/Generated_Face&Sketch_3/SketchLine_10][Extrusion_2_1_2/To_Face]"), model.selection("VERTEX", "[Extrusion_2_1_2/Generated_Face&Sketch_3/SketchCircle_1_2&weak_name_1][Extrusion_2_1_2/Generated_Face&Sketch_3/SketchLine_17][Extrusion_2_1_2/From_Face]"))
 Plane_12 = model.addPlane(Part_1_doc, model.selection("VERTEX", "[Extrusion_2_1_3/Generated_Face&Sketch_3/SketchLine_15][Extrusion_2_1_3/Generated_Face&Sketch_3/SketchLine_13][Extrusion_2_1_3/To_Face]"), model.selection("VERTEX", "[Extrusion_2_1_3/Generated_Face&Sketch_3/SketchCircle_1_2][Extrusion_2_1_3/Generated_Face&Sketch_3/SketchLine_15][Extrusion_2_1_3/To_Face]"), model.selection("VERTEX", "[Extrusion_2_1_3/Generated_Face&Sketch_3/SketchCircle_1_2][Extrusion_2_1_3/Generated_Face&Sketch_3/SketchLine_15][Extrusion_2_1_3/From_Face]"))
 Recover_1 = model.addRecover(Part_1_doc, Cut_1, [Extrusion_3.result()])
-Plane_13 = model.addPlane(Part_1_doc, model.selection("FACE", "Recover_1_1/Shape_4"), model.selection("EDGE", "[Recover_1_1/Shape_4][Recover_1_1/Shape_6]"), "90+45")
-Plane_14 = model.addPlane(Part_1_doc, model.selection("FACE", "Recover_1_1/Shape_1"), model.selection("EDGE", "[Recover_1_1/Shape_1][Recover_1_1/Shape_6]"), "90+45")
-Plane_15 = model.addPlane(Part_1_doc, model.selection("FACE", "Recover_1_1/Shape_2"), model.selection("EDGE", "[Recover_1_1/Shape_2][Recover_1_1/Shape_6]"), "90+45")
-Plane_16 = model.addPlane(Part_1_doc, model.selection("FACE", "Recover_1_1/Shape_6"), model.selection("EDGE", "[Recover_1_1/Shape_3][Recover_1_1/Shape_6]"), 45)
+Plane_13 = model.addPlane(Part_1_doc, model.selection("FACE", "Recover_1_1/Modified_Face&Sketch_3/SketchLine_10"), model.selection("EDGE", "[Recover_1_1/Modified_Face&Sketch_3/SketchLine_10][Recover_1_1/Modified_Face&Extrusion_3_1/To_Face]"), "90+45")
+Plane_14 = model.addPlane(Part_1_doc, model.selection("FACE", "Recover_1_1/Modified_Face&Sketch_3/SketchLine_13"), model.selection("EDGE", "[Recover_1_1/Modified_Face&Sketch_3/SketchLine_13][Recover_1_1/Modified_Face&Extrusion_3_1/To_Face]"), "90+45")
+Plane_15 = model.addPlane(Part_1_doc, model.selection("FACE", "Recover_1_1/Modified_Face&Sketch_3/SketchLine_12"), model.selection("EDGE", "[Recover_1_1/Modified_Face&Sketch_3/SketchLine_12][Recover_1_1/Modified_Face&Extrusion_3_1/To_Face]"), "90+45")
+Plane_16 = model.addPlane(Part_1_doc, model.selection("FACE", "Recover_1_1/Modified_Face&Extrusion_3_1/To_Face"), model.selection("EDGE", "[Recover_1_1/Modified_Face&Sketch_3/SketchLine_11][Recover_1_1/Modified_Face&Extrusion_3_1/To_Face]"), 45)
 Fill_5_objects_2 = [model.selection("FACE", "Plane_6"), model.selection("FACE", "Plane_7"), model.selection("FACE", "Plane_8"), model.selection("FACE", "Plane_9"), model.selection("FACE", "Plane_10"), model.selection("FACE", "Plane_11"), model.selection("FACE", "Plane_12"), model.selection("FACE", "Plane_13")]
 Fill_5 = model.addFill(Part_1_doc, [model.selection("SOLID", "demi-sphere")], Fill_5_objects_2)
 Fill_5.result().subResult(0).setName("Fill_5_1_1")
@@ -297,4 +297,5 @@ model.testResultsVolumes(Partition_1, [103221.354557478349306620657444])
 
 model.end()
 
+# too long
 #assert(model.checkPythonDump())
