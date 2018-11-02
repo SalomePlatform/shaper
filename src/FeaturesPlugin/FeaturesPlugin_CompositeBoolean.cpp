@@ -29,7 +29,7 @@
 #include <GeomAlgoAPI_PaveFiller.h>
 #include <GeomAlgoAPI_ShapeTools.h>
 
-#include <GeomAPI_ShapeExplorer.h>
+#include <GeomAPI_ShapeIterator.h>
 
 #include <map>
 
@@ -196,9 +196,11 @@ bool FeaturesPlugin_CompositeBoolean::makeBoolean(const ListOfShape& theTools,
 
         // Collecting solids from compsolids which will not be modified in boolean operation.
         ListOfShape aShapesToAdd;
-        for(GeomAPI_ShapeExplorer
-            anExp(aCompSolid, GeomAPI_Shape::SOLID); anExp.more(); anExp.next()) {
-          GeomShapePtr aSolidInCompSolid = anExp.current();
+        for (GeomAPI_ShapeIterator aCompSolidIt(aCompSolid);
+             aCompSolidIt.more();
+             aCompSolidIt.next())
+        {
+          GeomShapePtr aSolidInCompSolid = aCompSolidIt.current();
           ListOfShape::const_iterator aUsedShapesIt = aUsedShapes.cbegin();
           for(; aUsedShapesIt != aUsedShapes.cend(); ++aUsedShapesIt) {
             if(aSolidInCompSolid->isEqual(*aUsedShapesIt)) {
@@ -279,9 +281,11 @@ bool FeaturesPlugin_CompositeBoolean::makeBoolean(const ListOfShape& theTools,
         aSolidsToFuse.insert(aSolidsToFuse.end(), aUsedShapes.begin(), aUsedShapes.end());
 
         // Collect solids from compsolid which will not be modified in boolean operation.
-        for(GeomAPI_ShapeExplorer
-            anExp(aCompSolid, GeomAPI_Shape::SOLID); anExp.more(); anExp.next()) {
-          GeomShapePtr aSolidInCompSolid = anExp.current();
+        for (GeomAPI_ShapeIterator aCompSolidIt(aCompSolid);
+             aCompSolidIt.more();
+             aCompSolidIt.next())
+        {
+          GeomShapePtr aSolidInCompSolid = aCompSolidIt.current();
           ListOfShape::iterator anIt = aUsedShapes.begin();
           for(; anIt != aUsedShapes.end(); anIt++) {
             if(aSolidInCompSolid->isEqual(*anIt)) {
