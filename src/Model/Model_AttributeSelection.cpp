@@ -675,7 +675,7 @@ void Model_AttributeSelection::selectBody(
         (ModelAPI_Session::get()->moduleDocument())->extConstructionsLabel());
     }
     try {
-      aSelectorOk = aSel.select(aContext, aNewSub);
+      aSelectorOk = aSel.select(aContext, aNewSub, myIsGeometricalSelection);
       if (aSelectorOk) {
         aSel.store();
         aSelectorOk = aSel.solve(aContext);
