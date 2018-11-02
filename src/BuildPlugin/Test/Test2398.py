@@ -34,7 +34,7 @@ SketchCircle_1 = Sketch_1.addCircle(0, 0, 30.79356776198042)
 SketchConstraintCoincidence_1 = Sketch_1.setCoincident(SketchPoint_1.result(), SketchCircle_1.center())
 model.do()
 
-Extrusion_1 = model.addExtrusion(Part_1_doc, [model.selection("WIRE", "Sketch_1/Wire-SketchCircle_1_2f")], model.selection(), 100, 100)
+Extrusion_1 = model.addExtrusion(Part_1_doc, [model.selection("WIRE", "Sketch_1/Face-SketchCircle_1_2f_wire")], model.selection(), 100, 100)
 
 Sketch_2 = model.addSketch(Part_1_doc, model.standardPlane("XOY"))
 SketchProjection_2 = Sketch_2.addProjection(model.selection("VERTEX", "PartSet/Origin"), False)
@@ -72,7 +72,7 @@ SketchConstraintCoincidence_9 = Sketch_3.setCoincident(SketchLine_5.result(), Sk
 SketchConstraintMiddle_1 = Sketch_3.setMiddlePoint(SketchAPI_Point(SketchPoint_3).coordinates(), SketchLine_5.result())
 model.do()
 
-Edge_1_objects = [model.selection("EDGE", "Sketch_3/Edge-SketchLine_2"), model.selection("EDGE", "Sketch_3/Edge-SketchLine_1"), model.selection("EDGE", "Sketch_3/Edge-SketchLine_4"), model.selection("EDGE", "Sketch_3/Edge-SketchLine_3")]
+Edge_1_objects = [model.selection("EDGE", "Sketch_3/SketchLine_2"), model.selection("EDGE", "Sketch_3/SketchLine_1"), model.selection("EDGE", "Sketch_3/SketchLine_4"), model.selection("EDGE", "Sketch_3/SketchLine_3")]
 Edge_1 = model.addEdge(Part_1_doc, Edge_1_objects)
 
 Plane_4 = model.addPlane(Part_1_doc, model.selection("FACE", "PartSet/XOZ"), model.selection("EDGE", "PartSet/OZ"), 135)

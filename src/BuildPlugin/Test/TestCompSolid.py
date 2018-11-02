@@ -45,7 +45,7 @@ SketchConstraintVertical_2 = Sketch_1.setVertical(SketchLine_4.result())
 SketchConstraintEqual_1 = Sketch_1.setEqual(SketchLine_1.result(), SketchLine_2.result())
 SketchConstraintLength_1 = Sketch_1.setLength(SketchLine_1.result(), 40)
 model.do()
-Face_1 = model.addFace(Part_1_doc, [model.selection("WIRE", "Sketch_1/Wire-SketchLine_1r-SketchLine_2r-SketchLine_3r-SketchLine_4r")])
+Face_1 = model.addFace(Part_1_doc, [model.selection("WIRE", "Sketch_1/Face-SketchLine_4r-SketchLine_3r-SketchLine_2r-SketchLine_1r_wire")])
 Sketch_2 = model.addSketch(Part_1_doc, model.standardPlane("YOZ"))
 SketchLine_5 = Sketch_2.addLine(20, 0, 0, 0)
 SketchLine_6 = Sketch_2.addLine(0, 0, 0, 20)
@@ -58,7 +58,7 @@ SketchConstraintCoincidence_9 = Sketch_2.setCoincident(SketchLine_7.endPoint(), 
 SketchConstraintVertical_3 = Sketch_2.setVertical(SketchLine_6.result())
 SketchConstraintHorizontal_4 = Sketch_2.setHorizontal(SketchLine_7.result())
 SketchConstraintVertical_4 = Sketch_2.setVertical(SketchLine_8.result())
-SketchProjection_2 = Sketch_2.addProjection(model.selection("EDGE", "Sketch_1/Edge-SketchLine_2"), False)
+SketchProjection_2 = Sketch_2.addProjection(model.selection("EDGE", "Sketch_1/SketchLine_2"), False)
 SketchLine_9 = SketchProjection_2.createdFeature()
 SketchConstraintMiddle_1 = Sketch_2.setMiddlePoint(SketchLine_5.startPoint(), SketchLine_9.result())
 SketchConstraintCoincidence_10 = Sketch_2.setCoincident(SketchAPI_Line(SketchLine_9).startPoint(), SketchLine_5.endPoint())
@@ -75,7 +75,7 @@ SketchConstraintHorizontal_5 = Sketch_2.setHorizontal(SketchLine_11.result())
 SketchConstraintVertical_6 = Sketch_2.setVertical(SketchLine_12.result())
 SketchConstraintEqual_3 = Sketch_2.setEqual(SketchLine_6.result(), SketchLine_12.result())
 model.do()
-Face_2 = model.addFace(Part_1_doc, [model.selection("WIRE", "Sketch_2/Wire-SketchLine_5r-SketchLine_6r-SketchLine_7r-SketchLine_8r")])
+Face_2 = model.addFace(Part_1_doc, [model.selection("WIRE", "Sketch_2/Face-SketchLine_8r-SketchLine_7r-SketchLine_6r-SketchLine_5r_wire")])
 AngularCopy_1 = model.addMultiRotation(Part_1_doc, [model.selection("FACE", "Face_2_1")], model.selection("EDGE", "PartSet/OZ"), 270, 2)
 Shell_1 = model.addShell(Part_1_doc, [model.selection("FACE", "AngularCopy_1_1_1"), model.selection("FACE", "AngularCopy_1_1_2")])
 Extrusion_1 = model.addExtrusion(Part_1_doc, [model.selection("FACE", "Sketch_2/Face-SketchLine_7f-SketchLine_10f-SketchLine_11f-SketchLine_12f")], model.selection(), 40, 0)
@@ -90,17 +90,17 @@ SketchConstraintCoincidence_17 = Sketch_3.setCoincident(SketchLine_14.endPoint()
 SketchConstraintCoincidence_18 = Sketch_3.setCoincident(SketchLine_15.endPoint(), SketchLine_16.startPoint())
 SketchConstraintHorizontal_7 = Sketch_3.setHorizontal(SketchLine_15.result())
 SketchConstraintVertical_8 = Sketch_3.setVertical(SketchLine_16.result())
-SketchProjection_3 = Sketch_3.addProjection(model.selection("VERTEX", "Sketch_2/Vertex-SketchLine_5s-SketchLine_15s-SketchLine_8e-SketchLine_14e"), False)
+SketchProjection_3 = Sketch_3.addProjection(model.selection("VERTEX", "Sketch_2/SketchLine_5_StartVertex"), False)
 SketchPoint_2 = SketchProjection_3.createdFeature()
 SketchConstraintCoincidence_19 = Sketch_3.setCoincident(SketchLine_13.endPoint(), SketchAPI_Point(SketchPoint_2).coordinates())
-SketchProjection_4 = Sketch_3.addProjection(model.selection("VERTEX", "Sketch_2/Vertex-SketchLine_11s-SketchLine_10e"), False)
+SketchProjection_4 = Sketch_3.addProjection(model.selection("VERTEX", "Sketch_2/SketchLine_10_EndVertex"), False)
 SketchPoint_3 = SketchProjection_4.createdFeature()
 SketchConstraintCoincidence_20 = Sketch_3.setCoincident(SketchLine_14.endPoint(), SketchAPI_Point(SketchPoint_3).coordinates())
-SketchProjection_5 = Sketch_3.addProjection(model.selection("VERTEX", "Sketch_1/Vertex-SketchLine_3s-SketchLine_2e"), False)
+SketchProjection_5 = Sketch_3.addProjection(model.selection("VERTEX", "Sketch_1/SketchLine_2_EndVertex"), False)
 SketchPoint_4 = SketchProjection_5.createdFeature()
 SketchConstraintCoincidence_21 = Sketch_3.setCoincident(SketchLine_13.startPoint(), SketchAPI_Point(SketchPoint_4).coordinates())
 model.do()
-Extrusion_2 = model.addExtrusion(Part_1_doc, [model.selection("FACE", "Sketch_3/Face-SketchLine_13r-SketchLine_14r-SketchLine_15r-SketchLine_16r")], model.selection(), 20, 0)
+Extrusion_2 = model.addExtrusion(Part_1_doc, [model.selection("FACE", "Sketch_3/Face-SketchLine_16r-SketchLine_15r-SketchLine_14r-SketchLine_13r")], model.selection(), 20, 0)
 Box_1 = model.addBox(Part_1_doc, 20, 20, 20)
 model.do()
 
@@ -127,12 +127,12 @@ def createCompSolidStepByStep(theSelection, theExpectedType):
 # =============================================================================
 boundaries1 = [model.selection("FACE", "Face_1_1"),
                model.selection("SHELL", "Shell_1_1"),
-               model.selection("FACE", "Sketch_3/Face-SketchLine_13r-SketchLine_14r-SketchLine_15r-SketchLine_16r"),
-               model.selection("FACE", "Extrusion_1_1/Generated_Face_4"),
-               model.selection("FACE", "Extrusion_2_1/Generated_Face_2"),
-               model.selection("FACE", "Extrusion_2_1/Generated_Face_3"),
-               model.selection("FACE", "Extrusion_2_1/Generated_Face_4"),
-               model.selection("FACE", "Extrusion_2_1/To_Face_1"),
+               model.selection("FACE", "Sketch_3/Face-SketchLine_16r-SketchLine_15r-SketchLine_14r-SketchLine_13r"),
+               model.selection("FACE", "Extrusion_1_1/Generated_Face&Sketch_2/SketchLine_7"),
+               model.selection("FACE", "Extrusion_2_1/Generated_Face&Sketch_3/SketchLine_14"),
+               model.selection("FACE", "Extrusion_2_1/Generated_Face&Sketch_3/SketchLine_15"),
+               model.selection("FACE", "Extrusion_2_1/Generated_Face&Sketch_3/SketchLine_16"),
+               model.selection("FACE", "Extrusion_2_1/To_Face"),
                model.selection("FACE", "Box_1_1/Front")]
 expectType1 = [GeomAPI_Shape.SHAPE,
                GeomAPI_Shape.SHAPE,
@@ -153,14 +153,14 @@ model.testHaveNamingSubshapes(CompSolid_1, model, Part_1_doc)
 # =============================================================================
 boundaries2 = [model.selection("FACE", "Face_1_1"),
                model.selection("SHELL", "Shell_1_1"),
-               model.selection("FACE", "Sketch_3/Face-SketchLine_13r-SketchLine_14r-SketchLine_15r-SketchLine_16r"),
-               model.selection("FACE", "Extrusion_1_1/Generated_Face_4"),
-               model.selection("FACE", "Extrusion_1_1/Generated_Face_3"),
-               model.selection("FACE", "Extrusion_2_1/Generated_Face_3"),
-               model.selection("FACE", "Extrusion_2_1/Generated_Face_4"),
-               model.selection("FACE", "Extrusion_2_1/To_Face_1"),
+               model.selection("FACE", "Sketch_3/Face-SketchLine_16r-SketchLine_15r-SketchLine_14r-SketchLine_13r"),
+               model.selection("FACE", "Extrusion_1_1/Generated_Face&Sketch_2/SketchLine_7"),
+               model.selection("FACE", "Extrusion_1_1/Generated_Face&Sketch_2/SketchLine_10"),
+               model.selection("FACE", "Extrusion_2_1/Generated_Face&Sketch_3/SketchLine_15"),
+               model.selection("FACE", "Extrusion_2_1/Generated_Face&Sketch_3/SketchLine_16"),
+               model.selection("FACE", "Extrusion_2_1/To_Face"),
                model.selection("FACE", "Box_1_1/Front"),
-               model.selection("FACE", "Extrusion_2_1/Generated_Face_2"),
+               model.selection("FACE", "Extrusion_2_1/Generated_Face&Sketch_3/SketchLine_14"),
                model.selection("SOLID", "Extrusion_1_1")]
 expectType2 = [GeomAPI_Shape.SHAPE,
                GeomAPI_Shape.SHAPE,

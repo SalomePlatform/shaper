@@ -45,12 +45,12 @@ SketchLine_2 = Sketch_1.addLine(0, 0, 45, 45)
 model.do()
 
 # Get sketch points
-base_name = "Sketch_1/Vertex-SketchPoint_"
+base_name = "Sketch_1/SketchPoint_"
 p_1, p_2, p_3, p_4, p_5 = [model.selection("VERTEX", base_name + str(i + 1)) for i in range(0, 5)]
 
 # Get sketch edges
-Tangent_1 = model.selection("EDGE", "Sketch_1/Edge-SketchLine_1")
-Tangent_2 = model.selection("EDGE", "Sketch_1/Edge-SketchLine_2")
+Tangent_1 = model.selection("EDGE", "Sketch_1/SketchLine_1")
+Tangent_2 = model.selection("EDGE", "Sketch_1/SketchLine_2")
 
 # =============================================================================
 # Test 1. Create curve 1-2-3-4-5, closed off, reorder off, without tangents
@@ -117,14 +117,14 @@ Part_2 = model.addPart(partSet)
 Part_2_doc = Part_2.document()
 Box_1 = model.addBox(Part_2_doc, 10, 10, 10)
 
-point_names = ("Box_1_1/Back&Box_1_1/Left&Box_1_1/Bottom",
-               "Box_1_1/Back&Box_1_1/Left&Box_1_1/Top",
-               "Box_1_1/Front&Box_1_1/Left&Box_1_1/Top",
-               "Box_1_1/Front&Box_1_1/Left&Box_1_1/Bottom",
-               "Box_1_1/Front&Box_1_1/Right&Box_1_1/Bottom",
-               "Box_1_1/Front&Box_1_1/Right&Box_1_1/Top",
-               "Box_1_1/Back&Box_1_1/Right&Box_1_1/Top",
-               "Box_1_1/Back&Box_1_1/Right&Box_1_1/Bottom")
+point_names = ("[Box_1_1/Back][Box_1_1/Left][Box_1_1/Bottom]",
+               "[Box_1_1/Back][Box_1_1/Left][Box_1_1/Top]",
+               "[Box_1_1/Front][Box_1_1/Left][Box_1_1/Top]",
+               "[Box_1_1/Front][Box_1_1/Left][Box_1_1/Bottom]",
+               "[Box_1_1/Front][Box_1_1/Right][Box_1_1/Bottom]",
+               "[Box_1_1/Front][Box_1_1/Right][Box_1_1/Top]",
+               "[Box_1_1/Back][Box_1_1/Right][Box_1_1/Top]",
+               "[Box_1_1/Back][Box_1_1/Right][Box_1_1/Bottom]")
 points = [model.selection("VERTEX", name) for name in point_names]
 
 Interpolation_8 = model.addInterpolation(Part_2_doc, points, False, False)
@@ -140,8 +140,8 @@ Part_3_doc = Part_3.document()
 Box_1 = model.addBox(Part_3_doc, 20, 30, 40)
 
 points = [model.selection("VERTEX", name) for name in point_names]
-Tangent_1 = model.selection("EDGE", "Box_1_1/Back&Box_1_1/Top")
-Tangent_2 = model.selection("EDGE", "Box_1_1/Left&Box_1_1/Top")
+Tangent_1 = model.selection("EDGE", "[Box_1_1/Back][Box_1_1/Top]")
+Tangent_2 = model.selection("EDGE", "[Box_1_1/Left][Box_1_1/Top]")
 
 Interpolation_9 = model.addInterpolation(Part_3_doc, points,
                                          Tangent_1, Tangent_2, False, False)

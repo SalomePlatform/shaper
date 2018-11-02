@@ -42,7 +42,7 @@ SketchPoint_5 = Sketch_1.addPoint(50, 0)
 model.do()
 
 # Get sketch points
-base_name = "Sketch_1/Vertex-SketchPoint_"
+base_name = "Sketch_1/SketchPoint_"
 p_1, p_2, p_3, p_4, p_5 = [model.selection("VERTEX", base_name + str(i + 1)) for i in range(0, 5)]
 
 # =============================================================================
@@ -100,14 +100,14 @@ Part_2 = model.addPart(partSet)
 Part_2_doc = Part_2.document()
 Box_1 = model.addBox(Part_2_doc, 10, 10, 10)
 
-point_names = ("Box_1_1/Back&Box_1_1/Left&Box_1_1/Bottom",
-               "Box_1_1/Back&Box_1_1/Left&Box_1_1/Top",
-               "Box_1_1/Front&Box_1_1/Left&Box_1_1/Top",
-               "Box_1_1/Front&Box_1_1/Left&Box_1_1/Bottom",
-               "Box_1_1/Front&Box_1_1/Right&Box_1_1/Bottom",
-               "Box_1_1/Front&Box_1_1/Right&Box_1_1/Top",
-               "Box_1_1/Back&Box_1_1/Right&Box_1_1/Top",
-               "Box_1_1/Back&Box_1_1/Right&Box_1_1/Bottom")
+point_names = ("[Box_1_1/Back][Box_1_1/Left][Box_1_1/Bottom]",
+               "[Box_1_1/Back][Box_1_1/Left][Box_1_1/Top]",
+               "[Box_1_1/Front][Box_1_1/Left][Box_1_1/Top]",
+               "[Box_1_1/Front][Box_1_1/Left][Box_1_1/Bottom]",
+               "[Box_1_1/Front][Box_1_1/Right][Box_1_1/Bottom]",
+               "[Box_1_1/Front][Box_1_1/Right][Box_1_1/Top]",
+               "[Box_1_1/Back][Box_1_1/Right][Box_1_1/Top]",
+               "[Box_1_1/Back][Box_1_1/Right][Box_1_1/Bottom]")
 points = [model.selection("VERTEX", name) for name in point_names]
 
 Polyline_7 = model.addPolyline3D(Part_2_doc, points, False)

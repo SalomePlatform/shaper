@@ -45,9 +45,9 @@ SketchCircle_1 = Sketch_1.addCircle(51.0302184611028, -58.25492948210744, 14.676
 SketchCircle_2 = Sketch_1.addCircle(57.27434431552349, -55.3477547099222, 30.40870102508203)
 model.do()
 Vertex_1 = model.addVertex(Part_1_doc, [model.selection("VERTEX", "PartSet/Origin")])
-Edge_1 = model.addEdge(Part_1_doc, [model.selection("EDGE", "Sketch_1/Edge-SketchLine_5")])
-Wire_1 = model.addWire(Part_1_doc, [model.selection("EDGE", "Sketch_1/Edge-SketchCircle_2_2")])
-Face_1 = model.addFace(Part_1_doc, [model.selection("EDGE", "Sketch_1/Edge-SketchCircle_1_2")])
+Edge_1 = model.addEdge(Part_1_doc, [model.selection("EDGE", "Sketch_1/SketchLine_5")])
+Wire_1 = model.addWire(Part_1_doc, [model.selection("EDGE", "Sketch_1/SketchCircle_2_2")])
+Face_1 = model.addFace(Part_1_doc, [model.selection("EDGE", "Sketch_1/SketchCircle_1_2")])
 Sketch_2 = model.addSketch(Part_1_doc, model.standardPlane("YOZ"))
 SketchLine_6 = Sketch_2.addLine(73.69205241424749, 19.68979803478298, 29.86213888681927, 19.68979803478298)
 SketchLine_7 = Sketch_2.addLine(29.86213888681927, 19.68979803478298, 29.86213888681927, 46.16063196348271)
@@ -62,18 +62,18 @@ SketchConstraintVertical_3 = Sketch_2.setVertical(SketchLine_7.result())
 SketchConstraintHorizontal_4 = Sketch_2.setHorizontal(SketchLine_8.result())
 SketchConstraintVertical_4 = Sketch_2.setVertical(SketchLine_9.result())
 model.do()
-Face_2 = model.addFace(Part_1_doc, [model.selection("WIRE", "Sketch_2/Wire-SketchLine_6r-SketchLine_7r-SketchLine_8r-SketchLine_9r")])
-AngularCopy_1 = model.addMultiRotation(Part_1_doc, [model.selection("FACE", "Face_2_1")], model.selection("EDGE", "Sketch_2/Edge-SketchLine_6"), 120, 2)
+Face_2 = model.addFace(Part_1_doc, [model.selection("WIRE", "Sketch_2/Face-SketchLine_9r-SketchLine_8r-SketchLine_7r-SketchLine_6r_wire")])
+AngularCopy_1 = model.addMultiRotation(Part_1_doc, [model.selection("FACE", "Face_2_1")], model.selection("EDGE", "Sketch_2/SketchLine_6"), 120, 2)
 Shell_1 = model.addShell(Part_1_doc, [model.selection("FACE", "AngularCopy_1_1_1"), model.selection("FACE", "AngularCopy_1_1_2")])
 Box_1 = model.addBox(Part_1_doc, 10, 10, 10)
 Translation_1 = model.addTranslation(Part_1_doc, [model.selection("SOLID", "Box_1_1")], model.selection("EDGE", "PartSet/OX"), 50)
 Box_2 = model.addBox(Part_1_doc, 10, 10, 10)
 Plane_4 = model.addPlane(Part_1_doc, model.selection("FACE", "Box_2_1/Front"), 5, True)
 Partition_1 = model.addPartition(Part_1_doc, [model.selection("SOLID", "Box_2_1"), model.selection("FACE", "Plane_1")])
-Compound_1_objects = [model.selection("VERTEX", "Sketch_1/Vertex-SketchPoint_1"),
-                      model.selection("EDGE", "Sketch_1/Edge-SketchLine_1"),
-                      model.selection("WIRE", "Sketch_1/Wire-SketchLine_1r-SketchLine_2r-SketchLine_3r-SketchLine_4r"),
-                      model.selection("FACE", "Sketch_1/Face-SketchLine_1r-SketchLine_2r-SketchLine_3r-SketchLine_4r"),
+Compound_1_objects = [model.selection("VERTEX", "Sketch_1/SketchPoint_1"),
+                      model.selection("EDGE", "Sketch_1/SketchLine_1"),
+                      model.selection("WIRE", "Sketch_1/Face-SketchLine_4r-SketchLine_3r-SketchLine_2r-SketchLine_1r_wire"),
+                      model.selection("FACE", "Sketch_1/Face-SketchLine_4r-SketchLine_3r-SketchLine_2r-SketchLine_1r"),
                       model.selection("VERTEX", "Vertex_1_1"),
                       model.selection("EDGE", "Edge_1_1"),
                       model.selection("WIRE", "Wire_1_1"),

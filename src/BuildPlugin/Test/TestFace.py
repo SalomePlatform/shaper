@@ -107,7 +107,7 @@ aCylinderShape = aCylinderResult.shape()
 aSession.startOperation()
 aFaceFeature2 = aPart.addFeature("Face")
 aBaseObjectsList = aFaceFeature2.selectionList("base_objects")
-aBaseObjectsList.append("Cylinder_1_1/Face_1&Cylinder_1_1/Face_2", "EDGE")
+aBaseObjectsList.append("[Cylinder_1_1/Face_1][Cylinder_1_1/Face_2]", "EDGE")
 aSession.finishOperation()
 assert (len(aFaceFeature2.results()) > 0)
 

@@ -52,10 +52,10 @@ SketchConstraintCoincidence_8 = Sketch_1.setCoincident(SketchAPI_Line(SketchLine
 SketchConstraintRadius_1 = Sketch_1.setRadius(SketchArc_1.results()[1], 80)
 SketchConstraintLength_1 = Sketch_1.setLength(SketchLine_3.result(), 150)
 model.do()
-Extrusion_1 = model.addExtrusion(Part_1_doc, [model.selection("FACE", "Sketch_1/Face-SketchLine_1r-SketchLine_3r-SketchLine_4r-SketchLine_5r-SketchArc_1_2r")], model.selection(), 200, 0)
-Compound_1_objects = [model.selection("FACE", "Extrusion_1_1/To_Face_1"), model.selection("FACE", "Extrusion_1_1/Generated_Face_3"), model.selection("FACE", "Extrusion_1_1/Generated_Face_4")]
+Extrusion_1 = model.addExtrusion(Part_1_doc, [model.selection("FACE", "Sketch_1/Face-SketchArc_1_2r-SketchLine_5r-SketchLine_4r-SketchLine_3r-SketchLine_1r")], model.selection(), 200, 0)
+Compound_1_objects = [model.selection("FACE", "Extrusion_1_1/To_Face"), model.selection("FACE", "Extrusion_1_1/Generated_Face&Sketch_1/SketchLine_4"), model.selection("FACE", "Extrusion_1_1/Generated_Face&Sketch_1/SketchLine_5")]
 Compound_1 = model.addCompound(Part_1_doc, Compound_1_objects)
-Compound_2_objects = [model.selection("EDGE", "Compound_1_1_2/Modified_Edge_2"), model.selection("EDGE", "Sketch_1/Edge-SketchLine_4"), model.selection("EDGE", "Compound_1_1_3/Modified_Edge_2")]
+Compound_2_objects = [model.selection("EDGE", "[Compound_1_1_2/Compound_1_1_2&Sketch_1/SketchLine_4][weak_name_4]"), model.selection("EDGE", "Sketch_1/SketchLine_4"), model.selection("EDGE", "[Compound_1_1_3/Compound_1_1_3&Sketch_1/SketchLine_5][weak_name_4]")]
 Compound_2 = model.addCompound(Part_1_doc, Compound_2_objects)
 model.do()
 
