@@ -80,7 +80,7 @@ model.do()
 # Make a cylindrical hole using one of the produced faces
 #=========================================================================
 ExtrusionCut_2 = model.addExtrusionCut(Part_1_doc, [], model.selection(), model.selection(), 0, model.selection("FACE", "Extrusion_1_1/Generated_Face&Sketch_1/SketchLine_3"), 0, [model.selection("SOLID", "ExtrusionCut_1_1")])
-Sketch_3 = model.addSketch(Part_1_doc, model.selection("FACE", "ExtrusionCut_1_1/Modified_Face&Sketch_1/SketchLine_1&weak_name_2"))
+Sketch_3 = model.addSketch(Part_1_doc, model.selection("FACE", "(ExtrusionCut_1_1/Modified_Face&Extrusion_1_1/From_Face)(ExtrusionCut_1_1/Generated_Face&Sketch_2/SketchLine_6)(ExtrusionCut_1_1/Modified_Face&Extrusion_1_1/To_Face)(Extrusion_1_1/Generated_Face&Sketch_1/SketchLine_4)"))
 SketchCircle_1 = Sketch_3.addCircle(143.412751420315, -228.52745656314, 32.158435160764)
 ExtrusionCut_2.setNestedSketch(Sketch_3)
 
@@ -125,6 +125,6 @@ import ModelAPI
 
 assert(ModelAPI.ModelAPI_Session.get().validators().validate(Sketch_4.feature()))
 assert(ModelAPI.ModelAPI_Session.get().validators().validate(ExtrusionCut_2.feature()))
-assert(Sketch_3.feature().selection("External").namingName() == "ExtrusionCut_3_1/Modified_Face&Sketch_1/SketchLine_1&weak_name_3")
+assert(Sketch_3.feature().selection("External").namingName() == "(ExtrusionCut_1_1/Modified_Face&Extrusion_1_1/From_Face)(ExtrusionCut_3_1/Modified_Face&Sketch_2/SketchLine_6)(ExtrusionCut_1_1/Modified_Face&Extrusion_1_1/To_Face)(Extrusion_1_1/Generated_Face&Sketch_1/SketchLine_4)")
 
 assert(model.checkPythonDump())

@@ -59,31 +59,30 @@ void FeaturesPlugin_Recover::execute()
       continue;
 
     // Copy shape.
-    GeomAlgoAPI_Copy aCopyAlgo(aShape);
+    std::shared_ptr<GeomAlgoAPI_Copy> aCopyAlgo(new GeomAlgoAPI_Copy(aShape));
     // Check that algo is done.
-    if(!aCopyAlgo.isDone()) {
+    if(!aCopyAlgo->isDone()) {
       setError("Error: recover algorithm failed.");
       return;
     }
     // Check if shape is not null.
-    if(!aCopyAlgo.shape().get() || aCopyAlgo.shape()->isNull()) {
+    if(!aCopyAlgo->shape().get() || aCopyAlgo->shape()->isNull()) {
       setError("Error: resulting shape is null.");
       return;
     }
     // Check that resulting shape is valid.
-    if(!aCopyAlgo.isValid()) {
+    if(!aCopyAlgo->isValid()) {
       setError("Error: resulting shape is not valid.");
       return;
     }
 
     // Store result.
     ResultBodyPtr aResultBody = document()->createBody(data(), aResultIndex);
-    aResultBody->store(aCopyAlgo.shape());//, aCopyAlgo.shape());
-    std::shared_ptr<GeomAPI_DataMapOfShapeShape> aSubShapes = aCopyAlgo.mapOfSubShapes();
-    // like in import: forget any history
-    int aTag(1);
-    std::string aNameMS = "Shape";
-    aResultBody->loadFirstLevel(aCopyAlgo.shape(), aNameMS);
+    aResultBody->store(aCopyAlgo->shape());//, aCopyAlgo.shape());
+
+    aResultBody->loadModifiedShapes(aCopyAlgo, aShape, GeomAPI_Shape::VERTEX);
+    aResultBody->loadModifiedShapes(aCopyAlgo, aShape, GeomAPI_Shape::EDGE);
+    aResultBody->loadModifiedShapes(aCopyAlgo, aShape, GeomAPI_Shape::FACE);
 
     setResult(aResultBody, aResultIndex);
     ++aResultIndex;

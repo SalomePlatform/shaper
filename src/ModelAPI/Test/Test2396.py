@@ -21,6 +21,7 @@
 # -*- coding: utf-8 -*-
 
 from salome.shaper import model
+from GeomAPI import GeomAPI_Shape
 
 model.begin()
 partSet = model.moduleDocument()

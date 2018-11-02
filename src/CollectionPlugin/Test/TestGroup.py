@@ -73,21 +73,13 @@ aLineCEndPoint.setValue(-100., 0.)
 aSession.finishOperation()
 # Build sketch faces
 aSession.startOperation()
-aSketchResult = aTriangleSketchFeature.firstResult()
-aSketchEdges = modelAPI_ResultConstruction(aSketchResult).shape()
-origin = geomDataAPI_Point(aTriangleSketchFeature.attribute("Origin")).pnt()
-dirX = geomDataAPI_Dir(aTriangleSketchFeature.attribute("DirX")).dir()
-norm = geomDataAPI_Dir(aTriangleSketchFeature.attribute("Norm")).dir()
-aSketchFaces = ShapeList()
-GeomAlgoAPI_SketchBuilder.createFaces(origin, dirX, norm, aSketchEdges, aSketchFaces)
+aSketchResult = modelAPI_ResultConstruction(aTriangleSketchFeature.firstResult())
 # Create extrusion on them
 anExtrusionFt = aPart.addFeature("Extrusion")
-anExtrusionFt.selectionList("base").append(aSketchResult, aSketchFaces[0])
+anExtrusionFt.selectionList("base").append(aSketchResult, aSketchResult.face(0))
 anExtrusionFt.string("CreationMethod").setValue("BySizes")
 anExtrusionFt.real("to_size").setValue(50)
 anExtrusionFt.real("from_size").setValue(50)
-anExtrusionFt.real("to_offset").setValue(0) #TODO: remove
-anExtrusionFt.real("from_offset").setValue(0) #TODO: remove
 anExtrusionFt.execute()
 aSession.finishOperation()
 anExtrusionBody = modelAPI_ResultBody(anExtrusionFt.firstResult())
@@ -206,26 +198,17 @@ aSession.finishOperation()
 # Make extrusion on circle
 #=========================================================================
 # Build shape from sketcher results
-aCircleSketchResult = aCircleSketchFeature.firstResult()
-aCircleSketchEdges = modelAPI_ResultConstruction(aCircleSketchResult).shape()
-origin = geomDataAPI_Point(aCircleSketchFeature.attribute("Origin")).pnt()
-dirX = geomDataAPI_Dir(aCircleSketchFeature.attribute("DirX")).dir()
-norm = geomDataAPI_Dir(aCircleSketchFeature.attribute("Norm")).dir()
-aCircleSketchFaces = ShapeList()
-GeomAlgoAPI_SketchBuilder.createFaces(origin, dirX, norm, aCircleSketchEdges, aCircleSketchFaces)
-assert(len(aCircleSketchFaces) > 0)
-assert(aCircleSketchFaces[0] is not None)
+aCircleSketchResult = modelAPI_ResultConstruction(aCircleSketchFeature.firstResult())
+assert(aCircleSketchResult.numFaces() > 0)
 # Create extrusion
 aSession.startOperation()
 anExtrusionFt = aPart.addFeature("Extrusion")
 assert (anExtrusionFt.getKind() == "Extrusion")
 # selection type FACE=4
-anExtrusionFt.selectionList("base").append(aCircleSketchResult, aCircleSketchFaces[0])
+anExtrusionFt.selectionList("base").append(aCircleSketchResult, aCircleSketchResult.face(0))
 anExtrusionFt.string("CreationMethod").setValue("BySizes")
 anExtrusionFt.real("to_size").setValue(50)
 anExtrusionFt.real("from_size").setValue(50)
-anExtrusionFt.real("to_offset").setValue(0) #TODO: remove
-anExtrusionFt.real("from_offset").setValue(0) #TODO: remove
 anExtrusionFt.execute()
 aSession.finishOperation()
 aCylinderBody = modelAPI_ResultBody(anExtrusionFt.firstResult())

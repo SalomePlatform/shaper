@@ -401,6 +401,7 @@ class Model_Document : public ModelAPI_Document
   friend class Model_ResultBody;
   friend class Model_ResultConstruction;
   friend class Model_SelectionNaming;
+  friend class Model_BodyBuilder;
   friend class DFBrowser;
 
  private:

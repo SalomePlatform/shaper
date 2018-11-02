@@ -55,15 +55,20 @@ class Selector_Selector
   TDF_LabelList myBases; ///< initial labels that contain shapes that produce the modification
   int myWeakIndex; ///< index of the shape among commons for the modification type (-1 - not set)
 
-  std::list<int> myNBLevel; ///< list of integers corresponding to subsellist neighborhood level
+  std::list<int> myNBLevel; ///< list of integers corresponding to mySubSelList neighborhood level
 
   TDF_Label myLab; ///< main label where selector is performed
+
+  TDF_Label myBaseDocumentLab; ///< an access-label to the document that may contain initial shapes
 
  public:
   /// Initializes selector on the label
    SELECTOR_EXPORT Selector_Selector(TDF_Label theLab);
   /// Returns label of this selector
    SELECTOR_EXPORT TDF_Label label();
+
+   /// Sets the base document access label.
+   SELECTOR_EXPORT void setBaseDocument(const TDF_Label theAccess);
 
   /// Initializes the selector structure on the label.
   /// Stores the name data to restore after modification.
@@ -94,7 +99,7 @@ class Selector_Selector
 
 private:
 
-  /// Create and keep in the list the sub-sulector that select the given value.
+  /// Create and keep in the list the sub-selector that select the given value.
   /// Returns true if selection is correct.
   bool selectBySubSelector(const TopoDS_Shape theContext, const TopoDS_Shape theValue,
     const bool theUseNeighbors = true, const bool theUseIntersections = true);

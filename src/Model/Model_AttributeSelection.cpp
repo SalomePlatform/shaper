@@ -90,14 +90,6 @@ Standard_GUID kCIRCLE_CENTER("d0d0e0f1-217a-4b95-8fbb-0c4132f23718");
 Standard_GUID kELLIPSE_CENTER1("f70df04c-3168-4dc9-87a4-f1f840c1275d");
 // identifier of the selection of the second focus point of ellipse on edge
 Standard_GUID kELLIPSE_CENTER2("1395ae73-8e02-4cf8-b204-06ff35873a32");
-// reference to the external sketch face
-Standard_GUID kEXT_SKETCH_FACE("ba32aa31-bde7-422f-80b4-79c757c77b49");
-// reference to the external sketch wire
-Standard_GUID kEXT_SKETCH_WIRE("ba32aa31-bde7-422f-80b4-79c757c77b46");
-// reference to the external sketch edge
-Standard_GUID kEXT_SKETCH_EDGE("ba32aa31-bde7-422f-80b4-79c757c77b48");
-// reference to the external sketch vertex
-Standard_GUID kEXT_SKETCH_VERT("ba32aa31-bde7-422f-80b4-79c757c77b47");
 
 // prefix for the whole feature context identification
 const static std::string kWHOLE_FEATURE = "all-in-";
@@ -144,10 +136,6 @@ bool Model_AttributeSelection::setValue(const ObjectPtr& theContext,
   aSelLab.ForgetAttribute(kCIRCLE_CENTER);
   aSelLab.ForgetAttribute(kELLIPSE_CENTER1);
   aSelLab.ForgetAttribute(kELLIPSE_CENTER2);
-  aSelLab.ForgetAttribute(kEXT_SKETCH_FACE);
-  aSelLab.ForgetAttribute(kEXT_SKETCH_WIRE);
-  aSelLab.ForgetAttribute(kEXT_SKETCH_EDGE);
-  aSelLab.ForgetAttribute(kEXT_SKETCH_VERT);
 
   bool isDegeneratedEdge = false;
   // do not use the degenerated edge as a shape, a null context and shape is used in the case
@@ -388,53 +376,6 @@ std::shared_ptr<GeomAPI_Shape> Model_AttributeSelection::internalValue(CenterTyp
     if (aConstr) {
       if (aConstr->isInfinite())
         return aResult; // empty result
-      // external sketch face
-      Handle(TDataStd_Integer) anIndex;
-      if (aSelLab.FindAttribute(kEXT_SKETCH_FACE, anIndex)) {
-        return aConstr->face(anIndex->Get());
-      }
-      if (aSelLab.FindAttribute(kEXT_SKETCH_WIRE, anIndex)) {
-        GeomShapePtr aFace = aConstr->face(anIndex->Get());
-        if (aFace.get()) {
-          GeomAPI_ShapeExplorer aFaceExp(aFace, GeomAPI_Shape::WIRE);
-          if (aFaceExp.more()) {
-            return aFaceExp.current();
-          }
-        }
-      }
-      if (aSelLab.FindAttribute(kEXT_SKETCH_EDGE, anIndex) ||
-          aSelLab.FindAttribute(kEXT_SKETCH_VERT, anIndex)) {
-        bool isVert = anIndex->ID() == kEXT_SKETCH_VERT; // vertex is selected
-        CompositeFeaturePtr aComposite = std::dynamic_pointer_cast<ModelAPI_CompositeFeature>(
-          aConstr->document()->feature(aConstr));
-        if (aComposite.get()) {
-          int aSubNum = anIndex->Get() % 1000000;
-          int aVertShape = (anIndex->Get() - aSubNum) / 1000000;
-          FeaturePtr aSubFeat = aComposite->subFeature(aSubNum);
-          if (aSubFeat.get()) {
-            const std::list<std::shared_ptr<ModelAPI_Result> >& aResults = aSubFeat->results();
-            std::list<std::shared_ptr<ModelAPI_Result> >::const_iterator aRes = aResults.cbegin();
-            for (; aRes != aResults.cend(); aRes++) {
-              ResultConstructionPtr aConstr =
-                std::dynamic_pointer_cast<ModelAPI_ResultConstruction>(*aRes);
-              if (aConstr->shape()) {
-                if (!isVert && aConstr->shape()->isEdge())
-                  return aConstr->shape();
-                else if (isVert && aVertShape == 0 && aConstr->shape()->isVertex())
-                  return aConstr->shape();
-                else if (isVert && aVertShape > 1 && aConstr->shape()->isEdge()) {
-                  GeomAPI_ShapeExplorer anExp(aConstr->shape(), GeomAPI_Shape::VERTEX);
-                  for(; anExp.more(); anExp.next()) {
-                    if (aVertShape == 1)
-                      return anExp.current();
-                    aVertShape--;
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
     }
     if (!aConstr.get()) { // for construction context, return empty result as usual even
       // the whole feature is selected
@@ -643,6 +584,10 @@ bool Model_AttributeSelection::update()
       anOldShape = aNS->Get();
 
     Selector_Selector aSelector(aSelLab);
+    if (ModelAPI_Session::get()->moduleDocument() != owner()->document()) {
+      aSelector.setBaseDocument(std::dynamic_pointer_cast<Model_Document>
+        (ModelAPI_Session::get()->moduleDocument())->extConstructionsLabel());
+    }
     if (aSelector.restore()) { // it is stored in old OCCT format, use TNaming_Selector
       TopoDS_Shape aContextShape = aContext->shape()->impl<TopoDS_Shape>();
       aResult = aSelector.solve(aContextShape);
@@ -671,23 +616,12 @@ bool Model_AttributeSelection::update()
     std::shared_ptr<Model_ResultConstruction> aConstructionContext =
       std::dynamic_pointer_cast<Model_ResultConstruction>(aContext);
     if (!aConstructionContext->isInfinite()) {
-      // external sketch face
-      Handle(TDataStd_Integer) anIndex;
-      if (aSelLab.FindAttribute(kEXT_SKETCH_FACE, anIndex) ||
-          aSelLab.FindAttribute(kEXT_SKETCH_WIRE, anIndex)) {
-        return setInvalidIfFalse(aSelLab, anIndex->Get() < aConstructionContext->facesNum());
-      }
-      if (aSelLab.FindAttribute(kEXT_SKETCH_EDGE, anIndex) ||
-          aSelLab.FindAttribute(kEXT_SKETCH_VERT, anIndex)) {
-        CompositeFeaturePtr aComposite = std::dynamic_pointer_cast<ModelAPI_CompositeFeature>(
-          aConstructionContext->document()->feature(aConstructionContext));
-        if (aComposite.get()) {
-          FeaturePtr aSubFeat = aComposite->subFeature(anIndex->Get() % 1000000);
-          return setInvalidIfFalse(aSelLab, aSubFeat.get() != NULL);
-        }
-        return setInvalidIfFalse(aSelLab, false); // composite sub-feature is not found
-      }
       Selector_Selector aSelector(aSelLab);
+      if (ModelAPI_Session::get()->moduleDocument() != owner()->document()) {
+        aSelector.setBaseDocument(std::dynamic_pointer_cast<Model_Document>
+          (ModelAPI_Session::get()->moduleDocument())->extConstructionsLabel());
+      }
+
       aResult = aSelector.restore();
       TopoDS_Shape anOldShape = aSelector.value();
       if (aResult) {
@@ -728,88 +662,13 @@ void Model_AttributeSelection::selectBody(
   if (!aContext.IsNull()) {
     TDF_Label aSelLab = selectionLabel();
     TopoDS_Shape aNewSub = theSubShape->impl<TopoDS_Shape>();
-    FeaturePtr aFeatureOwner = std::dynamic_pointer_cast<ModelAPI_Feature>(owner());
-    if (aFeatureOwner->document() != theContext->document() &&
-        theContext->groupName() == ModelAPI_ResultConstruction::group()) {// condition for parts
-      // reference to the sketch face
-      if (theSubShape->shapeType() == GeomAPI_Shape::FACE ||
-          theSubShape->shapeType() == GeomAPI_Shape::WIRE) { // sketch face or sketch face wire
-        ResultConstructionPtr aConstr =
-          std::dynamic_pointer_cast<ModelAPI_ResultConstruction>(theContext);
-        int aFaceIndex = -1, aFacesNum = aConstr->facesNum();
-        for(int a = 0; a < aFacesNum; a++) {
-          bool isEqual = false;
-          GeomShapePtr aFace = aConstr->face(a);
-          if (!aFace.get() || aFace->isNull())
-            continue;
-          if (theSubShape->shapeType() == GeomAPI_Shape::FACE) {
-            isEqual = aFace->isEqual(theSubShape);
-          } else {
-            GeomAPI_ShapeExplorer anExp(aFace, GeomAPI_Shape::WIRE);
-            if (anExp.more())
-              isEqual = anExp.current()->isEqual(theSubShape);
-          }
-          if (isEqual) {
-            aFaceIndex = a;
-            break;
-          }
-        }
-        if (aFaceIndex >= 0) {
-          TDataStd_Integer::Set(aSelLab, theSubShape->shapeType() == GeomAPI_Shape::FACE ?
-            kEXT_SKETCH_FACE : kEXT_SKETCH_WIRE, aFaceIndex); // store index of the face
-          return;
-        }
-      } else if (theSubShape->shapeType() == GeomAPI_Shape::EDGE ||// sketch result edge (full one)
-                 theSubShape->shapeType() == GeomAPI_Shape::VERTEX) { // or start/end vertex
-        bool isVertex = theSubShape->shapeType() == GeomAPI_Shape::VERTEX;
-        CompositeFeaturePtr aComposite = std::dynamic_pointer_cast<ModelAPI_CompositeFeature>(
-          theContext->document()->feature(theContext));
-        if (aComposite.get()) { // iterate edges of composite to find index of matched with value
-          int aSub, anEdgeIndex = -1, aSubNum = aComposite->numberOfSubs();
-          int aVertIndex = -1, aVertShape = -1; // shape: 0 full, 1 start, 2 end
-          for(aSub = 0; aSub < aSubNum && anEdgeIndex == -1; aSub++) {
-            FeaturePtr aSubFeat = aComposite->subFeature(aSub);
-            const std::list<std::shared_ptr<ModelAPI_Result> >& aResults = aSubFeat->results();
-            std::list<std::shared_ptr<ModelAPI_Result> >::const_iterator aRes = aResults.cbegin();
-            for (; aRes != aResults.cend(); aRes++) {
-              ResultConstructionPtr aConstr =
-                std::dynamic_pointer_cast<ModelAPI_ResultConstruction>(*aRes);
-              if (aConstr->shape() && aConstr->shape()->isEdge()) {
-                if (isVertex) {
-                  GeomAPI_ShapeExplorer aVertExp(aConstr->shape(), GeomAPI_Shape::VERTEX);
-                  for(int aNum = 1; aVertExp.more(); aVertExp.next(), aNum++) {
-                    if (aVertExp.current()->isSame(theSubShape) && aVertShape != 0) {
-                      aVertIndex = aSub;
-                      aVertShape = aNum;
-                    }
-                  }
-                } else {
-                  if (aConstr->shape()->isSame(theSubShape)) {
-                    anEdgeIndex = aSub;
-                    break;
-                  }
-                }
-              } else if (isVertex && aConstr->shape() && aConstr->shape()->isVertex()) {
-                if (aConstr->shape()->isSame(theSubShape)) {
-                  aVertIndex = aSub;
-                  aVertShape = 0;
-                }
-              }
-            }
-          }
-          if (anEdgeIndex >= 0) {
-            TDataStd_Integer::Set(aSelLab, kEXT_SKETCH_EDGE, anEdgeIndex); // store index of edge
-            return;
-          } else if (aVertIndex >= 0) {
-            aVertIndex += aVertShape * 1000000; // to store both integers: index and shape
-            TDataStd_Integer::Set(aSelLab, kEXT_SKETCH_VERT, aVertIndex); // store index of edge
-            return;
-          }
-        }
-      }
-    }
+
     bool aSelectorOk = true;
     Selector_Selector aSel(aSelLab);
+    if (ModelAPI_Session::get()->moduleDocument() != owner()->document()) {
+      aSel.setBaseDocument(std::dynamic_pointer_cast<Model_Document>
+        (ModelAPI_Session::get()->moduleDocument())->extConstructionsLabel());
+    }
     try {
       aSelectorOk = aSel.select(aContext, aNewSub);
       if (aSelectorOk) {
@@ -932,36 +791,17 @@ std::string Model_AttributeSelection::namingName(const std::string& theDefaultNa
     ResultConstructionPtr aConstr = std::dynamic_pointer_cast<Model_ResultConstruction>(aCont);
     if (aConstr->isInfinite()) {
       return contextName(aCont);
-    } else {
-      // external sketch face
-      Handle(TDataStd_Integer) anIndex;
-      if (aSelLab.FindAttribute(kEXT_SKETCH_FACE, anIndex) ||
-          aSelLab.FindAttribute(kEXT_SKETCH_WIRE, anIndex) ||
-          aSelLab.FindAttribute(kEXT_SKETCH_EDGE, anIndex) ||
-          aSelLab.FindAttribute(kEXT_SKETCH_VERT, anIndex)) {
-        std::shared_ptr<Model_Document> anExtDoc =
-          std::dynamic_pointer_cast<Model_Document>(aCont->document());
-        Selector_Selector aSelector(anExtDoc->extConstructionsLabel());
-        TopoDS_Shape aContShape = aConstr->shape()->impl<TopoDS_Shape>();
-        TopoDS_Shape aValShape = value()->impl<TopoDS_Shape>();
-        aSelector.select(aContShape, aValShape);
-        myRestoreDocument = anExtDoc;
-        std::string aName = anExtDoc->kind() + "/" + aSelector.name(this);
-        myRestoreDocument.reset();
-        return aName;
-      }
     }
   }
 
   Selector_Selector aSelector(aSelLab);
+  if (ModelAPI_Session::get()->moduleDocument() != owner()->document()) {
+    aSelector.setBaseDocument(std::dynamic_pointer_cast<Model_Document>
+      (ModelAPI_Session::get()->moduleDocument())->extConstructionsLabel());
+  }
   std::string aResult;
   if (aSelector.restore())
     aResult = aSelector.name(this);
-  /*
-  Model_SelectionNaming aSelNaming(aSelLab);
-  std::string aResult = aSelNaming.namingName(
-    aCont, aSubSh, theDefaultName, owner()->document() != aCont->document());
-    */
   if (aCenterType != NOT_CENTER) {
     aResult += centersMap()[aCenterType];
   }
@@ -1067,6 +907,10 @@ void Model_AttributeSelection::selectSubShape(
     }
 
     Selector_Selector aSelector(aDoc->generalLabel());
+    if (ModelAPI_Session::get()->moduleDocument() != owner()->document()) {
+      aSelector.setBaseDocument(std::dynamic_pointer_cast<Model_Document>
+        (ModelAPI_Session::get()->moduleDocument())->extConstructionsLabel());
+    }
     myRestoreDocument = aDoc;
     TDF_Label aContextLabel = aSelector.restoreByName(aSubShapeName, aShapeType, this);
     myRestoreDocument.reset();
@@ -1612,6 +1456,12 @@ std::string Model_AttributeSelection::contextName(const TDF_Label theSelectionLa
   std::shared_ptr<Model_Document> aDoc = myRestoreDocument.get() ? myRestoreDocument :
     std::dynamic_pointer_cast<Model_Document>(owner()->document());
   FeaturePtr aFeatureOwner = aDoc->featureByLab(theSelectionLab);
+  bool aBaseDocumnetUsed = false;
+  if (!aFeatureOwner.get()) { // use module document
+    aDoc = std::dynamic_pointer_cast<Model_Document>(ModelAPI_Session::get()->moduleDocument());
+    aFeatureOwner = aDoc->featureByLab(theSelectionLab);
+    aBaseDocumnetUsed = true;
+  }
   if (aFeatureOwner.get()) {
     // if it is sub-element of the sketch, the context name is the name of the sketch
     // searching also for result - real context
@@ -1638,6 +1488,8 @@ std::string Model_AttributeSelection::contextName(const TDF_Label theSelectionLa
         aContextName = "_" + aContextName;
         aNumInHistoryNames--;
       }
+      if (aBaseDocumnetUsed)
+        aContextName = aDoc->kind() + "/" + aContextName;
       return aContextName;
     }
   }
@@ -1664,8 +1516,22 @@ bool Model_AttributeSelection::restoreContext(std::string theName,
   if (aName.empty()) return false;
   bool anUniqueContext = false;
   ResultPtr aCont = aDoc->findByName(aName, aSubShapeName, anUniqueContext);
-  if (!aCont.get() || !aCont->shape().get() || aCont->shape()->isNull())
-    return false;
+  if (!aCont.get() || !aCont->shape().get() || aCont->shape()->isNull()) {
+    // name in PartSet?
+    aDoc = std::dynamic_pointer_cast<Model_Document>(
+      ModelAPI_Session::get()->moduleDocument());
+    if (theName.find(aDoc->kind()) == 0) { // remove the document identifier from name if exists
+      aSubShapeName = theName.substr(aDoc->kind().size() + 1);
+      aName = aSubShapeName;
+      std::string::size_type n = aName.find('/');
+      if (n != std::string::npos) {
+        aName = aName.substr(0, n);
+      }
+    }
+    aCont = aDoc->findByName(aName, aSubShapeName, anUniqueContext);
+    if (!aCont.get() || !aCont->shape().get() || aCont->shape()->isNull())
+      return false;
+  }
 
   // searching the sub-shape
   static const ResultPtr anEmpty;

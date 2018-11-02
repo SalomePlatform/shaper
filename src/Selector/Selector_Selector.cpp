@@ -66,11 +66,18 @@ TDF_Label Selector_Selector::label()
   return myLab;
 }
 
-// adds to theResult all labels that contain initial shapes for theValue located in theFinal
-static void findBases(Handle(TNaming_NamedShape) theFinal, const TopoDS_Shape& theValue,
-  bool aMustBeAtFinal, TDF_LabelList& theResult)
+void Selector_Selector::setBaseDocument(const TDF_Label theAccess)
 {
-  TNaming_SameShapeIterator aLabIter(theValue, theFinal->Label());
+  myBaseDocumentLab = theAccess;
+}
+
+// adds to theResult all labels that contain initial shapes for theValue located in theFinal
+static void findBases(TDF_Label theAccess, Handle(TNaming_NamedShape) theFinal,
+  const TopoDS_Shape& theValue,
+  bool aMustBeAtFinal, const TDF_Label& theAdditionalDocument, TDF_LabelList& theResult)
+{
+  bool aFoundAnyShape = false;
+  TNaming_SameShapeIterator aLabIter(theValue, theAccess);
   for(; aLabIter.More(); aLabIter.Next()) {
     Handle(TNaming_NamedShape) aNS;
     if (aLabIter.Label().FindAttribute(TNaming_NamedShape::GetID(), aNS)) {
@@ -87,16 +94,25 @@ static void findBases(Handle(TNaming_NamedShape) theFinal, const TopoDS_Shape& t
         }
         if (!aResIter.More()) // not found, so add this new
           theResult.Append(aResult);
+        aFoundAnyShape = true;
       }
       if (anEvolution == TNaming_GENERATED || anEvolution == TNaming_MODIFY) {
         for(TNaming_Iterator aThisIter(aNS); aThisIter.More(); aThisIter.Next()) {
           if (aThisIter.NewShape().IsSame(theValue)) {
             // continue recursively, null NS means that any NS are ok
-            findBases(theFinal, aThisIter.OldShape(), false, theResult);
+            findBases(theAccess, theFinal, aThisIter.OldShape(),
+              false, theAdditionalDocument, theResult);
+            aFoundAnyShape = true;
           }
         }
       }
     }
+  }
+  if (!aFoundAnyShape && !theAdditionalDocument.IsNull()) { // try to find in additional document
+    static TDF_Label anEmpty;
+    if (TNaming_Tool::HasLabel(theAdditionalDocument, theValue))
+      findBases(theAdditionalDocument, Handle(TNaming_NamedShape)(), theValue,
+        false, anEmpty, theResult);
   }
 }
 
@@ -269,6 +285,23 @@ bool Selector_Selector::select(const TopoDS_Shape theContext, const TopoDS_Shape
       }
     }
   }
+  // searching in the base document
+  if (!aIsFound && !myBaseDocumentLab.IsNull() &&
+      TNaming_Tool::HasLabel(myBaseDocumentLab, theValue))
+  {
+    TNaming_SameShapeIterator aShapes(theValue, myBaseDocumentLab);
+    for(; aShapes.More(); aShapes.Next())
+    {
+      Handle(TNaming_NamedShape) aNS;
+      if (aShapes.Label().FindAttribute(TNaming_NamedShape::GetID(), aNS)) {
+        if (aNS->Evolution() == TNaming_MODIFY || aNS->Evolution() == TNaming_GENERATED ||
+          aNS->Evolution() == TNaming_PRIMITIVE) {
+          aIsFound = true;
+          break;
+        }
+      }
+    }
+  }
   if (!aIsFound) {
     TopAbs_ShapeEnum aSelectionType = theValue.ShapeType();
     myShapeType = aSelectionType;
@@ -352,6 +385,7 @@ bool Selector_Selector::select(const TopoDS_Shape theContext, const TopoDS_Shape
           TopoDS_Shape aNewNBShape = anOrder.Current();
           // check which can be named correctly, without "by neighbors" type
           Selector_Selector aSelector(myLab.FindChild(1));
+          aSelector.setBaseDocument(myBaseDocumentLab);
           if (aSelector.select(theContext, aNewNBShape, false, false)) { // add to list of good NBs
             aNBs.push_back(std::pair<TopoDS_Shape, int>(aNewNBShape, aLevel));
           }
@@ -430,22 +464,27 @@ bool Selector_Selector::select(const TopoDS_Shape theContext, const TopoDS_Shape
   // searching for the base shapes of the value
   Handle(TNaming_NamedShape) aPrimitiveNS;
   NCollection_List<Handle(TNaming_NamedShape)> aModifList;
-  for(TNaming_SameShapeIterator aShapes(theValue, myLab); aShapes.More(); aShapes.Next())
-  {
-    Handle(TNaming_NamedShape) aNS;
-    if (aShapes.Label().FindAttribute(TNaming_NamedShape::GetID(), aNS)) {
-      TNaming_Evolution anEvolution = aNS->Evolution();
-      if (anEvolution == TNaming_PRIMITIVE) { // the value shape is declared as PRIMITIVE
-        aPrimitiveNS = aNS;
-        break;
-      } else if (anEvolution == TNaming_GENERATED || anEvolution == TNaming_MODIFY) {
-        // check this is a new shape
-        TNaming_Iterator aNSIter(aNS);
-        for(; aNSIter.More(); aNSIter.Next())
-          if (aNSIter.NewShape().IsSame(theValue))
-            break;
-        if (aNSIter.More()) // new was found
-          aModifList.Append(aNS);
+  for(int aUseExternal = 0; aUseExternal < 2; aUseExternal++) {
+    TDF_Label aLab = aUseExternal == 0 ? myLab : myBaseDocumentLab;
+    if (aLab.IsNull() || !TNaming_Tool::HasLabel(aLab, theValue))
+      continue;
+    for(TNaming_SameShapeIterator aShapes(theValue, aLab); aShapes.More(); aShapes.Next())
+    {
+      Handle(TNaming_NamedShape) aNS;
+      if (aShapes.Label().FindAttribute(TNaming_NamedShape::GetID(), aNS)) {
+        TNaming_Evolution anEvolution = aNS->Evolution();
+        if (anEvolution == TNaming_PRIMITIVE) { // the value shape is declared as PRIMITIVE
+          aPrimitiveNS = aNS;
+          break;
+        } else if (anEvolution == TNaming_GENERATED || anEvolution == TNaming_MODIFY) {
+          // check this is a new shape
+          TNaming_Iterator aNSIter(aNS);
+          for(; aNSIter.More(); aNSIter.Next())
+            if (aNSIter.NewShape().IsSame(theValue))
+              break;
+          if (aNSIter.More()) // new was found
+            aModifList.Append(aNS);
+        }
       }
     }
   }
@@ -479,7 +518,7 @@ bool Selector_Selector::select(const TopoDS_Shape theContext, const TopoDS_Shape
 
   if (!aModifList.IsEmpty()) {
     // searching for all the base shapes of this modification
-    findBases(aModifList.First(), theValue, true, myBases);
+    findBases(myLab, aModifList.First(), theValue, true, myBaseDocumentLab, myBases);
     if (!myBases.IsEmpty()) {
       myFinal = aModifList.First()->Label();
       TopoDS_ListOfShape aCommon;
@@ -504,6 +543,8 @@ bool Selector_Selector::select(const TopoDS_Shape theContext, const TopoDS_Shape
               TopoDS_Shape aNewNBShape = anOrder.Current();
               // check which can be named correctly, without "by neighbors" type
               Selector_Selector aSelector(myLab.FindChild(1));
+              if (!myBaseDocumentLab.IsNull())
+                aSelector.setBaseDocument(myBaseDocumentLab);
               if (aSelector.select(theContext, aNewNBShape, false)) {// add to list of good NBs
                 aNBs.push_back(std::pair<TopoDS_Shape, int>(aNewNBShape, aLevel));
               }
@@ -645,6 +686,7 @@ bool Selector_Selector::restore()
     mySubSelList.clear();
     for(TDF_ChildIDIterator aSub(myLab, kSEL_TYPE, false); aSub.More(); aSub.Next()) {
       mySubSelList.push_back(Selector_Selector(aSub.Value()->Label()));
+      mySubSelList.back().setBaseDocument(myBaseDocumentLab);
       if (!mySubSelList.back().restore())
         aSubResult = false;
     }
@@ -688,6 +730,7 @@ bool Selector_Selector::restore()
     mySubSelList.clear();
     for(TDF_ChildIDIterator aSub(myLab, kSEL_TYPE, false); aSub.More(); aSub.Next()) {
       mySubSelList.push_back(Selector_Selector(aSub.Value()->Label()));
+      mySubSelList.back().setBaseDocument(myBaseDocumentLab);
       if (!mySubSelList.back().restore())
         aSubResult = false;
     }
@@ -722,26 +765,39 @@ bool Selector_Selector::restore()
 }
 
 /// Returns in theResults all shapes with history started in theBase and ended in theFinal
-static void findFinals(const TopoDS_Shape& theBase, const TDF_Label& theFinal,
-  TopTools_MapOfShape& theResults)
+static void findFinals(const TDF_Label& anAccess, const TopoDS_Shape& theBase,
+  const TDF_Label& theFinal,
+  const TDF_Label& theAdditionalDoc, TopTools_MapOfShape& theResults)
 {
-  for(TNaming_NewShapeIterator aBaseIter(theBase, theFinal); aBaseIter.More(); aBaseIter.Next()) {
-    TNaming_Evolution anEvolution = aBaseIter.NamedShape()->Evolution();
-    if (anEvolution == TNaming_GENERATED || anEvolution == TNaming_MODIFY) {
-      if (aBaseIter.NamedShape()->Label().IsEqual(theFinal)) {
-        theResults.Add(aBaseIter.Shape());
-      } else {
-        findFinals(aBaseIter.Shape(), theFinal, theResults);
+  if (TNaming_Tool::HasLabel(anAccess, theBase)) {
+    for(TNaming_NewShapeIterator aBaseIter(theBase, anAccess); aBaseIter.More(); aBaseIter.Next())
+    {
+      TNaming_Evolution anEvolution = aBaseIter.NamedShape()->Evolution();
+      if (anEvolution == TNaming_GENERATED || anEvolution == TNaming_MODIFY) {
+        if (aBaseIter.NamedShape()->Label().IsEqual(theFinal)) {
+          theResults.Add(aBaseIter.Shape());
+        } else {
+          findFinals(anAccess, aBaseIter.Shape(), theFinal, theAdditionalDoc, theResults);
+        }
       }
     }
+  }
+  if (!theAdditionalDoc.IsNull()) { // search additionally by the additional access label
+    static TDF_Label anEmpty;
+    findFinals(theAdditionalDoc, theBase, theFinal, anEmpty, theResults);
   }
 }
 
 void Selector_Selector::findModificationResult(TopoDS_ListOfShape& theCommon) {
   for(TDF_LabelList::Iterator aBase(myBases); aBase.More(); aBase.Next()) {
+    TDF_Label anAdditionalDoc; // this document if base is started in extra document
+    if (aBase.Value().Root() != myLab.Root()) {
+      anAdditionalDoc = myLab;
+    }
     TopTools_MapOfShape aFinals;
-    for(TNaming_Iterator aBaseShape(aBase.Value()); aBaseShape.More(); aBaseShape.Next())
-      findFinals(aBaseShape.NewShape(), myFinal, aFinals);
+    for(TNaming_Iterator aBaseShape(aBase.Value()); aBaseShape.More(); aBaseShape.Next()) {
+      findFinals(aBase.Value(), aBaseShape.NewShape(), myFinal, anAdditionalDoc, aFinals);
+    }
     if (!aFinals.IsEmpty()) {
       if (theCommon.IsEmpty()) { // just copy all to common
         for(TopTools_MapOfShape::Iterator aFinal(aFinals); aFinal.More(); aFinal.Next()) {
@@ -1051,6 +1107,7 @@ TDF_Label Selector_Selector::restoreByName(
           }
         }
         mySubSelList.push_back(Selector_Selector(myLab.FindChild(int(mySubSelList.size()) + 1)));
+        mySubSelList.back().setBaseDocument(myBaseDocumentLab);
         TDF_Label aSubContext =
           mySubSelList.back().restoreByName(aSubStr, aSubShapeType, theNameGenerator);
         if (aSubContext.IsNull())
@@ -1074,6 +1131,7 @@ TDF_Label Selector_Selector::restoreByName(
       if (anEndPos != std::string::npos) {
         std::string aSubStr = theName.substr(aStart + 1, anEndPos - aStart - 1);
         mySubSelList.push_back(Selector_Selector(myLab.FindChild(int(mySubSelList.size()) + 1)));
+        mySubSelList.back().setBaseDocument(myBaseDocumentLab);
         TDF_Label aSubContext =
           mySubSelList.back().restoreByName(aSubStr, theShapeType, theNameGenerator);
         if (aSubContext.IsNull())
@@ -1161,6 +1219,8 @@ bool Selector_Selector::selectBySubSelector(
   const bool theUseNeighbors, const bool theUseIntersections)
 {
   mySubSelList.push_back(Selector_Selector(myLab.FindChild(int(mySubSelList.size()) + 1)));
+  if (!myBaseDocumentLab.IsNull())
+    mySubSelList.back().setBaseDocument(myBaseDocumentLab);
   if (!mySubSelList.back().select(theContext, theValue, theUseNeighbors, theUseIntersections)) {
     mySubSelList.clear(); // if one of the selector is failed, all become invalid
     return false;

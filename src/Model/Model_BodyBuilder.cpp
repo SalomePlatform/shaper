@@ -22,6 +22,7 @@
 
 #include <Model_Data.h>
 #include <Model_Document.h>
+#include <ModelAPI_Session.h>
 #include <TNaming_Builder.hxx>
 #include <TNaming_NamedShape.hxx>
 #include <TNaming_Iterator.hxx>
@@ -466,7 +467,7 @@ static void keepTopLevelShapes(ListOfShape& theShapes,
   }
 }
 
-// returns an ancestor shape-type thaty used for naming-definition of the sub-type
+// returns an ancestor shape-type that used for naming-definition of the sub-type
 TopAbs_ShapeEnum typeOfAncestor(const TopAbs_ShapeEnum theSubType) {
   if (theSubType == TopAbs_VERTEX)
     return TopAbs_EDGE;
@@ -502,8 +503,12 @@ void Model_BodyBuilder::loadModifiedShapes(const GeomMakeShapePtr& theAlgo,
     // There is no sense to write history if shape already processed
     // or old shape does not exist in the document.
     bool anOldSubShapeAlreadyProcessed = !anAlreadyProcessedShapes.Add(anOldSubShape_);
-    bool anOldSubShapeNotInTree = TNaming_Tool::NamedShape(anOldSubShape_, aData->shapeLab())
-                                  .IsNull();
+    bool anOldSubShapeNotInTree = !TNaming_Tool::HasLabel(aData->shapeLab(), anOldSubShape_);
+    if (anOldSubShapeNotInTree) {// check this is in the module document
+      TDF_Label anAccess = std::dynamic_pointer_cast<Model_Document>(
+        ModelAPI_Session::get()->moduleDocument())->generalLabel();
+      anOldSubShapeNotInTree = !TNaming_Tool::HasLabel(anAccess, anOldSubShape_);
+    }
     if (anOldSubShapeAlreadyProcessed
         || anOldSubShapeNotInTree)
     {
@@ -586,8 +591,12 @@ void Model_BodyBuilder::loadGeneratedShapes(const GeomMakeShapePtr& theAlgo,
     // There is no sense to write history if shape already processed
     // or old shape does not exist in the document.
     bool anOldSubShapeAlreadyProcessed = !anAlreadyProcessedShapes.Add(anOldSubShape_);
-    bool anOldSubShapeNotInTree = TNaming_Tool::NamedShape(anOldSubShape_, aData->shapeLab())
-                                  .IsNull();
+    bool anOldSubShapeNotInTree = !TNaming_Tool::HasLabel(aData->shapeLab(), anOldSubShape_);
+    if (anOldSubShapeNotInTree) {// check this is in the module document
+      TDF_Label anAccess = std::dynamic_pointer_cast<Model_Document>(
+        ModelAPI_Session::get()->moduleDocument())->generalLabel();
+      anOldSubShapeNotInTree = !TNaming_Tool::HasLabel(anAccess, anOldSubShape_);
+    }
     if (anOldSubShapeAlreadyProcessed
         || anOldSubShapeNotInTree)
     {
@@ -910,7 +919,7 @@ void Model_BodyBuilder::loadDisconnectedEdges(GeomShapePtr theShape, const std::
         if(anEdgesToDelete.Contains(anEdge2)) continue;
         if (anEdge1.IsSame(anEdge2)) continue;
         const TopTools_ListOfShape& aList2 = itr.Value();
-        // compare lists of the neighbour faces of edge1 and edge2
+        // compare lists of the neighbor faces of edge1 and edge2
         if (aList1.Extent() == aList2.Extent()) {
           Standard_Integer aMatches = 0;
           for(TopTools_ListIteratorOfListOfShape aLIter1(aList1);aLIter1.More();aLIter1.Next())

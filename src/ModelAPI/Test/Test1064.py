@@ -71,14 +71,10 @@ aPart = aSession.activeDocument()
 #=========================================================================
 # Make extrusion on triangle
 #=========================================================================
-aSketchResult = aSketchFeature.firstResult()
-aSketchEdges = modelAPI_ResultConstruction(aSketchResult).shape()
-aSketchFaces = ShapeList()
-GeomAlgoAPI_SketchBuilder.createFaces(
-    origin.pnt(), dirx.dir(), norm.dir(), aSketchEdges, aSketchFaces)
+aSketchResult = modelAPI_ResultConstruction(aSketchFeature.firstResult())
 aSession.startOperation()
 anExtrusionFt = aPart.addFeature("Extrusion")
-anExtrusionFt.selectionList("base").append(aSketchResult, aSketchFaces[0])
+anExtrusionFt.selectionList("base").append(aSketchResult, aSketchResult.face(0))
 anExtrusionFt.string("CreationMethod").setValue("BySizes")
 anExtrusionFt.real("to_size").setValue(50)
 anExtrusionFt.real("from_size").setValue(0)
