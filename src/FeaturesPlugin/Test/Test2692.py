@@ -28,3 +28,5 @@ model.testNbSubShapes(ExtrusionCut_1, GeomAPI_Shape.FACE, [21])
 model.testNbSubShapes(ExtrusionCut_1, GeomAPI_Shape.EDGE, [90])
 model.testNbSubShapes(ExtrusionCut_1, GeomAPI_Shape.VERTEX, [180])
 model.testResultsVolumes(ExtrusionCut_1, [2347.550996571865198347950354218])
+
+assert(model.checkPythonDump())

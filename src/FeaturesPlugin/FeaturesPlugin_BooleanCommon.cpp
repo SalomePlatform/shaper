@@ -78,7 +78,8 @@ void FeaturesPlugin_BooleanCommon::execute()
     }
     ResultPtr aContext = anObjectAttr->context();
     ResultBodyPtr aResCompSolidPtr = ModelAPI_Tools::bodyOwner(aContext);
-    if (aResCompSolidPtr.get())
+    if (!isSimpleMode
+        && aResCompSolidPtr.get())
     {
       std::shared_ptr<GeomAPI_Shape> aContextShape = aResCompSolidPtr->shape();
       GeomAPI_Shape::ShapeType aShapeType = aResCompSolidPtr->shape()->shapeType();
