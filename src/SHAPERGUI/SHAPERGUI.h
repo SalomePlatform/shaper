@@ -226,6 +226,9 @@ private slots:
   // Update current toolbars
   void updateToolbars(const QMap<QString, QIntList>& theNewToolbars);
 
+  void saveToolbarsConfig();
+  void loadToolbarsConfig();
+
   /// List of registered nested actions
   QStringList myNestedActionsList;
 
@@ -263,6 +266,7 @@ private slots:
   /// List of registered actions
   QIntList myActionsList;
   QMap<QString, QIntList> myToolbars;
+  bool myIsToolbarsModified;
 };
 
 #endif

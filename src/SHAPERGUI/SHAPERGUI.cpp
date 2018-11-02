@@ -124,7 +124,7 @@ private:
 SHAPERGUI::SHAPERGUI()
     : LightApp_Module("SHAPER"),
       mySelector(0), myIsOpened(0), myPopupMgr(0), myIsInspectionVisible(false),
-  myInspectionPanel(0)
+  myInspectionPanel(0), myIsToolbarsModified(false)
 {
   myWorkshop = new XGUI_Workshop(this);
   connect(myWorkshop, SIGNAL(commandStatusUpdated()),
@@ -175,10 +175,10 @@ void SHAPERGUI::initialize(CAM_Application* theApp)
 
   // Define Edit toolbars command
   aId = getNextCommandId();
-  myActionsList.append(aId);
+  //myActionsList.append(aId); Do not use it for editing of toolbars
   aTip = tr("Edit toolbars of the module");
-  QAction* aAction = createAction(aId, aTip, QIcon(), tr("Edit toolbars..."),
-    aTip, QKeySequence(), aDesk, false, this, SLOT(onEditToolbars()));
+  QAction* aAction = createAction(aId, aTip, QIcon(":pictures/configure_toolbars.png"),
+    tr("Edit toolbars..."), aTip, QKeySequence(), aDesk, false, this, SLOT(onEditToolbars()));
   int aEditMenu = createMenu(tr("MEN_DESK_EDIT"), -1, -1, 30);
   int aEditItem = createMenu(aId, aEditMenu);
 }
@@ -223,6 +223,8 @@ void SHAPERGUI::viewManagers(QStringList& theList) const
 bool SHAPERGUI::activateModule(SUIT_Study* theStudy)
 {
   bool isDone = LightApp_Module::activateModule(theStudy);
+  loadToolbarsConfig();
+
   SHAPERGUI_DataModel* aDataModel = dynamic_cast<SHAPERGUI_DataModel*>(dataModel());
   aDataModel->initRootObject();
 
@@ -332,6 +334,8 @@ bool SHAPERGUI::activateModule(SUIT_Study* theStudy)
 //******************************************************
 bool SHAPERGUI::deactivateModule(SUIT_Study* theStudy)
 {
+  saveToolbarsConfig();
+
   myProxyViewer->activateViewer(false);
   setMenuShown(false);
   setToolShown(false);
@@ -389,7 +393,6 @@ bool SHAPERGUI::deactivateModule(SUIT_Study* theStudy)
           getApp(), SLOT(onSaveDoc()));
   connect(getApp()->action(LightApp_Application::FileSaveAsId), SIGNAL(triggered(bool)),
           getApp(), SLOT(onSaveAsDoc()));
-
 
   return LightApp_Module::deactivateModule(theStudy);
 }
@@ -855,7 +858,7 @@ void SHAPERGUI::updateToolbars(const QMap<QString, QIntList>& theNewToolbars)
       aToolbarId = aMgr->createToolBar(aName);
     }
     int aPos = 0;
-    foreach (int aCmd, aCommands) {
+    foreach(int aCmd, aCommands) {
       // Find action
       if (aCmd == -1)
         aAction = separator();
@@ -887,11 +890,82 @@ void SHAPERGUI::updateToolbars(const QMap<QString, QIntList>& theNewToolbars)
   }
   // Remove extra toolbars
   aToolbars = myToolbars.keys();
-  QToolBar* aToolbar = 0;
-  QList<QAction*> aActionList;
   foreach(QString aName, aToolbars) {
     aMgr->removeToolBar(aName);
   }
   // Set new toolbars structure
   myToolbars = theNewToolbars;
+  myIsToolbarsModified = true;
+}
+
+void SHAPERGUI::saveToolbarsConfig()
+{
+  if (!myIsToolbarsModified)
+    return;
+  // Set toolbars config
+  QMap<QString, QStringList> aToolbarsConfig;
+  QtxActionToolMgr* aMgr = toolMgr();
+  QStringList aToolbars = myToolbars.keys();
+  QIntList aActionsIds;
+  foreach(QString aName, aToolbars) {
+    aActionsIds = myToolbars[aName];
+    QStringList aContent;
+    foreach(int aId, aActionsIds) {
+      if (aId == -1)
+        aContent.append("");
+      else
+        aContent.append(action(aId)->data().toString());
+    }
+    aToolbarsConfig[aName] = aContent;
+  }
+
+  SUIT_ResourceMgr* aResMgr = application()->resourceMgr();
+  QStringList aNames = aToolbarsConfig.keys();
+  QStringList aValues;
+  const QString aSection("SHAPER_Toolbars");
+  foreach(QString aToolbar, aNames) {
+    aResMgr->setValue(aSection, aToolbar, aToolbarsConfig[aToolbar].join(","));
+  }
+  QStringList aOldParams = aResMgr->parameters(aSection);
+  foreach(QString aName, aOldParams) {
+    if (!aToolbars.contains(aName))
+      aResMgr->remove(aSection, aName);
+  }
+  myIsToolbarsModified = false;
+}
+
+void SHAPERGUI::loadToolbarsConfig()
+{
+  const QString aSection("SHAPER_Toolbars");
+  SUIT_ResourceMgr* aResMgr = application()->resourceMgr();
+  QStringList aToolbarNames = aResMgr->parameters(aSection);
+  if (aToolbarNames.size() == 0)
+    return;
+
+  QMap<QString, int> aCommandsMap;
+  QString aCmdIdStr;
+  foreach(int aId, myActionsList) {
+    aCmdIdStr = action(aId)->data().toString();
+    aCommandsMap[aCmdIdStr] = aId;
+  }
+
+  QMap<QString, QIntList> aToolbars;
+  QStringList aCommands;
+  QList<QAction*> aActions;
+  foreach(QString aName, aToolbarNames) {
+    aCommands = aResMgr->stringValue(aSection, aName).split(",");
+
+    aToolbars[aName] = QIntList();
+    if (aCommands.size() > 0) {
+      foreach(QString aCommand, aCommands) {
+        if (aCommand.isEmpty())
+          aToolbars[aName].append(-1);
+        else if (aCommandsMap.contains(aCommand)) {
+          aToolbars[aName].append(aCommandsMap[aCommand]);
+        }
+      }
+    }
+  }
+  updateToolbars(aToolbars);
+  myIsToolbarsModified = false;
 }

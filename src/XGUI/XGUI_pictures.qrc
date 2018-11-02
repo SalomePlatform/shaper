@@ -82,5 +82,6 @@
      <file>pictures/arrow-right.png</file>
      <file>pictures/arrow-up.png</file>
      <file>pictures/arrow-down.png</file>
+     <file>pictures/configure_toolbars.png</file>
  </qresource>
  </RCC>
