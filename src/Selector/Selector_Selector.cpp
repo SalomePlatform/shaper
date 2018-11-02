@@ -28,6 +28,8 @@
 #include <TopoDS_Builder.hxx>
 #include <TopoDS.hxx>
 #include <TopExp_Explorer.hxx>
+#include <TopoDS_Edge.hxx>
+#include <TopoDS_Face.hxx>
 #include <TNaming_Tool.hxx>
 #include <TNaming_NewShapeIterator.hxx>
 #include <TNaming_OldShapeIterator.hxx>
@@ -193,9 +195,33 @@ static void findNeighbors(const TopoDS_Shape theContext, const TopoDS_Shape theV
   }
 }
 
+/// Returns true if the given shapes are based on the same geometry
+static bool sameGeometry(const TopoDS_Shape theShape1, const TopoDS_Shape theShape2) {
+  if (!theShape1.IsNull() && theShape2.IsNull() && theShape1.ShapeType() == theShape2.ShapeType())
+  {
+    if (theShape1.ShapeType() == TopAbs_FACE) { // check surfaces
+      TopLoc_Location aLoc1, aLoc2;
+      TopoDS_Face aFace1 = TopoDS::Face(theShape1);
+      Handle(Geom_Surface) aSurf1 = BRep_Tool::Surface(aFace1, aLoc1);
+      TopoDS_Face aFace2 = TopoDS::Face(theShape2);
+      Handle(Geom_Surface) aSurf2 = BRep_Tool::Surface(aFace2, aLoc2);
+      return aSurf1 == aSurf2 && aLoc1.IsEqual(aLoc2);
+    } else if (theShape1.ShapeType() == TopAbs_FACE) { // check curves
+      TopLoc_Location aLoc1, aLoc2;
+      Standard_Real aFirst, aLast;
+      TopoDS_Edge anEdge1 = TopoDS::Edge(theShape1);
+      Handle(Geom_Curve) aCurve1 = BRep_Tool::Curve(anEdge1, aLoc1, aFirst, aLast);
+      TopoDS_Edge anEdge2 = TopoDS::Edge(theShape2);
+      Handle(Geom_Curve) aCurve2 = BRep_Tool::Curve(anEdge2, aLoc2, aFirst, aLast);
+      return aCurve1 == aCurve2 && aLoc1.IsEqual(aLoc2);
+    }
+  }
+  return false;
+}
+
 /// Searches the neighbor shape by neighbors defined in theNB in theContext shape
 static const TopoDS_Shape findNeighbor(const TopoDS_Shape theContext,
-  const std::list<std::pair<TopoDS_Shape, int> >& theNB)
+  const std::list<std::pair<TopoDS_Shape, int> >& theNB, const bool theGeometrical)
 {
   // searching for neighbors with minimum level
   int aMinLevel = 0;
@@ -234,6 +260,7 @@ static const TopoDS_Shape findNeighbor(const TopoDS_Shape theContext,
     return TopoDS_Shape(); // not found any candidate
   if (aMatches.Extent() == 1)
     return aMatches.First(); // already found good candidate
+  TopoDS_Compound aResultCompound; // in case of geometrical name and many candidates
   // iterate all matches to find by other (higher level) neighbors the best candidate
   TopoDS_Shape aGoodCandidate;
   for(TopoDS_ListOfShape::Iterator aCandidate(aMatches); aCandidate.More(); aCandidate.Next()) {
@@ -250,8 +277,16 @@ static const TopoDS_Shape findNeighbor(const TopoDS_Shape theContext,
       if (!aFooundHigherLevel && aLevelNBs.IsEmpty()) { // iterated all, so, good candidate
         if (aGoodCandidate.IsNull()) {
           aGoodCandidate = aCandidate.Value();
-        } else { // too many good candidates
-          return TopoDS_Shape();
+        } else { // another good candidate
+          if (theGeometrical && sameGeometry(aGoodCandidate, aCandidate.Value())) {
+            static TopoDS_Builder aBuilder;
+            if (aResultCompound.IsNull()) {
+              aBuilder.MakeCompound(aResultCompound);
+              aBuilder.Add(aResultCompound, aGoodCandidate);
+            }
+            aBuilder.Add(aResultCompound, aCandidate.Value());
+          } else
+            return TopoDS_Shape();
         }
       }
       if (!aLevelNBs.IsEmpty()) {
@@ -269,6 +304,8 @@ static const TopoDS_Shape findNeighbor(const TopoDS_Shape theContext,
         break;
     }
   }
+  if (!aResultCompound.IsNull())
+    return aResultCompound;
   return aGoodCandidate;
 }
 
@@ -403,7 +440,7 @@ bool Selector_Selector::select(const TopoDS_Shape theContext, const TopoDS_Shape
           }
         }
       }
-      TopoDS_Shape aResult = findNeighbor(theContext, aNBs);
+      TopoDS_Shape aResult = findNeighbor(theContext, aNBs, theGeometricalNaming);
       if (!aResult.IsNull() && aResult.IsSame(theValue)) {
         std::list<std::pair<TopoDS_Shape, int> >::iterator aNBIter = aNBs.begin();
         for(; aNBIter != aNBs.end(); aNBIter++) {
@@ -564,7 +601,7 @@ bool Selector_Selector::select(const TopoDS_Shape theContext, const TopoDS_Shape
               }
             }
           }
-          TopoDS_Shape aResult = findNeighbor(theContext, aNBs);
+          TopoDS_Shape aResult = findNeighbor(theContext, aNBs, theGeometricalNaming);
           if (!aResult.IsNull() && aResult.IsSame(theValue)) {
             std::list<std::pair<TopoDS_Shape, int> >::iterator aNBIter = aNBs.begin();
             for(; aNBIter != aNBs.end(); aNBIter++) {
@@ -920,11 +957,28 @@ bool Selector_Selector::solve(const TopoDS_Shape& theContext)
     } else { // standard case
       TopoDS_ListOfShape aFinalsCommon; // final shapes presented in all results from bases
       findModificationResult(aFinalsCommon);
-      if (aFinalsCommon.Extent() == 1) // only in this case result is valid: found only one shape
+      if (aFinalsCommon.Extent() == 1) { // result is valid: found only one shape
         aResult = aFinalsCommon.First();
-      else if (aFinalsCommon.Extent() > 1 && myWeakIndex) {
+      } else if (aFinalsCommon.Extent() > 1 && myWeakIndex) {
         Selector_NExplode aNExp(aFinalsCommon);
         aResult = aNExp.shape(myWeakIndex);
+      } else if (aFinalsCommon.Extent() > 1 && myGeometricalNaming) {// if same geometry - compound
+        TopoDS_ListOfShape::Iterator aCommonIter(aFinalsCommon);
+        TopoDS_Shape aFirst = aCommonIter.Value();
+        for(aCommonIter.Next(); aCommonIter.More(); aCommonIter.Next()) {
+          if (!sameGeometry(aFirst, aCommonIter.Value()))
+            break;
+        }
+        if (!aCommonIter.More()) { // all geometry is same, create a result compound
+          TopoDS_Builder aBuilder;
+          TopoDS_Compound aCompound;
+          aBuilder.MakeCompound(aCompound);
+          for(aCommonIter.Initialize(aFinalsCommon); aCommonIter.More(); aCommonIter.Next()) {
+            aBuilder.Add(aCompound, aCommonIter.Value());
+          }
+          aResult = aCompound;
+        }
+
       }
     }
     break;
@@ -939,7 +993,7 @@ bool Selector_Selector::solve(const TopoDS_Shape& theContext)
       }
       aNBs.push_back(std::pair<TopoDS_Shape, int>(aSubSel->value(), *aLevel));
     }
-    aResult = findNeighbor(theContext, aNBs);
+    aResult = findNeighbor(theContext, aNBs, myGeometricalNaming);
     break;
   }
   case SELTYPE_WEAK_NAMING: {
