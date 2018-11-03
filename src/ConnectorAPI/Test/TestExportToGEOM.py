@@ -86,8 +86,8 @@ def testSeveralExportsToGEOM():
   Box_1 = model.addBox(Part_1_doc, 10, 10, 10)
   Box_2 = model.addBox(Part_1_doc, 20, 20, 20)
   Translation_1 = model.addTranslation(Part_1_doc, [model.selection("SOLID", "Box_1_1")], model.selection("EDGE", "PartSet/OX"), -10)
-  Partition_1 = model.addPartition(Part_1_doc, [model.selection("SOLID", "Box_1_1"), model.selection("SOLID", "Box_2_1")])
-  Group_1 = model.addGroup(Part_1_doc, [model.selection("FACE", "Partition_1_1_1/Modified_Face_1_2"), model.selection("FACE", "Box_2_1/Top")])
+  Partition_1 = model.addPartition(Part_1_doc, [model.selection("SOLID", "Translation_1_1"), model.selection("SOLID", "Box_2_1")])
+  Group_1 = model.addGroup(Part_1_doc, [model.selection("FACE", "Partition_1_1_1/Modified_Face&Box_1_1/Bottom"), model.selection("FACE", "Box_2_1/Top")])
   model.do()
   model.end()
 

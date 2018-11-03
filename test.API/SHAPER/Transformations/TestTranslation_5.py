@@ -50,17 +50,17 @@ Point_1 = model.addPoint(Part_1_doc, 10, 0, 0)
 Point_2 = model.addPoint(Part_1_doc, 10, 10, 0)
 
 # Vertex
-Vertex_1 = model.addVertex(Part_1_doc, [model.selection("VERTEX", "Sketch_1/Vertex-SketchLine_1s-SketchLine_3e")])
-Vertex_2 = model.addVertex(Part_1_doc, [model.selection("VERTEX", "Sketch_1/Vertex-SketchLine_2s-SketchLine_1e")])
+Vertex_1 = model.addVertex(Part_1_doc, [model.selection("VERTEX", "Sketch_1/SketchLine_1_StartVertex")])
+Vertex_2 = model.addVertex(Part_1_doc, [model.selection("VERTEX", "Sketch_1/SketchLine_1_EndVertex")])
 
 # Translations
 Translation_99 = model.addTranslation(Part_1_doc, [model.selection("SOLID", "Box_1_1")], model.selection("VERTEX", "Point_1"), model.selection("VERTEX", "Point_2"))
-Translation_100 = model.addTranslation(Part_1_doc, [model.selection("SOLID", "Box_1_1")], model.selection("VERTEX", "Point_1"), model.selection("VERTEX", "Point_1"))
-Translation_101 = model.addTranslation(Part_1_doc, [model.selection("SOLID", "Box_1_1")], model.selection("VERTEX", "InvalidName"), model.selection("VERTEX", "Point_1"))
-Translation_102 = model.addTranslation(Part_1_doc, [model.selection("SOLID", "Box_1_1")], model.selection("VERTEX", "Point_1"), model.selection("VERTEX", "InvalidName"))
-Translation_103 = model.addTranslation(Part_1_doc, [model.selection("SOLID", "Box_2_1")], model.selection("VERTEX", "Sketch_1/Vertex-SketchLine_1s-SketchLine_3e"), model.selection("VERTEX", "Sketch_1/Vertex-SketchLine_2s-SketchLine_1e"))
+Translation_100 = model.addTranslation(Part_1_doc, [model.selection("SOLID", "Translation_1_1")], model.selection("VERTEX", "Point_1"), model.selection("VERTEX", "Point_1"))
+Translation_101 = model.addTranslation(Part_1_doc, [model.selection("SOLID", "Translation_1_1")], model.selection("VERTEX", "InvalidName"), model.selection("VERTEX", "Point_1"))
+Translation_102 = model.addTranslation(Part_1_doc, [model.selection("SOLID", "Translation_1_1")], model.selection("VERTEX", "Point_1"), model.selection("VERTEX", "InvalidName"))
+Translation_103 = model.addTranslation(Part_1_doc, [model.selection("SOLID", "Box_2_1")], model.selection("VERTEX", "Sketch_1/SketchLine_1_StartVertex"), model.selection("VERTEX", "Sketch_1/SketchLine_1_EndVertex"))
 Translation_104 = model.addTranslation(Part_1_doc, [model.selection("SOLID", "Box_3_1")], model.selection("VERTEX", "Vertex_1_1"), model.selection("VERTEX", "Vertex_2_1"))
-Translation_105 = model.addTranslation(Part_1_doc, [model.selection("SOLID", "Box_4_1")], model.selection("VERTEX", "Box_4_1/Back&Box_4_1/Left&Box_4_1/Bottom"), model.selection("VERTEX", "Box_4_1/Front&Box_4_1/Right&Box_4_1/Top"))
+Translation_105 = model.addTranslation(Part_1_doc, [model.selection("SOLID", "Box_4_1")], model.selection("VERTEX", "[Box_4_1/Back][Box_4_1/Left][Box_4_1/Bottom]"), model.selection("VERTEX", "[Box_4_1/Front][Box_4_1/Right][Box_4_1/Top]"))
 model.do()
 model.end()
 

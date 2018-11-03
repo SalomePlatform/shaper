@@ -55,11 +55,11 @@ SketchCircle_1 = Sketch_2.addCircle(3.420516499282639, 6.702654232424678, 2.6604
 model.do()
 
 # Create Wire & Extrusion
-Wire_1 = model.addWire(Part_1_doc, [model.selection("EDGE", "Sketch_1/Edge-SketchLine_2"), model.selection("EDGE", "Sketch_1/Edge-SketchLine_1"), model.selection("EDGE", "Sketch_1/Edge-SketchLine_3")])
+Wire_1 = model.addWire(Part_1_doc, [model.selection("EDGE", "Sketch_1/SketchLine_2"), model.selection("EDGE", "Sketch_1/SketchLine_1"), model.selection("EDGE", "Sketch_1/SketchLine_3")])
 Extrusion_1 = model.addExtrusion(Part_1_doc, [model.selection("WIRE", "Wire_1_1")], model.selection("EDGE", "PartSet/OZ"), 50, 0)
 
 # Revolution of the circle
-Revolution_1 = model.addRevolution(Part_1_doc, [model.selection("WIRE", "Sketch_2/Wire-SketchCircle_1_2f")], model.selection("EDGE", "PartSet/OZ"), 360, 0)
+Revolution_1 = model.addRevolution(Part_1_doc, [model.selection("WIRE", "Sketch_2/Face-SketchCircle_1_2r_wire")], model.selection("EDGE", "PartSet/OZ"), 360, 0)
 
 # Create MultiTranslations
 MultiTranslation_1 = model.addMultiTranslation(Part_1_doc, [model.selection("SOLID", "Box_1_1")], model.selection("EDGE", "PartSet/OX"), 15, 5)

@@ -70,25 +70,25 @@ model.do()
 Point_1 = model.addPoint(Part_1_doc, -10, -10, -10)
 
 # Create Vertexes
-Vertex_1 = model.addVertex(Part_1_doc, [model.selection("VERTEX", "Sketch_1/Vertex-SketchLine_1e")])
+Vertex_1 = model.addVertex(Part_1_doc, [model.selection("VERTEX", "Sketch_1/SketchLine_1_EndVertex")])
 
 # Create Wire & Extrusion
-Wire_1 = model.addWire(Part_1_doc, [model.selection("WIRE", "Sketch_2/Wire-SketchLine_2f-SketchLine_3f-SketchLine_4f-SketchLine_5f-SketchLine_6f")])
+Wire_1 = model.addWire(Part_1_doc, [model.selection("WIRE", "Sketch_2/Face-SketchLine_2r-SketchLine_3f-SketchLine_4f-SketchLine_5f-SketchLine_6f_wire")])
 Extrusion_1 = model.addExtrusion(Part_1_doc, [model.selection("WIRE", "Wire_1_1")], model.selection(), 50, 0)
 
 # Create Scales
 Scale_1 = model.addScale(Part_1_doc, [model.selection("SOLID", "Box_1_1")] , model.selection("VERTEX", "PartSet/Origin"), 2)
 Scale_2 = model.addScale(Part_1_doc, [model.selection("SOLID", "Box_2_1")] , model.selection("VERTEX", "Point_1"), 2)
-Scale_3 = model.addScale(Part_1_doc, [model.selection("SOLID", "Box_3_1")] , model.selection("VERTEX", "Box_3_1/Back&Box_3_1/Left&Box_3_1/Top"), 2)
-Scale_4 = model.addScale(Part_1_doc, [model.selection("SOLID", "Box_4_1")] , model.selection("VERTEX", "Sketch_1/Vertex-SketchLine_1e"), 2)
+Scale_3 = model.addScale(Part_1_doc, [model.selection("SOLID", "Box_3_1")] , model.selection("VERTEX", "[Box_3_1/Back][Box_3_1/Left][Box_3_1/Top]"), 2)
+Scale_4 = model.addScale(Part_1_doc, [model.selection("SOLID", "Box_4_1")] , model.selection("VERTEX", "Sketch_1/SketchLine_1_EndVertex"), 2)
 Scale_5 = model.addScale(Part_1_doc, [model.selection("SOLID", "Box_5_1")] , model.selection("VERTEX", "Vertex_1_1"), 2)
 Scale_6 = model.addScale(Part_1_doc, [model.selection("SOLID", "Box_6_1")] , model.selection("VERTEX", "PartSet/Origin"), 0)
 Scale_7 = model.addScale(Part_1_doc, [model.selection("SOLID", "Box_7_1")] , model.selection("VERTEX", "PartSet/Origin"), -3)
 Scale_8 = model.addScale(Part_1_doc, [model.selection("SOLID", "Box_8_1")] , model.selection("VERTEX", "InvalidName"), 2)
 Scale_9 = model.addScale(Part_1_doc, [model.selection("SOLID", "Box_9_1")] , model.selection("VERTEX", "PartSet/Origin"), 2 , 3, 1)
 Scale_10 = model.addScale(Part_1_doc, [model.selection("SOLID", "Box_10_1")] , model.selection("VERTEX", "Point_1"), 2 , 3, 1)
-Scale_11 = model.addScale(Part_1_doc, [model.selection("SOLID", "Box_11_1")] , model.selection("VERTEX", "Box_11_1/Back&Box_11_1/Right&Box_11_1/Top"), 2 , 3, 1)
-Scale_12 = model.addScale(Part_1_doc, [model.selection("SOLID", "Box_12_1")] , model.selection("VERTEX", "Sketch_1/Vertex-SketchLine_1e"), 2 , 3, 1)
+Scale_11 = model.addScale(Part_1_doc, [model.selection("SOLID", "Box_11_1")] , model.selection("VERTEX", "[Box_11_1/Back][Box_11_1/Right][Box_11_1/Top]"), 2 , 3, 1)
+Scale_12 = model.addScale(Part_1_doc, [model.selection("SOLID", "Box_12_1")] , model.selection("VERTEX", "Sketch_1/SketchLine_1_EndVertex"), 2 , 3, 1)
 Scale_13 = model.addScale(Part_1_doc, [model.selection("SOLID", "Box_13_1")] , model.selection("VERTEX", "Vertex_1_1"), 2 , 3, 1)
 Scale_14 = model.addScale(Part_1_doc, [model.selection("SOLID", "Box_14_1")] , model.selection("VERTEX", "PartSet/Origin"), 0 , 3, 1)
 Scale_15 = model.addScale(Part_1_doc, [model.selection("SOLID", "Box_15_1")] , model.selection("VERTEX", "PartSet/Origin"), 2 , 0, 1)

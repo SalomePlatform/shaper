@@ -89,13 +89,13 @@ SketchConstraintCoincidence_5 = Sketch_3.setCoincident(SketchLine_6.startPoint()
 model.do()
 
 # Vertexes
-Vertex_1 = model.addVertex(Part_1_doc, [model.selection("VERTEX", "Sketch_1/Vertex-SketchLine_1e")])
+Vertex_1 = model.addVertex(Part_1_doc, [model.selection("VERTEX", "Sketch_1/SketchLine_1_EndVertex")])
 
 # Edges
-Edge_1 = model.addEdge(Part_1_doc, [model.selection("EDGE", "Sketch_1/Edge-SketchLine_1")])
+Edge_1 = model.addEdge(Part_1_doc, [model.selection("EDGE", "Sketch_1/SketchLine_1")])
 
 # Wire & Extrusion
-Wire_1 = model.addWire(Part_1_doc, [model.selection("WIRE", "Sketch_3/Wire-SketchLine_6f-SketchLine_7f-SketchLine_8f-SketchLine_9f-SketchLine_10f")])
+Wire_1 = model.addWire(Part_1_doc, [model.selection("WIRE", "Sketch_3/Face-SketchLine_6r-SketchLine_7f-SketchLine_8f-SketchLine_9f-SketchLine_10f_wire")])
 Extrusion_1 = model.addExtrusion(Part_1_doc, [model.selection("WIRE", "Wire_1_1")], model.selection(), 50, 0)
 
 # Planes
@@ -103,22 +103,22 @@ Plane_1 = model.addPlane(Part_1_doc, model.selection("FACE", "Box_14_1/Top"), 10
 Plane_2 = model.addPlane(Part_1_doc, model.selection("FACE", "PartSet/XOZ"), 40, False)
 
 # Faces
-Face_1 = model.addFace(Part_1_doc, [model.selection("WIRE", "Sketch_2/Wire-SketchLine_2f-SketchLine_3f-SketchLine_4f-SketchLine_5f")])
+Face_1 = model.addFace(Part_1_doc, [model.selection("WIRE", "Sketch_2/Face-SketchLine_2r-SketchLine_3f-SketchLine_4f-SketchLine_5f_wire")])
 
 
 # Symmetries
 Symmetry_1 = model.addSymmetry(Part_1_doc, [model.selection("SOLID", "Box_1_1")], model.selection("VERTEX", "PartSet/Origin"))
 Symmetry_2 = model.addSymmetry(Part_1_doc, [model.selection("SOLID", "Box_2_1")], model.selection("VERTEX", "Point_1"))
-Symmetry_3 = model.addSymmetry(Part_1_doc, [model.selection("SOLID", "Box_3_1")], model.selection("VERTEX", "Box_3_1/Front&Box_3_1/Right&Box_3_1/Top"))
-Symmetry_4 = model.addSymmetry(Part_1_doc, [model.selection("SOLID", "Box_4_1")], model.selection("VERTEX", "Sketch_1/Vertex-SketchLine_1e"))
+Symmetry_3 = model.addSymmetry(Part_1_doc, [model.selection("SOLID", "Box_3_1")], model.selection("VERTEX", "[Box_3_1/Front][Box_3_1/Right][Box_3_1/Top]"))
+Symmetry_4 = model.addSymmetry(Part_1_doc, [model.selection("SOLID", "Box_4_1")], model.selection("VERTEX", "Sketch_1/SketchLine_1_EndVertex"))
 Symmetry_5 = model.addSymmetry(Part_1_doc, [model.selection("SOLID", "Box_5_1")], model.selection("VERTEX", "Vertex_1_1"))
 Symmetry_6 = model.addSymmetry(Part_1_doc, [model.selection("SOLID", "Box_6_1")], model.selection("VERTEX", "InvalidName"))
 Symmetry_7 = model.addSymmetry(Part_1_doc, [model.selection("SOLID", "Box_7_1")], model.selection("VERTEX", "PartSet/Origin"), False)
 
 Symmetry_8 = model.addSymmetry(Part_1_doc, [model.selection("SOLID", "Box_8_1")], model.selection("EDGE", "PartSet/OZ"))
 Symmetry_9 = model.addSymmetry(Part_1_doc, [model.selection("SOLID", "Box_9_1")], model.selection("EDGE", "Axis_1"))
-Symmetry_10 = model.addSymmetry(Part_1_doc, [model.selection("SOLID", "Box_10_1")], model.selection("EDGE", "Box_9_1/Front&Box_9_1/Top"))
-Symmetry_11 = model.addSymmetry(Part_1_doc, [model.selection("SOLID", "Box_11_1")], model.selection("EDGE", "Sketch_1/Edge-SketchLine_1"))
+Symmetry_10 = model.addSymmetry(Part_1_doc, [model.selection("SOLID", "Box_10_1")], model.selection("EDGE", "[Box_9_1/Front][Box_9_1/Top]"))
+Symmetry_11 = model.addSymmetry(Part_1_doc, [model.selection("SOLID", "Box_11_1")], model.selection("EDGE", "Sketch_1/SketchLine_1"))
 Symmetry_12 = model.addSymmetry(Part_1_doc, [model.selection("SOLID", "Box_12_1")], model.selection("EDGE", "Edge_1_1"))
 Symmetry_13 = model.addSymmetry(Part_1_doc, [model.selection("SOLID", "Box_13_1")], model.selection("EDGE", "InvalidName"))
 Symmetry_14 = model.addSymmetry(Part_1_doc, [model.selection("SOLID", "Box_14_1")], model.selection("EDGE", "PartSet/OZ"), False)

@@ -46,8 +46,8 @@ SketchConstraintCoincidence_3 = Sketch_1.setCoincident(SketchLine_1.startPoint()
 model.do()
 
 # Extrusion
-Extrusion_1 = model.addExtrusion(Part_1_doc, [model.selection("FACE", "Sketch_1/Face-SketchLine_1f-SketchLine_2f-SketchLine_3f")], model.selection(), 100, 0)
-Extrusion_2 = model.addExtrusion(Part_1_doc, [model.selection("WIRE", "Sketch_1/Wire-SketchLine_1f-SketchLine_2f-SketchLine_3f")], model.selection(), 100, 0)
+Extrusion_1 = model.addExtrusion(Part_1_doc, [model.selection("FACE", "Sketch_1/Face-SketchLine_1r-SketchLine_2r-SketchLine_3r")], model.selection(), 100, 0)
+Extrusion_2 = model.addExtrusion(Part_1_doc, [model.selection("WIRE", "Sketch_1/Wire-SketchLine_1r-SketchLine_2r-SketchLine_3r")], model.selection(), 100, 0)
 
 # Edge
 Edge_1 = model.addEdge(Part_1_doc, [model.selection("EDGE", "Sketch_1/Edge-SketchLine_2")])

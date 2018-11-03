@@ -81,7 +81,7 @@ SketchConstraintCoincidence_3 = Sketch_1.setCoincident(SketchLine_1.startPoint()
 model.do()
 
 # Edges
-Edge_1 = model.addEdge(Part_1_doc, [model.selection("EDGE", "Sketch_1/Edge-SketchLine_2")])
+Edge_1 = model.addEdge(Part_1_doc, [model.selection("EDGE", "Sketch_1/SketchLine_2")])
 
 # Axis
 Axis_1 = model.addAxis(Part_1_doc, 10, 10, 10)
@@ -117,7 +117,7 @@ Translation_31 = model.addTranslation(Part_1_doc, [model.selection("COMPOUND", "
 # Translation 32
 Translation_32_1 = model.addTranslation(Part_1_doc, [model.selection("SOLID", "Box_11_1")], model.selection("EDGE", "PartSet/OX"), 5)
 Intersection_6 = model.addIntersection(Part_1_doc, [model.selection("SOLID", "Box_12_1"), model.selection("SOLID", "Translation_11_1")])
-Translation_32 = model.addTranslation(Part_1_doc, [model.selection("COMPOUND", "Intersection_6_1")], model.selection("EDGE", "Sketch_1/Edge-SketchLine_1"), 15)
+Translation_32 = model.addTranslation(Part_1_doc, [model.selection("COMPOUND", "Intersection_6_1")], model.selection("EDGE", "Sketch_1/SketchLine_1"), 15)
 
 # Translation 33
 Translation_33_1 = model.addTranslation(Part_1_doc, [model.selection("SOLID", "Box_13_1")], model.selection("EDGE", "PartSet/OX"), 5)
@@ -162,7 +162,7 @@ Translation_40 = model.addTranslation(Part_1_doc, [model.selection("COMPSOLID", 
 # Translation 41
 Translation_41_1 = model.addTranslation(Part_1_doc, [model.selection("SOLID", "Box_29_1")], model.selection("EDGE", "PartSet/OX"), 5)
 Partition_6 = model.addPartition(Part_1_doc, [model.selection("SOLID", "Box_30_1"), model.selection("SOLID", "Translation_29_1")])
-Translation_41 = model.addTranslation(Part_1_doc, [model.selection("COMPSOLID", "Partition_6_1")], model.selection("EDGE", "Sketch_1/Edge-SketchLine_1"), 15)
+Translation_41 = model.addTranslation(Part_1_doc, [model.selection("COMPSOLID", "Partition_6_1")], model.selection("EDGE", "Sketch_1/SketchLine_1"), 15)
 
 # Translation 42
 Translation_42_1 = model.addTranslation(Part_1_doc, [model.selection("SOLID", "Box_31_1")], model.selection("EDGE", "PartSet/OX"), 5)
