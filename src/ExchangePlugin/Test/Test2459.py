@@ -109,7 +109,7 @@ SketchConstraintCoincidence_16 = Sketch_1.setCoincident(SketchArc_15.endPoint(),
 SketchConstraintCoincidence_17 = Sketch_1.setCoincident(SketchArc_15.startPoint(), SketchAPI_Arc(SketchArc_12).startPoint())
 SketchConstraintCoincidence_18 = Sketch_1.setCoincident(SketchArc_3.endPoint(), SketchAPI_Arc(SketchArc_6).endPoint())
 model.do()
-Extrusion_1 = model.addExtrusion(Part_1_doc, [model.selection("FACE", "Sketch_1/Face-SketchLine_2f-SketchLine_3f-SketchLine_4f-SketchArc_1_2f-SketchArc_2_2f-SketchArc_3_2f-SketchArc_4_2r-SketchArc_5_2r-SketchCircle_1_2r-SketchArc_6_2r-SketchArc_7_2r-SketchLine_6f-SketchLine_7f-SketchArc_8_2f-SketchArc_9_2f-SketchLine_8f-SketchLine_9f-SketchArc_10_2f-SketchArc_11_2f-SketchLine_10f-SketchLine_11f-SketchArc_12_2r-SketchArc_13_2r-SketchCircle_2_2r-SketchCircle_3_2r-SketchArc_14_2f-SketchArc_15_2f")], model.selection(), 10, 0)
+Extrusion_1 = model.addExtrusion(Part_1_doc, [model.selection("FACE", "Sketch_1/Face-SketchLine_2f-SketchArc_1_2f-SketchLine_3f-SketchArc_2_2f-SketchLine_4f-SketchArc_5_2r-SketchArc_3_2f-SketchArc_6_2r-SketchLine_6f-SketchArc_8_2f-SketchLine_8f-SketchArc_10_2f-SketchLine_10f-SketchArc_12_2r-SketchArc_15_2f-SketchArc_7_2r-SketchLine_7f-SketchArc_9_2f-SketchLine_9f-SketchArc_11_2f-SketchLine_11f-SketchArc_13_2r-SketchArc_14_2f-SketchArc_4_2r-SketchCircle_1_2r-SketchCircle_2_2r-SketchCircle_3_2r")], model.selection(), 10, 0)
 model.do()
 model.end()
 

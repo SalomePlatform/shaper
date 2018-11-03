@@ -112,9 +112,8 @@ def testImportXAO():
     aSelectionList = aFeature2.selectionList("group_list")
     assert aSelectionList.selectionType() == "face"
     assert aSelectionList.size() == 2
-    assert aSelectionList.value(0).namingName("") == "mygeom_1/Shape1"
-    print(aSelectionList.value(1).namingName(""))
-    assert aSelectionList.value(1).namingName("") == "mygeom_1/Shape2"
+    assert aSelectionList.value(0).namingName("") == "mygeom_1/Shape_1"
+    assert aSelectionList.value(1).namingName("") == "mygeom_1/Shape_2"
 
     aFeature3 = aCompositeFeature.subFeature(2, False)
     assert aFeature3.getKind() == "Field"

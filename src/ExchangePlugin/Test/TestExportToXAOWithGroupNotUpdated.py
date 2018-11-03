@@ -39,14 +39,14 @@ SketchConstraintParallel_1 = Sketch_1.setParallel(SketchLine_1.result(), SketchL
 SketchConstraintParallel_2 = Sketch_1.setParallel(SketchLine_2.result(), SketchLine_4.result())
 SketchConstraintPerpendicular_1 = Sketch_1.setPerpendicular(SketchLine_1.result(), SketchLine_4.result())
 model.do()
-Extrusion_1 = model.addExtrusion(Part_1_doc, [model.selection("FACE", "Sketch_1/Face-SketchLine_1r-SketchLine_2r-SketchLine_3r-SketchLine_4r")], model.selection(), 50, 0)
+Extrusion_1 = model.addExtrusion(Part_1_doc, [model.selection("FACE", "Sketch_1/Face-SketchLine_4r-SketchLine_3r-SketchLine_2r-SketchLine_1r")], model.selection(), 50, 0)
 # Create a group with the faces of the box
-Group_1_objects = [model.selection("FACE", "Extrusion_1_1/Generated_Face_1"), model.selection("FACE", "Extrusion_1_1/Generated_Face_2"), model.selection("FACE", "Extrusion_1_1/From_Face_1"), model.selection("FACE", "Extrusion_1_1/Generated_Face_4"), model.selection("FACE", "Extrusion_1_1/To_Face_1"), model.selection("FACE", "Extrusion_1_1/Generated_Face_3")]
+Group_1_objects = [model.selection("FACE", "Extrusion_1_1/Generated_Face&Sketch_1/SketchLine_1"), model.selection("FACE", "Extrusion_1_1/Generated_Face&Sketch_1/SketchLine_2"), model.selection("FACE", "Extrusion_1_1/From_Face"), model.selection("FACE", "Extrusion_1_1/Generated_Face&Sketch_1/SketchLine_4"), model.selection("FACE", "Extrusion_1_1/To_Face"), model.selection("FACE", "Extrusion_1_1/Generated_Face&Sketch_1/SketchLine_3")]
 Group_1 = model.addGroup(Part_1_doc, Group_1_objects)
 Group_1.setName("Group_faces")
 Group_1.result().setName("Group_faces")
 # Create a field on the box
-Field_1_objects = [model.selection("FACE", "Extrusion_1_1/Generated_Face_1"), model.selection("FACE", "Extrusion_1_1/Generated_Face_2"), model.selection("FACE", "Extrusion_1_1/From_Face_1"), model.selection("FACE", "Extrusion_1_1/Generated_Face_4"), model.selection("FACE", "Extrusion_1_1/To_Face_1"), model.selection("FACE", "Extrusion_1_1/Generated_Face_3")]
+Field_1_objects = [model.selection("FACE", "Extrusion_1_1/Generated_Face&Sketch_1/SketchLine_1"), model.selection("FACE", "Extrusion_1_1/Generated_Face&Sketch_1/SketchLine_2"), model.selection("FACE", "Extrusion_1_1/From_Face"), model.selection("FACE", "Extrusion_1_1/Generated_Face&Sketch_1/SketchLine_4"), model.selection("FACE", "Extrusion_1_1/To_Face"), model.selection("FACE", "Extrusion_1_1/Generated_Face&Sketch_1/SketchLine_3")]
 Field_1 = model.addField(Part_1_doc, 1, "DOUBLE", 1, ["Comp 1"], Field_1_objects)
 Field_1.addStep(0, 0, [[0], [1], [2], [3], [4], [5], [6]])
 # Create a plane to split the box in two parts
