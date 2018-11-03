@@ -78,7 +78,7 @@ def vertical_body():
 
 def bottom_body():
     # Create XOY sketch
-    sketch = model.addSketch(part, "Extrusion_1_1/Generated_Face_5")
+    sketch = model.addSketch(part, "Extrusion_1_1/Generated_Face&Sketch_1/SketchLine_4")
 
     # Create base polygon
     points = [(0, 0), (0, L), (P, L), (P, 16 + 16), (P - 20, 16 + 16), (P - 20, 16), (P, 16), (P, 0)]
@@ -111,7 +111,7 @@ def bottom_body():
     sketch.setCoincident(arc.endPoint(), h1.startPoint())
 
     # Binding
-    left_e = sketch.addLine("Extrusion_1_1/Generated_Face_5&Extrusion_1_1/To_Face_1_1")
+    left_e = sketch.addLine("[Extrusion_1_1/Generated_Face&Sketch_1/SketchLine_4][Extrusion_1_1/To_Face]")
     sketch.setCoincident(left_e.startPoint(), left.endPoint())
     sketch.setCoincident(left_e.endPoint(), left.startPoint())
 
@@ -132,7 +132,7 @@ def bottom_body():
 
 def body_3():
     # Create XOZ sketch
-    sketch = model.addSketch(part, "Boolean_1_1/Modified_Face_3")
+    sketch = model.addSketch(part, "Boolean_1_1/Modified_Face&Sketch_1/SketchLine_3")
 
     # Create base polygon
     H, L, l, r = 28, 40, 8, 12
@@ -170,7 +170,7 @@ def body_3():
     sketch.setRadius(arc, r)
 
     # Binding
-    bottom_e = sketch.addLine("Boolean_1_1/Modified_Face_7&Extrusion_2_1/To_Face_1")
+    bottom_e = sketch.addLine("[Boolean_1_1/Modified_Face&Sketch_2/SketchLine_6][Extrusion_2_1/To_Face]")
     sketch.setCoincident(bottom_e, bottom.startPoint())
     sketch.setCoincident(bottom_e.startPoint(), bottom.endPoint())
 
@@ -183,7 +183,7 @@ def body_3():
 
 def body_4():
     # Create XOZ 2nd sketch
-    sketch = model.addSketch(part, "Boolean_2_1/Modified_Face_4")
+    sketch = model.addSketch(part, "Boolean_2_1/Modified_Face&Sketch_2/SketchLine_6")
 
     # Create base polygon
     points = [(0, 0), (0, 1), (1, 0)]
@@ -192,11 +192,11 @@ def body_4():
     left, diagonal, bottom = model.addPolygon(sketch, *geom_points)
 
     # Binding
-    bottom_e = sketch.addLine("Boolean_2_1/Modified_Face_2&Boolean_2_1/Modified_Face_4")
+    bottom_e = sketch.addLine("Boolean_2_1/Modified_Edge&weak_name_2")
     sketch.setCoincident(bottom_e.endPoint(), bottom.startPoint())
     sketch.setCoincident(bottom_e.startPoint(), left.startPoint())
 
-    left_e = sketch.addLine("Boolean_2_1/Modified_Face_5&Extrusion_3_1/Generated_Face_2")
+    left_e = sketch.addLine("[Boolean_2_1/Modified_Face&Extrusion_3_1/From_Face][Extrusion_3_1/Generated_Face&Sketch_3/SketchLine_18]")
     sketch.setCoincident(left_e.startPoint(), left.endPoint())
 
     model.do()  #!!!
