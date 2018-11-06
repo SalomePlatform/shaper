@@ -38,6 +38,9 @@
 
 #include <QEvent>
 
+
+#define HIGHLIGHT_COLOR Quantity_NOC_YELLOW
+
 XGUI_ViewerProxy::XGUI_ViewerProxy(XGUI_Workshop* theParent)
     : ModuleBase_IViewer(theParent),
       myWorkshop(theParent)
@@ -418,7 +421,7 @@ void XGUI_ViewerProxy::displayHighlight()
         aRes = (*aIt);
         TopoDS_Shape aTShape = aRes->shape()->impl<TopoDS_Shape>();
         aAis = new AIS_Shape(aTShape);
-        aAis->SetColor(Quantity_NOC_CYAN4);
+        aAis->SetColor(HIGHLIGHT_COLOR);
         aAis->SetZLayer(1); //Graphic3d_ZLayerId_Topmost
         myHighlights.Append(aAis);
         aContext->Display(aAis, false);
@@ -429,7 +432,7 @@ void XGUI_ViewerProxy::displayHighlight()
   else {
     TopoDS_Shape aTShape = myResult->shape()->impl<TopoDS_Shape>();
     Handle(AIS_Shape) aAis = new AIS_Shape(aTShape);
-    aAis->SetColor(Quantity_NOC_CYAN4);
+    aAis->SetColor(HIGHLIGHT_COLOR);
     aAis->SetZLayer(1); //Graphic3d_ZLayerId_Topmost
     myHighlights.Append(aAis);
     aContext->Display(aAis, false);
