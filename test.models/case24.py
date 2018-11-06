@@ -175,7 +175,7 @@ SketchConstraintParallel_1 = Sketch_3.setParallel(SketchLine_17.result(), Sketch
 SketchConstraintDistance_7 = Sketch_3.setDistance(SketchLine_21.startPoint(), SketchLine_18.result(), 3)
 model.do()
 RevolutionFuse_1 = model.addRevolutionFuse(Part_1_doc, [model.selection("COMPOUND", "Sketch_3")], model.selection("EDGE", "Sketch_3/SketchLine_21"), 71, 0, [model.selection("SOLID", "ExtrusionFuse_2_1")])
-Sketch_4 = model.addSketch(Part_1_doc, model.selection("FACE", "RevolutionFuse_1_1/Modified_Face&weak_name_1"))
+Sketch_4 = model.addSketch(Part_1_doc, model.selection("FACE", "(RevolutionFuse_1_1/Modified_Face&Sketch_1/SketchLine_1)(ExtrusionFuse_1_1/Generated_Face&Sketch_1/SketchLine_8)(ExtrusionFuse_1_1/Generated_Face&Sketch_1/SketchArc_1_2)(RevolutionFuse_1_1/Generated_Face&Sketch_3/SketchLine_16)(RevolutionFuse_1_1/Modified_Face&Sketch_1/SketchLine_7)"))
 SketchLine_22 = Sketch_4.addLine(-3, -20, 17, -20)
 SketchLine_22.setName("SketchLine_26")
 SketchLine_22.result().setName("SketchLine_26")
