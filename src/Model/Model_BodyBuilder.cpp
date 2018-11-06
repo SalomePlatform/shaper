@@ -27,6 +27,7 @@
 #include <TNaming_NamedShape.hxx>
 #include <TNaming_Iterator.hxx>
 #include <TNaming_Tool.hxx>
+#include <TNaming_SameShapeIterator.hxx>
 #include <TDataStd_Name.hxx>
 #include <TDataStd_Integer.hxx>
 #include <TopoDS.hxx>
@@ -476,6 +477,29 @@ TopAbs_ShapeEnum typeOfAncestor(const TopAbs_ShapeEnum theSubType) {
   return TopAbs_VERTEX; // bad case
 }
 
+/// Checks that shape is presented in the tree with not-selection evolution
+static bool isShapeInTree(const TDF_Label& theAccess1, const TDF_Label& theAccess2,
+  TopoDS_Shape theShape)
+{
+  bool aResult = TNaming_Tool::HasLabel(theAccess1, theShape);
+  if (aResult) { //check evolution and a label of this shape
+    for(TNaming_SameShapeIterator aShapes(theShape, theAccess1); aShapes.More(); aShapes.Next())
+    {
+      static Handle(TNaming_NamedShape) aNS;
+      if (aShapes.Label().FindAttribute(TNaming_NamedShape::GetID(), aNS)) {
+        if (aNS->Evolution() != TNaming_SELECTED) {
+          return true;
+        }
+      }
+    }
+  }
+  if (!theAccess2.IsNull()) {
+    static const TDF_Label anEmpty;
+    return isShapeInTree(theAccess2, anEmpty, theShape);
+  }
+  return false;
+}
+
 void Model_BodyBuilder::loadModifiedShapes(const GeomMakeShapePtr& theAlgo,
                                            const GeomShapePtr& theOldShape,
                                            const GeomAPI_Shape::ShapeType theShapeTypeToExplore,
@@ -503,15 +527,10 @@ void Model_BodyBuilder::loadModifiedShapes(const GeomMakeShapePtr& theAlgo,
     // There is no sense to write history if shape already processed
     // or old shape does not exist in the document.
     bool anOldSubShapeAlreadyProcessed = !anAlreadyProcessedShapes.Add(anOldSubShape_);
-    bool anOldSubShapeNotInTree = !TNaming_Tool::HasLabel(aData->shapeLab(), anOldSubShape_);
-    if (anOldSubShapeNotInTree) {// check this is in the module document
-      TDF_Label anAccess = std::dynamic_pointer_cast<Model_Document>(
-        ModelAPI_Session::get()->moduleDocument())->generalLabel();
-      anOldSubShapeNotInTree = !TNaming_Tool::HasLabel(anAccess, anOldSubShape_);
-    }
-    if (anOldSubShapeAlreadyProcessed
-        || anOldSubShapeNotInTree)
-    {
+    TDF_Label anAccess2 = std::dynamic_pointer_cast<Model_Document>(
+      ModelAPI_Session::get()->moduleDocument())->generalLabel();
+    bool anOldSubShapeNotInTree = !isShapeInTree(aData->shapeLab(), anAccess2, anOldSubShape_);
+    if (anOldSubShapeAlreadyProcessed || anOldSubShapeNotInTree) {
       continue;
     }
 
@@ -591,15 +610,10 @@ void Model_BodyBuilder::loadGeneratedShapes(const GeomMakeShapePtr& theAlgo,
     // There is no sense to write history if shape already processed
     // or old shape does not exist in the document.
     bool anOldSubShapeAlreadyProcessed = !anAlreadyProcessedShapes.Add(anOldSubShape_);
-    bool anOldSubShapeNotInTree = !TNaming_Tool::HasLabel(aData->shapeLab(), anOldSubShape_);
-    if (anOldSubShapeNotInTree) {// check this is in the module document
-      TDF_Label anAccess = std::dynamic_pointer_cast<Model_Document>(
-        ModelAPI_Session::get()->moduleDocument())->generalLabel();
-      anOldSubShapeNotInTree = !TNaming_Tool::HasLabel(anAccess, anOldSubShape_);
-    }
-    if (anOldSubShapeAlreadyProcessed
-        || anOldSubShapeNotInTree)
-    {
+    TDF_Label anAccess2 = std::dynamic_pointer_cast<Model_Document>(
+      ModelAPI_Session::get()->moduleDocument())->generalLabel();
+    bool anOldSubShapeNotInTree = !isShapeInTree(aData->shapeLab(), anAccess2, anOldSubShape_);
+    if (anOldSubShapeAlreadyProcessed || anOldSubShapeNotInTree) {
       continue;
     }
 

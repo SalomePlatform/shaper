@@ -206,7 +206,7 @@ static bool sameGeometry(const TopoDS_Shape theShape1, const TopoDS_Shape theSha
       TopoDS_Face aFace2 = TopoDS::Face(theShape2);
       Handle(Geom_Surface) aSurf2 = BRep_Tool::Surface(aFace2, aLoc2);
       return aSurf1 == aSurf2 && aLoc1.IsEqual(aLoc2);
-    } else if (theShape1.ShapeType() == TopAbs_FACE) { // check curves
+    } else if (theShape1.ShapeType() == TopAbs_EDGE) { // check curves
       TopLoc_Location aLoc1, aLoc2;
       Standard_Real aFirst, aLast;
       TopoDS_Edge anEdge1 = TopoDS::Edge(theShape1);
@@ -926,6 +926,23 @@ bool Selector_Selector::solve(const TopoDS_Shape& theContext)
       if (myWeakIndex != -1) {
         Selector_NExplode aNexp(aCommon);
         aResult = aNexp.shape(myWeakIndex);
+      } else if (myGeometricalNaming && aCommon.Extent() > 1) {
+        // check results are on the same geometry, create compound
+        TopoDS_ListOfShape::Iterator aCommonIter(aCommon);
+        TopoDS_Shape aFirst = aCommonIter.Value();
+        for(aCommonIter.Next(); aCommonIter.More(); aCommonIter.Next()) {
+          if (!sameGeometry(aFirst, aCommonIter.Value()))
+            break;
+        }
+        if (!aCommonIter.More()) { // all geometry is same, create a result compound
+          TopoDS_Builder aBuilder;
+          TopoDS_Compound aCompound;
+          aBuilder.MakeCompound(aCompound);
+          for(aCommonIter.Initialize(aCommon); aCommonIter.More(); aCommonIter.Next()) {
+            aBuilder.Add(aCompound, aCommonIter.Value());
+          }
+          aResult = aCompound;
+        }
       } else {
         return false;
       }

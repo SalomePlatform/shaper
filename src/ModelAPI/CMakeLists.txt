@@ -225,4 +225,5 @@ ADD_UNIT_TESTS(TestConstants.py
                TestWeakNaming2452.py
                Test2685.py
                TestGeomNamingPlacement.py
+               TestGeomNamingRevolution.py
 )
