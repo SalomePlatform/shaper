@@ -82,7 +82,7 @@ SHAPERGUI_ToolbarsDlg::SHAPERGUI_ToolbarsDlg(SHAPERGUI* theModule)
   myModule(theModule),
   myResult(theModule->shaperToolbars())
 {
-  myFreeCommands = getModuleFreeCommands();
+  myFreeCommands = theModule->getFreeCommands();
 
   setWindowTitle(tr("Toolbars"));
   QVBoxLayout* aMailLayout = new QVBoxLayout(this);
@@ -209,23 +209,6 @@ void SHAPERGUI_ToolbarsDlg::updateToolbarsList()
     aItems.append(aIt.key() + tr(" (%1 items)").arg(aIt.value().size() - aIt.value().count(-1)));
   }
   myToolbarsList->addItems(aItems);
-}
-
-QIntList SHAPERGUI_ToolbarsDlg::getModuleFreeCommands() const
-{
-  QIntList aFreeCommands;
-  QtxActionToolMgr* aMgr = myModule->toolMgr();
-  QAction* anAction;
-  int aId;
-  QMap<QString, QIntList>::const_iterator aIt;
-  QIntList aShaperActions = myModule->shaperActions();
-  foreach(int aCmd, aShaperActions) {
-    anAction = myModule->action(aCmd);
-    aId = aMgr->actionId(anAction);
-    if (!aMgr->containsAction(aId))
-      aFreeCommands.append(aCmd);
-  }
-  return aFreeCommands;
 }
 
 

@@ -156,10 +156,14 @@ Q_OBJECT
 
   virtual void updateModuleVisibilityState();
 
-
+  /// Returns list of the module commands
   QIntList shaperActions() const { return myActionsList; }
+
+  /// Returns structure of tool bars
   QMap<QString, QIntList> shaperToolbars() const { return myToolbars; }
 
+  /// Returns free commands which are not in toolbars in the module
+  QIntList getFreeCommands() const;
 
  public slots:
   /// \brief The method is redefined to connect to the study viewer before the data

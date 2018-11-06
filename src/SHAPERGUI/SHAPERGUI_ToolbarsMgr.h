@@ -124,9 +124,6 @@ private:
   /// Update number of free items
   void updateNumber();
 
-  /// Returns free commands which are not in toolbars in the module
-  QIntList getModuleFreeCommands() const;
-
 private:
   SHAPERGUI* myModule;
   QMap<QString, QIntList> myResult;

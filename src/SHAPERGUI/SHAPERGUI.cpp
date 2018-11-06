@@ -83,6 +83,11 @@ SHAPERGUI_EXPORT char* getModuleVersion()
 }
 } // extern "C"
 
+
+static const QString ToolbarsSection("SHAPER_Toolbars");
+static const QString FreeCommandsParam("OutOFToolbars");
+
+
 /** 
 * Class for preferences management
 */
@@ -902,7 +907,7 @@ void SHAPERGUI::saveToolbarsConfig()
 {
   if (!myIsToolbarsModified)
     return;
-  // Set toolbars config
+  // Save toolbars config into map
   QMap<QString, QStringList> aToolbarsConfig;
   QtxActionToolMgr* aMgr = toolMgr();
   QStringList aToolbars = myToolbars.keys();
@@ -918,30 +923,39 @@ void SHAPERGUI::saveToolbarsConfig()
     }
     aToolbarsConfig[aName] = aContent;
   }
-
+  // Store the config into resources
   SUIT_ResourceMgr* aResMgr = application()->resourceMgr();
   QStringList aNames = aToolbarsConfig.keys();
   QStringList aValues;
-  const QString aSection("SHAPER_Toolbars");
   foreach(QString aToolbar, aNames) {
-    aResMgr->setValue(aSection, aToolbar, aToolbarsConfig[aToolbar].join(","));
+    aResMgr->setValue(ToolbarsSection, aToolbar, aToolbarsConfig[aToolbar].join(","));
   }
-  QStringList aOldParams = aResMgr->parameters(aSection);
+  // Remove obsolete parameters from resources
+  QStringList aOldParams = aResMgr->parameters(ToolbarsSection);
   foreach(QString aName, aOldParams) {
     if (!aToolbars.contains(aName))
-      aResMgr->remove(aSection, aName);
+      aResMgr->remove(ToolbarsSection, aName);
   }
+  // Store current list of free commands
+  QIntList aFreeCommands = getFreeCommands();
+  QStringList aFreeList;
+  foreach(int aId, aFreeCommands) {
+    aFreeList.append(action(aId)->data().toString());
+  }
+  if (aFreeList.size() > 0)
+    aResMgr->setValue(ToolbarsSection, FreeCommandsParam, aFreeList.join(","));
+
   myIsToolbarsModified = false;
 }
 
 void SHAPERGUI::loadToolbarsConfig()
 {
-  const QString aSection("SHAPER_Toolbars");
   SUIT_ResourceMgr* aResMgr = application()->resourceMgr();
-  QStringList aToolbarNames = aResMgr->parameters(aSection);
+  QStringList aToolbarNames = aResMgr->parameters(ToolbarsSection);
   if (aToolbarNames.size() == 0)
     return;
 
+  // Create commands map
   QMap<QString, int> aCommandsMap;
   QString aCmdIdStr;
   foreach(int aId, myActionsList) {
@@ -949,23 +963,87 @@ void SHAPERGUI::loadToolbarsConfig()
     aCommandsMap[aCmdIdStr] = aId;
   }
 
+  // Create new toolbars structure
   QMap<QString, QIntList> aToolbars;
   QStringList aCommands;
+  QIntList aKnownCommands;
   QList<QAction*> aActions;
   foreach(QString aName, aToolbarNames) {
-    aCommands = aResMgr->stringValue(aSection, aName).split(",");
-
-    aToolbars[aName] = QIntList();
-    if (aCommands.size() > 0) {
+    aCommands = aResMgr->stringValue(ToolbarsSection, aName).split(",");
+    if (aName == FreeCommandsParam) {
+      // The value is a list of free commands
       foreach(QString aCommand, aCommands) {
-        if (aCommand.isEmpty())
-          aToolbars[aName].append(-1);
-        else if (aCommandsMap.contains(aCommand)) {
-          aToolbars[aName].append(aCommandsMap[aCommand]);
+        aKnownCommands.append(aCommandsMap[aCommand]);
+      }
+    }
+    else {
+      aToolbars[aName] = QIntList();
+      if (aCommands.size() > 0) {
+        foreach(QString aCommand, aCommands) {
+          if (aCommand.isEmpty())
+            aToolbars[aName].append(-1);
+          else if (aCommandsMap.contains(aCommand)) {
+            int aId = aCommandsMap[aCommand];
+            aToolbars[aName].append(aId);
+            aKnownCommands.append(aId);
+          }
+        }
+      }
+    }
+  }
+  // Find new and obsolete commands
+  QIntList aNewCommands = myActionsList;
+  foreach(int aId, myActionsList) {
+    if (aKnownCommands.contains(aId)) {
+      aKnownCommands.removeAll(aId);
+      aNewCommands.removeAll(aId);
+    }
+  }
+  if (aNewCommands.size() > 0) {
+    // Add new commands to toolbars structure
+    QStringList aKeys = myToolbars.keys();
+    foreach(int aNewId, aNewCommands) {
+      foreach(QString aName, aKeys) {
+        if (myToolbars[aName].contains(aNewId)) {
+          if (!aToolbars.contains(aName)) {
+            aToolbars[aName] = QIntList();
+          }
+          aToolbars[aName].append(aNewId);
+        }
+      }
+    }
+  }
+  if (aKnownCommands.size() > 0) {
+    // Remove obsolete commands from the toolbars structure
+    QStringList aKeys = aToolbars.keys();
+    foreach(int aOldId, aKnownCommands) {
+      foreach(QString aName, aKeys) {
+        if (aToolbars[aName].contains(aOldId)) {
+          aToolbars[aName].removeAll(aOldId);
+          if (aToolbars[aName].size() == 0)
+            aToolbars.remove(aName);
         }
       }
     }
   }
   updateToolbars(aToolbars);
   myIsToolbarsModified = false;
+}
+
+
+QIntList SHAPERGUI::getFreeCommands() const
+{
+  QIntList aFreeCommands;
+  QtxActionToolMgr* aMgr = toolMgr();
+  QAction* anAction;
+  int aId;
+  QMap<QString, QIntList>::const_iterator aIt;
+  QIntList aShaperActions = shaperActions();
+  foreach(int aCmd, aShaperActions) {
+    anAction = action(aCmd);
+    aId = aMgr->actionId(anAction);
+    if (!aMgr->containsAction(aId))
+      aFreeCommands.append(aCmd);
+  }
+  return aFreeCommands;
 }
