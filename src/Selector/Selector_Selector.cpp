@@ -197,7 +197,7 @@ static void findNeighbors(const TopoDS_Shape theContext, const TopoDS_Shape theV
 
 /// Returns true if the given shapes are based on the same geometry
 static bool sameGeometry(const TopoDS_Shape theShape1, const TopoDS_Shape theShape2) {
-  if (!theShape1.IsNull() && theShape2.IsNull() && theShape1.ShapeType() == theShape2.ShapeType())
+  if (!theShape1.IsNull() && !theShape2.IsNull() && theShape1.ShapeType() == theShape2.ShapeType())
   {
     if (theShape1.ShapeType() == TopAbs_FACE) { // check surfaces
       TopLoc_Location aLoc1, aLoc2;
@@ -942,7 +942,7 @@ bool Selector_Selector::solve(const TopoDS_Shape& theContext)
     break;
   }
   case SELTYPE_MODIFICATION: {
-    if (myBases.IsEmpty() && myWeakIndex) { // weak name by the final shapes index
+    if (myBases.IsEmpty() && myWeakIndex > 0) { // weak name by the final shapes index
       TopoDS_ListOfShape aCommon;
       Handle(TNaming_NamedShape) aNS;
       if (myFinal.FindAttribute(TNaming_NamedShape::GetID(), aNS)) {
@@ -959,7 +959,7 @@ bool Selector_Selector::solve(const TopoDS_Shape& theContext)
       findModificationResult(aFinalsCommon);
       if (aFinalsCommon.Extent() == 1) { // result is valid: found only one shape
         aResult = aFinalsCommon.First();
-      } else if (aFinalsCommon.Extent() > 1 && myWeakIndex) {
+      } else if (aFinalsCommon.Extent() > 1 && myWeakIndex > 0) {
         Selector_NExplode aNExp(aFinalsCommon);
         aResult = aNExp.shape(myWeakIndex);
       } else if (aFinalsCommon.Extent() > 1 && myGeometricalNaming) {// if same geometry - compound

@@ -63,4 +63,4 @@ SketchConstraintVertical_2 = Sketch_1.setVertical(SketchLine_5.result())
 SketchConstraintLength_1 = Sketch_1.setLength(SketchLine_5.result(), 25)
 model.end()
 
-assert(model.checkPythonDump(True))
+assert(model.checkPythonDump(model.ModelHighAPI.CHECK_WEAK))

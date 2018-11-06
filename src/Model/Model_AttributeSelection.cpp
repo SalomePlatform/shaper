@@ -911,13 +911,14 @@ void Model_AttributeSelection::selectSubShape(
       }
     }
 
-    Selector_Selector aSelector(aDoc->generalLabel());
+    Selector_Selector aSelector(selectionLabel());
     if (ModelAPI_Session::get()->moduleDocument() != owner()->document()) {
       aSelector.setBaseDocument(std::dynamic_pointer_cast<Model_Document>
         (ModelAPI_Session::get()->moduleDocument())->extConstructionsLabel());
     }
     myRestoreDocument = aDoc;
-    TDF_Label aContextLabel = aSelector.restoreByName(aSubShapeName, aShapeType, this);
+    TDF_Label aContextLabel = aSelector.restoreByName(
+      aSubShapeName, aShapeType, this, myIsGeometricalSelection);
     myRestoreDocument.reset();
     if (!aContextLabel.IsNull()) {
       ResultPtr aContext = aDoc->resultByLab(aContextLabel); // any label for document access
@@ -929,14 +930,26 @@ void Model_AttributeSelection::selectSubShape(
           aShapeToBeSelected->setImpl<TopoDS_Shape>(new TopoDS_Shape(aSelectorShape));
           // make the context result the latest existing
           aContext = newestContext(aContext, aShapeToBeSelected);
-          if (aCenterType != NOT_CENTER) {
-            if (!aShapeToBeSelected->isEdge())
-              continue;
-            std::shared_ptr<GeomAPI_Edge> aSelectedEdge(new GeomAPI_Edge(aShapeToBeSelected));
-            setValueCenter(aContext, aSelectedEdge, aCenterType);
+          if (myIsGeometricalSelection) { // store the currently generated name
+            selectionLabel().ForgetAllAttributes(true);
+            bool aToUnblock = false;
+            aToUnblock = !owner()->data()->blockSendAttributeUpdated(true);
+            myRef.setValue(aContext);
+            aSelector.store();
+            owner()->data()->sendAttributeUpdated(this);
+            if (aToUnblock)
+              owner()->data()->blockSendAttributeUpdated(false);
+            return;
+          } else { // re-select by context and value
+            if (aCenterType != NOT_CENTER) {
+              if (!aShapeToBeSelected->isEdge())
+                continue;
+              std::shared_ptr<GeomAPI_Edge> aSelectedEdge(new GeomAPI_Edge(aShapeToBeSelected));
+              setValueCenter(aContext, aSelectedEdge, aCenterType);
+            }
+            else
+              setValue(aContext, aShapeToBeSelected);
           }
-          else
-            setValue(aContext, aShapeToBeSelected);
           return;
         }
       }

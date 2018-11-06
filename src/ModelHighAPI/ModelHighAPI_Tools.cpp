@@ -377,7 +377,7 @@ std::string strByValueType(const ModelAPI_AttributeTables::ValueType theType)
   return ""; // bad case
 }
 
-/// stores the features information, recoursively stores sub-documetns features
+/// stores the features information, recursively stores sub-documents features
 std::string storeFeatures(const std::string& theDocName, DocumentPtr theDoc,
   std::map<std::string, std::map<std::string, ModelHighAPI_FeatureStore> >& theStore,
   const bool theCompare) // if false => store
@@ -390,7 +390,7 @@ std::string storeFeatures(const std::string& theDocName, DocumentPtr theDoc,
      }
   }
   // store the model features information: iterate all features
-  int anObjectsCount = 0; // stores the number of compared features for this document to compate
+  int anObjectsCount = 0; // stores the number of compared features for this document to compare
   std::set<std::string> aProcessed; // processed features names (that are in the current document)
 
   // process all objects (features and folders)
@@ -422,7 +422,7 @@ std::string storeFeatures(const std::string& theDocName, DocumentPtr theDoc,
       ModelAPI_Tools::allResults(aFeature, allResults);
       std::list<ResultPtr>::iterator aRes = allResults.begin();
       for(; aRes != allResults.end(); aRes++) {
-        // recoursively store features of sub-documents
+        // recursively store features of sub-documents
         if ((*aRes)->groupName() == ModelAPI_ResultPart::group()) {
           DocumentPtr aDoc = std::dynamic_pointer_cast<ModelAPI_ResultPart>(*aRes)->partDoc();
           if (aDoc.get()) {
@@ -511,7 +511,7 @@ static bool checkDump(SessionPtr theSession,
   return true;
 }
 
-bool checkPythonDump(const bool theWeakNameCheck)
+bool checkPythonDump(const checkDumpType theCheckType)
 {
   static const std::string anErrorByNaming("checkPythonDump by naming");
   static const std::string anErrorByGeometry("checkPythonDump by geometry");
@@ -522,14 +522,17 @@ bool checkPythonDump(const bool theWeakNameCheck)
   static char aFileForWeakDump[] = "./check_dump_weak.py";
 
   SessionPtr aSession = ModelAPI_Session::get();
-  if (!theWeakNameCheck) {
+  if (theCheckType & CHECK_NAMING) {
     // dump with the selection by names
     if (!dumpToPython(aSession, aFileForNamingDump, "topological_naming", anErrorByNaming))
       return false;
+  }
+  if (theCheckType & CHECK_GEOMETRICAL) {
     // dump with the selection by geometry
     if (!dumpToPython(aSession, aFileForGeometryDump, "geometric_selection", anErrorByGeometry))
       return false;
-  } else {
+  }
+  if (theCheckType & CHECK_WEAK) {
     // dump with the selection by weak naming
     if (!dumpToPython(aSession, aFileForWeakDump, "weak_naming", anErrorByWeak))
       return false;
@@ -546,13 +549,16 @@ bool checkPythonDump(const bool theWeakNameCheck)
   }
 
   bool isOk;
-  if (!theWeakNameCheck) {
+  if (theCheckType & CHECK_NAMING) {
     // check dump with the selection by names
     isOk = checkDump(aSession, aFileForNamingDump, aStore, anErrorByNaming);
+  }
+  if (theCheckType & CHECK_GEOMETRICAL) {
     // check dump with the selection by geometry
     isOk = isOk && checkDump(aSession, aFileForGeometryDump, aStore, anErrorByGeometry);
-  } else {
-    isOk = checkDump(aSession, aFileForWeakDump, aStore, anErrorByWeak);
+  }
+  if (theCheckType & CHECK_WEAK) {
+    isOk = isOk && checkDump(aSession, aFileForWeakDump, aStore, anErrorByWeak);
   }
 
   return isOk;

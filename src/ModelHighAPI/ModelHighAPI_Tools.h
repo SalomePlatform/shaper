@@ -168,11 +168,19 @@ ModelAPI_AttributeTables::ValueType valueTypeByStr(const std::string& theValueTy
 MODELHIGHAPI_EXPORT
 std::string strByValueType(const ModelAPI_AttributeTables::ValueType theType);
 
+/// Enumeration to manage the check python dump modes.
+enum checkDumpType {
+  CHECK_NAMING = 1, ///< check topological naming only
+  CHECK_GEOMETRICAL = 2, ///< check geometrical naming only
+  CHECK_NAMING_AND_GEOMETRICAL = 3, ///< default option, check topological and geometrical dumps
+  CHECK_WEAK = 4, ///< check weak naming only
+};
+
 /// Performs the high level API dump, then closes all and executes the script:
 /// model must be recreated fully, with all attributes
 /// \returns true if check is well done
 MODELHIGHAPI_EXPORT
-bool checkPythonDump(const bool theWeakNameCheck = false);
+bool checkPythonDump(const checkDumpType theCheckType = CHECK_NAMING_AND_GEOMETRICAL);
 
 //--------------------------------------------------------------------------------------
 //--------------------------------------------------------------------------------------
