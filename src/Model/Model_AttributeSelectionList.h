@@ -113,6 +113,13 @@ public:
   /// during non-modification operations with this attribute)
   MODEL_EXPORT virtual void cashValues(const bool theEnabled);
 
+  MODEL_EXPORT virtual void setGeometricalSelection(const bool theIsGeometricalSelection) override;
+
+  /// Returns true if is geometrical selection.
+  MODEL_EXPORT virtual bool isGeometricalSelection() const override {
+    return myIsGeometricalSelection;
+  };
+
 protected:
   /// Objects are created for features automatically
   MODEL_EXPORT Model_AttributeSelectionList(TDF_Label& theLabel);

@@ -1059,6 +1059,7 @@ void ModuleBase_WidgetMultiSelector::onSameTopology(bool theOn)
   if (aType == ModelAPI_AttributeSelectionList::typeId()) {
     AttributeSelectionListPtr aSelectionListAttr = myFeature->data()->selectionList(attributeID());
     //TODO: set same topology flag
+    aSelectionListAttr->setGeometricalSelection(theOn);
     updateObject(myFeature);
   }
 }

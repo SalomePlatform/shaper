@@ -98,6 +98,11 @@ class ModelAPI_AttributeSelectionList : public ModelAPI_Attribute
   /// during non-modification operations with this attribute)
   virtual void cashValues(const bool theEnabled) = 0;
 
+  virtual void setGeometricalSelection(const bool theIsGeometricalSelection) = 0;
+
+  /// Returns true if is geometrical selection.
+  virtual bool isGeometricalSelection() const = 0;
+
   /// Returns the type of this class of attributes
   static std::string typeId()
   {

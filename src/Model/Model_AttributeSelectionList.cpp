@@ -371,8 +371,9 @@ bool Model_AttributeSelectionList::isInitialized()
 }
 
 Model_AttributeSelectionList::Model_AttributeSelectionList(TDF_Label& theLabel)
+: myLab(theLabel),
+  myIsGeometricalSelection(false)
 {
-  myLab = theLabel;
   reinit();
 }
 
@@ -401,4 +402,12 @@ void Model_AttributeSelectionList::cashValues(const bool theEnabled)
       }
     }
   }
+}
+
+void Model_AttributeSelectionList::setGeometricalSelection(const bool theIsGeometricalSelection)
+{
+  myIsGeometricalSelection = theIsGeometricalSelection;
+  // TODO: update list accodring to the flag:
+  // false - all objects with same geometry must be splited in separate.
+  // true - all objets with same geometry must be combined into single.
 }

@@ -447,7 +447,8 @@ bool Model_AttributeSelection::isInitialized()
 }
 
 Model_AttributeSelection::Model_AttributeSelection(TDF_Label& theLabel)
-  : myRef(theLabel)
+: myRef(theLabel),
+  myIsGeometricalSelection(false)
 {
   myIsInitialized = myRef.isInitialized();
   myParent = NULL;
@@ -458,9 +459,12 @@ void Model_AttributeSelection::setID(const std::string theID)
   myRef.setID(theID);
   ModelAPI_AttributeSelection::setID(theID);
   FeaturePtr aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(owner());
-  // TODO: check if parent list have geometrical selection flag.
-  myIsGeometricalSelection =
-    ModelAPI_Session::get()->validators()->isGeometricalSelection(aFeature->getKind(), id());
+  if (myParent) {
+    myIsGeometricalSelection = myParent->isGeometricalSelection();
+  } else {
+    myIsGeometricalSelection =
+      ModelAPI_Session::get()->validators()->isGeometricalSelection(aFeature->getKind(), id());
+  }
 }
 
 ResultPtr Model_AttributeSelection::context()
