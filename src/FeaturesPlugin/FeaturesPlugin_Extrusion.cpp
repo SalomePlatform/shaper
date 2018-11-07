@@ -148,7 +148,7 @@ bool FeaturesPlugin_Extrusion::makeExtrusions(ListOfShape& theBaseShapes,
       if(!aToShape.get() && aSelection->context().get()) {
         aToShape = aSelection->context()->shape();
       }
-      if (aToShape->isCompound()) {
+      if (aToShape.get() && aToShape->isCompound()) {
         GeomAPI_ShapeIterator anIt(aToShape);
         aToShape = anIt.current();
       }
@@ -159,7 +159,7 @@ bool FeaturesPlugin_Extrusion::makeExtrusions(ListOfShape& theBaseShapes,
       if(!aFromShape.get() && aSelection->context().get()) {
         aFromShape = aSelection->context()->shape();
       }
-      if (aFromShape->isCompound()) {
+      if (aFromShape.get() && aFromShape->isCompound()) {
         GeomAPI_ShapeIterator anIt(aFromShape);
         aFromShape = anIt.current();
       }
