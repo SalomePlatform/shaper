@@ -23,6 +23,7 @@
 
 #include <CAM_Application.h>
 #include <SUIT_Desktop.h>
+#include <SUIT_Session.h>
 #include <QtxActionToolMgr.h>
 
 #include <QLayout>
@@ -248,7 +249,9 @@ void SHAPERGUI_ToolbarsDlg::onReset()
 
 void SHAPERGUI_ToolbarsDlg::onHelp()
 {
-
+  SUIT_Application* app = SUIT_Session::session()->activeApplication();
+  if (app)
+    app->onHelpContextModule("SHAPER", "Introduction.html", "toolbars_dialog");
 }
 
 
@@ -469,5 +472,7 @@ QIntList SHAPERGUI_ToolbarItemsDlg::getItems(QListWidget* theWidget, int theStar
 
 void SHAPERGUI_ToolbarItemsDlg::onHelp()
 {
-
+  SUIT_Application* app = SUIT_Session::session()->activeApplication();
+  if (app)
+    app->onHelpContextModule("SHAPER", "Introduction.html", "edit_toolbar");
 }
