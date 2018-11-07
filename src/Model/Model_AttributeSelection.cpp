@@ -1442,7 +1442,7 @@ void Model_AttributeSelection::updateInHistory()
       if (aValueShape.get()) {
         aShapeShapeType = aValueShape->shapeType();
       } else {
-        (*aNewCont)->shape()->shapeType();
+        aShapeShapeType = (*aNewCont)->shape()->shapeType();
       }
       if (aListShapeType != GeomAPI_Shape::SHAPE && aListShapeType != aShapeShapeType) {
         continue;
