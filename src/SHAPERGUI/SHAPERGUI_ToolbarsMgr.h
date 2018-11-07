@@ -79,6 +79,9 @@ private slots:
   /// A slot to move a current item down in list of toolbar command
   void onDown();
 
+  /// A slot on help call
+  void onHelp();
+
 private:
   QIntList getItems(QListWidget* theWidget, int theStart) const;
 
@@ -119,8 +122,11 @@ private slots:
   /// A slot to delete a current toolbar
   void onDelete();
 
-  /// A slot to delete a current toolbar
+  /// A slot to reset toolbars
   void onReset();
+
+  /// A slot on help call
+  void onHelp();
 
   /// A slot called on double click on item in list
   void onDoubleClick(const QModelIndex& theIdx);

@@ -146,10 +146,12 @@ SHAPERGUI_ToolbarsDlg::SHAPERGUI_ToolbarsDlg(SHAPERGUI* theModule)
 
   // Buttons part of the dialog
   QDialogButtonBox* aButtons =
-    new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel, Qt::Horizontal, this);
+    new QDialogButtonBox(QDialogButtonBox::Help | QDialogButtonBox::Ok | QDialogButtonBox::Cancel,
+      Qt::Horizontal, this);
   aMailLayout->addWidget(aButtons);
   connect(aButtons, SIGNAL(accepted()), SLOT(accept()));
   connect(aButtons, SIGNAL(rejected()), SLOT(reject()));
+  connect(aButtons, SIGNAL(helpRequested()), SLOT(onHelp()));
 
   updateToolbarsList();
   updateNumber();
@@ -242,6 +244,11 @@ void SHAPERGUI_ToolbarsDlg::onReset()
   updateNumber();
   updateToolbarsList();
   myIsReset = true;
+}
+
+void SHAPERGUI_ToolbarsDlg::onHelp()
+{
+
 }
 
 
@@ -351,10 +358,12 @@ SHAPERGUI_ToolbarItemsDlg::SHAPERGUI_ToolbarItemsDlg(QWidget* theParent,
 
   // Buttons part of the dialog
   QDialogButtonBox* aButtons =
-    new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel, Qt::Horizontal, this);
+    new QDialogButtonBox(QDialogButtonBox::Help | QDialogButtonBox::Ok | QDialogButtonBox::Cancel,
+      Qt::Horizontal, this);
   aMailLayout->addWidget(aButtons);
   connect(aButtons, SIGNAL(accepted()), SLOT(accept()));
   connect(aButtons, SIGNAL(rejected()), SLOT(reject()));
+  connect(aButtons, SIGNAL(helpRequested()), SLOT(onHelp()));
 }
 
 void SHAPERGUI_ToolbarItemsDlg::onAddItem()
@@ -456,4 +465,9 @@ QIntList SHAPERGUI_ToolbarItemsDlg::getItems(QListWidget* theWidget, int theStar
     aList.append(aItem->id());
   }
   return aList;
+}
+
+void SHAPERGUI_ToolbarItemsDlg::onHelp()
+{
+
 }
