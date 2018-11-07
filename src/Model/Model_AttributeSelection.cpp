@@ -1421,9 +1421,11 @@ void Model_AttributeSelection::updateInHistory()
   if (searchNewContext(aDoc, aNewCShape, aContext, aValShape, aContLab, aNewContexts, aValShapes))
   {
     GeomAPI_Shape::ShapeType aListShapeType = GeomAPI_Shape::SHAPE;
-    if (myParent->selectionType() == "VERTEX") aListShapeType = GeomAPI_Shape::VERTEX;
-    else if (myParent->selectionType() == "EDGE") aListShapeType = GeomAPI_Shape::EDGE;
-    else if (myParent->selectionType() == "FACE") aListShapeType = GeomAPI_Shape::FACE;
+    if (myParent) {
+      if (myParent->selectionType() == "VERTEX") aListShapeType = GeomAPI_Shape::VERTEX;
+      else if (myParent->selectionType() == "EDGE") aListShapeType = GeomAPI_Shape::EDGE;
+      else if (myParent->selectionType() == "FACE") aListShapeType = GeomAPI_Shape::FACE;
+    }
 
     std::list<ResultPtr>::iterator aNewCont = aNewContexts.begin();
     TopTools_ListIteratorOfListOfShape aNewValues(aValShapes);
