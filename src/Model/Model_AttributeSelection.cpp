@@ -1199,7 +1199,7 @@ void Model_AttributeSelection::computeValues(
         std::dynamic_pointer_cast<Model_Data>((*aNewContIter)->data());
       TDF_Label aNewLab = aNewData->shapeLab();
       // searching for produced sub-shape fully on some label
-      TDF_ChildIDIterator aNSIter(aNewLab, TNaming_NamedShape::GetID(), Standard_True);
+      TDF_ChildIDIterator aNSIter(aNewLab, TNaming_NamedShape::GetID());
       for(; aNSIter.More(); aNSIter.Next()) {
         Handle(TNaming_NamedShape) aNS = Handle(TNaming_NamedShape)::DownCast(aNSIter.Value());
         for(TNaming_Iterator aPairIter(aNS); aPairIter.More(); aPairIter.Next()) {
@@ -1420,50 +1420,43 @@ void Model_AttributeSelection::updateInHistory()
   TopTools_ListOfShape aValShapes;
   if (searchNewContext(aDoc, aNewCShape, aContext, aValShape, aContLab, aNewContexts, aValShapes))
   {
+    GeomAPI_Shape::ShapeType aListShapeType = GeomAPI_Shape::SHAPE;
+    if (myParent->selectionType() == "VERTEX") aListShapeType = GeomAPI_Shape::VERTEX;
+    else if (myParent->selectionType() == "EDGE") aListShapeType = GeomAPI_Shape::EDGE;
+    else if (myParent->selectionType() == "FACE") aListShapeType = GeomAPI_Shape::FACE;
+
     std::list<ResultPtr>::iterator aNewCont = aNewContexts.begin();
     TopTools_ListIteratorOfListOfShape aNewValues(aValShapes);
-    if (aNewCont == aNewContexts.end()) { // all results were deleted
+    bool aFirst = true; // first is set to this, next are appended to parent
+    for(; aNewCont != aNewContexts.end(); aNewCont++, aNewValues.Next()) {
+
+      GeomShapePtr aValueShape;
+      if (!aNewValues.Value().IsNull()) {
+        aValueShape = std::make_shared<GeomAPI_Shape>();
+        aValueShape->setImpl<TopoDS_Shape>(new TopoDS_Shape(aNewValues.Value()));
+      }
+      // Check that list has the same type of shape selection before adding.
+      GeomAPI_Shape::ShapeType aShapeShapeType = GeomAPI_Shape::SHAPE;
+      if (aValueShape.get()) {
+        aShapeShapeType = aValueShape->shapeType();
+      } else {
+        (*aNewCont)->shape()->shapeType();
+      }
+      if (aListShapeType != GeomAPI_Shape::SHAPE && aListShapeType != aShapeShapeType) {
+        continue;
+      }
+      if (aFirst) {
+        setValue(*aNewCont, aValueShape);
+        aFirst = false;
+      } else if (myParent) {
+        myParent->append(*aNewCont, aValueShape);
+      }
+    }
+    if (aFirst) { // nothing was added, all results were deleted
       ResultPtr anEmptyContext;
       std::shared_ptr<GeomAPI_Shape> anEmptyShape;
       setValue(anEmptyContext, anEmptyShape); // nullify the selection
       return;
-    }
-
-    GeomShapePtr aValueShape;
-    if (!aNewValues.Value().IsNull()) {
-      aValueShape = std::make_shared<GeomAPI_Shape>();
-      aValueShape->setImpl<TopoDS_Shape>(new TopoDS_Shape(aNewValues.Value()));
-    }
-    setValue(*aNewCont, aValueShape);
-    // if there are more than one result, put them by "append" into "parent" list
-    if (myParent) {
-      for(aNewCont++, aNewValues.Next(); aNewCont != aNewContexts.end();
-          aNewCont++, aNewValues.Next()) {
-        GeomShapePtr aValueShape;
-        if (!aNewValues.Value().IsNull()) {
-          aValueShape = std::make_shared<GeomAPI_Shape>();
-          aValueShape->setImpl<TopoDS_Shape>(new TopoDS_Shape(aNewValues.Value()));
-        }
-
-        // Check that list has the same type of shape selection before adding.
-        GeomAPI_Shape::ShapeType aListShapeType = GeomAPI_Shape::SHAPE;
-        if (myParent->selectionType() == "VERTEX") aListShapeType = GeomAPI_Shape::VERTEX;
-        else if (myParent->selectionType() == "EDGE") aListShapeType = GeomAPI_Shape::EDGE;
-        else if (myParent->selectionType() == "FACE") aListShapeType = GeomAPI_Shape::FACE;
-
-        GeomAPI_Shape::ShapeType aShapeShapeType = GeomAPI_Shape::SHAPE;
-        if (aValueShape.get()) {
-          aShapeShapeType = aValueShape->shapeType();
-        } else {
-          (*aNewCont)->shape()->shapeType();
-        }
-
-        if (aListShapeType != GeomAPI_Shape::SHAPE && aListShapeType != aShapeShapeType) {
-          continue;
-        }
-
-        myParent->append(*aNewCont, aValueShape);
-      }
     }
   }
 }
