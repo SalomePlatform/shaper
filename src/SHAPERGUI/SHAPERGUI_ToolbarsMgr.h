@@ -104,6 +104,11 @@ public:
   /// Returns result of editing
   QMap<QString, QIntList> result() const { return myResult; }
 
+  /// Returns a flag of resetted toolbars structure
+  bool isReset() const {
+    return myIsReset;
+  }
+
 private slots:
   /// A slot to add a new toolbar
   void onAdd();
@@ -113,6 +118,9 @@ private slots:
 
   /// A slot to delete a current toolbar
   void onDelete();
+
+  /// A slot to delete a current toolbar
+  void onReset();
 
   /// A slot called on double click on item in list
   void onDoubleClick(const QModelIndex& theIdx);
@@ -131,6 +139,8 @@ private:
 
   QLabel* myFreeNbLbl;
   QListWidget* myToolbarsList;
+
+  bool myIsReset;
 };
 
 

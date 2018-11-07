@@ -80,7 +80,8 @@ private:
 SHAPERGUI_ToolbarsDlg::SHAPERGUI_ToolbarsDlg(SHAPERGUI* theModule)
   : QDialog(theModule->application()->desktop()),
   myModule(theModule),
-  myResult(theModule->shaperToolbars())
+  myResult(theModule->shaperToolbars()),
+  myIsReset(false)
 {
   myFreeCommands = theModule->getFreeCommands();
 
@@ -122,17 +123,26 @@ SHAPERGUI_ToolbarsDlg::SHAPERGUI_ToolbarsDlg(SHAPERGUI* theModule)
   aContolsLay->addWidget(aButtonsWgt);
 
   QPushButton* aAddBtn = new QPushButton(tr("Add..."), aButtonsWgt);
+  aAddBtn->setToolTip(tr("Add a new empty toolbar to the toolbars list"));
   connect(aAddBtn, SIGNAL(clicked(bool)), SLOT(onAdd()));
   aBtnLayout->addWidget(aAddBtn);
 
   QPushButton* aEditBtn = new QPushButton(tr("Edit..."), aButtonsWgt);
+  aEditBtn->setToolTip(tr("Edit currently selected toolbar"));
   connect(aEditBtn, SIGNAL(clicked(bool)), SLOT(onEdit()));
   aBtnLayout->addWidget(aEditBtn);
 
   QPushButton* aDeleteBtn = new QPushButton(tr("Delete"), aButtonsWgt);
+  aDeleteBtn->setToolTip(tr("Delete currently selected toolbar"));
   connect(aDeleteBtn, SIGNAL(clicked(bool)), SLOT(onDelete()));
   aBtnLayout->addWidget(aDeleteBtn);
   aBtnLayout->addStretch(1);
+
+  QPushButton* aResetBtn = new QPushButton(tr("Reset"), aButtonsWgt);
+  aResetBtn->setToolTip(tr("Restore default toolbars structure"));
+  connect(aResetBtn, SIGNAL(clicked(bool)), SLOT(onReset()));
+  aBtnLayout->addWidget(aResetBtn);
+  aBtnLayout->addSpacing(19);
 
   // Buttons part of the dialog
   QDialogButtonBox* aButtons =
@@ -153,6 +163,7 @@ void SHAPERGUI_ToolbarsDlg::onAdd()
     if (!myResult.contains(aNewToolbar)) {
       myResult[aNewToolbar] = QIntList();
       updateToolbarsList();
+      myIsReset = false;
     }
     else {
       QString aMsg = tr("A tool bar with name %1 already exists").arg(aNewToolbar);
@@ -176,6 +187,7 @@ void SHAPERGUI_ToolbarsDlg::onEdit()
       myResult[aToolbarName] = aDlg.toolbarItems();
       updateNumber();
       updateToolbarsList();
+      myIsReset = false;
     }
   }
 }
@@ -196,6 +208,7 @@ void SHAPERGUI_ToolbarsDlg::onDelete()
       myResult.remove(aToolbarName);
       updateToolbarsList();
       updateNumber();
+      myIsReset = false;
     }
   }
 }
@@ -223,6 +236,15 @@ void SHAPERGUI_ToolbarsDlg::updateNumber()
   myFreeNbLbl->setText(QString::number(myFreeCommands.size()));
 }
 
+void SHAPERGUI_ToolbarsDlg::onReset()
+{
+  myResult = myModule->defaultToolbars();
+  updateNumber();
+  updateToolbarsList();
+  myIsReset = true;
+}
+
+
 //************************************************************************************
 //************************************************************************************
 //************************************************************************************
@@ -234,7 +256,7 @@ SHAPERGUI_ToolbarItemsDlg::SHAPERGUI_ToolbarItemsDlg(QWidget* theParent,
   : QDialog(theParent),
   myModule(theModule)
 {
-  setWindowTitle(tr("Edit toolbar items"));
+  setWindowTitle(tr("Edit toolbar"));
 
   QVBoxLayout* aMailLayout = new QVBoxLayout(this);
 

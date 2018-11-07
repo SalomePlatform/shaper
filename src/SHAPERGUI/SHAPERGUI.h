@@ -165,6 +165,12 @@ Q_OBJECT
   /// Returns free commands which are not in toolbars in the module
   QIntList getFreeCommands() const;
 
+  /// Returns structure of default tool bars
+  QMap<QString, QIntList> defaultToolbars() const
+  { return (myDefaultToolbars.size() == 0)? myToolbars : myDefaultToolbars; }
+
+  void resetToolbars();
+
  public slots:
   /// \brief The method is redefined to connect to the study viewer before the data
   /// model is filled by opened file. This file open will flush redisplay signals for,
@@ -270,6 +276,7 @@ private slots:
   /// List of registered actions
   QIntList myActionsList;
   QMap<QString, QIntList> myToolbars;
+  QMap<QString, QIntList> myDefaultToolbars;
   bool myIsToolbarsModified;
 };
 

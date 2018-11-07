@@ -823,7 +823,10 @@ void SHAPERGUI::onEditToolbars()
 {
   SHAPERGUI_ToolbarsDlg aDlg(this);
   if (aDlg.exec() == QDialog::Accepted) {
-    updateToolbars(aDlg.result());
+    if (aDlg.isReset())
+      resetToolbars();
+    else
+      updateToolbars(aDlg.result());
   }
 }
 
@@ -846,6 +849,10 @@ int SHAPERGUI::getNextCommandId() const
 
 void SHAPERGUI::updateToolbars(const QMap<QString, QIntList>& theNewToolbars)
 {
+  // Store default toolbars
+  if (myDefaultToolbars.size() == 0)
+    myDefaultToolbars = myToolbars;
+
   QtxActionToolMgr* aMgr = toolMgr();
   QStringList aToolbars = theNewToolbars.keys();
   QIntList aCommands, aOldCmd;
@@ -1046,4 +1053,13 @@ QIntList SHAPERGUI::getFreeCommands() const
       aFreeCommands.append(aCmd);
   }
   return aFreeCommands;
+}
+
+void SHAPERGUI::resetToolbars()
+{
+  if (!myDefaultToolbars.isEmpty())
+    updateToolbars(myDefaultToolbars);
+  myIsToolbarsModified = false;
+  SUIT_ResourceMgr* aResMgr = application()->resourceMgr();
+  aResMgr->remove(ToolbarsSection);
 }
