@@ -219,7 +219,7 @@ void SHAPERGUI_ToolbarsDlg::updateToolbarsList()
   QStringList aItems;
   QMap<QString, QIntList>::const_iterator aIt;
   for (aIt = myResult.cbegin(); aIt != myResult.cend(); aIt++) {
-    aItems.append(aIt.key() + tr(" (%1 items)").arg(aIt.value().size() - aIt.value().count(-1)));
+    aItems.append(aIt.key() + tr(" (%1 commands)").arg(aIt.value().size() - aIt.value().count(-1)));
   }
   myToolbarsList->addItems(aItems);
 }
