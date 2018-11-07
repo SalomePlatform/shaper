@@ -251,7 +251,7 @@ void SHAPERGUI_ToolbarsDlg::onHelp()
 {
   SUIT_Application* app = SUIT_Session::session()->activeApplication();
   if (app)
-    app->onHelpContextModule("SHAPER", "Introduction.html", "toolbars_dialog");
+    app->onHelpContextModule("SHAPER", "Introduction.html", "toolbars-dialog-box");
 }
 
 
@@ -474,5 +474,5 @@ void SHAPERGUI_ToolbarItemsDlg::onHelp()
 {
   SUIT_Application* app = SUIT_Session::session()->activeApplication();
   if (app)
-    app->onHelpContextModule("SHAPER", "Introduction.html", "edit_toolbar");
+    app->onHelpContextModule("SHAPER", "Introduction.html", "edit-toolbar-dialog-box");
 }
