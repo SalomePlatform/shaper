@@ -934,7 +934,8 @@ void Model_AttributeSelection::selectSubShape(
           aShapeToBeSelected->setImpl<TopoDS_Shape>(new TopoDS_Shape(aSelectorShape));
           // make the context result the latest existing
           aContext = newestContext(aContext, aShapeToBeSelected);
-          if (myIsGeometricalSelection || aCenterType == NOT_CENTER) { // store the currently generated name
+          if (myIsGeometricalSelection || aCenterType == NOT_CENTER) {
+            // store the currently generated name
             selectionLabel().ForgetAllAttributes(true);
             bool aToUnblock = false;
             aToUnblock = !owner()->data()->blockSendAttributeUpdated(true);
