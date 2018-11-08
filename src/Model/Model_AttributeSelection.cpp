@@ -934,25 +934,22 @@ void Model_AttributeSelection::selectSubShape(
           aShapeToBeSelected->setImpl<TopoDS_Shape>(new TopoDS_Shape(aSelectorShape));
           // make the context result the latest existing
           aContext = newestContext(aContext, aShapeToBeSelected);
-          if (myIsGeometricalSelection) { // store the currently generated name
+          if (myIsGeometricalSelection || aCenterType == NOT_CENTER) { // store the currently generated name
             selectionLabel().ForgetAllAttributes(true);
             bool aToUnblock = false;
             aToUnblock = !owner()->data()->blockSendAttributeUpdated(true);
             myRef.setValue(aContext);
             aSelector.store();
+            aSelector.solve(aContextShape);
             owner()->data()->sendAttributeUpdated(this);
             if (aToUnblock)
               owner()->data()->blockSendAttributeUpdated(false);
             return;
-          } else { // re-select by context and value
-            if (aCenterType != NOT_CENTER) {
-              if (!aShapeToBeSelected->isEdge())
-                continue;
-              std::shared_ptr<GeomAPI_Edge> aSelectedEdge(new GeomAPI_Edge(aShapeToBeSelected));
-              setValueCenter(aContext, aSelectedEdge, aCenterType);
-            }
-            else
-              setValue(aContext, aShapeToBeSelected);
+          } else { // re-select center of circle/arc by context and value
+            if (!aShapeToBeSelected->isEdge())
+              continue;
+            std::shared_ptr<GeomAPI_Edge> aSelectedEdge(new GeomAPI_Edge(aShapeToBeSelected));
+            setValueCenter(aContext, aSelectedEdge, aCenterType);
           }
           return;
         }

@@ -177,4 +177,4 @@ aSession.startOperation()
 aPart.removeFeature(aWireFeature3)
 aSession.finishOperation()
 
-assert(model.checkPythonDump())
+assert(model.checkPythonDump(model.ModelHighAPI.CHECK_NAMING))

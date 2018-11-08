@@ -175,4 +175,4 @@ model.end()
 # =============================================================================
 # Test 12. Check Python dump
 # =============================================================================
-assert(model.checkPythonDump())
+assert(model.checkPythonDump(model.ModelHighAPI.CHECK_NAMING))

@@ -548,7 +548,7 @@ bool checkPythonDump(const checkDumpType theCheckType)
     return false;
   }
 
-  bool isOk;
+  bool isOk = true;
   if (theCheckType & CHECK_NAMING) {
     // check dump with the selection by names
     isOk = checkDump(aSession, aFileForNamingDump, aStore, anErrorByNaming);
