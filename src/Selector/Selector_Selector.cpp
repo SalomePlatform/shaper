@@ -23,7 +23,6 @@
 #include <Selector_NameGenerator.h>
 #include <Selector_NExplode.h>
 
-#include <TDF_ChildIDIterator.hxx>
 #include <TopoDS_Iterator.hxx>
 #include <TopoDS_Builder.hxx>
 #include <TopoDS.hxx>
@@ -39,11 +38,14 @@
 #include <TopTools_MapOfShape.hxx>
 #include <BRep_Tool.hxx>
 
+#include <TDF_ChildIDIterator.hxx>
+#include <TDF_Tool.hxx>
 #include <TDataStd_Integer.hxx>
 #include <TDataStd_ReferenceArray.hxx>
 #include <TDataStd_IntegerArray.hxx>
 #include <TDataStd_Name.hxx>
 #include <TDataStd_UAttribute.hxx>
+#include <TDataStd_ExtStringList.hxx>
 
 #include <list>
 
@@ -54,6 +56,9 @@ static const Standard_GUID kSHAPE_TYPE("864b3267-cb9d-4107-bf58-c3ce1775b171");
 //  reference attribute that contains the reference to labels where the "from" or "base" shapes
 // of selection are located
 static const Standard_GUID kBASE_ARRAY("7c515b1a-9549-493d-9946-a4933a22f45f");
+// if the base array contains reference to the root label, this means that it refers to an
+// external document and this list contains a tag in the document
+static const Standard_GUID kBASE_LIST("7c515b1a-9549-493d-9946-a4933a22f45a");
 // array of the neighbor levels
 static const Standard_GUID kLEVELS_ARRAY("ee4c4b45-e859-4e86-aa4f-6eac68e0ca1f");
 // weak index (integer) of the sub-shape
@@ -649,8 +654,37 @@ bool Selector_Selector::select(const TopoDS_Shape theContext, const TopoDS_Shape
   return false;
 }
 
+/// Stores the array of references to the label: references to elements of ref-list, then the last
+static void storeBaseArray(const TDF_Label& theLab,
+  const TDF_LabelList& theRef, const TDF_Label& theLast)
+{
+  Handle(TDataStd_ReferenceArray) anArray =
+    TDataStd_ReferenceArray::Set(theLab, kBASE_ARRAY, 0, theRef.Extent());
+  Handle(TDataStd_ExtStringList) anEntries; // entries of references to external document
+  const TDF_Label aThisDocRoot = theLab.Root();
+  TDF_LabelList::Iterator aBIter(theRef);
+  for(int anIndex = 0; true; aBIter.Next(), anIndex++) {
+    const TDF_Label& aLab = aBIter.More() ? aBIter.Value() : theLast;
+    // check this is a label of this document
+    if (aLab.Root().IsEqual(aThisDocRoot)) {
+      anArray->SetValue(anIndex, aLab);
+    } else { // store reference to external document as an entry-string
+      if (anEntries.IsNull()) {
+        anEntries = TDataStd_ExtStringList::Set(theLab, kBASE_LIST);
+      }
+      TCollection_AsciiString anEntry;
+      TDF_Tool::Entry(aLab, anEntry);
+      anEntries->Append(anEntry);
+      anArray->SetValue(anIndex, aThisDocRoot); // stored root means it is external reference
+    }
+    if (!aBIter.More())
+      break;
+  }
+}
+
 void Selector_Selector::store()
 {
+  static const TDF_LabelList anEmptyRefList;
   myLab.ForgetAllAttributes(true); // remove old naming data
   TDataStd_Integer::Set(myLab, kSEL_TYPE, (int)myType);
   if (myGeometricalNaming)
@@ -670,19 +704,11 @@ void Selector_Selector::store()
     break;
   }
   case SELTYPE_PRIMITIVE: {
-    Handle(TDataStd_ReferenceArray) anArray =
-      TDataStd_ReferenceArray::Set(myLab, kBASE_ARRAY, 0, 0);
-    anArray->SetValue(0, myFinal);
+    storeBaseArray(myLab, anEmptyRefList, myFinal);
     break;
   }
   case SELTYPE_MODIFICATION: {
-    Handle(TDataStd_ReferenceArray) anArray =
-      TDataStd_ReferenceArray::Set(myLab, kBASE_ARRAY, 0, myBases.Extent());
-    TDF_LabelList::Iterator aBIter(myBases);
-    for(int anIndex = 0; aBIter.More(); aBIter.Next(), anIndex++) {
-      anArray->SetValue(anIndex, aBIter.Value());
-    }
-    anArray->SetValue(myBases.Extent(), myFinal); // final is in the end of array
+    storeBaseArray(myLab, myBases, myFinal);
     if (myWeakIndex != -1) {
       TDataStd_Integer::Set(myLab, kWEAK_INDEX, myWeakIndex);
     }
@@ -707,11 +733,8 @@ void Selector_Selector::store()
   case SELTYPE_WEAK_NAMING: {
     TDataStd_Integer::Set(myLab, kWEAK_INDEX, myWeakIndex);
     TDataStd_Integer::Set(myLab, kSHAPE_TYPE, (int)myShapeType);
-    // store myFinal in the base array
     if (!myFinal.IsNull()) {
-      Handle(TDataStd_ReferenceArray) anArray =
-        TDataStd_ReferenceArray::Set(myLab, kBASE_ARRAY, 0, 0);
-      anArray->SetValue(0, myFinal);
+      storeBaseArray(myLab, anEmptyRefList, myFinal);
     }
     break;
   }
@@ -720,6 +743,43 @@ void Selector_Selector::store()
   }
   }
 }
+
+/// Restores references to the labels: references to elements of ref-list, then the last
+static bool restoreBaseArray(const TDF_Label& theLab, const TDF_Label& theBaseDocumetnLab,
+  TDF_LabelList& theRef, TDF_Label& theLast)
+{
+  const TDF_Label aThisDocRoot = theLab.Root();
+  Handle(TDataStd_ExtStringList) anEntries; // entries of references to external document
+  TDataStd_ListOfExtendedString::Iterator anIter;
+  Handle(TDataStd_ReferenceArray) anArray;
+  if (theLab.FindAttribute(kBASE_ARRAY, anArray)) {
+    int anUpper = anArray->Upper();
+    for(int anIndex = anArray->Lower(); anIndex <= anUpper; anIndex++) {
+      TDF_Label aLab = anArray->Value(anIndex);
+      if (aLab.IsEqual(aThisDocRoot)) { // external document reference
+        if (theBaseDocumetnLab.IsNull())
+          return false;
+        if (anEntries.IsNull()) {
+          if (!theLab.FindAttribute(kBASE_LIST, anEntries))
+            return false;
+          anIter.Initialize(anEntries->List());
+        }
+        if (!anIter.More())
+          return false;
+        TDF_Tool::Label(theBaseDocumetnLab.Data(), anIter.Value(), aLab);
+        anIter.Next();
+      }
+      if (anIndex == anUpper) {
+        theLast = aLab;
+      } else {
+        theRef.Append(aLab);
+      }
+    }
+    return true;
+  }
+  return false;
+}
+
 
 bool Selector_Selector::restore()
 {
@@ -751,21 +811,10 @@ bool Selector_Selector::restore()
     return aSubResult;
   }
   case SELTYPE_PRIMITIVE: {
-    Handle(TDataStd_ReferenceArray) anArray;
-    if (myLab.FindAttribute(kBASE_ARRAY, anArray)) {
-      myFinal = anArray->Value(0);
-      return true;
-    }
-    return false;
+    return restoreBaseArray(myLab, myBaseDocumentLab, myBases, myFinal);
   }
   case SELTYPE_MODIFICATION: {
-    Handle(TDataStd_ReferenceArray) anArray;
-    if (myLab.FindAttribute(kBASE_ARRAY, anArray)) {
-      int anUpper = anArray->Upper();
-      for(int anIndex = 0; anIndex < anUpper; anIndex++) {
-        myBases.Append(anArray->Value(anIndex));
-      }
-      myFinal = anArray->Value(anUpper);
+    if (restoreBaseArray(myLab, myBaseDocumentLab, myBases, myFinal)) {
       Handle(TDataStd_Integer) aWeakInt;
       if (myLab.FindAttribute(kWEAK_INDEX, aWeakInt)) {
         myWeakIndex = aWeakInt->Get();
@@ -806,10 +855,8 @@ bool Selector_Selector::restore()
     if (!myLab.FindAttribute(kSHAPE_TYPE, aShapeTypeAttr))
       return false;
     myShapeType = TopAbs_ShapeEnum(aShapeTypeAttr->Get());
-    Handle(TDataStd_ReferenceArray) anArray;
-    if (myLab.FindAttribute(kBASE_ARRAY, anArray)) {
-      myFinal = anArray->Value(0);
-    }
+    if (!restoreBaseArray(myLab, myBaseDocumentLab, myBases, myFinal))
+      return false;
     return true;
   }
   default: { // unknown case

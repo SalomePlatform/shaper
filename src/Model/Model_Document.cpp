@@ -32,6 +32,7 @@
 #include <ModelAPI_ResultBody.h>
 #include <Events_Loop.h>
 #include <Events_InfoMessage.h>
+#include <GeomAPI_Tools.h>
 
 #include <TDataStd_Integer.hxx>
 #include <TDataStd_Comment.hxx>
@@ -51,13 +52,18 @@
 #include <TDF_ListIteratorOfAttributeDeltaList.hxx>
 #include <TDF_ListIteratorOfLabelList.hxx>
 #include <TDF_LabelMap.hxx>
+#include <TDF_Tool.hxx>
 #include <TDF_DeltaOnAddition.hxx>
+#include <TDataStd_ExtStringList.hxx>
 #include <TDataStd_UAttribute.hxx>
 #include <TNaming_Builder.hxx>
 #include <TNaming_SameShapeIterator.hxx>
 #include <TNaming_Iterator.hxx>
 #include <TNaming_NamedShape.hxx>
 #include <TNaming_Tool.hxx>
+#include<TNaming_OldShapeIterator.hxx>
+#include <TopTools_DataMapOfShapeShape.hxx>
+#include <TopTools_ListOfShape.hxx>
 
 #include <TopExp_Explorer.hxx>
 #include <TopoDS_Shape.hxx>
@@ -91,6 +97,9 @@ static const int TAG_SELECTION_FEATURE = 3; ///< integer, tag of the selection f
 static const int TAG_NODES_STATE = 4; ///< array, tag of the Object Browser nodes states
 ///< naming structures constructions selected from other document
 static const int TAG_EXTERNAL_CONSTRUCTIONS = 5;
+
+/// reference to the shape in external document: sting list attribute identifier
+static const Standard_GUID kEXTERNAL_SHAPE_REF("9aa5dd14-6d34-4a8d-8786-05842fd7bbbd");
 
 Model_Document::Model_Document(const int theID, const std::string theKind)
     : myID(theID), myKind(theKind), myIsActive(false), myIsSetCurrentFeature(false),
@@ -134,6 +143,82 @@ static TCollection_ExtendedString DocFileName(const char* theDirName, const std:
 bool Model_Document::isRoot() const
 {
   return this == Model_Session::get()->moduleDocument().get();
+}
+
+/// Makes all modification and generation naming shapes that have old shapes corresponding to
+/// shapes in a root document be equal to this root document
+static void updateShapesFromRoot(const TDF_Label theThisAccess, const TDF_Label theRootAccess)
+{
+  TopTools_DataMapOfShapeShape aCurrentToRoot; // shapes that must be updated: from this to root
+  TDF_ChildIDIterator aThisIter(theThisAccess.Root(), kEXTERNAL_SHAPE_REF, true);
+  for(; aThisIter.More(); aThisIter.Next()) {
+    aCurrentToRoot.Clear();
+    Handle(TNaming_NamedShape) aNS;
+    if (!aThisIter.Value()->Label().FindAttribute(TNaming_NamedShape::GetID(), aNS))
+      continue;
+    if (aNS->Evolution() != TNaming_GENERATED && aNS->Evolution() != TNaming_MODIFY)
+      continue;
+    for (TNaming_Iterator aNSIter(aNS); aNSIter.More(); aNSIter.Next()) {
+      const TopoDS_Shape& anOld = aNSIter.OldShape();
+      if (anOld.IsNull())
+        continue;
+      TNaming_OldShapeIterator aNewIter(anOld, theThisAccess);
+      for (; aNewIter.More(); aNewIter.Next()) {
+        TNaming_Evolution anEvolution = aNewIter.NamedShape()->Evolution();
+        if (anEvolution != TNaming_SELECTED && anEvolution != TNaming_DELETE)
+          break;
+      }
+      if (aNewIter.More())
+        continue;
+      GeomShapePtr anOldShape(new GeomAPI_Shape), aRootShape(new GeomAPI_Shape);
+      anOldShape->setImpl<TopoDS_Shape>(new TopoDS_Shape(anOld));
+      anOldShape = GeomAPI_Tools::getTypedShape(anOldShape);
+
+      // search the same shape in the root document
+      Handle(TDataStd_ExtStringList) anEntries =
+        Handle(TDataStd_ExtStringList)::DownCast(aThisIter.Value());
+      TDataStd_ListOfExtendedString::Iterator anIter(anEntries->List());
+      for (; anIter.More(); anIter.Next()) {
+        TDF_Label aRootLab;
+        TDF_Tool::Label(theRootAccess.Data(), anIter.Value(), aRootLab);
+        if (aRootLab.IsNull())
+          continue;
+        Handle(TNaming_NamedShape) aRootNS;
+        if (!aRootLab.FindAttribute(TNaming_NamedShape::GetID(), aRootNS))
+          continue;
+        TNaming_Iterator aRootShapes(aRootNS);
+        for (; aRootShapes.More(); aRootShapes.Next()) {
+          if (aRootShapes.NewShape().IsNull())
+            continue;
+          aRootShape->setImpl(new TopoDS_Shape(aRootShapes.NewShape()));
+          aRootShape = GeomAPI_Tools::getTypedShape(aRootShape);
+          if (!anOldShape->isEqual(aRootShape)) // special checking by geometry
+            continue;
+          // found a good corresponded shape
+          if (!anOld.IsEqual(aRootShapes.NewShape()))
+            aCurrentToRoot.Bind(anOld, aRootShapes.NewShape());
+        }
+      }
+    }
+    if (!aCurrentToRoot.IsEmpty()) { // update the whole named shape content
+      TopTools_ListOfShape anOld, aNew;
+      TNaming_Evolution anEvol = aNS->Evolution();
+      for(TNaming_Iterator aNSIter(aNS); aNSIter.More(); aNSIter.Next()) {
+        anOld.Prepend(aCurrentToRoot.IsBound(aNSIter.OldShape()) ?
+          aCurrentToRoot.Find(aNSIter.OldShape()) : aNSIter.OldShape());
+        aNew.Prepend(aNSIter.NewShape());
+      }
+      TNaming_Builder aBuilder(aNS->Label());
+      TopTools_ListOfShape::Iterator anOldIter(anOld), aNewIter(aNew);
+      for(; anOldIter.More(); anOldIter.Next(), aNewIter.Next()) {
+        if (anEvol == TNaming_GENERATED) {
+          aBuilder.Generated(anOldIter.Value(), aNewIter.Value());
+        } else if (anEvol == TNaming_MODIFY) {
+          aBuilder.Modify(anOldIter.Value(), aNewIter.Value());
+        }
+      }
+    }
+  }
 }
 
 bool Model_Document::load(const char* theDirName, const char* theFileName, DocumentPtr theThis)
@@ -225,7 +310,7 @@ bool Model_Document::load(const char* theDirName, const char* theFileName, Docum
     // update the current features status
     setCurrentFeature(currentFeature(false), false);
     aSession->setCheckTransactions(true);
-    aSession->setActiveDocument(Model_Session::get()->moduleDocument(), false);
+    aSession->setActiveDocument(aSession->moduleDocument(), false);
     // this is done in Part result "activate", so no needed here. Causes not-blue active part.
     // aSession->setActiveDocument(anApp->getDocument(myID), true);
 
@@ -239,7 +324,10 @@ bool Model_Document::load(const char* theDirName, const char* theFileName, Docum
         anApp->setLoadByDemand(aPart->data()->name(),
           aPart->data()->document(ModelAPI_ResultPart::DOC_REF())->docId());
     }
-
+    if (!isRoot()) {
+      updateShapesFromRoot(myDoc->Main(),
+        std::dynamic_pointer_cast<Model_Document>(aSession->moduleDocument())->generalLabel());
+    }
   } else { // open failed, but new document was created to work with it: inform the model
     aSession->setActiveDocument(Model_Session::get()->moduleDocument(), false);
   }
