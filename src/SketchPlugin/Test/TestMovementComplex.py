@@ -370,7 +370,7 @@ SketchConstraintTangent_5 = Sketch_3.setTangent(SketchArc_5.results()[1], Sketch
 model.do()
 
 ExtrusionCut_1 = model.addExtrusionCut(Part_1_doc, [model.selection("FACE", "Sketch_3/Face-SketchArc_4_2r-SketchLine_18r-SketchLine_17r")], model.selection(), model.selection("FACE", "Fuse_1_1/Modified_Face&Sketch_1/SketchLine_2&Sketch_2/SketchLine_9"), 0, model.selection(), 0, [model.selection("SOLID", "Fuse_1_1")])
-ExtrusionFuse_1 = model.addExtrusionFuse(Part_1_doc, [model.selection("FACE", "Sketch_3/Face-SketchArc_4_2f-SketchLine_20r-SketchArc_5_2r-SketchLine_19r")], model.selection(), model.selection("FACE", "(Fuse_1_1/Modified_Face&Extrusion_2_1/From_Face)(ExtrusionCut_1_1/Modified_Face&Sketch_1/SketchLine_2&Sketch_2/SketchLine_9)(ExtrusionCut_1_1/Modified_Face&Extrusion_2_1/To_Face)(Extrusion_2_1/Generated_Face&Sketch_2/SketchLine_8)"), 0, model.selection(), 0, [model.selection("SOLID", "ExtrusionCut_1_1")])
+ExtrusionFuse_1 = model.addExtrusionFuse(Part_1_doc, [model.selection("FACE", "Sketch_3/Face-SketchArc_4_2f-SketchLine_20r-SketchArc_5_2r-SketchLine_19r")], model.selection(), model.selection("FACE", "(Fuse_1_1/Modified_Face&Extrusion_2_1/From_Face)(ExtrusionCut_1_1/Modified_Face&Sketch_1/SketchLine_2&Sketch_2/SketchLine_9)(ExtrusionCut_1_1/Generated_Face&Sketch_3/SketchArc_4_2)(ExtrusionCut_1_1/Modified_Face&Extrusion_2_1/To_Face)(Extrusion_2_1/Generated_Face&Sketch_2/SketchLine_8)"), 0, model.selection(), 0, [model.selection("SOLID", "ExtrusionCut_1_1")])
 model.do()
 
 model.end()

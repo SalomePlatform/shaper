@@ -192,7 +192,7 @@ def body_4():
     left, diagonal, bottom = model.addPolygon(sketch, *geom_points)
 
     # Binding
-    bottom_e = sketch.addLine("Boolean_2_1/Modified_Edge&weak_name_2")
+    bottom_e = sketch.addLine("[Boolean_2_1/Modified_Face&Extrusion_2_1/To_Face][Boolean_2_1/Modified_Face&Sketch_2/SketchLine_6]")
     sketch.setCoincident(bottom_e.endPoint(), bottom.startPoint())
     sketch.setCoincident(bottom_e.startPoint(), left.startPoint())
 
