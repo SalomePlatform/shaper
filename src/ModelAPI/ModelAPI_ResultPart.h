@@ -87,6 +87,9 @@ class ModelAPI_ResultPart : public ModelAPI_Result
   virtual std::shared_ptr<GeomAPI_Shape> shapeInPart(
     const std::string& theName, const std::string& theType, int& theIndex) = 0;
 
+  /// Updates the selection inside of the part as a geometrical selection
+  virtual bool combineGeometrical(const int theIndex, std::string& theNewName) = 0;
+
   /// Returns the shape selected in the selection index
   virtual std::shared_ptr<GeomAPI_Shape> selectionValue(const int theIndex) = 0;
 

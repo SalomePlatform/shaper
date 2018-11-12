@@ -1770,3 +1770,49 @@ ResultPtr Model_AttributeSelection::newestContext(
     aResult = theCurrent;
   return aResult;
 }
+
+void Model_AttributeSelection::combineGeometrical()
+{
+  if (myTmpContext.get() || myTmpSubShape.get())
+    return;
+  TDF_Label aSelLab = selectionLabel();
+  if (aSelLab.IsAttribute(kINVALID_SELECTION) || !myRef.isInitialized())
+    return;
+
+  if (aSelLab.IsAttribute(kCIRCLE_CENTER) || aSelLab.IsAttribute(kELLIPSE_CENTER1) ||
+      aSelLab.IsAttribute(kELLIPSE_CENTER2) || aSelLab.IsAttribute(kSIMPLE_REF_ID))
+    return;
+
+  if (aSelLab.IsAttribute(kPART_REF_ID)) {
+    ResultPartPtr aPart = std::dynamic_pointer_cast<ModelAPI_ResultPart>(context());
+    if (!aPart.get() || !aPart->isActivated())
+      return; // postponed naming needed
+    Handle(TDataStd_Integer) anIndex;
+    if (aSelLab.FindAttribute(TDataStd_Integer::GetID(), anIndex)) {
+      if (anIndex->Get()) { // special selection attribute was created, use it
+        std::string aNewName;
+        aPart->combineGeometrical(anIndex->Get(), aNewName);
+        TDataStd_Name::Set(aSelLab, aNewName.c_str());
+      }
+    }
+    return;
+  }
+
+  std::shared_ptr<Model_ResultConstruction> aConstr =
+    std::dynamic_pointer_cast<Model_ResultConstruction>(context());
+  if (aConstr.get())
+    return;
+  FeaturePtr aFeature = contextFeature();
+  if (aFeature.get())
+    return;
+
+  Selector_Selector aSelector(aSelLab);
+  if (ModelAPI_Session::get()->moduleDocument() != owner()->document()) {
+    aSelector.setBaseDocument(std::dynamic_pointer_cast<Model_Document>
+      (ModelAPI_Session::get()->moduleDocument())->extConstructionsLabel());
+  }
+  if (aSelector.restore()) {
+    TopoDS_Shape aContextShape = context()->shape()->impl<TopoDS_Shape>();
+    aSelector.combineGeometrical(aContextShape);
+  }
+}

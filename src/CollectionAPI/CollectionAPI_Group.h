@@ -70,6 +70,7 @@ typedef std::shared_ptr<CollectionAPI_Group> GroupPtr;
 /// \brief Create Group feature.
 COLLECTIONAPI_EXPORT
 GroupPtr addGroup(const std::shared_ptr<ModelAPI_Document>& thePart,
-                  const std::list<ModelHighAPI_Selection>& theGroupList);
+                  const std::list<ModelHighAPI_Selection>& theGroupList,
+                  const bool theShareSameTopology = false);
 
 #endif // CollectionAPI_Group_H_

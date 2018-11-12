@@ -75,6 +75,7 @@ static const std::string kPUREWEAK_NAME_IDENTIFIER = "_weak_name_";
 Selector_Selector::Selector_Selector(TDF_Label theLab) : myLab(theLab)
 {
   myWeakIndex = -1;
+  myAlwaysGeometricalNaming = false;
 }
 
 TDF_Label Selector_Selector::label()
@@ -362,7 +363,7 @@ bool Selector_Selector::select(const TopoDS_Shape theContext, const TopoDS_Shape
     { // iterate all sub-shapes and select them on sublabels
       for(TopoDS_Iterator aSubIter(theValue); aSubIter.More(); aSubIter.Next()) {
         if (!selectBySubSelector(theContext, aSubIter.Value(),
-            theGeometricalNaming, theUseNeighbors, theUseIntersections)) {
+            false, theUseNeighbors, theUseIntersections)) {//for subs no geometrical naming allowed
           return false; // if some selector is failed, everything is failed
         }
       }
@@ -461,8 +462,20 @@ bool Selector_Selector::select(const TopoDS_Shape theContext, const TopoDS_Shape
       }
     }
 
-    // weak naming to distinguish commons coming from intersection
     if (aLastCommon.Extent() > 1) {
+      if (myAlwaysGeometricalNaming) {
+        TopoDS_ListOfShape::Iterator aCommonIter(aLastCommon);
+        TopoDS_Shape aFirst = aCommonIter.Value();
+        for(aCommonIter.Next(); aCommonIter.More(); aCommonIter.Next()) {
+          if (!sameGeometry(aFirst, aCommonIter.Value()))
+            break;
+        }
+        if (!aCommonIter.More()) { // all geometry is same, result is a compound
+          myType = SELTYPE_INTERSECT;
+          return true;
+        }
+      }
+      // weak naming to distinguish commons coming from intersection
       Selector_NExplode aNexp(aLastCommon);
       myWeakIndex = aNexp.index(theValue);
       if (myWeakIndex != -1) {
@@ -580,6 +593,18 @@ bool Selector_Selector::select(const TopoDS_Shape theContext, const TopoDS_Shape
       findModificationResult(aCommon);
       // trying to search by neighbors
       if (aCommon.Extent() > 1) { // more complicated selection
+        if (myAlwaysGeometricalNaming) {
+          TopoDS_ListOfShape::Iterator aCommonIter(aCommon);
+          TopoDS_Shape aFirst = aCommonIter.Value();
+          for(aCommonIter.Next(); aCommonIter.More(); aCommonIter.Next()) {
+            if (!sameGeometry(aFirst, aCommonIter.Value()))
+              break;
+          }
+          if (!aCommonIter.More()) { // all geometry is same, result is a compound
+            myType = SELTYPE_MODIFICATION;
+            return true;
+          }
+        }
         if (!theUseNeighbors)
           return false;
 
@@ -622,7 +647,20 @@ bool Selector_Selector::select(const TopoDS_Shape theContext, const TopoDS_Shape
           }
         }
         // filter by neighbors did not help
-        if (aCommon.Extent() > 1) { // weak naming between the common results
+        if (aCommon.Extent() > 1) {
+          if (myAlwaysGeometricalNaming) {
+            TopoDS_ListOfShape::Iterator aCommonIter(aCommon);
+            TopoDS_Shape aFirst = aCommonIter.Value();
+            for(aCommonIter.Next(); aCommonIter.More(); aCommonIter.Next()) {
+              if (!sameGeometry(aFirst, aCommonIter.Value()))
+                break;
+            }
+            if (!aCommonIter.More()) { // all geometry is same, result is a compound
+              myType = SELTYPE_FILTER_BY_NEIGHBOR;
+              return true;
+            }
+          }
+          // weak naming between the common results
           Selector_NExplode aNexp(aCommon);
           myWeakIndex = aNexp.index(theValue);
           if (myWeakIndex == -1)
@@ -1360,4 +1398,41 @@ bool Selector_Selector::selectBySubSelector(const TopoDS_Shape theContext,
     return false;
   }
   return true;
+}
+
+void Selector_Selector::combineGeometrical(const TopoDS_Shape theContext)
+{
+  TopoDS_Shape aValue = value();
+  if (aValue.IsNull() || aValue.ShapeType() == TopAbs_COMPOUND)
+    return;
+  myAlwaysGeometricalNaming = true;
+  mySubSelList.clear();
+  myBases.Clear();
+  myWeakIndex = -1;
+  if (select(theContext, aValue, true)) {
+    store();
+    solve(theContext);
+    return;
+  }
+  // if can not select, select the compound in a custom way
+  TopTools_MapOfShape aMap;
+  TopoDS_ListOfShape aList;
+  for(TopExp_Explorer anExp(theContext, aValue.ShapeType()); anExp.More(); anExp.Next()) {
+    if (aMap.Add(anExp.Current())) {
+      if (sameGeometry(aValue, anExp.Current()))
+        aList.Append(anExp.Current());
+    }
+  }
+  if (aList.Size() > 1) {
+    TopoDS_Builder aBuilder;
+    TopoDS_Compound aCompound;
+    aBuilder.MakeCompound(aCompound);
+    for(TopoDS_ListIteratorOfListOfShape aListIter(aList); aListIter.More(); aListIter.Next()) {
+      aBuilder.Add(aCompound, aListIter.Value());
+    }
+    if (select(theContext, aCompound, true)) {
+      store();
+      solve(theContext);
+    }
+  }
 }

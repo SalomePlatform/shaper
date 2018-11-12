@@ -323,6 +323,24 @@ gp_Trsf Model_ResultPart::sumTrsf() {
   return aResult;
 }
 
+bool Model_ResultPart::combineGeometrical(const int theIndex, std::string& theNewName)
+{
+  std::shared_ptr<Model_Document> aDoc = std::dynamic_pointer_cast<Model_Document>(partDoc());
+  if (aDoc.get()) {
+    AttributeSelectionListPtr aSelAttr = aDoc->selectionInPartFeature();
+    AttributeSelectionPtr aThisAttr = aSelAttr->value(theIndex - 1);
+    if (aThisAttr.get()) {
+      aThisAttr->combineGeometrical();
+      if (aThisAttr->value().get()) {
+        int anIndex;
+        theNewName = nameInPart(aThisAttr->value(), anIndex);
+        return true;
+      }
+    }
+  }
+  return false; // something is wrong
+}
+
 std::shared_ptr<GeomAPI_Shape> Model_ResultPart::shapeInPart(
   const std::string& theName, const std::string& theType, int& theIndex)
 {

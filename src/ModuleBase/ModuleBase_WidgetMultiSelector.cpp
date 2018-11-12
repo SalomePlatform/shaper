@@ -160,9 +160,6 @@ ModuleBase_WidgetMultiSelector::ModuleBase_WidgetMultiSelector(QWidget* theParen
 
   aMainLay->addWidget(myListView->getControl(), 2, 0, 1, -1);
   aMainLay->setRowStretch(2, 1);
-  //aMainLay->addWidget(new QLabel(this)); //FIXME(sbh)???
-  //aMainLay->setRowMinimumHeight(3, 20);
-  //this->setLayout(aMainLay);
   connect(myTypeCtrl, SIGNAL(valueChanged(int)), this, SLOT(onSelectionTypeChanged()));
 
   bool aSameTop = theData->getBooleanAttribute("same_topology", false);
@@ -250,9 +247,9 @@ bool ModuleBase_WidgetMultiSelector::restoreValueCustom()
     return false;
 
   AttributePtr anAttribute = myFeature->data()->attribute(attributeID());
+  AttributeSelectionListPtr aSelectionListAttr = myFeature->data()->selectionList(attributeID());
   std::string aType = anAttribute->attributeType();
   if (aType == ModelAPI_AttributeSelectionList::typeId()) {
-    AttributeSelectionListPtr aSelectionListAttr = myFeature->data()->selectionList(attributeID());
     // Restore shape type
     std::string aSelectionType = aSelectionListAttr->selectionType().c_str();
     if (!aSelectionType.empty()) {
@@ -261,6 +258,7 @@ bool ModuleBase_WidgetMultiSelector::restoreValueCustom()
       myIsFirst = false;
     }
   }
+  myGeomCheck->setChecked(aSelectionListAttr->isGeometricalSelection());
   updateSelectionList();
   return true;
 }
@@ -1058,7 +1056,6 @@ void ModuleBase_WidgetMultiSelector::onSameTopology(bool theOn)
   std::string aType = anAttribute->attributeType();
   if (aType == ModelAPI_AttributeSelectionList::typeId()) {
     AttributeSelectionListPtr aSelectionListAttr = myFeature->data()->selectionList(attributeID());
-    //TODO: set same topology flag
     aSelectionListAttr->setGeometricalSelection(theOn);
     updateObject(myFeature);
   }

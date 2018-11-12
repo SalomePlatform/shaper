@@ -26,11 +26,13 @@
 
 #include <GeomAPI_Pnt.h>
 #include <GeomAPI_Shape.h>
+#include <GeomAPI_ShapeIterator.h>
 
 #include <TDF_AttributeIterator.hxx>
 #include <TDF_ChildIterator.hxx>
 #include <TDF_RelocationTable.hxx>
 #include <TDF_DeltaOnAddition.hxx>
+#include <TDataStd_UAttribute.hxx>
 #include <TopAbs_ShapeEnum.hxx>
 #include <TopoDS.hxx>
 #include <TopoDS_Shape.hxx>
@@ -40,6 +42,10 @@
 #include <TNaming_Iterator.hxx>
 #include <TNaming_NamedShape.hxx>
 #include <NCollection_List.hxx>
+
+/// GUID for UAttribute that indicates the list has "To add all elements that share the same
+/// topology" flag enabled
+static const Standard_GUID kIS_GEOMETRICAL_SELECTION("f16987b6-e6c8-435c-99fa-03a7e0b06e83");
 
 void Model_AttributeSelectionList::append(
     const ObjectPtr& theContext, const std::shared_ptr<GeomAPI_Shape>& theSubShape,
@@ -231,7 +237,7 @@ void Model_AttributeSelectionList::remove(const std::set<int>& theIndices)
 {
   int anOldSize = mySize->Get();
   int aRemoved = 0;
-  // iterate one by one and shifting the removed indicies
+  // iterate one by one and shifting the removed indices
   for(int aCurrent = 0; aCurrent < anOldSize; aCurrent++) {
     if (theIndices.find(aCurrent) == theIndices.end()) { // not removed
       if (aRemoved) { // but must be shifted to the removed position
@@ -263,6 +269,19 @@ int Model_AttributeSelectionList::size()
   return mySize->Get();
 }
 
+// returns true if theShape is same with theInList or is contained in it (a compound)
+static bool isIn(GeomShapePtr theInList, GeomShapePtr theShape) {
+  if (theShape->isSame(theInList))
+    return true;
+  if (theInList.get() && theInList->shapeType() == GeomAPI_Shape::COMPOUND) {
+    for(GeomAPI_ShapeIterator anIter(theInList); anIter.more(); anIter.next()) {
+      if (!anIter.current()->isNull() && anIter.current()->isSame(theShape))
+        return true;
+    }
+  }
+  return false;
+}
+
 bool Model_AttributeSelectionList::isInList(const ObjectPtr& theContext,
                                             const std::shared_ptr<GeomAPI_Shape>& theSubShape,
                                             const bool theTemporarily)
@@ -281,7 +300,7 @@ bool Model_AttributeSelectionList::isInList(const ObjectPtr& theContext,
               return true;
           } else {
             // we need to call here isSame instead of isEqual to do not check shapes orientation
-            if (theSubShape->isSame(*aShapes))
+            if (isIn(*aShapes, theSubShape))
               return true;
           }
         }
@@ -301,7 +320,7 @@ bool Model_AttributeSelectionList::isInList(const ObjectPtr& theContext,
           }
         } else {
           // we need to call here isSame instead of isEqual to do not check shapes orientation
-          if (theSubShape->isSame(aValue)) // shapes are equal
+          if (isIn(aValue, theSubShape)) // shapes are equal
             return true;
         }
       }
@@ -328,8 +347,8 @@ std::shared_ptr<ModelAPI_AttributeSelection>
   }
   TDF_Label aLabel = mySize->Label().FindChild(theIndex + 1);
   // create a new attribute each time, by demand
-  // supporting of old attributes is too slow (synch each time) and buggy on redo
-  // (if attribute is deleted and created, the abort updates attriute and makes the Attr invalid)
+  // supporting of old attributes is too slow (sync each time) and buggy on redo
+  // (if attribute is deleted and created, the abort updates attribute and makes the Attr invalid)
   std::shared_ptr<Model_AttributeSelection> aNewAttr =
     std::shared_ptr<Model_AttributeSelection>(new Model_AttributeSelection(aLabel));
   if (owner()) {
@@ -371,8 +390,7 @@ bool Model_AttributeSelectionList::isInitialized()
 }
 
 Model_AttributeSelectionList::Model_AttributeSelectionList(TDF_Label& theLabel)
-: myLab(theLabel),
-  myIsGeometricalSelection(false)
+: myLab(theLabel)
 {
   reinit();
 }
@@ -404,10 +422,58 @@ void Model_AttributeSelectionList::cashValues(const bool theEnabled)
   }
 }
 
+bool Model_AttributeSelectionList::isGeometricalSelection() const
+{
+  return myLab.IsAttribute(kIS_GEOMETRICAL_SELECTION);
+}
+
 void Model_AttributeSelectionList::setGeometricalSelection(const bool theIsGeometricalSelection)
 {
-  myIsGeometricalSelection = theIsGeometricalSelection;
-  // TODO: update list accodring to the flag:
-  // false - all objects with same geometry must be splited in separate.
-  // true - all objets with same geometry must be combined into single.
+  if (isGeometricalSelection() == theIsGeometricalSelection)
+    return; // nothing to do
+  if (theIsGeometricalSelection) // store the state
+    TDataStd_UAttribute::Set(myLab, kIS_GEOMETRICAL_SELECTION);
+  else
+    myLab.ForgetAttribute(kIS_GEOMETRICAL_SELECTION);
+  std::set<int> anIndiciesToRemove;  // Update list according to the flag
+  if (theIsGeometricalSelection) { // all objects with same geometry must be combined into single
+    std::list<AttributeSelectionPtr> anAttributes; // collect attributes with geometrical compounds
+    for(int anIndex = 0; anIndex < size(); anIndex++) {
+      AttributeSelectionPtr anAttr = value(anIndex);
+      if (!anAttr.get() || !anAttr->context().get())
+        continue;
+      anAttr->combineGeometrical();
+      if (!anAttr->value().get() || anAttr->value()->shapeType() != GeomAPI_Shape::COMPOUND)
+        continue;
+      // check it is equal to some other attribute already presented in the list
+      std::list<AttributeSelectionPtr>::iterator anAttrIter = anAttributes.begin();
+      for(; anAttrIter != anAttributes.end(); anAttrIter++) {
+        if (anAttr->context() == (*anAttrIter)->context() &&
+            anAttr->namingName() == (*anAttrIter)->namingName()) {
+          anIndiciesToRemove.insert(anIndex);
+          break;
+        }
+      }
+      if (anAttrIter == anAttributes.end()) // not removed, so, add to the compare-list
+        anAttributes.push_back(anAttr);
+    }
+  } else { // all objects with same geometry must be divided into separated sub-attributes
+    int anInitialSize = size();
+    for(int anIndex = 0; anIndex < anInitialSize; anIndex++) {
+      AttributeSelectionPtr anAttr = value(anIndex);
+      if (!anAttr.get() || !anAttr->context().get())
+        continue;
+      GeomShapePtr aValue = anAttr->value();
+      if (!aValue.get() || aValue->shapeType() != GeomAPI_Shape::COMPOUND)
+        continue;
+      for(GeomAPI_ShapeIterator anIter(aValue); anIter.more(); anIter.next()) {
+        append(anAttr->context(), anIter.current());
+      }
+      anIndiciesToRemove.insert(anIndex);
+    }
+  }
+  remove(anIndiciesToRemove);
+  myIsCashed = false;
+  myCash.clear(); // empty list as indicator that cash is not used
+  owner()->data()->sendAttributeUpdated(this);
 }

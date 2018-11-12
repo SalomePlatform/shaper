@@ -62,6 +62,7 @@ class Selector_Selector
   TDF_Label myBaseDocumentLab; ///< an access-label to the document that may contain initial shapes
 
   bool myGeometricalNaming; ///< flag that indicates that geometrical naming selection is enabled
+  bool myAlwaysGeometricalNaming; /// to enable geometrical naming from beginning, at select
 
 public:
   /// Initializes selector on the label
@@ -104,6 +105,9 @@ public:
 
   /// Returns the naming name of the selection
   SELECTOR_EXPORT std::string name(Selector_NameGenerator* theNameGenerator);
+
+  /// Makes the current local selection becomes all sub-shapes with same base geometry.
+  SELECTOR_EXPORT void combineGeometrical(const TopoDS_Shape theContext);
 
 private:
 

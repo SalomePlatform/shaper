@@ -150,6 +150,9 @@ public:
   /// Returns the name by context. Adds the part name if the context is located in other document
   MODEL_EXPORT virtual std::string contextName(const ResultPtr& theContext) const;
 
+  /// Makes the current local selection becomes all sub-shapes with same base geometry.
+  MODEL_EXPORT virtual void combineGeometrical();
+
 protected:
   /// Objects are created for features automatically
   MODEL_EXPORT Model_AttributeSelection(TDF_Label& theLabel);

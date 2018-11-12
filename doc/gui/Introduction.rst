@@ -241,7 +241,7 @@ Each feature, result, construction, group, field, parameter can be renamed using
 .. centered::
    Construction pop-up menu
 
-The order of features can be changed using *Move to the end* pop-up menu command. The selected feature will be moved to the end of feature list.
+The order of features can be changed using *Move to the end* pop-up menu command. It works only for Group features. The selected group will be moved to the end of features list.
 
 Folders can be used to arrange long Tree View for features.
 

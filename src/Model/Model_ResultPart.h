@@ -79,6 +79,8 @@ class Model_ResultPart : public ModelAPI_ResultPart
   /// Returns the shape by the name in the part
   MODEL_EXPORT virtual std::shared_ptr<GeomAPI_Shape> shapeInPart(
     const std::string& theName, const std::string& theType, int& theIndex);
+  /// Updates the selection inside of the part as a geometrical selection
+  MODEL_EXPORT virtual bool combineGeometrical(const int theIndex, std::string& theNewName);
   /// Updates the shape-result of the part (called on Part feature execution)
   MODEL_EXPORT virtual void updateShape();
   /// Applies the additional transformation of the part

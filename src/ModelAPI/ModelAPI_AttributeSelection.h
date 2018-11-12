@@ -124,6 +124,8 @@ class ModelAPI_AttributeSelection : public ModelAPI_Attribute
   /// Returns the name by context. Adds the part name if the context is located in other document
   MODELAPI_EXPORT virtual std::string contextName(const ResultPtr& theContext) const = 0;
 
+  /// Makes the current local selection becomes all sub-shapes with same base geometry.
+  MODELAPI_EXPORT virtual void combineGeometrical() = 0;
 
  protected:
   /// Objects are created for features automatically
