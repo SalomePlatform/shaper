@@ -316,15 +316,31 @@ void FeaturesPlugin_CompositeSketch::storeGenerationHistory(ResultBodyPtr theRes
       aShapeTypeToExplode == GeomAPI_Shape::COMPOUND) {
     theResultBody->loadGeneratedShapes(theMakeShape, theBaseShape, GeomAPI_Shape::EDGE);
   }
-
+  std::list<std::shared_ptr<GeomAlgoAPI_MakeSweep> > aSweeps; // all sweeps collected
   std::shared_ptr<GeomAlgoAPI_MakeSweep> aMakeSweep =
     std::dynamic_pointer_cast<GeomAlgoAPI_MakeSweep>(theMakeShape);
   if(aMakeSweep.get()) {
+    aSweeps.push_back(aMakeSweep);
+  } else {
+    std::shared_ptr<GeomAlgoAPI_MakeShapeList> aMakeList =
+      std::dynamic_pointer_cast<GeomAlgoAPI_MakeShapeList>(theMakeShape);
+    if (aMakeList.get()) {
+      ListOfMakeShape::const_iterator anIter = aMakeList->list().cbegin();
+      for(; anIter != aMakeList->list().cend(); anIter++) {
+        std::shared_ptr<GeomAlgoAPI_MakeSweep> aSweep =
+          std::dynamic_pointer_cast<GeomAlgoAPI_MakeSweep>(*anIter);
+        if (aSweep.get())
+          aSweeps.push_back(aSweep);
+      }
+    }
+  }
+  std::list<std::shared_ptr<GeomAlgoAPI_MakeSweep> >::iterator aSweep = aSweeps.begin();
+  for(; aSweep != aSweeps.end(); aSweep++) {
     // Store from shapes.
-    storeShapes(theResultBody, aBaseShapeType, aMakeSweep->fromShapes(), "From_");
+    storeShapes(theResultBody, aBaseShapeType, (*aSweep)->fromShapes(), "From_");
 
     // Store to shapes.
-    storeShapes(theResultBody, aBaseShapeType, aMakeSweep->toShapes(), "To_");
+    storeShapes(theResultBody, aBaseShapeType, (*aSweep)->toShapes(), "To_");
   }
 }
 

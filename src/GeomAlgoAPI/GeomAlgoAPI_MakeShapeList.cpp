@@ -54,6 +54,12 @@ void GeomAlgoAPI_MakeShapeList::init(const ListOfMakeShape& theMakeShapeList)
   }
 }
 
+const ListOfMakeShape& GeomAlgoAPI_MakeShapeList::list() const
+{
+  return myListOfMakeShape;
+}
+
+
 //==================================================================================================
 void GeomAlgoAPI_MakeShapeList::appendAlgo(
   const GeomMakeShapePtr theMakeShape)

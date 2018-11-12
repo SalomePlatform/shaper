@@ -49,6 +49,9 @@ public:
   /// \param[in] theMakeShapeList list of algorithms.
   GEOMALGOAPI_EXPORT void init(const ListOfMakeShape& theMakeShapeList);
 
+  /// \return the list reference
+  GEOMALGOAPI_EXPORT const ListOfMakeShape& list() const;
+
   /// \brief Adds algo to the end of list.
   /// \param[in] theMakeShape algo to be added.
   GEOMALGOAPI_EXPORT void appendAlgo(const GeomMakeShapePtr theMakeShape);
