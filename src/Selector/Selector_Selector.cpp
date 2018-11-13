@@ -269,6 +269,7 @@ static const TopoDS_Shape findNeighbor(const TopoDS_Shape theContext,
   TopoDS_Compound aResultCompound; // in case of geometrical name and many candidates
   // iterate all matches to find by other (higher level) neighbors the best candidate
   TopoDS_Shape aGoodCandidate;
+  TopTools_MapOfShape aGoodCandidates; // already added good candidates to the map
   for(TopoDS_ListOfShape::Iterator aCandidate(aMatches); aCandidate.More(); aCandidate.Next()) {
     bool aValidCadidate = true;
     for(int aLevel = aMinLevel + 1; true; aLevel++) {
@@ -285,6 +286,8 @@ static const TopoDS_Shape findNeighbor(const TopoDS_Shape theContext,
           aGoodCandidate = aCandidate.Value();
         } else { // another good candidate
           if (theGeometrical && sameGeometry(aGoodCandidate, aCandidate.Value())) {
+            if (!aGoodCandidates.Add(aCandidate.Value()))
+              break;
             static TopoDS_Builder aBuilder;
             if (aResultCompound.IsNull()) {
               aBuilder.MakeCompound(aResultCompound);

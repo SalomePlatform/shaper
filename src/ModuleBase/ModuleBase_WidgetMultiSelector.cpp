@@ -258,7 +258,8 @@ bool ModuleBase_WidgetMultiSelector::restoreValueCustom()
       myIsFirst = false;
     }
   }
-  myGeomCheck->setChecked(aSelectionListAttr->isGeometricalSelection());
+  if (myGeomCheck)
+    myGeomCheck->setChecked(aSelectionListAttr->isGeometricalSelection());
   updateSelectionList();
   return true;
 }
