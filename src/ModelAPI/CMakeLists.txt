@@ -226,4 +226,6 @@ ADD_UNIT_TESTS(TestConstants.py
                Test2685.py
                TestGeomNamingPlacement.py
                TestGeomNamingRevolution.py
+               TestGeomNamingEdgeByFilter.py
+               TestGeomNamingSketchPlane.py
 )

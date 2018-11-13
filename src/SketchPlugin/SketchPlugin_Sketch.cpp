@@ -263,38 +263,39 @@ void SketchPlugin_Sketch::attributeChanged(const std::string& theID) {
         GeomAPI_ShapeIterator anIt(aSelection);
         aFace = anIt.current()->face();
       }
+      if (aFace.get()) {
+        std::shared_ptr<GeomAPI_Pln> aPlane = aFace->getPlane();
+        if (aPlane.get()) {
+          double anA, aB, aC, aD;
+          aPlane->coefficients(anA, aB, aC, aD);
 
-      std::shared_ptr<GeomAPI_Pln> aPlane = aFace->getPlane();
-      if (aPlane) {
-        double anA, aB, aC, aD;
-        aPlane->coefficients(anA, aB, aC, aD);
+          // calculate attributes of the sketch
+          std::shared_ptr<GeomAPI_Dir> aNormDir(new GeomAPI_Dir(anA, aB, aC));
+          std::shared_ptr<GeomAPI_XYZ> aCoords = aNormDir->xyz();
+          std::shared_ptr<GeomAPI_XYZ> aZero(new GeomAPI_XYZ(0, 0, 0));
+          aCoords = aCoords->multiplied(-aD * aCoords->distance(aZero));
+          std::shared_ptr<GeomAPI_Pnt> anOrigPnt(new GeomAPI_Pnt(aCoords));
+          // X axis is preferable to be dirX on the sketch
+          // here can not be very small value to avoid very close to X normal axis (issue 595)
+          static const double tol = 0.1;
+          bool isX = fabs(anA) - 1.0 < tol && fabs(aB) < tol && fabs(aC) < tol;
+          std::shared_ptr<GeomAPI_Dir> aTempDir(
+            isX ? new GeomAPI_Dir(0, 1, 0) : new GeomAPI_Dir(1, 0, 0));
+          std::shared_ptr<GeomAPI_Dir> aYDir(new GeomAPI_Dir(aNormDir->cross(aTempDir)));
+          std::shared_ptr<GeomAPI_Dir> aXDir(new GeomAPI_Dir(aYDir->cross(aNormDir)));
 
-        // calculate attributes of the sketch
-        std::shared_ptr<GeomAPI_Dir> aNormDir(new GeomAPI_Dir(anA, aB, aC));
-        std::shared_ptr<GeomAPI_XYZ> aCoords = aNormDir->xyz();
-        std::shared_ptr<GeomAPI_XYZ> aZero(new GeomAPI_XYZ(0, 0, 0));
-        aCoords = aCoords->multiplied(-aD * aCoords->distance(aZero));
-        std::shared_ptr<GeomAPI_Pnt> anOrigPnt(new GeomAPI_Pnt(aCoords));
-        // X axis is preferable to be dirX on the sketch
-        // here can not be very small value to avoid very close to X normal axis (issue 595)
-        static const double tol = 0.1;
-        bool isX = fabs(anA) - 1.0 < tol && fabs(aB) < tol && fabs(aC) < tol;
-        std::shared_ptr<GeomAPI_Dir> aTempDir(
-          isX ? new GeomAPI_Dir(0, 1, 0) : new GeomAPI_Dir(1, 0, 0));
-        std::shared_ptr<GeomAPI_Dir> aYDir(new GeomAPI_Dir(aNormDir->cross(aTempDir)));
-        std::shared_ptr<GeomAPI_Dir> aXDir(new GeomAPI_Dir(aYDir->cross(aNormDir)));
-
-        // update position of the sketch
-        std::shared_ptr<GeomDataAPI_Point> anOrigin = std::dynamic_pointer_cast
-          <GeomDataAPI_Point>(data()->attribute(SketchPlugin_Sketch::ORIGIN_ID()));
-        anOrigin->setValue(anOrigPnt);
-        std::shared_ptr<GeomDataAPI_Dir> aNormal = std::dynamic_pointer_cast<GeomDataAPI_Dir>(
-          data()->attribute(SketchPlugin_Sketch::NORM_ID()));
-        aNormal->setValue(aNormDir);
-        std::shared_ptr<GeomDataAPI_Dir> aDirX = std::dynamic_pointer_cast<GeomDataAPI_Dir>(
-          data()->attribute(SketchPlugin_Sketch::DIRX_ID()));
-        aDirX->setValue(aXDir);
-        std::shared_ptr<GeomAPI_Dir> aDir = aPlane->direction();
+          // update position of the sketch
+          std::shared_ptr<GeomDataAPI_Point> anOrigin = std::dynamic_pointer_cast
+            <GeomDataAPI_Point>(data()->attribute(SketchPlugin_Sketch::ORIGIN_ID()));
+          anOrigin->setValue(anOrigPnt);
+          std::shared_ptr<GeomDataAPI_Dir> aNormal = std::dynamic_pointer_cast<GeomDataAPI_Dir>(
+            data()->attribute(SketchPlugin_Sketch::NORM_ID()));
+          aNormal->setValue(aNormDir);
+          std::shared_ptr<GeomDataAPI_Dir> aDirX = std::dynamic_pointer_cast<GeomDataAPI_Dir>(
+            data()->attribute(SketchPlugin_Sketch::DIRX_ID()));
+          aDirX->setValue(aXDir);
+          std::shared_ptr<GeomAPI_Dir> aDir = aPlane->direction();
+        }
       }
     }
   } else if (theID == NORM_ID() || theID == DIRX_ID() || theID == ORIGIN_ID()) {

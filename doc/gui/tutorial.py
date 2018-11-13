@@ -64,9 +64,9 @@ Face_1 = model.addFace(Part_1_doc, [model.selection("WIRE", "Polyline_1_1")])
 Revolution_1 = model.addRevolution(Part_1_doc, [model.selection("FACE", "Face_1_1")], model.selection("EDGE", "PartSet/OZ"), 360, 0)
 
 # Step5. Extrusion.
-Wire = model.selection("WIRE", "Sketch_1/Wire-SketchLine_1r-SketchLine_5r-SketchLine_6r-SketchLine_7r-SketchLine_8r-SketchLine_9r")
-To = model.selection("FACE", "Revolution_1_1/Generated_Face_6")
-From = model.selection("FACE", "Revolution_1_1/Generated_Face_1")
+Wire = model.selection("WIRE", "Sketch_1/Face-SketchLine_5r-SketchLine_6r-SketchLine_7r-SketchLine_8r-SketchLine_9r-SketchLine_1r_wire")
+To = model.selection("FACE", "Revolution_1_1/Generated_Face&Face_1_1/Edge_2")
+From = model.selection("FACE", "Revolution_1_1/Generated_Face&Face_1_1/Edge_7")
 
 Extrusion_1 = model.addExtrusion(Part_1_doc, [Wire], model.selection("EDGE", "PartSet/OZ"), To, 0, From, 0)
 
@@ -74,7 +74,7 @@ Extrusion_1 = model.addExtrusion(Part_1_doc, [Wire], model.selection("EDGE", "Pa
 Common_1 = model.addCommon(Part_1_doc, [model.selection("SOLID", "Revolution_1_1"), model.selection("SOLID", "Extrusion_1_1")])
 
 # Step7. Fillet.
-Fillet_1 = model.addFillet(Part_1_doc, [model.selection("EDGE", "Revolution_1_1/Generated_Face_5&Common_1_1/Modified_Face_11")], 10)
+Fillet_1 = model.addFillet(Part_1_doc, [model.selection("EDGE", "[Revolution_1_1/Generated_Face&Face_1_1/Edge_3][Common_1_1/Modified_Face&Face_1_1/Edge_4]")], 10)
 
 # Step8. Box.
 Box_1 = model.addBox(Part_1_doc, 20, 120, 20)
