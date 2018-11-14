@@ -55,7 +55,6 @@ Standard_GUID kIS_INFINITE("dea8cc5a-53f2-49c1-94e8-a947bed20a9f");
 // identifier of the result not in history
 Standard_GUID kIS_IN_HISTORY("a9aec01c-805e-44d1-b5d2-a63f06522f8a");
 
-
 void Model_ResultConstruction::colorConfigInfo(std::string& theSection, std::string& theName,
                                        std::string& theDefault)
 {

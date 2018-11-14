@@ -39,7 +39,7 @@ Box_2 = model.addBox(Part_1_doc, 2, 2, 10)
 Placement_1 = model.addPlacement(Part_1_doc, [model.selection("SOLID", "Box_2_1")], model.selection("FACE", "Box_2_1/Bottom"), model.selection("FACE", "_weak_name_4_Partition_1_1_14"), False, True)
 model.do()
 # update the selection of the placement
-Placement_1.setEndShape(model.selection("EDGE", "[_weak_name_4_Partition_1_1_5][(Partition_1_1_5/Modified_Face&Box_1_1/Back)2]"))
+Placement_1.setEndShape(model.selection("EDGE", "Partition_1_1_5/Generated_Edge&Plane_3/Plane_3&Plane_2/Plane_2"))
 model.end()
 
 # check that placement is valid

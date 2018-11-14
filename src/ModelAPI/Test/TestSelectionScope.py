@@ -74,7 +74,7 @@ lenParam.setValue(100)
 Part_1_doc.setCurrentFeature(Cylinder_2.feature(), True)
 model.do()
 # update selection of cylinder base points
-model.selection("VERTEX", "[ExtrusionCut_1_1/Modified_Face&Sketch_1/SketchLine_1][Extrusion_1_1/Generated_Face&Sketch_1/SketchLine_2][ExtrusionCut_1_1/Modified_Face&Extrusion_1_1/To_Face&weak_name_1]").fillAttribute(Cylinder_1.basePoint())
+model.selection("VERTEX", "[ExtrusionCut_1_1/Modified_Face&Sketch_1/SketchLine_1][Extrusion_1_1/Generated_Face&Sketch_1/SketchLine_2][(ExtrusionCut_1_1/Modified_Face&Sketch_1/SketchLine_1)(Extrusion_1_1/Generated_Face&Sketch_1/SketchLine_2)(ExtrusionCut_1_1/Generated_Face&Sketch_2/SketchLine_6)(ExtrusionCut_1_1/Modified_Face&Sketch_1/SketchLine_3)]").fillAttribute(Cylinder_1.basePoint())
 model.selection("VERTEX", "[ExtrusionCut_1_1/Modified_Face&Sketch_1/SketchLine_1][ExtrusionCut_1_1/Modified_Face&Extrusion_1_1/To_Face&weak_name_2][Extrusion_1_1/Generated_Face&Sketch_1/SketchLine_4]").fillAttribute(Cylinder_2.basePoint())
 model.end()
 

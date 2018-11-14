@@ -74,7 +74,7 @@ class ModelAPI_AttributeSelectionList : public ModelAPI_Attribute
   /// \param theContext object where the sub-shape was selected
   /// \param theSubShape selected sub-shape (if null, the whole context is selected)
   /// \param theTemporarily if it is true, it checks also the temporary added item
-  /// \returns true if the pair is found in the attirbute
+  /// \returns true if the pair is found in the attribute
   virtual bool isInList(
     const ObjectPtr& theContext, const std::shared_ptr<GeomAPI_Shape>& theSubShape,
     const bool theTemporarily = false) = 0;
