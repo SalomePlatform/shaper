@@ -67,8 +67,7 @@ void Model_ResultConstruction::colorConfigInfo(std::string& theSection, std::str
 void Model_ResultConstruction::setShape(std::shared_ptr<GeomAPI_Shape> theShape)
 {
   if (myShape != theShape) {
-    if (!isInfinite())
-      storeShape(theShape);
+    storeShape(theShape);
     if (!theShape.get() || !theShape->isEqual(myShape)) {
       static const Events_ID anEvent = Events_Loop::eventByName(EVENT_OBJECT_UPDATED);
       ModelAPI_EventCreator::get()->sendUpdated(data()->owner(), anEvent);
@@ -238,7 +237,7 @@ void Model_ResultConstruction::storeShape(std::shared_ptr<GeomAPI_Shape> theShap
     std::shared_ptr<Model_Document> aMyDoc =
       std::dynamic_pointer_cast<Model_Document>(document());
     const TopoDS_Shape& aShape = theShape->impl<TopoDS_Shape>();
-    if (aShape.ShapeType() == TopAbs_VERTEX) {
+    if (isInfinite() || aShape.ShapeType() == TopAbs_VERTEX) {
       aShapeLab.ForgetAllAttributes(); // clear all previously stored
       TNaming_Builder aBuilder(aShapeLab);
       aBuilder.Generated(aShape);
