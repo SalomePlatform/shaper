@@ -184,6 +184,8 @@ bool Selector_Modify::select(NCollection_List<Handle(TNaming_NamedShape)>& theMo
             return true;
           }
         }
+      } else if (aCommon.Extent() == 1) {
+        return true; // simple modification
       }
     }
     // weak naming case

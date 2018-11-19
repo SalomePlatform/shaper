@@ -324,10 +324,10 @@ TopoDS_Shape Selector_Algo::value()
   return TopoDS_Shape(); // empty, error shape
 }
 
-Selector_Algo* Selector_Algo::restoreByLab(TDF_Label theLab)
+Selector_Algo* Selector_Algo::restoreByLab(TDF_Label theLab, TDF_Label theBaseDocLab)
 {
   Handle(TDataStd_Integer) aTypeAttr;
-  if (!myLab.FindAttribute(kSEL_TYPE, aTypeAttr))
+  if (!theLab.FindAttribute(kSEL_TYPE, aTypeAttr))
     return NULL;
   Selector_Type aType = Selector_Type(aTypeAttr->Get());
   Selector_Algo* aResult = NULL;
@@ -360,12 +360,9 @@ Selector_Algo* Selector_Algo::restoreByLab(TDF_Label theLab)
   }
   }
   if (aResult) {
-    bool aGeomNaming = myLab.IsAttribute(kGEOMETRICAL_NAMING);
     aResult->myLab = theLab;
-    aResult->myBaseDocumentLab = myBaseDocumentLab;
-    aResult->myGeometricalNaming = aGeomNaming;
-    aResult->myUseNeighbors = myUseNeighbors;
-    aResult->myUseIntersections = myUseIntersections;
+    aResult->myBaseDocumentLab = theBaseDocLab;
+    aResult->myGeometricalNaming = theLab.IsAttribute(kGEOMETRICAL_NAMING);
     if (!aResult->restore()) {
       delete aResult;
       aResult = NULL;
@@ -396,7 +393,8 @@ Selector_Algo* Selector_Algo::restoreByName(TDF_Label theLab, TDF_Label theBaseD
     }
   } else if (theName[0] == '(') { // filter by neighbors
     aResult = new Selector_FilterByNeighbors;
-  } if (theName.find(pureWeakNameID()) == 0) { // weak naming identifier
+  } else if (theName.find(pureWeakNameID()) == 0) { // weak naming identifier
+    aResult = new Selector_WeakName;
   } else if (theName.find('&') != std::string::npos) { // modification
     aResult = new Selector_Modify;
   } else { // primitive

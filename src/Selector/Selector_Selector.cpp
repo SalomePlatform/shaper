@@ -59,9 +59,9 @@ bool Selector_Selector::store(const TopoDS_Shape theContext)
 
 bool Selector_Selector::restore(const TopoDS_Shape theContext)
 {
-  if (myAlgo->restoreByLab(myLab)) {
-    myAlgo->solve(theContext); // to update the selection shape on the label
-    return true;
+  myAlgo = Selector_Algo::restoreByLab(myLab, myBaseDocumentLab);
+  if (myAlgo) {
+    return myAlgo->solve(theContext); // to update the selection shape on the label
   }
   return false;
 }

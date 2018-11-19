@@ -73,7 +73,7 @@ bool Selector_Container::restore()
   // restore sub-selectors
   bool aSubResult = true;
   for(TDF_ChildIterator aSub(label(), false); aSub.More(); aSub.Next()) {
-    Selector_Algo* aSubSel = restoreByLab(aSub.Value());
+    Selector_Algo* aSubSel = restoreByLab(aSub.Value(), baseDocument());
     if (!append(aSubSel, false)) {
       break; // some empty label left in the end
     }
@@ -99,7 +99,7 @@ TDF_Label Selector_Container::restoreByName(std::string theName,
       TDF_Label aSubContext;
       Selector_Algo* aSubSel =
         Selector_Algo::restoreByName(
-          label(), baseDocument(), aSubStr, aSubShapeType, theNameGenerator, aSubContext);
+          newSubLabel(), baseDocument(), aSubStr, aSubShapeType, theNameGenerator, aSubContext);
       if (!append(aSubSel))
         return TDF_Label();
 

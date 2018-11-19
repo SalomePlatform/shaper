@@ -125,7 +125,7 @@ static const TopoDS_Shape findNeighbor(const TopoDS_Shape theContext,
   if (aMatches.Extent() == 1)
     return aMatches.First(); // already found good candidate
   TopoDS_Compound aResultCompound; // in case of geometrical name and many candidates
-                                   // iterate all matches to find by other (higher level) neighbors the best candidate
+  // iterate all matches to find by other (higher level) neighbors the best candidate
   TopoDS_Shape aGoodCandidate;
   TopTools_MapOfShape aGoodCandidates; // already added good candidates to the map
   for(TopoDS_ListOfShape::Iterator aCandidate(aMatches); aCandidate.More(); aCandidate.Next()) {
@@ -254,7 +254,7 @@ bool Selector_FilterByNeighbors::restore()
   // restore sub-selectors
   bool aSubResult = true;
   for(TDF_ChildIterator aSub(label(), false); aSub.More(); aSub.Next()) {
-    Selector_Algo* aSubSel = restoreByLab(aSub.Value());
+    Selector_Algo* aSubSel = restoreByLab(aSub.Value(), baseDocument());
     if (!append(aSubSel, false)) {
       break; // some empty label left in the end
     }
@@ -275,7 +275,7 @@ TDF_Label Selector_FilterByNeighbors::restoreByName(std::string theName,
       TDF_Label aSubContext;
       Selector_Algo* aSubSel =
         Selector_Algo::restoreByName(
-          label(), baseDocument(), aSubStr, myShapeType, theNameGenerator, aSubContext);
+          newSubLabel(), baseDocument(), aSubStr, myShapeType, theNameGenerator, aSubContext);
       if (!append(aSubSel))
         return TDF_Label();
 

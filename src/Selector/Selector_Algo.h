@@ -94,7 +94,7 @@ public:
   /// Returns the current sub-shape value (null if can not resolve)
   SELECTOR_EXPORT TopoDS_Shape value();
   /// Restores sub-algorithm of a given type by the storage-label
-  SELECTOR_EXPORT Selector_Algo* restoreByLab(TDF_Label theLab);
+  SELECTOR_EXPORT static Selector_Algo* restoreByLab(TDF_Label theLab, TDF_Label theBaseDocLab);
   /// Restores the selected sub-algorithm by the naming name.
   /// Returns not empty label of the context.
   SELECTOR_EXPORT static Selector_Algo* restoreByName(
