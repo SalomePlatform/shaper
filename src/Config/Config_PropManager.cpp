@@ -24,7 +24,10 @@ std::vector<int> stringToRGB(const std::string& theColor);
 int stringToInteger(const std::string& theInt);
 bool stringToBoolean(const std::string& theInt);
 
-Config_Properties Config_PropManager::myProps;
+Config_Properties& Config_PropManager::props() {
+  static Config_Properties* confProps = new Config_Properties();
+  return *confProps;
+}
 
 
 Config_Prop* Config_PropManager::registerProp(const std::string& theSection,
@@ -54,7 +57,7 @@ Config_Prop* Config_PropManager::registerProp(const std::string& theSection,
   else {
     aProp =
       new Config_Prop(theSection, theName, theTitle, theType, theDefaultValue, theMin, theMax);
-    myProps.push_back(aProp);
+    props().push_back(aProp);
   }
   return aProp;
 }
@@ -62,7 +65,8 @@ Config_Prop* Config_PropManager::registerProp(const std::string& theSection,
 Config_Prop* Config_PropManager::findProp(const std::string& theSection, const std::string& theName)
 {
   Config_Properties::const_iterator aIt;
-  for (aIt = myProps.cbegin(); aIt != myProps.cend(); ++aIt) {
+  Config_Properties aProps = props();
+  for (aIt = aProps.cbegin(); aIt != aProps.cend(); ++aIt) {
     Config_Prop* aProp = (*aIt);
     if ((aProp->section() == theSection) && (aProp->name() == theName))
       return aProp;
@@ -74,7 +78,8 @@ Config_Properties Config_PropManager::getProperties()
 {
   Config_Properties aRes;
   Config_Properties::const_iterator aIt;
-  for (aIt = myProps.cbegin(); aIt != myProps.cend(); aIt++) {
+  Config_Properties aProps = props();
+  for (aIt = aProps.cbegin(); aIt != aProps.cend(); aIt++) {
     Config_Prop* aProp = (*aIt);
     if (aProp->type() != Config_Prop::Disabled)
       aRes.push_back(aProp);
@@ -87,7 +92,8 @@ std::list<std::string> Config_PropManager::getSections()
   // Return only non disabled sections
   std::list<std::string> aSections;
   Config_Properties::const_iterator aIt;
-  for (aIt = myProps.cbegin(); aIt != myProps.cend(); aIt++) {
+  Config_Properties aProps = props();
+  for (aIt = aProps.cbegin(); aIt != aProps.cend(); aIt++) {
     const Config_Prop* aProp = (*aIt);
     if (aProp->type() != Config_Prop::Disabled)
       aSections.push_back(aProp->section());
@@ -100,7 +106,8 @@ Config_Properties Config_PropManager::getProperties(const std::string& theSectio
 {
   Config_Properties aRes;
   Config_Properties::iterator aIt;
-  for (aIt = myProps.begin(); aIt != myProps.end(); aIt++) {
+  Config_Properties aProps = props();
+  for (aIt = aProps.begin(); aIt != aProps.end(); aIt++) {
     Config_Prop* aProp = (*aIt);
     if ((aProp->section() == theSection) && (aProp->type() != Config_Prop::Disabled))
       aRes.push_back(aProp);

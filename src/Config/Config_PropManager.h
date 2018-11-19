@@ -91,7 +91,7 @@ class Config_PropManager
   CONFIG_EXPORT static double stringToDouble(const std::string& theDouble);
 
  private:
-  CONFIG_EXPORT static Config_Properties myProps; ///< List of all stored properties
+  CONFIG_EXPORT static Config_Properties& props(); ///< List of all stored properties
 };
 
 #endif
