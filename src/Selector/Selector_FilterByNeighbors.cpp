@@ -189,8 +189,9 @@ bool Selector_FilterByNeighbors::select(const TopoDS_Shape theContext, const Top
     }
     // iterate by the order in theContext to keep same naming names
     TopExp_Explorer anOrder(theContext, theValue.ShapeType());
+    TopTools_MapOfShape alreadyProcessed;
     for (; anOrder.More(); anOrder.Next()) {
-      if (aNewNB.Contains(anOrder.Current())) {
+      if (alreadyProcessed.Add(anOrder.Current()) && aNewNB.Contains(anOrder.Current())) {
         TopoDS_Shape aNewNBShape = anOrder.Current();
         // check which can be named correctly, without "by neighbors" type
         Selector_Algo* aSubAlgo = Selector_Algo::select(theContext, aNewNBShape,

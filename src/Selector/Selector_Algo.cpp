@@ -40,6 +40,8 @@
 #include <TDataStd_ReferenceArray.hxx>
 #include <TDataStd_ExtStringList.hxx>
 #include <TDataStd_Integer.hxx>
+#include <TDataStd_UAttribute.hxx>
+
 
 /// type of the selection, integer keeps the Selector_Type value
 static const Standard_GUID kSEL_TYPE("db174d59-c2e3-4a90-955e-55544df090d6");
@@ -122,6 +124,7 @@ Selector_Algo* Selector_Algo::select(const TopoDS_Shape theContext, const TopoDS
       delete aContainer;
       return NULL;
     }
+
     Selector_Intersect* anIntersect = new Selector_Intersect;
     SET_ALGO_FLAGS(anIntersect);
     bool aGoodIntersector = anIntersect->select(theContext, theValue);
@@ -415,4 +418,6 @@ Selector_Algo* Selector_Algo::restoreByName(TDF_Label theLab, TDF_Label theBaseD
 void Selector_Algo::storeType(const Selector_Type theType)
 {
   TDataStd_Integer::Set(myLab, kSEL_TYPE, (int)(theType));
+  if (myGeometricalNaming)
+    TDataStd_UAttribute::Set(myLab, kGEOMETRICAL_NAMING);
 }

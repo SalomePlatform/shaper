@@ -31,7 +31,7 @@ Part_1 = model.addPart(partSet)
 Part_1_doc = Part_1.document()
 Cylinder_1 = model.addCylinder(Part_1_doc, model.selection("VERTEX", "PartSet/Origin"), model.selection("EDGE", "PartSet/OZ"), 5, 10)
 Cylinder_1.result().setName("cylinder")
-LinearCopy_1 = model.addMultiTranslation(Part_1_doc, [model.selection("SOLID", "cylinder")], model.selection("EDGE", "[cylinder/Face_1][weak_name_3]"), 10, NB_COPIES)
+LinearCopy_1 = model.addMultiTranslation(Part_1_doc, [model.selection("SOLID", "cylinder")], model.selection("EDGE", "([cylinder/Face_1][cylinder/Face_2])([cylinder/Face_1][cylinder/Face_3])"), 10, NB_COPIES)
 model.do()
 
 TransResult = LinearCopy_1.result()

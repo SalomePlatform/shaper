@@ -63,6 +63,8 @@ static void commonShapes(const TopoDS_ListOfShape& theShapes, TopAbs_ShapeEnum t
 
 bool Selector_Intersect::select(const TopoDS_Shape theContext, const TopoDS_Shape theValue)
 {
+  if (!useIntersections())
+    return false;
   myShapeType = theValue.ShapeType();
   TopAbs_ShapeEnum aSelectionType = myShapeType;
   // try to find the shape of the higher level type in the context shape
@@ -132,7 +134,7 @@ bool Selector_Intersect::select(const TopoDS_Shape theContext, const TopoDS_Shap
       TopoDS_ListOfShape::Iterator anInt(aLastIntersectors);
       for (; anInt.More(); anInt.Next()) {
         Selector_Algo* aSubAlgo = Selector_Algo::select(theContext, anInt.Value(),
-          newSubLabel(), baseDocument(), geometricalNaming(), useNeighbors(), useIntersections());
+          newSubLabel(), baseDocument(), geometricalNaming(), useNeighbors(), false);
         if (!append(aSubAlgo))
           break; // if some selector is failed, stop and search another solution
       }

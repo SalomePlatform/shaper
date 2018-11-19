@@ -108,6 +108,9 @@ public:
   /// Creates a new selection algorithm for selection of all topology based on the same geometry
   SELECTOR_EXPORT static Selector_Algo* relesectWithAllGeometry(
     Selector_Algo* theOldAlgo, const TopoDS_Shape theContext);
+  /// Sets geometrical naming flag to true
+  void setGeometricalNaming()
+  {myGeometricalNaming = true;}
 
 protected:
   /// Returns label where this algorithm is attached to, or just an access label to the document

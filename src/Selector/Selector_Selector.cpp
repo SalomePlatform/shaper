@@ -86,6 +86,8 @@ TDF_Label Selector_Selector::restoreByName(
   myAlgo = Selector_Algo::restoreByName(
     myLab, myBaseDocumentLab, theName, theShapeType, theNameGenerator, aResult);
   if (myAlgo) {
+    if (theGeometricalNaming)
+      myAlgo->setGeometricalNaming();
     return aResult;
   }
   return TDF_Label();
