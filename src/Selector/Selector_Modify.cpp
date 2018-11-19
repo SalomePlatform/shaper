@@ -187,6 +187,10 @@ bool Selector_Modify::select(NCollection_List<Handle(TNaming_NamedShape)>& theMo
       } else if (aCommon.Extent() == 1) {
         return true; // simple modification
       }
+      // weak naming between the common results
+      Selector_NExplode aNexp(aCommon);
+      myWeakIndex = aNexp.index(theValue);
+      return myWeakIndex != -1;
     }
     // weak naming case
     TopoDS_ListOfShape aCommon;

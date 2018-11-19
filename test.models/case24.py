@@ -687,7 +687,7 @@ SketchConstraintCoincidence_129 = Sketch_10.setCoincident(SketchArc_11.startPoin
 SketchConstraintCoincidence_129.setName("SketchConstraintCoincidence_127")
 SketchConstraintTangent_19 = Sketch_10.setTangent(SketchArc_11.results()[1], SketchLine_78.result())
 SketchConstraintTangent_19.setName("SketchConstraintTangent_24")
-SketchPoint_8 = Sketch_10.addPoint(model.selection("VERTEX", "[RevolutionFuse_3_1/Modified_Face&Sketch_3/SketchLine_15&weak_name_2][RevolutionFuse_1_1/Generated_Face&Sketch_3/SketchLine_20][(RevolutionFuse_1_1/Generated_Face&Sketch_3/SketchLine_20)(RevolutionFuse_3_1/Modified_Face&Sketch_3/SketchArc_3_2)(ExtrusionCut_2_1/Modified_Face&Sketch_5/SketchLine_40)]"))
+SketchPoint_8 = Sketch_10.addPoint(model.selection("VERTEX", "[RevolutionFuse_3_1/Modified_Face&Sketch_3/SketchLine_15&weak_name_2][RevolutionFuse_1_1/Generated_Face&Sketch_3/SketchLine_20][RevolutionFuse_3_1/Modified_Face&RevolutionFuse_1_1/To_Face]"))
 SketchConstraintCoincidence_130 = Sketch_10.setCoincident(SketchArc_11.endPoint(), SketchPoint_8.result())
 SketchConstraintCoincidence_130.setName("SketchConstraintCoincidence_128")
 SketchArc_12 = Sketch_10.addArc(64.00001789135865, 23.01137360115889, 64, 20, 61.15622559702543, 22.02080994708722, True)
@@ -698,7 +698,7 @@ SketchConstraintCoincidence_131 = Sketch_10.setCoincident(SketchArc_12.startPoin
 SketchConstraintCoincidence_131.setName("SketchConstraintCoincidence_129")
 SketchConstraintTangent_20 = Sketch_10.setTangent(SketchArc_12.results()[1], SketchLine_77.result())
 SketchConstraintTangent_20.setName("SketchConstraintTangent_25")
-SketchPoint_9 = Sketch_10.addPoint(model.selection("VERTEX", "[RevolutionFuse_3_1/Modified_Face&Sketch_4/SketchLine_22&weak_name_2][RevolutionFuse_2_1/Generated_Face&Sketch_4/SketchLine_27][(RevolutionFuse_2_1/Generated_Face&Sketch_4/SketchLine_27)(RevolutionFuse_3_1/Modified_Face&Sketch_4/SketchArc_4_2)(ExtrusionCut_2_1/Modified_Face&Sketch_5/SketchLine_40)]"))
+SketchPoint_9 = Sketch_10.addPoint(model.selection("VERTEX", "[RevolutionFuse_3_1/Modified_Face&Sketch_4/SketchLine_22&weak_name_2][RevolutionFuse_2_1/Generated_Face&Sketch_4/SketchLine_27][RevolutionFuse_3_1/Modified_Face&RevolutionFuse_2_1/From_Face]"))
 SketchConstraintCoincidence_132 = Sketch_10.setCoincident(SketchArc_12.endPoint(), SketchPoint_9.result())
 SketchConstraintCoincidence_132.setName("SketchConstraintCoincidence_130")
 SketchLine_79 = Sketch_10.addLine(61.15622559702543, 22.02080994708722, 59.81204392543111, 22.0208099470871)
@@ -788,8 +788,10 @@ SketchMultiRotation_2 = Sketch_11.addRotation([SketchCircle_3.results()[1], Sket
 [SketchCircle_4, SketchCircle_5, SketchCircle_6, SketchCircle_7] = SketchMultiRotation_2.rotated()
 model.do()
 RevolutionCut_1 = model.addRevolutionCut(Part_1_doc, [model.selection("COMPOUND", "Sketch_9")], model.selection("EDGE", "PartSet/OZ"), 0, 360, [model.selection("SOLID", "ExtrusionFuse_3_1")])
-ExtrusionCut_3 = model.addExtrusionCut(Part_1_doc, [model.selection("WIRE", "Sketch_11/Face-SketchCircle_4_2f-SketchCircle_6_2r_wire"), model.selection("WIRE", "Sketch_11/Face-SketchCircle_3_2f-SketchCircle_2_2r_wire"), model.selection("WIRE", "Sketch_11/Face-SketchCircle_5_2f-SketchCircle_7_2r_wire")], model.selection(), 30, -15, [model.selection("SOLID", "RevolutionCut_1_1")])
-ExtrusionCut_4 = model.addExtrusionCut(Part_1_doc, [model.selection("WIRE", "Sketch_11/Face-SketchCircle_2_2r_wire"), model.selection("FACE", "Sketch_11/Face-SketchCircle_6_2f"), model.selection("WIRE", "Sketch_11/Face-SketchCircle_7_2f_wire")], model.selection(), 30, 2, [model.selection("SOLID", "ExtrusionCut_3_1")])
+ExtrusionCut_3_objects_1 = [model.selection("WIRE", "Sketch_11/Face-SketchCircle_4_2f-SketchCircle_6_2r_wire"), model.selection("WIRE", "Sketch_11/Face-SketchCircle_3_2f-SketchCircle_2_2r_wire"), model.selection("WIRE", "Sketch_11/Face-SketchCircle_5_2f-SketchCircle_7_2r_wire")]
+ExtrusionCut_3 = model.addExtrusionCut(Part_1_doc, ExtrusionCut_3_objects_1, model.selection(), 30, -15, [model.selection("SOLID", "RevolutionCut_1_1")])
+ExtrusionCut_4_objects_1 = [model.selection("WIRE", "Sketch_11/Face-SketchCircle_2_2r_wire"), model.selection("FACE", "Sketch_11/Face-SketchCircle_6_2f"), model.selection("WIRE", "Sketch_11/Face-SketchCircle_7_2f_wire")]
+ExtrusionCut_4 = model.addExtrusionCut(Part_1_doc, ExtrusionCut_4_objects_1, model.selection(), 30, 2, [model.selection("SOLID", "ExtrusionCut_3_1")])
 
 # Test reexecution after parameter change
 Parameter_R.setValue(5)
