@@ -195,7 +195,7 @@ bool Selector_FilterByNeighbors::select(const TopoDS_Shape theContext, const Top
         TopoDS_Shape aNewNBShape = anOrder.Current();
         // check which can be named correctly, without "by neighbors" type
         Selector_Algo* aSubAlgo = Selector_Algo::select(theContext, aNewNBShape,
-          newSubLabel(), baseDocument(), geometricalNaming(), false, false);
+          newSubLabel(), baseDocument(), geometricalNaming(), false, useIntersections());
         if (aSubAlgo) {
           // add to list of good NBs
           aNBs.push_back(std::pair<TopoDS_Shape, int>(aNewNBShape, aLevel));
@@ -208,7 +208,7 @@ bool Selector_FilterByNeighbors::select(const TopoDS_Shape theContext, const Top
       std::list<std::pair<TopoDS_Shape, int> >::iterator aNBIter = aNBs.begin();
       for(; aNBIter != aNBs.end(); aNBIter++) {
         Selector_Algo* aSubAlgo = Selector_Algo::select(theContext, aNBIter->first,
-          newSubLabel(), baseDocument(), geometricalNaming(), false, false);
+          newSubLabel(), baseDocument(), geometricalNaming(), false, useIntersections());
         if (append(aSubAlgo)) {
           myNBLevel.push_back(aNBIter->second);
         } else {
