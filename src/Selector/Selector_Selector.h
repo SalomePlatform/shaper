@@ -24,11 +24,10 @@
 #include "Selector.h"
 
 #include <TDF_Label.hxx>
-#include <TDF_LabelList.hxx>
 #include <TopoDS_Shape.hxx>
-#include <list>
 
 class Selector_NameGenerator;
+class Selector_Algo;
 
 /**\class Selector_Selector
  * \ingroup DataModel
@@ -37,41 +36,16 @@ class Selector_NameGenerator;
  */
 class Selector_Selector
 {
-  /// Type of a selector: on this type depends what is stored in this label and how to
-  /// restore it on update.
-  enum Selector_Type {
-    SELTYPE_CONTAINER, ///< just a container of sub-elements, keeps the shape type of container
-    SELTYPE_INTERSECT, ///< sub-shape is intersection of higher level objects
-    SELTYPE_PRIMITIVE, ///< sub-shape found as a primitive on some label
-    SELTYPE_MODIFICATION, ///< modification of base shapes to the final label
-    SELTYPE_FILTER_BY_NEIGHBOR,  ///< identification by neighbor shapes in context
-    SELTYPE_WEAK_NAMING, ///< pure weak naming by weak index in context
-  };
-
-  Selector_Type myType; ///< Type of this selector.
-  TopAbs_ShapeEnum myShapeType; ///< type of this shape: in container, intersection or neighbors
-  std::list<Selector_Selector> mySubSelList; ///< list of sub-selectors if needed
-  TDF_Label myFinal; ///< final label of the primitive or generation, where the value is
-  TDF_LabelList myBases; ///< initial labels that contain shapes that produce the modification
-  int myWeakIndex; ///< index of the shape among commons for the modification type (-1 - not set)
-
-  std::list<int> myNBLevel; ///< list of integers corresponding to mySubSelList neighborhood level
-
   TDF_Label myLab; ///< main label where selector is performed
-
   TDF_Label myBaseDocumentLab; ///< an access-label to the document that may contain initial shapes
-
-  bool myGeometricalNaming; ///< flag that indicates that geometrical naming selection is enabled
-  bool myAlwaysGeometricalNaming; /// to enable geometrical naming from beginning, at select
+  Selector_Algo* myAlgo; ///< root algorithm of the selector
 
 public:
   /// Initializes selector on the label
-  SELECTOR_EXPORT Selector_Selector(TDF_Label theLab);
-  /// Returns label of this selector
-  SELECTOR_EXPORT TDF_Label label();
+  SELECTOR_EXPORT Selector_Selector(TDF_Label theLab, TDF_Label theBaseDocLab = TDF_Label());
 
-  /// Sets the base document access label.
-  SELECTOR_EXPORT void setBaseDocument(const TDF_Label theAccess);
+  /// Destructor
+  SELECTOR_EXPORT ~Selector_Selector();
 
   /// Initializes the selector structure on the label.
   /// Stores the name data to restore after modification.
@@ -81,24 +55,20 @@ public:
   /// \param theUseNeighbors enables searching algorithm by neighbors
   /// \param theUseIntersections enables searching algorithm by intersection of higher level shapes
   SELECTOR_EXPORT bool select(const TopoDS_Shape theContext, const TopoDS_Shape theValue,
-    const bool theGeometricalNaming = false,
-    const bool theUseNeighbors = true, const bool theUseIntersections = true);
+    const bool theGeometricalNaming = false);
 
   /// Stores the name to the label and sub-labels tree
-  SELECTOR_EXPORT void store();
+  SELECTOR_EXPORT bool store(const TopoDS_Shape theContext);
 
   /// Restores the selected shape by the topological naming kept in the data structure
   /// Returns true if it can restore structure correctly
-  SELECTOR_EXPORT bool restore();
+  SELECTOR_EXPORT bool restore(const TopoDS_Shape theContext);
 
   /// Restores the selected shape by the topological name string.
   /// Returns not empty label of the context.
   SELECTOR_EXPORT TDF_Label restoreByName(
     std::string theName, const TopAbs_ShapeEnum theShapeType,
     Selector_NameGenerator* theNameGenerator, const bool theGeometricalNaming = false);
-
-  /// Updates the current shape by the stored topological name
-  SELECTOR_EXPORT bool solve(const TopoDS_Shape& theContext);
 
   /// Returns the current sub-shape value (null if can not resolve)
   SELECTOR_EXPORT TopoDS_Shape value();
@@ -109,15 +79,8 @@ public:
   /// Makes the current local selection becomes all sub-shapes with same base geometry.
   SELECTOR_EXPORT void combineGeometrical(const TopoDS_Shape theContext);
 
-private:
-
-  /// Create and keep in the list the sub-selector that select the given value.
-  /// Returns true if selection is correct.
-  bool selectBySubSelector(const TopoDS_Shape theContext, const TopoDS_Shape theValue,
-    const bool theGeometricalNaming = false, const bool theUseNeighbors = true,
-    const bool theUseIntersections = true);
-  /// Searches the final shapes presented in all results from bases basing on modification fields
-  void findModificationResult(TopoDS_ListOfShape& theCommon);
+  /// Stores the selected shape in he tree and returns true if shape found correctly
+  SELECTOR_EXPORT bool solve(const TopoDS_Shape theContext);
 };
 
 #endif

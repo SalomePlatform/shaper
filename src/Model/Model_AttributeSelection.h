@@ -208,6 +208,10 @@ protected:
     return myIsGeometricalSelection;
   };
 
+  /// Returns the module document label if this selection attribute is not in this document.
+  /// Returns null label otherwise.
+  TDF_Label baseDocumentLab();
+
   friend class Model_Data;
   friend class Model_AttributeSelectionList;
 };

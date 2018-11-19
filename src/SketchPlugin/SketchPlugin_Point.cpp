@@ -67,7 +67,7 @@ bool SketchPlugin_Point::isFixed() {
 }
 
 void SketchPlugin_Point::attributeChanged(const std::string& theID) {
-  // the second condition for unability to move external point anywhere
+  // the second condition for inability to move external point anywhere
   if (theID == EXTERNAL_ID() || isFixed()) {
     std::shared_ptr<GeomAPI_Shape> aSelection = data()->selection(EXTERNAL_ID())->value();
     if (!aSelection) {

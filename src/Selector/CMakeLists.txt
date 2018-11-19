@@ -23,12 +23,28 @@ INCLUDE(Common)
 SET(PROJECT_HEADERS
     Selector.h
     Selector_Selector.h
+    Selector_Algo.h
+    Selector_Primitive.h
+    Selector_AlgoWithSubs.h
+    Selector_Intersect.h
+    Selector_Container.h
+    Selector_Modify.h
+    Selector_FilterByNeighbors.h
+    Selector_WeakName.h
     Selector_NameGenerator.h
     Selector_NExplode.h
 )
 
 SET(PROJECT_SOURCES
     Selector_Selector.cpp
+    Selector_Algo.cpp
+    Selector_Primitive.cpp
+    Selector_AlgoWithSubs.cpp
+    Selector_Intersect.cpp
+    Selector_Container.cpp
+    Selector_Modify.cpp
+    Selector_FilterByNeighbors.cpp
+    Selector_WeakName.cpp
     Selector_NameGenerator.cpp
     Selector_NExplode.cpp
 )

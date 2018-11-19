@@ -592,16 +592,10 @@ bool Model_AttributeSelection::update()
     if (aSelLab.FindAttribute(TNaming_NamedShape::GetID(), aNS))
       anOldShape = aNS->Get();
 
-    Selector_Selector aSelector(aSelLab);
-    if (ModelAPI_Session::get()->moduleDocument() != owner()->document()) {
-      aSelector.setBaseDocument(std::dynamic_pointer_cast<Model_Document>
-        (ModelAPI_Session::get()->moduleDocument())->extConstructionsLabel());
-    }
-    if (aSelector.restore()) { // it is stored in old OCCT format, use TNaming_Selector
-      TopoDS_Shape aContextShape = aContext->shape()->impl<TopoDS_Shape>();
-      aResult = aSelector.solve(aContextShape);
-    }
-    aResult = setInvalidIfFalse(aSelLab, aResult);
+    TopoDS_Shape aContextShape = aContext->shape()->impl<TopoDS_Shape>();
+    Selector_Selector aSelector(aSelLab, baseDocumentLab());
+    aResult = aSelector.restore(aContextShape);
+    setInvalidIfFalse(aSelLab, aResult);
 
     TopoDS_Shape aNewShape;
     if (aSelLab.FindAttribute(TNaming_NamedShape::GetID(), aNS))
@@ -625,19 +619,11 @@ bool Model_AttributeSelection::update()
     std::shared_ptr<Model_ResultConstruction> aConstructionContext =
       std::dynamic_pointer_cast<Model_ResultConstruction>(aContext);
     if (!aConstructionContext->isInfinite()) {
-      Selector_Selector aSelector(aSelLab);
-      if (ModelAPI_Session::get()->moduleDocument() != owner()->document()) {
-        aSelector.setBaseDocument(std::dynamic_pointer_cast<Model_Document>
-          (ModelAPI_Session::get()->moduleDocument())->extConstructionsLabel());
-      }
-
-      aResult = aSelector.restore();
+      TopoDS_Shape aContextShape = aContext->shape()->impl<TopoDS_Shape>();
+      Selector_Selector aSelector(aSelLab, baseDocumentLab());
       TopoDS_Shape anOldShape = aSelector.value();
-      if (aResult) {
-        TopoDS_Shape aContextShape = aContext->shape()->impl<TopoDS_Shape>();
-        aResult = aSelector.solve(aContextShape);
-      }
-      aResult = setInvalidIfFalse(aSelLab, aResult);
+      aResult = aSelector.restore(aContextShape);
+      setInvalidIfFalse(aSelLab, aResult);
       if (aResult && !anOldShape.IsEqual(aSelector.value()))
         owner()->data()->sendAttributeUpdated(this);  // send updated if shape is changed
     } else {
@@ -673,30 +659,20 @@ void Model_AttributeSelection::selectBody(
     TopoDS_Shape aNewSub = theSubShape->impl<TopoDS_Shape>();
 
     bool aSelectorOk = true;
-    Selector_Selector aSel(aSelLab);
-    if (ModelAPI_Session::get()->moduleDocument() != owner()->document()) {
-      aSel.setBaseDocument(std::dynamic_pointer_cast<Model_Document>
-        (ModelAPI_Session::get()->moduleDocument())->extConstructionsLabel());
-    }
+    Selector_Selector aSelector(aSelLab, baseDocumentLab());
     try {
-      aSelectorOk = aSel.select(aContext, aNewSub, myIsGeometricalSelection);
+      aSelectorOk = aSelector.select(aContext, aNewSub, myIsGeometricalSelection);
       if (aSelectorOk) {
-        aSel.store();
-        aSelectorOk = aSel.solve(aContext);
+        aSelectorOk = aSelector.store(aContext);
       }
     } catch(...) {
       aSelectorOk = false;
     }
-    Handle(TNaming_NamedShape) aSelectorShape;
-    if (aSelectorOk && aSelLab.FindAttribute(TNaming_NamedShape::GetID(), aSelectorShape))
-    {
-      TopoDS_Shape aShape = aSelectorShape->Get();
-      if (aShape.IsNull() || aShape.ShapeType() != aNewSub.ShapeType())
-        aSelectorOk = false;
+    if (aSelectorOk) {
+      TopoDS_Shape aShape = aSelector.value();
+      aSelectorOk = !aShape.IsNull() && aShape.ShapeType() == aNewSub.ShapeType();
     }
-    if (!aSelectorOk) {
-      setInvalidIfFalse(aSelLab, false);
-    }
+    setInvalidIfFalse(aSelLab, aSelectorOk);
   }
 }
 
@@ -803,13 +779,9 @@ std::string Model_AttributeSelection::namingName(const std::string& theDefaultNa
     }
   }
 
-  Selector_Selector aSelector(aSelLab);
-  if (ModelAPI_Session::get()->moduleDocument() != owner()->document()) {
-    aSelector.setBaseDocument(std::dynamic_pointer_cast<Model_Document>
-      (ModelAPI_Session::get()->moduleDocument())->extConstructionsLabel());
-  }
+  Selector_Selector aSelector(aSelLab, baseDocumentLab());
   std::string aResult;
-  if (aSelector.restore())
+  if (aSelector.restore(aCont->shape()->impl<TopoDS_Shape>()))
     aResult = aSelector.name(this);
   if (aCenterType != NOT_CENTER) {
     aResult += centersMap()[aCenterType];
@@ -915,11 +887,7 @@ void Model_AttributeSelection::selectSubShape(
       }
     }
 
-    Selector_Selector aSelector(selectionLabel());
-    if (ModelAPI_Session::get()->moduleDocument() != owner()->document()) {
-      aSelector.setBaseDocument(std::dynamic_pointer_cast<Model_Document>
-        (ModelAPI_Session::get()->moduleDocument())->extConstructionsLabel());
-    }
+    Selector_Selector aSelector(selectionLabel(), baseDocumentLab());
     myRestoreDocument = aDoc;
     TDF_Label aContextLabel = aSelector.restoreByName(
       aSubShapeName, aShapeType, this, myIsGeometricalSelection);
@@ -940,8 +908,7 @@ void Model_AttributeSelection::selectSubShape(
             bool aToUnblock = false;
             aToUnblock = !owner()->data()->blockSendAttributeUpdated(true);
             myRef.setValue(aContext);
-            aSelector.store();
-            aSelector.solve(aContextShape);
+            aSelector.store(aContextShape);
             owner()->data()->sendAttributeUpdated(this);
             if (aToUnblock)
               owner()->data()->blockSendAttributeUpdated(false);
@@ -1806,13 +1773,18 @@ void Model_AttributeSelection::combineGeometrical()
   if (aFeature.get())
     return;
 
-  Selector_Selector aSelector(aSelLab);
-  if (ModelAPI_Session::get()->moduleDocument() != owner()->document()) {
-    aSelector.setBaseDocument(std::dynamic_pointer_cast<Model_Document>
-      (ModelAPI_Session::get()->moduleDocument())->extConstructionsLabel());
-  }
-  if (aSelector.restore()) {
-    TopoDS_Shape aContextShape = context()->shape()->impl<TopoDS_Shape>();
+  Selector_Selector aSelector(aSelLab, baseDocumentLab());
+  TopoDS_Shape aContextShape = context()->shape()->impl<TopoDS_Shape>();
+  if (aSelector.restore(aContextShape)) {
     aSelector.combineGeometrical(aContextShape);
   }
+}
+
+TDF_Label Model_AttributeSelection::baseDocumentLab()
+{
+  if (ModelAPI_Session::get()->moduleDocument() != owner()->document())
+    return std::dynamic_pointer_cast<Model_Document>
+      (ModelAPI_Session::get()->moduleDocument())->extConstructionsLabel();
+  static TDF_Label anEmpty;
+  return anEmpty;
 }

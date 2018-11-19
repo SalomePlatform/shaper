@@ -45,7 +45,7 @@ class Selector_NExplode
    SELECTOR_EXPORT TopoDS_Shape shape(const int theIndex);
 
 protected:
-  TopoDS_ListOfShape mySorted; ///< keepthe the ordered list of shapes
+  TopoDS_ListOfShape mySorted; ///< keep the ordered list of shapes
 };
 
 #endif
