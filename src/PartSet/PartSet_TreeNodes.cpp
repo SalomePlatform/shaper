@@ -859,16 +859,18 @@ void PartSet_PartRootNode::update()
 
   bool aHasFields = myFieldsFolder->childrenCount() > 0;
   bool aHasGroups = myGroupsFolder->childrenCount() > 0;
-  if (aHasFields && (!myChildren.contains(myFieldsFolder))) {
-    myChildren.insert(3, myFieldsFolder);
-  }
-  else if (myChildren.contains(myFieldsFolder)) {
+  if (aHasFields) {
+    if (!myChildren.contains(myFieldsFolder)) {
+      myChildren.insert(3, myFieldsFolder);
+    }
+  } else if (myChildren.contains(myFieldsFolder)) {
     myChildren.removeAll(myFieldsFolder);
   }
-  if (aHasGroups && (!myChildren.contains(myGroupsFolder))) {
-    myChildren.insert(aHasFields ? 4 : 3, myGroupsFolder);
-  }
-  else if (myChildren.contains(myGroupsFolder)) {
+  if (aHasGroups) {
+    if (!myChildren.contains(myGroupsFolder)) {
+      myChildren.insert(aHasFields ? 4 : 3, myGroupsFolder);
+    }
+  } else if (myChildren.contains(myGroupsFolder)) {
     myChildren.removeAll(myGroupsFolder);
   }
 
