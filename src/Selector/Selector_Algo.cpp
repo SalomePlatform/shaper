@@ -120,7 +120,7 @@ Selector_Algo* Selector_Algo::select(const TopoDS_Shape theContext, const TopoDS
       if (aContainer->select(theContext, theValue))
         return aContainer;
       delete aContainer;
-      return false;
+      return NULL;
     }
     Selector_Intersect* anIntersect = new Selector_Intersect;
     SET_ALGO_FLAGS(anIntersect);
@@ -131,7 +131,7 @@ Selector_Algo* Selector_Algo::select(const TopoDS_Shape theContext, const TopoDS
     }
     if (!theUseNeighbors) {
       delete anIntersect;
-      return false;
+      return NULL;
     }
     // searching by neighbors
     Selector_FilterByNeighbors* aNBs = new Selector_FilterByNeighbors;
@@ -200,7 +200,7 @@ Selector_Algo* Selector_Algo::select(const TopoDS_Shape theContext, const TopoDS
     }
     if (!theUseNeighbors) {
       delete aModify;
-      return false;
+      return NULL;
     }
     // searching by neighbors
     Selector_FilterByNeighbors* aNBs = new Selector_FilterByNeighbors;
