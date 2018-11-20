@@ -175,7 +175,7 @@ static QString MyFilter(QObject::tr("OpenParts files (*.shaper *.opp)"));
 static QString MyFilter2(QObject::tr("OpenParts files (*.shaper)"));
 static QString MyExtension(".shaper");
 #else
-static QString MyFilter(QObject::tr("OpenParts files (*.opp)"));
+static QString MyFilter(QObject::tr("OpenParts files (*.opp);;All files (*.*)"));
 static QString MyFilter2(QObject::tr("OpenParts files (*.opp)"));
 static QString MyExtension(".opp");
 #endif
