@@ -280,13 +280,10 @@ void Model_BodyBuilder::clean()
     return;
   std::map<int, TNaming_Builder*>::iterator aBuilder = myBuilders.begin();
   for(; aBuilder != myBuilders.end(); aBuilder++) {
+    Handle(TNaming_NamedShape) aNS = aBuilder->second->NamedShape();
     delete aBuilder->second;
-    // clear also shapes on cleaned sub-labels (#2241)
-    Handle(TNaming_NamedShape) aNS;
-    TDF_Label aSubLab = aLab.FindChild(aBuilder->first);
-    if (aSubLab.FindAttribute(TNaming_NamedShape::GetID(), aNS)) {
-      aNS->Clear();
-    }
+    if (!aNS.IsNull() && !aNS->Label().IsNull())
+      aNS->Label().ForgetAttribute(TNaming_NamedShape::GetID());
   }
   myBuilders.clear();
   myPrimitivesNamesIndexMap.clear();
