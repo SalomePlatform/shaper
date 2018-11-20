@@ -170,8 +170,15 @@ QString XGUI_Workshop::MOVE_TO_END_COMMAND = QObject::tr("Move to the end");
 //#define DEBUG_FEATURE_NAME
 //#define DEBUG_CLEAN_HISTORY
 
-
+#ifdef HAVE_SALOME
+static QString MyFilter(QObject::tr("OpenParts files (*.shaper *.opp)"));
+static QString MyFilter2(QObject::tr("OpenParts files (*.shaper)"));
+static QString MyExtension(".shaper");
+#else
 static QString MyFilter(QObject::tr("OpenParts files (*.opp)"));
+static QString MyFilter2(QObject::tr("OpenParts files (*.opp)"));
+static QString MyExtension(".opp");
+#endif
 
 
 //******************************************************
@@ -1082,10 +1089,10 @@ bool XGUI_Workshop::onSaveAs()
   if(!myOperationMgr->abortAllOperations(XGUI_OperationMgr::XGUI_InformationMessage))
     return false;
   myCurrentFile = QFileDialog::getSaveFileName(desktop(), tr("Select name to save file..."),
-    QString(), MyFilter);
+    QString(), MyFilter2);
   if (!myCurrentFile.isNull()) {
-    if (!myCurrentFile.endsWith(".opp")) {
-      myCurrentFile += ".opp";
+    if (!myCurrentFile.endsWith(MyExtension)) {
+      myCurrentFile += MyExtension;
     }
   }
   else

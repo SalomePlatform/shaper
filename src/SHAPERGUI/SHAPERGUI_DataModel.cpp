@@ -122,7 +122,7 @@ bool SHAPERGUI_DataModel::save(QStringList& theFiles)
     aMgr->blockAutoUpdate(false);
 
   //aWorkShop->saveDocument(QString(aTmpDir.c_str()), aFileNames);
-  aWorkShop->setCurrentDataFile(aTmp + "shaper.opp");
+  aWorkShop->setCurrentDataFile(aTmp + "shaper.shaper");
   aWorkShop->onSave();
   QString aName = aWorkShop->currentDataFile();
   std::string aa = aName.toStdString();
