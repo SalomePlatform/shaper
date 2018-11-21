@@ -142,7 +142,10 @@ void XGUI_DataModel::processEvent(const std::shared_ptr<Events_Message>& theMess
       foreach(ObjectPtr aObj, aCreated) {
         ModuleBase_ITreeNode* aNode = myRoot->subNode(aObj);
         if (aNode) {
-          aNode->update();
+          if (aNode->parent())
+            aNode->parent()->update();
+          else
+            aNode->update();
           rebuildDataTree();
           QModelIndex aFirstIdx = getIndex(aNode, 0);
           QModelIndex aLastIdx = getIndex(aNode, 2);
