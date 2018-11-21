@@ -139,20 +139,20 @@ void XGUI_DataModel::processEvent(const std::shared_ptr<Events_Message>& theMess
       rebuildDataTree();
     }
     else {
+      QTreeNodesList aParents;
       foreach(ObjectPtr aObj, aCreated) {
         ModuleBase_ITreeNode* aNode = myRoot->subNode(aObj);
         if (aNode) {
           if (aNode->parent())
-            aNode->parent()->update();
-          else
-            aNode->update();
-          rebuildDataTree();
-          QModelIndex aFirstIdx = getIndex(aNode, 0);
-          QModelIndex aLastIdx = getIndex(aNode, 2);
-
-          dataChanged(aFirstIdx, aLastIdx);
+            aNode = aNode->parent();
+          if (!aParents.contains(aNode))
+            aParents.append(aNode);
         }
       }
+      foreach(ModuleBase_ITreeNode* aNode, aParents) {
+        aNode->update();
+      }
+      rebuildDataTree();
     }
   }
   else if (theMessage->eventID() == Events_Loop::loop()->eventByName(EVENT_ORDER_UPDATED)) {
