@@ -139,14 +139,14 @@ void XGUI_DataModel::processEvent(const std::shared_ptr<Events_Message>& theMess
       rebuildDataTree();
     }
     else {
-      QTreeNodesList aParents;
+      QSet<ModuleBase_ITreeNode*> aParents;
       foreach(ObjectPtr aObj, aCreated) {
         ModuleBase_ITreeNode* aNode = myRoot->subNode(aObj);
         if (aNode) {
           if (aNode->parent())
             aNode = aNode->parent();
           if (!aParents.contains(aNode))
-            aParents.append(aNode);
+            aParents.insert(aNode);
         }
       }
       foreach(ModuleBase_ITreeNode* aNode, aParents) {
