@@ -52,20 +52,24 @@ Model_ResultBody::~Model_ResultBody()
   delete myBuilder;
 }
 
-void Model_ResultBody::generated(const GeomShapePtr& theNewShape,
-                                 const std::string& theName)
+bool Model_ResultBody::generated(const GeomShapePtr& theNewShape,
+  const std::string& theName, const bool theCheckIsInResult)
 {
+  bool aResult = false;
   if (mySubs.size()) { // consists of subs
     for (std::vector<ResultBodyPtr>::const_iterator aSubIter = mySubs.cbegin();
          aSubIter != mySubs.cend();
          ++aSubIter)
     {
       const ResultBodyPtr& aSub = *aSubIter;
-      aSub->generated(theNewShape, theName);
+      if (aSub->generated(theNewShape, theName, theCheckIsInResult))
+        aResult = true;
     }
   } else { // do for this directly
-    myBuilder->generated(theNewShape, theName);
+    if (myBuilder->generated(theNewShape, theName, theCheckIsInResult))
+      aResult = true;
   }
+  return aResult;
 }
 
 void Model_ResultBody::loadGeneratedShapes(const std::shared_ptr<GeomAlgoAPI_MakeShape>& theAlgo,

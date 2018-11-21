@@ -39,7 +39,8 @@
 #include <map>
 #include <sstream>
 
-static void storeSubShape(ResultBodyPtr theResultBody,
+static void storeSubShape(const std::shared_ptr<GeomAlgoAPI_MakeShape> theMakeShape,
+                          ResultBodyPtr theResultBody,
                           const GeomShapePtr theShape,
                           const GeomAPI_Shape::ShapeType theType,
                           const std::string& theName);
@@ -337,18 +338,20 @@ void FeaturesPlugin_CompositeSketch::storeGenerationHistory(ResultBodyPtr theRes
   std::list<std::shared_ptr<GeomAlgoAPI_MakeSweep> >::iterator aSweep = aSweeps.begin();
   for(; aSweep != aSweeps.end(); aSweep++) {
     // Store from shapes.
-    storeShapes(theResultBody, aBaseShapeType, (*aSweep)->fromShapes(), "From_");
+    storeShapes(theMakeShape, theResultBody, aBaseShapeType, (*aSweep)->fromShapes(), "From_");
 
     // Store to shapes.
-    storeShapes(theResultBody, aBaseShapeType, (*aSweep)->toShapes(), "To_");
+    storeShapes(theMakeShape, theResultBody, aBaseShapeType, (*aSweep)->toShapes(), "To_");
   }
 }
 
 //=================================================================================================
-void FeaturesPlugin_CompositeSketch::storeShapes(ResultBodyPtr theResultBody,
-                              const GeomAPI_Shape::ShapeType theBaseShapeType,
-                              const ListOfShape& theShapes,
-                              const std::string theName)
+void FeaturesPlugin_CompositeSketch::storeShapes(
+  const std::shared_ptr<GeomAlgoAPI_MakeShape> theMakeShape,
+  ResultBodyPtr theResultBody,
+  const GeomAPI_Shape::ShapeType theBaseShapeType,
+  const ListOfShape& theShapes,
+  const std::string theName)
 {
   GeomAPI_Shape::ShapeType aShapeTypeToExplore = GeomAPI_Shape::FACE;
   std::string aShapeTypeStr = "Face";
@@ -382,25 +385,31 @@ void FeaturesPlugin_CompositeSketch::storeShapes(ResultBodyPtr theResultBody,
 
     if(aShapeTypeToExplore == GeomAPI_Shape::COMPOUND) {
       std::string aName = theName + (aShape->shapeType() == GeomAPI_Shape::EDGE ? "Edge" : "Face");
-      storeSubShape(theResultBody, aShape, aShape->shapeType(), aName);
+      storeSubShape(theMakeShape, theResultBody, aShape, aShape->shapeType(), aName);
     } else {
       std::string aName = theName + aShapeTypeStr;
-      storeSubShape(theResultBody, aShape, aShapeTypeToExplore, aName);
+      storeSubShape(theMakeShape, theResultBody, aShape, aShapeTypeToExplore, aName);
       if (theBaseShapeType == GeomAPI_Shape::WIRE) { // issue 2289: special names also for vertices
         aName = theName + "Vertex";
-        storeSubShape(theResultBody, aShape, GeomAPI_Shape::VERTEX, aName);
+        storeSubShape(theMakeShape, theResultBody, aShape, GeomAPI_Shape::VERTEX, aName);
       }
     }
   }
 }
 
-void storeSubShape(ResultBodyPtr theResultBody,
-                   const GeomShapePtr theShape,
-                   const GeomAPI_Shape::ShapeType theType,
-                   const std::string& theName)
+void storeSubShape(
+  const std::shared_ptr<GeomAlgoAPI_MakeShape> theMakeShape,
+  ResultBodyPtr theResultBody,
+  const GeomShapePtr theShape,
+  const GeomAPI_Shape::ShapeType theType,
+  const std::string& theName)
 {
   for(GeomAPI_ShapeExplorer anExp(theShape, theType); anExp.more(); anExp.next()) {
     GeomShapePtr aSubShape = anExp.current();
-    theResultBody->generated(aSubShape, theName);
+    if (!theResultBody->generated(aSubShape, theName)) {
+      // store from/to shapes as primitives and then store modification of them by the boolean
+      theResultBody->generated(aSubShape, theName, false);
+      theResultBody->loadModifiedShapes(theMakeShape, aSubShape, theType);
+    }
   }
 }

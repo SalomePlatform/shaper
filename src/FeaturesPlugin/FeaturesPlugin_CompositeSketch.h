@@ -96,8 +96,9 @@ protected:
                               const GeomShapePtr theBaseShape,
                               const std::shared_ptr<GeomAlgoAPI_MakeShape> theMakeShape);
 
-  /// Used to store from and to shapes.
-  void storeShapes(ResultBodyPtr theResultBody,
+  /// Used to store from and to shapes: generated, or in common modified tag
+  void storeShapes(const std::shared_ptr<GeomAlgoAPI_MakeShape> theMakeShape,
+                   ResultBodyPtr theResultBody,
                    const GeomAPI_Shape::ShapeType theBaseShapeType,
                    const ListOfShape& theShapes,
                    const std::string theName);

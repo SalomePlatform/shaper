@@ -260,7 +260,7 @@ bool Selector_FilterByNeighbors::restore()
       break; // some empty label left in the end
     }
   }
-  return true;
+  return myNBLevel.size() == list().size();
 }
 
 TDF_Label Selector_FilterByNeighbors::restoreByName(std::string theName,

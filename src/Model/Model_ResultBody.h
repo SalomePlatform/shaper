@@ -51,8 +51,8 @@ public:
 
   /// Records the subshape newShape which was generated during a topological construction.
   /// As an example, consider the case of a face generated in construction of a box.
-  MODEL_EXPORT virtual void generated(const GeomShapePtr& theNewShape,
-                                      const std::string& theName) override;
+  MODEL_EXPORT virtual bool generated(const GeomShapePtr& theNewShape,
+    const std::string& theName, const bool theCheckIsInResult = true) override;
 
   /// load generated shapes
   MODEL_EXPORT

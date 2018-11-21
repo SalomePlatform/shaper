@@ -317,14 +317,16 @@ void Model_BodyBuilder::buildName(const int theTag, const std::string& theName)
 
   TDataStd_Name::Set(builder(theTag)->NamedShape()->Label(), aName.c_str());
 }
-void Model_BodyBuilder::generated(const GeomShapePtr& theNewShape,
-                                  const std::string& theName)
+bool Model_BodyBuilder::generated(const GeomShapePtr& theNewShape,
+                                  const std::string& theName,
+                                  const bool theCheckIsInResult)
 {
   GeomShapePtr aResultShape = shape();
-
-  bool aNewShapeIsNotInResultShape = !aResultShape->isSubShape(theNewShape, false);
-  if (aNewShapeIsNotInResultShape) {
-    return;
+  if (theCheckIsInResult) {
+    bool aNewShapeIsNotInResultShape = !aResultShape->isSubShape(theNewShape, false);
+    if (aNewShapeIsNotInResultShape) {
+      return false;
+    }
   }
 
   TopoDS_Shape aShape = theNewShape->impl<TopoDS_Shape>();
@@ -349,6 +351,7 @@ void Model_BodyBuilder::generated(const GeomShapePtr& theNewShape,
     buildName(myFreePrimitiveTag, aName);
   }
   ++myFreePrimitiveTag;
+  return true;
 }
 
 void Model_BodyBuilder::generated(const GeomShapePtr& theOldShape,

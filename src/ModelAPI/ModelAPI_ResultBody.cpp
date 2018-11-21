@@ -98,10 +98,10 @@ GeomShapePtr ModelAPI_ResultBody::shape()
   return myBuilder->shape();
 }
 
-void ModelAPI_ResultBody::generated(const GeomShapePtr& theNewShape,
-                                    const std::string& theName)
+bool ModelAPI_ResultBody::generated(const GeomShapePtr& theNewShape,
+  const std::string& theName, const bool theCheckIsInResult)
 {
-  myBuilder->generated(theNewShape, theName);
+  return myBuilder->generated(theNewShape, theName, theCheckIsInResult);
 }
 
 void ModelAPI_ResultBody::generated(const GeomShapePtr& theOldShape,
