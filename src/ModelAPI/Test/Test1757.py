@@ -92,7 +92,7 @@ Part_1.document().setCurrentFeature(ExtrusionCut_1.feature(), True)
 #=========================================================================
 # Modify the cylindrical hole base face by another groove in the history before the hole is created
 #=========================================================================
-ExtrusionCut_3 = model.addExtrusionCut(Part_1_doc, [], model.selection(), model.selection(), 0, model.selection("FACE", "Extrusion_1_1/Generated_Face&Sketch_1/SketchLine_4"), -50, [model.selection("SOLID", "ExtrusionCut_1_1")])
+ExtrusionCut_3 = model.addExtrusionCut(Part_1_doc, [], model.selection(), model.selection(), 0, model.selection("FACE", "Extrusion_1_1/Generated_Face&Sketch_1/SketchLine_4"), 0, [model.selection("SOLID", "ExtrusionCut_1_1")])
 Sketch_4 = model.addSketch(Part_1_doc, model.selection("FACE", "Extrusion_1_1/Generated_Face&Sketch_1/SketchLine_2"))
 SketchLine_9 = Sketch_4.addLine(-176.701443076057, -151.212050129331, -91.83965287802501, -151.212050129331)
 SketchLine_10 = Sketch_4.addLine(-91.83965287802501, -151.212050129331, -91.83965287802501, -84.473709256573)
@@ -125,6 +125,6 @@ import ModelAPI
 
 assert(ModelAPI.ModelAPI_Session.get().validators().validate(Sketch_4.feature()))
 assert(ModelAPI.ModelAPI_Session.get().validators().validate(ExtrusionCut_2.feature()))
-assert(Sketch_3.feature().selection("External").namingName() == "(ExtrusionCut_1_1/Modified_Face&Extrusion_1_1/From_Face)(ExtrusionCut_3_1/Modified_Face&Sketch_2/SketchLine_6)(ExtrusionCut_1_1/Modified_Face&Extrusion_1_1/To_Face)(Extrusion_1_1/Generated_Face&Sketch_1/SketchLine_4)")
+assert(Sketch_3.feature().selection("External").namingName() == "(ExtrusionCut_3_1/Modified_Face&Sketch_2/SketchLine_6)(ExtrusionCut_3_1/Modified_Face&Sketch_1/SketchLine_4)(ExtrusionCut_1_1/Modified_Face&Extrusion_1_1/To_Face)")
 
 assert(model.checkPythonDump())

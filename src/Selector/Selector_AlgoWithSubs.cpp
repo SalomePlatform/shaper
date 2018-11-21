@@ -53,7 +53,7 @@ bool Selector_AlgoWithSubs::append(Selector_Algo* theAlgo, const bool theEraseIf
   return false;
 }
 
-const std::list<Selector_Algo*>& Selector_AlgoWithSubs::list() const
+std::list<Selector_Algo*>& Selector_AlgoWithSubs::list()
 {
   return mySubSelList;
 }

@@ -417,6 +417,7 @@ Selector_Algo* Selector_Algo::restoreByName(TDF_Label theLab, TDF_Label theBaseD
 
 void Selector_Algo::storeType(const Selector_Type theType)
 {
+  myLab.ForgetAllAttributes(true);
   TDataStd_Integer::Set(myLab, kSEL_TYPE, (int)(theType));
   if (myGeometricalNaming)
     TDataStd_UAttribute::Set(myLab, kGEOMETRICAL_NAMING);

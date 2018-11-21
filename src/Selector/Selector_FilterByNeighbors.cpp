@@ -230,7 +230,7 @@ void Selector_FilterByNeighbors::store()
     TDataStd_IntegerArray::Set(label(), kLEVELS_ARRAY, 0, int(myNBLevel.size()) - 1);
   std::list<int>::iterator aLevel = myNBLevel.begin();
   for(int anIndex = 0; aLevel != myNBLevel.end(); aLevel++, anIndex++) {
-    anArray->SetValue(anIndex, *aLevel);
+    anArray->SetValue(anIndex, Abs(*aLevel));
   }
   // store all sub-selectors
   std::list<Selector_Algo*>::const_iterator aSubSel = list().cbegin();
@@ -257,10 +257,19 @@ bool Selector_FilterByNeighbors::restore()
   for(TDF_ChildIterator aSub(label(), false); aSub.More(); aSub.Next()) {
     Selector_Algo* aSubSel = restoreByLab(aSub.Value(), baseDocument());
     if (!append(aSubSel, false)) {
-      break; // some empty label left in the end
+      if (!aSub.Value().HasAttribute())
+        break; // some empty label left in the end
+      // some selector fails, try to use rest selectors, myNBLevel becomes negative: unused
+      if (myNBLevel.size() > list().size()) {
+        std::list<int>::iterator aListIter = myNBLevel.begin();
+        for(int a = 0; a < list().size(); a++)
+          aListIter++;
+        *aListIter = -*aListIter;
+        list().push_back(NULL);
+      }
     }
   }
-  return myNBLevel.size() == list().size();
+  return myNBLevel.size() == list().size() && !myNBLevel.empty();
 }
 
 TDF_Label Selector_FilterByNeighbors::restoreByName(std::string theName,
@@ -324,15 +333,18 @@ bool Selector_FilterByNeighbors::solve(const TopoDS_Shape& theContext)
   std::list<int>::iterator aLevel = myNBLevel.begin();
   std::list<Selector_Algo*>::const_iterator aSubSel = list().cbegin();
   for(; aSubSel != list().cend(); aSubSel++, aLevel++) {
-    if (!(*aSubSel)->solve(theContext)) {
-      return false;
+    if (*aLevel < 0)
+      continue; // skip because sub-selector is not good
+    if ((*aSubSel)->solve(theContext)) {
+      aNBs.push_back(std::pair<TopoDS_Shape, int>((*aSubSel)->value(), *aLevel));
     }
-    aNBs.push_back(std::pair<TopoDS_Shape, int>((*aSubSel)->value(), *aLevel));
   }
-  aResult = findNeighbor(theContext, aNBs, geometricalNaming());
-  if (!aResult.IsNull()) {
-    Selector_Algo::store(aResult);
-    return true;
+  if (!aNBs.empty()) {
+    aResult = findNeighbor(theContext, aNBs, geometricalNaming());
+    if (!aResult.IsNull()) {
+      Selector_Algo::store(aResult);
+      return true;
+    }
   }
   return false;
 }
@@ -344,6 +356,8 @@ std::string Selector_FilterByNeighbors::name(Selector_NameGenerator* theNameGene
   std::list<int>::iterator aLevel = myNBLevel.begin();
   std::list<Selector_Algo*>::const_iterator aSubSel = list().cbegin();
   for(; aSubSel != list().cend(); aSubSel++, aLevel++) {
+    if (!*aSubSel)
+      continue;
     aResult += "(" + (*aSubSel)->name(theNameGenerator) + ")";
     if (*aLevel > 1) {
       std::ostringstream aLevelStr;

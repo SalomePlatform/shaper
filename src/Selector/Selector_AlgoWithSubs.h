@@ -45,7 +45,7 @@ public:
   /// Appends a new algorithm to the list, erases list if it is null (failed)
   bool append(Selector_Algo* theAlgo, const bool theEraseIfNull = true);
   /// Returns the stored list of sub-algorithms.
-  const std::list<Selector_Algo*>& list() const;
+  std::list<Selector_Algo*>& list();
 };
 
 #endif
