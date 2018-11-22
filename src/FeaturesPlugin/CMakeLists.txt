@@ -387,4 +387,5 @@ ADD_UNIT_TESTS(TestExtrusion.py
                Test2724.py
                Test2692.py
                Test2617.py
+               Test2729.py
 )
