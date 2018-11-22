@@ -197,6 +197,7 @@ PartSet_SketcherMgr::PartSet_SketcherMgr(PartSet_Module* theModule)
 
 PartSet_SketcherMgr::~PartSet_SketcherMgr()
 {
+  delete mySketchPlane;
 }
 
 void PartSet_SketcherMgr::onEnterViewPort()
