@@ -143,10 +143,17 @@ void XGUI_DataModel::processEvent(const std::shared_ptr<Events_Message>& theMess
       foreach(ObjectPtr aObj, aCreated) {
         ModuleBase_ITreeNode* aNode = myRoot->subNode(aObj);
         if (aNode) {
-          if (aNode->parent())
-            aNode = aNode->parent();
-          if (!aParents.contains(aNode))
-            aParents.insert(aNode);
+          if (aNode->parent()) {
+            if (aNode->parent() == myRoot) {
+              aParents.clear();
+              aParents.insert(myRoot);
+              break;
+            }
+            else {
+              aNode = aNode->parent();
+            }
+          }
+          aParents.insert(aNode);
         }
       }
       foreach(ModuleBase_ITreeNode* aNode, aParents) {
