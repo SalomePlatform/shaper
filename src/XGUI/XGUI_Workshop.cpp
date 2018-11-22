@@ -310,6 +310,8 @@ XGUI_Workshop::~XGUI_Workshop(void)
 
   delete myDisplayer;
   delete myDataModelXMLReader;
+  delete mySelectionActivate;
+  delete myMenuMgr;
   clearTemporaryDir();
 }
 
