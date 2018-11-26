@@ -781,7 +781,7 @@ std::string Model_AttributeSelection::namingName(const std::string& theDefaultNa
 
   Selector_Selector aSelector(aSelLab, baseDocumentLab());
   std::string aResult;
-  if (aSelector.restore(aCont->shape()->impl<TopoDS_Shape>()))
+  if (aCont->shape().get() && aSelector.restore(aCont->shape()->impl<TopoDS_Shape>()))
     aResult = aSelector.name(this);
   if (aCenterType != NOT_CENTER) {
     aResult += centersMap()[aCenterType];

@@ -343,9 +343,9 @@ ADD_UNIT_TESTS(TestExtrusion.py
                Test2592.py
                Test2588.py
                Test1467.py
-               TestPartitionSubCompsolidWithCompsolid1.py
-               TestPartitionSubCompsolidWithCompsolid2.py
-               TestPartitionSubCompsolidWithCompsolid3.py
+               TestPartitionSubCompsolidWithCompSolid1.py
+               TestPartitionSubCompsolidWithCompSolid2.py
+               TestPartitionSubCompsolidWithCompSolid3.py
                TestPartitionSubCompsolidWithSolid1.py
                TestPartitionSubCompsolidWithSolid2.py
                TestPartitionSubCompsolidWithSolid3.py
