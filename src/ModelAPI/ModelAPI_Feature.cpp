@@ -91,7 +91,7 @@ void ModelAPI_Feature::setResult(const std::shared_ptr<ModelAPI_Result>& theResu
 void ModelAPI_Feature::removeResult(const std::shared_ptr<ModelAPI_Result>& theResult)
 {
   theResult->setDisabled(theResult, true);
-  // flush visualisation changes
+  // flush visualization changes
   static Events_Loop* aLoop = Events_Loop::loop();
   static Events_ID aRedispEvent = aLoop->eventByName(EVENT_OBJECT_TO_REDISPLAY);
   aLoop->flush(aRedispEvent);
@@ -138,7 +138,7 @@ void ModelAPI_Feature::removeResults(
     }
   }
   if (!aGroup.empty() && theFlush) {
-    // flush visualisation changes
+    // flush visualization changes
     static Events_Loop* aLoop = Events_Loop::loop();
     static Events_ID aRedispEvent = aLoop->eventByName(EVENT_OBJECT_TO_REDISPLAY);
     aLoop->flush(aRedispEvent);

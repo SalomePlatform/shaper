@@ -102,7 +102,6 @@ bool FeaturesPlugin_Symmetry::collectSourceObjects(ListOfShape& theSourceShapes,
       anObjectsSelList->value(anObjectsIndex);
     std::shared_ptr<GeomAPI_Shape> anObject = anObjectAttr->value();
     if (!anObject.get()) { // may be for not-activated parts
-      eraseResults();
       return false;
     }
     theSourceShapes.push_back(anObject);

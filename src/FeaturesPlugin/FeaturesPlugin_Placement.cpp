@@ -68,7 +68,6 @@ void FeaturesPlugin_Placement::execute()
       anObjectsSelList->value(anObjectsIndex);
     std::shared_ptr<GeomAPI_Shape> anObject = anObjectAttr->value();
     if(!anObject.get()) { // may be for not-activated parts
-      eraseResults();
       return;
     }
     anObjects.push_back(anObject);

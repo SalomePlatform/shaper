@@ -105,7 +105,6 @@ void FeaturesPlugin_Translation::performTranslationByAxisAndDistance()
       anObjectsSelList->value(anObjectsIndex);
     std::shared_ptr<GeomAPI_Shape> anObject = anObjectAttr->value();
     if(!anObject.get()) { // may be for not-activated parts
-      eraseResults();
       return;
     }
     anObjects.push_back(anObject);
@@ -230,7 +229,6 @@ void FeaturesPlugin_Translation::performTranslationByDimensions()
       anObjectsSelList->value(anObjectsIndex);
     std::shared_ptr<GeomAPI_Shape> anObject = anObjectAttr->value();
     if(!anObject.get()) { // may be for not-activated parts
-      eraseResults();
       return;
     }
     anObjects.push_back(anObject);
@@ -317,7 +315,6 @@ void FeaturesPlugin_Translation::performTranslationByTwoPoints()
       anObjectsSelList->value(anObjectsIndex);
     std::shared_ptr<GeomAPI_Shape> anObject = anObjectAttr->value();
     if(!anObject.get()) { // may be for not-activated parts
-      eraseResults();
       return;
     }
     anObjects.push_back(anObject);

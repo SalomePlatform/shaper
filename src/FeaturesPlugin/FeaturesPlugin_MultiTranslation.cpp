@@ -94,7 +94,6 @@ void FeaturesPlugin_MultiTranslation::performOneDirection()
       anObjectsSelList->value(anObjectsIndex);
     std::shared_ptr<GeomAPI_Shape> anObject = anObjectAttr->value();
     if(!anObject.get()) { // may be for not-activated parts
-      eraseResults();
       return;
     }
     anObjects.push_back(anObject);
@@ -238,7 +237,6 @@ void FeaturesPlugin_MultiTranslation::performTwoDirection()
       anObjectsSelList->value(anObjectsIndex);
     std::shared_ptr<GeomAPI_Shape> anObject = anObjectAttr->value();
     if(!anObject.get()) { // may be for not-activated parts
-      eraseResults();
       return;
     }
     anObjects.push_back(anObject);
