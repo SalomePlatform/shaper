@@ -219,16 +219,19 @@ QIntList ModuleBase_WidgetPointInput::shapeTypes() const
 
 //********************************************************************
 bool ModuleBase_WidgetPointInput
-::setSelectionCustom(const std::shared_ptr<ModuleBase_ViewerPrs>& thePrs)
+::setSelection(QList<std::shared_ptr<ModuleBase_ViewerPrs>>& theValues,
+  const bool theToValidate)
 {
-  GeomShapePtr aShape = thePrs->shape();
-  if (aShape->isVertex()) {
-    GeomVertexPtr aVertex(new GeomAPI_Vertex(aShape));
-    GeomPointPtr aPnt = aVertex->point();
-    myXSpin->setValue(aPnt->x());
-    myYSpin->setValue(aPnt->y());
-    myZSpin->setValue(aPnt->z());
-    return true;
+  if (theValues.size() == 1) {
+    GeomShapePtr aShape = theValues.first()->shape();
+    if (aShape->isVertex()) {
+      GeomVertexPtr aVertex(new GeomAPI_Vertex(aShape));
+      GeomPointPtr aPnt = aVertex->point();
+      myXSpin->setValue(aPnt->x());
+      myYSpin->setValue(aPnt->y());
+      myZSpin->setValue(aPnt->z());
+      return true;
+    }
   }
   return false;
 }

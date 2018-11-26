@@ -61,7 +61,8 @@ public:
 
   /// Fills the attribute with the value of the selected owner
   /// \param thePrs a selected owner
-  virtual bool setSelectionCustom(const std::shared_ptr<ModuleBase_ViewerPrs>& thePrs);
+  virtual bool setSelection(QList<std::shared_ptr<ModuleBase_ViewerPrs>>& theValues,
+    const bool theToValidate);
 
 protected:
   /// Retunrs a list of possible shape types
