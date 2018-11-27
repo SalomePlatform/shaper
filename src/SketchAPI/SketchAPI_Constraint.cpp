@@ -66,6 +66,31 @@ bool SketchAPI_Constraint::initialize()
   return true;
 }
 
+void SketchAPI_Constraint::setEntityA(const ModelHighAPI_RefAttr& theEntity)
+{
+  fillAttribute(theEntity, feature()->refattr(SketchPlugin_Constraint::ENTITY_A()));
+}
+
+void SketchAPI_Constraint::setEntityB(const ModelHighAPI_RefAttr& theEntity)
+{
+  fillAttribute(theEntity, feature()->refattr(SketchPlugin_Constraint::ENTITY_B()));
+}
+
+void SketchAPI_Constraint::setEntityC(const ModelHighAPI_RefAttr& theEntity)
+{
+  fillAttribute(theEntity, feature()->refattr(SketchPlugin_Constraint::ENTITY_C()));
+}
+
+void SketchAPI_Constraint::setEntityD(const ModelHighAPI_RefAttr& theEntity)
+{
+  fillAttribute(theEntity, feature()->refattr(SketchPlugin_Constraint::ENTITY_D()));
+}
+
+void SketchAPI_Constraint::setValue(const ModelHighAPI_Double& theValue)
+{
+  fillAttribute(theValue, feature()->real(SketchPlugin_Constraint::VALUE()));
+}
+
 static const std::string& constraintTypeToSetter(const std::string& theType)
 {
   if (theType == SketchPlugin_ConstraintCoincidence::ID()) {

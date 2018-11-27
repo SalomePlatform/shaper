@@ -29,6 +29,8 @@
 
 #include <SketchPlugin_Constraint.h>
 
+class ModelHighAPI_Double;
+
 /**\class SketchAPI_Constraint
  * \ingroup CPPHighAPI
  * \brief Interface for Constraint feature
@@ -53,6 +55,13 @@ public:
 
   SKETCHAPI_EXPORT
   bool initialize();
+
+  SKETCHAPI_EXPORT void setEntityA(const ModelHighAPI_RefAttr& theEntity);
+  SKETCHAPI_EXPORT void setEntityB(const ModelHighAPI_RefAttr& theEntity);
+  SKETCHAPI_EXPORT void setEntityC(const ModelHighAPI_RefAttr& theEntity);
+  SKETCHAPI_EXPORT void setEntityD(const ModelHighAPI_RefAttr& theEntity);
+
+  SKETCHAPI_EXPORT void setValue(const ModelHighAPI_Double& theValue);
 
   /// Dump wrapped feature
   SKETCHAPI_EXPORT

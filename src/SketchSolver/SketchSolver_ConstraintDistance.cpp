@@ -167,8 +167,12 @@ void SketchSolver_ConstraintDistance::removeConstraintsKeepingSign()
   aParams.insert(myOddPoint->y);
   aStorage->removeParameters(aParams);
 
-  aGCSConstraints.pop_back();
-  aGCSConstraints.pop_back();
+  // remove constraints keeping sign of point-line distance,
+  // not more than 2 additional constraints is possible
+  if (!aGCSConstraints.empty())
+    aGCSConstraints.pop_back();
+  if (!aGCSConstraints.empty())
+    aGCSConstraints.pop_back();
   aConstraint->setConstraints(aGCSConstraints);
   aStorage->addConstraint(myBaseConstraint, aConstraint);
 
