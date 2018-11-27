@@ -67,8 +67,8 @@ void BuildPlugin_Filling::initAttributes()
   data()->addAttribute(TOLERANCE_3D_ID(), ModelAPI_AttributeDouble::typeId());
   data()->addAttribute(APPROXIMATION_ID(), ModelAPI_AttributeBoolean::typeId());
 
-  restoreDefaultParameters();
-  string(ADVANCED_OPTIONS_ID())->setValue("");
+  if (string(ADVANCED_OPTIONS_ID())->value().empty())
+    restoreDefaultParameters();
 }
 
 //=================================================================================================
