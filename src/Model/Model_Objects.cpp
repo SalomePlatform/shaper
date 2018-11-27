@@ -1797,7 +1797,7 @@ std::shared_ptr<ModelAPI_Feature> Model_Objects::feature(
     const std::shared_ptr<ModelAPI_Result>& theResult)
 {
   std::shared_ptr<Model_Data> aData = std::dynamic_pointer_cast<Model_Data>(theResult->data());
-  if (aData.get()) {
+  if (aData.get() && aData->isValid()) {
     TDF_Label aFeatureLab = aData->label().Father().Father().Father();
     FeaturePtr aFeature = feature(aFeatureLab);
     while(!aFeature.get() && aFeatureLab.Depth() > 1) { // this may be sub-result of result

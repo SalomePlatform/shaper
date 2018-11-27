@@ -84,7 +84,7 @@ SketchConstraintCoincidence_14 = Sketch_1.setCoincident(SketchLine_13.startPoint
 SketchConstraintHorizontal_7 = Sketch_1.setHorizontal(SketchLine_13.result())
 SketchConstraintCoincidence_15 = Sketch_1.setCoincident(SketchLine_13.endPoint(), SketchLine_8.result())
 model.do()
-Revolution_1 = model.addRevolution(Part_1_doc, [model.selection("FACE", "Sketch_1/Face-SketchLine_1r-SketchLine_2r-SketchLine_3r-SketchLine_4r-SketchLine_5r-SketchLine_6r-SketchLine_7r-SketchLine_8r-SketchLine_9r-SketchLine_10r-SketchLine_11r-SketchLine_12r")], model.selection("EDGE", "Sketch_1/Edge-SketchLine_13"), 360, 0)
+Revolution_1 = model.addRevolution(Part_1_doc, [model.selection("FACE", "Sketch_1/Face-SketchLine_12r-SketchLine_11r-SketchLine_10r-SketchLine_9r-SketchLine_8r-SketchLine_7r-SketchLine_6r-SketchLine_5r-SketchLine_4r-SketchLine_3r-SketchLine_2r-SketchLine_1r")], model.selection("EDGE", "Sketch_1/SketchLine_13"), 360, 0)
 model.do()
 # check that naming of the revolution is correct
 model.testHaveNamingSubshapes(Revolution_1, model, Part_1_doc)

@@ -36,7 +36,6 @@ Vertex_3 = model.addVertex(Part_1_doc, [model.selection("VERTEX", "Sketch_1/Sket
 Vertex_4 = model.addVertex(Part_1_doc, [model.selection("VERTEX", "Sketch_1/SketchPoint_2")])
 Cut_1 = model.addCut(Part_1_doc, [model.selection("VERTEX", "Vertex_1_1")], [model.selection("VERTEX", "Vertex_2_1")])
 Cut_2 = model.addCut(Part_1_doc, [model.selection("VERTEX", "Vertex_3_1")], [model.selection("VERTEX", "Vertex_4_1")])
-model.testHaveNamingSubshapes(Cut_1, model, Part_1_doc)
 model.testHaveNamingSubshapes(Cut_2, model, Part_1_doc)
 model.do()
 model.end()

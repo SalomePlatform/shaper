@@ -30,7 +30,7 @@
 class ModelAPI_Data;
 class ModelAPI_Document;
 
-// sometimes it is usefull for debug to see name of each object (bad for memory and performance)
+// sometimes it is useful for debug to see name of each object (bad for memory and performance)
 //#define DEBUG_NAMES
 
 /**\class ModelAPI_Object
@@ -115,6 +115,7 @@ class ModelAPI_Object: public ModelAPI_Entity
   MODELAPI_EXPORT virtual void erase();
 
   friend class Model_Objects;
+  friend class ModelAPI_Feature;
   friend class Model_Document;
 
 };

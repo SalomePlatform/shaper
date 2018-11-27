@@ -263,6 +263,7 @@ def testHaveNamingSubshapes(theFeature, theModel, thePartDoc) :
   """ Tests if all vertices/edges/faces of result have a unique name
   :param theFeature: feature to test.
   """
+  assert(len(theFeature.results()) > 0)
   testHaveNamingByType(theFeature, theModel, thePartDoc, GeomAPI_Shape.VERTEX)
   testHaveNamingByType(theFeature, theModel, thePartDoc, GeomAPI_Shape.EDGE)
   testHaveNamingByType(theFeature, theModel, thePartDoc, GeomAPI_Shape.FACE)
