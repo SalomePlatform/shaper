@@ -36,6 +36,8 @@
 #include <ModelAPI_ResultPart.h>
 #include <ModelAPI_CompositeFeature.h>
 #include <ModelAPI_Tools.h>
+#include <ModelAPI_ResultConstruction.h>
+#include <ModelAPI_ResultBody.h>
 #include <Events_InfoMessage.h>
 
 #include <GeomAPI_Shape.h>
@@ -149,14 +151,29 @@ bool canRemoveOrRename(QWidget* theParent, const std::set<FeaturePtr>& theFeatur
 //******************************************************************
 bool canRename(const ObjectPtr& theObject, const QString& theName)
 {
-  if (std::dynamic_pointer_cast<ModelAPI_ResultParameter>(theObject).get()) {
+  std::string aType = theObject->groupName();
+  if (aType == ModelAPI_ResultParameter::group()) {
     double aValue;
     ResultParameterPtr aParam;
     if (ModelAPI_Tools::findVariable(theObject->document(),
           FeaturePtr(), qPrintable(theName), aValue, aParam)) {
       const char* aKeyStr = "Selected parameter can not be renamed to: %1. "
                             "There is a parameter with the same name. Its value is: %2.";
-      QString aErrMsg(QObject::tr(aKeyStr).arg(qPrintable(theName)).arg(aValue));
+      QString aErrMsg(QObject::tr(aKeyStr).arg(theName).arg(aValue));
+      // We can not use here a dialog box for message -
+      // it will crash editing process in ObjectBrowser
+      Events_InfoMessage("XGUI_Tools", aErrMsg.toStdString()).send();
+      return false;
+    }
+  }
+  else if ((aType == ModelAPI_ResultConstruction::group()) || (aType == ModelAPI_ResultBody::group())) {
+    DocumentPtr aDoc = theObject->document();
+    ObjectPtr aObj = aDoc->objectByName(ModelAPI_ResultConstruction::group(), theName.toStdString());
+    if (!aObj.get())
+      aObj = aDoc->objectByName(ModelAPI_ResultBody::group(), theName.toStdString());
+
+    if (aObj.get()) {
+      QString aErrMsg(QObject::tr("Object with name %1 already exists.").arg(theName));
       // We can not use here a dialog box for message -
       // it will crash editing process in ObjectBrowser
       Events_InfoMessage("XGUI_Tools", aErrMsg.toStdString()).send();
