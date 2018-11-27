@@ -103,6 +103,12 @@ void FeaturesPlugin_Intersection::loadNamingDS(ResultBodyPtr theResultBody,
                                                const GeomMakeShapePtr& theMakeShape)
 {
   std::shared_ptr<GeomAPI_Shape> aResultShape = theMakeShape->shape();
+
+  if(theObjects.front()->isEqual(aResultShape)) {
+    theResultBody->store(aResultShape, false);
+    return;
+  }
+
   theResultBody->storeModified(theObjects.front(), aResultShape);
 
   const int aShapeTypesNb = 3;
