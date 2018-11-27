@@ -115,6 +115,7 @@ ADD_UNIT_TESTS(TestVertex.py
                TestCompSolid.py
                TestCompound.py
                TestSubShapes.py
+               TestFilling.py
                TestFilling_ByEdges.py
                TestFilling_ByWires.py
                TestFilling_Mixed.py

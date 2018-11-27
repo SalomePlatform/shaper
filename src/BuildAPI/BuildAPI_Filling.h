@@ -114,7 +114,7 @@ public:
 
 private:
   void execIfBaseNotEmpty();
-  void setAdvancedOptions();
+  void setAdvancedOptions(bool isEnabled = true);
 };
 
 /// Pointer on Face object.

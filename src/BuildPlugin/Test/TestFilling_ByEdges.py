@@ -82,6 +82,7 @@ aSession.finishOperation()
 # Create filling
 aSession.startOperation()
 aFillingFeature = aPart.addFeature("Filling")
+aFillingFeature.string("advanced_options").setValue("")
 aBaseObjectsList = aFillingFeature.selectionList("base_objects")
 aBaseObjectsList.append(aSketch1Result, anArc.lastResult().shape())
 aSession.finishOperation()

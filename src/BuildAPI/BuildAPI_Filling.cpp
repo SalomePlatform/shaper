@@ -33,8 +33,10 @@ BuildAPI_Filling::BuildAPI_Filling(const std::shared_ptr<ModelAPI_Feature>& theF
                                    const std::list<ModelHighAPI_Selection>& theBaseObjects)
   : ModelHighAPI_Interface(theFeature)
 {
-  if(initialize())
+  if (initialize()) {
+    setAdvancedOptions(false);
     setBase(theBaseObjects);
+  }
 }
 
 BuildAPI_Filling::BuildAPI_Filling(const std::shared_ptr<ModelAPI_Feature>& theFeature,
@@ -48,7 +50,7 @@ BuildAPI_Filling::BuildAPI_Filling(const std::shared_ptr<ModelAPI_Feature>& theF
                                    const bool theApproximate)
   : ModelHighAPI_Interface(theFeature)
 {
-  if(initialize()) {
+  if (initialize()) {
     setOrientationMethod(theOrientCorrection);
     setMinDegree(theMinDegree);
     setMaxDegree(theMaxDegree);
@@ -133,9 +135,9 @@ void BuildAPI_Filling::setApproximation(const bool theApproximate)
   execIfBaseNotEmpty();
 }
 
-void BuildAPI_Filling::setAdvancedOptions()
+void BuildAPI_Filling::setAdvancedOptions(bool isEnabled)
 {
-  feature()->string(BuildPlugin_Filling::ADVANCED_OPTIONS_ID())->setValue("true");
+  feature()->string(BuildPlugin_Filling::ADVANCED_OPTIONS_ID())->setValue(isEnabled ? "true" : "");
 }
 
 void BuildAPI_Filling::dump(ModelHighAPI_Dumper& theDumper) const
