@@ -153,7 +153,8 @@ void Model_BodyBuilder::store(const GeomShapePtr& theShape,
 
     if(!theIsStoreSameShapes) {
       Handle(TNaming_NamedShape) aNS = TNaming_Tool::NamedShape(aShape, aShapeLab);
-      if(!aNS.IsNull() && !aNS->IsEmpty()) {
+      // the last condition is for the issue 2751 : existing shape may be found in compound-NS
+      if(!aNS.IsNull() && !aNS->IsEmpty() && aNS->Get().IsSame(aShape)) {
         // This shape is already in document, store reference instead of shape;
         const TDF_Label aFoundLabel = aNS->Label();
         TDF_Reference::Set(aShapeLab, aFoundLabel);
