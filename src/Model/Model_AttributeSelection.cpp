@@ -1703,14 +1703,44 @@ ResultPtr Model_AttributeSelection::newestContext(
             aResults.push_back(aBody);
         }
         std::list<std::shared_ptr<ModelAPI_Result> >::iterator aResIter = aResults.begin();
-        for (; aResIter != aResults.end(); aResIter++) {
-          if (!aResIter->get() || !(*aResIter)->data()->isValid() || (*aResIter)->isDisabled())
-            continue;
-          GeomShapePtr aShape = (*aResIter)->shape();
-          if (aShape.get() && (theAnyValue || aShape->isSubShape(aSelectedShape, false))) {
-            aResult = *aResIter; // found new context (produced from this) with same subshape
-            aFindNewContext = true; // continue searching further
-            break;
+
+        if (theAnyValue) { // searching the best sub-result by maximum number of references to orig
+          int aReferencesCount = 0;
+          ResultPtr aBestResult;
+          for (; aResIter != aResults.end(); aResIter++) {
+            if (!aResIter->get() || !(*aResIter)->data()->isValid() || (*aResIter)->isDisabled())
+              continue;
+            TDF_Label aCandidateLab =
+              std::dynamic_pointer_cast<Model_Data>((*aResIter)->data())->shapeLab();
+            Handle(TDF_Reference) aRef;
+            if (aCandidateLab.FindAttribute(TDF_Reference::GetID(), aRef)) {
+              TDF_Label aRefLab = aRef->Get();
+              ResultPtr aRefRes = aDoc->resultByLab(aRefLab);
+              if (aRefRes.get() && aRefRes->shape().get() &&
+                  aRefRes->shape()->isEqual(aResult->shape())) {// it directly references to result
+                aResult = *aResIter; // found new context (produced from this) with same subshape
+                aFindNewContext = true; // continue searching further
+                break;
+              }
+            } else {
+              if (!aBestResult.get())
+                aBestResult = *aResIter;
+            }
+          }
+          if (aBestResult.get() && !aFindNewContext) { // the first good result for now
+            aResult = aBestResult; // found new context
+            aFindNewContext = true;
+          }
+        } else { // searching by sub-shape
+          for (; aResIter != aResults.end(); aResIter++) {
+            if (!aResIter->get() || !(*aResIter)->data()->isValid() || (*aResIter)->isDisabled())
+              continue;
+            GeomShapePtr aShape = (*aResIter)->shape();
+            if (aShape.get() && (theAnyValue || aShape->isSubShape(aSelectedShape, false))) {
+              aResult = *aResIter; // found new context (produced from this) with same subshape
+              aFindNewContext = true; // continue searching further
+              break;
+            }
           }
         }
       }

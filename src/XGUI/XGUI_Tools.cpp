@@ -166,9 +166,11 @@ bool canRename(const ObjectPtr& theObject, const QString& theName)
       return false;
     }
   }
-  else if ((aType == ModelAPI_ResultConstruction::group()) || (aType == ModelAPI_ResultBody::group())) {
+  else if ((aType == ModelAPI_ResultConstruction::group()) ||
+           (aType == ModelAPI_ResultBody::group())) {
     DocumentPtr aDoc = theObject->document();
-    ObjectPtr aObj = aDoc->objectByName(ModelAPI_ResultConstruction::group(), theName.toStdString());
+    ObjectPtr aObj =
+      aDoc->objectByName(ModelAPI_ResultConstruction::group(), theName.toStdString());
     if (!aObj.get())
       aObj = aDoc->objectByName(ModelAPI_ResultBody::group(), theName.toStdString());
 
