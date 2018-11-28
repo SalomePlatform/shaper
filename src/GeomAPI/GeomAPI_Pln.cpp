@@ -120,6 +120,13 @@ double GeomAPI_Pln::distance(const std::shared_ptr<GeomAPI_Pln> thePlane) const
   return aMyPln.Distance(anOtherPln);
 }
 
+double GeomAPI_Pln::distance(const std::shared_ptr<GeomAPI_Pnt> thePoint) const
+{
+  const gp_Pln& aMyPln = impl<gp_Pln>();
+  const gp_Pnt& aPnt = thePoint->impl<gp_Pnt>();
+  return aMyPln.Distance(aPnt);
+}
+
 void GeomAPI_Pln::translate(const std::shared_ptr<GeomAPI_Dir> theDir, double theDist)
 {
   gp_Vec aVec(theDir->impl<gp_Dir>());

@@ -178,18 +178,6 @@ bool Model_AttributeSelection::setValue(const ObjectPtr& theContext,
     std::shared_ptr<GeomAPI_Shape> aSubShape;
     if (theSubShape.get() && !aConstruction->shape()->isEqual(theSubShape))
       aSubShape = theSubShape; // the whole context
-    if (aConstruction->isInfinite()) {
-      // For correct naming selection, put the shape into the naming structure.
-      // It seems sub-shapes are not needed: only this shape is (and can be) selected.
-      /*
-      TNaming_Builder aBuilder(aSelLab);
-      aBuilder.Generated(aConstruction->shape()->impl<TopoDS_Shape>());
-      std::string anInfinitiveName = contextName(aConstruction);
-      TDataStd_Name::Set(aSelLab, anInfinitiveName.c_str());
-      std::dynamic_pointer_cast<Model_Document>(owner()->document())
-        ->addNamingName(aSelLab, anInfinitiveName.c_str());
-        */
-    }
   } else if (theContext->groupName() == ModelAPI_ResultPart::group()) {
     aSelLab.ForgetAllAttributes(true);
     TDataStd_UAttribute::Set(aSelLab, kPART_REF_ID);

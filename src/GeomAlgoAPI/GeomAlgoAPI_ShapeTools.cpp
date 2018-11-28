@@ -234,14 +234,14 @@ std::shared_ptr<GeomAPI_Shape> GeomAlgoAPI_ShapeTools::combineShapes(
     }
   }
 
-  // Map subshapes and shapes.
+  // Map sub-shapes and shapes.
   TopTools_IndexedDataMapOfShapeListOfShape aMapSA;
   TopExp::MapShapesAndAncestors(aShapesComp, aTS, aTA, aMapSA);
   if(aMapSA.IsEmpty()) {
     return aResult;
   }
 
-  // Get all shapes with common subshapes and free shapes.
+  // Get all shapes with common sub-shapes and free shapes.
   NCollection_Map<TopoDS_Shape> aFreeShapes;
   NCollection_Vector<NCollection_Map<TopoDS_Shape>> aShapesWithCommonSubshapes;
   for(TopTools_IndexedDataMapOfShapeListOfShape::Iterator
@@ -299,7 +299,7 @@ std::shared_ptr<GeomAPI_Shape> GeomAlgoAPI_ShapeTools::combineShapes(
     }
   }
 
-  // Combine shapes with common subshapes.
+  // Combine shapes with common sub-shapes.
   for(NCollection_Vector<NCollection_Map<TopoDS_Shape>>::Iterator
       anIter(aShapesWithCommonSubshapes); anIter.More(); anIter.Next()) {
     TopoDS_Shell aShell;
@@ -444,7 +444,7 @@ std::shared_ptr<GeomAPI_Shape> GeomAlgoAPI_ShapeTools::groupSharedTopology(
         aKeysIt.Next()) {
         const TopTools_ListOfShape& anOtherConnected = aVertexShapesMap(aKeysIt.Value());
         if (!anOtherConnected.Contains(aConnected)) {
-          // Other connected group does not containt shape from our connected group
+          // Other connected group does not contain shape from our connected group
           continue;
         }
         // Other is connected to our, so add them to our connected

@@ -54,6 +54,7 @@
 #include <SketchPlugin_ExternalValidator.h>
 #include <SketchPlugin_Ellipse.h>
 #include <SketchPlugin_MacroEllipse.h>
+#include <SketchPlugin_SketchDrawer.h>
 
 #include <SketcherPrs_Tools.h>
 
@@ -244,6 +245,8 @@ FeaturePtr SketchPlugin_Plugin::createFeature(std::string theFeatureID)
     return FeaturePtr(new SketchPlugin_Ellipse);
   } else if (theFeatureID == SketchPlugin_MacroEllipse::ID()) {
     return FeaturePtr(new SketchPlugin_MacroEllipse);
+  } else if (theFeatureID == SketchPlugin_SketchDrawer::ID()) {
+    return FeaturePtr(new SketchPlugin_SketchDrawer);
   }
   // feature of such kind is not found
   return FeaturePtr();

@@ -77,7 +77,7 @@ class SketchPlugin_Line : public SketchPlugin_SketchEntity,
   SKETCHPLUGIN_EXPORT virtual void execute();
 
   /// Apply information of the message to current object. It fills start attribute of
-  /// the currrent feature by last attribute of the message feature, build coincidence
+  /// the current feature by last attribute of the message feature, build coincidence
   /// if message has selected object
   virtual std::string processEvent(const std::shared_ptr<Events_Message>& theMessage);
 
@@ -92,7 +92,7 @@ class SketchPlugin_Line : public SketchPlugin_SketchEntity,
   SketchPlugin_Line();
 
 private:
-  /// Calculates the lenght of the line and fill the lenght attribute with the value
+  /// Calculates the length of the line and fill the length attribute with the value
   void updateLenghtValue();
 
 protected:

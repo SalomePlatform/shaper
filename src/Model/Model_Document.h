@@ -38,8 +38,8 @@ class ModelAPI_AttributeSelectionList;
 /**\class Model_Document
  * \ingroup DataModel
  * \brief Document for internal data structure of any object storage.
- * Document contains all data that must be stored/retrived in the file.
- * Also it provides acces to this data: open/save, transactions management etc.
+ * Document contains all data that must be stored/retrieved in the file.
+ * Also it provides access to this data: open/save, transactions management etc.
  */
 class Model_Document : public ModelAPI_Document
 {
@@ -66,11 +66,11 @@ class Model_Document : public ModelAPI_Document
     const char* theDirName, const char* theFileName, std::list<std::string>& theResults);
 
   //! Removes document data
-  //! \param theForever if it is false, document is just hiden
+  //! \param theForever if it is false, document is just hidden
   //!                   (to keep possibility make it back on Undo/Redo)
   MODEL_EXPORT virtual void close(const bool theForever = false);
 
-  //! Starts a new operation (opens a tansaction)
+  //! Starts a new operation (opens a transaction)
   MODEL_EXPORT virtual void startOperation();
   //! Finishes the previously started operation (closes the transaction)
   //! \returns true if transaction in this document is not empty and really was performed
@@ -82,11 +82,11 @@ class Model_Document : public ModelAPI_Document
   //! Returns true if document was modified (since creation/opening)
   MODEL_EXPORT virtual bool isModified();
 
-  //! Returns True if there are available Undos
+  //! Returns True if there are available Undo-s
   MODEL_EXPORT virtual bool canUndo();
   //! Undoes last operation
   MODEL_EXPORT virtual void undo();
-  //! Returns True if there are available Redos
+  //! Returns True if there are available Redo-s
   MODEL_EXPORT virtual bool canRedo();
   //! Redoes last operation
   MODEL_EXPORT virtual void redo();
@@ -176,15 +176,15 @@ class Model_Document : public ModelAPI_Document
   MODEL_EXPORT virtual std::shared_ptr<ModelAPI_Feature> internalFeature(const int theIndex);
   //! Performs synchronization of transactions with the module document:
   //! If some document is not active (by undo of activation) but in memory,
-  //! on activation the transactions must be synchronised because all redos performed
-  //! wihtout this participation
+  //! on activation the transactions must be synchronized because all redo-s performed
+  //! without this participation
   MODEL_EXPORT virtual void synchronizeTransactions();
 
   //! Returns feature by the id of the feature (produced by the Data "featureId" method)
   MODEL_EXPORT virtual std::shared_ptr<ModelAPI_Feature> featureById(const int theId);
 
 
-  /// Creates a construction cresults
+  /// Creates construction results
   MODEL_EXPORT virtual std::shared_ptr<ModelAPI_ResultConstruction> createConstruction(
       const std::shared_ptr<ModelAPI_Data>& theFeatureData, const int theIndex = 0);
   /// Creates a body results
@@ -229,7 +229,7 @@ class Model_Document : public ModelAPI_Document
   MODEL_EXPORT virtual std::shared_ptr<ModelAPI_Folder> findFolderBelow(
       const std::list<std::shared_ptr<ModelAPI_Feature> >& theFeatures);
   //! Search a folder containing the given feature.
-  //! Addtionally calculates a zero-based index of the feature in this folder.
+  //! Additionally calculates a zero-based index of the feature in this folder.
   //! \param theFeature feature to search
   //! \param theIndexInFolder zero-based index in the folder or -1 if the feature is top-level.
   //! \return the folder containing the feature or empty pointer if the feature is top-level.
@@ -238,7 +238,7 @@ class Model_Document : public ModelAPI_Document
       int& theIndexInFolder);
   //! Add a list of features to the folder. The correctness of the adding is not performed
   //! (such checks have been done in corresponding find.. method).
-  //! \return \c true if the movement is successfull
+  //! \return \c true if the movement is successful
   MODEL_EXPORT virtual bool moveToFolder(
       const std::list<std::shared_ptr<ModelAPI_Feature> >& theFeatures,
       const std::shared_ptr<ModelAPI_Folder>& theFolder);
@@ -252,7 +252,7 @@ class Model_Document : public ModelAPI_Document
       const std::list<std::shared_ptr<ModelAPI_Feature> >& theFeatures,
       const bool theBefore = true);
 
-  ///! Returns true if parametric updater need to execute feature on recomputartion
+  ///! Returns true if parametric updater need to execute feature on recomputation
   ///! On abort, undo or redo it is not necessary: results in document are updated automatically
   bool executeFeatures() {return myExecuteFeatures;}
 
@@ -321,22 +321,22 @@ class Model_Document : public ModelAPI_Document
   }
 
   //! performs compactification of all nested operations into one
-  //! \returns true if resulting transaction is not empty and can be undoed
+  //! \returns true if resulting transaction is not empty and can be undone
   void compactNested();
 
   //! Returns all loaded sub documents
   const std::set<int> subDocuments() const;
 
-  //! The implementation of undo: with or without recoursive calls in the sub-documents
+  //! The implementation of undo: with or without recursive calls in the sub-documents
   void undoInternal(const bool theWithSubs, const bool theSynchronize);
 
   //! Stores the Id of the current operation (normally is called for the root document)
   void operationId(const std::string& theId);
 
-  //! Returns the list of Ids of the operations that can be undoed (called for the root document)
+  //! Returns the list of Ids of the operations that can be undone (called for the root document)
   std::list<std::string> undoList() const;
 
-  //! Returns the list of Ids of the operations that can be redoed (called for the root document)
+  //! Returns the list of Ids of the operations that can be redone (called for the root document)
   std::list<std::string> redoList() const;
 
   //! Internally makes document know that feature was removed or added in history after creation
@@ -366,7 +366,7 @@ class Model_Document : public ModelAPI_Document
   /// Normally is called outside of the transaction, just before "save".
   virtual void storeNodesState(const std::list<bool>& theStates);
 
-  /// Returns the stored nodes states. Normally it is calles just after "open".
+  /// Returns the stored nodes states. Normally it is called just after "open".
   /// Appends the values to theStates list.
   virtual void restoreNodesState(std::list<bool>& theStates) const;
 
@@ -378,15 +378,15 @@ class Model_Document : public ModelAPI_Document
   /// searches in this document result that contains this label
   ResultPtr resultByLab(const TDF_Label& theLab);
 
-  /// returns true if theThis is later in the features trre and dependencies than theOther
+  /// returns true if theThis is later in the features tree and dependencies than theOther
   bool isLaterByDep(FeaturePtr theThis, FeaturePtr theOther);
 
   /// appends the latest transaction to the previous one (used for AutoUpdate enabling transaction)
   void appendTransactionToPrevious();
 
-  /// Sets the automatic recomutation flag: true means enabled
+  /// Sets the automatic recomputation flag: true means enabled
   void setAutoRecomutationState(const bool theState);
-  /// Returns the current automatic recomutation flag: true means enabled
+  /// Returns the current automatic recomputation flag: true means enabled
   bool autoRecomutationState() const;
 
   friend class Model_Application;
@@ -413,7 +413,7 @@ class Model_Document : public ModelAPI_Document
 
   //! counter value of transaction on the last "save" call, used for "IsModified" method
   int myTransactionSave;
-  //! number of nested transactions performed (list becasue may be nested inside of nested)
+  //! number of nested transactions performed (list because may be nested inside of nested)
   //! the list is empty if not nested transaction is performed
   std::list<int> myNestedNum;
 

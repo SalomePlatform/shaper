@@ -82,6 +82,10 @@ class GeomAPI_Pln : public GeomAPI_Interface
   GEOMAPI_EXPORT
   double distance(const std::shared_ptr<GeomAPI_Pln> thePlane) const;
 
+  /// \return distance from a point to this plane.
+  GEOMAPI_EXPORT
+  double distance(const std::shared_ptr<GeomAPI_Pnt> thePoint) const;
+
   /// Translates the plane along direction theDir on distance theDist
   GEOMAPI_EXPORT
   void translate(const std::shared_ptr<GeomAPI_Dir> theDir, const double theDist);

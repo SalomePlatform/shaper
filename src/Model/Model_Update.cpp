@@ -409,7 +409,8 @@ void Model_Update::processEvent(const std::shared_ptr<Events_Message>& theMessag
     }
 
     if (anActiveDoc.get() && aCurrent.get() && aCurrent->data()->isValid()) {
-      if (anActiveDoc->currentFeature(false) != aCurrent)
+      if (anActiveDoc->currentFeature(false) != aCurrent &&
+          ModelAPI_Tools::compositeOwner(anActiveDoc->currentFeature(false)) == aCurrent)
         anActiveDoc->setCurrentFeature(aCurrent, false); // #2156 make the current feature back
     }
 
