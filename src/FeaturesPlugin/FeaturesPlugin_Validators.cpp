@@ -555,7 +555,8 @@ bool FeaturesPlugin_ValidatorExtrusionDir::isValid(
     }
   }
 
-  if(!aDirShape.get()) {
+  if(!aDirShape.get() || aDirShape->isNull() ||
+     aDirShape->shapeType() != GeomAPI_Shape::EDGE) {
     // Check that dir can be empty.
     if(!isShapesCanBeEmpty(aCheckAttribute, theError)) {
       theError = "Error: Base objects list contains vertex or edge, so attribute \"%1\" "
