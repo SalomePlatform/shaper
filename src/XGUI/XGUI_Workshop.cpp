@@ -171,8 +171,8 @@ QString XGUI_Workshop::MOVE_TO_END_COMMAND = QObject::tr("Move to the end");
 //#define DEBUG_CLEAN_HISTORY
 
 #ifdef HAVE_SALOME
-static QString MyFilter(QObject::tr("OpenParts files (*.shaper *.opp)"));
-static QString MyFilter2(QObject::tr("OpenParts files (*.shaper)"));
+static QString MyFilter(QObject::tr("SHAPER files (*.shaper *.opp)"));
+static QString MyFilter2(QObject::tr("SHAPER files (*.shaper)"));
 static QString MyExtension(".shaper");
 #else
 static QString MyFilter(QObject::tr("OpenParts files (*.opp);;All files (*.*)"));
@@ -2723,9 +2723,7 @@ void XGUI_Workshop::highlightResults(const QObjectPtrList& theObjects)
   }
   if (aSelList.count() > theObjects.count()) {
     // if something was found
-    bool aBlocked = objectBrowser()->blockSignals(true);
     objectBrowser()->setObjectsSelected(aSelList);
-    objectBrowser()->blockSignals(aBlocked);
     objectBrowser()->ensureVisible(aNewSel.first());
   }
   if (aHasHidden)
@@ -2752,9 +2750,7 @@ void XGUI_Workshop::highlightFeature(const QObjectPtrList& theObjects)
   }
   if (aSelList.count() > theObjects.count()) {
     // if something was found
-    bool aBlocked = objectBrowser()->blockSignals(true);
     objectBrowser()->setObjectsSelected(aSelList);
-    objectBrowser()->blockSignals(aBlocked);
     objectBrowser()->ensureVisible(aNewSel.first());
   }
 }

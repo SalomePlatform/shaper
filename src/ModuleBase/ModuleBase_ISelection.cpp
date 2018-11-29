@@ -34,24 +34,19 @@ void ModuleBase_ISelection::appendSelected(const QList<ModuleBase_ViewerPrsPtr> 
 {
   // collect the objects from the viewer
   QObjectPtrList anExistedObjects;
-  QList<ModuleBase_ViewerPrsPtr>::const_iterator aPrsIt = theValuesTo.begin(),
-                                              aPrsLast = theValuesTo.end();
-  for (; aPrsIt != aPrsLast; aPrsIt++) {
-    if ((*aPrsIt)->owner() && (*aPrsIt)->object())
-      anExistedObjects.push_back((*aPrsIt)->object());
+  foreach(ModuleBase_ViewerPrsPtr aPrs, theValuesTo) {
+    if (aPrs->owner() && aPrs->object())
+      anExistedObjects.append(aPrs->object());
   }
 
-
-  QList<ModuleBase_ViewerPrsPtr>::const_iterator anIt = theValues.begin(),
-                                              aLast = theValues.end();
-  for (; anIt != aLast; anIt++) {
-    ObjectPtr anObject = (*anIt)->object();
+  ObjectPtr anObject;
+  foreach(ModuleBase_ViewerPrsPtr aPrs, theValues) {
+    anObject = aPrs->object();
     if (anObject.get() != NULL && !anExistedObjects.contains(anObject)) {
       theValuesTo.append(std::shared_ptr<ModuleBase_ViewerPrs>(
                new ModuleBase_ViewerPrs(anObject, GeomShapePtr(), NULL)));
     }
   }
-
 }
 
 //********************************************************************

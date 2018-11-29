@@ -40,6 +40,7 @@
 #include <QAction>
 #include <QStyledItemDelegate>
 #include <QMessageBox>
+#include <QApplication>
 
 #ifdef DEBUG_INDXES
 #include <QToolTip>
@@ -533,17 +534,61 @@ void XGUI_ObjectsBrowser::rebuildDataTree()
 //***************************************************
 void XGUI_ObjectsBrowser::setObjectsSelected(const QObjectPtrList& theObjects)
 {
-  QList<QModelIndex> theIndexes;
   QItemSelectionModel* aSelectModel = myTreeView->selectionModel();
-  aSelectModel->clear();
+  QModelIndexList aIndexes = aSelectModel->selectedIndexes();
+  if (theObjects.size() == 0) {
+    bool aIsBlock = aSelectModel->blockSignals(true);
+    aSelectModel->clear();
+    aSelectModel->blockSignals(aIsBlock);
+    foreach(QModelIndex aIdx, aIndexes) {
+      myTreeView->update(aIdx);
+    }
+    return;
+  }
 
-  foreach(ObjectPtr aFeature, theObjects)
-  {
-    QModelIndex aIndex = myDocModel->objectIndex(aFeature);
-    if (aIndex.isValid()) {
-      aSelectModel->select(aIndex, QItemSelectionModel::Select);
+  ObjectPtr aObject;
+  QModelIndexList aUnselect;
+  QObjectPtrList aToSelect = theObjects;
+  QHash<qint64, ObjectPtr> aNotChanged;
+  foreach(QModelIndex aIdx, aIndexes) {
+    aObject = myDocModel->object(aIdx);
+    if (aObject.get()) {
+      if (aToSelect.contains(aObject)) {
+        aNotChanged.insert((qint64)aObject.get(), aObject);
+      } else {
+        aUnselect.append(aIdx);
+      }
+    }
+    else {
+      aUnselect.append(aIdx);
     }
   }
+
+  foreach(ObjectPtr aObj, aNotChanged)
+    aToSelect.removeAll(aObj);
+
+  bool aIsBlock = aSelectModel->blockSignals(true);
+  foreach(QModelIndex aIdx, aUnselect) {
+    aSelectModel->select(aIdx, QItemSelectionModel::Deselect);
+    myTreeView->update(aIdx);
+  }
+
+  QModelIndex aIndex0, aIndex1, aIndex2, aCurrent;
+  foreach(ObjectPtr aFeature, aToSelect) {
+    aIndex1 = myDocModel->objectIndex(aFeature, 1);
+    if (aIndex1.isValid()) {
+      if (!aCurrent.isValid())
+        aCurrent = aIndex1;
+      aIndex0 = myDocModel->objectIndex(aFeature, 0);
+      aIndex2 = myDocModel->objectIndex(aFeature, 2);
+      aSelectModel->select(aIndex1, QItemSelectionModel::Select | QItemSelectionModel::Rows);
+      myTreeView->update(aIndex0);
+      myTreeView->update(aIndex1);
+      myTreeView->update(aIndex2);
+    }
+  }
+  aSelectModel->setCurrentIndex(aCurrent, QItemSelectionModel::NoUpdate);
+  aSelectModel->blockSignals(aIsBlock);
 }
 
 //***************************************************
@@ -585,14 +630,14 @@ QObjectPtrList XGUI_ObjectsBrowser::selectedObjects(QModelIndexList* theIndexes)
   QObjectPtrList aList;
   QModelIndexList aIndexes = selectedIndexes();
   XGUI_DataModel* aModel = dataModel();
-  QModelIndexList::const_iterator aIt;
-  for (aIt = aIndexes.constBegin(); aIt != aIndexes.constEnd(); ++aIt) {
-    if ((*aIt).column() == 1) {
-      ObjectPtr aObject = aModel->object(*aIt);
+
+  foreach(QModelIndex aIdx, aIndexes) {
+    if (aIdx.column() == 1) {
+      ObjectPtr aObject = aModel->object(aIdx);
       if (aObject) {
         aList.append(aObject);
         if (theIndexes)
-          theIndexes->append(*aIt);
+          theIndexes->append(aIdx);
       }
     }
   }

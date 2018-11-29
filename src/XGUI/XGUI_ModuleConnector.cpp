@@ -137,9 +137,7 @@ void XGUI_ModuleConnector::setSelected(const QList<ModuleBase_ViewerPrsPtr>& the
     foreach(ModuleBase_ViewerPrsPtr aVal, theValues) {
       anObjects.append(aVal->object());
     }
-    bool aBlocked = myWorkshop->objectBrowser()->blockSignals(true);
     aBrowser->setObjectsSelected(anObjects);
-    myWorkshop->objectBrowser()->blockSignals(aBlocked);
   }
 }
 

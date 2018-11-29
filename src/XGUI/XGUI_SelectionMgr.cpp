@@ -146,10 +146,7 @@ void XGUI_SelectionMgr::onViewerSelection()
 
   QObjectPtrList anObjects;
   convertToObjectBrowserSelection(aValues, anObjects);
-
-  bool aBlocked = myWorkshop->objectBrowser()->blockSignals(true);
   myWorkshop->objectBrowser()->setObjectsSelected(anObjects);
-  myWorkshop->objectBrowser()->blockSignals(aBlocked);
 
   emit selectionChanged();
 }
@@ -191,9 +188,7 @@ void XGUI_SelectionMgr::updateSelectionBy(const ModuleBase_ISelection::Selection
 void XGUI_SelectionMgr::clearSelection()
 {
   QObjectPtrList aFeatures;
-  bool aBlocked = myWorkshop->objectBrowser()->blockSignals(true);
   myWorkshop->objectBrowser()->setObjectsSelected(aFeatures);
-  myWorkshop->objectBrowser()->blockSignals(aBlocked);
 
   QList<ModuleBase_ViewerPrsPtr> aSelectedPrs =
              myWorkshop->selector()->selection()->getSelected(ModuleBase_ISelection::Browser);
@@ -211,12 +206,9 @@ void XGUI_SelectionMgr::setSelected(const QList<ModuleBase_ViewerPrsPtr>& theVal
   aDisplayer->setSelected(theValues);
 
   // update selection in Object Browser
-  bool aBlocked = myWorkshop->objectBrowser()->blockSignals(true);
   QObjectPtrList anObjects;
   convertToObjectBrowserSelection(theValues, anObjects);
-
   myWorkshop->objectBrowser()->setObjectsSelected(anObjects);
-  myWorkshop->objectBrowser()->blockSignals(aBlocked);
 }
 
 //**************************************************************
