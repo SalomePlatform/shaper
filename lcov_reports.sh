@@ -4,7 +4,7 @@ source env.sh
 
 cd ${BUILD_DIR}
 
-lcov --capture --directory /data/mpv/build --no-external --base-directory=/data/mpv/sources --output-file coverage.info.noext -q
+lcov --capture --directory ${BUILD_DIR} --no-external --base-directory ${SOURCES_DIR} --output-file coverage.info.noext -q
 
 # make a working copy of report
 cp -f coverage.info.noext covfile
