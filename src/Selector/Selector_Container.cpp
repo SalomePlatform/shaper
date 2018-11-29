@@ -89,6 +89,17 @@ TDF_Label Selector_Container::restoreByName(std::string theName,
   for(size_t aStart = 0; aStart != std::string::npos; aStart = theName.find('[', aStart + 1)) {
     size_t anEndPos = theName.find(']', aStart + 1);
     if (anEndPos != std::string::npos) {
+      // there could be sub-intersections, so, [[...]] case; searching for other open-bracket
+      size_t aNextStart = theName.find('[', aStart + 1);
+      while(aNextStart != std::string::npos && aNextStart < anEndPos) {
+        anEndPos = theName.find(']', anEndPos + 1);
+        if (anEndPos == std::string::npos) {
+          return TDF_Label(); // invalid parentheses
+        }
+        aNextStart = theName.find('[', aNextStart + 1);
+      }
+      if (anEndPos == std::string::npos)
+        return TDF_Label(); // invalid parentheses
       std::string aSubStr = theName.substr(aStart + 1, anEndPos - aStart - 1);
       TopAbs_ShapeEnum aSubShapeType = TopAbs_FACE;
       switch (myShapeType) {
@@ -116,6 +127,7 @@ TDF_Label Selector_Container::restoreByName(std::string theName,
       }
     } else
       return TDF_Label(); // invalid parentheses
+    aStart = anEndPos; // for recursive parenthesis set start on the current end
   }
   return aContext;
 }
