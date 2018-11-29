@@ -79,6 +79,8 @@ void SketchPlugin_SketchDrawer::execute()
 
   ObjectPtr aPlaneContext = selection(PLANE_ID())->contextObject();
   GeomShapePtr aPlaneShape = selection(PLANE_ID())->value();
+  if (!aPlaneShape.get() && aPlaneContext.get())
+    aPlaneShape = selection(PLANE_ID())->context()->shape();
   if (!aPlaneShape.get() || aPlaneShape->shapeType() != GeomAPI_Shape::FACE) {
     setError("Error: a sketch plane can not be obtained");
     return; // invalid case
@@ -93,11 +95,9 @@ void SketchPlugin_SketchDrawer::execute()
   // by selection of plane
   aSketch->selection(SketchPlugin_SketchEntity::EXTERNAL_ID())->
     setValue(selection(PLANE_ID())->context(), aPlaneShape);
-  // if reference to non-construction, remove reference, but keep the sketch position
-  if (aPlaneContext->groupName() != ModelAPI_ResultConstruction::group()) {
-    aSketch->selection(SketchPlugin_SketchEntity::EXTERNAL_ID())->
-      setValue(ResultPtr(), GeomShapePtr());
-  }
+  // remove reference, but keep the sketch position
+  aSketch->selection(SketchPlugin_SketchEntity::EXTERNAL_ID())->
+    setValue(ResultPtr(), GeomShapePtr());
 
   // iterate all edges of the base to find all edges that belong to this plane
   GeomAPI_DataMapOfShapeShape alreadyProcessed;
