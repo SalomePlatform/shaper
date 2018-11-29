@@ -90,13 +90,6 @@ void SketchPlugin_SketchDrawer::execute()
   DocumentPtr aMyDoc = document();
   std::shared_ptr<SketchPlugin_Sketch> aSketch =
     std::dynamic_pointer_cast<SketchPlugin_Sketch>(aMyDoc->addFeature(SketchPlugin_Sketch::ID()));
-  /*if (aPlaneContext->groupName() == ModelAPI_ResultConstruction::group()) { // by coordinates
-    std::dynamic_pointer_cast<GeomDataAPI_Point>(
-      aSketch->attribute(SketchPlugin_Sketch::ORIGIN_ID()))->setValue(aPlane->location());
-    std::dynamic_pointer_cast<GeomDataAPI_Dir>(
-      aSketch->attribute(SketchPlugin_Sketch::NORM_ID()))->setValue(aPlane->direction());
-
-  } else {*/
   // by selection of plane
   aSketch->selection(SketchPlugin_SketchEntity::EXTERNAL_ID())->
     setValue(selection(PLANE_ID())->context(), aPlaneShape);

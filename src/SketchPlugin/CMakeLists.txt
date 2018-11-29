@@ -267,6 +267,7 @@ ADD_UNIT_TESTS(
   TestTrimCircleAndArc01.py
   TestTrimLine01.py
   TestTrimLine02.py
+  TestSketchDrawer.py
 )
 
 if(${SKETCHER_CHANGE_RADIUS_WHEN_MOVE})
