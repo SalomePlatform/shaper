@@ -489,10 +489,12 @@ void XGUI_ObjectsBrowser::onEditItem()
       // Find index which corresponds the feature
       QModelIndex aIndex;
       foreach(QModelIndex aIdx, selectedIndexes()) {
-        ObjectPtr aFea = dataModel()->object(aIdx);
-        if (dataModel()->object(aIdx)->isSame(anObject)) {
-          aIndex = aIdx;
-          break;
+        if (aIdx.column() == 1) {
+          ObjectPtr aFea = dataModel()->object(aIdx);
+          if (dataModel()->object(aIdx)->isSame(anObject)) {
+            aIndex = aIdx;
+            break;
+          }
         }
       }
       if (aIndex.isValid()) {
