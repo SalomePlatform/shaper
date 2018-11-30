@@ -1613,13 +1613,20 @@ bool Model_Document::isLaterByDep(FeaturePtr theThis, FeaturePtr theOther) {
         if (aRefFeat.get()) {
           if (aRefFeat == theThis)
             return false; // other references to this, so other later than this
-          if (std::dynamic_pointer_cast<ModelAPI_CompositeFeature>(aRefFeat)) {
-            if (!isLaterByDep(theThis, aRefFeat)) // nested composites: recursion
-              return false;
-          }
+          //if (std::dynamic_pointer_cast<ModelAPI_CompositeFeature>(aRefFeat)) {
+          //  if (!isLaterByDep(theThis, aRefFeat)) // nested composites: recursion
+          //    return false;
+          //}
         }
       }
     }
+  }
+  FeaturePtr aThisOwner = ModelAPI_Tools::compositeOwner(theThis);
+  if (aThisOwner.get()) {
+    if (aThisOwner == theOther)
+      return true; // composite owner is later that its sub
+    if (!isLaterByDep(aThisOwner, theOther))
+      return false;
   }
   return myObjs->isLater(theThis, theOther);
 }
