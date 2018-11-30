@@ -270,6 +270,7 @@ void PartSet_ObjectNode::update()
         else {
           aNode = new PartSet_ObjectNode(aBody, this);
           myChildren.append(aNode);
+          aNode->update();
         }
       }
       else if (aFieldRes.get()) {
@@ -482,7 +483,9 @@ ModuleBase_ITreeNode* PartSet_FolderNode::createNode(const ObjectPtr& theObj)
   //ResultCompSolidPtr aCompRes = std::dynamic_pointer_cast<ModelAPI_ResultCompSolid>(theObj);
   //if (aCompRes.get())
   //  return new PartSet_CompsolidNode(theObj, this);
-  return new PartSet_ObjectNode(theObj, this);
+  ModuleBase_ITreeNode* aNode = new PartSet_ObjectNode(theObj, this);
+  aNode->update();
+  return aNode;
 }
 
 void PartSet_FolderNode::update()
@@ -813,7 +816,9 @@ ModuleBase_ITreeNode* PartSet_RootNode::createNode(const ObjectPtr& theObj)
   if (aFeature->getKind() == PartSetPlugin_Part::ID())
     return new PartSet_PartRootNode(theObj, this);
 
-  return new PartSet_ObjectNode(theObj, this);
+  PartSet_ObjectNode* aNode = new PartSet_ObjectNode(theObj, this);
+  aNode->update();
+  return aNode;
 }
 
 //////////////////////////////////////////////////////////////////////////////////
@@ -968,7 +973,9 @@ ModuleBase_ITreeNode* PartSet_PartRootNode::createNode(const ObjectPtr& theObj)
 {
   if (theObj->groupName() == ModelAPI_Folder::group())
     return new PartSet_ObjectFolderNode(theObj, this);
-  return new PartSet_ObjectNode(theObj, this);
+  PartSet_ObjectNode* aNode = new PartSet_ObjectNode(theObj, this);
+  aNode->update();
+  return aNode;
 }
 
 int PartSet_PartRootNode::numberOfFolders() const
@@ -1074,11 +1081,13 @@ void PartSet_ObjectFolderNode::update()
         if (aObj != myChildren.at(i)->object()) {
           aNode = new PartSet_ObjectNode(aObj, this);
           myChildren.insert(i, aNode);
+          aNode->update();
         }
       }
       else {
         aNode = new PartSet_ObjectNode(aObj, this);
         myChildren.append(aNode);
+        aNode->update();
       }
     }
   }
@@ -1106,11 +1115,13 @@ QTreeNodesList PartSet_ObjectFolderNode::objectCreated(const QObjectPtrList& the
         aNode = new PartSet_ObjectNode(aObj, this);
         myChildren.insert(i, aNode);
         aResult.append(aNode);
+        aNode->update();
       }
     } else {
       aNode = new PartSet_ObjectNode(aObj, this);
       myChildren.append(aNode);
       aResult.append(aNode);
+      aNode->update();
     }
   }
   return aResult;
