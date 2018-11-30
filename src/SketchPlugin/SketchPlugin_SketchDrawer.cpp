@@ -45,6 +45,8 @@
 #include <ModelAPI_AttributeDouble.h>
 #include <ModelAPI_ResultConstruction.h>
 
+#include <cmath>
+
 static const double kTOL = 1.e-6;
 
 SketchPlugin_SketchDrawer::SketchPlugin_SketchDrawer() : ModelAPI_Feature()
@@ -122,10 +124,10 @@ void SketchPlugin_SketchDrawer::execute()
       anItem->execute(); // for constraints setting on result
       // add a vertical or horizontal constraints
       bool isHorVertConstr = true;
-      if (abs(aPoints.front().first->x() - aPoints.back().first->x()) < kTOL) {
+      if (fabs(aPoints.front().first->x() - aPoints.back().first->x()) < kTOL) {
         FeaturePtr aVert = aSketch->addFeature(SketchPlugin_ConstraintVertical::ID());
         aVert->refattr(SketchPlugin_Constraint::ENTITY_A())->setObject(anItem->firstResult());
-      } else if (abs(aPoints.front().first->y() - aPoints.back().first->y()) < kTOL) {
+      } else if (fabs(aPoints.front().first->y() - aPoints.back().first->y()) < kTOL) {
         FeaturePtr aHor = aSketch->addFeature(SketchPlugin_ConstraintHorizontal::ID());
         aHor->refattr(SketchPlugin_Constraint::ENTITY_A())->setObject(anItem->firstResult());
       } else {
@@ -187,10 +189,10 @@ void SketchPlugin_SketchDrawer::execute()
       std::list<AttributePoint2DPtr>::iterator aCoincIter = aCreatedPoints.begin();
       for(; aCoincIter != aCreatedPoints.end(); aCoincIter++) {
         double aDX = (*aCoincIter)->x() - aPIter->first->x();
-        if (abs(aDX) >= kTOL)
+        if (fabs(aDX) >= kTOL)
           continue;
         double aDY = (*aCoincIter)->y() - aPIter->first->y();
-        if (abs(aDY) >= kTOL)
+        if (fabs(aDY) >= kTOL)
           continue;
         // create a coincidence constraint
         FeaturePtr aCoinc = aSketch->addFeature(SketchPlugin_ConstraintCoincidence::ID());
