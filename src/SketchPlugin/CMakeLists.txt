@@ -208,6 +208,7 @@ ADD_UNIT_TESTS(
   TestConstraintParallel.py
   TestConstraintPerpendicular.py
   TestConstraintRadius.py
+  TestConstraintRadiusFailure.py
   TestConstraintTangent.py
   TestConstraintVertical.py
   TestCreateArcByCenterStartEnd.py
@@ -249,9 +250,12 @@ ADD_UNIT_TESTS(
   TestRemoveSketch.py
   TestSignedDistancePointLine.py
   TestSignedDistancePointPoint.py
+  TestSketchDrawer.py
   TestSketchPointLine.py
   TestSnowflake.py
   TestSplit.py
+  TestSplitLine.py
+  TestSplitPreview.py
   TestTrimArc01.py
   TestTrimArc02.py
   TestTrimArc03.py
@@ -267,7 +271,8 @@ ADD_UNIT_TESTS(
   TestTrimCircleAndArc01.py
   TestTrimLine01.py
   TestTrimLine02.py
-  TestSketchDrawer.py
+  TestTrimLine03.py
+  TestTrimPreview.py
 )
 
 if(${SKETCHER_CHANGE_RADIUS_WHEN_MOVE})

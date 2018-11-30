@@ -149,11 +149,6 @@ private:
                         std::shared_ptr<GeomDataAPI_Point2D>& theStartPointAttr,
                         std::shared_ptr<GeomDataAPI_Point2D>& theEndPointAttr);
 
-  /// Returns cast of attribute to geometrical point if the attribute is a ref attr attribute
-  /// \param theAttribute an attribute
-  /// \param geom point 2D or NULL
-  std::shared_ptr<GeomDataAPI_Point2D> getPointOfRefAttr(const AttributePtr& theAttribute);
-
   /// Obtains those constraints of the feature that should be modified. output maps contain
   /// point of coincidence and attribute id to be modified after split
   /// \param theFeaturesToDelete [out] constrains that will be deleted after split

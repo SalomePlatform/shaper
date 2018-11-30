@@ -1197,20 +1197,6 @@ void SketchPlugin_Trim::fillAttribute(const AttributePtr& theModifiedAttribute,
     if (aModifiedAttribute.get() && aSourceAttribute.get())
       aModifiedAttribute->setValue(aSourceAttribute->value());
   }
-  else if (anAttributeType == ModelAPI_AttributeRefAttr::typeId()) {
-    AttributeRefAttrPtr aRefAttributeToFill = std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(
-                                                                             theModifiedAttribute);
-    AttributeRefAttrPtr aSourceRefAttr = std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(
-                                         theSourceAttribute);
-    if (!aSourceRefAttr.get())
-      aRefAttributeToFill->setAttr(theSourceAttribute);
-    else {
-      if (aSourceRefAttr->isObject())
-        aRefAttributeToFill->setObject(aSourceRefAttr->object());
-      else
-        aRefAttributeToFill->setAttr(aSourceRefAttr->attr());
-    }
-  }
 }
 
 FeaturePtr SketchPlugin_Trim::createLineFeature(const FeaturePtr& theBaseFeature,

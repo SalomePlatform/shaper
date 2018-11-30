@@ -273,6 +273,116 @@ model.testNbSubFeatures(aSketch, "SketchConstraintCoincidence", 6)
 model.testNbSubFeatures(aSketch, "SketchConstraintTangent", 0)
 
 #=========================================================================
+# Test 5. Create another arc by center and points coincident to other features
+#=========================================================================
+# create new arc
+aSession.startOperation()
+anArc = aSketchFeature.addFeature("SketchMacroArc")
+aCenter = geomDataAPI_Point2D(anArc.attribute("center_point"))
+aCenterRef = anArc.refattr("center_point_ref")
+aStart = geomDataAPI_Point2D(anArc.attribute("start_point_1"))
+aStartRef = anArc.refattr("start_point_ref")
+aEnd = geomDataAPI_Point2D(anArc.attribute("end_point_1"))
+aEndRef = anArc.refattr("end_point_ref")
+anArcType = anArc.string("arc_type")
+# initialize attributes
+anArcType.setValue("by_center_and_points")
+aCenterRef.setObject(aLine.lastResult())
+aCenter.setValue(aLineStartPoint.pnt())
+aStartRef.setObject(aLine.lastResult())
+aStart.setValue(aLineEndPoint.pnt())
+aEndRef.setObject(aPrevArc.lastResult())
+aEnd.setValue(aPrevArcStart.pnt())
+aSession.finishOperation()
+assert (aSketchFeature.numberOfSubs() == 16), "Number of subs {}".format(aSketchFeature.numberOfSubs())
+# check connected features do not change their positions
+model.assertArc(aPrevArc, aPrevArcCenterXY, aPrevArcStartXY, aPrevArcEndXY)
+model.assertLine(aLine, aLineStart, aLineEnd)
+# verify newly created arc
+anArc = model.lastSubFeature(aSketchFeature, "SketchArc")
+aCenter = geomDataAPI_Point2D(anArc.attribute("center_point"))
+aStart = geomDataAPI_Point2D(anArc.attribute("start_point"))
+aEnd = geomDataAPI_Point2D(anArc.attribute("end_point"))
+verifyPointOnLine(aCenter, aLine)
+verifyPointOnLine(aStart, aLine)
+verifyPointOnCircle(aEnd, aPrevArc)
+model.testNbSubFeatures(aSketch, "SketchConstraintCoincidence", 9)
+model.testNbSubFeatures(aSketch, "SketchConstraintTangent", 0)
+
+#=========================================================================
+# Test 6. Create one more arc by center and points coincident to other features
+#=========================================================================
+# get previous arc
+aPrevArc = model.lastSubFeature(aSketchFeature, "SketchArc")
+aPrevArcCenter = geomDataAPI_Point2D(aPrevArc.attribute("center_point"))
+aPrevArcStart = geomDataAPI_Point2D(aPrevArc.attribute("start_point"))
+aPrevArcEnd = geomDataAPI_Point2D(aPrevArc.attribute("end_point"))
+aPrevArcCenterXY = [aPrevArcCenter.x(), aPrevArcCenter.y()]
+aPrevArcStartXY = [aPrevArcStart.x(), aPrevArcStart.y()]
+aPrevArcEndXY = [aPrevArcEnd.x(), aPrevArcEnd.y()]
+# create new arc
+aSession.startOperation()
+anArc = aSketchFeature.addFeature("SketchMacroArc")
+aCenter = geomDataAPI_Point2D(anArc.attribute("center_point"))
+aCenterRef = anArc.refattr("center_point_ref")
+aStart = geomDataAPI_Point2D(anArc.attribute("start_point_1"))
+aStartRef = anArc.refattr("start_point_ref")
+aEnd = geomDataAPI_Point2D(anArc.attribute("end_point_1"))
+aEndRef = anArc.refattr("end_point_ref")
+anArcType = anArc.string("arc_type")
+# initialize attributes
+anArcType.setValue("by_center_and_points")
+delta = [aPrevArcEndXY[0] - aPrevArcCenterXY[0], aPrevArcEndXY[1] - aPrevArcCenterXY[1]]
+aCenter.setValue(aPrevArcCenterXY[0] + 2 * delta[0], aPrevArcCenterXY[1] + 2 * delta[1])
+aStart.setValue(aPrevArcCenterXY[0] + 2 * delta[0] - 0.9 * delta[1], aPrevArcCenterXY[1] + 2 * delta[1] + 0.9 * delta[0])
+aEndRef.setObject(aPrevArc.lastResult())
+aEnd.setValue(aPrevArcCenterXY[0] + 1.1 * delta[0], aPrevArcCenterXY[1] + 1.1 * delta[1])
+aSession.finishOperation()
+assert (aSketchFeature.numberOfSubs() == 18), "Number of subs {}".format(aSketchFeature.numberOfSubs())
+# verify newly created arc
+anArc = model.lastSubFeature(aSketchFeature, "SketchArc")
+aCenter = geomDataAPI_Point2D(anArc.attribute("center_point"))
+aStart = geomDataAPI_Point2D(anArc.attribute("start_point"))
+aEnd = geomDataAPI_Point2D(anArc.attribute("end_point"))
+verifyPointOnCircle(aEnd, aPrevArc)
+model.testNbSubFeatures(aSketch, "SketchConstraintCoincidence", 10)
+model.testNbSubFeatures(aSketch, "SketchConstraintTangent", 0)
+
+#=========================================================================
+# Test 7. Create one more arc by center and points coincident to other features
+#=========================================================================
+aPrevArcCenterXY = [aPrevArcCenter.x(), aPrevArcCenter.y()]
+aPrevArcStartXY = [aPrevArcStart.x(), aPrevArcStart.y()]
+aPrevArcEndXY = [aPrevArcEnd.x(), aPrevArcEnd.y()]
+# create new arc
+aSession.startOperation()
+anArc = aSketchFeature.addFeature("SketchMacroArc")
+aCenter = geomDataAPI_Point2D(anArc.attribute("center_point"))
+aCenterRef = anArc.refattr("center_point_ref")
+aStart = geomDataAPI_Point2D(anArc.attribute("start_point_1"))
+aStartRef = anArc.refattr("start_point_ref")
+aEnd = geomDataAPI_Point2D(anArc.attribute("end_point_1"))
+aEndRef = anArc.refattr("end_point_ref")
+anArcType = anArc.string("arc_type")
+# initialize attributes
+anArcType.setValue("by_center_and_points")
+delta = [aPrevArcEndXY[0] - aPrevArcCenterXY[0], aPrevArcEndXY[1] - aPrevArcCenterXY[1]]
+aCenter.setValue(aPrevArcCenterXY[0] + 2 * delta[0], aPrevArcCenterXY[1] + 2 * delta[1])
+aStart.setValue(aPrevArcCenterXY[0] + 2 * delta[0] - delta[1], aPrevArcCenterXY[1] + 2 * delta[1] + delta[0])
+aEndRef.setObject(aPrevArc.lastResult())
+aEnd.setValue(aPrevArcCenterXY[0] + delta[0], aPrevArcCenterXY[1] + delta[1])
+aSession.finishOperation()
+assert (aSketchFeature.numberOfSubs() == 20), "Number of subs {}".format(aSketchFeature.numberOfSubs())
+# verify newly created arc
+anArc = model.lastSubFeature(aSketchFeature, "SketchArc")
+aCenter = geomDataAPI_Point2D(anArc.attribute("center_point"))
+aStart = geomDataAPI_Point2D(anArc.attribute("start_point"))
+aEnd = geomDataAPI_Point2D(anArc.attribute("end_point"))
+verifyPointOnCircle(aEnd, aPrevArc)
+model.testNbSubFeatures(aSketch, "SketchConstraintCoincidence", 11)
+model.testNbSubFeatures(aSketch, "SketchConstraintTangent", 0)
+
+#=========================================================================
 # End of test
 #=========================================================================
 

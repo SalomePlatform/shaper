@@ -713,23 +713,6 @@ GeomShapePtr SketchPlugin_Split::getSubShape(const std::string& theObjectAttribu
   return aBaseShape;
 }
 
-std::shared_ptr<GeomDataAPI_Point2D> SketchPlugin_Split::getPointOfRefAttr(
-                                                      const AttributePtr& theAttribute)
-{
-  AttributePoint2DPtr aPointAttribute;
-
-  if (theAttribute->attributeType() == ModelAPI_AttributeRefAttr::typeId()) {
-    AttributeRefAttrPtr aRefAttr =
-      std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(theAttribute);
-    if (aRefAttr.get() && aRefAttr->isInitialized()) {
-      AttributePtr anAttribute = aRefAttr->attr();
-      if (anAttribute.get() && anAttribute->attributeType() == GeomDataAPI_Point2D::typeId())
-        aPointAttribute = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(anAttribute);
-    }
-  }
-  return aPointAttribute;
-}
-
 void SketchPlugin_Split::getFeaturePoints(const FeaturePtr& theFeature,
                                                     AttributePoint2DPtr& theStartPointAttr,
                                                     AttributePoint2DPtr& theEndPointAttr)
@@ -1566,6 +1549,7 @@ std::shared_ptr<ModelAPI_Result> SketchPlugin_Split::getFeatureResult(
   return aResult;
 }
 
+#ifdef _DEBUG
 std::set<std::shared_ptr<ModelAPI_Attribute> > SketchPlugin_Split::getEdgeAttributes(
                                            const std::shared_ptr<ModelAPI_Feature>& theFeature)
 {
@@ -1585,6 +1569,7 @@ std::set<std::shared_ptr<ModelAPI_Attribute> > SketchPlugin_Split::getEdgeAttrib
 
   return anAttributes;
 }
+#endif
 
 std::shared_ptr<GeomDataAPI_Point2D> SketchPlugin_Split::getPointAttribute
                                                               (const bool isFirstAttribute)
