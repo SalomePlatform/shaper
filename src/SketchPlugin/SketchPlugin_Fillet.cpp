@@ -104,6 +104,10 @@ void SketchPlugin_Fillet::execute()
 
   // create feature for fillet arc
   FeaturePtr aFilletArc = createFilletArc();
+  if (!aFilletArc) {
+    setError("Error: unable to create a fillet arc.");
+    return;
+  }
 
   // collect features referred to the edges participating in fillet
   AttributePoint2DPtr aFilletPoints[2];
@@ -307,6 +311,10 @@ FeaturePtr SketchPlugin_Fillet::createFilletArc()
   // Calculate Fillet parameters if does not yet
   if (!myBaseFeatures[0] || !myBaseFeatures[1])
     calculateFilletParameters();
+
+  // fix for issue #2810 (sometimes, myCenterXY is NULL, fillet should report an error)
+  if (!myCenterXY)
+    return FeaturePtr();
 
   // Create arc feature.
   FeaturePtr aFilletArc = sketch()->addFeature(SketchPlugin_Arc::ID());
