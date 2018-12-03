@@ -120,7 +120,7 @@ void FeaturesPlugin_BooleanCommon::execute()
     }
   }
 
-  if ((anObjects.empty() && aCompSolidsObjects.empty())
+  if ((anObjects.empty() && aCompSolidsObjects.empty() && aCompoundObjects.empty())
       || (!isSimpleMode && aTools.empty() && aPlanes.empty())) {
     std::string aFeatureError = "Error: Not enough objects for boolean operation.";
     setError(aFeatureError);

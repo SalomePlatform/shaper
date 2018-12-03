@@ -106,7 +106,8 @@ private:
   /// Perform the multi rotation in one direction.
   void performRotation1D();
 
-  /// Perform the multi totation in two directions.
+#ifdef FEATURE_MULTIROTATION_TWO_DIRECTIONS
+  /// Perform the multi rotation in two directions.
   void performRotation2D();
 
   void loadNamingDS2(std::list<std::shared_ptr<GeomAlgoAPI_Translation> > theListOfTranslationAlgo,
@@ -116,6 +117,7 @@ private:
   void loadNamingDS3(std::list<std::shared_ptr<GeomAlgoAPI_Rotation> > theListOfRotationAlgo,
                     std::shared_ptr<ModelAPI_ResultBody> theResultBody,
                     std::shared_ptr<GeomAPI_Shape> theBaseShape, int nb);
+#endif
 
   void loadNamingDS(std::list<std::shared_ptr<GeomAlgoAPI_Rotation> > theListOfRotationAlgo,
                     std::shared_ptr<ModelAPI_ResultBody> theResultBody,

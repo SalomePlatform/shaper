@@ -258,6 +258,7 @@ ADD_UNIT_TESTS(TestExtrusion.py
                TestMeasurementDistance.py
                TestMeasurementRadius.py
                TestMeasurementAngle.py
+               TestMeasurementAngle3Points.py
                TestFusionFaces.py
                Test1379.py
                Test1922.py
@@ -315,6 +316,7 @@ ADD_UNIT_TESTS(TestExtrusion.py
                TestBooleanCut_Wire_Wire.py
                TestBooleanCut_WireCompound_WireCompound.py
                TestBooleanSmash_Face_Face.py
+               TestBooleanSmash_SubSolid_Solid.py
                TestBooleanFuse_SimpleMode.py
                TestBooleanFuse_RemoveEdges.py
                TestBooleanCommon_Vertex_Vertex.py
@@ -324,6 +326,7 @@ ADD_UNIT_TESTS(TestExtrusion.py
                TestBooleanCommon_Wire_Wire.py
                TestBooleanCommon_WireCompound_WireCompound.py
                TestBooleanCommon_Face_Face.py
+               TestBooleanCommon_Face_Plane.py
                TestBooleanCommon_FaceCompound_FaceCompound.py
                TestBooleanCommon_Shell_Shell.py
                TestBooleanCommon_ShellCompound_ShellCompound.py
@@ -333,6 +336,8 @@ ADD_UNIT_TESTS(TestExtrusion.py
                TestBooleanCommon_SolidCompound_Face.py
                TestBooleanCommon_SolidCompound_Shell.py
                TestBooleanCommon_SolidCompound_SolidCompound.py
+               TestBooleanCommon_SubCompound_Solid.py
+               TestBooleanCommon_SubSolid_Solid.py
                TestBooleanCommon_CompSolid_Face.py
                TestBooleanCommon_CompSolid_Shell.py
                TestBooleanCommon_CompSolid_CompSolid.py

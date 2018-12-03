@@ -50,24 +50,29 @@ void FeaturesPlugin_MultiRotation::initAttributes()
   data()->addAttribute(FeaturesPlugin_MultiRotation::NB_COPIES_ANGULAR_ID(),
                        ModelAPI_AttributeInteger::typeId());
 
-  /*data()->addAttribute(FeaturesPlugin_MultiRotation::USE_RADIAL_DIR_ID(),
+#ifdef FEATURE_MULTIROTATION_TWO_DIRECTIONS
+  data()->addAttribute(FeaturesPlugin_MultiRotation::USE_RADIAL_DIR_ID(),
                        ModelAPI_AttributeString::typeId());
   data()->addAttribute(FeaturesPlugin_MultiRotation::STEP_RADIAL_ID(),
                        ModelAPI_AttributeDouble::typeId());
   data()->addAttribute(FeaturesPlugin_MultiRotation::NB_COPIES_RADIAL_ID(),
-                       ModelAPI_AttributeInteger::typeId());*/
+                       ModelAPI_AttributeInteger::typeId());
+#endif
 }
 
 //=================================================================================================
 void FeaturesPlugin_MultiRotation::execute()
 {
-  /*std::string useRadialDir = string(FeaturesPlugin_MultiRotation::USE_RADIAL_DIR_ID())->value();
+#ifdef FEATURE_MULTIROTATION_TWO_DIRECTIONS
+  std::string useRadialDir = string(FeaturesPlugin_MultiRotation::USE_RADIAL_DIR_ID())->value();
   if (useRadialDir.empty()) {
     performRotation1D();
   } else {
     performRotation2D();
-  }*/
+  }
+#else
   performRotation1D();
+#endif
 }
 
 //=================================================================================================
@@ -221,6 +226,7 @@ void FeaturesPlugin_MultiRotation::performRotation1D()
 }
 
 //=================================================================================================
+#ifdef FEATURE_MULTIROTATION_TWO_DIRECTIONS
 void FeaturesPlugin_MultiRotation::performRotation2D()
 {
   // Getting objects.
@@ -447,6 +453,7 @@ void FeaturesPlugin_MultiRotation::loadNamingDS3(
     ++anIndex;
   }
 }
+#endif
 
 //=================================================================================================
 void FeaturesPlugin_MultiRotation::loadNamingDS(
