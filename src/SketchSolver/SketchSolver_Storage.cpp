@@ -94,41 +94,12 @@ void SketchSolver_Storage::addConstraint(ConstraintPtr        theConstraint,
     theConstraint->data()->blockSendAttributeUpdated(myEventsBlocked);
 }
 
-static std::list<AttributePtr> pointAttributes(FeaturePtr theFeature)
-{
-  std::list<AttributePtr> aPoints;
-  if (!theFeature->data() || !theFeature->data()->isValid())
-    return aPoints;
-  if (theFeature->getKind() == SketchPlugin_Arc::ID()) {
-    aPoints.push_back(theFeature->attribute(SketchPlugin_Arc::CENTER_ID()));
-    aPoints.push_back(theFeature->attribute(SketchPlugin_Arc::START_ID()));
-    aPoints.push_back(theFeature->attribute(SketchPlugin_Arc::END_ID()));
-  }
-  else if (theFeature->getKind() == SketchPlugin_Circle::ID())
-    aPoints.push_back(theFeature->attribute(SketchPlugin_Circle::CENTER_ID()));
-  else if (theFeature->getKind() == SketchPlugin_Line::ID()) {
-    aPoints.push_back(theFeature->attribute(SketchPlugin_Line::START_ID()));
-    aPoints.push_back(theFeature->attribute(SketchPlugin_Line::END_ID()));
-  }
-  else if (theFeature->getKind() == SketchPlugin_Point::ID() ||
-           theFeature->getKind() == SketchPlugin_IntersectionPoint::ID())
-    aPoints.push_back(theFeature->attribute(SketchPlugin_Point::COORD_ID()));
-  return aPoints;
-}
-
 void SketchSolver_Storage::addEntity(FeaturePtr       theFeature,
                                      EntityWrapperPtr theSolverEntity)
 {
   if (theSolverEntity) {
     myFeatureMap[theFeature] = theSolverEntity;
     setNeedToResolve(true);
-  } else {
-    // feature links to the empty entity, add its attributes
-    std::list<AttributePtr> aPntAttrs = pointAttributes(theFeature);
-    std::list<AttributePtr>::const_iterator anAttrIt = aPntAttrs.begin();
-    for (; anAttrIt != aPntAttrs.end(); ++anAttrIt)
-      addEntity(*anAttrIt, EntityWrapperPtr());
-    myFeatureMap[theFeature] = theSolverEntity;
   }
 
   // block events if necessary
