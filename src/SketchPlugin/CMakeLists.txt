@@ -74,7 +74,6 @@ SET(PROJECT_SOURCES
     SketchPlugin_Circle.cpp
     SketchPlugin_Constraint.cpp
     SketchPlugin_ConstraintAngle.cpp
-    SketchPlugin_ConstraintBase.cpp
     SketchPlugin_ConstraintCoincidence.cpp
     SketchPlugin_ConstraintCollinear.cpp
     SketchPlugin_ConstraintDistance.cpp

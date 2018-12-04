@@ -57,15 +57,7 @@ class SketchPlugin_ConstraintBase : public SketchPlugin_Constraint, public GeomA
                                     public GeomAPI_ICustomPrs
 {
  public:
-  /// Returns the AIS preview
-  SKETCHPLUGIN_EXPORT virtual AISObjectPtr getAISObject(AISObjectPtr thePrevious);
-
-  /** \brief Adds sub-feature of the higher level feature (sub-element of the sketch)
-   *  \param theFeature sub-feature
-   */
-  SKETCHPLUGIN_EXPORT virtual const void addSub(const FeaturePtr& theFeature);
-
-      /// Customize presentation of the feature
+  /// Customize presentation of the feature
   virtual bool customisePresentation(ResultPtr theResult, AISObjectPtr thePrs,
                                      std::shared_ptr<GeomAPI_ICustomPrs> theDefaultPrs)
   {

@@ -60,12 +60,6 @@ class SketchPlugin_ConstraintCoincidence : public SketchPlugin_ConstraintBase
   /// \brief Request for initialization of data model of the feature: adding all attributes
   SKETCHPLUGIN_EXPORT virtual void initAttributes();
 
-  /// Returns coincident feature if there is a coincidence built on the given features
-  /// \param theFeature1 the first feature
-  /// \param theFeature2 the second feature
-  static FeaturePtr findCoincidenceFeature(const FeaturePtr& theFeature1,
-                                           const FeaturePtr& theFeature2);
-
   /// Creates a constraint on two points
   /// \param theSketch a sketch feature
   /// \param thePoint1 the first point
