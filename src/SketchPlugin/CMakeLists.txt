@@ -264,6 +264,7 @@ ADD_UNIT_TESTS(
   TestTrimArc05.py
   TestTrimArc06.py
   TestTrimArc07.py
+  TestTrimArc08.py
   TestTrimCircle01.py
   TestTrimCircle02.py
   TestTrimCircle03.py

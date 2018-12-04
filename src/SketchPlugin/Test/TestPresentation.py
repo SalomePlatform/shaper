@@ -20,12 +20,13 @@
 
 """
     TestPresentation.py
-    Test AIS presentations for constraints
+    Test AIS presentations for constraints and macro-features
 """
 
 from salome.shaper import model
 from GeomAPI import *
 from ModelAPI import *
+from GeomDataAPI import *
 
 from ConfigAPI import *
 Config_PropManager().registerProp("Visualization", "dimension_value_size", "Dimension value size", Config_Prop.IntSpin, "16")
@@ -96,6 +97,34 @@ aSession.startOperation()
 aFillet = aSketchFeature.addFeature("SketchFillet")
 aFillet.refattr("fillet_point").setAttr(SketchLine_1.endPoint());
 assert(featureToPresentation(aFillet).getAISObject(None) is not None)
+aSession.finishOperation()
+
+# Test presentation for MacroCircle on low-level
+aSession.startOperation()
+aCircle = aSketchFeature.addFeature("SketchMacroCircle")
+aCirclePnt1 = geomDataAPI_Point2D(aCircle.attribute("first_point"))
+aCirclePnt2 = geomDataAPI_Point2D(aCircle.attribute("second_point"))
+aCirclePnt3 = geomDataAPI_Point2D(aCircle.attribute("third_point"))
+aCircleType = aCircle.string("circle_type")
+aCircleType.setValue("circle_type_by_three_points")
+aCirclePnt1.setValue(10, 0)
+aCirclePnt2.setValue(-10, 0)
+aCirclePnt3.setValue(0, 10)
+assert(featureToPresentation(aCircle).getAISObject(None) is not None)
+aSession.finishOperation()
+
+# Test presentation for MacroArc on low-level
+aSession.startOperation()
+anArc = aSketchFeature.addFeature("SketchMacroArc")
+anArcPnt1 = geomDataAPI_Point2D(anArc.attribute("start_point_2"))
+anArcPnt2 = geomDataAPI_Point2D(anArc.attribute("end_point_2"))
+anArcPnt3 = geomDataAPI_Point2D(anArc.attribute("passed_point"))
+anArcType = anArc.string("arc_type")
+anArcType.setValue("by_three_points")
+anArcPnt1.setValue(5, 0)
+anArcPnt2.setValue(-5, 0)
+anArcPnt3.setValue(0, 5)
+assert(featureToPresentation(anArc).getAISObject(None) is not None)
 aSession.finishOperation()
 
 model.end()

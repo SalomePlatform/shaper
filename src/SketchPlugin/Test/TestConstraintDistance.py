@@ -171,6 +171,25 @@ assert (refattrB.isInitialized())
 assert (aDistance.isInitialized())
 assert math.fabs(aDistance.value() - aDist) < 1.e-4, "Distance values are different: {0} != {1}".format(aDistance.value(), aDist)
 assert (model.dof(aSketchFeature) == 5)
+
+#=========================================================================
+# Swap point and line in the distance
+#=========================================================================
+aSession.startOperation()
+refattrA.setAttr(aSketchPointCoords)
+refattrB.setObject(aLineResult)
+aSession.finishOperation()
+assert (model.dof(aSketchFeature) == 5)
+# set flyout point then abort operation, after that check the Distance is correct
+aSession.startOperation()
+aFlyoutPoint = geomDataAPI_Point2D(aConstraint.attribute("ConstraintFlyoutValuePnt"))
+aFlyoutPoint.setValue(100.0, 100.0)
+aSession.abortOperation()
+assert (refattrA.isInitialized())
+assert (refattrB.isInitialized())
+assert (aDistance.isInitialized())
+assert math.fabs(aDistance.value() - aDist) < 1.e-4, "Distance values are different: {0} != {1}".format(aDistance.value(), aDist)
+assert (model.dof(aSketchFeature) == 5)
 #=========================================================================
 # Change distance value
 #=========================================================================
