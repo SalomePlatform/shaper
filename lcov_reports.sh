@@ -65,6 +65,9 @@ for MASK in 'Geom' 'GeomAlgo' 'GDML' 'Primitives' 'Builder' 'Collection' 'Connec
 lcov -r covElse *${MASK}API* --output-file covElse_res -q
 mv -f covElse_res covElse
 done
+# remove SketchPlugin's Ellipse feature (unsupported yet)
+lcov -r covElse SketchPlugin*Ellipse* --output-file covElse_res -q
+mv -f covElse_res covElse
 rm -rf lcov_htmlElse
 genhtml covElse --output-directory lcov_htmlElse -q
 
