@@ -23,6 +23,9 @@ from salome.shaper import model
 from ModelAPI import *
 from GeomDataAPI import *
 
+from ConfigAPI import *
+Config_PropManager().registerProp("Visualization", "operation_remove_feature_color", "Color of removed feature in operation", Config_Prop.Color, "255, 174, 201")
+
 # base sketch
 model.begin()
 partSet = model.moduleDocument()
