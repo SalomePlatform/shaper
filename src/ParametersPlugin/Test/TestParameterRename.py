@@ -63,7 +63,11 @@ __updated__ = "2015-04-27"
 class TestParameterRename(unittest.TestCase):
     def setUp(self):
         self.aSession = ModelAPI_Session.get()
-        self.aDocument = self.aSession.moduleDocument()
+        model.begin()
+        partSet = self.aSession.moduleDocument()
+        Part = model.addPart(partSet)
+        model.end()
+        self.aDocument = Part.document()
         self.createParameters()
         self.createFeature()
 
@@ -73,8 +77,8 @@ class TestParameterRename(unittest.TestCase):
         pass
 
     def createParameters(self):
-        ltNames = ["x1", "y1", "x2"]
-        ltExpressions = ["150.", "200.", "x1 + y1 + 100.0"]
+        ltNames = ["x1", "y1", "x2", "n", "px"]
+        ltExpressions = ["150.", "200.", "x1 + y1 + 100.0", "5", "50"]
         self.dtParams = {}
         for name, expr in zip(ltNames, ltExpressions):
             self.aSession.startOperation()
@@ -123,8 +127,7 @@ class TestParameterRename(unittest.TestCase):
         anEndPoint = geomDataAPI_Point2D(anOY.attribute("EndPoint"))
         aStartPoint.setValue(0., 0.)
         anEndPoint.setValue(0., 100.)
-        anOYRes = modelAPI_Result(self.aDocument.objectByName("Construction", "OY"))
-        anOY.selection("External").setValue(anOYRes, anOYRes.shape())
+        anOY.selection("External").selectSubShape("EDGE", "PartSet/OY")
         anOY.execute()
         refattrB.setObject(modelAPI_ResultConstruction(anOY.firstResult()))
         valueX = aDistanceConstraint1.real("ConstraintValue")
@@ -140,8 +143,7 @@ class TestParameterRename(unittest.TestCase):
         anEndPoint = geomDataAPI_Point2D(anOX.attribute("EndPoint"))
         aStartPoint.setValue(0., 0.)
         anEndPoint.setValue(100., 0.)
-        anOXRes = modelAPI_Result(self.aDocument.objectByName("Construction", "OX"))
-        anOX.selection("External").setValue(anOXRes, anOXRes.shape())
+        anOX.selection("External").selectSubShape("EDGE", "PartSet/OX")
         anOX.execute()
         refattrB.setObject(modelAPI_ResultConstruction(anOX.firstResult()))
         valueY = aDistanceConstraint2.real("ConstraintValue")
@@ -163,6 +165,41 @@ class TestParameterRename(unittest.TestCase):
         self.assertEqual(self.anCircleCentr.x(), 160.)
         self.assertEqual(self.anCircleCentr.y(), 170.)
         self.assertEqual(aRadiusAttr.value(), 150.)
+
+        # add a line and rotate it around origin
+        self.aSession.startOperation()
+        aSketchLine = aSketchFeature.addFeature("SketchLine")
+        aStartPoint = geomDataAPI_Point2D(aSketchLine.attribute("StartPoint"))
+        aEndPoint = geomDataAPI_Point2D(aSketchLine.attribute("EndPoint"))
+        aStartPoint.setText("px", "0")
+        aEndPoint.setValue(0., 0.)
+        self.aSession.finishOperation()
+        self.aSession.startOperation()
+        aEndPoint.move(100., 0.)
+        self.aSession.finishOperation()
+
+        self.aSession.startOperation()
+        aMultiRotation = aSketchFeature.addFeature("SketchMultiRotation")
+        aMultiRotation.reflist("MultiRotationList").append(aSketchLine.lastResult())
+        aMultiRotation.refattr("MultiRotationCenter").setAttr(anCircleCentr)
+        aMultiRotation.real("MultiRotationAngle").setValue(60.0)
+        aMultiRotation.string("AngleType").setValue("SingleAngle")
+        aMultiRotation.boolean("MultiRotationReversed").setValue(False)
+        aMultiRotation.integer("MultiRotationObjects").setText("n")
+        self.aSession.finishOperation()
+
+        self.aMultiRotCopies = aMultiRotation.integer("MultiRotationObjects")
+
+        # create 3D point
+        self.aSession.startOperation()
+        aPoint3D = self.aDocument.addFeature("Point")
+        aPoint3D.string("creation_method").setValue("by_xyz")
+        aCoords = geomDataAPI_Point(aPoint3D.attribute("point3d"))
+        aCoords.setText("px", "0", "0")
+        self.aSession.finishOperation()
+
+        self.aPoint2D = aStartPoint
+        self.aPoint3D = aCoords
 
     def test_rename(self):
         # Rename
@@ -187,6 +224,44 @@ class TestParameterRename(unittest.TestCase):
         self.assertEqual(self.anCircleCentr.x(), 160.)
         self.assertEqual(self.anCircleCentr.y(), 170.)
         self.assertEqual(self.aRadiusAttr.value(), 150.)
+
+    def test_rename_integer(self):
+        # rename integer parameter
+        aParam = self.dtParams["n"]
+        aResultAttr = modelAPI_ResultParameter(aParam.firstResult())
+        self.aSession.startOperation()
+        aResultAttr.data().setName("m")
+        self.aSession.finishOperation()
+
+        # Check rename in the parameter
+        self.assertEqual(aParam.name(), "m")
+        self.assertEqual(aParam.string("variable").value(), "m")
+        self.assertEqual(aResultAttr.data().name(), "m")
+
+        # Check rename in feature
+        self.assertEqual(self.aMultiRotCopies.text(), "m")
+        # Check corresponding value
+        self.assertEqual(self.aMultiRotCopies.value(), 5)
+
+    def test_rename_point(self):
+        # rename parameter in point coordinates
+        aParam = self.dtParams["px"]
+        aResultAttr = modelAPI_ResultParameter(aParam.firstResult())
+        self.aSession.startOperation()
+        aResultAttr.data().setName("p")
+        self.aSession.finishOperation()
+
+        # Check rename in the parameter
+        self.assertEqual(aParam.name(), "p")
+        self.assertEqual(aParam.string("variable").value(), "p")
+        self.assertEqual(aResultAttr.data().name(), "p")
+
+        # Check rename in feature
+        self.assertEqual(self.aPoint2D.textX(), "p")
+        self.assertEqual(self.aPoint3D.textX(), "p")
+        # Check corresponding value
+        self.assertEqual(self.aPoint2D.x(), 50.)
+        self.assertEqual(self.aPoint3D.x(), 50.)
 
     def test_rename_not_unique(self):
         # Rename to not unique name
@@ -229,6 +304,7 @@ class TestParameterRename(unittest.TestCase):
         self.assertEqual(self.anCircleCentr.x(), 160.)
         self.assertEqual(self.anCircleCentr.y(), 170.)
         self.assertEqual(self.aRadiusAttr.value(), 150.)
+
 
 if __name__ == "__main__":
     test_program = unittest.main(exit=False)
