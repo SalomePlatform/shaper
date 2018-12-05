@@ -121,11 +121,6 @@ void FeaturesPlugin_MultiRotation::performRotation1D()
     GeomAPI_ShapeIterator anIt(aShape);
     anEdge = anIt.current()->edge();
   }
-  else
-  {
-    setError(aSelectionError);
-    return;
-  }
 
   if (!anEdge.get())
   {

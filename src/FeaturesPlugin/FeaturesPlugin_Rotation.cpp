@@ -123,11 +123,6 @@ void FeaturesPlugin_Rotation::performTranslationByAxisAndAngle()
     GeomAPI_ShapeIterator anIt(aShape);
     anEdge = anIt.current()->edge();
   }
-  else
-  {
-    setError(aSelectionError);
-    return;
-  }
 
   if (!anEdge.get())
   {
@@ -230,16 +225,17 @@ void FeaturesPlugin_Rotation::performTranslationByThreePoints()
     selection(FeaturesPlugin_Rotation::START_POINT_ID());
   std::shared_ptr<ModelAPI_AttributeSelection> anEndPointRef =
     selection(FeaturesPlugin_Rotation::END_POINT_ID());
-  if ((aCenterRef.get() != NULL) && (aStartPointRef.get() != NULL)
-      && (anEndPointRef.get() != NULL)) {
+  if ((aCenterRef.get() != NULL) &&
+      (aStartPointRef.get() != NULL) &&
+      (anEndPointRef.get() != NULL)) {
     GeomShapePtr aCenterShape = aCenterRef->value();
-    if (!aCenterShape.get())
+    if (!aCenterShape.get() && aCenterRef->context().get())
       aCenterShape = aCenterRef->context()->shape();
     GeomShapePtr aStartShape = aStartPointRef->value();
-    if (!aStartShape.get())
+    if (!aStartShape.get() && aStartPointRef->context().get())
       aStartShape = aStartPointRef->context()->shape();
-      GeomShapePtr anEndShape = anEndPointRef->value();
-    if (!anEndShape.get())
+    GeomShapePtr anEndShape = anEndPointRef->value();
+    if (!anEndShape.get() && anEndPointRef->context().get())
       anEndShape = anEndPointRef->context()->shape();
     if (aStartShape && anEndShape && aCenterShape) {
       aCenterPoint = GeomAlgoAPI_PointBuilder::point(aCenterShape);

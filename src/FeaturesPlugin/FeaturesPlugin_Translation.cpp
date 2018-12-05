@@ -135,11 +135,6 @@ void FeaturesPlugin_Translation::performTranslationByAxisAndDistance()
     GeomAPI_ShapeIterator anIt(aShape);
     anEdge = anIt.current()->edge();
   }
-  else
-  {
-    setError(aSelectionError);
-    return;
-  }
 
   if (!anEdge.get())
   {

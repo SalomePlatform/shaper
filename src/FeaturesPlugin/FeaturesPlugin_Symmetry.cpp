@@ -218,11 +218,6 @@ void FeaturesPlugin_Symmetry::performSymmetryByAxis()
     GeomAPI_ShapeIterator anIt(aShape);
     anEdge = anIt.current()->edge();
   }
-  else
-  {
-    setError(aSelectionError);
-    return;
-  }
 
   if (!anEdge.get())
   {
@@ -318,11 +313,6 @@ void FeaturesPlugin_Symmetry::performSymmetryByPlane()
   {
     GeomAPI_ShapeIterator anIt(aShape);
     aFace = anIt.current()->face();
-  }
-  else
-  {
-    setError(aSelectionError);
-    return;
   }
 
   if (!aFace.get())
