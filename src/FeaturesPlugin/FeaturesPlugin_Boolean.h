@@ -59,9 +59,6 @@ public:
   /// \return boolean operation type.
   FEATURESPLUGIN_EXPORT OperationType operationType();
 
-  /// Creates a new part document if needed.
-  FEATURESPLUGIN_EXPORT virtual void execute();
-
   /// Request for initialization of data model of the feature: adding all attributes.
   FEATURESPLUGIN_EXPORT virtual void initAttributes();
 
@@ -70,7 +67,6 @@ protected:
   /// Use plugin manager for features creation.
   FeaturesPlugin_Boolean(const OperationType theOperationType);
 
-private:
   std::shared_ptr<GeomAPI_Shape> getShape(const std::string& theAttrName);
 
   /// Load Naming data structure of the feature to the document

@@ -44,10 +44,13 @@ public:
     return MY_KIND;
   }
 
+  /// Creates a new part document if needed.
+  FEATURESPLUGIN_EXPORT virtual void execute();
+
 public:
 
     /// Use plugin manager for features creation.
-  FeaturesPlugin_BooleanFill(): FeaturesPlugin_Boolean(BOOL_FILL) {};
+  FeaturesPlugin_BooleanFill();
 
 };
 

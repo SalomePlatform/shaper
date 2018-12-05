@@ -73,6 +73,7 @@ SET(PROJECT_SOURCES
     FeaturesPlugin_BooleanFuse.cpp
     FeaturesPlugin_BooleanCommon.cpp
     FeaturesPlugin_BooleanSmash.cpp
+    FeaturesPlugin_BooleanFill.cpp
     FeaturesPlugin_Intersection.cpp
     FeaturesPlugin_Partition.cpp
     FeaturesPlugin_Pipe.cpp
