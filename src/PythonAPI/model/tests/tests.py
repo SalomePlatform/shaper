@@ -130,7 +130,7 @@ def testResultsVolumes(theFeature, theExpectedResultsVolumes, theNbSignificantDi
     aResultVolumeStr = "{:0.27f}".format(aResultVolume).lstrip("0").lstrip(".").lstrip("0")
     anExpectedResultVolume = theExpectedResultsVolumes[anIndex]
     anExpectedResultVolumeStr = "{:0.27f}".format(anExpectedResultVolume).lstrip("0").lstrip(".").lstrip("0")
-    assert math.fabs(aResultVolume - anExpectedResultVolume) < aTolerance * anExpectedResultVolume, "Volume of result[{}]: {:0.27f}. Expected: {:0.27f}. The first {} significant digits not equal.".format(anIndex, aResultVolume, anExpectedResultVolume, theNbSignificantDigits)
+    assert math.fabs(aResultVolume - anExpectedResultVolume) < aTolerance * math.fabs(anExpectedResultVolume), "Volume of result[{}]: {:0.27f}. Expected: {:0.27f}. The first {} significant digits not equal.".format(anIndex, aResultVolume, anExpectedResultVolume, theNbSignificantDigits)
 
 def testHaveNamingFaces(theFeature, theModel, thePartDoc) :
   """ Tests if all faces of result have a name

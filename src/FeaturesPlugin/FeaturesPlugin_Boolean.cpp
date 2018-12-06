@@ -64,20 +64,6 @@ void FeaturesPlugin_Boolean::initAttributes()
 }
 
 //=================================================================================================
-std::shared_ptr<GeomAPI_Shape> FeaturesPlugin_Boolean::getShape(const std::string& theAttrName)
-{
-  std::shared_ptr<ModelAPI_AttributeReference> aObjRef = std::dynamic_pointer_cast<
-      ModelAPI_AttributeReference>(data()->attribute(theAttrName));
-  if (aObjRef) {
-    std::shared_ptr<ModelAPI_ResultBody> aConstr = std::dynamic_pointer_cast<
-        ModelAPI_ResultBody>(aObjRef->value());
-    if (aConstr)
-      return aConstr->shape();
-  }
-  return std::shared_ptr<GeomAPI_Shape>();
-}
-
-//=================================================================================================
 FeaturesPlugin_Boolean::OperationType FeaturesPlugin_Boolean::operationType()
 {
   return myOperationType;

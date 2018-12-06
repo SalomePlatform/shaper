@@ -67,8 +67,6 @@ protected:
   /// Use plugin manager for features creation.
   FeaturesPlugin_Boolean(const OperationType theOperationType);
 
-  std::shared_ptr<GeomAPI_Shape> getShape(const std::string& theAttrName);
-
   /// Load Naming data structure of the feature to the document
   void loadNamingDS(std::shared_ptr<ModelAPI_ResultBody> theResultBody,
                     const std::shared_ptr<GeomAPI_Shape> theBaseShape,
