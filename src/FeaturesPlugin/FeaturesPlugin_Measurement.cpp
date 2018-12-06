@@ -323,6 +323,13 @@ AISObjectPtr FeaturesPlugin_Measurement::getAISObject(AISObjectPtr thePrevious)
   if ((aValues->size() == 0) || (aValues->value(0) <= Precision::Confusion()))
     return AISObjectPtr();
 
+  if (!myScreenPlane) {
+    // initialize a default plane for dimension
+    GeomPointPtr anOrigin(new GeomAPI_Pnt(0., 0., 0.));
+    GeomDirPtr aNormal(new GeomAPI_Dir(0., 0., 1.));
+    myScreenPlane = GeomPlanePtr(new GeomAPI_Pln(anOrigin, aNormal));
+  }
+
   AISObjectPtr anAIS;
   std::string aKind = string(MEASURE_KIND())->value();
   if (aKind == MEASURE_LENGTH())
@@ -342,8 +349,6 @@ AISObjectPtr FeaturesPlugin_Measurement::getAISObject(AISObjectPtr thePrevious)
 AISObjectPtr FeaturesPlugin_Measurement::lengthDimension(AISObjectPtr thePrevious)
 {
   AISObjectPtr aAISObj;
-  if (!myScreenPlane.get())
-    return aAISObj;
 
   AttributeSelectionPtr aSelectedFeature = selection(EDGE_FOR_LENGTH_ID());
 
@@ -404,8 +409,6 @@ AISObjectPtr FeaturesPlugin_Measurement::lengthDimension(AISObjectPtr thePreviou
 AISObjectPtr FeaturesPlugin_Measurement::distanceDimension(AISObjectPtr thePrevious)
 {
   AISObjectPtr aAISObj;
-  if (!myScreenPlane.get())
-    return aAISObj;
 
   AttributeSelectionPtr aFirstFeature = selection(DISTANCE_FROM_OBJECT_ID());
   AttributeSelectionPtr aSecondFeature = selection(DISTANCE_TO_OBJECT_ID());

@@ -272,6 +272,7 @@ ADD_UNIT_TESTS(TestExtrusion.py
                TestMeasurementRadius.py
                TestMeasurementAngle.py
                TestMeasurementAngle3Points.py
+               TestMeasurementPresentation.py
                TestFusionFaces.py
                Test1379.py
                Test1922.py
