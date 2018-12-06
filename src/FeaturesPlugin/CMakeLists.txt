@@ -171,11 +171,13 @@ INSTALL(FILES ${TEXT_RESOURCES} DESTINATION ${SHAPER_INSTALL_XML_RESOURCES})
 ADD_UNIT_TESTS(TestExtrusion.py
                TestExtrusionCut.py
                TestExtrusionFuse.py
+               TestExtrusion_ErrorMsg.py
                TestRevolution.py
                TestRevolutionCut.py
                TestRevolutionFuse.py
                TestCompositeFeaturesOnCompSolids.py
                TestPartition.py
+               TestPartition_ErrorMsg.py
                TestPlacement_Vertex_Vertex.py
                TestPlacement_Edge_Vertex.py
                TestPlacement_Edge_Edge.py
@@ -200,9 +202,12 @@ ADD_UNIT_TESTS(TestExtrusion.py
                TestBooleanFillWithPlane.py
                TestMultiBoolean.py
                TestSerialBoolean.py
+               TestBoolean_ErrorMsg.py
                TestIntersection.py
+               TestIntersection_ErrorMsg.py
                TestUnion.py
                TestUnionFaces.py
+               TestUnion_ErrorMsg.py
                TestRemoveSubShapes.py
                TestRemoveSubShapes2.py
                TestRemoveSubShapes3.py
@@ -325,8 +330,10 @@ ADD_UNIT_TESTS(TestExtrusion.py
                TestBooleanCut_WireCompound_WireCompound.py
                TestBooleanSmash_Face_Face.py
                TestBooleanSmash_SubSolid_Solid.py
+               TestBooleanSmash_ErrorMsg.py
                TestBooleanFuse_SimpleMode.py
                TestBooleanFuse_RemoveEdges.py
+               TestBooleanFuse_ErrorMsg.py
                TestBooleanCommon_Vertex_Vertex.py
                TestBooleanCommon_VertexCompound_VertexCompound.py
                TestBooleanCommon_Edge_Edge.py
@@ -352,6 +359,7 @@ ADD_UNIT_TESTS(TestExtrusion.py
                TestBooleanCommon_CompSolidCompound_Face.py
                TestBooleanCommon_CompSolidCompound_Shell.py
                TestBooleanCommon_CompSolidCompound_CompSolidCompound.py
+               TestBooleanCommon_ErrorMsg.py
                Test2596.py
                Test2592.py
                Test2588.py
@@ -388,6 +396,8 @@ ADD_UNIT_TESTS(TestExtrusion.py
                TestBooleanFuse_SolidCompound_SolidCompound.py
                TestBooleanFuse_CompSolid_CompSolid.py
                TestBooleanFuse_CompSolidCompound_CompSolidCompound.py
+               TestFillet.py
+               TestFillet_ErrorMsg.py
                Test1816.py
                Test2631.py
                Test2650.py

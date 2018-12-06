@@ -1168,75 +1168,44 @@ bool FeaturesPlugin_ValidatorBooleanArguments::isValid(
     return false;
   }
 
-  int anObjectsNb = 0, aToolsNb = 0;
-  //int anOperationType = 0;
+  int anObjectsToolsNb[2] = { 0,  0 };
 
   std::list<std::string>::const_iterator anIt = theArguments.begin(), aLast = theArguments.end();
 
   bool isAllInSameCompSolid = true;
   ResultBodyPtr aCompSolid;
 
-  AttributeSelectionListPtr anAttrSelList = theFeature->selectionList(*anIt);
-  if (anAttrSelList)
-  {
-    anObjectsNb = anAttrSelList->size();
-    for (int anIndex = 0; anIndex < anObjectsNb; ++anIndex)
+  for (int* anArgNbIt = anObjectsToolsNb; anIt != aLast; ++anIt, ++anArgNbIt) {
+    AttributeSelectionListPtr anAttrSelList = theFeature->selectionList(*anIt);
+    if (anAttrSelList)
     {
-      AttributeSelectionPtr anAttr = anAttrSelList->value(anIndex);
-      ResultPtr aContext = anAttr->context();
-      ResultBodyPtr aResCompSolidPtr = ModelAPI_Tools::bodyOwner(aContext);
-      if (aResCompSolidPtr.get())
-      {
-        if (aCompSolid.get())
+      *anArgNbIt = anAttrSelList->size();
+      if (isAllInSameCompSolid) {
+        for (int anIndex = 0; anIndex < *anArgNbIt; ++anIndex)
         {
-          isAllInSameCompSolid = aCompSolid == aResCompSolidPtr;
-        }
-        else
-        {
-          aCompSolid = aResCompSolidPtr;
-        }
-      }
-      else
-      {
-        isAllInSameCompSolid = false;
-        break;
-      }
-    }
-  }
-  anIt++;
-
-
-  anAttrSelList = theFeature->selectionList(*anIt);
-  if (anAttrSelList)
-  {
-    aToolsNb = anAttrSelList->size();
-    if (isAllInSameCompSolid)
-    {
-      for (int anIndex = 0; anIndex < aToolsNb; ++anIndex)
-      {
-        AttributeSelectionPtr anAttr = anAttrSelList->value(anIndex);
-        ResultPtr aContext = anAttr->context();
-        ResultBodyPtr aResCompSolidPtr = ModelAPI_Tools::bodyOwner(aContext);
-        if (aResCompSolidPtr.get())
-        {
-          if (aCompSolid.get())
+          AttributeSelectionPtr anAttr = anAttrSelList->value(anIndex);
+          ResultPtr aContext = anAttr->context();
+          ResultBodyPtr aResCompSolidPtr = ModelAPI_Tools::bodyOwner(aContext);
+          if (aResCompSolidPtr.get())
           {
-            isAllInSameCompSolid = aCompSolid == aResCompSolidPtr;
+            if (aCompSolid.get())
+            {
+              isAllInSameCompSolid = aCompSolid == aResCompSolidPtr;
+            }
+            else
+            {
+              aCompSolid = aResCompSolidPtr;
+            }
           }
           else
           {
-            aCompSolid = aResCompSolidPtr;
+            isAllInSameCompSolid = false;
+            break;
           }
-        }
-        else
-        {
-          isAllInSameCompSolid = false;
-          break;
         }
       }
     }
   }
-  anIt++;
 
   std::shared_ptr<FeaturesPlugin_Boolean> aFeature =
     std::dynamic_pointer_cast<FeaturesPlugin_Boolean>(theFeature);
@@ -1245,7 +1214,7 @@ bool FeaturesPlugin_ValidatorBooleanArguments::isValid(
   if (anOperationType == FeaturesPlugin_Boolean::BOOL_FUSE)
   {
     // Fuse operation
-    if (anObjectsNb + aToolsNb < 2)
+    if (anObjectsToolsNb[0] + anObjectsToolsNb[1] < 2)
     {
       theError = "Not enough arguments for Fuse operation.";
       return false;
@@ -1258,12 +1227,12 @@ bool FeaturesPlugin_ValidatorBooleanArguments::isValid(
   }
   else
   {
-    if (anObjectsNb < 1)
+    if (anObjectsToolsNb[0] < 1) // check number of objects
     {
       theError = "Objects not selected.";
       return false;
     }
-    if (aToolsNb < 1)
+    if (anObjectsToolsNb[1] < 1) // check number of tools
     {
       theError = "Tools not selected.";
       return false;
