@@ -116,6 +116,8 @@ INSTALL(FILES ${QM_RESOURCES} DESTINATION ${SHAPER_INSTALL_QM_RESOURCES})
 ADD_UNIT_TESTS(TestParameterCreation.py
                TestParameterRename.py
                TestParameterChangeValue.py
+               TestParameterDelete.py
+               TestParameterErrorMsg.py
                TestParametersMgr.py
                Test1806.py
                Test2392.py

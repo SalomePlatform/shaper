@@ -83,6 +83,13 @@ ParameterPtr addParameter(const std::shared_ptr<ModelAPI_Document> & thePart,
                           const std::string & theExpression,
                           const std::string & theComment = std::string());
 
+/**\ingroup CPPHighAPI
+ * \brief Remove Parameter feature and substitute it by the value in referred features
+ */
+PARAMETERSAPI_EXPORT
+void removeParameter(const std::shared_ptr<ModelAPI_Document> & thePart,
+                     const ParameterPtr & theParameter);
+
 //--------------------------------------------------------------------------------------
 //--------------------------------------------------------------------------------------
 #endif /* SRC_PARAMETERSAPI_PARAMETERSAPI_PARAMETER_H_ */

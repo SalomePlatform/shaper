@@ -100,8 +100,6 @@ bool ParametersPlugin_ExpressionValidator::isValid(const AttributePtr& theAttrib
                                                    Events_InfoMessage& theError) const
 {
   FeaturePtr aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(theAttribute->owner());
-  ResultParameterPtr aParam =
-      std::dynamic_pointer_cast<ModelAPI_ResultParameter>(aFeature->firstResult());
 
   AttributeStringPtr aStrAttr =
       std::dynamic_pointer_cast<ModelAPI_AttributeString>(theAttribute);
@@ -113,11 +111,6 @@ bool ParametersPlugin_ExpressionValidator::isValid(const AttributePtr& theAttrib
   bool isEmptyExpr = aStrAttr->value().empty();
   if (isEmptyExpr) {
     theError = "Expression is empty.";
-    return false;
-  }
-
-  if (!aParam.get()) {
-    theError = "Result is empty.";
     return false;
   }
 

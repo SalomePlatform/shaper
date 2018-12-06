@@ -23,6 +23,7 @@
 #include <ModelHighAPI_Dumper.h>
 #include <ModelHighAPI_Tools.h>
 #include <ModelAPI_ResultParameter.h>
+#include <ModelAPI_Events.h>
 //--------------------------------------------------------------------------------------
 ParametersAPI_Parameter::ParametersAPI_Parameter(
     const std::shared_ptr<ModelAPI_Feature> & theFeature)
@@ -91,4 +92,15 @@ ParameterPtr addParameter(const std::shared_ptr<ModelAPI_Document> & thePart,
 {
   std::shared_ptr<ModelAPI_Feature> aFeature = thePart->addFeature(ParametersAPI_Parameter::ID());
   return ParameterPtr(new ParametersAPI_Parameter(aFeature, theName, theExpression, theComment));
+}
+
+//--------------------------------------------------------------------------------------
+void removeParameter(const std::shared_ptr<ModelAPI_Document> & thePart,
+                     const ParameterPtr & theParameter)
+{
+  FeaturePtr aParam = theParameter->feature();
+  if (aParam) {
+    ModelAPI_ReplaceParameterMessage::send(aParam, 0);
+    thePart->removeFeature(aParam);
+  }
 }
