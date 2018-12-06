@@ -43,6 +43,7 @@
 
 #include <ModelAPI_AttributeSelection.h>
 #include <ModelAPI_AttributeDouble.h>
+#include <ModelAPI_AttributeBoolean.h>
 #include <ModelAPI_ResultConstruction.h>
 
 #include <cmath>
@@ -56,6 +57,7 @@ void SketchPlugin_SketchDrawer::initAttributes()
 {
   data()->addAttribute(BASE_ID(), ModelAPI_AttributeSelection::typeId());
   data()->addAttribute(PLANE_ID(), ModelAPI_AttributeSelection::typeId());
+  data()->addAttribute(ADD_DIMENSIONS_ID(), ModelAPI_AttributeBoolean::typeId());
 }
 
 // sets a point attribute of the feature by 3D point on the sketch
@@ -101,6 +103,7 @@ void SketchPlugin_SketchDrawer::execute()
   aSketch->selection(SketchPlugin_SketchEntity::EXTERNAL_ID())->
     setValue(ResultPtr(), GeomShapePtr());
 
+  bool addDimensions = boolean(ADD_DIMENSIONS_ID())->value();
   // iterate all edges of the base to find all edges that belong to this plane
   GeomAPI_DataMapOfShapeShape alreadyProcessed;
   std::list<AttributePoint2DPtr> aCreatedPoints;// points to check and set coincidence
@@ -133,25 +136,28 @@ void SketchPlugin_SketchDrawer::execute()
       } else {
         isHorVertConstr = false;
       }
-      if (isHorVertConstr) { // only length constraint is enough
-        FeaturePtr aLen = aSketch->addFeature(SketchPlugin_ConstraintLength::ID());
-        aLen->refattr(SketchPlugin_ConstraintLength::ENTITY_A())->setObject(anItem->firstResult());
-        aLen->real(SketchPlugin_ConstraintLength::VALUE())->setValue(anEdge->length());
-      } else { // set horizontal and vertical distance constraints
-        FeaturePtr aVDist = aSketch->addFeature(SketchPlugin_ConstraintDistanceVertical::ID());
-        aVDist->refattr(SketchPlugin_Constraint::ENTITY_A())
-          ->setAttr(anItem->attribute(SketchPlugin_Line::START_ID()));
-        aVDist->refattr(SketchPlugin_Constraint::ENTITY_B())
-          ->setAttr(anItem->attribute(SketchPlugin_Line::END_ID()));
-        aVDist->real(SketchPlugin_ConstraintDistanceVertical::VALUE())
-          ->setValue(aPoints.back().first->y() - aPoints.front().first->y());
-        FeaturePtr aHDist = aSketch->addFeature(SketchPlugin_ConstraintDistanceHorizontal::ID());
-        aHDist->refattr(SketchPlugin_Constraint::ENTITY_A())
-          ->setAttr(anItem->attribute(SketchPlugin_Line::START_ID()));
-        aHDist->refattr(SketchPlugin_Constraint::ENTITY_B())
-          ->setAttr(anItem->attribute(SketchPlugin_Line::END_ID()));
-        aHDist->real(SketchPlugin_ConstraintDistanceVertical::VALUE())
-          ->setValue(aPoints.back().first->x() - aPoints.front().first->x());
+      if (addDimensions) {
+        if (isHorVertConstr) { // only length constraint is enough
+          FeaturePtr aLen = aSketch->addFeature(SketchPlugin_ConstraintLength::ID());
+          aLen->refattr(SketchPlugin_ConstraintLength::ENTITY_A())
+            ->setObject(anItem->firstResult());
+          aLen->real(SketchPlugin_ConstraintLength::VALUE())->setValue(anEdge->length());
+        } else { // set horizontal and vertical distance constraints
+          FeaturePtr aVDist = aSketch->addFeature(SketchPlugin_ConstraintDistanceVertical::ID());
+          aVDist->refattr(SketchPlugin_Constraint::ENTITY_A())
+            ->setAttr(anItem->attribute(SketchPlugin_Line::START_ID()));
+          aVDist->refattr(SketchPlugin_Constraint::ENTITY_B())
+            ->setAttr(anItem->attribute(SketchPlugin_Line::END_ID()));
+          aVDist->real(SketchPlugin_ConstraintDistanceVertical::VALUE())
+            ->setValue(aPoints.back().first->y() - aPoints.front().first->y());
+          FeaturePtr aHDist = aSketch->addFeature(SketchPlugin_ConstraintDistanceHorizontal::ID());
+          aHDist->refattr(SketchPlugin_Constraint::ENTITY_A())
+            ->setAttr(anItem->attribute(SketchPlugin_Line::START_ID()));
+          aHDist->refattr(SketchPlugin_Constraint::ENTITY_B())
+            ->setAttr(anItem->attribute(SketchPlugin_Line::END_ID()));
+          aHDist->real(SketchPlugin_ConstraintDistanceVertical::VALUE())
+            ->setValue(aPoints.back().first->x() - aPoints.front().first->x());
+        }
       }
     } else if (anEdge->isArc()) { // check also center
       GeomPointPtr aCenter = anEdge->circle()->center();
@@ -164,8 +170,10 @@ void SketchPlugin_SketchDrawer::execute()
       setPoint(anItem, SketchPlugin_Arc::END_ID(), aSketch, anEnd, aPoints);
       anItem->execute(); // for constraints setting on result
       // set radius constraint
-      FeaturePtr aRad = aSketch->addFeature(SketchPlugin_ConstraintRadius::ID());
-      aRad->refattr(SketchPlugin_Constraint::ENTITY_A())->setObject(anItem->lastResult());
+      if (addDimensions) {
+        FeaturePtr aRad = aSketch->addFeature(SketchPlugin_ConstraintRadius::ID());
+        aRad->refattr(SketchPlugin_Constraint::ENTITY_A())->setObject(anItem->lastResult());
+      }
     } else if (anEdge->isCircle()) { // check also center and middle (at value 2.)
       GeomPointPtr aCenter = anEdge->circle()->center();
       if (aPlane->distance(aCenter) >= kTOL || aPlane->distance(anEdge->middlePoint()) >= kTOL)
@@ -176,8 +184,10 @@ void SketchPlugin_SketchDrawer::execute()
       anItem->real(SketchPlugin_Circle::RADIUS_ID())->setValue(anEdge->circle()->radius());
       anItem->execute(); // for constraints setting on result
       // set radius constraint
-      FeaturePtr aRad = aSketch->addFeature(SketchPlugin_ConstraintRadius::ID());
-      aRad->refattr(SketchPlugin_Constraint::ENTITY_A())->setObject(anItem->lastResult());
+      if (addDimensions) {
+        FeaturePtr aRad = aSketch->addFeature(SketchPlugin_ConstraintRadius::ID());
+        aRad->refattr(SketchPlugin_Constraint::ENTITY_A())->setObject(anItem->lastResult());
+      }
     } else {
       continue; // other types of edges are not supported, only lines, circles and arcs
     }

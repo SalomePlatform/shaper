@@ -1068,6 +1068,7 @@ email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com
         <shape_selector id="plane" label="Plane:" tooltip="Select plane for sketch" shape_types="face">
           <validator id="GeomValidators_Face" parameters="plane"/>
         </shape_selector>
+        <boolvalue id="add_dimensions" label="Create dimensions" default="true" tooltip="To add dimensions into created sketch" obligatory="0"/>
       </feature>
     </group>
   </workbench>

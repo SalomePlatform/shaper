@@ -54,6 +54,12 @@ class SketchPlugin_SketchDrawer: public ModelAPI_Feature
     static const std::string ID("plane");
     return ID;
   }
+  /// Attribute name of the add-dimensions flag.
+  inline static const std::string& ADD_DIMENSIONS_ID()
+  {
+    static const std::string ID("add_dimensions");
+    return ID;
+  }
 
   /// \return the kind of a feature.
   SKETCHPLUGIN_EXPORT virtual const std::string& getKind()
