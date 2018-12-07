@@ -48,7 +48,7 @@
 //------------------------------------------------------------------------------
 // Tools
 
-std::string toStdString(double theValue)
+static std::string toStdString(double theValue)
 {
   std::ostringstream sstream;
   sstream << theValue;
@@ -59,7 +59,7 @@ std::string toStdString(double theValue)
   return sstream.str() + aPnt;
 }
 
-std::set<std::string> toSet(const std::list<std::string>& theContainer)
+static std::set<std::string> toSet(const std::list<std::string>& theContainer)
 {
   return std::set<std::string>(theContainer.begin(), theContainer.end());
 }
