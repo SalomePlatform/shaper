@@ -35,6 +35,7 @@
 #include <GeomAPI_Pln.h>
 #include <GeomAPI_ShapeIterator.h>
 #include <GeomAPI_Vertex.h>
+#include <GeomAPI_XYZ.h>
 #include <GeomAlgoAPI_EdgeBuilder.h>
 #include <GeomAlgoAPI_PointBuilder.h>
 
@@ -219,8 +220,30 @@ void ConstructionPlugin_Axis::createAxisByLine()
     anEdge = aLineShape->edge();
   }
   else if (aLineShape->isCompound()) {
-    GeomAPI_ShapeIterator anIt(aLineShape);
-    anEdge = anIt.current()->edge();
+    // create an edge which covers all edges from compounds (they are on the same line)
+    GeomPointPtr aFirst, aLast;
+    GeomXYZPtr aLineVec;
+    for(GeomAPI_ShapeIterator anIt(aLineShape); anIt.more(); anIt.next()) {
+      GeomEdgePtr aSub = anIt.current()->edge();
+      if (aSub.get() && aSub->isLine()) {
+        if (!aLineVec.get()) {
+          aFirst = aSub->firstPoint();
+          aLast = aSub->lastPoint();
+        } else { // set aFirst and aLast by extreme points
+          GeomXYZPtr aFirstVec = aSub->firstPoint()->xyz()->decreased(aFirst->xyz());
+          bool aSameDirection =
+            aSub->lastPoint()->xyz()->decreased(aSub->firstPoint()->xyz())->dot(aLineVec) > 0;
+          if (aLineVec->dot(aFirstVec) < -1.e-7) { // first point is changed
+            aFirst = aSameDirection ? aSub->firstPoint() : aSub->lastPoint();
+          } else { // last point is changed
+            aLast = aSameDirection ? aSub->lastPoint() : aSub->firstPoint();
+          }
+        }
+        aLineVec = aLast->xyz()->decreased(aFirst->xyz());
+      }
+    }
+    if (aLineVec.get())
+      anEdge = GeomAlgoAPI_EdgeBuilder::line(aFirst, aLast);
   }
 
   ResultConstructionPtr aConstr = document()->createConstruction(data());

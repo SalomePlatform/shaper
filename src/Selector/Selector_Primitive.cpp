@@ -63,7 +63,11 @@ bool Selector_Primitive::solve(const TopoDS_Shape& theContext)
 {
   Handle(TNaming_NamedShape) aNS;
   if (myFinal.FindAttribute(TNaming_NamedShape::GetID(), aNS)) {
-    Selector_Algo::store(aNS->Get());
+    TopoDS_Shape aResult = aNS->Get();
+    // if shape was modified and not exists in the context anymore, check evolution of this shape
+    // issue 2254 and similar (document CEA parametric first issue description)
+    findNewVersion(theContext, aResult);
+    Selector_Algo::store(aResult);
     return true;
   }
   return false;

@@ -284,8 +284,8 @@ TDF_Label Selector_FilterByNeighbors::restoreByName(std::string theName,
       std::string aSubStr = theName.substr(aStart + 1, anEndPos - aStart - 1);
       TDF_Label aSubContext;
       Selector_Algo* aSubSel =
-        Selector_Algo::restoreByName(
-          newSubLabel(), baseDocument(), aSubStr, myShapeType, theNameGenerator, aSubContext);
+        Selector_Algo::restoreByName(newSubLabel(), baseDocument(), aSubStr, myShapeType,
+          geometricalNaming(), theNameGenerator, aSubContext);
       if (!append(aSubSel))
         return TDF_Label();
 

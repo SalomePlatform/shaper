@@ -81,5 +81,8 @@ class GeomAPI_XYZ : public GeomAPI_Interface
   GEOMAPI_EXPORT double squareModulus() const;
 };
 
+//! Pointer on object
+typedef std::shared_ptr<GeomAPI_XYZ> GeomXYZPtr;
+
 #endif
 

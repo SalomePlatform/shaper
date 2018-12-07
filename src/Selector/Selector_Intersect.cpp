@@ -201,11 +201,6 @@ TDF_Label Selector_Intersect::restoreByName(std::string theName,
         char aShapeChar = theName[anEndPos + 1];
         if (theName[anEndPos + 1] != '[') {
           switch(aShapeChar) {
-          case 'c': aSubShapeType = TopAbs_COMPOUND; break;
-          case 'o': aSubShapeType = TopAbs_COMPSOLID; break;
-          case 's': aSubShapeType = TopAbs_SOLID; break;
-          case 'h': aSubShapeType = TopAbs_SHELL; break;
-          case 'w': aSubShapeType = TopAbs_WIRE; break;
           case 'e': aSubShapeType = TopAbs_EDGE; break;
           case 'v': aSubShapeType = TopAbs_VERTEX; break;
           default:;
@@ -214,8 +209,8 @@ TDF_Label Selector_Intersect::restoreByName(std::string theName,
       }
       TDF_Label aSubContext;
       Selector_Algo* aSubSel =
-        Selector_Algo::restoreByName(
-          newSubLabel(), baseDocument(), aSubStr, aSubShapeType, theNameGenerator, aSubContext);
+        Selector_Algo::restoreByName(newSubLabel(), baseDocument(), aSubStr, aSubShapeType,
+          geometricalNaming(), theNameGenerator, aSubContext);
       if (!append(aSubSel))
         return TDF_Label();
 
@@ -297,11 +292,6 @@ std::string Selector_Intersect::name(Selector_NameGenerator* theNameGenerator)
       TopAbs_ShapeEnum aSubType = aSubVal.ShapeType();
       if (aSubType != TopAbs_FACE) { // in case the sub shape type must be stored
         switch(aSubType) {
-        case TopAbs_COMPOUND: aResult += "c"; break;
-        case TopAbs_COMPSOLID: aResult += "o"; break;
-        case TopAbs_SOLID: aResult += "s"; break;
-        case TopAbs_SHELL: aResult += "h"; break;
-        case TopAbs_WIRE: aResult += "w"; break;
         case TopAbs_EDGE: aResult += "e"; break;
         case TopAbs_VERTEX: aResult += "v"; break;
         default:;

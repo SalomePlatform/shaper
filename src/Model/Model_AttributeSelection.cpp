@@ -448,7 +448,7 @@ void Model_AttributeSelection::setID(const std::string theID)
   ModelAPI_AttributeSelection::setID(theID);
   FeaturePtr aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(owner());
   if (myParent) {
-    myIsGeometricalSelection = myParent->isGeometricalSelection();
+    myIsGeometricalSelection = true;//myParent->isGeometricalSelection();
   } else {
     myIsGeometricalSelection =
       ModelAPI_Session::get()->validators()->isGeometricalSelection(aFeature->getKind(), id());
@@ -591,7 +591,7 @@ bool Model_AttributeSelection::update()
 
     if (anOldShape.IsNull() || aNewShape.IsNull() || !anOldShape.IsEqual(aNewShape)) {
       // shape type should not be changed: if shape becomes compound of such shapes, then split
-      if (myParent && !anOldShape.IsNull() && !aNewShape.IsNull() &&
+      if (!myIsGeometricalSelection && myParent && !anOldShape.IsNull() && !aNewShape.IsNull() &&
           anOldShape.ShapeType() != aNewShape.ShapeType() &&
           (aNewShape.ShapeType() == TopAbs_COMPOUND || aNewShape.ShapeType() == TopAbs_COMPSOLID))
       {

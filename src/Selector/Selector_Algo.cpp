@@ -31,16 +31,21 @@
 #include <TopoDS_Face.hxx>
 #include <TopoDS_Edge.hxx>
 #include <TopoDS.hxx>
+#include <TopTools_MapOfShape.hxx>
 #include <Geom_Surface.hxx>
 #include <BRep_Tool.hxx>
 #include <TNaming_Builder.hxx>
 #include <TNaming_Tool.hxx>
 #include <TNaming_SameShapeIterator.hxx>
 #include <TNaming_Iterator.hxx>
+#include <TNaming_NewShapeIterator.hxx>
 #include <TDataStd_ReferenceArray.hxx>
 #include <TDataStd_ExtStringList.hxx>
 #include <TDataStd_Integer.hxx>
 #include <TDataStd_UAttribute.hxx>
+#include <TopoDS_Iterator.hxx>
+#include <TopExp_Explorer.hxx>
+#include <BRep_Builder.hxx>
 
 
 /// type of the selection, integer keeps the Selector_Type value
@@ -375,7 +380,7 @@ Selector_Algo* Selector_Algo::restoreByLab(TDF_Label theLab, TDF_Label theBaseDo
 }
 
 Selector_Algo* Selector_Algo::restoreByName(TDF_Label theLab, TDF_Label theBaseDocLab,
-  std::string theName, const TopAbs_ShapeEnum theShapeType,
+  std::string theName, const TopAbs_ShapeEnum theShapeType, const bool theGeomNaming,
   Selector_NameGenerator* theNameGenerator, TDF_Label& theContextLab)
 {
   Selector_Algo* aResult = NULL;
@@ -406,6 +411,7 @@ Selector_Algo* Selector_Algo::restoreByName(TDF_Label theLab, TDF_Label theBaseD
   if (aResult) {
     aResult->myLab = theLab;
     aResult->myBaseDocumentLab = theBaseDocLab;
+    aResult->myGeometricalNaming = theGeomNaming;
     theContextLab = aResult->restoreByName(theName, theShapeType, theNameGenerator);
     if (theContextLab.IsNull()) {
       delete aResult;
@@ -421,4 +427,69 @@ void Selector_Algo::storeType(const Selector_Type theType)
   TDataStd_Integer::Set(myLab, kSEL_TYPE, (int)(theType));
   if (myGeometricalNaming)
     TDataStd_UAttribute::Set(myLab, kGEOMETRICAL_NAMING);
+}
+
+/// Returns true if theSub is in theContext shape
+static bool isInContext(const TopoDS_Shape& theContext, const TopoDS_Shape& theSub) {
+  for(TopExp_Explorer anExp(theContext, theSub.ShapeType()); anExp.More(); anExp.Next()) {
+    if (anExp.Current().IsSame(theSub))
+      return true;
+  }
+  return false;
+}
+
+bool Selector_Algo::findNewVersion(const TopoDS_Shape& theContext, TopoDS_Shape& theResult) const
+{
+  if (theResult.IsNull())
+    return false;
+  if (!TNaming_Tool::HasLabel(myLab, theResult)) {
+    if (theResult.ShapeType() == TopAbs_COMPOUND) { // do it for all elements of compound
+      BRep_Builder aBuilder;
+      TopoDS_Compound aResultingCompound;
+      aBuilder.MakeCompound(aResultingCompound);
+      bool aWasChanged = false;
+      for (TopoDS_Iterator anIter(theResult); anIter.More(); anIter.Next()) {
+        TopoDS_Shape aSub = anIter.Value();
+        if (findNewVersion(theContext, aSub))
+          aWasChanged = true;
+        aBuilder.Add(aResultingCompound, aSub);
+      }
+      if (aWasChanged)
+        theResult = aResultingCompound;
+      return aWasChanged;
+    }
+  } else {
+    // check theResult is in theContext
+    if (isInContext(theContext, theResult))
+      return false;
+    // searching the next modifications of the result shape in document
+    TopTools_MapOfShape aResultShapes;
+    for(TNaming_NewShapeIterator aBaseIter(theResult, myLab); aBaseIter.More(); aBaseIter.Next())
+    {
+      TNaming_Evolution anEvolution = aBaseIter.NamedShape()->Evolution();
+      if (anEvolution == TNaming_GENERATED || anEvolution == TNaming_MODIFY) {
+        TopoDS_Shape aNextModification = aBaseIter.Shape();
+        if (aNextModification.IsNull())
+          continue;
+        if (isInContext(theContext, aNextModification))
+          aResultShapes.Add(aNextModification);
+        else if (findNewVersion(theContext, aNextModification))
+          aResultShapes.Add(aNextModification);
+      }
+    }
+    if (aResultShapes.IsEmpty())
+      return false;
+    if (aResultShapes.Size() == 1) {
+      theResult = TopTools_MapIteratorOfMapOfShape(aResultShapes).Value();
+    } else { // make a compound of all results
+      BRep_Builder aBuilder;
+      TopoDS_Compound aResultingCompound;
+      aBuilder.MakeCompound(aResultingCompound);
+      for(TopTools_MapIteratorOfMapOfShape anIter(aResultShapes); anIter.More(); anIter.Next())
+        aBuilder.Add(aResultingCompound, anIter.Value());
+      theResult = aResultingCompound;
+    }
+    return true;
+  }
+  return false;
 }

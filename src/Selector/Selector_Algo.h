@@ -99,8 +99,8 @@ public:
   /// Returns not empty label of the context.
   SELECTOR_EXPORT static Selector_Algo* restoreByName(
     TDF_Label theLab, TDF_Label theBaseDocLab, std::string theName,
-    const TopAbs_ShapeEnum theShapeType, Selector_NameGenerator* theNameGenerator,
-    TDF_Label& theContextLab);
+    const TopAbs_ShapeEnum theShapeType, const bool theGeomNaming,
+    Selector_NameGenerator* theNameGenerator, TDF_Label& theContextLab);
 
   /// Returns true if the given shapes are based on the same geometry
   static bool sameGeometry(const TopoDS_Shape theShape1, const TopoDS_Shape theShape2);
@@ -163,6 +163,10 @@ protected:
   }
   /// Stores the type of an algorithm in the data tree (in myLab)
   void storeType(const Selector_Type theType);
+
+  /// Searches the newer version of the shape in the document if the base shape does not
+  /// belong to context. Returns it in theResult (if any). Returns true is theResult is changed.
+  bool findNewVersion(const TopoDS_Shape& theContext, TopoDS_Shape& theResult) const;
 };
 
 #endif

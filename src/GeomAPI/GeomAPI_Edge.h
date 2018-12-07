@@ -123,7 +123,7 @@ public:
   virtual std::shared_ptr<GeomAPI_Pnt> middlePoint() const;
 };
 
-//! Pointer on attribute object
+//! Pointer on object
 typedef std::shared_ptr<GeomAPI_Edge> GeomEdgePtr;
 
 #endif

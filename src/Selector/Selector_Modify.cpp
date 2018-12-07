@@ -280,9 +280,11 @@ bool Selector_Modify::solve(const TopoDS_Shape& theContext)
     findModificationResult(aFinalsCommon);
     if (aFinalsCommon.Extent() == 1) { // result is valid: found only one shape
       aResult = aFinalsCommon.First();
+      findNewVersion(theContext, aResult);
     } else if (aFinalsCommon.Extent() > 1 && myWeakIndex > 0) {
       Selector_NExplode aNExp(aFinalsCommon);
       aResult = aNExp.shape(myWeakIndex);
+      findNewVersion(theContext, aResult);
     } else if (aFinalsCommon.Extent() > 1 && geometricalNaming()) {// if same geometry - compound
       TopoDS_ListOfShape::Iterator aCommonIter(aFinalsCommon);
       TopoDS_Shape aFirst = aCommonIter.Value();
@@ -295,7 +297,9 @@ bool Selector_Modify::solve(const TopoDS_Shape& theContext)
         TopoDS_Compound aCompound;
         aBuilder.MakeCompound(aCompound);
         for(aCommonIter.Initialize(aFinalsCommon); aCommonIter.More(); aCommonIter.Next()) {
-          aBuilder.Add(aCompound, aCommonIter.Value());
+          TopoDS_Shape aSub = aCommonIter.Value();
+          findNewVersion(theContext, aSub);
+          aBuilder.Add(aCompound, aSub);
         }
         aResult = aCompound;
       }

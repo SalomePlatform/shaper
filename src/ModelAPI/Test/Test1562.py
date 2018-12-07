@@ -67,11 +67,16 @@ model.do()
 # on increase of parameter selected part of extrusion is increased and selected face is removed (U becomes L)
 # so, check that selection is still correct and cut from not existing part produces correct shape anyway
 lenParam.setValue(100)
-model.end()
+model.do()
 
 # check the result validity
 from ModelAPI import *
 aFactory = ModelAPI_Session.get().validators()
 assert(aFactory.validate(ExtrusionCut_2.feature()))
+
+# set the value back to avoid changed the name text in selection of "to_object" in check python dump
+lenParam.setValue(45)
+
+model.end()
 
 assert(model.checkPythonDump())

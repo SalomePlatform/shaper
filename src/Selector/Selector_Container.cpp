@@ -109,8 +109,8 @@ TDF_Label Selector_Container::restoreByName(std::string theName,
       }
       TDF_Label aSubContext;
       Selector_Algo* aSubSel =
-        Selector_Algo::restoreByName(
-          newSubLabel(), baseDocument(), aSubStr, aSubShapeType, theNameGenerator, aSubContext);
+        Selector_Algo::restoreByName(newSubLabel(), baseDocument(), aSubStr, aSubShapeType,
+          geometricalNaming(), theNameGenerator, aSubContext);
       if (!append(aSubSel))
         return TDF_Label();
 

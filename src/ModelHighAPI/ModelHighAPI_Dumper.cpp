@@ -1068,7 +1068,9 @@ ModelHighAPI_Dumper& ModelHighAPI_Dumper::operator<<(
     isDumpByGeom = aSelectedFeature && aSelectedFeature->isInHistory();
   }
 
-  if (theAttrSelect->isGeometricalSelection() && aShape->shapeType() == GeomAPI_Shape::COMPOUND) {
+  if (theAttrSelect->isGeometricalSelection() && aShape->shapeType() == GeomAPI_Shape::COMPOUND
+    && theAttrSelect->context().get() && !aShape->isEqual(theAttrSelect->context()->shape())
+    && theAttrSelect->context()->groupName() != ModelAPI_ResultPart::group()) {
     GeomAPI_ShapeIterator anIt(aShape);
     aShape = anIt.current();
   }
