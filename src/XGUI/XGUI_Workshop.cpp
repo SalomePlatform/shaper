@@ -2216,6 +2216,9 @@ void setColor(ResultPtr theResult, const std::vector<int>& theColor)
     aColorAttr->setValue(1, theColor[1]);
     aColorAttr->setValue(2, theColor[2]);
   }
+  static const Events_ID kRedisplayEvent =
+    Events_Loop::loop()->eventByName(EVENT_OBJECT_TO_REDISPLAY);
+  ModelAPI_EventCreator::get()->sendUpdated(theResult, kRedisplayEvent);
 }
 
 //**************************************************************
@@ -2294,6 +2297,9 @@ void setDeflection(ResultPtr theResult, const double theDeflection)
   AttributeDoublePtr aDeflectionAttr = theResult->data()->real(ModelAPI_Result::DEFLECTION_ID());
   if (aDeflectionAttr.get() != NULL)
     aDeflectionAttr->setValue(theDeflection);
+  static const Events_ID kRedisplayEvent =
+    Events_Loop::loop()->eventByName(EVENT_OBJECT_TO_REDISPLAY);
+  ModelAPI_EventCreator::get()->sendUpdated(theResult, kRedisplayEvent);
 }
 
 //**************************************************************
@@ -2305,6 +2311,9 @@ void setTransparency(ResultPtr theResult, double theTransparency)
   AttributeDoublePtr anAttribute = theResult->data()->real(ModelAPI_Result::TRANSPARENCY_ID());
   if (anAttribute.get() != NULL)
     anAttribute->setValue(theTransparency);
+  static const Events_ID kRedisplayEvent =
+    Events_Loop::loop()->eventByName(EVENT_OBJECT_TO_REDISPLAY);
+  ModelAPI_EventCreator::get()->sendUpdated(theResult, kRedisplayEvent);
 }
 
 //**************************************************************
