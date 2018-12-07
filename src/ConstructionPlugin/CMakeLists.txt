@@ -78,6 +78,7 @@ INCLUDE_DIRECTORIES(
 
 
 ADD_UNIT_TESTS(TestAxisCreation.py
+               TestAxis_ErrorMsg.py
                UnitTestAxis.py
                TestPoint_XYZ.py
                TestPoint_IntersectLines.py
@@ -90,4 +91,7 @@ ADD_UNIT_TESTS(TestAxisCreation.py
                TestPoint_GeometricalPropertyCenterOfCircle.py
                TestPoint_VertexSelection.py
                TestPointName.py
-               TestPlane.py)
+               TestPoint_ErrorMsg.py
+               TestPlane.py
+               TestPlane_ErrorMsg.py
+)

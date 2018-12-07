@@ -240,6 +240,8 @@ std::shared_ptr<GeomAPI_Shape> ConstructionPlugin_Plane::createByLineAndPoint()
     GeomAPI_ShapeIterator anIt(aLineShape);
     anEdge = anIt.current()->edge();
   }
+  if (!anEdge)
+    return GeomShapePtr();
 
   // Get point.
   AttributeSelectionPtr aPointSelection = selection(POINT());
@@ -285,7 +287,7 @@ std::shared_ptr<GeomAPI_Shape> ConstructionPlugin_Plane::createByDistanceFromOth
     bool anIsReverse = boolean(REVERSE())->value();
     if(anIsReverse) aDist = -aDist;
     GeomShapePtr aShape = aFaceAttr->value();
-    if (!aShape.get()) {
+    if (!aShape.get() && aFaceAttr->context()) {
       aShape = aFaceAttr->context()->shape();
     }
 
@@ -301,6 +303,8 @@ std::shared_ptr<GeomAPI_Shape> ConstructionPlugin_Plane::createByDistanceFromOth
       GeomAPI_ShapeIterator anIt(aShape);
       aFace = anIt.current()->face();
     }
+    if (!aFace)
+      return GeomShapePtr();
 
     std::shared_ptr<GeomAPI_Pln> aPln = aFace->getPlane();
     std::shared_ptr<GeomAPI_Pnt> aOrig = aPln->location();
@@ -338,7 +342,9 @@ std::shared_ptr<GeomAPI_Shape> ConstructionPlugin_Plane::createByCoincidentPoint
   if(!aPointShape.get()) {
     aPointShape = aPointSelection->context()->shape();
   }
-  std::shared_ptr<GeomAPI_Vertex> aVertex(new GeomAPI_Vertex(aPointShape));
+  std::shared_ptr<GeomAPI_Vertex> aVertex = aPointShape->vertex();
+  if (!aVertex)
+    return GeomShapePtr();
 
   std::shared_ptr<GeomAPI_Pnt> anOrig = aVertex->point();
   std::shared_ptr<GeomAPI_Pln> aPln = aFace->getPlane();
@@ -366,6 +372,8 @@ std::shared_ptr<GeomAPI_Shape> ConstructionPlugin_Plane::createByRotation()
     GeomAPI_ShapeIterator anIt(aFaceShape);
     aFace = anIt.current()->face();
   }
+  if (!aFace)
+    return GeomShapePtr();
   aFace = makeRectangularFace(aFace, aFace->getPlane());
 
   // Get axis.
@@ -382,6 +390,8 @@ std::shared_ptr<GeomAPI_Shape> ConstructionPlugin_Plane::createByRotation()
     GeomAPI_ShapeIterator anIt(anAxisShape);
     anEdge = anIt.current()->edge();
   }
+  if (!anEdge)
+    return GeomShapePtr();
 
   std::shared_ptr<GeomAPI_Ax1> anAxis =
     std::shared_ptr<GeomAPI_Ax1>(new GeomAPI_Ax1(anEdge->line()->location(),
@@ -422,6 +432,8 @@ std::shared_ptr<GeomAPI_Shape> ConstructionPlugin_Plane::createByTwoParallelPlan
     GeomAPI_ShapeIterator anIt(aFaceShape1);
     aFace1 = anIt.current()->face();
   }
+  if (!aFace1)
+    return GeomShapePtr();
   std::shared_ptr<GeomAPI_Pln> aPln1 = aFace1->getPlane();
 
   // Get plane 2.
@@ -438,6 +450,8 @@ std::shared_ptr<GeomAPI_Shape> ConstructionPlugin_Plane::createByTwoParallelPlan
     GeomAPI_ShapeIterator anIt(aFaceShape2);
     aFace2 = anIt.current()->face();
   }
+  if (!aFace2)
+    return GeomShapePtr();
   std::shared_ptr<GeomAPI_Pln> aPln2 = aFace2->getPlane();
 
   std::shared_ptr<GeomAPI_Pnt> anOrig1 = aPln1->location();

@@ -268,6 +268,8 @@ void ConstructionPlugin_Axis::createAxisByPlaneAndPoint()
     GeomAPI_ShapeIterator anIt(aFaceShape);
     aFace = anIt.current()->face();
   }
+  if (!aFace)
+    return;
   std::shared_ptr<GeomAPI_Pln> aPln = aFace->getPlane();
 
   // Get point.
@@ -309,6 +311,8 @@ void ConstructionPlugin_Axis::createAxisByTwoPlanes()
     GeomAPI_ShapeIterator anIt(aFaceShape1);
     aFace1 = anIt.current()->face();
   }
+  if (!aFace1)
+    return;
   std::shared_ptr<GeomAPI_Pln> aPln1 = aFace1->getPlane();
 
   std::string useOffset1 = string(USE_OFFSET1())->value();
@@ -335,6 +339,8 @@ void ConstructionPlugin_Axis::createAxisByTwoPlanes()
     GeomAPI_ShapeIterator anIt(aFaceShape2);
     aFace2 = anIt.current()->face();
   }
+  if (!aFace2)
+    return;
   std::shared_ptr<GeomAPI_Pln> aPln2 = aFace2->getPlane();
 
   std::string useOffset2 = string(USE_OFFSET2())->value();

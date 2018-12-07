@@ -547,7 +547,7 @@ std::shared_ptr<GeomAPI_Pln> getPln(const GeomShapePtr theShape)
     return aPln;
   }
 
-  if(!aFace->isPlanar()) {
+  if(!aFace || !aFace->isPlanar()) {
     return aPln;
   }
 
