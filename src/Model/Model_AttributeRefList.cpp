@@ -44,6 +44,12 @@ void Model_AttributeRefList::append(ObjectPtr theObject)
     myExtDocRef->Append(anEntry);
   } else return; // something is wrong
 
+  if (myHashUsed) {
+    myHashObjects.insert(theObject);
+    myHashIndex[myRef->Extent() - 1] = theObject;
+    myHashIndexNoEmpty[int(myHashIndexNoEmpty.size())] = theObject;
+  }
+
   // do it before the transaction finish to make just created/removed objects know dependencies
   // and reference from composite feature is removed automatically
   ADD_BACK_REF(theObject);
@@ -52,6 +58,7 @@ void Model_AttributeRefList::append(ObjectPtr theObject)
 
 void Model_AttributeRefList::remove(ObjectPtr theObject)
 {
+  eraseHash();
   if (theObject.get() != NULL) {
     if (owner()->document() == theObject->document()) {
       std::shared_ptr<Model_Data> aData;
@@ -79,7 +86,7 @@ void Model_AttributeRefList::remove(ObjectPtr theObject)
           if (anExtIter.Value() == anIdString.str().c_str()) {
             TDataStd_ListIteratorOfListOfExtendedString anExtIter2 = anExtIter;
             anExtIter2.Next();
-            if (anExtIter2.Value() == anEntry) { // fully maches, so, remove(don't copy)
+            if (anExtIter2.Value() == anEntry) { // fully matches, so, remove(don't copy)
               aFound = true;
               continue;
             }
@@ -117,6 +124,7 @@ void Model_AttributeRefList::remove(ObjectPtr theObject)
 
 void Model_AttributeRefList::clear()
 {
+  eraseHash();
   std::list<ObjectPtr> anOldList = list();
   myRef->Clear();
   std::list<ObjectPtr>::iterator anOldIter = anOldList.begin();
@@ -131,6 +139,10 @@ int Model_AttributeRefList::size(const bool theWithEmpty) const
 {
   if (theWithEmpty)
     return myRef->Extent();
+
+  if (myHashUsed)
+    return int(myHashIndexNoEmpty.size());
+
   int aResult = 0;
   const TDF_LabelList& aList = myRef->List();
   for (TDF_ListIteratorOfLabelList aLIter(aList); aLIter.More(); aLIter.Next()) {
@@ -177,15 +189,11 @@ ObjectPtr Model_AttributeRefList::iteratedObject(TDF_ListIteratorOfLabelList& th
 
 std::list<ObjectPtr> Model_AttributeRefList::list()
 {
+  createHash();
   std::list<ObjectPtr> aResult;
-  std::shared_ptr<Model_Document> aDoc = std::dynamic_pointer_cast<Model_Document>(
-      owner()->document());
-  if (aDoc) {
-    const TDF_LabelList& aList = myRef->List();
-    TDataStd_ListIteratorOfListOfExtendedString anExtIter(myExtDocRef->List());
-    for (TDF_ListIteratorOfLabelList aLIter(aList); aLIter.More(); aLIter.Next()) {
-      aResult.push_back(iteratedObject(aLIter, anExtIter, aDoc));
-    }
+  std::map<int, ObjectPtr>::iterator aHashIter = myHashIndex.begin();
+  for(; aHashIter != myHashIndex.end(); aHashIter++) {
+    aResult.push_back(aHashIter->second);
   }
   return aResult;
 }
@@ -195,65 +203,24 @@ bool Model_AttributeRefList::isInList(const ObjectPtr& theObj)
   if(!theObj.get()) {
     return false;
   }
-  if (theObj->document() == owner()->document()) { // this document object
-    std::shared_ptr<Model_Document> aDoc = std::dynamic_pointer_cast<Model_Document>(
-        owner()->document());
-    if (aDoc) {
-      std::shared_ptr<Model_Data> aData = std::dynamic_pointer_cast<Model_Data>(theObj->data());
-      if (aData.get() && aData->isValid()) {
-        TDF_Label anObjLab = aData->label().Father();
-        const TDF_LabelList& aList = myRef->List();
-        for (TDF_ListIteratorOfLabelList aLIter(aList); aLIter.More(); aLIter.Next()) {
-          if (aLIter.Value().IsEqual(anObjLab)) {
-            return true;
-          }
-        }
-      }
-    }
-  } else { // external document object
-    // create new lists because for the current moment remove one of the duplicated elements
-    // from the list is buggy
-    std::ostringstream anIdString; // string with document Id
-    anIdString<<theObj->document()->id();
-    std::shared_ptr<Model_Data> aData = std::dynamic_pointer_cast<Model_Data>(theObj->data());
-    TCollection_AsciiString anEntry;
-    TDF_Tool::Entry(aData->label().Father(), anEntry);
-    bool aFound = false;
-    TDataStd_ListIteratorOfListOfExtendedString anExtIter(myExtDocRef->List());
-    for (; anExtIter.More(); anExtIter.Next()) {
-      if (anExtIter.Value() == anIdString.str().c_str()) {
-        anExtIter.Next();
-        if (anExtIter.Value() == anEntry) { // fully maches
-          return true;
-        }
-      } else {
-        anExtIter.Next();
-      }
-    }
-  }
-  return false;
+  createHash();
+  return myHashObjects.count(theObj) != 0;
 }
 
-ObjectPtr Model_AttributeRefList::object(const int theIndex, const bool theWithEmpty) const
+ObjectPtr Model_AttributeRefList::object(const int theIndex, const bool theWithEmpty)
 {
-  std::shared_ptr<Model_Document> aDoc =
-    std::dynamic_pointer_cast<Model_Document>(owner()->document());
-  if (aDoc) {
-    int anIndex = -1;
-    TDataStd_ListIteratorOfListOfExtendedString anExtIter(myExtDocRef->List());
-    for (TDF_ListIteratorOfLabelList aLIter(myRef->List()); aLIter.More(); aLIter.Next()) {
-      if (theWithEmpty || (!aLIter.Value().IsNull() && !aLIter.Value().IsRoot()))
-        anIndex++;
-      if (anIndex == theIndex) {
-        return iteratedObject(aLIter, anExtIter, aDoc);
-      }
-      if (aLIter.Value() == myRef->Label()) {
-        anExtIter.Next();
-        anExtIter.Next();
-      }
-    }
+  createHash();
+  std::map<int, ObjectPtr>::iterator aFind;
+  if (theWithEmpty) {
+    aFind = myHashIndex.find(theIndex);
+    if (aFind == myHashIndex.end())
+      return ObjectPtr();
+  } else {
+    aFind = myHashIndexNoEmpty.find(theIndex);
+    if (aFind == myHashIndexNoEmpty.end())
+      return ObjectPtr();
   }
-  return ObjectPtr();
+  return aFind->second;
 }
 
 void Model_AttributeRefList::substitute(const ObjectPtr& theCurrent, const ObjectPtr& theNew)
@@ -273,6 +240,7 @@ void Model_AttributeRefList::substitute(const ObjectPtr& theCurrent, const Objec
         aNewLab = aCurrentLab.Root(); // root means null object
       }
       // do the substitution
+      eraseHash();
       ADD_BACK_REF(theNew);
       if (myRef->InsertAfter(aNewLab, aCurrentLab)) {
         myRef->Remove(aCurrentLab);
@@ -295,6 +263,7 @@ void Model_AttributeRefList::exchange(const ObjectPtr& theObject1, const ObjectP
         std::shared_ptr<Model_Data> aData2 =
           std::dynamic_pointer_cast<Model_Data>(theObject2->data());
         if (aData2.get() && aData2->isValid()) {
+          eraseHash();
           TDF_Label aLab2 = aData2->label().Father();
           // do the substitution: use the temporary label, as usually in exchange
           TDF_Label aTmpLab = aLab1.Root();
@@ -321,6 +290,7 @@ void Model_AttributeRefList::removeLast()
   if (aDoc && !myRef->IsEmpty()) {
     ObjectPtr anObj = aDoc->objects()->object(myRef->Last());
     if (anObj.get()) {
+      eraseHash();
       myRef->Remove(myRef->Last());
       REMOVE_BACK_REF(anObj);
       owner()->data()->sendAttributeUpdated(this);
@@ -333,7 +303,7 @@ void Model_AttributeRefList::remove(const std::set<int>& theIndices)
   std::shared_ptr<Model_Document> aDoc = std::dynamic_pointer_cast<Model_Document>(
       owner()->document());
   if (aDoc && !myRef->IsEmpty()) {
-    // collet labels that will be removed
+    // collect labels that will be removed
     TDF_LabelList aLabelsToRemove;
     TDF_ListIteratorOfLabelList aLabIter(myRef->List());
     for(int aCurrent = 0; aLabIter.More(); aLabIter.Next(), aCurrent++) {
@@ -348,6 +318,7 @@ void Model_AttributeRefList::remove(const std::set<int>& theIndices)
         REMOVE_BACK_REF(anObj);
       }
     }
+    eraseHash();
     if (!aLabelsToRemove.IsEmpty()) {
       owner()->data()->sendAttributeUpdated(this);
     }
@@ -369,4 +340,35 @@ void Model_AttributeRefList::reinit()
   if (!myLab.FindAttribute(TDataStd_ExtStringList::GetID(), myExtDocRef)) {
     myExtDocRef = TDataStd_ExtStringList::Set(myLab);
   }
+  eraseHash();
+}
+
+void Model_AttributeRefList::createHash()
+{
+  if (myHashUsed)
+    return;
+  std::shared_ptr<Model_Document> aDoc = std::dynamic_pointer_cast<Model_Document>(
+    owner()->document());
+  if (aDoc) {
+    const TDF_LabelList& aList = myRef->List();
+    TDataStd_ListIteratorOfListOfExtendedString anExtIter(myExtDocRef->List());
+    for (TDF_ListIteratorOfLabelList aLIter(aList); aLIter.More(); aLIter.Next()) {
+      ObjectPtr anObj = iteratedObject(aLIter, anExtIter, aDoc);
+      myHashIndex[int(myHashIndex.size())] = anObj;
+      if (anObj.get()) {
+        myHashIndexNoEmpty[int(myHashIndexNoEmpty.size())] = anObj;
+        myHashObjects.insert(anObj);
+      }
+    }
+    myHashUsed = true;
+  }
+}
+
+
+void Model_AttributeRefList::eraseHash()
+{
+  myHashObjects.clear();
+  myHashIndex.clear();
+  myHashIndexNoEmpty.clear();
+  myHashUsed = false;
 }

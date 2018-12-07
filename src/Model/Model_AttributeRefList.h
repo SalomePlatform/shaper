@@ -37,11 +37,16 @@
 class Model_AttributeRefList : public ModelAPI_AttributeRefList
 {
   TDF_Label myLab; ///< the main label of this attribute
+
   Handle_TDataStd_ReferenceList myRef;  ///< references to the features labels
   /// pairs of doc ID and entries if reference is to external object, appends some in this list if
   /// something in myRef is empty
   Handle_TDataStd_ExtStringList myExtDocRef;
- public:
+  bool myHashUsed; ///< true if the hash stored is valid
+  std::set<ObjectPtr> myHashObjects; ///< hashed information: objects existing in the list
+  std::map<int, ObjectPtr> myHashIndex; ///< index to object in the list
+  std::map<int, ObjectPtr> myHashIndexNoEmpty; ///< index to not empty object in the list
+public:
   /// Appends the feature to the end of a list
   MODEL_EXPORT virtual void append(ObjectPtr theObject);
 
@@ -64,7 +69,7 @@ class Model_AttributeRefList : public ModelAPI_AttributeRefList
   /// Returns the list of features
   ///\param theIndex zero-based index in the list
   ///\param theWithEmpty if it is false, counts the not-empty referenced objects only
-  MODEL_EXPORT virtual ObjectPtr object(const int theIndex, const bool theWithEmpty = true) const;
+  MODEL_EXPORT virtual ObjectPtr object(const int theIndex, const bool theWithEmpty = true);
 
   /// Substitutes the feature by another one. Does nothing if such object is not found.
   /// Does not support the external documents objects yet.
@@ -94,6 +99,10 @@ class Model_AttributeRefList : public ModelAPI_AttributeRefList
   ObjectPtr iteratedObject(TDF_ListIteratorOfLabelList& theLIter,
     TDataStd_ListIteratorOfListOfExtendedString& theExtIter,
     std::shared_ptr<Model_Document> theDoc) const;
+  /// Creates the hash-objects containers (does nothing if hash is already correct)
+  void createHash();
+  /// Erases the hashed objects caused by complicated modifications in the list
+  void eraseHash();
 
   friend class Model_Data;
 };

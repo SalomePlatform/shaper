@@ -35,9 +35,9 @@ void ModelAPI_Result::initAttributes()
 {
   // append the color attribute. It is empty, the attribute will be filled by a request
   DataPtr aData = data();
-  aData->addAttribute(COLOR_ID(), ModelAPI_AttributeIntArray::typeId());
-  aData->addAttribute(DEFLECTION_ID(), ModelAPI_AttributeDouble::typeId());
-  aData->addAttribute(TRANSPARENCY_ID(), ModelAPI_AttributeDouble::typeId());
+  aData->addAttribute(COLOR_ID(), ModelAPI_AttributeIntArray::typeId())->setIsArgument(false);
+  aData->addAttribute(DEFLECTION_ID(), ModelAPI_AttributeDouble::typeId())->setIsArgument(false);
+  aData->addAttribute(TRANSPARENCY_ID(), ModelAPI_AttributeDouble::typeId())->setIsArgument(false);
 }
 
 bool ModelAPI_Result::setDisabled(std::shared_ptr<ModelAPI_Result> theThis, const bool theFlag)

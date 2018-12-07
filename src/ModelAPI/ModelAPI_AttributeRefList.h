@@ -64,7 +64,7 @@ class ModelAPI_AttributeRefList : public ModelAPI_Attribute
   /// Returns the referenced object by the zero-based index
   ///\param theIndex zero-based index in the list
   ///\param theWithEmpty if it is false, counts the not-empty referenced objects only
-  virtual ObjectPtr object(const int theIndex, const bool theWithEmpty = true) const = 0;
+  virtual ObjectPtr object(const int theIndex, const bool theWithEmpty = true) = 0;
 
   /// Substitutes the object by another one. Does nothing if such object is not found.
   virtual void substitute(const ObjectPtr& theCurrent, const ObjectPtr& theNew) = 0;

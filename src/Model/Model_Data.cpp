@@ -346,10 +346,10 @@ void Model_Data::sendAttributeUpdated(ModelAPI_Attribute* theAttr)
     }
   } else {
     // trim: need to redisplay
-    if (myObject) {
+    /*if (myObject) {
       static const Events_ID anEvent = Events_Loop::eventByName(EVENT_OBJECT_TO_REDISPLAY);
       ModelAPI_EventCreator::get()->sendUpdated(myObject, anEvent);
-    }
+    }*/
   }
 }
 
