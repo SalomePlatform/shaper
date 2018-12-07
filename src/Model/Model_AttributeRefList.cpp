@@ -124,7 +124,6 @@ void Model_AttributeRefList::remove(ObjectPtr theObject)
 
 void Model_AttributeRefList::clear()
 {
-  eraseHash();
   std::list<ObjectPtr> anOldList = list();
   myRef->Clear();
   std::list<ObjectPtr>::iterator anOldIter = anOldList.begin();
@@ -132,6 +131,7 @@ void Model_AttributeRefList::clear()
     REMOVE_BACK_REF((*anOldIter));
   }
   myExtDocRef->Clear();
+  eraseHash();
   owner()->data()->sendAttributeUpdated(this);
 }
 
@@ -318,8 +318,8 @@ void Model_AttributeRefList::remove(const std::set<int>& theIndices)
         REMOVE_BACK_REF(anObj);
       }
     }
-    eraseHash();
     if (!aLabelsToRemove.IsEmpty()) {
+      eraseHash();
       owner()->data()->sendAttributeUpdated(this);
     }
   }
@@ -347,6 +347,7 @@ void Model_AttributeRefList::createHash()
 {
   if (myHashUsed)
     return;
+  eraseHash();
   std::shared_ptr<Model_Document> aDoc = std::dynamic_pointer_cast<Model_Document>(
     owner()->document());
   if (aDoc) {
