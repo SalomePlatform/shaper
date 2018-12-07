@@ -105,8 +105,11 @@ INSTALL(FILES ${XML_RESOURCES} ${TEXT_RESOURCES} DESTINATION ${SHAPER_INSTALL_XM
 INSTALL(DIRECTORY icons/ DESTINATION ${SHAPER_INSTALL_XML_RESOURCES}/icons/Build)
 
 ADD_UNIT_TESTS(TestVertex.py
+               TestVertex_ErrorMsg.py
                TestEdge.py
+               TestEdge_ErrorMsg.py
                TestWire.py
+               TestWire_ErrorMsg.py
                TestPolyline.py
                TestInterpolation.py
                TestFace.py
@@ -114,11 +117,14 @@ ADD_UNIT_TESTS(TestVertex.py
                TestSolid.py
                TestCompSolid.py
                TestCompound.py
+               TestConpound_ErrorMsg.py
                TestSubShapes.py
+               TestSubShapes_ErrorMsg.py
                TestFilling.py
                TestFilling_ByEdges.py
                TestFilling_ByWires.py
                TestFilling_Mixed.py
+               TestFilling_ErrorMsg.py
                Test1920.py
                Test2398.py
                Test2415.py
