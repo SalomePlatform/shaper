@@ -165,7 +165,7 @@ void FeaturesPlugin_Pipe::execute()
   }
   std::shared_ptr<GeomAPI_Shape> aPathShape =
     std::dynamic_pointer_cast<GeomAPI_Shape>(aPathSelection->value());
-  if(!aPathShape.get()) {
+  if(!aPathShape.get() && aPathSelection->context().get()) {
     // Probaply it is a construction.
     aPathShape = aPathSelection->context()->shape();
   }
@@ -183,7 +183,7 @@ void FeaturesPlugin_Pipe::execute()
       return;
     }
     aBiNormal = std::dynamic_pointer_cast<GeomAPI_Shape>(aBiNormalSelection->value());
-    if(!aBiNormal.get()) {
+    if(!aBiNormal.get() && aBiNormalSelection->context().get()) {
       // Probably it is a construction.
       aBiNormal = aBiNormalSelection->context()->shape();
     }
@@ -208,7 +208,7 @@ void FeaturesPlugin_Pipe::execute()
         return;
       }
       std::shared_ptr<GeomAPI_Shape> aLocationShape = aLocationSelection->value();
-      if(!aLocationShape.get()) {
+      if(!aLocationShape.get() && aLocationSelection->context().get()) {
         // Probably it is a construction.
         aLocationShape = aLocationSelection->context()->shape();
       }

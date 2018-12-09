@@ -215,6 +215,10 @@ ADD_UNIT_TESTS(TestExtrusion.py
                TestRemoveSubShapes5.py
                TestRemoveSubShapes6.py
                TestPipe.py
+               TestPipe_Edge.py
+               TestPipe_Wire.py
+               TestPipe_Compound.py
+               TestPipe_ErrorMsg.py
                TestRecover.py
                TestRecover1798.py
                TestFillEdgeVertex.py
