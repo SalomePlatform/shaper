@@ -70,7 +70,7 @@ lcov -r covElse SketchPlugin*Ellipse* --output-file covElse_res -q
 mv -f covElse_res covElse
 # remove GUI related files from Config plugin
 for MASK in 'DataModelReader' 'Translator' 'PointerMessage'; do
-lcov -r covElse *Config_${MASK}API* --output-file covElse_res -q
+lcov -r covElse *Config_${MASK}* --output-file covElse_res -q
 mv -f covElse_res covElse
 done
 rm -rf lcov_htmlElse
