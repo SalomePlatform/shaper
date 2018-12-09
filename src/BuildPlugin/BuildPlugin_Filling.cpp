@@ -95,8 +95,10 @@ void BuildPlugin_Filling::execute()
 
   // get base objects list
   AttributeSelectionListPtr aSelectionList = selectionList(BASE_OBJECTS_ID());
-  if (aSelectionList->size() <= 1)
+  if (aSelectionList->size() <= 1) {
+    setError("Not enough objects is selected");
     return;
+  }
 
   // collect base shapes
   for(int anIndex = 0; anIndex < aSelectionList->size(); ++anIndex) {
