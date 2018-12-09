@@ -117,7 +117,7 @@ ADD_UNIT_TESTS(TestVertex.py
                TestSolid.py
                TestCompSolid.py
                TestCompound.py
-               TestConpound_ErrorMsg.py
+               TestCompound_ErrorMsg.py
                TestSubShapes.py
                TestSubShapes_ErrorMsg.py
                TestFilling.py
