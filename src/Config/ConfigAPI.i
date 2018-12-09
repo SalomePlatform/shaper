@@ -29,8 +29,16 @@
 #define CONFIG_EXPORT
 
 %include "typemaps.i"
+%include "std_list.i"
 %include "std_string.i"
+%include "std_vector.i"
 
 %include "Config_ModuleReader.h"
 %include "Config_PropManager.h"
 %include "Config_Prop.h"
+
+// std::list -> []
+%template(ListOfString) std::list< std::string >;
+%template(listOfProp) std::list< Config_Prop* >;
+// std::vector -> []
+%template(VectorOfInteger) std::vector<int>;
