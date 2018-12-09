@@ -28,7 +28,7 @@ lcov -r covAPI *${MASK}API* --output-file covAPI_res -q
 mv -f covAPI_res covAPI
 done
 # remove others
-for MASK in 'Config' 'Events' 'GeomData' 'GeomValidators' 'Model_' 'ModelGeomAlgo' 'SketchSolver'; do
+for MASK in 'Config' 'Events' 'GeomData' 'GeomValidators' 'Model_' 'ModelGeomAlgo' 'Selector' 'SketchSolver'; do
 lcov -r covAPI *${MASK}* --output-file covAPI_res -q
 mv -f covAPI_res covAPI
 done
@@ -50,7 +50,7 @@ lcov -r covDirect *${MASK}API* --output-file covDirect_res -q
 mv -f covDirect_res covDirect
 done
 # remove others
-for MASK in 'Config' 'Events' 'GeomValidators' 'Model_' 'ModelGeomAlgo' 'SketchSolver' 'GeomData'; do
+for MASK in 'Config' 'Events' 'GeomValidators' 'Model_' 'ModelGeomAlgo' 'Selector' 'SketchSolver' 'GeomData'; do
 lcov -r covDirect *${MASK}* --output-file covDirect_res -q
 mv -f covDirect_res covDirect
 done
