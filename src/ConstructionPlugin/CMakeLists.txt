@@ -92,6 +92,7 @@ ADD_UNIT_TESTS(TestAxisCreation.py
                TestPoint_VertexSelection.py
                TestPointName.py
                TestPoint_ErrorMsg.py
+               TestPoint_FiniteValidator.py
                TestPlane.py
                TestPlane_ErrorMsg.py
 )

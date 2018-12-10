@@ -172,6 +172,7 @@ ADD_UNIT_TESTS(TestExtrusion.py
                TestExtrusionCut.py
                TestExtrusionFuse.py
                TestExtrusion_ErrorMsg.py
+               TestExtrusion_ZeroOffsetError.py
                TestRevolution.py
                TestRevolutionCut.py
                TestRevolutionFuse.py

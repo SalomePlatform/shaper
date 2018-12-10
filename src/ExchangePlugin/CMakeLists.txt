@@ -83,4 +83,6 @@ ADD_UNIT_TESTS(TestImport.py
                TestExport.py
                Test2290.py
                Test2459.py
-               TestExportToXAOWithGroupNotUpdated.py)
+               TestExportToXAOWithGroupNotUpdated.py
+               TestExport_FiniteValidator.py
+)

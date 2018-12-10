@@ -79,3 +79,10 @@ aPlacementFt.boolean("placement_centering").setValue(True)
 aPlacementFt.execute()
 aSession.finishOperation()
 assert(aPlacementFt.error() == "")
+
+
+model.begin()
+Placement_2 = model.addPlacement(Part_1_doc, [model.selection("SOLID", "Placement_1_1")], model.selection("COMPOUND", "Sketch_1"), model.selection("FACE", "Extrusion_1_1/To_Face"), False, False)
+assert(Placement_2.feature().error() != "")
+Part_1_doc.removeFeature(Placement_2.feature())
+model.end()
