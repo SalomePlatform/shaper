@@ -190,7 +190,8 @@ void FeaturesPlugin_MultiTranslation::performOneDirection()
         aTranslationAlgo->build();
 
         // Checking that the algorithm worked properly.
-        if (GeomAlgoAPI_Tools::AlgoError::isAlgorithmFailed(aTranslationAlgo, getKind(), anError)) {
+        if (GeomAlgoAPI_Tools::AlgoError::isAlgorithmFailed(
+            aTranslationAlgo, getKind(), anError)) {
           setError(anError);
           break;
         }
@@ -391,7 +392,8 @@ void FeaturesPlugin_MultiTranslation::performTwoDirection()
           aTranslationAlgo->build();
 
           // Checking that the algorithm worked properly.
-          if (GeomAlgoAPI_Tools::AlgoError::isAlgorithmFailed(aTranslationAlgo, getKind(), anError)) {
+          if (GeomAlgoAPI_Tools::AlgoError::isAlgorithmFailed(
+              aTranslationAlgo, getKind(), anError)) {
             setError(anError);
             break;
           }
