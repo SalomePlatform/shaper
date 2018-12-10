@@ -361,7 +361,8 @@ void Model_AttributeRefList::createHash()
         myHashObjects.insert(anObj);
       }
     }
-    myHashUsed = true;
+    if (!myHashObjects.empty()) // on open document with multi-rotation referenced have no results
+      myHashUsed = true;
   }
 }
 
