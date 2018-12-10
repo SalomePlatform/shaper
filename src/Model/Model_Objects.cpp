@@ -47,6 +47,8 @@
 #include <TDF_LabelMap.hxx>
 #include <TDF_ListIteratorOfLabelList.hxx>
 
+int kUNDEFINED_FEATURE_INDEX = -1;
+
 static const std::string& groupNameFoldering(const std::string& theGroupID,
                                              const bool theAllowFolder)
 {
@@ -148,7 +150,7 @@ static void AddToRefArray(TDF_Label& theArrayLab, TDF_Label& theReferenced, TDF_
   } else {  // extend array by one more element
     Handle(TDataStd_HLabelArray1) aNewArray = new TDataStd_HLabelArray1(aRefs->Lower(),
                                                                         aRefs->Upper() + 1);
-    int aPassedPrev = 0; // prev feature is found and passed
+    int aPassedPrev = 0; // previous feature is found and passed
     if (thePrevLab.IsNull()) { // null means that inserted feature must be the first
       aNewArray->SetValue(aRefs->Lower(), theReferenced);
       aPassedPrev = 1;
@@ -382,7 +384,7 @@ void Model_Objects::moveFeature(FeaturePtr theMoved, FeaturePtr theAfterThis)
 
   Handle(TDataStd_HLabelArray1) aNewArray =
     new TDataStd_HLabelArray1(aRefs->Lower(), aRefs->Upper());
-  int aPassedMovedFrom = 0; // the prev feature location is found and passed
+  int aPassedMovedFrom = 0; // the previous feature location is found and passed
   int aPassedMovedTo = 0; // the feature is added and this location is passed
   if (!theAfterThis.get()) { // null means that inserted feature must be the first
     aNewArray->SetValue(aRefs->Lower(), aMovedLab);
@@ -741,31 +743,17 @@ void Model_Objects::setUniqueName(FeaturePtr theFeature)
   // first count all features of such kind to start with index = count + 1
   int aNumObjects = -1; // this feature is already in this map
   NCollection_DataMap<TDF_Label, FeaturePtr>::Iterator aFIter(myFeatures);
+  std::set<std::string> allNames;
   for (; aFIter.More(); aFIter.Next()) {
     if (aFIter.Value()->getKind() == theFeature->getKind())
       aNumObjects++;
+    allNames.insert(aFIter.Value()->data()->name());
   }
   // generate candidate name
   aName = composeName(theFeature->getKind(), aNumObjects + 1);
   // check this is unique, if not, increase index by 1
-  for (aFIter.Initialize(myFeatures); aFIter.More();) {
-    FeaturePtr aFeature = aFIter.Value();
-    bool isSameName = aFeature->data()->name() == aName;
-    if (!isSameName) {  // check also results to avoid same results names (actual for Parts)
-      const std::list<std::shared_ptr<ModelAPI_Result> >& aResults = aFeature->results();
-      std::list<std::shared_ptr<ModelAPI_Result> >::const_iterator aRIter = aResults.begin();
-      for (; aRIter != aResults.cend(); aRIter++) {
-        isSameName = (*aRIter)->data()->name() == aName;
-      }
-    }
-
-    if (isSameName) {
-      aNumObjects++;
-      aName = composeName(theFeature->getKind(), aNumObjects + 1);
-      // reinitialize iterator to make sure a new name is unique
-      aFIter.Initialize(myFeatures);
-    } else
-      aFIter.Next();
+  for(aNumObjects++; allNames.find(aName) != allNames.end(); aNumObjects++) {
+    aName = composeName(theFeature->getKind(), aNumObjects + 1);
   }
   theFeature->data()->setName(aName);
 }
@@ -866,7 +854,7 @@ void Model_Objects::synchronizeFeatures(
       ObjectPtr aFeature = isFolder ? ObjectPtr(new ModelAPI_Folder)
                                     : ObjectPtr(aSession->createFeature(aFeatureID, anOwner));
       if (!aFeature.get()) {
-        // somethig is wrong, most probably, the opened document has invalid structure
+        // something is wrong, most probably, the opened document has invalid structure
         Events_InfoMessage("Model_Objects", "Invalid type of object in the document").send();
         aLabIter.Value()->Label().ForgetAllAttributes();
         continue;
@@ -967,7 +955,7 @@ void Model_Objects::synchronizeFeatures(
   }
   // update results of the features (after features created because
   // they may be connected, like sketch and sub elements)
-  // After synchronisation of back references because sketch
+  // After synchronization of back references because sketch
   // must be set in sub-elements before "execute" by updateResults
   std::set<FeaturePtr> aProcessed; // composites must be updated after their subs (issue 360)
   TDF_ChildIDIterator aLabIter2(featuresLabel(), TDataStd_Comment::GetID());
@@ -1006,14 +994,14 @@ void Model_Objects::synchronizeFeatures(
     anOwner->setExecuteFeatures(true);
 }
 
-/// synchronises back references for the given object basing on the collected data
+/// synchronizes back references for the given object basing on the collected data
 void Model_Objects::synchronizeBackRefsForObject(const std::set<AttributePtr>& theNewRefs,
   ObjectPtr theObject)
 {
   if (!theObject.get() || !theObject->data()->isValid())
     return; // invalid
   std::shared_ptr<Model_Data> aData = std::dynamic_pointer_cast<Model_Data>(theObject->data());
-  // iterate new list to compare with curent
+  // iterate new list to compare with current
   std::set<AttributePtr>::iterator aNewIter = theNewRefs.begin();
   for(; aNewIter != theNewRefs.end(); aNewIter++) {
     if (aData->refsToMe().find(*aNewIter) == aData->refsToMe().end()) {
@@ -1115,9 +1103,9 @@ static void collectReferences(std::shared_ptr<ModelAPI_Data> theData,
 void Model_Objects::synchronizeBackRefs()
 {
   // collect all back references in the separated container: to update everything at once,
-  // without additional Concealment switchin on and off: only the final modification
+  // without additional Concealment switching on and off: only the final modification
 
-  // referenced (slave) objects to referencing attirbutes
+  // referenced (slave) objects to referencing attributes
   std::map<ObjectPtr, std::set<AttributePtr> > allRefs;
   NCollection_DataMap<TDF_Label, FeaturePtr>::Iterator aFeatures(myFeatures);
   for(; aFeatures.More(); aFeatures.Next()) {
@@ -1158,7 +1146,7 @@ void Model_Objects::synchronizeBackRefs()
     FeaturePtr aFeature = aFeatures.Value();
     std::list<ResultPtr> aResults;
     ModelAPI_Tools::allResults(aFeature, aResults);
-    // update the concealment status for disply in isConcealed of ResultBody
+    // update the concealment status for display in isConcealed of ResultBody
     std::list<ResultPtr>::iterator aRIter = aResults.begin();
     for(; aRIter != aResults.cend(); aRIter++) {
       (*aRIter)->isConcealed();
@@ -1371,7 +1359,8 @@ std::shared_ptr<ModelAPI_Folder> Model_Objects::createFolder(
     std::shared_ptr<Model_Data> aPrevData =
         std::dynamic_pointer_cast<Model_Data>(theBeforeThis->data());
     if (aPrevData.get()) {
-      aPrevFeatureLab = nextLabel(aPrevData->label().Father(), true);
+      int anIndex = kUNDEFINED_FEATURE_INDEX;
+      aPrevFeatureLab = nextLabel(aPrevData->label().Father(), anIndex, true);
     }
   } else { // find the label of the last feature
     Handle(TDataStd_ReferenceArray) aRefs;
@@ -1490,7 +1479,7 @@ std::shared_ptr<ModelAPI_Folder> Model_Objects::findFolder(
 
     if (!aLastFeatureInFolder.IsNull()) {
       if (IsEqual(aCurLabel, aLastFeatureInFolder))
-        aLastFeatureInFolder.Nullify(); // the last feature in the folder is achived
+        aLastFeatureInFolder.Nullify(); // the last feature in the folder is achieved
       continue;
     }
 
@@ -1949,32 +1938,35 @@ ResultPtr Model_Objects::findByName(const std::string theName)
   return aResult;
 }
 
-TDF_Label Model_Objects::nextLabel(TDF_Label theCurrent, const bool theReverse)
+TDF_Label Model_Objects::nextLabel(TDF_Label theCurrent, int& theIndex, const bool theReverse)
 {
   Handle(TDataStd_ReferenceArray) aRefs;
   if (featuresLabel().FindAttribute(TDataStd_ReferenceArray::GetID(), aRefs)) {
-    for(int a = aRefs->Lower(); a <= aRefs->Upper(); a++) { // iterate all existing features
+    int aStart = theIndex == kUNDEFINED_FEATURE_INDEX ? aRefs->Lower() : theIndex;
+    for(int a = aStart; a <= aRefs->Upper(); a++) { // iterate all existing features
       TDF_Label aCurLab = aRefs->Value(a);
       if (aCurLab.IsEqual(theCurrent)) {
         a += theReverse ? -1 : 1;
-        if (a >= aRefs->Lower() && a <= aRefs->Upper())
+        if (a >= aRefs->Lower() && a <= aRefs->Upper()) {
+          theIndex = a;
           return aRefs->Value(a);
-        break; // finish iiteration: it's last feature
+        }
+        break; // finish iteration: it's last feature
       }
     }
   }
   return TDF_Label();
 }
 
-FeaturePtr Model_Objects::nextFeature(FeaturePtr theCurrent, const bool theReverse)
+FeaturePtr Model_Objects::nextFeature(FeaturePtr theCurrent, int& theIndex, const bool theReverse)
 {
   std::shared_ptr<Model_Data> aData = std::static_pointer_cast<Model_Data>(theCurrent->data());
   if (aData.get() && aData->isValid()) {
     TDF_Label aFeatureLabel = aData->label().Father();
     do {
-      TDF_Label aNextLabel = nextLabel(aFeatureLabel, theReverse);
+      TDF_Label aNextLabel = nextLabel(aFeatureLabel, theIndex, theReverse);
       if (aNextLabel.IsNull())
-        break; // last or something is wrong
+        break; // the last or something is wrong
       FeaturePtr aFound = feature(aNextLabel);
       if (aFound)
         return aFound; // the feature is found

@@ -40,6 +40,8 @@
 static Standard_Integer HashCode(const TDF_Label& theLab, const Standard_Integer theUpper);
 static Standard_Boolean IsEqual(const TDF_Label& theLab1, const TDF_Label& theLab2);
 
+extern int kUNDEFINED_FEATURE_INDEX;
+
 /**\class Model_Objects
  * \ingroup DataModel
  * \brief Manager of objects of the document. Normally one this class corresponds to
@@ -49,7 +51,7 @@ static Standard_Boolean IsEqual(const TDF_Label& theLab1, const TDF_Label& theLa
 class Model_Objects
 {
  public:
-  //! Registers the fieature in the data structure
+  //! Registers the feature in the data structure
   //! \param theFeature feature that must be added to the data structure
   //! \param theAfterThis the feature will be added after this feature;
   //!        if it is null, the added feature will be the first
@@ -167,7 +169,7 @@ class Model_Objects
       const std::list<std::shared_ptr<ModelAPI_Feature> >& theFeatures,
       const bool theBelow);
   //! Search a folder containing the given feature.
-  //! Addtionally calculates a zero-based index of the feature in this folder.
+  //! Additionally calculates a zero-based index of the feature in this folder.
   //! \param theFeature feature to search
   //! \param theIndexInFolder zero-based index in the folder or -1 if the feature is top-level.
   //! \return the folder containing the feature or empty pointer if the feature is top-level.
@@ -176,7 +178,7 @@ class Model_Objects
       int& theIndexInFolder);
   //! Add a list of features to the folder. The correctness of the adding is not performed
   //! (such checks have been done in corresponding find.. method).
-  //! \return \c true if the movement is successfull
+  //! \return \c true if the movement is successful
   bool moveToFolder(const std::list<std::shared_ptr<ModelAPI_Feature> >& theFeatures,
                     const std::shared_ptr<ModelAPI_Folder>& theFolder);
   //! Remove features from the folder
@@ -194,7 +196,7 @@ class Model_Objects
   //! Returns the owner of this manager
   DocumentPtr owner() {return myDoc;}
 
-  //! Deletes all managed features wit hemmitting of corresponded signal
+  //! Deletes all managed features with emitting of corresponded signal
   ~Model_Objects();
 
  protected:
@@ -206,15 +208,15 @@ class Model_Objects
   //! feature type + "_" + index
   void setUniqueName(FeaturePtr theFeature);
 
-  //! Initializes the foldet with an unique name ("Folder_" + index)
+  //! Initializes the folder with an unique name ("Folder_" + index)
   void setUniqueName(FolderPtr theFolder);
 
   //! Synchronizes myFeatures list with the updated document
-  //! \param theUpdated list of labels that are marked as modified, so featrues must be also
+  //! \param theUpdated list of labels that are marked as modified, so features must be also
   //! \param theUpdateReferences causes the update of back-references
   //! \param theExecuteFeatures requires re-execute modified persistent features
   //!            (not needed on undo/redo/abort/open)
-  //! \param theOpen - on open nothing must be reexecuted, except not persistent results
+  //! \param theOpen - on open nothing must be re-executed, except not persistent results
   //! \param theFlush makes flush all events in the end of all modifications of this method
   void synchronizeFeatures(const TDF_LabelList& theUpdated, const bool theUpdateReferences,
     const bool theOpen, const bool theExecuteFeatures, const bool theFlush);
@@ -255,8 +257,9 @@ class Model_Objects
 
   /// Returns the next (from the history point of view) feature, any: invisible or disabled
   /// \param theCurrent previous to the resulting feature
-  /// \param theReverse if it is true, iterates in reverced order (next becomes previous)
-  FeaturePtr nextFeature(FeaturePtr theCurrent, const bool theReverse = false);
+  /// \param theReverse if it is true, iterates in reversed order (next becomes previous)
+  /// \param theIndex may be used for optimization: index of theCurrent in references array
+  FeaturePtr nextFeature(FeaturePtr theCurrent, int& theIndex, const bool theReverse = false);
   /// Returns to the first (from the history point of view) feature, any: invisible or disabled
   FeaturePtr firstFeature();
   /// Returns to the last (from the history point of view) feature, any: invisible or disabled
@@ -266,8 +269,8 @@ class Model_Objects
 
   /// Returns the next or previous label
   /// \param theCurrent given label
-  /// \param theReverse if it is true, iterates in reverced order (next becomes previous)
-  TDF_Label nextLabel(TDF_Label theCurrent, const bool theReverse = false);
+  /// \param theReverse if it is true, iterates in reversed order (next becomes previous)
+  TDF_Label nextLabel(TDF_Label theCurrent, int& theIndex, const bool theReverse = false);
 
   /// Returns the result group identifier of the given feature (for this at least one result must
   /// be created before)
@@ -281,14 +284,14 @@ class Model_Objects
   //! history. Not very fast method, for calling once, not in big cycles.
   std::list<std::shared_ptr<ModelAPI_Object> > allObjects();
 
-  //! synchronises back references for the given object basing on the collected data
+  //! synchronizes back references for the given object basing on the collected data
   void synchronizeBackRefsForObject(
     const std::set<std::shared_ptr<ModelAPI_Attribute>>& theNewRefs, ObjectPtr theObject);
 
   /// Just removes all features without touching the document data (to be able undo)
   virtual void eraseAllFeatures();
 
-  // Check whether the pre-image of the result had user-defined name.
+  // Check whether the predefined-image of the result had user-defined name.
   // If yes, return this name.
   bool hasCustomName(DataPtr theFeatureData,
                      ResultPtr theResult,
@@ -301,7 +304,7 @@ class Model_Objects
  private:
   TDF_Label myMain; ///< main label of the data storage
 
-  DocumentPtr myDoc; ///< doc,ument, owner of this objects manager: needed for events creation
+  DocumentPtr myDoc; ///< document, owner of this objects manager: needed for events creation
 
   /// All managed features (not only in history of OB)
   /// For optimization mapped by labels
@@ -311,7 +314,7 @@ class Model_Objects
   NCollection_DataMap<TDF_Label, ObjectPtr> myFolders;
 
   /// Map from group id to the array that contains all objects located in history.
-  /// Each array is updated by demand from scratch, by browing all the features in the history.
+  /// Each array is updated by demand from scratch, by browsing all the features in the history.
   std::map<std::string, std::vector<ObjectPtr> > myHistory;
 
   friend class Model_Document;

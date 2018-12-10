@@ -1083,8 +1083,9 @@ void Model_Document::moveFeature(FeaturePtr theMoved, FeaturePtr theAfterThis)
   FeaturePtr anAfterThisSub = theAfterThis;
   if (aCompositeAfter.get()) {
     FeaturePtr aSub = aCompositeAfter;
+    int anIndex = kUNDEFINED_FEATURE_INDEX;
     do {
-      FeaturePtr aNext = myObjs->nextFeature(aSub);
+      FeaturePtr aNext = myObjs->nextFeature(aSub, anIndex);
       if (!isSub(aCompositeAfter, aNext)) {
         anAfterThisSub = aSub;
         break;
@@ -1180,8 +1181,9 @@ std::shared_ptr<ModelAPI_Feature> Model_Document::currentFeature(const bool theV
     TDF_Label aLab = aRef->Get();
     FeaturePtr aResult = myObjs->feature(aLab);
     if (theVisible) { // get nearest visible (in history) going up
+      int anIndex = kUNDEFINED_FEATURE_INDEX;
       while(aResult.get() &&  !aResult->isInHistory()) {
-        aResult = myObjs->nextFeature(aResult, true);
+        aResult = myObjs->nextFeature(aResult, anIndex, true);
       }
     }
     return aResult;
@@ -1217,9 +1219,10 @@ void Model_Document::setCurrentFeature(
 
   if (theVisible && !theCurrent.get()) {
     // needed to avoid disabling of PartSet initial constructions
+    int anIndex = kUNDEFINED_FEATURE_INDEX;
     FeaturePtr aNext =
-      theCurrent.get() ? myObjs->nextFeature(theCurrent) : myObjs->firstFeature();
-    for (; aNext.get(); aNext = myObjs->nextFeature(theCurrent)) {
+      theCurrent.get() ? myObjs->nextFeature(theCurrent, anIndex, false) : myObjs->firstFeature();
+    for (; aNext.get(); aNext = myObjs->nextFeature(theCurrent, anIndex, false)) {
       if (aNext->isInHistory()) {
         break; // next in history is not needed
       } else { // next not in history is good for making current
@@ -1253,7 +1256,8 @@ void Model_Document::setCurrentFeature(
   FeaturePtr anIter = myObjs->lastFeature();
   bool aWasChanged = false;
   bool isCurrentParameter = theCurrent.get() && theCurrent->getKind() == "Parameter";
-  for(; anIter.get(); anIter = myObjs->nextFeature(anIter, true)) {
+  int anIndex = kUNDEFINED_FEATURE_INDEX;
+  for(; anIter.get(); anIter = myObjs->nextFeature(anIter, anIndex, true)) {
     // check this before passed become enabled: the current feature is enabled!
     if (anIter == theCurrent) aPassed = true;
 
@@ -1315,7 +1319,8 @@ void Model_Document::setCurrentFeatureUp()
   // problems if it is true: here and in "setCurrentFeature"
   FeaturePtr aCurrent = currentFeature(false);
   if (aCurrent.get()) { // if not, do nothing because null is the upper
-    FeaturePtr aPrev = myObjs->nextFeature(aCurrent, true);
+    int anIndex = kUNDEFINED_FEATURE_INDEX;
+    FeaturePtr aPrev = myObjs->nextFeature(aCurrent, anIndex, true);
     // make the higher level composite as current (sketch becomes disabled if line is enabled)
     if (aPrev.get()) {
       FeaturePtr aComp = ModelAPI_Tools::compositeOwner(aPrev);
