@@ -211,6 +211,7 @@ ADD_UNIT_TESTS(TestConstants.py
                Test2607.py
                TestBlockRecalculation.py
                TestSelectionScope.py
+               TestSelectorShell.py
                TestWeakNaming2125.py
                TestWeakNaming2222.py
                TestWeakNaming2245.py

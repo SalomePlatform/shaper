@@ -103,31 +103,6 @@ void Selector_Selector::combineGeometrical(const TopoDS_Shape theContext)
     aNewAlgo->solve(theContext);
     delete myAlgo;
     myAlgo = aNewAlgo;
-  } else {
-    // if can not select, select the compound in a custom way
-    TopTools_MapOfShape aMap;
-    TopoDS_ListOfShape aList;
-    for(TopExp_Explorer anExp(theContext, aValue.ShapeType()); anExp.More(); anExp.Next()) {
-      if (aMap.Add(anExp.Current())) {
-        if (myAlgo->sameGeometry(aValue, anExp.Current()))
-          aList.Append(anExp.Current());
-      }
-    }
-    if (aList.Size() > 1) {
-      TopoDS_Builder aBuilder;
-      TopoDS_Compound aCompound;
-      aBuilder.MakeCompound(aCompound);
-      for(TopoDS_ListIteratorOfListOfShape aListIter(aList); aListIter.More(); aListIter.Next()) {
-        aBuilder.Add(aCompound, aListIter.Value());
-      }
-      Selector_Algo* aNewAlgo = Selector_Algo::relesectWithAllGeometry(myAlgo, theContext);
-      if (aNewAlgo) {
-        aNewAlgo->store();
-        aNewAlgo->solve(theContext);
-        delete myAlgo;
-        myAlgo = aNewAlgo;
-      }
-    }
   }
 }
 
