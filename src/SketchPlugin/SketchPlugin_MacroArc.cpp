@@ -373,6 +373,7 @@ void SketchPlugin_MacroArc::execute()
   Events_Loop::loop()->send(aMessage);
 }
 
+// LCOV_EXCL_START
 std::string SketchPlugin_MacroArc::processEvent(const std::shared_ptr<Events_Message>& theMessage)
 {
   std::string aFilledAttributeName;
@@ -450,6 +451,7 @@ std::string SketchPlugin_MacroArc::processEvent(const std::shared_ptr<Events_Mes
   }
   return aFilledAttributeName;
 }
+// LCOV_EXCL_STOP
 
 FeaturePtr SketchPlugin_MacroArc::createArcFeature()
 {

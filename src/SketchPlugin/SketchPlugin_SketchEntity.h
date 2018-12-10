@@ -112,6 +112,7 @@ class SketchPlugin_SketchEntity : public SketchPlugin_Feature, public GeomAPI_IC
     return false;
   }
 
+// LCOV_EXCL_START
   /// Customize presentation of the feature
   virtual bool customisePresentation(ResultPtr theResult, AISObjectPtr thePrs,
                                      std::shared_ptr<GeomAPI_ICustomPrs> theDefaultPrs)
@@ -192,6 +193,7 @@ class SketchPlugin_SketchEntity : public SketchPlugin_Feature, public GeomAPI_IC
     }
     return isCustomized;
   }
+// LCOV_EXCL_STOP
 
 protected:
   /// initializes mySketch

@@ -119,6 +119,7 @@ void SketchPlugin_MacroCircle::execute()
   Events_Loop::loop()->send(aMessage);
 }
 
+// LCOV_EXCL_START
 std::string SketchPlugin_MacroCircle::processEvent(
                                               const std::shared_ptr<Events_Message>& theMessage)
 {
@@ -180,6 +181,7 @@ std::string SketchPlugin_MacroCircle::processEvent(
   }
   return aFilledAttributeName;
 }
+// LCOV_EXCL_STOP
 
 void SketchPlugin_MacroCircle::constraintsForCircleByCenterAndPassed(FeaturePtr theCircleFeature)
 {

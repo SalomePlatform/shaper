@@ -421,6 +421,7 @@ void SketchPlugin_Split::execute()
 #endif
 }
 
+// LCOV_EXCL_START
 std::string SketchPlugin_Split::processEvent(const std::shared_ptr<Events_Message>& theMessage)
 {
 #ifdef DEBUG_SPLIT
@@ -484,6 +485,7 @@ std::string SketchPlugin_Split::processEvent(const std::shared_ptr<Events_Messag
   }
   return aFilledAttributeName;
 }
+// LCOV_EXCL_STOP
 
 AISObjectPtr SketchPlugin_Split::getAISObject(AISObjectPtr thePrevious)
 {

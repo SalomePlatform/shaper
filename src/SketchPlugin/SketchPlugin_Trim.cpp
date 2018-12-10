@@ -478,6 +478,7 @@ void SketchPlugin_Trim::execute()
 #endif
 }
 
+// LCOV_EXCL_START
 std::string SketchPlugin_Trim::processEvent(const std::shared_ptr<Events_Message>& theMessage)
 {
 #ifdef DEBUG_TRIM_METHODS
@@ -529,6 +530,7 @@ std::string SketchPlugin_Trim::processEvent(const std::shared_ptr<Events_Message
   }
   return aFilledAttributeName;
 }
+// LCOV_EXCL_STOP
 
 bool SketchPlugin_Trim::setCoincidenceToAttribute(const AttributePtr& theAttribute,
                                 const std::set<AttributePoint2DPtr>& theFurtherCoincidences,

@@ -92,6 +92,7 @@ void SketchPlugin_Line::execute()
   }
 }
 
+// LCOV_EXCL_START
 std::string SketchPlugin_Line::processEvent(const std::shared_ptr<Events_Message>& theMessage)
 {
   std::string aFilledAttributeName;
@@ -113,6 +114,7 @@ std::string SketchPlugin_Line::processEvent(const std::shared_ptr<Events_Message
   }
   return aFilledAttributeName;
 }
+// LCOV_EXCL_STOP
 
 double SketchPlugin_Line::distanceToPoint(const std::shared_ptr<GeomAPI_Pnt2d>& thePoint)
 {

@@ -252,6 +252,7 @@ FeaturePtr SketchPlugin_Plugin::createFeature(std::string theFeatureID)
   return FeaturePtr();
 }
 
+// LCOV_EXCL_START
 void SketchPlugin_Plugin::processEvent(const std::shared_ptr<Events_Message>& theMessage)
 {
   const Events_ID kRequestEvent =
@@ -321,3 +322,4 @@ std::shared_ptr<ModelAPI_FeatureStateMessage> SketchPlugin_Plugin
   }
   return aMsg;
 }
+// LCOV_EXCL_STOP
