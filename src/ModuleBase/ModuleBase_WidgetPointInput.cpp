@@ -224,7 +224,7 @@ bool ModuleBase_WidgetPointInput
 {
   if (theValues.size() == 1) {
     GeomShapePtr aShape = theValues.first()->shape();
-    if (aShape->isVertex()) {
+    if (aShape.get() && aShape->isVertex()) {
       GeomVertexPtr aVertex(new GeomAPI_Vertex(aShape));
       GeomPointPtr aPnt = aVertex->point();
       myXSpin->setValue(aPnt->x());
