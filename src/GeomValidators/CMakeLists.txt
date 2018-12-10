@@ -28,7 +28,6 @@ SET(PROJECT_HEADERS
     GeomValidators_Face.h
     GeomValidators_FeatureKind.h
     GeomValidators_Finite.h
-    GeomValidators_PartitionArguments.h
     GeomValidators_Plugin.h
     GeomValidators_Positive.h
     GeomValidators_ShapeType.h
@@ -48,7 +47,6 @@ SET(PROJECT_SOURCES
     GeomValidators_Face.cpp
     GeomValidators_FeatureKind.cpp
     GeomValidators_Finite.cpp
-    GeomValidators_PartitionArguments.cpp
     GeomValidators_Plugin.cpp
     GeomValidators_Positive.cpp
     GeomValidators_ShapeType.cpp

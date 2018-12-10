@@ -26,7 +26,6 @@
 #include <GeomValidators_DifferentShapes.h>
 #include <GeomValidators_Face.h>
 #include <GeomValidators_Finite.h>
-#include <GeomValidators_PartitionArguments.h>
 #include <GeomValidators_ShapeType.h>
 #include <GeomValidators_ZeroOffset.h>
 #include <GeomValidators_FeatureKind.h>
@@ -54,8 +53,6 @@ GeomValidators_Plugin::GeomValidators_Plugin()
                               new GeomValidators_DifferentShapes);
   aFactory->registerValidator("GeomValidators_Face", new GeomValidators_Face);
   aFactory->registerValidator("GeomValidators_Finite", new GeomValidators_Finite);
-  aFactory->registerValidator("GeomValidators_PartitionArguments",
-                              new GeomValidators_PartitionArguments);
   aFactory->registerValidator("GeomValidators_ShapeType", new GeomValidators_ShapeType);
   aFactory->registerValidator("GeomValidators_ZeroOffset", new GeomValidators_ZeroOffset);
   aFactory->registerValidator("GeomValidators_FeatureKind", new GeomValidators_FeatureKind);
