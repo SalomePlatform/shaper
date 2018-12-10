@@ -26,6 +26,7 @@
 #include <GeomAPI_PlanarEdges.h>
 #include <GeomAPI_Pln.h>
 #include <GeomAPI_ShapeExplorer.h>
+#include <GeomAPI_ShapeIterator.h>
 
 #include <GeomAlgoAPI_CompoundBuilder.h>
 #include <GeomAlgoAPI_PaveFiller.h>
@@ -34,8 +35,7 @@
 #include <GeomAlgoAPI_SketchBuilder.h>
 #include <GeomAlgoAPI_WireBuilder.h>
 #include <GeomAlgoAPI_MakeVolume.h>
-#include <GeomAPI_ShapeIterator.h>
-#include <GeomAPI_ShapeExplorer.h>
+#include <GeomAlgoAPI_Tools.h>
 
 #include <GeomValidators_FeatureKind.h>
 #include <GeomValidators_ShapeType.h>
@@ -292,16 +292,9 @@ bool BuildPlugin_ValidatorBaseForSolids::isValid(
   std::shared_ptr<GeomAlgoAPI_MakeVolume> anAlgorithm(
     new GeomAlgoAPI_MakeVolume(anOriginalShapes, false));
 
-  if (!anAlgorithm->isDone()) {
-    theError = "MakeVolume algorithm failed.";
-    return false;
-  }
-  if (anAlgorithm->shape()->isNull()) {
-    theError = "Resulting shape of MakeVolume is Null.";
-    return false;
-  }
-  if (!anAlgorithm->isValid()) {
-    theError = "Resulting shape of MakeVolume is not valid.";
+  std::string anErr;
+  if (GeomAlgoAPI_Tools::AlgoError::isAlgorithmFailed(anAlgorithm, "MakeVolume", anErr)) {
+    theError = anErr;
     return false;
   }
 

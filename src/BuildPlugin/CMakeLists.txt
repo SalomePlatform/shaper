@@ -113,8 +113,10 @@ ADD_UNIT_TESTS(TestVertex.py
                TestPolyline.py
                TestInterpolation.py
                TestFace.py
+               TestFace_ErrorMsg.py
                TestShell.py
                TestSolid.py
+               TestSolid_ErrorMsg.py
                TestCompSolid.py
                TestCompound.py
                TestCompound_ErrorMsg.py
