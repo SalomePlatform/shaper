@@ -30,6 +30,8 @@
 #include <GeomAlgoAPI_CompoundBuilder.h>
 #include <GeomAlgoAPI_Pipe.h>
 #include <GeomAlgoAPI_ShapeTools.h>
+#include <GeomAlgoAPI_Tools.h>
+
 #include <GeomAPI_PlanarEdges.h>
 #include <GeomAPI_ShapeExplorer.h>
 
@@ -222,6 +224,7 @@ void FeaturesPlugin_Pipe::execute()
 
   // Generating result for each object.
   int aResultIndex = 0;
+  std::string anError;
   if(aCreationMethod == CREATION_METHOD_SIMPLE() ||
       aCreationMethod == CREATION_METHOD_BINORMAL()) {
     for(ListOfShape::const_iterator
@@ -235,20 +238,8 @@ void FeaturesPlugin_Pipe::execute()
                                                                            aPathShape,
                                                                            aBiNormal));
 
-      if(!aPipeAlgo->isDone()) {
-        setError("Error: Pipe algorithm failed.");
-        aResultIndex = 0;
-        break;
-      }
-
-      // Check if shape is valid
-      if(!aPipeAlgo->shape().get() || aPipeAlgo->shape()->isNull()) {
-        setError("Error: Resulting shape is Null.");
-        aResultIndex = 0;
-        break;
-      }
-      if(!aPipeAlgo->isValid()) {
-        setError("Error: Resulting shape is not valid.");
+      if (GeomAlgoAPI_Tools::AlgoError::isAlgorithmFailed(aPipeAlgo, getKind(), anError)) {
+        setError(anError);
         aResultIndex = 0;
         break;
       }
@@ -260,20 +251,8 @@ void FeaturesPlugin_Pipe::execute()
                                                                      aLocations,
                                                                      aPathShape));
 
-    if(!aPipeAlgo->isDone()) {
-      setError("Error: Pipe algorithm failed.");
-      removeResults(0);
-      return;
-    }
-
-    // Check if shape is valid
-    if(!aPipeAlgo->shape().get() || aPipeAlgo->shape()->isNull()) {
-      setError("Error: Resulting shape is Null.");
-      removeResults(0);
-      return;
-    }
-    if(!aPipeAlgo->isValid()) {
-      setError("Error: Resulting shape is not valid.");
+    if (GeomAlgoAPI_Tools::AlgoError::isAlgorithmFailed(aPipeAlgo, getKind(), anError)) {
+      setError(anError);
       removeResults(0);
       return;
     }

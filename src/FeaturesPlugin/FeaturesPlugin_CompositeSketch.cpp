@@ -84,11 +84,12 @@ int FeaturesPlugin_CompositeSketch::numberOfSubs(bool forTree) const
 std::shared_ptr<ModelAPI_Feature> FeaturesPlugin_CompositeSketch::subFeature(const int theIndex,
                                                                              bool forTree)
 {
+  FeaturePtr aSubFeature;
   if(theIndex == 0) {
-    return std::dynamic_pointer_cast<ModelAPI_Feature>(data()->reference(SKETCH_ID())->value());
+    aSubFeature =
+        std::dynamic_pointer_cast<ModelAPI_Feature>(data()->reference(SKETCH_ID())->value());
   }
-
-  return std::shared_ptr<ModelAPI_Feature>();
+  return aSubFeature;
 }
 
 //=================================================================================================
@@ -108,14 +109,14 @@ int FeaturesPlugin_CompositeSketch::subFeatureId(const int theIndex) const
 //=================================================================================================
 bool FeaturesPlugin_CompositeSketch::isSub(ObjectPtr theObject) const
 {
+  bool isSubFeature = false;
   // Check is this feature of result
   FeaturePtr aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(theObject);
-  if(!aFeature.get()) {
-    return false;
+  if (aFeature.get()) {
+    ObjectPtr aSub = data()->reference(SKETCH_ID())->value();
+    isSubFeature = aSub == theObject;
   }
-
-  ObjectPtr aSub = data()->reference(SKETCH_ID())->value();
-  return aSub == theObject;
+  return isSubFeature;
 }
 
 //=================================================================================================
@@ -233,31 +234,6 @@ void FeaturesPlugin_CompositeSketch::getBaseShapes(ListOfShape& theBaseShapesLis
     theBaseShapesList.insert(theBaseShapesList.end(), aBaseFacesList.begin(),
                              aBaseFacesList.end());
   }
-}
-
-//=================================================================================================
-bool FeaturesPlugin_CompositeSketch::isMakeShapeValid(
-  const std::shared_ptr<GeomAlgoAPI_MakeShape> theMakeShape)
-{
-  // Check that algo is done.
-  if(!theMakeShape->isDone()) {
-    setError("Error: " + getKind() + " algorithm failed.");
-    return false;
-  }
-
-  // Check if shape is not null.
-  if(!theMakeShape->shape().get() || theMakeShape->shape()->isNull()) {
-    setError("Error: Resulting shape is null.");
-    return false;
-  }
-
-  // Check that resulting shape is valid.
-  if(!theMakeShape->isValid()) {
-    setError("Error: Resulting shape is not valid.");
-    return false;
-  }
-
-  return true;
 }
 
 //=================================================================================================

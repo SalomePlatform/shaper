@@ -8,6 +8,7 @@
 
 #include <GeomAlgoAPI_CompoundBuilder.h>
 #include <GeomAlgoAPI_ShapeTools.h>
+#include <GeomAlgoAPI_Tools.h>
 #include <GeomAlgoAPI_Translation.h>
 
 #include <GeomAPI_ShapeExplorer.h>
@@ -172,6 +173,7 @@ void FeaturesPlugin_MultiRotation::performRotation1D()
         aResultIndex++;
       }
     } else {
+      std::string anError;
       ListOfShape aListOfShape;
       std::list<std::shared_ptr<GeomAlgoAPI_Rotation> > aListOfRotationAlgo;
 
@@ -187,19 +189,8 @@ void FeaturesPlugin_MultiRotation::performRotation1D()
         aRotationnAlgo->build();
 
         // Checking that the algorithm worked properly.
-        if (!aRotationnAlgo->isDone()) {
-          static const std::string aFeatureError = "Error : Multitranslation algorithm failed.";
-          setError(aFeatureError);
-          break;
-        }
-        if (aRotationnAlgo->shape()->isNull()) {
-          static const std::string aShapeError = "Error : Resulting shape is null.";
-          setError(aShapeError);
-          break;
-        }
-        if (!aRotationnAlgo->isValid()) {
-          static const std::string aFeatureError = "Error : Resulting shape in not valid.";
-          setError(aFeatureError);
+        if (GeomAlgoAPI_Tools::AlgoError::isAlgorithmFailed(aRotationnAlgo, getKind(), anError)) {
+          setError(anError);
           break;
         }
         aListOfShape.push_back(aRotationnAlgo->shape());

@@ -25,6 +25,7 @@
 #include <GeomAlgoAPI_FaceBuilder.h>
 #include <GeomAlgoAPI_Copy.h>
 #include <GeomAlgoAPI_MakeShapeList.h>
+#include <GeomAlgoAPI_Tools.h>
 
 #include <GeomAPI_Edge.h>
 #include <GeomAPI_Face.h>
@@ -134,6 +135,7 @@ void FeaturesPlugin_Symmetry::performSymmetryByPoint()
   }
 
   // Moving each object.
+  std::string anError;
   int aResultIndex = 0;
   std::list<ResultPtr>::iterator aContext = aContextes.begin();
   for(ListOfShape::iterator anObjectsIt = anObjects.begin(); anObjectsIt != anObjects.end();
@@ -160,19 +162,8 @@ void FeaturesPlugin_Symmetry::performSymmetryByPoint()
       aSymmetryAlgo->build();
 
       // Checking that the algorithm worked properly.
-      if(!aSymmetryAlgo->isDone()) {
-        static const std::string aFeatureError = "Error: Symmetry algorithm failed.";
-        setError(aFeatureError);
-        break;
-      }
-      if(aSymmetryAlgo->shape()->isNull()) {
-        static const std::string aShapeError = "Error: Resulting shape is Null.";
-        setError(aShapeError);
-        break;
-      }
-      if(!aSymmetryAlgo->isValid()) {
-        std::string aFeatureError = "Error: Resulting shape is not valid.";
-        setError(aFeatureError);
+      if (GeomAlgoAPI_Tools::AlgoError::isAlgorithmFailed(aSymmetryAlgo, getKind(), anError)) {
+        setError(anError);
         break;
       }
 
@@ -230,6 +221,7 @@ void FeaturesPlugin_Symmetry::performSymmetryByAxis()
 
 
   // Moving each object.
+  std::string anError;
   int aResultIndex = 0;
   std::list<ResultPtr>::iterator aContext = aContextes.begin();
   for(ListOfShape::iterator anObjectsIt = anObjects.begin(); anObjectsIt != anObjects.end();
@@ -256,19 +248,8 @@ void FeaturesPlugin_Symmetry::performSymmetryByAxis()
       aSymmetryAlgo->build();
 
       // Checking that the algorithm worked properly.
-      if(!aSymmetryAlgo->isDone()) {
-        static const std::string aFeatureError = "Error: Symmetry algorithm failed.";
-        setError(aFeatureError);
-        break;
-      }
-      if(aSymmetryAlgo->shape()->isNull()) {
-        static const std::string aShapeError = "Error: Resulting shape is Null.";
-        setError(aShapeError);
-        break;
-      }
-      if(!aSymmetryAlgo->isValid()) {
-        std::string aFeatureError = "Error: Resulting shape is not valid.";
-        setError(aFeatureError);
+      if (GeomAlgoAPI_Tools::AlgoError::isAlgorithmFailed(aSymmetryAlgo, getKind(), anError)) {
+        setError(anError);
         break;
       }
 
@@ -326,6 +307,7 @@ void FeaturesPlugin_Symmetry::performSymmetryByPlane()
 
 
   // Moving each object.
+  std::string anError;
   int aResultIndex = 0;
   std::list<ResultPtr>::iterator aContext = aContextes.begin();
   for(ListOfShape::iterator anObjectsIt = anObjects.begin(); anObjectsIt != anObjects.end();
@@ -351,19 +333,8 @@ void FeaturesPlugin_Symmetry::performSymmetryByPlane()
       aSymmetryAlgo->build();
 
       // Checking that the algorithm worked properly.
-      if(!aSymmetryAlgo->isDone()) {
-        static const std::string aFeatureError = "Error: Symmetry algorithm failed.";
-        setError(aFeatureError);
-        break;
-      }
-      if(aSymmetryAlgo->shape()->isNull()) {
-        static const std::string aShapeError = "Error: Resulting shape is Null.";
-        setError(aShapeError);
-        break;
-      }
-      if(!aSymmetryAlgo->isValid()) {
-        std::string aFeatureError = "Error: Resulting shape is not valid.";
-        setError(aFeatureError);
+      if (GeomAlgoAPI_Tools::AlgoError::isAlgorithmFailed(aSymmetryAlgo, getKind(), anError)) {
+        setError(anError);
         break;
       }
 

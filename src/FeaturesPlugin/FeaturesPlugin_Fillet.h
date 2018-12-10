@@ -106,9 +106,6 @@ public:
   FeaturesPlugin_Fillet();
 
 private:
-  /// Check algorithm is finished correctly and store error otherwise
-  bool isFailed(const std::shared_ptr<GeomAlgoAPI_MakeShape>& theAlgorithm);
-
   /// Load Naming data structure of the feature to the document
   void loadNamingDS(std::shared_ptr<ModelAPI_ResultBody> theResultBody,
                     const std::shared_ptr<GeomAPI_Shape> theBaseShape,

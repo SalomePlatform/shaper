@@ -23,6 +23,7 @@
 #include <GeomAlgoAPI_Boolean.h>
 #include <GeomAlgoAPI_MakeShapeList.h>
 #include <GeomAlgoAPI_PaveFiller.h>
+#include <GeomAlgoAPI_Tools.h>
 #include <GeomAlgoAPI_UnifySameDomain.h>
 
 #include <GeomAPI_ShapeExplorer.h>
@@ -109,6 +110,7 @@ void FeaturesPlugin_Union::execute()
   }
 
   // Fuse objects.
+  std::string anError;
   std::shared_ptr<GeomAlgoAPI_MakeShape> anAlgo;
   ListOfShape aTools;
   if (anObjects.front()->shapeType() == GeomAPI_Shape::SOLID) {
@@ -123,16 +125,8 @@ void FeaturesPlugin_Union::execute()
   // Checking that the algorithm worked properly.
   std::shared_ptr<GeomAlgoAPI_MakeShapeList> aMakeShapeList(new GeomAlgoAPI_MakeShapeList());
   GeomAPI_DataMapOfShapeShape aMapOfShapes;
-  if(!anAlgo->isDone()) {
-    setError("Error: Boolean algorithm failed.");
-    return;
-  }
-  if(anAlgo->shape()->isNull()) {
-    setError("Error: Resulting shape is Null.");
-    return;
-  }
-  if(!anAlgo->isValid()) {
-    setError("Error: Resulting shape is not valid.");
+  if (GeomAlgoAPI_Tools::AlgoError::isAlgorithmFailed(anAlgo, getKind(), anError)) {
+    setError(anError);
     return;
   }
 
@@ -149,16 +143,8 @@ void FeaturesPlugin_Union::execute()
     aShapesToAdd.push_back(aShape);
     std::shared_ptr<GeomAlgoAPI_PaveFiller> aFillerAlgo(
       new GeomAlgoAPI_PaveFiller(aShapesToAdd, true));
-    if(!aFillerAlgo->isDone()) {
-      setError("Error: PaveFiller algorithm failed.");
-      return;
-    }
-    if(aFillerAlgo->shape()->isNull()) {
-      setError("Error: Resulting shape is Null.");
-      return;
-    }
-    if(!aFillerAlgo->isValid()) {
-      setError("Error: Resulting shape is not valid.");
+    if (GeomAlgoAPI_Tools::AlgoError::isAlgorithmFailed(aFillerAlgo, getKind(), anError)) {
+      setError(anError);
       return;
     }
 

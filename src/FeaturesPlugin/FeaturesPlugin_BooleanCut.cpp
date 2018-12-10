@@ -31,6 +31,8 @@
 #include <GeomAlgoAPI_MakeShapeList.h>
 #include <GeomAlgoAPI_PaveFiller.h>
 #include <GeomAlgoAPI_ShapeTools.h>
+#include <GeomAlgoAPI_Tools.h>
+
 #include <GeomAPI_ShapeExplorer.h>
 #include <GeomAPI_ShapeIterator.h>
 
@@ -103,6 +105,7 @@ void FeaturesPlugin_BooleanCut::execute()
 
   std::vector<FeaturesPlugin_Tools::ResultBaseAlgo> aResultBaseAlgoList;
   ListOfShape aResultShapesList;
+  std::string anError;
 
   // For solids cut each object with all tools.
   for(ListOfShape::iterator anObjectsIt = anObjects.begin();
@@ -117,19 +120,8 @@ void FeaturesPlugin_BooleanCut::execute()
     GeomShapePtr aResShape = aCutAlgo->shape();
 
     // Checking that the algorithm worked properly.
-    if (!aCutAlgo->isDone()) {
-      static const std::string aFeatureError = "Error: Boolean algorithm failed.";
-      setError(aFeatureError);
-      return;
-    }
-    if(aResShape->isNull()) {
-      static const std::string aShapeError = "Error: Resulting shape is Null.";
-      setError(aShapeError);
-      return;
-    }
-    if (!aCutAlgo->isValid()) {
-      std::string aFeatureError = "Error: Resulting shape is not valid.";
-      setError(aFeatureError);
+    if (GeomAlgoAPI_Tools::AlgoError::isAlgorithmFailed(aCutAlgo, getKind(), anError)) {
+      setError(anError);
       return;
     }
 
@@ -192,19 +184,8 @@ void FeaturesPlugin_BooleanCut::execute()
                               GeomAlgoAPI_Boolean::BOOL_CUT));
 
     // Checking that the algorithm worked properly.
-    if (!aCutAlgo->isDone()) {
-      static const std::string aFeatureError = "Error: Boolean algorithm failed.";
-      setError(aFeatureError);
-      return;
-    }
-    if (aCutAlgo->shape()->isNull()) {
-      static const std::string aShapeError = "Error: Resulting shape is Null.";
-      setError(aShapeError);
-      return;
-    }
-    if (!aCutAlgo->isValid()) {
-      std::string aFeatureError = "Error: Resulting shape is not valid.";
-      setError(aFeatureError);
+    if (GeomAlgoAPI_Tools::AlgoError::isAlgorithmFailed(aCutAlgo, getKind(), anError)) {
+      setError(anError);
       return;
     }
 
@@ -284,19 +265,8 @@ void FeaturesPlugin_BooleanCut::execute()
                               GeomAlgoAPI_Boolean::BOOL_CUT));
 
     // Checking that the algorithm worked properly.
-    if (!aCutAlgo->isDone()) {
-      static const std::string aFeatureError = "Error: Boolean algorithm failed.";
-      setError(aFeatureError);
-      return;
-    }
-    if (aCutAlgo->shape()->isNull()) {
-      static const std::string aShapeError = "Error: Resulting shape is Null.";
-      setError(aShapeError);
-      return;
-    }
-    if (!aCutAlgo->isValid()) {
-      std::string aFeatureError = "Error: Resulting shape is not valid.";
-      setError(aFeatureError);
+    if (GeomAlgoAPI_Tools::AlgoError::isAlgorithmFailed(aCutAlgo, getKind(), anError)) {
+      setError(anError);
       return;
     }
 

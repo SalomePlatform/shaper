@@ -36,6 +36,7 @@
 #include <GeomAPI_ShapeExplorer.h>
 #include <GeomAlgoAPI_PaveFiller.h>
 #include <GeomAlgoAPI_CompoundBuilder.h>
+#include <GeomAlgoAPI_Tools.h>
 
 
 //==================================================================================================
@@ -128,6 +129,7 @@ void FeaturesPlugin_BooleanCommon::execute()
   }
 
   int aResultIndex = 0;
+  std::string anError;
   std::shared_ptr<GeomAlgoAPI_MakeShapeList> aMakeShapeList(new GeomAlgoAPI_MakeShapeList());
   std::vector<FeaturesPlugin_Tools::ResultBaseAlgo> aResultBaseAlgoList;
   ListOfShape aResultShapesList;
@@ -142,19 +144,8 @@ void FeaturesPlugin_BooleanCommon::execute()
                                 *anObjectsIt,
                                 GeomAlgoAPI_Boolean::BOOL_COMMON));
 
-      if (!aCommonAlgo->isDone()) {
-        std::string aFeatureError = "Error: An algorithm failed.";
-        setError(aFeatureError);
-        return;
-      }
-      if (aCommonAlgo->shape()->isNull()) {
-        static const std::string aShapeError = "Error: Resulting shape is Null.";
-        setError(aShapeError);
-        return;
-      }
-      if (!aCommonAlgo->isValid()) {
-        std::string aFeatureError = "Error: Resulting shape is not valid.";
-        setError(aFeatureError);
+      if (GeomAlgoAPI_Tools::AlgoError::isAlgorithmFailed(aCommonAlgo, getKind(), anError)) {
+        setError(anError);
         return;
       }
 
@@ -220,19 +211,8 @@ void FeaturesPlugin_BooleanCommon::execute()
       aResShape = aBoolAlgo->shape();
 
       // Checking that the algorithm worked properly.
-      if (!aBoolAlgo->isDone()) {
-        static const std::string aFeatureError = "Error: Boolean algorithm failed.";
-        setError(aFeatureError);
-        return;
-      }
-      if (aResShape->isNull()) {
-        static const std::string aShapeError = "Error: Resulting shape is Null.";
-        setError(aShapeError);
-        return;
-      }
-      if (!aBoolAlgo->isValid()) {
-        std::string aFeatureError = "Error: Resulting shape is not valid.";
-        setError(aFeatureError);
+      if (GeomAlgoAPI_Tools::AlgoError::isAlgorithmFailed(aBoolAlgo, getKind(), anError)) {
+        setError(anError);
         return;
       }
 
@@ -294,19 +274,8 @@ void FeaturesPlugin_BooleanCommon::execute()
           GeomAlgoAPI_Boolean::BOOL_COMMON));
 
       // Checking that the algorithm worked properly.
-      if (!aCommonAlgo->isDone()) {
-        static const std::string aFeatureError = "Error: Boolean algorithm failed.";
-        setError(aFeatureError);
-        return;
-      }
-      if (aCommonAlgo->shape()->isNull()) {
-        static const std::string aShapeError = "Error: Resulting shape is Null.";
-        setError(aShapeError);
-        return;
-      }
-      if (!aCommonAlgo->isValid()) {
-        std::string aFeatureError = "Error: Resulting shape is not valid.";
-        setError(aFeatureError);
+      if (GeomAlgoAPI_Tools::AlgoError::isAlgorithmFailed(aCommonAlgo, getKind(), anError)) {
+        setError(anError);
         return;
       }
 
@@ -386,19 +355,8 @@ void FeaturesPlugin_BooleanCommon::execute()
           GeomAlgoAPI_Boolean::BOOL_COMMON));
 
       // Checking that the algorithm worked properly.
-      if (!aCommonAlgo->isDone()) {
-        static const std::string aFeatureError = "Error: Boolean algorithm failed.";
-        setError(aFeatureError);
-        return;
-      }
-      if (aCommonAlgo->shape()->isNull()) {
-        static const std::string aShapeError = "Error: Resulting shape is Null.";
-        setError(aShapeError);
-        return;
-      }
-      if (!aCommonAlgo->isValid()) {
-        std::string aFeatureError = "Error: Resulting shape is not valid.";
-        setError(aFeatureError);
+      if (GeomAlgoAPI_Tools::AlgoError::isAlgorithmFailed(aCommonAlgo, getKind(), anError)) {
+        setError(anError);
         return;
       }
 

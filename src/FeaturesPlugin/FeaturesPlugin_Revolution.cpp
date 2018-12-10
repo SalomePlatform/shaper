@@ -27,6 +27,7 @@
 #include <ModelAPI_Validator.h>
 
 #include <GeomAlgoAPI_Revolution.h>
+#include <GeomAlgoAPI_Tools.h>
 
 #include <GeomAPI_Edge.h>
 #include <GeomAPI_Lin.h>
@@ -177,6 +178,7 @@ bool FeaturesPlugin_Revolution::makeRevolutions(ListOfShape& theBaseShapes,
   }
 
   // Generating result for each base shape.
+  std::string anError;
   for(ListOfShape::const_iterator
       anIter = theBaseShapes.cbegin(); anIter != theBaseShapes.cend(); anIter++) {
     GeomShapePtr aBaseShape = *anIter;
@@ -185,7 +187,8 @@ bool FeaturesPlugin_Revolution::makeRevolutions(ListOfShape& theBaseShapes,
                                                        aBaseShape, anAxis,
                                                        aToShape, aToAngle,
                                                        aFromShape, aFromAngle));
-    if(!isMakeShapeValid(aRevolAlgo)) {
+    if (GeomAlgoAPI_Tools::AlgoError::isAlgorithmFailed(aRevolAlgo, getKind(), anError)) {
+      setError(anError);
       return false;
     }
 

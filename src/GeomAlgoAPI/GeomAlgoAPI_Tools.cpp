@@ -19,6 +19,7 @@
 //
 
 #include "GeomAlgoAPI_Tools.h"
+#include "GeomAlgoAPI_MakeShape.h"
 
 #include <clocale>
 
@@ -57,4 +58,33 @@ std::string File_Tools::name(const std::string& theFileName)
   TCollection_AsciiString aFileName(theFileName.c_str());
   OSD_Path aPath(aFileName);
   return aPath.Name().ToCString();
+}
+
+bool AlgoError::isAlgorithmFailed(const GeomMakeShapePtr& theAlgorithm,
+                                  const std::string& theFeature,
+                                  std::string& theError)
+{
+  theError.clear();
+  if (!theAlgorithm->isDone()) {
+    theError = "Error: " + (theFeature.empty() ? "The" : theFeature) + " algorithm failed.";
+    std::string anAlgoError = theAlgorithm->getError();
+    if (!anAlgoError.empty())
+      theError += " " + anAlgoError;
+    return true;
+  }
+  if (!theAlgorithm->shape() || theAlgorithm->shape()->isNull()) {
+    theError = "Error: Resulting shape";
+    if (!theFeature.empty())
+      theError += "of " + theFeature;
+    theError += " is Null.";
+    return true;
+  }
+  if (!theAlgorithm->isValid()) {
+    theError = "Error: Resulting shape";
+    if (!theFeature.empty())
+      theError += "of " + theFeature;
+    theError += " is not valid.";
+    return true;
+  }
+  return false;
 }

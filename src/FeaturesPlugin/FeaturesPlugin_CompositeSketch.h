@@ -83,9 +83,6 @@ protected:
   /// \param[in] theIsMakeShells if true make shells from faces with shared edges.
   void getBaseShapes(ListOfShape& theBaseShapesList, const bool theIsMakeShells = true);
 
-  /// Checks make shape algo.
-  bool isMakeShapeValid(const std::shared_ptr<GeomAlgoAPI_MakeShape> theMakeShape);
-
   /// Stores result of generation.
   void storeResult(const GeomShapePtr theBaseShape,
                    const std::shared_ptr<GeomAlgoAPI_MakeShape> theMakeShape,

@@ -21,6 +21,7 @@
 #include <FeaturesPlugin_MultiTranslation.h>
 
 #include <GeomAlgoAPI_CompoundBuilder.h>
+#include <GeomAlgoAPI_Tools.h>
 
 #include <GeomAPI_Ax1.h>
 #include <GeomAPI_Edge.h>
@@ -173,6 +174,7 @@ void FeaturesPlugin_MultiTranslation::performOneDirection()
         aResultIndex++;
       }
     } else {
+      std::string anError;
       ListOfShape aListOfShape;
       std::list<std::shared_ptr<GeomAlgoAPI_Translation> > aListOfTranslationAlgo;
 
@@ -188,19 +190,8 @@ void FeaturesPlugin_MultiTranslation::performOneDirection()
         aTranslationAlgo->build();
 
         // Checking that the algorithm worked properly.
-        if (!aTranslationAlgo->isDone()) {
-          static const std::string aFeatureError = "Error : Multitranslation algorithm failed.";
-          setError(aFeatureError);
-          break;
-        }
-        if (aTranslationAlgo->shape()->isNull()) {
-          static const std::string aShapeError = "Error : Resulting shape is null.";
-          setError(aShapeError);
-          break;
-        }
-        if (!aTranslationAlgo->isValid()) {
-          static const std::string aFeatureError = "Error : Resulting shape in not valid.";
-          setError(aFeatureError);
+        if (GeomAlgoAPI_Tools::AlgoError::isAlgorithmFailed(aTranslationAlgo, getKind(), anError)) {
+          setError(anError);
           break;
         }
         aListOfShape.push_back(aTranslationAlgo->shape());
@@ -380,6 +371,7 @@ void FeaturesPlugin_MultiTranslation::performTwoDirection()
         }
       }
     } else {
+      std::string anError;
       ListOfShape aListOfShape;
       std::list<std::shared_ptr<GeomAlgoAPI_Translation> > aListOfTranslationAlgo;
 
@@ -399,20 +391,9 @@ void FeaturesPlugin_MultiTranslation::performTwoDirection()
           aTranslationAlgo->build();
 
           // Checking that the algorithm worked properly.
-          if (!aTranslationAlgo->isDone()) {
-            static const std::string aFeatureError = "Error : Multitranslation algorithm failed.";
-            setError(aFeatureError);
+          if (GeomAlgoAPI_Tools::AlgoError::isAlgorithmFailed(aTranslationAlgo, getKind(), anError)) {
+            setError(anError);
             break;
-          }
-          if (aTranslationAlgo->shape()->isNull()) {
-            static const std::string aShapeError = "Error : Resulting shape is null.";
-            setError(aShapeError);
-            break;
-          }
-          if (!aTranslationAlgo->isValid()) {
-            static const std::string aFeatureError = "Error : Resulting shape in not valid.";
-            setError(aFeatureError);
-           break;
           }
           aListOfShape.push_back(aTranslationAlgo->shape());
           aListOfTranslationAlgo.push_back(aTranslationAlgo);

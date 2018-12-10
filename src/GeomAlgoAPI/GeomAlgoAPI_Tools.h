@@ -23,7 +23,10 @@
 
 #include <GeomAlgoAPI.h>
 
+#include <memory>
 #include <string>
+
+class GeomAlgoAPI_MakeShape;
 
 namespace GeomAlgoAPI_Tools {
 
@@ -54,6 +57,24 @@ public:
    * Returns a name of theFileName
    */
   GEOMALGOAPI_EXPORT static std::string name(const std::string& theFileName);
+};
+
+/** \class AlgoError
+ *  \ingroup DataAlgo
+ *  \brief Verify error in MakeShape algorithm.
+ */
+class AlgoError {
+public:
+  /** \brief Verify MakeShape algorithm for failures
+   *  \param[in]  theAlgorithm object to verify the failure
+   *  \param[in]  theFeature   kind of the feature, the algorithm belongs to
+   *  \param[out] theError     error string (empty if the feature succeed)
+   *  \return \c true if succeed
+   */
+  GEOMALGOAPI_EXPORT static bool isAlgorithmFailed(
+      const std::shared_ptr<GeomAlgoAPI_MakeShape>& theAlgorithm,
+      const std::string& theFeature,
+      std::string& theError);
 };
 
 } // GeomAlgoAPI_Tools

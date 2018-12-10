@@ -27,6 +27,7 @@
 #include <ModelAPI_AttributeSelectionList.h>
 
 #include <GeomAlgoAPI_Intersection.h>
+#include <GeomAlgoAPI_Tools.h>
 #include <GeomAPI_ShapeExplorer.h>
 
 #include <sstream>
@@ -71,19 +72,9 @@ void FeaturesPlugin_Intersection::execute()
   GeomMakeShapePtr anIntersectionAlgo(new GeomAlgoAPI_Intersection(anObjects));
 
   // Checking that the algorithm worked properly.
-  if (!anIntersectionAlgo->isDone()) {
-    static const std::string aFeatureError = "Error: Intersection algorithm failed.";
-    setError(aFeatureError);
-    return;
-  }
-  if (anIntersectionAlgo->shape()->isNull()) {
-    static const std::string aShapeError = "Error: Resulting shape is Null.";
-    setError(aShapeError);
-    return;
-  }
-  if (!anIntersectionAlgo->isValid()) {
-    std::string aFeatureError = "Error: Resulting shape is not valid.";
-    setError(aFeatureError);
+  std::string anError;
+  if (GeomAlgoAPI_Tools::AlgoError::isAlgorithmFailed(anIntersectionAlgo, getKind(), anError)) {
+    setError(anError);
     return;
   }
 

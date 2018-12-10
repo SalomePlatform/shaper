@@ -34,6 +34,7 @@
 #include <GeomAlgoAPI_MakeShapeList.h>
 #include <GeomAlgoAPI_PaveFiller.h>
 #include <GeomAlgoAPI_ShapeTools.h>
+#include <GeomAlgoAPI_Tools.h>
 #include <GeomAlgoAPI_UnifySameDomain.h>
 #include <GeomAPI_ShapeExplorer.h>
 
@@ -60,6 +61,7 @@ void FeaturesPlugin_BooleanFuse::initAttributes()
 //==================================================================================================
 void FeaturesPlugin_BooleanFuse::execute()
 {
+  std::string anError;
   ListOfShape anObjects, aTools, anEdgesAndFaces;
   std::map<GeomShapePtr, ListOfShape> aCompSolidsObjects;
 
@@ -218,19 +220,8 @@ void FeaturesPlugin_BooleanFuse::execute()
       GeomAlgoAPI_Boolean::BOOL_FUSE));
 
     // Checking that the algorithm worked properly.
-    if (!aFuseAlgo->isDone()) {
-      static const std::string aFeatureError = "Error: Boolean algorithm failed.";
-      setError(aFeatureError);
-      return;
-    }
-    if (aFuseAlgo->shape()->isNull()) {
-      static const std::string aShapeError = "Error: Resulting shape is Null.";
-      setError(aShapeError);
-      return;
-    }
-    if (!aFuseAlgo->isValid()) {
-      std::string aFeatureError = "Error: Resulting shape is not valid.";
-      setError(aFeatureError);
+    if (GeomAlgoAPI_Tools::AlgoError::isAlgorithmFailed(aFuseAlgo, getKind(), anError)) {
+      setError(anError);
       return;
     }
 
@@ -250,19 +241,8 @@ void FeaturesPlugin_BooleanFuse::execute()
     }
     std::shared_ptr<GeomAlgoAPI_PaveFiller> aFillerAlgo(
       new GeomAlgoAPI_PaveFiller(aShapesToAdd, true));
-    if (!aFillerAlgo->isDone()) {
-      std::string aFeatureError = "Error: PaveFiller algorithm failed.";
-      setError(aFeatureError);
-      return;
-    }
-    if (aFillerAlgo->shape()->isNull()) {
-      static const std::string aShapeError = "Error: Resulting shape is Null.";
-      setError(aShapeError);
-      return;
-    }
-    if (!aFillerAlgo->isValid()) {
-      std::string aFeatureError = "Error: Resulting shape is not valid.";
-      setError(aFeatureError);
+    if (GeomAlgoAPI_Tools::AlgoError::isAlgorithmFailed(aFillerAlgo, getKind(), anError)) {
+      setError(anError);
       return;
     }
 
@@ -280,19 +260,8 @@ void FeaturesPlugin_BooleanFuse::execute()
     std::shared_ptr<GeomAlgoAPI_UnifySameDomain> aUnifyAlgo(
       new GeomAlgoAPI_UnifySameDomain(aShape));
 
-    if (!aUnifyAlgo->isDone()) {
-      std::string aFeatureError = "Error: PaveFiller algorithm failed.";
-      setError(aFeatureError);
-      return;
-    }
-    if (aUnifyAlgo->shape()->isNull()) {
-      static const std::string aShapeError = "Error: Resulting shape is Null.";
-      setError(aShapeError);
-      return;
-    }
-    if (!aUnifyAlgo->isValid()) {
-      std::string aFeatureError = "Error: Resulting shape is not valid.";
-      setError(aFeatureError);
+    if (GeomAlgoAPI_Tools::AlgoError::isAlgorithmFailed(aUnifyAlgo, getKind(), anError)) {
+      setError(anError);
       return;
     }
 

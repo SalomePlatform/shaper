@@ -164,9 +164,6 @@ public:
   BUILDPLUGIN_EXPORT virtual void attributeChanged(const std::string& theID);
 
 private:
-  /// Check the filling algorithm is failed
-  bool isAlgorithmFailed(const std::shared_ptr<GeomAlgoAPI_MakeShape>& theAlgorithm);
-
   /// Convert shape to edge according to construction method
   std::shared_ptr<GeomAPI_Edge> toEdge(const std::shared_ptr<GeomAPI_Shape>& theShape,
                                        const std::string& theMethod);

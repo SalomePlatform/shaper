@@ -31,6 +31,8 @@
 #include <GeomAlgoAPI_MakeShapeList.h>
 #include <GeomAlgoAPI_PaveFiller.h>
 #include <GeomAlgoAPI_ShapeTools.h>
+#include <GeomAlgoAPI_Tools.h>
+
 #include <GeomAPI_ShapeExplorer.h>
 #include <GeomAPI_ShapeIterator.h>
 
@@ -50,6 +52,7 @@ void FeaturesPlugin_BooleanSmash::initAttributes()
 //==================================================================================================
 void FeaturesPlugin_BooleanSmash::execute()
 {
+  std::string anError;
   ListOfShape anObjects, aTools;
   std::map<std::shared_ptr<GeomAPI_Shape>, ListOfShape> aCompSolidsObjects;
 
@@ -180,21 +183,11 @@ void FeaturesPlugin_BooleanSmash::execute()
                             GeomAlgoAPI_Boolean::BOOL_CUT));
 
   // Checking that the algorithm worked properly.
-  if (!aBoolAlgo->isDone()) {
-    static const std::string aFeatureError = "Error: Boolean algorithm failed.";
-    setError(aFeatureError);
+  if (GeomAlgoAPI_Tools::AlgoError::isAlgorithmFailed(aBoolAlgo, getKind(), anError)) {
+    setError(anError);
     return;
   }
-  if (aBoolAlgo->shape()->isNull()) {
-    static const std::string aShapeError = "Error: Resulting shape is Null.";
-    setError(aShapeError);
-    return;
-  }
-  if (!aBoolAlgo->isValid()) {
-    std::string aFeatureError = "Error: Resulting shape is not valid.";
-    setError(aFeatureError);
-    return;
-  }
+
   aMakeShapeList->appendAlgo(aBoolAlgo);
 
   // Put all (cut result, tools and not used solids) to PaveFiller.
@@ -211,19 +204,8 @@ void FeaturesPlugin_BooleanSmash::execute()
   else {
     std::shared_ptr<GeomAlgoAPI_PaveFiller> aFillerAlgo(
       new GeomAlgoAPI_PaveFiller(aShapesToAdd, true));
-    if (!aFillerAlgo->isDone()) {
-      std::string aFeatureError = "Error: PaveFiller algorithm failed.";
-      setError(aFeatureError);
-      return;
-    }
-    if (aFillerAlgo->shape()->isNull()) {
-      static const std::string aShapeError = "Error: Resulting shape is Null.";
-      setError(aShapeError);
-      return;
-    }
-    if (!aFillerAlgo->isValid()) {
-      std::string aFeatureError = "Error: Resulting shape is not valid.";
-      setError(aFeatureError);
+    if (GeomAlgoAPI_Tools::AlgoError::isAlgorithmFailed(aFillerAlgo, getKind(), anError)) {
+      setError(anError);
       return;
     }
 

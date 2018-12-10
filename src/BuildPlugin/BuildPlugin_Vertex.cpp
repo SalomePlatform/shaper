@@ -24,6 +24,7 @@
 #include <ModelAPI_ResultBody.h>
 
 #include <GeomAlgoAPI_Copy.h>
+#include <GeomAlgoAPI_Tools.h>
 
 //=================================================================================================
 BuildPlugin_Vertex::BuildPlugin_Vertex()
@@ -76,29 +77,17 @@ void BuildPlugin_Vertex::execute()
     }
 
     // Copy shape.
-    GeomAlgoAPI_Copy aCopyAlgo(aShape);
+    std::shared_ptr<GeomAlgoAPI_Copy> aCopyAlgo(new GeomAlgoAPI_Copy(aShape));
 
-    // Check that algo is done.
-    if(!aCopyAlgo.isDone()) {
-      setError("Error: " + getKind() + " algorithm failed.");
-      return;
-    }
-
-    // Check if shape is not null.
-    if(!aCopyAlgo.shape().get() || aCopyAlgo.shape()->isNull()) {
-      setError("Error: Resulting shape is null.");
-      return;
-    }
-
-    // Check that resulting shape is valid.
-    if(!aCopyAlgo.isValid()) {
-      setError("Error: Resulting shape is not valid.");
+    std::string anError;
+    if (GeomAlgoAPI_Tools::AlgoError::isAlgorithmFailed(aCopyAlgo, getKind(), anError)) {
+      setError(anError);
       return;
     }
 
     // Store result.
     ResultBodyPtr aResultBody = document()->createBody(data(), aResultIndex);
-    aResultBody->storeModified(aShape, aCopyAlgo.shape());
+    aResultBody->storeModified(aShape, aCopyAlgo->shape());
     setResult(aResultBody, aResultIndex);
     ++aResultIndex;
   }

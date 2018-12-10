@@ -34,6 +34,7 @@
 #include <GeomAPI_ShapeIterator.h>
 #include <GeomAlgoAPI_Placement.h>
 #include <GeomAlgoAPI_Transform.h>
+#include <GeomAlgoAPI_Tools.h>
 
 #include <FeaturesPlugin_Tools.h>
 
@@ -142,6 +143,7 @@ void FeaturesPlugin_Placement::execute()
 
   // Applying transformation to each object.
   int aResultIndex = 0;
+  std::string anError;
   std::list<ResultPtr>::iterator aContext = aContextes.begin();
   for(ListOfShape::iterator anObjectsIt = anObjects.begin(); anObjectsIt != anObjects.end();
       anObjectsIt++, aContext++) {
@@ -158,19 +160,8 @@ void FeaturesPlugin_Placement::execute()
                                                                                       aTrsf));
 
       // Checking that the algorithm worked properly.
-      if(!aTransformAlgo->isDone()) {
-        static const std::string aFeatureError = "Error: Transform algorithm failed.";
-        setError(aFeatureError);
-        break;
-      }
-      if(aTransformAlgo->shape()->isNull()) {
-        static const std::string aShapeError = "Error: Resulting shape is Null.";
-        setError(aShapeError);
-        break;
-      }
-      if(!aTransformAlgo->isValid()) {
-        std::string aFeatureError = "Error: Resulting shape is not valid.";
-        setError(aFeatureError);
+      if (GeomAlgoAPI_Tools::AlgoError::isAlgorithmFailed(aTransformAlgo, getKind(), anError)) {
+        setError(anError);
         break;
       }
 

@@ -92,10 +92,10 @@ void BuildPlugin_Polyline::execute()
 
   // Create wire from edges
   GeomShapePtr aWire = GeomAlgoAPI_WireBuilder::wire(anEdges);
-	if (!aWire.get()) {
-		setError("Error: Result polyline is empty.");
-		return;
-	}
+  if (!aWire.get()) {
+    setError("Error: Result polyline is empty.");
+    return;
+  }
 
   // Check the wire.
   if (GeomAlgoAPI_WireBuilder::isSelfIntersected(aWire)) {

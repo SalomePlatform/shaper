@@ -27,6 +27,7 @@
 #include <ModelAPI_ResultPart.h>
 
 #include <GeomAlgoAPI_PointBuilder.h>
+#include <GeomAlgoAPI_Tools.h>
 
 #include <GeomAPI_Edge.h>
 #include <GeomAPI_Lin.h>
@@ -137,6 +138,7 @@ void FeaturesPlugin_Rotation::performTranslationByAxisAndAngle()
   double anAngle = real(FeaturesPlugin_Rotation::ANGLE_ID())->value();
 
   // Rotating each object.
+  std::string anError;
   int aResultIndex = 0;
   std::list<ResultPtr>::iterator aContext = aContextes.begin();
   for(ListOfShape::iterator anObjectsIt = anObjects.begin(); anObjectsIt != anObjects.end();
@@ -165,19 +167,8 @@ void FeaturesPlugin_Rotation::performTranslationByAxisAndAngle()
       aRotationAlgo->build();
 
       // Checking that the algorithm worked properly.
-      if(!aRotationAlgo->isDone()) {
-        static const std::string aFeatureError = "Error: Rotation algorithm failed.";
-        setError(aFeatureError);
-        break;
-      }
-      if(aRotationAlgo->shape()->isNull()) {
-        static const std::string aShapeError = "Error: Resulting shape is Null.";
-        setError(aShapeError);
-        break;
-      }
-      if(!aRotationAlgo->isValid()) {
-        std::string aFeatureError = "Error: Resulting shape is not valid.";
-        setError(aFeatureError);
+      if (GeomAlgoAPI_Tools::AlgoError::isAlgorithmFailed(aRotationAlgo, getKind(), anError)) {
+        setError(anError);
         break;
       }
 
@@ -245,6 +236,7 @@ void FeaturesPlugin_Rotation::performTranslationByThreePoints()
   }
 
   // Rotating each object.
+  std::string anError;
   int aResultIndex = 0;
   std::list<ResultPtr>::iterator aContext = aContextes.begin();
   for(ListOfShape::iterator anObjectsIt = anObjects.begin(); anObjectsIt != anObjects.end();
@@ -274,19 +266,8 @@ void FeaturesPlugin_Rotation::performTranslationByThreePoints()
       aRotationAlgo->build();
 
       // Checking that the algorithm worked properly.
-      if(!aRotationAlgo->isDone()) {
-        static const std::string aFeatureError = "Error: Rotation algorithm failed.";
-        setError(aFeatureError);
-        break;
-      }
-      if(aRotationAlgo->shape()->isNull()) {
-        static const std::string aShapeError = "Error : Resulting shape is Null.";
-        setError(aShapeError);
-        break;
-      }
-      if(!aRotationAlgo->isValid()) {
-        std::string aFeatureError = "Error: Resulting shape is not valid.";
-        setError(aFeatureError);
+      if (GeomAlgoAPI_Tools::AlgoError::isAlgorithmFailed(aRotationAlgo, getKind(), anError)) {
+        setError(anError);
         break;
       }
 

@@ -38,6 +38,7 @@
 #include <GeomAlgoAPI_MakeShapeList.h>
 #include <GeomAlgoAPI_Partition.h>
 #include <GeomAlgoAPI_ShapeTools.h>
+#include <GeomAlgoAPI_Tools.h>
 
 #include <GeomAPI_Face.h>
 #include <GeomAPI_ShapeExplorer.h>
@@ -65,9 +66,6 @@ static void unusedSubsOfComposolid(const CompsolidSubs& theObjects, CompsolidSub
 static bool cutUnusedSubs(CompsolidSubs& theObjects, CompsolidSubs& theNotUsed,
                           std::shared_ptr<GeomAlgoAPI_MakeShapeList>& theMakeShapeList,
                           std::string& theError);
-
-static bool isAlgoFailed(const std::shared_ptr<GeomAlgoAPI_MakeShape>& theAlgo,
-                         std::string& theError);
 
 
 //=================================================================================================
@@ -125,7 +123,7 @@ void FeaturesPlugin_Partition::execute()
     new GeomAlgoAPI_Partition(aTargetObjects, aPlanes));
 
   // Checking that the algorithm worked properly.
-  if (isAlgoFailed(aPartitionAlgo, aError)) {
+  if (GeomAlgoAPI_Tools::AlgoError::isAlgorithmFailed(aPartitionAlgo, getKind(), aError)) {
     setError(aError);
     return;
   }
@@ -143,7 +141,7 @@ void FeaturesPlugin_Partition::execute()
     aPartitionAlgo.reset(new GeomAlgoAPI_Partition(aTargetObjects, ListOfShape()));
 
     // Checking that the algorithm worked properly.
-    if (isAlgoFailed(aPartitionAlgo, aError)) {
+    if (GeomAlgoAPI_Tools::AlgoError::isAlgorithmFailed(aPartitionAlgo, getKind(), aError)) {
       setError(aError);
       return;
     }
@@ -376,7 +374,7 @@ static bool cutSubs(const GeomShapePtr& theFirstArgument,
     // cut from current list of solids
     aCutAlgo.reset(
         new GeomAlgoAPI_Boolean(aUIt->second, theTools, GeomAlgoAPI_Boolean::BOOL_CUT));
-    if (isAlgoFailed(aCutAlgo, theError))
+    if (GeomAlgoAPI_Tools::AlgoError::isAlgorithmFailed(aCutAlgo, "", theError))
       return false;
     theMakeShapeList->appendAlgo(aCutAlgo);
 
@@ -410,23 +408,4 @@ bool cutUnusedSubs(CompsolidSubs& theObjects, CompsolidSubs& theNotUsed,
   // cut subs
   return cutSubs(aFirstArgument, theObjects, aToolsForUsed, theMakeShapeList, theError)
       && cutSubs(aFirstArgument, theNotUsed, aToolsForUnused, theMakeShapeList, theError);
-}
-
-bool isAlgoFailed(const std::shared_ptr<GeomAlgoAPI_MakeShape>& theAlgo, std::string& theError)
-{
-  if (!theAlgo->isDone()) {
-    theError = "Error: Partition algorithm failed.";
-    return true;
-  }
-  if (theAlgo->shape()->isNull()) {
-    theError = "Error: Resulting shape is Null.";
-    return true;
-  }
-  if (!theAlgo->isValid()) {
-    theError = "Error: Resulting shape is not valid.";
-    return true;
-  }
-
-  theError.clear();
-  return false;
 }

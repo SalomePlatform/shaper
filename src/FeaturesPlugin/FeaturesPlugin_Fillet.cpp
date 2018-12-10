@@ -31,6 +31,7 @@
 
 #include <GeomAlgoAPI_Fillet.h>
 #include <GeomAlgoAPI_MakeShapeList.h>
+#include <GeomAlgoAPI_Tools.h>
 
 #include <GeomAPI_DataMapOfShapeMapOfShapes.h>
 #include <GeomAPI_ShapeExplorer.h>
@@ -147,6 +148,7 @@ void FeaturesPlugin_Fillet::execute()
   GeomAlgoAPI_MakeShapeList aMakeShapeList;
   std::shared_ptr<GeomAlgoAPI_Fillet> aFilletBuilder;
   int aResultIndex = 0;
+  std::string anError;
 
   GeomAPI_DataMapOfShapeMapOfShapes::iterator anIt = aSolidsAndSubs.begin();
   for (; anIt != aSolidsAndSubs.end(); ++anIt) {
@@ -158,8 +160,11 @@ void FeaturesPlugin_Fillet::execute()
       aFilletBuilder.reset(new GeomAlgoAPI_Fillet(aSolid, aFilletEdges, aRadius1));
     else
       aFilletBuilder.reset(new GeomAlgoAPI_Fillet(aSolid, aFilletEdges, aRadius1, aRadius2));
-    if (isFailed(aFilletBuilder))
+
+    if (GeomAlgoAPI_Tools::AlgoError::isAlgorithmFailed(aFilletBuilder, getKind(), anError)) {
+      setError(anError);
       return;
+    }
 
     GeomShapePtr aResult = unwrapCompound(aFilletBuilder->shape());
     std::shared_ptr<ModelAPI_ResultBody> aResultBody =
@@ -170,27 +175,6 @@ void FeaturesPlugin_Fillet::execute()
     aResultIndex++;
   }
   removeResults(aResultIndex);
-}
-
-bool FeaturesPlugin_Fillet::isFailed(
-    const std::shared_ptr<GeomAlgoAPI_MakeShape>& theAlgorithm)
-{
-  if (!theAlgorithm->isDone()) {
-    static const std::string aFeatureError = "Error: fillet algorithm failed.";
-    setError(aFeatureError);
-    return true;
-  }
-  if (theAlgorithm->shape()->isNull()) {
-    static const std::string aShapeError = "Error: Resulting shape of fillet is Null.";
-    setError(aShapeError);
-    return true;
-  }
-  if (!theAlgorithm->isValid()) {
-    std::string aFeatureError = "Error: Resulting shape of fillet is not valid.";
-    setError(aFeatureError);
-    return true;
-  }
-  return false;
 }
 
 void FeaturesPlugin_Fillet::loadNamingDS(

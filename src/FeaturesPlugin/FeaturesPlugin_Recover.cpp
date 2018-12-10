@@ -31,6 +31,7 @@
 #include <ModelAPI_ResultBody.h>
 #include <ModelAPI_Tools.h>
 #include <GeomAlgoAPI_Copy.h>
+#include <GeomAlgoAPI_Tools.h>
 
 FeaturesPlugin_Recover::FeaturesPlugin_Recover()
 {
@@ -45,6 +46,7 @@ void FeaturesPlugin_Recover::initAttributes()
 
 void FeaturesPlugin_Recover::execute()
 {
+  std::string anError;
   int aResultIndex = 0;
   AttributeRefListPtr aRecovered = reflist(RECOVERED_ENTITIES());
   for(int anIndex = aRecovered->size() - 1; anIndex >= 0; anIndex--) {
@@ -61,18 +63,8 @@ void FeaturesPlugin_Recover::execute()
     // Copy shape.
     std::shared_ptr<GeomAlgoAPI_Copy> aCopyAlgo(new GeomAlgoAPI_Copy(aShape));
     // Check that algo is done.
-    if(!aCopyAlgo->isDone()) {
-      setError("Error: recover algorithm failed.");
-      return;
-    }
-    // Check if shape is not null.
-    if(!aCopyAlgo->shape().get() || aCopyAlgo->shape()->isNull()) {
-      setError("Error: resulting shape is null.");
-      return;
-    }
-    // Check that resulting shape is valid.
-    if(!aCopyAlgo->isValid()) {
-      setError("Error: resulting shape is not valid.");
+    if (GeomAlgoAPI_Tools::AlgoError::isAlgorithmFailed(aCopyAlgo, getKind(), anError)) {
+      setError(anError);
       return;
     }
 

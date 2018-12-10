@@ -25,6 +25,7 @@
 #include <ModelAPI_ResultConstruction.h>
 
 #include <GeomAlgoAPI_Sewing.h>
+#include <GeomAlgoAPI_Tools.h>
 #include <GeomAPI_ShapeExplorer.h>
 
 //=================================================================================================
@@ -58,21 +59,9 @@ void BuildPlugin_Shell::execute()
   // Sew faces.
   GeomMakeShapePtr aSewingAlgo(new GeomAlgoAPI_Sewing(aShapes));
 
-  // Check that algo is done.
-  if(!aSewingAlgo->isDone()) {
-    setError("Error: " + getKind() + " algorithm failed.");
-    return;
-  }
-
-  // Check if shape is not null.
-  if(!aSewingAlgo->shape().get() || aSewingAlgo->shape()->isNull()) {
-    setError("Error: Resulting shape is null.");
-    return;
-  }
-
-  // Check that resulting shape is valid.
-  if(!aSewingAlgo->isValid()) {
-    setError("Error: Resulting shape is not valid.");
+  std::string anError;
+  if (GeomAlgoAPI_Tools::AlgoError::isAlgorithmFailed(aSewingAlgo, getKind(), anError)) {
+    setError(anError);
     return;
   }
 

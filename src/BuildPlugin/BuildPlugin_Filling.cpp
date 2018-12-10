@@ -30,6 +30,7 @@
 #include <GeomAlgoAPI_Copy.h>
 #include <GeomAlgoAPI_Filling.h>
 #include <GeomAlgoAPI_ShapeTools.h>
+#include <GeomAlgoAPI_Tools.h>
 
 #include <GeomAPI_Pnt.h>
 #include <GeomAPI_ShapeExplorer.h>
@@ -116,7 +117,9 @@ void BuildPlugin_Filling::execute()
 
   // build result
   aFilling->build(aParameters.isApprox);
-  if (isAlgorithmFailed(aFilling)) {
+  std::string anError;
+  if (GeomAlgoAPI_Tools::AlgoError::isAlgorithmFailed(aFilling, getKind(), anError)) {
+    setError(anError);
     removeResults(0);
     return;
   }
@@ -132,32 +135,6 @@ void BuildPlugin_Filling::execute()
     aResultBody->generated(anEdge, "Edge_" + std::to_string((long long)anEdgeInd));
   }
   setResult(aResultBody, 0);
-}
-
-bool BuildPlugin_Filling::isAlgorithmFailed(
-    const std::shared_ptr<GeomAlgoAPI_MakeShape>& theAlgorithm)
-{
-  if (!theAlgorithm->isDone()) {
-    static const std::string aFeatureError = "Error: filling algorithm failed.";
-    std::string anAlgoError = theAlgorithm->getError();
-    if (anAlgoError.empty())
-      anAlgoError = aFeatureError;
-    else
-      anAlgoError = aFeatureError + " " + anAlgoError;
-    setError(anAlgoError);
-    return true;
-  }
-  if (theAlgorithm->shape()->isNull()) {
-    static const std::string aShapeError = "Error: Resulting shape of filling is Null.";
-    setError(aShapeError);
-    return true;
-  }
-  if (!theAlgorithm->isValid()) {
-    std::string aFeatureError = "Error: Resulting shape of filling is not valid.";
-    setError(aFeatureError);
-    return true;
-  }
-  return false;
 }
 
 //=================================================================================================

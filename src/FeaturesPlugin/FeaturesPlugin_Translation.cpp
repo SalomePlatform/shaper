@@ -34,6 +34,7 @@
 #include <GeomAPI_Trsf.h>
 
 #include <GeomAlgoAPI_PointBuilder.h>
+#include <GeomAlgoAPI_Tools.h>
 
 #include <FeaturesPlugin_Tools.h>
 
@@ -150,6 +151,7 @@ void FeaturesPlugin_Translation::performTranslationByAxisAndDistance()
   double aDistance = real(FeaturesPlugin_Translation::DISTANCE_ID())->value();
 
   // Moving each object.
+  std::string anError;
   int aResultIndex = 0;
   std::list<ResultPtr>::iterator aContext = aContextes.begin();
   for(ListOfShape::iterator anObjectsIt = anObjects.begin(); anObjectsIt != anObjects.end();
@@ -177,19 +179,8 @@ void FeaturesPlugin_Translation::performTranslationByAxisAndDistance()
       aTranslationAlgo->build();
 
       // Checking that the algorithm worked properly.
-      if(!aTranslationAlgo->isDone()) {
-        static const std::string aFeatureError = "Error: Translation algorithm failed.";
-        setError(aFeatureError);
-        break;
-      }
-      if(aTranslationAlgo->shape()->isNull()) {
-        static const std::string aShapeError = "Error: Resulting shape is Null.";
-        setError(aShapeError);
-        break;
-      }
-      if(!aTranslationAlgo->isValid()) {
-        std::string aFeatureError = "Error: Resulting shape is not valid.";
-        setError(aFeatureError);
+      if (GeomAlgoAPI_Tools::AlgoError::isAlgorithmFailed(aTranslationAlgo, getKind(), anError)) {
+        setError(anError);
         break;
       }
 
@@ -236,6 +227,7 @@ void FeaturesPlugin_Translation::performTranslationByDimensions()
   double aDZ = real(FeaturesPlugin_Translation::DZ_ID())->value();
 
   // Moving each object.
+  std::string anError;
   int aResultIndex = 0;
   std::list<ResultPtr>::iterator aContext = aContextes.begin();
   for(ListOfShape::iterator anObjectsIt = anObjects.begin(); anObjectsIt != anObjects.end();
@@ -263,19 +255,8 @@ void FeaturesPlugin_Translation::performTranslationByDimensions()
       aTranslationAlgo->build();
 
       // Checking that the algorithm worked properly.
-      if(!aTranslationAlgo->isDone()) {
-        static const std::string aFeatureError = "Error: Translation algorithm failed.";
-        setError(aFeatureError);
-        break;
-      }
-      if(aTranslationAlgo->shape()->isNull()) {
-        static const std::string aShapeError = "Error: Resulting shape is Null.";
-        setError(aShapeError);
-        break;
-      }
-      if(!aTranslationAlgo->isValid()) {
-        std::string aFeatureError = "Error: Resulting shape is not valid.";
-        setError(aFeatureError);
+      if (GeomAlgoAPI_Tools::AlgoError::isAlgorithmFailed(aTranslationAlgo, getKind(), anError)) {
+        setError(anError);
         break;
       }
 
@@ -335,6 +316,7 @@ void FeaturesPlugin_Translation::performTranslationByTwoPoints()
   }
 
   // Moving each object.
+  std::string anError;
   int aResultIndex = 0;
   std::list<ResultPtr>::iterator aContext = aContextes.begin();
   for(ListOfShape::iterator anObjectsIt = anObjects.begin(); anObjectsIt != anObjects.end();
@@ -362,19 +344,8 @@ void FeaturesPlugin_Translation::performTranslationByTwoPoints()
       aTranslationAlgo->build();
 
       // Checking that the algorithm worked properly.
-      if(!aTranslationAlgo->isDone()) {
-        static const std::string aFeatureError = "Error: Translation algorithm failed.";
-        setError(aFeatureError);
-        break;
-      }
-      if(aTranslationAlgo->shape()->isNull()) {
-        static const std::string aShapeError = "Error: Resulting shape is Null.";
-        setError(aShapeError);
-        break;
-      }
-      if(!aTranslationAlgo->isValid()) {
-        std::string aFeatureError = "Error: Resulting shape is not valid.";
-        setError(aFeatureError);
+      if (GeomAlgoAPI_Tools::AlgoError::isAlgorithmFailed(aTranslationAlgo, getKind(), anError)) {
+        setError(anError);
         break;
       }
 

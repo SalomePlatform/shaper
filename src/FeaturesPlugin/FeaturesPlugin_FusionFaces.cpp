@@ -30,6 +30,7 @@
 #include <GeomAPI_ShapeIterator.h>
 #include <GeomAPI_ShapeExplorer.h>
 
+#include <GeomAlgoAPI_Tools.h>
 #include <GeomAlgoAPI_UnifySameDomain.h>
 
 
@@ -60,16 +61,9 @@ void FeaturesPlugin_FusionFaces::execute()
   std::shared_ptr<GeomAlgoAPI_UnifySameDomain> anAlgo(new GeomAlgoAPI_UnifySameDomain(aBaseShape));
 
   // Check algo status
-  if (!anAlgo->isDone()) {
-    setError("Error: Fusion algorithm failed.");
-    return;
-  }
-  if (anAlgo->shape()->isNull()) {
-    setError("Error: Resulting shape is Null.");
-    return;
-  }
-  if (!anAlgo->isValid()) {
-    setError("Error: Resulting shape is not valid.");
+  std::string anError;
+  if (GeomAlgoAPI_Tools::AlgoError::isAlgorithmFailed(anAlgo, getKind(), anError)) {
+    setError(anError);
     return;
   }
 

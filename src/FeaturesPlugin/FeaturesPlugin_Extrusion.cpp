@@ -27,6 +27,7 @@
 #include <ModelAPI_Validator.h>
 
 #include <GeomAlgoAPI_Prism.h>
+#include <GeomAlgoAPI_Tools.h>
 
 #include <GeomAPI_Dir.h>
 #include <GeomAPI_Edge.h>
@@ -167,6 +168,7 @@ bool FeaturesPlugin_Extrusion::makeExtrusions(ListOfShape& theBaseShapes,
   }
 
   // Generating result for each base shape.
+  std::string anError;
   for(ListOfShape::const_iterator
       anIter = theBaseShapes.cbegin(); anIter != theBaseShapes.cend(); anIter++) {
     std::shared_ptr<GeomAPI_Shape> aBaseShape = *anIter;
@@ -174,7 +176,8 @@ bool FeaturesPlugin_Extrusion::makeExtrusions(ListOfShape& theBaseShapes,
     std::shared_ptr<GeomAlgoAPI_Prism> aPrismAlgo(new GeomAlgoAPI_Prism(aBaseShape, aDir,
                                                                         aToShape, aToSize,
                                                                         aFromShape, aFromSize));
-    if(!isMakeShapeValid(aPrismAlgo)) {
+    if (GeomAlgoAPI_Tools::AlgoError::isAlgorithmFailed(aPrismAlgo, getKind(), anError)) {
+      setError(anError);
       return false;
     }
 

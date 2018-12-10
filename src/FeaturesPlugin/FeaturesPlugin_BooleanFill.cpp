@@ -30,6 +30,8 @@
 #include <GeomAlgoAPI_Partition.h>
 #include <GeomAlgoAPI_PaveFiller.h>
 #include <GeomAlgoAPI_ShapeTools.h>
+#include <GeomAlgoAPI_Tools.h>
+
 #include <GeomAPI_Face.h>
 #include <GeomAPI_ShapeExplorer.h>
 #include <GeomAPI_ShapeIterator.h>
@@ -46,6 +48,7 @@ FeaturesPlugin_BooleanFill::FeaturesPlugin_BooleanFill()
 //=================================================================================================
 void FeaturesPlugin_BooleanFill::execute()
 {
+  std::string anError;
   ListOfShape anObjects, aTools, anEdgesAndFaces, aPlanes;
   std::map<std::shared_ptr<GeomAPI_Shape>, ListOfShape> aCompSolidsObjects;
 
@@ -148,19 +151,8 @@ void FeaturesPlugin_BooleanFill::execute()
     }
 
     // Checking that the algorithm worked properly.
-    if(!aBoolAlgo->isDone()) {
-      static const std::string aFeatureError = "Error: Boolean algorithm failed.";
-      setError(aFeatureError);
-      return;
-    }
-    if(aResShape->isNull()) {
-      static const std::string aShapeError = "Error: Resulting shape is Null.";
-      setError(aShapeError);
-      return;
-    }
-    if(!aBoolAlgo->isValid()) {
-      std::string aFeatureError = "Error: Resulting shape is not valid.";
-      setError(aFeatureError);
+    if (GeomAlgoAPI_Tools::AlgoError::isAlgorithmFailed(aBoolAlgo, getKind(), anError)) {
+      setError(anError);
       return;
     }
 
@@ -224,19 +216,8 @@ void FeaturesPlugin_BooleanFill::execute()
     aBoolAlgo.reset(new GeomAlgoAPI_Partition(aUsedInOperationSolids, aToolsWithPlanes));
 
     // Checking that the algorithm worked properly.
-    if(!aBoolAlgo->isDone()) {
-      static const std::string aFeatureError = "Error: Boolean algorithm failed.";
-      setError(aFeatureError);
-      return;
-    }
-    if(aBoolAlgo->shape()->isNull()) {
-      static const std::string aShapeError = "Error: Resulting shape is Null.";
-      setError(aShapeError);
-      return;
-    }
-    if(!aBoolAlgo->isValid()) {
-      std::string aFeatureError = "Error: Resulting shape is not valid.";
-      setError(aFeatureError);
+    if (GeomAlgoAPI_Tools::AlgoError::isAlgorithmFailed(aBoolAlgo, getKind(), anError)) {
+      setError(anError);
       return;
     }
 

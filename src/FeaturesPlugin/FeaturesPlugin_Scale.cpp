@@ -21,6 +21,7 @@
 #include <FeaturesPlugin_Scale.h>
 
 #include <GeomAlgoAPI_PointBuilder.h>
+#include <GeomAlgoAPI_Tools.h>
 
 #include <ModelAPI_AttributeDouble.h>
 #include <ModelAPI_AttributeSelectionList.h>
@@ -114,6 +115,7 @@ void FeaturesPlugin_Scale::performScaleByFactor()
   double aScaleFactor = real(FeaturesPlugin_Scale::SCALE_FACTOR_ID())->value();
 
   // Moving each object.
+  std::string anError;
   int aResultIndex = 0;
   std::list<ResultPtr>::iterator aContext = aContextes.begin();
   for(ListOfShape::iterator anObjectsIt = anObjects.begin(); anObjectsIt != anObjects.end();
@@ -130,19 +132,8 @@ void FeaturesPlugin_Scale::performScaleByFactor()
     aScaleAlgo->build();
 
     // Checking that the algorithm worked properly.
-    if(!aScaleAlgo->isDone()) {
-      static const std::string aFeatureError = "Error: Symmetry algorithm failed.";
-      setError(aFeatureError);
-      break;
-    }
-    if(aScaleAlgo->shape()->isNull()) {
-      static const std::string aShapeError = "Error: Resulting shape is Null.";
-      setError(aShapeError);
-      break;
-    }
-    if(!aScaleAlgo->isValid()) {
-      std::string aFeatureError = "Error: Resulting shape is not valid.";
-      setError(aFeatureError);
+    if (GeomAlgoAPI_Tools::AlgoError::isAlgorithmFailed(aScaleAlgo, getKind(), anError)) {
+      setError(anError);
       break;
     }
 
@@ -199,6 +190,7 @@ void FeaturesPlugin_Scale::performScaleByDimensions()
   double aScaleFactorZ = real(FeaturesPlugin_Scale::SCALE_FACTOR_Z_ID())->value();
 
   // Moving each object.
+  std::string anError;
   int aResultIndex = 0;
   std::list<ResultPtr>::iterator aContext = aContextes.begin();
   for(ListOfShape::iterator anObjectsIt = anObjects.begin(); anObjectsIt != anObjects.end();
@@ -218,19 +210,8 @@ void FeaturesPlugin_Scale::performScaleByDimensions()
     aScaleAlgo->build();
 
     // Checking that the algorithm worked properly.
-    if(!aScaleAlgo->isDone()) {
-      static const std::string aFeatureError = "Error: Symmetry algorithm failed.";
-      setError(aFeatureError);
-      break;
-    }
-    if(aScaleAlgo->shape()->isNull()) {
-      static const std::string aShapeError = "Error: Resulting shape is Null.";
-      setError(aShapeError);
-      break;
-    }
-    if(!aScaleAlgo->isValid()) {
-      std::string aFeatureError = "Error: Resulting shape is not valid.";
-      setError(aFeatureError);
+    if (GeomAlgoAPI_Tools::AlgoError::isAlgorithmFailed(aScaleAlgo, getKind(), anError)) {
+      setError(anError);
       break;
     }
 
