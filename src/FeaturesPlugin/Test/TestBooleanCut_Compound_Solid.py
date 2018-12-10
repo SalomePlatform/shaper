@@ -25,24 +25,21 @@ partSet = model.moduleDocument()
 Part_1 = model.addPart(partSet)
 Part_1_doc = Part_1.document()
 Box_1 = model.addBox(Part_1_doc, 10, 10, 10)
-
-Common_1 = model.addCommon(Part_1_doc, [model.selection("SOLID", "Box_1_1")])
-assert(Common_1.feature().error() != "")
-Part_1_doc.removeFeature(Common_1.feature())
-
-Common_1 = model.addCommon(Part_1_doc, [model.selection("SOLID", "Box_1_1")], [])
-assert(Common_1.feature().error() != "")
-Part_1_doc.removeFeature(Common_1.feature())
-
+Box_2 = model.addBox(Part_1_doc, 10, 10, 10)
+Translation_1 = model.addTranslation(Part_1_doc, [model.selection("SOLID", "Box_2_1")], model.selection("EDGE", "PartSet/OX"), 20)
+Compound_1 = model.addCompound(Part_1_doc, [model.selection("SOLID", "Box_1_1"), model.selection("SOLID", "Translation_1_1")])
+Box_3 = model.addBox(Part_1_doc, 20, 6, 20)
+Translation_2 = model.addTranslation(Part_1_doc, [model.selection("SOLID", "Box_3_1")], -5, 2, -5)
+Cut_1 = model.addCut(Part_1_doc, [model.selection("SOLID", "Compound_1_1_1")], [model.selection("SOLID", "Translation_2_1")])
+model.do()
 model.end()
 
+from GeomAPI import GeomAPI_Shape
 
-from ModelAPI import *
-aSession = ModelAPI_Session.get()
-aDocument = aSession.moduleDocument()
-
-aSession.startOperation()
-Common_1 = Part_1_doc.addFeature("Common")
-Common_1.execute()
-assert(Common_1.error() != "")
-aSession.finishOperation()
+model.testNbResults(Cut_1, 1)
+model.testNbSubResults(Cut_1, [3])
+model.testNbSubShapes(Cut_1, GeomAPI_Shape.SOLID, [3])
+model.testNbSubShapes(Cut_1, GeomAPI_Shape.FACE, [18])
+model.testNbSubShapes(Cut_1, GeomAPI_Shape.EDGE, [72])
+model.testNbSubShapes(Cut_1, GeomAPI_Shape.VERTEX, [144])
+model.testResultsVolumes(Cut_1, [1400])

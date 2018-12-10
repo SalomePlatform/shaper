@@ -39,3 +39,14 @@ Fuse_1 = model.addFuse(Part_1_doc, [model.selection("SOLID", "Partition_1_1_1")]
 assert(Fuse_1.feature().error() != "")
 Part_1_doc.removeFeature(Fuse_1.feature())
 model.end()
+
+
+from ModelAPI import *
+aSession = ModelAPI_Session.get()
+aDocument = aSession.moduleDocument()
+
+aSession.startOperation()
+Fuse_1 = Part_1_doc.addFeature("Fuse")
+Fuse_1.execute()
+assert(Fuse_1.error() != "")
+aSession.finishOperation()

@@ -58,3 +58,14 @@ assert(Smash_1.feature().error() != "")
 Part_1_doc.removeFeature(Smash_1.feature())
 
 model.end()
+
+
+from ModelAPI import *
+aSession = ModelAPI_Session.get()
+aDocument = aSession.moduleDocument()
+
+aSession.startOperation()
+Smash_1 = Part_1_doc.addFeature("Smash")
+Smash_1.execute()
+assert(Smash_1.error() != "")
+aSession.finishOperation()

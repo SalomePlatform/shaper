@@ -200,6 +200,7 @@ ADD_UNIT_TESTS(TestExtrusion.py
                TestBooleanSmash.py
                TestBooleanFill.py
                TestBooleanFillWithPlane.py
+               TestBooleanFill_ErrorMsg.py
                TestMultiBoolean.py
                TestSerialBoolean.py
                TestBoolean_ErrorMsg.py
@@ -257,6 +258,7 @@ ADD_UNIT_TESTS(TestExtrusion.py
                TestFillSolidCompFace.py
                TestFillSolidShell.py
                TestFillSolidCompShell.py
+               TestFillCompsolidPlane.py
                TestPartition2Faces.py
                TestPartition2Solids.py
                TestPartition2Wires.py
@@ -333,8 +335,11 @@ ADD_UNIT_TESTS(TestExtrusion.py
                TestBooleanCut_Wire_Face.py
                TestBooleanCut_Wire_Wire.py
                TestBooleanCut_WireCompound_WireCompound.py
+               TestBooleanCut_Compound_Solid.py
+               TestBooleanCut_ErrorMsg.py
                TestBooleanSmash_Face_Face.py
                TestBooleanSmash_SubSolid_Solid.py
+               TestBooleanSmash_CompSolid_Solid.py
                TestBooleanSmash_ErrorMsg.py
                TestBooleanFuse_SimpleMode.py
                TestBooleanFuse_RemoveEdges.py
@@ -399,6 +404,7 @@ ADD_UNIT_TESTS(TestExtrusion.py
                TestBooleanFuse_ShellCompound_ShellCompound.py
                TestBooleanFuse_Solid_Solid.py
                TestBooleanFuse_SolidCompound_SolidCompound.py
+               TestBooleanFuse_CompSolid_Face.py
                TestBooleanFuse_CompSolid_CompSolid.py
                TestBooleanFuse_CompSolidCompound_CompSolidCompound.py
                TestFillet.py

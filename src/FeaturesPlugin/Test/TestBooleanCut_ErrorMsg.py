@@ -18,31 +18,19 @@
 ## email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com>
 ##
 
-from salome.shaper import model
-
-model.begin()
-partSet = model.moduleDocument()
-Part_1 = model.addPart(partSet)
-Part_1_doc = Part_1.document()
-Box_1 = model.addBox(Part_1_doc, 10, 10, 10)
-
-Common_1 = model.addCommon(Part_1_doc, [model.selection("SOLID", "Box_1_1")])
-assert(Common_1.feature().error() != "")
-Part_1_doc.removeFeature(Common_1.feature())
-
-Common_1 = model.addCommon(Part_1_doc, [model.selection("SOLID", "Box_1_1")], [])
-assert(Common_1.feature().error() != "")
-Part_1_doc.removeFeature(Common_1.feature())
-
-model.end()
-
-
 from ModelAPI import *
 aSession = ModelAPI_Session.get()
 aDocument = aSession.moduleDocument()
 
+# Create a part
 aSession.startOperation()
-Common_1 = Part_1_doc.addFeature("Common")
-Common_1.execute()
-assert(Common_1.error() != "")
+aPartFeature = aDocument.addFeature("Part")
+aSession.finishOperation()
+aPartResult = modelAPI_ResultPart(aPartFeature.firstResult())
+aPart = aPartResult.partDoc()
+
+aSession.startOperation()
+Cut_1 = aPart.addFeature("Cut")
+Cut_1.execute()
+assert(Cut_1.error() != "")
 aSession.finishOperation()

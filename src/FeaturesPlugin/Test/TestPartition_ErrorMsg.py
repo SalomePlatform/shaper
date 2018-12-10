@@ -45,3 +45,14 @@ assert(Partition_1.feature().error() != "")
 Part_1_doc.removeFeature(Partition_1.feature())
 
 model.end()
+
+
+from ModelAPI import *
+aSession = ModelAPI_Session.get()
+aDocument = aSession.moduleDocument()
+
+aSession.startOperation()
+Partition_1 = Part_1_doc.addFeature("Partition")
+Partition_1.execute()
+assert(Partition_1.error() != "")
+aSession.finishOperation()
