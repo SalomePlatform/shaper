@@ -60,6 +60,7 @@ Config_XMLReader::~Config_XMLReader()
   xmlFreeDoc(myXmlDoc);
 }
 
+// LCOV_EXCL_START
 std::string Config_XMLReader::resourcesConfigFile()
 {
   std::string aValue;
@@ -91,6 +92,7 @@ std::string Config_XMLReader::pluginConfigFile()
   }
   return aValue;
 }
+// LCOV_EXCL_STOP
 
 std::string Config_XMLReader::findConfigFile(const std::string theFileName, const int theFindIndex)
 {
@@ -115,6 +117,7 @@ std::string Config_XMLReader::findConfigFile(const std::string theFileName, cons
       if (!anEnv)
         continue;
       if (aSolution > 2) { // there may be several paths separated by ";" symbol
+// LCOV_EXCL_START
         std::string anEnvPart = anEnv;
         size_t aPosStart = 0, aPosEnd;
         for(int aSubNum = 0; aSubNum < aSolution - 3; aSubNum++) {
@@ -130,6 +133,7 @@ std::string Config_XMLReader::findConfigFile(const std::string theFileName, cons
         aPosEnd = anEnvPart.find(';', aPosStart);
         aFileName = anEnvPart.substr(aPosStart,
           aPosEnd == std::string::npos ? aPosEnd : aPosEnd - aPosStart) + FSEP;
+// LCOV_EXCL_STOP
       } else {
         aFileName = std::string(anEnv) + FSEP;
       }
@@ -189,10 +193,12 @@ void Config_XMLReader::cleanup(xmlNodePtr)
   // do nothing;
 }
 
+// LCOV_EXCL_START
 bool Config_XMLReader::processChildren(xmlNodePtr aNode)
 {
   return true;
 }
+// LCOV_EXCL_STOP
 
 xmlNodePtr Config_XMLReader::findRoot(const std::string theDocumentPath)
 {
@@ -234,10 +240,12 @@ void Config_XMLReader::readRecursively(xmlNodePtr theParent)
   }
 }
 
+// LCOV_EXCL_START
 xmlNodePtr Config_XMLReader::node(void* theNode)
 {
   return static_cast<xmlNodePtr>(theNode);
 }
+// LCOV_EXCL_STOP
 
 std::string Config_XMLReader::getNodeName(xmlNodePtr theNode)
 {
@@ -258,10 +266,12 @@ void Config_XMLReader::storeAttribute(xmlNodePtr theNode, const char* theAttribu
   }
 }
 
+// LCOV_EXCL_START
 std::string Config_XMLReader::restoreAttribute(xmlNodePtr theNode, const char* theAttribute)
 {
   return restoreAttribute(getNodeName(theNode).c_str(), theAttribute);
 }
+// LCOV_EXCL_STOP
 
 std::string Config_XMLReader::restoreAttribute(const char* theNodeName, const char* theAttribute)
 {
@@ -290,7 +300,9 @@ bool Config_XMLReader::cleanupAttribute(const char* theNodeName, const char* the
   return result;
 }
 
+// LCOV_EXCL_START
 const char* Config_XMLReader::encoding() const
 {
   return (const char*) myXmlDoc->encoding;
 }
+// LCOV_EXCL_STOP
