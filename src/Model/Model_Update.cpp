@@ -40,6 +40,7 @@
 #include <ModelAPI_Tools.h>
 #include <ModelAPI_ResultBody.h>
 #include <ModelAPI_ResultPart.h>
+#include <ModelAPI_ResultConstruction.h>
 #include <GeomAPI_Shape.h>
 #include <GeomDataAPI_Point.h>
 #include <GeomDataAPI_Point2D.h>
@@ -76,10 +77,6 @@ Model_Update::Model_Update()
   aLoop->registerListener(this, kReorderEvent);
   static const Events_ID kUpdatedSel = aLoop->eventByName(EVENT_UPDATE_SELECTION);
   aLoop->registerListener(this, kUpdatedSel);
-  static const Events_ID kAutomaticOff = aLoop->eventByName(EVENT_AUTOMATIC_RECOMPUTATION_DISABLE);
-  aLoop->registerListener(this, kAutomaticOff);
-  static const Events_ID kAutomaticOn = aLoop->eventByName(EVENT_AUTOMATIC_RECOMPUTATION_ENABLE);
-  aLoop->registerListener(this, kAutomaticOn);
 
   //  Config_PropManager::findProp("Model update", "automatic_rebuild")->value() == "true";
   myIsParamUpdated = false;
@@ -240,8 +237,6 @@ void Model_Update::processEvent(const std::shared_ptr<Events_Message>& theMessag
   static const Events_ID kReorderEvent = aLoop->eventByName(EVENT_ORDER_UPDATED);
   static const Events_ID kRedisplayEvent = aLoop->eventByName(EVENT_OBJECT_TO_REDISPLAY);
   static const Events_ID kUpdatedSel = aLoop->eventByName(EVENT_UPDATE_SELECTION);
-  static const Events_ID kAutomaticOff = aLoop->eventByName(EVENT_AUTOMATIC_RECOMPUTATION_DISABLE);
-  static const Events_ID kAutomaticOn = aLoop->eventByName(EVENT_AUTOMATIC_RECOMPUTATION_ENABLE);
 
 #ifdef DEB_UPDATE
   std::cout<<"****** Event "<<theMessage->eventID().eventText()<<std::endl;
@@ -714,7 +709,8 @@ bool Model_Update::processFeature(FeaturePtr theFeature)
           aDoExecute = true;
         } else if (theFeature->results().size()) { // execute only not-results features
           aDoExecute = !(theFeature->firstResult()->groupName() == ModelAPI_ResultBody::group() ||
-                         theFeature->firstResult()->groupName() == ModelAPI_ResultPart::group());
+            theFeature->firstResult()->groupName() == ModelAPI_ResultPart::group() ||
+            theFeature->getKind() == "Sketch");
         } else {
           aDoExecute = aState != ModelAPI_StateInvalidArgument;
         }

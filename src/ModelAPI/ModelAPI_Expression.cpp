@@ -54,14 +54,18 @@ bool ModelAPI_Expression::isVariable(const std::string& theString)
 {
   if (theString.empty())
     return false;
-  std::string::const_iterator it = theString.begin();
-  if (!(isalpha(*it) || (*it) == '_') || it == theString.end())
-    return false;
-  it++;
-  for ( ; it != theString.end(); ++it ) {
-    if(!(isalnum(*it) || (*it) == '_')) {
+  try {
+    std::string::const_iterator it = theString.begin();
+    if (!(isalpha(*it) || (*it) == '_') || it == theString.end())
       return false;
+    it++;
+    for ( ; it != theString.end(); ++it ) {
+      if(!(isalnum(*it) || (*it) == '_')) {
+        return false;
+      }
     }
+  } catch(...) {
+    return false;
   }
   return true;
 }
