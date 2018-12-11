@@ -108,27 +108,20 @@ bool GeomValidators_Face::isValid(const AttributePtr& theAttribute,
     // it is necessary to check whether the shape is face in order to set in selection a value
     // with any type and check the type in this validator
     // It is realized to select any object in OB and filter it in this validator (sketch plane)
-    if (!aGeomShape->isFace()) {
-      aValid = false;
-      theError = "The shape is not a face.";
+    GeomAbs_SurfaceType aFaceType = GeomAbs_Plane;
+    if (theArguments.size() == 1)
+      aFaceType = faceType(theArguments.front());
+    if (aGeomShape->isFace()) {
+      aValid = isValidFace(aGeomShape, aFaceType, theError);
+    }
+    else if (aSelectionAttr->isGeometricalSelection() && aGeomShape->isCompound()) {
+      for (GeomAPI_ShapeIterator anIt(aGeomShape); anIt.more() && aValid; anIt.next()) {
+        aValid = isValidFace(anIt.current(), aFaceType, theError);
+      }
     }
     else {
-      GeomAbs_SurfaceType aFaceType = GeomAbs_Plane;
-      if (theArguments.size() == 1) aFaceType = faceType(theArguments.front());
-      if (aGeomShape->isFace()) {
-        isValidFace(aGeomShape, aFaceType, theError);
-      }
-      else if (aSelectionAttr->isGeometricalSelection() && aGeomShape->isCompound()) {
-        for (GeomAPI_ShapeIterator anIt(aGeomShape); anIt.more(); anIt.next()) {
-          if (!isValidFace(anIt.current(), aFaceType, theError)) {
-            break;
-          }
-        }
-      }
-      else {
-        aValid = false;
-        theError = "The shape is not a face.";
-      }
+      aValid = false;
+      theError = "The shape is not a face.";
     }
   }
   return aValid;

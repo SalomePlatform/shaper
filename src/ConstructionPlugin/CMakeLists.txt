@@ -95,4 +95,5 @@ ADD_UNIT_TESTS(TestAxisCreation.py
                TestPoint_FiniteValidator.py
                TestPlane.py
                TestPlane_ErrorMsg.py
+               TestPlane_FaceValidator.py
 )
