@@ -82,17 +82,6 @@ void ModelAPI_ResultBody::storeModified(const GeomShapePtr& theOldShape,
   updateSubs(theNewShape);
 }
 
-void ModelAPI_ResultBody::storeWithoutNaming(const GeomShapePtr& theShape)
-{
-  myBuilder->storeWithoutNaming(theShape);
-  myConnect = ConnectionNotComputed;
-
-  static Events_Loop* aLoop = Events_Loop::loop();
-  static Events_ID aRedispEvent = aLoop->eventByName(EVENT_OBJECT_TO_REDISPLAY);
-  static const ModelAPI_EventCreator* aECreator = ModelAPI_EventCreator::get();
-  aECreator->sendUpdated(data()->owner(), aRedispEvent);
-}
-
 GeomShapePtr ModelAPI_ResultBody::shape()
 {
   return myBuilder->shape();
@@ -118,11 +107,6 @@ void ModelAPI_ResultBody::modified(const GeomShapePtr& theOldShape,
   myBuilder->modified(theOldShape, theNewShape, theName);
 }
 
-
-void ModelAPI_ResultBody::deleted(const GeomShapePtr& theOldShape)
-{
-  myBuilder->deleted(theOldShape);
-}
 
 void ModelAPI_ResultBody::loadDeletedShapes(const GeomMakeShapePtr& theAlgo,
                                             const GeomShapePtr& theOldShape,
@@ -152,18 +136,6 @@ void ModelAPI_ResultBody::loadFirstLevel(GeomShapePtr theShape,
                                          const std::string& theName)
 {
   myBuilder->loadFirstLevel(theShape, theName);
-}
-
-void ModelAPI_ResultBody::loadDisconnectedEdges(GeomShapePtr theShape,
-                                                const std::string& theName)
-{
-  myBuilder->loadDisconnectedEdges(theShape, theName);
-}
-
-void ModelAPI_ResultBody::loadDisconnectedVertexes(GeomShapePtr theShape,
-                                                   const std::string& theName)
-{
-  myBuilder->loadDisconnectedVertexes(theShape, theName);
 }
 
 bool ModelAPI_ResultBody::isConnectedTopology()

@@ -128,7 +128,7 @@ bool CompareShapes::operator() (const TopoDS_Shape& theShape1,
           }
         }
       }
-// LCOV_EXCL_START
+// LCOV_EXCL_STOP
     } else // compare addresses if shapes are geometrically equal
       return theShape1.TShape().get() > theShape2.TShape().get();
   }

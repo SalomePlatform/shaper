@@ -57,10 +57,6 @@ public:
                                           const GeomShapePtr& theNewShape,
                                           const bool theIsCleanStored = true) override;
 
-  /// Stores the shape without naming support
-  /// \param theShape shape to store
-  MODEL_EXPORT virtual void storeWithoutNaming(const GeomShapePtr& theShape);
-
   /// Returns the shape-result produced by this feature
   MODEL_EXPORT virtual GeomShapePtr shape();
 
@@ -83,10 +79,6 @@ public:
   MODEL_EXPORT virtual void modified(const GeomShapePtr& theOldShape,
                                      const GeomShapePtr& theNewShape,
                                      const std::string& theName = "") override;
-
-  /// Records the shape oldShape which was deleted from the current label.
-  /// As an example, consider the case of a face removed by a Boolean operation.
-  MODEL_EXPORT virtual void deleted(const GeomShapePtr& theOldShape) override;
 
   /// load deleted shapes
   MODEL_EXPORT
@@ -113,20 +105,8 @@ public:
   MODEL_EXPORT virtual void loadFirstLevel(GeomShapePtr theShape,
                                            const std::string& theName) override;
 
-  /// Loads disconnected edges
-  MODEL_EXPORT virtual void loadDisconnectedEdges(GeomShapePtr theShape,
-                                                  const std::string& theName) override;
-
-  /// Loads disconnected vetexes
-  MODEL_EXPORT virtual void loadDisconnectedVertexes(GeomShapePtr theShape,
-                                                     const std::string& theName) override;
-
   /// Removes the stored builders
   MODEL_EXPORT virtual ~Model_BodyBuilder();
-
-  /// Returns true if the latest modification of this body in the naming history
-  // is equal to the given shape
-  MODEL_EXPORT virtual bool isLatestEqual(const GeomShapePtr& theShape);
 
 protected:
   /// Default constructor accessible only by Model_Objects

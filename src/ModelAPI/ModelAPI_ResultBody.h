@@ -36,12 +36,12 @@ class GeomAlgoAPI_MakeShape;
 * Provides a shape that may be displayed in the viewer.
 * May provide really huge results, so, working with this kind
 * of result must be optimized.
-* Also provides a conainer of sub-body result in case it is compound or compsolid.
+* Also provides a container of sub-body result in case it is compound or compsolid.
 */
 class ModelAPI_ResultBody : public ModelAPI_Result
 {
 public:
-  /// Iternal enumeration for storage the information of connected topology flag
+  /// Internal enumeration for storage the information of connected topology flag
   enum ConnectedTopologyFlag {
     ConnectionNotComputed, ///< not yet computed
     IsConnected,           ///< the topology is connected
@@ -87,7 +87,7 @@ public:
   MODELAPI_EXPORT virtual std::shared_ptr<ModelAPI_ResultBody> subResult(
     const int theIndex, bool forTree = false) const = 0;
 
-  /// Returns true if feature or reuslt belong to this composite feature as subs
+  /// Returns true if feature or result belong to this composite feature as subs
   /// Returns theIndex - zero based index of sub if found
   MODELAPI_EXPORT virtual bool isSub(ObjectPtr theObject, int& theIndex) const = 0;
 
@@ -106,9 +106,6 @@ public:
   MODELAPI_EXPORT virtual void storeModified(const GeomShapePtr& theOldShape,
                                              const GeomShapePtr& theNewShape,
                                              const bool theIsCleanStored = true);
-
-  /// Stores the shape without naming support
-  MODELAPI_EXPORT virtual void storeWithoutNaming(const GeomShapePtr& theShape);
 
   /// Returns the shape-result produced by this feature
   MODELAPI_EXPORT virtual GeomShapePtr shape();
@@ -131,10 +128,6 @@ public:
   MODELAPI_EXPORT virtual void modified(const GeomShapePtr& theOldShape,
                                         const GeomShapePtr& theNewShape,
                                         const std::string& theName = "");
-
-  /// Records the shape oldShape which was deleted from the current label.
-  /// As an example, consider the case of a face removed by a Boolean operation.
-  MODELAPI_EXPORT virtual void deleted(const GeomShapePtr& theOldShape);
 
   /// load deleted shapes
   MODELAPI_EXPORT
@@ -160,18 +153,6 @@ public:
   /// load shapes of the first level (to be used during shape import)
   MODELAPI_EXPORT virtual void loadFirstLevel(GeomShapePtr theShape,
                                               const std::string& theName);
-
-  /// load disconnected edges
-  MODELAPI_EXPORT virtual void loadDisconnectedEdges(GeomShapePtr theShape,
-                                                     const std::string& theName);
-
-  /// load disconnected vetexes
-  MODELAPI_EXPORT virtual void loadDisconnectedVertexes(GeomShapePtr theShape,
-                                                        const std::string& theName);
-
-  /// Returns true if the latest modification of this body in the naming history
-  // is equal to the given shape
-  MODELAPI_EXPORT virtual bool isLatestEqual(const GeomShapePtr& theShape) = 0;
 
   /// Returns true is the topology is connected.
   MODELAPI_EXPORT virtual bool isConnectedTopology() = 0;

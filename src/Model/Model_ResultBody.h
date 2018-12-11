@@ -33,7 +33,7 @@
 * Provides a shape that may be displayed in the viewer.
 * May provide really huge results, so, working with this kind
 * of result must be optimized.
-* Also provides a conainer of sub-body result in case it is compound or compsolid.
+* Also provides a container of sub-body result in case it is compound or compsolid.
 */
 class Model_ResultBody : public ModelAPI_ResultBody
 {
@@ -76,11 +76,11 @@ public:
   MODEL_EXPORT virtual ResultBodyPtr subResult(const int theIndex,
     bool forTree = false) const;
 
-  /// Returns true if feature or reuslt belong to this composite feature as subs
+  /// Returns true if feature or result belong to this composite feature as subs
   /// Returns theIndex - zero based index of sub if found
   MODEL_EXPORT virtual bool isSub(ObjectPtr theObject, int& theIndex) const;
 
-  /// Returns the parameters of color definition in the resources config manager
+  /// Returns the parameters of color definition in the resources configuration manager
   MODEL_EXPORT virtual void colorConfigInfo(std::string& theSection, std::string& theName,
                                             std::string& theDefault);
 
@@ -95,10 +95,6 @@ public:
   /// Sets all subs as concealed in the data tree (referenced by other objects)
   MODEL_EXPORT virtual void setIsConcealed(const bool theValue);
 
-  /// Returns true if the latest modification of this body in the naming history
-  // is equal to the given shape
-  MODEL_EXPORT virtual bool isLatestEqual(const std::shared_ptr<GeomAPI_Shape>& theShape);
-
   /// Returns true is the topology is connected.
   MODEL_EXPORT virtual bool isConnectedTopology();
 
@@ -110,7 +106,7 @@ protected:
   void updateSubs(const std::shared_ptr<GeomAPI_Shape>& theThisShape,
                   const bool theShapeChanged = true);
 
-  // Checks the state of children and partents to send events of creation/erase when needed
+  // Checks the state of children and parents to send events of creation/erase when needed
   void updateConcealment();
 
   friend class Model_Objects;

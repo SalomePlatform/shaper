@@ -309,20 +309,6 @@ void Model_ResultBody::updateSubs(const std::shared_ptr<GeomAPI_Shape>& theThisS
   }
 }
 
-bool Model_ResultBody::isLatestEqual(const std::shared_ptr<GeomAPI_Shape>& theShape)
-{
-  if (myBuilder->isLatestEqual(theShape))
-    return true;
-  // also check that it is asked for sub-elements
-  std::vector<ResultBodyPtr>::const_iterator aSubIter = mySubs.cbegin();
-  for(; aSubIter != mySubs.cend(); aSubIter++) {
-    if (aSubIter->get() && (*aSubIter)->isLatestEqual(theShape)) {
-      return true;
-    }
-  }
-  return false;
-}
-
 bool Model_ResultBody::isConnectedTopology()
 {
   TDF_Label aDataLab = std::dynamic_pointer_cast<Model_Data>(data())->label();

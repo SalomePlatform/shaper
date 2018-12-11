@@ -54,9 +54,6 @@ public:
                              const GeomShapePtr& theNewShape,
                              const bool theIsCleanStored = true) = 0;
 
-  /// Stores the shape without naming support
-  virtual void storeWithoutNaming(const GeomShapePtr& theShape) = 0;
-
   /// Returns the shape-result produced by this feature
   virtual GeomShapePtr shape() = 0;
 
@@ -78,10 +75,6 @@ public:
   virtual void modified(const GeomShapePtr& theOldShape,
                         const GeomShapePtr& theNewShape,
                         const std::string& theName = "") = 0;
-
-  /// Records the shape oldShape which was deleted from the current label.
-  /// As an example, consider the case of a face removed by a Boolean operation.
-  virtual void deleted(const GeomShapePtr& theOldShape) = 0;
 
   /// load deleted shapes
   virtual void loadDeletedShapes(const GeomMakeShapePtr& theAlgo,
@@ -105,18 +98,6 @@ public:
   virtual void loadFirstLevel(GeomShapePtr theShape,
                               const std::string& theName) = 0;
 
-  /// load disconnected edges
-  virtual void loadDisconnectedEdges(GeomShapePtr theShape,
-                                     const std::string& theName) = 0;
-
-  /// load disconnected vetexes
-  virtual void loadDisconnectedVertexes(GeomShapePtr theShape,
-                                        const std::string& theName) = 0;
-
-  /// Returns true if the latest modification of this body in the naming history
-  // is equal to the given shape
-  virtual bool isLatestEqual(const GeomShapePtr& theShape) = 0;
-
 protected:
   /// Returns the data manager of this object: attributes
   MODELAPI_EXPORT virtual std::shared_ptr<ModelAPI_Data> data() const;
@@ -125,7 +106,7 @@ protected:
   MODELAPI_EXPORT virtual std::shared_ptr<ModelAPI_Document> document() const;
 
 protected:
-  /// Deafult constructor accessible only from Model_Object
+  /// Default constructor accessible only from Model_Object
   MODELAPI_EXPORT ModelAPI_BodyBuilder(ModelAPI_Object* theOwner);
 
   ModelAPI_Object* myOwner; ///< the owner object this builder belongs to

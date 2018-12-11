@@ -96,21 +96,6 @@ static int getModificationTag(const TopoDS_Shape& theShape) {
   return INVALID_TAG;
 }
 
-static TopAbs_ShapeEnum convertShapeType(const GeomAPI_Shape::ShapeType theType) {
-  switch (theType) {
-    case GeomAPI_Shape::VERTEX:    return TopAbs_VERTEX;
-    case GeomAPI_Shape::EDGE:      return TopAbs_EDGE;
-    case GeomAPI_Shape::WIRE:      return TopAbs_WIRE;
-    case GeomAPI_Shape::FACE:      return TopAbs_FACE;
-    case GeomAPI_Shape::SHELL:     return TopAbs_SHELL;
-    case GeomAPI_Shape::SOLID:     return TopAbs_SOLID;
-    case GeomAPI_Shape::COMPSOLID: return TopAbs_COMPSOLID;
-    case GeomAPI_Shape::COMPOUND:  return TopAbs_COMPOUND;
-    case GeomAPI_Shape::SHAPE:     return TopAbs_SHAPE;
-  }
-  return TopAbs_SHAPE;
-}
-
 static bool isAlreadyStored(const TNaming_Builder* theBuilder,
                             const TopoDS_Shape& theOldShape,
                             const TopoDS_Shape& theNewShape)
@@ -259,21 +244,6 @@ void Model_BodyBuilder::storeModified(const GeomShapePtr& theOldShape,
   }
 }
 
-void  Model_BodyBuilder::storeWithoutNaming(const GeomShapePtr& theShape)
-{
-  std::shared_ptr<Model_Data> aData = std::dynamic_pointer_cast<Model_Data>(data());
-  if (aData) {
-    clean();
-    if (!theShape.get())
-      return; // bad shape
-    TopoDS_Shape aShape = theShape->impl<TopoDS_Shape>();
-    if (aShape.IsNull())
-      return;  // null shape inside
-    TNaming_Builder aBuilder(aData->shapeLab());
-    aBuilder.Select(aShape, aShape);
-  }
-}
-
 void Model_BodyBuilder::clean()
 {
   TDF_Label aLab = std::dynamic_pointer_cast<Model_Data>(data())->shapeLab();
@@ -391,12 +361,6 @@ void Model_BodyBuilder::modified(const GeomShapePtr& theOldShape,
   buildName(aTag, theName);
 }
 
-void Model_BodyBuilder::deleted(const GeomShapePtr& theOldShape)
-{
-  TopoDS_Shape aShape = theOldShape->impl<TopoDS_Shape>();
-  builder(DELETED_TAG)->Delete(aShape);
-}
-
 void Model_BodyBuilder::loadDeletedShapes(const GeomMakeShapePtr& theAlgo,
                                           const GeomShapePtr& theOldShape,
                                           const GeomAPI_Shape::ShapeType theShapeTypeToExplore,
@@ -426,22 +390,6 @@ void Model_BodyBuilder::loadDeletedShapes(const GeomMakeShapePtr& theAlgo,
     if (aNewShapes.size() == 0
         || (aNewShapes.size() == 1 && aNewShapes.front()->isSame(anOldSubShape))) {
       builder(DELETED_TAG)->Delete(anOldSubShape_);
-    }
-  }
-}
-
-static void removeBadShapes(ListOfShape& theShapes)
-{
-  ListOfShape::iterator anIt = theShapes.begin();
-  while (anIt != theShapes.end()) {
-    TopoDS_Shape aNewShape = (*anIt)->impl<TopoDS_Shape>();
-    bool aSkip = aNewShape.IsNull()
-      || (aNewShape.ShapeType() == TopAbs_EDGE && BRep_Tool::Degenerated(TopoDS::Edge(aNewShape)));
-    if (aSkip) {
-      ListOfShape::iterator aRemoveIt = anIt++;
-      theShapes.erase(aRemoveIt);
-    } else {
-      ++anIt;
     }
   }
 }
@@ -476,15 +424,6 @@ static void keepTopLevelShapes(ListOfShape& theShapes,
         ++anIt;
     }
   }
-}
-
-// returns an ancestor shape-type that used for naming-definition of the sub-type
-TopAbs_ShapeEnum typeOfAncestor(const TopAbs_ShapeEnum theSubType) {
-  if (theSubType == TopAbs_VERTEX)
-    return TopAbs_EDGE;
-  if (theSubType == TopAbs_EDGE)
-    return TopAbs_FACE;
-  return TopAbs_VERTEX; // bad case
 }
 
 /// Checks that shape is presented in the tree with not-selection evolution
@@ -703,6 +642,7 @@ void Model_BodyBuilder::loadGeneratedShapes(const GeomMakeShapePtr& theAlgo,
   }
 }
 
+// LCOV_EXCL_START
 //=======================================================================
 int getDangleShapes(const TopoDS_Shape&           theShapeIn,
   const TopAbs_ShapeEnum        theGeneratedFrom,
@@ -735,6 +675,7 @@ void loadGeneratedDangleShapes(
   for (; itr.More(); itr.Next())
     theBuilder->Generated(itr.Key(), itr.Value());
 }
+// LCOV_EXCL_STOP
 
 //=======================================================================
 void Model_BodyBuilder::loadNextLevels(GeomShapePtr theShape,
@@ -935,121 +876,6 @@ void Model_BodyBuilder::loadFirstLevel(GeomShapePtr theShape, const std::string&
   }
 }
 
-//=======================================================================
-void Model_BodyBuilder::loadDisconnectedEdges(GeomShapePtr theShape, const std::string& theName)
-{
-  if(theShape->isNull()) return;
-  TopoDS_Shape aShape = theShape->impl<TopoDS_Shape>();
-  TopTools_DataMapOfShapeListOfShape edgeNaborFaces;
-  TopTools_ListOfShape empty;
-  TopExp_Explorer explF(aShape, TopAbs_FACE);
-  for (; explF.More(); explF.Next()) {
-    const TopoDS_Shape& aFace = explF.Current();
-    TopExp_Explorer explV(aFace, TopAbs_EDGE);
-    for (; explV.More(); explV.Next()) {
-      const TopoDS_Shape& anEdge = explV.Current();
-      if (!edgeNaborFaces.IsBound(anEdge)) edgeNaborFaces.Bind(anEdge, empty);
-      Standard_Boolean faceIsNew = Standard_True;
-      TopTools_ListIteratorOfListOfShape itrF(edgeNaborFaces.Find(anEdge));
-      for (; itrF.More(); itrF.Next()) {
-        if (itrF.Value().IsSame(aFace)) {
-          faceIsNew = Standard_False;
-          break;
-        }
-      }
-      if (faceIsNew)
-        edgeNaborFaces.ChangeFind(anEdge).Append(aFace);
-    }
-  }
-
-  TopTools_MapOfShape anEdgesToDelete;
-  TopExp_Explorer anEx(aShape,TopAbs_EDGE);
-  std::string aName;
-  for(;anEx.More();anEx.Next()) {
-    Standard_Boolean aC0 = Standard_False;
-    TopoDS_Shape anEdge1 = anEx.Current();
-    if (edgeNaborFaces.IsBound(anEdge1)) {
-      const TopTools_ListOfShape& aList1 = edgeNaborFaces.Find(anEdge1);
-      if (aList1.Extent()<2) continue;
-      TopTools_DataMapIteratorOfDataMapOfShapeListOfShape itr(edgeNaborFaces);
-      for (; itr.More(); itr.Next()) {
-        TopoDS_Shape anEdge2 = itr.Key();
-        if(anEdgesToDelete.Contains(anEdge2)) continue;
-        if (anEdge1.IsSame(anEdge2)) continue;
-        const TopTools_ListOfShape& aList2 = itr.Value();
-        // compare lists of the neighbor faces of edge1 and edge2
-        if (aList1.Extent() == aList2.Extent()) {
-          Standard_Integer aMatches = 0;
-          for(TopTools_ListIteratorOfListOfShape aLIter1(aList1);aLIter1.More();aLIter1.Next())
-            for(TopTools_ListIteratorOfListOfShape aLIter2(aList2);aLIter2.More();aLIter2.Next())
-              if (aLIter1.Value().IsSame(aLIter2.Value())) aMatches++;
-          if (aMatches == aList1.Extent()) {
-            aC0=Standard_True;
-            builder(myFreePrimitiveTag)->Generated(anEdge2);
-            anEdgesToDelete.Add(anEdge2);
-            TCollection_AsciiString aStr(myFreePrimitiveTag - PRIMITIVES_START_TAG + 1);
-            aName = theName + "_" + aStr.ToCString();
-            buildName(myFreePrimitiveTag, aName);
-            ++myFreePrimitiveTag;
-          }
-        }
-      }
-      TopTools_MapIteratorOfMapOfShape itDelete(anEdgesToDelete);
-      for(;itDelete.More();itDelete.Next())
-        edgeNaborFaces.UnBind(itDelete.Key());
-      edgeNaborFaces.UnBind(anEdge1);
-    }
-    if (aC0) {
-      builder(myFreePrimitiveTag)->Generated(anEdge1);
-      TCollection_AsciiString aStr(myFreePrimitiveTag - PRIMITIVES_START_TAG + 1);
-      aName = theName + "_" + aStr.ToCString();
-      buildName(myFreePrimitiveTag, aName);
-      ++myFreePrimitiveTag;
-    }
-  }
-}
-
-void Model_BodyBuilder::loadDisconnectedVertexes(GeomShapePtr theShape,
-                                                 const std::string& theName)
-{
-  if(theShape->isNull()) return;
-  TopoDS_Shape aShape = theShape->impl<TopoDS_Shape>();
-  TopTools_DataMapOfShapeListOfShape vertexNaborEdges;
-  TopTools_ListOfShape empty;
-  TopExp_Explorer explF(aShape, TopAbs_EDGE);
-  for (; explF.More(); explF.Next()) {
-    const TopoDS_Shape& anEdge = explF.Current();
-    TopExp_Explorer explV(anEdge, TopAbs_VERTEX);
-    for (; explV.More(); explV.Next()) {
-      const TopoDS_Shape& aVertex = explV.Current();
-      if (!vertexNaborEdges.IsBound(aVertex)) vertexNaborEdges.Bind(aVertex, empty);
-      Standard_Boolean faceIsNew = Standard_True;
-      TopTools_ListIteratorOfListOfShape itrF(vertexNaborEdges.Find(aVertex));
-      for (; itrF.More(); itrF.Next()) {
-        if (itrF.Value().IsSame(anEdge)) {
-          faceIsNew = Standard_False;
-          break;
-        }
-      }
-      if (faceIsNew) {
-        vertexNaborEdges.ChangeFind(aVertex).Append(anEdge);
-      }
-    }
-  }
-  std::string aName;
-  TopTools_DataMapIteratorOfDataMapOfShapeListOfShape itr(vertexNaborEdges);
-  for (; itr.More(); itr.Next()) {
-    const TopTools_ListOfShape& naborEdges = itr.Value();
-    if (naborEdges.Extent() < 2) {
-      builder(myFreePrimitiveTag)->Generated(itr.Key());
-      TCollection_AsciiString aStr(myFreePrimitiveTag - PRIMITIVES_START_TAG + 1);
-      aName = theName + "_" + aStr.ToCString();
-      buildName(myFreePrimitiveTag, aName);
-      ++myFreePrimitiveTag;
-    }
-  }
-}
-
 GeomShapePtr Model_BodyBuilder::shape()
 {
   std::shared_ptr<Model_Data> aData = std::dynamic_pointer_cast<Model_Data>(data());
@@ -1070,29 +896,4 @@ GeomShapePtr Model_BodyBuilder::shape()
     }
   }
   return GeomShapePtr();
-}
-
-bool Model_BodyBuilder::isLatestEqual(const GeomShapePtr& theShape)
-{
-  if (theShape.get()) {
-    TopoDS_Shape aShape = theShape->impl<TopoDS_Shape>();
-    std::shared_ptr<Model_Data> aData = std::dynamic_pointer_cast<Model_Data>(data());
-    if (aData) {
-      TDF_Label aShapeLab = aData->shapeLab();
-      Handle(TNaming_NamedShape) aName;
-      if (aShapeLab.FindAttribute(TNaming_NamedShape::GetID(), aName)) {
-        TopoDS_Shape aLatest = TNaming_Tool::CurrentShape(aName);
-        if (aLatest.IsNull())
-          return false;
-        if (aLatest.IsEqual(aShape))
-          return true;
-        // check sub-shapes for comp-solids:
-        for (TopExp_Explorer anExp(aShape, aLatest.ShapeType()); anExp.More(); anExp.Next()) {
-          if (aLatest.IsEqual(anExp.Current()))
-            return true;
-        }
-      }
-    }
-  }
-  return false;
 }
