@@ -88,6 +88,7 @@ void FeaturesPlugin_MultiTranslation::performOneDirection()
   AttributeSelectionListPtr anObjectsSelList =
     selectionList(FeaturesPlugin_MultiTranslation::OBJECTS_LIST_ID());
   if (anObjectsSelList->size() == 0) {
+    setError("Error: empty selection list");
     return;
   }
   for(int anObjectsIndex = 0; anObjectsIndex < anObjectsSelList->size(); anObjectsIndex++) {
@@ -124,11 +125,6 @@ void FeaturesPlugin_MultiTranslation::performOneDirection()
   {
     GeomAPI_ShapeIterator anIt(aShape);
     anEdge = anIt.current()->edge();
-  }
-  else
-  {
-    setError(aSelectionError);
-    return;
   }
 
   if (!anEdge.get())
@@ -222,6 +218,7 @@ void FeaturesPlugin_MultiTranslation::performTwoDirection()
   AttributeSelectionListPtr anObjectsSelList =
     selectionList(FeaturesPlugin_MultiTranslation::OBJECTS_LIST_ID());
   if (anObjectsSelList->size() == 0) {
+    setError("Error: empty selection list");
     return;
   }
   for(int anObjectsIndex = 0; anObjectsIndex < anObjectsSelList->size(); anObjectsIndex++) {
@@ -259,11 +256,6 @@ void FeaturesPlugin_MultiTranslation::performTwoDirection()
     GeomAPI_ShapeIterator anIt(aShape);
     anEdge = anIt.current()->edge();
   }
-  else
-  {
-    setError(aSelectionError);
-    return;
-  }
 
   if (!anEdge.get())
   {
@@ -295,11 +287,6 @@ void FeaturesPlugin_MultiTranslation::performTwoDirection()
   {
     GeomAPI_ShapeIterator anIt(aShape);
     anEdge = anIt.current()->edge();
-  }
-  else
-  {
-    setError(aSelectionError);
-    return;
   }
 
   if (!anEdge.get())

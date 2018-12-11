@@ -85,6 +85,7 @@ void FeaturesPlugin_MultiRotation::performRotation1D()
   AttributeSelectionListPtr anObjectsSelList =
     selectionList(FeaturesPlugin_MultiRotation::OBJECTS_LIST_ID());
   if (anObjectsSelList->size() == 0) {
+    setError("Error: empty selection list");
     return;
   }
   for(int anObjectsIndex = 0; anObjectsIndex < anObjectsSelList->size(); anObjectsIndex++) {

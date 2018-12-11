@@ -193,7 +193,9 @@ ADD_UNIT_TESTS(TestExtrusion.py
                TestRotation.py
                TestRotation_ErrorMsg.py
                TestMultiRotation_Part.py
+               TestMultiRotation_ErrorMsg.py
                TestMultiTranslation_Part.py
+               TestMultiTranslation_ErrorMsg.py
                TestSymmetry_Part.py
                TestBoolean1.py
                TestBoolean2.py
@@ -410,6 +412,7 @@ ADD_UNIT_TESTS(TestExtrusion.py
                TestBooleanFuse_CompSolid_CompSolid.py
                TestBooleanFuse_CompSolidCompound_CompSolidCompound.py
                TestFillet.py
+               TestFillet1.py
                TestFillet_ErrorMsg.py
                Test1816.py
                Test2631.py
