@@ -55,7 +55,7 @@
 
 static Model_Session* myImpl = new Model_Session();
 
-// t oredirect all calls to the root document
+// to redirect all calls to the root document
 #define ROOT_DOC std::dynamic_pointer_cast<Model_Document>(moduleDocument())
 
 bool Model_Session::load(const char* theFileName)
@@ -114,7 +114,7 @@ void Model_Session::abortOperation()
     myOperationAttachedToNext = false;
   }
   setCheckTransactions(true);
-  // here the update mechanism may work after abort, so, supress the warnings about
+  // here the update mechanism may work after abort, so, suppress the warnings about
   // modifications outside of the transactions
   bool aWasCheck = myCheckTransactions;
   myCheckTransactions = false;
@@ -294,7 +294,7 @@ void Model_Session::setActiveDocument(
     std::shared_ptr<ModelAPI_Document> aPrevious = myCurrentDoc;
     myCurrentDoc = theDoc;
     if (theDoc.get() && theSendSignal) {
-      // this must be before the synchronisation call because features in PartSet lower than this
+      // this must be before the synchronization call because features in PartSet lower than this
       // part feature must be disabled and don't recomputed anymore (issue 1156,
       // translation feature is failed on activation of Part 2)
       if (isOperation()) { // do it only in transaction, not on opening of document
@@ -306,7 +306,7 @@ void Model_Session::setActiveDocument(
           }
         }
       }
-      // syncronize the document: it may be just opened or opened but removed before
+      // synchronize the document: it may be just opened or opened but removed before
       std::shared_ptr<Model_Document> aDoc = std::dynamic_pointer_cast<Model_Document>(theDoc);
       if (aDoc.get()) {
         bool aWasChecked = myCheckTransactions;
@@ -320,7 +320,7 @@ void Model_Session::setActiveDocument(
           new Events_Message(Events_Loop::eventByName(EVENT_DOCUMENT_CHANGED)));
       Events_Loop::loop()->send(aMsg);
     }
-    // make the current state correct and synchronised in the module and sub-documents
+    // make the current state correct and synchronized in the module and sub-documents
     if (isOperation()) { // do it only in transaction, not on opening of document
       if (myCurrentDoc == moduleDocument()) {
         // make the current feature the latest in root, in previous root current become also last
@@ -619,7 +619,7 @@ void Model_Session::blockAutoUpdate(const bool theBlock)
     }
     if (!isOperation) {
       finishOperation();
-      // append this transaction to the previous one: ne don't need this separated operation in list
+      // append this transaction to the previous one: don't need this separated operation in list
       ROOT_DOC->appendTransactionToPrevious();
     }
   }

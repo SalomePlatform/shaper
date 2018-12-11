@@ -107,6 +107,8 @@ bool CompareShapes::operator() (const TopoDS_Shape& theShape1,
     else if (Abs(dLength) < tol && theShape1.ShapeType() <= TopAbs_FACE) {
       // equal values possible on shapes such as two halves of a sphere and
       // a membrane inside the sphere
+// LCOV_EXCL_START
+      // this part of code is taken from GEOM module, but can not reproduce in SHAPER
       Bnd_Box box1,box2;
       BRepBndLib::Add(theShape1, box1);
       if (!box1.IsVoid()) {
@@ -126,7 +128,8 @@ bool CompareShapes::operator() (const TopoDS_Shape& theShape1,
           }
         }
       }
-    } else // compare adresses if shapes are geometrically equal
+// LCOV_EXCL_START
+    } else // compare addresses if shapes are geometrically equal
       return theShape1.TShape().get() > theShape2.TShape().get();
   }
 

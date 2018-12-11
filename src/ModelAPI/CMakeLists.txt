@@ -232,4 +232,5 @@ ADD_UNIT_TESTS(TestConstants.py
                TestGeomNamingSketchPlane.py
                TestGeomNamingBoxWithFillet.py
                TestContainerSelector.py
+               TestSaveOpen.py
 )
