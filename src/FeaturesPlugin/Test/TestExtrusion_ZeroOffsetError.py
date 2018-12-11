@@ -45,6 +45,6 @@ model.do()
 Compound_2 = model.addCompound(Part_1_doc, [model.selection("FACE", "Sketch_3/Face-SketchCircle_4_2r"), model.selection("FACE", "Sketch_3/Face-SketchCircle_5_2f")])
 
 Extrusion_2 = model.addExtrusion(Part_1_doc, [model.selection("FACE", "Sketch_1/Face-SketchCircle_1_2r")], model.selection(), model.selection("COMPOUND", "Compound_1_1"), 0, model.selection("COMPOUND", "Compound_2_1"), 0)
-assert(Extrusion_2.feature().error() != "")
+assert(Extrusion_2.feature().error() == "")
 
 model.end()
