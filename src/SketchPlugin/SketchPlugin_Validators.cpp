@@ -45,7 +45,6 @@
 #include <ModelAPI_AttributeDouble.h>
 #include <ModelAPI_AttributeInteger.h>
 #include <ModelAPI_AttributeRefAttr.h>
-#include <ModelAPI_AttributeRefAttrList.h>
 #include <ModelAPI_AttributeRefList.h>
 #include <ModelAPI_AttributeSelectionList.h>
 #include <ModelAPI_AttributeString.h>

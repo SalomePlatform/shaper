@@ -9,28 +9,25 @@ lcov --capture --directory ${BUILD_DIR} --no-external --base-directory ${SOURCES
 # make a working copy of report
 cp -f coverage.info.noext covfile
 # remove all reports of GUI and external parts (for all the next kinds of reports)
-for MASK in '*wrap*' 'moc_*' 'XAO_*' 'SketcherPrs_*' 'GeomAlgoImpl_*' 'ModuleBase_*' '*Widget*' '*Splitter*'; do
+# RefAttrList is unused type of attribute for now
+for MASK in '*wrap*' 'moc_*' 'XAO_*' 'SketcherPrs_*' 'GeomAlgoImpl_*' 'ModuleBase_*' '*Widget*' '*Splitter*' '*RefAttrList*'; do
 lcov -r covfile ${MASK} --output-file covfile_res -q
 mv -f covfile_res covfile
 done
 
+ALL='BuildPlugin CollectionPlugin ConstructionPlugin ExchangePlugin FeaturesPlugin GDMLPlugin PrimitivesPlugin InitializationPlugin ParametersPlugin PartSetPlugin SketchPlugin'
+ALL+=' GDMLAPI PrimitivesAPI BuilderAPI CollectionAPI ConnectorAPI ConstructionAPI ModelAPI ExchangeAPI FeaturesAPI ModelHighAPI ParametersAPI PartSetAPI SketchAPI BuildAPI GeomDataAPI GeomAPI GeomAlgoAPI'
+ALL+=' Config Events GeomValidators Model_ ModelGeomAlgo Selector SketchSolver GeomData'
 
 # prepare API report
 cp -f covfile covAPI
-# remove plugins
-for MASK in 'Build' 'Collection' 'Construction' 'Exchange' 'Features' 'GDML' 'Primitives' 'Initialization' 'Parameters' 'PartSet' 'Sketch'; do
-lcov -r covAPI *${MASK}Plugin* --output-file covAPI_res -q
-mv -f covAPI_res covAPI
-done
-# remove low level API
-for MASK in 'Geom' 'GeomAlgo' 'GeomData' 'Model'; do
-lcov -r covAPI *${MASK}API* --output-file covAPI_res -q
-mv -f covAPI_res covAPI
-done
-# remove others
-for MASK in 'Config' 'Events' 'GeomData' 'GeomValidators' 'Model_' 'ModelGeomAlgo' 'Selector' 'SketchSolver'; do
-lcov -r covAPI *${MASK}* --output-file covAPI_res -q
-mv -f covAPI_res covAPI
+# remove all plugins data except the needed
+NEED='BuildAPI CollectionAPI ConnectorAPI ConstructionAPI ExchangeAPI FeaturesAPI GDMLAPI ModelHighAPI ParametersAPI PartSetAPI PrimitivesAPI SketchAPI'
+for MASK in $ALL; do
+  if ! [[ " $NEED " =~ " $MASK " ]]; then
+    lcov -r covAPI *${MASK}* --output-file covAPI_res -q
+    mv -f covAPI_res covAPI
+  fi
 done
 rm -rf lcov_htmlAPI
 genhtml covAPI --output-directory lcov_htmlAPI -q
@@ -38,21 +35,13 @@ genhtml covAPI --output-directory lcov_htmlAPI -q
 
 # prepare Direct report
 cp -f covfile covDirect
-# remove plugins
-for MASK in 'Build' 'Collection' 'Construction' 'Exchange' 'Features' 'GDML' 'Primitives' 'Initialization' 'Parameters' 'PartSet' 'Sketch'; do
-str=$startmask$MASK$endmask
-lcov -r covDirect *${MASK}Plugin* --output-file covDirect_res -q
-mv -f covDirect_res covDirect
-done
-# remove low level API
-for MASK in 'GDML' 'Primitives' 'Builder' 'Collection' 'Connector' 'Construction' 'Model' 'Exchange' 'Features' 'ModelHigh' 'Parameters' 'PartSet' 'Sketch' 'Build' 'GeomData'; do
-lcov -r covDirect *${MASK}API* --output-file covDirect_res -q
-mv -f covDirect_res covDirect
-done
-# remove others
-for MASK in 'Config' 'Events' 'GeomValidators' 'Model_' 'ModelGeomAlgo' 'Selector' 'SketchSolver' 'GeomData'; do
-lcov -r covDirect *${MASK}* --output-file covDirect_res -q
-mv -f covDirect_res covDirect
+# remove all plugins data except the needed
+NEED='GeomAlgoAPI GeomAPI'
+for MASK in $ALL; do
+  if ! [[ " $NEED " =~ " $MASK " ]]; then
+    lcov -r covDirect *${MASK}* --output-file covDirect_res -q
+    mv -f covDirect_res covDirect
+  fi
 done
 rm -rf lcov_htmlDirect
 genhtml covDirect --output-directory lcov_htmlDirect -q
@@ -60,22 +49,16 @@ genhtml covDirect --output-directory lcov_htmlDirect -q
 
 # prepare Else report
 cp -f covfile covElse
-# remove low level API
-for MASK in 'Geom' 'GeomAlgo' 'GDML' 'Primitives' 'Builder' 'Collection' 'Connector' 'Construction' 'Exchange' 'Features' 'ModelHigh' 'Parameters' 'PartSet' 'Sketch' 'Build'; do
-lcov -r covElse *${MASK}API* --output-file covElse_res -q
-mv -f covElse_res covElse
-done
-# remove SketchPlugin's Ellipse feature (unsupported yet)
-lcov -r covElse SketchPlugin*Ellipse* --output-file covElse_res -q
-mv -f covElse_res covElse
-# remove GUI related files from Config plugin
-for MASK in 'DataModelReader' 'FeatureMessage' 'Translator' 'PointerMessage'; do
-lcov -r covElse *Config_${MASK}* --output-file covElse_res -q
-mv -f covElse_res covElse
+# remove all plugins data except the needed
+NEED='BuildPlugin CollectionPlugin Config ConstructionPlugin Events ExchangePlugin FeaturesPlugin GDMLPlugin GeomData GeomDataAPLI GeomValidators InitializationPlugin Model_ ModelAPI ModelGeomAlgo ParametersPlugin PartSetPlugin PrimitivesPlugin Selector SketchPlugin SketchSolver'
+for MASK in $ALL; do
+  if ! [[ " $NEED " =~ " $MASK " ]]; then
+    lcov -r covElse *${MASK}API* --output-file covElse_res -q
+    mv -f covElse_res covElse
+  fi
 done
 rm -rf lcov_htmlElse
 genhtml covElse --output-directory lcov_htmlElse -q
-
 
 # go back
 cd ${SOURCES_DIR}

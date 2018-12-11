@@ -25,7 +25,6 @@
     SketchPlugin_Fillet
         static const std::string MY_CONSTRAINT_FILLET_ID("SketchFillet");
         data()->addAttribute(SketchPlugin_Constraint::VALUE(), ModelAPI_AttributeDouble::typeId());
-        data()->addAttribute(SketchPlugin_Constraint::ENTITY_A(), ModelAPI_AttributeRefAttrList::typeId());
         data()->addAttribute(SketchPlugin_Constraint::ENTITY_B(), ModelAPI_AttributeRefList::typeId());
         data()->addAttribute(SketchPlugin_Constraint::ENTITY_C(), ModelAPI_AttributeRefAttrList::typeId());
 
