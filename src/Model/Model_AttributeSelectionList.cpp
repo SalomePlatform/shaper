@@ -269,6 +269,8 @@ int Model_AttributeSelectionList::size()
   return mySize->Get();
 }
 
+// LCOV_EXCL_START
+
 // returns true if theShape is same with theInList or is contained in it (a compound)
 static bool isIn(GeomShapePtr theInList, GeomShapePtr theShape) {
   if (theShape->isSame(theInList))
@@ -328,6 +330,7 @@ bool Model_AttributeSelectionList::isInList(const ObjectPtr& theContext,
   }
   return false;
 }
+// LCOV_EXCL_STOP
 
 const std::string Model_AttributeSelectionList::selectionType() const
 {
@@ -407,7 +410,7 @@ void Model_AttributeSelectionList::reinit()
   myIsCashed = false;
 }
 
-
+// LCOV_EXCL_START
 void Model_AttributeSelectionList::cashValues(const bool theEnabled)
 {
   myIsCashed = theEnabled;
@@ -421,6 +424,7 @@ void Model_AttributeSelectionList::cashValues(const bool theEnabled)
     }
   }
 }
+// LCOV_EXCL_STOP
 
 bool Model_AttributeSelectionList::isGeometricalSelection() const
 {

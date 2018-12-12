@@ -67,6 +67,7 @@ void Model_AttributeRefList::remove(ObjectPtr theObject)
       REMOVE_BACK_REF(theObject);
       owner()->data()->sendAttributeUpdated(this);
     } else {
+      // LCOV_EXCL_START
       // create new lists because for the current moment remove one of the duplicated elements
       // from the list is buggy
       TDF_LabelList anOldList = myRef->List();
@@ -102,6 +103,7 @@ void Model_AttributeRefList::remove(ObjectPtr theObject)
         REMOVE_BACK_REF(theObject);
         owner()->data()->sendAttributeUpdated(this);
       }
+      // LCOV_EXCL_STOP
     }
   }
   else { // in case of empty object remove, the first empty object is removed from the list

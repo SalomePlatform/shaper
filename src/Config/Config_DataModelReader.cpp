@@ -24,7 +24,8 @@
 
 #include <Events_InfoMessage.h>
 
-
+// used only for GUI xml data reading
+// LCOV_EXCL_START
 Config_DataModelReader::Config_DataModelReader()
     : Config_XMLReader(DATAMODEL_FILE), isRootReading(true), myIsResultLink(false)
 {
@@ -132,4 +133,4 @@ std::string Config_DataModelReader::
 {
   return getFolderFeatures(theFolderName, myRootFolderNames, myRootFeaturesList);
 }
-
+// LCOV_EXCL_STOP

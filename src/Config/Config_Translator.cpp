@@ -77,7 +77,6 @@ void Config_TSReader::processNode(xmlNodePtr theNode)
       myTranslator[aName][aSource] = aTranslat;
   }
 }
-// LCOV_EXCL_STOP
 
 //******************************************************************************
 //******************************************************************************
@@ -120,6 +119,7 @@ bool Config_Translator::load(const std::string& theFileName)
   }
   return true;
 }
+// LCOV_EXCL_STOP
 
 std::string Config_Translator::translate(const Events_InfoMessage& theInfo)
 {
@@ -176,7 +176,7 @@ std::string Config_Translator::translate(const std::string& theContext,
   return aMsg;
 }
 
-
+// LCOV_EXCL_START
 std::string Config_Translator::codec(const std::string& theContext)
 {
   return (myCodecs.count(theContext) > 0)? myCodecs[theContext] : "UTF-8";
@@ -186,6 +186,7 @@ std::string Config_Translator::codec(const Events_InfoMessage& theInfo)
 {
   return codec(theInfo.context());
 }
+// LCOV_EXCL_STOP
 
 #ifdef _DEBUG
 #ifdef MISSED_TRANSLATION
