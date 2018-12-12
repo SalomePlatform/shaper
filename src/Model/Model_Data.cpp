@@ -96,15 +96,6 @@ void Model_Data::setLabel(TDF_Label theLab)
     myFlags->SetValue(kFlagInHistory, Standard_True); // is in history by default is true
     myFlags->SetValue(kFlagDisplayed, Standard_True); // is displayed by default is true
     myFlags->SetValue(kFlagDeleted, Standard_False); // is deleted by default is false
-  } else if (myFlags->Length() != 3) { // for old formats support
-    Standard_Boolean aFlag0 = myFlags->Upper() >= 0 ? myFlags->Value(0) : Standard_True;
-    Standard_Boolean aFlag1 = myFlags->Upper() >= 1 ? myFlags->Value(1) : Standard_True;
-    Standard_Boolean aFlag2 = myFlags->Upper() >= 2 ? myFlags->Value(2) : Standard_True;
-    Handle(TColStd_HArray1OfByte) aNewArray = new TColStd_HArray1OfByte(0, 2);
-    myFlags->SetInternalArray(aNewArray);
-    myFlags->SetValue(0, aFlag0);
-    myFlags->SetValue(1, aFlag1);
-    myFlags->SetValue(2, aFlag2);
   }
 }
 
@@ -344,12 +335,6 @@ void Model_Data::sendAttributeUpdated(ModelAPI_Attribute* theAttr)
       if (myWasChangedButBlocked.empty() || *(myWasChangedButBlocked.rbegin()) != theAttr)
         myWasChangedButBlocked.push_back(theAttr);
     }
-  } else {
-    // trim: need to redisplay
-    /*if (myObject) {
-      static const Events_ID anEvent = Events_Loop::eventByName(EVENT_OBJECT_TO_REDISPLAY);
-      ModelAPI_EventCreator::get()->sendUpdated(myObject, anEvent);
-    }*/
   }
 }
 
@@ -417,7 +402,7 @@ enum StatesIndexes {
   STATE_INDEX_TRANSACTION = 2, // transaction ID
 };
 
-/// Returns the label array, initialises it by default values if not exists
+/// Returns the label array, initializes it by default values if not exists
 static Handle(TDataStd_IntegerArray) stateArray(TDF_Label& theLab)
 {
   Handle(TDataStd_IntegerArray) aStateArray;
@@ -481,15 +466,6 @@ int Model_Data::featureId() const
   return myLab.Father().Tag(); // tag of the feature label
 }
 
-void Model_Data::eraseBackReferences()
-{
-  myRefsToMe.clear();
-  std::shared_ptr<ModelAPI_Result> aRes = std::dynamic_pointer_cast<ModelAPI_Result>(myObject);
-  if (aRes) {
-    aRes->setIsConcealed(false);
-  }
-}
-
 void Model_Data::removeBackReference(ObjectPtr theObject, std::string theAttrID)
 {
   AttributePtr anAttribute = theObject->data()->attribute(theAttrID);
@@ -503,7 +479,7 @@ void Model_Data::removeBackReference(AttributePtr theAttr)
 
   myRefsToMe.erase(theAttr);
 
-  // remove concealment immideately: on deselection it must be posible to reselect in GUI the same
+  // remove concealment immediately: on deselection it must be possible to reselect in GUI the same
   FeaturePtr aFeatureOwner = std::dynamic_pointer_cast<ModelAPI_Feature>(theAttr->owner());
   if (aFeatureOwner.get() &&
     ModelAPI_Session::get()->validators()->isConcealed(aFeatureOwner->getKind(), theAttr->id())) {
@@ -741,7 +717,7 @@ void Model_Data::copyTo(std::shared_ptr<ModelAPI_Data> theTarget)
   // reinitialize Model_Attributes by TDF_Attributes set
   std::shared_ptr<Model_Data> aTData = std::dynamic_pointer_cast<Model_Data>(theTarget);
   aTData->myAttrs.clear();
-  theTarget->owner()->initAttributes(); // reinit feature attributes
+  theTarget->owner()->initAttributes(); // reinitialize feature attributes
 }
 
 bool Model_Data::isInHistory()

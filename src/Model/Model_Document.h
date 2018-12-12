@@ -180,10 +180,6 @@ class Model_Document : public ModelAPI_Document
   //! without this participation
   MODEL_EXPORT virtual void synchronizeTransactions();
 
-  //! Returns feature by the id of the feature (produced by the Data "featureId" method)
-  MODEL_EXPORT virtual std::shared_ptr<ModelAPI_Feature> featureById(const int theId);
-
-
   /// Creates construction results
   MODEL_EXPORT virtual std::shared_ptr<ModelAPI_ResultConstruction> createConstruction(
       const std::shared_ptr<ModelAPI_Data>& theFeatureData, const int theIndex = 0);
@@ -285,8 +281,6 @@ class Model_Document : public ModelAPI_Document
   MODEL_EXPORT virtual int transactionID();
   /// Increases the transaction ID
   MODEL_EXPORT virtual void incrementTransactionID();
-  /// Decreases the transaction ID
-  MODEL_EXPORT virtual void decrementTransactionID();
 
   /// Returns true if document is opened and valid
   MODEL_EXPORT virtual bool isOpened();

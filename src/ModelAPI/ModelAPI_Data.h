@@ -181,7 +181,7 @@ class MODELAPI_EXPORT ModelAPI_Data
   /// Copies all attributes content into theTarget data
   virtual void copyTo(std::shared_ptr<ModelAPI_Data> theTarget) = 0;
 
-  /// Returns the invalid data pointer (to avoid working with NULL shared ptrs in swig)
+  /// Returns the invalid data pointer (to avoid working with NULL shared pointers in swig)
   virtual std::shared_ptr<ModelAPI_Data> invalidPtr() = 0;
 
   /// Identifier of the transaction when object (feature or result) was updated last time.
@@ -191,13 +191,13 @@ class MODELAPI_EXPORT ModelAPI_Data
   /// This method is called by the updater.
   virtual void setUpdateID(const int theID) = 0;
 
-  /// Returns the owner of htis data
+  /// Returns the owner of this data
   virtual std::shared_ptr<ModelAPI_Object> owner() = 0;
 
-  /// Returns true if the object is deleted, but some data is still keept in memory
+  /// Returns true if the object is deleted, but some data is still kept in memory
   virtual bool isDeleted() = 0;
 
-  /// Sets true if the object is deleted, but some data is still keept in memory
+  /// Sets true if the object is deleted, but some data is still kept in memory
   virtual void setIsDeleted(const bool theFlag) = 0;
 
   /// Returns \c true if theAttribute1 is going earlier than theAttribute2 in the data
@@ -216,7 +216,7 @@ class MODELAPI_EXPORT ModelAPI_Data
 
   /// Returns true if object must be displayed in the viewer: flag is stored in the
   /// data model, so on undo/redo, open/save or recreation of object by history-playing it keeps
-  /// the original state i nthe current transaction.
+  /// the original state in the current transaction.
   virtual bool isDisplayed() = 0;
 
   /// Sets the displayed/hidden state of the object. If it is changed, sends the "redisplay"

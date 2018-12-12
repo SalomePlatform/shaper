@@ -201,13 +201,6 @@ void ExchangePlugin_ImportFeature::importXAO(const std::string& theFileName)
     aSelectionList->setSelectionType(aSelectionType);
     for (int anElementIndex = 0; anElementIndex < aXaoGroup->count(); ++anElementIndex) {
       aSelectionList->append(aResultBody, GeomShapePtr());
-      // complex conversion of element index to reference id
-      int anElementID = aXaoGroup->get(anElementIndex);
-      std::string aReferenceString =
-          aXaoGeometry->getElementReference(aXaoGroup->getDimension(), anElementID);
-      int aReferenceID = XAO::XaoUtils::stringToInt(aReferenceString);
-
-      aSelectionList->value(anElementIndex)->setId(aReferenceID);
     }
   }
   // Create new fields

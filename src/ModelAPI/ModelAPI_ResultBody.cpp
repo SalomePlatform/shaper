@@ -87,12 +87,6 @@ GeomShapePtr ModelAPI_ResultBody::shape()
   return myBuilder->shape();
 }
 
-bool ModelAPI_ResultBody::generated(const GeomShapePtr& theNewShape,
-  const std::string& theName, const bool theCheckIsInResult)
-{
-  return myBuilder->generated(theNewShape, theName, theCheckIsInResult);
-}
-
 void ModelAPI_ResultBody::generated(const GeomShapePtr& theOldShape,
                                     const GeomShapePtr& theNewShape,
                                     const std::string& theName)
@@ -114,22 +108,6 @@ void ModelAPI_ResultBody::loadDeletedShapes(const GeomMakeShapePtr& theAlgo,
                                             const GeomShapePtr& theShapesToExclude)
 {
   myBuilder->loadDeletedShapes(theAlgo, theOldShape, theShapeTypeToExplore, theShapesToExclude);
-}
-
-void ModelAPI_ResultBody::loadModifiedShapes(const GeomMakeShapePtr& theAlgo,
-                                             const GeomShapePtr& theOldShape,
-                                             const GeomAPI_Shape::ShapeType theShapeTypeToExplore,
-                                             const std::string& theName)
-{
-  myBuilder->loadModifiedShapes(theAlgo, theOldShape, theShapeTypeToExplore, theName);
-}
-
-void ModelAPI_ResultBody::loadGeneratedShapes(const GeomMakeShapePtr& theAlgo,
-                                              const GeomShapePtr& theOldShape,
-                                              const GeomAPI_Shape::ShapeType theShapeTypeToExplore,
-                                              const std::string& theName)
-{
-  myBuilder->loadGeneratedShapes(theAlgo, theOldShape, theShapeTypeToExplore, theName);
 }
 
 void ModelAPI_ResultBody::loadFirstLevel(GeomShapePtr theShape,

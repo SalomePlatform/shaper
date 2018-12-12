@@ -168,7 +168,7 @@ class Model_Data : public ModelAPI_Data
   MODEL_EXPORT virtual const std::string& id(const std::shared_ptr<ModelAPI_Attribute>& theAttr);
   /// Returns true if data belongs to same features
   MODEL_EXPORT virtual bool isEqual(const std::shared_ptr<ModelAPI_Data>& theData);
-  /// Returns true if it is correctly connected t othe data model
+  /// Returns true if it is correctly connected to the data model
   MODEL_EXPORT virtual bool isValid();
 
   /// Returns the label where the shape must be stored (used in ResultBody)
@@ -236,10 +236,10 @@ class Model_Data : public ModelAPI_Data
   MODEL_EXPORT virtual void referencesToObjects(
     std::list<std::pair<std::string, std::list<ObjectPtr> > >& theRefs);
 
-  /// Copies all atributes content into theTarget data
+  /// Copies all attributes content into theTarget data
   MODEL_EXPORT virtual void copyTo(std::shared_ptr<ModelAPI_Data> theTarget);
 
-  /// Returns the invalid data pointer (to avoid working with NULL shared ptrs in swig)
+  /// Returns the invalid data pointer (to avoid working with NULL shared pointers in swig)
   MODEL_EXPORT virtual std::shared_ptr<ModelAPI_Data> invalidPtr();
 
   /// Returns the invalid data pointer: static method
@@ -263,15 +263,13 @@ protected:
   /// Defines the custom "is in history" behavior
   MODEL_EXPORT virtual void setIsInHistory(const bool theFlag);
 
-  /// Returns true if the object is deleted, but some data is still keept in memory
+  /// Returns true if the object is deleted, but some data is still kept in memory
   MODEL_EXPORT virtual bool isDeleted();
 
-  /// Sets true if the object is deleted, but some data is still keept in memory
+  /// Sets true if the object is deleted, but some data is still kept in memory
   MODEL_EXPORT virtual void setIsDeleted(const bool theFlag);
 
 private:
-  /// Removes all information about back references
-  void eraseBackReferences();
   /// Removes a back reference (with identifier which attribute references to this object)
   /// \param theFeature feature referenced to this
   /// \param theAttrID identifier of the attribute that is references from theFeature to this
@@ -282,7 +280,7 @@ private:
   /// Adds a back reference (with identifier which attribute references to this object
   /// \param theFeature feature referenced to this
   /// \param theAttrID identifier of the attribute that is references from theFeature to this
-  /// \param theApplyConcealment applies consealment flag changes
+  /// \param theApplyConcealment applies concealment flag changes
   void addBackReference(FeaturePtr theFeature, std::string theAttrID,
     const bool theApplyConcealment = true);
   /// Adds a back reference to an object
@@ -295,7 +293,7 @@ private:
 
   /// Returns true if object must be displayed in the viewer: flag is stored in the
   /// data model, so on undo/redo, open/save or recreation of object by history-playing it keeps
-  /// the original state i nthe current transaction.
+  /// the original state in the current transaction.
   MODEL_EXPORT virtual bool isDisplayed();
 
   /// Sets the displayed/hidden state of the object. If it is changed, sends the "redisplay"

@@ -100,16 +100,6 @@ public:
   /// \param theDefaultValue a name, which is returned if the naming name can not be obtained
   MODEL_EXPORT virtual std::string namingName(const std::string& theDefaultValue = "");
 
-  /// Returns an Id of the selection
-  /// NOTE: This method has been added for temporary export of groups towards old GEOM
-  /// It should then be removed when a direct use of objects from SHAPER
-  /// will be possible from SMESH module of SALOME.
-  MODEL_EXPORT virtual int Id();
-
-  /// Defines the sub-shape by Id
-  /// NOTE: This method is opposite to Id() method.
-  MODEL_EXPORT virtual void setId(int theID);
-
   /// Selects (i.e. creates Naming data structure) of sub-shape specified by textual name
   MODEL_EXPORT virtual void selectSubShape(const std::string& theType,
                                            const std::string& theSubShapeName);

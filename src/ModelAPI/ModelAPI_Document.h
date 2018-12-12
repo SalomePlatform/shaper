@@ -46,8 +46,8 @@ class GeomAPI_Shape;
 /**\class ModelAPI_Document
  * \ingroup DataModel
  * \brief Document for internal data structure of any object storage.
- * Document contains all data that must be stored/retrived in the file.
- * Also it provides acces to this data: open/save, transactions management etc.
+ * Document contains all data that must be stored/retrieved in the file.
+ * Also it provides access to this data: open/save, transactions management etc.
  */
 class ModelAPI_Document: public ModelAPI_Entity
 {
@@ -58,7 +58,7 @@ public:
   virtual const std::string& kind() const = 0;
 
   //! Removes document data
-  //! \param theForever if it is false, document is just hiden
+  //! \param theForever if it is false, document is just hidden
   //!                   (to keep possibility make it back on Undo/Redo)
   virtual void close(const bool theForever = false) = 0;
 
@@ -128,7 +128,7 @@ public:
   //! Sets the current feature: all features below will be disabled, new features
   //! will be appended after this one. This method does not flushes the events appeared:
   //! it will be done by the finishOperation, or direct flushes
-  //! \param theCurrent the selected feature as current: blow it everythin become disabled
+  //! \param theCurrent the selected feature as current: blow it everything become disabled
   //! \param theVisible use visible features only: flag is true for Object Browser functionality
   virtual void setCurrentFeature(std::shared_ptr<ModelAPI_Feature> theCurrent,
     const bool theVisible) = 0;
@@ -141,12 +141,9 @@ public:
   virtual std::shared_ptr<ModelAPI_Feature> internalFeature(const int theIndex) = 0;
   //! Performs synchronization of transactions with the module document:
   //! If some document is not active (by undo of activation) but in memory,
-  //! on activation the transactions must be synchronised because all redos performed
-  //! wihtout this participation
+  //! on activation the transactions must be synchronized because all redo-s performed
+  //! without this participation
   virtual void synchronizeTransactions() = 0;
-
-  //! Returns feature by the id of the feature (produced by the Data "featureId" method)
-  virtual std::shared_ptr<ModelAPI_Feature> featureById(const int theId) = 0;
 
   //! To virtually destroy the fields of successors
   MODELAPI_EXPORT virtual ~ModelAPI_Document();
@@ -204,7 +201,7 @@ public:
   virtual std::shared_ptr<ModelAPI_Folder> findFolderBelow(
       const std::list<std::shared_ptr<ModelAPI_Feature> >& theFeatures) = 0;
   //! Search a folder containing the given feature.
-  //! Addtionally calculates a zero-based index of the feature in this folder.
+  //! Additionally calculates a zero-based index of the feature in this folder.
   //! \param theFeature feature to search
   //! \param theIndexInFolder zero-based index in the folder or -1 if the feature is top-level.
   //! \return the folder containing the feature or empty pointer if the feature is top-level.
@@ -213,7 +210,7 @@ public:
       int& theIndexInFolder) = 0;
   //! Add a list of features to the folder. The correctness of the adding is not performed
   //! (such checks have been done in corresponding find.. method).
-  //! \return \c true if the movement is successfull
+  //! \return \c true if the movement is successful
   virtual bool moveToFolder(const std::list<std::shared_ptr<ModelAPI_Feature> >& theFeatures,
                             const std::shared_ptr<ModelAPI_Folder>& theFolder) = 0;
   //! Remove features from the folder
@@ -250,7 +247,7 @@ public:
   /// Normally is called outside of the transaction, just before "save".
   MODELAPI_EXPORT virtual void storeNodesState(const std::list<bool>& theStates) = 0;
 
-  /// Returns the stored nodes states. Normally it is calles just after "open".
+  /// Returns the stored nodes states. Normally it is calls just after "open".
   /// Appends the values to theStates list.
   MODELAPI_EXPORT virtual void restoreNodesState(std::list<bool>& theStates) const = 0;
 

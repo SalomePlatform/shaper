@@ -114,7 +114,7 @@ public:
   /// As an example, consider the case of a face generated in construction of a box.
   /// Returns true if it is stored correctly (the final shape contains this new sub-shape)
   MODELAPI_EXPORT virtual bool generated(const GeomShapePtr& theNewShape,
-    const std::string& theName, const bool theCheckIsInResult = true);
+    const std::string& theName, const bool theCheckIsInResult = true) = 0;
 
   /// Records the shape newShape which was generated from the shape oldShape during a topological
   /// construction. As an example, consider the case of a face generated from an edge in
@@ -141,14 +141,14 @@ public:
   virtual void loadModifiedShapes(const std::shared_ptr<GeomAlgoAPI_MakeShape>& theAlgo,
                                   const GeomShapePtr& theOldShape,
                                   const GeomAPI_Shape::ShapeType theShapeTypeToExplore,
-                                  const std::string& theName = "");
+                                  const std::string& theName = "") = 0;
 
   /// load and orient generated shapes
   MODELAPI_EXPORT
   virtual void loadGeneratedShapes(const std::shared_ptr<GeomAlgoAPI_MakeShape>& theAlgo,
                                    const GeomShapePtr& theOldShape,
                                    const GeomAPI_Shape::ShapeType theShapeTypeToExplore,
-                                   const std::string& theName = "");
+                                   const std::string& theName = "") = 0;
 
   /// load shapes of the first level (to be used during shape import)
   MODELAPI_EXPORT virtual void loadFirstLevel(GeomShapePtr theShape,

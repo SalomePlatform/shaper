@@ -45,7 +45,6 @@
 #include <TDataStd_AsciiString.hxx>
 #include <TDF_Reference.hxx>
 #include <TDF_ChildIDIterator.hxx>
-#include <TDF_LabelMapHasher.hxx>
 #include <TDF_Delta.hxx>
 #include <TDF_AttributeDelta.hxx>
 #include <TDF_AttributeDeltaList.hxx>
@@ -1435,16 +1434,6 @@ std::shared_ptr<ModelAPI_Feature> Model_Document::feature(
   return myObjs->feature(theResult);
 }
 
-Standard_Integer HashCode(const TDF_Label& theLab, const Standard_Integer theUpper)
-{
-  return TDF_LabelMapHasher::HashCode(theLab, theUpper);
-
-}
-Standard_Boolean IsEqual(const TDF_Label& theLab1, const TDF_Label& theLab2)
-{
-  return TDF_LabelMapHasher::IsEqual(theLab1, theLab2);
-}
-
 FeaturePtr Model_Document::featureByLab(const TDF_Label& theLab) {
   TDF_Label aCurrentLab = theLab;
   while(aCurrentLab.Depth() > 3)
@@ -1759,11 +1748,6 @@ void Model_Document::incrementTransactionID()
   int aNewVal = transactionID() + 1;
   TDataStd_Integer::Set(generalLabel().FindChild(TAG_CURRENT_TRANSACTION), aNewVal);
 }
-void Model_Document::decrementTransactionID()
-{
-  int aNewVal = transactionID() - 1;
-  TDataStd_Integer::Set(generalLabel().FindChild(TAG_CURRENT_TRANSACTION), aNewVal);
-}
 
 TDF_Label Model_Document::extConstructionsLabel() const
 {
@@ -1783,11 +1767,6 @@ int Model_Document::numInternalFeatures()
 std::shared_ptr<ModelAPI_Feature> Model_Document::internalFeature(const int theIndex)
 {
   return myObjs->internalFeature(theIndex);
-}
-
-std::shared_ptr<ModelAPI_Feature> Model_Document::featureById(const int theId)
-{
-  return myObjs->featureById(theId);
 }
 
 void Model_Document::synchronizeTransactions()

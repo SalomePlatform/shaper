@@ -798,15 +798,6 @@ void Model_Objects::initData(ObjectPtr theObj, TDF_Label theLab, const int theTa
   theObj->initAttributes();
 }
 
-std::shared_ptr<ModelAPI_Feature> Model_Objects::featureById(const int theId)
-{
-  if (theId > 0) {
-    TDF_Label aLab = featuresLabel().FindChild(theId, Standard_False);
-    return feature(aLab);
-  }
-  return std::shared_ptr<ModelAPI_Feature>(); // not found
-}
-
 void Model_Objects::synchronizeFeatures(
   const TDF_LabelList& theUpdated, const bool theUpdateReferences,
   const bool theExecuteFeatures, const bool theOpen, const bool theFlush)

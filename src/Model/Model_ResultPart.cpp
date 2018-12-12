@@ -56,7 +56,7 @@ void Model_ResultPart::initAttributes()
   data()->addAttribute(DEFLECTION_ID(), ModelAPI_AttributeDouble::typeId());
   data()->addAttribute(TRANSPARENCY_ID(), ModelAPI_AttributeDouble::typeId());
 
-  if (aDocRef->isInitialized() && // initialized immideately means already exist and will be loaded
+  if (aDocRef->isInitialized() && // initialized immediately means already exist and will be loaded
       !Model_Application::getApplication()->hasDocument(aDocRef->docId()))
     Model_Application::getApplication()->setLoadByDemand(data()->name(), aDocRef->docId());
 }
@@ -139,7 +139,7 @@ bool Model_ResultPart::setDisabled(std::shared_ptr<ModelAPI_Result> theThis,
     if (!myTrsf.get()) { // disable of base result part
       DocumentPtr aDoc = Model_ResultPart::partDoc();
       if (aDoc.get() && aDoc->isOpened()) {
-        // make the current feature the last in any case: to update shapes defore deactivation too
+        // make the current feature the last in any case: to update shapes before deactivation too
         int aSize = aDoc->size(ModelAPI_Feature::group());
         FeaturePtr aLastFeature;
         if (aSize)
@@ -170,7 +170,7 @@ std::shared_ptr<GeomAPI_Shape> Model_ResultPart::shape()
   std::shared_ptr<GeomAPI_Shape> aResult(new GeomAPI_Shape);
   if (myShape.IsNull()) { // shape is not produced yet, create it
     SessionPtr aMgr = ModelAPI_Session::get();
-    bool aToSendUpdate = aMgr->isOperation(); // inside of operation may send an update evnet
+    bool aToSendUpdate = aMgr->isOperation(); // inside of operation may send an update event
     if (myTrsf.get()) { // get shape of the base result and apply the transformation
       ResultPtr anOrigResult = baseRef();
       std::shared_ptr<GeomAPI_Shape> anOrigShape = anOrigResult->shape();
