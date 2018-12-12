@@ -39,6 +39,7 @@
 #include <Geom_Curve.hxx>
 #include <Geom_Line.hxx>
 #include <Geom_Circle.hxx>
+#include <Geom_TrimmedCurve.hxx>
 #include <Geom_Ellipse.hxx>
 #include <Geom_Plane.hxx>
 #include <GeomAPI_IntCS.hxx>
@@ -79,15 +80,29 @@ bool GeomAPI_Edge::isLine() const
   return false;
 }
 
+/// extracts a circle curve from the arbitrary curve, returns null is it is different type
+static Handle(Geom_Circle) circ(const Handle(Geom_Curve) theCurve)
+{
+  Handle(Geom_Circle) aResult = Handle(Geom_Circle)::DownCast(theCurve);
+  if (!aResult.IsNull())
+    return aResult;
+  // check this may be a trimmed curve that contains circle inside
+  Handle(Geom_TrimmedCurve) aTrimmed = Handle(Geom_TrimmedCurve)::DownCast(theCurve);
+  while(!aTrimmed.IsNull()) {
+    aResult = Handle(Geom_Circle)::DownCast(aTrimmed->BasisCurve());
+    if (!aResult.IsNull())
+      return aResult;
+    aTrimmed = Handle(Geom_TrimmedCurve)::DownCast(aTrimmed->BasisCurve());
+  }
+  return aResult; // null, not circle
+}
+
 bool GeomAPI_Edge::isCircle() const
 {
   const TopoDS_Shape& aShape = const_cast<GeomAPI_Edge*>(this)->impl<TopoDS_Shape>();
   double aFirst, aLast;
   Handle(Geom_Curve) aCurve = BRep_Tool::Curve((const TopoDS_Edge&)aShape, aFirst, aLast);
-  if (aCurve.IsNull()) // degenerative edge
-    return false;
-  if (aCurve->IsKind(STANDARD_TYPE(Geom_Circle)))
-  {
+  if (!circ(aCurve).IsNull()) {
     // Check the difference of first and last parameters to be equal to the curve period
     if (Abs(aLast - aFirst - aCurve->Period()) < Precision::PConfusion())
       return true;
@@ -100,10 +115,7 @@ bool GeomAPI_Edge::isArc() const
   const TopoDS_Shape& aShape = const_cast<GeomAPI_Edge*>(this)->impl<TopoDS_Shape>();
   double aFirst, aLast;
   Handle(Geom_Curve) aCurve = BRep_Tool::Curve((const TopoDS_Edge&)aShape, aFirst, aLast);
-  if (aCurve.IsNull()) // degenerative edge
-    return false;
-  if (aCurve->IsKind(STANDARD_TYPE(Geom_Circle)))
-  {
+  if (!circ(aCurve).IsNull()) {
     // Check the difference of first and last parameters is not equal the curve period
     if (Abs(aLast - aFirst - aCurve->Period()) >= Precision::PConfusion())
       return true;
@@ -148,15 +160,13 @@ std::shared_ptr<GeomAPI_Circ> GeomAPI_Edge::circle() const
   const TopoDS_Shape& aShape = const_cast<GeomAPI_Edge*>(this)->impl<TopoDS_Shape>();
   double aFirst, aLast;
   Handle(Geom_Curve) aCurve = BRep_Tool::Curve((const TopoDS_Edge&)aShape, aFirst, aLast);
-  if (!aCurve.IsNull()) {
-    Handle(Geom_Circle) aCirc = Handle(Geom_Circle)::DownCast(aCurve);
-    if (!aCirc.IsNull()) {
-      gp_Pnt aLoc = aCirc->Location();
-      std::shared_ptr<GeomAPI_Pnt> aCenter(new GeomAPI_Pnt(aLoc.X(), aLoc.Y(), aLoc.Z()));
-      gp_Dir anAxis = aCirc->Axis().Direction();
-      std::shared_ptr<GeomAPI_Dir> aDir(new GeomAPI_Dir(anAxis.X(), anAxis.Y(), anAxis.Z()));
-      return std::shared_ptr<GeomAPI_Circ>(new GeomAPI_Circ(aCenter, aDir, aCirc->Radius()));
-    }
+  Handle(Geom_Circle) aCirc = circ(aCurve);
+  if (!aCirc.IsNull()) {
+    gp_Pnt aLoc = aCirc->Location();
+    std::shared_ptr<GeomAPI_Pnt> aCenter(new GeomAPI_Pnt(aLoc.X(), aLoc.Y(), aLoc.Z()));
+    gp_Dir anAxis = aCirc->Axis().Direction();
+    std::shared_ptr<GeomAPI_Dir> aDir(new GeomAPI_Dir(anAxis.X(), anAxis.Y(), anAxis.Z()));
+    return std::shared_ptr<GeomAPI_Circ>(new GeomAPI_Circ(aCenter, aDir, aCirc->Radius()));
   }
   return std::shared_ptr<GeomAPI_Circ>(); // not circle
 }
@@ -175,7 +185,7 @@ std::shared_ptr<GeomAPI_Ellipse> GeomAPI_Edge::ellipse() const
       return aEllipse;
     }
   }
-  return std::shared_ptr<GeomAPI_Ellipse>(); // not elipse
+  return std::shared_ptr<GeomAPI_Ellipse>(); // not ellipse
 }
 
 std::shared_ptr<GeomAPI_Lin> GeomAPI_Edge::line() const
@@ -265,21 +275,22 @@ bool GeomAPI_Edge::isInPlane(std::shared_ptr<GeomAPI_Pln> thePlane) const
     gp_Pnt aLastPnt = aCurve->Value(aLast);
     inPlane = aPlane.SquareDistance(aFirstPnt) < Precision::SquareConfusion() &&
               aPlane.SquareDistance(aLastPnt) < Precision::SquareConfusion();
-  } else if (aCurve->IsKind(STANDARD_TYPE(Geom_Circle))) {
-    // check the center on the plane and normals are collinear
-    Handle(Geom_Circle) aCirc = Handle(Geom_Circle)::DownCast(aCurve);
-    gp_Pnt aCenter = aCirc->Location();
-    Standard_Real aDot = aPlane.Axis().Direction().Dot(aCirc->Axis().Direction());
-    inPlane = aPlane.SquareDistance(aCenter) < Precision::SquareConfusion() &&
-              Abs(Abs(aDot) - 1.0) < Precision::Confusion();
   } else {
-    // three points checking
-    gp_Pnt aFirstPnt = aCurve->Value(aFirst);
-    gp_Pnt aMidPnt = aCurve->Value((aFirst + aLast) / 2.);
-    gp_Pnt aLastPnt = aCurve->Value(aLast);
-    inPlane = aPlane.SquareDistance(aFirstPnt) < Precision::SquareConfusion() &&
-              aPlane.SquareDistance(aMidPnt) < Precision::SquareConfusion() &&
-              aPlane.SquareDistance(aLastPnt) < Precision::SquareConfusion();
+    Handle(Geom_Circle) aCirc = circ(aCurve);
+    if (!aCirc.IsNull()) {
+      gp_Pnt aCenter = aCirc->Location();
+      Standard_Real aDot = aPlane.Axis().Direction().Dot(aCirc->Axis().Direction());
+      inPlane = aPlane.SquareDistance(aCenter) < Precision::SquareConfusion() &&
+                Abs(Abs(aDot) - 1.0) < Precision::Confusion();
+    } else {
+      // three points checking
+      gp_Pnt aFirstPnt = aCurve->Value(aFirst);
+      gp_Pnt aMidPnt = aCurve->Value((aFirst + aLast) / 2.);
+      gp_Pnt aLastPnt = aCurve->Value(aLast);
+      inPlane = aPlane.SquareDistance(aFirstPnt) < Precision::SquareConfusion() &&
+                aPlane.SquareDistance(aMidPnt) < Precision::SquareConfusion() &&
+                aPlane.SquareDistance(aLastPnt) < Precision::SquareConfusion();
+    }
   }
   return inPlane;
 }

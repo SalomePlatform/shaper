@@ -50,7 +50,7 @@ genhtml covDirect --output-directory lcov_htmlDirect -q
 # prepare Else report
 cp -f covfile covElse
 # remove all plugins data except the needed
-NEED='BuildPlugin CollectionPlugin Config ConstructionPlugin Events ExchangePlugin FeaturesPlugin GDMLPlugin GeomData GeomDataAPLI GeomValidators InitializationPlugin Model_ ModelAPI ModelGeomAlgo ParametersPlugin PartSetPlugin PrimitivesPlugin Selector SketchPlugin SketchSolver'
+NEED='BuildPlugin CollectionPlugin Config ConstructionPlugin Events ExchangePlugin FeaturesPlugin GDMLPlugin GeomData GeomDataAPI GeomValidators InitializationPlugin Model_ ModelAPI ModelGeomAlgo ParametersPlugin PartSetPlugin PrimitivesPlugin Selector SketchPlugin SketchSolver'
 for MASK in $ALL; do
   if ! [[ " $NEED " =~ " $MASK " ]]; then
     lcov -r covElse *${MASK}* --output-file covElse_res -q
