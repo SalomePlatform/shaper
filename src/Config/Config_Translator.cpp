@@ -29,6 +29,7 @@
 #pragma warning(disable : 4996) // for sprintf
 #endif
 
+// LCOV_EXCL_START
 /**
  * \class Config_TSReader
  * \ingroup Config
@@ -76,6 +77,7 @@ void Config_TSReader::processNode(xmlNodePtr theNode)
       myTranslator[aName][aSource] = aTranslat;
   }
 }
+// LCOV_EXCL_STOP
 
 //******************************************************************************
 //******************************************************************************

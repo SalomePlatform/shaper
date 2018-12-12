@@ -144,6 +144,7 @@ bool Model_Document::isRoot() const
   return this == Model_Session::get()->moduleDocument().get();
 }
 
+// LCOV_EXCL_START
 /// Makes all modification and generation naming shapes that have old shapes corresponding to
 /// shapes in a root document be equal to this root document
 static void updateShapesFromRoot(const TDF_Label theThisAccess, const TDF_Label theRootAccess)
@@ -219,6 +220,7 @@ static void updateShapesFromRoot(const TDF_Label theThisAccess, const TDF_Label 
     }
   }
 }
+// LCOV_EXCL_STOP
 
 bool Model_Document::load(const char* theDirName, const char* theFileName, DocumentPtr theThis)
 {
@@ -238,6 +240,7 @@ bool Model_Document::load(const char* theDirName, const char* theFileName, Docum
   }
   bool isError = aStatus != PCDM_RS_OK;
   if (isError) {
+    // LCOV_EXCL_START
     switch (aStatus) {
       case PCDM_RS_UnknownDocument:
         Events_InfoMessage("Model_Document", "Can not open document").send();
@@ -292,6 +295,7 @@ bool Model_Document::load(const char* theDirName, const char* theFileName, Docum
         Events_InfoMessage("Model_Document", "Can not open document: unknown error").send();
         break;
     }
+    // LCOV_EXCL_STOP
   }
   std::shared_ptr<Model_Session> aSession =
     std::dynamic_pointer_cast<Model_Session>(Model_Session::get());
@@ -949,7 +953,8 @@ void Model_Document::redo()
   // update the current features status
   setCurrentFeature(currentFeature(false), false);
 }
-
+// this is used for creation of undo/redo1-list by GUI
+// LCOV_EXCL_START
 std::list<std::string> Model_Document::undoList() const
 {
   std::list<std::string> aResult;
@@ -975,6 +980,7 @@ std::list<std::string> Model_Document::redoList() const
   }
   return aResult;
 }
+// LCOV_EXCL_STOP
 
 void Model_Document::operationId(const std::string& theId)
 {
@@ -1988,6 +1994,8 @@ bool Model_Document::isLater(FeaturePtr theLater, FeaturePtr theCurrent) const
   return myObjs->isLater(theLater, theCurrent);
 }
 
+// Object Browser nodes states
+// LCOV_EXCL_START
 void Model_Document::storeNodesState(const std::list<bool>& theStates)
 {
   TDF_Label aLab = generalLabel().FindChild(TAG_NODES_STATE);
@@ -2013,6 +2021,7 @@ void Model_Document::restoreNodesState(std::list<bool>& theStates) const
     }
   }
 }
+// LCOV_EXCL_STOP
 
 void Model_Document::eraseAllFeatures()
 {

@@ -69,9 +69,6 @@ class ModelAPI_AttributeRefList : public ModelAPI_Attribute
   /// Substitutes the object by another one. Does nothing if such object is not found.
   virtual void substitute(const ObjectPtr& theCurrent, const ObjectPtr& theNew) = 0;
 
-  /// Substitutes the object by another one and back. So, features wil become exchanged in the list
-  virtual void exchange(const ObjectPtr& theObject1, const ObjectPtr& theObject2) = 0;
-
   /// Removes the last element in the list.
   virtual void removeLast() = 0;
 

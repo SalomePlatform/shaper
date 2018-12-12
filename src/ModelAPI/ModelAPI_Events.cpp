@@ -31,39 +31,29 @@
 ModelAPI_ObjectUpdatedMessage::ModelAPI_ObjectUpdatedMessage(const Events_ID theID,
                                                              const void* theSender)
     : Events_MessageGroup(theID, theSender)
-{
-
-}
+{}
 
 ModelAPI_ObjectUpdatedMessage::~ModelAPI_ObjectUpdatedMessage()
-{
-
-}
+{}
 
 ModelAPI_ObjectDeletedMessage::ModelAPI_ObjectDeletedMessage(const Events_ID theID,
                                                              const void* theSender)
     : Events_MessageGroup(theID, theSender)
-{
-
-}
+{}
 
 ModelAPI_ObjectDeletedMessage::~ModelAPI_ObjectDeletedMessage()
-{
-
-}
+{}
 
 ModelAPI_OrderUpdatedMessage::ModelAPI_OrderUpdatedMessage(const Events_ID theID,
                                                            const void* theSender)
     : Events_Message(theID, theSender)
-{
-
-}
+{}
 
 ModelAPI_OrderUpdatedMessage::~ModelAPI_OrderUpdatedMessage()
-{
+{}
 
-}
-
+// used by GUI only
+// LCOV_EXCL_START
 ModelAPI_FeatureStateMessage::ModelAPI_FeatureStateMessage(const Events_ID theID,
                                                            const void* theSender)
  : Events_Message(theID, theSender)
@@ -72,9 +62,7 @@ ModelAPI_FeatureStateMessage::ModelAPI_FeatureStateMessage(const Events_ID theID
 }
 
 ModelAPI_FeatureStateMessage::~ModelAPI_FeatureStateMessage()
-{
-
-}
+{}
 
 std::shared_ptr<ModelAPI_Feature> ModelAPI_FeatureStateMessage::feature() const
 {
@@ -113,7 +101,7 @@ std::list<std::string> ModelAPI_FeatureStateMessage::features() const
   }
   return result;
 }
-
+// LCOV_EXCL_STOP
 
 ModelAPI_DocumentCreatedMessage::ModelAPI_DocumentCreatedMessage(
   const Events_ID theID, const void* theSender)
@@ -240,14 +228,10 @@ const std::list<std::pair<int, int> >& ModelAPI_ComputePositionsMessage::positio
 ModelAPI_ObjectRenamedMessage::ModelAPI_ObjectRenamedMessage(const Events_ID theID,
                                                              const void* theSender)
 : Events_Message(theID, theSender)
-{
-
-}
+{}
 
 ModelAPI_ObjectRenamedMessage::~ModelAPI_ObjectRenamedMessage()
-{
-
-}
+{}
 
 void ModelAPI_ObjectRenamedMessage::send(ObjectPtr theObject,
                                          const std::string& theOldName,
@@ -295,14 +279,10 @@ void ModelAPI_ObjectRenamedMessage::setNewName(const std::string& theNewName)
 ModelAPI_ReplaceParameterMessage::ModelAPI_ReplaceParameterMessage(const Events_ID theID,
                                                                    const void* theSender)
 : Events_Message(theID, theSender)
-{
-
-}
+{}
 
 ModelAPI_ReplaceParameterMessage::~ModelAPI_ReplaceParameterMessage()
-{
-
-}
+{}
 
 void ModelAPI_ReplaceParameterMessage::send(ObjectPtr theObject,
                                             const void* theSender)
@@ -329,12 +309,10 @@ ModelAPI_SolverFailedMessage::ModelAPI_SolverFailedMessage(const Events_ID theID
                                                            const void* theSender)
   : Events_Message(theID, theSender),
     myDOF(-1)
-{
-}
+{}
 
 ModelAPI_SolverFailedMessage::~ModelAPI_SolverFailedMessage()
-{
-}
+{}
 
 void ModelAPI_SolverFailedMessage::setObjects(const std::set<ObjectPtr>& theObjects)
 {
@@ -350,8 +328,7 @@ const std::set<ObjectPtr>& ModelAPI_SolverFailedMessage::objects() const
 // =====   ModelAPI_ObjectMovedMessage   =====
 ModelAPI_ObjectMovedMessage::ModelAPI_ObjectMovedMessage(const void* theSender)
   : Events_Message(Events_Loop::eventByName(EVENT_OBJECT_MOVED), theSender)
-{
-}
+{}
 
 void ModelAPI_ObjectMovedMessage::setMovedObject(const ObjectPtr& theMovedObject)
 {

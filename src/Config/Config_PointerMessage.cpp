@@ -20,6 +20,7 @@
 
 #include <Config_PointerMessage.h>
 
+// LCOV_EXCL_START
 Config_PointerMessage::Config_PointerMessage(const Events_ID theId, const void* theParent)
     : Events_Message(theId, theParent),
       myPointer(0)
@@ -41,3 +42,4 @@ void Config_PointerMessage::setPointer(void* pointer)
 {
   myPointer = pointer;
 }
+// LCOV_EXCL_STOP

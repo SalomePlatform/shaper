@@ -116,6 +116,7 @@ void ModelAPI_ResultBody::loadFirstLevel(GeomShapePtr theShape,
   myBuilder->loadFirstLevel(theShape, theName);
 }
 
+// LCOV_EXCL_START
 bool ModelAPI_ResultBody::isConnectedTopology()
 {
   if (myConnect == ConnectionNotComputed) {
@@ -130,3 +131,4 @@ void ModelAPI_ResultBody::setDisplayed(const bool theDisplay)
   for (int i = 0; i < numberOfSubs(); i++)
     subResult(i)->setDisplayed(theDisplay);
 }
+// LCOV_EXCL_STOP

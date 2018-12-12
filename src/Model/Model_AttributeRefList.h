@@ -75,10 +75,6 @@ public:
   /// Does not support the external documents objects yet.
   MODEL_EXPORT virtual void substitute(const ObjectPtr& theCurrent, const ObjectPtr& theNew);
 
-  /// Substitutes the object by another one and back. So, features will become exchanged in the list
-  /// Does not support the external documents objects yet.
-  MODEL_EXPORT virtual void exchange(const ObjectPtr& theObject1, const ObjectPtr& theObject2);
-
   /// Removes the last element in the list.
   /// Does not support the external documents objects yet.
   MODEL_EXPORT virtual void removeLast();

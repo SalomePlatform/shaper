@@ -119,6 +119,7 @@ const char* toString(ModelAPI_ExecState theExecState)
   }
 }
 
+// LCOV_EXCL_START
 std::string getFeatureError(const FeaturePtr& theFeature)
 {
   std::string anError;
@@ -159,6 +160,7 @@ std::string getFeatureError(const FeaturePtr& theFeature)
 
   return anError;
 }
+// LCOV_EXCL_STOP
 
 ObjectPtr objectByName(const DocumentPtr& theDocument, const std::string& theGroup,
                        const std::string& theName)

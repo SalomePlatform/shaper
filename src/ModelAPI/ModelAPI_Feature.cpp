@@ -88,15 +88,6 @@ void ModelAPI_Feature::setResult(const std::shared_ptr<ModelAPI_Result>& theResu
   theResult->setDisabled(theResult, false);
 }
 
-void ModelAPI_Feature::removeResult(const std::shared_ptr<ModelAPI_Result>& theResult)
-{
-  theResult->setDisabled(theResult, true);
-  // flush visualization changes
-  static Events_Loop* aLoop = Events_Loop::loop();
-  static Events_ID aRedispEvent = aLoop->eventByName(EVENT_OBJECT_TO_REDISPLAY);
-  aLoop->flush(aRedispEvent);
-}
-
 void ModelAPI_Feature::eraseResultFromList(const std::shared_ptr<ModelAPI_Result>& theResult)
 {
   std::list<std::shared_ptr<ModelAPI_Result> >::iterator aResIter = myResults.begin();
@@ -234,6 +225,7 @@ bool ModelAPI_Feature::isDisabled()
   return myIsDisabled;
 }
 
+// LCOV_EXCL_START
 bool ModelAPI_Feature::setStable(const bool theFlag)
 {
   if (myIsStable != theFlag) {
@@ -247,6 +239,7 @@ bool ModelAPI_Feature::setStable(const bool theFlag)
   }
   return false;
 }
+// LCOV_EXCL_STOP
 
 bool ModelAPI_Feature::isStable()
 {

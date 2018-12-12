@@ -97,8 +97,6 @@ class ModelAPI_Feature : public ModelAPI_Object
   /// sets the result by index (zero based), results before this must be set before
   MODELAPI_EXPORT void setResult(const std::shared_ptr<ModelAPI_Result>& theResult,
                                  const int theIndex);
-  /// removes the result from the feature
-  MODELAPI_EXPORT void removeResult(const std::shared_ptr<ModelAPI_Result>& theResult);
   /// removes all results starting from the given index (zero-based)
   /// \param theSinceIndex - index of the deleted result and all after also will be deleted
   /// \param theForever - removes results for long period (not just because of feature disabling)

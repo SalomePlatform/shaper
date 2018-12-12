@@ -987,6 +987,8 @@ void Model_Update::executeFeature(FeaturePtr theFeature)
   redisplayWithResults(theFeature, aState);
 }
 
+// it is called on GUI edit of feature start
+// LCOV_EXCL_START
 void Model_Update::updateStability(void* theSender)
 {
   static ModelAPI_ValidatorsFactory* aFactory = ModelAPI_Session::get()->validators();
@@ -1039,6 +1041,7 @@ void Model_Update::updateStability(void* theSender)
     }
   }
 }
+// LCOV_EXCL_STOP
 
 void Model_Update::updateSelection(const std::set<std::shared_ptr<ModelAPI_Object> >& theObjects)
 {

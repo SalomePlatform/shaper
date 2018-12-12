@@ -43,6 +43,7 @@ Model_ResultField::~Model_ResultField()
   }
 }
 
+// LCOV_EXCL_START
 void Model_ResultField::colorConfigInfo(std::string& theSection, std::string& theName,
                                        std::string& theDefault)
 {
@@ -50,6 +51,7 @@ void Model_ResultField::colorConfigInfo(std::string& theSection, std::string& th
   theName = "result_field_color";
   theDefault = DEFAULT_COLOR();
 }
+// LCOV_EXCL_STOP
 
 std::shared_ptr<GeomAPI_Shape> Model_ResultField::shape()
 {
@@ -140,7 +142,8 @@ std::string Model_ResultField::textLine(int theLine) const
   return "";
 }
 
-
+// used by GUI only
+// LCOV_EXCL_START
 ModelAPI_ResultField::ModelAPI_FieldStep* Model_ResultField::step(int theId) const
 {
   if (theId < mySteps.size()) {
@@ -148,3 +151,4 @@ ModelAPI_ResultField::ModelAPI_FieldStep* Model_ResultField::step(int theId) con
   }
   return NULL;
 }
+// LCOV_EXCL_STOP
