@@ -1020,6 +1020,43 @@ void Model_AttributeSelection::selectSubShape(const std::string& theType,
   }
 }
 
+void Model_AttributeSelection::setId(int theID)
+{
+  std::shared_ptr<GeomAPI_Shape> aSelection;
+
+  ResultPtr aContextRes = context();
+  // support for compsolids:
+  while(ModelAPI_Tools::bodyOwner(aContextRes).get()) {
+    aContextRes = ModelAPI_Tools::bodyOwner(aContextRes);
+  }
+  std::shared_ptr<GeomAPI_Shape> aContext = aContextRes->shape();
+
+  TopoDS_Shape aMainShape = aContext->impl<TopoDS_Shape>();
+  // searching for the latest main shape
+  if (theID > 0 && aContext && !aContext->isNull())
+  {
+    std::shared_ptr<Model_Document> aDoc =
+      std::dynamic_pointer_cast<Model_Document>(aContextRes->document());
+    if (aDoc.get()) {
+      Handle(TNaming_NamedShape) aNS = TNaming_Tool::NamedShape(aMainShape, aDoc->generalLabel());
+      if (!aNS.IsNull()) {
+        aMainShape = TNaming_Tool::CurrentShape(aNS);
+      }
+    }
+
+    TopTools_IndexedMapOfShape aSubShapesMap;
+    TopExp::MapShapes(aMainShape, aSubShapesMap);
+    const TopoDS_Shape& aSelShape = aSubShapesMap.FindKey(theID);
+
+    std::shared_ptr<GeomAPI_Shape> aResult(new GeomAPI_Shape);
+    aResult->setImpl(new TopoDS_Shape(aSelShape));
+
+    aSelection = aResult;
+  }
+
+  setValue(aContextRes, aSelection);
+}
+
 std::string Model_AttributeSelection::contextName(const ResultPtr& theContext) const
 {
   std::string aResult;

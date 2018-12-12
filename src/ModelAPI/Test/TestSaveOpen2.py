@@ -65,9 +65,7 @@ aFieldFeature = aPartDoc.objectByName("Features", "Field_1")
 aFieldResult = modelAPI_ResultField(objectToFeature(aFieldFeature).results()[0])
 assert(aFieldResult.textLine(0) == "5")
 aSession.setActiveDocument(partSet, True)
+model.do()
 aTranslation = objectToFeature(partSet.objectByName("Features", "Translation_1"))
 partSet.setCurrentFeature(aTranslation, True)
 model.end()
-
-# check the translation feature has a correct result
-assert(not aTranslation.firstResult().shape().isNull())
