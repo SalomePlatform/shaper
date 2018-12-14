@@ -91,7 +91,7 @@ static void findBases(TDF_Label theAccess, Handle(TNaming_NamedShape) theFinal,
 /// Returns in theResults all shapes with history started in theBase and ended in theFinal
 static void findFinals(const TDF_Label& anAccess, const TopoDS_Shape& theBase,
   const TDF_Label& theFinal,
-  const TDF_Label& theAdditionalDoc, TopTools_MapOfShape& theResults)
+  const TDF_Label& theAdditionalDoc, TopTools_MapOfShape& thePass, TopTools_MapOfShape& theResults)
 {
   if (TNaming_Tool::HasLabel(anAccess, theBase)) {
     for(TNaming_NewShapeIterator aBaseIter(theBase, anAccess); aBaseIter.More(); aBaseIter.Next())
@@ -101,14 +101,17 @@ static void findFinals(const TDF_Label& anAccess, const TopoDS_Shape& theBase,
         if (aBaseIter.NamedShape()->Label().IsEqual(theFinal)) {
           theResults.Add(aBaseIter.Shape());
         } else {
-          findFinals(anAccess, aBaseIter.Shape(), theFinal, theAdditionalDoc, theResults);
+          if (thePass.Add(aBaseIter.Shape()))
+            findFinals(
+              anAccess, aBaseIter.Shape(), theFinal, theAdditionalDoc, thePass, theResults);
         }
       }
     }
   }
   if (!theAdditionalDoc.IsNull()) { // search additionally by the additional access label
     static TDF_Label anEmpty;
-    findFinals(theAdditionalDoc, theBase, theFinal, anEmpty, theResults);
+    TopTools_MapOfShape aPass;
+    findFinals(theAdditionalDoc, theBase, theFinal, anEmpty, aPass, theResults);
   }
 }
 
@@ -119,8 +122,9 @@ void Selector_Modify::findModificationResult(TopoDS_ListOfShape& theCommon) {
       anAdditionalDoc = label();
     }
     TopTools_MapOfShape aFinals;
+    TopTools_MapOfShape aPass;
     for(TNaming_Iterator aBaseShape(aBase.Value()); aBaseShape.More(); aBaseShape.Next()) {
-      findFinals(aBase.Value(), aBaseShape.NewShape(), myFinal, anAdditionalDoc, aFinals);
+      findFinals(aBase.Value(), aBaseShape.NewShape(), myFinal, anAdditionalDoc, aPass, aFinals);
     }
     if (!aFinals.IsEmpty()) {
       if (theCommon.IsEmpty()) { // just copy all to common
@@ -187,9 +191,13 @@ bool Selector_Modify::select(NCollection_List<Handle(TNaming_NamedShape)>& theMo
       } else if (aCommon.Extent() == 1) {
         return true; // simple modification
       }
-      // weak naming between the common results
-      Selector_NExplode aNexp(aCommon);
-      myWeakIndex = aNexp.index(theValue);
+      if (useNeighbors()) { // optimization: for the current moment only in one case this method is called
+                            // where this is not needed if neighbors option is disabled
+        // weak naming between the common results
+        Selector_NExplode aNexp(aCommon);
+        myWeakIndex = aNexp.index(theValue);
+      } else
+        myWeakIndex = 0;
       return myWeakIndex != -1;
     }
     // weak naming case
