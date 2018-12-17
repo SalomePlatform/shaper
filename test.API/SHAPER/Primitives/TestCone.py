@@ -33,6 +33,9 @@ Cone_13 = model.addCone(Part_1_doc, model.selection("VERTEX", "PartSet/Origin"),
 Cone_14 = model.addCone(Part_1_doc, model.selection("VERTEX", "PartSet/Origin"), model.selection("EDGE", "PartSet/OZ"), 10., 10., 15.)
 Cone_15 = model.addCone(Part_1_doc, model.selection("VERTEX", "PartSet/Origin"), model.selection("EDGE", "PartSet/OZ"), "baseRadius", "topRadius", "h")
 
+Cone_16 = model.addCone(Part_1_doc, 5., 10., 15.)
+Cone_16.setRadius(10., 15.)
+
 model.do()
 model.end()
 
@@ -80,6 +83,12 @@ model.testNbSubResults(Cone_15, [0])
 model.testNbSubShapes(Cone_15, GeomAPI_Shape.SOLID, [1])
 model.testNbSubShapes(Cone_15, GeomAPI_Shape.FACE, [3])
 model.testHaveNamingFaces(Cone_15, model, Part_1_doc)
+
+model.testNbResults(Cone_16, 1)
+model.testNbSubResults(Cone_16, [0])
+model.testNbSubShapes(Cone_16, GeomAPI_Shape.SOLID, [1])
+model.testNbSubShapes(Cone_16, GeomAPI_Shape.FACE, [3])
+model.testHaveNamingFaces(Cone_16, model, Part_1_doc)
 
 model.testNbResults(Cone_4, 0)
 assert(Cone_4.feature().error() == "Cone builder :: base radius is negative.")

@@ -20,6 +20,9 @@ Sphere_4 = model.addSphere(Part_1_doc, Point_1, 10)
 Sphere_5 = model.addSphere(Part_1_doc, Point_2, 10)
 Sphere_6 = model.addSphere(Part_1_doc, model.selection("VERTEX", "PartSet/Origin"), "r")
 
+Sphere_7 = model.addSphere(Part_1_doc, 10)
+Sphere_7.setCenterPoint(Point_1)
+
 model.do()
 model.end()
 
@@ -42,7 +45,13 @@ model.testNbResults(Sphere_6, 1)
 model.testNbSubResults(Sphere_6, [0])
 model.testNbSubShapes(Sphere_6, GeomAPI_Shape.SOLID, [1])
 model.testNbSubShapes(Sphere_6, GeomAPI_Shape.FACE, [1])
-model.testHaveNamingFaces(Sphere_4, model, Part_1_doc)
+model.testHaveNamingFaces(Sphere_6, model, Part_1_doc)
+
+model.testNbResults(Sphere_7, 1)
+model.testNbSubResults(Sphere_7, [0])
+model.testNbSubShapes(Sphere_7, GeomAPI_Shape.SOLID, [1])
+model.testNbSubShapes(Sphere_7, GeomAPI_Shape.FACE, [1])
+model.testHaveNamingFaces(Sphere_7, model, Part_1_doc)
 
 model.testNbResults(Sphere_2, 0)
 assert(Sphere_2.feature().error() == "Sphere builder :: radius is negative or null.")
