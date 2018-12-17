@@ -34,9 +34,11 @@ bool FeaturesPlugin_ValidatorTransform::isValid(const AttributePtr& theAttribute
   bool aValid = true;
   std::string anAttributeType = theAttribute->attributeType();
   if (anAttributeType != ModelAPI_AttributeSelectionList::typeId()) {
+// LCOV_EXCL_START
     theError = "The attribute with the %1 type is not processed";
     theError.arg(theAttribute->attributeType());
     return false;
+// LCOV_EXCL_STOP
   }
 
   std::shared_ptr<ModelAPI_AttributeSelectionList> aCurSelList =

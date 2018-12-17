@@ -68,8 +68,10 @@ bool FeaturesPlugin_ValidatorPipePath::isValid(const AttributePtr& theAttribute,
   AttributeSelectionPtr aPathAttrSelection =
     std::dynamic_pointer_cast<ModelAPI_AttributeSelection>(theAttribute);
   if(!aPathAttrSelection.get()) {
+// LCOV_EXCL_START
     theError = "Error: This validator can only work with path selector in \"Pipe\" feature.";
     return false;
+// LCOV_EXCL_STOP
   }
 
   GeomShapePtr aPathShape = aPathAttrSelection->value();
@@ -96,17 +98,21 @@ bool FeaturesPlugin_ValidatorPipeLocations::isValid(const AttributePtr& theAttri
   AttributeSelectionListPtr anAttrSelectionList =
     std::dynamic_pointer_cast<ModelAPI_AttributeSelectionList>(theAttribute);
   if(!anAttrSelectionList.get()) {
+// LCOV_EXCL_START
     theError =
       "Error: This validator can only work with selection list attributes in \"Pipe\" feature.";
     return false;
+// LCOV_EXCL_STOP
   }
   std::shared_ptr<FeaturesPlugin_Pipe> aFeature =
     std::dynamic_pointer_cast<FeaturesPlugin_Pipe>(theAttribute->owner());
 
   AttributeSelectionPtr aPathSelection = aFeature->selection(FeaturesPlugin_Pipe::PATH_OBJECT_ID());
   if (!aPathSelection.get()) {
+// LCOV_EXCL_START
     theError = "Error: Path not selected.";
     return false;
+// LCOV_EXCL_STOP
   }
 
   GeomShapePtr aPathShape = aPathSelection->value();
@@ -161,6 +167,7 @@ bool FeaturesPlugin_ValidatorPipeLocations::isValid(const AttributePtr& theAttri
 }
 
 //==================================================================================================
+// LCOV_EXCL_START
 bool FeaturesPlugin_ValidatorPipeLocationsNumber::isValid(
   const std::shared_ptr<ModelAPI_Feature>& theFeature,
   const std::list<std::string>& theArguments,
@@ -209,16 +216,19 @@ bool FeaturesPlugin_ValidatorPipeLocationsNumber::isValid(
 
   return true;
 }
+// LCOV_EXCL_STOP
 
 //==================================================================================================
 bool FeaturesPlugin_ValidatorBaseForGeneration::isValid(const AttributePtr& theAttribute,
                                                         const std::list<std::string>& theArguments,
                                                         Events_InfoMessage& theError) const
 {
+// LCOV_EXCL_START
   if(theArguments.empty()) {
     theError = "Error: Validator parameters is empty.";
     return false;
   }
+// LCOV_EXCL_STOP
 
   // Checking attribute.
   if(!isValidAttribute(theAttribute, theArguments, theError)) {
@@ -309,9 +319,11 @@ bool FeaturesPlugin_ValidatorBaseForGenerationSketchOrSketchObjects::isValid(
 
   AttributeSelectionListPtr aListAttr = theFeature->selectionList(aBaseObjectsID);
   if(!aListAttr.get()) {
+// LCOV_EXCL_START
     theError = "Error: Could not get \"%1\" attribute.";
     theError.arg(aBaseObjectsID);
     return false;
+// LCOV_EXCL_STOP
   }
 
   std::set<ResultConstructionPtr> aSelectedSketches;
@@ -369,8 +381,10 @@ bool FeaturesPlugin_ValidatorBaseForGeneration::isValidAttribute(const Attribute
                                                         Events_InfoMessage& theError) const
 {
   if(!theAttribute.get()) {
+// LCOV_EXCL_START
     theError = "Error: Empty attribute.";
     return false;
+// LCOV_EXCL_STOP
   }
 
   std::string anAttributeType = theAttribute->attributeType();
@@ -457,15 +471,18 @@ bool FeaturesPlugin_ValidatorBaseForGeneration::isValidAttribute(const Attribute
     }
 
   } else {
+// LCOV_EXCL_START
     theError = "Error: Attribute \"%1\" does not supported by this validator.";
     theError.arg(anAttributeType);
     return false;
+// LCOV_EXCL_STOP
   }
 
   return true;
 }
 
 //==================================================================================================
+// LCOV_EXCL_START
 bool FeaturesPlugin_ValidatorCompositeLauncher::isValid(const AttributePtr& theAttribute,
                                                         const std::list<std::string>& theArguments,
                                                         Events_InfoMessage& theError) const
@@ -512,6 +529,7 @@ bool FeaturesPlugin_ValidatorCompositeLauncher::isValid(const AttributePtr& theA
   bool aValid = !aFeatureKind && aPlanarFace;
   return aValid;
 }
+// LCOV_EXCL_STOP
 
 //==================================================================================================
 bool FeaturesPlugin_ValidatorExtrusionDir::isValid(
@@ -520,8 +538,10 @@ bool FeaturesPlugin_ValidatorExtrusionDir::isValid(
                                                Events_InfoMessage& theError) const
 {
   if(theArguments.size() != 2) {
+// LCOV_EXCL_START
     theError = "Error: Validator should be used with 2 parameters for extrusion.";
     return false;
+// LCOV_EXCL_STOP
   }
 
   std::list<std::string>::const_iterator
@@ -620,9 +640,11 @@ bool FeaturesPlugin_ValidatorExtrusionDir::isValid(
 bool FeaturesPlugin_ValidatorExtrusionDir::isShapesCanBeEmpty(const AttributePtr& theAttribute,
                                                               Events_InfoMessage& theError) const
 {
+// LCOV_EXCL_START
   if(!theAttribute.get()) {
     return true;
   }
+// LCOV_EXCL_STOP
 
   std::string anAttributeType = theAttribute->attributeType();
   if(anAttributeType == ModelAPI_AttributeSelectionList::typeId()) {
@@ -672,9 +694,11 @@ bool FeaturesPlugin_ValidatorBooleanSelection::isValid(const AttributePtr& theAt
   AttributeSelectionListPtr anAttrSelectionList =
     std::dynamic_pointer_cast<ModelAPI_AttributeSelectionList>(theAttribute);
   if(!anAttrSelectionList.get()) {
+// LCOV_EXCL_START
     theError =
       "Error: This validator can only work with selection list attributes in \"Boolean\" feature.";
     return false;
+// LCOV_EXCL_STOP
   }
   std::shared_ptr<FeaturesPlugin_Boolean> aFeature =
     std::dynamic_pointer_cast<FeaturesPlugin_Boolean>(theAttribute->owner());
@@ -761,9 +785,11 @@ bool FeaturesPlugin_ValidatorFilletSelection::isValid(const AttributePtr& theAtt
   AttributeSelectionListPtr anAttrSelectionList =
     std::dynamic_pointer_cast<ModelAPI_AttributeSelectionList>(theAttribute);
   if(!anAttrSelectionList.get()) {
+// LCOV_EXCL_START
     theError =
       "Error: This validator can only work with selection list attributes in \"Fillet\" feature.";
     return false;
+// LCOV_EXCL_STOP
   }
 
   FeaturePtr aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(theAttribute->owner());
@@ -824,8 +850,10 @@ bool FeaturesPlugin_ValidatorPartitionSelection::isValid(const AttributePtr& the
   AttributeSelectionListPtr anAttrSelectionList =
     std::dynamic_pointer_cast<ModelAPI_AttributeSelectionList>(theAttribute);
   if(!anAttrSelectionList.get()) {
+// LCOV_EXCL_START
     theError = "Error: This validator can only work with selection list in \"Partition\" feature.";
     return false;
+// LCOV_EXCL_STOP
   }
 
   for(int anIndex = 0; anIndex < anAttrSelectionList->size(); ++anIndex) {
@@ -882,9 +910,11 @@ bool FeaturesPlugin_ValidatorRemoveSubShapesSelection::isValid(const AttributePt
   AttributeSelectionListPtr aSubShapesAttrList =
     std::dynamic_pointer_cast<ModelAPI_AttributeSelectionList>(theAttribute);
   if(!aSubShapesAttrList.get()) {
+// LCOV_EXCL_START
     theError =
       "Error: This validator can only work with selection list in \"Remove Sub-Shapes\" feature.";
     return false;
+// LCOV_EXCL_STOP
   }
 
   static const std::string aBaseShapeID = "base_shape";
@@ -892,9 +922,11 @@ bool FeaturesPlugin_ValidatorRemoveSubShapesSelection::isValid(const AttributePt
   AttributeSelectionPtr aShapeAttrSelection = aFeature->selection(aBaseShapeID);
 
   if(!aShapeAttrSelection.get()) {
+// LCOV_EXCL_START
     theError = "Error: Could not get \"%1\" attribute.";
     theError.arg(aBaseShapeID);
     return false;
+// LCOV_EXCL_STOP
   }
 
   GeomShapePtr aBaseShape = aShapeAttrSelection->value();
@@ -941,6 +973,7 @@ bool FeaturesPlugin_ValidatorRemoveSubShapesResult::isValid(
   static const std::string aBaseShapeID = "base_shape";
   static const std::string aSubShapesID = "subshapes_to_keep";
 
+// LCOV_EXCL_START
   if(theFeature->getKind() != "Remove_SubShapes") {
     theError = "Error: Feature \"%1\" does not supported by this validator.";
     theError.arg(theFeature->getKind());
@@ -960,6 +993,7 @@ bool FeaturesPlugin_ValidatorRemoveSubShapesResult::isValid(
     theError.arg(aSubShapesID);
     return false;
   }
+// LCOV_EXCL_STOP
 
   // Copy base shape.
   GeomShapePtr aBaseShape = aShapeAttrSelection->value();
@@ -991,6 +1025,7 @@ bool FeaturesPlugin_ValidatorRemoveSubShapesResult::isValid(
 }
 
 //==================================================================================================
+// LCOV_EXCL_START
 bool FeaturesPlugin_ValidatorUnionSelection::isValid(const AttributePtr& theAttribute,
                                                      const std::list<std::string>& theArguments,
                                                      Events_InfoMessage& theError) const
@@ -1040,6 +1075,7 @@ bool FeaturesPlugin_ValidatorUnionSelection::isValid(const AttributePtr& theAttr
 
   return true;
 }
+// LCOV_EXCL_STOP
 
 //==================================================================================================
 bool FeaturesPlugin_ValidatorUnionArguments::isValid(
@@ -1047,6 +1083,7 @@ bool FeaturesPlugin_ValidatorUnionArguments::isValid(
   const std::list<std::string>& theArguments,
   Events_InfoMessage& theError) const
 {
+// LCOV_EXCL_START
   // Check feature kind.
   if(theFeature->getKind() != FeaturesPlugin_Union::ID()) {
     theError = "Error: This validator supports only \"%1\" feature.";
@@ -1062,6 +1099,7 @@ bool FeaturesPlugin_ValidatorUnionArguments::isValid(
     theError.arg(FeaturesPlugin_Union::BASE_OBJECTS_ID());
     return false;
   }
+// LCOV_EXCL_STOP
 
   // Get all shapes.
   GeomAPI_Shape::ShapeType aType = GeomAPI_Shape::COMPSOLID;
@@ -1099,9 +1137,11 @@ bool FeaturesPlugin_ValidatorConcealedResult::isValid(const AttributePtr& theAtt
                                             Events_InfoMessage& theError) const
 {
   if (theAttribute->attributeType() != ModelAPI_AttributeReference::typeId()) {
+// LCOV_EXCL_START
     theError = "Error: The attribute with the %1 type is not processed";
     theError.arg(theAttribute->attributeType());
     return false;
+// LCOV_EXCL_STOP
   }
 
   AttributeReferencePtr aRefAttribute = std::dynamic_pointer_cast<ModelAPI_AttributeReference>
@@ -1162,11 +1202,13 @@ bool FeaturesPlugin_ValidatorBooleanArguments::isValid(
   const std::list<std::string>& theArguments,
   Events_InfoMessage& theError) const
 {
+// LCOV_EXCL_START
   if (theArguments.size() != 2)
   {
     theError = "Wrong number of arguments (expected 2).";
     return false;
   }
+// LCOV_EXCL_STOP
 
   int anObjectsToolsNb[2] = { 0,  0 };
 
@@ -1248,6 +1290,7 @@ bool FeaturesPlugin_ValidatorBooleanArguments::isValid(
 }
 
 //=================================================================================================
+// LCOV_EXCL_START
 bool FeaturesPlugin_ValidatorBooleanArguments::isNotObligatory(std::string theFeature,
                                                                std::string theAttribute)
 {
@@ -1258,6 +1301,7 @@ bool FeaturesPlugin_ValidatorBooleanArguments::isNotObligatory(std::string theFe
 
   return false;
 }
+// LCOV_EXCL_STOP
 
 //==================================================================================================
 bool FeaturesPlugin_ValidatorBooleanSmashSelection::isValid(
@@ -1271,9 +1315,11 @@ bool FeaturesPlugin_ValidatorBooleanSmashSelection::isValid(
   AttributeSelectionListPtr anAttrSelectionList =
     std::dynamic_pointer_cast<ModelAPI_AttributeSelectionList>(theAttribute);
   if (!aFeature.get() || !anAttrSelectionList.get()) {
+// LCOV_EXCL_START
     theError =
       "Error: Validator used in wrong feature or attribute";
     return false;
+// LCOV_EXCL_STOP
   }
 
   AttributeSelectionListPtr anOtherAttrSelectionList;
@@ -1410,6 +1456,7 @@ bool FeaturesPlugin_ValidatorBooleanSmashSelection::isValid(
 }
 
 //==================================================================================================
+// LCOV_EXCL_START
 bool FeaturesPlugin_IntersectionSelection::isValid(const AttributePtr& theAttribute,
                                                    const std::list<std::string>& theArguments,
                                                    Events_InfoMessage& theError) const
@@ -1478,8 +1525,10 @@ bool FeaturesPlugin_IntersectionSelection::isValid(const AttributePtr& theAttrib
 
   return true;
 }
+// LCOV_EXCL_STOP
 
 //==================================================================================================
+// LCOV_EXCL_START
 bool FeaturesPlugin_ValidatorBooleanFuseSelection::isValid(
   const AttributePtr& theAttribute,
   const std::list<std::string>& theArguments,
@@ -1531,6 +1580,7 @@ bool FeaturesPlugin_ValidatorBooleanFuseSelection::isValid(
 
   return true;
 }
+// LCOV_EXCL_STOP
 
 //=================================================================================================
 bool FeaturesPlugin_ValidatorBooleanFuseArguments::isValid(
@@ -1538,10 +1588,12 @@ bool FeaturesPlugin_ValidatorBooleanFuseArguments::isValid(
   const std::list<std::string>& theArguments,
   Events_InfoMessage& theError) const
 {
+// LCOV_EXCL_START
   if (theArguments.size() != 2) {
     theError = "Wrong number of arguments (expected 2).";
     return false;
   }
+// LCOV_EXCL_STOP
 
   std::shared_ptr<FeaturesPlugin_BooleanFuse> aFeature =
     std::dynamic_pointer_cast<FeaturesPlugin_BooleanFuse>(theFeature);
@@ -1613,6 +1665,7 @@ bool FeaturesPlugin_ValidatorBooleanFuseArguments::isValid(
 }
 
 //=================================================================================================
+// LCOV_EXCL_START
 bool FeaturesPlugin_ValidatorBooleanFuseArguments::isNotObligatory(
   std::string theFeature,
   std::string theAttribute)
@@ -1623,8 +1676,10 @@ bool FeaturesPlugin_ValidatorBooleanFuseArguments::isNotObligatory(
 
   return false;
 }
+// LCOV_EXCL_STOP
 
 //==================================================================================================
+// LCOV_EXCL_START
 bool FeaturesPlugin_ValidatorBooleanCommonSelection::isValid(
   const AttributePtr& theAttribute,
   const std::list<std::string>& theArguments,
@@ -1682,6 +1737,7 @@ bool FeaturesPlugin_ValidatorBooleanCommonSelection::isValid(
 
   return true;
 }
+// LCOV_EXCL_STOP
 
 //=================================================================================================
 bool FeaturesPlugin_ValidatorBooleanCommonArguments::isValid(
@@ -1690,8 +1746,10 @@ bool FeaturesPlugin_ValidatorBooleanCommonArguments::isValid(
   Events_InfoMessage& theError) const
 {
   if (theArguments.size() != 2) {
+// LCOV_EXCL_START
     theError = "Wrong number of arguments (expected 2).";
     return false;
+// LCOV_EXCL_STOP
   }
 
   std::shared_ptr<FeaturesPlugin_BooleanCommon> aFeature =
@@ -1728,9 +1786,11 @@ bool FeaturesPlugin_ValidatorBooleanCommonArguments::isValid(
 }
 
 //=================================================================================================
+// LCOV_EXCL_START
 bool FeaturesPlugin_ValidatorBooleanCommonArguments::isNotObligatory(
   std::string theFeature,
   std::string theAttribute)
 {
   return false;
 }
+// LCOV_EXCL_STOP
