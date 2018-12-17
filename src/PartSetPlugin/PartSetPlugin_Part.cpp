@@ -97,7 +97,7 @@ std::shared_ptr<ModelAPI_Feature> PartSetPlugin_Part::subFeature(const int theIn
   }
   return FeaturePtr();
 }
-
+//LCOV_EXCL_START
 int PartSetPlugin_Part::subFeatureId(const int theIndex) const
 {
   ResultPartPtr aResult = std::dynamic_pointer_cast<ModelAPI_ResultPart>(firstResult());
@@ -109,7 +109,7 @@ int PartSetPlugin_Part::subFeatureId(const int theIndex) const
   }
   return 0; // none
 }
-
+//LCOV_EXCL_STOP
 bool PartSetPlugin_Part::isSub(ObjectPtr theObject) const
 {
   ResultPartPtr aResult = std::dynamic_pointer_cast<ModelAPI_ResultPart>(firstResult());

@@ -55,7 +55,8 @@ FeaturePtr PartSetPlugin_Plugin::createFeature(std::string theFeatureID)
   // feature of such kind is not found
   return FeaturePtr();
 }
-
+// used only in GUI
+//LCOV_EXCL_START
 void PartSetPlugin_Plugin::processEvent(const std::shared_ptr<Events_Message>& theMessage)
 {
   const Events_ID kRequestEvent =
@@ -83,3 +84,4 @@ std::shared_ptr<ModelAPI_FeatureStateMessage> PartSetPlugin_Plugin::getFeaturesS
   aMsg->setState(PartSetPlugin_Remove::ID(), aDocIsPart);
   return aMsg;
 }
+//LCOV_EXCL_STOP
