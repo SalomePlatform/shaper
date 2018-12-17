@@ -57,6 +57,9 @@ for MASK in $ALL; do
     mv -f covElse_res covElse
   fi
 done
+# remove SketchPlugin's Ellipse feature (unsupported yet)
+lcov -r covElse SketchPlugin*Ellipse* --output-file covElse_res -q
+mv -f covElse_res covElse
 rm -rf lcov_htmlElse
 genhtml covElse --output-directory lcov_htmlElse -q
 
