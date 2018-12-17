@@ -87,7 +87,7 @@ void GDMLAPI_ConeSegment::dump(ModelHighAPI_Dumper& theDumper) const
   AttributeDoublePtr anAttrDeltaPhi = aBase->real(GDMLPlugin_ConeSegment::DELTAPHI_ID());
   theDumper << ", " << anAttrRMin1 << ", " << anAttrRMax1;
   theDumper << ", " << anAttrRMin2 << ", " << anAttrRMax2;
-  theDumper << ", " << anAttrZ << ", " << anAttrStartPhi << " , " << anAttrDeltaPhi;
+  theDumper << ", " << anAttrZ << ", " << anAttrStartPhi << ", " << anAttrDeltaPhi;
 
   theDumper << ")" << std::endl;
 }
