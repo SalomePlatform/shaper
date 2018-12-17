@@ -45,12 +45,14 @@ class PartSetPlugin_Part : public ModelAPI_CompositeFeature
     return MY_KIND;
   }
 
+//LCOV_EXCL_START
   /// Returns to which group in the document must be added feature
   PARTSETPLUGIN_EXPORT virtual const std::string& getGroup()
   {
     static std::string MY_GROUP = "Parts";
     return MY_GROUP;
   }
+//LCOV_EXCL_STOP
 
   /// Creates a new part document if needed
   PARTSETPLUGIN_EXPORT virtual void execute();
@@ -80,7 +82,7 @@ class PartSetPlugin_Part : public ModelAPI_CompositeFeature
 
   /// This method to inform that sub-feature is removed and must be removed from the internal data
   /// structures of the owner (the remove from the document will be done outside just after)
-  virtual void removeFeature(std::shared_ptr<ModelAPI_Feature> theFeature);
+  virtual void removeFeature(std::shared_ptr<ModelAPI_Feature> theFeature) {}
 
   /// Use plugin manager for features creation
   PartSetPlugin_Part();

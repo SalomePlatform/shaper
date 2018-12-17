@@ -38,12 +38,14 @@ class PartSetPlugin_Duplicate : public ModelAPI_Feature
     static const std::string MY_REMOVE_KIND("Duplicate");
     return MY_REMOVE_KIND;
   }
+//LCOV_EXCL_START
   /// Returns the kind of a feature
   PARTSETPLUGIN_EXPORT virtual const std::string& getKind()
   {
     static std::string MY_KIND = PartSetPlugin_Duplicate::ID();
     return MY_KIND;
   }
+//LCOV_EXCL_STOP
 
   /// Returns to which group in the document must be added feature
   PARTSETPLUGIN_EXPORT virtual const std::string& getGroup()
@@ -53,9 +55,7 @@ class PartSetPlugin_Duplicate : public ModelAPI_Feature
   }
 
   /// Request for initialization of data model of the feature: adding all attributes
-  PARTSETPLUGIN_EXPORT virtual void initAttributes()
-  {
-  }
+  PARTSETPLUGIN_EXPORT virtual void initAttributes() {}
 
   /// Not normal feature that stored in the tree
   PARTSETPLUGIN_EXPORT virtual bool isAction()

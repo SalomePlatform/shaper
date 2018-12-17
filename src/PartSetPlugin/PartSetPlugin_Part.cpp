@@ -120,10 +120,6 @@ bool PartSetPlugin_Part::isSub(ObjectPtr theObject) const
   return false;
 }
 
-void PartSetPlugin_Part::removeFeature(std::shared_ptr<ModelAPI_Feature> theFeature)
-{
-}
-
 void PartSetPlugin_Part::erase() {
   ResultPartPtr aResult = std::dynamic_pointer_cast<ModelAPI_ResultPart>(firstResult());
   if (aResult.get()) {

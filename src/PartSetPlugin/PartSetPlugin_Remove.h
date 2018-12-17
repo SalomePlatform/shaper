@@ -37,6 +37,7 @@ class PartSetPlugin_Remove : public ModelAPI_Feature
     static const std::string MY_REMOVE_KIND("Remove");
     return MY_REMOVE_KIND;
   }
+//LCOV_EXCL_START
   /// Returns the kind of a feature
   PARTSETPLUGIN_EXPORT virtual const std::string& getKind()
   {
@@ -55,6 +56,7 @@ class PartSetPlugin_Remove : public ModelAPI_Feature
   PARTSETPLUGIN_EXPORT virtual void initAttributes()
   {
   }
+//LCOV_EXCL_STOP
 
   /// Not normal feature that stored in the tree
   PARTSETPLUGIN_EXPORT virtual bool isAction()
