@@ -94,6 +94,7 @@ bool isWidgetNode(xmlNodePtr theNode)
   return !isNode(theNode, NODE_SOURCE, NODE_VALIDATOR, NULL);
 }
 
+// LCOV_EXCL_START
 // widget api?
 bool isCaseNode(xmlNodePtr theNode)
 {
@@ -103,6 +104,7 @@ bool isCaseNode(xmlNodePtr theNode)
   return isNode(theNode, WDG_OPTIONALBOX, WDG_SWITCH_CASE, WDG_TOOLBOX_BOX,
     WDG_RADIOBOX_ITEM, NULL);
 }
+// LCOV_EXCL_STOP
 
 bool hasChild(xmlNodePtr theNode)
 {
@@ -251,6 +253,7 @@ std::string getProperty(xmlNodePtr theNode, const char* thePropName)
   return result;
 }
 
+// LCOV_EXCL_START
 std::string getContent(xmlNodePtr theNode)
 {
   std::string result = "";
@@ -261,6 +264,7 @@ std::string getContent(xmlNodePtr theNode)
   xmlFree(aContent);
   return result;
 }
+// LCOV_EXCL_STOP
 
 std::string getNormalizedProperty(xmlNodePtr theNode, const char* thePropName)
 {
@@ -277,13 +281,6 @@ bool getBooleanAttribute(xmlNodePtr theNode, const char* theAttributeName, bool 
     result = false;
   }
   return result;
-}
-
-CONFIG_EXPORT std::string normalize(const char* theString)
-{
-  if (!theString)
-    return std::string();
-  return normalize(std::string(theString));
 }
 
 CONFIG_EXPORT std::string normalize(const std::string& theString)

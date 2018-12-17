@@ -240,6 +240,7 @@ void Config_ModuleReader::loadLibrary(const std::string& theLibName)
   void* aModLib = dlopen( aFileName.c_str(), RTLD_LAZY | RTLD_GLOBAL );
   #endif
   if(!aModLib && theLibName != "DFBrowser") { // don't show error for internal debugging tool
+// LCOV_EXCL_START
     std::string anErrorMsg = "Failed to load " + aFileName;
     #ifdef WIN32
     DWORD   dwLastError = ::GetLastError();
@@ -257,6 +258,7 @@ void Config_ModuleReader::loadLibrary(const std::string& theLibName)
     #endif
     std::cerr << anErrorMsg << std::endl;
     Events_InfoMessage("Config_ModuleReader", anErrorMsg).send();
+// LCOV_EXCL_STOP
   }
 }
 

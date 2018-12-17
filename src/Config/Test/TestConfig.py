@@ -40,3 +40,15 @@ assert(len(Config_PropManager().color("TestSection", "PropColor")) == 3)
 # check sections and properties are not empty
 assert(len(Config_PropManager().getSections()) > 0)
 assert(len(Config_PropManager().getProperties()) > 0)
+
+# verify the property
+prop = Config_PropManager().findProp("TestSection", "PropDouble")
+assert(prop is not None)
+prop.setTitle("PropTitle")
+assert(prop.title() == "PropTitle")
+prop.setMin("0")
+assert(prop.min() == "0")
+prop.setMax("100")
+assert(prop.max() == "100")
+prop.setType(Config_Prop.String)
+assert(prop.type() == Config_Prop.String)
