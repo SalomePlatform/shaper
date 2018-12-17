@@ -1046,7 +1046,7 @@ void Model_Document::removeFeature(FeaturePtr theFeature)
 {
   myObjs->removeFeature(theFeature);
   // fix for #2723: send signal that part is updated
-  if (!isRoot()) {
+  if (!isRoot() && isOperation()) {
     std::shared_ptr<Model_Document> aRoot =
       std::dynamic_pointer_cast<Model_Document>(ModelAPI_Session::get()->moduleDocument());
     std::list<ResultPtr> allParts;
