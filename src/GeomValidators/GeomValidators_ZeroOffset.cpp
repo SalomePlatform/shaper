@@ -40,10 +40,12 @@ bool GeomValidators_ZeroOffset::isValid(const std::shared_ptr<ModelAPI_Feature>&
                                         const std::list<std::string>& theArguments,
                                         Events_InfoMessage& theError) const
 {
+// LCOV_EXCL_START
   if(theArguments.size() != 9) {
     theError = "Wrong number of validator arguments in xml(expected 9).";
     return false;
   }
+// LCOV_EXCL_STOP
 
   std::list<std::string>::const_iterator anIt = theArguments.begin(), aLast = theArguments.end();
 

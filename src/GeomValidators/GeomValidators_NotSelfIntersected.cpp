@@ -32,10 +32,12 @@ bool GeomValidators_NotSelfIntersected::isValid(const std::shared_ptr<ModelAPI_F
                                                 const std::list<std::string>& theArguments,
                                                 Events_InfoMessage& theError) const
 {
+// LCOV_EXCL_START
   if (theArguments.empty()) {
     theError = "Error: empty selection.";
     return false;
   }
+// LCOV_EXCL_STOP
 
   for (std::list<std::string>::const_iterator anIt = theArguments.cbegin();
        anIt != theArguments.cend();
@@ -44,8 +46,10 @@ bool GeomValidators_NotSelfIntersected::isValid(const std::shared_ptr<ModelAPI_F
     std::string anArgument = *anIt;
     AttributePtr anAttribute = theFeature->attribute(anArgument);
     if (!anAttribute.get()) {
+// LCOV_EXCL_START
       theError = std::string("Error: Feature does not contain attribute: ") + anArgument;
       return false;
+// LCOV_EXCL_STOP
     }
     if (anAttribute->attributeType() == ModelAPI_AttributeSelectionList::typeId()) {
       AttributeSelectionListPtr anAttrSelectionList =
@@ -53,8 +57,10 @@ bool GeomValidators_NotSelfIntersected::isValid(const std::shared_ptr<ModelAPI_F
       for (int anIndex = 0; anIndex < anAttrSelectionList->size(); ++anIndex) {
         AttributeSelectionPtr anAttrSelection = anAttrSelectionList->value(anIndex);
         if (!anAttrSelection.get()) {
+// LCOV_EXCL_START
           theError = "Error: Empty attribute selection.";
           return false;
+// LCOV_EXCL_STOP
         }
         ResultPtr aContext = anAttrSelection->context();
         if (!aContext.get()) {
@@ -80,9 +86,11 @@ bool GeomValidators_NotSelfIntersected::isValid(const std::shared_ptr<ModelAPI_F
         }*/
       }
     } else {
+// LCOV_EXCL_START
       theError = std::string("Error: validator does not support attribute with type: ")
         + anAttribute->attributeType();
       return false;
+// LCOV_EXCL_STOP
     }
   }
 

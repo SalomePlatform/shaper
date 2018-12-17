@@ -31,17 +31,21 @@ bool GeomValidators_MinObjectsSelected::isValid(const std::shared_ptr<ModelAPI_F
                                                 Events_InfoMessage& theError) const
 {
   if(theArguments.size() != 2) {
+// LCOV_EXCL_START
     theError =
       "Error: Wrong number of arguments (expected 2): selection list id and min number of objects";
     return false;
+// LCOV_EXCL_STOP
   }
 
   std::string aSelectionListId = theArguments.front();
   AttributeSelectionListPtr anAttrSelList = theFeature->selectionList(aSelectionListId);
   if(!anAttrSelList.get()) {
+// LCOV_EXCL_START
     theError = "Error: Could not get attribute \"%1\".";
     theError.arg(aSelectionListId);
     return false;
+// LCOV_EXCL_STOP
   }
   int anObjectsNb = anAttrSelList->size();
 

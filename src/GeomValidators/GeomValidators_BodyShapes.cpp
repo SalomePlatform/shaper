@@ -82,9 +82,11 @@ bool GeomValidators_BodyShapes::isValid(const AttributePtr& theAttribute,
       }
     }
   } else {
+// LCOV_EXCL_START
     theError = "Error: Attribute \"%1\" does not supported by this validator.";
     theError.arg(anAttributeType);
     return false;
+// LCOV_EXCL_STOP
   }
 
   return true;

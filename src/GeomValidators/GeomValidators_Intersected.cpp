@@ -31,6 +31,7 @@ bool GeomValidators_Intersected::isValid(const AttributePtr& theAttribute,
                                          const std::list<std::string>& theArguments,
                                          Events_InfoMessage& theError) const
 {
+// LCOV_EXCL_START
   if (!theAttribute) {
     theError = "Error: empty selection.";
     return false;
@@ -40,6 +41,7 @@ bool GeomValidators_Intersected::isValid(const AttributePtr& theAttribute,
     theError = "Error: compare with nothing";
     return false;
   }
+// LCOV_EXCL_STOP
 
   FeaturePtr aFeature = ModelAPI_Feature::feature(theAttribute->owner());
 
@@ -59,10 +61,12 @@ bool GeomValidators_Intersected::isValid(const AttributePtr& theAttribute,
   for (std::list<std::string>::const_iterator anIt = theArguments.begin();
        anIt != theArguments.end() && isOk; ++anIt) {
     aSelection = aFeature->selection(*anIt);
+// LCOV_EXCL_START
     if (!aSelection) {
       theError = "Error: incorrect type of attribute";
       return false;
     }
+// LCOV_EXCL_STOP
 
     GeomShapePtr aShape;
     if (aSelection)

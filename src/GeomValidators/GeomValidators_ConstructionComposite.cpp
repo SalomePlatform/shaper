@@ -32,10 +32,12 @@ bool GeomValidators_ConstructionComposite::isValid(const AttributePtr& theAttrib
 {
   bool aValid = true;
   if (theAttribute->attributeType() != ModelAPI_AttributeSelection::typeId()) {
+// LCOV_EXCL_START
     aValid = false;
     theError = "The attribute with the %1 type is not processed";
     theError.arg(theAttribute->attributeType());
     return aValid;
+// LCOV_EXCL_STOP
   }
 
   AttributeSelectionPtr aSelectionAttr = std::dynamic_pointer_cast<ModelAPI_AttributeSelection>

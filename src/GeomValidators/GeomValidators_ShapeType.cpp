@@ -163,8 +163,10 @@ bool GeomValidators_ShapeType::isValidAttribute(const AttributePtr& theAttribute
         std::string anAttributeType = aRefAttr->attributeType();
         aValid = anAttributeType == GeomDataAPI_Point2D::typeId();
         if (!aValid) {
+// LCOV_EXCL_START
           theError = "Shape type is \"%1\", it should be \"%2\"";
           theError.arg(anAttributeType).arg(getShapeTypeDescription(theShapeType));
+// LCOV_EXCL_STOP
         }
       }
     }
@@ -189,9 +191,11 @@ bool GeomValidators_ShapeType::isValidAttribute(const AttributePtr& theAttribute
     }
   }
   else {
+// LCOV_EXCL_START
     aValid = false;
     theError = "The attribute with the %1 type is not processed";
     theError.arg(anAttributeType);
+// LCOV_EXCL_STOP
   }
   if (aValid)
     theError = "";
