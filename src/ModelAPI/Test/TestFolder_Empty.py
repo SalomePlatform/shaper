@@ -1,4 +1,4 @@
-## Copyright (C) 2014-2017  CEA/DEN, EDF R&D
+## Copyright (C) 2018-20xx  CEA/DEN, EDF R&D
 ##
 ## This library is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU Lesser General Public
@@ -17,8 +17,6 @@
 ## See http:##www.salome-platform.org/ or
 ## email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com>
 ##
-
-# -*- coding: utf-8 -*-
 
 from salome.shaper import model
 
@@ -47,10 +45,9 @@ Extrusion_1 = model.addExtrusion(Part_1_doc, [model.selection("FACE", "Sketch_1/
 Fillet_1 = model.addFillet(Part_1_doc, [model.selection("EDGE", "[Extrusion_1_1/Generated_Face&Sketch_1/SketchLine_4][Extrusion_1_1/To_Face]")], 2)
 model.do()
 
-Folder_1 = model.addFolder(Part_1_doc, Sketch_1, Extrusion_1)
-Folder_1.setName("Box")
+Folder_1 = model.addFolder(Part_1_doc)
 
 model.end()
 
-assert(Folder_1.name() == "Box")
-assert(model.checkPythonDump())
+# empty folder is not dumped
+assert(model.checkPythonDump(model.ModelHighAPI.CHECK_NAMING) == False)

@@ -102,11 +102,8 @@ public:
 
   /// Add module to list of imported modules
   /// \param theModuleName  name of the module to be imported
-  /// \param theObject      name of the entity to be imported
-  ///                       from the module (if empty, while module will be imported)
   MODELHIGHAPI_EXPORT
-  void importModule(const std::string& theModuleName,
-                    const std::string& theObject = std::string());
+  void importModule(const std::string& theModuleName);
 
   /// Returns name of specified entity
   /// \param theEntity        [in] named entity
@@ -331,7 +328,7 @@ private:
   };
 
   typedef std::map<EntityPtr, EntityName>                                      EntityNameMap;
-  typedef std::map<std::string, std::set<std::string> >                        ModulesMap;
+  typedef std::set<std::string>                                                ModulesSet;
   typedef std::map<DocumentPtr, std::map<std::string, std::pair<int, int> > >  NbFeaturesMap;
 
   struct LastDumpedEntity {
@@ -352,7 +349,7 @@ private:
   std::ostringstream  myDumpBuffer;         ///< intermediate buffer to store dumping data
   std::ostringstream  myFullDump;           ///< full buffer of dumped data
 
-  ModulesMap          myModules;            ///< modules and entities to be imported
+  ModulesSet          myModules;            ///< modules and entities to be imported
   EntityNameMap       myNames;              ///< names of the entities
   DumpStack           myEntitiesStack;      ///< stack of dumped entities
 

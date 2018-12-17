@@ -120,5 +120,6 @@ ADD_UNIT_TESTS(
   TestRefAttr.py
   TestReference.py
   TestDeflectionDump.py
+  TestUndoRedo.py
   Test2488.py
 )

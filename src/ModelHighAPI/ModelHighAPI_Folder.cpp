@@ -74,8 +74,8 @@ void ModelHighAPI_Folder::dump(ModelHighAPI_Dumper& theDumper) const
 {
   const std::string& aDocName = theDumper.name(myFolder->document());
 
-  AttributeReferencePtr aStartRef = myFolder->reference(ModelAPI_Folder::FIRST_FEATURE_ID());
-  AttributeReferencePtr aEndRef   = myFolder->reference(ModelAPI_Folder::LAST_FEATURE_ID());
+  AttributeReferencePtr aStartRef = firstFeature();
+  AttributeReferencePtr aEndRef   = lastFeature();
 
   // do not dump empty folders
   if (!aEndRef->value())

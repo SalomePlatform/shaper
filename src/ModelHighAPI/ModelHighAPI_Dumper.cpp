@@ -441,20 +441,9 @@ bool ModelHighAPI_Dumper::exportTo(const std::string& theFileName)
 
   // standard header (encoding + imported modules)
   aFile << "# -*- coding: utf-8 -*-" << std::endl << std::endl;
-  for (ModulesMap::const_iterator aModIt = myModules.begin();
+  for (ModulesSet::const_iterator aModIt = myModules.begin();
        aModIt != myModules.end(); ++aModIt) {
-    aFile << "from " << aModIt->first << " import ";
-    if (aModIt->second.empty() ||
-        aModIt->second.find(std::string()) != aModIt->second.end())
-      aFile << "*"; // import whole module
-    else {
-      // import specific features
-      std::set<std::string>::const_iterator anObjIt = aModIt->second.begin();
-      aFile << *anObjIt;
-      for (++anObjIt; anObjIt != aModIt->second.end(); ++anObjIt)
-        aFile << ", " << *anObjIt;
-    }
-    aFile << std::endl;
+    aFile << "from " << *aModIt << " import *" << std::endl;
   }
   if (!myModules.empty())
     aFile << std::endl;
@@ -475,10 +464,9 @@ bool ModelHighAPI_Dumper::exportTo(const std::string& theFileName)
   return true;
 }
 
-void ModelHighAPI_Dumper::importModule(const std::string& theModuleName,
-                                       const std::string& theObject)
+void ModelHighAPI_Dumper::importModule(const std::string& theModuleName)
 {
-  myModules[theModuleName].insert(theObject);
+  myModules.insert(theModuleName);
 }
 
 void ModelHighAPI_Dumper::dumpEntitySetName()
@@ -688,7 +676,7 @@ ModelHighAPI_Dumper& ModelHighAPI_Dumper::operator<<(const double theValue)
 
 ModelHighAPI_Dumper& ModelHighAPI_Dumper::operator<<(const std::shared_ptr<GeomAPI_Pnt>& thePoint)
 {
-  importModule("GeomAPI", "GeomAPI_Pnt");
+  importModule("GeomAPI");
   myDumpBuffer << "GeomAPI_Pnt(" << thePoint->x() << ", "
                << thePoint->y() << ", " << thePoint->z() << ")";
   return *this;
@@ -696,7 +684,7 @@ ModelHighAPI_Dumper& ModelHighAPI_Dumper::operator<<(const std::shared_ptr<GeomA
 
 ModelHighAPI_Dumper& ModelHighAPI_Dumper::operator<<(const std::shared_ptr<GeomAPI_Dir>& theDir)
 {
-  importModule("GeomAPI", "GeomAPI_Dir");
+  importModule("GeomAPI");
   myDumpBuffer << "GeomAPI_Dir(" << theDir->x() << ", "
                << theDir->y() << ", " << theDir->z() << ")";
   return *this;

@@ -221,6 +221,7 @@ void ModelHighAPI_Selection::setDeflection(double theValue)
   aDeflectionAttr->setValue(theValue);
 }
 
+// LCOV_EXCL_START
 void ModelHighAPI_Selection::setTransparency(double theValue)
 {
   if (myVariantType != VT_ResultSubShapePair)
@@ -231,6 +232,7 @@ void ModelHighAPI_Selection::setTransparency(double theValue)
 
   aTransparencyAttr->setValue(theValue);
 }
+// LCOV_EXCL_STOP
 
 int ModelHighAPI_Selection::numberOfSubs() const
 {
