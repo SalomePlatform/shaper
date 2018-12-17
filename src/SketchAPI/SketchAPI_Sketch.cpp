@@ -846,9 +846,7 @@ std::shared_ptr<ModelHighAPI_Interface> SketchAPI_Sketch::setVertical(
 static std::shared_ptr<GeomAPI_Pnt2d> pointCoordinates(const AttributePtr& thePoint)
 {
   AttributePoint2DPtr aPnt = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(thePoint);
-  if (aPnt)
-    return aPnt->pnt();
-  return std::shared_ptr<GeomAPI_Pnt2d>();
+  return aPnt ? aPnt->pnt() : std::shared_ptr<GeomAPI_Pnt2d>();
 }
 
 static std::shared_ptr<GeomAPI_Pnt2d> middlePointOnLine(const FeaturePtr& theFeature)
@@ -919,20 +917,21 @@ static std::shared_ptr<GeomAPI_Pnt2d> middlePointOnArc(const FeaturePtr& theFeat
 
 static std::shared_ptr<GeomAPI_Pnt2d> middlePoint(const ObjectPtr& theObject)
 {
+  std::shared_ptr<GeomAPI_Pnt2d> aMiddlePoint;
   FeaturePtr aFeature = ModelAPI_Feature::feature(theObject);
   if (aFeature) {
+    // move only features of the following types
     const std::string& aFeatureKind = aFeature->getKind();
     if (aFeatureKind == SketchPlugin_Point::ID())
-      return pointCoordinates(aFeature->attribute(SketchPlugin_Point::COORD_ID()));
+      aMiddlePoint = pointCoordinates(aFeature->attribute(SketchPlugin_Point::COORD_ID()));
     else if (aFeatureKind == SketchPlugin_Line::ID())
-      return middlePointOnLine(aFeature);
+      aMiddlePoint = middlePointOnLine(aFeature);
     else if (aFeatureKind == SketchPlugin_Circle::ID())
-      return pointOnCircle(aFeature);
+      aMiddlePoint = pointOnCircle(aFeature);
     else if (aFeatureKind == SketchPlugin_Arc::ID())
-      return middlePointOnArc(aFeature);
+      aMiddlePoint = middlePointOnArc(aFeature);
   }
-  // do not move other types of features
-  return std::shared_ptr<GeomAPI_Pnt2d>();
+  return aMiddlePoint;
 }
 
 void SketchAPI_Sketch::move(const ModelHighAPI_RefAttr& theMovedEntity,
