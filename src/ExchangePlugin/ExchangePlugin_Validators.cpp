@@ -58,17 +58,21 @@ bool ExchangePlugin_FormatValidator::isValid(const AttributePtr& theAttribute,
                                              Events_InfoMessage& theError) const
 {
   if (!theAttribute->isInitialized()) {
+// LCOV_EXCL_START
     theError = "%1 is not initialized.";
     theError.arg(theAttribute->id());
     return false;
+// LCOV_EXCL_STOP
   }
 
   const AttributeStringPtr aStrAttr =
       std::dynamic_pointer_cast<ModelAPI_AttributeString>(theAttribute);
   if (!aStrAttr) {
+// LCOV_EXCL_START
     theError = "%1 is not a string attribute.";
     theError.arg(theAttribute->id());
     return false;
+// LCOV_EXCL_STOP
   }
 
   std::string aFileName = aStrAttr->value();
