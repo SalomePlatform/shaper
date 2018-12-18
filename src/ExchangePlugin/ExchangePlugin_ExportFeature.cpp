@@ -411,9 +411,11 @@ void ExchangePlugin_ExportFeature::exportXAO(const std::string& theFileName)
     return;
   }
 
+// LCOV_EXCL_START
   } catch (XAO::XAO_Exception& e) {
     std::string anError = e.what();
     setError("An error occurred while exporting " + theFileName + ": " + anError);
     return;
   }
+// LCOV_EXCL_STOP
 }

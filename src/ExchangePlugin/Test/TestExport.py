@@ -50,7 +50,7 @@ def removeFile(theFileName):
 #=========================================================================
 # Common test function
 #=========================================================================
-def testExport(theType, theFormat, theFile, theVolume, theDelta):
+def testExport(theType, theFormat, theFile, theVolume, theDelta, theErrorExpected = False):
     # Import a reference part
     aSession.startOperation("Add part")
     aPartFeature = aSession.moduleDocument().addFeature("Part")
@@ -76,12 +76,22 @@ def testExport(theType, theFormat, theFile, theVolume, theDelta):
     aSelectionListAttr.append(anImportFeature.firstResult(), anImportFeature.firstResult().shape())
     aSession.finishOperation()
 
-    assert os.path.exists(theFile)
+    if theErrorExpected:
+        assert anExportFeature.error() != ""
+        aPart.removeFeature(anExportFeature)
+    else:
+        assert os.path.exists(theFile)
 
-    # Test exported file by importing
-    testImport(theType, theFile, theVolume, theDelta)
+        # Test exported file by importing
+        testImport(theType, theFile, theVolume, theDelta)
 
-def testExportXAO(theFile):
+def testExportXAO(theFile, theEmptyFormat = False):
+    type = "XAO"
+    format = "XAO"
+    if theEmptyFormat:
+        type = "Regular"
+        format = ""
+
     # Import a reference part
     aSession.startOperation("Add part")
     aPartFeature = aSession.moduleDocument().addFeature("Part")
@@ -140,8 +150,8 @@ def testExportXAO(theFile):
     aSession.startOperation("Export to XAO")
     anExportFeature = aPart.addFeature("Export")
     anExportFeature.string("xao_file_path").setValue(theFile)
-    anExportFeature.string("file_format").setValue("XAO")
-    anExportFeature.string("ExportType").setValue("XAO")
+    anExportFeature.string("file_format").setValue(type)
+    anExportFeature.string("ExportType").setValue(type)
     anExportFeature.string("xao_author").setValue("me")
     anExportFeature.string("xao_geometry_name").setValue("mygeom")
     aSession.finishOperation()
@@ -159,22 +169,30 @@ if __name__ == '__main__':
         aRealVolume = 3.78827401738e-06
         testExport("BREP", "BREP", os.path.join(tmp_dir, "screw_export.brep"), aRealVolume, 10 ** -17)
         testExport("BRP", "BREP", os.path.join(tmp_dir, "screw_export.brp"), aRealVolume, 10 ** -17)
+        testExport("Regular", "", os.path.join(tmp_dir, "screw_export.brep"), aRealVolume, 10 ** -17)
         #=========================================================================
         # Export a shape into STEP
         #=========================================================================
         testExport("STEP", "STEP", os.path.join(tmp_dir, "screw_export.step"), 3.78825807533e-06, 10 ** -17)
         testExport("STP", "STEP", os.path.join(tmp_dir, "screw_export.stp"), 3.78825807533e-06, 10 ** -17)
+        testExport("Regular", "", os.path.join(tmp_dir, "screw_export.step"), 3.78825807533e-06, 10 ** -17)
         #=========================================================================
         # Export a shape into IGES
         #=========================================================================
         testExport("IGES-5.1", "IGES-5.1", os.path.join(tmp_dir, "screw_export-5.1.iges"), 3.78829613776e-06, 10 ** -17)
         testExport("IGS-5.1", "IGES-5.1", os.path.join(tmp_dir, "screw_export-5.1.igs"), 3.78829613776e-06, 10 ** -17)
+        testExport("Regular", "", os.path.join(tmp_dir, "screw_export-5.1.iges"), 3.78829613776e-06, 10 ** -17)
         testExport("IGES-5.3", "IGES-5.3", os.path.join(tmp_dir, "screw_export-5.3.iges"), 3.78827401651e-06, 10 ** -17)
         testExport("IGS-5.3", "IGES-5.3", os.path.join(tmp_dir, "screw_export-5.3.igs"), 3.78827401651e-06, 10 ** -17)
         #=========================================================================
         # Export a shape into XAO
         #=========================================================================
         testExportXAO(os.path.join(tmp_dir, "export.xao"))
+        testExportXAO(os.path.join(tmp_dir, "export.xao"), True)
+        #=========================================================================
+        # Check error when export to unsupported format
+        #=========================================================================
+        testExport("Regular", "", os.path.join(tmp_dir, "screw_export.dwg"), 3.78825807533e-06, 10 ** -17, True)
         #=========================================================================
         # End of test
         #=========================================================================

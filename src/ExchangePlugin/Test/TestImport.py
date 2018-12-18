@@ -44,7 +44,7 @@ def getShapePath(path):
     shapes_dir = os.path.join(os.getenv("DATA_DIR"), "Shapes")
     return os.path.join(shapes_dir, path)
 
-def testImport(theType, theFile, theVolume, theDelta):
+def testImport(theType, theFile, theVolume, theDelta, theErrorExpected = False):
     # Create a part for import
     aSession.startOperation("Create part for import")
     aPartFeature = aSession.moduleDocument().addFeature("Part")
@@ -61,18 +61,21 @@ def testImport(theType, theFile, theVolume, theDelta):
     file.setValue(theFile)
     aSession.finishOperation()
 
-    # Check results
-    assert anImportFeature.error() == '', "{0}: The error after execution: {1}".format(theType, anImportFeature.error())
-    assert len(anImportFeature.results()) == 1, "{0}: Wrong number of results: expected = 1, real = {1}".format(theType, len(anImportFeature.results()))
-    aResultBody = modelAPI_ResultBody(anImportFeature.firstResult())
-    assert aResultBody, "{0}: The result is not a body".format(theType)
-    aShape = aResultBody.shape()
-    assert aShape, "{0}: The body does not have a shape".format(theType)
+    if theErrorExpected:
+        assert anImportFeature.error() != ''
+    else:
+        # Check results
+        assert anImportFeature.error() == '', "{0}: The error after execution: {1}".format(theType, anImportFeature.error())
+        assert len(anImportFeature.results()) == 1, "{0}: Wrong number of results: expected = 1, real = {1}".format(theType, len(anImportFeature.results()))
+        aResultBody = modelAPI_ResultBody(anImportFeature.firstResult())
+        assert aResultBody, "{0}: The result is not a body".format(theType)
+        aShape = aResultBody.shape()
+        assert aShape, "{0}: The body does not have a shape".format(theType)
 
-    # Check shape volume
-    aRefVolume = theVolume
-    aResVolume = GeomAlgoAPI_ShapeTools.volume(aShape)
-    assert (math.fabs(aResVolume - aRefVolume) < theDelta), "{0}: The volume is wrong: expected = {1}, real = {2}".format(theType, aRefVolume, aResVolume)
+        # Check shape volume
+        aRefVolume = theVolume
+        aResVolume = GeomAlgoAPI_ShapeTools.volume(aShape)
+        assert (math.fabs(aResVolume - aRefVolume) < theDelta), "{0}: The volume is wrong: expected = {1}, real = {2}".format(theType, aRefVolume, aResVolume)
 
 def testImportXAO():
     # Create a part for import
@@ -153,6 +156,15 @@ if __name__ == '__main__':
         # Create a shape imported from XAO
         #=========================================================================
         testImportXAO()
+
+        #=========================================================================
+        # Check import errors
+        #=========================================================================
+        testImport("BREP", "", 0, 10 ** -25, True)
+        shape_path = getShapePath("Brep/solid.dwg")
+        testImport("BREP", shape_path, 0, 10 ** -25, True)
+        shape_path = getShapePath("Xao/wrong_file.xao")
+        testImport("XAO", shape_path, 0, 10 ** -25, True)
 
         #=========================================================================
         # End of test

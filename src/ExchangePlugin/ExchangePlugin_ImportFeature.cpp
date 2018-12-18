@@ -332,11 +332,13 @@ void ExchangePlugin_ImportFeature::importXAO(const std::string& theFileName)
   ModelAPI_EventCreator::get()->sendReordered(
     std::dynamic_pointer_cast<ModelAPI_Feature>(aRefListOfGroups->owner()));
 
+// LCOV_EXCL_START
   } catch (XAO::XAO_Exception& e) {
     std::string anError = e.what();
     setError("An error occurred while importing " + theFileName + ": " + anError);
     return;
   }
+// LCOV_EXCL_STOP
 }
 
 //============================================================================
@@ -373,6 +375,7 @@ std::shared_ptr<ModelAPI_Feature> ExchangePlugin_ImportFeature::subFeature(
   return aRes;
 }
 
+// LCOV_EXCL_START
 int ExchangePlugin_ImportFeature::subFeatureId(const int theIndex) const
 {
   std::shared_ptr<ModelAPI_AttributeRefList> aRefList = std::dynamic_pointer_cast<
@@ -390,6 +393,7 @@ int ExchangePlugin_ImportFeature::subFeatureId(const int theIndex) const
   }
   return aResultIndex;
 }
+// LCOV_EXCL_STOP
 
 bool ExchangePlugin_ImportFeature::isSub(ObjectPtr theObject) const
 {
