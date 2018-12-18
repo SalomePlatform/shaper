@@ -139,11 +139,7 @@ void FeaturesAPI_Revolution::setAngles(const ModelHighAPI_Double& theToAngle,
 //==================================================================================================
 void FeaturesAPI_Revolution::setAngle(const ModelHighAPI_Double& theAngle)
 {
-  fillAttribute(FeaturesPlugin_Revolution::CREATION_METHOD_BY_ANGLES(), mycreationMethod);
-  fillAttribute(theAngle, mytoAngle);
-  fillAttribute(ModelHighAPI_Double(), myfromAngle);
-
-  execIfBaseNotEmpty();
+  setAngles(theAngle, ModelHighAPI_Double());
 }
 
 //==================================================================================================

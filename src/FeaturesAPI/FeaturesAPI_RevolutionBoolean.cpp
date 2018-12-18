@@ -89,11 +89,7 @@ void FeaturesAPI_RevolutionBoolean::setAngles(const ModelHighAPI_Double& theToAn
 //==================================================================================================
 void FeaturesAPI_RevolutionBoolean::setAngle(const ModelHighAPI_Double& theAngle)
 {
-  fillAttribute(FeaturesPlugin_Revolution::CREATION_METHOD_BY_ANGLES(), mycreationMethod);
-  fillAttribute(theAngle, mytoAngle);
-  fillAttribute(ModelHighAPI_Double(), myfromAngle);
-
-  execIfBaseNotEmpty();
+  setAngles(theAngle, ModelHighAPI_Double());
 }
 
 //==================================================================================================
@@ -202,9 +198,7 @@ FeaturesAPI_RevolutionCut::FeaturesAPI_RevolutionCut(
   if(initialize()) {
     fillAttribute(theBaseObjects, mybaseObjects);
     fillAttribute(theAxis, myaxis);
-    fillAttribute(FeaturesPlugin_Revolution::CREATION_METHOD_BY_ANGLES(), mycreationMethod);
-    fillAttribute(theSize, mytoAngle);
-    fillAttribute(ModelHighAPI_Double(), myfromAngle);
+    setAngle(theSize);
     setBooleanObjects(theBooleanObjects);
   }
 }

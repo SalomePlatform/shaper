@@ -89,11 +89,7 @@ void FeaturesAPI_ExtrusionBoolean::setSizes(const ModelHighAPI_Double& theToSize
 //==================================================================================================
 void FeaturesAPI_ExtrusionBoolean::setSize(const ModelHighAPI_Double& theSize)
 {
-  fillAttribute(FeaturesPlugin_Extrusion::CREATION_METHOD_BY_SIZES(), mycreationMethod);
-  fillAttribute(theSize, mytoSize);
-  fillAttribute(ModelHighAPI_Double(), myfromSize);
-
-  execIfBaseNotEmpty();
+  setSizes(theSize, ModelHighAPI_Double());
 }
 
 //==================================================================================================
@@ -198,9 +194,7 @@ FeaturesAPI_ExtrusionCut::FeaturesAPI_ExtrusionCut(
 {
   if(initialize()) {
     fillAttribute(theBaseObjects, mybaseObjects);
-    fillAttribute(FeaturesPlugin_Extrusion::CREATION_METHOD_BY_SIZES(), mycreationMethod);
-    fillAttribute(theSize, mytoSize);
-    fillAttribute(ModelHighAPI_Double(), myfromSize);
+    setSize(theSize);
     setBooleanObjects(theBooleanObjects);
   }
 }
@@ -217,9 +211,7 @@ FeaturesAPI_ExtrusionCut::FeaturesAPI_ExtrusionCut(
   if(initialize()) {
     fillAttribute(theBaseObjects, mybaseObjects);
     fillAttribute(theDirection, mydirection);
-    fillAttribute(FeaturesPlugin_Extrusion::CREATION_METHOD_BY_SIZES(), mycreationMethod);
-    fillAttribute(theSize, mytoSize);
-    fillAttribute(ModelHighAPI_Double(), myfromSize);
+    setSize(theSize);
     setBooleanObjects(theBooleanObjects);
   }
 }
@@ -235,9 +227,7 @@ FeaturesAPI_ExtrusionCut::FeaturesAPI_ExtrusionCut(
 {
   if(initialize()) {
     fillAttribute(theBaseObjects, mybaseObjects);
-    fillAttribute(FeaturesPlugin_Extrusion::CREATION_METHOD_BY_SIZES(), mycreationMethod);
-    fillAttribute(theToSize, mytoSize);
-    fillAttribute(theFromSize, myfromSize);
+    setSizes(theToSize, theFromSize);
     setBooleanObjects(theBooleanObjects);
   }
 }
@@ -255,9 +245,7 @@ FeaturesAPI_ExtrusionCut::FeaturesAPI_ExtrusionCut(
   if(initialize()) {
     fillAttribute(theBaseObjects, mybaseObjects);
     fillAttribute(theDirection, mydirection);
-    fillAttribute(FeaturesPlugin_Extrusion::CREATION_METHOD_BY_SIZES(), mycreationMethod);
-    fillAttribute(theToSize, mytoSize);
-    fillAttribute(theFromSize, myfromSize);
+    setSizes(theToSize, theFromSize);
     setBooleanObjects(theBooleanObjects);
   }
 }
@@ -425,9 +413,7 @@ FeaturesAPI_ExtrusionFuse::FeaturesAPI_ExtrusionFuse(
 {
   if(initialize()) {
     fillAttribute(theBaseObjects, mybaseObjects);
-    fillAttribute(FeaturesPlugin_Extrusion::CREATION_METHOD_BY_SIZES(), mycreationMethod);
-    fillAttribute(theSize, mytoSize);
-    fillAttribute(ModelHighAPI_Double(), myfromSize);
+    setSize(theSize);
     setBooleanObjects(theBooleanObjects);
   }
 }
@@ -444,9 +430,7 @@ FeaturesAPI_ExtrusionFuse::FeaturesAPI_ExtrusionFuse(
   if(initialize()) {
     fillAttribute(theBaseObjects, mybaseObjects);
     fillAttribute(theDirection, mydirection);
-    fillAttribute(FeaturesPlugin_Extrusion::CREATION_METHOD_BY_SIZES(), mycreationMethod);
-    fillAttribute(theSize, mytoSize);
-    fillAttribute(ModelHighAPI_Double(), myfromSize);
+    setSize(theSize);
     setBooleanObjects(theBooleanObjects);
   }
 }
@@ -462,9 +446,7 @@ FeaturesAPI_ExtrusionFuse::FeaturesAPI_ExtrusionFuse(
 {
   if(initialize()) {
     fillAttribute(theBaseObjects, mybaseObjects);
-    fillAttribute(FeaturesPlugin_Extrusion::CREATION_METHOD_BY_SIZES(), mycreationMethod);
-    fillAttribute(theToSize, mytoSize);
-    fillAttribute(theFromSize, myfromSize);
+    setSizes(theToSize, theFromSize);
     setBooleanObjects(theBooleanObjects);
   }
 }
@@ -482,9 +464,7 @@ FeaturesAPI_ExtrusionFuse::FeaturesAPI_ExtrusionFuse(
   if(initialize()) {
     fillAttribute(theBaseObjects, mybaseObjects);
     fillAttribute(theDirection, mydirection);
-    fillAttribute(FeaturesPlugin_Extrusion::CREATION_METHOD_BY_SIZES(), mycreationMethod);
-    fillAttribute(theToSize, mytoSize);
-    fillAttribute(theFromSize, myfromSize);
+    setSizes(theToSize, theFromSize);
     setBooleanObjects(theBooleanObjects);
   }
 }

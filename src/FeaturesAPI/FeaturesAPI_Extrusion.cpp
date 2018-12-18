@@ -175,11 +175,7 @@ void FeaturesAPI_Extrusion::setSizes(const ModelHighAPI_Double& theToSize,
 //==================================================================================================
 void FeaturesAPI_Extrusion::setSize(const ModelHighAPI_Double& theSize)
 {
-  fillAttribute(FeaturesPlugin_Extrusion::CREATION_METHOD_BY_SIZES(), mycreationMethod);
-  fillAttribute(theSize, mytoSize);
-  fillAttribute(ModelHighAPI_Double(), myfromSize);
-
-  execIfBaseNotEmpty();
+  setSizes(theSize, ModelHighAPI_Double());
 }
 
 //==================================================================================================

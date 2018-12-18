@@ -170,12 +170,21 @@ INSTALL(FILES ${TEXT_RESOURCES} DESTINATION ${SHAPER_INSTALL_XML_RESOURCES})
 
 ADD_UNIT_TESTS(TestExtrusion.py
                TestExtrusionCut.py
+               TestExtrusionCut_BySize.py
+               TestExtrusionCut_ByPlanesAndOffsets.py
                TestExtrusionFuse.py
+               TestExtrusionFuse_BySize.py
+               TestExtrusionFuse_ByPlanesAndOffsets.py
                TestExtrusion_ErrorMsg.py
                TestExtrusion_ZeroOffsetError.py
                TestRevolution.py
+               TestRevolution_ByAngle.py
                TestRevolutionCut.py
+               TestRevolutionCut_ByAngle.py
+               TestRevolutionCut_ByPlanesAndOffsets.py
                TestRevolutionFuse.py
+               TestRevolutionFuse_ByAngle.py
+               TestRevolutionFuse_ByPlanesAndOffsets.py
                TestCompositeFeaturesOnCompSolids.py
                TestPartition.py
                TestPartition_ErrorMsg.py
@@ -191,6 +200,8 @@ ADD_UNIT_TESTS(TestExtrusion.py
                TestTranslation.py
                TestTranslation_Part.py
                TestRotation.py
+               TestRotation_ByAxis.py
+               TestRotation_ByPoints.py
                TestRotation_ErrorMsg.py
                TestMultiRotation_Part.py
                TestMultiRotation_ErrorMsg.py
@@ -414,6 +425,8 @@ ADD_UNIT_TESTS(TestExtrusion.py
                TestFillet.py
                TestFillet1.py
                TestFillet_ErrorMsg.py
+               TestScale1.py
+               TestScale2.py
                Test1816.py
                Test2631.py
                Test2650.py
