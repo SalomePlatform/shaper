@@ -44,19 +44,31 @@ SketchConstraintRadius_2 = Sketch_1.setRadius(SketchCircle_1.results()[1], 5)
 model.do()
 Extrusion_1 = model.addExtrusion(Part_1_doc, [model.selection("FACE", "Sketch_1/Face-SketchLine_1r-SketchArc_1_2f-SketchLine_2f-SketchLine_3f-SketchLine_4f-SketchCircle_1_2r")], model.selection(), 10, 0)
 model.do()
-# create a drawer feature of the extrusion and upper face
-Drawer = Part_1_doc.addFeature("SketchDrawer")
-Drawer.selection("base_shape").setValue(Extrusion_1.feature(), None)
+# create a drawer feature of the extrusion and upper face, without dimensions
+Drawer1 = Part_1_doc.addFeature("SketchDrawer")
+Drawer1.selection("base_shape").setValue(Extrusion_1.feature(), None)
+Drawer1.boolean("add_dimensions").setValue(False)
 PlaneSelection = model.selection("FACE", "Extrusion_1_1/To_Face")
-PlaneSelection.fillAttribute(Drawer.selection("plane"))
+PlaneSelection.fillAttribute(Drawer1.selection("plane"))
+model.do()
+# create a drawer feature of the extrusion and upper face, with dimensions
+Drawer2 = Part_1_doc.addFeature("SketchDrawer")
+Drawer2.selection("base_shape").setValue(Extrusion_1.feature(), None)
+Drawer2.boolean("add_dimensions").setValue(True)
+PlaneSelection = model.selection("FACE", "Extrusion_1_1/To_Face")
+PlaneSelection.fillAttribute(Drawer2.selection("plane"))
 model.end()
 
 # check that a sketch is created with valid elements
-assert(Part_1_doc.size("Construction") == 2) # two sketches: base of extrusion and this new one
+assert(Part_1_doc.size("Construction") == 3) # three sketches: base of extrusion and drawer's two
 
 from ModelAPI import *
 aFactory = ModelAPI_Session.get().validators()
 
-Sketch = objectToFeature(Part_1_doc.object("Features", 2)) # created sketch feature
-assert(aFactory.validate(Sketch))
-assert(len(Sketch.results()) == 1)
+Sketch1 = objectToFeature(Part_1_doc.object("Features", 2)) # the first created sketch feature
+assert(aFactory.validate(Sketch1))
+assert(len(Sketch1.results()) == 1)
+
+Sketch2 = objectToFeature(Part_1_doc.object("Features", 3)) # the second created sketch feature
+assert(aFactory.validate(Sketch2))
+assert(len(Sketch2.results()) == 1)

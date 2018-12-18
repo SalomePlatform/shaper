@@ -32,6 +32,11 @@ The following property panel appears:
 
 Click in the view once to set the whole original model, then click a second time to set the
 plane or planar face - a base of sketch. This can be plane on the original model.
+
+Flag "Create dimensions" allows to disable creation of dimensional constraints in the resulting sketch.
+So, if it is disabled, then lengths and radiuses will be omitted. It allows to avoid overconstraint
+situation and simplify work of the sketch solver.
+
 On Apply button press the new sketch will be created in the Object Browser tree.
 
 Result
