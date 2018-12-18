@@ -50,4 +50,24 @@ Extrusion_1 = model.addExtrusion(Part_1_doc, [model.selection("COMPOUND", "Sketc
 assert(Extrusion_1.feature().error() != "")
 Part_1_doc.removeFeature(Extrusion_1.feature())
 
+Extrusion_1 = model.addExtrusion(Part_1_doc, [model.selection("COMPOUND", "Sketch_1")], model.selection(), model.selection("EDGE", "Sketch_2/SketchArc_1_2"), 0, model.selection("EDGE", "Sketch_2/SketchArc_1_2"), 10)
+assert(Extrusion_1.feature().error() != "")
+Part_1_doc.removeFeature(Extrusion_1.feature())
+
+Extrusion_1 = model.addExtrusion(Part_1_doc, [model.selection("COMPOUND", "Sketch_1")], model.selection(), model.selection("EDGE", "Sketch_2/SketchArc_1_2"), 0, model.selection("FACE", "PartSet/XOY"), 10)
+assert(Extrusion_1.feature().error() != "")
+Part_1_doc.removeFeature(Extrusion_1.feature())
+
+Extrusion_1 = model.addExtrusion(Part_1_doc, [model.selection("COMPOUND", "Sketch_1")], model.selection(), model.selection("EDGE", "Sketch_2/SketchArc_1_2"), 0, model.selection(), 10)
+assert(Extrusion_1.feature().error() != "")
+Part_1_doc.removeFeature(Extrusion_1.feature())
+
+Extrusion_1 = model.addExtrusion(Part_1_doc, [model.selection("COMPOUND", "Sketch_1")], model.selection(), model.selection(), 0, model.selection("EDGE", "Sketch_2/SketchArc_1_2"), 10)
+assert(Extrusion_1.feature().error() != "")
+Part_1_doc.removeFeature(Extrusion_1.feature())
+
+Extrusion_1 = model.addExtrusion(Part_1_doc, [model.selection("COMPOUND", "Sketch_1")], model.selection(), model.selection(), 0, model.selection("FACE", "PartSet/XOY"), 10)
+assert(Extrusion_1.feature().error() == "")
+#Part_1_doc.removeFeature(Extrusion_1.feature())
+
 model.end()
