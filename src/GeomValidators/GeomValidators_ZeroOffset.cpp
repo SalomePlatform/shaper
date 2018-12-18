@@ -59,6 +59,7 @@ bool GeomValidators_ZeroOffset::isValid(const std::shared_ptr<ModelAPI_Feature>&
 
   ListOfShape aFacesList;
   if(theFeature->selection(*anIt)) {
+// LCOV_EXCL_START
     AttributeSelectionPtr aFaceSelection = theFeature->selection(*anIt);
     ResultConstructionPtr aConstruction =
       std::dynamic_pointer_cast<ModelAPI_ResultConstruction>(aFaceSelection->context());
@@ -72,6 +73,7 @@ bool GeomValidators_ZeroOffset::isValid(const std::shared_ptr<ModelAPI_Feature>&
         }
       }
     }
+// LCOV_EXCL_STOP
   } else if(theFeature->selectionList(*anIt)) {
     AttributeSelectionListPtr aFacesSelectionList = theFeature->selectionList(*anIt);
     for(int anIndex = 0; anIndex < aFacesSelectionList->size(); anIndex++) {
@@ -225,6 +227,7 @@ bool GeomValidators_ZeroOffset::isValid(const std::shared_ptr<ModelAPI_Feature>&
 }
 
 //=================================================================================================
+// LCOV_EXCL_START
 bool GeomValidators_ZeroOffset::isNotObligatory(std::string theFeature, std::string theAttribute)
 {
   if(theAttribute == "from_object" || theAttribute == "to_object") {
@@ -233,3 +236,4 @@ bool GeomValidators_ZeroOffset::isNotObligatory(std::string theFeature, std::str
 
   return false;
 }
+// LCOV_EXCL_STOP

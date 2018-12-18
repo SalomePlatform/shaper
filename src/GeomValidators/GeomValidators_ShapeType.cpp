@@ -62,10 +62,13 @@ GeomValidators_ShapeType::TypeOfShape
   if (MyShapeTypes.find(aType) != MyShapeTypes.end())
     return MyShapeTypes[aType];
 
+// LCOV_EXCL_START
   Events_InfoMessage("Shape type defined in XML is not implemented!").send();
   return AnyShape;
+// LCOV_EXCL_STOP
 }
 
+// LCOV_EXCL_START
 std::string getShapeTypeDescription(const GeomValidators_ShapeType::TypeOfShape& theType)
 {
   std::string aValue = "";
@@ -81,6 +84,7 @@ std::string getShapeTypeDescription(const GeomValidators_ShapeType::TypeOfShape&
   }
   return aValue;
 }
+// LCOV_EXCL_STOP
 
 bool GeomValidators_ShapeType::isValid(const AttributePtr& theAttribute,
                                        const std::list<std::string>& theArguments,

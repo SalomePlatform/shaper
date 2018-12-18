@@ -43,8 +43,10 @@ GeomAbs_SurfaceType faceType(const std::string& theType)
   if (MyFaceTypes.find(aType) != MyFaceTypes.end())
     return MyFaceTypes[aType];
 
+// LCOV_EXCL_START
   Events_InfoMessage("GeomValidators_Face", "Face type defined in XML is not implemented!").send();
   return GeomAbs_Plane;
+// LCOV_EXCL_STOP
 }
 
 bool isValidFace(const GeomShapePtr theShape,

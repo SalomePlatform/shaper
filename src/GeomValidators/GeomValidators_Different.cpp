@@ -109,7 +109,9 @@ bool GeomValidators_Different::isValid(const std::shared_ptr<ModelAPI_Feature>& 
   return true;
 }
 
+// LCOV_EXCL_START
 bool GeomValidators_Different::isNotObligatory(std::string theFeature, std::string theAttribute)
 {
   return true;
 }
+// LCOV_EXCL_STOP

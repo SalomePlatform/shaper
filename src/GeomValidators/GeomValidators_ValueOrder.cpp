@@ -28,6 +28,7 @@
 #include <ModelAPI_Session.h>
 #include <ModelAPI_Validator.h>
 
+// LCOV_EXCL_START
 static double attributeValue(AttributePtr theAttr)
 {
   AttributeIntegerPtr anIntAttr = std::dynamic_pointer_cast<ModelAPI_AttributeInteger>(theAttr);
@@ -92,7 +93,7 @@ static bool isValidOrder(const AttributePtr& theAttribute,
 
   return true;
 }
-
+// LCOV_EXCL_STOP
 
 
 /// Global instance for validators factory
@@ -107,13 +108,14 @@ GeomValidators_GreaterOrEqual::GeomValidators_GreaterOrEqual()
   aFactory->registerValidator("GeomValidators_GreaterOrEqual", this);
 }
 
+// LCOV_EXCL_START
 bool GeomValidators_GreaterOrEqual::isValid(const AttributePtr& theAttribute,
                                             const std::list<std::string>& theArguments,
                                             Events_InfoMessage& theError) const
 {
   return isValidOrder(theAttribute, theArguments, theError, &isGreaterOrEqual);
 }
-
+// LCOV_EXCL_STOP
 
 
 GeomValidators_LessOrEqual::GeomValidators_LessOrEqual()
@@ -124,9 +126,11 @@ GeomValidators_LessOrEqual::GeomValidators_LessOrEqual()
   aFactory->registerValidator("GeomValidators_LessOrEqual", this);
 }
 
+// LCOV_EXCL_START
 bool GeomValidators_LessOrEqual::isValid(const AttributePtr& theAttribute,
                                          const std::list<std::string>& theArguments,
                                          Events_InfoMessage& theError) const
 {
   return isValidOrder(theAttribute, theArguments, theError, &isLessOrEqual);
 }
+// LCOV_EXCL_STOP

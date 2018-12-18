@@ -97,8 +97,10 @@ bool GeomValidators_NotSelfIntersected::isValid(const std::shared_ptr<ModelAPI_F
   return true;
 }
 
+// LCOV_EXCL_START
 bool GeomValidators_NotSelfIntersected::isNotObligatory(std::string /*theFeature*/,
                                                         std::string /*theAttribute*/)
 {
   return false;
 }
+// LCOV_EXCL_STOP
