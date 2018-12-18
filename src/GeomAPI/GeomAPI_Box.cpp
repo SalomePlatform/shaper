@@ -44,12 +44,6 @@ struct Box
 #define MY_BOX implPtr<Box>()
 
 //=================================================================================================
-GeomAPI_Box::GeomAPI_Box()
-  : GeomAPI_Interface(new Box(std::shared_ptr<GeomAPI_Ax3>(new GeomAPI_Ax3), 0., 0., 0.))
-{
-}
-
-//=================================================================================================
 GeomAPI_Box::GeomAPI_Box(const std::shared_ptr<GeomAPI_Ax3>& theCorner,
                          const double theWidth,
                          const double theDepth,

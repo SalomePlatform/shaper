@@ -77,6 +77,8 @@ def checkEllipseFace(theDocument, theFaceName, theFirstFocus, theSecondFocus, th
 
 def assertCone(theCone, theApex, theAxis, theSemiAngle, theRadius1, theRadius2, theHeight):
     assert(theCone is not None)
+    assert(theCone.isSemiInfinite() == False)
+    assert(theCone.isInfinite() == False)
     anApex = theCone.apex()
     anAxis = theCone.axis()
     assert(anApex.distance(theApex) < TOLERANCE), "({}, {}, {}) != expected ({}, {}, {})".format(anApex.x(), anApex.y(), anApex.z(), theApex.x(), theApex.y(), theApex.z())

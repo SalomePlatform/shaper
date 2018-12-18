@@ -29,6 +29,7 @@ TOLERANCE = 1.e-7
 
 def assertCylinder(theCylinder, theLocation, theAxis, theRadius, theHeight):
     assert(theCylinder is not None)
+    assert(theCylinder.isInfinite() == False)
     aLoc = theCylinder.location()
     aDir = theCylinder.axis()
     assert(aLoc.distance(theLocation) < TOLERANCE), "({}, {}, {}) != expected ({}, {}, {})".format(aLoc.x(), aLoc.y(), aLoc.z(), theLocation.x(), theLocation.y(), theLocation.z())

@@ -34,9 +34,6 @@ class GeomAPI_Pnt;
 class GeomAPI_Box : public GeomAPI_Interface
 {
 public:
-  /// Default constructor
-  GEOMAPI_EXPORT GeomAPI_Box();
-
   /// Creation of torus defined by center point, direction, major and minor radii
   GEOMAPI_EXPORT GeomAPI_Box(const std::shared_ptr<GeomAPI_Ax3>& theCorner,
                              const double theWidth,

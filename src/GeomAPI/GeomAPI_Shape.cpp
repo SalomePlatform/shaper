@@ -152,6 +152,7 @@ bool GeomAPI_Shape::isCompoundOfSolids() const
   return isAtLeastOne;
 }
 
+// LCOV_EXCL_START
 GeomAPI_Shape::ShapeType GeomAPI_Shape::typeOfCompoundShapes() const
 {
   const TopoDS_Shape& aShape = const_cast<GeomAPI_Shape*>(this)->impl<TopoDS_Shape>();
@@ -168,6 +169,7 @@ GeomAPI_Shape::ShapeType GeomAPI_Shape::typeOfCompoundShapes() const
   }
   return (GeomAPI_Shape::ShapeType) aType;
 }
+// LCOV_EXCL_STOP
 
 // adds the nopt-compound elements recursively to the list
 static void addSimpleToList(const TopoDS_Shape& theShape, NCollection_List<TopoDS_Shape>& theList)
@@ -609,6 +611,7 @@ GeomPointPtr GeomAPI_Shape::middlePoint() const
   return aMiddlePoint;
 }
 
+// LCOV_EXCL_START
 std::string GeomAPI_Shape::getShapeStream() const
 {
   std::ostringstream aStream;
@@ -616,6 +619,7 @@ std::string GeomAPI_Shape::getShapeStream() const
   BRepTools::Write(aShape, aStream);
   return aStream.str();
 }
+// LCOV_EXCL_STOP
 
 GeomShapePtr GeomAPI_Shape::intersect(const GeomShapePtr theShape) const
 {
