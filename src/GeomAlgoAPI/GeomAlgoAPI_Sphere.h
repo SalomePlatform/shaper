@@ -18,8 +18,6 @@
 class GeomAlgoAPI_Sphere : public GeomAlgoAPI_MakeShape
 {
  public:
-  GEOMALGOAPI_EXPORT GeomAlgoAPI_Sphere();
-
   /// Creates a sphere.
   /// \param theCenterPoint The center point of the sphere
   /// \param theRadius The radius of the sphere

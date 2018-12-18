@@ -33,8 +33,6 @@
 class GeomAlgoAPI_Cylinder : public GeomAlgoAPI_MakeShape
 {
  public:
-  GEOMALGOAPI_EXPORT GeomAlgoAPI_Cylinder();
-
   /// Creates a cylinder.
   /// \param theAxis The axis of the cylinder
   /// \param theRadius The radius of the cylinder

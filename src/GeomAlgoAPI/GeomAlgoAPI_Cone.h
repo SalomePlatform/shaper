@@ -18,8 +18,6 @@
 class GeomAlgoAPI_Cone : public GeomAlgoAPI_MakeShape
 {
  public:
-  GEOMALGOAPI_EXPORT GeomAlgoAPI_Cone();
-
   /// Creates a cone.
   /// \param theAxis The axis of the cone
   /// \param theBaseRadius The base radius of the cone

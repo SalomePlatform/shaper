@@ -11,11 +11,6 @@
 #include <BRepPrimAPI_MakeCone.hxx>
 
 //=================================================================================================
-GeomAlgoAPI_Cone::GeomAlgoAPI_Cone()
-{
-}
-
-//=================================================================================================
 GeomAlgoAPI_Cone::GeomAlgoAPI_Cone(std::shared_ptr<GeomAPI_Ax2> theAxis,
                                    const double theBaseRadius,
                                    const double theTopRadius,

@@ -35,11 +35,6 @@
 #include <TopoDS_Edge.hxx>
 
 //=================================================================================================
-GeomAlgoAPI_Ellipsoid::GeomAlgoAPI_Ellipsoid()
-{
-}
-
-//=================================================================================================
 
 GeomAlgoAPI_Ellipsoid::GeomAlgoAPI_Ellipsoid(const double theAx,
                                              const double theBy,

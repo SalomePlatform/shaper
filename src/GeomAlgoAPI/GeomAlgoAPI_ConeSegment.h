@@ -30,8 +30,6 @@
 class GeomAlgoAPI_ConeSegment : public GeomAlgoAPI_MakeShape
 {
  public:
-  GEOMALGOAPI_EXPORT GeomAlgoAPI_ConeSegment();
-
   /// Creates a cone segment using standard GDML parameters.
   /// \param theRMin1 Cone base inner radius.
   /// \param theRMax1 Cone base outer radius.

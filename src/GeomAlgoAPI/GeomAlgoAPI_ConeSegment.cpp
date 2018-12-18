@@ -34,11 +34,6 @@
 #include <math.h>
 
 //=================================================================================================
-GeomAlgoAPI_ConeSegment::GeomAlgoAPI_ConeSegment()
-{
-}
-
-//=================================================================================================
 
 GeomAlgoAPI_ConeSegment::GeomAlgoAPI_ConeSegment(const double theRMin1,
                                                  const double theRMax1,

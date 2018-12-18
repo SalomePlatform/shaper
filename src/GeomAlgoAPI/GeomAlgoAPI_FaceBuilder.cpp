@@ -120,23 +120,3 @@ std::shared_ptr<GeomAPI_Face> GeomAlgoAPI_FaceBuilder::planarFaceByThreeVertices
   aFace->setImpl(new TopoDS_Face(aMakeFace.Face()));
   return aFace;
 }
-
-//==================================================================================================
-std::shared_ptr<GeomAPI_Face> GeomAlgoAPI_FaceBuilder::planarFaceByFaceAndVertex(
-    const std::shared_ptr<GeomAPI_Face> theFace,
-    const std::shared_ptr<GeomAPI_Vertex> theVertex)
-{
-  gp_Pln aPln = theFace->getPlane()->impl<gp_Pln>();
-  gp_Pnt aPnt = theVertex->point()->impl<gp_Pnt>();
-
-  std::shared_ptr<GeomAPI_Face> aFace;
-  GC_MakePlane aMakePlane(aPln, aPnt);
-  if(!aMakePlane.IsDone()) {
-    return aFace;
-  }
-
-  BRepBuilderAPI_MakeFace aMakeFace(aMakePlane.Value()->Pln());
-  aFace.reset(new GeomAPI_Face());
-  aFace->setImpl(new TopoDS_Face(aMakeFace.Face()));
-  return aFace;
-}

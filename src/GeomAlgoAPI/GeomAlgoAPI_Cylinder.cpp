@@ -28,11 +28,6 @@
 #include <BRepPrimAPI_MakeCylinder.hxx>
 
 //=================================================================================================
-GeomAlgoAPI_Cylinder::GeomAlgoAPI_Cylinder()
-{
-}
-
-//=================================================================================================
 GeomAlgoAPI_Cylinder::GeomAlgoAPI_Cylinder(std::shared_ptr<GeomAPI_Ax2> theAxis,
                                            const double theRadius,
                                            const double theHeight)

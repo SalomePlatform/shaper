@@ -18,8 +18,6 @@
 class GeomAlgoAPI_Torus : public GeomAlgoAPI_MakeShape
 {
  public:
-  GEOMALGOAPI_EXPORT GeomAlgoAPI_Torus();
-
   /// Creates a torus.
   /// \param theAxis The axis of the torus
   /// \param theRadius The radius of the torus

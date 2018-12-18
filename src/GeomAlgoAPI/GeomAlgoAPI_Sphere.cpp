@@ -9,11 +9,6 @@
 #include <BRepPrimAPI_MakeSphere.hxx>
 
 //=================================================================================================
-GeomAlgoAPI_Sphere::GeomAlgoAPI_Sphere()
-{
-}
-
-//=================================================================================================
 GeomAlgoAPI_Sphere::GeomAlgoAPI_Sphere(std::shared_ptr<GeomAPI_Pnt> theCenterPoint,
                                        const double theRadius)
 {

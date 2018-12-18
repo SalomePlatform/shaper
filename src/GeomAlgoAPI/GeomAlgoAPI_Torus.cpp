@@ -11,11 +11,6 @@
 #include <BRepPrimAPI_MakeTorus.hxx>
 
 //=================================================================================================
-GeomAlgoAPI_Torus::GeomAlgoAPI_Torus()
-{
-}
-
-//=================================================================================================
 GeomAlgoAPI_Torus::GeomAlgoAPI_Torus(std::shared_ptr<GeomAPI_Ax2> theAxis,
                                      const double theRadius,
                                      const double theRingRadius)

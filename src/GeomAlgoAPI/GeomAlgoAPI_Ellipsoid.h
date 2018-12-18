@@ -30,8 +30,6 @@
 class GeomAlgoAPI_Ellipsoid : public GeomAlgoAPI_MakeShape
 {
  public:
-  GEOMALGOAPI_EXPORT GeomAlgoAPI_Ellipsoid();
-
   /// Creates a ellipsoid using standard GDML parameters.
   /// \param theAx X dimension of the ellipsoid.
   /// \param theBy Y dimension of the ellipsoid.
