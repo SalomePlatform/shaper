@@ -298,6 +298,11 @@ bool ParametersPlugin_WidgetParamsMgr::storeValueCustom()
     }
     aId++;
   }
+  // #2813 : make the current feature the latest in the document
+  std::list<FeaturePtr> allFeatures = myFeature->document()->allFeatures();
+  if (!allFeatures.empty()) {
+    myFeature->document()->setCurrentFeature(*(allFeatures.rbegin()), true);
+  }
   return true;
 }
 

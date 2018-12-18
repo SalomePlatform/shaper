@@ -1035,7 +1035,6 @@ FeaturePtr Model_Document::addFeature(std::string theID, const bool theMakeCurre
   return aFeature;
 }
 
-
 void Model_Document::refsToFeature(FeaturePtr theFeature,
   std::set<std::shared_ptr<ModelAPI_Feature> >& theRefs, const bool isSendError)
 {
@@ -1073,7 +1072,6 @@ static bool isSub(const CompositeFeaturePtr theMain, const FeaturePtr theSub) {
     return true;
   return isSub(theMain, aParent);
 }
-
 
 void Model_Document::moveFeature(FeaturePtr theMoved, FeaturePtr theAfterThis)
 {
@@ -1459,7 +1457,6 @@ ResultPtr Model_Document::resultByLab(const TDF_Label& theLab)
   }
   return ResultPtr(); // not found
 }
-
 
 void Model_Document::addNamingName(const TDF_Label theLabel, std::string theName)
 {
