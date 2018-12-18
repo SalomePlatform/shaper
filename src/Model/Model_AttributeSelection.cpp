@@ -1129,7 +1129,9 @@ void Model_AttributeSelection::computeValues(
                 theShapes.Clear();
                 return;
               }
-              theShapes.Append(aPairIter.NewShape());
+              // don't add edges generated from faces
+              if (aPairIter.NewShape().ShapeType() <= theValShape.ShapeType())
+                theShapes.Append(aPairIter.NewShape());
             }
           } else if (!aPairIter.OldShape().IsNull()) { // search shape that contains this sub
             TopExp_Explorer anExp(aPairIter.OldShape(), theValShape.ShapeType());
