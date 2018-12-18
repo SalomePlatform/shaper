@@ -38,7 +38,7 @@ Part_1_doc = Part_1.document()
 Box_1 = model.addBox(Part_1_doc, 10, 10, 10)
 Axis_4 = model.addAxis(Part_1_doc, 10, 10, 10)
 
-ExtrusionFuse_1 = model.addExtrusionFuse(Part_1_doc, [], model.selection(), model.selection("FACE", "Box_1_1/Right"), 0, model.selection(), 0, [model.selection("SOLID", "Box_1_1")])
+ExtrusionFuse_1 = model.addExtrusionFuse(Part_1_doc, [], model.selection("FACE", "Box_1_1/Right"), 0, model.selection(), 0, [model.selection("SOLID", "Box_1_1")])
 Sketch_1 = model.addSketch(Part_1_doc, model.selection("FACE", "Box_1_1/Left"))
 SketchProjection_1 = Sketch_1.addProjection(model.selection("EDGE", "[Box_1_1/Left][Box_1_1/Top]"), False)
 SketchLine_1 = SketchProjection_1.createdFeature()

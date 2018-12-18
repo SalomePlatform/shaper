@@ -263,11 +263,7 @@ FeaturesAPI_ExtrusionCut::FeaturesAPI_ExtrusionCut(
 {
   if(initialize()) {
     fillAttribute(theBaseObjects, mybaseObjects);
-    fillAttribute(FeaturesPlugin_Extrusion::CREATION_METHOD_BY_PLANES(), mycreationMethod);
-    fillAttribute(theToObject, mytoObject);
-    fillAttribute(theToOffset, mytoOffset);
-    fillAttribute(theFromObject, myfromObject);
-    fillAttribute(theFromOffset, myfromOffset);
+    setPlanesAndOffsets(theToObject, theToOffset, theFromObject, theFromOffset);
     setBooleanObjects(theBooleanObjects);
   }
 }
@@ -287,11 +283,7 @@ FeaturesAPI_ExtrusionCut::FeaturesAPI_ExtrusionCut(
   if(initialize()) {
     fillAttribute(theBaseObjects, mybaseObjects);
     fillAttribute(theDirection, mydirection);
-    fillAttribute(FeaturesPlugin_Extrusion::CREATION_METHOD_BY_PLANES(), mycreationMethod);
-    fillAttribute(theToObject, mytoObject);
-    fillAttribute(theToOffset, mytoOffset);
-    fillAttribute(theFromObject, myfromObject);
-    fillAttribute(theFromOffset, myfromOffset);
+    setPlanesAndOffsets(theToObject, theToOffset, theFromObject, theFromOffset);
     setBooleanObjects(theBooleanObjects);
   }
 }
@@ -482,11 +474,7 @@ FeaturesAPI_ExtrusionFuse::FeaturesAPI_ExtrusionFuse(
 {
   if(initialize()) {
     fillAttribute(theBaseObjects, mybaseObjects);
-    fillAttribute(FeaturesPlugin_Extrusion::CREATION_METHOD_BY_PLANES(), mycreationMethod);
-    fillAttribute(theToObject, mytoObject);
-    fillAttribute(theToOffset, mytoOffset);
-    fillAttribute(theFromObject, myfromObject);
-    fillAttribute(theFromOffset, myfromOffset);
+    setPlanesAndOffsets(theToObject, theToOffset, theFromObject, theFromOffset);
     setBooleanObjects(theBooleanObjects);
   }
 }
@@ -506,11 +494,7 @@ FeaturesAPI_ExtrusionFuse::FeaturesAPI_ExtrusionFuse(
   if(initialize()) {
     fillAttribute(theBaseObjects, mybaseObjects);
     fillAttribute(theDirection, mydirection);
-    fillAttribute(FeaturesPlugin_Extrusion::CREATION_METHOD_BY_PLANES(), mycreationMethod);
-    fillAttribute(theToObject, mytoObject);
-    fillAttribute(theToOffset, mytoOffset);
-    fillAttribute(theFromObject, myfromObject);
-    fillAttribute(theFromOffset, myfromOffset);
+    setPlanesAndOffsets(theToObject, theToOffset, theFromObject, theFromOffset);
     setBooleanObjects(theBooleanObjects);
   }
 }

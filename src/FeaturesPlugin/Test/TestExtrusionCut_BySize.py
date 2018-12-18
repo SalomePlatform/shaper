@@ -53,6 +53,20 @@ model.do()
 Shape = ExtrusionCut_1.results()[0].resultSubShapePair()[0].shape()
 checkMiddlePoint(Shape, 5.00027719467643, 4.861055360637628, 5.101882685002874)
 
+ExtrusionCut_2 = model.addExtrusionCut(Part_1_doc, [], -5, [model.selection("SOLID", "ExtrusionCut_1_1")])
+Sketch_2 = model.addSketch(Part_1_doc, model.selection("FACE", "Box_1_1/Front"))
+SketchCircle_2 = Sketch_2.addCircle(2, 7, 1.5)
+ExtrusionCut_2.setNestedSketch(Sketch_2)
+model.do()
+
+ExtrusionCut_3 = model.addExtrusionCut(Part_1_doc, [], 0, 7, [model.selection("SOLID", "ExtrusionCut_2_1")])
+Sketch_3 = model.addSketch(Part_1_doc, model.selection("FACE", "ExtrusionCut_2_1/Modified_Face&Box_1_1/Front"))
+SketchCircle_3 = Sketch_3.addCircle(7, 2, 1.5)
+ExtrusionCut_3.setNestedSketch(Sketch_3)
+model.do()
+Shape = ExtrusionCut_3.results()[0].resultSubShapePair()[0].shape()
+checkMiddlePoint(Shape, 5.15104587473, 4.96021, 4.86946)
+
 model.end()
 
 assert(model.checkPythonDump())

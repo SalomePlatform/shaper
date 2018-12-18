@@ -53,6 +53,20 @@ model.do()
 Shape = ExtrusionFuse_1.results()[0].resultSubShapePair()[0].shape()
 checkMiddlePoint(Shape, 5, 4.299736969, 5.70604613)
 
+ExtrusionFuse_2 = model.addExtrusionFuse(Part_1_doc, [], 3, [model.selection("SOLID", "ExtrusionFuse_1_1")])
+Sketch_2 = model.addSketch(Part_1_doc, model.selection("FACE", "Box_1_1/Front"))
+SketchCircle_2 = Sketch_2.addCircle(4, 7, 2)
+ExtrusionFuse_2.setNestedSketch(Sketch_2)
+model.do()
+
+ExtrusionFuse_3 = model.addExtrusionFuse(Part_1_doc, [], 10, 0, [model.selection("SOLID", "ExtrusionFuse_2_1")])
+Sketch_3 = model.addSketch(Part_1_doc, model.selection("FACE", "Box_1_1/Right"))
+SketchCircle_3 = Sketch_3.addCircle(5, -6, 3)
+ExtrusionFuse_3.setNestedSketch(Sketch_3)
+model.do()
+Shape = ExtrusionFuse_3.results()[0].resultSubShapePair()[0].shape()
+checkMiddlePoint(Shape, 5.31705479, 6.86583379, 5.82287969)
+
 model.end()
 
 assert(model.checkPythonDump())
