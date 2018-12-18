@@ -84,67 +84,24 @@ public:
               thirdPoint, SketchPlugin_MacroCircle::THIRD_POINT_ID(),
               GeomDataAPI_Point2D, /** Third point */)
 
+private:
   /// Set by center and passed points.
-  SKETCHAPI_EXPORT
   void setByCenterAndPassedPoints(double theCenterX, double theCenterY,
                                   double thePassedX, double thePassedY);
 
   /// Set by center and passed points.
-  SKETCHAPI_EXPORT
   void setByCenterAndPassedPoints(const std::shared_ptr<GeomAPI_Pnt2d>& theCenterPoint,
                                   const std::shared_ptr<GeomAPI_Pnt2d>& thePassedPoint);
 
   /// Set by three points.
-  SKETCHAPI_EXPORT
   void setByThreePoints(double theX1, double theY1,
                         double theX2, double theY2,
                         double theX3, double theY3);
 
   /// Set by three points.
-  SKETCHAPI_EXPORT
   void setByThreePoints(const std::shared_ptr<GeomAPI_Pnt2d>& thePoint1,
                         const std::shared_ptr<GeomAPI_Pnt2d>& thePoint2,
                         const std::shared_ptr<GeomAPI_Pnt2d>& thePoint3);
-
-  /// Set center point.
-  SKETCHAPI_EXPORT
-  void setCenterPoint(double theX, double theY);
-
-  /// Set center point.
-  SKETCHAPI_EXPORT
-  void setCenterPoint(const std::shared_ptr<GeomAPI_Pnt2d>& theCenterPoint);
-
-  /// Set passed point.
-  SKETCHAPI_EXPORT
-  void setPassedPoint(double theX, double theY);
-
-  /// Set passed point.
-  SKETCHAPI_EXPORT
-  void setPassedPoint(const std::shared_ptr<GeomAPI_Pnt2d>& thePassedPoint);
-
-  /// Set first point.
-  SKETCHAPI_EXPORT
-  void setFirstPoint(double theX, double theY);
-
-  /// Set first point.
-  SKETCHAPI_EXPORT
-  void setFirstPoint(const std::shared_ptr<GeomAPI_Pnt2d>& thePoint);
-
-  /// Set second point.
-  SKETCHAPI_EXPORT
-  void setSecondPoint(double theX, double theY);
-
-  /// Set second point.
-  SKETCHAPI_EXPORT
-  void setSecondPoint(const std::shared_ptr<GeomAPI_Pnt2d>& thePoint);
-
-  /// Set third point.
-  SKETCHAPI_EXPORT
-  void setThirdPoint(double theX, double theY);
-
-  /// Set third point.
-  SKETCHAPI_EXPORT
-  void setThirdPoint(const std::shared_ptr<GeomAPI_Pnt2d>& thePoint);
 };
 
 /// Pointer on Circle object.

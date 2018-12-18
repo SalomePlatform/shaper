@@ -34,6 +34,7 @@ class SketchTestCase(unittest.TestCase):
         aPartSet = self.session.moduleDocument()
         self.doc = model.addPart(aPartSet).document()
         model.addCylinder(self.doc, model.selection("VERTEX", "PartSet/Origin"), model.selection("EDGE", "PartSet/OZ"), 5, 10)
+        model.addCylinder(self.doc, model.selection("VERTEX", "PartSet/Origin"), model.selection("EDGE", "PartSet/OZ"), 10, 10, 90)
         self.sketch = model.addSketch(self.doc, model.defaultPlane("XOY"))
 
     def tearDown(self):
@@ -57,7 +58,7 @@ class SketchTestCase(unittest.TestCase):
         self.checkPoint(aCircle.center(), point)
 
     def test_circle_by_external(self):
-        """ Test 2. Create point circle by external features
+        """ Test 2. Create point and circle by external features
         """
         aPoint = self.sketch.addPoint("PartSet/Origin")
         aCircle = self.sketch.addCircle("[Cylinder_1_1/Face_1][Cylinder_1_1/Face_3]")
@@ -140,6 +141,45 @@ class SketchTestCase(unittest.TestCase):
         aCenter = geom.Pnt2d(aTgPnt.x(), aTgPnt.y() + aRadius)
         self.checkPoint(anArc.center(), aCenter)
         self.assertAlmostEqual(anArc.radius().value(), aRadius, 6)
+
+    def test_arc_by_external(self):
+        """ Test 7. Create arc by external feature
+        """
+        anArc = self.sketch.addArc(model.selection("EDGE", "[Cylinder_2_1/Face_1][Cylinder_2_1/Face_3]"))
+        model.do()
+        point = geom.Pnt2d(0., 0.)
+        self.checkPoint(anArc.center(), point)
+        self.assertAlmostEqual(anArc.radius().value(), 10, 6)
+
+    def test_arc_by_name(self):
+        """ Test 8. Create arc by external feature
+        """
+        anArc = self.sketch.addArc("[Cylinder_2_1/Face_1][Cylinder_2_1/Face_3]")
+        model.do()
+        point = geom.Pnt2d(0., 0.)
+        self.checkPoint(anArc.center(), point)
+        self.assertAlmostEqual(anArc.radius().value(), 10, 6)
+
+    def test_point_by_intersection(self):
+        """ Test 9. Create point as intersection with external edge given by a name
+        """
+        self.sketch.addIntersectionPoint("[Cylinder_2_1/Face_1][Cylinder_2_1/Face_4]")
+        model.do()
+        aPoint = SketchAPI.SketchAPI_Point(model.lastSubFeature(self.sketch, "SketchPoint"))
+
+        point = geom.Pnt2d(10., 0.)
+        self.checkPoint(aPoint.coordinates(), point)
+
+    def test_arc_by_projection(self):
+        """ Test 10. Create arc by projection of external feature
+        """
+        self.sketch.addProjection("[Cylinder_2_1/Face_1][Cylinder_2_1/Face_3]")
+        model.do()
+        anArc = SketchAPI.SketchAPI_Arc(model.lastSubFeature(self.sketch, "SketchArc"))
+
+        point = geom.Pnt2d(0., 0.)
+        self.checkPoint(anArc.center(), point)
+        self.assertAlmostEqual(anArc.radius().value(), 10, 6)
 
 
 if __name__ == "__main__":

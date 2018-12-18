@@ -89,10 +89,6 @@ public:
   SKETCHAPI_EXPORT
   virtual ~SketchAPI_MacroArc();
 
-  void test() {
-    SketchPlugin_MacroArc::ID();
-  }
-
   INTERFACE_12(SketchPlugin_MacroArc::ID(),
                arcType, SketchPlugin_MacroArc::ARC_TYPE(),
                ModelAPI_AttributeString, /** Arc type */,
