@@ -146,17 +146,21 @@ void ConstructionPlugin_Axis::createAxisByPointAndDirection()
     std::shared_ptr<GeomAPI_Vertex> aVertex(new GeomAPI_Vertex(aXAttr->value(),
                                                                aYAttr->value(),
                                                                aZAttr->value()));
-    if (aShape1->isVertex() && (!aShape1->isEqual(aVertex))) {
+    if (aShape1->isVertex() &&
+        (fabs(aXAttr->value()) > MINIMAL_LENGTH() ||
+         fabs(aYAttr->value()) > MINIMAL_LENGTH() ||
+         fabs(aZAttr->value()) > MINIMAL_LENGTH())) {
       std::shared_ptr<GeomAPI_Pnt> aStart = GeomAlgoAPI_PointBuilder::point(aShape1);
-      std::shared_ptr<GeomAPI_Pnt> anEnd = aVertex->point();
-      if (aStart->distance(anEnd) > ConstructionPlugin_Axis::MINIMAL_LENGTH()) {
-        std::shared_ptr<GeomAPI_Edge> anEdge = GeomAlgoAPI_EdgeBuilder::line(aStart, anEnd);
+      std::shared_ptr<GeomAPI_Pnt> anEnd(new GeomAPI_Pnt(aStart->x() + aXAttr->value(),
+                                                         aStart->y() + aYAttr->value(),
+                                                         aStart->z() + aZAttr->value()));
 
-        ResultConstructionPtr aConstr = document()->createConstruction(data());
-        aConstr->setInfinite(true);
-        aConstr->setShape(anEdge);
-        setResult(aConstr);
-      }
+      std::shared_ptr<GeomAPI_Edge> anEdge = GeomAlgoAPI_EdgeBuilder::line(aStart, anEnd);
+
+      ResultConstructionPtr aConstr = document()->createConstruction(data());
+      aConstr->setInfinite(true);
+      aConstr->setShape(anEdge);
+      setResult(aConstr);
     }
   }
 }
