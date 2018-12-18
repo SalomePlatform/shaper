@@ -271,8 +271,9 @@ void Model_ResultBody::updateSubs(const std::shared_ptr<GeomAPI_Shape>& theThisS
       } else { // just update shape of this result
         aSub = mySubs[aSubIndex];
       }
-      if (!aShape->isEqual(aSub->shape())) {
-        aSub->store(aShape, false);
+      GeomShapePtr anOldSubShape = aSub->shape();
+      aSub->store(aShape, false); // store even equal to call "clear": #2814
+      if (!aShape->isEqual(anOldSubShape)) {
         aECreator->sendUpdated(aSub, EVENT_DISP);
         aECreator->sendUpdated(aSub, EVENT_UPD);
       }
