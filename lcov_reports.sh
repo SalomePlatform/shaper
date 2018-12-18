@@ -43,6 +43,9 @@ for MASK in $ALL; do
     mv -f covDirect_res covDirect
   fi
 done
+# exclude GeomAPI_AISObject as GUI-related object
+lcov -r covElse GeomAPI_AISObject* --output-file covElse_res -q
+mv -f covElse_res covElse
 rm -rf lcov_htmlDirect
 genhtml covDirect --output-directory lcov_htmlDirect -q
 
