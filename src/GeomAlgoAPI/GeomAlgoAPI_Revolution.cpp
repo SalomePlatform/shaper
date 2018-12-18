@@ -92,15 +92,6 @@ static void storeGenerationHistory(GeomAlgoAPI_Revolution* theRevolutionAlgo,
 //==================================================================================================
 GeomAlgoAPI_Revolution::GeomAlgoAPI_Revolution(const GeomShapePtr                 theBaseShape,
                                                const std::shared_ptr<GeomAPI_Ax1> theAxis,
-                                               const double                       theToAngle,
-                                               const double                       theFromAngle)
-{
-  build(theBaseShape, theAxis, GeomShapePtr(), theToAngle, GeomShapePtr(), theFromAngle);
-}
-
-//==================================================================================================
-GeomAlgoAPI_Revolution::GeomAlgoAPI_Revolution(const GeomShapePtr                 theBaseShape,
-                                               const std::shared_ptr<GeomAPI_Ax1> theAxis,
                                                const GeomShapePtr                 theToShape,
                                                const double                       theToAngle,
                                                const GeomShapePtr                 theFromShape,

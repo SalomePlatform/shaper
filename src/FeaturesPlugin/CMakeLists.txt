@@ -169,6 +169,7 @@ INSTALL(DIRECTORY icons/ DESTINATION ${SHAPER_INSTALL_XML_RESOURCES}/icons/Featu
 INSTALL(FILES ${TEXT_RESOURCES} DESTINATION ${SHAPER_INSTALL_XML_RESOURCES})
 
 ADD_UNIT_TESTS(TestExtrusion.py
+               TestExtrusionOfCompound.py
                TestExtrusionCut.py
                TestExtrusionCut_BySize.py
                TestExtrusionCut_ByPlanesAndOffsets.py
@@ -179,6 +180,8 @@ ADD_UNIT_TESTS(TestExtrusion.py
                TestExtrusion_ZeroOffsetError.py
                TestRevolution.py
                TestRevolution_ByAngle.py
+               TestRevolutionOfPoint.py
+               TestRevolutionOfEdge.py
                TestRevolutionCut.py
                TestRevolutionCut_ByAngle.py
                TestRevolutionCut_ByPlanesAndOffsets.py

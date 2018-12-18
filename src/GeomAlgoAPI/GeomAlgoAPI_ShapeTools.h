@@ -92,10 +92,6 @@ public:
     std::list<std::shared_ptr<GeomAPI_Pnt> > getBoundingBox(const ListOfShape& theShapes,
                                                             const double theEnlarge = 0.0);
 
-  /// \return infinite plane received from theFace plane.
-  GEOMALGOAPI_EXPORT static std::shared_ptr<GeomAPI_Shape>
-    faceToInfinitePlane(const std::shared_ptr<GeomAPI_Shape> theFace);
-
   /// \brief Enlarges or reduces plane to fit bounding box.
   /// \return plane that fits to bounding box.
   /// \param[in] thePlane base plane.
@@ -176,6 +172,7 @@ public:
                                     const std::list<std::shared_ptr<GeomAPI_Pnt> >& thePoints,
                                     const std::set<std::shared_ptr<GeomAPI_Shape> >& theShapes);
 
+#ifdef FEATURE_MULTIROTATION_TWO_DIRECTIONS
   /// \brief Returns a dir from a shape and an axis.
   /// \param[in] theBaseShape shape whose center of mass serves as the starting point of the dir.
   /// \param[in] theAxis axis that serves as a direction for the dir
@@ -183,6 +180,7 @@ public:
   GEOMALGOAPI_EXPORT static std::shared_ptr<GeomAPI_Dir> buildDirFromAxisAndShape(
                                     const std::shared_ptr<GeomAPI_Shape> theBaseShape,
                                     const std::shared_ptr<GeomAPI_Ax1> theAxis);
+#endif
 
   /// \brief Reapproximate a wire to build a single edge
   GEOMALGOAPI_EXPORT static std::shared_ptr<GeomAPI_Edge> wireToEdge(

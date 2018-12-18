@@ -67,35 +67,6 @@ static void storeGenerationHistory(GeomAlgoAPI_Prism* thePrismAlgo,
 
 
 //==================================================================================================
-GeomAlgoAPI_Prism::GeomAlgoAPI_Prism(const GeomShapePtr theBaseShape,
-                                     const double       theToSize,
-                                     const double       theFromSize)
-{
-  build(theBaseShape, std::shared_ptr<GeomAPI_Dir>(), GeomShapePtr(),
-    theToSize, GeomShapePtr(), theFromSize);
-}
-
-//==================================================================================================
-GeomAlgoAPI_Prism::GeomAlgoAPI_Prism(const GeomShapePtr                 theBaseShape,
-                                     const std::shared_ptr<GeomAPI_Dir> theDirection,
-                                     const double                       theToSize,
-                                     const double                       theFromSize)
-{
-  build(theBaseShape, theDirection, GeomShapePtr(), theToSize, GeomShapePtr(), theFromSize);
-}
-
-//==================================================================================================
-GeomAlgoAPI_Prism::GeomAlgoAPI_Prism(const GeomShapePtr theBaseShape,
-                                     const GeomShapePtr theToShape,
-                                     const double       theToSize,
-                                     const GeomShapePtr theFromShape,
-                                     const double       theFromSize)
-{
-  build(theBaseShape, std::shared_ptr<GeomAPI_Dir>(), theToShape,
-        theToSize, theFromShape, theFromSize);
-}
-
-//==================================================================================================
 GeomAlgoAPI_Prism::GeomAlgoAPI_Prism(const GeomShapePtr                 theBaseShape,
                                      const std::shared_ptr<GeomAPI_Dir> theDirection,
                                      const GeomShapePtr                 theToShape,

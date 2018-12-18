@@ -28,7 +28,6 @@
 #include <ModelAPI_Validator.h>
 
 #include <GeomAlgoAPI_CompoundBuilder.h>
-#include <GeomAlgoAPI_Prism.h>
 #include <GeomAlgoAPI_Revolution.h>
 #include <GeomAlgoAPI_ShapeTools.h>
 #include <GeomAlgoAPI_SketchBuilder.h>

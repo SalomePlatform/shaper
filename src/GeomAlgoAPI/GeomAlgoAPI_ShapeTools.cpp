@@ -555,29 +555,6 @@ std::list<std::shared_ptr<GeomAPI_Pnt> >
 }
 
 //==================================================================================================
-std::shared_ptr<GeomAPI_Shape>
-  GeomAlgoAPI_ShapeTools::faceToInfinitePlane(const std::shared_ptr<GeomAPI_Shape> theFace)
-{
-  if (!theFace.get())
-    return std::shared_ptr<GeomAPI_Shape>();
-
-  TopoDS_Face aPlaneFace = TopoDS::Face(theFace->impl<TopoDS_Shape>());
-  if (aPlaneFace.IsNull())
-    return std::shared_ptr<GeomAPI_Shape>();
-
-  Handle(Geom_Plane) aPlane = Handle(Geom_Plane)::DownCast(BRep_Tool::Surface(aPlaneFace));
-  if (aPlane.IsNull())
-    return std::shared_ptr<GeomAPI_Shape>();
-
-  // make an infinity face on the plane
-  TopoDS_Shape anInfiniteFace = BRepBuilderAPI_MakeFace(aPlane->Pln()).Shape();
-
-  std::shared_ptr<GeomAPI_Shape> aResult(new GeomAPI_Shape);
-  aResult->setImpl(new TopoDS_Shape(anInfiniteFace));
-  return aResult;
-}
-
-//==================================================================================================
 std::shared_ptr<GeomAPI_Face> GeomAlgoAPI_ShapeTools::fitPlaneToBox(
   const std::shared_ptr<GeomAPI_Shape> thePlane,
   const std::list<std::shared_ptr<GeomAPI_Pnt> >& thePoints)
@@ -997,6 +974,7 @@ std::shared_ptr<GeomAPI_Shape> GeomAlgoAPI_ShapeTools::findShape(
 }
 
 //==================================================================================================
+#ifdef FEATURE_MULTIROTATION_TWO_DIRECTIONS
 std::shared_ptr<GeomAPI_Dir> GeomAlgoAPI_ShapeTools::buildDirFromAxisAndShape(
                                     const std::shared_ptr<GeomAPI_Shape> theBaseShape,
                                     const std::shared_ptr<GeomAPI_Ax1> theAxis)
@@ -1012,6 +990,7 @@ std::shared_ptr<GeomAPI_Dir> GeomAlgoAPI_ShapeTools::buildDirFromAxisAndShape(
                                                     aCentreOfMassPoint.Z()-aPoint.Z()));
   return aDir;
 }
+#endif
 
 //==================================================================================================
 static TopoDS_Wire fixParametricGaps(const TopoDS_Wire& theWire)
