@@ -263,7 +263,7 @@ public:
   static std::shared_ptr<GeomAPI_Shape> makeMultiRotation(
                      std::shared_ptr<GeomAPI_Shape> theSourceShape,
                      std::shared_ptr<GeomAPI_Ax1> theAxis,
-                     const int theNumber);
+                     const int theNumber) throw (GeomAlgoAPI_Exception);
 
   /// Performs a multi rotation along one axis, at a step and a number of times
   /// \param theSourceShape Shape to be moved
@@ -274,7 +274,7 @@ public:
                      std::shared_ptr<GeomAPI_Shape> theSourceShape,
                      std::shared_ptr<GeomAPI_Ax1> theAxis,
                      const double theStep,
-                     const int theNumber);
+                     const int theNumber) throw (GeomAlgoAPI_Exception);
 
   /// Creates a cone segment using standard GDML parameters.
   /// \param theRMin1 Inner radius at base of cone

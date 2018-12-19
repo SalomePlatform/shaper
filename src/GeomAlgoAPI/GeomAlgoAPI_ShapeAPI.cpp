@@ -37,6 +37,33 @@
 
 #include <math.h>
 
+static GeomShapePtr runAlgo(GeomAlgoAPI_MakeShape& theAlgo)  throw (GeomAlgoAPI_Exception)
+{
+  if (!theAlgo.check())
+    throw GeomAlgoAPI_Exception(theAlgo.getError());
+
+  theAlgo.build();
+
+  if (!theAlgo.isDone())
+    throw GeomAlgoAPI_Exception(theAlgo.getError());
+
+  return theAlgo.shape();
+}
+
+static GeomShapePtr runAlgoAndCheckShape(GeomAlgoAPI_MakeShape& theAlgo, const std::string& theMsg)
+throw (GeomAlgoAPI_Exception)
+{
+  if (!theAlgo.check())
+    throw GeomAlgoAPI_Exception(theAlgo.getError());
+
+  theAlgo.build();
+
+  if (!theAlgo.isDone() || !theAlgo.checkValid(theMsg))
+    throw GeomAlgoAPI_Exception(theAlgo.getError());
+
+  return theAlgo.shape();
+}
+
 namespace GeomAlgoAPI_ShapeAPI
 {
   //===============================================================================================
@@ -44,21 +71,9 @@ namespace GeomAlgoAPI_ShapeAPI
     const double theDx, const double theDy,
     const double theDz) throw (GeomAlgoAPI_Exception)
   {
+    static const std::string aMsg("Box builder with dimensions");
     GeomAlgoAPI_Box aBoxAlgo(theDx,theDy,theDz);
-
-    if (!aBoxAlgo.check()) {
-      throw GeomAlgoAPI_Exception(aBoxAlgo.getError());
-    }
-
-    aBoxAlgo.build();
-
-    if(!aBoxAlgo.isDone()) {
-      throw GeomAlgoAPI_Exception(aBoxAlgo.getError());
-    }
-    if (!aBoxAlgo.checkValid("Box builder with dimensions")) {
-      throw GeomAlgoAPI_Exception(aBoxAlgo.getError());
-    }
-    return aBoxAlgo.shape();
+    return runAlgoAndCheckShape(aBoxAlgo, aMsg);
   }
 
   //===============================================================================================
@@ -66,21 +81,9 @@ namespace GeomAlgoAPI_ShapeAPI
     std::shared_ptr<GeomAPI_Pnt> theFirstPoint,
     std::shared_ptr<GeomAPI_Pnt> theSecondPoint) throw (GeomAlgoAPI_Exception)
   {
+    static const std::string aMsg("Box builder with two points");
     GeomAlgoAPI_Box aBoxAlgo(theFirstPoint, theSecondPoint);
-
-    if (!aBoxAlgo.check()) {
-      throw GeomAlgoAPI_Exception(aBoxAlgo.getError());
-    }
-
-    aBoxAlgo.build();
-
-    if(!aBoxAlgo.isDone()) {
-      throw GeomAlgoAPI_Exception(aBoxAlgo.getError());
-    }
-    if (!aBoxAlgo.checkValid("Box builder with two points")) {
-      throw GeomAlgoAPI_Exception(aBoxAlgo.getError());
-    }
-    return aBoxAlgo.shape();
+    return runAlgoAndCheckShape(aBoxAlgo, aMsg);
   }
 
   //===============================================================================================
@@ -103,19 +106,8 @@ namespace GeomAlgoAPI_ShapeAPI
 
     GeomAlgoAPI_Cylinder aCylinderAlgo(anAxis, theRadius, theHeight);
 
-    if (!aCylinderAlgo.check()) {
-      throw GeomAlgoAPI_Exception(aCylinderAlgo.getError());
-    }
-
-    aCylinderAlgo.build();
-
-    if(!aCylinderAlgo.isDone()) {
-      throw GeomAlgoAPI_Exception(aCylinderAlgo.getError());
-    }
-    if (!aCylinderAlgo.checkValid("Cylinder builder")) {
-      throw GeomAlgoAPI_Exception(aCylinderAlgo.getError());
-    }
-    return aCylinderAlgo.shape();
+    static const std::string aMsg("Cylinder builder");
+    return runAlgoAndCheckShape(aCylinderAlgo, aMsg);
   }
 
   //===============================================================================================
@@ -138,19 +130,8 @@ namespace GeomAlgoAPI_ShapeAPI
 
     GeomAlgoAPI_Cylinder aCylinderAlgo(anAxis, theRadius, theHeight, theAngle);
 
-    if (!aCylinderAlgo.check()) {
-      throw GeomAlgoAPI_Exception(aCylinderAlgo.getError());
-    }
-
-    aCylinderAlgo.build();
-
-    if(!aCylinderAlgo.isDone()) {
-      throw GeomAlgoAPI_Exception(aCylinderAlgo.getError());
-    }
-    if (!aCylinderAlgo.checkValid("Cylinder portion builder")) {
-      throw GeomAlgoAPI_Exception(aCylinderAlgo.getError());
-    }
-    return aCylinderAlgo.shape();
+    static const std::string aMsg("Cylinder portion builder");
+    return runAlgoAndCheckShape(aCylinderAlgo, aMsg);
   }
 
   //===============================================================================================
@@ -166,19 +147,8 @@ namespace GeomAlgoAPI_ShapeAPI
 
     GeomAlgoAPI_Cylinder aCylinderAlgo(anAxis, theRadius, theHeight);
 
-    if (!aCylinderAlgo.check()) {
-      throw GeomAlgoAPI_Exception(aCylinderAlgo.getError());
-    }
-
-    aCylinderAlgo.build();
-
-    if(!aCylinderAlgo.isDone()) {
-      throw GeomAlgoAPI_Exception(aCylinderAlgo.getError());
-    }
-    if (!aCylinderAlgo.checkValid("Cylinder builder")) {
-      throw GeomAlgoAPI_Exception(aCylinderAlgo.getError());
-    }
-    return aCylinderAlgo.shape();
+    static const std::string aMsg("Cylinder builder");
+    return runAlgoAndCheckShape(aCylinderAlgo, aMsg);
   }
 
   //===============================================================================================
@@ -194,41 +164,17 @@ namespace GeomAlgoAPI_ShapeAPI
 
     GeomAlgoAPI_Cylinder aCylinderAlgo(anAxis, theRadius, theHeight, theAngle);
 
-    if (!aCylinderAlgo.check()) {
-      throw GeomAlgoAPI_Exception(aCylinderAlgo.getError());
-    }
-
-    aCylinderAlgo.build();
-
-    if(!aCylinderAlgo.isDone()) {
-      throw GeomAlgoAPI_Exception(aCylinderAlgo.getError());
-    }
-    if (!aCylinderAlgo.checkValid("Cylinder portion builder")) {
-      throw GeomAlgoAPI_Exception(aCylinderAlgo.getError());
-    }
-    return aCylinderAlgo.shape();
+    static const std::string aMsg("Cylinder portion builder");
+    return runAlgoAndCheckShape(aCylinderAlgo, aMsg);
   }
 
   //===============================================================================================
   std::shared_ptr<GeomAPI_Shape> GeomAlgoAPI_ShapeAPI::makeSphere(
       std::shared_ptr<GeomAPI_Pnt> theCenterPoint, double theRadius) throw (GeomAlgoAPI_Exception)
   {
+    static const std::string aMsg("Sphere builder");
     GeomAlgoAPI_Sphere aSphereAlgo(theCenterPoint, theRadius);
-
-    if (!aSphereAlgo.check()) {
-      throw GeomAlgoAPI_Exception(aSphereAlgo.getError());
-    }
-
-    aSphereAlgo.build();
-
-    if(!aSphereAlgo.isDone()) {
-      throw GeomAlgoAPI_Exception(aSphereAlgo.getError());
-    }
-
-    if (!aSphereAlgo.checkValid("Sphere builder")) {
-      throw GeomAlgoAPI_Exception(aSphereAlgo.getError());
-    }
-    return aSphereAlgo.shape();
+    return runAlgoAndCheckShape(aSphereAlgo, aMsg);
   }
 
   //===============================================================================================
@@ -240,20 +186,8 @@ namespace GeomAlgoAPI_ShapeAPI
 
     GeomAlgoAPI_Sphere aSphereAlgo(aCenterPoint, theRadius);
 
-    if (!aSphereAlgo.check()) {
-      throw GeomAlgoAPI_Exception(aSphereAlgo.getError());
-    }
-
-    aSphereAlgo.build();
-
-    if(!aSphereAlgo.isDone()) {
-      throw GeomAlgoAPI_Exception(aSphereAlgo.getError());
-    }
-
-    if (!aSphereAlgo.checkValid("Sphere builder")) {
-      throw GeomAlgoAPI_Exception(aSphereAlgo.getError());
-    }
-    return aSphereAlgo.shape();
+    static const std::string aMsg("Sphere builder");
+    return runAlgoAndCheckShape(aSphereAlgo, aMsg);
   }
 
   //===============================================================================================
@@ -277,20 +211,8 @@ namespace GeomAlgoAPI_ShapeAPI
 
     GeomAlgoAPI_Torus aTorusAlgo(anAxis, theRadius, theRingRadius);
 
-    if (!aTorusAlgo.check()) {
-      throw GeomAlgoAPI_Exception(aTorusAlgo.getError());
-    }
-
-    aTorusAlgo.build();
-
-    if(!aTorusAlgo.isDone()) {
-      throw GeomAlgoAPI_Exception(aTorusAlgo.getError());
-    }
-
-    if (!aTorusAlgo.checkValid("Torus builder")) {
-      throw GeomAlgoAPI_Exception(aTorusAlgo.getError());
-    }
-    return aTorusAlgo.shape();
+    static const std::string aMsg("Torus builder");
+    return runAlgoAndCheckShape(aTorusAlgo, aMsg);
   }
 
   //===============================================================================================
@@ -306,20 +228,8 @@ namespace GeomAlgoAPI_ShapeAPI
 
     GeomAlgoAPI_Torus aTorusAlgo(anAxis, theRadius, theRingRadius);
 
-    if (!aTorusAlgo.check()) {
-      throw GeomAlgoAPI_Exception(aTorusAlgo.getError());
-    }
-
-    aTorusAlgo.build();
-
-    if(!aTorusAlgo.isDone()) {
-      throw GeomAlgoAPI_Exception(aTorusAlgo.getError());
-    }
-
-    if (!aTorusAlgo.checkValid("Torus builder")) {
-      throw GeomAlgoAPI_Exception(aTorusAlgo.getError());
-    }
-    return aTorusAlgo.shape();
+    static const std::string aMsg("Torus builder");
+    return runAlgoAndCheckShape(aTorusAlgo, aMsg);
   }
 
   //===============================================================================================
@@ -344,20 +254,8 @@ namespace GeomAlgoAPI_ShapeAPI
 
     GeomAlgoAPI_Cone aConeAlgo(anAxis, theBaseRadius, theTopRadius, theHeight);
 
-    if (!aConeAlgo.check()) {
-      throw GeomAlgoAPI_Exception(aConeAlgo.getError());
-    }
-
-    aConeAlgo.build();
-
-    if(!aConeAlgo.isDone()) {
-      throw GeomAlgoAPI_Exception(aConeAlgo.getError());
-    }
-
-    if (!aConeAlgo.checkValid("Cone builder")) {
-      throw GeomAlgoAPI_Exception(aConeAlgo.getError());
-    }
-    return aConeAlgo.shape();
+    static const std::string aMsg("Cone builder");
+    return runAlgoAndCheckShape(aConeAlgo, aMsg);
   }
 
   //===============================================================================================
@@ -374,20 +272,8 @@ namespace GeomAlgoAPI_ShapeAPI
 
     GeomAlgoAPI_Cone aConeAlgo(anAxis, theBaseRadius, theTopRadius, theHeight);
 
-    if (!aConeAlgo.check()) {
-      throw GeomAlgoAPI_Exception(aConeAlgo.getError());
-    }
-
-    aConeAlgo.build();
-
-    if(!aConeAlgo.isDone()) {
-      throw GeomAlgoAPI_Exception(aConeAlgo.getError());
-    }
-
-    if (!aConeAlgo.checkValid("Cone builder")) {
-      throw GeomAlgoAPI_Exception(aConeAlgo.getError());
-    }
-    return aConeAlgo.shape();
+    static const std::string aMsg("Cone builder");
+    return runAlgoAndCheckShape(aConeAlgo, aMsg);
   }
 
   //===============================================================================================
@@ -397,18 +283,7 @@ namespace GeomAlgoAPI_ShapeAPI
     const double theDistance) throw (GeomAlgoAPI_Exception)
   {
     GeomAlgoAPI_Translation aTranslationAlgo(theSourceShape, theAxis, theDistance);
-
-    if (!aTranslationAlgo.check()) {
-      throw GeomAlgoAPI_Exception(aTranslationAlgo.getError());
-    }
-
-    aTranslationAlgo.build();
-
-    if(!aTranslationAlgo.isDone()) {
-      throw GeomAlgoAPI_Exception(aTranslationAlgo.getError());
-    }
-
-    return aTranslationAlgo.shape();
+    return runAlgo(aTranslationAlgo);
   }
 
   //===============================================================================================
@@ -419,18 +294,7 @@ namespace GeomAlgoAPI_ShapeAPI
     const double theDz) throw (GeomAlgoAPI_Exception)
   {
     GeomAlgoAPI_Translation aTranslationAlgo(theSourceShape, theDx, theDy, theDz);
-
-    if (!aTranslationAlgo.check()) {
-      throw GeomAlgoAPI_Exception(aTranslationAlgo.getError());
-    }
-
-    aTranslationAlgo.build();
-
-    if(!aTranslationAlgo.isDone()) {
-      throw GeomAlgoAPI_Exception(aTranslationAlgo.getError());
-    }
-
-    return aTranslationAlgo.shape();
+    return runAlgo(aTranslationAlgo);
   }
 
   //===============================================================================================
@@ -440,18 +304,7 @@ namespace GeomAlgoAPI_ShapeAPI
     std::shared_ptr<GeomAPI_Pnt>   theEndPoint) throw (GeomAlgoAPI_Exception)
   {
     GeomAlgoAPI_Translation aTranslationAlgo(theSourceShape, theStartPoint, theEndPoint);
-
-    if (!aTranslationAlgo.check()) {
-      throw GeomAlgoAPI_Exception(aTranslationAlgo.getError());
-    }
-
-    aTranslationAlgo.build();
-
-    if(!aTranslationAlgo.isDone()) {
-      throw GeomAlgoAPI_Exception(aTranslationAlgo.getError());
-    }
-
-    return aTranslationAlgo.shape();
+    return runAlgo(aTranslationAlgo);
   }
 
   //===============================================================================================
@@ -461,18 +314,7 @@ namespace GeomAlgoAPI_ShapeAPI
     const double theAngle) throw (GeomAlgoAPI_Exception)
   {
     GeomAlgoAPI_Rotation aRotationAlgo(theSourceShape, theAxis, theAngle);
-
-    if (!aRotationAlgo.check()) {
-      throw GeomAlgoAPI_Exception(aRotationAlgo.getError());
-    }
-
-    aRotationAlgo.build();
-
-    if(!aRotationAlgo.isDone()) {
-      throw GeomAlgoAPI_Exception(aRotationAlgo.getError());
-    }
-
-    return aRotationAlgo.shape();
+    return runAlgo(aRotationAlgo);
   }
 
   //===============================================================================================
@@ -483,18 +325,7 @@ namespace GeomAlgoAPI_ShapeAPI
     std::shared_ptr<GeomAPI_Pnt> theEndPoint) throw (GeomAlgoAPI_Exception)
   {
     GeomAlgoAPI_Rotation aRotationAlgo(theSourceShape, theCenterPoint, theStartPoint, theEndPoint);
-
-    if (!aRotationAlgo.check()) {
-      throw GeomAlgoAPI_Exception(aRotationAlgo.getError());
-    }
-
-    aRotationAlgo.build();
-
-    if(!aRotationAlgo.isDone()) {
-      throw GeomAlgoAPI_Exception(aRotationAlgo.getError());
-    }
-
-    return aRotationAlgo.shape();
+    return runAlgo(aRotationAlgo);
   }
 
   //===============================================================================================
@@ -503,18 +334,7 @@ namespace GeomAlgoAPI_ShapeAPI
     std::shared_ptr<GeomAPI_Pnt>   thePoint) throw (GeomAlgoAPI_Exception)
   {
     GeomAlgoAPI_Symmetry aSymmetryAlgo(theSourceShape, thePoint);
-
-    if (!aSymmetryAlgo.check()) {
-      throw GeomAlgoAPI_Exception(aSymmetryAlgo.getError());
-    }
-
-    aSymmetryAlgo.build();
-
-    if(!aSymmetryAlgo.isDone()) {
-      throw GeomAlgoAPI_Exception(aSymmetryAlgo.getError());
-    }
-
-    return aSymmetryAlgo.shape();
+    return runAlgo(aSymmetryAlgo);
   }
 
   //===============================================================================================
@@ -523,18 +343,7 @@ namespace GeomAlgoAPI_ShapeAPI
     std::shared_ptr<GeomAPI_Ax1>   theAxis) throw (GeomAlgoAPI_Exception)
   {
     GeomAlgoAPI_Symmetry aSymmetryAlgo(theSourceShape, theAxis);
-
-    if (!aSymmetryAlgo.check()) {
-      throw GeomAlgoAPI_Exception(aSymmetryAlgo.getError());
-    }
-
-    aSymmetryAlgo.build();
-
-    if(!aSymmetryAlgo.isDone()) {
-      throw GeomAlgoAPI_Exception(aSymmetryAlgo.getError());
-    }
-
-    return aSymmetryAlgo.shape();
+    return runAlgo(aSymmetryAlgo);
   }
 
   //===============================================================================================
@@ -543,18 +352,7 @@ namespace GeomAlgoAPI_ShapeAPI
     std::shared_ptr<GeomAPI_Ax2>   thePlane) throw (GeomAlgoAPI_Exception)
   {
     GeomAlgoAPI_Symmetry aSymmetryAlgo(theSourceShape, thePlane);
-
-    if (!aSymmetryAlgo.check()) {
-      throw GeomAlgoAPI_Exception(aSymmetryAlgo.getError());
-    }
-
-    aSymmetryAlgo.build();
-
-    if(!aSymmetryAlgo.isDone()) {
-      throw GeomAlgoAPI_Exception(aSymmetryAlgo.getError());
-    }
-
-    return aSymmetryAlgo.shape();
+    return runAlgo(aSymmetryAlgo);
   }
 
   //===============================================================================================
@@ -564,18 +362,7 @@ namespace GeomAlgoAPI_ShapeAPI
     const double                   theScaleFactor) throw (GeomAlgoAPI_Exception)
   {
     GeomAlgoAPI_Scale aScaleAlgo(theSourceShape, theCenterPoint, theScaleFactor);
-
-    if (!aScaleAlgo.check()) {
-      throw GeomAlgoAPI_Exception(aScaleAlgo.getError());
-    }
-
-    aScaleAlgo.build();
-
-    if(!aScaleAlgo.isDone()) {
-      throw GeomAlgoAPI_Exception(aScaleAlgo.getError());
-    }
-
-    return aScaleAlgo.shape();
+    return runAlgo(aScaleAlgo);
   }
 
   //===============================================================================================
@@ -588,18 +375,7 @@ namespace GeomAlgoAPI_ShapeAPI
   {
     GeomAlgoAPI_Scale aScaleAlgo(theSourceShape, theCenterPoint,
                                  theScaleFactorX, theScaleFactorY, theScaleFactorZ);
-
-    if (!aScaleAlgo.check()) {
-      throw GeomAlgoAPI_Exception(aScaleAlgo.getError());
-    }
-
-    aScaleAlgo.build();
-
-    if(!aScaleAlgo.isDone()) {
-      throw GeomAlgoAPI_Exception(aScaleAlgo.getError());
-    }
-
-    return aScaleAlgo.shape();
+    return runAlgo(aScaleAlgo);
   }
 
   //===============================================================================================
@@ -691,7 +467,7 @@ namespace GeomAlgoAPI_ShapeAPI
   std::shared_ptr<GeomAPI_Shape> GeomAlgoAPI_ShapeAPI::makeMultiRotation(
     std::shared_ptr<GeomAPI_Shape> theSourceShape,
     std::shared_ptr<GeomAPI_Ax1> theAxis,
-    const int theNumber)
+    const int theNumber) throw (GeomAlgoAPI_Exception)
   {
     if (!theAxis) {
       std::string aError = "Multirotation builder ";
@@ -720,7 +496,7 @@ namespace GeomAlgoAPI_ShapeAPI
     std::shared_ptr<GeomAPI_Shape> theSourceShape,
     std::shared_ptr<GeomAPI_Ax1> theAxis,
     const double theStep,
-    const int theNumber)
+    const int theNumber) throw (GeomAlgoAPI_Exception)
   {
     if (!theAxis) {
       std::string aError = "Multirotation builder ";
@@ -752,18 +528,7 @@ namespace GeomAlgoAPI_ShapeAPI
     GeomAlgoAPI_ConeSegment aConeSegmentAlgo(theRMin1, theRMax1, theRMin2, theRMax2,
                                              theZ, theStartPhi, theDeltaPhi);
 
-    if (!aConeSegmentAlgo.check()) {
-      throw GeomAlgoAPI_Exception(aConeSegmentAlgo.getError());
-    }
-
-    aConeSegmentAlgo.build();
-
-    if(!aConeSegmentAlgo.isDone()) {
-      throw GeomAlgoAPI_Exception(aConeSegmentAlgo.getError());
-    }
-    if (!aConeSegmentAlgo.checkValid("Cone Segment builder")) {
-      throw GeomAlgoAPI_Exception(aConeSegmentAlgo.getError());
-    }
-    return aConeSegmentAlgo.shape();
+    static const std::string aMsg("Cone Segment builder");
+    return runAlgoAndCheckShape(aConeSegmentAlgo, aMsg);
   }
 }

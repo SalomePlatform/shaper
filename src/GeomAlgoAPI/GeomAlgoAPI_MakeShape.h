@@ -73,6 +73,9 @@ public:
     initialize();
   }
 
+  /// Execute the algorithm.
+  GEOMALGOAPI_EXPORT virtual void build() {}
+
   /// \return status of builder.
   GEOMALGOAPI_EXPORT bool isDone() const;
 
