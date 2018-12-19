@@ -193,27 +193,21 @@ void GeomAlgoAPI_Prism::build(const GeomShapePtr&                theBaseShape,
     aTrsf.SetTranslation(anExtVec * -theFromSize);
     BRepBuilderAPI_Transform* aTransformBuilder =
       new BRepBuilderAPI_Transform(aBaseShape, aTrsf);
-    if(!aTransformBuilder) {
+    if(!aTransformBuilder || !aTransformBuilder->IsDone()) {
       return;
     }
     this->appendAlgo(std::shared_ptr<GeomAlgoAPI_MakeShape>(
       new GeomAlgoAPI_MakeShape(aTransformBuilder)));
-    if(!aTransformBuilder->IsDone()) {
-      return;
-    }
     TopoDS_Shape aMovedBase = aTransformBuilder->Shape();
 
     // Making prism.
     BRepPrimAPI_MakePrism* aPrismBuilder =
       new BRepPrimAPI_MakePrism(aMovedBase, anExtVec * (theFromSize + theToSize));
-    if(!aPrismBuilder) {
+    if(!aPrismBuilder || !aPrismBuilder->IsDone()) {
       return;
     }
     this->appendAlgo(std::shared_ptr<GeomAlgoAPI_MakeShape>(
       new GeomAlgoAPI_MakeShape(aPrismBuilder)));
-    if(!aPrismBuilder->IsDone()) {
-      return;
-    }
     aResult = aPrismBuilder->Shape();
 
     // Setting naming.
@@ -293,27 +287,21 @@ void GeomAlgoAPI_Prism::build(const GeomShapePtr&                theBaseShape,
     gp_Trsf aTrsf;
     aTrsf.SetTranslation(anExtVec * -aPrismLength);
     BRepBuilderAPI_Transform* aTransformBuilder = new BRepBuilderAPI_Transform(aBaseShape, aTrsf);
-    if(!aTransformBuilder) {
+    if(!aTransformBuilder || !aTransformBuilder->IsDone()) {
       return;
     }
     this->appendAlgo(std::shared_ptr<GeomAlgoAPI_MakeShape>(
       new GeomAlgoAPI_MakeShape(aTransformBuilder)));
-    if(!aTransformBuilder->IsDone()) {
-      return;
-    }
     TopoDS_Shape aMovedBase = aTransformBuilder->Shape();
 
     // Making prism.
     BRepPrimAPI_MakePrism* aPrismBuilder =
       new BRepPrimAPI_MakePrism(aMovedBase, anExtVec * 2 * aPrismLength);
-    if(!aPrismBuilder) {
+    if(!aPrismBuilder || !aPrismBuilder->IsDone()) {
       return;
     }
     this->appendAlgo(std::shared_ptr<GeomAlgoAPI_MakeShape>(
       new GeomAlgoAPI_MakeShape(aPrismBuilder)));
-    if(!aPrismBuilder->IsDone()) {
-      return;
-    }
     aResult = aPrismBuilder->Shape();
 
     // Orienting bounding planes.
@@ -434,14 +422,13 @@ void GeomAlgoAPI_Prism::build(const GeomShapePtr&                theBaseShape,
   }
 
   // Setting result.
-  if(aResult.IsNull()) {
-    return;
+  if (!aResult.IsNull()) {
+    aResult = GeomAlgoAPI_DFLoader::refineResult(aResult);
+    GeomShapePtr aGeomSh(new GeomAPI_Shape());
+    aGeomSh->setImpl(new TopoDS_Shape(aResult));
+    this->setShape(aGeomSh);
+    this->setDone(true);
   }
-  aResult = GeomAlgoAPI_DFLoader::refineResult(aResult);
-  GeomShapePtr aGeomSh(new GeomAPI_Shape());
-  aGeomSh->setImpl(new TopoDS_Shape(aResult));
-  this->setShape(aGeomSh);
-  this->setDone(true);
 }
 
 // Auxilary functions:

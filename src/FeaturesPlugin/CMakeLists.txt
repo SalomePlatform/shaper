@@ -182,6 +182,7 @@ ADD_UNIT_TESTS(TestExtrusion.py
                TestRevolution_ByAngle.py
                TestRevolutionOfPoint.py
                TestRevolutionOfEdge.py
+               TestRevolutionOfCompound.py
                TestRevolutionCut.py
                TestRevolutionCut_ByAngle.py
                TestRevolutionCut_ByPlanesAndOffsets.py
