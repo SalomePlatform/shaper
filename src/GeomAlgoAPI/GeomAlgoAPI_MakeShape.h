@@ -85,9 +85,6 @@ public:
   /// \return true if resulting shape is valid.
   GEOMALGOAPI_EXPORT bool isValid() const;
 
-  /// \return true if resulting shape has volume.
-  GEOMALGOAPI_EXPORT bool hasVolume() const;
-
   /// \return map of sub-shapes of the result. To be used for History keeping.
   GEOMALGOAPI_EXPORT std::shared_ptr<GeomAPI_DataMapOfShapeShape> mapOfSubShapes() const;
 

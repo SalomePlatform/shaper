@@ -80,20 +80,6 @@ bool GeomAlgoAPI_MakeShape::isValid() const
 }
 
 //==================================================================================================
-bool GeomAlgoAPI_MakeShape::hasVolume() const
-{
-  bool hasVolume = false;
-  if(isValid()) {
-    const TopoDS_Shape& aRShape = myShape->impl<TopoDS_Shape>();
-    GProp_GProps aGProp;
-    BRepGProp::VolumeProperties(aRShape, aGProp);
-    if(aGProp.Mass() > Precision::Confusion())
-      hasVolume = true;
-  }
-  return hasVolume;
-}
-
-//==================================================================================================
 std::shared_ptr<GeomAPI_DataMapOfShapeShape> GeomAlgoAPI_MakeShape::mapOfSubShapes() const
 {
   return myMap;
