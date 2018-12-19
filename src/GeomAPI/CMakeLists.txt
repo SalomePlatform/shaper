@@ -164,6 +164,7 @@ ADD_UNIT_TESTS(
   TestBox.py
   TestCone.py
   TestCylinder.py
+  TestEllipse2d.py
   TestPlanarEdge.py
   TestPolygon.py
   TestSphere.py
