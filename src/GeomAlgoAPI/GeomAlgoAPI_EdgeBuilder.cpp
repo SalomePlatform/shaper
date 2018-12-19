@@ -35,52 +35,45 @@
 #include <Bnd_Box.hxx>
 #include <BRepBndLib.hxx>
 
+static GeomEdgePtr createLine(const gp_Pnt& theStart, const gp_Pnt& theEnd)
+{
+  GeomEdgePtr aRes;
+  if (!theStart.IsEqual(theEnd, Precision::Confusion()) &&
+    Abs(theStart.SquareDistance(theEnd)) < 1.e+100) {
+    BRepBuilderAPI_MakeEdge anEdgeBuilder(theStart, theEnd);
+    TopoDS_Edge anEdge = anEdgeBuilder.Edge();
+    aRes = GeomEdgePtr(new GeomAPI_Edge);
+    aRes->setImpl(new TopoDS_Shape(anEdge));
+  }
+  return aRes;
+}
+
 std::shared_ptr<GeomAPI_Edge> GeomAlgoAPI_EdgeBuilder::line(
     std::shared_ptr<GeomAPI_Pnt> theStart, std::shared_ptr<GeomAPI_Pnt> theEnd)
 {
   const gp_Pnt& aStart = theStart->impl<gp_Pnt>();
   const gp_Pnt& anEnd = theEnd->impl<gp_Pnt>();
-
-  if (aStart.IsEqual(anEnd, Precision::Confusion()))
-    return std::shared_ptr<GeomAPI_Edge>();
-  if (Abs(aStart.SquareDistance(anEnd)) > 1.e+100)
-    return std::shared_ptr<GeomAPI_Edge>();
-  BRepBuilderAPI_MakeEdge anEdgeBuilder(aStart, anEnd);
-  std::shared_ptr<GeomAPI_Edge> aRes(new GeomAPI_Edge);
-  TopoDS_Edge anEdge = anEdgeBuilder.Edge();
-  aRes->setImpl(new TopoDS_Shape(anEdge));
-  return aRes;
+  return createLine(aStart, anEnd);
 }
 std::shared_ptr<GeomAPI_Edge> GeomAlgoAPI_EdgeBuilder::line(
     double theDX, double theDY, double theDZ)
 {
-
   const gp_Pnt& aStart = gp_Pnt(0, 0, 0);
   const gp_Pnt& anEnd = gp_Pnt(theDX, theDY, theDZ);
-
-  if (aStart.IsEqual(anEnd, Precision::Confusion()))
-    return std::shared_ptr<GeomAPI_Edge>();
-  if (Abs(aStart.SquareDistance(anEnd)) > 1.e+100)
-    return std::shared_ptr<GeomAPI_Edge>();
-  BRepBuilderAPI_MakeEdge anEdgeBuilder(aStart, anEnd);
-  std::shared_ptr<GeomAPI_Edge> aRes(new GeomAPI_Edge);
-  TopoDS_Edge anEdge = anEdgeBuilder.Edge();
-  aRes->setImpl(new TopoDS_Shape(anEdge));
-  return aRes;
+  return createLine(aStart, anEnd);
 }
 
 std::shared_ptr<GeomAPI_Edge> GeomAlgoAPI_EdgeBuilder::line(
     const std::shared_ptr<GeomAPI_Lin> theLin)
 {
-  if(!theLin.get()) {
-    return std::shared_ptr<GeomAPI_Edge>();
+  GeomEdgePtr aRes;
+  if (theLin.get()) {
+    const gp_Lin& aLin = theLin->impl<gp_Lin>();
+    BRepBuilderAPI_MakeEdge anEdgeBuilder(aLin);
+    TopoDS_Edge anEdge = anEdgeBuilder.Edge();
+    aRes = GeomEdgePtr(new GeomAPI_Edge);
+    aRes->setImpl(new TopoDS_Shape(anEdge));
   }
-
-  const gp_Lin& aLin = theLin->impl<gp_Lin>();
-  BRepBuilderAPI_MakeEdge anEdgeBuilder(aLin);
-  std::shared_ptr<GeomAPI_Edge> aRes(new GeomAPI_Edge());
-  TopoDS_Edge anEdge = anEdgeBuilder.Edge();
-  aRes->setImpl(new TopoDS_Shape(anEdge));
   return aRes;
 }
 
@@ -176,15 +169,14 @@ std::shared_ptr<GeomAPI_Edge> GeomAlgoAPI_EdgeBuilder::lineCircle(
 std::shared_ptr<GeomAPI_Edge> GeomAlgoAPI_EdgeBuilder::lineCircle(
     std::shared_ptr<GeomAPI_Circ> theCircle)
 {
-  if(!theCircle.get()) {
-    return std::shared_ptr<GeomAPI_Edge>();
+  GeomEdgePtr aRes;
+  if (theCircle.get()) {
+    const gp_Circ& aCirc = theCircle->impl<gp_Circ>();
+    BRepBuilderAPI_MakeEdge anEdgeBuilder(aCirc);
+    TopoDS_Edge anEdge = anEdgeBuilder.Edge();
+    aRes = GeomEdgePtr(new GeomAPI_Edge);
+    aRes->setImpl(new TopoDS_Shape(anEdge));
   }
-
-  const gp_Circ& aCirc = theCircle->impl<gp_Circ>();
-  BRepBuilderAPI_MakeEdge anEdgeBuilder(aCirc);
-  std::shared_ptr<GeomAPI_Edge> aRes(new GeomAPI_Edge());
-  TopoDS_Edge anEdge = anEdgeBuilder.Edge();
-  aRes->setImpl(new TopoDS_Shape(anEdge));
   return aRes;
 }
 
