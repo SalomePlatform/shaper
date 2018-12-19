@@ -74,6 +74,41 @@ model.testNbSubShapes(Ellipsoid_4, GeomAPI_Shape.EDGE, [7])
 model.testNbSubShapes(Ellipsoid_4, GeomAPI_Shape.VERTEX, [14])
 model.testResultsVolumes(Ellipsoid_4, [5726.87643051263])
 
+# Check ellipsoid errors
+Part_5 = model.addPart(partSet)
+Part_5_doc = Part_5.document()
+Ellipsoid_5 = model.addEllipsoid(Part_5_doc, 0, 20, 30)
+model.do()
+assert(Ellipsoid_5.feature().error() != "")
+Part_5_doc.removeFeature(Ellipsoid_5.feature())
+
+Ellipsoid_5 = model.addEllipsoid(Part_5_doc, 10, 0, 30)
+model.do()
+assert(Ellipsoid_5.feature().error() != "")
+Part_5_doc.removeFeature(Ellipsoid_5.feature())
+
+Ellipsoid_5 = model.addEllipsoid(Part_5_doc, 10, 20, 0)
+model.do()
+assert(Ellipsoid_5.feature().error() != "")
+Part_5_doc.removeFeature(Ellipsoid_5.feature())
+
+Ellipsoid_5 = model.addEllipsoid(Part_5_doc, 10, 20, 30, -5, 5)
+model.do()
+assert(Ellipsoid_5.feature().error() != "")
+Part_5_doc.removeFeature(Ellipsoid_5.feature())
+
+Ellipsoid_5 = model.addEllipsoid(Part_5_doc, 10, 20, 30, 5, -5)
+model.do()
+assert(Ellipsoid_5.feature().error() != "")
+Part_5_doc.removeFeature(Ellipsoid_5.feature())
+
+Ellipsoid_5 = model.addEllipsoid(Part_5_doc, 10, 20, 30, 0, 0)
+model.do()
+assert(Ellipsoid_5.feature().error() != "")
+Part_5_doc.removeFeature(Ellipsoid_5.feature())
+
+partSet.removeFeature(Part_5.feature())
+
 model.end()
 
 assert(model.checkPythonDump())
