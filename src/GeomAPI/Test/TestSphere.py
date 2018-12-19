@@ -72,6 +72,11 @@ def checkSphereAll(theDocument, theFeature, theFaceName, theCenter, theRadius):
     anArcName = "[" + theFaceName + "][weak_name_3]"
     checkArc(theDocument, anArcName, theCenter, theRadius)
 
+def checkNonSphereShell(theFeature):
+    aShape = theFeature.result().resultSubShapePair()[0].shape()
+    assert(aShape.isShell())
+    assert(aShape.shell().getSphere() is None)
+
 
 model.begin()
 partSet = model.moduleDocument()
@@ -122,5 +127,24 @@ checkSphereFace(Part_1_doc, "Rotation_1_1/MF:Rotated&Sketch_1/SketchArc_1_2", aC
 checkSphereShell(Part_1_doc, "Rotation_1_1/MF:Rotated&Sketch_1/SketchArc_1_2", aCenter, ParamR.value())
 checkArc(Part_1_doc, "[Rotation_1_1/MF:Rotated&Sketch_1/SketchArc_1_2][Rotation_1_1/MF:Rotated&Revolution_1_1/From_Face]", aCenter, ParamR.value())
 checkArc(Part_1_doc, "[Rotation_1_1/MF:Rotated&Sketch_1/SketchArc_1_2][Rotation_1_1/MF:Rotated&Revolution_1_1/To_Face]", aCenter, ParamR.value())
+
+# Test 5. Sheck non-spherical shell
+Shell_1 = model.addShell(Part_1_doc, [model.selection("FACE", "Rotation_1_1/MF:Rotated&Revolution_1_1/To_Face"), model.selection("FACE", "Rotation_1_1/MF:Rotated&Revolution_1_1/From_Face")])
+checkNonSphereShell(Shell_1)
+
+Sketch_2 = model.addSketch(Part_1_doc, model.defaultPlane("XOZ"))
+SketchLine_2 = Sketch_2.addLine(18.12152721893265, 20.53645178481853, 73.15172297255518, 20.53645178481853)
+SketchConstraintHorizontal_1 = Sketch_2.setHorizontal(SketchLine_2.result())
+SketchArc_2 = Sketch_2.addArc(60.28852631862447, 20.53645178481853, 73.15172297255518, 20.53645178481853, 58.16589238004093, 33.22330534748203, False)
+SketchConstraintCoincidence_5 = Sketch_2.setCoincident(SketchLine_2.result(), SketchArc_2.center())
+SketchConstraintCoincidence_6 = Sketch_2.setCoincident(SketchLine_2.endPoint(), SketchArc_2.startPoint())
+SketchArc_3 = Sketch_2.addArc(40.15343392262997, 20.53645178481853, 18.12152721893265, 20.53645178481853, 58.16589238004093, 33.22330534748203, True)
+SketchConstraintCoincidence_7 = Sketch_2.setCoincident(SketchLine_2.result(), SketchArc_3.center())
+SketchConstraintCoincidence_8 = Sketch_2.setCoincident(SketchLine_2.startPoint(), SketchArc_3.startPoint())
+SketchConstraintCoincidence_9 = Sketch_2.setCoincident(SketchArc_2.endPoint(), SketchArc_3.endPoint())
+model.do()
+Revolution_2 = model.addRevolution(Part_1_doc, [model.selection("FACE", "Sketch_2/Face-SketchLine_2r-SketchArc_2_2f-SketchArc_3_2f")], model.selection("EDGE", "Sketch_2/SketchLine_2"), 360, 0)
+Shell_2 = model.addShell(Part_1_doc, [model.selection("FACE", "Revolution_2_1/Generated_Face&Sketch_2/SketchArc_3_2"), model.selection("FACE", "Revolution_2_1/Generated_Face&Sketch_2/SketchArc_2_2")])
+checkNonSphereShell(Shell_2)
 
 model.end()

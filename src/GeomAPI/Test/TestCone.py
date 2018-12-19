@@ -50,7 +50,7 @@ def checkCircleFace(theDocument, theFaceName, theCenter, theRadius):
     assertCircle(aSubs[0].edge(), theCenter, theRadius)
     theDocument.removeFeature(aFaceFeature.feature())
 
-def assertEllipse(theEdge, theFirstFocus, theSecondFocus, theMajorRadius, theMinorRadius):
+def assertEllipse(theEdge, theFirstFocus, theSecondFocus, theMajorRadius, theMinorRadius, theNormal = None):
     assert(theEdge.isEllipse())
     anEllipse = theEdge.ellipse()
     assert(anEllipse.firstFocus().distance(theFirstFocus) < TOLERANCE), "({}, {}, {}) != expected ({}, {}, {})".format(anEllipse.firstFocus().x(), anEllipse.firstFocus().y(), anEllipse.firstFocus().z(), theFirstFocus.x(), theFirstFocus.y(), theFirstFocus.z())
@@ -58,11 +58,17 @@ def assertEllipse(theEdge, theFirstFocus, theSecondFocus, theMajorRadius, theMin
     assert(math.fabs(anEllipse.majorRadius() - theMajorRadius) < TOLERANCE), "Major radius {} != {}".format(anEllipse.majorRadius(), theMajorRadius)
     assert(math.fabs(anEllipse.minorRadius() - theMinorRadius) < TOLERANCE), "Minor radius {} != {}".format(anEllipse.minorRadius(), theMinorRadius)
 
-def checkEllipseEdge(theDocument, theEdgeName, theFirstFocus, theSecondFocus, theMajorRadius, theMinorRadius):
+    center = GeomAPI.GeomAPI_Pnt((theFirstFocus.x() + theSecondFocus.x()) * 0.5, (theFirstFocus.y() + theSecondFocus.y()) * 0.5, (theFirstFocus.z() + theSecondFocus.z()) * 0.5)
+    assert(anEllipse.center().distance(center) < TOLERANCE), "({}, {}, {}) != expected ({}, {}, {})".format(anEllipse.center().x(), anEllipse.center().y(), anEllipse.center().z(), center.x(), center.y(), center.z())
+
+    if theNormal is not None:
+        assert(math.fabs(anEllipse.normal().dot(theNormal) - 1.) < TOLERANCE), "Normal ({}, {}, {}) != ({}, {}, {})".format(anEllipse.normal().x(), anEllipse.normal().y(), anEllipse.normal().z(), theNormal.x(), theNormal.y(), theNormal.z())
+
+def checkEllipseEdge(theDocument, theEdgeName, theFirstFocus, theSecondFocus, theMajorRadius, theMinorRadius, theNormal):
     anEdge = model.addEdge(theDocument, [model.selection("EDGE", theEdgeName)])
     aShape = anEdge.result().resultSubShapePair()[0].shape()
     assert(aShape.isEdge())
-    assertEllipse(aShape.edge(), theFirstFocus, theSecondFocus, theMajorRadius, theMinorRadius)
+    assertEllipse(aShape.edge(), theFirstFocus, theSecondFocus, theMajorRadius, theMinorRadius, theNormal)
     theDocument.removeFeature(anEdge.feature())
 
 def checkEllipseFace(theDocument, theFaceName, theFirstFocus, theSecondFocus, theMajorRadius, theMinorRadius):
@@ -107,6 +113,17 @@ def checkConeShell(theDocument, theFaceNames, theApex, theAxis, theSemiAngle, th
     assertCone(aShape.shell().getCone(), theApex, theAxis, theSemiAngle, theRadius1, theRadius2, theHeight)
     theDocument.removeFeature(aShell.feature())
 
+def checkConeSolid(theDocument, theFaceNames, theApex, theAxis, theSemiAngle, theRadius1, theRadius2, theHeight):
+    # check cone
+    aSelection = []
+    for name in theFaceNames:
+        aSelection.append(model.selection("FACE", name))
+    aSolid = model.addSolid(theDocument, aSelection)
+    aShape = aSolid.result().resultSubShapePair()[0].shape()
+    assert(aShape.isSolid())
+    assertCone(aShape.solid().getCone(), theApex, theAxis, theSemiAngle, theRadius1, theRadius2, theHeight)
+    theDocument.removeFeature(aSolid.feature())
+
 def checkConeAll(theDocument, theFeature, theFaceName, theApex, theAxis, theSemiAngle, theRadius1, theRadius2, theHeight):
     # check solid
     aShape = theFeature.result().resultSubShapePair()[0].shape()
@@ -115,6 +132,16 @@ def checkConeAll(theDocument, theFeature, theFaceName, theApex, theAxis, theSemi
 
     checkConeShell(theDocument, [theFaceName], theApex, theAxis, theSemiAngle, theRadius1, theRadius2, theHeight)
     checkConeFace(theDocument, theFaceName, theApex, theAxis, theSemiAngle, theRadius1, theRadius2, theHeight)
+
+def checkNonCone(theFeature):
+    aShape = theFeature.result().resultSubShapePair()[0].shape()
+    assert(aShape.isSolid())
+    assert(aShape.solid().getCone() is None)
+
+def checkNonConeShell(theFeature):
+    aShape = theFeature.result().resultSubShapePair()[0].shape()
+    assert(aShape.isShell())
+    assert(aShape.shell().getCone() is None)
 
 def checkSegment(theDocument, theEdgeName, theStartPoint, theEndPoint):
     anEdgeFeature = model.addEdge(theDocument, [model.selection("EDGE", theEdgeName)])
@@ -217,7 +244,37 @@ aFirstFocus = GeomAPI.GeomAPI_Pnt(20, 0, 31.062397266842858)
 aSecondFocus = GeomAPI.GeomAPI_Pnt(20, 0, -1.0935246846933797)
 aMajorRadius = 27.91915871311068
 aMinorRadius = 22.824955511666207
+aNormal = GeomAPI.GeomAPI_Dir(1, 0, 0)
 checkEllipseFace(Part_1_doc, "_weak_name_1_Partition_1_1_2", aFirstFocus, aSecondFocus, aMajorRadius, aMinorRadius)
-checkEllipseEdge(Part_1_doc, "Partition_1_1_1/Generated_Edge&Cone_1_1/Face_1", aFirstFocus, aSecondFocus, aMajorRadius, aMinorRadius)
+checkEllipseEdge(Part_1_doc, "Partition_1_1_1/Generated_Edge&Cone_1_1/Face_1", aFirstFocus, aSecondFocus, aMajorRadius, aMinorRadius, aNormal)
+
+# Test 6. Compose a conical solid
+Solid_1_objects = ["Rotation_1_1/MF:Rotated&Cone_1_1/Face_3",
+                   "Partition_1_1_1/Modified_Face&Cone_1_1/Face_1",
+                   "Partition_1_1_2/Modified_Face&Cone_1_1/Face_1",
+                   "Rotation_1_1/MF:Rotated&Cone_1_1/Face_2"]
+checkConeSolid(Part_1_doc, Solid_1_objects, anApex, anAxis, aSemiAngle, ParamR1.value(), ParamR2.value(), ParamH.value())
+
+# Test 7. Check non-cone
+Cone_2 = model.addCone(Part_1_doc, model.selection("VERTEX", "PartSet/Origin"), model.selection("EDGE", "PartSet/OZ"), 10, 5, 10)
+Cone_3 = model.addCone(Part_1_doc, model.selection("VERTEX", "PartSet/Origin"), model.selection("EDGE", "PartSet/OZ"), 5, 10, 20)
+Fuse_1 = model.addFuse(Part_1_doc, [model.selection("SOLID", "Cone_2_1"), model.selection("SOLID", "Cone_3_1")], True)
+Solid_2_objects = [model.selection("FACE", "Fuse_1_1/Modified_Face&Cone_2_1/Face_3&Cone_3_1/Face_3"),
+                   model.selection("FACE", "Fuse_1_1/Modified_Face&Cone_2_1/Face_1"),
+                   model.selection("FACE", "Fuse_1_1/Modified_Face&Cone_3_1/Face_1"),
+                   model.selection("FACE", "Cone_3_1/Face_2")]
+Solid_2 = model.addSolid(Part_1_doc, Solid_2_objects)
+checkNonCone(Solid_2)
+
+# Test 8. Check non-conical shell
+Shell_1_objects = [model.selection("FACE", "Rotation_1_1/MF:Rotated&Cone_1_1/Face_3"),
+                   model.selection("FACE", "Partition_1_1_1/Modified_Face&Cone_1_1/Face_1"),
+                   model.selection("FACE", "Partition_1_1_2/Modified_Face&Cone_1_1/Face_1"),
+                   model.selection("FACE", "Rotation_1_1/MF:Rotated&Cone_1_1/Face_2")]
+Shell_1 = model.addShell(Part_1_doc, Shell_1_objects)
+checkNonConeShell(Shell_1)
+
+Shell_2 = model.addShell(Part_1_doc, [model.selection("FACE", "Fuse_1_1/Modified_Face&Cone_2_1/Face_1"), model.selection("FACE", "Fuse_1_1/Modified_Face&Cone_3_1/Face_1")])
+checkNonConeShell(Shell_2)
 
 model.end()

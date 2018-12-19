@@ -162,4 +162,9 @@ checkShellNotBox(Part_1_doc, Shell_objects)
 Shell_objects = ["Rotation_3_1/MF:Rotated&Extrusion_1_1/To_Face", "Rotation_3_1/MF:Rotated&Extrusion_1_1/From_Face", "Rotation_3_1/MF:Rotated&Sketch_1/SketchLine_1", "Rotation_3_1/MF:Rotated&Sketch_1/SketchLine_2", "Rotation_3_1/MF:Rotated&Sketch_1/SketchLine_3", "Rotation_3_1/MF:Rotated&Sketch_1/SketchLine_4"]
 checkShellRotatedBox(Part_1_doc, Shell_objects, aCornerPara, aCornerPara1)
 
+# Test 6. One more check the shell is not a box
+Cylinder_1 = model.addCylinder(Part_1_doc, model.selection("VERTEX", "PartSet/Origin"), model.selection("EDGE", "PartSet/OZ"), 5, 10, 45)
+Shell_objects = ["Cylinder_1_1/Face_2", "Cylinder_1_1/Face_4"]
+checkShellNotBox(Part_1_doc, Shell_objects)
+
 model.end()

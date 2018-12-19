@@ -61,6 +61,11 @@ def checkTorusAll(theDocument, theFeature, theFaceName, theCenter, theAxis, theM
     checkTorusShell(theDocument, [theFaceName], theCenter, theAxis, theMajorRadius, theMinorRadius)
     checkTorusFace(theDocument, theFaceName, theCenter, theAxis, theMajorRadius, theMinorRadius)
 
+def checkNonTorusShell(theFeature):
+    aShape = theFeature.result().resultSubShapePair()[0].shape()
+    assert(aShape.isShell())
+    assert(aShape.shell().getTorus() is None)
+
 
 model.begin()
 partSet = model.moduleDocument()
@@ -94,5 +99,13 @@ Shell_1_objects = ["Partition_1_1_6/Modified_Face&Torus_1_1/Face_1",
                    "Partition_1_1_7/Modified_Face&Torus_1_1/Face_1&weak_name_1",
                    "Partition_1_1_5/Modified_Face&Torus_1_1/Face_1"]
 checkTorusShell(Part_1_doc, Shell_1_objects, aCenter, anAxis, ParamRMax.value(), ParamRMin.value())
+
+# Test 4. Check non-torus shell
+Shell_1 = model.addShell(Part_1_doc, [model.selection("FACE", "Partition_1_1_1/Modified_Face&Torus_1_1/Face_1"), model.selection("FACE", "Partition_1_1_1/Modified_Face&PartSet/YOZ/YOZ")])
+checkNonTorusShell(Shell_1)
+
+Symmetry_1 = model.addSymmetry(Part_1_doc, [model.selection("SHELL", "Shell_1_1")], model.selection("FACE", "PartSet/XOY"), True)
+Shell_2 = model.addShell(Part_1_doc, [model.selection("FACE", "_weak_name_1_Symmetry_1_1_1"), model.selection("FACE", "_weak_name_1_Symmetry_1_1_2")])
+checkNonTorusShell(Shell_2)
 
 model.end()

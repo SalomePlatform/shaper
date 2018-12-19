@@ -54,6 +54,16 @@ def checkCylinderShell(theDocument, theFaceNames, theLocation, theAxis, theRadiu
     assertCylinder(aShape.shell().getCylinder(), theLocation, theAxis, theRadius, theHeight)
     theDocument.removeFeature(aShell.feature())
 
+def checkCylinderSolid(theDocument, theFaceNames, theLocation, theAxis, theRadius, theHeight):
+    aSelection = []
+    for name in theFaceNames:
+        aSelection.append(model.selection("FACE", name))
+    aSolid = model.addSolid(theDocument, aSelection)
+    aShape = aSolid.result().resultSubShapePair()[0].shape()
+    assert(aShape.isSolid())
+    assertCylinder(aShape.solid().getCylinder(), theLocation, theAxis, theRadius, theHeight)
+    theDocument.removeFeature(aSolid.feature())
+
 def checkCylinderAll(theDocument, theFeature, theFaceName, theLocation, theAxis, theRadius, theHeight):
     aShape = theFeature.result().resultSubShapePair()[0].shape()
     assert(aShape.isSolid())
@@ -66,6 +76,11 @@ def checkNonCylinder(theFeature):
     aShape = theFeature.result().resultSubShapePair()[0].shape()
     assert(aShape.isSolid())
     assert(aShape.solid().getCylinder() is None)
+
+def checkNonCylindricalShell(theFeature):
+    aShape = theFeature.result().resultSubShapePair()[0].shape()
+    assert(aShape.isShell())
+    assert(aShape.shell().getCylinder() is None)
 
 
 model.begin()
@@ -148,5 +163,43 @@ Shell_1_objects = ["Partition_1_1_1/Modified_Face&Sketch_2/SketchLine_4",
                    "Partition_1_1_4/Modified_Face&Sketch_2/SketchLine_4",
                    "(Partition_1_1_2/Modified_Face&Revolution_1_1/To_Face)(Partition_1_1_2/Modified_Face&Sketch_2/SketchLine_1)"]
 checkCylinderShell(Part_1_doc, Shell_1_objects, aLoc3, anAxis, 0.5 * ParamR.value(), ParamH.value())
+
+# Test 4. Split cylinder and compose a solid
+Partition_2 = model.addPartition(Part_1_doc, [model.selection("SOLID", "Rotation_1_1"), model.selection("FACE", "PartSet/XOZ")])
+Solid_1_objects = ["(Partition_2_1_1/Modified_Face&Cylinder_1_1/Face_3)(Partition_2_1_1/Modified_Face&PartSet/XOZ/XOZ)(Partition_2_1_1/Modified_Face&Cylinder_1_1/Face_2)",
+                   "Partition_2_1_1/Modified_Face&Cylinder_1_1/Face_1&weak_name_2",
+                   "Partition_2_1_1/Modified_Face&Cylinder_1_1/Face_2",
+                   "Partition_2_1_1/Modified_Face&Cylinder_1_1/Face_3",
+                   "Partition_2_1_2/Modified_Face&Cylinder_1_1/Face_1",
+                   "Partition_2_1_2/Modified_Face&Cylinder_1_1/Face_2",
+                   "Partition_2_1_2/Modified_Face&Cylinder_1_1/Face_3"]
+checkCylinderSolid(Part_1_doc, Solid_1_objects, aLoc1, anAxis, 2 * ParamR.value(), ParamH.value())
+
+# Test 5. Check non-cylinder
+Sketch_3 = model.addSketch(Part_1_doc, model.defaultPlane("XOY"))
+SketchCircle_2 = Sketch_3.addCircle(12.62721775445329, 9.188425784259302, 5)
+SketchCircle_3 = Sketch_3.addCircle(16.49821418064359, 12.35313535520289, 5)
+SketchConstraintRadius_2 = Sketch_3.setRadius(SketchCircle_2.results()[1], 5)
+SketchConstraintEqual_1 = Sketch_3.setEqual(SketchCircle_2.results()[1], SketchCircle_3.results()[1])
+SketchConstraintDistance_1 = Sketch_3.setDistance(SketchCircle_2.center(), SketchCircle_3.center(), 5, True)
+model.do()
+Extrusion_2 = model.addExtrusion(Part_1_doc, [model.selection("COMPOUND", "Sketch_3")], model.selection(), 10, 0)
+Solid_1_objects = [model.selection("FACE", "Extrusion_2_1_1/From_Face"), model.selection("FACE", "Extrusion_2_1_1/To_Face"), model.selection("FACE", "Extrusion_2_1_2/From_Face"), model.selection("FACE", "Extrusion_2_1_2/Generated_Face&Sketch_3/SketchCircle_3_2&weak_name_2"), model.selection("FACE", "Extrusion_2_1_2/Generated_Face&Sketch_3/SketchCircle_3_2&weak_name_1"), model.selection("FACE", "Extrusion_2_1_2/To_Face"), model.selection("FACE", "Extrusion_2_1_3/From_Face"), model.selection("FACE", "Extrusion_2_1_3/Generated_Face&Sketch_3/SketchCircle_2_2"), model.selection("FACE", "Extrusion_2_1_3/To_Face")]
+Solid_1 = model.addSolid(Part_1_doc, Solid_1_objects)
+checkNonCylinder(Solid_1)
+
+# Test 6. Check non-cylindrical shell
+Shell_1_objects = [model.selection("FACE", "(Partition_2_1_1/Modified_Face&Cylinder_1_1/Face_3)(Partition_2_1_1/Modified_Face&PartSet/XOZ/XOZ)(Partition_2_1_1/Modified_Face&Cylinder_1_1/Face_2)"),
+                   model.selection("FACE", "Partition_2_1_1/Modified_Face&Cylinder_1_1/Face_1&weak_name_2"),
+                   model.selection("FACE", "Partition_2_1_1/Modified_Face&Cylinder_1_1/Face_2"),
+                   model.selection("FACE", "Partition_2_1_1/Modified_Face&Cylinder_1_1/Face_3"),
+                   model.selection("FACE", "Partition_2_1_2/Modified_Face&Cylinder_1_1/Face_1"),
+                   model.selection("FACE", "Partition_2_1_2/Modified_Face&Cylinder_1_1/Face_2"),
+                   model.selection("FACE", "Partition_2_1_2/Modified_Face&Cylinder_1_1/Face_3")]
+Shell_1 = model.addShell(Part_1_doc, Shell_1_objects)
+checkNonCylindricalShell(Shell_1)
+
+Shell_2 = model.addShell(Part_1_doc, [model.selection("FACE", "Extrusion_2_1_3/Generated_Face&Sketch_3/SketchCircle_2_2"), model.selection("FACE", "Extrusion_2_1_2/Generated_Face&Sketch_3/SketchCircle_3_2&weak_name_1")])
+checkNonCylindricalShell(Shell_2)
 
 model.end()
