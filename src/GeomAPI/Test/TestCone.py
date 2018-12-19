@@ -37,6 +37,7 @@ def checkCircleEdge(theDocument, theEdgeName, theCenter, theRadius):
     anEdge = model.addEdge(theDocument, [model.selection("EDGE", theEdgeName)])
     aShape = anEdge.result().resultSubShapePair()[0].shape()
     assert(aShape.isEdge())
+    assert(aShape.edge().isClosed())
     assertCircle(aShape.edge(), theCenter, theRadius)
     theDocument.removeFeature(anEdge.feature())
 
@@ -276,5 +277,17 @@ checkNonConeShell(Shell_1)
 
 Shell_2 = model.addShell(Part_1_doc, [model.selection("FACE", "Fuse_1_1/Modified_Face&Cone_2_1/Face_1"), model.selection("FACE", "Fuse_1_1/Modified_Face&Cone_3_1/Face_1")])
 checkNonConeShell(Shell_2)
+
+# Test 9. Check error on conversion to wrong type of curve
+anEdge = model.addEdge(Part_1_doc, [model.selection("EDGE", "[Partition_1_1_2/Modified_Face&Cone_1_1/Face_1][Rotation_1_1/MF:Rotated&Cone_1_1/Face_2]")])
+aShape = anEdge.result().resultSubShapePair()[0].shape()
+assert(aShape.isEdge())
+assert(aShape.edge().ellipse() is None)
+assert(aShape.edge().line() is None)
+
+anEdge = model.addEdge(Part_1_doc, [model.selection("EDGE", "[Partition_1_1_2/Modified_Face&Cone_1_1/Face_1][weak_name_2]")])
+aShape = anEdge.result().resultSubShapePair()[0].shape()
+assert(aShape.isEdge())
+assert(aShape.edge().circle() is None)
 
 model.end()

@@ -48,6 +48,7 @@ def checkRectangleWire(theDocument, theEdgeNames):
     aWire = model.addWire(theDocument, aSelection)
     aShape = aWire.result().resultSubShapePair()[0].shape()
     assert(aShape.isWire())
+    assert(aShape.wire().isClosed())
     assertRectangle(aShape.wire())
     theDocument.removeFeature(aWire.feature())
 
