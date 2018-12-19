@@ -107,12 +107,12 @@ std::shared_ptr<GeomAPI_Pnt> GeomAPI_Ax3::to3D(double theX, double theY) const
 std::shared_ptr<GeomAPI_Pnt2d> GeomAPI_Ax3::to2D(double theX, double theY, double theZ) const
 {
   gp_Pnt anOriginPnt = MY_AX3->Axis().Location();
-  gp_Vec aVec(anOriginPnt, gp_Pnt(0, 0, 0));
+  gp_Vec aVec(anOriginPnt, gp_Pnt(theX, theY, theZ));
 
   gp_Dir aXDir = MY_AX3->XDirection();
   gp_Dir aYDir = MY_AX3->YDirection();
 
   double aX = aVec.X() * aXDir.X() + aVec.Y() * aXDir.Y() + aVec.Z() * aXDir.Z();
-  double aY = aVec.X() * aYDir.X() + aVec.Y() * aYDir.Y() + aVec.Z() * aYDir.Y();
+  double aY = aVec.X() * aYDir.X() + aVec.Y() * aYDir.Y() + aVec.Z() * aYDir.Z();
   return std::shared_ptr<GeomAPI_Pnt2d>(new GeomAPI_Pnt2d(aX, aY));
 }
