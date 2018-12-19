@@ -250,6 +250,7 @@ bool GeomAPI_Edge::isEqual(const std::shared_ptr<GeomAPI_Shape> theEdge) const
   return true;
 }
 
+// LCOV_EXCL_START
 void GeomAPI_Edge::getRange(double& theFirst, double& theLast) const
 {
   const TopoDS_Shape& aShape = const_cast<GeomAPI_Edge*>(this)->impl<TopoDS_Shape>();
@@ -294,6 +295,7 @@ bool GeomAPI_Edge::isInPlane(std::shared_ptr<GeomAPI_Pln> thePlane) const
   }
   return inPlane;
 }
+// LCOV_EXCL_STOP
 
 void GeomAPI_Edge::intersectWithPlane(const std::shared_ptr<GeomAPI_Pln> thePlane,
                                       std::list<std::shared_ptr<GeomAPI_Pnt>>& theResult) const
