@@ -63,6 +63,12 @@ def verifyTangentCircles(theCircle1, theCircle2):
     aRDiff = math.fabs(aRadius1 - aRadius2)
     assert math.fabs(aRSum - aDistCC) < TOLERANCE or math.fabs(aRDiff - aDistCC) < TOLERANCE, "Circles do not tangent"
 
+def verifyTangentCircleLine(theCircle, theLine):
+    aCenter = geomDataAPI_Point2D(theCircle.attribute("circle_center"))
+    aRadius = theCircle.real("circle_radius").value()
+    aDistCL = model.distancePointLine(aCenter, theLine)
+    assert math.fabs(aDistCL - aRadius) < TOLERANCE, "Circle and line are not tangent"
+
 
 #=========================================================================
 # Start of test
@@ -222,6 +228,35 @@ model.testNbSubFeatures(aSketch, "SketchConstraintCoincidence", 3)
 model.testNbSubFeatures(aSketch, "SketchConstraintTangent", 1)
 
 #=========================================================================
+# Test 5. Create a circle as a macro-feature by center and passed point on line
+#=========================================================================
+# create new circle
+aSession.startOperation()
+aCircle = aSketchFeature.addFeature("SketchMacroCircle")
+aCenter = geomDataAPI_Point2D(aCircle.attribute("center_point"))
+aCenterRef = aCircle.refattr("center_point_ref")
+aPassed = geomDataAPI_Point2D(aCircle.attribute("passed_point"))
+aPassedRef = aCircle.refattr("passed_point_ref")
+aCircleType = aCircle.string("circle_type")
+# initialize attributes
+aCircleType.setValue("circle_type_by_center_and_passed_points")
+anExpectedCenter = [(aLineStart[0] + aLineEnd[0]) * 0.5 + 10., (aLineStart[1] + aLineEnd[1]) * 0.5]
+aCenter.setValue(anExpectedCenter[0], anExpectedCenter[1])
+aPassedRef.setObject(aLine.lastResult())
+aPassed.setValue(aLineStart[0], aLineStart[1])
+aSession.finishOperation()
+assert (aSketchFeature.numberOfSubs() == 12)
+# check connected features do not change their positions
+model.assertLine(aLine, aLineStart, aLineEnd)
+# verify newly created circle
+aCircle = model.lastSubFeature(aSketchFeature, "SketchCircle")
+aCenter = geomDataAPI_Point2D(aCircle.attribute("circle_center"))
+model.assertPoint(aCenter, anExpectedCenter)
+verifyTangentCircleLine(aCircle, aLine)
+model.testNbSubFeatures(aSketch, "SketchConstraintCoincidence", 3)
+model.testNbSubFeatures(aSketch, "SketchConstraintTangent", 2)
+
+#=========================================================================
 # Test 5. Create a circle as a macro-feature by center and passed point placed on the same line
 #         Check the circle is not created
 #=========================================================================
@@ -244,7 +279,7 @@ assert aLastFeature.getKind() == "SketchMacroCircle", "ERROR: SketchMacroCircle 
 aSession.startOperation()
 aDocument.removeFeature(aCircle)
 aSession.finishOperation()
-assert (aSketchFeature.numberOfSubs() == 10)
+assert (aSketchFeature.numberOfSubs() == 12)
 
 #=========================================================================
 # End of test

@@ -211,29 +211,28 @@ private:
     VectorOfGccLine aTgLine;
     convertTangentCurvesToGccEnt(aTgCirc, aTgLine);
 
-    if (aTgCirc.size() + aTgLine.size() != 3)
-      return Circ2dPtr();
-
     std::shared_ptr<GccAna_Circ2d3Tan> aCircleBuilder;
-    switch (aTgLine.size()) {
-    case 0:
-      aCircleBuilder = std::shared_ptr<GccAna_Circ2d3Tan>(new GccAna_Circ2d3Tan(
-          *aTgCirc[0], *aTgCirc[1], *aTgCirc[2], Precision::Confusion()));
-      break;
-    case 1:
-      aCircleBuilder = std::shared_ptr<GccAna_Circ2d3Tan>(new GccAna_Circ2d3Tan(
-          *aTgCirc[0], *aTgCirc[1], *aTgLine[0], Precision::Confusion()));
-      break;
-    case 2:
-      aCircleBuilder = std::shared_ptr<GccAna_Circ2d3Tan>(new GccAna_Circ2d3Tan(
-          *aTgCirc[0], *aTgLine[0], *aTgLine[1], Precision::Confusion()));
-      break;
-    case 3:
-      aCircleBuilder = std::shared_ptr<GccAna_Circ2d3Tan>(new GccAna_Circ2d3Tan(
-          *aTgLine[0], *aTgLine[1], *aTgLine[0], Precision::Confusion()));
-      break;
-    default:
-      break;
+    if (aTgCirc.size() + aTgLine.size() == 3) {
+      switch (aTgLine.size()) {
+      case 0:
+        aCircleBuilder = std::shared_ptr<GccAna_Circ2d3Tan>(new GccAna_Circ2d3Tan(
+            *aTgCirc[0], *aTgCirc[1], *aTgCirc[2], Precision::Confusion()));
+        break;
+      case 1:
+        aCircleBuilder = std::shared_ptr<GccAna_Circ2d3Tan>(new GccAna_Circ2d3Tan(
+            *aTgCirc[0], *aTgCirc[1], *aTgLine[0], Precision::Confusion()));
+        break;
+      case 2:
+        aCircleBuilder = std::shared_ptr<GccAna_Circ2d3Tan>(new GccAna_Circ2d3Tan(
+            *aTgCirc[0], *aTgLine[0], *aTgLine[1], Precision::Confusion()));
+        break;
+      case 3:
+        aCircleBuilder = std::shared_ptr<GccAna_Circ2d3Tan>(new GccAna_Circ2d3Tan(
+            *aTgLine[0], *aTgLine[1], *aTgLine[2], Precision::Confusion()));
+        break;
+      default:
+        break;
+      }
     }
 
     return getProperCircle(aCircleBuilder);
@@ -242,35 +241,28 @@ private:
   Circ2dPtr circleByPointAndTwoTangentCurves()
   {
     const gp_Pnt2d& aPoint = myPassingPoints[0];
-    CurveAdaptorPtr aCurve1 = myTangentShapes[0];
-    CurveAdaptorPtr aCurve2 = myTangentShapes[1];
-    if (!aCurve1 || !aCurve2)
-      return Circ2dPtr();
+
+    VectorOfGccCirc aTgCirc;
+    VectorOfGccLine aTgLine;
+    convertTangentCurvesToGccEnt(aTgCirc, aTgLine);
 
     std::shared_ptr<GccAna_Circ2d3Tan> aCircleBuilder;
-    if (aCurve1->GetType() == GeomAbs_Line) {
-      if (aCurve2->GetType() == GeomAbs_Line) {
-        aCircleBuilder = std::shared_ptr<GccAna_Circ2d3Tan>(
-            new GccAna_Circ2d3Tan(GccEnt::Unqualified(aCurve1->Line()),
-                                  GccEnt::Unqualified(aCurve2->Line()),
-                                  aPoint, Precision::Confusion()));
-      } else if (aCurve2->GetType() == GeomAbs_Circle) {
-        aCircleBuilder = std::shared_ptr<GccAna_Circ2d3Tan>(
-            new GccAna_Circ2d3Tan(GccEnt::Unqualified(aCurve2->Circle()),
-                                  GccEnt::Unqualified(aCurve1->Line()),
-                                  aPoint, Precision::Confusion()));
-      }
-    } else if (aCurve1->GetType() == GeomAbs_Circle) {
-      if (aCurve2->GetType() == GeomAbs_Line) {
-        aCircleBuilder = std::shared_ptr<GccAna_Circ2d3Tan>(
-            new GccAna_Circ2d3Tan(GccEnt::Unqualified(aCurve1->Circle()),
-                                  GccEnt::Unqualified(aCurve2->Line()),
-                                  aPoint, Precision::Confusion()));
-      } else if (aCurve2->GetType() == GeomAbs_Circle) {
-        aCircleBuilder = std::shared_ptr<GccAna_Circ2d3Tan>(
-            new GccAna_Circ2d3Tan(GccEnt::Unqualified(aCurve2->Circle()),
-                                  GccEnt::Unqualified(aCurve1->Circle()),
-                                  aPoint, Precision::Confusion()));
+    if (aTgCirc.size() + aTgLine.size() == 2) {
+      switch (aTgLine.size()) {
+      case 0:
+        aCircleBuilder = std::shared_ptr<GccAna_Circ2d3Tan>(new GccAna_Circ2d3Tan(
+            *aTgCirc[0], *aTgCirc[1], aPoint, Precision::Confusion()));
+        break;
+      case 1:
+        aCircleBuilder = std::shared_ptr<GccAna_Circ2d3Tan>(new GccAna_Circ2d3Tan(
+            *aTgCirc[0], *aTgLine[0], aPoint, Precision::Confusion()));
+        break;
+      case 2:
+        aCircleBuilder = std::shared_ptr<GccAna_Circ2d3Tan>(new GccAna_Circ2d3Tan(
+            *aTgLine[0], *aTgLine[1], aPoint, Precision::Confusion()));
+        break;
+      default:
+        break;
       }
     }
 
@@ -282,16 +274,17 @@ private:
     const gp_Pnt2d& aPoint1 = myPassingPoints[0];
     const gp_Pnt2d& aPoint2 = myPassingPoints[1];
     CurveAdaptorPtr aCurve = myTangentShapes[0];
-    if (!aCurve)
-      return Circ2dPtr();
 
     std::shared_ptr<GccAna_Circ2d3Tan> aCircleBuilder;
-    if (aCurve->GetType() == GeomAbs_Line) {
-      aCircleBuilder = std::shared_ptr<GccAna_Circ2d3Tan>(new GccAna_Circ2d3Tan(
-        GccEnt::Unqualified(aCurve->Line()), aPoint1, aPoint2, Precision::Confusion()));
-    } else if (aCurve->GetType() == GeomAbs_Circle) {
-      aCircleBuilder = std::shared_ptr<GccAna_Circ2d3Tan>(new GccAna_Circ2d3Tan(
-          GccEnt::Unqualified(aCurve->Circle()), aPoint1, aPoint2, Precision::Confusion()));
+    if (aCurve) {
+      if (aCurve->GetType() == GeomAbs_Line) {
+        aCircleBuilder = std::shared_ptr<GccAna_Circ2d3Tan>(new GccAna_Circ2d3Tan(
+            GccEnt::Unqualified(aCurve->Line()), aPoint1, aPoint2, Precision::Confusion()));
+      }
+      else if (aCurve->GetType() == GeomAbs_Circle) {
+        aCircleBuilder = std::shared_ptr<GccAna_Circ2d3Tan>(new GccAna_Circ2d3Tan(
+            GccEnt::Unqualified(aCurve->Circle()), aPoint1, aPoint2, Precision::Confusion()));
+      }
     }
 
     return getProperCircle(aCircleBuilder);
@@ -356,25 +349,24 @@ private:
     VectorOfGccLine aTgLine;
     convertTangentCurvesToGccEnt(aTgCirc, aTgLine);
 
-    if (aTgCirc.size() + aTgLine.size() != 2)
-      return Circ2dPtr();
-
     std::shared_ptr<GccAna_Circ2d2TanRad> aCircleBuilder;
-    switch (aTgLine.size()) {
-    case 0:
-      aCircleBuilder = std::shared_ptr<GccAna_Circ2d2TanRad>(new GccAna_Circ2d2TanRad(
-          *aTgCirc[0], *aTgCirc[1], myRadius, Precision::Confusion()));
-      break;
-    case 1:
-      aCircleBuilder = std::shared_ptr<GccAna_Circ2d2TanRad>(new GccAna_Circ2d2TanRad(
-          *aTgCirc[0], *aTgLine[0], myRadius, Precision::Confusion()));
-      break;
-    case 2:
-      aCircleBuilder = std::shared_ptr<GccAna_Circ2d2TanRad>(new GccAna_Circ2d2TanRad(
-          *aTgLine[0], *aTgLine[1], myRadius, Precision::Confusion()));
-      break;
-    default:
-      break;
+    if (aTgCirc.size() + aTgLine.size() == 2) {
+      switch (aTgLine.size()) {
+      case 0:
+        aCircleBuilder = std::shared_ptr<GccAna_Circ2d2TanRad>(new GccAna_Circ2d2TanRad(
+            *aTgCirc[0], *aTgCirc[1], myRadius, Precision::Confusion()));
+        break;
+      case 1:
+        aCircleBuilder = std::shared_ptr<GccAna_Circ2d2TanRad>(new GccAna_Circ2d2TanRad(
+            *aTgCirc[0], *aTgLine[0], myRadius, Precision::Confusion()));
+        break;
+      case 2:
+        aCircleBuilder = std::shared_ptr<GccAna_Circ2d2TanRad>(new GccAna_Circ2d2TanRad(
+            *aTgLine[0], *aTgLine[1], myRadius, Precision::Confusion()));
+        break;
+      default:
+        break;
+      }
     }
 
     return getProperCircle(aCircleBuilder);

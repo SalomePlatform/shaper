@@ -258,7 +258,9 @@ aCirclePnt3.setValue(aLineEnd[0], aLineEnd[1])
 aSession.finishOperation()
 aLastFeature = aSketchFeature.subFeature(aSketchFeature.numberOfSubs() - 1)
 assert aLastFeature.getKind() == "SketchMacroCircle", "ERROR: SketchMacroCircle has NOT expected to be valid"
+aSession.startOperation()
 aDocument.removeFeature(aCircle)
+aSession.finishOperation()
 assert (aSketchFeature.numberOfSubs() == 12)
 
 #=========================================================================
@@ -285,12 +287,211 @@ aCirclePnt3.setValue(aLineEnd[0], aLineEnd[1])
 aSession.finishOperation()
 aLastFeature = aSketchFeature.subFeature(aSketchFeature.numberOfSubs() - 1)
 assert aLastFeature.getKind() == "SketchMacroCircle", "ERROR: SketchMacroCircle has NOT expected to be valid"
+aSession.startOperation()
 aDocument.removeFeature(aCircle)
+aSession.finishOperation()
 assert (aSketchFeature.numberOfSubs() == 12)
+
+
+#=========================================================================
+# Auxiliary objects for the following tests
+#=========================================================================
+from salome.shaper import model
+
+model.begin()
+Sketch_1 = model.addSketch(aDocument, model.defaultPlane("XOY"))
+SketchLine_1 = Sketch_1.addLine(20, -10, 20, 10)
+SketchLine_2 = Sketch_1.addLine(20, 10, 40, 10)
+SketchLine_3 = Sketch_1.addLine(40, 10, 40, -10)
+SketchCircle_1 = Sketch_1.addCircle(-10, 0, 20)
+SketchCircle_2 = Sketch_1.addCircle(30, 25, 5)
+SketchCircle_3 = Sketch_1.addCircle(50, 0, 10)
+model.do()
+model.end()
+aSketchFeature = featureToCompositeFeature(Sketch_1.feature())
+
+#=========================================================================
+# Test 6. Create a circle passing through a point and tangent to 2 lines
+#=========================================================================
+# create new circle
+aSession.startOperation()
+aCircle = aSketchFeature.addFeature("SketchMacroCircle")
+aCirclePnt1 = geomDataAPI_Point2D(aCircle.attribute("first_point"))
+aCirclePnt2 = geomDataAPI_Point2D(aCircle.attribute("second_point"))
+aCirclePnt3 = geomDataAPI_Point2D(aCircle.attribute("third_point"))
+aCirclePnt1Ref = aCircle.refattr("first_point_ref")
+aCirclePnt2Ref = aCircle.refattr("second_point_ref")
+aCirclePnt3Ref = aCircle.refattr("third_point_ref")
+aCircleType = aCircle.string("circle_type")
+# initialize attributes
+aCircleType.setValue("circle_type_by_three_points")
+aCirclePnt1.setValue(0, 0)
+aCirclePnt2Ref.setObject(SketchLine_1.feature().lastResult())
+aCirclePnt2.setValue(SketchLine_1.startPoint().x(), SketchLine_1.startPoint().y())
+aCirclePnt3Ref.setObject(SketchLine_2.feature().lastResult())
+aCirclePnt3.setValue(SketchLine_2.startPoint().x(), SketchLine_2.startPoint().y())
+aSession.finishOperation()
+assert (aSketchFeature.numberOfSubs() == 9)
+# check newly created circle tangent to objects
+aCircle = model.lastSubFeature(aSketchFeature, "SketchCircle")
+verifyTangentCircleLine(aCircle, SketchLine_1.feature())
+verifyTangentCircleLine(aCircle, SketchLine_2.feature())
+model.testNbSubFeatures(Sketch_1, "SketchConstraintCoincidence", 0)
+model.testNbSubFeatures(Sketch_1, "SketchConstraintTangent", 2)
+
+#=========================================================================
+# Test 7. Create a circle passing through a point and tangent to 2 circles
+#=========================================================================
+# create new circle
+aSession.startOperation()
+aCircle = aSketchFeature.addFeature("SketchMacroCircle")
+aCirclePnt1 = geomDataAPI_Point2D(aCircle.attribute("first_point"))
+aCirclePnt2 = geomDataAPI_Point2D(aCircle.attribute("second_point"))
+aCirclePnt3 = geomDataAPI_Point2D(aCircle.attribute("third_point"))
+aCirclePnt1Ref = aCircle.refattr("first_point_ref")
+aCirclePnt2Ref = aCircle.refattr("second_point_ref")
+aCirclePnt3Ref = aCircle.refattr("third_point_ref")
+aCircleType = aCircle.string("circle_type")
+# initialize attributes
+aCircleType.setValue("circle_type_by_three_points")
+aCirclePnt1.setValue(0, 0)
+aCirclePnt2Ref.setObject(SketchCircle_3.feature().lastResult())
+aCirclePnt2.setValue(40, 0)
+aCirclePnt3Ref.setObject(SketchCircle_2.feature().lastResult())
+aCirclePnt3.setValue(30, 20)
+aSession.finishOperation()
+assert (aSketchFeature.numberOfSubs() == 12)
+# check newly created circle tangent to objects
+aCircle = model.lastSubFeature(aSketchFeature, "SketchCircle")
+verifyTangentCircles(aCircle, SketchCircle_3.feature())
+verifyTangentCircles(aCircle, SketchCircle_2.feature())
+model.testNbSubFeatures(Sketch_1, "SketchConstraintCoincidence", 0)
+model.testNbSubFeatures(Sketch_1, "SketchConstraintTangent", 4)
+
+#=========================================================================
+# Test 8. Create a circle passing through a point and tangent to line and circle
+#=========================================================================
+# create new circle
+aSession.startOperation()
+aCircle = aSketchFeature.addFeature("SketchMacroCircle")
+aCirclePnt1 = geomDataAPI_Point2D(aCircle.attribute("first_point"))
+aCirclePnt2 = geomDataAPI_Point2D(aCircle.attribute("second_point"))
+aCirclePnt3 = geomDataAPI_Point2D(aCircle.attribute("third_point"))
+aCirclePnt1Ref = aCircle.refattr("first_point_ref")
+aCirclePnt2Ref = aCircle.refattr("second_point_ref")
+aCirclePnt3Ref = aCircle.refattr("third_point_ref")
+aCircleType = aCircle.string("circle_type")
+# initialize attributes
+aCircleType.setValue("circle_type_by_three_points")
+aCirclePnt1.setValue(0, 0)
+aCirclePnt2Ref.setObject(SketchLine_3.feature().lastResult())
+aCirclePnt2.setValue(30, 0)
+aCirclePnt3Ref.setObject(SketchCircle_2.feature().lastResult())
+aCirclePnt3.setValue(30, 20)
+aSession.finishOperation()
+assert (aSketchFeature.numberOfSubs() == 15)
+# check newly created circle tangent to objects
+aCircle = model.lastSubFeature(aSketchFeature, "SketchCircle")
+verifyTangentCircles(aCircle, SketchCircle_2.feature())
+verifyTangentCircleLine(aCircle, SketchLine_3.feature())
+model.testNbSubFeatures(Sketch_1, "SketchConstraintCoincidence", 0)
+model.testNbSubFeatures(Sketch_1, "SketchConstraintTangent", 6)
+
+#=========================================================================
+# Test 9. Create a circle tangent to 3 lines
+#=========================================================================
+# create new circle
+aSession.startOperation()
+aCircle = aSketchFeature.addFeature("SketchMacroCircle")
+aCirclePnt1 = geomDataAPI_Point2D(aCircle.attribute("first_point"))
+aCirclePnt2 = geomDataAPI_Point2D(aCircle.attribute("second_point"))
+aCirclePnt3 = geomDataAPI_Point2D(aCircle.attribute("third_point"))
+aCirclePnt1Ref = aCircle.refattr("first_point_ref")
+aCirclePnt2Ref = aCircle.refattr("second_point_ref")
+aCirclePnt3Ref = aCircle.refattr("third_point_ref")
+aCircleType = aCircle.string("circle_type")
+# initialize attributes
+aCircleType.setValue("circle_type_by_three_points")
+aCirclePnt1Ref.setObject(SketchLine_1.feature().lastResult())
+aCirclePnt1.setValue(20, 0)
+aCirclePnt2Ref.setObject(SketchLine_2.feature().lastResult())
+aCirclePnt2.setValue(30, 10)
+aCirclePnt3Ref.setObject(SketchLine_3.feature().lastResult())
+aCirclePnt3.setValue(40, 0)
+aSession.finishOperation()
+assert (aSketchFeature.numberOfSubs() == 19)
+# check newly created circle tangent to objects
+aCircle = model.lastSubFeature(aSketchFeature, "SketchCircle")
+verifyTangentCircleLine(aCircle, SketchLine_1.feature())
+verifyTangentCircleLine(aCircle, SketchLine_2.feature())
+verifyTangentCircleLine(aCircle, SketchLine_3.feature())
+model.testNbSubFeatures(Sketch_1, "SketchConstraintCoincidence", 0)
+model.testNbSubFeatures(Sketch_1, "SketchConstraintTangent", 9)
+
+#=========================================================================
+# Test 10. Create a circle tangent to a circle and 2 lines
+#=========================================================================
+# create new circle
+aSession.startOperation()
+aCircle = aSketchFeature.addFeature("SketchMacroCircle")
+aCirclePnt1 = geomDataAPI_Point2D(aCircle.attribute("first_point"))
+aCirclePnt2 = geomDataAPI_Point2D(aCircle.attribute("second_point"))
+aCirclePnt3 = geomDataAPI_Point2D(aCircle.attribute("third_point"))
+aCirclePnt1Ref = aCircle.refattr("first_point_ref")
+aCirclePnt2Ref = aCircle.refattr("second_point_ref")
+aCirclePnt3Ref = aCircle.refattr("third_point_ref")
+aCircleType = aCircle.string("circle_type")
+# initialize attributes
+aCircleType.setValue("circle_type_by_three_points")
+aCirclePnt1Ref.setObject(SketchLine_1.feature().lastResult())
+aCirclePnt1.setValue(20, 0)
+aCirclePnt2Ref.setObject(SketchLine_2.feature().lastResult())
+aCirclePnt2.setValue(30, 10)
+aCirclePnt3Ref.setObject(SketchCircle_3.feature().lastResult())
+aCirclePnt3.setValue(40, 0)
+aSession.finishOperation()
+assert (aSketchFeature.numberOfSubs() == 23)
+# check newly created circle tangent to objects
+aCircle = model.lastSubFeature(aSketchFeature, "SketchCircle")
+verifyTangentCircleLine(aCircle, SketchLine_1.feature())
+verifyTangentCircleLine(aCircle, SketchLine_2.feature())
+verifyTangentCircles(aCircle, SketchCircle_3.feature())
+model.testNbSubFeatures(Sketch_1, "SketchConstraintCoincidence", 0)
+model.testNbSubFeatures(Sketch_1, "SketchConstraintTangent", 12)
+
+#=========================================================================
+# Test 11. Create a circle tangent to 3 circles
+#=========================================================================
+# create new circle
+aSession.startOperation()
+aCircle = aSketchFeature.addFeature("SketchMacroCircle")
+aCirclePnt1 = geomDataAPI_Point2D(aCircle.attribute("first_point"))
+aCirclePnt2 = geomDataAPI_Point2D(aCircle.attribute("second_point"))
+aCirclePnt3 = geomDataAPI_Point2D(aCircle.attribute("third_point"))
+aCirclePnt1Ref = aCircle.refattr("first_point_ref")
+aCirclePnt2Ref = aCircle.refattr("second_point_ref")
+aCirclePnt3Ref = aCircle.refattr("third_point_ref")
+aCircleType = aCircle.string("circle_type")
+# initialize attributes
+aCircleType.setValue("circle_type_by_three_points")
+aCirclePnt1Ref.setObject(SketchCircle_1.feature().lastResult())
+aCirclePnt1.setValue(10, 0)
+aCirclePnt2Ref.setObject(SketchCircle_2.feature().lastResult())
+aCirclePnt2.setValue(30, 20)
+aCirclePnt3Ref.setObject(SketchCircle_3.feature().lastResult())
+aCirclePnt3.setValue(40, 0)
+aSession.finishOperation()
+assert (aSketchFeature.numberOfSubs() == 27)
+# check newly created circle tangent to objects
+aCircle = model.lastSubFeature(aSketchFeature, "SketchCircle")
+verifyTangentCircles(aCircle, SketchCircle_1.feature())
+verifyTangentCircles(aCircle, SketchCircle_2.feature())
+verifyTangentCircles(aCircle, SketchCircle_3.feature())
+model.testNbSubFeatures(Sketch_1, "SketchConstraintCoincidence", 0)
+model.testNbSubFeatures(Sketch_1, "SketchConstraintTangent", 15)
 
 #=========================================================================
 # End of test
 #=========================================================================
 
-from salome.shaper import model
 assert(model.checkPythonDump())
