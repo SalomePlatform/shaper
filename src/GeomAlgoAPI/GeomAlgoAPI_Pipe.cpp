@@ -77,26 +77,15 @@ GeomAlgoAPI_Pipe::GeomAlgoAPI_Pipe(const ListOfShape& theBaseShapes,
 void GeomAlgoAPI_Pipe::build(const GeomShapePtr theBaseShape,
                              const GeomShapePtr thePathShape)
 {
-  // Getting base shape.
-  if(!theBaseShape.get()) {
-    return;
-  }
-  TopoDS_Shape aBaseShape = theBaseShape->impl<TopoDS_Shape>();
-  if(aBaseShape.IsNull()) {
-    return;
-  }
-  TopAbs_ShapeEnum aBaseShapeType = aBaseShape.ShapeType();
-  if(aBaseShapeType != TopAbs_VERTEX && aBaseShapeType != TopAbs_EDGE &&
-     aBaseShapeType != TopAbs_WIRE && aBaseShapeType != TopAbs_FACE &&
-     aBaseShapeType != TopAbs_SHELL && aBaseShapeType != TopAbs_COMPOUND) {
+  // Getting base shape and path.
+  TopoDS_Shape aBaseShape;
+  TopAbs_ShapeEnum aBaseShapeType;
+  TopoDS_Wire aPathWire;
+  if (!getBase(aBaseShape, aBaseShapeType, theBaseShape) ||
+      !getPath(aPathWire, thePathShape)) {
     return;
   }
 
-  // Getting path.
-  TopoDS_Wire aPathWire;
-  if(!getPath(aPathWire, thePathShape)) {
-    return;
-  }
   aPathWire.Move(getPathToBaseTranslation(aBaseShape, aPathWire));
 
   // Making pipe.
@@ -131,25 +120,19 @@ void GeomAlgoAPI_Pipe::build(const GeomShapePtr theBaseShape,
                              const GeomShapePtr thePathShape,
                              const GeomShapePtr theBiNormal)
 {
-  // Getting base shape.
+  // Getting base shape and path.
   TopoDS_Shape aBaseShape;
   TopAbs_ShapeEnum aBaseShapeType;
-  if(!getBase(aBaseShape, aBaseShapeType, theBaseShape)) {
-    return;
-  }
-
-  // Getting path.
   TopoDS_Wire aPathWire;
-  if(!getPath(aPathWire, thePathShape)) {
+  if (!getBase(aBaseShape, aBaseShapeType, theBaseShape) ||
+      !getPath(aPathWire, thePathShape) ||
+      !theBiNormal.get()) {
     return;
   }
 
   aPathWire.Move(getPathToBaseTranslation(theBaseShape->impl<TopoDS_Shape>(), aPathWire));
 
   // Getting Bi-Normal.
-  if(!theBiNormal.get()) {
-    return;
-  }
   TopoDS_Shape aBiNormalShape = theBiNormal->impl<TopoDS_Shape>();
   if(aBiNormalShape.IsNull() || aBiNormalShape.ShapeType() != TopAbs_EDGE) {
     return;
@@ -177,10 +160,8 @@ void GeomAlgoAPI_Pipe::build(const GeomShapePtr theBaseShape,
   this->initialize(aPipeBuilder);
 
   // Checking result.
-  if(aBaseShapeType == TopAbs_FACE) {
-    if(aPipeBuilder->MakeSolid() == Standard_False) {
-      return;
-    }
+  if(aBaseShapeType == TopAbs_FACE && !aPipeBuilder->MakeSolid()) {
+    return;
   }
   TopoDS_Shape aResult = aPipeBuilder->Shape();
   if(aResult.IsNull()) {
@@ -209,15 +190,12 @@ void GeomAlgoAPI_Pipe::build(const ListOfShape& theBaseShapes,
     return;
   }
 
-  // Getting path.
+  // Getting base shape and path.
   TopoDS_Shape aBaseShape;
   TopAbs_ShapeEnum aBaseShapeType;
-  if (!getBase(aBaseShape, aBaseShapeType, theBaseShapes.front())) {
-    return;
-  }
-
   TopoDS_Wire aPathWire;
-  if(!getPath(aPathWire, thePathShape)) {
+  if (!getBase(aBaseShape, aBaseShapeType, theBaseShapes.front()) ||
+      !getPath(aPathWire, thePathShape)) {
     return;
   }
 
@@ -312,10 +290,8 @@ void GeomAlgoAPI_Pipe::build(const ListOfShape& theBaseShapes,
   this->initialize(aPipeBuilder);
 
   // Checking result.
-  if(anIsSolidNeeded) {
-    if(aPipeBuilder->MakeSolid() == Standard_False) {
-      return;
-    }
+  if(anIsSolidNeeded && !aPipeBuilder->MakeSolid()) {
+    return;
   }
   TopoDS_Shape aResult = aPipeBuilder->Shape();
 
