@@ -77,15 +77,26 @@ GeomAlgoAPI_Pipe::GeomAlgoAPI_Pipe(const ListOfShape& theBaseShapes,
 void GeomAlgoAPI_Pipe::build(const GeomShapePtr theBaseShape,
                              const GeomShapePtr thePathShape)
 {
-  // Getting base shape and path.
-  TopoDS_Shape aBaseShape;
-  TopAbs_ShapeEnum aBaseShapeType;
-  TopoDS_Wire aPathWire;
-  if (!getBase(aBaseShape, aBaseShapeType, theBaseShape) ||
-      !getPath(aPathWire, thePathShape)) {
+  // Getting base shape.
+  if(!theBaseShape.get()) {
+    return;
+  }
+  TopoDS_Shape aBaseShape = theBaseShape->impl<TopoDS_Shape>();
+  if(aBaseShape.IsNull()) {
+    return;
+  }
+  TopAbs_ShapeEnum aBaseShapeType = aBaseShape.ShapeType();
+  if(aBaseShapeType != TopAbs_VERTEX && aBaseShapeType != TopAbs_EDGE &&
+     aBaseShapeType != TopAbs_WIRE && aBaseShapeType != TopAbs_FACE &&
+     aBaseShapeType != TopAbs_SHELL && aBaseShapeType != TopAbs_COMPOUND) {
     return;
   }
 
+  // Getting path.
+  TopoDS_Wire aPathWire;
+  if(!getPath(aPathWire, thePathShape)) {
+    return;
+  }
   aPathWire.Move(getPathToBaseTranslation(aBaseShape, aPathWire));
 
   // Making pipe.
