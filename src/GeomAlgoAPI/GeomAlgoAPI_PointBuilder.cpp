@@ -148,13 +148,10 @@ std::shared_ptr<GeomAPI_Vertex> GeomAlgoAPI_PointBuilder::vertexByProjection(
 
   GeomAPI_ProjectPointOnCurve aProjection(aPnt, aCurve);
 
-  if (aProjection.NbPoints() == 0) {
-    return aVertex;
+  if (aProjection.NbPoints() != 0) {
+    gp_Pnt aNearestPoint = aProjection.NearestPoint();
+    aVertex.reset(new GeomAPI_Vertex(aNearestPoint.X(), aNearestPoint.Y(), aNearestPoint.Z()));
   }
-
-  gp_Pnt aNearestPoint = aProjection.NearestPoint();
-
-  aVertex.reset(new GeomAPI_Vertex(aNearestPoint.X(), aNearestPoint.Y(), aNearestPoint.Z()));
 
   return aVertex;
 }
@@ -166,20 +163,15 @@ std::shared_ptr<GeomAPI_Vertex> GeomAlgoAPI_PointBuilder::vertexByProjection(
 {
   std::shared_ptr<GeomAPI_Vertex> aVertex;
 
-  if(!theVertex.get() || !theFace.get() || !theFace->isPlanar()) {
-    return aVertex;
+  if (theVertex.get() && theFace.get() && theFace->isPlanar()) {
+    std::shared_ptr<GeomAPI_Pnt> aProjPnt = theVertex->point();
+    std::shared_ptr<GeomAPI_Pln> aProjPln = theFace->getPlane();
+
+    std::shared_ptr<GeomAPI_Pnt> aPnt = aProjPln->project(aProjPnt);
+
+    if (aPnt.get())
+      aVertex.reset(new GeomAPI_Vertex(aPnt->x(), aPnt->y(), aPnt->z()));
   }
-
-  std::shared_ptr<GeomAPI_Pnt> aProjPnt = theVertex->point();
-  std::shared_ptr<GeomAPI_Pln> aProjPln = theFace->getPlane();
-
-  std::shared_ptr<GeomAPI_Pnt> aPnt = aProjPln->project(aProjPnt);
-
-  if(!aPnt.get()) {
-    return aVertex;
-  }
-
-  aVertex.reset(new GeomAPI_Vertex(aPnt->x(), aPnt->y(), aPnt->z()));
 
   return aVertex;
 }
@@ -191,45 +183,15 @@ std::shared_ptr<GeomAPI_Vertex> GeomAlgoAPI_PointBuilder::vertexByIntersection(
 {
   std::shared_ptr<GeomAPI_Vertex> aVertex;
 
-  if(!theEdge1.get() || !theEdge2.get() || !theEdge1->isLine() || !theEdge2->isLine()) {
-    return aVertex;
+  if (theEdge1.get() && theEdge2.get() && theEdge1->isLine() && theEdge2->isLine()) {
+    std::shared_ptr<GeomAPI_Lin> aLin1 = theEdge1->line();
+    std::shared_ptr<GeomAPI_Lin> aLin2 = theEdge2->line();
+
+    std::shared_ptr<GeomAPI_Pnt> aPnt = aLin1->intersect(aLin2);
+
+    if (aPnt.get())
+      aVertex.reset(new GeomAPI_Vertex(aPnt->x(), aPnt->y(), aPnt->z()));
   }
-
-  std::shared_ptr<GeomAPI_Lin> aLin1 = theEdge1->line();
-  std::shared_ptr<GeomAPI_Lin> aLin2 = theEdge2->line();
-
-  std::shared_ptr<GeomAPI_Pnt> aPnt = aLin1->intersect(aLin2);
-
-  if(!aPnt.get()) {
-    return aVertex;
-  }
-
-  aVertex.reset(new GeomAPI_Vertex(aPnt->x(), aPnt->y(), aPnt->z()));
-
-  return aVertex;
-}
-
-//==================================================================================================
-std::shared_ptr<GeomAPI_Vertex> GeomAlgoAPI_PointBuilder::vertexByIntersection(
-    const std::shared_ptr<GeomAPI_Edge> theEdge,
-    const std::shared_ptr<GeomAPI_Face> theFace)
-{
-  std::shared_ptr<GeomAPI_Vertex> aVertex;
-
-  if(!theEdge.get() || !theFace.get() || !theEdge->isLine() || !theFace->isPlanar()) {
-    return aVertex;
-  }
-
-  std::shared_ptr<GeomAPI_Lin> aLin = theEdge->line();
-  std::shared_ptr<GeomAPI_Pln> aPln = theFace->getPlane();
-
-  std::shared_ptr<GeomAPI_Pnt> aPnt = aPln->intersect(aLin);
-
-  if(!aPnt.get()) {
-    return aVertex;
-  }
-
-  aVertex.reset(new GeomAPI_Vertex(aPnt->x(), aPnt->y(), aPnt->z()));
 
   return aVertex;
 }
