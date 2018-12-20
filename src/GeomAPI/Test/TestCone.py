@@ -289,5 +289,19 @@ anEdge = model.addEdge(Part_1_doc, [model.selection("EDGE", "[Partition_1_1_2/Mo
 aShape = anEdge.result().resultSubShapePair()[0].shape()
 assert(aShape.isEdge())
 assert(aShape.edge().circle() is None)
+assert(aShape.isSelfIntersected() == False)
+
+# Test 10. Test cone constructors
+apex = GeomAPI_Pnt(10, 0, 0)
+dir = GeomAPI_Dir(1, 0, 0)
+semiAngle = math.pi / 4
+cone = GeomAPI_Cone(apex, dir, semiAngle)
+assert(cone.location().distance(apex) < TOLERANCE)
+
+radius = 5
+cone = GeomAPI_Cone(apex, dir, semiAngle, radius)
+assert(cone.location().distance(apex) < TOLERANCE)
+
+
 
 model.end()
