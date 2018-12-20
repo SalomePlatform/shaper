@@ -25,7 +25,6 @@ from GeomAlgoAPI import GeomAlgoAPI_CurveBuilder as curveBuilder
 from GeomAlgoAPI import GeomAlgoAPI_EdgeBuilder as edgeBuilder
 from GeomAlgoAPI import GeomAlgoAPI_FaceBuilder as faceBuilder
 from GeomAlgoAPI import GeomAlgoAPI_ShapeTools as tools
-from GeomAlgoAPI import GeomAlgoAPI_MakeVolume as makeVolume
 from GeomAPI import GeomAPI_Ax3 as ax3
 from GeomAPI import GeomAPI_Dir as dir
 from GeomAPI import GeomAPI_Pnt as pnt

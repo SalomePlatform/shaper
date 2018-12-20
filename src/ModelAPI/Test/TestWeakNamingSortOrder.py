@@ -42,7 +42,6 @@ model.testNbSubShapes(Translation_1, GeomAPI_Shape.SOLID, [0])
 model.testNbSubShapes(Translation_1, GeomAPI_Shape.FACE, [0])
 model.testNbSubShapes(Translation_1, GeomAPI_Shape.EDGE, [1])
 model.testNbSubShapes(Translation_1, GeomAPI_Shape.VERTEX, [2])
-model.testResultsVolumes(Translation_1, [0])
 
 
 Part_2 = model.addPart(partSet)
