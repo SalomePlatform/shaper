@@ -142,8 +142,8 @@ void GeomAlgoAPI_ConeSegment::build()
   BRepPrimAPI_MakeRevol* aRevolBuilder =
     new BRepPrimAPI_MakeRevol(aFaceBuilder.Face(), aZAxis, myDeltaPhi * M_PI/180., Standard_True);
   if(!aRevolBuilder) {
-    return;
     myError = "Cone Segment builder :: section revolution did not succeed";
+    return;
   }
   if(!aRevolBuilder->IsDone()) {
     myError = "Cone Segment builder :: section revolution did not succeed";
