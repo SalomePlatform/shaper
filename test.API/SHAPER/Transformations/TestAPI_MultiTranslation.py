@@ -58,18 +58,27 @@ MultiTranslation_5 = shaperpy.makeMultiTranslation(Box_5, ax1, 10., 5, ax2, 10.,
 MultiTranslation_6 = shaperpy.makeMultiTranslation(Box_6, ax1, 15., 5, ax2, -10., 5)
 
 # Tests en erreur
-#try:
-#    MultiTranslation_4 = shaperpy.makeMultiTranslation(Box_4, None, 15., 2)
-#except myExcept,ec:
-#    assert(ec.what() == "Multitranslation builder :: the first axis is not valid.")
+try:
+    MultiTranslation_4 = shaperpy.makeMultiTranslation(Box_4, None, 15., 2)
+except myExcept as ec:
+    assert(ec.what() == "Multitranslation builder :: the first axis is not valid")
 
 # Pas d'exception levee alors qu'une devrait y en avoir une
 try:
     MultiTranslation_7 = shaperpy.makeMultiTranslation(Box_7, ax1, 15., 5, ax2, 10., -2)
 except myExcept as ec:
     assert(ec.what() == "Multitranslation builder :: the number of copies for the second direction is null or negative.")
+try:
+    MultiTranslation_8 = shaperpy.makeMultiTranslation(Box_7, ax1, 15., -2, ax2, 10., 5)
+except myExcept as ec:
+    assert(ec.what() == "Multitranslation builder :: the number of copies for the first direction is null or negative.")
 
-#try:
-#    MultiTranslation_8 = shaperpy.makeMultiTranslation(Box_8, ax1, 15., 5, None, 10., 5)
-#except myExcept,ec:
-#    assert(ec.what() == "Multitranslation builder :: the second axis is not valid.")
+try:
+    MultiTranslation_9 = shaperpy.makeMultiTranslation(Box_8, None, 15., 5, ax2, 10., 5)
+except myExcept as ec:
+    assert(ec.what() == "Multitranslation builder :: the first axis is not valid")
+
+try:
+    MultiTranslation_10 = shaperpy.makeMultiTranslation(Box_8, ax1, 15., 5, None, 10., 5)
+except myExcept as ec:
+    assert(ec.what() == "Multitranslation builder :: the second axis is not valid")
