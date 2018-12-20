@@ -24,6 +24,7 @@ from GeomAPI import GeomAPI_Pnt as pnt
 from GeomAPI import GeomAPI_Dir as direction
 from GeomAPI import GeomAPI_Ax1 as axis
 from GeomAPI import GeomAPI_Ax2 as plane
+from GeomAPI import GeomAPI_Shape as shape
 
 # Create boxes
 Box_1 = shaperpy.makeBox(10., 10., 10.)
@@ -63,10 +64,30 @@ Symmetry_1 = shaperpy.makeSymmetry(Box_1, origin)
 Symmetry_2 = shaperpy.makeSymmetry(Box_2, pnt1)
 
 try :
-    Symmetry_6 = shaperpy.makeSymmetry(Box_2, None)
+    Symmetry_3 = shaperpy.makeSymmetry(Box_3, None)
 except myExcept as ec :
     assert(ec.what() == "Symmetry builder :: point is not valid.")
 
-Symmetry_7 = shaperpy.makeSymmetry(Box_7, axZ)
-Symmetry_8 = shaperpy.makeSymmetry(Box_8, ax1)
-Symmetry_13 = shaperpy.makeSymmetry(Box_13, planeXOY)
+Symmetry_4 = shaperpy.makeSymmetry(Box_4, axZ)
+Symmetry_5 = shaperpy.makeSymmetry(Box_5, ax1)
+Symmetry_6 = shaperpy.makeSymmetry(Box_6, planeXOY)
+
+try :
+    Symmetry_7 = shaperpy.makeSymmetry(None, pnt1)
+except myExcept as ec :
+    assert(ec.what() == "Symmetry builder :: source shape is not valid.")
+
+try :
+    Symmetry_8 = shaperpy.makeSymmetry(None, axZ)
+except myExcept as ec :
+    assert(ec.what() == "Symmetry builder :: source shape is not valid.")
+
+try :
+    Symmetry_9 = shaperpy.makeSymmetry(None, planeXOY)
+except myExcept as ec :
+    assert(ec.what() == "Symmetry builder :: source shape is not valid.")
+
+try :
+    Symmetry_10 = shaperpy.makeSymmetry(shape(), pnt1)
+except myExcept as ec :
+    assert(ec.what() == "Symmetry builder :: source shape does not contain any actual shape.")

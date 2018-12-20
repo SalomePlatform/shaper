@@ -20,7 +20,7 @@
 
 from GeomAlgoAPI import GeomAlgoAPI_ShapeAPI as shaperpy
 from GeomAlgoAPI import GeomAlgoAPI_Exception as myExcept
-from GeomAPI import GeomAPI_Pnt as pnt
+from GeomAPI import GeomAPI_Pnt as pnt, GeomAPI_Shape as shape
 
 # Create Boxes
 Box_1 = shaperpy.makeBox(10.,10.,10.)
@@ -78,3 +78,18 @@ try :
     Scale_18 = shaperpy.makeScale(Box_12, None, 2., 3., 1.)
 except myExcept as ec :
     assert(ec.what() == "Scale builder :: center point is not valid.")
+
+try :
+    Scale_19 = shaperpy.makeScale(None, pntOrigin, 2., 3., 1.)
+except myExcept as ec :
+    assert(ec.what() == "Scale builder :: source shape is not valid.")
+
+try :
+    Scale_20 = shaperpy.makeScale(shape(), pntOrigin, 2.)
+except myExcept as ec :
+    assert(ec.what() == "Scale builder :: source shape does not contain any actual shape.")
+
+try :
+    Scale_21 = shaperpy.makeScale(shape(), pntOrigin, 2., 3., 1.)
+except myExcept as ec :
+    assert(ec.what() == "Scale builder :: source shape does not contain any actual shape.")

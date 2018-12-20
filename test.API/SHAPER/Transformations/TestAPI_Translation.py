@@ -23,6 +23,7 @@ from GeomAlgoAPI import GeomAlgoAPI_Exception as myExcept
 from GeomAPI import GeomAPI_Ax1 as axis
 from GeomAPI import GeomAPI_Pnt as pnt
 from GeomAPI import GeomAPI_Dir as direction
+from GeomAPI import GeomAPI_Shape as shape
 
 # Points
 pntOrigin = pnt(0.,0.,0.)
@@ -72,49 +73,69 @@ try:
 except myExcept as ec:
     assert(ec.what() == "Translation builder :: axis is not valid.")
 
-Translation_9 = shaperpy.makeTranslation(Box_5, ax4, 15.)
+Translation_5 = shaperpy.makeTranslation(Box_5, ax4, 15.)
 
 MultiTranslation_1 = shaperpy.makeMultiTranslation(Box_6, ax1, 15., 3, ax2, 15., 3)
-Translation_10 = shaperpy.makeTranslation(MultiTranslation_1, ax3, 15.)
+Translation_6 = shaperpy.makeTranslation(MultiTranslation_1, ax3, 15.)
 
 MultiTranslation_2 = shaperpy.makeMultiTranslation(Box_7, ax1, 15., 3, ax2, 15., 3)
-Translation_11 = shaperpy.makeTranslation(MultiTranslation_2, ax3, 0.)
+Translation_7 = shaperpy.makeTranslation(MultiTranslation_2, ax3, 0.)
 
 MultiTranslation_3 = shaperpy.makeMultiTranslation(Box_8, ax1, 15., 3, ax2, 15., 3)
-Translation_12 = shaperpy.makeTranslation(MultiTranslation_3, ax3, -15.)
+Translation_8 = shaperpy.makeTranslation(MultiTranslation_3, ax3, -15.)
 
 MultiTranslation_4 = shaperpy.makeMultiTranslation(Box_9, ax1, 15., 3, ax2, 15., 3)
 try:
-    Translation_13 = shaperpy.makeTranslation(MultiTranslation_4, None, 15.)
+    Translation_9 = shaperpy.makeTranslation(MultiTranslation_4, None, 15.)
 except myExcept as ec:
     assert(ec.what() == "Translation builder :: axis is not valid.")
 
 MultiTranslation_5 = shaperpy.makeMultiTranslation(Box_10, ax1, 15., 3, ax2, 15., 3)
-Translation_18 = shaperpy.makeTranslation(MultiTranslation_5, ax4, 15.)
+Translation_10 = shaperpy.makeTranslation(MultiTranslation_5, ax4, 15.)
 
 # Translations "By dimensions in X, in Y and in Z"
-Translation_91 = shaperpy.makeTranslation(Box_11, 10., 20., 15.)
-Translation_92 = shaperpy.makeTranslation(Box_11, 0., 20., 15.)
-Translation_93 = shaperpy.makeTranslation(Box_11, 10., 0., 15.)
-Translation_94 = shaperpy.makeTranslation(Box_11, 10., 20., 0.)
-Translation_95 = shaperpy.makeTranslation(Box_11, -10., 20., 15.)
-Translation_96 = shaperpy.makeTranslation(Box_11, 10., -20., 15.)
-Translation_97 = shaperpy.makeTranslation(Box_11, 10., 20., -15.)
+Translation_11 = shaperpy.makeTranslation(Box_11, 10., 20., 15.)
+Translation_12 = shaperpy.makeTranslation(Box_11, 0., 20., 15.)
+Translation_13 = shaperpy.makeTranslation(Box_11, 10., 0., 15.)
+Translation_14 = shaperpy.makeTranslation(Box_11, 10., 20., 0.)
+Translation_15 = shaperpy.makeTranslation(Box_11, -10., 20., 15.)
+Translation_16 = shaperpy.makeTranslation(Box_11, 10., -20., 15.)
+Translation_17 = shaperpy.makeTranslation(Box_11, 10., 20., -15.)
 
 # Translations "By two points"
-Translation_99 = shaperpy.makeTranslation(Box_11, pnt1, pnt2)
+Translation_18 = shaperpy.makeTranslation(Box_11, pnt1, pnt2)
 
 try:
-    Translation_100 = shaperpy.makeTranslation(Box_11, pnt1, pnt1)
+    Translation_19 = shaperpy.makeTranslation(Box_11, pnt1, pnt1)
 except myExcept as ec:
     assert(ec.what() == "Translation builder :: start point and end point coincide.")
 
 try:
-    Translation_101 = shaperpy.makeTranslation(Box_11, None, pnt1)
+    Translation_20 = shaperpy.makeTranslation(Box_11, None, pnt1)
 except myExcept as ec:
     assert(ec.what() == "Translation builder :: start point is not valid.")
 
 try:
-    Translation_102 = shaperpy.makeTranslation(Box_11, pnt1, None)
+    Translation_21 = shaperpy.makeTranslation(Box_11, pnt1, None)
 except myExcept as ec:
     assert(ec.what() == "Translation builder :: end point is not valid.")
+
+try:
+    Translation_22 = shaperpy.makeTranslation(None, ax1, 15.)
+except myExcept as ec:
+    assert(ec.what() == "Translation builder :: source shape is not valid.")
+
+try:
+    Translation_23 = shaperpy.makeTranslation(None, 10., 20., 15.)
+except myExcept as ec:
+    assert(ec.what() == "Translation builder :: source shape is not valid.")
+
+try:
+    Translation_24 = shaperpy.makeTranslation(None, pnt1, pnt2)
+except myExcept as ec:
+    assert(ec.what() == "Translation builder :: source shape is invalid.")
+
+try:
+    Translation_25 = shaperpy.makeTranslation(shape(), ax1, 15.)
+except myExcept as ec:
+    assert(ec.what() == "Translation builder :: source shape does not contain any actual shape.")

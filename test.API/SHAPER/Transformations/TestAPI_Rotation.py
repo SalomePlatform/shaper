@@ -21,6 +21,7 @@
 from GeomAlgoAPI import GeomAlgoAPI_ShapeAPI as shaperpy
 from GeomAlgoAPI import GeomAlgoAPI_Exception as myExcept
 from GeomAPI import GeomAPI_Ax1 as axis, GeomAPI_Pnt as pnt, GeomAPI_Dir as direction
+from GeomAPI import GeomAPI_Shape as shape
 
 # Create Boxes
 Box_1 = shaperpy.makeBox(10.,10.,10.)
@@ -113,3 +114,8 @@ try:
     Rotation_17 = shaperpy.makeRotation(None, pntOrigin, pnt3, pnt2)
 except myExcept as ec:
     assert(ec.what() == "Rotation builder :: source shape is not valid.")
+
+try:
+    Rotation_18 = shaperpy.makeRotation(shape(), ax1, 450)
+except myExcept as ec:
+    assert(ec.what() == "Rotation builder :: source shape does not contain any actual shape.")
