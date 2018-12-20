@@ -226,6 +226,7 @@ ADD_UNIT_TESTS(TestConstants.py
                TestWeakNaming2445.py
                TestWeakNaming2446.py
                TestWeakNaming2452.py
+               TestWeakNamingSortOrder.py
                Test2685.py
                TestGeomNamingPlacement.py
                TestGeomNamingRevolution.py

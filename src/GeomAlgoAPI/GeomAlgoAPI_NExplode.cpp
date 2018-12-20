@@ -124,10 +124,12 @@ bool CompareShapes::operator() (const TopoDS_Shape& theShape1,
           if ((val1 - val2) >= tol) {
             exchange = Standard_True;
           }
+          else // compare adresses if shapes are geometrically equal
+            exchange = theShape1.TShape().get() > theShape2.TShape().get();
         }
       }
     } else // compare adresses if shapes are geometrically equal
-      return theShape1.TShape().get() > theShape2.TShape().get();
+      exchange = theShape1.TShape().get() > theShape2.TShape().get();
   }
 
   //return val1 < val2;
