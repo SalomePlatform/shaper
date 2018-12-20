@@ -127,17 +127,6 @@ static void sortCompound(TopoDS_Shape& theCompound, GEOMAlgo_Splitter* theOperat
 }
 
 //=================================================================================================
-std::shared_ptr<GeomAPI_Shape> GeomAlgoAPI_Partition::make(const ListOfShape& theObjects,
-                                                           const ListOfShape& theTools)
-{
-  GeomAlgoAPI_Partition aPartitionAlgo(theObjects, theTools);
-  if(aPartitionAlgo.isDone() && !aPartitionAlgo.shape()->isNull() && aPartitionAlgo.isValid()) {
-    return aPartitionAlgo.shape();
-  }
-  return std::shared_ptr<GeomAPI_Shape>();
-}
-
-//=================================================================================================
 GeomAlgoAPI_Partition::GeomAlgoAPI_Partition(const ListOfShape& theObjects,
                                              const ListOfShape& theTools)
 {
