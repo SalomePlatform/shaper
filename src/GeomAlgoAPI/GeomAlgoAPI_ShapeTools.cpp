@@ -614,23 +614,26 @@ void GeomAlgoAPI_ShapeTools::findBounds(const std::shared_ptr<GeomAPI_Shape> the
                                         std::shared_ptr<GeomAPI_Vertex>& theV1,
                                         std::shared_ptr<GeomAPI_Vertex>& theV2)
 {
-  if(!theShape.get()) {
-    std::shared_ptr<GeomAPI_Vertex> aVertex(new GeomAPI_Vertex);
+  static GeomVertexPtr aVertex;
+  if (!aVertex) {
+    aVertex = GeomVertexPtr(new GeomAPI_Vertex);
     aVertex->setImpl(new TopoDS_Vertex());
-    theV1 = aVertex;
-    theV2 = aVertex;
-    return;
   }
 
-  const TopoDS_Shape& aShape = theShape->impl<TopoDS_Shape>();
-  TopoDS_Vertex aV1, aV2;
-  ShapeAnalysis::FindBounds(aShape, aV1, aV2);
+  theV1 = aVertex;
+  theV2 = aVertex;
 
-  std::shared_ptr<GeomAPI_Vertex> aGeomV1(new GeomAPI_Vertex()), aGeomV2(new GeomAPI_Vertex());
-  aGeomV1->setImpl(new TopoDS_Vertex(aV1));
-  aGeomV2->setImpl(new TopoDS_Vertex(aV2));
-  theV1 = aGeomV1;
-  theV2 = aGeomV2;
+  if (theShape) {
+    const TopoDS_Shape& aShape = theShape->impl<TopoDS_Shape>();
+    TopoDS_Vertex aV1, aV2;
+    ShapeAnalysis::FindBounds(aShape, aV1, aV2);
+
+    std::shared_ptr<GeomAPI_Vertex> aGeomV1(new GeomAPI_Vertex()), aGeomV2(new GeomAPI_Vertex());
+    aGeomV1->setImpl(new TopoDS_Vertex(aV1));
+    aGeomV2->setImpl(new TopoDS_Vertex(aV2));
+    theV1 = aGeomV1;
+    theV2 = aGeomV2;
+  }
 }
 
 //==================================================================================================

@@ -61,7 +61,9 @@
 // all supported interfaces
 %include "GeomAlgoAPI_MakeShape.h"
 %include "GeomAlgoAPI_Boolean.h"
+%include "GeomAlgoAPI_Circ2dBuilder.h"
 %include "GeomAlgoAPI_CompoundBuilder.h"
+%include "GeomAlgoAPI_CurveBuilder.h"
 %include "GeomAlgoAPI_DFLoader.h"
 %include "GeomAlgoAPI_EdgeBuilder.h"
 %include "GeomAlgoAPI_FaceBuilder.h"

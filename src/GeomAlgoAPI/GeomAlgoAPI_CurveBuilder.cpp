@@ -35,7 +35,7 @@
 #include <Precision.hxx>
 
 
-static void reorder(Handle(TColgp_HArray1OfPnt) thePoints);
+static void reorder(Handle(TColgp_HArray1OfPnt)& thePoints);
 
 //=================================================================================================
 GeomEdgePtr GeomAlgoAPI_CurveBuilder::edge(const std::list<GeomPointPtr>& thePoints,
@@ -52,15 +52,15 @@ GeomEdgePtr GeomAlgoAPI_CurveBuilder::edge(const std::list<GeomPointPtr>& thePoi
     aPoints->SetValue(i, aPoint->impl<gp_Pnt>());
   }
 
-  // Reorder points if required
-  if (theIsToReorder) {
-    reorder(aPoints);
-  }
-
   // If the curve to be closed - remove last point if it is too close to the first one
   bool isClose = aPoints->First().Distance(aPoints->Last()) <= gp::Resolution();
   if (isClose && theIsClosed) {
     aPoints->Resize(aPoints->Lower(), aPoints->Upper() - 1, Standard_True);
+  }
+
+  // Reorder points if required
+  if (theIsToReorder) {
+    reorder(aPoints);
   }
 
   // Initialize interpolator
@@ -94,7 +94,7 @@ GeomEdgePtr GeomAlgoAPI_CurveBuilder::edge(const std::list<GeomPointPtr>& thePoi
 }
 
 //================   Auxiliary functions   ========================================================
-void reorder(Handle(TColgp_HArray1OfPnt) thePoints)
+void reorder(Handle(TColgp_HArray1OfPnt)& thePoints)
 {
   if (thePoints->Length() < 3) {
     return;
@@ -103,7 +103,7 @@ void reorder(Handle(TColgp_HArray1OfPnt) thePoints)
   int aNbPoints = thePoints->Length();
   int aNbDup = 0;
   gp_Pnt aPrevPnt = thePoints->Value(1);
-  for (int i = 1; i < aNbPoints - 1; i++) {
+  for (int i = 1; i < aNbPoints; i++) {
     gp_Pnt aPnt = thePoints->Value(i);
     int aNearest = 0;
     double aMinDist = RealLast();
@@ -118,7 +118,7 @@ void reorder(Handle(TColgp_HArray1OfPnt) thePoints)
       // Keep given order of points to use it in case of equidistant candidates
       //               .-<---<-.
       //              /         \
-                      // o  o  o  c  o->o->o->o->n  o  o
+      // o  o  o  c  o->o->o->o->n  o  o
       //          |  |           |
       //          i i+1       nearest
       gp_Pnt aNearestPnt = thePoints->Value(aNearest);

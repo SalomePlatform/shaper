@@ -162,6 +162,7 @@ INSTALL(FILES ${SWIG_SCRIPTS} DESTINATION ${SHAPER_INSTALL_SWIG})
 ADD_UNIT_TESTS(
   TestAx123.py
   TestBox.py
+  TestBuilders.py
   TestCone.py
   TestCylinder.py
   TestEllipse2d.py
