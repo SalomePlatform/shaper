@@ -35,7 +35,7 @@ class Selector_FilterByNeighbors: public Selector_AlgoWithSubs
 {
   TopAbs_ShapeEnum myShapeType; ///< type of this shape
   std::list<int> myNBLevel; ///< list of integers corresponding to subs neighborhood level
-  TDF_Label myContext; ///< label where the context of filter is stored (needed for python name string)
+  TDF_Label myContext; ///< label where the context of filter is stored (for naming name strings)
 public:
   /// Initializes the selection of this kind
   SELECTOR_EXPORT bool select(
