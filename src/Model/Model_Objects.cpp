@@ -29,6 +29,7 @@
 #include <Model_ResultGroup.h>
 #include <Model_ResultField.h>
 #include <Model_ResultParameter.h>
+#include <Model_AttributeRefList.h>
 #include <ModelAPI_Validator.h>
 #include <ModelAPI_CompositeFeature.h>
 #include <ModelAPI_Tools.h>
@@ -995,6 +996,12 @@ void Model_Objects::synchronizeBackRefsForObject(const std::set<AttributePtr>& t
   // iterate new list to compare with current
   std::set<AttributePtr>::iterator aNewIter = theNewRefs.begin();
   for(; aNewIter != theNewRefs.end(); aNewIter++) {
+    // for the Model_AttributeRefList erase cash (issue #2819)
+    std::shared_ptr<Model_AttributeRefList> aRefList =
+      std::dynamic_pointer_cast<Model_AttributeRefList>(*aNewIter);
+    if (aRefList)
+      aRefList->eraseHash();
+
     if (aData->refsToMe().find(*aNewIter) == aData->refsToMe().end()) {
       FeaturePtr aRefFeat = std::dynamic_pointer_cast<ModelAPI_Feature>((*aNewIter)->owner());
       if (aRefFeat)

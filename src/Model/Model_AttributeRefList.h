@@ -86,7 +86,11 @@ public:
 
   /// Returns true if attribute was  initialized by some value
   MODEL_EXPORT virtual bool isInitialized();
- protected:
+
+  /// Erases the hashed objects caused by complicated modifications in the list
+  void eraseHash();
+
+protected:
   /// Objects are created for features automatically
   MODEL_EXPORT Model_AttributeRefList(TDF_Label& theLabel);
   /// Reinitializes the internal state of the attribute (may be needed on undo/redo, abort, etc)
@@ -97,8 +101,6 @@ public:
     std::shared_ptr<Model_Document> theDoc) const;
   /// Creates the hash-objects containers (does nothing if hash is already correct)
   void createHash();
-  /// Erases the hashed objects caused by complicated modifications in the list
-  void eraseHash();
 
   friend class Model_Data;
 };
