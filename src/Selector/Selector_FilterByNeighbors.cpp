@@ -312,8 +312,8 @@ TDF_Label Selector_FilterByNeighbors::restoreByName(std::string theName,
       } else {
         aContext = aSubContext;
       }
-      if (!aContext.IsNull()) // for filters by neighbor the latest context shape is vital
-        aContext = theNameGenerator->newestContext(aContext);
+      //if (!aContext.IsNull()) // for filters by neighbor the latest context shape is vital
+      //  aContext = theNameGenerator->newestContext(aContext);
 
       // searching for the level index
       std::string aLevel;
@@ -398,7 +398,7 @@ std::string Selector_FilterByNeighbors::name(Selector_NameGenerator* theNameGene
     }
     // sub-name already contains the needed context name, so, here it is not needed
     if (aThisContextNameNeeded && (
-         aSubName.find(aContextName) == 0 || aSubName.substr(1).find(aContextName)) == 0)
+         aSubName.find(aContextName) == 0 || aSubName.substr(1).find(aContextName) == 0))
       aThisContextNameNeeded = false;
   }
   if (aThisContextNameNeeded) {
