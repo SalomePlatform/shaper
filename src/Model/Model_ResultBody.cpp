@@ -272,8 +272,8 @@ void Model_ResultBody::updateSubs(const std::shared_ptr<GeomAPI_Shape>& theThisS
         aSub = mySubs[aSubIndex];
       }
       GeomShapePtr anOldSubShape = aSub->shape();
-      aSub->store(aShape, false); // store even equal to call "clear": #2814
       if (!aShape->isEqual(anOldSubShape)) {
+        aSub->store(aShape, false);
         aECreator->sendUpdated(aSub, EVENT_DISP);
         aECreator->sendUpdated(aSub, EVENT_UPD);
       }
@@ -294,6 +294,7 @@ void Model_ResultBody::updateSubs(const std::shared_ptr<GeomAPI_Shape>& theThisS
       // redisplay this because result with and without subs are displayed differently
       aECreator->sendUpdated(data()->owner(), EVENT_DISP);
     }
+    cleanCash();
   } else if (!mySubs.empty()) { // erase all subs
     while(!mySubs.empty()) {
       ResultBodyPtr anErased = *(mySubs.rbegin());
@@ -326,4 +327,15 @@ bool Model_ResultBody::isConnectedTopology()
     return aDataLab.IsAttribute(kIsConnectedTopology);
   }
   return false; // invalid case
+}
+
+void Model_ResultBody::cleanCash()
+{
+  myBuilder->cleanCash();
+  for (std::vector<ResultBodyPtr>::const_iterator aSubIter = mySubs.cbegin();
+    aSubIter != mySubs.cend(); ++aSubIter)
+  {
+    const ResultBodyPtr& aSub = *aSubIter;
+    aSub->cleanCash();
+  }
 }

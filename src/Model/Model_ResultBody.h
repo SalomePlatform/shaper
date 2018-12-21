@@ -98,6 +98,9 @@ public:
   /// Returns true is the topology is connected.
   MODEL_EXPORT virtual bool isConnectedTopology();
 
+  /// Cleans cash related to the already stored elements
+  MODEL_EXPORT virtual void cleanCash() override;
+
 protected:
   /// Makes a body on the given feature
   Model_ResultBody();

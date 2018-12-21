@@ -108,6 +108,8 @@ public:
   /// Removes the stored builders
   MODEL_EXPORT virtual ~Model_BodyBuilder();
 
+  /// Cleans cash related to the already stored elements
+  MODEL_EXPORT virtual void cleanCash() override;
 protected:
   /// Default constructor accessible only by Model_Objects
   Model_BodyBuilder(ModelAPI_Object* theOwner);

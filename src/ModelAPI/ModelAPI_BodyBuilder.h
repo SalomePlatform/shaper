@@ -98,6 +98,9 @@ public:
   virtual void loadFirstLevel(GeomShapePtr theShape,
                               const std::string& theName) = 0;
 
+  /// Cleans cash related to the already stored elements
+  MODELAPI_EXPORT virtual void cleanCash() = 0;
+
 protected:
   /// Returns the data manager of this object: attributes
   MODELAPI_EXPORT virtual std::shared_ptr<ModelAPI_Data> data() const;

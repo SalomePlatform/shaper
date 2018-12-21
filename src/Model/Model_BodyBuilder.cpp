@@ -267,6 +267,11 @@ void Model_BodyBuilder::clean()
   }
 }
 
+void Model_BodyBuilder::cleanCash()
+{
+  myPrimitivesNamesIndexMap.clear();
+}
+
 Model_BodyBuilder::~Model_BodyBuilder()
 {
   clean();

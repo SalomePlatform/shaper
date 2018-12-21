@@ -365,7 +365,10 @@ bool Model_Document::save(
   Handle(Model_Application) anApp = Model_Application::getApplication();
   if (isRoot()) {
 #ifdef WIN32
-    CreateDirectory((LPTSTR) theDirName, NULL);
+    size_t aDirLen = strlen(theDirName);
+    std::wstring aWStr(aDirLen, L'#');
+    mbstowcs(&aWStr[0], theDirName, aDirLen);
+    CreateDirectory(aWStr.c_str(), NULL);
 #else
     mkdir(theDirName, 0x1ff);
 #endif

@@ -165,6 +165,9 @@ public:
   MODELAPI_EXPORT virtual void updateSubs(const GeomShapePtr& theThisShape,
     const bool theShapeChanged = true) = 0;
 
+  /// Cleans cash related to the already stored elements
+  MODELAPI_EXPORT virtual void cleanCash() = 0;
+
 protected:
   /// Default constructor accessible only from Model_Objects
   MODELAPI_EXPORT ModelAPI_ResultBody();

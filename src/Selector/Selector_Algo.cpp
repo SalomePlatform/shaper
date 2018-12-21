@@ -67,6 +67,24 @@ Selector_Algo::Selector_Algo()
   myAlwaysGeometricalNaming = false;
 }
 
+static TDF_Label findGoodLabelWithShape(const TDF_Label theAccess, const TopoDS_Shape& theShape) {
+  TDF_Label aResult;
+  if (TNaming_Tool::HasLabel(theAccess, theShape)) { // selection and delete evolution are not used
+    for(TNaming_SameShapeIterator aShapes(theShape, theAccess); aShapes.More(); aShapes.Next())
+    {
+      Handle(TNaming_NamedShape) aNS;
+      if (aShapes.Label().FindAttribute(TNaming_NamedShape::GetID(), aNS)) {
+        if (aNS->Evolution() == TNaming_MODIFY || aNS->Evolution() == TNaming_GENERATED ||
+            aNS->Evolution() == TNaming_PRIMITIVE) {
+          aResult = aNS->Label();
+          break;
+        }
+      }
+    }
+  }
+  return aResult;
+}
+
 #define SET_ALGO_FLAGS(algo) \
   algo->myLab = theAccess; \
   algo->myBaseDocumentLab = theBaseDocument; \
@@ -86,37 +104,9 @@ Selector_Algo* Selector_Algo::select(const TopoDS_Shape theContext, const TopoDS
 
   // check the value shape can be named as it is, or it is needed to construct it from the
   // higher level shapes (like a box vertex by faces that form this vertex)
-  bool aIsFound = TNaming_Tool::HasLabel(theAccess, theValue);
-  if (aIsFound) { // additional check for selection and delete evolution only: also could not use
-    aIsFound = false;
-    for(TNaming_SameShapeIterator aShapes(theValue, theAccess); aShapes.More(); aShapes.Next())
-    {
-      Handle(TNaming_NamedShape) aNS;
-      if (aShapes.Label().FindAttribute(TNaming_NamedShape::GetID(), aNS)) {
-        if (aNS->Evolution() == TNaming_MODIFY || aNS->Evolution() == TNaming_GENERATED ||
-          aNS->Evolution() == TNaming_PRIMITIVE) {
-          aIsFound = true;
-          break;
-        }
-      }
-    }
-  }
-  // searching in the base document
-  if (!aIsFound && !theBaseDocument.IsNull() && TNaming_Tool::HasLabel(theBaseDocument, theValue))
-  {
-    TNaming_SameShapeIterator aShapes(theValue, theBaseDocument);
-    for(; aShapes.More(); aShapes.Next())
-    {
-      Handle(TNaming_NamedShape) aNS;
-      if (aShapes.Label().FindAttribute(TNaming_NamedShape::GetID(), aNS)) {
-        if (aNS->Evolution() == TNaming_MODIFY || aNS->Evolution() == TNaming_GENERATED ||
-          aNS->Evolution() == TNaming_PRIMITIVE) {
-          aIsFound = true;
-          break;
-        }
-      }
-    }
-  }
+  bool aIsFound = !findGoodLabelWithShape(theAccess, theValue).IsNull();
+  if (!aIsFound && !theBaseDocument.IsNull()) // searching in the base document
+    aIsFound = !findGoodLabelWithShape(theBaseDocument, theValue).IsNull();
   if (!aIsFound) {
     TopAbs_ShapeEnum aSelectionType = theValue.ShapeType();
     if (aSelectionType == TopAbs_COMPOUND || aSelectionType == TopAbs_COMPSOLID ||
@@ -144,7 +134,11 @@ Selector_Algo* Selector_Algo::select(const TopoDS_Shape theContext, const TopoDS
     // searching by neighbors
     Selector_FilterByNeighbors* aNBs = new Selector_FilterByNeighbors;
     SET_ALGO_FLAGS(aNBs);
-    if (aNBs->select(theContext, theValue)) {
+    // searching a context lab to store in NB algorithm
+    TDF_Label aContextLab = findGoodLabelWithShape(theAccess, theContext);
+    if (aContextLab.IsNull() && !theBaseDocument.IsNull()) // search also in the base document
+      aContextLab = findGoodLabelWithShape(theBaseDocument, theContext);
+    if (aNBs->select(aContextLab, theContext, theValue)) {
       delete anIntersect;
       return aNBs;
     }
@@ -213,7 +207,11 @@ Selector_Algo* Selector_Algo::select(const TopoDS_Shape theContext, const TopoDS
     // searching by neighbors
     Selector_FilterByNeighbors* aNBs = new Selector_FilterByNeighbors;
     SET_ALGO_FLAGS(aNBs);
-    if (aNBs->select(theContext, theValue)) {
+    // searching a context lab to store in NB algorithm
+    TDF_Label aContextLab = findGoodLabelWithShape(theAccess, theContext);
+    if (aContextLab.IsNull() && !theBaseDocument.IsNull()) // search also in the base document
+      aContextLab = findGoodLabelWithShape(theBaseDocument, theContext);
+    if (aNBs->select(aContextLab, theContext, theValue)) {
       delete aModify;
       return aNBs;
     }
@@ -472,9 +470,12 @@ bool Selector_Algo::findNewVersion(const TopoDS_Shape& theContext, TopoDS_Shape&
         if (aNextModification.IsNull())
           continue;
         if (isInContext(theContext, aNextModification))
-          aResultShapes.Add(aNextModification);
+          // don't add vertices generated from edges
+          if (aNextModification.ShapeType() <= theResult.ShapeType())
+            aResultShapes.Add(aNextModification);
         else if (findNewVersion(theContext, aNextModification))
-          aResultShapes.Add(aNextModification);
+          if (aNextModification.ShapeType() <= theResult.ShapeType())
+            aResultShapes.Add(aNextModification);
       }
     }
     if (aResultShapes.IsEmpty())
