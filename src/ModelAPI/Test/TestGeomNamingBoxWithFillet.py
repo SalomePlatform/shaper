@@ -81,11 +81,6 @@ param_p.setValue(30);
 from ModelAPI import *
 aFactory = ModelAPI_Session.get().validators()
 assert(aFactory.validate(Fillet_1.feature()))
-model.do()
-# set the value back and check again
-param_p.setValue(5);
-aFactory = ModelAPI_Session.get().validators()
-assert(aFactory.validate(Fillet_1.feature()))
 model.end()
 
 assert(model.checkPythonDump())
