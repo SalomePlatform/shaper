@@ -133,9 +133,6 @@ public:
   MODEL_EXPORT virtual bool restoreContext(std::string theName,
     TDF_Label& theContext, TDF_Label& theValue) override;
 
-  /// Returns the label of the newest context presented by the current one
-  MODEL_EXPORT virtual TDF_Label newestContext(const TDF_Label theCurrentContext) override;
-
   /// Returns true if the first result is newer than the second one in the tree of features
   MODEL_EXPORT virtual bool isLater(const TDF_Label theResult1, const TDF_Label theResult2)
     const override;
@@ -188,8 +185,8 @@ protected:
                         std::list<ResultPtr>& theResults, TopTools_ListOfShape& theValShapes);
 
   /// Searches for the newest context, modification of the current, that contains theValue
-  ResultPtr newestContext(const ResultPtr theCurrent,
-    const std::shared_ptr<GeomAPI_Shape> theValue, const bool theAnyValue = false);
+  ResultPtr newestContext(
+    const ResultPtr theCurrent, const std::shared_ptr<GeomAPI_Shape> theValue);
 
   /// computes theShapes list - shapes that were generated/modified/deleted the theValShape
   /// during creation from new to old context

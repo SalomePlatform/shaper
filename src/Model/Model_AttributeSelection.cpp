@@ -448,7 +448,8 @@ void Model_AttributeSelection::setID(const std::string theID)
   ModelAPI_AttributeSelection::setID(theID);
   FeaturePtr aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(owner());
   if (myParent) {
-    myIsGeometricalSelection = true;//myParent->isGeometricalSelection();
+    // to be able to select as geometrical selection and then - split
+    myIsGeometricalSelection = true; // myParent->isGeometricalSelection();
   } else {
     myIsGeometricalSelection =
       ModelAPI_Session::get()->validators()->isGeometricalSelection(aFeature->getKind(), id());
@@ -591,10 +592,9 @@ bool Model_AttributeSelection::update()
 
     if (anOldShape.IsNull() || aNewShape.IsNull() || !anOldShape.IsEqual(aNewShape)) {
       // shape type should not be changed: if shape becomes compound of such shapes, then split
-      if (!myIsGeometricalSelection && myParent && !anOldShape.IsNull() && !aNewShape.IsNull() &&
+      if (myParent && !anOldShape.IsNull() && !aNewShape.IsNull() &&
           anOldShape.ShapeType() != aNewShape.ShapeType() &&
-          (aNewShape.ShapeType() == TopAbs_COMPOUND || aNewShape.ShapeType() == TopAbs_COMPSOLID))
-      {
+          aNewShape.ShapeType() == TopAbs_COMPOUND) {
         split(aContext, aNewShape, anOldShape.ShapeType());
       }
       owner()->data()->sendAttributeUpdated(this);  // send updated if shape is changed
@@ -1516,18 +1516,6 @@ bool Model_AttributeSelection::restoreContext(std::string theName,
   return true;
 }
 
-TDF_Label Model_AttributeSelection::newestContext(const TDF_Label theCurrentContext) {
-  std::shared_ptr<Model_Document> aDoc = myRestoreDocument.get() ? myRestoreDocument :
-    std::dynamic_pointer_cast<Model_Document>(owner()->document());
-  ResultPtr aContext = aDoc->resultByLab(theCurrentContext);
-  if (aContext.get()) {
-    aContext = newestContext(aContext, GeomShapePtr(), true);
-    if (aContext.get())
-      return std::dynamic_pointer_cast<Model_Data>(aContext->data())->label();
-  }
-  return theCurrentContext; // nothing is changed
-}
-
 bool Model_AttributeSelection::isLater(
   const TDF_Label theResult1, const TDF_Label theResult2) const
 {
@@ -1543,7 +1531,7 @@ bool Model_AttributeSelection::isLater(
 }
 
 ResultPtr Model_AttributeSelection::newestContext(
-  const ResultPtr theCurrent, const GeomShapePtr theValue, const bool theAnyValue)
+  const ResultPtr theCurrent, const GeomShapePtr theValue)
 {
   ResultPtr aResult = theCurrent;
   GeomShapePtr aSelectedShape = theValue.get() ? theValue : theCurrent->shape();
@@ -1566,7 +1554,7 @@ ResultPtr Model_AttributeSelection::newestContext(
           TDF_Label aLab = aNS->Label();
           ResultPtr aRes = aDoc->resultByLab(aLab);
           if (aRes.get()) {
-            if (theAnyValue || aRes->shape()->isSubShape(aSelectedShape)) {
+            if (aRes->shape()->isSubShape(aSelectedShape)) {
               aResult = aRes;
               aFindNewContext = true;
               continue;
@@ -1575,47 +1563,6 @@ ResultPtr Model_AttributeSelection::newestContext(
         }
       }
     }
-    if (theAnyValue) { // only for neighbors for now
-      // try to find modification of sub-shapes: the best number of matches
-      std::map<ResultPtr, int> aMatches; // result -> number of matches of shapes to find the best
-      TDF_Label aResLab = std::dynamic_pointer_cast<Model_Data>(aResult->data())->shapeLab();
-      TDF_ChildIDIterator aModifIter(aResLab, TNaming_NamedShape::GetID());
-      for(; aModifIter.More(); aModifIter.Next()) {
-        Handle(TNaming_NamedShape) aNS = Handle(TNaming_NamedShape)::DownCast(aModifIter.Value());
-        if (aNS->Evolution() == TNaming_MODIFY || aNS->Evolution() == TNaming_GENERATED) {
-          for(TNaming_Iterator aNSIter(aNS); aNSIter.More(); aNSIter.Next()) {
-            TNaming_NewShapeIterator aNewIter(aNSIter.NewShape(), aNS->Label());
-            for(; aNewIter.More(); aNewIter.Next()) {
-              TDF_Label aLab = aNewIter.Label();
-              if (isLater(aLab, aNS->Label()) && isLater(selectionLabel(), aLab)) {
-                ResultPtr aRes = aDoc->resultByLab(aLab);
-                if (aRes.get()) {
-                  if (aMatches.find(aRes) == aMatches.end())
-                    aMatches[aRes] = 0;
-                  aMatches[aRes]++; // found result, add matches
-                }
-              }
-            }
-          }
-        }
-      }
-      // searching for the best result-candidate
-      int aBest = 0;
-      ResultPtr aBestResult;
-      std::map<ResultPtr, int>::iterator aMatchIter = aMatches.begin();
-      for(; aMatchIter != aMatches.end(); aMatchIter++) {
-        if (aMatchIter->second > aBest) {
-          aBest = aMatchIter->second;
-          aBestResult = aMatchIter->first;
-        }
-      }
-      if (aBestResult.get()) {
-        aResult = aBestResult;
-        aFindNewContext = true;
-        continue;
-      }
-    }
-
 
     // TestFillWireVertex.py - sketch constructions for wire may participate too
     //if (aResult->groupName() == ModelAPI_ResultBody::group()) {
@@ -1661,43 +1608,15 @@ ResultPtr Model_AttributeSelection::newestContext(
         }
         std::list<std::shared_ptr<ModelAPI_Result> >::iterator aResIter = aResults.begin();
 
-        if (theAnyValue) { // searching the best sub-result by maximum number of references to orig
-          int aReferencesCount = 0;
-          ResultPtr aBestResult;
-          for (; aResIter != aResults.end(); aResIter++) {
-            if (!aResIter->get() || !(*aResIter)->data()->isValid() || (*aResIter)->isDisabled())
-              continue;
-            TDF_Label aCandidateLab =
-              std::dynamic_pointer_cast<Model_Data>((*aResIter)->data())->shapeLab();
-            Handle(TDF_Reference) aRef;
-            if (aCandidateLab.FindAttribute(TDF_Reference::GetID(), aRef)) {
-              TDF_Label aRefLab = aRef->Get();
-              ResultPtr aRefRes = aDoc->resultByLab(aRefLab);
-              if (aRefRes.get() && aRefRes->shape().get() &&
-                  aRefRes->shape()->isEqual(aResult->shape())) {// it directly references to result
-                aResult = *aResIter; // found new context (produced from this) with same subshape
-                aFindNewContext = true; // continue searching further
-                break;
-              }
-            } else {
-              if (!aBestResult.get())
-                aBestResult = *aResIter;
-            }
-          }
-          if (aBestResult.get() && !aFindNewContext) { // the first good result for now
-            aResult = aBestResult; // found new context
-            aFindNewContext = true;
-          }
-        } else { // searching by sub-shape
-          for (; aResIter != aResults.end(); aResIter++) {
-            if (!aResIter->get() || !(*aResIter)->data()->isValid() || (*aResIter)->isDisabled())
-              continue;
-            GeomShapePtr aShape = (*aResIter)->shape();
-            if (aShape.get() && (theAnyValue || aShape->isSubShape(aSelectedShape, false))) {
-              aResult = *aResIter; // found new context (produced from this) with same subshape
-              aFindNewContext = true; // continue searching further
-              break;
-            }
+        // searching by sub-shape
+        for (; aResIter != aResults.end(); aResIter++) {
+          if (!aResIter->get() || !(*aResIter)->data()->isValid() || (*aResIter)->isDisabled())
+            continue;
+          GeomShapePtr aShape = (*aResIter)->shape();
+          if (aShape.get() && aShape->isSubShape(aSelectedShape, false)) {
+            aResult = *aResIter; // found new context (produced from this) with same subshape
+            aFindNewContext = true; // continue searching further
+            break;
           }
         }
       }
@@ -1712,7 +1631,7 @@ ResultPtr Model_AttributeSelection::newestContext(
     for (; aS != allSubs.end(); aS++) {
       ResultBodyPtr aSub = std::dynamic_pointer_cast<ModelAPI_ResultBody>(*aS);
       if (aSub && aSub->numberOfSubs() == 0 && aSub->shape().get() &&
-        (theAnyValue || aSub->shape()->isSubShape(aSelectedShape))) {
+          aSub->shape()->isSubShape(aSelectedShape)) {
         aResult = aSub;
         break;
       }

@@ -47,9 +47,6 @@ public:
 
   /// Returns true if the first result is older than the second one in the tree of features
   virtual bool isLater(const TDF_Label theResult1, const TDF_Label theResult2) const = 0;
-
-  /// Returns the label of the newest context presented by the current one
-  virtual TDF_Label newestContext(const TDF_Label theCurrentContext) = 0;
 };
 
 #endif
