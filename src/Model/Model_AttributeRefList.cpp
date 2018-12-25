@@ -315,9 +315,8 @@ void Model_AttributeRefList::reinit()
 
 void Model_AttributeRefList::createHash()
 {
-  if (myHashUsed) {
+  if (myHashUsed)
     return;
-  }
   eraseHash();
   std::shared_ptr<Model_Document> aDoc = std::dynamic_pointer_cast<Model_Document>(
     owner()->document());
@@ -333,8 +332,9 @@ void Model_AttributeRefList::createHash()
       }
     }
   }
+  if (!myHashObjects.empty()) // on open document with multi-rotation referenced have no results
+    myHashUsed = true;
 }
-
 
 void Model_AttributeRefList::eraseHash()
 {
