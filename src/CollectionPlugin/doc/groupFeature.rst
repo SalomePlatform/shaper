@@ -2,7 +2,7 @@
 Group
 =====
 
-A groups is a set of geometrical entities created by selection.
+A group is a set of geometrical entities created by selection of sub-shapes of the same type.
 To create a Group in the active part:
 
 #. select in the Main Menu *Features - > Group* item  or
@@ -45,7 +45,7 @@ Input fields:
  
 - The list of selected entities of the given type.  Multiple selection can be done manually in OCC 3D Viewer by mouse click with Shift button pressed or by rectangle selection. To delete entities from the list, select them and call pop-up menu *Delete* item.
 
-- Control **Add elements that share the same topology** allows to add automatically all elements laying on the same topology that was selected and remove these elements if they are disappeared due to the parametrical update. They will be represented as one line in the list of selection and managed in the viewer as one object if this flag is enabled. If flag becomes disabled when such elements are already in the list, they will become divided in one line per one shape.
+- Control **Add elements that share the same topology** allows to add automatically all elements laying on the same topology that was selected and remove these elements if they have disappeared due to the parametrical update. They will be represented as one line in the list of selection and managed in the viewer as one object if this flag is enabled. If flag becomes disabled when such elements are already in the list, they will become divided in one line per one shape.
 
 **TUI Command**: *model.addGroup(Part_1_doc, [model.selection("EDGE", "Cone_1_1/Face_1&Cone_1_1/Face_2"), model.selection("EDGE", "Cone_1_1/Face_1")])*
 
