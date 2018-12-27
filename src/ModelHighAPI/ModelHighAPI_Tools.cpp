@@ -346,6 +346,12 @@ GeomAPI_Shape::ShapeType getShapeType(const ModelHighAPI_Selection& theSelection
       aShapeType = shapeTypeByStr(aType);
       break;
     }
+    case ModelHighAPI_Selection::VT_WeakNamingPair: {
+      TypeWeakNamingPair aPair = theSelection.typeWeakNamingPair();
+      std::string aType = aPair.first;
+      aShapeType = shapeTypeByStr(aType);
+      break;
+    }
   }
 
   return aShapeType;

@@ -162,6 +162,12 @@ TypeInnerPointPair ModelHighAPI_Selection::typeInnerPointPair() const
 }
 
 //==================================================================================================
+TypeWeakNamingPair ModelHighAPI_Selection::typeWeakNamingPair() const
+{
+  return myWeakNamingPair;
+}
+
+//==================================================================================================
 std::string ModelHighAPI_Selection::shapeType() const
 {
   switch(myVariantType) {

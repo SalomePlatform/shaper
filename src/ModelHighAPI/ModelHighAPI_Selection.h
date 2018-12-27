@@ -115,6 +115,10 @@ public:
   MODELHIGHAPI_EXPORT
   virtual TypeInnerPointPair typeInnerPointPair() const;
 
+  /// \return pair of sub-shape type and pair of context name and sub-shape index.
+  MODELHIGHAPI_EXPORT
+    virtual TypeWeakNamingPair typeWeakNamingPair() const;
+
   /// \return shape type.
   MODELHIGHAPI_EXPORT
   virtual std::string shapeType() const;
