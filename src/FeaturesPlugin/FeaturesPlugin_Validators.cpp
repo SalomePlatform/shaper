@@ -1427,15 +1427,6 @@ bool FeaturesPlugin_ValidatorBooleanSmashSelection::isValid(
         theError = "Error: Selected shapes should have the same type.";
         return false;
       }
-
-      ResultBodyPtr aResCompSolidPtr = ModelAPI_Tools::bodyOwner(aContext);
-      if (aResCompSolidPtr.get()) {
-        GeomShapePtr aCompSolidShape = aResCompSolidPtr->shape();
-        if (aSelectedCompSolidsInOtherList.isBound(aCompSolidShape)) {
-          theError = "Error: Solids from compsolid in other list not allowed.";
-          return false;
-        }
-      }
     } else {
       GeomAPI_Face aFace(aShape);
       GeomPlanePtr aPln = aFace.getPlane();
