@@ -419,15 +419,18 @@ bool Model_AttributeSelection::isInitialized()
       if (selectionLabel().FindAttribute(TNaming_NamedShape::GetID(), aSelection)) {
         return !aSelection->Get().IsNull();
       } else { // for simple construction element: just shape of this construction element
-        std::shared_ptr<Model_ResultConstruction> aConstr =
-          std::dynamic_pointer_cast<Model_ResultConstruction>(context());
-        if (aConstr.get()) {
-            return true;
-        }
-        // for the whole feature, a feature object
-        FeaturePtr aFeat = contextFeature();
-        if (aFeat.get())
+        if (myRef.value().get())
           return true;
+        // check that this is on open of document, so, results are not initialized yet
+        TDF_Label aRefLab = myRef.myRef->Get();
+        if (aRefLab.IsNull() || !owner().get())
+          return false;
+        std::shared_ptr<Model_Document> aMyDoc =
+          std::dynamic_pointer_cast<Model_Document>(owner()->document());
+        if (!aMyDoc.get())
+          return false;
+        // check at least the feature exists
+        return aMyDoc->featureByLab(aRefLab).get() != NULL;
       }
     }
   }
