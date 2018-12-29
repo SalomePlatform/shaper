@@ -225,7 +225,10 @@ std::string ModelHighAPI_FeatureStore::dumpAttr(const AttributePtr& theAttr) {
   } else if (aType == ModelAPI_AttributeSelection::typeId()) {
     AttributeSelectionPtr anAttr =
       std::dynamic_pointer_cast<ModelAPI_AttributeSelection>(theAttr);
-    aResult<<anAttr->namingName();
+    if (anAttr->context().get())
+      aResult<<anAttr->namingName();
+    else
+      aResult<<"__notinitialized__";
   } else if (aType == ModelAPI_AttributeSelectionList::typeId()) {
     AttributeSelectionListPtr anAttr =
       std::dynamic_pointer_cast<ModelAPI_AttributeSelectionList>(theAttr);
