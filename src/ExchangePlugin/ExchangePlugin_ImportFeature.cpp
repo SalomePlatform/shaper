@@ -353,6 +353,7 @@ std::shared_ptr<ModelAPI_Feature> ExchangePlugin_ImportFeature::addFeature(
   return aNew;
 }
 
+// LCOV_EXCL_START
 void ExchangePlugin_ImportFeature::removeFeature(
     std::shared_ptr<ModelAPI_Feature> theFeature)
 {
@@ -361,6 +362,7 @@ void ExchangePlugin_ImportFeature::removeFeature(
   AttributeRefListPtr aList = reflist(FEATURES_ID());
   aList->remove(theFeature);
 }
+// LCOV_EXCL_STOP
 
 int ExchangePlugin_ImportFeature::numberOfSubs(bool forTree) const
 {
