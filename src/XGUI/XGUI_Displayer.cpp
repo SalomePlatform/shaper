@@ -86,6 +86,7 @@
 
 #include <Events_Loop.h>
 #include <ModelAPI_Events.h>
+#include <Config_PropManager.h>
 
 #include <set>
 
@@ -693,7 +694,13 @@ Handle(AIS_InteractiveContext) XGUI_Displayer::AISContext() const
       selectionActivate()->deactivateTrihedron(true);
     aContext->DefaultDrawer()->VIsoAspect()->SetNumber(0);
     aContext->DefaultDrawer()->UIsoAspect()->SetNumber(0);
+
     ModuleBase_IViewer::DefaultHighlightDrawer = aContext->HighlightStyle();
+    Handle(Prs3d_Drawer) aSelStyle = aContext->SelectionStyle();
+    double aDeflection = Config_PropManager::real("Visualization", "construction_deflection");
+
+    ModuleBase_IViewer::DefaultHighlightDrawer->SetDeviationCoefficient(aDeflection);
+    aSelStyle->SetDeviationCoefficient(aDeflection);
   }
   return aContext;
 }

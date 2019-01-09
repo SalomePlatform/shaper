@@ -34,6 +34,8 @@
 #include <GeomAPI_Shape.h>
 #include <ModelAPI_ResultConstruction.h>
 
+#include <Config_PropManager.h>
+
 #include <AIS_Shape.hxx>
 
 #include <QEvent>
@@ -410,6 +412,7 @@ void XGUI_ViewerProxy::displayHighlight()
 {
   Handle(AIS_InteractiveContext) aContext = AISContext();
 
+  double aDeflection;
   if (myResult->groupName() == ModelAPI_ResultConstruction::group()) {
     FeaturePtr aFeature = ModelAPI_Feature::feature(myResult);
     if (aFeature.get()) {
@@ -423,6 +426,8 @@ void XGUI_ViewerProxy::displayHighlight()
         aAis = new AIS_Shape(aTShape);
         aAis->SetColor(HIGHLIGHT_COLOR);
         aAis->SetZLayer(1); //Graphic3d_ZLayerId_Topmost
+        aDeflection = Config_PropManager::real("Visualization", "construction_deflection");
+        aAis->Attributes()->SetDeviationCoefficient(aDeflection);
         myHighlights.Append(aAis);
         aContext->Display(aAis, false);
         aContext->Deactivate(aAis);
@@ -434,6 +439,8 @@ void XGUI_ViewerProxy::displayHighlight()
     Handle(AIS_Shape) aAis = new AIS_Shape(aTShape);
     aAis->SetColor(HIGHLIGHT_COLOR);
     aAis->SetZLayer(1); //Graphic3d_ZLayerId_Topmost
+    aDeflection = Config_PropManager::real("Visualization", "body_deflection");
+    aAis->Attributes()->SetDeviationCoefficient(aDeflection);
     myHighlights.Append(aAis);
     aContext->Display(aAis, false);
     aContext->Deactivate(aAis);
