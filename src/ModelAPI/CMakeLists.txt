@@ -237,4 +237,5 @@ ADD_UNIT_TESTS(TestConstants.py
                TestSaveOpen1.py
                TestSaveOpen2.py
                TestSelectionInitialization.py
+               Test2828.py
 )

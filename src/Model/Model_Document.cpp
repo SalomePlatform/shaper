@@ -674,10 +674,10 @@ bool Model_Document::finishOperation()
   }
   myObjs->synchronizeBackRefs();
   Events_Loop* aLoop = Events_Loop::loop();
-  static const Events_ID kCreatedEvent = Events_Loop::loop()->eventByName(EVENT_OBJECT_CREATED);
-  static const Events_ID kUpdatedEvent = Events_Loop::loop()->eventByName(EVENT_OBJECT_UPDATED);
-  static const Events_ID kRedispEvent = Events_Loop::loop()->eventByName(EVENT_OBJECT_TO_REDISPLAY);
-  static const Events_ID kDeletedEvent = Events_Loop::loop()->eventByName(EVENT_OBJECT_DELETED);
+  static const Events_ID kCreatedEvent = aLoop->eventByName(EVENT_OBJECT_CREATED);
+  static const Events_ID kUpdatedEvent = aLoop->eventByName(EVENT_OBJECT_UPDATED);
+  static const Events_ID kRedispEvent = aLoop->eventByName(EVENT_OBJECT_TO_REDISPLAY);
+  static const Events_ID kDeletedEvent = aLoop->eventByName(EVENT_OBJECT_DELETED);
   aLoop->flush(kCreatedEvent);
   aLoop->flush(kUpdatedEvent);
   aLoop->flush(kRedispEvent);

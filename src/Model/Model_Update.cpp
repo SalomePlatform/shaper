@@ -77,6 +77,8 @@ Model_Update::Model_Update()
   aLoop->registerListener(this, kReorderEvent);
   static const Events_ID kUpdatedSel = aLoop->eventByName(EVENT_UPDATE_SELECTION);
   aLoop->registerListener(this, kUpdatedSel);
+  static const Events_ID kAutoRecomp = aLoop->eventByName(EVENT_AUTOMATIC_RECOMPUTATION_ENABLE);
+  aLoop->registerListener(this, kAutoRecomp);
 
   //  Config_PropManager::findProp("Model update", "automatic_rebuild")->value() == "true";
   myIsParamUpdated = false;
