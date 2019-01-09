@@ -111,7 +111,6 @@ void XGUI_SelectionMgr::onObjectBrowserSelection()
   XGUI_Displayer* aDisplayer = myWorkshop->displayer();
   if (!myWorkshop->operationMgr()->hasOperation()) {
 
-    QList<ModuleBase_ViewerPrsPtr> aTmpList = aSelectedPrs;
     ObjectPtr aObject;
     FeaturePtr aFeature;
     // Select all results of a selected feature in viewer
@@ -120,19 +119,18 @@ void XGUI_SelectionMgr::onObjectBrowserSelection()
       if (aObject.get()) {
         aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(aObject);
         if (aFeature.get()) {
-        std::list<ResultPtr> allRes;
-        ModelAPI_Tools::allResults(aFeature, allRes);
-        for(std::list<ResultPtr>::iterator aRes = allRes.begin(); aRes != allRes.end(); aRes++) {
-          aSelectedPrs.append(std::shared_ptr<ModuleBase_ViewerPrs>(
-            new ModuleBase_ViewerPrs(*aRes, GeomShapePtr(), NULL)));
+          std::list<ResultPtr> allRes;
+          ModelAPI_Tools::allResults(aFeature, allRes);
+          std::list<ResultPtr>::iterator aRes;
+          for(aRes = allRes.begin(); aRes != allRes.end(); aRes++) {
+            aSelectedPrs.append(std::shared_ptr<ModuleBase_ViewerPrs>(
+              new ModuleBase_ViewerPrs(*aRes, GeomShapePtr(), NULL)));
           }
         }
       }
     }
-    aDisplayer->setSelected(aTmpList);
-  } else {
-    aDisplayer->setSelected(aSelectedPrs);
   }
+  aDisplayer->setSelected(aSelectedPrs);
   emit selectionChanged();
 }
 
