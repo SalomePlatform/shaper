@@ -38,6 +38,7 @@
 #include <ModelAPI_Tools.h>
 #include <ModelAPI_AttributeIntArray.h>
 #include <ModelAPI_ResultBody.h>
+#include <ModelAPI_ResultConstruction.h>
 
 #include <ModuleBase_BRepOwner.h>
 #include <ModuleBase_IModule.h>
@@ -697,7 +698,10 @@ Handle(AIS_InteractiveContext) XGUI_Displayer::AISContext() const
 
     ModuleBase_IViewer::DefaultHighlightDrawer = aContext->HighlightStyle();
     Handle(Prs3d_Drawer) aSelStyle = aContext->SelectionStyle();
-    double aDeflection = Config_PropManager::real("Visualization", "construction_deflection");
+    double aDeflection = QString(ModelAPI_ResultConstruction::DEFAULT_DEFLECTION().c_str()).toDouble();
+    try {
+      aDeflection = Config_PropManager::real("Visualization", "construction_deflection");
+    } catch (...) {}
 
     ModuleBase_IViewer::DefaultHighlightDrawer->SetDeviationCoefficient(aDeflection);
     aSelStyle->SetDeviationCoefficient(aDeflection);
