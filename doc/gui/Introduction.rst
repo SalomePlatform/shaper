@@ -601,3 +601,65 @@ Viewer tab defines selection in OCC 3D viewer properties.
 
   - **Vertex** defines selection  sensitivity for vertices; 
   - **Edge**  defines selection  sensitivity for edges.  
+
+
+.. _toolbars_management:
+
+Toolbars management
+-------------------
+
+There is a possibility to modify default toolbars structure.
+
+To edit the current tool bars structure select in the Main Menu *Edit - > Edit toolbars* item. Editing of tool bars can be done with help of two following dialog boxes:
+
+#. **Toolbars** provides possibility to create a new toolbar or delete an existing.
+#. **Edit toolbar** provides possibility to edit content of a toolbar.
+
+.. _toolbars_dialog:
+
+**Toolbars** dialog box
+^^^^^^^^^^^^^^^^^^^^^^^
+
+The dialog box looks like following:
+
+.. image:: images/Toolbars.png
+   :align: center
+
+.. centered::
+   **Toolbars** diaqlog box
+
+In this dialog box there are following controls:
+
+- **Toolbars** is a window with a list of toolbars names. Number of commands in each tool bar is shown in brackets.
+- **Add** a button for creation of a new toolbar. When this button is pressed then a small dialog box with a text input field will uppear. In this diaog box user has to input a name of the new tool bar. The name of tool bar has to be unique. If user defines a not unique name then a warning will be shown.
+- **Edit** a button which calls **Edit toolbar** dialog box for currently selected tool bar.
+- **Delete** a button to delete currently selected tool bar. If user presses this button then he will have to confirm deletion of the selected toolbar.
+- **Reset** a button to reset modified tool bars structure to default one.
+- **Ok** button to close the dialog box, store result of tool bars editing and update tool bars of the module.
+- **Cancel** closes the dialog box without modification of tool bars.
+
+.. _edit_toolbar:
+
+**Edit toolbar** dialog box
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+The dialog box like following:
+
+.. image:: images/EditToolbar.png
+   :align: center
+
+.. centered::
+   **Edit toolbar** diaqlog box
+
+In this dialog box there are following controls:
+
+- **Toolbar name** a non-editable field which displays a name of current tool bar.
+- **Out of toolbars** a left window with a list of commands which are out of any tool bar. Also this list contains an item for separator definition "------".
+- Right arrow button transfers currently selected item from left window to right one. If right window contains a selected item then new item will be placed before the selectged one. If there is no selected item in right window then new item will be added at the end of items list. In order to clear current selection in right window it is necessary to click in empty space or click by right button of the window.
+- Left arrow button removes currently selected item from right window and appends it to left window.
+- **In the toolbar** a right window with a list of commands which are defined in the current tool bar. Items in this window are listed according to order of commands in the toolbar.
+- Buttons **Up** and **Down** to change position of a selected command in right window.
+- **Ok** button to close the dialog box, store result of editing.
+- **Cancel** closes the dialog box without modification of tool bar content.
+
+

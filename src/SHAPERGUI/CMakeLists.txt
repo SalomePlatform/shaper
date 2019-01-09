@@ -33,6 +33,7 @@ SET(PROJECT_HEADERS
     SHAPERGUI_OCCSelector.h
     SHAPERGUI_SalomeViewer.h
     SHAPERGUI_NestedButton.h
+	SHAPERGUI_ToolbarsMgr.h
 )
 
 SET(PROJECT_MOC_HEADERS
@@ -40,6 +41,7 @@ SET(PROJECT_MOC_HEADERS
     SHAPERGUI_DataModel.h
     SHAPERGUI_NestedButton.h
     SHAPERGUI_SalomeViewer.h
+	SHAPERGUI_ToolbarsMgr.h
 )
 
 # sources / moc wrappings
@@ -51,6 +53,7 @@ SET(PROJECT_SOURCES
     SHAPERGUI_OCCSelector.cpp
     SHAPERGUI_SalomeViewer.cpp
     SHAPERGUI_NestedButton.cpp
+	SHAPERGUI_ToolbarsMgr.cpp
 )
 
 SET(PROJECT_RESOURCES

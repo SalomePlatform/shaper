@@ -77,5 +77,11 @@
      <file>pictures/autoapply_start.png</file>
      <file>pictures/autoapply_stop.png</file>
      <file>pictures/whatis.png</file>
+
+     <file>pictures/arrow-left.png</file>
+     <file>pictures/arrow-right.png</file>
+     <file>pictures/arrow-up.png</file>
+     <file>pictures/arrow-down.png</file>
+     <file>pictures/configure_toolbars.png</file>
  </qresource>
  </RCC>

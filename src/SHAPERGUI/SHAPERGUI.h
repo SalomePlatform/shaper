@@ -29,7 +29,7 @@
 
 #include <ModuleBase_ActionInfo.h>
 
-#include <QStringList>
+#include <QList>
 #include <QMap>
 
 class XGUI_Workshop;
@@ -156,6 +156,21 @@ Q_OBJECT
 
   virtual void updateModuleVisibilityState();
 
+  /// Returns list of the module commands
+  QIntList shaperActions() const { return myActionsList; }
+
+  /// Returns structure of tool bars
+  QMap<QString, QIntList> shaperToolbars() const { return myToolbars; }
+
+  /// Returns free commands which are not in toolbars in the module
+  QIntList getFreeCommands() const;
+
+  /// Returns structure of default tool bars
+  QMap<QString, QIntList> defaultToolbars() const
+  { return (myDefaultToolbars.size() == 0)? myToolbars : myDefaultToolbars; }
+
+  void resetToolbars();
+
  public slots:
   /// \brief The method is redefined to connect to the study viewer before the data
   /// model is filled by opened file. This file open will flush redisplay signals for,
@@ -207,13 +222,22 @@ Q_OBJECT
 private slots:
   void onWhatIs(bool isToggled);
 
+  void onEditToolbars();
+
  private:
    /// Create selector for OCC Viewer
    /// \param theMgr view manager
   SHAPERGUI_OCCSelector* createSelector(SUIT_ViewManager* theMgr);
 
-  /// List of registered actions
-  QStringList myActionsList;
+  void registerCommandToolbar(const QString& theToolName, int theCommandId);
+
+  int getNextCommandId() const;
+
+  // Update current toolbars
+  void updateToolbars(const QMap<QString, QIntList>& theNewToolbars);
+
+  void saveToolbarsConfig();
+  void loadToolbarsConfig();
 
   /// List of registered nested actions
   QStringList myNestedActionsList;
@@ -249,6 +273,11 @@ private slots:
   bool myIsInspectionVisible;
   QDockWidget* myInspectionPanel;
 
+  /// List of registered actions
+  QIntList myActionsList;
+  QMap<QString, QIntList> myToolbars;
+  QMap<QString, QIntList> myDefaultToolbars;
+  bool myIsToolbarsModified;
 };
 
 #endif
