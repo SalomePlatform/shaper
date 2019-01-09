@@ -698,7 +698,8 @@ Handle(AIS_InteractiveContext) XGUI_Displayer::AISContext() const
 
     ModuleBase_IViewer::DefaultHighlightDrawer = aContext->HighlightStyle();
     Handle(Prs3d_Drawer) aSelStyle = aContext->SelectionStyle();
-    double aDeflection = QString(ModelAPI_ResultConstruction::DEFAULT_DEFLECTION().c_str()).toDouble();
+    double aDeflection =
+      QString(ModelAPI_ResultConstruction::DEFAULT_DEFLECTION().c_str()).toDouble();
     try {
       aDeflection = Config_PropManager::real("Visualization", "construction_deflection");
     } catch (...) {}
