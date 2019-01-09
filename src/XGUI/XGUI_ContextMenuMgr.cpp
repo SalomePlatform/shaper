@@ -803,6 +803,7 @@ void XGUI_ContextMenuMgr::addViewerMenu(QMenu* theMenu) const
         aActions = myViewerMenu[aName];
     }
   } else if (aSelected > 1) {
+    aActions.append(action("SHOW_ONLY_CMD"));
     aActions.append(action("HIDE_CMD"));
   }
   // hide all is shown always even if selection in the viewer is empty
