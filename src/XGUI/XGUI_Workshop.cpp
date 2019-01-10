@@ -505,11 +505,11 @@ void XGUI_Workshop::initMenu()
   aCommand->connectTo(this, SLOT(onOpen()));
 
 
-  //aCommand = aGroup->addFeature("AUTOCOMPUTE_CMD", tr("Auto rebuild"),
-  //                              tr("Blocks immediate apply of modifications"),
-  //                              QIcon(":pictures/autoapply_start.png"), QKeySequence());
-  //aCommand->setChecked(ModelAPI_Session::get()->isAutoUpdateBlocked());
-  //aCommand->connectTo(this, SLOT(onAutoApply()));
+  aCommand = aGroup->addFeature("AUTOCOMPUTE_CMD", tr("Auto rebuild"),
+                                tr("Blocks immediate apply of modifications"),
+                                QIcon(":pictures/autoapply_start.png"), QKeySequence());
+  aCommand->setChecked(ModelAPI_Session::get()->isAutoUpdateBlocked());
+  aCommand->connectTo(this, SLOT(onAutoApply()));
 
   aCommand = aGroup->addFeature("PREF_CMD", tr("Preferences"), tr("Edit preferences"),
                                 QIcon(":pictures/preferences.png"), QKeySequence::Preferences);
@@ -1331,11 +1331,11 @@ void XGUI_Workshop::updateCommandStatus()
         else
           aCmd->setEnabled(myModule->canRedo());
       }
-      //else if (aId == "AUTOCOMPUTE_CMD") {
-      //  aCmd->setIcon(aMgr->isAutoUpdateBlocked() ?
-      //    QIcon(":pictures/autoapply_stop.png") :
-      //    QIcon(":pictures/autoapply_start.png"));
-      //}
+      else if (aId == "AUTOCOMPUTE_CMD") {
+        aCmd->setIcon(aMgr->isAutoUpdateBlocked() ?
+          QIcon(":pictures/autoapply_stop.png") :
+          QIcon(":pictures/autoapply_start.png"));
+      }
       else
         // Enable all commands
         aCmd->setEnabled(true);
@@ -2843,10 +2843,10 @@ void XGUI_Workshop::onAutoApply()
   aMgr->blockAutoUpdate(!isBlocked);
 }
 
-//void XGUI_Workshop::updateAutoComputeState()
-//{
-//  SessionPtr aMgr = ModelAPI_Session::get();
-//  bool isComputeBlocked = aMgr->isAutoUpdateBlocked();
+void XGUI_Workshop::updateAutoComputeState()
+{
+  SessionPtr aMgr = ModelAPI_Session::get();
+  bool isComputeBlocked = aMgr->isAutoUpdateBlocked();
 //#ifdef HAVE_SALOME
 //  QAction* aUpdateCmd;
 //  QList<QAction*> aCommands = mySalomeConnector->commandList();
@@ -2859,12 +2859,12 @@ void XGUI_Workshop::onAutoApply()
 //  aUpdateCmd->setIcon(isComputeBlocked? QIcon(":pictures/autoapply_stop.png") :
 //    QIcon(":pictures/autoapply_start.png"));
 //#else
-//  AppElements_MainMenu* aMenuBar = myMainWindow->menuObject();
-//  AppElements_Command* aUpdateCmd = aMenuBar->feature("AUTOCOMPUTE_CMD");
-//  aUpdateCmd->button()->setIcon(isComputeBlocked? QIcon(":pictures/autoapply_stop.png") :
-//    QIcon(":pictures/autoapply_start.png"));
+  AppElements_MainMenu* aMenuBar = myMainWindow->menuObject();
+  AppElements_Command* aUpdateCmd = aMenuBar->feature("AUTOCOMPUTE_CMD");
+  aUpdateCmd->button()->setIcon(isComputeBlocked? QIcon(":pictures/autoapply_stop.png") :
+    QIcon(":pictures/autoapply_start.png"));
 //#endif
-//}
+}
 
 
 void XGUI_Workshop::clearTemporaryDir()
