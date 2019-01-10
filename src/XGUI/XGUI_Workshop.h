@@ -321,7 +321,7 @@ Q_OBJECT
   /// \param theDirectory a path to directory
   void openFile(const QString& theDirectory);
 
-  void updateAutoComputeState();
+  //void updateAutoComputeState();
 
 signals:
   /// Emitted when selection happens in Salome viewer

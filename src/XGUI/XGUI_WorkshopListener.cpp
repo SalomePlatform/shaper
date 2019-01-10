@@ -113,8 +113,8 @@ void XGUI_WorkshopListener::initializeEventListening()
 
   aLoop->registerListener(this, Events_Loop::eventByName("FinishOperation"));
   aLoop->registerListener(this, Events_Loop::eventByName("AbortOperation"));
-  aLoop->registerListener(this, Events_Loop::eventByName(EVENT_AUTOMATIC_RECOMPUTATION_ENABLE));
-  aLoop->registerListener(this, Events_Loop::eventByName(EVENT_AUTOMATIC_RECOMPUTATION_DISABLE));
+  //aLoop->registerListener(this, Events_Loop::eventByName(EVENT_AUTOMATIC_RECOMPUTATION_ENABLE));
+  //aLoop->registerListener(this, Events_Loop::eventByName(EVENT_AUTOMATIC_RECOMPUTATION_DISABLE));
 }
 
 //******************************************************
@@ -186,11 +186,11 @@ void XGUI_WorkshopListener::processEvent(const std::shared_ptr<Events_Message>& 
     // the viewer's update context is unblocked, the viewer's update works
     XGUI_Displayer* aDisplayer = workshop()->displayer();
     aDisplayer->enableUpdateViewer(true);
-  } else if ((theMessage->eventID() ==
-    Events_Loop::eventByName(EVENT_AUTOMATIC_RECOMPUTATION_ENABLE)) ||
-    (theMessage->eventID() ==
-      Events_Loop::eventByName(EVENT_AUTOMATIC_RECOMPUTATION_DISABLE))) {
-    myWorkshop->updateAutoComputeState();
+  //} else if ((theMessage->eventID() ==
+  //  Events_Loop::eventByName(EVENT_AUTOMATIC_RECOMPUTATION_ENABLE)) ||
+  //  (theMessage->eventID() ==
+  //    Events_Loop::eventByName(EVENT_AUTOMATIC_RECOMPUTATION_DISABLE))) {
+  //  myWorkshop->updateAutoComputeState();
   } else {
     //Show error dialog if error message received.
     std::shared_ptr<Events_InfoMessage> anIngfoMsg =
