@@ -166,16 +166,14 @@ bool canRename(const ObjectPtr& theObject, const QString& theName)
       return false;
     }
   }
-  else if ((aType == ModelAPI_ResultConstruction::group()) ||
-           (aType == ModelAPI_ResultBody::group())) {
+  else {
     DocumentPtr aDoc = theObject->document();
     ObjectPtr aObj =
-      aDoc->objectByName(ModelAPI_ResultConstruction::group(), theName.toStdString());
-    if (!aObj.get())
-      aObj = aDoc->objectByName(ModelAPI_ResultBody::group(), theName.toStdString());
+      aDoc->objectByName(aType, theName.toStdString());
 
     if (aObj.get()) {
-      QString aErrMsg(QObject::tr("Object with name %1 already exists.").arg(theName));
+      QString aErrMsg(QObject::tr("%1 with name %2 already exists.").
+        arg(aType.c_str()).arg(theName));
       // We can not use here a dialog box for message -
       // it will crash editing process in ObjectBrowser
       Events_InfoMessage("XGUI_Tools", aErrMsg.toStdString()).send();
