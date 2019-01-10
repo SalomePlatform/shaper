@@ -2847,7 +2847,7 @@ void XGUI_Workshop::updateAutoComputeState()
 {
   SessionPtr aMgr = ModelAPI_Session::get();
   bool isComputeBlocked = aMgr->isAutoUpdateBlocked();
-//#ifdef HAVE_SALOME
+#ifdef HAVE_SALOME
 //  QAction* aUpdateCmd;
 //  QList<QAction*> aCommands = mySalomeConnector->commandList();
 //  foreach(QAction* aCmd, aCommands) {
@@ -2858,12 +2858,12 @@ void XGUI_Workshop::updateAutoComputeState()
 //  }
 //  aUpdateCmd->setIcon(isComputeBlocked? QIcon(":pictures/autoapply_stop.png") :
 //    QIcon(":pictures/autoapply_start.png"));
-//#else
+#else
   AppElements_MainMenu* aMenuBar = myMainWindow->menuObject();
   AppElements_Command* aUpdateCmd = aMenuBar->feature("AUTOCOMPUTE_CMD");
   aUpdateCmd->button()->setIcon(isComputeBlocked? QIcon(":pictures/autoapply_stop.png") :
     QIcon(":pictures/autoapply_start.png"));
-//#endif
+#endif
 }
 
 
