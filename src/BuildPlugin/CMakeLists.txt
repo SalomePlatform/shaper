@@ -129,6 +129,7 @@ ADD_UNIT_TESTS(TestVertex.py
                TestFilling_ErrorMsg.py
                Test1920.py
                Test2398.py
+               Test2409.py
                Test2415.py
                Test2439.py
                Test2454.py

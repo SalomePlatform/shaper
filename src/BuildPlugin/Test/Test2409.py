@@ -44,12 +44,12 @@ SketchConstraintHorizontal_2 = Sketch_1.setHorizontal(SketchLine_3.result())
 SketchConstraintVertical_2 = Sketch_1.setVertical(SketchLine_4.result())
 model.do()
 
-Filling_1 = model.addFilling(Part_1_doc, [model.selection("EDGE", "Sketch_1/Edge-SketchLine_2")])
+Filling_1 = model.addFilling(Part_1_doc, [model.selection("EDGE", "Sketch_1/SketchLine_2")])
 model.do()
 # check error is reported
 assert(Filling_1.feature().error() != "")
 
-Filling_1.setBase([model.selection("EDGE", "Sketch_1/Edge-SketchLine_2"), model.selection("EDGE", "Sketch_1/Edge-SketchLine_4")])
+Filling_1.setBase([model.selection("EDGE", "Sketch_1/SketchLine_2"), model.selection("EDGE", "Sketch_1/SketchLine_4")])
 model.do()
 # check there is no error
 assert(Filling_1.feature().error() == "")
