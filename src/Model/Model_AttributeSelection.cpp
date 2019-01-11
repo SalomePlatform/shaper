@@ -1374,7 +1374,6 @@ void Model_AttributeSelection::updateInHistory()
       }
 
       ResultPtr aSetContext;
-      AttributeSelectionPtr aSetAttr;
       if (aFirst) {
         setValue(*aNewCont, aValueShape);
         aSetContext = context();

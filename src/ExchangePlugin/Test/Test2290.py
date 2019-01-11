@@ -27,8 +27,12 @@ Part_1_doc = Part_1.document()
 Box_1 = model.addBox(Part_1_doc, 5, 10, 10)
 Box_2 = model.addBox(Part_1_doc, 10, 50, 8)
 Partition_1 = model.addPartition(Part_1_doc, [model.selection("SOLID", "Box_2_1"), model.selection("SOLID", "Box_1_1")])
-Group_1 = model.addGroup(Part_1_doc, [model.selection("FACE", "Partition_1_1_3/Modified_Face_2_3"), model.selection("FACE", "Partition_1_1_1/Modified_Face_2_3")])
+Group_1 = model.addGroup(Part_1_doc, [model.selection("FACE", "Partition_1_1_1/Modified_Face&Box_1_1/Left&Box_2_1/Left"), model.selection("FACE", "Partition_1_1_3/Modified_Face&Box_1_1/Front")])
 model.do()
+
+from ModelAPI import *
+aFactory = ModelAPI_Session.get().validators()
+assert(aFactory.validate(Group_1.feature()))
 # test export to XAO
 anExportFeature = Part_1_doc.addFeature("Export")
 anExportFeature.string("xao_file_path").setValue("Data/export2290.xao")
