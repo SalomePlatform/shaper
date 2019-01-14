@@ -42,9 +42,7 @@ model.checkSketch(Sketch_1, SKETCH_DOF)
 # add one more distance constraint, DoF should be the same
 SketchConstraintDistance_2 = Sketch_1.setDistance(SketchLine_1.startPoint(), SketchLine_2.result(), 25, True)
 model.do()
-model.checkSketch(Sketch_1, SKETCH_DOF)
-# TODO: following line should be uncommented when PlanGCS will be able to determine over-constraint in this case
-#assert Sketch_1.solverError().value() != "", "FAILED: Sketch should report over-constrained situation"
+assert Sketch_1.solverError().value() != "", "FAILED: Sketch should report over-constrained situation"
 
 # remove last constraint
 partSet.removeFeature(SketchConstraintDistance_2.feature())

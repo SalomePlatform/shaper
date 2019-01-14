@@ -181,6 +181,7 @@ ADD_UNIT_TESTS(
   Test2280.py
   Test2287.py
   Test2341.py
+  Test2376.py
   Test2390.py
   Test2393.py
   Test2425.py
