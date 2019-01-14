@@ -697,15 +697,16 @@ Handle(AIS_InteractiveContext) XGUI_Displayer::AISContext() const
     aContext->DefaultDrawer()->UIsoAspect()->SetNumber(0);
 
     ModuleBase_IViewer::DefaultHighlightDrawer = aContext->HighlightStyle();
-    Handle(Prs3d_Drawer) aSelStyle = aContext->SelectionStyle();
-    double aDeflection =
-      QString(ModelAPI_ResultConstruction::DEFAULT_DEFLECTION().c_str()).toDouble();
-    try {
-      aDeflection = Config_PropManager::real("Visualization", "construction_deflection");
-    } catch (...) {}
+    // Commented out according to discussion in bug #2825
+    //Handle(Prs3d_Drawer) aSelStyle = aContext->SelectionStyle();
+    //double aDeflection =
+    //  QString(ModelAPI_ResultConstruction::DEFAULT_DEFLECTION().c_str()).toDouble();
+    //try {
+    //  aDeflection = Config_PropManager::real("Visualization", "construction_deflection");
+    //} catch (...) {}
 
-    ModuleBase_IViewer::DefaultHighlightDrawer->SetDeviationCoefficient(aDeflection);
-    aSelStyle->SetDeviationCoefficient(aDeflection);
+    //ModuleBase_IViewer::DefaultHighlightDrawer->SetDeviationCoefficient(aDeflection);
+    //aSelStyle->SetDeviationCoefficient(aDeflection);
   }
   return aContext;
 }
