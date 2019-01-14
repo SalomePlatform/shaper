@@ -7,8 +7,6 @@ partSet = model.moduleDocument()
 Part_1 = model.addPart(partSet)
 Part_1_doc = Part_1.document()
 Box_1 = model.addBox(Part_1_doc, 10, 10, 10)
-Edges = [model.selection("EDGE", "Box_1_1/Left&Box_1_1/Top"),
-         model.selection("EDGE", "Box_1_1/Front&Box_1_1/Top")]
-Filling_1 = model.addFilling(Part_1_doc, Edges)
+Filling_1 = model.addFilling(Part_1_doc, [model.selection("EDGE", "[Box_1_1/Left][Box_1_1/Top]"), model.selection("EDGE", "[Box_1_1/Right][Box_1_1/Top]")])
 model.do()
 model.end()

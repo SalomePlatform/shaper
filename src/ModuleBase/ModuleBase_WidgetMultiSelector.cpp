@@ -948,6 +948,8 @@ bool ModuleBase_WidgetMultiSelector::findInSelection(const ObjectPtr& theObject,
                               const std::map<ObjectPtr, std::set<GeomShapePtr> >& theGeomSelection,
                               ModuleBase_IWorkshop* theWorkshop)
 {
+  if (!theObject.get())
+    return false;
   // issue #2154: we should not remove from list objects hidden in the viewer if selection
   // was done with SHIFT button
   if (theWorkshop->hasSHIFTPressed() && !theObject->isDisplayed())
