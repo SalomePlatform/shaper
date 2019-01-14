@@ -569,17 +569,19 @@ QTreeNodesList PartSet_FolderNode::objectCreated(const QObjectPtrList& theObject
     }
   }
   // Add nodes in correct order
-  int i;
-  for (i = 0; i < myChildren.size(); i++) {
-    if (aNewNodes.contains(i)) {
-      myChildren.insert(i, aNewNodes[i]);
+  if (aNewNodes.size() > 0) {
+    int i;
+    for (i = 0; i < myChildren.size(); i++) {
+      if (aNewNodes.contains(i)) {
+        myChildren.insert(i, aNewNodes[i]);
+        aNewNodes.remove(i);
+      }
+    }
+    while (aNewNodes.size()) {
+      i = myChildren.size();
+      myChildren.append(aNewNodes[i]);
       aNewNodes.remove(i);
     }
-  }
-  while (aNewNodes.size()) {
-    i = myChildren.size();
-    myChildren.append(aNewNodes[i]);
-    aNewNodes.remove(i);
   }
   foreach(ModuleBase_ITreeNode* aNode, myChildren) {
     aResult.append(aNode->objectCreated(theObjects));
@@ -649,19 +651,22 @@ QTreeNodesList PartSet_FeatureFolderNode::objectCreated(const QObjectPtrList& th
     }
   }
   // To add in correct order
-  int i;
-  for (i = 0; i < myChildren.size(); i++) {
-    if (aNewNodes.contains(i)) {
-      myChildren.insert(i, aNewNodes[i]);
-      aNewNodes.remove(i);
+  if (aNewNodes.size() > 0) {
+    int i;
+    for (i = 0; i < myChildren.size(); i++) {
+      if (aNewNodes.contains(i)) {
+        myChildren.insert(i, aNewNodes[i]);
+        aNewNodes.remove(i);
+      }
+    }
+    while (aNewNodes.size()) {
+      i = myChildren.size();
+      if (aNewNodes.contains(i)) {
+        myChildren.append(aNewNodes[i]);
+        aNewNodes.remove(i);
+      }
     }
   }
-  while (aNewNodes.size()) {
-    i = myChildren.size();
-    myChildren.append(aNewNodes[i]);
-    aNewNodes.remove(i);
-  }
-
   // Update sub-folders
   foreach(ModuleBase_ITreeNode* aNode, myChildren) {
     aResult.append(aNode->objectCreated(theObjects));
@@ -885,13 +890,17 @@ void PartSet_PartRootNode::update()
   // Remove extra sub-nodes
   int aIndex = -1;
   int aId = aRows;
+  QMap<int, ModuleBase_ITreeNode*> aExistingNodes;
   while (aId < myChildren.size()) {
     ModuleBase_ITreeNode* aNode = myChildren.at(aId);
     if (aNode->object().get()) {
       aIndex = aDoc->index(aNode->object(), true);
       if ((aIndex == -1) || (aId != (aIndex + aRows))) {
         myChildren.removeAll(aNode);
-        delete aNode;
+        if (aIndex == -1)
+          delete aNode;
+        else
+          aExistingNodes[aIndex + aRows] = aNode;
         continue;
       }
     }
@@ -906,12 +915,19 @@ void PartSet_PartRootNode::update()
     aId = i + aRows; // Take into account existing folders
     if (aId < myChildren.size()) {
       if (myChildren.at(aId)->object() != aObj) {
-        ModuleBase_ITreeNode* aNode = createNode(aObj);
-        myChildren.insert(aId, aNode);
+        if (aExistingNodes.contains(aId)) {
+          myChildren.insert(aId, aExistingNodes[aId]);
+          aExistingNodes.remove(aId);
+        }
+        else {
+          myChildren.insert(aId, createNode(aObj));
+        }
       }
     } else {
-      ModuleBase_ITreeNode* aNode = createNode(aObj);
-      myChildren.append(aNode);
+      if (aExistingNodes.contains(myChildren.size()))
+        myChildren.append(aExistingNodes[myChildren.size()]);
+      else
+        myChildren.append(createNode(aObj));
     }
   }
   // Update sub-folders
