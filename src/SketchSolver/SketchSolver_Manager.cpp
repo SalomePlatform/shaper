@@ -43,6 +43,42 @@ static bool isFeatureValid(FeaturePtr theFeature)
   return aFactory->validate(theFeature);
 }
 
+typedef std::map<int, std::shared_ptr<SketchPlugin_Feature>> IndexedFeatureMap;
+
+static void featuresOrderedByCreation(const std::set<ObjectPtr>& theOriginalFeatures,
+                                      IndexedFeatureMap& theOrderedFeatures)
+{
+  std::set<ObjectPtr>::iterator aFeatIter = theOriginalFeatures.begin();
+  for (; aFeatIter != theOriginalFeatures.end(); aFeatIter++) {
+    std::shared_ptr<SketchPlugin_Feature> aFeature =
+        std::dynamic_pointer_cast<SketchPlugin_Feature>(*aFeatIter);
+    if (aFeature && !aFeature->isMacro() && aFeature->data() && aFeature->data()->isValid()) {
+      theOrderedFeatures[aFeature->data()->featureId()] = aFeature;
+    }
+  }
+}
+
+static void featuresOrderedByType(const std::set<ObjectPtr>& theOriginalFeatures,
+                                  IndexedFeatureMap& theOrderedFeatures)
+{
+  int aFeatureIndex = 0;
+  int aConstraintIndex = (int)theOriginalFeatures.size();
+
+  std::set<ObjectPtr>::iterator aFeatIter = theOriginalFeatures.begin();
+  for (; aFeatIter != theOriginalFeatures.end(); aFeatIter++) {
+    std::shared_ptr<SketchPlugin_Feature> aFeature =
+        std::dynamic_pointer_cast<SketchPlugin_Feature>(*aFeatIter);
+    if (aFeature && !aFeature->isMacro() && aFeature->data() && aFeature->data()->isValid()) {
+      std::shared_ptr<SketchPlugin_Constraint> aConstraint =
+          std::dynamic_pointer_cast<SketchPlugin_Constraint>(aFeature);
+      if (aConstraint)
+        theOrderedFeatures[++aConstraintIndex] = aFeature;
+      else
+        theOrderedFeatures[++aFeatureIndex] = aFeature;
+    }
+  }
+}
+
 
 
 // ========================================================
@@ -115,29 +151,17 @@ void SketchSolver_Manager::processEvent(
 
     // update sketch features only
     const std::set<ObjectPtr>& aFeatures = anUpdateMsg->objects();
+    IndexedFeatureMap anOrderedFeatures;
     // try to keep order as features were created if there are several created features: #2229
     if (theMessage->eventID() == aCreatedEvent && aFeatures.size() > 1) {
-      std::map<int, std::shared_ptr<SketchPlugin_Feature>> anOrderedFeatures;
-      std::set<ObjectPtr>::iterator aFeatIter;
-      for (aFeatIter = aFeatures.begin(); aFeatIter != aFeatures.end(); aFeatIter++) {
-        std::shared_ptr<SketchPlugin_Feature> aFeature =
-            std::dynamic_pointer_cast<SketchPlugin_Feature>(*aFeatIter);
-        if (aFeature && !aFeature->isMacro() && aFeature->data() && aFeature->data()->isValid()) {
-          anOrderedFeatures[aFeature->data()->featureId()] = aFeature;
-        }
-      }
-      std::map<int, std::shared_ptr<SketchPlugin_Feature>>::iterator aFeat;
-      for(aFeat = anOrderedFeatures.begin(); aFeat != anOrderedFeatures.end(); aFeat++) {
-        updateFeature(aFeat->second);
-      }
-    } else { // order is not important
-      std::set<ObjectPtr>::iterator aFeatIter;
-      for (aFeatIter = aFeatures.begin(); aFeatIter != aFeatures.end(); aFeatIter++) {
-        std::shared_ptr<SketchPlugin_Feature> aFeature =
-            std::dynamic_pointer_cast<SketchPlugin_Feature>(*aFeatIter);
-        if (aFeature && !aFeature->isMacro())
-          updateFeature(aFeature);
-      }
+      featuresOrderedByCreation(aFeatures, anOrderedFeatures);
+    } else { // order is not important, just process features before constraints
+      featuresOrderedByType(aFeatures, anOrderedFeatures);
+    }
+
+    IndexedFeatureMap::iterator aFeat;
+    for (aFeat = anOrderedFeatures.begin(); aFeat != anOrderedFeatures.end(); aFeat++) {
+      updateFeature(aFeat->second);
     }
 
   } else if (theMessage->eventID() == Events_Loop::loop()->eventByName(EVENT_OBJECT_MOVED)) {

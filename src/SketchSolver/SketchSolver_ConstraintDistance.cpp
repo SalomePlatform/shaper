@@ -38,6 +38,41 @@
 #include <math.h>
 
 
+static void getPointAndLine(const ConstraintPtr& theConstraint, const StoragePtr& theStorage,
+                            EntityWrapperPtr& thePoint, EntityWrapperPtr& theLine)
+{
+  for (int i = 0; i < 2; ++i) {
+    AttributePtr anAttr = theConstraint->attribute(SketchPlugin_Constraint::ATTRIBUTE(i));
+    EntityWrapperPtr anEntity = theStorage->entity(anAttr);
+    if (anEntity->type() == ENTITY_POINT)
+      thePoint = anEntity;
+    else if (anEntity->type() == ENTITY_LINE)
+      theLine = anEntity;
+  }
+}
+
+static void adjustOddPoint(const EntityWrapperPtr& theDistPoint,
+                           const EntityWrapperPtr& theDistLine,
+                           GCSPointPtr& theOddPoint)
+{
+  if (!theOddPoint)
+    return;
+
+  std::shared_ptr<GeomAPI_Lin2d> aLine = PlaneGCSSolver_Tools::line(theDistLine);
+  std::shared_ptr<GeomAPI_Pnt2d> aPoint = PlaneGCSSolver_Tools::point(theDistPoint);
+
+  std::shared_ptr<GeomAPI_XY> aLineVec = aLine->direction()->xy();
+  std::shared_ptr<GeomAPI_XY> aPtLineVec = aPoint->xy()->decreased(aLine->location()->xy());
+
+  double aDot = aPtLineVec->dot(aLineVec);
+  std::shared_ptr<GeomAPI_XY> aProjectedPnt =
+    aLine->location()->xy()->added(aLineVec->multiplied(aDot));
+
+  *(theOddPoint->x) = aProjectedPnt->x();
+  *(theOddPoint->y) = aProjectedPnt->y();
+}
+
+
 void SketchSolver_ConstraintDistance::getAttributes(
     EntityWrapperPtr& theValue,
     std::vector<EntityWrapperPtr>& theAttributes)
@@ -67,14 +102,21 @@ void SketchSolver_ConstraintDistance::adjustConstraint()
 {
   if (getType() == CONSTRAINT_PT_LINE_DISTANCE) {
     bool isSigned = myBaseConstraint->boolean(SketchPlugin_ConstraintDistance::SIGNED())->value();
-    if (myIsSigned == isSigned)
-      return; // distance type is not changed => nothing to adjust
-
-    // Adjust point-line distance by setting/removing additional constraints
-    if (isSigned)
-      addConstraintsToKeepSign();
-    else
-      removeConstraintsKeepingSign();
+    if (myIsSigned == isSigned) {
+      // adjust auxiliary point for sign-keeping
+      if (isSigned) {
+        EntityWrapperPtr aDistPoint, aDistLine;
+        getPointAndLine(myBaseConstraint, myStorage, aDistPoint, aDistLine);
+        adjustOddPoint(aDistPoint, aDistLine, myOddPoint);
+      }
+    }
+    else {
+      // Adjust point-line distance by setting/removing additional constraints
+      if (isSigned)
+        addConstraintsToKeepSign();
+      else
+        removeConstraintsKeepingSign();
+    }
     myIsSigned = isSigned;
   }
 }
@@ -103,14 +145,8 @@ void SketchSolver_ConstraintDistance::addConstraintsToKeepSign()
 
   // calculate projection of the point on the line and find a sign of a distance
   EntityWrapperPtr aDistPoint, aDistLine;
-  for (int i = 0; i < 2; ++i) {
-    AttributePtr anAttr = myBaseConstraint->attribute(SketchPlugin_Constraint::ATTRIBUTE(i));
-    EntityWrapperPtr anEntity = myStorage->entity(anAttr);
-    if (anEntity->type() == ENTITY_POINT)
-      aDistPoint = anEntity;
-    else if (anEntity->type() == ENTITY_LINE)
-      aDistLine = anEntity;
-  }
+  getPointAndLine(myBaseConstraint, myStorage, aDistPoint, aDistLine);
+
   std::shared_ptr<GeomAPI_Lin2d> aLine = PlaneGCSSolver_Tools::line(aDistLine);
   std::shared_ptr<GeomAPI_Pnt2d> aPoint = PlaneGCSSolver_Tools::point(aDistPoint);
 
@@ -120,16 +156,12 @@ void SketchSolver_ConstraintDistance::addConstraintsToKeepSign()
     mySignValue = PI/2.0;
   else
     mySignValue = - PI/2.0;
-  double aDot = aPtLineVec->dot(aLineVec);
-  std::shared_ptr<GeomAPI_XY> aProjectedPnt =
-      aLine->location()->xy()->added(aLineVec->multiplied(aDot));
 
   // create auxiliary point on the line and set auxiliary constraints
   myOddPoint = GCSPointPtr(new GCS::Point);
   myOddPoint->x = aStorage->createParameter();
   myOddPoint->y = aStorage->createParameter();
-  *(myOddPoint->x) = aProjectedPnt->x();
-  *(myOddPoint->y) = aProjectedPnt->y();
+  adjustOddPoint(aDistPoint, aDistLine, myOddPoint);
 
   PointWrapperPtr aPointWr = std::dynamic_pointer_cast<PlaneGCSSolver_PointWrapper>(aDistPoint);
   EdgeWrapperPtr anEdgeWr = std::dynamic_pointer_cast<PlaneGCSSolver_EdgeWrapper>(aDistLine);
