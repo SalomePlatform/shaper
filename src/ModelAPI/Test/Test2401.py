@@ -77,8 +77,6 @@ model.do()
 SketchLine_8 = Sketch_1.addLine(0, 3, 8, 3)
 SketchConstraintCoincidence_9 = Sketch_1.setCoincident(SketchLine_1.endPoint(), SketchLine_8.startPoint())
 SketchConstraintCoincidence_10 = Sketch_1.setCoincident(SketchLine_4.endPoint(), SketchLine_8.endPoint())
-model.do()
-Part_1_doc.setCurrentFeature(Fill_1.feature(), True)
 model.end()
 
 # check that the plane is located as previously

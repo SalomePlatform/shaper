@@ -56,9 +56,6 @@ model.do()
 
 # update the parameter N => number of sketch contours is changed
 Param_N.setValue(4)
-Part_1_doc.setCurrentFeature(None, True)
-model.do()
-Part_1_doc.setCurrentFeature(Cut_1.feature(), True)
 model.end()
 
 assert(Cut_1.result().numberOfSubs() == 4)

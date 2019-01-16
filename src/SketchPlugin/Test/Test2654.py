@@ -178,9 +178,6 @@ assert(Split_1.feature().error() != "")
 Part_1_doc.removeFeature(Split_1.feature())
 model.do()
 model.checkSketch(Sketch_2, 0)
-
-Part_1_doc.setCurrentFeature(Extrusion_2.feature(), True)
-
 model.end()
 
 assert(model.checkPythonDump())

@@ -103,6 +103,15 @@ void begin()
 
 void end()
 {
+  // some operations make the current feature not the last one (like "galeries" change parameters)
+  DocumentPtr anActive = ModelAPI_Session::get()->activeDocument();
+  int aSize = anActive->size("Features");
+  if (aSize > 0) {
+    FeaturePtr aLastFeat =
+      std::dynamic_pointer_cast<ModelAPI_Feature>(anActive->object("Features", aSize - 1));
+    anActive->setCurrentFeature(aLastFeat, true);
+  }
+
   ModelAPI_Session::get()->finishOperation();
   // to update data tree in the end of dumped script execution
   ModelAPI_EventCreator::get()->sendReordered(FeaturePtr());

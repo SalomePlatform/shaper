@@ -71,7 +71,6 @@ Cylinder_2 = model.addCylinder(Part_1_doc, model.selection("VERTEX", "[Extrusion
 model.do()
 # make sketch_2 cut the whole top face of the initial extrusion, so, one of the cylinder becomes invalid
 lenParam.setValue(100)
-Part_1_doc.setCurrentFeature(Cylinder_2.feature(), True)
 model.do()
 # update selection of cylinder base points
 model.selection("VERTEX", "[ExtrusionCut_1_1/Modified_Face&Sketch_1/SketchLine_1][Extrusion_1_1/Generated_Face&Sketch_1/SketchLine_2][(ExtrusionCut_1_1/Modified_Face&Sketch_1/SketchLine_1)(Extrusion_1_1/Generated_Face&Sketch_1/SketchLine_2)(ExtrusionCut_1_1/Generated_Face&Sketch_2/SketchLine_6)(ExtrusionCut_1_1/Modified_Face&Sketch_1/SketchLine_3)]").fillAttribute(Cylinder_1.basePoint())
