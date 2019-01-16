@@ -1345,9 +1345,12 @@ bool FeaturesPlugin_ValidatorBooleanSmashSelection::isValid(
 
     ResultPtr aContext = anAttrSelection->context();
     std::shared_ptr<GeomAPI_Shape> aShape = anAttrSelection->value();
-    GeomShapePtr aContextShape = aContext->shape();
     if (!aShape.get()) {
-      aShape = aContextShape;
+      if (!aContext.get()) {
+        theError = "Error: Empty selection.";
+        return false;
+      }
+      aShape = aContext->shape();
     }
 
     if (aShape->isSolid() || aShape->isCompSolid()) {
