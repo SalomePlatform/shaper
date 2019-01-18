@@ -122,7 +122,12 @@ protected:
   /// Reinitializes the internal state of the attribute (may be needed on undo/redo, abort, etc)
   virtual void reinit();
 
+  /// Tries to merge attributes in this list with the same result shape. Returns true
+  /// if theStart matches with some later attribute and theStart is removed from the list.
+  bool merge(Model_AttributeSelection* theStart);
+
   friend class Model_Data;
+  friend class Model_AttributeSelection;
 };
 
 #endif

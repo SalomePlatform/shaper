@@ -42,19 +42,32 @@ static void findNeighbors(const TopoDS_Shape theContext, const TopoDS_Shape theV
   const int theLevel, TopTools_MapOfShape& theResult)
 {
   TopAbs_ShapeEnum aConnectorType = TopAbs_VERTEX; // type of the connector sub-shapes
-  if (theValue.ShapeType() == TopAbs_FACE)
+  TopAbs_ShapeEnum aValueType = theValue.ShapeType();
+  if (aValueType == TopAbs_FACE)
     aConnectorType = TopAbs_EDGE;
-  TopTools_MapOfShape aNBConnectors; // connector shapes that already belong to neighbors
-  for(TopExp_Explorer aValExp(theValue, aConnectorType); aValExp.More(); aValExp.Next()) {
-    aNBConnectors.Add(aValExp.Current());
+  else if (aValueType == TopAbs_COMPOUND) { // for geometrical naming: compound of faces
+    TopExp_Explorer anExp(theValue, TopAbs_FACE);
+    if (anExp.More()) {
+      aConnectorType = TopAbs_EDGE;
+      aValueType = TopAbs_FACE;
+    } else {
+      aValueType = TopAbs_EDGE;
+    }
   }
+  TopTools_MapOfShape aNBConnectors; // connector shapes that already belong to neighbors
+  for(TopExp_Explorer aValExp(theValue, aConnectorType); aValExp.More(); aValExp.Next())
+    aNBConnectors.Add(aValExp.Current());
 
   TopTools_MapOfShape alreadyProcessed;
-  alreadyProcessed.Add(theValue);
+  if (aValueType == theValue.ShapeType())
+    alreadyProcessed.Add(theValue);
+  else
+    for(TopExp_Explorer aValExp(theValue, aValueType); aValExp.More(); aValExp.Next())
+      alreadyProcessed.Add(aValExp.Current());
 
   for(int aLevel = 1; aLevel <= theLevel; aLevel++) {
     TopoDS_ListOfShape aGoodCandidates;
-    TopExp_Explorer aCandidate(theContext, theValue.ShapeType());
+    TopExp_Explorer aCandidate(theContext, aValueType);
     for(; aCandidate.More(); aCandidate.Next()) {
       if (alreadyProcessed.Contains(aCandidate.Current()))
         continue;
@@ -102,18 +115,16 @@ static const TopoDS_Shape findNeighbor(const TopoDS_Shape theContext,
     if (aNBIter->second == aMinLevel) {
       TopTools_MapOfShape aThisNBs;
       findNeighbors(theContext, aNBIter->first, aMinLevel, aThisNBs);
-      // aMatches must contain common part of all NBs lists
-      for(TopTools_MapOfShape::Iterator aThisNB(aThisNBs); aThisNB.More(); aThisNB.Next()) {
-        if (aFirst) {
+      if (aFirst) { // aMatches must contain common part of all NBs lists
+        for(TopTools_MapOfShape::Iterator aThisNB(aThisNBs); aThisNB.More(); aThisNB.Next()) {
           aMatches.Append(aThisNB.Value());
-        } else {
-          // remove all in aMatches which are not in this NBs
-          for(TopoDS_ListOfShape::Iterator aMatch(aMatches); aMatch.More(); ) {
-            if (aThisNBs.Contains(aMatch.Value())) {
-              aMatch.Next();
-            } else {
-              aMatches.Remove(aMatch);
-            }
+        }
+      } else { // remove all in aMatches which are not in this NBs
+        for(TopoDS_ListOfShape::Iterator aMatch(aMatches); aMatch.More(); ) {
+          if (aThisNBs.Contains(aMatch.Value())) {
+            aMatch.Next();
+          } else {
+            aMatches.Remove(aMatch);
           }
         }
       }
@@ -155,6 +166,7 @@ static const TopoDS_Shape findNeighbor(const TopoDS_Shape theContext,
           } else
             return TopoDS_Shape();
         }
+        break; // no more NBs with higher levels
       }
       if (!aLevelNBs.IsEmpty()) {
         TopTools_MapOfShape aNBsOfCandidate;

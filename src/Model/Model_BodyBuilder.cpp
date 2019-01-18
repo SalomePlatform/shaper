@@ -616,9 +616,7 @@ void Model_BodyBuilder::loadGeneratedShapes(const GeomMakeShapePtr& theAlgo,
 
       bool aNewShapeIsSameAsOldShape = anOldSubShape->isSame(aNewShape);
       bool aNewShapeIsNotInResultShape = !aResultShape->isSubShape(aNewShape, false);
-      if (aNewShapeIsSameAsOldShape
-        || aNewShapeIsNotInResultShape)
-      {
+      if (aNewShapeIsSameAsOldShape || aNewShapeIsNotInResultShape) {
         continue;
       }
 
@@ -634,8 +632,26 @@ void Model_BodyBuilder::loadGeneratedShapes(const GeomMakeShapePtr& theAlgo,
           storeExternalReference(anOriginalLabel, builder(aTag)->NamedShape()->Label());
         }
         buildName(aTag, theName);
-      }
-      else {
+      } if (aResultShape->isSame(aNewShape)) {
+        // keep the generation evolution on the root level (2397 - for intersection feature)
+        TNaming_Builder* aBuilder = builder(0);
+        TDF_Label aShapeLab = aBuilder->NamedShape()->Label();
+        Handle(TDF_Reference) aRef;
+        if (aShapeLab.FindAttribute(TDF_Reference::GetID(), aRef)) {
+          // Store only in case if it does not have reference.
+          continue;
+        }
+
+        // Check if new shape was already stored.
+        if (isAlreadyStored(aBuilder, anOldSubShape_, aNewShape_)) continue;
+
+        if (!aBuilder->NamedShape().IsNull() &&
+            aBuilder->NamedShape()->Evolution() != TNaming_GENERATED) {
+          myBuilders.erase(0); // clear old builder to avoid different evolutions crash
+          aBuilder = builder(0);
+        }
+        aBuilder->Generated(anOldSubShape_, aNewShape_);
+      } else {
         int aTag = getGenerationTag(aNewShape_);
         if (aTag == INVALID_TAG) return;
         builder(aTag)->Generated(anOldSubShape_, aNewShape_);
