@@ -44,13 +44,13 @@ ADD_UNIT_TESTS(
   TestSketcherSetFixed.py
   TestSketcherSetLength.py
   TestSketcherSetRadius.py
-  #TestSketcherSetAngle.py
+  TestSketcherSetAngle.py
   TestSketcherSetEqual.py
   TestSketcherSetFillet.py
 
   TestFeatures.py
   TestFeaturesExtrusion.py
-  #TestFeaturesRevolution.py
+  TestFeaturesRevolution.py
 
   TestPrimitivesBox.py
 

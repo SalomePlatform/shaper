@@ -75,7 +75,7 @@ SketchConstraintDistance_8 = Sketch_1.setDistance(SketchPoint_1.coordinates(), S
 SketchConstraintDistance_9 = Sketch_1.setDistance(SketchPoint_2.coordinates(), SketchPoint_1.coordinates(), 50, True)
 SketchConstraintLength_1 = Sketch_1.setLength(SketchLine_1.result(), "length/8")
 model.do()
-Extrusion_1 = model.addExtrusion(Part_1_doc, [model.selection("FACE", "Sketch_1/Face-SketchLine_1f-SketchArc_1_2r-SketchArc_2_2r-SketchLine_2r-SketchLine_3r-SketchLine_4r-SketchLine_5r-SketchLine_6r-SketchLine_7r-SketchLine_8r-SketchLine_9r-SketchArc_3_2f")], model.selection(), 500, 0)
+Extrusion_1 = model.addExtrusion(Part_1_doc, [model.selection("FACE", "Sketch_1/Face-SketchLine_1r-SketchArc_1_2r-SketchLine_9r-SketchLine_8r-SketchLine_7r-SketchLine_6r-SketchLine_5r-SketchLine_4r-SketchArc_3_2f-SketchLine_3r-SketchLine_2r-SketchArc_2_2r")], model.selection(), 500, 0)
 Extrusion_2 = model.addExtrusion(Part_1_doc, [model.selection("FACE", "Sketch_1/Face-SketchCircle_1_2f"), model.selection("FACE", "Sketch_1/Face-SketchCircle_2_2f")], model.selection(), 500, -400)
 Extrusion_3 = model.addExtrusion(Part_1_doc, [model.selection("FACE", "Sketch_1/Face-SketchCircle_1_2f"), model.selection("FACE", "Sketch_1/Face-SketchCircle_2_2f")], model.selection(), 100, 0)
 model.do()

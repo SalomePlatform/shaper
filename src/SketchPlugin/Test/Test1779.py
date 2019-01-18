@@ -205,10 +205,10 @@ SketchConstraintTangent_10 = Sketch_1.setTangent(SketchLine_1.result(), SketchAr
 SketchConstraintTangent_10.setName("SketchConstraintTangent_13")
 SketchConstraintAngle_2 = Sketch_1.setAngle(SketchLine_11.result(), SketchLine_10.result(), 45)
 model.do()
-Extrusion_1 = model.addExtrusion(Part_1_doc, [model.selection("FACE", "Sketch_1/Face-SketchLine_13r-SketchLine_14f-SketchLine_2f-SketchArc_1_2f-SketchArc_2_2f-SketchLine_5r-SketchArc_3_2f-SketchCircle_1_2r-SketchCircle_2_2r-SketchCircle_3_2r-SketchArc_4_2f-SketchArc_5_2r-SketchArc_6_2r-SketchLine_21r-SketchCircle_4_2r")], model.selection(), "height", 0)
-Sketch_2 = model.addSketch(Part_1_doc, model.selection("FACE", "Extrusion_1_1/Generated_Face_14"))
+Extrusion_1 = model.addExtrusion(Part_1_doc, [model.selection("FACE", "Sketch_1/Face-SketchArc_1_2f-SketchLine_2f-SketchArc_3_2f-SketchLine_5r-SketchArc_2_2f-SketchArc_4_2f-SketchLine_21r-SketchArc_6_2r-SketchLine_14f-SketchArc_5_2r-SketchLine_13r-SketchCircle_2_2r-SketchCircle_1_2r-SketchCircle_4_2r-SketchCircle_3_2r")], model.selection(), "height", 0)
+Sketch_2 = model.addSketch(Part_1_doc, model.selection("FACE", "Extrusion_1_1/Generated_Face&Sketch_1/SketchLine_2"))
 SketchLine_12 = Sketch_2.addLine(38.24999999999999, 6.5, 13.75, 6.5)
-SketchLine_13 = Sketch_2.addLine(model.selection("EDGE", "Extrusion_1_1/Generated_Face_14&Extrusion_1_1/To_Face_1"))
+SketchLine_13 = Sketch_2.addLine(model.selection("EDGE", "[Extrusion_1_1/Generated_Face&Sketch_1/SketchLine_2][Extrusion_1_1/To_Face_1]"))
 SketchLine_13.setName("SketchLine_15")
 SketchLine_13.result().setName("SketchLine_15")
 SketchConstraintCoincidence_25 = Sketch_2.setCoincident(SketchLine_12.endPoint(), SketchLine_13.result())
@@ -238,7 +238,7 @@ SketchConstraintLength_3 = Sketch_2.setLength(SketchLine_12.result(), "width_hol
 SketchConstraintDistance_13 = Sketch_2.setDistance(SketchLine_13.endPoint(), SketchLine_16.result(), "width_hole/2")
 SketchConstraintDistance_13.setName("SketchConstraintDistance_17")
 model.do()
-ExtrusionCut_1 = model.addExtrusionCut(Part_1_doc, [model.selection("FACE", "Sketch_2/Face-SketchLine_12f-SketchLine_16f-SketchLine_17f-SketchLine_18f")], model.selection(), 0, 100, [model.selection("SOLID", "Extrusion_1_1")])
+ExtrusionCut_1 = model.addExtrusionCut(Part_1_doc, [model.selection("FACE", "Sketch_2/Face-SketchLine_12r-SketchLine_16f-SketchLine_17f-SketchLine_18f")], model.selection(), 0, 100, [model.selection("SOLID", "Extrusion_1_1")])
 model.do()
 
 # check ExtrusionCut_1 is valid

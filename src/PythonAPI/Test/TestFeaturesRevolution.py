@@ -56,10 +56,9 @@ class FeaturesRevolutionFixture(FeaturesAddRevolutionFixture):
         base = base_sketch.selectFace()
         axis_point1 = model.addPoint(self.part, 20, -10, 0).result()
         axis_point2 = model.addPoint(self.part, 20, 10, 0).result()
-        axis_object = model.addAxis(self.part, axis_point1[0], axis_point2[0]).result()
+        axis_object = model.addAxis(self.part, axis_point1, axis_point2).result()
 
-        self.revolution = model.addRevolution(self.part, base, axis_object[0],
-                                              0, 180)
+        self.revolution = model.addRevolution(self.part, base, axis_object, 0, 180)
 
         model.do()
 
@@ -81,18 +80,15 @@ class FeaturesAddRevolutionTestCase(FeaturesAddRevolutionFixture):
         base = base_sketch.selectFace()
         axis_point1 = model.addPoint(self.part, 20, -10, 0).result()
         axis_point2 = model.addPoint(self.part, 20, 10, 0).result()
-        axis_object = model.addAxis(self.part, axis_point1[0], axis_point2[0]).result()
+        axis_object = model.addAxis(self.part, axis_point1, axis_point2).result()
 
-        revolution = model.addRevolution(self.part, base, axis_object[0],
-                                         0, 180)
+        revolution = model.addRevolution(self.part, base, axis_object, 0, 180)
 
         self.assertEqual(revolution.creationMethod().value(), "ByAngles")
         self.assertEqual(revolution.toAngle().value(), 0)
         self.assertEqual(revolution.fromAngle().value(), 180)
         self.assertEqual(revolution.toObject().context(), None)
-        self.assertEqual(revolution.toOffset().value(), 0)
         self.assertEqual(revolution.fromObject().context(), None)
-        self.assertEqual(revolution.fromOffset().value(), 0)
 
     def test_add_revolution_by_face_and_planes(self):
         # base
@@ -114,23 +110,19 @@ class FeaturesAddRevolutionTestCase(FeaturesAddRevolutionFixture):
         base = base_sketch.selectFace()
         axis_point1 = model.addPoint(self.part, 20, -10, 0).result()
         axis_point2 = model.addPoint(self.part, 20, 10, 0).result()
-        axis_object = model.addAxis(self.part, axis_point1[0], axis_point2[0]).result()
+        axis_object = model.addAxis(self.part, axis_point1, axis_point2).result()
         to_obejct = to_sketch.selectFace()[0]
         from_object = from_sketch.selectFace()[0]
 
-        revolution = model.addRevolution(self.part, base, axis_object[0],
-                                         to_obejct, 15,
-                                         from_object, 20)
+        self.revolution = model.addRevolution(self.part, base, axis_object,
+                                              to_obejct, 15,
+                                              from_object, 20)
 
-        self.assertEqual(revolution.creationMethod().value(), "ByPlanesAndOffsets")
-        self.assertEqual(revolution.toAngle().value(), 0)
-        self.assertEqual(revolution.fromAngle().value(), 0)
-#         self.assertEqual(revolution.getToObject().context(),
-#                          to_sketch.result())
-        self.assertEqual(revolution.toOffset().value(), 15)
-#         self.assertEqual(revolution.getFromObject().context(),
-#                          from_sketch.result())
-        self.assertEqual(revolution.fromOffset().value(), 20)
+        self.assertEqual(self.revolution.creationMethod().value(), "ByPlanesAndOffsets")
+        self.assertNotEqual(self.revolution.toObject().context(), None)
+        self.assertEqual(self.revolution.toOffset().value(), 15)
+        self.assertNotEqual(self.revolution.fromObject().context(), None)
+        self.assertEqual(self.revolution.fromOffset().value(), 20)
 
 
 class FeaturesRevolutionTestCase(FeaturesRevolutionFixture):
@@ -166,9 +158,7 @@ class FeaturesRevolutionTestCase(FeaturesRevolutionFixture):
         self.assertEqual(self.revolution.toAngle().value(), 90)
         self.assertEqual(self.revolution.fromAngle().value(), 270)
         self.assertEqual(self.revolution.toObject().context(), None)
-        self.assertEqual(self.revolution.toOffset().value(), 0)
         self.assertEqual(self.revolution.fromObject().context(), None)
-        self.assertEqual(self.revolution.fromOffset().value(), 0)
 
     def test_revolution_set_planes_and_offsets(self):
         # base
@@ -190,18 +180,17 @@ class FeaturesRevolutionTestCase(FeaturesRevolutionFixture):
         base = base_sketch.selectFace()
         axis_point1 = model.addPoint(self.part, 20, -10, 0).result()
         axis_point2 = model.addPoint(self.part, 20, 10, 0).result()
-        axis_object = model.addAxis(self.part, axis_point1[0], axis_point2[0]).result()
+        axis_object = model.addAxis(self.part, axis_point1, axis_point2).result()
         to_obejct = to_sketch.selectFace()[0]
         from_object = from_sketch.selectFace()[0]
 
+        self.revolution = model.addRevolution(self.part, base, axis_object, 0, 180)
         self.revolution.setPlanesAndOffsets(to_obejct, 15, from_object, 20)
 
         self.assertEqual(self.revolution.creationMethod().value(), "ByPlanesAndOffsets")
-        # self.assertEqual(self.revolution.toAngle().value(), 0)
-        # self.assertEqual(self.revolution.fromAngle().value(), 0)
-#         self.assertEqual(self.revolution.getToObject().context(), None)
+        self.assertNotEqual(self.revolution.toObject().context(), None)
         self.assertEqual(self.revolution.toOffset().value(), 15)
-#         self.assertEqual(self.revolution.getFromObject().context(), None)
+        self.assertNotEqual(self.revolution.fromObject().context(), None)
         self.assertEqual(self.revolution.fromOffset().value(), 20)
 
 

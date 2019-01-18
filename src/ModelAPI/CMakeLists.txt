@@ -200,6 +200,7 @@ ADD_UNIT_TESTS(TestConstants.py
                TestFolder_Stability.py
                TestFolder_CustomName.py
                TestFolder_Empty.py
+               TestFolder_Sketch.py
                Test2358_1.py
                Test2358_2.py
                Test2396.py

@@ -32,11 +32,15 @@ SketchLine_1 = Sketch_1.addLine(20, -50, 70, 50)
 model.do()
 
 Sketch_2 = model.addSketch(partSet, model.defaultPlane("YOZ"))
-SketchProjection_1 = Sketch_2.addProjection(model.selection("VERTEX", "Sketch_1/Vertex-SketchLine_1s"), True)
+SketchProjection_1 = Sketch_2.addProjection(model.selection("VERTEX", "Sketch_1/SketchLine_1_StartVertex"), True)
 model.do()
 
 # change the feature projected (no crash expected)
-SketchProjection_1.setExternalFeature(model.selection("EDGE", "Sketch_1/Edge-SketchLine_1"))
+SketchProjection_1.setExternalFeature(model.selection("EDGE", "Sketch_1/SketchLine_1"))
 model.do()
 
 model.end()
+
+from GeomAPI import GeomAPI_Shape
+
+model.testNbSubShapes(Sketch_2, GeomAPI_Shape.EDGE, [1])

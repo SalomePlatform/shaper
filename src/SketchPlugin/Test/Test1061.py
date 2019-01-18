@@ -23,7 +23,6 @@
     Test case for issue #1061 "Distance constraint using for points with equal coordinates"
 """
 
-import math
 from salome.shaper import model
 
 model.begin()
@@ -41,8 +40,7 @@ model.do()
 
 # check distance between points
 aDist2 = (SketchLine_1.endPoint().x() - SketchLine_2.startPoint().x())**2 + (SketchLine_1.endPoint().y() - SketchLine_2.startPoint().y())**2
-assert(math.fabs(aDist2 - DISTANCE**2) > 1e-12)
+assert(aDist2 < 1e-12)
+assert(Sketch_1.solverError() != "")
 
 model.end()
-
-assert(model.checkPythonDump())

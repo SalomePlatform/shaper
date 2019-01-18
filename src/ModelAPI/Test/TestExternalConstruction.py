@@ -34,7 +34,17 @@ SketchConstraintCoincidence_3 = Sketch_1.setCoincident(SketchLine_1.startPoint()
 model.do()
 Part_1 = model.addPart(partSet)
 Part_1_doc = Part_1.document()
-Revolution_1 = model.addRevolution(Part_1_doc, [model.selection("COMPOUND", "PartSet/Sketch_1")], model.selection("EDGE", "PartSet/Sketch_1/Edge-SketchLine_3"), 360, 0)
+Revolution_1 = model.addRevolution(Part_1_doc, [model.selection("COMPOUND", "PartSet/Sketch_1")], model.selection("EDGE", "PartSet/Sketch_1/SketchLine_3"), 360, 0)
 model.end()
+
+from GeomAPI import GeomAPI_Shape
+
+model.testNbResults(Revolution_1, 1)
+model.testNbSubResults(Revolution_1, [0])
+model.testNbSubShapes(Revolution_1, GeomAPI_Shape.SOLID, [1])
+model.testNbSubShapes(Revolution_1, GeomAPI_Shape.FACE, [2])
+model.testNbSubShapes(Revolution_1, GeomAPI_Shape.EDGE, [8])
+model.testNbSubShapes(Revolution_1, GeomAPI_Shape.VERTEX, [16])
+model.testResultsVolumes(Revolution_1, [17830100])
 
 assert(model.checkPythonDump())
