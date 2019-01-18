@@ -1373,75 +1373,12 @@ void Model_AttributeSelection::updateInHistory()
         continue;
       }
 
-      ResultPtr aSetContext;
       if (aFirst) {
         setValue(*aNewCont, aValueShape);
-        aSetContext = context();
+        aFirst = false;
       } else if (myParent) {
         myParent->append(*aNewCont, aValueShape);
-        aSetContext = myParent->value(myParent->size() - 1)->context();
       }
-
-      // #2826 : error if context is concealed by new context where the value is not presented
-      if (aSetContext.get()) {
-        bool anError = false;
-        std::list<ResultPtr> allRes;
-        ResultPtr aCompContext;
-        ResultBodyPtr aCompBody = ModelAPI_Tools::bodyOwner(aSetContext, true);
-        if (aCompBody.get()) {
-          ModelAPI_Tools::allSubs(aCompBody, allRes);
-          allRes.push_back(aCompBody);
-          aCompContext = aCompBody;
-        }
-        if (allRes.empty())
-          allRes.push_back(aSetContext);
-
-        std::list<ResultPtr>::iterator aSub = allRes.begin();
-        for (; !anError && aSub != allRes.end(); aSub++) {
-          ResultPtr aResCont = *aSub;
-          ResultBodyPtr aResBody = std::dynamic_pointer_cast<ModelAPI_ResultBody>(aResCont);
-          const std::set<AttributePtr>& aRefs = aResCont->data()->refsToMe();
-          std::set<AttributePtr>::const_iterator aRef = aRefs.begin();
-          for (; aRef != aRefs.end(); aRef++) {
-            if (!aRef->get() || !(*aRef)->owner().get())
-              continue;
-            // concealed attribute only
-            FeaturePtr aRefFeat = std::dynamic_pointer_cast<ModelAPI_Feature>((*aRef)->owner());
-            if (!aRefFeat.get())
-              continue;
-            if (!ModelAPI_Session::get()->validators()->isConcealed(
-              aRefFeat->getKind(), (*aRef)->id()))
-              continue;
-            // check the found feature is older than this attribute
-            if (aRefFeat == aThisFeature || aDoc->isLaterByDep(aRefFeat, aThisFeature))
-              continue;
-            // check the found feature don't have the value-shape
-            GeomShapePtr aValue = aFirst ? value() : myParent->value(myParent->size() - 1)->value();
-            if (aValue.get()) {
-              std::list<ResultPtr>::const_iterator aRefResults = aRefFeat->results().cbegin();
-              for(; aRefResults != aRefFeat->results().cend(); aRefResults++) {
-                if ((*aRefResults)->shape().get() &&
-                    !(*aRefResults)->shape()->isSubShape(aValue, false)) { // set error
-                  ResultPtr anEmptyContext;
-                  std::shared_ptr<GeomAPI_Shape> anEmptyShape;
-                  if (aFirst) {
-                    setValue(anEmptyContext, anEmptyShape); // nullify the selection
-                  } else {
-                    myParent->value(myParent->size() - 1)->setValue(anEmptyContext, anEmptyShape);
-                  }
-                  Events_InfoMessage("Model_AttributeSelection",
-                    "Selection of sub-shape of already modified result").send();
-                  anError = true;
-                  break;
-                }
-              }
-              if (anError)
-                break;
-            }
-          }
-        }
-      }
-      aFirst = false;
     }
     if (aFirst) { // nothing was added, all results were deleted
       ResultPtr anEmptyContext;

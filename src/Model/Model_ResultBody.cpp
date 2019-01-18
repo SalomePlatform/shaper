@@ -95,31 +95,12 @@ void Model_ResultBody::loadModifiedShapes(const std::shared_ptr<GeomAlgoAPI_Make
                                           const GeomAPI_Shape::ShapeType theShapeTypeToExplore,
                                           const std::string& theName)
 {
-  if (/*theSplitInSubs &&*/ mySubs.size()) { // consists of subs
+  if (mySubs.size()) { // consists of subs
     // optimization of getting of new shapes for specific sub-result
     if (!theAlgo->isNewShapesCollected(theOldShape, theShapeTypeToExplore))
       theAlgo->collectNewShapes(theOldShape, theShapeTypeToExplore);
     std::vector<ResultBodyPtr>::const_iterator aSubIter = mySubs.cbegin();
     for(; aSubIter != mySubs.cend(); aSubIter++) {
-      // check that sub-shape was also created as modification of ShapeIn
-      /* to find when it is needed later to enable: to store modification of sub-bodies not only as primitives
-      GeomShapePtr aSubGeomShape = (*aSubIter)->shape();
-      if (!theIsStoreAsGenerated && aSubGeomShape.get() && !aSubGeomShape->isNull()) {
-        TopoDS_Shape aSubShape = aSubGeomShape->impl<TopoDS_Shape>();
-        TopoDS_Shape aWholeIn = theShapeIn->impl<TopoDS_Shape>();
-        for(TopExp_Explorer anExp(aWholeIn, aSubShape.ShapeType()); anExp.More(); anExp.Next()) {
-          ListOfShape aHistory;
-          std::shared_ptr<GeomAPI_Shape> aSubIn(new GeomAPI_Shape());
-          aSubIn->setImpl((new TopoDS_Shape(anExp.Current())));
-          theMS->modified(aSubIn, aHistory);
-          std::list<std::shared_ptr<GeomAPI_Shape> >::const_iterator anIt = aHistory.begin();
-          for (; anIt != aHistory.end(); anIt++) {
-            if ((*anIt)->isSame(aSubGeomShape)) {
-              (*aSubIter)->storeModified(aSubIn, aSubGeomShape, -2); // -2 is to avoid clearing
-            }
-          }
-        }
-      }*/
       (*aSubIter)->loadModifiedShapes(theAlgo, theOldShape, theShapeTypeToExplore, theName);
     }
   } else { // do for this directly
@@ -273,7 +254,14 @@ void Model_ResultBody::updateSubs(const std::shared_ptr<GeomAPI_Shape>& theThisS
       }
       GeomShapePtr anOldSubShape = aSub->shape();
       if (!aShape->isEqual(anOldSubShape)) {
-        aSub->store(aShape, false);
+        if (myAlgo.get()) {
+          std::list<GeomShapePtr> anOldForSub;
+          computeOldForSub(aShape, anOldForSub);
+          myIsGenerated ? aSub->storeGenerated(anOldForSub, aShape, myAlgo) :
+            aSub->storeModified(anOldForSub, aShape, myAlgo);
+        } else {
+          aSub->store(aShape, false);
+        }
         aECreator->sendUpdated(aSub, EVENT_DISP);
         aECreator->sendUpdated(aSub, EVENT_UPD);
       }
@@ -311,6 +299,19 @@ void Model_ResultBody::updateSubs(const std::shared_ptr<GeomAPI_Shape>& theThisS
   }
 }
 
+void Model_ResultBody::updateSubs(
+  const GeomShapePtr& theThisShape, const std::list<GeomShapePtr>& theOlds,
+  const std::shared_ptr<GeomAlgoAPI_MakeShape> theMakeShape, const bool isGenerated)
+{
+  myAlgo = theMakeShape;
+  myOlds = theOlds;
+  myIsGenerated = isGenerated;
+  updateSubs(theThisShape, true);
+  myAlgo.reset();
+  myOlds.clear();
+}
+
+
 bool Model_ResultBody::isConnectedTopology()
 {
   TDF_Label aDataLab = std::dynamic_pointer_cast<Model_Data>(data())->label();
@@ -337,5 +338,21 @@ void Model_ResultBody::cleanCash()
   {
     const ResultBodyPtr& aSub = *aSubIter;
     aSub->cleanCash();
+  }
+}
+
+void Model_ResultBody::computeOldForSub(
+  const GeomShapePtr& theSubShape, std::list<GeomShapePtr>& theOldForSub)
+{
+  std::list<GeomShapePtr>::iterator aRootOlds = myOlds.begin();
+  for(; aRootOlds != myOlds.end(); aRootOlds++) {
+    ListOfShape aNews;
+    myIsGenerated ? myAlgo->generated(*aRootOlds, aNews) : myAlgo->modified(*aRootOlds, aNews);
+    for(ListOfShape::iterator aNewIter = aNews.begin(); aNewIter != aNews.end(); aNewIter++) {
+      if (theSubShape->isSame(*aNewIter)) { // found old that was used for new theSubShape creation
+        theOldForSub.push_back(*aRootOlds);
+        break;
+      }
+    }
   }
 }

@@ -47,12 +47,21 @@ public:
 
   /// Stores the generated shape (called by the execution method).
   virtual void storeGenerated(const GeomShapePtr& theFromShape,
-                              const GeomShapePtr& theToShape) = 0;
+                              const GeomShapePtr& theToShape,
+                              const bool theIsCleanStored = true) = 0;
+
+  /// Stores the root generated shapes (called by the execution method).
+  virtual void storeGenerated(const std::list<GeomShapePtr>& theFromShapes,
+    const GeomShapePtr& theToShape, const std::shared_ptr<GeomAlgoAPI_MakeShape> theMakeShape) = 0;
 
   /// Stores the modified shape (called by the execution method).
   virtual void storeModified(const GeomShapePtr& theOldShape,
                              const GeomShapePtr& theNewShape,
                              const bool theIsCleanStored = true) = 0;
+
+  /// Stores the root modified shapes (called by the execution method).
+  virtual void storeModified(const std::list<GeomShapePtr>& theOldShapes,
+    const GeomShapePtr& theNewShape, const std::shared_ptr<GeomAlgoAPI_MakeShape> theMakeShape)=0;
 
   /// Returns the shape-result produced by this feature
   virtual GeomShapePtr shape() = 0;

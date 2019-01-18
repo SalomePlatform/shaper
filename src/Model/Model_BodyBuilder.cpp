@@ -166,13 +166,14 @@ void Model_BodyBuilder::store(const GeomShapePtr& theShape,
 }
 
 void Model_BodyBuilder::storeGenerated(const GeomShapePtr& theFromShape,
-  const GeomShapePtr& theToShape)
+  const GeomShapePtr& theToShape, const bool theIsCleanStored)
 {
   std::shared_ptr<Model_Data> aData = std::dynamic_pointer_cast<Model_Data>(data());
   if (aData) {
     TDF_Label aShapeLab = aData->shapeLab();
     // clean builders
-    clean();
+    if (theIsCleanStored)
+      clean();
     // store the new shape as primitive
     TNaming_Builder aBuilder(aShapeLab);
     if (!theFromShape || !theToShape)
@@ -196,6 +197,31 @@ void Model_BodyBuilder::storeGenerated(const GeomShapePtr& theFromShape,
         }
       }
     }
+  }
+}
+
+void Model_BodyBuilder::storeGenerated(const std::list<GeomShapePtr>& theFromShapes,
+  const GeomShapePtr& theToShape, const std::shared_ptr<GeomAlgoAPI_MakeShape> theMakeShape)
+{
+  bool aStored = false;
+  std::list<GeomShapePtr>::const_iterator anOldIter = theFromShapes.cbegin();
+  for(; anOldIter != theFromShapes.cend(); anOldIter++) {
+    ListOfShape aNews; // check this old really generates theToShape
+    theMakeShape->generated(*anOldIter, aNews);
+    ListOfShape::iterator aNewIter = aNews.begin();
+    for(; aNewIter != aNews.end(); aNewIter++) {
+      if (theToShape->isSame(*aNewIter))
+        break;
+    }
+    if (aNewIter != aNews.end()) {
+      storeGenerated(*anOldIter, theToShape, !aStored);
+      TNaming_Builder* aBuilder = builder(0);
+      aStored = !aBuilder->NamedShape()->IsEmpty();
+    }
+  }
+  if (!aStored) { // store as PRIMITIVE, but clean in any way
+    store(theToShape);
+    return;
   }
 }
 
@@ -232,7 +258,7 @@ void Model_BodyBuilder::storeModified(const GeomShapePtr& theOldShape,
     aBuilder->Modify(aShapeOld, aShapeNew);
     if(!aBuilder->NamedShape()->IsEmpty()) {
       Handle(TDataStd_Name) anAttr;
-      if(aBuilder->NamedShape()->Label().FindAttribute(TDataStd_Name::GetID(),anAttr)) {
+      if(aBuilder->NamedShape()->Label().FindAttribute(TDataStd_Name::GetID(), anAttr)) {
         std::string aName (TCollection_AsciiString(anAttr->Get()).ToCString());
         if(!aName.empty()) {
           std::shared_ptr<Model_Document> aDoc =
@@ -241,6 +267,31 @@ void Model_BodyBuilder::storeModified(const GeomShapePtr& theOldShape,
         }
       }
     }
+  }
+}
+
+void Model_BodyBuilder::storeModified(const std::list<GeomShapePtr>& theOldShapes,
+  const GeomShapePtr& theNewShape, const std::shared_ptr<GeomAlgoAPI_MakeShape> theMakeShape)
+{
+  bool aStored = false;
+  std::list<GeomShapePtr>::const_iterator anOldIter = theOldShapes.cbegin();
+  for(; anOldIter != theOldShapes.cend(); anOldIter++) {
+    ListOfShape aNews; // check this old really modifies theNewShape
+    theMakeShape->modified(*anOldIter, aNews);
+    ListOfShape::iterator aNewIter = aNews.begin();
+    for(; aNewIter != aNews.end(); aNewIter++) {
+      if (theNewShape->isSame(*aNewIter))
+        break;
+    }
+    if (aNewIter != aNews.end()) {
+      storeModified(*anOldIter, theNewShape, !aStored);
+      TNaming_Builder* aBuilder = builder(0);
+      aStored = !aBuilder->NamedShape()->IsEmpty();
+    }
+  }
+  if (!aStored) { // store as PRIMITIVE, but clean in any way
+    store(theNewShape);
+    return;
   }
 }
 
@@ -528,44 +579,18 @@ void Model_BodyBuilder::loadModifiedShapes(const GeomMakeShapePtr& theAlgo,
 
       bool aNewShapeIsSameAsOldShape = anOldSubShape->isSame(aNewShape);
       bool aNewShapeIsNotInResultShape = !aResultShape->isSubShape(aNewShape, false);
-      if (aNewShapeIsSameAsOldShape
-          || aNewShapeIsNotInResultShape)
-      {
+      if (aNewShapeIsSameAsOldShape || aNewShapeIsNotInResultShape)
         continue;
-      }
 
-      TNaming_Builder* aBuilder;
-      if (aResultShape->isSame(aNewShape)) {
-        // keep the modification evolution on the root level (2241 - history propagation issue)
-        aBuilder = builder(0);
-        TDF_Label aShapeLab = aBuilder->NamedShape()->Label();
-        Handle(TDF_Reference) aRef;
-        if (aShapeLab.FindAttribute(TDF_Reference::GetID(), aRef)) {
-          // Store only in case if it does not have reference.
-          continue;
-        }
+      if (aResultShape->isSame(aNewShape))
+        continue; // it is stored on the root level (2241 - history propagation issue)
 
-        // Check if new shape was already stored.
-        if (isAlreadyStored(aBuilder, anOldSubShape_, aNewShape_)) continue;
+      int aTag = isGenerated ? getGenerationTag(aNewShape_) : getModificationTag(aNewShape_);
+      TNaming_Builder*aBuilder = builder(aTag);
+      if (isAlreadyStored(aBuilder, anOldSubShape_, aNewShape_))
+        continue; // new shape was already stored.
 
-        if (!aBuilder->NamedShape().IsNull() &&
-            ((isGenerated && aBuilder->NamedShape()->Evolution() != TNaming_GENERATED)
-              || (!isGenerated && aBuilder->NamedShape()->Evolution() != TNaming_MODIFY)))
-        {
-          myBuilders.erase(0); // clear old builder to avoid different evolutions crash
-          aBuilder = builder(0);
-        }
-      } else {
-        int aTag = isGenerated ? getGenerationTag(aNewShape_)
-                               : getModificationTag(aNewShape_);
-        aBuilder = builder(aTag);
-
-        // Check if new shape was already stored.
-        if (isAlreadyStored(aBuilder, anOldSubShape_, aNewShape_)) continue;
-
-        buildName(aTag, theName);
-      }
-
+      buildName(aTag, theName);
       isGenerated ? aBuilder->Generated(anOldSubShape_, aNewShape_)
                   : aBuilder->Modify(anOldSubShape_, aNewShape_);
       // store information about the external document reference to restore old shape on open
@@ -632,25 +657,6 @@ void Model_BodyBuilder::loadGeneratedShapes(const GeomMakeShapePtr& theAlgo,
           storeExternalReference(anOriginalLabel, builder(aTag)->NamedShape()->Label());
         }
         buildName(aTag, theName);
-      } if (aResultShape->isSame(aNewShape)) {
-        // keep the generation evolution on the root level (2397 - for intersection feature)
-        TNaming_Builder* aBuilder = builder(0);
-        TDF_Label aShapeLab = aBuilder->NamedShape()->Label();
-        Handle(TDF_Reference) aRef;
-        if (aShapeLab.FindAttribute(TDF_Reference::GetID(), aRef)) {
-          // Store only in case if it does not have reference.
-          continue;
-        }
-
-        // Check if new shape was already stored.
-        if (isAlreadyStored(aBuilder, anOldSubShape_, aNewShape_)) continue;
-
-        if (!aBuilder->NamedShape().IsNull() &&
-            aBuilder->NamedShape()->Evolution() != TNaming_GENERATED) {
-          myBuilders.erase(0); // clear old builder to avoid different evolutions crash
-          aBuilder = builder(0);
-        }
-        aBuilder->Generated(anOldSubShape_, aNewShape_);
       } else {
         int aTag = getGenerationTag(aNewShape_);
         if (aTag == INVALID_TAG) return;
