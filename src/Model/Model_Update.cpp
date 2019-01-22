@@ -43,6 +43,7 @@
 #include <ModelAPI_ResultConstruction.h>
 #include <GeomAPI_Shape.h>
 #include <GeomDataAPI_Point.h>
+#include <GeomDataAPI_Dir.h>
 #include <GeomDataAPI_Point2D.h>
 #include <Events_Loop.h>
 #include <Events_LongOp.h>
@@ -565,36 +566,46 @@ bool Model_Update::processFeature(FeaturePtr theFeature)
 
   // update the sketch plane before the sketch sub-elements are recomputed
   // (otherwise sketch will update plane, modify subs, after executed, but with old subs edges)
-  if (aIsModified && theFeature->getKind() == "Sketch") {
+    if (aIsModified && theFeature->getKind() == "Sketch") {
 #ifdef DEB_UPDATE
-    std::cout<<"****** Update sketch args "<<theFeature->name()<<std::endl;
+      std::cout << "****** Update sketch args " << theFeature->name() << std::endl;
 #endif
-    AttributeSelectionPtr anExtSel = theFeature->selection("External");
-    if (anExtSel.get()) {
-      ResultPtr aContext = anExtSel->context();
-      if (aContext.get() && aContext->document().get()) {
-        FeaturePtr anExtBase = aContext->document()->feature(aContext);
-        if (anExtBase.get()) {
-          processFeature(anExtBase);
+      AttributeSelectionPtr anExtSel = theFeature->selection("External");
+      if (anExtSel.get()) {
+        ResultPtr aContext = anExtSel->context();
+        if (aContext.get() && aContext->document().get()) {
+          FeaturePtr anExtBase = aContext->document()->feature(aContext);
+          if (anExtBase.get()) {
+            processFeature(anExtBase);
+          }
+          std::shared_ptr<GeomDataAPI_Point> anOrigin =
+            std::dynamic_pointer_cast<GeomDataAPI_Point>(theFeature->attribute("Origin"));
+          double anOX = anOrigin->x(), anOY = anOrigin->y(), anOZ = anOrigin->z();
+          std::shared_ptr<GeomDataAPI_Dir> aDir =
+            std::dynamic_pointer_cast<GeomDataAPI_Dir>(theFeature->attribute("DirX"));
+          double aDX = aDir->x(), aDY = aDir->y(), aDZ = aDir->z();
+          std::shared_ptr<GeomDataAPI_Dir> aNorm =
+            std::dynamic_pointer_cast<GeomDataAPI_Dir>(theFeature->attribute("Norm"));
+          double aNX = aNorm->x(), aNY = aNorm->y(), aNZ = aNorm->z();
+          // update sketch plane
+          updateArguments(theFeature);
+          //theFeature->attributeChanged("External"); // to recompute origin, direction and normal
+          // check it is updated, so all must be changed
+          if (anOrigin->x() != anOX || anOrigin->y() != anOY || anOrigin->z() != anOZ ||
+              aDir->x() != aDX || aDir->y() != aDY || aDir->z() != aDZ ||
+              aNorm->x() != aNX || aNorm->y() != aNY || aNorm->z() != aNZ)
+          {
+            std::set<FeaturePtr> aWholeR;
+            allReasons(theFeature, aWholeR);
+            std::set<FeaturePtr>::iterator aRIter = aWholeR.begin();
+            for (; aRIter != aWholeR.end(); aRIter++) {
+              if ((*aRIter)->data()->selection("External").get())
+                (*aRIter)->attributeChanged("External");
+            }
+          }
         }
       }
     }
-    std::shared_ptr<GeomAPI_Shape> aShapeBefore = anExtSel->value();
-    if (!aShapeBefore.get() && anExtSel->context()) aShapeBefore = anExtSel->context()->shape();
-    updateArguments(theFeature);
-    std::shared_ptr<GeomAPI_Shape> aShapeAfter = anExtSel->value();
-    if (!aShapeAfter.get() && anExtSel->context()) aShapeAfter = anExtSel->context()->shape();
-    // if selected plane is changed, try to re-take external references of all subs of the sketch
-    if (aShapeBefore.get() && !aShapeBefore->isEqual(aShapeAfter)) {
-      std::set<FeaturePtr> aWholeR;
-      allReasons(theFeature, aWholeR);
-      std::set<FeaturePtr>::iterator aRIter = aWholeR.begin();
-      for(; aRIter != aWholeR.end(); aRIter++) {
-        if ((*aRIter)->data()->selection("External"))
-          (*aRIter)->attributeChanged("External");
-      }
-    }
-  }
 
   if (!aIsModified) { // no modification is needed
     return false;

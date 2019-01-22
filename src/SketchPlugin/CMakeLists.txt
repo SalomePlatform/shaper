@@ -277,6 +277,7 @@ ADD_UNIT_TESTS(
   TestTrimLine02.py
   TestTrimLine03.py
   TestTrimPreview.py
+  TestUpdateSketch.py
 )
 
 if(${SKETCHER_CHANGE_RADIUS_WHEN_MOVE})
