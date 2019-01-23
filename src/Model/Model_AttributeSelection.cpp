@@ -1155,6 +1155,32 @@ void Model_AttributeSelection::computeValues(
     }
   }
   if (aToFindPart == 2 && !aNewToOld.IsEmpty()) {
+    // also iterate the whole old shape to find not-modified shapes that contain this old
+    TopoDS_Shape anOldContShape = theOldContext->shape()->impl<TopoDS_Shape>();
+    NCollection_Map<TopAbs_ShapeEnum> aNewTypes; // types of shapes to iterate
+    TopTools_DataMapOfShapeShape::Iterator aNewTypeIter(aNewToOld);
+    for(; aNewTypeIter.More(); aNewTypeIter.Next()) {
+      if (aNewTypeIter.Key().ShapeType() != theValShape.ShapeType())
+        aNewTypes.Add(aNewTypeIter.Key().ShapeType());
+    }
+    NCollection_Map<TopAbs_ShapeEnum>::Iterator aTypeIter(aNewTypes);
+    for(; aTypeIter.More(); aTypeIter.Next()) {
+      for(TopExp_Explorer anExp(anOldContShape, aTypeIter.Value()); anExp.More(); anExp.Next()) {
+        TopoDS_Shape anOld = anExp.Current();
+        if (aNewToOld.IsBound(anOld) || anOlds.Contains(anOld)) // this was modified
+          continue;
+        TopExp_Explorer aValExp(anOld, theValShape.ShapeType());
+        for(; aValExp.More(); aValExp.Next()) {
+          const TopoDS_Shape& anUnchanged = aValExp.Current();
+          if (anUnchanged.IsSame(theValShape)) {
+            aNewToOld.Bind(anOld, anOld);
+            anOlds.Add(anOld);
+            break;
+          }
+        }
+      }
+    }
+
     // map of sub-shapes -> number of occurrences of these shapes in containers
     NCollection_DataMap<TopoDS_Shape, TopTools_MapOfShape, TopTools_ShapeMapHasher> aSubs;
     TopTools_DataMapOfShapeShape::Iterator aContIter(aNewToOld);
@@ -1174,12 +1200,29 @@ void Model_AttributeSelection::computeValues(
       aSubsIter(aSubs);
     for(; aSubsIter.More(); aSubsIter.Next()) {
       if (aSubsIter.Value().Size() == aCountInOld) {
-        theShapes.Append(aSubsIter.Key());
+        TopoDS_Shape anOld = aSubsIter.Key();
+        // check this exists in the new shape
+        TopExp_Explorer aNew(aNewContShape, anOld.ShapeType());
+        for (; aNew.More(); aNew.Next()) {
+          if (aNew.Current().IsSame(anOld))
+            break;
+        }
+        if (aNew.More())
+          theShapes.Append(anOld);
       }
     }
   }
   if (theShapes.IsEmpty()) { // nothing was changed
-    theShapes.Append(aWasWholeContext ? TopoDS_Shape() : theValShape);
+    if (aWasWholeContext)
+      theShapes.Append(TopoDS_Shape());
+    else { // if theValShape exists in new context, add it without changes, otherwise - nothing
+      for (TopExp_Explorer aNew(aNewContShape, theValShape.ShapeType()); aNew.More(); aNew.Next()){
+        if (aNew.Current().IsSame(theValShape)) {
+          theShapes.Append(theValShape);
+          break;
+        }
+      }
+    }
   }
 }
 

@@ -69,4 +69,4 @@ assert(aList1.value(1).value().shapeTypeStr() == "SOLID")
 assert(aList2.value(0).value().shapeTypeStr() == "SOLID")
 assert(aList2.value(1).value().shapeTypeStr() == "SOLID")
 assert(aList1.value(0).value().isSame(aList2.value(0).value()) or aList1.value(1).value().isSame(aList2.value(0).value()) or
-aList1.value(1).value().isSame(aList2.value(0).value()) or aList1.value(1).value().isSame(aList2.value(1).value()))
+aList1.value(0).value().isSame(aList2.value(1).value()) or aList1.value(1).value().isSame(aList2.value(1).value()))

@@ -29,6 +29,7 @@
 #include <ModelAPI_Tools.h>
 #include <Model_Data.h>
 #include <Events_Loop.h>
+#include <GeomAPI_ShapeIterator.h>
 
 #include <TopoDS_Shape.hxx>
 #include <TopExp_Explorer.hxx>
@@ -256,7 +257,7 @@ void Model_ResultBody::updateSubs(const std::shared_ptr<GeomAPI_Shape>& theThisS
       if (!aShape->isEqual(anOldSubShape)) {
         if (myAlgo.get()) {
           std::list<GeomShapePtr> anOldForSub;
-          computeOldForSub(aShape, anOldForSub);
+          computeOldForSub(aShape, myOlds, anOldForSub);
           myIsGenerated ? aSub->storeGenerated(anOldForSub, aShape, myAlgo) :
             aSub->storeModified(anOldForSub, aShape, myAlgo);
         } else {
@@ -341,15 +342,27 @@ void Model_ResultBody::cleanCash()
   }
 }
 
-void Model_ResultBody::computeOldForSub(
-  const GeomShapePtr& theSubShape, std::list<GeomShapePtr>& theOldForSub)
+void Model_ResultBody::computeOldForSub(const GeomShapePtr& theSub,
+  const std::list<GeomShapePtr>& theAllOlds, std::list<GeomShapePtr>& theOldForSub)
 {
-  std::list<GeomShapePtr>::iterator aRootOlds = myOlds.begin();
-  for(; aRootOlds != myOlds.end(); aRootOlds++) {
+  std::list<GeomShapePtr>::const_iterator aRootOlds = theAllOlds.cbegin();
+  for(; aRootOlds != theAllOlds.cend(); aRootOlds++) {
     ListOfShape aNews;
     myIsGenerated ? myAlgo->generated(*aRootOlds, aNews) : myAlgo->modified(*aRootOlds, aNews);
+    // MakeShape may return alone old shape if there is no history information for this input
+    if (aNews.size() == 1 && aNews.front()->isEqual(*aRootOlds))
+      aNews.clear();
+    if (aNews.empty()) { // try to iterate to sub-elements (for intersection of solids this is face)
+      std::list<GeomShapePtr> theAllSubOlds;
+      for(GeomAPI_ShapeIterator aSubOld(*aRootOlds); aSubOld.more(); aSubOld.next()) {
+        GeomShapePtr aSub = aSubOld.current();
+        if (aSub.get() && !aSub->isNull())
+          theAllSubOlds.push_back(aSub);
+      }
+      computeOldForSub(theSub, theAllSubOlds, theOldForSub);
+    }
     for(ListOfShape::iterator aNewIter = aNews.begin(); aNewIter != aNews.end(); aNewIter++) {
-      if (theSubShape->isSame(*aNewIter)) { // found old that was used for new theSubShape creation
+      if (theSub->isSame(*aNewIter)) { // found old that was used for new theSubShape creation
         theOldForSub.push_back(*aRootOlds);
         break;
       }

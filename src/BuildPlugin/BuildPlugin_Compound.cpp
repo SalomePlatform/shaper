@@ -76,7 +76,7 @@ void BuildPlugin_Compound::execute()
   int anIndexToRemove = 0;
   if (aCopyCompound) {
     ResultBodyPtr aResultBody = document()->createBody(data(), anIndexToRemove++);
-    aResultBody->store(aCopyCompound);
+    aResultBody->storeModified(anOriginalShapes, aCopyCompound, aCopyAlgo);
     aResultBody->loadModifiedShapes(aCopyAlgo, aCompound, GeomAPI_Shape::VERTEX);
     aResultBody->loadModifiedShapes(aCopyAlgo, aCompound, GeomAPI_Shape::EDGE);
     aResultBody->loadModifiedShapes(aCopyAlgo, aCompound, GeomAPI_Shape::FACE);

@@ -123,8 +123,9 @@ protected:
   // Checks the state of children and parents to send events of creation/erase when needed
   void updateConcealment();
 
-  /// Adds to theOldForSub only old shapes that where used for theSubShape creation
-  void computeOldForSub(const GeomShapePtr& theSubShape, std::list<GeomShapePtr>& theOldForSub);
+  /// Adds to theOldForSub only old shapes that where used for theSub creation
+  void computeOldForSub(const GeomShapePtr& theSub,
+    const std::list<GeomShapePtr>& theAllOlds, std::list<GeomShapePtr>& theOldForSub);
 
   friend class Model_Objects;
 };

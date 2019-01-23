@@ -589,7 +589,7 @@ bool Model_Update::processFeature(FeaturePtr theFeature)
           double aNX = aNorm->x(), aNY = aNorm->y(), aNZ = aNorm->z();
           // update sketch plane
           updateArguments(theFeature);
-          //theFeature->attributeChanged("External"); // to recompute origin, direction and normal
+          theFeature->attributeChanged("External"); // to recompute origin, direction and normal
           // check it is updated, so all must be changed
           if (anOrigin->x() != anOX || anOrigin->y() != anOY || anOrigin->z() != anOZ ||
               aDir->x() != aDX || aDir->y() != aDY || aDir->z() != aDZ ||

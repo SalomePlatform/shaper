@@ -120,6 +120,53 @@ Model_BodyBuilder::Model_BodyBuilder(ModelAPI_Object* theOwner)
 {
 }
 
+/// Checks that shape is presented in the tree with not-selection evolution
+/// In theOriginalLabel it returns label where NS of old sub-shape is stored
+static bool isShapeInTree(const TDF_Label& theAccess1, const TDF_Label& theAccess2,
+  TopoDS_Shape theShape, TDF_Label& theOriginalLabel)
+{
+  bool aResult = TNaming_Tool::HasLabel(theAccess1, theShape);
+  if (aResult) { //check evolution and a label of this shape
+    for(TNaming_SameShapeIterator aShapes(theShape, theAccess1); aShapes.More(); aShapes.Next())
+    {
+      static Handle(TNaming_NamedShape) aNS;
+      if (aShapes.Label().FindAttribute(TNaming_NamedShape::GetID(), aNS)) {
+        if (aNS->Evolution() != TNaming_SELECTED) {
+          theOriginalLabel = aNS->Label();
+          return true;
+        }
+      }
+    }
+  }
+  if (!theAccess2.IsNull()) {
+    static const TDF_Label anEmpty;
+    return isShapeInTree(theAccess2, anEmpty, theShape, theOriginalLabel);
+  }
+  return false;
+}
+
+/// Stores entry to the external label in the entries list at this label
+static void storeExternalReference(const TDF_Label& theExternal, const TDF_Label theThis)
+{
+  // store information about the external document reference to restore old shape on open
+  if (!theExternal.IsNull() && !theExternal.Root().IsEqual(theThis.Root())) {
+    Handle(TDataStd_ExtStringList) anEntries;
+    if (!theThis.FindAttribute(kEXTERNAL_SHAPE_REF, anEntries)) {
+      anEntries = TDataStd_ExtStringList::Set(theThis, kEXTERNAL_SHAPE_REF);
+    }
+    TCollection_AsciiString anEntry;
+    TDF_Tool::Entry(theExternal, anEntry);
+    // check it already contains this entry
+    TDataStd_ListOfExtendedString::Iterator anIter(anEntries->List());
+    for(; anIter.More(); anIter.Next())
+      if (anIter.Value() == anEntry)
+        break;
+    if (!anIter.More()) {
+      anEntries->Append(anEntry);
+    }
+  }
+}
+
 void Model_BodyBuilder::store(const GeomShapePtr& theShape,
                               const bool theIsStoreSameShapes)
 {
@@ -174,8 +221,7 @@ void Model_BodyBuilder::storeGenerated(const GeomShapePtr& theFromShape,
     // clean builders
     if (theIsCleanStored)
       clean();
-    // store the new shape as primitive
-    TNaming_Builder aBuilder(aShapeLab);
+    TNaming_Builder* aBuilder = builder(0);
     if (!theFromShape || !theToShape)
       return;  // bad shape
     TopoDS_Shape aShapeBasis = theFromShape->impl<TopoDS_Shape>();
@@ -184,16 +230,35 @@ void Model_BodyBuilder::storeGenerated(const GeomShapePtr& theFromShape,
     TopoDS_Shape aShapeNew = theToShape->impl<TopoDS_Shape>();
     if (aShapeNew.IsNull())
       return;  // null shape inside
-    aBuilder.Generated(aShapeBasis, aShapeNew);
+
+    // There is no sense to write history if old shape does not exist in the document.
+    TDF_Label anAccess2 = std::dynamic_pointer_cast<Model_Document>(
+      ModelAPI_Session::get()->moduleDocument())->generalLabel();
+    TDF_Label anOriginalLabel;
+    if (!isShapeInTree(aData->shapeLab(), anAccess2, aShapeBasis, anOriginalLabel)) {
+      if (aBuilder->NamedShape()->Get().IsNull()) { // store as primitive if alone anyway
+        aBuilder->Generated(aShapeNew);
+      }
+    } else {
+      if (aBuilder->NamedShape()->Evolution() == TNaming_PRIMITIVE) { // erase primitive before
+        myBuilders.erase(0);
+        aBuilder = builder(0);
+      }
+
+      aBuilder->Generated(aShapeBasis, aShapeNew);
+      // store information about the external document reference to restore old shape on open
+      storeExternalReference(anOriginalLabel, aBuilder->NamedShape()->Label());
+    }
+
     // register name
-    if(!aBuilder.NamedShape()->IsEmpty()) {
+    if(!aBuilder->NamedShape()->IsEmpty()) {
       Handle(TDataStd_Name) anAttr;
-      if(aBuilder.NamedShape()->Label().FindAttribute(TDataStd_Name::GetID(),anAttr)) {
+      if(aBuilder->NamedShape()->Label().FindAttribute(TDataStd_Name::GetID(),anAttr)) {
         std::string aName (TCollection_AsciiString(anAttr->Get()).ToCString());
         if(!aName.empty()) {
           std::shared_ptr<Model_Document> aDoc =
             std::dynamic_pointer_cast<Model_Document>(document());
-          aDoc->addNamingName(aBuilder.NamedShape()->Label(), aName);
+          aDoc->addNamingName(aBuilder->NamedShape()->Label(), aName);
         }
       }
     }
@@ -245,7 +310,6 @@ void Model_BodyBuilder::storeModified(const GeomShapePtr& theOldShape,
   if (aData) {
     // clean builders
     if (theIsCleanStored) clean();
-    // store the new shape as primitive
     TNaming_Builder* aBuilder = builder(0);
     if (!theOldShape || !theNewShape)
       return;  // bad shape
@@ -255,7 +319,26 @@ void Model_BodyBuilder::storeModified(const GeomShapePtr& theOldShape,
     TopoDS_Shape aShapeNew = theNewShape->impl<TopoDS_Shape>();
     if (aShapeNew.IsNull())
       return;  // null shape inside
-    aBuilder->Modify(aShapeOld, aShapeNew);
+
+    // There is no sense to write history if old shape does not exist in the document.
+    TDF_Label anAccess2 = std::dynamic_pointer_cast<Model_Document>(
+      ModelAPI_Session::get()->moduleDocument())->generalLabel();
+    TDF_Label anOriginalLabel;
+    if (!isShapeInTree(aData->shapeLab(), anAccess2, aShapeOld, anOriginalLabel)) {
+      if (aBuilder->NamedShape()->Get().IsNull()) { // store as primitive if alone anyway
+        aBuilder->Generated(aShapeNew);
+      }
+    } else {
+      if (aBuilder->NamedShape()->Evolution() == TNaming_PRIMITIVE) { // erase primitive before
+        myBuilders.erase(0);
+        aBuilder = builder(0);
+      }
+
+      aBuilder->Modify(aShapeOld, aShapeNew);
+      // store information about the external document reference to restore old shape on open
+      storeExternalReference(anOriginalLabel, aBuilder->NamedShape()->Label());
+    }
+
     if(!aBuilder->NamedShape()->IsEmpty()) {
       Handle(TDataStd_Name) anAttr;
       if(aBuilder->NamedShape()->Label().FindAttribute(TDataStd_Name::GetID(), anAttr)) {
@@ -478,53 +561,6 @@ static void keepTopLevelShapes(ListOfShape& theShapes,
         theShapes.erase(aRemoveIt);
       } else
         ++anIt;
-    }
-  }
-}
-
-/// Checks that shape is presented in the tree with not-selection evolution
-/// In theOriginalLabel it returns label where NS of old sub-shape is stored
-static bool isShapeInTree(const TDF_Label& theAccess1, const TDF_Label& theAccess2,
-  TopoDS_Shape theShape, TDF_Label& theOriginalLabel)
-{
-  bool aResult = TNaming_Tool::HasLabel(theAccess1, theShape);
-  if (aResult) { //check evolution and a label of this shape
-    for(TNaming_SameShapeIterator aShapes(theShape, theAccess1); aShapes.More(); aShapes.Next())
-    {
-      static Handle(TNaming_NamedShape) aNS;
-      if (aShapes.Label().FindAttribute(TNaming_NamedShape::GetID(), aNS)) {
-        if (aNS->Evolution() != TNaming_SELECTED) {
-          theOriginalLabel = aNS->Label();
-          return true;
-        }
-      }
-    }
-  }
-  if (!theAccess2.IsNull()) {
-    static const TDF_Label anEmpty;
-    return isShapeInTree(theAccess2, anEmpty, theShape, theOriginalLabel);
-  }
-  return false;
-}
-
-/// Stores entry to the external label in the entries list at this label
-static void storeExternalReference(const TDF_Label& theExternal, const TDF_Label theThis)
-{
-  // store information about the external document reference to restore old shape on open
-  if (!theExternal.IsNull() && !theExternal.Root().IsEqual(theThis.Root())) {
-    Handle(TDataStd_ExtStringList) anEntries;
-    if (!theThis.FindAttribute(kEXTERNAL_SHAPE_REF, anEntries)) {
-      anEntries = TDataStd_ExtStringList::Set(theThis, kEXTERNAL_SHAPE_REF);
-    }
-    TCollection_AsciiString anEntry;
-    TDF_Tool::Entry(theExternal, anEntry);
-    // check it already contains this entry
-    TDataStd_ListOfExtendedString::Iterator anIter(anEntries->List());
-    for(; anIter.More(); anIter.Next())
-      if (anIter.Value() == anEntry)
-        break;
-    if (!anIter.More()) {
-      anEntries->Append(anEntry);
     }
   }
 }
