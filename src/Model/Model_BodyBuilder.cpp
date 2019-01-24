@@ -270,15 +270,19 @@ void Model_BodyBuilder::storeGenerated(const std::list<GeomShapePtr>& theFromSha
 {
   bool aStored = false;
   std::list<GeomShapePtr>::const_iterator anOldIter = theFromShapes.cbegin();
-  for(; anOldIter != theFromShapes.cend(); anOldIter++) {
-    ListOfShape aNews; // check this old really generates theToShape
-    theMakeShape->generated(*anOldIter, aNews);
-    ListOfShape::iterator aNewIter = aNews.begin();
-    for(; aNewIter != aNews.end(); aNewIter++) {
-      if (theToShape->isSame(*aNewIter))
-        break;
+  for (; anOldIter != theFromShapes.cend(); anOldIter++) {
+    bool aStore = (*anOldIter)->isCompound() || (*anOldIter)->isShell() || (*anOldIter)->isWire();
+    if (!aStore) {
+      ListOfShape aNews; // check this old really generates theToShape
+      theMakeShape->generated(*anOldIter, aNews);
+      ListOfShape::iterator aNewIter = aNews.begin();
+      for (; aNewIter != aNews.end(); aNewIter++) {
+        if (theToShape->isSame(*aNewIter))
+          break;
+      }
+      aStore = aNewIter != aNews.end();
     }
-    if (aNewIter != aNews.end()) {
+    if (aStore) {
       storeGenerated(*anOldIter, theToShape, !aStored);
       TNaming_Builder* aBuilder = builder(0);
       aStored = !aBuilder->NamedShape()->IsEmpty();
@@ -359,14 +363,19 @@ void Model_BodyBuilder::storeModified(const std::list<GeomShapePtr>& theOldShape
   bool aStored = false;
   std::list<GeomShapePtr>::const_iterator anOldIter = theOldShapes.cbegin();
   for(; anOldIter != theOldShapes.cend(); anOldIter++) {
-    ListOfShape aNews; // check this old really modifies theNewShape
-    theMakeShape->modified(*anOldIter, aNews);
-    ListOfShape::iterator aNewIter = aNews.begin();
-    for(; aNewIter != aNews.end(); aNewIter++) {
-      if (theNewShape->isSame(*aNewIter))
-        break;
+    // compounds may cause crash if call "modified"
+    bool aStore = (*anOldIter)->isCompound() || (*anOldIter)->isShell() || (*anOldIter)->isWire();
+    if (!aStore) {
+      ListOfShape aNews; // check this old really modifies theNewShape
+      theMakeShape->modified(*anOldIter, aNews);
+      ListOfShape::iterator aNewIter = aNews.begin();
+      for(; aNewIter != aNews.end(); aNewIter++) {
+        if (theNewShape->isSame(*aNewIter))
+          break;
+      }
+      aStore = aNewIter != aNews.end();
     }
-    if (aNewIter != aNews.end()) {
+    if (aStore) {
       storeModified(*anOldIter, theNewShape, !aStored);
       TNaming_Builder* aBuilder = builder(0);
       aStored = !aBuilder->NamedShape()->IsEmpty();

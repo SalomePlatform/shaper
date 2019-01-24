@@ -30,6 +30,7 @@
 #include <Model_Data.h>
 #include <Events_Loop.h>
 #include <GeomAPI_ShapeIterator.h>
+#include <GeomAPI_ShapeExplorer.h>
 
 #include <TopoDS_Shape.hxx>
 #include <TopExp_Explorer.hxx>
@@ -351,9 +352,20 @@ static void collectSubs(
     return;
   if (theSubSubs.Add(theSub->impl<TopoDS_Shape>()))  {
     bool aIsComp = theSub->isCompound() || theSub->isCompSolid();
-    if (aIsComp || theOneLevelMore) {
-      for(GeomAPI_ShapeIterator anIter(theSub); anIter.more(); anIter.next()) {
-        collectSubs(anIter.current(), theSubSubs, aIsComp && theOneLevelMore);
+    if (aIsComp) {
+      for(GeomAPI_ShapeIterator anIter(theSub); anIter.more(); anIter.next())
+        collectSubs(anIter.current(), theSubSubs, theOneLevelMore);
+    } else if (theOneLevelMore) {
+      GeomAPI_Shape::ShapeType aSubType = GeomAPI_Shape::ShapeType(int(theSub->shapeType()) + 1);
+      if (aSubType == GeomAPI_Shape::SHAPE)
+        return;
+      if (aSubType == GeomAPI_Shape::SHELL)
+        aSubType = GeomAPI_Shape::FACE;
+      if (aSubType == GeomAPI_Shape::WIRE)
+        aSubType = GeomAPI_Shape::EDGE;
+
+      for(GeomAPI_ShapeExplorer anExp(theSub, aSubType); anExp.more(); anExp.next()) {
+        collectSubs(anExp.current(), theSubSubs, false);
       }
     }
   }
@@ -375,6 +387,8 @@ void Model_ResultBody::computeOldForSub(const GeomShapePtr& theSub,
     for (TopTools_MapOfShape::Iterator anOldIter(anOldSubs); anOldIter.More(); anOldIter.Next()) {
       GeomShapePtr anOldSub(new GeomAPI_Shape);
       anOldSub->setImpl<TopoDS_Shape>(new TopoDS_Shape(anOldIter.Value()));
+      if (anOldSub->isCompound() || anOldSub->isShell() || anOldSub->isWire())
+        continue; // container old-shapes are not supported by the history, may cause crash
       ListOfShape aNews;
       myIsGenerated ? myAlgo->generated(anOldSub, aNews) : myAlgo->modified(anOldSub, aNews);
       // MakeShape may return alone old shape if there is no history information for this input

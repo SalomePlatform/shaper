@@ -1398,6 +1398,20 @@ void Model_AttributeSelection::updateInHistory()
   TopTools_ListOfShape aValShapes;
   if (searchNewContext(aDoc, aNewCShape, aContext, aValShape, aContLab, aNewContexts, aValShapes))
   {
+    std::set<ResultPtr> allContexts, aSkippedContext;
+    std::list<ResultPtr>::iterator aNewContext = aNewContexts.begin();
+    for(; aNewContext != aNewContexts.end(); aNewContext++)
+      allContexts.insert(*aNewContext);
+
+    // if there exist context composite and sub-result(s), leave only sub(s)
+    std::set<ResultPtr>::iterator aResIter = allContexts.begin();
+    for(; aResIter != allContexts.end(); aResIter++) {
+      ResultPtr aParent = ModelAPI_Tools::bodyOwner(*aResIter);
+      for(; aParent.get(); aParent = ModelAPI_Tools::bodyOwner(aParent))
+        if (allContexts.count(aParent))
+          aSkippedContext.insert(aParent);
+    }
+
     GeomAPI_Shape::ShapeType aListShapeType = GeomAPI_Shape::SHAPE;
     if (myParent) {
       if (myParent->selectionType() == "VERTEX") aListShapeType = GeomAPI_Shape::VERTEX;
@@ -1409,6 +1423,8 @@ void Model_AttributeSelection::updateInHistory()
     TopTools_ListIteratorOfListOfShape aNewValues(aValShapes);
     bool aFirst = true; // first is set to this, next are appended to parent
     for(; aNewCont != aNewContexts.end(); aNewCont++, aNewValues.Next()) {
+      if (aSkippedContext.count(*aNewCont))
+        continue;
 
       GeomShapePtr aValueShape;
       if (!aNewValues.Value().IsNull()) {
