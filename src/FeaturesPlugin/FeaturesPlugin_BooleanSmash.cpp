@@ -213,12 +213,10 @@ void FeaturesPlugin_BooleanSmash::execute()
     aMakeShapeList->appendAlgo(aFillerAlgo);
   }
 
-  std::shared_ptr<GeomAPI_Shape> aFrontShape = anOriginalShapes.front();
-  anOriginalShapes.pop_front();
   std::shared_ptr<ModelAPI_ResultBody> aResultBody = document()->createBody(data(), aResultIndex);
 
   FeaturesPlugin_Tools::loadModifiedShapes(aResultBody,
-                                           aFrontShape,
+                                           anOriginalShapes,
                                            anOriginalShapes,
                                            aMakeShapeList,
                                            aShape);
@@ -227,7 +225,7 @@ void FeaturesPlugin_BooleanSmash::execute()
   aResultIndex++;
 
   FeaturesPlugin_Tools::loadDeletedShapes(aResultBody,
-                                          aFrontShape,
+                                          GeomShapePtr(),
                                           anOriginalShapes,
                                           aMakeShapeList,
                                           aShape);

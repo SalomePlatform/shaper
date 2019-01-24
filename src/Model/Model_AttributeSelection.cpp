@@ -1232,7 +1232,6 @@ bool Model_AttributeSelection::searchNewContext(std::shared_ptr<Model_Document> 
   std::list<ResultPtr>& theResults, TopTools_ListOfShape& theValShapes)
 {
   std::set<ResultPtr> aResults; // to avoid duplicates, new context, null if deleted
-  TopTools_ListOfShape aResContShapes;
   // iterate context and shape, but also if it is sub-shape of main shape, check also it
   TopTools_ListOfShape aContextList;
   aContextList.Append(theContShape);
@@ -1269,7 +1268,6 @@ bool Model_AttributeSelection::searchNewContext(std::shared_ptr<Model_Document> 
       aModifIter.Label().FindAttribute(TNaming_NamedShape::GetID(), aNewNS);
       if (aNewNS->Evolution() == TNaming_MODIFY || aNewNS->Evolution() == TNaming_GENERATED) {
         aResults.insert(aModifierObj);
-        aResContShapes.Append(aModifierObj->shape()->impl<TopoDS_Shape>());
       } else if (aNewNS->Evolution() == TNaming_DELETE) { // a shape was deleted => result is empty
         aResults.insert(ResultPtr());
       } else { // not-processed modification => don't support it
@@ -1277,6 +1275,18 @@ bool Model_AttributeSelection::searchNewContext(std::shared_ptr<Model_Document> 
       }
     }
   }
+  // if there exist context composite and sub-result(s), leave only sub(s)
+  for(std::set<ResultPtr>::iterator aResIter = aResults.begin(); aResIter != aResults.end();) {
+    ResultPtr aParent = ModelAPI_Tools::bodyOwner(*aResIter);
+    for(; aParent.get(); aParent = ModelAPI_Tools::bodyOwner(aParent))
+      if (aResults.count(aParent))
+        break;
+    if (aParent.get()) { // erase from set, so, restart iteration
+      aResults.erase(aParent);
+      aResIter = aResults.begin();
+    } else aResIter++;
+  }
+
   if (aResults.empty())
     return false; // no modifications found, must stay the same
   // iterate all results to find further modifications
@@ -1420,7 +1430,8 @@ void Model_AttributeSelection::updateInHistory()
         setValue(*aNewCont, aValueShape);
         aFirst = false;
       } else if (myParent) {
-        myParent->append(*aNewCont, aValueShape);
+        if (!myParent->isInList(*aNewCont, aValueShape)) // avoid addition of duplicates
+          myParent->append(*aNewCont, aValueShape);
       }
     }
     if (aFirst) { // nothing was added, all results were deleted

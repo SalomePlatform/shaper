@@ -36,16 +36,15 @@ public:
 
 public:
   static void loadModifiedShapes(ResultBodyPtr theResultBody,
-                                 const GeomShapePtr theBaseShape,
+                                 const ListOfShape& theBaseShapes,
                                  const ListOfShape& theTools,
                                  const GeomMakeShapePtr& theMakeShape,
                                  const GeomShapePtr theResultShape);
 
   static void loadModifiedShapes(ResultBodyPtr theResultBody,
-                                 const GeomShapePtr theBaseShape,
+                                 const GeomShapePtr& theBaseShape,
                                  const GeomMakeShapePtr& theMakeShape,
                                  const std::string theName);
-
     /// Stores deleted shapes.
   static void loadDeletedShapes(ResultBodyPtr theResultBody,
                                 const GeomShapePtr theBaseShape,

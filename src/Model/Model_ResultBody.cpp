@@ -33,6 +33,7 @@
 
 #include <TopoDS_Shape.hxx>
 #include <TopExp_Explorer.hxx>
+#include <TopTools_MapOfShape.hxx>
 #include <TDataStd_UAttribute.hxx>
 
 // if this attribute exists, the shape is connected topology
@@ -342,29 +343,55 @@ void Model_ResultBody::cleanCash()
   }
 }
 
+// adds to the theSubSubs map all sub-shapes of theSub if it is compound of compsolid
+static void collectSubs(
+  const GeomShapePtr theSub, TopTools_MapOfShape& theSubSubs, const bool theOneLevelMore)
+{
+  if (theSub->isNull())
+    return;
+  if (theSubSubs.Add(theSub->impl<TopoDS_Shape>()))  {
+    bool aIsComp = theSub->isCompound() || theSub->isCompSolid();
+    if (aIsComp || theOneLevelMore) {
+      for(GeomAPI_ShapeIterator anIter(theSub); anIter.more(); anIter.next()) {
+        collectSubs(anIter.current(), theSubSubs, aIsComp && theOneLevelMore);
+      }
+    }
+  }
+}
+
 void Model_ResultBody::computeOldForSub(const GeomShapePtr& theSub,
   const std::list<GeomShapePtr>& theAllOlds, std::list<GeomShapePtr>& theOldForSub)
 {
+  // the old can be also used for sub-shape of theSub; collect all subs of compound or compsolid
+  TopTools_MapOfShape aSubSubs;
+  collectSubs(theSub, aSubSubs, false);
+
   std::list<GeomShapePtr>::const_iterator aRootOlds = theAllOlds.cbegin();
-  for(; aRootOlds != theAllOlds.cend(); aRootOlds++) {
-    ListOfShape aNews;
-    myIsGenerated ? myAlgo->generated(*aRootOlds, aNews) : myAlgo->modified(*aRootOlds, aNews);
-    // MakeShape may return alone old shape if there is no history information for this input
-    if (aNews.size() == 1 && aNews.front()->isEqual(*aRootOlds))
-      aNews.clear();
-    if (aNews.empty()) { // try to iterate to sub-elements (for intersection of solids this is face)
-      std::list<GeomShapePtr> theAllSubOlds;
-      for(GeomAPI_ShapeIterator aSubOld(*aRootOlds); aSubOld.more(); aSubOld.next()) {
-        GeomShapePtr aSub = aSubOld.current();
-        if (aSub.get() && !aSub->isNull())
-          theAllSubOlds.push_back(aSub);
-      }
-      computeOldForSub(theSub, theAllSubOlds, theOldForSub);
-    }
-    for(ListOfShape::iterator aNewIter = aNews.begin(); aNewIter != aNews.end(); aNewIter++) {
-      if (theSub->isSame(*aNewIter)) { // found old that was used for new theSubShape creation
-        theOldForSub.push_back(*aRootOlds);
-        break;
+  for (; aRootOlds != theAllOlds.cend(); aRootOlds++) {
+    // use sub-shapes of olds too if they are compounds or compsolids
+    TopTools_MapOfShape anOldSubs;
+    // iterate one level more (for intersection of solids this is face)
+    collectSubs(*aRootOlds, anOldSubs, true);
+    for (TopTools_MapOfShape::Iterator anOldIter(anOldSubs); anOldIter.More(); anOldIter.Next()) {
+      GeomShapePtr anOldSub(new GeomAPI_Shape);
+      anOldSub->setImpl<TopoDS_Shape>(new TopoDS_Shape(anOldIter.Value()));
+      ListOfShape aNews;
+      myIsGenerated ? myAlgo->generated(anOldSub, aNews) : myAlgo->modified(anOldSub, aNews);
+      // MakeShape may return alone old shape if there is no history information for this input
+      if (aNews.size() == 1 && aNews.front()->isEqual(anOldSub))
+        aNews.clear();
+
+      for (ListOfShape::iterator aNewIter = aNews.begin(); aNewIter != aNews.end(); aNewIter++) {
+        if (aSubSubs.Contains((*aNewIter)->impl<TopoDS_Shape>())) {
+          // check list already contains this sub
+          std::list<GeomShapePtr>::iterator aResIter = theOldForSub.begin();
+          for(; aResIter != theOldForSub.end(); aResIter++)
+            if ((*aResIter)->isSame(anOldSub))
+              break;
+          if (aResIter == theOldForSub.end())
+            theOldForSub.push_back(anOldSub); // found old used for new theSubShape creation
+          break;
+        }
       }
     }
   }

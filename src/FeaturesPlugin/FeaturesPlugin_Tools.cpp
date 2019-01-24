@@ -26,20 +26,17 @@
 
 //==================================================================================================
 void FeaturesPlugin_Tools::loadModifiedShapes(ResultBodyPtr theResultBody,
-                                              const GeomShapePtr theBaseShape,
+                                              const ListOfShape& theBaseShapes,
                                               const ListOfShape& theTools,
                                               const GeomMakeShapePtr& theMakeShape,
                                               const GeomShapePtr theResultShape)
 {
-  if (theBaseShape->isEqual(theResultShape)) {
-    theResultBody->store(theResultShape, false);
-    return;
-  }
+  theResultBody->storeModified(theBaseShapes, theResultShape, theMakeShape);
 
-  theResultBody->storeModified(theBaseShape, theResultShape);
-
-  ListOfShape aShapes = theTools;
-  aShapes.push_front(theBaseShape);
+  ListOfShape aShapes = theBaseShapes;
+  ListOfShape::const_iterator aToolIter = theTools.cbegin();
+  for(; aToolIter != theTools.cend(); aToolIter++)
+    aShapes.push_back(*aToolIter);
 
   for (ListOfShape::const_iterator anIter = aShapes.begin(); anIter != aShapes.end(); ++anIter)
   {
@@ -51,7 +48,7 @@ void FeaturesPlugin_Tools::loadModifiedShapes(ResultBodyPtr theResultBody,
 
 //==================================================================================================
 void FeaturesPlugin_Tools::loadModifiedShapes(ResultBodyPtr theResultBody,
-                                              const GeomShapePtr theBaseShape,
+                                              const GeomShapePtr& theBaseShape,
                                               const GeomMakeShapePtr& theMakeShape,
                                               const std::string theName)
 {
@@ -98,7 +95,8 @@ void FeaturesPlugin_Tools::loadDeletedShapes(ResultBodyPtr theResultBody,
   const GeomShapePtr theResultShapesCompound)
 {
   ListOfShape aShapes = theTools;
-  aShapes.push_front(theBaseShape);
+  if (theBaseShape.get())
+    aShapes.push_front(theBaseShape);
 
   for (ListOfShape::const_iterator anIter = aShapes.begin(); anIter != aShapes.end(); anIter++)
   {

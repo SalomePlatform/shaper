@@ -133,8 +133,10 @@ void FeaturesPlugin_BooleanCut::execute()
       std::shared_ptr<ModelAPI_ResultBody> aResultBody =
         document()->createBody(data(), aResultIndex);
 
+      ListOfShape anObjectList;
+      anObjectList.push_back(anObject);
       FeaturesPlugin_Tools::loadModifiedShapes(aResultBody,
-                                               anObject,
+                                               anObjectList,
                                                aTools,
                                                aMakeShapeList,
                                                aResShape);
@@ -214,8 +216,10 @@ void FeaturesPlugin_BooleanCut::execute()
       std::shared_ptr<ModelAPI_ResultBody> aResultBody =
         document()->createBody(data(), aResultIndex);
 
+      ListOfShape anObjectList;
+      anObjectList.push_back(aCompSolid);
       FeaturesPlugin_Tools::loadModifiedShapes(aResultBody,
-                                               aCompSolid,
+                                               anObjectList,
                                                aTools,
                                                aMakeShapeList,
                                                aResultShape);
@@ -296,8 +300,10 @@ void FeaturesPlugin_BooleanCut::execute()
       std::shared_ptr<ModelAPI_ResultBody> aResultBody =
         document()->createBody(data(), aResultIndex);
 
+      ListOfShape anObjectList;
+      anObjectList.push_back(aCompound);
       FeaturesPlugin_Tools::loadModifiedShapes(aResultBody,
-                                               aCompound,
+                                               anObjectList,
                                                aTools,
                                                aMakeShapeList,
                                                aResultShape);
