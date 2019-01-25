@@ -1287,8 +1287,41 @@ bool Model_AttributeSelection::searchNewContext(std::shared_ptr<Model_Document> 
     } else aResIter++;
   }
 
-  if (aResults.empty())
+  if (aResults.empty()) {
+    // check the context become concealed by operation which is earlier than this selection
+    std::list<ResultPtr> allRes;
+    ResultPtr aRoot = ModelAPI_Tools::bodyOwner(theContext, true);
+    if (!aRoot.get())
+      aRoot = theContext;
+    ResultBodyPtr aRootBody = std::dynamic_pointer_cast<ModelAPI_ResultBody>(aRoot);
+    if (aRootBody.get()) {
+      ModelAPI_Tools::allSubs(aRootBody, allRes);
+      allRes.push_back(aRootBody);
+    } else
+      allRes.push_back(aRoot);
+
+    FeaturePtr aThisFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(owner());
+    for (std::list<ResultPtr>::iterator aSub = allRes.begin(); aSub != allRes.end(); aSub++) {
+      ResultPtr aResCont = *aSub;
+      const std::set<AttributePtr>& aRefs = aResCont->data()->refsToMe();
+      std::set<AttributePtr>::const_iterator aRef = aRefs.begin();
+      for (; aRef != aRefs.end(); aRef++) {
+        if (!aRef->get() || !(*aRef)->owner().get())
+          continue;
+        // concealed attribute only
+        FeaturePtr aRefFeat = std::dynamic_pointer_cast<ModelAPI_Feature>((*aRef)->owner());
+        if (aRefFeat == aThisFeature)
+          continue;
+        if (!ModelAPI_Session::get()->validators()->isConcealed(
+          aRefFeat->getKind(), (*aRef)->id()))
+          continue;
+        if (!theDoc->isLaterByDep(aRefFeat, aThisFeature)) {
+          return true; // feature conceals result, return true, so the context will be removed
+        }
+      }
+    }
     return false; // no modifications found, must stay the same
+  }
   // iterate all results to find further modifications
   std::set<ResultPtr>::iterator aResIter = aResults.begin();
   for(; aResIter != aResults.end(); aResIter++) {
@@ -1325,7 +1358,7 @@ bool Model_AttributeSelection::searchNewContext(std::shared_ptr<Model_Document> 
   return true; // theResults must be empty: everything is deleted
 }
 
-void Model_AttributeSelection::updateInHistory()
+void Model_AttributeSelection::updateInHistory(bool& theRemove)
 {
   ResultPtr aContext = std::dynamic_pointer_cast<ModelAPI_Result>(myRef.value());
   // only bodies and parts may be modified later in the history, don't do anything otherwise
@@ -1451,10 +1484,14 @@ void Model_AttributeSelection::updateInHistory()
       }
     }
     if (aFirst) { // nothing was added, all results were deleted
-      ResultPtr anEmptyContext;
-      std::shared_ptr<GeomAPI_Shape> anEmptyShape;
-      setValue(anEmptyContext, anEmptyShape); // nullify the selection
-      return;
+      if (myParent) {
+        theRemove = true;
+      } else {
+        ResultPtr anEmptyContext;
+        std::shared_ptr<GeomAPI_Shape> anEmptyShape;
+        setValue(anEmptyContext, anEmptyShape); // nullify the selection
+        return;
+      }
     }
   }
 }

@@ -1066,19 +1066,27 @@ void Model_Update::updateSelection(const std::set<std::shared_ptr<ModelAPI_Objec
     for (; aRefsIter != aRefs.end(); aRefsIter++) {
       std::shared_ptr<Model_AttributeSelection> aSel =
         std::dynamic_pointer_cast<Model_AttributeSelection>(*aRefsIter);
-      aSel->updateInHistory();
+      bool aRemove = false;
+      aSel->updateInHistory(aRemove);
     }
     // update the selection list attributes if any
     aRefs = (*anObj)->data()->attributes(ModelAPI_AttributeSelectionList::typeId());
     for (aRefsIter = aRefs.begin(); aRefsIter != aRefs.end(); aRefsIter++) {
+      std::set<int> aRemoveSet;
       std::shared_ptr<ModelAPI_AttributeSelectionList> aSel =
         std::dynamic_pointer_cast<ModelAPI_AttributeSelectionList>(*aRefsIter);
       for(int a = aSel->size() - 1; a >= 0; a--) {
         std::shared_ptr<Model_AttributeSelection> aSelAttr =
           std::dynamic_pointer_cast<Model_AttributeSelection>(aSel->value(a));
-        if (aSelAttr.get())
-          aSelAttr->updateInHistory();
+        if (aSelAttr.get()) {
+          bool theRemove = false;
+          aSelAttr->updateInHistory(theRemove);
+          if (theRemove) {
+            aRemoveSet.insert(a);
+          }
+        }
       }
+      aSel->remove(aRemoveSet);
     }
   }
 }
