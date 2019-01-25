@@ -118,10 +118,6 @@ private:
                     std::shared_ptr<ModelAPI_ResultBody> theResultBody,
                     std::shared_ptr<GeomAPI_Shape> theBaseShape, int nb);
 #endif
-
-  void loadNamingDS(std::list<std::shared_ptr<GeomAlgoAPI_Rotation> > theListOfRotationAlgo,
-                    std::shared_ptr<ModelAPI_ResultBody> theResultBody,
-                    std::shared_ptr<GeomAPI_Shape> theBaseShape);
 };
 
 #endif // FEATURESPLUGIN_MULTIROTATION_H_

@@ -447,22 +447,3 @@ void FeaturesPlugin_MultiRotation::loadNamingDS3(
   }
 }
 #endif
-
-//=================================================================================================
-void FeaturesPlugin_MultiRotation::loadNamingDS(
-    std::list<std::shared_ptr<GeomAlgoAPI_Rotation> > theListOfRotationAlgo,
-    std::shared_ptr<ModelAPI_ResultBody> theResultBody,
-    std::shared_ptr<GeomAPI_Shape> theBaseShape)
-{
-  for (std::list<std::shared_ptr<GeomAlgoAPI_Rotation> >::const_iterator anIt =
-    theListOfRotationAlgo.begin(); anIt != theListOfRotationAlgo.cend(); ++anIt) {
-    // naming of faces
-    theResultBody->loadModifiedShapes(*anIt, theBaseShape, GeomAPI_Shape::FACE, "Rotated_Face");
-
-    // naming of edges
-    theResultBody->loadModifiedShapes(*anIt, theBaseShape, GeomAPI_Shape::EDGE, "Rotated_Edge");
-
-    // naming of vertex
-    theResultBody->loadModifiedShapes(*anIt, theBaseShape, GeomAPI_Shape::VERTEX, "Rotated_Vertex");
-  }
-}
