@@ -120,10 +120,6 @@ private:
 
   /// Perform the multi translation in two directions.
   void performTwoDirection();
-
-  void loadNamingDS(std::list<std::shared_ptr<GeomAlgoAPI_Translation> > theListOfTranslationAlgo,
-                    std::shared_ptr<ModelAPI_ResultBody> theResultBody,
-                    std::shared_ptr<GeomAPI_Shape> theBaseShape);
 };
 
 #endif // FEATURESPLUGIN_MULTITRANSLATION_H_

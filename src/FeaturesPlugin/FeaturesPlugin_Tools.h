@@ -39,7 +39,8 @@ public:
                                  const ListOfShape& theBaseShapes,
                                  const ListOfShape& theTools,
                                  const GeomMakeShapePtr& theMakeShape,
-                                 const GeomShapePtr theResultShape);
+                                 const GeomShapePtr theResultShape,
+                                 const std::string& theNamePrefix = "");
 
   static void loadModifiedShapes(ResultBodyPtr theResultBody,
                                  const GeomShapePtr& theBaseShape,

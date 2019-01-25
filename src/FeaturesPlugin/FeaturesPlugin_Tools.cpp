@@ -29,7 +29,8 @@ void FeaturesPlugin_Tools::loadModifiedShapes(ResultBodyPtr theResultBody,
                                               const ListOfShape& theBaseShapes,
                                               const ListOfShape& theTools,
                                               const GeomMakeShapePtr& theMakeShape,
-                                              const GeomShapePtr theResultShape)
+                                              const GeomShapePtr theResultShape,
+                                              const std::string& theNamePrefix)
 {
   theResultBody->storeModified(theBaseShapes, theResultShape, theMakeShape);
 
@@ -38,11 +39,18 @@ void FeaturesPlugin_Tools::loadModifiedShapes(ResultBodyPtr theResultBody,
   for(; aToolIter != theTools.cend(); aToolIter++)
     aShapes.push_back(*aToolIter);
 
+  std::string aVertexName, anEdgeName, aFaceName;
+  if (!theNamePrefix.empty()) {
+    aVertexName = theNamePrefix + "_Vertex";
+    anEdgeName = theNamePrefix + "_Edge";
+    aFaceName = theNamePrefix + "_Face";
+  }
+
   for (ListOfShape::const_iterator anIter = aShapes.begin(); anIter != aShapes.end(); ++anIter)
   {
-    theResultBody->loadModifiedShapes(theMakeShape, *anIter, GeomAPI_Shape::VERTEX);
-    theResultBody->loadModifiedShapes(theMakeShape, *anIter, GeomAPI_Shape::EDGE);
-    theResultBody->loadModifiedShapes(theMakeShape, *anIter, GeomAPI_Shape::FACE);
+    theResultBody->loadModifiedShapes(theMakeShape, *anIter, GeomAPI_Shape::VERTEX, aVertexName);
+    theResultBody->loadModifiedShapes(theMakeShape, *anIter, GeomAPI_Shape::EDGE, anEdgeName);
+    theResultBody->loadModifiedShapes(theMakeShape, *anIter, GeomAPI_Shape::FACE, aFaceName);
   }
 }
 

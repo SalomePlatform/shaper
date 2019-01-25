@@ -5,8 +5,10 @@
 // Author:      Clarisse Genrault (CEA)
 
 #include <FeaturesPlugin_MultiRotation.h>
+#include <FeaturesPlugin_Tools.h>
 
 #include <GeomAlgoAPI_CompoundBuilder.h>
+#include <GeomAlgoAPI_MakeShapeList.h>
 #include <GeomAlgoAPI_ShapeTools.h>
 #include <GeomAlgoAPI_Tools.h>
 #include <GeomAlgoAPI_Translation.h>
@@ -176,7 +178,8 @@ void FeaturesPlugin_MultiRotation::performRotation1D()
     } else {
       std::string anError;
       ListOfShape aListOfShape;
-      std::list<std::shared_ptr<GeomAlgoAPI_Rotation> > aListOfRotationAlgo;
+      std::shared_ptr<GeomAlgoAPI_MakeShapeList>
+          aListOfRotationAlgo(new GeomAlgoAPI_MakeShapeList);
 
       for (int i=0; i<nbCopies; i++) {
         std::shared_ptr<GeomAlgoAPI_Rotation> aRotationnAlgo(
@@ -195,13 +198,16 @@ void FeaturesPlugin_MultiRotation::performRotation1D()
           break;
         }
         aListOfShape.push_back(aRotationnAlgo->shape());
-        aListOfRotationAlgo.push_back(aRotationnAlgo);
+        aListOfRotationAlgo->appendAlgo(aRotationnAlgo);
       }
       std::shared_ptr<GeomAPI_Shape> aCompound =
         GeomAlgoAPI_CompoundBuilder::compound(aListOfShape);
       ResultBodyPtr aResultBody = document()->createBody(data(), aResultIndex);
-      aResultBody->storeModified(aBaseShape, aCompound);
-      loadNamingDS(aListOfRotationAlgo, aResultBody, aBaseShape);
+
+      ListOfShape aBaseShapes;
+      aBaseShapes.push_back(aBaseShape);
+      FeaturesPlugin_Tools::loadModifiedShapes(aResultBody, aBaseShapes, ListOfShape(),
+                                               aListOfRotationAlgo, aCompound, "Rotated");
 
       setResult(aResultBody, aResultIndex);
     }

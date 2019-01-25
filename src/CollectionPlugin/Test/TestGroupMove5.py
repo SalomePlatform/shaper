@@ -34,8 +34,7 @@ Group_2_objects = [model.selection("FACE", "Box_1_1/Back"), model.selection("FAC
 Group_2 = model.addGroup(Part_1_doc, Group_2_objects)
 Group_3_objects = [model.selection("EDGE", "[Box_1_1/Back][Box_1_1/Bottom]"), model.selection("EDGE", "[Box_1_1/Back][Box_1_1/Right]"), model.selection("EDGE", "[Box_1_1/Back][Box_1_1/Left]"), model.selection("EDGE", "[Box_1_1/Back][Box_1_1/Top]"), model.selection("EDGE", "[Box_1_1/Right][Box_1_1/Bottom]"), model.selection("EDGE", "[Box_1_1/Left][Box_1_1/Top]"), model.selection("EDGE", "[Box_1_1/Left][Box_1_1/Bottom]"), model.selection("EDGE", "[Box_1_1/Right][Box_1_1/Top]"), model.selection("EDGE", "[Box_1_1/Front][Box_1_1/Bottom]"), model.selection("EDGE", "[Box_1_1/Front][Box_1_1/Left]"), model.selection("EDGE", "[Box_1_1/Front][Box_1_1/Right]"), model.selection("EDGE", "[Box_1_1/Front][Box_1_1/Top]")]
 Group_3 = model.addGroup(Part_1_doc, Group_3_objects)
-Axis_4 = model.addAxis(Part_1_doc, model.selection("VERTEX", "[Box_1_1/Back][Box_1_1/Left][Box_1_1/Bottom]"), model.selection("VERTEX", "[Box_1_1/Front][Box_1_1/Right][Box_1_1/Top]"))
-LinearCopy_1 = model.addMultiTranslation(Part_1_doc, [model.selection("SOLID", "Box_1_1")], model.selection("EDGE", "Axis_1"), 10, 2)
+LinearCopy_1 = model.addMultiTranslation(Part_1_doc, [model.selection("SOLID", "Box_1_1")], model.selection("EDGE", "PartSet/OX"), 15, 2)
 model.do()
 # move groups to the end
 Part_1_doc.moveFeature(Group_1.feature(), LinearCopy_1.feature())
@@ -46,9 +45,9 @@ model.end()
 from ModelAPI import *
 
 aFactory = ModelAPI_Session.get().validators()
-# check group 1: full compound should be selected
+# check group 1: all solids in compound should be selected
 selectionList = Group_1.feature().selectionList("group_list")
-assert(selectionList.size() == 1)
+assert(selectionList.size() == 2)
 assert(aFactory.validate(Group_1.feature()))
 # check group 2: number of faces is multiplied twice than original
 selectionList = Group_2.feature().selectionList("group_list")
@@ -57,6 +56,48 @@ assert(aFactory.validate(Group_2.feature()))
 # check group 3: number of edges is multiplied twice than original
 selectionList = Group_3.feature().selectionList("group_list")
 assert(selectionList.size() == 24)
+assert(aFactory.validate(Group_3.feature()))
+
+model.begin()
+LinearCopy_2 = model.addMultiTranslation(Part_1_doc, [model.selection("COMPOUND", "LinearCopy_1_1")], model.selection("EDGE", "PartSet/OY"), 15, 2, model.selection("EDGE", "PartSet/OZ"), 15, 2)
+# move groups to the end
+Part_1_doc.moveFeature(Group_1.feature(), LinearCopy_2.feature())
+Part_1_doc.moveFeature(Group_2.feature(), Group_1.feature())
+Part_1_doc.moveFeature(Group_3.feature(), Group_2.feature())
+model.end()
+
+# check group 1: all solids in compound should be selected
+selectionList = Group_1.feature().selectionList("group_list")
+assert(selectionList.size() == 8)
+assert(aFactory.validate(Group_1.feature()))
+# check group 2: number of faces is multiplied twice than original
+selectionList = Group_2.feature().selectionList("group_list")
+assert(selectionList.size() == 48)
+assert(aFactory.validate(Group_2.feature()))
+# check group 3: number of edges is multiplied twice than original
+selectionList = Group_3.feature().selectionList("group_list")
+assert(selectionList.size() == 96)
+assert(aFactory.validate(Group_3.feature()))
+
+model.begin()
+AngularCopy_1 = model.addMultiRotation(Part_1_doc, [model.selection("SOLID", "LinearCopy_2_1_1_1"), model.selection("SOLID", "LinearCopy_2_1_1_2")], model.selection("EDGE", "PartSet/OZ"), 2)
+# move groups to the end
+Part_1_doc.moveFeature(Group_1.feature(), AngularCopy_1.feature())
+Part_1_doc.moveFeature(Group_2.feature(), Group_1.feature())
+Part_1_doc.moveFeature(Group_3.feature(), Group_2.feature())
+model.end()
+
+# check group 1: all solids in compound should be selected
+selectionList = Group_1.feature().selectionList("group_list")
+assert(selectionList.size() == 4)
+assert(aFactory.validate(Group_1.feature()))
+# check group 2: number of faces is multiplied twice than original
+selectionList = Group_2.feature().selectionList("group_list")
+assert(selectionList.size() == 24)
+assert(aFactory.validate(Group_2.feature()))
+# check group 3: number of edges is multiplied twice than original
+selectionList = Group_3.feature().selectionList("group_list")
+assert(selectionList.size() == 48)
 assert(aFactory.validate(Group_3.feature()))
 
 assert(model.checkPythonDump())
