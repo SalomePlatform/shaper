@@ -71,17 +71,17 @@ selectionList = Group_3.feature().selectionList("group_list")
 assert(selectionList.size() == 19)
 assert(aFactory.validate(Group_3.feature()))
 
-# groups related to the copied box should stay untouched
+# groups related to the copied box should contain only the elements connected with the original box
 selectionList = Group_4.feature().selectionList("group_list")
 assert(selectionList.size() == 1)
 assert(aFactory.validate(Group_4.feature()))
 
 selectionList = Group_5.feature().selectionList("group_list")
-assert(selectionList.size() == 6)
+assert(selectionList.size() == 3)
 assert(aFactory.validate(Group_5.feature()))
 
 selectionList = Group_6.feature().selectionList("group_list")
-assert(selectionList.size() == 12)
+assert(selectionList.size() == 3)
 assert(aFactory.validate(Group_6.feature()))
 
 
@@ -108,10 +108,11 @@ assert(selectionList.size() == 16)
 assert(aFactory.validate(Group_2.feature()))
 
 selectionList = Group_3.feature().selectionList("group_list")
-assert(selectionList.size() == 19)
+# one of edges should disappear, due to its belonging to the face of the filling
+assert(selectionList.size() == 18)
 assert(aFactory.validate(Group_3.feature()))
 
-# groups related to the copied box should stay untouched
+# groups related to the copied box should be split correspondingly
 selectionList = Group_4.feature().selectionList("group_list")
 assert(selectionList.size() == 1)
 assert(aFactory.validate(Group_4.feature()))
@@ -121,7 +122,7 @@ assert(selectionList.size() == 6)
 assert(aFactory.validate(Group_5.feature()))
 
 selectionList = Group_6.feature().selectionList("group_list")
-assert(selectionList.size() == 12)
+assert(selectionList.size() == 5)
 assert(aFactory.validate(Group_6.feature()))
 
 assert(model.checkPythonDump())

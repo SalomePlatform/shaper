@@ -166,6 +166,9 @@ void FeaturesPlugin_BooleanFill::execute()
     std::shared_ptr<ModelAPI_ResultBody> aResultBody =
         document()->createBody(data(), aResultIndex);
 
+    // tools should be added to the list to fulfill the correct history of modification
+    aListWithObject.insert(aListWithObject.end(), aTools.begin(), aTools.end());
+
     ListOfShape aUsedTools = aTools;
     aUsedTools.insert(aUsedTools.end(), aPlanes.begin(), aPlanes.end());
 
@@ -261,6 +264,9 @@ void FeaturesPlugin_BooleanFill::execute()
 
     ListOfShape aBaseShapes;
     aBaseShapes.push_back(aCompSolid);
+    // tools should be added to the list to fulfill the correct history of modification
+    aBaseShapes.insert(aBaseShapes.end(), aTools.begin(), aTools.end());
+
     FeaturesPlugin_Tools::loadModifiedShapes(aResultBody, aBaseShapes, aUsedTools,
                                              aMakeShapeList, aResultShape);
     setResult(aResultBody, aResultIndex);
