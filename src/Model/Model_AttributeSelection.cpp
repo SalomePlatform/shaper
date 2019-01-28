@@ -1315,8 +1315,13 @@ bool Model_AttributeSelection::searchNewContext(std::shared_ptr<Model_Document> 
         if (!ModelAPI_Session::get()->validators()->isConcealed(
           aRefFeat->getKind(), (*aRef)->id()))
           continue;
-        if (!theDoc->isLaterByDep(aRefFeat, aThisFeature)) {
-          return true; // feature conceals result, return true, so the context will be removed
+        if (theDoc->isLaterByDep(aThisFeature, aRefFeat)) {
+          // for extrusion cut in python script the nested sketch reference may be concealed before
+          // it is nested, so, check this composite feature is valid
+          static ModelAPI_ValidatorsFactory* aFactory = ModelAPI_Session::get()->validators();
+          // need to be validated to update the "Apply" state if not previewed
+          if (aFactory->validate(aRefFeat))
+            return true; // feature conceals result, return true, so the context will be removed
         }
       }
     }

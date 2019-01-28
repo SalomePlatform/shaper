@@ -18,7 +18,7 @@
 ## email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com>
 ##
 
-# Test that removed vertex, selected in the group makes group with one invalid element (empty shape)
+# Test that removed vertex, selected in the group makes empty group => invalid one
 
 from salome.shaper import model
 from ModelAPI import *
@@ -41,5 +41,5 @@ model.end()
 # Check group
 aFactory = ModelAPI_Session.get().validators()
 selectionList = Group_1.feature().selectionList("group_list")
-assert(selectionList.size() == 1)
+assert(selectionList.size() == 0)
 assert(aFactory.validate(Group_1.feature()) == False)
