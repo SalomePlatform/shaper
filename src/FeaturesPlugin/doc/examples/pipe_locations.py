@@ -25,8 +25,7 @@ Interpolation_1 = model.addInterpolation(Part_2_doc, Interpolation_1_objects, Fa
 Vertex_1 = model.addVertex(Part_2_doc, [model.selection("VERTEX", "Sketch_2/SketchCircle_2")])
 Partition_1 = model.addPartition(Part_2_doc, [model.selection("EDGE", "Interpolation_1_1"), model.selection("VERTEX", "Vertex_1_1")])
 Wire_1 = model.addWire(Part_2_doc, [model.selection("EDGE", "Partition_1_1_1"), model.selection("EDGE", "Partition_1_1_2")])
-Pipe_1_objects_2 = [model.selection("VERTEX", "Interpolation_1_1/Vertex_1_2"), model.selection("VERTEX", "Interpolation_1_1/Vertex_1_1"), model.selection("VERTEX", "Vertex_1_1/Vertex_1_1&Sketch_2/SketchCircle_2")]
-Pipe_1_objects_1 = [model.selection("WIRE", "Sketch_1/Face-SketchCircle_1_2r_wire"), model.selection("WIRE", "Sketch_2/Face-SketchCircle_2_2r_wire"), model.selection("FACE", "Sketch_3/Face-SketchCircle_3_2r")]
+Pipe_1_objects_2 = [model.selection("VERTEX", "Interpolation_1_1/Vertex_1_1"), model.selection("VERTEX", "Vertex_1_1/Vertex_1_1&Sketch_2/SketchCircle_2"), model.selection("VERTEX", "Interpolation_1_1/Vertex_1_2")]
+Pipe_1_objects_1 = [model.selection("FACE", "Sketch_1/Face-SketchCircle_1_2r"), model.selection("FACE", "Sketch_2/Face-SketchCircle_2_2r"), model.selection("FACE", "Sketch_3/Face-SketchCircle_3_2r")]
 Pipe_1 = model.addPipe(Part_2_doc, Pipe_1_objects_1, model.selection("WIRE", "Wire_1_1"), Pipe_1_objects_2)
-model.do()
 model.end()
