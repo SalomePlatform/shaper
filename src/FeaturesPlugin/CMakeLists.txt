@@ -412,6 +412,7 @@ ADD_UNIT_TESTS(TestExtrusion.py
                TestPartitionSubCompsolidWithPlane3.py
                TestPartitionSubCompsolidWithPlane4.py
                TestPartitionSubCompsolidWithPlane5.py
+               TestPartitionArgsUpdate.py
                TestBooleanFuse_Vertex_Vertex.py
                TestBooleanFuse_VertexCompound_VertexCompound.py
                TestBooleanFuse_Edge_Edge.py

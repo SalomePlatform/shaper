@@ -323,13 +323,29 @@ std::shared_ptr<GeomAPI_Shape> GeomAlgoAPI_ShapeTools::combineShapes(
     theCombinedShapes.push_back(aGeomShape);
   }
 
-  // Adding free shapes.
-  for(TopExp_Explorer anExp(aShapesComp, aTA); anExp.More(); anExp.Next()) {
-    const TopoDS_Shape& aShape = anExp.Current();
-    if(aFreeShapes.Contains(aShape)) {
+  // Adding free shapes in the same order as they are in the initial compound
+  NCollection_Map<TopoDS_Shape> aFreeSimple;
+  for(ListOfShape::iterator aFree = theFreeShapes.begin(); aFree != theFreeShapes.end(); aFree++) {
+    aFreeSimple.Add((*aFree)->impl<TopoDS_Shape>());
+  }
+  theFreeShapes.clear();
+
+  for(TopoDS_Iterator anIter(aShapesComp); anIter.More(); anIter.Next() ) {
+    const TopoDS_Shape& aShape = anIter.Value();
+    if((aShape.ShapeType() > aTA && aFreeSimple.Contains(aShape)) ||
+       (aShape.ShapeType() == aTA && aFreeShapes.Contains(aShape))) {
       std::shared_ptr<GeomAPI_Shape> aGeomShape(new GeomAPI_Shape);
       aGeomShape->setImpl<TopoDS_Shape>(new TopoDS_Shape(aShape));
       theFreeShapes.push_back(aGeomShape);
+    } else if (aShape.ShapeType() < aTA) {
+      for(TopExp_Explorer anExp(aShape, aTA); anExp.More(); anExp.Next()) {
+        const TopoDS_Shape& aSubShape = anExp.Current();
+        if (aFreeShapes.Contains(aSubShape)) {
+          std::shared_ptr<GeomAPI_Shape> aGeomShape(new GeomAPI_Shape);
+          aGeomShape->setImpl<TopoDS_Shape>(new TopoDS_Shape(aSubShape));
+          theFreeShapes.push_back(aGeomShape);
+        }
+      }
     }
   }
 
