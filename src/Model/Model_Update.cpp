@@ -301,16 +301,19 @@ void Model_Update::processEvent(const std::shared_ptr<Events_Message>& theMessag
         std::dynamic_pointer_cast<ModelAPI_ObjectUpdatedMessage>(theMessage);
     const std::set<ObjectPtr>& anObjs = aMsg->objects();
     std::set<ObjectPtr>::const_iterator anObjIter = anObjs.cbegin();
+    std::list<ObjectPtr> aFeatures, aResults;
     for(; anObjIter != anObjs.cend(); anObjIter++) {
       if (std::dynamic_pointer_cast<Model_Document>((*anObjIter)->document())->executeFeatures()) {
         if ((*anObjIter)->groupName() == ModelAPI_Feature::group()) {
           // results creation means enabling, not update
-          ModelAPI_EventCreator::get()->sendUpdated(*anObjIter, kUpdatedEvent);
+          aFeatures.push_back(*anObjIter);
         } else {
-          ModelAPI_EventCreator::get()->sendUpdated(*anObjIter, kRedisplayEvent);
+          aResults.push_back(*anObjIter);
         }
       }
     }
+    ModelAPI_EventCreator::get()->sendUpdated(aFeatures, kUpdatedEvent);
+    ModelAPI_EventCreator::get()->sendUpdated(aResults, kRedisplayEvent);
     return;
   }
   if (theMessage->eventID() == kUpdatedEvent) {

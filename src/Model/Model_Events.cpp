@@ -33,6 +33,22 @@ void Model_EventCreator::sendUpdated(const ObjectPtr& theObject, const Events_ID
   Events_Loop::loop()->send(aMsg, isGroupped);
 }
 
+void Model_EventCreator::sendUpdated(const std::list<ObjectPtr>& theObjects,
+  const Events_ID& theEvent, const bool isGroupped) const
+{
+  if (theObjects.empty())
+    return;
+  std::list<ObjectPtr>::const_iterator anObj = theObjects.cbegin();
+  std::shared_ptr<Model_ObjectUpdatedMessage> aMsg(
+    new Model_ObjectUpdatedMessage(*anObj, theEvent));
+  for(anObj++; anObj != theObjects.cend(); anObj++) {
+    std::shared_ptr<Model_ObjectUpdatedMessage> aJoined(
+      new Model_ObjectUpdatedMessage(*anObj, theEvent));
+    aMsg->Join(aJoined);
+  }
+  Events_Loop::loop()->send(aMsg, isGroupped);
+}
+
 void Model_EventCreator::sendDeleted(const std::shared_ptr<ModelAPI_Document>& theDoc,
                                      const std::string& theGroup) const
 {

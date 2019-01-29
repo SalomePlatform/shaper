@@ -66,6 +66,8 @@ std::shared_ptr<ModelAPI_Document> Model_ResultPart::partDoc()
   if (myTrsf.get() && baseRef().get()) { // the second condition is due to #2035
     return baseRef()->partDoc();
   }
+  if (!data()->isValid())
+    return DocumentPtr();
   DocumentPtr aRes = data()->document(DOC_REF())->value();
   return aRes;
 }

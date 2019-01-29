@@ -56,7 +56,7 @@ static const char * EVENT_PLUGIN_LOADED = "PluginLoaded";
 static const char * EVENT_DOCUMENT_CHANGED = "CurrentDocumentChanged";
 
 /// Event ID that order of objects in group is changed,
-/// so, tree must be fully rectreated (movement of feature)
+/// so, tree must be fully recreated (movement of feature)
 static const char * EVENT_ORDER_UPDATED = "OrderUpdated";
 /// Event ID that the sketch is prepared and all grouped messages for the solver may be flushed
 static const char * EVENT_UPDATE_SELECTION = "UpdateSelection";
@@ -142,7 +142,7 @@ public:
   /// Returns the identifier of the kind of a message
   virtual const Events_ID messageId() = 0;
 
-  /// Appenad to this message the given one.
+  /// Appends to this message the given one.
   virtual void Join(const std::shared_ptr<Events_MessageGroup>& theJoined) = 0;
 };
 
@@ -170,6 +170,9 @@ public:
   /// creates created, updated or moved messages and sends to the loop
   virtual void sendUpdated(const ObjectPtr& theObject, const Events_ID& theEvent,
                            const bool isGroupped = true) const = 0;
+  /// creates created, updated or moved messages with the objects collection and sends to the loop
+  virtual void sendUpdated(const std::list<ObjectPtr>& theObjects, const Events_ID& theEvent,
+    const bool isGroupped = true) const = 0;
   /// creates deleted message and sends to the loop
   virtual void sendDeleted(const std::shared_ptr<ModelAPI_Document>& theDoc,
                            const std::string& theGroup) const = 0;
@@ -183,7 +186,6 @@ public:
   static void set(const ModelAPI_EventCreator* theCreator);
 };
 
-// TODO(sbh): Move this message into a separate package, like "GuiAPI"
 /// Contains the state information about the feature: is it enabled or disabled.
 class ModelAPI_FeatureStateMessage : public Events_Message
 {
@@ -470,7 +472,7 @@ private:
   int myDOF;
 };
 
-/// Message sent when feature or attrubute has been moved.
+/// Message sent when feature or attribute has been moved.
 /// Stores the moving object/attribute, original and new positions of mouse.
 class ModelAPI_ObjectMovedMessage : public Events_Message
 {

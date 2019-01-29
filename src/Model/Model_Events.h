@@ -26,13 +26,17 @@
 
 #include <memory>
 
-/// Allovs to create ModelAPI messages
+/// Allows to create ModelAPI messages
 class Model_EventCreator : public ModelAPI_EventCreator
 {
  public:
   /// creates created, updated or moved messages and sends to the loop
   virtual void sendUpdated(const ObjectPtr& theObject, const Events_ID& theEvent,
                            const bool isGroupped = true) const;
+
+  /// creates created, updated or moved messages with the objects collection and sends to the loop
+  virtual void sendUpdated(const std::list<ObjectPtr>& theObjects, const Events_ID& theEvent,
+    const bool isGroupped = true) const;
   /// creates deleted message and sends to the loop
   virtual void sendDeleted(const std::shared_ptr<ModelAPI_Document>& theDoc,
                            const std::string& theGroup) const;
