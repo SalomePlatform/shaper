@@ -35,7 +35,7 @@ SET(PROJECT_HEADERS
     CollectionPlugin_Field.h
     CollectionPlugin_WidgetCreator.h
     CollectionPlugin_WidgetField.h
-	CollectionPlugin_Validators.h
+    CollectionPlugin_Validators.h
 )
 
 SET(PROJECT_MOC_HEADERS
@@ -48,7 +48,7 @@ SET(PROJECT_SOURCES
     CollectionPlugin_Field.cpp
     CollectionPlugin_WidgetCreator.cpp
     CollectionPlugin_WidgetField.cpp
-	CollectionPlugin_Validators.cpp
+    CollectionPlugin_Validators.cpp
 )
 
 SET(XML_RESOURCES
@@ -115,5 +115,6 @@ ADD_UNIT_TESTS(
                TestGroupMove5.py
                TestGroupMove6.py
                TestGroupMove7.py
+               TestGroupMove8.py
                TestGroupShareTopology.py
 )
