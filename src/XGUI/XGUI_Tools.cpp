@@ -171,8 +171,8 @@ bool canRename(const ObjectPtr& theObject, const QString& theName)
     ObjectPtr aObj =
       aDoc->objectByName(aType, theName.toStdString());
 
-    if (aObj.get()) {
-      QString aErrMsg(QObject::tr("%1 with name %2 already exists.").
+    if (aObj.get() && theObject != aObj) {
+      QString aErrMsg(QObject::tr("Name %2 already exists in %1.").
         arg(aType.c_str()).arg(theName));
       // We can not use here a dialog box for message -
       // it will crash editing process in ObjectBrowser
