@@ -240,4 +240,5 @@ ADD_UNIT_TESTS(TestConstants.py
                TestSelectionInitialization.py
                Test2828.py
                TestSelectionRestore.py
+               Test2491.py
 )
