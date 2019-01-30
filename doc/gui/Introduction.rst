@@ -608,58 +608,80 @@ Viewer tab defines selection in OCC 3D viewer properties.
 Toolbars management
 -------------------
 
-There is a possibility to modify default toolbars structure.
-
-To edit the current tool bars structure select in the Main Menu *Edit - > Edit toolbars* item. Editing of tool bars can be done with help of two following dialog boxes:
-
-#. **Toolbars** provides possibility to create a new toolbar or delete an existing.
-#. **Edit toolbar** provides possibility to edit content of a toolbar.
-
 .. _toolbars_dialog:
 
 **Toolbars** dialog box
 ^^^^^^^^^^^^^^^^^^^^^^^
-
-The dialog box looks like following:
+To edit the current tool bars structure select in the Main Menu *Edit - > Edit toolbars* item. 
+The following dialog box with existing toolbars appears:
 
 .. image:: images/Toolbars.png
    :align: center
 
 .. centered::
-   **Toolbars** diaqlog box
+   **Toolbars** dialog box
 
-In this dialog box there are following controls:
+**Input fields**:
 
-- **Toolbars** is a window with a list of toolbars names. Number of commands in each tool bar is shown in brackets.
-- **Add** a button for creation of a new toolbar. When this button is pressed then a small dialog box with a text input field will uppear. In this diaog box user has to input a name of the new tool bar. The name of tool bar has to be unique. If user defines a not unique name then a warning will be shown.
-- **Edit** a button which calls **Edit toolbar** dialog box for currently selected tool bar.
-- **Delete** a button to delete currently selected tool bar. If user presses this button then he will have to confirm deletion of the selected toolbar.
-- **Reset** a button to reset modified tool bars structure to default one.
-- **Ok** button to close the dialog box, store result of tool bars editing and update tool bars of the module.
+- **Toolbars** window contains list of toolbars names. Number of commands in each tool bar is shown in brackets.
+- **Add** button creates a new toolbar. Click on **Add** button opens  :ref:`create_toolbar`;
+- **Edit**  button  calls :ref:`edit_toolbar` for currently selected tool bar;
+- **Delete** button removes currently selected tool bar. Click on **Delete** button opens  **Delete toolbar** dialog box. After confirmation by click **Yes** button the selected toolbar is deleted;
+- **Reset** button restores modified tool bars structure to default state;
+- **Ok** button closes the dialog box, stores result of tool bars editing and updates tool bars of the module;
 - **Cancel** closes the dialog box without modification of tool bars.
+
+.. image:: images/delete_toolbar.png
+   :align: center
+
+.. centered::
+   **Delete toolbar** dialog box
+
+   
+.. _create_toolbar:
+
+**Create toolbar** dialog box
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+**Input fields** of **Create toolbar** dialog box:
+
+.. image:: images/create_toolbar.png
+   :align: center
+
+.. centered::
+   **Create toolbar** dialog box
+
+- **Name of a new toolbar** defines name of the new tool bar. The name of tool bar has to be unique. If user defines a not unique name then a warning appears and a new tooolbar with not unique name is not created;
+- **Ok** button closes the dialog box and add a new tool bars of the module into  **Toolbars** window;
+- **Cancel** closes the dialog box without addition of a new tool bar.
+
+.. image:: images/name_toolbar.png
+   :align: center
+
+.. centered::
+   **Warning** dialog box
+   
 
 .. _edit_toolbar:
 
 **Edit toolbar** dialog box
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-The dialog box like following:
+**Input fields** of **Edit toolbar** dialog box:
 
 .. image:: images/EditToolbar.png
    :align: center
 
 .. centered::
-   **Edit toolbar** diaqlog box
+   **Edit toolbar** dialog box
 
-In this dialog box there are following controls:
-
-- **Toolbar name** a non-editable field which displays a name of current tool bar.
-- **Out of toolbars** a left window with a list of commands which are out of any tool bar. Also this list contains an item for separator definition "------".
-- Right arrow button transfers currently selected item from left window to right one. If right window contains a selected item then new item will be placed before the selectged one. If there is no selected item in right window then new item will be added at the end of items list. In order to clear current selection in right window it is necessary to click in empty space or click by right button of the window.
-- Left arrow button removes currently selected item from right window and appends it to left window.
-- **In the toolbar** a right window with a list of commands which are defined in the current tool bar. Items in this window are listed according to order of commands in the toolbar.
-- Buttons **Up** and **Down** to change position of a selected command in right window.
-- **Ok** button to close the dialog box, store result of editing.
+- **Toolbar name** non-editable field displays  name of modified tool bar;
+- **Out of toolbars** window contains list of commands which are not included into any tool bar and separator definition "------";
+- **In the toolbar** window contains list of commands which are defined in the current tool bar. Items in this window are listed according to order of commands in the toolbar; 
+- **Right arrow** button transfers currently selected item from left window to right one. If right window contains a selected item then new item will be placed before the selected one. If there is no selected item in right window then new item will be added at the end of items list. In order to clear current selection in right window it is necessary to click in empty space or click by right button of the window.
+- **Left arrow** button removes currently selected item from right window and appends it to left window;
+- **Up** and **Down** buttons  change position of a selected command in right window;
+- **Ok** button closes the dialog box, stores result of edition;
 - **Cancel** closes the dialog box without modification of tool bar content.
 
 
