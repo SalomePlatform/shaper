@@ -624,24 +624,24 @@ The following dialog box with existing toolbars appears:
 **Input fields**:
 
 - **Toolbars** window contains list of toolbars names. Number of commands in each tool bar is shown in brackets.
-- **Add** button creates a new toolbar. Click on **Add** button opens  :ref:`create_toolbar`;
+- **Add** button creates a new toolbar. Click on **Add** button opens :ref:`create_toolbar`;
 - **Edit**  button  calls :ref:`edit_toolbar` for currently selected tool bar;
-- **Delete** button removes currently selected tool bar. Click on **Delete** button opens  **Delete toolbar** dialog box. After confirmation by click **Yes** button the selected toolbar is deleted;
+- **Delete** button removes currently selected tool bar. Click on **Delete** button opens warning dialog box. After confirmation by click **Yes** button the selected toolbar is deleted. Click **No** button cancels removing of the selected toolbar;
 - **Reset** button restores modified tool bars structure to default state;
-- **Ok** button closes the dialog box, stores result of tool bars editing and updates tool bars of the module;
-- **Cancel** closes the dialog box without modification of tool bars.
+- **OK** button closes the dialog box, stores result of tool bars edition and updates Shaper tool bars;
+- **Cancel** button closes the dialog box without modification of tool bars.
 
 .. image:: images/delete_toolbar.png
    :align: center
 
 .. centered::
-   **Delete toolbar** dialog box
+    Warning dialog box
 
    
 .. _create_toolbar:
 
 **Create toolbar** dialog box
-^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 **Input fields** of **Create toolbar** dialog box:
 
@@ -652,8 +652,8 @@ The following dialog box with existing toolbars appears:
    **Create toolbar** dialog box
 
 - **Name of a new toolbar** defines name of the new tool bar. The name of tool bar has to be unique. If user defines a not unique name then a warning appears and a new tooolbar with not unique name is not created;
-- **Ok** button closes the dialog box and add a new tool bars of the module into  **Toolbars** window;
-- **Cancel** closes the dialog box without addition of a new tool bar.
+- **Ok** button closes the dialog box and add a new tool bar of the module into  **Toolbars** window;
+- **Cancel** button closes the dialog box without addition of a new tool bar.
 
 .. image:: images/name_toolbar.png
    :align: center
@@ -678,10 +678,11 @@ The following dialog box with existing toolbars appears:
 - **Toolbar name** non-editable field displays  name of modified tool bar;
 - **Out of toolbars** window contains list of commands which are not included into any tool bar and separator definition "------";
 - **In the toolbar** window contains list of commands which are defined in the current tool bar. Items in this window are listed according to order of commands in the toolbar; 
-- **Right arrow** button transfers currently selected item from left window to right one. If right window contains a selected item then new item will be placed before the selected one. If there is no selected item in right window then new item will be added at the end of items list. In order to clear current selection in right window it is necessary to click in empty space or click by right button of the window.
-- **Left arrow** button removes currently selected item from right window and appends it to left window;
-- **Up** and **Down** buttons  change position of a selected command in right window;
+- **Right arrow** button transfers currently selected item from  **Out of toolbars** window to **In the toolbar** window and puts new item before the selected item in **In the toolbar** window.
+    If there is no selected item in **In the toolbar**  window then new item will be added at the end of items list. In order to clear current selection it is necessary to click in empty space of the window.
+- **Left arrow** button transfers currently selected item from **In the toolbar** window into **Out of toolbars** window;
+- **Up** and **Down** buttons  change position of selected command in **In the toolbar** window;
 - **Ok** button closes the dialog box, stores result of edition;
-- **Cancel** closes the dialog box without modification of tool bar content.
+- **Cancel**  button closes the dialog box without modification of tool bar content.
 
 
