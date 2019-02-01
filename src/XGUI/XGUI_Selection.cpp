@@ -63,6 +63,7 @@ XGUI_Selection::XGUI_Selection(XGUI_Workshop* theWorkshop)
 QList<ModuleBase_ViewerPrsPtr> XGUI_Selection::getSelected(const SelectionPlace& thePlace) const
 {
   QList<ModuleBase_ViewerPrsPtr> aPresentations;
+  QList<ModuleBase_ViewerPrsPtr> aToRemove;
 
   switch (thePlace) {
     case Browser:
@@ -72,8 +73,62 @@ QList<ModuleBase_ViewerPrsPtr> XGUI_Selection::getSelected(const SelectionPlace&
       getSelectedInViewer(aPresentations);
     break;
   case AllControls:
-      getSelectedInViewer(aPresentations);
-      getSelectedInBrowser(aPresentations);
+    // Get selection from object browser
+    getSelectedInBrowser(aPresentations);
+
+    // Filter out all objects except feature if there is no selected results in object browser
+    // Filter out all features if in object browser there are selected features and their results
+    bool aHasFeature = false;
+    bool aHasResult = false;
+    foreach(ModuleBase_ViewerPrsPtr aVal, aPresentations) {
+      if (aVal->object().get()) {
+        FeaturePtr aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(aVal->object());
+        if (aFeature.get()) {
+          aHasFeature = true;
+          std::list<ResultPtr> aResList = aFeature->results();
+          std::list<ResultPtr>::const_iterator aIt;
+          for (aIt = aResList.cbegin(); aIt != aResList.cend(); aIt++) {
+            foreach(ModuleBase_ViewerPrsPtr aSel, aPresentations) {
+              if (aSel->object() == (*aIt)) {
+                aHasResult = true;
+                break;
+              }
+            }
+            if (aHasResult)
+              break;
+          }
+        }
+      }
+      if (aHasFeature && aHasResult)
+        break;
+    }
+    //Get selection from a viewer
+    getSelectedInViewer(aPresentations);
+
+    // Filter out extra objects
+    if (aHasFeature && aHasResult) {
+      foreach(ModuleBase_ViewerPrsPtr aVal, aPresentations) {
+        if (aVal->object().get()) {
+          FeaturePtr aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(aVal->object());
+          if (aFeature.get()) {
+            aToRemove.append(aVal);
+          }
+        }
+      }
+    }
+    else if (aHasFeature && (!aHasResult)) {
+      foreach(ModuleBase_ViewerPrsPtr aVal, aPresentations) {
+        if (aVal->object().get()) {
+          FeaturePtr aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(aVal->object());
+          if (!aFeature.get()) {
+            aToRemove.append(aVal);
+          }
+        }
+      }
+    }
+    foreach(ModuleBase_ViewerPrsPtr aVal, aToRemove) {
+      aPresentations.removeAll(aVal);
+    }
     break;
   }
   return aPresentations;
