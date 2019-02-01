@@ -1086,9 +1086,10 @@ void Model_AttributeSelection::computeValues(
   if (aWasWholeContext) {
     theValShape = theOldContext->shape()->impl<TopoDS_Shape>();
   }
+  TopAbs_ShapeEnum aValType = theValShape.ShapeType();
   TopoDS_Shape aNewContShape = theNewContext->shape()->impl<TopoDS_Shape>();
   // if a new value is unchanged in the new context, do nothing: value is correct
-  TopExp_Explorer aSubExp(aNewContShape, theValShape.ShapeType());
+  TopExp_Explorer aSubExp(aNewContShape, aValType);
   for(; aSubExp.More(); aSubExp.Next()) {
     if (aSubExp.Current().IsSame(theValShape)) {
       theShapes.Append(theValShape);
@@ -1133,17 +1134,15 @@ void Model_AttributeSelection::computeValues(
                 return;
               }
               // don't add edges generated from faces
-              if (aPairIter.NewShape().ShapeType() <= theValShape.ShapeType())
+              if (aPairIter.NewShape().ShapeType() <= aValType)
                 theShapes.Append(aPairIter.NewShape());
             }
           } else if (!aPairIter.OldShape().IsNull()) { // search shape that contains this sub
-            TopExp_Explorer anExp(aPairIter.OldShape(), theValShape.ShapeType());
+            TopExp_Explorer anExp(aPairIter.OldShape(), aValType);
             for(; anExp.More(); anExp.Next()) {
               if (anExp.Current().IsSame(theValShape)) { // found a new container
-                if (aPairIter.NewShape().IsNull()) {// value was removed
-                  theShapes.Clear();
-                  return;
-                }
+                if (aPairIter.NewShape().IsNull()) // skip removed high-level shape
+                  continue;
                 aNewToOld.Bind(aPairIter.NewShape(), aPairIter.OldShape());
                 anOlds.Add(aPairIter.OldShape());
                 break;
@@ -1160,7 +1159,7 @@ void Model_AttributeSelection::computeValues(
     NCollection_Map<TopAbs_ShapeEnum> aNewTypes; // types of shapes to iterate
     TopTools_DataMapOfShapeShape::Iterator aNewTypeIter(aNewToOld);
     for(; aNewTypeIter.More(); aNewTypeIter.Next()) {
-      if (aNewTypeIter.Key().ShapeType() != theValShape.ShapeType())
+      if (aNewTypeIter.Key().ShapeType() != aValType)
         aNewTypes.Add(aNewTypeIter.Key().ShapeType());
     }
     NCollection_Map<TopAbs_ShapeEnum>::Iterator aTypeIter(aNewTypes);
@@ -1169,7 +1168,7 @@ void Model_AttributeSelection::computeValues(
         TopoDS_Shape anOld = anExp.Current();
         if (aNewToOld.IsBound(anOld) || anOlds.Contains(anOld)) // this was modified
           continue;
-        TopExp_Explorer aValExp(anOld, theValShape.ShapeType());
+        TopExp_Explorer aValExp(anOld, aValType);
         for(; aValExp.More(); aValExp.Next()) {
           const TopoDS_Shape& anUnchanged = aValExp.Current();
           if (anUnchanged.IsSame(theValShape)) {
@@ -1185,7 +1184,7 @@ void Model_AttributeSelection::computeValues(
     NCollection_DataMap<TopoDS_Shape, TopTools_MapOfShape, TopTools_ShapeMapHasher> aSubs;
     TopTools_DataMapOfShapeShape::Iterator aContIter(aNewToOld);
     for(; aContIter.More(); aContIter.Next()) {
-      TopExp_Explorer aSubExp(aContIter.Key(), theValShape.ShapeType());
+      TopExp_Explorer aSubExp(aContIter.Key(), aValType);
       for(; aSubExp.More(); aSubExp.Next()) {
         if (!aSubs.IsBound(aSubExp.Current())) {
           aSubs.Bind(aSubExp.Current(), TopTools_MapOfShape());
@@ -1216,12 +1215,34 @@ void Model_AttributeSelection::computeValues(
     if (aWasWholeContext)
       theShapes.Append(TopoDS_Shape());
     else { // if theValShape exists in new context, add it without changes, otherwise - nothing
-      for (TopExp_Explorer aNew(aNewContShape, theValShape.ShapeType()); aNew.More(); aNew.Next()){
+      for (TopExp_Explorer aNew(aNewContShape, aValType); aNew.More(); aNew.Next()){
         if (aNew.Current().IsSame(theValShape)) {
           theShapes.Append(theValShape);
           break;
         }
       }
+    }
+  } else if (theShapes.Size() > 1) {
+    // check it is possible to remove extra sub-shapes:
+    // keep only shapes with the same number of containers if possible
+    TopAbs_ShapeEnum anAncType = TopAbs_FACE;
+    if (aValType == TopAbs_VERTEX)
+      anAncType = TopAbs_EDGE;
+    TopoDS_Shape anOldContext = theOldContext->shape()->impl<TopoDS_Shape>();
+    TopTools_IndexedDataMapOfShapeListOfShape anOldMap;
+    TopExp::MapShapesAndUniqueAncestors(anOldContext, aValType,  anAncType, anOldMap);
+    if (anOldMap.Contains(theValShape)) {
+      int aNumInOld = anOldMap.FindFromKey(theValShape).Extent();
+      TopTools_IndexedDataMapOfShapeListOfShape aNewMap;
+      TopExp::MapShapesAndUniqueAncestors(aNewContShape, aValType,  anAncType, aNewMap);
+      TopTools_ListOfShape aNewResults;
+      for(TopTools_ListOfShape::Iterator aNewSubs(theShapes); aNewSubs.More(); aNewSubs.Next()) {
+        TopoDS_Shape aCand = aNewSubs.Value();
+        if (aNewMap.Contains(aCand) && aNewMap.FindFromKey(aCand).Extent() == aNumInOld)
+          aNewResults.Append(aCand);
+      }
+      if (!aNewResults.IsEmpty() && aNewResults.Size() < theShapes.Size())
+        theShapes = aNewResults;
     }
   }
 }

@@ -84,7 +84,7 @@ assert(selectionList.size() == 3)
 assert(aFactory.validate(Group_5.feature()))
 
 selectionList = Group_6.feature().selectionList("group_list")
-assert(selectionList.size() == 3)
+assert(selectionList.size() == 2) # edge selected for the fillet become removed
 assert(aFactory.validate(Group_6.feature()))
 
 model.begin()
