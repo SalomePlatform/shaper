@@ -306,6 +306,8 @@ void Model_ResultBody::updateSubs(
   const GeomShapePtr& theThisShape, const std::list<GeomShapePtr>& theOlds,
   const std::shared_ptr<GeomAlgoAPI_MakeShape> theMakeShape, const bool isGenerated)
 {
+  // to avoid changing of "isDisabled" flag in the "updateSubs" cycle
+  isDisabled();
   myAlgo = theMakeShape;
   myOlds = theOlds;
   myIsGenerated = isGenerated;
