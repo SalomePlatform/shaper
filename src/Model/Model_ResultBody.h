@@ -26,6 +26,8 @@
 #include <vector>
 #include <map>
 
+#include <TopTools_DataMapOfShapeListOfShape.hxx>
+
 /**\class Model_ResultBody
 * \ingroup DataModel
 * \brief The body (shape) result of a feature.
@@ -49,6 +51,8 @@ class Model_ResultBody : public ModelAPI_ResultBody
   std::list<GeomShapePtr> myOlds;
   /// Information about the kind of the history information: modified or generated
   bool myIsGenerated;
+  /// Map from old shape to list of new shapes, cash for computeOldForSub method
+  TopTools_DataMapOfShapeListOfShape myHistoryCash;
 
 public:
 

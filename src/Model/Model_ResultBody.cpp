@@ -306,14 +306,16 @@ void Model_ResultBody::updateSubs(
   const GeomShapePtr& theThisShape, const std::list<GeomShapePtr>& theOlds,
   const std::shared_ptr<GeomAlgoAPI_MakeShape> theMakeShape, const bool isGenerated)
 {
-  // to avoid changing of "isDisabled" flag in the "updateSubs" cycle
-  isDisabled();
   myAlgo = theMakeShape;
   myOlds = theOlds;
   myIsGenerated = isGenerated;
+  // to avoid changing of "isDisabled" flag in the "updateSubs" cycle
+  isDisabled();
+
   updateSubs(theThisShape, true);
   myAlgo.reset();
   myOlds.clear();
+  myHistoryCash.Clear();
 }
 
 
@@ -387,15 +389,33 @@ void Model_ResultBody::computeOldForSub(const GeomShapePtr& theSub,
     // iterate one level more (for intersection of solids this is face)
     collectSubs(*aRootOlds, anOldSubs, true);
     for (TopTools_MapOfShape::Iterator anOldIter(anOldSubs); anOldIter.More(); anOldIter.Next()) {
-      GeomShapePtr anOldSub(new GeomAPI_Shape);
-      anOldSub->setImpl<TopoDS_Shape>(new TopoDS_Shape(anOldIter.Value()));
-      if (anOldSub->isCompound() || anOldSub->isShell() || anOldSub->isWire())
+      TopoDS_Shape anOldShape = anOldIter.Value();
+      if (anOldShape.ShapeType() == TopAbs_COMPOUND || anOldShape.ShapeType() == TopAbs_SHELL ||
+          anOldShape.ShapeType() == TopAbs_WIRE)
         continue; // container old-shapes are not supported by the history, may cause crash
+      GeomShapePtr anOldSub(new GeomAPI_Shape);
+      anOldSub->setImpl<TopoDS_Shape>(new TopoDS_Shape(anOldShape));
+
       ListOfShape aNews;
-      myIsGenerated ? myAlgo->generated(anOldSub, aNews) : myAlgo->modified(anOldSub, aNews);
-      // MakeShape may return alone old shape if there is no history information for this input
-      if (aNews.size() == 1 && aNews.front()->isEqual(anOldSub))
-        aNews.clear();
+      if (myHistoryCash.IsBound(anOldShape)) {
+        const TopTools_ListOfShape& aList = myHistoryCash.Find(anOldShape);
+        for(TopTools_ListIteratorOfListOfShape anIter(aList); anIter.More(); anIter.Next()) {
+          GeomShapePtr aShape(new GeomAPI_Shape);
+          aShape->setImpl<TopoDS_Shape>(new TopoDS_Shape(anIter.Value()));
+          aNews.push_back(aShape);
+        }
+      } else {
+        myIsGenerated ? myAlgo->generated(anOldSub, aNews) : myAlgo->modified(anOldSub, aNews);
+        // MakeShape may return alone old shape if there is no history information for this input
+        if (aNews.size() == 1 && aNews.front()->isEqual(anOldSub))
+          aNews.clear();
+        // store result in the history
+        TopTools_ListOfShape aList;
+        for (ListOfShape::iterator aNewIter = aNews.begin(); aNewIter != aNews.end(); aNewIter++) {
+          aList.Append((*aNewIter)->impl<TopoDS_Shape>());
+        }
+        myHistoryCash.Bind(anOldShape, aList);
+      }
 
       for (ListOfShape::iterator aNewIter = aNews.begin(); aNewIter != aNews.end(); aNewIter++) {
         if (aSubSubs.Contains((*aNewIter)->impl<TopoDS_Shape>())) {
