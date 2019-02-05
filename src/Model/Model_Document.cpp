@@ -1516,7 +1516,7 @@ void Model_Document::changeNamingName(const std::string theOldName,
           Handle(TDataStd_Name) aSubName = Handle(TDataStd_Name)::DownCast(aChild.Value());
           std::string aName = TCollection_AsciiString(aSubName->Get()).ToCString();
           if (aName.find(theOldName) == 0) { // started from parent name
-            std::string aNewSubName = theNewName + aName.substr(theNewName.size());
+            std::string aNewSubName = theNewName + aName.substr(theOldName.size());
             changeNamingName(aName, aNewSubName, aSubName->Label());
             aSubName->Set(aNewSubName.c_str());
           }
