@@ -52,7 +52,7 @@ public:
   /// \return the total area of the faces of the current shape or 0.0 if it can be computed.
   GEOMALGOAPI_EXPORT static double area(const std::shared_ptr<GeomAPI_Shape> theShape);
 
-  /// \return the centre of mass of the current face.
+  /// \return the center of mass of the current face.
   /// The coordinates returned for the center of mass
   /// are expressed in the absolute Cartesian coordinate system.
   /// (This function works only for surfaces).
@@ -95,7 +95,7 @@ public:
   /// \brief Enlarges or reduces plane to fit bounding box.
   /// \return plane that fits to bounding box.
   /// \param[in] thePlane base plane.
-  /// \param[in] thePoints bounding box points (shoud be eight).
+  /// \param[in] thePoints bounding box points (should be eight).
   GEOMALGOAPI_EXPORT static std::shared_ptr<GeomAPI_Face> fitPlaneToBox(
     const std::shared_ptr<GeomAPI_Shape> thePlane,
     const std::list<std::shared_ptr<GeomAPI_Pnt> >& thePoints);
@@ -120,10 +120,10 @@ public:
 
   /// \brief Return a plane for list of shapes if they are all planar.
   /// \param[in] theShapes shapes to find plane.
-  /// \return plane where all shapes lie or empty ptr if they not planar.
+  /// \return plane where all shapes lie or empty pointer if they not planar.
   GEOMALGOAPI_EXPORT static std::shared_ptr<GeomAPI_Pln> findPlane(const ListOfShape& theShapes);
 
-  /// \brief Checks that vertex/edge is inside face or vertext inside wire.
+  /// \brief Checks that vertex/edge is inside face or vertex inside wire.
   /// \param[in] theSubShape shape that should be inside.
   /// \param[in] theBaseShape base shape.
   /// \return true if edge inside the face.
@@ -153,7 +153,7 @@ public:
                    std::pair<std::list<std::shared_ptr<GeomDataAPI_Point2D> >,
                              std::list<std::shared_ptr<ModelAPI_Object> > > > PointToRefsMap;
   /// \brief Performs the split of the shape by points.
-  /// \param[in] theBaseShape shape that should be splitted.
+  /// \param[in] theBaseShape shape that should be divided.
   /// \param[in] thePoints container of points to split
   /// \param[out] theShapes container of shapes after split
   GEOMALGOAPI_EXPORT static void splitShape(const std::shared_ptr<GeomAPI_Shape>& theBaseShape,
@@ -161,7 +161,7 @@ public:
                                       std::set<std::shared_ptr<GeomAPI_Shape> >& theShapes);
 
   /// \brief Performs the split of the shape by points.
-  /// \param[in] theBaseShape shape that should be splitted.
+  /// \param[in] theBaseShape shape that should be divided.
   /// \param[in] thePoints container of points to split
   /// \param[out] theShapes container of shapes after split
   GEOMALGOAPI_EXPORT static void splitShape_p(const std::shared_ptr<GeomAPI_Shape>& theBaseShape,
@@ -173,7 +173,7 @@ public:
                                     const std::set<std::shared_ptr<GeomAPI_Shape> >& theShapes);
 
 #ifdef FEATURE_MULTIROTATION_TWO_DIRECTIONS
-  /// \brief Returns a dir from a shape and an axis.
+  /// \brief Returns a direction from a shape and an axis.
   /// \param[in] theBaseShape shape whose center of mass serves as the starting point of the dir.
   /// \param[in] theAxis axis that serves as a direction for the dir
   /// \return dir that builds from center of mass of the base shape and the axis
@@ -182,7 +182,7 @@ public:
                                     const std::shared_ptr<GeomAPI_Ax1> theAxis);
 #endif
 
-  /// \brief Reapproximate a wire to build a single edge
+  /// \brief Re-approximate a wire to build a single edge
   GEOMALGOAPI_EXPORT static std::shared_ptr<GeomAPI_Edge> wireToEdge(
       const std::shared_ptr<GeomAPI_Wire>& theWire);
 

@@ -57,6 +57,10 @@ public:
                                          const ListOfShape& theTools,
                                          const OperationType theOperationType);
 
+  /// Redefinition of the generic method for the Fuse problem: OCCT 30481
+  GEOMALGOAPI_EXPORT virtual void modified(const GeomShapePtr theOldShape,
+    ListOfShape& theNewShapes);
+
 private:
   /// Builds resulting shape.
   void build(const ListOfShape& theObjects,
