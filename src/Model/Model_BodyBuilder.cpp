@@ -690,6 +690,9 @@ void Model_BodyBuilder::loadGeneratedShapes(const GeomMakeShapePtr& theAlgo,
         continue;
       }
 
+      if (aResultShape->isSame(aNewShape))
+        continue; // it is stored on the root level
+
       TopAbs_ShapeEnum aNewShapeType = aNewShape_.ShapeType();
       if (aNewShapeType == TopAbs_WIRE || aNewShapeType == TopAbs_SHELL) {
         // TODO: This is a workaround. New shape should be only edge or face.

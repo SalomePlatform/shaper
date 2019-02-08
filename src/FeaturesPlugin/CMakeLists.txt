@@ -427,6 +427,7 @@ ADD_UNIT_TESTS(TestExtrusion.py
                TestBooleanFuse_CompSolid_Face.py
                TestBooleanFuse_CompSolid_CompSolid.py
                TestBooleanFuse_CompSolidCompound_CompSolidCompound.py
+               TestBooleanFuse_SolidsHistory.py
                TestFillet.py
                TestFillet1.py
                TestFillet_ErrorMsg.py
