@@ -222,13 +222,8 @@ void FeaturesPlugin_CompositeSketch::getBaseShapes(ListOfShape& theBaseShapesLis
 
   // Searching faces with common edges.
   if(theIsMakeShells && aBaseFacesList.size() > 1) {
-    ListOfShape aShells;
-    ListOfShape aFreeFaces;
     GeomShapePtr aFacesCompound = GeomAlgoAPI_CompoundBuilder::compound(aBaseFacesList);
-    GeomAlgoAPI_ShapeTools::combineShapes(aFacesCompound, GeomAPI_Shape::SHELL,
-                                          aShells, aFreeFaces);
-    theBaseShapesList.insert(theBaseShapesList.end(), aFreeFaces.begin(), aFreeFaces.end());
-    theBaseShapesList.insert(theBaseShapesList.end(), aShells.begin(), aShells.end());
+    GeomAlgoAPI_ShapeTools::combineShapes(aFacesCompound, GeomAPI_Shape::SHELL, theBaseShapesList);
   } else {
     theBaseShapesList.insert(theBaseShapesList.end(), aBaseFacesList.begin(),
                              aBaseFacesList.end());

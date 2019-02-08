@@ -1117,14 +1117,10 @@ bool FeaturesPlugin_ValidatorUnionArguments::isValid(
 
   // Make compound and find connected.
   GeomShapePtr aCompound = GeomAlgoAPI_CompoundBuilder::compound(aBaseShapesList);
-  ListOfShape aCombined, aFree;
-  GeomAlgoAPI_ShapeTools::combineShapes(
-    aCompound,
-    aType,
-    aCombined,
-    aFree);
+  ListOfShape aResults;
+  GeomAlgoAPI_ShapeTools::combineShapes(aCompound, aType, aResults);
 
-  if(aFree.size() > 0 || aCombined.size() > 1) {
+  if(aResults.size() > 1 || (aResults.size() == 1 && aResults.front()->shapeType() > aType)) {
     theError = "Error: Not all shapes have shared topology.";
     return false;
   }

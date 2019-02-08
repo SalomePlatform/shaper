@@ -70,13 +70,10 @@ public:
   /// \brief Combines faces with common edges to shells, or solids to compsolids.
   /// \param[in] theCompound compound of shapes.
   /// \param[in] theType type of combine.
-  /// \param[out] theCombinedShapes resulting shapes.
-  /// \param[out] theFreeShapes shapes that does not have common subshapes.
+  /// \param[out] theResults resulting shapes.
   GEOMALGOAPI_EXPORT static std::shared_ptr<GeomAPI_Shape> combineShapes(
     const std::shared_ptr<GeomAPI_Shape> theCompound,
-    const GeomAPI_Shape::ShapeType theType,
-    ListOfShape& theCombinedShapes,
-    ListOfShape& theFreeShapes);
+    const GeomAPI_Shape::ShapeType theType, ListOfShape& theResults);
 
   /// \brief Groups shapes with shared topology to compounds.
   /// \param[in] theCompound compound of shapes.

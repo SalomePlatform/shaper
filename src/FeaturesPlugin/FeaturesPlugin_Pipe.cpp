@@ -147,14 +147,9 @@ void FeaturesPlugin_Pipe::execute()
 
   // Searching faces with common edges.
   if(aCreationMethod == CREATION_METHOD_SIMPLE()) {
-    ListOfShape aShells;
-    ListOfShape aFreeFaces;
     std::shared_ptr<GeomAPI_Shape> aFacesCompound =
       GeomAlgoAPI_CompoundBuilder::compound(aBaseFacesList);
-    GeomAlgoAPI_ShapeTools::combineShapes(aFacesCompound, GeomAPI_Shape::SHELL,
-                                          aShells, aFreeFaces);
-    aBaseShapesList.insert(aBaseShapesList.end(), aFreeFaces.begin(), aFreeFaces.end());
-    aBaseShapesList.insert(aBaseShapesList.end(), aShells.begin(), aShells.end());
+    GeomAlgoAPI_ShapeTools::combineShapes(aFacesCompound, GeomAPI_Shape::SHELL, aBaseShapesList);
   } else {
     aBaseShapesList.insert(aBaseShapesList.end(), aBaseFacesList.begin(), aBaseFacesList.end());
   }
@@ -168,7 +163,7 @@ void FeaturesPlugin_Pipe::execute()
   std::shared_ptr<GeomAPI_Shape> aPathShape =
     std::dynamic_pointer_cast<GeomAPI_Shape>(aPathSelection->value());
   if(!aPathShape.get() && aPathSelection->context().get()) {
-    // Probaply it is a construction.
+    // Probably it is a construction.
     aPathShape = aPathSelection->context()->shape();
   }
   if(!aPathShape.get() || aPathShape->isNull()) {

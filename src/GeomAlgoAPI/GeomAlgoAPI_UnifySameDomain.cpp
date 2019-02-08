@@ -48,18 +48,18 @@ void GeomAlgoAPI_UnifySameDomain::build(const ListOfShape& theShapes)
 
   // Make compound.
   GeomShapePtr aCompound = GeomAlgoAPI_CompoundBuilder::compound(theShapes);
-  ListOfShape aCombined, aFree;
+  ListOfShape aResults;
   GeomAlgoAPI_ShapeTools::combineShapes(
     aCompound,
     GeomAPI_Shape::SHELL,
-    aCombined,
-    aFree);
+    aResults);
 
-  if(aFree.size() > 0 || aCombined.size() > 1) {
+  if(aResults.size() > 1 ||
+     (aResults.size() == 1 && aResults.front()->shapeType() > GeomAPI_Shape::SHELL)) {
     return;
   }
 
-  const TopoDS_Shape& aShell = aCombined.front()->impl<TopoDS_Shape>();
+  const TopoDS_Shape& aShell = aResults.front()->impl<TopoDS_Shape>();
 
   std::shared_ptr<GeomAPI_Shape> aShape(new GeomAPI_Shape());
   aShape->setImpl(new TopoDS_Shape(aShell));

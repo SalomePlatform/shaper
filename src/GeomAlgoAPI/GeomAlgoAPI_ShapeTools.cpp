@@ -200,9 +200,12 @@ double GeomAlgoAPI_ShapeTools::minimalDistance(const GeomShapePtr& theShape1,
 std::shared_ptr<GeomAPI_Shape> GeomAlgoAPI_ShapeTools::combineShapes(
   const std::shared_ptr<GeomAPI_Shape> theCompound,
   const GeomAPI_Shape::ShapeType theType,
-  ListOfShape& theCombinedShapes,
-  ListOfShape& theFreeShapes)
+  ListOfShape& theResuts)
 {
+
+  ListOfShape aResCombinedShapes;
+  ListOfShape aResFreeShapes;
+
   GeomShapePtr aResult = theCompound;
 
   if(!theCompound.get()) {
@@ -220,17 +223,25 @@ std::shared_ptr<GeomAPI_Shape> GeomAlgoAPI_ShapeTools::combineShapes(
     aTA = TopAbs_SOLID;
   }
 
-  theCombinedShapes.clear();
-  theFreeShapes.clear();
+  // map from the resulting shapes to minimal index of the used shape from theCompound list
+  std::map<GeomShapePtr, int> anInputOrder;
+  // map from ancestors-shapes to the index of shapes in theCompound
+  NCollection_DataMap<TopoDS_Shape, int> anAncestorsOrder;
 
   // Get free shapes.
+  int anOrder = 0;
   const TopoDS_Shape& aShapesComp = theCompound->impl<TopoDS_Shape>();
-  for(TopoDS_Iterator anIter(aShapesComp); anIter.More(); anIter.Next() ) {
+  for(TopoDS_Iterator anIter(aShapesComp); anIter.More(); anIter.Next(), anOrder++) {
     const TopoDS_Shape& aShape = anIter.Value();
     if(aShape.ShapeType() > aTA) {
       std::shared_ptr<GeomAPI_Shape> aGeomShape(new GeomAPI_Shape);
       aGeomShape->setImpl<TopoDS_Shape>(new TopoDS_Shape(aShape));
-      theFreeShapes.push_back(aGeomShape);
+      aResFreeShapes.push_back(aGeomShape);
+      anInputOrder[aGeomShape] = anOrder;
+    } else {
+      for(TopExp_Explorer anExp(aShape, aTA); anExp.More(); anExp.Next()) {
+        anAncestorsOrder.Bind(anExp.Current(), anOrder);
+      }
     }
   }
 
@@ -240,6 +251,7 @@ std::shared_ptr<GeomAPI_Shape> GeomAlgoAPI_ShapeTools::combineShapes(
   if(aMapSA.IsEmpty()) {
     return aResult;
   }
+  theResuts.clear();
 
   // Get all shapes with common sub-shapes and free shapes.
   NCollection_Map<TopoDS_Shape> aFreeShapes;
@@ -305,6 +317,7 @@ std::shared_ptr<GeomAPI_Shape> GeomAlgoAPI_ShapeTools::combineShapes(
     TopoDS_Shell aShell;
     TopoDS_CompSolid aCSolid;
     TopoDS_Builder aBuilder;
+    anOrder = -1;
     theType ==
       GeomAPI_Shape::COMPSOLID ? aBuilder.MakeCompSolid(aCSolid) : aBuilder.MakeShell(aShell);
     NCollection_Map<TopoDS_Shape>& aShapesMap = anIter.ChangeValue();
@@ -314,56 +327,49 @@ std::shared_ptr<GeomAPI_Shape> GeomAlgoAPI_ShapeTools::combineShapes(
         theType ==
           GeomAPI_Shape::COMPSOLID ? aBuilder.Add(aCSolid, aShape) : aBuilder.Add(aShell, aShape);
         aShapesMap.Remove(aShape);
+        int aThisOrder = anAncestorsOrder.Find(aShape);
+        if (anOrder == -1 || aThisOrder < anOrder)
+          anOrder = aThisOrder; // take the minimum order position
       }
     }
     std::shared_ptr<GeomAPI_Shape> aGeomShape(new GeomAPI_Shape);
     TopoDS_Shape* aSh = theType == GeomAPI_Shape::COMPSOLID ? new TopoDS_Shape(aCSolid) :
                                                               new TopoDS_Shape(aShell);
     aGeomShape->setImpl<TopoDS_Shape>(aSh);
-    theCombinedShapes.push_back(aGeomShape);
+    aResCombinedShapes.push_back(aGeomShape);
+    anInputOrder[aGeomShape] = anOrder;
   }
 
-  // Adding free shapes in the same order as they are in the initial compound
-  NCollection_Map<TopoDS_Shape> aFreeSimple;
-  for(ListOfShape::iterator aFree = theFreeShapes.begin(); aFree != theFreeShapes.end(); aFree++) {
-    aFreeSimple.Add((*aFree)->impl<TopoDS_Shape>());
-  }
-  theFreeShapes.clear();
-
-  for(TopoDS_Iterator anIter(aShapesComp); anIter.More(); anIter.Next() ) {
-    const TopoDS_Shape& aShape = anIter.Value();
-    if((aShape.ShapeType() > aTA && aFreeSimple.Contains(aShape)) ||
-       (aShape.ShapeType() == aTA && aFreeShapes.Contains(aShape))) {
+  // Adding free shapes.
+  for(TopExp_Explorer anExp(aShapesComp, aTA); anExp.More(); anExp.Next()) {
+    const TopoDS_Shape& aShape = anExp.Current();
+    if(aFreeShapes.Contains(aShape)) {
       std::shared_ptr<GeomAPI_Shape> aGeomShape(new GeomAPI_Shape);
       aGeomShape->setImpl<TopoDS_Shape>(new TopoDS_Shape(aShape));
-      theFreeShapes.push_back(aGeomShape);
-    } else if (aShape.ShapeType() < aTA) {
-      for(TopExp_Explorer anExp(aShape, aTA); anExp.More(); anExp.Next()) {
-        const TopoDS_Shape& aSubShape = anExp.Current();
-        if (aFreeShapes.Contains(aSubShape)) {
-          std::shared_ptr<GeomAPI_Shape> aGeomShape(new GeomAPI_Shape);
-          aGeomShape->setImpl<TopoDS_Shape>(new TopoDS_Shape(aSubShape));
-          theFreeShapes.push_back(aGeomShape);
-        }
-      }
+      aResFreeShapes.push_back(aGeomShape);
+      anInputOrder[aGeomShape] = anAncestorsOrder.Find(aShape);
     }
   }
 
-  if(theCombinedShapes.size() == 1 && theFreeShapes.size() == 0) {
-    aResult = theCombinedShapes.front();
-  } else if(theCombinedShapes.size() == 0 && theFreeShapes.size() == 1) {
-    aResult = theFreeShapes.front();
+  if(aResCombinedShapes.size() == 1 && aResFreeShapes.size() == 0) {
+    aResult = aResCombinedShapes.front();
+    theResuts.push_back(aResult);
+  } else if(aResCombinedShapes.size() == 0 && aResFreeShapes.size() == 1) {
+    aResult = aResFreeShapes.front();
+    theResuts.push_back(aResult);
   } else {
     TopoDS_Compound aResultComp;
     TopoDS_Builder aBuilder;
     aBuilder.MakeCompound(aResultComp);
-    for(ListOfShape::const_iterator anIter = theCombinedShapes.cbegin();
-        anIter != theCombinedShapes.cend(); anIter++) {
-      aBuilder.Add(aResultComp, (*anIter)->impl<TopoDS_Shape>());
-    }
-    for(ListOfShape::const_iterator anIter = theFreeShapes.cbegin();
-        anIter != theFreeShapes.cend(); anIter++) {
-      aBuilder.Add(aResultComp, (*anIter)->impl<TopoDS_Shape>());
+    // put to result compound and result list in accordance to the order numbers
+    std::map<GeomShapePtr, int>::iterator anInputIter = anInputOrder.begin();
+    std::map<int, GeomShapePtr> aNums;
+    for(; anInputIter != anInputOrder.end(); anInputIter++)
+      aNums[anInputIter->second] = anInputIter->first;
+    std::map<int, GeomShapePtr>::iterator aNumsIter = aNums.begin();
+    for(; aNumsIter != aNums.end(); aNumsIter++) {
+      aBuilder.Add(aResultComp, (aNumsIter->second)->impl<TopoDS_Shape>());
+      theResuts.push_back(aNumsIter->second);
     }
     aResult->setImpl(new TopoDS_Shape(aResultComp));
   }
@@ -503,7 +509,7 @@ std::shared_ptr<GeomAPI_Shape> GeomAlgoAPI_ShapeTools::groupSharedTopology(
   TopoDS_Compound aCompound;
   BRep_Builder aBuilder;
   aBuilder.MakeCompound(aCompound);
-  ListOfShape aCompSolids, aFreeSolids;
+  ListOfShape aSolids;
   for (NCollection_Vector<TopTools_MapOfShape>::Iterator anIt(aGroups); anIt.More(); anIt.Next()) {
     const TopTools_MapOfShape& aGroup = anIt.ChangeValue();
     GeomShapePtr aGeomShape(new GeomAPI_Shape());
@@ -521,8 +527,7 @@ std::shared_ptr<GeomAPI_Shape> GeomAlgoAPI_ShapeTools::groupSharedTopology(
       aGeomShape->setImpl(new TopoDS_Shape(makeCompound(anOrderedGoup)));
       aGeomShape = GeomAlgoAPI_ShapeTools::combineShapes(aGeomShape,
                                                          GeomAPI_Shape::COMPSOLID,
-                                                         aCompSolids,
-                                                         aFreeSolids);
+                                                         aSolids);
     }
     aBuilder.Add(aCompound, aGeomShape->impl<TopoDS_Shape>());
   }

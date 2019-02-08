@@ -35,7 +35,7 @@ Sketch_2 = model.addSketch(Part_1_doc, model.defaultPlane("XOY"))
 SketchCircle_2 = Sketch_2.addCircle(-111.0503834053735, -148.4878232655183, 89.21253106334201)
 model.do()
 Extrusion_1 = model.addExtrusion(Part_1_doc, [model.selection("COMPOUND", "Sketch_1"), model.selection("COMPOUND", "Sketch_2")], model.selection(), 10, 0)
-Cut_1 = model.addCut(Part_1_doc, [model.selection("SOLID", "Extrusion_1_2_2"), model.selection("SOLID", "Extrusion_1_2_1")], [model.selection("SOLID", "Extrusion_1_1")])
+Cut_1 = model.addCut(Part_1_doc, [model.selection("SOLID", "Extrusion_1_1_2"), model.selection("SOLID", "Extrusion_1_1_1")], [model.selection("SOLID", "Extrusion_1_2")])
 model.do()
 model.end()
 
