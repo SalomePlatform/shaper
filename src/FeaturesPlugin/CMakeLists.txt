@@ -357,10 +357,12 @@ ADD_UNIT_TESTS(TestExtrusion.py
                TestBooleanCut_WireCompound_WireCompound.py
                TestBooleanCut_Compound_Solid.py
                TestBooleanCut_ErrorMsg.py
+               TestBooleanCut_SolidsHistory.py
                TestBooleanSmash_Face_Face.py
                TestBooleanSmash_SubSolid_Solid.py
                TestBooleanSmash_CompSolid_Solid.py
                TestBooleanSmash_ErrorMsg.py
+               TestBooleanSmash_SolidsHistory.py
                TestBooleanFuse_SimpleMode.py
                TestBooleanFuse_RemoveEdges.py
                TestBooleanFuse_ErrorMsg.py
@@ -390,6 +392,7 @@ ADD_UNIT_TESTS(TestExtrusion.py
                TestBooleanCommon_CompSolidCompound_Shell.py
                TestBooleanCommon_CompSolidCompound_CompSolidCompound.py
                TestBooleanCommon_ErrorMsg.py
+               TestBooleanCommon_SolidsHistory.py
                Test2596.py
                Test2592.py
                Test2588.py
@@ -412,6 +415,7 @@ ADD_UNIT_TESTS(TestExtrusion.py
                TestPartitionSubCompsolidWithPlane3.py
                TestPartitionSubCompsolidWithPlane4.py
                TestPartitionSubCompsolidWithPlane5.py
+               TestPartition_SolidsHistory.py
                TestBooleanFuse_Vertex_Vertex.py
                TestBooleanFuse_VertexCompound_VertexCompound.py
                TestBooleanFuse_Edge_Edge.py
