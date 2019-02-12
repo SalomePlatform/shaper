@@ -69,7 +69,8 @@ public:
   virtual void loadGeneratedShapes(const std::shared_ptr<GeomAlgoAPI_MakeShape>& theAlgo,
                                    const GeomShapePtr& theOldShape,
                                    const GeomAPI_Shape::ShapeType theShapeTypeToExplore,
-                                   const std::string& theName = "") override;
+                                   const std::string& theName = "",
+                                   const bool theSaveOldIfNotInTree = false) override;
 
   /// load modified shapes for sub-objects
   MODEL_EXPORT

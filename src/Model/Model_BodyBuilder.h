@@ -112,7 +112,8 @@ public:
   virtual void loadGeneratedShapes(const GeomMakeShapePtr& theAlgo,
                                    const GeomShapePtr& theOldShape,
                                    const GeomAPI_Shape::ShapeType theShapeTypeToExplore,
-                                   const std::string& theName = "") override;
+                                   const std::string& theName = "",
+                                   const bool theSaveOldIfNotInTree = false) override;
 
   /// Loads shapes of the first level (to be used during shape import)
   MODEL_EXPORT virtual void loadFirstLevel(GeomShapePtr theShape,

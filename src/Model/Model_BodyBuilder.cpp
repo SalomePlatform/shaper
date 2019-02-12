@@ -647,7 +647,8 @@ void Model_BodyBuilder::loadModifiedShapes(const GeomMakeShapePtr& theAlgo,
 void Model_BodyBuilder::loadGeneratedShapes(const GeomMakeShapePtr& theAlgo,
                                             const GeomShapePtr& theOldShape,
                                             const GeomAPI_Shape::ShapeType theShapeTypeToExplore,
-                                            const std::string& theName)
+                                            const std::string& theName,
+                                            const bool theSaveOldIfNotInTree)
 {
   GeomShapePtr aResultShape = shape();
   TopTools_MapOfShape anAlreadyProcessedShapes;
@@ -668,7 +669,11 @@ void Model_BodyBuilder::loadGeneratedShapes(const GeomMakeShapePtr& theAlgo,
     bool anOldSubShapeNotInTree =
       !isShapeInTree(aData->shapeLab(), anAccess2, anOldSubShape_, anOriginalLabel);
     if (anOldSubShapeAlreadyProcessed || anOldSubShapeNotInTree) {
-      continue;
+      if (theSaveOldIfNotInTree) {
+        std::string aSelectionName = theName + "Selected";
+        generated(anOldSubShape, aSelectionName, false);
+      } else
+        continue;
     }
 
     // Get new shapes.

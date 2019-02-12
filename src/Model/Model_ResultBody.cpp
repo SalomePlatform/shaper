@@ -78,7 +78,8 @@ bool Model_ResultBody::generated(const GeomShapePtr& theNewShape,
 void Model_ResultBody::loadGeneratedShapes(const std::shared_ptr<GeomAlgoAPI_MakeShape>& theAlgo,
                                            const GeomShapePtr& theOldShape,
                                            const GeomAPI_Shape::ShapeType theShapeTypeToExplore,
-                                           const std::string& theName)
+                                           const std::string& theName,
+                                           const bool theSaveOldIfNotInTree)
 {
   if (mySubs.size()) { // consists of subs
     for (std::vector<ResultBodyPtr>::const_iterator aSubIter = mySubs.cbegin();
@@ -86,10 +87,12 @@ void Model_ResultBody::loadGeneratedShapes(const std::shared_ptr<GeomAlgoAPI_Mak
          ++aSubIter)
     {
       const ResultBodyPtr& aSub = *aSubIter;
-      aSub->loadGeneratedShapes(theAlgo, theOldShape, theShapeTypeToExplore, theName);
+      aSub->loadGeneratedShapes(
+        theAlgo, theOldShape, theShapeTypeToExplore, theName, theSaveOldIfNotInTree);
     }
   } else { // do for this directly
-    myBuilder->loadGeneratedShapes(theAlgo, theOldShape, theShapeTypeToExplore, theName);
+    myBuilder->loadGeneratedShapes(
+      theAlgo, theOldShape, theShapeTypeToExplore, theName, theSaveOldIfNotInTree);
   }
 }
 

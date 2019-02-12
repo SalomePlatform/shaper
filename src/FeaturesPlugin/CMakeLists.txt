@@ -435,6 +435,7 @@ ADD_UNIT_TESTS(TestExtrusion.py
                TestFillet.py
                TestFillet1.py
                TestFillet_ErrorMsg.py
+               TestFillet_History.py
                TestScale1.py
                TestScale2.py
                Test1816.py

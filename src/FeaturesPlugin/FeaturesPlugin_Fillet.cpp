@@ -104,9 +104,9 @@ void FeaturesPlugin_Fillet::execute()
   if (!aCreationMethod)
     return;
 
-  GeomAPI_DataMapOfShapeMapOfShapes aSolidsAndSubs;
+  std::list<std::pair<GeomShapePtr, ListOfShape> > aSolidsAndSubs;
 
-  // getting objects and sort them accroding to parent solids
+  // getting objects and sort them according to parent solids
   AttributeSelectionListPtr anObjectsSelList = selectionList(OBJECT_LIST_ID());
   for (int anObjectsIndex = 0; anObjectsIndex < anObjectsSelList->size(); ++anObjectsIndex) {
     AttributeSelectionPtr anObjectAttr = anObjectsSelList->value(anObjectsIndex);
@@ -128,12 +128,26 @@ void FeaturesPlugin_Fillet::execute()
     if (!aParent)
       return;
 
+    // searching this parent is already in the list aSolidsAndSubs
+    std::list<std::pair<GeomShapePtr, ListOfShape> >::iterator aSearch = aSolidsAndSubs.begin();
+    ListOfShape* aFound;
+    for(; aSearch != aSolidsAndSubs.end(); aSearch++) {
+      if (aSearch->first->isSame(aParent)) {
+        aFound = &(aSearch->second);
+        break;
+      }
+    }
+    if (aSearch == aSolidsAndSubs.end()) { // not found, so, add a new one
+      aSolidsAndSubs.push_back(std::pair<GeomShapePtr, ListOfShape>(aParent, ListOfShape()));
+      aFound = &(aSolidsAndSubs.back().second);
+    }
+
     ListOfShape anEdgesAndVertices;
     collectSubs(anObject, anEdgesAndVertices, GeomAPI_Shape::EDGE);
     collectSubs(anObject, anEdgesAndVertices, GeomAPI_Shape::VERTEX);
     for (ListOfShape::iterator aEIt = anEdgesAndVertices.begin();
          aEIt != anEdgesAndVertices.end(); ++aEIt)
-      aSolidsAndSubs.add(aParent, *aEIt);
+      aFound->push_back(*aEIt);
   }
 
   bool isFixedRadius = true;
@@ -155,10 +169,10 @@ void FeaturesPlugin_Fillet::execute()
   std::vector<FeaturesPlugin_Tools::ResultBaseAlgo> aResultBaseAlgoList;
   ListOfShape anOriginalShapesList, aResultShapesList;
 
-  GeomAPI_DataMapOfShapeMapOfShapes::iterator anIt = aSolidsAndSubs.begin();
+  std::list<std::pair<GeomShapePtr, ListOfShape> >::iterator anIt = aSolidsAndSubs.begin();
   for (; anIt != aSolidsAndSubs.end(); ++anIt) {
-    GeomShapePtr aSolid = anIt.first();
-    ListOfShape aFilletEdgesAndVertices = anIt.second();
+    GeomShapePtr aSolid = anIt->first;
+    ListOfShape aFilletEdgesAndVertices = anIt->second;
 
     ListOfShape aFilletEdges = selectEdges(aFilletEdgesAndVertices);
     if (isFixedRadius)
@@ -190,6 +204,15 @@ void FeaturesPlugin_Fillet::execute()
     aResultBaseAlgoList.push_back(aRBA);
     aResultShapesList.push_back(aResult);
     anOriginalShapesList.push_back(aSolid);
+
+    const std::string aFilletFaceName = "Fillet";
+    ListOfShape::iterator aSelectedBase = aFilletEdges.begin();
+    for(; aSelectedBase != aFilletEdges.end(); aSelectedBase++) {
+      GeomShapePtr aBase = *aSelectedBase;
+      // Store new faces generated from edges and vertices
+      aResultBody->loadGeneratedShapes(
+        aFilletBuilder, aBase, GeomAPI_Shape::EDGE, aFilletFaceName, true);
+    }
   }
 
   // Store deleted shapes after all results has been proceeded. This is to avoid issue when in one
@@ -199,38 +222,4 @@ void FeaturesPlugin_Fillet::execute()
       anOriginalShapesList, aResultShapesCompound);
 
   removeResults(aResultIndex);
-}
-
-void FeaturesPlugin_Fillet::loadNamingDS(
-    std::shared_ptr<ModelAPI_ResultBody> theResultBody,
-    const std::shared_ptr<GeomAPI_Shape> theBaseShape,
-    const std::shared_ptr<GeomAPI_Shape> theResultShape,
-    const std::shared_ptr<GeomAlgoAPI_MakeShape>& theMakeShape)
-{
-  //load result
-  if(theBaseShape->isEqual(theResultShape)) {
-    theResultBody->store(theResultShape, false);
-    return;
-  }
-
-  theResultBody->storeModified(theBaseShape, theResultShape);
-
-  const std::string aFilletFaceName = "Fillet_Face";
-
-  // Store modified faces
-  theResultBody->loadModifiedShapes(theMakeShape, theBaseShape, GeomAPI_Shape::FACE);
-
-  // Store new faces generated from edges and vertices
-  theResultBody->loadGeneratedShapes(theMakeShape,
-                                     theBaseShape,
-                                     GeomAPI_Shape::EDGE,
-                                     aFilletFaceName);
-  theResultBody->loadGeneratedShapes(theMakeShape,
-                                     theBaseShape,
-                                     GeomAPI_Shape::VERTEX,
-                                     aFilletFaceName);
-
-  // Deleted shapes
-  theResultBody->loadDeletedShapes(theMakeShape, theBaseShape, GeomAPI_Shape::EDGE);
-  theResultBody->loadDeletedShapes(theMakeShape, theBaseShape, GeomAPI_Shape::FACE);
 }

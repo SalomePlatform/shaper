@@ -18,7 +18,7 @@
 ## email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com>
 ##
 
-# Test that the history of Common operation works correctly after movement of groups after this Common feature:
+# Test that the history of Common operation works correctly after movement of groups after this Common feature
 
 # -*- coding: utf-8 -*-
 

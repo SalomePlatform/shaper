@@ -1473,9 +1473,12 @@ void Model_AttributeSelection::updateInHistory(bool& theRemove)
 
     GeomAPI_Shape::ShapeType aListShapeType = GeomAPI_Shape::SHAPE;
     if (myParent) {
-      if (myParent->selectionType() == "VERTEX") aListShapeType = GeomAPI_Shape::VERTEX;
-      else if (myParent->selectionType() == "EDGE") aListShapeType = GeomAPI_Shape::EDGE;
-      else if (myParent->selectionType() == "FACE") aListShapeType = GeomAPI_Shape::FACE;
+      if (myParent->selectionType() == "VERTEX" || myParent->selectionType() == "Vertices")
+        aListShapeType = GeomAPI_Shape::VERTEX;
+      else if (myParent->selectionType() == "EDGE" || myParent->selectionType() == "Edges")
+        aListShapeType = GeomAPI_Shape::EDGE;
+      else if (myParent->selectionType() == "FACE" || myParent->selectionType() == "Faces")
+        aListShapeType = GeomAPI_Shape::FACE;
     }
 
     std::list<ResultPtr>::iterator aNewCont = aNewContexts.begin();
