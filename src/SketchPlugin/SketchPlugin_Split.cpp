@@ -621,7 +621,8 @@ void SketchPlugin_Split::fillObjectShapes(const ObjectPtr& theObject,
     ModelGeomAlgo_Point2D::getPointsInsideShape_p(aFeatureShape, aRefAttributes, aC->pnt(),
                                                 aX->dir(), aY, aPoints, aPointToAttributes);
 
-    GeomAlgoAPI_ShapeTools::splitShape_p(aFeatureShape, aPoints, aShapes);
+    if (!aPoints.empty())
+      GeomAlgoAPI_ShapeTools::splitShape_p(aFeatureShape, aPoints, aShapes);
   }
   myCashedShapes[theObject] = aShapes;
   myCashedReferences[theObject] = aPointToAttributes;
