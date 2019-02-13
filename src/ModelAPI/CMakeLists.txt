@@ -243,4 +243,5 @@ ADD_UNIT_TESTS(TestConstants.py
                Test2491.py
                Test2493.py
                Test2627.py
+               Test2859.py
 )

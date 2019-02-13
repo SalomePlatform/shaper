@@ -348,7 +348,7 @@ void Model_ResultConstruction::storeShape(std::shared_ptr<GeomAPI_Shape> theShap
               aNotFound += 1.;
             }
           }
-          if (aNotFound < aBestNotFound) {
+          if (aNotFound <= aBestNotFound) { // less and equal to find better "found": #2859
             if (aFound > aBestFound) {
               aBestNotFound = aNotFound;
               aBestFound = aFound;
