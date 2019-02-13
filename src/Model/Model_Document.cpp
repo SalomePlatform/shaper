@@ -1025,6 +1025,14 @@ FeaturePtr Model_Document::addFeature(std::string theID, const bool theMakeCurre
           aCurrent = aSub;
         }
       }
+      // #2861: if the parameter is added, add it after parameters existing in the list
+      if (aCurrent.get() && aFeature->getKind() == "Parameter") {
+        int anIndex = kUNDEFINED_FEATURE_INDEX;
+        for(FeaturePtr aNextFeat = myObjs->nextFeature(aCurrent, anIndex);
+            aNextFeat.get() && aNextFeat->getKind() == "Parameter";
+            aNextFeat = myObjs->nextFeature(aCurrent, anIndex))
+          aCurrent = aNextFeat;
+      }
     }
     aDocToAdd->myObjs->addFeature(aFeature, aCurrent);
     if (!aFeature->isAction()) {  // do not add action to the data model
