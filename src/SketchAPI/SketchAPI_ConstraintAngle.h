@@ -1,4 +1,4 @@
-// Copyright (C) 2014-2017  CEA/DEN, EDF R&D
+// Copyright (C) 2019-20xx  CEA/DEN, EDF R&D
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -18,27 +18,34 @@
 // email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com>
 //
 
-#ifndef SRC_SKETCHAPI_SKETCHAPI_SWIG_H_
-#define SRC_SKETCHAPI_SKETCHAPI_SWIG_H_
+#ifndef SRC_SKETCHAPI_SKETCHAPI_CONSTRAINTANGLE_H_
+#define SRC_SKETCHAPI_SKETCHAPI_CONSTRAINTANGLE_H_
 
-  #include <ModelHighAPI_swig.h>
+#include "SketchAPI_Constraint.h"
 
-  #include "SketchAPI.h"
-  #include "SketchAPI_Arc.h"
-  #include "SketchAPI_MacroArc.h"
-  #include "SketchAPI_Circle.h"
-  #include "SketchAPI_MacroCircle.h"
-  #include "SketchAPI_Constraint.h"
-  #include "SketchAPI_ConstraintAngle.h"
-  #include "SketchAPI_IntersectionPoint.h"
-  #include "SketchAPI_Line.h"
-  #include "SketchAPI_Mirror.h"
-  #include "SketchAPI_Sketch.h"
-  #include "SketchAPI_SketchEntity.h"
-  #include "SketchAPI_Point.h"
-  #include "SketchAPI_Projection.h"
-  #include "SketchAPI_Rectangle.h"
-  #include "SketchAPI_Rotation.h"
-  #include "SketchAPI_Translation.h"
+class ModelHighAPI_Double;
 
-#endif /* SRC_SKETCHAPI_SKETCHAPI_SWIG_H_ */
+/**\class SketchAPI_ConstraintAngle
+ * \ingroup CPPHighAPI
+ * \brief Interface for ConstraintAngle feature
+ */
+class SketchAPI_ConstraintAngle : public SketchAPI_Constraint
+{
+public:
+  /// Constructor without values
+  SKETCHAPI_EXPORT
+  explicit SketchAPI_ConstraintAngle(const std::shared_ptr<ModelAPI_Feature> & theFeature);
+
+  static std::string ID()
+  {
+    static const std::string MY_SKETCH_CONSTRAINT_ID = "SketchConstraintAngle";
+    return MY_SKETCH_CONSTRAINT_ID;
+  }
+  virtual std::string getID() { return ID(); }
+
+  /// Dump wrapped feature
+  SKETCHAPI_EXPORT
+  virtual void dump(ModelHighAPI_Dumper& theDumper) const;
+};
+
+#endif

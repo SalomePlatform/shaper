@@ -193,6 +193,7 @@ ADD_UNIT_TESTS(
   Test2741.py
   Test2810.py
   Test2824.py
+  Test2860.py
   TestArcBehavior.py
   TestConstraintAngle.py
   TestConstraintCoincidence.py

@@ -50,6 +50,7 @@
 %shared_ptr(SketchAPI_Circle)
 %shared_ptr(SketchAPI_MacroCircle)
 %shared_ptr(SketchAPI_Constraint)
+%shared_ptr(SketchAPI_ConstraintAngle)
 %shared_ptr(SketchAPI_IntersectionPoint)
 %shared_ptr(SketchAPI_Line)
 %shared_ptr(SketchAPI_Mirror)
@@ -239,3 +240,4 @@
 %include "SketchAPI_Rotation.h"
 %include "SketchAPI_Sketch.h"
 %include "SketchAPI_Constraint.h"
+%include "SketchAPI_ConstraintAngle.h"

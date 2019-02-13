@@ -188,12 +188,23 @@ std::string ModelHighAPI_FeatureStore::dumpAttr(const AttributePtr& theAttr) {
     }
   } else if (aType == ModelAPI_AttributeInteger::typeId()) {
     AttributeIntegerPtr anAttr = std::dynamic_pointer_cast<ModelAPI_AttributeInteger>(theAttr);
+    // do not dump a type of ConstraintAngle, because it can be changed due dumping
+    if (anAttr->id() == "AngleType") {
+      return "";
+    }
     if (anAttr->text().empty())
       aResult<<anAttr->value();
     else
       aResult<<anAttr->text();
   } else if (aType == ModelAPI_AttributeDouble::typeId()) {
     AttributeDoublePtr anAttr = std::dynamic_pointer_cast<ModelAPI_AttributeDouble>(theAttr);
+    if (anAttr->id() == "ConstraintValue") {
+      // do not dump a value of constraint if it is ConstraintAngle,
+      // because this value depends on the angle type
+      FeaturePtr anOwner = ModelAPI_Feature::feature(anAttr->owner());
+      if (anOwner && anOwner->getKind() == "SketchConstraintAngle")
+        return "";
+    }
     int aPrecision = PRECISION;
     // Special case - precision for the arc angle. It is calculated with tolerance 1e-4,
     // so the value has only 4 correct digits
@@ -206,6 +217,10 @@ std::string ModelHighAPI_FeatureStore::dumpAttr(const AttributePtr& theAttr) {
       aResult<<anAttr->text();
   } else if (aType == ModelAPI_AttributeBoolean::typeId()) {
     AttributeBooleanPtr anAttr = std::dynamic_pointer_cast<ModelAPI_AttributeBoolean>(theAttr);
+    // do not dump internal flags of ConstraintAngle
+    if (anAttr->id() == "AngleReversedLine1" || anAttr->id() == "AngleReversedLine2") {
+      return "";
+    }
     aResult<<anAttr->value();
   } else if (aType == ModelAPI_AttributeString::typeId()) {
     AttributeStringPtr anAttr = std::dynamic_pointer_cast<ModelAPI_AttributeString>(theAttr);

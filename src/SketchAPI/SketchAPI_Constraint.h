@@ -66,6 +66,11 @@ public:
   /// Dump wrapped feature
   SKETCHAPI_EXPORT
   virtual void dump(ModelHighAPI_Dumper& theDumper) const;
+
+protected:
+  // Check all attributes of constraint are already dumped.
+  // If not, store the constraint as postponed.
+  bool areAllAttributesDumped(ModelHighAPI_Dumper& theDumper) const;
 };
 
 #endif

@@ -24,7 +24,6 @@
 #include <ModelHighAPI_Tools.h>
 
 #include <SketchPlugin_Constraint.h>
-#include <SketchPlugin_ConstraintAngle.h>
 #include <SketchPlugin_ConstraintCoincidence.h>
 #include <SketchPlugin_ConstraintCollinear.h>
 #include <SketchPlugin_ConstraintDistance.h>
@@ -96,10 +95,6 @@ static const std::string& constraintTypeToSetter(const std::string& theType)
   if (theType == SketchPlugin_ConstraintCoincidence::ID()) {
     static const std::string COINCIDENCE_SETTER("setCoincident");
     return COINCIDENCE_SETTER;
-  }
-  if (theType == SketchPlugin_ConstraintAngle::ID()) {
-    static const std::string ANGLE_SETTER("setAngle");
-    return ANGLE_SETTER;
   }
   if (theType == SketchPlugin_ConstraintCollinear::ID()) {
     static const std::string COLLINEAR_SETTER("setCollinear");
@@ -175,6 +170,20 @@ static std::string angleTypeToString(int theAngleType)
   return std::string();
 }
 
+bool SketchAPI_Constraint::areAllAttributesDumped(ModelHighAPI_Dumper& theDumper) const
+{
+  bool areAttributesDumped = true;
+  FeaturePtr aBase = feature();
+  for (int i = 0; i < CONSTRAINT_ATTR_SIZE && areAttributesDumped; ++i) {
+    AttributeRefAttrPtr aRefAttr = aBase->refattr(SketchPlugin_Constraint::ATTRIBUTE(i));
+    if (aRefAttr && aRefAttr->isInitialized())
+      areAttributesDumped = theDumper.isDumped(aRefAttr);
+  }
+  if (!areAttributesDumped)
+    theDumper.postpone(aBase);
+  return areAttributesDumped;
+}
+
 void SketchAPI_Constraint::dump(ModelHighAPI_Dumper& theDumper) const
 {
   FeaturePtr aBase = feature();
@@ -194,26 +203,12 @@ void SketchAPI_Constraint::dump(ModelHighAPI_Dumper& theDumper) const
       return;
   }
 
-  // Check all attributes are already dumped. If not, store the constraint as postponed.
-  bool areAttributesDumped = true;
-  for (int i = 0; i < CONSTRAINT_ATTR_SIZE && areAttributesDumped; ++i) {
-    AttributeRefAttrPtr aRefAttr = aBase->refattr(SketchPlugin_Constraint::ATTRIBUTE(i));
-    if (aRefAttr && aRefAttr->isInitialized())
-      areAttributesDumped = theDumper.isDumped(aRefAttr);
-  }
-  if (!areAttributesDumped) {
-    theDumper.postpone(aBase);
+  // postpone constraint until all its attributes be dumped
+  if (!areAllAttributesDumped(theDumper))
     return;
-  }
-
-  bool isAngle = aBase->getKind() == SketchPlugin_ConstraintAngle::ID();
-  std::string aSetterSuffix;
-  if (isAngle)
-    aSetterSuffix = angleTypeToString(aBase->integer(
-                    SketchPlugin_ConstraintAngle::TYPE_ID())->value());
 
   const std::string& aSketchName = theDumper.parentName(aBase);
-  theDumper << aBase << " = " << aSketchName << "." << aSetter << aSetterSuffix << "(";
+  theDumper << aBase << " = " << aSketchName << "." << aSetter << "(";
 
   bool isFirstAttr = true;
   for (int i = 0; i < CONSTRAINT_ATTR_SIZE; ++i) {
@@ -225,10 +220,8 @@ void SketchAPI_Constraint::dump(ModelHighAPI_Dumper& theDumper) const
   }
 
   AttributeDoublePtr aValueAttr;
-  if (isAngle)
-    aValueAttr = aBase->real(SketchPlugin_ConstraintAngle::ANGLE_VALUE_ID());
-  else if (aBase->getKind() == SketchPlugin_ConstraintDistanceHorizontal::ID() ||
-           aBase->getKind() == SketchPlugin_ConstraintDistanceVertical::ID())
+  if (aBase->getKind() == SketchPlugin_ConstraintDistanceHorizontal::ID() ||
+      aBase->getKind() == SketchPlugin_ConstraintDistanceVertical::ID())
     aValueAttr = aBase->real(SketchPlugin_ConstraintDistanceAlongDir::DISTANCE_VALUE_ID());
   else
     aValueAttr = aBase->real(SketchPlugin_Constraint::VALUE());
