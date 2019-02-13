@@ -1026,7 +1026,8 @@ FeaturePtr Model_Document::addFeature(std::string theID, const bool theMakeCurre
         }
       }
       // #2861: if the parameter is added, add it after parameters existing in the list
-      if (aCurrent.get() && aFeature->getKind() == "Parameter") {
+      if (aCurrent.get() &&
+          (aFeature->getKind() == "Parameter" || aFeature->getKind() == "ParametersMgr")) {
         int anIndex = kUNDEFINED_FEATURE_INDEX;
         for(FeaturePtr aNextFeat = myObjs->nextFeature(aCurrent, anIndex);
             aNextFeat.get() && aNextFeat->getKind() == "Parameter";
