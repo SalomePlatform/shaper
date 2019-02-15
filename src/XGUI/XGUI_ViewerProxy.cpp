@@ -37,6 +37,7 @@
 #include <Config_PropManager.h>
 
 #include <AIS_Shape.hxx>
+#include <StdSelect_BRepOwner.hxx>
 
 #include <QEvent>
 
@@ -408,29 +409,31 @@ bool XGUI_ViewerProxy::canDragByMouse() const
 }
 
 //***************************************
-void XGUI_ViewerProxy::displayHighlight()
+void XGUI_ViewerProxy::displayHighlight(FeaturePtr theFeature, const TopoDS_Shape& theIgnoreShape)
 {
   Handle(AIS_InteractiveContext) aContext = AISContext();
 
   double aDeflection;
   if (myResult->groupName() == ModelAPI_ResultConstruction::group()) {
-    FeaturePtr aFeature = ModelAPI_Feature::feature(myResult);
-    if (aFeature.get()) {
-      std::list<ResultPtr> aResults = aFeature->results();
+    //FeaturePtr aFeature = ModelAPI_Feature::feature(myResult);
+    if (theFeature.get()) {
+      std::list<ResultPtr> aResults = theFeature->results();
       std::list<ResultPtr>::const_iterator aIt;
       ResultPtr aRes;
       Handle(AIS_Shape) aAis;
       for (aIt = aResults.cbegin(); aIt != aResults.cend(); aIt++) {
         aRes = (*aIt);
         TopoDS_Shape aTShape = aRes->shape()->impl<TopoDS_Shape>();
-        aAis = new AIS_Shape(aTShape);
-        aAis->SetColor(HIGHLIGHT_COLOR);
-        aAis->SetZLayer(1); //Graphic3d_ZLayerId_Topmost
-        aDeflection = Config_PropManager::real("Visualization", "construction_deflection");
-        aAis->Attributes()->SetDeviationCoefficient(aDeflection);
-        myHighlights.Append(aAis);
-        aContext->Display(aAis, false);
-        aContext->Deactivate(aAis);
+        if (!aTShape.IsSame(theIgnoreShape)) {
+          aAis = new AIS_Shape(aTShape);
+          aAis->SetColor(HIGHLIGHT_COLOR);
+          aAis->SetZLayer(1); //Graphic3d_ZLayerId_Topmost
+          aDeflection = Config_PropManager::real("Visualization", "construction_deflection");
+          aAis->Attributes()->SetDeviationCoefficient(aDeflection);
+          myHighlights.Append(aAis);
+          aContext->Display(aAis, false);
+          aContext->Deactivate(aAis);
+        }
       }
     }
   }
@@ -463,22 +466,33 @@ void XGUI_ViewerProxy::updateHighlight()
 {
   Handle(AIS_InteractiveContext) aContext = AISContext();
   if (!aContext.IsNull()) {
-    Handle(SelectMgr_EntityOwner) aOwner;
+    Handle(StdSelect_BRepOwner) aOwner;
     Handle(AIS_InteractiveObject) anIO;
     bool isDisplayed = false;
+    TopoDS_Shape aShape, aShp;
     ResultPtr aRes;
     XGUI_Displayer* aDisplayer = myWorkshop->displayer();
     for (aContext->InitDetected(); aContext->MoreDetected(); aContext->NextDetected()) {
-      aOwner = aContext->DetectedOwner();
-      anIO = Handle(AIS_InteractiveObject)::DownCast(aOwner->Selectable());
-      aRes = std::dynamic_pointer_cast<ModelAPI_Result>(aDisplayer->getObject(anIO));
-      if (aRes.get() && (aRes != myResult)) {
-        eraseHighlight();
-        myResult = aRes;
-        displayHighlight();
-        aContext->UpdateCurrentViewer();
+      aOwner = Handle(StdSelect_BRepOwner)::DownCast(aContext->DetectedOwner());
+      if ((!aOwner.IsNull()) && aOwner->HasShape()) {
+        aShape = aOwner->Shape();
+        anIO = Handle(AIS_InteractiveObject)::DownCast(aOwner->Selectable());
+        aRes = std::dynamic_pointer_cast<ModelAPI_Result>(aDisplayer->getObject(anIO));
+        if (aRes.get() && (aRes != myResult)) {
+          eraseHighlight();
+          FeaturePtr aFeature = ModelAPI_Feature::feature(aRes);
+          aShp = aRes->shape()->impl<TopoDS_Shape>();
+          if ((aFeature->results().size() > 1) || (!aShp.IsSame(aShape))) {
+            myResult = aRes;
+            displayHighlight(aFeature, aShape);
+          }
+          else {
+            myResult = ResultPtr();
+          }
+          aContext->UpdateCurrentViewer();
+        }
+        isDisplayed = aRes.get();
       }
-      isDisplayed = aRes.get();
     }
     if (!isDisplayed) {
       eraseHighlight();
