@@ -244,8 +244,11 @@ void XGUI_DataTree::processEyeClick(const QModelIndex& theIndex)
       bool hasHiddenState = aModel->hasHiddenState(theIndex);
       if (aObjBrowser && hasHiddenState && !aObjBrowser->workshop()->prepareForDisplay(anObjects))
         return;
-      if (hasHiddenState) // #issue 2335(hide all faces then show solid problem)
+      if (hasHiddenState) { // #issue 2335(hide all faces then show solid problem)
+        if (aResObj->isDisplayed())
+          aResObj->setDisplayed(false);
         aResObj->setDisplayed(true);
+      }
       else
         aResObj->setDisplayed(!aResObj->isDisplayed());
       Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_TO_REDISPLAY));
