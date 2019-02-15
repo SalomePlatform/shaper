@@ -66,6 +66,7 @@ ModuleBase_WidgetFileSelector::ModuleBase_WidgetFileSelector(QWidget* theParent,
   aMainLay->addWidget(aTitleLabel, 0, 0);
   myPathField = new QLineEdit(this);
   aMainLay->addWidget(myPathField, 1, 0);
+
   QPushButton* aSelectPathBtn = new QPushButton("...", this);
   aSelectPathBtn->setToolTip(tr("Select file..."));
   aSelectPathBtn->setMaximumWidth(20);
@@ -94,7 +95,7 @@ bool ModuleBase_WidgetFileSelector::storeValueCustom()
   DataPtr aData = myFeature->data();
   AttributeStringPtr aStringAttr = aData->string(attributeID());
   QString aWidgetValue = myPathField->text();
-  aStringAttr->setValue(aWidgetValue.toStdString());
+  aStringAttr->setValue(aWidgetValue.toStdWString());
   updateObject(myFeature);
   return true;
 }
@@ -107,11 +108,13 @@ bool ModuleBase_WidgetFileSelector::restoreValueCustom()
   DataPtr aData = myFeature->data();
   AttributeStringPtr aStringAttr = aData->string(attributeID());
 
-  bool isBlocked = myPathField->blockSignals(true);
-  QString aNewText = QString::fromStdString(aStringAttr->value());
-  if( myPathField->text() != aNewText )
-    myPathField->setText( aNewText );
-  myPathField->blockSignals(isBlocked);
+  std::wstring aUtfStr = aStringAttr->valueW();
+  QString aNewText = QString::fromStdWString(aUtfStr);
+  if (myPathField->text() != aNewText) {
+    bool isBlocked = myPathField->blockSignals(true);
+    myPathField->setText(aNewText);
+    myPathField->blockSignals(isBlocked);
+  }
 
   return true;
 }
@@ -162,7 +165,7 @@ void ModuleBase_WidgetFileSelector::onPathSelectionBtn()
       if (!aFileName.isEmpty()) {
         if (myType == WFS_SAVE)
           aFileName = applyExtension(aFileName, mySelectedFilter);
-        myPathField->setText(aFileName);
+        myPathField->setText(aFileName.toUtf8());
         myDefaultPath = QFileInfo(aFileName).absolutePath();
         emit focusOutWidget(this);
       }

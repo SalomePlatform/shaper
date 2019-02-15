@@ -41,9 +41,13 @@ class Model_AttributeString : public ModelAPI_AttributeString
  public:
   /// Defines the std::string value
   MODEL_EXPORT virtual void setValue(const std::string& theValue);
+  /// Defines the std::wstring value
+  MODEL_EXPORT virtual void setValue(const std::wstring& theValue);
 
   /// Returns the std::string  value
   MODEL_EXPORT virtual std::string value();
+  /// Returns the std::wstring  value
+  MODEL_EXPORT virtual std::wstring valueW();
 
  protected:
   /// Initializes attibutes
