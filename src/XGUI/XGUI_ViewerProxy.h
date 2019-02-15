@@ -159,7 +159,7 @@ private slots:
 #endif
 
  private:
-   void displayHighlight();
+   void displayHighlight(FeaturePtr theFeature, const TopoDS_Shape& theIgnoreShape);
    void eraseHighlight();
 
   XGUI_Workshop* myWorkshop;
