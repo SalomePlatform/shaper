@@ -1,24 +1,8 @@
-<!--
-  Copyright (C) 2005-2013  OPEN CASCADE
-
-  This library is free software; you can redistribute it and/or
-  modify it under the terms of the GNU Lesser General Public
-  License as published by the Free Software Foundation; either
-  version 2.1 of the License.
-
-  This library is distributed in the hope that it will be useful,
-  but WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-  Lesser General Public License for more details.
-
-  You should have received a copy of the GNU Lesser General Public
-  License along with this library; if not, write to the Free Software
-  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
-
-  See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
-
--->
 <document>
+  <section name="launch">
+    <!-- SALOME launching parameters -->
+    <parameter name="modules"    value="GEOM,SMESH,HEXABLOCK,MED,YACS,PARAVIS,SHAPER"/>
+  </section>
   <section name="SHAPER">
     <!-- Major module parameters -->
     <parameter name="name" value="Shaper"/>
@@ -27,13 +11,12 @@
     <parameter name="documentation" value="shaper_help"/>
   </section>
   <section name="shaper_help" >
-    <parameter name="sub_menu"          value="%1 module"/>
-    <parameter name="Developer's Guide" value="%SHAPER_ROOT_DIR%/share/doc/salome/tui/SHAPER/index.html"/>
-    <parameter name="User's Guide"      value="%SHAPER_ROOT_DIR%/share/doc/salome/gui/SHAPER/index.html"/>
+    <parameter name="Developer's Guide/Shaper module/Developer's Guide" value="%SHAPER_ROOT_DIR%/share/doc/salome/tui/SHAPER/index.html"/>
+    <parameter name="User's Guide/Shaper module/User's Guide" value="%SHAPER_ROOT_DIR%/share/doc/salome/gui/SHAPER/index.html"/>
   </section>
   <section name="resources">
     <!-- Module resources -->
-    <parameter name="SHAPER" value="${SHAPER_ROOT_DIR}/share/salome/resources/shaper"/>
+    <parameter name="SHAPER" value="%SHAPER_ROOT_DIR%/share/salome/resources/shaper"/>
   </section>
   <section name="Viewer" >
     <!-- Viewer preferences -->
@@ -42,5 +25,11 @@
     <parameter name="vertex-selection" value="true" />
     <parameter name="point-selection-sensitivity" value="12" />
     <parameter name="edge-selection-sensitivity" value="2" />
+  </section>
+  <section name="windows_geometry">
+   <parameter name="SHAPER" value="@ByteArray[#00 #00 #00 #FF #00 #00 #00 #00 #FD #00 #00 #00 #03 #00 #00 #00 #00 #00 #00 #01 #00 #00 #00 #02 #DF #FC #02 #00 #00 #00 #02 #FB #00 #00 #00 #22 #00 #6F #00 #62 #00 #6A #00 #65 #00 #63 #00 #74 #00 #42 #00 #72 #00 #6F #00 #77 #00 #73 #00 #65 #00 #72 #00 #44 #00 #6F #00 #63 #00 #6B #01 #00 #00 #00 #B0 #00 #00 #02 #3D #00 #00 #00 #00 #00 #00 #00 #00 #FC #00 #00 #00 #B0 #00 #00 #02 #DF #00 #00 #00 #6B #00 #FF #FF #FF #FA #00 #00 #00 #00 #02 #00 #00 #00 #02 #FB #FF #FF #FF #FF #01 #00 #00 #00 #00 #FF #FF #FF #FF #00 #00 #00 #6B #00 #FF #FF #FF #FB #00 #00 #00 #26 #00 #70 #00 #72 #00 #6F #00 #70 #00 #65 #00 #72 #00 #74 #00 #79 #00 #5F #00 #70 #00 #61 #00 #6E #00 #65 #00 #6C #00 #5F #00 #64 #00 #6F #00 #63 #00 #6B #00 #00 #00 #00 #00 #FF #FF #FF #FF #00 #00 #01 #1F #00 #FF #FF #FF #00 #00 #00 #01 #00 #00 #00 #00 #00 #00 #00 #00 #FC #02 #00 #00 #00 #02 #FB #00 #00 #00 #2A #00 #69 #00 #6E #00 #73 #00 #70 #00 #65 #00 #63 #00 #74 #00 #69 #00 #6F #00 #6E #00 #5F #00 #70 #00 #61 #00 #6E #00 #65 #00 #6C #00 #5F #00 #64 #00 #6F #00 #63 #00 #6B #00 #00 #00 #00 #00 #FF #FF #FF #FF #00 #00 #00 #D1 #00 #FF #FF #FF #FB #FF #FF #FF #FF #00 #00 #00 #00 #00 #FF #FF #FF #FF #00 #00 #00 #70 #00 #FF #FF #FF #00 #00 #00 #03 #00 #00 #07 #5C #00 #00 #00 #59 #FC #01 #00 #00 #00 #01 #FB #00 #00 #00 #22 #00 #70 #00 #79 #00 #74 #00 #68 #00 #6F #00 #6E #00 #43 #00 #6F #00 #6E #00 #73 #00 #6F #00 #6C #00 #65 #00 #44 #00 #6F #00 #63 #00 #6B #01 #00 #00 #00 #00 #00 #00 #07 #5C #00 #00 #00 #46 #00 #FF #FF #FF #00 #00 #06 #56 #00 #00 #02 #DF #00 #00 #00 #04 #00 #00 #00 #04 #00 #00 #00 #08 #00 #00 #00 #08 #FC #00 #00 #00 #04 #00 #00 #00 #02 #00 #00 #00 #05 #00 #00 #00 #1C #00 #53 #00 #61 #00 #6C #00 #6F #00 #6D #00 #65 #00 #53 #00 #74 #00 #61 #00 #6E #00 #64 #00 #61 #00 #72 #00 #64 #01 #00 #00 #00 #00 #FF #FF #FF #FF #00 #00 #00 #00 #00 #00 #00 #00 #00 #00 #00 #1A #00 #53 #00 #61 #00 #6C #00 #6F #00 #6D #00 #65 #00 #4D #00 #6F #00 #64 #00 #75 #00 #6C #00 #65 #00 #73 #01 #00 #00 #00 #F5 #FF #FF #FF #FF #00 #00 #00 #00 #00 #00 #00 #00 #00 #00 #00 #08 #00 #50 #00 #61 #00 #72 #00 #74 #01 #00 #00 #01 #B5 #FF #FF #FF #FF #00 #00 #00 #00 #00 #00 #00 #00 #00 #00 #00 #10 #00 #4D #00 #6F #00 #76 #00 #65 #00 #6D #00 #65 #00 #6E #00 #74 #01 #00 #00 #02 #DB #FF #FF #FF #FF #00 #00 #00 #00 #00 #00 #00 #00 #00 #00 #00 #16 #00 #4D #00 #65 #00 #61 #00 #73 #00 #75 #00 #72 #00 #65 #00 #6D #00 #65 #00 #6E #00 #74 #01 #00 #00 #03 #B1 #FF #FF #FF #FF #00 #00 #00 #00 #00 #00 #00 #00 #00 #00 #00 #02 #00 #00 #00 #04 #00 #00 #00 #18 #00 #43 #00 #6F #00 #6E #00 #73 #00 #74 #00 #72 #00 #75 #00 #63 #00 #74 #00 #69 #00 #6F #00 #6E #01 #00 #00 #00 #00 #FF #FF #FF #FF #00 #00 #00 #00 #00 #00 #00 #00 #00 #00 #00 #0A #00 #42 #00 #75 #00 #69 #00 #6C #00 #64 #01 #00 #00 #00 #73 #FF #FF #FF #FF #00 #00 #00 #00 #00 #00 #00 #00 #00 #00 #00 #14 #00 #50 #00 #72 #00 #69 #00 #6D #00 #69 #00 #74 #00 #69 #00 #76 #00 #65 #00 #73 #01 #00 #00 #02 #1D #FF #FF #FF #FF #00 #00 #00 #00 #00 #00 #00 #00 #00 #00 #00 #08 #00 #47 #00 #44 #00 #4D #00 #4C #01 #00 #00 #02 #D2 #FF #FF #FF #FF #00 #00 #00 #00 #00 #00 #00 #00 #00 #00 #00 #02 #00 #00 #00 #05 #00 #00 #00 #10 #00 #46 #00 #65 #00 #61 #00 #74 #00 #75 #00 #72 #00 #65 #00 #73 #01 #00 #00 #00 #00 #FF #FF #FF #FF #00 #00 #00 #00 #00 #00 #00 #00 #00 #00 #00 #0E #00 #42 #00 #6F #00 #6F #00 #6C #00 #65 #00 #61 #00 #6E #01 #00 #00 #01 #9E #FF #FF #FF #FF #00 #00 #00 #00 #00 #00 #00 #00 #00 #00 #00 #16 #00 #43 #00 #6F #00 #6C #00 #6C #00 #65 #00 #63 #00 #74 #00 #69 #00 #6F #00 #6E #00 #73 #01 #00 #00 #02 #D7 #FF #FF #FF #FF #00 #00 #00 #00 #00 #00 #00 #00 #00 #00 #00 #0C #00 #46 #00 #69 #00 #6C #00 #6C #00 #65 #00 #74 #01 #00 #00 #03 #08 #FF #FF #FF #FF #00 #00 #00 #00 #00 #00 #00 #00 #00 #00 #00 #0C #00 #4D #00 #61 #00 #63 #00 #72 #00 #6F #00 #73 #01 #00 #00 #03 #5A #00 #00 #04 #02 #00 #00 #00 #00 #00 #00 #00 #00 #00 #00 #00 #02 #00 #00 #00 #02 #00 #00 #00 #0C #00 #53 #00 #6B #00 #65 #00 #74 #00 #63 #00 #68 #01 #00 #00 #00 #00 #FF #FF #FF #FF #00 #00 #00 #00 #00 #00 #00 #00 #00 #00 #00 #1E #00 #49 #00 #4E #00 #53 #00 #50 #00 #57 #00 #43 #00 #54 #00 #49 #00 #4F #00 #4E #00 #5F #00 #54 #00 #4F #00 #4F #00 #4C #01 #00 #00 #04 #48 #FF #FF #FF #FF #00 #00 #00 #00 #00 #00 #00 #00]"/>
+  </section>
+  <section name="windows_geometry_version">
+    <parameter name="SHAPER" value="8.5.0"/>
   </section>
 </document>

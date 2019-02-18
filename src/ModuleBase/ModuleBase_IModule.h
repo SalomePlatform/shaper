@@ -1,4 +1,4 @@
-// Copyright (C) 2014-2017  CEA/DEN, EDF R&D
+// Copyright (C) 2014-2019  CEA/DEN, EDF R&D
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -12,13 +12,10 @@
 //
 // You should have received a copy of the GNU Lesser General Public
 // License along with this library; if not, write to the Free Software
-// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+// Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
 //
-// See http://www.salome-platform.org/ or
-// email : webmaster.salome@opencascade.com<mailto:webmaster.salome@opencascade.com>
+// See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
-
- // Copyright (C) 2014-20xx CEA/DEN, EDF R&D
 
 #ifndef ModuleBase_IModule_H
 #define ModuleBase_IModule_H

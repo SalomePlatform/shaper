@@ -1,5 +1,3 @@
-<!-- Copyright (C) 2014-20xx CEA/DEN, EDF R&D -->
-
 <plugins module="PartSet">
   <!-- Initialization plugin must be first here to initialize the PartSet document -->
   <plugin library="InitializationPlugin"/>
