@@ -1306,7 +1306,7 @@ void Model_AttributeSelection::updateInHistory()
               continue;
 
             FeaturePtr aRefFeat = std::dynamic_pointer_cast<ModelAPI_Feature>((*aRef)->owner());
-            if (aRefFeat.get() && aRefFeat != owner()) {
+            if (aRefFeat.get() && aRefFeat != owner() && aRefFeat->firstResult().get()) {
               FeaturePtr aThisFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(owner());
               if (!aDoc->isLaterByDep(aRefFeat, aThisFeature)) { // found better feature
                 aFoundNewContext = true;
