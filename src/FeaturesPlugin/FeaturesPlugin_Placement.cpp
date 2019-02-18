@@ -167,8 +167,11 @@ void FeaturesPlugin_Placement::execute()
 
       //LoadNamingDS
       ResultBodyPtr aResultBody = document()->createBody(data(), aResultIndex);
-      aResultBody->storeModified(aBaseShape, aTransformAlgo->shape());
-      FeaturesPlugin_Tools::loadModifiedShapes(aResultBody, aBaseShape, aTransformAlgo, "Placed");
+
+      ListOfShape aShapes;
+      aShapes.push_back(aBaseShape);
+      FeaturesPlugin_Tools::loadModifiedShapes(aResultBody, aShapes, ListOfShape(),
+                                               aTransformAlgo, aTransformAlgo->shape(), "Placed");
       setResult(aResultBody, aResultIndex);
     }
     aResultIndex++;

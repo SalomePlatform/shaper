@@ -122,5 +122,6 @@ ADD_UNIT_TESTS(
                TestGroupMove12.py
                TestGroupMove13.py
                TestGroupMove14.py
+               TestGroupMove15.py
                TestGroupShareTopology.py
 )
