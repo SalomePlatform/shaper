@@ -108,15 +108,15 @@ ADD_UNIT_TESTS(
                TestGroup2.py
                TestField.py
                TestGroup1799.py
-               TestGroupMove.py
-               TestGroupMove2.py
-               TestGroupMove3.py
-               TestGroupMove4.py
-               TestGroupMove5.py
-               TestGroupMove6.py
-               TestGroupMove7.py
-               TestGroupMove8.py
-               TestGroupMove9.py
+               TestGroupMove01.py
+               TestGroupMove02.py
+               TestGroupMove03.py
+               TestGroupMove04.py
+               TestGroupMove05.py
+               TestGroupMove06.py
+               TestGroupMove07.py
+               TestGroupMove08.py
+               TestGroupMove09.py
                TestGroupMove10.py
                TestGroupMove11.py
                TestGroupMove12.py
