@@ -185,10 +185,14 @@ void FeaturesPlugin_Translation::performTranslationByAxisAndDistance()
       }
 
       ResultBodyPtr aResultBody = document()->createBody(data(), aResultIndex);
-      aResultBody->storeModified(aBaseShape, aTranslationAlgo->shape());
+
+      ListOfShape aShapes;
+      aShapes.push_back(aBaseShape);
       FeaturesPlugin_Tools::loadModifiedShapes(aResultBody,
-                                               aBaseShape,
+                                               aShapes,
+                                               ListOfShape(),
                                                aTranslationAlgo,
+                                               aTranslationAlgo->shape(),
                                                "Translated");
       setResult(aResultBody, aResultIndex);
     }
@@ -261,10 +265,14 @@ void FeaturesPlugin_Translation::performTranslationByDimensions()
       }
 
       ResultBodyPtr aResultBody = document()->createBody(data(), aResultIndex);
-      aResultBody->storeModified(aBaseShape, aTranslationAlgo->shape());
+
+      ListOfShape aShapes;
+      aShapes.push_back(aBaseShape);
       FeaturesPlugin_Tools::loadModifiedShapes(aResultBody,
-                                               aBaseShape,
+                                               aShapes,
+                                               ListOfShape(),
                                                aTranslationAlgo,
+                                               aTranslationAlgo->shape(),
                                                "Translated");
       setResult(aResultBody, aResultIndex);
     }
@@ -350,10 +358,14 @@ void FeaturesPlugin_Translation::performTranslationByTwoPoints()
       }
 
       ResultBodyPtr aResultBody = document()->createBody(data(), aResultIndex);
-      aResultBody->storeModified(aBaseShape, aTranslationAlgo->shape());
+
+      ListOfShape aShapes;
+      aShapes.push_back(aBaseShape);
       FeaturesPlugin_Tools::loadModifiedShapes(aResultBody,
-                                               aBaseShape,
+                                               aShapes,
+                                               ListOfShape(),
                                                aTranslationAlgo,
+                                               aTranslationAlgo->shape(),
                                                "Translated");
       setResult(aResultBody, aResultIndex);
     }

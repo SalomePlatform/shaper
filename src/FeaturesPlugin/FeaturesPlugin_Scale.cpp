@@ -138,8 +138,15 @@ void FeaturesPlugin_Scale::performScaleByFactor()
     }
 
     ResultBodyPtr aResultBody = document()->createBody(data(), aResultIndex);
-    aResultBody->storeModified(aBaseShape, aScaleAlgo->shape());
-    FeaturesPlugin_Tools::loadModifiedShapes(aResultBody, aBaseShape, aScaleAlgo, "Scaled");
+
+    ListOfShape aShapes;
+    aShapes.push_back(aBaseShape);
+    FeaturesPlugin_Tools::loadModifiedShapes(aResultBody,
+                                             aShapes,
+                                             ListOfShape(),
+                                             aScaleAlgo,
+                                             aScaleAlgo->shape(),
+                                             "Scaled");
     setResult(aResultBody, aResultIndex);
     aResultIndex++;
   }
@@ -216,8 +223,15 @@ void FeaturesPlugin_Scale::performScaleByDimensions()
     }
 
     ResultBodyPtr aResultBody = document()->createBody(data(), aResultIndex);
-    aResultBody->storeModified(aBaseShape, aScaleAlgo->shape());
-    FeaturesPlugin_Tools::loadModifiedShapes(aResultBody, aBaseShape, aScaleAlgo, "Scaled");
+
+    ListOfShape aShapes;
+    aShapes.push_back(aBaseShape);
+    FeaturesPlugin_Tools::loadModifiedShapes(aResultBody,
+                                             aShapes,
+                                             ListOfShape(),
+                                             aScaleAlgo,
+                                             aScaleAlgo->shape(),
+                                             "Scaled");
     setResult(aResultBody, aResultIndex);
     aResultIndex++;
   }

@@ -173,8 +173,15 @@ void FeaturesPlugin_Rotation::performTranslationByAxisAndAngle()
       }
 
       ResultBodyPtr aResultBody = document()->createBody(data(), aResultIndex);
-      aResultBody->storeModified(aBaseShape, aRotationAlgo->shape());
-      FeaturesPlugin_Tools::loadModifiedShapes(aResultBody, aBaseShape, aRotationAlgo, "Rotated");
+
+      ListOfShape aShapes;
+      aShapes.push_back(aBaseShape);
+      FeaturesPlugin_Tools::loadModifiedShapes(aResultBody,
+                                               aShapes,
+                                               ListOfShape(),
+                                               aRotationAlgo,
+                                               aRotationAlgo->shape(),
+                                               "Rotated");
       setResult(aResultBody, aResultIndex);
     }
     aResultIndex++;
@@ -272,8 +279,15 @@ void FeaturesPlugin_Rotation::performTranslationByThreePoints()
       }
 
       ResultBodyPtr aResultBody = document()->createBody(data(), aResultIndex);
-      aResultBody->storeModified(aBaseShape, aRotationAlgo->shape());
-      FeaturesPlugin_Tools::loadModifiedShapes(aResultBody, aBaseShape, aRotationAlgo, "Rotated");
+
+      ListOfShape aShapes;
+      aShapes.push_back(aBaseShape);
+      FeaturesPlugin_Tools::loadModifiedShapes(aResultBody,
+                                               aShapes,
+                                               ListOfShape(),
+                                               aRotationAlgo,
+                                               aRotationAlgo->shape(),
+                                               "Rotated");
       setResult(aResultBody, aResultIndex);
     }
     aResultIndex++;
