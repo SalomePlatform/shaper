@@ -427,7 +427,7 @@ void XGUI_ViewerProxy::displayHighlight(FeaturePtr theFeature, const TopoDS_Shap
         if (!aTShape.IsSame(theIgnoreShape)) {
           aAis = new AIS_Shape(aTShape);
           aAis->SetColor(HIGHLIGHT_COLOR);
-          aAis->SetZLayer(1); //Graphic3d_ZLayerId_Topmost
+          aAis->SetZLayer(Graphic3d_ZLayerId_Top); //Graphic3d_ZLayerId_Topmost
           aDeflection = Config_PropManager::real("Visualization", "construction_deflection");
           aAis->Attributes()->SetDeviationCoefficient(aDeflection);
           myHighlights.Append(aAis);
@@ -441,7 +441,7 @@ void XGUI_ViewerProxy::displayHighlight(FeaturePtr theFeature, const TopoDS_Shap
     TopoDS_Shape aTShape = myResult->shape()->impl<TopoDS_Shape>();
     Handle(AIS_Shape) aAis = new AIS_Shape(aTShape);
     aAis->SetColor(HIGHLIGHT_COLOR);
-    aAis->SetZLayer(1); //Graphic3d_ZLayerId_Topmost
+    aAis->SetZLayer(Graphic3d_ZLayerId_Top); //Graphic3d_ZLayerId_Topmost
     aDeflection = Config_PropManager::real("Visualization", "body_deflection");
     aAis->Attributes()->SetDeviationCoefficient(aDeflection);
     myHighlights.Append(aAis);

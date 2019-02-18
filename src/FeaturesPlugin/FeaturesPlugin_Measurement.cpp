@@ -615,7 +615,7 @@ void FeaturesPlugin_Measurement::setupDimension(AISObjectPtr theDim)
     anAspect->SetExtensionSize((aTextSize / mySceenScale + aSize) / 2.0);
     aDim->SetDimensionAspect(anAspect);
 
-    aDim->SetZLayer(1);
+    aDim->SetZLayer(Graphic3d_ZLayerId_Top);
     std::vector<int> aColor = Config_PropManager::color("Visualization", "sketch_dimension_color");
     theDim->setColor(aColor[0], aColor[1], aColor[2]);
   }
