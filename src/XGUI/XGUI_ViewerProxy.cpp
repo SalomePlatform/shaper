@@ -186,6 +186,7 @@ void XGUI_ViewerProxy::connectToViewer()
 
   connect(aViewer, SIGNAL(contextMenuRequested(QContextMenuEvent*)), this,
           SIGNAL(contextMenuRequested(QContextMenuEvent*)));
+
 #else
   AppElements_Viewer* aViewer = myWorkshop->mainWindow()->viewer();
 
@@ -241,9 +242,7 @@ bool XGUI_ViewerProxy::eventFilter(QObject *theObject, QEvent *theEvent)
 void XGUI_ViewerProxy::onViewCreated(ModuleBase_IViewWindow* theWnd)
 {
   theWnd->viewPort()->installEventFilter(this);
-
   myWindowScale.insert (theWnd->v3dView(), theWnd->v3dView()->Camera()->Scale());
-
   emit viewCreated(theWnd);
 }
 

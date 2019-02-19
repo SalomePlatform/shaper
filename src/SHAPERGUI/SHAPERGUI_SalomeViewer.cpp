@@ -119,7 +119,7 @@ Handle(V3d_View) SHAPERGUI_SalomeViewer::activeView() const
 //**********************************************
 QWidget* SHAPERGUI_SalomeViewer::activeViewPort() const
 {
-  QWidget* aViewPort;
+  QWidget* aViewPort = 0;
   if (mySelector) {
     OCCViewer_Viewer* aViewer = mySelector->viewer();
     SUIT_ViewManager* aMgr = aViewer->getViewManager();

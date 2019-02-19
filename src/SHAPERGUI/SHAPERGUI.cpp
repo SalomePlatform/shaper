@@ -33,6 +33,7 @@
 #include <XGUI_FacesPanel.h>
 #include <XGUI_SelectionActivate.h>
 #include <XGUI_InspectionPanel.h>
+#include <XGUI_ViewerProxy.h>
 
 #include <ModuleBase_Operation.h>
 #include <ModuleBase_Preferences.h>
@@ -43,11 +44,14 @@
 #include <LightApp_SelectionMgr.h>
 #include <LightApp_OCCSelector.h>
 #include <LightApp_Study.h>
+
 #include <OCCViewer_ViewModel.h>
+#include <OCCViewer_ViewPort3d.h>
 
 #include <SUIT_Selector.h>
 #include <SUIT_Desktop.h>
 #include <SUIT_ViewManager.h>
+#include <SUIT_ViewWindow.h>
 #include <SUIT_ResourceMgr.h>
 #include <SUIT_DataBrowser.h>
 
@@ -185,6 +189,24 @@ void SHAPERGUI::initialize(CAM_Application* theApp)
     tr("Edit toolbars..."), aTip, QKeySequence(), aDesk, false, this, SLOT(onEditToolbars()));
   int aEditMenu = createMenu(tr("MEN_DESK_EDIT"), -1, -1, 30);
   int aEditItem = createMenu(aId, aEditMenu);
+
+  // Initialize viewer proxy if OCC viewer is already exist
+  ViewManagerList aOCCViewManagers;
+  application()->viewManagers(OCCViewer_Viewer::Type(), aOCCViewManagers);
+  if (aOCCViewManagers.size() > 0) {
+    SUIT_ViewManager* aMgr = aOCCViewManagers.first();
+    SUIT_ViewWindow* aWnd = aMgr->getActiveView();
+    if (aWnd) {
+      OCCViewer_ViewWindow* aOccWnd = static_cast<OCCViewer_ViewWindow*>(aWnd);
+      OCCViewer_ViewPort3d* aViewPort = aOccWnd->getViewPort();
+      if (aViewPort) {
+        XGUI_ViewerProxy* aViewer = myWorkshop->viewer();
+        aViewPort->installEventFilter(aViewer);
+        Handle(V3d_View) aView = aViewPort->getView();
+        aViewer->SetScale(aView, aView->Camera()->Scale());
+      }
+    }
+  }
 }
 
 //******************************************************
