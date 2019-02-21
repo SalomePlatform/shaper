@@ -1,6 +1,6 @@
 #!/bin/bash -x
 
-export SALOME_DIR=/VIRTEX/dn46/SALOME/stable/V9_2_0
+export SALOME_DIR=/dn46/SALOME/stable/V9_2_0
 
 # Path to sources
 export SOURCES_DIR=$(pwd)
