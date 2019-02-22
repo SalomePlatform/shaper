@@ -1,0 +1,17 @@
+<plugin>
+  <workbench id="Macros" document="Part">
+    <group id="Samples">
+
+      <feature id="SketchDrawer" title="Sketch drawer" tooltip="Creates sketch using elements of selected shape belonging to selected plane"
+            icon="icons/Sketch/drawer.png"
+            helpfile="sketchDrawer.html">
+        <shape_selector id="base_shape" label="Shape:" tooltip="Select a shape for extraction to sketch."
+            shape_types="objects" concealment="false"/>
+        <shape_selector id="plane" label="Plane:" tooltip="Select plane for sketch" shape_types="face">
+          <validator id="GeomValidators_Face" parameters="plane"/>
+        </shape_selector>
+        <boolvalue id="add_dimensions" label="Create dimensions" default="true" tooltip="To add dimensions into created sketch" obligatory="0"/>
+      </feature>
+    </group>
+  </workbench>
+</plugin>

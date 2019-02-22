@@ -125,6 +125,7 @@ SET(PROJECT_LIBRARIES
 
 SET(XML_RESOURCES
   plugin-Sketch.xml
+  plugin-SketchDrawer.xml
 )
 
 SET(TEXT_RESOURCES
