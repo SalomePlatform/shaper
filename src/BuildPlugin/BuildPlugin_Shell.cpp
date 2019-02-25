@@ -46,15 +46,8 @@ void BuildPlugin_Shell::execute()
   AttributeSelectionListPtr aSelectionList = selectionList(BASE_OBJECTS_ID());
 
   // Collect base shapes.
-  ListOfShape aShapes;
-  for(int anIndex = 0; anIndex < aSelectionList->size(); ++anIndex) {
-    AttributeSelectionPtr aSelection = aSelectionList->value(anIndex);
-    GeomShapePtr aShape = aSelection->value();
-    if(!aShape.get()) {
-      aShape = aSelection->context()->shape();
-    }
-    aShapes.push_back(aShape);
-  }
+  ListOfShape aShapes, aContexts;
+  getOriginalShapesAndContexts(BASE_OBJECTS_ID(), aShapes, aContexts);
 
   // Sew faces.
   GeomMakeShapePtr aSewingAlgo(new GeomAlgoAPI_Sewing(aShapes));
@@ -71,35 +64,7 @@ void BuildPlugin_Shell::execute()
   int anIndex = 0;
   for(GeomAPI_ShapeExplorer anExp(aResult, GeomAPI_Shape::SHELL); anExp.more(); anExp.next()) {
     GeomShapePtr aShell = anExp.current();
-    ResultBodyPtr aResultBody = document()->createBody(data(), anIndex);
-    aResultBody->store(aShell);
-    for(ListOfShape::const_iterator anIt = aShapes.cbegin(); anIt != aShapes.cend(); ++anIt) {
-      for (GeomAPI_ShapeExplorer aFaceExp(*anIt, GeomAPI_Shape::FACE);
-           aFaceExp.more();
-           aFaceExp.next())
-      {
-        GeomShapePtr aFace = aFaceExp.current();
-        ListOfShape aHistory;
-        aSewingAlgo->modified(aFace, aHistory);
-        for (ListOfShape::const_iterator aHistoryIt = aHistory.cbegin();
-             aHistoryIt != aHistory.cend();
-             ++aHistoryIt)
-        {
-          GeomShapePtr aHistoryShape = *aHistoryIt;
-          if (aShell->isSubShape(aHistoryShape, false)) {
-            aResultBody->loadModifiedShapes(aSewingAlgo,
-                                            aFace,
-                                            GeomAPI_Shape::EDGE);
-            aResultBody->loadModifiedShapes(aSewingAlgo,
-                                            aFace,
-                                            GeomAPI_Shape::FACE);
-            break;
-          }
-        }
-      }
-    }
-    setResult(aResultBody, anIndex);
-    ++anIndex;
+    storeResult(aSewingAlgo, aShapes, aContexts, aShell, anIndex++);
   }
 
   removeResults(anIndex);

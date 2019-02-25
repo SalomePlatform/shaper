@@ -20,6 +20,8 @@
 
 #include "GeomAlgoAPI_MakeVolume.h"
 
+#include <GeomAPI_ShapeExplorer.h>
+
 #include <GeomAlgoAPI_ShapeTools.h>
 
 #include <BOPAlgo_MakerVolume.hxx>
@@ -90,4 +92,33 @@ void GeomAlgoAPI_MakeVolume::build(const ListOfShape& theFaces)
   aShape->setImpl(new TopoDS_Shape(aResult));
   this->setShape(aShape);
   this->setDone(true);
+}
+
+//=================================================================================================
+void GeomAlgoAPI_MakeVolume::modified(const GeomShapePtr theOldShape,
+                                      ListOfShape& theNewShapes)
+{
+  if (theOldShape->shapeType() == GeomAPI_Shape::SOLID) {
+    ListOfShape aNewShapes;
+    // collect faces and parent shapes, if it is not done yet
+    if (!isNewShapesCollected(theOldShape, GeomAPI_Shape::FACE))
+      collectNewShapes(theOldShape, GeomAPI_Shape::FACE);
+
+    for (GeomAPI_ShapeExplorer anIt(shape(), GeomAPI_Shape::SOLID); anIt.more(); anIt.next()) {
+      for (GeomAPI_ShapeExplorer anExp(anIt.current(), GeomAPI_Shape::FACE);
+           anExp.more(); anExp.next()) {
+        GeomShapePtr anOldShapesCompound =
+            oldShapesForNew(theOldShape, anExp.current(), GeomAPI_Shape::FACE);
+        if (!anOldShapesCompound->isNull()) {
+          aNewShapes.push_back(anIt.current());
+          break;
+        }
+      }
+    }
+
+    if (!aNewShapes.empty())
+      theNewShapes = aNewShapes;
+  }
+  else
+    GeomAlgoAPI_MakeShape::modified(theOldShape, theNewShapes);
 }

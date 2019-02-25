@@ -292,12 +292,12 @@ void Model_ResultConstruction::storeShape(std::shared_ptr<GeomAPI_Shape> theShap
         }
       }
 
-      std::list<std::shared_ptr<GeomAPI_Shape> > aFaces;
-      GeomAlgoAPI_SketchBuilder::createFaces(aWirePtr->origin(), aWirePtr->dirX(),
-        aWirePtr->norm(), aWirePtr, aFaces);
+      GeomAlgoAPI_SketchBuilder aSketchBuilder(aWirePtr->origin(), aWirePtr->dirX(),
+                                               aWirePtr->norm(), aWirePtr);
+      const ListOfShape& aFaces = aSketchBuilder.faces();
       // order is important to store faces in the same order if sketch is created from scratch
       NCollection_IndexedDataMap<TopoDS_Face, TColStd_ListOfInteger> aNewIndices; // edges indices
-      std::list<std::shared_ptr<GeomAPI_Shape> >::iterator aFIter = aFaces.begin();
+      std::list<std::shared_ptr<GeomAPI_Shape> >::const_iterator aFIter = aFaces.begin();
       for (; aFIter != aFaces.end(); aFIter++) {
         std::shared_ptr<GeomAPI_Face> aFace(new GeomAPI_Face(*aFIter));
         // put them to a label, trying to keep the same faces on the same labels

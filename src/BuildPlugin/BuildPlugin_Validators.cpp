@@ -247,9 +247,8 @@ bool BuildPlugin_ValidatorBaseForFace::isValid(const std::shared_ptr<ModelAPI_Fe
     }
 
     // Check that selected objects have closed contours.
-    ListOfShape aFaces;
-    GeomAlgoAPI_SketchBuilder::createFaces(aPln->location(), aPln->xDirection(),
-                                           aPln->direction(), anEdges, aFaces);
+    GeomAlgoAPI_SketchBuilder aBuilder(aPln, anEdges);
+    const ListOfShape& aFaces = aBuilder.faces();
     if(aFaces.empty()) {
       theError = "Selected objects do not generate closed contour.";
       return false;

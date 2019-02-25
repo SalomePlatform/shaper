@@ -44,6 +44,12 @@ public:
   GEOMALGOAPI_EXPORT GeomAlgoAPI_MakeVolume(const ListOfShape& theFaces,
     const bool theAvoidInternal);
 
+  /// \return the list of shapes modified from the shape \a theShape.
+  /// \param[in] theOldShape base shape.
+  /// \param[out] theNewShapes shapes modified from \a theShape. Does not cleared!
+  GEOMALGOAPI_EXPORT virtual void modified(const GeomShapePtr theOldShape,
+                                           ListOfShape& theNewShapes);
+
 private:
   /// Builds resulting shape.
   void build(const ListOfShape& theFaces);

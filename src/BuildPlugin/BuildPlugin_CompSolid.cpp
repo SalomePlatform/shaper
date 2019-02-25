@@ -33,25 +33,3 @@ void BuildPlugin_CompSolid::initAttributes()
 {
   data()->addAttribute(BASE_OBJECTS_ID(), ModelAPI_AttributeSelectionList::typeId());
 }
-
-//=================================================================================================
-void BuildPlugin_CompSolid::execute()
-{
-  // all the needed checkings are in validator, so, here just make and store result
-  ListOfShape anOriginalShapes;
-  AttributeSelectionListPtr aSelectionList = selectionList(BASE_OBJECTS_ID());
-  for (int anIndex = 0; anIndex < aSelectionList->size(); ++anIndex) {
-    AttributeSelectionPtr aSelection = aSelectionList->value(anIndex);
-    GeomShapePtr aShape = aSelection->value();
-    if (!aShape.get())
-      aShape = aSelection->context()->shape();
-    anOriginalShapes.push_back(aShape);
-  }
-  std::shared_ptr<GeomAlgoAPI_MakeVolume> anAlgo(
-    new GeomAlgoAPI_MakeVolume(anOriginalShapes, false));
-  GeomShapePtr aVolumeRes = anAlgo->shape();
-
-  // check and process result of volume maker
-  GeomShapePtr aResShape = getSingleSubshape(aVolumeRes);
-  storeResult(anOriginalShapes, aResShape, anAlgo);
-}

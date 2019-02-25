@@ -22,13 +22,12 @@
 #define BuildPlugin_Shell_H_
 
 #include "BuildPlugin.h"
-
-#include <ModelAPI_Feature.h>
+#include "BuildPlugin_Shape.h"
 
 /// \class BuildPlugin_Shell
 /// \ingroup Plugins
 /// \brief Feature for creation of shell from faces and shells.
-class BuildPlugin_Shell: public ModelAPI_Feature
+class BuildPlugin_Shell: public BuildPlugin_Shape
 {
 public:
   /// Use plugin manager for features creation

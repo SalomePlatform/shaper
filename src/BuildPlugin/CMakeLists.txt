@@ -32,6 +32,7 @@ INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR}/src/Events
 SET(PROJECT_HEADERS
     BuildPlugin.h
     BuildPlugin_Plugin.h
+    BuildPlugin_Shape.h
     BuildPlugin_Vertex.h
     BuildPlugin_Edge.h
     BuildPlugin_Wire.h
@@ -49,6 +50,7 @@ SET(PROJECT_HEADERS
 
 SET(PROJECT_SOURCES
     BuildPlugin_Plugin.cpp
+    BuildPlugin_Shape.cpp
     BuildPlugin_Vertex.cpp
     BuildPlugin_Edge.cpp
     BuildPlugin_Wire.cpp
