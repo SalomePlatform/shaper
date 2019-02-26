@@ -132,7 +132,9 @@ std::shared_ptr<GeomAPI_Edge> GeomAlgoAPI_EdgeBuilder::cylinderAxis(
   aParamMax += aDelta * 0.1;
 
   gp_Pnt aStart(aParamMin * anAxis.Direction().XYZ() + anAxis.Location().XYZ());
+  aStart.Transform(aLoc.Transformation());
   gp_Pnt anEnd(aParamMax * anAxis.Direction().XYZ() + anAxis.Location().XYZ());
+  anEnd.Transform(aLoc.Transformation());
   /*
   gp_Pnt aStart(anAxis.Location().Transformed(aLoc.Transformation()));
   // edge length is 100, "-" because cylinder of extrusion has negative direction with the cylinder

@@ -25,6 +25,11 @@
 #include <ShapeUpgrade_UnifySameDomain.hxx>
 #include <TopExp_Explorer.hxx>
 #include <TopoDS_Shape.hxx>
+#include <Precision.hxx>
+#include <TopoDS.hxx>
+#include <TopoDS_Edge.hxx>
+#include <Bnd_Box.hxx>
+#include <BRepBndLib.hxx>
 
 //==================================================================================================
 GeomAlgoAPI_UnifySameDomain::GeomAlgoAPI_UnifySameDomain(const ListOfShape& theShapes)
@@ -65,6 +70,32 @@ void GeomAlgoAPI_UnifySameDomain::build(const ListOfShape& theShapes)
   build(aShape, true);
 }
 
+// calculates maximum possible tolerance on edges of shape
+// (method from GEOM module BlockFix_UnionFaces.cxx)
+static Standard_Real defineLinearTolerance(const TopoDS_Shape& theShape)
+{
+  Standard_Real aTol = Precision::Confusion();
+
+  Standard_Real MinSize = RealLast();
+  TopExp_Explorer Explo(theShape, TopAbs_EDGE);
+  for (; Explo.More(); Explo.Next())
+  {
+    const TopoDS_Edge& anEdge = TopoDS::Edge(Explo.Current());
+    Bnd_Box aBox;
+    BRepBndLib::Add(anEdge, aBox);
+    Standard_Real Xmin, Ymin, Zmin, Xmax, Ymax, Zmax;
+    aBox.Get(Xmin, Ymin, Zmin, Xmax, Ymax, Zmax);
+    Standard_Real MaxSize = Max(Xmax - Xmin, Max(Ymax - Ymin, Zmax - Zmin));
+    if (MaxSize < MinSize)
+      MinSize = MaxSize;
+  }
+
+  if (!Precision::IsInfinite(MinSize))
+    aTol = 0.1 * MinSize;
+
+  return aTol;
+}
+
 //==================================================================================================
 void GeomAlgoAPI_UnifySameDomain::build(const GeomShapePtr& theShape,
                                         const bool theIsToSimplifyShell)
@@ -74,6 +105,8 @@ void GeomAlgoAPI_UnifySameDomain::build(const GeomShapePtr& theShape,
 
   const TopoDS_Shape& aShape = theShape->impl<TopoDS_Shape>();
   aUnifyAlgo->Initialize(aShape);
+  aUnifyAlgo->SetLinearTolerance(defineLinearTolerance(aShape));
+  aUnifyAlgo->SetAngularTolerance(1.e-6); // for #2697
   aUnifyAlgo->Build();
 
   TopoDS_Shape aResult = aUnifyAlgo->Shape();
