@@ -201,7 +201,8 @@ void GeomAlgoAPI_Boolean::modified(const GeomShapePtr theOldShape, ListOfShape& 
       TopTools_MapOfShape aNewsMap;
       searchResult(anOld, aResult, aBuilder, aNewsMap);
       if (!aNewsMap.IsEmpty()) {
-        for(TopTools_MapIteratorOfMapOfShape aNewsIter(aNewsMap); aNewsIter.More(); aNewsIter.Next())
+        for(TopTools_MapIteratorOfMapOfShape aNewsIter(aNewsMap);
+            aNewsIter.More(); aNewsIter.Next())
         {
           GeomShapePtr aShape(new GeomAPI_Shape);
           aShape->setImpl<TopoDS_Shape>(new TopoDS_Shape(aNewsIter.Value()));
