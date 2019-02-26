@@ -112,7 +112,10 @@ void BuildPlugin_Face::execute()
     aMakeShapeList->appendAlgo(aCopy);
 
     ListOfShape aBaseShapes;
-    aBaseShapes.push_back(aShape);
+    if (anIndex < aNbFacesFromEdges)
+      aBaseShapes = anEdges;
+    else
+      aBaseShapes.push_back(aShape);
     storeResult(aMakeShapeList, aBaseShapes, aContexts, aCopy->shape(), anIndex++);
   }
 
