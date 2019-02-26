@@ -41,20 +41,33 @@ class Model_BodyBuilder : public ModelAPI_BodyBuilder
 public:
   /// Stores the shape (called by the execution method).
   MODEL_EXPORT virtual void store(const GeomShapePtr& theShape,
-                                  const bool theIsStoreSameShapes = true);
+                                  const bool theIsStoreSameShapes = true) override;
 
   /// Stores the generated shape (called by the execution method).
   MODEL_EXPORT virtual void storeGenerated(const GeomShapePtr& theFromShape,
-                                           const GeomShapePtr& theToShape);
+                                           const GeomShapePtr& theToShape,
+                                           const bool theIsCleanStored = true) override;
+
+  /// Stores the root generated shapes (called by the execution method).
+  MODEL_EXPORT virtual void storeGenerated(const std::list<GeomShapePtr>& theFromShapes,
+    const GeomShapePtr& theToShape,
+    const std::shared_ptr<GeomAlgoAPI_MakeShape> theMakeShape) override;
 
   /// Stores the modified shape (called by the execution method).
   /// \param theOldShape shape that produces result
   /// \param theNewShape resulting shape
-  /// \param theDecomposeSolidsTag tag for starting of solids sub-elements placement in case
-  ///          theNewShape is compound of solids, if zero it is not used
+  /// \param theIsCleanStored erases all previous data structure of this body if true
   MODEL_EXPORT virtual void storeModified(const GeomShapePtr& theOldShape,
                                           const GeomShapePtr& theNewShape,
                                           const bool theIsCleanStored = true) override;
+
+  /// Stores the root modified shape (called by the execution method).
+  /// \param theOldShapes all shapes that produce result
+  /// \param theNewShape resulting shape
+  /// \param theIsCleanStored erases all previous data structure of this body if true
+  MODEL_EXPORT virtual void storeModified(const std::list<GeomShapePtr>& theOldShapes,
+    const GeomShapePtr& theNewShape,
+    const std::shared_ptr<GeomAlgoAPI_MakeShape> theMakeShape) override;
 
   /// Returns the shape-result produced by this feature
   MODEL_EXPORT virtual GeomShapePtr shape();
@@ -98,7 +111,8 @@ public:
   virtual void loadGeneratedShapes(const GeomMakeShapePtr& theAlgo,
                                    const GeomShapePtr& theOldShape,
                                    const GeomAPI_Shape::ShapeType theShapeTypeToExplore,
-                                   const std::string& theName = "") override;
+                                   const std::string& theName = "",
+                                   const bool theSaveOldIfNotInTree = false) override;
 
   /// Loads shapes of the first level (to be used during shape import)
   MODEL_EXPORT virtual void loadFirstLevel(GeomShapePtr theShape,

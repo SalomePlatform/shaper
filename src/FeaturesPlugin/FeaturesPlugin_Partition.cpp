@@ -171,37 +171,20 @@ void FeaturesPlugin_Partition::storeResult(
   const std::shared_ptr<GeomAlgoAPI_MakeShape> theMakeShape,
   const int theIndex)
 {
-  // Find base. The most complicated is the real modified object (#1799 if box is partitioned by
-  // two planes the box is the base, not planes, independently on the order in the list).
-  GeomShapePtr aBaseShape;
-  for(ListOfShape::const_iterator anIt = theObjects.cbegin(); anIt != theObjects.cend(); ++anIt) {
-    GeomShapePtr anObjectShape = *anIt;
-    GeomShapePtr aCandidate =
-      findBase(anObjectShape, theResultShape, GeomAPI_Shape::VERTEX, theMakeShape);
-    if(!aCandidate.get()) {
-      aCandidate = findBase(anObjectShape, theResultShape, GeomAPI_Shape::EDGE, theMakeShape);
-    }
-    if (!aCandidate.get())
-      aCandidate = findBase(anObjectShape, theResultShape, GeomAPI_Shape::FACE, theMakeShape);
-
-    if(aCandidate.get()) {
-      if (!aBaseShape.get() || aBaseShape->shapeType() > aCandidate->shapeType()) {
-        aBaseShape = aCandidate;
-      }
-    }
-  }
-
   // Create result body.
   ResultBodyPtr aResultBody = document()->createBody(data(), theIndex);
 
-  // Store modified shape.
-  if(!aBaseShape.get() || aBaseShape->isEqual(theResultShape)) {
-    aResultBody->store(theResultShape, false);
-    setResult(aResultBody, theIndex);
-    return;
+  // if result is same as one of the base object, no modification was performed
+  for(ListOfShape::const_iterator anObj = theObjects.cbegin(); anObj != theObjects.cend(); ++anObj)
+  {
+    if (anObj->get() && (*anObj)->isSame(theResultShape)) {
+      aResultBody->store(theResultShape, false);
+      setResult(aResultBody, theIndex);
+      return;
+    }
   }
 
-  aResultBody->storeModified(aBaseShape, theResultShape);
+  aResultBody->storeModified(theObjects, theResultShape, theMakeShape);
 
   std::shared_ptr<GeomAPI_DataMapOfShapeShape> aMapOfSubShapes = theMakeShape->mapOfSubShapes();
   theObjects.insert(theObjects.end(), thePlanes.begin(), thePlanes.end());
@@ -220,38 +203,6 @@ void FeaturesPlugin_Partition::storeResult(
 
 
 //=================     Auxiliary functions     ===================================================
-
-GeomShapePtr findBase(const GeomShapePtr theObjectShape,
-                      const GeomShapePtr theResultShape,
-                      const GeomAPI_Shape::ShapeType theShapeType,
-                      const std::shared_ptr<GeomAlgoAPI_MakeShape> theMakeShape)
-{
-  GeomShapePtr aBaseShape;
-  std::shared_ptr<GeomAPI_DataMapOfShapeShape> aMapOfSubShapes = theMakeShape->mapOfSubShapes();
-  for(GeomAPI_ShapeExplorer anObjectSubShapesExp(theObjectShape, theShapeType);
-      anObjectSubShapesExp.more();
-      anObjectSubShapesExp.next()) {
-    GeomShapePtr anObjectSubShape = anObjectSubShapesExp.current();
-    ListOfShape aModifiedShapes;
-    theMakeShape->modified(anObjectSubShape, aModifiedShapes);
-    for(ListOfShape::const_iterator
-        aModIt = aModifiedShapes.cbegin(); aModIt != aModifiedShapes.cend(); ++aModIt) {
-      GeomShapePtr aModShape = *aModIt;
-      if(aMapOfSubShapes->isBound(aModShape)) {
-        aModShape = aMapOfSubShapes->find(aModShape);
-      }
-      if(theResultShape->isSubShape(aModShape)) {
-        aBaseShape = theObjectShape;
-        break;
-      }
-    }
-    if(aBaseShape.get()) {
-      break;
-    }
-  }
-
-  return aBaseShape;
-}
 
 static CompsolidSubs::iterator findOrAdd(CompsolidSubs& theList, const GeomShapePtr& theCompsolid)
 {

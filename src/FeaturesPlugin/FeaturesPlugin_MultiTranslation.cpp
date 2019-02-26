@@ -18,8 +18,10 @@
 //
 
 #include <FeaturesPlugin_MultiTranslation.h>
+#include <FeaturesPlugin_Tools.h>
 
 #include <GeomAlgoAPI_CompoundBuilder.h>
+#include <GeomAlgoAPI_MakeShapeList.h>
 #include <GeomAlgoAPI_Tools.h>
 
 #include <GeomAPI_Ax1.h>
@@ -171,7 +173,8 @@ void FeaturesPlugin_MultiTranslation::performOneDirection()
     } else {
       std::string anError;
       ListOfShape aListOfShape;
-      std::list<std::shared_ptr<GeomAlgoAPI_Translation> > aListOfTranslationAlgo;
+      std::shared_ptr<GeomAlgoAPI_MakeShapeList>
+          aListOfTranslationAlgo(new GeomAlgoAPI_MakeShapeList);
 
       for (int i=0; i<nbCopies; i++) {
         std::shared_ptr<GeomAlgoAPI_Translation> aTranslationAlgo(
@@ -191,13 +194,16 @@ void FeaturesPlugin_MultiTranslation::performOneDirection()
           break;
         }
         aListOfShape.push_back(aTranslationAlgo->shape());
-        aListOfTranslationAlgo.push_back(aTranslationAlgo);
+        aListOfTranslationAlgo->appendAlgo(aTranslationAlgo);
       }
       std::shared_ptr<GeomAPI_Shape> aCompound =
         GeomAlgoAPI_CompoundBuilder::compound(aListOfShape);
       ResultBodyPtr aResultBody = document()->createBody(data(), aResultIndex);
-      aResultBody->storeModified(aBaseShape, aCompound);
-      loadNamingDS(aListOfTranslationAlgo, aResultBody, aBaseShape);
+
+      ListOfShape aBaseShapes;
+      aBaseShapes.push_back(aBaseShape);
+      FeaturesPlugin_Tools::loadModifiedShapes(aResultBody, aBaseShapes, ListOfShape(),
+                                               aListOfTranslationAlgo, aCompound, "Translated");
 
       setResult(aResultBody, aResultIndex);
     }
@@ -360,7 +366,8 @@ void FeaturesPlugin_MultiTranslation::performTwoDirection()
     } else {
       std::string anError;
       ListOfShape aListOfShape;
-      std::list<std::shared_ptr<GeomAlgoAPI_Translation> > aListOfTranslationAlgo;
+      std::shared_ptr<GeomAlgoAPI_MakeShapeList>
+          aListOfTranslationAlgo(new GeomAlgoAPI_MakeShapeList);
 
       for (int j=0; j<aSecondNbCopies; j++) {
         for (int i=0; i<aFirstNbCopies; i++) {
@@ -384,14 +391,18 @@ void FeaturesPlugin_MultiTranslation::performTwoDirection()
             break;
           }
           aListOfShape.push_back(aTranslationAlgo->shape());
-          aListOfTranslationAlgo.push_back(aTranslationAlgo);
+          aListOfTranslationAlgo->appendAlgo(aTranslationAlgo);
         }
       }
       std::shared_ptr<GeomAPI_Shape> aCompound =
         GeomAlgoAPI_CompoundBuilder::compound(aListOfShape);
       ResultBodyPtr aResultBody = document()->createBody(data(), aResultIndex);
-      aResultBody->storeModified(aBaseShape, aCompound);
-      loadNamingDS(aListOfTranslationAlgo, aResultBody, aBaseShape);
+
+      ListOfShape aBaseShapes;
+      aBaseShapes.push_back(aBaseShape);
+      FeaturesPlugin_Tools::loadModifiedShapes(aResultBody, aBaseShapes, ListOfShape(),
+                                               aListOfTranslationAlgo, aCompound, "Translated");
+
       setResult(aResultBody, aResultIndex);
     }
     aResultIndex++;
@@ -399,32 +410,4 @@ void FeaturesPlugin_MultiTranslation::performTwoDirection()
 
   // Remove the rest results if there were produced in the previous pass.
   removeResults(aResultIndex);
-}
-
-//=================================================================================================
-void FeaturesPlugin_MultiTranslation::loadNamingDS(
-    std::list<std::shared_ptr<GeomAlgoAPI_Translation> > theListOfTranslationAlgo,
-    std::shared_ptr<ModelAPI_ResultBody> theResultBody,
-    std::shared_ptr<GeomAPI_Shape> theBaseShape)
-{
-  for (std::list<std::shared_ptr<GeomAlgoAPI_Translation> >::const_iterator anIt =
-    theListOfTranslationAlgo.begin(); anIt != theListOfTranslationAlgo.cend(); ++anIt) {
-    // naming of faces
-    theResultBody->loadModifiedShapes(*anIt,
-                                      theBaseShape,
-                                      GeomAPI_Shape::FACE,
-                                      "Translated_Face");
-
-    // naming of edges
-    theResultBody->loadModifiedShapes(*anIt,
-                                      theBaseShape,
-                                      GeomAPI_Shape::EDGE,
-                                      "Translated_Edge");
-
-    // naming of vertex
-    theResultBody->loadModifiedShapes(*anIt,
-                                      theBaseShape,
-                                      GeomAPI_Shape::VERTEX,
-                                      "Translated_Vertex");
-  }
 }

@@ -49,7 +49,7 @@ class Model_AttributeString : public ModelAPI_AttributeString
   MODEL_EXPORT virtual std::wstring valueW();
 
  protected:
-  /// Initializes attibutes
+  /// Initializes attributes
   Model_AttributeString(TDF_Label& theLabel);
   /// Reinitializes the internal state of the attribute (may be needed on undo/redo, abort, etc)
   virtual void reinit();

@@ -27,6 +27,7 @@
 #include <GeomAPI_Pln.h>
 #include <GeomAPI_ShapeExplorer.h>
 
+#include <GeomAlgoAPI_MakeShapeList.h>
 #include <GeomAlgoAPI_ShapeTools.h>
 #include <GeomAlgoAPI_SketchBuilder.h>
 #include <GeomAlgoAPI_Copy.h>
@@ -59,6 +60,9 @@ void BuildPlugin_Face::execute()
   // Collect base shapes.
   ListOfShape anEdges;
   ListOfShape anOriginalFaces;
+  ListOfShape aContexts;
+  getOriginalShapesAndContexts(BASE_OBJECTS_ID(), anOriginalFaces, aContexts);
+  anOriginalFaces.clear();
   std::list< std::shared_ptr<GeomAPI_Dir> > aListOfNormals;
   for(int anIndex = 0; anIndex < aSelectionList->size(); ++anIndex) {
     AttributeSelectionPtr aSelection = aSelectionList->value(anIndex);
@@ -87,8 +91,10 @@ void BuildPlugin_Face::execute()
 
   // Build faces by edges.
   ListOfShape aFaces;
+  GeomMakeShapePtr aFaceBuilder;
   if (!anEdges.empty())
-    buildFacesByEdges(anEdges, aListOfNormals, aFaces);
+    buildFacesByEdges(anEdges, aListOfNormals, aFaces, aFaceBuilder);
+  int aNbFacesFromEdges = (int)aFaces.size();
 
   // Add faces selected by user.
   aFaces.insert(aFaces.end(), anOriginalFaces.begin(), anOriginalFaces.end());
@@ -96,22 +102,20 @@ void BuildPlugin_Face::execute()
   // Store result.
   int anIndex = 0;
   for(ListOfShape::const_iterator anIt = aFaces.cbegin(); anIt != aFaces.cend(); ++anIt) {
-    ResultBodyPtr aResultBody = document()->createBody(data(), anIndex);
+    std::shared_ptr<GeomAlgoAPI_MakeShapeList> aMakeShapeList(new GeomAlgoAPI_MakeShapeList);
+    if (anIndex < aNbFacesFromEdges)
+      aMakeShapeList->appendAlgo(aFaceBuilder);
+
     GeomShapePtr aShape = *anIt;
-    GeomAlgoAPI_Copy aCopy(aShape);
-    aShape = aCopy.shape();
-    aResultBody->store(aShape);
+    GeomMakeShapePtr aCopy(new GeomAlgoAPI_Copy(aShape));
+    aMakeShapeList->appendAlgo(aCopy);
 
-    // Store edges.
-    int anEdgeIndex = 1;
-    for(GeomAPI_ShapeExplorer anExp(aShape, GeomAPI_Shape::EDGE); anExp.more(); anExp.next()) {
-      GeomShapePtr anEdge = anExp.current();
-      aResultBody->generated(anEdge, "Edge_" + std::to_string((long long)anEdgeIndex));
-      ++anEdgeIndex;
-    }
-
-    setResult(aResultBody, anIndex);
-    ++anIndex;
+    ListOfShape aBaseShapes;
+    if (anIndex < aNbFacesFromEdges)
+      aBaseShapes = anEdges;
+    else
+      aBaseShapes.push_back(aShape);
+    storeResult(aMakeShapeList, aBaseShapes, aContexts, aCopy->shape(), anIndex++);
   }
 
   removeResults(anIndex);
@@ -120,7 +124,8 @@ void BuildPlugin_Face::execute()
 void BuildPlugin_Face::buildFacesByEdges(
     const ListOfShape& theEdges,
     const std::list< std::shared_ptr<GeomAPI_Dir> >& theNormals,
-    ListOfShape& theFaces) const
+    ListOfShape& theFaces,
+    std::shared_ptr<GeomAlgoAPI_MakeShape>& theBuilderAlgo) const
 {
   // Get plane.
   std::shared_ptr<GeomAPI_Pln> aPln = GeomAlgoAPI_ShapeTools::findPlane(theEdges);
@@ -136,8 +141,10 @@ void BuildPlugin_Face::buildFacesByEdges(
   }
 
   // Get faces.
-  GeomAlgoAPI_SketchBuilder::createFaces(aPln->location(), aPln->xDirection(),
-                                         aPln->direction(), theEdges, theFaces);
+  std::shared_ptr<GeomAlgoAPI_SketchBuilder> aSketchBuilder(
+      new GeomAlgoAPI_SketchBuilder(aPln, theEdges));
+  theFaces = aSketchBuilder->faces();
+  theBuilderAlgo = aSketchBuilder;
 
   // Get wires from faces.
   ListOfShape aWires;

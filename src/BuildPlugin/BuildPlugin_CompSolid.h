@@ -55,9 +55,6 @@ public:
 
   /// Request for initialization of data model of the feature: adding all attributes.
   BUILDPLUGIN_EXPORT virtual void initAttributes();
-
-  /// Creates a new part document if needed.
-  BUILDPLUGIN_EXPORT virtual void execute();
 };
 
 #endif

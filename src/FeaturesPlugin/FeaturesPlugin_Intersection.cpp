@@ -82,7 +82,6 @@ void FeaturesPlugin_Intersection::execute()
   setResult(aResultBody, aResultIndex);
   aResultIndex++;
 
-
   // remove the rest results if there were produced in the previous pass
   removeResults(aResultIndex);
 }
@@ -99,7 +98,7 @@ void FeaturesPlugin_Intersection::loadNamingDS(ResultBodyPtr theResultBody,
     return;
   }
 
-  theResultBody->storeModified(theObjects.front(), aResultShape);
+  theResultBody->storeModified(theObjects, aResultShape, theMakeShape);
 
   const int aShapeTypesNb = 3;
   const GeomAPI_Shape::ShapeType aShapeTypes[aShapeTypesNb] = {GeomAPI_Shape::VERTEX,

@@ -66,6 +66,21 @@ void ModelAPI_ResultBody::storeGenerated(const GeomShapePtr& theFromShape,
   updateSubs(theToShape);
 }
 
+void ModelAPI_ResultBody::storeGenerated(
+  const std::list<GeomShapePtr>& theFromShapes, const GeomShapePtr& theToShape,
+  const std::shared_ptr<GeomAlgoAPI_MakeShape> theMakeShape)
+{
+  myBuilder->storeGenerated(theFromShapes, theToShape, theMakeShape);
+  myConnect = ConnectionNotComputed;
+
+  static Events_Loop* aLoop = Events_Loop::loop();
+  static Events_ID aRedispEvent = aLoop->eventByName(EVENT_OBJECT_TO_REDISPLAY);
+  static const ModelAPI_EventCreator* aECreator = ModelAPI_EventCreator::get();
+  aECreator->sendUpdated(data()->owner(), aRedispEvent);
+
+  updateSubs(theToShape, theFromShapes, theMakeShape, true);
+}
+
 void ModelAPI_ResultBody::storeModified(const GeomShapePtr& theOldShape,
                                         const GeomShapePtr& theNewShape,
                                         const bool theIsCleanStored)
@@ -79,6 +94,21 @@ void ModelAPI_ResultBody::storeModified(const GeomShapePtr& theOldShape,
   aECreator->sendUpdated(data()->owner(), aRedispEvent);
 
   updateSubs(theNewShape);
+}
+
+void ModelAPI_ResultBody::storeModified(
+  const std::list<GeomShapePtr>& theOldShapes, const GeomShapePtr& theNewShape,
+  const std::shared_ptr<GeomAlgoAPI_MakeShape> theMakeShape)
+{
+  myBuilder->storeModified(theOldShapes, theNewShape, theMakeShape);
+  myConnect = ConnectionNotComputed;
+
+  static Events_Loop* aLoop = Events_Loop::loop();
+  static Events_ID aRedispEvent = aLoop->eventByName(EVENT_OBJECT_TO_REDISPLAY);
+  static const ModelAPI_EventCreator* aECreator = ModelAPI_EventCreator::get();
+  aECreator->sendUpdated(data()->owner(), aRedispEvent);
+
+  updateSubs(theNewShape, theOldShapes, theMakeShape, false);
 }
 
 GeomShapePtr ModelAPI_ResultBody::shape()

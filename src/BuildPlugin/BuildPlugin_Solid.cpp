@@ -22,6 +22,7 @@
 #include <ModelAPI_AttributeSelectionList.h>
 #include <ModelAPI_ResultBody.h>
 
+#include <GeomAPI_ShapeExplorer.h>
 #include <GeomAPI_ShapeIterator.h>
 
 #include <GeomAlgoAPI_MakeVolume.h>
@@ -41,38 +42,15 @@ void BuildPlugin_Solid::initAttributes()
 void BuildPlugin_Solid::execute()
 {
   // all the needed checkings are in validator, so, here just make and store result
-  ListOfShape anOriginalShapes;
-  AttributeSelectionListPtr aSelectionList = selectionList(BASE_OBJECTS_ID());
-  for (int anIndex = 0; anIndex < aSelectionList->size(); ++anIndex) {
-    AttributeSelectionPtr aSelection = aSelectionList->value(anIndex);
-    GeomShapePtr aShape = aSelection->value();
-    if (!aShape.get())
-      aShape = aSelection->context()->shape();
-    anOriginalShapes.push_back(aShape);
-  }
+  ListOfShape anOriginalFaces;
+  ListOfShape anOriginalSolids;
+  getOriginalShapesAndContexts(BASE_OBJECTS_ID(), anOriginalFaces, anOriginalSolids);
+
   std::shared_ptr<GeomAlgoAPI_MakeVolume> anAlgo(
-    new GeomAlgoAPI_MakeVolume(anOriginalShapes, false));
+    new GeomAlgoAPI_MakeVolume(anOriginalFaces, false));
   // check and process result of volume maker
   GeomShapePtr aResShape = getSingleSubshape(anAlgo->shape());
-  storeResult(anOriginalShapes, aResShape, anAlgo);
-}
-
-void BuildPlugin_Solid::storeResult(const ListOfShape& theOriginalShapes,
-                                    const GeomShapePtr& theResultShape,
-                                    const GeomMakeShapePtr& theAlgorithm)
-{
-  ResultBodyPtr aResultBody = document()->createBody(data());
-  aResultBody->store(theResultShape);
-
-  // Store faces
-  for (ListOfShape::const_iterator anIt = theOriginalShapes.cbegin();
-       anIt != theOriginalShapes.cend();
-       ++anIt)
-  {
-    GeomShapePtr aShape = *anIt;
-    aResultBody->loadModifiedShapes(theAlgorithm, aShape, GeomAPI_Shape::FACE);
-  }
-  setResult(aResultBody);
+  storeResult(anAlgo, anOriginalFaces, anOriginalSolids, aResShape);
 }
 
 GeomShapePtr BuildPlugin_Solid::getSingleSubshape(const GeomShapePtr& theCompound)

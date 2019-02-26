@@ -21,16 +21,12 @@
 #define BuildPlugin_Solid_H_
 
 #include "BuildPlugin.h"
-
-#include <GeomAPI_Shape.h>
-#include <ModelAPI_Feature.h>
-
-class GeomAlgoAPI_MakeShape;
+#include "BuildPlugin_Shape.h"
 
 /// \class BuildPlugin_Solid
 /// \ingroup Plugins
 /// \brief Feature for creation of solid from faces or shells.
-class BuildPlugin_Solid: public ModelAPI_Feature
+class BuildPlugin_Solid: public BuildPlugin_Shape
 {
 public:
   /// Use plugin manager for features creation
@@ -64,11 +60,6 @@ public:
   BUILDPLUGIN_EXPORT virtual void execute();
 
 protected:
-  /// Store result of algorithm
-  void storeResult(const ListOfShape& theOriginalShapes,
-                   const GeomShapePtr& theResultShape,
-                   const std::shared_ptr<GeomAlgoAPI_MakeShape>& theAlgorithm);
-
   /// Explode compound to get single shape
   GeomShapePtr getSingleSubshape(const GeomShapePtr& theCompound);
 };

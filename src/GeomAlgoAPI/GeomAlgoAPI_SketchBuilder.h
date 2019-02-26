@@ -21,50 +21,59 @@
 #define GeomAlgoAPI_SketchBuilder_H_
 
 #include <GeomAlgoAPI.h>
+#include <GeomAlgoAPI_MakeShape.h>
 
 #include <memory>
 #include <list>
 
-#include <GeomAPI_Dir.h>
-#include <GeomAPI_Pnt.h>
-#include <GeomAPI_Shape.h>
+class GeomAPI_Dir;
+class GeomAPI_Pln;
+class GeomAPI_Pnt;
+class GeomAPI_Shape;
 
 /** \class GeomAlgoAPI_SketchBuilder
  *  \ingroup DataAlgo
  *  \brief Creates planar faces based on the list of Sketch features
  */
-class GEOMALGOAPI_EXPORT GeomAlgoAPI_SketchBuilder
+class GeomAlgoAPI_SketchBuilder : public GeomAlgoAPI_MakeShape
 {
- public:
-  /** \brief Creates list of faces based on the features of the sketch
-   *  \param[in]  theOrigin      origin point of the sketch
-   *  \param[in]  theDirX        x-direction of the sketch
-   *  \param[in]  theNorm        normal of the sketch
-   *  \param[in]  theFeatures    initial features of the sketch
-   *  \param[out] theResultFaces faces based on closed wires
+public:
+  /** \brief Creates list of faces based on the edges of the sketch
+   *  \param[in]  thePlane  plane of the sketch
+   *  \param[in]  theEdges  initial edges of the sketch
    *
    *  The algorithm searches all loops of edges surrounding lesser areas.
    */
-  static void createFaces(const std::shared_ptr<GeomAPI_Pnt>& theOrigin,
-                          const std::shared_ptr<GeomAPI_Dir>& theDirX,
-                          const std::shared_ptr<GeomAPI_Dir>& theNorm,
-                          const std::list<std::shared_ptr<GeomAPI_Shape> >& theFeatures,
-                          std::list<std::shared_ptr<GeomAPI_Shape> >& theResultFaces);
+  GEOMALGOAPI_EXPORT
+  GeomAlgoAPI_SketchBuilder(const std::shared_ptr<GeomAPI_Pln>& thePlane,
+                            const std::list<std::shared_ptr<GeomAPI_Shape> >& theEdges);
 
   /** \brief Creates list of faces and unclosed wires on basis of the features of the sketch
    *  \param[in]  theOrigin      origin point of the sketch
    *  \param[in]  theDirX        x-direction of the sketch
    *  \param[in]  theNorm        normal of the sketch
    *  \param[in]  theWire        a wire which contains all edges
-   *  \param[out] theResultFaces faces based on closed wires
    *
    *  The algorithm searches all loops of edges surrounding lesser areas.
    */
-  static void createFaces(const std::shared_ptr<GeomAPI_Pnt>& theOrigin,
-                          const std::shared_ptr<GeomAPI_Dir>& theDirX,
-                          const std::shared_ptr<GeomAPI_Dir>& theNorm,
-                          const std::shared_ptr<GeomAPI_Shape>& theWire,
-                          std::list<std::shared_ptr<GeomAPI_Shape> >& theResultFaces);
+  GEOMALGOAPI_EXPORT
+  GeomAlgoAPI_SketchBuilder(const std::shared_ptr<GeomAPI_Pnt>& theOrigin,
+                            const std::shared_ptr<GeomAPI_Dir>& theDirX,
+                            const std::shared_ptr<GeomAPI_Dir>& theNorm,
+                            const std::shared_ptr<GeomAPI_Shape>& theWire);
+
+  /// Return list of created faces
+  GEOMALGOAPI_EXPORT const std::list<std::shared_ptr<GeomAPI_Shape> >& faces() const
+  { return myResultFaces; }
+
+private:
+  void build(const std::shared_ptr<GeomAPI_Pnt>& theOrigin,
+             const std::shared_ptr<GeomAPI_Dir>& theDirX,
+             const std::shared_ptr<GeomAPI_Dir>& theNorm,
+             const std::list<std::shared_ptr<GeomAPI_Shape> >& theEdges);
+
+private:
+  std::list<std::shared_ptr<GeomAPI_Shape> > myResultFaces;
 };
 
 #endif

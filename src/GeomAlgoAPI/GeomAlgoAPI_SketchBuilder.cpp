@@ -20,6 +20,8 @@
 #include <GeomAlgoAPI_SketchBuilder.h>
 #include <GeomAPI_PlanarEdges.h>
 
+#include <GeomAPI_Pln.h>
+
 #include <BOPAlgo_Builder.hxx>
 #include <BRep_Builder.hxx>
 #include <BRepTools_WireExplorer.hxx>
@@ -198,14 +200,15 @@ static void sortFaces(TopTools_ListOfShape& theAreas,
   }
 }
 
-void GeomAlgoAPI_SketchBuilder::createFaces(
+void GeomAlgoAPI_SketchBuilder::build(
     const std::shared_ptr<GeomAPI_Pnt>& theOrigin,
     const std::shared_ptr<GeomAPI_Dir>& theDirX,
     const std::shared_ptr<GeomAPI_Dir>& theNorm,
-    const std::list<std::shared_ptr<GeomAPI_Shape> >& theFeatures,
-    std::list<std::shared_ptr<GeomAPI_Shape> >& theResultFaces)
+    const std::list<std::shared_ptr<GeomAPI_Shape> >& theEdges)
 {
-  if (theFeatures.empty())
+  myResultFaces.clear();
+  setDone(false);
+  if (theEdges.empty())
     return;
 
   BRep_Builder aBuilder;
@@ -215,24 +218,31 @@ void GeomAlgoAPI_SketchBuilder::createFaces(
   aBuilder.MakeFace(aPlnFace, aPlane, Precision::Confusion());
 
   // Use General Fuse algorithm to prepare all subfaces, bounded by given list of edges
-  BOPAlgo_Builder aBB;
-  aBB.AddArgument(aPlnFace);
+  BOPAlgo_Builder* aBB = new BOPAlgo_Builder;
+  aBB->AddArgument(aPlnFace);
+
+  setImpl(aBB);
+  setBuilderType(OCCT_BOPAlgo_Builder);
 
   NCollection_List<TopoDS_Shape> anEdges;
   NCollection_List<TopoDS_Shape>::Iterator aShapeIt;
-  std::list<std::shared_ptr<GeomAPI_Shape> >::const_iterator aFeatIt = theFeatures.begin();
-  for (; aFeatIt != theFeatures.end(); aFeatIt++) {
+  std::list<std::shared_ptr<GeomAPI_Shape> >::const_iterator aFeatIt = theEdges.begin();
+  for (; aFeatIt != theEdges.end(); aFeatIt++) {
     std::shared_ptr<GeomAPI_Shape> aShape(*aFeatIt);
     const TopoDS_Edge& anEdge = aShape->impl<TopoDS_Edge>();
     if (anEdge.ShapeType() == TopAbs_EDGE)
-      aBB.AddArgument(anEdge);
+      aBB->AddArgument(anEdge);
   }
-  aBB.Perform();
-  if (aBB.HasErrors())
+  aBB->Perform();
+  if (aBB->HasErrors())
     return;
+
+  TopoDS_Compound aResult;
+  aBuilder.MakeCompound(aResult);
+
   // Collect faces
-  TopTools_ListOfShape anAreas = aBB.Modified(aPlnFace);
-  sortFaces(anAreas, theFeatures); // sort faces by the edges in them
+  TopTools_ListOfShape anAreas = aBB->Modified(aPlnFace);
+  sortFaces(anAreas, theEdges); // sort faces by the edges in them
   TopTools_ListIteratorOfListOfShape anIt(anAreas);
   for (; anIt.More(); anIt.Next()) {
     TopoDS_Face aFace = TopoDS::Face(anIt.Value());
@@ -252,7 +262,7 @@ void GeomAlgoAPI_SketchBuilder::createFaces(
 
       // to make faces equal on different platforms, we will find
       // a vertex lying on an edge with the lowest index in the list of initial edges
-      TopoDS_Vertex aStartVertex = findStartVertex(aWire, aFace, theFeatures);
+      TopoDS_Vertex aStartVertex = findStartVertex(aWire, aFace, theEdges);
 
       TopoDS_Wire aNewWire;
       aBuilder.MakeWire(aNewWire);
@@ -288,30 +298,43 @@ void GeomAlgoAPI_SketchBuilder::createFaces(
     }
 
     // store face
-    aFace = aNewFace;
+    aBuilder.Add(aResult, aNewFace);
     std::shared_ptr<GeomAPI_Shape> aResFace(new GeomAPI_Shape);
     aResFace->setImpl(new TopoDS_Face(aFace));
-    theResultFaces.push_back(aResFace);
+    myResultFaces.push_back(aResFace);
   }
+
+  // update results
+  GeomShapePtr aResShape(new GeomAPI_Shape);
+  aResShape->setImpl(new TopoDS_Shape(aResult));
+  setShape(aResShape);
+  setDone(true);
 }
 
-void GeomAlgoAPI_SketchBuilder::createFaces(const std::shared_ptr<GeomAPI_Pnt>& theOrigin,
-                                            const std::shared_ptr<GeomAPI_Dir>& theDirX,
-                                            const std::shared_ptr<GeomAPI_Dir>& theNorm,
-                                            const std::shared_ptr<GeomAPI_Shape>& theWire,
-                                std::list<std::shared_ptr<GeomAPI_Shape> >& theResultFaces)
+GeomAlgoAPI_SketchBuilder::GeomAlgoAPI_SketchBuilder(
+  const std::shared_ptr<GeomAPI_Pln>& thePlane,
+  const std::list<std::shared_ptr<GeomAPI_Shape> >& theEdges)
+{
+  build(thePlane->location(), thePlane->xDirection(), thePlane->direction(), theEdges);
+}
+
+GeomAlgoAPI_SketchBuilder::GeomAlgoAPI_SketchBuilder(
+    const std::shared_ptr<GeomAPI_Pnt>& theOrigin,
+    const std::shared_ptr<GeomAPI_Dir>& theDirX,
+    const std::shared_ptr<GeomAPI_Dir>& theNorm,
+    const std::shared_ptr<GeomAPI_Shape>& theWire)
 {
   std::shared_ptr<GeomAPI_PlanarEdges> aWire =
     std::dynamic_pointer_cast<GeomAPI_PlanarEdges>(theWire);
   if(aWire) {
     // Filter wires, return only faces.
-    createFaces(theOrigin, theDirX, theNorm, aWire->getEdges(), theResultFaces);
+    build(theOrigin, theDirX, theNorm, aWire->getEdges());
   } else { // it may be only one circle
     std::shared_ptr<GeomAPI_Edge> anEdge = std::dynamic_pointer_cast<GeomAPI_Edge>(theWire);
     if (anEdge) {
       std::list<std::shared_ptr<GeomAPI_Shape> > aList;
       aList.push_back(anEdge);
-      createFaces(theOrigin, theDirX, theNorm, aList, theResultFaces);
+      build(theOrigin, theDirX, theNorm, aList);
     }
   }
 }

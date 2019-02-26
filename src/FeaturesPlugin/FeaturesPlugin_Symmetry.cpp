@@ -369,8 +369,12 @@ void FeaturesPlugin_Symmetry::buildResult(
 
   // Store and name the result.
   ResultBodyPtr aResultBody = document()->createBody(data(), theResultIndex);
-  aResultBody->storeModified(theBaseShape, aCompound);
-  FeaturesPlugin_Tools::loadModifiedShapes(aResultBody, theBaseShape, anAlgoList, "Symmetried");
+
+  ListOfShape aBaseShapes;
+  aBaseShapes.push_back(theBaseShape);
+  FeaturesPlugin_Tools::loadModifiedShapes(aResultBody, aBaseShapes, ListOfShape(),
+                                           anAlgoList, aCompound, "Symmetried");
+
   setResult(aResultBody, theResultIndex);
 }
 

@@ -18,6 +18,7 @@
 //
 
 #include "FeaturesPlugin_FusionFaces.h"
+#include "FeaturesPlugin_Tools.h"
 
 #include <ModelAPI_AttributeSelectionList.h>
 #include <ModelAPI_AttributeString.h>
@@ -69,13 +70,10 @@ void FeaturesPlugin_FusionFaces::execute()
   // Store result
   GeomShapePtr aResultShape = anAlgo->shape();
   ResultBodyPtr aResultBody = document()->createBody(data());
-  if (aResultShape->isEqual(aBaseShape)) {
-    aResultBody->store(aResultShape);
-  } else {
-    aResultBody->storeModified(aBaseShape, aResultShape);
 
-    aResultBody->loadModifiedShapes(anAlgo, aBaseShape, GeomAPI_Shape::EDGE);
-    aResultBody->loadModifiedShapes(anAlgo, aBaseShape, GeomAPI_Shape::FACE);
-  }
+  ListOfShape aBaseShapesList;
+  aBaseShapesList.push_back(aBaseShape);
+  FeaturesPlugin_Tools::loadModifiedShapes(aResultBody, aBaseShapesList, ListOfShape(),
+                                           anAlgo, aResultShape);
   setResult(aResultBody);
 }

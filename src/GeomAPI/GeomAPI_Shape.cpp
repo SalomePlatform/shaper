@@ -688,3 +688,9 @@ bool GeomAPI_Shape::isSelfIntersected(const int theLevelOfCheck) const
 
   return false;
 }
+
+bool GeomAPI_Shape::Comparator::operator()(const std::shared_ptr<GeomAPI_Shape>& theShape1,
+                                           const std::shared_ptr<GeomAPI_Shape>& theShape2) const
+{
+  return theShape1->impl<TopoDS_Shape>().TShape() < theShape2->impl<TopoDS_Shape>().TShape();
+}

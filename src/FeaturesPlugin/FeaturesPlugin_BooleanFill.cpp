@@ -18,12 +18,14 @@
 //
 
 #include "FeaturesPlugin_BooleanFill.h"
+#include "FeaturesPlugin_Tools.h"
 
 #include <ModelAPI_ResultBody.h>
 #include <ModelAPI_AttributeSelectionList.h>
 #include <ModelAPI_Tools.h>
 
 #include <GeomAlgoAPI_Boolean.h>
+#include <GeomAlgoAPI_CompoundBuilder.h>
 #include <GeomAlgoAPI_MakeShapeCustom.h>
 #include <GeomAlgoAPI_MakeShapeList.h>
 #include <GeomAlgoAPI_Partition.h>
@@ -105,6 +107,9 @@ void FeaturesPlugin_BooleanFill::execute()
     return;
   }
 
+  std::vector<FeaturesPlugin_Tools::ResultBaseAlgo> aResultBaseAlgoList;
+  ListOfShape aResultShapesList;
+
   // For solids cut each object with all tools.
   for(ListOfShape::iterator
       anObjectsIt = anObjects.begin(); anObjectsIt != anObjects.end(); anObjectsIt++) {
@@ -160,12 +165,23 @@ void FeaturesPlugin_BooleanFill::execute()
     std::shared_ptr<ModelAPI_ResultBody> aResultBody =
         document()->createBody(data(), aResultIndex);
 
+    // tools should be added to the list to fulfill the correct history of modification
+    aListWithObject.insert(aListWithObject.end(), aTools.begin(), aTools.end());
+
     ListOfShape aUsedTools = aTools;
     aUsedTools.insert(aUsedTools.end(), aPlanes.begin(), aPlanes.end());
 
-    loadNamingDS(aResultBody, anObject, aUsedTools, aResShape, aMakeShapeList);
+    FeaturesPlugin_Tools::loadModifiedShapes(aResultBody, aListWithObject, aUsedTools,
+                                             aMakeShapeList, aResShape);
     setResult(aResultBody, aResultIndex);
     aResultIndex++;
+
+    FeaturesPlugin_Tools::ResultBaseAlgo aRBA;
+    aRBA.resultBody = aResultBody;
+    aRBA.baseShape = anObject;
+    aRBA.makeShape = aMakeShapeList;
+    aResultBaseAlgoList.push_back(aRBA);
+    aResultShapesList.push_back(aResShape);
   }
 
   // Compsolids handling
@@ -245,14 +261,28 @@ void FeaturesPlugin_BooleanFill::execute()
     ListOfShape aUsedTools = aTools;
     aUsedTools.insert(aUsedTools.end(), aPlanes.begin(), aPlanes.end());
 
-    loadNamingDS(aResultBody,
-                  aCompSolid,
-                  aUsedTools,
-                  aResultShape,
-                  aMakeShapeList);
+    ListOfShape aBaseShapes;
+    aBaseShapes.push_back(aCompSolid);
+    // tools should be added to the list to fulfill the correct history of modification
+    aBaseShapes.insert(aBaseShapes.end(), aTools.begin(), aTools.end());
+
+    FeaturesPlugin_Tools::loadModifiedShapes(aResultBody, aBaseShapes, aUsedTools,
+                                             aMakeShapeList, aResultShape);
     setResult(aResultBody, aResultIndex);
     aResultIndex++;
+
+    FeaturesPlugin_Tools::ResultBaseAlgo aRBA;
+    aRBA.resultBody = aResultBody;
+    aRBA.baseShape = aCompSolid;
+    aRBA.makeShape = aMakeShapeList;
+    aResultBaseAlgoList.push_back(aRBA);
+    aResultShapesList.push_back(aResultShape);
   }
+
+  // Store deleted shapes after all results has been proceeded. This is to avoid issue when in one
+  // result shape has been deleted, but in another it was modified or stayed.
+  GeomShapePtr aResultShapesCompound = GeomAlgoAPI_CompoundBuilder::compound(aResultShapesList);
+  FeaturesPlugin_Tools::loadDeletedShapes(aResultBaseAlgoList, aTools, aResultShapesCompound);
 
   // remove the rest results if there were produced in the previous pass
   removeResults(aResultIndex);

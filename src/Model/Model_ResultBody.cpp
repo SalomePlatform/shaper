@@ -28,9 +28,12 @@
 #include <ModelAPI_Tools.h>
 #include <Model_Data.h>
 #include <Events_Loop.h>
+#include <GeomAPI_ShapeIterator.h>
+#include <GeomAPI_ShapeExplorer.h>
 
 #include <TopoDS_Shape.hxx>
 #include <TopExp_Explorer.hxx>
+#include <TopTools_MapOfShape.hxx>
 #include <TDataStd_UAttribute.hxx>
 
 // if this attribute exists, the shape is connected topology
@@ -74,7 +77,8 @@ bool Model_ResultBody::generated(const GeomShapePtr& theNewShape,
 void Model_ResultBody::loadGeneratedShapes(const std::shared_ptr<GeomAlgoAPI_MakeShape>& theAlgo,
                                            const GeomShapePtr& theOldShape,
                                            const GeomAPI_Shape::ShapeType theShapeTypeToExplore,
-                                           const std::string& theName)
+                                           const std::string& theName,
+                                           const bool theSaveOldIfNotInTree)
 {
   if (mySubs.size()) { // consists of subs
     for (std::vector<ResultBodyPtr>::const_iterator aSubIter = mySubs.cbegin();
@@ -82,10 +86,12 @@ void Model_ResultBody::loadGeneratedShapes(const std::shared_ptr<GeomAlgoAPI_Mak
          ++aSubIter)
     {
       const ResultBodyPtr& aSub = *aSubIter;
-      aSub->loadGeneratedShapes(theAlgo, theOldShape, theShapeTypeToExplore, theName);
+      aSub->loadGeneratedShapes(
+        theAlgo, theOldShape, theShapeTypeToExplore, theName, theSaveOldIfNotInTree);
     }
   } else { // do for this directly
-    myBuilder->loadGeneratedShapes(theAlgo, theOldShape, theShapeTypeToExplore, theName);
+    myBuilder->loadGeneratedShapes(
+      theAlgo, theOldShape, theShapeTypeToExplore, theName, theSaveOldIfNotInTree);
   }
 }
 
@@ -94,31 +100,12 @@ void Model_ResultBody::loadModifiedShapes(const std::shared_ptr<GeomAlgoAPI_Make
                                           const GeomAPI_Shape::ShapeType theShapeTypeToExplore,
                                           const std::string& theName)
 {
-  if (/*theSplitInSubs &&*/ mySubs.size()) { // consists of subs
+  if (mySubs.size()) { // consists of subs
     // optimization of getting of new shapes for specific sub-result
     if (!theAlgo->isNewShapesCollected(theOldShape, theShapeTypeToExplore))
       theAlgo->collectNewShapes(theOldShape, theShapeTypeToExplore);
     std::vector<ResultBodyPtr>::const_iterator aSubIter = mySubs.cbegin();
     for(; aSubIter != mySubs.cend(); aSubIter++) {
-      // check that sub-shape was also created as modification of ShapeIn
-      /* to find when it is needed later to enable: to store modification of sub-bodies not only as primitives
-      GeomShapePtr aSubGeomShape = (*aSubIter)->shape();
-      if (!theIsStoreAsGenerated && aSubGeomShape.get() && !aSubGeomShape->isNull()) {
-        TopoDS_Shape aSubShape = aSubGeomShape->impl<TopoDS_Shape>();
-        TopoDS_Shape aWholeIn = theShapeIn->impl<TopoDS_Shape>();
-        for(TopExp_Explorer anExp(aWholeIn, aSubShape.ShapeType()); anExp.More(); anExp.Next()) {
-          ListOfShape aHistory;
-          std::shared_ptr<GeomAPI_Shape> aSubIn(new GeomAPI_Shape());
-          aSubIn->setImpl((new TopoDS_Shape(anExp.Current())));
-          theMS->modified(aSubIn, aHistory);
-          std::list<std::shared_ptr<GeomAPI_Shape> >::const_iterator anIt = aHistory.begin();
-          for (; anIt != aHistory.end(); anIt++) {
-            if ((*anIt)->isSame(aSubGeomShape)) {
-              (*aSubIter)->storeModified(aSubIn, aSubGeomShape, -2); // -2 is to avoid clearing
-            }
-          }
-        }
-      }*/
       (*aSubIter)->loadModifiedShapes(theAlgo, theOldShape, theShapeTypeToExplore, theName);
     }
   } else { // do for this directly
@@ -272,7 +259,14 @@ void Model_ResultBody::updateSubs(const std::shared_ptr<GeomAPI_Shape>& theThisS
       }
       GeomShapePtr anOldSubShape = aSub->shape();
       if (!aShape->isEqual(anOldSubShape)) {
-        aSub->store(aShape, false);
+        if (myAlgo.get()) {
+          std::list<GeomShapePtr> anOldForSub;
+          computeOldForSub(aShape, myOlds, anOldForSub);
+          myIsGenerated ? aSub->storeGenerated(anOldForSub, aShape, myAlgo) :
+            aSub->storeModified(anOldForSub, aShape, myAlgo);
+        } else {
+          aSub->store(aShape, false);
+        }
         aECreator->sendUpdated(aSub, EVENT_DISP);
         aECreator->sendUpdated(aSub, EVENT_UPD);
       }
@@ -310,6 +304,23 @@ void Model_ResultBody::updateSubs(const std::shared_ptr<GeomAPI_Shape>& theThisS
   }
 }
 
+void Model_ResultBody::updateSubs(
+  const GeomShapePtr& theThisShape, const std::list<GeomShapePtr>& theOlds,
+  const std::shared_ptr<GeomAlgoAPI_MakeShape> theMakeShape, const bool isGenerated)
+{
+  myAlgo = theMakeShape;
+  myOlds = theOlds;
+  myIsGenerated = isGenerated;
+  // to avoid changing of "isDisabled" flag in the "updateSubs" cycle
+  isDisabled();
+
+  updateSubs(theThisShape, true);
+  myAlgo.reset();
+  myOlds.clear();
+  myHistoryCash.Clear();
+}
+
+
 bool Model_ResultBody::isConnectedTopology()
 {
   TDF_Label aDataLab = std::dynamic_pointer_cast<Model_Data>(data())->label();
@@ -336,5 +347,90 @@ void Model_ResultBody::cleanCash()
   {
     const ResultBodyPtr& aSub = *aSubIter;
     aSub->cleanCash();
+  }
+}
+
+// adds to the theSubSubs map all sub-shapes of theSub if it is compound of compsolid
+static void collectSubs(
+  const GeomShapePtr theSub, TopTools_MapOfShape& theSubSubs, const bool theOneLevelMore)
+{
+  if (theSub->isNull())
+    return;
+  if (theSubSubs.Add(theSub->impl<TopoDS_Shape>()))  {
+    bool aIsComp = theSub->isCompound() || theSub->isCompSolid();
+    if (aIsComp) {
+      for(GeomAPI_ShapeIterator anIter(theSub); anIter.more(); anIter.next())
+        collectSubs(anIter.current(), theSubSubs, theOneLevelMore);
+    } else if (theOneLevelMore) {
+      GeomAPI_Shape::ShapeType aSubType = GeomAPI_Shape::ShapeType(int(theSub->shapeType()) + 1);
+      if (aSubType == GeomAPI_Shape::SHAPE)
+        return;
+      if (aSubType == GeomAPI_Shape::SHELL)
+        aSubType = GeomAPI_Shape::FACE;
+      if (aSubType == GeomAPI_Shape::WIRE)
+        aSubType = GeomAPI_Shape::EDGE;
+
+      for(GeomAPI_ShapeExplorer anExp(theSub, aSubType); anExp.more(); anExp.next()) {
+        collectSubs(anExp.current(), theSubSubs, false);
+      }
+    }
+  }
+}
+
+void Model_ResultBody::computeOldForSub(const GeomShapePtr& theSub,
+  const std::list<GeomShapePtr>& theAllOlds, std::list<GeomShapePtr>& theOldForSub)
+{
+  // the old can be also used for sub-shape of theSub; collect all subs of compound or compsolid
+  TopTools_MapOfShape aSubSubs;
+  collectSubs(theSub, aSubSubs, false);
+
+  std::list<GeomShapePtr>::const_iterator aRootOlds = theAllOlds.cbegin();
+  for (; aRootOlds != theAllOlds.cend(); aRootOlds++) {
+    // use sub-shapes of olds too if they are compounds or compsolids
+    TopTools_MapOfShape anOldSubs;
+    // iterate one level more (for intersection of solids this is face)
+    collectSubs(*aRootOlds, anOldSubs, true);
+    for (TopTools_MapOfShape::Iterator anOldIter(anOldSubs); anOldIter.More(); anOldIter.Next()) {
+      TopoDS_Shape anOldShape = anOldIter.Value();
+      if (anOldShape.ShapeType() == TopAbs_COMPOUND || anOldShape.ShapeType() == TopAbs_SHELL ||
+          anOldShape.ShapeType() == TopAbs_WIRE)
+        continue; // container old-shapes are not supported by the history, may cause crash
+      GeomShapePtr anOldSub(new GeomAPI_Shape);
+      anOldSub->setImpl<TopoDS_Shape>(new TopoDS_Shape(anOldShape));
+
+      ListOfShape aNews;
+      if (myHistoryCash.IsBound(anOldShape)) {
+        const TopTools_ListOfShape& aList = myHistoryCash.Find(anOldShape);
+        for(TopTools_ListIteratorOfListOfShape anIter(aList); anIter.More(); anIter.Next()) {
+          GeomShapePtr aShape(new GeomAPI_Shape);
+          aShape->setImpl<TopoDS_Shape>(new TopoDS_Shape(anIter.Value()));
+          aNews.push_back(aShape);
+        }
+      } else {
+        myIsGenerated ? myAlgo->generated(anOldSub, aNews) : myAlgo->modified(anOldSub, aNews);
+        // MakeShape may return alone old shape if there is no history information for this input
+        if (aNews.size() == 1 && aNews.front()->isEqual(anOldSub))
+          aNews.clear();
+        // store result in the history
+        TopTools_ListOfShape aList;
+        for (ListOfShape::iterator aNewIter = aNews.begin(); aNewIter != aNews.end(); aNewIter++) {
+          aList.Append((*aNewIter)->impl<TopoDS_Shape>());
+        }
+        myHistoryCash.Bind(anOldShape, aList);
+      }
+
+      for (ListOfShape::iterator aNewIter = aNews.begin(); aNewIter != aNews.end(); aNewIter++) {
+        if (aSubSubs.Contains((*aNewIter)->impl<TopoDS_Shape>())) {
+          // check list already contains this sub
+          std::list<GeomShapePtr>::iterator aResIter = theOldForSub.begin();
+          for(; aResIter != theOldForSub.end(); aResIter++)
+            if ((*aResIter)->isSame(anOldSub))
+              break;
+          if (aResIter == theOldForSub.end())
+            theOldForSub.push_back(anOldSub); // found old used for new theSubShape creation
+          break;
+        }
+      }
+    }
   }
 }

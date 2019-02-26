@@ -356,10 +356,12 @@ ADD_UNIT_TESTS(TestExtrusion.py
                TestBooleanCut_WireCompound_WireCompound.py
                TestBooleanCut_Compound_Solid.py
                TestBooleanCut_ErrorMsg.py
+               TestBooleanCut_SolidsHistory.py
                TestBooleanSmash_Face_Face.py
                TestBooleanSmash_SubSolid_Solid.py
                TestBooleanSmash_CompSolid_Solid.py
                TestBooleanSmash_ErrorMsg.py
+               TestBooleanSmash_SolidsHistory.py
                TestBooleanFuse_SimpleMode.py
                TestBooleanFuse_RemoveEdges.py
                TestBooleanFuse_ErrorMsg.py
@@ -389,6 +391,7 @@ ADD_UNIT_TESTS(TestExtrusion.py
                TestBooleanCommon_CompSolidCompound_Shell.py
                TestBooleanCommon_CompSolidCompound_CompSolidCompound.py
                TestBooleanCommon_ErrorMsg.py
+               TestBooleanCommon_SolidsHistory.py
                Test2596.py
                Test2592.py
                Test2588.py
@@ -412,6 +415,7 @@ ADD_UNIT_TESTS(TestExtrusion.py
                TestPartitionSubCompsolidWithPlane4.py
                TestPartitionSubCompsolidWithPlane5.py
                TestPartitionArgsUpdate.py
+               TestPartition_SolidsHistory.py
                TestBooleanFuse_Vertex_Vertex.py
                TestBooleanFuse_VertexCompound_VertexCompound.py
                TestBooleanFuse_Edge_Edge.py
@@ -427,13 +431,17 @@ ADD_UNIT_TESTS(TestExtrusion.py
                TestBooleanFuse_CompSolid_Face.py
                TestBooleanFuse_CompSolid_CompSolid.py
                TestBooleanFuse_CompSolidCompound_CompSolidCompound.py
+               TestBooleanFuse_SolidsHistory.py
                TestFillet.py
                TestFillet1.py
                TestFillet_ErrorMsg.py
+               TestFillet_History.py
                TestScale1.py
                TestScale2.py
                Test1816.py
+               Test1876.py
                Test2631.py
+               Test2636.py
                Test2650.py
                Test2681.py
                Test2686.py
@@ -445,6 +453,8 @@ ADD_UNIT_TESTS(TestExtrusion.py
                Test2692.py
                Test2617.py
                Test2729.py
+               Test2738.py
                Test2751.py
+               Test2826.py
                Test2854.py
 )

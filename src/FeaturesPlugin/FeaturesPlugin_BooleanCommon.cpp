@@ -157,13 +157,14 @@ void FeaturesPlugin_BooleanCommon::execute()
       std::shared_ptr<ModelAPI_ResultBody> aResultBody =
         document()->createBody(data(), aResultIndex);
 
-      GeomShapePtr aBaseShape = anObjects.front();
-      anObjects.pop_front();
+      ListOfShape anEmptyTools;
       FeaturesPlugin_Tools::loadModifiedShapes(aResultBody,
-                                               aBaseShape,
                                                anObjects,
+                                               anEmptyTools,
                                                aMakeShapeList,
                                                aShape);
+      GeomShapePtr aBaseShape = anObjects.front();
+      anObjects.pop_front();
       setResult(aResultBody, aResultIndex);
       aResultIndex++;
 
@@ -221,9 +222,10 @@ void FeaturesPlugin_BooleanCommon::execute()
       if (aShapeIt.more() || aResShape->shapeType() == GeomAPI_Shape::VERTEX) {
         std::shared_ptr<ModelAPI_ResultBody> aResultBody =
           document()->createBody(data(), aResultIndex);
-
+        ListOfShape anObjectList;
+        anObjectList.push_back(anObject);
         FeaturesPlugin_Tools::loadModifiedShapes(aResultBody,
-                                                 anObject,
+                                                 anObjectList,
                                                  aTools,
                                                  aMakeShapeList,
                                                  aResShape);
@@ -303,8 +305,10 @@ void FeaturesPlugin_BooleanCommon::execute()
         std::shared_ptr<ModelAPI_ResultBody> aResultBody =
           document()->createBody(data(), aResultIndex);
 
+        ListOfShape aCompSolidList;
+        aCompSolidList.push_back(aCompSolid);
         FeaturesPlugin_Tools::loadModifiedShapes(aResultBody,
-                                                 aCompSolid,
+                                                 aCompSolidList,
                                                  aTools,
                                                  aMakeShapeList,
                                                  aResultShape);
@@ -387,8 +391,10 @@ void FeaturesPlugin_BooleanCommon::execute()
         std::shared_ptr<ModelAPI_ResultBody> aResultBody =
           document()->createBody(data(), aResultIndex);
 
+        ListOfShape aCompoundList;
+        aCompoundList.push_back(aCompound);
         FeaturesPlugin_Tools::loadModifiedShapes(aResultBody,
-                                                 aCompound,
+                                                 aCompoundList,
                                                  aTools,
                                                  aMakeShapeList,
                                                  aResultShape);

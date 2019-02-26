@@ -25,6 +25,8 @@
 #include <vector>
 #include <map>
 
+#include <TopTools_DataMapOfShapeListOfShape.hxx>
+
 /**\class Model_ResultBody
 * \ingroup DataModel
 * \brief The body (shape) result of a feature.
@@ -42,6 +44,14 @@ class Model_ResultBody : public ModelAPI_ResultBody
   std::map<ObjectPtr, int> mySubsMap;
   /// Keeps the last state of the concealment flag in order to update it when needed.
   bool myLastConcealed;
+  /// History information for update subs
+  std::shared_ptr<GeomAlgoAPI_MakeShape> myAlgo;
+  /// All old shapes used for the root result construction
+  std::list<GeomShapePtr> myOlds;
+  /// Information about the kind of the history information: modified or generated
+  bool myIsGenerated;
+  /// Map from old shape to list of new shapes, cash for computeOldForSub method
+  TopTools_DataMapOfShapeListOfShape myHistoryCash;
 
 public:
 
@@ -58,7 +68,8 @@ public:
   virtual void loadGeneratedShapes(const std::shared_ptr<GeomAlgoAPI_MakeShape>& theAlgo,
                                    const GeomShapePtr& theOldShape,
                                    const GeomAPI_Shape::ShapeType theShapeTypeToExplore,
-                                   const std::string& theName = "") override;
+                                   const std::string& theName = "",
+                                   const bool theSaveOldIfNotInTree = false) override;
 
   /// load modified shapes for sub-objects
   MODEL_EXPORT
@@ -108,8 +119,17 @@ protected:
   void updateSubs(const std::shared_ptr<GeomAPI_Shape>& theThisShape,
                   const bool theShapeChanged = true);
 
+  /// Updates the sub-bodies in accordance to the algorithm history information
+  void updateSubs(
+    const GeomShapePtr& theThisShape, const std::list<GeomShapePtr>& theOlds,
+    const std::shared_ptr<GeomAlgoAPI_MakeShape> theMakeShape, const bool isGenerated);
+
   // Checks the state of children and parents to send events of creation/erase when needed
   void updateConcealment();
+
+  /// Adds to theOldForSub only old shapes that where used for theSub creation
+  void computeOldForSub(const GeomShapePtr& theSub,
+    const std::list<GeomShapePtr>& theAllOlds, std::list<GeomShapePtr>& theOldForSub);
 
   friend class Model_Objects;
 };

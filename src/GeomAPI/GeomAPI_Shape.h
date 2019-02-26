@@ -218,6 +218,16 @@ public:
   /// 8 - V/V, V/E, E/E, V/F, E/F, F/F, V/S, E/S and F/S;<br>
   /// 9 - V/V, V/E, E/E, V/F, E/F, F/F, V/S, E/S, F/S and S/S - all interferences (Default value)
   GEOMAPI_EXPORT bool isSelfIntersected(const int theLevelOfCheck = 9) const;
+
+public:
+  class Comparator
+  {
+  public:
+    /// Return \c true if the address of the first shape is less than the address of the second
+    GEOMAPI_EXPORT
+    bool operator ()(const std::shared_ptr<GeomAPI_Shape>& theShape1,
+                     const std::shared_ptr<GeomAPI_Shape>& theShape2) const;
+  };
 };
 
 //! Pointer on list of shapes

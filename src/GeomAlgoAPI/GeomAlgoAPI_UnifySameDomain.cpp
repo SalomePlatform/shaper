@@ -112,6 +112,8 @@ void GeomAlgoAPI_UnifySameDomain::modified(const std::shared_ptr<GeomAPI_Shape> 
   const ShapeUpgrade_UnifySameDomain& aUnifyAlgo = this->impl<ShapeUpgrade_UnifySameDomain>();
 
   for (int aIsModified = 0; aIsModified <= 1; aIsModified++) {
+    if (!aUnifyAlgo.History()->IsSupportedType(aShape)) // to avoid crash in BRepTools_History
+      continue;
     const TopTools_ListOfShape& aMList = aIsModified ?
       aUnifyAlgo.History()->Modified(aShape) : aUnifyAlgo.History()->Generated(aShape);
     for (TopTools_ListIteratorOfListOfShape aModified(aMList); aModified.More(); aModified.Next()) {

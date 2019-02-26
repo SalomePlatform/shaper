@@ -270,20 +270,19 @@ void FeaturesPlugin_BooleanFuse::execute()
 
   int aResultIndex = 0;
 
-  GeomShapePtr aBackShape = anOriginalShapes.back();
-  anOriginalShapes.pop_back();
   ResultBodyPtr aResultBody = document()->createBody(data(), aResultIndex);
 
+  ListOfShape anEmptyTools;
   FeaturesPlugin_Tools::loadModifiedShapes(aResultBody,
-                                           aBackShape,
                                            anOriginalShapes,
+                                           anEmptyTools,
                                            aMakeShapeList,
                                            aShape);
   setResult(aResultBody, aResultIndex);
   aResultIndex++;
 
   FeaturesPlugin_Tools::loadDeletedShapes(aResultBody,
-                                          aBackShape,
+                                          GeomShapePtr(),
                                           anOriginalShapes,
                                           aMakeShapeList,
                                           aShape);

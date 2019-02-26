@@ -79,6 +79,30 @@ void GeomAlgoAPI_Sewing::build(const ListOfShape& theShapes)
 }
 
 //==================================================================================================
+#include <GeomAPI_ShapeExplorer.h>
+#include <GeomAPI_ShapeIterator.h>
+
+typedef std::map<GeomShapePtr, ListOfShape, GeomAPI_Shape::Comparator> MapFaceSolid;
+static void facesBelongingToSolids(const GeomShapePtr& theShape,
+                                   MapFaceSolid& theShapeRelations)
+{
+  for (GeomAPI_ShapeExplorer aSolidExp(theShape, GeomAPI_Shape::SHELL);
+       aSolidExp.more(); aSolidExp.next()) {
+    GeomShapePtr aSolid = aSolidExp.current();
+    for (GeomAPI_ShapeExplorer aFaceExp(aSolid, GeomAPI_Shape::FACE);
+         aFaceExp.more(); aFaceExp.next())
+      theShapeRelations[aFaceExp.current()].push_back(aSolid);
+  }
+}
+
+static bool isShapeInList(const GeomShapePtr& theShape, const ListOfShape& theList)
+{
+  for (ListOfShape::const_iterator anIt = theList.begin(); anIt != theList.end(); ++anIt)
+    if (theShape->isEqual(*anIt))
+      return true;
+  return false;
+}
+
 void GeomAlgoAPI_Sewing::modified(const std::shared_ptr<GeomAPI_Shape> theShape,
                                   ListOfShape& theHistory)
 {
@@ -99,5 +123,22 @@ void GeomAlgoAPI_Sewing::modified(const std::shared_ptr<GeomAPI_Shape> theShape,
     GeomShapePtr aGeomShape(new GeomAPI_Shape());
     aGeomShape->setImpl(new TopoDS_Shape(anExp.Current()));
     theHistory.push_back(aGeomShape);
+  }
+
+  if (theShape->shapeType() < GeomAPI_Shape::FACE) {
+    ListOfShape aNewShapes;
+    // collect faces and parent shapes, if it is not done yet
+    if (!isNewShapesCollected(theShape, GeomAPI_Shape::FACE))
+      collectNewShapes(theShape, GeomAPI_Shape::FACE);
+
+    for (GeomAPI_ShapeIterator anIt(shape()); anIt.more(); anIt.next()) {
+      GeomShapePtr anOldShapesCompound =
+          oldShapesForNew(theShape, anIt.current(), GeomAPI_Shape::FACE);
+      if (!anOldShapesCompound->isNull())
+        aNewShapes.push_back(anIt.current());
+    }
+
+    if (!aNewShapes.empty())
+      theHistory = aNewShapes;
   }
 }

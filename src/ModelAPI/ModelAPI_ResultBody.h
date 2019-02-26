@@ -101,10 +101,20 @@ public:
   MODELAPI_EXPORT virtual void storeGenerated(const GeomShapePtr& theFromShape,
                                               const GeomShapePtr& theToShape);
 
+  /// Stores the root modified shapes (called by the execution method).
+  MODELAPI_EXPORT virtual void storeGenerated(
+    const std::list<GeomShapePtr>& theFromShapes, const GeomShapePtr& theToShape,
+    const std::shared_ptr<GeomAlgoAPI_MakeShape> theMakeShape);
+
   /// Stores the modified shape (called by the execution method).
   MODELAPI_EXPORT virtual void storeModified(const GeomShapePtr& theOldShape,
                                              const GeomShapePtr& theNewShape,
                                              const bool theIsCleanStored = true);
+
+  /// Stores the root modified shapes (called by the execution method).
+  MODELAPI_EXPORT virtual void storeModified(
+    const std::list<GeomShapePtr>& theOldShapes, const GeomShapePtr& theNewShape,
+    const std::shared_ptr<GeomAlgoAPI_MakeShape> theMakeShape);
 
   /// Returns the shape-result produced by this feature
   MODELAPI_EXPORT virtual GeomShapePtr shape();
@@ -147,7 +157,8 @@ public:
   virtual void loadGeneratedShapes(const std::shared_ptr<GeomAlgoAPI_MakeShape>& theAlgo,
                                    const GeomShapePtr& theOldShape,
                                    const GeomAPI_Shape::ShapeType theShapeTypeToExplore,
-                                   const std::string& theName = "") = 0;
+                                   const std::string& theName = "",
+                                   const bool theSaveOldIfNotInTree = false) = 0;
 
   /// load shapes of the first level (to be used during shape import)
   MODELAPI_EXPORT virtual void loadFirstLevel(GeomShapePtr theShape,
@@ -163,6 +174,11 @@ public:
   /// Updates the sub-bodies if shape of this object is compsolid or compound
   MODELAPI_EXPORT virtual void updateSubs(const GeomShapePtr& theThisShape,
     const bool theShapeChanged = true) = 0;
+
+  /// Updates the sub-bodies in accordance to the algorithm history information
+  MODELAPI_EXPORT virtual void updateSubs(
+    const GeomShapePtr& theThisShape, const std::list<GeomShapePtr>& theOlds,
+    const std::shared_ptr<GeomAlgoAPI_MakeShape> theMakeShape, const bool isGenerated) = 0;
 
   /// Cleans cash related to the already stored elements
   MODELAPI_EXPORT virtual void cleanCash() = 0;

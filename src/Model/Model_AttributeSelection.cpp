@@ -1085,9 +1085,10 @@ void Model_AttributeSelection::computeValues(
   if (aWasWholeContext) {
     theValShape = theOldContext->shape()->impl<TopoDS_Shape>();
   }
+  TopAbs_ShapeEnum aValType = theValShape.ShapeType();
   TopoDS_Shape aNewContShape = theNewContext->shape()->impl<TopoDS_Shape>();
   // if a new value is unchanged in the new context, do nothing: value is correct
-  TopExp_Explorer aSubExp(aNewContShape, theValShape.ShapeType());
+  TopExp_Explorer aSubExp(aNewContShape, aValType);
   for(; aSubExp.More(); aSubExp.Next()) {
     if (aSubExp.Current().IsSame(theValShape)) {
       theShapes.Append(theValShape);
@@ -1132,17 +1133,15 @@ void Model_AttributeSelection::computeValues(
                 return;
               }
               // don't add edges generated from faces
-              if (aPairIter.NewShape().ShapeType() <= theValShape.ShapeType())
+              if (aPairIter.NewShape().ShapeType() <= aValType)
                 theShapes.Append(aPairIter.NewShape());
             }
           } else if (!aPairIter.OldShape().IsNull()) { // search shape that contains this sub
-            TopExp_Explorer anExp(aPairIter.OldShape(), theValShape.ShapeType());
+            TopExp_Explorer anExp(aPairIter.OldShape(), aValType);
             for(; anExp.More(); anExp.Next()) {
               if (anExp.Current().IsSame(theValShape)) { // found a new container
-                if (aPairIter.NewShape().IsNull()) {// value was removed
-                  theShapes.Clear();
-                  return;
-                }
+                if (aPairIter.NewShape().IsNull()) // skip removed high-level shape
+                  continue;
                 aNewToOld.Bind(aPairIter.NewShape(), aPairIter.OldShape());
                 anOlds.Add(aPairIter.OldShape());
                 break;
@@ -1154,11 +1153,37 @@ void Model_AttributeSelection::computeValues(
     }
   }
   if (aToFindPart == 2 && !aNewToOld.IsEmpty()) {
+    // also iterate the whole old shape to find not-modified shapes that contain this old
+    TopoDS_Shape anOldContShape = theOldContext->shape()->impl<TopoDS_Shape>();
+    NCollection_Map<TopAbs_ShapeEnum> aNewTypes; // types of shapes to iterate
+    TopTools_DataMapOfShapeShape::Iterator aNewTypeIter(aNewToOld);
+    for(; aNewTypeIter.More(); aNewTypeIter.Next()) {
+      if (aNewTypeIter.Key().ShapeType() != aValType)
+        aNewTypes.Add(aNewTypeIter.Key().ShapeType());
+    }
+    NCollection_Map<TopAbs_ShapeEnum>::Iterator aTypeIter(aNewTypes);
+    for(; aTypeIter.More(); aTypeIter.Next()) {
+      for(TopExp_Explorer anExp(anOldContShape, aTypeIter.Value()); anExp.More(); anExp.Next()) {
+        TopoDS_Shape anOld = anExp.Current();
+        if (aNewToOld.IsBound(anOld) || anOlds.Contains(anOld)) // this was modified
+          continue;
+        TopExp_Explorer aValExp(anOld, aValType);
+        for(; aValExp.More(); aValExp.Next()) {
+          const TopoDS_Shape& anUnchanged = aValExp.Current();
+          if (anUnchanged.IsSame(theValShape)) {
+            aNewToOld.Bind(anOld, anOld);
+            anOlds.Add(anOld);
+            break;
+          }
+        }
+      }
+    }
+
     // map of sub-shapes -> number of occurrences of these shapes in containers
     NCollection_DataMap<TopoDS_Shape, TopTools_MapOfShape, TopTools_ShapeMapHasher> aSubs;
     TopTools_DataMapOfShapeShape::Iterator aContIter(aNewToOld);
     for(; aContIter.More(); aContIter.Next()) {
-      TopExp_Explorer aSubExp(aContIter.Key(), theValShape.ShapeType());
+      TopExp_Explorer aSubExp(aContIter.Key(), aValType);
       for(; aSubExp.More(); aSubExp.Next()) {
         if (!aSubs.IsBound(aSubExp.Current())) {
           aSubs.Bind(aSubExp.Current(), TopTools_MapOfShape());
@@ -1173,12 +1198,51 @@ void Model_AttributeSelection::computeValues(
       aSubsIter(aSubs);
     for(; aSubsIter.More(); aSubsIter.Next()) {
       if (aSubsIter.Value().Size() == aCountInOld) {
-        theShapes.Append(aSubsIter.Key());
+        TopoDS_Shape anOld = aSubsIter.Key();
+        // check this exists in the new shape
+        TopExp_Explorer aNew(aNewContShape, anOld.ShapeType());
+        for (; aNew.More(); aNew.Next()) {
+          if (aNew.Current().IsSame(anOld))
+            break;
+        }
+        if (aNew.More())
+          theShapes.Append(anOld);
       }
     }
   }
   if (theShapes.IsEmpty()) { // nothing was changed
-    theShapes.Append(aWasWholeContext ? TopoDS_Shape() : theValShape);
+    if (aWasWholeContext)
+      theShapes.Append(TopoDS_Shape());
+    else { // if theValShape exists in new context, add it without changes, otherwise - nothing
+      for (TopExp_Explorer aNew(aNewContShape, aValType); aNew.More(); aNew.Next()){
+        if (aNew.Current().IsSame(theValShape)) {
+          theShapes.Append(theValShape);
+          break;
+        }
+      }
+    }
+  } else if (theShapes.Size() > 1) {
+    // check it is possible to remove extra sub-shapes:
+    // keep only shapes with the same number of containers if possible
+    TopAbs_ShapeEnum anAncType = TopAbs_FACE;
+    if (aValType == TopAbs_VERTEX)
+      anAncType = TopAbs_EDGE;
+    TopoDS_Shape anOldContext = theOldContext->shape()->impl<TopoDS_Shape>();
+    TopTools_IndexedDataMapOfShapeListOfShape anOldMap;
+    TopExp::MapShapesAndUniqueAncestors(anOldContext, aValType,  anAncType, anOldMap);
+    if (anOldMap.Contains(theValShape)) {
+      int aNumInOld = anOldMap.FindFromKey(theValShape).Extent();
+      TopTools_IndexedDataMapOfShapeListOfShape aNewMap;
+      TopExp::MapShapesAndUniqueAncestors(aNewContShape, aValType,  anAncType, aNewMap);
+      TopTools_ListOfShape aNewResults;
+      for(TopTools_ListOfShape::Iterator aNewSubs(theShapes); aNewSubs.More(); aNewSubs.Next()) {
+        TopoDS_Shape aCand = aNewSubs.Value();
+        if (aNewMap.Contains(aCand) && aNewMap.FindFromKey(aCand).Extent() == aNumInOld)
+          aNewResults.Append(aCand);
+      }
+      if (!aNewResults.IsEmpty() && aNewResults.Size() < theShapes.Size())
+        theShapes = aNewResults;
+    }
   }
 }
 
@@ -1188,7 +1252,6 @@ bool Model_AttributeSelection::searchNewContext(std::shared_ptr<Model_Document> 
   std::list<ResultPtr>& theResults, TopTools_ListOfShape& theValShapes)
 {
   std::set<ResultPtr> aResults; // to avoid duplicates, new context, null if deleted
-  TopTools_ListOfShape aResContShapes;
   // iterate context and shape, but also if it is sub-shape of main shape, check also it
   TopTools_ListOfShape aContextList;
   aContextList.Append(theContShape);
@@ -1225,7 +1288,6 @@ bool Model_AttributeSelection::searchNewContext(std::shared_ptr<Model_Document> 
       aModifIter.Label().FindAttribute(TNaming_NamedShape::GetID(), aNewNS);
       if (aNewNS->Evolution() == TNaming_MODIFY || aNewNS->Evolution() == TNaming_GENERATED) {
         aResults.insert(aModifierObj);
-        aResContShapes.Append(aModifierObj->shape()->impl<TopoDS_Shape>());
       } else if (aNewNS->Evolution() == TNaming_DELETE) { // a shape was deleted => result is empty
         aResults.insert(ResultPtr());
       } else { // not-processed modification => don't support it
@@ -1233,8 +1295,58 @@ bool Model_AttributeSelection::searchNewContext(std::shared_ptr<Model_Document> 
       }
     }
   }
-  if (aResults.empty())
+  // if there exist context composite and sub-result(s), leave only sub(s)
+  for(std::set<ResultPtr>::iterator aResIter = aResults.begin(); aResIter != aResults.end();) {
+    ResultPtr aParent = ModelAPI_Tools::bodyOwner(*aResIter);
+    for(; aParent.get(); aParent = ModelAPI_Tools::bodyOwner(aParent))
+      if (aResults.count(aParent))
+        break;
+    if (aParent.get()) { // erase from set, so, restart iteration
+      aResults.erase(aParent);
+      aResIter = aResults.begin();
+    } else aResIter++;
+  }
+
+  if (aResults.empty()) {
+    // check the context become concealed by operation which is earlier than this selection
+    std::list<ResultPtr> allRes;
+    ResultPtr aRoot = ModelAPI_Tools::bodyOwner(theContext, true);
+    if (!aRoot.get())
+      aRoot = theContext;
+    ResultBodyPtr aRootBody = std::dynamic_pointer_cast<ModelAPI_ResultBody>(aRoot);
+    if (aRootBody.get()) {
+      ModelAPI_Tools::allSubs(aRootBody, allRes);
+      allRes.push_back(aRootBody);
+    } else
+      allRes.push_back(aRoot);
+
+    FeaturePtr aThisFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(owner());
+    for (std::list<ResultPtr>::iterator aSub = allRes.begin(); aSub != allRes.end(); aSub++) {
+      ResultPtr aResCont = *aSub;
+      const std::set<AttributePtr>& aRefs = aResCont->data()->refsToMe();
+      std::set<AttributePtr>::const_iterator aRef = aRefs.begin();
+      for (; aRef != aRefs.end(); aRef++) {
+        if (!aRef->get() || !(*aRef)->owner().get())
+          continue;
+        // concealed attribute only
+        FeaturePtr aRefFeat = std::dynamic_pointer_cast<ModelAPI_Feature>((*aRef)->owner());
+        if (aRefFeat == aThisFeature)
+          continue;
+        if (!ModelAPI_Session::get()->validators()->isConcealed(
+          aRefFeat->getKind(), (*aRef)->id()))
+          continue;
+        if (theDoc->isLaterByDep(aThisFeature, aRefFeat)) {
+          // for extrusion cut in python script the nested sketch reference may be concealed before
+          // it is nested, so, check this composite feature is valid
+          static ModelAPI_ValidatorsFactory* aFactory = ModelAPI_Session::get()->validators();
+          // need to be validated to update the "Apply" state if not previewed
+          if (aFactory->validate(aRefFeat))
+            return true; // feature conceals result, return true, so the context will be removed
+        }
+      }
+    }
     return false; // no modifications found, must stay the same
+  }
   // iterate all results to find further modifications
   std::set<ResultPtr>::iterator aResIter = aResults.begin();
   for(; aResIter != aResults.end(); aResIter++) {
@@ -1271,7 +1383,7 @@ bool Model_AttributeSelection::searchNewContext(std::shared_ptr<Model_Document> 
   return true; // theResults must be empty: everything is deleted
 }
 
-void Model_AttributeSelection::updateInHistory()
+void Model_AttributeSelection::updateInHistory(bool& theRemove)
 {
   ResultPtr aContext = std::dynamic_pointer_cast<ModelAPI_Result>(myRef.value());
   // only bodies and parts may be modified later in the history, don't do anything otherwise
@@ -1344,17 +1456,36 @@ void Model_AttributeSelection::updateInHistory()
   TopTools_ListOfShape aValShapes;
   if (searchNewContext(aDoc, aNewCShape, aContext, aValShape, aContLab, aNewContexts, aValShapes))
   {
+    std::set<ResultPtr> allContexts, aSkippedContext;
+    std::list<ResultPtr>::iterator aNewContext = aNewContexts.begin();
+    for(; aNewContext != aNewContexts.end(); aNewContext++)
+      allContexts.insert(*aNewContext);
+
+    // if there exist context composite and sub-result(s), leave only sub(s)
+    std::set<ResultPtr>::iterator aResIter = allContexts.begin();
+    for(; aResIter != allContexts.end(); aResIter++) {
+      ResultPtr aParent = ModelAPI_Tools::bodyOwner(*aResIter);
+      for(; aParent.get(); aParent = ModelAPI_Tools::bodyOwner(aParent))
+        if (allContexts.count(aParent))
+          aSkippedContext.insert(aParent);
+    }
+
     GeomAPI_Shape::ShapeType aListShapeType = GeomAPI_Shape::SHAPE;
     if (myParent) {
-      if (myParent->selectionType() == "VERTEX") aListShapeType = GeomAPI_Shape::VERTEX;
-      else if (myParent->selectionType() == "EDGE") aListShapeType = GeomAPI_Shape::EDGE;
-      else if (myParent->selectionType() == "FACE") aListShapeType = GeomAPI_Shape::FACE;
+      if (myParent->selectionType() == "VERTEX" || myParent->selectionType() == "Vertices")
+        aListShapeType = GeomAPI_Shape::VERTEX;
+      else if (myParent->selectionType() == "EDGE" || myParent->selectionType() == "Edges")
+        aListShapeType = GeomAPI_Shape::EDGE;
+      else if (myParent->selectionType() == "FACE" || myParent->selectionType() == "Faces")
+        aListShapeType = GeomAPI_Shape::FACE;
     }
 
     std::list<ResultPtr>::iterator aNewCont = aNewContexts.begin();
     TopTools_ListIteratorOfListOfShape aNewValues(aValShapes);
     bool aFirst = true; // first is set to this, next are appended to parent
     for(; aNewCont != aNewContexts.end(); aNewCont++, aNewValues.Next()) {
+      if (aSkippedContext.count(*aNewCont))
+        continue;
 
       GeomShapePtr aValueShape;
       if (!aNewValues.Value().IsNull()) {
@@ -1372,81 +1503,23 @@ void Model_AttributeSelection::updateInHistory()
         continue;
       }
 
-      ResultPtr aSetContext;
       if (aFirst) {
         setValue(*aNewCont, aValueShape);
-        aSetContext = context();
+        aFirst = false;
       } else if (myParent) {
-        myParent->append(*aNewCont, aValueShape);
-        aSetContext = myParent->value(myParent->size() - 1)->context();
+        if (!myParent->isInList(*aNewCont, aValueShape)) // avoid addition of duplicates
+          myParent->append(*aNewCont, aValueShape);
       }
-
-      // #2826 : error if context is concealed by new context where the value is not presented
-      if (aSetContext.get()) {
-        bool anError = false;
-        std::list<ResultPtr> allRes;
-        ResultPtr aCompContext;
-        ResultBodyPtr aCompBody = ModelAPI_Tools::bodyOwner(aSetContext, true);
-        if (aCompBody.get()) {
-          ModelAPI_Tools::allSubs(aCompBody, allRes);
-          allRes.push_back(aCompBody);
-          aCompContext = aCompBody;
-        }
-        if (allRes.empty())
-          allRes.push_back(aSetContext);
-
-        std::list<ResultPtr>::iterator aSub = allRes.begin();
-        for (; !anError && aSub != allRes.end(); aSub++) {
-          ResultPtr aResCont = *aSub;
-          ResultBodyPtr aResBody = std::dynamic_pointer_cast<ModelAPI_ResultBody>(aResCont);
-          const std::set<AttributePtr>& aRefs = aResCont->data()->refsToMe();
-          std::set<AttributePtr>::const_iterator aRef = aRefs.begin();
-          for (; aRef != aRefs.end(); aRef++) {
-            if (!aRef->get() || !(*aRef)->owner().get())
-              continue;
-            // concealed attribute only
-            FeaturePtr aRefFeat = std::dynamic_pointer_cast<ModelAPI_Feature>((*aRef)->owner());
-            if (!aRefFeat.get())
-              continue;
-            if (!ModelAPI_Session::get()->validators()->isConcealed(
-              aRefFeat->getKind(), (*aRef)->id()))
-              continue;
-            // check the found feature is older than this attribute
-            if (aRefFeat == aThisFeature || aDoc->isLaterByDep(aRefFeat, aThisFeature))
-              continue;
-            // check the found feature don't have the value-shape
-            GeomShapePtr aValue = aFirst ? value() : myParent->value(myParent->size() - 1)->value();
-            if (aValue.get()) {
-              std::list<ResultPtr>::const_iterator aRefResults = aRefFeat->results().cbegin();
-              for(; aRefResults != aRefFeat->results().cend(); aRefResults++) {
-                if ((*aRefResults)->shape().get() &&
-                    !(*aRefResults)->shape()->isSubShape(aValue, false)) { // set error
-                  ResultPtr anEmptyContext;
-                  std::shared_ptr<GeomAPI_Shape> anEmptyShape;
-                  if (aFirst) {
-                    setValue(anEmptyContext, anEmptyShape); // nullify the selection
-                  } else {
-                    myParent->value(myParent->size() - 1)->setValue(anEmptyContext, anEmptyShape);
-                  }
-                  Events_InfoMessage("Model_AttributeSelection",
-                    "Selection of sub-shape of already modified result").send();
-                  anError = true;
-                  break;
-                }
-              }
-              if (anError)
-                break;
-            }
-          }
-        }
-      }
-      aFirst = false;
     }
     if (aFirst) { // nothing was added, all results were deleted
-      ResultPtr anEmptyContext;
-      std::shared_ptr<GeomAPI_Shape> anEmptyShape;
-      setValue(anEmptyContext, anEmptyShape); // nullify the selection
-      return;
+      if (myParent) {
+        theRemove = true;
+      } else {
+        ResultPtr anEmptyContext;
+        std::shared_ptr<GeomAPI_Shape> anEmptyShape;
+        setValue(anEmptyContext, anEmptyShape); // nullify the selection
+        return;
+      }
     }
   }
 }

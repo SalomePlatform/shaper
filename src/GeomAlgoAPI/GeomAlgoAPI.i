@@ -49,6 +49,7 @@
 %shared_ptr(GeomAlgoAPI_Revolution)
 %shared_ptr(GeomAlgoAPI_Rotation)
 %shared_ptr(GeomAlgoAPI_Sewing)
+%shared_ptr(GeomAlgoAPI_SketchBuilder)
 %shared_ptr(GeomAlgoAPI_ShapeBuilder)
 %shared_ptr(GeomAlgoAPI_Translation)
 %shared_ptr(GeomAlgoAPI_Transform)
