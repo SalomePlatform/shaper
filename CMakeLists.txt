@@ -100,6 +100,8 @@ IF(${HAVE_SALOME})
     SET(SHAPER_INSTALL_GUI_DOC share/doc/salome/gui/SHAPER CACHE INTERNAL "" FORCE)
     SET(SHAPER_INSTALL_TUI_DOC share/doc/salome/tui/SHAPER CACHE INTERNAL "" FORCE)
     # without SALOME there is another kind of documentation, separated one
+
+    SALOME_INSTALL_SCRIPTS("shaper_test.py" ${SHAPER_INSTALL_PYTHON_FILES})
 ELSE(${HAVE_SALOME})
     SET(SHAPER_INSTALL_ADDONS addons CACHE INTERNAL "" FORCE)
     SET(SHAPER_INSTALL_BIN bin CACHE INTERNAL "" FORCE)
