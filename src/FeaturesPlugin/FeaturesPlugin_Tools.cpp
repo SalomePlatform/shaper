@@ -38,18 +38,11 @@ void FeaturesPlugin_Tools::loadModifiedShapes(ResultBodyPtr theResultBody,
   for(; aToolIter != theTools.cend(); aToolIter++)
     aShapes.push_back(*aToolIter);
 
-  std::string aVertexName, anEdgeName, aFaceName;
-  if (!theNamePrefix.empty()) {
-    aVertexName = theNamePrefix + "_Vertex";
-    anEdgeName = theNamePrefix + "_Edge";
-    aFaceName = theNamePrefix + "_Face";
-  }
-
   for (ListOfShape::const_iterator anIter = aShapes.begin(); anIter != aShapes.end(); ++anIter)
   {
-    theResultBody->loadModifiedShapes(theMakeShape, *anIter, GeomAPI_Shape::VERTEX, aVertexName);
-    theResultBody->loadModifiedShapes(theMakeShape, *anIter, GeomAPI_Shape::EDGE, anEdgeName);
-    theResultBody->loadModifiedShapes(theMakeShape, *anIter, GeomAPI_Shape::FACE, aFaceName);
+    theResultBody->loadModifiedShapes(theMakeShape, *anIter, GeomAPI_Shape::VERTEX, theNamePrefix);
+    theResultBody->loadModifiedShapes(theMakeShape, *anIter, GeomAPI_Shape::EDGE, theNamePrefix);
+    theResultBody->loadModifiedShapes(theMakeShape, *anIter, GeomAPI_Shape::FACE, theNamePrefix);
   }
 }
 

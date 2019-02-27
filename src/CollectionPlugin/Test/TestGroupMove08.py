@@ -88,7 +88,7 @@ assert(selectionList.size() == 2) # edge selected for the fillet become removed
 assert(aFactory.validate(Group_6.feature()))
 
 model.begin()
-Fillet_3 = model.addFillet(Part_1_doc, [model.selection("EDGE", "[Fillet_1_1/MF:Fillet_Face&Box_1_1/Front][Fillet_1_1/MF:Fillet_Face&Box_1_1/Left]")], 1, 2)
+Fillet_3 = model.addFillet(Part_1_doc, [model.selection("EDGE", "[Fillet_1_1/MF:Fillet&Box_1_1/Front][Fillet_1_1/MF:Fillet&Box_1_1/Left]")], 1, 2)
 model.do()
 # move groups to the end
 Part_1_doc.moveFeature(Group_1.feature(), Fillet_3.feature())

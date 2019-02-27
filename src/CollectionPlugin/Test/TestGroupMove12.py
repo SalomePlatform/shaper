@@ -74,7 +74,7 @@ model.end()
 moveGroupsAndVerify(Part_1_doc, Translation_2.feature(), num_in_groups)
 
 model.begin()
-Translation_3 = model.addTranslation(Part_1_doc, [model.selection("COMPSOLID", "Translation_2_1")], model.selection("VERTEX", "[Translation_2_1_1/MF:Translated_Face&Box_1_1/Back][Translation_2_1_1/MF:Translated_Face&Box_1_1/Bottom][Translation_2_1_1/MF:Translated_Face&Box_1_1/Left]"), model.selection("VERTEX", "PartSet/Origin"))
+Translation_3 = model.addTranslation(Part_1_doc, [model.selection("COMPSOLID", "Translation_2_1")], model.selection("VERTEX", "[Translation_2_1_1/MF:Translated&Box_1_1/Back][Translation_2_1_1/MF:Translated&Box_1_1/Bottom][Translation_2_1_1/MF:Translated&Box_1_1/Left]"), model.selection("VERTEX", "PartSet/Origin"))
 model.end()
 moveGroupsAndVerify(Part_1_doc, Translation_3.feature(), num_in_groups)
 

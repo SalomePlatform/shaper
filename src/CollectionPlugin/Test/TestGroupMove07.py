@@ -59,7 +59,7 @@ assert(selectionList.size() == 12)
 assert(aFactory.validate(Group_3.feature()))
 
 model.begin()
-Symmetry_2 = model.addSymmetry(Part_1_doc, [model.selection("SOLID", "Symmetry_1_1")], model.selection("VERTEX", "[Symmetry_1_1/MF:Symmetried_Face&Box_1_1/Front][Symmetry_1_1/MF:Symmetried_Face&Box_1_1/Left][Symmetry_1_1/MF:Symmetried_Face&Box_1_1/Bottom]"), True)
+Symmetry_2 = model.addSymmetry(Part_1_doc, [model.selection("SOLID", "Symmetry_1_1")], model.selection("VERTEX", "[Symmetry_1_1/MF:Symmetried&Box_1_1/Front][Symmetry_1_1/MF:Symmetried&Box_1_1/Left][Symmetry_1_1/MF:Symmetried&Box_1_1/Bottom]"), True)
 model.do()
 # move groups to the end
 Part_1_doc.moveFeature(Group_1.feature(), Symmetry_2.feature())

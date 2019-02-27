@@ -68,7 +68,7 @@ num_in_groups = [2, 4, 12, 9]
 moveGroupsAndVerify(Part_1_doc, Rotation_1.feature(), num_in_groups)
 
 model.begin()
-Rotation_2 = model.addRotation(Part_1_doc, [model.selection("COMPSOLID", "Rotation_1_1")], model.selection("VERTEX", "[Rotation_1_1_3/MF:Rotated_Face&Box_1_1/Top][Rotation_1_1_3/MF:Rotated_Face&Box_1_1/Front][Rotation_1_1_3/MF:Rotated_Face&Box_1_1/Left]"), model.selection("VERTEX", "[Rotation_1_1_4/MF:Rotated_Face&Box_1_1/Front][Rotation_1_1_4/MF:Rotated_Face&Box_1_1/Bottom][Rotation_1_1_4/MF:Rotated_Face&Box_1_1/Right]"), model.selection("VERTEX", "[Rotation_1_1_2/MF:Rotated_Face&Box_1_1/Back][Rotation_1_1_2/MF:Rotated_Face&Box_1_1/Right][Rotation_1_1_2/MF:Rotated_Face&Box_1_1/Bottom]"))
+Rotation_2 = model.addRotation(Part_1_doc, [model.selection("COMPSOLID", "Rotation_1_1")], model.selection("VERTEX", "[Rotation_1_1_3/MF:Rotated&Box_1_1/Top][Rotation_1_1_3/MF:Rotated&Box_1_1/Front][Rotation_1_1_3/MF:Rotated&Box_1_1/Left]"), model.selection("VERTEX", "[Rotation_1_1_4/MF:Rotated&Box_1_1/Front][Rotation_1_1_4/MF:Rotated&Box_1_1/Bottom][Rotation_1_1_4/MF:Rotated&Box_1_1/Right]"), model.selection("VERTEX", "[Rotation_1_1_2/MF:Rotated&Box_1_1/Back][Rotation_1_1_2/MF:Rotated&Box_1_1/Right][Rotation_1_1_2/MF:Rotated&Box_1_1/Bottom]"))
 model.end()
 moveGroupsAndVerify(Part_1_doc, Rotation_2.feature(), num_in_groups)
 
