@@ -300,7 +300,7 @@ void GeomAlgoAPI_SketchBuilder::build(
     // store face
     aBuilder.Add(aResult, aNewFace);
     std::shared_ptr<GeomAPI_Shape> aResFace(new GeomAPI_Shape);
-    aResFace->setImpl(new TopoDS_Face(aFace));
+    aResFace->setImpl(new TopoDS_Face(aNewFace));
     myResultFaces.push_back(aResFace);
   }
 
