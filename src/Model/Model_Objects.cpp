@@ -770,7 +770,7 @@ void Model_Objects::setUniqueName(FolderPtr theFolder)
   NCollection_DataMap<TDF_Label, ObjectPtr>::Iterator anIt(myFolders);
   while (anIt.More()) {
     if (anIt.Value()->data()->name() == aName) {
-      aName = composeName(ModelAPI_Folder::ID(), aNbFolders);
+      aName = composeName(ModelAPI_Folder::ID(), ++aNbFolders);
       // reinitialize iterator to make sure a new name is unique
       anIt.Initialize(myFolders);
     } else
