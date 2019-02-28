@@ -23,6 +23,7 @@
 #include <BRep_Builder.hxx>
 #include <BRepTools_WireExplorer.hxx>
 #include <Geom_Line.hxx>
+#include <Geom_TrimmedCurve.hxx>
 #include <Precision.hxx>
 #include <Standard_Type.hxx>
 #include <TopoDS.hxx>
@@ -84,6 +85,7 @@ bool GeomAPI_Wire::isRectangle(std::list<GeomPointPtr>& thePoints) const
 
   const TopoDS_Wire& aWire = TopoDS::Wire(impl<TopoDS_Shape>());
   const Handle(Standard_Type)& aLineType = STANDARD_TYPE(Geom_Line);
+  const Handle(Standard_Type)& aTrimmedCurveType = STANDARD_TYPE(Geom_TrimmedCurve);
 
   gp_XYZ aPrevDir(0, 0, 0);
 
@@ -91,6 +93,8 @@ bool GeomAPI_Wire::isRectangle(std::list<GeomPointPtr>& thePoints) const
     const TopoDS_Edge& anEdge = anExp.Current();
     double aT1, aT2;
     Handle(Geom_Curve) aC3D = BRep_Tool::Curve(anEdge, aT1, aT2);
+    while (aC3D->IsKind(aTrimmedCurveType))
+      aC3D = Handle(Geom_TrimmedCurve)::DownCast(aC3D)->BasisCurve();
     if (!aC3D.IsNull() && aC3D->IsKind(aLineType)) {
       gp_Pnt aCorner = BRep_Tool::Pnt(anExp.CurrentVertex());
       thePoints.push_back(GeomPointPtr(new GeomAPI_Pnt(aCorner.X(), aCorner.Y(), aCorner.Z())));

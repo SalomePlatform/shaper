@@ -171,4 +171,5 @@ ADD_UNIT_TESTS(
   TestSphere.py
   TestTorus.py
   Test2675.py
+  Test2879.py
 )
