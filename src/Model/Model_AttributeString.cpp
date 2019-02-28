@@ -57,11 +57,13 @@ std::string Model_AttributeString::value()
     return "";  // not initialized
   return TCollection_AsciiString(myString->Get()).ToCString();
 }
-std::wstring Model_AttributeString::valueW()
+char16_t* Model_AttributeString::valueU()
 {
-  if (myString.IsNull())
-    return std::wstring(L"");  // not initialized
-  return std::wstring((wchar_t*)(myString->Get().ToExtString()));
+  if (myString.IsNull()) {   // not initialized
+    static TCollection_ExtendedString anEmpty;
+    return (char16_t*)(anEmpty.ToExtString());
+  }
+  return (char16_t*)(myString->Get().ToExtString());
 }
 
 Model_AttributeString::Model_AttributeString(TDF_Label& theLabel)

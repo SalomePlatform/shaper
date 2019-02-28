@@ -45,8 +45,8 @@ class Model_AttributeString : public ModelAPI_AttributeString
 
   /// Returns the std::string  value
   MODEL_EXPORT virtual std::string value();
-  /// Returns the std::wstring  value
-  MODEL_EXPORT virtual std::wstring valueW();
+  /// Returns a pointer to Unicode string
+  MODEL_EXPORT virtual char16_t* valueU();
 
  protected:
   /// Initializes attributes

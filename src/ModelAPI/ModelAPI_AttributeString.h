@@ -39,8 +39,8 @@ class ModelAPI_AttributeString : public ModelAPI_Attribute
 
   /// Returns the string value
   MODELAPI_EXPORT virtual std::string value() = 0;
-  /// Returns the wstring value
-  MODELAPI_EXPORT virtual std::wstring valueW() = 0;
+  /// Returns a pointer to Unicode string
+  MODELAPI_EXPORT virtual char16_t* valueU() = 0;
 
   /// Returns the type of this class of attributes
   MODELAPI_EXPORT static std::string typeId()

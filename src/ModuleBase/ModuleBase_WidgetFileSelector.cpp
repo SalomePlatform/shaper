@@ -107,8 +107,8 @@ bool ModuleBase_WidgetFileSelector::restoreValueCustom()
   DataPtr aData = myFeature->data();
   AttributeStringPtr aStringAttr = aData->string(attributeID());
 
-  std::wstring aUtfStr = aStringAttr->valueW();
-  QString aNewText = QString::fromStdWString(aUtfStr);
+  char16_t* aStr = aStringAttr->valueU();
+  QString aNewText = QString::fromUtf16(aStr);
   if (myPathField->text() != aNewText) {
     bool isBlocked = myPathField->blockSignals(true);
     myPathField->setText(aNewText);
