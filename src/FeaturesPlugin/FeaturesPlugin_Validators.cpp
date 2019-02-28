@@ -254,7 +254,7 @@ bool FeaturesPlugin_ValidatorBaseForGeneration::isValid(const AttributePtr& theA
         std::dynamic_pointer_cast<ModelAPI_ResultConstruction>(aContext);
       if(!aResultConstruction.get()) {
         // It is not a result construction.
-        // If shape is compound check that it contains only faces and edges.
+        // If shape is compound check that it contains only faces, edges or vertices.
         GeomShapePtr aShape = aSelectionAttr->value();
         if(!aShape.get()) {
           if (aContext.get()) {
@@ -268,9 +268,10 @@ bool FeaturesPlugin_ValidatorBaseForGeneration::isValid(const AttributePtr& theA
         if(aShape->shapeType() == GeomAPI_Shape::COMPOUND) {
           for(GeomAPI_ShapeIterator anIt(aShape); anIt.more(); anIt.next()) {
             GeomShapePtr aSubShape = anIt.current();
-            if(aSubShape->shapeType() != GeomAPI_Shape::EDGE
+            if(aSubShape->shapeType() != GeomAPI_Shape::VERTEX
+                && aSubShape->shapeType() != GeomAPI_Shape::EDGE
                 && aSubShape->shapeType() != GeomAPI_Shape::FACE) {
-              theError = "Error: Compound should contain only faces and edges.";
+              theError = "Error: Compound should contain only faces, edges or vertices.";
               return false;
             }
           }

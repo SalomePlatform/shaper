@@ -152,8 +152,8 @@
   <context>
     <name>Extrusion:base:FeaturesPlugin_ValidatorBaseForGeneration</name>
     <message>
-      <source>Error: Compound should contain only faces and edges.</source>
-      <translation>Compound should contain only faces and edges.</translation>
+      <source>Error: Compound should contain only faces, edges or vertices.</source>
+      <translation>Compound should contain only faces, edges or vertices.</translation>
     </message>
   </context>
   <context>
@@ -580,8 +580,8 @@
   <context>
     <name>ExtrusionCut:base:FeaturesPlugin_ValidatorBaseForGeneration</name>
     <message>
-      <source>Error: Compound should contain only faces and edges.</source>
-      <translation>Compound should contain only faces and edges.</translation>
+      <source>Error: Compound should contain only faces, edges or vertices.</source>
+      <translation>Compound should contain only faces, edges or vertices.</translation>
     </message>
   </context>
   <context>
@@ -1042,8 +1042,8 @@
   <context>
     <name>Revolution:base:FeaturesPlugin_ValidatorBaseForGeneration</name>
     <message>
-      <source>Error: Compound should contain only faces and edges.</source>
-      <translation>Compound should contain only faces and edges.</translation>
+      <source>Error: Compound should contain only faces, edges or vertices.</source>
+      <translation>Compound should contain only faces, edges or vertices.</translation>
     </message>
   </context>
   <context>
@@ -1448,8 +1448,8 @@
   <context>
     <name>RevolutionCut:base:FeaturesPlugin_ValidatorBaseForGeneration</name>
     <message>
-      <source>Error: Compound should contain only faces and edges.</source>
-      <translation>Compound should contain only faces and edges.</translation>
+      <source>Error: Compound should contain only faces, edges or vertices.</source>
+      <translation>Compound should contain only faces, edges or vertices.</translation>
     </message>
   </context>
   <context>
@@ -1875,8 +1875,8 @@
   <context>
     <name>ExtrusionFuse:base:FeaturesPlugin_ValidatorBaseForGeneration</name>
     <message>
-      <source>Error: Compound should contain only faces and edges.</source>
-      <translation>Compound should contain only faces and edges.</translation>
+      <source>Error: Compound should contain only faces, edges or vertices.</source>
+      <translation>Compound should contain only faces, edges or vertices.</translation>
     </message>
   </context>
   <context>
@@ -2372,8 +2372,8 @@
   <context>
     <name>RevolutionFuse:base:FeaturesPlugin_ValidatorBaseForGeneration</name>
     <message>
-      <source>Error: Compound should contain only faces and edges.</source>
-      <translation>Compound should contain only faces and edges.</translation>
+      <source>Error: Compound should contain only faces, edges or vertices.</source>
+      <translation>Compound should contain only faces, edges or vertices.</translation>
     </message>
   </context>
   <context>
@@ -2932,8 +2932,8 @@
   <context>
     <name>Pipe:base_objects:FeaturesPlugin_ValidatorBaseForGeneration</name>
     <message>
-      <source>Error: Compound should contain only faces and edges.</source>
-      <translation>Compound should contain only faces and edges.</translation>
+      <source>Error: Compound should contain only faces, edges or vertices.</source>
+      <translation>Compound should contain only faces, edges or vertices.</translation>
     </message>
   </context>
   <context>
