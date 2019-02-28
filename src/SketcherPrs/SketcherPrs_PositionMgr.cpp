@@ -150,14 +150,17 @@ const std::array<int, 2>& SketcherPrs_PositionMgr::getPositionIndex(GeomPointPtr
       if (aUseFeature) {
         DataPtr aData = aFeature->data();
         AttributeRefAttrPtr aObjRef = aData->refattr(SketchPlugin_Constraint::ENTITY_A());
-        FeaturePtr aObj = ModelAPI_Feature::feature(aObjRef->object());
+        FeaturePtr aObj;
+        if (aObjRef)
+          aObj = ModelAPI_Feature::feature(aObjRef->object());
         bool aContains = false;
-        if (containsPoint(aObj, aPnt2d, thePos)) {
+        if (aObj && containsPoint(aObj, aPnt2d, thePos)) {
           aContains = true;
         } else {
           aObjRef = aData->refattr(SketchPlugin_Constraint::ENTITY_B());
-          aObj = ModelAPI_Feature::feature(aObjRef->object());
-          if (containsPoint(aObj, aPnt2d, thePos)) {
+          if (aObjRef)
+            aObj = ModelAPI_Feature::feature(aObjRef->object());
+          if (aObj && containsPoint(aObj, aPnt2d, thePos)) {
             aContains = true;
           }
         }
