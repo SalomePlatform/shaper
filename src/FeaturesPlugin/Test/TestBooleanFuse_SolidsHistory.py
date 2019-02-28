@@ -51,11 +51,11 @@ SketchCircle_2 = Sketch_2.addCircle(-5.846059113300496, 9.453201970443347, 11.01
 model.do()
 Extrusion_1 = model.addExtrusion(Part_1_doc, [model.selection("COMPOUND", "all-in-Sketch_1")], model.selection(), 10, 0)
 Extrusion_2 = model.addExtrusion(Part_1_doc, [model.selection("COMPOUND", "Sketch_2")], model.selection(), 11, 1)
-Group_1_objects = [model.selection("SOLID", "Extrusion_1_2_1"), model.selection("SOLID", "Extrusion_1_2_2"), model.selection("SOLID", "Extrusion_2_1"), model.selection("SOLID", "Extrusion_1_1")]
+Group_1_objects = [model.selection("SOLID", "Extrusion_1_1_1"), model.selection("SOLID", "Extrusion_1_1_2"), model.selection("SOLID", "Extrusion_2_1"), model.selection("SOLID", "Extrusion_1_2")]
 Group_1 = model.addGroup(Part_1_doc, Group_1_objects)
-Group_2_objects = [model.selection("FACE", "Extrusion_1_2_1/To_Face"), model.selection("FACE", "Extrusion_1_2_2/To_Face"), model.selection("FACE", "Extrusion_2_1/To_Face"), model.selection("FACE", "Extrusion_1_1/To_Face")]
+Group_2_objects = [model.selection("FACE", "Extrusion_1_1_1/To_Face"), model.selection("FACE", "Extrusion_1_1_2/To_Face"), model.selection("FACE", "Extrusion_2_1/To_Face"), model.selection("FACE", "Extrusion_1_2/To_Face")]
 Group_2 = model.addGroup(Part_1_doc, Group_2_objects)
-Fuse_1_objects_1 = [model.selection("SOLID", "Extrusion_1_2_2"), model.selection("SOLID", "Extrusion_2_1"), model.selection("SOLID", "Extrusion_1_1")]
+Fuse_1_objects_1 = [model.selection("SOLID", "Extrusion_1_1_2"), model.selection("SOLID", "Extrusion_2_1"), model.selection("SOLID", "Extrusion_1_2")]
 Fuse_1 = model.addFuse(Part_1_doc, Fuse_1_objects_1)
 model.do()
 # move group

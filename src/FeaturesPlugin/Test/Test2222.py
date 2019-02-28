@@ -43,7 +43,7 @@ Face_1_objects = [model.selection("EDGE", "Sketch_1/SketchLine_2"), model.select
 Face_1 = model.addFace(Part_1_doc, Face_1_objects)
 Plane_4 = model.addPlane(Part_1_doc, model.selection("FACE", "PartSet/YOZ"), 1, False)
 Partition_1 = model.addPartition(Part_1_doc, [model.selection("FACE", "Face_1_1"), model.selection("FACE", "Plane_1")])
-Group_1 = model.addGroup(Part_1_doc, [model.selection("EDGE", "Partition_1_1_2/Modified_Edge&Face_1_1/Edge_4")])
+Group_1 = model.addGroup(Part_1_doc, [model.selection("EDGE", "Partition_1_1_2/Modified_Edge&Sketch_1/SketchLine_1")])
 model.do()
 model.end()
 

@@ -184,17 +184,17 @@ Face_1_objects = [model.selection("EDGE", "Sketch_1/SketchArc_2_2"), model.selec
 Face_1 = model.addFace(Part_1_doc, Face_1_objects)
 Intersection_1 = model.addIntersection(Part_1_doc, [model.selection("SOLID", "Recover_1_1"), model.selection("FACE", "Face_1_1")])
 Group_1_objects = [
-model.selection("VERTEX", "[Intersection_1_1_3/Intersection_1_1_3&Face_1_1/Edge_3][weak_name_2]"),
-model.selection("VERTEX", "[Intersection_1_1_1/Intersection_1_1_1][weak_name_2]"),
-model.selection("VERTEX", "[Intersection_1_1_9/Intersection_1_1_9&Face_1_1/Edge_7][weak_name_1]"),
-model.selection("VERTEX", "[Intersection_1_1_7/Intersection_1_1_7&Face_1_1/Edge_5][weak_name_2]"),
-model.selection("VERTEX", "[Intersection_1_1_4/Intersection_1_1_4][weak_name_2]"),
-model.selection("VERTEX", "[Intersection_1_1_1/Intersection_1_1_1][weak_name_1]"),
-model.selection("VERTEX", "[Intersection_1_1_2/Intersection_1_1_2&Face_1_1/Edge_2][weak_name_1]"),
-model.selection("VERTEX", "[Intersection_1_1_4/Intersection_1_1_4][weak_name_1]"),
-model.selection("VERTEX", "[Intersection_1_1_6/Intersection_1_1_6&Face_1_1/Edge_4][weak_name_2]"),
-model.selection("VERTEX", "[Intersection_1_1_10/Intersection_1_1_10&Face_1_1/Edge_8][weak_name_1]"),
-model.selection("VERTEX", "[Intersection_1_1_8/Intersection_1_1_8&Face_1_1/Edge_6][weak_name_1]")]
+model.selection("VERTEX", "Intersection_1_1_3/Modified_Vertex&Sketch_1/SketchLine_1_StartVertex&Sketch_1/SketchLine_8_EndVertex"),
+model.selection("VERTEX", "[Intersection_1_1_1/Intersection_1_1_1]e[weak_name_2]"),
+model.selection("VERTEX", "Intersection_1_1_9/Modified_Vertex&Sketch_1/SketchLine_5_StartVertex&Sketch_1/SketchLine_4_EndVertex"),
+model.selection("VERTEX", "Intersection_1_1_7/Modified_Vertex&Sketch_1/SketchLine_7_StartVertex&Sketch_1/SketchLine_6_EndVertex"),
+model.selection("VERTEX", "[Intersection_1_1_4/Intersection_1_1_4]e[weak_name_2]"),
+model.selection("VERTEX", "[Intersection_1_1_1/Intersection_1_1_1]e[weak_name_1]"),
+model.selection("VERTEX", "Intersection_1_1_2/Modified_Vertex&Sketch_1/SketchLine_2_EndVertex&Sketch_1/SketchArc_2_2_EndVertex"),
+model.selection("VERTEX", "[Intersection_1_1_4/Intersection_1_1_4]e[weak_name_1]"),
+model.selection("VERTEX", "Intersection_1_1_6/Modified_Vertex&Sketch_1/SketchLine_8_StartVertex&Sketch_1/SketchLine_7_EndVertex"),
+model.selection("VERTEX", "Intersection_1_1_10/Modified_Vertex&Sketch_1/SketchLine_4_StartVertex&Sketch_1/SketchArc_2_2_StartVertex"),
+model.selection("VERTEX", "Intersection_1_1_8/Modified_Vertex&Sketch_1/SketchLine_6_StartVertex&Sketch_1/SketchLine_5_EndVertex")]
 
 Group_1 = model.addGroup(Part_1_doc, Group_1_objects)
 Group_2_objects = [model.selection("EDGE", "Intersection_1_1_7"), model.selection("EDGE", "Intersection_1_1_6"), model.selection("EDGE", "Intersection_1_1_3"), model.selection("EDGE", "Intersection_1_1_11"), model.selection("EDGE", "Intersection_1_1_5"), model.selection("EDGE", "Intersection_1_1_1"), model.selection("EDGE", "Intersection_1_1_4"), model.selection("EDGE", "Intersection_1_1_2"), model.selection("EDGE", "Intersection_1_1_10"), model.selection("EDGE", "Intersection_1_1_9"), model.selection("EDGE", "Intersection_1_1_8")]

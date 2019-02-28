@@ -45,7 +45,7 @@ SketchConstraintVertical_2 = Sketch_2.setVertical(SketchLine_4.result())
 model.do()
 Extrusion_1 = model.addExtrusion(Part_1_doc, [model.selection("FACE", "Sketch_2/Face-SketchLine_1r-SketchLine_2f-SketchLine_3f-SketchLine_4f")], model.selection(), 10, 10)
 Cut_1 = model.addCut(Part_1_doc, [model.selection("FACE", "Face_1_1")], [model.selection("SOLID", "Extrusion_1_1")])
-Group_1_objects = [model.selection("VERTEX", "Cut_1_1/Generated_Vertex&Sketch_2/SketchLine_3&Face_1_1/Edge_1"), model.selection("FACE", "Cut_1_1"), model.selection("FACE", "Cut_1_1"), model.selection("VERTEX", "Cut_1_1/Generated_Vertex&Face_1_1/Face_1_1")]
+Group_1_objects = [model.selection("VERTEX", "Cut_1_1/Generated_Vertex&Sketch_2/SketchLine_3&Sketch_1/SketchCircle_1_2"), model.selection("FACE", "Cut_1_1"), model.selection("FACE", "Cut_1_1"), model.selection("VERTEX", "Cut_1_1/Generated_Vertex&Face_1_1/Face_1_1")]
 Group_1 = model.addGroup(Part_1_doc, Group_1_objects)
 Group_2_objects = [model.selection("FACE", "Cut_1_1"), model.selection("EDGE", "Cut_1_1/Generated_Edge&Sketch_2/SketchLine_3&Face_1_1/Face_1_1"), model.selection("VERTEX", "Cut_1_1/Generated_Vertex&Face_1_1/Face_1_1"), model.selection("FACE", "Cut_1_1")]
 Group_2 = model.addGroup(Part_1_doc, Group_2_objects)
