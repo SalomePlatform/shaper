@@ -441,7 +441,7 @@ void Model_Update::processEvent(const std::shared_ptr<Events_Message>& theMessag
     Events_Loop::loop()->flush(kRedisplayEvent);
 
     // in the end of transaction everything is updated, so clear the old objects
-    myIsParamUpdated = false;
+    //myIsParamUpdated = false; // to avoid problems in sprocket.py parameter update
     myWaitForFinish.clear();
   } else if (theMessage->eventID() == kReorderEvent) {
     std::shared_ptr<ModelAPI_OrderUpdatedMessage> aMsg =
