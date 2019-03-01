@@ -22,7 +22,7 @@ ALL+=' Config Events GeomValidators Model_ ModelGeomAlgo Selector SketchSolver G
 # prepare API report
 cp -f covfile covAPI
 # remove all plugins data except the needed
-NEED='BuildAPI CollectionAPI ConnectorAPI ConstructionAPI ExchangeAPI FeaturesAPI GDMLAPI ModelHighAPI ParametersAPI PartSetAPI PrimitivesAPI SketchAPI'
+NEED='BuildAPI CollectionAPI ConnectorAPI ConstructionAPI ExchangeAPI FeaturesAPI ModelHighAPI ParametersAPI PartSetAPI PrimitivesAPI SketchAPI'
 for MASK in $ALL; do
   if ! [[ " $NEED " =~ " $MASK " ]]; then
     lcov -r covAPI *${MASK}* --output-file covAPI_res -q
@@ -46,6 +46,11 @@ done
 # exclude GeomAPI_AISObject as GUI-related object
 lcov -r covDirect GeomAPI_AISObject* --output-file covDirect_res -q
 mv -f covDirect_res covDirect
+# exclude coverage of algorithms related to GDML plugin
+lcov -r covDirect GeomAlgoAPI_ConeSegment* --output-file covDirect_res -q
+mv -f covDirect_res covDirect
+lcov -r covDirect GeomAlgoAPI_Ellipsoid* --output-file covDirect_res -q
+mv -f covDirect_res covDirect
 rm -rf lcov_htmlDirect
 genhtml covDirect --output-directory lcov_htmlDirect -q
 
@@ -53,7 +58,7 @@ genhtml covDirect --output-directory lcov_htmlDirect -q
 # prepare Else report
 cp -f covfile covElse
 # remove all plugins data except the needed
-NEED='BuildPlugin CollectionPlugin Config ConstructionPlugin Events ExchangePlugin FeaturesPlugin GDMLPlugin GeomData GeomDataAPI GeomValidators InitializationPlugin Model_ ModelAPI ModelGeomAlgo ParametersPlugin PartSetPlugin PrimitivesPlugin Selector SketchPlugin SketchSolver'
+NEED='BuildPlugin CollectionPlugin Config ConstructionPlugin Events ExchangePlugin FeaturesPlugin GeomData GeomDataAPI GeomValidators InitializationPlugin Model_ ModelAPI ModelGeomAlgo ParametersPlugin PartSetPlugin PrimitivesPlugin Selector SketchPlugin SketchSolver'
 for MASK in $ALL; do
   if ! [[ " $NEED " =~ " $MASK " ]]; then
     lcov -r covElse *${MASK}* --output-file covElse_res -q

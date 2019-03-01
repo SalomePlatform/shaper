@@ -114,6 +114,7 @@ int GeomAPI_DataMapOfShapeMapOfShapes::size() const
   return MY_MAP->Size();
 }
 
+// LCOV_EXCL_START
 
 //=================================================================================================
 //   iterator implementation
@@ -268,3 +269,4 @@ GeomAPI_DataMapOfShapeMapOfShapes::const_iterator GeomAPI_DataMapOfShapeMapOfSha
 {
   return IteratorImpl(std::shared_ptr<IteratorImpl>());
 }
+// LCOV_EXCL_STOP
