@@ -60,7 +60,7 @@ assert(aFactory.validate(Group_1.feature()))
 
 # same-plane faces should be merged
 selectionList = Group_2.feature().selectionList("group_list")
-assert(selectionList.size() == 11)
+assert(selectionList.size() == 7)
 assert(aFactory.validate(Group_2.feature()))
 
 # shared edges of merged faces should be deleted

@@ -73,7 +73,7 @@ Face_1 = model.addFace(Part_1_doc, Face_1_objects)
 model.do()
 model.end()
 
-num_in_groups = [4, 8]
+num_in_groups = [4, 4]
 moveGroupsAndVerify(Part_1_doc, Face_1.feature(), num_in_groups)
 
 assert(model.checkPythonDump())

@@ -63,12 +63,12 @@ Part_1_doc.moveFeature(Group_1.feature(), Fuse_1.feature())
 Part_1_doc.moveFeature(Group_2.feature(), Group_1.feature())
 model.end()
 
-# Check group 1: 3 solids
+# All solids are merged to one - result
 aFactory = ModelAPI_Session.get().validators()
 selectionList = Group_1.feature().selectionList("group_list")
-assert(selectionList.size() == 3)
+assert(selectionList.size() == 1)
 assert(aFactory.validate(Group_1.feature()))
-for i in range(3):
+for i in range(1):
   assert(Group_1.groupList().value(i).value().shapeType() == GeomAPI_Shape.SOLID)
 
 # Check group 2: 3 faces
