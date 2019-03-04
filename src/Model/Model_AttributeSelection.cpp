@@ -1504,8 +1504,10 @@ void Model_AttributeSelection::updateInHistory(bool& theRemove)
       }
 
       if (aFirst) {
-        setValue(*aNewCont, aValueShape);
-        aFirst = false;
+        if (!myParent || !myParent->isInList(*aNewCont, aValueShape)) { // avoid duplicates
+          setValue(*aNewCont, aValueShape);
+          aFirst = false;
+        }
       } else if (myParent) {
         if (!myParent->isInList(*aNewCont, aValueShape)) // avoid addition of duplicates
           myParent->append(*aNewCont, aValueShape);
