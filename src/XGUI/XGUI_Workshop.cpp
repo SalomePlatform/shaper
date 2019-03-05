@@ -2700,11 +2700,27 @@ void XGUI_Workshop::synchronizeGroupInViewer(const DocumentPtr& theDoc,
       ResultPtr aRes = std::dynamic_pointer_cast<ModelAPI_Result>(aObj);
       if (aRes.get() && (!aRes->shape().get() || aRes->shape()->isNull()))
         continue;
-      myDisplayer->display(aObj, false);
+      ResultBodyPtr aResBody = std::dynamic_pointer_cast<ModelAPI_ResultBody>(aObj);
+      if (aResBody.get())
+        synchronizeResultTree(aResBody, false);
+      else
+        myDisplayer->display(aObj, false);
     }
   }
   if (theUpdateViewer)
     myDisplayer->updateViewer();
+}
+
+void XGUI_Workshop::synchronizeResultTree(const ResultBodyPtr& theRes, bool theUpdateViewer)
+{
+  if (theRes->numberOfSubs() > 0)
+    for (int i = 0; i < theRes->numberOfSubs(); i++) {
+      ResultBodyPtr aRes = theRes->subResult(i);
+      if (aRes.get())
+        synchronizeResultTree(aRes, theUpdateViewer);
+    }
+  else
+    myDisplayer->display(theRes, theUpdateViewer);
 }
 #endif
 

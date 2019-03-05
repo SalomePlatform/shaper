@@ -24,6 +24,7 @@
 
 #include <ModelAPI_Document.h>
 #include <ModelAPI_Feature.h>
+#include <ModelAPI_ResultBody.h>
 
 #include <ModuleBase_ActionInfo.h>
 #include <ModuleBase_ActionType.h>
@@ -286,6 +287,8 @@ Q_OBJECT
   void synchronizeGroupInViewer(const DocumentPtr& theDoc,
                                 const std::string& theGroup,
                                 bool theUpdateViewer);
+
+  void synchronizeResultTree(const ResultBodyPtr& theRes, bool theUpdateViewer);
 
 #endif
   /// Update the property panel content by the XML description of the operation and set the panel
