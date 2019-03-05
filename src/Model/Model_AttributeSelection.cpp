@@ -1340,12 +1340,31 @@ bool Model_AttributeSelection::searchNewContext(std::shared_ptr<Model_Document> 
           // it is nested, so, check this composite feature is valid
           static ModelAPI_ValidatorsFactory* aFactory = ModelAPI_Session::get()->validators();
           // need to be validated to update the "Apply" state if not previewed
-          if (aFactory->validate(aRefFeat))
-            return true; // feature conceals result, return true, so the context will be removed
+          if (aFactory->validate(aRefFeat)) {
+            // there could be a reference to unmodified object, check result contain same shape
+            std::list<ResultPtr> aRefResults;
+            ModelAPI_Tools::allResults(aRefFeat, aRefResults);
+            std::list<ResultPtr>::iterator aRefIter = aRefResults.begin();
+            for(; aRefIter != aRefResults.end(); aRefIter++) {
+              ResultBodyPtr aRefBody = std::dynamic_pointer_cast<ModelAPI_ResultBody>(*aRefIter);
+              if (!aRefBody.get() || aRefBody->numberOfSubs() != 0) // iterate only leafs
+                continue;
+              GeomShapePtr aRefShape = aRefBody->shape();
+              if (!aRefShape.get() || aRefShape->isNull())
+                continue;
+              if (aRefShape->impl<TopoDS_Shape>().IsSame(theContShape)) {
+                // add the new context result with the same shape
+                aResults.insert(aRefBody);
+              }
+            }
+            if (aResults.empty())
+              return true; // feature conceals result, return true, so the context will be removed
+          }
         }
       }
     }
-    return false; // no modifications found, must stay the same
+    if (aResults.empty())
+      return false; // no modifications found, must stay the same
   }
   // iterate all results to find further modifications
   std::set<ResultPtr>::iterator aResIter = aResults.begin();

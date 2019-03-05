@@ -380,8 +380,24 @@ void Model_BodyBuilder::storeModified(const std::list<GeomShapePtr>& theOldShape
       aStored = !aBuilder->NamedShape()->IsEmpty();
     }
   }
-  if (!aStored) { // store as PRIMITIVE, but clean in any way
-    store(theNewShape);
+  if (!aStored) {
+    // check the new shape is already in the tree, so, no need to store primitive, just reference
+    std::shared_ptr<Model_Data> aData = std::dynamic_pointer_cast<Model_Data>(data());
+    if (aData.get()) {
+      TDF_Label aShapeLab = aData->shapeLab();
+      TopoDS_Shape aShapeNew = theNewShape->impl<TopoDS_Shape>();
+      Handle(TNaming_NamedShape) aNS = TNaming_Tool::NamedShape(aShapeNew, aShapeLab);
+      // the last condition is for the issue 2751 : existing shape may be found in compound-NS
+      if (!aNS.IsNull() && !aNS->IsEmpty() && aNS->Get().IsSame(aShapeNew)) {
+        // This shape is already in document, store reference instead of shape;
+        const TDF_Label aFoundLabel = aNS->Label();
+        TDF_Reference::Set(aShapeLab, aFoundLabel);
+        myBuilders.erase(0);
+        aShapeLab.ForgetAttribute(TNaming_NamedShape::GetID());
+        return;
+      }
+    }
+    store(theNewShape); // store as PRIMITIVE, but clean in any way
     return;
   }
 }
