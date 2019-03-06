@@ -1,6 +1,6 @@
 #!/bin/bash -x
 
-export SALOME_DIR=/dn46/SALOME/stable/V9_2_0
+export SALOME_DIR=/dn46/SALOME/series9x/current-2019-03-06
 
 # Path to sources
 export SOURCES_DIR=$(pwd)
