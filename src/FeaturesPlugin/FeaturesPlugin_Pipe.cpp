@@ -238,7 +238,7 @@ void FeaturesPlugin_Pipe::execute()
         break;
       }
 
-      storeResult(aBaseShape, aPipeAlgo, aResultIndex++);
+      storeResult(aBaseShape, aPathShape, aPipeAlgo, aResultIndex++);
     }
   } else if(aCreationMethod == CREATION_METHOD_LOCATIONS()) {
     std::shared_ptr<GeomAlgoAPI_Pipe> aPipeAlgo(new GeomAlgoAPI_Pipe(aBaseShapesList,
@@ -251,7 +251,7 @@ void FeaturesPlugin_Pipe::execute()
       return;
     }
 
-    storeResult(aBaseShapesList, aPipeAlgo, aResultIndex++);
+    storeResult(aBaseShapesList, aPathShape, aPipeAlgo, aResultIndex++);
   } else {
     setError("Error: Wrong creation method.");
     return;
@@ -262,6 +262,7 @@ void FeaturesPlugin_Pipe::execute()
 
 //==================================================================================================
 void FeaturesPlugin_Pipe::storeResult(const std::shared_ptr<GeomAPI_Shape> theBaseShape,
+                                      const std::shared_ptr<GeomAPI_Shape> thePathShape,
                                       const std::shared_ptr<GeomAlgoAPI_Pipe> thePipeAlgo,
                                       const int theResultIndex)
 {
@@ -312,6 +313,8 @@ void FeaturesPlugin_Pipe::storeResult(const std::shared_ptr<GeomAPI_Shape> theBa
       aShapeTypeToExplode == GeomAPI_Shape::COMPOUND) {
     aResultBody->loadGeneratedShapes(thePipeAlgo, theBaseShape, GeomAPI_Shape::EDGE);
   }
+  if (thePathShape.get())
+    aResultBody->loadGeneratedShapes(thePipeAlgo, thePathShape, GeomAPI_Shape::EDGE);
 
   // Store from shapes.
   storeShapes(aResultBody, aBaseShapeType, thePipeAlgo->fromShapes(), "From_");
@@ -324,6 +327,7 @@ void FeaturesPlugin_Pipe::storeResult(const std::shared_ptr<GeomAPI_Shape> theBa
 
 //==================================================================================================
 void FeaturesPlugin_Pipe::storeResult(const ListOfShape& theBaseShapes,
+                                      const std::shared_ptr<GeomAPI_Shape> thePathShape,
                                       const std::shared_ptr<GeomAlgoAPI_Pipe> thePipeAlgo,
                                       const int theResultIndex)
 {
@@ -364,6 +368,9 @@ void FeaturesPlugin_Pipe::storeResult(const ListOfShape& theBaseShapes,
     }
     aResultBody->loadGeneratedShapes(thePipeAlgo, aBaseShape, aShapeTypeToExplode);
   }
+
+  if (thePathShape.get())
+    aResultBody->loadGeneratedShapes(thePipeAlgo, thePathShape, GeomAPI_Shape::EDGE);
 
   // Store from shapes.
   storeShapes(aResultBody, theBaseShapes.front()->shapeType(), thePipeAlgo->fromShapes(), "From_");

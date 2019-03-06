@@ -36,6 +36,7 @@
 /// Face -> Solid
 class GeomAlgoAPI_Pipe : public GeomAlgoAPI_MakeSweep
 {
+  GeomAPI_DataMapOfShapeShape myMovedPath; ///< map from initial path edges to the moved
 public:
   /// \brief Creates extrusion for the given shape along a path.
   /// \param[in] theBaseShape base shape(vertex, edge, wire of face).
@@ -78,6 +79,8 @@ private:
   void build(const ListOfShape& theBaseShapes,
              const ListOfShape& theLocations,
              const GeomShapePtr thePathShape);
+  /// keeps the information about the moved path shapes into myMovedPath field
+  void addMovedPath(GeomShapePtr thePath, GeomShapePtr theMoved);
 };
 
 #endif

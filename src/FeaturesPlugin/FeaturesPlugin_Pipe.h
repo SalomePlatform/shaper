@@ -120,10 +120,12 @@ public:
 
 private:
   void storeResult(const std::shared_ptr<GeomAPI_Shape> theBaseShape,
+                   const std::shared_ptr<GeomAPI_Shape> thePathShape,
                    const std::shared_ptr<GeomAlgoAPI_Pipe> thePipeAlgo,
                    const int theResultIndex = 0);
 
   void storeResult(const ListOfShape& theBaseShapes,
+                   const std::shared_ptr<GeomAPI_Shape> thePathShape,
                    const std::shared_ptr<GeomAlgoAPI_Pipe> thePipeAlgo,
                    const int theResultIndex = 0);
 

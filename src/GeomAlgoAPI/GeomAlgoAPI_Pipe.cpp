@@ -24,6 +24,7 @@
 #include <GeomAPI_Dir.h>
 #include <GeomAPI_Edge.h>
 #include <GeomAPI_Lin.h>
+#include <GeomAPI_ShapeExplorer.h>
 
 #include <BRep_Tool.hxx>
 #include <BRepExtrema_DistShapeShape.hxx>
@@ -96,7 +97,12 @@ void GeomAlgoAPI_Pipe::build(const GeomShapePtr theBaseShape,
   if(!getPath(aPathWire, thePathShape)) {
     return;
   }
+  GeomShapePtr anOldPath(new GeomAPI_Shape), aNewPath(new GeomAPI_Shape);
+  anOldPath->setImpl(new TopoDS_Shape(aPathWire));
   aPathWire.Move(getPathToBaseTranslation(aBaseShape, aPathWire));
+  aNewPath->setImpl(new TopoDS_Shape(aPathWire));
+  if (!anOldPath->isSame(aNewPath))
+    addMovedPath(anOldPath, aNewPath);
 
   // Making pipe.
   BRepOffsetAPI_MakePipe* aPipeBuilder = new BRepOffsetAPI_MakePipe(aPathWire, aBaseShape);
@@ -140,7 +146,12 @@ void GeomAlgoAPI_Pipe::build(const GeomShapePtr theBaseShape,
     return;
   }
 
+  GeomShapePtr anOldPath(new GeomAPI_Shape), aNewPath(new GeomAPI_Shape);
+  anOldPath->setImpl(new TopoDS_Shape(aPathWire));
   aPathWire.Move(getPathToBaseTranslation(theBaseShape->impl<TopoDS_Shape>(), aPathWire));
+  aNewPath->setImpl(new TopoDS_Shape(aPathWire));
+  if (!anOldPath->isSame(aNewPath))
+    addMovedPath(anOldPath, aNewPath);
 
   // Getting Bi-Normal.
   TopoDS_Shape aBiNormalShape = theBiNormal->impl<TopoDS_Shape>();
@@ -211,7 +222,13 @@ void GeomAlgoAPI_Pipe::build(const ListOfShape& theBaseShapes,
 
   TopoDS_Shape aReallyBase = theBaseShapes.front()->impl<TopoDS_Shape>();
   gp_Trsf aTrsf = getPathToBaseTranslation(aReallyBase, aPathWire);
+
+  GeomShapePtr anOldPath(new GeomAPI_Shape), aNewPath(new GeomAPI_Shape);
+  anOldPath->setImpl(new TopoDS_Shape(aPathWire));
   aPathWire.Move(aTrsf);
+  aNewPath->setImpl(new TopoDS_Shape(aPathWire));
+  if (!anOldPath->isSame(aNewPath))
+    addMovedPath(anOldPath, aNewPath);
 
   // Get locations after moving path shape.
   std::list<TopoDS_Vertex> aLocations;
@@ -329,7 +346,10 @@ void GeomAlgoAPI_Pipe::build(const ListOfShape& theBaseShapes,
 void GeomAlgoAPI_Pipe::generated(const GeomShapePtr theShape,
                                  ListOfShape& theHistory)
 {
-  GeomAlgoAPI_MakeShape::generated(theShape, theHistory);
+  if (myMovedPath.isBound(theShape))
+    GeomAlgoAPI_MakeShape::generated(myMovedPath.find(theShape), theHistory);
+  else
+    GeomAlgoAPI_MakeShape::generated(theShape, theHistory);
 }
 
 // Auxilary functions:
@@ -439,4 +459,15 @@ ListOfShape getListFromShape(const TopoDS_Shape& theShape)
   }
 
   return aList;
+}
+
+//==================================================================================================
+void GeomAlgoAPI_Pipe::addMovedPath(GeomShapePtr thePath, GeomShapePtr theMoved)
+{
+  myMovedPath.clear();
+  GeomAPI_ShapeExplorer anOldExp(thePath, GeomAPI_Shape::EDGE);
+  GeomAPI_ShapeExplorer aNewExp(theMoved, GeomAPI_Shape::EDGE);
+  for(; anOldExp.more(); anOldExp.next(), aNewExp.next()) {
+    myMovedPath.bind(anOldExp.current(), aNewExp.current());
+  }
 }
