@@ -106,6 +106,10 @@ void GeomAlgoAPI_Boolean::build(const ListOfShape& theObjects,
   aBuilder->SetArguments(anObjects);
   aBuilder->SetTools(aTools);
 
+  // Set parallel processing mode (default is false)
+  Standard_Boolean bRunParallel = Standard_True;
+  aBuilder->SetRunParallel(bRunParallel);
+
   // Building and getting result.
   aBuilder->Perform();
   if (aBuilder->HasErrors())

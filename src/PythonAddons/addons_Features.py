@@ -21,7 +21,6 @@
 """
 
 import ModelAPI
-from macros.box.feature       import BoxFeature
 from macros.rectangle.feature import SketchPlugin_Rectangle
 
 
@@ -42,10 +41,7 @@ class PythonFeaturesPlugin(ModelAPI.ModelAPI_Plugin):
         """Override ModelAPI_Plugin.createFeature()"""
         aFeature = None
 
-        if theFeatureID == BoxFeature.ID():
-            aFeature = BoxFeature().__disown__()
-
-        elif theFeatureID == SketchPlugin_Rectangle.ID():
+        if theFeatureID == SketchPlugin_Rectangle.ID():
             aFeature = SketchPlugin_Rectangle().__disown__()
 
         else:

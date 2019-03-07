@@ -19,5 +19,4 @@ Two examples of already created custom features are:
    :titlesonly:
    :maxdepth: 1
 
-   boxFeature.rst
    rectangleFeature.rst
