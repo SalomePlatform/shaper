@@ -1,4 +1,3 @@
 <plugin>
-  <source path="@ADDONS_FOLDER_PATH@/macros/box/widget.xml"/>
   <source path="@ADDONS_FOLDER_PATH@/macros/rectangle/widget.xml"/>
 </plugin>
