@@ -71,7 +71,7 @@
           <source path="partition_widget.xml"/>
       </feature>
       <feature id="Split" title="Split" tooltip="Perform boolean split operation with objects"
-               icon="icons/Features/bool_split.png" helpfile="fillFeature.html"
+               icon="icons/Features/bool_split.png" helpfile="splitFeature.html"
                auto_preview="false">
           <source path="boolean_split_widget.xml"/>
       </feature>
