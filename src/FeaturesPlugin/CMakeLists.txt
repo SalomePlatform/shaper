@@ -112,7 +112,7 @@ SET(XML_RESOURCES
   boolean_widget.xml
   boolean_fuse_widget.xml
   boolean_common_widget.xml
-  boolean_fill_widget.xml
+  boolean_split_widget.xml
   boolean_smash_widget.xml
   recover_widget.xml
   partition_widget.xml

@@ -32,7 +32,7 @@ public:
   /// Feature kind.
   inline static const std::string& ID()
   {
-    static const std::string MY_ID("Fill");
+    static const std::string MY_ID("Split");
     return MY_ID;
   }
 

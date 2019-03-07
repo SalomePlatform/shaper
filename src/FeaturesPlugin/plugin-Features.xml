@@ -70,10 +70,10 @@
                auto_preview="false">
           <source path="partition_widget.xml"/>
       </feature>
-      <feature id="Fill" title="Fill" tooltip="Perform boolean fill operation with objects"
-               icon="icons/Features/bool_fill.png" helpfile="fillFeature.html"
+      <feature id="Split" title="Split" tooltip="Perform boolean split operation with objects"
+               icon="icons/Features/bool_split.png" helpfile="fillFeature.html"
                auto_preview="false">
-          <source path="boolean_fill_widget.xml"/>
+          <source path="boolean_split_widget.xml"/>
       </feature>
       <feature id="Union" title="Union" tooltip="Perform union operations with shapes"
                icon="icons/Features/union.png" helpfile="unionFeature.html">
