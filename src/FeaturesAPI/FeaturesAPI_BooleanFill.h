@@ -75,8 +75,8 @@ typedef std::shared_ptr<FeaturesAPI_BooleanFill> BooleanFillPtr;
 /// \ingroup CPPHighAPI
 /// \brief Create Boolean Fill feature.
 FEATURESAPI_EXPORT
-BooleanFillPtr addFill(const std::shared_ptr<ModelAPI_Document>& thePart,
-                       const std::list<ModelHighAPI_Selection>& theMainObjects,
-                       const std::list<ModelHighAPI_Selection>& theToolObjects);
+BooleanFillPtr addSplit(const std::shared_ptr<ModelAPI_Document>& thePart,
+                        const std::list<ModelHighAPI_Selection>& theMainObjects,
+                        const std::list<ModelHighAPI_Selection>& theToolObjects);
 
 #endif // FeaturesAPI_BooleanFill_H_

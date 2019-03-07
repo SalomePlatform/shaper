@@ -75,7 +75,7 @@ void FeaturesAPI_BooleanFill::dump(ModelHighAPI_Dumper& theDumper) const
 {
   FeaturePtr aBase = feature();
 
-  theDumper << aBase << " = model.addFill";
+  theDumper << aBase << " = model.addSplit";
 
   const std::string& aDocName = theDumper.name(aBase->document());
   AttributeSelectionListPtr anObjects =
@@ -87,9 +87,9 @@ void FeaturesAPI_BooleanFill::dump(ModelHighAPI_Dumper& theDumper) const
 }
 
 //==================================================================================================
-BooleanFillPtr addFill(const std::shared_ptr<ModelAPI_Document>& thePart,
-                       const std::list<ModelHighAPI_Selection>& theMainObjects,
-                       const std::list<ModelHighAPI_Selection>& theToolObjects)
+BooleanFillPtr addSplit(const std::shared_ptr<ModelAPI_Document>& thePart,
+                        const std::list<ModelHighAPI_Selection>& theMainObjects,
+                        const std::list<ModelHighAPI_Selection>& theToolObjects)
 {
   std::shared_ptr<ModelAPI_Feature> aFeature = thePart->addFeature(FeaturesAPI_BooleanFill::ID());
   return BooleanFillPtr(new FeaturesAPI_BooleanFill(aFeature,
