@@ -45,6 +45,8 @@ def findDir(theConfFile):
 
 ## Find accessible plugins from plugins.xml configuration file
 aPluginList = []
+# A map to avoid duplication of plugins
+aPluginsMap = {}
 aDomObj = parse(aConfigPath)
 aPluginsList = aDomObj.getElementsByTagName("plugin")
 for plugin in aPluginsList:
@@ -53,7 +55,8 @@ for plugin in aPluginsList:
         aLibName = plugin.getAttribute("script")
     aConfigFile = plugin.getAttribute("configuration")
 
-    if aLibName and aConfigFile:
+    if aLibName and aConfigFile and not aLibName in aPluginsMap:
+        aPluginsMap[aLibName] = True
         aLibDir = findDir(aConfigFile)
         if not aLibDir is None:
             aPluginDocDir = aSrcPath + os.sep + aLibDir + os.sep + "doc"
