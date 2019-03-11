@@ -17,6 +17,10 @@ while [[ $# > 0 ]]; do
       ADD_MODELS_TESTS=TRUE
       shift
       ;;
+    compatibility|test-compatibility)
+      ADD_COMPATIBILITY_TESTS=TRUE
+      shift
+      ;;
     *)
       shift
       ;;
