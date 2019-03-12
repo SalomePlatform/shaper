@@ -63,12 +63,78 @@ typedef std::shared_ptr<ModelAPI_Feature>  FeaturePtr;
 typedef std::shared_ptr<ModelAPI_Folder>   FolderPtr;
 typedef std::shared_ptr<ModelAPI_Result>   ResultPtr;
 
+typedef std::set<std::string>                                                ModulesSet;
+typedef std::map<DocumentPtr, std::map<std::string, std::pair<int, int> > >  NbFeaturesMap;
+
 /**\class ModelHighAPI_Dumper
  * \ingroup CPPHighAPI
  * \brief Dump engine for the model
+ *
+ * The dumper can be customized by the set of storages (DumpStorage), for example to identify
+ * dumped selected objects by their geometrical properties. By default, the dump is executed to
+ * store original names of the selected shapes.
  */
 class ModelHighAPI_Dumper
 {
+public:
+  /** \class DumpStorage
+   *  \ingroup CPPHighAPI
+   *  \brief Storage for the dumped data. Process selection attributes to be dumped by naming.
+   */
+  class DumpStorage
+  {
+  public:
+    DumpStorage() {}
+    MODELHIGHAPI_EXPORT DumpStorage(const DumpStorage& theOther);
+    MODELHIGHAPI_EXPORT const DumpStorage& operator=(const DumpStorage& theOther);
+
+    void setFilenameSuffix(const std::string& theSuffix) { myFilenameSuffix = theSuffix; }
+
+  protected:
+    std::ostringstream& buffer() { return myDumpBuffer; }
+    std::ostringstream& fullDump() { return myFullDump; }
+
+    MODELHIGHAPI_EXPORT virtual void reserveBuffer();
+    MODELHIGHAPI_EXPORT virtual void restoreReservedBuffer();
+
+    MODELHIGHAPI_EXPORT
+    virtual void write(const std::shared_ptr<ModelAPI_AttributeSelection>& theAttrSelect);
+
+    MODELHIGHAPI_EXPORT
+    virtual bool exportTo(const std::string& theFilename, const ModulesSet& theUsedModules);
+
+  private:
+    std::string myFilenameSuffix;
+    std::ostringstream myDumpBuffer;
+    std::ostringstream myFullDump;
+
+    std::stack<std::string> myDumpBufferHideout;
+
+    friend class ModelHighAPI_Dumper;
+  };
+
+  /** \class DumpStorageGeom
+   *  \ingroup CPPHighAPI
+   *  \brief Process selection attributes to be dumped by geometric properties.
+   */
+  class DumpStorageGeom : public DumpStorage
+  {
+  protected:
+    MODELHIGHAPI_EXPORT
+    virtual void write(const std::shared_ptr<ModelAPI_AttributeSelection>& theAttrSelect);
+  };
+
+  /** \class DumpStorageWeak
+   *  \ingroup CPPHighAPI
+   *  \brief Process selection attributes to be dumped by weak naming.
+   */
+  class DumpStorageWeak : public DumpStorage
+  {
+  protected:
+    MODELHIGHAPI_EXPORT
+    virtual void write(const std::shared_ptr<ModelAPI_AttributeSelection>& theAttrSelect);
+  };
+
 public:
   /// Default constructor
   MODELHIGHAPI_EXPORT
@@ -83,16 +149,15 @@ public:
   static ModelHighAPI_Dumper* getInstance();
 
   /// Destructor
-  virtual ~ModelHighAPI_Dumper() {}
+  MODELHIGHAPI_EXPORT
+  virtual ~ModelHighAPI_Dumper();
 
-  /// Set/unset flag to dump selection attributes by geometrical properties:
-  /// inner point in the selected shape
-  void setSelectionByGeometry(bool theDumpByGeom = true)
-  { myGeometricalSelection = theDumpByGeom; }
-
-  /// Set/unset flag to dump selection attributes by weak naming
-  void setSelectionWeakNaming(bool theDumpByWeakNaming = true)
-  { myWeakNamingSelection = theDumpByWeakNaming; }
+  /// Add custom storage to collect corresponding dump
+  MODELHIGHAPI_EXPORT
+  void addCustomStorage(const DumpStorage& theStorage);
+  /// Clear custom storages list
+  MODELHIGHAPI_EXPORT
+  void clearCustomStorage();
 
   /// Dump given document into the file
   /// \return \c true, if succeed
@@ -150,10 +215,6 @@ public:
 
   /// Return name of wrapper feature
   virtual std::string featureWrapper(const FeaturePtr& theFeature) const = 0;
-
-  /// Save all dumps into specified file
-  MODELHIGHAPI_EXPORT
-  bool exportTo(const std::string& theFileName);
 
   /// Dump character
   MODELHIGHAPI_EXPORT
@@ -256,9 +317,6 @@ public:
   MODELHIGHAPI_EXPORT ModelHighAPI_Dumper&
     operator<<(const std::shared_ptr<ModelAPI_AttributeStringArray>& theArray);
 
-  /// Clear dump buffer
-  MODELHIGHAPI_EXPORT
-  void clear(bool bufferOnly = false);
   /// clear list of not dumped entities
   MODELHIGHAPI_EXPORT void clearNotDumped();
 
@@ -325,10 +383,7 @@ private:
         myIsDumped(false)
     {}
   };
-
-  typedef std::map<EntityPtr, EntityName>                                      EntityNameMap;
-  typedef std::set<std::string>                                                ModulesSet;
-  typedef std::map<DocumentPtr, std::map<std::string, std::pair<int, int> > >  NbFeaturesMap;
+  typedef std::map<EntityPtr, EntityName> EntityNameMap;
 
   struct LastDumpedEntity {
     EntityPtr            myEntity;   ///< last dumped entity
@@ -341,12 +396,12 @@ private:
       : myEntity(theEntity), myUserName(theUserName), myResults(theResults)
     {}
   };
-  typedef std::stack<LastDumpedEntity>                              DumpStack;
+  typedef std::stack<LastDumpedEntity> DumpStack;
 
   static ModelHighAPI_Dumper* mySelf;
 
-  std::ostringstream  myDumpBuffer;         ///< intermediate buffer to store dumping data
-  std::ostringstream  myFullDump;           ///< full buffer of dumped data
+  class DumpStorageBuffer;
+  DumpStorageBuffer*  myDumpStorage;        ///< storage of dumped data
 
   ModulesSet          myModules;            ///< modules and entities to be imported
   EntityNameMap       myNames;              ///< names of the entities
@@ -359,9 +414,6 @@ private:
 
   std::list<EntityPtr> myPostponed; ///< list of postponed entities (sketch constraints or folders)
   bool myDumpPostponedInProgress; ///< processing postponed is in progress
-
-  bool myGeometricalSelection; ///< dump selection not by naming, but by coordinates of inner point
-  bool myWeakNamingSelection; ///< dump selection by weak naming
 
 protected:
   /// list of entities, used by other features but not dumped yet

@@ -20,17 +20,18 @@
           <validator id="ExchangePlugin_ExportFormat"
                      parameters="py:Python" />
         </export_file_selector>
-        <radiobox id="selection_type">
-          <radio id="topological_naming"
-               title="Topological naming selection"
-               tooltip="To use standard topological naming selection identifier, used for parametric model"/>
-          <radio id="geometric_selection"
-               title="Geometric selection"
-               tooltip="To use geometrical point coordinates to identify selected shapes"/>
-          <radio id="weak_naming"
-               title="Weak naming selection"
-               tooltip="To use geometrical order for identification of selected shapes"/>
-        </radiobox>
+        <!--<boolvalue id="topological_naming"
+             label="Topological naming selection"
+             tooltip="To use standard topological naming selection identifier, used for parametric model"
+             default="true"/>
+        <boolvalue id="geometric_selection"
+             label="Geometric selection"
+             tooltip="To use geometrical point coordinates to identify selected shapes"
+             default="true"/>
+        <boolvalue id="weak_naming"
+             label="Weak naming selection"
+             tooltip="To use geometrical order for identification of selected shapes"
+             default="false"/> -->
       </feature>
     </group>
   </workbench>

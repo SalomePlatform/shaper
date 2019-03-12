@@ -63,14 +63,408 @@
 
 #include <fstream>
 
+// ===========    Implementation of storage of dumped data    ===========
+class ModelHighAPI_Dumper::DumpStorageBuffer : public ModelHighAPI_Dumper::DumpStorage
+{
+  static const int THE_DUMP_PRECISION = 16;
+
+public:
+  void addStorage(const ModelHighAPI_Dumper::DumpStorage& theStorage)
+  { myStorageArray.push_back(theStorage); }
+
+  void clear() { myStorageArray.clear(); }
+
+  bool isBufferEmpty()
+  {
+    return myStorageArray.empty() || myStorageArray.front().buffer().str().empty();
+  }
+
+  void mergeBuffer()
+  {
+    std::list<ModelHighAPI_Dumper::DumpStorage>::iterator anIt = myStorageArray.begin();
+    for (; anIt != myStorageArray.end(); ++anIt) {
+      // avoid multiple empty lines
+      std::string aBuf = anIt->buffer().str();
+      size_t anInd = std::string::npos;
+      while ((anInd = aBuf.find("\n\n\n")) != std::string::npos)
+        aBuf.erase(anInd, 1);
+
+      anIt->fullDump() << aBuf;
+      anIt->buffer().str("");
+    }
+  }
+
+  void write(const std::string& theValue)
+  {
+    if (myStorageArray.empty())
+      addStorage(DumpStorage());
+
+    std::list<ModelHighAPI_Dumper::DumpStorage>::iterator anIt = myStorageArray.begin();
+    for (; anIt != myStorageArray.end(); ++anIt)
+      anIt->buffer() << theValue;
+  }
+
+  DumpStorageBuffer& operator<<(const char theChar)
+  {
+    std::ostringstream out;
+    out << theChar;
+    write(out.str());
+    return *this;
+  }
+
+  DumpStorageBuffer& operator<<(const char* theString)
+  {
+    write(theString);
+    return *this;
+  }
+
+  DumpStorageBuffer& operator<<(const std::string& theString)
+  {
+    write(theString);
+    return *this;
+  }
+
+  DumpStorageBuffer& operator<<(const bool theValue)
+  {
+    std::ostringstream out;
+    out << theValue;
+    write(out.str());
+    return *this;
+  }
+
+  DumpStorageBuffer& operator<<(const int theValue)
+  {
+    std::ostringstream out;
+    out << theValue;
+    write(out.str());
+    return *this;
+  }
+
+  DumpStorageBuffer& operator<<(const double theValue)
+  {
+    std::ostringstream out;
+    out << std::setprecision(THE_DUMP_PRECISION) << theValue;
+    write(out.str());
+    return *this;
+  }
+  /// Dump std::endl
+  friend
+  DumpStorageBuffer& operator<<(DumpStorageBuffer& theBuffer,
+                                std::basic_ostream<char>& (*theEndl)(std::basic_ostream<char>&))
+  {
+    theBuffer.write("\n");
+    return theBuffer;
+  }
+
+  void dumpArray(int theSize, double* theValues, std::string* theTexts)
+  {
+    std::ostringstream anOutput;
+    anOutput << std::setprecision(THE_DUMP_PRECISION);
+    for (int i = 0; i < theSize; ++i) {
+      if (i > 0)
+        anOutput << ", ";
+      if (theTexts[i].empty())
+        anOutput << theValues[i];
+      else
+        anOutput << "\"" << theTexts[i] << "\"";
+    }
+    write(anOutput.str());
+  }
+
+  virtual void write(const std::shared_ptr<ModelAPI_AttributeSelection>& theAttrSelect)
+  {
+    if (myStorageArray.empty())
+      addStorage(DumpStorage());
+
+    std::list<ModelHighAPI_Dumper::DumpStorage>::iterator anIt = myStorageArray.begin();
+    for (; anIt != myStorageArray.end(); ++anIt)
+      anIt->write(theAttrSelect);
+  }
+
+  virtual void reserveBuffer()
+  {
+    std::list<ModelHighAPI_Dumper::DumpStorage>::iterator anIt = myStorageArray.begin();
+    for (; anIt != myStorageArray.end(); ++anIt)
+      anIt->reserveBuffer();
+  }
+
+  virtual void restoreReservedBuffer()
+  {
+    std::list<ModelHighAPI_Dumper::DumpStorage>::iterator anIt = myStorageArray.begin();
+    for (; anIt != myStorageArray.end(); ++anIt)
+      anIt->restoreReservedBuffer();
+  }
+
+  virtual bool exportTo(const std::string& theFilename, const ModulesSet& theUsedModules)
+  {
+    static const std::string THE_EXT = ".py";
+    std::string aFilenameBase = theFilename;
+    if (aFilenameBase.rfind(THE_EXT) == aFilenameBase.size() - THE_EXT.size())
+      aFilenameBase = aFilenameBase.substr(0, aFilenameBase.size() - THE_EXT.size());
+
+    bool isOk = true;
+    std::list<ModelHighAPI_Dumper::DumpStorage>::iterator anIt = myStorageArray.begin();
+    for (; anIt != myStorageArray.end(); ++anIt) {
+      std::string aFilename = aFilenameBase + anIt->myFilenameSuffix + THE_EXT;
+      isOk = anIt->exportTo(aFilename, theUsedModules) && isOk;
+    }
+    clear();
+    return isOk;
+  }
+
+private:
+  std::list<ModelHighAPI_Dumper::DumpStorage> myStorageArray;
+};
+
+
+ModelHighAPI_Dumper::DumpStorage::DumpStorage(const DumpStorage& theOther)
+  : myFilenameSuffix(theOther.myFilenameSuffix),
+    myDumpBufferHideout(theOther.myDumpBufferHideout)
+{
+  myFullDump.str(theOther.myFullDump.str());
+  myDumpBuffer.str(theOther.myDumpBuffer.str());
+}
+
+const ModelHighAPI_Dumper::DumpStorage&
+ModelHighAPI_Dumper::DumpStorage::operator=(const ModelHighAPI_Dumper::DumpStorage& theOther)
+{
+  myFilenameSuffix = theOther.myFilenameSuffix;
+  myFullDump.str(theOther.myFullDump.str());
+  myDumpBuffer.str(theOther.myDumpBuffer.str());
+  myDumpBufferHideout = theOther.myDumpBufferHideout;
+  return *this;
+}
+
+void ModelHighAPI_Dumper::DumpStorage::reserveBuffer()
+{
+  myDumpBufferHideout.push(myDumpBuffer.str());
+  myDumpBuffer.str("");
+}
+
+void ModelHighAPI_Dumper::DumpStorage::restoreReservedBuffer()
+{
+  myDumpBuffer << myDumpBufferHideout.top();
+  myDumpBufferHideout.pop();
+}
+
+bool ModelHighAPI_Dumper::DumpStorage::exportTo(const std::string& theFilename,
+                                                const ModulesSet& theUsedModules)
+{
+  std::ofstream aFile;
+  OSD_OpenStream(aFile, theFilename.c_str(), std::ofstream::out);
+  if (!aFile.is_open())
+    return false;
+
+  // standard header (encoding + imported modules)
+  aFile << "# -*- coding: utf-8 -*-" << std::endl << std::endl;
+  for (ModulesSet::const_iterator aModIt = theUsedModules.begin();
+    aModIt != theUsedModules.end(); ++aModIt) {
+    aFile << "from " << *aModIt << " import *" << std::endl;
+  }
+  if (!theUsedModules.empty())
+    aFile << std::endl;
+
+  aFile << "from salome.shaper import model" << std::endl << std::endl;
+  aFile << "model.begin()" << std::endl;
+
+  // dump collected data
+  aFile << myFullDump.str();
+  aFile << myDumpBuffer.str();
+
+  // standard footer
+  aFile << "model.end()" << std::endl;
+  aFile.close();
+
+  return true;
+}
+
+static void getShapeAndContext(const AttributeSelectionPtr& theAttrSelect,
+                               GeomShapePtr& theShape, ResultPtr& theContext)
+{
+  if (theAttrSelect->isInitialized()) {
+    theShape = theAttrSelect->value();
+    theContext = theAttrSelect->context();
+    if (!theShape.get())
+      theShape = theContext->shape();
+
+    if (theAttrSelect->isGeometricalSelection() &&
+        theShape.get() && theShape->shapeType() == GeomAPI_Shape::COMPOUND &&
+        theContext.get() && !theShape->isEqual(theContext->shape()) &&
+        theContext->groupName() != ModelAPI_ResultPart::group()) {
+      GeomAPI_ShapeIterator anIt(theShape);
+      theShape = anIt.current();
+    }
+  }
+}
+
+void ModelHighAPI_Dumper::DumpStorage::write(const AttributeSelectionPtr& theAttrSelect)
+{
+  myDumpBuffer << "model.selection(";
+
+  GeomShapePtr aShape;
+  ResultPtr aContext;
+  getShapeAndContext(theAttrSelect, aShape, aContext);
+
+  if (aShape.get()) {
+    myDumpBuffer << "\"" << aShape->shapeTypeStr() << "\", \""
+                 << theAttrSelect->namingName() << "\"";
+  }
+
+  myDumpBuffer << ")";
+}
+
+static int possibleSelectionsByPoint(const GeomPointPtr& thePoint,
+                                     const ResultPtr& theResult,
+                                     const GeomShapePtr& theShape,
+                                     const FeaturePtr& theStartFeature,
+                                     const FeaturePtr& theEndFeature)
+{
+  DocumentPtr aDoc1 = theStartFeature->document();
+  DocumentPtr aDoc2 = theEndFeature->document();
+
+  std::list<FeaturePtr> aFeatures = aDoc1->allFeatures();
+  if (aDoc1 != aDoc2) {
+    std::list<FeaturePtr> anAdditionalFeatures = aDoc2->allFeatures();
+    aFeatures.insert(aFeatures.end(), anAdditionalFeatures.begin(), anAdditionalFeatures.end());
+  }
+
+  CompositeFeaturePtr aLastCompositeFeature;
+
+  std::list<FeaturePtr>::const_iterator aFIt = aFeatures.begin();
+  while (aFIt != aFeatures.end() && *aFIt != theStartFeature) {
+    CompositeFeaturePtr aCompFeat = std::dynamic_pointer_cast<ModelAPI_CompositeFeature>(*aFIt);
+    if (aCompFeat)
+      aLastCompositeFeature = aCompFeat;
+    ++aFIt;
+  }
+
+  // collect the list of composite features, containing the last feature;
+  // these features should be excluded from searching,
+  // because the feature cannot select sub-shapes from its parent
+  std::set<FeaturePtr> aEndFeatureParents = ModelAPI_Tools::getParents(theEndFeature);
+
+  int aNbPossibleSelections = 0;
+  for (; aFIt != aFeatures.end() && *aFIt != theEndFeature; ++aFIt) {
+    bool isSkipFeature = false;
+    if (aLastCompositeFeature && aLastCompositeFeature->isSub(*aFIt))
+      isSkipFeature = true;
+    CompositeFeaturePtr aCompFeat = std::dynamic_pointer_cast<ModelAPI_CompositeFeature>(*aFIt);
+    if (aCompFeat) {
+      ResultPartPtr aPartRes =
+          std::dynamic_pointer_cast<ModelAPI_ResultPart>(aCompFeat->firstResult());
+      if (!aPartRes)
+        aLastCompositeFeature = aCompFeat;
+      if (aEndFeatureParents.find(aCompFeat) != aEndFeatureParents.end()) {
+        // do not process the parent for the last feature,
+        // because it cannot select objects from its parent
+        isSkipFeature = true;
+      }
+    }
+    if (isSkipFeature)
+      continue;
+
+    std::list<ModelGeomAlgo_Shape::SubshapeOfResult> anApproproate;
+    if (ModelGeomAlgo_Shape::findSubshapeByPoint(*aFIt, thePoint, theShape->shapeType(),
+                                                 anApproproate)) {
+      std::list<ModelGeomAlgo_Shape::SubshapeOfResult>::iterator anApIt = anApproproate.begin();
+      for (; anApIt != anApproproate.end(); ++anApIt) {
+        ++aNbPossibleSelections;
+
+        // stop if the target shape and result are found
+        GeomShapePtr aCurShape = anApIt->mySubshape;
+        if (!aCurShape)
+          aCurShape = anApIt->myResult->shape();
+
+        if (anApIt->myResult->isSame(theResult) && aCurShape->isSame(theShape))
+          break;
+      }
+    }
+  }
+  return aNbPossibleSelections;
+}
+
+void ModelHighAPI_Dumper::DumpStorageGeom::write(const AttributeSelectionPtr& theAttrSelect)
+{
+  GeomShapePtr aShape;
+  ResultPtr aContext;
+  getShapeAndContext(theAttrSelect, aShape, aContext);
+
+  // how to dump selection: construction features are dumped by name always
+  FeaturePtr aSelectedFeature;
+  FeaturePtr aFeature = theAttrSelect->contextFeature();
+  if (aShape && aContext && !aFeature)
+    aSelectedFeature = ModelAPI_Feature::feature(aContext->data()->owner());
+  bool isDumpByGeom = aSelectedFeature && aSelectedFeature->isInHistory();
+
+  if (isDumpByGeom) {
+    myDumpBuffer << "model.selection(\"" << aShape->shapeTypeStr();
+    // check the selected item is a ResultPart;
+    // in this case it is necessary to get shape with full transformation
+    // for correct calculation of the middle point
+    ResultPartPtr aResPart =
+      std::dynamic_pointer_cast<ModelAPI_ResultPart>(theAttrSelect->context());
+    if (aResPart && aShape->shapeType() == GeomAPI_Shape::COMPOUND)
+      aShape = aResPart->shape();
+    GeomPointPtr aMiddlePoint = aShape->middlePoint();
+    // calculate number of features, which could be selected by the same point
+    FeaturePtr anOwner = ModelAPI_Feature::feature(theAttrSelect->owner());
+    int aNbPossibleSelections = possibleSelectionsByPoint(aMiddlePoint,
+        theAttrSelect->context(), aShape, aSelectedFeature, anOwner);
+
+    // produce the index if the number of applicable features is greater than 1
+    std::string anIndex;
+    if (aNbPossibleSelections > 1) {
+      std::ostringstream anOutput;
+      anOutput << "_" << aNbPossibleSelections;
+      anIndex = anOutput.str();
+    }
+
+    myDumpBuffer << anIndex << "\", ("
+                 << aMiddlePoint->x() << ", "
+                 << aMiddlePoint->y() << ", "
+                 << aMiddlePoint->z() << ")";
+    myDumpBuffer << ")";
+  }
+  else
+    DumpStorage::write(theAttrSelect);
+}
+
+void ModelHighAPI_Dumper::DumpStorageWeak::write(const AttributeSelectionPtr& theAttrSelect)
+{
+  GeomShapePtr aShape;
+  ResultPtr aContext;
+  getShapeAndContext(theAttrSelect, aShape, aContext);
+
+  bool aStandardDump = true;
+  if (aShape.get() && aContext.get() &&
+      aShape != aContext->shape()) { // weak naming for local selection only
+    GeomAlgoAPI_NExplode aNExplode(aContext->shape(), aShape->shapeType());
+    int anIndex = aNExplode.index(aShape);
+    if (anIndex != 0) { // found a week-naming index, so, export it
+      myDumpBuffer << "model.selection(\"" << aShape->shapeTypeStr() << "\", \""
+                   << theAttrSelect->contextName(aContext) << "\", " << anIndex;
+      aStandardDump = false;
+    }
+  }
+  if (aStandardDump)
+    DumpStorage::write(theAttrSelect);
+}
+// ======================================================================
+
+
 static int gCompositeStackDepth = 0;
 
 ModelHighAPI_Dumper* ModelHighAPI_Dumper::mySelf = 0;
 
 ModelHighAPI_Dumper::ModelHighAPI_Dumper()
-  : myGeometricalSelection(false)
+  : myDumpStorage(new DumpStorageBuffer),
+    myDumpPostponedInProgress(false)
 {
-  clear();
+}
+
+ModelHighAPI_Dumper::~ModelHighAPI_Dumper()
+{
+  delete myDumpStorage;
 }
 
 void ModelHighAPI_Dumper::setInstance(ModelHighAPI_Dumper* theDumper)
@@ -84,26 +478,15 @@ ModelHighAPI_Dumper* ModelHighAPI_Dumper::getInstance()
   return mySelf;
 }
 
-void ModelHighAPI_Dumper::clear(bool bufferOnly)
+void ModelHighAPI_Dumper::addCustomStorage(const ModelHighAPI_Dumper::DumpStorage& theStorage)
 {
-  myDumpBuffer.str("");
-  myDumpBuffer << std::setprecision(16);
+  myDumpStorage->addStorage(theStorage);
+}
 
+void ModelHighAPI_Dumper::clearCustomStorage()
+{
+  myDumpStorage->clear();
   clearNotDumped();
-
-  if (!bufferOnly) {
-    myFullDump.str("");
-    myFullDump << std::setprecision(16);
-
-    myNames.clear();
-    myModules.clear();
-    myFeatureCount.clear();
-    while (!myEntitiesStack.empty())
-      myEntitiesStack.pop();
-
-    myPostponed.clear();
-    myDumpPostponedInProgress = false;
-  }
 }
 
 void ModelHighAPI_Dumper::clearNotDumped()
@@ -252,7 +635,7 @@ bool ModelHighAPI_Dumper::process(const std::shared_ptr<ModelAPI_Document>& theD
   *this << aDocName << " = model.moduleDocument()" << std::endl;
 
   // dump subfeatures and store result to file
-  return process(theDoc) && exportTo(theFileName);
+  return process(theDoc) && myDumpStorage->exportTo(theFileName, myModules);
 }
 
 bool ModelHighAPI_Dumper::process(const std::shared_ptr<ModelAPI_Document>& theDoc)
@@ -431,38 +814,6 @@ void ModelHighAPI_Dumper::dumpSubFeatureNameAndColor(const std::string theSubFea
   dumpEntitySetName();
 }
 
-bool ModelHighAPI_Dumper::exportTo(const std::string& theFileName)
-{
-  std::ofstream aFile;
-  OSD_OpenStream(aFile, theFileName.c_str(), std::ofstream::out);
-  if (!aFile.is_open())
-    return false;
-
-  // standard header (encoding + imported modules)
-  aFile << "# -*- coding: utf-8 -*-" << std::endl << std::endl;
-  for (ModulesSet::const_iterator aModIt = myModules.begin();
-       aModIt != myModules.end(); ++aModIt) {
-    aFile << "from " << *aModIt << " import *" << std::endl;
-  }
-  if (!myModules.empty())
-    aFile << std::endl;
-
-  aFile << "from salome.shaper import model" << std::endl << std::endl;
-  aFile << "model.begin()" << std::endl;
-
-  // dump collected data
-  aFile << myFullDump.str();
-  aFile << myDumpBuffer.str();
-
-  // standard footer
-  aFile << "model.end()" << std::endl;
-
-  aFile.close();
-  clear();
-
-  return true;
-}
-
 void ModelHighAPI_Dumper::importModule(const std::string& theModuleName)
 {
   myModules.insert(theModuleName);
@@ -471,14 +822,14 @@ void ModelHighAPI_Dumper::importModule(const std::string& theModuleName)
 void ModelHighAPI_Dumper::dumpEntitySetName()
 {
   const LastDumpedEntity& aLastDumped = myEntitiesStack.top();
-  bool isBufferEmpty = myDumpBuffer.str().empty();
+  bool isBufferEmpty = myDumpStorage->isBufferEmpty();
 
   // dump "setName" for the entity
   if (aLastDumped.myUserName) {
     EntityName& anEntityNames = myNames[aLastDumped.myEntity];
     if (!anEntityNames.myIsDefault)
-      myDumpBuffer << anEntityNames.myCurrentName << ".setName(\""
-                   << anEntityNames.myUserName << "\")" << std::endl;
+      *myDumpStorage << anEntityNames.myCurrentName << ".setName(\""
+                     << anEntityNames.myUserName << "\")\n";
     // don't dump "setName" for the entity twice
     anEntityNames.myUserName.clear();
     anEntityNames.myIsDefault = true;
@@ -491,7 +842,7 @@ void ModelHighAPI_Dumper::dumpEntitySetName()
     EntityName& anEntityNames = myNames[*aResIt];
     if (!anEntityNames.myIsDefault) {
       *this << *aResIt;
-      myDumpBuffer << ".setName(\"" << anEntityNames.myUserName << "\")" << std::endl;
+      *myDumpStorage << ".setName(\"" << anEntityNames.myUserName << "\")\n";
       // don't dump "setName" for the entity twice
       anEntityNames.myUserName.clear();
       anEntityNames.myIsDefault = true;
@@ -501,8 +852,8 @@ void ModelHighAPI_Dumper::dumpEntitySetName()
       AttributeIntArrayPtr aColor = (*aResIt)->data()->intArray(ModelAPI_Result::COLOR_ID());
       if (aColor && aColor->isInitialized()) {
         *this << *aResIt;
-        myDumpBuffer << ".setColor(" << aColor->value(0) << ", " << aColor->value(1)
-                     << ", " << aColor->value(2) << ")" << std::endl;
+        *myDumpStorage << ".setColor(" << aColor->value(0) << ", " << aColor->value(1)
+                       << ", " << aColor->value(2) << ")\n";
       }
     }
     // set result deflection
@@ -511,7 +862,7 @@ void ModelHighAPI_Dumper::dumpEntitySetName()
         (*aResIt)->data()->real(ModelAPI_Result::DEFLECTION_ID());
       if(aDeflectionAttr.get() && aDeflectionAttr->isInitialized()) {
         *this << *aResIt;
-        myDumpBuffer << ".setDeflection(" << aDeflectionAttr->value() << ")" << std::endl;
+        *myDumpStorage << ".setDeflection(" << aDeflectionAttr->value() << ")\n";
       }
     }
     // set result transparency
@@ -520,7 +871,7 @@ void ModelHighAPI_Dumper::dumpEntitySetName()
         (*aResIt)->data()->real(ModelAPI_Result::TRANSPARENCY_ID());
       if(aTransparencyAttr.get() && aTransparencyAttr->isInitialized()) {
         *this << *aResIt;
-        myDumpBuffer << ".setTransparency(" << aTransparencyAttr->value() << ")" << std::endl;
+        *myDumpStorage << ".setTransparency(" << aTransparencyAttr->value() << ")\n";
       }
     }
   }
@@ -529,10 +880,8 @@ void ModelHighAPI_Dumper::dumpEntitySetName()
   myEntitiesStack.pop();
 
   // clean buffer if it was clear before
-  if (isBufferEmpty) {
-    myFullDump << myDumpBuffer.str();
-    myDumpBuffer.str("");
-  }
+  if (isBufferEmpty)
+    myDumpStorage->mergeBuffer();
 }
 
 bool ModelHighAPI_Dumper::isDumped(const EntityPtr& theEntity) const
@@ -639,74 +988,61 @@ bool ModelHighAPI_Dumper::isDefaultTransparency(const ResultPtr& theResult) cons
 
 ModelHighAPI_Dumper& ModelHighAPI_Dumper::operator<<(const char theChar)
 {
-  myDumpBuffer << theChar;
+  *myDumpStorage << theChar;
   return *this;
 }
 
 ModelHighAPI_Dumper& ModelHighAPI_Dumper::operator<<(const char* theString)
 {
-  myDumpBuffer << theString;
+  *myDumpStorage << theString;
   return *this;
 }
 
 ModelHighAPI_Dumper& ModelHighAPI_Dumper::operator<<(const std::string& theString)
 {
-  myDumpBuffer << theString;
+  *myDumpStorage << theString;
   return *this;
 }
 
 ModelHighAPI_Dumper& ModelHighAPI_Dumper::operator<<(const bool theValue)
 {
-  myDumpBuffer << (theValue ? "True" : "False");
+  *myDumpStorage << (theValue ? "True" : "False");
   return *this;
 }
 
 ModelHighAPI_Dumper& ModelHighAPI_Dumper::operator<<(const int theValue)
 {
-  myDumpBuffer << theValue;
+  *myDumpStorage << theValue;
   return *this;
 }
 
 ModelHighAPI_Dumper& ModelHighAPI_Dumper::operator<<(const double theValue)
 {
-  myDumpBuffer << theValue;
+  *myDumpStorage << theValue;
   return *this;
 }
 
 ModelHighAPI_Dumper& ModelHighAPI_Dumper::operator<<(const std::shared_ptr<GeomAPI_Pnt>& thePoint)
 {
   importModule("GeomAPI");
-  myDumpBuffer << "GeomAPI_Pnt(" << thePoint->x() << ", "
-               << thePoint->y() << ", " << thePoint->z() << ")";
+  *myDumpStorage << "GeomAPI_Pnt(" << thePoint->x() << ", "
+                 << thePoint->y() << ", " << thePoint->z() << ")";
   return *this;
 }
 
 ModelHighAPI_Dumper& ModelHighAPI_Dumper::operator<<(const std::shared_ptr<GeomAPI_Dir>& theDir)
 {
   importModule("GeomAPI");
-  myDumpBuffer << "GeomAPI_Dir(" << theDir->x() << ", "
-               << theDir->y() << ", " << theDir->z() << ")";
+  *myDumpStorage << "GeomAPI_Dir(" << theDir->x() << ", "
+                 << theDir->y() << ", " << theDir->z() << ")";
   return *this;
 }
 
 ModelHighAPI_Dumper& ModelHighAPI_Dumper::operator<<(
     const std::shared_ptr<GeomDataAPI_Dir>& theDir)
 {
-  myDumpBuffer << theDir->x() << ", " << theDir->y() << ", " << theDir->z();
+  *myDumpStorage << theDir->x() << ", " << theDir->y() << ", " << theDir->z();
   return *this;
-}
-
-static void dumpArray(std::ostringstream& theOutput, int theSize,
-                      double* theValues, std::string* theTexts)
-{
-  for (int i = 0; i < theSize; ++i) {
-    if (i > 0)
-      theOutput << ", ";
-    if (theTexts[i].empty())
-      theOutput << theValues[i];
-    else
-      theOutput << "\"" << theTexts[i] << "\"";
-  }
 }
 
 ModelHighAPI_Dumper& ModelHighAPI_Dumper::operator<<(
@@ -715,7 +1051,7 @@ ModelHighAPI_Dumper& ModelHighAPI_Dumper::operator<<(
   static const int aSize = 3;
   double aValues[aSize] = {thePoint->x(), thePoint->y(), thePoint->z()};
   std::string aTexts[aSize] = {thePoint->textX(), thePoint->textY(), thePoint->textZ()};
-  dumpArray(myDumpBuffer, aSize, aValues, aTexts);
+  myDumpStorage->dumpArray(aSize, aValues, aTexts);
   return *this;
 }
 
@@ -725,14 +1061,14 @@ ModelHighAPI_Dumper& ModelHighAPI_Dumper::operator<<(
   static const int aSize = 2;
   double aValues[aSize] = {thePoint->x(), thePoint->y()};
   std::string aTexts[aSize] = {thePoint->textX(), thePoint->textY()};
-  dumpArray(myDumpBuffer, aSize, aValues, aTexts);
+  myDumpStorage->dumpArray(aSize, aValues, aTexts);
   return *this;
 }
 
 ModelHighAPI_Dumper& ModelHighAPI_Dumper::operator<<(
     const std::shared_ptr<ModelAPI_AttributeBoolean>& theAttrBool)
 {
-  myDumpBuffer << (theAttrBool->value() ? "True" : "False");
+  *myDumpStorage << (theAttrBool->value() ? "True" : "False");
   return *this;
 }
 
@@ -741,9 +1077,9 @@ ModelHighAPI_Dumper& ModelHighAPI_Dumper::operator<<(
 {
   std::string aText = theAttrInt->text();
   if (aText.empty())
-    myDumpBuffer << theAttrInt->value();
+    *myDumpStorage << theAttrInt->value();
   else
-    myDumpBuffer << "\"" << aText << "\"";
+    *myDumpStorage << "\"" << aText << "\"";
   return *this;
 }
 
@@ -752,22 +1088,22 @@ ModelHighAPI_Dumper& ModelHighAPI_Dumper::operator<<(
 {
   std::string aText = theAttrReal->text();
   if (aText.empty())
-    myDumpBuffer << theAttrReal->value();
+    *myDumpStorage << theAttrReal->value();
   else
-    myDumpBuffer << "\"" << aText << "\"";
+    *myDumpStorage << "\"" << aText << "\"";
   return *this;
 }
 
 ModelHighAPI_Dumper& ModelHighAPI_Dumper::operator<<(
     const std::shared_ptr<ModelAPI_AttributeString>& theAttrStr)
 {
-  myDumpBuffer << "\"" << theAttrStr->value() << "\"";
+  *myDumpStorage << "\"" << theAttrStr->value() << "\"";
   return *this;
 }
 
 ModelHighAPI_Dumper& ModelHighAPI_Dumper::operator<<(const FolderPtr& theFolder)
 {
-  myDumpBuffer << name(theFolder);
+  *myDumpStorage << name(theFolder);
 
   // add dumped folder to a stack
   if (!myNames[theFolder].myIsDumped &&
@@ -779,7 +1115,7 @@ ModelHighAPI_Dumper& ModelHighAPI_Dumper::operator<<(const FolderPtr& theFolder)
 
 ModelHighAPI_Dumper& ModelHighAPI_Dumper::operator<<(const FeaturePtr& theEntity)
 {
-  myDumpBuffer << name(theEntity);
+  *myDumpStorage << name(theEntity);
 
   if (!myNames[theEntity].myIsDumped) {
     bool isUserDefinedName = !myNames[theEntity].myIsDefault;
@@ -825,17 +1161,17 @@ ModelHighAPI_Dumper& ModelHighAPI_Dumper::operator<<(const ResultPtr& theResult)
     aCurRes = aParent;
   }
 
-  myDumpBuffer << name(aFeature);
+  *myDumpStorage << name(aFeature);
   for (std::list<int>::iterator anI = anIndices.begin(); anI != anIndices.end(); anI++) {
     if (anI == anIndices.begin()) {
       if(*anI == 0) {
-        myDumpBuffer << ".result()";
+        *myDumpStorage << ".result()";
       }
       else {
-        myDumpBuffer << ".results()[" << *anI << "]";
+        *myDumpStorage << ".results()[" << *anI << "]";
       }
     } else {
-      myDumpBuffer << ".subResult(" << *anI << ")";
+      *myDumpStorage << ".subResult(" << *anI << ")";
     }
   }
 
@@ -846,7 +1182,7 @@ ModelHighAPI_Dumper& ModelHighAPI_Dumper::operator<<(const ObjectPtr& theObject)
 {
   FeaturePtr aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(theObject);
   if(aFeature.get()) {
-    myDumpBuffer << name(aFeature);
+    *myDumpStorage << name(aFeature);
     return *this;
   }
 
@@ -873,8 +1209,8 @@ ModelHighAPI_Dumper& ModelHighAPI_Dumper::operator<<(const AttributePtr& theAttr
     importModule("SketchAPI");
   }
 
-  myDumpBuffer << aWrapperPrefix << name(anOwner) << aWrapperSuffix
-               << "." << attributeGetter(anOwner, theAttr->id()) << "()";
+  *myDumpStorage << aWrapperPrefix << name(anOwner) << aWrapperSuffix
+                 << "." << attributeGetter(anOwner, theAttr->id()) << "()";
   return *this;
 }
 
@@ -891,13 +1227,13 @@ ModelHighAPI_Dumper& ModelHighAPI_Dumper::operator<<(
 ModelHighAPI_Dumper& ModelHighAPI_Dumper::operator<<(
     const std::shared_ptr<ModelAPI_AttributeRefAttrList>& theRefAttrList)
 {
-  myDumpBuffer << "[";
+  *myDumpStorage << "[";
   std::list<std::pair<ObjectPtr, AttributePtr> > aList = theRefAttrList->list();
   bool isAdded = false;
   std::list<std::pair<ObjectPtr, AttributePtr> >::const_iterator anIt = aList.begin();
   for (; anIt != aList.end(); ++anIt) {
     if (isAdded)
-      myDumpBuffer << ", ";
+      *myDumpStorage << ", ";
     else
       isAdded = true;
     if (anIt->first)
@@ -905,7 +1241,7 @@ ModelHighAPI_Dumper& ModelHighAPI_Dumper::operator<<(
     else if (anIt->second)
       * this << anIt->second;
   }
-  myDumpBuffer << "]";
+  *myDumpStorage << "]";
   return *this;
 }
 
@@ -920,190 +1256,43 @@ ModelHighAPI_Dumper& ModelHighAPI_Dumper::operator<<(
     const std::shared_ptr<ModelAPI_AttributeRefList>& theRefList)
 {
   static const int aThreshold = 2;
+  static bool aDumpAsIs = false;
   // if number of elements in the list if greater than a threshold,
   // dump it in a separate line with specific name
-  std::string aDumped = myDumpBuffer.str();
-  if (aDumped.empty() || theRefList->size() <= aThreshold) {
-    myDumpBuffer << "[";
+  if (aDumpAsIs || theRefList->size() <= aThreshold) {
+    *myDumpStorage << "[";
     std::list<ObjectPtr> aList = theRefList->list();
     bool isAdded = false;
     std::list<ObjectPtr>::const_iterator anIt = aList.begin();
     for (; anIt != aList.end(); ++anIt) {
       if (isAdded)
-        myDumpBuffer << ", ";
+        *myDumpStorage << ", ";
       else
         isAdded = true;
 
       *this << *anIt;
     }
-    myDumpBuffer << "]";
+    *myDumpStorage << "]";
   } else {
-    // clear buffer and store list "as is"
-    myDumpBuffer.str("");
-    *this << theRefList;
-    // save buffer and clear it again
-    std::string aDumpedList = myDumpBuffer.str();
-    myDumpBuffer.str("");
-    // obtain name of list
+    // name of list
     FeaturePtr anOwner = ModelAPI_Feature::feature(theRefList->owner());
     std::string aListName = name(anOwner) + "_objects";
-    // store all previous data
-    myDumpBuffer << aListName << " = " << aDumpedList << std::endl
-                 << aDumped << aListName;
+    // reserve dumped buffer and store list "as is"
+    myDumpStorage->reserveBuffer();
+    aDumpAsIs = true;
+    *this << aListName << " = " << theRefList << "\n";
+    aDumpAsIs = false;
+    // append reserved data to the end of the current buffer
+    myDumpStorage->restoreReservedBuffer();
+    *myDumpStorage << aListName;
   }
   return *this;
-}
-
-static int possibleSelectionsByPoint(const GeomPointPtr& thePoint,
-                                     const ResultPtr& theResult,
-                                     const GeomShapePtr& theShape,
-                                     const FeaturePtr& theStartFeature,
-                                     const FeaturePtr& theEndFeature)
-{
-  DocumentPtr aDoc1 = theStartFeature->document();
-  DocumentPtr aDoc2 = theEndFeature->document();
-
-  std::list<FeaturePtr> aFeatures = aDoc1->allFeatures();
-  if (aDoc1 != aDoc2) {
-    std::list<FeaturePtr> anAdditionalFeatures = aDoc2->allFeatures();
-    aFeatures.insert(aFeatures.end(), anAdditionalFeatures.begin(), anAdditionalFeatures.end());
-  }
-
-  CompositeFeaturePtr aLastCompositeFeature;
-
-  std::list<FeaturePtr>::const_iterator aFIt = aFeatures.begin();
-  while (aFIt != aFeatures.end() && *aFIt != theStartFeature) {
-    CompositeFeaturePtr aCompFeat = std::dynamic_pointer_cast<ModelAPI_CompositeFeature>(*aFIt);
-    if (aCompFeat)
-      aLastCompositeFeature = aCompFeat;
-    ++aFIt;
-  }
-
-  // collect the list of composite features, containing the last feature;
-  // these features should be excluded from searching,
-  // because the feature cannot select sub-shapes from its parent
-  std::set<FeaturePtr> aEndFeatureParents = ModelAPI_Tools::getParents(theEndFeature);
-
-  int aNbPossibleSelections = 0;
-  for (; aFIt != aFeatures.end() && *aFIt != theEndFeature; ++aFIt) {
-    bool isSkipFeature = false;
-    if (aLastCompositeFeature && aLastCompositeFeature->isSub(*aFIt))
-      isSkipFeature = true;
-    CompositeFeaturePtr aCompFeat = std::dynamic_pointer_cast<ModelAPI_CompositeFeature>(*aFIt);
-    if (aCompFeat) {
-      ResultPartPtr aPartRes =
-          std::dynamic_pointer_cast<ModelAPI_ResultPart>(aCompFeat->firstResult());
-      if (!aPartRes)
-        aLastCompositeFeature = aCompFeat;
-      if (aEndFeatureParents.find(aCompFeat) != aEndFeatureParents.end()) {
-        // do not process the parent for the last feature,
-        // because it cannot select objects from its parent
-        isSkipFeature = true;
-      }
-    }
-    if (isSkipFeature)
-      continue;
-
-    std::list<ModelGeomAlgo_Shape::SubshapeOfResult> anApproproate;
-    if (ModelGeomAlgo_Shape::findSubshapeByPoint(*aFIt, thePoint, theShape->shapeType(),
-                                                 anApproproate)) {
-      std::list<ModelGeomAlgo_Shape::SubshapeOfResult>::iterator anApIt = anApproproate.begin();
-      for (; anApIt != anApproproate.end(); ++anApIt) {
-        ++aNbPossibleSelections;
-
-        // stop if the target shape and result are found
-        GeomShapePtr aCurShape = anApIt->mySubshape;
-        if (!aCurShape)
-          aCurShape = anApIt->myResult->shape();
-
-        if (anApIt->myResult->isSame(theResult) && aCurShape->isSame(theShape))
-          break;
-      }
-    }
-  }
-  return aNbPossibleSelections;
 }
 
 ModelHighAPI_Dumper& ModelHighAPI_Dumper::operator<<(
     const std::shared_ptr<ModelAPI_AttributeSelection>& theAttrSelect)
 {
-  myDumpBuffer << "model.selection(";
-
-  if(!theAttrSelect->isInitialized()) {
-    myDumpBuffer << ")";
-    return *this;
-  }
-
-  GeomShapePtr aShape = theAttrSelect->value();
-  if(!aShape.get()) {
-    aShape = theAttrSelect->context()->shape();
-  }
-
-  if(!aShape.get()) {
-    myDumpBuffer << ")";
-    return *this;
-  }
-
-  // how to dump selection: construction features are dumped by name always
-  bool isDumpByGeom = myGeometricalSelection;
-  FeaturePtr aSelectedFeature;
-  if (isDumpByGeom) {
-    ResultPtr aRes = theAttrSelect->context();
-    FeaturePtr aFeature = theAttrSelect->contextFeature();
-    if (aRes && !aFeature)
-      aSelectedFeature = ModelAPI_Feature::feature(aRes->data()->owner());
-    isDumpByGeom = aSelectedFeature && aSelectedFeature->isInHistory();
-  }
-
-  if (theAttrSelect->isGeometricalSelection() && aShape->shapeType() == GeomAPI_Shape::COMPOUND
-    && theAttrSelect->context().get() && !aShape->isEqual(theAttrSelect->context()->shape())
-    && theAttrSelect->context()->groupName() != ModelAPI_ResultPart::group()) {
-    GeomAPI_ShapeIterator anIt(aShape);
-    aShape = anIt.current();
-  }
-
-  myDumpBuffer << "\"" << aShape->shapeTypeStr();
-  bool aStandardDump = true;
-  if (isDumpByGeom) {
-    // check the selected item is a ResultPart;
-    // in this case it is necessary to get shape with full transformation
-    // for correct calculation of the middle point
-    ResultPartPtr aResPart =
-        std::dynamic_pointer_cast<ModelAPI_ResultPart>(theAttrSelect->context());
-    if (aResPart && aShape->shapeType() == GeomAPI_Shape::COMPOUND)
-      aShape = aResPart->shape();
-    GeomPointPtr aMiddlePoint = aShape->middlePoint();
-    // calculate number of features, which could be selected by the same point
-    FeaturePtr anOwner = ModelAPI_Feature::feature(theAttrSelect->owner());
-    int aNbPossibleSelections = possibleSelectionsByPoint(aMiddlePoint,
-        theAttrSelect->context(), aShape, aSelectedFeature, anOwner);
-
-    // produce the index if the number of applicable features is greater than 1
-    std::string anIndex;
-    if (aNbPossibleSelections > 1) {
-      std::ostringstream anOutput;
-      anOutput << "_" << aNbPossibleSelections;
-      anIndex = anOutput.str();
-    }
-
-    myDumpBuffer << anIndex << "\", ("
-                 << aMiddlePoint->x() << ", "
-                 << aMiddlePoint->y() << ", "
-                 << aMiddlePoint->z() << ")";
-    aStandardDump = false;
-  } else if (myWeakNamingSelection && aShape.get() && theAttrSelect->context().get() &&
-       aShape != theAttrSelect->context()->shape()) { // weak naming for local selection only
-    GeomAlgoAPI_NExplode aNExplode(theAttrSelect->context()->shape(), aShape->shapeType());
-    int anIndex = aNExplode.index(aShape);
-    if (anIndex != 0) { // found a week-naming index, so, export it
-      myDumpBuffer<<"\", \""<<
-        theAttrSelect->contextName(theAttrSelect->context())<<"\", "<<anIndex;
-      aStandardDump = false;
-    }
-  }
-  if (aStandardDump)
-    myDumpBuffer << "\", \"" << theAttrSelect->namingName() << "\"";
-  myDumpBuffer << ")";
+  myDumpStorage->write(theAttrSelect);
   return *this;
 }
 
@@ -1111,12 +1300,11 @@ ModelHighAPI_Dumper& ModelHighAPI_Dumper::operator<<(
     const std::shared_ptr<ModelAPI_AttributeSelectionList>& theAttrSelList)
 {
   static const int aThreshold = 2;
+  static bool aDumpAsIs = false;
   // if number of elements in the list if greater than a threshold,
   // dump it in a separate line with specific name
-  std::string aDumped = myDumpBuffer.str();
-
-  if (aDumped.empty() || theAttrSelList->size() <= aThreshold) {
-    myDumpBuffer << "[";
+  if (aDumpAsIs || theAttrSelList->size() <= aThreshold) {
+    *myDumpStorage << "[";
 
     GeomShapePtr aShape;
     std::string aShapeTypeStr;
@@ -1137,21 +1325,15 @@ ModelHighAPI_Dumper& ModelHighAPI_Dumper::operator<<(
       }
 
       if(isAdded) {
-        myDumpBuffer << ", ";
+        *myDumpStorage << ", ";
       } else {
         isAdded = true;
       }
       *this << anAttribute;
     }
 
-    myDumpBuffer << "]";
+    *myDumpStorage << "]";
   } else {
-    // clear buffer and store list "as is"
-    myDumpBuffer.str("");
-    *this << theAttrSelList;
-    // save buffer and clear it again
-    std::string aDumpedList = myDumpBuffer.str();
-    myDumpBuffer.str("");
     // obtain name of list (the feature may contain several selection lists)
     FeaturePtr anOwner = ModelAPI_Feature::feature(theAttrSelList->owner());
     std::string aListName = name(anOwner) + "_objects";
@@ -1167,9 +1349,14 @@ ModelHighAPI_Dumper& ModelHighAPI_Dumper::operator<<(
       aSStream << aListName << "_" << anIndex;
       aListName = aSStream.str();
     }
-    // store all previous data
-    myDumpBuffer << aListName << " = " << aDumpedList << std::endl
-                 << aDumped << aListName;
+    // reserve dumped buffer and store list "as is"
+    myDumpStorage->reserveBuffer();
+    aDumpAsIs = true;
+    *this << aListName << " = " << theAttrSelList << "\n";
+    aDumpAsIs = false;
+    // append reserved data to the end of the current buffer
+    myDumpStorage->restoreReservedBuffer();
+    *myDumpStorage << aListName;
   }
   return *this;
 }
@@ -1177,15 +1364,17 @@ ModelHighAPI_Dumper& ModelHighAPI_Dumper::operator<<(
 ModelHighAPI_Dumper& ModelHighAPI_Dumper::operator<<(
   const std::shared_ptr<ModelAPI_AttributeStringArray>& theArray)
 {
-  myDumpBuffer<<"[";
+  std::ostringstream aBuffer;
+  aBuffer << "[";
   for(int anIndex = 0; anIndex < theArray->size(); ++anIndex) {
     if (anIndex != 0)
-      myDumpBuffer<<", ";
+      aBuffer << ", ";
 
-    myDumpBuffer<<"\""<<theArray->value(anIndex)<<"\"";
+    aBuffer << "\"" << theArray->value(anIndex) << "\"";
   }
+  aBuffer << "]";
 
-  myDumpBuffer<<"]";
+  myDumpStorage->write(aBuffer.str());
   return *this;
 }
 
@@ -1193,7 +1382,7 @@ ModelHighAPI_Dumper& ModelHighAPI_Dumper::operator<<(
 ModelHighAPI_Dumper& operator<<(ModelHighAPI_Dumper& theDumper,
                                 std::basic_ostream<char>& (*theEndl)(std::basic_ostream<char>&))
 {
-  theDumper.myDumpBuffer << theEndl;
+  *theDumper.myDumpStorage << theEndl;
 
   if (!theDumper.myEntitiesStack.empty()) {
     bool isCopy;
@@ -1218,8 +1407,7 @@ ModelHighAPI_Dumper& operator<<(ModelHighAPI_Dumper& theDumper,
 
   // store all not-dumped entities first
   std::set<EntityPtr> aNotDumped = theDumper.myNotDumpedEntities;
-  std::string aBufCopy = theDumper.myDumpBuffer.str();
-  theDumper.clear(true);
+  theDumper.myDumpStorage->reserveBuffer();
   std::set<EntityPtr>::const_iterator anIt = aNotDumped.begin();
   for (; anIt != aNotDumped.end(); ++anIt) {
     // if the feature is composite, dump it with all subs
@@ -1247,12 +1435,9 @@ ModelHighAPI_Dumper& operator<<(ModelHighAPI_Dumper& theDumper,
     }
   }
 
-  // avoid multiple empty lines
-  size_t anInd = std::string::npos;
-  while ((anInd = aBufCopy.find("\n\n\n")) != std::string::npos)
-    aBufCopy.erase(anInd, 1);
-  // then store currently dumped string
-  theDumper.myFullDump << aBufCopy;
+  // then store the reserved data
+  theDumper.myDumpStorage->restoreReservedBuffer();
+  theDumper.myDumpStorage->mergeBuffer();
 
   // now, store all postponed features
   theDumper.dumpPostponed();

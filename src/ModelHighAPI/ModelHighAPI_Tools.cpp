@@ -463,7 +463,7 @@ typedef std::map<std::string, std::map<std::string, ModelHighAPI_FeatureStore> >
 
 static bool dumpToPython(SessionPtr theSession,
                          const char* theFilename,
-                         const char* theSelectionType,
+                         const checkDumpType theSelectionType,
                          const std::string& theErrorMsgContext)
 {
   // 2431: set PartSet as a current document
@@ -474,8 +474,9 @@ static bool dumpToPython(SessionPtr theSession,
   if (aDump.get()) {
     aDump->string("file_path")->setValue(theFilename);
     aDump->string("file_format")->setValue("py");
-    aDump->string("selection_type")->setValue(theSelectionType);
-    aDump->execute();
+    aDump->boolean("topological_naming")->setValue(theSelectionType & CHECK_NAMING);
+    aDump->boolean("geometric_selection")->setValue(theSelectionType & CHECK_GEOMETRICAL);
+    aDump->boolean("weak_naming")->setValue(theSelectionType & CHECK_WEAK);
   }
   bool isProblem = !aDump.get() || !aDump->error().empty(); // after "finish" dump will be removed
   if (isProblem && aDump.get()) {
@@ -522,26 +523,16 @@ bool checkPythonDump(const checkDumpType theCheckType)
   static const std::string anErrorByGeometry("checkPythonDump by geometry");
   static const std::string anErrorByWeak("checkPythonDump by weak naming");
 
-  static char aFileForNamingDump[] = "./check_dump_byname.py";
-  static char aFileForGeometryDump[] = "./check_dump_bygeom.py";
+  static char aFileForNamingDump[] = "./check_dump.py";
+  static char aFileForGeometryDump[] = "./check_dump_geo.py";
   static char aFileForWeakDump[] = "./check_dump_weak.py";
 
   SessionPtr aSession = ModelAPI_Session::get();
-  if (theCheckType & CHECK_NAMING) {
-    // dump with the selection by names
-    if (!dumpToPython(aSession, aFileForNamingDump, "topological_naming", anErrorByNaming))
-      return false;
-  }
-  if (theCheckType & CHECK_GEOMETRICAL) {
-    // dump with the selection by geometry
-    if (!dumpToPython(aSession, aFileForGeometryDump, "geometric_selection", anErrorByGeometry))
-      return false;
-  }
-  if (theCheckType & CHECK_WEAK) {
-    // dump with the selection by weak naming
-    if (!dumpToPython(aSession, aFileForWeakDump, "weak_naming", anErrorByWeak))
-      return false;
-  }
+  // dump with the specified types
+  char* aFileName = theCheckType == CHECK_GEOMETRICAL ? aFileForGeometryDump :
+                   (theCheckType == CHECK_WEAK ? aFileForWeakDump : aFileForNamingDump);
+  if (!dumpToPython(aSession, aFileName, theCheckType, anErrorByNaming))
+    return false;
 
    // map from document name to feature name to feature data
   std::map<std::string, std::map<std::string, ModelHighAPI_FeatureStore> > aStore;
