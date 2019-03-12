@@ -15,8 +15,7 @@ Features plug-in provides a set of common topological operations. It implements 
    cutFeature.rst
    extrusionCutFeature.rst
    extrusionFeature.rst
-   extrusionFuseFeature.rst
-   fillFeature.rst
+   extrusionFuseFeature.
    filletFeature.rst
    fuseFeature.rst
    fuseFeatureFaces.rst
@@ -32,7 +31,8 @@ Features plug-in provides a set of common topological operations. It implements 
    revolutionFeature.rst
    revolutionFuseFeature.rst
    rotationFeature.rst
-   smashFeature.rst
+   smashFeature.rstrst
+   splitFeature.rst
    symmetryFeature.rst
    transformationFeature.rst
    translationFeature.rst
