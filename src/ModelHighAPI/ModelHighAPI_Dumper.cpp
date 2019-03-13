@@ -442,7 +442,7 @@ void ModelHighAPI_Dumper::DumpStorageWeak::write(const AttributeSelectionPtr& th
     int anIndex = aNExplode.index(aShape);
     if (anIndex != 0) { // found a week-naming index, so, export it
       myDumpBuffer << "model.selection(\"" << aShape->shapeTypeStr() << "\", \""
-                   << theAttrSelect->contextName(aContext) << "\", " << anIndex;
+                   << theAttrSelect->contextName(aContext) << "\", " << anIndex << ")";
       aStandardDump = false;
     }
   }
