@@ -33,3 +33,18 @@ Cut_1 = aPart.addFeature("Cut")
 Cut_1.execute()
 assert(Cut_1.error() != "")
 aSession.finishOperation()
+
+
+from salome.shaper import model
+
+model.begin()
+partSet = model.moduleDocument()
+Part_1 = model.addPart(partSet)
+Part_1_doc = Part_1.document()
+Sketch_2 = model.addSketch(Part_1_doc, model.defaultPlane("XOY"))
+SketchLine_1 = Sketch_2.addLine(-30, -30, 0, 10)
+model.do()
+Cut_1 = model.addCut(Part_1_doc, [model.selection("COMPOUND", "Sketch_1")], [model.selection("SOLID", "")])
+model.do()
+assert(Cut_1.feature().error() != "")
+model.end()
