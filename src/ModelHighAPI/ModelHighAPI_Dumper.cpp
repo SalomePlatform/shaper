@@ -64,10 +64,10 @@
 #include <fstream>
 
 // ===========    Implementation of storage of dumped data    ===========
+static const int THE_DUMP_PRECISION = 16;
+
 class ModelHighAPI_Dumper::DumpStorageBuffer : public ModelHighAPI_Dumper::DumpStorage
 {
-  static const int THE_DUMP_PRECISION = 16;
-
 public:
   void addStorage(const ModelHighAPI_Dumper::DumpStoragePtr& theStorage)
   { myStorageArray.push_back(theStorage); }
@@ -418,7 +418,8 @@ void ModelHighAPI_Dumper::DumpStorageGeom::write(const AttributeSelectionPtr& th
       anIndex = anOutput.str();
     }
 
-    myDumpBuffer << anIndex << "\", ("
+    myDumpBuffer << std::setprecision(THE_DUMP_PRECISION)
+                 << anIndex << "\", ("
                  << aMiddlePoint->x() << ", "
                  << aMiddlePoint->y() << ", "
                  << aMiddlePoint->z() << ")";
