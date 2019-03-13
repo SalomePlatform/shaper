@@ -69,39 +69,39 @@ class ModelHighAPI_Dumper::DumpStorageBuffer : public ModelHighAPI_Dumper::DumpS
   static const int THE_DUMP_PRECISION = 16;
 
 public:
-  void addStorage(const ModelHighAPI_Dumper::DumpStorage& theStorage)
+  void addStorage(const ModelHighAPI_Dumper::DumpStoragePtr& theStorage)
   { myStorageArray.push_back(theStorage); }
 
   void clear() { myStorageArray.clear(); }
 
   bool isBufferEmpty()
   {
-    return myStorageArray.empty() || myStorageArray.front().buffer().str().empty();
+    return myStorageArray.empty() || myStorageArray.front()->buffer().str().empty();
   }
 
   void mergeBuffer()
   {
-    std::list<ModelHighAPI_Dumper::DumpStorage>::iterator anIt = myStorageArray.begin();
+    std::list<ModelHighAPI_Dumper::DumpStoragePtr>::iterator anIt = myStorageArray.begin();
     for (; anIt != myStorageArray.end(); ++anIt) {
       // avoid multiple empty lines
-      std::string aBuf = anIt->buffer().str();
+      std::string aBuf = (*anIt)->buffer().str();
       size_t anInd = std::string::npos;
       while ((anInd = aBuf.find("\n\n\n")) != std::string::npos)
         aBuf.erase(anInd, 1);
 
-      anIt->fullDump() << aBuf;
-      anIt->buffer().str("");
+      (*anIt)->fullDump() << aBuf;
+      (*anIt)->buffer().str("");
     }
   }
 
   void write(const std::string& theValue)
   {
     if (myStorageArray.empty())
-      addStorage(DumpStorage());
+      addStorage(DumpStoragePtr(new DumpStorage));
 
-    std::list<ModelHighAPI_Dumper::DumpStorage>::iterator anIt = myStorageArray.begin();
+    std::list<ModelHighAPI_Dumper::DumpStoragePtr>::iterator anIt = myStorageArray.begin();
     for (; anIt != myStorageArray.end(); ++anIt)
-      anIt->buffer() << theValue;
+      (*anIt)->buffer() << theValue;
   }
 
   DumpStorageBuffer& operator<<(const char theChar)
@@ -174,25 +174,25 @@ public:
   virtual void write(const std::shared_ptr<ModelAPI_AttributeSelection>& theAttrSelect)
   {
     if (myStorageArray.empty())
-      addStorage(DumpStorage());
+      addStorage(DumpStoragePtr(new DumpStorage));
 
-    std::list<ModelHighAPI_Dumper::DumpStorage>::iterator anIt = myStorageArray.begin();
+    std::list<ModelHighAPI_Dumper::DumpStoragePtr>::iterator anIt = myStorageArray.begin();
     for (; anIt != myStorageArray.end(); ++anIt)
-      anIt->write(theAttrSelect);
+      (*anIt)->write(theAttrSelect);
   }
 
   virtual void reserveBuffer()
   {
-    std::list<ModelHighAPI_Dumper::DumpStorage>::iterator anIt = myStorageArray.begin();
+    std::list<ModelHighAPI_Dumper::DumpStoragePtr>::iterator anIt = myStorageArray.begin();
     for (; anIt != myStorageArray.end(); ++anIt)
-      anIt->reserveBuffer();
+      (*anIt)->reserveBuffer();
   }
 
   virtual void restoreReservedBuffer()
   {
-    std::list<ModelHighAPI_Dumper::DumpStorage>::iterator anIt = myStorageArray.begin();
+    std::list<ModelHighAPI_Dumper::DumpStoragePtr>::iterator anIt = myStorageArray.begin();
     for (; anIt != myStorageArray.end(); ++anIt)
-      anIt->restoreReservedBuffer();
+      (*anIt)->restoreReservedBuffer();
   }
 
   virtual bool exportTo(const std::string& theFilename, const ModulesSet& theUsedModules)
@@ -203,17 +203,16 @@ public:
       aFilenameBase = aFilenameBase.substr(0, aFilenameBase.size() - THE_EXT.size());
 
     bool isOk = true;
-    std::list<ModelHighAPI_Dumper::DumpStorage>::iterator anIt = myStorageArray.begin();
+    std::list<ModelHighAPI_Dumper::DumpStoragePtr>::iterator anIt = myStorageArray.begin();
     for (; anIt != myStorageArray.end(); ++anIt) {
-      std::string aFilename = aFilenameBase + anIt->myFilenameSuffix + THE_EXT;
-      isOk = anIt->exportTo(aFilename, theUsedModules) && isOk;
+      std::string aFilename = aFilenameBase + (*anIt)->myFilenameSuffix + THE_EXT;
+      isOk = (*anIt)->exportTo(aFilename, theUsedModules) && isOk;
     }
-    clear();
     return isOk;
   }
 
 private:
-  std::list<ModelHighAPI_Dumper::DumpStorage> myStorageArray;
+  std::list<ModelHighAPI_Dumper::DumpStoragePtr> myStorageArray;
 };
 
 
@@ -478,7 +477,7 @@ ModelHighAPI_Dumper* ModelHighAPI_Dumper::getInstance()
   return mySelf;
 }
 
-void ModelHighAPI_Dumper::addCustomStorage(const ModelHighAPI_Dumper::DumpStorage& theStorage)
+void ModelHighAPI_Dumper::addCustomStorage(const ModelHighAPI_Dumper::DumpStoragePtr& theStorage)
 {
   myDumpStorage->addStorage(theStorage);
 }
@@ -486,6 +485,13 @@ void ModelHighAPI_Dumper::addCustomStorage(const ModelHighAPI_Dumper::DumpStorag
 void ModelHighAPI_Dumper::clearCustomStorage()
 {
   myDumpStorage->clear();
+
+  myNames.clear();
+  myModules.clear();
+  myFeatureCount.clear();
+  myPostponed.clear();
+  while (!myEntitiesStack.empty())
+    myEntitiesStack.pop();
   clearNotDumped();
 }
 
@@ -635,7 +641,9 @@ bool ModelHighAPI_Dumper::process(const std::shared_ptr<ModelAPI_Document>& theD
   *this << aDocName << " = model.moduleDocument()" << std::endl;
 
   // dump subfeatures and store result to file
-  return process(theDoc) && myDumpStorage->exportTo(theFileName, myModules);
+  bool isOk = process(theDoc) && myDumpStorage->exportTo(theFileName, myModules);
+  clearCustomStorage();
+  return isOk;
 }
 
 bool ModelHighAPI_Dumper::process(const std::shared_ptr<ModelAPI_Document>& theDoc)

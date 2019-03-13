@@ -112,6 +112,7 @@ public:
 
     friend class ModelHighAPI_Dumper;
   };
+  typedef std::shared_ptr<DumpStorage> DumpStoragePtr;
 
   /** \class DumpStorageGeom
    *  \ingroup CPPHighAPI
@@ -154,7 +155,7 @@ public:
 
   /// Add custom storage to collect corresponding dump
   MODELHIGHAPI_EXPORT
-  void addCustomStorage(const DumpStorage& theStorage);
+  void addCustomStorage(const DumpStoragePtr& theStorage);
   /// Clear custom storages list
   MODELHIGHAPI_EXPORT
   void clearCustomStorage();

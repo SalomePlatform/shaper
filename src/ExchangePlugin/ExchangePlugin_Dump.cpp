@@ -123,19 +123,21 @@ void ExchangePlugin_Dump::dump(const std::string& theFileName)
       ++aNbSelectedTypes;
 
   if (boolean(TOPOLOGICAL_NAMING_DUMP_ID())->value()) {
-    ModelHighAPI_Dumper::DumpStorage aTopoNameStorage;
+    ModelHighAPI_Dumper::DumpStoragePtr aTopoNameStorage(new ModelHighAPI_Dumper::DumpStorage);
     aDumper->addCustomStorage(aTopoNameStorage);
   }
   if (boolean(GEOMETRIC_DUMP_ID())->value()) {
-    ModelHighAPI_Dumper::DumpStorageGeom aGeomSelectionStorage;
+    ModelHighAPI_Dumper::DumpStoragePtr aGeomSelectionStorage(
+        new ModelHighAPI_Dumper::DumpStorageGeom);
     if (aNbSelectedTypes > 1)
-      aGeomSelectionStorage.setFilenameSuffix("_geo");
+      aGeomSelectionStorage->setFilenameSuffix("_geo");
     aDumper->addCustomStorage(aGeomSelectionStorage);
   }
   if (boolean(WEAK_NAMING_DUMP_ID())->value()) {
-    ModelHighAPI_Dumper::DumpStorageWeak aWeakNamingStorage;
+    ModelHighAPI_Dumper::DumpStoragePtr aWeakNamingStorage(
+        new ModelHighAPI_Dumper::DumpStorageWeak);
     if (aNbSelectedTypes > 1)
-      aWeakNamingStorage.setFilenameSuffix("_weak");
+      aWeakNamingStorage->setFilenameSuffix("_weak");
     aDumper->addCustomStorage(aWeakNamingStorage);
   }
 
