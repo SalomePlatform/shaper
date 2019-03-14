@@ -217,9 +217,9 @@ ADD_UNIT_TESTS(TestExtrusion.py
                TestBoolean3.py
                TestBooleanCompSolids.py
                TestBooleanSmash.py
-               TestBooleanFill.py
-               TestBooleanFillWithPlane.py
-               TestBooleanFill_ErrorMsg.py
+               TestBooleanSplit.py
+               TestBooleanSplitWithPlane.py
+               TestBooleanSplit_ErrorMsg.py
                TestMultiBoolean.py
                TestSerialBoolean.py
                TestBoolean_ErrorMsg.py
@@ -241,43 +241,43 @@ ADD_UNIT_TESTS(TestExtrusion.py
                TestPipe_ErrorMsg.py
                TestRecover.py
                TestRecover1798.py
-               TestFillEdgeVertex.py
-               TestFillEdgeEdge.py
-               TestFillEdgeEdgeIntersected.py
-               TestFillEdgeWire.py
-               TestFillEdgeFace.py
-               TestFillEdgeShell.py
-               TestFillEdgeSolid.py
-               TestFillEdgeSolidIntersected.py
-               TestFillWireVertex.py
-               TestFillWireEdge.py
-               TestFillWireWire.py
-               TestFillWireFace.py
-               TestFillWireShell.py
-               TestFillWireSolid.py
-               TestFillFaceVertex.py
-               TestFillFaceEdge.py
-               TestFillFaceEdgeInside.py
-               TestFillFaceEdgePerpendicular.py
-               TestFillFaceWire.py
-               TestFillFaceFace.py
-               TestFillFaceShell.py
-               TestFillFaceSolid.py
-               TestFillCompFaceSolid.py
-               TestFillShellVertex.py
-               TestFillShellEdge.py
-               TestFillShellConstrPlane.py
-               TestFillShellWire.py
-               TestFillShellFace.py
-               TestFillShellShell.py
-               TestFillShellSolid.py
-               TestFillSolid2ConstructionPlanes.py
-               TestFillSolidEdge.py
-               TestFillSolidFace.py
-               TestFillSolidCompFace.py
-               TestFillSolidShell.py
-               TestFillSolidCompShell.py
-               TestFillCompsolidPlane.py
+               TestSplitEdgeVertex.py
+               TestSplitEdgeEdge.py
+               TestSplitEdgeEdgeIntersected.py
+               TestSplitEdgeWire.py
+               TestSplitEdgeFace.py
+               TestSplitEdgeShell.py
+               TestSplitEdgeSolid.py
+               TestSplitEdgeSolidIntersected.py
+               TestSplitWireVertex.py
+               TestSplitWireEdge.py
+               TestSplitWireWire.py
+               TestSplitWireFace.py
+               TestSplitWireShell.py
+               TestSplitWireSolid.py
+               TestSplitFaceVertex.py
+               TestSplitFaceEdge.py
+               TestSplitFaceEdgeInside.py
+               TestSplitFaceEdgePerpendicular.py
+               TestSplitFaceWire.py
+               TestSplitFaceFace.py
+               TestSplitFaceShell.py
+               TestSplitFaceSolid.py
+               TestSplitCompFaceSolid.py
+               TestSplitShellVertex.py
+               TestSplitShellEdge.py
+               TestSplitShellConstrPlane.py
+               TestSplitShellWire.py
+               TestSplitShellFace.py
+               TestSplitShellShell.py
+               TestSplitShellSolid.py
+               TestSplitSolid2ConstructionPlanes.py
+               TestSplitSolidEdge.py
+               TestSplitSolidFace.py
+               TestSplitSolidCompFace.py
+               TestSplitSolidShell.py
+               TestSplitSolidCompShell.py
+               TestSplitCompsolidPlane.py
                TestPartition2Faces.py
                TestPartition2Solids.py
                TestPartition2Wires.py
@@ -299,7 +299,7 @@ ADD_UNIT_TESTS(TestExtrusion.py
                TestMeasurementAngle3Points.py
                TestMeasurementPresentation.py
                TestFusionFaces.py
-               TestFusionFaces2697.py
+               TestFusionFaces2697.py 
                Test1379.py
                Test1922.py
                Test1942.py

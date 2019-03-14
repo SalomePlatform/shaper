@@ -86,7 +86,7 @@ SketchConstraintDistance_1 = Sketch_2.setDistance(SketchPoint_3.coordinates(), S
 model.do()
 Extrusion_1 = model.addExtrusion(Part_1_doc, [model.selection("COMPOUND", "all-in-Sketch_2")], model.selection(), 10, 0)
 AngularCopy_1 = model.addMultiRotation(Part_1_doc, [model.selection("COMPOUND", "all-in-Extrusion_1")], model.selection("EDGE", "PartSet/OZ"), "(90-2*a)/(n-1)", "n")
-Fill_1 = model.addFill(Part_1_doc, [model.selection("FACE", (30, 30, 0))], [model.selection("COMPOUND", (29.25281542867235, 29.25281542867235, 5))])
+Split_1 = model.addSplit(Part_1_doc, [model.selection("FACE", (30, 30, 0))], [model.selection("COMPOUND", (29.25281542867235, 29.25281542867235, 5))])
 model.end()
 
 assert(model.checkPythonDump())

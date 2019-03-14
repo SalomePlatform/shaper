@@ -18,7 +18,7 @@
 #
 
 # Test based on DBC mail 04.03.2019. If the selected solid was not modified by
-# the following Fill operation, this selection disappears after movement to the end.
+# the following Split operation, this selection disappears after movement to the end.
 
 from GeomAPI import *
 from ModelAPI import *
@@ -31,13 +31,13 @@ Part_1_doc = Part_1.document()
 Box_1 = model.addBox(Part_1_doc, 10, 10, 10)
 Plane_4 = model.addPlane(Part_1_doc, model.selection("FACE", "Box_1_1/Front"), 2, True)
 Plane_5 = model.addPlane(Part_1_doc, model.selection("FACE", "Box_1_1/Front"), 7, True)
-Fill_1 = model.addFill(Part_1_doc, [model.selection("SOLID", "Box_1_1")], [model.selection("FACE", "Plane_2")])
-Group_1 = model.addGroup(Part_1_doc, [model.selection("SOLID", "Fill_1_1_1")])
-Fill_2 = model.addFill(Part_1_doc, [model.selection("COMPSOLID", "Fill_1_1")], [model.selection("FACE", "Plane_1")])
+Split_1 = model.addSplit(Part_1_doc, [model.selection("SOLID", "Box_1_1")], [model.selection("FACE", "Plane_2")])
+Group_1 = model.addGroup(Part_1_doc, [model.selection("SOLID", "Split_1_1_1")])
+Split_2 = model.addSplit(Part_1_doc, [model.selection("COMPSOLID", "Split_1_1")], [model.selection("FACE", "Plane_1")])
 model.do()
 
 # move group
-Part_1_doc.moveFeature(Group_1.feature(), Fill_2.feature())
+Part_1_doc.moveFeature(Group_1.feature(), Split_2.feature())
 model.end()
 
 # Check group: result must be four faces

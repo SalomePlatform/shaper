@@ -18,7 +18,7 @@
 #
 
 # Test of deep nested results history.
-# Copied boxes are involved to Fill operation.
+# Copied boxes are involved to Split operation.
 # Check the groups of initial boxes moved to the end contain the corresponding
 # results, but divided.
 
@@ -42,10 +42,10 @@ Group_5 = model.addGroup(Part_1_doc, Group_5_objects)
 Group_6_objects = [model.selection("EDGE", "[LinearCopy_1_1_2/MF:Translated&Box_1_1/Back][LinearCopy_1_1_2/MF:Translated&Box_1_1/Bottom]"), model.selection("EDGE", "[LinearCopy_1_1_2/MF:Translated&Box_1_1/Back][LinearCopy_1_1_2/MF:Translated&Box_1_1/Right]"), model.selection("EDGE", "[LinearCopy_1_1_2/MF:Translated&Box_1_1/Back][LinearCopy_1_1_2/MF:Translated&Box_1_1/Left]"), model.selection("EDGE", "[LinearCopy_1_1_2/MF:Translated&Box_1_1/Back][LinearCopy_1_1_2/MF:Translated&Box_1_1/Top]"), model.selection("EDGE", "[LinearCopy_1_1_2/MF:Translated&Box_1_1/Right][LinearCopy_1_1_2/MF:Translated&Box_1_1/Bottom]"), model.selection("EDGE", "[LinearCopy_1_1_2/MF:Translated&Box_1_1/Left][LinearCopy_1_1_2/MF:Translated&Box_1_1/Top]"), model.selection("EDGE", "[LinearCopy_1_1_2/MF:Translated&Box_1_1/Left][LinearCopy_1_1_2/MF:Translated&Box_1_1/Bottom]"), model.selection("EDGE", "[LinearCopy_1_1_2/MF:Translated&Box_1_1/Right][LinearCopy_1_1_2/MF:Translated&Box_1_1/Top]"), model.selection("EDGE", "[LinearCopy_1_1_2/MF:Translated&Box_1_1/Front][LinearCopy_1_1_2/MF:Translated&Box_1_1/Bottom]"), model.selection("EDGE", "[LinearCopy_1_1_2/MF:Translated&Box_1_1/Front][LinearCopy_1_1_2/MF:Translated&Box_1_1/Left]"), model.selection("EDGE", "[LinearCopy_1_1_2/MF:Translated&Box_1_1/Front][LinearCopy_1_1_2/MF:Translated&Box_1_1/Right]"), model.selection("EDGE", "[LinearCopy_1_1_2/MF:Translated&Box_1_1/Front][LinearCopy_1_1_2/MF:Translated&Box_1_1/Top]")]
 Group_6 = model.addGroup(Part_1_doc, Group_6_objects)
 Plane_4 = model.addPlane(Part_1_doc, model.selection("FACE", "LinearCopy_1_1_1/MF:Translated&Box_1_1/Left"), model.selection("FACE", "LinearCopy_1_1_1/MF:Translated&Box_1_1/Right"))
-Fill_1 = model.addFill(Part_1_doc, [model.selection("SOLID", "LinearCopy_1_1_1")], [model.selection("SOLID", "LinearCopy_1_1_2"), model.selection("FACE", "Plane_1")])
+Split_1 = model.addSplit(Part_1_doc, [model.selection("SOLID", "LinearCopy_1_1_1")], [model.selection("SOLID", "LinearCopy_1_1_2"), model.selection("FACE", "Plane_1")])
 model.do()
 # move groups to the end
-Part_1_doc.moveFeature(Group_1.feature(), Fill_1.feature())
+Part_1_doc.moveFeature(Group_1.feature(), Split_1.feature())
 Part_1_doc.moveFeature(Group_2.feature(), Group_1.feature())
 Part_1_doc.moveFeature(Group_3.feature(), Group_2.feature())
 Part_1_doc.moveFeature(Group_4.feature(), Group_3.feature())
@@ -85,11 +85,11 @@ assert(aFactory.validate(Group_6.feature()))
 
 
 model.begin()
-Filling_1 = model.addFilling(Part_1_doc, [model.selection("EDGE", "Fill_1_1_2/Generated_Edge&Plane_1/Plane_1&Box_1_1/Top"), model.selection("EDGE", "[Fill_1_1_2/Modified_Face&Box_1_1/Right][(Fill_1_1_2/Modified_Face&Box_1_1/Right)(Fill_1_1_2/Modified_Face&Plane_1/Plane_1)(Fill_1_1_2/Modified_Face&Box_1_1/Front)(Fill_1_1_2/Modified_Face&Box_1_1/Top)2(Fill_1_1_2/Modified_Face&Box_1_1/Left)2]")])
-Fill_2 = model.addFill(Part_1_doc, [model.selection("SOLID", "Fill_1_1_2")], [model.selection("FACE", "Filling_1_1")])
+Filling_1 = model.addFilling(Part_1_doc, [model.selection("EDGE", "Split_1_1_2/Generated_Edge&Plane_1/Plane_1&Box_1_1/Top"), model.selection("EDGE", "[Split_1_1_2/Modified_Face&Box_1_1/Right][(Split_1_1_2/Modified_Face&Box_1_1/Right)(Split_1_1_2/Modified_Face&Plane_1/Plane_1)(Split_1_1_2/Modified_Face&Box_1_1/Front)(Split_1_1_2/Modified_Face&Box_1_1/Top)2(Split_1_1_2/Modified_Face&Box_1_1/Left)2]")])
+Split_2 = model.addSplit(Part_1_doc, [model.selection("SOLID", "Split_1_1_2")], [model.selection("FACE", "Filling_1_1")])
 model.do()
 # move groups to the end once again
-Part_1_doc.moveFeature(Group_1.feature(), Fill_2.feature())
+Part_1_doc.moveFeature(Group_1.feature(), Split_2.feature())
 Part_1_doc.moveFeature(Group_2.feature(), Group_1.feature())
 Part_1_doc.moveFeature(Group_3.feature(), Group_2.feature())
 Part_1_doc.moveFeature(Group_4.feature(), Group_3.feature())

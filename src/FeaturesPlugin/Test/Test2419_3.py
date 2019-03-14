@@ -148,18 +148,18 @@ Recover_4 = model.addRecover(Part_1_doc, LinearCopy_1, [Face_5.result()])
 Translation_4 = model.addTranslation(Part_1_doc, [model.selection("FACE", "Recover_4_1")], model.selection("VERTEX", "Sketch_1/SketchLine_7_EndVertex"), model.selection("VERTEX", "Sketch_1/SketchLine_1_StartVertex"))
 LinearCopy_5 = model.addMultiTranslation(Part_1_doc, [model.selection("FACE", "Translation_4_1")], model.selection("EDGE", "PartSet/OX"), "length_assemblage", 2)
 Shell_1 = model.addShell(Part_1_doc, [model.selection("FACE", "Face_1_1"), model.selection("FACE", "Face_2_1")])
-Fill_1_objects_2 = [model.selection("FACE", "Face_3_1"), model.selection("FACE", "Face_3_2"), model.selection("FACE", "Face_3_3"), model.selection("FACE", "Face_3_4"), model.selection("FACE", "Face_3_5"), model.selection("FACE", "Face_3_6"), model.selection("FACE", "Face_3_7"), model.selection("FACE", "Face_3_8"), model.selection("FACE", "Face_3_9"), model.selection("FACE", "Face_3_10"), model.selection("FACE", "Face_3_11"), model.selection("FACE", "Face_3_12"), model.selection("FACE", "Face_4_1"), model.selection("COMPOUND", "LinearCopy_1_1"), model.selection("COMPOUND", "LinearCopy_2_1"), model.selection("COMPOUND", "LinearCopy_3_1"), model.selection("COMPOUND", "LinearCopy_4_1"), model.selection("COMPOUND", "LinearCopy_5_1")]
-Fill_1 = model.addFill(Part_1_doc, [model.selection("SHELL", "Shell_1_1")], Fill_1_objects_2)
+Split_1_objects_2 = [model.selection("FACE", "Face_3_1"), model.selection("FACE", "Face_3_2"), model.selection("FACE", "Face_3_3"), model.selection("FACE", "Face_3_4"), model.selection("FACE", "Face_3_5"), model.selection("FACE", "Face_3_6"), model.selection("FACE", "Face_3_7"), model.selection("FACE", "Face_3_8"), model.selection("FACE", "Face_3_9"), model.selection("FACE", "Face_3_10"), model.selection("FACE", "Face_3_11"), model.selection("FACE", "Face_3_12"), model.selection("FACE", "Face_4_1"), model.selection("COMPOUND", "LinearCopy_1_1"), model.selection("COMPOUND", "LinearCopy_2_1"), model.selection("COMPOUND", "LinearCopy_3_1"), model.selection("COMPOUND", "LinearCopy_4_1"), model.selection("COMPOUND", "LinearCopy_5_1")]
+Split_1 = model.addSplit(Part_1_doc, [model.selection("SHELL", "Shell_1_1")], Split_1_objects_2)
 model.do()
 model.end()
 
 from GeomAPI import  GeomAPI_Shape
 
-model.testNbResults(Fill_1, 1)
-model.testNbSubResults(Fill_1, [0])
-model.testNbSubShapes(Fill_1, GeomAPI_Shape.SOLID, [0])
-model.testNbSubShapes(Fill_1, GeomAPI_Shape.FACE, [60])
-model.testNbSubShapes(Fill_1, GeomAPI_Shape.EDGE, [273])
-model.testNbSubShapes(Fill_1, GeomAPI_Shape.VERTEX, [546])
+model.testNbResults(Split_1, 1)
+model.testNbSubResults(Split_1, [0])
+model.testNbSubShapes(Split_1, GeomAPI_Shape.SOLID, [0])
+model.testNbSubShapes(Split_1, GeomAPI_Shape.FACE, [60])
+model.testNbSubShapes(Split_1, GeomAPI_Shape.EDGE, [273])
+model.testNbSubShapes(Split_1, GeomAPI_Shape.VERTEX, [546])
 
 assert(model.checkPythonDump())

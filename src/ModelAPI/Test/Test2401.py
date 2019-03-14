@@ -69,7 +69,7 @@ SketchConstraintHorizontal_2 = Sketch_2.setHorizontal(SketchLine_10.result())
 SketchConstraintVertical_3 = Sketch_2.setVertical(SketchLine_11.result())
 model.do()
 Face_1 = model.addFace(Part_1_doc, [model.selection("FACE", "Sketch_2/Face-SketchLine_8r-SketchLine_9f-SketchLine_10f-SketchLine_11f")])
-Fill_1 = model.addFill(Part_1_doc, [model.selection("SOLID", "Extrusion_1_1")], [model.selection("FACE", "Face_1_1")])
+Split_1 = model.addSplit(Part_1_doc, [model.selection("SOLID", "Extrusion_1_1")], [model.selection("FACE", "Face_1_1")])
 model.do()
 
 # now add an additional edge to the first sketch as it is described in the issue
@@ -79,6 +79,6 @@ SketchConstraintCoincidence_10 = Sketch_1.setCoincident(SketchLine_4.endPoint(),
 model.end()
 
 # check that the plane is located as previously
-model.testNbSubResults(Fill_1, [2])
-model.testResultsVolumes(Fill_1, [120])
+model.testNbSubResults(Split_1, [2])
+model.testResultsVolumes(Split_1, [120])
 assert(model.checkPythonDump())
