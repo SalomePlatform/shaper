@@ -43,8 +43,14 @@ void ExchangePlugin_Dump::initAttributes()
   data()->addAttribute(FILE_PATH_ID(), ModelAPI_AttributeString::typeId());
   data()->addAttribute(FILE_FORMAT_ID(), ModelAPI_AttributeString::typeId());
 
-  data()->addAttribute(SELECTION_TYPE_ID(), ModelAPI_AttributeString::typeId());
-  //string(SELECTION_TYPE_ID())->setValue(TOPOLOGICAL_NAMING_DUMP_ID()); // default value
+  data()->addAttribute(TOPOLOGICAL_NAMING_DUMP_ID(), ModelAPI_AttributeBoolean::typeId());
+  data()->addAttribute(GEOMETRIC_DUMP_ID(), ModelAPI_AttributeBoolean::typeId());
+  data()->addAttribute(WEAK_NAMING_DUMP_ID(), ModelAPI_AttributeBoolean::typeId());
+
+  // default values
+  boolean(TOPOLOGICAL_NAMING_DUMP_ID())->setValue(true);
+  boolean(GEOMETRIC_DUMP_ID())->setValue(true);
+  boolean(WEAK_NAMING_DUMP_ID())->setValue(false);
 }
 
 void ExchangePlugin_Dump::execute()
@@ -62,11 +68,6 @@ void ExchangePlugin_Dump::dump(const std::string& theFileName)
 {
   // load DumpAssistant from Python side
   Config_ModuleReader::loadScript("salome.shaper.model.dump");
-
-  ModelHighAPI_Dumper* aDumper = ModelHighAPI_Dumper::getInstance();
-  aDumper->clear();
-  aDumper->setSelectionByGeometry(string(SELECTION_TYPE_ID())->value() == GEOMETRIC_DUMP_ID());
-  aDumper->setSelectionWeakNaming(string(SELECTION_TYPE_ID())->value() == WEAK_NAMING_DUMP_ID());
 
   DocumentPtr aDoc = ModelAPI_Session::get()->moduleDocument();
 
@@ -86,8 +87,8 @@ void ExchangePlugin_Dump::dump(const std::string& theFileName)
     FeaturePtr aLastFeature =
         ModelAPI_Feature::feature(anActiveDoc->object(ModelAPI_Feature::group(), aFeaturesNb - 1));
     if(anActiveDoc->currentFeature(true) != aLastFeature) {
-        setError("Dump cannot be done. Please move the history line to the end before dumping.");
-        return;
+      setError("Dump cannot be done. Please move the history line to the end before dumping.");
+      return;
     }
   }
 
@@ -105,6 +106,41 @@ void ExchangePlugin_Dump::dump(const std::string& theFileName)
     }
   }
 
-  if (!aDumper || !aDumper->process(aDoc, theFileName))
+  // process selected types of the dump
+  ModelHighAPI_Dumper* aDumper = ModelHighAPI_Dumper::getInstance();
+  if (!aDumper)
+    setError("An error occured while dumping to " + theFileName);
+
+  static const int THE_TYPES_SIZE = 3;
+  bool aTypes[THE_TYPES_SIZE] = {
+    boolean(TOPOLOGICAL_NAMING_DUMP_ID())->value(),
+    boolean(GEOMETRIC_DUMP_ID())->value(),
+    boolean(WEAK_NAMING_DUMP_ID())->value()
+  };
+  int aNbSelectedTypes = 0;
+  for (int i = 0; i < THE_TYPES_SIZE; ++i)
+    if (aTypes[i])
+      ++aNbSelectedTypes;
+
+  if (boolean(TOPOLOGICAL_NAMING_DUMP_ID())->value()) {
+    ModelHighAPI_Dumper::DumpStoragePtr aTopoNameStorage(new ModelHighAPI_Dumper::DumpStorage);
+    aDumper->addCustomStorage(aTopoNameStorage);
+  }
+  if (boolean(GEOMETRIC_DUMP_ID())->value()) {
+    ModelHighAPI_Dumper::DumpStoragePtr aGeomSelectionStorage(
+        new ModelHighAPI_Dumper::DumpStorageGeom);
+    if (aNbSelectedTypes > 1)
+      aGeomSelectionStorage->setFilenameSuffix("_geo");
+    aDumper->addCustomStorage(aGeomSelectionStorage);
+  }
+  if (boolean(WEAK_NAMING_DUMP_ID())->value()) {
+    ModelHighAPI_Dumper::DumpStoragePtr aWeakNamingStorage(
+        new ModelHighAPI_Dumper::DumpStorageWeak);
+    if (aNbSelectedTypes > 1)
+      aWeakNamingStorage->setFilenameSuffix("_weak");
+    aDumper->addCustomStorage(aWeakNamingStorage);
+  }
+
+  if (!aDumper->process(aDoc, theFileName))
     setError("An error occured while dumping to " + theFileName);
 }

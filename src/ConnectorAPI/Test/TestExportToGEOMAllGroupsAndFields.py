@@ -63,7 +63,9 @@ def dumpShaper(fileName):
   dump=model.moduleDocument().addFeature("Dump")
   dump.string("file_path").setValue(fileName)
   dump.string("file_format").setValue("py")
-  dump.string("selection_type").setValue("topological_naming")
+  dump.boolean("topological_naming").setValue(True)
+  dump.boolean("geometric_selection").setValue(False)
+  dump.boolean("weak_naming").setValue(False)
   model.do()
   model.end()
   pass

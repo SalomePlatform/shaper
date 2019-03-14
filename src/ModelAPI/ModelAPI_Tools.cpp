@@ -106,6 +106,7 @@ std::shared_ptr<GeomAPI_Shape> shape(const ResultPtr& theResult)
   return theResult->shape();
 }
 
+// LCOV_EXCL_START
 const char* toString(ModelAPI_ExecState theExecState)
 {
   switch (theExecState) {
@@ -118,7 +119,6 @@ const char* toString(ModelAPI_ExecState theExecState)
   }
 }
 
-// LCOV_EXCL_START
 std::string getFeatureError(const FeaturePtr& theFeature)
 {
   std::string anError;
