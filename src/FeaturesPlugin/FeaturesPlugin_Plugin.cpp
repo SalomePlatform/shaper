@@ -133,7 +133,7 @@ FeaturePtr FeaturesPlugin_Plugin::createFeature(std::string theFeatureID)
     return FeaturePtr(new FeaturesPlugin_BooleanCommon);
   } else if (theFeatureID == FeaturesPlugin_BooleanSmash::ID()) {
     return FeaturePtr(new FeaturesPlugin_BooleanSmash);
-  } else if (theFeatureID == FeaturesPlugin_BooleanFill::ID()) {
+  } else if (theFeatureID == FeaturesPlugin_BooleanFill::ID() || theFeatureID == "Fill") {
     return FeaturePtr(new FeaturesPlugin_BooleanFill);
   } else if (theFeatureID == FeaturesPlugin_Intersection::ID()) {
     return FeaturePtr(new FeaturesPlugin_Intersection);
