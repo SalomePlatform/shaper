@@ -110,6 +110,12 @@ bool XGUI_EXPORT canRemoveOrRename(QWidget* theParent, const std::set<FeaturePtr
 bool canRename(const ObjectPtr& theObject, const QString& theName);
 
 /*!
+ Checks that the given string contains only ASCII symbols
+ \param theStr a string to check
+ */
+bool isAscii(const QString& theStr);
+
+/*!
  Returns converted workshop
  \param theWorkshop an interface workshop
  \return XGUI workshop instance

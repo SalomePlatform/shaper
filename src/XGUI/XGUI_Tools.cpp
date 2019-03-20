@@ -148,10 +148,26 @@ bool canRemoveOrRename(QWidget* theParent, const std::set<FeaturePtr>& theFeatur
 }
 
 //******************************************************************
+bool isAscii(const QString& theStr)
+{
+  char aCh;
+  for (int i = 0; i < theStr.size(); i++) {
+    aCh = theStr[i].toLatin1();
+    if (aCh == 0)
+      return false;
+  }
+  return true;
+}
+
+//******************************************************************
 bool canRename(const ObjectPtr& theObject, const QString& theName)
 {
   std::string aType = theObject->groupName();
   if (aType == ModelAPI_ResultParameter::group()) {
+    // For parameters names only ASCII symbols have to be used
+    if (!isAscii(theName))
+      return false;
+
     double aValue;
     ResultParameterPtr aParam;
     if (ModelAPI_Tools::findVariable(theObject->document(),
