@@ -119,7 +119,7 @@ bool GeomAPI_Wire::isRectangle(std::list<GeomPointPtr>& thePoints) const
     else
       return false;
   }
-  return true;
+  return thePoints.size() == 4;
 }
 
 //==================================================================================================
