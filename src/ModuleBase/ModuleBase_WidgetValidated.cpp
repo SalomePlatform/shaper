@@ -116,7 +116,8 @@ bool ModuleBase_WidgetValidated::isValidInFilters(const ModuleBase_ViewerPrsPtr&
       myPresentedObject = aResult;
     }
     else {
-      FeaturePtr aFeature = ModelAPI_Feature::feature(thePrs->object());
+      //FeaturePtr aFeature = ModelAPI_Feature::feature(thePrs->object());
+      FeaturePtr aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(thePrs->object());
       if (aFeature.get()) {
         // Use feature as a reference to all its results
         myPresentedObject = aFeature;
@@ -148,8 +149,11 @@ bool ModuleBase_WidgetValidated::isValidInFilters(const ModuleBase_ViewerPrsPtr&
             GeomShapePtr aShapePtr = ModelAPI_Tools::shape(aResult);
             if (aShapePtr.get()) {
               const TopoDS_Shape aTDShape = aShapePtr->impl<TopoDS_Shape>();
-              Handle(AIS_InteractiveObject) anIO = myWorkshop->selection()->getIO(thePrs);
-              anOwner = new StdSelect_BRepOwner(aTDShape, anIO);
+              AISObjectPtr aIOPtr = myWorkshop->findPresentation(aResult);
+              if (aIOPtr.get()) {
+                Handle(AIS_InteractiveObject) anIO = aIOPtr->impl<Handle(AIS_InteractiveObject)>();
+                anOwner = new StdSelect_BRepOwner(aTDShape, anIO);
+              }
             }
           }
           aValid = !anOwner.IsNull(); // only results with a shape can be filtered
@@ -439,12 +443,9 @@ QList<ModuleBase_ViewerPrsPtr> ModuleBase_WidgetValidated::getFilteredSelected()
 void ModuleBase_WidgetValidated::filterPresentations(QList<ModuleBase_ViewerPrsPtr>& theValues)
 {
   QList<ModuleBase_ViewerPrsPtr> aValidatedValues;
-
-  QList<ModuleBase_ViewerPrsPtr>::const_iterator anIt = theValues.begin(), aLast = theValues.end();
-  bool isDone = false;
-  for (; anIt != aLast; anIt++) {
-    if (isValidInFilters(*anIt))
-      aValidatedValues.append(*anIt);
+  foreach(ModuleBase_ViewerPrsPtr aPrs, theValues) {
+    if (isValidInFilters(aPrs))
+      aValidatedValues.append(aPrs);
   }
   if (aValidatedValues.size() != theValues.size()) {
     theValues.clear();
