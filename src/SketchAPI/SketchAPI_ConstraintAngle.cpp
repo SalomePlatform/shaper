@@ -91,15 +91,18 @@ static std::string angleTypeToString(FeaturePtr theFeature)
 
   AttributeDoublePtr aValueAttr = theFeature->real(SketchPlugin_ConstraintAngle::ANGLE_VALUE_ID());
 
+  double aDirectDiff = fabs(aValueAttr->value() - anAngleDirect);
+  double aComplementaryDiff = fabs(aValueAttr->value() - anAngleComplmentary);
+  double aBackwardDiff = fabs(aValueAttr->value() - anAngleBackward);
+
+  // find the minimal difference
   std::string aType;
-  if (fabs(aValueAttr->value() - anAngleDirect) < TOLERANCE) {
-    // Nothing to do.
-    // This case is empty and going the first to check the direct angle before the others.
+  if (aDirectDiff > TOLERANCE) {
+    if (aComplementaryDiff < aDirectDiff && aComplementaryDiff < aBackwardDiff)
+      aType = "Complementary";
+    else if (aBackwardDiff < aDirectDiff && aBackwardDiff < aComplementaryDiff)
+      aType = "Backward";
   }
-  else if (fabs(aValueAttr->value() - anAngleComplmentary) < TOLERANCE)
-    aType = "Complementary";
-  else if (fabs(aValueAttr->value() - anAngleBackward) < TOLERANCE)
-    aType = "Backward";
   return aType;
 }
 
