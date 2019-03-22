@@ -176,3 +176,6 @@ for Group in [Group_1, Group_2, Group_3]:
   for a in range(Group.groupList().size()):
     assert(Group.groupList().value(a).value().shapeTypeStr() == "FACE")
     assert(len(Group.groupList().value(a).namingName()) > 0)
+
+# for the issue #2892 check fix
+assert(model.checkPythonDump())
