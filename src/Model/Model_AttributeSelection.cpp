@@ -1522,14 +1522,32 @@ void Model_AttributeSelection::updateInHistory(bool& theRemove)
         continue;
       }
 
+      ResultPtr aNewContext = *aNewCont;
+      if (aValueShape.get()) { // #2892 if context is higher level result, search this sub in lower
+        ResultBodyPtr aBodyContext = std::dynamic_pointer_cast<ModelAPI_ResultBody>(aNewContext);
+        if (aBodyContext.get() && aBodyContext->numberOfSubs() != 0) {
+          std::list<ResultPtr> aLower;
+          ModelAPI_Tools::allSubs(aBodyContext, aLower, true);
+          for(std::list<ResultPtr>::iterator aL = aLower.begin(); aL != aLower.end(); aL++) {
+            GeomShapePtr aLShape = (*aL)->shape();
+            if (aLShape.get() && !aLShape->isNull()) {
+              if (aLShape->isSubShape(aValueShape, false)) {
+                aNewContext = *aL;
+                break;
+              }
+            }
+          }
+        }
+      }
+
       if (aFirst) {
-        if (!myParent || !myParent->isInList(*aNewCont, aValueShape)) { // avoid duplicates
-          setValue(*aNewCont, aValueShape);
+        if (!myParent || !myParent->isInList(aNewContext, aValueShape)) { // avoid duplicates
+          setValue(aNewContext, aValueShape);
           aFirst = false;
         }
       } else if (myParent) {
-        if (!myParent->isInList(*aNewCont, aValueShape)) // avoid addition of duplicates
-          myParent->append(*aNewCont, aValueShape);
+        if (!myParent->isInList(aNewContext, aValueShape)) // avoid addition of duplicates
+          myParent->append(aNewContext, aValueShape);
       }
     }
     if (aFirst) { // nothing was added, all results were deleted

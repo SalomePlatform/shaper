@@ -301,14 +301,16 @@ bool hasSubResults(const ResultPtr& theResult)
   return aCompSolid.get() && aCompSolid->numberOfSubs() > 0;
 }
 
-void allSubs(const ResultBodyPtr& theResult, std::list<ResultPtr>& theResults) {
+void allSubs(const ResultBodyPtr& theResult, std::list<ResultPtr>& theResults,
+             const bool theLowerOnly) {
   // iterate sub-bodies of compsolid
   ResultBodyPtr aComp = std::dynamic_pointer_cast<ModelAPI_ResultBody>(theResult);
   if (aComp.get()) {
     int aNumSub = aComp->numberOfSubs();
     for (int a = 0; a < aNumSub; a++) {
       ResultBodyPtr aSub = aComp->subResult(a);
-      theResults.push_back(aSub);
+      if (!theLowerOnly || aSub->numberOfSubs() == 0)
+        theResults.push_back(aSub);
       allSubs(aSub, theResults);
     }
   }

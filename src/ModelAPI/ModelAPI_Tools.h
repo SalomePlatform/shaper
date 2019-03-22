@@ -125,7 +125,8 @@ MODELAPI_EXPORT bool hasSubResults(const std::shared_ptr<ModelAPI_Result>& theRe
 *  collects recursively all subs of the given result
 */
 MODELAPI_EXPORT void allSubs(const std::shared_ptr<ModelAPI_ResultBody>& theResult,
-                             std::list<std::shared_ptr<ModelAPI_Result> >& theResults);
+                             std::list<std::shared_ptr<ModelAPI_Result> >& theResults,
+                             const bool theLowerOnly = false);
 
 /*!
 * Adds the results of the given feature to theResults list: including disabled and sub-results
