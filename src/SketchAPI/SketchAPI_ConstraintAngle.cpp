@@ -28,6 +28,8 @@
 #include <SketchPlugin_ConstraintAngle.h>
 #include <SketchPlugin_Line.h>
 
+#include <SketcherPrs_Tools.h>
+
 #include <cmath>
 
 SketchAPI_ConstraintAngle::SketchAPI_ConstraintAngle(
@@ -90,14 +92,26 @@ static std::string angleTypeToString(FeaturePtr theFeature)
   calculatePossibleValuesOfAngle(theFeature, anAngleDirect, anAngleComplmentary, anAngleBackward);
 
   AttributeDoublePtr aValueAttr = theFeature->real(SketchPlugin_ConstraintAngle::ANGLE_VALUE_ID());
-
   double aDirectDiff = fabs(aValueAttr->value() - anAngleDirect);
   double aComplementaryDiff = fabs(aValueAttr->value() - anAngleComplmentary);
   double aBackwardDiff = fabs(aValueAttr->value() - anAngleBackward);
 
+  AttributeIntegerPtr aTypeAttr = theFeature->integer(SketchPlugin_ConstraintAngle::TYPE_ID());
+  bool isDirect = aTypeAttr->value() == SketcherPrs_Tools::ANGLE_DIRECT;
+  bool isComplementary = aTypeAttr->value() == SketcherPrs_Tools::ANGLE_COMPLEMENTARY;
+  bool isBackward = aTypeAttr->value() == SketcherPrs_Tools::ANGLE_BACKWARD;
+
   // find the minimal difference
   std::string aType;
-  if (aDirectDiff > TOLERANCE) {
+  if (isDirect && aDirectDiff < TOLERANCE) {
+    // Nothing to do.
+    // This case is empty and going the first to check the direct angle before the others.
+  }
+  else if (isComplementary && aComplementaryDiff < TOLERANCE)
+    aType = "Complementary";
+  else if (isBackward && aBackwardDiff < TOLERANCE)
+    aType = "Backward";
+  else {
     if (aComplementaryDiff < aDirectDiff && aComplementaryDiff < aBackwardDiff)
       aType = "Complementary";
     else if (aBackwardDiff < aDirectDiff && aBackwardDiff < aComplementaryDiff)
