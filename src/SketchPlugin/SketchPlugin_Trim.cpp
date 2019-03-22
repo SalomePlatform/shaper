@@ -239,6 +239,10 @@ void SketchPlugin_Trim::execute()
   std::cout << " Base Feature: " << aBaseFeature->data()->name() << std::endl;
 #endif
   findShapePoints(SELECTED_OBJECT(), SELECTED_POINT(), aStartShapePoint, aLastShapePoint);
+  if (!aStartShapePoint || !aLastShapePoint) {
+    setError("Error: Selected point is not placed on any edge");
+    return;
+  }
 
   std::shared_ptr<GeomAPI_Pnt2d> aStartShapePoint2d = convertPoint(aStartShapePoint);
   std::shared_ptr<GeomAPI_Pnt2d> aLastShapePoint2d = convertPoint(aLastShapePoint);
