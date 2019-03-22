@@ -155,6 +155,16 @@ bool isAscii(const QString& theStr)
     aCh = theStr[i].toLatin1();
     if (aCh == 0)
       return false;
+    if ((aCh >= 0x30) && (aCh <= 0x39))
+      continue;
+    else if ((aCh >= 0x41) && (aCh <= 0x5A))
+      continue;
+    else if ((aCh >= 0x61) && (aCh <= 0x7A))
+      continue;
+    else if (aCh == 0x5f)
+      continue;
+    else
+      return false;
   }
   return true;
 }
