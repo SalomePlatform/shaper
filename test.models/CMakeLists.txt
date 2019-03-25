@@ -21,6 +21,12 @@ ENABLE_TESTING()
 
 file(GLOB pyFiles "*.py")
 
+SET(RESTRICTED_ROOT_DIR $ENV{RESTRICTED_ROOT_DIR} CACHE PATH "Path to the restricted repository")
+
+if (EXISTS ${RESTRICTED_ROOT_DIR})
+  file(GLOB pyFilesRestr "${RESTRICTED_ROOT_DIR}/SHAPER/test.models/*.py")
+endif()
+
 if (WIN32) # different separators and path to libraries variable name
   SET(_JUSTPATH "${CMAKE_INSTALL_PREFIX}/${SHAPER_INSTALL_BIN};${CMAKE_INSTALL_PREFIX}/${SHAPER_INSTALL_SWIG};${CMAKE_INSTALL_PREFIX}/${SHAPER_INSTALL_PLUGIN_FILES};${SUIT_LIB_DIR};$ENV{PATH}")
   STRING(REPLACE "\\" "/" _JUSTPATH "${_JUSTPATH}")
@@ -33,7 +39,7 @@ else()
   SET(_PYTHONPATH "${CMAKE_INSTALL_PREFIX}/${SHAPER_INSTALL_SWIG}:${CMAKE_INSTALL_PREFIX}/${SHAPER_INSTALL_PLUGIN_FILES}:${CMAKE_INSTALL_PREFIX}/${SHAPER_INSTALL_ADDONS}:$ENV{PYTHONPATH}")
 endif()
 
-foreach(eachFilePath ${pyFiles})
+foreach(eachFilePath ${pyFiles};${pyFilesRestr})
   # Strip the ".py" suffix
   GET_FILENAME_COMPONENT(aTestName ${eachFilePath} NAME_WE)
 
