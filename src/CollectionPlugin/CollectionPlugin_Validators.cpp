@@ -29,17 +29,15 @@ bool CollectionPlugin_FieldValidator::isValid(const FeaturePtr& theFeature,
 {
   AttributeSelectionListPtr aSelList =
     theFeature->selectionList(CollectionPlugin_Field::SELECTED_ID());
+  std::string aTypeStr = aSelList->selectionType();
+  if (aTypeStr == "part")
+    return true;
   if (aSelList->isInitialized()) {
     int aSize = aSelList->size();
-    std::string aTypeStr = aSelList->selectionType();
-    if (aTypeStr == "part")
-      return true;
-    else {
-      bool aIsDefined = aSize > 0;
-      if (!aIsDefined)
-        theError = "Selection list is not initialized";
-      return aIsDefined;
-    }
+    bool aIsDefined = aSize > 0;
+    if (!aIsDefined)
+      theError = "Selection list is not initialized";
+    return aIsDefined;
   }
   theError = "Selection list is not initialized";
   return false;

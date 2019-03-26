@@ -52,6 +52,7 @@
 #include <ModelAPI_ResultField.h>
 #include <ModelAPI_Session.h>
 #include <ModelAPI_Validator.h>
+#include <ModelAPI_Tools.h>
 
 #include <Events_InfoMessage.h>
 
@@ -212,6 +213,37 @@ static std::string valToString(const ModelAPI_AttributeTables::Value& theVal,
   return aStr.str();
 }
 
+/// Returns true if something in selection is presented in the results list
+static bool isInResults(AttributeSelectionListPtr theSelection,
+                        const std::list<ResultBodyPtr>& theResults,
+                        std::set<ResultBodyPtr>& theCashedResults)
+{
+  // collect all results into a cashed set
+  if (theCashedResults.empty()) {
+    std::list<ResultPtr> aResults;
+    std::list<ResultBodyPtr>::const_iterator aRes = theResults.cbegin();
+    for(; aRes != theResults.cend(); aRes++) {
+      if (theCashedResults.count(*aRes))
+        continue;
+      else
+        theCashedResults.insert(*aRes);
+      std::list<ResultPtr> aResults;
+      ModelAPI_Tools::allSubs(*aRes, aResults, false);
+      for(std::list<ResultPtr>::iterator aR = aResults.begin(); aR != aResults.end(); aR++) {
+        theCashedResults.insert(std::dynamic_pointer_cast<ModelAPI_ResultBody>(*aR));
+      }
+    }
+  }
+  // if context is in results, return true
+  for(int a = 0; a < theSelection->size(); a++) {
+    AttributeSelectionPtr anAttr = theSelection->value(a);
+    ResultBodyPtr aSelected= std::dynamic_pointer_cast<ModelAPI_ResultBody>(anAttr->context());
+    if (aSelected.get() && theCashedResults.count(aSelected))
+      return true;
+  }
+  return false;
+}
+
 void ExchangePlugin_ExportFeature::exportXAO(const std::string& theFileName)
 {
   try {
@@ -227,16 +259,39 @@ void ExchangePlugin_ExportFeature::exportXAO(const std::string& theFileName)
   // make shape for export from all results
   std::list<GeomShapePtr> aShapes;
   std::list<ResultBodyPtr> aResults;
-  int aBodyCount = document()->size(ModelAPI_ResultBody::group());
-  for (int aBodyIndex = 0; aBodyIndex < aBodyCount; ++aBodyIndex) {
-    ResultBodyPtr aResultBody =
-        std::dynamic_pointer_cast<ModelAPI_ResultBody>(
-            document()->object(ModelAPI_ResultBody::group(), aBodyIndex));
-    if (!aResultBody.get())
-      continue;
-    aShapes.push_back(aResultBody->shape());
-    aResults.push_back(aResultBody);
+
+  AttributeSelectionListPtr aSelection = selectionList(SELECTION_LIST_ID());
+  bool aIsSelection = aSelection->isInitialized() && aSelection->size() > 0;
+  if (aIsSelection) { // a mode for export to geom result by result
+    for(int a = 0; a < aSelection->size(); a++) {
+      AttributeSelectionPtr anAttr = aSelection->value(a);
+      ResultBodyPtr aBodyContext = std::dynamic_pointer_cast<ModelAPI_ResultBody>(anAttr->context());
+      if (aBodyContext.get() && !aBodyContext->isDisabled() && aBodyContext->shape().get()) {
+        aResults.push_back(aBodyContext);
+        GeomShapePtr aShape = anAttr->value();
+        if (!aShape.get())
+          aShape = aBodyContext->shape();
+        aShapes.push_back(aShape);
+      }
+    }
+  } else {
+    int aBodyCount = document()->size(ModelAPI_ResultBody::group());
+    for (int aBodyIndex = 0; aBodyIndex < aBodyCount; ++aBodyIndex) {
+      ResultBodyPtr aResultBody =
+          std::dynamic_pointer_cast<ModelAPI_ResultBody>(
+              document()->object(ModelAPI_ResultBody::group(), aBodyIndex));
+      if (!aResultBody.get())
+        continue;
+      aShapes.push_back(aResultBody->shape());
+      aResults.push_back(aResultBody);
+    }
   }
+  if (aShapes.empty()) {
+    setError("No shapes to export");
+    return;
+  }
+
+
   GeomShapePtr aShape = (aShapes.size() == 1)
       ? *aShapes.begin()
       : GeomAlgoAPI_CompoundBuilder::compound(aShapes);
@@ -250,13 +305,15 @@ void ExchangePlugin_ExportFeature::exportXAO(const std::string& theFileName)
 
   // geometry name
   std::string aGeometryName = string(ExchangePlugin_ExportFeature::XAO_GEOMETRY_NAME_ID())->value();
-  if (aGeometryName.empty() && aBodyCount == 1) {
+  if (aGeometryName.empty() && aResults.size() == 1) {
     // get the name from the first result
     ResultBodyPtr aResultBody = *aResults.begin();
     aGeometryName = aResultBody->data()->name();
   }
 
   aXao.getGeometry()->setName(aGeometryName);
+
+  std::set<ResultBodyPtr> allResultsCashed; // cash to speed up searching in all results selected
 
   // groups
   int aGroupCount = document()->size(ModelAPI_ResultGroup::group());
@@ -269,6 +326,9 @@ void ExchangePlugin_ExportFeature::exportXAO(const std::string& theFileName)
 
     AttributeSelectionListPtr aSelectionList =
         aGroupFeature->selectionList("group_list");
+
+    if (!isInResults(aSelectionList, aResults, allResultsCashed))// skip group not used in results
+      continue;
 
     // conversion of dimension
     std::string aSelectionType = aSelectionList->selectionType();
@@ -289,6 +349,9 @@ void ExchangePlugin_ExportFeature::exportXAO(const std::string& theFileName)
         // int aReferenceID_old = aSelection->Id();
 
         int aReferenceID = GeomAlgoAPI_CompoundBuilder::id(aShape, aSelection->value());
+
+        if (aReferenceID == 0) // selected value does not found in the exported shape
+          continue;
 
         std::string aReferenceString = XAO::XaoUtils::intToString(aReferenceID);
         int anElementID =
@@ -318,13 +381,17 @@ void ExchangePlugin_ExportFeature::exportXAO(const std::string& theFileName)
 
     AttributeSelectionListPtr aSelectionList =
         aFieldFeature->selectionList("selected");
+    std::string aSelectionType = aSelectionList->selectionType();
+    bool isWholePart = aSelectionType == "part";
+
+    if (!isWholePart &&
+        !isInResults(aSelectionList, aResults, allResultsCashed))// skip field not used in results
+      continue;
 
     // conversion of dimension
-    std::string aSelectionType = aSelectionList->selectionType();
     std::string aDimensionString =
       ExchangePlugin_Tools::selectionType2xaoDimension(aSelectionType);
     XAO::Dimension aFieldDimension = XAO::XaoUtils::stringToDimension(aDimensionString);
-    bool isWholePart = aSelectionType == "part";
     // get tables and their type
     std::shared_ptr<ModelAPI_AttributeTables> aTables = aFieldFeature->tables("values");
     std::string aTypeString = ExchangePlugin_Tools::valuesType2xaoType(aTables->type());
@@ -358,13 +425,9 @@ void ExchangePlugin_ExportFeature::exportXAO(const std::string& theFileName)
             if (!isWholePart) {
               // element index actually is the ID of the selection
               AttributeSelectionPtr aSelection = aSelectionList->value(aRow - 1);
-
-              // complex conversion of reference id to element index
-              // gives bad id in case the selection is done from python script
-              // => using GeomAlgoAPI_CompoundBuilder::id instead
-              //int aReferenceID_old = aSelection->Id();
-
               int aReferenceID = GeomAlgoAPI_CompoundBuilder::id(aShape, aSelection->value());
+              if (aReferenceID == 0) // selected value does not found in the exported shape
+                continue;
 
               std::string aReferenceString = XAO::XaoUtils::intToString(aReferenceID);
               anElementID =

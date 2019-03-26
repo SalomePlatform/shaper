@@ -90,10 +90,10 @@ def testSeveralExportsToGEOM():
   Partition_1 = model.addPartition(Part_1_doc, [model.selection("SOLID", "Translation_1_1"), model.selection("SOLID", "Box_2_1")])
   Group_1 = model.addGroup(Part_1_doc, [model.selection("FACE", "Partition_1_1_1/Modified_Face&Box_1_1/Bottom"), model.selection("FACE", "Box_2_1/Top")])
   model.do()
-  model.end()
 
   # First export to GEOM
   model.exportToGEOM(Part_1_doc)
+  model.end()
 
   # Check that the GEOM object has 1 compsolid and 2 solids
   geomObject_1 = getLastGEOMShape()
@@ -105,15 +105,18 @@ def testSeveralExportsToGEOM():
   assert geompy.NumberOfFaces(geomGroup_1) == 2
 
   # Add a third box
+  model.begin()
   Box_3 = model.addBox(Part_1_doc, 10, 10, 10)
   Translation_2 = model.addTranslation(Part_1_doc, [model.selection("SOLID", "Box_3_1")], model.selection("EDGE", "PartSet/OX"), 20)
+  model.do()
 
   # Second export to GEOM
   model.exportToGEOM(Part_1_doc)
+  model.end()
 
-  # Check that the GEOM object has 3 solids
+  # Check that the last exported GEOM object is 1 solids
   geomObject_2 = getLastGEOMShape()
-  assert geompy.NumberOfSolids(geomObject_2) == 3
+  assert geompy.NumberOfSolids(geomObject_2) == 1
 
   # Dump the salome study (only CORBA modules, SHAPER dump is not in it)
   tempdir = tempfile.gettempdir()

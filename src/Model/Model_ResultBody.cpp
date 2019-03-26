@@ -125,9 +125,9 @@ ResultBodyPtr Model_ResultBody::subResult(const int theIndex, bool forTree) cons
   return mySubs.at(theIndex);
 }
 
-bool Model_ResultBody::isSub(ObjectPtr theObject, int& theIndex) const
+bool Model_ResultBody::isSub(ObjectPtr theResult, int& theIndex) const
 {
-  std::map<ObjectPtr, int>::const_iterator aFound = mySubsMap.find(theObject);
+  std::map<ObjectPtr, int>::const_iterator aFound = mySubsMap.find(theResult);
   if (aFound != mySubsMap.end()) {
     theIndex = aFound->second;
     return true;

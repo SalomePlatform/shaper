@@ -117,8 +117,8 @@ def testGroupsAndFieldsExportToGEOM():
   Field_4 = model.addField(Part_1_doc, 1, "DOUBLE", 1, ["Comp 1"], Field_4_objects)
   Field_4.result().setName("Field_vertices")
   Field_4.addStep(0, 0, [[0], [1], [1], [1], [1], [1], [1], [1], [1], [2], [2], [2], [2], [3], [3], [3], [3]])
-  model.exportToGEOM(Part_1_doc)
   model.do()
+  model.exportToGEOM(Part_1_doc)
   model.end()
 
 # check the groups content by the coordinates of a point on its sub-shapes
@@ -130,55 +130,55 @@ def checkGroupByCoords(group, coords, tolerance=1e-7):
 
 ## Check the result imported in GEOM
 def checkResultInGEOM():
-  geomObject_1 = getLastGEOMShape()
+  geomObject_1 = getLastGEOMShape() # the second, translation result
 
   group_1_GEOM = getSubObject(geomObject_1, 1)
   assert group_1_GEOM.GetName() == 'faces_top'
-  assert geompy.NumberOfFaces(group_1_GEOM) == 3
+  assert geompy.NumberOfFaces(group_1_GEOM) == 1 # 2 faces are in the first result, only one here
 
   # coordinates of the barycenters of the faces of Group_1
-  coords_1 = [[-5, 5, 10], [10, 10, 20], [25, 5, 10]]
+  coords_1 = [[25, 5, 10]]
   checkGroupByCoords(group_1_GEOM, coords_1)
 
   group_2_GEOM = getSubObject(geomObject_1, 2)
   assert group_2_GEOM.GetName() == 'edges_x'
-  assert geompy.NumberOfEdges(group_2_GEOM) == 3
+  assert geompy.NumberOfEdges(group_2_GEOM) == 1 # 2 edges are in the first result, only one here
 
   # coordinates of the barycenters of the edges of Group_2
-  coords_2 = [[-5, 0, 0], [10, 0, 0], [25, 0, 0]]
+  coords_2 = [[25, 0, 0]]
   checkGroupByCoords(group_2_GEOM, coords_2)
 
   group_3_GEOM = getSubObject(geomObject_1, 3)
   assert group_3_GEOM.GetName() == 'vertices_bottom'
-  assert geompy.NumberOfSubShapes(group_3_GEOM, geompy.ShapeType["VERTEX"]) == 8
+  assert geompy.NumberOfSubShapes(group_3_GEOM, geompy.ShapeType["VERTEX"]) == 3 # 3 of 8
 
   # coordinates of the points of of Group_3
-  coords_3 = [[-10, 0, 0], [-10, 10, 0], [0, 10, 0], [0, 20, 0], [20, 20, 0], [20, 10, 0], [30, 10, 0], [30, 0, 0]]
+  coords_3 = [[20, 10, 0], [30, 10, 0], [30, 0, 0]]
   checkGroupByCoords(group_3_GEOM, coords_3)
 
   group_4_GEOM = getSubObject(geomObject_1, 4)
   assert group_4_GEOM.GetName() == 'solids_small'
-  assert geompy.NumberOfSolids(group_4_GEOM) == 2
+  assert geompy.NumberOfSolids(group_4_GEOM) == 1 # 1 of 2
 
   # coordinates of the barycenters of the solids of Group_4
-  coords_4 = [[-5, 5, 5], [25, 5, 5]]
+  coords_4 = [[25, 5, 5]]
   checkGroupByCoords(group_4_GEOM, coords_4)
 
   field_1_GEOM = getSubObject(geomObject_1, 5)
   assert field_1_GEOM.GetName() == 'Field_solids'
-  assert field_1_GEOM.GetStep(0).GetValues() == [1.0, 2.0, 3.0]
+  assert field_1_GEOM.GetStep(0).GetValues() == [3.0]
 
   field_2_GEOM = getSubObject(geomObject_1, 6)
   assert field_2_GEOM.GetName() == 'Field_faces'
-  assert field_2_GEOM.GetStep(0).GetValues() == [0.0, 0.0, 0.0, 0.0, 1.0, 2.0, 0.0, 0.0, 0.0, 0.0, 1.0, 2.0, 0.0, 0.0, 0.0, 0.0, 1.0, 2.0]
+  assert field_2_GEOM.GetStep(0).GetValues() == [0.0, 0.0, 0.0, 0.0, 1.0, 2.0]
 
   field_3_GEOM = getSubObject(geomObject_1, 7)
   assert field_3_GEOM.GetName() == 'Field_edges'
-  assert field_3_GEOM.GetStep(0).GetValues() == [2.0, 0.0, 2.0, 0.0, 0.0, 0.0, 0.0, 0.0, 2.0, 0.0, 0.0, 0.0, 0.0, 0.0, 3.0, 0.0, 0.0, 0.0, 3.0, 0.0, 1.0, 0.0, 3.0, 3.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 2.0, 0.0, 1.0, 0.0, 0.0, 0.0]
+  assert field_3_GEOM.GetStep(0).GetValues() == [0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 2.0, 0.0, 1.0, 0.0, 0.0, 0.0]
 
   field_4_GEOM = getSubObject(geomObject_1, 8)
   assert field_4_GEOM.GetName() == 'Field_vertices'
-  assert field_4_GEOM.GetStep(0).GetValues() == [2.0, 1.0, 2.0, 1.0, 0.0, 0.0, 0.0, 1.0, 2.0, 2.0, 1.0, 3.0, 0.0, 3.0, 1.0, 0.0, 0.0, 0.0, 1.0, 3.0, 1.0, 3.0, 1.0]
+  assert field_4_GEOM.GetStep(0).GetValues() == [0.0, 0.0, 0.0, 1.0, 3.0, 1.0, 3.0, 1.0]
 
   pass
 

@@ -24,6 +24,7 @@
 #include <ModelHighAPI_Tools.h>
 #include <ModelHighAPI_Dumper.h>
 #include <ModelHighAPI_Services.h>
+#include <ModelHighAPI_Selection.h>
 //--------------------------------------------------------------------------------------
 
 ExchangeAPI_Export::ExchangeAPI_Export(const std::shared_ptr<ModelAPI_Feature>& theFeature)
@@ -49,6 +50,27 @@ ExchangeAPI_Export::ExchangeAPI_Export(const std::shared_ptr<ModelAPI_Feature>& 
   execute();
   apply(); // finish operation to make sure the export is done on the current state of the history
 }
+
+ExchangeAPI_Export::ExchangeAPI_Export(const std::shared_ptr<ModelAPI_Feature>& theFeature,
+  const std::string & theFilePath, const ModelHighAPI_Selection& theResult,
+  const std::string & theAuthor, const std::string & theGeometryName)
+  : ModelHighAPI_Interface(theFeature)
+{
+  initialize();
+  fillAttribute("XAO", theFeature->string(ExchangePlugin_ExportFeature::EXPORT_TYPE_ID()));
+  fillAttribute(theFilePath, theFeature->string(ExchangePlugin_ExportFeature::XAO_FILE_PATH_ID()));
+  fillAttribute(theAuthor, theFeature->string(ExchangePlugin_ExportFeature::XAO_AUTHOR_ID()));
+  fillAttribute(theGeometryName,
+    theFeature->string(ExchangePlugin_ExportFeature::XAO_GEOMETRY_NAME_ID()));
+  fillAttribute("XAO", theFeature->string(ExchangePlugin_ExportFeature::FILE_FORMAT_ID()));
+  std::list<ModelHighAPI_Selection> aListOfOneSel;
+  aListOfOneSel.push_back(theResult);
+  fillAttribute(aListOfOneSel,
+    theFeature->selectionList(ExchangePlugin_ExportFeature::SELECTION_LIST_ID()));
+  execute();
+  apply(); // finish operation to make sure the export is done on the current state of the history
+}
+
 
 /// Constructor with values for export in other formats than XAO.
 ExchangeAPI_Export::ExchangeAPI_Export(const std::shared_ptr<ModelAPI_Feature>& theFeature,
@@ -147,6 +169,17 @@ ExportPtr exportToXAO(const std::shared_ptr<ModelAPI_Document> & thePart,
   std::shared_ptr<ModelAPI_Feature> aFeature =
     thePart->addFeature(ExchangePlugin_ExportFeature::ID());
   return ExportPtr(new ExchangeAPI_Export(aFeature, theFilePath, theAuthor, theGeometryName));
+}
+
+ExportPtr exportToXAO(const std::shared_ptr<ModelAPI_Document> & thePart,
+  const std::string & theFilePath, const ModelHighAPI_Selection& theSelectedShape,
+  const std::string & theAuthor, const std::string & theGeometryName)
+{
+  apply(); // finish previous operation to make sure all previous operations are done
+  std::shared_ptr<ModelAPI_Feature> aFeature =
+    thePart->addFeature(ExchangePlugin_ExportFeature::ID());
+  // special internal case when for XAO a selection list is filled
+  return ExportPtr(new ExchangeAPI_Export(aFeature, theFilePath, theSelectedShape, "XAO"));
 }
 
 //--------------------------------------------------------------------------------------

@@ -86,9 +86,9 @@ public:
   MODELAPI_EXPORT virtual std::shared_ptr<ModelAPI_ResultBody> subResult(
     const int theIndex, bool forTree = false) const = 0;
 
-  /// Returns true if feature or result belong to this composite feature as subs
+  /// Returns true if theResult belong to this composite result as sub.
   /// Returns theIndex - zero based index of sub if found
-  MODELAPI_EXPORT virtual bool isSub(ObjectPtr theObject, int& theIndex) const = 0;
+  MODELAPI_EXPORT virtual bool isSub(ObjectPtr theResult, int& theIndex) const = 0;
 
   /// \brief Stores the shape (called by the execution method).
   /// param[in] theShape shape to store.

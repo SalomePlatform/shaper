@@ -57,7 +57,7 @@ class ExportFeature(ModelAPI.ModelAPI_Feature):
     def getKind(self):
         return ExportFeature.ID()
 
-    ## This feature is action: has no property pannel and executes immediately.
+    ## This feature is action: has no property panel and executes immediately.
     def isAction(self):
         return True
 
@@ -67,32 +67,38 @@ class ExportFeature(ModelAPI.ModelAPI_Feature):
 
     ## Export the results, groups and fields via XAO
     def exportViaXAO(self):
-        tmpXAOFile = getTmpFileName("xao")
-        self.tmpXAOFile = tmpXAOFile
-        #print "Export to %s"%tmpXAOFile
-        exportXAO = ExchangeAPI.exportToXAO(self.Part, tmpXAOFile, "automatic_shaper_export_to_XAO")
-        if not os.path.exists(tmpXAOFile) or os.stat(tmpXAOFile).st_size == 0:
-            exportXAO.feature().setError("Error in exportToXAO. No XAO file has been created.")
-            return
-        imported, shape, subShapes, groups, fields = self.geompy.ImportXAO(tmpXAOFile)
-        self.geompy.addToStudy( shape, shape.GetName() )
-        # add sub-shapes and groups to the object browser
-        for obj in subShapes + groups:
-            name = obj.GetName()
-            self.geompy.addToStudyInFather(shape, obj, name)
-        # add fields to the object browser
-        for field in fields:
-            name = field.GetName()
-            self.geompy.addToStudyInFather(shape, field, name)
-            # add steps to the object browser
-            steps = field.getSteps()
-            for i_step in steps:
-                step = field.getStep(i_step)
-                i_stamp = step.GetStamp()
-                step_name = "Step %i %i"%(i_step, i_stamp)
-                self.geompy.addToStudyInFather( field, step, step_name )
-        # Remove the temporary file
-        os.remove(tmpXAOFile)
+        # iterate all results of Part, export one by one due to issue 2882
+        for aResIndex in range(self.Part.size(model.ModelAPI_ResultBody_group())):
+          anObject = self.Part.object(model.ModelAPI_ResultBody_group(), aResIndex)
+          aResult = model.objectToResult(anObject)
+          if not aResult is None:
+            tmpXAOFile = getTmpFileName("xao")
+            self.tmpXAOFile = tmpXAOFile
+            #print "Export to %s"%tmpXAOFile
+            exportXAO = ExchangeAPI.exportToXAO(self.Part, tmpXAOFile, model.selection(aResult), "automatic_shaper_export_to_XAO")
+            if not os.path.exists(tmpXAOFile) or os.stat(tmpXAOFile).st_size == 0:
+                exportXAO.feature().setError("Error in exportToXAO. No XAO file has been created.")
+                return
+            imported, shape, subShapes, groups, fields = self.geompy.ImportXAO(tmpXAOFile)
+            self.geompy.addToStudy( shape, shape.GetName() )
+            # add sub-shapes and groups to the object browser
+            for obj in subShapes + groups:
+                name = obj.GetName()
+                self.geompy.addToStudyInFather(shape, obj, name)
+            # add fields to the object browser
+            for field in fields:
+                name = field.GetName()
+                self.geompy.addToStudyInFather(shape, field, name)
+                # add steps to the object browser
+                steps = field.getSteps()
+                for i_step in steps:
+                    step = field.getStep(i_step)
+                    i_stamp = step.GetStamp()
+                    step_name = "Step %i %i"%(i_step, i_stamp)
+                    self.geompy.addToStudyInFather( field, step, step_name )
+            # Remove the temporary file
+            os.remove(tmpXAOFile)
+          pass
         pass
 
     ## Exports all shapes and groups into the GEOM module.
