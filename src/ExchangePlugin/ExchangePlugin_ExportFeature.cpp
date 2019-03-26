@@ -265,7 +265,8 @@ void ExchangePlugin_ExportFeature::exportXAO(const std::string& theFileName)
   if (aIsSelection) { // a mode for export to geom result by result
     for(int a = 0; a < aSelection->size(); a++) {
       AttributeSelectionPtr anAttr = aSelection->value(a);
-      ResultBodyPtr aBodyContext = std::dynamic_pointer_cast<ModelAPI_ResultBody>(anAttr->context());
+      ResultBodyPtr aBodyContext =
+        std::dynamic_pointer_cast<ModelAPI_ResultBody>(anAttr->context());
       if (aBodyContext.get() && !aBodyContext->isDisabled() && aBodyContext->shape().get()) {
         aResults.push_back(aBodyContext);
         GeomShapePtr aShape = anAttr->value();
