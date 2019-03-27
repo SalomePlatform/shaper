@@ -74,20 +74,19 @@ SketchConstraintEqual_5 = Sketch_1.setEqual(SketchLine_6.result(), SketchLine_8.
 SketchConstraintLength_2 = Sketch_1.setLength(SketchLine_2.result(), 20)
 model.do()
 Extrusion_1 = model.addExtrusion(Part_1_doc, [model.selection("COMPOUND", "all-in-Sketch_1")], model.selection(), 10, 0)
-Group_1_objects = [model.selection("FACE", "Extrusion_1_1_2/Generated_Face&Sketch_1/SketchLine_4"), model.selection("FACE", "Extrusion_1_1_3/Generated_Face&Sketch_1/SketchLine_5"), model.selection("FACE", "Extrusion_1_1_1/Generated_Face&Sketch_1/SketchLine_2"), model.selection("FACE", "Extrusion_1_1_1/Generated_Face&Sketch_1/SketchLine_1"), model.selection("FACE", "Extrusion_1_1_2/Generated_Face&Sketch_1/SketchLine_3"), model.selection("FACE", "Extrusion_1_3/Generated_Face&Sketch_1/SketchLine_6"), model.selection("FACE", "Extrusion_1_3/Generated_Face&Sketch_1/SketchLine_7"), model.selection("FACE", "Extrusion_1_3/Generated_Face&Sketch_1/SketchLine_8")]
+Group_1_objects = [model.selection("FACE", "Extrusion_1_1_2/Generated_Face&Sketch_1/SketchLine_4"), model.selection("FACE", "Extrusion_1_1_3/Generated_Face&Sketch_1/SketchLine_5"), model.selection("FACE", "Extrusion_1_1_1/Generated_Face&Sketch_1/SketchLine_2"), model.selection("FACE", "Extrusion_1_1_1/Generated_Face&Sketch_1/SketchLine_1"), model.selection("FACE", "Extrusion_1_1_2/Generated_Face&Sketch_1/SketchLine_3"), model.selection("FACE", "Extrusion_1_2/Generated_Face&Sketch_1/SketchLine_6"), model.selection("FACE", "Extrusion_1_2/Generated_Face&Sketch_1/SketchLine_7"), model.selection("FACE", "Extrusion_1_2/Generated_Face&Sketch_1/SketchLine_8")]
 Group_1 = model.addGroup(Part_1_doc, Group_1_objects)
 Group_1.setName("planar")
 Group_1.result().setName("planar")
-Group_2 = model.addGroup(Part_1_doc, [model.selection("FACE", "Extrusion_1_3/From_Face"), model.selection("FACE", "Extrusion_1_3/To_Face")])
+Group_2 = model.addGroup(Part_1_doc, [model.selection("FACE", "Extrusion_1_2/From_Face"), model.selection("FACE", "Extrusion_1_2/To_Face")])
 Group_2.setName("triangle_top_bottom")
 Group_2.result().setName("triangle_top_bottom")
-Field_1 = model.addField(Part_1_doc, 1, "DOUBLE", 1, ["Comp 1"], [])
-Field_1.addStep(0, 0, [[7]])
 model.do()
 model.exportToGEOM(Part_1_doc)
 model.end()
 
 # check what is exported to GEOM
+import salome
 from salome.geom import geomBuilder
 
 import os
@@ -108,32 +107,20 @@ assert ok
 assert group_0_1.GetName() == "planar"
 
 ok, group_0_2 = aComponents[0].FindSubObject(2)
-assert ok
-assert group_0_2.GetName() == "Field_1"
-
-ok, group_0_3 = aComponents[0].FindSubObject(3)
 assert not ok
 
 
 ok, group_1_1 = aComponents[1].FindSubObject(1)
 assert ok
-assert group_1_1.GetName() == "Field_1"
+assert group_1_1.GetName() == "planar"
 
 ok, group_1_2 = aComponents[1].FindSubObject(2)
+assert ok
+assert group_1_2.GetName() == "triangle_top_bottom"
+
+ok, group_1_3 = aComponents[1].FindSubObject(3)
 assert not ok
 
 
 ok, group_2_1 = aComponents[2].FindSubObject(1)
-assert ok
-assert group_2_1.GetName() == "planar"
-
-ok, group_2_2 = aComponents[2].FindSubObject(2)
-assert ok
-assert group_2_2.GetName() == "triangle_top_bottom"
-
-ok, group_2_3 = aComponents[2].FindSubObject(3)
-assert ok
-assert group_2_3.GetName() == "Field_1"
-
-ok, group_2_4 = aComponents[2].FindSubObject(4)
 assert not ok
