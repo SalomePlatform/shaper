@@ -127,6 +127,12 @@ void ExchangeAPI_Export::dump(ModelHighAPI_Dumper& theDumper) const
                 aBase->string(ExchangePlugin_ExportFeature::XAO_FILE_PATH_ID())->value();
     correctSeparators(aTmpXAOFile);
     theDumper << "exportToXAO(" << aDocName << ", '" << aTmpXAOFile << "'" ;
+    AttributeSelectionListPtr aShapeSelected =
+      aBase->selectionList(ExchangePlugin_ExportFeature::SELECTION_LIST_ID());
+    if (aShapeSelected->isInitialized() && aShapeSelected->size() == 1) {
+      theDumper<<", "<<aShapeSelected->value(0);
+    }
+
     std::string theAuthor = aBase->string(ExchangePlugin_ExportFeature::XAO_AUTHOR_ID())->value();
     if (! theAuthor.empty())
       theDumper << ", '" << theAuthor << "'";
