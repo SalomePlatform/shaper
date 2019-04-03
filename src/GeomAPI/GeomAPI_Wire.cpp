@@ -93,6 +93,8 @@ bool GeomAPI_Wire::isRectangle(std::list<GeomPointPtr>& thePoints) const
     const TopoDS_Edge& anEdge = anExp.Current();
     double aT1, aT2;
     Handle(Geom_Curve) aC3D = BRep_Tool::Curve(anEdge, aT1, aT2);
+    if (aC3D.IsNull())
+      continue;
     while (aC3D->IsKind(aTrimmedCurveType))
       aC3D = Handle(Geom_TrimmedCurve)::DownCast(aC3D)->BasisCurve();
     if (!aC3D.IsNull() && aC3D->IsKind(aLineType)) {

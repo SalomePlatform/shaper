@@ -361,6 +361,7 @@ void ExchangePlugin_ExportFeature::exportXAO(const std::string& theFileName)
         aXaoGroup->add(anElementID);
       }
     } catch (XAO::XAO_Exception& e) {
+      // LCOV_EXCL_START
       std::string msg = "An error occurred while exporting group " + aResultGroup->data()->name();
       msg += ".\n";
       msg += e.what();
@@ -368,6 +369,7 @@ void ExchangePlugin_ExportFeature::exportXAO(const std::string& theFileName)
       msg += "=> skipping this group from XAO export.";
       Events_InfoMessage("ExportFeature", msg, this).send();
       aXao.removeGroup(aXaoGroup);
+      // LCOV_EXCL_STOP
     }
   }
 
@@ -456,6 +458,7 @@ void ExchangePlugin_ExportFeature::exportXAO(const std::string& theFileName)
         }
       }
     } catch (XAO::XAO_Exception& e) {
+      // LCOV_EXCL_START
       std::string msg = "An error occurred while exporting field " + aResultField->data()->name();
       msg += ".\n";
       msg += e.what();
@@ -463,6 +466,7 @@ void ExchangePlugin_ExportFeature::exportXAO(const std::string& theFileName)
       msg += "=> skipping this field from XAO export.";
       Events_InfoMessage("ExportFeature", msg, this).send();
       aXao.removeField(aXaoField);
+      // LCOV_EXCL_STOP
     }
   }
 

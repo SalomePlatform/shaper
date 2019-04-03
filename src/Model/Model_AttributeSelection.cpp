@@ -1415,7 +1415,14 @@ void Model_AttributeSelection::updateInHistory(bool& theRemove)
   if (!aContData.get() || !aContData->isValid())
     return;
   TDF_Label aContLab = aContData->shapeLab(); // named shape where the selected context is located
+
+  // checking this may be just a reference to another context (same shape), so use that label
   Handle(TNaming_NamedShape) aContNS;
+  Handle(TDF_Reference) aRefAttr;
+  while(!aContLab.FindAttribute(TNaming_NamedShape::GetID(), aContNS) &&
+        aContLab.FindAttribute(TDF_Reference::GetID(), aRefAttr))
+    aContLab = aRefAttr->Get();
+
   if (!aContLab.FindAttribute(TNaming_NamedShape::GetID(), aContNS)) {
     bool aFoundNewContext = true;
     ResultPtr aNewContext = aContext;
