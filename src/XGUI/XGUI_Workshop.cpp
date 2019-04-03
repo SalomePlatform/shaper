@@ -1073,15 +1073,23 @@ bool XGUI_Workshop::onSave()
     aMgr->blockAutoUpdate(false);
 
   std::list<std::string> aFiles;
-  saveDocument(myTmpDir.path(), aFiles);
-  if (!XGUI_CompressFiles::compress(myCurrentFile, aFiles))
-    return false;
+  // issue #2899: create a temporary directory, save and then remove it
+#ifdef HAVE_SALOME
+  std::string aTmpDir = XGUI_Tools::getTmpDirByEnv("SALOME_TMP_DIR");
+#else
+  std::string aTmpDir = XGUI_Tools::getTmpDirByEnv("");
+#endif
+  saveDocument(QString(aTmpDir.c_str()), aFiles);
+  bool aResult = XGUI_CompressFiles::compress(myCurrentFile, aFiles);
+  XGUI_Tools::removeTemporaryFiles(aTmpDir, aFiles);
 
-  updateCommandStatus();
+  if (aResult) {
+    updateCommandStatus();
 #ifndef HAVE_SALOME
     myMainWindow->setModifiedState(false);
 #endif
-  return true;
+  }
+  return aResult;
 }
 
 //******************************************************
