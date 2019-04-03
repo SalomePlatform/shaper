@@ -251,8 +251,7 @@ class TestMoveArc(unittest.TestCase):
     self.mySketch.move(self.myArc.defaultResult(), newPosition[0], newPosition[1])
     model.do()
     self.checkPointCoordinates(self.myArc.endPoint(), self.myEnd)
-    self.assertNotEqual(self.myArc.center().x(), self.myCenter[0])
-    self.assertNotEqual(self.myArc.center().y(), self.myCenter[1])
+    self.assertTrue(fabs(self.myArc.center().x() - self.myCenter[0]) > 1.e-5 or fabs(self.myArc.center().y() - self.myCenter[1]) > 1.e-5)
 
   def test_move_center_of_arc_fixed_radius(self):
     """ Test 17. Movement of center of the arc with fixed radius
