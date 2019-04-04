@@ -204,7 +204,8 @@ void SHAPERGUI::initialize(CAM_Application* theApp)
         aViewPort->installEventFilter(aViewer);
         Handle(V3d_View) aView = aViewPort->getView();
         aViewer->SetScale(aView, aView->Camera()->Scale());
-        onViewManagerAdded(aMgr);
+        // We can not create selector here because other modules will be deactivatet later
+        //onViewManagerAdded(aMgr);
       }
     }
   }
