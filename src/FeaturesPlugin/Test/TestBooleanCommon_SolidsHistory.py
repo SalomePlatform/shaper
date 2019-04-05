@@ -19,8 +19,6 @@
 
 # Test that the history of Common operation works correctly after movement of groups after this Common feature
 
-# -*- coding: utf-8 -*-
-
 from salome.shaper import model
 from ModelAPI import *
 from GeomAPI import *

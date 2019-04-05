@@ -17,8 +17,6 @@
 # See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 #
 
-# -*- coding: utf-8 -*-
-
 from SketchAPI import *
 from ModelAPI import *
 from salome.shaper import model

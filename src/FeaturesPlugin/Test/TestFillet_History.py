@@ -20,8 +20,6 @@
 # Test that the history of Fillet operation works correctly after movement of groups after this Fillet feature:
 # Faces are modified, edges that were used for fillet are removed
 
-# -*- coding: utf-8 -*-
-
 from salome.shaper import model
 from ModelAPI import *
 from GeomAPI import *

@@ -20,8 +20,6 @@
 # Test that the history of Cut operation works correctly after movement of groups after this Cut feature:
 # cut tools are deleted, cut objects are correctly transformed to and divided if needed
 
-# -*- coding: utf-8 -*-
-
 from salome.shaper import model
 from ModelAPI import *
 from GeomAPI import *

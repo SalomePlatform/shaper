@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 from salome.shaper import model
 
 model.begin()

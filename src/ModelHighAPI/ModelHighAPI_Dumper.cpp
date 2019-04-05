@@ -254,8 +254,7 @@ bool ModelHighAPI_Dumper::DumpStorage::exportTo(const std::string& theFilename,
   if (!aFile.is_open())
     return false;
 
-  // standard header (encoding + imported modules)
-  aFile << "# -*- coding: utf-8 -*-" << std::endl << std::endl;
+  // standard header imported modules
   for (ModulesSet::const_iterator aModIt = theUsedModules.begin();
     aModIt != theUsedModules.end(); ++aModIt) {
     aFile << "from " << *aModIt << " import *" << std::endl;

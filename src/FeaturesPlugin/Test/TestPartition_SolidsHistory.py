@@ -19,8 +19,6 @@
 
 # Test that partition of solid works correctly after movement of groups after this partition
 
-# -*- coding: utf-8 -*-
-
 from salome.shaper import model
 from ModelAPI import *
 from GeomAPI import *

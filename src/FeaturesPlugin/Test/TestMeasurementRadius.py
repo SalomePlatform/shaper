@@ -17,8 +17,6 @@
 # See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 #
 
-# -*- coding: utf-8 -*-
-
 from salome.shaper import model
 
 import math

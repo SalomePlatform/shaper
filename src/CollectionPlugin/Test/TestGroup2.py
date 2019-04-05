@@ -20,8 +20,6 @@
 # Test that splitted edges in the group are still correct edges in the group
 # Based on the CEA report mail 04.12.2018, page 4
 
-# -*- coding: utf-8 -*-
-
 from SketchAPI import *
 from ModelAPI import *
 from GeomAPI import *
