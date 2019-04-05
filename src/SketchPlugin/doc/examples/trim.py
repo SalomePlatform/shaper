@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 from salome.shaper import model
 from salome.shaper import geom
 

@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-#
 # Shaper python API documentation build configuration file, created by
 # sphinx-quickstart on Thu Oct 15 11:55:42 2015.
 #

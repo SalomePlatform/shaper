@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-
 from SketchAPI import *
 
 from salome.shaper import model
