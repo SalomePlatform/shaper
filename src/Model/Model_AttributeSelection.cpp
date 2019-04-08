@@ -1443,7 +1443,12 @@ void Model_AttributeSelection::updateInHistory(bool& theRemove)
               continue;
 
             FeaturePtr aRefFeat = std::dynamic_pointer_cast<ModelAPI_Feature>((*aRef)->owner());
+
             if (aRefFeat.get() && aRefFeat != owner() && aRefFeat->firstResult().get()) {
+              // check the reference is concealed: #2900
+              ModelAPI_ValidatorsFactory* aValidators = ModelAPI_Session::get()->validators();
+              if (!aValidators->isConcealed(aRefFeat->getKind(), (*aRef)->id()))
+                continue;
               FeaturePtr aThisFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(owner());
               if (!aDoc->isLaterByDep(aRefFeat, aThisFeature)) { // found better feature
                 aFoundNewContext = true;
