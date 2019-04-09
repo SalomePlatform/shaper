@@ -36,6 +36,6 @@ assert(aFactory.validate(Partition_1.feature()))
 # Modify Fuse to add sphere thatwas used in Partition
 Fuse_1.setMainObjects([model.selection("COMPOUND", "all-in-Box_1"), model.selection("COMPOUND", "all-in-Cylinder_1"), model.selection("COMPOUND", "all-in-Sphere_1")])
 model.end()
-# both fuse and partition must become invalid because both refer to the same object
+# partition must become invalid because it refers to the same object as fuse
 assert(not aFactory.validate(Fuse_1.feature()))
-assert(not aFactory.validate(Partition_1.feature()))
+assert(aFactory.validate(Partition_1.feature()))

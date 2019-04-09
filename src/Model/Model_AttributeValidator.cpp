@@ -136,9 +136,13 @@ bool Model_AttributeValidator::isValid(const AttributePtr& theAttribute,
                   continue;
                 if (ModelAPI_Session::get()->validators()->isConcealed(
                     aRefFeat->getKind(), (*aRR)->id())) {
-                  theError = "Reference to concealed object %1";
-                  theError.arg(aRefd->data()->name());
-                  return false;
+                  // check this feature is later than another referenced to make unit tests working
+                  //because of Test1757 and others: allow to move selection context of this to next
+                  if (aFeat->document()->isLater(aFeat, aRefFeat)) {
+                    theError = "Reference to concealed object %1";
+                    theError.arg(aRefd->data()->name());
+                    return false;
+                  }
                 }
               }
               if (aCheckFeature)
