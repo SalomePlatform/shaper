@@ -113,11 +113,21 @@ assert (len(aFaceFeature2.results()) > 0)
 # =============================================================================
 # Test 3. Create face from face of solid
 # =============================================================================
+aSession.startOperation()
+aCylinder = aPart.addFeature("Cylinder")
+aCylinder.string("CreationMethod").setValue("Cylinder")
+aCylinder.selection("base_point").selectSubShape("VERTEX", "PartSet/Origin")
+aCylinder.selection("axis").selectSubShape("EDGE", "PartSet/OZ")
+aCylinder.real("radius").setValue(5)
+aCylinder.real("height").setValue(10)
+aSession.finishOperation()
+aCylinderResult = aCylinder.firstResult()
+aCylinderShape = aCylinderResult.shape()
 
 aSession.startOperation()
 aFaceFeature3 = aPart.addFeature("Face")
 aBaseObjectsList = aFaceFeature3.selectionList("base_objects")
-aBaseObjectsList.append("Cylinder_1_1/Face_1", "FACE")
+aBaseObjectsList.append("Cylinder_2_1/Face_1", "FACE")
 aSession.finishOperation()
 assert (len(aFaceFeature3.results()) > 0)
 
@@ -126,13 +136,24 @@ assert (len(aFaceFeature3.results()) > 0)
 # =============================================================================
 
 aSession.startOperation()
+aCylinder = aPart.addFeature("Cylinder")
+aCylinder.string("CreationMethod").setValue("Cylinder")
+aCylinder.selection("base_point").selectSubShape("VERTEX", "PartSet/Origin")
+aCylinder.selection("axis").selectSubShape("EDGE", "PartSet/OZ")
+aCylinder.real("radius").setValue(5)
+aCylinder.real("height").setValue(10)
+aSession.finishOperation()
+aCylinderResult = aCylinder.firstResult()
+aCylinderShape = aCylinderResult.shape()
+
+aSession.startOperation()
 aFaceFeature4 = aPart.addFeature("Face")
 aBaseObjectsList = aFaceFeature4.selectionList("base_objects")
 aShapeExplorer = GeomAPI_ShapeExplorer(aSketchShape, GeomAPI_Shape.EDGE)
 while aShapeExplorer.more():
     aBaseObjectsList.append(aSketchResult, aShapeExplorer.current())
     aShapeExplorer.next()
-aBaseObjectsList.append("Cylinder_1_1/Face_3", "FACE")
+aBaseObjectsList.append("Cylinder_3_1/Face_3", "FACE")
 aSession.finishOperation()
 assert (len(aFaceFeature4.results()) == 0)
 # remove failed feature

@@ -123,8 +123,7 @@ bool Model_AttributeValidator::isValid(const AttributePtr& theAttribute,
                 aCheckFeature = false;
               } else {
                 aRefd = *aRefRes;
-                if (aRefd->groupName() != ModelAPI_ResultBody::group() &&
-                    aRefd->groupName() != ModelAPI_ResultPart::group())
+                if (aRefd->groupName() != ModelAPI_ResultBody::group())
                   break;
               }
               if (!aRefd->data().get() || !aRefd->data()->isValid())
