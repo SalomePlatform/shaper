@@ -101,6 +101,8 @@ bool Model_AttributeValidator::isValid(const AttributePtr& theAttribute,
           std::list<ObjectPtr>::const_iterator aRefIter = aReferencedList.cbegin();
           for(; aRefIter != aReferencedList.cend(); aRefIter++) {
             const ObjectPtr& aReferenced = *aRefIter;
+            if (!aReferenced.get())
+              continue;
             // get all results and feature that is referenced to see all references to them
             FeaturePtr aReferencedFeature;
             if (aReferenced->groupName() == ModelAPI_Feature::group()) {
@@ -112,8 +114,21 @@ bool Model_AttributeValidator::isValid(const AttributePtr& theAttribute,
             if (alreadyProcessed.count(aReferencedFeature))
               continue;
             alreadyProcessed.insert(aReferencedFeature);
+            /* it takes all results, not only concealed
             std::list<ResultPtr> aReferencedResults;
             ModelAPI_Tools::allResults(aReferencedFeature, aReferencedResults);
+            */
+            std::list<ResultPtr> aReferencedResults;
+            ResultBodyPtr aRefBody = std::dynamic_pointer_cast<ModelAPI_ResultBody>(aReferenced);
+            if (aRefBody.get()) { // take only sub-results of this result or sub-result
+              ResultBodyPtr aRoot = ModelAPI_Tools::bodyOwner(aRefBody, true);
+              if (aRoot.get()) {
+                ModelAPI_Tools::allSubs(aRoot, aReferencedResults, false);
+                aReferencedResults.push_back(aRoot);
+              } else
+                aReferencedResults.push_back(aRefBody);
+            }
+
             std::list<ResultPtr>::iterator aRefRes = aReferencedResults.begin();
             bool aCheckFeature = true; // the last iteration to check the feature
             while(aRefRes != aReferencedResults.end() || aCheckFeature) {

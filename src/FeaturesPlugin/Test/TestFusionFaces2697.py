@@ -256,7 +256,9 @@ Symmetry_1.results()[1].subResult(1).setName("Symmetry_1_2_2")
 Cut_1 = model.addCut(Part_1_doc, [model.selection("SOLID", "Revolution_1_1")], [model.selection("COMPOUND", "Cut_tool")])
 Fuse_1 = model.addFuse(Part_1_doc, [model.selection("SOLID", "Cut_1_1"), model.selection("COMPOUND", "Fuse_tool")])
 FusionFaces_1 = model.addFusionFaces(Part_1_doc, model.selection("SOLID", "Fuse_1_1"))
-model.end()
+model.do()
 
 # check the faces are fused
 model.checkResult(FusionFaces_1, model, 1, [0], [1], [16], [76], [152])
+
+model.end()

@@ -37,5 +37,5 @@ assert(aFactory.validate(Partition_1.feature()))
 Fuse_1.setMainObjects([model.selection("COMPOUND", "all-in-Box_1"), model.selection("COMPOUND", "all-in-Cylinder_1"), model.selection("COMPOUND", "all-in-Sphere_1")])
 model.end()
 # partition must become invalid because it refers to the same object as fuse
-assert(not aFactory.validate(Fuse_1.feature()))
-assert(aFactory.validate(Partition_1.feature()))
+assert(aFactory.validate(Fuse_1.feature()))
+assert(not aFactory.validate(Partition_1.feature()))

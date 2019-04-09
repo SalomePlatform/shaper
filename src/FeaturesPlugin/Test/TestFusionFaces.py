@@ -32,15 +32,20 @@ Box_1 = model.addBox(Part_1_doc, 10, 10, 10)
 Box_2 = model.addBox(Part_1_doc, 10, 10, 10)
 Translation_1 = model.addTranslation(Part_1_doc, [model.selection("SOLID", "Box_2_1")], model.selection("EDGE", "PartSet/OX"), 10)
 
+model.do()
 Shell_1 = model.addShell(Part_1_doc, [model.selection("FACE", "Box_1_1/Top"), model.selection("FACE", "Translation_1_1/MF:Translated&Box_2_1/Top")])
 model.do()
 
 model.checkResult(Shell_1, model, 1, [0], [0], [2], [8], [16])
 
 FusionFaces_1 = model.addFusionFaces(Part_1_doc, model.selection("SHELL", "Shell_1_1"))
-model.do()
+model.end()
 
 model.checkResult(FusionFaces_1, model, 1, [0], [0], [1], [4], [8])
+
+model.undo() # to reuse Box_1_1 and Translation_1_1
+model.undo()
+model.begin()
 
 # =============================================================================
 # Test 2. Fusion faces for solid of 2 adjacent boxes
@@ -63,7 +68,7 @@ Shell_2 = model.addShell(Part_1_doc, [model.selection("FACE", "Cylinder_1_1/Face
 Point_1 = model.addPoint(Part_1_doc, 0, 0, 5)
 Plane_1 = model.addPlane(Part_1_doc, model.selection("EDGE", "PartSet/OZ"), model.selection("VERTEX", "Point_1"), True)
 
-Partition_1 = model.addPartition(Part_1_doc, [model.selection("SHELL", "Shell_2_1"), model.selection("FACE", "Plane_1")])
+Partition_1 = model.addPartition(Part_1_doc, [model.selection("SHELL", "Shell_1_1"), model.selection("FACE", "Plane_1")])
 model.do()
 
 model.checkResult(Partition_1, model, 1, [0], [0], [2], [8], [16])
