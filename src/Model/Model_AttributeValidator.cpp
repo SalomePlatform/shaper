@@ -136,6 +136,9 @@ bool Model_AttributeValidator::isValid(const AttributePtr& theAttribute,
               if (aRefRes == aReferencedResults.end()) {
                 aRefd = aReferencedFeature;
                 aCheckFeature = false;
+                if (!aReferencedFeature->results().empty() &&
+                    aReferencedFeature->firstResult()->groupName() != ModelAPI_ResultBody::group())
+                  break;
               } else {
                 aRefd = *aRefRes;
                 if (aRefd->groupName() != ModelAPI_ResultBody::group())
