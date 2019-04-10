@@ -23,6 +23,10 @@
 
 #include <ModelAPI_AttributeDouble.h>
 #include <ModelAPI_AttributeInteger.h>
+#include <ModelAPI_Session.h>
+#include <ModelAPI_Tools.h>
+#include <ModelAPI_ResultBody.h>
+#include <ModelAPI_ResultPart.h>
 
 #include <GeomDataAPI_Point.h>
 #include <GeomDataAPI_Point2D.h>
@@ -81,6 +85,90 @@ bool Model_AttributeValidator::isValid(const AttributePtr& theAttribute,
       theError = "Expression error: %1";
       theError.arg(anErrorMessage);
       return false;
+    }
+  } else { // #2903 : check that concealed attribute refers to already concealed result
+    FeaturePtr aFeat = std::dynamic_pointer_cast<ModelAPI_Feature>(theAttribute->owner());
+
+    std::set<ObjectPtr> alreadyProcessed; // optimization
+    if (aFeat.get() &&
+        ModelAPI_Session::get()->validators()->isConcealed(aFeat->getKind(), theAttribute->id())) {
+      std::list<std::pair<std::string, std::list<ObjectPtr> > > allRefs;
+      aFeat->data()->referencesToObjects(allRefs);
+      std::list<std::pair<std::string, std::list<ObjectPtr> > >::iterator anIter = allRefs.begin();
+      for(; anIter != allRefs.end(); anIter++) {
+        if (anIter->first == theAttribute->id()) {
+          const std::list<ObjectPtr>& aReferencedList = anIter->second;
+          std::list<ObjectPtr>::const_iterator aRefIter = aReferencedList.cbegin();
+          for(; aRefIter != aReferencedList.cend(); aRefIter++) {
+            const ObjectPtr& aReferenced = *aRefIter;
+            if (!aReferenced.get())
+              continue;
+            // get all results and feature that is referenced to see all references to them
+            FeaturePtr aReferencedFeature;
+            if (aReferenced->groupName() == ModelAPI_Feature::group()) {
+              aReferencedFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(aReferenced);
+            } else {
+              aReferencedFeature = aReferenced->document()->feature(
+                std::dynamic_pointer_cast<ModelAPI_Result>(aReferenced));
+            }
+            if (alreadyProcessed.count(aReferencedFeature))
+              continue;
+            alreadyProcessed.insert(aReferencedFeature);
+            /* it takes all results, not only concealed
+            std::list<ResultPtr> aReferencedResults;
+            ModelAPI_Tools::allResults(aReferencedFeature, aReferencedResults);
+            */
+            std::list<ResultPtr> aReferencedResults;
+            ResultBodyPtr aRefBody = std::dynamic_pointer_cast<ModelAPI_ResultBody>(aReferenced);
+            if (aRefBody.get()) { // take only sub-results of this result or sub-result
+              ResultBodyPtr aRoot = ModelAPI_Tools::bodyOwner(aRefBody, true);
+              if (aRoot.get()) {
+                ModelAPI_Tools::allSubs(aRoot, aReferencedResults, false);
+                aReferencedResults.push_back(aRoot);
+              } else
+                aReferencedResults.push_back(aRefBody);
+            }
+
+            std::list<ResultPtr>::iterator aRefRes = aReferencedResults.begin();
+            bool aCheckFeature = true; // the last iteration to check the feature
+            while(aRefRes != aReferencedResults.end() || aCheckFeature) {
+              ObjectPtr aRefd;
+              if (aRefRes == aReferencedResults.end()) {
+                aRefd = aReferencedFeature;
+                aCheckFeature = false;
+                if (!aReferencedFeature->results().empty() &&
+                    aReferencedFeature->firstResult()->groupName() != ModelAPI_ResultBody::group())
+                  break;
+              } else {
+                aRefd = *aRefRes;
+                if (aRefd->groupName() != ModelAPI_ResultBody::group())
+                  break;
+              }
+              if (!aRefd->data().get() || !aRefd->data()->isValid())
+                continue;
+              const std::set<AttributePtr>& aRefsToRef = aRefd->data()->refsToMe();
+              std::set<AttributePtr>::const_iterator aRR = aRefsToRef.cbegin();
+              for(; aRR != aRefsToRef.cend(); aRR++) {
+                FeaturePtr aRefFeat = std::dynamic_pointer_cast<ModelAPI_Feature>((*aRR)->owner());
+                if (!aRefFeat.get() || aRefFeat == aFeat)
+                  continue;
+                if (ModelAPI_Session::get()->validators()->isConcealed(
+                    aRefFeat->getKind(), (*aRR)->id())) {
+                  // check this feature is later than another referenced to make unit tests working
+                  //because of Test1757 and others: allow to move selection context of this to next
+                  if (aFeat->document()->isLater(aFeat, aRefFeat)) {
+                    theError = "Reference to concealed object %1";
+                    theError.arg(aRefd->data()->name());
+                    return false;
+                  }
+                }
+              }
+              if (aCheckFeature)
+                aRefRes++;
+            }
+          }
+        }
+      }
     }
   }
   return true;

@@ -24,7 +24,7 @@ The following property panel will be opened:
 .. centered::
   Create a face
   
-Select one or several faces in viewer.
+Select one or several faces in viewer. Additionally, a face can be build by a closed wire or a set of edges composing a closed wire.
 
 **Apply** button creates faces.
 

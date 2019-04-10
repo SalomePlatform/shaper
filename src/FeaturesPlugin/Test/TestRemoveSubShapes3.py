@@ -30,7 +30,8 @@ Part_1_doc = Part_1.document()
 
 Cylinder_1 = model.addCylinder(Part_1_doc, model.selection("VERTEX", "PartSet/Origin"), model.selection("EDGE", "PartSet/OZ"), 5, 10)
 Face_1 = model.addFace(Part_1_doc, [model.selection("FACE", "Cylinder_1_1/Face_1")])
-Face_2 = model.addFace(Part_1_doc, [model.selection("FACE", "Cylinder_1_1/Face_1")])
+Cylinder_2 = model.addCylinder(Part_1_doc, model.selection("VERTEX", "PartSet/Origin"), model.selection("EDGE", "PartSet/OZ"), 5, 10)
+Face_2 = model.addFace(Part_1_doc, [model.selection("FACE", "Cylinder_2_1/Face_1")])
 Translation_1 = model.addTranslation(Part_1_doc, [model.selection("FACE", "Face_2_1")], model.selection("EDGE", "PartSet/OZ"), 10)
 Shell_1 = model.addShell(Part_1_doc, [model.selection("FACE", "Translation_1_1"), model.selection("FACE", "Face_1_1")])
 

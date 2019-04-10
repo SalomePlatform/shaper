@@ -75,7 +75,8 @@ c3 = sk3.addCircle(0, 0, 90)
 model.do()
 big2 = model.addExtrusion(mypart, sk3.selectFace(), 110)
 
-cut2 = model.addCut(mypart, big2.results(), smallcyl.results())
+smallcyl2 = model.addExtrusion(mypart, sk2.selectFace(), 150)
+cut2 = model.addCut(mypart, big2.results(), smallcyl2.results())
 
 model.end()
 

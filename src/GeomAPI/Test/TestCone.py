@@ -259,14 +259,21 @@ checkConeSolid(Part_1_doc, Solid_1_objects, anApex, anAxis, aSemiAngle, ParamR1.
 Cone_2 = model.addCone(Part_1_doc, model.selection("VERTEX", "PartSet/Origin"), model.selection("EDGE", "PartSet/OZ"), 10, 5, 10)
 Cone_3 = model.addCone(Part_1_doc, model.selection("VERTEX", "PartSet/Origin"), model.selection("EDGE", "PartSet/OZ"), 5, 10, 20)
 Fuse_1 = model.addFuse(Part_1_doc, [model.selection("SOLID", "Cone_2_1"), model.selection("SOLID", "Cone_3_1")], True)
+
+model.do()
 Solid_2_objects = [model.selection("FACE", "Fuse_1_1/Modified_Face&Cone_2_1/Face_3&Cone_3_1/Face_3"),
                    model.selection("FACE", "Fuse_1_1/Modified_Face&Cone_2_1/Face_1"),
                    model.selection("FACE", "Fuse_1_1/Modified_Face&Cone_3_1/Face_1"),
                    model.selection("FACE", "Cone_3_1/Face_2")]
 Solid_2 = model.addSolid(Part_1_doc, Solid_2_objects)
 checkNonCone(Solid_2)
+model.end()
+
+# in order to use study objects once again, undo Test7 actions
+model.undo()
 
 # Test 8. Check non-conical shell
+model.begin()
 Shell_1_objects = [model.selection("FACE", "Rotation_1_1/MF:Rotated&Cone_1_1/Face_3"),
                    model.selection("FACE", "Partition_1_1_1/Modified_Face&Cone_1_1/Face_1"),
                    model.selection("FACE", "Partition_1_1_2/Modified_Face&Cone_1_1/Face_1"),
@@ -276,13 +283,23 @@ checkNonConeShell(Shell_1)
 
 Shell_2 = model.addShell(Part_1_doc, [model.selection("FACE", "Fuse_1_1/Modified_Face&Cone_2_1/Face_1"), model.selection("FACE", "Fuse_1_1/Modified_Face&Cone_3_1/Face_1")])
 checkNonConeShell(Shell_2)
+model.end()
+
+# in order to use study objects once again, undo Test8 actions
+model.undo()
 
 # Test 9. Check error on conversion to wrong type of curve
+model.begin()
 anEdge = model.addEdge(Part_1_doc, [model.selection("EDGE", "[Partition_1_1_2/Modified_Face&Cone_1_1/Face_1][Rotation_1_1/MF:Rotated&Cone_1_1/Face_2]")])
 aShape = anEdge.result().resultSubShapePair()[0].shape()
 assert(aShape.isEdge())
 assert(aShape.edge().ellipse() is None)
 assert(aShape.edge().line() is None)
+model.end()
+
+model.undo()
+
+model.begin()
 
 anEdge = model.addEdge(Part_1_doc, [model.selection("EDGE", "[Partition_1_1_2/Modified_Face&Cone_1_1/Face_1][weak_name_2]")])
 aShape = anEdge.result().resultSubShapePair()[0].shape()
@@ -300,7 +317,5 @@ assert(cone.location().distance(apex) < TOLERANCE)
 radius = 5
 cone = GeomAPI_Cone(apex, dir, semiAngle, radius)
 assert(cone.location().distance(apex) < TOLERANCE)
-
-
 
 model.end()

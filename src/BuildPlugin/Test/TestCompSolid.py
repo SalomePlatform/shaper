@@ -147,6 +147,12 @@ CompSolid_1 = createCompSolidStepByStep(boundaries1, expectType1)
 model.checkResult(CompSolid_1, model, 1, [2], [2], [13], [54], [108])
 model.testHaveNamingSubshapes(CompSolid_1, model, Part_1_doc)
 
+# to reuse all results, undo the solid and 3 groups creation
+model.undo()
+model.undo()
+model.undo()
+model.undo()
+
 # =============================================================================
 # Test 2. Build compsolid containing 3 solids
 # =============================================================================

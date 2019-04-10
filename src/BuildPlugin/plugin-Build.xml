@@ -21,7 +21,7 @@
                helpfile="polylineFeature.html">
         <source path="polyline_widget.xml"/>
       </feature>
-      <feature id="Face" title="Face" tooltip ="Create a face from sketch edges, edges and wires objects" icon="icons/Build/feature_face.png"
+      <feature id="Face" title="Face" tooltip ="Create a face from edges, wires and faces" icon="icons/Build/feature_face.png"
                helpfile="faceFeature.html">
         <source path="face_widget.xml"/>
       </feature>
