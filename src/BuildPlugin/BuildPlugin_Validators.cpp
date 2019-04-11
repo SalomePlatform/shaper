@@ -343,20 +343,24 @@ bool BuildPlugin_ValidatorSubShapesSelection::isValid(const AttributePtr& theAtt
                                                       Events_InfoMessage& theError) const
 {
   if(theArguments.size() != 1) {
+    // LCOV_EXCL_START
     std::string aMsg = "Error: BuildPlugin_ValidatorSubShapesSelection should be used only with "
       "1 parameter(Sketch feature id).";
     Events_InfoMessage("BuildPlugin_Validators", aMsg).send();
     return false;
+    // LCOV_EXCL_STOP
   }
 
   // Get base objects list.
   if(theAttribute->attributeType() != ModelAPI_AttributeSelectionList::typeId()) {
+    // LCOV_EXCL_START
     std::string aMsg =
       "Error: BuildPlugin_ValidatorSubShapesSelection does not support attribute type \""
       "%1\"\n Only \"%2\" supported.";
     Events_InfoMessage("BuildPlugin_Validators", aMsg).
       arg(theAttribute->attributeType()).arg(ModelAPI_AttributeSelectionList::typeId()).send();
     return false;
+    // LCOV_EXCL_STOP
   }
   AttributeSelectionListPtr aSelectionList =
     std::dynamic_pointer_cast<ModelAPI_AttributeSelectionList>(theAttribute);
@@ -444,12 +448,14 @@ bool BuildPlugin_ValidatorFillingSelection::isValid(const AttributePtr& theAttri
 {
   // Get base objects list.
   if (theAttribute->attributeType() != ModelAPI_AttributeSelectionList::typeId()) {
+    // LCOV_EXCL_START
     std::string aMsg =
       "Error: BuildPlugin_ValidatorFillingSelection does not support attribute type \""
       "%1\"\n Only \"%2\" supported.";
     Events_InfoMessage("BuildPlugin_Validators", aMsg).
       arg(theAttribute->attributeType()).arg(ModelAPI_AttributeSelectionList::typeId()).send();
     return false;
+    // LCOV_EXCL_STOP
   }
   AttributeSelectionListPtr aSelectionList =
     std::dynamic_pointer_cast<ModelAPI_AttributeSelectionList>(theAttribute);
