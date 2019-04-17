@@ -2037,6 +2037,16 @@ void Model_Document::eraseAllFeatures()
     myObjs->eraseAllFeatures();
 }
 
+std::shared_ptr<ModelAPI_Feature> Model_Document::nextFeature(
+  std::shared_ptr<ModelAPI_Feature> theCurrent, const bool theReverse) const
+{
+  if (theCurrent.get() && myObjs) {
+    int anIndex = kUNDEFINED_FEATURE_INDEX;
+    return myObjs->nextFeature(theCurrent, anIndex, theReverse);
+  }
+  return FeaturePtr(); // nothing by default
+}
+
 void Model_Document::setExecuteFeatures(const bool theFlag)
 {
   myExecuteFeatures = theFlag;

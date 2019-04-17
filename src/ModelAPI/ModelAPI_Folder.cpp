@@ -42,3 +42,16 @@ void ModelAPI_Folder::initAttributes()
 void ModelAPI_Folder::execute()
 {
 }
+
+std::shared_ptr<ModelAPI_Feature> ModelAPI_Folder::lastVisibleFeature()
+{
+  FeaturePtr aResult;
+  AttributeReferencePtr aLastFeatAttr = data()->reference(LAST_FEATURE_ID());
+  if (!aLastFeatAttr.get())
+    return aResult;
+  aResult = ModelAPI_Feature::feature(aLastFeatAttr->value());
+  while(aResult.get() && !aResult->isInHistory()) { // searching for previous feature
+    aResult = aResult->document()->nextFeature(aResult, true);
+  }
+  return aResult;
+}

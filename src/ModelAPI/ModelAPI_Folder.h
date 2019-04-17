@@ -92,6 +92,10 @@ public:
     return data()->reference(theID);
   }
 
+  /// Returns the last visible feature in the folder, passing through invisible,
+  /// that may appear as the last ones.
+  MODELAPI_EXPORT std::shared_ptr<ModelAPI_Feature> lastVisibleFeature();
+
 protected:
   /// This method is called just after creation of the object: it must initialize
   /// all fields, normally initialized in the constructor
