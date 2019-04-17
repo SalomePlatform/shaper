@@ -324,9 +324,6 @@ public:
   /// Request for initialization of data model of the feature: adding all attributes.
   CONSTRUCTIONPLUGIN_EXPORT virtual void initAttributes();
 
-  /// Construction result is allways recomuted on the fly.
-  CONSTRUCTIONPLUGIN_EXPORT virtual bool isPersistentResult() {return false;}
-
   /// Use plugin manager for features creation
   ConstructionPlugin_Point();
 
