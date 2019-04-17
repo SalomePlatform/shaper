@@ -299,6 +299,11 @@ class Model_Document : public ModelAPI_Document
   /// Just removes all features without touching the document data (to be able undo)
   MODEL_EXPORT virtual void eraseAllFeatures();
 
+  /// Returns the next (from the history point of view) feature, any: invisible or disabled
+  /// \param theCurrent previous to the resulting feature
+  /// \param theReverse if it is true, iterates in reversed order (next becomes previous)
+  MODEL_EXPORT virtual std::shared_ptr<ModelAPI_Feature> nextFeature(
+    std::shared_ptr<ModelAPI_Feature> theCurrent, const bool theReverse = false) const;
 
  protected:
   //! Returns (creates if needed) the general label

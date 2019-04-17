@@ -772,11 +772,7 @@ void PartSet_Tools::getFirstAndLastIndexInFolder(const ObjectPtr& theFolder,
   if (!aFirstFeatureInFolder.get())
     return;
 
-  AttributeReferencePtr aLastFeatAttr =
-    aFolder->data()->reference(ModelAPI_Folder::LAST_FEATURE_ID());
-  if (!aLastFeatAttr.get())
-    return;
-  FeaturePtr aLastFeatureInFolder = ModelAPI_Feature::feature(aLastFeatAttr->value());
+  FeaturePtr aLastFeatureInFolder = aFolder->lastVisibleFeature();
   if (!aLastFeatureInFolder.get())
     return;
 
