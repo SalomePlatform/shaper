@@ -68,6 +68,8 @@ void XGUI_DataModel::processEvent(const std::shared_ptr<Events_Message>& theMess
       if ((*aIt)->isInHistory())
         aCreated.append(*aIt);
     }
+    if (aCreated.length() == 0)
+      return;
     QTreeNodesList aNodes = myRoot->objectCreated(aCreated);
     ModuleBase_ITreeNode* aParent;
     int aRow = 0;
