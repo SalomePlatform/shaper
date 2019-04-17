@@ -722,10 +722,8 @@ bool Model_Update::processFeature(FeaturePtr theFeature)
       if (myUpdateBlocked) {
         if (!theFeature->isStable()) {
           aDoExecute = true;
-        } else if (theFeature->results().size()) { // execute only not-results features
-          aDoExecute = !(theFeature->firstResult()->groupName() == ModelAPI_ResultBody::group() ||
-            theFeature->firstResult()->groupName() == ModelAPI_ResultPart::group() ||
-            theFeature->getKind() == "Sketch");
+        } else if (theFeature->results().size()) { // execute only not persistent results features
+          aDoExecute = !theFeature->isPersistentResult();
         } else {
           aDoExecute = aState != ModelAPI_StateInvalidArgument;
         }
