@@ -21,6 +21,10 @@ while [[ $# > 0 ]]; do
       ADD_COMPATIBILITY_TESTS=TRUE
       shift
       ;;
+    hdf|test-hdf-models)
+      ADD_HDF_TESTS=TRUE
+      shift
+      ;;
     *)
       shift
       ;;
