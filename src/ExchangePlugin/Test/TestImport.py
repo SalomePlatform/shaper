@@ -147,9 +147,9 @@ if __name__ == '__main__':
         # Create a shape imported from IGES
         #=========================================================================
         shape_path = getShapePath("Iges/bearing.igs")
-        testImport("IGES", shape_path, 6.86970803067e-14, 10 ** -25)
+        testImport("IGES", shape_path, 1.3407098545036494e-08, 10 ** -25)
         shape_path = shutil.copyfile(shape_path, os.path.join(tmp_dir, "bearing.iges"))
-        testImport("IGS", shape_path, 6.86970803067e-14, 10 ** -25)
+        testImport("IGS", shape_path, 1.3407098545036494e-08, 10 ** -25)
 
         #=========================================================================
         # Create a shape imported from XAO

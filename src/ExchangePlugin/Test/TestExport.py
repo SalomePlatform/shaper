@@ -172,15 +172,15 @@ if __name__ == '__main__':
         #=========================================================================
         # Export a shape into STEP
         #=========================================================================
-        testExport("STEP", "STEP", os.path.join(tmp_dir, "screw_export.step"), 3.78825807533e-06, 10 ** -17)
-        testExport("STP", "STEP", os.path.join(tmp_dir, "screw_export.stp"), 3.78825807533e-06, 10 ** -17)
-        testExport("Regular", "", os.path.join(tmp_dir, "screw_export.step"), 3.78825807533e-06, 10 ** -17)
+        testExport("STEP", "STEP", os.path.join(tmp_dir, "screw_export.step"), 3.788258075329978e-06, 10 ** -17)
+        testExport("STP", "STEP", os.path.join(tmp_dir, "screw_export.stp"), 3.788258075329978e-06, 10 ** -17)
+        testExport("Regular", "", os.path.join(tmp_dir, "screw_export.step"), 3.788258075329978e-06, 10 ** -17)
         #=========================================================================
         # Export a shape into IGES
         #=========================================================================
-        testExport("IGES-5.1", "IGES-5.1", os.path.join(tmp_dir, "screw_export-5.1.iges"), 3.78829613776e-06, 10 ** -17)
-        testExport("IGS-5.1", "IGES-5.1", os.path.join(tmp_dir, "screw_export-5.1.igs"), 3.78829613776e-06, 10 ** -17)
-        testExport("Regular", "", os.path.join(tmp_dir, "screw_export-5.1.iges"), 3.78829613776e-06, 10 ** -17)
+        testExport("IGES-5.1", "IGES-5.1", os.path.join(tmp_dir, "screw_export-5.1.iges"), 0.0019293313766693052, 10 ** -17)
+        testExport("IGS-5.1", "IGES-5.1", os.path.join(tmp_dir, "screw_export-5.1.igs"), 0.0019293313766693052, 10 ** -17)
+        testExport("Regular", "", os.path.join(tmp_dir, "screw_export-5.1.iges"), 0.0019293313766693052, 10 ** -17)
         testExport("IGES-5.3", "IGES-5.3", os.path.join(tmp_dir, "screw_export-5.3.iges"), 3.78827401651e-06, 10 ** -17)
         testExport("IGS-5.3", "IGES-5.3", os.path.join(tmp_dir, "screw_export-5.3.igs"), 3.78827401651e-06, 10 ** -17)
         #=========================================================================

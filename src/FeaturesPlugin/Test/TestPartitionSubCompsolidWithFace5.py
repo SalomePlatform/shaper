@@ -50,7 +50,7 @@ model.testNbResults(Partition_1, 1)
 model.testNbSubResults(Partition_1, [2])
 model.testNbSubShapes(Partition_1, GeomAPI_Shape.SOLID, [5])
 model.testNbSubShapes(Partition_1, GeomAPI_Shape.FACE, [29])
-model.testResultsVolumes(Partition_1, [61804.7209520386313670314848423])
+model.testResultsVolumes(Partition_1, [58449.978429877664893865585327148])
 
 # update extrusion and check partition
 Param_ExtrusionMin.setValue(-5)
@@ -61,7 +61,7 @@ model.testNbResults(Partition_1, 1)
 model.testNbSubResults(Partition_1, [2])
 model.testNbSubShapes(Partition_1, GeomAPI_Shape.SOLID, [4])
 model.testNbSubShapes(Partition_1, GeomAPI_Shape.FACE, [25])
-model.testResultsVolumes(Partition_1, [60965.634801387262996286153793335])
+model.testResultsVolumes(Partition_1, [58449.978433183350716717541217804])
 
 # change radius of a circle and check partition
 Param_Radius.setValue(50)
@@ -71,7 +71,7 @@ model.testNbResults(Partition_1, 1)
 model.testNbSubResults(Partition_1, [2])
 model.testNbSubShapes(Partition_1, GeomAPI_Shape.SOLID, [4])
 model.testNbSubShapes(Partition_1, GeomAPI_Shape.FACE, [25])
-model.testResultsVolumes(Partition_1, [83661.21013607898203190416097641])
+model.testResultsVolumes(Partition_1, [81554.943249191215727478265762329])
 
 # check naming
 model.testHaveNamingSubshapes(Partition_1, model, Part_1_doc)
