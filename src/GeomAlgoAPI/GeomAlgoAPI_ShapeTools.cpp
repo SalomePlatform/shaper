@@ -113,7 +113,6 @@ static GProp_GProps props(const TopoDS_Shape& theShape)
 //==================================================================================================
 double GeomAlgoAPI_ShapeTools::volume(const std::shared_ptr<GeomAPI_Shape> theShape)
 {
-  GProp_GProps aGProps;
   if(!theShape.get()) {
     return 0.0;
   }
@@ -122,10 +121,19 @@ double GeomAlgoAPI_ShapeTools::volume(const std::shared_ptr<GeomAPI_Shape> theSh
     return 0.0;
   }
   const Standard_Real anEps = 1.e-6;
-  if (aShape.ShapeType() <= TopAbs_SOLID)
-    BRepGProp::VolumeProperties(aShape, aGProps, anEps);
-  else
-    BRepGProp::SurfaceProperties(aShape, aGProps, anEps);
+  TopExp_Explorer anExp(aShape, TopAbs_SOLID);
+  if (anExp.More()) { // return volume if there is at least one solid
+    double aVolume = 0.0;
+    for (; anExp.More(); anExp.Next()) {
+      GProp_GProps aGProps;
+      BRepGProp::VolumeProperties(anExp.Current(), aGProps, anEps);
+      aVolume += aGProps.Mass();
+    }
+    return aVolume;
+  }
+  // return surfaces area
+  GProp_GProps aGProps;
+  BRepGProp::SurfaceProperties(aShape, aGProps, anEps);
   return aGProps.Mass();
 }
 
