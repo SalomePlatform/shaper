@@ -86,65 +86,69 @@ void FeaturesPlugin_RemoveSubShapes::attributeChanged(const std::string& theID)
   }
 
   myChangedInCode = true;
+  if (theID == BASE_SHAPE_ID() || theID == SUBSHAPES_TO_KEEP_ID() ||
+    theID == SUBSHAPES_TO_REMOVE_ID()) {
+    std::list<ResultPtr> anAllSubs;
+    ModelAPI_Tools::allSubs(aResultBody, anAllSubs);
 
-  if(theID == BASE_SHAPE_ID()) {
-    aSubShapesToKeepAttrList->clear();
-    aSubShapesToRemoveAttrList->clear();
+    if(theID == BASE_SHAPE_ID()) {
+      aSubShapesToKeepAttrList->clear();
+      aSubShapesToRemoveAttrList->clear();
 
-    if (!aBaseShape.get()) {
-      return;
-    }
+      if (!aBaseShape.get()) {
+        return;
+      }
 
-    std::list<GeomShapePtr> aSubShapes = GeomAlgoAPI_ShapeTools::getLowLevelSubShapes(aBaseShape);
-    for (ListOfShape::const_iterator anIt = aSubShapes.cbegin(); anIt != aSubShapes.cend(); ++anIt)
-    {
-      GeomShapePtr aSubShape = *anIt;
-      if(!isHasSubs) {
-        aSubShapesToKeepAttrList->append(aContext, aSubShape);
-      } else {
-        std::list<ResultPtr> anAllSubs;
-        ModelAPI_Tools::allSubs(aResultBody, anAllSubs);
-        std::list<ResultPtr>::iterator aSubsIt = anAllSubs.begin();
-        for(; aSubsIt != anAllSubs.end(); aSubsIt++) {
-          ResultBodyPtr aSub = std::dynamic_pointer_cast<ModelAPI_ResultBody>(*aSubsIt);
-          if (aSub && aSub->shape().get() && aSub->shape()->isSubShape(aSubShape)) {
-            aSubShapesToKeepAttrList->append(aSub, aSubShape);
-            break;
+      std::list<GeomShapePtr> aSubShapes = GeomAlgoAPI_ShapeTools::getLowLevelSubShapes(aBaseShape);
+      for (ListOfShape::const_iterator anIt = aSubShapes.cbegin(); anIt != aSubShapes.cend(); ++anIt)
+      {
+        GeomShapePtr aSubShape = *anIt;
+        if(!isHasSubs) {
+          aSubShapesToKeepAttrList->append(aContext, aSubShape);
+        } else {
+          std::list<ResultPtr>::iterator aSubsIt = anAllSubs.begin();
+          for(; aSubsIt != anAllSubs.end(); aSubsIt++) {
+            ResultBodyPtr aSub = std::dynamic_pointer_cast<ModelAPI_ResultBody>(*aSubsIt);
+            if (aSub && aSub->shape().get() && aSub->shape()->isSubShape(aSubShape)) {
+              aSubShapesToKeepAttrList->append(aSub, aSubShape);
+              break;
+            }
           }
         }
       }
     }
-  }
-  else if (theID == SUBSHAPES_TO_KEEP_ID())
-  {
-    aSubShapesToRemoveAttrList->clear();
-
-    if (!aBaseShape.get()) {
-      return;
-    }
-
-    int anIndex;
-    const int aSubsToKeepNb = aSubShapesToKeepAttrList->size();
-    std::list<GeomShapePtr> aSubShapes = GeomAlgoAPI_ShapeTools::getLowLevelSubShapes(aBaseShape);
-    for (ListOfShape::const_iterator anIt = aSubShapes.cbegin(); anIt != aSubShapes.cend(); ++anIt)
+    else if (theID == SUBSHAPES_TO_KEEP_ID())
     {
-      GeomShapePtr aSubShape = *anIt;
+      aSubShapesToRemoveAttrList->clear();
+
+      if (!aBaseShape.get()) {
+        return;
+      }
+
+      int anIndex;
+      // optimization: collect selection attribute values into a map
+      const int aSubsToKeepNb = aSubShapesToKeepAttrList->size();
+      GeomAPI_DataMapOfShapeShape aSubShapesToKeep;
       for(anIndex = 0; anIndex < aSubsToKeepNb; ++anIndex) {
         AttributeSelectionPtr anAttrSelectionInList = aSubShapesToKeepAttrList->value(anIndex);
         GeomShapePtr aSubShapeToKeep = anAttrSelectionInList->value();
-        if (aSubShapeToKeep.get() && aSubShapeToKeep->isEqual(aSubShape)) {
-          break;
-        }
+        if (aSubShapeToKeep.get())
+          aSubShapesToKeep.bind(aSubShapeToKeep, aSubShapeToKeep);
       }
 
-      if (anIndex == aSubsToKeepNb) {
+      std::list<GeomShapePtr> aSubShapes = GeomAlgoAPI_ShapeTools::getLowLevelSubShapes(aBaseShape);
+      for (ListOfShape::const_iterator anIt = aSubShapes.cbegin(); anIt != aSubShapes.cend(); ++anIt)
+      {
+        GeomShapePtr aSubShape = *anIt;
+        if (aSubShapesToKeep.isBound(aSubShape))
+          continue;
+
         if(!isHasSubs) {
           aSubShapesToRemoveAttrList->append(aContext, aSubShape);
-        } else {
-          std::list<ResultPtr> anAllSubs;
-          ModelAPI_Tools::allSubs(aResultBody, anAllSubs);
+        }
+        else {
           std::list<ResultPtr>::iterator aSubsIt = anAllSubs.begin();
-          for(; aSubsIt != anAllSubs.end(); aSubsIt++) {
+          for (; aSubsIt != anAllSubs.end(); aSubsIt++) {
             ResultBodyPtr aSub = std::dynamic_pointer_cast<ModelAPI_ResultBody>(*aSubsIt);
             if (aSub && aSub->shape().get() && aSub->shape()->isSubShape(aSubShape)) {
               aSubShapesToRemoveAttrList->append(aSub, aSubShape);
@@ -154,37 +158,38 @@ void FeaturesPlugin_RemoveSubShapes::attributeChanged(const std::string& theID)
         }
       }
     }
-  }
-  else if (theID == SUBSHAPES_TO_REMOVE_ID())
-  {
-    aSubShapesToKeepAttrList->clear();
-
-    if (!aBaseShape.get()) {
-      return;
-    }
-
-    int anIndex;
-    const int aSubsToRemoveNb = aSubShapesToRemoveAttrList->size();
-    std::list<GeomShapePtr> aSubShapes = GeomAlgoAPI_ShapeTools::getLowLevelSubShapes(aBaseShape);
-    for (ListOfShape::const_iterator anIt = aSubShapes.cbegin(); anIt != aSubShapes.cend(); ++anIt)
+    else if (theID == SUBSHAPES_TO_REMOVE_ID())
     {
-      GeomShapePtr aSubShape = *anIt;
+      aSubShapesToKeepAttrList->clear();
+
+      if (!aBaseShape.get()) {
+        return;
+      }
+
+      int anIndex;
+      const int aSubsToRemoveNb = aSubShapesToRemoveAttrList->size();
+      GeomAPI_DataMapOfShapeShape aSubShapesToRemove;
       for(anIndex = 0; anIndex < aSubsToRemoveNb; ++anIndex) {
         AttributeSelectionPtr anAttrSelectionInList = aSubShapesToRemoveAttrList->value(anIndex);
         GeomShapePtr aSubShapeToRemove = anAttrSelectionInList->value();
-        if (aSubShapeToRemove.get() && aSubShapeToRemove->isEqual(aSubShape)) {
-          break;
-        }
+        if (aSubShapeToRemove.get())
+          aSubShapesToRemove.bind(aSubShapeToRemove, aSubShapeToRemove);
       }
 
-      if (anIndex == aSubsToRemoveNb) {
-        if(!isHasSubs) {
+
+      std::list<GeomShapePtr> aSubShapes = GeomAlgoAPI_ShapeTools::getLowLevelSubShapes(aBaseShape);
+      for (ListOfShape::const_iterator anIt = aSubShapes.cbegin(); anIt != aSubShapes.cend(); ++anIt)
+      {
+        GeomShapePtr aSubShape = *anIt;
+        if (aSubShapesToRemove.isBound(aSubShape))
+          continue;
+
+        if (!isHasSubs) {
           aSubShapesToKeepAttrList->append(aContext, aSubShape);
-        } else {
-          std::list<ResultPtr> anAllSubs;
-          ModelAPI_Tools::allSubs(aResultBody, anAllSubs);
+        }
+        else {
           std::list<ResultPtr>::iterator aSubsIt = anAllSubs.begin();
-          for(; aSubsIt != anAllSubs.end(); aSubsIt++) {
+          for (; aSubsIt != anAllSubs.end(); aSubsIt++) {
             ResultBodyPtr aSub = std::dynamic_pointer_cast<ModelAPI_ResultBody>(*aSubsIt);
             if (aSub && aSub->shape().get() && aSub->shape()->isSubShape(aSubShape)) {
               aSubShapesToKeepAttrList->append(aSub, aSubShape);
