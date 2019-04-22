@@ -39,6 +39,10 @@ if (EXISTS ${RESTRICTED_ROOT_DIR})
   foreach(eachFilePath ${hdfFilesRestr})
     # Strip the ".hdf" suffix
     GET_FILENAME_COMPONENT(aTestName ${eachFilePath} NAME_WE)
+    # Check corresponding ".py" file with reference data exists
+    IF(NOT EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/${aTestName}.py")
+      MESSGAGE(WARNING "File ${aTestName}.py containing reference data does not exist")
+    ENDIF()
 
     # Add "SubprojectName_" prefix
     GET_FILENAME_COMPONENT(aSubprojectName ${CMAKE_CURRENT_SOURCE_DIR} NAME)
