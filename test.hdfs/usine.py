@@ -20,8 +20,8 @@
 if __name__ == "__main__":
   model.testNbResults(aPartFeature, 1)
   model.testNbSubResults(aPartFeature, [0])
-  model.testNbSubShapes(aPartFeature, GeomAPI_Shape.SOLID, [30])
-  model.testNbSubShapes(aPartFeature, GeomAPI_Shape.FACE, [231])
-  model.testNbSubShapes(aPartFeature, GeomAPI_Shape.EDGE, [968])
-  model.testNbSubShapes(aPartFeature, GeomAPI_Shape.VERTEX, [1936])
-  model.testResultsVolumes(aPartFeature, [1429610.103267467])
+  model.testNbSubShapes(aPartFeature, GeomAPI_Shape.SOLID, [186])
+  model.testNbSubShapes(aPartFeature, GeomAPI_Shape.FACE, [4573])
+  model.testNbSubShapes(aPartFeature, GeomAPI_Shape.EDGE, [25474])
+  model.testNbSubShapes(aPartFeature, GeomAPI_Shape.VERTEX, [50980])
+  model.testResultsVolumes(aPartFeature, [2688153.285910513252])
