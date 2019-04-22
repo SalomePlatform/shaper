@@ -800,7 +800,7 @@ QString wrapTextByWords(const QString& theValue, QWidget* theWidget,
   int n = aWords.count();
   QString aLine;
   for (int i = 0; i < n; i++) {
-    QString aLineExt = aLine + " " + aWords[i];
+    QString aLineExt =  i == 0 ? aWords[i] : aLine + " " + aWords[i];
     qreal anWidthNonExt = tfm.boundingRect(aLine).width();
     qreal anWidthExt = tfm.boundingRect(aLineExt).width();
     qreal aDeltaNonExt = fabs(anWidthNonExt-aGoldWidth);

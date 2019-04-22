@@ -83,6 +83,7 @@ const static char* FEATURE_DOC = WORKBENCH_DOC;
 const static char* FEATURE_MODAL = "modal";
 const static char* FEATURE_APPLY_CONTINUE = "apply_continue";
 const static char* FEATURE_AUTO_PREVIEW = "auto_preview";
+const static char* FEATURE_TITLE_IN_TOOLBAR = "titleInToolbar";
 // NODE_VALIDATOR properties
 const static char* _PARAMETERS = "parameters";
 

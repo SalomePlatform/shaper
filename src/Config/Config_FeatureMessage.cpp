@@ -38,6 +38,7 @@ Config_FeatureMessage::Config_FeatureMessage(const Events_ID theId, const void* 
   myUseInput = false;
   myNestedFeatures = "";
   myModal = false;
+  myIsTitleInToolbar = true;
   myIsApplyContinue = false;
 }
 
@@ -161,6 +162,11 @@ bool Config_FeatureMessage::isAutoPreview() const
   return myIsAutoPreview;
 }
 
+bool Config_FeatureMessage::isTitleInToolbar() const
+{
+  return myIsTitleInToolbar;
+}
+
 bool Config_FeatureMessage::isModal() const
 {
   return myModal;
@@ -225,4 +231,9 @@ const std::string& Config_FeatureMessage::helpFileName() const
 void Config_FeatureMessage::setHelpFileName(const std::string& aName)
 {
   myHelpFile = aName;
+}
+
+void Config_FeatureMessage::setTitleInToolbar(bool theValue)
+{
+  myIsTitleInToolbar = theValue;
 }
