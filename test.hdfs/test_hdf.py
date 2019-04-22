@@ -32,29 +32,74 @@ class TestHDF(unittest.TestCase):
   reffile = ""
 
   def setUp(self):
+    # ===========================================
+    dbgFile = open(os.getcwd() + "/dbgfile", 'a')
+    print("  UnitTest setUp() started", file=dbgFile)
+    dbgFile.close()
+    # ===========================================
     salome.salome_close()
+    # ===========================================
+    dbgFile = open(os.getcwd() + "/dbgfile", 'a')
+    print("  UnitTest previous session closed", file=dbgFile)
+    dbgFile.close()
+    # ===========================================
 
     # leave file name only (trim path and extension)
     fileName = os.path.basename(self.testfile)
     self.reffile = self.reffile + "/" + os.path.splitext(fileName)[0] + ".py"
+    # ===========================================
+    dbgFile = open(os.getcwd() + "/dbgfile", 'a')
+    print("  UnitTest reffile: {}".format(self.reffile), file=dbgFile)
+    dbgFile.close()
+    # ===========================================
 
     salome.salome_init(self.testfile, embedded=1)
     myStudyName = salome.myStudy._get_Name()
     self.session = salome.naming_service.Resolve('/Kernel/Session')
     self.session.emitMessage("connect_to_study")
+    # ===========================================
+    dbgFile = open(os.getcwd() + "/dbgfile", 'a')
+    print("  UnitTest Salome started", file=dbgFile)
+    dbgFile.close()
+    # ===========================================
 
     self.sg = SalomePyQt.SalomePyQt()
     self.sg.activateModule("Shaper")
     self.session = ModelAPI.ModelAPI_Session.get()
     self.partSet = self.session.moduleDocument()
+    # ===========================================
+    dbgFile = open(os.getcwd() + "/dbgfile", 'a')
+    print("  UnitTest Shaper started", file=dbgFile)
+    dbgFile.close()
+    # ===========================================
 
   def tearDown(self):
+    # ===========================================
+    dbgFile = open(os.getcwd() + "/dbgfile", 'a')
+    print("  UnitTest tearDown() started", file=dbgFile)
+    dbgFile.close()
+    # ===========================================
     salome.sg.UpdateView()
     self.sg.processEvents()
     salome.sg.FitAll()
+    # ===========================================
+    dbgFile = open(os.getcwd() + "/dbgfile", 'a')
+    print("  UnitTest tearDown() finished", file=dbgFile)
+    dbgFile.close()
+    # ===========================================
 
   def test_hdf_file(self):
+    # ===========================================
+    dbgFile = open(os.getcwd() + "/dbgfile", 'a')
+    print("  UnitTest start HDF file testing", file=dbgFile)
+    dbgFile.close()
+    # ===========================================
     self.assertTrue(self.partSet.size("Parts") > 0)
+    # ===========================================
+    dbgFile = open(os.getcwd() + "/dbgfile", 'a')
+    print("  UnitTest number of parts: {}".format(self.partSet.size("Parts")), file=dbgFile)
+    dbgFile.close()
+    # ===========================================
     aPartsList = []
     for aPartIndex in range(self.partSet.size("Parts")):
       self.session.startOperation()
@@ -62,9 +107,19 @@ class TestHDF(unittest.TestCase):
       aPart.activate()
       self.session.finishOperation()
 
+      # ===========================================
+      dbgFile = open(os.getcwd() + "/dbgfile", 'a')
+      print("  UnitTest test part: {}".format(aPartIndex), file=dbgFile)
+      dbgFile.close()
+      # ===========================================
       aPartFeature = PartSetAPI.PartSetAPI_Part(self.partSet.currentFeature(True))
       # check reference data
       exec(open(self.reffile, "rb").read())
+      # ===========================================
+      dbgFile = open(os.getcwd() + "/dbgfile", 'a')
+      print("  UnitTest test part finished", file=dbgFile)
+      dbgFile.close()
+      # ===========================================
 
 
 if __name__ == "__main__":
@@ -79,6 +134,15 @@ if __name__ == "__main__":
   if len(sys.argv) > 5:
     TestHDF.reffile = sys.argv[5]
 
+  # ===========================================
+  dbgFile = open(os.getcwd() + "/dbgfile", 'a')
+  print("  UnitTest started with parameters:", file=dbgFile)
+  print("      testfile: {}".format(TestHDF.testfile), file=dbgFile)
+  print("      salomePortFile: {}".format(salomePortFile), file=dbgFile)
+  print("      salomeKernelDir: {}".format(salomeKernelDir), file=dbgFile)
+  print("      reffile: {}".format(TestHDF.reffile), file=dbgFile)
+  dbgFile.close()
+  # ===========================================
   aTest = unittest.TestLoader().loadTestsFromTestCase(TestHDF)
   unittest.TextTestRunner(stream=sys.stderr).run(aTest)
 
