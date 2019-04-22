@@ -128,7 +128,7 @@ if __name__ == "__main__":
   if len(sys.argv) > 2:
     salomePortFile = sys.argv[2]
   if len(sys.argv) > 3:
-    sys.stderr = open(sys.argv[3], 'w')
+    errFile = open(sys.argv[3], 'w')
   if len(sys.argv) > 4:
     salomeKernelDir = sys.argv[4]
   if len(sys.argv) > 5:
@@ -144,7 +144,8 @@ if __name__ == "__main__":
   dbgFile.close()
   # ===========================================
   aTest = unittest.TestLoader().loadTestsFromTestCase(TestHDF)
-  unittest.TextTestRunner(stream=sys.stderr).run(aTest)
+  unittest.TextTestRunner(stream=errFile).run(aTest)
+  errFile.close()
 
 #  test_program = unittest.main(argv=[sys.argv[0]], exit=False)
   proc = subprocess.Popen(salomeKernelDir + "/bin/salome/killSalome.py")
