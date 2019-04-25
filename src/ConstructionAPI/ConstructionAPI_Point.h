@@ -70,10 +70,12 @@ public:
                         const ModelHighAPI_Selection& theObject3);
 
   /// Constructor with values: object and circular edge flag.
+  /// May be used for creation of point by coordinates using selection-vertex.
   CONSTRUCTIONAPI_EXPORT
   ConstructionAPI_Point(const std::shared_ptr<ModelAPI_Feature>& theFeature,
                         const ModelHighAPI_Selection& theObject,
-                        const bool theIsCircularEdge = false);
+                        const bool theIsCircularEdge = false,
+                        const bool theIsXYZSelection = false);
 
   /// Destructor.
   CONSTRUCTIONAPI_EXPORT
@@ -234,5 +236,11 @@ CONSTRUCTIONAPI_EXPORT
 PointPtr addPoint(const std::shared_ptr<ModelAPI_Document> & thePart,
                   const ModelHighAPI_Selection& theObject,
                   const bool theIsCircularEdge = false);
+
+/// \ingroup CPPHighAPI
+/// \brief Create Point feature by coordinates using the selected vertex.
+CONSTRUCTIONAPI_EXPORT
+PointPtr addPointXYZ(const std::shared_ptr<ModelAPI_Document> & thePart,
+                     const ModelHighAPI_Selection& theObject);
 
 #endif /* SRC_CONSTRUCTIONAPI_CONSTRUCTIONAPI_POINT_H_ */

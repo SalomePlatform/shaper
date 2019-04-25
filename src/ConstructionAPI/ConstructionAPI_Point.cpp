@@ -109,14 +109,15 @@ ConstructionAPI_Point::ConstructionAPI_Point(const std::shared_ptr<ModelAPI_Feat
 //==================================================================================================
 ConstructionAPI_Point::ConstructionAPI_Point(const std::shared_ptr<ModelAPI_Feature>& theFeature,
                                              const ModelHighAPI_Selection& theObject,
-                                             const bool theIsCircularEdge)
+                                             const bool theIsCircularEdge,
+                                             const bool theIsXYZSelection)
 : ModelHighAPI_Interface(theFeature)
 {
   if (initialize())
   {
     if (theIsCircularEdge) {
       setByCenterOfCircle(theObject);
-    } else if (theObject.shapeType() == "VERTEX") {
+    } else if (theObject.shapeType() == "VERTEX" && theIsXYZSelection) {
       // This is tricky way to get vertex shape.
       fillAttribute(theObject, mypointToProject);
       GeomShapePtr aShape = mypointToProject->value();
@@ -415,4 +416,12 @@ PointPtr addPoint(const std::shared_ptr<ModelAPI_Document> & thePart,
 {
   std::shared_ptr<ModelAPI_Feature> aFeature = thePart->addFeature(ConstructionAPI_Point::ID());
   return PointPtr(new ConstructionAPI_Point(aFeature, theObject, theIsCircularEdge));
+}
+
+//==================================================================================================
+PointPtr addPointXYZ(const std::shared_ptr<ModelAPI_Document> & thePart,
+                     const ModelHighAPI_Selection& theObject)
+{
+  std::shared_ptr<ModelAPI_Feature> aFeature = thePart->addFeature(ConstructionAPI_Point::ID());
+  return PointPtr(new ConstructionAPI_Point(aFeature, theObject, false, true));
 }
