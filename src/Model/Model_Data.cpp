@@ -335,8 +335,8 @@ void Model_Data::sendAttributeUpdated(ModelAPI_Attribute* theAttr)
         myWasChangedButBlocked.push_back(theAttr);
     }
   } else {
-    // trim: need to redisplay
-    if (myObject && theAttr->attributeType() == "Point2D") {
+    // trim: need to redisplay or set color in the python script
+    if (myObject && (theAttr->attributeType() == "Point2D" || theAttr->id() == "Color")) {
       static const Events_ID anEvent = Events_Loop::eventByName(EVENT_OBJECT_TO_REDISPLAY);
       ModelAPI_EventCreator::get()->sendUpdated(myObject, anEvent);
     }
