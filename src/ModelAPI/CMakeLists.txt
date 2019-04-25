@@ -65,6 +65,7 @@ SET(PROJECT_HEADERS
     ModelAPI_Tools.h
     ModelAPI_Validator.h
     ModelAPI_Entity.h
+	ModelAPI_Filter.h
 )
 
 SET(PROJECT_SOURCES

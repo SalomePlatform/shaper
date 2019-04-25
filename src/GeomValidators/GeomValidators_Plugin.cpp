@@ -61,8 +61,8 @@ GeomValidators_Plugin::GeomValidators_Plugin()
   aFactory->registerValidator("GeomValidators_NotSelfIntersected",
                               new GeomValidators_NotSelfIntersected);
 
-  // register this plugin
-  ModelAPI_Session::get()->registerPlugin(this);
+  // Do not register this plugin because it doesn't create features
+  //ModelAPI_Session::get()->registerPlugin(this);
 }
 
 FeaturePtr GeomValidators_Plugin::createFeature(std::string theFeatureID)

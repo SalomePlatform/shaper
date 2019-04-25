@@ -131,6 +131,9 @@ class Model_Session : public ModelAPI_Session, public Events_Listener
   /// Returns the validators factory: the only one instance per application
   MODEL_EXPORT virtual ModelAPI_ValidatorsFactory* validators();
 
+  /// Returns the filters factory: the only one instance per application
+  MODEL_EXPORT virtual ModelAPI_FiltersFactory* filters();
+
   /// Sets the flag to check modifications outside the transaction or not
   void setCheckTransactions(const bool theCheck)
   {

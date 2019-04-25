@@ -26,6 +26,7 @@
 #include <Model_Application.h>
 #include <Model_Events.h>
 #include <Model_Validator.h>
+#include <Model_Filter.h>
 #include <ModelAPI_Events.h>
 #include <Events_Loop.h>
 #include <Events_InfoMessage.h>
@@ -577,6 +578,12 @@ void Model_Session::registerPlugin(ModelAPI_Plugin* thePlugin)
 ModelAPI_ValidatorsFactory* Model_Session::validators()
 {
   static Model_ValidatorsFactory* aFactory = new Model_ValidatorsFactory;
+  return aFactory;
+}
+
+ModelAPI_FiltersFactory* Model_Session::filters()
+{
+  static Model_FiltersFactory* aFactory = new Model_FiltersFactory;
   return aFactory;
 }
 

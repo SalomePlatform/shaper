@@ -895,8 +895,6 @@ void XGUI_ContextMenuMgr::addFeatures(QMenu* theMenu) const
       // Exit if the selected index belongs to non active document
       if (aIsRoot && (aActiveDoc != aMgr->moduleDocument()))
         return;
-      if ((!aIsRoot) && (aIdx.internalPointer() != aActiveDoc.get()))
-        return;
 
       // Get name of the selected index
       aName = aIdx.data().toString();

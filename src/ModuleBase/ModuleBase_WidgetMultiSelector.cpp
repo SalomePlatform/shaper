@@ -37,6 +37,7 @@
 #include <ModuleBase_ViewerPrs.h>
 #include <ModuleBase_WidgetShapeSelector.h>
 #include <ModuleBase_ChoiceCtrl.h>
+#include <ModuleBase_WidgetSelectionFilter.h>
 
 #include <ModelAPI_Data.h>
 #include <ModelAPI_Object.h>
@@ -112,21 +113,21 @@ ModuleBase_WidgetMultiSelector::ModuleBase_WidgetMultiSelector(QWidget* theParen
                                                                const Config_WidgetAPI* theData)
 : ModuleBase_WidgetSelector(theParent, theWorkshop, theData),
   myIsSetSelectionBlocked(false), myCurrentHistoryIndex(-1),
-  myIsFirst(true)
+  myIsFirst(true), myFiltersWgt(0)
 {
   std::string aPropertyTypes = theData->getProperty("type_choice");
   QString aTypesStr = aPropertyTypes.c_str();
   myShapeTypes = aTypesStr.split(' ', QString::SkipEmptyParts);
   myIsUseChoice = theData->getBooleanAttribute("use_choice", false);
 
-  QGridLayout* aMainLay = new QGridLayout(this);
+  QVBoxLayout* aMainLay = new QVBoxLayout(this);
   ModuleBase_Tools::adjustMargins(aMainLay);
 
   QStringList aIconsList = getIconsList(myShapeTypes);
   myTypeCtrl = new ModuleBase_ChoiceCtrl(this, myShapeTypes, aIconsList);
   myTypeCtrl->setLabel(tr("Type"));
   myTypeCtrl->setValue(0);
-  aMainLay->addWidget(myTypeCtrl, 0, 0, 1, 2);
+  aMainLay->addWidget(myTypeCtrl);
   myDefMode = myShapeTypes.first().toStdString();
 
   // There is no sense to parameterize list of types while we can not parameterize selection mode
@@ -136,18 +137,30 @@ ModuleBase_WidgetMultiSelector::ModuleBase_WidgetMultiSelector(QWidget* theParen
   }
 
   QString aLabelText = translate(theData->getProperty("label"));
-  QLabel* aListLabel = new QLabel(aLabelText, this);
-  aMainLay->addWidget(aListLabel, 1, 0);
-  // if the xml definition contains one type, an information label
-  // should be shown near to the latest
-  if (myShapeTypes.size() <= 1) {
-    QString aLabelIcon = QString::fromStdString(theData->widgetIcon());
-    if (!aLabelIcon.isEmpty()) {
-      QLabel* aSelectedLabel = new QLabel("", this);
-      aSelectedLabel->setPixmap(ModuleBase_IconFactory::loadPixmap(aLabelIcon));
-      aMainLay->addWidget(aSelectedLabel, 1, 1);
+  if (aLabelText.size() > 0) {
+    QWidget* aLabelWgt = new QWidget(this);
+    QHBoxLayout* aLabelLayout = new QHBoxLayout(aLabelWgt);
+    aLabelLayout->setContentsMargins(0, 0, 0, 0);
+    aMainLay->addWidget(aLabelWgt);
+
+    QLabel* aListLabel = new QLabel(aLabelText, this);
+    aLabelLayout->addWidget(aListLabel);
+    // if the xml definition contains one type, an information label
+    // should be shown near to the latest
+    if (myShapeTypes.size() <= 1) {
+      QString aLabelIcon = QString::fromStdString(theData->widgetIcon());
+      if (!aLabelIcon.isEmpty()) {
+        QLabel* aSelectedLabel = new QLabel("", this);
+        aSelectedLabel->setPixmap(ModuleBase_IconFactory::loadPixmap(aLabelIcon));
+        aLabelLayout->addWidget(aSelectedLabel);
+        aLabelLayout->addStretch(1);
+      }
     }
-    aMainLay->setColumnStretch(2, 1);
+  }
+  std::string aUseFilters = theData->getProperty("use_filters");
+  if (aUseFilters.length() > 0) {
+    myFiltersWgt = new ModuleBase_FilterStarter(aUseFilters.c_str(), this, theWorkshop);
+    aMainLay->addWidget(myFiltersWgt);
   }
 
   QString aToolTip = QString::fromStdString(theData->widgetTooltip());
@@ -157,8 +170,7 @@ ModuleBase_WidgetMultiSelector::ModuleBase_WidgetMultiSelector(QWidget* theParen
   connect(myListView, SIGNAL(deleteActionClicked()), SLOT(onDeleteItem()));
   connect(myListView, SIGNAL(listActivated()), SLOT(onListActivated()));
 
-  aMainLay->addWidget(myListView->getControl(), 2, 0, 1, -1);
-  aMainLay->setRowStretch(2, 1);
+  aMainLay->addWidget(myListView->getControl());
   connect(myTypeCtrl, SIGNAL(valueChanged(int)), this, SLOT(onSelectionTypeChanged()));
 
   bool aSameTop = theData->getBooleanAttribute("same_topology", false);
@@ -498,6 +510,7 @@ void ModuleBase_WidgetMultiSelector::onSelectionTypeChanged()
 {
   // Clear current selection in order to avoid updating of object browser with obsolete indexes
   // which can appear because of results deletetion after changing a type of selection
+  QString aSelectionType = myTypeCtrl->textValue();
   QList<ModuleBase_ViewerPrsPtr> aEmptyList;
   myWorkshop->setSelected(aEmptyList);
 
@@ -511,7 +524,7 @@ void ModuleBase_WidgetMultiSelector::onSelectionTypeChanged()
   std::string aType = anAttribute->attributeType();
   if (aType == ModelAPI_AttributeSelectionList::typeId()) {
     AttributeSelectionListPtr aSelectionListAttr = myFeature->data()->selectionList(attributeID());
-    aSelectionListAttr->setSelectionType(myTypeCtrl->textValue().toStdString());
+    aSelectionListAttr->setSelectionType(aSelectionType.toStdString());
   }
 
   // clear attribute values

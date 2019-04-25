@@ -37,7 +37,7 @@ ModuleBase_ChoiceCtrl::ModuleBase_ChoiceCtrl(QWidget* theParent,
  : QWidget(theParent), myType(theType)
 {
   QHBoxLayout* aLayout = new QHBoxLayout(this);
-  ModuleBase_Tools::adjustMargins(aLayout);
+  aLayout->setContentsMargins(0, 0, 0, 0);
 
   switch (myType) {
   case RadioButtons:

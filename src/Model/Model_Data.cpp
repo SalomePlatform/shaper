@@ -60,6 +60,7 @@
 #include <TDF_AttributeIterator.hxx>
 #include <TDF_ChildIterator.hxx>
 #include <TDF_RelocationTable.hxx>
+#include <TDF_ChildIDIterator.hxx>
 #include <TColStd_HArray1OfByte.hxx>
 
 #include <string>
@@ -80,6 +81,10 @@ Standard_GUID kUSER_DEFINED_NAME("9c694d18-a83c-4a56-bc9b-8020628a8244");
 
 // invalid data
 const static std::shared_ptr<ModelAPI_Data> kInvalid(new Model_Data());
+
+static const Standard_GUID kGroupAttributeGroupID("df64ea4c-fc42-4bf8-ad7e-08f7a54bf1b8");
+static const Standard_GUID kGroupAttributeID("ebdcb22a-e045-455b-9a7f-cfd38d68e185");
+
 
 Model_Data::Model_Data() : mySendAttributeUpdated(true), myWasChangedButBlocked(false)
 {
@@ -153,10 +158,11 @@ bool Model_Data::hasUserDefinedName() const
   return shapeLab().IsAttribute(kUSER_DEFINED_NAME);
 }
 
-AttributePtr Model_Data::addAttribute(const std::string& theID, const std::string theAttrType)
+AttributePtr Model_Data::addAttribute(
+  const std::string& theID, const std::string theAttrType, const int theIndex)
 {
   AttributePtr aResult;
-  int anAttrIndex = int(myAttrs.size()) + 1;
+  int anAttrIndex = theIndex == -1 ? int(myAttrs.size()) + 1 : theIndex;
   TDF_Label anAttrLab = myLab.FindChild(anAttrIndex);
   ModelAPI_Attribute* anAttr = 0;
   if (theAttrType == ModelAPI_AttributeDocRef::typeId()) {
@@ -225,6 +231,75 @@ AttributePtr Model_Data::addAttribute(const std::string& theID, const std::strin
   }
   return aResult;
 }
+
+AttributePtr Model_Data::addFloatingAttribute(
+  const std::string& theID, const std::string theAttrType, const std::string& theGroup)
+{
+  // compute the index of the attribute placement
+  int anIndex;
+  TDF_Label aLab;
+  if (myLab.IsAttribute(TDF_TagSource::GetID())) {
+    TDF_Label aLab = myLab.NewChild(); // already exists a floating attribute, create the next
+    anIndex = aLab.Tag();
+  } else { // put the first floating attribute, quite far from other standard attributes
+    anIndex = int(myAttrs.size()) + 1000;
+    TDF_TagSource::Set(myLab)->Set(anIndex);
+    aLab = myLab.FindChild(anIndex, true);
+  }
+  // store the group ID and the attribute ID (to restore correctly)
+  TDataStd_Name::Set(aLab, kGroupAttributeGroupID, theGroup.c_str());
+  TDataStd_Name::Set(aLab, kGroupAttributeID, theID.c_str());
+
+  return addAttribute(theGroup + "__" + theID, theAttrType, anIndex);
+}
+
+void Model_Data::allGroups(std::list<std::string>& theGroups)
+{
+  std::set<std::string> alreadyThere;
+  for(TDF_ChildIDIterator aGroup(myLab, kGroupAttributeGroupID); aGroup.More(); aGroup.Next()) {
+    Handle(TDataStd_Name) aGroupAttr = Handle(TDataStd_Name)::DownCast(aGroup.Value());
+    std::string aGroupID = TCollection_AsciiString(aGroupAttr->Get()).ToCString();
+    if (alreadyThere.find(aGroupID) == alreadyThere.end()) {
+      theGroups.push_back(aGroupID);
+      alreadyThere.insert(aGroupID);
+    }
+  }
+}
+
+void Model_Data::attributesOfGroup(const std::string& theGroup,
+  std::list<std::shared_ptr<ModelAPI_Attribute> >& theAttrs)
+{
+  for(TDF_ChildIDIterator aGroup(myLab, kGroupAttributeGroupID); aGroup.More(); aGroup.Next()) {
+    Handle(TDataStd_Name) aGroupID = Handle(TDataStd_Name)::DownCast(aGroup.Value());
+    if (aGroupID->Get().IsEqual(theGroup.c_str())) {
+      Handle(TDataStd_Name) anID;
+      if (aGroup.Value()->Label().FindAttribute(kGroupAttributeID, anID)) {
+        TCollection_AsciiString anAsciiID(aGroupID->Get() + "__" + anID->Get());
+        theAttrs.push_back(attribute(anAsciiID.ToCString()));
+      }
+    }
+  }
+}
+
+void Model_Data::removeAttributes(const std::string& theGroup)
+{
+  TDF_LabelList aLabsToRemove; // collect labels that must be erased after the cycle
+  for(TDF_ChildIDIterator aGroup(myLab, kGroupAttributeGroupID); aGroup.More(); aGroup.Next()) {
+    Handle(TDataStd_Name) aGroupID = Handle(TDataStd_Name)::DownCast(aGroup.Value());
+    if (aGroupID->Get().IsEqual(theGroup.c_str())) {
+      Handle(TDataStd_Name) anID;
+      if (aGroup.Value()->Label().FindAttribute(kGroupAttributeID, anID)) {
+        TCollection_AsciiString anAsciiID(aGroupID->Get() + "__" + anID->Get());
+        myAttrs.erase(anAsciiID.ToCString());
+        aLabsToRemove.Append(aGroup.Value()->Label());
+      }
+    }
+  }
+  for(TDF_LabelList::Iterator aLab(aLabsToRemove); aLab.More(); aLab.Next()) {
+    aLab.ChangeValue().ForgetAllAttributes(true);
+  }
+}
+
 
 // macro for the generic returning of the attribute by the ID
 #define GET_ATTRIBUTE_BY_ID(ATTR_TYPE, METHOD_NAME) \

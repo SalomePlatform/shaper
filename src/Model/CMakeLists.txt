@@ -54,6 +54,7 @@ SET(PROJECT_HEADERS
     Model_ResultParameter.h
     Model_FeatureValidator.h
     Model_AttributeValidator.h
+	Model_Filter.h
 )
 
 SET(PROJECT_SOURCES
@@ -90,6 +91,7 @@ SET(PROJECT_SOURCES
     Model_ResultParameter.cpp
     Model_FeatureValidator.cpp
     Model_AttributeValidator.cpp
+	Model_Filter.cpp
 )
 
 SET(PROJECT_LIBRARIES

@@ -154,9 +154,6 @@ XGUI_InspectionPanel::XGUI_InspectionPanel(QWidget* theParent, XGUI_SelectionMgr
   mySubShapesTab->setColumnWidth(0, 90);
   mySubShapesTab->setColumnWidth(1, 70);
 
-  //mySubShapesTab->setMaximumWidth(170);
-  //mySubShapesTab->setMinimumHeight(300);
-
   aSplitter->addWidget(mySubShapesTab);
 
   // Type of object

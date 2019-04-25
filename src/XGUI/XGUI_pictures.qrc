@@ -80,8 +80,13 @@
 
      <file>pictures/arrow-left.png</file>
      <file>pictures/arrow-right.png</file>
+     <file>pictures/filter.png</file>
+     <file>pictures/plus_minus.png</file>
      <file>pictures/arrow-up.png</file>
      <file>pictures/arrow-down.png</file>
      <file>pictures/configure_toolbars.png</file>
+     <file>pictures/add.png</file>
+     <file>pictures/accept.png</file>
+     <file>pictures/stop.png</file>
  </qresource>
  </RCC>

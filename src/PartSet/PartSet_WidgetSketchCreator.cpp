@@ -382,10 +382,6 @@ bool PartSet_WidgetSketchCreator::startSketchOperation(
   bool aHidePreview = myPreviewPlanes->isPreviewDisplayed();
   myPreviewPlanes->erasePreviewPlanes(myWorkshop);
 
-  // Launch Sketch operation
-  CompositeFeaturePtr aCompFeature =
-    std::dynamic_pointer_cast<ModelAPI_CompositeFeature>(myFeature);
-
   // start edit operation for the sketch
   ModuleBase_OperationFeature* aFOperation = dynamic_cast<ModuleBase_OperationFeature*>
                                                             (myModule->createOperation("Sketch"));

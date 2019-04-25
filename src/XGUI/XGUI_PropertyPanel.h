@@ -144,6 +144,8 @@ Q_OBJECT
   /// \param theWidget a widget control to store as internal active widget
   void setInternalActiveWidget(ModuleBase_ModelWidget* theWidget);
 
+  void updateApplyPlusButton(FeaturePtr theFeature);
+
 public slots:
   /// \brief Update all widgets in property panel with values from the given feature
   /// \param theFeature a Feature to update values in widgets

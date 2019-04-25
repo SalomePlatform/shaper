@@ -41,6 +41,7 @@ class QCheckBox;
 class ModuleBase_ListView;
 class ModuleBase_IWorkshop;
 class ModuleBase_ChoiceCtrl;
+class ModuleBase_FilterStarter;
 
 /**
 * \ingroup GUI
@@ -251,6 +252,7 @@ protected:
   std::string myDefMode;
 
   QCheckBox* myGeomCheck;
+  ModuleBase_FilterStarter* myFiltersWgt;
 };
 
 #endif /* MODULEBASE_WIDGETFILESELECTOR_H_ */

@@ -225,10 +225,20 @@ void XGUI_PropertyPanel::createContentPanel(FeaturePtr theFeature)
     /// Apply button should be update if the feature was modified by the panel
     myOperationMgr->onValidateOperation();
   }
-  std::shared_ptr<Config_FeatureMessage> aFeatureInfo =
-    myOperationMgr->workshop()->featureInfo(theFeature->getKind().c_str());
-  if (aFeatureInfo.get())
-    findButton(PROP_PANEL_OK_PLUS)->setVisible(aFeatureInfo->isApplyContinue());
+  updateApplyPlusButton(theFeature);
+}
+
+void XGUI_PropertyPanel::updateApplyPlusButton(FeaturePtr theFeature)
+{
+  if (theFeature.get()) {
+    std::shared_ptr<Config_FeatureMessage> aFeatureInfo =
+      myOperationMgr->workshop()->featureInfo(theFeature->getKind().c_str());
+    if (aFeatureInfo.get()) {
+      findButton(PROP_PANEL_OK_PLUS)->setVisible(aFeatureInfo->isApplyContinue());
+      return;
+    }
+  }
+  findButton(PROP_PANEL_OK_PLUS)->setVisible(false);
 }
 
 ModuleBase_ModelWidget* XGUI_PropertyPanel::activeWidget(const bool isUseCustomWidget) const
