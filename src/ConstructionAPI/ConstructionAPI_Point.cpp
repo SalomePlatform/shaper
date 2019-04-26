@@ -166,13 +166,6 @@ void ConstructionAPI_Point::setByXYZ(const ModelHighAPI_Double& theX,
                                      const ModelHighAPI_Double& theY,
                                      const ModelHighAPI_Double& theZ)
 {
-  //fillAttribute(ConstructionPlugin_Point::CREATION_METHOD_BY_XYZ(), mycreationMethod);
-
-  // TODO: Fill point attribute
-  //fillAttribute(theX, myx);
-  //fillAttribute(theY, myy);
-  //fillAttribute(theZ, myz);
-
   fillAttribute(ConstructionPlugin_Point::CREATION_METHOD_BY_XYZ(), mycreationMethod);
   fillAttribute(theX, theY, theZ, mypoint);
 
@@ -277,6 +270,8 @@ void ConstructionAPI_Point::setByCenterOfGravity(const ModelHighAPI_Selection& t
   fillAttribute(ConstructionPlugin_Point::GEOMETRICAL_PROPERTY_TYPE_BY_CENTER_OF_GRAVITY(),
                 mygeometricalPropertyType);
   fillAttribute(theObject, myobjectForCenterOfGravity);
+
+  execute();
 }
 
 //==================================================================================================
@@ -287,6 +282,8 @@ void ConstructionAPI_Point::setByCenterOfCircle(const ModelHighAPI_Selection& th
   fillAttribute(ConstructionPlugin_Point::GEOMETRICAL_PROPERTY_TYPE_BY_CENTER_OF_CIRCLE(),
                 mygeometricalPropertyType);
   fillAttribute(theObject, myobjectForCenterOfCircle);
+
+  execute();
 }
 
 //==================================================================================================
