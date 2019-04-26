@@ -116,7 +116,7 @@ void FeaturesPlugin_Union::execute()
     aTools.splice(aTools.begin(), anObjects, anObjects.begin());
     anAlgo.reset(new GeomAlgoAPI_Boolean(anObjects,
                  aTools,
-                 GeomAlgoAPI_Boolean::BOOL_FUSE));
+                 GeomAlgoAPI_Tools::BOOL_FUSE));
   } else {
     anAlgo.reset(new GeomAlgoAPI_UnifySameDomain(anObjects));
   }

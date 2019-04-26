@@ -49,11 +49,6 @@
 
 typedef std::list<std::pair<GeomShapePtr, ListOfShape> > CompsolidSubs;
 
-static GeomShapePtr findBase(const GeomShapePtr theObjectShape,
-                             const GeomShapePtr theResultShape,
-                             const GeomAPI_Shape::ShapeType theShapeType,
-                             const std::shared_ptr<GeomAlgoAPI_MakeShape> theMakeShape);
-
 static void pullObjectsAndPlanes(const AttributeSelectionListPtr& theSelectedList,
                                  CompsolidSubs& theObjects, ListOfShape& thePlanes);
 
@@ -323,7 +318,7 @@ static bool cutSubs(const GeomShapePtr& theFirstArgument,
 
     // cut from current list of solids
     aCutAlgo.reset(
-        new GeomAlgoAPI_Boolean(aUIt->second, theTools, GeomAlgoAPI_Boolean::BOOL_CUT));
+        new GeomAlgoAPI_Boolean(aUIt->second, theTools, GeomAlgoAPI_Tools::BOOL_CUT));
     if (GeomAlgoAPI_Tools::AlgoError::isAlgorithmFailed(aCutAlgo, "", theError))
       return false;
     theMakeShapeList->appendAlgo(aCutAlgo);

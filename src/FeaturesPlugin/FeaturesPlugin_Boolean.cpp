@@ -30,11 +30,13 @@
 #include <ModelAPI_Tools.h>
 
 #include <GeomAlgoAPI_Boolean.h>
+#include <GeomAlgoAPI_CompoundBuilder.h>
 #include <GeomAlgoAPI_MakeShapeCustom.h>
 #include <GeomAlgoAPI_MakeShapeList.h>
 #include <GeomAlgoAPI_Partition.h>
 #include <GeomAlgoAPI_PaveFiller.h>
 #include <GeomAlgoAPI_ShapeTools.h>
+#include <GeomAlgoAPI_Tools.h>
 #include <GeomAPI_Face.h>
 #include <GeomAPI_ShapeExplorer.h>
 #include <GeomAPI_ShapeIterator.h>
@@ -69,6 +71,48 @@ FeaturesPlugin_Boolean::OperationType FeaturesPlugin_Boolean::operationType()
 }
 
 //=================================================================================================
+void FeaturesPlugin_Boolean::parentForShape(const GeomShapePtr& theShape,
+                                            const ResultPtr& theContext,
+                                            ObjectHierarchy& theShapesHierarchy)
+{
+  ResultBodyPtr aResCompSolidPtr = ModelAPI_Tools::bodyOwner(theContext);
+  if (aResCompSolidPtr.get()) {
+    std::shared_ptr<GeomAPI_Shape> aContextShape = aResCompSolidPtr->shape();
+    if (aContextShape->shapeType() <= GeomAPI_Shape::COMPSOLID) {
+      theShapesHierarchy.AddParent(theShape, aContextShape);
+      parentForShape(aContextShape, aResCompSolidPtr, theShapesHierarchy);
+    }
+  }
+}
+
+bool FeaturesPlugin_Boolean::processAttribute(const std::string& theAttributeName,
+                                              ObjectHierarchy& theObjects,
+                                              ListOfShape& thePlanesList)
+{
+  AttributeSelectionListPtr anObjectsSelList = selectionList(theAttributeName);
+  for (int anObjectsIndex = 0; anObjectsIndex < anObjectsSelList->size(); anObjectsIndex++) {
+    AttributeSelectionPtr anObjectAttr = anObjectsSelList->value(anObjectsIndex);
+    GeomShapePtr anObject = anObjectAttr->value();
+    if (!anObject.get()) {
+      // It could be a construction plane.
+      ResultPtr aContext = anObjectAttr->context();
+      anObject = anObjectAttr->context()->shape();
+      if (anObject.get()) {
+        thePlanesList.push_back(anObject);
+        continue;
+      } else
+        return false;
+    }
+
+    theObjects.AddObject(anObject);
+
+    ResultPtr aContext = anObjectAttr->context();
+    parentForShape(anObject, aContext, theObjects);
+  }
+  return true;
+}
+
+//=================================================================================================
 void FeaturesPlugin_Boolean::loadNamingDS(std::shared_ptr<ModelAPI_ResultBody> theResultBody,
                                           const std::shared_ptr<GeomAPI_Shape> theBaseShape,
                                           const ListOfShape& theTools,
@@ -99,4 +143,386 @@ void FeaturesPlugin_Boolean::loadNamingDS(std::shared_ptr<ModelAPI_ResultBody> t
 
     theResultBody->loadDeletedShapes(theMakeShape, *anIter, GeomAPI_Shape::FACE);
   }
+}
+
+//=================================================================================================
+bool FeaturesPlugin_Boolean::processObject(
+    const GeomAlgoAPI_Tools::BOPType theBooleanType,
+    const GeomShapePtr& theObject,
+    const ListOfShape& theTools,
+    const ListOfShape& thePlanes,
+    int& theResultIndex,
+    std::vector<FeaturesPlugin_Tools::ResultBaseAlgo>& theResultBaseAlgoList,
+    ListOfShape& theResultShapesList)
+{
+  ListOfShape aListWithObject;
+  aListWithObject.push_back(theObject);
+  std::shared_ptr<GeomAlgoAPI_MakeShapeList> aMakeShapeList(new GeomAlgoAPI_MakeShapeList());
+  std::shared_ptr<GeomAlgoAPI_MakeShape> aBoolAlgo;
+  GeomShapePtr aResShape;
+
+  std::list<std::shared_ptr<GeomAPI_Pnt> > aBoundingPoints =
+      GeomAlgoAPI_ShapeTools::getBoundingBox(aListWithObject, 1.0);
+
+  // Resize planes.
+  ListOfShape aToolsWithPlanes = theTools;
+  for (ListOfShape::const_iterator anIt = thePlanes.begin(); anIt != thePlanes.end(); ++anIt) {
+    GeomShapePtr aPlane = *anIt;
+    GeomShapePtr aTool = GeomAlgoAPI_ShapeTools::fitPlaneToBox(aPlane, aBoundingPoints);
+    std::shared_ptr<GeomAlgoAPI_MakeShapeCustom> aMkShCustom(
+        new GeomAlgoAPI_MakeShapeCustom);
+    aMkShCustom->addModified(aPlane, aTool);
+    aMakeShapeList->appendAlgo(aMkShCustom);
+    aToolsWithPlanes.push_back(aTool);
+  }
+
+  if (theBooleanType == GeomAlgoAPI_Tools::BOOL_PARTITION)
+    aBoolAlgo.reset(new GeomAlgoAPI_Partition(aListWithObject, aToolsWithPlanes));
+  else
+    aBoolAlgo.reset(new GeomAlgoAPI_Boolean(aListWithObject,
+                                            aToolsWithPlanes,
+                                            theBooleanType));
+
+  // Checking that the algorithm worked properly.
+  std::string anError;
+  if (GeomAlgoAPI_Tools::AlgoError::isAlgorithmFailed(aBoolAlgo, getKind(), anError)) {
+    setError(anError);
+    return false;
+  }
+
+  aResShape = aBoolAlgo->shape();
+  if (aResShape.get() && aResShape->shapeType() == GeomAPI_Shape::COMPOUND) {
+    int aSubResultsNb = 0;
+    GeomAPI_ShapeIterator anIt(aResShape);
+    for (; anIt.more(); anIt.next())
+      ++aSubResultsNb;
+
+    if (aSubResultsNb == 1) {
+      anIt.init(aResShape);
+      if (anIt.more())
+        aResShape = anIt.current();
+    }
+  }
+
+  aMakeShapeList->appendAlgo(aBoolAlgo);
+
+  GeomAPI_ShapeIterator aShapeIt(aResShape);
+  if (aShapeIt.more() || aResShape->shapeType() == GeomAPI_Shape::VERTEX) {
+    std::shared_ptr<ModelAPI_ResultBody> aResultBody =
+        document()->createBody(data(), theResultIndex);
+
+    ListOfShape aUsedTools = theTools;
+    aUsedTools.insert(aUsedTools.end(), thePlanes.begin(), thePlanes.end());
+
+    FeaturesPlugin_Tools::loadModifiedShapes(aResultBody,
+                                             aListWithObject,
+                                             aUsedTools,
+                                             aMakeShapeList,
+                                             aResShape);
+    setResult(aResultBody, theResultIndex);
+    ++theResultIndex;
+
+    FeaturesPlugin_Tools::ResultBaseAlgo aRBA;
+    aRBA.resultBody = aResultBody;
+    aRBA.baseShape = theObject;
+    aRBA.makeShape = aMakeShapeList;
+    theResultBaseAlgoList.push_back(aRBA);
+    theResultShapesList.push_back(aResShape);
+  }
+  return true;
+}
+
+//=================================================================================================
+bool FeaturesPlugin_Boolean::processCompsolid(
+    const GeomAlgoAPI_Tools::BOPType theBooleanType,
+    const ObjectHierarchy& theCompsolidHierarchy,
+    const GeomShapePtr& theCompsolid,
+    const ListOfShape& theTools,
+    const ListOfShape& thePlanes,
+    int& theResultIndex,
+    std::vector<FeaturesPlugin_Tools::ResultBaseAlgo>& theResultBaseAlgoList,
+    ListOfShape& theResultShapesList)
+{
+  ListOfShape aUsedInOperationSolids;
+  ListOfShape aNotUsedSolids;
+  theCompsolidHierarchy.SplitCompound(theCompsolid, aUsedInOperationSolids, aNotUsedSolids);
+
+  std::shared_ptr<GeomAlgoAPI_MakeShapeList> aMakeShapeList(new GeomAlgoAPI_MakeShapeList());
+
+  std::list<std::shared_ptr<GeomAPI_Pnt> > aBoundingPoints =
+      GeomAlgoAPI_ShapeTools::getBoundingBox(aUsedInOperationSolids, 1.0);
+
+  // Resize planes.
+  ListOfShape aToolsWithPlanes = theTools;
+  for (ListOfShape::const_iterator anIt = thePlanes.begin(); anIt != thePlanes.end(); ++anIt)
+  {
+    GeomShapePtr aPlane = *anIt;
+    GeomShapePtr aTool = GeomAlgoAPI_ShapeTools::fitPlaneToBox(aPlane, aBoundingPoints);
+    std::shared_ptr<GeomAlgoAPI_MakeShapeCustom> aMkShCustom(
+      new GeomAlgoAPI_MakeShapeCustom);
+    aMkShCustom->addModified(aPlane, aTool);
+    aMakeShapeList->appendAlgo(aMkShCustom);
+    aToolsWithPlanes.push_back(aTool);
+  }
+
+  std::shared_ptr<GeomAlgoAPI_MakeShape> aBoolAlgo;
+  if (theBooleanType == GeomAlgoAPI_Tools::BOOL_PARTITION)
+    aBoolAlgo.reset(new GeomAlgoAPI_Partition(aUsedInOperationSolids, aToolsWithPlanes));
+  else
+    aBoolAlgo.reset(new GeomAlgoAPI_Boolean(aUsedInOperationSolids,
+                                            aToolsWithPlanes,
+                                            theBooleanType));
+
+  // Checking that the algorithm worked properly.
+  std::string anError;
+  if (GeomAlgoAPI_Tools::AlgoError::isAlgorithmFailed(aBoolAlgo, getKind(), anError)) {
+    setError(anError);
+    return false;
+  }
+
+  aMakeShapeList->appendAlgo(aBoolAlgo);
+  GeomShapePtr aResultShape = aBoolAlgo->shape();
+
+  // Add result to not used solids from compsolid.
+  if (!aNotUsedSolids.empty()) {
+    ListOfShape aShapesToAdd = aNotUsedSolids;
+    aShapesToAdd.push_back(aBoolAlgo->shape());
+    std::shared_ptr<GeomAlgoAPI_PaveFiller> aFillerAlgo(
+        new GeomAlgoAPI_PaveFiller(aShapesToAdd, true));
+    if (!aFillerAlgo->isDone()) {
+      std::string aFeatureError = "Error: PaveFiller algorithm failed.";
+      setError(aFeatureError);
+      return false;
+    }
+
+    aMakeShapeList->appendAlgo(aFillerAlgo);
+    aResultShape = aFillerAlgo->shape();
+  }
+
+  GeomAPI_ShapeIterator aShapeIt(aResultShape);
+  if (aShapeIt.more() || aResultShape->shapeType() == GeomAPI_Shape::VERTEX)
+  {
+    std::shared_ptr<ModelAPI_ResultBody> aResultBody =
+        document()->createBody(data(), theResultIndex);
+
+    ListOfShape aCompSolidList;
+    aCompSolidList.push_back(theCompsolid);
+
+    ListOfShape aUsedTools = theTools;
+    aUsedTools.insert(aUsedTools.end(), thePlanes.begin(), thePlanes.end());
+
+    FeaturesPlugin_Tools::loadModifiedShapes(aResultBody,
+                                             aCompSolidList,
+                                             aUsedTools,
+                                             aMakeShapeList,
+                                             aResultShape);
+    setResult(aResultBody, theResultIndex);
+    ++theResultIndex;
+
+    FeaturesPlugin_Tools::ResultBaseAlgo aRBA;
+    aRBA.resultBody = aResultBody;
+    aRBA.baseShape = theCompsolid;
+    aRBA.makeShape = aMakeShapeList;
+    theResultBaseAlgoList.push_back(aRBA);
+    theResultShapesList.push_back(aResultShape);
+  }
+  return true;
+}
+
+//=================================================================================================
+bool FeaturesPlugin_Boolean::processCompound(
+    const GeomAlgoAPI_Tools::BOPType theBooleanType,
+    const ObjectHierarchy& theCompoundHierarchy,
+    const GeomShapePtr& theCompound,
+    const ListOfShape& theTools,
+    int& theResultIndex,
+    std::vector<FeaturesPlugin_Tools::ResultBaseAlgo>& theResultBaseAlgoList,
+    ListOfShape& theResultShapesList)
+{
+  ListOfShape aUsedInOperationShapes;
+  ListOfShape aNotUsedShapes;
+  theCompoundHierarchy.SplitCompound(theCompound, aUsedInOperationShapes, aNotUsedShapes);
+
+  std::shared_ptr<GeomAlgoAPI_MakeShapeList> aMakeShapeList(new GeomAlgoAPI_MakeShapeList());
+  std::shared_ptr<GeomAlgoAPI_Boolean> aBoolAlgo(
+      new GeomAlgoAPI_Boolean(aUsedInOperationShapes,
+                              theTools,
+                              theBooleanType));
+
+  // Checking that the algorithm worked properly.
+  std::string anError;
+  if (GeomAlgoAPI_Tools::AlgoError::isAlgorithmFailed(aBoolAlgo, getKind(), anError)) {
+    setError(anError);
+    return false;
+  }
+
+  aMakeShapeList->appendAlgo(aBoolAlgo);
+  GeomShapePtr aResultShape = aBoolAlgo->shape();
+
+  // Add result to not used shape from compound.
+  if (!aNotUsedShapes.empty()) {
+    ListOfShape aShapesForResult = aNotUsedShapes;
+    if (aResultShape->shapeType() == GeomAPI_Shape::COMPOUND) {
+      for (GeomAPI_ShapeIterator aResultIt(aResultShape); aResultIt.more(); aResultIt.next()) {
+        aShapesForResult.push_back(aResultIt.current());
+      }
+    }
+    else {
+      aShapesForResult.push_back(aResultShape);
+    }
+
+    if (aShapesForResult.size() == 1) {
+      aResultShape = aShapesForResult.front();
+    }
+    else {
+      aResultShape = GeomAlgoAPI_CompoundBuilder::compound(aShapesForResult);
+    }
+  }
+
+  GeomAPI_ShapeIterator aShapeIt(aResultShape);
+  if (aShapeIt.more() || aResultShape->shapeType() == GeomAPI_Shape::VERTEX) {
+    std::shared_ptr<ModelAPI_ResultBody> aResultBody =
+        document()->createBody(data(), theResultIndex);
+
+    ListOfShape aCompoundList;
+    aCompoundList.push_back(theCompound);
+    FeaturesPlugin_Tools::loadModifiedShapes(aResultBody,
+                                             aCompoundList,
+                                             theTools,
+                                             aMakeShapeList,
+                                             aResultShape);
+    setResult(aResultBody, theResultIndex);
+    ++theResultIndex;
+
+    FeaturesPlugin_Tools::ResultBaseAlgo aRBA;
+    aRBA.resultBody = aResultBody;
+    aRBA.baseShape = theCompound;
+    aRBA.makeShape = aMakeShapeList;
+    theResultBaseAlgoList.push_back(aRBA);
+    theResultShapesList.push_back(aResultShape);
+  }
+  return true;
+}
+
+//=================================================================================================
+
+void FeaturesPlugin_Boolean::ObjectHierarchy::AddObject(const GeomShapePtr& theObject)
+{
+  myObjects.push_back(theObject);
+}
+
+void FeaturesPlugin_Boolean::ObjectHierarchy::AddParent(const GeomShapePtr& theShape,
+                                                        const GeomShapePtr& theParent)
+{
+  myParent[theShape] = theParent;
+  mySubshapes[theParent].push_back(theShape);
+}
+
+GeomShapePtr FeaturesPlugin_Boolean::ObjectHierarchy::Parent(const GeomShapePtr& theShape,
+                                                             bool theMarkProcessed)
+{
+  MapShapeToParent::const_iterator aFound = myParent.find(theShape);
+  GeomShapePtr aParent;
+  if (aFound != myParent.end()) {
+    aParent = aFound->second;
+    if (theMarkProcessed) {
+      // mark the parent and all its subs as processed by Boolean algorithm
+      myProcessedObjects.insert(aParent);
+      const ListOfShape& aSubs = mySubshapes[aParent];
+      for (ListOfShape::const_iterator anIt = aSubs.begin(); anIt != aSubs.end(); ++anIt)
+        myProcessedObjects.insert(*anIt);
+    }
+  }
+  return aParent;
+}
+
+void FeaturesPlugin_Boolean::ObjectHierarchy::SplitCompound(const GeomShapePtr& theCompShape,
+                                                            ListOfShape& theUsed,
+                                                            ListOfShape& theNotUsed) const
+{
+  theUsed.clear();
+  theNotUsed.clear();
+
+  const ListOfShape& aSubs = mySubshapes.find(theCompShape)->second;
+  SetOfShape aSubsSet;
+  aSubsSet.insert(aSubs.begin(), aSubs.end());
+
+  for (GeomAPI_ShapeExplorer anExp(theCompShape, GeomAPI_Shape::SOLID);
+       anExp.more(); anExp.next()) {
+    GeomShapePtr aCurrent = anExp.current();
+    if (aSubsSet.find(aCurrent) == aSubsSet.end())
+      theNotUsed.push_back(aCurrent);
+    else
+      theUsed.push_back(aCurrent);
+  }
+}
+
+bool FeaturesPlugin_Boolean::ObjectHierarchy::IsEmpty() const
+{
+  return myObjects.empty();
+}
+
+FeaturesPlugin_Boolean::ObjectHierarchy::Iterator FeaturesPlugin_Boolean::ObjectHierarchy::Begin()
+{
+  return Iterator(this);
+}
+
+FeaturesPlugin_Boolean::ObjectHierarchy::Iterator FeaturesPlugin_Boolean::ObjectHierarchy::End()
+{
+  return Iterator(this, false);
+}
+
+FeaturesPlugin_Boolean::ObjectHierarchy::Iterator::Iterator(
+    FeaturesPlugin_Boolean::ObjectHierarchy* theHierarchy, bool isBegin)
+  : myHierarchy(theHierarchy)
+{
+  if (isBegin) {
+    myObject = myHierarchy->myObjects.begin();
+    SkipAlreadyProcessed();
+  } else
+    myObject = myHierarchy->myObjects.end();
+}
+
+void FeaturesPlugin_Boolean::ObjectHierarchy::Iterator::SkipAlreadyProcessed()
+{
+  while (myObject != myHierarchy->myObjects.end() &&
+         myHierarchy->myProcessedObjects.find(*myObject) != myHierarchy->myProcessedObjects.end())
+    ++myObject;
+}
+
+bool FeaturesPlugin_Boolean::ObjectHierarchy::Iterator::operator==(const Iterator& theOther) const
+{
+  return myObject == theOther.myObject;
+}
+
+bool FeaturesPlugin_Boolean::ObjectHierarchy::Iterator::operator!=(const Iterator& theOther) const
+{
+  return !operator==(theOther);
+}
+
+FeaturesPlugin_Boolean::ObjectHierarchy::Iterator&
+FeaturesPlugin_Boolean::ObjectHierarchy::Iterator::operator++()
+{
+  ++myObject;
+  SkipAlreadyProcessed();
+  return *this;
+}
+
+FeaturesPlugin_Boolean::ObjectHierarchy::Iterator
+FeaturesPlugin_Boolean::ObjectHierarchy::Iterator::operator++(int)
+{
+  Iterator aCurrent;
+  aCurrent.myHierarchy = myHierarchy;
+  aCurrent.myObject = myObject;
+
+  // increase iterator
+  operator++();
+
+  return aCurrent;
+}
+
+GeomShapePtr FeaturesPlugin_Boolean::ObjectHierarchy::Iterator::operator*() const
+{
+  myHierarchy->myProcessedObjects.insert(*myObject);
+  return *myObject;
 }

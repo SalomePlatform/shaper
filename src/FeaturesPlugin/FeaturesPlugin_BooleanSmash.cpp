@@ -154,7 +154,7 @@ void FeaturesPlugin_BooleanSmash::execute()
     std::shared_ptr<GeomAlgoAPI_Boolean> anObjectsCutAlgo(
       new GeomAlgoAPI_Boolean(aShapesToSmash,
                               aShapesToAdd,
-                              GeomAlgoAPI_Boolean::BOOL_CUT));
+                              GeomAlgoAPI_Tools::BOOL_CUT));
 
     if (GeomAlgoAPI_ShapeTools::volume(anObjectsCutAlgo->shape()) > 1.e-27) {
       aShapesToSmash.clear();
@@ -166,7 +166,7 @@ void FeaturesPlugin_BooleanSmash::execute()
     std::shared_ptr<GeomAlgoAPI_Boolean> aToolsCutAlgo(
       new GeomAlgoAPI_Boolean(aTools,
                               aShapesToAdd,
-                              GeomAlgoAPI_Boolean::BOOL_CUT));
+                              GeomAlgoAPI_Tools::BOOL_CUT));
 
     if (GeomAlgoAPI_ShapeTools::volume(aToolsCutAlgo->shape()) > 1.e-27) {
       aTools.clear();
@@ -179,7 +179,7 @@ void FeaturesPlugin_BooleanSmash::execute()
   std::shared_ptr<GeomAlgoAPI_Boolean> aBoolAlgo(
     new GeomAlgoAPI_Boolean(aShapesToSmash,
                             aTools,
-                            GeomAlgoAPI_Boolean::BOOL_CUT));
+                            GeomAlgoAPI_Tools::BOOL_CUT));
 
   // Checking that the algorithm worked properly.
   if (GeomAlgoAPI_Tools::AlgoError::isAlgorithmFailed(aBoolAlgo, getKind(), anError)) {
