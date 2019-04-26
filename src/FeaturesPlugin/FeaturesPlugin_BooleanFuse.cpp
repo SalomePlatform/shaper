@@ -174,7 +174,7 @@ void FeaturesPlugin_BooleanFuse::execute()
   GeomShapePtr aCuttedEdgesAndFaces;
   if (!anEdgesAndFaces.empty()) {
     std::shared_ptr<GeomAlgoAPI_Boolean> aCutAlgo(new GeomAlgoAPI_Boolean(anEdgesAndFaces,
-      anOriginalShapes, GeomAlgoAPI_Boolean::BOOL_CUT));
+      anOriginalShapes, GeomAlgoAPI_Tools::BOOL_CUT));
     if (aCutAlgo->isDone()) {
       aCuttedEdgesAndFaces = aCutAlgo->shape();
       aMakeShapeList->appendAlgo(aCutAlgo);
@@ -191,7 +191,7 @@ void FeaturesPlugin_BooleanFuse::execute()
       ListOfShape aOneObjectList;
       aOneObjectList.push_back(*anIt);
       std::shared_ptr<GeomAlgoAPI_Boolean> aCutAlgo(
-        new GeomAlgoAPI_Boolean(aOneObjectList, aShapesToAdd, GeomAlgoAPI_Boolean::BOOL_CUT));
+        new GeomAlgoAPI_Boolean(aOneObjectList, aShapesToAdd, GeomAlgoAPI_Tools::BOOL_CUT));
 
       if (GeomAlgoAPI_ShapeTools::volume(aCutAlgo->shape()) > 1.e-27) {
         aSolidsToFuse.push_back(aCutAlgo->shape());
@@ -216,7 +216,7 @@ void FeaturesPlugin_BooleanFuse::execute()
   } else if ((anObjects.size() + aTools.size()) > 1) {
     std::shared_ptr<GeomAlgoAPI_Boolean> aFuseAlgo(new GeomAlgoAPI_Boolean(anObjects,
       aTools,
-      GeomAlgoAPI_Boolean::BOOL_FUSE));
+      GeomAlgoAPI_Tools::BOOL_FUSE));
 
     // Checking that the algorithm worked properly.
     if (GeomAlgoAPI_Tools::AlgoError::isAlgorithmFailed(aFuseAlgo, getKind(), anError)) {

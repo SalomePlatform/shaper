@@ -28,6 +28,13 @@
 class GeomAlgoAPI_MakeShape;
 
 namespace GeomAlgoAPI_Tools {
+/// Type of booelan operation
+enum BOPType {
+  BOOL_CUT,      ///< Cut objects
+  BOOL_FUSE,     ///< Fuse objects
+  BOOL_COMMON,   ///< Take common part of objects
+  BOOL_PARTITION ///< Parition operation
+};
 
 /** \class Localizer
  *  \ingroup DataAlgo

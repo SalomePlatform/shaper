@@ -21,10 +21,14 @@
 #define FeaturesPlugin_Boolean_H_
 
 #include "FeaturesPlugin.h"
+#include "FeaturesPlugin_Tools.h"
 
 #include <GeomAlgoAPI_MakeShape.h>
+#include <GeomAlgoAPI_Tools.h>
 
 #include <ModelAPI_Feature.h>
+
+class ModelAPI_Result;
 
 /// \class FeaturesPlugin_Boolean
 /// \ingroup Plugins
@@ -72,6 +76,109 @@ protected:
                     const ListOfShape& theTools,
                     const std::shared_ptr<GeomAPI_Shape> theResultShape,
                     const GeomMakeShapePtr& theMakeShape);
+
+
+  /// Auxiliary class to store hierarchy of Boolean operation objects/tools
+  /// and their parent shapes (compounds or compsolids)
+  class ObjectHierarchy {
+    typedef std::map<GeomShapePtr, ListOfShape, GeomAPI_Shape::Comparator>  MapShapeToSubshapes;
+    typedef std::map<GeomShapePtr, GeomShapePtr, GeomAPI_Shape::Comparator> MapShapeToParent;
+    typedef std::set<GeomShapePtr, GeomAPI_Shape::Comparator> SetOfShape;
+
+    ListOfShape myObjects;
+    MapShapeToParent myParent;
+    MapShapeToSubshapes mySubshapes;
+
+    SetOfShape myProcessedObjects;
+
+  public:
+    /// Add object of Boolean opration
+    void AddObject(const GeomShapePtr& theObject);
+
+    /// Maps shape and its parent
+    void AddParent(const GeomShapePtr& theShape, const GeomShapePtr& theParent);
+
+    /// Return parent shape for the given, or empty if it is a high-level shape.
+    /// By default, the parent and all its subshapes are marked as processed for further skip.
+    GeomShapePtr Parent(const GeomShapePtr& theShape, bool theMarkProcessed = true);
+
+    /// Split compound/compsolid shape for subshapes selected for Boolean operation and the other.
+    void SplitCompound(const GeomShapePtr& theCompShape,
+                       ListOfShape& theUsed,
+                       ListOfShape& theNotUsed) const;
+
+    /// Return \c true if there is no object in hierarchy
+    bool IsEmpty() const;
+
+    /// Return list of objects
+    const ListOfShape& Objects() const { return myObjects; }
+
+  public:
+    class Iterator {
+      friend class ObjectHierarchy;
+
+      ObjectHierarchy* myHierarchy;
+      ListOfShape::iterator myObject;
+
+      Iterator() {}
+      Iterator(ObjectHierarchy* theHierarchy, bool isBegin = true);
+
+      void SkipAlreadyProcessed();
+
+    public:
+      bool operator==(const Iterator&) const;
+      bool operator!=(const Iterator&) const;
+
+      Iterator& operator++();
+      Iterator  operator++(int);
+
+      GeomShapePtr operator*() const;
+    };
+
+    Iterator Begin();
+    Iterator End();
+  };
+
+  /// Process SelectionList attribute and fill the objects hierarchy.
+  bool processAttribute(const std::string& theAttributeName,
+                        ObjectHierarchy& theObjects,
+                        ListOfShape& thePlanesList);
+
+  /// Perform Boolean operation of the object with the tools
+  /// \return \c false if something went wrong
+  bool processObject(const GeomAlgoAPI_Tools::BOPType theBooleanType,
+                     const GeomShapePtr& theObject,
+                     const ListOfShape& theTools,
+                     const ListOfShape& thePlanes,
+                     int& theResultIndex,
+                     std::vector<FeaturesPlugin_Tools::ResultBaseAlgo>& theResultBaseAlgoList,
+                     ListOfShape& theResultShapesList);
+
+  /// Perform Boolean operation of the Compsolid with the tools
+  /// \return \c false if something went wrong
+  bool processCompsolid(const GeomAlgoAPI_Tools::BOPType theBooleanType,
+                        const ObjectHierarchy& theCompsolidHierarchy,
+                        const GeomShapePtr& theCompsolid,
+                        const ListOfShape& theTools,
+                        const ListOfShape& thePlanes,
+                        int& theResultIndex,
+                        std::vector<FeaturesPlugin_Tools::ResultBaseAlgo>& theResultBaseAlgoList,
+                        ListOfShape& theResultShapesList);
+
+  /// Perform Boolean operation of the Compound with the tools
+  /// \return \c false if something went wrong
+  bool processCompound(const GeomAlgoAPI_Tools::BOPType theBooleanType,
+                       const ObjectHierarchy& theCompoundHierarchy,
+                       const GeomShapePtr& theCompound,
+                       const ListOfShape& theTools,
+                       int& theResultIndex,
+                       std::vector<FeaturesPlugin_Tools::ResultBaseAlgo>& theResultBaseAlgoList,
+                       ListOfShape& theResultShapesList);
+
+private:
+  void parentForShape(const GeomShapePtr& theShape,
+                      const std::shared_ptr<ModelAPI_Result>& theContext,
+                      ObjectHierarchy& theShapesHierarchy);
 
 private:
   OperationType myOperationType;

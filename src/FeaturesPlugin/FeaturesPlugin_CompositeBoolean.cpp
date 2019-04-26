@@ -173,7 +173,7 @@ bool FeaturesPlugin_CompositeBoolean::makeBoolean(const ListOfShape& theTools,
         aListWithObject.push_back(anObject);
         std::shared_ptr<GeomAlgoAPI_Boolean> aBoolAlgo(new GeomAlgoAPI_Boolean(aListWithObject,
                                                                 theTools,
-                                                                GeomAlgoAPI_Boolean::BOOL_CUT));
+                                                                GeomAlgoAPI_Tools::BOOL_CUT));
 
         // Checking that the algorithm worked properly.
         if(!aBoolAlgo->isDone() || aBoolAlgo->shape()->isNull() || !aBoolAlgo->isValid()) {
@@ -213,7 +213,7 @@ bool FeaturesPlugin_CompositeBoolean::makeBoolean(const ListOfShape& theTools,
 
         std::shared_ptr<GeomAlgoAPI_Boolean> aBoolAlgo(new GeomAlgoAPI_Boolean(aUsedShapes,
                                                                   theTools,
-                                                                  GeomAlgoAPI_Boolean::BOOL_CUT));
+                                                                  GeomAlgoAPI_Tools::BOOL_CUT));
 
         // Checking that the algorithm worked properly.
         if(!aBoolAlgo->isDone() || aBoolAlgo->shape()->isNull() || !aBoolAlgo->isValid()) {
@@ -307,7 +307,7 @@ bool FeaturesPlugin_CompositeBoolean::makeBoolean(const ListOfShape& theTools,
       if(!anEdgesAndFaces.empty() && !aCutTools.empty()) {
         std::shared_ptr<GeomAlgoAPI_Boolean> aCutAlgo(new GeomAlgoAPI_Boolean(anEdgesAndFaces,
                                                               aCutTools,
-                                                              GeomAlgoAPI_Boolean::BOOL_CUT));
+                                                              GeomAlgoAPI_Tools::BOOL_CUT));
         if(aCutAlgo->isDone() && !aCutAlgo->shape()->isNull() && aCutAlgo->isValid()) {
           anEdgesAndFaces.clear();
           anEdgesAndFaces.push_back(aCutAlgo->shape());
@@ -319,7 +319,7 @@ bool FeaturesPlugin_CompositeBoolean::makeBoolean(const ListOfShape& theTools,
       if(!aShapesToAdd.empty()) {
         std::shared_ptr<GeomAlgoAPI_Boolean> aCutAlgo(new GeomAlgoAPI_Boolean(aSolidsToFuse,
                                                               aShapesToAdd,
-                                                              GeomAlgoAPI_Boolean::BOOL_CUT));
+                                                              GeomAlgoAPI_Tools::BOOL_CUT));
         if(aCutAlgo->isDone() && GeomAlgoAPI_ShapeTools::volume(aCutAlgo->shape()) > 1.e-27) {
           aSolidsToFuse.clear();
           aSolidsToFuse.push_back(aCutAlgo->shape());
@@ -339,7 +339,7 @@ bool FeaturesPlugin_CompositeBoolean::makeBoolean(const ListOfShape& theTools,
 
         std::shared_ptr<GeomAlgoAPI_Boolean> aFuseAlgo(new GeomAlgoAPI_Boolean(anObjects,
                                                           aTools,
-                                                          GeomAlgoAPI_Boolean::BOOL_FUSE));
+                                                          GeomAlgoAPI_Tools::BOOL_FUSE));
 
         // Checking that the algorithm worked properly.
         if(!aFuseAlgo->isDone() || aFuseAlgo->shape()->isNull() || !aFuseAlgo->isValid()) {
