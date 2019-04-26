@@ -460,4 +460,10 @@ ADD_UNIT_TESTS(TestExtrusion.py
                Test2826.py
                Test2854.py
                Test2878.py
+               TestBooleanCommon_MultiLevelCompound0.py
+               TestBooleanCut_MultiLevelCompound0.py
+               TestBooleanFuse_MultiLevelCompound0.py
+               TestBooleanSmash_MultiLevelCompound0.py
+               TestBooleanSplit_MultiLevelCompound0.py
+               TestPartition_MultiLevelCompound0.py
 )
