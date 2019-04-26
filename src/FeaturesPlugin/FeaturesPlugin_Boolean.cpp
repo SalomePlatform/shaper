@@ -211,6 +211,9 @@ bool FeaturesPlugin_Boolean::processObject(
     std::shared_ptr<ModelAPI_ResultBody> aResultBody =
         document()->createBody(data(), theResultIndex);
 
+    // tools should be added to the list to fulfill the correct history of modification
+    aListWithObject.insert(aListWithObject.end(), theTools.begin(), theTools.end());
+
     ListOfShape aUsedTools = theTools;
     aUsedTools.insert(aUsedTools.end(), thePlanes.begin(), thePlanes.end());
 
@@ -307,6 +310,8 @@ bool FeaturesPlugin_Boolean::processCompsolid(
 
     ListOfShape aCompSolidList;
     aCompSolidList.push_back(theCompsolid);
+    // tools should be added to the list to fulfill the correct history of modification
+    aCompSolidList.insert(aCompSolidList.end(), theTools.begin(), theTools.end());
 
     ListOfShape aUsedTools = theTools;
     aUsedTools.insert(aUsedTools.end(), thePlanes.begin(), thePlanes.end());
