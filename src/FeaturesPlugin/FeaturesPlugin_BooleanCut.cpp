@@ -45,11 +45,11 @@ FeaturesPlugin_BooleanCut::FeaturesPlugin_BooleanCut()
 void FeaturesPlugin_BooleanCut::execute()
 {
   ObjectHierarchy anObjects, aTools;
-  ListOfShape aPlanes;
+  ListOfShape aPlanes, anEdgesAndFaces;
 
   // Getting objects and tools
-  if (!processAttribute(OBJECT_LIST_ID(), anObjects, aPlanes) ||
-      !processAttribute(TOOL_LIST_ID(), aTools, aPlanes))
+  if (!processAttribute(OBJECT_LIST_ID(), anObjects, aPlanes, anEdgesAndFaces) ||
+      !processAttribute(TOOL_LIST_ID(), aTools, aPlanes, anEdgesAndFaces))
     return;
 
   int aResultIndex = 0;

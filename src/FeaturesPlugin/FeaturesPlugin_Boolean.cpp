@@ -87,7 +87,8 @@ void FeaturesPlugin_Boolean::parentForShape(const GeomShapePtr& theShape,
 
 bool FeaturesPlugin_Boolean::processAttribute(const std::string& theAttributeName,
                                               ObjectHierarchy& theObjects,
-                                              ListOfShape& thePlanesList)
+                                              ListOfShape& thePlanesList,
+                                              ListOfShape& theEdgesAndFaces)
 {
   AttributeSelectionListPtr anObjectsSelList = selectionList(theAttributeName);
   for (int anObjectsIndex = 0; anObjectsIndex < anObjectsSelList->size(); anObjectsIndex++) {
@@ -102,6 +103,12 @@ bool FeaturesPlugin_Boolean::processAttribute(const std::string& theAttributeNam
         continue;
       } else
         return false;
+    }
+
+    if (anObject->shapeType() == GeomAPI_Shape::EDGE ||
+        anObject->shapeType() == GeomAPI_Shape::FACE) {
+      theEdgesAndFaces.push_back(anObject);
+      continue;
     }
 
     theObjects.AddObject(anObject);

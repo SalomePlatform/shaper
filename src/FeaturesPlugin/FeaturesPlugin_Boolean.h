@@ -142,7 +142,8 @@ protected:
   /// Process SelectionList attribute and fill the objects hierarchy.
   bool processAttribute(const std::string& theAttributeName,
                         ObjectHierarchy& theObjects,
-                        ListOfShape& thePlanesList);
+                        ListOfShape& thePlanesList,
+                        ListOfShape& theEdgesAndFaces);
 
   /// Perform Boolean operation of the object with the tools
   /// \return \c false if something went wrong
