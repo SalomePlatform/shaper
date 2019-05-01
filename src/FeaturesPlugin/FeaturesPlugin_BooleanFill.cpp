@@ -51,16 +51,16 @@ void FeaturesPlugin_BooleanFill::execute()
 {
   std::string anError;
   ObjectHierarchy anObjects, aTools;
-  ListOfShape aPlanes;
+  ListOfShape aPlanes, anEdgesAndFaces;
 
   // Getting objects.
-  if (!processAttribute(OBJECT_LIST_ID(), anObjects, aPlanes))
+  if (!processAttribute(OBJECT_LIST_ID(), anObjects, aPlanes, anEdgesAndFaces))
     return;
   // Planes are not supported as objects of FILL operation
   aPlanes.clear();
 
   // Getting tools.
-  if (!processAttribute(TOOL_LIST_ID(), aTools, aPlanes))
+  if (!processAttribute(TOOL_LIST_ID(), aTools, aPlanes, anEdgesAndFaces))
     return;
 
   int aResultIndex = 0;

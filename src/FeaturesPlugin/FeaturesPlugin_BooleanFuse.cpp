@@ -61,8 +61,8 @@ void FeaturesPlugin_BooleanFuse::initAttributes()
 void FeaturesPlugin_BooleanFuse::execute()
 {
   std::string anError;
-  ListOfShape anObjects, aTools, anEdgesAndFaces;
-  std::map<GeomShapePtr, ListOfShape> aCompSolidsObjects;
+  ObjectHierarchy anObjectsHierarchy, aToolsHierarchy;
+  ListOfShape aPlanes, anEdgesAndFaces;
 
   bool isSimpleCreation = false;
 
@@ -74,60 +74,18 @@ void FeaturesPlugin_BooleanFuse::execute()
   }
 
   // Getting objects.
-  AttributeSelectionListPtr anObjectsSelList =
-    selectionList(FeaturesPlugin_Boolean::OBJECT_LIST_ID());
-  for (int anObjectsIndex = 0; anObjectsIndex < anObjectsSelList->size(); anObjectsIndex++) {
-    AttributeSelectionPtr anObjectAttr = anObjectsSelList->value(anObjectsIndex);
-    GeomShapePtr anObject = anObjectAttr->value();
-    if (!anObject.get()) {
-      return;
-    }
-    ResultPtr aContext = anObjectAttr->context();
-    ResultBodyPtr aResCompSolidPtr = ModelAPI_Tools::bodyOwner(aContext);
-    if (!isSimpleCreation
-        && aResCompSolidPtr.get()
-        && aResCompSolidPtr->shape()->shapeType() == GeomAPI_Shape::COMPSOLID)
-    {
-      GeomShapePtr aContextShape = aResCompSolidPtr->shape();
-      std::map<GeomShapePtr, ListOfShape>::iterator
-        anIt = aCompSolidsObjects.begin();
-      for (; anIt != aCompSolidsObjects.end(); anIt++) {
-        if (anIt->first->isEqual(aContextShape)) {
-          aCompSolidsObjects[anIt->first].push_back(anObject);
-          break;
-        }
-      }
-      if (anIt == aCompSolidsObjects.end()) {
-        aCompSolidsObjects[aContextShape].push_back(anObject);
-      }
-    } else {
-      if (anObject->shapeType() == GeomAPI_Shape::EDGE
-          || anObject->shapeType() == GeomAPI_Shape::FACE) {
-        anEdgesAndFaces.push_back(anObject);
-      } else {
-        anObjects.push_back(anObject);
-      }
-    }
-  }
+  if (!processAttribute(OBJECT_LIST_ID(), anObjectsHierarchy, aPlanes, anEdgesAndFaces))
+    return;
 
   // Getting tools.
-  if (!isSimpleCreation) {
-    AttributeSelectionListPtr aToolsSelList = selectionList(FeaturesPlugin_Boolean::TOOL_LIST_ID());
-    for (int aToolsIndex = 0; aToolsIndex < aToolsSelList->size(); aToolsIndex++) {
-      AttributeSelectionPtr aToolAttr = aToolsSelList->value(aToolsIndex);
-      GeomShapePtr aTool = aToolAttr->value();
-      if (aTool->shapeType() == GeomAPI_Shape::EDGE
-          || aTool->shapeType() == GeomAPI_Shape::FACE)
-      {
-        anEdgesAndFaces.push_back(aTool);
-      } else {
-        aTools.push_back(aTool);
-      }
-    }
-  }
+  if (!isSimpleCreation &&
+      !processAttribute(TOOL_LIST_ID(), aToolsHierarchy, aPlanes, anEdgesAndFaces))
+    return;
 
-  if ((anObjects.size() + aTools.size() +
-    aCompSolidsObjects.size() + anEdgesAndFaces.size()) < 2) {
+  ListOfShape anObjects = anObjectsHierarchy.Objects();
+  ListOfShape aTools = aToolsHierarchy.Objects();
+
+  if ((anObjects.size() + aTools.size() + anEdgesAndFaces.size()) < 2) {
     std::string aFeatureError = "Error: Not enough objects for boolean operation.";
     setError(aFeatureError);
     return;
@@ -141,28 +99,16 @@ void FeaturesPlugin_BooleanFuse::execute()
   // Collecting solids from compsolids which will not be modified
   // in boolean operation and will be added to result.
   ListOfShape aShapesToAdd;
-  for (std::map<GeomShapePtr, ListOfShape>::iterator anIt = aCompSolidsObjects.begin();
-       anIt != aCompSolidsObjects.end();
-       ++anIt)
-  {
-    GeomShapePtr aCompSolid = anIt->first;
-    ListOfShape& aUsedInOperationSolids = anIt->second;
-    aSolidsToFuse.insert(aSolidsToFuse.end(), aUsedInOperationSolids.begin(),
-                         aUsedInOperationSolids.end());
+  for (ObjectHierarchy::Iterator anObjectsIt = anObjectsHierarchy.Begin();
+       !isSimpleCreation && anObjectsIt != anObjectsHierarchy.End();
+       ++anObjectsIt) {
+    GeomShapePtr anObject = *anObjectsIt;
+    GeomShapePtr aParent = anObjectsHierarchy.Parent(anObject, false);
 
-    // Collect solids from compsolid which will not be modified in boolean operation.
-    for (GeomAPI_ShapeExplorer
-         anExp(aCompSolid, GeomAPI_Shape::SOLID); anExp.more(); anExp.next()) {
-      GeomShapePtr aSolidInCompSolid = anExp.current();
-      ListOfShape::iterator anIt = aUsedInOperationSolids.begin();
-      for (; anIt != aUsedInOperationSolids.end(); anIt++) {
-        if (aSolidInCompSolid->isEqual(*anIt)) {
-          break;
-        }
-      }
-      if (anIt == aUsedInOperationSolids.end()) {
-        aShapesToAdd.push_back(aSolidInCompSolid);
-      }
+    if (aParent && aParent->shapeType() == GeomAPI_Shape::COMPSOLID) {
+      ListOfShape aUsed, aNotUsed;
+      anObjectsHierarchy.SplitCompound(aParent, aUsed, aNotUsed);
+      aShapesToAdd.insert(aShapesToAdd.end(), aNotUsed.begin(), aNotUsed.end());
     }
   }
 
