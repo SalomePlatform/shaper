@@ -126,8 +126,6 @@ void FeaturesPlugin_BooleanFuse::execute()
       aMakeShapeList->appendAlgo(aCutAlgo);
     }
   }
-  anOriginalShapes.insert(anOriginalShapes.end(), anEdgesAndFaces.begin(),
-                          anEdgesAndFaces.end());
 
   // If we have compsolids then cut with not used solids all others.
   if (!aShapesToAdd.empty()) {
@@ -145,6 +143,9 @@ void FeaturesPlugin_BooleanFuse::execute()
       }
     }
   }
+
+  anOriginalShapes.insert(anOriginalShapes.end(), anEdgesAndFaces.begin(),
+                          anEdgesAndFaces.end());
 
   if (!aSolidsToFuse.empty()) {
     anObjects.clear();
