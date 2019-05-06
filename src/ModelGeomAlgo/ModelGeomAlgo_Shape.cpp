@@ -131,7 +131,7 @@ namespace ModelGeomAlgo_Shape
     aSR.mySubshape = theSubshape;
     aSR.myCenterType = theCenterType;
     // compound subshapes from other compounds should be processed as whole results
-    if (aSR.mySubshape->shapeType() == GeomAPI_Shape::COMPOUND &&
+    if (aSR.mySubshape && aSR.mySubshape->shapeType() == GeomAPI_Shape::COMPOUND &&
         !theResult->shape()->isEqual(theSubshape)) {
       ResultBodyPtr aResult = std::dynamic_pointer_cast<ModelAPI_ResultBody>(theResult);
       for (int i = 0; aResult && i < aResult->numberOfSubs(); ++i) {
