@@ -87,8 +87,7 @@ void FeaturesPlugin_Boolean::parentForShape(const GeomShapePtr& theShape,
 
 bool FeaturesPlugin_Boolean::processAttribute(const std::string& theAttributeName,
                                               ObjectHierarchy& theObjects,
-                                              ListOfShape& thePlanesList,
-                                              ListOfShape& theEdgesAndFaces)
+                                              ListOfShape& thePlanesList)
 {
   AttributeSelectionListPtr anObjectsSelList = selectionList(theAttributeName);
   for (int anObjectsIndex = 0; anObjectsIndex < anObjectsSelList->size(); anObjectsIndex++) {
@@ -103,12 +102,6 @@ bool FeaturesPlugin_Boolean::processAttribute(const std::string& theAttributeNam
         continue;
       } else
         return false;
-    }
-
-    if (anObject->shapeType() == GeomAPI_Shape::EDGE ||
-        anObject->shapeType() == GeomAPI_Shape::FACE) {
-      theEdgesAndFaces.push_back(anObject);
-      continue;
     }
 
     theObjects.AddObject(anObject);
@@ -447,6 +440,31 @@ GeomShapePtr FeaturesPlugin_Boolean::ObjectHierarchy::Parent(const GeomShapePtr&
   }
   return aParent;
 }
+
+void FeaturesPlugin_Boolean::ObjectHierarchy::ObjectsByType(
+    ListOfShape& theShapesByType,
+    ListOfShape& theOtherShapes,
+    const GeomAPI_Shape::ShapeType theMinType,
+    const GeomAPI_Shape::ShapeType theMaxType) const
+{
+  if (theMinType > theMaxType)
+    return ObjectsByType(theShapesByType, theOtherShapes, theMaxType, theMinType);
+
+  // no need to select objects if whole range is specified
+  if (theMinType == GeomAPI_Shape::COMPOUND && theMaxType == GeomAPI_Shape::SHAPE) {
+    theShapesByType.insert(theShapesByType.end(), myObjects.begin(), myObjects.end());
+    return;
+  }
+
+  for (ListOfShape::const_iterator anIt = myObjects.begin(); anIt != myObjects.end(); ++anIt) {
+    GeomAPI_Shape::ShapeType aType = (*anIt)->shapeType();
+    if (aType >= theMinType && aType <= theMaxType)
+      theShapesByType.push_back(*anIt);
+    else
+      theOtherShapes.push_back(*anIt);
+  }
+}
+
 
 void FeaturesPlugin_Boolean::ObjectHierarchy::SplitCompound(const GeomShapePtr& theCompShape,
                                                             ListOfShape& theUsed,

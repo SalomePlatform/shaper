@@ -62,7 +62,7 @@ void FeaturesPlugin_BooleanFuse::execute()
 {
   std::string anError;
   ObjectHierarchy anObjectsHierarchy, aToolsHierarchy;
-  ListOfShape aPlanes, anEdgesAndFaces;
+  ListOfShape aPlanes;
 
   bool isSimpleCreation = false;
 
@@ -74,16 +74,20 @@ void FeaturesPlugin_BooleanFuse::execute()
   }
 
   // Getting objects.
-  if (!processAttribute(OBJECT_LIST_ID(), anObjectsHierarchy, aPlanes, anEdgesAndFaces))
+  if (!processAttribute(OBJECT_LIST_ID(), anObjectsHierarchy, aPlanes))
     return;
 
   // Getting tools.
   if (!isSimpleCreation &&
-      !processAttribute(TOOL_LIST_ID(), aToolsHierarchy, aPlanes, anEdgesAndFaces))
+      !processAttribute(TOOL_LIST_ID(), aToolsHierarchy, aPlanes))
     return;
 
-  ListOfShape anObjects = anObjectsHierarchy.Objects();
-  ListOfShape aTools = aToolsHierarchy.Objects();
+  ListOfShape anObjects, aTools, anEdgesAndFaces;
+  // all objects except edges and faces
+  anObjectsHierarchy.ObjectsByType(anEdgesAndFaces, anObjects,
+                                   GeomAPI_Shape::FACE, GeomAPI_Shape::EDGE);
+  aToolsHierarchy.ObjectsByType(anEdgesAndFaces, aTools,
+                                GeomAPI_Shape::FACE, GeomAPI_Shape::EDGE);
 
   if ((anObjects.size() + aTools.size() + anEdgesAndFaces.size()) < 2) {
     std::string aFeatureError = "Error: Not enough objects for boolean operation.";
@@ -106,6 +110,9 @@ void FeaturesPlugin_BooleanFuse::execute()
     GeomShapePtr aParent = anObjectsHierarchy.Parent(anObject, false);
 
     if (aParent && aParent->shapeType() == GeomAPI_Shape::COMPSOLID) {
+      // mark all subs of this parent as precessed to avoid handling twice
+      aParent = anObjectsHierarchy.Parent(anObject);
+
       ListOfShape aUsed, aNotUsed;
       anObjectsHierarchy.SplitCompound(aParent, aUsed, aNotUsed);
       aShapesToAdd.insert(aShapesToAdd.end(), aNotUsed.begin(), aNotUsed.end());
@@ -126,6 +133,8 @@ void FeaturesPlugin_BooleanFuse::execute()
       aMakeShapeList->appendAlgo(aCutAlgo);
     }
   }
+  anOriginalShapes.insert(anOriginalShapes.end(), anEdgesAndFaces.begin(),
+                          anEdgesAndFaces.end());
 
   // If we have compsolids then cut with not used solids all others.
   if (!aShapesToAdd.empty()) {
@@ -143,9 +152,6 @@ void FeaturesPlugin_BooleanFuse::execute()
       }
     }
   }
-
-  anOriginalShapes.insert(anOriginalShapes.end(), anEdgesAndFaces.begin(),
-                          anEdgesAndFaces.end());
 
   if (!aSolidsToFuse.empty()) {
     anObjects.clear();
