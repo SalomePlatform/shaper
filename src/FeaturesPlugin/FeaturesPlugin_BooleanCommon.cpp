@@ -54,7 +54,7 @@ void FeaturesPlugin_BooleanCommon::initAttributes()
 //==================================================================================================
 void FeaturesPlugin_BooleanCommon::execute()
 {
-  ListOfShape aPlanes, anEdgesAndFaces;
+  ListOfShape aPlanes;
   ObjectHierarchy anObjects, aTools;
 
   bool isSimpleMode = false;
@@ -66,14 +66,14 @@ void FeaturesPlugin_BooleanCommon::execute()
   }
 
   // Getting objects.
-  if (!processAttribute(OBJECT_LIST_ID(), anObjects, aPlanes, anEdgesAndFaces))
+  if (!processAttribute(OBJECT_LIST_ID(), anObjects, aPlanes))
     return;
   // Planes are not supported as objects of COMMON operation
   aPlanes.clear();
 
   // Getting tools.
   if (!isSimpleMode &&
-      !processAttribute(TOOL_LIST_ID(), aTools, aPlanes, anEdgesAndFaces))
+      !processAttribute(TOOL_LIST_ID(), aTools, aPlanes))
     return;
 
   if (anObjects.IsEmpty() || (!isSimpleMode && aTools.IsEmpty() && aPlanes.empty())) {

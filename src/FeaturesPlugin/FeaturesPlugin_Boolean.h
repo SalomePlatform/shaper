@@ -112,6 +112,10 @@ protected:
 
     /// Return list of objects
     const ListOfShape& Objects() const { return myObjects; }
+    /// Separate objects of the given range of types and all other objects
+    void ObjectsByType(ListOfShape& theShapesByType, ListOfShape& theOtherShapes,
+        const GeomAPI_Shape::ShapeType theMinType = GeomAPI_Shape::COMPOUND,
+        const GeomAPI_Shape::ShapeType theMaxType = GeomAPI_Shape::SHAPE) const;
 
   public:
     class Iterator {
@@ -142,8 +146,7 @@ protected:
   /// Process SelectionList attribute and fill the objects hierarchy.
   bool processAttribute(const std::string& theAttributeName,
                         ObjectHierarchy& theObjects,
-                        ListOfShape& thePlanesList,
-                        ListOfShape& theEdgesAndFaces);
+                        ListOfShape& thePlanesList);
 
   /// Perform Boolean operation of the object with the tools
   /// \return \c false if something went wrong
