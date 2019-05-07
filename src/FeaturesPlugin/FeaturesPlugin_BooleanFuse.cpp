@@ -23,6 +23,7 @@
 
 #include <ModelAPI_ResultBody.h>
 #include <ModelAPI_AttributeBoolean.h>
+#include <ModelAPI_AttributeInteger.h>
 #include <ModelAPI_AttributeSelectionList.h>
 #include <ModelAPI_AttributeString.h>
 #include <ModelAPI_Session.h>
@@ -32,10 +33,15 @@
 #include <GeomAlgoAPI_Boolean.h>
 #include <GeomAlgoAPI_MakeShapeList.h>
 #include <GeomAlgoAPI_PaveFiller.h>
+#include <GeomAlgoAPI_ShapeBuilder.h>
 #include <GeomAlgoAPI_ShapeTools.h>
 #include <GeomAlgoAPI_Tools.h>
 #include <GeomAlgoAPI_UnifySameDomain.h>
+
 #include <GeomAPI_ShapeExplorer.h>
+#include <GeomAPI_ShapeIterator.h>
+
+static const int THE_FUSE_VERSION_1 = 20190506;
 
 //==================================================================================================
 FeaturesPlugin_BooleanFuse::FeaturesPlugin_BooleanFuse()
@@ -55,6 +61,17 @@ void FeaturesPlugin_BooleanFuse::initAttributes()
 
   ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(), OBJECT_LIST_ID());
   ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(), TOOL_LIST_ID());
+
+  AttributePtr aVerAttr = data()->addAttribute(VERSION_ID(), ModelAPI_AttributeInteger::typeId());
+  aVerAttr->setIsArgument(false);
+  ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(), VERSION_ID());
+  if (!integer(VERSION_ID())->isInitialized() &&
+      !selectionList(OBJECT_LIST_ID())->isInitialized() &&
+      !selectionList(TOOL_LIST_ID())->isInitialized()) {
+    // this is a newly created feature (not read from file),
+    // so, initialize the latest version
+    integer(VERSION_ID())->setValue(THE_FUSE_VERSION_1);
+  }
 }
 
 //==================================================================================================
@@ -94,6 +111,14 @@ void FeaturesPlugin_BooleanFuse::execute()
     setError(aFeatureError);
     return;
   }
+
+  // version of FUSE feature
+  AttributeIntegerPtr aVersionAttr = integer(VERSION_ID());
+  int aFuseVersion = 0;
+  if (aVersionAttr && aVersionAttr->isInitialized())
+    aFuseVersion = aVersionAttr->value();
+
+////  isSimpleCreation = isSimpleCreation && aFuseVersion < THE_FUSE_VERSION_1;
 
   // Collecting all solids which will be fused.
   ListOfShape aSolidsToFuse;
@@ -221,6 +246,12 @@ void FeaturesPlugin_BooleanFuse::execute()
     aMakeShapeList->appendAlgo(aUnifyAlgo);
   }
 
+  if (aFuseVersion == THE_FUSE_VERSION_1) {
+    // merge hierarchies of compounds containing objects and tools
+    // and append the result of the FUSE operation
+    aShape = keepUnusedSubsOfCompound(aShape, anObjectsHierarchy, aToolsHierarchy, aMakeShapeList);
+  }
+
   int aResultIndex = 0;
 
   ResultBodyPtr aResultBody = document()->createBody(data(), aResultIndex);
@@ -242,4 +273,33 @@ void FeaturesPlugin_BooleanFuse::execute()
 
   // remove the rest results if there were produced in the previous pass
   removeResults(aResultIndex);
+}
+
+//==================================================================================================
+GeomShapePtr FeaturesPlugin_BooleanFuse::keepUnusedSubsOfCompound(
+    const GeomShapePtr& theFuseResult,
+    const ObjectHierarchy& theObjectsHierarchy,
+    const ObjectHierarchy& theToolsHierarchy,
+    std::shared_ptr<GeomAlgoAPI_MakeShapeList> theMakeShapeList)
+{
+  ListOfShape aCompounds;
+  theObjectsHierarchy.CompoundsOfUnusedObjects(aCompounds);
+  theToolsHierarchy.CompoundsOfUnusedObjects(aCompounds);
+
+  GeomShapePtr aResultShape = theFuseResult;
+  if (!aCompounds.empty()) {
+    aResultShape = aCompounds.front();
+    aCompounds.pop_front();
+
+    std::shared_ptr<GeomAlgoAPI_ShapeBuilder> aBuilder(new GeomAlgoAPI_ShapeBuilder);
+    for (ListOfShape::iterator anIt = aCompounds.begin(); anIt != aCompounds.end(); ++anIt) {
+      for (GeomAPI_ShapeIterator aSub(*anIt); aSub.more(); aSub.next())
+        aBuilder->add(aResultShape, aSub.current());
+    }
+
+    aBuilder->add(aResultShape, theFuseResult);
+
+    theMakeShapeList->appendAlgo(aBuilder);
+  }
+  return aResultShape;
 }
