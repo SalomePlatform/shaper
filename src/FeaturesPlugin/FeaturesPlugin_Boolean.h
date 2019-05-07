@@ -59,6 +59,13 @@ public:
     return MY_TOOL_LIST_ID;
   }
 
+  /// Attribute name of the version of Boolean feature
+  inline static const std::string& VERSION_ID()
+  {
+    static const std::string MY_VERSION_ID("version");
+    return MY_VERSION_ID;
+  }
+
   /// \return boolean operation type.
   FEATURESPLUGIN_EXPORT OperationType operationType();
 
@@ -81,13 +88,18 @@ protected:
   /// Auxiliary class to store hierarchy of Boolean operation objects/tools
   /// and their parent shapes (compounds or compsolids)
   class ObjectHierarchy {
-    typedef std::map<GeomShapePtr, ListOfShape, GeomAPI_Shape::Comparator>  MapShapeToSubshapes;
+    typedef std::pair<GeomShapePtr, ListOfShape> ShapeAndSubshapes;
     typedef std::map<GeomShapePtr, GeomShapePtr, GeomAPI_Shape::Comparator> MapShapeToParent;
+    typedef std::map<GeomShapePtr, size_t, GeomAPI_Shape::Comparator> MapShapeToIndex;
     typedef std::set<GeomShapePtr, GeomAPI_Shape::Comparator> SetOfShape;
 
-    ListOfShape myObjects;
-    MapShapeToParent myParent;
-    MapShapeToSubshapes mySubshapes;
+    ListOfShape myObjects; ///< list of objects/tools of Boolean operation
+    MapShapeToParent myParent; ///< refer a shape to compound/compsolid containing it
+    /// indices of compounds/compsolids to keep the order of parent shapes
+    /// corresponding to the order of objects
+    MapShapeToIndex  myParentIndices;
+    /// list of shape and its subshapes stored according to the index of parent shape
+    std::vector<ShapeAndSubshapes> mySubshapes;
 
     SetOfShape myProcessedObjects;
 
@@ -107,6 +119,10 @@ protected:
                        ListOfShape& theUsed,
                        ListOfShape& theNotUsed) const;
 
+    /// Generates the list of top-level compounds, which contain the objects of Boolean operation.
+    /// The generated list will contain only shapes unused during the Boolean operation.
+    void CompoundsOfUnusedObjects(ListOfShape& theDestination) const;
+
     /// Return \c true if there is no object in hierarchy
     bool IsEmpty() const;
 
@@ -116,6 +132,10 @@ protected:
     void ObjectsByType(ListOfShape& theShapesByType, ListOfShape& theOtherShapes,
         const GeomAPI_Shape::ShapeType theMinType = GeomAPI_Shape::COMPOUND,
         const GeomAPI_Shape::ShapeType theMaxType = GeomAPI_Shape::SHAPE) const;
+
+  private:
+    GeomShapePtr collectUnusedSubs(const GeomShapePtr theTopLevelCompound,
+                                   const SetOfShape& theUsed) const;
 
   public:
     class Iterator {

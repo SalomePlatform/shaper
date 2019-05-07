@@ -465,6 +465,11 @@ ADD_UNIT_TESTS(TestExtrusion.py
                TestBooleanFuse_MultiLevelCompound_v0_1.py
                TestBooleanFuse_MultiLevelCompound_v0_2.py
                TestBooleanFuse_MultiLevelCompound_v0_3.py
+               TestBooleanFuse_MultiLevelCompound_v0_4.py
+               TestBooleanFuse_MultiLevelCompound_v20190506_1.py
+               TestBooleanFuse_MultiLevelCompound_v20190506_2.py
+               TestBooleanFuse_MultiLevelCompound_v20190506_3.py
+               TestBooleanFuse_MultiLevelCompound_v20190506_4.py
                TestBooleanSmash_MultiLevelCompound0.py
                TestBooleanSplit_MultiLevelCompound0.py
                TestPartition_MultiLevelCompound0.py

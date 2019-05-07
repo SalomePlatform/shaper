@@ -61,7 +61,7 @@ SketchConstraintLength_1 = Sketch_1.setLength(SketchLine_2.result(), 5)
 SketchConstraintLength_2 = Sketch_1.setLength(SketchLine_1.result(), 10)
 Extrusion_1.setNestedSketch(Sketch_1)
 Sketch_2 = model.addSketch(Part_1_doc, model.selection("FACE", "Extrusion_1_1_2/From_Face"))
-SketchLine_9 = Sketch_2.addLine(22, 2.5, 6, 2.5)
+SketchLine_9 = Sketch_2.addLine(22, 2.5, 5.999999999999998, 2.5)
 SketchConstraintHorizontal_5 = Sketch_2.setHorizontal(SketchLine_9.result())
 SketchConstraintLength_3 = Sketch_2.setLength(SketchLine_9.result(), 16)
 SketchProjection_2 = Sketch_2.addProjection(model.selection("EDGE", "[Extrusion_1_1_1/Generated_Face&Sketch_1/SketchLine_4][Extrusion_1_1_1/From_Face]"), False)
@@ -75,7 +75,20 @@ model.do()
 Edge_1 = model.addEdge(Part_1_doc, [model.selection("EDGE", "Sketch_2/SketchLine_9")])
 Extrusion_2 = model.addExtrusion(Part_1_doc, [model.selection("EDGE", "Edge_1_1")], model.selection("EDGE", "PartSet/OZ"), 13, 3)
 Compound_1 = model.addCompound(Part_1_doc, [model.selection("COMPSOLID", "Extrusion_1_1"), model.selection("FACE", "Extrusion_2_1")])
-Fuse_1 = model.addFuse(Part_1_doc, [model.selection("SOLID", "Compound_1_1_1_1")], [model.selection("SOLID", "LinearCopy_2_1_1_1"), model.selection("FACE", "Compound_1_1_2")], True)
+Fuse_1 = model.addFuse(Part_1_doc, [model.selection("SOLID", "Compound_1_1_1_1")], [model.selection("SOLID", "LinearCopy_2_1_1_1")], False, 20190506)
+
+model.testHaveNamingSubshapes(Fuse_1, model, Part_1_doc)
+
 model.end()
 
-assert(Fuse_1.feature().error() != "")
+from GeomAPI import GeomAPI_Shape
+
+model.testNbResults(Fuse_1, 1)
+model.testNbSubResults(Fuse_1, [4])
+model.testNbSubShapes(Fuse_1, GeomAPI_Shape.SOLID, [7])
+model.testNbSubShapes(Fuse_1, GeomAPI_Shape.FACE, [32])
+model.testNbSubShapes(Fuse_1, GeomAPI_Shape.EDGE, [94])
+model.testNbSubShapes(Fuse_1, GeomAPI_Shape.VERTEX, [188])
+model.testResultsVolumes(Fuse_1, [5516.039439629021])
+
+assert(model.checkPythonDump())

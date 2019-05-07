@@ -75,7 +75,20 @@ model.do()
 Edge_1 = model.addEdge(Part_1_doc, [model.selection("EDGE", "Sketch_2/SketchLine_9")])
 Extrusion_2 = model.addExtrusion(Part_1_doc, [model.selection("EDGE", "Edge_1_1")], model.selection("EDGE", "PartSet/OZ"), 13, 3)
 Compound_1 = model.addCompound(Part_1_doc, [model.selection("COMPSOLID", "Extrusion_1_1"), model.selection("FACE", "Extrusion_2_1")])
-Fuse_1 = model.addFuse(Part_1_doc, [model.selection("SOLID", "Compound_1_1_1_1")], [model.selection("SOLID", "LinearCopy_2_1_1_1"), model.selection("FACE", "Compound_1_1_2")], True)
+Fuse_1 = model.addFuse(Part_1_doc, [model.selection("SOLID", "Compound_1_1_1_1")], [model.selection("SOLID", "LinearCopy_2_1_1_1")])
+
+model.testHaveNamingSubshapes(Fuse_1, model, Part_1_doc)
+
 model.end()
 
-assert(Fuse_1.feature().error() != "")
+from GeomAPI import GeomAPI_Shape
+
+model.testNbResults(Fuse_1, 1)
+model.testNbSubResults(Fuse_1, [2])
+model.testNbSubShapes(Fuse_1, GeomAPI_Shape.SOLID, [2])
+model.testNbSubShapes(Fuse_1, GeomAPI_Shape.FACE, [16])
+model.testNbSubShapes(Fuse_1, GeomAPI_Shape.EDGE, [60])
+model.testNbSubShapes(Fuse_1, GeomAPI_Shape.VERTEX, [120])
+model.testResultsVolumes(Fuse_1, [1589.04862264177882])
+
+assert(model.checkPythonDump())

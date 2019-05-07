@@ -35,6 +35,7 @@
 #include <GeomAlgoAPI_MakeShapeList.h>
 #include <GeomAlgoAPI_Partition.h>
 #include <GeomAlgoAPI_PaveFiller.h>
+#include <GeomAlgoAPI_ShapeBuilder.h>
 #include <GeomAlgoAPI_ShapeTools.h>
 #include <GeomAlgoAPI_Tools.h>
 #include <GeomAPI_Face.h>
@@ -420,7 +421,16 @@ void FeaturesPlugin_Boolean::ObjectHierarchy::AddParent(const GeomShapePtr& theS
                                                         const GeomShapePtr& theParent)
 {
   myParent[theShape] = theParent;
-  mySubshapes[theParent].push_back(theShape);
+
+  MapShapeToIndex::iterator aFound = myParentIndices.find(theParent);
+  size_t anIndex = myParentIndices.size();
+  if (aFound == myParentIndices.end()) {
+    myParentIndices[theParent] = anIndex;
+    mySubshapes.push_back(ShapeAndSubshapes(theParent, ListOfShape()));
+  } else
+    anIndex = aFound->second;
+
+  mySubshapes[anIndex].second.push_back(theShape);
 }
 
 GeomShapePtr FeaturesPlugin_Boolean::ObjectHierarchy::Parent(const GeomShapePtr& theShape,
@@ -433,7 +443,7 @@ GeomShapePtr FeaturesPlugin_Boolean::ObjectHierarchy::Parent(const GeomShapePtr&
     if (theMarkProcessed) {
       // mark the parent and all its subs as processed by Boolean algorithm
       myProcessedObjects.insert(aParent);
-      const ListOfShape& aSubs = mySubshapes[aParent];
+      const ListOfShape& aSubs = mySubshapes[myParentIndices[aParent]].second;
       for (ListOfShape::const_iterator anIt = aSubs.begin(); anIt != aSubs.end(); ++anIt)
         myProcessedObjects.insert(*anIt);
     }
@@ -473,12 +483,15 @@ void FeaturesPlugin_Boolean::ObjectHierarchy::SplitCompound(const GeomShapePtr& 
   theUsed.clear();
   theNotUsed.clear();
 
-  const ListOfShape& aSubs = mySubshapes.find(theCompShape)->second;
+  MapShapeToIndex::const_iterator aFoundIndex = myParentIndices.find(theCompShape);
+  if (aFoundIndex == myParentIndices.end())
+    return; // no such shape
+
+  const ListOfShape& aSubs = mySubshapes[aFoundIndex->second].second;
   SetOfShape aSubsSet;
   aSubsSet.insert(aSubs.begin(), aSubs.end());
 
-  for (GeomAPI_ShapeExplorer anExp(theCompShape, GeomAPI_Shape::SOLID);
-       anExp.more(); anExp.next()) {
+  for (GeomAPI_ShapeIterator anExp(theCompShape); anExp.more(); anExp.next()) {
     GeomShapePtr aCurrent = anExp.current();
     if (aSubsSet.find(aCurrent) == aSubsSet.end())
       theNotUsed.push_back(aCurrent);
@@ -491,6 +504,64 @@ bool FeaturesPlugin_Boolean::ObjectHierarchy::IsEmpty() const
 {
   return myObjects.empty();
 }
+
+void FeaturesPlugin_Boolean::ObjectHierarchy::CompoundsOfUnusedObjects(
+    ListOfShape& theDestination) const
+{
+  SetOfShape aUsedObjects;
+  aUsedObjects.insert(myObjects.begin(), myObjects.end());
+
+  for (std::vector<ShapeAndSubshapes>::const_iterator anIt = mySubshapes.begin();
+       anIt != mySubshapes.end(); ++anIt) {
+    MapShapeToParent::const_iterator aParent = myParent.find(anIt->first);
+    if ((aParent == myParent.end() || !aParent->second) &&
+         anIt->first->shapeType() ==  GeomAPI_Shape::COMPOUND) {
+      // this is a top-level compound
+      GeomShapePtr aCompound = collectUnusedSubs(anIt->first, aUsedObjects);
+      // add to destination non-empty compounds only
+      if (aCompound)
+        theDestination.push_back(aCompound);
+    }
+  }
+}
+
+GeomShapePtr FeaturesPlugin_Boolean::ObjectHierarchy::collectUnusedSubs(
+    GeomShapePtr theTopLevelCompound,
+    const SetOfShape& theUsed) const
+{
+  GeomShapePtr aResult = theTopLevelCompound->emptyCopied();
+  bool isResultEmpty = true;
+
+  for (GeomAPI_ShapeIterator aSub(theTopLevelCompound); aSub.more(); aSub.next()) {
+    GeomShapePtr aCurrent = aSub.current();
+    if (theUsed.find(aCurrent) != theUsed.end())
+      continue; // already used
+
+    MapShapeToIndex::const_iterator aFoundIndex = myParentIndices.find(aCurrent);
+    if (aCurrent->shapeType() > GeomAPI_Shape::COMPOUND ||
+        aFoundIndex == myParentIndices.end()) {
+      bool isAddShape = true;
+      // check compsolid is fully unused in the Boolean operation
+      if (aCurrent->shapeType() == GeomAPI_Shape::COMPSOLID) {
+        for (GeomAPI_ShapeIterator anIt(aCurrent); isAddShape && anIt.more(); anIt.next())
+          isAddShape = theUsed.find(anIt.current()) == theUsed.end();
+      }
+
+      if (isAddShape) { // low-level shape, add it
+        GeomAlgoAPI_ShapeBuilder::add(aResult, aCurrent);
+        isResultEmpty = false;
+      }
+    } else {
+      GeomShapePtr aCompound = collectUnusedSubs(aCurrent, theUsed);
+      if (aCompound) {
+        GeomAlgoAPI_ShapeBuilder::add(theTopLevelCompound, aCompound);
+        isResultEmpty = false;
+      }
+    }
+  }
+  return isResultEmpty ? GeomShapePtr() : aResult;
+}
+
 
 FeaturesPlugin_Boolean::ObjectHierarchy::Iterator FeaturesPlugin_Boolean::ObjectHierarchy::Begin()
 {
