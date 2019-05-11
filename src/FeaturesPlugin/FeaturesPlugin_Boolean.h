@@ -29,6 +29,7 @@
 #include <ModelAPI_Feature.h>
 
 class ModelAPI_Result;
+class GeomAlgoAPI_MakeShapeList;
 
 /// \class FeaturesPlugin_Boolean
 /// \ingroup Plugins
@@ -168,7 +169,9 @@ protected:
                         ObjectHierarchy& theObjects,
                         ListOfShape& thePlanesList);
 
-  /// Perform Boolean operation of the object with the tools
+  /// Perform Boolean operation of the object with the tools.
+  /// In case of theResultCompound is not empty, the result of Boolean operation
+  /// is added to this compound, and corresponding ResultBody is not generated.
   /// \return \c false if something went wrong
   bool processObject(const GeomAlgoAPI_Tools::BOPType theBooleanType,
                      const GeomShapePtr& theObject,
@@ -176,9 +179,12 @@ protected:
                      const ListOfShape& thePlanes,
                      int& theResultIndex,
                      std::vector<FeaturesPlugin_Tools::ResultBaseAlgo>& theResultBaseAlgoList,
-                     ListOfShape& theResultShapesList);
+                     ListOfShape& theResultShapesList,
+                     GeomShapePtr theResulCompound = GeomShapePtr());
 
   /// Perform Boolean operation of the Compsolid with the tools
+  /// In case of theResultCompound is not empty, the result of Boolean operation
+  /// is added to this compound, and corresponding ResultBody is not generated.
   /// \return \c false if something went wrong
   bool processCompsolid(const GeomAlgoAPI_Tools::BOPType theBooleanType,
                         const ObjectHierarchy& theCompsolidHierarchy,
@@ -187,9 +193,12 @@ protected:
                         const ListOfShape& thePlanes,
                         int& theResultIndex,
                         std::vector<FeaturesPlugin_Tools::ResultBaseAlgo>& theResultBaseAlgoList,
-                        ListOfShape& theResultShapesList);
+                        ListOfShape& theResultShapesList,
+                        GeomShapePtr theResulCompound = GeomShapePtr());
 
   /// Perform Boolean operation of the Compound with the tools
+  /// In case of theResultCompound is not empty, the result of Boolean operation
+  /// is added to this compound, and corresponding ResultBody is not generated.
   /// \return \c false if something went wrong
   bool processCompound(const GeomAlgoAPI_Tools::BOPType theBooleanType,
                        const ObjectHierarchy& theCompoundHierarchy,
@@ -197,7 +206,20 @@ protected:
                        const ListOfShape& theTools,
                        int& theResultIndex,
                        std::vector<FeaturesPlugin_Tools::ResultBaseAlgo>& theResultBaseAlgoList,
-                       ListOfShape& theResultShapesList);
+                       ListOfShape& theResultShapesList,
+                       GeomShapePtr theResulCompound = GeomShapePtr());
+
+  /// Process unused sub-shapes of compounds.
+  /// Keep the compound hierarchy, but merge top-level compounds
+  /// into a single compound and add the result of the FUSE operation.
+  GeomShapePtr keepUnusedSubsOfCompound(
+      const GeomShapePtr& theResult,
+      const ObjectHierarchy& theObjectsHierarchy,
+      const ObjectHierarchy& theToolsHierarchy,
+      std::shared_ptr<GeomAlgoAPI_MakeShapeList> theMakeShapeList);
+
+  /// Return version of the feature
+  int version();
 
 private:
   void parentForShape(const GeomShapePtr& theShape,

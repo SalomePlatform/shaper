@@ -113,12 +113,7 @@ void FeaturesPlugin_BooleanFuse::execute()
   }
 
   // version of FUSE feature
-  AttributeIntegerPtr aVersionAttr = integer(VERSION_ID());
-  int aFuseVersion = 0;
-  if (aVersionAttr && aVersionAttr->isInitialized())
-    aFuseVersion = aVersionAttr->value();
-
-////  isSimpleCreation = isSimpleCreation && aFuseVersion < THE_FUSE_VERSION_1;
+  int aFuseVersion = version();
 
   // Collecting all solids which will be fused.
   ListOfShape aSolidsToFuse;
@@ -273,33 +268,4 @@ void FeaturesPlugin_BooleanFuse::execute()
 
   // remove the rest results if there were produced in the previous pass
   removeResults(aResultIndex);
-}
-
-//==================================================================================================
-GeomShapePtr FeaturesPlugin_BooleanFuse::keepUnusedSubsOfCompound(
-    const GeomShapePtr& theFuseResult,
-    const ObjectHierarchy& theObjectsHierarchy,
-    const ObjectHierarchy& theToolsHierarchy,
-    std::shared_ptr<GeomAlgoAPI_MakeShapeList> theMakeShapeList)
-{
-  ListOfShape aCompounds;
-  theObjectsHierarchy.CompoundsOfUnusedObjects(aCompounds);
-  theToolsHierarchy.CompoundsOfUnusedObjects(aCompounds);
-
-  GeomShapePtr aResultShape = theFuseResult;
-  if (!aCompounds.empty()) {
-    aResultShape = aCompounds.front();
-    aCompounds.pop_front();
-
-    std::shared_ptr<GeomAlgoAPI_ShapeBuilder> aBuilder(new GeomAlgoAPI_ShapeBuilder);
-    for (ListOfShape::iterator anIt = aCompounds.begin(); anIt != aCompounds.end(); ++anIt) {
-      for (GeomAPI_ShapeIterator aSub(*anIt); aSub.more(); aSub.next())
-        aBuilder->add(aResultShape, aSub.current());
-    }
-
-    aBuilder->add(aResultShape, theFuseResult);
-
-    theMakeShapeList->appendAlgo(aBuilder);
-  }
-  return aResultShape;
 }

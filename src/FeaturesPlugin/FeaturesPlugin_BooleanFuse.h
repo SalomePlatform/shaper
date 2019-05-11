@@ -22,8 +22,6 @@
 
 #include "FeaturesPlugin_Boolean.h"
 
-class GeomAlgoAPI_MakeShapeList;
-
 /// \class FeaturesPlugin_BooleanFuse
 /// \ingroup Plugins
 /// \brief Feature for applying of Boolean Fuse operation.
@@ -97,16 +95,6 @@ public:
 
   /// Use plugin manager for features creation.
   FeaturesPlugin_BooleanFuse();
-
-private:
-  /// Process unused sub-shapes of compounds.
-  /// Keep the compound hierarchy, but merge top-level compounds
-  /// into a single compound and add the result of the FUSE operation.
-  GeomShapePtr keepUnusedSubsOfCompound(
-      const GeomShapePtr& theFuseResult,
-      const ObjectHierarchy& theObjectsHierarchy,
-      const ObjectHierarchy& theToolsHierarchy,
-      std::shared_ptr<GeomAlgoAPI_MakeShapeList> theMakeShapeList);
 };
 
 #endif
