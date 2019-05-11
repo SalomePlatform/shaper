@@ -215,7 +215,8 @@ void FeaturesPlugin_BooleanCommon::execute()
       FeaturesPlugin_Tools::ResultBaseAlgo aRBA;
       aRBA.resultBody = aResultBody;
       aRBA.baseShape = anObjectList.front();
-      for (std::vector<FeaturesPlugin_Tools::ResultBaseAlgo>::iterator aRBAIt = aResultBaseAlgoList.begin();
+      for (std::vector<FeaturesPlugin_Tools::ResultBaseAlgo>::iterator
+           aRBAIt = aResultBaseAlgoList.begin();
            aRBAIt != aResultBaseAlgoList.end(); ++aRBAIt) {
         aMakeShapeList->appendAlgo(aRBAIt->makeShape);
       }
