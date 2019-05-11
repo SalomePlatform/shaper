@@ -154,7 +154,8 @@ bool FeaturesPlugin_Boolean::processObject(
     const ListOfShape& thePlanes,
     int& theResultIndex,
     std::vector<FeaturesPlugin_Tools::ResultBaseAlgo>& theResultBaseAlgoList,
-    ListOfShape& theResultShapesList)
+    ListOfShape& theResultShapesList,
+    GeomShapePtr theResultCompound)
 {
   ListOfShape aListWithObject;
   aListWithObject.push_back(theObject);
@@ -209,22 +210,31 @@ bool FeaturesPlugin_Boolean::processObject(
 
   GeomAPI_ShapeIterator aShapeIt(aResShape);
   if (aShapeIt.more() || aResShape->shapeType() == GeomAPI_Shape::VERTEX) {
-    std::shared_ptr<ModelAPI_ResultBody> aResultBody =
-        document()->createBody(data(), theResultIndex);
+    std::shared_ptr<ModelAPI_ResultBody> aResultBody;
 
-    // tools should be added to the list to fulfill the correct history of modification
-    aListWithObject.insert(aListWithObject.end(), theTools.begin(), theTools.end());
+    if (theResultCompound) { // store BOP result to the compound
+      std::shared_ptr<GeomAlgoAPI_ShapeBuilder> aBuilder(new GeomAlgoAPI_ShapeBuilder);
+      aBuilder->add(theResultCompound, aResShape);
+      aMakeShapeList->appendAlgo(aBuilder);
+    }
+    else { // create a separate ResultBody
+      aResultBody = document()->createBody(data(), theResultIndex);
 
-    ListOfShape aUsedTools = theTools;
-    aUsedTools.insert(aUsedTools.end(), thePlanes.begin(), thePlanes.end());
+      // tools should be added to the list to fulfill the correct history of modification
+      aListWithObject.insert(aListWithObject.end(), theTools.begin(), theTools.end());
 
-    FeaturesPlugin_Tools::loadModifiedShapes(aResultBody,
-                                             aListWithObject,
-                                             aUsedTools,
-                                             aMakeShapeList,
-                                             aResShape);
-    setResult(aResultBody, theResultIndex);
-    ++theResultIndex;
+      ListOfShape aUsedTools = theTools;
+      aUsedTools.insert(aUsedTools.end(), thePlanes.begin(), thePlanes.end());
+
+      FeaturesPlugin_Tools::loadModifiedShapes(aResultBody,
+                                               aListWithObject,
+                                               aUsedTools,
+                                               aMakeShapeList,
+                                               aResShape);
+      setResult(aResultBody, theResultIndex);
+      ++theResultIndex;
+    }
+
 
     FeaturesPlugin_Tools::ResultBaseAlgo aRBA;
     aRBA.resultBody = aResultBody;
@@ -245,7 +255,8 @@ bool FeaturesPlugin_Boolean::processCompsolid(
     const ListOfShape& thePlanes,
     int& theResultIndex,
     std::vector<FeaturesPlugin_Tools::ResultBaseAlgo>& theResultBaseAlgoList,
-    ListOfShape& theResultShapesList)
+    ListOfShape& theResultShapesList,
+    GeomShapePtr theResultCompound)
 {
   ListOfShape aUsedInOperationSolids;
   ListOfShape aNotUsedSolids;
@@ -306,24 +317,32 @@ bool FeaturesPlugin_Boolean::processCompsolid(
   GeomAPI_ShapeIterator aShapeIt(aResultShape);
   if (aShapeIt.more() || aResultShape->shapeType() == GeomAPI_Shape::VERTEX)
   {
-    std::shared_ptr<ModelAPI_ResultBody> aResultBody =
-        document()->createBody(data(), theResultIndex);
+    std::shared_ptr<ModelAPI_ResultBody> aResultBody;
 
-    ListOfShape aCompSolidList;
-    aCompSolidList.push_back(theCompsolid);
-    // tools should be added to the list to fulfill the correct history of modification
-    aCompSolidList.insert(aCompSolidList.end(), theTools.begin(), theTools.end());
+    if (theResultCompound) { // store BOP result to the compound
+      std::shared_ptr<GeomAlgoAPI_ShapeBuilder> aBuilder(new GeomAlgoAPI_ShapeBuilder);
+      aBuilder->add(theResultCompound, aResultShape);
+      aMakeShapeList->appendAlgo(aBuilder);
+    }
+    else { // create a separate ResultBody
+      aResultBody = document()->createBody(data(), theResultIndex);
 
-    ListOfShape aUsedTools = theTools;
-    aUsedTools.insert(aUsedTools.end(), thePlanes.begin(), thePlanes.end());
+      ListOfShape aCompSolidList;
+      aCompSolidList.push_back(theCompsolid);
+      // tools should be added to the list to fulfill the correct history of modification
+      aCompSolidList.insert(aCompSolidList.end(), theTools.begin(), theTools.end());
 
-    FeaturesPlugin_Tools::loadModifiedShapes(aResultBody,
-                                             aCompSolidList,
-                                             aUsedTools,
-                                             aMakeShapeList,
-                                             aResultShape);
-    setResult(aResultBody, theResultIndex);
-    ++theResultIndex;
+      ListOfShape aUsedTools = theTools;
+      aUsedTools.insert(aUsedTools.end(), thePlanes.begin(), thePlanes.end());
+
+      FeaturesPlugin_Tools::loadModifiedShapes(aResultBody,
+                                               aCompSolidList,
+                                               aUsedTools,
+                                               aMakeShapeList,
+                                               aResultShape);
+      setResult(aResultBody, theResultIndex);
+      ++theResultIndex;
+    }
 
     FeaturesPlugin_Tools::ResultBaseAlgo aRBA;
     aRBA.resultBody = aResultBody;
@@ -343,7 +362,8 @@ bool FeaturesPlugin_Boolean::processCompound(
     const ListOfShape& theTools,
     int& theResultIndex,
     std::vector<FeaturesPlugin_Tools::ResultBaseAlgo>& theResultBaseAlgoList,
-    ListOfShape& theResultShapesList)
+    ListOfShape& theResultShapesList,
+    GeomShapePtr theResultCompound)
 {
   ListOfShape aUsedInOperationShapes;
   ListOfShape aNotUsedShapes;
@@ -387,18 +407,26 @@ bool FeaturesPlugin_Boolean::processCompound(
 
   GeomAPI_ShapeIterator aShapeIt(aResultShape);
   if (aShapeIt.more() || aResultShape->shapeType() == GeomAPI_Shape::VERTEX) {
-    std::shared_ptr<ModelAPI_ResultBody> aResultBody =
-        document()->createBody(data(), theResultIndex);
+    std::shared_ptr<ModelAPI_ResultBody> aResultBody;
 
-    ListOfShape aCompoundList;
-    aCompoundList.push_back(theCompound);
-    FeaturesPlugin_Tools::loadModifiedShapes(aResultBody,
-                                             aCompoundList,
-                                             theTools,
-                                             aMakeShapeList,
-                                             aResultShape);
-    setResult(aResultBody, theResultIndex);
-    ++theResultIndex;
+    if (theResultCompound) { // store BOP result to the compound
+      std::shared_ptr<GeomAlgoAPI_ShapeBuilder> aBuilder(new GeomAlgoAPI_ShapeBuilder);
+      aBuilder->add(theResultCompound, aResultShape);
+      aMakeShapeList->appendAlgo(aBuilder);
+    }
+    else { // create a separate ResultBody
+      aResultBody = document()->createBody(data(), theResultIndex);
+
+      ListOfShape aCompoundList;
+      aCompoundList.push_back(theCompound);
+      FeaturesPlugin_Tools::loadModifiedShapes(aResultBody,
+                                               aCompoundList,
+                                               theTools,
+                                               aMakeShapeList,
+                                               aResultShape);
+      setResult(aResultBody, theResultIndex);
+      ++theResultIndex;
+    }
 
     FeaturesPlugin_Tools::ResultBaseAlgo aRBA;
     aRBA.resultBody = aResultBody;
@@ -408,6 +436,46 @@ bool FeaturesPlugin_Boolean::processCompound(
     theResultShapesList.push_back(aResultShape);
   }
   return true;
+}
+
+//==================================================================================================
+GeomShapePtr FeaturesPlugin_Boolean::keepUnusedSubsOfCompound(
+    const GeomShapePtr& theResult,
+    const ObjectHierarchy& theObjectsHierarchy,
+    const ObjectHierarchy& theToolsHierarchy,
+    std::shared_ptr<GeomAlgoAPI_MakeShapeList> theMakeShapeList)
+{
+  ListOfShape aCompounds;
+  theObjectsHierarchy.CompoundsOfUnusedObjects(aCompounds);
+  theToolsHierarchy.CompoundsOfUnusedObjects(aCompounds);
+
+  GeomShapePtr aResultShape = theResult;
+  if (!aCompounds.empty()) {
+    aResultShape = aCompounds.front();
+    aCompounds.pop_front();
+
+    std::shared_ptr<GeomAlgoAPI_ShapeBuilder> aBuilder(new GeomAlgoAPI_ShapeBuilder);
+    for (ListOfShape::iterator anIt = aCompounds.begin(); anIt != aCompounds.end(); ++anIt) {
+      for (GeomAPI_ShapeIterator aSub(*anIt); aSub.more(); aSub.next())
+        aBuilder->add(aResultShape, aSub.current());
+    }
+
+    if (theResult)
+      aBuilder->add(aResultShape, theResult);
+
+    theMakeShapeList->appendAlgo(aBuilder);
+  }
+  return aResultShape;
+}
+
+//=================================================================================================
+int FeaturesPlugin_Boolean::version()
+{
+  AttributeIntegerPtr aVersionAttr = integer(VERSION_ID());
+  int aVersion = 0;
+  if (aVersionAttr && aVersionAttr->isInitialized())
+    aVersion = aVersionAttr->value();
+  return aVersion;
 }
 
 //=================================================================================================

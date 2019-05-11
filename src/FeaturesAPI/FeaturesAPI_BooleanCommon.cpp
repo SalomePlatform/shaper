@@ -34,11 +34,13 @@ FeaturesAPI_BooleanCommon::FeaturesAPI_BooleanCommon(
 //==================================================================================================
 FeaturesAPI_BooleanCommon::FeaturesAPI_BooleanCommon(
   const std::shared_ptr<ModelAPI_Feature>& theFeature,
-  const std::list<ModelHighAPI_Selection>& theMainObjects)
+  const std::list<ModelHighAPI_Selection>& theMainObjects,
+  const int theVersion)
 : ModelHighAPI_Interface(theFeature)
 {
   if(initialize()) {
     fillAttribute(FeaturesPlugin_BooleanCommon::CREATION_METHOD_SIMPLE(), mycreationMethod);
+    fillAttribute(theVersion, theFeature->integer(FeaturesPlugin_Boolean::VERSION_ID()));
     fillAttribute(theMainObjects, mymainObjects);
 
     execute(false);
@@ -49,11 +51,13 @@ FeaturesAPI_BooleanCommon::FeaturesAPI_BooleanCommon(
 FeaturesAPI_BooleanCommon::FeaturesAPI_BooleanCommon(
   const std::shared_ptr<ModelAPI_Feature>& theFeature,
   const std::list<ModelHighAPI_Selection>& theMainObjects,
-  const std::list<ModelHighAPI_Selection>& theToolObjects)
+  const std::list<ModelHighAPI_Selection>& theToolObjects,
+  const int theVersion)
 : ModelHighAPI_Interface(theFeature)
 {
   if(initialize()) {
     fillAttribute(FeaturesPlugin_BooleanCommon::CREATION_METHOD_ADVANCED(), mycreationMethod);
+    fillAttribute(theVersion, theFeature->integer(FeaturesPlugin_Boolean::VERSION_ID()));
     fillAttribute(theMainObjects, mymainObjects);
     fillAttribute(theToolObjects, mytoolObjects);
 
@@ -111,6 +115,8 @@ void FeaturesAPI_BooleanCommon::dump(ModelHighAPI_Dumper& theDumper) const
     aBase->selectionList(FeaturesPlugin_BooleanCommon::OBJECT_LIST_ID());
   AttributeSelectionListPtr aTools =
     aBase->selectionList(FeaturesPlugin_BooleanCommon::TOOL_LIST_ID());
+  AttributeIntegerPtr aVersion =
+    aBase->integer(FeaturesPlugin_BooleanCommon::VERSION_ID());
 
   theDumper << "(" << aDocName << ", " << anObjects;
 
@@ -118,24 +124,31 @@ void FeaturesAPI_BooleanCommon::dump(ModelHighAPI_Dumper& theDumper) const
     theDumper << ", " << aTools;
   }
 
+  if (aVersion && aVersion->isInitialized()) {
+    theDumper << ", " << aVersion->value();
+  }
+
   theDumper << ")" << std::endl;
 }
 
 //==================================================================================================
 BooleanCommonPtr addCommon(const std::shared_ptr<ModelAPI_Document>& thePart,
-                           const std::list<ModelHighAPI_Selection>& theMainObjects)
+                           const std::list<ModelHighAPI_Selection>& theMainObjects,
+                           const int theVersion)
 {
   std::shared_ptr<ModelAPI_Feature> aFeature = thePart->addFeature(FeaturesAPI_BooleanCommon::ID());
-  return BooleanCommonPtr(new FeaturesAPI_BooleanCommon(aFeature, theMainObjects));
+  return BooleanCommonPtr(new FeaturesAPI_BooleanCommon(aFeature, theMainObjects, theVersion));
 }
 
 //==================================================================================================
 BooleanCommonPtr addCommon(const std::shared_ptr<ModelAPI_Document>& thePart,
                            const std::list<ModelHighAPI_Selection>& theMainObjects,
-                           const std::list<ModelHighAPI_Selection>& theToolObjects)
+                           const std::list<ModelHighAPI_Selection>& theToolObjects,
+                           const int theVersion)
 {
   std::shared_ptr<ModelAPI_Feature> aFeature = thePart->addFeature(FeaturesAPI_BooleanCommon::ID());
   return BooleanCommonPtr(new FeaturesAPI_BooleanCommon(aFeature,
                                                         theMainObjects,
-                                                        theToolObjects));
+                                                        theToolObjects,
+                                                        theVersion));
 }

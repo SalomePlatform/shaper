@@ -20,9 +20,12 @@
 #include "FeaturesPlugin_BooleanCommon.h"
 
 #include <ModelAPI_ResultBody.h>
+#include <ModelAPI_AttributeInteger.h>
 #include <ModelAPI_AttributeSelectionList.h>
 #include <ModelAPI_AttributeString.h>
+#include <ModelAPI_Session.h>
 #include <ModelAPI_Tools.h>
+#include <ModelAPI_Validator.h>
 
 #include <GeomAlgoAPI_Boolean.h>
 #include <GeomAlgoAPI_MakeShapeCustom.h>
@@ -35,6 +38,7 @@
 #include <GeomAlgoAPI_CompoundBuilder.h>
 #include <GeomAlgoAPI_Tools.h>
 
+static const int THE_COMMON_VERSION_1 = 20190506;
 
 //==================================================================================================
 FeaturesPlugin_BooleanCommon::FeaturesPlugin_BooleanCommon()
@@ -49,6 +53,17 @@ void FeaturesPlugin_BooleanCommon::initAttributes()
 
   data()->addAttribute(OBJECT_LIST_ID(), ModelAPI_AttributeSelectionList::typeId());
   data()->addAttribute(TOOL_LIST_ID(), ModelAPI_AttributeSelectionList::typeId());
+
+  AttributePtr aVerAttr = data()->addAttribute(VERSION_ID(), ModelAPI_AttributeInteger::typeId());
+  aVerAttr->setIsArgument(false);
+  ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(), VERSION_ID());
+  if (!integer(VERSION_ID())->isInitialized() &&
+      !selectionList(OBJECT_LIST_ID())->isInitialized() &&
+      !selectionList(TOOL_LIST_ID())->isInitialized()) {
+    // this is a newly created feature (not read from file),
+    // so, initialize the latest version
+    integer(VERSION_ID())->setValue(THE_COMMON_VERSION_1);
+  }
 }
 
 //==================================================================================================
@@ -82,7 +97,12 @@ void FeaturesPlugin_BooleanCommon::execute()
     return;
   }
 
+  // version of COMMON feature
+  int aCommonVersion = version();
+
   int aResultIndex = 0;
+  GeomShapePtr aResultCompound;
+
   std::string anError;
   std::shared_ptr<GeomAlgoAPI_MakeShapeList> aMakeShapeList(new GeomAlgoAPI_MakeShapeList());
   std::vector<FeaturesPlugin_Tools::ResultBaseAlgo> aResultBaseAlgoList;
@@ -104,6 +124,12 @@ void FeaturesPlugin_BooleanCommon::execute()
 
       aShape = aCommonAlgo->shape();
       aMakeShapeList->appendAlgo(aCommonAlgo);
+    }
+
+    if (aCommonVersion == THE_COMMON_VERSION_1) {
+      // merge hierarchies of compounds containing objects and tools
+      // and append the result of the FUSE operation
+      aShape = keepUnusedSubsOfCompound(aShape, anObjects, aTools, aMakeShapeList);
     }
 
     GeomAPI_ShapeIterator aShapeIt(aShape);
@@ -132,6 +158,12 @@ void FeaturesPlugin_BooleanCommon::execute()
       aResultShapesList.push_back(aShape);
     }
   } else {
+    if (aCommonVersion == THE_COMMON_VERSION_1) {
+      // merge hierarchies of compounds containing objects and tools
+      aResultCompound =
+          keepUnusedSubsOfCompound(GeomShapePtr(), anObjects, aTools, aMakeShapeList);
+    }
+
     bool isOk = true;
     for (ObjectHierarchy::Iterator anObjectsIt = anObjects.Begin();
          anObjectsIt != anObjects.End() && isOk;
@@ -146,29 +178,60 @@ void FeaturesPlugin_BooleanCommon::execute()
           // Compound handling
           isOk = processCompound(GeomAlgoAPI_Tools::BOOL_COMMON,
                                  anObjects, aParent, aTools.Objects(),
-                                 aResultIndex, aResultBaseAlgoList, aResultShapesList);
+                                 aResultIndex, aResultBaseAlgoList, aResultShapesList,
+                                 aResultCompound);
         }
         else if (aShapeType == GeomAPI_Shape::COMPSOLID) {
           // Compsolid handling
           isOk = processCompsolid(GeomAlgoAPI_Tools::BOOL_COMMON,
                                   anObjects, aParent, aTools.Objects(), ListOfShape(),
-                                  aResultIndex, aResultBaseAlgoList, aResultShapesList);
+                                  aResultIndex, aResultBaseAlgoList, aResultShapesList,
+                                  aResultCompound);
         }
       } else {
         // process object as is
         isOk = processObject(GeomAlgoAPI_Tools::BOOL_COMMON,
                              anObject, aTools.Objects(), aPlanes,
-                             aResultIndex, aResultBaseAlgoList, aResultShapesList);
+                             aResultIndex, aResultBaseAlgoList, aResultShapesList,
+                             aResultCompound);
       }
+    }
+
+    GeomAPI_ShapeIterator aShapeIt(aResultCompound);
+    if (aShapeIt.more()) {
+      std::shared_ptr<ModelAPI_ResultBody> aResultBody =
+          document()->createBody(data(), aResultIndex);
+
+      ListOfShape anObjectList = anObjects.Objects();
+      ListOfShape aToolsList = aTools.Objects();
+      FeaturesPlugin_Tools::loadModifiedShapes(aResultBody,
+                                               anObjectList,
+                                               aToolsList,
+                                               aMakeShapeList,
+                                               aResultCompound);
+      setResult(aResultBody, aResultIndex++);
+
+      // merge algorithms
+      FeaturesPlugin_Tools::ResultBaseAlgo aRBA;
+      aRBA.resultBody = aResultBody;
+      aRBA.baseShape = anObjectList.front();
+      for (std::vector<FeaturesPlugin_Tools::ResultBaseAlgo>::iterator aRBAIt = aResultBaseAlgoList.begin();
+           aRBAIt != aResultBaseAlgoList.end(); ++aRBAIt) {
+        aMakeShapeList->appendAlgo(aRBAIt->makeShape);
+      }
+      aRBA.makeShape = aMakeShapeList;
+      aResultBaseAlgoList.clear();
+      aResultBaseAlgoList.push_back(aRBA);
     }
   }
 
   // Store deleted shapes after all results has been proceeded. This is to avoid issue when in one
   // result shape has been deleted, but in another it was modified or stayed.
-  GeomShapePtr aResultShapesCompound = GeomAlgoAPI_CompoundBuilder::compound(aResultShapesList);
+  if (!aResultCompound)
+    aResultCompound = GeomAlgoAPI_CompoundBuilder::compound(aResultShapesList);
   FeaturesPlugin_Tools::loadDeletedShapes(aResultBaseAlgoList,
                                           aTools.Objects(),
-                                          aResultShapesCompound);
+                                          aResultCompound);
 
   // remove the rest results if there were produced in the previous pass
   removeResults(aResultIndex);

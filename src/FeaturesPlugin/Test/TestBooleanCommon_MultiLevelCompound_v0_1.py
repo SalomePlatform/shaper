@@ -33,8 +33,8 @@ LinearCopy_2.result().subResult(0).subResult(1).setColor(255, 170, 0)
 LinearCopy_2.result().subResult(1).subResult(0).setColor(0, 0, 255)
 LinearCopy_2.result().subResult(1).subResult(1).setColor(0, 0, 255)
 Sketch_1 = model.addSketch(Part_1_doc, model.defaultPlane("YOZ"))
-SketchLine_1 = Sketch_1.addLine(7, 0, -6.999999999999999, 0)
-SketchLine_2 = Sketch_1.addLine(-6.999999999999999, 0, -7, 5)
+SketchLine_1 = Sketch_1.addLine(7, 0, -7, 0)
+SketchLine_2 = Sketch_1.addLine(-7, 0, -7, 5)
 SketchLine_3 = Sketch_1.addLine(-7, 5, 7, 5)
 SketchLine_4 = Sketch_1.addLine(7, 5, 7, 0)
 SketchConstraintCoincidence_1 = Sketch_1.setCoincident(SketchLine_4.endPoint(), SketchLine_1.startPoint())
@@ -78,7 +78,9 @@ Compound_1.result().subResult(0).subResult(1).setColor(0, 170, 0)
 Compound_1.result().subResult(1).subResult(0).setColor(0, 255, 0)
 Compound_1.result().subResult(1).subResult(1).setColor(0, 255, 0)
 Common_1 = model.addCommon(Part_1_doc, [model.selection("SOLID", "LinearCopy_2_1_1_1"), model.selection("COMPOUND", "Compound_1_1_2")])
-model.do()
+
+model.testHaveNamingSubshapes(Common_1, model, Part_1_doc)
+
 model.end()
 
 from GeomAPI import GeomAPI_Shape
@@ -90,3 +92,5 @@ model.testNbSubShapes(Common_1, GeomAPI_Shape.FACE, [13])
 model.testNbSubShapes(Common_1, GeomAPI_Shape.EDGE, [54])
 model.testNbSubShapes(Common_1, GeomAPI_Shape.VERTEX, [108])
 model.testResultsVolumes(Common_1, [1147.933772988635155343217775226])
+
+assert(model.checkPythonDump())
