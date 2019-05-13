@@ -44,16 +44,20 @@ SketchConstraintCoincidence_1 = Sketch_2.setCoincident(SketchPoint_2.result(), S
 SketchConstraintRadius_2 = Sketch_2.setRadius(SketchCircle_2.results()[1], 3)
 model.do()
 Extrusion_2 = model.addExtrusion(Part_1_doc, [model.selection("FACE", "Sketch_2/Face-SketchCircle_2_2f")], model.selection(), 5, 5)
-Cut_1 = model.addCut(Part_1_doc, [model.selection("SOLID", "LinearCopy_1_1_1_2")], [model.selection("SOLID", "Extrusion_2_1")])
-model.do()
+Cut_1 = model.addCut(Part_1_doc, [model.selection("SOLID", "LinearCopy_1_1_1_2")], [model.selection("SOLID", "Extrusion_2_1")], 20190506)
+
+model.testHaveNamingSubshapes(Cut_1, model, Part_1_doc)
+
 model.end()
 
 from GeomAPI import GeomAPI_Shape
 
 model.testNbResults(Cut_1, 1)
-model.testNbSubResults(Cut_1, [2])
-model.testNbSubShapes(Cut_1, GeomAPI_Shape.SOLID, [2])
-model.testNbSubShapes(Cut_1, GeomAPI_Shape.FACE, [8])
-model.testNbSubShapes(Cut_1, GeomAPI_Shape.EDGE, [18])
-model.testNbSubShapes(Cut_1, GeomAPI_Shape.VERTEX, [36])
-model.testResultsVolumes(Cut_1, [1429.424657383355906858923844993])
+model.testNbSubResults(Cut_1, [3])
+model.testNbSubShapes(Cut_1, GeomAPI_Shape.SOLID, [4])
+model.testNbSubShapes(Cut_1, GeomAPI_Shape.FACE, [14])
+model.testNbSubShapes(Cut_1, GeomAPI_Shape.EDGE, [30])
+model.testNbSubShapes(Cut_1, GeomAPI_Shape.VERTEX, [60])
+model.testResultsVolumes(Cut_1, [3000.22098417825282])
+
+assert(model.checkPythonDump())

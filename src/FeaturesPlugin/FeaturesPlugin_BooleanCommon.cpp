@@ -54,16 +54,7 @@ void FeaturesPlugin_BooleanCommon::initAttributes()
   data()->addAttribute(OBJECT_LIST_ID(), ModelAPI_AttributeSelectionList::typeId());
   data()->addAttribute(TOOL_LIST_ID(), ModelAPI_AttributeSelectionList::typeId());
 
-  AttributePtr aVerAttr = data()->addAttribute(VERSION_ID(), ModelAPI_AttributeInteger::typeId());
-  aVerAttr->setIsArgument(false);
-  ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(), VERSION_ID());
-  if (!integer(VERSION_ID())->isInitialized() &&
-      !selectionList(OBJECT_LIST_ID())->isInitialized() &&
-      !selectionList(TOOL_LIST_ID())->isInitialized()) {
-    // this is a newly created feature (not read from file),
-    // so, initialize the latest version
-    integer(VERSION_ID())->setValue(THE_COMMON_VERSION_1);
-  }
+  initVersion(THE_COMMON_VERSION_1);
 }
 
 //==================================================================================================

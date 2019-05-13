@@ -66,6 +66,21 @@ void FeaturesPlugin_Boolean::initAttributes()
 }
 
 //=================================================================================================
+void FeaturesPlugin_Boolean::initVersion(const int theVersion)
+{
+  AttributePtr aVerAttr = data()->addAttribute(VERSION_ID(), ModelAPI_AttributeInteger::typeId());
+  aVerAttr->setIsArgument(false);
+  ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(), VERSION_ID());
+  if (!integer(VERSION_ID())->isInitialized() &&
+      !selectionList(OBJECT_LIST_ID())->isInitialized() &&
+      !selectionList(TOOL_LIST_ID())->isInitialized()) {
+    // this is a newly created feature (not read from file),
+    // so, initialize the latest version
+    integer(VERSION_ID())->setValue(theVersion);
+  }
+}
+
+//=================================================================================================
 FeaturesPlugin_Boolean::OperationType FeaturesPlugin_Boolean::operationType()
 {
   return myOperationType;
@@ -368,6 +383,11 @@ bool FeaturesPlugin_Boolean::processCompound(
   ListOfShape aUsedInOperationShapes;
   ListOfShape aNotUsedShapes;
   theCompoundHierarchy.SplitCompound(theCompound, aUsedInOperationShapes, aNotUsedShapes);
+  if (theResultCompound) {
+    // Not necessary to keep all subs of the current compound,
+    // all unused solids are already stored in the result compound.
+    aNotUsedShapes.clear();
+  }
 
   std::shared_ptr<GeomAlgoAPI_MakeShapeList> aMakeShapeList(new GeomAlgoAPI_MakeShapeList());
   std::shared_ptr<GeomAlgoAPI_Boolean> aBoolAlgo(

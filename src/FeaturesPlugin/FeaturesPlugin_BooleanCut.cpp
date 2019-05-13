@@ -35,10 +35,19 @@
 #include <GeomAPI_ShapeExplorer.h>
 #include <GeomAPI_ShapeIterator.h>
 
+static const int THE_CUT_VERSION_1 = 20190506;
+
 //==================================================================================================
 FeaturesPlugin_BooleanCut::FeaturesPlugin_BooleanCut()
 : FeaturesPlugin_Boolean(FeaturesPlugin_Boolean::BOOL_CUT)
 {
+}
+
+//==================================================================================================
+void FeaturesPlugin_BooleanCut::initAttributes()
+{
+  FeaturesPlugin_Boolean::initAttributes();
+  initVersion(THE_CUT_VERSION_1);
 }
 
 //==================================================================================================
@@ -60,9 +69,21 @@ void FeaturesPlugin_BooleanCut::execute()
     return;
   }
 
+  // version of CUT feature
+  int aCutVersion = version();
+
   std::vector<FeaturesPlugin_Tools::ResultBaseAlgo> aResultBaseAlgoList;
   ListOfShape aResultShapesList;
   std::string anError;
+
+  std::shared_ptr<GeomAlgoAPI_MakeShapeList> aMakeShapeList(new GeomAlgoAPI_MakeShapeList());
+
+  GeomShapePtr aResultCompound;
+  if (aCutVersion == THE_CUT_VERSION_1) {
+    // merge hierarchies of compounds containing objects and tools
+    aResultCompound =
+        keepUnusedSubsOfCompound(GeomShapePtr(), anObjects, aTools, aMakeShapeList);
+  }
 
   // For solids cut each object with all tools.
   bool isOk = true;
@@ -78,28 +99,60 @@ void FeaturesPlugin_BooleanCut::execute()
         // Compound handling
         isOk = processCompound(GeomAlgoAPI_Tools::BOOL_CUT,
                                anObjects, aParent, aTools.Objects(),
-                               aResultIndex, aResultBaseAlgoList, aResultShapesList);
+                               aResultIndex, aResultBaseAlgoList, aResultShapesList,
+                               aResultCompound);
       }
       else if (aShapeType == GeomAPI_Shape::COMPSOLID) {
         // Compsolid handling
         isOk = processCompsolid(GeomAlgoAPI_Tools::BOOL_CUT,
                                 anObjects, aParent, aTools.Objects(), ListOfShape(),
-                                aResultIndex, aResultBaseAlgoList, aResultShapesList);
+                                aResultIndex, aResultBaseAlgoList, aResultShapesList,
+                                aResultCompound);
       }
     } else {
       // process object as is
       isOk = processObject(GeomAlgoAPI_Tools::BOOL_CUT,
                            anObject, aTools.Objects(), aPlanes,
-                           aResultIndex, aResultBaseAlgoList, aResultShapesList);
+                           aResultIndex, aResultBaseAlgoList, aResultShapesList,
+                           aResultCompound);
     }
+  }
+
+  GeomAPI_ShapeIterator aShapeIt(aResultCompound);
+  if (aShapeIt.more()) {
+    std::shared_ptr<ModelAPI_ResultBody> aResultBody =
+        document()->createBody(data(), aResultIndex);
+
+    ListOfShape anObjectList = anObjects.Objects();
+    ListOfShape aToolsList = aTools.Objects();
+    FeaturesPlugin_Tools::loadModifiedShapes(aResultBody,
+                                             anObjectList,
+                                             aToolsList,
+                                             aMakeShapeList,
+                                             aResultCompound);
+    setResult(aResultBody, aResultIndex++);
+
+    // merge algorithms
+    FeaturesPlugin_Tools::ResultBaseAlgo aRBA;
+    aRBA.resultBody = aResultBody;
+    aRBA.baseShape = anObjectList.front();
+    for (std::vector<FeaturesPlugin_Tools::ResultBaseAlgo>::iterator
+         aRBAIt = aResultBaseAlgoList.begin();
+         aRBAIt != aResultBaseAlgoList.end(); ++aRBAIt) {
+      aMakeShapeList->appendAlgo(aRBAIt->makeShape);
+    }
+    aRBA.makeShape = aMakeShapeList;
+    aResultBaseAlgoList.clear();
+    aResultBaseAlgoList.push_back(aRBA);
   }
 
   // Store deleted shapes after all results has been proceeded. This is to avoid issue when in one
   // result shape has been deleted, but in another it was modified or stayed.
-  GeomShapePtr aResultShapesCompound = GeomAlgoAPI_CompoundBuilder::compound(aResultShapesList);
+  if (!aResultCompound)
+    aResultCompound = GeomAlgoAPI_CompoundBuilder::compound(aResultShapesList);
   FeaturesPlugin_Tools::loadDeletedShapes(aResultBaseAlgoList,
                                           aTools.Objects(),
-                                          aResultShapesCompound);
+                                          aResultCompound);
 
   // remove the rest results if there were produced in the previous pass
   removeResults(aResultIndex);

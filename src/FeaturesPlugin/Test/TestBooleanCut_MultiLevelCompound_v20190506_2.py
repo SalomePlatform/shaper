@@ -102,20 +102,20 @@ Compound_3.result().subResult(0).setColor(0, 170, 0)
 Compound_3.result().subResult(1).setColor(0, 255, 0)
 Compound_3.result().subResult(1).subResult(0).setColor(0, 255, 0)
 Compound_3.result().subResult(1).subResult(1).setColor(0, 255, 0)
-Common_1 = model.addCommon(Part_1_doc, [model.selection("SOLID", "Compound_2_1_1_1"), model.selection("SOLID", "Compound_2_1_2_3")], [model.selection("COMPOUND", "Compound_3_1_2")], 20190506)
+Cut_1 = model.addCut(Part_1_doc, [model.selection("SOLID", "Compound_2_1_1_1"), model.selection("SOLID", "Compound_2_1_2_3")], [model.selection("SOLID", "Compound_3_1_2_2")], 20190506)
 
-model.testHaveNamingSubshapes(Common_1, model, Part_1_doc)
+model.testHaveNamingSubshapes(Cut_1, model, Part_1_doc)
 
 model.end()
 
 from GeomAPI import GeomAPI_Shape
 
-model.testNbResults(Common_1, 1)
-model.testNbSubResults(Common_1, [4])
-model.testNbSubShapes(Common_1, GeomAPI_Shape.SOLID, [6])
-model.testNbSubShapes(Common_1, GeomAPI_Shape.FACE, [33])
-model.testNbSubShapes(Common_1, GeomAPI_Shape.EDGE, [128])
-model.testNbSubShapes(Common_1, GeomAPI_Shape.VERTEX, [256])
-model.testResultsVolumes(Common_1, [16551.5491059462365])
+model.testNbResults(Cut_1, 1)
+model.testNbSubResults(Cut_1, [5])
+model.testNbSubShapes(Cut_1, GeomAPI_Shape.SOLID, [7])
+model.testNbSubShapes(Cut_1, GeomAPI_Shape.FACE, [43])
+model.testNbSubShapes(Cut_1, GeomAPI_Shape.EDGE, [182])
+model.testNbSubShapes(Cut_1, GeomAPI_Shape.VERTEX, [364])
+model.testResultsVolumes(Cut_1, [27585.506105596567])
 
 assert(model.checkPythonDump())
