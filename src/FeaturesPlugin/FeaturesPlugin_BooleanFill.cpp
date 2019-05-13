@@ -40,10 +40,19 @@
 #include <algorithm>
 #include <map>
 
+static const int THE_SPLIT_VERSION_1 = 20190506;
+
 //=================================================================================================
 FeaturesPlugin_BooleanFill::FeaturesPlugin_BooleanFill()
   : FeaturesPlugin_Boolean(FeaturesPlugin_Boolean::BOOL_FILL)
 {
+}
+
+//==================================================================================================
+void FeaturesPlugin_BooleanFill::initAttributes()
+{
+  FeaturesPlugin_Boolean::initAttributes();
+  initVersion(THE_SPLIT_VERSION_1);
 }
 
 //=================================================================================================
@@ -71,8 +80,20 @@ void FeaturesPlugin_BooleanFill::execute()
     return;
   }
 
+  // version of Split feature
+  int aSplitVersion = version();
+
   std::vector<FeaturesPlugin_Tools::ResultBaseAlgo> aResultBaseAlgoList;
   ListOfShape aResultShapesList;
+
+  std::shared_ptr<GeomAlgoAPI_MakeShapeList> aMakeShapeList(new GeomAlgoAPI_MakeShapeList());
+
+  GeomShapePtr aResultCompound;
+  if (aSplitVersion == THE_SPLIT_VERSION_1) {
+    // merge hierarchies of compounds containing objects and tools
+    aResultCompound =
+        keepUnusedSubsOfCompound(GeomShapePtr(), anObjects, aTools, aMakeShapeList);
+  }
 
   // For solids cut each object with all tools.
   bool isOk = true;
@@ -88,21 +109,52 @@ void FeaturesPlugin_BooleanFill::execute()
       // compsolid handling
       isOk = processCompsolid(GeomAlgoAPI_Tools::BOOL_PARTITION,
                               anObjects, aParent, aTools.Objects(), aPlanes,
-                              aResultIndex, aResultBaseAlgoList, aResultShapesList);
+                              aResultIndex, aResultBaseAlgoList, aResultShapesList,
+                              aResultCompound);
     } else {
       // process object as is
       isOk = processObject(GeomAlgoAPI_Tools::BOOL_PARTITION,
                            anObject, aTools.Objects(), aPlanes,
-                           aResultIndex, aResultBaseAlgoList, aResultShapesList);
+                           aResultIndex, aResultBaseAlgoList, aResultShapesList,
+                           aResultCompound);
     }
+  }
+
+  GeomAPI_ShapeIterator aShapeIt(aResultCompound);
+  if (aShapeIt.more()) {
+    std::shared_ptr<ModelAPI_ResultBody> aResultBody =
+        document()->createBody(data(), aResultIndex);
+
+    ListOfShape anObjectList = anObjects.Objects();
+    ListOfShape aToolsList = aTools.Objects();
+    FeaturesPlugin_Tools::loadModifiedShapes(aResultBody,
+                                             anObjectList,
+                                             aToolsList,
+                                             aMakeShapeList,
+                                             aResultCompound);
+    setResult(aResultBody, aResultIndex++);
+
+    // merge algorithms
+    FeaturesPlugin_Tools::ResultBaseAlgo aRBA;
+    aRBA.resultBody = aResultBody;
+    aRBA.baseShape = anObjectList.front();
+    for (std::vector<FeaturesPlugin_Tools::ResultBaseAlgo>::iterator
+         aRBAIt = aResultBaseAlgoList.begin();
+         aRBAIt != aResultBaseAlgoList.end(); ++aRBAIt) {
+      aMakeShapeList->appendAlgo(aRBAIt->makeShape);
+    }
+    aRBA.makeShape = aMakeShapeList;
+    aResultBaseAlgoList.clear();
+    aResultBaseAlgoList.push_back(aRBA);
   }
 
   // Store deleted shapes after all results has been proceeded. This is to avoid issue when in one
   // result shape has been deleted, but in another it was modified or stayed.
-  GeomShapePtr aResultShapesCompound = GeomAlgoAPI_CompoundBuilder::compound(aResultShapesList);
+  if (!aResultCompound)
+    aResultCompound = GeomAlgoAPI_CompoundBuilder::compound(aResultShapesList);
   FeaturesPlugin_Tools::loadDeletedShapes(aResultBaseAlgoList,
                                           aTools.Objects(),
-                                          aResultShapesCompound);
+                                          aResultCompound);
 
   // remove the rest results if there were produced in the previous pass
   removeResults(aResultIndex);
