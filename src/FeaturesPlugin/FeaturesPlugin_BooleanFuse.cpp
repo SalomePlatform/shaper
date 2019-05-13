@@ -62,16 +62,7 @@ void FeaturesPlugin_BooleanFuse::initAttributes()
   ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(), OBJECT_LIST_ID());
   ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(), TOOL_LIST_ID());
 
-  AttributePtr aVerAttr = data()->addAttribute(VERSION_ID(), ModelAPI_AttributeInteger::typeId());
-  aVerAttr->setIsArgument(false);
-  ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(), VERSION_ID());
-  if (!integer(VERSION_ID())->isInitialized() &&
-      !selectionList(OBJECT_LIST_ID())->isInitialized() &&
-      !selectionList(TOOL_LIST_ID())->isInitialized()) {
-    // this is a newly created feature (not read from file),
-    // so, initialize the latest version
-    integer(VERSION_ID())->setValue(THE_FUSE_VERSION_1);
-  }
+  initVersion(THE_FUSE_VERSION_1);
 }
 
 //==================================================================================================

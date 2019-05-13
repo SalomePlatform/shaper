@@ -78,6 +78,11 @@ protected:
   /// Use plugin manager for features creation.
   FeaturesPlugin_Boolean(const OperationType theOperationType);
 
+  /// Initialize version field of the Boolean feature.
+  /// The version is initialized for newly created features,
+  /// not read from previously stored document.
+  void initVersion(const int theVersion);
+
   /// Load Naming data structure of the feature to the document
   void loadNamingDS(std::shared_ptr<ModelAPI_ResultBody> theResultBody,
                     const std::shared_ptr<GeomAPI_Shape> theBaseShape,
