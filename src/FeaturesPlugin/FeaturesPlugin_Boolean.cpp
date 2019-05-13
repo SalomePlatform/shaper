@@ -489,6 +489,42 @@ GeomShapePtr FeaturesPlugin_Boolean::keepUnusedSubsOfCompound(
 }
 
 //=================================================================================================
+void FeaturesPlugin_Boolean::storeResult(
+    const ListOfShape& theObjects,
+    const ListOfShape& theTools,
+    const GeomShapePtr theResultShape,
+    int& theResultIndex,
+    std::shared_ptr<GeomAlgoAPI_MakeShapeList> theMakeShapeList,
+    std::vector<FeaturesPlugin_Tools::ResultBaseAlgo>& theResultBaseAlgoList)
+{
+  if (!theResultShape)
+    return;
+
+  std::shared_ptr<ModelAPI_ResultBody> aResultBody =
+      document()->createBody(data(), theResultIndex);
+
+  FeaturesPlugin_Tools::loadModifiedShapes(aResultBody,
+                                           theObjects,
+                                           theTools,
+                                           theMakeShapeList,
+                                           theResultShape);
+  setResult(aResultBody, theResultIndex++);
+
+  // merge algorithms
+  FeaturesPlugin_Tools::ResultBaseAlgo aRBA;
+  aRBA.resultBody = aResultBody;
+  aRBA.baseShape = theObjects.front();
+  for (std::vector<FeaturesPlugin_Tools::ResultBaseAlgo>::iterator
+       aRBAIt = theResultBaseAlgoList.begin();
+       aRBAIt != theResultBaseAlgoList.end(); ++aRBAIt) {
+    theMakeShapeList->appendAlgo(aRBAIt->makeShape);
+  }
+  aRBA.makeShape = theMakeShapeList;
+  theResultBaseAlgoList.clear();
+  theResultBaseAlgoList.push_back(aRBA);
+}
+
+//=================================================================================================
 int FeaturesPlugin_Boolean::version()
 {
   AttributeIntegerPtr aVersionAttr = integer(VERSION_ID());

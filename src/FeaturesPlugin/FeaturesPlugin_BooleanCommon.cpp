@@ -188,33 +188,8 @@ void FeaturesPlugin_BooleanCommon::execute()
       }
     }
 
-    GeomAPI_ShapeIterator aShapeIt(aResultCompound);
-    if (aShapeIt.more()) {
-      std::shared_ptr<ModelAPI_ResultBody> aResultBody =
-          document()->createBody(data(), aResultIndex);
-
-      ListOfShape anObjectList = anObjects.Objects();
-      ListOfShape aToolsList = aTools.Objects();
-      FeaturesPlugin_Tools::loadModifiedShapes(aResultBody,
-                                               anObjectList,
-                                               aToolsList,
-                                               aMakeShapeList,
-                                               aResultCompound);
-      setResult(aResultBody, aResultIndex++);
-
-      // merge algorithms
-      FeaturesPlugin_Tools::ResultBaseAlgo aRBA;
-      aRBA.resultBody = aResultBody;
-      aRBA.baseShape = anObjectList.front();
-      for (std::vector<FeaturesPlugin_Tools::ResultBaseAlgo>::iterator
-           aRBAIt = aResultBaseAlgoList.begin();
-           aRBAIt != aResultBaseAlgoList.end(); ++aRBAIt) {
-        aMakeShapeList->appendAlgo(aRBAIt->makeShape);
-      }
-      aRBA.makeShape = aMakeShapeList;
-      aResultBaseAlgoList.clear();
-      aResultBaseAlgoList.push_back(aRBA);
-    }
+    storeResult(anObjects.Objects(), aTools.Objects(), aResultCompound, aResultIndex,
+                aMakeShapeList, aResultBaseAlgoList);
   }
 
   // Store deleted shapes after all results has been proceeded. This is to avoid issue when in one
