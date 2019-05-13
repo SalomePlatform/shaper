@@ -35,10 +35,12 @@ FeaturesAPI_BooleanSmash::FeaturesAPI_BooleanSmash(
 FeaturesAPI_BooleanSmash::FeaturesAPI_BooleanSmash(
   const std::shared_ptr<ModelAPI_Feature>& theFeature,
   const std::list<ModelHighAPI_Selection>& theMainObjects,
-  const std::list<ModelHighAPI_Selection>& theToolObjects)
+  const std::list<ModelHighAPI_Selection>& theToolObjects,
+  const int theVersion)
 : ModelHighAPI_Interface(theFeature)
 {
   if(initialize()) {
+    fillAttribute(theVersion, theFeature->integer(FeaturesPlugin_Boolean::VERSION_ID()));
     fillAttribute(theMainObjects, mymainObjects);
     fillAttribute(theToolObjects, mytoolObjects);
 
@@ -82,17 +84,26 @@ void FeaturesAPI_BooleanSmash::dump(ModelHighAPI_Dumper& theDumper) const
     aBase->selectionList(FeaturesPlugin_BooleanSmash::OBJECT_LIST_ID());
   AttributeSelectionListPtr aTools =
     aBase->selectionList(FeaturesPlugin_BooleanSmash::TOOL_LIST_ID());
+  AttributeIntegerPtr aVersion =
+    aBase->integer(FeaturesPlugin_BooleanSmash::VERSION_ID());
 
-  theDumper << "(" << aDocName << ", " << anObjects << ", " << aTools << ")" << std::endl;
+  theDumper << "(" << aDocName << ", " << anObjects << ", " << aTools;
+
+  if (aVersion && aVersion->isInitialized())
+    theDumper << ", " << aVersion->value();
+
+  theDumper << ")" << std::endl;
 }
 
 //==================================================================================================
 BooleanSmashPtr addSmash(const std::shared_ptr<ModelAPI_Document>& thePart,
                          const std::list<ModelHighAPI_Selection>& theMainObjects,
-                         const std::list<ModelHighAPI_Selection>& theToolObjects)
+                         const std::list<ModelHighAPI_Selection>& theToolObjects,
+                         const int theVersion)
 {
   std::shared_ptr<ModelAPI_Feature> aFeature = thePart->addFeature(FeaturesAPI_BooleanSmash::ID());
   return BooleanSmashPtr(new FeaturesAPI_BooleanSmash(aFeature,
                                                       theMainObjects,
-                                                      theToolObjects));
+                                                      theToolObjects,
+                                                      theVersion));
 }
