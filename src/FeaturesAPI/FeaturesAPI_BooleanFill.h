@@ -44,7 +44,8 @@ public:
   FEATURESAPI_EXPORT
   FeaturesAPI_BooleanFill(const std::shared_ptr<ModelAPI_Feature>& theFeature,
                           const std::list<ModelHighAPI_Selection>& theMainObjects,
-                          const std::list<ModelHighAPI_Selection>& theToolObjects);
+                          const std::list<ModelHighAPI_Selection>& theToolObjects,
+                          const int theVersion = 0);
 
   /// Destructor.
   FEATURESAPI_EXPORT
@@ -77,6 +78,7 @@ typedef std::shared_ptr<FeaturesAPI_BooleanFill> BooleanFillPtr;
 FEATURESAPI_EXPORT
 BooleanFillPtr addSplit(const std::shared_ptr<ModelAPI_Document>& thePart,
                         const std::list<ModelHighAPI_Selection>& theMainObjects,
-                        const std::list<ModelHighAPI_Selection>& theToolObjects);
+                        const std::list<ModelHighAPI_Selection>& theToolObjects,
+                        const int theVersion = 0);
 
 #endif // FeaturesAPI_BooleanFill_H_
