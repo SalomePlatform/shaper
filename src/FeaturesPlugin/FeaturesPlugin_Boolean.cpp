@@ -575,16 +575,14 @@ void FeaturesPlugin_Boolean::ObjectHierarchy::SplitCompound(const GeomShapePtr& 
   if (aFoundIndex == myParentIndices.end())
     return; // no such shape
 
-  const ListOfShape& aSubs = mySubshapes[aFoundIndex->second].second;
+  theUsed = mySubshapes[aFoundIndex->second].second;
   SetOfShape aSubsSet;
-  aSubsSet.insert(aSubs.begin(), aSubs.end());
+  aSubsSet.insert(theUsed.begin(), theUsed.end());
 
   for (GeomAPI_ShapeIterator anExp(theCompShape); anExp.more(); anExp.next()) {
     GeomShapePtr aCurrent = anExp.current();
     if (aSubsSet.find(aCurrent) == aSubsSet.end())
       theNotUsed.push_back(aCurrent);
-    else
-      theUsed.push_back(aCurrent);
   }
 }
 
