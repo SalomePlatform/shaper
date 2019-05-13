@@ -223,6 +223,14 @@ protected:
       const ObjectHierarchy& theToolsHierarchy,
       std::shared_ptr<GeomAlgoAPI_MakeShapeList> theMakeShapeList);
 
+  /// Store result shape if it is not empty and increase results counter
+  void storeResult(const ListOfShape& theObjects,
+                   const ListOfShape& theTools,
+                   const GeomShapePtr theResultShape,
+                   int& theResultIndex,
+                   std::shared_ptr<GeomAlgoAPI_MakeShapeList> theMakeShapeList,
+                   std::vector<FeaturesPlugin_Tools::ResultBaseAlgo>& theResultBaseAlgoList);
+
   /// Return version of the feature
   int version();
 
