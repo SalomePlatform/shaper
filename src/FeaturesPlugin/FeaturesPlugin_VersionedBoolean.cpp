@@ -121,20 +121,11 @@ bool FeaturesPlugin_VersionedBoolean::processObject(
   std::shared_ptr<GeomAlgoAPI_MakeShape> aBoolAlgo;
   GeomShapePtr aResShape;
 
-  std::list<std::shared_ptr<GeomAPI_Pnt> > aBoundingPoints =
-      GeomAlgoAPI_ShapeTools::getBoundingBox(aListWithObject, 1.0);
-
   // Resize planes.
   ListOfShape aToolsWithPlanes = theTools;
-  for (ListOfShape::const_iterator anIt = thePlanes.begin(); anIt != thePlanes.end(); ++anIt) {
-    GeomShapePtr aPlane = *anIt;
-    GeomShapePtr aTool = GeomAlgoAPI_ShapeTools::fitPlaneToBox(aPlane, aBoundingPoints);
-    std::shared_ptr<GeomAlgoAPI_MakeShapeCustom> aMkShCustom(
-        new GeomAlgoAPI_MakeShapeCustom);
-    aMkShCustom->addModified(aPlane, aTool);
-    aMakeShapeList->appendAlgo(aMkShCustom);
-    aToolsWithPlanes.push_back(aTool);
-  }
+  ListOfShape aPlanesCopy = thePlanes;
+  resizePlanes(aListWithObject, aPlanesCopy, aMakeShapeList);
+  aToolsWithPlanes.insert(aToolsWithPlanes.end(), aPlanesCopy.begin(), aPlanesCopy.end());
 
   if (theBooleanType == GeomAlgoAPI_Tools::BOOL_PARTITION)
     aBoolAlgo.reset(new GeomAlgoAPI_Partition(aListWithObject, aToolsWithPlanes));
@@ -222,21 +213,11 @@ bool FeaturesPlugin_VersionedBoolean::processCompsolid(
 
   std::shared_ptr<GeomAlgoAPI_MakeShapeList> aMakeShapeList(new GeomAlgoAPI_MakeShapeList());
 
-  std::list<std::shared_ptr<GeomAPI_Pnt> > aBoundingPoints =
-      GeomAlgoAPI_ShapeTools::getBoundingBox(aUsedInOperationSolids, 1.0);
-
   // Resize planes.
   ListOfShape aToolsWithPlanes = theTools;
-  for (ListOfShape::const_iterator anIt = thePlanes.begin(); anIt != thePlanes.end(); ++anIt)
-  {
-    GeomShapePtr aPlane = *anIt;
-    GeomShapePtr aTool = GeomAlgoAPI_ShapeTools::fitPlaneToBox(aPlane, aBoundingPoints);
-    std::shared_ptr<GeomAlgoAPI_MakeShapeCustom> aMkShCustom(
-      new GeomAlgoAPI_MakeShapeCustom);
-    aMkShCustom->addModified(aPlane, aTool);
-    aMakeShapeList->appendAlgo(aMkShCustom);
-    aToolsWithPlanes.push_back(aTool);
-  }
+  ListOfShape aPlanesCopy = thePlanes;
+  resizePlanes(aUsedInOperationSolids, aPlanesCopy, aMakeShapeList);
+  aToolsWithPlanes.insert(aToolsWithPlanes.end(), aPlanesCopy.begin(), aPlanesCopy.end());
 
   std::shared_ptr<GeomAlgoAPI_MakeShape> aBoolAlgo;
   if (theBooleanType == GeomAlgoAPI_Tools::BOOL_PARTITION)
@@ -432,6 +413,29 @@ GeomShapePtr FeaturesPlugin_VersionedBoolean::keepUnusedSubsOfCompound(
 }
 
 //=================================================================================================
+void FeaturesPlugin_VersionedBoolean::resizePlanes(
+    const ListOfShape& theObjects,
+    ListOfShape& thePlanes,
+    std::shared_ptr<GeomAlgoAPI_MakeShapeList>& theMakeShapeList)
+{
+  if (thePlanes.empty())
+    return;
+
+  std::list<std::shared_ptr<GeomAPI_Pnt> > aBoundingPoints =
+      GeomAlgoAPI_ShapeTools::getBoundingBox(theObjects, 1.0);
+
+  // Resize planes to fit in bounding box
+  for (ListOfShape::iterator anIt = thePlanes.begin(); anIt != thePlanes.end(); ++anIt) {
+    GeomShapePtr aPlane = *anIt;
+    GeomShapePtr aTool = GeomAlgoAPI_ShapeTools::fitPlaneToBox(aPlane, aBoundingPoints);
+    std::shared_ptr<GeomAlgoAPI_MakeShapeCustom> aMkShCustom(new GeomAlgoAPI_MakeShapeCustom);
+    aMkShCustom->addModified(aPlane, aTool);
+    theMakeShapeList->appendAlgo(aMkShCustom);
+    *anIt = aTool;
+  }
+}
+
+//=================================================================================================
 int FeaturesPlugin_VersionedBoolean::version()
 {
   AttributeIntegerPtr aVersionAttr = integer(VERSION_ID());
@@ -449,7 +453,7 @@ void FeaturesPlugin_VersionedBoolean::ObjectHierarchy::AddObject(const GeomShape
 }
 
 void FeaturesPlugin_VersionedBoolean::ObjectHierarchy::AddParent(const GeomShapePtr& theShape,
-                                                        const GeomShapePtr& theParent)
+                                                                 const GeomShapePtr& theParent)
 {
   myParent[theShape] = theParent;
 
@@ -465,7 +469,7 @@ void FeaturesPlugin_VersionedBoolean::ObjectHierarchy::AddParent(const GeomShape
 }
 
 GeomShapePtr FeaturesPlugin_VersionedBoolean::ObjectHierarchy::Parent(const GeomShapePtr& theShape,
-                                                             bool theMarkProcessed)
+                                                                      bool theMarkProcessed)
 {
   MapShapeToParent::const_iterator aFound = myParent.find(theShape);
   GeomShapePtr aParent;
@@ -507,9 +511,10 @@ void FeaturesPlugin_VersionedBoolean::ObjectHierarchy::ObjectsByType(
 }
 
 
-void FeaturesPlugin_VersionedBoolean::ObjectHierarchy::SplitCompound(const GeomShapePtr& theCompShape,
-                                                            ListOfShape& theUsed,
-                                                            ListOfShape& theNotUsed) const
+void FeaturesPlugin_VersionedBoolean::ObjectHierarchy::SplitCompound(
+    const GeomShapePtr& theCompShape,
+    ListOfShape& theUsed,
+    ListOfShape& theNotUsed) const
 {
   theUsed.clear();
   theNotUsed.clear();
@@ -583,7 +588,7 @@ GeomShapePtr FeaturesPlugin_VersionedBoolean::ObjectHierarchy::collectUnusedSubs
     } else {
       GeomShapePtr aCompound = collectUnusedSubs(aCurrent, theUsed);
       if (aCompound) {
-        GeomAlgoAPI_ShapeBuilder::add(theTopLevelCompound, aCompound);
+        GeomAlgoAPI_ShapeBuilder::add(aResult, aCompound);
         isResultEmpty = false;
       }
     }
@@ -592,12 +597,14 @@ GeomShapePtr FeaturesPlugin_VersionedBoolean::ObjectHierarchy::collectUnusedSubs
 }
 
 
-FeaturesPlugin_VersionedBoolean::ObjectHierarchy::Iterator FeaturesPlugin_VersionedBoolean::ObjectHierarchy::Begin()
+FeaturesPlugin_VersionedBoolean::ObjectHierarchy::Iterator
+FeaturesPlugin_VersionedBoolean::ObjectHierarchy::Begin()
 {
   return Iterator(this);
 }
 
-FeaturesPlugin_VersionedBoolean::ObjectHierarchy::Iterator FeaturesPlugin_VersionedBoolean::ObjectHierarchy::End()
+FeaturesPlugin_VersionedBoolean::ObjectHierarchy::Iterator
+FeaturesPlugin_VersionedBoolean::ObjectHierarchy::End()
 {
   return Iterator(this, false);
 }
@@ -620,12 +627,14 @@ void FeaturesPlugin_VersionedBoolean::ObjectHierarchy::Iterator::SkipAlreadyProc
     ++myObject;
 }
 
-bool FeaturesPlugin_VersionedBoolean::ObjectHierarchy::Iterator::operator==(const Iterator& theOther) const
+bool FeaturesPlugin_VersionedBoolean::ObjectHierarchy::Iterator::operator==(
+    const Iterator& theOther) const
 {
   return myObject == theOther.myObject;
 }
 
-bool FeaturesPlugin_VersionedBoolean::ObjectHierarchy::Iterator::operator!=(const Iterator& theOther) const
+bool FeaturesPlugin_VersionedBoolean::ObjectHierarchy::Iterator::operator!=(
+    const Iterator& theOther) const
 {
   return !operator==(theOther);
 }

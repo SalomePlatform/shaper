@@ -53,8 +53,10 @@ protected:
   /// The version is initialized for newly created features,
   /// not read from previously stored document.
   void initVersion(const int theVersion,
-                   const std::shared_ptr<ModelAPI_Attribute> theObjectsAttr,
-                   const std::shared_ptr<ModelAPI_Attribute> theToolsAttr);
+                   const std::shared_ptr<ModelAPI_Attribute> theObjectsAttr
+                            = std::shared_ptr<ModelAPI_Attribute>(),
+                   const std::shared_ptr<ModelAPI_Attribute> theToolsAttr
+                            = std::shared_ptr<ModelAPI_Attribute>());
 
   /// Auxiliary class to store hierarchy of Boolean operation objects/tools
   /// and their parent shapes (compounds or compsolids)
@@ -178,6 +180,11 @@ protected:
                        std::vector<FeaturesPlugin_Tools::ResultBaseAlgo>& theResultBaseAlgoList,
                        ListOfShape& theResultShapesList,
                        GeomShapePtr theResulCompound = GeomShapePtr());
+
+  /// Resize planes to fit them to the bounding box of the given lins of objects.
+  static void resizePlanes(const ListOfShape& theObjects,
+                           ListOfShape& thePlanes,
+                           std::shared_ptr<GeomAlgoAPI_MakeShapeList>& theMakeShapeList);
 
   /// Process unused sub-shapes of compounds.
   /// Keep the compound hierarchy, but merge top-level compounds
