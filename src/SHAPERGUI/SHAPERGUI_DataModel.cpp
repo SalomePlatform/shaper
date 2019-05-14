@@ -197,32 +197,34 @@ bool SHAPERGUI_DataModel::dumpPython(const QString& thePath, CAM_Study* theStudy
     ModelAPI_Session::get()->finishOperation();
 
     if (QFile::exists(aFileName.c_str())) {
-      if (isMultiFile) {
         QFile aInFile(aFileName.c_str());
-        if (!aInFile.open(QIODevice::ReadOnly | QIODevice::Text))
-          return false;
-        QTextStream aText(&aInFile);
-        QString aTrace(aText.readAll());
-        aInFile.close();
+      if (!aInFile.open(QIODevice::ReadOnly | QIODevice::Text))
+        return false;
+      QTextStream aText(&aInFile);
+      QString aTrace(aText.readAll());
+      aInFile.close();
 
+      if (isMultiFile) {
         QStringList aBuffer;
-        aBuffer.push_back(QString("def RebuildData( theStudy ):"));
+        aBuffer.push_back(QString("def RebuildData():"));
         QStringList aList(aTrace.split("\n"));
         foreach(QString aStr, aList) {
           QString s = "  " + aStr;
           aBuffer.push_back(s);
         }
         aTrace = aBuffer.join("\n");
-
-        QFile aOutFile(aFileName.c_str());
-        if (!aOutFile.open(QIODevice::WriteOnly | QIODevice::Text | QIODevice::Truncate))
-          return false;
-
-        QTextStream aOut(&aOutFile);
-        aOut << aTrace.toStdString().c_str() << "\n";
-        aOut.flush();
-        aOutFile.close();
       }
+
+      QFile aOutFile(aFileName.c_str());
+      // binary for SALOME, issue 16931
+      if (!aOutFile.open(QIODevice::WriteOnly | QIODevice::Truncate))
+        return false;
+
+      QTextStream aOut(&aOutFile);
+      aOut << aTrace.toStdString().c_str() << "\n";
+      aOut.flush();
+      aOutFile.close();
+
       theListOfFiles.append(aTmpDir.c_str());
       theListOfFiles.append(DUMP_NAME);
       return true;
