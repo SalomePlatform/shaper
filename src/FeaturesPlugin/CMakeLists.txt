@@ -28,6 +28,7 @@ SET(PROJECT_HEADERS
     FeaturesPlugin_Revolution.h
     FeaturesPlugin_Rotation.h
     FeaturesPlugin_Translation.h
+    FeaturesPlugin_VersionedBoolean.h
     FeaturesPlugin_Boolean.h
     FeaturesPlugin_BooleanCut.h
     FeaturesPlugin_BooleanFuse.h
@@ -67,6 +68,7 @@ SET(PROJECT_SOURCES
     FeaturesPlugin_Revolution.cpp
     FeaturesPlugin_Rotation.cpp
     FeaturesPlugin_Translation.cpp
+    FeaturesPlugin_VersionedBoolean.cpp
     FeaturesPlugin_Boolean.cpp
     FeaturesPlugin_BooleanCut.cpp
     FeaturesPlugin_BooleanFuse.cpp

@@ -47,7 +47,7 @@ FeaturesPlugin_BooleanCut::FeaturesPlugin_BooleanCut()
 void FeaturesPlugin_BooleanCut::initAttributes()
 {
   FeaturesPlugin_Boolean::initAttributes();
-  initVersion(THE_CUT_VERSION_1);
+  initVersion(THE_CUT_VERSION_1, selectionList(OBJECT_LIST_ID()), selectionList(TOOL_LIST_ID()));
 }
 
 //==================================================================================================
