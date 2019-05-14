@@ -54,7 +54,7 @@ void FeaturesPlugin_BooleanCommon::initAttributes()
   data()->addAttribute(OBJECT_LIST_ID(), ModelAPI_AttributeSelectionList::typeId());
   data()->addAttribute(TOOL_LIST_ID(), ModelAPI_AttributeSelectionList::typeId());
 
-  initVersion(THE_COMMON_VERSION_1);
+  initVersion(THE_COMMON_VERSION_1, selectionList(OBJECT_LIST_ID()), selectionList(TOOL_LIST_ID()));
 }
 
 //==================================================================================================

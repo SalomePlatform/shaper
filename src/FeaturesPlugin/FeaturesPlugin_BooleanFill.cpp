@@ -48,11 +48,11 @@ FeaturesPlugin_BooleanFill::FeaturesPlugin_BooleanFill()
 {
 }
 
-//==================================================================================================
+//=================================================================================================
 void FeaturesPlugin_BooleanFill::initAttributes()
 {
   FeaturesPlugin_Boolean::initAttributes();
-  initVersion(THE_SPLIT_VERSION_1);
+  initVersion(THE_SPLIT_VERSION_1, selectionList(OBJECT_LIST_ID()), selectionList(TOOL_LIST_ID()));
 }
 
 //=================================================================================================

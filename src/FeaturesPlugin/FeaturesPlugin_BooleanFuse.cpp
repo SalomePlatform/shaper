@@ -62,7 +62,7 @@ void FeaturesPlugin_BooleanFuse::initAttributes()
   ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(), OBJECT_LIST_ID());
   ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(), TOOL_LIST_ID());
 
-  initVersion(THE_FUSE_VERSION_1);
+  initVersion(THE_FUSE_VERSION_1, selectionList(OBJECT_LIST_ID()), selectionList(TOOL_LIST_ID()));
 }
 
 //==================================================================================================
