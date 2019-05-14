@@ -17,6 +17,7 @@
 # See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 #
 
+from GeomAPI import GeomAPI_Shape
 from SketchAPI import *
 
 from salome.shaper import model
@@ -77,16 +78,33 @@ Compound_1.result().subResult(0).subResult(0).setColor(0, 170, 0)
 Compound_1.result().subResult(0).subResult(1).setColor(0, 170, 0)
 Compound_1.result().subResult(1).subResult(0).setColor(0, 255, 0)
 Compound_1.result().subResult(1).subResult(1).setColor(0, 255, 0)
-Partition_1 = model.addPartition(Part_1_doc, [model.selection("SOLID", "LinearCopy_2_1_1_1"), model.selection("COMPOUND", "Compound_1_1_2")])
+Partition_1_objects = [model.selection("SOLID", "LinearCopy_2_1_1_1"), model.selection("SOLID", "Compound_1_1_2_2"), model.selection("SOLID", "LinearCopy_2_1_2_2"), model.selection("SOLID", "Compound_1_1_1_2")]
+Partition_1 = model.addPartition(Part_1_doc, Partition_1_objects, 20190506)
 model.do()
-model.end()
-
-from GeomAPI import GeomAPI_Shape
 
 model.testNbResults(Partition_1, 1)
-model.testNbSubResults(Partition_1, [10])
+model.testNbSubResults(Partition_1, [6])
+model.testNbSubShapes(Partition_1, GeomAPI_Shape.SOLID, [12])
+model.testNbSubShapes(Partition_1, GeomAPI_Shape.FACE, [70])
+model.testNbSubShapes(Partition_1, GeomAPI_Shape.EDGE, [276])
+model.testNbSubShapes(Partition_1, GeomAPI_Shape.VERTEX, [552])
+model.testResultsVolumes(Partition_1, [38683.4768556698836619])
+
+# change Partition objects
+Partition_1_objects = [model.selection("SOLID", "LinearCopy_2_1_1_1"), model.selection("SOLID", "Compound_1_1_2_2"), model.selection("SOLID", "LinearCopy_2_1_2_2")]
+Partition_1.setBase(Partition_1_objects)
+model.do()
+
+model.testHaveNamingSubshapes(Partition_1, model, Part_1_doc)
+
+model.end()
+
+model.testNbResults(Partition_1, 1)
+model.testNbSubResults(Partition_1, [6])
 model.testNbSubShapes(Partition_1, GeomAPI_Shape.SOLID, [10])
-model.testNbSubShapes(Partition_1, GeomAPI_Shape.FACE, [77])
-model.testNbSubShapes(Partition_1, GeomAPI_Shape.EDGE, [328])
-model.testNbSubShapes(Partition_1, GeomAPI_Shape.VERTEX, [656])
-model.testResultsVolumes(Partition_1, [9335.251534206097858259454369545])
+model.testNbSubShapes(Partition_1, GeomAPI_Shape.FACE, [52])
+model.testNbSubShapes(Partition_1, GeomAPI_Shape.EDGE, [192])
+model.testNbSubShapes(Partition_1, GeomAPI_Shape.VERTEX, [384])
+model.testResultsVolumes(Partition_1, [39958.774342237426])
+
+assert(model.checkPythonDump())

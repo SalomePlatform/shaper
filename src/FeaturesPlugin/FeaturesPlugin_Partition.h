@@ -20,7 +20,7 @@
 #ifndef FeaturesPlugin_Partition_H_
 #define FeaturesPlugin_Partition_H_
 
-#include "FeaturesPlugin.h"
+#include "FeaturesPlugin_VersionedBoolean.h"
 #include <ModelAPI_Feature.h>
 
 #include <GeomAlgoAPI_Partition.h>
@@ -29,7 +29,7 @@
 /// \ingroup Plugins
 /// \brief Feature for applying of Partition operations on Shapes. Partition makes conjunctional
 /// faces of solids as shared. The result of partitions is a compsolid.
-class FeaturesPlugin_Partition : public ModelAPI_Feature
+class FeaturesPlugin_Partition : public FeaturesPlugin_VersionedBoolean
 {
 public:
   /// Feature kind.
@@ -69,6 +69,15 @@ private:
                    const GeomShapePtr theResultShape,
                    const std::shared_ptr<GeomAlgoAPI_MakeShape> theMakeShape,
                    const int theIndex = 0);
+
+  /// Cut all of unused subs of compsolids by the full compsolid of the first selected object,
+  /// and vice versa, cut all objects of Partition by not used subs of the first selected object.
+  /// Store results of operation to the separated lists of shapes.
+  bool cutSubs(ObjectHierarchy& theHierarchy,
+               ListOfShape& theUsed,
+               ListOfShape& theNotUsed,
+               std::shared_ptr<GeomAlgoAPI_MakeShapeList>& theMakeShapeList,
+               std::string& theError);
 };
 
 #endif

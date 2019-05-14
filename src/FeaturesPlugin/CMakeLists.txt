@@ -486,5 +486,10 @@ ADD_UNIT_TESTS(TestExtrusion.py
                TestBooleanSplit_MultiLevelCompound_v0_2.py
                TestBooleanSplit_MultiLevelCompound_v20190506_1.py
                TestBooleanSplit_MultiLevelCompound_v20190506_2.py
-               TestPartition_MultiLevelCompound0.py
+               TestPartition_MultiLevelCompound_v0_1.py
+               TestPartition_MultiLevelCompound_v0_2.py
+               TestPartition_MultiLevelCompound_v0_3.py
+               TestPartition_MultiLevelCompound_v20190506_1.py
+               TestPartition_MultiLevelCompound_v20190506_2.py
+               TestPartition_MultiLevelCompound_v20190506_3.py
 )

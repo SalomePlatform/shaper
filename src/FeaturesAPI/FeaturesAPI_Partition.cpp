@@ -30,11 +30,14 @@ FeaturesAPI_Partition::FeaturesAPI_Partition(const std::shared_ptr<ModelAPI_Feat
 }
 
 //==================================================================================================
-FeaturesAPI_Partition::FeaturesAPI_Partition(const std::shared_ptr<ModelAPI_Feature>& theFeature,
-                                          const std::list<ModelHighAPI_Selection>& theBaseObjects)
+FeaturesAPI_Partition::FeaturesAPI_Partition(
+    const std::shared_ptr<ModelAPI_Feature>& theFeature,
+    const std::list<ModelHighAPI_Selection>& theBaseObjects,
+    const int theVersion)
 : ModelHighAPI_Interface(theFeature)
 {
   if(initialize()) {
+    fillAttribute(theVersion, theFeature->integer(FeaturesPlugin_Partition::VERSION_ID()));
     setBase(theBaseObjects);
   }
 }
@@ -61,15 +64,22 @@ void FeaturesAPI_Partition::dump(ModelHighAPI_Dumper& theDumper) const
 
   AttributeSelectionListPtr anAttrObjects =
     aBase->selectionList(FeaturesPlugin_Partition::BASE_OBJECTS_ID());
+  AttributeIntegerPtr aVersion =
+    aBase->integer(FeaturesPlugin_Partition::VERSION_ID());
 
-  theDumper << aBase << " = model.addPartition(" << aDocName <<
-    ", " << anAttrObjects << ")" << std::endl;
+  theDumper << aBase << " = model.addPartition(" << aDocName << ", " << anAttrObjects;
+
+  if (aVersion && aVersion->isInitialized())
+    theDumper << ", " << aVersion->value();
+
+  theDumper << ")" << std::endl;
 }
 
 //==================================================================================================
 PartitionPtr addPartition(const std::shared_ptr<ModelAPI_Document>& thePart,
-                          const std::list<ModelHighAPI_Selection>& theBaseObjects)
+                          const std::list<ModelHighAPI_Selection>& theBaseObjects,
+                          const int theVersion)
 {
   std::shared_ptr<ModelAPI_Feature> aFeature = thePart->addFeature(FeaturesAPI_Partition::ID());
-  return PartitionPtr(new FeaturesAPI_Partition(aFeature, theBaseObjects));
+  return PartitionPtr(new FeaturesAPI_Partition(aFeature, theBaseObjects, theVersion));
 }
