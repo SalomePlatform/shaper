@@ -127,7 +127,8 @@ void FeaturesPlugin_Union::execute()
   ListOfShape anObjectsList = anObjects.Objects();
   aResultBody->storeModified(anObjectsList.front(), aShape);
 
-  for(ListOfShape::const_iterator anIter = anObjectsList.begin(); anIter != anObjectsList.end(); ++anIter) {
+  for(ListOfShape::const_iterator anIter = anObjectsList.begin();
+      anIter != anObjectsList.end(); ++anIter) {
     aResultBody->loadModifiedShapes(aMakeShapeList, *anIter, GeomAPI_Shape::EDGE);
     aResultBody->loadModifiedShapes(aMakeShapeList, *anIter, GeomAPI_Shape::FACE);
     //aResultBody->loadDeletedShapes(&aMakeShapeList, *anIter, GeomAPI_Shape::FACE, aDeletedTag);
