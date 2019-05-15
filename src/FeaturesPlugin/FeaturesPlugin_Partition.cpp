@@ -258,12 +258,15 @@ bool FeaturesPlugin_Partition::cutSubs(
 
   // cut subs
   bool isOk = true;
-  for (; anIt != theHierarchy.End() && isOk; ++anIt) {
+  for (++anIt; anIt != theHierarchy.End() && isOk; ++anIt) {
     ListOfShape aUsed, aNotUsed;
 
     GeomShapePtr aParent = theHierarchy.Parent(*anIt);
-    if (aParent && aParent->shapeType() == GeomAPI_Shape::COMPSOLID)
+    if (aParent && aParent->shapeType() <= GeomAPI_Shape::COMPSOLID) {
       theHierarchy.SplitCompound(aParent, aUsed, aNotUsed);
+      if (aParent->shapeType() == GeomAPI_Shape::COMPOUND)
+        aNotUsed.clear(); // do not cut unused subshapes of compound
+    }
     else
       aUsed.push_back(*anIt);
 
