@@ -31,10 +31,12 @@ FeaturesAPI_Union::FeaturesAPI_Union(const std::shared_ptr<ModelAPI_Feature>& th
 
 //================================================================================================
 FeaturesAPI_Union::FeaturesAPI_Union(const std::shared_ptr<ModelAPI_Feature>& theFeature,
-                                     const std::list<ModelHighAPI_Selection>& theBaseObjects)
+                                     const std::list<ModelHighAPI_Selection>& theBaseObjects,
+                                     const int theVersion)
 : ModelHighAPI_Interface(theFeature)
 {
   if(initialize()) {
+    fillAttribute(theVersion, theFeature->integer(FeaturesPlugin_VersionedBoolean::VERSION_ID()));
     setBase(theBaseObjects);
   }
 }
@@ -61,15 +63,22 @@ void FeaturesAPI_Union::dump(ModelHighAPI_Dumper& theDumper) const
 
   AttributeSelectionListPtr anAttrObjects =
     aBase->selectionList(FeaturesPlugin_Union::BASE_OBJECTS_ID());
+  AttributeIntegerPtr aVersion =
+    aBase->integer(FeaturesPlugin_Union::VERSION_ID());
 
-  theDumper << aBase << " = model.addUnion(" << aDocName <<
-    ", " << anAttrObjects << ")" << std::endl;
+  theDumper << aBase << " = model.addUnion(" << aDocName << ", " << anAttrObjects;
+
+  if (aVersion && aVersion->isInitialized())
+    theDumper << ", " << aVersion->value();
+
+  theDumper << ")" << std::endl;
 }
 
 //==================================================================================================
 UnionPtr addUnion(const std::shared_ptr<ModelAPI_Document>& thePart,
-                  const std::list<ModelHighAPI_Selection>& theBaseObjects)
+                  const std::list<ModelHighAPI_Selection>& theBaseObjects,
+                  const int theVersion)
 {
   std::shared_ptr<ModelAPI_Feature> aFeature = thePart->addFeature(FeaturesAPI_Union::ID());
-  return UnionPtr(new FeaturesAPI_Union(aFeature, theBaseObjects));
+  return UnionPtr(new FeaturesAPI_Union(aFeature, theBaseObjects, theVersion));
 }

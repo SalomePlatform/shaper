@@ -38,12 +38,37 @@
 #include <GeomAlgoAPI_ShapeBuilder.h>
 #include <GeomAlgoAPI_ShapeTools.h>
 #include <GeomAlgoAPI_Tools.h>
+#include <GeomAlgoAPI_UnifySameDomain.h>
 #include <GeomAPI_Face.h>
 #include <GeomAPI_ShapeExplorer.h>
 #include <GeomAPI_ShapeIterator.h>
 
 #include <algorithm>
 #include <map>
+
+static void performBoolean(const GeomAlgoAPI_Tools::BOPType theBooleanType,
+                           GeomMakeShapePtr& theBooleanAlgo,
+                           const ListOfShape& theObjects,
+                           const ListOfShape& theTools)
+{
+  if (theBooleanType == GeomAlgoAPI_Tools::BOOL_PARTITION)
+    theBooleanAlgo.reset(new GeomAlgoAPI_Partition(theObjects, theTools));
+  else {
+    // separate processing of FUSE, if only objects are given
+    if (theBooleanType == GeomAlgoAPI_Tools::BOOL_FUSE && theTools.empty()) {
+      if (theObjects.front()->shapeType() == GeomAPI_Shape::FACE)
+        theBooleanAlgo.reset(new GeomAlgoAPI_UnifySameDomain(theObjects));
+      else {
+        ListOfShape anObjects = theObjects;
+        ListOfShape aTools;
+        aTools.splice(aTools.begin(), anObjects, anObjects.begin());
+        theBooleanAlgo.reset(new GeomAlgoAPI_Boolean(anObjects, aTools, theBooleanType));
+      }
+    }
+    else
+      theBooleanAlgo.reset(new GeomAlgoAPI_Boolean(theObjects, theTools, theBooleanType));
+  }
+}
 
 //=================================================================================================
 void FeaturesPlugin_VersionedBoolean::initVersion(const int theVersion,
@@ -198,7 +223,7 @@ bool FeaturesPlugin_VersionedBoolean::processObject(
 //=================================================================================================
 bool FeaturesPlugin_VersionedBoolean::processCompsolid(
     const GeomAlgoAPI_Tools::BOPType theBooleanType,
-    const ObjectHierarchy& theCompsolidHierarchy,
+    ObjectHierarchy& theCompsolidHierarchy,
     const GeomShapePtr& theCompsolid,
     const ListOfShape& theTools,
     const ListOfShape& thePlanes,
@@ -220,12 +245,7 @@ bool FeaturesPlugin_VersionedBoolean::processCompsolid(
   aToolsWithPlanes.insert(aToolsWithPlanes.end(), aPlanesCopy.begin(), aPlanesCopy.end());
 
   std::shared_ptr<GeomAlgoAPI_MakeShape> aBoolAlgo;
-  if (theBooleanType == GeomAlgoAPI_Tools::BOOL_PARTITION)
-    aBoolAlgo.reset(new GeomAlgoAPI_Partition(aUsedInOperationSolids, aToolsWithPlanes));
-  else
-    aBoolAlgo.reset(new GeomAlgoAPI_Boolean(aUsedInOperationSolids,
-                                            aToolsWithPlanes,
-                                            theBooleanType));
+  performBoolean(theBooleanType, aBoolAlgo, aUsedInOperationSolids, aToolsWithPlanes);
 
   // Checking that the algorithm worked properly.
   std::string anError;
@@ -239,6 +259,8 @@ bool FeaturesPlugin_VersionedBoolean::processCompsolid(
 
   // Add result to not used solids from compsolid.
   if (!aNotUsedSolids.empty()) {
+    theCompsolidHierarchy.MarkProcessed(aNotUsedSolids);
+
     ListOfShape aShapesToAdd = aNotUsedSolids;
     aShapesToAdd.push_back(aBoolAlgo->shape());
     std::shared_ptr<GeomAlgoAPI_PaveFiller> aFillerAlgo(
@@ -296,7 +318,7 @@ bool FeaturesPlugin_VersionedBoolean::processCompsolid(
 //=================================================================================================
 bool FeaturesPlugin_VersionedBoolean::processCompound(
     const GeomAlgoAPI_Tools::BOPType theBooleanType,
-    const ObjectHierarchy& theCompoundHierarchy,
+    ObjectHierarchy& theCompoundHierarchy,
     const GeomShapePtr& theCompound,
     const ListOfShape& theTools,
     int& theResultIndex,
@@ -314,10 +336,8 @@ bool FeaturesPlugin_VersionedBoolean::processCompound(
   }
 
   std::shared_ptr<GeomAlgoAPI_MakeShapeList> aMakeShapeList(new GeomAlgoAPI_MakeShapeList());
-  std::shared_ptr<GeomAlgoAPI_Boolean> aBoolAlgo(
-      new GeomAlgoAPI_Boolean(aUsedInOperationShapes,
-                              theTools,
-                              theBooleanType));
+  std::shared_ptr<GeomAlgoAPI_MakeShape> aBoolAlgo;
+  performBoolean(theBooleanType, aBoolAlgo, aUsedInOperationShapes, theTools);
 
   // Checking that the algorithm worked properly.
   std::string anError;
@@ -331,6 +351,8 @@ bool FeaturesPlugin_VersionedBoolean::processCompound(
 
   // Add result to not used shape from compound.
   if (!aNotUsedShapes.empty()) {
+    theCompoundHierarchy.MarkProcessed(aNotUsedShapes);
+
     ListOfShape aShapesForResult = aNotUsedShapes;
     if (aResultShape->shapeType() == GeomAPI_Shape::COMPOUND) {
       for (GeomAPI_ShapeIterator aResultIt(aResultShape); aResultIt.more(); aResultIt.next()) {
@@ -486,6 +508,17 @@ GeomShapePtr FeaturesPlugin_VersionedBoolean::ObjectHierarchy::Parent(const Geom
   return aParent;
 }
 
+void FeaturesPlugin_VersionedBoolean::ObjectHierarchy::MarkProcessed(const GeomShapePtr& theShape)
+{
+  myProcessedObjects.insert(theShape);
+}
+
+void FeaturesPlugin_VersionedBoolean::ObjectHierarchy::MarkProcessed(const ListOfShape& theShapes)
+{
+  for (ListOfShape::const_iterator anIt = theShapes.begin(); anIt != theShapes.end(); ++anIt)
+    MarkProcessed(*anIt);
+}
+
 void FeaturesPlugin_VersionedBoolean::ObjectHierarchy::ObjectsByType(
     ListOfShape& theShapesByType,
     ListOfShape& theOtherShapes,
@@ -542,7 +575,7 @@ bool FeaturesPlugin_VersionedBoolean::ObjectHierarchy::IsEmpty() const
 void FeaturesPlugin_VersionedBoolean::ObjectHierarchy::CompoundsOfUnusedObjects(
     ListOfShape& theDestination) const
 {
-  SetOfShape aUsedObjects;
+  SetOfShape aUsedObjects = myProcessedObjects;
   aUsedObjects.insert(myObjects.begin(), myObjects.end());
 
   for (std::vector<ShapeAndSubshapes>::const_iterator anIt = mySubshapes.begin();

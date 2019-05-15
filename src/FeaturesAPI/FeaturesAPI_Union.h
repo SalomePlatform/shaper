@@ -43,7 +43,8 @@ public:
   /// Constructor with values.
   FEATURESAPI_EXPORT
   explicit FeaturesAPI_Union(const std::shared_ptr<ModelAPI_Feature>& theFeature,
-                             const std::list<ModelHighAPI_Selection>& theBaseObjects);
+                             const std::list<ModelHighAPI_Selection>& theBaseObjects,
+                             const int theVersion = 0);
 
   /// Destructor.
   FEATURESAPI_EXPORT
@@ -69,6 +70,7 @@ typedef std::shared_ptr<FeaturesAPI_Union> UnionPtr;
 /// \brief Create Union feature.
 FEATURESAPI_EXPORT
 UnionPtr addUnion(const std::shared_ptr<ModelAPI_Document>& thePart,
-                  const std::list<ModelHighAPI_Selection>& theBaseObjects);
+                  const std::list<ModelHighAPI_Selection>& theBaseObjects,
+                  const int theVersion = 0);
 
 #endif // FeaturesAPI_Union_H_

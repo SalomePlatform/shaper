@@ -492,4 +492,7 @@ ADD_UNIT_TESTS(TestExtrusion.py
                TestPartition_MultiLevelCompound_v20190506_1.py
                TestPartition_MultiLevelCompound_v20190506_2.py
                TestPartition_MultiLevelCompound_v20190506_3.py
+               TestUnion_MultiLevelCompound_v0.py
+               TestUnion_MultiLevelCompound_v20190506.py
+               TestUnionFaces_v20190506.py
 )

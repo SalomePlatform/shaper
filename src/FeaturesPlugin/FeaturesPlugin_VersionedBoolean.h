@@ -87,6 +87,11 @@ protected:
     /// By default, the parent and all its subshapes are marked as processed for further skip.
     GeomShapePtr Parent(const GeomShapePtr& theShape, bool theMarkProcessed = true);
 
+    /// Marke the shape as already processed
+    void MarkProcessed(const GeomShapePtr& theShape);
+    /// Marke list ofshapes as already processed
+    void MarkProcessed(const ListOfShape& theShapes);
+
     /// Split compound/compsolid shape for subshapes selected for Boolean operation and the other.
     void SplitCompound(const GeomShapePtr& theCompShape,
                        ListOfShape& theUsed,
@@ -159,7 +164,7 @@ protected:
   /// is added to this compound, and corresponding ResultBody is not generated.
   /// \return \c false if something went wrong
   bool processCompsolid(const GeomAlgoAPI_Tools::BOPType theBooleanType,
-                        const ObjectHierarchy& theCompsolidHierarchy,
+                        ObjectHierarchy& theCompsolidHierarchy,
                         const GeomShapePtr& theCompsolid,
                         const ListOfShape& theTools,
                         const ListOfShape& thePlanes,
@@ -173,7 +178,7 @@ protected:
   /// is added to this compound, and corresponding ResultBody is not generated.
   /// \return \c false if something went wrong
   bool processCompound(const GeomAlgoAPI_Tools::BOPType theBooleanType,
-                       const ObjectHierarchy& theCompoundHierarchy,
+                       ObjectHierarchy& theCompoundHierarchy,
                        const GeomShapePtr& theCompound,
                        const ListOfShape& theTools,
                        int& theResultIndex,
