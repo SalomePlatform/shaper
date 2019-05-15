@@ -245,7 +245,7 @@ bool FeaturesPlugin_Partition::cutSubs(
   // compose a set of tools for the CUT operation:
   // find the list of unused subs of the first argument or use itself
   ListOfShape aToolsForUsed, aToolsForUnused;
-  GeomShapePtr aFirstArgument = theHierarchy.Parent(*anIt);
+  GeomShapePtr aFirstArgument = theHierarchy.Parent(*anIt, false);
   if (aFirstArgument && aFirstArgument->shapeType() == GeomAPI_Shape::COMPSOLID) {
     theHierarchy.SplitCompound(aFirstArgument, theUsed, aToolsForUsed);
     theNotUsed = aToolsForUsed;
@@ -261,11 +261,10 @@ bool FeaturesPlugin_Partition::cutSubs(
   for (++anIt; anIt != theHierarchy.End() && isOk; ++anIt) {
     ListOfShape aUsed, aNotUsed;
 
-    GeomShapePtr aParent = theHierarchy.Parent(*anIt);
-    if (aParent && aParent->shapeType() <= GeomAPI_Shape::COMPSOLID) {
+    GeomShapePtr aParent = theHierarchy.Parent(*anIt, false);
+    if (aParent && aParent->shapeType() == GeomAPI_Shape::COMPSOLID) {
+      aParent = theHierarchy.Parent(*anIt); // get parent once again to mark its subs as processed
       theHierarchy.SplitCompound(aParent, aUsed, aNotUsed);
-      if (aParent->shapeType() == GeomAPI_Shape::COMPOUND)
-        aNotUsed.clear(); // do not cut unused subshapes of compound
     }
     else
       aUsed.push_back(*anIt);
