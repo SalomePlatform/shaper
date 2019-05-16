@@ -1,5 +1,5 @@
 <plugin>
-  <workbench id="Features" document="Part">
+  <workbench id="Features">
     <group id="Exchange">
       <feature
         id="ExportToGEOM"

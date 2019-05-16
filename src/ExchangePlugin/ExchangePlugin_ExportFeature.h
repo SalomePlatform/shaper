@@ -105,8 +105,9 @@ public:
   EXCHANGEPLUGIN_EXPORT virtual void execute();
 
   /// Reimplemented from ModelAPI_Feature::isMacro(). Returns false.
-  // Not a macro. Otherwise, the feature will be deleted after being executed
-  EXCHANGEPLUGIN_EXPORT virtual bool isMacro() const { return false; }
+  // It is macro for not-XAO export. For XAO the feature is kept invisible in the tree
+  // for the export to GEOM functionality correct working.
+  EXCHANGEPLUGIN_EXPORT virtual bool isMacro() const;
 
   /// Reimplemented from ModelAPI_Feature::isPreviewNeeded(). Returns false.
   EXCHANGEPLUGIN_EXPORT virtual bool isPreviewNeeded() const { return false; }
