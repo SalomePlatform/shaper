@@ -44,6 +44,9 @@ Field_3 = model.addField(Part_1_doc, 1, "STRING", 1, ["Comp 1"], [model.selectio
 Field_3.addStep(0, 0, [[""], ["box"]])
 
 Export_1 = model.exportToXAO(Part_1_doc, tmp_file1)
-assert(Export_1.feature().error() == "")
-
+# due to the issue 2530, the export feature is removed after execution, so, if export was performed correctly,
+# the feature must become invalid
+#assert(Export_1.feature().error() == "")
+assert(not Export_1.feature().data().isValid())
+assert(os.path.isfile(tmp_file1))
 model.end()
