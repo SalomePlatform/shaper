@@ -20,17 +20,13 @@
 #ifndef FeaturesPlugin_Boolean_H_
 #define FeaturesPlugin_Boolean_H_
 
-#include "FeaturesPlugin.h"
-
-#include <GeomAlgoAPI_MakeShape.h>
-
-#include <ModelAPI_Feature.h>
+#include "FeaturesPlugin_VersionedBoolean.h"
 
 /// \class FeaturesPlugin_Boolean
 /// \ingroup Plugins
 /// \brief Feature for applying of Boolean operations on Solids.
 /// Supports four kinds of Boolean operations: Cut, Fuse, Common and Smash.
-class FeaturesPlugin_Boolean : public ModelAPI_Feature
+class FeaturesPlugin_Boolean : public FeaturesPlugin_VersionedBoolean
 {
 public:
   enum OperationType {
@@ -72,6 +68,14 @@ protected:
                     const ListOfShape& theTools,
                     const std::shared_ptr<GeomAPI_Shape> theResultShape,
                     const GeomMakeShapePtr& theMakeShape);
+
+  /// Store result shape if it is not empty and increase results counter
+  void storeResult(const ListOfShape& theObjects,
+                   const ListOfShape& theTools,
+                   const GeomShapePtr theResultShape,
+                   int& theResultIndex,
+                   std::shared_ptr<GeomAlgoAPI_MakeShapeList> theMakeShapeList,
+                   std::vector<FeaturesPlugin_Tools::ResultBaseAlgo>& theResultBaseAlgoList);
 
 private:
   OperationType myOperationType;

@@ -30,7 +30,7 @@
 //=================================================================================================
 GeomAlgoAPI_Boolean::GeomAlgoAPI_Boolean(const GeomShapePtr theObject,
                                          const GeomShapePtr theTool,
-                                         const OperationType theOperationType)
+                                         const GeomAlgoAPI_Tools::BOPType theOperationType)
 {
   ListOfShape aListWithObject, aListWithTool;
   aListWithObject.push_back(theObject);
@@ -41,7 +41,7 @@ GeomAlgoAPI_Boolean::GeomAlgoAPI_Boolean(const GeomShapePtr theObject,
 //=================================================================================================
 GeomAlgoAPI_Boolean::GeomAlgoAPI_Boolean(const GeomShapePtr theObject,
                                          const ListOfShape& theTools,
-                                         const OperationType theOperationType)
+                                         const GeomAlgoAPI_Tools::BOPType theOperationType)
 {
   ListOfShape aListWithObject;
   aListWithObject.push_back(theObject);
@@ -51,7 +51,7 @@ GeomAlgoAPI_Boolean::GeomAlgoAPI_Boolean(const GeomShapePtr theObject,
 //=================================================================================================
 GeomAlgoAPI_Boolean::GeomAlgoAPI_Boolean(const ListOfShape& theObjects,
                                          const ListOfShape& theTools,
-                                         const OperationType theOperationType)
+                                         const GeomAlgoAPI_Tools::BOPType theOperationType)
 {
   build(theObjects, theTools, theOperationType);
 }
@@ -60,7 +60,7 @@ GeomAlgoAPI_Boolean::GeomAlgoAPI_Boolean(const ListOfShape& theObjects,
 //=================================================================================================
 void GeomAlgoAPI_Boolean::build(const ListOfShape& theObjects,
                                 const ListOfShape& theTools,
-                                const OperationType theOperationType)
+                                const GeomAlgoAPI_Tools::BOPType theOperationType)
 {
   if(theObjects.empty() || theTools.empty()) {
     return;
@@ -85,15 +85,15 @@ void GeomAlgoAPI_Boolean::build(const ListOfShape& theObjects,
   // Creating boolean operation.
   BOPAlgo_BOP* aBuilder = new BOPAlgo_BOP();
   switch (theOperationType) {
-    case BOOL_CUT: {
+    case GeomAlgoAPI_Tools::BOOL_CUT: {
       aBuilder->SetOperation(BOPAlgo_CUT);
       break;
     }
-    case BOOL_FUSE: {
+    case GeomAlgoAPI_Tools::BOOL_FUSE: {
       aBuilder->SetOperation(BOPAlgo_FUSE);
       break;
     }
-    case BOOL_COMMON: {
+    case GeomAlgoAPI_Tools::BOOL_COMMON: {
       aBuilder->SetOperation(BOPAlgo_COMMON);
       break;
     }

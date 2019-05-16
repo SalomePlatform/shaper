@@ -43,13 +43,15 @@ public:
     /// Constructor with values.
   FEATURESAPI_EXPORT
   FeaturesAPI_BooleanCommon(const std::shared_ptr<ModelAPI_Feature>& theFeature,
-                            const std::list<ModelHighAPI_Selection>& theMainObjects);
+                            const std::list<ModelHighAPI_Selection>& theMainObjects,
+                            const int theVersion = 0);
 
   /// Constructor with values.
   FEATURESAPI_EXPORT
   FeaturesAPI_BooleanCommon(const std::shared_ptr<ModelAPI_Feature>& theFeature,
                             const std::list<ModelHighAPI_Selection>& theMainObjects,
-                            const std::list<ModelHighAPI_Selection>& theToolObjects);
+                            const std::list<ModelHighAPI_Selection>& theToolObjects,
+                            const int theVersion = 0);
 
   /// Destructor.
   FEATURESAPI_EXPORT
@@ -87,13 +89,15 @@ typedef std::shared_ptr<FeaturesAPI_BooleanCommon> BooleanCommonPtr;
 /// \brief Create Boolean Common feature.
 FEATURESAPI_EXPORT
 BooleanCommonPtr addCommon(const std::shared_ptr<ModelAPI_Document>& thePart,
-                           const std::list<ModelHighAPI_Selection>& theMainObjects);
+                           const std::list<ModelHighAPI_Selection>& theMainObjects,
+                           const int theVersion = 0);
 
 /// \ingroup CPPHighAPI
 /// \brief Create Boolean Common feature.
 FEATURESAPI_EXPORT
 BooleanCommonPtr addCommon(const std::shared_ptr<ModelAPI_Document>& thePart,
                            const std::list<ModelHighAPI_Selection>& theMainObjects,
-                           const std::list<ModelHighAPI_Selection>& theToolObjects);
+                           const std::list<ModelHighAPI_Selection>& theToolObjects,
+                           const int theVersion = 0);
 
 #endif // FeaturesAPI_BooleanCommon_H_

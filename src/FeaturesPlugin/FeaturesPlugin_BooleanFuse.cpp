@@ -23,6 +23,7 @@
 
 #include <ModelAPI_ResultBody.h>
 #include <ModelAPI_AttributeBoolean.h>
+#include <ModelAPI_AttributeInteger.h>
 #include <ModelAPI_AttributeSelectionList.h>
 #include <ModelAPI_AttributeString.h>
 #include <ModelAPI_Session.h>
@@ -32,10 +33,15 @@
 #include <GeomAlgoAPI_Boolean.h>
 #include <GeomAlgoAPI_MakeShapeList.h>
 #include <GeomAlgoAPI_PaveFiller.h>
+#include <GeomAlgoAPI_ShapeBuilder.h>
 #include <GeomAlgoAPI_ShapeTools.h>
 #include <GeomAlgoAPI_Tools.h>
 #include <GeomAlgoAPI_UnifySameDomain.h>
+
 #include <GeomAPI_ShapeExplorer.h>
+#include <GeomAPI_ShapeIterator.h>
+
+static const int THE_FUSE_VERSION_1 = 20190506;
 
 //==================================================================================================
 FeaturesPlugin_BooleanFuse::FeaturesPlugin_BooleanFuse()
@@ -55,14 +61,16 @@ void FeaturesPlugin_BooleanFuse::initAttributes()
 
   ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(), OBJECT_LIST_ID());
   ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(), TOOL_LIST_ID());
+
+  initVersion(THE_FUSE_VERSION_1, selectionList(OBJECT_LIST_ID()), selectionList(TOOL_LIST_ID()));
 }
 
 //==================================================================================================
 void FeaturesPlugin_BooleanFuse::execute()
 {
   std::string anError;
-  ListOfShape anObjects, aTools, anEdgesAndFaces;
-  std::map<GeomShapePtr, ListOfShape> aCompSolidsObjects;
+  ObjectHierarchy anObjectsHierarchy, aToolsHierarchy;
+  ListOfShape aPlanes;
 
   bool isSimpleCreation = false;
 
@@ -74,64 +82,29 @@ void FeaturesPlugin_BooleanFuse::execute()
   }
 
   // Getting objects.
-  AttributeSelectionListPtr anObjectsSelList =
-    selectionList(FeaturesPlugin_Boolean::OBJECT_LIST_ID());
-  for (int anObjectsIndex = 0; anObjectsIndex < anObjectsSelList->size(); anObjectsIndex++) {
-    AttributeSelectionPtr anObjectAttr = anObjectsSelList->value(anObjectsIndex);
-    GeomShapePtr anObject = anObjectAttr->value();
-    if (!anObject.get()) {
-      return;
-    }
-    ResultPtr aContext = anObjectAttr->context();
-    ResultBodyPtr aResCompSolidPtr = ModelAPI_Tools::bodyOwner(aContext);
-    if (!isSimpleCreation
-        && aResCompSolidPtr.get()
-        && aResCompSolidPtr->shape()->shapeType() == GeomAPI_Shape::COMPSOLID)
-    {
-      GeomShapePtr aContextShape = aResCompSolidPtr->shape();
-      std::map<GeomShapePtr, ListOfShape>::iterator
-        anIt = aCompSolidsObjects.begin();
-      for (; anIt != aCompSolidsObjects.end(); anIt++) {
-        if (anIt->first->isEqual(aContextShape)) {
-          aCompSolidsObjects[anIt->first].push_back(anObject);
-          break;
-        }
-      }
-      if (anIt == aCompSolidsObjects.end()) {
-        aCompSolidsObjects[aContextShape].push_back(anObject);
-      }
-    } else {
-      if (anObject->shapeType() == GeomAPI_Shape::EDGE
-          || anObject->shapeType() == GeomAPI_Shape::FACE) {
-        anEdgesAndFaces.push_back(anObject);
-      } else {
-        anObjects.push_back(anObject);
-      }
-    }
-  }
+  if (!processAttribute(OBJECT_LIST_ID(), anObjectsHierarchy, aPlanes))
+    return;
 
   // Getting tools.
-  if (!isSimpleCreation) {
-    AttributeSelectionListPtr aToolsSelList = selectionList(FeaturesPlugin_Boolean::TOOL_LIST_ID());
-    for (int aToolsIndex = 0; aToolsIndex < aToolsSelList->size(); aToolsIndex++) {
-      AttributeSelectionPtr aToolAttr = aToolsSelList->value(aToolsIndex);
-      GeomShapePtr aTool = aToolAttr->value();
-      if (aTool->shapeType() == GeomAPI_Shape::EDGE
-          || aTool->shapeType() == GeomAPI_Shape::FACE)
-      {
-        anEdgesAndFaces.push_back(aTool);
-      } else {
-        aTools.push_back(aTool);
-      }
-    }
-  }
+  if (!isSimpleCreation &&
+      !processAttribute(TOOL_LIST_ID(), aToolsHierarchy, aPlanes))
+    return;
 
-  if ((anObjects.size() + aTools.size() +
-    aCompSolidsObjects.size() + anEdgesAndFaces.size()) < 2) {
+  ListOfShape anObjects, aTools, anEdgesAndFaces;
+  // all objects except edges and faces
+  anObjectsHierarchy.ObjectsByType(anEdgesAndFaces, anObjects,
+                                   GeomAPI_Shape::FACE, GeomAPI_Shape::EDGE);
+  aToolsHierarchy.ObjectsByType(anEdgesAndFaces, aTools,
+                                GeomAPI_Shape::FACE, GeomAPI_Shape::EDGE);
+
+  if ((anObjects.size() + aTools.size() + anEdgesAndFaces.size()) < 2) {
     std::string aFeatureError = "Error: Not enough objects for boolean operation.";
     setError(aFeatureError);
     return;
   }
+
+  // version of FUSE feature
+  int aFuseVersion = version();
 
   // Collecting all solids which will be fused.
   ListOfShape aSolidsToFuse;
@@ -141,28 +114,19 @@ void FeaturesPlugin_BooleanFuse::execute()
   // Collecting solids from compsolids which will not be modified
   // in boolean operation and will be added to result.
   ListOfShape aShapesToAdd;
-  for (std::map<GeomShapePtr, ListOfShape>::iterator anIt = aCompSolidsObjects.begin();
-       anIt != aCompSolidsObjects.end();
-       ++anIt)
-  {
-    GeomShapePtr aCompSolid = anIt->first;
-    ListOfShape& aUsedInOperationSolids = anIt->second;
-    aSolidsToFuse.insert(aSolidsToFuse.end(), aUsedInOperationSolids.begin(),
-                         aUsedInOperationSolids.end());
+  for (ObjectHierarchy::Iterator anObjectsIt = anObjectsHierarchy.Begin();
+       !isSimpleCreation && anObjectsIt != anObjectsHierarchy.End();
+       ++anObjectsIt) {
+    GeomShapePtr anObject = *anObjectsIt;
+    GeomShapePtr aParent = anObjectsHierarchy.Parent(anObject, false);
 
-    // Collect solids from compsolid which will not be modified in boolean operation.
-    for (GeomAPI_ShapeExplorer
-         anExp(aCompSolid, GeomAPI_Shape::SOLID); anExp.more(); anExp.next()) {
-      GeomShapePtr aSolidInCompSolid = anExp.current();
-      ListOfShape::iterator anIt = aUsedInOperationSolids.begin();
-      for (; anIt != aUsedInOperationSolids.end(); anIt++) {
-        if (aSolidInCompSolid->isEqual(*anIt)) {
-          break;
-        }
-      }
-      if (anIt == aUsedInOperationSolids.end()) {
-        aShapesToAdd.push_back(aSolidInCompSolid);
-      }
+    if (aParent && aParent->shapeType() == GeomAPI_Shape::COMPSOLID) {
+      // mark all subs of this parent as precessed to avoid handling twice
+      aParent = anObjectsHierarchy.Parent(anObject);
+
+      ListOfShape aUsed, aNotUsed;
+      anObjectsHierarchy.SplitCompound(aParent, aUsed, aNotUsed);
+      aShapesToAdd.insert(aShapesToAdd.end(), aNotUsed.begin(), aNotUsed.end());
     }
   }
 
@@ -174,7 +138,7 @@ void FeaturesPlugin_BooleanFuse::execute()
   GeomShapePtr aCuttedEdgesAndFaces;
   if (!anEdgesAndFaces.empty()) {
     std::shared_ptr<GeomAlgoAPI_Boolean> aCutAlgo(new GeomAlgoAPI_Boolean(anEdgesAndFaces,
-      anOriginalShapes, GeomAlgoAPI_Boolean::BOOL_CUT));
+      anOriginalShapes, GeomAlgoAPI_Tools::BOOL_CUT));
     if (aCutAlgo->isDone()) {
       aCuttedEdgesAndFaces = aCutAlgo->shape();
       aMakeShapeList->appendAlgo(aCutAlgo);
@@ -191,7 +155,7 @@ void FeaturesPlugin_BooleanFuse::execute()
       ListOfShape aOneObjectList;
       aOneObjectList.push_back(*anIt);
       std::shared_ptr<GeomAlgoAPI_Boolean> aCutAlgo(
-        new GeomAlgoAPI_Boolean(aOneObjectList, aShapesToAdd, GeomAlgoAPI_Boolean::BOOL_CUT));
+        new GeomAlgoAPI_Boolean(aOneObjectList, aShapesToAdd, GeomAlgoAPI_Tools::BOOL_CUT));
 
       if (GeomAlgoAPI_ShapeTools::volume(aCutAlgo->shape()) > 1.e-27) {
         aSolidsToFuse.push_back(aCutAlgo->shape());
@@ -216,7 +180,7 @@ void FeaturesPlugin_BooleanFuse::execute()
   } else if ((anObjects.size() + aTools.size()) > 1) {
     std::shared_ptr<GeomAlgoAPI_Boolean> aFuseAlgo(new GeomAlgoAPI_Boolean(anObjects,
       aTools,
-      GeomAlgoAPI_Boolean::BOOL_FUSE));
+      GeomAlgoAPI_Tools::BOOL_FUSE));
 
     // Checking that the algorithm worked properly.
     if (GeomAlgoAPI_Tools::AlgoError::isAlgorithmFailed(aFuseAlgo, getKind(), anError)) {
@@ -266,6 +230,12 @@ void FeaturesPlugin_BooleanFuse::execute()
 
     aShape = aUnifyAlgo->shape();
     aMakeShapeList->appendAlgo(aUnifyAlgo);
+  }
+
+  if (aFuseVersion == THE_FUSE_VERSION_1) {
+    // merge hierarchies of compounds containing objects and tools
+    // and append the result of the FUSE operation
+    aShape = keepUnusedSubsOfCompound(aShape, anObjectsHierarchy, aToolsHierarchy, aMakeShapeList);
   }
 
   int aResultIndex = 0;

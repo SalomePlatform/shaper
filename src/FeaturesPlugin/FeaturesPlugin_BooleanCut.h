@@ -46,6 +46,9 @@ public:
     return MY_KIND;
   }
 
+  /// Request for initialization of data model of the feature: adding all attributes.
+  FEATURESPLUGIN_EXPORT virtual void initAttributes();
+
   /// Creates a new part document if needed.
   FEATURESPLUGIN_EXPORT virtual void execute();
 

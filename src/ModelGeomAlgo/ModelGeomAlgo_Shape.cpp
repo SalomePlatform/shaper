@@ -130,6 +130,19 @@ namespace ModelGeomAlgo_Shape
     aSR.myResult = theResult;
     aSR.mySubshape = theSubshape;
     aSR.myCenterType = theCenterType;
+    // compound subshapes from other compounds should be processed as whole results
+    if (aSR.mySubshape && aSR.mySubshape->shapeType() == GeomAPI_Shape::COMPOUND &&
+        !theResult->shape()->isEqual(theSubshape)) {
+      ResultBodyPtr aResult = std::dynamic_pointer_cast<ModelAPI_ResultBody>(theResult);
+      for (int i = 0; aResult && i < aResult->numberOfSubs(); ++i) {
+        ResultBodyPtr aSub = aResult->subResult(i);
+        if (aSub->shape()->isEqual(theSubshape)) {
+          aSR.myResult = aSub;
+          aSR.mySubshape = GeomShapePtr();
+          break;
+        }
+      }
+    }
     theList.push_back(aSR);
   }
 
@@ -138,13 +151,8 @@ namespace ModelGeomAlgo_Shape
       const std::list<GeomShapePtr>& theSubshape)
   {
     for (std::list<GeomShapePtr>::const_iterator anIt = theSubshape.begin();
-         anIt != theSubshape.end(); ++anIt) {
-      SubshapeOfResult aSR;
-      aSR.myResult = theResult;
-      aSR.mySubshape = *anIt;
-      aSR.myCenterType = (int)ModelAPI_AttributeSelection::NOT_CENTER;
-      theList.push_back(aSR);
-    }
+         anIt != theSubshape.end(); ++anIt)
+      appendSubshapeOfResult(theList, theResult, *anIt);
   }
 
   static bool findSubshapeInCompsolid(const ResultBodyPtr& theCompsolid,

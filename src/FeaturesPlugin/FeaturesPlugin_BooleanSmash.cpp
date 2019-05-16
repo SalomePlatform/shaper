@@ -35,6 +35,8 @@
 #include <GeomAPI_ShapeExplorer.h>
 #include <GeomAPI_ShapeIterator.h>
 
+static const int THE_SMASH_VERSION_1 = 20190506;
+
 //==================================================================================================
 FeaturesPlugin_BooleanSmash::FeaturesPlugin_BooleanSmash()
 : FeaturesPlugin_Boolean(FeaturesPlugin_Boolean::BOOL_SMASH)
@@ -46,105 +48,59 @@ void FeaturesPlugin_BooleanSmash::initAttributes()
 {
   data()->addAttribute(OBJECT_LIST_ID(), ModelAPI_AttributeSelectionList::typeId());
   data()->addAttribute(TOOL_LIST_ID(), ModelAPI_AttributeSelectionList::typeId());
+
+  initVersion(THE_SMASH_VERSION_1, selectionList(OBJECT_LIST_ID()), selectionList(TOOL_LIST_ID()));
 }
 
 //==================================================================================================
 void FeaturesPlugin_BooleanSmash::execute()
 {
   std::string anError;
-  ListOfShape anObjects, aTools;
-  std::map<std::shared_ptr<GeomAPI_Shape>, ListOfShape> aCompSolidsObjects;
+  ObjectHierarchy anObjectsHistory, aToolsHistory;
+  ListOfShape aPlanes;
 
-  // Getting objects.
-  AttributeSelectionListPtr anObjectsSelList = selectionList(OBJECT_LIST_ID());
-  for(int anObjectsIndex = 0; anObjectsIndex < anObjectsSelList->size(); anObjectsIndex++) {
-    AttributeSelectionPtr anObjectAttr = anObjectsSelList->value(anObjectsIndex);
-    std::shared_ptr<GeomAPI_Shape> anObject = anObjectAttr->value();
-    if(!anObject.get()) {
-      return;
-    }
-    ResultPtr aContext = anObjectAttr->context();
-    ResultBodyPtr aResCompSolidPtr = ModelAPI_Tools::bodyOwner(aContext);
-    if (aResCompSolidPtr.get())
-    {
-      std::shared_ptr<GeomAPI_Shape> aContextShape = aResCompSolidPtr->shape();
-
-      std::map<std::shared_ptr<GeomAPI_Shape>, ListOfShape>::iterator
-        anIt = aCompSolidsObjects.begin();
-      for (; anIt != aCompSolidsObjects.end(); anIt++) {
-        if (anIt->first->isEqual(aContextShape)) {
-          aCompSolidsObjects[anIt->first].push_back(anObject);
-          break;
-        }
-      }
-      if (anIt == aCompSolidsObjects.end()) {
-        aCompSolidsObjects[aContextShape].push_back(anObject);
-      }
-
-    } else {
-      anObjects.push_back(anObject);
-    }
-  }
-
-  // Getting tools.
-  AttributeSelectionListPtr aToolsSelList = selectionList(TOOL_LIST_ID());
-  for(int aToolsIndex = 0; aToolsIndex < aToolsSelList->size(); aToolsIndex++) {
-    AttributeSelectionPtr aToolAttr = aToolsSelList->value(aToolsIndex);
-    GeomShapePtr aTool = aToolAttr->value();
-    if(!aTool.get()) {
-      return;
-    }
-    aTools.push_back(aTool);
-  }
+  // Getting objects and tools.
+  if (!processAttribute(OBJECT_LIST_ID(), anObjectsHistory, aPlanes) ||
+      !processAttribute(TOOL_LIST_ID(), aToolsHistory, aPlanes))
+    return;
 
   int aResultIndex = 0;
 
-  if((anObjects.empty() && aCompSolidsObjects.empty())
-     || aTools.empty()) {
+  if (anObjectsHistory.IsEmpty() || aToolsHistory.IsEmpty()) {
     std::string aFeatureError = "Error: Not enough objects for boolean operation.";
     setError(aFeatureError);
     return;
   }
 
+  // Collecting all shapes which will be smashed.
+  ListOfShape aShapesToSmash = anObjectsHistory.Objects();
+
   // List of original shapes for naming.
   ListOfShape anOriginalShapes;
-  anOriginalShapes.insert(anOriginalShapes.end(), anObjects.begin(), anObjects.end());
+  anOriginalShapes.insert(anOriginalShapes.end(), aShapesToSmash.begin(), aShapesToSmash.end());
+  ListOfShape aTools = aToolsHistory.Objects();
   anOriginalShapes.insert(anOriginalShapes.end(), aTools.begin(), aTools.end());
-
-  // Collecting all shapes which will be smashed.
-  ListOfShape aShapesToSmash;
-  aShapesToSmash.insert(aShapesToSmash.end(), anObjects.begin(), anObjects.end());
 
   // Collecting solids from compsolids which will not be modified in
   // boolean operation and will be added to result.
   ListOfShape aShapesToAdd;
-  for (std::map<std::shared_ptr<GeomAPI_Shape>, ListOfShape>::iterator
-       anIt = aCompSolidsObjects.begin();
-       anIt != aCompSolidsObjects.end();
+  for (ObjectHierarchy::Iterator anIt = anObjectsHistory.Begin();
+       anIt != anObjectsHistory.End();
        ++anIt)
   {
-    std::shared_ptr<GeomAPI_Shape> aCompSolid = anIt->first;
-    ListOfShape& aUsedInOperationSolids = anIt->second;
-    anOriginalShapes.push_back(aCompSolid);
-    aShapesToSmash.insert(aShapesToSmash.end(),
-                          aUsedInOperationSolids.begin(),
-                          aUsedInOperationSolids.end());
+    GeomShapePtr aParent = anObjectsHistory.Parent(*anIt, false);
+    if (aParent) {
+      anOriginalShapes.push_back(aParent);
 
-    // Collect solids from compsolid which will not be modified in boolean operation.
-    for (GeomAPI_ShapeExplorer anExp(aCompSolid, GeomAPI_Shape::SOLID);
-         anExp.more();
-         anExp.next())
-    {
-      std::shared_ptr<GeomAPI_Shape> aSolidInCompSolid = anExp.current();
-      ListOfShape::iterator anIt = aUsedInOperationSolids.begin();
-      for (; anIt != aUsedInOperationSolids.end(); anIt++) {
-        if (aSolidInCompSolid->isEqual(*anIt)) {
-          break;
-        }
-      }
-      if (anIt == aUsedInOperationSolids.end()) {
-        aShapesToAdd.push_back(aSolidInCompSolid);
-      }
+      ListOfShape aUsed, aNotUsed;
+      anObjectsHistory.SplitCompound(aParent, aUsed, aNotUsed);
+      aShapesToAdd.insert(aShapesToAdd.end(), aNotUsed.begin(), aNotUsed.end());
+
+      // add unused shapes of compounds/compsolids to the history,
+      // to avoid treating them as unused later when constructing a compound containing
+      // the result of Smash and all unused sub-shapes of multi-level compounds
+      for (ListOfShape::iterator anIt = aNotUsed.begin(); anIt != aNotUsed.end(); ++anIt)
+        anObjectsHistory.AddObject(*anIt);
     }
   }
 
@@ -154,7 +110,7 @@ void FeaturesPlugin_BooleanSmash::execute()
     std::shared_ptr<GeomAlgoAPI_Boolean> anObjectsCutAlgo(
       new GeomAlgoAPI_Boolean(aShapesToSmash,
                               aShapesToAdd,
-                              GeomAlgoAPI_Boolean::BOOL_CUT));
+                              GeomAlgoAPI_Tools::BOOL_CUT));
 
     if (GeomAlgoAPI_ShapeTools::volume(anObjectsCutAlgo->shape()) > 1.e-27) {
       aShapesToSmash.clear();
@@ -166,7 +122,7 @@ void FeaturesPlugin_BooleanSmash::execute()
     std::shared_ptr<GeomAlgoAPI_Boolean> aToolsCutAlgo(
       new GeomAlgoAPI_Boolean(aTools,
                               aShapesToAdd,
-                              GeomAlgoAPI_Boolean::BOOL_CUT));
+                              GeomAlgoAPI_Tools::BOOL_CUT));
 
     if (GeomAlgoAPI_ShapeTools::volume(aToolsCutAlgo->shape()) > 1.e-27) {
       aTools.clear();
@@ -179,7 +135,7 @@ void FeaturesPlugin_BooleanSmash::execute()
   std::shared_ptr<GeomAlgoAPI_Boolean> aBoolAlgo(
     new GeomAlgoAPI_Boolean(aShapesToSmash,
                             aTools,
-                            GeomAlgoAPI_Boolean::BOOL_CUT));
+                            GeomAlgoAPI_Tools::BOOL_CUT));
 
   // Checking that the algorithm worked properly.
   if (GeomAlgoAPI_Tools::AlgoError::isAlgorithmFailed(aBoolAlgo, getKind(), anError)) {
@@ -210,6 +166,14 @@ void FeaturesPlugin_BooleanSmash::execute()
 
     aShape = aFillerAlgo->shape();
     aMakeShapeList->appendAlgo(aFillerAlgo);
+  }
+
+  // take into account a version of SMASH feature
+  int aSmashVersion = version();
+  if (aSmashVersion == THE_SMASH_VERSION_1) {
+    // merge hierarchies of compounds containing objects and tools
+    // and append the result of the FUSE operation
+    aShape = keepUnusedSubsOfCompound(aShape, anObjectsHistory, aToolsHistory, aMakeShapeList);
   }
 
   std::shared_ptr<ModelAPI_ResultBody> aResultBody = document()->createBody(data(), aResultIndex);

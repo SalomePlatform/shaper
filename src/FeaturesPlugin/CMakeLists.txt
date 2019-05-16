@@ -28,6 +28,7 @@ SET(PROJECT_HEADERS
     FeaturesPlugin_Revolution.h
     FeaturesPlugin_Rotation.h
     FeaturesPlugin_Translation.h
+    FeaturesPlugin_VersionedBoolean.h
     FeaturesPlugin_Boolean.h
     FeaturesPlugin_BooleanCut.h
     FeaturesPlugin_BooleanFuse.h
@@ -67,6 +68,7 @@ SET(PROJECT_SOURCES
     FeaturesPlugin_Revolution.cpp
     FeaturesPlugin_Rotation.cpp
     FeaturesPlugin_Translation.cpp
+    FeaturesPlugin_VersionedBoolean.cpp
     FeaturesPlugin_Boolean.cpp
     FeaturesPlugin_BooleanCut.cpp
     FeaturesPlugin_BooleanFuse.cpp
@@ -460,4 +462,37 @@ ADD_UNIT_TESTS(TestExtrusion.py
                Test2826.py
                Test2854.py
                Test2878.py
+               TestBooleanCommon_MultiLevelCompound_v0_1.py
+               TestBooleanCommon_MultiLevelCompound_v0_2.py
+               TestBooleanCommon_MultiLevelCompound_v20190506_1.py
+               TestBooleanCommon_MultiLevelCompound_v20190506_2.py
+               TestBooleanCut_MultiLevelCompound_v0_1.py
+               TestBooleanCut_MultiLevelCompound_v0_2.py
+               TestBooleanCut_MultiLevelCompound_v20190506_1.py
+               TestBooleanCut_MultiLevelCompound_v20190506_2.py
+               TestBooleanFuse_MultiLevelCompound_v0_1.py
+               TestBooleanFuse_MultiLevelCompound_v0_2.py
+               TestBooleanFuse_MultiLevelCompound_v0_3.py
+               TestBooleanFuse_MultiLevelCompound_v0_4.py
+               TestBooleanFuse_MultiLevelCompound_v20190506_1.py
+               TestBooleanFuse_MultiLevelCompound_v20190506_2.py
+               TestBooleanFuse_MultiLevelCompound_v20190506_3.py
+               TestBooleanFuse_MultiLevelCompound_v20190506_4.py
+               TestBooleanSmash_MultiLevelCompound_v0_1.py
+               TestBooleanSmash_MultiLevelCompound_v0_2.py
+               TestBooleanSmash_MultiLevelCompound_v20190506_1.py
+               TestBooleanSmash_MultiLevelCompound_v20190506_2.py
+               TestBooleanSplit_MultiLevelCompound_v0_1.py
+               TestBooleanSplit_MultiLevelCompound_v0_2.py
+               TestBooleanSplit_MultiLevelCompound_v20190506_1.py
+               TestBooleanSplit_MultiLevelCompound_v20190506_2.py
+               TestPartition_MultiLevelCompound_v0_1.py
+               TestPartition_MultiLevelCompound_v0_2.py
+               TestPartition_MultiLevelCompound_v0_3.py
+               TestPartition_MultiLevelCompound_v20190506_1.py
+               TestPartition_MultiLevelCompound_v20190506_2.py
+               TestPartition_MultiLevelCompound_v20190506_3.py
+               TestUnion_MultiLevelCompound_v0.py
+               TestUnion_MultiLevelCompound_v20190506.py
+               TestUnionFaces_v20190506.py
 )

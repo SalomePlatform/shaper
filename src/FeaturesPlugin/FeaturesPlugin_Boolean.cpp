@@ -30,11 +30,14 @@
 #include <ModelAPI_Tools.h>
 
 #include <GeomAlgoAPI_Boolean.h>
+#include <GeomAlgoAPI_CompoundBuilder.h>
 #include <GeomAlgoAPI_MakeShapeCustom.h>
 #include <GeomAlgoAPI_MakeShapeList.h>
 #include <GeomAlgoAPI_Partition.h>
 #include <GeomAlgoAPI_PaveFiller.h>
+#include <GeomAlgoAPI_ShapeBuilder.h>
 #include <GeomAlgoAPI_ShapeTools.h>
+#include <GeomAlgoAPI_Tools.h>
 #include <GeomAPI_Face.h>
 #include <GeomAPI_ShapeExplorer.h>
 #include <GeomAPI_ShapeIterator.h>
@@ -99,4 +102,40 @@ void FeaturesPlugin_Boolean::loadNamingDS(std::shared_ptr<ModelAPI_ResultBody> t
 
     theResultBody->loadDeletedShapes(theMakeShape, *anIter, GeomAPI_Shape::FACE);
   }
+}
+
+//=================================================================================================
+void FeaturesPlugin_Boolean::storeResult(
+    const ListOfShape& theObjects,
+    const ListOfShape& theTools,
+    const GeomShapePtr theResultShape,
+    int& theResultIndex,
+    std::shared_ptr<GeomAlgoAPI_MakeShapeList> theMakeShapeList,
+    std::vector<FeaturesPlugin_Tools::ResultBaseAlgo>& theResultBaseAlgoList)
+{
+  if (!theResultShape)
+    return;
+
+  std::shared_ptr<ModelAPI_ResultBody> aResultBody =
+      document()->createBody(data(), theResultIndex);
+
+  FeaturesPlugin_Tools::loadModifiedShapes(aResultBody,
+                                           theObjects,
+                                           theTools,
+                                           theMakeShapeList,
+                                           theResultShape);
+  setResult(aResultBody, theResultIndex++);
+
+  // merge algorithms
+  FeaturesPlugin_Tools::ResultBaseAlgo aRBA;
+  aRBA.resultBody = aResultBody;
+  aRBA.baseShape = theObjects.front();
+  for (std::vector<FeaturesPlugin_Tools::ResultBaseAlgo>::iterator
+       aRBAIt = theResultBaseAlgoList.begin();
+       aRBAIt != theResultBaseAlgoList.end(); ++aRBAIt) {
+    theMakeShapeList->appendAlgo(aRBAIt->makeShape);
+  }
+  aRBA.makeShape = theMakeShapeList;
+  theResultBaseAlgoList.clear();
+  theResultBaseAlgoList.push_back(aRBA);
 }

@@ -20,18 +20,13 @@
 #ifndef FeaturesPlugin_Union_H_
 #define FeaturesPlugin_Union_H_
 
-#include "FeaturesPlugin.h"
-#include <ModelAPI_Feature.h>
-
-#include <GeomAPI_Shape.h>
-
-class GeomAlgoAPI_MakeShape;
+#include "FeaturesPlugin_VersionedBoolean.h"
 
 /// \class FeaturesPlugin_Union
 /// \ingroup Plugins
 /// \brief Feature for applying of Union operations on Shapes. Union removes shared shapes from
 ///        several shapes and combines them into one.
-class FeaturesPlugin_Union : public ModelAPI_Feature
+class FeaturesPlugin_Union : public FeaturesPlugin_VersionedBoolean
 {
 public:
   /// Feature kind.

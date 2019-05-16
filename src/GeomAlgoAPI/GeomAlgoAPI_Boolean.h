@@ -22,6 +22,7 @@
 
 #include <GeomAlgoAPI.h>
 #include <GeomAlgoAPI_MakeShape.h>
+#include <GeomAlgoAPI_Tools.h>
 
 #include <GeomAPI_Shape.h>
 
@@ -31,30 +32,22 @@
 class GeomAlgoAPI_Boolean : public GeomAlgoAPI_MakeShape
 {
 public:
-  /// Type of booelan operation
-  enum OperationType {
-    BOOL_CUT,   ///< Cut objects
-    BOOL_FUSE,  ///< Fuse objects
-    BOOL_COMMON ///< Take common part of objects
-  };
-
-public:
 
   /// Constructor.
   GEOMALGOAPI_EXPORT GeomAlgoAPI_Boolean(const GeomShapePtr theObject,
                                          const GeomShapePtr theTool,
-                                         const OperationType theOperationType);
+                                         const GeomAlgoAPI_Tools::BOPType theOperationType);
 
   /// Constructor.
   GEOMALGOAPI_EXPORT GeomAlgoAPI_Boolean(const GeomShapePtr theObject,
                                          const ListOfShape& theTools,
-                                         const OperationType theOperationType);
+                                         const GeomAlgoAPI_Tools::BOPType theOperationType);
 
 
   /// Constructor.
   GEOMALGOAPI_EXPORT GeomAlgoAPI_Boolean(const ListOfShape& theObjects,
                                          const ListOfShape& theTools,
-                                         const OperationType theOperationType);
+                                         const GeomAlgoAPI_Tools::BOPType theOperationType);
 
   /// Redefinition of the generic method for the Fuse problem: OCCT 30481
   GEOMALGOAPI_EXPORT virtual void modified(const GeomShapePtr theOldShape,
@@ -64,7 +57,7 @@ private:
   /// Builds resulting shape.
   void build(const ListOfShape& theObjects,
              const ListOfShape& theTools,
-             const OperationType theOperationType);
+             const GeomAlgoAPI_Tools::BOPType theOperationType);
 };
 
 #endif

@@ -390,11 +390,28 @@ GeomAPI_Shape::subShapes(ShapeType theSubShapeType) const
   if (aShape.IsNull())
     return aSubs;
 
-  for (TopExp_Explorer anExp(aShape, (TopAbs_ShapeEnum)theSubShapeType);
-       anExp.More(); anExp.Next()) {
+  // process multi-level compounds
+  if (shapeType() == COMPOUND && theSubShapeType == COMPOUND) {
+    for (TopoDS_Iterator anIt(aShape); anIt.More(); anIt.Next()) {
+      const TopoDS_Shape& aCurrent = anIt.Value();
+      if (aCurrent.ShapeType() == TopAbs_COMPOUND) {
+        GeomShapePtr aSub(new GeomAPI_Shape);
+        aSub->setImpl(new TopoDS_Shape(aCurrent));
+        aSubs.push_back(aSub);
+      }
+    }
+    // add self
     GeomShapePtr aSub(new GeomAPI_Shape);
-    aSub->setImpl(new TopoDS_Shape(anExp.Current()));
+    aSub->setImpl(new TopoDS_Shape(aShape));
     aSubs.push_back(aSub);
+  }
+  else {
+    for (TopExp_Explorer anExp(aShape, (TopAbs_ShapeEnum)theSubShapeType);
+         anExp.More(); anExp.Next()) {
+      GeomShapePtr aSub(new GeomAPI_Shape);
+      aSub->setImpl(new TopoDS_Shape(anExp.Current()));
+      aSubs.push_back(aSub);
+    }
   }
   return aSubs;
 }

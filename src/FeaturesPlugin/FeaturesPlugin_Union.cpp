@@ -20,10 +20,11 @@
 #include "FeaturesPlugin_Union.h"
 
 #include <GeomAlgoAPI_Boolean.h>
+#include <GeomAlgoAPI_CompoundBuilder.h>
 #include <GeomAlgoAPI_MakeShapeList.h>
 #include <GeomAlgoAPI_PaveFiller.h>
+#include <GeomAlgoAPI_ShapeBuilder.h>
 #include <GeomAlgoAPI_Tools.h>
-#include <GeomAlgoAPI_UnifySameDomain.h>
 
 #include <GeomAPI_ShapeExplorer.h>
 #include <GeomAPI_ShapeIterator.h>
@@ -31,6 +32,8 @@
 #include <ModelAPI_AttributeSelectionList.h>
 #include <ModelAPI_ResultBody.h>
 #include <ModelAPI_Tools.h>
+
+static const int THE_UNION_VERSION_1 = 20190506;
 
 //=================================================================================================
 FeaturesPlugin_Union::FeaturesPlugin_Union()
@@ -41,124 +44,91 @@ FeaturesPlugin_Union::FeaturesPlugin_Union()
 void FeaturesPlugin_Union::initAttributes()
 {
   data()->addAttribute(BASE_OBJECTS_ID(), ModelAPI_AttributeSelectionList::typeId());
+  initVersion(THE_UNION_VERSION_1, selectionList(BASE_OBJECTS_ID()));
 }
 
 //=================================================================================================
 void FeaturesPlugin_Union::execute()
 {
-  ListOfShape anObjects;
-  std::map<std::shared_ptr<GeomAPI_Shape>, ListOfShape> aCompSolidsObjects;
+  ObjectHierarchy anObjects;
+  ListOfShape anEmptyList;
 
   // Getting objects.
-  AttributeSelectionListPtr anObjectsSelList =
-    selectionList(FeaturesPlugin_Union::BASE_OBJECTS_ID());
-  for(int anObjectsIndex = 0; anObjectsIndex < anObjectsSelList->size(); anObjectsIndex++) {
-    AttributeSelectionPtr anObjectAttr = anObjectsSelList->value(anObjectsIndex);
-    std::shared_ptr<GeomAPI_Shape> anObject = anObjectAttr->value();
-    if(!anObject.get()) {
-      return;
-    }
-    ResultPtr aContext = anObjectAttr->context();
-    ResultBodyPtr aResCompSolidPtr = ModelAPI_Tools::bodyOwner(aContext);
-    if(aResCompSolidPtr.get()) {
-      std::shared_ptr<GeomAPI_Shape> aContextShape = aResCompSolidPtr->shape();
-      std::map<std::shared_ptr<GeomAPI_Shape>, ListOfShape>::iterator
-        anIt = aCompSolidsObjects.begin();
-      for(; anIt != aCompSolidsObjects.end(); anIt++) {
-        if(anIt->first->isEqual(aContextShape)) {
-          aCompSolidsObjects[anIt->first].push_back(anObject);
-          break;
-        }
-      }
-      if(anIt == aCompSolidsObjects.end()) {
-        aCompSolidsObjects[aContextShape].push_back(anObject);
-      }
-    } else {
-      anObjects.push_back(anObject);
-    }
-  }
+  if (!processAttribute(BASE_OBJECTS_ID(), anObjects, anEmptyList))
+    return;
 
-  // Collecting solids from compsolids which will not be modified in
-  // boolean operation and will be added to result.
-  ListOfShape aShapesToAdd;
-  for(std::map<std::shared_ptr<GeomAPI_Shape>, ListOfShape>::iterator
-    anIt = aCompSolidsObjects.begin();
-    anIt != aCompSolidsObjects.end(); anIt++) {
-    std::shared_ptr<GeomAPI_Shape> aCompSolid = anIt->first;
-    ListOfShape& aUsedInOperationSolids = anIt->second;
-    anObjects.insert(anObjects.end(), aUsedInOperationSolids.begin(), aUsedInOperationSolids.end());
-
-    // Collect solids from compsolid which will not be modified in boolean operation.
-    for(GeomAPI_ShapeIterator anExp(aCompSolid); anExp.more(); anExp.next()) {
-      std::shared_ptr<GeomAPI_Shape> aSolidInCompSolid = anExp.current();
-      ListOfShape::iterator anIt = aUsedInOperationSolids.begin();
-      for(; anIt != aUsedInOperationSolids.end(); anIt++) {
-        if(aSolidInCompSolid->isEqual(*anIt)) {
-          break;
-        }
-      }
-      if(anIt == aUsedInOperationSolids.end()) {
-        aShapesToAdd.push_back(aSolidInCompSolid);
-      }
-    }
-  }
-
-  if(anObjects.size() < 2) {
+  if(anObjects.Objects().size() < 2) {
     setError("Error: Not enough objects for operation. Should be at least 2.");
     return;
   }
 
-  // Fuse objects.
   std::string anError;
-  std::shared_ptr<GeomAlgoAPI_MakeShape> anAlgo;
-  ListOfShape aTools;
-  if (anObjects.front()->shapeType() == GeomAPI_Shape::SOLID) {
-    aTools.splice(aTools.begin(), anObjects, anObjects.begin());
-    anAlgo.reset(new GeomAlgoAPI_Boolean(anObjects,
-                 aTools,
-                 GeomAlgoAPI_Boolean::BOOL_FUSE));
-  } else {
-    anAlgo.reset(new GeomAlgoAPI_UnifySameDomain(anObjects));
-  }
+  int aResultIndex = 0;
+  std::vector<FeaturesPlugin_Tools::ResultBaseAlgo> aResultBaseAlgoList;
+  ListOfShape aResultShapesList;
 
-  // Checking that the algorithm worked properly.
-  std::shared_ptr<GeomAlgoAPI_MakeShapeList> aMakeShapeList(new GeomAlgoAPI_MakeShapeList());
-  GeomAPI_DataMapOfShapeShape aMapOfShapes;
-  if (GeomAlgoAPI_Tools::AlgoError::isAlgorithmFailed(anAlgo, getKind(), anError)) {
-    setError(anError);
-    return;
-  }
+  int aUnionVersion = version();
+  GeomShapePtr aResultCompound = GeomAlgoAPI_CompoundBuilder::compound(ListOfShape());
 
-  GeomShapePtr aShape = anAlgo->shape();
-  aMakeShapeList->appendAlgo(anAlgo);
-  aMapOfShapes.merge(anAlgo->mapOfSubShapes());
+  // Fuse objects.
+  bool isOk = true;
+  for (ObjectHierarchy::Iterator anObjectsIt = anObjects.Begin();
+       anObjectsIt != anObjects.End() && isOk;
+       ++anObjectsIt) {
+    GeomShapePtr anObject = *anObjectsIt;
+    GeomShapePtr aParent = anObjects.Parent(anObject, false);
 
-  // Store original shapes for naming.
-  anObjects.splice(anObjects.begin(), aTools);
-  anObjects.insert(anObjects.end(), aShapesToAdd.begin(), aShapesToAdd.end());
-
-  // Combine result with not used solids from compsolid.
-  if(aShapesToAdd.size() > 0) {
-    aShapesToAdd.push_back(aShape);
-    std::shared_ptr<GeomAlgoAPI_PaveFiller> aFillerAlgo(
-      new GeomAlgoAPI_PaveFiller(aShapesToAdd, true));
-    if (GeomAlgoAPI_Tools::AlgoError::isAlgorithmFailed(aFillerAlgo, getKind(), anError)) {
-      setError(anError);
-      return;
+    if (aParent && aParent->shapeType() <= GeomAPI_Shape::COMPSOLID) {
+      // get parent once again to mark it and the subs as processed
+      aParent = anObjects.Parent(anObject);
+      // compsolid handling
+      isOk = processCompsolid(GeomAlgoAPI_Tools::BOOL_FUSE,
+                              anObjects, aParent, anEmptyList, anEmptyList,
+                              aResultIndex, aResultBaseAlgoList, aResultShapesList,
+                              aResultCompound);
+    } else {
+      // process object as is
+      isOk = processObject(GeomAlgoAPI_Tools::BOOL_FUSE,
+                           anObject, anEmptyList, anEmptyList,
+                           aResultIndex, aResultBaseAlgoList, aResultShapesList,
+                           aResultCompound);
     }
-
-    aShape = aFillerAlgo->shape();
-    aMakeShapeList->appendAlgo(aFillerAlgo);
-    aMapOfShapes.merge(aFillerAlgo->mapOfSubShapes());
   }
-  // workaround: make copy to name edges correctly
+
+  std::shared_ptr<GeomAlgoAPI_MakeShapeList> aMakeShapeList(new GeomAlgoAPI_MakeShapeList());
+  for (std::vector<FeaturesPlugin_Tools::ResultBaseAlgo>::iterator
+       aRBAIt = aResultBaseAlgoList.begin();
+       aRBAIt != aResultBaseAlgoList.end(); ++aRBAIt) {
+    aMakeShapeList->appendAlgo(aRBAIt->makeShape);
+  }
+
+  GeomShapePtr aShape;
+  GeomAPI_ShapeIterator aCIt(aResultCompound);
+  if (aUnionVersion < THE_UNION_VERSION_1) {
+    // if the compound consists of a single sub-shape, take it,
+    // otherwise, take the full compound
+    aShape = aCIt.current();
+    aCIt.next();
+    if (aCIt.more())
+      aShape = aResultCompound;
+  }
+  else {
+    // merge hierarchies of compounds containing objects and tools
+    aShape = keepUnusedSubsOfCompound(aCIt.current(), anObjects, ObjectHierarchy(), aMakeShapeList);
+    for (aCIt.next(); aCIt.more(); aCIt.next()) {
+      std::shared_ptr<GeomAlgoAPI_ShapeBuilder> aBuilder(new GeomAlgoAPI_ShapeBuilder);
+      aBuilder->add(aShape, aCIt.current());
+      aMakeShapeList->appendAlgo(aBuilder);
+    }
+  }
 
   // Store result and naming.
-
   std::shared_ptr<ModelAPI_ResultBody> aResultBody = document()->createBody(data());
-  aResultBody->storeModified(anObjects.front(), aShape);
+  ListOfShape anObjectsList = anObjects.Objects();
+  aResultBody->storeModified(anObjectsList.front(), aShape);
 
-  for(ListOfShape::const_iterator anIter = anObjects.begin(); anIter != anObjects.end(); ++anIter) {
+  for(ListOfShape::const_iterator anIter = anObjectsList.begin();
+      anIter != anObjectsList.end(); ++anIter) {
     aResultBody->loadModifiedShapes(aMakeShapeList, *anIter, GeomAPI_Shape::EDGE);
     aResultBody->loadModifiedShapes(aMakeShapeList, *anIter, GeomAPI_Shape::FACE);
     //aResultBody->loadDeletedShapes(&aMakeShapeList, *anIter, GeomAPI_Shape::FACE, aDeletedTag);
