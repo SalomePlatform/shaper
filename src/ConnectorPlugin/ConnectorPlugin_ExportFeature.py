@@ -22,6 +22,7 @@
 
 import ModelAPI
 import ExchangeAPI
+import EventsAPI
 
 import salome
 from salome.geom import geomBuilder
@@ -67,37 +68,52 @@ class ExportFeature(ModelAPI.ModelAPI_Feature):
 
     ## Export the results, groups and fields via XAO
     def exportViaXAO(self):
-        # iterate all results of Part, export one by one due to issue 2882
-        for aResIndex in range(self.Part.size(model.ModelAPI_ResultBody_group())):
-          anObject = self.Part.object(model.ModelAPI_ResultBody_group(), aResIndex)
-          aResult = model.objectToResult(anObject)
-          if not aResult is None:
-            tmpXAOFile = getTmpFileName("xao")
-            self.tmpXAOFile = tmpXAOFile
-            #print "Export to %s"%tmpXAOFile
-            exportXAO = ExchangeAPI.exportToXAO(self.Part, tmpXAOFile, model.selection(aResult), "automatic_shaper_export_to_XAO")
-            if not os.path.exists(tmpXAOFile) or os.stat(tmpXAOFile).st_size == 0:
-                exportXAO.feature().setError("Error in exportToXAO. No XAO file has been created.")
-                return
-            imported, shape, subShapes, groups, fields = self.geompy.ImportXAO(tmpXAOFile)
-            self.geompy.addToStudy( shape, shape.GetName() )
-            # add sub-shapes and groups to the object browser
-            for obj in subShapes + groups:
-                name = obj.GetName()
-                self.geompy.addToStudyInFather(shape, obj, name)
-            # add fields to the object browser
-            for field in fields:
-                name = field.GetName()
-                self.geompy.addToStudyInFather(shape, field, name)
-                # add steps to the object browser
-                steps = field.getSteps()
-                for i_step in steps:
-                    step = field.getStep(i_step)
-                    i_stamp = step.GetStamp()
-                    step_name = "Step %i %i"%(i_step, i_stamp)
-                    self.geompy.addToStudyInFather( field, step, step_name )
-            # Remove the temporary file
-            os.remove(tmpXAOFile)
+        # if part-set is active, iterate also parts
+        for isPart in (True, False):
+          aResultType = model.ModelAPI_ResultBody_group()
+          if isPart:
+            aResultType = model.ModelAPI_ResultPart_group()
+          # iterate all results of Part, export one by one due to issue 2882
+          for aResIndex in range(self.Part.size(aResultType)):
+            anObject = self.Part.object(aResultType, aResIndex)
+            aResult = model.objectToResult(anObject)
+            if not aResult is None:
+              if (not aResult.shape() or aResult.shape().isNull()) and isPart:
+                aPart = model.modelAPI_ResultPart(aResult)
+                aPartDoc = aPart.partDoc()
+                if not aPartDoc or not aPartDoc.isOpened():
+                  EventsAPI.Events_InfoMessage("ExportToGEOM", "For export to GEOM some Part is not activated", self).send()
+                  return
+
+              if  not aResult.shape() or aResult.shape().isNull():
+                continue
+              tmpXAOFile = getTmpFileName("xao")
+              self.tmpXAOFile = tmpXAOFile
+              #print "Export to %s"%tmpXAOFile
+              exportXAO = ExchangeAPI.exportToXAO(self.Part, tmpXAOFile, model.selection(aResult), "automatic_shaper_export_to_XAO")
+              if not os.path.exists(tmpXAOFile) or os.stat(tmpXAOFile).st_size == 0:
+                  exportXAO.feature().setError("Error in exportToXAO. No XAO file has been created.")
+                  return
+              imported, shape, subShapes, groups, fields = self.geompy.ImportXAO(tmpXAOFile)
+              self.geompy.addToStudy( shape, shape.GetName() )
+              # add sub-shapes and groups to the object browser
+              for obj in subShapes + groups:
+                  name = obj.GetName()
+                  self.geompy.addToStudyInFather(shape, obj, name)
+              # add fields to the object browser
+              for field in fields:
+                  name = field.GetName()
+                  self.geompy.addToStudyInFather(shape, field, name)
+                  # add steps to the object browser
+                  steps = field.getSteps()
+                  for i_step in steps:
+                      step = field.getStep(i_step)
+                      i_stamp = step.GetStamp()
+                      step_name = "Step %i %i"%(i_step, i_stamp)
+                      self.geompy.addToStudyInFather( field, step, step_name )
+              # Remove the temporary file
+              os.remove(tmpXAOFile)
+            pass
           pass
         pass
 
