@@ -35,7 +35,23 @@ BuildAPI_Edge::BuildAPI_Edge(const std::shared_ptr<ModelAPI_Feature>& theFeature
 : ModelHighAPI_Interface(theFeature)
 {
   if(initialize()) {
+    fillAttribute(BuildPlugin_Edge::CREATION_BY_SEGMENTS(), mycreationMethod);
     setBase(theBaseObjects);
+  }
+}
+
+//==================================================================================================
+BuildAPI_Edge::BuildAPI_Edge(const std::shared_ptr<ModelAPI_Feature>& theFeature,
+                             const ModelHighAPI_Selection& theFirstPoint,
+                             const ModelHighAPI_Selection& theSecondPoint)
+: ModelHighAPI_Interface(theFeature)
+{
+  if(initialize()) {
+    fillAttribute(BuildPlugin_Edge::CREATION_BY_POINTS(), mycreationMethod);
+    fillAttribute(theFirstPoint, myfirstPoint);
+    fillAttribute(theSecondPoint, mysecondPoint);
+
+    execute();
   }
 }
 
@@ -59,8 +75,17 @@ void BuildAPI_Edge::dump(ModelHighAPI_Dumper& theDumper) const
   FeaturePtr aBase = feature();
   std::string aPartName = theDumper.name(aBase->document());
 
-  theDumper << aBase << " = model.addEdge(" << aPartName << ", "
-            << aBase->selectionList(BuildPlugin_Edge::BASE_OBJECTS_ID()) << ")" << std::endl;
+  theDumper << aBase << " = model.addEdge(" << aPartName << ", ";
+
+  AttributeStringPtr aCreationMethod = aBase->string(BuildPlugin_Edge::CREATION_METHOD());
+  if (aCreationMethod && aCreationMethod->isInitialized() &&
+      aCreationMethod->value() == BuildPlugin_Edge::CREATION_BY_POINTS()) {
+    theDumper << aBase->selection(BuildPlugin_Edge::FIRST_POINT()) << ", "
+              << aBase->selection(BuildPlugin_Edge::SECOND_POINT());
+  }
+  else
+    theDumper << aBase->selectionList(BuildPlugin_Edge::BASE_OBJECTS_ID());
+  theDumper << ")" << std::endl;
 }
 
 //==================================================================================================
@@ -69,4 +94,12 @@ EdgePtr addEdge(const std::shared_ptr<ModelAPI_Document>& thePart,
 {
   std::shared_ptr<ModelAPI_Feature> aFeature = thePart->addFeature(BuildAPI_Edge::ID());
   return EdgePtr(new BuildAPI_Edge(aFeature, theBaseObjects));
+}
+
+EdgePtr addEdge(const std::shared_ptr<ModelAPI_Document>& thePart,
+                const ModelHighAPI_Selection& theFirstPoint,
+                const ModelHighAPI_Selection& theSecondPoint)
+{
+  std::shared_ptr<ModelAPI_Feature> aFeature = thePart->addFeature(BuildAPI_Edge::ID());
+  return EdgePtr(new BuildAPI_Edge(aFeature, theFirstPoint, theSecondPoint));
 }

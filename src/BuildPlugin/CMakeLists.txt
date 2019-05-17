@@ -108,6 +108,7 @@ INSTALL(DIRECTORY icons/ DESTINATION ${SHAPER_INSTALL_XML_RESOURCES}/icons/Build
 ADD_UNIT_TESTS(TestVertex.py
                TestVertex_ErrorMsg.py
                TestEdge.py
+               TestEdge_ByPoints.py
                TestEdge_ErrorMsg.py
                TestWire.py
                TestWire_ErrorMsg.py

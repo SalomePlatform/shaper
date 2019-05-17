@@ -54,11 +54,52 @@ public:
     return MY_KIND;
   }
 
+  /// Attribute name for creation method.
+  inline static const std::string& CREATION_METHOD()
+  {
+    static const std::string MY_CREATION_METHOD_ID("creation_method");
+    return MY_CREATION_METHOD_ID;
+  }
+
+  /// Value for creation method.
+  inline static const std::string& CREATION_BY_SEGMENTS()
+  {
+    static const std::string MY_CREATION_METHOD_ID("by_segments");
+    return MY_CREATION_METHOD_ID;
+  }
+
+  /// Value for creation method.
+  inline static const std::string& CREATION_BY_POINTS()
+  {
+    static const std::string MY_CREATION_METHOD_ID("by_points");
+    return MY_CREATION_METHOD_ID;
+  }
+
+  /// Attribute name for the first point.
+  inline static const std::string& FIRST_POINT()
+  {
+    static const std::string MY_FIRST_POINT_ID("first_point");
+    return MY_FIRST_POINT_ID;
+  }
+
+  /// Attribute name for the second point.
+  inline static const std::string& SECOND_POINT()
+  {
+    static const std::string MY_SECOND_POINT_ID("second_point");
+    return MY_SECOND_POINT_ID;
+  }
+
   /// Request for initialization of data model of the feature: adding all attributes.
   BUILDPLUGIN_EXPORT virtual void initAttributes();
 
   /// Creates a new part document if needed.
   BUILDPLUGIN_EXPORT virtual void execute();
+
+private:
+  /// Build edges by the set of segments
+  void edgesBySegments();
+  /// Build edge by two points.
+  void edgeByPoints();
 };
 
 #endif
