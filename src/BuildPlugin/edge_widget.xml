@@ -1,9 +1,32 @@
 <source>
-  <multi_selector id="base_objects"
-                  label="Edges:"
-                  tooltip="Select edges on sketch or edges objects."
-                  type_choice="edges"
-                  concealment="true">
-    <validator id="BuildPlugin_ValidatorBaseForBuild" parameters="edge"/>
-  </multi_selector>
+  <toolbox id="creation_method">
+    <box id="by_segments" title="By segments" icon="icons/Build/edge_by_segments_32x32.png">
+      <multi_selector id="base_objects"
+                      label="Edges:"
+                      tooltip="Select edges on sketch or edges objects."
+                      type_choice="edges"
+                      concealment="true">
+        <validator id="BuildPlugin_ValidatorBaseForBuild" parameters="edge"/>
+      </multi_selector>
+    </box>
+    <box id="by_points" title="By two points" icon="icons/Build/edge_by_points_32x32.png">
+      <shape_selector id="first_point"
+                      label="First point"
+                      icon="icons/Construction/point.png"
+                      tooltip="Select a first point"
+                      shape_types="vertex">
+        <validator id="GeomValidators_ConstructionComposite"/>
+        <validator id="GeomValidators_ShapeType" parameters="vertex"/>
+      </shape_selector>
+      <shape_selector id="second_point"
+                      label="Second point"
+                      icon="icons/Construction/point.png"
+                      tooltip="Select a second point"
+                      shape_types="vertex">
+        <validator id="GeomValidators_ConstructionComposite"/>
+        <validator id="GeomValidators_ShapeType" parameters="vertex"/>
+        <validator id="GeomValidators_DifferentShapes"/>
+      </shape_selector>
+    </box>
+  </toolbox>
 </source>

@@ -44,13 +44,25 @@ public:
   explicit BuildAPI_Edge(const std::shared_ptr<ModelAPI_Feature>& theFeature,
                          const std::list<ModelHighAPI_Selection>& theBaseObjects);
 
+  /// Constructor by points.
+  BUILDAPI_EXPORT
+  explicit BuildAPI_Edge(const std::shared_ptr<ModelAPI_Feature>& theFeature,
+                         const ModelHighAPI_Selection& theFirstPoint,
+                         const ModelHighAPI_Selection& theSecondPoint);
+
   /// Destructor.
   BUILDAPI_EXPORT
   virtual ~BuildAPI_Edge();
 
-  INTERFACE_1(BuildPlugin_Edge::ID(),
+  INTERFACE_4(BuildPlugin_Edge::ID(),
               baseObjects, BuildPlugin_Edge::BASE_OBJECTS_ID(),
-              ModelAPI_AttributeSelectionList, /** Base objects */)
+              ModelAPI_AttributeSelectionList, /** Base objects */,
+              creationMethod, BuildPlugin_Edge::CREATION_METHOD(),
+              ModelAPI_AttributeString, /** Creation method */,
+              firstPoint, BuildPlugin_Edge::FIRST_POINT(),
+              ModelAPI_AttributeSelection, /** First point */,
+              secondPoint, BuildPlugin_Edge::SECOND_POINT(),
+              ModelAPI_AttributeSelection, /** Second point */)
 
   /// Modify base attribute of the feature.
   BUILDAPI_EXPORT
@@ -69,5 +81,11 @@ typedef std::shared_ptr<BuildAPI_Edge> EdgePtr;
 BUILDAPI_EXPORT
 EdgePtr addEdge(const std::shared_ptr<ModelAPI_Document>& thePart,
                 const std::list<ModelHighAPI_Selection>& theBaseObjects);
+/// \ingroup CPPHighAPI
+/// \brief Create Edge feature.
+BUILDAPI_EXPORT
+EdgePtr addEdge(const std::shared_ptr<ModelAPI_Document>& thePart,
+                const ModelHighAPI_Selection& theFirstPoint,
+                const ModelHighAPI_Selection& theSecondPoint);
 
 #endif // BuildAPI_Edge_H_
