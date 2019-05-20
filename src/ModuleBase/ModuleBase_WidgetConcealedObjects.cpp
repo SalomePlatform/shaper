@@ -21,6 +21,7 @@
 #include <ModuleBase_Tools.h>
 
 #include <ModelAPI_Result.h>
+#include <ModelAPI_ResultBody.h>
 #include <ModelAPI_AttributeReference.h>
 #include <ModelAPI_AttributeRefList.h>
 #include <ModelAPI_Session.h>
@@ -37,6 +38,8 @@
 #include <QCheckBox>
 #include <QVBoxLayout>
 
+#include <algorithm>
+
 const int DEFAULT_NAME_COLUMN_WIDTH = 200;
 
 ModuleBase_WidgetConcealedObjects::ModuleBase_WidgetConcealedObjects(QWidget* theParent,
@@ -44,6 +47,10 @@ ModuleBase_WidgetConcealedObjects::ModuleBase_WidgetConcealedObjects(QWidget* th
 : ModuleBase_ModelWidget(theParent, theData)
 {
   myBaseShapeAttribute = theData->getProperty("base_shape_attribute");
+  std::string aPickParents = theData->getProperty("pick_concealed_parents");
+  std::transform(aPickParents.begin(), aPickParents.end(), aPickParents.begin(), std::tolower);
+  myPickConcealedParents = aPickParents == "1" || aPickParents == "true" || aPickParents == "yes";
+
   QGridLayout* aMainLay = new QGridLayout(this);
   ModuleBase_Tools::adjustMargins(aMainLay);
 
@@ -92,11 +99,24 @@ bool ModuleBase_WidgetConcealedObjects::restoreValueCustom()
     myBaseFeature = aBaseFeature;
     if (myBaseFeature.get()) {
       std::list<std::shared_ptr<ModelAPI_Result> > aResults;
+      std::set<ResultBodyPtr> aParents;
       ModelAPI_Tools::getConcealedResults(myBaseFeature, aResults);
       std::list<std::shared_ptr<ModelAPI_Result> >::const_iterator anIt = aResults.begin(),
                                                                    aLast = aResults.end();
       for (; anIt != aLast; anIt++) {
         ResultPtr aResult = *anIt;
+        if (myPickConcealedParents) {
+          // pick the parent result of the concealed object
+          ResultBodyPtr aRootParent = ModelAPI_Tools::bodyOwner(aResult, true);
+          if (aRootParent) {
+            if (aParents.find(aRootParent) == aParents.end()) {
+              aResult = aRootParent;
+              aParents.insert(aRootParent);
+            }
+            else // do not add parent compound once again
+              continue;
+          }
+        }
 
         int aRowId = myView->rowCount();
         addViewRow(aResult);

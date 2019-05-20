@@ -24,6 +24,7 @@
 #include <ModelAPI_AttributeReference.h>
 #include <ModelAPI_AttributeRefList.h>
 #include <ModelAPI_AttributeBoolean.h>
+#include <ModelAPI_AttributeString.h>
 #include <ModelAPI_Session.h>
 #include <ModelAPI_Validator.h>
 #include <ModelAPI_Result.h>
@@ -41,6 +42,8 @@ void FeaturesPlugin_Recover::initAttributes()
   data()->addAttribute(BASE_FEATURE(), ModelAPI_AttributeReference::typeId());
   data()->addAttribute(RECOVERED_ENTITIES(), ModelAPI_AttributeRefList::typeId());
 
+  data()->addAttribute(METHOD(), ModelAPI_AttributeString::typeId());
+  ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(), METHOD());
 }
 
 void FeaturesPlugin_Recover::execute()
@@ -80,4 +83,10 @@ void FeaturesPlugin_Recover::execute()
   }
 
   removeResults(aResultIndex);
+}
+
+void FeaturesPlugin_Recover::attributeChanged(const std::string& theID)
+{
+  if (theID == METHOD())
+    reflist(RECOVERED_ENTITIES())->clear();
 }
