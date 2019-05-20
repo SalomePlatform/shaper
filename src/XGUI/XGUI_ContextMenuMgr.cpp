@@ -338,7 +338,7 @@ void XGUI_ContextMenuMgr::updateObjectBrowserMenu()
         }
       }
       // end single selection
-    } else { // multiselection
+    } else { // multi-selection
       // parameter is commented because the actions are not in the list of result parameter actions
       if (hasResult /*&& (!hasParameter)*/) {
         action("SHOW_CMD")->setEnabled(true);
@@ -347,7 +347,7 @@ void XGUI_ContextMenuMgr::updateObjectBrowserMenu()
         action("SHADING_CMD")->setEnabled(true);
         action("WIREFRAME_CMD")->setEnabled(true);
       }
-    } // end multiselection
+    } // end multi-selection
 
     // Check folder management commands state if only features are selected
     if ((!hasResult) && hasFeature && (!hasParameter) && (!hasCompositeOwner) &&
@@ -468,7 +468,7 @@ void XGUI_ContextMenuMgr::updateObjectBrowserMenu()
     }
   }
   if (aDeactivate) {
-    // If at leas a one objec can not be edited then Show/Hide has to be disabled
+    // If at leas a one object can not be edited then Show/Hide has to be disabled
     action("SHOW_CMD")->setEnabled(false);
     action("HIDE_CMD")->setEnabled(false);
     action("SHOW_ONLY_CMD")->setEnabled(false);
