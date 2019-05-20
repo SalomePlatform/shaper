@@ -38,6 +38,7 @@
 #include <ModelAPI_Feature.h>
 #include <ModelAPI_Result.h>
 #include <ModelAPI_ResultParameter.h>
+#include <ModelAPI_ResultConstruction.h>
 #include <ModelAPI_Validator.h>
 #include <ModelAPI_Session.h>
 #include <ModelAPI_ResultPart.h>
@@ -579,7 +580,7 @@ void Model_Data::addBackReference(FeaturePtr theFeature, std::string theAttrID,
     // be displayed and previewed; also for avoiding of quick show/hide on history
     // moving deep down
     if (aRes && !theFeature->isDisabled()) {
-      aRes->setIsConcealed(true);
+      aRes->setIsConcealed(true, theFeature->getKind() == "RemoveResults");
     }
   }
 }
@@ -604,8 +605,13 @@ void Model_Data::updateConcealmentFlag()
           std::shared_ptr<ModelAPI_Result> aRes =
             std::dynamic_pointer_cast<ModelAPI_Result>(myObject);
           if (aRes.get()) {
-            aRes->setIsConcealed(true); // set concealed
-            return;
+            if (aRes->groupName() != ModelAPI_ResultConstruction::group()) {
+              aRes->setIsConcealed(true); // set concealed
+              return;
+            } else if (aFeature->getKind() == "RemoveResults") {
+              aRes->setIsConcealed(true, true);
+              return;
+            }
           }
         }
       }

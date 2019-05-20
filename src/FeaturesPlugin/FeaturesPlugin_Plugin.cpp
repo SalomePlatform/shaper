@@ -46,6 +46,7 @@
 #include <FeaturesPlugin_Translation.h>
 #include <FeaturesPlugin_Union.h>
 #include <FeaturesPlugin_FusionFaces.h>
+#include <FeaturesPlugin_RemoveResults.h>
 #include <FeaturesPlugin_ValidatorTransform.h>
 #include <FeaturesPlugin_Validators.h>
 
@@ -171,6 +172,8 @@ FeaturePtr FeaturesPlugin_Plugin::createFeature(std::string theFeatureID)
     return FeaturePtr(new FeaturesPlugin_Fillet);
   } else if (theFeatureID == FeaturesPlugin_Measurement::ID()) {
     return FeaturePtr(new FeaturesPlugin_Measurement);
+  } else if (theFeatureID == FeaturesPlugin_RemoveResults::ID()) {
+    return FeaturePtr(new FeaturesPlugin_RemoveResults);
   }
 
   // feature of such kind is not found

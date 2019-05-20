@@ -103,7 +103,7 @@ public:
   MODEL_EXPORT virtual bool isConcealed();
 
   /// Sets all subs as concealed in the data tree (referenced by other objects)
-  MODEL_EXPORT virtual void setIsConcealed(const bool theValue);
+  MODEL_EXPORT virtual void setIsConcealed(const bool theValue, const bool theForced = false);
 
   /// Returns true is the topology is connected.
   MODEL_EXPORT virtual bool isConnectedTopology();

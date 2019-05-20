@@ -446,7 +446,7 @@ void XGUI_ContextMenuMgr::updateObjectBrowserMenu()
         break;
       }
     if (!hasCompositeOwner && allActive ) {
-      if (hasFeature || hasParameter)
+      if (hasResult || hasFeature || hasParameter) // #2924 results can be erased
         action("DELETE_CMD")->setEnabled(true);
     }
     if (!hasCompositeOwner && allActive && (hasFeature|| hasParameter))
@@ -622,6 +622,8 @@ void XGUI_ContextMenuMgr::buildObjBrowserMenu()
   aList.append(action("TRANSPARENCY_CMD"));
 #endif
   aList.append(action("SHOW_FEATURE_CMD"));
+  aList.append(mySeparator2);
+  aList.append(action("DELETE_CMD"));
   myObjBrowserMenus[ModelAPI_ResultConstruction::group()] = aList;
 
   //-------------------------------------
@@ -642,6 +644,8 @@ void XGUI_ContextMenuMgr::buildObjBrowserMenu()
   aList.append(action("TRANSPARENCY_CMD"));
 #endif
   aList.append(action("SHOW_FEATURE_CMD"));
+  aList.append(mySeparator3);
+  aList.append(action("DELETE_CMD"));
   myObjBrowserMenus[ModelAPI_ResultBody::group()] = aList;
   // Group menu
   myObjBrowserMenus[ModelAPI_ResultGroup::group()] = aList;

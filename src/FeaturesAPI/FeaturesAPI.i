@@ -66,6 +66,7 @@
 %shared_ptr(FeaturesAPI_Translation)
 %shared_ptr(FeaturesAPI_Union)
 %shared_ptr(FeaturesAPI_FusionFaces)
+%shared_ptr(FeaturesAPI_RemoveResults)
 
 // all supported interfaces
 %include "FeaturesAPI_BooleanCut.h"
@@ -93,3 +94,4 @@
 %include "FeaturesAPI_Translation.h"
 %include "FeaturesAPI_Union.h"
 %include "FeaturesAPI_FusionFaces.h"
+%include "FeaturesAPI_RemoveResults.h"

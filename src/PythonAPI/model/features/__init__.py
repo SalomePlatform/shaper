@@ -30,3 +30,4 @@ from FeaturesAPI import addRecover
 from FeaturesAPI import addFillet
 from FeaturesAPI import addFusionFaces
 from FeaturesAPI import measureLength, measureDistance, measureRadius, measureAngle
+from FeaturesAPI import addRemoveResults

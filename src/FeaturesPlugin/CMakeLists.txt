@@ -59,6 +59,7 @@ SET(PROJECT_HEADERS
     FeaturesPlugin_Fillet.h
     FeaturesPlugin_Measurement.h
     FeaturesPlugin_FusionFaces.h
+    FeaturesPlugin_RemoveResults.h
 )
 
 SET(PROJECT_SOURCES
@@ -99,6 +100,7 @@ SET(PROJECT_SOURCES
     FeaturesPlugin_Fillet.cpp
     FeaturesPlugin_Measurement.cpp
     FeaturesPlugin_FusionFaces.cpp
+    FeaturesPlugin_RemoveResults.cpp
 )
 
 SET(XML_RESOURCES
@@ -495,4 +497,7 @@ ADD_UNIT_TESTS(TestExtrusion.py
                TestUnion_MultiLevelCompound_v0.py
                TestUnion_MultiLevelCompound_v20190506.py
                TestUnionFaces_v20190506.py
+               TestRemoveResultsBody.py
+               TestRemoveResultsConstruction.py
+               TestRemoveResultsPart.py
 )

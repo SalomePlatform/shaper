@@ -48,5 +48,6 @@
   #include "FeaturesAPI_Translation.h"
   #include "FeaturesAPI_Union.h"
   #include "FeaturesAPI_FusionFaces.h"
+  #include "FeaturesAPI_RemoveResults.h"
 
 #endif // FeaturesAPI_swig_H_
