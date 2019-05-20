@@ -76,7 +76,7 @@ bool ModelAPI_Result::isConcealed()
   return myIsConcealed;
 }
 
-void ModelAPI_Result::setIsConcealed(const bool theValue)
+void ModelAPI_Result::setIsConcealed(const bool theValue, const bool theForced)
 {
   if (myIsConcealed != theValue) {
     myIsConcealed = theValue;

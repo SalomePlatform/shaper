@@ -23,6 +23,7 @@
 #include <ModelAPI_Document.h>
 #include <ModelAPI_Object.h>
 #include <ModelAPI_AttributeDouble.h>
+#include <ModelAPI_AttributeSelectionList.h>
 #include <ModelAPI_ResultBody.h>
 #include <ModelAPI_ResultParameter.h>
 #include <ModelAPI_ResultPart.h>
@@ -758,6 +759,29 @@ std::set<FeaturePtr> getParents(const FeaturePtr& theFeature)
     }
   }
   return aParents;
+}
+
+void removeResults(const std::list<ResultPtr>& theResults)
+{
+  // collect all documents where the results must be removed
+  std::map<DocumentPtr, std::list<ResultPtr> > aDocs;
+
+  std::list<ResultPtr>::const_iterator aResIter = theResults.cbegin();
+  for(; aResIter != theResults.cend(); aResIter++) {
+    DocumentPtr aDoc = (*aResIter)->document();
+    if (!aDocs.count(aDoc))
+      aDocs[aDoc] = std::list<ResultPtr>();
+    aDocs[aDoc].push_back(*aResIter);
+  }
+  // create a "remove" feature in each doc
+  std::map<DocumentPtr, std::list<ResultPtr> >::iterator aDoc = aDocs.begin();
+  for(; aDoc != aDocs.end(); aDoc++) {
+    FeaturePtr aRemove = aDoc->first->addFeature("RemoveResults");
+    if (aRemove) {
+      for(aResIter = aDoc->second.cbegin(); aResIter != aDoc->second.cend(); aResIter++)
+        aRemove->selectionList("results")->append(*aResIter, GeomShapePtr());
+    }
+  }
 }
 
 } // namespace ModelAPI_Tools

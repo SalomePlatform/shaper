@@ -992,6 +992,8 @@ bool askToDelete(const std::set<FeaturePtr> theFeatures,
   aLast = theReferencesToDelete.end();
   for (; anIt != aLast; anIt++) {
     FeaturePtr aFeature = *anIt;
+    if (aFeature->getKind() == "RemoveResults")
+      continue; // skip the remove results feature mentioning: result will be removed anyway
     if (isFeatureOfResult(aFeature, ModelAPI_ResultPart::group()))
       aPartFeatureNames.append(aFeature->name().c_str());
     else

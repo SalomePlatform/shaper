@@ -410,7 +410,8 @@ bool Model_AttributeSelection::isInitialized()
     std::shared_ptr<GeomAPI_Shape> aResult;
     if (myRef.isInitialized()) {
       TDF_Label aSelLab = selectionLabel();
-      if (aSelLab.IsAttribute(kSIMPLE_REF_ID)) { // it is just reference to shape, not sub-shape
+      // it is just reference to shape, not sub-shape
+      if (aSelLab.IsAttribute(kSIMPLE_REF_ID) || aSelLab.IsAttribute(kPART_REF_ID)) {
         ResultPtr aContext = context();
         return aContext.get() != NULL;
       }

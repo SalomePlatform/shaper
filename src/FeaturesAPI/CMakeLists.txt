@@ -37,6 +37,7 @@ SET(PROJECT_HEADERS
   FeaturesAPI_Pipe.h
   FeaturesAPI_Placement.h
   FeaturesAPI_Recover.h
+  FeaturesAPI_RemoveResults.h
   FeaturesAPI_RemoveSubShapes.h
   FeaturesAPI_Revolution.h
   FeaturesAPI_RevolutionBoolean.h
@@ -65,6 +66,7 @@ SET(PROJECT_SOURCES
   FeaturesAPI_Pipe.cpp
   FeaturesAPI_Placement.cpp
   FeaturesAPI_Recover.cpp
+  FeaturesAPI_RemoveResults.cpp
   FeaturesAPI_RemoveSubShapes.cpp
   FeaturesAPI_Revolution.cpp
   FeaturesAPI_RevolutionBoolean.cpp

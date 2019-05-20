@@ -157,10 +157,10 @@ bool Model_ResultBody::isConcealed()
   return myLastConcealed;
 }
 
-void Model_ResultBody::setIsConcealed(const bool theValue)
+void Model_ResultBody::setIsConcealed(const bool theValue, const bool theForced)
 {
   if (ModelAPI_ResultBody::isConcealed() != theValue) {
-    ModelAPI_ResultBody::setIsConcealed(theValue);
+    ModelAPI_ResultBody::setIsConcealed(theValue, theForced);
     updateConcealment();
   }
 }

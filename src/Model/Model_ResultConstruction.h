@@ -63,8 +63,8 @@ class Model_ResultConstruction : public ModelAPI_ResultConstruction
   MODEL_EXPORT virtual bool isInfinite();
   /// Sets the flag that it is infinite
   MODEL_EXPORT virtual void setInfinite(const bool theInfinite);
-  /// The construction element is never concealed
-  MODEL_EXPORT virtual void setIsConcealed(const bool theValue);
+  /// The construction element may be concealed only by "delete" feature
+  MODEL_EXPORT virtual void setIsConcealed(const bool theValue, const bool theForced = false);
 
   /// Updates the shape taking the current value from the data structure, returns true
   /// if update has been correctly done

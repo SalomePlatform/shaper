@@ -97,6 +97,9 @@
         helpfile="recoverFeature.html">
         <source path="recover_widget.xml"/>
       </feature>
+      <feature id="RemoveResults" title="Remove results" tooltip="Internal feature for results removal" internal="1">
+        <multi_selector id="results" concealment="true"/>
+      </feature>
     </group>
     <group id="Fillet">
       <feature id="Fillet" title="Fillet" tooltip="Perform fillet on face or edge"

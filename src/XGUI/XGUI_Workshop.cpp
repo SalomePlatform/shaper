@@ -916,7 +916,6 @@ void XGUI_Workshop::onOpen()
   //save current file before close if modified
   SessionPtr aSession = ModelAPI_Session::get();
   if (aSession->isModified()) {
-    //TODO(sbh): re-launch the app?
     int anAnswer = QMessageBox::question(
         desktop(), tr("Save current file"),
         tr("The document is modified, save before opening another?"),
@@ -1522,7 +1521,7 @@ void XGUI_Workshop::hidePanel(QDockWidget* theDockWidget)
   // the property panel is active window of the desktop, when it is
   // hidden, it is undefined which window becomes active. By this reason
   // it is defined to perform the desktop as the active window.
-  // in SALOME mode, workstack made the PyConsole the active window,
+  // in SALOME mode, work-stack made the PyConsole the active window,
   // set the focus on it. As a result, shortcuts of the application, like
   // are processed by this console. For example Undo actions.
   // It is possible that this code is to be moved to SHAPER package
@@ -1791,7 +1790,7 @@ void XGUI_Workshop::deleteObjects()
   bool hasFolder = false;
   ModuleBase_Tools::checkObjects(anObjects, hasResult, hasFeature, hasParameter, hasCompositeOwner,
                                  hasResultInHistory, hasFolder);
-  if (!(hasFeature || hasParameter || hasFolder))
+  if (!(hasResult || hasFeature || hasParameter || hasFolder))
     return;
 
   // delete objects
@@ -1831,6 +1830,16 @@ void XGUI_Workshop::deleteObjects()
         aDoc->removeFolder(aFolder);
       }
     }
+  }
+  // remove results selected
+  std::list<ResultPtr> aResults;
+  for(QObjectPtrList::const_iterator anIt = anObjects.begin(); anIt != anObjects.end(); anIt++) {
+    ResultPtr aRes = std::dynamic_pointer_cast<ModelAPI_Result>(*anIt);
+    if (aRes.get() && aRes->data()->isValid() && !aRes->data()->isDeleted())
+      aResults.push_back(aRes);
+  }
+  if (!aResults.empty()) {
+    ModelAPI_Tools::removeResults(aResults);
   }
 
   if (aDone)
@@ -1886,11 +1895,11 @@ void XGUI_Workshop::cleanHistory()
   ModelAPI_Tools::findAllReferences(aFeatures, aReferences, true, false);
   // find for each object whether all reference values are in the map as key, that means that there
   // is no other reference in the model to this object, so it might be removed by cleaning history
-  // sk_1(ext_1, vertex_1) + (sk_3, bool_1) - cann't be deleted, dependency to bool_1
-  // ext_1(bool_1, sk_3)  - cann't be deleted, dependency to bool_1
+  // sk_1(ext_1, vertex_1) + (sk_3, bool_1) - can't be deleted, dependency to bool_1
+  // ext_1(bool_1, sk_3)  - can't be deleted, dependency to bool_1
   // vertex_1()
-  // sk_2(ext_2) + (bool_1)  - cann't be deleted, dependency to bool_1
-  // ext_2(bool_1)  - cann't be deleted, dependency to bool_1
+  // sk_2(ext_2) + (bool_1)  - can't be deleted, dependency to bool_1
+  // ext_2(bool_1)  - can't be deleted, dependency to bool_1
   // sk_3()
   // Information: bool_1 is not selected
   std::set<FeaturePtr> anUnusedObjects;

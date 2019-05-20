@@ -216,9 +216,12 @@ std::shared_ptr<GeomAPI_Face> Model_ResultConstruction::face(const int theIndex)
   return aResult;
 }
 
-void Model_ResultConstruction::setIsConcealed(const bool theValue)
+void Model_ResultConstruction::setIsConcealed(const bool theValue, const bool theForced)
 {
-  // do nothing: the construction element is never concealed
+  // the construction element may be concealed only by "delete" feature
+  if (!theValue || theForced) {
+    ModelAPI_ResultConstruction::setIsConcealed(theValue, theForced);
+  }
 }
 
 void Model_ResultConstruction::storeShape(std::shared_ptr<GeomAPI_Shape> theShape)

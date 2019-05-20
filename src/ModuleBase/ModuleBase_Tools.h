@@ -79,7 +79,7 @@ MODULEBASE_EXPORT void setFocus(QWidget* theWidget, const QString& theInfo = QSt
 
 /// Sets or removes the shadow effect to the widget
 /// \param theWidget a widget to be styled
-/// \param isSetEffect if true, the shadow effect is set, overwise cleared
+/// \param isSetEffect if true, the shadow effect is set, otherwise cleared
 /// \return resulting pixmap
 MODULEBASE_EXPORT void setShadowEffect(QWidget* theWidget, const bool isSetEffect);
 
@@ -193,7 +193,7 @@ MODULEBASE_EXPORT void checkObjects(const QObjectPtrList& theObjects, bool& hasR
 
 /// Sets the default coeffient into the driver calculated accordingly the shape type.
 /// It provides 1.e-4 for results of construction type
-/// \param theResult a result object to define the deviation coeffient
+/// \param theResult a result object to define the deviation coefficient
 /// \param theDrawer a drawer
 //MODULEBASE_EXPORT void setDefaultDeviationCoefficient(
 //                           const std::shared_ptr<ModelAPI_Result>& theResult,
@@ -201,7 +201,7 @@ MODULEBASE_EXPORT void checkObjects(const QObjectPtrList& theObjects, bool& hasR
 
 /// Sets the default coeffient into the driver calculated accordingly the shape type.
 /// It provides 1.e-4 for a shape withe Edge shape type
-/// \param theShape a shape to define the deviation coeffient,
+/// \param theShape a shape to define the deviation coefficient,
 /// \param theDrawer a drawer
 MODULEBASE_EXPORT void setDefaultDeviationCoefficient(const TopoDS_Shape& theShape,
                                                       const Handle(Prs3d_Drawer)& theDrawer);
@@ -300,7 +300,7 @@ void MODULEBASE_EXPORT refsToFeatureInFeatureDocument(const ObjectPtr& theObject
 
 
 /// Returns true if the object if a sub child of the feature. The feature is casted to the
-/// composite one. If it is possible, the sub object check happens. The method is applyed
+/// composite one. If it is possible, the sub object check happens. The method is applied
 /// recursively to the feature subs.
 /// \param theObject a candidate to be a sub object
 /// \param theFeature a candidate to be a composite feature
@@ -339,18 +339,18 @@ bool MODULEBASE_EXPORT askToDelete(const std::set<FeaturePtr> aFeatures,
                                    std::set<FeaturePtr>& theReferencesToDelete,
                                    const std::string& thePrefixInfo = "");
 
-/// Converts a list of objects to set of corresponded features. If object is result, it is ingored
-/// because the feauture only might be removed. But if result is in a parameter group, the feature
+/// Converts a list of objects to set of corresponded features. If object is result, it is ignored
+/// because the feature only might be removed. But if result is in a parameter group, the feature
 /// of this parameter is to be removed
 /// \param theObjects a list of objects
-/// \param theFeatures an out conteiner of features
+/// \param theFeatures an out container of features
 void MODULEBASE_EXPORT convertToFeatures(const QObjectPtrList& theObjects,
                                          std::set<FeaturePtr>& theFeatures);
 
 
 /// Converts a list of objects to set of folders.
 /// \param theObjects a list of objects
-/// \param theFeatures an out conteiner of features
+/// \param theFeatures an out container of features
 void MODULEBASE_EXPORT convertToFolders(const QObjectPtrList& theObjects,
                                          std::set<FolderPtr>& theFolders);
 
@@ -358,14 +358,14 @@ void MODULEBASE_EXPORT convertToFolders(const QObjectPtrList& theObjects,
 /// Returns translation from the given data.
 /// If translation is not exists then it returns a string
 /// from the info data without translation
-/// \param theMessage a message which dave to be translated
+/// \param theMessage a message which have to be translated
 QString MODULEBASE_EXPORT translate(const Events_InfoMessage& theMessage);
 
 /// Returns translation from the given data.
 /// If translation is not exists then it returns a string
 /// from the info data without translation
 /// \param theContext context of the message (Feature Id)
-/// \param theMessage a message which dave to be translated
+/// \param theMessage a message which have to be translated
 QString MODULEBASE_EXPORT translate(const std::string& theContext, const std::string& theMessage);
 
 /// Set Highlighting of points as a Ball shape

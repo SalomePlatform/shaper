@@ -67,7 +67,7 @@ class ModelAPI_Result : public ModelAPI_Object
   MODELAPI_EXPORT virtual bool isConcealed();
 
   /// Sets the result as concealed in the data tree (referenced by other objects)
-  MODELAPI_EXPORT virtual void setIsConcealed(const bool theValue);
+  MODELAPI_EXPORT virtual void setIsConcealed(const bool theValue, const bool theForced = false);
 
   /// Enables/disables the result. The disabled result does not participate in any calculation
   /// and visualization: like it was removed. But it keeps the general parameters: colors,

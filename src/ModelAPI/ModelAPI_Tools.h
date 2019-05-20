@@ -205,6 +205,10 @@ MODELAPI_EXPORT std::pair<std::string, bool> getDefaultName(
  */
 MODELAPI_EXPORT std::set<std::shared_ptr<ModelAPI_Feature> >
     getParents(const std::shared_ptr<ModelAPI_Feature>& theFeature);
+
+/*! Creates a remove result features with the given results
+*/
+MODELAPI_EXPORT void removeResults(const std::list<std::shared_ptr<ModelAPI_Result> >& theResults);
 }
 
 #endif

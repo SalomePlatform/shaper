@@ -1244,6 +1244,18 @@ void Model_Document::setCurrentFeature(
       }
     }
   }
+  if (theVisible) { // make RemoveResults feature be active even it is performed after the current
+    int anIndex = kUNDEFINED_FEATURE_INDEX;
+    FeaturePtr aNext =
+      theCurrent.get() ? myObjs->nextFeature(theCurrent, anIndex, false) : myObjs->firstFeature();
+    for (; aNext.get(); aNext = myObjs->nextFeature(theCurrent, anIndex, false)) {
+      if (aNext->isInHistory()) {
+        break; // next in history is not needed
+      } else if (aNext->getKind() == "RemoveResults"){
+        theCurrent = aNext;
+      }
+    }
+  }
   if (theCurrent.get()) {
     std::shared_ptr<Model_Data> aData = std::static_pointer_cast<Model_Data>(theCurrent->data());
     if (!aData.get() || !aData->isValid()) {
