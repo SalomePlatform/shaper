@@ -1835,7 +1835,9 @@ void XGUI_Workshop::deleteObjects()
   std::list<ResultPtr> aResults;
   for(QObjectPtrList::const_iterator anIt = anObjects.begin(); anIt != anObjects.end(); anIt++) {
     ResultPtr aRes = std::dynamic_pointer_cast<ModelAPI_Result>(*anIt);
-    if (aRes.get() && aRes->data()->isValid() && !aRes->data()->isDeleted())
+    if (aRes.get() && aRes->data()->isValid() && !aRes->data()->isDeleted() &&
+        aRes->groupName() != ModelAPI_ResultGroup::group() && // don't remove groups and fields
+        aRes->groupName() != ModelAPI_ResultField::group()) // because they are badly selected
       aResults.push_back(aRes);
   }
   if (!aResults.empty()) {
