@@ -4,7 +4,17 @@
                   tooltip="Select a feature that conceals results.">
     <validator id="FeaturesPlugin_ValidatorConcealedResult" parameters="recovered"/>
   </feature_selector>
-  <concealed_objects_view id="recovered"
-                  tooltip="Concealed results to be recevered"
-                  base_shape_attribute="base_feature"/>
+  <toolbox id="method">
+    <box id="default" title="Concealed results" icon="icons/Features/recover_default_32x32.png">
+      <concealed_objects_view id="recovered"
+                              tooltip="Concealed results to be recevered"
+                              base_shape_attribute="base_feature"/>
+    </box>
+    <box id="compound" title="Concealed compounds" icon="icons/Features/recover_compound_32x32.png">
+      <concealed_objects_view id="recovered"
+                              tooltip="Concealed results to be recevered"
+                              base_shape_attribute="base_feature"
+                              pick_concealed_parents="1"/>
+    </box>
+  </toolbox>
 </source>

@@ -73,6 +73,7 @@ private slots:
 
 private:
   std::string myBaseShapeAttribute; ///< attribute of the base object
+  bool myPickConcealedParents; ///< select parent compsolid/compounds of concealed objects
   QTableWidget* myView; ///< table view of visibility states
 
   std::shared_ptr<ModelAPI_Feature> myBaseFeature; ///< backup of feature of filling the table view

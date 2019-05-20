@@ -263,6 +263,9 @@ ADD_UNIT_TESTS(TestExtrusion.py
                TestPipe_Compound.py
                TestPipe_ErrorMsg.py
                TestRecover.py
+               TestRecover_Compound.py
+               TestRecover_Compsolid1.py
+               TestRecover_Compsolid2.py
                TestRecover1798.py
                TestSplitEdgeVertex.py
                TestSplitEdgeEdge.py

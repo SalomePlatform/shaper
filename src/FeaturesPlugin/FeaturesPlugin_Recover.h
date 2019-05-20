@@ -59,6 +59,26 @@ class FeaturesPlugin_Recover : public ModelAPI_Feature
     return MY_RECOVERED_ENTITIES_ID;
   }
 
+  /// Attribute name of the type of recover.
+  inline static const std::string& METHOD()
+  {
+    static const std::string MY_METHOD_ID("method");
+    return MY_METHOD_ID;
+  }
+
+  /// Value of default method, recovering concealed objects only.
+  inline static const std::string& METHOD_DEFAULT()
+  {
+    static const std::string MY_METHOD_ID("default");
+    return MY_METHOD_ID;
+  }
+  /// Value of method, recovering parent compounds of concealed objects.
+  inline static const std::string& METHOD_COMPOUND()
+  {
+    static const std::string MY_METHOD_ID("compound");
+    return MY_METHOD_ID;
+  }
+
   /// Returns the kind of a feature
   FEATURESPLUGIN_EXPORT virtual const std::string& getKind()
   {
@@ -71,6 +91,10 @@ class FeaturesPlugin_Recover : public ModelAPI_Feature
 
   /// Request for initialization of data model of the feature: adding all attributes
   FEATURESPLUGIN_EXPORT virtual void initAttributes();
+
+  /// Called on change of any argument-attribute of this object
+  /// \param theID identifier of changed attribute
+  FEATURESPLUGIN_EXPORT virtual void attributeChanged(const std::string& theID);
 
   /// Use plugin manager for features creation
   FeaturesPlugin_Recover();

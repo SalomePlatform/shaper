@@ -45,7 +45,7 @@ public:
   FeaturesAPI_Recover(const std::shared_ptr<ModelAPI_Feature>& theFeature,
                       const ModelHighAPI_Reference& theBaseFeature,
                       const std::list<ModelHighAPI_Selection>& theRecoveredList,
-                      const bool thePersistent = false);
+                      const bool theRecoverCompound = false);
 
   /// Destructor.
   FEATURESAPI_EXPORT
@@ -79,6 +79,6 @@ FEATURESAPI_EXPORT
 RecoverPtr addRecover(const std::shared_ptr<ModelAPI_Document>& thePart,
                       const ModelHighAPI_Reference& theBaseFeature,
                       const std::list<ModelHighAPI_Selection>& theRecoveredList,
-                      const bool thePersistent = false);
+                      const bool theRecoverCompound = false);
 
 #endif // FeaturesAPI_Recover_H_
