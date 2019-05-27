@@ -477,6 +477,9 @@ private:
   /// Called on help button clicked in the property panel.
   void onHelpActionClicked();
 
+  //! The slot is called only once on resizing of Object Browser
+  void onDockSizeChanged();
+
  private:
   /// Init menu
   void initMenu();

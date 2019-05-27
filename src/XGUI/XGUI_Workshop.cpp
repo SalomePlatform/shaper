@@ -1394,8 +1394,7 @@ QDockWidget* XGUI_Workshop::createObjectBrowser(QWidget* theParent)
 {
   QDockWidget* aObjDock = new QDockWidget(theParent);
   aObjDock->setAllowedAreas(Qt::LeftDockWidgetArea |
-                            Qt::RightDockWidgetArea |
-                            Qt::BottomDockWidgetArea);
+                            Qt::RightDockWidgetArea);
   aObjDock->setWindowTitle(tr("Object browser"));
   aObjDock->setStyleSheet(
       "::title { position: relative; padding-left: 5px; text-align: left center }");
@@ -1403,6 +1402,8 @@ QDockWidget* XGUI_Workshop::createObjectBrowser(QWidget* theParent)
   myObjectBrowser->initialize(myModule->rootNode());
   myModule->customizeObjectBrowser(myObjectBrowser);
   aObjDock->setWidget(myObjectBrowser);
+
+  connect(myObjectBrowser, SIGNAL(sizeChanged()), SLOT(onDockSizeChanged()));
 
   myContextMenuMgr->connectObjectBrowser();
   return aObjDock;
@@ -1423,9 +1424,9 @@ void XGUI_Workshop::createDockWidgets()
 
   myPropertyPanel->setupActions(myActionsMgr);
   myPropertyPanel->setAllowedAreas(Qt::LeftDockWidgetArea |
-                                   Qt::RightDockWidgetArea |
-                                   Qt::BottomDockWidgetArea);
+                                   Qt::RightDockWidgetArea);
   aDesktop->addDockWidget(Qt::LeftDockWidgetArea, myPropertyPanel);
+
   hidePanel(myPropertyPanel);  ///<! Invisible by default
 
   myFacesPanel = new XGUI_FacesPanel(aDesktop, myModuleConnector);
@@ -2916,5 +2917,20 @@ void XGUI_Workshop::clearTemporaryDir()
     foreach(QString aFile, aEntries) {
       aDir.remove(aFile);
     }
+  }
+}
+
+
+void XGUI_Workshop::onDockSizeChanged()
+{
+  QDockWidget* aDockWgt = dynamic_cast<QDockWidget*>(myObjectBrowser->parentWidget());
+  int aObWidth = aDockWgt->size().width();
+  if (myPropertyPanel->width() != aObWidth) {
+    QList<QDockWidget*> aWgtList;
+    aWgtList << myPropertyPanel << aDockWgt;
+    QList<int> aSizeList;
+    aSizeList << aObWidth << aObWidth;
+    desktop()->resizeDocks(aWgtList, aSizeList, Qt::Horizontal);
+    disconnect(myObjectBrowser, SIGNAL(sizeChanged()), this, SLOT(onDockSizeChanged()));
   }
 }
