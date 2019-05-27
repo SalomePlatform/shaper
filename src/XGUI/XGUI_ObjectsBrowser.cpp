@@ -727,3 +727,10 @@ void XGUI_ObjectsBrowser::setFoldersState(const QMap<ObjectPtr, bool>& theStates
     myTreeView->setExpanded(aIdx, aIt.value());
   }
 }
+
+
+void XGUI_ObjectsBrowser::resizeEvent(QResizeEvent* theEvent)
+{
+  QWidget::resizeEvent(theEvent);
+  emit sizeChanged();
+}

@@ -237,6 +237,15 @@ signals:
   //! Segnal is emitted when user cliks by mouse in header label of object browser
   void headerMouseDblClicked(const QModelIndex&);
 
+  //! An signal emitted on resize of the Object Browser
+  void sizeChanged();
+
+
+protected:
+  //! redefinition of a virtual method
+  void resizeEvent(QResizeEvent* theEvent);
+
+
  private slots:
   /// Show context menu
   /// \param theEvent a context menu event
