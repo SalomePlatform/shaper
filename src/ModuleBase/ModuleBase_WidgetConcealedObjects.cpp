@@ -48,7 +48,7 @@ ModuleBase_WidgetConcealedObjects::ModuleBase_WidgetConcealedObjects(QWidget* th
 {
   myBaseShapeAttribute = theData->getProperty("base_shape_attribute");
   std::string aPickParents = theData->getProperty("pick_concealed_parents");
-  std::transform(aPickParents.begin(), aPickParents.end(), aPickParents.begin(), std::tolower);
+  std::transform(aPickParents.begin(), aPickParents.end(), aPickParents.begin(), ::tolower);
   myPickConcealedParents = aPickParents == "1" || aPickParents == "true" || aPickParents == "yes";
 
   QGridLayout* aMainLay = new QGridLayout(this);
