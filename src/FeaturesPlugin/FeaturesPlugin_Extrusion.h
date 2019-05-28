@@ -132,10 +132,18 @@ public:
 protected:
   /// Generates extrusions.
   /// \param[out] theBaseShapes list of base shapes.
+  /// \param[out] theBoundaryShapes list of faces limiting the extrusion
   /// \param[out] theMakeShapes list of according algos.
   /// \return false in case one of algo failed.
   bool makeExtrusions(ListOfShape& theBaseShapes,
+                      ListOfShape& theBoundaryShapes,
                       ListOfMakeShape& theMakeShapes);
+
+  /// Stores result of generation.
+  void storeResultWithBoundaries(const GeomShapePtr theBaseShape,
+                                 const ListOfShape& theBoundaryShapes,
+                                 const std::shared_ptr<GeomAlgoAPI_MakeShape> theMakeShape,
+                                 const int theIndex = 0);
 };
 
 #endif

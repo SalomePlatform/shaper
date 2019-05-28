@@ -23,12 +23,14 @@
 #include "FeaturesPlugin_BooleanFuse.h"
 #include "FeaturesPlugin_BooleanCommon.h"
 #include "FeaturesPlugin_BooleanSmash.h"
+#include "FeaturesPlugin_Extrusion.h"
 #include "FeaturesPlugin_Pipe.h"
 #include "FeaturesPlugin_Union.h"
 
 #include <Events_InfoMessage.h>
 
 #include <ModelAPI_Attribute.h>
+#include <ModelAPI_AttributeDouble.h>>
 #include <ModelAPI_AttributeInteger.h>
 #include <ModelAPI_AttributeSelectionList.h>
 #include <ModelAPI_AttributeString.h>
@@ -52,6 +54,7 @@
 #include <GeomAPI_ShapeIterator.h>
 
 #include <GeomAlgoAPI_CompoundBuilder.h>
+#include <GeomAlgoAPI_Prism.h>
 #include <GeomAlgoAPI_ShapeBuilder.h>
 #include <GeomAlgoAPI_ShapeTools.h>
 #include <GeomAlgoAPI_WireBuilder.h>
@@ -681,6 +684,99 @@ bool FeaturesPlugin_ValidatorExtrusionDir::isShapesCanBeEmpty(const AttributePtr
     }
   } else {
     return false;
+  }
+
+  return true;
+}
+
+//==================================================================================================
+bool FeaturesPlugin_ValidatorExtrusionBoundaryFace::isValid(
+    const AttributePtr& theAttribute,
+    const std::list<std::string>& theArguments,
+    Events_InfoMessage& theError) const
+{
+  FeaturePtr aFeature = ModelAPI_Feature::feature(theAttribute->owner());
+
+  // Collect all necessary attributes and try to build prism
+
+  // base face
+  AttributeSelectionListPtr aBaseShapeAttr =
+      aFeature->selectionList(FeaturesPlugin_Extrusion::BASE_OBJECTS_ID());
+  ListOfShape aBaseShapeList;
+  std::string anError;
+  if (!FeaturesPlugin_Tools::getShape(aBaseShapeAttr, true, aBaseShapeList, anError)) {
+    theError = anError;
+    return false;
+  }
+
+  // direction
+  AttributeSelectionPtr aSelection =
+      aFeature->selection(FeaturesPlugin_Extrusion::DIRECTION_OBJECT_ID());
+  GeomShapePtr aShape = aSelection->value();
+  if (!aShape.get() && aSelection->context().get())
+    aShape = aSelection->context()->shape();
+
+  GeomEdgePtr anEdge;
+  if (aShape.get()) {
+    if (aShape->isEdge())
+      anEdge = aShape->edge();
+    else if (aShape->isCompound()) {
+      GeomAPI_ShapeIterator anIt(aShape);
+      anEdge = anIt.current()->edge();
+    }
+  }
+
+  std::shared_ptr<GeomAPI_Dir> aDir;
+  if (anEdge.get() && anEdge->isLine())
+    aDir = anEdge->line()->direction();
+
+  // from/to shapes
+  GeomShapePtr aFromShape, aToShape;
+  aSelection = aFeature->selection(FeaturesPlugin_Extrusion::TO_OBJECT_ID());
+  if (aSelection.get()) {
+    aToShape = aSelection->value();
+    if (!aToShape.get() && aSelection->context().get())
+      aToShape = aSelection->context()->shape();
+    if (aToShape.get() && aToShape->isCompound()) {
+      GeomAPI_ShapeIterator anIt(aToShape);
+      aToShape = anIt.current();
+    }
+    if (aToShape.get() && !aToShape->isFace()) {
+      theError = "\"To\" shape is not a face";
+      return false;
+    }
+  }
+  aSelection = aFeature->selection(FeaturesPlugin_Extrusion::FROM_OBJECT_ID());
+  if (aSelection.get()) {
+    aFromShape = aSelection->value();
+    if (!aFromShape.get() && aSelection->context().get())
+      aFromShape = aSelection->context()->shape();
+    if (aFromShape.get() && aFromShape->isCompound()) {
+      GeomAPI_ShapeIterator anIt(aFromShape);
+      aFromShape = anIt.current();
+    }
+    if (aFromShape.get() && !aFromShape->isFace()) {
+      theError = "\"From\" shape is not a face";
+      return false;
+    }
+  }
+
+  double aToSize = aFeature->real(FeaturesPlugin_Extrusion::TO_OFFSET_ID())->value();
+  double aFromSize = aFeature->real(FeaturesPlugin_Extrusion::FROM_OFFSET_ID())->value();
+
+  // check extrusion
+  for (ListOfShape::iterator anIt = aBaseShapeList.begin(); anIt != aBaseShapeList.end(); anIt++) {
+    std::shared_ptr<GeomAPI_Shape> aBaseShape = *anIt;
+
+    std::shared_ptr<GeomAlgoAPI_Prism> aPrismAlgo(
+        new GeomAlgoAPI_Prism(aBaseShape, aDir, aToShape, aToSize, aFromShape, aFromSize));
+    bool isFailed = GeomAlgoAPI_Tools::AlgoError::isAlgorithmFailed(aPrismAlgo,
+                                                                    FeaturesPlugin_Extrusion::ID(),
+                                                                    anError);
+    if (isFailed) {
+      theError = anError;
+      return false;
+    }
   }
 
   return true;

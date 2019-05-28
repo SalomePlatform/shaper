@@ -547,6 +547,24 @@ std::shared_ptr<GeomAPI_Shape> GeomAlgoAPI_ShapeTools::groupSharedTopology(
 }
 
 //==================================================================================================
+bool GeomAlgoAPI_ShapeTools::hasSharedTopology(const ListOfShape& theShapes,
+                                               const GeomAPI_Shape::ShapeType theShapeType)
+{
+  TopTools_IndexedMapOfShape aSubs;
+  for (ListOfShape::const_iterator anIt = theShapes.begin(); anIt != theShapes.end(); ++anIt) {
+    TopTools_IndexedMapOfShape aCurSubs;
+    TopExp::MapShapes((*anIt)->impl<TopoDS_Shape>(), (TopAbs_ShapeEnum)theShapeType, aCurSubs);
+    for (TopTools_IndexedMapOfShape::Iterator aSubIt(aCurSubs); aSubIt.More(); aSubIt.Next()) {
+      if (aSubs.Contains(aSubIt.Value()))
+        return true;
+      else
+        aSubs.Add(aSubIt.Value());
+    }
+  }
+  return false;
+}
+
+//==================================================================================================
 std::list<std::shared_ptr<GeomAPI_Pnt> >
   GeomAlgoAPI_ShapeTools::getBoundingBox(const ListOfShape& theShapes, const double theEnlarge)
 {

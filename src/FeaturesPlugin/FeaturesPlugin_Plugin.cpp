@@ -77,6 +77,8 @@ FeaturesPlugin_Plugin::FeaturesPlugin_Plugin()
                               new FeaturesPlugin_ValidatorPipeLocationsNumber);
   aFactory->registerValidator("FeaturesPlugin_ValidatorExtrusionDir",
                               new FeaturesPlugin_ValidatorExtrusionDir);
+  aFactory->registerValidator("FeaturesPlugin_ValidatorExtrusionBoundary",
+                              new FeaturesPlugin_ValidatorExtrusionBoundaryFace);
   aFactory->registerValidator("FeaturesPlugin_ValidatorBooleanSelection",
                               new FeaturesPlugin_ValidatorBooleanSelection);
   aFactory->registerValidator("FeaturesPlugin_ValidatorPartitionSelection",

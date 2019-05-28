@@ -80,6 +80,13 @@ public:
   GEOMALGOAPI_EXPORT static std::shared_ptr<GeomAPI_Shape>
     groupSharedTopology(const std::shared_ptr<GeomAPI_Shape> theCompound);
 
+  /// \brief Check group of shapes has shared sub-shapes of the given type
+  /// \param[in] theShapes    list of shapes
+  /// \param[in] theShapeType type of sub-shapes to check
+  /// \return \c true if shared topology exists
+  GEOMALGOAPI_EXPORT static bool hasSharedTopology(const ListOfShape& theShapes,
+                                                   const GeomAPI_Shape::ShapeType theShapeType);
+
   /// \brief Calculates bounding box for theShapes
   /// \return list of eight points.
   /// \param[in] theShapes list of shapes.

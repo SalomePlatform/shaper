@@ -18,6 +18,7 @@
 //
 
 #include <FeaturesPlugin_CompositeSketch.h>
+#include <FeaturesPlugin_Tools.h>
 
 #include <ModelAPI_AttributeSelectionList.h>
 #include <ModelAPI_AttributeReference.h>
@@ -26,16 +27,10 @@
 #include <ModelAPI_Session.h>
 #include <ModelAPI_Validator.h>
 
-#include <GeomAlgoAPI_CompoundBuilder.h>
 #include <GeomAlgoAPI_Revolution.h>
-#include <GeomAlgoAPI_ShapeTools.h>
-#include <GeomAlgoAPI_SketchBuilder.h>
 
-#include <GeomAPI_PlanarEdges.h>
 #include <GeomAPI_ShapeExplorer.h>
 
-#include <map>
-#include <sstream>
 
 static void storeSubShape(const std::shared_ptr<GeomAlgoAPI_MakeShape> theMakeShape,
                           ResultBodyPtr theResultBody,
@@ -132,101 +127,12 @@ void FeaturesPlugin_CompositeSketch::removeFeature(std::shared_ptr<ModelAPI_Feat
 void FeaturesPlugin_CompositeSketch::getBaseShapes(ListOfShape& theBaseShapesList,
                                                    const bool theIsMakeShells)
 {
-  theBaseShapesList.clear();
-
-  ListOfShape aBaseFacesList;
-  std::map<ResultConstructionPtr, ListOfShape> aSketchWiresMap;
   AttributeSelectionListPtr aBaseObjectsSelectionList = selectionList(BASE_OBJECTS_ID());
-  if(!aBaseObjectsSelectionList.get()) {
-    setError("Error: Could not get base objects selection list.");
-    return;
-  }
-  if(aBaseObjectsSelectionList->size() == 0) {
-    setError("Error: Base objects list is empty.");
-    return;
-  }
-  for(int anIndex = 0; anIndex < aBaseObjectsSelectionList->size(); anIndex++) {
-    AttributeSelectionPtr aBaseObjectSelection = aBaseObjectsSelectionList->value(anIndex);
-    if(!aBaseObjectSelection.get()) {
-      setError("Error: Selected base object is empty.");
-      return;
-    }
-    GeomShapePtr aBaseShape = aBaseObjectSelection->value();
-    if(aBaseShape.get() && !aBaseShape->isNull()) {
-      GeomAPI_Shape::ShapeType aST = aBaseShape->shapeType();
-      if(aST == GeomAPI_Shape::SOLID || aST == GeomAPI_Shape::COMPSOLID) {
-        setError("Error: Selected shapes has unsupported type.");
-        return;
-      }
-      ResultConstructionPtr aConstruction =
-        std::dynamic_pointer_cast<ModelAPI_ResultConstruction>(aBaseObjectSelection->context());
-      if(aConstruction.get() && !aBaseShape->isEqual(aConstruction->shape()) &&
-          aST == GeomAPI_Shape::WIRE) {
-        // It is a wire on the sketch, store it to make face later.
-        aSketchWiresMap[aConstruction].push_back(aBaseShape);
-        continue;
-      } else {
-      aST == GeomAPI_Shape::FACE ? aBaseFacesList.push_back(aBaseShape) :
-                                   theBaseShapesList.push_back(aBaseShape);
-      }
-    } else {
-      // This may be the whole sketch result selected, check and get faces.
-      ResultConstructionPtr aConstruction =
-        std::dynamic_pointer_cast<ModelAPI_ResultConstruction>(aBaseObjectSelection->context());
-      if(!aConstruction.get()) {
-        setError("Error: Selected sketches does not have results.");
-        return;
-      }
-      int aFacesNum = aConstruction->facesNum();
-      if(aFacesNum == 0) {
-        // Probably it can be construction.
-        aBaseShape = aConstruction->shape();
-        if(aBaseShape.get() && !aBaseShape->isNull()) {
-          GeomAPI_Shape::ShapeType aST = aBaseShape->shapeType();
-          if(aST != GeomAPI_Shape::VERTEX && aST != GeomAPI_Shape::EDGE &&
-             aST != GeomAPI_Shape::WIRE &&
-             aST != GeomAPI_Shape::FACE && aST != GeomAPI_Shape::SHELL) {
-            setError("Error: Selected shapes has unsupported type.");
-            return;
-          }
-          aST == GeomAPI_Shape::FACE ? aBaseFacesList.push_back(aBaseShape) :
-                                       theBaseShapesList.push_back(aBaseShape);
-        }
-      } else {
-        for(int aFaceIndex = 0; aFaceIndex < aFacesNum; aFaceIndex++) {
-          GeomShapePtr aBaseFace = aConstruction->face(aFaceIndex);
-          if(!aBaseFace.get() || aBaseFace->isNull()) {
-            setError("Error: One of the faces on selected sketch is null.");
-            return;
-          }
-          aBaseFacesList.push_back(aBaseFace);
-        }
-      }
-    }
-  }
-
-  // Make faces from sketch wires.
-  for(std::map<ResultConstructionPtr, ListOfShape>::const_iterator anIt = aSketchWiresMap.cbegin();
-      anIt != aSketchWiresMap.cend(); ++anIt) {
-    const std::shared_ptr<GeomAPI_PlanarEdges> aSketchPlanarEdges =
-      std::dynamic_pointer_cast<GeomAPI_PlanarEdges>((*anIt).first->shape());
-    const ListOfShape& aWiresList = (*anIt).second;
-    ListOfShape aFaces;
-    GeomAlgoAPI_ShapeTools::makeFacesWithHoles(aSketchPlanarEdges->origin(),
-                                               aSketchPlanarEdges->norm(),
-                                               aWiresList,
-                                               aFaces);
-    aBaseFacesList.insert(aBaseFacesList.end(), aFaces.begin(), aFaces.end());
-  }
-
-  // Searching faces with common edges.
-  if(theIsMakeShells && aBaseFacesList.size() > 1) {
-    GeomShapePtr aFacesCompound = GeomAlgoAPI_CompoundBuilder::compound(aBaseFacesList);
-    GeomAlgoAPI_ShapeTools::combineShapes(aFacesCompound, GeomAPI_Shape::SHELL, theBaseShapesList);
-  } else {
-    theBaseShapesList.insert(theBaseShapesList.end(), aBaseFacesList.begin(),
-                             aBaseFacesList.end());
-  }
+  std::string anError;
+  bool isOk = FeaturesPlugin_Tools::getShape(
+      aBaseObjectsSelectionList, theIsMakeShells, theBaseShapesList, anError);
+  if (!isOk)
+    setError(anError);
 }
 
 //=================================================================================================

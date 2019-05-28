@@ -20,14 +20,14 @@
 #ifndef GeomAlgoAPI_Prism_H_
 #define GeomAlgoAPI_Prism_H_
 
-#include "GeomAlgoAPI.h"
-
 #include "GeomAlgoAPI_MakeSweep.h"
 
-#include <GeomAPI_Dir.h>
 #include <GeomAPI_Shape.h>
 
 #include <memory>
+
+class GeomAPI_Dir;
+class GeomAPI_Pln;
 
 /// \class GeomAlgoAPI_Prism
 /// \ingroup DataAlgo
@@ -55,13 +55,32 @@ public:
                                        const double                       theFromSize);
 
 private:
-  /// Builds resulting shape.
-  void build(const GeomShapePtr&                theBaseShape,
-             const std::shared_ptr<GeomAPI_Dir> theDirection,
-             const GeomShapePtr&                theToShape,
-             const double                       theToSize,
-             const GeomShapePtr&                theFromShape,
-             const double                       theFromSize);
+  /// Build extrusion by distances from the base shape.
+  void buildBySizes(const GeomShapePtr                 theBaseShape,
+                    const std::shared_ptr<GeomAPI_Dir> theDirection,
+                    const double                       theToSize,
+                    const double                       theFromSize,
+                    const GeomAPI_Shape::ShapeType     theTypeToExp);
+
+  /// Build extrusion from plane to plane.
+  void buildByPlanes(const GeomShapePtr                 theBaseShape,
+                     const std::shared_ptr<GeomAPI_Dir> theDirection,
+                     const std::shared_ptr<GeomAPI_Pln> theToPlane,
+                     const double                       theToSize,
+                     const std::shared_ptr<GeomAPI_Pln> theFromPlane,
+                     const double                       theFromSize,
+                     const GeomAPI_Shape::ShapeType     theTypeToExp);
+
+  /// Build extrusion from face to face.
+  void buildByFaces(const GeomShapePtr                 theBaseShape,
+                    const std::shared_ptr<GeomAPI_Dir> theDirection,
+                    const GeomShapePtr                 theToShape,
+                    const double                       theToSize,
+                    const bool                         theToIsPlanar,
+                    const GeomShapePtr                 theFromShape,
+                    const double                       theFromSize,
+                    const bool                         theFromIsPlanar,
+                    const GeomAPI_Shape::ShapeType     theTypeToExp);
 };
 
 #endif
