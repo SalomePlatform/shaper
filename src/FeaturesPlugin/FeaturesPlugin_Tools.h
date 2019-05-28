@@ -45,7 +45,7 @@ public:
                                  const GeomShapePtr& theBaseShape,
                                  const GeomMakeShapePtr& theMakeShape,
                                  const std::string theName);
-    /// Stores deleted shapes.
+  /// Stores deleted shapes.
   static void loadDeletedShapes(ResultBodyPtr theResultBody,
                                 const GeomShapePtr theBaseShape,
                                 const ListOfShape& theTools,
@@ -56,6 +56,12 @@ public:
   static void loadDeletedShapes(std::vector<ResultBaseAlgo>& theResultBaseAlgoList,
                                 const ListOfShape& theTools,
                                 const GeomShapePtr theResultShapesCompound);
+
+  /// Obtain shapes from the selection list attribute.
+  static bool getShape(const std::shared_ptr<ModelAPI_AttributeSelectionList> theSelectionList,
+                       const bool theShareTopology,
+                       ListOfShape& theShapesList,
+                       std::string& theError);
 };
 
 #endif /* FeaturesPlugin_Tools_H_ */

@@ -141,6 +141,21 @@ private:
                           Events_InfoMessage& theError) const;
 };
 
+/// \class FeaturesPlugin_ValidatorExtrusionBoundaryFace
+/// \ingroup Validators
+/// \brief A validator for extrusion from/to face attribute.
+class FeaturesPlugin_ValidatorExtrusionBoundaryFace: public ModelAPI_AttributeValidator
+{
+public:
+  //! \return true if attribute listed in the parameter arguments are planar.
+  //! \param[in] theFeature the checked feature.
+  //! \param[in] theArguments arguments of the attribute.
+  //! \param[out] theError error message.
+  virtual bool isValid(const AttributePtr& theAttribute,
+                       const std::list<std::string>& theArguments,
+                       Events_InfoMessage& theError) const;
+};
+
 /// \class FeaturesPlugin_ValidatorBooleanSelection
 /// \ingroup Validators
 /// \brief Validates selection for boolean operation.

@@ -31,7 +31,7 @@ There are two variants of the property panel for Extrusion depending on the chos
 
 .. image:: images/extrusion_by_bounding_planes.png
    :align: left
-**By Bounding Planes** extrudes objects by specifying bounding planes and offsets.
+**By Bounding Faces** extrudes objects by specifying bounding faces/planes and offsets.
 
 
 By sizes
@@ -77,21 +77,24 @@ The Result of the operation will be an extruded shape:
 
 **See Also** a sample TUI Script of :ref:`tui_create_extrusion_by_sizes` operation.
 
-By bounding planes
+By bounding faces
 ------------------
 
 .. image:: images/Extrusion2.png
   :align: center
 
 .. centered::
-  Extrusion: definition by bounding planes
+  Extrusion: definition by bounding faces
 
 - **Base objects** - contains a list of objects selected in the Object Browser or in the Viewer, which will be extruded.
 - **Axis** if selected, it will be direction of extrusion, otherwise objects normals will be used.
-- **To plane** - a planar face can be selected to bound extrusion from one side.
+- **To face** - a face can be selected to bound extrusion from one side.
 - **To offset** - offset for extrusion or for bounding plane, if selected.
-- **From plane** - a planar face can be selected to bound extrusion from the other side.
+- **From face** - a face can be selected to bound extrusion from the other side.
 - **From offset** - offset for extrusion or for bounding plane, if selected.
+
+Planar face selected as a boundary of extrusion will be enlarged infinitely. As a result, extrusion bounded only by planar faces will be completed always.
+On the other hand, if the boundary face is not planar, extrusion may fail, for example, in case of the base object cannot be projected to this face along given direction.
 
 **TUI Command**:  *model.addExtrusion(part, objects, toObject, toOffset, fromObject, fromOffset);*
 

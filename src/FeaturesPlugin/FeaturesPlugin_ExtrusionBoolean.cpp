@@ -31,7 +31,8 @@ void FeaturesPlugin_ExtrusionBoolean::initAttributes()
 bool FeaturesPlugin_ExtrusionBoolean::makeGeneration(ListOfShape& theBaseShapes,
                                                      ListOfMakeShape& theMakeShapes)
 {
-  return makeExtrusions(theBaseShapes, theMakeShapes);
+  ListOfShape aBoundaryShapes;
+  return makeExtrusions(theBaseShapes, aBoundaryShapes, theMakeShapes);
 }
 
 //=================================================================================================

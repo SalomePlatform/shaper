@@ -46,17 +46,17 @@
       </groupbox>
     </box>
     <box id="ByPlanesAndOffsets"
-         title="By bounding planes and offsets"
+         title="By bounding faces and offsets"
          icon="icons/Features/plane_inverted_32x32.png">
       <groupbox title="From">
         <shape_selector id="from_object"
                         icon="icons/Features/plane.png"
-                        label="Plane face"
-                        tooltip="Bounding plane (select a planar face)"
+                        label="From face"
+                        tooltip="From face"
                         shape_types="face"
                         geometrical_selection="true"
                         default="&lt;base sketch&gt;">
-          <validator id="GeomValidators_Face" parameters="plane"/>
+          <validator id="FeaturesPlugin_ValidatorExtrusionBoundary"/>
         </shape_selector>
         <doublevalue id="from_offset"
                      label="Offset"
@@ -68,12 +68,12 @@
       <groupbox title="To">
         <shape_selector id="to_object"
                         icon="icons/Features/plane_inverted.png"
-                        label="Plane face"
-                        tooltip="Bounding plane (select a planar face)"
+                        label="To face"
+                        tooltip="To face"
                         shape_types="face"
                         geometrical_selection="true"
                         default="&lt;base sketch&gt;">
-          <validator id="GeomValidators_Face" parameters="plane"/>
+          <validator id="FeaturesPlugin_ValidatorExtrusionBoundary"/>
         </shape_selector>
         <doublevalue id="to_offset"
                      label="Offset"

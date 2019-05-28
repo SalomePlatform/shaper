@@ -18,6 +18,7 @@
 //
 
 #include "FeaturesPlugin_Extrusion.h"
+#include "FeaturesPlugin_Tools.h"
 
 #include <ModelAPI_AttributeDouble.h>
 #include <ModelAPI_AttributeSelection.h>
@@ -66,11 +67,11 @@ void FeaturesPlugin_Extrusion::initAttributes()
 //=================================================================================================
 void FeaturesPlugin_Extrusion::execute()
 {
-  ListOfShape aBaseShapesList;
+  ListOfShape aBaseShapesList, aBoundaryShapes;
   ListOfMakeShape aMakeShapesList;
 
   // Make extrusions.
-  if(!makeExtrusions(aBaseShapesList, aMakeShapesList)) {
+  if(!makeExtrusions(aBaseShapesList, aBoundaryShapes, aMakeShapesList)) {
     return;
   }
 
@@ -80,7 +81,10 @@ void FeaturesPlugin_Extrusion::execute()
   ListOfMakeShape::const_iterator anAlgoIt = aMakeShapesList.cbegin();
   for(; aBaseIt != aBaseShapesList.cend() && anAlgoIt != aMakeShapesList.cend();
         ++aBaseIt, ++anAlgoIt) {
-    storeResult(*aBaseIt, *anAlgoIt, aResultIndex++);
+    if (aBoundaryShapes.empty())
+      storeResult(*aBaseIt, *anAlgoIt, aResultIndex++);
+    else
+      storeResultWithBoundaries(*aBaseIt, aBoundaryShapes, *anAlgoIt, aResultIndex++);
   }
 
   removeResults(aResultIndex);
@@ -88,6 +92,7 @@ void FeaturesPlugin_Extrusion::execute()
 
 //=================================================================================================
 bool FeaturesPlugin_Extrusion::makeExtrusions(ListOfShape& theBaseShapes,
+                                              ListOfShape& theBoundaryShapes,
                                               ListOfMakeShape& theMakeShapes)
 {
   theMakeShapes.clear();
@@ -165,6 +170,10 @@ bool FeaturesPlugin_Extrusion::makeExtrusions(ListOfShape& theBaseShapes,
       }
     }
   }
+  if (aToShape)
+    theBoundaryShapes.push_back(aToShape);
+  if (aFromShape)
+    theBoundaryShapes.push_back(aFromShape);
 
   // Generating result for each base shape.
   std::string anError;
@@ -184,4 +193,24 @@ bool FeaturesPlugin_Extrusion::makeExtrusions(ListOfShape& theBaseShapes,
   }
 
   return true;
+}
+
+//=================================================================================================
+void FeaturesPlugin_Extrusion::storeResultWithBoundaries(
+    const GeomShapePtr theBaseShape,
+    const ListOfShape& theBoundaryShapes,
+    const std::shared_ptr<GeomAlgoAPI_MakeShape> theMakeShape,
+    const int theIndex)
+{
+  // Create result body.
+  ResultBodyPtr aResultBody = document()->createBody(data(), theIndex);
+
+  // Store modified shapes.
+  FeaturesPlugin_Tools::loadModifiedShapes(aResultBody, theBoundaryShapes, ListOfShape(),
+                                           theMakeShape, theMakeShape->shape());
+
+  // Store generated edges/faces.
+  storeGenerationHistory(aResultBody, theBaseShape, theMakeShape);
+
+  setResult(aResultBody, theIndex);
 }

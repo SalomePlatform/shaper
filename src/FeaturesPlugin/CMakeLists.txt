@@ -181,6 +181,25 @@ ADD_UNIT_TESTS(TestExtrusion.py
                TestExtrusionFuse_ByPlanesAndOffsets.py
                TestExtrusion_ErrorMsg.py
                TestExtrusion_ZeroOffsetError.py
+               TestExtrusion_ByFaces01.py
+               TestExtrusion_ByFaces02.py
+               TestExtrusion_ByFaces03.py
+               TestExtrusion_ByFaces04.py
+               TestExtrusion_ByFaces05.py
+               TestExtrusion_ByFaces06.py
+               TestExtrusion_ByFaces07.py
+               TestExtrusion_ByFaces08.py
+               TestExtrusion_ByFaces09.py
+               TestExtrusion_ByFaces10.py
+               TestExtrusion_ByFaces11.py
+               TestExtrusion_ByFaces12.py
+               TestExtrusion_ByFaces13.py
+               TestExtrusion_ByFaces14.py
+               TestExtrusion_ByFaces15.py
+               TestExtrusion_ByFaces16.py
+               TestExtrusion_ByFaces17.py
+               TestExtrusion_ByFaces18.py
+               TestExtrusion_ByFaces19.py
                TestRevolution.py
                TestRevolution_ByAngle.py
                TestRevolutionOfPoint.py
