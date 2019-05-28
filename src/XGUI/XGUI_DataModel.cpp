@@ -70,17 +70,22 @@ void XGUI_DataModel::processEvent(const std::shared_ptr<Events_Message>& theMess
     }
     if (aCreated.length() == 0)
       return;
+
+    emit beforeTreeRebuild();
     QTreeNodesList aNodes = myRoot->objectCreated(aCreated);
     ModuleBase_ITreeNode* aParent;
     int aRow = 0;
     QModelIndex aParentIndex1, aParentIndex2;
     ObjectPtr aObj;
+    bool aRebuildAll = false;
+    bool isInserted = false;
+
     foreach(ModuleBase_ITreeNode* aNode, aNodes) {
       aObj = aNode->object();
       aParent = aNode->parent();
       if (aObj.get() && (aObj->groupName() == ModelAPI_Folder::group())) {
         aParent->update();
-        rebuildDataTree();
+        aRebuildAll = true;
       }
       else {
         aRow = aParent->nodeRow(aNode);
@@ -88,8 +93,15 @@ void XGUI_DataModel::processEvent(const std::shared_ptr<Events_Message>& theMess
         aParentIndex2 = getParentIndex(aNode, 2);
         insertRows(aRow, 1, aParentIndex1);
         dataChanged(aParentIndex1, aParentIndex2);
+        isInserted = true;
       }
     }
+    if (aRebuildAll)
+      rebuildDataTree();
+    else if (isInserted)
+      endInsertRows();
+
+    emit treeRebuilt();
   }
   else if (theMessage->eventID() == Events_Loop::loop()->eventByName(EVENT_OBJECT_DELETED)) {
     std::shared_ptr<ModelAPI_ObjectDeletedMessage> aUpdMsg =
@@ -98,6 +110,7 @@ void XGUI_DataModel::processEvent(const std::shared_ptr<Events_Message>& theMess
       aUpdMsg->groups();
     QTreeNodesList aList;
     std::list<std::pair<std::shared_ptr<ModelAPI_Document>, std::string>>::const_iterator aIt;
+    emit beforeTreeRebuild();
     for (aIt = aMsgGroups.cbegin(); aIt != aMsgGroups.cend(); aIt++) {
       aList.append(myRoot->objectsDeleted(aIt->first, aIt->second.c_str()));
     }
@@ -113,6 +126,7 @@ void XGUI_DataModel::processEvent(const std::shared_ptr<Events_Message>& theMess
         aNode->parent()->update();
     }
     rebuildDataTree();
+    emit treeRebuilt();
   }
   else if (theMessage->eventID() == Events_Loop::loop()->eventByName(EVENT_OBJECT_UPDATED)) {
     std::shared_ptr<ModelAPI_ObjectUpdatedMessage> aUpdMsg =
@@ -122,6 +136,7 @@ void XGUI_DataModel::processEvent(const std::shared_ptr<Events_Message>& theMess
     QObjectPtrList aCreated;
     std::set<ObjectPtr>::const_iterator aIt;
     bool aRebuildAll = false;
+    emit beforeTreeRebuild();
     for (aIt = aObjects.cbegin(); aIt != aObjects.cend(); aIt++) {
       ObjectPtr aObj = (*aIt);
       if (!aObj->isInHistory())
@@ -137,7 +152,6 @@ void XGUI_DataModel::processEvent(const std::shared_ptr<Events_Message>& theMess
     }
     if (aRebuildAll) {
       myRoot->update();
-      rebuildDataTree();
     }
     else {
       QSet<ModuleBase_ITreeNode*> aParents;
@@ -160,8 +174,9 @@ void XGUI_DataModel::processEvent(const std::shared_ptr<Events_Message>& theMess
       foreach(ModuleBase_ITreeNode* aNode, aParents) {
         aNode->update();
       }
-      rebuildDataTree();
     }
+    rebuildDataTree();
+    emit treeRebuilt();
   }
   else if (theMessage->eventID() == Events_Loop::loop()->eventByName(EVENT_ORDER_UPDATED)) {
     std::shared_ptr<ModelAPI_OrderUpdatedMessage> aUpdMsg =
@@ -171,8 +186,10 @@ void XGUI_DataModel::processEvent(const std::shared_ptr<Events_Message>& theMess
       std::string aGroup = aUpdMsg->reordered()->group();
       ModuleBase_ITreeNode* aNode = myRoot->findParent(aDoc, aGroup.c_str());
       if (aNode) {
+        emit beforeTreeRebuild();
         aNode->update();
         rebuildDataTree();
+        emit treeRebuilt();
       }
     }
   }
@@ -197,6 +214,11 @@ void XGUI_DataModel::processEvent(const std::shared_ptr<Events_Message>& theMess
         aCreated.append(aObj);
       }
     }
+    if (aCreated.length() == 0)
+      return;
+    bool isInsert = false;
+    bool isRemove = false;
+    emit beforeTreeRebuild();
     foreach(ObjectPtr aObj, aCreated) {
       ModuleBase_ITreeNode* aNode = myRoot->subNode(aObj);
       if (aNode) {
@@ -209,16 +231,23 @@ void XGUI_DataModel::processEvent(const std::shared_ptr<Events_Message>& theMess
 
         if (aNewNb > aOldNb) {
           insertRows(aOldNb - 1, aNewNb - aOldNb, aFirstIdx);
+          isInsert = true;
         }
         else if (aNewNb < aOldNb) {
           if (aNewNb)
             removeRows(aNewNb - 1, aOldNb - aNewNb, aFirstIdx);
           else if (aOldNb)
             removeRows(0, aOldNb, aFirstIdx);
+          isRemove = aNewNb || aOldNb;
         }
         dataChanged(aFirstIdx, aLastIdx);
       }
     }
+    if (isRemove)
+      endRemoveRows();
+    if (isInsert)
+      endInsertRows();
+    emit treeRebuilt();
   }
 }
 
@@ -234,7 +263,6 @@ void XGUI_DataModel::rebuildDataTree()
 {
   beginResetModel();
   endResetModel();
-  emit treeRebuilt();
 }
 
 //******************************************************
@@ -319,7 +347,6 @@ bool XGUI_DataModel::hasChildren(const QModelIndex& theParent) const
 bool XGUI_DataModel::insertRows(int theRow, int theCount, const QModelIndex& theParent)
 {
   beginInsertRows(theParent, theRow, theRow + theCount - 1);
-  endInsertRows();
   return true;
 }
 
@@ -327,7 +354,6 @@ bool XGUI_DataModel::insertRows(int theRow, int theCount, const QModelIndex& the
 bool XGUI_DataModel::removeRows(int theRow, int theCount, const QModelIndex& theParent)
 {
   beginRemoveRows(theParent, theRow, theRow + theCount - 1);
-  endRemoveRows();
   return true;
 }
 

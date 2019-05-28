@@ -49,7 +49,6 @@
 #define FIRST_COL_WIDTH 20
 #define SECOND_COL_WIDTH 30
 
-
 /**
 * \ingroup GUI
 * Tree item delegate for definition of data in column items editor
@@ -416,7 +415,7 @@ XGUI_ObjectsBrowser::XGUI_ObjectsBrowser(QWidget* theParent, XGUI_Workshop* theW
   aLabelWgt->setPalette(aPalet);
 
   myDocModel = new XGUI_DataModel(this);
-  connect(myDocModel, SIGNAL(modelAboutToBeReset()), SLOT(onBeforeReset()));
+  connect(myDocModel, SIGNAL(beforeTreeRebuild()), SLOT(onBeforeReset()));
   connect(myDocModel, SIGNAL(treeRebuilt()), SLOT(onAfterModelReset()));
 
   connect(myTreeView, SIGNAL(contextMenuRequested(QContextMenuEvent*)), this,
@@ -509,16 +508,17 @@ void XGUI_ObjectsBrowser::onEditItem()
 }
 
 //***************************************************
-QModelIndexList XGUI_ObjectsBrowser::expandedItems(const QModelIndex& theParent) const
+QList<ModuleBase_ITreeNode*> XGUI_ObjectsBrowser::expandedItems(const QModelIndex& theParent) const
 {
-  QModelIndexList aIndexes;
+  QList<ModuleBase_ITreeNode*> aIndexes;
   QModelIndex aIndex;
-  for (int i = 0; i < myDocModel->rowCount(theParent); i++) {
+  int aCount = myDocModel->rowCount(theParent);
+  for (int i = 0; i < aCount; i++) {
     aIndex = myDocModel->index(i, 0, theParent);
     if (myDocModel->hasChildren(aIndex)) {
       if (myTreeView->isExpanded(aIndex)) {
-        aIndexes.append(aIndex);
-        QModelIndexList aSubIndexes = expandedItems(aIndex);
+        aIndexes.append((ModuleBase_ITreeNode*)aIndex.internalPointer());
+        QList<ModuleBase_ITreeNode*> aSubIndexes = expandedItems(aIndex);
         if (!aSubIndexes.isEmpty())
           aIndexes.append(aSubIndexes);
       }
@@ -655,8 +655,11 @@ void XGUI_ObjectsBrowser::onBeforeReset()
 
 void XGUI_ObjectsBrowser::onAfterModelReset()
 {
-  foreach(QModelIndex aIndex, myExpandedItems) {
-    if (myTreeView->dataModel()->hasIndex(aIndex))
+  XGUI_DataModel* aModel = myTreeView->dataModel();
+  QModelIndex aIndex;
+  foreach(ModuleBase_ITreeNode* aNode, myExpandedItems) {
+    aIndex = aModel->getIndex(aNode, 0);
+    if (aIndex.isValid() && (myTreeView->dataModel()->hasIndex(aIndex)) )
       myTreeView->setExpanded(aIndex, true);
   }
 }

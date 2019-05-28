@@ -263,7 +263,7 @@ protected:
   void onAfterModelReset();
 
  private:
-  QModelIndexList expandedItems(const QModelIndex& theParent = QModelIndex()) const;
+   QList<ModuleBase_ITreeNode*> expandedItems(const QModelIndex& theParent = QModelIndex()) const;
 
   //! Internal model
   XGUI_DataModel* myDocModel;
@@ -272,7 +272,8 @@ protected:
   XGUI_Workshop* myWorkshop;
 
   /// A field to store expanded items before model reset
-  QModelIndexList myExpandedItems;
+  //QModelIndexList myExpandedItems;
+  QList<ModuleBase_ITreeNode*> myExpandedItems;
 };
 
 #endif
