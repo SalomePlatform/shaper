@@ -157,7 +157,12 @@ public:
 
   DocumentPtr document(const QModelIndex& theIndex) const;
 
+  QModelIndex getIndex(ModuleBase_ITreeNode* theNode, int thCol) const;
+
 signals:
+  void beforeTreeRebuild();
+
+
   /// Signal about tree had been rebuilt
   void treeRebuilt();
 
@@ -170,8 +175,6 @@ private:
 
 
   QModelIndex getParentIndex(ModuleBase_ITreeNode* theNode, int thCol) const;
-
-  QModelIndex getIndex(ModuleBase_ITreeNode* theNode, int thCol) const;
 
   void updateSubTree(ModuleBase_ITreeNode* theParent);
 
