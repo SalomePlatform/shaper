@@ -42,7 +42,7 @@ def getGEOMShape(index):
       sobj = iterator.Value()
       iterator.Next()
       i = i - 1
-    if sobj:
+    if i == 0 and sobj:
       obj = sobj.GetObject()
   else:
     raise Exception("GEOM component " + str(index) + " not found.")
