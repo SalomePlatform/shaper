@@ -44,6 +44,8 @@ void FeaturesPlugin_Recover::initAttributes()
 
   data()->addAttribute(METHOD(), ModelAPI_AttributeString::typeId());
   ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(), METHOD());
+  // set default method for recovering
+  string(METHOD())->setValue(METHOD_DEFAULT());
 }
 
 void FeaturesPlugin_Recover::execute()
