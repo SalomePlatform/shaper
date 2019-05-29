@@ -204,7 +204,7 @@ void SHAPERGUI::initialize(CAM_Application* theApp)
         aViewPort->installEventFilter(aViewer);
         Handle(V3d_View) aView = aViewPort->getView();
         aViewer->SetScale(aView, aView->Camera()->Scale());
-        // We can not create selector here because other modules will be deactivatet later
+        // We can not create selector here because other modules will be deactivated later
         //onViewManagerAdded(aMgr);
       }
     }
@@ -230,7 +230,7 @@ void SHAPERGUI::viewManagers(QStringList& theList) const
 //void SHAPERGUI::connectToStudy(CAM_Study* theStudy)
 //{
 //  // if there are created viewer managers, we should try to create viewer
-//  // selector and initialize viewer with it. It sets interactive contect to the
+//  // selector and initialize viewer with it. It sets interactive context to the
 //  // proxy viewer. If study is opened, CAM application calls this method before the open()
 //  // of data model
 //  // the SHAPER data model is specific and during open(load) redisplay signals are flushed, so
@@ -284,7 +284,7 @@ bool SHAPERGUI::activateModule(SUIT_Study* theStudy)
         mySelector = createSelector(OCCViewManagers.first());
       }
     }
-    // it should be pefromed after the selector creation in order to have AISContext
+    // it should be performed after the selector creation in order to have AISContext
     myWorkshop->activateModule();
     //action(myEraseAll)->setEnabled(false);
 
@@ -342,7 +342,7 @@ bool SHAPERGUI::activateModule(SUIT_Study* theStudy)
   }
   myProxyViewer->activateViewer(true);
 
-  // Postrrocessing for LoadScriptId to remove created(if it was created) SALOME Object Browser
+  // Post-processing for LoadScriptId to remove created(if it was created) SALOME Object Browser
   connect(getApp()->action(LightApp_Application::UserID+1), SIGNAL(triggered(bool)),
           this, SLOT(onScriptLoaded()));
 
@@ -408,7 +408,7 @@ bool SHAPERGUI::deactivateModule(SUIT_Study* theStudy)
   aResMgr->setValue("Study", "store_positions", myIsStorePositions);
   getApp()->setEditEnabled(myIsEditEnabled);
 
-  // Postrrocessing for LoadScriptId to remove created(if it was created) SALOME Object Browser
+  // Post-processing for LoadScriptId to remove created(if it was created) SALOME Object Browser
   disconnect(getApp()->action(LightApp_Application::UserID+1), SIGNAL(triggered(bool)),
              this, SLOT(onScriptLoaded()));
 
@@ -937,7 +937,7 @@ void SHAPERGUI::saveToolbarsConfig()
 {
   if (!myIsToolbarsModified)
     return;
-  // Save toolbars config into map
+  // Save toolbars configuration into map
   QMap<QString, QStringList> aToolbarsConfig;
   QtxActionToolMgr* aMgr = toolMgr();
   QStringList aToolbars = myToolbars.keys();
@@ -953,7 +953,7 @@ void SHAPERGUI::saveToolbarsConfig()
     }
     aToolbarsConfig[aName] = aContent;
   }
-  // Store the config into resources
+  // Store the configuration into resources
   SUIT_ResourceMgr* aResMgr = application()->resourceMgr();
   QStringList aNames = aToolbarsConfig.keys();
   QStringList aValues;
