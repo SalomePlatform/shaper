@@ -18,6 +18,7 @@
 #
 
 from salome.shaper import model
+from ModelAPI import *
 
 model.begin()
 partSet = model.moduleDocument()
@@ -27,11 +28,10 @@ Sketch_1 = model.addSketch(Part_1_doc, model.defaultPlane("YOZ"))
 SketchCircle_1 = Sketch_1.addCircle(0, 0, 2)
 model.do()
 Extrusion_1 = model.addExtrusion(Part_1_doc, [model.selection("FACE", "Sketch_1/Face-SketchCircle_1_2r")], model.selection(), 10, 0)
-RemoveResults_1 = model.addRemoveResults(Part_1_doc, [model.selection("SOLID", "Extrusion_1_1")])
+removeResults(Extrusion_1.feature().results())
 model.end()
 
 # check the number of bodies = 0, number of construction = 1
-from ModelAPI import *
 assert(Part_1.document().size(ModelAPI_ResultConstruction.group()) == 1)
 assert(Part_1.document().size(ModelAPI_ResultBody.group()) == 0)
 
