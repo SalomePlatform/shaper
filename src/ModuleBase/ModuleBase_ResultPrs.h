@@ -107,6 +107,11 @@ public:
   /// \return false if parameter is out of [0, 1]
   Standard_EXPORT bool setHiddenSubShapeTransparency(double theTransparency);
 
+  Standard_EXPORT TopoDS_Shape originalShape() const { return myOriginalShape; }
+
+  Standard_EXPORT bool isSubstituted() const { return myIsSubstituted; }
+
+
   DEFINE_STANDARD_RTTIEXT(ModuleBase_ResultPrs, ViewerData_AISShape)
 
 protected:
@@ -148,6 +153,8 @@ private:
 
   /// Original shape of the result object
   TopoDS_Shape myOriginalShape;
+
+  bool myIsSubstituted;
 
   /// Container of original Shape sub shape to be hidden and not selectable
   NCollection_List<TopoDS_Shape> myHiddenSubShapes;
