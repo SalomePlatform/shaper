@@ -205,9 +205,17 @@ void XGUI_Selection::fillPresentation(ModuleBase_ViewerPrsPtr& thePrs,
   // for one feature
   Handle(StdSelect_BRepOwner) aBRO = Handle(StdSelect_BRepOwner)::DownCast(theOwner);
   if( !aBRO.IsNull() && aBRO->HasShape() ) {
+    TopoDS_Shape aShape = aBRO->Shape();
+    Handle(ModuleBase_ResultPrs) aPrsObj = Handle(ModuleBase_ResultPrs)::DownCast(aBRO->Selectable());
+    if (!aPrsObj.IsNull()) {
+      if (aPrsObj->isSubstituted()) {
+        if (aPrsObj->Shape().IsSame(aShape))
+          aShape = aPrsObj->originalShape();
+      }
+    }
     // the located method is called in the context to obtain the shape by the SelectedShape()
     // method, so the shape is located by the same rules
-    TopoDS_Shape aShape = aBRO->Shape().Located (aBRO->Location() * aBRO->Shape().Location());
+    aShape = aShape.Located(aBRO->Location() * aShape.Location());
 #ifdef BEFORE_TRIHEDRON_PATCH
 #ifndef DEBUG_DELIVERY
     if (aShape.IsNull())
