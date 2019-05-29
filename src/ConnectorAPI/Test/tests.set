@@ -20,6 +20,6 @@
 SET(TEST_NAMES
   TestExportToGEOM
   TestExportToGEOMAllGroupsAndFields
-  TestExportToGEOMPartSet.py
+  TestExportToGEOMPartSet
   Test2882
 )
