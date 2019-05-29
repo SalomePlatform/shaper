@@ -88,7 +88,8 @@ void ModelHighAPI_Interface::execute(bool isForce)
 
 void ModelHighAPI_Interface::setName(const std::string& theName)
 {
-  feature()->data()->setName(theName);
+  if (feature().get())
+    feature()->data()->setName(theName);
 }
 
 std::string ModelHighAPI_Interface::name() const
@@ -110,10 +111,12 @@ std::list<ModelHighAPI_Selection> ModelHighAPI_Interface::results() const
 
   std::list<ModelHighAPI_Selection> aSelectionList;
 
-  std::list<std::shared_ptr<ModelAPI_Result> > aResults = feature()->results();
-  for (auto it = aResults.begin(), end = aResults.end(); it != end; ++it) {
-    if (!(*it)->isDisabled())
-      aSelectionList.push_back(ModelHighAPI_Selection(*it));
+  if (feature().get())  {
+    std::list<std::shared_ptr<ModelAPI_Result> > aResults = feature()->results();
+    for (auto it = aResults.begin(), end = aResults.end(); it != end; ++it) {
+      if (!(*it)->isDisabled())
+        aSelectionList.push_back(ModelHighAPI_Selection(*it));
+    }
   }
 
   return aSelectionList;
