@@ -85,7 +85,8 @@ PartSet_WidgetSketchLabel::PartSet_WidgetSketchLabel(QWidget* theParent,
                         ModuleBase_IWorkshop* theWorkshop,
                         const Config_WidgetAPI* theData,
                         const QMap<PartSet_Tools::ConstraintVisibleState, bool>& toShowConstraints)
-: ModuleBase_WidgetValidated(theParent, theWorkshop, theData), myOpenTransaction(false)
+: ModuleBase_WidgetValidated(theParent, theWorkshop, theData), myOpenTransaction(false),
+myIsSelection(false)
 {
   QVBoxLayout* aLayout = new QVBoxLayout(this);
   ModuleBase_Tools::zeroMargins(aLayout);
@@ -281,8 +282,11 @@ bool PartSet_WidgetSketchLabel::setSelectionInternal(
   else {
     // it removes the processed value from the parameters list
     ModuleBase_ViewerPrsPtr aValue = theValues.first();//.takeFirst();
-    if (!theToValidate || isValidInFilters(aValue))
+    if (!theToValidate || isValidInFilters(aValue)) {
+      myIsSelection = true;
       aDone = setSelectionCustom(aValue);
+      myIsSelection = false;
+    }
   }
 
   return aDone;
@@ -412,7 +416,7 @@ void PartSet_WidgetSketchLabel::restoreAttributeValue(const AttributePtr& theAtt
 
 bool PartSet_WidgetSketchLabel::setSelectionCustom(const ModuleBase_ViewerPrsPtr& thePrs)
 {
-  if (myRemoveExternal->isVisible()) {
+  if (myIsSelection && myRemoveExternal->isVisible()) {
     if (myRemoveExternal->isChecked()) {
       myFeature->customAction(SketchPlugin_Sketch::ACTION_REMOVE_EXTERNAL());
     }

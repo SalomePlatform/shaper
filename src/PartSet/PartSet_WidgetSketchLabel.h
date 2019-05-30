@@ -224,6 +224,7 @@ private:
   QStackedWidget* myStackWidget;
 
   bool myOpenTransaction;
+  bool myIsSelection;
 };
 
 #endif
