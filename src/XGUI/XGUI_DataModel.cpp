@@ -446,3 +446,10 @@ DocumentPtr XGUI_DataModel::document(const QModelIndex& theIndex) const
   ModuleBase_ITreeNode* aNode = (ModuleBase_ITreeNode*)theIndex.internalPointer();
   return aNode->document();
 }
+
+
+//******************************************************
+bool XGUI_DataModel::hasNode(ModuleBase_ITreeNode* theNode) const
+{
+  return myRoot->hasSubNode(theNode);
+}

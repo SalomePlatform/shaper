@@ -658,10 +658,13 @@ void XGUI_ObjectsBrowser::onAfterModelReset()
   XGUI_DataModel* aModel = myTreeView->dataModel();
   QModelIndex aIndex;
   foreach(ModuleBase_ITreeNode* aNode, myExpandedItems) {
-    aIndex = aModel->getIndex(aNode, 0);
-    if (aIndex.isValid() && (myTreeView->dataModel()->hasIndex(aIndex)) )
-      myTreeView->setExpanded(aIndex, true);
+    if (aModel->hasNode(aNode)) {
+      aIndex = aModel->getIndex(aNode, 0);
+      if (aIndex.isValid() && (myTreeView->dataModel()->hasIndex(aIndex)))
+        myTreeView->setExpanded(aIndex, true);
+    }
   }
+  myExpandedItems.clear();
 }
 
 std::list<bool> XGUI_ObjectsBrowser::getStateForDoc(DocumentPtr theDoc) const
