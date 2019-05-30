@@ -124,7 +124,7 @@ void Events_Loop::registerListener(Events_Listener* theListener, const Events_ID
     aFindID->second[theSender] = std::list<Events_Listener*>();
     aFindSender = aFindID->second.find(theSender);
   }
-  // check that listener was not registered wit hsuch parameters before
+  // check that listener was not registered with such parameters before
   std::list<Events_Listener*>& aListeners = aFindSender->second;
   for (std::list<Events_Listener*>::iterator aL = aListeners.begin(); aL != aListeners.end(); aL++)
     if (*aL == theListener)
@@ -156,14 +156,14 @@ void Events_Loop::removeListener(Events_Listener* theListener)
         aLMap.erase(aLIt->first);
         myListeners[anIt->first] = aLMap;
         if (aLMap.empty())
-          break; // avoid incrementation of the iterator if the the container is empty
+          break; // avoid incrementation of the iterator if the container is empty
       }
       aLIt++;
     }
     if (anIt->second.empty()) {
       myListeners.erase(anIt->first);
       if (myListeners.empty())
-        break; // avoid incrementation of the iterator if the the container is empty
+        break; // avoid incrementation of the iterator if the container is empty
     }
     anIt++;
   }
@@ -174,7 +174,7 @@ void Events_Loop::removeListener(Events_Listener* theListener)
     if (anImIt->second == theListener) {
       myImmediateListeners.erase(anImIt->first);
       if (myImmediateListeners.empty())
-        break; // avoid incrementation of the iterator if the the container is empty
+        break; // avoid incrementation of the iterator if the container is empty
     }
     anImIt++;
   }

@@ -65,7 +65,7 @@ bool ModelAPI_Result::setDisabled(std::shared_ptr<ModelAPI_Result> theThis, cons
 
 bool ModelAPI_Result::isDisabled()
 {
-  if (myIsDisabled != data()->isDeleted())
+  if (data()->isValid() && myIsDisabled != data()->isDeleted())
     setDisabled(std::dynamic_pointer_cast<ModelAPI_Result>(
       data()->owner()), data()->isDeleted()); // restore from the data model the correct value
   return myIsDisabled;
