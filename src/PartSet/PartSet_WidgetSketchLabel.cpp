@@ -120,6 +120,12 @@ PartSet_WidgetSketchLabel::PartSet_WidgetSketchLabel(QWidget* theParent,
   ModuleBase_Tools::zeroMargins(aLayout);
   aLayout->addWidget(mySizeOfViewWidget);
   aLayout->addWidget(aLabel);
+
+  myRemoveExternal = new QCheckBox(tr("Remove external dependencies"), aFirstWgt);
+  myRemoveExternal->setChecked(false);
+  aLayout->addWidget(myRemoveExternal);
+  myRemoveExternal->setVisible(false);
+
   aLayout->addStretch(1);
 
   myStackWidget->addWidget(aFirstWgt);
@@ -362,6 +368,8 @@ void PartSet_WidgetSketchLabel::updateByPlaneSelected(const ModuleBase_ViewerPrs
   myWorkshop->updateCommandStatus();
   aWorkshop->selector()->clearSelection();
   myWorkshop->viewer()->update();
+
+  myRemoveExternal->setVisible(false);
 }
 
 std::shared_ptr<GeomAPI_Pln> PartSet_WidgetSketchLabel::plane() const
@@ -404,6 +412,11 @@ void PartSet_WidgetSketchLabel::restoreAttributeValue(const AttributePtr& theAtt
 
 bool PartSet_WidgetSketchLabel::setSelectionCustom(const ModuleBase_ViewerPrsPtr& thePrs)
 {
+  if (myRemoveExternal->isVisible()) {
+    if (myRemoveExternal->isChecked()) {
+      myFeature->customAction(SketchPlugin_Sketch::ACTION_REMOVE_EXTERNAL());
+    }
+  }
   return fillSketchPlaneBySelection(thePrs);
 }
 
@@ -661,6 +674,7 @@ void PartSet_WidgetSketchLabel::onChangePlane()
   PartSet_Module* aModule = dynamic_cast<PartSet_Module*>(myWorkshop->module());
   if (aModule) {
     mySizeOfViewWidget->setVisible(false);
+    myRemoveExternal->setVisible(true);
     myStackWidget->setCurrentIndex(0);
 
     CompositeFeaturePtr aSketch = std::dynamic_pointer_cast<ModelAPI_CompositeFeature>(myFeature);

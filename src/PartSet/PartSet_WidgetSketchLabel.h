@@ -215,6 +215,7 @@ private:
   PartSet_PreviewPlanes* myPreviewPlanes;
 
   QCheckBox* myViewInverted;
+  QCheckBox* myRemoveExternal;
 
   QMap<PartSet_Tools::ConstraintVisibleState, QCheckBox*> myShowConstraints;
 
