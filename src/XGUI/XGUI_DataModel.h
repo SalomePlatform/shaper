@@ -154,13 +154,22 @@ public:
   /// \param theIndex an index to check
   bool hasIndex(const QModelIndex& theIndex) const;
 
+  /// Returns true if the given node is a parto of the data tree
+  /// \param theNode a node to check
+  bool hasNode(ModuleBase_ITreeNode* theNode) const;
+
+  /// Returns document of the given index
+  /// \param theIndex an index to check
   DocumentPtr document(const QModelIndex& theIndex) const;
 
+  /// Returns index for the node and column
+  /// \param theNode a node
+  /// \param thCol a column
   QModelIndex getIndex(ModuleBase_ITreeNode* theNode, int thCol) const;
 
 signals:
+  /// Signal send before tree rebuild
   void beforeTreeRebuild();
-
 
   /// Signal about tree had been rebuilt
   void treeRebuilt();
