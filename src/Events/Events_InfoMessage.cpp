@@ -25,18 +25,16 @@
 
 void Events_InfoMessage::addParameter(double theParam)
 {
-  char aBuf[50];
-  int n = sprintf(aBuf, "%g", theParam);
-  std::string aStr(aBuf);
-  myParameters.push_back(aStr);
+  static char aBuf[50];
+  sprintf(aBuf, "%g", theParam);
+  myParameters.push_back(std::string(aBuf));
 }
 
 void Events_InfoMessage::addParameter(int theParam)
 {
-  char aBuf[50];
-  int n = sprintf(aBuf, "%d", theParam);
-  std::string aStr(aBuf);
-  myParameters.push_back(aStr);
+  static char aBuf[50];
+  sprintf(aBuf, "%d", theParam);
+  myParameters.push_back(std::string(aBuf));
 }
 
 void Events_InfoMessage::send()

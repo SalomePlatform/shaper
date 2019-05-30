@@ -141,8 +141,6 @@ void ExchangePlugin_ExportFeature::exportFile(const std::string& theFileName,
       aFormatName = "STEP";
     } else if (anExtension == "IGES" || anExtension == "IGS") {
       aFormatName = "IGES-5.1";
-    } else if (anExtension == "XAO") {
-      aFormatName = "XAO";
     } else {
       aFormatName = anExtension;
     }
@@ -167,12 +165,8 @@ void ExchangePlugin_ExportFeature::exportFile(const std::string& theFileName,
   }
 
   // Store compound if we have more than one shape.
-  std::shared_ptr<GeomAPI_Shape> aShape;
-  if(aShapes.size() == 1) {
-    aShape = aShapes.front();
-  } else {
-    aShape = GeomAlgoAPI_CompoundBuilder::compound(aShapes);
-  }
+  std::shared_ptr<GeomAPI_Shape> aShape =
+    aShapes.size() == 1 ? aShapes.front() : GeomAlgoAPI_CompoundBuilder::compound(aShapes);
 
   // Perform the export
   std::string anError;
@@ -535,18 +529,14 @@ bool ExchangePlugin_ExportFeature::isMacro() const
     return false;
   ExchangePlugin_ExportFeature* aThis = ((ExchangePlugin_ExportFeature*)(this));
   AttributeStringPtr aFormatAttr = aThis->string(FILE_FORMAT_ID());
-  if (!aFormatAttr.get())
-    return false;
-  std::string aFormat = aFormatAttr->value();
+  std::string aFormat(aFormatAttr.get() ? aFormatAttr->value() : "");
 
   if (aFormat.empty()) { // get default format for the extension
     AttributeStringPtr aFilePathAttr = aThis->string(FILE_PATH_ID());
     std::string aFilePath = aFilePathAttr->value();
     if (!aFilePath.empty()) {
       std::string anExtension = GeomAlgoAPI_Tools::File_Tools::extension(aFilePath);
-      if (anExtension == "XAO") {
-        aFormat = "XAO";
-      }
+      aFormat = anExtension;
     }
   }
 
