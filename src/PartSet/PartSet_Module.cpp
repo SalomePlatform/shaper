@@ -1516,7 +1516,9 @@ void PartSet_Module::processEvent(const std::shared_ptr<Events_Message>& theMess
   else if (theMessage->eventID() == Events_Loop::loop()->eventByName(EVENT_OBJECT_TO_REDISPLAY)) {
     CompositeFeaturePtr aSketch = mySketchMgr->activeSketch();
     if (aSketch.get()) {
-      mySketchMgr->previewSketchPlane()->createSketchPlane(aSketch, myWorkshop);
+      ModuleBase_Operation* anOperation = myWorkshop->currentOperation();
+      if (PartSet_SketcherMgr::isSketchOperation(anOperation))
+        mySketchMgr->previewSketchPlane()->createSketchPlane(aSketch, myWorkshop);
     }
   }
 }

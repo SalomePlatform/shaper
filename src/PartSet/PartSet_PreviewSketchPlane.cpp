@@ -68,6 +68,14 @@ void PartSet_PreviewSketchPlane::createSketchPlane(const CompositeFeaturePtr& th
   if (!PartSet_Tools::sketchPlane(theSketch).get())
     return;
 
+  AttributeSelectionPtr aSelAttr = std::dynamic_pointer_cast<ModelAPI_AttributeSelection>
+    (theSketch->data()->attribute(SketchPlugin_SketchEntity::EXTERNAL_ID()));
+  if (!aSelAttr)
+    return;
+
+  if (myShape.get() && myShape->isSame(aSelAttr->value()))
+    return;
+
   XGUI_Displayer* aDisp = XGUI_Tools::workshop(theWorkshop)->displayer();
   if (myPreviewIsDisplayed) {
     aDisp->eraseAIS(myPlane, false);
@@ -75,15 +83,12 @@ void PartSet_PreviewSketchPlane::createSketchPlane(const CompositeFeaturePtr& th
 
   // Create Preview
   // selected linear face parameters
-  AttributeSelectionPtr aSelAttr = std::dynamic_pointer_cast<ModelAPI_AttributeSelection>
-    (theSketch->data()->attribute(SketchPlugin_SketchEntity::EXTERNAL_ID()));
-  if (aSelAttr) {
-    myShape = aSelAttr->value();
-    // this case is needed by constructing sketch on a plane, where result shape is equal
-    // to context result, therefore value() returns NULL and we should use shape of context.
-    if (!myShape.get() && aSelAttr->context().get())
-      myShape = aSelAttr->context()->shape();
-  }
+  myShape = aSelAttr->value();
+  // this case is needed by constructing sketch on a plane, where result shape is equal
+  // to context result, therefore value() returns NULL and we should use shape of context.
+  if (!myShape.get() && aSelAttr->context().get())
+    myShape = aSelAttr->context()->shape();
+
   if (!myShape.get()) {
     // Create Preview for default planes
     std::shared_ptr<GeomDataAPI_Point> anOrigin = std::dynamic_pointer_cast<GeomDataAPI_Point>(
