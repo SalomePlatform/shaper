@@ -48,6 +48,7 @@
 #include <SketchPlugin_SketchEntity.h>
 #include <SketchPlugin_Tools.h>
 
+#include <Events_InfoMessage.h>
 #include <Events_Loop.h>
 
 #include <memory>
@@ -368,4 +369,22 @@ std::shared_ptr<GeomAPI_Ax3> SketchPlugin_Sketch::plane(SketchPlugin_Sketch* the
       aData->attribute(SketchPlugin_Sketch::NORM_ID()));
 
   return std::shared_ptr<GeomAPI_Ax3>(new GeomAPI_Ax3(anOrigin->pnt(), aDirX->dir(), aNorm->dir()));
+}
+
+bool SketchPlugin_Sketch::customAction(const std::string& theActionId)
+{
+  bool isOk = false;
+  if (theActionId == ACTION_REMOVE_EXTERNAL())
+    isOk = removeLinksToExternal();
+  else {
+    std::string aMsg = "Error: Feature \"%1\" does not support action \"%2\".";
+    Events_InfoMessage("SketchPlugin_Sketch", aMsg).arg(getKind()).arg(theActionId).send();
+  }
+  return isOk;
+}
+
+bool SketchPlugin_Sketch::removeLinksToExternal()
+{
+  // TODO
+  return true;
 }

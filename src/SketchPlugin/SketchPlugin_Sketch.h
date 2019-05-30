@@ -90,6 +90,13 @@ class SketchPlugin_Sketch : public ModelAPI_CompositeFeature, public GeomAPI_ICu
     return MY_SOLVER_DOF;
   }
 
+  /// Action ID to remove links to external entities while changing the sketch plane.
+  inline static const std::string& ACTION_REMOVE_EXTERNAL()
+  {
+    static const std::string MY_ACTION_REMOVE_EXTERNAL("RemoveExternalLinks");
+    return MY_ACTION_REMOVE_EXTERNAL;
+  }
+
   /// Returns the kind of a feature
   SKETCHPLUGIN_EXPORT virtual const std::string& getKind()
   {
@@ -205,6 +212,11 @@ class SketchPlugin_Sketch : public ModelAPI_CompositeFeature, public GeomAPI_ICu
 
   SKETCHPLUGIN_EXPORT virtual void attributeChanged(const std::string& theID);
 
+  /// Performs some custom feature specific functionality (normally called by some GUI button)
+  /// \param theActionId an action key
+  /// \return a boolean value about it is performed
+  SKETCHPLUGIN_EXPORT virtual bool customAction(const std::string& theActionId);
+
   /// \brief Create a result for the point in the attribute if the attribute is initialized
   /// \param theFeature a source feature
   /// \param theSketch a sketch intance
@@ -242,6 +254,10 @@ class SketchPlugin_Sketch : public ModelAPI_CompositeFeature, public GeomAPI_ICu
     return isCustomized;
   }
 
+private:
+  /// Substitute all links to external objects by newly created features.
+  /// \return \c true, if all links updated.
+  bool removeLinksToExternal();
 };
 
 #endif
