@@ -56,7 +56,7 @@ public:
 
   /// Returns whether the selector should be activated as soon as possible (by deactivatate other)
   /// \return boolean result
-  XGUI_EXPORT virtual bool needToBeActiated() const;
+  XGUI_EXPORT virtual bool needToBeActivated() const;
 
   /// Processes current selection of workshop. Reaction to selection change in workshop.
   XGUI_EXPORT virtual void processSelection();

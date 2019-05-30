@@ -41,6 +41,7 @@
 #include <ModuleBase_ViewerPrs.h>
 #include <ModuleBase_Tools.h>
 #include <ModuleBase_IModule.h>
+#include <ModuleBase_IPropertyPanel.h>
 
 #include <GeomAlgoAPI_FaceBuilder.h>
 #include <GeomAlgoAPI_ShapeTools.h>
@@ -84,7 +85,7 @@ PartSet_WidgetSketchLabel::PartSet_WidgetSketchLabel(QWidget* theParent,
                         ModuleBase_IWorkshop* theWorkshop,
                         const Config_WidgetAPI* theData,
                         const QMap<PartSet_Tools::ConstraintVisibleState, bool>& toShowConstraints)
-: ModuleBase_WidgetValidated(theParent, theWorkshop, theData)
+: ModuleBase_WidgetValidated(theParent, theWorkshop, theData), myOpenTransaction(false)
 {
   QVBoxLayout* aLayout = new QVBoxLayout(this);
   ModuleBase_Tools::zeroMargins(aLayout);
@@ -159,6 +160,11 @@ PartSet_WidgetSketchLabel::PartSet_WidgetSketchLabel(QWidget* theParent,
     if (toShowConstraints.contains(aState))
       aShowConstraints->setChecked(toShowConstraints[aState]);
   }
+
+
+  QPushButton* aPlaneBtn = new QPushButton(tr("Change sketch plane"), aSecondWgt);
+  connect(aPlaneBtn, SIGNAL(clicked(bool)), SLOT(onChangePlane()));
+  aLayout->addWidget(aPlaneBtn);
 
   myStackWidget->addWidget(aSecondWgt);
   //setLayout(aLayout);
@@ -331,6 +337,11 @@ void PartSet_WidgetSketchLabel::updateByPlaneSelected(const ModuleBase_ViewerPrs
   if (aModule)
     aModule->onViewTransformed();
 
+  if (myOpenTransaction) {
+    SessionPtr aMgr = ModelAPI_Session::get();
+    aMgr->finishOperation();
+    myOpenTransaction = false;
+  }
   // 3. Clear text in the label
   myStackWidget->setCurrentIndex(1);
   //myLabel->setText("");
@@ -642,4 +653,31 @@ QList<std::shared_ptr<ModuleBase_ViewerPrs>> PartSet_WidgetSketchLabel::findCirc
     }
   }
   return aResult;
+}
+
+//******************************************************
+void PartSet_WidgetSketchLabel::onChangePlane()
+{
+  PartSet_Module* aModule = dynamic_cast<PartSet_Module*>(myWorkshop->module());
+  if (aModule) {
+    mySizeOfViewWidget->setVisible(false);
+    myStackWidget->setCurrentIndex(0);
+
+    CompositeFeaturePtr aSketch = std::dynamic_pointer_cast<ModelAPI_CompositeFeature>(myFeature);
+    PartSet_Tools::nullifySketchPlane(aSketch);
+
+    Handle(SelectMgr_Filter) aFilter = aModule->selectionFilter(SF_SketchPlaneFilter);
+    if (!aFilter.IsNull()) {
+      std::shared_ptr<GeomAPI_Pln> aPln;
+      Handle(ModuleBase_ShapeInPlaneFilter)::DownCast(aFilter)->setPlane(aPln);
+    }
+    XGUI_Workshop* aWorkshop = aModule->getWorkshop();
+
+    aWorkshop->selectionActivate()->updateSelectionFilters();
+    aWorkshop->selectionActivate()->updateSelectionModes();
+
+    SessionPtr aMgr = ModelAPI_Session::get();
+    aMgr->startOperation();
+    myOpenTransaction = true;
+  }
 }

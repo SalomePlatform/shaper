@@ -205,7 +205,7 @@ Q_OBJECT
   virtual void updateAfterActivation() {}
 
   /// The method called if widget should be activated always
-  virtual bool needToBeActiated() { return false; }
+  virtual bool needToBeActivated() { return false; }
 
   /// Returns list of widget controls
   /// \return a control list

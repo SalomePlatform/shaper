@@ -64,45 +64,43 @@ void PartSet_PreviewSketchPlane::eraseSketchPlane(ModuleBase_IWorkshop* theWorks
 void PartSet_PreviewSketchPlane::createSketchPlane(const CompositeFeaturePtr& theSketch,
                                                    ModuleBase_IWorkshop* theWorkshop)
 {
-  // the preview plane has been already created and displayed
-  if (myPreviewIsDisplayed)
-    return;
-
   // plane is visualized only if sketch plane is filled
   if (!PartSet_Tools::sketchPlane(theSketch).get())
     return;
 
-  if (!myPlane) { // If planes are not created
-    // Create Preview
-    // selected linear face parameters
-    AttributeSelectionPtr aSelAttr = std::dynamic_pointer_cast<ModelAPI_AttributeSelection>
-      (theSketch->data()->attribute(SketchPlugin_SketchEntity::EXTERNAL_ID()));
-    if (aSelAttr) {
-      myShape = aSelAttr->value();
-      // this case is needed by constructing sketch on a plane, where result shape is equal
-      // to context result, therefore value() returns NULL and we should use shape of context.
-      if (!myShape.get() && aSelAttr->context().get())
-        myShape = aSelAttr->context()->shape();
-    }
-    if (!myShape.get()) {
-      // Create Preview for default planes
-      std::shared_ptr<GeomDataAPI_Point> anOrigin = std::dynamic_pointer_cast<GeomDataAPI_Point>(
-          theSketch->data()->attribute(SketchPlugin_Sketch::ORIGIN_ID()));
-      std::shared_ptr<GeomDataAPI_Dir> aNormal = std::dynamic_pointer_cast<GeomDataAPI_Dir>(
-          theSketch->data()->attribute(SketchPlugin_Sketch::NORM_ID()));
-
-      double aFaceSize = myIsUseSizeOfView ? mySizeOfView
-        : Config_PropManager::real(SKETCH_TAB_NAME, "planes_size");
-      if (aFaceSize <= Precision::Confusion())
-        aFaceSize = 200;   // Set default value
-
-      myShape = GeomAlgoAPI_FaceBuilder::squareFace(
-        myViewCentralPoint.get() ? myViewCentralPoint : anOrigin->pnt(), aNormal->dir(), aFaceSize);
-    }
-    myPlane = createPreviewPlane();
+  XGUI_Displayer* aDisp = XGUI_Tools::workshop(theWorkshop)->displayer();
+  if (myPreviewIsDisplayed) {
+    aDisp->eraseAIS(myPlane, false);
   }
 
-  XGUI_Displayer* aDisp = XGUI_Tools::workshop(theWorkshop)->displayer();
+  // Create Preview
+  // selected linear face parameters
+  AttributeSelectionPtr aSelAttr = std::dynamic_pointer_cast<ModelAPI_AttributeSelection>
+    (theSketch->data()->attribute(SketchPlugin_SketchEntity::EXTERNAL_ID()));
+  if (aSelAttr) {
+    myShape = aSelAttr->value();
+    // this case is needed by constructing sketch on a plane, where result shape is equal
+    // to context result, therefore value() returns NULL and we should use shape of context.
+    if (!myShape.get() && aSelAttr->context().get())
+      myShape = aSelAttr->context()->shape();
+  }
+  if (!myShape.get()) {
+    // Create Preview for default planes
+    std::shared_ptr<GeomDataAPI_Point> anOrigin = std::dynamic_pointer_cast<GeomDataAPI_Point>(
+        theSketch->data()->attribute(SketchPlugin_Sketch::ORIGIN_ID()));
+    std::shared_ptr<GeomDataAPI_Dir> aNormal = std::dynamic_pointer_cast<GeomDataAPI_Dir>(
+        theSketch->data()->attribute(SketchPlugin_Sketch::NORM_ID()));
+
+    double aFaceSize = myIsUseSizeOfView ? mySizeOfView
+      : Config_PropManager::real(SKETCH_TAB_NAME, "planes_size");
+    if (aFaceSize <= Precision::Confusion())
+      aFaceSize = 200;   // Set default value
+
+    myShape = GeomAlgoAPI_FaceBuilder::squareFace(
+      myViewCentralPoint.get() ? myViewCentralPoint : anOrigin->pnt(), aNormal->dir(), aFaceSize);
+  }
+  myPlane = createPreviewPlane();
+
   aDisp->displayAIS(myPlane, false/*load object in selection*/, 1/*shaded*/, false);
   myPreviewIsDisplayed = true;
 }
