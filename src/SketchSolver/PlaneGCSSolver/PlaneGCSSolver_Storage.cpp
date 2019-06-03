@@ -162,12 +162,12 @@ bool PlaneGCSSolver_Storage::update(FeaturePtr theFeature, bool theForce)
 {
   bool sendNotify = false;
   bool isUpdated = false;
+  std::shared_ptr<SketchPlugin_Feature> aSketchFeature =
+      std::dynamic_pointer_cast<SketchPlugin_Feature>(theFeature);
   EntityWrapperPtr aRelated = entity(theFeature);
   if (aRelated) // send signal to subscribers
     sendNotify = true;
   else { // Feature is not exist, create it
-    std::shared_ptr<SketchPlugin_Feature> aSketchFeature =
-        std::dynamic_pointer_cast<SketchPlugin_Feature>(theFeature);
     bool isCopy = isCopyFeature(aSketchFeature);
     bool isProjReferred = hasReference(aSketchFeature, SketchPlugin_Projection::ID());
     // the feature is a copy in "Multi" constraint and does not used in other constraints
@@ -195,6 +195,16 @@ bool PlaneGCSSolver_Storage::update(FeaturePtr theFeature, bool theForce)
     if ((*anAttrIt)->attributeType() == GeomDataAPI_Point2D::typeId() ||
         (*anAttrIt)->attributeType() == ModelAPI_AttributeDouble::typeId())
       isUpdated = update(*anAttrIt) || isUpdated;
+
+  // check external attribute is changed
+  bool isExternal = aSketchFeature && aSketchFeature->isExternal();
+  if (aRelated && isExternal != aRelated->isExternal()) {
+    if (isExternal)
+      makeExternal(aRelated);
+    else
+      makeNonExternal(aRelated);
+    isUpdated = true;
+  }
 
   // send notification to listeners due to at least one attribute is changed
   if (sendNotify && isUpdated)

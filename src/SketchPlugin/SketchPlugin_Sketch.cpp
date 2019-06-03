@@ -383,8 +383,51 @@ bool SketchPlugin_Sketch::customAction(const std::string& theActionId)
   return isOk;
 }
 
+static bool isExternalBased(const FeaturePtr theFeature)
+{
+  return theFeature->getKind() == SketchPlugin_Projection::ID() ||
+         theFeature->getKind() == SketchPlugin_IntersectionPoint::ID();
+}
+
 bool SketchPlugin_Sketch::removeLinksToExternal()
 {
-  // TODO
+  std::list<FeaturePtr> aRemove;
+  std::list<ObjectPtr> aSubs = reflist(FEATURES_ID())->list();
+  for (std::list<ObjectPtr>::iterator anIt = aSubs.begin(); anIt != aSubs.end(); ++anIt) {
+    FeaturePtr aFeature = ModelAPI_Feature::feature(*anIt);
+    if (!aFeature)
+      continue;
+    if (isExternalBased(aFeature)) {
+      // mark feature as to be removed
+      aRemove.push_back(aFeature);
+    }
+    else {
+      AttributeSelectionPtr anExtAttr = aFeature->selection(SketchPlugin_SketchEntity::EXTERNAL_ID());
+      ResultPtr anExternal = anExtAttr ? anExtAttr->context() : ResultPtr();
+      if (anExternal) {
+        FeaturePtr anExtFeature = ModelAPI_Feature::feature(anExternal);
+        if (anExtFeature && isExternalBased(anExtFeature)) {
+          // make result of projection/intersection as non-external,
+          aFeature->selection(SketchPlugin_SketchEntity::EXTERNAL_ID())->setValue(
+            ObjectPtr(), GeomShapePtr());
+          // set feature auxiliary if the parent is not included into sketch result
+          bool isIncludedToSketchResult = false;
+          if (anExtFeature->getKind() == SketchPlugin_Projection::ID()) {
+            isIncludedToSketchResult = anExtFeature->boolean(
+                SketchPlugin_Projection::INCLUDE_INTO_RESULT())->value();
+          }
+          if (anExtFeature->getKind() == SketchPlugin_IntersectionPoint::ID()) {
+            isIncludedToSketchResult = anExtFeature->boolean(
+                SketchPlugin_IntersectionPoint::INCLUDE_INTO_RESULT())->value();
+          }
+
+          aFeature->boolean(SketchPlugin_SketchEntity::AUXILIARY_ID())->setValue(
+              !isIncludedToSketchResult);
+        }
+      }
+    }
+  }
+  for (std::list<FeaturePtr>::iterator anIt = aRemove.begin(); anIt != aRemove.end(); ++anIt)
+    removeFeature(*anIt);
   return true;
 }
