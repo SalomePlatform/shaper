@@ -118,28 +118,23 @@ public:
   /// \param thePrevious the previous presentation
   GET_CONSTRAINT_PRS(coincidentConstraint)
 
-#define GET_CONSTRAINT2_PRS(NAME) \
-  static AISObjectPtr NAME(ModelAPI_Feature* theConstraint, \
-                           const std::shared_ptr<GeomAPI_Ax3>& thePlane, \
-                           AISObjectPtr thePrevious);
+  /// Creates length dimension presentation
+  /// \param theConstraint the constraint
+  /// \param thePlane the current sketch plane
+  /// \param thePrevious the previous presentation
+  GET_CONSTRAINT_PRS(lengthDimensionConstraint)
 
   /// Creates angle constraint presentation
   /// \param theConstraint the constraint
   /// \param thePlane the current sketch plane
   /// \param thePrevious the previous presentation
-  GET_CONSTRAINT2_PRS(angleConstraint)
-
-  /// Creates length dimension presentation
-  /// \param theConstraint the constraint
-  /// \param thePlane the current sketch plane
-  /// \param thePrevious the previous presentation
-  GET_CONSTRAINT2_PRS(lengthDimensionConstraint)
+  GET_CONSTRAINT_PRS(angleConstraint)
 
   /// Creates radius dimension presentation
   /// \param theConstraint the constraint
   /// \param thePlane the current sketch plane
   /// \param thePrevious the previous presentation
-  GET_CONSTRAINT2_PRS(radiusConstraint)
+  GET_CONSTRAINT_PRS(radiusConstraint)
 };
 
 #endif

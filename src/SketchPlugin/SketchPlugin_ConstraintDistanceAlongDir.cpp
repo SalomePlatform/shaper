@@ -82,7 +82,7 @@ AISObjectPtr SketchPlugin_ConstraintDistanceAlongDir::getAISObject(AISObjectPtr 
     return thePrevious;
 
   AISObjectPtr anAIS = SketcherPrs_Factory::lengthDimensionConstraint(this,
-                                                                      sketch()->coordinatePlane(),
+                                                                      sketch(),
                                                                       thePrevious);
   return anAIS;
 }

@@ -54,9 +54,9 @@ extern void updateArrows(Handle(Prs3d_DimensionAspect) theDimAspect,
 IMPLEMENT_STANDARD_RTTIEXT(SketcherPrs_Angle, AIS_AngleDimension);
 
 SketcherPrs_Angle::SketcherPrs_Angle(ModelAPI_Feature* theConstraint,
-                                     const std::shared_ptr<GeomAPI_Ax3>& thePlane)
+  SketchPlugin_Sketch* theSketcher)
 : AIS_AngleDimension(gp_Pnt(0,0,0), gp_Pnt(1,0,0), gp_Pnt(0,1,0)), myConstraint(theConstraint),
-  mySketcherPlane(thePlane),
+  mySketcher(theSketcher),
   myFirstPoint(gp_Pnt(0,0,0)), myCenterPoint(gp_Pnt(1,0,0)), mySecondPoint(gp_Pnt(0,1,0)),
   myValue(90., false, ""), myFlyOutPoint(0, 0.5, 0)
 {
@@ -166,7 +166,7 @@ void SketcherPrs_Angle::Compute(const Handle(PrsMgr_PresentationManager3d)& theP
                                 const Standard_Integer theMode)
 {
   gp_Pnt aFirstPoint, aSecondPoint, aCenterPoint;
-  bool aReadyToDisplay = readyToDisplay(myConstraint, mySketcherPlane,
+  bool aReadyToDisplay = readyToDisplay(myConstraint, plane(),
                                         aFirstPoint, aSecondPoint, aCenterPoint);
   if (aReadyToDisplay) {
     myFirstPoint = aFirstPoint;
@@ -182,7 +182,7 @@ void SketcherPrs_Angle::Compute(const Handle(PrsMgr_PresentationManager3d)& theP
                                 std::dynamic_pointer_cast<GeomDataAPI_Point2D>
                                 (aData->attribute(SketchPlugin_Constraint::FLYOUT_VALUE_PNT()));
     std::shared_ptr<GeomAPI_Pnt> aFlyoutPnt =
-      mySketcherPlane->to3D(aFlyoutAttr->x(), aFlyoutAttr->y());
+      plane()->to3D(aFlyoutAttr->x(), aFlyoutAttr->y());
     myFlyOutPoint = aFlyoutPnt->impl<gp_Pnt>();
   }
 
@@ -287,12 +287,12 @@ void SketcherPrs_Angle::ComputeSelection(const Handle(SelectMgr_Selection)& aSel
 bool SketcherPrs_Angle::isAnglePlaneReversedToSketchPlane()
 {
   bool aReversed = false;
-  if (!mySketcherPlane.get())
+  if (!plane().get())
     return aReversed;
 
   gp_Pln aPlane = GetPlane();
   gp_Dir aDir = aPlane.Axis().Direction();
-  double aDot = mySketcherPlane->normal()->dot(
+  double aDot = plane()->normal()->dot(
                 std::shared_ptr<GeomAPI_Dir>(new GeomAPI_Dir(aDir.X(), aDir.Y(), aDir.Z())));
   return aDot < 0;
 }

@@ -170,7 +170,7 @@ AISObjectPtr SketchPlugin_ConstraintLength::getAISObject(AISObjectPtr thePreviou
     return thePrevious;
 
   AISObjectPtr anAIS = SketcherPrs_Factory::lengthDimensionConstraint(this,
-    sketch()->coordinatePlane(), thePrevious);
+    sketch(), thePrevious);
   return anAIS;
 }
 

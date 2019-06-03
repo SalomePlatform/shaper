@@ -70,7 +70,10 @@ public:
     const Handle(SelectMgr_EntityOwner)& theOwner);
 
   /// Returns sketcher plane
-  Standard_EXPORT std::shared_ptr<GeomAPI_Ax3> plane() const { return mySketcher->coordinatePlane(); }
+  Standard_EXPORT std::shared_ptr<GeomAPI_Ax3> plane() const
+  {
+    return mySketcher->coordinatePlane();
+  }
 
   /// Returns feature object
   Standard_EXPORT ModelAPI_Feature* feature() const { return myConstraint; }

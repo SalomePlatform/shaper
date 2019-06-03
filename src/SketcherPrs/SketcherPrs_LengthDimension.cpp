@@ -109,10 +109,10 @@ static const gp_Pln MyDefPln(gp_Pnt(0,0,0), gp_Dir(0,0,1));
 IMPLEMENT_STANDARD_RTTIEXT(SketcherPrs_LengthDimension, AIS_LengthDimension);
 
 SketcherPrs_LengthDimension::SketcherPrs_LengthDimension(ModelAPI_Feature* theConstraint,
-                                              const std::shared_ptr<GeomAPI_Ax3>& thePlane)
+  SketchPlugin_Sketch* theSketcher)
 : AIS_LengthDimension(MyDefStart, MyDefEnd, MyDefPln),
   myConstraint(theConstraint),
-  mySketcherPlane(thePlane),
+  mySketcher(theSketcher),
   myFirstPoint(MyDefStart),
   mySecondPoint(MyDefEnd),
   myPlane(MyDefPln),
@@ -124,9 +124,9 @@ SketcherPrs_LengthDimension::SketcherPrs_LengthDimension(ModelAPI_Feature* theCo
 
 #ifdef OCCT_28850_FIXED
   if (theConstraint->getKind() == SketchPlugin_ConstraintDistanceHorizontal::ID())
-    SetDirection(mySketcherPlane->dirX()->impl<gp_Dir>(), true);
+    SetDirection(plane()->dirX()->impl<gp_Dir>(), true);
   else if (theConstraint->getKind() == SketchPlugin_ConstraintDistanceVertical::ID())
-    SetDirection(mySketcherPlane->dirY()->impl<gp_Dir>(), true);
+    SetDirection(plane()->dirY()->impl<gp_Dir>(), true);
 #endif
 }
 
@@ -148,13 +148,13 @@ void SketcherPrs_LengthDimension::Compute(
   const Standard_Integer theMode)
 {
   gp_Pnt aPnt1, aPnt2;
-  bool aReadyToDisplay = readyToDisplay(myConstraint, mySketcherPlane, aPnt1, aPnt2);
+  bool aReadyToDisplay = readyToDisplay(myConstraint, plane(), aPnt1, aPnt2);
   if (aReadyToDisplay) {
     myFirstPoint = aPnt1;
     mySecondPoint = aPnt2;
 
     myDistance = SketcherPrs_Tools::getFlyoutDistance(myConstraint);
-    myPlane = gp_Pln(mySketcherPlane->impl<gp_Ax3>());
+    myPlane = gp_Pln(plane()->impl<gp_Ax3>());
 
     DataPtr aData = myConstraint->data();
     AttributeDoublePtr anAttributeValue;
