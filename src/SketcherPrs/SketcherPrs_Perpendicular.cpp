@@ -58,7 +58,7 @@ bool SketcherPrs_Perpendicular::IsReadyToDisplay(ModelAPI_Feature* theConstraint
 
 bool SketcherPrs_Perpendicular::updateIfReadyToDisplay(double theStep, bool withColor) const
 {
-  if (!IsReadyToDisplay(myConstraint, myPlane))
+  if (!IsReadyToDisplay(myConstraint, plane()))
     return false;
 
   ObjectPtr aObj1 =

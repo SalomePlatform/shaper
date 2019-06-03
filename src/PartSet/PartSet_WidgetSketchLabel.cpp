@@ -344,9 +344,6 @@ void PartSet_WidgetSketchLabel::updateByPlaneSelected(const ModuleBase_ViewerPrs
       }
     }
   }
-  if (aModule)
-    aModule->onViewTransformed();
-
   if (myOpenTransaction) {
     SessionPtr aMgr = ModelAPI_Session::get();
     aMgr->finishOperation();
@@ -365,6 +362,9 @@ void PartSet_WidgetSketchLabel::updateByPlaneSelected(const ModuleBase_ViewerPrs
   // the selection by any label deactivation, but need to switch it off by stop the sketch
   myWorkshop->selectionActivate()->updateSelectionFilters();
   myWorkshop->selectionActivate()->updateSelectionModes();
+
+  if (aModule)
+    aModule->onViewTransformed();
 
   // 6. Update sketcher actions
   XGUI_ActionsMgr* anActMgr = aWorkshop->actionsMgr();

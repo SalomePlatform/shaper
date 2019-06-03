@@ -62,7 +62,7 @@ bool SketcherPrs_Tangent::IsReadyToDisplay(ModelAPI_Feature* theConstraint,
 
 bool SketcherPrs_Tangent::updateIfReadyToDisplay(double theStep, bool withColor) const
 {
-  if (!IsReadyToDisplay(myConstraint, myPlane))
+  if (!IsReadyToDisplay(myConstraint, plane()))
     return false;
 
   ObjectPtr aObj1 =

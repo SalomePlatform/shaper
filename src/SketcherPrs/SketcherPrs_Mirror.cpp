@@ -74,7 +74,7 @@ bool SketcherPrs_Mirror::IsReadyToDisplay(ModelAPI_Feature* theConstraint,
 
 bool SketcherPrs_Mirror::updateIfReadyToDisplay(double theStep, bool withColor) const
 {
-  if (!IsReadyToDisplay(myConstraint, myPlane))
+  if (!IsReadyToDisplay(myConstraint, plane()))
     return false;
 
   // Get axis of mirror

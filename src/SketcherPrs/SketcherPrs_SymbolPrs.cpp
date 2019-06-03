@@ -120,7 +120,7 @@ std::map<const char*, Handle(Image_AlienPixMap)> SketcherPrs_SymbolPrs::myIconsM
 SketcherPrs_SymbolPrs::SketcherPrs_SymbolPrs(ModelAPI_Feature* theConstraint,
   SketchPlugin_Sketch* theSketcher)
  : AIS_InteractiveObject(), myConstraint(theConstraint),
-   myPlane(theSketcher->coordinatePlane()), myIsCustomColor(false),
+   myIsCustomColor(false),
    mySketcher(theSketcher)
 {
   SetAutoHilight(Standard_False);
