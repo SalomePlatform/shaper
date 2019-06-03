@@ -135,6 +135,8 @@ protected slots:
 
   void onSameTopology(bool theOn);
 
+  void onShowOnly();
+
 protected:
   /// Returns true if the event is processed. The default implementation is empty, returns false.
   virtual bool processDelete();

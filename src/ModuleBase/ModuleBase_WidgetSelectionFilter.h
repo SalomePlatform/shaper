@@ -39,6 +39,7 @@ class QGroupBox;
 class QToolButton;
 class QVBoxLayout;
 class QPushButton;
+class QCheckBox;
 
 class ModuleBase_IWorkshop;
 
@@ -110,7 +111,7 @@ protected:
   virtual bool restoreValueCustom() { return true; }
 
 private slots:
-  void onAddItem();
+  void onAddFilter(int);
   void onDeleteItem(ModuleBase_FilterItem* theItem);
   void onSelect();
   void onShowOnly(bool theErase);
@@ -124,12 +125,13 @@ private:
 private:
   ModuleBase_IWorkshop* myWorkshop;
 
+  QWidget* myFiltersWgt;
+  QVBoxLayout* myFiltersLayout;
+
   QComboBox* myFiltersCombo;
-  QGroupBox* myFiltersGroup;
-  QVBoxLayout* myGroupLayout;
   QPushButton* mySelectBtn;
   QLabel* myNbLbl;
-  QPushButton* myShowBtn;
+  QCheckBox* myShowBtn;
 
   int mySelectionType;
   std::list<std::string> myFilters;

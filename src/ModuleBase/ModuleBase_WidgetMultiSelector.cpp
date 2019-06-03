@@ -63,6 +63,7 @@
 #include <QTimer>
 #include <QMainWindow>
 #include <QCheckBox>
+#include <QPushButton>
 
 #include <memory>
 #include <string>
@@ -157,11 +158,6 @@ ModuleBase_WidgetMultiSelector::ModuleBase_WidgetMultiSelector(QWidget* theParen
       }
     }
   }
-  std::string aUseFilters = theData->getProperty("use_filters");
-  if (aUseFilters.length() > 0) {
-    myFiltersWgt = new ModuleBase_FilterStarter(aUseFilters.c_str(), this, theWorkshop);
-    aMainLay->addWidget(myFiltersWgt);
-  }
 
   QString aToolTip = QString::fromStdString(theData->widgetTooltip());
   QString anObjName = QString::fromStdString(attributeID());
@@ -172,6 +168,23 @@ ModuleBase_WidgetMultiSelector::ModuleBase_WidgetMultiSelector(QWidget* theParen
 
   aMainLay->addWidget(myListView->getControl());
   connect(myTypeCtrl, SIGNAL(valueChanged(int)), this, SLOT(onSelectionTypeChanged()));
+
+  std::string aUseFilters = theData->getProperty("use_filters");
+  if (aUseFilters.length() > 0) {
+    QWidget* aFltrWgt = new QWidget(this);
+    QHBoxLayout* aFltrLayout = new QHBoxLayout(aFltrWgt);
+
+    myFiltersWgt = new ModuleBase_FilterStarter(aUseFilters.c_str(), aFltrWgt, theWorkshop);
+    aFltrLayout->addWidget(myFiltersWgt);
+
+    aFltrLayout->addStretch();
+
+    QPushButton* aShowBtn = new QPushButton(tr("Show only"), aFltrWgt);
+    connect(aShowBtn, SIGNAL(clicked(bool)), SLOT(onShowOnly()));
+    aFltrLayout->addWidget(aShowBtn);
+
+    aMainLay->addWidget(aFltrWgt);
+  }
 
   bool aSameTop = theData->getBooleanAttribute("same_topology", false);
   if (aSameTop) {
@@ -1074,4 +1087,9 @@ void ModuleBase_WidgetMultiSelector::onSameTopology(bool theOn)
     aSelectionListAttr->setGeometricalSelection(theOn);
     updateObject(myFeature);
   }
+}
+
+void ModuleBase_WidgetMultiSelector::onShowOnly()
+{
+
 }
