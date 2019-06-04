@@ -56,13 +56,15 @@ std::list<std::string> FiltersPlugin_Selection::filters() const
 
 void FiltersPlugin_Selection::setReversed(const std::string theFilterID, const bool theReversed)
 {
-  std::string anAttrID = kReverseAttrID + kFilterSeparator + theFilterID;
+  std::string anAttrID = theFilterID + kFilterSeparator + kReverseAttrID;
   std::shared_ptr<ModelAPI_AttributeBoolean> aBool = boolean(anAttrID);
+  if (aBool.get())
+    aBool->setValue(theReversed);
 }
 
 bool FiltersPlugin_Selection::isReversed(const std::string theFilterID)
 {
-  std::string anAttrID = kReverseAttrID + kFilterSeparator + theFilterID;
+  std::string anAttrID = theFilterID + kFilterSeparator + kReverseAttrID;
   std::shared_ptr<ModelAPI_AttributeBoolean> aBool = boolean(anAttrID);
   return aBool->value();
 }
