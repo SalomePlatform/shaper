@@ -74,8 +74,9 @@ public:
 
 signals:
   void deleteItem(ModuleBase_FilterItem* theItem);
+  void reversedItem(ModuleBase_FilterItem* theItem);
 
-  private slots:
+private slots:
   void onReverse(bool theCheck);
   void onDelete();
 
@@ -113,6 +114,7 @@ protected:
 private slots:
   void onAddFilter(int);
   void onDeleteItem(ModuleBase_FilterItem* theItem);
+  void onReverseItem(ModuleBase_FilterItem* theItem);
   void onSelect();
   void onShowOnly(bool theErase);
 

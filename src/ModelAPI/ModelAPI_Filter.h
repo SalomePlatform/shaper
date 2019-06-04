@@ -73,6 +73,10 @@ public:
   /// \param theShape the given shape
   virtual bool isOk(const GeomShapePtr& theShape, const ModelAPI_FiltersArgs& theArgs) const = 0;
 
+  /// Returns XML string which represents GUI of the filter
+  /// By default it retrurns nothing (no GUI)
+  virtual std::string xmlRepresentation() const { return ""; }
+
 private:
   bool myIsReverse;
 };

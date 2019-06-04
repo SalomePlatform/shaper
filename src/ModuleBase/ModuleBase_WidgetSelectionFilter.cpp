@@ -128,6 +128,8 @@ ModuleBase_FilterItem::ModuleBase_FilterItem(
   : QWidget(theParent), myFilterID(theFilter),
     mySelection(std::dynamic_pointer_cast<ModelAPI_FiltersFeature>(theSelection))
 {
+  std::string aXmlString = ModelAPI_Session::get()->filters()->filter(theFilter)->xmlRepresentation();
+
   QHBoxLayout* aLayout = new QHBoxLayout(this);
   ModuleBase_Tools::zeroMargins(aLayout);
 
@@ -155,11 +157,12 @@ ModuleBase_FilterItem::ModuleBase_FilterItem(
 
 void ModuleBase_FilterItem::onReverse(bool theCheck)
 {
-  //mySelection->setReversed(myFilterID, theCheck);
+  mySelection->setReversed(myFilterID, theCheck);
   if (theCheck)
     myRevBtn->setIcon(QIcon(":pictures/reverce.png"));
   else
     myRevBtn->setIcon(QIcon(":pictures/add.png"));
+  emit reversedItem(this);
 }
 
 void ModuleBase_FilterItem::onDelete()
@@ -292,9 +295,11 @@ void ModuleBase_WidgetSelectionFilter::onAddFilter(int theIndex)
   if (!aFilter.empty()) {
     myUseFilters.push_back(aFilter);
     ModuleBase_FilterItem* aItem =
-      new ModuleBase_FilterItem(aFilter, mySelectorFeature, myFiltersWgt);
+      new ModuleBase_FilterItem(aFilter, myFeature, myFiltersWgt);
     connect(aItem, SIGNAL(deleteItem(ModuleBase_FilterItem*)),
       SLOT(onDeleteItem(ModuleBase_FilterItem*)));
+    connect(aItem, SIGNAL(reversedItem(ModuleBase_FilterItem*)),
+      SLOT(onReverseItem(ModuleBase_FilterItem*)));
     myFiltersLayout->addWidget(aItem);
 
     FiltersFeaturePtr aFiltersFeature =
@@ -322,6 +327,13 @@ void ModuleBase_WidgetSelectionFilter::onDeleteItem(ModuleBase_FilterItem* theIt
     std::dynamic_pointer_cast<ModelAPI_FiltersFeature>(myFeature);
   aFiltersFeature->removeFilter(aFilter);
 
+  updateSelectBtn();
+  clearCurrentSelection(true);
+  updateNumberSelected();
+}
+
+void ModuleBase_WidgetSelectionFilter::onReverseItem(ModuleBase_FilterItem* theItem)
+{
   updateSelectBtn();
   clearCurrentSelection(true);
   updateNumberSelected();
