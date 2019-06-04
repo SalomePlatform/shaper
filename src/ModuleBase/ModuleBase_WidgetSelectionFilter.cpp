@@ -26,6 +26,7 @@
 #include "ModuleBase_PageWidget.h"
 #include "ModuleBase_WidgetMultiSelector.h"
 #include "ModuleBase_ResultPrs.h"
+#include "ModuleBase_WidgetFactory.h"
 
 #include <ModelAPI_Session.h>
 #include <ModelAPI_AttributeSelectionList.h>
@@ -124,17 +125,40 @@ void ModuleBase_FilterStarter::onFiltersLaunch()
 //*****************************************************************************
 //*****************************************************************************
 ModuleBase_FilterItem::ModuleBase_FilterItem(
-  const std::string& theFilter, FeaturePtr theSelection, QWidget* theParent)
-  : QWidget(theParent), myFilterID(theFilter),
-    mySelection(std::dynamic_pointer_cast<ModelAPI_FiltersFeature>(theSelection))
+  const std::string& theFilter, ModuleBase_WidgetSelectionFilter* theParent)
+  : QWidget(theParent->filtersWidget()), myFilterID(theFilter),
+    mySelection(std::dynamic_pointer_cast<ModelAPI_FiltersFeature>(theParent->feature()))
 {
   std::string aXmlString = ModelAPI_Session::get()->filters()->filter(theFilter)->xmlRepresentation();
+  if (aXmlString.length() == 0)
+    addItemRow(this);
+  else {
+    ModuleBase_WidgetFactory aFactory(aXmlString, theParent->workshop());
+    QVBoxLayout* aLayout = new QVBoxLayout(this);
+    ModuleBase_Tools::zeroMargins(aLayout);
 
-  QHBoxLayout* aLayout = new QHBoxLayout(this);
+    QWidget* aItemRow = new QWidget(this);
+    addItemRow(aItemRow);
+    aLayout->addWidget(aItemRow);
+
+    ModuleBase_PageWidget* aParamsWgt = new ModuleBase_PageWidget(this);
+    aFactory.createWidget(aParamsWgt);
+    ModuleBase_Tools::zeroMargins(aParamsWgt->layout());
+    QList<ModuleBase_ModelWidget*> aWidgets = aFactory.getModelWidgets();
+    foreach(ModuleBase_ModelWidget* aWidget, aWidgets) {
+      aWidget->setFeature(theParent->feature());
+    }
+    aLayout->addWidget(aParamsWgt);
+  }
+}
+
+void ModuleBase_FilterItem::addItemRow(QWidget* theParent)
+{
+  QHBoxLayout* aLayout = new QHBoxLayout(theParent);
   ModuleBase_Tools::zeroMargins(aLayout);
 
   // Reverse filter button
-  myRevBtn = new QToolButton(this);
+  myRevBtn = new QToolButton(theParent);
   myRevBtn->setCheckable(true);
   myRevBtn->setChecked(false);
   myRevBtn->setAutoRaise(true);
@@ -144,16 +168,15 @@ ModuleBase_FilterItem::ModuleBase_FilterItem(
   aLayout->addWidget(myRevBtn);
 
   const std::string& aFilterName = ModelAPI_Session::get()->filters()->filter(myFilterID)->name();
-  aLayout->addWidget(new QLabel(aFilterName.c_str(), this), 1);
+  aLayout->addWidget(new QLabel(aFilterName.c_str(), theParent), 1);
 
-  QToolButton* aDelBtn = new QToolButton(this);
+  QToolButton* aDelBtn = new QToolButton(theParent);
   aDelBtn->setIcon(QIcon(":pictures/delete.png"));
   aDelBtn->setAutoRaise(true);
   aDelBtn->setToolTip(tr("Delete the filter"));
   connect(aDelBtn, SIGNAL(clicked(bool)), SLOT(onDelete()));
   aLayout->addWidget(aDelBtn);
 }
-
 
 void ModuleBase_FilterItem::onReverse(bool theCheck)
 {
@@ -294,8 +317,7 @@ void ModuleBase_WidgetSelectionFilter::onAddFilter(int theIndex)
   }
   if (!aFilter.empty()) {
     myUseFilters.push_back(aFilter);
-    ModuleBase_FilterItem* aItem =
-      new ModuleBase_FilterItem(aFilter, myFeature, myFiltersWgt);
+    ModuleBase_FilterItem* aItem = new ModuleBase_FilterItem(aFilter, this);
     connect(aItem, SIGNAL(deleteItem(ModuleBase_FilterItem*)),
       SLOT(onDeleteItem(ModuleBase_FilterItem*)));
     connect(aItem, SIGNAL(reversedItem(ModuleBase_FilterItem*)),

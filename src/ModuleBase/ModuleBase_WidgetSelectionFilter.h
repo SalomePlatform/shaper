@@ -64,11 +64,13 @@ private:
 };
 
 
+class ModuleBase_WidgetSelectionFilter;
+
 class ModuleBase_FilterItem : public QWidget
 {
   Q_OBJECT
 public:
-  ModuleBase_FilterItem(const std::string& theFilter, FeaturePtr theSelection, QWidget* theParent);
+  ModuleBase_FilterItem(const std::string& theFilter, ModuleBase_WidgetSelectionFilter* theParent);
 
   std::string filter() const { return myFilterID; }
 
@@ -81,6 +83,8 @@ private slots:
   void onDelete();
 
 private:
+  void addItemRow(QWidget* theParent);
+
   std::string myFilterID;
   FiltersFeaturePtr mySelection;
   QToolButton* myRevBtn;
@@ -102,6 +106,10 @@ public:
   /// It is called when user press Ok or OkPlus buttons in the parent property panel
   /// By default this slot does nothing
   virtual void onFeatureAccepted();
+
+  ModuleBase_IWorkshop* workshop() const { return myWorkshop; }
+
+  QWidget* filtersWidget() const { return myFiltersWgt; }
 
 protected:
   /// Saves the internal parameters to the given feature (not ussed for this widget)

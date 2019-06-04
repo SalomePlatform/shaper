@@ -25,6 +25,7 @@ SET(PROJECT_HEADERS
     FiltersPlugin_Selection.h
     FiltersPlugin_HorizontalFace.h
     FiltersPlugin_VerticalFace.h
+	FiltersPlugin_BelongsTo.h
 )
 
 SET(PROJECT_SOURCES
@@ -32,6 +33,7 @@ SET(PROJECT_SOURCES
     FiltersPlugin_Selection.cpp
     FiltersPlugin_HorizontalFace.cpp
     FiltersPlugin_VerticalFace.cpp
+	FiltersPlugin_BelongsTo.cpp
 )
 
 SET(PROJECT_LIBRARIES

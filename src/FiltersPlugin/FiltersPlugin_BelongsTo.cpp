@@ -31,11 +31,11 @@ bool FiltersPlugin_BelongsTo::isOk(const GeomShapePtr& theShape,
 }
 
 static std::string XMLRepresentation =
-"<filter id = \"Belongs to\""
+"<filter id = \"Belongs to\">"
 " <multi_selector id=\"Belongs to\""
 "   label = \"Objects:\""
 "   tooltip = \"Select objects to limit selection.\""
-"   type_choice = \"objects\""
+"   type_choice = \"objects\">"
 " </multi_selector>"
 "</filter>";
 

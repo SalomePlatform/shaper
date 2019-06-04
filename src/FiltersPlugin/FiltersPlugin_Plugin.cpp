@@ -21,6 +21,7 @@
 #include "FiltersPlugin_Selection.h"
 #include "FiltersPlugin_HorizontalFace.h"
 #include "FiltersPlugin_VerticalFace.h"
+#include "FiltersPlugin_BelongsTo.h"
 
 #include <ModelAPI_Session.h>
 #include <ModelAPI_Filter.h>
@@ -35,6 +36,7 @@ FiltersPlugin_Plugin::FiltersPlugin_Plugin()
   ModelAPI_FiltersFactory* aFactory = aMgr->filters();
   aFactory->registerFilter("HorizontalFaces", new FiltersPlugin_HorizontalFace);
   aFactory->registerFilter("VerticalFaces", new FiltersPlugin_VerticalFace);
+  aFactory->registerFilter("BelongsTo", new FiltersPlugin_BelongsTo);
 
   ModelAPI_Session::get()->registerPlugin(this);
 }
