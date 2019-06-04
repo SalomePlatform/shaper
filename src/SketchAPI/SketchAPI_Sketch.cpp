@@ -127,6 +127,26 @@ void SketchAPI_Sketch::setPlane(const std::shared_ptr<GeomAPI_Ax3> & thePlane)
   execute();
 }
 
+void SketchAPI_Sketch::setPlane(const ModelHighAPI_Selection & thePlane,
+                                bool theRemoveExternalDependency)
+{
+  std::shared_ptr<SketchPlugin_Sketch> aSketch =
+      std::dynamic_pointer_cast<SketchPlugin_Sketch>(feature());
+
+  DocumentPtr aDoc = aSketch->document();
+  bool useVisible = false;
+  FeaturePtr aCurFeatureBefore = aDoc->currentFeature(useVisible);
+  aDoc->setCurrentFeature(aSketch, useVisible);
+
+  if (theRemoveExternalDependency)
+    aSketch->customAction(SketchPlugin_Sketch::ACTION_REMOVE_EXTERNAL());
+
+  setExternal(thePlane);
+
+  aDoc->setCurrentFeature(aCurFeatureBefore, useVisible);
+}
+
+//--------------------------------------------------------------------------------------
 void SketchAPI_Sketch::setExternal(const ModelHighAPI_Selection & theExternal)
 {
   fillAttribute(theExternal, myexternal);
