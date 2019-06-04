@@ -240,7 +240,7 @@ AttributePtr Model_Data::addFloatingAttribute(
   int anIndex;
   TDF_Label aLab;
   if (myLab.IsAttribute(TDF_TagSource::GetID())) {
-    TDF_Label aLab = myLab.NewChild(); // already exists a floating attribute, create the next
+    aLab = myLab.NewChild(); // already exists a floating attribute, create the next
     anIndex = aLab.Tag();
   } else { // put the first floating attribute, quite far from other standard attributes
     anIndex = int(myAttrs.size()) + 1000;

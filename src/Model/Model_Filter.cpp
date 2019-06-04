@@ -38,21 +38,28 @@ bool Model_FiltersFactory::isValid(FeaturePtr theFiltersFeature, GeomShapePtr th
   // prepare all filters args
   ModelAPI_FiltersArgs anArgs;
   std::map<FilterPtr, bool> aReverseFlags; /// map of all filters to the reverse values
-  static const std::string& anEmptyType("");
-  std::list<std::shared_ptr<ModelAPI_Attribute> > allAttrs =
-    theFiltersFeature->data()->attributes(anEmptyType);
-  std::list<std::shared_ptr<ModelAPI_Attribute> >::iterator anAttr = allAttrs.begin();
-  for(; anAttr != allAttrs.end(); anAttr++) {
-    const std::string& anAttrID = (*anAttr)->id();
-    if (anAttrID.find(kFilterSeparator) == std::string::npos) { // possible a filter reverse flag
-      std::shared_ptr<ModelAPI_AttributeBoolean> aReverse = theFiltersFeature->boolean(anAttrID);
-      if (aReverse.get() && myFilters.find(anAttrID) != myFilters.end()) {
-        aReverseFlags[myFilters[anAttrID] ] = aReverse->value();
+
+  std::list<std::string> aGroups;
+  theFiltersFeature->data()->allGroups(aGroups);
+  for(std::list<std::string>::iterator aGIter = aGroups.begin(); aGIter != aGroups.end(); aGIter++)
+  {
+    if (myFilters.find(*aGIter) == myFilters.end())
+      continue;
+    std::list<std::shared_ptr<ModelAPI_Attribute> > anAttrs;
+    theFiltersFeature->data()->attributesOfGroup(*aGIter, anAttrs);
+    std::list<std::shared_ptr<ModelAPI_Attribute> >::iterator anAttrIter = anAttrs.begin();
+    for(; anAttrIter != anAttrs.end(); anAttrIter++) {
+      std::string anArgID = (*anAttrIter)->id().substr((*aGIter).length() + 2);
+      if (anArgID.empty()) { // reverse flag
+        std::shared_ptr<ModelAPI_AttributeBoolean> aReverse =
+          std::dynamic_pointer_cast<ModelAPI_AttributeBoolean>(*anAttrIter);
+        aReverseFlags[myFilters[*aGIter] ] = aReverse->value();
+      } else {
+        anArgs.add(*anAttrIter);
       }
-    } else { // an argument of a filter
-      anArgs.add(*anAttr);
     }
   }
+
   // iterate filters and check shape for validity for all of them
   std::map<FilterPtr, bool>::iterator aFilter = aReverseFlags.begin();
   for(; aFilter != aReverseFlags.end(); aFilter++) {
