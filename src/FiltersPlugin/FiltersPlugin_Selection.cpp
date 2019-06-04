@@ -34,7 +34,11 @@ void FiltersPlugin_Selection::addFilter(const std::string theFilterID)
       std::dynamic_pointer_cast<ModelAPI_AttributeBoolean>(data()->addFloatingAttribute(
         kReverseAttrID, ModelAPI_AttributeBoolean::typeId(), theFilterID));
     aBool->setValue(false); // not reversed by default
-    // TODO: to add attributes related to the filter
+    // to add attributes related to the filter
+    ModelAPI_FiltersArgs anArgs;
+    anArgs.setFeature(std::dynamic_pointer_cast<ModelAPI_FiltersFeature>(data()->owner()));
+    anArgs.setFilter(theFilterID);
+    aFilter->initAttributes(anArgs);
   }
 }
 

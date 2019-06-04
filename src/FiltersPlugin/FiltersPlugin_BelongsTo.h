@@ -49,6 +49,9 @@ public:
 
   /// Returns XML string which represents GUI of the filter
   virtual std::string xmlRepresentation() const override;
+
+  /// Initializes arguments of a filter.
+  virtual void initAttributes(ModelAPI_FiltersArgs& theArguments) override;
 };
 
 #endif

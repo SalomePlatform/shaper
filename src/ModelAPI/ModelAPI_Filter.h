@@ -24,23 +24,61 @@
 #include "ModelAPI_Attribute.h"
 #include "ModelAPI_Feature.h"
 
+#include "ModelAPI_Data.h"
+
 #include <GeomAPI_Shape.h>
 #include <map>
 
 /// separator between the filter name and the filter attribute ID
 static const std::string kFilterSeparator = "__";
 
+/**\class ModelAPI_FiltersFeature
+* \ingroup DataModel
+* \brief An interface for working with filters in the feature. A filters feature must inherit it
+*       in order to allow management of filters in the feature data structure.
+*/
+class ModelAPI_FiltersFeature: public ModelAPI_Feature
+{
+public:
+  /// Adds a filter to the feature. Also initializes arguments of this filter.
+  virtual void addFilter(const std::string theFilterID) = 0;
+
+  /// Removes an existing filter from the feature.
+  virtual void removeFilter(const std::string theFilterID) = 0;
+
+  /// Returns the list of existing filters in the feature.
+  virtual std::list<std::string> filters() const = 0;
+
+  /// Stores the reversed flag for the filter.
+  virtual void setReversed(const std::string theFilterID, const bool theReversed) = 0;
+
+  /// Returns the reversed flag value for the filter.
+  virtual bool isReversed(const std::string theFilterID) = 0;
+
+  /// Returns the ordered list of attributes related to the filter.
+  virtual std::list<AttributePtr> filterArgs(const std::string theFilterID) const = 0;
+};
+
+typedef std::shared_ptr<ModelAPI_FiltersFeature> FiltersFeaturePtr;
+
+
 /// definition of arguments of filters: id of the argument to attributes
 class ModelAPI_FiltersArgs {
   /// a map from the FilterID+AttributeID -> attribute
   std::map<std::string, AttributePtr> myMap;
   std::string myCurrentFilter; ///< ID of the filter that will take attributes now
+  FiltersFeaturePtr myFeature; ///< the feature is stored to minimize initAttribute interface
 public:
   ModelAPI_FiltersArgs() {}
 
   /// Sets the current filter ID
   void setFilter(const std::string& theFilterID) {
     myCurrentFilter = theFilterID;
+  }
+
+  /// Sets the current feature
+  void setFeature(const FiltersFeaturePtr theFeature) {
+    myFeature = theFeature;
   }
 
   /// Appends an argument of a filter
@@ -52,7 +90,11 @@ public:
   AttributePtr argument(const std::string& theID) {
     return myMap.find(myCurrentFilter + kFilterSeparator + theID)->second;
   }
-
+  /// adds an attribute of the filter
+  std::shared_ptr<ModelAPI_Attribute> initAttribute(
+    const std::string& theID, const std::string theAttrType) {
+    return myFeature->data()->addFloatingAttribute(theID, theAttrType, myCurrentFilter);
+  }
 };
 
 /**\class ModelAPI_ViewFilter
@@ -74,8 +116,12 @@ public:
   virtual bool isOk(const GeomShapePtr& theShape, const ModelAPI_FiltersArgs& theArgs) const = 0;
 
   /// Returns XML string which represents GUI of the filter
-  /// By default it retrurns nothing (no GUI)
+  /// By default it returns nothing (no GUI)
   virtual std::string xmlRepresentation() const { return ""; }
+
+  /// Initializes arguments of a filter. If a filter has no arguments, this method may be
+  /// not redefined.
+  virtual void initAttributes(ModelAPI_FiltersArgs& theArguments) {}
 
 private:
   bool myIsReverse;
@@ -115,34 +161,5 @@ protected:
   /// Get instance from Session
   ModelAPI_FiltersFactory() {}
 };
-
-/**\class ModelAPI_FiltersFeature
-* \ingroup DataModel
-* \brief An interface for working with filters in the feature. A filters feature must inherit it
-*       in order to allow management of filters in the feature data structure.
-*/
-class ModelAPI_FiltersFeature
-{
-public:
-  /// Adds a filter to the feature. Also initializes arguments of this filter.
-  virtual void addFilter(const std::string theFilterID) = 0;
-
-  /// Removes an existing filter from the feature.
-  virtual void removeFilter(const std::string theFilterID) = 0;
-
-  /// Returns the list of existing filters in the feature.
-  virtual std::list<std::string> filters() const = 0;
-
-  /// Stores the reversed flag for the filter.
-  virtual void setReversed(const std::string theFilterID, const bool theReversed) = 0;
-
-  /// Returns the reversed flag value for the filter.
-  virtual bool isReversed(const std::string theFilterID) = 0;
-
-  /// Returns the ordered list of attributes related to the filter.
-  virtual std::list<AttributePtr> filterArgs(const std::string theFilterID) const = 0;
-};
-
-typedef std::shared_ptr<ModelAPI_FiltersFeature> FiltersFeaturePtr;
 
 #endif

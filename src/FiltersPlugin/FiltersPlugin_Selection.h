@@ -29,7 +29,7 @@
 * \brief An interface for working with filters in the feature. A filters feature must inherit it
 *       in order to allow management of filters in the feature data structure.
 */
-class FiltersPlugin_Selection : public ModelAPI_Feature, public ModelAPI_FiltersFeature
+class FiltersPlugin_Selection : public ModelAPI_FiltersFeature
 {
 public:
   /// Extrusion kind

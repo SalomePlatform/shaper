@@ -19,6 +19,8 @@
 
 #include "FiltersPlugin_BelongsTo.h"
 
+#include <ModelAPI_AttributeSelectionList.h>
+
 bool FiltersPlugin_BelongsTo::isSupported(GeomAPI_Shape::ShapeType theType) const
 {
   return true;
@@ -43,4 +45,9 @@ static std::string XMLRepresentation =
 std::string FiltersPlugin_BelongsTo::xmlRepresentation() const
 {
   return XMLRepresentation;
+}
+
+void FiltersPlugin_BelongsTo::initAttributes(ModelAPI_FiltersArgs& theArguments)
+{
+  theArguments.initAttribute("Belongs to", ModelAPI_AttributeSelectionList::typeId());
 }
