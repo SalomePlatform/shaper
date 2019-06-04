@@ -73,14 +73,14 @@ static void sendMessage(const char* theMessageName,
 // ========================================================
 
 SketchSolver_Group::SketchSolver_Group(const CompositeFeaturePtr& theWorkplane)
-  : mySketch(theWorkplane),
-    myPrevResult(PlaneGCSSolver_Solver::STATUS_UNKNOWN),
+  : myPrevResult(PlaneGCSSolver_Solver::STATUS_UNKNOWN),
     myDOF(-1),
     myIsEventsBlocked(false),
     myMultiConstraintUpdateStack(0)
 {
   mySketchSolver = SolverPtr(new PlaneGCSSolver_Solver);
   myStorage = StoragePtr(new PlaneGCSSolver_Storage(mySketchSolver));
+  updateSketch(theWorkplane);
 }
 
 SketchSolver_Group::~SketchSolver_Group()
@@ -120,6 +120,34 @@ bool SketchSolver_Group::changeConstraint(
 
   // constraint is created/updated => reset stack of "multi" constraints updates
   myMultiConstraintUpdateStack = 0;
+  return true;
+}
+
+bool SketchSolver_Group::updateSketch(CompositeFeaturePtr theSketch)
+{
+  static const double THE_TOLERANCE = 1.e-7;
+  bool isChanged = theSketch != mySketch;
+
+  AttributePointPtr anOrigin = std::dynamic_pointer_cast<GeomDataAPI_Point>(
+      theSketch->attribute(SketchPlugin_Sketch::ORIGIN_ID()));
+  AttributeDirPtr aNorm = std::dynamic_pointer_cast<GeomDataAPI_Dir>(
+      theSketch->attribute(SketchPlugin_Sketch::NORM_ID()));
+  AttributeDirPtr aDirX = std::dynamic_pointer_cast<GeomDataAPI_Dir>(
+      theSketch->attribute(SketchPlugin_Sketch::DIRX_ID()));
+
+  isChanged = isChanged
+      || (mySketchOrigin && anOrigin->pnt()->distance(mySketchOrigin) > THE_TOLERANCE)
+      || (mySketchNormal && aNorm->xyz()->distance(mySketchNormal->xyz()) > THE_TOLERANCE)
+      || (mySketchXDir && aDirX->xyz()->distance(mySketchXDir->xyz()) > THE_TOLERANCE);
+
+  if (isChanged) {
+    mySketch = theSketch;
+    mySketchOrigin = anOrigin->pnt();
+    mySketchNormal = aNorm->dir();
+    mySketchXDir = aDirX->dir();
+
+    myStorage->notify(theSketch);
+  }
   return true;
 }
 

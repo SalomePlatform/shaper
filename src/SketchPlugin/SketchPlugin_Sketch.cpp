@@ -402,7 +402,8 @@ bool SketchPlugin_Sketch::removeLinksToExternal()
       aRemove.push_back(aFeature);
     }
     else {
-      AttributeSelectionPtr anExtAttr = aFeature->selection(SketchPlugin_SketchEntity::EXTERNAL_ID());
+      AttributeSelectionPtr anExtAttr =
+          aFeature->selection(SketchPlugin_SketchEntity::EXTERNAL_ID());
       ResultPtr anExternal = anExtAttr ? anExtAttr->context() : ResultPtr();
       if (anExternal) {
         FeaturePtr anExtFeature = ModelAPI_Feature::feature(anExternal);
@@ -421,6 +422,7 @@ bool SketchPlugin_Sketch::removeLinksToExternal()
                 SketchPlugin_IntersectionPoint::INCLUDE_INTO_RESULT())->value();
           }
 
+          aFeature->boolean(SketchPlugin_SketchEntity::COPY_ID())->setValue(false);
           aFeature->boolean(SketchPlugin_SketchEntity::AUXILIARY_ID())->setValue(
               !isIncludedToSketchResult);
         }
@@ -428,6 +430,6 @@ bool SketchPlugin_Sketch::removeLinksToExternal()
     }
   }
   for (std::list<FeaturePtr>::iterator anIt = aRemove.begin(); anIt != aRemove.end(); ++anIt)
-    removeFeature(*anIt);
+    document()->removeFeature(*anIt);
   return true;
 }
