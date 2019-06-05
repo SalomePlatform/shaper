@@ -138,6 +138,8 @@ Q_OBJECT
   /// \return boolean value
   virtual bool hasSHIFTPressed() const = 0;
 
+  virtual void deactivateCurrentSelector() = 0;
+
 signals:
   /// Signal selection changed.
   void selectionChanged();

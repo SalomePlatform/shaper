@@ -119,6 +119,8 @@ Q_OBJECT
   /// \return boolean value
   virtual bool hasSHIFTPressed() const;
 
+  virtual void deactivateCurrentSelector();
+
   //! Returns workshop
   XGUI_Workshop* workshop() const { return myWorkshop; }
 

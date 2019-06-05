@@ -20,6 +20,7 @@
 #include "ModuleBase_WidgetSelectionFilter.h"
 #include "ModuleBase_Tools.h"
 #include "ModuleBase_IWorkshop.h"
+#include "ModuleBase_ISelectionActivate.h"
 #include "ModuleBase_IModule.h"
 #include "ModuleBase_IViewer.h"
 #include "ModuleBase_IPropertyPanel.h"
@@ -30,7 +31,10 @@
 
 #include <ModelAPI_Session.h>
 #include <ModelAPI_AttributeSelectionList.h>
+#include <ModelAPI_Events.h>
 #include <GeomAPI_ShapeExplorer.h>
+
+#include <Events_Loop.h>
 
 #include <AIS_InteractiveContext.hxx>
 #include <StdSelect_BRepOwner.hxx>
@@ -142,11 +146,16 @@ ModuleBase_FilterItem::ModuleBase_FilterItem(
     aLayout->addWidget(aItemRow);
 
     ModuleBase_PageWidget* aParamsWgt = new ModuleBase_PageWidget(this);
+    aParamsWgt->setFrameStyle(QFrame::Box | QFrame::Raised);
     aFactory.createWidget(aParamsWgt);
     ModuleBase_Tools::zeroMargins(aParamsWgt->layout());
-    QList<ModuleBase_ModelWidget*> aWidgets = aFactory.getModelWidgets();
-    foreach(ModuleBase_ModelWidget* aWidget, aWidgets) {
+    myWidgets = aFactory.getModelWidgets();
+    foreach(ModuleBase_ModelWidget* aWidget, myWidgets) {
       aWidget->setFeature(theParent->feature());
+      connect(aWidget, SIGNAL(focusInWidget(ModuleBase_ModelWidget*)),
+        theParent, SIGNAL(focusInWidget(ModuleBase_ModelWidget*)));
+      connect(aWidget, SIGNAL(focusOutWidget(ModuleBase_ModelWidget*)),
+        theParent, SIGNAL(focusOutWidget(ModuleBase_ModelWidget*)));
     }
     aLayout->addWidget(aParamsWgt);
   }
@@ -192,6 +201,19 @@ void ModuleBase_FilterItem::onDelete()
 {
   emit deleteItem(this);
 }
+
+QList<QWidget*>  ModuleBase_FilterItem::getControls() const
+{
+  QList<QWidget*> aWidgetsList;
+  foreach(ModuleBase_ModelWidget* aWgt, myWidgets) {
+    QList<QWidget*> aSubList = aWgt->getControls();
+    foreach(QWidget* aSub, aSubList) {
+      aWidgetsList.append(aSub);
+    }
+  }
+  return aWidgetsList;
+}
+
 
 
 //*****************************************************************************
@@ -333,11 +355,17 @@ void ModuleBase_WidgetSelectionFilter::onAddFilter(int theIndex)
   updateNumberSelected();
   myFiltersCombo->setCurrentIndex(0);
   myFiltersCombo->removeItem(theIndex);
+
+  enableFocusProcessing();
 }
 
 void ModuleBase_WidgetSelectionFilter::onDeleteItem(ModuleBase_FilterItem* theItem)
 {
   std::string aFilter = theItem->filter();
+  QList<ModuleBase_ModelWidget*> aWidgets = theItem->widgets();
+  foreach(ModuleBase_ModelWidget* aWgt, aWidgets) {
+    aWgt->deactivate();
+  }
   myFiltersLayout->removeWidget(theItem);
   theItem->deleteLater();
 
@@ -352,6 +380,20 @@ void ModuleBase_WidgetSelectionFilter::onDeleteItem(ModuleBase_FilterItem* theIt
   updateSelectBtn();
   clearCurrentSelection(true);
   updateNumberSelected();
+
+  enableFocusProcessing();
+  myWorkshop->deactivateCurrentSelector();
+  myWorkshop->selectionActivate()->updateSelectionModes();
+  myWorkshop->selectionActivate()->updateSelectionFilters();
+  redisplayFeature();
+}
+
+
+void ModuleBase_WidgetSelectionFilter::redisplayFeature()
+{
+  static Events_ID aDispEvent = Events_Loop::loop()->eventByName(EVENT_OBJECT_TO_REDISPLAY);
+  ModelAPI_EventCreator::get()->sendUpdated(myFeature, aDispEvent);
+  Events_Loop::loop()->flush(aDispEvent);
 }
 
 void ModuleBase_WidgetSelectionFilter::onReverseItem(ModuleBase_FilterItem* theItem)
@@ -419,8 +461,9 @@ void ModuleBase_WidgetSelectionFilter::updatePreview(const TopoDS_Shape& theShap
 
   if (myPreview.IsNull()) {
     myPreview = new AIS_Shape(theShape);
-    myPreview->SetDisplayMode(myShowBtn->isChecked()? AIS_Shaded : AIS_WireFrame);
-    myPreview->SetColor(Quantity_NOC_YELLOW);
+    //myPreview->SetDisplayMode(myShowBtn->isChecked()? AIS_Shaded : AIS_WireFrame);
+    myPreview->SetDisplayMode(AIS_Shaded);
+    myPreview->SetColor(Quantity_NOC_BLUE1);
     myPreview->SetTransparency();
     aCtx->Display(myPreview, true);
     aCtx->Deactivate(myPreview);
@@ -439,13 +482,9 @@ void ModuleBase_WidgetSelectionFilter::onShowOnly(bool theShow)
   Handle(AIS_InteractiveContext) aCtx = myWorkshop->viewer()->AISContext();
 
   if (theShow) {
-    aCtx->SetDisplayMode(myPreview, AIS_Shaded, false);
     myListIO.Clear();
     aCtx->DisplayedObjects(AIS_KOI_Shape, -1, myListIO);
     myListIO.Remove(myPreview);
-  }
-  else {
-    aCtx->SetDisplayMode(myPreview, AIS_WireFrame, false);
   }
   AIS_ListOfInteractive::const_iterator aIt;
   Handle(AIS_Shape) aShapeIO;
@@ -472,7 +511,15 @@ void ModuleBase_WidgetSelectionFilter::updateNumberSelected()
 }
 QList<QWidget*> ModuleBase_WidgetSelectionFilter::getControls() const
 {
-  return QList<QWidget*>();
+  QList<QWidget*> aWidgets;
+  QList<ModuleBase_FilterItem*> aItems = myFiltersWgt->findChildren<ModuleBase_FilterItem*>();
+  foreach(ModuleBase_FilterItem* aItem, aItems) {
+    QList<QWidget*> aSubList = aItem->getControls();
+    foreach(QWidget* aWgt, aSubList) {
+      aWidgets.append(aWgt);
+    }
+  }
+  return aWidgets;
 }
 
 void ModuleBase_WidgetSelectionFilter::clearCurrentSelection(bool toUpdate)
@@ -494,4 +541,17 @@ void ModuleBase_WidgetSelectionFilter::onFeatureAccepted()
   foreach(ModuleBase_ViewerPrsPtr aPrs, myValues) {
     aSelListAttr->append(aPrs->object(), aPrs->shape());
   }
+}
+
+bool ModuleBase_WidgetSelectionFilter::storeValueCustom()
+{
+  return true;
+}
+
+bool ModuleBase_WidgetSelectionFilter::restoreValueCustom()
+{
+  ModuleBase_ModelWidget* aActive = myWorkshop->propertyPanel()->activeWidget();
+  if (aActive)
+    return aActive->restoreValue();
+  return true;
 }

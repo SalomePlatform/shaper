@@ -155,8 +155,10 @@ void XGUI_PropertyPanel::cleanContent()
   myPanelPage->clearPage();
   myActiveWidget = NULL;
   emit propertyPanelDeactivated();
-  myOperationMgr->workshop()->selectionActivate()->updateSelectionModes();
-  myOperationMgr->workshop()->selectionActivate()->updateSelectionFilters();
+  // VSV: It seems that this code is not necessary:
+  //      it is called on propertyPanelDeactivated() event
+  //myOperationMgr->workshop()->selectionActivate()->updateSelectionModes();
+  //myOperationMgr->workshop()->selectionActivate()->updateSelectionFilters();
 #ifdef DEBUG_ACTIVE_WIDGET
   std::cout << "myActiveWidget = NULL" << std::endl;
 #endif

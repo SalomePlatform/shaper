@@ -87,7 +87,7 @@ public:
   }
 
   /// returns the argument of the current filter by the argument id
-  AttributePtr argument(const std::string& theID) {
+  AttributePtr argument(const std::string& theID) const {
     return myMap.find(myCurrentFilter + kFilterSeparator + theID)->second;
   }
   /// adds an attribute of the filter

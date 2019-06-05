@@ -29,12 +29,23 @@ bool FiltersPlugin_BelongsTo::isSupported(GeomAPI_Shape::ShapeType theType) cons
 bool FiltersPlugin_BelongsTo::isOk(const GeomShapePtr& theShape,
   const ModelAPI_FiltersArgs& theArgs) const
 {
-  return true;
+  AttributePtr aAttr = theArgs.argument("BelongsTo");
+  AttributeSelectionListPtr aList =
+    std::dynamic_pointer_cast<ModelAPI_AttributeSelectionList>(aAttr);
+  if (!aList.get())
+    return false;
+  for (int i = 0; i < aList->size(); i++) {
+    AttributeSelectionPtr aAttr = aList->value(i);
+    GeomShapePtr aGeom = aAttr->value();
+    if (aGeom->isSubShape(theShape))
+      return true;
+  }
+  return false;
 }
 
 static std::string XMLRepresentation =
-"<filter id = \"Belongs to\">"
-" <multi_selector id=\"Belongs to\""
+"<filter id = \"BelongsTo\">"
+" <multi_selector id=\"BelongsTo__BelongsTo\""
 "   label = \"Objects:\""
 "   tooltip = \"Select objects to limit selection.\""
 "   type_choice = \"objects\">"
@@ -49,5 +60,5 @@ std::string FiltersPlugin_BelongsTo::xmlRepresentation() const
 
 void FiltersPlugin_BelongsTo::initAttributes(ModelAPI_FiltersArgs& theArguments)
 {
-  theArguments.initAttribute("Belongs to", ModelAPI_AttributeSelectionList::typeId());
+  theArguments.initAttribute("BelongsTo", ModelAPI_AttributeSelectionList::typeId());
 }

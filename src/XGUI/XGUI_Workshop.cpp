@@ -2934,3 +2934,8 @@ void XGUI_Workshop::onDockSizeChanged()
     disconnect(myObjectBrowser, SIGNAL(sizeChanged()), this, SLOT(onDockSizeChanged()));
   }
 }
+
+void XGUI_Workshop::deactivateCurrentSelector()
+{
+  myActiveControlMgr->deactivateSelector(myActiveControlMgr->activeSelector());
+}

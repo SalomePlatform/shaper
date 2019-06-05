@@ -93,7 +93,13 @@ void XGUI_ActiveControlMgr::onSelectorActivated()
 void XGUI_ActiveControlMgr::onSelectorDeactivated()
 {
   XGUI_ActiveControlSelector* aSelector = qobject_cast<XGUI_ActiveControlSelector*>(sender());
-  if (!aSelector || aSelector != myActiveSelector || !myActiveSelector)
+  deactivateSelector(aSelector);
+}
+
+//********************************************************************
+void XGUI_ActiveControlMgr::deactivateSelector(XGUI_ActiveControlSelector* theSelector)
+{
+  if (!theSelector || theSelector != myActiveSelector || !myActiveSelector)
     return;
 
   if (myIsBlocked) // we've come here from the same method
@@ -104,8 +110,7 @@ void XGUI_ActiveControlMgr::onSelectorDeactivated()
   activateSelector(NULL);
 
   XGUI_ActiveControlSelector* aSelectorToBeActivated = 0;
-  for (int i = 0, aCount = mySelectors.count(); i < aCount; i++)
-  {
+  for (int i = 0, aCount = mySelectors.count(); i < aCount; i++) {
     if (!mySelectors[i]->needToBeActiated())
       continue;
     aSelectorToBeActivated = mySelectors[i];

@@ -74,6 +74,14 @@ public:
 
   std::string filter() const { return myFilterID; }
 
+  /// Returns list of widget controls
+  /// \return a control list
+  QList<QWidget*> getControls() const;
+
+  QList<ModuleBase_ModelWidget*> widgets() const {
+    return myWidgets;
+  }
+
 signals:
   void deleteItem(ModuleBase_FilterItem* theItem);
   void reversedItem(ModuleBase_FilterItem* theItem);
@@ -88,6 +96,7 @@ private:
   std::string myFilterID;
   FiltersFeaturePtr mySelection;
   QToolButton* myRevBtn;
+  QList<ModuleBase_ModelWidget*> myWidgets;
 };
 
 class ModuleBase_WidgetSelectionFilter : public ModuleBase_ModelWidget
@@ -114,10 +123,10 @@ public:
 protected:
   /// Saves the internal parameters to the given feature (not ussed for this widget)
   /// \return True in success
-  virtual bool storeValueCustom() { return true; }
+  virtual bool storeValueCustom();
 
   /// Restore value from attribute data to the widget's control (not ussed for this widget)
-  virtual bool restoreValueCustom() { return true; }
+  virtual bool restoreValueCustom();
 
 private slots:
   void onAddFilter(int);
@@ -131,6 +140,7 @@ private:
   void updateNumberSelected();
   void clearCurrentSelection(bool toUpdate = false);
   void updatePreview(const TopoDS_Shape& theShape);
+  void redisplayFeature();
 
 private:
   ModuleBase_IWorkshop* myWorkshop;

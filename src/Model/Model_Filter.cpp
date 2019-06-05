@@ -33,11 +33,17 @@ void Model_FiltersFactory::registerFilter(const std::string& theID, ModelAPI_Fil
   }
 }
 
+struct FilterArgs {
+  FilterPtr myFilter;
+  bool myReverse;
+  std::string myFilterID;
+};
+
 bool Model_FiltersFactory::isValid(FeaturePtr theFiltersFeature, GeomShapePtr theShape)
 {
   // prepare all filters args
   ModelAPI_FiltersArgs anArgs;
-  std::map<FilterPtr, bool> aReverseFlags; /// map of all filters to the reverse values
+  std::list<FilterArgs> aFilters; /// all filters and the reverse values
 
   std::list<std::string> aGroups;
   theFiltersFeature->data()->allGroups(aGroups);
@@ -53,7 +59,9 @@ bool Model_FiltersFactory::isValid(FeaturePtr theFiltersFeature, GeomShapePtr th
       if (anArgID.empty()) { // reverse flag
         std::shared_ptr<ModelAPI_AttributeBoolean> aReverse =
           std::dynamic_pointer_cast<ModelAPI_AttributeBoolean>(*anAttrIter);
-        aReverseFlags[myFilters[*aGIter] ] = aReverse->value();
+        FilterArgs aFArgs = { myFilters[*aGIter] , aReverse->value() , *aGIter };
+        aFilters.push_back(aFArgs);
+
       } else {
         anArgs.add(*anAttrIter);
       }
@@ -61,10 +69,11 @@ bool Model_FiltersFactory::isValid(FeaturePtr theFiltersFeature, GeomShapePtr th
   }
 
   // iterate filters and check shape for validity for all of them
-  std::map<FilterPtr, bool>::iterator aFilter = aReverseFlags.begin();
-  for(; aFilter != aReverseFlags.end(); aFilter++) {
-    bool aResult = aFilter->first->isOk(theShape, anArgs);
-    if (aFilter->second)
+  std::list<FilterArgs>::iterator aFilter = aFilters.begin();
+  for(; aFilter != aFilters.end(); aFilter++) {
+    anArgs.setFilter(aFilter->myFilterID);
+    bool aResult = aFilter->myFilter->isOk(theShape, anArgs);
+    if (aFilter->myReverse)
       aResult = !aResult;
     if (!aResult) // one filter is failed => exit immediately
       return false;

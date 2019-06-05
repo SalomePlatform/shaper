@@ -56,6 +56,8 @@ public:
   /// \return selector instance
   XGUI_ActiveControlSelector* activeSelector() const { return myActiveSelector; }
 
+  void deactivateSelector(XGUI_ActiveControlSelector* theSelector);
+
 protected slots:
   /// Deactivates active selector and set the sender selector as active
   void onSelectorActivated();
