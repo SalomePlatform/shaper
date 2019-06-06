@@ -59,7 +59,8 @@
 #endif
 
 ModuleBase_OperationFeature::ModuleBase_OperationFeature(const QString& theId, QObject* theParent)
-: ModuleBase_Operation(theId, theParent), myIsEditing(false), myNeedToBeAborted(false)
+: ModuleBase_Operation(theId, theParent), myIsEditing(false), myNeedToBeAborted(false),
+myRestartTransactionOnResume(false)
 {
 }
 
@@ -521,5 +522,13 @@ void ModuleBase_OperationFeature::setPropertyPanel(ModuleBase_IPropertyPanel* th
     // set focus on Ok button in order to operation manager could process Enter press
     if (theProp)
       theProp->setFocusOnOkButton();
+  }
+}
+
+void ModuleBase_OperationFeature::resumeOperation()
+{
+  if (myRestartTransactionOnResume) {
+    ModelAPI_Session::get()->startOperation(this->id().toStdString(), true);
+    myRestartTransactionOnResume = false;
   }
 }

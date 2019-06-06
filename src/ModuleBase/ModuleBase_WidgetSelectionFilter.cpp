@@ -107,6 +107,12 @@ ModuleBase_FilterStarter::ModuleBase_FilterStarter(const std::string& theFeature
 
 void ModuleBase_FilterStarter::onFiltersLaunch()
 {
+  ModuleBase_Operation* aParentOp = myWorkshop->currentOperation();
+  ModuleBase_OperationFeature* aFeatureOp = dynamic_cast<ModuleBase_OperationFeature*>(aParentOp);
+  if (aFeatureOp)
+    // Open transaction on filters operation finish
+    aFeatureOp->openTransactionOnResume();
+
   QWidget* aParent = parentWidget();
   ModuleBase_WidgetMultiSelector* aSelector =
     dynamic_cast<ModuleBase_WidgetMultiSelector*>(aParent);
