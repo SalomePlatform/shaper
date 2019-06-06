@@ -79,9 +79,9 @@ static void featuresOrderedByType(const std::set<ObjectPtr>& theOriginalFeatures
       }
     }
     else {
-      std::shared_ptr<SketchPlugin_Sketch> aSketch =
-          std::dynamic_pointer_cast<SketchPlugin_Sketch>(*aFeatIter);
-      if (aSketch)
+      CompositeFeaturePtr aSketch =
+          std::dynamic_pointer_cast<ModelAPI_CompositeFeature>(*aFeatIter);
+      if (aSketch && aSketch->getKind() == SketchPlugin_Sketch::ID())
         theSketch = aSketch;
     }
   }
