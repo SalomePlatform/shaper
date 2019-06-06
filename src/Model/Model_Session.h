@@ -48,7 +48,8 @@ class Model_Session : public ModelAPI_Session, public Events_Listener
 
   /// if true, generates error if document is updated outside of transaction
   bool myCheckTransactions;
-  bool myOperationAttachedToNext; ///< the current operation must be committed twice, with nested
+  ///< if true, the current operation must be committed twice, with nested (list for any nesting depth)
+  std::list<bool> myOperationAttachedToNext;
  public:
 
   //! Loads the OCAF document from the file.
