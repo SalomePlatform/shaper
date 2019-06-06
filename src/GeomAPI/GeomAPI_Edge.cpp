@@ -41,6 +41,7 @@
 #include <Geom_TrimmedCurve.hxx>
 #include <Geom_Ellipse.hxx>
 #include <Geom_Plane.hxx>
+#include <GeomAPI_ExtremaCurveSurface.hxx>
 #include <GeomAPI_IntCS.hxx>
 #include <GeomAdaptor_Curve.hxx>
 #include <gp_Ax1.hxx>
@@ -306,8 +307,9 @@ void GeomAPI_Edge::intersectWithPlane(const std::shared_ptr<GeomAPI_Pln> thePlan
     double A, B, C, D;
     thePlane->coefficients(A, B, C, D);
     gp_Pln aPln(A, B, C, D);
-
     Handle(Geom_Plane) aPlane = new Geom_Plane(aPln);
+
+    // intersect the plane with the curve
     GeomAPI_IntCS aIntersect;
     aIntersect.Perform(aCurve, aPlane);
     if (aIntersect.IsDone() && (aIntersect.NbPoints() > 0)) {
@@ -323,6 +325,18 @@ void GeomAPI_Edge::intersectWithPlane(const std::shared_ptr<GeomAPI_Pln> thePlan
         // obtain intersection point
         aPnt = aIntersect.Point(i);
         std::shared_ptr<GeomAPI_Pnt> aPntPtr(new GeomAPI_Pnt(aPnt.X(), aPnt.Y(), aPnt.Z()));
+        theResult.push_back(aPntPtr);
+      }
+    }
+    else {
+      // find minimal distance between the plane and the curve
+      GeomAPI_ExtremaCurveSurface anExtrema(aCurve, aPlane);
+      double aTolerance = BRep_Tool::Tolerance(TopoDS::Edge(aShape));
+      if (anExtrema.LowerDistance() < aTolerance) {
+        // distance is lower than tolerance => tangent case
+        gp_Pnt aPntC, aPntS;
+        anExtrema.NearestPoints(aPntC, aPntS);
+        std::shared_ptr<GeomAPI_Pnt> aPntPtr(new GeomAPI_Pnt(aPntS.X(), aPntS.Y(), aPntS.Z()));
         theResult.push_back(aPntPtr);
       }
     }
