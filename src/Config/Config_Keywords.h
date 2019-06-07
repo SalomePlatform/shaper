@@ -63,6 +63,8 @@ const static char* WDG_RADIOBOX_ITEM = "radio";
 const static char* WDG_TOOLBOX_BOX = "box";
 const static char* WDG_SWITCH = "switch";
 const static char* WDG_SWITCH_CASE = "case";
+const static char* WDG_FILTER = "filter";
+
 // Common properties (xml attributes of nodes)
 const static char* _ID = "id";
 // NODE_WORKBENCH properties

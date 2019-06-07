@@ -17,24 +17,24 @@
 // See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 
-#ifndef FILTERSPLUGIN_BELONGSTO_H_
-#define FILTERSPLUGIN_BELONGSTO_H_
+#ifndef FILTERSPLUGIN_ONPLANE_H_
+#define FILTERSPLUGIN_ONPLANE_H_
 
 #include "FiltersPlugin.h"
 
 #include <ModelAPI_Filter.h>
 
-/**\class FiltersPlugin_BelongsTo
+/**\class FiltersPlugin_OnPlane
 * \ingroup DataModel
-* \brief Filter for objects which are part of specified objects
+* \brief Filter for objects which belong to selected planes
 */
-class FiltersPlugin_BelongsTo : public ModelAPI_Filter
+class FiltersPlugin_OnPlane : public ModelAPI_Filter
 {
 public:
-  FiltersPlugin_BelongsTo() : ModelAPI_Filter() {}
+  FiltersPlugin_OnPlane() : ModelAPI_Filter() {}
 
   virtual const std::string& name() const {
-    static const std::string kName("Belongs to");
+    static const std::string kName("On plane");
     return kName;
   }
 

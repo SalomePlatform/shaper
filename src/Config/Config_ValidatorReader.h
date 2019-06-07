@@ -39,8 +39,12 @@ class Config_ValidatorReader : public Config_XMLReader
    * Constructor
    * \param theXmlFile - full path to the xml file which will be processed by the reader
    */
-  CONFIG_EXPORT Config_ValidatorReader(const std::string& theXmlFile);
+  CONFIG_EXPORT Config_ValidatorReader(const std::string& theXmlFile, bool isXMLContent = false);
   CONFIG_EXPORT virtual ~Config_ValidatorReader();
+
+
+  /// Set feature ID for cases when XML for validators is parsed from memory
+  CONFIG_EXPORT void setFeatureId(const std::string& theId) { myExtFeatureId = theId; }
 
  protected:
   /*!
@@ -67,6 +71,7 @@ class Config_ValidatorReader : public Config_XMLReader
 
  private:
   std::string myCurrentWidget;
+  std::string myExtFeatureId;
 };
 
 #endif /* CONFIG_VALIDATORREADER_H_ */

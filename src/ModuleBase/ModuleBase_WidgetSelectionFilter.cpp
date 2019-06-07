@@ -35,6 +35,7 @@
 #include <GeomAPI_ShapeExplorer.h>
 
 #include <Events_Loop.h>
+#include <Config_ValidatorReader.h>
 
 #include <AIS_InteractiveContext.hxx>
 #include <StdSelect_BRepOwner.hxx>
@@ -144,6 +145,10 @@ ModuleBase_FilterItem::ModuleBase_FilterItem(
     addItemRow(this);
   else {
     ModuleBase_WidgetFactory aFactory(aXmlString, theParent->workshop());
+    Config_ValidatorReader aValidatorReader(aXmlString, true);
+    aValidatorReader.setFeatureId(mySelection->getKind());
+    aValidatorReader.readAll();
+
     QVBoxLayout* aLayout = new QVBoxLayout(this);
     ModuleBase_Tools::zeroMargins(aLayout);
 
@@ -208,7 +213,7 @@ void ModuleBase_FilterItem::onDelete()
   emit deleteItem(this);
 }
 
-QList<QWidget*>  ModuleBase_FilterItem::getControls() const
+QList<QWidget*> ModuleBase_FilterItem::getControls() const
 {
   QList<QWidget*> aWidgetsList;
   foreach(ModuleBase_ModelWidget* aWgt, myWidgets) {
@@ -219,7 +224,6 @@ QList<QWidget*>  ModuleBase_FilterItem::getControls() const
   }
   return aWidgetsList;
 }
-
 
 
 //*****************************************************************************

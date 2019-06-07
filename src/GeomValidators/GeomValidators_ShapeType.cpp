@@ -293,6 +293,9 @@ bool GeomValidators_ShapeType::isValidShape(const GeomShapePtr theShape,
     case Shell:
       aValid = theShape->shapeType() == GeomAPI_Shape::SHELL;
       break;
+    case Plane:
+      aValid = theShape->isPlanar();
+      break;
     case Solid:
       aValid = theShape->isSolid() || theShape->isCompSolid() ||
                theShape->isCompoundOfSolids();

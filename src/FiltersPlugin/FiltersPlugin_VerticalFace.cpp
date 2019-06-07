@@ -21,6 +21,9 @@
 
 #include <GeomAPI_Face.h>
 #include <GeomAPI_Pln.h>
+#include <GeomAPI_Solid.h>
+#include <GeomAPI_Shell.h>
+#include <GeomAPI_Cylinder.h>
 
 bool FiltersPlugin_VerticalFace::isSupported(GeomAPI_Shape::ShapeType theType) const
 {
@@ -30,11 +33,14 @@ bool FiltersPlugin_VerticalFace::isSupported(GeomAPI_Shape::ShapeType theType) c
 bool FiltersPlugin_VerticalFace::isOk(
   const GeomShapePtr& theShape, const ModelAPI_FiltersArgs& theArgs) const
 {
-  if (!theShape->isPlanar())
+  if (!theShape->isFace())
     return false;
-  GeomFacePtr aFace(new GeomAPI_Face(theShape));
+  if (theShape->isPlanar()) {
+    GeomFacePtr aFace(new GeomAPI_Face(theShape));
 
-  GeomPlanePtr aPlane = aFace->getPlane();
-  GeomDirPtr aDir = aPlane->direction();
-  return fabs(aDir->z()) <= 1.e-7;
+    GeomPlanePtr aPlane = aFace->getPlane();
+    GeomDirPtr aDir = aPlane->direction();
+    return fabs(aDir->z()) <= 1.e-7;
+  }
+  return false;
 }

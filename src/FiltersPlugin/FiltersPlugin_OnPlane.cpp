@@ -17,48 +17,52 @@
 // See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 
-#include "FiltersPlugin_BelongsTo.h"
+#include "FiltersPlugin_OnPlane.h"
 
 #include <ModelAPI_AttributeSelectionList.h>
 
-bool FiltersPlugin_BelongsTo::isSupported(GeomAPI_Shape::ShapeType theType) const
+bool FiltersPlugin_OnPlane::isSupported(GeomAPI_Shape::ShapeType theType) const
 {
-  return true;
-}
-
-bool FiltersPlugin_BelongsTo::isOk(const GeomShapePtr& theShape,
-  const ModelAPI_FiltersArgs& theArgs) const
-{
-  AttributePtr aAttr = theArgs.argument("BelongsTo");
-  AttributeSelectionListPtr aList =
-    std::dynamic_pointer_cast<ModelAPI_AttributeSelectionList>(aAttr);
-  if (!aList.get())
-    return false;
-  for (int i = 0; i < aList->size(); i++) {
-    AttributeSelectionPtr aAttr = aList->value(i);
-    GeomShapePtr aGeom = aAttr->value();
-    if (aGeom->isSubShape(theShape))
-      return true;
+  switch (theType) {
+  case GeomAPI_Shape::SHELL:
+  case GeomAPI_Shape::FACE:
+  case GeomAPI_Shape::WIRE:
+  case GeomAPI_Shape::EDGE:
+  case GeomAPI_Shape::VERTEX:
+    return true;
   }
   return false;
 }
 
+bool FiltersPlugin_OnPlane::isOk(const GeomShapePtr& theShape,
+  const ModelAPI_FiltersArgs& theArgs) const
+{
+  AttributePtr aAttr = theArgs.argument("OnPlane");
+  AttributeSelectionListPtr aList =
+    std::dynamic_pointer_cast<ModelAPI_AttributeSelectionList>(aAttr);
+  if (!aList.get())
+    return false;
+  // ToDo
+  return false;
+}
+
 static std::string XMLRepresentation =
-"<filter id = \"BelongsTo\">"
-" <multi_selector id=\"BelongsTo__BelongsTo\""
-"   label=\"Objects:\""
-"   tooltip=\"Select objects to limit selection.\""
-"   type_choice=\"objects\">"
+"<filter id = \"OnPlane\">"
+" <multi_selector id=\"OnPlane__OnPlane\""
+"   label=\"Planes:\""
+"   tooltip=\"Select planes or planar faces.\""
+"   type_choice=\"faces\">"
+"   <validator id=\"GeomValidators_ShapeType\" parameters=\"plane\"/>"
 " </multi_selector>"
 "</filter>";
 
 
-std::string FiltersPlugin_BelongsTo::xmlRepresentation() const
+std::string FiltersPlugin_OnPlane::xmlRepresentation() const
 {
   return XMLRepresentation;
 }
 
-void FiltersPlugin_BelongsTo::initAttributes(ModelAPI_FiltersArgs& theArguments)
+void FiltersPlugin_OnPlane::initAttributes(ModelAPI_FiltersArgs& theArguments)
 {
-  theArguments.initAttribute("BelongsTo", ModelAPI_AttributeSelectionList::typeId());
+  theArguments.initAttribute("OnPlane", ModelAPI_AttributeSelectionList::typeId());
 }
