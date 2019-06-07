@@ -105,11 +105,15 @@ void SketchPlugin_IntersectionPoint::computePoint(const std::string& theID)
          aPntIt != anIntersectionsPoints.end(); ++aPntIt, ++aResultIndex) {
       std::shared_ptr<SketchPlugin_Point> aCurSketchPoint;
       if (aExistInterIt == anExistentIntersections.end()) {
+        keepCurrentFeature();
+
         // create new point
         aCurSketchPoint = std::dynamic_pointer_cast<SketchPlugin_Point>(
           sketch()->addFeature(SketchPlugin_Point::ID()));
         aCurSketchPoint->boolean(COPY_ID())->setValue(true);
         anIntersectionsList->append(aCurSketchPoint);
+
+        restoreCurrentFeature();
       } else {
         // update existent point
         aCurSketchPoint = std::dynamic_pointer_cast<SketchPlugin_Point>(*aExistInterIt);

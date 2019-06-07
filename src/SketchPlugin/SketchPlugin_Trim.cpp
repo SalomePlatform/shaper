@@ -295,6 +295,9 @@ void SketchPlugin_Trim::execute()
   std::cout << "[" << aRefsToFeature.size() << "] " << aRefsInfo << std::endl;
   std::cout << "---- getRefAttributes:end ----" << std::endl;
 #endif
+
+  keepCurrentFeature();
+
   std::set<AttributePoint2DPtr> aFurtherCoincidences;
   std::set<std::pair<AttributePtr, AttributePtr>> aModifiedAttributes;
   const std::string& aKind = aBaseFeature->getKind();
@@ -317,6 +320,8 @@ void SketchPlugin_Trim::execute()
     aNewFeature = trimArc(aStartShapePoint2d, aLastShapePoint2d, aBaseRefAttributes,
                           aFurtherCoincidences, aModifiedAttributes);
   }
+
+  restoreCurrentFeature();
 
   // constraints to end points of trim feature
   if (myObjectToPoints.find(aBaseObject) == myObjectToPoints.end())
