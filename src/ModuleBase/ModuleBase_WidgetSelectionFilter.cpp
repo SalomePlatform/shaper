@@ -365,8 +365,6 @@ void ModuleBase_WidgetSelectionFilter::onAddFilter(int theIndex)
   updateNumberSelected();
   myFiltersCombo->setCurrentIndex(0);
   myFiltersCombo->removeItem(theIndex);
-
-  enableFocusProcessing();
 }
 
 void ModuleBase_WidgetSelectionFilter::onDeleteItem(ModuleBase_FilterItem* theItem)
@@ -391,7 +389,6 @@ void ModuleBase_WidgetSelectionFilter::onDeleteItem(ModuleBase_FilterItem* theIt
   clearCurrentSelection(true);
   updateNumberSelected();
 
-  enableFocusProcessing();
   myWorkshop->deactivateCurrentSelector();
   myWorkshop->selectionActivate()->updateSelectionModes();
   myWorkshop->selectionActivate()->updateSelectionFilters();
