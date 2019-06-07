@@ -197,6 +197,7 @@ ADD_UNIT_TESTS(
   Test2894.py
   TestArcBehavior.py
   TestChangeSketchPlane1.py
+  TestChangeSketchPlane2.py
   TestConstraintAngle.py
   TestConstraintCoincidence.py
   TestConstraintCollinear.py
