@@ -136,9 +136,9 @@ bool SketchSolver_Group::updateSketch(CompositeFeaturePtr theSketch)
       theSketch->attribute(SketchPlugin_Sketch::DIRX_ID()));
 
   isChanged = isChanged
-      || (mySketchOrigin && anOrigin->pnt()->distance(mySketchOrigin) > THE_TOLERANCE)
-      || (mySketchNormal && aNorm->xyz()->distance(mySketchNormal->xyz()) > THE_TOLERANCE)
-      || (mySketchXDir && aDirX->xyz()->distance(mySketchXDir->xyz()) > THE_TOLERANCE);
+      || (mySketchOrigin && anOrigin && anOrigin->pnt()->distance(mySketchOrigin) > THE_TOLERANCE)
+      || (mySketchNormal && aNorm && aNorm->xyz()->distance(mySketchNormal->xyz()) > THE_TOLERANCE)
+      || (mySketchXDir && aDirX && aDirX->xyz()->distance(mySketchXDir->xyz()) > THE_TOLERANCE);
 
   if (isChanged) {
     mySketch = theSketch;

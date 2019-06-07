@@ -197,7 +197,8 @@ bool PlaneGCSSolver_Storage::update(FeaturePtr theFeature, bool theForce)
       isUpdated = update(*anAttrIt) || isUpdated;
 
   // check external attribute is changed
-  bool isExternal = aSketchFeature && aSketchFeature->isExternal();
+  bool isExternal = aSketchFeature &&
+                   (aSketchFeature->isExternal() || isCopyFeature(aSketchFeature));
   if (aRelated && isExternal != aRelated->isExternal()) {
     if (isExternal)
       makeExternal(aRelated);
