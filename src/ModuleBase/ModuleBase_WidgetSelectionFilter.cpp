@@ -130,6 +130,11 @@ void ModuleBase_FilterStarter::onFiltersLaunch()
   // Launch Filters operation
   ModuleBase_OperationFeature* aFOperation = dynamic_cast<ModuleBase_OperationFeature*>
     (myWorkshop->module()->createOperation(myFeatureName));
+
+  AttributeSelectionListPtr aAttrList = SelectorFeature->selectionList(AttributeId);
+  FiltersFeaturePtr aFilters = aAttrList->filters();
+  if (aFilters.get())
+    aFOperation->setFeature(aFilters);
   myWorkshop->processLaunchOperation(aFOperation);
 }
 
@@ -238,11 +243,9 @@ ModuleBase_WidgetSelectionFilter::ModuleBase_WidgetSelectionFilter(QWidget* theP
   mySelectorAttribute(AttributeId)
 {
   // Clear Old selection
-  AttributePtr aAttr = SelectorFeature->attribute(AttributeId);
-  AttributeSelectionListPtr aSelListAttr =
-    std::dynamic_pointer_cast<ModelAPI_AttributeSelectionList>(aAttr);
-  mySelectionType = selectionType(aSelListAttr->selectionType().c_str());
-  aSelListAttr->clear();
+  AttributeSelectionListPtr aAttrList = mySelectorFeature->selectionList(mySelectorAttribute);
+  mySelectionType = selectionType(aAttrList->selectionType().c_str());
+  aAttrList->clear();
 
   // Define widgets
   QVBoxLayout* aMainLayout = new QVBoxLayout(this);
@@ -344,28 +347,39 @@ void ModuleBase_WidgetSelectionFilter::onAddFilter(int theIndex)
   for (aIt = myFilters.begin(), i = 0; aIt != myFilters.cend(); i++, aIt++) {
     if (i == (theIndex - 1)) {
       aFilter = (*aIt);
-      myFilters.erase(aIt);
       break;
     }
   }
-  if (!aFilter.empty()) {
-    myUseFilters.push_back(aFilter);
-    ModuleBase_FilterItem* aItem = new ModuleBase_FilterItem(aFilter, this);
-    connect(aItem, SIGNAL(deleteItem(ModuleBase_FilterItem*)),
-      SLOT(onDeleteItem(ModuleBase_FilterItem*)));
-    connect(aItem, SIGNAL(reversedItem(ModuleBase_FilterItem*)),
-      SLOT(onReverseItem(ModuleBase_FilterItem*)));
-    myFiltersLayout->addWidget(aItem);
+  onAddFilter(aFilter);
+  FiltersFeaturePtr aFiltersFeature =
+    std::dynamic_pointer_cast<ModelAPI_FiltersFeature>(myFeature);
+  aFiltersFeature->addFilter(aFilter);
 
-    FiltersFeaturePtr aFiltersFeature =
-      std::dynamic_pointer_cast<ModelAPI_FiltersFeature>(myFeature);
-    aFiltersFeature->addFilter(aFilter);
+  myFiltersCombo->setCurrentIndex(0);
+  myFiltersCombo->removeItem(theIndex);
+}
+
+void ModuleBase_WidgetSelectionFilter::onAddFilter(const std::string& theFilter)
+{
+  if (theFilter.length() == 0)
+    return;
+  std::list<std::string>::const_iterator aIt;
+  for (aIt = myUseFilters.cbegin(); aIt != myUseFilters.cend(); aIt++) {
+    if (theFilter == (*aIt))
+      return;
   }
+  myFilters.remove(theFilter);
+  myUseFilters.push_back(theFilter);
+  ModuleBase_FilterItem* aItem = new ModuleBase_FilterItem(theFilter, this);
+  connect(aItem, SIGNAL(deleteItem(ModuleBase_FilterItem*)),
+    SLOT(onDeleteItem(ModuleBase_FilterItem*)));
+  connect(aItem, SIGNAL(reversedItem(ModuleBase_FilterItem*)),
+    SLOT(onReverseItem(ModuleBase_FilterItem*)));
+  myFiltersLayout->addWidget(aItem);
+
   updateSelectBtn();
   clearCurrentSelection(true);
   updateNumberSelected();
-  myFiltersCombo->setCurrentIndex(0);
-  myFiltersCombo->removeItem(theIndex);
 }
 
 void ModuleBase_WidgetSelectionFilter::onDeleteItem(ModuleBase_FilterItem* theItem)
@@ -554,13 +568,38 @@ void ModuleBase_WidgetSelectionFilter::onFeatureAccepted()
 
 bool ModuleBase_WidgetSelectionFilter::storeValueCustom()
 {
+  ModuleBase_ModelWidget* aActive = myWorkshop->propertyPanel()->activeWidget();
+  if (aActive)
+    return aActive->storeValue();
   return true;
 }
 
 bool ModuleBase_WidgetSelectionFilter::restoreValueCustom()
 {
+  FiltersFeaturePtr aFiltersFeature = std::dynamic_pointer_cast<ModelAPI_FiltersFeature>(myFeature);
+  std::list<std::string> aFilters = aFiltersFeature->filters();
+  std::list<std::string>::const_iterator aIt;
+  for (aIt = aFilters.cbegin(); aIt != aFilters.cend(); aIt++) {
+    std::string aStr = (*aIt);
+    onAddFilter(aStr);
+    myFiltersCombo->removeItem(myFiltersCombo->findText(aStr.c_str()));
+  }
+  // Init filters member of the parent attribute
+  AttributeSelectionListPtr aAttrList = mySelectorFeature->selectionList(mySelectorAttribute);
+  if (aAttrList->filters() != aFiltersFeature) {
+    aAttrList->setFilters(aFiltersFeature);
+  }
+
   ModuleBase_ModelWidget* aActive = myWorkshop->propertyPanel()->activeWidget();
   if (aActive)
     return aActive->restoreValue();
+  QList<QWidget*> aWidgets;
+  QList<ModuleBase_FilterItem*> aItems = myFiltersWgt->findChildren<ModuleBase_FilterItem*>();
+  foreach(ModuleBase_FilterItem* aItem, aItems) {
+    QList<ModuleBase_ModelWidget*> aSubList = aItem->widgets();
+    foreach(ModuleBase_ModelWidget* aWgt, aSubList) {
+      aWgt->restoreValue();
+    }
+  }
   return true;
 }

@@ -22,6 +22,7 @@
 
 #include "ModelAPI_AttributeSelection.h"
 #include <ModelAPI_Result.h>
+#include <ModelAPI_Filter.h>
 
 class GeomAPI_Pnt;
 class GeomAPI_Shape;
@@ -114,9 +115,15 @@ class ModelAPI_AttributeSelectionList : public ModelAPI_Attribute
   /// To virtually destroy the fields of successors
   MODELAPI_EXPORT virtual ~ModelAPI_AttributeSelectionList();
 
- protected:
+  MODELAPI_EXPORT FiltersFeaturePtr filters() const { return myFilters; }
+  MODELAPI_EXPORT void setFilters(FiltersFeaturePtr theFeature) { myFilters = theFeature; }
+
+protected:
   /// Objects are created for features automatically
   MODELAPI_EXPORT ModelAPI_AttributeSelectionList();
+
+protected:
+  FiltersFeaturePtr myFilters;
 };
 
 //! Pointer on double attribute

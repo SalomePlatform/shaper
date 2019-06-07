@@ -130,6 +130,7 @@ protected:
 
 private slots:
   void onAddFilter(int);
+  void onAddFilter(const std::string& theFilter);
   void onDeleteItem(ModuleBase_FilterItem* theItem);
   void onReverseItem(ModuleBase_FilterItem* theItem);
   void onSelect();
