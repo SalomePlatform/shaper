@@ -32,6 +32,7 @@
 #include <ModelAPI_Session.h>
 #include <ModelAPI_AttributeSelectionList.h>
 #include <ModelAPI_Events.h>
+#include <ModelAPI_ResultBody.h>
 #include <GeomAPI_ShapeExplorer.h>
 
 #include <Events_Loop.h>
@@ -424,37 +425,31 @@ void ModuleBase_WidgetSelectionFilter::onSelect()
   TopoDS_Compound aComp;
   aBuilder.MakeCompound(aComp);
 
-  if (!myShowBtn->isChecked()) {
-    myListIO.Clear();
-    aCtx->DisplayedObjects(AIS_KOI_Shape, -1, myListIO);
-    if (!myPreview.IsNull())
-      myListIO.Remove(myPreview);
-  }
-  AIS_ListOfInteractive::const_iterator aIt;
-  Handle(ModuleBase_ResultPrs) aShapeIO;
-  for (aIt = myListIO.cbegin(); aIt != myListIO.cend(); aIt++) {
-    aShapeIO = Handle(ModuleBase_ResultPrs)::DownCast(*aIt);
-    if (!aShapeIO.IsNull()) {
-      GeomShapePtr aShape(new GeomAPI_Shape);
-      aShape->setImpl(new TopoDS_Shape(aShapeIO->Shape()));
-      std::list<GeomShapePtr> aSubShapes =
-        aShape->subShapes((GeomAPI_Shape::ShapeType)mySelectionType);
-      std::list<GeomShapePtr>::const_iterator aShapesIt;
-      for (aShapesIt = aSubShapes.cbegin(); aShapesIt != aSubShapes.cend(); aShapesIt++) {
-        GeomShapePtr aShape = (*aShapesIt);
-        SessionPtr aSession = ModelAPI_Session::get();
-        bool isValid = aSession->filters()->isValid(myFeature, aShape);
-        if (isValid) {
-          TopoDS_Shape aTShape = aShape->impl<TopoDS_Shape>();
-          Handle(StdSelect_BRepOwner) aOwner = new StdSelect_BRepOwner(aTShape, aShapeIO, true);
-          aBuilder.Add(aComp, aTShape);
-
-          ModuleBase_ViewerPrsPtr aValue(new ModuleBase_ViewerPrs(aShapeIO->getResult(), aShape, aOwner));
-          myValues.append(aValue);
-        }
+  DocumentPtr aDoc = myFeature->document();
+  int aNb = aDoc->size(ModelAPI_ResultBody::group());
+  ObjectPtr aObj;
+  ResultBodyPtr aBody;
+  GeomShapePtr aShape;
+  for (int i = 0; i < aNb; i++) {
+    aObj = aDoc->object(ModelAPI_ResultBody::group(), i);
+    aBody = std::dynamic_pointer_cast<ModelAPI_ResultBody>(aObj);
+    GeomShapePtr aShape = aBody->shape();
+    std::list<GeomShapePtr> aSubShapes =
+      aShape->subShapes((GeomAPI_Shape::ShapeType)mySelectionType);
+    std::list<GeomShapePtr>::const_iterator aShapesIt;
+    for (aShapesIt = aSubShapes.cbegin(); aShapesIt != aSubShapes.cend(); aShapesIt++) {
+      GeomShapePtr aShape = (*aShapesIt);
+      SessionPtr aSession = ModelAPI_Session::get();
+      bool isValid = aSession->filters()->isValid(myFeature, aShape);
+      if (isValid) {
+        TopoDS_Shape aTShape = aShape->impl<TopoDS_Shape>();
+        aBuilder.Add(aComp, aTShape);
+        ModuleBase_ViewerPrsPtr aValue(new ModuleBase_ViewerPrs(aObj, aShape));
+        myValues.append(aValue);
       }
     }
   }
+
   if (myValues.size() > 0)
     updatePreview(aComp);
   updateNumberSelected();
@@ -468,9 +463,16 @@ void ModuleBase_WidgetSelectionFilter::updatePreview(const TopoDS_Shape& theShap
 
   if (myPreview.IsNull()) {
     myPreview = new AIS_Shape(theShape);
-    //myPreview->SetDisplayMode(myShowBtn->isChecked()? AIS_Shaded : AIS_WireFrame);
     myPreview->SetDisplayMode(AIS_Shaded);
     myPreview->SetColor(Quantity_NOC_BLUE1);
+    Handle(Prs3d_Drawer) aDrawer = myPreview->Attributes();
+    if (aDrawer->HasOwnPointAspect()) {
+      aDrawer->PointAspect()->SetTypeOfMarker(Aspect_TOM_O_STAR);
+      aDrawer->PointAspect()->SetColor(Quantity_NOC_BLUE1);
+      aDrawer->PointAspect()->SetScale(2.);
+    }
+    else
+      aDrawer->SetPointAspect(new Prs3d_PointAspect(Aspect_TOM_O_STAR, Quantity_NOC_BLUE1, 2.));
     myPreview->SetTransparency();
     aCtx->Display(myPreview, true);
     aCtx->Deactivate(myPreview);
