@@ -576,13 +576,17 @@ bool ModuleBase_WidgetSelectionFilter::storeValueCustom()
 
 bool ModuleBase_WidgetSelectionFilter::restoreValueCustom()
 {
+  ModelAPI_FiltersFactory* aFactory = ModelAPI_Session::get()->filters();
   FiltersFeaturePtr aFiltersFeature = std::dynamic_pointer_cast<ModelAPI_FiltersFeature>(myFeature);
   std::list<std::string> aFilters = aFiltersFeature->filters();
   std::list<std::string>::const_iterator aIt;
   for (aIt = aFilters.cbegin(); aIt != aFilters.cend(); aIt++) {
     std::string aStr = (*aIt);
     onAddFilter(aStr);
-    myFiltersCombo->removeItem(myFiltersCombo->findText(aStr.c_str()));
+    FilterPtr aFilterObj = aFactory->filter(aStr);
+    int aId = myFiltersCombo->findText(aFilterObj->name().c_str());
+    if (aId != -1)
+      myFiltersCombo->removeItem(aId);
   }
   // Init filters member of the parent attribute
   AttributeSelectionListPtr aAttrList = mySelectorFeature->selectionList(mySelectorAttribute);
