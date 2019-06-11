@@ -51,11 +51,11 @@ public:
   /// Computes a selection?
   FILTERS_EXPORT virtual void execute() {}
 
-  /// Initially there are no filters selected, so, no attributes
-  virtual void initAttributes() {}
-
   /// Feature is created in the plugin manager
   FiltersPlugin_Selection() {}
+
+  /// This method initializes all filters on open of document
+  FILTERS_EXPORT virtual void initAttributes() override;
 
   // methods related to the filters management
 
@@ -89,7 +89,6 @@ public:
 protected:
 
   AttributePtr myBase; ///< the attribute related to this filter
-
 };
 
 #endif

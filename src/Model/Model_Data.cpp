@@ -240,6 +240,21 @@ AttributePtr Model_Data::addFloatingAttribute(
   int anIndex;
   TDF_Label aLab;
   if (myLab.IsAttribute(TDF_TagSource::GetID())) {
+    // check this is re-init of attributes, so, check attribute with this name already there
+    TDF_ChildIDIterator anIter(myLab, kGroupAttributeID, false);
+    for(; anIter.More(); anIter.Next()) {
+      TCollection_AsciiString aThisName(Handle(TDataStd_Name)::DownCast(anIter.Value())->Get());
+      if (theID == aThisName.ToCString()) {
+        TDF_Label aLab = anIter.Value()->Label();
+        Handle(TDataStd_Name) aGName;
+        if (aLab.FindAttribute(kGroupAttributeGroupID, aGName)) {
+          TCollection_AsciiString aGroupName(aGName->Get());
+          if (theGroup == aGroupName.ToCString()) {
+            return addAttribute(theGroup + "__" + theID, theAttrType, aLab.Tag());
+          }
+        }
+      }
+    }
     aLab = myLab.NewChild(); // already exists a floating attribute, create the next
     anIndex = aLab.Tag();
   } else { // put the first floating attribute, quite far from other standard attributes
@@ -289,17 +304,24 @@ void Model_Data::removeAttributes(const std::string& theGroup)
     Handle(TDataStd_Name) aGroupID = Handle(TDataStd_Name)::DownCast(aGroup.Value());
     if (aGroupID->Get().IsEqual(theGroup.c_str())) {
       Handle(TDataStd_Name) anID;
-      if (aGroup.Value()->Label().FindAttribute(kGroupAttributeID, anID)) {
-        TCollection_AsciiString anAsciiID(aGroupID->Get() + "__" + anID->Get());
-        myAttrs.erase(anAsciiID.ToCString());
+      if (!aGroup.Value()->Label().IsNull() &&
+          aGroup.Value()->Label().FindAttribute(kGroupAttributeID, anID)) {
         aLabsToRemove.Append(aGroup.Value()->Label());
       }
+      TCollection_AsciiString anAsciiID(aGroupID->Get() + "__" + anID->Get());
+      myAttrs.erase(anAsciiID.ToCString());
     }
   }
   for(TDF_LabelList::Iterator aLab(aLabsToRemove); aLab.More(); aLab.Next()) {
     aLab.ChangeValue().ForgetAllAttributes(true);
   }
 }
+
+void Model_Data::clearAttributes()
+{
+  myAttrs.clear();
+}
+
 
 
 // macro for the generic returning of the attribute by the ID

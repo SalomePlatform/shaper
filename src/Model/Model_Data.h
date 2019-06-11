@@ -288,6 +288,9 @@ protected:
   /// Sets true if the object is deleted, but some data is still kept in memory
   MODEL_EXPORT virtual void setIsDeleted(const bool theFlag);
 
+  /// Erases all attributes from myAttrs, but keeping them in the data structure
+  void clearAttributes();
+
 private:
   /// Removes a back reference (with identifier which attribute references to this object)
   /// \param theFeature feature referenced to this
@@ -322,6 +325,8 @@ private:
   /// Returns \c true if theAttribute1 is going earlier than theAttribute2 in the data
   MODEL_EXPORT virtual bool isPrecedingAttribute(const std::string& theAttribute1,
                                                  const std::string& theAttribute2) const;
+
+  friend class Model_Objects;
 };
 
 /// Generic method to register back reference, used in referencing attributes.

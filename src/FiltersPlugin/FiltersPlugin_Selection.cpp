@@ -83,14 +83,6 @@ std::list<AttributePtr> FiltersPlugin_Selection::filterArgs(const std::string th
 
 void FiltersPlugin_Selection::setAttribute(const AttributePtr& theAttr)
 {
-  if (myBase != theAttr) { // clear all filters if the attribute is changed or defined a new
-    std::list<std::string> aFilters;
-    data()->allGroups(aFilters);
-    std::list<std::string>::iterator aFIter = aFilters.begin();
-    for(; aFIter != aFilters.end(); aFIter++) {
-      data()->removeAttributes(*aFIter);
-    }
-  }
   myBase = theAttr;
   if (myBase.get()) { // check that the type of sub-elements is supported by all existing filters
     std::shared_ptr<ModelAPI_AttributeSelectionList> aSelList =
@@ -115,4 +107,24 @@ void FiltersPlugin_Selection::setAttribute(const AttributePtr& theAttr)
 const AttributePtr& FiltersPlugin_Selection::baseAttribute() const
 {
   return myBase;
+}
+
+void FiltersPlugin_Selection::initAttributes()
+{
+  ModelAPI_FiltersFactory* aFactory = ModelAPI_Session::get()->filters();
+  std::list<std::string> aFilters;
+  data()->allGroups(aFilters);
+  for(std::list<std::string>::iterator aFIt = aFilters.begin(); aFIt != aFilters.end(); aFIt++) {
+    FilterPtr aFilter = aFactory->filter(*aFIt);
+    if (aFilter.get()) {
+      std::shared_ptr<ModelAPI_AttributeBoolean> aBool =
+        std::dynamic_pointer_cast<ModelAPI_AttributeBoolean>(data()->addFloatingAttribute(
+          kReverseAttrID, ModelAPI_AttributeBoolean::typeId(), *aFIt));
+      aBool->setValue(false); // not reversed by default
+      ModelAPI_FiltersArgs anArgs;
+      anArgs.setFeature(std::dynamic_pointer_cast<ModelAPI_FiltersFeature>(data()->owner()));
+      anArgs.setFilter(*aFIt);
+      aFilter->initAttributes(anArgs);
+    }
+  }
 }
