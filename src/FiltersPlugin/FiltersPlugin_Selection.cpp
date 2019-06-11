@@ -21,6 +21,7 @@
 
 #include <ModelAPI_Session.h>
 #include <ModelAPI_AttributeBoolean.h>
+#include <ModelAPI_AttributeSelectionList.h>
 
 // identifier of the reverse flag of a filter
 static const std::string kReverseAttrID("");
@@ -78,4 +79,40 @@ std::list<AttributePtr> FiltersPlugin_Selection::filterArgs(const std::string th
   std::list<AttributePtr> aList;
   data()->attributesOfGroup(theFilterID, aList);
   return aList;
+}
+
+void FiltersPlugin_Selection::setAttribute(const AttributePtr& theAttr)
+{
+  if (myBase != theAttr) { // clear all filters if the attribute is changed or defined a new
+    std::list<std::string> aFilters;
+    data()->allGroups(aFilters);
+    std::list<std::string>::iterator aFIter = aFilters.begin();
+    for(; aFIter != aFilters.end(); aFIter++) {
+      data()->removeAttributes(*aFIter);
+    }
+  }
+  myBase = theAttr;
+  if (myBase.get()) { // check that the type of sub-elements is supported by all existing filters
+    std::shared_ptr<ModelAPI_AttributeSelectionList> aSelList =
+      std::dynamic_pointer_cast<ModelAPI_AttributeSelectionList>(theAttr);
+    if (aSelList.get()) {
+      std::string aStrType = aSelList->selectionType();
+      GeomAPI_Shape::ShapeType aType = GeomAPI_Shape::shapeTypeByStr(aStrType);
+      std::list<std::string> aFilters;
+      data()->allGroups(aFilters);
+      ModelAPI_FiltersFactory* aFactory = ModelAPI_Session::get()->filters();
+      std::list<std::string>::iterator aFIter = aFilters.begin();
+      for(; aFIter != aFilters.end(); aFIter++) {
+        FilterPtr aFilter = aFactory->filter(*aFIter);
+        if (aFilter.get() && !aFilter->isSupported(aType)) {
+          data()->removeAttributes(*aFIter);
+        }
+      }
+    }
+  }
+}
+
+const AttributePtr& FiltersPlugin_Selection::baseAttribute() const
+{
+  return myBase;
 }

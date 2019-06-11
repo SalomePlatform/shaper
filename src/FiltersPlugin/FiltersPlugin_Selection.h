@@ -60,22 +60,36 @@ public:
   // methods related to the filters management
 
   /// Adds a filter to the feature. Also initializes arguments of this filter.
-  FILTERS_EXPORT virtual void addFilter(const std::string theFilterID);
+  FILTERS_EXPORT virtual void addFilter(const std::string theFilterID) override;
 
   /// Removes an existing filter from the feature.
-  FILTERS_EXPORT virtual void removeFilter(const std::string theFilterID);
+  FILTERS_EXPORT virtual void removeFilter(const std::string theFilterID) override;
 
   /// Returns the list of existing filters in the feature.
-  FILTERS_EXPORT virtual std::list<std::string> filters() const;
+  FILTERS_EXPORT virtual std::list<std::string> filters() const override;
 
   /// Stores the reversed flag for the filter.
-  FILTERS_EXPORT virtual void setReversed(const std::string theFilterID, const bool theReversed);
+  FILTERS_EXPORT virtual void setReversed
+  (const std::string theFilterID, const bool theReversed) override;
 
   /// Returns the reversed flag value for the filter.
-  FILTERS_EXPORT virtual bool isReversed(const std::string theFilterID);
+  FILTERS_EXPORT virtual bool isReversed(const std::string theFilterID) override;
 
   /// Returns the ordered list of attributes related to the filter.
-  FILTERS_EXPORT virtual std::list<AttributePtr> filterArgs(const std::string theFilterID) const;
+  FILTERS_EXPORT virtual std::list<AttributePtr>
+    filterArgs(const std::string theFilterID) const override;
+
+  /// Sets the attribute (not-persistent field) that contains this filters feature.
+  /// The filter feature may make synchronization by this method call.
+  FILTERS_EXPORT virtual void setAttribute(const AttributePtr& theAttr) override;
+
+  /// Returns the attribute (not-persistent field) that contains this filters feature.
+  FILTERS_EXPORT virtual const AttributePtr& baseAttribute() const override;
+
+protected:
+
+  AttributePtr myBase; ///< the attribute related to this filter
+
 };
 
 #endif

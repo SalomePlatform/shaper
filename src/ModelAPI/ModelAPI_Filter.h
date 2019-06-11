@@ -57,6 +57,13 @@ public:
 
   /// Returns the ordered list of attributes related to the filter.
   virtual std::list<AttributePtr> filterArgs(const std::string theFilterID) const = 0;
+
+  /// Sets the attribute (not-persistent field) that contains this filters feature.
+  /// The filter feature may make synchronization by this method call.
+  virtual void setAttribute(const AttributePtr& theAttr) = 0;
+
+  /// Returns the attribute (not-persistent field) that contains this filters feature.
+  virtual const AttributePtr& baseAttribute() const = 0;
 };
 
 typedef std::shared_ptr<ModelAPI_FiltersFeature> FiltersFeaturePtr;
@@ -93,7 +100,9 @@ public:
   /// adds an attribute of the filter
   std::shared_ptr<ModelAPI_Attribute> initAttribute(
     const std::string& theID, const std::string theAttrType) {
-    return myFeature->data()->addFloatingAttribute(theID, theAttrType, myCurrentFilter);
+    AttributePtr aR = myFeature->data()->addFloatingAttribute(theID, theAttrType, myCurrentFilter);
+    aR->setIsArgument(false); // to avoid parametric update
+    return aR;
   }
 };
 

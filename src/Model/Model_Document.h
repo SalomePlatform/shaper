@@ -395,6 +395,7 @@ class Model_Document : public ModelAPI_Document
   friend class Model_AttributeRefList;
   friend class Model_AttributeRefAttrList;
   friend class Model_AttributeSelection;
+  friend class Model_AttributeSelectionList;
   friend class Model_ResultPart;
   friend class Model_ResultBody;
   friend class Model_ResultConstruction;

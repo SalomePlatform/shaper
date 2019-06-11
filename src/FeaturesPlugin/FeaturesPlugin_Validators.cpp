@@ -30,7 +30,7 @@
 #include <Events_InfoMessage.h>
 
 #include <ModelAPI_Attribute.h>
-#include <ModelAPI_AttributeDouble.h>>
+#include <ModelAPI_AttributeDouble.h>
 #include <ModelAPI_AttributeInteger.h>
 #include <ModelAPI_AttributeSelectionList.h>
 #include <ModelAPI_AttributeString.h>

@@ -460,21 +460,21 @@ GeomAPI_Shape::ShapeType GeomAPI_Shape::shapeType() const
 GeomAPI_Shape::ShapeType GeomAPI_Shape::shapeTypeByStr(std::string theType)
 {
   std::transform(theType.begin(), theType.end(), theType.begin(), ::toupper);
-  if (theType == "COMPOUND")
+  if (theType == "COMPOUND" || theType == "COMPOUNDS")
     return COMPOUND;
-  if (theType == "COMPSOLID")
+  if (theType == "COMPSOLID" || theType == "COMPSOLIDS")
     return COMPSOLID;
-  if (theType == "SOLID")
+  if (theType == "SOLID" || theType == "SOLIDS")
     return SOLID;
-  if (theType == "SHELL")
+  if (theType == "SHELL" || theType == "SHELLS")
     return SHELL;
-  if (theType == "FACE")
+  if (theType == "FACE" || theType == "FACES")
     return FACE;
-  if (theType == "WIRE")
+  if (theType == "WIRE" || theType == "WIRES")
     return WIRE;
-  if (theType == "EDGE")
+  if (theType == "EDGE" || theType == "EDGES")
     return EDGE;
-  if (theType == "VERTEX")
+  if (theType == "VERTEX" || theType == "VERTICES")
     return VERTEX;
   return SHAPE; // default
 }

@@ -450,13 +450,16 @@ void ModuleBase_WidgetSelectionFilter::onSelect()
     GeomShapePtr aShape = aBody->shape();
     std::list<GeomShapePtr> aSubShapes =
       aShape->subShapes((GeomAPI_Shape::ShapeType)mySelectionType);
+    TopTools_MapOfShape alreadyThere;
     std::list<GeomShapePtr>::const_iterator aShapesIt;
     for (aShapesIt = aSubShapes.cbegin(); aShapesIt != aSubShapes.cend(); aShapesIt++) {
       GeomShapePtr aShape = (*aShapesIt);
-      SessionPtr aSession = ModelAPI_Session::get();
+      TopoDS_Shape aTShape = aShape->impl<TopoDS_Shape>();
+      if (!alreadyThere.Add(aTShape))
+        continue;
+      static SessionPtr aSession = ModelAPI_Session::get();
       bool isValid = aSession->filters()->isValid(myFeature, aShape);
       if (isValid) {
-        TopoDS_Shape aTShape = aShape->impl<TopoDS_Shape>();
         aBuilder.Add(aComp, aTShape);
         ModuleBase_ViewerPrsPtr aValue(new ModuleBase_ViewerPrs(aObj, aShape));
         myValues.append(aValue);

@@ -115,15 +115,16 @@ class ModelAPI_AttributeSelectionList : public ModelAPI_Attribute
   /// To virtually destroy the fields of successors
   MODELAPI_EXPORT virtual ~ModelAPI_AttributeSelectionList();
 
-  MODELAPI_EXPORT FiltersFeaturePtr filters() const { return myFilters; }
-  MODELAPI_EXPORT void setFilters(FiltersFeaturePtr theFeature) { myFilters = theFeature; }
+  /// Returns a selection filters feature if it is defined for this selection list
+  MODELAPI_EXPORT virtual FiltersFeaturePtr filters() const = 0;
+
+  /// Sets a selection filters feature if it is defined for this selection list
+  MODELAPI_EXPORT virtual void setFilters(FiltersFeaturePtr theFeature) = 0;
 
 protected:
   /// Objects are created for features automatically
   MODELAPI_EXPORT ModelAPI_AttributeSelectionList();
 
-protected:
-  FiltersFeaturePtr myFilters;
 };
 
 //! Pointer on double attribute

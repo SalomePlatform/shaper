@@ -20,6 +20,7 @@
 #include "Model_Filter.h"
 
 #include "ModelAPI_AttributeBoolean.h"
+#include "ModelAPI_AttributeSelectionList.h"
 #include <Events_InfoMessage.h>
 
 
@@ -41,6 +42,17 @@ struct FilterArgs {
 
 bool Model_FiltersFactory::isValid(FeaturePtr theFiltersFeature, GeomShapePtr theShape)
 {
+  // check that the shape type corresponds to the attribute list type
+  AttributePtr aBase =
+    std::dynamic_pointer_cast<ModelAPI_FiltersFeature>(theFiltersFeature)->baseAttribute();
+  if (aBase.get()) {
+    std::shared_ptr<ModelAPI_AttributeSelectionList> aList =
+      std::dynamic_pointer_cast<ModelAPI_AttributeSelectionList>(aBase);
+    std::string aStrType = aList->selectionType();
+    GeomAPI_Shape::ShapeType aType = GeomAPI_Shape::shapeTypeByStr(aStrType);
+    if (theShape->shapeType() != aType)
+      return false;
+  }
   // prepare all filters args
   ModelAPI_FiltersArgs anArgs;
   std::list<FilterArgs> aFilters; /// all filters and the reverse values

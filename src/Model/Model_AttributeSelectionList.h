@@ -115,6 +115,12 @@ public:
   /// Returns true if is geometrical selection.
   MODEL_EXPORT virtual bool isGeometricalSelection() const override;
 
+  /// Returns a selection filters feature if it is defined for this selection list
+  MODEL_EXPORT virtual FiltersFeaturePtr filters() const;
+
+  /// Sets a selection filters feature if it is defined for this selection list
+  MODEL_EXPORT virtual void setFilters(FiltersFeaturePtr theFeature);
+
 protected:
   /// Objects are created for features automatically
   MODEL_EXPORT Model_AttributeSelectionList(TDF_Label& theLabel);
