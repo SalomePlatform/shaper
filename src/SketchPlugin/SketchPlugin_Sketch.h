@@ -177,6 +177,10 @@ class SketchPlugin_Sketch : public ModelAPI_CompositeFeature, public GeomAPI_ICu
     std::shared_ptr<GeomDataAPI_Dir> aNorm = std::dynamic_pointer_cast<GeomDataAPI_Dir>(
       aData->attribute(NORM_ID()));
 
+    if (!aNorm->isInitialized() || !aX->isInitialized() ||
+        aNorm->dir()->cross(aX->dir())->squareModulus() < 1.e-14)
+      return std::shared_ptr<GeomAPI_Ax3>();
+
     return std::shared_ptr<GeomAPI_Ax3>(new GeomAPI_Ax3(aC->pnt(), aX->dir(), aNorm->dir()));
   }
 
@@ -258,6 +262,12 @@ private:
   /// Substitute all links to external objects by newly created features.
   /// \return \c true, if all links updated.
   bool removeLinksToExternal();
+
+  /// Update projected coordinate axes
+  void updateCoordinateAxis(ObjectPtr theSub, std::shared_ptr<GeomAPI_Ax3> thePlane);
+
+private:
+  std::shared_ptr<GeomAPI_Ax3> myPlane;
 };
 
 #endif
