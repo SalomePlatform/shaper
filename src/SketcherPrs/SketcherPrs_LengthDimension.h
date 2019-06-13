@@ -24,6 +24,7 @@
 #include <ModelAPI_Feature.h>
 #include <AIS_LengthDimension.hxx>
 #include <Standard_DefineHandle.hxx>
+#include <SketchPlugin_Sketch.h>
 
 #include <gp_Pnt.hxx>
 #include <gp_Pln.hxx>
@@ -45,7 +46,7 @@ public:
   /// \param theConstraint a constraint feature
   /// \param thePlane a coordinate plane of current sketch
   Standard_EXPORT SketcherPrs_LengthDimension(ModelAPI_Feature* theConstraint,
-                        const std::shared_ptr<GeomAPI_Ax3>& thePlane);
+    SketchPlugin_Sketch* theSketcher);
 
   /// Destructor
   Standard_EXPORT ~SketcherPrs_LengthDimension();
@@ -59,6 +60,13 @@ public:
   /// \return boolean result value
   static bool IsReadyToDisplay(ModelAPI_Feature* theConstraint,
                                const std::shared_ptr<GeomAPI_Ax3>& thePlane);
+
+  /// Returns sketcher plane
+  Standard_EXPORT std::shared_ptr<GeomAPI_Ax3> plane() const
+  {
+    return mySketcher->coordinatePlane();
+  }
+
 protected:
   /// Redefinition of virtual function
   Standard_EXPORT virtual void Compute(
@@ -78,8 +86,8 @@ private:
   /// Constraint feature
   ModelAPI_Feature* myConstraint;
 
-  /// Plane of the current sketcher
-  std::shared_ptr<GeomAPI_Ax3> mySketcherPlane;
+  /// A current sketcher
+  SketchPlugin_Sketch* mySketcher;
 
   //Handle(Prs3d_DimensionAspect) myAspect;
 

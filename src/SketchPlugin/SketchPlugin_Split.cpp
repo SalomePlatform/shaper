@@ -234,6 +234,8 @@ void SketchPlugin_Split::execute()
   std::cout << std::endl;
 #endif
 
+  keepCurrentFeature();
+
   std::string aFeatureKind = aBaseFeature->getKind();
   FeaturePtr aSplitFeature, anAfterFeature;
   std::set<AttributePoint2DPtr> aFurtherCoincidences;
@@ -246,6 +248,9 @@ void SketchPlugin_Split::execute()
   else if (aFeatureKind == SketchPlugin_Arc::ID())
     aNewFeature = splitArc(aSplitFeature, aBaseFeature, anAfterFeature, aFurtherCoincidences,
                            aCreatedFeatures, aModifiedAttributes);
+
+  restoreCurrentFeature();
+
   if (aFeatureKind == SketchPlugin_Circle::ID()) {
     FeaturePtr aCircleFeature = aBaseFeature;
     aReplacingFeature = splitCircle(aSplitFeature, aBaseFeature, anAfterFeature,

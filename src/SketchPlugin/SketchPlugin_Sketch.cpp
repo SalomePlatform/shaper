@@ -20,9 +20,11 @@
 #include <Config_PropManager.h>
 
 #include <GeomAlgoAPI_CompoundBuilder.h>
+#include <GeomAlgoAPI_EdgeBuilder.h>
 #include <GeomAlgoAPI_FaceBuilder.h>
 
 #include <GeomAPI_Dir.h>
+#include <GeomAPI_Lin.h>
 #include <GeomAPI_PlanarEdges.h>
 #include <GeomAPI_ShapeIterator.h>
 #include <GeomAPI_Vertex.h>
@@ -48,6 +50,7 @@
 #include <SketchPlugin_SketchEntity.h>
 #include <SketchPlugin_Tools.h>
 
+#include <Events_InfoMessage.h>
 #include <Events_Loop.h>
 
 #include <memory>
@@ -248,6 +251,35 @@ bool SketchPlugin_Sketch::isSub(ObjectPtr theObject) const
 }
 
 
+static bool isOrigin(const GeomPointPtr& thePoint, const double theTolerance)
+{
+  return fabs(thePoint->x()) < theTolerance &&
+         fabs(thePoint->y()) < theTolerance &&
+         fabs(thePoint->z()) < theTolerance;
+}
+
+static bool isCoordinateAxis(const GeomDirPtr& theDir, const double theTolerance)
+{
+  return fabs(theDir->x() - 1.0) < theTolerance || fabs(theDir->x() + 1.0) < theTolerance ||
+         fabs(theDir->y() - 1.0) < theTolerance || fabs(theDir->y() + 1.0) < theTolerance ||
+         fabs(theDir->z() - 1.0) < theTolerance || fabs(theDir->z() + 1.0) < theTolerance;
+}
+
+static bool isCoordinatePlane(const GeomAx3Ptr& thePlane)
+{
+  static const double THE_TOLERANCE = 1.e-7;
+  if (!thePlane)
+    return false;
+
+  GeomPointPtr anOrigin = thePlane->origin();
+  GeomDirPtr aNormal = thePlane->normal();
+  GeomDirPtr aDirX = thePlane->dirX();
+
+  return isOrigin(anOrigin, THE_TOLERANCE) &&
+         isCoordinateAxis(aNormal, THE_TOLERANCE) &&
+         isCoordinateAxis(aDirX, THE_TOLERANCE);
+}
+
 void SketchPlugin_Sketch::attributeChanged(const std::string& theID) {
   if (theID == SketchPlugin_SketchEntity::EXTERNAL_ID()) {
     AttributeSelectionPtr aSelAttr = selection(SketchPlugin_SketchEntity::EXTERNAL_ID());
@@ -298,14 +330,28 @@ void SketchPlugin_Sketch::attributeChanged(const std::string& theID) {
       }
     }
   } else if (theID == NORM_ID() || theID == DIRX_ID() || theID == ORIGIN_ID()) {
+    // check if current and previous sketch planes are coordinate planes and they are different
+    GeomAx3Ptr aCurPlane;
+    bool areCoordPlanes = false;
+    if (isPlaneSet()) {
+      aCurPlane = coordinatePlane();
+      areCoordPlanes = isCoordinatePlane(aCurPlane) && isCoordinatePlane(myPlane);
+    }
+
     // send all sub-elements are also updated: all entities become created on different plane
     static Events_ID anUpdateEvent = Events_Loop::eventByName(EVENT_OBJECT_UPDATED);
     std::list<ObjectPtr> aSubs = data()->reflist(SketchPlugin_Sketch::FEATURES_ID())->list();
     std::list<ObjectPtr>::iterator aSub = aSubs.begin();
     for(; aSub != aSubs.end(); aSub++) {
-      if (aSub->get())
+      if (aSub->get()) {
+        if (areCoordPlanes)
+          updateCoordinateAxis(*aSub, aCurPlane);
+
         ModelAPI_EventCreator::get()->sendUpdated(*aSub, anUpdateEvent);
+      }
     }
+    if (aCurPlane)
+      myPlane = aCurPlane;
   }
 }
 
@@ -368,4 +414,159 @@ std::shared_ptr<GeomAPI_Ax3> SketchPlugin_Sketch::plane(SketchPlugin_Sketch* the
       aData->attribute(SketchPlugin_Sketch::NORM_ID()));
 
   return std::shared_ptr<GeomAPI_Ax3>(new GeomAPI_Ax3(anOrigin->pnt(), aDirX->dir(), aNorm->dir()));
+}
+
+bool SketchPlugin_Sketch::customAction(const std::string& theActionId)
+{
+  bool isOk = false;
+  if (theActionId == ACTION_REMOVE_EXTERNAL())
+    isOk = removeLinksToExternal();
+  else {
+    std::string aMsg = "Error: Feature \"%1\" does not support action \"%2\".";
+    Events_InfoMessage("SketchPlugin_Sketch", aMsg).arg(getKind()).arg(theActionId).send();
+  }
+  return isOk;
+}
+
+static bool isExternalBased(const FeaturePtr theFeature)
+{
+  return theFeature->getKind() == SketchPlugin_Projection::ID() ||
+         theFeature->getKind() == SketchPlugin_IntersectionPoint::ID();
+}
+
+bool SketchPlugin_Sketch::removeLinksToExternal()
+{
+  std::list<FeaturePtr> aRemove;
+  std::list<ObjectPtr> aSubs = reflist(FEATURES_ID())->list();
+  for (std::list<ObjectPtr>::iterator anIt = aSubs.begin(); anIt != aSubs.end(); ++anIt) {
+    FeaturePtr aFeature = ModelAPI_Feature::feature(*anIt);
+    if (!aFeature)
+      continue;
+    if (isExternalBased(aFeature)) {
+      // mark feature as to be removed
+      aRemove.push_back(aFeature);
+    }
+    else {
+      AttributeSelectionPtr anExtAttr =
+          aFeature->selection(SketchPlugin_SketchEntity::EXTERNAL_ID());
+      ResultPtr anExternal = anExtAttr ? anExtAttr->context() : ResultPtr();
+      if (anExternal) {
+        FeaturePtr anExtFeature = ModelAPI_Feature::feature(anExternal);
+        if (anExtFeature && isExternalBased(anExtFeature)) {
+          // make result of projection/intersection as non-external,
+          aFeature->selection(SketchPlugin_SketchEntity::EXTERNAL_ID())->setValue(
+            ObjectPtr(), GeomShapePtr());
+          // set feature auxiliary if the parent is not included into sketch result
+          bool isIncludedToSketchResult = false;
+          if (anExtFeature->getKind() == SketchPlugin_Projection::ID()) {
+            isIncludedToSketchResult = anExtFeature->boolean(
+                SketchPlugin_Projection::INCLUDE_INTO_RESULT())->value();
+          }
+          if (anExtFeature->getKind() == SketchPlugin_IntersectionPoint::ID()) {
+            isIncludedToSketchResult = anExtFeature->boolean(
+                SketchPlugin_IntersectionPoint::INCLUDE_INTO_RESULT())->value();
+          }
+
+          aFeature->boolean(SketchPlugin_SketchEntity::COPY_ID())->setValue(false);
+          aFeature->boolean(SketchPlugin_SketchEntity::AUXILIARY_ID())->setValue(
+              !isIncludedToSketchResult);
+        }
+      }
+    }
+  }
+  for (std::list<FeaturePtr>::iterator anIt = aRemove.begin(); anIt != aRemove.end(); ++anIt)
+    document()->removeFeature(*anIt);
+  return true;
+}
+
+
+static ObjectPtr findAxis(GeomShapePtr theAxisToCompare,
+                          ObjectPtr theOX,
+                          ObjectPtr theOY,
+                          ObjectPtr theOZ)
+{
+  if (theAxisToCompare) {
+    ObjectPtr anAxes[] = { theOX, theOY, theOZ };
+    for (int i = 0; i < 3; ++i) {
+      ResultPtr anAx = std::dynamic_pointer_cast<ModelAPI_Result>(anAxes[i]);
+      if (anAx && theAxisToCompare->isEqual(anAx->shape()))
+        return anAxes[i];
+    }
+  }
+  return ObjectPtr();
+}
+
+static ObjectPtr findAxis(ObjectPtr theAxisToCompare,
+                          ObjectPtr theOX,
+                          ObjectPtr theOY,
+                          ObjectPtr theOZ)
+{
+  if (theAxisToCompare == theOX)
+    return theOX;
+  else if (theAxisToCompare == theOY)
+    return theOY;
+  else if (theAxisToCompare == theOZ)
+    return theOZ;
+  // nothing helped, search by shape
+  ResultPtr anAxis = std::dynamic_pointer_cast<ModelAPI_Result>(theAxisToCompare);
+  return findAxis(anAxis ? anAxis->shape() : GeomShapePtr(), theOX, theOY, theOZ);
+}
+
+GeomShapePtr axisOnNewPlane(ObjectPtr theAxis, GeomAx3Ptr theOldPlane, GeomAx3Ptr theNewPlane)
+{
+  ResultPtr anAxis = std::dynamic_pointer_cast<ModelAPI_Result>(theAxis);
+  if (!anAxis)
+    return GeomShapePtr();
+
+  GeomEdgePtr anAxisEdge = anAxis->shape()->edge();
+  GeomLinePtr anAxisLine = anAxisEdge->line();
+  GeomDirPtr anAxisDir = anAxisLine->direction();
+
+  double aFirstParam, aLastParam;
+  anAxisEdge->getRange(aFirstParam, aLastParam);
+
+  if (theOldPlane->dirX()->isParallel(anAxisDir))
+    anAxisDir = theNewPlane->dirX();
+  else if (theOldPlane->dirY()->isParallel(anAxisDir))
+    anAxisDir = theNewPlane->dirY();
+  else if (theOldPlane->normal()->isParallel(anAxisDir))
+    anAxisDir = theNewPlane->normal();
+
+  GeomPointPtr aFirstPoint(new GeomAPI_Pnt(aFirstParam * anAxisDir->x(),
+                                           aFirstParam * anAxisDir->y(),
+                                           aFirstParam * anAxisDir->z()));
+  GeomPointPtr aLastPoint(new GeomAPI_Pnt(aLastParam * anAxisDir->x(),
+                                          aLastParam * anAxisDir->y(),
+                                          aLastParam * anAxisDir->z()));
+  return GeomAlgoAPI_EdgeBuilder::line(aFirstPoint, aLastPoint);
+}
+
+void  SketchPlugin_Sketch::updateCoordinateAxis(ObjectPtr theSub, GeomAx3Ptr thePlane)
+{
+  FeaturePtr aFeature = ModelAPI_Feature::feature(theSub);
+  if (!aFeature)
+    return;
+
+  DocumentPtr aRootDoc = ModelAPI_Session::get()->moduleDocument();
+  ObjectPtr anOX = aRootDoc->objectByName(ModelAPI_ResultConstruction::group(), "OX");
+  ObjectPtr anOY = aRootDoc->objectByName(ModelAPI_ResultConstruction::group(), "OY");
+  ObjectPtr anOZ = aRootDoc->objectByName(ModelAPI_ResultConstruction::group(), "OZ");
+
+  AttributeSelectionPtr anExtFeature;
+  if (aFeature->getKind() == SketchPlugin_Projection::ID())
+    anExtFeature = aFeature->selection(SketchPlugin_Projection::EXTERNAL_FEATURE_ID());
+  else if (aFeature->getKind() == SketchPlugin_IntersectionPoint::ID())
+    anExtFeature = aFeature->selection(SketchPlugin_IntersectionPoint::EXTERNAL_FEATURE_ID());
+  else
+    return;
+
+  ObjectPtr aContext = anExtFeature->context();
+  GeomShapePtr aShape = anExtFeature->value();
+  if (!aShape) { // selected object is a construction
+    ObjectPtr anAxis = findAxis(aContext, anOX, anOY, anOZ);
+    GeomShapePtr aNewAxis = axisOnNewPlane(anAxis, myPlane, thePlane);
+    anAxis = findAxis(aNewAxis, anOX, anOY, anOZ);
+    if (anAxis)
+      anExtFeature->setValue(anAxis, aShape);
+  }
 }

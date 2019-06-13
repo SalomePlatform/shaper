@@ -70,7 +70,10 @@ public:
     const Handle(SelectMgr_EntityOwner)& theOwner);
 
   /// Returns sketcher plane
-  Standard_EXPORT std::shared_ptr<GeomAPI_Ax3> plane() const { return myPlane; }
+  Standard_EXPORT std::shared_ptr<GeomAPI_Ax3> plane() const
+  {
+    return mySketcher->coordinatePlane();
+  }
 
   /// Returns feature object
   Standard_EXPORT ModelAPI_Feature* feature() const { return myConstraint; }
@@ -146,10 +149,7 @@ protected:
   ModelAPI_Feature* myConstraint;
 
   /// Sketcher feature
-  ModelAPI_CompositeFeature* mySketcher;
-
-  /// Plane of the current sketcher
-  std::shared_ptr<GeomAPI_Ax3> myPlane;
+  SketchPlugin_Sketch* mySketcher;
 
   /// Aspect for entities drawing
   Handle(Graphic3d_AspectMarker3d) myAspect;

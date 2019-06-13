@@ -95,6 +95,8 @@ void SketchSolver_ConstraintDistance::getAttributes(
     theAttributes.clear();
 
   myPrevValue = 0.0;
+
+  myStorage->subscribeUpdates(this, PlaneGCSSolver_UpdateFeature::GROUP());
 }
 
 void SketchSolver_ConstraintDistance::adjustConstraint()
@@ -208,4 +210,16 @@ void SketchSolver_ConstraintDistance::removeConstraintsKeepingSign()
   aStorage->addConstraint(myBaseConstraint, aConstraint);
 
   myIsSigned = false;
+}
+
+void SketchSolver_ConstraintDistance::notify(const FeaturePtr& theFeature,
+                                             PlaneGCSSolver_Update*)
+{
+  if (getType() == CONSTRAINT_PT_LINE_DISTANCE && myIsSigned &&
+      theFeature->getKind() == SketchPlugin_Sketch::ID()) {
+    // the sketch plane was updated, recalculate auxiliary constraints
+    removeConstraintsKeepingSign();
+    addConstraintsToKeepSign();
+    myIsSigned = true; // reset it, due to changing by removeConstraintsKeepingSign()
+  }
 }

@@ -106,7 +106,7 @@ void XGUI_ActiveControlMgr::onSelectorDeactivated()
   XGUI_ActiveControlSelector* aSelectorToBeActivated = 0;
   for (int i = 0, aCount = mySelectors.count(); i < aCount; i++)
   {
-    if (!mySelectors[i]->needToBeActiated())
+    if (!mySelectors[i]->needToBeActivated())
       continue;
     aSelectorToBeActivated = mySelectors[i];
     break;

@@ -91,7 +91,7 @@ public:
   virtual void deactivate();
 
   /// The method called if widget should be activated always
-  virtual bool needToBeActiated() { return true; }
+  virtual bool needToBeActivated() { return true; }
 
   /// Returns sketcher plane
   std::shared_ptr<GeomAPI_Pln> plane() const;
@@ -192,6 +192,8 @@ private slots:
   /// \param theOn a flag show constraints or not
   void onShowConstraint(bool theOn);
 
+  void onChangePlane();
+
 private:
   /// Set sketch plane by shape
   /// \param theShape a planar face
@@ -213,12 +215,16 @@ private:
   PartSet_PreviewPlanes* myPreviewPlanes;
 
   QCheckBox* myViewInverted;
+  QCheckBox* myRemoveExternal;
 
   QMap<PartSet_Tools::ConstraintVisibleState, QCheckBox*> myShowConstraints;
 
   QWidget* mySizeOfViewWidget; ///< Size of view widget, visualized if preview planes are shown
   QLineEdit* mySizeOfView; ///< Value of square of size of View
   QStackedWidget* myStackWidget;
+
+  bool myOpenTransaction;
+  bool myIsSelection;
 };
 
 #endif

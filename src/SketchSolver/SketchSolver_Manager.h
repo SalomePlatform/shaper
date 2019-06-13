@@ -29,6 +29,7 @@
 
 class GeomAPI_Pnt2d;
 class GeomDataAPI_Point2D;
+class ModelAPI_CompositeFeature;
 class SketchPlugin_Constraint;
 
 /** \class   SketchSolver_Manager
@@ -66,6 +67,12 @@ protected:
    *  \return \c true if the feature changed successfully
    */
   bool updateFeature(const std::shared_ptr<SketchPlugin_Feature>& theFeature);
+
+  /** \brief Updates the sketch and related constraints, if the sketch plane is changed
+   *  \param[in] theSketch sketch to be updated
+   *  \return \c true if the sketch plane is changed
+   */
+  bool updateSketch(const std::shared_ptr<ModelAPI_CompositeFeature>& theSketch);
 
   /** \brief Move feature
    *  \param[in] theMovedFeature dragged sketch feature

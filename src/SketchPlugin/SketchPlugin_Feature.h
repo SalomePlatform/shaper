@@ -78,11 +78,18 @@ protected:
   /// initializes mySketch
   SketchPlugin_Feature();
 
+  /// Store current feature of the document if it is not the sub-feature of the current sketch
+  void keepCurrentFeature();
+  /// Restore current feature of the document after adding new feature to the sketch
+  void restoreCurrentFeature();
+
   friend class SketchPlugin_Sketch;
 
- private:
+private:
   std::shared_ptr<GeomAPI_Shape> myPreview;  ///< the preview shape
   SketchPlugin_Sketch* mySketch;  /// sketch that contains this feature
+
+  FeaturePtr myCurrentFeature; /// temporary stored current feature
 };
 
 #endif

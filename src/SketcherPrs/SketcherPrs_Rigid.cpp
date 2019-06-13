@@ -80,7 +80,7 @@ bool SketcherPrs_Rigid::IsReadyToDisplay(ModelAPI_Feature* theConstraint,
 
 bool SketcherPrs_Rigid::updateIfReadyToDisplay(double theStep, bool withColor) const
 {
-  if (!IsReadyToDisplay(myConstraint, myPlane))
+  if (!IsReadyToDisplay(myConstraint, plane()))
     return false;
 
   myPntArray = new Graphic3d_ArrayOfPoints(1, withColor);
@@ -99,7 +99,7 @@ bool SketcherPrs_Rigid::updateIfReadyToDisplay(double theStep, bool withColor) c
     // The constraint attached to a point
     std::shared_ptr<GeomAPI_Pnt2d> aPnt = SketcherPrs_Tools::getPoint(myConstraint,
                                                   SketchPlugin_Constraint::ENTITY_A());
-    std::shared_ptr<GeomAPI_Pnt> aPoint = myPlane->to3D(aPnt->x(), aPnt->y() + theStep);
+    std::shared_ptr<GeomAPI_Pnt> aPoint = plane()->to3D(aPnt->x(), aPnt->y() + theStep);
     myPntArray->AddVertex(aPoint->impl<gp_Pnt>());
   }
   return true;

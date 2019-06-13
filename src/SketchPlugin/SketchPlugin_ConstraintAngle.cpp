@@ -115,7 +115,7 @@ AISObjectPtr SketchPlugin_ConstraintAngle::getAISObject(AISObjectPtr thePrevious
   if (!sketch())
     return thePrevious;
 
-  AISObjectPtr anAIS = SketcherPrs_Factory::angleConstraint(this, sketch()->coordinatePlane(),
+  AISObjectPtr anAIS = SketcherPrs_Factory::angleConstraint(this, sketch(),
                                                             thePrevious);
   return anAIS;
 }

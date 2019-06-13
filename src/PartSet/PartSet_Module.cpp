@@ -177,6 +177,7 @@ PartSet_Module::PartSet_Module(ModuleBase_IWorkshop* theWshop)
 
   Events_Loop* aLoop = Events_Loop::loop();
   aLoop->registerListener(this, Events_Loop::eventByName(EVENT_DOCUMENT_CHANGED));
+  aLoop->registerListener(this, Events_Loop::eventByName(EVENT_OBJECT_TO_REDISPLAY));
 
   registerSelectionFilter(SF_GlobalFilter, new PartSet_GlobalFilter(myWorkshop));
   registerSelectionFilter(SF_FilterInfinite, new PartSet_FilterInfinite(myWorkshop));
@@ -1510,6 +1511,14 @@ void PartSet_Module::processEvent(const std::shared_ptr<Events_Message>& theMess
       if (aConstrObj.get()) {
         EXPAND_PARENT(aConstrObj)
       }
+    }
+  }
+  else if (theMessage->eventID() == Events_Loop::loop()->eventByName(EVENT_OBJECT_TO_REDISPLAY)) {
+    CompositeFeaturePtr aSketch = mySketchMgr->activeSketch();
+    if (aSketch.get()) {
+      ModuleBase_Operation* anOperation = myWorkshop->currentOperation();
+      if (PartSet_SketcherMgr::isSketchOperation(anOperation))
+        mySketchMgr->previewSketchPlane()->createSketchPlane(aSketch, myWorkshop);
     }
   }
 }

@@ -49,6 +49,8 @@ Standard_Boolean ModuleBase_FilterValidated::
       if (aCurrentWidget) {
         ModuleBase_ViewerPrsPtr aPrs(new ModuleBase_ViewerPrs());
         myWorkshop->selection()->fillPresentation(aPrs, theOwner);
+        if (aPrs->isEmpty())
+          return false;
         ModuleBase_WidgetValidated* aWidgetValidated = dynamic_cast<ModuleBase_WidgetValidated*>
                                                                                (aCurrentWidget);
         if (aWidgetValidated)

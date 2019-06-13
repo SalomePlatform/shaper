@@ -52,8 +52,8 @@ static const gp_Circ MyDefCirc(gp_Ax2(gp_Pnt(0,0,0), gp_Dir(0,0,1)), 1);
 IMPLEMENT_STANDARD_RTTIEXT(SketcherPrs_Radius, AIS_RadiusDimension);
 
 SketcherPrs_Radius::SketcherPrs_Radius(ModelAPI_Feature* theConstraint,
-                                       const std::shared_ptr<GeomAPI_Ax3>& thePlane)
-: AIS_RadiusDimension(MyDefCirc), myConstraint(theConstraint), mySketcherPlane(thePlane),
+  SketchPlugin_Sketch* theSketcher)
+: AIS_RadiusDimension(MyDefCirc), myConstraint(theConstraint), mySketcher(theSketcher),
   myCircle(MyDefCirc),
   myAnchorPoint(gp_Pnt(0, 0, 2)),
   myValue(1, false, "")
@@ -147,7 +147,7 @@ void SketcherPrs_Radius::Compute(
 {
   gp_Circ aCircle;
   gp_Pnt anAnchorPoint;
-  bool aReadyToDisplay = readyToDisplay(myConstraint, mySketcherPlane, aCircle, anAnchorPoint);
+  bool aReadyToDisplay = readyToDisplay(myConstraint, plane(), aCircle, anAnchorPoint);
   if (aReadyToDisplay) {
     myCircle = aCircle;
     myAnchorPoint = anAnchorPoint;

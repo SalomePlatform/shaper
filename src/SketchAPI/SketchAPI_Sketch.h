@@ -98,6 +98,11 @@ public:
   SKETCHAPI_EXPORT
   void setPlane(const std::shared_ptr<GeomAPI_Ax3> & thePlane);
 
+  /// Change sketch plane
+  SKETCHAPI_EXPORT
+  void setPlane(const ModelHighAPI_Selection & thePlane,
+                bool theRemoveExternalDependency = false);
+
   /// Set external
   SKETCHAPI_EXPORT
   void setExternal(const ModelHighAPI_Selection & theExternal);

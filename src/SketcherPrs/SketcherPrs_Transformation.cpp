@@ -86,7 +86,7 @@ bool SketcherPrs_Transformation::IsReadyToDisplay(ModelAPI_Feature* theConstrain
 
 bool SketcherPrs_Transformation::updateIfReadyToDisplay(double theStep, bool withColor) const
 {
-  if (!IsReadyToDisplay(myConstraint, myPlane))
+  if (!IsReadyToDisplay(myConstraint, plane()))
     return false;
 
   std::shared_ptr<ModelAPI_Data> aData = myConstraint->data();
@@ -144,12 +144,12 @@ void SketcherPrs_Transformation::drawLines(const Handle(Prs3d_Presentation)& the
 
     if (aStart.get() && aEnd.get() && aStart->isInitialized() && aEnd->isInitialized()) {
       // Add start point
-      std::shared_ptr<GeomAPI_Pnt> aPnt = myPlane->to3D(aStart->x(), aStart->y());
+      std::shared_ptr<GeomAPI_Pnt> aPnt = plane()->to3D(aStart->x(), aStart->y());
       Handle(Geom_CartesianPoint) aPoint = new Geom_CartesianPoint(aPnt->impl<gp_Pnt>());
       StdPrs_Point::Add(thePrs, aPoint, myDrawer);
 
       // Add end point
-      aPnt = myPlane->to3D(aEnd->x(), aEnd->y());
+      aPnt = plane()->to3D(aEnd->x(), aEnd->y());
       aPoint = new Geom_CartesianPoint(aPnt->impl<gp_Pnt>());
       StdPrs_Point::Add(thePrs, aPoint, myDrawer);
     }
@@ -159,7 +159,7 @@ void SketcherPrs_Transformation::drawLines(const Handle(Prs3d_Presentation)& the
       GeomDataAPI_Point2D::getPoint2D(aData, SketchPlugin_MultiRotation::CENTER_ID());
     if (aCenter.get() && aCenter->isInitialized()) {
       // Show center of rotation
-      std::shared_ptr<GeomAPI_Pnt> aPnt = myPlane->to3D(aCenter->x(), aCenter->y());
+      std::shared_ptr<GeomAPI_Pnt> aPnt = plane()->to3D(aCenter->x(), aCenter->y());
       Handle(Geom_CartesianPoint) aPoint = new Geom_CartesianPoint(aPnt->impl<gp_Pnt>());
       StdPrs_Point::Add(thePrs, aPoint, myDrawer);
     }

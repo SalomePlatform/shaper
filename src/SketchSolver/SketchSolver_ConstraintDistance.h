@@ -42,6 +42,9 @@ public:
   /// \brief Remove constraint
   virtual bool remove();
 
+  /// \brief Notify this object about the feature is changed somewhere
+  virtual void notify(const FeaturePtr& theFeature, PlaneGCSSolver_Update*);
+
 protected:
   /// \brief Generate list of attributes of constraint in order useful for constraints
   /// \param[out] theValue      numerical characteristic of constraint (e.g. distance)

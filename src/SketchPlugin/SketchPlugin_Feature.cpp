@@ -57,3 +57,18 @@ SketchPlugin_Sketch* SketchPlugin_Feature::sketch()
   return mySketch;
 }
 
+void SketchPlugin_Feature::keepCurrentFeature()
+{
+  FeaturePtr aCurFeature = document()->currentFeature(true);
+  std::shared_ptr<SketchPlugin_Feature> aSketchFeature =
+      std::dynamic_pointer_cast<SketchPlugin_Feature>(aCurFeature);
+  if (!aSketchFeature || aSketchFeature->sketch() == sketch())
+    myCurrentFeature = aCurFeature;
+}
+
+void SketchPlugin_Feature::restoreCurrentFeature()
+{
+  if (myCurrentFeature)
+    document()->setCurrentFeature(myCurrentFeature, true);
+  myCurrentFeature = FeaturePtr();
+}

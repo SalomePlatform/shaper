@@ -168,6 +168,8 @@ void SketchPlugin_Projection::computeProjection(const std::string& theID)
       aProjection->selection(EXTERNAL_ID())->setValue(lastResult(), lastResult()->shape());
   }
 
+  keepCurrentFeature();
+
   if (aVertex) {
     std::shared_ptr<GeomAPI_Pnt> aPrjPnt = aSketchPlane->project(aVertex->point());
     std::shared_ptr<GeomAPI_Pnt2d> aPntInSketch = sketch()->to2D(aPrjPnt);
@@ -263,6 +265,8 @@ void SketchPlugin_Projection::computeProjection(const std::string& theID)
   aProjection->boolean(COPY_ID())->setValue(true);
   aProjection->execute();
   aRefAttr->setObject(aProjection);
+
+  restoreCurrentFeature();
 
   if (theID == EXTERNAL_FEATURE_ID()) {
     selection(EXTERNAL_ID())->selectValue(aExtFeature);

@@ -58,7 +58,8 @@ static void featuresOrderedByCreation(const std::set<ObjectPtr>& theOriginalFeat
 }
 
 static void featuresOrderedByType(const std::set<ObjectPtr>& theOriginalFeatures,
-                                  IndexedFeatureMap& theOrderedFeatures)
+                                  IndexedFeatureMap& theOrderedFeatures,
+                                  CompositeFeaturePtr& theSketch)
 {
   int aFeatureIndex = 0;
   int aConstraintIndex = (int)theOriginalFeatures.size();
@@ -67,13 +68,21 @@ static void featuresOrderedByType(const std::set<ObjectPtr>& theOriginalFeatures
   for (; aFeatIter != theOriginalFeatures.end(); aFeatIter++) {
     std::shared_ptr<SketchPlugin_Feature> aFeature =
         std::dynamic_pointer_cast<SketchPlugin_Feature>(*aFeatIter);
-    if (aFeature && !aFeature->isMacro() && aFeature->data() && aFeature->data()->isValid()) {
-      std::shared_ptr<SketchPlugin_Constraint> aConstraint =
-          std::dynamic_pointer_cast<SketchPlugin_Constraint>(aFeature);
-      if (aConstraint)
-        theOrderedFeatures[++aConstraintIndex] = aFeature;
-      else
-        theOrderedFeatures[++aFeatureIndex] = aFeature;
+    if (aFeature) {
+      if (!aFeature->isMacro() && aFeature->data() && aFeature->data()->isValid()) {
+        std::shared_ptr<SketchPlugin_Constraint> aConstraint =
+            std::dynamic_pointer_cast<SketchPlugin_Constraint>(aFeature);
+        if (aConstraint)
+          theOrderedFeatures[++aConstraintIndex] = aFeature;
+        else
+          theOrderedFeatures[++aFeatureIndex] = aFeature;
+      }
+    }
+    else {
+      CompositeFeaturePtr aSketch =
+          std::dynamic_pointer_cast<ModelAPI_CompositeFeature>(*aFeatIter);
+      if (aSketch && aSketch->getKind() == SketchPlugin_Sketch::ID())
+        theSketch = aSketch;
     }
   }
 }
@@ -151,17 +160,19 @@ void SketchSolver_Manager::processEvent(
     // update sketch features only
     const std::set<ObjectPtr>& aFeatures = anUpdateMsg->objects();
     IndexedFeatureMap anOrderedFeatures;
+    CompositeFeaturePtr aSketchFeature;
     // try to keep order as features were created if there are several created features: #2229
     if (theMessage->eventID() == aCreatedEvent && aFeatures.size() > 1) {
       featuresOrderedByCreation(aFeatures, anOrderedFeatures);
     } else { // order is not important, just process features before constraints
-      featuresOrderedByType(aFeatures, anOrderedFeatures);
+      featuresOrderedByType(aFeatures, anOrderedFeatures, aSketchFeature);
     }
 
     IndexedFeatureMap::iterator aFeat;
     for (aFeat = anOrderedFeatures.begin(); aFeat != anOrderedFeatures.end(); aFeat++) {
       updateFeature(aFeat->second);
     }
+    updateSketch(aSketchFeature);
 
   } else if (theMessage->eventID() == Events_Loop::loop()->eventByName(EVENT_OBJECT_MOVED)) {
     std::shared_ptr<ModelAPI_ObjectMovedMessage> aMoveMsg =
@@ -226,6 +237,25 @@ void SketchSolver_Manager::processEvent(
   // send update for movement in any case
   if (needToUpdate || isMovedEvt)
     Events_Loop::loop()->flush(anUpdateEvent);
+}
+
+// ============================================================================
+//  Function: updateSketch
+//  Purpose:  update sketch plane in appropriate group
+// ============================================================================
+bool SketchSolver_Manager::updateSketch(const CompositeFeaturePtr& theSketch)
+{
+  if (!theSketch)
+    return true;
+
+  bool isOk = true;
+  std::list<SketchGroupPtr>::const_iterator aGroupIt;
+  for (aGroupIt = myGroups.begin(); aGroupIt != myGroups.end(); ++aGroupIt)
+    if ((*aGroupIt)->getWorkplane() == theSketch) {
+      (*aGroupIt)->updateSketch(theSketch);
+      break;
+    }
+  return isOk;
 }
 
 // ============================================================================

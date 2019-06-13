@@ -143,6 +143,11 @@ public:
   /// \return API object of geom plane
   static std::shared_ptr<GeomAPI_Pln> sketchPlane(CompositeFeaturePtr theSketch);
 
+  /// Create a sketch plane instance
+  /// \param theSketch a sketch feature
+  /// \return API object of geom plane
+  static void nullifySketchPlane(CompositeFeaturePtr theSketch);
+
   /// Create a point 3D on a basis of point 2D and sketch feature
   /// \param thePoint2D a point on a sketch
   /// \param theSketch a sketch feature

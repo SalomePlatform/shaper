@@ -311,6 +311,17 @@ std::shared_ptr<GeomAPI_Pln> PartSet_Tools::sketchPlane(CompositeFeaturePtr theS
   return aPlane;
 }
 
+void PartSet_Tools::nullifySketchPlane(CompositeFeaturePtr theSketch)
+{
+  std::shared_ptr<GeomDataAPI_Point> anOrigin = std::dynamic_pointer_cast<GeomDataAPI_Point>(
+    theSketch->data()->attribute(SketchPlugin_Sketch::ORIGIN_ID()));
+  std::shared_ptr<GeomDataAPI_Dir> aNormal = std::dynamic_pointer_cast<GeomDataAPI_Dir>(
+    theSketch->data()->attribute(SketchPlugin_Sketch::NORM_ID()));
+
+  aNormal->reset();
+  anOrigin->reset();
+}
+
 std::shared_ptr<GeomAPI_Pnt> PartSet_Tools::point3D(std::shared_ptr<GeomAPI_Pnt2d> thePoint2D,
                                                       CompositeFeaturePtr theSketch)
 {

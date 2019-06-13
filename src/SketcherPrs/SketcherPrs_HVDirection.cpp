@@ -51,7 +51,7 @@ bool SketcherPrs_HVDirection::IsReadyToDisplay(ModelAPI_Feature* theConstraint,
 
 bool SketcherPrs_HVDirection::updateIfReadyToDisplay(double theStep, bool withColor) const
 {
-  if (!IsReadyToDisplay(myConstraint, myPlane))
+  if (!IsReadyToDisplay(myConstraint, plane()))
     return false;
 
   // Set point of the symbol

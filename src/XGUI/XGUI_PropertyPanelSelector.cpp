@@ -46,7 +46,7 @@ void XGUI_PropertyPanelSelector::setActive(const bool& isActive)
 
   if (!isActive) { // on deactivating, store previous active widget
     ModuleBase_ModelWidget* aWidget = myPanel->activeWidget();
-    if (aWidget && aWidget->needToBeActiated())
+    if (aWidget && aWidget->needToBeActivated())
     {
       myWidgetToBeActivated = aWidget;
     }
@@ -55,7 +55,7 @@ void XGUI_PropertyPanelSelector::setActive(const bool& isActive)
 }
 
 //********************************************************************
-bool XGUI_PropertyPanelSelector::needToBeActiated() const
+bool XGUI_PropertyPanelSelector::needToBeActivated() const
 {
   return myWidgetToBeActivated != NULL;
 }

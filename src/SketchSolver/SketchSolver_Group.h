@@ -30,6 +30,8 @@
 #include <memory>
 #include <map>
 
+class GeomAPI_Dir;
+class GeomAPI_Pnt;
 class GeomAPI_Pnt2d;
 
 typedef std::map<ConstraintPtr, SolverConstraintPtr> ConstraintConstraintMap;
@@ -66,6 +68,10 @@ class SketchSolver_Group
    *  \return \c true if the constraint added or updated successfully
    */
   bool changeConstraint(std::shared_ptr<SketchPlugin_Constraint> theConstraint);
+
+  /** \brief Updates the sketch feature
+   */
+  bool updateSketch(CompositeFeaturePtr theSketch);
 
   /** \brief Updates the data corresponding the specified feature
    *  \param[in] theFeature the feature to be updated
@@ -132,6 +138,10 @@ private:
 
 private:
   CompositeFeaturePtr mySketch; ///< Sketch for this group
+  std::shared_ptr<GeomAPI_Pnt> mySketchOrigin;
+  std::shared_ptr<GeomAPI_Dir> mySketchNormal;
+  std::shared_ptr<GeomAPI_Dir> mySketchXDir;
+
   ConstraintConstraintMap myConstraints; ///< List of constraints
   std::set<SolverConstraintPtr> myTempConstraints; ///< List of temporary constraints
 

@@ -63,31 +63,9 @@ CONSTRAINT_PRS_IMPL(tangentConstraint, SketcherPrs_Tangent);
 CONSTRAINT_PRS_IMPL(middleConstraint, SketcherPrs_Middle);
 CONSTRAINT_PRS_IMPL(mirrorConstraint, SketcherPrs_Mirror);
 CONSTRAINT_PRS_IMPL(coincidentConstraint, SketcherPrs_Coincident);
-
-
-
-#define CONSTRAINT2_PRS_IMPL(NAME, CLASS) \
-AISObjectPtr SketcherPrs_Factory::NAME(ModelAPI_Feature* theConstraint, \
-                                       const std::shared_ptr<GeomAPI_Ax3>& thePlane, \
-                                       AISObjectPtr thePrevious) \
-{ \
-  std::shared_ptr<GeomAPI_AISObject> anAISObj; \
-  if (CLASS::IsReadyToDisplay(theConstraint, thePlane)) { \
-    if (thePrevious.get()) \
-      anAISObj = thePrevious; \
-    else { \
-      anAISObj = AISObjectPtr(new GeomAPI_AISObject()); \
-      Handle(CLASS) aPrs = new CLASS(theConstraint, thePlane); \
-      anAISObj->setImpl(new Handle(AIS_InteractiveObject)(aPrs)); \
-    } \
-  } \
-  return anAISObj; \
-}
-
-
-CONSTRAINT2_PRS_IMPL(angleConstraint, SketcherPrs_Angle);
-CONSTRAINT2_PRS_IMPL(radiusConstraint, SketcherPrs_Radius);
-CONSTRAINT2_PRS_IMPL(lengthDimensionConstraint, SketcherPrs_LengthDimension);
+CONSTRAINT_PRS_IMPL(lengthDimensionConstraint, SketcherPrs_LengthDimension);
+CONSTRAINT_PRS_IMPL(angleConstraint, SketcherPrs_Angle);
+CONSTRAINT_PRS_IMPL(radiusConstraint, SketcherPrs_Radius);
 
 // Non-standard constraints definition
 AISObjectPtr SketcherPrs_Factory::horisontalConstraint(ModelAPI_Feature* theConstraint,

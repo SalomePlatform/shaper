@@ -23,6 +23,10 @@
 #include "XGUI_ViewerProxy.h"
 #include "XGUI_ObjectsBrowser.h"
 
+#ifndef HAVE_SALOME
+#include <AppElements_ViewCube.h>
+#endif
+
 #include "ModuleBase_BRepOwner.h"
 #include "ModuleBase_ResultPrs.h"
 #include "ModuleBase_ViewerPrs.h"
@@ -196,9 +200,15 @@ void XGUI_Selection::getSelectedInBrowser(QList<ModuleBase_ViewerPrsPtr>& thePre
 void XGUI_Selection::fillPresentation(ModuleBase_ViewerPrsPtr& thePrs,
                                       const Handle(SelectMgr_EntityOwner)& theOwner) const
 {
-  thePrs->setOwner(theOwner);
   Handle(AIS_InteractiveObject) anIO =
                            Handle(AIS_InteractiveObject)::DownCast(theOwner->Selectable());
+#ifndef HAVE_SALOME
+  Handle(AppElements_ViewCube) aCube = Handle(AppElements_ViewCube)::DownCast(anIO);
+  if (!aCube.IsNull())
+    return;
+#endif
+
+  thePrs->setOwner(theOwner);
   thePrs->setInteractive(anIO);
 
   // we should not check the appearance of this feature because there can be some selected shapes
