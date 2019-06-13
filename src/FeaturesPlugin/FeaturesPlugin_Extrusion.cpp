@@ -170,9 +170,9 @@ bool FeaturesPlugin_Extrusion::makeExtrusions(ListOfShape& theBaseShapes,
       }
     }
   }
-  if (aToShape)
+  if (aToShape && !aToShape->isPlanar())
     theBoundaryShapes.push_back(aToShape);
-  if (aFromShape)
+  if (aFromShape && !aFromShape->isPlanar())
     theBoundaryShapes.push_back(aFromShape);
 
   // Generating result for each base shape.
