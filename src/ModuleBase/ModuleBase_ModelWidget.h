@@ -150,7 +150,7 @@ Q_OBJECT
   //! If the feature is correct, it returns an empty value
   //! \param theValueStateChecked the boolean flag if the state of the widget should be checked
   //! \return string value
-  QString getError(const bool theValueStateChecked = true) const;
+  virtual QString getError(const bool theValueStateChecked = true) const;
 
   /// Set the given wrapped value to the current widget
   /// This value should be processed in the widget according to the needs

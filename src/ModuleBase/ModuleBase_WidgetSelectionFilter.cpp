@@ -93,18 +93,6 @@ ModuleBase_FilterStarter::ModuleBase_FilterStarter(const std::string& theFeature
   QPushButton* aLaunchBtn = new QPushButton(tr("Selection by filters"), this);
   connect(aLaunchBtn, SIGNAL(clicked()), SLOT(onFiltersLaunch()));
   aMainLayout->addWidget(aLaunchBtn);
-
-  myFilterLbl = new QLabel(this);
-  myFilterLbl->setPixmap(QPixmap(":pictures/filter.png"));
-  aMainLayout->addWidget(myFilterLbl);
-
-  myModifyLbl = new QLabel(this);
-  myModifyLbl->setPixmap(QPixmap(":pictures/plus_minus.png"));
-  aMainLayout->addWidget(myModifyLbl);
-  aMainLayout->addStretch(1);
-
-  myFilterLbl->hide();
-  myModifyLbl->hide();
 }
 
 void ModuleBase_FilterStarter::onFiltersLaunch()
@@ -173,6 +161,7 @@ ModuleBase_FilterItem::ModuleBase_FilterItem(
         theParent, SIGNAL(focusInWidget(ModuleBase_ModelWidget*)));
       connect(aWidget, SIGNAL(focusOutWidget(ModuleBase_ModelWidget*)),
         theParent, SIGNAL(focusOutWidget(ModuleBase_ModelWidget*)));
+      connect(aWidget, SIGNAL(objectUpdated()), theParent, SLOT(onObjectUpdated()));
     }
     aLayout->addWidget(aParamsWgt);
   }
@@ -357,6 +346,7 @@ void ModuleBase_WidgetSelectionFilter::onAddFilter(int theIndex)
 
   myFiltersCombo->setCurrentIndex(0);
   myFiltersCombo->removeItem(theIndex);
+  updateObject(myFeature);
 }
 
 void ModuleBase_WidgetSelectionFilter::onAddFilter(const std::string& theFilter)
@@ -408,6 +398,8 @@ void ModuleBase_WidgetSelectionFilter::onDeleteItem(ModuleBase_FilterItem* theIt
   myWorkshop->selectionActivate()->updateSelectionModes();
   myWorkshop->selectionActivate()->updateSelectionFilters();
   redisplayFeature();
+  myFiltersCombo->setFocus();
+  updateObject(myFeature);
 }
 
 
@@ -470,6 +462,7 @@ void ModuleBase_WidgetSelectionFilter::onSelect()
   if (myValues.size() > 0)
     updatePreview(aComp);
   updateNumberSelected();
+  updateObject(myFeature);
 }
 
 void ModuleBase_WidgetSelectionFilter::updatePreview(const TopoDS_Shape& theShape)
@@ -533,8 +526,17 @@ void ModuleBase_WidgetSelectionFilter::updateSelectBtn()
 
 void ModuleBase_WidgetSelectionFilter::updateNumberSelected()
 {
-  myNbLbl->setText(QString::number(myValues.size()));
+  int aNb = myValues.size();
+  myNbLbl->setText(QString::number(aNb));
+  //QString aErr = () ? tr("Selection is empty") : "";
+  if (aNb == 0)
+    myFeature->setError(tr("Selection is empty").toStdString(), false, false);
+  else {
+    myFeature->setError("", false, false);
+    myFeature->data()->execState(ModelAPI_StateDone);
+  }
 }
+
 QList<QWidget*> ModuleBase_WidgetSelectionFilter::getControls() const
 {
   QList<QWidget*> aWidgets;
@@ -545,6 +547,7 @@ QList<QWidget*> ModuleBase_WidgetSelectionFilter::getControls() const
       aWidgets.append(aWgt);
     }
   }
+  aWidgets.append(myFiltersCombo);
   return aWidgets;
 }
 
@@ -574,6 +577,7 @@ bool ModuleBase_WidgetSelectionFilter::storeValueCustom()
   ModuleBase_ModelWidget* aActive = myWorkshop->propertyPanel()->activeWidget();
   if (aActive)
     return aActive->storeValue();
+  updateObject(myFeature);
   return true;
 }
 
@@ -597,9 +601,6 @@ bool ModuleBase_WidgetSelectionFilter::restoreValueCustom()
     aAttrList->setFilters(aFiltersFeature);
   }
 
-  ModuleBase_ModelWidget* aActive = myWorkshop->propertyPanel()->activeWidget();
-  if (aActive)
-    return aActive->restoreValue();
   QList<QWidget*> aWidgets;
   QList<ModuleBase_FilterItem*> aItems = myFiltersWgt->findChildren<ModuleBase_FilterItem*>();
   foreach(ModuleBase_FilterItem* aItem, aItems) {
@@ -609,4 +610,21 @@ bool ModuleBase_WidgetSelectionFilter::restoreValueCustom()
     }
   }
   return true;
+}
+
+QString ModuleBase_WidgetSelectionFilter::getError(const bool theValueStateChecked) const
+{
+  QString aErrorMsg = ModuleBase_ModelWidget::getError(theValueStateChecked);
+  if (aErrorMsg.isEmpty()) {
+    if (myValues.size() == 0)
+      aErrorMsg = tr("Selection is empty");
+  }
+  return aErrorMsg;
+}
+
+void ModuleBase_WidgetSelectionFilter::onObjectUpdated()
+{
+  clearCurrentSelection(true);
+  updateNumberSelected();
+  updateObject(myFeature);
 }
