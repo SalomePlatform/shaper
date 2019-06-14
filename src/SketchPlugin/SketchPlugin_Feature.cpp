@@ -62,7 +62,10 @@ void SketchPlugin_Feature::keepCurrentFeature()
   FeaturePtr aCurFeature = document()->currentFeature(true);
   std::shared_ptr<SketchPlugin_Feature> aSketchFeature =
       std::dynamic_pointer_cast<SketchPlugin_Feature>(aCurFeature);
-  if (!aSketchFeature || aSketchFeature->sketch() == sketch())
+  std::shared_ptr<SketchPlugin_Sketch> aSketch =
+      std::dynamic_pointer_cast<SketchPlugin_Sketch>(aCurFeature);
+  if ((!aSketchFeature || aSketchFeature->sketch() != sketch()) &&
+      (!aSketch || aSketch.get() != sketch()))
     myCurrentFeature = aCurFeature;
 }
 
