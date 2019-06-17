@@ -131,6 +131,17 @@ Q_OBJECT
   /// Show highlight for pre-highlighted sub-shape
   virtual void updateHighlight() {}
 
+  /// Set flag which indicates that viewer is used for 2d operations
+  /// \param is2d a new 2d mode state
+  void set2dMode(bool is2d) {
+    myIs2dMode = is2d;
+  }
+
+  /// Returns current state of 2d mode flag
+  bool is2dMode() const {
+    return myIs2dMode;
+  }
+
   static Handle(Prs3d_Drawer) DefaultHighlightDrawer;
 
 signals:
@@ -184,6 +195,7 @@ signals:
     /// A map for storing a scale factors dependent on view object
     QMap<Handle(V3d_View), double> myWindowScale;
 
+    bool myIs2dMode;
 };
 
 #endif

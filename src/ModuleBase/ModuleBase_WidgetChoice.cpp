@@ -31,7 +31,6 @@
 #include <QWidget>
 #include <QLayout>
 #include <QLabel>
-#include <QComboBox>
 #include <QButtonGroup>
 #include <QGroupBox>
 #include <QRadioButton>

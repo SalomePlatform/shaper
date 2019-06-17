@@ -164,6 +164,8 @@ private slots:
   XGUI_Workshop* myWorkshop;
   ResultPtr myResult;
   AIS_ListOfInteractive myHighlights;
+
+  bool myShowHighlight;
 };
 
 #endif

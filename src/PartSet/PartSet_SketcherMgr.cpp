@@ -1050,6 +1050,8 @@ void PartSet_SketcherMgr::startSketch(ModuleBase_Operation* theOperation)
   Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_TO_REDISPLAY));
 
   myExternalPointsMgr = new PartSet_ExternalPointsMgr(myModule->workshop(), myCurrentSketch);
+
+  workshop()->viewer()->set2dMode(true);
 }
 
 void PartSet_SketcherMgr::stopSketch(ModuleBase_Operation* theOperation)
@@ -1119,6 +1121,7 @@ void PartSet_SketcherMgr::stopSketch(ModuleBase_Operation* theOperation)
   }
   workshop()->selectionActivate()->updateSelectionFilters();
   workshop()->selectionActivate()->updateSelectionModes();
+  workshop()->viewer()->set2dMode(false);
 }
 
 void PartSet_SketcherMgr::startNestedSketch(ModuleBase_Operation* theOperation)

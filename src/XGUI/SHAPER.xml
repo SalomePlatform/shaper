@@ -12,6 +12,8 @@
     <parameter name="vertex-selection" value="true" />
     <parameter name="point-selection-sensitivity" value="12" />
     <parameter name="edge-selection-sensitivity" value="2" />
+    <parameter name="highlighting-3d" value="false" />
+    <parameter name="highlighting-2d" value="true" />
   </section>
   <section name="Menu" >
     <!-- Menu bar preferences -->

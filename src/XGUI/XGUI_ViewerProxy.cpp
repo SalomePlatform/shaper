@@ -30,22 +30,25 @@
 #endif
 
 #include <ModuleBase_IViewWindow.h>
+#include <ModuleBase_Preferences.h>
 #include <GeomAPI_Shape.h>
 #include <ModelAPI_ResultConstruction.h>
 
 #include <Config_PropManager.h>
 
+#include <SUIT_ResourceMgr.h>
 #include <AIS_Shape.hxx>
 #include <StdSelect_BRepOwner.hxx>
 
 #include <QEvent>
+#include <QKeyEvent>
 
 
 #define HIGHLIGHT_COLOR Quantity_NOC_YELLOW
 
 XGUI_ViewerProxy::XGUI_ViewerProxy(XGUI_Workshop* theParent)
     : ModuleBase_IViewer(theParent),
-      myWorkshop(theParent)
+      myWorkshop(theParent), myShowHighlight(false)
 {
 }
 
@@ -293,17 +296,36 @@ void XGUI_ViewerProxy::onMouseDoubleClick(AppElements_ViewWindow* theWnd, QMouse
 
 void XGUI_ViewerProxy::onMouseMove(AppElements_ViewWindow* theWnd, QMouseEvent* theEvent)
 {
-  updateHighlight();
+  if (myIs2dMode) {
+    bool aHighlight2d =
+      ModuleBase_Preferences::resourceMgr()->booleanValue("Viewer", "highlighting-2d", true);
+    if (aHighlight2d || myShowHighlight)
+      updateHighlight();
+    else
+      eraseHighlight();
+  }
+  else {
+    bool aHighlight3d =
+      ModuleBase_Preferences::resourceMgr()->booleanValue("Viewer", "highlighting-3d", false);
+    if (aHighlight3d || myShowHighlight)
+      updateHighlight();
+    else
+      eraseHighlight();
+  }
   emit mouseMove(theWnd, theEvent);
 }
 
 void XGUI_ViewerProxy::onKeyPress(AppElements_ViewWindow* theWnd, QKeyEvent* theEvent)
 {
+  myShowHighlight = theEvent->key() == Qt::Key_H;
   emit keyPress(theWnd, theEvent);
 }
 
 void XGUI_ViewerProxy::onKeyRelease(AppElements_ViewWindow* theWnd, QKeyEvent* theEvent)
 {
+  if (theEvent->key() == Qt::Key_H) {
+    myShowHighlight = false;
+  }
   emit keyRelease(theWnd, theEvent);
 }
 

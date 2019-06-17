@@ -263,7 +263,7 @@ ModuleBase_PreferencesDlg::ModuleBase_PreferencesDlg(SUIT_ResourceMgr* theResurc
   createEditors();
 
   myPreferences->retrieve();
-  setMinimumSize(800, 240);
+  setMinimumSize(800, 300);
 }
 
 ModuleBase_PreferencesDlg::~ModuleBase_PreferencesDlg()
@@ -333,6 +333,13 @@ void ModuleBase_PreferencesDlg::createViewerPage(int thePageId)
                          ModuleBase_Preferences::VIEWER_SECTION, "point-selection-sensitivity");
   myPreferences->addItem(tr("Edge"), sensitivityGroup, SUIT_PreferenceMgr::DblSpin,
                          ModuleBase_Preferences::VIEWER_SECTION, "edge-selection-sensitivity");
+
+  int highlightGroup = myPreferences->addItem(tr("Additional highlighting"), viewTab);
+  myPreferences->setItemProperty("columns", 2, highlightGroup);
+  myPreferences->addItem(tr("In 3d mode"), highlightGroup,
+    SUIT_PreferenceMgr::Bool, ModuleBase_Preferences::VIEWER_SECTION, "highlighting-3d");
+  myPreferences->addItem(tr("In 2d mode"), highlightGroup,
+    SUIT_PreferenceMgr::Bool, ModuleBase_Preferences::VIEWER_SECTION, "highlighting-2d");
 }
 
 void ModuleBase_PreferencesDlg::createMenuPage(int thePageId)
