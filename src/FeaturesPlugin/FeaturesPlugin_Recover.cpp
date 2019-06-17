@@ -34,6 +34,7 @@
 #include <GeomAlgoAPI_Tools.h>
 
 FeaturesPlugin_Recover::FeaturesPlugin_Recover()
+  : myClearListOnTypeChange(true)
 {
 }
 
@@ -43,6 +44,11 @@ void FeaturesPlugin_Recover::initAttributes()
   data()->addAttribute(RECOVERED_ENTITIES(), ModelAPI_AttributeRefList::typeId());
 
   data()->addAttribute(METHOD(), ModelAPI_AttributeString::typeId());
+  if (!string(METHOD())->isInitialized()) {
+    myClearListOnTypeChange = false;
+    string(METHOD())->setValue(METHOD_DEFAULT());
+    myClearListOnTypeChange = true;
+  }
   ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(), METHOD());
   // set default method for recovering
   string(METHOD())->setValue(METHOD_DEFAULT());
@@ -89,6 +95,6 @@ void FeaturesPlugin_Recover::execute()
 
 void FeaturesPlugin_Recover::attributeChanged(const std::string& theID)
 {
-  if (theID == METHOD())
+  if (theID == METHOD() && myClearListOnTypeChange)
     reflist(RECOVERED_ENTITIES())->clear();
 }

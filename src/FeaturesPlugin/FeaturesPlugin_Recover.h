@@ -38,6 +38,8 @@ class FeaturesPlugin_Recover : public ModelAPI_Feature
   FeaturePtr myCurrentBase;
   /// previous state of persistent flag
   bool myPersistent;
+  /// necessity to clean recovered list while changing the type of recover
+  bool myClearListOnTypeChange;
  public:
   /// Extrusion kind
   inline static const std::string& ID()
