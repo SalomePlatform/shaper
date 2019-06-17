@@ -361,6 +361,8 @@ gp_Pnt SketcherPrs_PositionMgr::getPointPosition(
   double theStep, GeomPointPtr thePnt)
 {
   gp_Pnt aP = thePnt->impl<gp_Pnt>();
+  if (!thePrs->plane().get())
+    return aP;
   GeomDirPtr aNormal = thePrs->plane()->normal();
   gp_Dir aNormDir = aNormal->impl<gp_Dir>();
 
