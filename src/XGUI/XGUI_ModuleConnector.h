@@ -97,6 +97,9 @@ Q_OBJECT
   //! \param theObject a data object
   virtual bool isVisible(const ObjectPtr& theObject) const;
 
+  //! Returns list of currently displayed objects
+  virtual QObjectPtrList displayedObjects() const;
+
   //! Select features clearing previous selection.
   //! If the list is empty then selection will be cleared
   virtual void setSelected(const QList<std::shared_ptr<ModuleBase_ViewerPrs>>& theValues);
@@ -120,6 +123,10 @@ Q_OBJECT
   virtual bool hasSHIFTPressed() const;
 
   virtual void deactivateCurrentSelector();
+
+  //! Temporary enable or disable viewer update. Returns previous state of updating
+  //! \param isEnabled new state of the viewer update
+  virtual bool enableUpdateViewer(bool isEnabled);
 
   //! Returns workshop
   XGUI_Workshop* workshop() const { return myWorkshop; }

@@ -135,7 +135,7 @@ protected slots:
 
   void onSameTopology(bool theOn);
 
-  void onShowOnly();
+  void onShowOnly(bool);
 
 protected:
   /// Returns true if the event is processed. The default implementation is empty, returns false.
@@ -255,6 +255,8 @@ protected:
 
   QCheckBox* myGeomCheck;
   ModuleBase_FilterStarter* myFiltersWgt;
+
+  QObjectPtrList myVisibleObjects;
 };
 
 #endif /* MODULEBASE_WIDGETFILESELECTOR_H_ */

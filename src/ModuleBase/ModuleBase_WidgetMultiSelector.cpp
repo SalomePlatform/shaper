@@ -180,7 +180,9 @@ ModuleBase_WidgetMultiSelector::ModuleBase_WidgetMultiSelector(QWidget* theParen
     aFltrLayout->addStretch();
 
     QPushButton* aShowBtn = new QPushButton(tr("Show only"), aFltrWgt);
-    connect(aShowBtn, SIGNAL(clicked(bool)), SLOT(onShowOnly()));
+    aShowBtn->setCheckable(true);
+    aShowBtn->setChecked(false);
+    connect(aShowBtn, SIGNAL(toggled(bool)), SLOT(onShowOnly(bool)));
     aFltrLayout->addWidget(aShowBtn);
 
     aMainLay->addWidget(aFltrWgt);
@@ -222,6 +224,8 @@ void ModuleBase_WidgetMultiSelector::activateCustom()
 void ModuleBase_WidgetMultiSelector::deactivate()
 {
   ModuleBase_WidgetSelector::deactivate();
+  if (myVisibleObjects.size())
+    onShowOnly(false);
 
   myWorkshop->module()->deactivateCustomPrs(ModuleBase_IModule::CustomizeHighlightedObjects, true);
   clearSelectedHistory();
@@ -1089,7 +1093,34 @@ void ModuleBase_WidgetMultiSelector::onSameTopology(bool theOn)
   }
 }
 
-void ModuleBase_WidgetMultiSelector::onShowOnly()
+void ModuleBase_WidgetMultiSelector::onShowOnly(bool theChecked)
 {
+  std::list<ResultPtr> aResults = myFeature->results();
+   std::list<ResultPtr>::const_iterator aIt;
+  if (theChecked) {
+    myVisibleObjects = myWorkshop->displayedObjects();
+    for (aIt = aResults.cbegin(); aIt != aResults.cend(); aIt++) {
+      myVisibleObjects.removeAll(*aIt);
+    }
+  }
+  foreach(ObjectPtr aObj, myVisibleObjects) {
+    aObj->setDisplayed(!theChecked);
+  }
 
+  if (!theChecked) {
+    // Hide and show the group result in order to make it above all objects
+    bool aOldState = myWorkshop->enableUpdateViewer(false);
+    for (aIt = aResults.cbegin(); aIt != aResults.cend(); aIt++) {
+      (*aIt)->setDisplayed(false);
+    }
+    Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_TO_REDISPLAY));
+    for (aIt = aResults.cbegin(); aIt != aResults.cend(); aIt++) {
+      (*aIt)->setDisplayed(true);
+    }
+    Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_TO_REDISPLAY));
+    myWorkshop->enableUpdateViewer(aOldState);
+
+    myVisibleObjects.clear();
+  } else
+    Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_TO_REDISPLAY));
 }

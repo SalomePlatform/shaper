@@ -216,3 +216,13 @@ void XGUI_ModuleConnector::deactivateCurrentSelector()
 {
   myWorkshop->deactivateCurrentSelector();
 }
+
+QObjectPtrList XGUI_ModuleConnector::displayedObjects() const
+{
+  return myWorkshop->displayer()->displayedObjects();
+}
+
+bool XGUI_ModuleConnector::enableUpdateViewer(bool isEnabled)
+{
+  return myWorkshop->displayer()->enableUpdateViewer(isEnabled);
+}
