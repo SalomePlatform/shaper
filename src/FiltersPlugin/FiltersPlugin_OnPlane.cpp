@@ -99,11 +99,9 @@ bool FiltersPlugin_OnPlane::isOk(const GeomShapePtr& theShape,
       for (int i = 0; i < aList->size(); i++) {
         AttributeSelectionPtr aAttr = aList->value(i);
         GeomShapePtr aGeom = aAttr->value();
-        if (!aGeom->isSame(theShape)) {
-          GeomPlanePtr aPlane = getPlane(aAttr);
-          if (aPlane->isCoincident(aPln))
-            return true;
-        }
+        GeomPlanePtr aPlane = getPlane(aAttr);
+        if (aPlane->isCoincident(aPln))
+          return true;
       }
     }
   }

@@ -730,6 +730,22 @@ std::string Model_AttributeSelection::namingName(const std::string& theDefaultNa
   if(!this->isInitialized())
     return !theDefaultName.empty() ? theDefaultName : aName;
 
+  // not argument has not parametric name (filters)
+  if (!this->isArgument() || (myParent && !myParent->isArgument())) {
+    GeomShapePtr aShape = value();
+    if (!aShape.get() && context().get())
+      aShape = context()->shape();
+    std::string aName;
+    if (aShape.get()) {
+      aName = aShape->shapeTypeStr();
+      if (myParent) {
+        aName += std::string("_") +
+          TCollection_AsciiString(selectionLabel().Father().Tag()).ToCString();
+      }
+    }
+    return aName;
+  }
+
   CenterType aCenterType = NOT_CENTER;
   std::shared_ptr<GeomAPI_Shape> aSubSh = internalValue(aCenterType);
   ResultPtr aCont = context();
