@@ -155,6 +155,8 @@ private slots:
   void onViewTransformed(AppElements_ViewWindow::OperationType);
 #else
   void onMouseMove(ModuleBase_IViewWindow*, QMouseEvent*);
+  void onKeyPress(ModuleBase_IViewWindow*, QKeyEvent*);
+  void onKeyRelease(ModuleBase_IViewWindow*, QKeyEvent*);
 #endif
 
  private:

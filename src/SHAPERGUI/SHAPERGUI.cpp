@@ -780,6 +780,14 @@ void SHAPERGUI::createPreferences()
                 ModuleBase_Preferences::VIEWER_SECTION, "point-selection-sensitivity");
   pref->addItem(tr("Edge"), sensitivityGroup, SUIT_PreferenceMgr::DblSpin,
                 ModuleBase_Preferences::VIEWER_SECTION, "edge-selection-sensitivity");
+
+  int highlightGroup = pref->addItem(tr("Additional highlighting"), viewTab);
+  pref->setItemProperty("columns", 2, highlightGroup);
+  pref->addItem(tr("In 3d mode"), highlightGroup,
+    SUIT_PreferenceMgr::Bool, ModuleBase_Preferences::VIEWER_SECTION, "highlighting-3d");
+  pref->addItem(tr("In 2d mode"), highlightGroup,
+    SUIT_PreferenceMgr::Bool, ModuleBase_Preferences::VIEWER_SECTION, "highlighting-2d");
+
   pref->retrieve();
 }
 

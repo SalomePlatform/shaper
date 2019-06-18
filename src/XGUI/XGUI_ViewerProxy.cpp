@@ -178,10 +178,10 @@ void XGUI_ViewerProxy::connectToViewer()
     this, SLOT(onMouseMove(ModuleBase_IViewWindow*, QMouseEvent*)));
 
   connect(aViewer, SIGNAL(keyPress(ModuleBase_IViewWindow*, QKeyEvent*)),
-    this, SIGNAL(keyPress(ModuleBase_IViewWindow*, QKeyEvent*)));
+    this, SLOT(onKeyPress(ModuleBase_IViewWindow*, QKeyEvent*)));
 
   connect(aViewer, SIGNAL(keyRelease(ModuleBase_IViewWindow*, QKeyEvent*)),
-    this, SIGNAL(keyRelease(ModuleBase_IViewWindow*, QKeyEvent*)));
+    this, SLOT(onKeyRelease(ModuleBase_IViewWindow*, QKeyEvent*)));
 
   connect(aViewer, SIGNAL(selectionChanged()), this, SIGNAL(selectionChanged()));
 
@@ -525,8 +525,37 @@ void XGUI_ViewerProxy::updateHighlight()
 #ifdef HAVE_SALOME
 void XGUI_ViewerProxy::onMouseMove(ModuleBase_IViewWindow* theWnd, QMouseEvent* theEvent)
 {
-  updateHighlight();
+  if (myIs2dMode) {
+    bool aHighlight2d =
+      ModuleBase_Preferences::resourceMgr()->booleanValue("Viewer", "highlighting-2d", true);
+    if (aHighlight2d || myShowHighlight)
+      updateHighlight();
+    else
+      eraseHighlight();
+  }
+  else {
+    bool aHighlight3d =
+      ModuleBase_Preferences::resourceMgr()->booleanValue("Viewer", "highlighting-3d", false);
+    if (aHighlight3d || myShowHighlight)
+      updateHighlight();
+    else
+      eraseHighlight();
+  }
   emit mouseMove(theWnd, theEvent);
+}
+
+void XGUI_ViewerProxy::onKeyPress(ModuleBase_IViewWindow* theWnd, QKeyEvent* theEvent)
+{
+  myShowHighlight = theEvent->key() == Qt::Key_H;
+  emit keyPress(theWnd, theEvent);
+}
+
+void XGUI_ViewerProxy::onKeyRelease(ModuleBase_IViewWindow* theWnd, QKeyEvent* theEvent)
+{
+  if (theEvent->key() == Qt::Key_H) {
+    myShowHighlight = false;
+  }
+  emit keyRelease(theWnd, theEvent);
 }
 #endif
 
