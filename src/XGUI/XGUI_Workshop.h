@@ -409,9 +409,6 @@ signals:
   /// Apply the current transparency value if preview in transparency dialog is switched on
   void onTransparencyValueChanged();
 
-  /// Switch on/off preview of transparency change
-  void onPreviewStateChanged();
-
  protected:
   /// Sets the granted operations for the parameter operation. Firstly, it finds the nested features
   /// and set them into the operation. Secondly, it asks the module about ids of granted operations.

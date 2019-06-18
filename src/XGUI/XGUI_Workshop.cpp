@@ -1571,10 +1571,8 @@ void XGUI_Workshop::onContextMenuCommand(const QString& theId, bool isChecked)
     changeColor(aObjects);
   else if (theId == "DEFLECTION_CMD")
     changeDeflection(aObjects);
-#ifdef USE_TRANSPARENCY
   else if (theId == "TRANSPARENCY_CMD")
     changeTransparency(aObjects);
-#endif
   else if (theId == "SHOW_CMD") {
     showObjects(aObjects, true);
     mySelector->updateSelectionBy(ModuleBase_ISelection::Browser);
@@ -2201,11 +2199,8 @@ bool XGUI_Workshop::canBeShaded(const ObjectPtr& theObject) const
 bool XGUI_Workshop::canChangeProperty(const QString& theActionName) const
 {
   if (theActionName == "COLOR_CMD" ||
-      theActionName == "DEFLECTION_CMD"
-#ifdef USE_TRANSPARENCY
-      || theActionName == "TRANSPARENCY_CMD"
-#endif
-      ) {
+      theActionName == "DEFLECTION_CMD" ||
+      theActionName == "TRANSPARENCY_CMD") {
     QObjectPtrList aObjects = mySelector->selection()->selectedObjects();
 
     std::set<std::string> aTypes;
@@ -2428,16 +2423,6 @@ void XGUI_Workshop::changeTransparency(const QObjectPtrList& theObjects)
     if (aResult.get()) {
       aCurrentValue = XGUI_CustomPrs::getResultTransparency(aResult);
     }
-    else {
-      // TODO: remove the obtaining a property from the AIS object
-      // this does not happen never because:
-      // 1. The property can be changed only on results
-      // 2. The result can be not visualized in the viewer(e.g. Origin Construction)
-      AISObjectPtr anAISObj = myDisplayer->getAISObject(anObject);
-      if (anAISObj.get()) {
-        aCurrentValue = anAISObj->getDeflection();
-      }
-    }
     if (aCurrentValue > 0)
       break;
   }
@@ -2445,7 +2430,7 @@ void XGUI_Workshop::changeTransparency(const QObjectPtrList& theObjects)
     return;
 
   if (!abortAllOperations())
-  return;
+    return;
 
   // 2. show the dialog to change the value
   XGUI_PropertyDialog* aDlg = new XGUI_PropertyDialog(desktop());
@@ -2453,8 +2438,6 @@ void XGUI_Workshop::changeTransparency(const QObjectPtrList& theObjects)
   XGUI_TransparencyWidget* aTransparencyWidget = new XGUI_TransparencyWidget(aDlg);
   connect(aTransparencyWidget, SIGNAL(transparencyValueChanged()),
           this, SLOT(onTransparencyValueChanged()));
-  connect(aTransparencyWidget, SIGNAL(previewStateChanged()),
-          this, SLOT(onPreviewStateChanged()));
   aDlg->setContent(aTransparencyWidget);
   aTransparencyWidget->setValue(aCurrentValue);
 
@@ -2463,9 +2446,7 @@ void XGUI_Workshop::changeTransparency(const QObjectPtrList& theObjects)
   QString aDescription = contextMenuMgr()->action("TRANSPARENCY_CMD")->text();
   aMgr->startOperation(aDescription.toStdString());
 
-  aDlg->move(QCursor::pos());
-  bool isDone = aDlg->exec() == QDialog::Accepted;
-  if (!isDone)
+  if (aDlg->exec() != QDialog::Accepted)
     return;
 
   // 4. set the value to all results
@@ -2480,19 +2461,7 @@ void XGUI_Workshop::changeTransparency(const QObjectPtrList& theObjects)
 void XGUI_Workshop::onTransparencyValueChanged()
 {
   XGUI_TransparencyWidget* aTransparencyWidget = (XGUI_TransparencyWidget*)sender();
-  if (!aTransparencyWidget || !aTransparencyWidget->isPreviewNeeded())
-    return;
-
-  QObjectPtrList anObjects = mySelector->selection()->selectedObjects();
-  setTransparency(aTransparencyWidget->getValue(), anObjects);
-  Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_TO_REDISPLAY));
-}
-
-//**************************************************************
-void XGUI_Workshop::onPreviewStateChanged()
-{
-  XGUI_TransparencyWidget* aTransparencyWidget = (XGUI_TransparencyWidget*)sender();
-  if (!aTransparencyWidget || !aTransparencyWidget->isPreviewNeeded())
+  if (!aTransparencyWidget)
     return;
 
   QObjectPtrList anObjects = mySelector->selection()->selectedObjects();

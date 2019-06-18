@@ -109,11 +109,9 @@ void XGUI_ContextMenuMgr::createActions()
   aAction = ModuleBase_Tools::createAction(QIcon(""), tr("Deflection..."), aDesktop);
   addAction("DEFLECTION_CMD", aAction);
 
-#ifdef USE_TRANSPARENCY
   aAction = ModuleBase_Tools::createAction(QIcon(":pictures/transparency.png"),
                                            tr("Transparency..."), aDesktop);
   addAction("TRANSPARENCY_CMD", aAction);
-#endif
 
   aAction = ModuleBase_Tools::createAction(QIcon(":pictures/eye_pencil.png"), tr("Show"), aDesktop);
   addAction("SHOW_CMD", aAction);
@@ -476,9 +474,7 @@ void XGUI_ContextMenuMgr::updateObjectBrowserMenu()
 
   action("COLOR_CMD")->setEnabled(myWorkshop->canChangeProperty("COLOR_CMD"));
   action("DEFLECTION_CMD")->setEnabled(myWorkshop->canChangeProperty("DEFLECTION_CMD"));
-#ifdef USE_TRANSPARENCY
   action("TRANSPARENCY_CMD")->setEnabled(myWorkshop->canChangeProperty("TRANSPARENCY_CMD"));
-#endif
   #ifdef _DEBUG
     #ifdef TINSPECTOR
       action("TINSPECTOR_VIEW")->setEnabled(true);
@@ -582,10 +578,8 @@ void XGUI_ContextMenuMgr::updateViewerMenu()
   if (myWorkshop->canChangeProperty("DEFLECTION_CMD"))
     action("DEFLECTION_CMD")->setEnabled(true);
 
-#ifdef USE_TRANSPARENCY
   if (myWorkshop->canChangeProperty("TRANSPARENCY_CMD"))
     action("TRANSPARENCY_CMD")->setEnabled(true);
-#endif
 
   action("DELETE_CMD")->setEnabled(true);
 }
@@ -618,9 +612,7 @@ void XGUI_ContextMenuMgr::buildObjBrowserMenu()
   aList.append(action("RENAME_CMD"));
   aList.append(action("COLOR_CMD"));
   aList.append(action("DEFLECTION_CMD"));
-#ifdef USE_TRANSPARENCY
   aList.append(action("TRANSPARENCY_CMD"));
-#endif
   aList.append(action("SHOW_FEATURE_CMD"));
   aList.append(mySeparator2);
   aList.append(action("DELETE_CMD"));
@@ -640,9 +632,7 @@ void XGUI_ContextMenuMgr::buildObjBrowserMenu()
   aList.append(action("RENAME_CMD"));
   aList.append(action("COLOR_CMD"));
   aList.append(action("DEFLECTION_CMD"));
-#ifdef USE_TRANSPARENCY
   aList.append(action("TRANSPARENCY_CMD"));
-#endif
   aList.append(action("SHOW_FEATURE_CMD"));
   aList.append(mySeparator3);
   aList.append(action("DELETE_CMD"));
@@ -694,9 +684,7 @@ void XGUI_ContextMenuMgr::buildViewerMenu()
   aList.append(mySeparator1);
   aList.append(action("COLOR_CMD"));
   aList.append(action("DEFLECTION_CMD"));
-#ifdef USE_TRANSPARENCY
   aList.append(action("TRANSPARENCY_CMD"));
-#endif
   myViewerMenu[ModelAPI_ResultConstruction::group()] = aList;
   // Result part menu
   myViewerMenu[ModelAPI_ResultPart::group()] = aList;
@@ -711,9 +699,7 @@ void XGUI_ContextMenuMgr::buildViewerMenu()
   aList.append(mySeparator2);
   aList.append(action("COLOR_CMD"));
   aList.append(action("DEFLECTION_CMD"));
-#ifdef USE_TRANSPARENCY
   aList.append(action("TRANSPARENCY_CMD"));
-#endif
   myViewerMenu[ModelAPI_ResultBody::group()] = aList;
   // Group menu
   myViewerMenu[ModelAPI_ResultGroup::group()] = aList;
@@ -755,9 +741,7 @@ void XGUI_ContextMenuMgr::addObjBrowserMenu(QMenu* theMenu) const
       //aActions.append(action("MOVE_CMD"));
       aActions.append(action("COLOR_CMD"));
       aActions.append(action("DEFLECTION_CMD"));
-#ifdef USE_TRANSPARENCY
       aActions.append(action("TRANSPARENCY_CMD"));
-#endif
       aActions.append(action("CLEAN_HISTORY_CMD"));
       aActions.append(action("DELETE_CMD"));
   }
@@ -813,9 +797,7 @@ void XGUI_ContextMenuMgr::addViewerMenu(QMenu* theMenu) const
   aActions.append(action("HIDEALL_CMD"));
   aActions.append(action("COLOR_CMD"));
   aActions.append(action("DEFLECTION_CMD"));
-#ifdef USE_TRANSPARENCY
   aActions.append(action("TRANSPARENCY_CMD"));
-#endif
   theMenu->addActions(aActions);
 
   QMap<int, QAction*> aMenuActions;

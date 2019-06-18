@@ -24,9 +24,8 @@
 
 #include <QWidget>
 
-class QDoubleSpinBox;
 class QSlider;
-class QCheckBox;
+class QLabel;
 
 /**
 * \ingroup GUI
@@ -52,27 +51,17 @@ public:
   /// \return value
   double getValue() const;
 
-  /// Returns true if the value should be applyed immediatelly
-  /// \return state of preview check control
-  bool isPreviewNeeded() const;
-
 signals:
   void transparencyValueChanged();
-  void previewStateChanged();
 
 private slots:
-  /// Update slider value by spin value
-  /// \param theValue the new spin value
-  void onSpinValueChanged(double theValue);
-
   /// Update spin value by slider value
   /// \param theValue the new slider value
   void onSliderValueChanged(int theValue);
 
 private:
-  QDoubleSpinBox* mySpinValue; /// value control
   QSlider* mySliderValue; /// slider to select value
-  QCheckBox* myPreview; /// do preview immediatelly
+  QLabel* myValLbl;
 };
 
 #endif

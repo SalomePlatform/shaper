@@ -21,6 +21,7 @@
 
 #include <QCheckBox>
 #include <QDoubleSpinBox>
+#include <QVBoxLayout>
 #include <QHBoxLayout>
 #include <QLabel>
 #include <QSlider>
@@ -28,59 +29,45 @@
 XGUI_TransparencyWidget::XGUI_TransparencyWidget(QWidget* theParent, const QString& theLabelText)
   : QWidget(theParent)
 {
-  QHBoxLayout* aLay = new QHBoxLayout(this);
+  QVBoxLayout* aLay = new QVBoxLayout(this);
   aLay->setContentsMargins(0, 0, 0, 0);
 
-  mySpinValue = new QDoubleSpinBox(this);
-  mySpinValue->setRange(0, 1);
-  mySpinValue->setSingleStep(0.1);
+  QWidget* aInfoWgt = new QWidget(this);
+  QHBoxLayout* aInfoLay = new QHBoxLayout(aInfoWgt);
+  aInfoLay->setContentsMargins(0, 0, 0, 0);
+
+  aInfoLay->addWidget(new QLabel(tr("Opaque")));
+
+  myValLbl = new QLabel("0%", aInfoWgt);
+  myValLbl->setAlignment(Qt::AlignCenter);
+  aInfoLay->addWidget(myValLbl, 1);
+
+  aInfoLay->addWidget(new QLabel(tr("Transparent")));
+  aLay->addWidget(aInfoWgt);
+
   mySliderValue = new QSlider(Qt::Horizontal, this);
   mySliderValue->setRange(0, 100);
-
-  myPreview = new QCheckBox("Preview", this);
-  myPreview->setChecked(true);
-
-  if (!theLabelText.isEmpty())
-    aLay->addWidget(new QLabel(theLabelText, this));
-  aLay->addWidget(mySpinValue);
   aLay->addWidget(mySliderValue);
-  aLay->addWidget(myPreview);
 
-  connect(mySpinValue, SIGNAL(valueChanged(double)), this, SLOT(onSpinValueChanged(double)));
   connect(mySliderValue, SIGNAL(valueChanged(int)), this, SLOT(onSliderValueChanged(int)));
-  connect(myPreview, SIGNAL(toggled(bool)), this, SIGNAL(previewStateChanged()));
 }
 
 void XGUI_TransparencyWidget::setValue(double theValue)
 {
-  bool isSpinBlocked = mySpinValue->blockSignals(true);
   bool isSliderBlocked = mySliderValue->blockSignals(true);
-
-  mySpinValue->setValue(theValue);
-  mySliderValue->setValue(theValue * 100);
-
-  mySpinValue->blockSignals(isSpinBlocked);
+  int aVal = theValue * 100;
+  mySliderValue->setValue(aVal);
+  myValLbl->setText(QString("%1%").arg(aVal));
   mySliderValue->blockSignals(isSliderBlocked);
 }
 
 double XGUI_TransparencyWidget::getValue() const
 {
-  return mySpinValue->value();
-}
-
-bool XGUI_TransparencyWidget::isPreviewNeeded() const
-{
-  return myPreview->isChecked();
-}
-
-void XGUI_TransparencyWidget::onSpinValueChanged(double theValue)
-{
-  setValue(theValue);
-  emit transparencyValueChanged();
+  return mySliderValue->value() / 100.;
 }
 
 void XGUI_TransparencyWidget::onSliderValueChanged(int theValue)
 {
-  setValue((double)theValue / 100);
+  myValLbl->setText(QString("%1%").arg(theValue));
   emit transparencyValueChanged();
 }

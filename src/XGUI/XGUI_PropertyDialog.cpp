@@ -17,7 +17,8 @@
 // See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 
-#include <XGUI_PropertyDialog.h>
+#include "XGUI_PropertyDialog.h"
+#include <ModuleBase_Tools.h>
 
 #include <QDialogButtonBox>
 #include <QLabel>

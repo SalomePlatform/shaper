@@ -2,7 +2,6 @@
  <qresource>
      <file>icons/activate.png</file>
      <file>icons/angle_32x32.png</file>
-     <file>icons/color.png</file>
      <file>icons/concealed_on.png</file>
      <file>icons/concealed_off.png</file>
      <file>icons/deactivate.png</file>

@@ -135,7 +135,7 @@ double getTransparency(const ResultPtr& theResult)
 
 double getDefaultTransparency(const ResultPtr& theResult)
 {
-  return 0;
+  return Config_PropManager::real("Visualization", "default_transparency");
 }
 
 XGUI_CustomPrs::XGUI_CustomPrs(XGUI_Workshop* theWorkshop)
