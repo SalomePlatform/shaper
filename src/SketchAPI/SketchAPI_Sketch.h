@@ -111,6 +111,10 @@ public:
   SKETCHAPI_EXPORT
   void setExternal(std::shared_ptr<ModelAPI_Object> thePlaneObject);
 
+  /// List points not connected by constraints with other sketch entitites
+  SKETCHAPI_EXPORT
+  std::list< std::shared_ptr<SketchAPI_Point> > getFreePoints();
+
   /// Add point
   SKETCHAPI_EXPORT
   std::shared_ptr<SketchAPI_Point> addPoint(

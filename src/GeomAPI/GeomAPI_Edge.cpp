@@ -332,7 +332,8 @@ void GeomAPI_Edge::intersectWithPlane(const std::shared_ptr<GeomAPI_Pln> thePlan
       // find minimal distance between the plane and the curve
       GeomAPI_ExtremaCurveSurface anExtrema(aCurve, aPlane);
       double aTolerance = BRep_Tool::Tolerance(TopoDS::Edge(aShape));
-      if (anExtrema.LowerDistance() < aTolerance) {
+      if (anExtrema.NbExtrema() > 0 &&
+          anExtrema.LowerDistance() < aTolerance) {
         // distance is lower than tolerance => tangent case
         gp_Pnt aPntC, aPntS;
         anExtrema.NearestPoints(aPntC, aPntS);

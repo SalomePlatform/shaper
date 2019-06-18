@@ -61,6 +61,7 @@ SET(PROJECT_SOURCES
 SET(PROJECT_LIBRARIES
   ModelAPI
   ModelHighAPI
+  SketcherPrs
 )
 
 INCLUDE_DIRECTORIES(
@@ -129,6 +130,7 @@ INCLUDE(UnitTest)
 
 ADD_UNIT_TESTS(
   TestSketch.py
+  TestFreePoints.py
 )
 
 # ADD_SUBDIRECTORY (Test)

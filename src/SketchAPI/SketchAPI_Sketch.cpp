@@ -223,6 +223,19 @@ SketchPtr addSketch(const std::shared_ptr<ModelAPI_Document> & thePart,
 
 
 //--------------------------------------------------------------------------------------
+std::list< std::shared_ptr<SketchAPI_Point> > SketchAPI_Sketch::getFreePoints()
+{
+  std::list< std::shared_ptr<SketchAPI_Point> > aFreePoints;
+  std::list<ResultPtr> aPoints = SketcherPrs_Tools::getFreePoints(compositeFeature());
+  for (std::list<ResultPtr>::iterator anIt = aPoints.begin(); anIt != aPoints.end(); ++anIt) {
+    FeaturePtr aFeature = ModelAPI_Feature::feature(*anIt);
+    PointPtr aPoint(new SketchAPI_Point(aFeature));
+    aFreePoints.push_back(aPoint);
+  }
+  return aFreePoints;
+}
+
+//--------------------------------------------------------------------------------------
 std::shared_ptr<SketchAPI_Point> SketchAPI_Sketch::addPoint(
     double theX, double theY)
 {

@@ -27,6 +27,8 @@
 #include <ModelAPI_Object.h>
 #include <ModelAPI_Attribute.h>
 #include <ModelAPI_Feature.h>
+#include <ModelAPI_CompositeFeature.h>
+#include <ModelAPI_Result.h>
 #include <string>
 
 #include <Events_Loop.h>
@@ -153,6 +155,11 @@ namespace SketcherPrs_Tools {
   SKETCHERPRS_EXPORT std::shared_ptr<GeomDataAPI_Point2D> getFeaturePoint(DataPtr theData,
                                                const std::string& theAttribute,
                                                const std::shared_ptr<GeomAPI_Ax3>& thePlane);
+
+  /// Collect all sketch points which are not connected with other entities.
+  /// \param theSketch sketch feature
+  /// \return list of results of SketchPlugin_Point features
+  SKETCHERPRS_EXPORT std::list<ResultPtr> getFreePoints(const CompositeFeaturePtr& theSketch);
 
   /// Returns value of dimension arrows size
   SKETCHERPRS_EXPORT double getArrowSize();

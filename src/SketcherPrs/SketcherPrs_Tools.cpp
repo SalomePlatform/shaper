@@ -27,6 +27,7 @@
 
 #include <ModelAPI_ResultConstruction.h>
 #include <ModelAPI_AttributeRefAttr.h>
+#include <ModelAPI_AttributeRefList.h>
 #include <ModelAPI_AttributeDouble.h>
 #include <ModelAPI_Events.h>
 
@@ -184,6 +185,38 @@ std::shared_ptr<GeomDataAPI_Point2D> getFeaturePoint(DataPtr theData,
     }
   }
   return aPointAttr;
+}
+
+//*************************************************************************************
+std::list<ResultPtr> getFreePoints(const CompositeFeaturePtr& theSketch)
+{
+  std::list<ResultPtr> aFreePoints;
+  if (!theSketch)
+    return aFreePoints;
+
+  AttributeRefListPtr aFeatures = theSketch->reflist(SketchPlugin_Sketch::FEATURES_ID());
+  if (!aFeatures)
+    return aFreePoints;
+  std::list<ObjectPtr> anObjects = aFeatures->list();
+  for (std::list<ObjectPtr>::iterator anObjIt = anObjects.begin();
+       anObjIt != anObjects.end(); ++anObjIt) {
+    FeaturePtr aCurrent = ModelAPI_Feature::feature(*anObjIt);
+    if (aCurrent && aCurrent->getKind() == SketchPlugin_Point::ID()) {
+      // check point is not referred by any constraints
+      const std::set<AttributePtr>& aRefs = aCurrent->data()->refsToMe();
+      std::set<AttributePtr>::iterator aRIt = aRefs.begin();
+      for (; aRIt != aRefs.end(); ++aRIt) {
+        FeaturePtr aRefFeat = ModelAPI_Feature::feature((*aRIt)->owner());
+        std::shared_ptr<SketchPlugin_Constraint> aRefConstr =
+            std::dynamic_pointer_cast<SketchPlugin_Constraint>(aRefFeat);
+        if (aRefConstr)
+          break;
+      }
+      if (aRIt == aRefs.end())
+        aFreePoints.push_back(aCurrent->lastResult());
+    }
+  }
+  return aFreePoints;
 }
 
 //*************************************************************************************

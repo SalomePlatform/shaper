@@ -64,6 +64,7 @@
 // std::list -> []
 %template(InterfaceList) std::list<std::shared_ptr<ModelHighAPI_Interface> >;
 %template(EntityList)    std::list<std::shared_ptr<SketchAPI_SketchEntity> >;
+%template(SketchPointList) std::list<std::shared_ptr<SketchAPI_Point> >;
 
 %typecheck(SWIG_TYPECHECK_POINTER) std::shared_ptr<ModelAPI_Feature>, const std::shared_ptr<ModelAPI_Feature> & {
   std::shared_ptr<ModelAPI_Feature> * temp_feature;
