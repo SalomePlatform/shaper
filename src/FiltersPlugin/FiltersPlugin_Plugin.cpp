@@ -25,7 +25,7 @@
 #include "FiltersPlugin_OnPlane.h"
 
 #include <ModelAPI_Session.h>
-#include <ModelAPI_Filter.h>
+#include <ModelAPI_FiltersFactory.h>
 
 // the only created instance of this plugin
 static FiltersPlugin_Plugin* MY_VIEWFILTERS_INSTANCE = new FiltersPlugin_Plugin();

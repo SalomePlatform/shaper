@@ -24,7 +24,7 @@
 #include "ModuleBase_ModelWidget.h"
 #include "ModuleBase_ViewerPrs.h"
 
-#include <ModelAPI_Filter.h>
+#include <ModelAPI_FiltersFeature.h>
 
 #include <SelectMgr_IndexedMapOfOwner.hxx>
 #include <AIS_Shape.hxx>

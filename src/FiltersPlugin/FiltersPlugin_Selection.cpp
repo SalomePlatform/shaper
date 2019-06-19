@@ -19,9 +19,10 @@
 
 #include "FiltersPlugin_Selection.h"
 
-#include <ModelAPI_Session.h>
 #include <ModelAPI_AttributeBoolean.h>
 #include <ModelAPI_AttributeSelectionList.h>
+#include <ModelAPI_FiltersFactory.h>
+#include <ModelAPI_Session.h>
 
 // identifier of the reverse flag of a filter
 static const std::string kReverseAttrID("");

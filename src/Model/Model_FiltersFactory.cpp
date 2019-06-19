@@ -17,7 +17,7 @@
 // See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 
-#include "Model_Filter.h"
+#include "Model_FiltersFactory.h"
 
 #include "ModelAPI_AttributeBoolean.h"
 #include "ModelAPI_AttributeSelectionList.h"

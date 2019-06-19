@@ -45,11 +45,16 @@ SET(PROJECT_HEADERS
     ModelAPI_CompositeFeature.h
     ModelAPI_Data.h
     ModelAPI_Document.h
+    ModelAPI_Entity.h
     ModelAPI_EventReentrantMessage.h
     ModelAPI_Events.h
     ModelAPI_Expression.h
     ModelAPI_Feature.h
     ModelAPI_FeatureValidator.h
+    ModelAPI_Filter.h
+    ModelAPI_FiltersArgs.h
+    ModelAPI_FiltersFactory.h
+    ModelAPI_FiltersFeature.h
     ModelAPI_Folder.h
     ModelAPI_IReentrant.h
     ModelAPI_Object.h
@@ -64,8 +69,6 @@ SET(PROJECT_HEADERS
     ModelAPI_Session.h
     ModelAPI_Tools.h
     ModelAPI_Validator.h
-    ModelAPI_Entity.h
-	ModelAPI_Filter.h
 )
 
 SET(PROJECT_SOURCES
@@ -85,6 +88,7 @@ SET(PROJECT_SOURCES
     ModelAPI_AttributeString.cpp
     ModelAPI_AttributeStringArray.cpp
     ModelAPI_AttributeTables.cpp
+    ModelAPI_AttributeValidator.cpp
     ModelAPI_BodyBuilder.cpp
     ModelAPI_CompositeFeature.cpp
     ModelAPI_Data.cpp
@@ -107,7 +111,6 @@ SET(PROJECT_SOURCES
     ModelAPI_ResultParameter.cpp
     ModelAPI_Session.cpp
     ModelAPI_Tools.cpp
-    ModelAPI_AttributeValidator.cpp
 )
 
 SET(PROJECT_LIBRARIES

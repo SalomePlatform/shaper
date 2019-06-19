@@ -21,8 +21,7 @@
 #define FILTERSPLUGIN_SELECTION_H_
 
 #include "FiltersPlugin.h"
-#include <ModelAPI_Feature.h>
-#include <ModelAPI_Filter.h>
+#include <ModelAPI_FiltersFeature.h>
 
 /**\class FiltersPlugin_Selection
 * \ingroup DataModel

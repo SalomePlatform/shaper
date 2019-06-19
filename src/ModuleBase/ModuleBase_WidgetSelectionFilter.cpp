@@ -32,6 +32,7 @@
 #include <ModelAPI_Session.h>
 #include <ModelAPI_AttributeSelectionList.h>
 #include <ModelAPI_Events.h>
+#include <ModelAPI_FiltersFactory.h>
 #include <ModelAPI_ResultBody.h>
 #include <GeomAPI_ShapeExplorer.h>
 

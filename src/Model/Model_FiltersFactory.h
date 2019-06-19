@@ -17,17 +17,17 @@
 // See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 
-#ifndef Model_Filter_H_
-#define Model_Filter_H_
+#ifndef Model_FiltersFactory_H_
+#define Model_FiltersFactory_H_
 
 #include "Model.h"
 
-#include <ModelAPI_Filter.h>
+#include <ModelAPI_FiltersFactory.h>
 
 #include <map>
 
 
-/**\class Model_ValidatorsFactory
+/**\class Model_FiltersFactory
 * \ingroup DataModel
 * \brief Manages registering of filters
 */
