@@ -892,6 +892,8 @@ ModuleBase_ModelWidget* PartSet_Module::createWidgetByType(const std::string& th
       mySketchMgr, SLOT(onPlaneSelected(const std::shared_ptr<GeomAPI_Pln>&)));
     connect(aLabelWgt, SIGNAL(showConstraintToggled(int, bool)),
       mySketchMgr, SLOT(onShowConstraintsToggle(int, bool)));
+    connect(aLabelWgt, SIGNAL(showFreePoints(bool)), mySketchMgr, SLOT(onShowPoints(bool)));
+    aLabelWgt->setShowPointsState(mySketchMgr->isShowFreePointsShown());
     aWgt = aLabelWgt;
   } else if (theType == "sketch-2dpoint_selector") {
     PartSet_WidgetPoint2D* aPointWgt = new PartSet_WidgetPoint2D(theParent, aWorkshop,

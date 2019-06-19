@@ -61,6 +61,8 @@
 
 #include <GeomDataAPI_Point2D.h>
 
+#include <GeomAPI_Shape.h>
+
 #include <Events_Loop.h>
 
 #include <SketchPlugin_Line.h>
@@ -1065,6 +1067,7 @@ void PartSet_SketcherMgr::stopSketch(ModuleBase_Operation* theOperation)
     delete myExternalPointsMgr;
     myExternalPointsMgr = 0;
   }
+  onShowPoints(false);
 
   XGUI_ModuleConnector* aConnector = dynamic_cast<XGUI_ModuleConnector*>(myModule->workshop());
 
@@ -1163,6 +1166,8 @@ void PartSet_SketcherMgr::stopNestedSketch(ModuleBase_Operation* theOperation)
   }
   if (isClearSelectionPossible)
     workshop()->selector()->clearSelection();
+  if (myPointsHighlight.size())
+    onShowPoints(true);
 }
 
 void PartSet_SketcherMgr::commitNestedSketch(ModuleBase_Operation* theOperation)
@@ -1990,3 +1995,63 @@ XGUI_OperationMgr* PartSet_SketcherMgr::operationMgr() const
   return workshop()->operationMgr();
 }
 
+void PartSet_SketcherMgr::onShowPoints(bool toShow)
+{
+  if (!myCurrentSketch.get())
+    return;
+  ModuleBase_IWorkshop* aWorkshop = myModule->workshop();
+  ModuleBase_IViewer* aViewer = aWorkshop->viewer();
+  Handle(AIS_InteractiveContext) aContext = aViewer->AISContext();
+
+  bool aToUpdate = false;
+  if (toShow) {
+    std::list<ResultPtr> aFreePoints = SketcherPrs_Tools::getFreePoints(myCurrentSketch);
+
+    // Delete obsolete presentations
+    std::list<ResultPtr> aDelList;
+    foreach(ResultPtr aObj, myPointsHighlight.keys()) {
+      bool aFound = (std::find(aFreePoints.begin(), aFreePoints.end(), aObj) != aFreePoints.end());
+      if (!aFound)
+        aDelList.push_back(aObj);
+    }
+    foreach(ResultPtr aObj, aDelList) {
+      aContext->Remove(myPointsHighlight[aObj], false);
+      aToUpdate = true;
+      myPointsHighlight.remove(aObj);
+    }
+
+    // Display new objects
+    QList<ResultPtr> aKeysList = myPointsHighlight.keys();
+    std::list<ResultPtr>::const_iterator aIt;
+    for (aIt = aFreePoints.cbegin(); aIt != aFreePoints.cend(); aIt++) {
+      if (!aKeysList.contains(*aIt)) {
+        GeomShapePtr aShapePtr = (*aIt)->shape();
+        TopoDS_Shape aShape = aShapePtr->impl<TopoDS_Shape>();
+        Handle(AIS_Shape) aShapePrs = new AIS_Shape(aShape);
+        aShapePrs->SetColor(Quantity_NOC_BLUE1);
+        aShapePrs->SetZLayer(Graphic3d_ZLayerId_Top);
+        Handle(Prs3d_Drawer) aDrawer = aShapePrs->Attributes();
+        if (aDrawer->HasOwnPointAspect()) {
+          aDrawer->PointAspect()->SetTypeOfMarker(Aspect_TOM_O_STAR);
+          aDrawer->PointAspect()->SetColor(Quantity_NOC_BLUE1);
+          aDrawer->PointAspect()->SetScale(2);
+        }
+        else
+          aDrawer->SetPointAspect(new Prs3d_PointAspect(Aspect_TOM_O_STAR, Quantity_NOC_BLUE1, 2));
+        aContext->Display(aShapePrs, false);
+        aContext->Deactivate(aShapePrs);
+        myPointsHighlight[*aIt] = aShapePrs;
+        aToUpdate = true;
+      }
+    }
+  }
+  else {
+    foreach(Handle(AIS_Shape) aPrs, myPointsHighlight.values()) {
+      aContext->Remove(aPrs, false);
+      aToUpdate = true;
+    }
+    myPointsHighlight.clear();
+  }
+  if (aToUpdate)
+    aViewer->update();
+}

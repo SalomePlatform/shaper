@@ -101,6 +101,10 @@ public:
   virtual void setHighlighted(bool) { /*do nothing*/ };
   virtual void enableFocusProcessing();
 
+  /// Set current state of show free points
+  /// \param theState a state of the corresponded check box
+  void setShowPointsState(bool theState);
+
   /// Returns True if the selected presentation can be used for plane definition
   /// \param thePrs a presentation
   static bool canFillSketch(const std::shared_ptr<ModuleBase_ViewerPrs>& thePrs);
@@ -113,6 +117,8 @@ signals:
   /// \param theType a ConstraintVisibleState value
   /// \param theState a state of the check box
   void showConstraintToggled(int theType, bool theState);
+
+  void showFreePoints(bool toShow);
 
 protected:
   /// Creates a backup of the current values of the attribute
@@ -216,6 +222,7 @@ private:
 
   QCheckBox* myViewInverted;
   QCheckBox* myRemoveExternal;
+  QCheckBox* myShowPoints;
 
   QMap<PartSet_Tools::ConstraintVisibleState, QCheckBox*> myShowConstraints;
 

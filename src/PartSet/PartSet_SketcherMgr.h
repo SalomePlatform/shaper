@@ -41,6 +41,7 @@
 
 #include <TopoDS_Shape.hxx>
 #include <TopTools_MapOfShape.hxx>
+#include <AIS_Shape.hxx>
 
 #include <QObject>
 #include <QList>
@@ -335,9 +336,15 @@ public:
   void updateBySketchParameters(const PartSet_Tools::ConstraintVisibleState& theType,
                                 bool theState);
 
+  bool isShowFreePointsShown() const {
+    return myPointsHighlight.size() > 0;
+  }
+
 public slots:
   /// Process sketch plane selected event
   void onPlaneSelected(const std::shared_ptr<GeomAPI_Pln>& thePln);
+
+  void onShowPoints(bool toShow);
 
 private slots:
   /// Toggle show constraints
@@ -452,6 +459,8 @@ private:
   QMap<PartSet_Tools::ConstraintVisibleState, bool> myIsConstraintsShown;
 
   PartSet_ExternalPointsMgr* myExternalPointsMgr;
+
+  QMap<ResultPtr, Handle(AIS_Shape)> myPointsHighlight;
 };
 
 

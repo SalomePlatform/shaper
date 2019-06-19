@@ -167,7 +167,9 @@ myIsSelection(false)
     if (toShowConstraints.contains(aState))
       aShowConstraints->setChecked(toShowConstraints[aState]);
   }
-
+  myShowPoints = new QCheckBox(tr("Show free points"), this);
+  connect(myShowPoints, SIGNAL(toggled(bool)), this, SIGNAL(showFreePoints(bool)));
+  aLayout->addWidget(myShowPoints);
 
   QPushButton* aPlaneBtn = new QPushButton(tr("Change sketch plane"), aSecondWgt);
   connect(aPlaneBtn, SIGNAL(clicked(bool)), SLOT(onChangePlane()));
@@ -698,4 +700,11 @@ void PartSet_WidgetSketchLabel::onChangePlane()
     aMgr->startOperation();
     myOpenTransaction = true;
   }
+}
+
+void PartSet_WidgetSketchLabel::setShowPointsState(bool theState)
+{
+  bool aBlock = myShowPoints->blockSignals(true);
+  myShowPoints->setChecked(theState);
+  myShowPoints->blockSignals(aBlock);
 }
