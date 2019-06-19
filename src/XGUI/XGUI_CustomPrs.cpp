@@ -119,18 +119,16 @@ double XGUI_CustomPrs::getDefaultDeflection(const ObjectPtr& theObject)
 
 double getTransparency(const ResultPtr& theResult)
 {
-  double aDeflection = -1;
+  double aTransparency = -1;
   // get transparency from the attribute of the result
   if (theResult.get() != NULL &&
       theResult->data()->attribute(ModelAPI_Result::TRANSPARENCY_ID()).get() != NULL) {
     AttributeDoublePtr aDoubleAttr = theResult->data()->real(ModelAPI_Result::TRANSPARENCY_ID());
     if (aDoubleAttr.get() && aDoubleAttr->isInitialized()) {
-      double aValue = aDoubleAttr->value();
-      if (aValue > 0) /// zero value should not be used as a transparency(previous studies)
-        aDeflection = aDoubleAttr->value();
+      aTransparency = aDoubleAttr->value();
     }
   }
-  return aDeflection;
+  return aTransparency;
 }
 
 double getDefaultTransparency(const ResultPtr& theResult)
