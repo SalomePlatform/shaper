@@ -84,5 +84,7 @@
      <file>pictures/arrow-down.png</file>
      <file>pictures/configure_toolbars.png</file>
      <file>pictures/color.png</file>
+     <file>pictures/normal-view-inversed.png</file>
+     <file>pictures/normal-view.png</file>
  </qresource>
  </RCC>

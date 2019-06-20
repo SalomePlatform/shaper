@@ -86,6 +86,8 @@
 #include <Events_InfoMessage.h>
 #include <Events_LongOp.h>
 
+#include <GeomAPI_Pnt.h>
+
 #include <ModuleBase_IModule.h>
 #include <ModuleBase_IViewer.h>
 #include <ModuleBase_Operation.h>
@@ -1630,6 +1632,10 @@ void XGUI_Workshop::onContextMenuCommand(const QString& theId, bool isChecked)
     highlightResults(aObjects);
   } else if (theId == "SHOW_FEATURE_CMD") {
     highlightFeature(aObjects);
+  } else if (theId == "SET_VIEW_NORMAL_CMD") {
+    setNormalView();
+  } else if (theId == "SET_VIEW_INVERTEDNORMAL_CMD") {
+    setNormalView(true);
   }
 #ifdef TINSPECTOR
   else if (theId == "TINSPECTOR_VIEW") {
@@ -2531,6 +2537,40 @@ void XGUI_Workshop::showOnlyObjects(const QObjectPtrList& theList)
 
   // Necessary for update icons in ObjectBrowser on Linux
   myObjectBrowser->updateAllIndexes();
+}
+
+//**************************************************************
+void XGUI_Workshop::setNormalView(bool toInvert)
+{
+  QList<ModuleBase_ViewerPrsPtr> aPrsList =
+    mySelector->selection()->getSelected(ModuleBase_ISelection::Viewer);
+  GeomShapePtr aPlanarFace;
+  foreach(ModuleBase_ViewerPrsPtr aPrs, aPrsList) {
+    GeomShapePtr aShape = aPrs->shape();
+    if (aShape.get() && aShape->isPlanar()) {
+      aPlanarFace = aShape;
+      break;
+    }
+  }
+  if (aPlanarFace.get()) {
+    GeomFacePtr aFace(new GeomAPI_Face(aPlanarFace));
+    GeomPlanePtr aPlane = aFace->getPlane();
+    GeomDirPtr aNormal = aPlane->direction();
+    if (toInvert)
+      aNormal->reverse();
+    GeomPointPtr aPos = aPlane->location();
+
+    double aXmin, aYmin, aZmin, aXmax, aYmax, aZmax;
+    aFace->computeSize(aXmin, aYmin, aZmin, aXmax, aYmax, aZmax);
+
+    Handle(V3d_View) aView = myViewerProxy->activeView();
+    double aScale = aView->Scale();
+    aView->SetAt(aPos->x(), aPos->y(), aPos->z());
+    aView->SetProj(aNormal->x(), aNormal->y(), aNormal->z());
+    Bnd_Box aBox;
+    aBox.Update(aXmin, aYmin, aZmin, aXmax, aYmax, aZmax);
+    aView->FitAll(aBox);
+  }
 }
 
 //**************************************************************

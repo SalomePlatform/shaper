@@ -516,6 +516,10 @@ private:
   /// Clear content of temporary directory
   void clearTemporaryDir();
 
+  /// Set current point of view normal to selected planar face
+  /// \param toInvert invert the normal vector
+  void setNormalView(bool toInvert = false);
+
 private:
 #ifndef HAVE_SALOME
   AppElements_MainWindow* myMainWindow; ///< desktop window

@@ -144,32 +144,25 @@ void XGUI_ContextMenuMgr::createActions()
   mySeparator3 = ModuleBase_Tools::createAction(QIcon(), "", aDesktop);
   mySeparator3->setSeparator(true);
 
-  //mySelectActions = new QActionGroup(this);
-  //mySelectActions->setExclusive(true);
-
   aAction = ModuleBase_Tools::createAction(QIcon(":pictures/vertex.png"), tr("Vertices"), aDesktop,
                                            this, SLOT(onShapeSelection(bool)));
   aAction->setCheckable(true);
   addAction("SELECT_VERTEX_CMD", aAction);
-  //mySelectActions->addAction(aAction);
 
   aAction = ModuleBase_Tools::createAction(QIcon(":pictures/edge.png"), tr("Edges"), aDesktop,
                                            this, SLOT(onShapeSelection(bool)));
   aAction->setCheckable(true);
   addAction("SELECT_EDGE_CMD", aAction);
-  //mySelectActions->addAction(aAction);
 
   aAction = ModuleBase_Tools::createAction(QIcon(":pictures/face.png"), tr("Faces"), aDesktop,
                                            this, SLOT(onShapeSelection(bool)));
   aAction->setCheckable(true);
   addAction("SELECT_FACE_CMD", aAction);
-  //mySelectActions->addAction(aAction);
 
   aAction = ModuleBase_Tools::createAction(QIcon(":pictures/result.png"), tr("Results"), aDesktop,
                                            this, SLOT(onResultSelection(bool)));
   aAction->setCheckable(true);
   addAction("SELECT_RESULT_CMD", aAction);
-  //mySelectActions->addAction(aAction);
 
   aAction->setChecked(true);
 
@@ -206,6 +199,14 @@ void XGUI_ContextMenuMgr::createActions()
   aAction = ModuleBase_Tools::createAction(QIcon(":pictures/move_out_after.png"),
                                            tr("Move out after the folder"), aDesktop);
   addAction("ADD_OUT_FOLDER_AFTER_CMD", aAction);
+
+  aAction = ModuleBase_Tools::createAction(QIcon(":pictures/normal-view-inversed.png"),
+                                           tr("Set view by inverted normal to face"), aDesktop);
+  addAction("SET_VIEW_INVERTEDNORMAL_CMD", aAction);
+
+  aAction = ModuleBase_Tools::createAction(QIcon(":pictures/normal-view.png"),
+                                           tr("Set view by normal to face"), aDesktop);
+  addAction("SET_VIEW_NORMAL_CMD", aAction);
 
   buildObjBrowserMenu();
   buildViewerMenu();
@@ -500,16 +501,22 @@ void XGUI_ContextMenuMgr::updateViewerMenu()
     bool isVisible = false;
     bool isShading = false;
     bool canBeShaded = false;
+    bool hasPlanar = false;
     ObjectPtr aObject;
     foreach(ModuleBase_ViewerPrsPtr aPrs, aPrsList) {
       aObject = aPrs->object();
+      GeomShapePtr aShape = aPrs->shape();
       ResultPtr aRes = std::dynamic_pointer_cast<ModelAPI_Result>(aObject);
       if (aRes && aRes->isDisplayed()) {
         isVisible = true;
         canBeShaded = myWorkshop->displayer()->canBeShaded(aObject);
         isShading =
           (myWorkshop->displayer()->displayMode(aObject) == XGUI_Displayer::Shading);
-        break;
+      }
+      if (aShape.get()) {
+        if (aShape->isPlanar()) {
+          hasPlanar = true;
+        }
       }
     }
     if (isVisible) {
@@ -527,6 +534,9 @@ void XGUI_ContextMenuMgr::updateViewerMenu()
       action("HIDE_CMD")->setEnabled(true);
     } else
       action("SHOW_CMD")->setEnabled(true);
+
+    action("SET_VIEW_NORMAL_CMD")->setEnabled(hasPlanar);
+    action("SET_VIEW_INVERTEDNORMAL_CMD")->setEnabled(hasPlanar);
   }
   //issue #2159 Hide all incomplete behavior
 #ifdef HAVE_SALOME
@@ -679,12 +689,15 @@ void XGUI_ContextMenuMgr::buildViewerMenu()
 {
   QActionsList aList;
   // Result construction menu
-  aList.append(action("HIDE_CMD"));
-  aList.append(action("SHOW_ONLY_CMD"));
-  aList.append(mySeparator1);
   aList.append(action("COLOR_CMD"));
   aList.append(action("DEFLECTION_CMD"));
   aList.append(action("TRANSPARENCY_CMD"));
+  aList.append(mySeparator3);
+  aList.append(action("SET_VIEW_NORMAL_CMD"));
+  aList.append(action("SET_VIEW_INVERTEDNORMAL_CMD"));
+  aList.append(mySeparator1);
+  aList.append(action("SHOW_ONLY_CMD"));
+  aList.append(action("HIDE_CMD"));
   myViewerMenu[ModelAPI_ResultConstruction::group()] = aList;
   // Result part menu
   myViewerMenu[ModelAPI_ResultPart::group()] = aList;
@@ -693,13 +706,16 @@ void XGUI_ContextMenuMgr::buildViewerMenu()
   aList.clear();
   aList.append(action("WIREFRAME_CMD"));
   aList.append(action("SHADING_CMD"));
-  aList.append(mySeparator1);
-  aList.append(action("HIDE_CMD"));
-  aList.append(action("SHOW_ONLY_CMD"));
   aList.append(mySeparator2);
   aList.append(action("COLOR_CMD"));
   aList.append(action("DEFLECTION_CMD"));
   aList.append(action("TRANSPARENCY_CMD"));
+  aList.append(mySeparator3);
+  aList.append(action("SET_VIEW_NORMAL_CMD"));
+  aList.append(action("SET_VIEW_INVERTEDNORMAL_CMD"));
+  aList.append(mySeparator1);
+  aList.append(action("SHOW_ONLY_CMD"));
+  aList.append(action("HIDE_CMD"));
   myViewerMenu[ModelAPI_ResultBody::group()] = aList;
   // Group menu
   myViewerMenu[ModelAPI_ResultGroup::group()] = aList;
@@ -790,14 +806,15 @@ void XGUI_ContextMenuMgr::addViewerMenu(QMenu* theMenu) const
         aActions = myViewerMenu[aName];
     }
   } else if (aSelected > 1) {
+    aActions.append(action("COLOR_CMD"));
+    aActions.append(action("DEFLECTION_CMD"));
+    aActions.append(action("TRANSPARENCY_CMD"));
+    aActions.append(mySeparator1);
     aActions.append(action("SHOW_ONLY_CMD"));
     aActions.append(action("HIDE_CMD"));
   }
   // hide all is shown always even if selection in the viewer is empty
   aActions.append(action("HIDEALL_CMD"));
-  aActions.append(action("COLOR_CMD"));
-  aActions.append(action("DEFLECTION_CMD"));
-  aActions.append(action("TRANSPARENCY_CMD"));
   theMenu->addActions(aActions);
 
   QMap<int, QAction*> aMenuActions;
