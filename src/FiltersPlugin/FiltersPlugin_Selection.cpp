@@ -71,7 +71,9 @@ bool FiltersPlugin_Selection::isReversed(const std::string theFilterID)
 {
   std::string anAttrID = theFilterID + kFilterSeparator + kReverseAttrID;
   std::shared_ptr<ModelAPI_AttributeBoolean> aBool = boolean(anAttrID);
-  return aBool->value();
+  if (aBool.get())
+    return aBool->value();
+  return false;
 }
 
 std::list<AttributePtr> FiltersPlugin_Selection::filterArgs(const std::string theFilterID) const

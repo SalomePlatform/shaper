@@ -175,9 +175,13 @@ void ModuleBase_FilterItem::addItemRow(QWidget* theParent)
   // Reverse filter button
   myRevBtn = new QToolButton(theParent);
   myRevBtn->setCheckable(true);
-  myRevBtn->setChecked(false);
+  bool isReversed = mySelection->isReversed(myFilterID);
+  myRevBtn->setChecked(isReversed);
   myRevBtn->setAutoRaise(true);
-  myRevBtn->setIcon(QIcon(":pictures/add.png"));
+  if (isReversed)
+    myRevBtn->setIcon(QIcon(":pictures/reverce.png"));
+  else
+    myRevBtn->setIcon(QIcon(":pictures/add.png"));
   myRevBtn->setToolTip(tr("Reverse the filter"));
   connect(myRevBtn, SIGNAL(toggled(bool)), SLOT(onReverse(bool)));
   aLayout->addWidget(myRevBtn);
