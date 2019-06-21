@@ -32,6 +32,7 @@ class GeomAPI_Pnt;
 class GeomAPI_Shape;
 class ModelAPI_AttributeSelection;
 class ModelAPI_AttributeSelectionList;
+class ModelAPI_FiltersFeature;
 class ModelAPI_Result;
 //--------------------------------------------------------------------------------------
 typedef std::pair<std::shared_ptr<ModelAPI_Result>, std::shared_ptr<GeomAPI_Shape> >
@@ -52,7 +53,8 @@ public:
     VT_ResultSubShapePair,
     VT_TypeSubShapeNamePair,
     VT_TypeInnerPointPair,
-    VT_WeakNamingPair
+    VT_WeakNamingPair,
+    VT_Filtering
   };
 
 public:
@@ -150,12 +152,13 @@ public:
   MODELHIGHAPI_EXPORT
   ModelHighAPI_Selection subResult(int theIndex) const;
 
-private:
+protected:
   VariantType myVariantType;
   ResultSubShapePair myResultSubShapePair;
   TypeSubShapeNamePair myTypeSubShapeNamePair;
   TypeInnerPointPair myTypeInnerPointPair;
   TypeWeakNamingPair myWeakNamingPair;
+  std::shared_ptr<ModelAPI_FiltersFeature> myFilterFeature;
 };
 
 //--------------------------------------------------------------------------------------

@@ -133,6 +133,9 @@ void ModelHighAPI_Selection::appendToList(
       theAttribute->append(
         myWeakNamingPair.first, myWeakNamingPair.second.first, myWeakNamingPair.second.second);
       return;
+    case VT_Filtering:
+      theAttribute->setFilters(myFilterFeature);
+      return;
   }
 }
 
