@@ -59,6 +59,10 @@
   #include "ModelAPI_ResultField.h"
   #include "ModelAPI_Tools.h"
   #include "ModelAPI_Folder.h"
+  #include "ModelAPI_Filter.h"
+  #include "ModelAPI_FiltersArgs.h"
+  #include "ModelAPI_FiltersFactory.h"
+  #include "ModelAPI_FiltersFeature.h"
 
   #include <memory>
   #include <string>

@@ -29,6 +29,11 @@ FiltersAPI_Selection::~FiltersAPI_Selection()
 {
 }
 
+FiltersFeaturePtr FiltersAPI_Selection::feature() const
+{
+  return myFilterFeature;
+}
+
 // ================================================================================================
 FiltersAPI_Selection filters(const std::shared_ptr<ModelAPI_Document>& thePart,
                              const std::list<FilterAPIPtr>& theFilters)

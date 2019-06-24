@@ -20,7 +20,8 @@
 from GeomAlgoAPI import *
 from GeomAPI import *
 from GeomDataAPI import *
-from ModelAPI import ModelAPI_Feature
+from ModelAPI import ModelAPI_Feature, ModelAPI_Session
+from ModelHighAPI import *
 import math
 from salome.shaper.model import sketcher
 
@@ -321,3 +322,32 @@ def checkGroup(theGroup, theShapeType):
     assert(name != ""), "String empty"
     presented_names.add(name)
   assert(len(presented_names) == groupSelectionList.size()), "Some names are not unique"
+
+def createSubShape(thePartDoc, theModel, theSelection):
+  """ Create feature according to the type of the given subshape
+  """
+  if theSelection.shapeType() == "VERTEX":
+    return theModel.addVertex(thePartDoc, [theSelection])
+  elif theSelection.shapeType() == "EDGE":
+    return theModel.addEdge(thePartDoc, [theSelection])
+  elif theSelection.shapeType() == "FACE":
+    return theModel.addFace(thePartDoc, [theSelection])
+
+def checkFilter(thePartDoc, theModel, theFilter, theShapesList):
+  """ Check filter's work on specified shape.
+      Shapes given as a dictionary of selection and expected result.
+  """
+  aFiltersFactory = ModelAPI_Session.get().filters()
+  for sel, res in theShapesList.items():
+    needUndo = False
+    if sel.variantType() == ModelHighAPI_Selection.VT_ResultSubShapePair:
+      shape = sel.resultSubShapePair()[1]
+    else:
+      needUndo = True
+      theModel.begin()
+      subShapeFeature = createSubShape(thePartDoc, theModel, sel)
+      theModel.end()
+      shape = subShapeFeature.results()[0].resultSubShapePair()[0].shape()
+    assert(aFiltersFactory.isValid(theFilter.feature(), shape) == res)
+    if needUndo:
+      theModel.undo()

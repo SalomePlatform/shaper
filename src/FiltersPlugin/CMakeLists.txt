@@ -18,6 +18,7 @@
 ##
 
 INCLUDE(Common)
+INCLUDE(UnitTest)
 
 SET(PROJECT_HEADERS
     FiltersPlugin.h
@@ -64,3 +65,11 @@ INCLUDE_DIRECTORIES(
 
 INSTALL(TARGETS Filters DESTINATION ${SHAPER_INSTALL_PLUGIN_FILES})
 INSTALL(FILES ${XML_RESOURCES} DESTINATION ${SHAPER_INSTALL_XML_RESOURCES})
+
+ADD_UNIT_TESTS(
+  TestFilters.py
+  TestFilter_BelongsTo.py
+  TestFilter_OnPlane.py
+  TestFilter_HorizontalFaces.py
+  TestFilter_VerticalFaces.py
+)

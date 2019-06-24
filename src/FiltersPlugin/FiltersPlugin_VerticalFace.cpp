@@ -33,14 +33,12 @@ bool FiltersPlugin_VerticalFace::isSupported(GeomAPI_Shape::ShapeType theType) c
 bool FiltersPlugin_VerticalFace::isOk(
   const GeomShapePtr& theShape, const ModelAPI_FiltersArgs& theArgs) const
 {
-  if (!theShape->isFace())
+  if (!theShape->isFace() || !theShape->isPlanar())
     return false;
-  if (theShape->isPlanar()) {
-    GeomFacePtr aFace(new GeomAPI_Face(theShape));
 
-    GeomPlanePtr aPlane = aFace->getPlane();
-    GeomDirPtr aDir = aPlane->direction();
-    return fabs(aDir->z()) <= 1.e-7;
-  }
-  return false;
+  GeomFacePtr aFace(new GeomAPI_Face(theShape));
+
+  GeomPlanePtr aPlane = aFace->getPlane();
+  GeomDirPtr aDir = aPlane->direction();
+  return fabs(aDir->z()) <= 1.e-7;
 }

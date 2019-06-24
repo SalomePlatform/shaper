@@ -22,6 +22,7 @@
 #include <ModelAPI_Feature.h>
 
 #include <ModelHighAPI_Dumper.h>
+#include <ModelHighAPI_Tools.h>
 
 FiltersAPI_Feature::FiltersAPI_Feature(
     const std::shared_ptr<ModelAPI_Feature> & theFeature)
@@ -41,6 +42,19 @@ void FiltersAPI_Feature::setFilters(const std::list<FilterAPIPtr>& theFilters)
        anIt != theFilters.end(); ++anIt) {
     aBase->addFilter((*anIt)->name());
     aBase->setReversed((*anIt)->name(), (*anIt)->isReversed());
+
+    const std::list<ModelHighAPI_Selection>& anArgs = (*anIt)->arguments();
+    if (!anArgs.empty()) {
+      // find selectionList argument and fill it
+      std::list<AttributePtr> aFilterArgs = aBase->filterArgs((*anIt)->name());
+      for (std::list<AttributePtr>::iterator aFIt = aFilterArgs.begin();
+           aFIt != aFilterArgs.end(); ++aFIt) {
+        AttributeSelectionListPtr aSelList =
+            std::dynamic_pointer_cast<ModelAPI_AttributeSelectionList>(*aFIt);
+        if (aSelList)
+          fillAttribute(anArgs, aSelList);
+      }
+    }
   }
 }
 

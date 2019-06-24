@@ -40,6 +40,10 @@ public:
   /// Destructor
   FILTERSAPI_EXPORT
   virtual ~FiltersAPI_Selection();
+
+  /// Return filters feature
+  FILTERSAPI_EXPORT
+  FiltersFeaturePtr feature() const;
 };
 
 /// Create list of filters

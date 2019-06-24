@@ -30,7 +30,7 @@ bool FiltersPlugin_HorizontalFace::isSupported(GeomAPI_Shape::ShapeType theType)
 bool FiltersPlugin_HorizontalFace::isOk(
   const GeomShapePtr& theShape, const ModelAPI_FiltersArgs& theArgs) const
 {
-  if (!theShape->isPlanar())
+  if (!theShape->isFace() || !theShape->isPlanar())
     return false;
   GeomFacePtr aFace(new GeomAPI_Face(theShape));
 

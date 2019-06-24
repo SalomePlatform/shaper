@@ -26,7 +26,7 @@
 #include <Model_Application.h>
 #include <Model_Events.h>
 #include <Model_Validator.h>
-#include <Model_Filter.h>
+#include <Model_FiltersFactory.h>
 #include <ModelAPI_Events.h>
 #include <Events_Loop.h>
 #include <Events_InfoMessage.h>

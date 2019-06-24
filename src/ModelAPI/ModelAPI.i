@@ -65,6 +65,7 @@
 %shared_ptr(ModelAPI_Feature)
 %shared_ptr(ModelAPI_CompositeFeature)
 %shared_ptr(ModelAPI_Data)
+%shared_ptr(ModelAPI_FiltersFeature)
 %shared_ptr(ModelAPI_Folder)
 %shared_ptr(ModelAPI_Attribute)
 %shared_ptr(ModelAPI_AttributeDocRef)
@@ -157,6 +158,10 @@
 %include "ModelAPI_ResultParameter.h"
 %include "ModelAPI_Tools.h"
 %include "ModelAPI_Folder.h"
+%include "ModelAPI_Filter.h"
+%include "ModelAPI_FiltersArgs.h"
+%include "ModelAPI_FiltersFactory.h"
+%include "ModelAPI_FiltersFeature.h"
 
 // std::list -> []
 %template(StringList) std::list<std::string>;

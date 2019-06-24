@@ -51,6 +51,7 @@ public:
 
   const std::string& name() const { return myName; }
   bool isReversed() const { return myReversed; }
+  const std::list<ModelHighAPI_Selection>& arguments() const { return myFilterArguments; }
 
   /// Dump wrapped feature
   FILTERSAPI_EXPORT
