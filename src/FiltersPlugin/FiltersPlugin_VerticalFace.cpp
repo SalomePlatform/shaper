@@ -25,6 +25,8 @@
 #include <GeomAPI_Shell.h>
 #include <GeomAPI_Cylinder.h>
 
+#include <cmath>
+
 bool FiltersPlugin_VerticalFace::isSupported(GeomAPI_Shape::ShapeType theType) const
 {
   return theType == GeomAPI_Shape::FACE;
