@@ -135,7 +135,8 @@ ModuleBase_FilterItem::ModuleBase_FilterItem(
   : QWidget(theParent->filtersWidget()), myFilterID(theFilter),
     mySelection(std::dynamic_pointer_cast<ModelAPI_FiltersFeature>(theParent->feature()))
 {
-  std::string aXmlString = ModelAPI_Session::get()->filters()->filter(theFilter)->xmlRepresentation();
+  std::string aXmlString =
+      ModelAPI_Session::get()->filters()->filter(theFilter)->xmlRepresentation();
   if (aXmlString.length() == 0)
     addItemRow(this);
   else {
