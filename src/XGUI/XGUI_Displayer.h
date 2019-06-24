@@ -440,10 +440,12 @@ private:
     const NCollection_DataMap<TopoDS_Shape,
       NCollection_Map<Handle(AIS_InteractiveObject)>>& theShapesToBeSelected);
 
-protected:
+private:
   XGUI_SelectionActivate* selectionActivate() const;
 
-protected:
+  AISObjectPtr createPresentation(const ResultPtr& theResult) const;
+
+private:
   XGUI_Workshop* myWorkshop; ///< Reference to workshop
 #ifdef TINSPECTOR
   Handle(VInspectorAPI_CallBack) myVCallBack;

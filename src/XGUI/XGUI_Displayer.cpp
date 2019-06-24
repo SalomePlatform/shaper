@@ -38,6 +38,7 @@
 #include <ModelAPI_AttributeIntArray.h>
 #include <ModelAPI_ResultBody.h>
 #include <ModelAPI_ResultConstruction.h>
+#include <ModelAPI_ResultField.h>
 
 #include <ModuleBase_BRepOwner.h>
 #include <ModuleBase_IModule.h>
@@ -97,8 +98,6 @@ const int MOUSE_SENSITIVITY_IN_PIXEL = 10;
 //#define DEBUG_FEATURE_REDISPLAY
 //#define DEBUG_SELECTION_FILTERS
 
-//#define DEBUG_COMPOSILID_DISPLAY
-
 //#define DEBUG_OCCT_SHAPE_SELECTION
 
 #define CLEAR_OUTDATED_SELECTION_BEFORE_REDISPLAY
@@ -146,20 +145,6 @@ bool XGUI_Displayer::display(ObjectPtr theObject, bool theUpdateViewer)
 {
   bool aDisplayed = false;
   if (isVisible(theObject)) {
-#ifdef DEBUG_COMPOSILID_DISPLAY
-    ResultCompSolidPtr aCompsolidResult =
-      std::dynamic_pointer_cast<ModelAPI_ResultCompSolid>(theObject);
-    if (aCompsolidResult.get()) {
-      for(int i = 0; i < aCompsolidResult->numberOfSubs(); i++) {
-        ResultPtr aSubResult = aCompsolidResult->subResult(i);
-        if (aSubResult.get())
-          redisplay(aSubResult, false);
-      }
-      if (theUpdateViewer)
-        updateViewer();
-    }
-    else
-#endif
     aDisplayed = redisplay(theObject, theUpdateViewer);
   } else {
     AISObjectPtr anAIS;
@@ -172,54 +157,24 @@ bool XGUI_Displayer::display(ObjectPtr theObject, bool theUpdateViewer)
         aScreen->setViewScale(getViewScale());
       }
       anAIS = aPrs->getAISObject(anAIS);
-      //if (anAIS.get()) {
-        // correct deviation coefficient for
-        /*Handle(AIS_InteractiveObject) anAISPrs = anAIS->impl<Handle(AIS_InteractiveObject)>();
-        if (!anAISPrs.IsNull()) {
-          Handle(AIS_Shape) aShapePrs = Handle(AIS_Shape)::DownCast(anAISPrs);
-          if (!aShapePrs.IsNull()) {
-            TopoDS_Shape aShape = aShapePrs->Shape();
-            if (!aShape.IsNull())
-              //ModuleBase_Tools::setDefaultDeviationCoefficient(aShape, anAISPrs->Attributes());
-          }
-        }*/
-      //}
     } else {
       ResultPtr aResult = std::dynamic_pointer_cast<ModelAPI_Result>(theObject);
       if (aResult.get() != NULL) {
-#ifdef DEBUG_COMPOSILID_DISPLAY
-        ResultCompSolidPtr aCompsolidResult =
-          std::dynamic_pointer_cast<ModelAPI_ResultCompSolid>(theObject);
-        if (aCompsolidResult.get()) {
-          for(int i = 0; i < aCompsolidResult->numberOfSubs(); i++) {
-            ResultPtr aSubResult = aCompsolidResult->subResult(i);
-            if (aSubResult.get())
-              display(aSubResult, false);
+        anAIS = createPresentation(aResult);
+        isShading = true;
+      }
+      else {
+        FieldStepPtr aStep =
+          std::dynamic_pointer_cast<ModelAPI_ResultField::ModelAPI_FieldStep>(theObject);
+        if (aStep) {
+          GeomShapePtr aShapePtr = aStep->field()->shape();
+          if (aShapePtr.get() != NULL) {
+            Handle(AIS_InteractiveObject) anAISPrs = new ModuleBase_ResultPrs(aStep);
+            anAIS = AISObjectPtr(new GeomAPI_AISObject());
+            anAIS->setImpl(new Handle(AIS_InteractiveObject)(anAISPrs));
+            isShading = true;
           }
-          if (theUpdateViewer)
-            updateViewer();
         }
-        else {
-#endif
-        std::shared_ptr<GeomAPI_Shape> aShapePtr = ModelAPI_Tools::shape(aResult);
-        if (aShapePtr.get() != NULL) {
-          anAIS = AISObjectPtr(new GeomAPI_AISObject());
-          Handle(AIS_InteractiveObject) anAISPrs =
-            myWorkshop->module()->createPresentation(aResult);
-          if (anAISPrs.IsNull())
-            anAISPrs = new ModuleBase_ResultPrs(aResult);
-          else {
-            Handle(AIS_Shape) aShapePrs = Handle(AIS_Shape)::DownCast(anAISPrs);
-            if (!aShapePrs.IsNull())
-              ModuleBase_Tools::setPointBallHighlighting((AIS_Shape*) aShapePrs.get());
-          }
-          anAIS->setImpl(new Handle(AIS_InteractiveObject)(anAISPrs));
-          //anAIS->createShape(aShapePtr);
-          isShading = true;
-        }
-#ifdef DEBUG_COMPOSILID_DISPLAY
-        } // close else
-#endif
       }
     }
     if (anAIS)
@@ -227,6 +182,31 @@ bool XGUI_Displayer::display(ObjectPtr theObject, bool theUpdateViewer)
   }
   return aDisplayed;
 }
+
+
+//**************************************************************
+AISObjectPtr XGUI_Displayer::createPresentation(const ResultPtr& theResult) const
+{
+  AISObjectPtr anAIS;
+  if (theResult.get() != NULL) {
+    std::shared_ptr<GeomAPI_Shape> aShapePtr = ModelAPI_Tools::shape(theResult);
+    if (aShapePtr.get() != NULL) {
+      anAIS = AISObjectPtr(new GeomAPI_AISObject());
+      Handle(AIS_InteractiveObject) anAISPrs =
+        myWorkshop->module()->createPresentation(theResult);
+      if (anAISPrs.IsNull())
+        anAISPrs = new ModuleBase_ResultPrs(theResult);
+      else {
+        Handle(AIS_Shape) aShapePrs = Handle(AIS_Shape)::DownCast(anAISPrs);
+        if (!aShapePrs.IsNull())
+          ModuleBase_Tools::setPointBallHighlighting((AIS_Shape*)aShapePrs.get());
+      }
+      anAIS->setImpl(new Handle(AIS_InteractiveObject)(anAISPrs));
+    }
+  }
+  return anAIS;
+}
+
 
 //**************************************************************
 bool canBeShaded(Handle(AIS_InteractiveObject) theAIS, ModuleBase_IModule* theModule)

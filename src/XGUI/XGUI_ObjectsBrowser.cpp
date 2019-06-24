@@ -231,44 +231,67 @@ void XGUI_DataTree::processHistoryChange(const QModelIndex& theIndex)
 
 void XGUI_DataTree::processEyeClick(const QModelIndex& theIndex)
 {
+  static Events_Loop* aLoop = Events_Loop::loop();
+  static Events_ID EVENT_DISP = aLoop->eventByName(EVENT_OBJECT_TO_REDISPLAY);
+  static const ModelAPI_EventCreator* aECreator = ModelAPI_EventCreator::get();
+
   XGUI_DataModel* aModel = dataModel();
   ObjectPtr aObj = aModel->object(theIndex);
   if (aObj.get()) {
-    ResultPtr aResObj = std::dynamic_pointer_cast<ModelAPI_Result>(aObj);
     XGUI_ObjectsBrowser* aObjBrowser = qobject_cast<XGUI_ObjectsBrowser*>(parent());
-    if (aResObj.get()) {
-      std::set<ObjectPtr> anObjects;
-      anObjects.insert(aResObj);
-
-      bool hasHiddenState = aModel->hasHiddenState(theIndex);
-      if (aObjBrowser && hasHiddenState && !aObjBrowser->workshop()->prepareForDisplay(anObjects))
-        return;
-      if (hasHiddenState) { // #issue 2335(hide all faces then show solid problem)
-        if (aResObj->isDisplayed())
-          aResObj->setDisplayed(false);
-        aResObj->setDisplayed(true);
+    ResultFieldPtr aField = std::dynamic_pointer_cast<ModelAPI_ResultField>(aObj);
+    if (aField.get()) {
+      bool toDisplay = !aField->isDisplayed();
+      aField->setDisplayed(toDisplay);
+      if (toDisplay) {
+        for (int i = 0; i < aField->stepsSize(); i++) {
+          aField->step(i)->setDisplayed(false);
+          // TODO: Sending events has to be removed when step will be defined as Object
+          aECreator->sendUpdated(aField->step(i), EVENT_DISP);
+        }
       }
-      else
-        aResObj->setDisplayed(!aResObj->isDisplayed());
       Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_TO_REDISPLAY));
-      update(theIndex);
     }
     else {
       FieldStepPtr aStep =
         std::dynamic_pointer_cast<ModelAPI_ResultField::ModelAPI_FieldStep>(aObj);
       if (aStep.get()) {
         // Only one step from a field can be visible at once
-        int aId = aStep->id();
-        ModelAPI_ResultField* aField = aStep->field();
-        aField->setDisplayed(false);
-        for (int i = 0; i < aField->stepsSize(); i++) {
-          aField->step(i)->setDisplayed(i == aId);
-          static Events_Loop* aLoop = Events_Loop::loop();
-          static Events_ID EVENT_DISP = aLoop->eventByName(EVENT_OBJECT_TO_REDISPLAY);
-          static const ModelAPI_EventCreator* aECreator = ModelAPI_EventCreator::get();
-          aECreator->sendUpdated(aField->step(i), EVENT_DISP);
+        bool toDisplay = !aStep->isDisplayed();
+        if (toDisplay) {
+          int aId = aStep->id();
+          ModelAPI_ResultField* aField = aStep->field();
+          aField->setDisplayed(false);
+          for (int i = 0; i < aField->stepsSize(); i++) {
+            aField->step(i)->setDisplayed(i == aId);
+            // TODO: Sending events has to be removed when step will be defined as Object
+            aECreator->sendUpdated(aField->step(i), EVENT_DISP);
+          }
+        }
+        else {
+          aStep->setDisplayed(false);
+          aECreator->sendUpdated(aStep, EVENT_DISP);
         }
         Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_TO_REDISPLAY));
+      }
+      else {
+        ResultPtr aResObj = std::dynamic_pointer_cast<ModelAPI_Result>(aObj);
+        if (aResObj.get()) {
+          std::set<ObjectPtr> anObjects;
+          anObjects.insert(aResObj);
+
+          bool hasHiddenState = aModel->hasHiddenState(theIndex);
+          if (aObjBrowser && hasHiddenState && !aObjBrowser->workshop()->prepareForDisplay(anObjects))
+            return;
+          if (hasHiddenState) { // #issue 2335(hide all faces then show solid problem)
+            if (aResObj->isDisplayed())
+              aResObj->setDisplayed(false);
+            aResObj->setDisplayed(true);
+          }
+          else
+            aResObj->setDisplayed(!aResObj->isDisplayed());
+          Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_TO_REDISPLAY));
+        }
       }
     }
     // Update list of selected objects because this event happens after
@@ -276,6 +299,7 @@ void XGUI_DataTree::processEyeClick(const QModelIndex& theIndex)
     if (aObjBrowser) {
       aObjBrowser->onSelectionChanged();
     }
+    update(theIndex);
   }
 }
 

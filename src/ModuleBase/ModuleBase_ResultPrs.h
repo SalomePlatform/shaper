@@ -23,6 +23,7 @@
 #include "ModuleBase.h"
 
 #include <ModelAPI_Result.h>
+#include <ModelAPI_ResultField.h>
 
 #include <BRep_Builder.hxx>
 #include <NCollection_List.hxx>
@@ -55,6 +56,10 @@ public:
   /// Constructor
   /// \param theResult a result object
   Standard_EXPORT ModuleBase_ResultPrs(ResultPtr theResult);
+
+  /// Constructor
+  /// \param theResult a result object
+  Standard_EXPORT ModuleBase_ResultPrs(FieldStepPtr theStep);
 
   //! Method which draws selected owners ( for fast presentation draw )
   Standard_EXPORT virtual void HilightSelected(const Handle(PrsMgr_PresentationManager3d)& thePM,
@@ -147,9 +152,16 @@ private:
 
   void setEdgesDefaultColor();
 
+  void init();
+
+  GeomShapePtr getOriginalShape() const;
+
 private:
   /// Reference to result object
   ResultPtr myResult;
+
+  /// Reference to step object (initialised is only or step or result)
+  FieldStepPtr myStep;
 
   /// Original shape of the result object
   TopoDS_Shape myOriginalShape;

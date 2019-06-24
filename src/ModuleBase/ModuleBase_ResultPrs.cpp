@@ -70,6 +70,29 @@ ModuleBase_ResultPrs::ModuleBase_ResultPrs(ResultPtr theResult)
   TopoDS_Shape aShape = aShapePtr->impl<TopoDS_Shape>();
   Set(aShape);
 
+  // Activate individual repaintng if this is a part of compsolid
+  ResultBodyPtr aResOwner = ModelAPI_Tools::bodyOwner(myResult);
+  SetAutoHilight(aResOwner.get() == NULL);
+
+  init();
+}
+
+//********************************************************************
+ModuleBase_ResultPrs::ModuleBase_ResultPrs(FieldStepPtr theStep)
+  : ViewerData_AISShape(TopoDS_Shape()), myStep(theStep), myAdditionalSelectionPriority(0),
+  myTransparency(1), myIsSubstituted(false)
+{
+  GeomShapePtr aShapePtr = theStep->field()->shape();
+  TopoDS_Shape aShape = aShapePtr->impl<TopoDS_Shape>();
+  Set(aShape);
+
+  init();
+}
+
+
+//********************************************************************
+void ModuleBase_ResultPrs::init()
+{
   // Set own free boundaries aspect in order to have free
   // and unfree boundaries with different colors
   Handle(Prs3d_Drawer) aDrawer = Attributes();
@@ -82,11 +105,7 @@ ModuleBase_ResultPrs::ModuleBase_ResultPrs(ResultPtr theResult)
   else
     aDrawer->SetPointAspect(new Prs3d_PointAspect(Aspect_TOM_PLUS, Quantity_NOC_YELLOW, 1.));
 
-  // Activate individual repaintng if this is a part of compsolid
-  ResultBodyPtr aResOwner = ModelAPI_Tools::bodyOwner(myResult);
-  SetAutoHilight(aResOwner.get() == NULL);
-
-  myHiddenSubShapesDrawer = new AIS_ColoredDrawer (myDrawer);
+  myHiddenSubShapesDrawer = new AIS_ColoredDrawer(myDrawer);
   Handle(Prs3d_ShadingAspect) aShadingAspect = new Prs3d_ShadingAspect();
   aShadingAspect->SetMaterial(Graphic3d_NOM_BRASS); //default value of context material
   myHiddenSubShapesDrawer->SetShadingAspect(aShadingAspect);
@@ -96,6 +115,7 @@ ModuleBase_ResultPrs::ModuleBase_ResultPrs(ResultPtr theResult)
   // Define colors for wireframe mode
   setEdgesDefaultColor();
 }
+
 
 //********************************************************************
 void ModuleBase_ResultPrs::setAdditionalSelectionPriority(const int thePriority)
@@ -113,31 +133,33 @@ void ModuleBase_ResultPrs::SetColor (const Quantity_Color& theColor)
 
 void ModuleBase_ResultPrs::setEdgesDefaultColor()
 {
-  AttributeIntArrayPtr aColorAttr = myResult->data()->intArray(ModelAPI_Result::COLOR_ID());
-  bool aHasColor = aColorAttr.get() && aColorAttr->isInitialized();
+  if (myResult.get()) {
+    AttributeIntArrayPtr aColorAttr = myResult->data()->intArray(ModelAPI_Result::COLOR_ID());
+    bool aHasColor = aColorAttr.get() && aColorAttr->isInitialized();
 
-  if (!aHasColor) {
-    Handle(Prs3d_Drawer) aDrawer = Attributes();
-    Handle(Prs3d_LineAspect) anAspect; // = aDrawer->LineAspect();
-    //anAspect->SetColor(Quantity_NOC_YELLOW);
-    //aDrawer->SetLineAspect(anAspect);
+    if (!aHasColor) {
+      Handle(Prs3d_Drawer) aDrawer = Attributes();
+      Handle(Prs3d_LineAspect) anAspect; // = aDrawer->LineAspect();
+      //anAspect->SetColor(Quantity_NOC_YELLOW);
+      //aDrawer->SetLineAspect(anAspect);
 
-    // - unfree boundaries color
-    anAspect = aDrawer->UnFreeBoundaryAspect();
-    anAspect->SetColor(Quantity_NOC_YELLOW);
-    aDrawer->SetUnFreeBoundaryAspect(anAspect);
-    aDrawer->SetUnFreeBoundaryDraw(true);
+      // - unfree boundaries color
+      anAspect = aDrawer->UnFreeBoundaryAspect();
+      anAspect->SetColor(Quantity_NOC_YELLOW);
+      aDrawer->SetUnFreeBoundaryAspect(anAspect);
+      aDrawer->SetUnFreeBoundaryDraw(true);
 
-    // - free boundaries color
-    anAspect = aDrawer->FreeBoundaryAspect();
-    anAspect->SetColor(Quantity_NOC_GREEN);
-    aDrawer->SetFreeBoundaryAspect(anAspect);
-    aDrawer->SetFreeBoundaryDraw(true);
+      // - free boundaries color
+      anAspect = aDrawer->FreeBoundaryAspect();
+      anAspect->SetColor(Quantity_NOC_GREEN);
+      aDrawer->SetFreeBoundaryAspect(anAspect);
+      aDrawer->SetFreeBoundaryDraw(true);
 
-    // - standalone edges color
-    anAspect = aDrawer->WireAspect();
-    anAspect->SetColor(Quantity_NOC_RED);
-    aDrawer->SetWireAspect(anAspect);
+      // - standalone edges color
+      anAspect = aDrawer->WireAspect();
+      anAspect->SetColor(Quantity_NOC_RED);
+      aDrawer->SetWireAspect(anAspect);
+    }
   }
 }
 
@@ -240,12 +262,20 @@ bool ModuleBase_ResultPrs::setHiddenSubShapeTransparency(double theTransparency)
 }
 
 //********************************************************************
+GeomShapePtr ModuleBase_ResultPrs::getOriginalShape() const
+{
+  if (myStep.get())
+    return myStep->field()->shape();
+  return myResult->shape();
+}
+
+//********************************************************************
 void ModuleBase_ResultPrs::Compute(
           const Handle(PrsMgr_PresentationManager3d)& thePresentationManager,
           const Handle(Prs3d_Presentation)& thePresentation,
           const Standard_Integer theMode)
 {
-  std::shared_ptr<GeomAPI_Shape> aShapePtr = ModelAPI_Tools::shape(myResult);
+  std::shared_ptr<GeomAPI_Shape> aShapePtr = getOriginalShape();
   bool aReadyToDisplay = aShapePtr.get();
   if (aReadyToDisplay) {
     myOriginalShape = aShapePtr->impl<TopoDS_Shape>();
@@ -272,8 +302,6 @@ void ModuleBase_ResultPrs::Compute(
         aReadyToDisplay = false;
     }
   }
-  // change deviation coefficient to provide more precise circle
-  //ModuleBase_Tools::setDefaultDeviationCoefficient(myResult, Attributes());
   try {
     AIS_Shape::Compute(thePresentationManager, thePresentation, theMode);
   }
@@ -282,17 +310,19 @@ void ModuleBase_ResultPrs::Compute(
   }
 
   // visualize hidden sub-shapes transparent
-  if (myTransparency < 1 && !myHiddenSubShapes.IsEmpty())
-  {
-    StdPrs_ShadedShape::Add (thePresentation, myHiddenCompound, myHiddenSubShapesDrawer);
-    aReadyToDisplay = true;
-  }
+  if (myResult.get()) {
+    if (myTransparency < 1 && !myHiddenSubShapes.IsEmpty())
+    {
+      StdPrs_ShadedShape::Add(thePresentation, myHiddenCompound, myHiddenSubShapesDrawer);
+      aReadyToDisplay = true;
+    }
 
-  if (!aReadyToDisplay) {
-    Events_InfoMessage("ModuleBase_ResultPrs",
-                       "An empty AIS presentation: ModuleBase_ResultPrs").send();
-    static const Events_ID anEvent = Events_Loop::eventByName(EVENT_EMPTY_AIS_PRESENTATION);
-    ModelAPI_EventCreator::get()->sendUpdated(myResult, anEvent);
+    if (!aReadyToDisplay) {
+      Events_InfoMessage("ModuleBase_ResultPrs",
+        "An empty AIS presentation: ModuleBase_ResultPrs").send();
+      static const Events_ID anEvent = Events_Loop::eventByName(EVENT_EMPTY_AIS_PRESENTATION);
+      ModelAPI_EventCreator::get()->sendUpdated(myResult, anEvent);
+    }
   }
 }
 
