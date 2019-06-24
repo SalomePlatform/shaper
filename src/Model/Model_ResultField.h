@@ -39,11 +39,13 @@ public:
   {
   public:
     Model_FieldStep(ModelAPI_ResultField* theParent, int theId)
-      : myParent(theParent), myId(theId) {};
+      : ModelAPI_ResultField::ModelAPI_FieldStep(), myParent(theParent), myId(theId) {};
 
     virtual ModelAPI_ResultField* field() const { return myParent; }
 
     virtual int id() const { return myId; }
+
+    virtual std::shared_ptr<ModelAPI_Document> document() const { return myParent->document(); }
 
   private:
     ModelAPI_ResultField* myParent;
@@ -66,7 +68,7 @@ public:
 
   /// Returns step object
   /// \param theId an id of the object
-  MODEL_EXPORT virtual ModelAPI_ResultField::ModelAPI_FieldStep* step(int theId) const;
+  MODEL_EXPORT virtual std::shared_ptr<ModelAPI_ResultField::ModelAPI_FieldStep> step(int theId) const;
 
   /// Removes the stored builders
   MODEL_EXPORT virtual ~Model_ResultField();
@@ -80,7 +82,7 @@ protected:
 private:
   void updateSteps();
 
-  std::vector<ModelAPI_FieldStep*> mySteps;
+  std::vector<FieldStepPtr> mySteps;
 };
 
 #endif

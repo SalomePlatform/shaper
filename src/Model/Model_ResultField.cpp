@@ -37,7 +37,7 @@ Model_ResultField::Model_ResultField(std::shared_ptr<ModelAPI_Data> theOwnerData
 Model_ResultField::~Model_ResultField()
 {
   while(mySteps.size() > 0) {
-    delete mySteps.back();
+    //delete mySteps.back();
     mySteps.pop_back();
   }
 }
@@ -106,11 +106,11 @@ void Model_ResultField::updateSteps()
   int aNbSteps = stepsSize();
   if (mySteps.size() != aNbSteps) {
     while(mySteps.size() > aNbSteps) {
-      delete mySteps.back();
+      //delete mySteps.back();
       mySteps.pop_back();
     }
     while(mySteps.size() < aNbSteps) {
-      mySteps.push_back(new Model_ResultField::Model_FieldStep(this, int(mySteps.size())));
+      mySteps.push_back(FieldStepPtr(new Model_ResultField::Model_FieldStep(this, int(mySteps.size()))));
     }
   }
 }
@@ -143,7 +143,7 @@ std::string Model_ResultField::textLine(int theLine) const
 
 // used by GUI only
 // LCOV_EXCL_START
-ModelAPI_ResultField::ModelAPI_FieldStep* Model_ResultField::step(int theId) const
+std::shared_ptr<ModelAPI_ResultField::ModelAPI_FieldStep> Model_ResultField::step(int theId) const
 {
   if (theId < mySteps.size()) {
     return mySteps[theId];

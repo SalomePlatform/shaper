@@ -25,6 +25,7 @@
 #include <ModelAPI_Session.h>
 #include <ModelAPI_Document.h>
 #include <ModelAPI_Tools.h>
+#include <ModelAPI_ResultField.h>
 
 #include <ModuleBase_Tools.h>
 #include <ModuleBase_ITreeNode.h>
@@ -251,6 +252,24 @@ void XGUI_DataTree::processEyeClick(const QModelIndex& theIndex)
         aResObj->setDisplayed(!aResObj->isDisplayed());
       Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_TO_REDISPLAY));
       update(theIndex);
+    }
+    else {
+      FieldStepPtr aStep =
+        std::dynamic_pointer_cast<ModelAPI_ResultField::ModelAPI_FieldStep>(aObj);
+      if (aStep.get()) {
+        // Only one step from a field can be visible at once
+        int aId = aStep->id();
+        ModelAPI_ResultField* aField = aStep->field();
+        aField->setDisplayed(false);
+        for (int i = 0; i < aField->stepsSize(); i++) {
+          aField->step(i)->setDisplayed(i == aId);
+          static Events_Loop* aLoop = Events_Loop::loop();
+          static Events_ID EVENT_DISP = aLoop->eventByName(EVENT_OBJECT_TO_REDISPLAY);
+          static const ModelAPI_EventCreator* aECreator = ModelAPI_EventCreator::get();
+          aECreator->sendUpdated(aField->step(i), EVENT_DISP);
+        }
+        Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_TO_REDISPLAY));
+      }
     }
     // Update list of selected objects because this event happens after
     // selection event in object browser

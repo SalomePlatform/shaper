@@ -35,12 +35,45 @@ class ModelAPI_ResultField : public ModelAPI_Result
 {
 public:
 
-  class ModelAPI_FieldStep : public ModelAPI_Entity
+  class ModelAPI_FieldStep : public ModelAPI_Object
   {
   public:
     virtual ModelAPI_ResultField* field() const = 0;
 
     virtual int id() const = 0;
+
+    /// Returns the group identifier of this result
+    inline static std::string group()
+    {
+      static std::string MY_GROUP = "FieldRersultStep";
+      return MY_GROUP;
+    }
+
+    /// Returns the group identifier of this object
+    virtual std::string groupName() { return group(); }
+
+    /// Request for initialization of data model of the object: adding all attributes
+    virtual void initAttributes() {}
+
+    /// Returns the feature is disabled or not.
+    virtual bool isDisabled() { return false; }
+
+    /// Returns true if object must be displayed in the viewer: flag is stored in the
+    /// data model, so on undo/redo, open/save or recreation of object by history-playing it keeps
+    /// the original state in the current transaction.
+    virtual bool isDisplayed() { return myIsDisplayed; }
+
+    /// Sets the displayed/hidden state of the object. If it is changed, sends the "redisplay"
+    /// signal.
+    MODELAPI_EXPORT virtual void setDisplayed(const bool theDisplay);
+
+  protected:
+    /// This method is called just after creation of the object: it must initialize
+    /// all fields, normally initialized in the constructor
+    MODELAPI_EXPORT virtual void init() {}
+
+  private:
+    bool myIsDisplayed;
   };
 
   MODELAPI_EXPORT virtual ~ModelAPI_ResultField();
@@ -70,7 +103,7 @@ public:
 
   /// Returns step object
   /// \param theId an id of the object
-  virtual ModelAPI_FieldStep* step(int theId) const = 0;
+  virtual std::shared_ptr<ModelAPI_ResultField::ModelAPI_FieldStep> step(int theId) const = 0;
 };
 
 //! Pointer on feature object
