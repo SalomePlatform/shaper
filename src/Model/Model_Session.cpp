@@ -98,12 +98,14 @@ void Model_Session::finishOperation()
 {
   setCheckTransactions(false);
   ROOT_DOC->finishOperation();
-  while(myOperationAttachedToNext.back()) {
-    // with nested, the first transaction can not be attached
-    ROOT_DOC->finishOperation();
+  if (!myOperationAttachedToNext.empty()) {
+    while (myOperationAttachedToNext.back()) {
+      // with nested, the first transaction can not be attached
+      ROOT_DOC->finishOperation();
+      myOperationAttachedToNext.pop_back();
+    }
     myOperationAttachedToNext.pop_back();
   }
-  myOperationAttachedToNext.pop_back();
   setCheckTransactions(true);
 }
 
@@ -111,12 +113,14 @@ void Model_Session::abortOperation()
 {
   setCheckTransactions(false);
   ROOT_DOC->abortOperation();
-  while(myOperationAttachedToNext.back()) {
-    // with nested, the first transaction can not be attached
-    ROOT_DOC->abortOperation();
+  if (!myOperationAttachedToNext.empty()) {
+    while (myOperationAttachedToNext.back()) {
+      // with nested, the first transaction can not be attached
+      ROOT_DOC->abortOperation();
+      myOperationAttachedToNext.pop_back();
+    }
     myOperationAttachedToNext.pop_back();
   }
-  myOperationAttachedToNext.pop_back();
   setCheckTransactions(true);
   // here the update mechanism may work after abort, so, suppress the warnings about
   // modifications outside of the transactions
