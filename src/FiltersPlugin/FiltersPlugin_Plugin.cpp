@@ -23,6 +23,7 @@
 #include "FiltersPlugin_VerticalFace.h"
 #include "FiltersPlugin_BelongsTo.h"
 #include "FiltersPlugin_OnPlane.h"
+#include "FiltersPlugin_OnLine.h"
 
 #include <ModelAPI_Session.h>
 #include <ModelAPI_FiltersFactory.h>
@@ -39,6 +40,7 @@ FiltersPlugin_Plugin::FiltersPlugin_Plugin()
   aFactory->registerFilter("VerticalFaces", new FiltersPlugin_VerticalFace);
   aFactory->registerFilter("BelongsTo", new FiltersPlugin_BelongsTo);
   aFactory->registerFilter("OnPlane", new FiltersPlugin_OnPlane);
+  aFactory->registerFilter("OnLine", new FiltersPlugin_OnLine);
 
   ModelAPI_Session::get()->registerPlugin(this);
 }
