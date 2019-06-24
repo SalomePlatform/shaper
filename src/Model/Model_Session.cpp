@@ -98,7 +98,8 @@ void Model_Session::finishOperation()
 {
   setCheckTransactions(false);
   ROOT_DOC->finishOperation();
-  while(myOperationAttachedToNext.back()) { // with nested, the first transaction can not be attached
+  while(myOperationAttachedToNext.back()) {
+    // with nested, the first transaction can not be attached
     ROOT_DOC->finishOperation();
     myOperationAttachedToNext.pop_back();
   }
@@ -110,7 +111,8 @@ void Model_Session::abortOperation()
 {
   setCheckTransactions(false);
   ROOT_DOC->abortOperation();
-  while(myOperationAttachedToNext.back()) { // with nested, the first transaction can not be attached
+  while(myOperationAttachedToNext.back()) {
+    // with nested, the first transaction can not be attached
     ROOT_DOC->abortOperation();
     myOperationAttachedToNext.pop_back();
   }
