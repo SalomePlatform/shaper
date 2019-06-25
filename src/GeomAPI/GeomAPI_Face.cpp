@@ -104,6 +104,18 @@ bool GeomAPI_Face::isEqual(std::shared_ptr<GeomAPI_Shape> theFace) const
   return aRes == Standard_True;
 }
 
+bool GeomAPI_Face::isSameGeometry(const std::shared_ptr<GeomAPI_Shape> theShape) const
+{
+  if (!theShape->isFace())
+    return false;
+  TopoDS_Face anOwnFace = TopoDS::Face(impl<TopoDS_Shape>());
+  TopoDS_Face anOtherFace = TopoDS::Face(theShape->impl<TopoDS_Shape>());
+
+  Handle(Geom_Surface) anOwnSurf = BRep_Tool::Surface(anOwnFace);
+  Handle(Geom_Surface) anOtherSurf = BRep_Tool::Surface(anOtherFace);
+  return anOwnSurf == anOtherSurf;
+}
+
 bool GeomAPI_Face::isCylindrical() const
 {
   const TopoDS_Shape& aShape = const_cast<GeomAPI_Face*>(this)->impl<TopoDS_Shape>();

@@ -101,6 +101,15 @@ bool GeomAPI_Shape::isSame(const std::shared_ptr<GeomAPI_Shape> theShape) const
   return MY_SHAPE->IsSame(theShape->impl<TopoDS_Shape>()) == Standard_True;
 }
 
+bool GeomAPI_Shape::isSameGeometry(const std::shared_ptr<GeomAPI_Shape> theShape) const
+{
+  if (isFace())
+    return face()->isSameGeometry(theShape);
+  else if (isEdge())
+    return edge()->isSameGeometry(theShape);
+  return false;
+}
+
 bool GeomAPI_Shape::isVertex() const
 {
   const TopoDS_Shape& aShape = const_cast<GeomAPI_Shape*>(this)->impl<TopoDS_Shape>();

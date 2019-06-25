@@ -29,6 +29,7 @@ SET(PROJECT_HEADERS
     FiltersPlugin_BelongsTo.h
     FiltersPlugin_OnPlane.h
     FiltersPlugin_OnLine.h
+    FiltersPlugin_OnGeometry.h
 )
 
 SET(PROJECT_SOURCES
@@ -39,6 +40,7 @@ SET(PROJECT_SOURCES
     FiltersPlugin_BelongsTo.cpp
     FiltersPlugin_OnPlane.cpp
     FiltersPlugin_OnLine.cpp
+    FiltersPlugin_OnGeometry.cpp
 )
 
 SET(PROJECT_LIBRARIES
@@ -73,6 +75,8 @@ ADD_UNIT_TESTS(
   TestFilter_BelongsTo.py
   TestFilter_OnPlane.py
   TestFilter_OnLine.py
+  TestFilter_OnGeometry_Edge.py
+  TestFilter_OnGeometry_Face.py
   TestFilter_HorizontalFaces.py
   TestFilter_VerticalFaces.py
 )

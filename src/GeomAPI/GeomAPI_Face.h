@@ -47,6 +47,10 @@ public:
   GEOMAPI_EXPORT
   virtual bool isEqual(const std::shared_ptr<GeomAPI_Shape> theFace) const;
 
+  /// Returns \c true if faces have same underlying surface
+  GEOMAPI_EXPORT
+  virtual bool isSameGeometry(const std::shared_ptr<GeomAPI_Shape> theShape) const;
+
   /// Returns true if the face is a cylindrical face
   GEOMAPI_EXPORT
   bool isCylindrical() const;

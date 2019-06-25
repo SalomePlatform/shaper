@@ -44,6 +44,10 @@ public:
   GEOMAPI_EXPORT
    GeomAPI_Edge(const std::shared_ptr<GeomAPI_Shape>& theShape);
 
+  /// Returns \c true if edges have same underlying curve
+  GEOMAPI_EXPORT
+  virtual bool isSameGeometry(const std::shared_ptr<GeomAPI_Shape> theShape) const;
+
   /// Verifies that the edge is a line
   GEOMAPI_EXPORT
   bool isLine() const;
