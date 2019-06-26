@@ -596,8 +596,7 @@ void XGUI_ViewerProxy::setColorScaleSize(double theW, double theH)
   myWorkshop->salomeConnector()->viewer()->setColorScaleShown(on);
 #else
   Handle(AIS_ColorScale) aColorScale = myWorkshop->mainWindow()->viewer()->colorScale();
-  aColorScale->SetWidth(aWindow->width() * theW);
-  aColorScale->SetHeight(aWindow->height() * theH);
+  aColorScale->SetSize(aWindow->width() * theW, aWindow->height() * theH);
 #endif
 }
 
@@ -649,6 +648,7 @@ void XGUI_ViewerProxy::setupColorScale()
   setColorScaleSize(0.2, 0.5);
   setColorScaleTextHeigth(14);
   setColorScaleIntervals(20);
+  Handle(AIS_ColorScale) aColorScale = myWorkshop->mainWindow()->viewer()->colorScale();
 }
 
 

@@ -151,7 +151,7 @@ void XGUI_SelectionMgr::onObjectBrowserSelection()
           aViewer->setupColorScale();
           if (aType == ModelAPI_AttributeTables::BOOLEAN) {
             aViewer->setColorScaleIntervals(2);
-            aViewer->setColorScaleRange(0, 1);
+            aViewer->setColorScaleRange(0., 1.);
           }
           else {
             double aMin, aMax;

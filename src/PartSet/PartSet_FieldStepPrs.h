@@ -57,6 +57,7 @@ protected:
 
 private:
   QList<double> range(double& theMin, double& theMax) const;
+  QList<double> booleanValues() const;
 
   FieldStepPtr myStep;
   FeaturePtr myFeature;
