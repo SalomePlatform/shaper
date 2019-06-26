@@ -342,6 +342,8 @@ def checkFilter(thePartDoc, theModel, theFilter, theShapesList):
     needUndo = False
     if sel.variantType() == ModelHighAPI_Selection.VT_ResultSubShapePair:
       shape = sel.resultSubShapePair()[1]
+      if shape.isNull():
+        shape = sel.resultSubShapePair()[0].shape()
     else:
       needUndo = True
       theModel.begin()

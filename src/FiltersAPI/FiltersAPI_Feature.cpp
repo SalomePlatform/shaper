@@ -53,6 +53,12 @@ void FiltersAPI_Feature::setFilters(const std::list<FilterAPIPtr>& theFilters)
             std::dynamic_pointer_cast<ModelAPI_AttributeSelectionList>(*aFIt);
         if (aSelList)
           fillAttribute(anArgs, aSelList);
+        else {
+          AttributeSelectionPtr aSelection =
+              std::dynamic_pointer_cast<ModelAPI_AttributeSelection>(*aFIt);
+          if (aSelection && anArgs.size() == 1)
+            fillAttribute(anArgs.front(), aSelection);
+        }
       }
     }
   }
