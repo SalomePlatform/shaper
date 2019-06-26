@@ -58,6 +58,7 @@ SET(PROJECT_HEADERS
     PartSet_CenterPrs.h
     PartSet_ExternalPointsMgr.h
 	PartSet_TreeNodes.h
+	PartSet_FieldStepPrs.h
 )
 
 SET(PROJECT_MOC_HEADERS
@@ -107,6 +108,7 @@ SET(PROJECT_SOURCES
     PartSet_CenterPrs.cpp
     PartSet_ExternalPointsMgr.cpp
 	PartSet_TreeNodes.cpp
+	PartSet_FieldStepPrs.cpp
 )
 
 SET(PROJECT_RESOURCES

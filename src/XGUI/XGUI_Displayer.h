@@ -443,8 +443,6 @@ private:
 private:
   XGUI_SelectionActivate* selectionActivate() const;
 
-  AISObjectPtr createPresentation(const ResultPtr& theResult) const;
-
 private:
   XGUI_Workshop* myWorkshop; ///< Reference to workshop
 #ifdef TINSPECTOR

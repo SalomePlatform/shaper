@@ -301,8 +301,7 @@ class MODULEBASE_EXPORT ModuleBase_IModule : public QObject
   /// Create specific for the module presentation
   /// \param theResult an object for presentation
   /// \return created presentation or NULL(default value)
-  virtual Handle(AIS_InteractiveObject) createPresentation(
-                           const std::shared_ptr<ModelAPI_Result>& theResult);
+  virtual Handle(AIS_InteractiveObject) createPresentation(const ObjectPtr& theResult);
 
   //! Returns data object by AIS
   virtual ObjectPtr findPresentedObject(const AISObjectPtr& theAIS) const = 0;

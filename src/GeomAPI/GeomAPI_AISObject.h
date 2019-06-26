@@ -49,7 +49,7 @@ class GeomAPI_AISObject : public GeomAPI_Interface
   GEOMAPI_EXPORT
   void createShape(std::shared_ptr<GeomAPI_Shape> theShape);
 
-  /// Reyirns shape used for the presentation creation (can be NULL)
+  /// Returns shape used for the presentation creation (can be NULL)
   GEOMAPI_EXPORT std::shared_ptr<GeomAPI_Shape> getShape() const;
 
   /** \brief Creates AIS_LengthDimension object

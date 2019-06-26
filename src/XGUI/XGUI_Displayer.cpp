@@ -38,7 +38,6 @@
 #include <ModelAPI_AttributeIntArray.h>
 #include <ModelAPI_ResultBody.h>
 #include <ModelAPI_ResultConstruction.h>
-#include <ModelAPI_ResultField.h>
 
 #include <ModuleBase_BRepOwner.h>
 #include <ModuleBase_IModule.h>
@@ -158,53 +157,28 @@ bool XGUI_Displayer::display(ObjectPtr theObject, bool theUpdateViewer)
       }
       anAIS = aPrs->getAISObject(anAIS);
     } else {
-      ResultPtr aResult = std::dynamic_pointer_cast<ModelAPI_Result>(theObject);
-      if (aResult.get() != NULL) {
-        anAIS = createPresentation(aResult);
-        isShading = true;
-      }
-      else {
-        FieldStepPtr aStep =
-          std::dynamic_pointer_cast<ModelAPI_ResultField::ModelAPI_FieldStep>(theObject);
-        if (aStep) {
-          GeomShapePtr aShapePtr = aStep->field()->shape();
+      Handle(AIS_InteractiveObject) anAISPrs =
+        myWorkshop->module()->createPresentation(theObject);
+      if (anAISPrs.IsNull()) {
+        ResultPtr aResult = std::dynamic_pointer_cast<ModelAPI_Result>(theObject);
+        if (aResult.get() != NULL) {
+          std::shared_ptr<GeomAPI_Shape> aShapePtr = ModelAPI_Tools::shape(aResult);
           if (aShapePtr.get() != NULL) {
-            Handle(AIS_InteractiveObject) anAISPrs = new ModuleBase_ResultPrs(aStep);
-            anAIS = AISObjectPtr(new GeomAPI_AISObject());
-            anAIS->setImpl(new Handle(AIS_InteractiveObject)(anAISPrs));
-            isShading = true;
+             anAISPrs = new ModuleBase_ResultPrs(aResult);
           }
         }
       }
+      Handle(AIS_Shape) aShapePrs = Handle(AIS_Shape)::DownCast(anAISPrs);
+      if (!aShapePrs.IsNull())
+        ModuleBase_Tools::setPointBallHighlighting((AIS_Shape*)aShapePrs.get());
+      anAIS = AISObjectPtr(new GeomAPI_AISObject());
+      anAIS->setImpl(new Handle(AIS_InteractiveObject)(anAISPrs));
+      isShading = true;
     }
     if (anAIS)
       aDisplayed = display(theObject, anAIS, isShading, theUpdateViewer);
   }
   return aDisplayed;
-}
-
-
-//**************************************************************
-AISObjectPtr XGUI_Displayer::createPresentation(const ResultPtr& theResult) const
-{
-  AISObjectPtr anAIS;
-  if (theResult.get() != NULL) {
-    std::shared_ptr<GeomAPI_Shape> aShapePtr = ModelAPI_Tools::shape(theResult);
-    if (aShapePtr.get() != NULL) {
-      anAIS = AISObjectPtr(new GeomAPI_AISObject());
-      Handle(AIS_InteractiveObject) anAISPrs =
-        myWorkshop->module()->createPresentation(theResult);
-      if (anAISPrs.IsNull())
-        anAISPrs = new ModuleBase_ResultPrs(theResult);
-      else {
-        Handle(AIS_Shape) aShapePrs = Handle(AIS_Shape)::DownCast(anAISPrs);
-        if (!aShapePrs.IsNull())
-          ModuleBase_Tools::setPointBallHighlighting((AIS_Shape*)aShapePrs.get());
-      }
-      anAIS->setImpl(new Handle(AIS_InteractiveObject)(anAISPrs));
-    }
-  }
-  return anAIS;
 }
 
 

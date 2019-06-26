@@ -74,25 +74,6 @@ ModuleBase_ResultPrs::ModuleBase_ResultPrs(ResultPtr theResult)
   ResultBodyPtr aResOwner = ModelAPI_Tools::bodyOwner(myResult);
   SetAutoHilight(aResOwner.get() == NULL);
 
-  init();
-}
-
-//********************************************************************
-ModuleBase_ResultPrs::ModuleBase_ResultPrs(FieldStepPtr theStep)
-  : ViewerData_AISShape(TopoDS_Shape()), myStep(theStep), myAdditionalSelectionPriority(0),
-  myTransparency(1), myIsSubstituted(false)
-{
-  GeomShapePtr aShapePtr = theStep->field()->shape();
-  TopoDS_Shape aShape = aShapePtr->impl<TopoDS_Shape>();
-  Set(aShape);
-
-  init();
-}
-
-
-//********************************************************************
-void ModuleBase_ResultPrs::init()
-{
   // Set own free boundaries aspect in order to have free
   // and unfree boundaries with different colors
   Handle(Prs3d_Drawer) aDrawer = Attributes();
@@ -115,7 +96,6 @@ void ModuleBase_ResultPrs::init()
   // Define colors for wireframe mode
   setEdgesDefaultColor();
 }
-
 
 //********************************************************************
 void ModuleBase_ResultPrs::setAdditionalSelectionPriority(const int thePriority)
@@ -262,20 +242,12 @@ bool ModuleBase_ResultPrs::setHiddenSubShapeTransparency(double theTransparency)
 }
 
 //********************************************************************
-GeomShapePtr ModuleBase_ResultPrs::getOriginalShape() const
-{
-  if (myStep.get())
-    return myStep->field()->shape();
-  return myResult->shape();
-}
-
-//********************************************************************
 void ModuleBase_ResultPrs::Compute(
           const Handle(PrsMgr_PresentationManager3d)& thePresentationManager,
           const Handle(Prs3d_Presentation)& thePresentation,
           const Standard_Integer theMode)
 {
-  std::shared_ptr<GeomAPI_Shape> aShapePtr = getOriginalShape();
+  std::shared_ptr<GeomAPI_Shape> aShapePtr = myResult->shape();
   bool aReadyToDisplay = aShapePtr.get();
   if (aReadyToDisplay) {
     myOriginalShape = aShapePtr->impl<TopoDS_Shape>();

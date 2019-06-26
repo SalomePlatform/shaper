@@ -38,6 +38,7 @@
 #include "PartSet_IconFactory.h"
 #include "PartSet_OverconstraintListener.h"
 #include "PartSet_TreeNodes.h"
+#include "PartSet_FieldStepPrs.h"
 
 #include "PartSet_Filters.h"
 #include "PartSet_FilterInfinite.h"
@@ -62,6 +63,7 @@
 #include <ModuleBase_WidgetFactory.h>
 #include <ModuleBase_OperationDescription.h>
 #include <ModuleBase_ViewerPrs.h>
+#include <ModelAPI_ResultField.h>
 
 #include <ModelAPI_Object.h>
 #include <ModelAPI_Events.h>
@@ -1313,9 +1315,19 @@ void PartSet_Module::onActiveDocPopup(const QPoint& thePnt)
 }
 
 //******************************************************
-Handle(AIS_InteractiveObject) PartSet_Module::createPresentation(const ResultPtr& theResult)
+Handle(AIS_InteractiveObject) PartSet_Module::createPresentation(const ObjectPtr& theObject)
 {
-  return mySketchMgr->createPresentation(theResult);
+  ResultPtr aResult = std::dynamic_pointer_cast<ModelAPI_Result>(theObject);
+  if (aResult.get())
+    return mySketchMgr->createPresentation(aResult);
+  else {
+    FieldStepPtr aStep =
+      std::dynamic_pointer_cast<ModelAPI_ResultField::ModelAPI_FieldStep>(theObject);
+    if (aStep.get()) {
+      return new PartSet_FieldStepPrs(aStep);
+    }
+  }
+  return Handle(AIS_InteractiveObject)();
 }
 
 //******************************************************
