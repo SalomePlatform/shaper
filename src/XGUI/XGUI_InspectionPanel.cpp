@@ -24,6 +24,7 @@
 
 #include <ModuleBase_ViewerPrs.h>
 #include <ModuleBase_Tools.h>
+#include <ModelAPI_ResultField.h>
 
 #include <ModelAPI_Result.h>
 
@@ -228,6 +229,10 @@ void XGUI_InspectionPanel::onSelectionChanged()
 
   if (aSelectedList.count() > 0) {
     ModuleBase_ViewerPrsPtr aPrs = aSelectedList.first();
+    FieldStepPtr aStep =
+      std::dynamic_pointer_cast<ModelAPI_ResultField::ModelAPI_FieldStep>(aPrs->object());
+    if (aStep)
+      return;
     TopoDS_Shape aShape = ModuleBase_Tools::getSelectedShape(aPrs);
     if (aShape.IsNull()) {
       ResultPtr aRes = std::dynamic_pointer_cast<ModelAPI_Result>(aPrs->object());
