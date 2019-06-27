@@ -561,6 +561,14 @@ void SHAPERGUI_SalomeViewer::setColorScaleTextHeigth(int theH)
   }
 }
 
+void SHAPERGUI_SalomeViewer::setColorScaleTextColor(const QColor& theColor)
+{
+  if (mySelector) {
+    Quantity_Color aColor(theColor.redF(), theColor.greenF(), theColor.blueF(), Quantity_TOC_RGB);
+    mySelector->viewer()->getColorScale()->SetColor(aColor);
+  }
+}
+
 void SHAPERGUI_SalomeViewer::setColorScaleTitle(const QString& theText)
 {
   if (mySelector) {
