@@ -146,6 +146,7 @@ QList<double> PartSet_FieldStepPrs::range(double& theMin, double& theMax) const
 void PartSet_FieldStepPrs::Compute(const Handle(PrsMgr_PresentationManager3d)& thePrsMgr,
   const Handle(Prs3d_Presentation)& thePrs, const Standard_Integer theMode)
 {
+  SUIT_ResourceMgr* aResMgr = ModuleBase_Preferences::resourceMgr();
   ModelAPI_AttributeTables::ValueType aType = dataType();
   DataPtr aData = myFeature->data();
   switch (aType) {
@@ -154,7 +155,6 @@ void PartSet_FieldStepPrs::Compute(const Handle(PrsMgr_PresentationManager3d)& t
   {
     double aMin, aMax;
     QList<double> aShapeData = range(aMin, aMax);
-    SUIT_ResourceMgr* aResMgr = ModuleBase_Preferences::resourceMgr();
     int aNbIntertvals = aResMgr->integerValue("Viewer", "scalar_bar_nb_intervals", 20);
 
     AttributeSelectionListPtr aSelList = aData->selectionList(CollectionPlugin_Field::SELECTED_ID());
@@ -203,8 +203,9 @@ void PartSet_FieldStepPrs::Compute(const Handle(PrsMgr_PresentationManager3d)& t
         anAspectText3d->SetColor(myLabelColor);
         aGroup->SetPrimitivesAspect(anAspectText3d);
 
+        int aT = aResMgr->integerValue("Viewer", "scalar_bar_text_height", 14);
         QString aString = aValues.at(i);
-        aGroup->Text(aString.toUtf8().constData(), aVertex, 14);
+        aGroup->Text(aString.toUtf8().constData(), aVertex, aT);
       }
     }
   }
