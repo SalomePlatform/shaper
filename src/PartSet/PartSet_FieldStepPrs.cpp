@@ -91,8 +91,8 @@ QList<double> PartSet_FieldStepPrs::range(double& theMin, double& theMax) const
   int aCols = aTablesAttr->columns();
 
   QList<double> aFieldStepData;
-  for (int j = 0; j < aCols; j++) {
-    for (int k = 1; k < aRows; k++) { // Do not use default values
+  for (int k = 1; k < aRows; k++) { // Do not use default values
+    for (int j = 0; j < aCols; j++) {
       ModelAPI_AttributeTables::Value aVal = aTablesAttr->value(k, j, aStep);
       switch (aType) {
       case ModelAPI_AttributeTables::DOUBLE:
@@ -157,7 +157,7 @@ void PartSet_FieldStepPrs::Compute(const Handle(PrsMgr_PresentationManager3d)& t
       TopoDS_Shape aShape = aShapePtr->impl<TopoDS_Shape>();
       double aValue = aShapeData.at(i);
       Quantity_Color aColor;
-      if (AIS_ColorScale::FindColor(aValue, 0., 1. + Precision::Confusion(), 2, aColor))
+      if (AIS_ColorScale::FindColor(aValue, 0., 1., 2, aColor))
         SetCustomColor(aShape, aColor);
     }
   }
@@ -172,8 +172,8 @@ QList<double> PartSet_FieldStepPrs::booleanValues() const
   int aRows = aTablesAttr->rows();
   int aCols = aTablesAttr->columns();
   QList<int> aFieldStepData;
-  for (int j = 0; j < aCols; j++) {
-    for (int k = 1; k < aRows; k++) { // Do not use default values
+  for (int k = 1; k < aRows; k++) { // Do not use default values
+    for (int j = 0; j < aCols; j++) {
       ModelAPI_AttributeTables::Value aVal = aTablesAttr->value(k, j, aStep);
       aFieldStepData << (aVal.myBool ? 1 : 0);
     }
