@@ -28,6 +28,12 @@
 #include <AIS_ColorScale.hxx>
 #include <Prs3d_Drawer.hxx>
 #include <Prs3d_PointAspect.hxx>
+#include <BRep_Tool.hxx>
+#include <BRepAdaptor_Surface.hxx>
+#include <TopoDS.hxx>
+#include <TopoDS_Vertex.hxx>
+#include <TopExp_Explorer.hxx>
+#include <Prs3d_Root.hxx>
 
 
 IMPLEMENT_STANDARD_RTTIEXT(PartSet_FieldStepPrs, ViewerData_AISShape);
@@ -61,6 +67,8 @@ PartSet_FieldStepPrs::PartSet_FieldStepPrs(FieldStepPtr theStep)
   else
     aDrawer->SetPointAspect(
       new Prs3d_PointAspect(Aspect_TOM_POINT, Quantity_NOC_YELLOW, POINT_SIZE));
+
+  myLabelColor = Quantity_Color(1, 1, 1, Quantity_TOC_RGB);
 }
 
 
@@ -130,8 +138,10 @@ void PartSet_FieldStepPrs::Compute(const Handle(PrsMgr_PresentationManager3d)& t
 {
   ModelAPI_AttributeTables::ValueType aType = dataType();
   DataPtr aData = myFeature->data();
-  if ((aType == ModelAPI_AttributeTables::DOUBLE) ||
-    (aType == ModelAPI_AttributeTables::INTEGER)) {
+  switch (aType) {
+  case ModelAPI_AttributeTables::DOUBLE:
+  case ModelAPI_AttributeTables::INTEGER:
+  {
     double aMin, aMax;
     QList<double> aShapeData = range(aMin, aMax);
     int aNbIntertvals = 20;
@@ -147,7 +157,9 @@ void PartSet_FieldStepPrs::Compute(const Handle(PrsMgr_PresentationManager3d)& t
         SetCustomColor(aShape, aColor);
     }
   }
-  else if (aType == ModelAPI_AttributeTables::BOOLEAN) {
+  break;
+  case ModelAPI_AttributeTables::BOOLEAN:
+  {
     QList<double> aShapeData = booleanValues();
 
     AttributeSelectionListPtr aSelList = aData->selectionList(CollectionPlugin_Field::SELECTED_ID());
@@ -160,6 +172,32 @@ void PartSet_FieldStepPrs::Compute(const Handle(PrsMgr_PresentationManager3d)& t
       if (AIS_ColorScale::FindColor(aValue, 0., 1., 2, aColor))
         SetCustomColor(aShape, aColor);
     }
+  }
+  break;
+  case ModelAPI_AttributeTables::STRING:
+  {
+    QStringList aValues = strings();
+    AttributeSelectionListPtr aSelList = aData->selectionList(CollectionPlugin_Field::SELECTED_ID());
+    Handle(Graphic3d_Group) aGroup = Prs3d_Root::NewGroup(thePrs);
+    for (int i = 0; i < aSelList->size(); i++) {
+      AttributeSelectionPtr aSelection = aSelList->value(i);
+      GeomShapePtr aShapePtr = aSelection->value();
+      TopoDS_Shape aShape = aShapePtr->impl<TopoDS_Shape>();
+      gp_Pnt aCenter;
+      if (computeMassCenter(aShape, aCenter)) {
+        Graphic3d_Vertex aVertex(aCenter.X(), aCenter.Y(), aCenter.Z());
+
+        Handle(Graphic3d_AspectText3d) anAspectText3d = new Graphic3d_AspectText3d();
+        anAspectText3d->SetStyle(Aspect_TOST_ANNOTATION);
+        anAspectText3d->SetColor(myLabelColor);
+        aGroup->SetPrimitivesAspect(anAspectText3d);
+
+        QString aString = aValues.at(i);
+        aGroup->Text(aString.toUtf8().constData(), aVertex, 14);
+      }
+    }
+  }
+  break;
   }
   ViewerData_AISShape::Compute(thePrsMgr, thePrs, theMode);
 }
@@ -190,4 +228,97 @@ QList<double> PartSet_FieldStepPrs::booleanValues() const
     aShapeData << aNorm;
   }
   return aShapeData;
+}
+
+QStringList PartSet_FieldStepPrs::strings() const
+{
+  DataPtr aData = myFeature->data();
+  int aStep = myStep->id();
+  AttributeTablesPtr aTablesAttr = aData->tables(CollectionPlugin_Field::VALUES_ID());
+  int aRows = aTablesAttr->rows();
+  int aCols = aTablesAttr->columns();
+  QStringList aFieldStepData;
+  for (int k = 1; k < aRows; k++) { // Do not use default values
+    for (int j = 0; j < aCols; j++) {
+      ModelAPI_AttributeTables::Value aVal = aTablesAttr->value(k, j, aStep);
+      aFieldStepData << aVal.myStr.c_str();
+    }
+  }
+  QStringList aShapeData;
+  for (int aRow = 0; aRow < aRows - 1; aRow++) {
+    QStringList aRowStrings;
+    int aBaseIndex = aRow * aCols;
+    for (int aCol = 0; aCol < aCols; aCol++) {
+      aRowStrings << aFieldStepData.at(aCol + aBaseIndex);
+    }
+    aRowStrings.join('\n');
+    aShapeData << aRowStrings;
+  }
+  return aShapeData;
+}
+
+bool PartSet_FieldStepPrs::computeMassCenter(const TopoDS_Shape& theShape, gp_Pnt& theCenter)
+{
+  theCenter.SetCoord(0, 0, 0);
+  int aNbPoints = 0;
+
+  if (theShape.ShapeType() == TopAbs_EDGE) {
+    double f, l;
+    Handle(Geom_Curve) curve = BRep_Tool::Curve(TopoDS::Edge(theShape), f, l);
+    if (!curve.IsNull()) {
+      theCenter = curve->Value(0.5 * (f + l));
+      aNbPoints = 1;
+    }
+  }
+  else if (theShape.ShapeType() == TopAbs_FACE) {
+    const TopoDS_Face& F = TopoDS::Face(theShape);
+    BRepAdaptor_Surface surface(F);
+
+    TopLoc_Location L;
+    Handle(Poly_Triangulation) triangulation = BRep_Tool::Triangulation(F, L);
+    if (!triangulation.IsNull() && triangulation->HasUVNodes()) {
+      gp_XY C(0, 0);
+      double A = 0;
+      const TColgp_Array1OfPnt2d& uvArray = triangulation->UVNodes();
+      const Poly_Array1OfTriangle&  trias = triangulation->Triangles();
+      int n1, n2, n3;
+      for (int iT = trias.Lower(); iT <= trias.Upper(); ++iT) {
+        trias(iT).Get(n1, n2, n3);
+        const gp_Pnt2d& uv1 = uvArray(n1);
+        const gp_Pnt2d& uv2 = uvArray(n2);
+        const gp_Pnt2d& uv3 = uvArray(n3);
+        double a = 0.5 * sqrt((uv1.X() - uv3.X()) * (uv2.Y() - uv1.Y()) -
+          (uv1.X() - uv2.X()) * (uv3.Y() - uv1.Y()));
+        C += (uv1.XY() + uv2.XY() + uv3.XY()) / 3. * a;
+        A += a;
+      }
+      if (A > std::numeric_limits<double>::min()) {
+        C /= A;
+        theCenter = surface.Value(C.X(), C.Y());
+        aNbPoints = 1;
+      }
+    }
+    if (aNbPoints == 0) {
+      theCenter = surface.Value(0.5 * (surface.FirstUParameter() + surface.LastUParameter()),
+        0.5 * (surface.FirstVParameter() + surface.LastVParameter()));
+    }
+    aNbPoints = 1;
+  }
+
+  if (aNbPoints == 0) {
+    TopExp_Explorer anExp;
+    for (anExp.Init(theShape, TopAbs_VERTEX); anExp.More(); anExp.Next()) {
+      TopoDS_Vertex aVertex = TopoDS::Vertex(anExp.Current());
+      if (!aVertex.IsNull()) {
+        gp_Pnt aPnt = BRep_Tool::Pnt(aVertex);
+        theCenter.ChangeCoord() += aPnt.XYZ();
+        aNbPoints++;
+      }
+    }
+  }
+
+  if (aNbPoints > 0)
+    theCenter.ChangeCoord() /= (double)aNbPoints;
+
+  return aNbPoints;
 }

@@ -27,6 +27,8 @@
 #include <ModelAPI_Feature.h>
 
 #include <ViewerData_AISShape.hxx>
+#include <TopoDS_Shape.hxx>
+#include <gp_Pnt.hxx>
 
 #include <QList>
 
@@ -58,9 +60,13 @@ protected:
 private:
   QList<double> range(double& theMin, double& theMax) const;
   QList<double> booleanValues() const;
+  QStringList strings() const;
+  bool computeMassCenter(const TopoDS_Shape& theShape, gp_Pnt& theCenter);
+
 
   FieldStepPtr myStep;
   FeaturePtr myFeature;
+  Quantity_Color myLabelColor;
 };
 
 #endif
