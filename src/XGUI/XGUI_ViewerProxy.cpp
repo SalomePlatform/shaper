@@ -620,6 +620,18 @@ void XGUI_ViewerProxy::setColorScaleIntervals(int theNb)
 #endif
 }
 
+void XGUI_ViewerProxy::setColorScaleTextColor(const QColor& theColor)
+{
+#ifdef HAVE_SALOME
+  myWorkshop->salomeConnector()->viewer()->setColorScaleTextColor(theColor);
+#else
+  Handle(AIS_ColorScale) aColorScale = myWorkshop->mainWindow()->viewer()->colorScale();
+  Quantity_Color aColor(theColor.redF(), theColor.greenF(), theColor.blueF(), Quantity_TOC_RGB);
+  aColorScale->SetColor(aColor);
+#endif
+}
+
+
 void XGUI_ViewerProxy::setColorScaleTextHeigth(int theH)
 {
 #ifdef HAVE_SALOME
@@ -652,6 +664,9 @@ void XGUI_ViewerProxy::setupColorScale()
   double aW = aResMgr->doubleValue("Viewer", "scalar_bar_width", 0.2);
   double aH = aResMgr->doubleValue("Viewer", "scalar_bar_height", 0.5);
   setColorScaleSize(aW, aH);
+
+  QColor aColor = aResMgr->integerValue("Viewer", "scalar_bar_text_color", Qt::black);
+  setColorScaleTextColor(aColor);
 
   int aT = aResMgr->integerValue("Viewer", "scalar_bar_text_height", 14);
   setColorScaleTextHeigth(aT);

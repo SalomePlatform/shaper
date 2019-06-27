@@ -150,6 +150,10 @@ Q_OBJECT
   // \param theH is number of intervals
   virtual void setColorScaleTextHeigth(int theH);
 
+  //! Set color of text of color scale
+  // \param theH is number of intervals
+  virtual void setColorScaleTextColor(const QColor& theColor);
+
   //! Set title of color scale
   // \param theText is a title
   virtual void setColorScaleTitle(const QString& theText);

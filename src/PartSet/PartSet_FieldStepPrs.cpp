@@ -19,11 +19,15 @@
 
 #include "PartSet_FieldStepPrs.h"
 
+#include <ModuleBase_Preferences.h>
+
 #include <CollectionPlugin_Field.h>
 
 #include <ModelAPI_AttributeSelectionList.h>
 #include <ModelAPI_AttributeIntArray.h>
 #include <ModelAPI_AttributeStringArray.h>
+
+#include <SUIT_ResourceMgr.h>
 
 #include <AIS_ColorScale.hxx>
 #include <Prs3d_Drawer.hxx>
@@ -68,7 +72,13 @@ PartSet_FieldStepPrs::PartSet_FieldStepPrs(FieldStepPtr theStep)
     aDrawer->SetPointAspect(
       new Prs3d_PointAspect(Aspect_TOM_POINT, Quantity_NOC_YELLOW, POINT_SIZE));
 
-  myLabelColor = Quantity_Color(1, 1, 1, Quantity_TOC_RGB);
+  SUIT_ResourceMgr* aResMgr = ModuleBase_Preferences::resourceMgr();
+  QColor aQColor = aResMgr->colorValue("Viewer", "scalar_bar_text_color", Qt::black);
+
+  myLabelColor = Quantity_Color(aQColor.redF(), aQColor.greenF(), aQColor.blueF(),
+    Quantity_TOC_RGB);
+
+  SetMaterial(Graphic3d_NOM_PLASTIC);
 }
 
 
@@ -144,7 +154,8 @@ void PartSet_FieldStepPrs::Compute(const Handle(PrsMgr_PresentationManager3d)& t
   {
     double aMin, aMax;
     QList<double> aShapeData = range(aMin, aMax);
-    int aNbIntertvals = 20;
+    SUIT_ResourceMgr* aResMgr = ModuleBase_Preferences::resourceMgr();
+    int aNbIntertvals = aResMgr->integerValue("Viewer", "scalar_bar_nb_intervals", 20);
 
     AttributeSelectionListPtr aSelList = aData->selectionList(CollectionPlugin_Field::SELECTED_ID());
     for (int i = 0; i < aSelList->size(); i++) {
