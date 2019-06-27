@@ -580,10 +580,10 @@ void XGUI_ViewerProxy::setColorScaleShown(bool on)
 
 void XGUI_ViewerProxy::setColorScalePosition(double theX, double theY)
 {
-  QWidget* aWindow = activeViewPort();
 #ifdef HAVE_SALOME
-  myWorkshop->salomeConnector()->viewer()->setColorScaleShown(on);
+  myWorkshop->salomeConnector()->viewer()->setColorScalePosition(theX, theY);
 #else
+  QWidget* aWindow = activeViewPort();
   Handle(AIS_ColorScale) aColorScale = myWorkshop->mainWindow()->viewer()->colorScale();
   aColorScale->SetPosition(aWindow->width() * theX, aWindow->height() * theY);
 #endif
@@ -591,10 +591,10 @@ void XGUI_ViewerProxy::setColorScalePosition(double theX, double theY)
 
 void XGUI_ViewerProxy::setColorScaleSize(double theW, double theH)
 {
-  QWidget* aWindow = activeViewPort();
 #ifdef HAVE_SALOME
-  myWorkshop->salomeConnector()->viewer()->setColorScaleShown(on);
+  myWorkshop->salomeConnector()->viewer()->setColorScaleSize(theW, theH);
 #else
+  QWidget* aWindow = activeViewPort();
   Handle(AIS_ColorScale) aColorScale = myWorkshop->mainWindow()->viewer()->colorScale();
   aColorScale->SetSize(aWindow->width() * theW, aWindow->height() * theH);
 #endif
@@ -603,7 +603,7 @@ void XGUI_ViewerProxy::setColorScaleSize(double theW, double theH)
 void XGUI_ViewerProxy::setColorScaleRange(double theMin, double theMax)
 {
 #ifdef HAVE_SALOME
-  myWorkshop->salomeConnector()->viewer()->setColorScaleShown(on);
+  myWorkshop->salomeConnector()->viewer()->setColorScaleRange(theMin, theMax);
 #else
   Handle(AIS_ColorScale) aColorScale = myWorkshop->mainWindow()->viewer()->colorScale();
   aColorScale->SetRange(theMin, theMax);
@@ -613,7 +613,7 @@ void XGUI_ViewerProxy::setColorScaleRange(double theMin, double theMax)
 void XGUI_ViewerProxy::setColorScaleIntervals(int theNb)
 {
 #ifdef HAVE_SALOME
-  myWorkshop->salomeConnector()->viewer()->setColorScaleShown(on);
+  myWorkshop->salomeConnector()->viewer()->setColorScaleIntervals(theNb);
 #else
   Handle(AIS_ColorScale) aColorScale = myWorkshop->mainWindow()->viewer()->colorScale();
   aColorScale->SetNumberOfIntervals(theNb);
@@ -623,7 +623,7 @@ void XGUI_ViewerProxy::setColorScaleIntervals(int theNb)
 void XGUI_ViewerProxy::setColorScaleTextHeigth(int theH)
 {
 #ifdef HAVE_SALOME
-  myWorkshop->salomeConnector()->viewer()->setColorScaleShown(on);
+  myWorkshop->salomeConnector()->viewer()->setColorScaleTextHeigth(theH);
 #else
   Handle(AIS_ColorScale) aColorScale = myWorkshop->mainWindow()->viewer()->colorScale();
   aColorScale->SetTextHeight(theH);
@@ -633,7 +633,7 @@ void XGUI_ViewerProxy::setColorScaleTextHeigth(int theH)
 void XGUI_ViewerProxy::setColorScaleTitle(const QString& theText)
 {
 #ifdef HAVE_SALOME
-  myWorkshop->salomeConnector()->viewer()->setColorScaleShown(on);
+  myWorkshop->salomeConnector()->viewer()->setColorScaleTitle(theText);
 #else
   Handle(AIS_ColorScale) aColorScale = myWorkshop->mainWindow()->viewer()->colorScale();
   aColorScale->SetTitle(theText.toStdString().c_str());
@@ -648,7 +648,6 @@ void XGUI_ViewerProxy::setupColorScale()
   setColorScaleSize(0.2, 0.5);
   setColorScaleTextHeigth(14);
   setColorScaleIntervals(20);
-  Handle(AIS_ColorScale) aColorScale = myWorkshop->mainWindow()->viewer()->colorScale();
 }
 
 

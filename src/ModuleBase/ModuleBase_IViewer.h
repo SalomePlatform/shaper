@@ -142,6 +142,41 @@ Q_OBJECT
     return myIs2dMode;
   }
 
+  // Methods for color scale management
+
+  //! Returns True if ColorScale is visible
+  virtual bool isColorScaleVisible() const = 0;
+
+  //! Show/Hide ColorScale object
+  virtual void setColorScaleShown(bool on) = 0;
+
+  //! Set position of color scale
+  // \param theX is X position relative to current view width
+  // \param theY is Y position relative to current view heigth
+  virtual void setColorScalePosition(double theX, double theY) = 0;
+
+  //! Set size of color scale
+  // \param theW is width relative to current view width
+  // \param theh is height relative to current view heigth
+  virtual void setColorScaleSize(double theW, double theH) = 0;
+
+  //! Set range of color scale
+  // \param theMin is a minimal value
+  // \param theMax is a maximal value
+  virtual void setColorScaleRange(double theMin, double theMax) = 0;
+
+  //! Set number of intervals of color scale
+  // \param theNb is number of intervals
+  virtual void setColorScaleIntervals(int theNb) = 0;
+
+  //! Set text heigth of color scale
+  // \param theH is number of intervals
+  virtual void setColorScaleTextHeigth(int theH) = 0;
+
+  //! Set title of color scale
+  // \param theText is a title
+  virtual void setColorScaleTitle(const QString& theText) = 0;
+
   static Handle(Prs3d_Drawer) DefaultHighlightDrawer;
 
 signals:
