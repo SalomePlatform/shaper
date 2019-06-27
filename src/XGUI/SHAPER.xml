@@ -14,6 +14,12 @@
     <parameter name="edge-selection-sensitivity" value="2" />
     <parameter name="highlighting-3d" value="false" />
     <parameter name="highlighting-2d" value="true" />
+    <parameter name="scalar_bar_x_position" value="0.03" />
+    <parameter name="scalar_bar_y_position" value="0.35" />
+    <parameter name="scalar_bar_width" value="0.2" />
+    <parameter name="scalar_bar_height" value="0.5" />
+    <parameter name="scalar_bar_text_height" value="14" />
+    <parameter name="scalar_bar_nb_intervals" value="20" />
   </section>
   <section name="Menu" >
     <!-- Menu bar preferences -->

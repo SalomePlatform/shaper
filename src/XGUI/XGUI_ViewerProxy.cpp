@@ -644,10 +644,20 @@ void XGUI_ViewerProxy::setColorScaleTitle(const QString& theText)
 //******************************************************
 void XGUI_ViewerProxy::setupColorScale()
 {
-  setColorScalePosition(0.03, 0.35);
-  setColorScaleSize(0.2, 0.5);
-  setColorScaleTextHeigth(14);
-  setColorScaleIntervals(20);
+  SUIT_ResourceMgr* aResMgr = ModuleBase_Preferences::resourceMgr();
+  double aX = aResMgr->doubleValue("Viewer", "scalar_bar_x_position", 0.03);
+  double aY = aResMgr->doubleValue("Viewer", "scalar_bar_y_position", 0.35);
+  setColorScalePosition(aX, aY);
+
+  double aW = aResMgr->doubleValue("Viewer", "scalar_bar_width", 0.2);
+  double aH = aResMgr->doubleValue("Viewer", "scalar_bar_height", 0.5);
+  setColorScaleSize(aW, aH);
+
+  int aT = aResMgr->integerValue("Viewer", "scalar_bar_text_height", 14);
+  setColorScaleTextHeigth(aT);
+
+  int aN = aResMgr->integerValue("Viewer", "scalar_bar_nb_intervals", 20);
+  setColorScaleIntervals(aN);
 }
 
 
