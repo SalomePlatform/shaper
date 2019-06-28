@@ -26,6 +26,7 @@
 #include "FiltersPlugin_OnLine.h"
 #include "FiltersPlugin_OnGeometry.h"
 #include "FiltersPlugin_OnPlaneSide.h"
+#include "FiltersPlugin_OppositeToEdge.h"
 
 #include <ModelAPI_Session.h>
 #include <ModelAPI_FiltersFactory.h>
@@ -45,6 +46,7 @@ FiltersPlugin_Plugin::FiltersPlugin_Plugin()
   aFactory->registerFilter("OnLine", new FiltersPlugin_OnLine);
   aFactory->registerFilter("OnGeometry", new FiltersPlugin_OnGeometry);
   aFactory->registerFilter("OnPlaneSide", new FiltersPlugin_OnPlaneSide);
+  aFactory->registerFilter("OppositeToEdge", new FiltersPlugin_OppositeToEdge);
 
   ModelAPI_Session::get()->registerPlugin(this);
 }
