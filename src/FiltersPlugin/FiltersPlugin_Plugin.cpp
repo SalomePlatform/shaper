@@ -27,6 +27,7 @@
 #include "FiltersPlugin_OnGeometry.h"
 #include "FiltersPlugin_OnPlaneSide.h"
 #include "FiltersPlugin_OppositeToEdge.h"
+#include "FiltersPlugin_RelativeToSolid.h"
 
 #include <ModelAPI_Session.h>
 #include <ModelAPI_FiltersFactory.h>
@@ -47,6 +48,7 @@ FiltersPlugin_Plugin::FiltersPlugin_Plugin()
   aFactory->registerFilter("OnGeometry", new FiltersPlugin_OnGeometry);
   aFactory->registerFilter("OnPlaneSide", new FiltersPlugin_OnPlaneSide);
   aFactory->registerFilter("OppositeToEdge", new FiltersPlugin_OppositeToEdge);
+  aFactory->registerFilter("RelativeToSolid", new FiltersPlugin_RelativeToSolid);
 
   ModelAPI_Session::get()->registerPlugin(this);
 }
