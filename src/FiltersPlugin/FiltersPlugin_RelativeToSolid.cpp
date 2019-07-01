@@ -47,8 +47,8 @@ static std::string XMLRepresentation =
 "   <case id=\"out\" title=\"Out\"/>"
 "   <case id=\"on\" title=\"On\"/>"
 "   <case id=\"noton\" title=\"Not On\"/>"
-"   <case id=\"inon\" title=\"In & On\"/>"
-"   <case id=\"outon\" title=\"On & Out\"/>"
+"   <case id=\"inon\" title=\"In and On\"/>"
+"   <case id=\"outon\" title=\"On and Out\"/>"
 " </switch>"
 "</filter>";
 
