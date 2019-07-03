@@ -63,15 +63,16 @@ PartSet_FieldStepPrs::PartSet_FieldStepPrs(FieldStepPtr theStep)
   std::shared_ptr<ModelAPI_ResultField> aFieldPtr(aField, emptyDeleter);
   myFeature = ModelAPI_Feature::feature(aFieldPtr);
 
-  Handle(Prs3d_Drawer) aDrawer = Attributes();
-  if (aDrawer->HasOwnPointAspect()) {
-    aDrawer->PointAspect()->SetTypeOfMarker(Aspect_TOM_POINT);
-    aDrawer->PointAspect()->SetScale(POINT_SIZE);
+  if (dataType() != ModelAPI_AttributeTables::STRING) {
+    Handle(Prs3d_Drawer) aDrawer = Attributes();
+    if (aDrawer->HasOwnPointAspect()) {
+      aDrawer->PointAspect()->SetTypeOfMarker(Aspect_TOM_POINT);
+      aDrawer->PointAspect()->SetScale(POINT_SIZE);
+    }
+    else
+      aDrawer->SetPointAspect(
+        new Prs3d_PointAspect(Aspect_TOM_POINT, Quantity_NOC_YELLOW, POINT_SIZE));
   }
-  else
-    aDrawer->SetPointAspect(
-      new Prs3d_PointAspect(Aspect_TOM_POINT, Quantity_NOC_YELLOW, POINT_SIZE));
-
   SUIT_ResourceMgr* aResMgr = ModuleBase_Preferences::resourceMgr();
   QColor aQColor = aResMgr->colorValue("Viewer", "scalar_bar_text_color", Qt::black);
 
