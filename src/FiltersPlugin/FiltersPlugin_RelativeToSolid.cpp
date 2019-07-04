@@ -72,28 +72,9 @@ bool FiltersPlugin_RelativeToSolid::isOk(const GeomShapePtr& theShape, const Res
   return isOK;
 }
 
-static std::string XMLRepresentation =
-"<filter id = \"RelativeToSolid\">"
-" <shape_selector id=\"RelativeToSolid__Solid\""
-"   label=\"Solid:\""
-"   tooltip=\"Select a solid.\""
-"   shape_types=\"solids\">"
-"   <validator id=\"GeomValidators_ShapeType\" parameters=\"solid\"/>"
-" </shape_selector>"
-" <switch id=\"RelativeToSolid__Location\" label=\"Algorithm:\">"
-"   <case id=\"in\" title=\"In\"/>"
-"   <case id=\"out\" title=\"Out\"/>"
-"   <case id=\"on\" title=\"On\"/>"
-"   <case id=\"not_on\" title=\"Not On\"/>"
-"   <case id=\"not_out\" title=\"In and On\"/>"
-"   <case id=\"not_in\" title=\"On and Out\"/>"
-" </switch>"
-"</filter>";
-
-
 std::string FiltersPlugin_RelativeToSolid::xmlRepresentation() const
 {
-  return XMLRepresentation;
+  return xmlFromFile("filter-RelativeToSolid.xml");
 }
 
 void FiltersPlugin_RelativeToSolid::initAttributes(ModelAPI_FiltersArgs& theArguments)

@@ -98,6 +98,7 @@ SET(PROJECT_SOURCES
     ModelAPI_Expression.cpp
     ModelAPI_Feature.cpp
     ModelAPI_FeatureValidator.cpp
+    ModelAPI_Filter.cpp
     ModelAPI_Folder.cpp
     ModelAPI_IReentrant.cpp
     ModelAPI_Object.cpp

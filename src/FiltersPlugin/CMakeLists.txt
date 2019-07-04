@@ -61,6 +61,13 @@ SET(PROJECT_LIBRARIES
 
 SET(XML_RESOURCES
   plugin-Filters.xml
+  filter-BelongsTo.xml
+  filter-OnGeometry.xml
+  filter-OnLine.xml
+  filter-OnPlane.xml
+  filter-OnPlaneSide.xml
+  filter-OppositeToEdge.xml
+  filter-RelativeToSolid.xml
 )
 
 ADD_DEFINITIONS(-DFILTERS_EXPORTS ${OpenCASCADE_DEFINITIONS})

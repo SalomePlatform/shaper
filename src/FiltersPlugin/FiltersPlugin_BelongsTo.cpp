@@ -43,19 +43,9 @@ bool FiltersPlugin_BelongsTo::isOk(const GeomShapePtr& theShape, const ResultPtr
   return false;
 }
 
-static std::string XMLRepresentation =
-"<filter id = \"BelongsTo\">"
-" <multi_selector id=\"BelongsTo__BelongsTo\""
-"   label=\"Objects:\""
-"   tooltip=\"Select objects to limit selection.\""
-"   type_choice=\"objects\">"
-" </multi_selector>"
-"</filter>";
-
-
 std::string FiltersPlugin_BelongsTo::xmlRepresentation() const
 {
-  return XMLRepresentation;
+  return xmlFromFile("filter-BelongsTo.xml");
 }
 
 void FiltersPlugin_BelongsTo::initAttributes(ModelAPI_FiltersArgs& theArguments)

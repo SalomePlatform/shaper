@@ -1,0 +1,7 @@
+<filter id="BelongsTo">
+  <multi_selector id="BelongsTo__BelongsTo"
+                  label="Objects:"
+                  tooltip="Select objects to limit selection."
+                  type_choice="objects">
+  </multi_selector>
+</filter>

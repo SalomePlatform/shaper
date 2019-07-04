@@ -55,20 +55,9 @@ bool FiltersPlugin_OnPlaneSide::isOk(const GeomShapePtr& theShape, const ResultP
   return aVec->dot(aPlaneNorm->xyz()) > THE_TOLERANCE;
 }
 
-static std::string XMLRepresentation =
-"<filter id = \"OnPlaneSide\">"
-" <shape_selector id=\"OnPlaneSide__OnPlaneSide\""
-"   label=\"Plane:\""
-"   tooltip=\"Select plane or planar face.\""
-"   shape_types=\"faces\">"
-"   <validator id=\"GeomValidators_ShapeType\" parameters=\"plane\"/>"
-" </shape_selector>"
-"</filter>";
-
-
 std::string FiltersPlugin_OnPlaneSide::xmlRepresentation() const
 {
-  return XMLRepresentation;
+  return xmlFromFile("filter-OnPlaneSide.xml");
 }
 
 void FiltersPlugin_OnPlaneSide::initAttributes(ModelAPI_FiltersArgs& theArguments)

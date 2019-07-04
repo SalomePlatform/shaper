@@ -43,20 +43,9 @@ bool FiltersPlugin_OnGeometry::isOk(const GeomShapePtr& theShape, const ResultPt
   return false;
 }
 
-static std::string XMLRepresentation =
-"<filter id = \"OnGeometry\">"
-" <multi_selector id=\"OnGeometry__OnGeometry\""
-"   label=\"Edges/faces:\""
-"   tooltip=\"Select objects to limit selection.\""
-"   type_choice=\"edges faces\">"
-"   <validator id=\"GeomValidators_ShapeType\" parameters=\"edge,face\"/>"
-" </multi_selector>"
-"</filter>";
-
-
 std::string FiltersPlugin_OnGeometry::xmlRepresentation() const
 {
-  return XMLRepresentation;
+  return xmlFromFile("filter-OnGeometry.xml");
 }
 
 void FiltersPlugin_OnGeometry::initAttributes(ModelAPI_FiltersArgs& theArguments)

@@ -1,0 +1,8 @@
+<filter id="OnPlaneSide">
+  <shape_selector id="OnPlaneSide__OnPlaneSide"
+                  label="Plane:"
+                  tooltip="Select plane or planar face."
+                  shape_types="faces">
+    <validator id="GeomValidators_ShapeType" parameters="plane"/>
+  </shape_selector>
+</filter>

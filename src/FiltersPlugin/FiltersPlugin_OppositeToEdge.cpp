@@ -143,20 +143,9 @@ bool FiltersPlugin_OppositeToEdge::isOk(const GeomShapePtr& theShape, const Resu
   return myCachedShapes.find(theShape) != myCachedShapes.end();
 }
 
-static std::string XMLRepresentation =
-"<filter id = \"OppositeToEdge\">"
-" <shape_selector id=\"OppositeToEdge__OppositeToEdge\""
-"   label=\"Edge:\""
-"   tooltip=\"Select edge.\""
-"   shape_types=\"edges\">"
-"   <validator id=\"GeomValidators_ShapeType\" parameters=\"line\"/>"
-" </shape_selector>"
-"</filter>";
-
-
 std::string FiltersPlugin_OppositeToEdge::xmlRepresentation() const
 {
-  return XMLRepresentation;
+  return xmlFromFile("filter-OppositeToEdge.xml");
 }
 
 void FiltersPlugin_OppositeToEdge::initAttributes(ModelAPI_FiltersArgs& theArguments)

@@ -108,20 +108,9 @@ bool FiltersPlugin_OnPlane::isOk(const GeomShapePtr& theShape, const ResultPtr&,
   return false;
 }
 
-static std::string XMLRepresentation =
-"<filter id = \"OnPlane\">"
-" <multi_selector id=\"OnPlane__OnPlane\""
-"   label=\"Planes:\""
-"   tooltip=\"Select planes or planar faces.\""
-"   type_choice=\"faces\">"
-"   <validator id=\"GeomValidators_ShapeType\" parameters=\"plane\"/>"
-" </multi_selector>"
-"</filter>";
-
-
 std::string FiltersPlugin_OnPlane::xmlRepresentation() const
 {
-  return XMLRepresentation;
+  return xmlFromFile("filter-OnPlane.xml");
 }
 
 void FiltersPlugin_OnPlane::initAttributes(ModelAPI_FiltersArgs& theArguments)

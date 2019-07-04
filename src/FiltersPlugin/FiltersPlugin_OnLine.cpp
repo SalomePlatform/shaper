@@ -79,20 +79,9 @@ bool FiltersPlugin_OnLine::isOk(const GeomShapePtr& theShape, const ResultPtr&,
   return false;
 }
 
-static std::string XMLRepresentation =
-"<filter id = \"OnLine\">"
-" <multi_selector id=\"OnLine__OnLine\""
-"   label=\"Lines:\""
-"   tooltip=\"Select vertices or segments.\""
-"   type_choice=\"edges\">"
-"   <validator id=\"GeomValidators_ShapeType\" parameters=\"line\"/>"
-" </multi_selector>"
-"</filter>";
-
-
 std::string FiltersPlugin_OnLine::xmlRepresentation() const
 {
-  return XMLRepresentation;
+  return xmlFromFile("filter-OnLine.xml");
 }
 
 void FiltersPlugin_OnLine::initAttributes(ModelAPI_FiltersArgs& theArguments)
