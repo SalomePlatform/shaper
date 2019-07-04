@@ -17,27 +17,29 @@
 // See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 
-#ifndef ModelAPI_Filter_H_
-#define ModelAPI_Filter_H_
+#ifndef FILTERSPLUGIN_EXTERNALFACES_H_
+#define FILTERSPLUGIN_EXTERNALFACES_H_
 
-#include "ModelAPI_FiltersArgs.h"
-#include "ModelAPI_ResultBody.h"
+#include "FiltersPlugin.h"
 
-#include <GeomAPI_Shape.h>
+#include <ModelAPI_Filter.h>
 
-
-/**\class ModelAPI_ViewFilter
+/**\class FiltersPlugin_ExternalFaces
 * \ingroup DataModel
-* \brief A general interface class filters definition
+* \brief Filter for faces not shared between solids in compsolid.
 */
-class ModelAPI_Filter
+class FiltersPlugin_ExternalFaces : public ModelAPI_Filter
 {
 public:
-  /// Returns name of the filter to represent it in GUI
-  virtual const std::string& name() const = 0;
+  FiltersPlugin_ExternalFaces() : ModelAPI_Filter() {}
 
-  /// Returns true if the given shape type is supported
-  virtual bool isSupported(GeomAPI_Shape::ShapeType theType) const = 0;
+  virtual const std::string& name() const {
+    static const std::string kName("External faces");
+    return kName;
+  }
+
+  /// Returns true for any type because it supports all selection types
+  virtual bool isSupported(GeomAPI_Shape::ShapeType theType) const override;
 
   /// This method should contain the filter logic. It returns true if the given shape
   /// is accepted by the filter.
@@ -46,20 +48,7 @@ public:
   /// \param theArgs arguments of the filter
   virtual bool isOk(const GeomShapePtr& theShape,
                     const ResultPtr& theResult,
-                    const ModelAPI_FiltersArgs& theArgs) const = 0;
-
-  /// Returns XML string which represents GUI of the filter
-  /// By default it returns nothing (no GUI)
-  virtual std::string xmlRepresentation() const { return ""; }
-
-  /// Initializes arguments of a filter. If a filter has no arguments, this method may be
-  /// not redefined.
-  virtual void initAttributes(ModelAPI_FiltersArgs& theArguments) {}
-
-private:
-  bool myIsReverse;
+                    const ModelAPI_FiltersArgs& theArgs) const override;
 };
-
-typedef std::shared_ptr<ModelAPI_Filter> FilterPtr;
 
 #endif

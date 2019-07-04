@@ -44,8 +44,9 @@ public:
   /// This method should contain the filter logic. It returns true if the given shape
   /// is accepted by the filter.
   /// \param theShape the given shape
-  virtual bool isOk(
-    const GeomShapePtr& theShape, const ModelAPI_FiltersArgs& theArgs) const override;
+  /// \param theArgs arguments of the filter
+  virtual bool isOk(const GeomShapePtr& theShape, const ResultPtr&,
+                    const ModelAPI_FiltersArgs& theArgs) const override;
 };
 
 #endif

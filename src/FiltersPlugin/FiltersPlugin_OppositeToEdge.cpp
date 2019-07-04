@@ -117,7 +117,7 @@ bool FiltersPlugin_OppositeToEdge::isSupported(GeomAPI_Shape::ShapeType theType)
   return theType == GeomAPI_Shape::EDGE;
 }
 
-bool FiltersPlugin_OppositeToEdge::isOk(const GeomShapePtr& theShape,
+bool FiltersPlugin_OppositeToEdge::isOk(const GeomShapePtr& theShape, const ResultPtr&,
                                         const ModelAPI_FiltersArgs& theArgs) const
 {
   AttributePtr aAttr = theArgs.argument("OppositeToEdge");

@@ -33,6 +33,7 @@ SET(PROJECT_HEADERS
     FiltersPlugin_OnPlaneSide.h
     FiltersPlugin_OppositeToEdge.h
     FiltersPlugin_RelativeToSolid.h
+    FiltersPlugin_ExternalFaces.h
 )
 
 SET(PROJECT_SOURCES
@@ -47,6 +48,7 @@ SET(PROJECT_SOURCES
     FiltersPlugin_OnPlaneSide.cpp
     FiltersPlugin_OppositeToEdge.cpp
     FiltersPlugin_RelativeToSolid.cpp
+    FiltersPlugin_ExternalFaces.cpp
 )
 
 SET(PROJECT_LIBRARIES
@@ -94,6 +96,7 @@ ADD_UNIT_TESTS(
   TestFilter_RelativeToSolid_NotOn.py
   TestFilter_RelativeToSolid_InAndOn.py
   TestFilter_RelativeToSolid_OutAndOn.py
+  TestFilter_ExternalFaces.py
   TestFilter_HorizontalFaces.py
   TestFilter_VerticalFaces.py
 )

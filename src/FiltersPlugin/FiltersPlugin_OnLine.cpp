@@ -46,7 +46,7 @@ bool FiltersPlugin_OnLine::isSupported(GeomAPI_Shape::ShapeType theType) const
   return theType == GeomAPI_Shape::EDGE || theType == GeomAPI_Shape::VERTEX;
 }
 
-bool FiltersPlugin_OnLine::isOk(const GeomShapePtr& theShape,
+bool FiltersPlugin_OnLine::isOk(const GeomShapePtr& theShape, const ResultPtr&,
                                 const ModelAPI_FiltersArgs& theArgs) const
 {
   AttributePtr aAttr = theArgs.argument("OnLine");

@@ -52,8 +52,8 @@ GeomPlanePtr getPlane(AttributeSelectionPtr theAttr)
   return aFace->getPlane();
 }
 
-bool FiltersPlugin_OnPlane::isOk(const GeomShapePtr& theShape,
-  const ModelAPI_FiltersArgs& theArgs) const
+bool FiltersPlugin_OnPlane::isOk(const GeomShapePtr& theShape, const ResultPtr&,
+                                 const ModelAPI_FiltersArgs& theArgs) const
 {
   AttributePtr aAttr = theArgs.argument("OnPlane");
   AttributeSelectionListPtr aList =

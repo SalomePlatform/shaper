@@ -22,6 +22,7 @@
 
 #include "ModelAPI_Feature.h"
 #include "ModelAPI_Filter.h"
+#include "ModelAPI_ResultBody.h"
 
 #include <GeomAPI_Shape.h>
 
@@ -41,8 +42,11 @@ public:
   /// Returns true if all filters of the Filters feature are ok for the Shape (taking into account
   /// the Reversed states).
   /// \param theFiltersFeature feature that contains all information about the filters
+  /// \param theResult parent result of the shape to check
   /// \param theShape the checked shape
-  virtual bool isValid(FeaturePtr theFiltersFeature, GeomShapePtr theShape) = 0;
+  virtual bool isValid(FeaturePtr theFiltersFeature,
+                       ResultPtr theResult,
+                       GeomShapePtr theShape) = 0;
 
   /// Returns the filters that support the given shape type
   virtual std::list<FilterPtr> filters(GeomAPI_Shape::ShapeType theType) = 0;

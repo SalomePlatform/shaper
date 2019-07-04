@@ -40,7 +40,9 @@ struct FilterArgs {
   std::string myFilterID;
 };
 
-bool Model_FiltersFactory::isValid(FeaturePtr theFiltersFeature, GeomShapePtr theShape)
+bool Model_FiltersFactory::isValid(FeaturePtr theFiltersFeature,
+                                   ResultPtr theResult,
+                                   GeomShapePtr theShape)
 {
   // check that the shape type corresponds to the attribute list type
   AttributePtr aBase =
@@ -84,7 +86,7 @@ bool Model_FiltersFactory::isValid(FeaturePtr theFiltersFeature, GeomShapePtr th
   std::list<FilterArgs>::iterator aFilter = aFilters.begin();
   for(; aFilter != aFilters.end(); aFilter++) {
     anArgs.setFilter(aFilter->myFilterID);
-    bool aResult = aFilter->myFilter->isOk(theShape, anArgs);
+    bool aResult = aFilter->myFilter->isOk(theShape, theResult, anArgs);
     if (aFilter->myReverse)
       aResult = !aResult;
     if (!aResult) // one filter is failed => exit immediately

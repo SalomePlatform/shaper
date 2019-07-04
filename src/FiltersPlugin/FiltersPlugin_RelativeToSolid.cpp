@@ -32,7 +32,7 @@ bool FiltersPlugin_RelativeToSolid::isSupported(GeomAPI_Shape::ShapeType theType
   return true;
 }
 
-bool FiltersPlugin_RelativeToSolid::isOk(const GeomShapePtr& theShape,
+bool FiltersPlugin_RelativeToSolid::isOk(const GeomShapePtr& theShape, const ResultPtr&,
                                          const ModelAPI_FiltersArgs& theArgs) const
 {
   AttributePtr anAttr = theArgs.argument("Solid");

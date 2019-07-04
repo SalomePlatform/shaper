@@ -343,19 +343,21 @@ def checkFilter(thePartDoc, theModel, theFilter, theShapesList):
     shapeName = ""
     shapeType = "UNKNOWN"
     if sel.variantType() == ModelHighAPI_Selection.VT_ResultSubShapePair:
+      parent = sel.resultSubShapePair()[0]
       shape = sel.resultSubShapePair()[1]
       if shape.isNull():
         shape = sel.resultSubShapePair()[0].shape()
-        shapeName = sel.name()
-        shapeType = shape.shapeTypeStr()
+      shapeName = sel.name()
+      shapeType = shape.shapeTypeStr()
     else:
       needUndo = True
       theModel.begin()
       subShapeFeature = createSubShape(thePartDoc, theModel, sel)
       theModel.end()
+      parent = subShapeFeature.results()[0].resultSubShapePair()[0]
       shape = subShapeFeature.results()[0].resultSubShapePair()[0].shape()
       shapeType = sel.typeSubShapeNamePair()[0]
       shapeName = sel.typeSubShapeNamePair()[1]
-    assert aFiltersFactory.isValid(theFilter.feature(), shape) == res, "Filter result for {} \"{}\" incorrect. Expected {}.".format(shapeType, shapeName, res)
+    assert aFiltersFactory.isValid(theFilter.feature(), parent, shape) == res, "Filter result for {} \"{}\" incorrect. Expected {}.".format(shapeType, shapeName, res)
     if needUndo:
       theModel.undo()

@@ -456,7 +456,7 @@ void ModuleBase_WidgetSelectionFilter::onSelect()
       if (!alreadyThere.Add(aTShape))
         continue;
       static SessionPtr aSession = ModelAPI_Session::get();
-      bool isValid = aSession->filters()->isValid(myFeature, aShape);
+      bool isValid = aSession->filters()->isValid(myFeature, aBody, aShape);
       if (isValid) {
         aBuilder.Add(aComp, aTShape);
         ModuleBase_ViewerPrsPtr aValue(new ModuleBase_ViewerPrs(aObj, aShape));

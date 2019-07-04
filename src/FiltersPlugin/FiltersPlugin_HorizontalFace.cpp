@@ -27,8 +27,8 @@ bool FiltersPlugin_HorizontalFace::isSupported(GeomAPI_Shape::ShapeType theType)
   return theType == GeomAPI_Shape::FACE;
 }
 
-bool FiltersPlugin_HorizontalFace::isOk(
-  const GeomShapePtr& theShape, const ModelAPI_FiltersArgs& theArgs) const
+bool FiltersPlugin_HorizontalFace::isOk(const GeomShapePtr& theShape, const ResultPtr&,
+                                        const ModelAPI_FiltersArgs& theArgs) const
 {
   if (!theShape->isFace() || !theShape->isPlanar())
     return false;

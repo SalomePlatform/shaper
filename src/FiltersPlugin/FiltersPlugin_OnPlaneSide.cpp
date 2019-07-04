@@ -32,7 +32,7 @@ bool FiltersPlugin_OnPlaneSide::isSupported(GeomAPI_Shape::ShapeType theType) co
   return true;
 }
 
-bool FiltersPlugin_OnPlaneSide::isOk(const GeomShapePtr& theShape,
+bool FiltersPlugin_OnPlaneSide::isOk(const GeomShapePtr& theShape, const ResultPtr&,
                                      const ModelAPI_FiltersArgs& theArgs) const
 {
   static const double THE_TOLERANCE = 1.e-7;

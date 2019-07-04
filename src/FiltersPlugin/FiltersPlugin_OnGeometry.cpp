@@ -26,8 +26,8 @@ bool FiltersPlugin_OnGeometry::isSupported(GeomAPI_Shape::ShapeType theType) con
   return theType == GeomAPI_Shape::EDGE || theType == GeomAPI_Shape::FACE;
 }
 
-bool FiltersPlugin_OnGeometry::isOk(const GeomShapePtr& theShape,
-  const ModelAPI_FiltersArgs& theArgs) const
+bool FiltersPlugin_OnGeometry::isOk(const GeomShapePtr& theShape, const ResultPtr&,
+                                    const ModelAPI_FiltersArgs& theArgs) const
 {
   AttributePtr aAttr = theArgs.argument("OnGeometry");
   AttributeSelectionListPtr aList =

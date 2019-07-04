@@ -26,8 +26,8 @@ bool FiltersPlugin_BelongsTo::isSupported(GeomAPI_Shape::ShapeType theType) cons
   return true;
 }
 
-bool FiltersPlugin_BelongsTo::isOk(const GeomShapePtr& theShape,
-  const ModelAPI_FiltersArgs& theArgs) const
+bool FiltersPlugin_BelongsTo::isOk(const GeomShapePtr& theShape, const ResultPtr&,
+                                   const ModelAPI_FiltersArgs& theArgs) const
 {
   AttributePtr aAttr = theArgs.argument("BelongsTo");
   AttributeSelectionListPtr aList =
