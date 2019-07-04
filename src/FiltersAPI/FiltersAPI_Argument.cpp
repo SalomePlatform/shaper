@@ -17,15 +17,35 @@
 // See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 
-#ifndef FiltersAPI_swig_H_
-#define FiltersAPI_swig_H_
+#include "FiltersAPI_Argument.h"
 
-  #include <ModelHighAPI_swig.h>
+FiltersAPI_Argument::FiltersAPI_Argument()
+{
+}
 
-  #include "FiltersAPI.h"
-  #include "FiltersAPI_Argument.h"
-  #include "FiltersAPI_Feature.h"
-  #include "FiltersAPI_Filter.h"
-  #include "FiltersAPI_Selection.h"
+FiltersAPI_Argument::FiltersAPI_Argument(const std::string& theValue)
+  : myValue(theValue)
+{
+}
 
-#endif // FiltersAPI_swig_H_
+FiltersAPI_Argument::FiltersAPI_Argument(const ModelHighAPI_Selection& theSelection)
+  : mySelection(theSelection)
+{
+}
+
+FiltersAPI_Argument::FiltersAPI_Argument(const AttributeSelectionPtr& theSelection)
+  : mySelectionAttr(theSelection)
+{
+}
+
+FiltersAPI_Argument::~FiltersAPI_Argument()
+{
+}
+
+void FiltersAPI_Argument::dump(ModelHighAPI_Dumper& theDumper) const
+{
+  if (mySelectionAttr)
+    theDumper << mySelectionAttr;
+  else if (mySelection.variantType() == ModelHighAPI_Selection::VT_Empty)
+    theDumper << "\"" << myValue << "\"";
+}

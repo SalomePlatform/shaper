@@ -21,12 +21,14 @@ INCLUDE(Common)
 
 SET(PROJECT_HEADERS
   FiltersAPI.h
+  FiltersAPI_Argument.h
   FiltersAPI_Feature.h
   FiltersAPI_Filter.h
   FiltersAPI_Selection.h
 )
 
 SET(PROJECT_SOURCES
+  FiltersAPI_Argument.cpp
   FiltersAPI_Feature.cpp
   FiltersAPI_Filter.cpp
   FiltersAPI_Selection.cpp

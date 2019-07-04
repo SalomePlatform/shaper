@@ -35,6 +35,19 @@ FiltersAPI_Feature::~FiltersAPI_Feature()
 {
 }
 
+static void separateArguments(const std::list<FiltersAPI_Argument>& theArguments,
+                              std::list<ModelHighAPI_Selection>& theSelections,
+                              std::list<std::string>& theTextArgs)
+{
+  std::list<FiltersAPI_Argument>::const_iterator anIt = theArguments.begin();
+  for (; anIt != theArguments.end(); ++anIt) {
+    if (anIt->selection().variantType() != ModelHighAPI_Selection::VT_Empty)
+      theSelections.push_back(anIt->selection());
+    else if (!anIt->string().empty())
+      theTextArgs.push_back(anIt->string());
+  }
+}
+
 void FiltersAPI_Feature::setFilters(const std::list<FilterAPIPtr>& theFilters)
 {
   FiltersFeaturePtr aBase = std::dynamic_pointer_cast<ModelAPI_FiltersFeature>(feature());
@@ -43,21 +56,32 @@ void FiltersAPI_Feature::setFilters(const std::list<FilterAPIPtr>& theFilters)
     aBase->addFilter((*anIt)->name());
     aBase->setReversed((*anIt)->name(), (*anIt)->isReversed());
 
-    const std::list<ModelHighAPI_Selection>& anArgs = (*anIt)->arguments();
+    const std::list<FiltersAPI_Argument>& anArgs = (*anIt)->arguments();
     if (!anArgs.empty()) {
-      // find selectionList argument and fill it
+      // separate selection arguments and strings
+      std::list<ModelHighAPI_Selection> aSelections;
+      std::list<std::string> aTexts;
+      separateArguments(anArgs, aSelections, aTexts);
+
+      // fill arguments of the filter
       std::list<AttributePtr> aFilterArgs = aBase->filterArgs((*anIt)->name());
       for (std::list<AttributePtr>::iterator aFIt = aFilterArgs.begin();
            aFIt != aFilterArgs.end(); ++aFIt) {
         AttributeSelectionListPtr aSelList =
             std::dynamic_pointer_cast<ModelAPI_AttributeSelectionList>(*aFIt);
         if (aSelList)
-          fillAttribute(anArgs, aSelList);
+          fillAttribute(aSelections, aSelList);
         else {
           AttributeSelectionPtr aSelection =
               std::dynamic_pointer_cast<ModelAPI_AttributeSelection>(*aFIt);
-          if (aSelection && anArgs.size() == 1)
-            fillAttribute(anArgs.front(), aSelection);
+          if (aSelection && aSelections.size() == 1)
+            fillAttribute(aSelections.front(), aSelection);
+          else {
+            AttributeStringPtr aString =
+                std::dynamic_pointer_cast<ModelAPI_AttributeString>(*aFIt);
+            if (aString && aTexts.size() == 1)
+              fillAttribute(aTexts.front(), aString);
+          }
         }
       }
     }

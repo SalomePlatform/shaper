@@ -19,6 +19,10 @@
 
 #include "FiltersPlugin_RelativeToSolid.h"
 
+#include <GeomAPI_Solid.h>
+
+#include <GeomAlgoAPI_SolidClassifier.h>
+
 #include <ModelAPI_AttributeSelection.h>
 #include <ModelAPI_AttributeString.h>
 
@@ -31,7 +35,41 @@ bool FiltersPlugin_RelativeToSolid::isSupported(GeomAPI_Shape::ShapeType theType
 bool FiltersPlugin_RelativeToSolid::isOk(const GeomShapePtr& theShape,
                                          const ModelAPI_FiltersArgs& theArgs) const
 {
-  return false;
+  AttributePtr anAttr = theArgs.argument("Solid");
+  AttributeSelectionPtr aSel = std::dynamic_pointer_cast<ModelAPI_AttributeSelection>(anAttr);
+  if (!aSel)
+    return false;
+
+  anAttr = theArgs.argument("Location");
+  AttributeStringPtr aLocAttr = std::dynamic_pointer_cast<ModelAPI_AttributeString>(anAttr);
+  if (!aLocAttr)
+    return false;
+  std::string aLocString = aLocAttr->value();
+
+  GeomShapePtr aSolidSelected = aSel->value();
+  if (!aSolidSelected && aSel->context())
+    aSolidSelected = aSel->context()->shape();
+  GeomSolidPtr aSolid = aSolidSelected ? aSolidSelected->solid() : GeomSolidPtr();
+  if (!aSolid)
+    return false;
+
+  GeomAlgoAPI_SolidClassifier aClassifier(aSolid, theShape);
+  GeomAlgoAPI_SolidClassifier::State aState = aClassifier.state();
+
+  bool isOK = false;
+  if (aLocString == "in")
+    isOK = aState == GeomAlgoAPI_SolidClassifier::State_IN;
+  else if (aLocString == "out")
+    isOK = aState == GeomAlgoAPI_SolidClassifier::State_OUT;
+  else if (aLocString == "on")
+    isOK = aState == GeomAlgoAPI_SolidClassifier::State_ON;
+  else if (aLocString == "not_on")
+    isOK = !(aState & GeomAlgoAPI_SolidClassifier::State_ON);
+  else if (aLocString == "not_out")
+    isOK = !(aState & GeomAlgoAPI_SolidClassifier::State_OUT);
+  else if (aLocString == "not_in")
+    isOK = !(aState & GeomAlgoAPI_SolidClassifier::State_IN);
+  return isOK;
 }
 
 static std::string XMLRepresentation =
@@ -46,9 +84,9 @@ static std::string XMLRepresentation =
 "   <case id=\"in\" title=\"In\"/>"
 "   <case id=\"out\" title=\"Out\"/>"
 "   <case id=\"on\" title=\"On\"/>"
-"   <case id=\"noton\" title=\"Not On\"/>"
-"   <case id=\"inon\" title=\"In and On\"/>"
-"   <case id=\"outon\" title=\"On and Out\"/>"
+"   <case id=\"not_on\" title=\"Not On\"/>"
+"   <case id=\"not_out\" title=\"In and On\"/>"
+"   <case id=\"not_in\" title=\"On and Out\"/>"
 " </switch>"
 "</filter>";
 

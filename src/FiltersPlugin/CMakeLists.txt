@@ -54,6 +54,7 @@ SET(PROJECT_LIBRARIES
     Events
     Config
     GeomAPI
+    GeomAlgoAPI
 )
 
 SET(XML_RESOURCES
@@ -70,6 +71,7 @@ INCLUDE_DIRECTORIES(
   ${PROJECT_SOURCE_DIR}/src/Config
   ${PROJECT_SOURCE_DIR}/src/Events
   ${PROJECT_SOURCE_DIR}/src/GeomAPI
+  ${PROJECT_SOURCE_DIR}/src/GeomAlgoAPI
   ${PROJECT_SOURCE_DIR}/src/GeomDataAPI
 )
 
@@ -86,12 +88,12 @@ ADD_UNIT_TESTS(
   TestFilter_OnPlaneSide_Face.py
   TestFilter_OnPlaneSide_Plane.py
   TestFilter_OppositeToEdge.py
-#  TestFilter_RelativeToSolid_In.py
-#  TestFilter_RelativeToSolid_Out.py
-#  TestFilter_RelativeToSolid_On.py
-#  TestFilter_RelativeToSolid_NotOn.py
-#  TestFilter_RelativeToSolid_InAndOn.py
-#  TestFilter_RelativeToSolid_OutAndOn.py
+  TestFilter_RelativeToSolid_In.py
+  TestFilter_RelativeToSolid_Out.py
+  TestFilter_RelativeToSolid_On.py
+  TestFilter_RelativeToSolid_NotOn.py
+  TestFilter_RelativeToSolid_InAndOn.py
+  TestFilter_RelativeToSolid_OutAndOn.py
   TestFilter_HorizontalFaces.py
   TestFilter_VerticalFaces.py
 )

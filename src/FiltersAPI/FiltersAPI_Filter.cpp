@@ -22,13 +22,14 @@
 #include <ModelAPI_Attribute.h>
 #include <ModelAPI_AttributeBoolean.h>
 #include <ModelAPI_AttributeSelectionList.h>
+#include <ModelAPI_AttributeString.h>
 
 #include <ModelHighAPI_Dumper.h>
 
 FiltersAPI_Filter::FiltersAPI_Filter(
     const std::string& theName,
     const bool theRevertFilter,
-    const std::list<ModelHighAPI_Selection>& theArguments)
+    const std::list<FiltersAPI_Argument>& theArguments)
   : myName(theName), myReversed(theRevertFilter), myFilterArguments(theArguments)
 {
 }
@@ -41,19 +42,33 @@ FiltersAPI_Filter::FiltersAPI_Filter(const std::string& theName,
        anArgIt != theArguments.end(); ++anArgIt) {
     AttributeBooleanPtr aBoolAttr =
       std::dynamic_pointer_cast<ModelAPI_AttributeBoolean>(*anArgIt);
-    if (aBoolAttr)
+    if (aBoolAttr) {
       myReversed = aBoolAttr->value();
-    else {
-      AttributeSelectionListPtr aSelList =
-          std::dynamic_pointer_cast<ModelAPI_AttributeSelectionList>(*anArgIt);
-      if (aSelList) {
-        int aSize = aSelList->size();
-        for (int i = 0; i < aSize; ++i) {
-          AttributeSelectionPtr aSelection = aSelList->value(i);
-          myFilterArguments.push_back(
-              ModelHighAPI_Selection(aSelection->context(), aSelection->value()));
-        }
+      continue;
+    }
+
+    AttributeSelectionListPtr aSelList =
+        std::dynamic_pointer_cast<ModelAPI_AttributeSelectionList>(*anArgIt);
+    if (aSelList) {
+      int aSize = aSelList->size();
+      for (int i = 0; i < aSize; ++i) {
+        AttributeSelectionPtr aSelection = aSelList->value(i);
+        myFilterArguments.push_back(FiltersAPI_Argument(aSelection));
       }
+      continue;
+    }
+
+    AttributeSelectionPtr aSelection =
+        std::dynamic_pointer_cast<ModelAPI_AttributeSelection>(*anArgIt);
+    if (aSelection) {
+      myFilterArguments.push_back(FiltersAPI_Argument(aSelection));
+      continue;
+    }
+
+    AttributeStringPtr aString = std::dynamic_pointer_cast<ModelAPI_AttributeString>(*anArgIt);
+    if (aString) {
+      myFilterArguments.push_back(FiltersAPI_Argument(aString->value()));
+      continue;
     }
   }
 }
@@ -67,15 +82,26 @@ void FiltersAPI_Filter::dump(ModelHighAPI_Dumper& theDumper) const
   theDumper << "model.addFilter(name = \"" << myName << "\"";
   if (myReversed)
     theDumper << ", exclude = " << myReversed;
-  if (!myFilterArguments.empty())
-    theDumper << ", args = []";
+  if (!myFilterArguments.empty()) {
+    theDumper << ", args = [";
+    bool isFirstArg = true;
+    for (std::list<FiltersAPI_Argument>::const_iterator anIt = myFilterArguments.begin();
+         anIt != myFilterArguments.end(); ++anIt) {
+      if (isFirstArg)
+        isFirstArg = false;
+      else
+        theDumper << ", ";
+      anIt->dump(theDumper);
+    }
+    theDumper << "]";
+  }
   theDumper << ")";
 }
 
 // ================================================================================================
 FilterAPIPtr addFilter(const std::string& name,
                        const bool exclude,
-                       const std::list<ModelHighAPI_Selection>& args)
+                       const std::list<FiltersAPI_Argument>& args)
 {
   return FilterAPIPtr(new FiltersAPI_Filter(name, exclude, args));
 }

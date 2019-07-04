@@ -21,6 +21,7 @@
 #define FILTERSAPI_FILTER_H_
 
 #include "FiltersAPI.h"
+#include "FiltersAPI_Argument.h"
 
 #include <ModelHighAPI_Dumper.h>
 #include <ModelHighAPI_Selection.h>
@@ -38,7 +39,7 @@ public:
   FiltersAPI_Filter(
       const std::string& theName,
       const bool theRevertFilter = false,
-      const std::list<ModelHighAPI_Selection>& theArguments = std::list<ModelHighAPI_Selection>());
+      const std::list<FiltersAPI_Argument>& theArguments = std::list<FiltersAPI_Argument>());
 
   // Internal constructor based on filter arguments
   FILTERSAPI_EXPORT
@@ -51,7 +52,7 @@ public:
 
   const std::string& name() const { return myName; }
   bool isReversed() const { return myReversed; }
-  const std::list<ModelHighAPI_Selection>& arguments() const { return myFilterArguments; }
+  const std::list<FiltersAPI_Argument>& arguments() const { return myFilterArguments; }
 
   /// Dump wrapped feature
   FILTERSAPI_EXPORT
@@ -60,7 +61,7 @@ public:
 private:
   std::string myName;
   bool myReversed;
-  std::list<ModelHighAPI_Selection> myFilterArguments;
+  std::list<FiltersAPI_Argument> myFilterArguments;
 };
 
 typedef std::shared_ptr<FiltersAPI_Filter> FilterAPIPtr;
@@ -69,6 +70,6 @@ typedef std::shared_ptr<FiltersAPI_Filter> FilterAPIPtr;
 FILTERSAPI_EXPORT FilterAPIPtr
 addFilter(const std::string& name = std::string(),
           const bool exclude = false,
-          const std::list<ModelHighAPI_Selection>& args = std::list<ModelHighAPI_Selection>());
+          const std::list<FiltersAPI_Argument>& args = std::list<FiltersAPI_Argument>());
 
 #endif

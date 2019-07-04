@@ -45,13 +45,86 @@
 %shared_ptr(FiltersAPI_Feature)
 %shared_ptr(FiltersAPI_Filter)
 
-// std::list -> []
-%template(FilterList) std::list<std::shared_ptr<FiltersAPI_Filter> >;
-
 // function with named parameters
 %feature("kwargs") addFilter;
 
+
+// std::list -> []
+%template(FilterList) std::list<std::shared_ptr<FiltersAPI_Filter> >;
+%template(ArgumentList) std::list<FiltersAPI_Argument>;
+
+// fix compilarion error: 'res*' was not declared in this scope
+%typemap(freearg) const std::list<FiltersAPI_Argument> & {}
+
+%typecheck(SWIG_TYPECHECK_POINTER) std::list<FiltersAPI_Argument>, const std::list<FiltersAPI_Argument> & {
+  ModelHighAPI_Selection* temp_selection;
+  std::string* temp_string;
+  int newmem = 0;
+  $1 = 1;
+  if (PySequence_Check($input)) {
+    for (Py_ssize_t i = 0; i < PySequence_Size($input); ++i) {
+      PyObject * item = PySequence_GetItem($input, i);
+      if ((SWIG_ConvertPtrAndOwn(item, (void **)&temp_selection, $descriptor(ModelHighAPI_Selection *), SWIG_POINTER_EXCEPTION, &newmem)) == 0) {
+        if (!temp_selection) {
+          $1 = 0;
+        }
+      } else
+      if ((SWIG_ConvertPtrAndOwn(item, (void **)&temp_string, $descriptor(std::string *), SWIG_POINTER_EXCEPTION, &newmem)) == 0) {
+        if (!temp_string) {
+          $1 = 0;
+        }
+      } else
+      if (!PyUnicode_Check(item))
+        $1 = 0;
+    }
+  }
+}
+
+%typemap(in) const std::list<FiltersAPI_Argument> & (std::list<FiltersAPI_Argument> temp) {
+  ModelHighAPI_Selection* temp_selection;
+  std::string* temp_string;
+  int newmem = 0;
+  if (PySequence_Check($input)) {
+    for (Py_ssize_t i = 0; i < PySequence_Size($input); ++i) {
+      PyObject * item = PySequence_GetItem($input, i);
+      if ((SWIG_ConvertPtrAndOwn(item, (void **)&temp_selection, $descriptor(ModelHighAPI_Selection*), SWIG_POINTER_EXCEPTION, &newmem)) == 0) {
+        if (!temp_selection) {
+          PyErr_SetString(PyExc_TypeError, "argument must be ModelHighAPI_Selection or string.");
+          return NULL;
+        }
+        temp.push_back(FiltersAPI_Argument(*temp_selection));
+        if (newmem & SWIG_CAST_NEW_MEMORY) {
+          delete temp_selection;
+        }
+      } else
+      if ((SWIG_ConvertPtrAndOwn(item, (void **)&temp_string, $descriptor(std::string*), SWIG_POINTER_EXCEPTION, &newmem)) == 0) {
+        if (!temp_string) {
+          PyErr_SetString(PyExc_TypeError, "argument must be ModelHighAPI_Selection or string.");
+          return NULL;
+        }
+        temp.push_back(FiltersAPI_Argument(*temp_string));
+        if (newmem & SWIG_CAST_NEW_MEMORY) {
+          delete temp_string;
+        }
+      } else
+      if (PyUnicode_Check(item)) {
+        temp.push_back(FiltersAPI_Argument(PyUnicode_AsUTF8(item)));
+      } else {
+        PyErr_SetString(PyExc_TypeError, "argument must be ModelHighAPI_Selection or string.");
+        return NULL;
+      }
+      Py_DECREF(item);
+    }
+    $1 = &temp;
+  } else {
+    PyErr_SetString(PyExc_TypeError, "argument must be ModelHighAPI_Selection or std::string.");
+    return NULL;
+  }
+}
+
+
 // all supported interfaces
+%include "FiltersAPI_Argument.h"
 %include "FiltersAPI_Feature.h"
 %include "FiltersAPI_Filter.h"
 %include "FiltersAPI_Selection.h"

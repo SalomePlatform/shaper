@@ -79,6 +79,7 @@ SET(PROJECT_HEADERS
     GeomAlgoAPI_CurveBuilder.h
     GeomAlgoAPI_NExplode.h
     GeomAlgoAPI_Offset.h
+    GeomAlgoAPI_SolidClassifier.h
 )
 
 SET(PROJECT_SOURCES
@@ -137,6 +138,7 @@ SET(PROJECT_SOURCES
     GeomAlgoAPI_CurveBuilder.cpp
     GeomAlgoAPI_NExplode.cpp
     GeomAlgoAPI_Offset.cpp
+    GeomAlgoAPI_SolidClassifier.cpp
 )
 
 SET(PROJECT_LIBRARIES
