@@ -29,8 +29,10 @@
 // standard definitions
 %include "typemaps.i"
 %include "std_list.i"
-%include "std_string.i"
+%include "std_map.i"
+%include "std_set.i"
 %include "std_shared_ptr.i"
+%include "std_string.i"
 
 // shared pointers
 %shared_ptr(GeomAPI_AISObject)
@@ -148,3 +150,8 @@
 // std::list -> []
 %template(PointList) std::list<std::shared_ptr<GeomAPI_Pnt> >;
 %template(ShapeList) std::list<std::shared_ptr<GeomAPI_Shape> >;
+// std::set -> []
+%template(ShapeSet) std::set<std::shared_ptr<GeomAPI_Shape>, GeomAPI_Shape::Comparator>;
+%template(OriShapeSet) std::set<std::shared_ptr<GeomAPI_Shape>, GeomAPI_Shape::ComparatorWithOri>;
+// std::map -> {}
+%template(ShapeToShapesMap) std::map<std::shared_ptr<GeomAPI_Shape>, std::set<std::shared_ptr<GeomAPI_Shape>, GeomAPI_Shape::ComparatorWithOri>, GeomAPI_Shape::Comparator>;

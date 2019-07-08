@@ -33,6 +33,8 @@
 class ModelAPI_Filter
 {
 public:
+  virtual ~ModelAPI_Filter() {}
+
   /// Returns name of the filter to represent it in GUI
   virtual const std::string& name() const = 0;
 
@@ -56,10 +58,9 @@ public:
   /// not redefined.
   virtual void initAttributes(ModelAPI_FiltersArgs& theArguments) {}
 
-protected:
   /// Returns XML string which represents GUI of the filter
   /// by reading corresponding XML file.
-  MODELAPI_EXPORT std::string xmlFromFile(const std::string& theConfigFile) const;
+  MODELAPI_EXPORT virtual std::string xmlFromFile(const std::string& theConfigFile) const;
 
 private:
   bool myIsReverse;

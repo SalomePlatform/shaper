@@ -720,3 +720,14 @@ bool GeomAPI_Shape::Comparator::operator()(const std::shared_ptr<GeomAPI_Shape>&
 {
   return theShape1->impl<TopoDS_Shape>().TShape() < theShape2->impl<TopoDS_Shape>().TShape();
 }
+
+bool GeomAPI_Shape::ComparatorWithOri::operator()(
+    const std::shared_ptr<GeomAPI_Shape>& theShape1,
+    const std::shared_ptr<GeomAPI_Shape>& theShape2) const
+{
+  const TopoDS_Shape& aShape1 = theShape1->impl<TopoDS_Shape>();
+  const TopoDS_Shape& aShape2 = theShape2->impl<TopoDS_Shape>();
+  return (aShape1.TShape() < aShape2.TShape()) ||
+         (aShape1.TShape() == aShape2.TShape() &&
+          aShape1.Orientation() < aShape2.Orientation());
+}

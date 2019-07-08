@@ -59,6 +59,10 @@ SET(PROJECT_LIBRARIES
     GeomAlgoAPI
 )
 
+SET(PROJECT_PYFILES
+    FiltersPlugin_TopoConnectedFaces.py
+)
+
 SET(XML_RESOURCES
   plugin-Filters.xml
   filter-BelongsTo.xml
@@ -68,6 +72,7 @@ SET(XML_RESOURCES
   filter-OnPlaneSide.xml
   filter-OppositeToEdge.xml
   filter-RelativeToSolid.xml
+  filter-TopoConnectedFaces.xml
 )
 
 ADD_DEFINITIONS(-DFILTERS_EXPORTS ${OpenCASCADE_DEFINITIONS})
@@ -86,6 +91,8 @@ INCLUDE_DIRECTORIES(
 
 INSTALL(TARGETS Filters DESTINATION ${SHAPER_INSTALL_PLUGIN_FILES})
 INSTALL(FILES ${XML_RESOURCES} DESTINATION ${SHAPER_INSTALL_XML_RESOURCES})
+INSTALL(FILES ${PROJECT_PYFILES} DESTINATION ${SHAPER_INSTALL_ADDONS})
+
 
 ADD_UNIT_TESTS(
   TestFilters.py
@@ -106,4 +113,22 @@ ADD_UNIT_TESTS(
   TestFilter_ExternalFaces.py
   TestFilter_HorizontalFaces.py
   TestFilter_VerticalFaces.py
+  TestFilter_TopoConnectedFaces_Vertex1.py
+  TestFilter_TopoConnectedFaces_Vertex2.py
+  TestFilter_TopoConnectedFaces_Vertex3.py
+  TestFilter_TopoConnectedFaces_Prop_Vertex1.py
+  TestFilter_TopoConnectedFaces_Prop_Vertex2.py
+  TestFilter_TopoConnectedFaces_Prop_Vertex3.py
+  TestFilter_TopoConnectedFaces_Edge1.py
+  TestFilter_TopoConnectedFaces_Edge2.py
+  TestFilter_TopoConnectedFaces_Edge3.py
+  TestFilter_TopoConnectedFaces_Prop_Edge1.py
+  TestFilter_TopoConnectedFaces_Prop_Edge2.py
+  TestFilter_TopoConnectedFaces_Prop_Edge3.py
+  TestFilter_TopoConnectedFaces_Face1.py
+  TestFilter_TopoConnectedFaces_Face2.py
+  TestFilter_TopoConnectedFaces_Face3.py
+  TestFilter_TopoConnectedFaces_Prop_Face1.py
+  TestFilter_TopoConnectedFaces_Prop_Face2.py
+  TestFilter_TopoConnectedFaces_Prop_Face3.py
 )

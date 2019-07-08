@@ -30,6 +30,8 @@
 #include "FiltersPlugin_RelativeToSolid.h"
 #include "FiltersPlugin_ExternalFaces.h"
 
+#include <Config_ModuleReader.h>
+
 #include <ModelAPI_Session.h>
 #include <ModelAPI_FiltersFactory.h>
 
@@ -51,6 +53,8 @@ FiltersPlugin_Plugin::FiltersPlugin_Plugin()
   aFactory->registerFilter("OppositeToEdge", new FiltersPlugin_OppositeToEdge);
   aFactory->registerFilter("RelativeToSolid", new FiltersPlugin_RelativeToSolid);
   aFactory->registerFilter("ExternalFaces", new FiltersPlugin_ExternalFaces);
+
+  Config_ModuleReader::loadScript("FiltersPlugin_TopoConnectedFaces");
 
   ModelAPI_Session::get()->registerPlugin(this);
 }

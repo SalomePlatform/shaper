@@ -80,6 +80,7 @@ SET(PROJECT_HEADERS
     GeomAlgoAPI_NExplode.h
     GeomAlgoAPI_Offset.h
     GeomAlgoAPI_SolidClassifier.h
+    GeomAlgoAPI_MapShapesAndAncestors.h
 )
 
 SET(PROJECT_SOURCES
@@ -139,6 +140,7 @@ SET(PROJECT_SOURCES
     GeomAlgoAPI_NExplode.cpp
     GeomAlgoAPI_Offset.cpp
     GeomAlgoAPI_SolidClassifier.cpp
+    GeomAlgoAPI_MapShapesAndAncestors.cpp
 )
 
 SET(PROJECT_LIBRARIES

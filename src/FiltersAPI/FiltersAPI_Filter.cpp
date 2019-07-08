@@ -70,6 +70,12 @@ FiltersAPI_Filter::FiltersAPI_Filter(const std::string& theName,
       myFilterArguments.push_back(FiltersAPI_Argument(aString->value()));
       continue;
     }
+
+    AttributeBooleanPtr aBoolean = std::dynamic_pointer_cast<ModelAPI_AttributeBoolean>(*anArgIt);
+    if (aBoolean) {
+      myFilterArguments.push_back(FiltersAPI_Argument(aBoolean->value()));
+      continue;
+    }
   }
 }
 

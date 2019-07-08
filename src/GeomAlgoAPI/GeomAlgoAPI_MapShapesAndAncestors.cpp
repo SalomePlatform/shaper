@@ -17,44 +17,29 @@
 // See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 
-#include "FiltersAPI_Argument.h"
+#include "GeomAlgoAPI_MapShapesAndAncestors.h"
 
-FiltersAPI_Argument::FiltersAPI_Argument()
+#include <GeomAPI_ShapeExplorer.h>
+
+GeomAlgoAPI_MapShapesAndAncestors::GeomAlgoAPI_MapShapesAndAncestors(
+    const std::shared_ptr<GeomAPI_Shape> theShape,
+    const GeomAPI_Shape::ShapeType theShapeType,
+    const GeomAPI_Shape::ShapeType theAncestorType)
 {
+  perform(theShape, theShapeType, theAncestorType);
 }
 
-FiltersAPI_Argument::FiltersAPI_Argument(const bool theValue)
-  : myBoolean(theValue)
+void GeomAlgoAPI_MapShapesAndAncestors::perform(
+    const std::shared_ptr<GeomAPI_Shape> theShape,
+    const GeomAPI_Shape::ShapeType theShapeType,
+    const GeomAPI_Shape::ShapeType theAncestorType)
 {
-}
+  myMap.clear();
 
-FiltersAPI_Argument::FiltersAPI_Argument(const std::string& theValue)
-  : myValue(theValue)
-{
-}
-
-FiltersAPI_Argument::FiltersAPI_Argument(const ModelHighAPI_Selection& theSelection)
-  : mySelection(theSelection)
-{
-}
-
-FiltersAPI_Argument::FiltersAPI_Argument(const AttributeSelectionPtr& theSelection)
-  : mySelectionAttr(theSelection)
-{
-}
-
-FiltersAPI_Argument::~FiltersAPI_Argument()
-{
-}
-
-void FiltersAPI_Argument::dump(ModelHighAPI_Dumper& theDumper) const
-{
-  if (mySelectionAttr)
-    theDumper << mySelectionAttr;
-  else if (mySelection.variantType() == ModelHighAPI_Selection::VT_Empty) {
-    if (myValue.empty())
-      theDumper << myBoolean;
-    else
-      theDumper << "\"" << myValue << "\"";
+  GeomAPI_ShapeExplorer anAncIt(theShape, theAncestorType);
+  for (; anAncIt.more(); anAncIt.next()) {
+    GeomAPI_ShapeExplorer aShIt(anAncIt.current(), theShapeType);
+    for (; aShIt.more(); aShIt.next())
+      myMap[aShIt.current()].insert(anAncIt.current());
   }
 }

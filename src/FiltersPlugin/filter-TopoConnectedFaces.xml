@@ -1,0 +1,9 @@
+<filter id="TopoConnectedFaces">
+  <shape_selector id="TopoConnectedFaces__Shape"
+                  label="Shape:"
+                  tooltip="Select vertex, edge or face."
+                  shape_types="vertex edge face">
+    <validator id="GeomValidators_ShapeType" parameters="vertex,edge,face"/>
+  </shape_selector>
+  <boolvalue id="TopoConnectedFaces__Propagation" label="Propagation"/>
+</filter>

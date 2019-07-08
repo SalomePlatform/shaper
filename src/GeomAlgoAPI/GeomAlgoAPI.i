@@ -57,6 +57,7 @@
 %shared_ptr(GeomAlgoAPI_ConeSegment)
 %shared_ptr(GeomAlgoAPI_Copy)
 %shared_ptr(GeomAlgoAPI_Symmetry)
+%shared_ptr(GeomAlgoAPI_MapShapesAndAncestors)
 
 // all supported interfaces
 %include "GeomAlgoAPI_MakeShape.h"
@@ -97,6 +98,7 @@
 %include "GeomAlgoAPI_Copy.h"
 %include "GeomAlgoAPI_Symmetry.h"
 %include "GeomAlgoAPI_Box.h"
+%include "GeomAlgoAPI_MapShapesAndAncestors.h"
 
 %typemap(out) std::list< std::shared_ptr< GeomAPI_Shape > >::value_type & {
   $result = SWIG_NewPointerObj(SWIG_as_voidptr(new std::shared_ptr<GeomAPI_Shape>(*$1)), $descriptor(std::shared_ptr<GeomAPI_Shape> *), SWIG_POINTER_OWN | 0 );

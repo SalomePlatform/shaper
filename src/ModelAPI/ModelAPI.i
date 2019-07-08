@@ -54,6 +54,7 @@
 %feature("director") ModelAPI_CompositeFeature;
 %feature("director") ModelAPI_Data;
 %feature("director") ModelAPI_Folder;
+%feature("director") ModelAPI_Filter;
 
 // shared pointers
 // For ModelAPI_ResultConstruction.shape()

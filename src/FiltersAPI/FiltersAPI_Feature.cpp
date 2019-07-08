@@ -37,13 +37,16 @@ FiltersAPI_Feature::~FiltersAPI_Feature()
 
 static void separateArguments(const std::list<FiltersAPI_Argument>& theArguments,
                               std::list<ModelHighAPI_Selection>& theSelections,
-                              std::list<std::string>& theTextArgs)
+                              std::list<std::string>& theTextArgs,
+                              std::list<bool>& theBoolArgs)
 {
   std::list<FiltersAPI_Argument>::const_iterator anIt = theArguments.begin();
   for (; anIt != theArguments.end(); ++anIt) {
     if (anIt->selection().variantType() != ModelHighAPI_Selection::VT_Empty)
       theSelections.push_back(anIt->selection());
-    else if (!anIt->string().empty())
+    else if (anIt->string().empty())
+      theBoolArgs.push_back(anIt->boolean());
+    else
       theTextArgs.push_back(anIt->string());
   }
 }
@@ -61,12 +64,18 @@ void FiltersAPI_Feature::setFilters(const std::list<FilterAPIPtr>& theFilters)
       // separate selection arguments and strings
       std::list<ModelHighAPI_Selection> aSelections;
       std::list<std::string> aTexts;
-      separateArguments(anArgs, aSelections, aTexts);
+      std::list<bool> aBools;
+      separateArguments(anArgs, aSelections, aTexts, aBools);
 
-      // fill arguments of the filter
       std::list<AttributePtr> aFilterArgs = aBase->filterArgs((*anIt)->name());
-      for (std::list<AttributePtr>::iterator aFIt = aFilterArgs.begin();
-           aFIt != aFilterArgs.end(); ++aFIt) {
+      std::list<AttributePtr>::iterator aFIt = aFilterArgs.begin();
+      // first boolean argument is always "Reversed" flag
+      AttributeBooleanPtr aReversedFlag =
+          std::dynamic_pointer_cast<ModelAPI_AttributeBoolean>(*aFIt);
+      if (aReversedFlag)
+        ++aFIt;
+      // fill arguments of the filter
+      for (; aFIt != aFilterArgs.end(); ++aFIt) {
         AttributeSelectionListPtr aSelList =
             std::dynamic_pointer_cast<ModelAPI_AttributeSelectionList>(*aFIt);
         if (aSelList)
@@ -79,8 +88,16 @@ void FiltersAPI_Feature::setFilters(const std::list<FilterAPIPtr>& theFilters)
           else {
             AttributeStringPtr aString =
                 std::dynamic_pointer_cast<ModelAPI_AttributeString>(*aFIt);
-            if (aString && aTexts.size() == 1)
-              fillAttribute(aTexts.front(), aString);
+            if (aString) {
+              if (aTexts.size() == 1)
+                fillAttribute(aTexts.front(), aString);
+            }
+            else {
+              AttributeBooleanPtr aBoolean =
+                  std::dynamic_pointer_cast<ModelAPI_AttributeBoolean>(*aFIt);
+              if (aBoolean && aBools.size() == 1)
+                fillAttribute(aBools.front(), aBoolean);
+            }
           }
         }
       }

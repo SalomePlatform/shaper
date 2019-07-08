@@ -37,6 +37,9 @@ public:
   FILTERSAPI_EXPORT FiltersAPI_Argument();
 
   FILTERSAPI_EXPORT
+  FiltersAPI_Argument(const bool theValue);
+
+  FILTERSAPI_EXPORT
   FiltersAPI_Argument(const std::string& theValue);
 
   FILTERSAPI_EXPORT
@@ -49,6 +52,7 @@ public:
   FILTERSAPI_EXPORT
   virtual ~FiltersAPI_Argument();
 
+  const bool boolean() const { return myBoolean; }
   const std::string& string() const { return myValue; }
   const ModelHighAPI_Selection& selection() const { return mySelection; }
 
@@ -57,6 +61,7 @@ public:
   void dump(ModelHighAPI_Dumper& theDumper) const;
 
 private:
+  bool myBoolean;
   std::string myValue;
   ModelHighAPI_Selection mySelection;
   AttributeSelectionPtr mySelectionAttr;

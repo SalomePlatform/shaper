@@ -74,7 +74,7 @@
           $1 = 0;
         }
       } else
-      if (!PyUnicode_Check(item))
+      if (!PyUnicode_Check(item) && !PyBool_Check(item))
         $1 = 0;
     }
   }
@@ -89,7 +89,7 @@
       PyObject * item = PySequence_GetItem($input, i);
       if ((SWIG_ConvertPtrAndOwn(item, (void **)&temp_selection, $descriptor(ModelHighAPI_Selection*), SWIG_POINTER_EXCEPTION, &newmem)) == 0) {
         if (!temp_selection) {
-          PyErr_SetString(PyExc_TypeError, "argument must be ModelHighAPI_Selection or string.");
+          PyErr_SetString(PyExc_TypeError, "argument must be ModelHighAPI_Selection, string or boolean.");
           return NULL;
         }
         temp.push_back(FiltersAPI_Argument(*temp_selection));
@@ -99,7 +99,7 @@
       } else
       if ((SWIG_ConvertPtrAndOwn(item, (void **)&temp_string, $descriptor(std::string*), SWIG_POINTER_EXCEPTION, &newmem)) == 0) {
         if (!temp_string) {
-          PyErr_SetString(PyExc_TypeError, "argument must be ModelHighAPI_Selection or string.");
+          PyErr_SetString(PyExc_TypeError, "argument must be ModelHighAPI_Selection, string or boolean.");
           return NULL;
         }
         temp.push_back(FiltersAPI_Argument(*temp_string));
@@ -109,15 +109,18 @@
       } else
       if (PyUnicode_Check(item)) {
         temp.push_back(FiltersAPI_Argument(PyUnicode_AsUTF8(item)));
+      } else
+      if (PyBool_Check(item)) {
+        temp.push_back(FiltersAPI_Argument(item == Py_True));
       } else {
-        PyErr_SetString(PyExc_TypeError, "argument must be ModelHighAPI_Selection or string.");
+        PyErr_SetString(PyExc_TypeError, "argument must be ModelHighAPI_Selection, string or boolean.");
         return NULL;
       }
       Py_DECREF(item);
     }
     $1 = &temp;
   } else {
-    PyErr_SetString(PyExc_TypeError, "argument must be ModelHighAPI_Selection or std::string.");
+    PyErr_SetString(PyExc_TypeError, "argument must be ModelHighAPI_Selection, string or boolean.");
     return NULL;
   }
 }
