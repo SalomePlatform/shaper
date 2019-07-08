@@ -246,8 +246,6 @@ void XGUI_DataTree::processEyeClick(const QModelIndex& theIndex)
       if (toDisplay) {
         for (int i = 0; i < aField->stepsSize(); i++) {
           aField->step(i)->setDisplayed(false);
-          // TODO: Sending events has to be removed when step will be defined as Object
-          aECreator->sendUpdated(aField->step(i), EVENT_DISP);
         }
       }
       Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_TO_REDISPLAY));
@@ -264,8 +262,6 @@ void XGUI_DataTree::processEyeClick(const QModelIndex& theIndex)
           aField->setDisplayed(false);
           for (int i = 0; i < aField->stepsSize(); i++) {
             aField->step(i)->setDisplayed(i == aId);
-            // TODO: Sending events has to be removed when step will be defined as Object
-            aECreator->sendUpdated(aField->step(i), EVENT_DISP);
           }
         }
         else {

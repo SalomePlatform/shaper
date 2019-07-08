@@ -33,9 +33,13 @@ std::string ModelAPI_ResultField::groupName()
 
 void ModelAPI_ResultField::ModelAPI_FieldStep::setDisplayed(const bool theDisplay)
 {
-  myIsDisplayed = theDisplay;
-  //static Events_Loop* aLoop = Events_Loop::loop();
-  //static Events_ID EVENT_DISP = aLoop->eventByName(EVENT_OBJECT_TO_REDISPLAY);
-  //static const ModelAPI_EventCreator* aECreator = ModelAPI_EventCreator::get();
-  //aECreator->sendUpdated(FieldStepPtr(this), EVENT_DISP);
+  if (myIsDisplayed != theDisplay) {
+    myIsDisplayed = theDisplay;
+    static Events_Loop* aLoop = Events_Loop::loop();
+    static Events_ID EVENT_DISP = aLoop->eventByName(EVENT_OBJECT_TO_REDISPLAY);
+    static const ModelAPI_EventCreator* aECreator = ModelAPI_EventCreator::get();
+    if (field()) {
+      aECreator->sendUpdated(field()->step(id()), EVENT_DISP); // updated pointer to this
+    }
+  }
 }
