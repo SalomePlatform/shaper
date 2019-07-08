@@ -108,6 +108,10 @@ public:
   /// \param theId an id of the object
   virtual std::shared_ptr<ModelAPI_ResultField::ModelAPI_FieldStep> step(int theId) const = 0;
 
+  /// Sets the displayed/hidden state of the object. If it is changed, sends the "redisplay"
+  /// signal.
+  MODELAPI_EXPORT virtual void setDisplayed(const bool theDisplay);
+
   /// To refresh the steps of a field
   MODELAPI_EXPORT virtual void updateSteps() = 0;
 };

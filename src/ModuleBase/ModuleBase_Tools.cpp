@@ -40,6 +40,7 @@
 #include <ModelAPI_ResultConstruction.h>
 #include <ModelAPI_AttributeString.h>
 #include <ModelAPI_Expression.h>
+#include <ModelAPI_ResultField.h>
 #include <Events_Loop.h>
 
 #include <ModelAPI_Data.h>
@@ -397,8 +398,9 @@ void checkObjects(const QObjectPtrList& theObjects, bool& hasResult, bool& hasFe
     ResultPtr aResult = std::dynamic_pointer_cast<ModelAPI_Result>(aObj);
     FolderPtr aFolder = std::dynamic_pointer_cast<ModelAPI_Folder>(aObj);
     ResultParameterPtr aConstruction = std::dynamic_pointer_cast<ModelAPI_ResultParameter>(aResult);
+    FieldStepPtr aStep = std::dynamic_pointer_cast<ModelAPI_ResultField::ModelAPI_FieldStep>(aObj);
 
-    hasResult |= (aResult.get() != NULL);
+    hasResult |= ((aResult.get() != NULL) || (aStep.get() != NULL));
     hasFeature |= (aFeature.get() != NULL);
     hasFolder |= (aFolder.get() != NULL);
     hasParameter |= (aConstruction.get() != NULL);

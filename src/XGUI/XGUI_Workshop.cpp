@@ -2475,11 +2475,6 @@ void XGUI_Workshop::onTransparencyValueChanged()
   Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_TO_REDISPLAY));
 }
 
-//**************************************************************
-#define SET_DISPLAY_GROUP(aGroupName, aDisplay) \
-for (int i = 0; i < aDoc->size(aGroupName); i++) { \
-  aDoc->object(aGroupName, i)->setDisplayed(aDisplay); \
-}
 
 //******************************************************
 void XGUI_Workshop::showObjects(const QObjectPtrList& theList, bool isVisible)

@@ -49,6 +49,7 @@
 #include <ModelAPI_ResultField.h>
 #include <ModelAPI_Folder.h>
 #include <ModelAPI_AttributeReference.h>
+#include <ModelAPI_ResultField.h>
 
 #include <Config_DataModelReader.h>
 
@@ -506,8 +507,7 @@ void XGUI_ContextMenuMgr::updateViewerMenu()
     foreach(ModuleBase_ViewerPrsPtr aPrs, aPrsList) {
       aObject = aPrs->object();
       GeomShapePtr aShape = aPrs->shape();
-      ResultPtr aRes = std::dynamic_pointer_cast<ModelAPI_Result>(aObject);
-      if (aRes && aRes->isDisplayed()) {
+      if (aObject->isDisplayed()) {
         isVisible = true;
         canBeShaded = myWorkshop->displayer()->canBeShaded(aObject);
         isShading =
@@ -683,6 +683,13 @@ void XGUI_ContextMenuMgr::buildObjBrowserMenu()
   aList.append(action("DELETE_CMD"));
   myObjBrowserMenus[ModelAPI_Folder::group()] = aList;
 
+  //---------------------------------------
+  // Step objects menu
+  aList.clear();
+  aList.append(action("SHOW_CMD"));
+  aList.append(action("HIDE_CMD"));
+  aList.append(action("SHOW_ONLY_CMD"));
+  myObjBrowserMenus[ModelAPI_ResultField::ModelAPI_FieldStep::group()] = aList;
 }
 
 void XGUI_ContextMenuMgr::buildViewerMenu()
@@ -721,6 +728,10 @@ void XGUI_ContextMenuMgr::buildViewerMenu()
   myViewerMenu[ModelAPI_ResultGroup::group()] = aList;
   myViewerMenu[ModelAPI_ResultField::group()] = aList;
   //-------------------------------------
+  // Step objects menu
+  aList.clear();
+  aList.append(action("HIDE_CMD"));
+  myViewerMenu[ModelAPI_ResultField::ModelAPI_FieldStep::group()] = aList;
 }
 
 

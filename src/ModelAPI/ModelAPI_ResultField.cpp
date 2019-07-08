@@ -38,8 +38,25 @@ void ModelAPI_ResultField::ModelAPI_FieldStep::setDisplayed(const bool theDispla
     static Events_Loop* aLoop = Events_Loop::loop();
     static Events_ID EVENT_DISP = aLoop->eventByName(EVENT_OBJECT_TO_REDISPLAY);
     static const ModelAPI_EventCreator* aECreator = ModelAPI_EventCreator::get();
-    if (field()) {
-      aECreator->sendUpdated(field()->step(id()), EVENT_DISP); // updated pointer to this
+    ModelAPI_ResultField* aField = field();
+    if (aField) {
+      aECreator->sendUpdated(aField->step(id()), EVENT_DISP); // updated pointer to this
+      if (myIsDisplayed) {
+        for (int i = 0; i < aField->stepsSize(); i++)
+          if (i != id())
+            aField->step(i)->setDisplayed(false);
+        aField->setDisplayed(false);
+      }
     }
+  }
+}
+
+
+void ModelAPI_ResultField::setDisplayed(const bool theDisplay)
+{
+  ModelAPI_Result::setDisplayed(theDisplay);
+  if (isDisplayed()) {
+    for (int i = 0; i < stepsSize(); i++)
+      step(i)->setDisplayed(false);
   }
 }
