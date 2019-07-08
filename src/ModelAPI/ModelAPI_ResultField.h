@@ -67,6 +67,9 @@ public:
     /// signal.
     MODELAPI_EXPORT virtual void setDisplayed(const bool theDisplay);
 
+    /// Returns a GUI name of this step
+    MODELAPI_EXPORT virtual std::string name() = 0;
+
   protected:
     /// This method is called just after creation of the object: it must initialize
     /// all fields, normally initialized in the constructor
@@ -104,6 +107,9 @@ public:
   /// Returns step object
   /// \param theId an id of the object
   virtual std::shared_ptr<ModelAPI_ResultField::ModelAPI_FieldStep> step(int theId) const = 0;
+
+  /// To refresh the steps of a field
+  MODELAPI_EXPORT virtual void updateSteps() = 0;
 };
 
 //! Pointer on feature object

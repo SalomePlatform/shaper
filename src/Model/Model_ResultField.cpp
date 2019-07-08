@@ -150,4 +150,11 @@ std::shared_ptr<ModelAPI_ResultField::ModelAPI_FieldStep> Model_ResultField::ste
   }
   return NULL;
 }
+
+std::string Model_ResultField::Model_FieldStep::name() {
+  std::ostringstream aStream;
+  aStream<<myParent->data()->name()<<std::endl;
+  aStream<<"Step "<<(myId + 1)<<" "<<myParent->textLine(myId);
+  return aStream.str();
+}
 // LCOV_EXCL_STOP

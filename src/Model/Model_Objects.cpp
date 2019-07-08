@@ -1877,7 +1877,9 @@ void Model_Objects::updateResults(FeaturePtr theFeature, std::set<FeaturePtr>& t
         } else if (aGroup->Get() == ModelAPI_ResultGroup::group().c_str()) {
           aNewBody = createGroup(theFeature->data(), aResIndex);
         } else if (aGroup->Get() == ModelAPI_ResultField::group().c_str()) {
-          aNewBody = createField(theFeature->data(), aResIndex);
+          ResultFieldPtr aField = createField(theFeature->data(), aResIndex);
+          aField->updateSteps(); // to refresh the internal data
+          aNewBody = aField;
         } else if (aGroup->Get() == ModelAPI_ResultParameter::group().c_str()) {
           theFeature->attributeChanged("expression"); // just produce a value
         } else {

@@ -158,7 +158,7 @@ void XGUI_SelectionMgr::onObjectBrowserSelection()
             aPrs->dataRange(aMin, aMax);
             aViewer->setColorScaleRange(aMin, aMax);
           }
-          aViewer->setColorScaleTitle("Step");
+          aViewer->setColorScaleTitle(aStep->name().c_str());
           aViewer->setColorScaleShown(true);
         }
       }

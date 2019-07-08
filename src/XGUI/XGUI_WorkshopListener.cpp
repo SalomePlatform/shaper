@@ -271,15 +271,8 @@ void XGUI_WorkshopListener::
     ObjectPtr aObj = (*aIt);
 
     // Hide the object if it is invalid or concealed one
-    //bool aHide = !aObj->data() || !aObj->data()->isValid() ||
-    //  aObj->isDisabled() || (!aObj->isDisplayed());
-    // TODO: Remove the Hide code as soon as a fields step will become as object
-    bool aHide = false;
-    if (aObj->groupName() == ModelAPI_ResultField::ModelAPI_FieldStep::group())
-      aHide = !aObj->isDisplayed();
-    else
-      aHide = !aObj->data() || !aObj->data()->isValid() ||
-        aObj->isDisabled() || (!aObj->isDisplayed());
+    bool aHide = !aObj->data() || !aObj->data()->isValid() ||
+      aObj->isDisabled() || (!aObj->isDisplayed());
 
     if (!aHide) { // check that this is not hidden result
       ResultPtr aRes = std::dynamic_pointer_cast<ModelAPI_Result>(aObj);
