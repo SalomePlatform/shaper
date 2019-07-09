@@ -75,7 +75,8 @@ public:
 
   /// Returns step object
   /// \param theId an id of the object
-  MODEL_EXPORT virtual std::shared_ptr<ModelAPI_ResultField::ModelAPI_FieldStep> step(int theId) const;
+  MODEL_EXPORT virtual std::shared_ptr<ModelAPI_ResultField::ModelAPI_FieldStep>
+    step(int theId) const;
 
   /// Removes the stored builders
   MODEL_EXPORT virtual ~Model_ResultField();

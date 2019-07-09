@@ -158,7 +158,8 @@ void PartSet_FieldStepPrs::Compute(const Handle(PrsMgr_PresentationManager3d)& t
     QList<double> aShapeData = range(aMin, aMax);
     int aNbIntertvals = aResMgr->integerValue("Viewer", "scalar_bar_nb_intervals", 20);
 
-    AttributeSelectionListPtr aSelList = aData->selectionList(CollectionPlugin_Field::SELECTED_ID());
+    AttributeSelectionListPtr aSelList =
+      aData->selectionList(CollectionPlugin_Field::SELECTED_ID());
     for (int i = 0; i < aSelList->size(); i++) {
       AttributeSelectionPtr aSelection = aSelList->value(i);
       GeomShapePtr aShapePtr = aSelection->value();
@@ -174,7 +175,8 @@ void PartSet_FieldStepPrs::Compute(const Handle(PrsMgr_PresentationManager3d)& t
   {
     QList<double> aShapeData = booleanValues();
 
-    AttributeSelectionListPtr aSelList = aData->selectionList(CollectionPlugin_Field::SELECTED_ID());
+    AttributeSelectionListPtr aSelList =
+      aData->selectionList(CollectionPlugin_Field::SELECTED_ID());
     for (int i = 0; i < aSelList->size(); i++) {
       AttributeSelectionPtr aSelection = aSelList->value(i);
       GeomShapePtr aShapePtr = aSelection->value();
@@ -189,7 +191,8 @@ void PartSet_FieldStepPrs::Compute(const Handle(PrsMgr_PresentationManager3d)& t
   case ModelAPI_AttributeTables::STRING:
   {
     QStringList aValues = strings();
-    AttributeSelectionListPtr aSelList = aData->selectionList(CollectionPlugin_Field::SELECTED_ID());
+    AttributeSelectionListPtr aSelList =
+      aData->selectionList(CollectionPlugin_Field::SELECTED_ID());
     Handle(Graphic3d_Group) aGroup = Prs3d_Root::NewGroup(thePrs);
     for (int i = 0; i < aSelList->size(); i++) {
       AttributeSelectionPtr aSelection = aSelList->value(i);
