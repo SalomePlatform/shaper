@@ -97,22 +97,39 @@ INSTALL(FILES ${PROJECT_PYFILES} DESTINATION ${SHAPER_INSTALL_ADDONS})
 ADD_UNIT_TESTS(
   TestFilters.py
   TestFilter_BelongsTo.py
+  TestFilter_BelongsTo_Exclude.py
   TestFilter_OnPlane.py
+  TestFilter_OnPlane_Exclude.py
   TestFilter_OnLine.py
+  TestFilter_OnLine_Exclude.py
   TestFilter_OnGeometry_Edge.py
   TestFilter_OnGeometry_Face.py
+  TestFilter_OnGeometry_Exclude_Edge.py
+  TestFilter_OnGeometry_Exclude_Face.py
   TestFilter_OnPlaneSide_Face.py
   TestFilter_OnPlaneSide_Plane.py
+  TestFilter_OnPlaneSide_Exclude_Face.py
+  TestFilter_OnPlaneSide_Exclude_Plane.py
   TestFilter_OppositeToEdge.py
+  TestFilter_OppositeToEdge_Exclude.py
   TestFilter_RelativeToSolid_In.py
   TestFilter_RelativeToSolid_Out.py
   TestFilter_RelativeToSolid_On.py
   TestFilter_RelativeToSolid_NotOn.py
   TestFilter_RelativeToSolid_InAndOn.py
   TestFilter_RelativeToSolid_OutAndOn.py
+  TestFilter_RelativeToSolid_Exclude_In.py
+  TestFilter_RelativeToSolid_Exclude_Out.py
+  TestFilter_RelativeToSolid_Exclude_On.py
+  TestFilter_RelativeToSolid_Exclude_NotOn.py
+  TestFilter_RelativeToSolid_Exclude_InAndOn.py
+  TestFilter_RelativeToSolid_Exclude_OutAndOn.py
   TestFilter_ExternalFaces.py
+  TestFilter_ExternalFaces_Exclude.py
   TestFilter_HorizontalFaces.py
+  TestFilter_HorizontalFaces_Exclude.py
   TestFilter_VerticalFaces.py
+  TestFilter_VerticalFaces_Exclude.py
   TestFilter_TopoConnectedFaces_Vertex1.py
   TestFilter_TopoConnectedFaces_Vertex2.py
   TestFilter_TopoConnectedFaces_Vertex3.py
@@ -131,4 +148,22 @@ ADD_UNIT_TESTS(
   TestFilter_TopoConnectedFaces_Prop_Face1.py
   TestFilter_TopoConnectedFaces_Prop_Face2.py
   TestFilter_TopoConnectedFaces_Prop_Face3.py
+  TestFilter_TopoConnectedFaces_Exclude_Vertex1.py
+  TestFilter_TopoConnectedFaces_Exclude_Vertex2.py
+  TestFilter_TopoConnectedFaces_Exclude_Vertex3.py
+  TestFilter_TopoConnectedFaces_Prop_Exclude_Vertex1.py
+  TestFilter_TopoConnectedFaces_Prop_Exclude_Vertex2.py
+  TestFilter_TopoConnectedFaces_Prop_Exclude_Vertex3.py
+  TestFilter_TopoConnectedFaces_Exclude_Edge1.py
+  TestFilter_TopoConnectedFaces_Exclude_Edge2.py
+  TestFilter_TopoConnectedFaces_Exclude_Edge3.py
+  TestFilter_TopoConnectedFaces_Prop_Exclude_Edge1.py
+  TestFilter_TopoConnectedFaces_Prop_Exclude_Edge2.py
+  TestFilter_TopoConnectedFaces_Prop_Exclude_Edge3.py
+  TestFilter_TopoConnectedFaces_Exclude_Face1.py
+  TestFilter_TopoConnectedFaces_Exclude_Face2.py
+  TestFilter_TopoConnectedFaces_Exclude_Face3.py
+  TestFilter_TopoConnectedFaces_Prop_Exclude_Face1.py
+  TestFilter_TopoConnectedFaces_Prop_Exclude_Face2.py
+  TestFilter_TopoConnectedFaces_Prop_Exclude_Face3.py
 )
