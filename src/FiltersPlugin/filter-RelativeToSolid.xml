@@ -10,7 +10,7 @@
     <case id="out" title="Out"/>
     <case id="on" title="On"/>
     <case id="not_on" title="Not On"/>
-    <case id="not_out" title="In and On"/>
-    <case id="not_in" title="On and Out"/>
+    <case id="not_out" title="In &amp; On"/>
+    <case id="not_in" title="On &amp; Out"/>
   </switch>
 </filter>
