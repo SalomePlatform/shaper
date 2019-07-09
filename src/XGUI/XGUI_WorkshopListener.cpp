@@ -38,6 +38,7 @@
 #include <ModelAPI_Feature.h>
 #include <ModelAPI_Data.h>
 #include <ModelAPI_Tools.h>
+#include <ModelAPI_ResultField.h>
 
 #include <ModuleBase_Events.h>
 #include <ModuleBase_IModule.h>
@@ -272,6 +273,7 @@ void XGUI_WorkshopListener::
     // Hide the object if it is invalid or concealed one
     bool aHide = !aObj->data() || !aObj->data()->isValid() ||
       aObj->isDisabled() || (!aObj->isDisplayed());
+
     if (!aHide) { // check that this is not hidden result
       ResultPtr aRes = std::dynamic_pointer_cast<ModelAPI_Result>(aObj);
       aHide = aRes && aRes->isConcealed();

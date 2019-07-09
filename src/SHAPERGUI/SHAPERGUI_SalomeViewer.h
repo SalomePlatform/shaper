@@ -168,6 +168,46 @@ Q_OBJECT
   /// \param toActivate - activation flag
   void activateViewer(bool toActivate);
 
+
+  // Methods for color scale management
+
+  //! Returns True if ColorScale is visible
+  virtual bool isColorScaleVisible() const;
+
+  //! Show/Hide ColorScale object
+  virtual void setColorScaleShown(bool on);
+
+  //! Set position of color scale
+  // \param theX is X position relative to current view width
+  // \param theY is Y position relative to current view heigth
+  virtual void setColorScalePosition(double theX, double theY);
+
+  //! Set size of color scale
+  // \param theW is width relative to current view width
+  // \param theh is height relative to current view heigth
+  virtual void setColorScaleSize(double theW, double theH);
+
+  //! Set range of color scale
+  // \param theMin is a minimal value
+  // \param theMax is a maximal value
+  virtual void setColorScaleRange(double theMin, double theMax);
+
+  //! Set number of intervals of color scale
+  // \param theNb is number of intervals
+  virtual void setColorScaleIntervals(int theNb);
+
+  //! Set text heigth of color scale
+  // \param theH is number of intervals
+  virtual void setColorScaleTextHeigth(int theH);
+
+  //! Set color of text of color scale
+  // \param theH is number of intervals
+  virtual void setColorScaleTextColor(const QColor& theColor);
+
+  //! Set title of color scale
+  // \param theText is a title
+  virtual void setColorScaleTitle(const QString& theText);
+
   // Fit all along Z (perpendicular to display)
   //virtual void Zfitall();
 

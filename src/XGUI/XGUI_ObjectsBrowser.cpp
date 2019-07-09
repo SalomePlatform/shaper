@@ -25,6 +25,7 @@
 #include <ModelAPI_Session.h>
 #include <ModelAPI_Document.h>
 #include <ModelAPI_Tools.h>
+#include <ModelAPI_ResultField.h>
 
 #include <ModuleBase_Tools.h>
 #include <ModuleBase_ITreeNode.h>
@@ -230,33 +231,31 @@ void XGUI_DataTree::processHistoryChange(const QModelIndex& theIndex)
 
 void XGUI_DataTree::processEyeClick(const QModelIndex& theIndex)
 {
+  XGUI_ObjectsBrowser* aObjBrowser = qobject_cast<XGUI_ObjectsBrowser*>(parent());
   XGUI_DataModel* aModel = dataModel();
   ObjectPtr aObj = aModel->object(theIndex);
   if (aObj.get()) {
-    ResultPtr aResObj = std::dynamic_pointer_cast<ModelAPI_Result>(aObj);
-    XGUI_ObjectsBrowser* aObjBrowser = qobject_cast<XGUI_ObjectsBrowser*>(parent());
-    if (aResObj.get()) {
-      std::set<ObjectPtr> anObjects;
-      anObjects.insert(aResObj);
+    std::set<ObjectPtr> anObjects;
+    anObjects.insert(aObj);
 
-      bool hasHiddenState = aModel->hasHiddenState(theIndex);
-      if (aObjBrowser && hasHiddenState && !aObjBrowser->workshop()->prepareForDisplay(anObjects))
-        return;
-      if (hasHiddenState) { // #issue 2335(hide all faces then show solid problem)
-        if (aResObj->isDisplayed())
-          aResObj->setDisplayed(false);
-        aResObj->setDisplayed(true);
-      }
-      else
-        aResObj->setDisplayed(!aResObj->isDisplayed());
-      Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_TO_REDISPLAY));
-      update(theIndex);
+    bool hasHiddenState = aModel->hasHiddenState(theIndex);
+    if (aObjBrowser && hasHiddenState && !aObjBrowser->workshop()->prepareForDisplay(anObjects))
+      return;
+    if (hasHiddenState) { // #issue 2335(hide all faces then show solid problem)
+      if (aObj->isDisplayed())
+        aObj->setDisplayed(false);
+      aObj->setDisplayed(true);
     }
+    else
+      aObj->setDisplayed(!aObj->isDisplayed());
+
     // Update list of selected objects because this event happens after
     // selection event in object browser
     if (aObjBrowser) {
       aObjBrowser->onSelectionChanged();
     }
+    Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_TO_REDISPLAY));
+    update(theIndex);
   }
 }
 

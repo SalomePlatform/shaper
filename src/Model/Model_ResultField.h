@@ -39,18 +39,27 @@ public:
   {
   public:
     Model_FieldStep(ModelAPI_ResultField* theParent, int theId)
-      : myParent(theParent), myId(theId) {};
+      : ModelAPI_ResultField::ModelAPI_FieldStep(), myParent(theParent), myId(theId)
+    {
+      setData(myParent->data()); // it is not needed to have special data for the temporary
+                                 // step object, but data must be "valid" for GUI checks
+    };
 
     virtual ModelAPI_ResultField* field() const { return myParent; }
 
     virtual int id() const { return myId; }
+
+    virtual std::shared_ptr<ModelAPI_Document> document() const { return myParent->document(); }
+
+    /// Returns a GUI name of this step
+    virtual std::string name();
 
   private:
     ModelAPI_ResultField* myParent;
     int myId;
   };
 
-  /// Retuns the parameters of color definition in the resources config manager
+  /// Returns the parameters of color definition in the resources configuration manager
   MODEL_EXPORT virtual void colorConfigInfo(std::string& theSection, std::string& theName,
                                             std::string& theDefault);
 
@@ -66,10 +75,13 @@ public:
 
   /// Returns step object
   /// \param theId an id of the object
-  MODEL_EXPORT virtual ModelAPI_ResultField::ModelAPI_FieldStep* step(int theId) const;
+  MODEL_EXPORT virtual std::shared_ptr<ModelAPI_ResultField::ModelAPI_FieldStep> step(int theId) const;
 
   /// Removes the stored builders
   MODEL_EXPORT virtual ~Model_ResultField();
+
+  /// To refresh the steps of a field
+  MODEL_EXPORT virtual void updateSteps();
 
 protected:
   /// Makes a body on the given feature data
@@ -78,9 +90,8 @@ protected:
   friend class Model_Objects;
 
 private:
-  void updateSteps();
 
-  std::vector<ModelAPI_FieldStep*> mySteps;
+  std::vector<FieldStepPtr> mySteps;
 };
 
 #endif

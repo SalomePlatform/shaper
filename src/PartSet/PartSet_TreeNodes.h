@@ -333,11 +333,11 @@ public:
 * \ingroup Modules
 * Implementation of a node for compsolid representation
 */
-class PartSet_StepNode : public PartSet_TreeNode
+class PartSet_StepNode : public PartSet_ObjectNode
 {
 public:
-  PartSet_StepNode(ModelAPI_Entity* theEnt, ModuleBase_ITreeNode* theParent) :
-    PartSet_TreeNode(theParent), myEntity(theEnt) {}
+  PartSet_StepNode(const ObjectPtr& theObj, ModuleBase_ITreeNode* theParent) :
+    PartSet_ObjectNode(theObj, theParent) {}
 
   static std::string typeId()
   {
@@ -350,16 +350,7 @@ public:
   /// Returns the node representation according to theRole.
   virtual QVariant data(int theColumn, int theRole) const;
 
-  ModelAPI_Entity* entity() const {
-    return myEntity;
-  }
-
-  void setEntity(ModelAPI_Entity* theEnt) {
-    myEntity = theEnt;
-  }
-
-private:
-  ModelAPI_Entity* myEntity;
+  virtual VisibilityState visibilityState() const;
 };
 
 #endif

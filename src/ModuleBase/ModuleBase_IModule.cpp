@@ -147,7 +147,7 @@ void ModuleBase_IModule::launchOperation(const QString& theCmdId,
   }
 }
 
-Handle(AIS_InteractiveObject) ModuleBase_IModule::createPresentation(const ResultPtr& theResult)
+Handle(AIS_InteractiveObject) ModuleBase_IModule::createPresentation(const ObjectPtr& theResult)
 {
   return Handle(AIS_InteractiveObject)();
 }

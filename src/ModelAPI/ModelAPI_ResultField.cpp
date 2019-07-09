@@ -18,6 +18,8 @@
 //
 
 #include "ModelAPI_ResultField.h"
+#include "ModelAPI_Events.h"
+#include <Events_Loop.h>
 
 ModelAPI_ResultField::~ModelAPI_ResultField()
 {
@@ -27,4 +29,34 @@ ModelAPI_ResultField::~ModelAPI_ResultField()
 std::string ModelAPI_ResultField::groupName()
 {
   return group();
+}
+
+void ModelAPI_ResultField::ModelAPI_FieldStep::setDisplayed(const bool theDisplay)
+{
+  if (myIsDisplayed != theDisplay) {
+    myIsDisplayed = theDisplay;
+    static Events_Loop* aLoop = Events_Loop::loop();
+    static Events_ID EVENT_DISP = aLoop->eventByName(EVENT_OBJECT_TO_REDISPLAY);
+    static const ModelAPI_EventCreator* aECreator = ModelAPI_EventCreator::get();
+    ModelAPI_ResultField* aField = field();
+    if (aField) {
+      aECreator->sendUpdated(aField->step(id()), EVENT_DISP); // updated pointer to this
+      if (myIsDisplayed) {
+        for (int i = 0; i < aField->stepsSize(); i++)
+          if (i != id())
+            aField->step(i)->setDisplayed(false);
+        aField->setDisplayed(false);
+      }
+    }
+  }
+}
+
+
+void ModelAPI_ResultField::setDisplayed(const bool theDisplay)
+{
+  ModelAPI_Result::setDisplayed(theDisplay);
+  if (isDisplayed()) {
+    for (int i = 0; i < stepsSize(); i++)
+      step(i)->setDisplayed(false);
+  }
 }

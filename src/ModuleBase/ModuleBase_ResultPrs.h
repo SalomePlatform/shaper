@@ -23,6 +23,7 @@
 #include "ModuleBase.h"
 
 #include <ModelAPI_Result.h>
+#include <ModelAPI_ResultField.h>
 
 #include <BRep_Builder.hxx>
 #include <NCollection_List.hxx>

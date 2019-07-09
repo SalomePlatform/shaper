@@ -273,11 +273,11 @@ void PartSet_ObjectNode::update()
         }
       }
       else if (aFieldRes.get()) {
-        ModelAPI_ResultField::ModelAPI_FieldStep* aStep = aFieldRes->step(i);
+        FieldStepPtr aStep = aFieldRes->step(i);
         if (i < myChildren.size()) {
           PartSet_StepNode* aStepNode = static_cast<PartSet_StepNode*>(myChildren.at(i));
-          if (aStepNode->entity() != aStep) {
-            aStepNode->setEntity(aStep);
+          if (aStepNode->object() != aStep) {
+            aStepNode->setObject(aStep);
           }
         }
         else {
@@ -327,11 +327,11 @@ QTreeNodesList PartSet_ObjectNode::objectCreated(const QObjectPtrList& theObject
         }
       }
       else {
-        ModelAPI_ResultField::ModelAPI_FieldStep* aStep = aFieldRes->step(i);
+        FieldStepPtr aStep = aFieldRes->step(i);
         if (i < myChildren.size()) {
           PartSet_StepNode* aStepNode = static_cast<PartSet_StepNode*>(myChildren.at(i));
-          if (aStepNode->entity() != aStep) {
-            aStepNode->setEntity(aStep);
+          if (aStepNode->object() != aStep) {
+            aStepNode->setObject(aStep);
           }
         }
         else {
@@ -1194,11 +1194,24 @@ QTreeNodesList PartSet_ObjectFolderNode::objectsDeleted(const DocumentPtr& theDo
 QVariant PartSet_StepNode::data(int theColumn, int theRole) const
 {
   if ((theColumn == 1) && (theRole == Qt::DisplayRole)) {
-    ModelAPI_ResultField::ModelAPI_FieldStep* aStep =
-      dynamic_cast<ModelAPI_ResultField::ModelAPI_FieldStep*>(myEntity);
+    FieldStepPtr aStep =
+      std::dynamic_pointer_cast<ModelAPI_ResultField::ModelAPI_FieldStep>(myObject);
 
     return "Step " + QString::number(aStep->id() + 1) + " " +
       aStep->field()->textLine(aStep->id()).c_str();
   }
-  return PartSet_TreeNode::data(theColumn, theRole);
+  return PartSet_ObjectNode::data(theColumn, theRole);
+}
+
+ModuleBase_ITreeNode::VisibilityState PartSet_StepNode::visibilityState() const
+{
+  Qt::ItemFlags aFlags = flags(1);
+  if (aFlags == Qt::ItemFlags())
+    return NoneState;
+
+  ModuleBase_IWorkshop* aWork = workshop();
+  if (aWork->isVisible(myObject))
+    return Visible;
+  else
+    return Hidden;
 }

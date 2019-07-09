@@ -559,6 +559,123 @@ void XGUI_ViewerProxy::onKeyRelease(ModuleBase_IViewWindow* theWnd, QKeyEvent* t
 }
 #endif
 
+
+bool XGUI_ViewerProxy::isColorScaleVisible() const
+{
+#ifdef HAVE_SALOME
+  return myWorkshop->salomeConnector()->viewer()->isColorScaleVisible();
+#else
+  return myWorkshop->mainWindow()->viewer()->isColorScaleVisible();
+#endif
+}
+
+void XGUI_ViewerProxy::setColorScaleShown(bool on)
+{
+#ifdef HAVE_SALOME
+  myWorkshop->salomeConnector()->viewer()->setColorScaleShown(on);
+#else
+  myWorkshop->mainWindow()->viewer()->setColorScaleShown(on);
+#endif
+}
+
+void XGUI_ViewerProxy::setColorScalePosition(double theX, double theY)
+{
+#ifdef HAVE_SALOME
+  myWorkshop->salomeConnector()->viewer()->setColorScalePosition(theX, theY);
+#else
+  QWidget* aWindow = activeViewPort();
+  Handle(AIS_ColorScale) aColorScale = myWorkshop->mainWindow()->viewer()->colorScale();
+  aColorScale->SetPosition(aWindow->width() * theX, aWindow->height() * theY);
+#endif
+}
+
+void XGUI_ViewerProxy::setColorScaleSize(double theW, double theH)
+{
+#ifdef HAVE_SALOME
+  myWorkshop->salomeConnector()->viewer()->setColorScaleSize(theW, theH);
+#else
+  QWidget* aWindow = activeViewPort();
+  Handle(AIS_ColorScale) aColorScale = myWorkshop->mainWindow()->viewer()->colorScale();
+  aColorScale->SetSize(aWindow->width() * theW, aWindow->height() * theH);
+#endif
+}
+
+void XGUI_ViewerProxy::setColorScaleRange(double theMin, double theMax)
+{
+#ifdef HAVE_SALOME
+  myWorkshop->salomeConnector()->viewer()->setColorScaleRange(theMin, theMax);
+#else
+  Handle(AIS_ColorScale) aColorScale = myWorkshop->mainWindow()->viewer()->colorScale();
+  aColorScale->SetRange(theMin, theMax);
+#endif
+}
+
+void XGUI_ViewerProxy::setColorScaleIntervals(int theNb)
+{
+#ifdef HAVE_SALOME
+  myWorkshop->salomeConnector()->viewer()->setColorScaleIntervals(theNb);
+#else
+  Handle(AIS_ColorScale) aColorScale = myWorkshop->mainWindow()->viewer()->colorScale();
+  aColorScale->SetNumberOfIntervals(theNb);
+#endif
+}
+
+void XGUI_ViewerProxy::setColorScaleTextColor(const QColor& theColor)
+{
+#ifdef HAVE_SALOME
+  myWorkshop->salomeConnector()->viewer()->setColorScaleTextColor(theColor);
+#else
+  Handle(AIS_ColorScale) aColorScale = myWorkshop->mainWindow()->viewer()->colorScale();
+  Quantity_Color aColor(theColor.redF(), theColor.greenF(), theColor.blueF(), Quantity_TOC_RGB);
+  aColorScale->SetColor(aColor);
+#endif
+}
+
+
+void XGUI_ViewerProxy::setColorScaleTextHeigth(int theH)
+{
+#ifdef HAVE_SALOME
+  myWorkshop->salomeConnector()->viewer()->setColorScaleTextHeigth(theH);
+#else
+  Handle(AIS_ColorScale) aColorScale = myWorkshop->mainWindow()->viewer()->colorScale();
+  aColorScale->SetTextHeight(theH);
+#endif
+}
+
+void XGUI_ViewerProxy::setColorScaleTitle(const QString& theText)
+{
+#ifdef HAVE_SALOME
+  myWorkshop->salomeConnector()->viewer()->setColorScaleTitle(theText);
+#else
+  Handle(AIS_ColorScale) aColorScale = myWorkshop->mainWindow()->viewer()->colorScale();
+  aColorScale->SetTitle(theText.toStdString().c_str());
+#endif
+}
+
+
+//******************************************************
+void XGUI_ViewerProxy::setupColorScale()
+{
+  SUIT_ResourceMgr* aResMgr = ModuleBase_Preferences::resourceMgr();
+  double aX = aResMgr->doubleValue("Viewer", "scalar_bar_x_position", 0.03);
+  double aY = aResMgr->doubleValue("Viewer", "scalar_bar_y_position", 0.35);
+  setColorScalePosition(aX, aY);
+
+  double aW = aResMgr->doubleValue("Viewer", "scalar_bar_width", 0.2);
+  double aH = aResMgr->doubleValue("Viewer", "scalar_bar_height", 0.5);
+  setColorScaleSize(aW, aH);
+
+  QColor aColor = aResMgr->integerValue("Viewer", "scalar_bar_text_color", Qt::black);
+  setColorScaleTextColor(aColor);
+
+  int aT = aResMgr->integerValue("Viewer", "scalar_bar_text_height", 14);
+  setColorScaleTextHeigth(aT);
+
+  int aN = aResMgr->integerValue("Viewer", "scalar_bar_nb_intervals", 20);
+  setColorScaleIntervals(aN);
+}
+
+
 //***************************************
 //void XGUI_ViewerProxy::Zfitall()
 //{

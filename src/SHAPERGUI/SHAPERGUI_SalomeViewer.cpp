@@ -507,6 +507,77 @@ void SHAPERGUI_SalomeViewer::activateViewer(bool toActivate)
   }
 }
 
+bool SHAPERGUI_SalomeViewer::isColorScaleVisible() const
+{
+  if (mySelector) {
+    return mySelector->viewer()->isColorScaleVisible();
+  }
+  return false;
+}
+
+void SHAPERGUI_SalomeViewer::setColorScaleShown(bool on)
+{
+  if (mySelector) {
+    mySelector->viewer()->setColorScaleShown(on);
+  }
+}
+
+void SHAPERGUI_SalomeViewer::setColorScalePosition(double theX, double theY)
+{
+  if (mySelector) {
+    QWidget* aWindow = activeViewPort();
+    mySelector->viewer()->getColorScale()->SetPosition(aWindow->width() * theX,
+      aWindow->height() * theY);
+  }
+}
+
+void SHAPERGUI_SalomeViewer::setColorScaleSize(double theW, double theH)
+{
+  if (mySelector) {
+    QWidget* aWindow = activeViewPort();
+    mySelector->viewer()->getColorScale()->SetSize(aWindow->width() * theW,
+      aWindow->height() * theH);
+  }
+}
+
+void SHAPERGUI_SalomeViewer::setColorScaleRange(double theMin, double theMax)
+{
+  if (mySelector) {
+    mySelector->viewer()->getColorScale()->SetRange(theMin, theMax);
+  }
+}
+
+void SHAPERGUI_SalomeViewer::setColorScaleIntervals(int theNb)
+{
+  if (mySelector) {
+    mySelector->viewer()->getColorScale()->SetNumberOfIntervals(theNb);
+  }
+}
+
+void SHAPERGUI_SalomeViewer::setColorScaleTextHeigth(int theH)
+{
+  if (mySelector) {
+    mySelector->viewer()->getColorScale()->SetTextHeight(theH);
+  }
+}
+
+void SHAPERGUI_SalomeViewer::setColorScaleTextColor(const QColor& theColor)
+{
+  if (mySelector) {
+    Quantity_Color aColor(theColor.redF(), theColor.greenF(), theColor.blueF(), Quantity_TOC_RGB);
+    mySelector->viewer()->getColorScale()->SetColor(aColor);
+  }
+}
+
+void SHAPERGUI_SalomeViewer::setColorScaleTitle(const QString& theText)
+{
+  if (mySelector) {
+    mySelector->viewer()->getColorScale()->SetTitle(theText.toStdString().c_str());
+  }
+}
+
+
+
 //void SHAPERGUI_SalomeViewer::Zfitall()
 //{
 //  if (!mySelector || !mySelector->viewer())
