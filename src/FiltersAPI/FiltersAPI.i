@@ -108,7 +108,7 @@
         }
       } else
       if (PyUnicode_Check(item)) {
-        temp.push_back(FiltersAPI_Argument(PyUnicode_AsUTF8(item)));
+        temp.push_back(FiltersAPI_Argument(std::string(PyUnicode_AsUTF8(item))));
       } else
       if (PyBool_Check(item)) {
         temp.push_back(FiltersAPI_Argument(item == Py_True));
