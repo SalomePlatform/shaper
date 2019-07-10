@@ -64,6 +64,9 @@ class FiltersPlugin_TopoConnectedFaces(ModelAPI_Filter):
         if anOwner is None:
           return False
       topLevelShape = anOwner.shape()
+      if not topLevelShape.isSubShape(selectedShape):
+        return False;
+
       mapVFAlgo = mapShapesAndAncestors(topLevelShape, GeomAPI_Shape.VERTEX, GeomAPI_Shape.FACE)
       mapVF = mapVFAlgo.map()
       mapEFAlgo = mapShapesAndAncestors(topLevelShape, GeomAPI_Shape.EDGE, GeomAPI_Shape.FACE)
