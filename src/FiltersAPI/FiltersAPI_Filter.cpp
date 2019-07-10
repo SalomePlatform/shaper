@@ -38,15 +38,16 @@ FiltersAPI_Filter::FiltersAPI_Filter(const std::string& theName,
                                      const std::list<AttributePtr>& theArguments)
   : myName(theName)
 {
-  for (std::list<AttributePtr>::const_iterator anArgIt = theArguments.begin();
-       anArgIt != theArguments.end(); ++anArgIt) {
-    AttributeBooleanPtr aBoolAttr =
+  std::list<AttributePtr>::const_iterator anArgIt = theArguments.begin();
+  // first attribute is usually for reversing the filter
+  AttributeBooleanPtr aBoolAttr =
       std::dynamic_pointer_cast<ModelAPI_AttributeBoolean>(*anArgIt);
-    if (aBoolAttr) {
-      myReversed = aBoolAttr->value();
-      continue;
-    }
+  if (aBoolAttr) {
+    myReversed = aBoolAttr->value();
+    ++anArgIt;
+  }
 
+  for (; anArgIt != theArguments.end(); ++anArgIt) {
     AttributeSelectionListPtr aSelList =
         std::dynamic_pointer_cast<ModelAPI_AttributeSelectionList>(*anArgIt);
     if (aSelList) {

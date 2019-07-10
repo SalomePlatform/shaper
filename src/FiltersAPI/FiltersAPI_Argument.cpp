@@ -49,8 +49,10 @@ FiltersAPI_Argument::~FiltersAPI_Argument()
 
 void FiltersAPI_Argument::dump(ModelHighAPI_Dumper& theDumper) const
 {
-  if (mySelectionAttr)
-    theDumper << mySelectionAttr;
+  if (mySelectionAttr) {
+    // write empty selection attribute, because parametrization is not supported yet
+    theDumper << "model.selection()"; // mySelectionAttr;
+  }
   else if (mySelection.variantType() == ModelHighAPI_Selection::VT_Empty) {
     if (myValue.empty())
       theDumper << myBoolean;

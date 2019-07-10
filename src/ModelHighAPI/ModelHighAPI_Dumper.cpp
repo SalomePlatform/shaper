@@ -1344,7 +1344,8 @@ ModelHighAPI_Dumper& ModelHighAPI_Dumper::operator<<(
     // check selection list is obtained by filters
     FiltersFeaturePtr aFilters = theAttrSelList->filters();
     if (aFilters) {
-      *myDumpStorage << ", ";
+      if (theAttrSelList->size() > 0)
+        *myDumpStorage << ", ";
       dumpFeature(aFilters, true);
     }
 
