@@ -96,6 +96,8 @@ INSTALL(FILES ${PROJECT_PYFILES} DESTINATION ${SHAPER_INSTALL_ADDONS})
 
 ADD_UNIT_TESTS(
   TestFilters.py
+  TestFilters_Mixed1.py
+  TestFilters_Mixed2.py
   TestFilter_BelongsTo.py
   TestFilter_BelongsTo_Exclude.py
   TestFilter_OnPlane.py
