@@ -66,6 +66,7 @@
 %shared_ptr(ModelAPI_Feature)
 %shared_ptr(ModelAPI_CompositeFeature)
 %shared_ptr(ModelAPI_Data)
+%shared_ptr(ModelAPI_Filter)
 %shared_ptr(ModelAPI_FiltersFeature)
 %shared_ptr(ModelAPI_Folder)
 %shared_ptr(ModelAPI_Attribute)
@@ -170,6 +171,7 @@
 %template(FeatureList) std::list<std::shared_ptr<ModelAPI_Feature> >;
 %template(ResultList) std::list<std::shared_ptr<ModelAPI_Result> >;
 %template(DocumentList) std::list<std::shared_ptr<ModelAPI_Document> >;
+%template(FilterList) std::list<std::shared_ptr<ModelAPI_Filter> >;
 // std::set -> []
 %template(AttributeSet) std::set<std::shared_ptr<ModelAPI_Attribute> >;
 %template(FeatureSet) std::set<std::shared_ptr<ModelAPI_Feature> >;

@@ -98,6 +98,8 @@ ADD_UNIT_TESTS(
   TestFilters.py
   TestFilters_Mixed1.py
   TestFilters_Mixed2.py
+  TestFilters_Supported.py
+  TestFilters_Xml.py
   TestFilter_BelongsTo.py
   TestFilter_BelongsTo_Exclude.py
   TestFilter_OnPlane.py
