@@ -50,7 +50,7 @@
 
 
 // std::list -> []
-%template(FilterList) std::list<std::shared_ptr<FiltersAPI_Filter> >;
+%template(FilterAPIList) std::list<std::shared_ptr<FiltersAPI_Filter> >;
 %template(ArgumentList) std::list<FiltersAPI_Argument>;
 
 // fix compilarion error: 'res*' was not declared in this scope
