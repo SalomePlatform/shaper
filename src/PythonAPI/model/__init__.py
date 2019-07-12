@@ -37,6 +37,7 @@ from .connection import *
 from .construction import *
 from .exchange import *
 from .features import *
+from .filters import *
 from .collection import *
 from .parameter import *
 from .partset import *

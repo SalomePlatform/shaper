@@ -51,7 +51,7 @@ class Config_XMLReader
    * Constructor
    * \param theXmlFile - full path to the xml file which will be processed by the reader
    */
-  CONFIG_EXPORT Config_XMLReader(const std::string& theXmlFile);
+  CONFIG_EXPORT Config_XMLReader(const std::string& theXmlFile, bool isXMLContent = false);
   CONFIG_EXPORT virtual ~Config_XMLReader();
   /*!
    * Returns a path to resource files (created from ROOT_DIR environment variable)
@@ -130,6 +130,8 @@ class Config_XMLReader
   /// A map to store all parent's attributes.
   /// The key has from "Node_Name:Node_Attribute"
   std::map<std::string, std::string> myCachedAttributes;
+
+  bool isFromMemory;
 };
 
 #endif /* CONFIG_XMLREADER_H_ */

@@ -41,6 +41,7 @@ class QCheckBox;
 class ModuleBase_ListView;
 class ModuleBase_IWorkshop;
 class ModuleBase_ChoiceCtrl;
+class ModuleBase_FilterStarter;
 
 /**
 * \ingroup GUI
@@ -133,6 +134,8 @@ protected slots:
   void onListActivated();
 
   void onSameTopology(bool theOn);
+
+  void onShowOnly(bool);
 
 protected:
   /// Returns true if the event is processed. The default implementation is empty, returns false.
@@ -251,6 +254,9 @@ protected:
   std::string myDefMode;
 
   QCheckBox* myGeomCheck;
+  ModuleBase_FilterStarter* myFiltersWgt;
+
+  QObjectPtrList myVisibleObjects;
 };
 
 #endif /* MODULEBASE_WIDGETFILESELECTOR_H_ */

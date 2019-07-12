@@ -45,12 +45,15 @@
     static const char FSEP = '/';
 #endif
 
-Config_XMLReader::Config_XMLReader(const std::string& theXmlFileName)
+Config_XMLReader::Config_XMLReader(const std::string& theXmlFileName, bool isXMLContent)
     : myXmlDoc(NULL), myRootFileName(theXmlFileName)
 {
-  myDocumentPath = findConfigFile(theXmlFileName);
-  if (myDocumentPath.empty()) {
-    Events_InfoMessage("Config_XMLReader", "Unable to open %1").arg(theXmlFileName).send();
+  isFromMemory = isXMLContent;
+  if (!isXMLContent) {
+    myDocumentPath = findConfigFile(theXmlFileName);
+    if (myDocumentPath.empty()) {
+      Events_InfoMessage("Config_XMLReader", "Unable to open %1").arg(theXmlFileName).send();
+    }
   }
 }
 
@@ -157,6 +160,13 @@ std::string Config_XMLReader::findConfigFile(const std::string theFileName, cons
 
 void Config_XMLReader::readAll()
 {
+  if (isFromMemory) {
+    myXmlDoc = xmlParseMemory(myRootFileName.c_str(), myRootFileName.length());
+    xmlNodePtr aRoot = xmlDocGetRootElement(myXmlDoc);
+    readRecursively(aRoot);
+    return;
+  }
+
   // to load external modules dependencies (like GEOM for Connector Feature)
   Config_ModuleReader::loadScript("salome.shaper.initConfig", false);
 

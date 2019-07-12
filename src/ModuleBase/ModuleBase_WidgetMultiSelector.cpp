@@ -37,6 +37,7 @@
 #include <ModuleBase_ViewerPrs.h>
 #include <ModuleBase_WidgetShapeSelector.h>
 #include <ModuleBase_ChoiceCtrl.h>
+#include <ModuleBase_WidgetSelectionFilter.h>
 
 #include <ModelAPI_Data.h>
 #include <ModelAPI_Object.h>
@@ -62,6 +63,7 @@
 #include <QTimer>
 #include <QMainWindow>
 #include <QCheckBox>
+#include <QPushButton>
 
 #include <memory>
 #include <string>
@@ -112,21 +114,21 @@ ModuleBase_WidgetMultiSelector::ModuleBase_WidgetMultiSelector(QWidget* theParen
                                                                const Config_WidgetAPI* theData)
 : ModuleBase_WidgetSelector(theParent, theWorkshop, theData),
   myIsSetSelectionBlocked(false), myCurrentHistoryIndex(-1),
-  myIsFirst(true)
+  myIsFirst(true), myFiltersWgt(0)
 {
   std::string aPropertyTypes = theData->getProperty("type_choice");
   QString aTypesStr = aPropertyTypes.c_str();
   myShapeTypes = aTypesStr.split(' ', QString::SkipEmptyParts);
   myIsUseChoice = theData->getBooleanAttribute("use_choice", false);
 
-  QGridLayout* aMainLay = new QGridLayout(this);
+  QVBoxLayout* aMainLay = new QVBoxLayout(this);
   ModuleBase_Tools::adjustMargins(aMainLay);
 
   QStringList aIconsList = getIconsList(myShapeTypes);
   myTypeCtrl = new ModuleBase_ChoiceCtrl(this, myShapeTypes, aIconsList);
   myTypeCtrl->setLabel(tr("Type"));
   myTypeCtrl->setValue(0);
-  aMainLay->addWidget(myTypeCtrl, 0, 0, 1, 2);
+  aMainLay->addWidget(myTypeCtrl);
   myDefMode = myShapeTypes.first().toStdString();
 
   // There is no sense to parameterize list of types while we can not parameterize selection mode
@@ -136,18 +138,25 @@ ModuleBase_WidgetMultiSelector::ModuleBase_WidgetMultiSelector(QWidget* theParen
   }
 
   QString aLabelText = translate(theData->getProperty("label"));
-  QLabel* aListLabel = new QLabel(aLabelText, this);
-  aMainLay->addWidget(aListLabel, 1, 0);
-  // if the xml definition contains one type, an information label
-  // should be shown near to the latest
-  if (myShapeTypes.size() <= 1) {
-    QString aLabelIcon = QString::fromStdString(theData->widgetIcon());
-    if (!aLabelIcon.isEmpty()) {
-      QLabel* aSelectedLabel = new QLabel("", this);
-      aSelectedLabel->setPixmap(ModuleBase_IconFactory::loadPixmap(aLabelIcon));
-      aMainLay->addWidget(aSelectedLabel, 1, 1);
+  if (aLabelText.size() > 0) {
+    QWidget* aLabelWgt = new QWidget(this);
+    QHBoxLayout* aLabelLayout = new QHBoxLayout(aLabelWgt);
+    aLabelLayout->setContentsMargins(0, 0, 0, 0);
+    aMainLay->addWidget(aLabelWgt);
+
+    QLabel* aListLabel = new QLabel(aLabelText, this);
+    aLabelLayout->addWidget(aListLabel);
+    // if the xml definition contains one type, an information label
+    // should be shown near to the latest
+    if (myShapeTypes.size() <= 1) {
+      QString aLabelIcon = QString::fromStdString(theData->widgetIcon());
+      if (!aLabelIcon.isEmpty()) {
+        QLabel* aSelectedLabel = new QLabel("", this);
+        aSelectedLabel->setPixmap(ModuleBase_IconFactory::loadPixmap(aLabelIcon));
+        aLabelLayout->addWidget(aSelectedLabel);
+        aLabelLayout->addStretch(1);
+      }
     }
-    aMainLay->setColumnStretch(2, 1);
   }
 
   QString aToolTip = QString::fromStdString(theData->widgetTooltip());
@@ -157,9 +166,27 @@ ModuleBase_WidgetMultiSelector::ModuleBase_WidgetMultiSelector(QWidget* theParen
   connect(myListView, SIGNAL(deleteActionClicked()), SLOT(onDeleteItem()));
   connect(myListView, SIGNAL(listActivated()), SLOT(onListActivated()));
 
-  aMainLay->addWidget(myListView->getControl(), 2, 0, 1, -1);
-  aMainLay->setRowStretch(2, 1);
+  aMainLay->addWidget(myListView->getControl());
   connect(myTypeCtrl, SIGNAL(valueChanged(int)), this, SLOT(onSelectionTypeChanged()));
+
+  std::string aUseFilters = theData->getProperty("use_filters");
+  if (aUseFilters.length() > 0) {
+    QWidget* aFltrWgt = new QWidget(this);
+    QHBoxLayout* aFltrLayout = new QHBoxLayout(aFltrWgt);
+
+    myFiltersWgt = new ModuleBase_FilterStarter(aUseFilters.c_str(), aFltrWgt, theWorkshop);
+    aFltrLayout->addWidget(myFiltersWgt);
+
+    aFltrLayout->addStretch();
+
+    QPushButton* aShowBtn = new QPushButton(tr("Show only"), aFltrWgt);
+    aShowBtn->setCheckable(true);
+    aShowBtn->setChecked(false);
+    connect(aShowBtn, SIGNAL(toggled(bool)), SLOT(onShowOnly(bool)));
+    aFltrLayout->addWidget(aShowBtn);
+
+    aMainLay->addWidget(aFltrWgt);
+  }
 
   bool aSameTop = theData->getBooleanAttribute("same_topology", false);
   if (aSameTop) {
@@ -197,6 +224,8 @@ void ModuleBase_WidgetMultiSelector::activateCustom()
 void ModuleBase_WidgetMultiSelector::deactivate()
 {
   ModuleBase_WidgetSelector::deactivate();
+  if (myVisibleObjects.size())
+    onShowOnly(false);
 
   myWorkshop->module()->deactivateCustomPrs(ModuleBase_IModule::CustomizeHighlightedObjects, true);
   clearSelectedHistory();
@@ -498,6 +527,7 @@ void ModuleBase_WidgetMultiSelector::onSelectionTypeChanged()
 {
   // Clear current selection in order to avoid updating of object browser with obsolete indexes
   // which can appear because of results deletetion after changing a type of selection
+  QString aSelectionType = myTypeCtrl->textValue();
   QList<ModuleBase_ViewerPrsPtr> aEmptyList;
   myWorkshop->setSelected(aEmptyList);
 
@@ -511,7 +541,7 @@ void ModuleBase_WidgetMultiSelector::onSelectionTypeChanged()
   std::string aType = anAttribute->attributeType();
   if (aType == ModelAPI_AttributeSelectionList::typeId()) {
     AttributeSelectionListPtr aSelectionListAttr = myFeature->data()->selectionList(attributeID());
-    aSelectionListAttr->setSelectionType(myTypeCtrl->textValue().toStdString());
+    aSelectionListAttr->setSelectionType(aSelectionType.toStdString());
   }
 
   // clear attribute values
@@ -1061,4 +1091,36 @@ void ModuleBase_WidgetMultiSelector::onSameTopology(bool theOn)
     aSelectionListAttr->setGeometricalSelection(theOn);
     updateObject(myFeature);
   }
+}
+
+void ModuleBase_WidgetMultiSelector::onShowOnly(bool theChecked)
+{
+  std::list<ResultPtr> aResults = myFeature->results();
+   std::list<ResultPtr>::const_iterator aIt;
+  if (theChecked) {
+    myVisibleObjects = myWorkshop->displayedObjects();
+    for (aIt = aResults.cbegin(); aIt != aResults.cend(); aIt++) {
+      myVisibleObjects.removeAll(*aIt);
+    }
+  }
+  foreach(ObjectPtr aObj, myVisibleObjects) {
+    aObj->setDisplayed(!theChecked);
+  }
+
+  if (!theChecked) {
+    // Hide and show the group result in order to make it above all objects
+    bool aOldState = myWorkshop->enableUpdateViewer(false);
+    for (aIt = aResults.cbegin(); aIt != aResults.cend(); aIt++) {
+      (*aIt)->setDisplayed(false);
+    }
+    Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_TO_REDISPLAY));
+    for (aIt = aResults.cbegin(); aIt != aResults.cend(); aIt++) {
+      (*aIt)->setDisplayed(true);
+    }
+    Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_TO_REDISPLAY));
+    myWorkshop->enableUpdateViewer(aOldState);
+
+    myVisibleObjects.clear();
+  } else
+    Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_TO_REDISPLAY));
 }

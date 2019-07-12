@@ -1,0 +1,11 @@
+<plugin>
+  <workbench id="Features" document="Part">
+    <group id="Collections">
+      <feature id="FiltersSelection"
+               title="Selection filters"
+               internal="1">
+        <selection_filters/>
+      </feature>
+    </group>
+  </workbench>
+</plugin>

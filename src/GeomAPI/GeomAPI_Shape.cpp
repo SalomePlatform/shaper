@@ -101,6 +101,15 @@ bool GeomAPI_Shape::isSame(const std::shared_ptr<GeomAPI_Shape> theShape) const
   return MY_SHAPE->IsSame(theShape->impl<TopoDS_Shape>()) == Standard_True;
 }
 
+bool GeomAPI_Shape::isSameGeometry(const std::shared_ptr<GeomAPI_Shape> theShape) const
+{
+  if (isFace())
+    return face()->isSameGeometry(theShape);
+  else if (isEdge())
+    return edge()->isSameGeometry(theShape);
+  return false;
+}
+
 bool GeomAPI_Shape::isVertex() const
 {
   const TopoDS_Shape& aShape = const_cast<GeomAPI_Shape*>(this)->impl<TopoDS_Shape>();
@@ -460,21 +469,21 @@ GeomAPI_Shape::ShapeType GeomAPI_Shape::shapeType() const
 GeomAPI_Shape::ShapeType GeomAPI_Shape::shapeTypeByStr(std::string theType)
 {
   std::transform(theType.begin(), theType.end(), theType.begin(), ::toupper);
-  if (theType == "COMPOUND")
+  if (theType == "COMPOUND" || theType == "COMPOUNDS")
     return COMPOUND;
-  if (theType == "COMPSOLID")
+  if (theType == "COMPSOLID" || theType == "COMPSOLIDS")
     return COMPSOLID;
-  if (theType == "SOLID")
+  if (theType == "SOLID" || theType == "SOLIDS")
     return SOLID;
-  if (theType == "SHELL")
+  if (theType == "SHELL" || theType == "SHELLS")
     return SHELL;
-  if (theType == "FACE")
+  if (theType == "FACE" || theType == "FACES")
     return FACE;
-  if (theType == "WIRE")
+  if (theType == "WIRE" || theType == "WIRES")
     return WIRE;
-  if (theType == "EDGE")
+  if (theType == "EDGE" || theType == "EDGES")
     return EDGE;
-  if (theType == "VERTEX")
+  if (theType == "VERTEX" || theType == "VERTICES")
     return VERTEX;
   return SHAPE; // default
 }
@@ -709,5 +718,29 @@ bool GeomAPI_Shape::isSelfIntersected(const int theLevelOfCheck) const
 bool GeomAPI_Shape::Comparator::operator()(const std::shared_ptr<GeomAPI_Shape>& theShape1,
                                            const std::shared_ptr<GeomAPI_Shape>& theShape2) const
 {
-  return theShape1->impl<TopoDS_Shape>().TShape() < theShape2->impl<TopoDS_Shape>().TShape();
+  const TopoDS_Shape& aShape1 = theShape1->impl<TopoDS_Shape>();
+  const TopoDS_Shape& aShape2 = theShape2->impl<TopoDS_Shape>();
+  bool isLess = aShape1.TShape() < aShape2.TShape();
+  if (aShape1.TShape() == aShape2.TShape()) {
+    Standard_Integer aHash1 = aShape1.Location().HashCode(IntegerLast());
+    Standard_Integer aHash2 = aShape2.Location().HashCode(IntegerLast());
+    isLess = aHash1 < aHash2;
+  }
+  return isLess;
+}
+
+bool GeomAPI_Shape::ComparatorWithOri::operator()(
+    const std::shared_ptr<GeomAPI_Shape>& theShape1,
+    const std::shared_ptr<GeomAPI_Shape>& theShape2) const
+{
+  const TopoDS_Shape& aShape1 = theShape1->impl<TopoDS_Shape>();
+  const TopoDS_Shape& aShape2 = theShape2->impl<TopoDS_Shape>();
+  bool isLess = aShape1.TShape() < aShape2.TShape();
+  if (aShape1.TShape() == aShape2.TShape()) {
+    Standard_Integer aHash1 = aShape1.Location().HashCode(IntegerLast());
+    Standard_Integer aHash2 = aShape2.Location().HashCode(IntegerLast());
+    isLess = (aHash1 < aHash2) ||
+             (aHash1 == aHash2 && aShape1.Orientation() < aShape2.Orientation());
+  }
+  return isLess;
 }

@@ -115,6 +115,9 @@ Q_OBJECT
   //! \param theObject a data object
   virtual bool isVisible(const ObjectPtr& theObject) const = 0;
 
+  //! Returns list of currently displayed objects
+  virtual QObjectPtrList displayedObjects() const = 0;
+
   //! Select features clearing previous selection.
   //! If the list is empty then selection will be cleared
   //! \param theValues a list of presentations
@@ -137,6 +140,12 @@ Q_OBJECT
   /// Returns true if SHIFT is pressed
   /// \return boolean value
   virtual bool hasSHIFTPressed() const = 0;
+
+  virtual void deactivateCurrentSelector() = 0;
+
+  //! Temporary enable or disable viewer update. Returns previous state of updating
+  //! \param isEnabled new state of the viewer update
+  virtual bool enableUpdateViewer(bool isEnabled) = 0;
 
 signals:
   /// Signal selection changed.

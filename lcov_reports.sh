@@ -15,14 +15,14 @@ lcov -r covfile ${MASK} --output-file covfile_res -q
 mv -f covfile_res covfile
 done
 
-ALL='BuildPlugin CollectionPlugin ConstructionPlugin ExchangePlugin FeaturesPlugin GDMLPlugin PrimitivesPlugin InitializationPlugin ParametersPlugin PartSetPlugin SketchPlugin'
-ALL+=' GDMLAPI PrimitivesAPI BuilderAPI CollectionAPI ConnectorAPI ConstructionAPI ModelAPI ExchangeAPI FeaturesAPI ModelHighAPI ParametersAPI PartSetAPI SketchAPI BuildAPI GeomDataAPI GeomAPI GeomAlgoAPI'
+ALL='BuildPlugin CollectionPlugin ConstructionPlugin ExchangePlugin FiltersPlugin FeaturesPlugin GDMLPlugin PrimitivesPlugin InitializationPlugin ParametersPlugin PartSetPlugin SketchPlugin'
+ALL+=' GDMLAPI PrimitivesAPI BuilderAPI CollectionAPI ConnectorAPI ConstructionAPI ModelAPI ExchangeAPI FiltersAPI FeaturesAPI ModelHighAPI ParametersAPI PartSetAPI SketchAPI BuildAPI GeomDataAPI GeomAPI GeomAlgoAPI'
 ALL+=' Config Events GeomValidators Model_ ModelGeomAlgo Selector SketchSolver GeomData'
 
 # prepare API report
 cp -f covfile covAPI
 # remove all plugins data except the needed
-NEED='BuildAPI CollectionAPI ConnectorAPI ConstructionAPI ExchangeAPI FeaturesAPI ModelHighAPI ParametersAPI PartSetAPI PrimitivesAPI SketchAPI'
+NEED='BuildAPI CollectionAPI ConnectorAPI ConstructionAPI ExchangeAPI FiltersAPI FeaturesAPI ModelHighAPI ParametersAPI PartSetAPI PrimitivesAPI SketchAPI'
 for MASK in $ALL; do
   if ! [[ " $NEED " =~ " $MASK " ]]; then
     lcov -r covAPI *${MASK}* --output-file covAPI_res -q
@@ -58,7 +58,7 @@ genhtml covDirect --output-directory lcov_htmlDirect -q
 # prepare Else report
 cp -f covfile covElse
 # remove all plugins data except the needed
-NEED='BuildPlugin CollectionPlugin Config ConstructionPlugin Events ExchangePlugin FeaturesPlugin GeomData GeomDataAPI GeomValidators InitializationPlugin Model_ ModelAPI ModelGeomAlgo ParametersPlugin PartSetPlugin PrimitivesPlugin Selector SketchPlugin SketchSolver'
+NEED='BuildPlugin CollectionPlugin Config ConstructionPlugin Events ExchangePlugin FiltersPlugin FeaturesPlugin GeomData GeomDataAPI GeomValidators InitializationPlugin Model_ ModelAPI ModelGeomAlgo ParametersPlugin PartSetPlugin PrimitivesPlugin Selector SketchPlugin SketchSolver'
 for MASK in $ALL; do
   if ! [[ " $NEED " =~ " $MASK " ]]; then
     lcov -r covElse *${MASK}* --output-file covElse_res -q

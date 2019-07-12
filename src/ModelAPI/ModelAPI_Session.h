@@ -29,6 +29,7 @@ class ModelAPI_Feature;
 class ModelAPI_Plugin;
 class ModelAPI_Document;
 class ModelAPI_ValidatorsFactory;
+class ModelAPI_FiltersFactory;
 
 /**\class ModelAPI_Session
  * \ingroup DataModel
@@ -119,6 +120,9 @@ class MODELAPI_EXPORT ModelAPI_Session
 
   /// Returns the validators factory: the only one instance per application
   virtual ModelAPI_ValidatorsFactory* validators() = 0;
+
+  /// Returns the filters factory: the only one instance per application
+  virtual ModelAPI_FiltersFactory* filters() = 0;
 
   /// To virtually destroy the fields of successors
   virtual ~ModelAPI_Session()

@@ -26,6 +26,7 @@
 #include <Model_Application.h>
 #include <Model_Events.h>
 #include <Model_Validator.h>
+#include <Model_FiltersFactory.h>
 #include <ModelAPI_Events.h>
 #include <Events_Loop.h>
 #include <Events_InfoMessage.h>
@@ -79,7 +80,7 @@ void Model_Session::closeAll()
 
 void Model_Session::startOperation(const std::string& theId, const bool theAttachedToNested)
 {
-  myOperationAttachedToNext = theAttachedToNested;
+  myOperationAttachedToNext.push_back(theAttachedToNested);
   ROOT_DOC->startOperation();
   ROOT_DOC->operationId(theId);
   static std::shared_ptr<Events_Message> aStartedMsg
@@ -97,9 +98,13 @@ void Model_Session::finishOperation()
 {
   setCheckTransactions(false);
   ROOT_DOC->finishOperation();
-  if (myOperationAttachedToNext) { // twice, with nested
-    ROOT_DOC->finishOperation();
-    myOperationAttachedToNext = false;
+  if (!myOperationAttachedToNext.empty()) {
+    while (myOperationAttachedToNext.back()) {
+      // with nested, the first transaction can not be attached
+      ROOT_DOC->finishOperation();
+      myOperationAttachedToNext.pop_back();
+    }
+    myOperationAttachedToNext.pop_back();
   }
   setCheckTransactions(true);
 }
@@ -108,9 +113,13 @@ void Model_Session::abortOperation()
 {
   setCheckTransactions(false);
   ROOT_DOC->abortOperation();
-  if (myOperationAttachedToNext) { // twice, with nested
-    ROOT_DOC->abortOperation();
-    myOperationAttachedToNext = false;
+  if (!myOperationAttachedToNext.empty()) {
+    while (myOperationAttachedToNext.back()) {
+      // with nested, the first transaction can not be attached
+      ROOT_DOC->abortOperation();
+      myOperationAttachedToNext.pop_back();
+    }
+    myOperationAttachedToNext.pop_back();
   }
   setCheckTransactions(true);
   // here the update mechanism may work after abort, so, suppress the warnings about
@@ -426,7 +435,6 @@ Model_Session::Model_Session()
 {
   myPluginsInfoLoaded = false;
   myCheckTransactions = true;
-  myOperationAttachedToNext = false;
   ModelAPI_Session::setSession(std::shared_ptr<ModelAPI_Session>(this));
   // register the configuration reading listener
   Events_Loop* aLoop = Events_Loop::loop();
@@ -577,6 +585,12 @@ void Model_Session::registerPlugin(ModelAPI_Plugin* thePlugin)
 ModelAPI_ValidatorsFactory* Model_Session::validators()
 {
   static Model_ValidatorsFactory* aFactory = new Model_ValidatorsFactory;
+  return aFactory;
+}
+
+ModelAPI_FiltersFactory* Model_Session::filters()
+{
+  static Model_FiltersFactory* aFactory = new Model_FiltersFactory;
   return aFactory;
 }
 

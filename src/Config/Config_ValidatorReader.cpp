@@ -33,8 +33,8 @@
 #include <iostream>
 #endif
 
-Config_ValidatorReader::Config_ValidatorReader(const std::string& theXmlFileName)
-: Config_XMLReader(theXmlFileName)
+Config_ValidatorReader::Config_ValidatorReader(const std::string& theXmlFileName, bool isXMLContent)
+: Config_XMLReader(theXmlFileName, isXMLContent)
 {
 }
 
@@ -85,6 +85,8 @@ void Config_ValidatorReader::processValidator(xmlNodePtr theNode)
   aMessage->setValidatorId(aValidatorId);
   aMessage->setValidatorParameters(aParameters);
   std::string aFeatureId = restoreAttribute(NODE_FEATURE, _ID);
+  if (aFeatureId.length() == 0)
+    aFeatureId = myExtFeatureId;
   aMessage->setFeatureId(aFeatureId);
   // parent is attribute (widget)
   if (!myCurrentWidget.empty()) {

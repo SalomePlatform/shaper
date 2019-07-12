@@ -50,6 +50,7 @@
 #include <ModuleBase_WidgetCreatorFactory.h>
 #include <ModuleBase_WidgetAction.h>
 #include <ModuleBase_WidgetPointInput.h>
+#include <ModuleBase_WidgetSelectionFilter.h>
 
 #include <ModelAPI_Validator.h>
 #include <ModelAPI_Session.h>
@@ -344,6 +345,8 @@ ModuleBase_ModelWidget* ModuleBase_WidgetFactory::createWidgetByType(const std::
     result = new ModuleBase_WidgetAction(theParent, myWidgetApi);
   } else if (theType == WDG_POINT_INPUT) {
     result = new ModuleBase_WidgetPointInput(theParent, myWorkshop, myWidgetApi);
+  } else if (theType == WDG_SELECTION_FILTERS) {
+    result = new ModuleBase_WidgetSelectionFilter(theParent, myWorkshop, myWidgetApi);
   } else {
     result = myWorkshop->module()->createWidgetByType(theType, theParent, myWidgetApi);
     if (!result)

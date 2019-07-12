@@ -133,9 +133,29 @@ class MODELAPI_EXPORT ModelAPI_Data
   /// for each attribute of the object
   /// \param theID identifier of the attribute that can be referenced by this ID later
   /// \param theAttrType type of the created attribute (received from the type method)
+  /// \param theIndex index of the attribute in the internal data structure, for not-floating
+  ///                 attributes it is -1 to let it automatically be added
   /// \returns the just created attribute
+  virtual std::shared_ptr<ModelAPI_Attribute> addAttribute(
+    const std::string& theID, const std::string theAttrType, const int theIndex = -1) = 0;
+
+  /// Adds a floating attribute (that may be added/removed during the data life)
+  /// \param theID identifier of the attribute that can be referenced by this ID later
+  /// \param theAttrType type of the created attribute (received from the type method)
+  /// \param theGroup identifier of the group this attribute belongs to, may be an empty string
   virtual std::shared_ptr<ModelAPI_Attribute>
-    addAttribute(const std::string& theID, const std::string theAttrType) = 0;
+    addFloatingAttribute(const std::string& theID, const std::string theAttrType,
+      const std::string& theGroup) = 0;
+
+  /// Returns all groups of this data (ordered).
+  virtual void allGroups(std::list<std::string>& theGroups) = 0;
+
+  /// Returns an ordered list of attributes that belong to the given group
+  virtual void attributesOfGroup(const std::string& theGroup,
+    std::list<std::shared_ptr<ModelAPI_Attribute> >& theAttrs) = 0;
+
+  /// Remove all attributes of the given group
+  virtual void removeAttributes(const std::string& theGroup) = 0;
 
   /// Useful method for "set" methods of the attributes: sends an UPDATE event and
   /// makes attribute initialized

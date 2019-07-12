@@ -159,6 +159,14 @@ std::string ModelHighAPI_FeatureStore::dumpAttr(const AttributePtr& theAttr) {
     return "__notcase__";
   }
   std::string aType = theAttr->attributeType();
+
+  // do not check selection of the filter,
+  // because there is neither parametric update nor dump support yet.
+  FiltersFeaturePtr aFilter = std::dynamic_pointer_cast<ModelAPI_FiltersFeature>(aFeatOwner);
+  if (aFilter && (aType == ModelAPI_AttributeSelection::typeId() ||
+                  aType == ModelAPI_AttributeSelectionList::typeId()))
+    return "__filter_selection__";
+
   std::ostringstream aResult;
   if (!theAttr->isInitialized()) {
     if (aType == ModelAPI_AttributeBoolean::typeId()) {

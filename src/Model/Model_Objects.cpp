@@ -32,6 +32,8 @@
 #include <ModelAPI_Validator.h>
 #include <ModelAPI_CompositeFeature.h>
 #include <ModelAPI_Tools.h>
+#include <ModelAPI_Filter.h>
+
 
 #include <Events_Loop.h>
 #include <Events_InfoMessage.h>
@@ -874,11 +876,17 @@ void Model_Objects::synchronizeFeatures(
 
       if (anUpdatedMap.Contains(aFeatureLabel)) {
         if (!theOpen) { // on abort/undo/redo reinitialize attributes if something is changed
-          std::list<std::shared_ptr<ModelAPI_Attribute> > anAttrs =
-            anObject->data()->attributes("");
-          std::list<std::shared_ptr<ModelAPI_Attribute> >::iterator anAttr = anAttrs.begin();
-          for(; anAttr != anAttrs.end(); anAttr++)
-            (*anAttr)->reinit();
+          FiltersFeaturePtr aFilter = std::dynamic_pointer_cast<ModelAPI_FiltersFeature>(anObject);
+          if (aFilter.get()) { // for filters attributes may be added/removed on undo/redo
+            std::dynamic_pointer_cast<Model_Data>(aFilter->data())->clearAttributes();
+            aFilter->initAttributes();
+          } else {
+            std::list<std::shared_ptr<ModelAPI_Attribute> > anAttrs =
+              anObject->data()->attributes("");
+            std::list<std::shared_ptr<ModelAPI_Attribute> >::iterator anAttr = anAttrs.begin();
+            for(; anAttr != anAttrs.end(); anAttr++)
+              (*anAttr)->reinit();
+          }
         }
         ModelAPI_EventCreator::get()->sendUpdated(anObject, anUpdateEvent);
         if (aFeature && aFeature->getKind() == "Parameter") {

@@ -41,19 +41,20 @@ SET(PROJECT_HEADERS
     Model_AttributeSelection.h
     Model_AttributeSelectionList.h
     Model_AttributeTables.h
+    Model_AttributeValidator.h
     Model_BodyBuilder.h
     Model_Events.h
     Model_Expression.h
-    Model_Update.h
-    Model_Validator.h
+    Model_FeatureValidator.h
+    Model_FiltersFactory.h
     Model_ResultBody.h
     Model_ResultConstruction.h
     Model_ResultPart.h
     Model_ResultField.h
     Model_ResultGroup.h
     Model_ResultParameter.h
-    Model_FeatureValidator.h
-    Model_AttributeValidator.h
+    Model_Update.h
+    Model_Validator.h
 )
 
 SET(PROJECT_SOURCES
@@ -77,19 +78,20 @@ SET(PROJECT_SOURCES
     Model_AttributeSelection.cpp
     Model_AttributeSelectionList.cpp
     Model_AttributeTables.cpp
+    Model_AttributeValidator.cpp
     Model_BodyBuilder.cpp
     Model_Events.cpp
     Model_Expression.cpp
-    Model_Update.cpp
-    Model_Validator.cpp
+    Model_FeatureValidator.cpp
+    Model_FiltersFactory.cpp
     Model_ResultBody.cpp
     Model_ResultConstruction.cpp
     Model_ResultPart.cpp
     Model_ResultField.cpp
     Model_ResultGroup.cpp
     Model_ResultParameter.cpp
-    Model_FeatureValidator.cpp
-    Model_AttributeValidator.cpp
+    Model_Update.cpp
+    Model_Validator.cpp
 )
 
 SET(PROJECT_LIBRARIES

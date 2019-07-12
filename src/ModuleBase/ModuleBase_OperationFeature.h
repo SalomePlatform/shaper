@@ -147,6 +147,11 @@ Q_OBJECT
   /// \return custom validity state (it is almost always true)
   bool isNeedToBeAborted() const { return myNeedToBeAborted; }
 
+  /// Call this function on launch of a nested operation
+  /// when transaction has to be reopened on resume of main operation
+  /// By default transaction is not reopened on resuming
+  void openTransactionOnResume() { myRestartTransactionOnResume = true; }
+
  public slots:
   /// Starts operation
   /// Public slot. Verifies whether operation can be started and starts operation.
@@ -173,6 +178,9 @@ Q_OBJECT
 
   /// Hide feature/results if they were hided on start
   virtual void stopOperation();
+
+  /// Virtual method called after operation resume (see resume() method for more description)
+  virtual void resumeOperation();
 
   /// Creates an operation new feature
   /// \param theFlushMessage the flag whether the create message should be flushed
@@ -207,6 +215,8 @@ Q_OBJECT
   /// Last current feature before editing operation. It is cashed when Edit operation is started
   /// in order to restore the document current feature on commit/abort this operation.
   FeaturePtr myPreviousCurrentFeature;
+
+  bool myRestartTransactionOnResume;
 };
 
 #endif

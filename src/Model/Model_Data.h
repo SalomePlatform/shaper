@@ -180,9 +180,29 @@ class Model_Data : public ModelAPI_Data
   /// for each attribute of the object
   /// \param theID identifier of the attribute that can be referenced by this ID later
   /// \param theAttrType type of the created attribute (received from the type method)
+  /// \param theIndex index of the attribute in the internal data structure, for not-floating
+  ///                 attributes it is -1 to let it automatically be added
   /// \returns the just created attribute
   MODEL_EXPORT virtual AttributePtr
-    addAttribute(const std::string& theID, const std::string theAttrType);
+    addAttribute(const std::string& theID, const std::string theAttrType, const int theIndex = -1);
+
+  /// Adds a floating attribute (that may be added/removed during the data life)
+  /// \param theID identifier of the attribute that can be referenced by this ID later
+  /// \param theAttrType type of the created attribute (received from the type method)
+  /// \param theGroup identifier of the group this attribute belongs to, may be an empty string
+  MODEL_EXPORT virtual AttributePtr
+    addFloatingAttribute(const std::string& theID, const std::string theAttrType,
+      const std::string& theGroup);
+
+  /// Returns all groups of this data (ordered).
+  MODEL_EXPORT virtual void allGroups(std::list<std::string>& theGroups);
+
+  /// Returns an ordered list of attributes that belong to the given group
+  MODEL_EXPORT virtual void attributesOfGroup(const std::string& theGroup,
+    std::list<std::shared_ptr<ModelAPI_Attribute> >& theAttrs);
+
+  /// Remove all attributes of the given group
+  MODEL_EXPORT virtual void removeAttributes(const std::string& theGroup);
 
   /// Useful method for "set" methods of the attributes: sends an UPDATE event and
   /// makes attribute initialized
@@ -268,6 +288,9 @@ protected:
   /// Sets true if the object is deleted, but some data is still kept in memory
   MODEL_EXPORT virtual void setIsDeleted(const bool theFlag);
 
+  /// Erases all attributes from myAttrs, but keeping them in the data structure
+  void clearAttributes();
+
 private:
   /// Removes a back reference (with identifier which attribute references to this object)
   /// \param theFeature feature referenced to this
@@ -302,6 +325,8 @@ private:
   /// Returns \c true if theAttribute1 is going earlier than theAttribute2 in the data
   MODEL_EXPORT virtual bool isPrecedingAttribute(const std::string& theAttribute1,
                                                  const std::string& theAttribute2) const;
+
+  friend class Model_Objects;
 };
 
 /// Generic method to register back reference, used in referencing attributes.

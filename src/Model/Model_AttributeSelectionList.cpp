@@ -22,6 +22,7 @@
 #include "Model_Application.h"
 #include "Model_Events.h"
 #include "Model_Data.h"
+#include "Model_Objects.h"
 
 #include <GeomAPI_Pnt.h>
 #include <GeomAPI_Shape.h>
@@ -32,6 +33,7 @@
 #include <TDF_RelocationTable.hxx>
 #include <TDF_DeltaOnAddition.hxx>
 #include <TDataStd_UAttribute.hxx>
+#include <TDataStd_ReferenceList.hxx>
 #include <TopAbs_ShapeEnum.hxx>
 #include <TopoDS.hxx>
 #include <TopoDS_Shape.hxx>
@@ -45,6 +47,10 @@
 /// GUID for UAttribute that indicates the list has "To add all elements that share the same
 /// topology" flag enabled
 static const Standard_GUID kIS_GEOMETRICAL_SELECTION("f16987b6-e6c8-435c-99fa-03a7e0b06e83");
+
+/// GUID for TDataStd_ReferenceList attribute that refers the selection filters feature
+static const Standard_GUID kSELECTION_FILTERS_REF("ea5b1dbf-a740-4a0b-a1b2-3c3c756e691a");
+
 
 void Model_AttributeSelectionList::append(
     const ObjectPtr& theContext, const std::shared_ptr<GeomAPI_Shape>& theSubShape,
@@ -479,4 +485,45 @@ void Model_AttributeSelectionList::setGeometricalSelection(const bool theIsGeome
   myIsCashed = false;
   myCash.clear(); // empty list as indicator that cash is not used
   owner()->data()->sendAttributeUpdated(this);
+}
+
+FiltersFeaturePtr Model_AttributeSelectionList::filters() const
+{
+  Handle(TDataStd_ReferenceList) aRef;
+  if (myLab.FindAttribute(kSELECTION_FILTERS_REF, aRef) && !aRef->IsEmpty()) {
+    if (owner().get()) {
+      std::shared_ptr<Model_Document> aDoc = std::dynamic_pointer_cast<Model_Document>(
+        owner()->document());
+      if (aDoc) {
+        const TDF_Label& aRefLab = aRef->First();
+        if (!aRefLab.IsNull()) {  // it may happen with old document, issue #285
+          ObjectPtr anObj = aDoc->objects()->object(aRefLab);
+          FiltersFeaturePtr aFeat = std::dynamic_pointer_cast<ModelAPI_FiltersFeature>(anObj);
+          if (aFeat.get()) {
+            aFeat->setAttribute(owner()->data()->attribute(id()));
+            return aFeat;
+          }
+        }
+      }
+    }
+  }
+  return FiltersFeaturePtr(); // null pointer if nothing is defined
+}
+
+void Model_AttributeSelectionList::setFilters(FiltersFeaturePtr theFeature)
+{
+  Handle(TDataStd_ReferenceList) aRef = TDataStd_ReferenceList::Set(myLab, kSELECTION_FILTERS_REF);
+  if (theFeature.get()) {
+    std::shared_ptr<Model_Data> aData = std::dynamic_pointer_cast<Model_Data>(theFeature->data());
+    if (aData->isValid())  {
+      TDF_Label anObjLab = aData->label().Father(); // object label
+      if (!aRef->IsEmpty())
+        aRef->Clear();
+      aRef->Append(anObjLab);
+      theFeature->setAttribute(owner()->data()->attribute(id()));
+      return;
+    }
+  }
+  // remove attribute if something is wrong
+  myLab.ForgetAttribute(TDataStd_ReferenceList::GetID());
 }

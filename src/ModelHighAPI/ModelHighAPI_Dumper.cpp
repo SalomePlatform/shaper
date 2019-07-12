@@ -47,6 +47,7 @@
 #include <ModelAPI_Document.h>
 #include <ModelAPI_Entity.h>
 #include <ModelAPI_Feature.h>
+#include <ModelAPI_FiltersFeature.h>
 #include <ModelAPI_Folder.h>
 #include <ModelAPI_Result.h>
 #include <ModelAPI_ResultBody.h>
@@ -1338,6 +1339,14 @@ ModelHighAPI_Dumper& ModelHighAPI_Dumper::operator<<(
         isAdded = true;
       }
       *this << anAttribute;
+    }
+
+    // check selection list is obtained by filters
+    FiltersFeaturePtr aFilters = theAttrSelList->filters();
+    if (aFilters) {
+      if (theAttrSelList->size() > 0)
+        *myDumpStorage << ", ";
+      dumpFeature(aFilters, true);
     }
 
     *myDumpStorage << "]";

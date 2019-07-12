@@ -791,6 +791,12 @@ void XGUI_Workshop::onOperationResumed(ModuleBase_Operation* theOperation)
   if (theOperation->getDescription()->hasXmlRepresentation()) {  //!< No need for property panel
     fillPropertyPanel(theOperation);
     connectToPropertyPanel(true);
+    ModuleBase_OperationFeature* aFOperation = dynamic_cast<ModuleBase_OperationFeature*>
+      (theOperation);
+    if (aFOperation)
+      myPropertyPanel->updateApplyPlusButton(aFOperation->feature());
+    else
+      myPropertyPanel->updateApplyPlusButton(FeaturePtr());
   }
   updateCommandStatus();
 
@@ -2931,4 +2937,9 @@ void XGUI_Workshop::onDockSizeChanged()
     desktop()->resizeDocks(aWgtList, aSizeList, Qt::Horizontal);
     disconnect(myObjectBrowser, SIGNAL(sizeChanged()), this, SLOT(onDockSizeChanged()));
   }
+}
+
+void XGUI_Workshop::deactivateCurrentSelector()
+{
+  myActiveControlMgr->deactivateSelector(myActiveControlMgr->activeSelector());
 }

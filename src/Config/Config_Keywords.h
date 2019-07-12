@@ -52,6 +52,7 @@ const static char* WDG_EXPR_EDITOR = "expr_editor";
 const static char* WDG_PLACE_HOLDER = "placeholder";
 const static char* WDG_ACTION = "action";
 const static char* WDG_POINT_INPUT = "point_input";
+const static char* WDG_SELECTION_FILTERS = "selection_filters";
 
 // Containers
 const static char* WDG_GROUP = "groupbox";
@@ -62,6 +63,8 @@ const static char* WDG_RADIOBOX_ITEM = "radio";
 const static char* WDG_TOOLBOX_BOX = "box";
 const static char* WDG_SWITCH = "switch";
 const static char* WDG_SWITCH_CASE = "case";
+const static char* WDG_FILTER = "filter";
+
 // Common properties (xml attributes of nodes)
 const static char* _ID = "id";
 // NODE_WORKBENCH properties

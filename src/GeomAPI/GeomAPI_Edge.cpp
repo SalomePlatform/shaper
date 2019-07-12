@@ -68,6 +68,19 @@ GeomAPI_Edge::GeomAPI_Edge(const std::shared_ptr<GeomAPI_Shape>& theShape)
   }
 }
 
+bool GeomAPI_Edge::isSameGeometry(const std::shared_ptr<GeomAPI_Shape> theShape) const
+{
+  if (!theShape->isEdge())
+    return false;
+  TopoDS_Edge anOwnEdge = TopoDS::Edge(impl<TopoDS_Shape>());
+  TopoDS_Edge anOtherEdge = TopoDS::Edge(theShape->impl<TopoDS_Shape>());
+
+  double aFirst, aLast;
+  Handle(Geom_Curve) anOwnCurve = BRep_Tool::Curve(anOwnEdge, aFirst, aLast);
+  Handle(Geom_Curve) anOtherCurve = BRep_Tool::Curve(anOtherEdge, aFirst, aLast);
+  return anOwnCurve == anOtherCurve;
+}
+
 bool GeomAPI_Edge::isLine() const
 {
   const TopoDS_Shape& aShape = const_cast<GeomAPI_Edge*>(this)->impl<TopoDS_Shape>();

@@ -325,6 +325,8 @@ Q_OBJECT
 
   void updateAutoComputeState();
 
+  void deactivateCurrentSelector();
+
 signals:
   /// Emitted when selection happens in Salome viewer
   void salomeViewerSelection();

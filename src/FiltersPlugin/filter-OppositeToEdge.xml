@@ -1,0 +1,8 @@
+<filter id="OppositeToEdge">
+  <shape_selector id="OppositeToEdge__OppositeToEdge"
+                  label="Edge:"
+                  tooltip="Select edge."
+                  shape_types="edges">
+    <validator id="GeomValidators_ShapeType" parameters="line"/>
+  </shape_selector>
+</filter>

@@ -77,6 +77,10 @@ public:
   GEOMAPI_EXPORT
   virtual bool isSame(const std::shared_ptr<GeomAPI_Shape> theShape) const;
 
+  /// Returns \c true if shapes have same underlying geometry
+  GEOMAPI_EXPORT
+  virtual bool isSameGeometry(const std::shared_ptr<GeomAPI_Shape> theShape) const;
+
   /// Returns whether the shape is a vertex
   GEOMAPI_EXPORT
   virtual bool isVertex() const;
@@ -220,6 +224,7 @@ public:
   GEOMAPI_EXPORT bool isSelfIntersected(const int theLevelOfCheck = 9) const;
 
 public:
+  /// \brief Compare addresses of shapes
   class Comparator
   {
   public:
@@ -227,6 +232,17 @@ public:
     GEOMAPI_EXPORT
     bool operator ()(const std::shared_ptr<GeomAPI_Shape>& theShape1,
                      const std::shared_ptr<GeomAPI_Shape>& theShape2) const;
+  };
+
+  /// \brief Compare addresses of shapes with respect to orientation of shapes.
+  ///        Same TShapes with opposite orientations will be treated as different.
+  class ComparatorWithOri
+  {
+  public:
+    /// Return \c true if the address of the first shape is less than the address of the second
+    GEOMAPI_EXPORT
+      bool operator ()(const std::shared_ptr<GeomAPI_Shape>& theShape1,
+                       const std::shared_ptr<GeomAPI_Shape>& theShape2) const;
   };
 };
 

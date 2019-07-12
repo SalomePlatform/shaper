@@ -62,6 +62,7 @@
   #include "GeomAlgoAPI_ConeSegment.h"
   #include "GeomAlgoAPI_Copy.h"
   #include "GeomAlgoAPI_Symmetry.h"
+  #include "GeomAlgoAPI_MapShapesAndAncestors.h"
 
   #include <memory>
   #include <string>

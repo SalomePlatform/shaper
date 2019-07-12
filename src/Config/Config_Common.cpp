@@ -86,7 +86,7 @@ bool isWidgetNode(xmlNodePtr theNode)
     return false;
   // it's parent is "feature" or "source" or a page ("box", "case")
   if(!hasParent(theNode, NODE_FEATURE, NODE_SOURCE, WDG_GROUP, WDG_OPTIONALBOX,
-    WDG_TOOLBOX_BOX, WDG_RADIOBOX_ITEM, WDG_SWITCH_CASE, NULL))
+    WDG_TOOLBOX_BOX, WDG_RADIOBOX_ITEM, WDG_SWITCH_CASE, WDG_FILTER, NULL))
     return false;
 
   //it should not be a "source" or a "validator" node

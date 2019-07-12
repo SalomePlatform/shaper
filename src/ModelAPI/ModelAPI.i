@@ -54,6 +54,7 @@
 %feature("director") ModelAPI_CompositeFeature;
 %feature("director") ModelAPI_Data;
 %feature("director") ModelAPI_Folder;
+%feature("director") ModelAPI_Filter;
 
 // shared pointers
 // For ModelAPI_ResultConstruction.shape()
@@ -65,6 +66,8 @@
 %shared_ptr(ModelAPI_Feature)
 %shared_ptr(ModelAPI_CompositeFeature)
 %shared_ptr(ModelAPI_Data)
+%shared_ptr(ModelAPI_Filter)
+%shared_ptr(ModelAPI_FiltersFeature)
 %shared_ptr(ModelAPI_Folder)
 %shared_ptr(ModelAPI_Attribute)
 %shared_ptr(ModelAPI_AttributeDocRef)
@@ -157,6 +160,10 @@
 %include "ModelAPI_ResultParameter.h"
 %include "ModelAPI_Tools.h"
 %include "ModelAPI_Folder.h"
+%include "ModelAPI_Filter.h"
+%include "ModelAPI_FiltersArgs.h"
+%include "ModelAPI_FiltersFactory.h"
+%include "ModelAPI_FiltersFeature.h"
 
 // std::list -> []
 %template(StringList) std::list<std::string>;
@@ -164,6 +171,7 @@
 %template(FeatureList) std::list<std::shared_ptr<ModelAPI_Feature> >;
 %template(ResultList) std::list<std::shared_ptr<ModelAPI_Result> >;
 %template(DocumentList) std::list<std::shared_ptr<ModelAPI_Document> >;
+%template(FilterList) std::list<std::shared_ptr<ModelAPI_Filter> >;
 // std::set -> []
 %template(AttributeSet) std::set<std::shared_ptr<ModelAPI_Attribute> >;
 %template(FeatureSet) std::set<std::shared_ptr<ModelAPI_Feature> >;
