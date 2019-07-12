@@ -1,3 +1,4 @@
+.. |Torus_button.icon|    image:: images/Torus_button.png
 
 Torus
 =====
@@ -7,13 +8,7 @@ Torus feature creates a torus solid.
 To create a Torus in the active part:
 
 #. select in the Main Menu *Primitives - > Torus* item  or
-#. click **Torus** button in the toolbar
-
-.. image:: images/Torus_button.png
-   :align: center
-
-.. centered::
-   **Torus** button 
+#. click |Torus_button.icon| **Torus** button in the toolbar
 
 The following property panel appears.
 
@@ -31,9 +26,16 @@ Input fields:
    - **Radius**;
    - **Ring radius**.
   
-**TUI Command**: *model.addTorus(Part_doc, Point, Axis, Radius1, Radius2)*
+**TUI Command**:
 
-**Arguments**:  Part + 1 vertex + 1 vector + 2 real values (first and second radii).
+.. py:function:: model.addTorus(Part_doc, Point, Axis, Radius1, Radius2)
+
+    :param part: The current part object.
+    :param object: Vertex.
+    :param object: Axis.
+    :param real: Radius 1.
+    :param real: Radius 2.
+    :return: Result object.
 
 Result
 """"""

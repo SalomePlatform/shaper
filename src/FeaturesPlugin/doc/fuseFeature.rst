@@ -1,3 +1,4 @@
+.. |bool_fuse.icon|    image:: images/bool_fuse.png
 
 Fuse
 ====
@@ -7,13 +8,7 @@ Fuse feature implements a Boolean operation for fusion of a set of main objects 
 To perform Fuse in the active part:
 
 #. select in the Main Menu *Features - > Fuse* item  or
-#. click **Fuse** button in the toolbar
-
-.. image:: images/bool_fuse.png
-   :align: center
-
-.. centered::
-   **Fuse**  button 
+#. click |bool_fuse.icon| **Fuse** button in the toolbar
 
 There are 2 options for creation of a Fuse:
 
@@ -40,9 +35,14 @@ Simple
 - **Remove intersection edges** -  if enabled, edges that lie on the same surface will be removed.
 - **See preview** - button shows a result of the operation.
 
-**TUI Command**:  *model.addFuse(Part_doc, objects, isRemoveEdges)*
+**TUI Command**:
 
-**Arguments**:   Part + list of objects + remove edges flag (optional).
+.. py:function:: model.addFuse(Part_doc, objects, isRemoveEdges)
+
+    :param part: The current part object.
+    :param list: A list of objects.
+    :param boolean: Remove edges flag (optional).
+    :return: Created object.
 
 Result
 """"""
@@ -74,9 +74,15 @@ Advanced
 - **Remove intersection edges** - if enabled, edges that lie on the same surface will be removed.
 - **See preview** - button shows a result of the operation.
 
-**TUI Command**:  *model.addFuse(Part_doc, objects, tools, isRemoveEdges)*
+**TUI Command**:
 
-**Arguments**:   Part + list of objects + list of tools + remove edges flag (optional).
+.. py:function:: model.addFuse(Part_doc, objects, tools, isRemoveEdges)
+
+    :param part: The current part object.
+    :param list: A list of objects.
+    :param list: A list of tools.
+    :param boolean: Remove edges flag (optional).
+    :return: Created object.
 
 Result
 """"""

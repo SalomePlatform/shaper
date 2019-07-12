@@ -1,3 +1,4 @@
+.. |feature_edge.icon|    image:: images/feature_edge.png
 
 Edge
 ====
@@ -7,13 +8,7 @@ Edge feature creates one or several edges using shapes already existing in other
 To create edges in the active part:
 
 #. select in the Main Menu *Build - > Edge* item  or
-#. click **Edge** button in the toolbar
-
-.. image:: images/feature_edge.png
-  :align: center
-
-.. centered::
-  **Edge** button
+#. click |feature_edge.icon| **Edge** button in the toolbar
 
 The options to create edges:
 
@@ -41,9 +36,13 @@ Select one or several edges in the viewer.
 
 **Cancel** button cancels the operation. 
 
-**TUI Command**:  *model.addEdge(Part_doc, Shapes)*
+**TUI Command**:
 
-**Arguments**:   Part document + list of shapes.
+.. py:function:: model.addEdge(Part_doc, Shapes)
+
+    :param part: The current part object.
+    :param list: A list of shapes.
+    :return: Result object.
 
 Result
 """"""
@@ -74,9 +73,14 @@ Select two points in the viewer.
 
 **Cancel** button cancels the operation. 
 
-**TUI Command**:  *model.addEdge(Part_doc, Point_1, Point_2)*
+**TUI Command**:
 
-**Arguments**:   Part document + two points/vertices.
+.. py:function:: model.addEdge(Part_doc, Point_1, Point_2)
+
+    :param part: The current part object.
+    :param object: First point.
+    :param object: Second point.
+    :return: Result object.
 
 Result
 """"""

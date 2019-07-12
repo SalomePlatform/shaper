@@ -1,4 +1,5 @@
 .. _featureTranslation:
+.. |translation_vector_32x32.icon|    image:: images/translation_vector_32x32.png
 
 Translation
 ===========
@@ -8,7 +9,7 @@ Translation
 To create a Translation in the active part:
 
 #. select in the Main Menu *Part - > Translation* item  or
-#. click **Translation** button in the toolbar
+#. click |translation_vector_32x32.icon| **Translation** button in the toolbar
 
 .. image:: images/translation_vector_32x32.png   
    :align: center
@@ -45,9 +46,15 @@ Input fields:
 - **Axis**  defines a vector along which the object will be translated. The vector is an edge or axis selected in 3D OCC viewer or object browser;
 - **Distance** defines the distance along the **Vector of translation**.
 
-**TUI Command**:  *model.addTranslation(Part_doc, [shape], axis, dist)*
+**TUI Command**:
 
-**Arguments**: part + list of shapes in format *model.selection(TYPE, shape)* + axis in format *model.selection(TYPE, shape)*+ real (distance value).
+.. py:function:: model.addTranslation(Part_doc, [shape], axis, dist)
+
+    :param part: The current part object.
+    :param list: A list of shapes in format *model.selection(TYPE, shape)*.
+    :param object: axis in format *model.selection(TYPE, shape)*.
+    :param real: Distance value.
+    :return: Result object.
 
 Result
 """"""
@@ -76,9 +83,16 @@ Input fields:
 - **Main objects** panel contains shapes to be translated. The shapes are selected in 3D OCC viewer or object browser;
 - **DX**, **DY**, **DZ**  define vector using coordinates along the axis.
 
-**TUI Command**:  *model.addTranslation(Part_1_doc, [shape], DX, DY, DZ)*
+**TUI Command**:
 
-**Arguments**: part + list of shapes in format *model.selection(TYPE, shape)* + 3 real (coordinate values).
+.. py:function:: model.addTranslation(Part_1_doc, [shape], DX, DY, DZ)
+
+    :param part: The current part object.
+    :param list: A list of shapes in format *model.selection(TYPE, shape)*.
+    :param real: dX value.
+    :param real: dY value.
+    :param real: dZ value.
+    :return: Result object.
 
 Result
 """"""
@@ -109,9 +123,15 @@ Input fields:
 - **Start point**  defines start vector point as point or vertex selected in 3D OCC viewer or object browser;
 - **End point**  defines end vector point as point or vertex selected in 3D OCC viewer or object browser;
   
-**TUI Command**:  *model.addTranslation(Part_doc, [shape], point1, point2)*
+**TUI Command**:
 
-**Arguments**: part + list of shapes in format *model.selection(TYPE, shape)* + 2 points in format *model.selection(TYPE, shape)*.
+.. py:function:: model.addTranslation(Part_doc, [shape], point1, point2)
+
+    :param part: The current part object.
+    :param list: A list of shapes in format *model.selection(TYPE, shape)*.
+    :param object: A point in format *model.selection(TYPE, shape)*.
+    :param object: A point in format *model.selection(TYPE, shape)*.
+    :return: Result object.
 
 Result
 """"""

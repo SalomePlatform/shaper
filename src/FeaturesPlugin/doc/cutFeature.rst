@@ -1,4 +1,5 @@
 .. _featureCut:
+.. |bool_cut.icon|    image:: images/bool_cut.png
 
 Cut
 ===
@@ -8,13 +9,7 @@ Cut feature implements a Boolean operation to cut tool objects from main objects
 To perform a Cut operationin the active part:
 
 #. select in the Main Menu *Features - > Cut* item  or
-#. click **Cut** button in the toolbar
-
-.. image:: images/bool_cut.png
-   :align: center
-
-.. centered::
-   **Cut**  button 
+#. click |bool_cut.icon| **Cut** button in the toolbar
 
 The following property panel will be opened:
 
@@ -32,9 +27,14 @@ The following property panel will be opened:
   Non-selected subshapes from compsolids/compounds will be ignored.
 - **See preview** button shows a result of the operation.
 
-**TUI Command**:  *model.addCut(Part_doc, mainObjects, toolObjects)*
+**TUI Command**:
 
-**Arguments**:   Part + list of main objects + list of tool objects.
+.. py:function:: model.addCut(Part_doc, mainObjects, toolObjects)
+
+    :param part: The current part object
+    :param list: A list of main objects.
+    :param list: A list of tool objects.
+    :return: Created object
 
 Result
 """"""

@@ -1,3 +1,4 @@
+.. |intersection_btn.icon|    image:: images/intersection_btn.png
 
 Intersection
 ============
@@ -7,13 +8,7 @@ Intersection feature a boolean operation for intersection of a set of main objec
 To perform a boolean operation Intersection in the active part:
 
 #. select in the Main Menu *Features - > Intersection* item  or
-#. click **Intersection** button in the toolbar
-
-.. image:: images/intersection_btn.png
-   :align: center
-
-.. centered::
-   **Intersection**  button 
+#. click |intersection_btn.icon| **Intersection** button in the toolbar
 
 The following property panel will be opened:
 
@@ -25,9 +20,13 @@ The following property panel will be opened:
 
 **Objects** - contains a list of objects selected in the Object Browser or in the Viewer, which will be intersected.
 
-**TUI Command**:  *model.addIntersection(Part_doc, Objects)*
+**TUI Command**:
 
-**Arguments**:   Part + list of objects.
+.. py:function:: model.addIntersection(Part_doc, Objects)
+
+    :param part: The current part object.
+    :param list: A list of objects.
+    :return: Created object.
 
 Result
 """"""

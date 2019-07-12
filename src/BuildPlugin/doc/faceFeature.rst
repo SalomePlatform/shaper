@@ -1,4 +1,5 @@
 .. _buildFace:
+.. |feature_face.icon|    image:: images/feature_face.png
 
 Face
 ====
@@ -8,13 +9,7 @@ Face feature creates one or several faces using shapes already existing in other
 To create a face in the active part:
 
 #. select in the Main Menu *Build - > Face* item  or
-#. click **Face** button in the toolbar
-
-.. image:: images/feature_face.png
-  :align: center
-
-.. centered::
-  **Face** button
+#. click |feature_face.icon| **Face** button in the toolbar
 
 The following property panel will be opened:
    
@@ -30,9 +25,13 @@ Select one or several faces in viewer. Additionally, a face can be build by a cl
 
 **Cancel** button cancels the operation. 
 
-**TUI Command**:  *model.addFace(Part_doc, Shapes)*
+**TUI Command**:
 
-**Arguments**:   Part document + list of shapes.
+.. py:function:: model.addFace(Part_doc, Shapes)
+
+    :param part: The current part object.
+    :param list: A list of shapes.
+    :return: Result object.
 
 Result
 """"""

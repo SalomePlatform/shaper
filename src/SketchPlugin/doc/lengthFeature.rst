@@ -1,4 +1,5 @@
 .. _sketchLength:
+.. |length.icon|    image:: images/length.png
 
 Length constraint
 =================
@@ -8,13 +9,7 @@ Length constraint fixes the length of lines, such as standalone line or rectangl
 To create a Length constraint in the active Sketch:
 
 #. select in the Main Menu *Sketch - > Length* item  or
-#. click **Length** button in Sketch toolbar:
-
-.. image:: images/length.png
-   :align: center
-
-.. centered::
-   **Length**  button
+#. click |length.icon| **Length** button in Sketch toolbar:
 
 Property panel:
 
@@ -51,9 +46,13 @@ When creating the constraint, after selection of a line for the first time:
 .. centered::
    Length input in the view
 
-**TUI Command**: *Sketch_1.setLength(LineObject, Value)*
+**TUI Command**:
 
-**Arguments**:  line + length value
+.. py:function:: Sketch_1.setLength(LineObject, Value)
+
+    :param object: A line.
+    :param real: Length value.
+    :return: Result object.
 
 Result
 """"""

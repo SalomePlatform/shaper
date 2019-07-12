@@ -1,3 +1,4 @@
+.. |tangent.icon|    image:: images/tangent.png
 
 Tangent constraint
 ==================
@@ -7,13 +8,7 @@ Tangent constraint fixes a circle (or an arc) and a line so that a line is tange
 To create a Tangent in the active Sketch:
 
 #. select in the Main Menu *Sketch - > Tangent* item  or
-#. click **Tangent** button in Sketch toolbar:
-
-.. image:: images/tangent.png
-   :align: center
-
-.. centered::
-   **Tangent**  button
+#. click |tangent.icon| **Tangent** button in Sketch toolbar:
 
 Property panel:
 
@@ -29,9 +24,13 @@ Note that one of two objects should be a line.
 
 After the objects are selected, a special sign will be added close to the tangency point in the view.
 
-**TUI Command**: *Sketch_1.setTangent(Line, CircleOrArc)*
+**TUI Command**:
 
-**Arguments**:  2 objects (the first is a line, the second one is a circle or an arc)
+.. py:function:: Sketch_1.setTangent(Line, CircleOrArc)
+
+    :param object: A line.
+    :param object: A circle or an arc.
+    :return: Result object.
 
 Result
 """"""

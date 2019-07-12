@@ -1,3 +1,4 @@
+.. |Sphere_button.icon|    image:: images/Sphere_button.png
 
 Sphere
 ======
@@ -7,13 +8,7 @@ Sphere feature creates a sphere solid.
 To create a Sphere in the active part:
 
 #. select in the Main Menu *Primitives - > Sphere* item  or
-#. click **Sphere** button in the toolbar
-
-.. image:: images/Sphere_button.png
-   :align: center
-
-.. centered::
-   **Sphere** button 
+#. click |Sphere_button.icon| **Sphere** button in the toolbar
 
 The following property panel appears.
 
@@ -28,9 +23,14 @@ Input fields:
 - **Point** defines the center of the sphere selected in 3D OCC  viewer or object browser; 
 - **Radius** defines the radius.
   
-**TUI Command**: *model.addSphere(Part_doc, Point, Radius)*.
+**TUI Command**:
 
-**Arguments**:  Part + 1 vertex + 1 real value (radius).
+.. py:function:: model.addSphere(Part_doc, Point, Radius)
+
+    :param part: The current part object.
+    :param object: Vertex.
+    :param real: Radius.
+    :return: Result object.
 
 Result
 """"""

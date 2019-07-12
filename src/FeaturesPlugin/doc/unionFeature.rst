@@ -1,3 +1,4 @@
+.. |union_btn.icon|    image:: images/union_btn.png
 
 Union
 =====
@@ -7,13 +8,7 @@ Union feature implements a Boolean operation for creation of a union of selected
 To create a Union in the active part:
 
 #. select in the Main Menu *Features - > Union* item  or
-#. click **Union** button in the toolbar
-
-.. image:: images/union_btn.png
-   :align: center
-
-.. centered::
-   **Union**  button 
+#. click |union_btn.icon| **Union** button in the toolbar
 
 The following property panel will be opened:
 
@@ -29,9 +24,13 @@ Here it is necessary to select some objects. Only faces with shared edges or sol
   
 **Cancel** button cancels the operation.
 
-**TUI Command**:  *model.addUnion(Part_doc, objects)*
+**TUI Command**:
 
-**Arguments**:   Part + list of objects.
+.. py:function:: model.addUnion(Part_doc, objects)
+
+    :param part: The current part object.
+    :param list: A list of objects.
+    :return: Result object.
 
 Result
 """"""

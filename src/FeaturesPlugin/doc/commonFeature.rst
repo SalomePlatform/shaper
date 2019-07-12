@@ -1,3 +1,5 @@
+.. |bool_common.icon|    image:: images/bool_common.png
+
 Common
 ======
 
@@ -6,13 +8,7 @@ Common feature implements a Boolean operation for extraction of a common part fr
 To perform a Common operation in the active part:
 
 #. select in the Main Menu *Features - > Common* item  or
-#. click **Common** button in the toolbar
-
-.. image:: images/bool_common.png
-   :align: center
-
-.. centered::
-   **Common**  button 
+#. click |bool_common.icon| **Common** button in the toolbar
 
 There are 2 options for creation of a Common:
 
@@ -38,9 +34,13 @@ Simple
   If a subshape that belongs to a compsolid/compound was selected, other shapes of this compsolid/compound will be ignored.
 - **See preview** button shows a result of the operation.
 
-**TUI Command**:  *model.addCommon(Part_doc, objects)*
+**TUI Command**:
 
-**Arguments**:   Part + list of objects.
+.. py:function:: model.addCommon(Part_doc, objects)
+
+    :param part: The current part object
+    :param list: A list of objects.
+    :return: Created object
 
 Result
 """"""
@@ -71,9 +71,14 @@ Advanced
   If a subshape that belongs to a compsolid/compound was selected, other shapes of this compsolid/compound  will be ignored.
 - **See preview** button shows a result of the operation.
 
-**TUI Command**:  *model.addCommon(Part_doc, objects, tools)*
+**TUI Command**:
 
-**Arguments**:   Part + list of objects + list of tools.
+.. py:function:: model.addCommon(Part_doc, objects, tools)
+
+    :param part: The current part object
+    :param list: A list of objects.
+    :param list: A list of tools.
+    :return: Created object
 
 Result
 """"""

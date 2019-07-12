@@ -1,3 +1,4 @@
+.. |multitranslation.icon|    image:: images/multitranslation.png
 
 Linear copy
 ===========
@@ -7,13 +8,7 @@ Linear copy
 To create a Linear copy in the active part:
 
 #. select in the Main Menu *Part - > Linear copy* item  or
-#. click **Linear copy** button in the toolbar
-
-.. image:: images/multitranslation.png  
-   :align: center
-
-.. centered::
-   **Linear copy** button 
+#. click |multitranslation.icon| **Linear copy** button in the toolbar
 
 The following property panel appears.
 
@@ -38,9 +33,19 @@ Input fields:
   - **Step** defines the distance between the shape copies;
   - **Nb. Copies** defines the number of shape copies.
 
-**TUI Command**:  *model.addMultiTranslation(Part_doc, [shape], axis1, step1, Nb1, axis2, step2, Nb2)*
+**TUI Command**:
 
-**Arguments**: part + list of shapes in format *model.selection(TYPE, shape)* + 2 axis in format *model.selection(TYPE, shape)*+ 2 real (step values) + 2 integers (Nb. Copies).
+.. py:function:: model.addMultiTranslation(Part_doc, [shape], axis1, step1, Nb1, axis2, step2, Nb2)
+
+    :param part: The current part object.
+    :param list: A list of shapes in format *model.selection(TYPE, shape)*.
+    :param object: A first axis in format *model.selection(TYPE, shape)*.
+    :param real: The first step value.
+    :param integer: The first number of copies.
+    :param object: A second axis in format *model.selection(TYPE, shape)*.
+    :param real: The second step value.
+    :param integer: The second number of copies.
+    :return: Created object.
 
 Result
 """"""

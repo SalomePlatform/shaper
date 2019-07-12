@@ -1,3 +1,4 @@
+.. |feature_wire.icon|    image:: images/feature_wire.png
 
 Wire
 ====
@@ -7,13 +8,7 @@ Wire feature creates a wire using edges already existing in other objects.
 To create a wire in the active part:
 
 #. select in the Main Menu *Build - > Wire* item  or
-#. click **Wire** button in the toolbar
-
-.. image:: images/feature_wire.png
-  :align: center
-
-.. centered::
-  **Wire** button
+#. click |feature_wire.icon| **Wire** button in the toolbar
 
 The following property panel will be opened:
 
@@ -29,9 +24,13 @@ Select one or several edges in the viewer. For automatic selection of a closed c
 
 **Cancel** button cancels the operation. 
 
-**TUI Command**:  *model.addWire(Part_doc, Shapes)*
+**TUI Command**:
 
-**Arguments**:   Part document + list of shapes.
+.. py:function:: model.addWire(Part_doc, Shapes)
+
+    :param part: The current part object.
+    :param list: A list of shapes.
+    :return: Result object.
 
 Result
 """"""

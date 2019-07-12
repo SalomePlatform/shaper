@@ -1,3 +1,4 @@
+.. |extrusion_fuse_btn.icon|    image:: images/extrusion_fuse_btn.png
 
 Extrusion Fuse
 =============
@@ -7,13 +8,7 @@ Extrusion Fuse feature extrudes selected objects along their normals or the sele
 To perform Extrusion Fuse in the active part:
 
 #. select in the Main Menu *Features - > Extrusion Fuse* item  or
-#. click **Extrusion Fuse** button in the toolbar
-
-.. image:: images/extrusion_fuse_btn.png
-   :align: center
-
-.. centered::
-   **Extrusion Fuse** button
+#. click |extrusion_fuse_btn.icon| **Extrusion Fuse** button in the toolbar
 
 The following property panel will be opened:
 
@@ -49,21 +44,43 @@ By sizes
 - **From size** - size for extrusion in the opposite direction.
 - **Fuse with** - contains a list of objects which will be fused with the result of extrusion.
 
-**TUI Command**:  *model.addExtrusionFuse(part, objectsToExtrude, size, objectsToFuse);*
+**TUI Commands**:
 
-**Arguments**:   Part + list of objects for extrusion + size + list of objects to fuse with.
+.. py:function:: model.addExtrusionFuse(part, objectsToExtrude, size, objectsToFuse)
 
-**TUI Command**:  *model.addExtrusionFuse(part, objects, direction, size, objectsToFuse);*
+    :param part: The current part object.
+    :param list: A list of objects for extrusion.
+    :param number: Size of extrucion.
+    :param list: A list of objects to fuse with.
+    :return: Created object.
 
-**Arguments**:   Part + list of objects for extrusion + direction + size + list of objects to fuse with.
+.. py:function:: model.addExtrusionFuse(part, objects, direction, size, objectsToFuse)
 
-**TUI Command**:  *model.addExtrusionFuse(part, objects, toSize, fromSize, objectsToFuse);*
+    :param part: The current part object.
+    :param list: A list of objects for extrusion.
+    :param object: A direction of extrusion
+    :param number: Size of extrucion.
+    :param list: A list of objects to fuse with.
+    :return: Created object.
 
-**Arguments**:   Part + list of objects for extrusion + to size + from size + list of objects to fuse with.
+.. py:function:: model.addExtrusionFuse(part, objects, toSize, fromSize, objectsToFuse)
 
-**TUI Command**:  *model.addExtrusionFuse(part, objects, direction, toSize, fromSize, objectsToFuse);*
+    :param part: The current part object.
+    :param list: A list of objects for extrusion.
+    :param number: "Size to" value.
+    :param number: "Size from" value.
+    :param list: A list of objects to fuse with.
+    :return: Created object.
 
-**Arguments**:   Part + list of objects for extrusion + direction + to size + from size + list of objects to fuse with.
+.. py:function:: model.addExtrusionFuse(part, objects, direction, toSize, fromSize, objectsToFuse)
+
+    :param part: The current part object.
+    :param list: A list of objects for extrusion.
+    :param object: A direction of extrusion
+    :param number: "Size to" value.
+    :param number: "Size from" value.
+    :param list: A list of objects to fuse with.
+    :return: Created object.
 
 Result
 """"""
@@ -95,13 +112,30 @@ By bounding planes
 - **From offset** - offset for extrusion or for bounding plane,  if selected.
 - **Fuse with** - contains a list of objects which will be fused with the result of extrusion.
 
-**TUI Command**:  *model.addExtrusionFuse(part, objects, toObject, toOffset, fromObject, fromOffset, objectsToFuse);*
+**TUI Commands**:
 
-**Arguments**:   Part + list of objects for extrusion + to object + to offset + from object + from offset + list of objects to fuse with.
+.. py:function:: model.addExtrusionFuse(part, objects, toObject, toOffset, fromObject, fromOffset, objectsToFuse)
 
-**TUI Command**:  *model.addExtrusionFuse(part, objects, direction, toObject, toOffset, fromObject, fromOffset, objectsToFuse);*
+    :param part: The current part object.
+    :param list: A list of objects for extrusion.
+    :param object: "To object".
+    :param number: "To offset".
+    :param object: "From object".
+    :param number: "From offset".
+    :param list: A list of objects to fuse with.
+    :return: Created object.
 
-**Arguments**:   Part + list of objects for extrusion + direction + to object + to offset + from object + from offset + list of objects to fuse with.
+.. py:function:: model.addExtrusionFuse(part, objects, direction, toObject, toOffset, fromObject, fromOffset, objectsToFuse)
+
+    :param part: The current part object.
+    :param list: A list of objects for extrusion.
+    :param object: A direction of extrusion
+    :param object: "To object".
+    :param number: "To offset".
+    :param object: "From object".
+    :param number: "From offset".
+    :param list: A list of objects to fuse with.
+    :return: Created object.
 
 Result
 """"""

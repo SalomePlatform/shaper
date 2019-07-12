@@ -1,3 +1,4 @@
+.. |point.icon|    image:: images/point.png
 
 Point
 =====
@@ -7,13 +8,7 @@ Point feature creates a point in the current Sketch.
 To add a new Point to the Sketch:
 
 #. select in the Main Menu *Sketch - > Point* item  or
-#. click **Point** button in Sketch toolbar:
-
-.. image:: images/point.png
-   :align: center
-
-.. centered::
-   **Point**  button
+#. click |point.icon| **Point** button in Sketch toolbar:
 
 The following property panel appears:
 
@@ -28,9 +23,13 @@ the point will be created automatically.
 
 The point coordinates are displayed in the property panel.
 
-**TUI Command**:  *Sketch_1.addPoint(X, Y)*
+**TUI Command**:
 
-**Arguments**:    2 values (coordinates on the Sketch plane).
+.. py:function:: Sketch_1.addPoint(X, Y)
+
+    :param real: X value.
+    :param real: Y value.
+    :return: Result object.
 
 Result
 """"""

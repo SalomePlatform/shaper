@@ -1,3 +1,4 @@
+.. |pipe.icon|    image:: images/pipe.png
 
 Pipe
 ====
@@ -7,13 +8,7 @@ Pipe
 To create a Pipe in the active part:
 
 #. select in the Main Menu *Features - > Pipe* item  or
-#. click **Pipe** button in the toolbar
-
-.. image:: images/pipe.png        
-   :align: center
-
-.. centered::
-   **Pipe** button 
+#. click |pipe.icon| **Pipe** button in the toolbar
 
 Pipe can be created in three different ways:
 
@@ -45,9 +40,14 @@ Input fields:
 - **Base objects** panel contains shapes to be extruded. Several Base Objects generate several pipes. Shapes (edges, faces, shells) are selected in 3D OCC viewer or object browser;
 - **Path object**  defines the path along which the Base Object will be extruded.  **Path object** (edge or wire) is selected in 3D OCC viewer or object browser;
 
-**TUI Command**:  *model.addPipe(Part_doc, [shape], path)*
+**TUI Command**:
+
+.. py:function:: model.addPipe(Part_doc, [shape], path)
  
-**Arguments**: part + list of shapes in format *model.selection(TYPE, shape)* + path in format *model.selection(TYPE, shape)*.
+    :param part: The current part object.
+    :param list: A list of shapes in format *model.selection(TYPE, shape)*.
+    :param object: A path in format *model.selection(TYPE, shape)*.
+    :return: Created object.
 
 Result
 """"""
@@ -79,9 +79,15 @@ Input fields:
 - **Path object**  defines the path along which the Base Object will be extruded.  **Path object** (edge or wire) is selected in 3D OCC viewer or object browser;
 - **Bi-Normal** defines the BiNormal Vector. **Bi-Normal** (edge or wire) is selected in 3D OCC viewer or object browser.
 
-**TUI Command**:  *model.addPipe(Part_doc, [shape], path, binormal)*
+**TUI Command**:
+
+.. py:function:: model.addPipe(Part_doc, [shape], path, binormal)
  
-**Arguments**: part + list of shapes in format *model.selection(TYPE, shape)* + path in format *model.selection(TYPE, shape)* + binormal in format *model.selection(TYPE, shape)*.
+    :param part: The current part object.
+    :param list: A list of shapes in format *model.selection(TYPE, shape)*.
+    :param object: A path in format *model.selection(TYPE, shape)*.
+    :param object: A binormal in format *model.selection(TYPE, shape)*.
+    :return: Created object.
 
 Result
 """"""
@@ -113,9 +119,15 @@ Input fields:
 - **Path object**  defines the path along which the Base Object will be extruded.  **Path object** (edge or wire) is selected in 3D OCC viewer or object browser;
 - **Locations** define the list of vertices that specify the locations of extruded Base Objects on the resulting Path Object. The number of Base Objects should be equal to the number of Locations.
 
-**TUI Command**:  *model.addPipe(Part_doc, [shape], path, locations)*
+**TUI Command**:
+
+.. py:function:: model.addPipe(Part_doc, [shape], path, locations)
  
-**Arguments**: part + list of shapes in format *model.selection(TYPE, shape)* + path in format *model.selection(TYPE, shape)* + list of locations in format *model.selection(TYPE, shape)*.
+    :param part: The current part object.
+    :param list: A list of shapes in format *model.selection(TYPE, shape)*.
+    :param object: A path in format *model.selection(TYPE, shape)*.
+    :param list: A list of locations in format *model.selection(TYPE, shape)*.
+    :return: Created object.
 
 Result
 """"""

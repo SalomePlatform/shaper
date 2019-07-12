@@ -1,3 +1,4 @@
+.. |collinear.icon|    image:: images/collinear.png
 
 Collinear constraint
 ====================
@@ -7,13 +8,7 @@ Collinear constraint forces lines to be collinear.
 To create a Collinear constraint in the active Sketch:
 
 #. select in the Main Menu *Sketch - > Collinear* item  or
-#. click **Collinear** button in Sketch toolbar:
-
-.. image:: images/collinear.png
-   :align: center
-
-.. centered::
-   **Collinear**  button
+#. click |collinear.icon| **Collinear** button in Sketch toolbar:
 
 Property panel:
 
@@ -28,9 +23,13 @@ Input fields:
 | After the lines are selected, they are translated to become collinear.
 | The lines are marked with a special sign.
 
-**TUI Command**: *Sketch_1.setCollinear(Line1, Line2)*
+**TUI Command**:
 
-**Arguments**:  2 line objects
+.. py:function:: Sketch_1.setCollinear(Line1, Line2)
+
+    :param object: First object.
+    :param object: Second object.
+    :return: Result object.
 
 Result
 """"""

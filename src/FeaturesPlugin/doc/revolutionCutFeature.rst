@@ -1,3 +1,4 @@
+.. |revolution_cut_btn.icon|    image:: images/revolution_cut_btn.png
 
 Revolution Cut
 ==============
@@ -7,13 +8,7 @@ Revolution Cut feature revolves the selected objects around the selected axis an
 To perform a Revolution Cut in the active part:
 
 #. select in the Main Menu *Features - > Revolution Cut* item  or
-#. click **Revolution Cut** button in the toolbar
-
-.. image:: images/revolution_cut_btn.png
-   :align: center
-
-.. centered::
-   **Revolution Cut** button
+#. click |revolution_cut_btn.icon| **Revolution Cut** button in the toolbar
 
 The following property panel will be opened:
 
@@ -49,13 +44,26 @@ By angles
 - **From angle** - start angle of revolution.
 - **Cut from** - contains a list of objects which will but cut with the result of revolution.
 
-**TUI Command**:  *model.addRevolutionCut(part, objectsToRevolve, axis, angle, objectToCut);*
+**TUI Commands**:
 
-**Arguments**:   Part + list of objects for revolution + axis + angle + list of objects to cut from.
+.. py:function:: model.addRevolutionCut(part, objectsToRevolve, axis, angle, objectToCut)
 
-**TUI Command**:  *model.addRevolutionCut(part, objectsToRevolve, axis, toAngle, fromAngle, objectToCut);*
+    :param part: The current part object.
+    :param list: A list of objects for revolution.
+    :param object: An axis.
+    :param real: An angle.
+    :param list: A list of objects to cut from.
+    :return: Created object.
 
-**Arguments**:   Part + list of objects for revolution + axis + to angle + from angle + list of objects to cut from.
+.. py:function:: model.addRevolutionCut(part, objectsToRevolve, axis, toAngle, fromAngle, objectToCut)
+
+    :param part: The current part object.
+    :param list: A list of objects for revolution.
+    :param object: An axis.
+    :param real: To angle.
+    :param real: From angle.
+    :param list: A list of objects to cut from.
+    :return: Created object.
 
 Result
 """"""
@@ -87,9 +95,19 @@ By bounding planes
 - **From offset** - offset for revolution or for bounding plane, if selected.
 - **Cut from** - contains a list of objects from which the result of revolution will be cut.
 
-**TUI Command**:  *model.addRevolutionCut(part, objectsToRevolve, axis, toObject, toOffset, fromObject, fromOffset, objectToCut);*
+**TUI Command**:
 
-**Arguments**:   Part + list of objects for revolution + axis + to object + to offset + from object + from offset + list of objects to cut from.
+.. py:function:: model.addRevolutionCut(part, objectsToRevolve, axis, toObject, toOffset, fromObject, fromOffset, objectToCut)
+
+    :param part: The current part object.
+    :param list: A list of objects for revolution.
+    :param object: An axis.
+    :param object: To object.
+    :param real: To offset.
+    :param object: From object.
+    :param real: From offset.
+    :param list: A list of objects to cut from.
+    :return: Created object.
 
 Result
 """"""

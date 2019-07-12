@@ -1,3 +1,4 @@
+.. |Cylinder_button.icon|    image:: images/Cylinder_button.png
 
 Cylinder
 ========
@@ -7,13 +8,7 @@ Cylinder feature creates a cylinder solid.
 To create a Cylinder in the active part:
 
 #. select in the Main Menu *Primitives - > Cylinder* item  or
-#. click **Cylinder** button in the toolbar
-
-.. image:: images/Cylinder_button.png
-   :align: center
-
-.. centered::
-   **Cylinder** button 
+#. click |Cylinder_button.icon| **Cylinder** button in the toolbar
 
 There are 2 algorithms for creation of a Cylinder:
 
@@ -42,9 +37,16 @@ Input fields:
    - **Radius**;
    - **Height**.    
 
-**TUI Commands**: *model.addCylinder(Part_doc, Point, Axis, Radius, Height)*
+**TUI Commands**:
 
-**Arguments**:   Part + 1 vertex +1 vector +  2 real values (radius, height).
+.. py:function:: model.addCylinder(Part_doc, Point, Axis, Radius, Height)
+
+    :param part: The current part object.
+    :param object: Vertex.
+    :param object: Axis.
+    :param real: Radius.
+    :param real: Height.
+    :return: Result object.
 
 Result
 """"""
@@ -70,9 +72,17 @@ Portion of cylinder
 
 Input fields for ***Portion of cylinder** tab include **Angle** defining a portion of cylinder.
 
-**TUI Commands**: *model.addCylinder(Part_doc, Point, Axis, Radius, Height,Angle)*
+**TUI Commands**:
+
+.. py:function:: model.addCylinder(Part_doc, Point, Axis, Radius, Height,Angle)
   
-**Arguments**:   1 Part + 1 vertex +1 vector +  3 real values (radius, height and angle).
+    :param part: The current part object.
+    :param object: Vertex.
+    :param object: Axis.
+    :param real: Radius.
+    :param real: Height.
+    :param real: Angle.
+    :return: Result object.
 
 Result
 """"""

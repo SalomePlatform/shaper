@@ -1,3 +1,5 @@
+.. |recover.icon|    image:: images/recover.png
+
 Recover
 =======
 
@@ -6,13 +8,7 @@ Recover
 To recover in the active part:
 
 #. select in the Main Menu *Features - > Recover* item or
-#. click **Recover** button in the toolbar
-
-.. image:: images/recover.png
-   :align: center
-
-.. centered::
-   **Recover** button
+#. click |recover.icon| **Recover** button in the toolbar
 
 The feature has the following options:
 
@@ -37,9 +33,14 @@ Recover objects
 - **Feature** field contains one of the previous operations;
 - **List of recovered** objects contains all the shapes used in the operation. Need to enable checkbox to restore a shape.
 
-**TUI Command**: *model.addRecover(Part_doc, feature, [recovering_results])*
+**TUI Command**:
 
-**Arguments**: part + the name of the feature + list of results used in the feature.
+.. py:function:: model.addRecover(Part_doc, feature, [recovering_results])
+
+    :param part: The current part object.
+    :param string: The name of the feature.
+    :param list: A list of results used in the feature.
+    :return: Created object.
 
 Result
 """"""
@@ -67,9 +68,15 @@ Recover top-level objects
 - **Feature** field contains one of the previous operations;
 - **List of recovered** objects contains all top-level shapes (compounds/compsolids) of the shapes used in the operation. Need to enable checkbox to restore a shape.
 
-**TUI Command**: *model.addRecover(Part_doc, feature, [recovering_results], True)*
+**TUI Command**:
 
-**Arguments**: part + the name of the feature + list of results used in the feature + *True* to specify restoring compounds.
+.. py:function:: model.addRecover(Part_doc, feature, [recovering_results], True)
+
+    :param part: The current part object.
+    :param string: The name of the feature.
+    :param list: A list of results used in the feature.
+    :param boolean: *True* to specify restoring compounds.
+    :return: Created object.
 
 Result
 """"""

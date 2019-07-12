@@ -1,3 +1,4 @@
+.. |fillet.icon|    image:: images/fillet.png
 
 .. _featureFillet:
 
@@ -9,13 +10,7 @@ Fillet
 To create a Fillet in the active part:
 
 #. select in the Main Menu *Feature - > Fillet* item  or
-#. click **Fillet** button in the toolbar
-
-.. image:: images/fillet.png  
-   :align: center
-
-.. centered::
-   **Fillet** button 
+#. click |fillet.icon| **Fillet** button in the toolbar
 
 There are 2 types of fillet:
 
@@ -43,9 +38,14 @@ Input fields:
 - **Faces or/and edges** panel contains filleted faces and edges. All edges of a face are subject to fillet operation. Faces and edges are selected in 3D OCC viewer;
 - **Radius** defines fillet radius.
 
-**TUI Command**:  *model.addFillet(Part_doc, [face,edge], radius)*
+**TUI Command**:
 
-**Arguments**: 1 part + list of faces and edges subject to fillet operation in format *model.selection(TYPE, shape)* + real (radius value).
+.. py:function:: model.addFillet(Part_doc, [face,edge], radius)
+
+    :param part: The current part object.
+    :param list: A list of faces and edges subject to fillet operation in format *model.selection(TYPE, shape)*.
+    :param number: Radius value.
+    :return: Created object.
 
 Result
 """"""
@@ -77,9 +77,15 @@ Input fields:
 - **Start radius** defines  the  fillet radius at the start of the selected edge(s);  
 - **End radius** defines  the  fillet radius at the end of the selected edge(s).
 
-**TUI Command**:  *model.addFillet(Part_doc, [face,edge], R1, R2)*
+**TUI Command**:
 
-**Arguments**: part + list of faces and edges subjected to fillet operation in format *model.selection(TYPE, shape)* + 2 reals (start and end radius values).
+.. py:function:: model.addFillet(Part_doc, [face,edge], R1, R2)
+
+    :param part: The current part object.
+    :param list: A list of faces and edges subject to fillet operation in format *model.selection(TYPE, shape)*.
+    :param number: Start radius value.
+    :param number: End radius value.
+    :return: Created object.
 
 Result
 """"""

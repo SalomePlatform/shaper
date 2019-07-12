@@ -1,3 +1,4 @@
+.. |extrusion_btn.icon|    image:: images/extrusion_btn.png
 
 Extrusion
 =========
@@ -7,13 +8,7 @@ Extrusion feature extrudes selected objects along their normals or the selected 
 To perform Extrusion in the active part:
 
 #. select in the Main Menu *Features - > Extrusion* item  or
-#. click **Extrusion** button in the toolbar
-
-.. image:: images/extrusion_btn.png
-   :align: center
-
-.. centered::
-   **Extrusion** button
+#. click |extrusion_btn.icon| **Extrusion** button in the toolbar
 
 The following property panel will be opened:
 
@@ -48,21 +43,39 @@ By sizes
 - **To size** - size for extrusion in the direction.
 - **From size** - size for extrusion in the opposite direction.
 
-**TUI Command**:  *model.addExtrusion(part, objects, size);*
+**TUI Commands**:
 
-**Arguments**:   Part + list of objects + size.
+.. py:function:: model.addExtrusion(part, objects, size)
 
-**TUI Command**:  *model.addExtrusion(part, objects, direction, size);*
+    :param part: The current part object.
+    :param list: A list of objects for extrusion.
+    :param number: Size of extrucion.
+    :return: Created object.
 
-**Arguments**:   Part + list of objects + direction + size.
+.. py:function:: model.addExtrusion(part, objects, direction, size)
 
-**TUI Command**:  *model.addExtrusion(part, objects, toSize, fromSize);*
+    :param part: The current part object.
+    :param list: A list of objects for extrusion.
+    :param object: A direction of extrusion
+    :param number: Size of extrucion.
+    :return: Created object.
 
-**Arguments**:   Part + list of objects + to size + from size.
+.. py:function:: model.addExtrusion(part, objects, toSize, fromSize)
 
-**TUI Command**:  *model.addExtrusion(part, objects, direction, toSize, fromSize);*
+    :param part: The current part object.
+    :param list: A list of objects for extrusion.
+    :param number: "Size to" value.
+    :param number: "Size from" value.
+    :return: Created object.
 
-**Arguments**:   Part + list of objects + direction + to size + from size.
+.. py:function:: model.addExtrusion(part, objects, direction, toSize, fromSize)
+
+    :param part: The current part object.
+    :param list: A list of objects for extrusion.
+    :param object: A direction of extrusion
+    :param number: "Size to" value.
+    :param number: "Size from" value.
+    :return: Created object.
 
 Result
 """"""
@@ -96,13 +109,28 @@ By bounding faces
 Planar face selected as a boundary of extrusion will be enlarged infinitely. As a result, extrusion bounded only by planar faces will be completed always.
 On the other hand, if the boundary face is not planar, extrusion may fail, for example, in case of the base object cannot be projected to this face along given direction.
 
-**TUI Command**:  *model.addExtrusion(part, objects, toObject, toOffset, fromObject, fromOffset);*
+**TUI Commands**:
 
-**Arguments**:   Part + list of objects + to object + to offset + from object + from offset.
+.. py:function:: model.addExtrusion(part, objects, toObject, toOffset, fromObject, fromOffset)
 
-**TUI Command**:  *model.addExtrusion(part, objects, direction, toObject, toOffset, fromObject, fromOffset);*
+    :param part: The current part object.
+    :param list: A list of objects for extrusion.
+    :param object: "To object"
+    :param number: "To offset".
+    :param object: "From object"
+    :param number: "From offset".
+    :return: Created object.
 
-**Arguments**:   Part + list of objects + direction + to object + to offset + from object + from offset.
+.. py:function:: model.addExtrusion(part, objects, direction, toObject, toOffset, fromObject, fromOffset)
+
+    :param part: The current part object.
+    :param list: A list of objects for extrusion.
+    :param object: A direction of extrusion
+    :param object: "To object"
+    :param number: "To offset".
+    :param object: "From object"
+    :param number: "From offset".
+    :return: Created object.
 
 Result
 """"""

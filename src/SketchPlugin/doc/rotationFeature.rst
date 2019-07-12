@@ -1,4 +1,5 @@
 .. _sketchAngularCopy:
+.. |rotate.icon|    image:: images/rotate.png
 
 Angular copy
 ============
@@ -8,13 +9,7 @@ Angular copy operation creates one or multiple copies of the sketch entities by 
 To create an Angular copy in the active Sketch:
 
 #. select in the Main Menu *Sketch - > Angular copy* item  or
-#. click **Angular copy** button in Sketch toolbar:
-
-.. image:: images/rotate.png
-   :align: center
-
-.. centered::
-   **Angular copy**  button
+#. click |rotate.icon| **Angular copy** button in Sketch toolbar:
 
 Property panel:
 
@@ -43,9 +38,17 @@ Input fields:
 - **Total number of objects** is the total number of objects including the original one.
 
 
-**TUI Command**: *Sketch_1.addRotation(Objects, CenterPoint, Angle, NumberOfObjects, FullValue, Reversed)*
+**TUI Command**:
 
-**Arguments**:   list of objects + center point + angle + number of objects + full value flag + reversed flag
+.. py:function:: Sketch_1.addRotation(Objects, CenterPoint, Angle, NumberOfObjects, FullValue, Reversed)
+
+    :param list: A list of objects.
+    :param object: Center point.
+    :param real: Angle.
+    :param integer: Number of objects.
+    :param boolean: Full value flag.
+    :param boolean: Reversed flag.
+    :return: Result object.
 
 Result
 """"""

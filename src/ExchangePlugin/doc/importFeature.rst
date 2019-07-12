@@ -1,3 +1,4 @@
+.. |import.icon|    image:: images/import.png
 
 Import
 ======
@@ -7,13 +8,7 @@ The Import feature allows importing an external file into a current study.
 It is possible to import files in the following formats: BREP, STEP, IGES, XAO. To import a file into active part:
 
 #. select in the Main Menu *Part - > Import* item  or
-#. click **Import** button in the toolbar.
-
-.. image:: images/import.png
-   :align: center
-
-.. centered::
-   **Import**  button 
+#. click |import.icon| **Import** button in the toolbar.
 
 The following property panel will be opened:
 
@@ -35,9 +30,12 @@ In this panel it is possible to enter a file name directly or press **'...'** bu
   
 **Cancel** button cancels the operation.
 
-**TUI Command**: *model.addImport(Part_doc, FileNameString)*
+**TUI Command**:
 
-**Arguments**: Part + file name string.
+.. py:function:: model.addImport(Part_doc, FileNameString)
+
+    :param part: The current part object
+    :param string: A file name string.
 
 Result
 """"""

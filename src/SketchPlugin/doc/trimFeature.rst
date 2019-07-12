@@ -1,3 +1,4 @@
+.. |trim.icon|    image:: images/trim.png
 
 Trim
 ====
@@ -9,13 +10,7 @@ Trim
 To create a Trim in the active Sketch:
 
 #. select in the Main Menu *Sketch - > Trim* item  or
-#. click **Trim** button in Sketch toolbar:
-
-.. image:: images/trim.png
-   :align: center
-
-.. centered::
-   **Trim**  button
+#. click |trim.icon| **Trim** button in Sketch toolbar:
 
 Property panel:
 
@@ -37,8 +32,13 @@ The selected segment is highlighted in the view:
 .. centered::
    The segment to remove
 
-**TUI Command**: *Sketch_1.addTrim(Feature, PositionPoint)*
+**TUI Command**:
 
+.. py:function:: Sketch_1.addTrim(Feature, PositionPoint)
+
+    :param object: Line, arc or circle.
+    :param object: Position point.
+    :return: Result object.
 **Arguments**:   feature (line, arc or circle) and position point (a point on or closest to the segment to remove)
 
 Result

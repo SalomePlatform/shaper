@@ -1,3 +1,4 @@
+.. |horisontal.icon|    image:: images/horisontal.png
 
 Horizontal constraint
 =====================
@@ -7,13 +8,7 @@ Horizontal constraint fixes lines as parallel to the horizontal axis.
 To create a Horizontal constraint in the active Sketch:
 
 #. select in the Main Menu *Sketch - > Horizontal* item  or
-#. click **Horizontal** button in Sketch toolbar:
-
-.. image:: images/horisontal.png
-   :align: center
-
-.. centered::
-   **Horizontal**  button
+#. click |horisontal.icon| **Horizontal** button in Sketch toolbar:
 
 Property panel:
 
@@ -27,9 +22,12 @@ Input fields:
 | After the line is selected it becomes parallel to the horizontal axis in the view.
 | **H** sign is added above the line.
 
-**TUI Command**: *Sketch_1.setHorizontal(LineObject)*
+**TUI Command**:
 
-**Arguments**:  1 line object
+.. py:function:: Sketch_1.setHorizontal(LineObject)
+
+    :param object: A line.
+    :return: Result object.
 
 Result
 """"""

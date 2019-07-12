@@ -1,3 +1,4 @@
+.. |plane_button.icon|    image:: images/plane_button.png
 
 Plane
 =====
@@ -7,13 +8,7 @@ Plane feature creates a new constructive plane.
 Plane is a construction object that can be created in a part or in a partset. To create a plane:
 
 #. select in the Main Menu *Construction - > Plane* item  or
-#. click **Point** button in the toolbar
-
-.. image:: images/plane_button.png
-  :align: center
-
-.. centered::
-  **Plane** button
+#. click |plane_button.icon| **Point** button in the toolbar
 
 There are 4 algorithms for creation of a Plane:
 
@@ -45,9 +40,15 @@ By three points
 
 A plane is created by selecting three points in a viewer.
 
-**TUI Commands**: *model.addPlane(Part_doc, model.selection("VERTEX", "Box_1_1/Back&Box_1_1/Left&Box_1_1/Top"), model.selection("VERTEX", "Box_1_1/Front&Box_1_1/Right&Box_1_1/Top"), model.selection("VERTEX", "Box_1_1/Front&Box_1_1/Left&Box_1_1/Bottom"))*
+**TUI Commands**:
 
-**Arguments**: Part + 3 vertices.
+.. py:function:: model.addPlane(Part_doc, model.selection("VERTEX", "Box_1_1/Back&Box_1_1/Left&Box_1_1/Top"), model.selection("VERTEX", "Box_1_1/Front&Box_1_1/Right&Box_1_1/Top"), model.selection("VERTEX", "Box_1_1/Front&Box_1_1/Left&Box_1_1/Bottom"))
+
+    :param part: The current part object.
+    :param object: Vertex 1.
+    :param object: Vertex 2.
+    :param object: Vertex 3.
+    :return: Result object.
 
 Result
 """"""
@@ -74,9 +75,15 @@ By line and point
 
 A plane is created by selecting  a linear edge and point. It is possible to create a new plane perpendicular to the selected edge.
 
-**TUI Commands**: *model.addPlane(Part_doc, model.selection("EDGE", "Box_1_1/Left&Box_1_1/Top"), model.selection("VERTEX", "Box_1_1/Front&Box_1_1/Right&Box_1_1/Bottom"), False)*
+**TUI Commands**:
 
-**Arguments**: Part + line + point + is perpendicular to line flag.
+.. py:function:: model.addPlane(Part_doc, model.selection("EDGE", "Box_1_1/Left&Box_1_1/Top"), model.selection("VERTEX", "Box_1_1/Front&Box_1_1/Right&Box_1_1/Bottom"), False)
+
+    :param part: The current part object.
+    :param object: A line.
+    :param object: A point.
+    :param boolean: Is perpendicular to line.
+    :return: Result object.
 
 Result
 """"""
@@ -118,9 +125,15 @@ By coincidence with a point.
 
 By rotation around an edge by a specified angle.
 
-**TUI Commands**: *model.addPlane(Part_doc, model.selection("FACE", "Box_1_1/Front"), 10, False)*
+**TUI Commands**:
 
-**Arguments**: Part + a plane + offset + is reverse flag.
+.. py:function:: model.addPlane(Part_doc, model.selection("FACE", "Box_1_1/Front"), 10, False)
+
+    :param part: The current part object.
+    :param object: A plane.
+    :param real: An offset.
+    :param boolean: Is reverse.
+    :return: Result object.
 
 Result
 """"""
@@ -147,9 +160,14 @@ By two parallel planes
 
 A plane is created by selecting two parallel planes. A new plane will be defined between them.
 
-**TUI Commands**: *model.addPlane(Part_doc, model.selection("FACE", "Box_1_1/Left"), model.selection("FACE", "Box_1_1/Right"))*
+**TUI Commands**:
 
-**Arguments**: Part + 2 planes.
+.. py:function:: model.addPlane(Part_doc, model.selection("FACE", "Box_1_1/Left"), model.selection("FACE", "Box_1_1/Right"))
+
+    :param part: The current part object.
+    :param object: A plane 1.
+    :param object: A plane 2.
+    :return: Result object.
 
 Result
 """"""

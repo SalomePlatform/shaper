@@ -1,4 +1,5 @@
 .. _constructionPoint:
+.. |point_button.icon|    image:: images/point_button.png
 
 Point
 =====
@@ -8,13 +9,7 @@ Point feature creates a new construction point.
 Point is a construction object and it can be created in a part or in a partset. To create a point:
 
 #. select in the Main Menu *Construction - > Point* item  or
-#. click **Point** button in the toolbar
-
-.. image:: images/point_button.png
-  :align: center
-
-.. centered::
-  **Point** button
+#. click |point_button.icon| **Point** button in the toolbar
 
 There are 5 algorithms for creation of a Point:
 
@@ -49,9 +44,15 @@ By X,Y,Z
 
 A point is created by X, Y, and Z coordinates.
 
-**TUI Commands**: *model.addPoint(Part_doc, 50, 50, 50)*
+**TUI Commands**:
 
-**Arguments**: Part + 3 values (X, Y, Z coordinates).
+.. py:function:: model.addPoint(Part_doc, 50, 50, 50)
+
+    :param part: The current part object.
+    :param real: X value.
+    :param real: Y value.
+    :param real: Z value.
+    :return: Result object.
 
 Result
 """"""
@@ -77,9 +78,16 @@ By distance on edge
 
 To create a point, select an edge in a viewer and define a distance along the edge, where point will be defined. This distance can be defined by an absolute value or by a relative one as a ratio to the edge length. The direction of the edge can be reversed by the corresponded check box.
 
-**TUI Commands**: *model.addPoint(Part_doc, model.selection("EDGE", "Box_1_1/Left&Box_1_1/Top"), 0.5, True, False)*
+**TUI Commands**:
 
-**Arguments**: Part + edge + value + is by ratio flag + to reverse flag.
+.. py:function:: model.addPoint(Part_doc, model.selection("EDGE", "Box_1_1/Left&Box_1_1/Top"), 0.5, True, False)
+
+    :param part: The current part object.
+    :param object: An edge.
+    :param real: A value.
+    :param boolean: Is by ratio.
+    :param boolean: Is reversed.
+    :return: Result object.
 
 Result
 """"""
@@ -105,9 +113,14 @@ By projection on edge or plane
 
 To create a point, select an existing point or vertex and an edge or face. The new point will be created by projection of the selected point on the edge or face.
 
-**TUI Commands**: *model.addPoint(Part_doc, model.selection("VERTEX", "Box_1_1/Front&Box_1_1/Left&Box_1_1/Top"), model.selection("EDGE", "Box_1_1/Right&Box_1_1/Top"))*
+**TUI Commands**:
 
-**Arguments**: Part + vertex + edge (or plane).
+.. py:function:: model.addPoint(Part_doc, model.selection("VERTEX", "Box_1_1/Front&Box_1_1/Left&Box_1_1/Top"), model.selection("EDGE", "Box_1_1/Right&Box_1_1/Top"))
+
+    :param part: The current part object.
+    :param object: A vertex.
+    :param object: An edge or plane.
+    :return: Result object.
 
 Result
 """"""
@@ -139,9 +152,16 @@ To create a point, select:
 
 The new point will be defined by intersection of the selected objects.
 
-**TUI Commands**: *model.addPoint(Part_doc, model.selection("EDGE", "Box_1_1/Front&Box_1_1/Top"), model.selection("FACE", "Box_1_1/Left"), 10, False)*
+**TUI Commands**:
 
-**Arguments**: Part + edge + plane (planar face) + offset value + is offset reversed.
+.. py:function:: model.addPoint(Part_doc, model.selection("EDGE", "Box_1_1/Front&Box_1_1/Top"), model.selection("FACE", "Box_1_1/Left"), 10, False)
+
+    :param part: The current part object.
+    :param object: An edge.
+    :param object: A plane.
+    :param real: Offset.
+    :param boolean: Is offset reversed.
+    :return: Result object.
 
 Result
 """"""
@@ -167,9 +187,13 @@ By geometrical property of object
 
 In this case the new point can be defined as a center of gravity of the selected object or as a center of a circle. To create a point, select the desirable object.
 
-**TUI Commands**:  *model.addPoint(Part_1_doc, model.selection("SOLID", "Box_1_1"))*
+**TUI Commands**:
 
-**Arguments**: Part + solid
+.. py:function:: model.addPoint(Part_1_doc, model.selection("SOLID", "Box_1_1"))
+
+    :param part: The current part object.
+    :param object: Solid.
+    :return: Result object.
 
 Result
 """"""

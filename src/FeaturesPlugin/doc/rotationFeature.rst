@@ -1,4 +1,5 @@
 .. _featureRotation:
+.. |rotation.icon|    image:: images/rotation.png
 
 Rotation
 ========
@@ -8,13 +9,7 @@ Rotation
 To create a Rotation in the active part:
 
 #. select in the Main Menu *Part - > Rotation* item  or
-#. click **Rotation** button in the toolbar
-
-.. image:: images/rotation.png      
-   :align: center
-
-.. centered::
-   **Rotation** button 
+#. click |rotation.icon| **Rotation** button in the toolbar
 
 Two rotation algorithms are:
 
@@ -41,9 +36,15 @@ Input fields:
 - **Axis** defines the axis of rotation. The vector is an edge or axis selected in 3D OCC viewer or object browser;
 - **Angle** defines the angle by which the object is rotated. 
 
-**TUI Command**:  *model.addRotation(Part_doc, [shape], axis, angle)*
+**TUI Command**:
 
-**Arguments**: part + list of shapes in format *model.selection(TYPE, shape)* + axis in format *model.selection(TYPE, shape)*+ real (angle value).
+.. py:function:: model.addRotation(Part_doc, [shape], axis, angle)
+
+    :param part: The current part object.
+    :param list: A list of shapes in format *model.selection(TYPE, shape)*.
+    :param object: An axis in format *model.selection(TYPE, shape)*.
+    :param real: An angle.
+    :return: Rotated object.
 
 Result
 """"""
@@ -72,9 +73,17 @@ Input fields:
 - **Main objects** panel contains shapes to be rotated. Shapes are selected in 3D OCC viewer or object browser;
 - **Center point**, **Start point**, **End point** define 3 points or vertices selected in 3D OCC viewer or object browser. Rotation axis will pass through the **Center point** and will be orthogonal to a plane defined by three points. Rotation Angle is the angle between two vectors directed from the **Center point** to **Start point** and **End point**.  
 
-**TUI Command**:  *model.addRotation(Part_doc, [shape], point1, point2, point3)*
+**TUI Command**:
 
-**Arguments**: part + list of shapes in format *model.selection(TYPE, shape)* + 3 points in format *model.selection(TYPE, shape)*.
+.. py:function:: model.addRotation(Part_doc, [shape], point1, point2, point3)*
+
+    :param part: The current part object.
+    :param list: A list of shapes in format *model.selection(TYPE, shape)*.
+    :param object: An axis in format *model.selection(TYPE, shape)*.
+    :param object: Center vertex.
+    :param object: Start vertex.
+    :param object: End vertex.
+    :return: Rotated object.
 
 Result
 """"""

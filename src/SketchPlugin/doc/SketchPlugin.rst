@@ -1,5 +1,6 @@
 
 .. _sketchPlugin:
+.. |SketchButton.icon|    image:: images/SketchButton.png
 
 
 Sketch plug-in
@@ -19,13 +20,7 @@ Sketch can be created in the active part or in a partset (if there is no active 
 To create a Sketch:
 
 #. select in the Main Menu *Sketch - > Sketch* item  or
-#. click **Sketch** button in Sketch toolbar:
-
-.. image:: images/SketchButton.png
-   :align: center
-
-.. centered::
-   **Sketch**  button
+#. click |SketchButton.icon| **Sketch** button in Sketch toolbar:
 
 First define a plane for the sketch:
 
@@ -68,9 +63,13 @@ The Result of operation will be a COMPOUND. In the object tree, Result node is l
 
 The Name is assigned automatically: **Sketch_1**, **Sketch_2**, ... both for Feature and Result.
 
-**TUI Command**:  *Sketch_1 = model.addSketch(PartOrPartSet, plane)*
+**TUI Command**:
 
-**Arguments**:    Part or PartSet + plane.
+.. py:function:: model.addSketch(PartOrPartSet, plane)
+
+    :param part: The current part object.
+    :param object: A plane.
+    :return: Result object.
 
 .. _sketch_objects:
 

@@ -1,3 +1,4 @@
+.. |feature_subshapes.icon|    image:: images/feature_subshapes.png
 
 Sub-shapes
 ==========
@@ -10,13 +11,7 @@ The feature **Sub-shapes** modifies the selected entity by creating a non-manifo
 To create Sub-shapes in the active part:
 
 #. select in the Main Menu *Build - > Sub-shapes* item  or
-#. click **Sub-shapes** button in the toolbar
-
-.. image:: images/feature_subshapes.png 
-   :align: center
-
-.. centered::
-   **Sub-shapes** button 
+#. click |feature_subshapes.icon| **Sub-shapes** button in the toolbar
 
 The following property panel appears.
 
@@ -31,9 +26,14 @@ Input fields:
 - **Shape** panel contains the shape to be modified. The shape is selected in 3D OCC viewer or object browser. For today it has to be a wire or a face;
 - **Sub-shapes** panel contains the list of sub-shapes which are already included into result. A sub-shape can be deleted from the list or the list can be extended with new shapes selected in the view.
 
-**TUI Command**:  *model.addSubShapes(Part_doc, shape, sub-shapes)*
+**TUI Command**:
 
-**Arguments**: 1 part + shape in format *model.selection(TYPE, shape)* + list of sub-shapes in format *model.selection(TYPE, subshape)*.
+.. py:function:: model.addSubShapes(Part_doc, shape, sub-shapes)
+
+    :param part: The current part object.
+    :param object: A shape in format *model.selection(TYPE, shape)*.
+    :param list: A list of sub-shapes in format *model.selection(TYPE, subshape)*.
+    :return: Result object.
 
 Result
 """"""

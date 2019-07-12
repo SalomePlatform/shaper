@@ -1,3 +1,4 @@
+.. |axis_button.icon|    image:: images/axis_button.png
 
 Axis
 ====
@@ -7,13 +8,7 @@ Axis feature creates a new constructive axis line.
 Axis is a construction object and it can be created in a part or in a partset. To create an axis:
 
 #. select in the Main Menu *Construction - > Axis* item  or
-#. click **Axis** button in the toolbar
-
-.. image:: images/axis_button.png
-  :align: center
-
-.. centered::
-  **Axis** button
+#. click |axis_button.icon| **Axis** button in the toolbar
 
 There are 6 algorithms for creation of an Axis:
 
@@ -52,9 +47,15 @@ By three dimensions
 
 An axis is defined by dX, dY and dZ values of a vector.
 
-**TUI Commands**:  *model.addAxis(Part_doc, 10, 10, 10)*
+**TUI Commands**:
 
-**Arguments**: Part + 3 values (dX, dY, dZ values).
+.. py:function:: model.addAxis(Part_doc, 10, 10, 10)
+
+    :param part: The current part object.
+    :param real: dX.
+    :param real: dY.
+    :param real: dZ.
+    :return: Result object.
 
 Result
 """"""
@@ -81,9 +82,14 @@ By two points
 
 An axis is defined by two points or vertices.
 
-**TUI Commands**:  *model.addAxis(Part_doc, model.selection("VERTEX", "Box_1_1/Back&Box_1_1/Left&Box_1_1/Top"), model.selection("VERTEX", "Box_1_1/Front&Box_1_1/Right&Box_1_1/Bottom"))*
+**TUI Commands**:
 
-**Arguments**: Part + 2 vertices.
+.. py:function:: model.addAxis(Part_doc, model.selection("VERTEX", "Box_1_1/Back&Box_1_1/Left&Box_1_1/Top"), model.selection("VERTEX", "Box_1_1/Front&Box_1_1/Right&Box_1_1/Bottom"))
+
+    :param part: The current part object.
+    :param object: Vertex 1.
+    :param object: Vertex 2.
+    :return: Result object.
 
 **See Also** a sample TUI Script of :ref:`tui_create_axis_points` operation.
 
@@ -112,9 +118,13 @@ By line
 
 An axis is defined by a linear edge.
 
-**TUI Commands**:  *model.addAxis(Part_doc, model.selection("EDGE", "Box_1_1/Left&Box_1_1/Top"))*
+**TUI Commands**:
 
-**Arguments**: Part + edge.
+.. py:function:: model.addAxis(Part_doc, model.selection("EDGE", "Box_1_1/Left&Box_1_1/Top"))
+
+    :param part: The current part object.
+    :param object: Edge.
+    :return: Result object.
 
 Result
 """"""
@@ -141,9 +151,13 @@ As an axis of cylindrical face
 
 An axis is defined by a cylindrical face. Axis of the cylinder will be an axis object.
 
-**TUI Commands**:  *model.addAxis(Part_doc, model.selection("FACE", "Cylinder_1_1/Face_1"))*
+**TUI Commands**:
 
-**Arguments**: Part + cylindrical face.
+.. py:function:: model.addAxis(Part_doc, model.selection("FACE", "Cylinder_1_1/Face_1"))
+
+    :param part: The current part object.
+    :param object: Cylindrical face.
+    :return: Result object.
 
 Result
 """"""
@@ -170,9 +184,14 @@ By plane and point
 
 An axis is defined by a point or vertex and plane (or planar face) as a normal from the point to the plane.
 
-**TUI Commands**: *model.addAxis(Part_doc, model.selection("FACE", "Box_1_1/Front"), model.selection("VERTEX", "Box_1_1/Back&Box_1_1/Right&Box_1_1/Top"))*
+**TUI Commands**:
 
-**Arguments**: Part + plane + point.
+.. py:function:: model.addAxis(Part_doc, model.selection("FACE", "Box_1_1/Front"), model.selection("VERTEX", "Box_1_1/Back&Box_1_1/Right&Box_1_1/Top"))
+
+    :param part: The current part object.
+    :param object: Plane.
+    :param object: Point.
+    :return: Result object.
 
 Result
 """"""
@@ -199,9 +218,18 @@ By two planes
 
 An axis is defined by two planes. The intersection of the planes defines an axis. It is possible to define offset for axis definition from both planes.
 
-**TUI Commands**: *model.addAxis(Part_doc, model.selection("FACE", "Box_1_1/Top"), 5, False, model.selection("FACE", "Box_1_1/Front"), 3, False)*
+**TUI Commands**:
 
-**Arguments**: Part + plane + offset value + is reversed flag + plane + offset value + is reversed flag.
+.. py:function:: model.addAxis(Part_doc, model.selection("FACE", "Box_1_1/Top"), 5, False, model.selection("FACE", "Box_1_1/Front"), 3, False)
+
+    :param part: The current part object.
+    :param object: Plane 1.
+    :param real: Offset value.
+    :param boolean: Is reversed.
+    :param object: Plane 2.
+    :param real: Offset value.
+    :param boolean: Is reversed.
+    :return: Result object.
 
 Result
 """"""

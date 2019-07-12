@@ -1,3 +1,4 @@
+.. |scale.icon|    image:: images/scale.png
 
 Scale
 =====
@@ -7,13 +8,7 @@ Scale
 To create a Scale in the active part:
 
 #. select in the Main Menu *Features - > Scale* item  or
-#. click **Scale** button in the toolbar
-
-.. image:: images/scale.png      
-   :align: center
-
-.. centered::
-   **Scale** button 
+#. click |scale.icon| **Scale** button in the toolbar
 
 Two Scale algorithms are:
 
@@ -42,9 +37,15 @@ Input fields:
 - **Center point** defines the point relatively to which the object is scaled. Point is selected in 3D OCC viewer or object browser;
 - **Scale factor** defines the multiplier of axial dimensions. If Scale Factor is negative, the object is mirrored through the Central Point. 
 
-**TUI Command**:  *model.addScale(Part_doc, [shape], center, factor)*
+**TUI Command**:
+
+.. py:function:: model.addScale(Part_doc, [shape], center, factor)
  
-**Arguments**: part + list of shapes in format *model.selection(TYPE, shape)* + center point in format *model.selection(TYPE, shape)*+ real (scale factor value).
+    :param part: The current part object.
+    :param list: A list of shapes in format *model.selection(TYPE, shape)*.
+    :param object: A center point in format *model.selection(TYPE, shape)*.
+    :param real: Scale factor.
+    :return: Result object.
 
 Result
 """"""
@@ -76,9 +77,15 @@ Input fields:
 - **Center point** defines the point relatively to which the object is scaled. Point is selected in 3D OCC viewer or object browser;
 - **Scale factor in X**, **Scale factor in Y**, **Scale factor in Z** define the the multipliers of axial dimensions.  If Scale Factor is negative, the object is mirrored through the Central Point. 
 
-**TUI Command**:  *model.addScale(Part_doc, [shape], center, factors)*
+**TUI Command**:
+
+.. py:function:: model.addScale(Part_doc, [shape], center, factors)
  
-**Arguments**: part + list of shapes in format *model.selection(TYPE, shape)* + center point in format *model.selection(TYPE, shape)*+ 3 reals (scale factor values along X. Y, Z axes).
+    :param part: The current part object.
+    :param list: A list of shapes in format *model.selection(TYPE, shape)*.
+    :param object: A center point in format *model.selection(TYPE, shape)*.
+    :param list: A list of three scale factor values along X. Y, Z axes.
+    :return: Result object.
 
 Result
 """"""

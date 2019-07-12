@@ -1,3 +1,4 @@
+.. |mirror.icon|    image:: images/mirror.png
 
 Mirror copy
 ===========
@@ -7,13 +8,7 @@ Mirror copy operation mirrors sketch entities across a line.
 To create a Mirror copy in the active Sketch:
 
 #. select in the Main Menu *Sketch - > Mirror copy* item  or
-#. click **Mirror copy** button in Sketch toolbar:
-
-.. image:: images/mirror.png
-   :align: center
-
-.. centered::
-   **Mirror copy**  button
+#. click |mirror.icon| **Mirror copy** button in Sketch toolbar:
 
 Property panel:
 
@@ -28,9 +23,13 @@ Input fields:
 - **Mirror line** is the mirror line selected in the view.
 - **Segments** is the list of segments (lines, circles, arcs) selected in the view.
 
-**TUI Command**: *Sketch_1.addMirror(MirrorLine, Objects)*
+**TUI Command**:
 
-**Arguments**:   Mirror line and a list of objects
+.. py:function:: Sketch_1.addMirror(MirrorLine, Objects)
+
+    :param object: A mirror line.
+    :param listg: A list of objects.
+    :return: Result object.
 
 Result
 """"""

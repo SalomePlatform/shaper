@@ -1,4 +1,5 @@
 .. _sketchLine:
+.. |line.icon|    image:: images/line.png
 
 Line
 ====
@@ -8,13 +9,7 @@ Line feature creates a line segment by two points in the current Sketch.
 To add a new Line to the Sketch:
 
 #. select in the Main Menu *Sketch - > Line* item  or
-#. click **Line** button in Sketch toolbar:
-
-.. image:: images/line.png
-   :align: center
-
-.. centered::
-   **Line**  button
+#. click |line.icon| **Line** button in Sketch toolbar:
 
 The following property panel appears:
 
@@ -28,9 +23,15 @@ Pick 2 points (start and end) in the view to create a Line. If an existing objec
 
 Start and end points coordinates are displayed in the property panel.
 
-**TUI Command**:  *Sketch_1.addLine(X1, Y1, X2, Y2)*
+**TUI Command**:
 
-**Arguments**:    4 values (coordinates of the start and end points).
+.. py:function:: Sketch_1.addLine(X1, Y1, X2, Y2)*
+
+    :param real: X1 value.
+    :param real: Y1 value.
+    :param real: X2 value.
+    :param real: Y2 value.
+    :return: Result object.
 
 Result
 """"""

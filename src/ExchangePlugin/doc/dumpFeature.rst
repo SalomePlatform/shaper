@@ -1,3 +1,4 @@
+.. |dump.icon|    image:: images/dump.png
 
 Dump
 ====
@@ -7,13 +8,7 @@ The Dump feature allows exporting a current study to a Python script which dumps
 It is possible to dump the current study state into a Python script. To dump a study:
 
 #. select in the Main Menu *Part - > Dump* item  or
-#. click **Dump** button in the toolbar.
-
-.. image:: images/dump.png
-   :align: center
-
-.. centered::
-   **Dump**  button 
+#. click |dump.icon| **Dump** button in the toolbar.
 
 The following property panel will be opened:
 

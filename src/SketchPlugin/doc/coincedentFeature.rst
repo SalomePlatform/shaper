@@ -1,4 +1,5 @@
 .. _sketchCoincident:
+.. |coincedence.icon|    image:: images/coincedence.png
 
 Coincident constraint
 =====================
@@ -8,13 +9,7 @@ Coincident constraint forces two points to be coincident, or one point to lie on
 To create a Coincident constraint in the active Sketch:
 
 #. select in the Main Menu *Sketch - > Coincident* item  or
-#. click **Coincident** button in Sketch toolbar:
-
-.. image:: images/coincedence.png
-   :align: center
-
-.. centered::
-   **Coincident**  button
+#. click |coincedence.icon| **Coincident** button in Sketch toolbar:
 
 Property panel:
 
@@ -30,9 +25,13 @@ Note that one of two objects should be a point (i.e. a point, a line or an arc e
 
 After the objects are selected, the point is highlighted in yellow in the view.
 
-**TUI Command**: *Sketch_1.setCoincident(Object1, Object2)*
+**TUI Command**:
 
-**Arguments**:  2 objects (one of them is a point, the second one is a point, a circle, an arc or a line)
+.. py:function:: Sketch_1.setCoincident(Object1, Object2)
+
+    :param object: First object.
+    :param object: Second object.
+    :return: Result object.
 
 Result
 """"""

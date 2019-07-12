@@ -1,3 +1,4 @@
+.. |Cone_button.icon|    image:: images/Cone_button.png
 
 Cone
 ====
@@ -7,13 +8,7 @@ Cone feature creates a cone solid.
 To create a Cone in the active part:
 
 #. select in the Main Menu *Primitives - > Cone* item  or
-#. click **Cone** button in the toolbar
-
-.. image:: images/Cone_button.png
-   :align: center
-
-.. centered::
-   **Cone** button 
+#. click |Cone_button.icon| **Cone** button in the toolbar
 
 The following property panel appears.
 
@@ -32,9 +27,17 @@ Input fields:
    - **Top radius**;  
    - **Height**.
   
-**TUI Command**: *model.addCone(Part_doc, Point, Axis, Radius1, Radius2, Height)* 
+**TUI Command**:
 
-**Arguments**:  Part + 1 vertex + 1 vector + 3 real values (base and top radii, heght).
+.. py:function:: model.addCone(Part_doc, Point, Axis, Radius1, Radius2, Height)
+
+    :param part: The current part object.
+    :param object: Vertex.
+    :param object: Axis.
+    :param real: Radius 1.
+    :param real: Radius 2.
+    :param real: Height.
+    :return: Result object.
 
 Result
 """"""

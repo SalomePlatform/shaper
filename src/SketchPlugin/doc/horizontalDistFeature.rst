@@ -1,3 +1,4 @@
+.. |distance_h.icon|    image:: images/distance_h.png
 
 Horizontal distance constraint
 ==============================
@@ -9,13 +10,7 @@ The constraint can be defined between two points such as point object, line or a
 To create a Horizontal Distance constraint in the active Sketch:
 
 #. select in the Main Menu *Sketch - > Horizontal Distance* item  or
-#. click **Horizontal Distance** button in Sketch toolbar:
-
-.. image:: images/distance_h.png
-   :align: center
-
-.. centered::
-   **Horizontal Distance**  button
+#. click |distance_h.icon| **Horizontal Distance** button in Sketch toolbar:
 
 Property panel:
 
@@ -53,9 +48,14 @@ When creating the constraint, after selection of two objects for the first time:
 .. centered::
    Horizontal Distance input in the view
 
-**TUI Command**: *Sketch_1.setHorizontalDistance(FirstObject, SecondObject, Value)*
+**TUI Command**:
 
-**Arguments**:  2 objects + horizontal distance value
+.. py:function:: Sketch_1.setHorizontalDistance(FirstObject, SecondObject, Value)
+
+    :param object: An object 1.
+    :param object: An object 2.
+    :param real: Value.
+    :return: Result object.
 
 Result
 """"""

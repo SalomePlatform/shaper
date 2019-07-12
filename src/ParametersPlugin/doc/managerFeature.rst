@@ -1,4 +1,5 @@
 .. _parameters:
+.. |paper_roll.icon|    image:: images/paper_roll.png
 
 
 Parameters manager
@@ -7,13 +8,7 @@ Parameters manager
 To create/edit simultaneously a set of parameters  in the active partset or part instead of calling them one by one:
 
 #. select in the Main Menu *Part - > Parameters* item or
-#. click **Parameters** button in the toolbar:
-
-.. image:: images/paper_roll.png
-   :align: center
-
-.. centered::
-   **Parameters** button
+#. click |paper_roll.icon| **Parameters** button in the toolbar:
 
 The following dialog box with parameter table appears:
    
@@ -42,9 +37,15 @@ The following dialog box with parameter table appears:
     one string lower in the table.
 
   
-**TUI Command**: *model.addParameter(Part_doc, Name, Value, Comment)*
+**TUI Command**: 
 
-**Arguments**:  1 Part + 1 string + 1 value + 1 string
+.. py:function:: model.addParameter(Part_doc, Name, Value, Comment)
+
+    :param part: The current part object
+    :param string: The parameter name
+    :param number: The parameter value
+    :param string: The parameter comment
+    :return: Created object.
 
 **See Also** a sample TUI Script of :ref:`tui_parametersFeature` operation.
 

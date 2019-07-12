@@ -1,3 +1,4 @@
+.. |angle_constr.icon|    image:: images/angle_constr.png
 
 Angle constraint
 ================
@@ -10,13 +11,7 @@ Angle constraint fixes the angle between two lines.
 To create an Angle constraint in the active Sketch:
 
 #. select in the Main Menu *Sketch - > Angle* item  or
-#. click **Angle** button in Sketch toolbar:
-
-.. image:: images/angle_constr.png
-   :align: center
-
-.. centered::
-   **Angle** button
+#. click |angle_constr.icon| **Angle** button in Sketch toolbar:
 
 Property panel:
 
@@ -66,13 +61,16 @@ When creating the constraint, after selection of two lines at the first time:
 .. centered::
    Angle input in the view
 
-**TUI Command**:
+**TUI Commands**:
 
-- *Sketch_1.setAngle(Line1, Line2, Value)*
-- *Sketch_1.setAngleComplementary(Line1, Line2, Value)*
-- *Sketch_1.setAngleBackward(Line1, Line2, Value)*
+.. py:function:: Sketch_1.setAngle(Line1, Line2, Value)
+.. py:function:: Sketch_1.setAngleComplementary(Line1, Line2, Value)
+.. py:function:: Sketch_1.setAngleBackward(Line1, Line2, Value)
 
-**Arguments**:  2 lines + angle value
+    :param object: Line 1.
+    :param object: Line 2.
+    :param real: Value.
+    :return: Result object.
 
 Result
 """"""

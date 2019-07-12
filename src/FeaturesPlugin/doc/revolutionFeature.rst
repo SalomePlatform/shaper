@@ -1,3 +1,4 @@
+.. |revolution_btn.icon|    image:: images/revolution_btn.png
 
 Revolution
 ==========
@@ -7,13 +8,7 @@ Revolution feature revolves selected objects around selected axis.
 To perform a Revolution in the active part:
 
 #. select in the Main Menu *Features - > Revolution* item  or
-#. click **Revolution** button in the toolbar
-
-.. image:: images/revolution_btn.png
-   :align: center
-
-.. centered::
-   **Revolution** button
+#. click |revolution_btn.icon| **Revolution** button in the toolbar
 
 The following property panel will be opened:
 
@@ -48,13 +43,24 @@ By angles
 - **To angle** - end angle of revolution.
 - **From angle** - start angle of revolution.
 
-**TUI Command**:  *model.addRevolution(part, objects, axis, angle);*
+**TUI Commands**:
 
-**Arguments**:   Part + list of objects + axis + angle.
+.. py:function:: model.addRevolution(part, objects, axis, angle)
 
-**TUI Command**:  *model.addRevolution(part, objects, axis, toSize, fromSize);*
+    :param part: The current part object.
+    :param list: A list of objects for revolution.
+    :param object: An axis.
+    :param real: An angle.
+    :return: Created object.
 
-**Arguments**:   Part + list of objects + axis + to angle + from angle.
+.. py:function:: model.addRevolution(part, objects, axis, toSize, fromSize)
+
+    :param part: The current part object.
+    :param list: A list of objects for revolution.
+    :param object: An axis.
+    :param real: To angle.
+    :param real: From angle.
+    :return: Created object.
 
 Result
 """"""
@@ -85,9 +91,18 @@ By bounding planes
 - **From plane** - a planar face can be selected to bound revolution from other side.
 - **From offset** - offset for revolution or for bounding plane, if selected.
 
-**TUI Command**:  *model.addRevolution(part, objects, axis, toObject, toOffset, fromObject, fromOffset);*
+**TUI Command**:
 
-**Arguments**:   Part + list of objects + axis + to object + to offset + from object + from offset.
+.. py:function:: model.addRevolution(part, objects, axis, toObject, toOffset, fromObject, fromOffset)
+
+    :param part: The current part object.
+    :param list: A list of objects for revolution.
+    :param object: An axis.
+    :param object: To object.
+    :param real: To offset.
+    :param object: From object.
+    :param real: From offset.
+    :return: Created object.
 
 Result
 """"""

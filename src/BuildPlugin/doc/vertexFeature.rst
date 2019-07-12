@@ -1,3 +1,4 @@
+.. |feature_vertex.icon|    image:: images/feature_vertex.png
 
 Vertex
 ======
@@ -7,13 +8,7 @@ Vertex feature creates one or several vertices using vertices already existing i
 To create vertices in the active part:
 
 #. select in the Main Menu *Build - > Vertex* item  or
-#. click **Vertex** button in the toolbar
-
-.. image:: images/feature_vertex.png
-  :align: center
-
-.. centered::
-  **Vertex** button
+#. click |feature_vertex.icon| **Vertex** button in the toolbar
 
 The following property panel will be opened:
 
@@ -29,9 +24,13 @@ Select one or several vertices in the viewer.
 
 **Cancel** button cancels operation. 
 
-**TUI Command**:  *model.addVertex(Part_doc, Shapes)*
+**TUI Command**:
 
-**Arguments**:   Part document + list of shapes.
+.. py:function:: model.addVertex(Part_doc, Shapes)
+
+    :param part: The current part object.
+    :param list: A list of shapes.
+    :return: Result object.
 
 Result
 """"""

@@ -1,3 +1,4 @@
+.. |fillet.icon|    image:: images/fillet.png
 
 Fillet
 ======
@@ -8,13 +9,7 @@ Fillet
 To create a Fillet in the active Sketch:
 
 #. select in the Main Menu *Sketch - > Fillet* item  or
-#. click **Fillet** button in Sketch toolbar:
-
-.. image:: images/fillet.png
-   :align: center
-
-.. centered::
-   **Fillet**  button
+#. click |fillet.icon| **Fillet** button in Sketch toolbar:
 
 Property panel:
 
@@ -32,13 +27,16 @@ After the point is selected, Fillet preview appears in the view.
 
 **TUI Command**:
 
-- *Sketch_1.setFillet(Point)*
+.. py:function:: Sketch_1.setFillet(Point)
 
-  **Arguments**: coincident point
+    :param object: Coincident point.
+    :return: Result object.
 
-- *Sketch_1.setFilletWithRadius(Point, Radius)*
+.. py:function:: Sketch_1.setFilletWithRadius(Point, Radius)
 
-  **Arguments**: coincident point and fillet radius
+    :param object: Coincident point.
+    :param real: Radius.
+    :return: Result object.
 
 Result
 """"""

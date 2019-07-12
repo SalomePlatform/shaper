@@ -1,3 +1,4 @@
+.. |circle.icon|    image:: images/circle.png
 
 Circle
 ======
@@ -7,13 +8,7 @@ The feature Circle creates a circle in the current Sketch.
 To add a new Circle to the Sketch:
 
 #. select in the Main Menu *Sketch - > Circle* item  or
-#. click **Circle** button in Sketch toolbar:
-
-.. image:: images/circle.png
-   :align: center
-
-.. centered::
-   **Circle**  button
+#. click |circle.icon| **Circle** button in Sketch toolbar:
 
 There are 2 algorithms for creation of a Circle:
 
@@ -37,9 +32,15 @@ Click in the view once to set the center point, then move the mouse and click a 
 - When entering a passing point by selecting a point, a Coincident constraint is also created.
 - When entering a passing point by selecting a segment, a Tangent constraint is created.
 
-**TUI Command**:  *Sketch_1.addCircle(CenterX, CenterY, PassedX, PassedY)*
+**TUI Command**:
 
-**Arguments**:    4 values (coordinates of the center and the passed point).
+.. py:function:: Sketch_1.addCircle(CenterX, CenterY, PassedX, PassedY)
+
+    :param real: Start X.
+    :param real: Start Y.
+    :param real: Passed X.
+    :param real: Passed Y.
+    :return: Result object.
 
 By three points
 """""""""""""""
@@ -53,9 +54,17 @@ and finally move the mouse and click a third time to set the last passed point.
 - When entering a passing point by selecting a point, a Coincident constraint is created.
 - When entering a passing point by selecting a segment, a Tangent constraint is created.
 
-**TUI Command**:  *Sketch_1.addCircle(X1, Y1, X2, Y2, X3, Y3)*
+**TUI Command**:
 
-**Arguments**:    6 values (coordinates of three points).
+.. py:function:: Sketch_1.addCircle(X1, Y1, X2, Y2, X3, Y3)
+
+    :param real: Start X.
+    :param real: Start Y.
+    :param real: Passed X.
+    :param real: Passed Y.
+    :param real: End X.
+    :param real: End Y.
+    :return: Result object.
 
 Property panel in edition context
 """""""""""""""""""""""""""""""""

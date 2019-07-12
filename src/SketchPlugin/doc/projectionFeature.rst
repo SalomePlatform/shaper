@@ -1,3 +1,4 @@
+.. |projection.icon|    image:: images/projection.png
 
 Projection
 ==========
@@ -8,13 +9,7 @@ Projection
 To create a Projection in the active Sketch:
 
 #. select in the Main Menu *Sketch - > Projection* item  or
-#. click **Projection** button in Sketch toolbar:
-
-.. image:: images/projection.png
-   :align: center
-
-.. centered::
-   **Projection**  button
+#. click |projection.icon| **Projection** button in Sketch toolbar:
 
 Property panel:
 
@@ -29,15 +24,19 @@ Input fields:
 - **Object** is the 3D object (edge or vertex) to project onto the sketch plane.
 - **Include into the sketch result** option defines whether to include the projection line into the sketch result.
 
-**TUI Command**:
+**TUI Commands**:
 
-- *Sketch_1.addProjection(EdgeOrVertex, IncludeIntoResult)*
+.. py:function:: Sketch_1.addProjection(EdgeOrVertex, IncludeIntoResult)
 
-  **Arguments**: edge or vertex and include into the result flag
+    :param object: Edge or vertex.
+    :param boolean: Include into the result flag.
+    :return: Result object.
 
-- *Sketch_1.addProjection(EdgeOrVertexName, IncludeIntoResult)*
+.. py:function:: Sketch_1.addProjection(EdgeOrVertexName, IncludeIntoResult)
 
-  **Arguments**: edge or vertex name and include into the result flag
+    :param object: Edge or vertex name.
+    :param boolean: Include into the result flag.
+    :return: Result object.
 
 Result
 """"""

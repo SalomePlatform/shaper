@@ -1,3 +1,4 @@
+.. |radius_constr.icon|    image:: images/radius_constr.png
 
 Radius constraint
 =================
@@ -7,13 +8,7 @@ Radius constraint fixes the radius of circle or arc.
 To create a Radius constraint in the active Sketch:
 
 #. select in the Main Menu *Sketch - > Radius* item  or
-#. click **Radius** button in Sketch toolbar:
-
-.. image:: images/radius_constr.png
-   :align: center
-
-.. centered::
-   **Radius**  button
+#. click |radius_constr.icon| **Radius** button in Sketch toolbar:
 
 Property panel:
 
@@ -50,9 +45,13 @@ When creating the constraint, after selection of the circle or arc at the first 
 .. centered::
    Radius input in the view
 
-**TUI Command**: *Sketch_1.setRadius(CircleOrArc, Value)*
+**TUI Command**:
 
-**Arguments**:  circle or arc circumference object + radius value
+.. py:function:: Sketch_1.setRadius(CircleOrArc, Value)
+
+    :param object: Circle or arc.
+    :param real: Radius.
+    :return: Result object.
 
 Result
 """"""

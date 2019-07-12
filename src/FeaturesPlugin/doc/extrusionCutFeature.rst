@@ -1,3 +1,4 @@
+.. |extrusion_cut_btn.icon|    image:: images/extrusion_cut_btn.png
 
 Extrusion Cut
 =============
@@ -7,13 +8,7 @@ Extrusion Cut feature extrudes selected objects along their normals or selected 
 To perform Extrusion Cut in the active part:
 
 #. select in the Main Menu *Features - > Extrusion Cut* item  or
-#. click **Extrusion Cut** button in the toolbar
-
-.. image:: images/extrusion_cut_btn.png
-   :align: center
-
-.. centered::
-   **Extrusion Cut** button
+#. click |extrusion_cut_btn.icon| **Extrusion Cut** button in the toolbar
 
 The following property panel will be opened:
 
@@ -49,21 +44,43 @@ By sizes
 - **From size** - size for extrusion in the opposite direction.
 - **Cut from** - contains a list of objects which will be cut from the result of extrusion.
 
-**TUI Command**:  *model.addExtrusionCut(part, objectsToExtrude, size, objectsToCut);*
+**TUI Commands**:  
 
-**Arguments**:   Part + list of objects for extrusion + size + list of objects to cut from.
+.. py:function:: model.addExtrusionCut(part, objectsToExtrude, size, objectsToCut)
 
-**TUI Command**:  *model.addExtrusionCut(part, objects, direction, size, objectsToCut);*
+    :param part: The current part object.
+    :param list: A list of objects for extrusion.
+    :param number: Size of extrucion.
+    :param list: A list of objects to cut from.
+    :return: Created object.
 
-**Arguments**:   Part + list of objects for extrusion + direction + size + list of objects to cut from.
+.. py:function:: model.addExtrusionCut(part, objects, direction, size, objectsToCut)
 
-**TUI Command**:  *model.addExtrusionCut(part, objects, toSize, fromSize, objectsToCut);*
+    :param part: The current part object.
+    :param list: A list of objects for extrusion.
+    :param object: A direction of extrusion
+    :param number: Size of extrucion.
+    :param list: A list of objects to cut from.
+    :return: Created object.
 
-**Arguments**:   Part + list of objects for extrusion + to size + from size + list of objects to cut from.
+.. py:function:: model.addExtrusionCut(part, objects, toSize, fromSize, objectsToCut)
 
-**TUI Command**:  *model.addExtrusionCut(part, objects, direction, toSize, fromSize, objectsToCut);*
+    :param part: The current part object.
+    :param list: A list of objects for extrusion.
+    :param number: "Size to" value.
+    :param number: "Size from" value.
+    :param list: A list of objects to cut from.
+    :return: Created object.
 
-**Arguments**:   Part + list of objects for extrusion + direction + to size + from size + list of objects to cut from.
+.. py:function:: model.addExtrusionCut(part, objects, direction, toSize, fromSize, objectsToCut)
+
+    :param part: The current part object.
+    :param list: A list of objects for extrusion.
+    :param object: A direction of extrusion
+    :param number: "Size to" value.
+    :param number: "Size from" value.
+    :param list: A list of objects to cut from.
+    :return: Created object.
 
 Result
 """"""
@@ -95,13 +112,30 @@ By bounding planes
 - **From offset** - offset for extrusion or for a bounding plane, if selected.
 - **Cut from** - contains a list of objects which will be cut from the result of extrusion.
 
-**TUI Command**:  *model.addExtrusionCut(part, objects, toObject, toOffset, fromObject, fromOffset, objectsToCut);*
+**TUI Commands**:
 
-**Arguments**:   Part + list of objects for extrusion + to object + to offset + from object + from offset + list of objects to cut from.
+.. py:function:: model.addExtrusionCut(part, objects, toObject, toOffset, fromObject, fromOffset, objectsToCut)
 
-**TUI Command**:  *model.addExtrusionCut(part, objects, direction, toObject, toOffset, fromObject, fromOffset, objectsToCut);*
+    :param part: The current part object.
+    :param list: A list of objects for extrusion.
+    :param object: "To object".
+    :param number: "Offset to" value.
+    :param object: "From object".
+    :param number: "Offset from" value.
+    :param list: A list of objects to cut from.
+    :return: Created object.
 
-**Arguments**:   Part + list of objects for extrusion + direction + to object + to offset + from object + from offset + list of objects to cut from.
+.. py:function:: model.addExtrusionCut(part, objects, direction, toObject, toOffset, fromObject, fromOffset, objectsToCut)
+
+    :param part: The current part object.
+    :param list: A list of objects for extrusion.
+    :param object: A direction of extrusion
+    :param object: "To object".
+    :param number: "Offset to" value.
+    :param object: "From object".
+    :param number: "Offset from" value.
+    :param list: A list of objects to cut from.
+    :return: Created object.
 
 Result
 """"""

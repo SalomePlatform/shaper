@@ -1,3 +1,4 @@
+.. |fusion_faces.icon|    image:: images/fusion_faces.png
 
 Fuse Faces
 ==========
@@ -7,13 +8,7 @@ Fuse Faces
 To perform **Fuse Faces** in the active part:
 
 #. select in the Main Menu *Features - > Fuse Faces* item  or
-#. click **Fuse Faces** button in the toolbar
-
-.. image:: images/fusion_faces.png 
-   :align: center
-
-.. centered::
-   **Fuse Faces**  button 
+#. click |fusion_faces.icon| **Fuse Faces** button in the toolbar
 
 The following property panel appears:
 
@@ -27,9 +22,13 @@ Input fields:
 
 - **Shape** - contains object selected in the Object Browser or in the Viewer, on which faces will be fused.
 
-**TUI Command**:  *model.addFusionFaces(Part_doc, shape)*
+**TUI Command**:
 
-**Arguments**:   Part +  shape in format *model.selection(TYPE, shape)*.
+.. py:function:: model.addFusionFaces(Part_doc, shape)
+
+    :param part: The current part object.
+    :param list: A shape in format *model.selection(TYPE, shape)*.
+    :return: Created object.
 
 Result
 """"""

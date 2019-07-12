@@ -1,3 +1,4 @@
+.. |feature_interpolation.icon|    image:: images/feature_interpolation.png
 
 Interpolation
 =============
@@ -7,13 +8,7 @@ Interpolation feature creates a curve (edge) using vertices already existing in 
 To create an interpolation in the active part:
 
 #. select in the Main Menu *Build - > Interpolation* item  or
-#. click **Interpolation** button in the toolbar
-
-.. image:: images/feature_interpolation.png
-  :align: center
-
-.. centered::
-  **Interpolation** button
+#. click |feature_interpolation.icon| **Interpolation** button in the toolbar
 
 The following property panel will be opened:
 
@@ -35,15 +30,25 @@ Select one or several vertices or points in the viewer.
 
 **Cancel** button cancels the operation. 
 
-**TUI Command**:
+**TUI Commands**:
 
-- *model.addInterpolation(Part_doc, Points, IsClosed, IsReordered)*.
+.. py:function:: model.addInterpolation(Part_doc, Points, IsClosed, IsReordered)
 
-**Arguments**:   Part document + list of points + is closed + is reordered.
+    :param part: The current part object.
+    :param list: A list of points.
+    :param boolean: Is closed.
+    :param boolean: Is reordered.
+    :return: Result object.
 
-- *model.addInterpolation(Part_doc, Points, StartEdge, EndEdge, IsClosed, IsReordered)*.
+.. py:function:: model.addInterpolation(Part_doc, Points, StartEdge, EndEdge, IsClosed, IsReordered)
 
-**Arguments**:   Part document + list of points + start edge + end edge + is closed + is reordered.
+    :param part: The current part object.
+    :param list: A list of points.
+    :param object: Start point.
+    :param object: End point.
+    :param boolean: Is closed.
+    :param boolean: Is reordered.
+    :return: Result object.
 
 Result
 """"""

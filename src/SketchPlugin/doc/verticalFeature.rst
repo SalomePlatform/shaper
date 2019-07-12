@@ -1,3 +1,4 @@
+.. |vertical.icon|    image:: images/vertical.png
 
 Vertical constraint
 ===================
@@ -7,13 +8,7 @@ Vertical constraint fixes lines as parallel to the vertical axis.
 To create a Vertical constraint in the active Sketch:
 
 #. select in the Main Menu *Sketch - > Vertical* item  or
-#. click **Vertical** button in Sketch toolbar:
-
-.. image:: images/vertical.png
-   :align: center
-
-.. centered::
-   **Vertical**  button
+#. click |vertical.icon| **Vertical** button in Sketch toolbar:
 
 Property panel:
 
@@ -27,9 +22,12 @@ Input fields:
 | After the line is selected it becomes parallel to the vertical axis in the view.
 | **V** sign is added above the line.
 
-**TUI Command**: *Sketch_1.setVertical(LineObject)*
+**TUI Command**:
 
-**Arguments**:  1 line object
+.. py:function:: Sketch_1.setVertical(LineObject)
+
+    :param object: A line.
+    :return: Result object.
 
 Result
 """"""

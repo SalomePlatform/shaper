@@ -1,3 +1,4 @@
+.. |arc.icon|    image:: images/arc.png
 
 Arc
 ===
@@ -7,13 +8,7 @@ Arc feature creates an arc segment in the current Sketch.
 To add a new Arc to the Sketch:
 
 #. select in the Main Menu *Sketch - > Arc* item  or
-#. click **Arc** button in Sketch toolbar:
-
-.. image:: images/arc.png
-   :align: center
-
-.. centered::
-   **Arc**  button
+#. click |arc.icon| **Arc** button in Sketch toolbar:
 
 There are 3 algorithms for creation of an Arc:
 
@@ -42,9 +37,18 @@ and finally move the mouse and click a third time to set the last passed point.
 - When entering an end point by selecting a segment, a Coincident constraint is created.
 - When entering an end point, only segments are selectable.
 
-**TUI Command**:  *Sketch_1.addArc(CenterX, CenterY, StartX, StartY, EndX, EndY, Inversed)*
+**TUI Command**:
 
-**Arguments**:    7 values (coordinates of the center, the start, the end, inversed flag (if true - build arc from end to start)).
+.. py:function:: Sketch_1.addArc(CenterX, CenterY, StartX, StartY, EndX, EndY, Inversed)
+
+    :param real: Center X.
+    :param real: Center Y.
+    :param real: Start X.
+    :param real: Start Y.
+    :param real: End X.
+    :param real: End Y.
+    :param boolean: Is inversed.
+    :return: Result object.
 
 By three points
 """""""""""""""
@@ -59,9 +63,17 @@ and finally move the mouse and click a third time to set the passed point.
 - When entering a passing point by selecting a point, a Coincident constraint is created.
 - When entering a passing point by selecting a segment, a Tangent constraint is created.
 
-**TUI Command**:  *Sketch_1.addArc(StartX, StartY, EndX, EndY, PassedX, PassedY)*
+**TUI Command**:
 
-**Arguments**:    6 values (coordinates of the start, end and passed points).
+.. py:function:: Sketch_1.addArc(StartX, StartY, EndX, EndY, PassedX, PassedY)
+
+    :param real: Start X.
+    :param real: Start Y.
+    :param real: End X.
+    :param real: End Y.
+    :param real: Passed X.
+    :param real: Passed Y.
+    :return: Result object.
 
 By tangent point and point
 """"""""""""""""""""""""""
@@ -76,9 +88,15 @@ The tangent point by itself is a start point. The edge on which it lies will be 
 - When entering an end point by selecting a segment, a Coincident constraint is created.
 - When entering an end point, only segments are selectable.
 
-**TUI Command**:  *Sketch_1.addArc(TangetPoint, EndX, EndY, Inversed)*
+**TUI Command**:
 
-**Arguments**:    4 values (reference to tangent point, coordinates of end point, inversed flag (if true - build arc from end to start)).
+.. py:function:: Sketch_1.addArc(TangetPoint, EndX, EndY, Inversed)
+
+    :param object: Tanget Point.
+    :param real: End X.
+    :param real: End Y.
+    :param boolean: Is inversed.
+    :return: Result object.
 
 Result
 """"""

@@ -1,3 +1,4 @@
+.. |symmetry.icon|    image:: images/symmetry.png
 
 Symmetry
 ========
@@ -7,13 +8,7 @@ Symmetry
 To create a Symmetry in the active part:
 
 #. select in the Main Menu *Part - > Symmetry* item  or
-#. click **Symmetry** button in the toolbar
-
-.. image:: images/symmetry.png    
-   :align: center
-
-.. centered::
-   **Symmetry** button 
+#. click |symmetry.icon| **Symmetry** button in the toolbar
 
 Symmetrical copy of an Object can be mirrored in three different ways:
 
@@ -44,9 +39,15 @@ Input fields:
 - **Point**  defines a point of symmetry selected in 3D OCC viewer or object browser;
 - **Create a copy** checkbox preserves/removes the initial object.
 
-**TUI Command**:  *model.addSymmetry(Part_doc, [shape], point, copy)*
+**TUI Command**:
 
-**Arguments**: part + list of shapes in format *model.selection(TYPE, shape)* + point in format *model.selection(TYPE, shape)*+ boolean (Create a copy key).
+.. py:function:: model.addSymmetry(Part_doc, [shape], point, copy)
+
+    :param part: The current part object.
+    :param list: A list of shapes in format *model.selection(TYPE, shape)*.
+    :param object: A point in format *model.selection(TYPE, shape)*.
+    :param boolean: A flag to create a copy.
+    :return: Result object.
 
 Result
 """"""
@@ -76,9 +77,15 @@ Input fields:
 - **Axis**  defines an axis of symmetry selected in 3D OCC viewer or object browser;
 - **Create a copy** checkbox preserves/removes the initial object.
 
-**TUI Command**:  *model.addSymmetry(Part_doc, [shape], axis, copy)*
+**TUI Command**:
 
-**Arguments**: part + list of shapes in format *model.selection(TYPE, shape)* + axis in format *model.selection(TYPE, shape)*+ boolean (Create a copy key).
+.. py:function:: model.addSymmetry(Part_doc, [shape], axis, copy)
+
+    :param part: The current part object.
+    :param list: A list of shapes in format *model.selection(TYPE, shape)*.
+    :param object: An axis in format *model.selection(TYPE, shape)*.
+    :param boolean: A flag to create a copy.
+    :return: Result object.
 
 Result
 """"""
@@ -108,9 +115,15 @@ Input fields:
 - **Plane**  defines a plane of symmetry selected in 3D OCC viewer or object browser;
 - **Create a copy** checkbox preserves/removes the initial object.
 
-**TUI Command**:  *model.addSymmetry(Part_doc, [shape], plane, copy)*
+**TUI Command**:
 
-**Arguments**: part + list of shapes in format *model.selection(TYPE, shape)* + plane in format *model.selection(TYPE, shape)*+ boolean (Create a copy key).
+.. py:function:: model.addSymmetry(Part_doc, [shape], plane, copy)
+
+    :param part: The current part object.
+    :param list: A list of shapes in format *model.selection(TYPE, shape)*.
+    :param object: A plane in format *model.selection(TYPE, shape)*.
+    :param boolean: A flag to create a copy.
+    :return: Result object.
 
 Result
 """"""

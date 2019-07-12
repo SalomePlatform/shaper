@@ -1,3 +1,4 @@
+.. |feature_solid.icon|    image:: images/feature_solid.png
 
 Solid
 =====
@@ -7,13 +8,7 @@ Solid feature creates a solid using faces already existing in other objects.
 To create a solid in the active part:
 
 #. select in the Main Menu *Build - > Solid* item  or
-#. click **Solid** button in the toolbar
-
-.. image:: images/feature_solid.png
-  :align: center
-
-.. centered::
-  **Solid** button
+#. click |feature_solid.icon| **Solid** button in the toolbar
 
 The following property panel will be opened:
 
@@ -29,9 +24,13 @@ Select one or several faces in the viewer. The selected faces have to define a c
 
 **Cancel** button cancels the operation. 
 
-**TUI Command**:  *model.addSolid(Part_doc, Shapes)*
+**TUI Command**:
 
-**Arguments**:   Part document + list of shapes.
+.. py:function:: model.addSolid(Part_doc, Shapes)
+
+    :param part: The current part object.
+    :param list: A list of shapes.
+    :return: Result object.
 
 Result
 """"""

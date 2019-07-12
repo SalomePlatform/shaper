@@ -1,3 +1,4 @@
+.. |placement_btn.icon|    image:: images/placement_btn.png
 
 Placement
 =========
@@ -5,13 +6,7 @@ Placement
 Placement defines position of an object relatively to another object. To make a placement:
 
 #. select in the Main Menu *Part - > Placement* item  or
-#. click **Placement** button in the toolbar
-
-.. image:: images/placement_btn.png
-   :align: center
-
-.. centered::
-   **Placement**  button 
+#. click |placement_btn.icon| **Placement** button in the toolbar
 
 The following property panel will be opened:
 
@@ -32,14 +27,21 @@ In this property panel, it is necessary to:
 -  Define state of **Reverse** and **Centering** check boxes.
 
 
-
 **Apply** button creates the placement.
   
 **Cancel** button cancels the operation.
 
-**TUI Command**:  *model.addPlacement(Part_doc, placeObjects, startShape, endShape, isReverse, isCentering)*
+**TUI Command**:
 
-**Arguments**:   Part + list of objects to move + start shape + end shape + is reverse flag + is centering flag.
+.. py:function:: model.addPlacement(Part_doc, placeObjects, startShape, endShape, isReverse, isCentering)
+
+    :param part: The current part object.
+    :param list: A list of objects to move.
+    :param object: A start shape.
+    :param object: A end shape.
+    :param bool: Is reverse flag.
+    :param bool: Is centering flag.
+    :return: Created object.
 
 Result
 """"""

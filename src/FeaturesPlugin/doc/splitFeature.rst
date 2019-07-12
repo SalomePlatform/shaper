@@ -1,3 +1,4 @@
+.. |bool_split.icon|    image:: images/bool_split.png
 
 Split
 =====
@@ -7,13 +8,7 @@ Split feature implements a Boolean operation splitting of main objects by parts 
 To perform Split in the active part:
 
 #. select in the Main Menu *Features - > Split* item  or
-#. click **Split** button in the toolbar
-
-.. image:: images/bool_split.png
-   :align: center
-
-.. centered::
-   **Split**  button 
+#. click |bool_split.icon| **Split** button in the toolbar
 
 The following property panel will be opened:
 
@@ -27,9 +22,14 @@ The following property panel will be opened:
 - **Tool Objects** contains a list of objects selected in the Object Browser or in the Viewer, which will cut and split the main objects.
 - **See preview** button shows a result of the operation.
 
-**TUI Command**:  *model.addSplit(Part_doc, mainObjects, toolObjects)*
+**TUI Command**:
 
-**Arguments**:   Part + list of main objects + list of tool objects.
+.. py:function:: model.addSplit(Part_doc, mainObjects, toolObjects)
+
+    :param part: The current part object.
+    :param list: A list of main objects.
+    :param list: A list of tool objects.
+    :return: Result object.
 
 Result
 """"""

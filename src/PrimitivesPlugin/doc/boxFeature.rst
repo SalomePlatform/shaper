@@ -1,4 +1,5 @@
 .. _box_feature:
+.. |box.icon|    image:: images/box.png
 
 Box
 ===
@@ -8,13 +9,7 @@ Box feature creates a box solid.
 To create a Box in the active part:
 
 #. select in the Main Menu *Primitives - > Box* item  or
-#. click **Box** button in the toolbar:
-
-.. image:: images/box.png
-   :align: center
-
-.. centered::
-   **Box**  button 
+#. click |box.icon| **Box** button in the toolbar:
 
 There are 2 algorithms for creation of a Box:
 
@@ -39,9 +34,15 @@ Input fields:
 
 - **DX**, **DY**, **DZ** define dimensions of the box along the corresponding coordinate axes. 
 
-**TUI Command**:  *model.addBox(Part_doc, DX, DY, DZ)*
+**TUI Command**:
+
+.. py:function:: model.addBox(Part_doc, DX, DY, DZ)
   
-**Arguments**:    Part + 3 real values (dimensions at origin).
+    :param part: The current part object.
+    :param real: Size along X.
+    :param real: Size along Y.
+    :param real: Size along Z.
+    :return: Result object.
 
 Result
 """"""
@@ -65,8 +66,14 @@ Input fields:
 
 - **Point 1** and **Point 2**  define diagonal points of the box selected in 3D OCC viewer or object browser.
   
-**TUI Command**:  *model.addBox(Part_doc, point1, point2)*
+**TUI Command**:
 
+.. py:function:: model.addBox(Part_doc, point1, point2)
+
+    :param part: The current part object.
+    :param object: First vertex of diagonal.
+    :param object: Second vertex of diagonal.
+    :return: Result object.
 **Arguments**:   Part + 2 selected points (opposite vertices of the box)
 
 Result

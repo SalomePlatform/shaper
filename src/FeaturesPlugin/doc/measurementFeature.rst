@@ -1,3 +1,4 @@
+.. |measurement.icon|    image:: images/measurement.png
 
 Measurement
 ===========
@@ -13,13 +14,7 @@ The  properties of dimension text and line, such as font, color, arrow size, etc
 To start Measurement in the active part:
 
 #. select in the Main Menu *Part - > Measurement* item  or
-#. click **Measurement** button in the toolbar
-
-.. image:: images/measurement.png      
-   :align: center
-
-.. centered::
-   **Measurement** button 
+#. click |measurement.icon| **Measurement** button in the toolbar
 
 The following dimensions can be calculated:
 
@@ -60,9 +55,13 @@ Input fields:
 
 Note, that for curved edges length is displayed only in the property panel.
 
-**TUI Command**:  *length =model.measureLength(Part_doc, edge)*
+**TUI Command**:
+
+.. py:function:: model.measureLength(Part_doc, edge)
  
-**Arguments**: part + edge in format *model.selection("EDGE", edge)*. 
+    :param part: The current part object.
+    :param object: An edge in format *model.selection("EDGE", edge)*.
+    :return: Calculated value.
 
 
 Distance between objects
@@ -80,9 +79,14 @@ Input fields:
 
 - **From**, **To**  contain shapes between which distance is  measured. Shapes are selected in 3D OCC viewer or object browser. 
 
-**TUI Command**:  *length =model.measureDistance(Part_doc, shape1, shape2)*
+**TUI Command**:
+
+.. py:function:: model.measureDistance(Part_doc, shape1, shape2)
  
-**Arguments**: part +  2 shapes in format *model.selection("TYPE", shape)*.
+    :param part: The current part object.
+    :param object: A first edge in format *model.selection("EDGE", edge)*.
+    :param object: A second edge in format *model.selection("EDGE", edge)*.
+    :return: Calculated value.
 
 Radius
 ------
@@ -100,9 +104,13 @@ Input fields:
 - **Object**  contains shape to be measured selected in 3D OCC viewer or object browser.  
 
 
-**TUI Command**:  *radius = model.measureRadius(Part_doc, shape)*
+**TUI Command**:
+
+.. py:function:: model.measureRadius(Part_doc, shape)
  
-**Arguments**: part +  shape in format *model.selection("TYPE", shape)*.
+    :param part: The current part object.
+    :param object: An edge in format *model.selection("TYPE", shape)*.
+    :return: Calculated value.
 
 Angle between edges
 -------------------
@@ -119,9 +127,14 @@ Input fields:
 
 - **First Edge**, **Second edge**  contain  edges between which angle is measured. Edges are selected in 3D OCC viewer or object browser. 
 
-**TUI Command**:  *angle = model.measureAngle(Part_doc, edge1, edge2)*
+**TUI Command**:
+
+.. py:function:: model.measureAngle(Part_doc, edge1, edge2)
  
-**Arguments**: part +  2 edges in format *model.selection("EDGE", edge)*.  
+    :param part: The current part object.
+    :param object: A first edge in format *model.selection("TYPE", shape)*.
+    :param object: A second edge in format *model.selection("TYPE", shape)*.
+    :return: Calculated value.
 
 Angle by 3 points
 -----------------
@@ -138,7 +151,13 @@ Input fields:
 
 - **First point**, **Second point**, **Third point**  contain  point between which angle is measured. Points are selected in 3D OCC viewer or object browser. 
 
-**TUI Command**:  *angle = model.measureAngle(Part_doc, vertex1, vertex2, vertex3)*
+**TUI Command**:
+
+.. py:function:: model.measureAngle(Part_doc, vertex1, vertex2, vertex3)
   
-**Arguments**: part +  3 vertices in format *model.selection("VERTEX", vertex)*.  
+    :param part: The current part object.
+    :param object: A first vertex in format *model.selection("TYPE", shape)*.
+    :param object: A second vertex in format *model.selection("TYPE", shape)*.
+    :param object: A third vertex in format *model.selection("TYPE", shape)*.
+    :return: Calculated value.
  

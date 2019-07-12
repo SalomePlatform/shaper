@@ -1,3 +1,4 @@
+.. |feature_filling.icon|    image:: images/feature_filling.png
 
 Filling
 =======
@@ -7,13 +8,7 @@ Filling feature creates one or several faces using shapes already existing in ot
 To create a filling in the active part:
 
 #. select in the Main Menu *Build - > Filling* item  or
-#. click **Filling** button in the toolbar
-
-.. image:: images/feature_filling.png
-  :align: center
-
-.. centered::
-  **Filling** button
+#. click |feature_filling.icon| **Filling** button in the toolbar
 
 The following property panel will be opened:
 
@@ -31,9 +26,13 @@ Select two or more edges in the viewer.
 
 **Cancel** button cancels the operation.
 
-**TUI Command**:  *model.addFilling(Part_doc, Edges)*
+**TUI Command**:
 
-**Arguments**:   Part document + list of edges.
+.. py:function:: model.addFilling(Part_doc, Edges)
+
+    :param part: The current part object.
+    :param list: A list of shapes.
+    :return: Result object.
 
 Result
 """"""

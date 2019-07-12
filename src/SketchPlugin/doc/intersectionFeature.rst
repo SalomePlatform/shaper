@@ -1,3 +1,4 @@
+.. |intersection.icon|    image:: images/intersection.png
 
 Intersection
 ============
@@ -8,13 +9,7 @@ Intersection
 To create an Intersection in the active Sketch:
 
 #. select in the Main Menu *Sketch - > Intersection* item  or
-#. click **Intersection** button in Sketch toolbar:
-
-.. image:: images/intersection.png
-   :align: center
-
-.. centered::
-   **Intersection**  button
+#. click |intersection.icon| **Intersection** button in Sketch toolbar:
 
 Property panel:
 
@@ -29,15 +24,19 @@ Input fields:
 - **Object** is the 3D edge to intersect with the sketch plane.
 - **Include into the sketch result** option defines whether to include the intersection point into the sketch result.
 
-**TUI Command**:
+**TUI Commands**:
 
-- *Sketch_1.addIntersectionPoint(Edge, IncludeIntoResult)*
+.. py:function:: Sketch_1.addIntersectionPoint(Edge, IncludeIntoResult)*
 
-  **Arguments**: Edge and include into the result flag
+    :param object: An edge.
+    :param boolean: Include into the result flag.
+    :return: Result object.
 
-- *Sketch_1.addIntersectionPoint(EdgeName, IncludeIntoResult)*
+.. py:function:: Sketch_1.addIntersectionPoint(EdgeName, IncludeIntoResult)*
 
-  **Arguments**: Edge name and include into the result flag
+    :param object: An edge name.
+    :param boolean: Include into the result flag.
+    :return: Result object.
 
 Result
 """"""

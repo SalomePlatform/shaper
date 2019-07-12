@@ -1,4 +1,5 @@
-  .. _create_sketch_drawer:
+.. _create_sketch_drawer:
+.. |SketchDrawer.icon|    image:: images/SketchDrawer.png
 
 Sketch Drawer
 =========
@@ -14,13 +15,7 @@ able to remove the initial model, there are no references created by this featur
 To add a new Sketch Drawing:
 
 #. select in the Main Menu *Macros - > Sketch drawer* item  or
-#. click **Sketch drawer** button in Macros toolbar:
-
-.. image:: images/SketchDrawer.png
-   :align: center
-
-.. centered::
-   **Sketch drawer**  button
+#. click |SketchDrawer.icon| **Sketch drawer** button in Macros toolbar:
 
 The following property panel appears:
 

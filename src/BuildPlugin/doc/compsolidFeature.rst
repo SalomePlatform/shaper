@@ -1,3 +1,4 @@
+.. |feature_compsolid.icon|    image:: images/feature_compsolid.png
 
 CompSolid
 =========
@@ -7,13 +8,7 @@ Compsolid feature creates a compsolid using shapes already existing in other obj
 To create a compsolid in the active part:
 
 #. select in the Main Menu *Build - > CompSolid* item  or
-#. click **CompSolid** button in the toolbar
-
-.. image:: images/feature_compsolid.png
-  :align: center
-
-.. centered::
-  **CompSolid** button
+#. click |feature_compsolid.icon| **CompSolid** button in the toolbar
 
 The following property panel will be opened:
 
@@ -29,9 +24,13 @@ Select one or several shapes in the viewer.
 
 **Cancel** button cancels the operation. 
 
-**TUI Command**:  *model.addCompSolid(Part_doc, Shapes)*
+**TUI Command**:
 
-**Arguments**:   Part document + list of shapes.
+.. py:function:: model.addCompSolid(Part_doc, Shapes)
+
+    :param part: The current part object.
+    :param list: A list of shapes.
+    :return: Result object.
 
 Result
 """"""

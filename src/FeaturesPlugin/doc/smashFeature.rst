@@ -1,3 +1,4 @@
+.. |bool_smash.icon|    image:: images/bool_smash.png
 
 Smash
 =====
@@ -7,13 +8,7 @@ Smash feature implements a boolean operation for smashing a set of main objects 
 To create a Smash in the active part:
 
 #. select in the Main Menu *Features - > Smash* item  or
-#. click **Smash** button in the toolbar
-
-.. image:: images/bool_smash.png
-   :align: center
-
-.. centered::
-   **Smash**  button 
+#. click |bool_smash.icon| **Smash** button in the toolbar
 
 The following property panel will be opened:
 
@@ -30,9 +25,14 @@ The following property panel will be opened:
   If a subshape that belongs to a compsolid/compound was selected, other shapes of this compsolid/compound will be ignored.
 - **See preview** button shows a result of the operation.
 
-**TUI Command**:  *model.addSmash(Part_doc, mainObjects, toolObjects)*
+**TUI Command**:
 
-**Arguments**:   Part + list of main objects + list of tool objects.
+.. py:function:: model.addSmash(Part_doc, mainObjects, toolObjects)
+
+    :param part: The current part object.
+    :param list: A list of main objects.
+    :param list: A list of tool objects.
+    :return: Rotated object.
 
 Result
 """"""

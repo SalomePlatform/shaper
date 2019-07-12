@@ -1,3 +1,4 @@
+.. |feature_compound.icon|    image:: images/feature_compound.png
 
 Compound
 ========
@@ -7,13 +8,7 @@ Compound feature creates a compound using shapes already existing in other objec
 To create a compound in the active part:
 
 #. select in the Main Menu *Build - > Compound* item  or
-#. click **Compound** button in the toolbar
-
-.. image:: images/feature_compound.png
-  :align: center
-
-.. centered::
-  **Compound** button
+#. click |feature_compound.icon| **Compound** button in the toolbar
 
 The following property panel will be opened:
 
@@ -29,9 +24,13 @@ Select one or several shapes in the viewer. The selected shapes can be of any ty
 
 **Cancel** button cancels the operation. 
 
-**TUI Command**:  *model.addCompound(Part_doc, Shapes)*
+**TUI Command**:
 
-**Arguments**:   Part document + a list of shapes.
+.. py:function:: model.addCompound(Part_doc, Shapes)
+
+    :param part: The current part object.
+    :param list: A list of shapes.
+    :return: Result object.
 
 Result
 """"""

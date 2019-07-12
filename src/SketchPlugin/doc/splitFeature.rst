@@ -1,3 +1,4 @@
+.. |split.icon|    image:: images/split.png
 
 Split
 =====
@@ -9,13 +10,7 @@ Split
 To create a Split in the active Sketch:
 
 #. select in the Main Menu *Sketch - > Split* item  or
-#. click **Split** button in Sketch toolbar:
-
-.. image:: images/split.png
-   :align: center
-
-.. centered::
-   **Split**  button
+#. click |split.icon| **Split** button in Sketch toolbar:
 
 Property panel:
 
@@ -37,9 +32,13 @@ The selected segment is highlighted in the view:
 .. centered::
    The segment to split off
 
-**TUI Command**: *Sketch_1.addSplit(Feature, PositionPoint)*
+**TUI Command**:
 
-**Arguments**:   feature (line, arc or circle) and position point (a point on the segment to split off or closest to it)
+.. py:function:: Sketch_1.addSplit(Feature, PositionPoint)
+
+    :param object: Line, arc or circle.
+    :param object: Position point (a point on the segment to split off or closest to it).
+    :return: Result object.
 
 Result
 """"""

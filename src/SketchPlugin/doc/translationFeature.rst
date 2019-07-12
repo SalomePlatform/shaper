@@ -1,3 +1,4 @@
+.. |translate.icon|    image:: images/translate.png
 
 Linear copy
 ===========
@@ -7,13 +8,7 @@ Linear copy operation creates one or multiple copies of the sketch entities alon
 To create a Linear copy in the active Sketch:
 
 #. select in the Main Menu *Sketch - > Linear copy* item  or
-#. click **Linear copy** button in Sketch toolbar:
-
-.. image:: images/translate.png
-   :align: center
-
-.. centered::
-   **Linear copy**  button
+#. click |translate.icon| **Linear copy** button in Sketch toolbar:
 
 Property panel:
 
@@ -40,9 +35,16 @@ Input fields:
 - **Total number of objects** is the total number of objects including the original one.
 
 
-**TUI Command**: *Sketch_1.addTranslation(Objects, Point1, Point2, NumberOfObjects, FullValue)*
+**TUI Command**:
 
-**Arguments**:   list of objects + start and end points + number of objects + full value flag
+.. py:function:: Sketch_1.addTranslation(Objects, Point1, Point2, NumberOfObjects, FullValue)
+
+    :param list: A list of objects.
+    :param object: Start point.
+    :param object: End point.
+    :param integer: Number of objects.
+    :param boolean: Full value flag.
+    :return: Result object.
 
 Result
 """"""

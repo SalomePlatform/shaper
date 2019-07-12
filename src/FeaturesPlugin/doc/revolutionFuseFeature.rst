@@ -1,3 +1,4 @@
+.. |revolution_fuse_btn.icon|    image:: images/revolution_fuse_btn.png
 
 Revolution Fuse
 ===============
@@ -7,13 +8,7 @@ Revolution Fuse feature revolves the selected objects around the selected axis a
 To perform Revolution Fuse in the active part:
 
 #. select in the Main Menu *Features - > Revolution Fuse* item  or
-#. click **Revolution Fuse** button in the toolbar
-
-.. image:: images/revolution_fuse_btn.png
-   :align: center
-
-.. centered::
-   **Revolution Fuse** button
+#. click |revolution_fuse_btn.icon| **Revolution Fuse** button in the toolbar
 
 The following property panel will be opened:
 
@@ -49,13 +44,26 @@ By angles
 - **From angle**-  start angle of revolution.
 - **Fuse with** contains a list of objects which will be fused with the result of revolution.
 
-**TUI Command**:  *model.addRevolutionFuse(part, objectsToRevolve, axis, angle, objectToFuse);*
+**TUI Command**:
 
-**Arguments**:   Part + list of objects for revolution + axis + angle + list of objects to fuse with.
+.. py:function:: model.addRevolutionFuse(part, objectsToRevolve, axis, angle, objectToFuse)
 
-**TUI Command**:  *model.addRevolutionFuse(part, objectsToRevolve, axis, toAngle, fromAngle, objectToFuse);*
+    :param part: The current part object.
+    :param list: A list of objects for revolution.
+    :param object: An axis.
+    :param real: Angle.
+    :param list: A list of objects to fuse with.
+    :return: Created object.
 
-**Arguments**:   Part + list of objects for revolution + axis + to angle + from angle + list of objects to fuse with.
+.. py:function:: model.addRevolutionFuse(part, objectsToRevolve, axis, toAngle, fromAngle, objectToFuse)
+
+    :param part: The current part object.
+    :param list: A list of objects for revolution.
+    :param object: An axis.
+    :param real: To angle.
+    :param real: From angle.
+    :param list: A list of objects to fuse with.
+    :return: Created object.
 
 Result
 """"""
@@ -87,9 +95,19 @@ By bounding planes
 - **From offset** - offset for revolution or for bounding plane, if selected.
 - **Fuse with** - contains a list of objects which will be fused with the result of revolution.
 
-**TUI Command**:  *model.addRevolutionFuse(part, objectsToRevolve, axis, toObject, toOffset, fromObject, fromOffset, objectToFuse);*
+**TUI Command**:
 
-**Arguments**:   Part + list of objects for revolution + axis + to object + to offset + from object + from offset + list of objects to fuse with.
+.. py:function:: model.addRevolutionFuse(part, objectsToRevolve, axis, toObject, toOffset, fromObject, fromOffset, objectToFuse)
+
+    :param part: The current part object.
+    :param list: A list of objects for revolution.
+    :param object: An axis.
+    :param object: To object.
+    :param real: To offset.
+    :param object: From object.
+    :param real: From offset.
+    :param list: A list of objects to fuse with.
+    :return: Created object.
 
 Result
 """"""

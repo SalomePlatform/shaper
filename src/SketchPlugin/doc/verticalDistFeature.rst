@@ -1,3 +1,4 @@
+.. |distance_v.icon|    image:: images/distance_v.png
 
 Vertical distance constraint
 ============================
@@ -9,13 +10,7 @@ The constraint can be defined between two points such as point object, line or a
 To create a Vertical Distance constraint in the active Sketch:
 
 #. select in the Main Menu *Sketch - > Vertical Distance* item  or
-#. click **Vertical Distance** button in Sketch toolbar:
-
-.. image:: images/distance_v.png
-   :align: center
-
-.. centered::
-   **Vertical Distance**  button
+#. click |distance_v.icon| **Vertical Distance** button in Sketch toolbar:
 
 Property panel:
 
@@ -53,9 +48,14 @@ When creating the constraint, after selection of two objects for the first time:
 .. centered::
    Vertical Distance input in the view
 
-**TUI Command**: *Sketch_1.setVerticalDistance(FirstObject, SecondObject, Value)*
+**TUI Command**:
 
-**Arguments**:  2 objects + vertical distance value
+.. py:function:: Sketch_1.setVerticalDistance(FirstObject, SecondObject, Value)
+
+    :param object: First object.
+    :param object: Second object.
+    :param real: Value.
+    :return: Result object.
 
 Result
 """"""

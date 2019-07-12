@@ -1,3 +1,4 @@
+.. |feature_shell.icon|    image:: images/feature_shell.png
 
 Shell
 =====
@@ -7,13 +8,7 @@ Shell feature creates a shell using faces already existing in other objects.
 To create a shell in the active part:
 
 #. select in the Main Menu *Build - > Shell* item  or
-#. click **Shell** button in the toolbar
-
-.. image:: images/feature_shell.png
-  :align: center
-
-.. centered::
-  **Shell** button
+#. click |feature_shell.icon| **Shell** button in the toolbar
 
 The following property panel will be opened:
 
@@ -29,9 +24,13 @@ Select one or several faces in the viewer.
 
 **Cancel** button cancels the operation. 
 
-**TUI Command**:  *model.addShell(Part_doc, Objects)*
+**TUI Command**:
 
-**Arguments**:   Part document + list of shapes.
+.. py:function:: model.addShell(Part_doc, Objects)
+
+    :param part: The current part object.
+    :param list: A list of shapes.
+    :return: Result object.
 
 Result
 """"""

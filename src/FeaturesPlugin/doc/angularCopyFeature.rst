@@ -1,4 +1,5 @@
 .. _featureAngularCopy:
+.. |multirotation.icon|    image:: images/multirotation.png
 
 Angular copy
 ============
@@ -8,13 +9,7 @@ The feature **Angular copy** makes a compound of several rotated shapes basing o
 To create an Angular copy in the active part:
 
 #. select in the Main Menu *Part - > Angular copy* item  or
-#. click **Angular copy** button in the toolbar
-
-.. image:: images/multirotation.png  
-   :align: center
-
-.. centered::
-   **Angular copy** button 
+#. click |multirotation.icon| **Angular copy** button in the toolbar
 
 The following property panel appears.
 
@@ -31,9 +26,16 @@ Input fields:
 - **Angular Step** check-box turns on/off definition of the angle by which the object is rotated. By default (if the checkbox is not checked), **Angular Step** = 2 * PI / NbTimes;
 - **Nb. Copies** defines the number of rotated shape copies in the resulting compound. If **Nb. Copies** = 1, the result contains only the initial shape.
 
-**TUI Command**:  *model.addMultiRotation(Part_doc, [shape], axis, step, Nb)*
+**TUI Command**:
 
-**Arguments**: part + list of shapes in format *model.selection(TYPE, shape)* + axis in format *model.selection(TYPE, shape)*+ real (step value) + integer (Nb. Copies).
+.. py:function:: model.addMultiRotation(Part_doc, [shape], axis, step, Nb)*
+
+    :param part: The current part object
+    :param list: A list of shapes in format *model.selection(TYPE, shape)*
+    :param object: An axis in format *model.selection(TYPE, shape)*
+    :param real: a step value
+    :param integer: A number of copies
+    :return: Created object
 
 Result
 """"""

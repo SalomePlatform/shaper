@@ -1,3 +1,4 @@
+.. |distance.icon|    image:: images/distance.png
 
 Distance constraint
 ===================
@@ -9,13 +10,7 @@ The constraint can be defined between such objects as point, line, line or arc e
 To create a Distance constraint in the active Sketch:
 
 #. select in the Main Menu *Sketch - > Distance* item  or
-#. click **Distance** button in Sketch toolbar:
-
-.. image:: images/distance.png
-   :align: center
-
-.. centered::
-   **Distance**  button
+#. click |distance.icon| **Distance** button in Sketch toolbar:
 
 Property panel:
 
@@ -54,9 +49,15 @@ When creating a constraint after selection of two objects for the first time:
 .. centered::
    Distance input in the view
 
-**TUI Command**: *Sketch_1.setDistance(FirstObject, SecondObject, Value, KeepOrientation)*
+**TUI Command**:
 
-**Arguments**:  2 objects + distance value + keep orientation flag
+.. py:function:: Sketch_1.setDistance(FirstObject, SecondObject, Value, KeepOrientation)
+
+    :param object: First object.
+    :param object: Second object.
+    :param real: Value.
+    :param boolean: Keep orientation flag.
+    :return: Result object.
 
 Result
 """"""

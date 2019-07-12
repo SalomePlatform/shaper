@@ -1,4 +1,5 @@
 .. _buildPolyline:
+.. |feature_polyline.icon|    image:: images/feature_polyline.png
 
 Polyline
 ========
@@ -8,13 +9,7 @@ Polyline feature creates a wire.
 To create a Polyline in the active part:
 
 #. select in the Main Menu *Build - > Polyline* item  or
-#. click **Polyline** button in the toolbar
-
-.. image:: images/feature_polyline.png
-   :align: center
-
-.. centered::
-   **Polyline** button 
+#. click |feature_polyline.icon| **Polyline** button in the toolbar
 
 The following property panel appears.
 
@@ -29,9 +24,14 @@ Input fields:
 - **Points and vertices** panel contains a list of points and vertices selected in 3D OCC viewer. The Polyline consequently connects points;
 - **Closed** check-box turns on/off connection of the start and end points to make polyline closed/opened.
 
-**TUI Commands**:  *model.addPolyline3D(Part_1_doc, Polyline_objects, Key)*
+**TUI Commands**:
 
-**Arguments**: 1 part+ list of vertices selected in format *model.selection("VERTEX", "Point")* + Boolean key defining  connection between the start and end points.
+.. py:function:: model.addPolyline3D(Part_1_doc, Polyline_objects, Key)
+
+    :param part: The current part object.
+    :param list: list of vertices selected in format *model.selection("VERTEX", "Point")*.
+    :param boolean: Is closed.
+    :return: Result object.
 
 Result
 """"""

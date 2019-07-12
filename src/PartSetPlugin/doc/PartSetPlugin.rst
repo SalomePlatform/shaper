@@ -1,3 +1,6 @@
+.. |new_part.icon|    image:: images/new_part.png
+.. |remove.icon|    image:: images/remove.png
+.. |duplicate.icon|    image:: images/duplicate.png
 
 .. _partPlugin:
 
@@ -12,17 +15,14 @@ New Part
 To create a New Part:
 
 #. select in the Main Menu *Part - > New part* item  or
-#. click **New part** button in Shaper toolbar:
+#. click |new_part.icon| **New part** button in Shaper toolbar:
 
-.. image:: images/new_part.png
-  :align: center
+**TUI Command**:
 
-.. centered::
-   New part button 
+.. py:function:: model.addPart(partSet)
 
-**TUI Command**: *model.addPart(partSet)*
-
-**Arguments**:  1 partset 
+    :param part: The current part object.
+    :return: Result object.
 
 Result
 """"""
@@ -37,13 +37,7 @@ Duplicate Part
 To duplicate an active Part:
 
 #. select in the Main Menu *Part - > Duplicate part* item  or
-#. click **Duplicate part** button in Shaper toolbar:
-
-.. image:: images/duplicate.png 
-  :align: center
-
-.. centered::
-   Duplicate part button    
+#. click |duplicate.icon| **Duplicate part** button in Shaper toolbar:
 
 Result
 """"""
@@ -58,13 +52,7 @@ Remove Part
 To remove an active Part:
 
 #. select in the Main Menu *Part - > Remove part* item  or
-#. click **Remove part** button in Shaper toolbar:
-
-.. image:: images/remove.png 
-  :align: center
-
-.. centered::
-   Remove part button    
+#. click |remove.icon| **Remove part** button in Shaper toolbar:
 
 Result
 """"""

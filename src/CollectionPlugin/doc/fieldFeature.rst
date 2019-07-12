@@ -1,3 +1,4 @@
+.. |field.icon|    image:: images/field.png
 
 Field
 =====
@@ -11,13 +12,7 @@ The field can include several sets of data called steps, each dedicated to a cer
 To create a Field in the active part:
 
 #. select in the Main Menu *Features - > Field* item  or
-#. click **Field** button in Shaper toolbar:
-
-.. image:: images/field.png
-  :align: center
-
-.. centered::
-   Field button
+#. click |field.icon| **Field** button in the toolbar:
 
 The following property panel appears. 
 
@@ -59,12 +54,22 @@ Input fields:
 - **Remove Step** button deletes the current time step.
 
  
-**TUI Command**: *model.addField(Part_1_doc, 2, "DOUBLE", 2, ["DX", "DY"], [model.selection("FACE", "Box_1_1/Left"), model.selection("FACE", "Box_1_1/Top")])*
+**TUI Commands**:
 
-**Arguments**:  1 part + integer (number of steps) + text (Type of field) + integer (number of components) + list of text (names of components) + list of objects
+.. py:function:: model.addField(Part_1_doc, 2, "DOUBLE", 2, ["DX", "DY"], [model.selection("FACE", "Box_1_1/Left"), model.selection("FACE", "Box_1_1/Top")])
 
-**TUI Command**: *Field_1.addStep(step, stamp, [[0.1, 0.2], [2.1, 1.7], [3.7, 1.95]])*
+    :param part: The current part object
+    :param integer: Number of steps
+    :param text: Type of the field
+    :param integer: Number of components
+    :param list: List of components names
+    :param list: List of objects
+    :return: the created field object
 
-**Arguments**:  2 integers + list of lists of values with Type of field
+.. py:function:: Field_1.addStep(step, stamp, [[0.1, 0.2], [2.1, 1.7], [3.7, 1.95]])
+
+    :param integer: step id
+    :param integer: time stamp id
+    :param list: list of lists of values with Type of field
 
 **See Also** a sample TUI Script of :ref:`tui_create_field` operation.

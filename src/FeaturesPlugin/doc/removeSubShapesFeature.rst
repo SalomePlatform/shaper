@@ -1,3 +1,4 @@
+.. |remove_subshapes_btn.icon|    image:: images/remove_subshapes_btn.png
 
 Remove Sub-Shapes
 =================
@@ -7,13 +8,7 @@ Remove Sub-Shapes allows removing sub shapes from wires, shells, compsolids and 
 To Remove Sub-Shapes in the active part:
 
 #. select in the Main Menu *Features - > Remove Sub-Shapes* item  or
-#. click **Remove Sub-Shapes** button in the toolbar
-
-.. image:: images/remove_subshapes_btn.png
-   :align: center
-
-.. centered::
-   **Remove Sub-Shapes** button
+#. click |remove_subshapes_btn.icon| **Remove Sub-Shapes** button in the toolbar
 
 The following property panel will be opened:
 
@@ -34,10 +29,16 @@ There are 2 options for removing sub-shapes:
 - **Sub-Shapes to remove** the list of sub-shapes which should be removed.
 
 **TUI Command**:
- | *Remove_SubShapes_1 = model.addRemoveSubShapes(Part_1_doc, object)*
- | *Remove_SubShapes_1.setSubShapesToRemove(subShapes)*
 
-**Arguments**: Part + object; List of sub-shapes to remove.
+.. py:function:: model.addRemoveSubShapes(Part_1_doc, object)
+
+    :param part: The current part object.
+    :param object: The object.
+    :return: Created object.
+
+.. py:function:: Remove_SubShapes_1.setSubShapesToRemove(subShapes)
+
+    :param list: A list of objects.
 
 
 .. image:: images/keep_subshapes_32x32.png
@@ -47,10 +48,16 @@ There are 2 options for removing sub-shapes:
 - **Sub-Shapes to keep** the list of sub-shapes which should be kept.
 
 **TUI Command**:
- | *Remove_SubShapes_1 = model.addRemoveSubShapes(Part_1_doc, object)*
- | *Remove_SubShapes_1.setSubShapesToKeep(subShapes)*
 
-**Arguments**: Part + object; List of sub-shapes to keep.
+.. py:function:: model.addRemoveSubShapes(Part_1_doc, object)
+
+    :param part: The current part object.
+    :param object: The object.
+    :return: Created object.
+
+.. py:function:: Remove_SubShapes_1.setSubShapesToKeep(subShapes)
+
+    :param list: A list of sub-shapes to keep.
 
 
 Result

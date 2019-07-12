@@ -1,3 +1,4 @@
+.. |middlepoint.icon|    image:: images/middlepoint.png
 
 Middle point constraint
 =======================
@@ -7,13 +8,7 @@ Middle point constraint forces a point to middle of a line.
 To create a Middle point in the active Sketch:
 
 #. select in the Main Menu *Sketch - > Middle point* item  or
-#. click **Middle point** button in Sketch toolbar:
-
-.. image:: images/middlepoint.png
-   :align: center
-
-.. centered::
-   **Middle point**  button
+#. click |middlepoint.icon| **Middle point** button in Sketch toolbar:
 
 Property panel:
 
@@ -30,9 +25,13 @@ Note that one of two objects should be a line and the other a point (i.e. a poin
 | After the objects are selected, the point is moved to the middle of the line.
 | The middle points are marked with a special sign.
 
-**TUI Command**: *Sketch_1.setMiddlePoint(Point, Line)*
+**TUI Command**:
 
-**Arguments**:  2 objects (the first is a point, the second one is a line)
+.. py:function:: Sketch_1.setMiddlePoint(Point, Line)
+
+    :param object: A point.
+    :param object: A line.
+    :return: Result object.
 
 Result
 """"""

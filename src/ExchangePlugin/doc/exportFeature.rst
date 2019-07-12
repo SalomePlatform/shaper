@@ -1,3 +1,4 @@
+.. |export.icon|    image:: images/export.png
 
 Export
 ======
@@ -7,13 +8,7 @@ The  export feature allows exporting objects from the current study to an extern
 It is possible to export objects to files in the following formats: BREP, STEP, IGES, XAO. To export objects to a file:
 
 #. select in the Main Menu *Part - > Export* item  or
-#. click **Export** button in the toolbar.
-
-.. image:: images/export.png
-   :align: center
-
-.. centered::
-   **Export**  button
+#. click |export.icon| **Export** button in the toolbar.
 
 The following property panel will be opened:
 
@@ -37,9 +32,13 @@ Selection list in the property panel contains a list of exported objects which c
   
 **Cancel** button cancels the operation.
 
-**TUI Command**: *model.exportToFile(Part_doc, FileNameString, ObjectsList)*
+**TUI Command**:
 
-**Arguments**: Part + file name string + list of objects.
+.. py:function:: model.exportToFile(Part_doc, FileNameString, ObjectsList)*
+
+    :param part: The current part object
+    :param string: The file name
+    :param list: A list of exporting objects
 
 Result
 """"""

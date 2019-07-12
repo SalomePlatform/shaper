@@ -1,3 +1,4 @@
+.. |fixed.icon|    image:: images/fixed.png
 
 Fixed constraint
 ================
@@ -9,13 +10,7 @@ The constraint can be defined for such objects as point, line, line or arc end p
 To create a Fixed constraint in the active Sketch:
 
 #. select in the Main Menu *Sketch - > Fixed* item  or
-#. click **Fixed** button in Sketch toolbar:
-
-.. image:: images/fixed.png
-   :align: center
-
-.. centered::
-   **Fixed**  button
+#. click |fixed.icon| **Fixed** button in Sketch toolbar:
 
 Property panel:
 
@@ -34,9 +29,12 @@ Selection rules:
 - To fix the whole line the segment between endpoints should be selected.
 - To fix the whole circle or arc the circumference should be selected.
 
-**TUI Command**: *Sketch_1.setFixed(Object)*
+**TUI Command**:
 
-**Arguments**:  1 object
+.. py:function:: Sketch_1.setFixed(Object)
+
+    :param object: An object.
+    :return: Result object.
 
 Result
 """"""
