@@ -31,6 +31,7 @@ std::string ModelAPI_ResultField::groupName()
   return group();
 }
 
+// LCOV_EXCL_START
 void ModelAPI_ResultField::ModelAPI_FieldStep::setDisplayed(const bool theDisplay)
 {
   if (myIsDisplayed != theDisplay) {
@@ -60,3 +61,4 @@ void ModelAPI_ResultField::setDisplayed(const bool theDisplay)
       step(i)->setDisplayed(false);
   }
 }
+// LCOV_EXCL_STOP
