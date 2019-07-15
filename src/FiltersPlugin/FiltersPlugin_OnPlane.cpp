@@ -48,6 +48,9 @@ bool FiltersPlugin_OnPlane::isSupported(GeomAPI_Shape::ShapeType theType) const
 GeomPlanePtr getPlane(AttributeSelectionPtr theAttr)
 {
   GeomShapePtr aGeom = theAttr->value();
+  if (!aGeom.get()) {  // construction plane, #2942
+    aGeom = theAttr->context()->shape();
+  }
   GeomFacePtr aFace(new GeomAPI_Face(aGeom));
   return aFace->getPlane();
 }
