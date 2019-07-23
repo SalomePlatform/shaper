@@ -119,8 +119,13 @@
 //#define DEBUG_DO_NOT_BY_ENTER
 //#define DEBUG_SKETCHER_ENTITIES
 //#define DEBUG_SKETCH_ENTITIES_ON_MOVE
-
+//#define DRAGGING_DEBUG
 //#define DEBUG_CURSOR
+
+
+#ifdef DRAGGING_DEBUG
+#include <QTime>
+#endif
 
 /// Fills attribute and result lists by the selected owner. In case if the attribute is found,
 /// by the owner shape, it is put to the list. Otherwise if type of owner shape is edge,
@@ -512,6 +517,10 @@ void PartSet_SketcherMgr::onMouseMoved(ModuleBase_IViewWindow* theWnd, QMouseEve
     return;
 
   if (isNestedCreateOperation(getCurrentOperation(), activeSketch())) {
+#ifdef DRAGGING_DEBUG
+    QTime t;
+    t.start();
+#endif
     // 1. perform the widget mouse move functionality and display the presentation
     // the mouse move should be processed in the widget, if it can in order to visualize correct
     // presentation. These widgets correct the feature attribute according to the mouse position
@@ -531,6 +540,9 @@ void PartSet_SketcherMgr::onMouseMoved(ModuleBase_IViewWindow* theWnd, QMouseEve
         visualizeFeature(aFeature, aFOperation->isEditOperation(), canDisplayObject(aFeature));
       }
     }
+#ifdef DRAGGING_DEBUG
+    cout << "Mouse move processing " << t.elapsed() << endl;
+#endif
   }
   //myClickedPoint.clear();
 
