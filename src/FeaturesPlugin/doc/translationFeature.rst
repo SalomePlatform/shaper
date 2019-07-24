@@ -11,12 +11,6 @@ To create a Translation in the active part:
 #. select in the Main Menu *Part - > Translation* item  or
 #. click |translation_vector_32x32.icon| **Translation** button in the toolbar
 
-.. image:: images/translation_vector_32x32.png   
-   :align: center
-
-.. centered::
-   **Translation** button 
-
 The Vector of translation can be defined in three different ways:
 
   .. image:: images/translation_vector_32x32.png    
