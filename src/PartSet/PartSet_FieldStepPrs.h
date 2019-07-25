@@ -66,7 +66,6 @@ private:
 
   FieldStepPtr myStep;
   FeaturePtr myFeature;
-  Quantity_Color myLabelColor;
 };
 
 #endif

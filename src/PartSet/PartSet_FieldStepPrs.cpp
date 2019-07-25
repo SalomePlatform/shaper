@@ -73,12 +73,6 @@ PartSet_FieldStepPrs::PartSet_FieldStepPrs(FieldStepPtr theStep)
       aDrawer->SetPointAspect(
         new Prs3d_PointAspect(Aspect_TOM_POINT, Quantity_NOC_YELLOW, POINT_SIZE));
   }
-  SUIT_ResourceMgr* aResMgr = ModuleBase_Preferences::resourceMgr();
-  QColor aQColor = aResMgr->colorValue("Viewer", "scalar_bar_text_color", Qt::black);
-
-  myLabelColor = Quantity_Color(aQColor.redF(), aQColor.greenF(), aQColor.blueF(),
-    Quantity_TOC_RGB);
-
   SetMaterial(Graphic3d_NOM_PLASTIC);
 }
 
@@ -148,6 +142,10 @@ void PartSet_FieldStepPrs::Compute(const Handle(PrsMgr_PresentationManager3d)& t
   const Handle(Prs3d_Presentation)& thePrs, const Standard_Integer theMode)
 {
   SUIT_ResourceMgr* aResMgr = ModuleBase_Preferences::resourceMgr();
+  QColor aQColor = aResMgr->colorValue("Viewer", "scalar_bar_text_color", Qt::black);
+  Quantity_Color aLabelColor = Quantity_Color(aQColor.redF(), aQColor.greenF(), aQColor.blueF(),
+    Quantity_TOC_RGB);
+
   ModelAPI_AttributeTables::ValueType aType = dataType();
   DataPtr aData = myFeature->data();
   switch (aType) {
@@ -204,7 +202,7 @@ void PartSet_FieldStepPrs::Compute(const Handle(PrsMgr_PresentationManager3d)& t
 
         Handle(Graphic3d_AspectText3d) anAspectText3d = new Graphic3d_AspectText3d();
         anAspectText3d->SetStyle(Aspect_TOST_ANNOTATION);
-        anAspectText3d->SetColor(myLabelColor);
+        anAspectText3d->SetColor(aLabelColor);
         aGroup->SetPrimitivesAspect(anAspectText3d);
 
         int aT = aResMgr->integerValue("Viewer", "scalar_bar_text_height", 14);
