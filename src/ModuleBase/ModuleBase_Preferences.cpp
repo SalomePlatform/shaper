@@ -197,6 +197,16 @@ void ModuleBase_Preferences::createCustomPage(ModuleBase_IPrefMgr* thePref, int 
             thePref->setItemProperty("max", aMax, anId);
           }
         }
+        if (aPrefType == SUIT_PreferenceMgr::IntSpin) {
+          if (aProp->min() != "") {
+            int aMin = QString(aProp->min().c_str()).toInt();
+            thePref->setItemProperty("min", aMin, anId);
+          }
+          if (aProp->max() != "") {
+            int aMax = QString(aProp->max().c_str()).toInt();
+            thePref->setItemProperty("max", aMax, anId);
+          }
+        }
       }
     }
   }

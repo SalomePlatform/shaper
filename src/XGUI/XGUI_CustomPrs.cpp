@@ -133,7 +133,7 @@ double getTransparency(const ResultPtr& theResult)
 
 double getDefaultTransparency(const ResultPtr& theResult)
 {
-  return Config_PropManager::real("Visualization", "default_transparency");
+  return Config_PropManager::integer("Visualization", "shaper_default_transparency") / 100.;
 }
 
 XGUI_CustomPrs::XGUI_CustomPrs(XGUI_Workshop* theWorkshop)

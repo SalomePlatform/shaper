@@ -80,8 +80,8 @@ std::shared_ptr<ModelAPI_Session> ModelAPI_Session::get()
                                      Config_Prop::Double,
                                      ModelAPI_ResultConstruction::DEFAULT_DEFLECTION());
 
-    Config_PropManager::registerProp("Visualization", "default_transparency",
-      "Default transparency", Config_Prop::Double, "0");
+    Config_PropManager::registerProp("Visualization", "shaper_default_transparency",
+      "Default transparency (%)", Config_Prop::IntSpin, "0", "0", "100");
 
   }
   return MY_MANAGER;

@@ -44,7 +44,7 @@ class Config_PropManager
    * \param theType - type of the value.
    * \param theDefValue - default and initial value of the property
    * \param theMin - minimal value
-   * \param theMax - minimal value
+   * \param theMax - maximal value
    * Returns True if the property succesfully registered
    */
   CONFIG_EXPORT static Config_Prop* registerProp(const std::string& theSection,

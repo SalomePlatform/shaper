@@ -50,8 +50,10 @@ Config_Prop* Config_PropManager::registerProp(const std::string& theSection,
       aProp->setType(theType);
       aProp->setTitle(theTitle);
     }
-    aProp->setMin(theMin);
-    aProp->setMax(theMax);
+    if (theMin != "")
+      aProp->setMin(theMin);
+    if (theMax != "")
+      aProp->setMax(theMax);
   }
   else {
     aProp =
