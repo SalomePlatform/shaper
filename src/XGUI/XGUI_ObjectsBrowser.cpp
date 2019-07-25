@@ -251,11 +251,11 @@ void XGUI_DataTree::processEyeClick(const QModelIndex& theIndex)
 
     // Update list of selected objects because this event happens after
     // selection event in object browser
+    Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_TO_REDISPLAY));
+    update(theIndex);
     if (aObjBrowser) {
       aObjBrowser->onSelectionChanged();
     }
-    Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_TO_REDISPLAY));
-    update(theIndex);
   }
 }
 
