@@ -820,7 +820,7 @@ void SHAPERGUI::createPreferences()
   pref->setItemProperty("min", 0, aItem);
   pref->setItemProperty("max", 100, aItem);
 
-  aItem = pref->addItem(tr("Text color"), colorScaleGroup,
+  aItem = aMgr.addPreference(tr("Text color"), colorScaleGroup,
     SUIT_PreferenceMgr::Color, ModuleBase_Preferences::VIEWER_SECTION, "scalar_bar_text_color");
 
   pref->retrieve();
