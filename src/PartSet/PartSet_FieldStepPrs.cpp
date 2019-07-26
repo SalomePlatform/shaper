@@ -123,7 +123,7 @@ QList<double> PartSet_FieldStepPrs::range(double& theMin, double& theMax) const
   }
   QList<double> aShapeData;
   double aRangeMin = aFieldStepData.first(), aRangeMax = aFieldStepData.last();
-  for (int aRow = 0; aRow < aRows - 1; aRow++) {
+  for (int aRow = 0; aRow < aRows - aStart; aRow++) {
     double aNorm = 0;
     int aBaseIndex = aRow * aCols;
     for (int aCol = 0; aCol < aCols; aCol++) {
@@ -158,18 +158,27 @@ void PartSet_FieldStepPrs::Compute(const Handle(PrsMgr_PresentationManager3d)& t
   {
     double aMin, aMax;
     QList<double> aShapeData = range(aMin, aMax);
-    int aNbIntertvals = aResMgr->integerValue("Viewer", "scalar_bar_nb_intervals", 20);
 
     AttributeSelectionListPtr aSelList =
       aData->selectionList(CollectionPlugin_Field::SELECTED_ID());
-    for (int i = 0; i < aSelList->size(); i++) {
-      AttributeSelectionPtr aSelection = aSelList->value(i);
-      GeomShapePtr aShapePtr = aSelection->value();
-      TopoDS_Shape aShape = aShapePtr->impl<TopoDS_Shape>();
-      double aValue = aShapeData.at(i);
+    std::string aTypeStr = aSelList->selectionType();
+    if (aTypeStr == "part") {
       Quantity_Color aColor;
-      if (AIS_ColorScale::FindColor(aValue, aMin, aMax, aNbIntertvals, aColor))
-        SetCustomColor(aShape, aColor);
+      if (AIS_ColorScale::FindColor(aMin, aMin, aMax, 1, aColor)) {
+        SetColor(aColor);
+      }
+    }
+    else {
+      int aNbIntertvals = aResMgr->integerValue("Viewer", "scalar_bar_nb_intervals", 20);
+      for (int i = 0; i < aSelList->size(); i++) {
+        AttributeSelectionPtr aSelection = aSelList->value(i);
+        GeomShapePtr aShapePtr = aSelection->value();
+        TopoDS_Shape aShape = aShapePtr->impl<TopoDS_Shape>();
+        double aValue = aShapeData.at(i);
+        Quantity_Color aColor;
+        if (AIS_ColorScale::FindColor(aValue, aMin, aMax, aNbIntertvals, aColor))
+          SetCustomColor(aShape, aColor);
+      }
     }
   }
   break;
