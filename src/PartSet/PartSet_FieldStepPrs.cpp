@@ -98,13 +98,17 @@ QList<double> PartSet_FieldStepPrs::range(double& theMin, double& theMax) const
 {
   ModelAPI_AttributeTables::ValueType aType = dataType();
   DataPtr aData = myFeature->data();
+  AttributeSelectionListPtr aSelList = aData->selectionList(CollectionPlugin_Field::SELECTED_ID());
+  std::string aTypeStr = aSelList->selectionType();
+
   int aStep = myStep->id();
   AttributeTablesPtr aTablesAttr = aData->tables(CollectionPlugin_Field::VALUES_ID());
   int aRows = aTablesAttr->rows();
   int aCols = aTablesAttr->columns();
 
   QList<double> aFieldStepData;
-  for (int k = 1; k < aRows; k++) { // Do not use default values
+  int aStart = (aTypeStr == "part")? 0:1;
+  for (int k = aStart; k < aRows; k++) { // Do not use default values
     for (int j = 0; j < aCols; j++) {
       ModelAPI_AttributeTables::Value aVal = aTablesAttr->value(k, j, aStep);
       switch (aType) {
