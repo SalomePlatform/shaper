@@ -141,7 +141,9 @@ SHAPERGUI::SHAPERGUI()
   myProxyViewer = new SHAPERGUI_SalomeViewer(this);
 
   ModuleBase_Preferences::setResourceMgr(application()->resourceMgr());
-  // ModuleBase_Preferences::loadCustomProps(); - It will be called in XGUI_Workshop::startApplication
+
+  // It will be called in XGUI_Workshop::startApplication
+  // ModuleBase_Preferences::loadCustomProps();
 }
 
 //******************************************************
