@@ -197,6 +197,11 @@ bool ModuleBase_WidgetValidated::isValidInFilters(const ModuleBase_ViewerPrsPtr&
     anOwner.Nullify();
     myPresentedObject = ObjectPtr();
   }
+  if (!aValid) {
+    // Clear attribute if it still has selection
+    AttributePtr anAttr = attribute();
+    anAttr->reset();
+  }
   return aValid;
 }
 
