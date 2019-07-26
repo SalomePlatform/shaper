@@ -694,7 +694,7 @@ void PartSet_WidgetSketchLabel::onChangePlane()
     aWorkshop->selectionActivate()->updateSelectionModes();
 
     SessionPtr aMgr = ModelAPI_Session::get();
-    aMgr->startOperation();
+    aMgr->startOperation("Change Sketch plane");
     myOpenTransaction = true;
   }
 }
