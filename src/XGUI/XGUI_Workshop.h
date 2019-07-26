@@ -327,6 +327,9 @@ Q_OBJECT
 
   void deactivateCurrentSelector();
 
+  /// The method updates a Color Scale object in the viewer
+  void updateColorScaleVisibility();
+
 signals:
   /// Emitted when selection happens in Salome viewer
   void salomeViewerSelection();

@@ -79,6 +79,7 @@
 #include <ModelAPI_Session.h>
 #include <ModelAPI_Validator.h>
 #include <ModelAPI_Tools.h>
+#include <ModelAPI_ResultField.h>
 
 //#include <PartSetPlugin_Part.h>
 
@@ -104,6 +105,7 @@
 #include <ModuleBase_ModelWidget.h>
 #include <ModuleBase_ResultPrs.h>
 #include <ModuleBase_ActionIntParameter.h>
+#include <ModuleBase_IStepPrs.h>
 
 #include <Config_Common.h>
 #include <Config_FeatureMessage.h>
@@ -2499,6 +2501,8 @@ void XGUI_Workshop::showObjects(const QObjectPtrList& theList, bool isVisible)
   }
   Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_TO_REDISPLAY));
   myObjectBrowser->updateAllIndexes();
+
+  updateColorScaleVisibility();
 }
 
 //**************************************************************
@@ -2538,7 +2542,45 @@ void XGUI_Workshop::showOnlyObjects(const QObjectPtrList& theList)
 
   // Necessary for update icons in ObjectBrowser on Linux
   myObjectBrowser->updateAllIndexes();
+  updateColorScaleVisibility();
 }
+
+
+//**************************************************************
+void XGUI_Workshop::updateColorScaleVisibility()
+{
+  QObjectPtrList aObjects = mySelector->selection()->selectedObjects();
+  viewer()->setColorScaleShown(false);
+  if (aObjects.size() == 1) {
+    FieldStepPtr aStep =
+      std::dynamic_pointer_cast<ModelAPI_ResultField::ModelAPI_FieldStep>(aObjects.first());
+    if (aStep.get() && myDisplayer->isVisible(aStep)) {
+      AISObjectPtr aAisPtr = myDisplayer->getAISObject(aStep);
+      Handle(AIS_InteractiveObject) aIO = aAisPtr->impl<Handle(AIS_InteractiveObject)>();
+      ModuleBase_IStepPrs* aPrs = dynamic_cast<ModuleBase_IStepPrs*>(aIO.get());
+      if (aPrs) {
+        ModelAPI_AttributeTables::ValueType aType = aPrs->dataType();
+        if ((aType == ModelAPI_AttributeTables::DOUBLE) ||
+          (aType == ModelAPI_AttributeTables::INTEGER) ||
+          (aType == ModelAPI_AttributeTables::BOOLEAN)) {
+          myViewerProxy->setupColorScale();
+          if (aType == ModelAPI_AttributeTables::BOOLEAN) {
+            myViewerProxy->setColorScaleIntervals(2);
+            myViewerProxy->setColorScaleRange(0., 1.);
+          }
+          else {
+            double aMin, aMax;
+            aPrs->dataRange(aMin, aMax);
+            myViewerProxy->setColorScaleRange(aMin, aMax);
+          }
+          myViewerProxy->setColorScaleTitle(aStep->name().c_str());
+          myViewerProxy->setColorScaleShown(true);
+        }
+      }
+    }
+  }
+}
+
 
 //**************************************************************
 void XGUI_Workshop::setNormalView(bool toInvert)

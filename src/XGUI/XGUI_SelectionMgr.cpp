@@ -41,7 +41,6 @@
 #include <ModelAPI_ResultBody.h>
 #include <ModelAPI_Tools.h>
 #include <ModelAPI_ResultField.h>
-#include <ModuleBase_IStepPrs.h>
 
 #include <GeomAPI_Shape.h>
 
@@ -132,38 +131,7 @@ void XGUI_SelectionMgr::onObjectBrowserSelection()
     }
   }
   aDisplayer->setSelected(aSelectedPrs);
-  myWorkshop->viewer()->setColorScaleShown(false);
-  if (aSelectedPrs.size() == 1) {
-    FieldStepPtr aStep =
-      std::dynamic_pointer_cast<ModelAPI_ResultField::ModelAPI_FieldStep>
-      (aSelectedPrs.first()->object());
-    XGUI_Displayer* aDisplayer = myWorkshop->displayer();
-    if (aStep.get() && aDisplayer->isVisible(aStep)) {
-      XGUI_ViewerProxy* aViewer = myWorkshop->viewer();
-      AISObjectPtr aAisPtr = aDisplayer->getAISObject(aStep);
-      Handle(AIS_InteractiveObject) aIO = aAisPtr->impl<Handle(AIS_InteractiveObject)>();
-      ModuleBase_IStepPrs* aPrs = dynamic_cast<ModuleBase_IStepPrs*>(aIO.get());
-      if (aPrs) {
-        ModelAPI_AttributeTables::ValueType aType = aPrs->dataType();
-        if ((aType == ModelAPI_AttributeTables::DOUBLE) ||
-          (aType == ModelAPI_AttributeTables::INTEGER) ||
-          (aType == ModelAPI_AttributeTables::BOOLEAN)) {
-          aViewer->setupColorScale();
-          if (aType == ModelAPI_AttributeTables::BOOLEAN) {
-            aViewer->setColorScaleIntervals(2);
-            aViewer->setColorScaleRange(0., 1.);
-          }
-          else {
-            double aMin, aMax;
-            aPrs->dataRange(aMin, aMax);
-            aViewer->setColorScaleRange(aMin, aMax);
-          }
-          aViewer->setColorScaleTitle(aStep->name().c_str());
-          aViewer->setColorScaleShown(true);
-        }
-      }
-    }
-  }
+  myWorkshop->updateColorScaleVisibility();
   emit selectionChanged();
 }
 
