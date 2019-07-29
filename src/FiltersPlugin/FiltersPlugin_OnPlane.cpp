@@ -83,14 +83,10 @@ bool FiltersPlugin_OnPlane::isOk(const GeomShapePtr& theShape, const ResultPtr&,
           return true;
       }
     }
-    else if (aEdge->isCircle()) {
-      GeomCurvePtr aCurve(new GeomAPI_Curve(aEdge));
-      GeomCirclePtr aCircle(new GeomAPI_Circ(aCurve));
-      GeomDirPtr aDir = aCircle->normal();
-      GeomPointPtr aPnt = aCircle->center();
+    else if (aEdge->isPlanar()) {
       for (int i = 0; i < aList->size(); i++) {
         GeomPlanePtr aPlane = getPlane(aList->value(i));
-        if ((aPlane->direction()->isParallel(aDir)) && (aPlane->distance(aPnt) < LIN_TOLERANCE))
+        if (aEdge->isInPlane(aPlane))
           return true;
       }
     }
