@@ -33,6 +33,7 @@
 
 #include <Events_InfoMessage.h>
 
+#include <algorithm>
 #include <string>
 #include <map>
 
@@ -46,18 +47,23 @@ GeomValidators_ShapeType::TypeOfShape
   if (MyShapeTypes.size() == 0) {
     MyShapeTypes["empty"]     = Empty;
     MyShapeTypes["vertex"]    = Vertex;
+    MyShapeTypes["vertices"]  = Vertex;
     MyShapeTypes["edge"]      = Edge;
+    MyShapeTypes["edges"]     = Edge;
     MyShapeTypes["line"]      = Line;
     MyShapeTypes["circle"]    = Circle;
     MyShapeTypes["wire"]      = Wire;
     MyShapeTypes["face"]      = Face;
+    MyShapeTypes["faces"]     = Face;
     MyShapeTypes["plane"]     = Plane;
     MyShapeTypes["shell"]     = Shell;
     MyShapeTypes["solid"]     = Solid;
+    MyShapeTypes["solids"]    = Solid;
     MyShapeTypes["compsolid"] = CompSolid;
     MyShapeTypes["compound"]  = Compound;
   }
   std::string aType = std::string(theType.c_str());
+  std::transform(aType.begin(), aType.end(), aType.begin(), ::tolower);
   if (MyShapeTypes.find(aType) != MyShapeTypes.end())
     return MyShapeTypes[aType];
 

@@ -66,12 +66,13 @@ class GeomValidators_ShapeType : public ModelAPI_AttributeValidator
 protected:
   /// Convert string to TypeOfShape value
   /// \param theType a string value
-  static TypeOfShape shapeType(const std::string& theType);
+  GEOMVALIDATORS_EXPORT static TypeOfShape shapeType(const std::string& theType);
 
   /// Returns true if the attibute's object type satisfies the argument value
   /// \param[in] theAttribute a checked attribute
   /// \param[in] theShapeType a type of shape
   /// \param[out] theError error message.
+  GEOMVALIDATORS_EXPORT
   bool isValidAttribute(const AttributePtr& theAttribute,
                         const TypeOfShape theShapeType,
                         Events_InfoMessage& theError) const;

@@ -34,6 +34,7 @@ SET(PROJECT_HEADERS
     FiltersPlugin_OppositeToEdge.h
     FiltersPlugin_RelativeToSolid.h
     FiltersPlugin_ExternalFaces.h
+    FiltersPlugin_Validators.h
 )
 
 SET(PROJECT_SOURCES
@@ -49,6 +50,7 @@ SET(PROJECT_SOURCES
     FiltersPlugin_OppositeToEdge.cpp
     FiltersPlugin_RelativeToSolid.cpp
     FiltersPlugin_ExternalFaces.cpp
+    FiltersPlugin_Validators.cpp
 )
 
 SET(PROJECT_LIBRARIES
@@ -57,6 +59,7 @@ SET(PROJECT_LIBRARIES
     Config
     GeomAPI
     GeomAlgoAPI
+    GeomValidators
 )
 
 SET(PROJECT_PYFILES
@@ -87,6 +90,8 @@ INCLUDE_DIRECTORIES(
   ${PROJECT_SOURCE_DIR}/src/GeomAPI
   ${PROJECT_SOURCE_DIR}/src/GeomAlgoAPI
   ${PROJECT_SOURCE_DIR}/src/GeomDataAPI
+  ${PROJECT_SOURCE_DIR}/src/GeomValidators
+  ${PROJECT_SOURCE_DIR}/src/CollectionPlugin
 )
 
 INSTALL(TARGETS Filters DESTINATION ${SHAPER_INSTALL_PLUGIN_FILES})

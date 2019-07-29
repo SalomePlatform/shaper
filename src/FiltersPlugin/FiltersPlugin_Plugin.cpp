@@ -29,6 +29,7 @@
 #include "FiltersPlugin_OppositeToEdge.h"
 #include "FiltersPlugin_RelativeToSolid.h"
 #include "FiltersPlugin_ExternalFaces.h"
+#include "FiltersPlugin_Validators.h"
 
 #include <Config_ModuleReader.h>
 
@@ -40,7 +41,7 @@ static FiltersPlugin_Plugin* MY_VIEWFILTERS_INSTANCE = new FiltersPlugin_Plugin(
 
 FiltersPlugin_Plugin::FiltersPlugin_Plugin()
 {
-  // register validators
+  // register filters
   SessionPtr aMgr = ModelAPI_Session::get();
   ModelAPI_FiltersFactory* aFactory = aMgr->filters();
   aFactory->registerFilter("HorizontalFaces", new FiltersPlugin_HorizontalFace);
@@ -55,6 +56,11 @@ FiltersPlugin_Plugin::FiltersPlugin_Plugin()
   aFactory->registerFilter("ExternalFaces", new FiltersPlugin_ExternalFaces);
 
   Config_ModuleReader::loadScript("FiltersPlugin_TopoConnectedFaces");
+
+  // register validators
+  ModelAPI_ValidatorsFactory* aValidators = aMgr->validators();
+  aValidators->registerValidator("FiltersPlugin_ShapeType",
+                                 new FiltersPlugin_ShapeTypeValidator);
 
   ModelAPI_Session::get()->registerPlugin(this);
 }

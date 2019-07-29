@@ -1,8 +1,8 @@
 <filter id="OnGeometry">
   <multi_selector id="OnGeometry__OnGeometry"
-                  label="Edges/faces:"
+                  label="Shapes:"
                   tooltip="Select objects to limit selection."
                   type_choice="edges faces">
-    <validator id="GeomValidators_ShapeType" parameters="edge,face"/>
+    <validator id="FiltersPlugin_ShapeType"/>
   </multi_selector>
 </filter>
