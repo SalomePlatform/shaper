@@ -226,3 +226,10 @@ bool XGUI_ModuleConnector::enableUpdateViewer(bool isEnabled)
 {
   return myWorkshop->displayer()->enableUpdateViewer(isEnabled);
 }
+
+
+void XGUI_ModuleConnector::applyCurrentSelectionModes(const AISObjectPtr& theAIS)
+{
+  Handle(AIS_InteractiveObject) anIO = theAIS->impl<Handle(AIS_InteractiveObject)>();
+  myWorkshop->selectionActivate()->activate(anIO, false);
+}

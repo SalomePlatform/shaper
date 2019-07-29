@@ -303,15 +303,21 @@ ModuleBase_WidgetSelectionFilter::~ModuleBase_WidgetSelectionFilter()
     Handle(AIS_InteractiveContext) aCtx = myWorkshop->viewer()->AISContext();
     aCtx->Remove(myPreview, false);
     myPreview.Nullify();
-    if (myShowBtn->isChecked()) {
+    if (myListIO.Size() > 0) {
+      Handle(AIS_InteractiveContext) aCtx = myWorkshop->viewer()->AISContext();
       AIS_ListOfInteractive::const_iterator aIt;
       Handle(AIS_Shape) aShapeIO;
       for (aIt = myListIO.cbegin(); aIt != myListIO.cend(); aIt++) {
         aShapeIO = Handle(AIS_Shape)::DownCast(*aIt);
         if (!aShapeIO.IsNull()) {
           aCtx->Display(aShapeIO, false);
+          std::shared_ptr<GeomAPI_AISObject> anAISObj = AISObjectPtr(new GeomAPI_AISObject());
+          anAISObj->setImpl(new Handle(AIS_InteractiveObject)(aShapeIO));
+          myWorkshop->applyCurrentSelectionModes(anAISObj);
         }
       }
+      myListIO.Clear();
+      myShowBtn->setChecked(false);
     }
     aCtx->UpdateCurrentViewer();
   }
@@ -512,8 +518,12 @@ void ModuleBase_WidgetSelectionFilter::onShowOnly(bool theShow)
     if (!aShapeIO.IsNull()) {
       if (theShow)
         aCtx->Erase(aShapeIO, false);
-      else
+      else {
         aCtx->Display(aShapeIO, false);
+        std::shared_ptr<GeomAPI_AISObject> anAISObj = AISObjectPtr(new GeomAPI_AISObject());
+        anAISObj->setImpl(new Handle(AIS_InteractiveObject)(aShapeIO));
+        myWorkshop->applyCurrentSelectionModes(anAISObj);
+      }
     }
   }
   aCtx->UpdateCurrentViewer();
@@ -617,6 +627,7 @@ QString ModuleBase_WidgetSelectionFilter::getError(const bool theValueStateCheck
 
 void ModuleBase_WidgetSelectionFilter::onObjectUpdated()
 {
+  myShowBtn->setChecked(false);
   clearCurrentSelection(true);
   updateNumberSelected();
   updateObject(myFeature);
