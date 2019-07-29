@@ -40,7 +40,7 @@ class Model_AttributeSelection : public ModelAPI_AttributeSelection,
 {
   Model_AttributeReference myRef;  ///< The reference functionality re-usage
   /// temporarily storages to avoid keeping in the data structure if not needed
-  ResultPtr myTmpContext;
+  ObjectPtr myTmpContext;
   /// temporarily storages to avoid keeping in the data structure if not needed
   std::shared_ptr<GeomAPI_Shape> myTmpSubShape;
   /// temporarily storages to avoid keeping in the data structure if not needed

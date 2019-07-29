@@ -141,7 +141,7 @@ bool ModuleBase_WidgetValidated::isValidInFilters(const ModuleBase_ViewerPrsPtr&
           }
           else
             aValid = false;
-          aSelectAttr->setValue(ObjectPtr(), GeomShapePtr(), true);
+          //aSelectAttr->setValue(ObjectPtr(), GeomShapePtr(), true);
         }
         else {
           ResultPtr aResult = aFeature->firstResult();
@@ -200,7 +200,12 @@ bool ModuleBase_WidgetValidated::isValidInFilters(const ModuleBase_ViewerPrsPtr&
   if (!aValid) {
     // Clear attribute if it still has selection
     AttributePtr anAttr = attribute();
-    anAttr->reset();
+    std::string aType = anAttr->attributeType();
+    if (aType == ModelAPI_AttributeSelection::typeId()) {
+      AttributeSelectionPtr aSelectAttr =
+        std::dynamic_pointer_cast<ModelAPI_AttributeSelection>(anAttr);
+      aSelectAttr->removeTemporaryValues();
+    }
   }
   return aValid;
 }

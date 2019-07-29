@@ -103,10 +103,9 @@ const static std::string kWHOLE_FEATURE = "all-in-";
 bool Model_AttributeSelection::setValue(const ObjectPtr& theContext,
   const std::shared_ptr<GeomAPI_Shape>& theSubShape, const bool theTemporarily)
 {
-  if (theTemporarily &&
-      (!theContext.get() || theContext->groupName() != ModelAPI_Feature::group())) {
+  if (theTemporarily) {
     // just keep the stored without DF update
-    myTmpContext = std::dynamic_pointer_cast<ModelAPI_Result>(theContext);
+    myTmpContext = theContext;
     myTmpSubShape = theSubShape;
     owner()->data()->sendAttributeUpdated(this);
     return true;
@@ -313,7 +312,14 @@ std::shared_ptr<GeomAPI_Shape> Model_AttributeSelection::internalValue(CenterTyp
       // it is just reference to construction.
       return myTmpSubShape;
     }
-    return myTmpSubShape.get() ? myTmpSubShape : myTmpContext->shape();
+    FeaturePtr aFeature =
+      std::dynamic_pointer_cast<ModelAPI_Feature>(myTmpContext);
+    if (aFeature.get()) {
+      // it is just reference to construction.
+      return myTmpSubShape;
+    }
+    return myTmpSubShape.get() ? myTmpSubShape :
+      std::dynamic_pointer_cast<ModelAPI_Result>(myTmpContext)->shape();
   }
 
   TDF_Label aSelLab = selectionLabel();
@@ -465,7 +471,7 @@ ResultPtr Model_AttributeSelection::context()
     return ResultPtr();
 
   if (myTmpContext.get() || myTmpSubShape.get()) {
-    return myTmpContext;
+    return std::dynamic_pointer_cast<ModelAPI_Result>(myTmpContext);
   }
 
   ResultPtr aResult = std::dynamic_pointer_cast<ModelAPI_Result>(myRef.value());
@@ -495,8 +501,8 @@ ResultPtr Model_AttributeSelection::context()
 }
 
 FeaturePtr Model_AttributeSelection::contextFeature() {
-  if (myTmpContext.get() || myTmpSubShape.get()) {
-    return FeaturePtr(); // feature can not be selected temporarily
+  if (myTmpContext.get()) {
+    return std::dynamic_pointer_cast<ModelAPI_Feature>(myTmpContext);
   }
   return std::dynamic_pointer_cast<ModelAPI_Feature>(myRef.value());
 }
