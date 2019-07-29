@@ -214,18 +214,6 @@ void ModuleBase_FilterItem::onDelete()
   emit deleteItem(this);
 }
 
-QList<QWidget*> ModuleBase_FilterItem::getControls() const
-{
-  QList<QWidget*> aWidgetsList;
-  foreach(ModuleBase_ModelWidget* aWgt, myWidgets) {
-    QList<QWidget*> aSubList = aWgt->getControls();
-    foreach(QWidget* aSub, aSubList) {
-      aWidgetsList.append(aSub);
-    }
-  }
-  return aWidgetsList;
-}
-
 
 //*****************************************************************************
 //*****************************************************************************
@@ -345,7 +333,7 @@ void ModuleBase_WidgetSelectionFilter::onAddFilter(int theIndex)
       break;
     }
   }
-  onAddFilter(aFilter);
+  ModuleBase_FilterItem* aItem = onAddFilter(aFilter);
   FiltersFeaturePtr aFiltersFeature =
     std::dynamic_pointer_cast<ModelAPI_FiltersFeature>(myFeature);
   aFiltersFeature->addFilter(aFilter);
@@ -353,16 +341,21 @@ void ModuleBase_WidgetSelectionFilter::onAddFilter(int theIndex)
   myFiltersCombo->setCurrentIndex(0);
   myFiltersCombo->removeItem(theIndex);
   updateObject(myFeature);
+
+  if (aItem && (aItem->widgets().size() > 0))
+    aItem->widgets().first()->emitFocusInWidget();
+  else
+    emitFocusInWidget();
 }
 
-void ModuleBase_WidgetSelectionFilter::onAddFilter(const std::string& theFilter)
+ModuleBase_FilterItem* ModuleBase_WidgetSelectionFilter::onAddFilter(const std::string& theFilter)
 {
   if (theFilter.length() == 0)
-    return;
+    return 0;
   std::list<std::string>::const_iterator aIt;
   for (aIt = myUseFilters.cbegin(); aIt != myUseFilters.cend(); aIt++) {
     if (theFilter == (*aIt))
-      return;
+      return 0;
   }
   myFilters.remove(theFilter);
   myUseFilters.push_back(theFilter);
@@ -376,6 +369,7 @@ void ModuleBase_WidgetSelectionFilter::onAddFilter(const std::string& theFilter)
   updateSelectBtn();
   clearCurrentSelection(true);
   updateNumberSelected();
+  return aItem;
 }
 
 void ModuleBase_WidgetSelectionFilter::onDeleteItem(ModuleBase_FilterItem* theItem)
@@ -404,7 +398,7 @@ void ModuleBase_WidgetSelectionFilter::onDeleteItem(ModuleBase_FilterItem* theIt
   myWorkshop->selectionActivate()->updateSelectionModes();
   myWorkshop->selectionActivate()->updateSelectionFilters();
   redisplayFeature();
-  myFiltersCombo->setFocus();
+  emitFocusInWidget();
   updateObject(myFeature);
 }
 
@@ -546,13 +540,6 @@ void ModuleBase_WidgetSelectionFilter::updateNumberSelected()
 QList<QWidget*> ModuleBase_WidgetSelectionFilter::getControls() const
 {
   QList<QWidget*> aWidgets;
-  QList<ModuleBase_FilterItem*> aItems = myFiltersWgt->findChildren<ModuleBase_FilterItem*>();
-  foreach(ModuleBase_FilterItem* aItem, aItems) {
-    QList<QWidget*> aSubList = aItem->getControls();
-    foreach(QWidget* aWgt, aSubList) {
-      aWidgets.append(aWgt);
-    }
-  }
   aWidgets.append(myFiltersCombo);
   return aWidgets;
 }

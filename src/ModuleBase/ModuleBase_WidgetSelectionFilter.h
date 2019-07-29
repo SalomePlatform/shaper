@@ -94,10 +94,6 @@ public:
   /// Returns filter Id
   std::string filter() const { return myFilterID; }
 
-  /// Returns list of widget controls
-  /// \return a control list
-  QList<QWidget*> getControls() const;
-
   /// Returns list of widgets which reperesent the current filter GUI
   QList<ModuleBase_ModelWidget*> widgets() const {
     return myWidgets;
@@ -183,9 +179,6 @@ private slots:
   /// Add a filter by Id in combo box
   void onAddFilter(int);
 
-  /// Add a filter by name
-  void onAddFilter(const std::string& theFilter);
-
   /// Process deletion of a filter item
   void onDeleteItem(ModuleBase_FilterItem* theItem);
 
@@ -217,6 +210,9 @@ private:
 
   /// Call to redisplay the fiter feature
   void redisplayFeature();
+
+  /// Add a filter by name
+  ModuleBase_FilterItem* onAddFilter(const std::string& theFilter);
 
 private:
   ModuleBase_IWorkshop* myWorkshop;
