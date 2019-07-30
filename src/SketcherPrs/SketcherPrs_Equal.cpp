@@ -57,6 +57,8 @@ bool SketcherPrs_Equal::updateIfReadyToDisplay(double theStep, bool withColor) c
 {
   if (!IsReadyToDisplay(myConstraint, plane()))
     return false;
+  if (!plane())
+    return false;
 
   ObjectPtr aObj1 =
     SketcherPrs_Tools::getResult(myConstraint, SketchPlugin_Constraint::ENTITY_A());
