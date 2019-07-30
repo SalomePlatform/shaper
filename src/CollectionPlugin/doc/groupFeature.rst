@@ -40,7 +40,21 @@ Input fields:
  
 - The list of selected entities of the given type.  Multiple selection can be done manually in OCC 3D Viewer by mouse click with Shift button pressed or by rectangle selection. To delete entities from the list, select them and call pop-up menu *Delete* item.
 
+- **Selection by filters** button opens "selection by filters" property panel and allows to select entities by set of selected filters.
+
+- **Show only** button allows to hide all other objects and shapes and show only selected ones.
+
 - Control **Add elements that share the same topology** allows to add automatically all elements laying on the same topology that was selected and remove these elements if they have disappeared due to the parametrical update. They will be represented as one line in the list of selection and managed in the viewer as one object if this flag is enabled. If flag becomes disabled when such elements are already in the list, they will become divided in one line per one shape.
+
+**Selection by filters**
+
+If user press this button then following property panel will be opened.
+
+.. image:: images/selection_by_filters.png
+  :align: center
+
+.. centered::
+  Selection by filters property panel
 
 **TUI Command**:
 
