@@ -123,7 +123,8 @@ void FiltersPlugin_Selection::initAttributes()
       std::shared_ptr<ModelAPI_AttributeBoolean> aBool =
         std::dynamic_pointer_cast<ModelAPI_AttributeBoolean>(data()->addFloatingAttribute(
           kReverseAttrID, ModelAPI_AttributeBoolean::typeId(), *aFIt));
-      aBool->setValue(false); // not reversed by default
+      if (!aBool->isInitialized())
+        aBool->setValue(false); // not reversed by default
       ModelAPI_FiltersArgs anArgs;
       anArgs.setFeature(std::dynamic_pointer_cast<ModelAPI_FiltersFeature>(data()->owner()));
       anArgs.setFilter(*aFIt);
