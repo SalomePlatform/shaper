@@ -511,9 +511,33 @@ void Model_Session::processEvent(const std::shared_ptr<Events_Message>& theMessa
       }
     }
   } else {  // create/update/delete
-    if (myCheckTransactions && !isOperation())
-      Events_InfoMessage("Model_Session",
-        "Modification of data structure outside of the transaction").send();
+    if (myCheckTransactions && !isOperation()) {
+      // check it is done in real opened document: 2958
+      bool aIsActual = true;
+      static const Events_ID kDeletedEvent = Events_Loop::eventByName(EVENT_OBJECT_DELETED);
+      if (theMessage->eventID() == kDeletedEvent) {
+        aIsActual = false;
+        std::shared_ptr<ModelAPI_ObjectDeletedMessage> aDeleted =
+          std::dynamic_pointer_cast<ModelAPI_ObjectDeletedMessage>(theMessage);
+        std::list<std::shared_ptr<ModelAPI_Document> > allOpened =
+          Model_Session::allOpenedDocuments();
+        std::list<std::pair<std::shared_ptr<ModelAPI_Document>, std::string>>::const_iterator
+          aGIter = aDeleted->groups().cbegin();
+        for (; !aIsActual && aGIter != aDeleted->groups().cend(); aGIter++) {
+          std::list<std::shared_ptr<ModelAPI_Document> >::iterator anOpened = allOpened.begin();
+          for(; anOpened != allOpened.end(); anOpened++) {
+            if (aGIter->first == *anOpened) {
+              aIsActual = true;
+              break;
+            }
+          }
+        }
+      }
+
+      if (aIsActual)
+        Events_InfoMessage("Model_Session",
+          "Modification of data structure outside of the transaction").send();
+    }
     // if part is deleted, make the root as the current document (on undo of Parts creations)
     static const Events_ID kDeletedEvent = Events_Loop::eventByName(EVENT_OBJECT_DELETED);
     if (theMessage->eventID() == kDeletedEvent) {
