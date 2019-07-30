@@ -141,7 +141,7 @@ assert(geompy.NumberOfSubShapes(shape3, geompy.ShapeType["VERTEX"]) == 3)
 field = salome.ObjectToSObject(shape3).FindSubObject(1)[1].GetObject()
 assert(field)
 assert(field.GetName() == "Field_1")
-assert(field.GetSteps() == [0, 1])
+assert(field.GetSteps() == [1, 2])
 
 shape4 = getGEOMShape(3)
 assert(not shape4)
