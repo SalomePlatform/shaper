@@ -29,6 +29,7 @@
 #include <ModelAPI_ResultBody.h>
 #include <ModelAPI_ResultBody.h>
 #include <ModelAPI_ResultConstruction.h>
+#include <ModelAPI_ResultGroup.h>
 #include <ModelAPI_ResultPart.h>
 #include <ModelAPI_CompositeFeature.h>
 #include <ModelAPI_Tools.h>
@@ -180,6 +181,9 @@ bool Model_AttributeSelection::setValue(const ObjectPtr& theContext,
     aSelLab.ForgetAllAttributes(true);
     TDataStd_UAttribute::Set(aSelLab, kPART_REF_ID);
     selectPart(std::dynamic_pointer_cast<ModelAPI_Result>(theContext), theSubShape);
+  } else if (theContext->groupName() == ModelAPI_ResultGroup::group()) {
+    aSelLab.ForgetAllAttributes(true);
+    TDataStd_UAttribute::Set(aSelLab, kSIMPLE_REF_ID);
   } else { // check the feature context: parent-Part of this feature should not be used
     FeaturePtr aFeatureContext = std::dynamic_pointer_cast<ModelAPI_Feature>(theContext);
     if (aFeatureContext.get()) {

@@ -18,6 +18,7 @@
 //
 
 #include "FeaturesPlugin_Pipe.h"
+#include "FeaturesPlugin_Tools.h"
 
 #include <ModelAPI_AttributeSelection.h>
 #include <ModelAPI_AttributeSelectionList.h>
@@ -373,11 +374,12 @@ void FeaturesPlugin_Pipe::storeResult(const ListOfShape& theBaseShapes,
     aResultBody->loadGeneratedShapes(thePipeAlgo, thePathShape, GeomAPI_Shape::EDGE);
 
   // Store from shapes.
-  storeShapes(aResultBody, theBaseShapes.front()->shapeType(), thePipeAlgo->fromShapes(), "From_");
+  FeaturesPlugin_Tools::loadModifiedShapes(aResultBody, thePipeAlgo->fromShapes(), ListOfShape(),
+                                           thePipeAlgo, thePipeAlgo->shape(), "From");
 
   // Store to shapes.
-  storeShapes(aResultBody, theBaseShapes.back()->shapeType(), thePipeAlgo->toShapes(), "To_");
-
+  FeaturesPlugin_Tools::loadModifiedShapes(aResultBody, thePipeAlgo->toShapes(), ListOfShape(),
+                                           thePipeAlgo, thePipeAlgo->shape(), "To");
 
   setResult(aResultBody, theResultIndex);
 }

@@ -63,8 +63,7 @@ Standard_Boolean PartSet_GlobalFilter::IsOk(const Handle(SelectMgr_EntityOwner)&
           if (aResultGroupName == ModelAPI_ResultPart::group()) {
             SessionPtr aMgr = ModelAPI_Session::get();
             aValid = aMgr->activeDocument() == aMgr->moduleDocument();
-          } else if (aResultGroupName == ModelAPI_ResultGroup::group() ||
-                     aResultGroupName == ModelAPI_ResultField::group()) {
+          } else if (aResultGroupName == ModelAPI_ResultField::group()) {
             aValid = Standard_False;
           } else
             aValid = Standard_True;

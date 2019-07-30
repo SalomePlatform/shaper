@@ -20,6 +20,7 @@
 #include <CollectionPlugin_Plugin.h>
 
 #include <CollectionPlugin_Group.h>
+#include <CollectionPlugin_GroupAddition.h>
 #include <CollectionPlugin_Field.h>
 #include <CollectionPlugin_Validators.h>
 #include <ModelAPI_Session.h>
@@ -56,6 +57,8 @@ FeaturePtr CollectionPlugin_Plugin::createFeature(std::string theFeatureID)
     return FeaturePtr(new CollectionPlugin_Group);
   } else if (theFeatureID == CollectionPlugin_Field::ID()) {
     return FeaturePtr(new CollectionPlugin_Field);
+  } else if (theFeatureID == CollectionPlugin_GroupAddition::ID()) {
+    return FeaturePtr(new CollectionPlugin_GroupAddition);
   }
 
   // feature of such kind is not found

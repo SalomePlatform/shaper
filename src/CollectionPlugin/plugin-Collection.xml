@@ -21,6 +21,15 @@
         </field-panel>
         <validator id="CollectionPlugin_FieldValidator"/>
       </feature>
+
+      <feature id="GroupAddition"
+        title="Group Addition"
+        tooltip="Join several groups to single group"
+        icon="icons/Collection/group_addition.png"
+        apply_continue="true"
+        helpfile="groupAdditionFeature.html">
+        <source path="group_addition_widget.xml"/>
+      </feature>
     </group>
   </workbench>
 </plugin>

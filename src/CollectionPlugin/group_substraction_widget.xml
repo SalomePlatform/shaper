@@ -1,0 +1,15 @@
+<source>
+  <namevalue id="name"
+    label="Name"
+    placeholder="Please input the group name">
+  </namevalue>
+  <multi_selector id="group_list"
+    tooltip="Select a set of objects"
+    type_choice="Vertices Edges Faces Solids"
+    use_choice="true"
+    clear_in_neutral_point="false"
+    filter_points="false"
+    same_topology="true">
+    <validator id="GeomValidators_BodyShapes"/>
+  </multi_selector>
+</source>
