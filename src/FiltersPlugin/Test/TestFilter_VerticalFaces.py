@@ -53,7 +53,7 @@ Reference = {
     model.selection("FACE", "LinearCopy_1_1_3/MF:Translated&Box_1_1/Right"): True,
     model.selection("FACE", "LinearCopy_1_1_3/MF:Translated&Box_1_1/Left"): True,
     # Faces of the cylinder
-    model.selection("FACE", "Translation_1_1/MF:Translated&Cylinder_1_1/Face_1"): False,
+    model.selection("FACE", "Translation_1_1/MF:Translated&Cylinder_1_1/Face_1"): True,
     model.selection("FACE", "Translation_1_1/MF:Translated&Cylinder_1_1/Face_2"): False,
     model.selection("FACE", "Translation_1_1/MF:Translated&Cylinder_1_1/Face_3"): False,
     # Edges and vertices are not applicable

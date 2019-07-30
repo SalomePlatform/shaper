@@ -35,12 +35,25 @@ bool FiltersPlugin_VerticalFace::isSupported(GeomAPI_Shape::ShapeType theType) c
 bool FiltersPlugin_VerticalFace::isOk(const GeomShapePtr& theShape, const ResultPtr&,
                                       const ModelAPI_FiltersArgs& theArgs) const
 {
-  if (!theShape->isFace() || !theShape->isPlanar())
-    return false;
+  static const double THE_TOLERANCE = 1.e-7;
+
+  bool isVertical = false;
+  if (!theShape->isFace())
+    return isVertical;
 
   GeomFacePtr aFace(new GeomAPI_Face(theShape));
 
   GeomPlanePtr aPlane = aFace->getPlane();
-  GeomDirPtr aDir = aPlane->direction();
-  return fabs(aDir->z()) <= 1.e-7;
+  if (aPlane) {
+    GeomDirPtr aDir = aPlane->direction();
+    isVertical = fabs(aDir->z()) <= THE_TOLERANCE;
+  }
+  else {
+    GeomCylinderPtr aCylinder = aFace->getCylinder();
+    if (aCylinder) {
+      GeomDirPtr aDir = aCylinder->axis();
+      isVertical = fabs(fabs(aDir->z()) - 1.0) <= THE_TOLERANCE;
+    }
+  }
+  return isVertical;
 }
