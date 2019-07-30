@@ -181,6 +181,16 @@ Q_OBJECT
   // \param theText is a title
   virtual void setColorScaleTitle(const QString& theText) = 0;
 
+  /// Switches On additional highlight for objects preselection
+  void showSelectionHighlight() {
+    myShowHighlight = true;
+  }
+
+  /// Switches Off additional highlight for objects preselection
+  void hideSelectionHighlight() {
+    myShowHighlight = false;
+  }
+
   static Handle(Prs3d_Drawer) DefaultHighlightDrawer;
 
 signals:
@@ -235,6 +245,8 @@ signals:
     QMap<Handle(V3d_View), double> myWindowScale;
 
     bool myIs2dMode;
+
+    bool myShowHighlight;
 };
 
 #endif

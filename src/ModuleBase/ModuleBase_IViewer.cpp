@@ -22,7 +22,7 @@
 Handle(Prs3d_Drawer) ModuleBase_IViewer::DefaultHighlightDrawer;
 
 ModuleBase_IViewer::ModuleBase_IViewer(QObject* theParent)
-  : QObject(theParent), myIs2dMode(false)
+  : QObject(theParent), myIs2dMode(false), myShowHighlight(false)
 {
 
 }

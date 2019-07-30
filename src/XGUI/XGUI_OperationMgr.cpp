@@ -94,13 +94,7 @@ public:
       else if (theEvent->type() == QEvent::KeyPress) {
         QKeyEvent* aKeyEvent = dynamic_cast<QKeyEvent*>(theEvent);
         myOperationMgr->setSHIFTPressed(aKeyEvent->modifiers() & Qt::ShiftModifier);
-        switch (aKeyEvent->key()) {
-          case Qt::Key_Escape:
-            isAccepted = myOperationMgr->onKeyPressed(theObject, aKeyEvent);
-          break;
-          default:
-            break;
-        }
+        isAccepted = myOperationMgr->onKeyPressed(theObject, aKeyEvent);
       }
     }
     if (!isAccepted)
@@ -688,10 +682,13 @@ bool XGUI_OperationMgr::onKeyReleased(QObject *theObject, QKeyEvent* theEvent)
           isAccepted = true;
         }
       }
-    }
-    break;
-    break;
-    default:
+      }
+      break;
+   case Qt::Key_H:
+     if ((theEvent->modifiers() == Qt::NoModifier))
+      myWorkshop->viewer()->hideSelectionHighlight();
+     break;
+   default:
       isAccepted = false;
       break;
   }
@@ -744,6 +741,10 @@ bool XGUI_OperationMgr::onKeyPressed(QObject *theObject, QKeyEvent* theEvent)
       }
     }
     break;
+    case Qt::Key_H:
+      if ((theEvent->modifiers() == Qt::NoModifier))
+        myWorkshop->viewer()->showSelectionHighlight();
+      break;
   }
   return isAccepted;
 }

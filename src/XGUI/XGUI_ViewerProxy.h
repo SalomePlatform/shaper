@@ -210,7 +210,6 @@ private slots:
   ResultPtr myResult;
   AIS_ListOfInteractive myHighlights;
 
-  bool myShowHighlight;
 };
 
 #endif

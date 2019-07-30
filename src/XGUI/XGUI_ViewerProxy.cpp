@@ -48,7 +48,7 @@
 
 XGUI_ViewerProxy::XGUI_ViewerProxy(XGUI_Workshop* theParent)
     : ModuleBase_IViewer(theParent),
-      myWorkshop(theParent), myShowHighlight(false)
+      myWorkshop(theParent)
 {
 }
 
