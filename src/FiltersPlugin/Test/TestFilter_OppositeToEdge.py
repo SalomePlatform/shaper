@@ -54,34 +54,72 @@ while exp.more():
 # sub-result 0
 SubResult = Partition_1.result().subResult(0).resultSubShapePair()[0]
 exp = GeomAPI_ShapeExplorer(SubResult.shape(), GeomAPI_Shape.EDGE)
+# edges of face 1
 Reference[model.selection(SubResult, exp.current())] = False; exp.next()
 Reference[model.selection(SubResult, exp.current())] = True;  exp.next()
 Reference[model.selection(SubResult, exp.current())] = False; exp.next()
 Reference[model.selection(SubResult, exp.current())] = True;  exp.next()
+# edges of face 2
 Reference[model.selection(SubResult, exp.current())] = False; exp.next()
 Reference[model.selection(SubResult, exp.current())] = False; exp.next()
 Reference[model.selection(SubResult, exp.current())] = False; exp.next()
 Reference[model.selection(SubResult, exp.current())] = False; exp.next()
+# edges of face 3
 Reference[model.selection(SubResult, exp.current())] = False; exp.next()
 Reference[model.selection(SubResult, exp.current())] = True;  exp.next()
 Reference[model.selection(SubResult, exp.current())] = False; exp.next()
 Reference[model.selection(SubResult, exp.current())] = True;  exp.next()
+# edges of face 4
+Reference[model.selection(SubResult, exp.current())] = False; exp.next()
+Reference[model.selection(SubResult, exp.current())] = False; exp.next()
+Reference[model.selection(SubResult, exp.current())] = False; exp.next()
+Reference[model.selection(SubResult, exp.current())] = False; exp.next()
+# edges of face 5
+Reference[model.selection(SubResult, exp.current())] = True;  exp.next()
+Reference[model.selection(SubResult, exp.current())] = False; exp.next()
+Reference[model.selection(SubResult, exp.current())] = True;  exp.next()
+Reference[model.selection(SubResult, exp.current())] = False; exp.next()
+# edges of face 6
+Reference[model.selection(SubResult, exp.current())] = True;  exp.next()
+Reference[model.selection(SubResult, exp.current())] = False; exp.next()
+Reference[model.selection(SubResult, exp.current())] = True;  exp.next()
+Reference[model.selection(SubResult, exp.current())] = False; exp.next()
+assert(not exp.more())
 
 # sub-result 1
 SubResult = Partition_1.result().subResult(1).resultSubShapePair()[0]
 exp = GeomAPI_ShapeExplorer(SubResult.shape(), GeomAPI_Shape.EDGE)
+# edges of face 1
 Reference[model.selection(SubResult, exp.current())] = False; exp.next()
 Reference[model.selection(SubResult, exp.current())] = True;  exp.next()
 Reference[model.selection(SubResult, exp.current())] = False; exp.next()
 Reference[model.selection(SubResult, exp.current())] = True;  exp.next()
+# edges of face 2
 Reference[model.selection(SubResult, exp.current())] = False; exp.next()
 Reference[model.selection(SubResult, exp.current())] = False; exp.next()
 Reference[model.selection(SubResult, exp.current())] = False; exp.next()
 Reference[model.selection(SubResult, exp.current())] = False; exp.next()
+# edges of face 3
 Reference[model.selection(SubResult, exp.current())] = True;  exp.next()
 Reference[model.selection(SubResult, exp.current())] = False; exp.next()
 Reference[model.selection(SubResult, exp.current())] = True;  exp.next()
 Reference[model.selection(SubResult, exp.current())] = False; exp.next()
+# edges of face 4
+Reference[model.selection(SubResult, exp.current())] = False; exp.next()
+Reference[model.selection(SubResult, exp.current())] = False; exp.next()
+Reference[model.selection(SubResult, exp.current())] = False; exp.next()
+Reference[model.selection(SubResult, exp.current())] = False; exp.next()
+# edges of face 5
+Reference[model.selection(SubResult, exp.current())] = False; exp.next()
+Reference[model.selection(SubResult, exp.current())] = True;  exp.next()
+Reference[model.selection(SubResult, exp.current())] = False; exp.next()
+Reference[model.selection(SubResult, exp.current())] = True;  exp.next()
+# edges of face 6
+Reference[model.selection(SubResult, exp.current())] = False; exp.next()
+Reference[model.selection(SubResult, exp.current())] = True;  exp.next()
+Reference[model.selection(SubResult, exp.current())] = False; exp.next()
+Reference[model.selection(SubResult, exp.current())] = True;  exp.next()
+assert(not exp.more())
 
 # sub-result 2
 SubResult = Partition_1.result().subResult(2).resultSubShapePair()[0]
@@ -100,18 +138,37 @@ while exp.more():
 # sub-result 4
 SubResult = Partition_1.result().subResult(4).resultSubShapePair()[0]
 exp = GeomAPI_ShapeExplorer(SubResult.shape(), GeomAPI_Shape.EDGE)
+# edges of face 1
 Reference[model.selection(SubResult, exp.current())] = False; exp.next()
 Reference[model.selection(SubResult, exp.current())] = False; exp.next()
 Reference[model.selection(SubResult, exp.current())] = False; exp.next()
 Reference[model.selection(SubResult, exp.current())] = False; exp.next()
+# edges of face 2
 Reference[model.selection(SubResult, exp.current())] = True;  exp.next()
 Reference[model.selection(SubResult, exp.current())] = False; exp.next()
 Reference[model.selection(SubResult, exp.current())] = True;  exp.next()
 Reference[model.selection(SubResult, exp.current())] = False; exp.next()
+# edges of face 3
 Reference[model.selection(SubResult, exp.current())] = False; exp.next()
 Reference[model.selection(SubResult, exp.current())] = True;  exp.next()
 Reference[model.selection(SubResult, exp.current())] = False; exp.next()
 Reference[model.selection(SubResult, exp.current())] = True;  exp.next()
+# edges of face 4
+Reference[model.selection(SubResult, exp.current())] = False; exp.next()
+Reference[model.selection(SubResult, exp.current())] = True;  exp.next()
+Reference[model.selection(SubResult, exp.current())] = False; exp.next()
+Reference[model.selection(SubResult, exp.current())] = True;  exp.next()
+# edges of face 5
+Reference[model.selection(SubResult, exp.current())] = True;  exp.next()
+Reference[model.selection(SubResult, exp.current())] = False; exp.next()
+Reference[model.selection(SubResult, exp.current())] = True;  exp.next()
+Reference[model.selection(SubResult, exp.current())] = False; exp.next()
+# edges of face 6
+Reference[model.selection(SubResult, exp.current())] = False; exp.next()
+Reference[model.selection(SubResult, exp.current())] = False; exp.next()
+Reference[model.selection(SubResult, exp.current())] = False; exp.next()
+Reference[model.selection(SubResult, exp.current())] = False; exp.next()
+assert(not exp.more())
 
 # sub-result 5
 SubResult = Partition_1.result().subResult(5).resultSubShapePair()[0]
@@ -123,18 +180,37 @@ while exp.more():
 # sub-result 6
 SubResult = Partition_1.result().subResult(6).resultSubShapePair()[0]
 exp = GeomAPI_ShapeExplorer(SubResult.shape(), GeomAPI_Shape.EDGE)
+# edges of face 1
 Reference[model.selection(SubResult, exp.current())] = False; exp.next()
 Reference[model.selection(SubResult, exp.current())] = True;  exp.next()
 Reference[model.selection(SubResult, exp.current())] = False; exp.next()
 Reference[model.selection(SubResult, exp.current())] = True;  exp.next()
+# edges of face 2
 Reference[model.selection(SubResult, exp.current())] = False; exp.next()
 Reference[model.selection(SubResult, exp.current())] = False; exp.next()
 Reference[model.selection(SubResult, exp.current())] = False; exp.next()
 Reference[model.selection(SubResult, exp.current())] = False; exp.next()
+# edges of face 3
 Reference[model.selection(SubResult, exp.current())] = False; exp.next()
 Reference[model.selection(SubResult, exp.current())] = True;  exp.next()
 Reference[model.selection(SubResult, exp.current())] = False; exp.next()
 Reference[model.selection(SubResult, exp.current())] = True;  exp.next()
+# edges of face 4
+Reference[model.selection(SubResult, exp.current())] = False; exp.next()
+Reference[model.selection(SubResult, exp.current())] = False; exp.next()
+Reference[model.selection(SubResult, exp.current())] = False; exp.next()
+Reference[model.selection(SubResult, exp.current())] = False; exp.next()
+# edges of face 5
+Reference[model.selection(SubResult, exp.current())] = False; exp.next()
+Reference[model.selection(SubResult, exp.current())] = True;  exp.next()
+Reference[model.selection(SubResult, exp.current())] = False; exp.next()
+Reference[model.selection(SubResult, exp.current())] = True;  exp.next()
+# edges of face 6
+Reference[model.selection(SubResult, exp.current())] = True;  exp.next()
+Reference[model.selection(SubResult, exp.current())] = False; exp.next()
+Reference[model.selection(SubResult, exp.current())] = True;  exp.next()
+Reference[model.selection(SubResult, exp.current())] = False; exp.next()
+assert(not exp.more())
 
 # sub-result 7
 SubResult = Partition_1.result().subResult(7).resultSubShapePair()[0]

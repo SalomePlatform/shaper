@@ -179,4 +179,5 @@ ADD_UNIT_TESTS(
   TestFilter_TopoConnectedFaces_Prop_Exclude_Face2.py
   TestFilter_TopoConnectedFaces_Prop_Exclude_Face3.py
   Test2946.py
+  Test2951.py
 )

@@ -67,6 +67,7 @@ SET(PROJECT_HEADERS
     GeomAPI_Cone.h
     GeomAPI_Torus.h
     GeomAPI_Box.h
+    GeomAPI_WireExplorer.h
 )
 
 SET(PROJECT_SOURCES
@@ -112,6 +113,7 @@ SET(PROJECT_SOURCES
     GeomAPI_Cone.cpp
     GeomAPI_Torus.cpp
     GeomAPI_Box.cpp
+    GeomAPI_WireExplorer.cpp
 )
 
 SET(PROJECT_LIBRARIES

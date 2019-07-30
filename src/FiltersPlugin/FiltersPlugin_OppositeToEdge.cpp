@@ -25,6 +25,8 @@
 
 #include <GeomAPI_Shape.h>
 #include <GeomAPI_ShapeExplorer.h>
+#include <GeomAPI_Wire.h>
+#include <GeomAPI_WireExplorer.h>
 
 #include <map>
 
@@ -51,12 +53,21 @@ static GeomShapePtr oppositeEdgeInQuadFace(const GeomShapePtr theEdge,
   int aNbEdges = 0;
   int anOriginalEdgeIndex = -THE_QUAD;
   GeomShapePtr anOppositeEdge;
-  GeomAPI_ShapeExplorer anExp(theFace, GeomAPI_Shape::EDGE);
+  GeomAPI_ShapeExplorer aWExp(theFace, GeomAPI_Shape::WIRE);
+  GeomWirePtr aWire = aWExp.current()->wire();
+  aWExp.next();
+  if (aWExp.more()) {
+    // face with a hole is not a quadrangle
+    return anOppositeEdge;
+  }
+
+  GeomAPI_WireExplorer anExp(aWire);
   while (anExp.more()) {
     if (anExp.current()->isSame(theEdge))
       anOriginalEdgeIndex = aNbEdges;
     else if (aNbEdges == anOriginalEdgeIndex + THE_QUAD / 2) {
-      anOppositeEdge = anExp.current();
+      if (anOriginalEdgeIndex < THE_QUAD)
+        anOppositeEdge = anExp.current();
       if (aNbEdges >= THE_QUAD)
         break;
     }
@@ -70,7 +81,7 @@ static GeomShapePtr oppositeEdgeInQuadFace(const GeomShapePtr theEdge,
         break;
       }
       if (!anOppositeEdge)
-        anExp.reinit();
+        anExp.init(aWire);
     }
   }
   return anOppositeEdge;
@@ -133,8 +144,11 @@ bool FiltersPlugin_OppositeToEdge::isOk(const GeomShapePtr& theShape, const Resu
 
   if (myCachedShapes.empty()) {
     ResultBodyPtr aBaseResult = ModelAPI_Tools::bodyOwner(aList->context(), true);
-    if (!aBaseResult.get())
-      return false;
+    if (!aBaseResult.get()) {
+      aBaseResult = std::dynamic_pointer_cast<ModelAPI_ResultBody>(aList->context());
+      if (!aBaseResult.get())
+        return false;
+    }
 
     cacheOppositeEdges(aBaseResult->shape(), anEdge,
         const_cast<FiltersPlugin_OppositeToEdge*>(this)->myCachedShapes);

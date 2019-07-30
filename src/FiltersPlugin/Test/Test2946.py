@@ -16,6 +16,7 @@
 #
 # See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 #
+
 from SketchAPI import *
 
 from salome.shaper import model
@@ -82,9 +83,6 @@ SketchConstraintCoincidence_26 = Sketch_1.setCoincident(SketchArc_7.endPoint(), 
 SketchConstraintCoincidence_27 = Sketch_1.setCoincident(SketchArc_8.startPoint(), SketchLine_1.result())
 model.do()
 Extrusion_1 = model.addExtrusion(Part_1_doc, [model.selection("FACE", "Sketch_1/Face-SketchArc_8_2f-SketchLine_7f-SketchArc_1_2f-SketchLine_4r-SketchArc_5_2f-SketchLine_8f-SketchArc_2_2f-SketchLine_5r-SketchArc_6_2f-SketchLine_9f-SketchArc_3_2f-SketchLine_6r-SketchArc_7_2f-SketchLine_3f-SketchArc_4_2f-SketchLine_1r-SketchCircle_1_2r")], model.selection(), 10, 0)
-#Group_1_objects = [model.selection("EDGE", "[Extrusion_1_1/Generated_Face&Sketch_1/SketchLine_7][Extrusion_1_1/To_Face]"), model.selection("EDGE", "[Extrusion_1_1/Generated_Face&Sketch_1/SketchLine_4][Extrusion_1_1/To_Face]"), model.selection("EDGE", "[Extrusion_1_1/Generated_Face&Sketch_1/SketchLine_8][Extrusion_1_1/To_Face]"), model.selection("EDGE", "[Extrusion_1_1/Generated_Face&Sketch_1/SketchLine_5][Extrusion_1_1/To_Face]"), model.selection("EDGE", "[Extrusion_1_1/Generated_Face&Sketch_1/SketchLine_9][Extrusion_1_1/To_Face]"), model.selection("EDGE", "[Extrusion_1_1/Generated_Face&Sketch_1/SketchLine_6][Extrusion_1_1/To_Face]"), model.selection("EDGE", "[Extrusion_1_1/Generated_Face&Sketch_1/SketchLine_3][Extrusion_1_1/To_Face]"), model.selection("EDGE", "[Extrusion_1_1/Generated_Face&Sketch_1/SketchLine_1][Extrusion_1_1/To_Face]"), model.selection("EDGE", "[Extrusion_1_1/Generated_Face&Sketch_1/SketchCircle_1_2][Extrusion_1_1/To_Face]"), model.filters(Part_1_doc, [model.addFilter(name = "OnPlane", args = [model.selection()])])]
-#Group_1 = model.addGroup(Part_1_doc, Group_1_objects)
-#model.do()
 Filters = model.filters(Part_1_doc, [model.addFilter(name = "OnPlane", args = [model.selection("FACE", "Extrusion_1_1/To_Face")])])
 model.end()
 
