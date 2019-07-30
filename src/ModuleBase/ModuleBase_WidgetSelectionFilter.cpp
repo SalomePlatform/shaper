@@ -469,6 +469,7 @@ void ModuleBase_WidgetSelectionFilter::onSelect()
     updatePreview(aComp);
   updateNumberSelected();
   updateObject(myFeature);
+  onShowOnly(myShowBtn->isChecked());
 }
 
 void ModuleBase_WidgetSelectionFilter::updatePreview(const TopoDS_Shape& theShape)
@@ -507,9 +508,11 @@ void ModuleBase_WidgetSelectionFilter::onShowOnly(bool theShow)
   Handle(AIS_InteractiveContext) aCtx = myWorkshop->viewer()->AISContext();
 
   if (theShow) {
-    myListIO.Clear();
-    aCtx->DisplayedObjects(AIS_KOI_Shape, -1, myListIO);
-    myListIO.Remove(myPreview);
+    AIS_ListOfInteractive aList;
+    aCtx->DisplayedObjects(AIS_KOI_Shape, -1, aList);
+    aList.Remove(myPreview);
+    if (aList.Size() > 0)
+      myListIO = aList;
   }
   AIS_ListOfInteractive::const_iterator aIt;
   Handle(AIS_Shape) aShapeIO;
