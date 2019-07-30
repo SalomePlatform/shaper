@@ -446,8 +446,8 @@ void ExchangePlugin_ExportFeature::exportXAO(const std::string& theFileName)
 
         AttributeIntArrayPtr aStamps = aFieldFeature->intArray("stamps");
         for (int aStepIndex = 0; aStepIndex < aTables->tables(); aStepIndex++) {
-          XAO::Step* aStep = aXaoField->addNewStep(aStepIndex);
-          aStep->setStep(aStepIndex);
+          XAO::Step* aStep = aXaoField->addNewStep(aStepIndex + 1);
+          aStep->setStep(aStepIndex + 1);
           int aStampIndex = aStamps->value(aStepIndex);
           aStep->setStamp(aStampIndex);
           int aNumElements = isWholePart ? aXaoField->countElements() : aTables->rows();
