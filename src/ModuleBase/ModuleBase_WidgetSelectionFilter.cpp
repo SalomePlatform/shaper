@@ -630,5 +630,20 @@ void ModuleBase_WidgetSelectionFilter::onObjectUpdated()
   myShowBtn->setChecked(false);
   clearCurrentSelection(true);
   updateNumberSelected();
+
+  QList<ModuleBase_FilterItem*> aItemsList = myFiltersWgt->findChildren<ModuleBase_FilterItem*>();
+  foreach(ModuleBase_FilterItem* aItem, aItemsList) {
+    QList<ModuleBase_ModelWidget*> aWidgetsList = aItem->widgets();
+    foreach(ModuleBase_ModelWidget* aWidget, aWidgetsList) {
+      if (!aWidget->feature().get())
+        aWidget->setFeature(myFeature);
+      aWidget->restoreValue();
+    }
+  }
   updateObject(myFeature);
+
+  // Redisplay the feature on order to Customize presentations from filters with selectors
+  static Events_ID EVENT_DISP = Events_Loop::loop()->eventByName(EVENT_OBJECT_TO_REDISPLAY);
+  ModelAPI_EventCreator::get()->sendUpdated(myFeature, EVENT_DISP);
+  Events_Loop::loop()->flush(EVENT_DISP);
 }
