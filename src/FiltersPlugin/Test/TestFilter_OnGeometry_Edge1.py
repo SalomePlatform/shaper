@@ -29,7 +29,7 @@ Plane_4 = model.addPlane(Part_1_doc, model.selection("FACE", "Box_1_1/Left"), mo
 Partition_1 = model.addPartition(Part_1_doc, [model.selection("SOLID", "Box_1_1"), model.selection("FACE", "Plane_1")], 20190506)
 Cylinder_1 = model.addCylinder(Part_1_doc, model.selection("VERTEX", "PartSet/Origin"), model.selection("EDGE", "PartSet/OZ"), 5, 10)
 Translation_1 = model.addTranslation(Part_1_doc, [model.selection("SOLID", "Cylinder_1_1")], model.selection("EDGE", "PartSet/OX"), 20)
-FilterFace = model.filters(Part_1_doc, [model.addFilter(name = "OnGeometry", exclude = True, args = [model.selection("EDGE", "Partition_1_1_2/Generated_Edge&Plane_1/Plane_1&Box_1_1/Front"), model.selection("EDGE", "[Partition_1_1_1/Modified_Face&Box_1_1/Top][Partition_1_1_1/Modified_Face&Box_1_1/Front]")])])
+FilterFace = model.filters(Part_1_doc, [model.addFilter(name = "OnGeometry", args = [model.selection("EDGE", "Partition_1_1_2/Generated_Edge&Plane_1/Plane_1&Box_1_1/Front"), model.selection("EDGE", "[Partition_1_1_1/Modified_Face&Box_1_1/Top][Partition_1_1_1/Modified_Face&Box_1_1/Front]")])])
 model.end()
 
 Reference = {}
@@ -37,79 +37,80 @@ Reference = {}
 ResultBox_1 = Partition_1.result().resultSubShapePair()[0]
 exp = GeomAPI_ShapeExplorer(ResultBox_1.shape(), GeomAPI_Shape.FACE)
 while exp.more():
-  Reference[model.selection(ResultBox_1, exp.current())] = True
+  Reference[model.selection(ResultBox_1, exp.current())] = False
   exp.next()
 # Faces of the cylinder
 ResultCylinder_1 = Translation_1.result().resultSubShapePair()[0]
 exp = GeomAPI_ShapeExplorer(ResultCylinder_1.shape(), GeomAPI_Shape.FACE)
 while exp.more():
-  Reference[model.selection(ResultCylinder_1, exp.current())] = True
+  Reference[model.selection(ResultCylinder_1, exp.current())] = False
   exp.next()
 # Edges of the original box (selected as a sub-shapes of the result to keep original surface).
 # Note: the expected values have to be updated if ShapeExplorer will return another order of sub-shapes.
 exp = GeomAPI_ShapeExplorer(ResultBox_1.shape(), GeomAPI_Shape.EDGE)
-Reference[model.selection(ResultBox_1, exp.current())] = True;  exp.next()
-Reference[model.selection(ResultBox_1, exp.current())] = True;  exp.next()
-Reference[model.selection(ResultBox_1, exp.current())] = True;  exp.next()
-Reference[model.selection(ResultBox_1, exp.current())] = True;  exp.next()
-Reference[model.selection(ResultBox_1, exp.current())] = True;  exp.next()
-Reference[model.selection(ResultBox_1, exp.current())] = True;  exp.next()
 Reference[model.selection(ResultBox_1, exp.current())] = False; exp.next()
-Reference[model.selection(ResultBox_1, exp.current())] = True;  exp.next()
-Reference[model.selection(ResultBox_1, exp.current())] = True;  exp.next()
 Reference[model.selection(ResultBox_1, exp.current())] = False; exp.next()
-Reference[model.selection(ResultBox_1, exp.current())] = True;  exp.next()
-Reference[model.selection(ResultBox_1, exp.current())] = True;  exp.next()
-Reference[model.selection(ResultBox_1, exp.current())] = True;  exp.next()
-Reference[model.selection(ResultBox_1, exp.current())] = True;  exp.next()
-Reference[model.selection(ResultBox_1, exp.current())] = True;  exp.next()
-Reference[model.selection(ResultBox_1, exp.current())] = True;  exp.next()
-Reference[model.selection(ResultBox_1, exp.current())] = True;  exp.next()
-Reference[model.selection(ResultBox_1, exp.current())] = True;  exp.next()
-Reference[model.selection(ResultBox_1, exp.current())] = True;  exp.next()
+Reference[model.selection(ResultBox_1, exp.current())] = False; exp.next()
+Reference[model.selection(ResultBox_1, exp.current())] = False; exp.next()
+Reference[model.selection(ResultBox_1, exp.current())] = False; exp.next()
+Reference[model.selection(ResultBox_1, exp.current())] = False; exp.next()
 Reference[model.selection(ResultBox_1, exp.current())] = True;  exp.next()
 Reference[model.selection(ResultBox_1, exp.current())] = False; exp.next()
 Reference[model.selection(ResultBox_1, exp.current())] = False; exp.next()
 Reference[model.selection(ResultBox_1, exp.current())] = True;  exp.next()
-Reference[model.selection(ResultBox_1, exp.current())] = True;  exp.next()
-Reference[model.selection(ResultBox_1, exp.current())] = True;  exp.next()
-Reference[model.selection(ResultBox_1, exp.current())] = True;  exp.next()
-Reference[model.selection(ResultBox_1, exp.current())] = True;  exp.next()
-Reference[model.selection(ResultBox_1, exp.current())] = True;  exp.next()
-Reference[model.selection(ResultBox_1, exp.current())] = True;  exp.next()
-Reference[model.selection(ResultBox_1, exp.current())] = True;  exp.next()
 Reference[model.selection(ResultBox_1, exp.current())] = False; exp.next()
-Reference[model.selection(ResultBox_1, exp.current())] = True;  exp.next()
-Reference[model.selection(ResultBox_1, exp.current())] = True;  exp.next()
-Reference[model.selection(ResultBox_1, exp.current())] = True;  exp.next()
-Reference[model.selection(ResultBox_1, exp.current())] = True;  exp.next()
-Reference[model.selection(ResultBox_1, exp.current())] = True;  exp.next()
-Reference[model.selection(ResultBox_1, exp.current())] = True;  exp.next()
-Reference[model.selection(ResultBox_1, exp.current())] = True;  exp.next()
-Reference[model.selection(ResultBox_1, exp.current())] = True;  exp.next()
-Reference[model.selection(ResultBox_1, exp.current())] = True;  exp.next()
-Reference[model.selection(ResultBox_1, exp.current())] = True;  exp.next()
+Reference[model.selection(ResultBox_1, exp.current())] = False; exp.next()
+Reference[model.selection(ResultBox_1, exp.current())] = False; exp.next()
+Reference[model.selection(ResultBox_1, exp.current())] = False; exp.next()
+Reference[model.selection(ResultBox_1, exp.current())] = False; exp.next()
+Reference[model.selection(ResultBox_1, exp.current())] = False; exp.next()
+Reference[model.selection(ResultBox_1, exp.current())] = False; exp.next()
+Reference[model.selection(ResultBox_1, exp.current())] = False; exp.next()
+Reference[model.selection(ResultBox_1, exp.current())] = False; exp.next()
 Reference[model.selection(ResultBox_1, exp.current())] = False; exp.next()
 Reference[model.selection(ResultBox_1, exp.current())] = True;  exp.next()
 Reference[model.selection(ResultBox_1, exp.current())] = True;  exp.next()
 Reference[model.selection(ResultBox_1, exp.current())] = False; exp.next()
-Reference[model.selection(ResultBox_1, exp.current())] = True;  exp.next()
+Reference[model.selection(ResultBox_1, exp.current())] = False; exp.next()
+Reference[model.selection(ResultBox_1, exp.current())] = False; exp.next()
+Reference[model.selection(ResultBox_1, exp.current())] = False; exp.next()
+Reference[model.selection(ResultBox_1, exp.current())] = False; exp.next()
+Reference[model.selection(ResultBox_1, exp.current())] = False; exp.next()
+Reference[model.selection(ResultBox_1, exp.current())] = False; exp.next()
+Reference[model.selection(ResultBox_1, exp.current())] = False; exp.next()
 Reference[model.selection(ResultBox_1, exp.current())] = True;  exp.next()
 Reference[model.selection(ResultBox_1, exp.current())] = False; exp.next()
+Reference[model.selection(ResultBox_1, exp.current())] = False; exp.next()
+Reference[model.selection(ResultBox_1, exp.current())] = False; exp.next()
+Reference[model.selection(ResultBox_1, exp.current())] = False; exp.next()
+Reference[model.selection(ResultBox_1, exp.current())] = False; exp.next()
+Reference[model.selection(ResultBox_1, exp.current())] = False; exp.next()
+Reference[model.selection(ResultBox_1, exp.current())] = False; exp.next()
+Reference[model.selection(ResultBox_1, exp.current())] = False; exp.next()
+Reference[model.selection(ResultBox_1, exp.current())] = False; exp.next()
+Reference[model.selection(ResultBox_1, exp.current())] = False; exp.next()
+Reference[model.selection(ResultBox_1, exp.current())] = True;  exp.next()
+Reference[model.selection(ResultBox_1, exp.current())] = False; exp.next()
+Reference[model.selection(ResultBox_1, exp.current())] = False; exp.next()
+Reference[model.selection(ResultBox_1, exp.current())] = True;  exp.next()
+Reference[model.selection(ResultBox_1, exp.current())] = False; exp.next()
+Reference[model.selection(ResultBox_1, exp.current())] = False; exp.next()
+Reference[model.selection(ResultBox_1, exp.current())] = True;  exp.next()
+assert(not exp.more())
 # Edges of the cylinder
 exp = GeomAPI_ShapeExplorer(ResultCylinder_1.shape(), GeomAPI_Shape.EDGE)
 while exp.more():
-  Reference[model.selection(ResultCylinder_1, exp.current())] = True
+  Reference[model.selection(ResultCylinder_1, exp.current())] = False
   exp.next()
 # Vertices of the original box
 exp = GeomAPI_ShapeExplorer(ResultBox_1.shape(), GeomAPI_Shape.VERTEX)
 while exp.more():
-  Reference[model.selection(ResultBox_1, exp.current())] = True
+  Reference[model.selection(ResultBox_1, exp.current())] = False
   exp.next()
 # Vertices of the cylinder
 exp = GeomAPI_ShapeExplorer(ResultCylinder_1.shape(), GeomAPI_Shape.VERTEX)
 while exp.more():
-  Reference[model.selection(ResultCylinder_1, exp.current())] = True
+  Reference[model.selection(ResultCylinder_1, exp.current())] = False
   exp.next()
 
 model.checkFilter(Part_1_doc, model, FilterFace, Reference)

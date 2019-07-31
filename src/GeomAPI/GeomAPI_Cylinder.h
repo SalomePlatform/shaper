@@ -59,6 +59,10 @@ public:
   /// Return \c true is the cylinder is infinite
   GEOMAPI_EXPORT bool isInfinite() const;
 
+  /// Returns true if cylinders have same axis and radii.
+  GEOMAPI_EXPORT bool isCoincident(const std::shared_ptr<GeomAPI_Cylinder> theCylinder,
+                                   const double theTolerance = 1.e-7);
+
 private:
   double myHeight;
 };

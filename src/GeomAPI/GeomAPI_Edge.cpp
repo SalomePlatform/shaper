@@ -41,6 +41,7 @@
 #include <Geom_TrimmedCurve.hxx>
 #include <Geom_Ellipse.hxx>
 #include <Geom_Plane.hxx>
+#include <GeomAPI_ExtremaCurveCurve.hxx>
 #include <GeomAPI_ExtremaCurveSurface.hxx>
 #include <GeomAPI_IntCS.hxx>
 #include <GeomAdaptor_Curve.hxx>
@@ -68,17 +69,34 @@ GeomAPI_Edge::GeomAPI_Edge(const std::shared_ptr<GeomAPI_Shape>& theShape)
   }
 }
 
+static Handle(Geom_Curve) baseCurve(const TopoDS_Edge& theEdge)
+{
+  double aFirst, aLast;
+  Handle(Geom_Curve) aCurve = BRep_Tool::Curve(theEdge, aFirst, aLast);
+  while (aCurve->IsKind(STANDARD_TYPE(Geom_TrimmedCurve))) {
+    Handle(Geom_TrimmedCurve) tc = Handle(Geom_TrimmedCurve)::DownCast(aCurve);
+    aCurve = tc->BasisCurve();
+  }
+  return aCurve;
+}
+
 bool GeomAPI_Edge::isSameGeometry(const std::shared_ptr<GeomAPI_Shape> theShape) const
 {
   if (!theShape->isEdge())
     return false;
+  if (isSame(theShape))
+    return true;
+
   TopoDS_Edge anOwnEdge = TopoDS::Edge(impl<TopoDS_Shape>());
   TopoDS_Edge anOtherEdge = TopoDS::Edge(theShape->impl<TopoDS_Shape>());
 
-  double aFirst, aLast;
-  Handle(Geom_Curve) anOwnCurve = BRep_Tool::Curve(anOwnEdge, aFirst, aLast);
-  Handle(Geom_Curve) anOtherCurve = BRep_Tool::Curve(anOtherEdge, aFirst, aLast);
-  return anOwnCurve == anOtherCurve;
+  Handle(Geom_Curve) anOwnCurve = baseCurve(anOwnEdge);
+  Handle(Geom_Curve) anOtherCurve = baseCurve(anOtherEdge);
+  GeomAPI_ExtremaCurveCurve anExtrema(anOwnCurve, anOtherCurve);
+
+  bool isSame = anExtrema.Extrema().IsParallel() &&
+                anExtrema.TotalLowerDistance() < Precision::Confusion();
+  return isSame;
 }
 
 bool GeomAPI_Edge::isLine() const

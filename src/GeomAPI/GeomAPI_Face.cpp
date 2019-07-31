@@ -32,13 +32,17 @@
 #include <BRepAdaptor_Surface.hxx>
 #include <BRepGProp_Face.hxx>
 #include <BRepTools.hxx>
+#include <BRepTopAdaptor_TopolTool.hxx>
 #include <Geom_Surface.hxx>
 #include <Geom_SphericalSurface.hxx>
 #include <Geom_ConicalSurface.hxx>
 #include <Geom_CylindricalSurface.hxx>
 #include <Geom_RectangularTrimmedSurface.hxx>
+#include <Geom_SweptSurface.hxx>
 #include <Geom_ToroidalSurface.hxx>
+#include <GeomAdaptor_HSurface.hxx>
 #include <GeomLib_IsPlanarSurface.hxx>
+#include <IntPatch_ImpImpIntersection.hxx>
 #include <IntTools_Context.hxx>
 #include <Standard_Type.hxx>
 #include <TopoDS.hxx>
@@ -104,16 +108,74 @@ bool GeomAPI_Face::isEqual(std::shared_ptr<GeomAPI_Shape> theFace) const
   return aRes == Standard_True;
 }
 
+static Handle(Geom_Surface) baseSurface(const TopoDS_Face& theFace)
+{
+  Handle(Geom_Surface) aSurf = BRep_Tool::Surface(theFace);
+  while (aSurf->IsKind(STANDARD_TYPE(Geom_RectangularTrimmedSurface))) {
+    Handle(Geom_RectangularTrimmedSurface) rts =
+        Handle(Geom_RectangularTrimmedSurface)::DownCast(aSurf);
+    aSurf = rts->BasisSurface();
+  }
+  return aSurf;
+}
+
 bool GeomAPI_Face::isSameGeometry(const std::shared_ptr<GeomAPI_Shape> theShape) const
 {
   if (!theShape->isFace())
     return false;
+  if (isSame(theShape))
+    return true;
+
+  GeomFacePtr anOther = theShape->face();
+  if (isPlanar() && anOther->isPlanar()) {
+    GeomPlanePtr anOwnPlane = getPlane();
+    GeomPlanePtr anOtherPlane = anOther->getPlane();
+    return anOwnPlane->isCoincident(anOtherPlane);
+  }
+
   TopoDS_Face anOwnFace = TopoDS::Face(impl<TopoDS_Shape>());
   TopoDS_Face anOtherFace = TopoDS::Face(theShape->impl<TopoDS_Shape>());
 
-  Handle(Geom_Surface) anOwnSurf = BRep_Tool::Surface(anOwnFace);
-  Handle(Geom_Surface) anOtherSurf = BRep_Tool::Surface(anOtherFace);
-  return anOwnSurf == anOtherSurf;
+  Handle(Geom_Surface) anOwnSurf = baseSurface(anOwnFace);
+  Handle(Geom_Surface) anOtherSurf = baseSurface(anOtherFace);
+
+  // case of two elementary surfaces
+  if (anOwnSurf->IsKind(STANDARD_TYPE(Geom_ElementarySurface)) &&
+      anOtherSurf->IsKind(STANDARD_TYPE(Geom_ElementarySurface)))
+  {
+    Handle(GeomAdaptor_HSurface) aGA1 = new GeomAdaptor_HSurface(anOwnSurf);
+    Handle(GeomAdaptor_HSurface) aGA2 = new GeomAdaptor_HSurface(anOtherSurf);
+
+    Handle(BRepTopAdaptor_TopolTool) aTT1 = new BRepTopAdaptor_TopolTool();
+    Handle(BRepTopAdaptor_TopolTool) aTT2 = new BRepTopAdaptor_TopolTool();
+
+    try {
+      IntPatch_ImpImpIntersection anIIInt(aGA1, aTT1, aGA2, aTT2,
+                                          Precision::Confusion(),
+                                          Precision::Confusion());
+      if (!anIIInt.IsDone() || anIIInt.IsEmpty())
+        return false;
+
+      return anIIInt.TangentFaces();
+    }
+    catch (Standard_Failure const&) {
+      return false;
+    }
+  }
+
+  // case of two cylindrical surfaces, at least one of which is a swept surface
+  // swept surfaces: SurfaceOfLinearExtrusion, SurfaceOfRevolution
+  if ((anOwnSurf->IsKind(STANDARD_TYPE(Geom_CylindricalSurface)) ||
+       anOwnSurf->IsKind(STANDARD_TYPE(Geom_SweptSurface))) &&
+      (anOtherSurf->IsKind(STANDARD_TYPE(Geom_CylindricalSurface)) ||
+       anOtherSurf->IsKind(STANDARD_TYPE(Geom_SweptSurface))))
+  {
+    GeomCylinderPtr anOwnCyl = getCylinder();
+    GeomCylinderPtr anOtherCyl = anOther->getCylinder();
+    return anOwnCyl && anOtherCyl && anOwnCyl->isCoincident(anOtherCyl);
+  }
+
+  return false;
 }
 
 bool GeomAPI_Face::isCylindrical() const

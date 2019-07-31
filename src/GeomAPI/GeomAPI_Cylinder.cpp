@@ -81,3 +81,26 @@ bool GeomAPI_Cylinder::isInfinite() const
 {
   return Precision::IsInfinite(myHeight);
 }
+
+//=================================================================================================
+bool GeomAPI_Cylinder::isCoincident(const GeomCylinderPtr theCylinder, const double theTolerance)
+{
+  if (!theCylinder)
+    return false;
+
+  gp_Cylinder* anOther = theCylinder->implPtr<gp_Cylinder>();
+  if (fabs(MY_CYL->Radius() - anOther->Radius()) < theTolerance) {
+    gp_Dir aDir1 = MY_CYL->Position().Direction();
+    gp_Dir aDir2 = anOther->Position().Direction();
+    if (aDir1.IsParallel(aDir2, Precision::Angular())) {
+      gp_Pnt aLoc1 = MY_CYL->Location();
+      gp_Pnt aLoc2 = anOther->Location();
+      gp_Vec aVec12(aLoc1, aLoc2);
+      if (aVec12.SquareMagnitude() < theTolerance * theTolerance ||
+          aVec12.IsParallel(aDir1, Precision::Angular())) {
+        return true;
+      }
+    }
+  }
+  return false;
+}
