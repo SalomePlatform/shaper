@@ -36,6 +36,12 @@ bool FiltersPlugin_ExternalFaces::isOk(const GeomShapePtr& theShape,
   if (!theShape->isFace())
     return false;
 
+  // verify INTERNAL flag
+  TopoDS_Shape aShape = theShape->impl<TopoDS_Shape>();
+  if (aShape.Orientation() == TopAbs_INTERNAL)
+    return false;
+
+  // check number of solids containing the face
   ResultBodyPtr anOwner = ModelAPI_Tools::bodyOwner(theResult, true);
   if (!anOwner) {
     anOwner = std::dynamic_pointer_cast<ModelAPI_ResultBody>(theResult);
@@ -47,6 +53,6 @@ bool FiltersPlugin_ExternalFaces::isOk(const GeomShapePtr& theShape,
   TopTools_IndexedDataMapOfShapeListOfShape aMapFS;
   TopExp::MapShapesAndUniqueAncestors(anOwnerShape->impl<TopoDS_Shape>(),
                                       TopAbs_FACE, TopAbs_SOLID, aMapFS);
-  const TopTools_ListOfShape& aSolids = aMapFS.FindFromKey(theShape->impl<TopoDS_Shape>());
+  const TopTools_ListOfShape& aSolids = aMapFS.FindFromKey(aShape);
   return aSolids.Extent() <= 1;
 }

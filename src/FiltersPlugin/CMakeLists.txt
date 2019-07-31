@@ -142,8 +142,10 @@ ADD_UNIT_TESTS(
   TestFilter_RelativeToSolid_Exclude_NotOn.py
   TestFilter_RelativeToSolid_Exclude_InAndOn.py
   TestFilter_RelativeToSolid_Exclude_OutAndOn.py
-  TestFilter_ExternalFaces.py
-  TestFilter_ExternalFaces_Exclude.py
+  TestFilter_ExternalFaces1.py
+  TestFilter_ExternalFaces2.py
+  TestFilter_ExternalFaces_Exclude1.py
+  TestFilter_ExternalFaces_Exclude2.py
   TestFilter_HorizontalFaces.py
   TestFilter_HorizontalFaces_Exclude.py
   TestFilter_VerticalFaces.py
