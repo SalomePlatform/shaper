@@ -389,6 +389,12 @@ bool MODULEBASE_EXPORT isNameExist(const QString& theName, FeaturePtr theIgnoreP
 /// \theName a name of parameter
 FeaturePtr MODULEBASE_EXPORT findParameter(const QString& theName);
 
+/// Returns true if both shapes are the same. In case of compounds it
+/// compares their contents.
+/// \param theShape1 a first shape to compare
+/// \param theShape2 a second shape to compare
+/// \return true if both shapes are the same
+bool MODULEBASE_EXPORT isSameShape(const TopoDS_Shape& theShape1, const TopoDS_Shape& theShape2);
 
 //----------- Class members -------------
 /// Returns a name in the next form: attribute_feature_name/attribute_id
