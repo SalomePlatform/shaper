@@ -98,6 +98,16 @@ public:
   /// it caused erroneus case because the presentation has linkage to the previous context.
   void clearPrs();
 
+  /// Disable displaying of custom mode
+  /// \param theMode a mode to disable
+  void disableCustomMode(ModuleBase_IModule::ModuleBase_CustomizeFlag theMode) {
+    myDisabledMode = theMode;
+    erasePresentation(theMode, false);
+  }
+
+  /// Enables disabled custom mode
+  void enableCustomModes() { myDisabledMode = -1; }
+
   //! Redefinition of Events_Listener method to listen a moment that the presentation becomes empty
   virtual void processEvent(const std::shared_ptr<Events_Message>& theMessage);
 
@@ -149,6 +159,8 @@ private:
   QMap<ModuleBase_IModule::ModuleBase_CustomizeFlag, AISObjectPtr> myPresentations;
   /// State whether the presentation is activated/deactivated
   QMap<ModuleBase_IModule::ModuleBase_CustomizeFlag, bool> myIsActive;
+
+  int myDisabledMode;
 };
 
 #endif

@@ -223,6 +223,8 @@ void ModuleBase_WidgetMultiSelector::activateCustom()
 //********************************************************************
 void ModuleBase_WidgetMultiSelector::deactivate()
 {
+  myWorkshop->module()->enableCustomModes();
+
   ModuleBase_WidgetSelector::deactivate();
   if (myVisibleObjects.size())
     onShowOnly(false);
@@ -1102,7 +1104,11 @@ void ModuleBase_WidgetMultiSelector::onShowOnly(bool theChecked)
     for (aIt = aResults.cbegin(); aIt != aResults.cend(); aIt++) {
       myVisibleObjects.removeAll(*aIt);
     }
+    myWorkshop->module()->disableCustomMode(ModuleBase_IModule::CustomizeArguments);
   }
+  else
+    myWorkshop->module()->enableCustomModes();
+
   foreach(ObjectPtr aObj, myVisibleObjects) {
     aObj->setDisplayed(!theChecked);
   }

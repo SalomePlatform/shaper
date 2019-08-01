@@ -235,7 +235,8 @@ void PartSet_OperationPrs::appendShapeIfVisible(ModuleBase_IWorkshop* theWorksho
                               QMap<ObjectPtr, QList<GeomShapePtr> >& theObjectShapes)
 {
   XGUI_Displayer* aDisplayer = XGUI_Tools::workshop(theWorkshop)->displayer();
-  if (XGUI_Displayer::isVisible(aDisplayer, theObject)) {
+  // VSV: Do not use isVisible checking because it can be used when state "Show Only" is ON
+  //if (XGUI_Displayer::isVisible(aDisplayer, theObject)) {
     if (theGeomShape.get()) {
       if (theObjectShapes.contains(theObject))
         theObjectShapes[theObject].append(theGeomShape);
@@ -250,7 +251,7 @@ void PartSet_OperationPrs::appendShapeIfVisible(ModuleBase_IWorkshop* theWorksho
               .arg(ModuleBase_Tools::objectInfo(theObject)).toStdString().c_str());
   #endif
     }
-  }
+  //}
 }
 
 void PartSet_OperationPrs::getFeatureShapes(const FeaturePtr& theFeature,

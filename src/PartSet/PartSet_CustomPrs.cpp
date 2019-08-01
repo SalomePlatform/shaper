@@ -41,7 +41,8 @@
 //#define DO_NOT_VISUALIZE_CUSTOM_PRESENTATION
 
 PartSet_CustomPrs::PartSet_CustomPrs(ModuleBase_IWorkshop* theWorkshop)
-  : myWorkshop(theWorkshop), myFeature(FeaturePtr()), myPresentationIsEmpty(false)
+  : myWorkshop(theWorkshop), myFeature(FeaturePtr()), myPresentationIsEmpty(false),
+  myDisabledMode(-1)
 {
   Events_Loop* aLoop = Events_Loop::loop();
   aLoop->registerListener(this, Events_Loop::eventByName(EVENT_EMPTY_OPERATION_PRESENTATION));
@@ -92,6 +93,9 @@ bool PartSet_CustomPrs::displayPresentation(
                                   const bool theUpdateViewer)
 {
   bool isModified = false;
+
+  if (myDisabledMode == theFlag)
+    return isModified;
 
   // update the AIS objects content
   AISObjectPtr aPresentation = getPresentation(theFlag, true);
@@ -243,7 +247,7 @@ void PartSet_CustomPrs::initPresentation(
   if (theFlag == ModuleBase_IModule::CustomizeArguments ||
       theFlag == ModuleBase_IModule::CustomizeResults) {
     anOperationPrs->setPointMarker(5, 2.);
-    anOperationPrs->setWidth(1);
+    anOperationPrs->setWidth((theFlag == ModuleBase_IModule::CustomizeHighlightedObjects)? 2 : 1);
   }
   else if (theFlag == ModuleBase_IModule::CustomizeHighlightedObjects)
     anAISPrs->useAISWidth();

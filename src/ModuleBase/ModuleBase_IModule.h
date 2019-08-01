@@ -290,6 +290,13 @@ class MODULEBASE_EXPORT ModuleBase_IModule : public QObject
   virtual bool customizeObject(ObjectPtr theObject, const ModuleBase_CustomizeFlag& theFlag,
                                const bool theUpdateViewer);
 
+  /// Disable displaying of custom mode
+  /// \param theMode a mode to disable
+  virtual void disableCustomMode(ModuleBase_CustomizeFlag theMode) {}
+
+  /// Enables disabled custom mode
+  virtual void enableCustomModes() {}
+
   /// This method is called on object browser creation for customization of module specific features
   /// \param theObjectBrowser a pinter on Object Browser widget
   virtual void customizeObjectBrowser(QWidget* theObjectBrowser) {}

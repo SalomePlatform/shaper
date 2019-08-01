@@ -1711,3 +1711,13 @@ ModuleBase_ITreeNode* PartSet_Module::rootNode() const
 {
   return myRoot;
 }
+
+//******************************************************
+void PartSet_Module::disableCustomMode(ModuleBase_CustomizeFlag theMode) {
+  myCustomPrs->disableCustomMode(theMode);
+}
+
+//******************************************************
+void PartSet_Module::enableCustomModes() {
+  myCustomPrs->enableCustomModes();
+}
