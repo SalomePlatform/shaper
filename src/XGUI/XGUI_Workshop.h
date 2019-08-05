@@ -504,7 +504,7 @@ private:
   void createDockWidgets();
 
   /// Extends undo/redo toolbutton's with history menu
-  /// \param theObject - in the OpenParts it is a QToolButton by itself,
+  /// \param theObject - in the CADBuilder it is a QToolButton by itself,
   /// in salome mode - QAction that creates a button.
   /// \param theSignal - void "updateUndoHistory" or "updateRedoHistory" SIGNAL;
   /// \param theSlot - onUndo(int) or onRedo(int) SLOT

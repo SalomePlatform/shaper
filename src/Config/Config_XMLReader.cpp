@@ -71,7 +71,7 @@ std::string Config_XMLReader::resourcesConfigFile()
     aValue = std::string(anEnv) +
       FSEP + "share" + FSEP + "salome" + FSEP + "resources" + FSEP + "shaper";
   } else {
-    anEnv = getenv("OPENPARTS_ROOT_DIR");
+    anEnv = getenv("CADBUILDER_ROOT_DIR");
     if (anEnv) {
       aValue = std::string(anEnv) + FSEP + "resources";
     }
@@ -87,7 +87,7 @@ std::string Config_XMLReader::pluginConfigFile()
     aValue = std::string(anEnv) +
       FSEP + "share" + FSEP + "salome" + FSEP + "resources" + FSEP + "shaper";
   } else {
-    anEnv = getenv("OPENPARTS_ROOT_DIR");
+    anEnv = getenv("CADBUILDER_ROOT_DIR");
     if (anEnv) {
       aValue = std::string(anEnv) + FSEP + "plugins";
     }
@@ -111,9 +111,9 @@ std::string Config_XMLReader::findConfigFile(const std::string theFileName, cons
       if (aSolution == 1)
         anEnvName<<"SHAPER_ROOT_DIR";
       else if (aSolution == 2)
-        anEnvName<<"OPENPARTS_ROOT_DIR";
+        anEnvName<<"CADBUILDER_ROOT_DIR";
       else
-        anEnvName<<"OPENPARTS_PLUGINS_DIR";
+        anEnvName<<"CADBUILDER_ROOT_DIR";
 
       char* anEnv = getenv(anEnvName.str().c_str());
       if (!anEnv)
@@ -151,7 +151,7 @@ std::string Config_XMLReader::findConfigFile(const std::string theFileName, cons
       if (aResultIndex == theFindIndex)
         return aFileName;
       aResultIndex++;
-      if (aSolution == 1) // don't allow SHAPER and OpenParts paths treated simultaneously
+      if (aSolution == 1) // don't allow SHAPER and CADBuilder paths treated simultaneously
         aSolution++;
     }
   }

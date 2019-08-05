@@ -168,7 +168,7 @@ Handle(Image_AlienPixMap) SketcherPrs_SymbolPrs::icon()
     aFile = std::string(anEnv) +
       FSEP + "share" + FSEP + "salome" + FSEP + "resources" + FSEP + "shaper";
   } else {
-    anEnv = getenv("OPENPARTS_ROOT_DIR");
+    anEnv = getenv("CADBUILDER_ROOT_DIR");
     if (anEnv)
       aFile = std::string(anEnv) + FSEP + "resources";
   }

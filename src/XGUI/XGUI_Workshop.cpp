@@ -178,8 +178,8 @@ static QString MyFilter(QObject::tr("SHAPER files (*.shaper *.opp)"));
 static QString MyFilter2(QObject::tr("SHAPER files (*.shaper)"));
 static QString MyExtension(".shaper");
 #else
-static QString MyFilter(QObject::tr("OpenParts files (*.opp);;All files (*.*)"));
-static QString MyFilter2(QObject::tr("OpenParts files (*.opp)"));
+static QString MyFilter(QObject::tr("CAD Builder files (*.opp);;All files (*.*)"));
+static QString MyFilter2(QObject::tr("CAD Builder files (*.opp)"));
 static QString MyExtension(".opp");
 #endif
 
@@ -624,7 +624,7 @@ void XGUI_Workshop::onHelpActionClicked()
             "salome" + aSep + "gui" + aSep + "SHAPER";
         }
 #else
-        QString aDir(getenv("OPENPARTS_ROOT_DIR"));
+        QString aDir(getenv("CADBUILDER_ROOT_DIR"));
         aDocDir = aDir + aSep + "doc" + aSep + "gui";
 #endif
         QString aFileName = aDocDir + aSep + aHelpPage;

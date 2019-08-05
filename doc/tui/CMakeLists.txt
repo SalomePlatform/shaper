@@ -24,7 +24,7 @@ ELSE (WIN32)
 ENDIF(WIN32)
 
 IF(HAVE_SALOME)
-  SET(EXCLUDE_DOC_DIR "*/AppElements/* */OpenParts/*")
+  SET(EXCLUDE_DOC_DIR "*/AppElements/* */CADBuilder/*")
 ELSE(HAVE_SALOME)
   SET(EXCLUDE_DOC_DIR "*/Shaper/*")
 ENDIF(HAVE_SALOME)
