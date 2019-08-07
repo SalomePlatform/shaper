@@ -34,7 +34,7 @@ Selection list in the property panel contains a list of exported objects which c
 
 **TUI Command**:
 
-.. py:function:: model.exportToFile(Part_doc, FileNameString, ObjectsList)*
+.. py:function:: model.exportToFile(Part_doc, FileNameString, ObjectsList)
 
     :param part: The current part object
     :param string: The file name
