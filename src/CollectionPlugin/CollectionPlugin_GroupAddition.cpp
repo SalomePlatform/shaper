@@ -26,20 +26,62 @@
 #include <ModelAPI_AttributeSelectionList.h>
 #include <ModelAPI_ResultGroup.h>
 
+#include <GeomAPI_ShapeIterator.h>
+#include <GeomAlgoAPI_CompoundBuilder.h>
+
 CollectionPlugin_GroupAddition::CollectionPlugin_GroupAddition()
 {
 }
 
 void CollectionPlugin_GroupAddition::initAttributes()
 {
-  data()->addAttribute(CollectionPlugin_Group::LIST_ID(),
+  data()->addAttribute(CollectionPlugin_GroupAddition::LIST_ID(),
                        ModelAPI_AttributeSelectionList::typeId());
+}
+
+static void explodeCompound(const GeomShapePtr& theCompound, ListOfShape& theSubs)
+{
+  if (theCompound->isCompound()) {
+    GeomAPI_ShapeIterator anIt(theCompound);
+    for (; anIt.more(); anIt.next())
+      explodeCompound(anIt.current(), theSubs);
+  }
+  else
+    theSubs.push_back(theCompound);
+}
+
+static void keepUniqueShapes(ListOfShape& theShapes)
+{
+  ListOfShape::iterator anIt = theShapes.begin();
+  while (anIt != theShapes.end()) {
+    GeomShapePtr aCurrent = *anIt;
+    ListOfShape::iterator anIt2 = theShapes.begin();
+    for (; anIt2 != anIt; ++anIt2)
+      if (aCurrent->isEqual(*anIt2))
+        break;
+    if (anIt2 != anIt) {
+      // the same shape is found
+      ListOfShape::iterator aRemoveIt = anIt++;
+      theShapes.erase(aRemoveIt);
+    }
+    else
+      ++anIt;
+  }
 }
 
 void CollectionPlugin_GroupAddition::execute()
 {
-  if (results().empty() || firstResult()->isDisabled()) { // just create result if not exists
-    ResultPtr aGroup = document()->createGroup(data());
-    setResult(aGroup);
-  }
+  ResultGroupPtr aGroup = document()->createGroup(data());
+  // clean the result of the operation
+  aGroup->store(GeomShapePtr());
+
+  // collect all unique sub-shapes
+  GeomShapePtr aCompound = aGroup->shape();
+  ListOfShape aSubs;
+  explodeCompound(aCompound, aSubs);
+  keepUniqueShapes(aSubs);
+  aCompound = aSubs.empty() ? GeomShapePtr() : GeomAlgoAPI_CompoundBuilder::compound(aSubs);
+  aGroup->store(aCompound);
+
+  setResult(aGroup);
 }

@@ -46,6 +46,8 @@ CollectionPlugin_Plugin::CollectionPlugin_Plugin()
   ModelAPI_ValidatorsFactory* aFactory = aMgr->validators();
   aFactory->registerValidator("CollectionPlugin_FieldValidator",
     new CollectionPlugin_FieldValidator);
+  aFactory->registerValidator("CollectionPlugin_OperationAttribute",
+    new CollectionPlugin_GroupOperationAttributeValidator);
 
   // register this plugin
   ModelAPI_Session::get()->registerPlugin(this);

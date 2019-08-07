@@ -46,7 +46,7 @@ class CollectionPlugin_GroupAddition : public CollectionPlugin_Group
   /// Returns the kind of a feature
   COLLECTIONPLUGIN_EXPORT virtual const std::string& getKind()
   {
-    static std::string MY_KIND = CollectionPlugin_Group::ID();
+    static std::string MY_KIND = CollectionPlugin_GroupAddition::ID();
     return MY_KIND;
   }
 

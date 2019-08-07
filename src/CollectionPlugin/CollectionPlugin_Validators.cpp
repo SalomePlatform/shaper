@@ -18,8 +18,10 @@
 //
 
 #include "CollectionPlugin_Validators.h"
+#include "CollectionPlugin_Group.h"
 #include "CollectionPlugin_Field.h"
 #include <ModelAPI_AttributeSelectionList.h>
+#include <ModelAPI_ResultGroup.h>
 #include <Events_InfoMessage.h>
 
 
@@ -41,4 +43,41 @@ bool CollectionPlugin_FieldValidator::isValid(const FeaturePtr& theFeature,
   }
   theError = "Selection list is not initialized";
   return false;
+}
+
+bool CollectionPlugin_GroupOperationAttributeValidator::isValid(
+    const AttributePtr& theAttribute,
+    const std::list<std::string>& theArguments,
+    Events_InfoMessage& theError) const
+{
+  AttributeSelectionListPtr aSelList =
+      std::dynamic_pointer_cast<ModelAPI_AttributeSelectionList>(theAttribute);
+  if (!aSelList) {
+    theError = "Error: This validator can only work with selection list of attributes";
+    return false;
+  }
+
+  FeaturePtr anOwner = ModelAPI_Feature::feature(theAttribute->owner());
+  // check selected items
+  std::string aType;
+  for (int anIndex = 0; anIndex < aSelList->size(); ++anIndex) {
+    AttributeSelectionPtr aCurSelection = aSelList->value(anIndex);
+    // applicable the groups only
+    ResultPtr aGroupResult = aCurSelection->context();
+    if (aGroupResult->groupName() != ModelAPI_ResultGroup::group()) {
+      theError = "Error: Groups can be selected only.";
+      return false;
+    }
+    // groups of same type can be selected only
+    FeaturePtr aGroupFeature = ModelAPI_Feature::feature(aGroupResult->data()->owner());
+    std::string aGroupType =
+        aGroupFeature->selectionList(CollectionPlugin_Group::LIST_ID())->selectionType();
+    if (aType.empty())
+      aType = aGroupType;
+    else if (aType != aGroupType) {
+      theError = "Error: Groups should have same type";
+      return false;
+    }
+  }
+  return true;
 }
