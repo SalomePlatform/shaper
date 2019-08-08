@@ -25,18 +25,9 @@ Part_1 = model.addPart(partSet)
 Part_1_doc = Part_1.document()
 Box_1 = model.addBox(Part_1_doc, 10, 10, 10)
 Group_1 = model.addGroup(Part_1_doc, [model.selection("FACE", "Box_1_1/Top"), model.selection("FACE", "Box_1_1/Left")])
-Group_2 = model.addGroup(Part_1_doc, [model.selection("FACE", "Box_1_1/Front"), model.selection("FACE", "Box_1_1/Top")])
-GroupAddition_1 = model.addGroupAddition(Part_1_doc, [model.selection("COMPOUND", "Group_1"), model.selection("COMPOUND", "Group_2")])
+Group_2 = model.addGroup(Part_1_doc, [model.selection("FACE", "Box_1_1/Left"), model.selection("FACE", "Box_1_1/Front")])
+Group_3 = model.addGroup(Part_1_doc, [model.selection("FACE", "Box_1_1/Front"), model.selection("FACE", "Box_1_1/Top")])
+GroupSubstraction_1 = model.addGroupSubstraction(Part_1_doc, [model.selection("COMPOUND", "Group_1")], [model.selection("COMPOUND", "Group_2"), model.selection("COMPOUND", "Group_3")])
 model.end()
 
-from GeomAPI import *
-
-model.testNbResults(GroupAddition_1, 1)
-model.testNbSubResults(GroupAddition_1, [0])
-model.testNbSubShapes(GroupAddition_1, GeomAPI_Shape.SOLID, [0])
-model.testNbSubShapes(GroupAddition_1, GeomAPI_Shape.FACE, [3])
-model.testNbSubShapes(GroupAddition_1, GeomAPI_Shape.EDGE, [12])
-model.testNbSubShapes(GroupAddition_1, GeomAPI_Shape.VERTEX, [24])
-model.testResultsVolumes(GroupAddition_1, [300])
-
-assert(model.checkPythonDump())
+assert(GroupSubstraction_1.feature().error() != "")

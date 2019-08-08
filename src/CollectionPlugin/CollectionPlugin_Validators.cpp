@@ -45,6 +45,29 @@ bool CollectionPlugin_FieldValidator::isValid(const FeaturePtr& theFeature,
   return false;
 }
 
+static bool isGroupTypeCorrect(const AttributeSelectionPtr& theSelection,
+                               std::string& theType,
+                               Events_InfoMessage& theError)
+{
+  // applicable the groups only
+  ResultPtr aGroupResult = theSelection->context();
+  if (aGroupResult->groupName() != ModelAPI_ResultGroup::group()) {
+    theError = "Error: Groups can be selected only.";
+    return false;
+  }
+  // groups of same type can be selected only
+  FeaturePtr aGroupFeature = ModelAPI_Feature::feature(aGroupResult->data()->owner());
+  std::string aGroupType =
+      aGroupFeature->selectionList(CollectionPlugin_Group::LIST_ID())->selectionType();
+  if (theType.empty())
+    theType = aGroupType;
+  else if (theType != aGroupType) {
+    theError = "Error: Groups should have same type";
+    return false;
+  }
+  return true;
+}
+
 bool CollectionPlugin_GroupOperationAttributeValidator::isValid(
     const AttributePtr& theAttribute,
     const std::list<std::string>& theArguments,
@@ -62,22 +85,18 @@ bool CollectionPlugin_GroupOperationAttributeValidator::isValid(
   std::string aType;
   for (int anIndex = 0; anIndex < aSelList->size(); ++anIndex) {
     AttributeSelectionPtr aCurSelection = aSelList->value(anIndex);
-    // applicable the groups only
-    ResultPtr aGroupResult = aCurSelection->context();
-    if (aGroupResult->groupName() != ModelAPI_ResultGroup::group()) {
-      theError = "Error: Groups can be selected only.";
+    if (!isGroupTypeCorrect(aCurSelection, aType, theError))
       return false;
-    }
-    // groups of same type can be selected only
-    FeaturePtr aGroupFeature = ModelAPI_Feature::feature(aGroupResult->data()->owner());
-    std::string aGroupType =
-        aGroupFeature->selectionList(CollectionPlugin_Group::LIST_ID())->selectionType();
-    if (aType.empty())
-      aType = aGroupType;
-    else if (aType != aGroupType) {
-      theError = "Error: Groups should have same type";
+  }
+  // check types of all selection lists are the same
+  for (std::list<std::string>::const_iterator aParIt = theArguments.begin();
+       aParIt != theArguments.end() && !aType.empty(); ++aParIt) {
+    AttributeSelectionListPtr aCurList = anOwner->selectionList(*aParIt);
+    if (aCurList->size() == 0)
+      continue;
+    AttributeSelectionPtr aCurSelection = aCurList->value(0);
+    if (!isGroupTypeCorrect(aCurSelection, aType, theError))
       return false;
-    }
   }
   return true;
 }

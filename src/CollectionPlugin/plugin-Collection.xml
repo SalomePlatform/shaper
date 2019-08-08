@@ -39,6 +39,15 @@
         helpfile="groupIntersectionFeature.html">
         <source path="group_intersection_widget.xml"/>
       </feature>
+
+      <feature id="GroupSubstraction"
+        title="Group Substraction"
+        tooltip="Exclude elements existing tool groups"
+        icon="icons/Collection/group_substraction.png"
+        apply_continue="true"
+        helpfile="groupSubstractionFeature.html">
+        <source path="group_substraction_widget.xml"/>
+      </feature>
     </group>
   </workbench>
 </plugin>

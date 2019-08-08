@@ -31,6 +31,7 @@
   #include "CollectionAPI_Group.h"
   #include "CollectionAPI_GroupAddition.h"
   #include "CollectionAPI_GroupIntersection.h"
+  #include "CollectionAPI_GroupSubstraction.h"
   #include "CollectionAPI_Field.h"
 
 #endif // CollectionAPI_swig_H_
@@ -70,10 +71,12 @@
 %shared_ptr(CollectionAPI_Group)
 %shared_ptr(CollectionAPI_GroupAddition)
 %shared_ptr(CollectionAPI_GroupIntersection)
+%shared_ptr(CollectionAPI_GroupSubstraction)
 %shared_ptr(CollectionAPI_Field)
 
 // all supported interfaces
 %include "CollectionAPI_Group.h"
 %include "CollectionAPI_GroupAddition.h"
 %include "CollectionAPI_GroupIntersection.h"
+%include "CollectionAPI_GroupSubstraction.h"
 %include "CollectionAPI_Field.h"

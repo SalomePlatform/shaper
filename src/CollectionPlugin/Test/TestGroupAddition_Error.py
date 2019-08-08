@@ -28,6 +28,6 @@ Group_1 = model.addGroup(Part_1_doc, [model.selection("FACE", "Box_1_1/Top"), mo
 Group_2 = model.addGroup(Part_1_doc, [model.selection("EDGE", "[Box_1_1/Front][Box_1_1/Bottom]"), model.selection("EDGE", "[Box_1_1/Front][Box_1_1/Right]")])
 GroupAddition_1 = model.addGroupAddition(Part_1_doc, [model.selection("COMPOUND", "Group_1"), model.selection("COMPOUND", "Group_2")])
 GroupAddition_2 = model.addGroupAddition(Part_1_doc, [model.selection("COMPOUND", "Group_1"), model.selection("FACE", "Box_1_1/Front")])
-model.end
+model.end()
 
 assert(GroupAddition_1.feature().error() != "")

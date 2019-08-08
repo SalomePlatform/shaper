@@ -22,6 +22,7 @@
 #include <CollectionPlugin_Group.h>
 #include <CollectionPlugin_GroupAddition.h>
 #include <CollectionPlugin_GroupIntersection.h>
+#include <CollectionPlugin_GroupSubstraction.h>
 #include <CollectionPlugin_Field.h>
 #include <CollectionPlugin_Validators.h>
 #include <ModelAPI_Session.h>
@@ -64,6 +65,8 @@ FeaturePtr CollectionPlugin_Plugin::createFeature(std::string theFeatureID)
     return FeaturePtr(new CollectionPlugin_GroupAddition);
   } else if (theFeatureID == CollectionPlugin_GroupIntersection::ID()) {
     return FeaturePtr(new CollectionPlugin_GroupIntersection);
+  } else if (theFeatureID == CollectionPlugin_GroupSubstraction::ID()) {
+    return FeaturePtr(new CollectionPlugin_GroupSubstraction);
   }
 
   // feature of such kind is not found
