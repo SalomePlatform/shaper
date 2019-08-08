@@ -17,12 +17,12 @@
 // See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 
-#ifndef CollectionAPI_GroupAddition_H_
-#define CollectionAPI_GroupAddition_H_
+#ifndef CollectionAPI_GroupIntersection_H_
+#define CollectionAPI_GroupIntersection_H_
 
 #include "CollectionAPI.h"
 
-#include <CollectionPlugin_GroupAddition.h>
+#include <CollectionPlugin_GroupIntersection.h>
 
 #include <ModelHighAPI_Interface.h>
 #include <ModelHighAPI_Macro.h>
@@ -30,27 +30,27 @@
 class ModelHighAPI_Dumper;
 class ModelHighAPI_Selection;
 
-/// \class CollectionAPI_GroupAddition
+/// \class CollectionAPI_GroupIntersection
 /// \ingroup CPPHighAPI
-/// \brief Interface for Group Addition feature.
-class CollectionAPI_GroupAddition : public ModelHighAPI_Interface
+/// \brief Interface for Group Intersection feature.
+class CollectionAPI_GroupIntersection : public ModelHighAPI_Interface
 {
 public:
   /// Constructor without values.
   COLLECTIONAPI_EXPORT
-  explicit CollectionAPI_GroupAddition(const std::shared_ptr<ModelAPI_Feature>& theFeature);
+  explicit CollectionAPI_GroupIntersection(const std::shared_ptr<ModelAPI_Feature>& theFeature);
 
   /// Constructor with values.
   COLLECTIONAPI_EXPORT
-  CollectionAPI_GroupAddition(const std::shared_ptr<ModelAPI_Feature>& theFeature,
-                              const std::list<ModelHighAPI_Selection>& theGroupList);
+  CollectionAPI_GroupIntersection(const std::shared_ptr<ModelAPI_Feature>& theFeature,
+                                  const std::list<ModelHighAPI_Selection>& theGroupList);
 
   /// Destructor.
   COLLECTIONAPI_EXPORT
-  virtual ~CollectionAPI_GroupAddition();
+  virtual ~CollectionAPI_GroupIntersection();
 
-  INTERFACE_1(CollectionPlugin_GroupAddition::ID(),
-              groupList, CollectionPlugin_GroupAddition::LIST_ID(),
+  INTERFACE_1(CollectionPlugin_GroupIntersection::ID(),
+              groupList, CollectionPlugin_GroupIntersection::LIST_ID(),
               ModelAPI_AttributeSelectionList, /** Group list*/)
 
   /// Set main objects.
@@ -63,12 +63,12 @@ public:
 };
 
 /// Pointer on Group Addition object.
-typedef std::shared_ptr<CollectionAPI_GroupAddition> GroupAdditionPtr;
+typedef std::shared_ptr<CollectionAPI_GroupIntersection> GroupIntersectionPtr;
 
 /// \ingroup CPPHighAPI
-/// \brief Create Group Addition feature.
+/// \brief Create Group Intersection feature.
 COLLECTIONAPI_EXPORT
-GroupAdditionPtr addGroupAddition(const std::shared_ptr<ModelAPI_Document>& thePart,
-                                  const std::list<ModelHighAPI_Selection>& theGroupsList);
+GroupIntersectionPtr addGroupIntersection(const std::shared_ptr<ModelAPI_Document>& thePart,
+                                          const std::list<ModelHighAPI_Selection>& theGroupsList);
 
-#endif // CollectionAPI_GroupAddition_H_
+#endif // CollectionAPI_GroupIntersection_H_

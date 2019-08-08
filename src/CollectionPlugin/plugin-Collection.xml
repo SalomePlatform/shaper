@@ -30,6 +30,15 @@
         helpfile="groupAdditionFeature.html">
         <source path="group_addition_widget.xml"/>
       </feature>
+
+      <feature id="GroupIntersection"
+        title="Group Intersection"
+        tooltip="Get elements existing in all groups"
+        icon="icons/Collection/group_intersection.png"
+        apply_continue="true"
+        helpfile="groupIntersectionFeature.html">
+        <source path="group_intersection_widget.xml"/>
+      </feature>
     </group>
   </workbench>
 </plugin>

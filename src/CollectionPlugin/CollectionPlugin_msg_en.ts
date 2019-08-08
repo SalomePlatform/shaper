@@ -37,5 +37,12 @@
       <translation>Components are not selected</translation>
     </message>
   </context>
+  <context>
+    <name>GroupIntersection:EmptyResult</name>
+    <message>
+      <source>Error: Empty result.</source>
+      <translation>Error: Empty result.</translation>
+    </message>
+  </context>
 
 </TS>

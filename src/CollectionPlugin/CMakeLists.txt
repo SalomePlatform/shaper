@@ -32,6 +32,7 @@ SET(PROJECT_HEADERS
     CollectionPlugin_Plugin.h
     CollectionPlugin_Group.h
     CollectionPlugin_GroupAddition.h
+    CollectionPlugin_GroupIntersection.h
     CollectionPlugin_Field.h
     CollectionPlugin_WidgetCreator.h
     CollectionPlugin_WidgetField.h
@@ -46,6 +47,7 @@ SET(PROJECT_SOURCES
     CollectionPlugin_Plugin.cpp
     CollectionPlugin_Group.cpp
     CollectionPlugin_GroupAddition.cpp
+    CollectionPlugin_GroupIntersection.cpp
     CollectionPlugin_Field.cpp
     CollectionPlugin_WidgetCreator.cpp
     CollectionPlugin_WidgetField.cpp
@@ -135,4 +137,6 @@ ADD_UNIT_TESTS(
                TestGroupShareTopology.py
                TestGroupAddition.py
                TestGroupAddition_Error.py
+               TestGroupIntersection.py
+               TestGroupIntersection_Error.py
 )

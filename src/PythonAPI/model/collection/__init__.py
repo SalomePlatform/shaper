@@ -20,4 +20,4 @@
 """
 
 from CollectionAPI import addGroup, addField
-from CollectionAPI import addGroupAddition
+from CollectionAPI import addGroupAddition, addGroupIntersection
