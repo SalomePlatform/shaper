@@ -1,3 +1,5 @@
 <plugin>
   <source path="@ADDONS_FOLDER_PATH@/macros/rectangle/widget.xml"/>
+  <source path="@ADDONS_FOLDER_PATH@/macros/compoundVertices/widget.xml"/>
+  <source path="@ADDONS_FOLDER_PATH@/macros/box/widget.xml"/>
 </plugin>
