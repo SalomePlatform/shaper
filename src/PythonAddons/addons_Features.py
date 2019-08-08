@@ -22,6 +22,8 @@
 
 import ModelAPI
 from macros.rectangle.feature import SketchPlugin_Rectangle
+from macros.compoundVertices.feature import compoundVertices
+from macros.box.feature import BoxFeature
 
 
 class PythonFeaturesPlugin(ModelAPI.ModelAPI_Plugin):
@@ -43,7 +45,10 @@ class PythonFeaturesPlugin(ModelAPI.ModelAPI_Plugin):
 
         if theFeatureID == SketchPlugin_Rectangle.ID():
             aFeature = SketchPlugin_Rectangle().__disown__()
-
+        elif theFeatureID == compoundVertices.ID():
+            aFeature = compoundVertices().__disown__()
+        elif theFeatureID == BoxFeature.ID():
+            aFeature = BoxFeature().__disown__()
         else:
             raise Exception("No such feature %s" % theFeatureID)
 
