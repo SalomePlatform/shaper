@@ -22,11 +22,13 @@ INCLUDE(Common)
 SET(PROJECT_HEADERS
   CollectionAPI.h
   CollectionAPI_Group.h
+  CollectionAPI_GroupAddition.h
   CollectionAPI_Field.h
 )
 
 SET(PROJECT_SOURCES
   CollectionAPI_Group.cpp
+  CollectionAPI_GroupAddition.cpp
   CollectionAPI_Field.cpp
 )
 

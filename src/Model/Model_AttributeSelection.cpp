@@ -896,8 +896,11 @@ void Model_AttributeSelection::selectSubShape(
     // the whole result selection check
     if (aSubShapeName.find('/') == std::string::npos) {
       ObjectPtr aRes = aDoc->objectByName(ModelAPI_ResultConstruction::group(), aSubShapeName);
-      if (!aRes.get())
+      if (!aRes.get()) {
         aRes = aDoc->objectByName(ModelAPI_ResultBody::group(), aSubShapeName);
+        if (!aRes.get())
+          aRes = aDoc->objectByName(ModelAPI_ResultGroup::group(), aSubShapeName);
+      }
       if (aRes.get()) {
         setValue(aRes, anEmptyShape);
         return;
