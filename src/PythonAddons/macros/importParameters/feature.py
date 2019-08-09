@@ -1,4 +1,4 @@
-"""compound of vertices Feature
+"""importParameters
 Author: Nathalie Gore
 """
 
@@ -6,7 +6,7 @@ from salome.shaper import model
 from salome.shaper import geom
 import ModelAPI
 
-class compoundVertices(model.Feature):
+class importParameters(model.Feature):
     """Import of Construction points
     """
 
@@ -19,7 +19,7 @@ class compoundVertices(model.Feature):
     @staticmethod
     def ID():
         """Return Id of the Feature."""
-        return "compoundVertices"
+        return "importParameters"
 
     @staticmethod
     def FILE_ID():
@@ -28,7 +28,7 @@ class compoundVertices(model.Feature):
 
     def getKind(self):
         """Override Feature.getKind()"""
-        return compoundVertices.ID()
+        return importParameters.ID()
 
 
 # Initialization of the dialog panel
@@ -45,22 +45,18 @@ class compoundVertices(model.Feature):
         # Retrieving the user input
         apath    = self.string(self.FILE_ID())
         filepath = apath.value()
-        print("filepath : ", filepath)
+        #print("filepath : ", filepath)
         if filepath != "" :
 
-            # Creating the construction points in the current document
+            # Creating the parameters in the current document
             part = model.activeDocument()
-            lVertices = []
 
             with open(filepath) as file:
                 for line in file:
-                    coord = line.split(' ')
-                    x = float(coord[0]); y = float(coord[1]); z = float(coord[2]);
-                    point = model.addPoint(part, x,y,z)
-                    vertex = model.addVertex(part, [point.result()])
-                    lVertices.append(vertex.result())
+                    defParameters = line.replace("\n","").split(' ')
+                    if len(defParameters) == 2 :
+                        model.addParameter(part, defParameters[0], defParameters[1])
                 file.close()
-                Compound_1 = model.addCompound(part, lVertices)
                 return
         
             setError("The file does not exist")

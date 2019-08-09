@@ -2,7 +2,7 @@
   <workbench id="Macros" document="Part">
     <group id="Samples">
 
-      <feature id="compoundVertices" title="Points set" tooltip="Import a set of construction points" icon="icons/import.png">
+      <feature id="importParameters" title="List of Parameters" tooltip="Import a set of parameters" icon="icons/import.png">
         <file_selector id="file_path" title="Import file" path="">
         </file_selector>
       </feature>
