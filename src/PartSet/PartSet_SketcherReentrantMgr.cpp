@@ -31,6 +31,9 @@
 
 #include "GeomDataAPI_Point2D.h"
 
+#include "GeomAPI_Lin2d.h"
+#include "GeomAPI_Dir2d.h"
+
 #include <ModuleBase_IPropertyPanel.h>
 #include <ModuleBase_ISelectionActivate.h>
 #include <ModuleBase_OperationFeature.h>
@@ -51,6 +54,8 @@
 #include <SketchPlugin_Point.h>
 #include <SketchPlugin_Trim.h>
 #include <SketchPlugin_Split.h>
+#include <SketchPlugin_ConstraintHorizontal.h>
+#include <SketchPlugin_ConstraintVertical.h>
 
 #include <XGUI_Workshop.h>
 #include <XGUI_ModuleConnector.h>
@@ -69,7 +74,8 @@ PartSet_SketcherReentrantMgr::PartSet_SketcherReentrantMgr(ModuleBase_IWorkshop*
   myRestartingMode(RM_None),
   myIsFlagsBlocked(false),
   myIsInternalEditOperation(false),
-  myNoMoreWidgetsAttribute("")
+  myNoMoreWidgetsAttribute(""),
+  myIsAutoConstraints(true)
 {
 }
 
@@ -171,6 +177,8 @@ bool PartSet_SketcherReentrantMgr::processMouseMoved(ModuleBase_IViewWindow* the
         workshop()->selector()->clearSelection();
 
         myPreviousFeature = aFOperation->feature();
+        if (myIsAutoConstraints)
+          addConstraints(myPreviousFeature);
         restartOperation();
         myPreviousFeature = FeaturePtr();
 
@@ -819,5 +827,47 @@ void PartSet_SketcherReentrantMgr::setInternalActiveWidget(ModuleBase_ModelWidge
       (aFOperation->propertyPanel());
     if (aPropertyPanel)
       aPropertyPanel->setInternalActiveWidget(theWidget);
+  }
+}
+
+void PartSet_SketcherReentrantMgr::onAutoConstraints(bool isOn)
+{
+  myIsAutoConstraints = isOn;
+}
+
+void PartSet_SketcherReentrantMgr::addConstraints(const FeaturePtr& theFeature)
+{
+  static GeomDir2dPtr myHorDir(new GeomAPI_Dir2d(1, 0));
+  static GeomDir2dPtr myVertDir(new GeomAPI_Dir2d(0, 1));
+
+  if (theFeature->getKind() == SketchPlugin_Line::ID()) {
+    std::shared_ptr<ModelAPI_Data> aData = theFeature->data();
+    std::shared_ptr<GeomDataAPI_Point2D> aPoint1 =
+      std::dynamic_pointer_cast<GeomDataAPI_Point2D>(aData->attribute(SketchPlugin_Line::START_ID()));
+    std::shared_ptr<GeomDataAPI_Point2D> aPoint2 =
+      std::dynamic_pointer_cast<GeomDataAPI_Point2D>(aData->attribute(SketchPlugin_Line::END_ID()));
+    if (aPoint1.get() && aPoint2.get()) {
+      GeomLine2dPtr aLine(new GeomAPI_Lin2d(aPoint1->pnt(), aPoint2->pnt()));
+      GeomDir2dPtr aDir = aLine->direction();
+      double aHorAngle = fabs(myHorDir->angle(aDir));
+      double aVertAngle = fabs(myVertDir->angle(aDir));
+      if (aHorAngle > M_PI/2.)
+        aHorAngle = M_PI - aHorAngle;
+      if (aVertAngle > M_PI/2.)
+        aVertAngle = M_PI - aVertAngle;
+
+      double aTolerance = Config_PropManager::real(SKETCH_TAB_NAME, "angular_tolerance");
+      CompositeFeaturePtr aSketch = module()->sketchMgr()->activeSketch();
+      FeaturePtr aFeature;
+      if (aHorAngle < aTolerance)
+        // Add horizontal constraint
+        aFeature = aSketch->addFeature(SketchPlugin_ConstraintHorizontal::ID());
+      else if (aVertAngle < aTolerance)
+        // Add vertical constraint
+        aFeature = aSketch->addFeature(SketchPlugin_ConstraintVertical::ID());
+
+      if (aFeature.get())
+        aFeature->refattr(SketchPlugin_Constraint::ENTITY_A())->setObject(theFeature->firstResult());
+    }
   }
 }

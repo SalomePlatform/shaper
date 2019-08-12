@@ -344,6 +344,8 @@ public slots:
   /// Process sketch plane selected event
   void onPlaneSelected(const std::shared_ptr<GeomAPI_Pln>& thePln);
 
+  /// The slot is called when user checks "Show free points" button
+  /// \param toShow a state of the check box
   void onShowPoints(bool toShow);
 
 private slots:

@@ -131,6 +131,15 @@ public:
   /// \param theMessage a message of reentrant operation
   void setReentrantPreSelection(const std::shared_ptr<Events_Message>& theMessage);
 
+  bool isAutoConstraints() const { return myIsAutoConstraints; }
+
+
+public slots:
+  /// The slot is called when user checks "Automatic constraints" button
+  /// \param isOn a state of the check box
+  void onAutoConstraints(bool isOn);
+
+
 private slots:
   /// SLOT, that is called by a widget activating in the property panel
   /// If the 'internal' edit operation is started, it activates the first widget selection
@@ -211,6 +220,8 @@ private:
 
   void setInternalActiveWidget(ModuleBase_ModelWidget* theWidget);
 
+  void addConstraints(const FeaturePtr& theFeature);
+
 private:
   ModuleBase_IWorkshop* myWorkshop; /// the workshop
 
@@ -227,6 +238,8 @@ private:
   ObjectPtr mySelectedObject; /// cashed selected object
   std::shared_ptr<ModelAPI_Attribute> mySelectedAttribute; /// cashed selected attribute
   std::shared_ptr<GeomAPI_Pnt2d> myClickedSketchPoint; /// cashed clicked point
+
+  bool myIsAutoConstraints;
 };
 
 #endif

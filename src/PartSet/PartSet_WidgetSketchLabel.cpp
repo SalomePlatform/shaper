@@ -21,6 +21,7 @@
 #include "PartSet_Tools.h"
 #include "PartSet_Module.h"
 #include "PartSet_PreviewPlanes.h"
+#include "PartSet_SketcherReentrantMgr.h"
 
 #include "SketchPlugin_SketchEntity.h"
 
@@ -170,6 +171,10 @@ myIsSelection(false)
   myShowPoints = new QCheckBox(tr("Show free points"), this);
   connect(myShowPoints, SIGNAL(toggled(bool)), this, SIGNAL(showFreePoints(bool)));
   aLayout->addWidget(myShowPoints);
+
+  myAutoConstraints = new QCheckBox(tr("Automatic constraints"), this);
+  connect(myAutoConstraints, SIGNAL(toggled(bool)), this, SIGNAL(autoConstraints(bool)));
+  aLayout->addWidget(myAutoConstraints);
 
   QPushButton* aPlaneBtn = new QPushButton(tr("Change sketch plane"), aSecondWgt);
   connect(aPlaneBtn, SIGNAL(clicked(bool)), SLOT(onChangePlane()));
@@ -508,6 +513,13 @@ bool PartSet_WidgetSketchLabel::fillSketchPlaneBySelection(const ModuleBase_View
 
 void PartSet_WidgetSketchLabel::activateCustom()
 {
+  PartSet_Module* aModule = dynamic_cast<PartSet_Module*>(myWorkshop->module());
+  if (aModule) {
+    bool isBlocked = myAutoConstraints->blockSignals(true);
+    myAutoConstraints->setChecked(aModule->sketchReentranceMgr()->isAutoConstraints());
+    myAutoConstraints->blockSignals(isBlocked);
+  }
+
   std::shared_ptr<GeomAPI_Pln> aPlane = plane();
   if (aPlane.get()) {
     myStackWidget->setCurrentIndex(1);

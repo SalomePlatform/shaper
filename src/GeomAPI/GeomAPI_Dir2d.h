@@ -66,5 +66,8 @@ class GeomAPI_Dir2d : public GeomAPI_Interface
   double angle(const std::shared_ptr<GeomAPI_Dir2d>& theArg) const;
 };
 
+//! Pointer on the object
+typedef std::shared_ptr<GeomAPI_Dir2d> GeomDir2dPtr;
+
 #endif
 
