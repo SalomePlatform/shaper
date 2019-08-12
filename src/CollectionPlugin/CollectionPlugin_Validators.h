@@ -21,14 +21,13 @@
 #define CollectionPlugin_Validators_H
 
 #include "CollectionPlugin.h"
+#include <ModelAPI_AttributeValidator.h>
 #include <ModelAPI_FeatureValidator.h>
 
-/**\class SketchPlugin_SolverErrorValidator
-* \ingroup Validators
-* \brief Validator for the solver error.
-*
-* Simply checks that solver error attribute is empty. Returns the attribute value as an error.
-*/
+/**\class CollectionPlugin_FieldValidator
+ * \ingroup Validators
+ * \brief Validator for the field.
+ */
 class CollectionPlugin_FieldValidator : public ModelAPI_FeatureValidator
 {
 public:
@@ -39,6 +38,21 @@ public:
   virtual bool isValid(const FeaturePtr& theFeature,
     const std::list<std::string>& theArguments,
     Events_InfoMessage& theError) const;
+};
+
+/**\class CollectionPlugin_GroupOperationAttributeValidator
+ * \ingroup Validators
+ * \brief Validator for the parameters of operation on groups.
+ */
+class CollectionPlugin_GroupOperationAttributeValidator : public ModelAPI_AttributeValidator
+{
+  //! Returns true if attribute is ok.
+  //! \param[in] theAttribute the checked attribute.
+  //! \param[in] theArguments arguments of the attribute.
+  //! \param[out] theError error message.
+  virtual bool isValid(const AttributePtr& theAttribute,
+                       const std::list<std::string>& theArguments,
+                       Events_InfoMessage& theError) const;
 };
 
 #endif

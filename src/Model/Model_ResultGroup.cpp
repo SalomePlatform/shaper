@@ -18,11 +18,18 @@
 //
 
 #include <Model_ResultGroup.h>
+#include <Model_Data.h>
 #include <ModelAPI_AttributeSelectionList.h>
 
 #include <GeomAlgoAPI_CompoundBuilder.h>
 
 #include <Config_PropManager.h>
+
+#include <TDF_Label.hxx>
+#include <TDF_Reference.hxx>
+#include <TNaming_Builder.hxx>
+#include <TNaming_NamedShape.hxx>
+#include <TopoDS_Shape.hxx>
 
 Model_ResultGroup::Model_ResultGroup(std::shared_ptr<ModelAPI_Data> theOwnerData)
 {
@@ -40,7 +47,25 @@ void Model_ResultGroup::colorConfigInfo(std::string& theSection, std::string& th
 std::shared_ptr<GeomAPI_Shape> Model_ResultGroup::shape()
 {
   std::shared_ptr<GeomAPI_Shape> aResult;
-  if (myOwnerData) {
+  // obtain stored shape
+  std::shared_ptr<Model_Data> aData = std::dynamic_pointer_cast<Model_Data>(data());
+  if (aData && aData->isValid()) {
+    TDF_Label aShapeLab = aData->shapeLab();
+    Handle(TDF_Reference) aRef;
+    if (aShapeLab.FindAttribute(TDF_Reference::GetID(), aRef)) {
+      aShapeLab = aRef->Get();
+    }
+    Handle(TNaming_NamedShape) aName;
+    if (aShapeLab.FindAttribute(TNaming_NamedShape::GetID(), aName)) {
+      TopoDS_Shape aShape = aName->Get();
+      if (!aShape.IsNull()) {
+        aResult.reset(new GeomAPI_Shape);
+        aResult->setImpl(new TopoDS_Shape(aShape));
+      }
+    }
+  }
+  // collect shapes selected in group
+  if (!aResult && myOwnerData) {
     AttributeSelectionListPtr aList = myOwnerData->selectionList("group_list");
     if (aList) {
       std::list<std::shared_ptr<GeomAPI_Shape> > aSubs;
@@ -56,4 +81,24 @@ std::shared_ptr<GeomAPI_Shape> Model_ResultGroup::shape()
     }
   }
   return aResult;
+}
+
+void Model_ResultGroup::store(const GeomShapePtr& theShape)
+{
+  std::shared_ptr<Model_Data> aData = std::dynamic_pointer_cast<Model_Data>(data());
+  if (aData) {
+    TDF_Label aShapeLab = aData->shapeLab();
+    aShapeLab.ForgetAttribute(TDF_Reference::GetID());
+    aShapeLab.ForgetAttribute(TNaming_NamedShape::GetID());
+
+    if (!theShape)
+      return;  // bad shape
+    TopoDS_Shape aShape = theShape->impl<TopoDS_Shape>();
+    if (aShape.IsNull())
+      return;  // null shape inside
+
+    // store the new shape as primitive
+    TNaming_Builder aBuilder(aShapeLab);
+    aBuilder.Generated(aShape);
+  }
 }

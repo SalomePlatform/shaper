@@ -41,6 +41,11 @@ public:
   /// Returns the compound of selected entities
   MODEL_EXPORT virtual std::shared_ptr<GeomAPI_Shape> shape();
 
+  /// \brief Stores the result of operation made on groups.
+  ///        Cleans the storage if empty shape is given.
+  /// param[in] theShape shape to store.
+  MODEL_EXPORT virtual void store(const GeomShapePtr& theShape);
+
   /// Removes the stored builders
   MODEL_EXPORT virtual ~Model_ResultGroup() {}
 

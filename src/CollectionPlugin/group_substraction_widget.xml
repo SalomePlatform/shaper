@@ -1,0 +1,16 @@
+<source>
+  <namevalue id="name"
+             label="Name"
+             placeholder="Please input the group name">
+  </namevalue>
+  <multi_selector id="group_list"
+                  tooltip="Select a set of groups"
+                  type_choice="objects">
+    <validator id="CollectionPlugin_OperationAttribute" parameters="tools_list"/>
+  </multi_selector>
+  <multi_selector id="tools_list"
+                  tooltip="Select a set of groups"
+                  type_choice="objects">
+    <validator id="CollectionPlugin_OperationAttribute" parameters="group_list"/>
+  </multi_selector>
+</source>

@@ -21,6 +21,30 @@
         </field-panel>
         <validator id="CollectionPlugin_FieldValidator"/>
       </feature>
+
+      <feature id="GroupAddition"
+        title="Group Addition"
+        tooltip="Join several groups to single group"
+        icon="icons/Collection/group_addition.png"
+        helpfile="groupAdditionFeature.html">
+        <source path="group_addition_widget.xml"/>
+      </feature>
+
+      <feature id="GroupIntersection"
+        title="Group Intersection"
+        tooltip="Get elements existing in all groups"
+        icon="icons/Collection/group_intersection.png"
+        helpfile="groupIntersectionFeature.html">
+        <source path="group_intersection_widget.xml"/>
+      </feature>
+
+      <feature id="GroupSubstraction"
+        title="Group Substraction"
+        tooltip="Exclude elements existing tool groups"
+        icon="icons/Collection/group_substraction.png"
+        helpfile="groupSubstractionFeature.html">
+        <source path="group_substraction_widget.xml"/>
+      </feature>
     </group>
   </workbench>
 </plugin>

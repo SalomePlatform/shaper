@@ -52,6 +52,7 @@
 #include <ModelAPI_Result.h>
 #include <ModelAPI_ResultBody.h>
 #include <ModelAPI_ResultConstruction.h>
+#include <ModelAPI_ResultGroup.h>
 #include <ModelAPI_ResultPart.h>
 #include <ModelAPI_Session.h>
 #include <ModelAPI_Tools.h>
@@ -289,7 +290,8 @@ static void getShapeAndContext(const AttributeSelectionPtr& theAttrSelect,
     if (theAttrSelect->isGeometricalSelection() &&
         theShape.get() && theShape->shapeType() == GeomAPI_Shape::COMPOUND &&
         theContext.get() && !theShape->isEqual(theContext->shape()) &&
-        theContext->groupName() != ModelAPI_ResultPart::group()) {
+        theContext->groupName() != ModelAPI_ResultPart::group() &&
+        theContext->groupName() != ModelAPI_ResultGroup::group()) {
       GeomAPI_ShapeIterator anIt(theShape);
       theShape = anIt.current();
     }

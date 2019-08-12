@@ -28,14 +28,13 @@
 #include <ModuleBase_ActionInfo.h>
 #include <ModuleBase_Tools.h>
 
+#include <ModelAPI_ResultGroup.h>
 #include <ModelAPI_ResultPart.h>
 #include <ModelAPI_ResultConstruction.h>
 #include <ModelAPI_ResultBody.h>
 
 #include <Config_FeatureMessage.h>
 #include <Events_Loop.h>
-
-#include <CollectionPlugin_Group.h>
 
 QMap<QString, QString> PartSet_IconFactory::myIcons;
 
@@ -128,8 +127,7 @@ QIcon PartSet_IconFactory::getIcon(ObjectPtr theObj)
     if(aShape.get()) {
       switch(aShape->shapeType()) {
         case GeomAPI_Shape::COMPOUND: {
-          FeaturePtr aFeature = ModelAPI_Feature::feature(theObj);
-          if (aFeature.get() && aFeature->getKind() == CollectionPlugin_Group::ID()) {
+          if (aResult->groupName() == ModelAPI_ResultGroup::group()) {
             switch (aShape->typeOfCompoundShapes()) {
             case GeomAPI_Shape::VERTEX:
               return QIcon(":icons/group_vertex.png");
