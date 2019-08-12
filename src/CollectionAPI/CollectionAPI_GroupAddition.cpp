@@ -65,6 +65,7 @@ void CollectionAPI_GroupAddition::dump(ModelHighAPI_Dumper& theDumper) const
 GroupAdditionPtr addGroupAddition(const std::shared_ptr<ModelAPI_Document>& thePart,
                                   const std::list<ModelHighAPI_Selection>& theGroupList)
 {
-  std::shared_ptr<ModelAPI_Feature> aFeature = thePart->addFeature(CollectionAPI_GroupAddition::ID());
+  std::shared_ptr<ModelAPI_Feature> aFeature =
+      thePart->addFeature(CollectionAPI_GroupAddition::ID());
   return GroupAdditionPtr(new CollectionAPI_GroupAddition(aFeature, theGroupList));
 }
