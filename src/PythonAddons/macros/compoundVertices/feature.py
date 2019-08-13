@@ -56,8 +56,8 @@ class compoundVertices(model.Feature):
                 for line in file:
                     coord = line.split(' ')
                     x = float(coord[0]); y = float(coord[1]); z = float(coord[2]);
-                    point = model.addPoint(part, x,y,z)
-                    vertex = model.addVertex(part, [point.result()])
+                    point = model.addPoint(part, x,y,z); point.execute(True)
+                    vertex = model.addVertex(part, [point.result()]); vertex.execute(True)
                     lVertices.append(vertex.result())
                 file.close()
                 Compound_1 = model.addCompound(part, lVertices)
