@@ -523,4 +523,5 @@ ADD_UNIT_TESTS(TestExtrusion.py
                TestRemoveResultsConstruction.py
                TestRemoveResultsPart.py
                Test17000.py
+               Test17261.py
 )
