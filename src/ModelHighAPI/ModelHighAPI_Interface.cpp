@@ -107,7 +107,7 @@ ModelHighAPI_Selection ModelHighAPI_Interface::result() const
 
 std::list<ModelHighAPI_Selection> ModelHighAPI_Interface::results() const
 {
-  const_cast<ModelHighAPI_Interface*>(this)->execute(true);
+  const_cast<ModelHighAPI_Interface*>(this)->execute();
 
   std::list<ModelHighAPI_Selection> aSelectionList;
 
