@@ -2011,6 +2011,10 @@ void XGUI_Workshop::cleanHistory()
 }
 
 //**************************************************************
+bool compareFeature(const FeaturePtr& theF1, const FeaturePtr& theF2) {
+  DocumentPtr aDoc = theF1->document();
+  return aDoc->index(theF1) < aDoc->index(theF2);
+}
 void XGUI_Workshop::moveObjects()
 {
   if (!abortAllOperations())
@@ -2032,9 +2036,13 @@ void XGUI_Workshop::moveObjects()
   if (!XGUI_Tools::canRemoveOrRename(desktop(), aFeatures))
     return;
 
+  // Sort features by index in document
+  std::list<FeaturePtr> aFList(aFeatures.begin(), aFeatures.end());
+  aFList.sort(compareFeature);
+
   DocumentPtr anActiveDocument = aMgr->activeDocument();
   FeaturePtr aCurrentFeature = anActiveDocument->currentFeature(true);
-  std::set<FeaturePtr>::const_iterator anIt = aFeatures.begin(), aLast = aFeatures.end();
+  std::list<FeaturePtr>::const_iterator anIt = aFList.begin(), aLast = aFList.end();
   for (; anIt != aLast; anIt++) {
     FeaturePtr aFeature = *anIt;
     if (!aFeature.get() || !myModule->canApplyAction(aFeature, anActionId))

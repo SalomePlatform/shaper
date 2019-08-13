@@ -347,6 +347,8 @@ void XGUI_ContextMenuMgr::updateObjectBrowserMenu()
         action("SHADING_CMD")->setEnabled(true);
         action("WIREFRAME_CMD")->setEnabled(true);
       }
+      if (hasFeature && myWorkshop->canMoveFeature())
+        action("MOVE_CMD")->setEnabled(true);
     } // end multi-selection
 
     // Check folder management commands state if only features are selected
@@ -765,7 +767,7 @@ void XGUI_ContextMenuMgr::addObjBrowserMenu(QMenu* theMenu) const
       aActions.append(action("ADD_OUT_FOLDER_BEFORE_CMD"));
       aActions.append(action("ADD_OUT_FOLDER_AFTER_CMD"));
       aActions.append(mySeparator3);
-      //aActions.append(action("MOVE_CMD"));
+      aActions.append(action("MOVE_CMD"));
       aActions.append(action("COLOR_CMD"));
       aActions.append(action("DEFLECTION_CMD"));
       aActions.append(action("TRANSPARENCY_CMD"));
