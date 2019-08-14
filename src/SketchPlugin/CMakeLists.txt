@@ -214,6 +214,7 @@ ADD_UNIT_TESTS(
   TestConstraintMiddlePoint.py
   TestConstraintParallel.py
   TestConstraintPerpendicular.py
+  TestConstraintPerpendicularArcLine.py
   TestConstraintRadius.py
   TestConstraintRadiusFailure.py
   TestConstraintTangent.py

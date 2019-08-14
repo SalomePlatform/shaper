@@ -198,6 +198,50 @@ bool SketchPlugin_TangentAttrValidator::isValid(const AttributePtr& theAttribute
   return true;
 }
 
+bool SketchPlugin_PerpendicularAttrValidator::isValid(const AttributePtr& theAttribute,
+                                                      const std::list<std::string>& theArguments,
+                                                      Events_InfoMessage& theError) const
+{
+  if (theAttribute->attributeType() != ModelAPI_AttributeRefAttr::typeId()) {
+    theError = "The attribute with the %1 type is not processed";
+    theError.arg(theAttribute->attributeType());
+    return false;
+  }
+
+  std::string aParamA = theArguments.front();
+  SessionPtr aMgr = ModelAPI_Session::get();
+  ModelAPI_ValidatorsFactory* aFactory = aMgr->validators();
+
+  FeaturePtr anOwner = std::dynamic_pointer_cast<ModelAPI_Feature>(theAttribute->owner());
+  AttributeRefAttrPtr aRefAttr =
+      std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(theAttribute);
+
+  bool isObject = aRefAttr->isObject();
+  ObjectPtr anObject = aRefAttr->object();
+  if (isObject && anObject.get()) {
+    FeaturePtr aRefFea = ModelAPI_Feature::feature(anObject);
+
+    AttributeRefAttrPtr aOtherAttr = anOwner->refattr(aParamA);
+    ObjectPtr aOtherObject = aOtherAttr->object();
+    FeaturePtr aOtherFea = ModelAPI_Feature::feature(aOtherObject);
+    if (!aOtherFea)
+      return true;
+
+    // at least one feature should be a line
+    if (aRefFea->getKind() != SketchPlugin_Line::ID() &&
+        aOtherFea->getKind() != SketchPlugin_Line::ID()) {
+      theError = "At least one feature should be a line";
+      return false;
+    }
+  }
+  else {
+    theError = "It uses an empty object";
+    return false;
+  }
+
+  return true;
+}
+
 bool SketchPlugin_NotFixedValidator::isValid(const AttributePtr& theAttribute,
                                              const std::list<std::string>& theArguments,
                                              Events_InfoMessage& theError) const

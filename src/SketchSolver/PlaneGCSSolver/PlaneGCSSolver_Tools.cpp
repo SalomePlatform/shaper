@@ -496,7 +496,23 @@ ConstraintWrapperPtr createConstraintPerpendicular(
 {
   std::shared_ptr<GCS::Line> aLine1 = std::dynamic_pointer_cast<GCS::Line>(theEntity1->entity());
   std::shared_ptr<GCS::Line> aLine2 = std::dynamic_pointer_cast<GCS::Line>(theEntity2->entity());
-  GCSConstraintPtr aNewConstr(new GCS::ConstraintPerpendicular(*(aLine1), *(aLine2)));
+
+  std::shared_ptr<GCS::Circle> aCirc1 =
+      std::dynamic_pointer_cast<GCS::Circle>(theEntity1->entity());
+  std::shared_ptr<GCS::Circle> aCirc2 =
+      std::dynamic_pointer_cast<GCS::Circle>(theEntity2->entity());
+
+  GCSConstraintPtr aNewConstr;
+  if (aLine1 && aLine2)
+    aNewConstr.reset(new GCS::ConstraintPerpendicular(*(aLine1), *(aLine2)));
+  else {
+    if (aLine1 && aCirc2)
+      aCirc1 = aCirc2;
+    else if (aLine2 && aCirc1)
+      aLine1 = aLine2;
+
+    aNewConstr.reset(new GCS::ConstraintPointOnLine(aCirc1->center, *aLine1));
+  }
 
   return ConstraintWrapperPtr(
       new PlaneGCSSolver_ConstraintWrapper(aNewConstr, CONSTRAINT_PERPENDICULAR));

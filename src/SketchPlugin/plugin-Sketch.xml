@@ -925,23 +925,25 @@
 
     <!--  SketchConstraintPerpendicular  -->
       <feature id="SketchConstraintPerpendicular" title="Perpendicular"
-               tooltip="Create constraint defining two perpendicular lines"
+               tooltip="Create constraint defining two orthogonal objects"
                icon="icons/Sketch/perpendicular.png"
                helpfile="perpendicularFeature.html">
         <sketch_shape_selector id="ConstraintEntityA"
-            label="First line" tooltip="Select a line"
+            label="First object" tooltip="Select line or arc"
             shape_types="edge">
           <validator id="PartSet_DifferentObjects"/>
           <validator id="SketchPlugin_ExternalValidator" parameters="ConstraintEntityB"/>
-            <validator id="GeomValidators_ShapeType" parameters="line"/>
+          <validator id="SketchPlugin_PerpendicularAttr" parameters="ConstraintEntityB"/>
+          <validator id="GeomValidators_ShapeType" parameters="line,circle"/>
         </sketch_shape_selector>
 
         <sketch_shape_selector id="ConstraintEntityB"
-            label="Second line" tooltip="Select a line"
+            label="Second object" tooltip="Select line or arc"
             shape_types="edge">
-            <validator id="PartSet_DifferentObjects"/>
+          <validator id="PartSet_DifferentObjects"/>
           <validator id="SketchPlugin_ExternalValidator" parameters="ConstraintEntityA"/>
-            <validator id="GeomValidators_ShapeType" parameters="line"/>
+          <validator id="SketchPlugin_PerpendicularAttr" parameters="ConstraintEntityA"/>
+          <validator id="GeomValidators_ShapeType" parameters="line,circle"/>
         </sketch_shape_selector>
         <validator id="PartSet_PerpendicularSelection"/>
       </feature>
