@@ -393,31 +393,32 @@ void GeomAlgoAPI_Prism::buildByPlanes(const GeomShapePtr             theBaseShap
   IntAna_IntConicQuad aFromIntAna(aLine, aBndFromQuadric);
   Standard_Real aToParameter = aToIntAna.ParamOnConic(1);
   Standard_Real aFromParameter = aFromIntAna.ParamOnConic(1);
+  static const double THE_FACE_SIZE_COEFF = 10.0;
   if(aToParameter > aFromParameter) {
     gp_Vec aVec = aToDir->impl<gp_Dir>();
     if((aVec * anExtVec) > 0) {
       aToDir->setImpl(new gp_Dir(aVec.Reversed()));
       aBoundingToShape =
-          GeomAlgoAPI_FaceBuilder::squareFace(aToPnt, aToDir, 2.0 * aBndBoxSize);
+        GeomAlgoAPI_FaceBuilder::squareFace(aToPnt, aToDir, THE_FACE_SIZE_COEFF * aBndBoxSize);
     }
     aVec = aFromDir->impl<gp_Dir>();
     if((aVec * anExtVec) < 0) {
       aFromDir->setImpl(new gp_Dir(aVec.Reversed()));
       aBoundingFromShape =
-          GeomAlgoAPI_FaceBuilder::squareFace(aFromPnt, aFromDir, 2.0 * aBndBoxSize);
+        GeomAlgoAPI_FaceBuilder::squareFace(aFromPnt, aFromDir, THE_FACE_SIZE_COEFF * aBndBoxSize);
     }
   } else {
     gp_Vec aVec = aToDir->impl<gp_Dir>();
     if((aVec * anExtVec) < 0) {
       aToDir->setImpl(new gp_Dir(aVec.Reversed()));
       aBoundingToShape =
-          GeomAlgoAPI_FaceBuilder::squareFace(aToPnt, aToDir, 2.0 * aBndBoxSize);
+        GeomAlgoAPI_FaceBuilder::squareFace(aToPnt, aToDir, THE_FACE_SIZE_COEFF * aBndBoxSize);
     }
     aVec = aFromDir->impl<gp_Dir>();
     if((aVec * anExtVec) > 0) {
       aFromDir->setImpl(new gp_Dir(aVec.Reversed()));
       aBoundingFromShape =
-          GeomAlgoAPI_FaceBuilder::squareFace(aFromPnt, aFromDir, 2.0 * aBndBoxSize);
+        GeomAlgoAPI_FaceBuilder::squareFace(aFromPnt, aFromDir, THE_FACE_SIZE_COEFF * aBndBoxSize);
     }
   }
 
@@ -429,13 +430,14 @@ void GeomAlgoAPI_Prism::buildByPlanes(const GeomShapePtr             theBaseShap
 
   // Solid based on "To" bounding plane
   gp_Vec aNormal = aToDir->impl<gp_Dir>();
-  aPrismBuilder = new BRepPrimAPI_MakePrism(aToShape, aNormal * (-aBndBoxSize));
-  if (!aPrismBuilder || !aPrismBuilder->IsDone()) {
+  BRepPrimAPI_MakePrism* aToPrismBuilder =
+      new BRepPrimAPI_MakePrism(aToShape, aNormal * (-2.0 * aBndBoxSize));
+  if (!aToPrismBuilder || !aToPrismBuilder->IsDone()) {
     return;
   }
   this->appendAlgo(std::shared_ptr<GeomAlgoAPI_MakeShape>(
-    new GeomAlgoAPI_MakeShape(aPrismBuilder)));
-  TopoDS_Shape aToSolid = aPrismBuilder->Shape();
+    new GeomAlgoAPI_MakeShape(aToPrismBuilder)));
+  TopoDS_Shape aToSolid = aToPrismBuilder->Shape();
 
   // Cutting with to plane.
   BRepAlgoAPI_Cut* aToCutBuilder = new BRepAlgoAPI_Cut(aResult, aToSolid);
@@ -450,7 +452,9 @@ void GeomAlgoAPI_Prism::buildByPlanes(const GeomShapePtr             theBaseShap
     aResult = GeomAlgoAPI_DFLoader::refineResult(aResult);
   }
   if (theTypeToExp == GeomAPI_Shape::FACE || theTypeToExp == GeomAPI_Shape::COMPOUND) {
-    const TopTools_ListOfShape& aPrismShapes = aPrismBuilder->Modified(aToShape);
+    TopTools_ListOfShape aPrismShapes = aToPrismBuilder->Modified(aToShape);
+    if (aPrismShapes.IsEmpty())
+      aPrismShapes.Append(aToShape);
     for (TopTools_ListIteratorOfListOfShape anIt1(aPrismShapes); anIt1.More(); anIt1.Next()) {
       const TopTools_ListOfShape& aToShapes = aToCutBuilder->Modified(anIt1.Value());
       for (TopTools_ListIteratorOfListOfShape anIt2(aToShapes); anIt2.More(); anIt2.Next()) {
@@ -463,13 +467,14 @@ void GeomAlgoAPI_Prism::buildByPlanes(const GeomShapePtr             theBaseShap
 
   // Solid based on "From" bounding plane
   aNormal = aFromDir->impl<gp_Dir>();
-  aPrismBuilder = new BRepPrimAPI_MakePrism(aFromShape, aNormal * (-aBndBoxSize));
-  if (!aPrismBuilder || !aPrismBuilder->IsDone()) {
+  BRepPrimAPI_MakePrism* aFromPrismBuilder =
+      new BRepPrimAPI_MakePrism(aFromShape, aNormal * (-aBndBoxSize));
+  if (!aFromPrismBuilder || !aFromPrismBuilder->IsDone()) {
     return;
   }
   this->appendAlgo(std::shared_ptr<GeomAlgoAPI_MakeShape>(
-    new GeomAlgoAPI_MakeShape(aPrismBuilder)));
-  TopoDS_Shape aFromSolid = aPrismBuilder->Shape();
+    new GeomAlgoAPI_MakeShape(aFromPrismBuilder)));
+  TopoDS_Shape aFromSolid = aFromPrismBuilder->Shape();
 
   // Cutting with from plane.
   BRepAlgoAPI_Cut* aFromCutBuilder = new BRepAlgoAPI_Cut(aResult, aFromSolid);
@@ -488,7 +493,9 @@ void GeomAlgoAPI_Prism::buildByPlanes(const GeomShapePtr             theBaseShap
     aResult = GeomAlgoAPI_DFLoader::refineResult(aResult);
   }
   if (theTypeToExp == GeomAPI_Shape::FACE || theTypeToExp == GeomAPI_Shape::COMPOUND) {
-    const TopTools_ListOfShape& aPrismShapes = aPrismBuilder->Modified(aFromShape);
+    TopTools_ListOfShape aPrismShapes = aFromPrismBuilder->Modified(aFromShape);
+    if (aPrismShapes.IsEmpty())
+      aPrismShapes.Append(aFromShape);
     for (TopTools_ListIteratorOfListOfShape anIt1(aPrismShapes); anIt1.More(); anIt1.Next()) {
       const TopTools_ListOfShape& aFromShapes = aFromCutBuilder->Modified(anIt1.Value());
       for (TopTools_ListIteratorOfListOfShape anIt2(aFromShapes); anIt2.More(); anIt2.Next()) {
