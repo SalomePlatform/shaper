@@ -842,10 +842,10 @@ void PartSet_SketcherReentrantMgr::addConstraints(const FeaturePtr& theFeature)
 
   if (theFeature->getKind() == SketchPlugin_Line::ID()) {
     std::shared_ptr<ModelAPI_Data> aData = theFeature->data();
-    std::shared_ptr<GeomDataAPI_Point2D> aPoint1 =
-      std::dynamic_pointer_cast<GeomDataAPI_Point2D>(aData->attribute(SketchPlugin_Line::START_ID()));
-    std::shared_ptr<GeomDataAPI_Point2D> aPoint2 =
-      std::dynamic_pointer_cast<GeomDataAPI_Point2D>(aData->attribute(SketchPlugin_Line::END_ID()));
+    std::shared_ptr<GeomDataAPI_Point2D> aPoint1 = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
+        aData->attribute(SketchPlugin_Line::START_ID()));
+    std::shared_ptr<GeomDataAPI_Point2D> aPoint2 = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
+        aData->attribute(SketchPlugin_Line::END_ID()));
     if (aPoint1.get() && aPoint2.get()) {
       GeomLine2dPtr aLine(new GeomAPI_Lin2d(aPoint1->pnt(), aPoint2->pnt()));
       GeomDir2dPtr aDir = aLine->direction();
@@ -866,8 +866,10 @@ void PartSet_SketcherReentrantMgr::addConstraints(const FeaturePtr& theFeature)
         // Add vertical constraint
         aFeature = aSketch->addFeature(SketchPlugin_ConstraintVertical::ID());
 
-      if (aFeature.get())
-        aFeature->refattr(SketchPlugin_Constraint::ENTITY_A())->setObject(theFeature->firstResult());
+      if (aFeature.get()) {
+        aFeature->refattr(SketchPlugin_Constraint::ENTITY_A())->setObject(
+            theFeature->firstResult());
+      }
     }
   }
 }
