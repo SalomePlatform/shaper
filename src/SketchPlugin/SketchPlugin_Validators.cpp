@@ -836,6 +836,44 @@ bool SketchPlugin_ArcTangentPointValidator::isValid(const AttributePtr& theAttri
   return true;
 }
 
+bool SketchPlugin_ArcTransversalPointValidator::isValid(
+    const AttributePtr& theAttribute,
+    const std::list<std::string>& /*theArguments*/,
+    Events_InfoMessage& theError) const
+{
+  if (theAttribute->attributeType() != ModelAPI_AttributeRefAttr::typeId()) {
+    theError = "The attribute with the %1 type is not processed";
+    theError.arg(theAttribute->attributeType());
+    return false;
+  }
+  AttributeRefAttrPtr aRefAttr = std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(theAttribute);
+  AttributePtr anAttr = aRefAttr->attr();
+  if (!anAttr) {
+    theError = "The attribute %1 should be a point";
+    theError.arg(theAttribute->id());
+    return false;
+  }
+
+  FeaturePtr anAttrFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(anAttr->owner());
+  const std::string& aFeatureType = anAttrFeature->getKind();
+  if (aFeatureType == SketchPlugin_Line::ID()) {
+    // selected point should be bound point of line
+    const std::string& aPntId = anAttr->id();
+    if (aPntId != SketchPlugin_Line::START_ID() && aPntId != SketchPlugin_Line::END_ID()) {
+      theError = "The attribute %1 is not supported";
+      theError.arg(aPntId);
+      return false;
+    }
+  }
+  else {
+    theError = "Unable to build transversal arc on %1";
+    theError.arg(anAttrFeature->getKind());
+    return false;
+  }
+
+  return true;
+}
+
 bool SketchPlugin_IntersectionValidator::isValid(const AttributePtr& theAttribute,
                                                  const std::list<std::string>& theArguments,
                                                  Events_InfoMessage& theError) const

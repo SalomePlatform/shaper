@@ -94,14 +94,13 @@ bool SketcherPrs_Perpendicular::updateIfReadyToDisplay(double theStep, bool with
 void SketcherPrs_Perpendicular::drawLines(const Handle(Prs3d_Presentation)& thePrs,
                                           Quantity_Color theColor) const
 {
-  Handle(Graphic3d_Group) aGroup = Prs3d_Root::CurrentGroup(thePrs);
-
-  Handle(Graphic3d_AspectLine3d) aLineAspect =
-    new Graphic3d_AspectLine3d(theColor, Aspect_TOL_SOLID, 2);
-  aGroup->SetPrimitivesAspect(aLineAspect);
-
   // Draw constrained lines
-  addLine(aGroup, SketchPlugin_Constraint::ENTITY_A());
-  addLine(aGroup, SketchPlugin_Constraint::ENTITY_B());
+  for (int i = 0; i < 2; ++i) {
+    ObjectPtr anObj =
+        SketcherPrs_Tools::getResult(myConstraint, SketchPlugin_Constraint::ATTRIBUTE(i));
+    GeomShapePtr aShape = SketcherPrs_Tools::getShape(anObj);
+    if (!aShape)
+      return;
+    drawShape(aShape, thePrs, theColor);
+  }
 }
-

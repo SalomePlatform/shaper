@@ -236,19 +236,21 @@ public:
       const std::shared_ptr<GeomAPI_Pnt2d>& theEnd,
       const std::shared_ptr<GeomAPI_Pnt2d>& thePassed);
 
-  /// Add arc
+  /// Add transversal/tangent arc
   SKETCHAPI_EXPORT
   std::shared_ptr<SketchAPI_MacroArc> addArc(
-      const ModelHighAPI_RefAttr& theTangentPoint,
+      const ModelHighAPI_RefAttr& theConnectedPoint,
       double theEndX, double theEndY,
-      bool theInversed);
+      bool theInversed,
+      bool theTransversal = false);
 
-  /// Add arc
+  /// Add transversal/tangent arc
   SKETCHAPI_EXPORT
   std::shared_ptr<SketchAPI_MacroArc> addArc(
-      const ModelHighAPI_RefAttr& theTangentPoint,
+      const ModelHighAPI_RefAttr& theConnectedPoint,
       const std::shared_ptr<GeomAPI_Pnt2d>& theEnd,
-      bool theInversed);
+      bool theInversed,
+      bool theTransversal = false);
 
   /// Add arc
   SKETCHAPI_EXPORT

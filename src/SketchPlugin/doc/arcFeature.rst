@@ -10,7 +10,7 @@ To add a new Arc to the Sketch:
 #. select in the Main Menu *Sketch - > Arc* item  or
 #. click |arc.icon| **Arc** button in Sketch toolbar:
 
-There are 3 algorithms for creation of an Arc:
+There are 4 algorithms for creation of an Arc:
 
 .. image:: images/arc_base_32x32.png
    :align: left
@@ -23,6 +23,10 @@ There are 3 algorithms for creation of an Arc:
 .. image:: images/arc_tang_32x32.png
    :align: left
 **By tangent point and end point** creates an arc segment with the tangent point and the end point.
+
+.. image:: images/arc_perp_32x32.png
+   :align: left
+**By transversal point and end point** creates an arc segment perpendicular to a straight line with the start point, connected with boundary of this line, and the end point.
 
 By center and two points
 """"""""""""""""""""""""
@@ -90,12 +94,36 @@ The tangent point by itself is a start point. The edge on which it lies will be 
 
 **TUI Command**:
 
-.. py:function:: Sketch_1.addArc(TangetPoint, EndX, EndY, Inversed)
+.. py:function:: Sketch_1.addArc(TangentPoint, EndX, EndY, Inversed)
 
-    :param object: Tanget Point.
+    :param object: Tangent Point.
     :param real: End X.
     :param real: End Y.
     :param boolean: Is inversed.
+    :return: Result object.
+
+By transveral point and point
+"""""""""""""""""""""""""""""
+
+.. image:: images/Arc_panel_perp.png
+   :align: center
+
+Select a point on a straight segment in the view to set the transversal point, then move the mouse and click to set the end point.
+The transversal point by itself is a start point. The edge on which it lies will be perpendicular to the arc (the center of the arc is lying on the edge).
+
+- When entering a transversal point by selecting a point on segment, a Perpendicular constraint is created.
+- When entering an end point by selecting a segment, a Coincident constraint is created.
+- When entering an end point, only segments are selectable.
+
+**TUI Command**:
+
+.. py:function:: Sketch_1.addArc(TransversalPoint, EndX, EndY, Inversed, True)
+
+    :param object: Transversal Point.
+    :param real: End X.
+    :param real: End Y.
+    :param boolean: Is inversed.
+    :param boolean: Arc is transversal (always True).
     :return: Result object.
 
 Result

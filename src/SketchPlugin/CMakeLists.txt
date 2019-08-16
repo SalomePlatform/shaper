@@ -222,6 +222,7 @@ ADD_UNIT_TESTS(
   TestCreateArcByCenterStartEnd.py
   TestCreateArcByTangentEdge.py
   TestCreateArcByThreePoints.py
+  TestCreateArcByTransversalLine.py
   TestCreateArcChangeType.py
   TestCreateCircleByCenterAndPassed.py
   TestCreateCircleByThreePoints.py

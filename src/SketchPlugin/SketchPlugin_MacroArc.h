@@ -72,6 +72,12 @@ class SketchPlugin_MacroArc: public SketchPlugin_SketchEntity,
     return ID;
   }
 
+  inline static const std::string& ARC_TYPE_BY_TRANSVERSAL_LINE()
+  {
+    static const std::string ID("by_transversal_line");
+    return ID;
+  }
+
   /// Central 2D point of the circle which contains the arc
   inline static const std::string& CENTER_POINT_ID()
   {
@@ -220,8 +226,9 @@ private:
   void fillByCenterAndTwoPassed();
   /// Set fields for center, start and end points by selected passed points
   void fillByThreePassedPoints();
-  /// Set fields for center, start and end points by selected tangent edge
-  void fillByTangentEdge();
+  /// Set fields for center, start and end points by selected tangent or transversal edge
+  /// \param theTransversal if \c true, builds transversal arc, otherwise builds tangential arc.
+  void fillByEdge(bool theTransversal);
 
   FeaturePtr createArcFeature();
 

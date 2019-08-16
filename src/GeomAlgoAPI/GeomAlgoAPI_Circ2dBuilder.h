@@ -58,6 +58,10 @@ public:
   GEOMALGOAPI_EXPORT
   void addTangentCurve(const std::shared_ptr<GeomAPI_Shape>& theEdge);
 
+  /// \brief Constrain circle to be orthogonal to the given edge
+  GEOMALGOAPI_EXPORT
+  void setTransversalLine(const std::shared_ptr<GeomAPI_Shape>& theEdge);
+
   /// \brief Constrain circle to pass through the given point
   GEOMALGOAPI_EXPORT
   void addPassingPoint(const std::shared_ptr<GeomAPI_Pnt2d>& thePoint);
@@ -82,6 +86,7 @@ private:
   std::shared_ptr<GeomAPI_Pnt2d>                myCenter;
   std::vector< std::shared_ptr<GeomAPI_Pnt2d> > myPassingPoints;
   std::vector< std::shared_ptr<GeomAPI_Shape> > myTangentShapes;
+  std::shared_ptr<GeomAPI_Shape>                myTransversalLine;
   std::shared_ptr<GeomAPI_Pnt2d>                myClosestPoint;
   double                                        myRadius;
 };

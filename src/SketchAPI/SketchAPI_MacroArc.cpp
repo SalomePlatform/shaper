@@ -201,3 +201,29 @@ void SketchAPI_MacroArc::setByTangent(const ModelHighAPI_RefAttr& theTangentPoin
 
   execute();
 }
+
+//================================================================================================
+void SketchAPI_MacroArc::setByTransversal(const ModelHighAPI_RefAttr& theTransversalPoint,
+                                          double theEndX, double theEndY,
+                                          bool theInversed)
+{
+  fillAttribute(SketchPlugin_MacroArc::ARC_TYPE_BY_TRANSVERSAL_LINE(), myarcType);
+  fillAttribute(theTransversalPoint, mytangentPoint);
+  fillAttribute(endPoint3(), theEndX, theEndY);
+  fillAttribute(theInversed, myreversed);
+
+  execute();
+}
+
+//================================================================================================
+void SketchAPI_MacroArc::setByTransversal(const ModelHighAPI_RefAttr& theTransversalPoint,
+                                          const std::shared_ptr<GeomAPI_Pnt2d>& theEnd,
+                                          bool theInversed)
+{
+  fillAttribute(SketchPlugin_MacroArc::ARC_TYPE_BY_TRANSVERSAL_LINE(), myarcType);
+  fillAttribute(theTransversalPoint, mytangentPoint);
+  fillAttribute(theEnd, myendPoint3);
+  fillAttribute(theInversed, myreversed);
+
+  execute();
+}

@@ -249,6 +249,25 @@ class SketchPlugin_ArcTangentPointValidator : public ModelAPI_AttributeValidator
                        Events_InfoMessage& theError) const;
 };
 
+/**\class SketchPlugin_ArcTransversalPointValidator
+ * \ingroup Validators
+ * \brief Validator for the point where the transversal arc is building.
+ *
+ * Checks that the point is a start or end point just on line or arc.
+ */
+class SketchPlugin_ArcTransversalPointValidator : public ModelAPI_AttributeValidator
+{
+ public:
+  //! returns true if attribute is valid
+  //! \param theAttribute the checked attribute
+  //! \param theArguments arguments of the attribute
+  //! \param theError error message
+  virtual bool isValid(const AttributePtr& theAttribute,
+                       const std::list<std::string>& theArguments,
+                       Events_InfoMessage& theError) const;
+};
+
+
 /**\class SketchPlugin_SplitValidator
  * \ingroup Validators
  * \brief Validator for the entity of the following type:

@@ -460,22 +460,33 @@ std::shared_ptr<SketchAPI_MacroArc> SketchAPI_Sketch::addArc(
 std::shared_ptr<SketchAPI_MacroArc> SketchAPI_Sketch::addArc(
                                                 const ModelHighAPI_RefAttr& theTangentPoint,
                                                 double theEndX, double theEndY,
-                                                bool theInversed)
+                                                bool theInversed,
+                                                bool theTransversal)
 {
   std::shared_ptr<ModelAPI_Feature> aFeature =
     compositeFeature()->addFeature(SketchPlugin_MacroArc::ID());
-  return MacroArcPtr(new SketchAPI_MacroArc(
-    aFeature, theTangentPoint, theEndX, theEndY, theInversed));
+  MacroArcPtr aMacroArc(new SketchAPI_MacroArc(aFeature));
+  if (theTransversal)
+    aMacroArc->setByTransversal(theTangentPoint, theEndX, theEndY, theInversed);
+  else
+    aMacroArc->setByTangent(theTangentPoint, theEndX, theEndY, theInversed);
+  return aMacroArc;
 }
 
 std::shared_ptr<SketchAPI_MacroArc> SketchAPI_Sketch::addArc(
                                               const ModelHighAPI_RefAttr& theTangentPoint,
                                               const std::shared_ptr<GeomAPI_Pnt2d>& theEnd,
-                                              bool theInversed)
+                                              bool theInversed,
+                                              bool theTransversal)
 {
   std::shared_ptr<ModelAPI_Feature> aFeature =
     compositeFeature()->addFeature(SketchPlugin_MacroArc::ID());
-  return MacroArcPtr(new SketchAPI_MacroArc(aFeature, theTangentPoint, theEnd, theInversed));
+  MacroArcPtr aMacroArc(new SketchAPI_MacroArc(aFeature));
+  if (theTransversal)
+    aMacroArc->setByTransversal(theTangentPoint, theEnd, theInversed);
+  else
+    aMacroArc->setByTangent(theTangentPoint, theEnd, theInversed);
+  return aMacroArc;
 }
 
 std::shared_ptr<SketchAPI_Arc> SketchAPI_Sketch::addArc(const ModelHighAPI_Selection & theExternal)

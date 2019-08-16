@@ -119,6 +119,8 @@ SketchPlugin_Plugin::SketchPlugin_Plugin()
                               new SketchPlugin_MiddlePointAttrValidator);
   aFactory->registerValidator("SketchPlugin_ArcTangentPoint",
                               new SketchPlugin_ArcTangentPointValidator);
+  aFactory->registerValidator("SketchPlugin_ArcTransversalPoint",
+                              new SketchPlugin_ArcTransversalPointValidator);
   aFactory->registerValidator("SketchPlugin_IntersectionValidator",
                               new SketchPlugin_IntersectionValidator);
   aFactory->registerValidator("SketchPlugin_ProjectionValidator",
