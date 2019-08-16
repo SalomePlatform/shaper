@@ -463,6 +463,8 @@ private:
   PartSet_ExternalPointsMgr* myExternalPointsMgr;
 
   QMap<ResultPtr, Handle(AIS_Shape)> myPointsHighlight;
+
+  bool myNoDragMoving;
 };
 
 
