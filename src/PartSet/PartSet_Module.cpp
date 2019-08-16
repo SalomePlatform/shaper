@@ -1493,7 +1493,7 @@ void PartSet_Module::processEvent(const std::shared_ptr<Events_Message>& theMess
     aDisplayer->updateViewer();
     // Update tree items if they are expanded
     if (needUpdate) {
-      aTreeView->viewport()->repaint(aTreeView->viewport()->rect());
+      aTreeView->viewport()->update(aTreeView->viewport()->rect());
     }
   } else if (theMessage->eventID() == Events_Loop::loop()->eventByName(EVENT_OBJECT_CREATED)) {
     std::shared_ptr<ModelAPI_ObjectUpdatedMessage> aUpdMsg =

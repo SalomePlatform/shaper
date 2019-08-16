@@ -761,7 +761,7 @@ void ModuleBase_WidgetMultiSelector::updateSelectionList()
   }
 
   // We have to call repaint because sometimes the List control is not updated
-  myListView->getControl()->repaint();
+  myListView->getControl()->update();
 }
 
 //********************************************************************

@@ -155,7 +155,7 @@ void setFocus(QWidget* theWidget, const QString& theInfo)
   activateWindow(theWidget);
   theWidget->setFocus();
   // rectangle of focus is not visible on tool button widgets
-  theWidget->repaint();
+  theWidget->update();
 #ifdef DEBUG_SET_FOCUS
   qDebug(QString("setFocus: %1").arg(theInfo).toStdString().c_str());
 #endif
