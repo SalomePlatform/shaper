@@ -895,7 +895,8 @@ ModuleBase_ModelWidget* PartSet_Module::createWidgetByType(const std::string& th
     connect(aLabelWgt, SIGNAL(showConstraintToggled(int, bool)),
       mySketchMgr, SLOT(onShowConstraintsToggle(int, bool)));
     connect(aLabelWgt, SIGNAL(showFreePoints(bool)), mySketchMgr, SLOT(onShowPoints(bool)));
-    connect(aLabelWgt, SIGNAL(autoConstraints(bool)), sketchReentranceMgr(), SLOT(onAutoConstraints(bool)));
+    connect(aLabelWgt, SIGNAL(autoConstraints(bool)),
+      sketchReentranceMgr(), SLOT(onAutoConstraints(bool)));
     aLabelWgt->setShowPointsState(mySketchMgr->isShowFreePointsShown());
     aWgt = aLabelWgt;
   } else if (theType == "sketch-2dpoint_selector") {
