@@ -47,20 +47,30 @@ class compoundVertices(model.Feature):
         filepath = apath.value()
         print("filepath : ", filepath)
         if filepath != "" :
+            
+            from os.path import basename
+            filename = basename(filepath)
+            print("filename : ", filename)
 
             # Creating the construction points in the current document
             part = model.activeDocument()
             lVertices = []
+
+            startPoint = None
 
             with open(filepath) as file:
                 for line in file:
                     coord = line.split(' ')
                     x = float(coord[0]); y = float(coord[1]); z = float(coord[2]);
                     point = model.addPoint(part, x,y,z); point.execute(True)
+                    if startPoint == None : startPoint = point
                     vertex = model.addVertex(part, [point.result()]); vertex.execute(True)
                     lVertices.append(vertex.result())
                 file.close()
-                Compound_1 = model.addCompound(part, lVertices)
+                compound = model.addCompound(part, lVertices)
+                compound.execute(True)
+                folder = model.addFolder(part, startPoint, compound)
+                folder.setName(filename)
                 return
         
             setError("The file does not exist")
