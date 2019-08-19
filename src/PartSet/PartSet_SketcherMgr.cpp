@@ -577,6 +577,11 @@ void PartSet_SketcherMgr::onMouseMoved(ModuleBase_IViewWindow* theWnd, QMouseEve
     if (isSketchOperation(aCurrentOperation))
       return; // No edit operation activated
 
+#ifdef DRAGGING_DEBUG
+    QTime t;
+    t.start();
+#endif
+
     Handle(V3d_View) aView = theWnd->v3dView();
     gp_Pnt aPoint = PartSet_Tools::convertClickToPoint(theEvent->pos(), aView);
     Point aMousePnt;
@@ -662,6 +667,10 @@ void PartSet_SketcherMgr::onMouseMoved(ModuleBase_IViewWindow* theWnd, QMouseEve
     // 6. restore the update viewer flag and call this update
     aDisplayer->enableUpdateViewer(isEnableUpdateViewer);
     aDisplayer->updateViewer();
+
+#ifdef DRAGGING_DEBUG
+    cout << "Mouse move processing " << t.elapsed() << endl;
+#endif
 
     myDragDone = true;
     myCurrentPoint = aMousePnt;
