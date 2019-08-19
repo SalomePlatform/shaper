@@ -104,8 +104,16 @@ static TopoDS_Vertex findStartVertex(const TopoDS_Wire& theWire, const TopoDS_Fa
   return findStartVertex(theWire);
 }
 
+static double middleValue(const NCollection_Array1<int>& theArray)
+{
+  double aSum = 0.0;
+  for (NCollection_Array1<int>::Iterator anIt(theArray); anIt.More(); anIt.Next())
+    aSum += (double)anIt.Value();
+  return aSum / theArray.Size();
+}
+
 // returns true if the first shape must be located earlier than the second
-bool isFirst(const TopoDS_Shape& theFirst, const TopoDS_Shape& theSecond,
+static bool isFirst(const TopoDS_Shape& theFirst, const TopoDS_Shape& theSecond,
   NCollection_DataMap<TopoDS_Shape, NCollection_Array1<int> >& theAreaToIndex,
   const NCollection_DataMap<Handle(Geom_Curve), int>& theCurveToIndex)
 {
@@ -139,15 +147,25 @@ bool isFirst(const TopoDS_Shape& theFirst, const TopoDS_Shape& theSecond,
   bool isFirst;
   bool aGeomCompare = !theAreaToIndex.IsBound(theFirst) || !theAreaToIndex.IsBound(theSecond);
   if (!aGeomCompare) {
-    // compare lists of indices one by one to find chich list indices are lower
-    NCollection_Array1<int>::Iterator aFirstList(theAreaToIndex.ChangeFind(theFirst));
-    NCollection_Array1<int>::Iterator aSecondList(theAreaToIndex.ChangeFind(theSecond));
-    for (; aFirstList.More() && aSecondList.More(); aFirstList.Next(), aSecondList.Next()) {
-      if (aFirstList.Value() < aSecondList.Value()) return true;
-      if (aFirstList.Value() > aSecondList.Value()) return false;
+    // compare median of the lists
+    NCollection_Array1<int>& aFirstList  = theAreaToIndex.ChangeFind(theFirst);
+    NCollection_Array1<int>& aSecondList = theAreaToIndex.ChangeFind(theSecond);
+    double aFirstMiddle  = middleValue(aFirstList);
+    double aSecondMiddle = middleValue(aSecondList);
+    if (aFirstMiddle < aSecondMiddle)
+      return true;
+    else if (aFirstMiddle > aSecondMiddle)
+      return false;
+    // compare lists of indices one by one to find which list indices are lower
+    NCollection_Array1<int>::Iterator aFirstListIt(aFirstList);
+    NCollection_Array1<int>::Iterator aSecondListIt(aSecondList);
+    for (; aFirstListIt.More() && aSecondListIt.More();
+         aFirstListIt.Next(), aSecondListIt.Next()) {
+      if (aFirstListIt.Value() < aSecondListIt.Value()) return true;
+      if (aFirstListIt.Value() > aSecondListIt.Value()) return false;
     }
-    aGeomCompare = !aFirstList.More() && !aSecondList.More();
-    isFirst = !aFirstList.More();
+    aGeomCompare = !aFirstListIt.More() && !aSecondListIt.More();
+    isFirst = !aFirstListIt.More();
   } else {
     isFirst = !theAreaToIndex.IsBound(theFirst);
   }

@@ -77,8 +77,11 @@ namespace ModelGeomAlgo_Shape
     std::list<GeomShapePtr> aSubs = theShape->subShapes(theType);
     for (std::list<GeomShapePtr>::const_iterator aSubIt = aSubs.begin();
          aSubIt != aSubs.end(); ++aSubIt) {
+      double aTol = (*aSubIt)->tolerance();
+      if (theTolerance > aTol)
+        aTol = theTolerance;
       GeomPointPtr aMiddlePoint = (*aSubIt)->middlePoint();
-      if (aMiddlePoint && aMiddlePoint->distance(thePoint) < theTolerance)
+      if (aMiddlePoint && aMiddlePoint->distance(thePoint) < aTol)
         aFoundSubs.push_back(*aSubIt);
     }
     return aFoundSubs;
