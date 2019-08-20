@@ -104,7 +104,7 @@ static TopoDS_Vertex findStartVertex(const TopoDS_Wire& theWire, const TopoDS_Fa
   return findStartVertex(theWire);
 }
 
-static double middleValue(const NCollection_Array1<int>& theArray)
+static double averageValue(const NCollection_Array1<int>& theArray)
 {
   double aSum = 0.0;
   for (NCollection_Array1<int>::Iterator anIt(theArray); anIt.More(); anIt.Next())
@@ -147,15 +147,17 @@ static bool isFirst(const TopoDS_Shape& theFirst, const TopoDS_Shape& theSecond,
   bool isFirst;
   bool aGeomCompare = !theAreaToIndex.IsBound(theFirst) || !theAreaToIndex.IsBound(theSecond);
   if (!aGeomCompare) {
-    // compare median of the lists
+    // compare average values of the lists
     NCollection_Array1<int>& aFirstList  = theAreaToIndex.ChangeFind(theFirst);
     NCollection_Array1<int>& aSecondList = theAreaToIndex.ChangeFind(theSecond);
-    double aFirstMiddle  = middleValue(aFirstList);
-    double aSecondMiddle = middleValue(aSecondList);
-    if (aFirstMiddle < aSecondMiddle)
-      return true;
-    else if (aFirstMiddle > aSecondMiddle)
-      return false;
+    if (aFirstList.Size() > 1 && aSecondList.Size() > 1) {
+      double aFirstMiddle  = averageValue(aFirstList);
+      double aSecondMiddle = averageValue(aSecondList);
+      if ((double)aFirstList.Last() < aSecondMiddle)
+        return true;
+      else if (aFirstMiddle > (double)aSecondList.Last())
+        return false;
+    }
     // compare lists of indices one by one to find which list indices are lower
     NCollection_Array1<int>::Iterator aFirstListIt(aFirstList);
     NCollection_Array1<int>::Iterator aSecondListIt(aSecondList);
@@ -189,7 +191,7 @@ static void sortFaces(TopTools_ListOfShape& theAreas,
   // collect indices of all edges to operate them quickly
   NCollection_DataMap<Handle(Geom_Curve), int> aCurveToIndex; // curve -> index in initial shapes
   std::list<std::shared_ptr<GeomAPI_Shape> >::const_iterator aFeatIt = theInitialShapes.begin();
-  for (int anIndex = 0; aFeatIt != theInitialShapes.end(); aFeatIt++) {
+  for (int anIndex = 0; aFeatIt != theInitialShapes.end(); ++aFeatIt, ++anIndex) {
     std::shared_ptr<GeomAPI_Shape> aShape(*aFeatIt);
     const TopoDS_Edge& anEdge = aShape->impl<TopoDS_Edge>();
     if (anEdge.ShapeType() != TopAbs_EDGE)
@@ -200,7 +202,7 @@ static void sortFaces(TopTools_ListOfShape& theAreas,
     if (aCurve->DynamicType() == STANDARD_TYPE(Geom_TrimmedCurve))
       aCurve = Handle(Geom_TrimmedCurve)::DownCast(aCurve)->BasisCurve();
     if (!aCurveToIndex.IsBound(aCurve))
-      aCurveToIndex.Bind(aCurve, anIndex++);
+      aCurveToIndex.Bind(aCurve, anIndex);
   }
   // map from area to the most first indices of curves (to compare) in it
   NCollection_DataMap<TopoDS_Shape, NCollection_Array1<int> > anAreaToIndex;
