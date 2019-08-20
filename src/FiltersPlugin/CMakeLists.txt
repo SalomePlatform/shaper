@@ -119,11 +119,13 @@ ADD_UNIT_TESTS(
   TestFilter_OnGeometry_Face1.py
   TestFilter_OnGeometry_Face2.py
   TestFilter_OnGeometry_Face3.py
+  TestFilter_OnGeometry_Face4.py
   TestFilter_OnGeometry_Exclude_Edge1.py
   TestFilter_OnGeometry_Exclude_Edge2.py
   TestFilter_OnGeometry_Exclude_Face1.py
   TestFilter_OnGeometry_Exclude_Face2.py
   TestFilter_OnGeometry_Exclude_Face3.py
+  TestFilter_OnGeometry_Exclude_Face4.py
   TestFilter_OnPlaneSide_Face.py
   TestFilter_OnPlaneSide_Plane.py
   TestFilter_OnPlaneSide_Exclude_Face.py

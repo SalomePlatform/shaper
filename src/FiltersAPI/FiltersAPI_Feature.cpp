@@ -29,6 +29,7 @@ FiltersAPI_Feature::FiltersAPI_Feature(
 : ModelHighAPI_Interface(theFeature)
 {
   initialize();
+  std::dynamic_pointer_cast<ModelAPI_FiltersFeature>(theFeature)->initAttributes();
 }
 
 FiltersAPI_Feature::~FiltersAPI_Feature()
