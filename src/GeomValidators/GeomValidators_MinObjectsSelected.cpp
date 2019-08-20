@@ -52,7 +52,7 @@ bool GeomValidators_MinObjectsSelected::isValid(const std::shared_ptr<ModelAPI_F
 
   if(anObjectsNb < aMinObjectsNb) {
     theError = "Error: Attribute \"%1\" should contain at least %2 items.";
-    theError.arg(aSelectionListId).arg(theArguments.back());
+    theError.arg(aSelectionListId).arg(aMinObjectsNb);
     return false;
   }
 

@@ -79,29 +79,7 @@ void GeomAlgoAPI_Sewing::build(const ListOfShape& theShapes)
 }
 
 //==================================================================================================
-#include <GeomAPI_ShapeExplorer.h>
 #include <GeomAPI_ShapeIterator.h>
-
-typedef std::map<GeomShapePtr, ListOfShape, GeomAPI_Shape::Comparator> MapFaceSolid;
-static void facesBelongingToSolids(const GeomShapePtr& theShape,
-                                   MapFaceSolid& theShapeRelations)
-{
-  for (GeomAPI_ShapeExplorer aSolidExp(theShape, GeomAPI_Shape::SHELL);
-       aSolidExp.more(); aSolidExp.next()) {
-    GeomShapePtr aSolid = aSolidExp.current();
-    for (GeomAPI_ShapeExplorer aFaceExp(aSolid, GeomAPI_Shape::FACE);
-         aFaceExp.more(); aFaceExp.next())
-      theShapeRelations[aFaceExp.current()].push_back(aSolid);
-  }
-}
-
-static bool isShapeInList(const GeomShapePtr& theShape, const ListOfShape& theList)
-{
-  for (ListOfShape::const_iterator anIt = theList.begin(); anIt != theList.end(); ++anIt)
-    if (theShape->isEqual(*anIt))
-      return true;
-  return false;
-}
 
 void GeomAlgoAPI_Sewing::modified(const std::shared_ptr<GeomAPI_Shape> theShape,
                                   ListOfShape& theHistory)

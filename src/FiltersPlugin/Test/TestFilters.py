@@ -25,13 +25,13 @@ partSet = model.moduleDocument()
 Part_1 = model.addPart(partSet)
 Part_1_doc = Part_1.document()
 Box_1 = model.addBox(Part_1_doc, 10, 10, 10)
-Group_1 = model.addGroup(Part_1_doc, [model.selection("FACE", "Box_1_1/Bottom"), model.selection("FACE", "Box_1_1/Top"), model.filters(Part_1_doc, [model.addFilter(name = "BelongsTo", args = []), model.addFilter(name = "HorizontalFaces")])])
+Group_1 = model.addGroup(Part_1_doc, [model.selection("FACE", "Box_1_1/Bottom"), model.filters(Part_1_doc, [model.addFilter(name = "BelongsTo", args = [model.selection("SOLID", "Box_1_1")]), model.addFilter(name = "HorizontalFaces"), model.addFilter(name = "OnGeometry", args = [model.selection("FACE", "PartSet/XOY")])])])
 model.end()
 
 aFactory = ModelAPI_Session.get().validators()
 
 GroupFeature = Group_1.feature()
 assert(aFactory.validate(GroupFeature))
-assert(GroupFeature.selectionList("group_list").size() == 2)
+assert(GroupFeature.selectionList("group_list").size() == 1)
 
 assert(model.checkPythonDump())
