@@ -74,4 +74,12 @@ class compoundVertices(model.Feature):
                 return
         
             setError("The file does not exist")
-			
+
+    def isMacro(self):
+        """Override Feature.initAttributes().
+        F.isMacro() -> True
+
+        compoundVertices feature is macro: removes itself on the creation transaction
+        finish.
+        """
+        return True			
