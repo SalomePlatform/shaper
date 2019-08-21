@@ -83,5 +83,8 @@ void CollectionPlugin_GroupAddition::execute()
   aCompound = aSubs.empty() ? GeomShapePtr() : GeomAlgoAPI_CompoundBuilder::compound(aSubs);
   aGroup->store(aCompound);
 
+  // update the type of selection
+  updateGroupType(LIST_ID());
+
   setResult(aGroup);
 }

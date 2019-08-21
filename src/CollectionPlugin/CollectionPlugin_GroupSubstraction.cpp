@@ -101,6 +101,9 @@ void CollectionPlugin_GroupSubstraction::execute()
     removeResults(0);
   }
   else {
+    // update the type of selection
+    updateGroupType(LIST_ID());
+
     GeomShapePtr aCompound = GeomAlgoAPI_CompoundBuilder::compound(aCut);
     aGroup->store(aCompound);
     setResult(aGroup);
