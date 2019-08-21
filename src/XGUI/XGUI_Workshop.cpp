@@ -174,13 +174,13 @@ QString XGUI_Workshop::MOVE_TO_END_COMMAND = QObject::tr("Move to the end");
 //#define DEBUG_CLEAN_HISTORY
 
 #ifdef HAVE_SALOME
-static QString MyFilter(QObject::tr("SHAPER files (*.shaper *.opp)"));
+static QString MyFilter(QObject::tr("SHAPER files (*.shaper *.cadbld)"));
 static QString MyFilter2(QObject::tr("SHAPER files (*.shaper)"));
 static QString MyExtension(".shaper");
 #else
-static QString MyFilter(QObject::tr("CAD Builder files (*.opp);;All files (*.*)"));
-static QString MyFilter2(QObject::tr("CAD Builder files (*.opp)"));
-static QString MyExtension(".opp");
+static QString MyFilter(QObject::tr("CAD Builder files (*.cadbld);;All files (*.*)"));
+static QString MyFilter2(QObject::tr("CAD Builder files (*.cadbld)"));
+static QString MyExtension(".cadbld");
 #endif
 
 
