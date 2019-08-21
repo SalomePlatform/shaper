@@ -31,7 +31,7 @@ Note, that operation is valid only for the groups of the same type.
 
     :param part: The current part object
     :param list: A list of selected groups
-    :return: Created object.
+    :return: Created group.
 
 
 **See Also** a sample TUI Script of :ref:`tui_create_group_intersection` operation.
