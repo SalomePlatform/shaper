@@ -76,25 +76,7 @@ Translation_1 = model.addTranslation(Part_1_doc, [model.selection("SOLID", "Cyli
 Filters = model.filters(Part_1_doc, [model.addFilter(name = "RelativeToSolid", args = [model.selection("SOLID", "Extrusion_1_1"), "on"])])
 model.end()
 
-Solid1 = Extrusion_1.results()[0].resultSubShapePair()[0]
-Solid2 = Extrusion_1.results()[1].resultSubShapePair()[0]
-Solid3 = Extrusion_2.result().resultSubShapePair()[0]
-Solid4 = Extrusion_3.result().resultSubShapePair()[0]
-Solid5 = Extrusion_4.result().resultSubShapePair()[0]
-Solid6 = Translation_1.result().resultSubShapePair()[0]
-
-from GeomAPI import GeomAPI_Shape
-emptyShape = GeomAPI_Shape()
-
 Reference = {
-    # Solids
-    model.selection(Solid1, emptyShape): False,
-    model.selection(Solid2, emptyShape): False,
-    model.selection(Solid3, emptyShape): False,
-    model.selection(Solid4, emptyShape): False,
-    model.selection(Solid5, emptyShape): False,
-    model.selection(Solid6, emptyShape): False,
-
     # Faces of solid 1
     model.selection("FACE", "Extrusion_1_1/To_Face"): True,
     model.selection("FACE", "Extrusion_1_1/From_Face"): True,
