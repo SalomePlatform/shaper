@@ -4,6 +4,7 @@
              placeholder="Please input the group name">
   </namevalue>
   <multi_selector id="group_list"
+                  label="Base groups:"
                   tooltip="Select a set of groups"
                   type_choice="objects">
     <validator id="CollectionPlugin_OperationAttribute"/>
