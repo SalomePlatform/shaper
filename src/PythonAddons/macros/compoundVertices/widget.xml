@@ -5,6 +5,8 @@
       <feature id="compoundVertices" title="Points set" tooltip="Import a set of construction points" icon="icons/import.png">
         <file_selector id="file_path" title="Import file" path="">
         </file_selector>
+        <stringvalue id="separator"  label="Separator (optional): ">
+        </stringvalue>
       </feature>
 
     </group>

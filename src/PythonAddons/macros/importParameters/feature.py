@@ -58,6 +58,8 @@ class importParameters(model.Feature):
                         model.addParameter(part, defParameters[0], defParameters[1])
                 file.close()
                 return
+        
+            setError("The file does not exist")
 
     def isMacro(self):
         """Override Feature.initAttributes().
@@ -67,6 +69,5 @@ class importParameters(model.Feature):
         finish.
         """
         return True
-        
-            setError("The file does not exist")
+
 			
