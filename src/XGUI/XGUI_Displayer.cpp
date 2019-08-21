@@ -370,10 +370,15 @@ void XGUI_Displayer::redisplayObjects()
   // redisplay objects visualized in the viewer
   static Events_ID EVENT_DISP = Events_Loop::eventByName(EVENT_OBJECT_TO_REDISPLAY);
   static const ModelAPI_EventCreator* aECreator = ModelAPI_EventCreator::get();
-  QObjectPtrList aDisplayed = myWorkshop->displayer()->displayedObjects();
+  QObjectPtrList aDisplayed = displayedObjects();
   QObjectPtrList::const_iterator anIt = aDisplayed.begin(), aLast = aDisplayed.end();
   for (; anIt != aLast; anIt++) {
     aECreator->sendUpdated(*anIt, EVENT_DISP);
+  }
+  XGUI_ViewerProxy* aViewer = myWorkshop->viewer();
+  if (aViewer->isColorScaleVisible()) {
+    aViewer->setupColorScale();
+    aViewer->setColorScaleShown(true);
   }
   Events_Loop::loop()->flush(EVENT_DISP);
 }

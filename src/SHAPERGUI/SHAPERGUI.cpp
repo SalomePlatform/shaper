@@ -792,32 +792,32 @@ void SHAPERGUI::createPreferences()
 
   int colorScaleGroup = pref->addItem(tr("Color scale"), viewTab);
   pref->setItemProperty("columns", 4, colorScaleGroup);
-  int aItem = pref->addItem(tr("X position"), colorScaleGroup,
+  int aItem = aMgr.addPreference(tr("X position"), colorScaleGroup,
     SUIT_PreferenceMgr::Double, ModuleBase_Preferences::VIEWER_SECTION, "scalar_bar_x_position");
   pref->setItemProperty("min", 0, aItem);
   pref->setItemProperty("max", 1, aItem);
 
-  aItem = pref->addItem(tr("Y position"), colorScaleGroup,
+  aItem = aMgr.addPreference(tr("Y position"), colorScaleGroup,
     SUIT_PreferenceMgr::Double, ModuleBase_Preferences::VIEWER_SECTION, "scalar_bar_y_position");
   pref->setItemProperty("min", 0, aItem);
   pref->setItemProperty("max", 1, aItem);
 
-  aItem = pref->addItem(tr("Width"), colorScaleGroup,
+  aItem = aMgr.addPreference(tr("Width"), colorScaleGroup,
     SUIT_PreferenceMgr::Double, ModuleBase_Preferences::VIEWER_SECTION, "scalar_bar_width");
   pref->setItemProperty("min", 0, aItem);
   pref->setItemProperty("max", 1, aItem);
 
-  aItem = pref->addItem(tr("Height"), colorScaleGroup,
+  aItem = aMgr.addPreference(tr("Height"), colorScaleGroup,
     SUIT_PreferenceMgr::Double, ModuleBase_Preferences::VIEWER_SECTION, "scalar_bar_height");
   pref->setItemProperty("min", 0, aItem);
   pref->setItemProperty("max", 1, aItem);
 
-  aItem = pref->addItem(tr("Intervals number"), colorScaleGroup,
+  aItem = aMgr.addPreference(tr("Intervals number"), colorScaleGroup,
     SUIT_PreferenceMgr::Integer, ModuleBase_Preferences::VIEWER_SECTION, "scalar_bar_nb_intervals");
   pref->setItemProperty("min", 0, aItem);
   pref->setItemProperty("max", 100, aItem);
 
-  aItem = pref->addItem(tr("Text height"), colorScaleGroup,
+  aItem = aMgr.addPreference(tr("Text height"), colorScaleGroup,
     SUIT_PreferenceMgr::Integer, ModuleBase_Preferences::VIEWER_SECTION, "scalar_bar_text_height");
   pref->setItemProperty("min", 0, aItem);
   pref->setItemProperty("max", 100, aItem);
