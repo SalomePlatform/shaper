@@ -33,6 +33,9 @@
 #include <ModelAPI_Tools.h>
 #include <ModelAPI_Expression.h>
 
+#include <GeomDataAPI_Point.h>
+#include <GeomDataAPI_Point2D.h>
+
 #include <ModuleBase_Tools.h>
 
 #include <Events_Loop.h>
@@ -374,18 +377,40 @@ QList<QStringList> ParametersPlugin_WidgetParamsMgr::
             QStringList aValNames;
             aValNames << aReferenced->data()->name().c_str();
 
-            AttributeDoublePtr aDouble =
-              std::dynamic_pointer_cast<ModelAPI_AttributeDouble>(aAttr);
-            if (aDouble.get()) {
+            std::string aId = aAttr->attributeType();
+            if (aId == ModelAPI_AttributeDouble::typeId()) {
+              AttributeDoublePtr aDouble =
+                std::dynamic_pointer_cast<ModelAPI_AttributeDouble>(aAttr);
               aValNames << aDouble->text().c_str();
               aValNames << QString::number(aDouble->value());
-            } else {
+            }
+            else if (aId == ModelAPI_AttributeInteger::typeId()) {
               AttributeIntegerPtr aInt =
                 std::dynamic_pointer_cast<ModelAPI_AttributeInteger>(aAttr);
-              if (aInt.get()) {
-                aValNames << aInt->text().c_str();
-                aValNames << QString::number(aInt->value());
-              }
+              aValNames << aInt->text().c_str();
+              aValNames << QString::number(aInt->value());
+            }
+            else if (aId == GeomDataAPI_Point::typeId()) {
+              std::shared_ptr<GeomDataAPI_Point> aPnt =
+                std::dynamic_pointer_cast<GeomDataAPI_Point>(aAttr);
+
+              QString aExpr = QString("%1,%2,%3").arg(aPnt->textX().c_str()).
+                arg(aPnt->textY().c_str()).arg(aPnt->textZ().c_str());
+              aValNames << aExpr;
+
+              QString aRes = QString("%1,%2,%3").arg(aPnt->x()).arg(aPnt->y()).arg(aPnt->z());
+              aValNames << aRes;
+            }
+            else if (aId == GeomDataAPI_Point2D::typeId()) {
+              std::shared_ptr<GeomDataAPI_Point2D> aPnt =
+                std::dynamic_pointer_cast<GeomDataAPI_Point2D>(aAttr);
+
+              QString aExpr = QString("%1,%2").arg(aPnt->textX().c_str()).
+                arg(aPnt->textY().c_str());
+              aValNames << aExpr;
+
+              QString aRes = QString("%1,%2").arg(aPnt->x()).arg(aPnt->y());
+              aValNames << aRes;
             }
             aItemsList.append(aValNames);
             theFeatureList.append(aReferenced);
