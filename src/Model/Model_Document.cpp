@@ -892,9 +892,10 @@ void Model_Document::undoInternal(const bool theWithSubs, const bool theSynchron
     myDoc->Undo();
   }
 
+  std::set<int> aSubs;
   if (theWithSubs) {
     // undo for all subs
-    const std::set<int> aSubs = subDocuments();
+    aSubs = subDocuments();
     std::set<int>::iterator aSubIter = aSubs.begin();
     for (; aSubIter != aSubs.end(); aSubIter++) {
       if (!subDoc(*aSubIter)->myObjs)
@@ -907,6 +908,19 @@ void Model_Document::undoInternal(const bool theWithSubs, const bool theSynchron
     myObjs->synchronizeFeatures(aDeltaLabels, true, false, false, isRoot());
     // update the current features status
     setCurrentFeature(currentFeature(false), false);
+
+    if (theWithSubs) {
+      // undo for all subs
+      const std::set<int> aNewSubs = subDocuments();
+      std::set<int>::iterator aNewSubIter = aNewSubs.begin();
+      for (; aNewSubIter != aNewSubs.end(); aNewSubIter++) {
+        // synchronize only newly appeared documents
+        if (!subDoc(*aNewSubIter)->myObjs || aSubs.find(*aNewSubIter) != aSubs.end())
+          continue;
+        TDF_LabelList anEmptyDeltas;
+        subDoc(*aNewSubIter)->myObjs->synchronizeFeatures(anEmptyDeltas, true, false, true, true);
+      }
+    }
   }
 }
 
