@@ -17,13 +17,13 @@
 // See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 
-#ifndef XGUI_SelectionFilterType_H
-#define XGUI_SelectionFilterType_H
+#ifndef ModuleBase_SelectionFilterType_H
+#define ModuleBase_SelectionFilterType_H
 
-#include "XGUI.h"
+#include "ModuleBase.h"
 
 /// Enumeration to specify module selection filters
-enum XGUI_EXPORT XGUI_SelectionFilterType {
+enum MODULEBASE_EXPORT ModuleBase_SelectionFilterType {
   SF_GlobalFilter, /// filter for different documents, group results
   SF_FilterInfinite, /// filter for infinite construction results
   SF_ResultGroupNameFilter, /// filter for selection some kind of results

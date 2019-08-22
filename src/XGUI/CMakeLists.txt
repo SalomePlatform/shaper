@@ -54,7 +54,6 @@ SET(PROJECT_HEADERS
     XGUI_SalomeConnector.h
     XGUI_Selection.h
     XGUI_SelectionActivate.h
-    XGUI_SelectionFilterType.h
     XGUI_SelectionMgr.h
     XGUI_Tools.h
     XGUI_TransparencyWidget.h

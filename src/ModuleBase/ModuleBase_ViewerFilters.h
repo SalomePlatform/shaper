@@ -53,11 +53,35 @@ public:
   Standard_EXPORT virtual
     Standard_Boolean IsOk(const Handle(SelectMgr_EntityOwner)& theOwner) const;
 
+  /// Add an object type name to list of non selectable objects
+  /// \param theType - a name of an object type
+  Standard_EXPORT void addNonSelectableType(const QString& theType)
+  {
+    if (!myNonSelectableTypes.contains(theType))
+      myNonSelectableTypes.append(theType);
+  }
+
+  /// Removes an object type name from list of non selectable objects
+  /// \param theType - a name of an object type
+  Standard_EXPORT void removeNonSelectableType(const QString& theType)
+  {
+    if (myNonSelectableTypes.contains(theType))
+      myNonSelectableTypes.removeAll(theType);
+  }
+
+  /// Returns list of non-selectable an object type names
+  Standard_EXPORT QStringList nonSelectableTypes() const
+  {
+    return myNonSelectableTypes;
+  }
+
   DEFINE_STANDARD_RTTIEXT(ModuleBase_ShapeDocumentFilter, SelectMgr_Filter)
 
 protected:
   /// Reference to workshop
   ModuleBase_IWorkshop* myWorkshop;
+
+  QStringList myNonSelectableTypes;
 };
 
 /**

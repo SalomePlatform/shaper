@@ -3,7 +3,7 @@
     label="Objects"
     icon="icons/Features/cut_shape.png"
     tooltip="Select objects(compounds, compsolids, solids, shells, faces or edges)"
-    type_choice="edges faces shells solids compsolids compounds"
+    shape_types="edges faces shells solids compsolids compounds"
     use_choice="false"
     concealment="true">
     <validator id="PartSet_DifferentObjects"/>

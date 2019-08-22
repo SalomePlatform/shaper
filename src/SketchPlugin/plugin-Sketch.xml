@@ -497,7 +497,7 @@
         <sketch_multi_selector id="ConstraintMirrorList"
             label="Segments:"
             tooltip="Select list of objects to be mirrored"
-            type_choice="Edges"
+            shape_types="Edges"
             use_external="true"
             greed ="true">
           <validator id="SketchPlugin_MirrorAttr" />
@@ -514,7 +514,7 @@
         <sketch_multi_selector id="MultiTranslationList"
             label="Segments:"
             tooltip="Select list of objects to be translated"
-            type_choice="Edges"
+            shape_types="Edges"
             use_external="true"
             greed ="true">
           <validator id="SketchPlugin_CopyValidator" />
@@ -583,7 +583,7 @@
         <sketch_multi_selector id="MultiRotationList"
             label="Segments:"
             tooltip="Select list of objects to be rotated"
-            type_choice="Edges"
+            shape_types="Edges"
             use_external="true"
             greed ="true">
           <validator id="SketchPlugin_CopyValidator" />

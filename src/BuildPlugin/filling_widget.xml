@@ -2,7 +2,7 @@
   <multi_selector id="base_objects"
                   label="Segments and wires:"
                   tooltip="Select edges or wires."
-                  type_choice="edges wires"
+                  shape_types="edges wires"
                   concealment="false">
     <validator id="PartSet_DifferentObjects"/>
     <validator id="BuildPlugin_ValidatorFillingSelection"/>

@@ -23,7 +23,6 @@
 #include "PartSet.h"
 #include "PartSet_Tools.h"
 #include "PartSet_OverconstraintListener.h"
-#include "XGUI_SelectionFilterType.h"
 #include "PartSet_SketcherMgr.h"
 
 #include <ModuleBase_IModule.h>
@@ -230,20 +229,6 @@ public:
   virtual void moduleSelectionFilters(const QIntList& theFilterTypes,
                                       SelectMgr_ListOfFilter& theSelectionFilters);
 
-  /// Returns types of registered module selection filters
-  /// \param theSelectionFilters [out] container of type value
-  virtual QIntList selectionFilters();
-
-  /// Append selection filter into the module and type of the filter in internal container
-  /// \param theFilterType selection filter type
-  /// \param theFilter added filter
-  void registerSelectionFilter(const XGUI_SelectionFilterType theFilterType,
-                               const Handle(SelectMgr_Filter)& theFilter);
-
-  /// Returns selection filter
-  /// \param theType selection filter type
-  /// \param theFilter instance of filter
-  virtual Handle(SelectMgr_Filter) selectionFilter(const int theType);
 
   /// Returns whether the mouse enter the viewer's window
   /// \return true if items are added and there is no necessity to provide standard menu
@@ -485,7 +470,6 @@ protected:
 
 private:
   bool myIsOperationIsLaunched; /// state of application between launch and stop operation
-  std::map<XGUI_SelectionFilterType, Handle(SelectMgr_Filter)> mySelectionFilters;
 
   PartSet_SketcherMgr* mySketchMgr;
   PartSet_SketcherReentrantMgr* mySketchReentrantMgr;

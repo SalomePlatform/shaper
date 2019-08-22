@@ -8,7 +8,7 @@
                       label="Faces or/and edges"
                       icon=""
                       tooltip="Select objects"
-                      type_choice="edges faces"
+                      shape_types="edges faces"
                       use_choice="false"
                       concealment="true">
         <validator id="PartSet_DifferentObjects"/>
@@ -30,7 +30,7 @@
                       label="Faces or/and edges"
                       icon=""
                       tooltip="Select objects"
-                      type_choice="edges faces"
+                      shape_types="edges faces"
                       use_choice="false"
                       concealment="true">
         <validator id="PartSet_DifferentObjects"/>

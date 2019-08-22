@@ -2,7 +2,7 @@
   <multi_selector id="base_objects"
                   label="Vertices:"
                   tooltip="Select vertices on sketch or vertex objects."
-                  type_choice="vertices"
+                  shape_types="vertices"
                   concealment="true">
   </multi_selector>
 </source>

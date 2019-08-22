@@ -3,7 +3,7 @@
                   label="Main objects"
                   icon=""
                   tooltip="Select objects"
-                  type_choice="objects"
+                  shape_types="objects"
                   concealment="true">
     <validator id="FeaturesPlugin_ValidatorTransform"/>
   </multi_selector>

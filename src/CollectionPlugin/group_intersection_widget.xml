@@ -6,7 +6,7 @@
   <multi_selector id="group_list"
                   label="Base groups:"
                   tooltip="Select a set of groups"
-                  type_choice="objects">
+                  shape_types="objects">
     <validator id="CollectionPlugin_OperationAttribute"/>
   </multi_selector>
 </source>

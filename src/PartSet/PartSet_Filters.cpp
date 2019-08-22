@@ -36,6 +36,14 @@
 
 IMPLEMENT_STANDARD_RTTIEXT(PartSet_GlobalFilter, ModuleBase_ShapeDocumentFilter);
 
+PartSet_GlobalFilter::PartSet_GlobalFilter(ModuleBase_IWorkshop* theWorkshop)
+  : ModuleBase_ShapeDocumentFilter(theWorkshop)
+{
+  addNonSelectableType(ModelAPI_ResultField::group().c_str());
+  addNonSelectableType(ModelAPI_ResultGroup::group().c_str());
+}
+
+
 Standard_Boolean PartSet_GlobalFilter::IsOk(const Handle(SelectMgr_EntityOwner)& theOwner) const
 {
   bool aValid = true;
@@ -63,7 +71,7 @@ Standard_Boolean PartSet_GlobalFilter::IsOk(const Handle(SelectMgr_EntityOwner)&
           if (aResultGroupName == ModelAPI_ResultPart::group()) {
             SessionPtr aMgr = ModelAPI_Session::get();
             aValid = aMgr->activeDocument() == aMgr->moduleDocument();
-          } else if (aResultGroupName == ModelAPI_ResultField::group()) {
+          } else if (myNonSelectableTypes.contains(aResultGroupName.c_str())) {
             aValid = Standard_False;
           } else
             aValid = Standard_True;
@@ -72,7 +80,7 @@ Standard_Boolean PartSet_GlobalFilter::IsOk(const Handle(SelectMgr_EntityOwner)&
           // only and there can not be Group feature
           FeaturePtr aFeature = ModelAPI_Feature::feature(aObj);
           if (aFeature) {
-            aValid = aFeature->getKind() != "Group";
+            aValid = !myNonSelectableTypes.contains(aFeature->getKind().c_str());
           } else
             aValid = Standard_True;
         }

@@ -2,7 +2,7 @@
   <multi_selector id="base_objects"
                   label="Faces and shells:"
                   tooltip="Select faces or shells."
-                  type_choice="faces shells"
+                  shape_types="faces shells"
                   concealment="true">
     <validator id="BuildPlugin_ValidatorBaseForBuild" parameters="face,shell"/>
   </multi_selector>

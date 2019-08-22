@@ -18,26 +18,25 @@
 //
 
 #include "XGUI_FacesPanel.h"
+#include "XGUI_ObjectsBrowser.h"
+#include "XGUI_SelectionMgr.h"
+#include "XGUI_Tools.h"
+#include "XGUI_Workshop.h"
+
+#include <ModuleBase_IModule.h>
+#include <ModuleBase_ISelection.h>
+#include <ModuleBase_IWorkshop.h>
+#include <ModuleBase_ListView.h>
+#include <ModuleBase_ResultPrs.h>
+#include <ModuleBase_Tools.h>
+#include <ModuleBase_ViewerPrs.h>
+#include <ModuleBase_SelectionFilterType.h>
 
 #include <Config_PropManager.h>
 #include <Events_Loop.h>
 #include <GeomAlgoAPI_CompoundBuilder.h>
 
 #include <ModelAPI_Events.h>
-
-#include <ModuleBase_IModule.h>
-#include <ModuleBase_ISelection.h>
-#include "ModuleBase_IWorkshop.h"
-#include "ModuleBase_ListView.h"
-#include "ModuleBase_ResultPrs.h"
-#include "ModuleBase_Tools.h"
-#include "ModuleBase_ViewerPrs.h"
-
-#include "XGUI_ObjectsBrowser.h"
-#include "XGUI_SelectionMgr.h"
-#include "XGUI_SelectionFilterType.h"
-#include "XGUI_Tools.h"
-#include "XGUI_Workshop.h"
 
 #include <QAction>
 #include <QCheckBox>

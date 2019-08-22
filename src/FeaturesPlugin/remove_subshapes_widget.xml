@@ -15,7 +15,7 @@
       <multi_selector id="subshapes_to_remove"
                 label="Sub-Shapes to remove:"
                 tooltip="Select shapes to remove."
-                type_choice="vertices edges wires faces shells solids compsolids compounds"
+                shape_types="vertices edges wires faces shells solids compsolids compounds"
                 clear_in_neutral_point="false">
         <validator id="FeaturesPlugin_ValidatorRemoveSubShapesSelection"/>
       </multi_selector>
@@ -26,7 +26,7 @@
       <multi_selector id="subshapes_to_keep"
                 label="Sub-Shapes to keep:"
                 tooltip="Select shapes to keep."
-                type_choice="vertices edges wires faces shells solids compsolids compounds"
+                shape_types="vertices edges wires faces shells solids compsolids compounds"
                 clear_in_neutral_point="false">
         <validator id="FeaturesPlugin_ValidatorRemoveSubShapesSelection"/>
       </multi_selector>

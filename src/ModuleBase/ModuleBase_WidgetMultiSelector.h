@@ -50,12 +50,12 @@ class ModuleBase_FilterStarter;
 * \code
 * <multi_selector id="group_list" 
 *    tooltip="Select a set of objects" 
-*    type_choice="Vertices Edges Faces Solids" /> 
+*    shape_types="Vertices Edges Faces Solids" />
 * \endcode
 * It uses following parameters:
 * - id - is a name of corresponded attribute
 * - tooltip - a tooltip for the widget
-* - type_choice - list of expected shape types.
+* - shape_types - list of expected shape types.
 */
 class MODULEBASE_EXPORT ModuleBase_WidgetMultiSelector : public ModuleBase_WidgetSelector
 {
@@ -257,6 +257,8 @@ protected:
   ModuleBase_FilterStarter* myFiltersWgt;
 
   QObjectPtrList myVisibleObjects;
+  QStringList myAllowedObjects;
+  QStringList myTmpAllowed;
 };
 
 #endif /* MODULEBASE_WIDGETFILESELECTOR_H_ */

@@ -2,7 +2,7 @@
   <multi_selector id="OnGeometry__OnGeometry"
                   label="Shapes:"
                   tooltip="Select objects to limit selection."
-                  type_choice="edges faces">
+                  shape_types="edges faces">
     <validator id="FiltersPlugin_ShapeType"/>
   </multi_selector>
 </filter>

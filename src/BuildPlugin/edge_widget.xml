@@ -4,7 +4,7 @@
       <multi_selector id="base_objects"
                       label="Edges:"
                       tooltip="Select edges on sketch or edges objects."
-                      type_choice="edges"
+                      shape_types="edges"
                       concealment="true">
         <validator id="BuildPlugin_ValidatorBaseForBuild" parameters="edge"/>
       </multi_selector>

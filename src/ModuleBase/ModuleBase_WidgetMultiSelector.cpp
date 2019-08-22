@@ -116,10 +116,14 @@ ModuleBase_WidgetMultiSelector::ModuleBase_WidgetMultiSelector(QWidget* theParen
   myIsSetSelectionBlocked(false), myCurrentHistoryIndex(-1),
   myIsFirst(true), myFiltersWgt(0)
 {
-  std::string aPropertyTypes = theData->getProperty("type_choice");
+  std::string aPropertyTypes = theData->getProperty("shape_types");
   QString aTypesStr = aPropertyTypes.c_str();
   myShapeTypes = aTypesStr.split(' ', QString::SkipEmptyParts);
   myIsUseChoice = theData->getBooleanAttribute("use_choice", false);
+
+  QString aAllowedList(theData->getProperty("allow_objects").c_str());
+  if (!aAllowedList.isEmpty())
+    myAllowedObjects = aAllowedList.split(' ', QString::SkipEmptyParts);
 
   QVBoxLayout* aMainLay = new QVBoxLayout(this);
   ModuleBase_Tools::adjustMargins(aMainLay);
@@ -215,9 +219,26 @@ void ModuleBase_WidgetMultiSelector::activateCustom()
 {
   ModuleBase_WidgetSelector::activateCustom();
 
-  myWorkshop->module()->activateCustomPrs(myFeature,
+  ModuleBase_IModule* aModule = myWorkshop->module();
+  aModule->activateCustomPrs(myFeature,
                             ModuleBase_IModule::CustomizeHighlightedObjects, true);
   clearSelectedHistory();
+  if (myAllowedObjects.length() > 0) {
+    Handle(SelectMgr_Filter) aFilter = aModule->selectionFilter(SF_GlobalFilter);
+    if (!aFilter.IsNull()) {
+      Handle(ModuleBase_ShapeDocumentFilter) aDocFilter =
+        Handle(ModuleBase_ShapeDocumentFilter)::DownCast(aFilter);
+      if (!aDocFilter.IsNull()) {
+        QStringList aSelFilters = aDocFilter->nonSelectableTypes();
+        foreach(QString aType, aSelFilters) {
+          if (aSelFilters.contains(aType)) {
+            aDocFilter->removeNonSelectableType(aType);
+            myTmpAllowed.append(aType);
+          }
+        }
+      }
+    }
+  }
 }
 
 //********************************************************************
@@ -231,6 +252,20 @@ void ModuleBase_WidgetMultiSelector::deactivate()
 
   myWorkshop->module()->deactivateCustomPrs(ModuleBase_IModule::CustomizeHighlightedObjects, true);
   clearSelectedHistory();
+  if (myTmpAllowed.length() > 0) {
+    ModuleBase_IModule* aModule = myWorkshop->module();
+    Handle(SelectMgr_Filter) aFilter = aModule->selectionFilter(SF_GlobalFilter);
+    if (!aFilter.IsNull()) {
+      Handle(ModuleBase_ShapeDocumentFilter) aDocFilter =
+        Handle(ModuleBase_ShapeDocumentFilter)::DownCast(aFilter);
+      if (!aDocFilter.IsNull()) {
+        foreach(QString aType, myTmpAllowed) {
+          aDocFilter->addNonSelectableType(aType);
+        }
+      }
+    }
+    myTmpAllowed.clear();
+  }
 }
 
 //********************************************************************

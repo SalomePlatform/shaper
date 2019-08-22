@@ -6,13 +6,13 @@
   <multi_selector id="group_list"
                   label="Main groups:"
                   tooltip="Select a set of groups"
-                  type_choice="objects">
+                  shape_types="objects">
     <validator id="CollectionPlugin_OperationAttribute" parameters="tools_list"/>
   </multi_selector>
   <multi_selector id="tools_list"
                   label="Tool groups:"
                   tooltip="Select a set of groups"
-                  type_choice="objects">
+                  shape_types="objects">
     <validator id="CollectionPlugin_OperationAttribute" parameters="group_list"/>
   </multi_selector>
 </source>

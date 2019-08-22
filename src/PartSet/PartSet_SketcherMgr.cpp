@@ -1198,12 +1198,12 @@ void PartSet_SketcherMgr::commitNestedSketch(ModuleBase_Operation* theOperation)
   }
 }
 
-bool PartSet_SketcherMgr::sketchSelectionFilter(const XGUI_SelectionFilterType theFilterType)
+bool PartSet_SketcherMgr::sketchSelectionFilter(const ModuleBase_SelectionFilterType theFilterType)
 {
   return mySelectionFilterTypes.find(theFilterType) != mySelectionFilterTypes.end();
 }
 
-void PartSet_SketcherMgr::registerSelectionFilter(const XGUI_SelectionFilterType theFilterType,
+void PartSet_SketcherMgr::registerSelectionFilter(const ModuleBase_SelectionFilterType theFilterType,
                                                   const Handle(SelectMgr_Filter)& theFilter)
 {
   mySelectionFilterTypes.insert(theFilterType);

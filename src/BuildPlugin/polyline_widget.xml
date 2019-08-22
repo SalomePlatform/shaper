@@ -2,7 +2,7 @@
   <multi_selector id="base_objects"
                   label="Points and vertices:"
                   tooltip="Select points or vertices objects."
-                  type_choice="vertices"
+                  shape_types="vertices"
                   concealment="true">
     <validator id="GeomValidators_DifferentShapes"/>
   </multi_selector>
