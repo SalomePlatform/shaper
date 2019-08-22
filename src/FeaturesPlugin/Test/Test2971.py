@@ -291,6 +291,15 @@ SketchLine_33.result().setName("SketchLine_36")
 model.do()
 Sketch_3.setName("PHomoProfile")
 Sketch_3.result().setName("PHomoProfile")
+Sketch_3.changeFacesOrder([[SketchLine_25.result(), SketchArc_9.results()[1], SketchLine_27.result(), SketchLine_27.result(), SketchLine_26.result()],
+                           [SketchLine_29.result(), SketchLine_31.result(), SketchArc_9.results()[1], SketchLine_26.result()],
+                           [SketchLine_27.result(), SketchLine_30.result(), SketchLine_29.result(), SketchLine_26.result()],
+                           [SketchArc_9.results()[1], SketchLine_31.result(), SketchLine_30.result(), SketchLine_27.result()],
+                           [SketchLine_33.result(), SketchLine_37.result(), SketchLine_37.result(), SketchArc_10.results()[1], SketchLine_25.result()],
+                           [SketchLine_33.result(), SketchArc_10.results()[1], SketchLine_35.result(), SketchLine_34.result()],
+                           [SketchLine_33.result(), SketchLine_34.result(), SketchLine_36.result(), SketchLine_37.result()],
+                           [SketchArc_10.results()[1], SketchLine_37.result(), SketchLine_36.result(), SketchLine_35.result()]
+                          ])
 Extrusion_2 = model.addExtrusion(Part_1_doc, [model.selection("COMPOUND", "all-in-PHomoProfile")], model.selection(), "ep_homo", 0)
 Partition_1_objects = [model.selection("SOLID", "Remove_SubShapes_1_1"), model.selection("COMPSOLID", "Recover_1_1"), model.selection("COMPSOLID", "Extrusion_2_1")]
 Partition_1 = model.addPartition(Part_1_doc, Partition_1_objects)

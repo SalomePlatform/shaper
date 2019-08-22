@@ -74,6 +74,8 @@ class ModelAPI_ResultConstruction : public ModelAPI_Result
   virtual int facesNum(const bool theUpdateNaming = true) = 0;
   /// if the construction result may be used as faces, this method returns face by zero based index
   virtual std::shared_ptr<GeomAPI_Face> face(const int theIndex) = 0;
+  /// Change the order of faces
+  virtual void setFacesOrder(const std::list<std::shared_ptr<GeomAPI_Face> >& theFaces) = 0;
 
   /// By default object is not infinite.
   virtual bool isInfinite() = 0;

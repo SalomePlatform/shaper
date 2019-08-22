@@ -223,9 +223,6 @@ public:
   /// 9 - V/V, V/E, E/E, V/F, E/F, F/F, V/S, E/S, F/S and S/S - all interferences (Default value)
   GEOMAPI_EXPORT bool isSelfIntersected(const int theLevelOfCheck = 9) const;
 
-  /// Returns maximal tolerance of the shape
-  GEOMAPI_EXPORT double tolerance() const;
-
 public:
   /// \brief Compare addresses of shapes
   class Comparator

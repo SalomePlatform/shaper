@@ -48,6 +48,48 @@
 
 #include <algorithm>
 
+typedef NCollection_IndexedDataMap<TopoDS_Face, TColStd_ListOfInteger> MapFaceToEdgeIndices;
+
+/// Convert each edge of sketch to corresponding integer value
+/// \param[in]  theComposite      sketch feature
+/// \param[out] theCurvesIndices  map curve to its index
+/// \param[out] theEdgesIndices   indexed edge
+/// \param[out] theEdgesNames     indexed name for edge
+static void indexingSketchEdges(
+    const CompositeFeaturePtr& theComposite,
+    NCollection_DataMap<Handle(Geom_Curve), int>& theCurvesIndices,
+    NCollection_DataMap<int, TopoDS_Edge>& theEdgesIndices,
+    std::map<int, std::string>& theEdgesNames);
+
+/// Convert each face to the list of indices of its edges
+/// \param[in]  theFaces          list of faces to proceed
+/// \param[in]  theCurvesIndices  index of each curve
+/// \param[out] theFaceEdges      map face to indices of its edges
+static void faceToEdgeIndices(
+    const ListOfShape& theFaces,
+    const NCollection_DataMap<Handle(Geom_Curve), int>& theCurvesIndices,
+    MapFaceToEdgeIndices& theFaceEdges);
+
+/// Assign faces to tags for the specified label
+/// \param theDocument        current document
+/// \param theShapeLabel      label to store shapes
+/// \param theName            name of the object
+/// \param theShape           shape to be stored to the label
+/// \param theFacesOrder      faces to be assigned to specified tag
+/// \param theUnorderedFaces  faces which may be stored to any tag
+/// \param theFaceEdges       indices of edges for each face
+/// \param theEdgesIndices    indices of edges
+/// \param theEdgesNames      named of edges
+static void storeFacesOnLabel(std::shared_ptr<Model_Document>& theDocument,
+                              TDF_Label& theShapeLabel,
+                              const std::string& theName,
+                              const TopoDS_Shape& theShape,
+                              NCollection_DataMap<int, TopoDS_Face>& theFacesOrder,
+                              NCollection_List<TopoDS_Face>& theUnorderedFaces,
+                              const MapFaceToEdgeIndices& theFaceEdges,
+                              const NCollection_DataMap<int, TopoDS_Edge>& theEdgesIndices,
+                              const std::map<int, std::string>& theEdgesNames);
+
 
 // identifier of the infinite result
 Standard_GUID kIS_INFINITE("dea8cc5a-53f2-49c1-94e8-a947bed20a9f");
@@ -275,56 +317,19 @@ void Model_ResultConstruction::storeShape(std::shared_ptr<GeomAPI_Shape> theShap
       NCollection_DataMap<Handle(Geom_Curve), int> aCurvesIndices;
       NCollection_DataMap<int, TopoDS_Edge> anEdgeIndices;
       std::map<int, std::string> aComponentsNames; // names of components that lay on index
-      const int aSubNum = aComposite->numberOfSubs();
-      for (int a = 0; a < aSubNum; a++) {
-        FeaturePtr aSub = aComposite->subFeature(a);
-        const std::list<std::shared_ptr<ModelAPI_Result> >& aResults = aSub->results();
-        std::list<std::shared_ptr<ModelAPI_Result> >::const_iterator aRes = aResults.cbegin();
-        for (; aRes != aResults.cend(); aRes++) {
-          ResultConstructionPtr aConstr =
-            std::dynamic_pointer_cast<ModelAPI_ResultConstruction>(*aRes);
-          if (aConstr->shape() && aConstr->shape()->isEdge()) {
-            TopoDS_Edge anEdge = TopoDS::Edge(aConstr->shape()->impl<TopoDS_Shape>());
-            Standard_Real aFirst, aLast;
-            Handle(Geom_Curve) aCurve = BRep_Tool::Curve(anEdge, aFirst, aLast);
-            aCurvesIndices.Bind(aCurve, a);
-            anEdgeIndices.Bind(a, anEdge);
-            aComponentsNames[a] = shortName(aConstr);
-          }
-        }
-      }
+      indexingSketchEdges(aComposite, aCurvesIndices, anEdgeIndices, aComponentsNames);
 
       GeomAlgoAPI_SketchBuilder aSketchBuilder(aWirePtr->origin(), aWirePtr->dirX(),
                                                aWirePtr->norm(), aWirePtr);
       const ListOfShape& aFaces = aSketchBuilder.faces();
       // order is important to store faces in the same order if sketch is created from scratch
-      NCollection_IndexedDataMap<TopoDS_Face, TColStd_ListOfInteger> aNewIndices; // edges indices
-      std::list<std::shared_ptr<GeomAPI_Shape> >::const_iterator aFIter = aFaces.begin();
-      for (; aFIter != aFaces.end(); aFIter++) {
-        std::shared_ptr<GeomAPI_Face> aFace(new GeomAPI_Face(*aFIter));
-        // put them to a label, trying to keep the same faces on the same labels
-        if (aFace.get() && !aFace->isNull()) {
-          TopoDS_Face aTopoFace = TopoDS::Face(aFace->impl<TopoDS_Shape>());
-          aNewIndices.Add(aTopoFace, TColStd_ListOfInteger());
-          // keep new indices of sub-elements used in this face
-          for (TopExp_Explorer anEdges(aTopoFace, TopAbs_EDGE); anEdges.More(); anEdges.Next()) {
-            TopoDS_Edge anEdge = TopoDS::Edge(anEdges.Current());
-            Standard_Real aFirst, aLast;
-            Handle(Geom_Curve) aCurve = BRep_Tool::Curve(anEdge, aFirst, aLast);
-            if (aCurvesIndices.IsBound(aCurve)) {
-              int anIndex = aCurvesIndices.Find(aCurve);
-              if ((aFirst > aLast) != (anEdge.Orientation() == TopAbs_REVERSED))
-                anIndex = -anIndex;
-              aNewIndices.ChangeFromKey(aTopoFace).Append(anIndex);
-            }
-          }
-        }
-      }
+      MapFaceToEdgeIndices aNewIndices; // edges indices
+      faceToEdgeIndices(aFaces, aCurvesIndices, aNewIndices);
+
       NCollection_DataMap<int, TopoDS_Face> aFacesOrder; // faces -> tag where they must be set
       NCollection_List<TopoDS_Face> anUnorderedFaces; // faces that may be located at any index
       // searching for the best new candidate to old location
-      NCollection_IndexedDataMap<TopoDS_Face, TColStd_ListOfInteger>::Iterator
-        aNewIter(aNewIndices);
+      MapFaceToEdgeIndices::Iterator aNewIter(aNewIndices);
       for (; aNewIter.More(); aNewIter.Next()) {
         double aBestFound = 0, aBestNotFound = 1.e+100;
         int aBestTag = 0;
@@ -364,103 +369,219 @@ void Model_ResultConstruction::storeShape(std::shared_ptr<GeomAPI_Shape> theShap
           anUnorderedFaces.Append(aNewIter.Key());
         }
       }
-      aShapeLab.ForgetAllAttributes(); // clear all previously stored
-      TDataStd_Name::Set(aShapeLab, aMyName.c_str()); // restore name forgotten
-      TNaming_Builder aBuilder(aShapeLab); // store the compound to get it ready on open of document
-      aBuilder.Generated(aShape);
-      aMyDoc->addNamingName(aShapeLab, aMyName);
-      // set new faces to the labels
-      int aCurrentTag = 1;
-      NCollection_List<TopoDS_Face>::Iterator anUnordered(anUnorderedFaces);
-      for(int aCurrentTag = 1; !aFacesOrder.IsEmpty() || anUnordered.More(); aCurrentTag++) {
-        TopoDS_Face aFaceToPut;
-        if (aFacesOrder.IsBound(aCurrentTag)) {
-          aFaceToPut = aFacesOrder.Find(aCurrentTag);
-          aFacesOrder.UnBind(aCurrentTag);
-        } else if (anUnordered.More()){
-          aFaceToPut = anUnordered.Value();
-          anUnordered.Next();
+      storeFacesOnLabel(aMyDoc, aShapeLab, aMyName, aShape, aFacesOrder, anUnorderedFaces,
+                        aNewIndices, anEdgeIndices, aComponentsNames);
+    }
+  }
+}
+
+void Model_ResultConstruction::setFacesOrder(const std::list<GeomFacePtr>& theFaces)
+{
+  std::shared_ptr<Model_Data> aData = std::dynamic_pointer_cast<Model_Data>(data());
+  if (aData && aData->isValid()) {
+    std::string aMyName = data()->name();
+    TDF_Label aShapeLab = aData->shapeLab();
+    GeomShapePtr aResShape = shape();
+    if (!aResShape.get() || aResShape->isNull()) {
+      // do nothing
+      return;
+    }
+    std::shared_ptr<Model_Document> aMyDoc =
+        std::dynamic_pointer_cast<Model_Document>(document());
+    const TopoDS_Shape& aShape = aResShape->impl<TopoDS_Shape>();
+    if (aShape.ShapeType() != TopAbs_VERTEX &&
+        aShape.ShapeType() != TopAbs_EDGE) {
+      ResultPtr aThisPtr = std::dynamic_pointer_cast<ModelAPI_Result>(data()->owner());
+      FeaturePtr aThisFeature = aMyDoc->feature(aThisPtr);
+      CompositeFeaturePtr aComposite =
+        std::dynamic_pointer_cast<ModelAPI_CompositeFeature>(aThisFeature);
+      if (!aComposite || aComposite->numberOfSubs() == 0)
+        return; // unknown case
+      // collect indices of curves of current composite
+      NCollection_DataMap<Handle(Geom_Curve), int> aCurvesIndices;
+      NCollection_DataMap<int, TopoDS_Edge> anEdgeIndices;
+      std::map<int, std::string> aComponentsNames; // names of components that lay on index
+      indexingSketchEdges(aComposite, aCurvesIndices, anEdgeIndices, aComponentsNames);
+
+      ListOfShape aFaces;
+      NCollection_DataMap<int, TopoDS_Face> aFacesOrder; // faces -> tag where they must be set
+      NCollection_List<TopoDS_Face> anUnorderedFaces; // unordered faces are empty in this case
+      int aTagId = 0;
+      for (std::list<GeomFacePtr>::const_iterator aFIt = theFaces.begin();
+           aFIt != theFaces.end(); ++aFIt) {
+        aFaces.push_back(*aFIt);
+        aFacesOrder.Bind(++aTagId, (*aFIt)->impl<TopoDS_Face>());
+      }
+
+      MapFaceToEdgeIndices aNewIndices; // edges indices
+      faceToEdgeIndices(aFaces, aCurvesIndices, aNewIndices);
+
+      storeFacesOnLabel(aMyDoc, aShapeLab, aMyName, aShape, aFacesOrder, anUnorderedFaces,
+                        aNewIndices, anEdgeIndices, aComponentsNames);
+    }
+  }
+}
+
+// ==========================     Auxiliary functions     =========================================
+
+void storeFacesOnLabel(std::shared_ptr<Model_Document>& theDocument,
+                       TDF_Label& theShapeLabel,
+                       const std::string& theName,
+                       const TopoDS_Shape& theShape,
+                       NCollection_DataMap<int, TopoDS_Face>& theFacesOrder,
+                       NCollection_List<TopoDS_Face>& theUnorderedFaces,
+                       const MapFaceToEdgeIndices& theFaceEdges,
+                       const NCollection_DataMap<int, TopoDS_Edge>& theEdgesIndices,
+                       const std::map<int, std::string>& theEdgesNames)
+{
+  theShapeLabel.ForgetAllAttributes(); // clear all previously stored
+  TDataStd_Name::Set(theShapeLabel, theName.c_str()); // restore name forgotten
+  TNaming_Builder aBuilder(theShapeLabel); // store the compound to get it ready on open of document
+  aBuilder.Generated(theShape);
+  theDocument->addNamingName(theShapeLabel, theName);
+  // set new faces to the labels
+  int aCurrentTag = 1;
+  NCollection_List<TopoDS_Face>::Iterator anUnordered(theUnorderedFaces);
+  for (int aCurrentTag = 1; !theFacesOrder.IsEmpty() || anUnordered.More(); aCurrentTag++) {
+    TopoDS_Face aFaceToPut;
+    if (theFacesOrder.IsBound(aCurrentTag)) {
+      aFaceToPut = theFacesOrder.Find(aCurrentTag);
+      theFacesOrder.UnBind(aCurrentTag);
+    }
+    else if (anUnordered.More()) {
+      aFaceToPut = anUnordered.Value();
+      anUnordered.Next();
+    }
+
+    if (aFaceToPut.IsNull())
+      continue;
+
+    TopTools_MapOfShape aFaceEdges;
+    for (TopExp_Explorer anEdges(aFaceToPut, TopAbs_EDGE); anEdges.More(); anEdges.Next())
+      aFaceEdges.Add(anEdges.Current());
+
+    TDF_Label aLab = theShapeLabel.FindChild(aCurrentTag);
+    TNaming_Builder aFaceBuilder(aLab);
+    aFaceBuilder.Generated(aFaceToPut);
+    // store also indices of the new face edges
+    Handle(TDataStd_IntPackedMap) aNewMap = TDataStd_IntPackedMap::Set(aLab);
+    const TColStd_ListOfInteger& aNewInd = theFaceEdges.FindFromKey(aFaceToPut);
+    std::stringstream aName;
+    aName<<"Face";
+    TopExp_Explorer aPutEdges(aFaceToPut, TopAbs_EDGE);
+    TNaming_Builder *anEdgesBuilder = 0, *aVerticesBuilder = 0;
+    for(TColStd_ListOfInteger::Iterator anIter(aNewInd); anIter.More(); anIter.Next()) {
+      int anIndex = anIter.Value();
+      int aModIndex = anIndex > 0 ? anIndex : -anIndex;
+      aNewMap->Add(anIndex);
+      aName<<"-"<<theEdgesNames.find(aModIndex)->second;
+      if (anIter.Value() > 0)
+        aName<<"f";
+      else
+        aName<<"r";
+      // collect all edges of the face which are modified in sub-label of the face
+      if (theEdgesIndices.IsBound(aModIndex) &&
+          !aFaceEdges.Contains(theEdgesIndices.Find(aModIndex))) {
+        if (!anEdgesBuilder) {
+          TDF_Label anEdgesLabel = aLab.FindChild(1);
+          anEdgesBuilder = new TNaming_Builder(anEdgesLabel);
+          std::ostringstream aSubName;
+          // tag is needed for Test1922 to distinguish sub-edges of different faces
+          aSubName<<"SubEdge_"<<aCurrentTag;
+          TDataStd_Name::Set(anEdgesLabel, aSubName.str().c_str());
         }
-
-        if (!aFaceToPut.IsNull()) {
-          TopTools_MapOfShape aFaceEdges;
-          for(TopExp_Explorer anEdges(aFaceToPut, TopAbs_EDGE); anEdges.More(); anEdges.Next()) {
-            aFaceEdges.Add(anEdges.Current());
-          }
-
-          TDF_Label aLab = aShapeLab.FindChild(aCurrentTag);
-          TNaming_Builder aFaceBuilder(aLab);
-          aFaceBuilder.Generated(aFaceToPut);
-          // store also indices of the new face edges
-          Handle(TDataStd_IntPackedMap) aNewMap = TDataStd_IntPackedMap::Set(aLab);
-          const TColStd_ListOfInteger& aNewInd = aNewIndices.FindFromKey(aFaceToPut);
-          std::stringstream aName;
-          aName<<"Face";
-          TopExp_Explorer aPutEdges(aFaceToPut, TopAbs_EDGE);
-          TNaming_Builder *anEdgesBuilder = 0, *aVerticesBuilder = 0;
-          for(TColStd_ListOfInteger::Iterator anIter(aNewInd); anIter.More(); anIter.Next()) {
-            int anIndex = anIter.Value();
-            int aModIndex = anIndex > 0 ? anIndex : -anIndex;
-            aNewMap->Add(anIndex);
-            aName<<"-"<<aComponentsNames[aModIndex];
-            if (anIter.Value() > 0)
-              aName<<"f";
-            else
-              aName<<"r";
-            // collect all edges of the face which are modified in sub-label of the face
-            if (anEdgeIndices.IsBound(aModIndex) &&
-                !aFaceEdges.Contains(anEdgeIndices.Find(aModIndex))) {
-              if (!anEdgesBuilder) {
-                TDF_Label anEdgesLabel = aLab.FindChild(1);
-                anEdgesBuilder = new TNaming_Builder(anEdgesLabel);
-                std::ostringstream aSubName;
-                // tag is needed for Test1922 to distinguish sub-edges of different faces
-                aSubName<<"SubEdge_"<<aCurrentTag;
-                TDataStd_Name::Set(anEdgesLabel, aSubName.str().c_str());
-              }
-              anEdgesBuilder->Modify(anEdgeIndices.Find(aModIndex), aPutEdges.Current());
+        anEdgesBuilder->Modify(theEdgesIndices.Find(aModIndex), aPutEdges.Current());
+      }
+      // put also modified vertices, otherwise vertex of original edge has no history
+      if (theEdgesIndices.IsBound(aModIndex)) {
+        TopExp_Explorer aVExpOld(theEdgesIndices.Find(aModIndex), TopAbs_VERTEX);
+        TopExp_Explorer aVExpNew(aPutEdges.Current(), TopAbs_VERTEX);
+        for(; aVExpNew.More() && aVExpOld.More(); aVExpNew.Next(), aVExpOld.Next()) {
+          if (!aVExpOld.Current().IsSame(aVExpNew.Current())) {
+            if (!aVerticesBuilder) {
+              TDF_Label aVertLabel = aLab.FindChild(2);
+              aVerticesBuilder = new TNaming_Builder(aVertLabel);
+              std::ostringstream aSubName;
+              // tag is needed for Test1922 to distinguish sub-edges of different faces
+              aSubName<<"SubVertex_"<<aCurrentTag;
+              TDataStd_Name::Set(aVertLabel, aSubName.str().c_str());
             }
-            // put also modified vertices, otherwise vertex of original edge has no history
-            if (anEdgeIndices.IsBound(aModIndex)) {
-              TopExp_Explorer aVExpOld(anEdgeIndices.Find(aModIndex), TopAbs_VERTEX);
-              TopExp_Explorer aVExpNew(aPutEdges.Current(), TopAbs_VERTEX);
-              for(; aVExpNew.More() && aVExpOld.More(); aVExpNew.Next(), aVExpOld.Next()) {
-                if (!aVExpOld.Current().IsSame(aVExpNew.Current())) {
-                  if (!aVerticesBuilder) {
-                    TDF_Label aVertLabel = aLab.FindChild(2);
-                    aVerticesBuilder = new TNaming_Builder(aVertLabel);
-                    std::ostringstream aSubName;
-                    // tag is needed for Test1922 to distinguish sub-edges of different faces
-                    aSubName<<"SubVertex_"<<aCurrentTag;
-                    TDataStd_Name::Set(aVertLabel, aSubName.str().c_str());
-                  }
-                  aVerticesBuilder->Modify(aVExpOld.Current(), aVExpNew.Current());
+            aVerticesBuilder->Modify(aVExpOld.Current(), aVExpNew.Current());
 
-                }
-              }
-            }
-            aPutEdges.Next();
           }
-          if (anEdgesBuilder)
-            delete anEdgesBuilder;
-          if (aVerticesBuilder)
-            delete aVerticesBuilder;
-          TDataStd_Name::Set(aLab, TCollection_ExtendedString(aName.str().c_str()));
-          aMyDoc->addNamingName(aLab, aName.str());
-          // put also wires to sub-labels to correctly select them instead of collection by edges
-          int aWireTag = 3; // first tag is for SubEdge-s, second - for vertices
-          for(TopExp_Explorer aWires(aFaceToPut, TopAbs_WIRE); aWires.More(); aWires.Next()) {
-            TDF_Label aWireLab = aLab.FindChild(aWireTag);
-            TNaming_Builder aWireBuilder(aWireLab);
-            aWireBuilder.Generated(aWires.Current());
-            std::ostringstream aWireName;
-            aWireName<<aName.str()<<"_wire";
-            if (aWireTag > 3)
-              aWireName<<"_"<<aWireTag - 2;
-            TDataStd_Name::Set(aWireLab, aWireName.str().c_str());
-            aMyDoc->addNamingName(aWireLab, aWireName.str());
-            aWireTag++;
-          }
+        }
+      }
+      aPutEdges.Next();
+    }
+    if (anEdgesBuilder)
+      delete anEdgesBuilder;
+    if (aVerticesBuilder)
+      delete aVerticesBuilder;
+    TDataStd_Name::Set(aLab, TCollection_ExtendedString(aName.str().c_str()));
+    theDocument->addNamingName(aLab, aName.str());
+    // put also wires to sub-labels to correctly select them instead of collection by edges
+    int aWireTag = 3; // first tag is for SubEdge-s, second - for vertices
+    for(TopExp_Explorer aWires(aFaceToPut, TopAbs_WIRE); aWires.More(); aWires.Next()) {
+      TDF_Label aWireLab = aLab.FindChild(aWireTag);
+      TNaming_Builder aWireBuilder(aWireLab);
+      aWireBuilder.Generated(aWires.Current());
+      std::ostringstream aWireName;
+      aWireName<<aName.str()<<"_wire";
+      if (aWireTag > 3)
+        aWireName<<"_"<<aWireTag - 2;
+      TDataStd_Name::Set(aWireLab, aWireName.str().c_str());
+      theDocument->addNamingName(aWireLab, aWireName.str());
+      aWireTag++;
+    }
+  }
+}
+
+void indexingSketchEdges(const CompositeFeaturePtr& theComposite,
+                         NCollection_DataMap<Handle(Geom_Curve), int>& theCurvesIndices,
+                         NCollection_DataMap<int, TopoDS_Edge>& theEdgesIndices,
+                         std::map<int, std::string>& theEdgesNames)
+{
+  const int aSubNum = theComposite->numberOfSubs();
+  for (int a = 0; a < aSubNum; a++) {
+    FeaturePtr aSub = theComposite->subFeature(a);
+    const std::list<std::shared_ptr<ModelAPI_Result> >& aResults = aSub->results();
+    std::list<std::shared_ptr<ModelAPI_Result> >::const_iterator aRes = aResults.cbegin();
+    for (; aRes != aResults.cend(); aRes++) {
+      ResultConstructionPtr aConstr =
+        std::dynamic_pointer_cast<ModelAPI_ResultConstruction>(*aRes);
+      if (aConstr->shape() && aConstr->shape()->isEdge()) {
+        TopoDS_Edge anEdge = TopoDS::Edge(aConstr->shape()->impl<TopoDS_Shape>());
+        Standard_Real aFirst, aLast;
+        Handle(Geom_Curve) aCurve = BRep_Tool::Curve(anEdge, aFirst, aLast);
+        theCurvesIndices.Bind(aCurve, a);
+        theEdgesIndices.Bind(a, anEdge);
+        theEdgesNames[a] = shortName(aConstr);
+      }
+    }
+  }
+}
+
+void faceToEdgeIndices(const ListOfShape& theFaces,
+                       const NCollection_DataMap<Handle(Geom_Curve), int>& theCurvesIndices,
+                       MapFaceToEdgeIndices& theFaceEdges)
+{
+  std::list<std::shared_ptr<GeomAPI_Shape> >::const_iterator aFIter = theFaces.begin();
+  for (; aFIter != theFaces.end(); aFIter++) {
+    std::shared_ptr<GeomAPI_Face> aFace(new GeomAPI_Face(*aFIter));
+    // put them to a label, trying to keep the same faces on the same labels
+    if (aFace.get() && !aFace->isNull()) {
+      TopoDS_Face aTopoFace = TopoDS::Face(aFace->impl<TopoDS_Shape>());
+      theFaceEdges.Add(aTopoFace, TColStd_ListOfInteger());
+      // keep new indices of sub-elements used in this face
+      for (TopExp_Explorer anEdges(aTopoFace, TopAbs_EDGE); anEdges.More(); anEdges.Next()) {
+        TopoDS_Edge anEdge = TopoDS::Edge(anEdges.Current());
+        Standard_Real aFirst, aLast;
+        Handle(Geom_Curve) aCurve = BRep_Tool::Curve(anEdge, aFirst, aLast);
+        if (theCurvesIndices.IsBound(aCurve)) {
+          int anIndex = theCurvesIndices.Find(aCurve);
+          if ((aFirst > aLast) != (anEdge.Orientation() == TopAbs_REVERSED))
+            anIndex = -anIndex;
+          theFaceEdges.ChangeFromKey(aTopoFace).Append(anIndex);
         }
       }
     }

@@ -21,9 +21,10 @@
 #include<GeomAPI_Pnt.h>
 
 #include <TopoDS_Shape.hxx>
+#include <Geom_Circle.hxx>
 #include <Geom_Curve.hxx>
 #include <Geom_Line.hxx>
-#include <Geom_Circle.hxx>
+#include <Geom_TrimmedCurve.hxx>
 #include <BRep_Tool.hxx>
 #include <TopoDS_Edge.hxx>
 #include <TopoDS.hxx>
@@ -69,4 +70,35 @@ std::shared_ptr<GeomAPI_Pnt> GeomAPI_Curve::getPoint(double theParam)
   GeomAdaptor_Curve aAdaptor(MY_CURVE, myStart, myEnd);
   gp_Pnt aPnt = aAdaptor.Value(theParam);
   return std::shared_ptr<GeomAPI_Pnt>(new GeomAPI_Pnt(aPnt.X(), aPnt.Y(), aPnt.Z()));
+}
+
+bool GeomAPI_Curve::isEqual(const std::shared_ptr<GeomAPI_Curve>& theOther) const
+{
+  return MY_CURVE == theOther->impl<Handle_Geom_Curve>();
+}
+
+bool GeomAPI_Curve::isTrimmed() const
+{
+  return !isNull() && MY_CURVE->DynamicType() == STANDARD_TYPE(Geom_TrimmedCurve);
+}
+
+GeomCurvePtr GeomAPI_Curve::basisCurve() const
+{
+  Handle(Geom_Curve) aCurve = MY_CURVE;
+  if (aCurve->DynamicType() == STANDARD_TYPE(Geom_TrimmedCurve))
+    aCurve = Handle(Geom_TrimmedCurve)::DownCast(aCurve)->BasisCurve();
+
+  GeomCurvePtr aNewCurve(new GeomAPI_Curve);
+  aNewCurve->setImpl(new Handle(Geom_Curve)(aCurve));
+  return aNewCurve;
+}
+
+// ================================================================================================
+
+bool GeomAPI_Curve::Comparator::operator()(const GeomCurvePtr& theCurve1,
+                                           const GeomCurvePtr& theCurve2) const
+{
+  const Handle(Geom_Curve)& aCurve1 = theCurve1->impl<Handle_Geom_Curve>();
+  const Handle(Geom_Curve)& aCurve2 = theCurve2->impl<Handle_Geom_Curve>();
+  return aCurve1.get() < aCurve2.get();
 }

@@ -715,18 +715,6 @@ bool GeomAPI_Shape::isSelfIntersected(const int theLevelOfCheck) const
   return false;
 }
 
-double GeomAPI_Shape::tolerance() const
-{
-  double aTolerance = 0.0;
-  for (TopExp_Explorer anExp(*MY_SHAPE, TopAbs_FACE); anExp.More(); anExp.Next())
-    aTolerance = Max(aTolerance, BRep_Tool::Tolerance(TopoDS::Face(anExp.Current())));
-  for (TopExp_Explorer anExp(*MY_SHAPE, TopAbs_EDGE); anExp.More(); anExp.Next())
-    aTolerance = Max(aTolerance, BRep_Tool::Tolerance(TopoDS::Edge(anExp.Current())));
-  for (TopExp_Explorer anExp(*MY_SHAPE, TopAbs_VERTEX); anExp.More(); anExp.Next())
-    aTolerance = Max(aTolerance, BRep_Tool::Tolerance(TopoDS::Vertex(anExp.Current())));
-  return aTolerance;
-}
-
 bool GeomAPI_Shape::Comparator::operator()(const std::shared_ptr<GeomAPI_Shape>& theShape1,
                                            const std::shared_ptr<GeomAPI_Shape>& theShape2) const
 {

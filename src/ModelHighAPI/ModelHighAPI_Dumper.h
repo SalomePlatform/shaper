@@ -287,6 +287,10 @@ public:
   MODELHIGHAPI_EXPORT
   ModelHighAPI_Dumper& operator<<(const ResultPtr& theResult);
 
+  /// Dump a list of results
+  MODELHIGHAPI_EXPORT
+  ModelHighAPI_Dumper& operator<<(const std::list<ResultPtr>& theResults);
+
   /// Dump Attribute
   MODELHIGHAPI_EXPORT ModelHighAPI_Dumper&
     operator<<(const std::shared_ptr<ModelAPI_Attribute>& theAttr);

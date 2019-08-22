@@ -111,6 +111,10 @@ public:
   SKETCHAPI_EXPORT
   void setExternal(std::shared_ptr<ModelAPI_Object> thePlaneObject);
 
+  /// Change order of sketch results (faces)
+  SKETCHAPI_EXPORT
+  void changeFacesOrder(const std::list<std::list<ModelHighAPI_Selection> >& theFaces);
+
   /// List points not connected by constraints with other sketch entitites
   SKETCHAPI_EXPORT
   std::list< std::shared_ptr<SketchAPI_Point> > getFreePoints();

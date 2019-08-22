@@ -241,6 +241,7 @@
 
 // std::list -> []
 %template(SelectionList) std::list<ModelHighAPI_Selection>;
+%template(SelectionListList) std::list<std::list<ModelHighAPI_Selection> >;
 %template(RefAttrList) std::list<ModelHighAPI_RefAttr>;
 %template(RefList) std::list<ModelHighAPI_Reference>;
 

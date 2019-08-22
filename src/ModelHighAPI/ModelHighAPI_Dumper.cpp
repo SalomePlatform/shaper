@@ -1189,6 +1189,19 @@ ModelHighAPI_Dumper& ModelHighAPI_Dumper::operator<<(const ResultPtr& theResult)
   return *this;
 }
 
+ModelHighAPI_Dumper& ModelHighAPI_Dumper::operator<<(const std::list<ResultPtr>& theResults)
+{
+  *this << "[";
+  for (std::list<ResultPtr>::const_iterator anIt = theResults.begin();
+       anIt != theResults.end(); ++anIt) {
+    if (anIt != theResults.begin())
+      *this << ", ";
+    *this << *anIt;
+  }
+  *this << "]";
+  return *this;
+}
+
 ModelHighAPI_Dumper& ModelHighAPI_Dumper::operator<<(const ObjectPtr& theObject)
 {
   FeaturePtr aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(theObject);
