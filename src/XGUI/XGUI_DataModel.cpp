@@ -67,6 +67,13 @@ void XGUI_DataModel::processEvent(const std::shared_ptr<Events_Message>& theMess
     for (aIt = aObjects.cbegin(); aIt != aObjects.cend(); aIt++) {
       if ((*aIt)->isInHistory())
         aCreated.append(*aIt);
+      if ((*aIt)->groupName() == ModelAPI_ResultPart::group()) {
+        emit beforeTreeRebuild();
+        myRoot->update();
+        rebuildDataTree();
+        emit treeRebuilt();
+        return;
+      }
     }
     if (aCreated.length() == 0)
       return;
