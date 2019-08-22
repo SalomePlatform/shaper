@@ -665,7 +665,7 @@ void XGUI_ViewerProxy::setupColorScale()
   double aH = aResMgr->doubleValue("Viewer", "scalar_bar_height", 0.5);
   setColorScaleSize(aW, aH);
 
-  QColor aColor = aResMgr->integerValue("Viewer", "scalar_bar_text_color", Qt::black);
+  QColor aColor = aResMgr->colorValue("Viewer", "scalar_bar_text_color", Qt::black);
   setColorScaleTextColor(aColor);
 
   int aT = aResMgr->integerValue("Viewer", "scalar_bar_text_height", 14);
