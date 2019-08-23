@@ -3,6 +3,8 @@
 .. |minus.icon|  image:: images/reverce.png
 .. |delete.icon|  image:: images/delete.png
 
+.. _groupPage:
+
 Group
 =====
 
@@ -43,45 +45,12 @@ Input fields:
  
 - The list of selected entities of the given type.  Multiple selection can be done manually in OCC 3D Viewer by mouse click with Shift button pressed or by rectangle selection. To delete entities from the list, select them and call pop-up menu *Delete* item.
 
-- **Selection by filters** button opens "selection by filters" property panel and allows to select entities by set of selected filters.
+- **Selection by filters** button opens "selection by filters" property panel and allows to select entities by set of selected filters. For details on filters see :ref:`filtersPlugin`
 
 - **Show only** button allows to hide all other objects and shapes and show only selected ones.
 
 - Control **Add elements that share the same topology** allows to add automatically all elements laying on the same topology that was selected and remove these elements if they have disappeared due to the parametrical update. They will be represented as one line in the list of selection and managed in the viewer as one object if this flag is enabled. If flag becomes disabled when such elements are already in the list, they will become divided in one line per one shape.
 
-**Selection by filters**
-
-If user presses this button then following property panel appears.
-
-.. image:: images/selection_by_filters.png
-  :align: center
-
-.. centered::
-  Selection by filters property panel
-
-In this panel:
-
-- **Filters** a panel for added filters.
-
-- **Add new filter** combo box. It contains accessible filters according to the selection mode defined in **Group** property panel. When user selects an item from this combo box a filter item appears in **Filters** panel like in the following example:
-
-.. image:: images/selection_by_filters_added.png
-  :align: center
-
-.. centered::
-  Filters **Horizontal faces** and **On plane** added to the property panel.
-  
-Each filter item can be deleted with help of |delete.icon| button. A filter can be reverced with help of toggle button |plus.icon|/|minus.icon|. Also a filter could have input fields in case
-if the filter has arguments.
-
-- **Select** button traverces all objects of a current document and selects entities acceptable by currently defined set of filters. All selected entities will be shown in viewer 3d with
-blue semi-transparent color. Any modification in filters clears current selection.
-
-- **Number of selected objects** shows number currently selected entities.
-
-- **Show only** check box lets to hide all non-selected objects.
-
-**Accept** button in the **Selection by filters** property panel reopens **Group** property panel again and transfers all selected entities to the corresponded list.
 
 **TUI Command**:
 

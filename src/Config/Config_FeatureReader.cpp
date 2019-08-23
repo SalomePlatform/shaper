@@ -174,6 +174,11 @@ void Config_FeatureReader::fillFeature(xmlNodePtr theFeatureNode,
 
   bool isInternal = getBooleanAttribute(theFeatureNode, ATTR_INTERNAL, false);
   outFeatureMessage->setInternal(isInternal);
+
+  std::string aHelpFile = getProperty(theFeatureNode, HELP_FILE);
+  if (!aHelpFile.empty())
+    outFeatureMessage->setHelpFileName(myLibraryName + "/" + aHelpFile);
+
   if (isInternal) {
     //Internal feature has no visual representation.
     return;
@@ -188,9 +193,6 @@ void Config_FeatureReader::fillFeature(xmlNodePtr theFeatureNode,
   //outFeatureMessage->setTooltip(aToolTip);
   outFeatureMessage->setIcon(getProperty(theFeatureNode, FEATURE_ICON));
   outFeatureMessage->setKeysequence(getProperty(theFeatureNode, FEATURE_KEYSEQUENCE));
-  std::string aHelpFile = getProperty(theFeatureNode, HELP_FILE);
-  if (!aHelpFile.empty())
-    outFeatureMessage->setHelpFileName(myLibraryName + "/" + aHelpFile);
 
   std::string aGroupName = restoreAttribute(NODE_GROUP, _ID);
   std::string aWBNName = restoreAttribute(NODE_WORKBENCH, _ID);
