@@ -313,12 +313,10 @@ void GeomAlgoAPI_Prism::buildByPlanes(const GeomShapePtr             theBaseShap
   std::shared_ptr<GeomAPI_Pnt> aFromPnt(
     new GeomAPI_Pnt(aFromLoc->xyz()->added(anExtDir->multiplied(
                     aSign ? theFromSize : -theFromSize))));
-  GeomShapePtr aBoundingFromShape = GeomAlgoAPI_FaceBuilder::planarFace(aFromPnt, aFromDir);
 
   std::shared_ptr<GeomAPI_Pnt> aToPnt(
     new GeomAPI_Pnt(aToLoc->xyz()->added(anExtDir->multiplied(
                     aSign ? -theToSize : theToSize))));
-  GeomShapePtr aBoundingToShape = GeomAlgoAPI_FaceBuilder::planarFace(aToPnt, aToDir);
 
   // Getting bounding box for base shape.
   Bnd_Box aBndBox;
@@ -393,34 +391,27 @@ void GeomAlgoAPI_Prism::buildByPlanes(const GeomShapePtr             theBaseShap
   IntAna_IntConicQuad aFromIntAna(aLine, aBndFromQuadric);
   Standard_Real aToParameter = aToIntAna.ParamOnConic(1);
   Standard_Real aFromParameter = aFromIntAna.ParamOnConic(1);
-  static const double THE_FACE_SIZE_COEFF = 10.0;
   if(aToParameter > aFromParameter) {
     gp_Vec aVec = aToDir->impl<gp_Dir>();
-    if((aVec * anExtVec) > 0) {
+    if((aVec * anExtVec) > 0)
       aToDir->setImpl(new gp_Dir(aVec.Reversed()));
-      aBoundingToShape =
-        GeomAlgoAPI_FaceBuilder::squareFace(aToPnt, aToDir, THE_FACE_SIZE_COEFF * aBndBoxSize);
-    }
     aVec = aFromDir->impl<gp_Dir>();
-    if((aVec * anExtVec) < 0) {
+    if((aVec * anExtVec) < 0)
       aFromDir->setImpl(new gp_Dir(aVec.Reversed()));
-      aBoundingFromShape =
-        GeomAlgoAPI_FaceBuilder::squareFace(aFromPnt, aFromDir, THE_FACE_SIZE_COEFF * aBndBoxSize);
-    }
   } else {
     gp_Vec aVec = aToDir->impl<gp_Dir>();
-    if((aVec * anExtVec) < 0) {
+    if((aVec * anExtVec) < 0)
       aToDir->setImpl(new gp_Dir(aVec.Reversed()));
-      aBoundingToShape =
-        GeomAlgoAPI_FaceBuilder::squareFace(aToPnt, aToDir, THE_FACE_SIZE_COEFF * aBndBoxSize);
-    }
     aVec = aFromDir->impl<gp_Dir>();
-    if((aVec * anExtVec) > 0) {
+    if((aVec * anExtVec) > 0)
       aFromDir->setImpl(new gp_Dir(aVec.Reversed()));
-      aBoundingFromShape =
-        GeomAlgoAPI_FaceBuilder::squareFace(aFromPnt, aFromDir, THE_FACE_SIZE_COEFF * aBndBoxSize);
-    }
   }
+
+  static const double THE_FACE_SIZE_COEFF = 10.0;
+  GeomShapePtr aBoundingFromShape =
+      GeomAlgoAPI_FaceBuilder::squareFace(aFromPnt, aFromDir, THE_FACE_SIZE_COEFF * aBndBoxSize);
+  GeomShapePtr aBoundingToShape =
+      GeomAlgoAPI_FaceBuilder::squareFace(aToPnt, aToDir, THE_FACE_SIZE_COEFF * aBndBoxSize);
 
   // bounding planes
   const TopoDS_Shape& aToShape   = aBoundingToShape->impl<TopoDS_Shape>();
@@ -468,7 +459,7 @@ void GeomAlgoAPI_Prism::buildByPlanes(const GeomShapePtr             theBaseShap
   // Solid based on "From" bounding plane
   aNormal = aFromDir->impl<gp_Dir>();
   BRepPrimAPI_MakePrism* aFromPrismBuilder =
-      new BRepPrimAPI_MakePrism(aFromShape, aNormal * (-aBndBoxSize));
+      new BRepPrimAPI_MakePrism(aFromShape, aNormal * (-2.0 * aBndBoxSize));
   if (!aFromPrismBuilder || !aFromPrismBuilder->IsDone()) {
     return;
   }
