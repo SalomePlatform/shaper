@@ -40,6 +40,8 @@
 #include <ModuleBase_ActionInfo.h>
 #include <ModuleBase_IModule.h>
 
+#include <ModelAPI_Tools.h>
+
 #include <LightApp_Application.h>
 #include <LightApp_SelectionMgr.h>
 #include <LightApp_OCCSelector.h>
@@ -447,8 +449,16 @@ void SHAPERGUI::onViewManagerRemoved(SUIT_ViewManager* theMgr)
       if (mySelector->viewer() == aViewer) {
         XGUI_Displayer* aDisp = myWorkshop->displayer();
         QObjectPtrList aObjects = aDisp->displayedObjects();
-        foreach(ObjectPtr aObj, aObjects)
+        ResultPtr aRes;
+        foreach(ObjectPtr aObj, aObjects) {
           aObj->setDisplayed(false);
+          aRes = std::dynamic_pointer_cast<ModelAPI_Result>(aObj);
+          if (aRes.get()) {
+            while (aRes = ModelAPI_Tools::bodyOwner(aRes)) {
+              aRes->setDisplayed(false);
+            }
+          }
+        }
         Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_TO_REDISPLAY));
         myProxyViewer->setSelector(0);
         delete mySelector;
