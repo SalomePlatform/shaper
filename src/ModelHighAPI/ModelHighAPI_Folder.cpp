@@ -24,6 +24,7 @@
 
 #include <ModelAPI_AttributeReference.h>
 #include <ModelAPI_Document.h>
+#include <ModelAPI_Events.h>
 
 //--------------------------------------------------------------------------------------
 
@@ -109,5 +110,13 @@ std::shared_ptr<ModelHighAPI_Folder> addFolder(const std::shared_ptr<ModelAPI_Do
   AttributeReferencePtr aLastFeatAttr = aFolder->reference(ModelAPI_Folder::LAST_FEATURE_ID());
   fillAttribute(theLastFeature.feature(), aLastFeatAttr);
 
+  // to update the folder state in the Object Browser
+  theDoc->updateHistory(ModelAPI_Feature::group());
+
   return std::shared_ptr<ModelHighAPI_Folder>(new ModelHighAPI_Folder(aFolder));
+}
+
+void removeFolder(std::shared_ptr<ModelHighAPI_Folder>& theFolder)
+{
+  theFolder->folder()->document()->removeFolder(theFolder->folder());
 }
