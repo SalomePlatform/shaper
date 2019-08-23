@@ -254,6 +254,12 @@ void SketchAPI_Sketch::changeFacesOrder(
   // collect faces of the sketch
   ResultConstructionPtr aSketchResult =
       std::dynamic_pointer_cast<ModelAPI_ResultConstruction>(feature()->lastResult());
+  if (!aSketchResult) {
+    // sketch is nested to a boolean operation, thus, it has no result yet.
+    feature()->execute();
+    aSketchResult =
+        std::dynamic_pointer_cast<ModelAPI_ResultConstruction>(feature()->lastResult());
+  }
   std::list<GeomFacePtr> aFaces;
   int aFacesNum = aSketchResult->facesNum();
   for (int i = 0; i < aFacesNum; ++i)
