@@ -65,7 +65,7 @@ class compoundVertices(model.Feature):
                 for feature in self.lfeatures:
                    part.removeFeature(feature.feature())
                 self.lfeatures = []
-                #part.removeFeature(self.folder.feature())
+                model.removeFolder(self.folder)
 
             from os.path import basename
             filename = basename(filepath)
