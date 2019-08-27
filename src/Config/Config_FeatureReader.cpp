@@ -188,9 +188,9 @@ void Config_FeatureReader::fillFeature(xmlNodePtr theFeatureNode,
   outFeatureMessage->setText(aText);
   bool isTitleInToolbar = getBooleanAttribute(theFeatureNode, FEATURE_TITLE_IN_TOOLBAR, true);
   outFeatureMessage->setTitleInToolbar(isTitleInToolbar);
-  //std::string aToolTip = Config_Translator::translate(
-  //  anId, getProperty(theFeatureNode, FEATURE_TOOLTIP));
-  //outFeatureMessage->setTooltip(aToolTip);
+  std::string aToolTip = Config_Translator::translate(
+    anId, getProperty(theFeatureNode, FEATURE_TOOLTIP));
+  outFeatureMessage->setTooltip(aToolTip);
   outFeatureMessage->setIcon(getProperty(theFeatureNode, FEATURE_ICON));
   outFeatureMessage->setKeysequence(getProperty(theFeatureNode, FEATURE_KEYSEQUENCE));
 

@@ -13,7 +13,7 @@ A feature description includes 4 files:
 - feature.py with python commands, 
 - icon.png with image of button in the toolbar (the file is located at sub-folder /icons).
 
-Two examples of already created custom features are:
+An example of already created custom features is:
 
 .. toctree::
    :titlesonly:
