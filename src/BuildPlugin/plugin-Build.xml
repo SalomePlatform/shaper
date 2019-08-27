@@ -1,11 +1,11 @@
 <plugin>
   <workbench id="Build" document="Part">
     <group id="Generate">
-      <feature id="Vertex" title="Vertex" tooltip ="Create a vertex from sketch vertex and vertex objects" icon="icons/Build/feature_vertex.png"
+      <feature id="Vertex" title="Vertex" tooltip ="Create vertices from sketch point or other vertex objects" icon="icons/Build/feature_vertex.png"
                helpfile="vertexFeature.html">
         <source path="vertex_widget.xml"/>
       </feature>
-      <feature id="Edge" title="Edge" tooltip ="Create an edge from sketch edges and edge objects" icon="icons/Build/feature_edge.png"
+      <feature id="Edge" title="Edge" tooltip ="Create edges from sketch edges or other edge objects" icon="icons/Build/feature_edge.png"
                helpfile="edgeFeature.html">
         <source path="edge_widget.xml"/>
       </feature>
@@ -33,7 +33,7 @@
                helpfile="solidFeature.html">
         <source path="solid_widget.xml"/>
       </feature>
-      <feature id="CompSolid" title="CompSolid" tooltip ="Create a compsolid from solids or another compsolids" icon="icons/Build/feature_compsolid.png"
+      <feature id="CompSolid" title="CompSolid" tooltip ="Create a compsolid from solids or other compsolids" icon="icons/Build/feature_compsolid.png"
                helpfile="compsolidFeature.html">
         <source path="compsolid_widget.xml"/>
       </feature>

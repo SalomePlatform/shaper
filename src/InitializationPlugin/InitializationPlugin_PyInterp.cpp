@@ -228,22 +228,24 @@ bool InitializationPlugin_PyInterp::initContext()
   Py_INCREF(_local_context);
 
   // to avoid "help()" hang in the python console
-  PyRun_SimpleString("def help(): print(\"Available modules:\\n\
-  salome.shaper.model : higher level access to features and data model\\n\
-  BuildAPI            : Build plugin features allowing to build shapes\\n\
-  ConfigAPI           : configuration management: preferences and XML properties\\n\
-  ConstructionAPI     : Construction plugin for auxiliary features creation\\n\
-  EventsAPI           : application events receiving and emitting manager\\n\
-  ExchangeAPI         : Exchange plugin with import/export features\\n\
-  FeaturesAPI         : Features plugin with general 3D features\\n\
-  GeomAlgoAPI         : geometrical algorithms\\n\
-  GeomAPI             : geometrical data structures\\n\
-  GeomDataAPI         : specific geometrical data structures stored in the data model\\n\
-  ModelAPI            : general low-level interface to access data model\\n\
-  ModelHighAPI        : general high-level interface to access data model\\n\
-  ParametersAPI       : Parameters plugin for parameters feature management\\n\
-  PartSetAPI          : PartSet plugin for management Parts features\\n\
-  SketchAPI           : Sketch plugin with all sketch features\")");
+  const static char* aHelpTxt = "def help(): print(\"Available modules:\\n"
+    "  salome.shaper.model : higher level access to features and data model\\n"
+    "  BuildAPI            : Build plugin features allowing to build shapes\\n"
+    "  ConfigAPI           : configuration management: preferences and XML properties\\n"
+    "  ConstructionAPI     : Construction plugin for auxiliary features creation\\n"
+    "  EventsAPI           : application events receiving and emitting manager\\n"
+    "  ExchangeAPI         : Exchange plugin with import/export features\\n"
+    "  FeaturesAPI         : Features plugin with general 3D features\\n"
+    "  GeomAlgoAPI         : geometrical algorithms\\n"
+    "  GeomAPI             : geometrical data structures\\n"
+    "  GeomDataAPI         : specific geometrical data structures stored in the data model\\n"
+    "  ModelAPI            : general low-level interface to access data model\\n"
+    "  ModelHighAPI        : general high-level interface to access data model\\n"
+    "  ParametersAPI       : Parameters plugin for parameters feature management\\n"
+    "  PartSetAPI          : PartSet plugin for management Parts features\\n"
+    "  SketchAPI           : Sketch plugin with all sketch features\")";
+
+  PyRun_SimpleString(aHelpTxt);
 
   return PyRun_SimpleString("from math import *") == 0;
 }

@@ -301,7 +301,7 @@
       <!--  SketchFillet  -->
       <feature id="SketchFillet"
                title="Fillet"
-               tooltip="Create constraint defining fillet between two objects"
+               tooltip="Create constraint defining fillet between two connected segments"
                icon="icons/Sketch/fillet.png"
                helpfile="filletFeature.html">
         <sketch_shape_selector id="fillet_point"
@@ -947,7 +947,7 @@
       </feature>
 
       <!--  SketchConstraintTangent  -->
-      <feature id="SketchConstraintTangent" title="Tangent" tooltip="Create constraint defining tangency of two objects with common coincident point" icon="icons/Sketch/tangent.png"
+      <feature id="SketchConstraintTangent" title="Tangent" tooltip="Create constraint defining tangency of two segments with common coincident point" icon="icons/Sketch/tangent.png"
                helpfile="tangentFeature.html">
         <sketch_shape_selector id="ConstraintEntityA"
             label="First object" tooltip="Select line or arc" shape_types="edge">

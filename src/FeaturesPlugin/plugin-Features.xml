@@ -114,15 +114,15 @@
   </workbench>
   <workbench id="Part">
     <group id="Movement">
-      <feature id="Placement" title="Placement" tooltip="Place an objects relatively to another one"
+      <feature id="Placement" title="Placement" tooltip="Place objects relatively to another one"
                icon="icons/Features/placement.png" helpfile="placementFeature.html">
         <source path="placement_widget.xml"/>
       </feature>
-      <feature id="Translation" title="Translation" tooltip="Perform translation of an objects along the axis to specified distance"
+      <feature id="Translation" title="Translation" tooltip="Perform translation of objects along the axis to specified distance"
                icon="icons/Features/movement.png" helpfile="translationFeature.html">
         <source path="translation_widget.xml"/>
       </feature>
-      <feature id="Rotation" title="Rotation" tooltip="Perform rotation of an objects around the axis to specified angle"
+      <feature id="Rotation" title="Rotation" tooltip="Perform rotation of objects around the axis to specified angle"
                icon="icons/Features/rotation.png" helpfile="rotationFeature.html">
         <source path="rotation_widget.xml"/>
       </feature>
