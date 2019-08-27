@@ -98,4 +98,4 @@ class compoundVertices(model.Feature):
         compoundVertices feature is macro: removes itself on the creation transaction
         finish.
         """
-        return True
+        return False
