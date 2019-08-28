@@ -131,9 +131,11 @@ ModuleBase_WidgetMultiSelector::ModuleBase_WidgetMultiSelector(QWidget* theParen
   QStringList aIconsList = getIconsList(myShapeTypes);
   myTypeCtrl = new ModuleBase_ChoiceCtrl(this, myShapeTypes, aIconsList);
   myTypeCtrl->setLabel(tr("Type"));
-  myTypeCtrl->setValue(0);
+  if (!myShapeTypes.empty()) {
+    myTypeCtrl->setValue(0);
+    myDefMode = myShapeTypes.first().toStdString();
+  }
   aMainLay->addWidget(myTypeCtrl);
-  myDefMode = myShapeTypes.first().toStdString();
 
   // There is no sense to parameterize list of types while we can not parameterize selection mode
   // if the xml definition contains one type, the controls to select a type should not be shown
@@ -294,12 +296,23 @@ bool ModuleBase_WidgetMultiSelector::storeValueCustom()
   std::string aType = anAttribute->attributeType();
   if (aType == ModelAPI_AttributeSelectionList::typeId()) {
     AttributeSelectionListPtr aSelectionListAttr = myFeature->data()->selectionList(attributeID());
-    std::string aMode = myTypeCtrl->textValue().toStdString();
-    if (myTypeCtrl->isVisible() && myIsFirst && (!myDefMode.empty()))
-      aMode = myDefMode;
+    if (myTypeCtrl->isVisible()) {
+      std::string aMode = myTypeCtrl->textValue().toStdString();
+      if (myIsFirst && (!myDefMode.empty()))
+        aMode = myDefMode;
 
-    aSelectionListAttr->setSelectionType(aMode);
-    myIsFirst = false;
+      aSelectionListAttr->setSelectionType(aMode);
+      myIsFirst = false;
+    } else { // no type, set the type as a first element of the list shape type when it is appeared
+      if (aSelectionListAttr->size()) {
+        AttributeSelectionPtr aSel = aSelectionListAttr->value(0);
+        GeomShapePtr aFirstVal = aSel->value();
+        if (!aFirstVal.get() && aSel->context().get())
+          aFirstVal = aSel->context()->shape();
+        if (aFirstVal.get() && !aFirstVal->isNull())
+          aSelectionListAttr->setSelectionType(aFirstVal->shapeTypeStr());
+      }
+    }
   }
   return true;
 }
