@@ -45,6 +45,8 @@ std::string File_Tools::extension(const std::string& theFileName)
   TCollection_AsciiString aFileName(theFileName.c_str());
   OSD_Path aPath(aFileName);
   TCollection_AsciiString anExtension = aPath.Extension();
+  if (anExtension.Length() < 2)
+    return "";
   // TCollection_AsciiString are numbered from 1
   anExtension = anExtension.SubString(2, anExtension.Length());
   anExtension.UpperCase();
