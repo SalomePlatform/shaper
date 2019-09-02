@@ -886,6 +886,19 @@ void Model_Objects::synchronizeFeatures(
             std::list<std::shared_ptr<ModelAPI_Attribute> >::iterator anAttr = anAttrs.begin();
             for(; anAttr != anAttrs.end(); anAttr++)
               (*anAttr)->reinit();
+            // if feature contains results, re-init them too
+            if (aFeature.get()) {
+              std::list<ResultPtr> aResults;
+              ModelAPI_Tools::allResults(aFeature, aResults);
+              std::list<ResultPtr>::iterator aResIter = aResults.begin();
+              for(; aResIter != aResults.end(); aResIter++) {
+                std::list<std::shared_ptr<ModelAPI_Attribute> > anAttrs =
+                  (*aResIter)->data()->attributes("");
+                std::list<std::shared_ptr<ModelAPI_Attribute> >::iterator anAttr = anAttrs.begin();
+                for(; anAttr != anAttrs.end(); anAttr++)
+                  (*anAttr)->reinit();
+              }
+            }
           }
         }
         ModelAPI_EventCreator::get()->sendUpdated(anObject, anUpdateEvent);
