@@ -124,6 +124,7 @@ void ModuleBase_FilterStarter::onFiltersLaunch()
   FiltersFeaturePtr aFilters = aAttrList->filters();
   if (aFilters.get())
     aFOperation->setFeature(aFilters);
+  aFOperation->setHelpFileName("FiltersPlugin.html");
   myWorkshop->processLaunchOperation(aFOperation);
 }
 

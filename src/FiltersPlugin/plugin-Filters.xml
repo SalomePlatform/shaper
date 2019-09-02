@@ -3,8 +3,7 @@
     <group id="Collections">
       <feature id="FiltersSelection"
                title="Selection filters"
-               internal="1"
-               helpfile="FiltersPlugin.html">
+               internal="1">
         <selection_filters/>
       </feature>
     </group>
