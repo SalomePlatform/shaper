@@ -293,6 +293,7 @@ void XGUI_ContextMenuMgr::updateObjectBrowserMenu()
     bool hasCompositeOwner = false;
     bool hasResultInHistory = false;
     bool hasFolder = false;
+    bool canBeDeleted = true;
     ModuleBase_Tools::checkObjects(aObjects, hasResult, hasFeature, hasParameter,
                                    hasCompositeOwner, hasResultInHistory, hasFolder);
     //Process Feature
@@ -332,7 +333,13 @@ void XGUI_ContextMenuMgr::updateObjectBrowserMenu()
         if( aMgr->activeDocument() == aObject->document() )
         {
           action("RENAME_CMD")->setEnabled(true);
-          action("DELETE_CMD")->setEnabled(!hasCompositeOwner);
+          if (aObject->groupName() == ModelAPI_ResultConstruction::group()) {
+            FeaturePtr aFeature = ModelAPI_Feature::feature(aObject);
+            canBeDeleted = aFeature->isInHistory();
+            action("DELETE_CMD")->setEnabled(canBeDeleted);
+          }
+          else
+            action("DELETE_CMD")->setEnabled(!hasCompositeOwner);
           action("CLEAN_HISTORY_CMD")->setEnabled(!hasCompositeOwner &&
                                                   (hasFeature || hasParameter));
         }
@@ -446,8 +453,8 @@ void XGUI_ContextMenuMgr::updateObjectBrowserMenu()
         break;
       }
     if (!hasCompositeOwner && allActive ) {
-      if (hasResult || hasFeature || hasParameter) // #2924 results can be erased
-        action("DELETE_CMD")->setEnabled(true);
+      if (hasResult || hasFeature || hasParameter)  // #2924 results can be erased
+        action("DELETE_CMD")->setEnabled(canBeDeleted);
     }
     if (!hasCompositeOwner && allActive && (hasFeature|| hasParameter))
       action("CLEAN_HISTORY_CMD")->setEnabled(true);
@@ -506,6 +513,8 @@ void XGUI_ContextMenuMgr::updateViewerMenu()
     ObjectPtr aObject;
     foreach(ModuleBase_ViewerPrsPtr aPrs, aPrsList) {
       aObject = aPrs->object();
+      if (!aObject.get())
+        continue;
       GeomShapePtr aShape = aPrs->shape();
       if (aObject->isDisplayed()) {
         isVisible = true;
