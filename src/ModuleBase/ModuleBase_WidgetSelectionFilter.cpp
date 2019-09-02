@@ -52,6 +52,7 @@
 #include <QDialog>
 #include <QToolButton>
 #include <QCheckBox>
+#include <QDir>
 
 static FeaturePtr SelectorFeature;
 static std::string AttributeId;
@@ -98,6 +99,9 @@ ModuleBase_FilterStarter::ModuleBase_FilterStarter(const std::string& theFeature
 
 void ModuleBase_FilterStarter::onFiltersLaunch()
 {
+  static QString aHelpFileName = QString("FiltersPlugin") + QDir::separator() +
+    QString("FiltersPlugin.html");
+
   ModuleBase_Operation* aParentOp = myWorkshop->currentOperation();
   ModuleBase_OperationFeature* aFeatureOp = dynamic_cast<ModuleBase_OperationFeature*>(aParentOp);
   if (aFeatureOp)
@@ -124,7 +128,7 @@ void ModuleBase_FilterStarter::onFiltersLaunch()
   FiltersFeaturePtr aFilters = aAttrList->filters();
   if (aFilters.get())
     aFOperation->setFeature(aFilters);
-  aFOperation->setHelpFileName("FiltersPlugin.html");
+  aFOperation->setHelpFileName(aHelpFileName);
   myWorkshop->processLaunchOperation(aFOperation);
 }
 
