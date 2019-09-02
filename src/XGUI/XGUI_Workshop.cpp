@@ -2460,16 +2460,16 @@ void XGUI_Workshop::changeTransparency(const QObjectPtrList& theObjects)
   QString aDescription = contextMenuMgr()->action("TRANSPARENCY_CMD")->text();
   aMgr->startOperation(aDescription.toStdString());
 
-  if (aDlg->exec() != QDialog::Accepted) {
+  if (aDlg->exec() == QDialog::Accepted) {
+    // 4. set the value to all results
+    aCurrentValue = aTransparencyWidget->getValue();
+    setTransparency(aCurrentValue, theObjects);
+    aMgr->finishOperation();
+  } else {
     aMgr->abortOperation();
     Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_TO_REDISPLAY));
-    return;
   }
-  // 4. set the value to all results
-  aCurrentValue = aTransparencyWidget->getValue();
-  setTransparency(aCurrentValue, theObjects);
 
-  aMgr->finishOperation();
   updateCommandStatus();
 }
 
