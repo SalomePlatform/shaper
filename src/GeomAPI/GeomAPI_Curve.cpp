@@ -82,6 +82,8 @@ bool GeomAPI_Curve::isTrimmed() const
   return !isNull() && MY_CURVE->DynamicType() == STANDARD_TYPE(Geom_TrimmedCurve);
 }
 
+// unused in the unit tests for now
+// LCOV_EXCL_START
 GeomCurvePtr GeomAPI_Curve::basisCurve() const
 {
   Handle(Geom_Curve) aCurve = MY_CURVE;
@@ -92,6 +94,7 @@ GeomCurvePtr GeomAPI_Curve::basisCurve() const
   aNewCurve->setImpl(new Handle(Geom_Curve)(aCurve));
   return aNewCurve;
 }
+// LCOV_EXCL_STOP
 
 // ================================================================================================
 
