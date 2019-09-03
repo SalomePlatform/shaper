@@ -397,7 +397,9 @@ bool PartSet_SketcherReentrantMgr::processEnter(const std::string& thePreviousAt
 
   if (!isSketchSolverError) {
     myRestartingMode = RM_EmptyFeatureUsed;
-    isDone = startInternalEdit(thePreviousAttributeID);
+    // It seems that the call is obsolete for Enter key processing
+    // It prevent finalysing of the current operation by Enter key
+    //isDone = startInternalEdit(thePreviousAttributeID);
   }
 
   return isDone;
