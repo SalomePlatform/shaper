@@ -477,7 +477,8 @@ void PartSet_SketcherMgr::onMouseReleased(ModuleBase_IViewWindow* theWnd, QMouse
   ModuleBase_IViewer* aViewer = aWorkshop->viewer();
   //if (!aViewer->canDragByMouse())
   //  return;
-  ModuleBase_OperationFeature* aOp = dynamic_cast<ModuleBase_OperationFeature*>(getCurrentOperation());
+  ModuleBase_OperationFeature* aOp =
+      dynamic_cast<ModuleBase_OperationFeature*>(getCurrentOperation());
   if (aOp) {
     bool aStartNoDragOperation = !aViewer->canDragByMouse() && aOp->isEditOperation();
     if (aStartNoDragOperation || myNoDragMoving) {
