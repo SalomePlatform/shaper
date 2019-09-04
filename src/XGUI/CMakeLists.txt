@@ -25,6 +25,10 @@ INCLUDE_DIRECTORIES(${QT_INCLUDES})
 # additional preprocessor / compiler flags
 ADD_DEFINITIONS(${QT_DEFINITIONS})
 
+SET(UPDATE_TRANSLATION OFF)
+
+
+
 SET(PROJECT_HEADERS
     XGUI.h
     XGUI_ActionsMgr.h
@@ -171,12 +175,19 @@ ELSE()
 ENDIF()
 
 QT_ADD_RESOURCES(PROJECT_COMPILED_RESOURCES ${PROJECT_RESOURCES})
-QT5_ADD_TRANSLATION(QM_RESOURCES ${TEXT_RESOURCES})
-# QT4_CREATE_TRANSLATION(QM_RESOURCES
-#                        ${PROJECT_SOURCES}
-#                        ${TEXT_RESOURCES}
-#                        OPTIONS -extensions cpp -no-recursive
-#                        )
+
+
+
+IF (${UPDATE_TRANSLATION})
+    SET(PROJECT_FILES ${PROJECT_SOURCES} ${ROJECT_HEADERS} )
+    QT5_CREATE_TRANSLATION(QM_RESOURCES
+                           ${PROJECT_FILES}
+                           ${TEXT_RESOURCES}
+                           OPTIONS -extensions cpp -no-recursive
+                          )
+ELSE(${UPDATE_TRANSLATION)
+    QT5_ADD_TRANSLATION(QM_RESOURCES ${TEXT_RESOURCES})
+ENDIF(${UPDATE_TRANSLATION)
 
 
 SOURCE_GROUP ("Generated Files" FILES ${PROJECT_AUTOMOC} ${PROJECT_COMPILED_RESOURCES} ${QM_RESOURCES})
