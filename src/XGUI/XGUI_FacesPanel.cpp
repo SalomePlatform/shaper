@@ -255,18 +255,18 @@ void XGUI_FacesPanel::processSelection()
       continue;
     Handle(ModuleBase_ResultPrs) aResultPrs = anObjectToPrs.at(anObject);
 
-    if (aResultPrs->hasSubShapeVisible(anIt->second) || useTransparency()) // redisplay
-      ModelAPI_EventCreator::get()->sendUpdated(anObject, aDispEvent);
-    else { // erase object because it is entirely hidden
+    if (!aResultPrs->hasSubShapeVisible(anIt->second)) { // redisplay
+      // erase object because it is entirely hidden
       anObject->setDisplayed(false);
       myHiddenObjects.insert(anObject);
-      ModelAPI_EventCreator::get()->sendUpdated(anObject, aDispEvent);
     }
+    ModelAPI_EventCreator::get()->sendUpdated(anObject, aDispEvent);
   }
   if (isModified) {
     updateProcessedObjects(myItems, myItemObjects);
     flushRedisplay();
   }
+  onTransparencyChanged();
 }
 
 //********************************************************************
