@@ -163,7 +163,7 @@ EntityWrapperPtr createArc(const AttributeEntityMap&    theAttributes,
                            PlaneGCSSolver_Storage*      theStorage)
 {
   std::shared_ptr<GCS::Arc> aNewArc(new GCS::Arc);
-  BooleanWrapperPtr isReversed = false;
+  BooleanWrapperPtr isReversed;
 
   // Base attributes of arc (center, start and end points)
   AttributeEntityMap::const_iterator anIt = theAttributes.begin();
