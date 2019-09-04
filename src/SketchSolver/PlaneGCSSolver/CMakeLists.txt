@@ -29,6 +29,7 @@ SET(PLANEGCSSOLVER_HEADERS
     PlaneGCSSolver_PointWrapper.h
     PlaneGCSSolver_ScalarWrapper.h
     PlaneGCSSolver_AngleWrapper.h
+    PlaneGCSSolver_BooleanWrapper.h
     PlaneGCSSolver_Tools.h
 )
 
@@ -40,6 +41,7 @@ SET(PLANEGCSSOLVER_SOURCES
     PlaneGCSSolver_PointWrapper.cpp
     PlaneGCSSolver_ScalarWrapper.cpp
     PlaneGCSSolver_AngleWrapper.cpp
+    PlaneGCSSolver_BooleanWrapper.cpp
     PlaneGCSSolver_Tools.cpp
 )
 

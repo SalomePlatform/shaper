@@ -21,7 +21,8 @@
 #include <cmath>
 
 PlaneGCSSolver_EdgeWrapper::PlaneGCSSolver_EdgeWrapper(const GCSCurvePtr theEntity)
-  : myEntity(theEntity)
+  : myEntity(theEntity),
+    myReversed(false)
 {
   std::shared_ptr<GCS::Line> aLine = std::dynamic_pointer_cast<GCS::Line>(myEntity);
   if (aLine) myType = ENTITY_LINE;

@@ -21,6 +21,7 @@
 #include <PlaneGCSSolver_AttributeBuilder.h>
 #include <PlaneGCSSolver_PointWrapper.h>
 #include <PlaneGCSSolver_ScalarWrapper.h>
+#include <PlaneGCSSolver_BooleanWrapper.h>
 
 #include <GeomDataAPI_Point2D.h>
 #include <ModelAPI_AttributeDouble.h>
@@ -42,6 +43,16 @@ PlaneGCSSolver_AttributeBuilder::PlaneGCSSolver_AttributeBuilder(const StoragePt
 static double* createParameter(PlaneGCSSolver_Storage* theStorage)
 {
   return theStorage ? theStorage->createParameter() : (new double(0));
+}
+
+static EntityWrapperPtr createBoolean(const AttributePtr& theAttribute)
+{
+  BooleanWrapperPtr aWrapper;
+  AttributeBooleanPtr aBoolean =
+      std::dynamic_pointer_cast<ModelAPI_AttributeBoolean>(theAttribute);
+  if (aBoolean)
+    aWrapper = BooleanWrapperPtr(new PlaneGCSSolver_BooleanWrapper(aBoolean->value()));
+  return aWrapper;
 }
 
 static EntityWrapperPtr createScalar(const AttributePtr&     theAttribute,
@@ -99,6 +110,8 @@ EntityWrapperPtr PlaneGCSSolver_AttributeBuilder::createAttribute(
     aResult = createPoint(theAttribute, myStorage);
   if (!aResult)
     aResult = createScalar(theAttribute, myStorage);
+  if (!aResult)
+    aResult = createBoolean(theAttribute);
   if (aResult && !myStorage)
     aResult->setExternal(true);
   return aResult;

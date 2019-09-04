@@ -44,6 +44,7 @@ const ConstraintID CID_FICTIVE = 1024;
 /// Types of entities
 enum SketchSolver_EntityType {
   ENTITY_UNKNOWN = 0,
+  ENTITY_BOOLEAN,
   ENTITY_SCALAR,
   ENTITY_ANGLE,
   ENTITY_POINT,

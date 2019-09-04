@@ -21,6 +21,7 @@
 #include <PlaneGCSSolver_EdgeWrapper.h>
 #include <PlaneGCSSolver_PointWrapper.h>
 #include <PlaneGCSSolver_ScalarWrapper.h>
+#include <PlaneGCSSolver_BooleanWrapper.h>
 
 #include <SketchPlugin_Arc.h>
 #include <SketchPlugin_Circle.h>
@@ -162,21 +163,25 @@ EntityWrapperPtr createArc(const AttributeEntityMap&    theAttributes,
                            PlaneGCSSolver_Storage*      theStorage)
 {
   std::shared_ptr<GCS::Arc> aNewArc(new GCS::Arc);
+  BooleanWrapperPtr isReversed = false;
 
   // Base attributes of arc (center, start and end points)
   AttributeEntityMap::const_iterator anIt = theAttributes.begin();
   for (; anIt != theAttributes.end(); ++anIt) {
     std::shared_ptr<PlaneGCSSolver_PointWrapper> aPoint =
         std::dynamic_pointer_cast<PlaneGCSSolver_PointWrapper>(anIt->second);
-    if (!aPoint)
-      continue;
-
-    if (anIt->first->id() == SketchPlugin_Arc::CENTER_ID())
-      aNewArc->center = *(aPoint->point());
-    else if (anIt->first->id() == SketchPlugin_Arc::START_ID())
-      aNewArc->start = *(aPoint->point());
-    else if (anIt->first->id() == SketchPlugin_Arc::END_ID())
-      aNewArc->end = *(aPoint->point());
+    if (aPoint) {
+      if (anIt->first->id() == SketchPlugin_Arc::CENTER_ID())
+        aNewArc->center = *(aPoint->point());
+      else if (anIt->first->id() == SketchPlugin_Arc::START_ID())
+        aNewArc->start = *(aPoint->point());
+      else if (anIt->first->id() == SketchPlugin_Arc::END_ID())
+        aNewArc->end = *(aPoint->point());
+    }
+    else {
+      // reversed flag
+      isReversed = std::dynamic_pointer_cast<PlaneGCSSolver_BooleanWrapper>(anIt->second);
+    }
   }
 
   // Additional atrtributes of arc necessary for PlaneGCS solver
@@ -200,7 +205,9 @@ EntityWrapperPtr createArc(const AttributeEntityMap&    theAttributes,
       new GeomAPI_Dir2d((*aNewArc->end.x) - aCenter->x(), (*aNewArc->end.y) - aCenter->y()));
   *aNewArc->endAngle = OX->angle(aDir);
 
-  return EntityWrapperPtr(new PlaneGCSSolver_EdgeWrapper(aNewArc));
+  EdgeWrapperPtr anArcWrapper(new PlaneGCSSolver_EdgeWrapper(aNewArc));
+  anArcWrapper->setReversed(isReversed);
+  return anArcWrapper;
 }
 
 bool isAttributeApplicable(const std::string& theAttrName, const std::string& theOwnerName)
@@ -208,7 +215,8 @@ bool isAttributeApplicable(const std::string& theAttrName, const std::string& th
   if (theOwnerName == SketchPlugin_Arc::ID()) {
     return theAttrName == SketchPlugin_Arc::CENTER_ID() ||
            theAttrName == SketchPlugin_Arc::START_ID() ||
-           theAttrName == SketchPlugin_Arc::END_ID();
+           theAttrName == SketchPlugin_Arc::END_ID() ||
+           theAttrName == SketchPlugin_Arc::REVERSED_ID();
   }
   else if (theOwnerName == SketchPlugin_Circle::ID()) {
     return theAttrName == SketchPlugin_Circle::CENTER_ID() ||

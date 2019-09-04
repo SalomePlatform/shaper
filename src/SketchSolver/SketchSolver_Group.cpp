@@ -179,6 +179,7 @@ static SolverConstraintPtr move(StoragePtr theStorage,
     SolverConstraintPtr(aConstraint)->process(theStorage, theEventsBlocked);
     if (aConstraint->error().empty()) {
       aConstraint->startPoint(theFrom);
+      theStorage->adjustParametrizationOfArcs();
       theSketchSolver->initialize();
       aConstraint->moveTo(theTo);
       theStorage->setNeedToResolve(true);
@@ -236,8 +237,10 @@ bool SketchSolver_Group::resolveConstraints()
 
     PlaneGCSSolver_Solver::SolveStatus aResult = PlaneGCSSolver_Solver::STATUS_OK;
     try {
-      if (!isGroupEmpty)
+      if (!isGroupEmpty) {
+        myStorage->adjustParametrizationOfArcs();
         aResult = mySketchSolver->solve();
+      }
       if (aResult == PlaneGCSSolver_Solver::STATUS_FAILED &&
           !myTempConstraints.empty()) {
         mySketchSolver->undo();

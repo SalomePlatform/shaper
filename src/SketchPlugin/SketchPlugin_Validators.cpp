@@ -778,7 +778,8 @@ bool SketchPlugin_MiddlePointAttrValidator::isValid(const AttributePtr& theAttri
 
       if (aFeature->getKind() == SketchPlugin_Point::ID())
         ++aNbPoints;
-      else if (aFeature->getKind() == SketchPlugin_Line::ID())
+      else if (aFeature->getKind() == SketchPlugin_Line::ID() ||
+               aFeature->getKind() == SketchPlugin_Arc::ID())
         ++aNbLines;
     }
   }

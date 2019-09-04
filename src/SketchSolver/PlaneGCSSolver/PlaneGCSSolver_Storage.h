@@ -90,6 +90,11 @@ public:
   virtual bool isEmpty() const
   { return SketchSolver_Storage::isEmpty() && myArcConstraintMap.empty(); }
 
+  /// \brief Make parametrization of arcs consistent.
+  ///        Forward arcs should have the last parameter greater than the first parameter.
+  ///        Reversed arcs should have the last parameter lesser than the first parameter.
+  virtual void adjustParametrizationOfArcs();
+
 private:
   /// \brief Convert feature using specified builder.
   EntityWrapperPtr createFeature(const FeaturePtr&             theFeature,

@@ -19,6 +19,10 @@
 
 #include <SketchSolver_ConstraintMiddle.h>
 #include <PlaneGCSSolver_ConstraintWrapper.h>
+#include <PlaneGCSSolver_EdgeWrapper.h>
+#include <PlaneGCSSolver_PointWrapper.h>
+#include <PlaneGCSSolver_Storage.h>
+#include <PlaneGCSSolver_Tools.h>
 #include <PlaneGCSSolver_UpdateCoincidence.h>
 
 void SketchSolver_ConstraintMiddle::getAttributes(
@@ -26,13 +30,55 @@ void SketchSolver_ConstraintMiddle::getAttributes(
     std::vector<EntityWrapperPtr>& theAttributes)
 {
   SketchSolver_Constraint::getAttributes(theValue, theAttributes);
+
+  // create auxiliary point if middle point on arc is specified
+  if (theAttributes[2]->type() == ENTITY_ARC) {
+    std::shared_ptr<PlaneGCSSolver_Storage> aStorage =
+        std::dynamic_pointer_cast<PlaneGCSSolver_Storage>(myStorage);
+
+    myOddPoint = GCSPointPtr(new GCS::Point);
+    myOddPoint->x = aStorage->createParameter();
+    myOddPoint->y = aStorage->createParameter();
+    theAttributes[1] = PointWrapperPtr(new PlaneGCSSolver_PointWrapper(myOddPoint));
+  }
+}
+
+bool SketchSolver_ConstraintMiddle::remove()
+{
+  if (myOddPoint) {
+    std::shared_ptr<PlaneGCSSolver_Storage> aStorage =
+        std::dynamic_pointer_cast<PlaneGCSSolver_Storage>(myStorage);
+
+    GCS::SET_pD aParams;
+    aParams.insert(myOddPoint->x);
+    aParams.insert(myOddPoint->y);
+    aStorage->removeParameters(aParams);
+  }
+  return SketchSolver_ConstraintCoincidence::remove();
 }
 
 void SketchSolver_ConstraintMiddle::notify(const FeaturePtr&      theFeature,
                                            PlaneGCSSolver_Update* theUpdater)
 {
-  if (theFeature == myBaseConstraint && myInSolver)
-    return; // the constraint is already being updated
+  if (theFeature == myBaseConstraint && myInSolver) {
+    // the constraint is already being updated,
+    // update the middle point parameter if the constraint is "point-on-arc".
+    if (myOddPoint) {
+      EntityWrapperPtr anArcEntity =
+          myAttributes.front()->type() == ENTITY_ARC ? myAttributes.front() : myAttributes.back();
+      EdgeWrapperPtr anArcEdge =
+          std::dynamic_pointer_cast<PlaneGCSSolver_EdgeWrapper>(anArcEntity);
+      std::shared_ptr<GCS::Arc> anArc;
+      if (anArcEdge)
+        anArc = std::dynamic_pointer_cast<GCS::Arc>(anArcEdge->entity());
+      if (anArc) {
+        // recalculate parameters of middle point according to arc
+        *myOddPoint->x = (*anArc->startAngle + *anArc->endAngle) * 0.5;
+        *myOddPoint->y = (*anArc->endAngle - *anArc->startAngle) * 0.5;
+      }
+    }
+    return;
+  }
 
   PlaneGCSSolver_UpdateCoincidence* anUpdater =
       static_cast<PlaneGCSSolver_UpdateCoincidence*>(theUpdater);
@@ -45,13 +91,8 @@ void SketchSolver_ConstraintMiddle::notify(const FeaturePtr&      theFeature,
         // remove previously adde constraint
         myStorage->removeConstraint(myBaseConstraint);
         // merge divided constraints into single object
-        std::list<GCSConstraintPtr> aGCSConstraints;
-        std::shared_ptr<PlaneGCSSolver_ConstraintWrapper> aConstraint =
-            std::dynamic_pointer_cast<PlaneGCSSolver_ConstraintWrapper>(myMiddle);
-        aGCSConstraints.push_back(aConstraint->constraints().front());
-        aConstraint =
-            std::dynamic_pointer_cast<PlaneGCSSolver_ConstraintWrapper>(mySolverConstraint);
-        aGCSConstraints.push_back(aConstraint->constraints().front());
+        std::list<GCSConstraintPtr> aGCSConstraints = myMiddle->constraints();
+        aGCSConstraints.push_front(mySolverConstraint->constraints().front());
 
         myMiddle = ConstraintWrapperPtr();
         mySolverConstraint = ConstraintWrapperPtr(
@@ -72,10 +113,11 @@ void SketchSolver_ConstraintMiddle::notify(const FeaturePtr&      theFeature,
           std::dynamic_pointer_cast<PlaneGCSSolver_ConstraintWrapper>(mySolverConstraint);
       std::list<GCSConstraintPtr> aGCSConstraints = aConstraint->constraints();
 
-      myMiddle = ConstraintWrapperPtr(
-          new PlaneGCSSolver_ConstraintWrapper(aGCSConstraints.front(), CONSTRAINT_MIDDLE_POINT));
       mySolverConstraint = ConstraintWrapperPtr(
-          new PlaneGCSSolver_ConstraintWrapper(aGCSConstraints.back(), CONSTRAINT_MIDDLE_POINT));
+        new PlaneGCSSolver_ConstraintWrapper(aGCSConstraints.front(), CONSTRAINT_MIDDLE_POINT));
+      aGCSConstraints.pop_front();
+      myMiddle = ConstraintWrapperPtr(
+          new PlaneGCSSolver_ConstraintWrapper(aGCSConstraints, CONSTRAINT_MIDDLE_POINT));
 
       // send middle constraint only
       myStorage->addConstraint(myBaseConstraint, myMiddle);

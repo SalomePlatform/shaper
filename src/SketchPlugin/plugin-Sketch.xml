@@ -657,7 +657,7 @@
     </group>
 
     <group id="Dimensional constraints">
-    <!--  SketchConstraintDistance  -->
+      <!--  SketchConstraintDistance  -->
       <feature
         id="SketchConstraintDistance"
         title="Distance"
@@ -941,7 +941,7 @@
         <validator id="PartSet_ParallelSelection"/>
       </feature>
 
-    <!--  SketchConstraintPerpendicular  -->
+      <!--  SketchConstraintPerpendicular  -->
       <feature id="SketchConstraintPerpendicular" title="Perpendicular"
                tooltip="Create constraint defining two orthogonal objects"
                icon="icons/Sketch/perpendicular.png"
@@ -1035,7 +1035,7 @@
         <validator id="PartSet_EqualSelection"/>
       </feature>
 
-    <!--  SketchConstraintCollinear  -->
+      <!--  SketchConstraintCollinear  -->
       <feature id="SketchConstraintCollinear" title="Collinear" tooltip="Create constraint defining collinearity of two lines"
                icon="icons/Sketch/collinear.png"
                helpfile="collinearFeature.html">

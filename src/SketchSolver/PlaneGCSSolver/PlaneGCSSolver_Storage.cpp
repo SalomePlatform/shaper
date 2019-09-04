@@ -19,6 +19,7 @@
 
 #include <PlaneGCSSolver_Storage.h>
 #include <PlaneGCSSolver_Solver.h>
+#include <PlaneGCSSolver_BooleanWrapper.h>
 #include <PlaneGCSSolver_ConstraintWrapper.h>
 #include <PlaneGCSSolver_EdgeWrapper.h>
 #include <PlaneGCSSolver_PointWrapper.h>
@@ -134,6 +135,15 @@ static bool updateValues(AttributePtr& theAttribute, EntityWrapperPtr& theEntity
       isUpdated = updateValue(aScalar->value(), aValue);
       if (isUpdated)
         aWrapper->setValue(aValue);
+    } else {
+      AttributeBooleanPtr aBoolean =
+          std::dynamic_pointer_cast<ModelAPI_AttributeBoolean>(theAttribute);
+      if (aBoolean) {
+        BooleanWrapperPtr aWrapper =
+            std::dynamic_pointer_cast<PlaneGCSSolver_BooleanWrapper>(theEntity);
+        isUpdated = aWrapper->value() != aBoolean->value();
+        aWrapper->setValue(aBoolean->value());
+      }
     }
   }
 
@@ -193,7 +203,8 @@ bool PlaneGCSSolver_Storage::update(FeaturePtr theFeature, bool theForce)
   std::list<AttributePtr>::iterator anAttrIt = anAttributes.begin();
   for (; anAttrIt != anAttributes.end(); ++anAttrIt)
     if ((*anAttrIt)->attributeType() == GeomDataAPI_Point2D::typeId() ||
-        (*anAttrIt)->attributeType() == ModelAPI_AttributeDouble::typeId())
+        (*anAttrIt)->attributeType() == ModelAPI_AttributeDouble::typeId() ||
+        (*anAttrIt)->attributeType() == ModelAPI_AttributeBoolean::typeId())
       isUpdated = update(*anAttrIt) || isUpdated;
 
   // check external attribute is changed
@@ -210,30 +221,6 @@ bool PlaneGCSSolver_Storage::update(FeaturePtr theFeature, bool theForce)
   // send notification to listeners due to at least one attribute is changed
   if (sendNotify && isUpdated)
     notify(theFeature);
-
-  // update arc
-  if (aRelated && aRelated->type() == ENTITY_ARC) {
-    /// TODO: this code should be shared with FeatureBuilder somehow
-
-    std::shared_ptr<PlaneGCSSolver_EdgeWrapper> anEntity =
-        std::dynamic_pointer_cast<PlaneGCSSolver_EdgeWrapper>(aRelated);
-    std::shared_ptr<GCS::Arc> anArc = std::dynamic_pointer_cast<GCS::Arc>(anEntity->entity());
-
-    static std::shared_ptr<GeomAPI_Dir2d> OX(new GeomAPI_Dir2d(1.0, 0.0));
-    std::shared_ptr<GeomAPI_Pnt2d> aCenter(
-        new GeomAPI_Pnt2d(*anArc->center.x, *anArc->center.y));
-    std::shared_ptr<GeomAPI_Pnt2d> aStart(
-        new GeomAPI_Pnt2d(*anArc->start.x, *anArc->start.y));
-
-    *anArc->rad = aStart->distance(aCenter);
-
-    std::shared_ptr<GeomAPI_Dir2d> aDir(new GeomAPI_Dir2d(aStart->xy()->decreased(aCenter->xy())));
-    *anArc->startAngle = OX->angle(aDir);
-
-    aDir = std::shared_ptr<GeomAPI_Dir2d>(
-        new GeomAPI_Dir2d((*anArc->end.x) - aCenter->x(), (*anArc->end.y) - aCenter->y()));
-    *anArc->endAngle = OX->angle(aDir);
-  }
 
   return isUpdated;
 }
@@ -311,16 +298,16 @@ void PlaneGCSSolver_Storage::createArcConstraints(const EntityWrapperPtr& theArc
 
   // Additional constaints to fix arc's extra DoF (if the arc is not external):
   std::list<GCSConstraintPtr> anArcConstraints;
-  // 1. distances from center till start and end points are equal to radius
-  anArcConstraints.push_back(GCSConstraintPtr(new GCS::ConstraintP2PDistance(
-      anArc->center, anArc->start, anArc->rad)));
-  anArcConstraints.push_back(GCSConstraintPtr(new GCS::ConstraintP2PDistance(
-      anArc->center, anArc->end, anArc->rad)));
-  // 2. angles of start and end points should be equal to the arc angles
-  anArcConstraints.push_back(GCSConstraintPtr(new GCS::ConstraintP2PAngle(
-      anArc->center, anArc->start, anArc->startAngle)));
-  anArcConstraints.push_back(GCSConstraintPtr(new GCS::ConstraintP2PAngle(
-      anArc->center, anArc->end, anArc->endAngle)));
+  // constrain the start point on the arc
+  anArcConstraints.push_back(GCSConstraintPtr(new GCS::ConstraintCurveValue(
+      anArc->start, anArc->start.x, *anArc, anArc->startAngle)));
+  anArcConstraints.push_back(GCSConstraintPtr(new GCS::ConstraintCurveValue(
+      anArc->start, anArc->start.y, *anArc, anArc->startAngle)));
+  // constrain the end point on the arc
+  anArcConstraints.push_back(GCSConstraintPtr(new GCS::ConstraintCurveValue(
+      anArc->end, anArc->end.x, *anArc, anArc->endAngle)));
+  anArcConstraints.push_back(GCSConstraintPtr(new GCS::ConstraintCurveValue(
+      anArc->end, anArc->end.y, *anArc, anArc->endAngle)));
 
   ConstraintWrapperPtr aWrapper(
       new PlaneGCSSolver_ConstraintWrapper(anArcConstraints, CONSTRAINT_UNKNOWN));
@@ -338,6 +325,39 @@ void PlaneGCSSolver_Storage::removeArcConstraints(const EntityWrapperPtr& theArc
     mySketchSolver->removeConstraint(aFound->second->id());
     myArcConstraintMap.erase(aFound);
   }
+}
+
+void PlaneGCSSolver_Storage::adjustParametrizationOfArcs()
+{
+  std::map<EntityWrapperPtr, ConstraintWrapperPtr>::iterator anIt = myArcConstraintMap.begin();
+  for (; anIt != myArcConstraintMap.end(); ++anIt) {
+    EdgeWrapperPtr anEdge = std::dynamic_pointer_cast<PlaneGCSSolver_EdgeWrapper>(anIt->first);
+    std::shared_ptr<GCS::Arc> anArc = std::dynamic_pointer_cast<GCS::Arc>(anEdge->entity());
+    // tune start angle of the arc to be in [0, 2PI]
+    while (*anArc->startAngle < -PI)
+      *anArc->startAngle += 2.0 * PI;
+    while (*anArc->startAngle >= PI)
+      *anArc->startAngle -= 2.0 * PI;
+    // adjust end angle of the arc
+    if (anEdge->isReversed()) {
+      while (*anArc->endAngle > *anArc->startAngle)
+        *anArc->endAngle -= 2.0 * PI;
+      while (*anArc->endAngle + 2 * PI < *anArc->startAngle)
+        *anArc->endAngle += 2.0 * PI;
+    } else {
+      while (*anArc->endAngle < *anArc->startAngle)
+        *anArc->endAngle += 2.0 * PI;
+      while (*anArc->endAngle > *anArc->startAngle + 2 * PI)
+        *anArc->endAngle -= 2.0 * PI;
+    }
+  }
+
+  // update parameters of Middle point constraint for point on arc
+  std::map<ConstraintPtr, ConstraintWrapperPtr>::iterator aCIt = myConstraintMap.begin();
+  for (; aCIt != myConstraintMap.end(); ++aCIt)
+    if (aCIt->second->type() == CONSTRAINT_MIDDLE_POINT) {
+      notify(aCIt->first);
+    }
 }
 
 

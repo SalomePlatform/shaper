@@ -150,6 +150,11 @@ public:
   /// \brief Notify all subscribers about update of the feature
   void notify(const FeaturePtr& theFeature) const;
 
+  /// \brief Make parametrization of arcs consistent.
+  ///        Forward arcs should have the last parameter greater than the first parameter.
+  ///        Reversed arcs should have the last parameter lesser than the first parameter.
+  virtual void adjustParametrizationOfArcs() = 0;
+
 protected:
   /// \brief Convert result to feature or attribute if theResult is linked to center of circle/arc
   static void resultToFeatureOrAttribute(const ObjectPtr& theResult,

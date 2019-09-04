@@ -17,46 +17,35 @@
 // See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 
-#ifndef PlaneGCSSolver_EdgeWrapper_H_
-#define PlaneGCSSolver_EdgeWrapper_H_
+#ifndef PlaneGCSSolver_BooleanWrapper_H_
+#define PlaneGCSSolver_BooleanWrapper_H_
 
 #include <PlaneGCSSolver_Defs.h>
-#include <PlaneGCSSolver_BooleanWrapper.h>
 #include <PlaneGCSSolver_EntityWrapper.h>
 
 /**
- *  Wrapper providing operations with PlaneGCS entities (lines, circles and arcs).
+ *  Wrapper providing storage for boolean values.
  */
-class PlaneGCSSolver_EdgeWrapper : public PlaneGCSSolver_EntityWrapper
+class PlaneGCSSolver_BooleanWrapper : public PlaneGCSSolver_EntityWrapper
 {
 public:
-  PlaneGCSSolver_EdgeWrapper(const GCSCurvePtr theEntity);
+  PlaneGCSSolver_BooleanWrapper(bool theValue);
 
-  /// \brief Return PlaneGCS geometric entity
-  const GCSCurvePtr& entity() const
-  { return myEntity; }
-  /// \brief Return PlaneGCS geometric entity to change
-  GCSCurvePtr& changeEntity()
-  { return myEntity; }
+  /// \brief Change value of parameter
+  void setValue(bool theValue)
+  { myValue = theValue; }
+  /// \brief Return value of parameter
+  bool value() const
+  { return myValue; }
 
   /// \brief Return type of current entity
   virtual SketchSolver_EntityType type() const
-  { return myType; }
+  { return ENTITY_BOOLEAN; }
 
-  bool isDegenerated() const;
-
-  void setReversed(BooleanWrapperPtr theReversed)
-  { myReversed = theReversed; }
-
-  bool isReversed() const
-  { return myReversed ? myReversed->value() : false; }
-
-private:
-  SketchSolver_EntityType myType;
-  GCSCurvePtr myEntity;
-  BooleanWrapperPtr myReversed; // preferably used to control arc orientation
+protected:
+  bool myValue;
 };
 
-typedef std::shared_ptr<PlaneGCSSolver_EdgeWrapper> EdgeWrapperPtr;
+typedef std::shared_ptr<PlaneGCSSolver_BooleanWrapper> BooleanWrapperPtr;
 
 #endif

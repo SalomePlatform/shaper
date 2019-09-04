@@ -212,6 +212,7 @@ ADD_UNIT_TESTS(
   TestConstraintHorizontalValidator.py
   TestConstraintLength.py
   TestConstraintMiddlePoint.py
+  TestConstraintMiddlePointOnArc.py
   TestConstraintParallel.py
   TestConstraintPerpendicular.py
   TestConstraintPerpendicularArcLine.py
