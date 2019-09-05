@@ -246,7 +246,7 @@ QString ModuleBase_WidgetFileSelector::applyExtension(const QString& theFileName
   bool hasExtension = false;
   QStringList anExtensions = filterToExtensions(theFilter);
   foreach(const QString& anExtension, anExtensions) {
-    if (theFileName.endsWith(anExtension.section(".", 1, 1), Qt::CaseInsensitive)) {
+    if (theFileName.endsWith(QString(".") + anExtension.section(".", 1, 1), Qt::CaseInsensitive)) {
       hasExtension = true;
       break;
     }
