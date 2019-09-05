@@ -299,18 +299,34 @@ void XGUI_ViewerProxy::onMouseMove(AppElements_ViewWindow* theWnd, QMouseEvent* 
   if (myIs2dMode) {
     bool aHighlight2d =
       ModuleBase_Preferences::resourceMgr()->booleanValue("Viewer", "highlighting-2d", true);
-    if (aHighlight2d || myShowHighlight)
-      updateHighlight();
-    else
-      eraseHighlight();
+    if (aHighlight2d) {
+      if (myShowHighlight)
+        eraseHighlight();
+      else
+        updateHighlight();
+    }
+    else {
+      if (myShowHighlight)
+        updateHighlight();
+      else
+        eraseHighlight();
+    }
   }
   else {
     bool aHighlight3d =
       ModuleBase_Preferences::resourceMgr()->booleanValue("Viewer", "highlighting-3d", false);
-    if (aHighlight3d || myShowHighlight)
-      updateHighlight();
-    else
-      eraseHighlight();
+    if (aHighlight3d) {
+      if (myShowHighlight)
+        eraseHighlight();
+      else
+        updateHighlight();
+    }
+    else {
+      if (myShowHighlight)
+        updateHighlight();
+      else
+        eraseHighlight();
+    }
   }
   emit mouseMove(theWnd, theEvent);
 }
@@ -528,18 +544,34 @@ void XGUI_ViewerProxy::onMouseMove(ModuleBase_IViewWindow* theWnd, QMouseEvent* 
   if (myIs2dMode) {
     bool aHighlight2d =
       ModuleBase_Preferences::resourceMgr()->booleanValue("Viewer", "highlighting-2d", true);
-    if (aHighlight2d || myShowHighlight)
-      updateHighlight();
-    else
-      eraseHighlight();
+    if (aHighlight2d) {
+      if (myShowHighlight)
+        eraseHighlight();
+      else
+        updateHighlight();
+    }
+    else {
+      if (myShowHighlight)
+        updateHighlight();
+      else
+        eraseHighlight();
+    }
   }
   else {
     bool aHighlight3d =
       ModuleBase_Preferences::resourceMgr()->booleanValue("Viewer", "highlighting-3d", false);
-    if (aHighlight3d || myShowHighlight)
-      updateHighlight();
-    else
-      eraseHighlight();
+    if (aHighlight3d) {
+      if (myShowHighlight)
+        eraseHighlight();
+      else
+        updateHighlight();
+    }
+    else {
+      if (myShowHighlight)
+        updateHighlight();
+      else
+        eraseHighlight();
+    }
   }
   emit mouseMove(theWnd, theEvent);
 }
