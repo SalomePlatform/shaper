@@ -149,11 +149,13 @@ bool ModuleBase_WidgetSelector::acceptSubShape(const GeomShapePtr& theShape,
   if (aShape.get()) {
     // Check that the selection corresponds to selection type
     TopoDS_Shape aTopoShape = aShape->impl<TopoDS_Shape>();
-    aShapeType = aTopoShape.ShapeType();
-    // for compounds check sub-shapes: it may be compound of needed type:
-    // Booleans may produce compounds of Solids
-    if (aShapeType == TopAbs_COMPOUND) {
-      aShapeType = ModuleBase_Tools::getCompoundSubType(aTopoShape);
+    if (!aTopoShape.IsNull()) {
+      aShapeType = aTopoShape.ShapeType();
+      // for compounds check sub-shapes: it may be compound of needed type:
+      // Booleans may produce compounds of Solids
+      if (aShapeType == TopAbs_COMPOUND) {
+        aShapeType = ModuleBase_Tools::getCompoundSubType(aTopoShape);
+      }
     }
   }
 
