@@ -353,6 +353,15 @@ void XGUI_ContextMenuMgr::updateObjectBrowserMenu()
         action("SHOW_ONLY_CMD")->setEnabled(true);
         action("SHADING_CMD")->setEnabled(true);
         action("WIREFRAME_CMD")->setEnabled(true);
+
+        foreach(ObjectPtr aObj, aObjects) {
+          FeaturePtr aFeature = ModelAPI_Feature::feature(aObj);
+          if (!aFeature->isInHistory()) {
+            canBeDeleted = false;
+            break;
+          }
+        }
+        action("DELETE_CMD")->setEnabled(canBeDeleted);
       }
     } // end multi-selection
 
@@ -600,7 +609,8 @@ void XGUI_ContextMenuMgr::updateViewerMenu()
   if (myWorkshop->canChangeProperty("TRANSPARENCY_CMD"))
     action("TRANSPARENCY_CMD")->setEnabled(true);
 
-  action("DELETE_CMD")->setEnabled(true);
+  // Delete command is not used in viewer pop-up menu
+  action("DELETE_CMD")->setEnabled(false);
 }
 
 void XGUI_ContextMenuMgr::connectObjectBrowser()
