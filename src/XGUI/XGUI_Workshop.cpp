@@ -2793,8 +2793,12 @@ void XGUI_Workshop::synchronizeResultTree(const ResultBodyPtr& theRes, bool theU
       if (aRes.get())
         synchronizeResultTree(aRes, theUpdateViewer);
     }
-  else
-    myDisplayer->display(theRes, theUpdateViewer);
+  else {
+    if (theRes->isDisplayed())
+      myDisplayer->display(theRes, theUpdateViewer);
+    else
+      myDisplayer->erase(theRes, theUpdateViewer);
+  }
 }
 #endif
 

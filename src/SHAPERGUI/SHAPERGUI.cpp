@@ -285,7 +285,7 @@ bool SHAPERGUI::activateModule(SUIT_Study* theStudy)
       ViewManagerList OCCViewManagers;
       application()->viewManagers(OCCViewer_Viewer::Type(), OCCViewManagers);
       if (OCCViewManagers.size() > 0) {
-        mySelector = createSelector(OCCViewManagers.first());
+        onViewManagerAdded(OCCViewManagers.first());
       }
     }
     // it should be performed after the selector creation in order to have AISContext
