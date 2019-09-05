@@ -255,8 +255,20 @@ std::shared_ptr<GeomAPI_Pnt2d> getProjectionPoint(const FeaturePtr theLine,
   return aLin2d.project(thePoint);
 }
 
+static int MyPixelRatio = 1;
+
+void setPixelRatio(int theRatio)
+{
+  MyPixelRatio = theRatio;
+}
+
+int pixelRatio()
+{
+  return MyPixelRatio;
+}
 
 static double MyArrowSize = 20;
+
 double getArrowSize()
 {
   return MyArrowSize;
@@ -280,7 +292,7 @@ int getConfigArrowSize()
 static double MyTextHeight = 16;
 double getTextHeight()
 {
-  return MyTextHeight;
+  return MyTextHeight * MyPixelRatio;
 }
 
 void setTextHeight(double theHeight)
@@ -290,12 +302,12 @@ void setTextHeight(double theHeight)
 
 double getDefaultTextHeight()
 {
-  return 16;
+  return 16 * MyPixelRatio;
 }
 
 double getConfigTextHeight()
 {
-  return Config_PropManager::integer("Visualization", "dimension_value_size");
+  return Config_PropManager::integer("Visualization", "dimension_value_size") * MyPixelRatio;
 }
 
 double getFlyoutDistance(const ModelAPI_Feature* theConstraint)

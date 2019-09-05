@@ -206,6 +206,10 @@ namespace SketcherPrs_Tools {
   /// \param theError a debug error information
   SKETCHERPRS_EXPORT void sendEmptyPresentationError(ModelAPI_Feature* theFeature,
                                                      const std::string theError);
+
+  SKETCHERPRS_EXPORT void setPixelRatio(int theRatio);
+
+  SKETCHERPRS_EXPORT int pixelRatio();
 };
 
 #endif

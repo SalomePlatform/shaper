@@ -961,6 +961,8 @@ void PartSet_SketcherMgr::startSketch(ModuleBase_Operation* theOperation)
   if (!aFOperation)
     return;
 
+  SketcherPrs_Tools::setPixelRatio(ModuleBase_Tools::currentPixelRatio());
+
   myModule->onViewTransformed();
 
   // Display all sketcher sub-Objects
