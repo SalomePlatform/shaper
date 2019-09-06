@@ -111,10 +111,10 @@ myIsSelection(false)
   mySizeOfView->setValidator(aValidator);
   aSizeLayout->addWidget(mySizeOfView);
 
-  QString aText = QString::fromStdString(theData->getProperty("title"));
+  QString aText = translate(theData->getProperty("title"));
   QLabel* aLabel = new QLabel(aText, aFirstWgt);
   aLabel->setWordWrap(true);
-  QString aTooltip = QString::fromStdString(theData->getProperty("tooltip"));
+  QString aTooltip = translate(theData->getProperty("tooltip"));
   aLabel->setToolTip(aTooltip);
   aLabel->setIndent(5);
 

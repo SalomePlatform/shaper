@@ -752,12 +752,13 @@ void XGUI_Workshop::fillPropertyPanel(ModuleBase_Operation* theOperation)
   myModule->propertyPanelDefined(theOperation);
 
 #ifndef DEBUG_FEATURE_NAME
-  myPropertyPanel->setWindowTitle(theOperation->getDescription()->description());
+  myPropertyPanel->setWindowTitle(ModuleBase_Tools::translate("workshop",
+    theOperation->getDescription()->description().toStdString()));
 #else
   std::string aFeatureName = aFeature->name();
   myPropertyPanel->setWindowTitle(QString("%1: %2")
-    .arg(theOperation->getDescription()->description())
-    .arg(aFeatureName.c_str()));
+    .arg(translate(theOperation->getDescription()->description()))
+    .arg(translate(aFeatureName.c_str())));
 #endif
 
   myErrorMgr->setPropertyPanel(myPropertyPanel);
@@ -1960,7 +1961,7 @@ void XGUI_Workshop::cleanHistory()
     QString anUnusedNames = aNames.join(", ");
 
     QString anActionId = "CLEAN_HISTORY_CMD";
-    QString aDescription = contextMenuMgr()->action(anActionId)->text();
+    QString aDescription = ModuleBase_Tools::translate("workshop", contextMenuMgr()->action(anActionId)->text().toStdString());
 
     QMessageBox aMessageBox(desktop());
     aMessageBox.setWindowTitle(aDescription);
@@ -2462,7 +2463,7 @@ void XGUI_Workshop::changeTransparency(const QObjectPtrList& theObjects)
 
   // 2. show the dialog to change the value
   XGUI_PropertyDialog* aDlg = new XGUI_PropertyDialog(desktop());
-  aDlg->setWindowTitle("Transparency");
+  aDlg->setWindowTitle(tr("Transparency"));
   XGUI_TransparencyWidget* aTransparencyWidget = new XGUI_TransparencyWidget(aDlg);
   connect(aTransparencyWidget, SIGNAL(transparencyValueChanged()),
           this, SLOT(onTransparencyValueChanged()));

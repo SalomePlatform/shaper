@@ -36,9 +36,9 @@ ModuleBase_WidgetLabelValue::ModuleBase_WidgetLabelValue(QWidget* theParent,
   aLayout->setContentsMargins(0, 0, 0, 0);
   aLayout->setSpacing(0);
 
-  QString aText = QString::fromStdString(theData->widgetLabel());
+  QString aText = translate(theData->widgetLabel());
   QString aLabelIcon = QString::fromStdString(theData->widgetIcon());
-  QString aToolTip = QString::fromStdString(theData->widgetTooltip());
+  QString aToolTip = translate(theData->widgetTooltip());
 
   myLabel = new ModuleBase_LabelValue(theParent, aText, aToolTip, aLabelIcon);
   bool isOk;
