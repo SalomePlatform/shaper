@@ -939,7 +939,11 @@ void XGUI_Workshop::onOpen()
   }
 
   //show file dialog, check if readable and open
-  QString aFile = QFileDialog::getOpenFileName(desktop(), tr("Open file"), QString(), MyFilter);
+  qreal aRatio = ModuleBase_Tools::currentPixelRatio();
+  // If the ratio is > 1 (HD screen) then QT has a bug in
+  // displaying of system open file dialog (too small)
+  QString aFile = QFileDialog::getOpenFileName(desktop(), tr("Open file"), QString(), MyFilter,
+    Q_NULLPTR, ((aRatio > 1)? QFileDialog::DontUseNativeDialog : QFileDialog::Options()));
   if (!aFile.isNull())
     openFile(aFile);
 }
@@ -1106,8 +1110,10 @@ bool XGUI_Workshop::onSaveAs()
 {
   if(!myOperationMgr->abortAllOperations(XGUI_OperationMgr::XGUI_InformationMessage))
     return false;
+  qreal aRatio = ModuleBase_Tools::currentPixelRatio();
   myCurrentFile = QFileDialog::getSaveFileName(desktop(), tr("Select name to save file..."),
-    QString(), MyFilter2);
+    QString(), MyFilter2,
+    Q_NULLPTR, ((aRatio > 1) ? QFileDialog::DontUseNativeDialog : QFileDialog::Options()));
   if (!myCurrentFile.isNull()) {
     if (!myCurrentFile.endsWith(MyExtension)) {
       myCurrentFile += MyExtension;
