@@ -66,8 +66,11 @@ protected:
   /// \brief Create constraint to fix moved arc extremity
   ConstraintWrapperPtr fixArcExtremity(const EntityWrapperPtr& theArcExtremity);
 
-  /// \brief Creat constraint to fix moved point on circle/arc
+  /// \brief Create constraint to fix moved point on circle/arc
   ConstraintWrapperPtr fixPointOnCircle(const EntityWrapperPtr& theCircular);
+
+  /// \brief Create constraint to fix moved point on ellipse/elliptical arc
+  ConstraintWrapperPtr fixPointOnEllipse(const EntityWrapperPtr& theConic);
 
 private:
   FeaturePtr       myMovedFeature; ///< fixed feature (if set, myBaseConstraint should be NULL)

@@ -28,6 +28,9 @@
 #include <list>
 #include <memory>
 
+class PlaneGCSSolver_EntityWrapper;
+typedef std::shared_ptr<PlaneGCSSolver_EntityWrapper> EntityWrapperPtr;
+
 /**
  *  Wrapper providing operations with entities regardless the solver.
  */
@@ -45,10 +48,16 @@ public:
   /// \brief Return the External flag
   bool isExternal() const { return myExternal; }
 
+  /// \brief Store names of attributes and their values if necessary
+  void setAdditionalAttributes(const std::map<std::string, EntityWrapperPtr>& theAttribues)
+  { myAdditionalAttributes = theAttribues; }
+  /// \brief Return the list of additional attributes
+  const std::map<std::string, EntityWrapperPtr>& additionalAttributes() const
+  { return myAdditionalAttributes; }
+
 private:
   bool myExternal;
+  std::map<std::string, EntityWrapperPtr> myAdditionalAttributes;
 };
-
-typedef std::shared_ptr<PlaneGCSSolver_EntityWrapper> EntityWrapperPtr;
 
 #endif

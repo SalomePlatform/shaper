@@ -114,6 +114,7 @@ static GCS::SET_pD pointParameters(const PointWrapperPtr& thePoint);
 static GCS::SET_pD lineParameters(const EdgeWrapperPtr& theLine);
 static GCS::SET_pD circleParameters(const EdgeWrapperPtr& theCircle);
 static GCS::SET_pD arcParameters(const EdgeWrapperPtr& theArc);
+static GCS::SET_pD ellipseParameters(const EdgeWrapperPtr& theEllipse);
 
 
 
@@ -296,6 +297,8 @@ GCS::SET_pD PlaneGCSSolver_Tools::parameters(const EntityWrapperPtr& theEntity)
     return circleParameters(GCS_EDGE_WRAPPER(theEntity));
   case ENTITY_ARC:
     return arcParameters(GCS_EDGE_WRAPPER(theEntity));
+  case ENTITY_ELLIPSE:
+    return ellipseParameters(GCS_EDGE_WRAPPER(theEntity));
   default: break;
   }
   return GCS::SET_pD();
@@ -344,6 +347,13 @@ ConstraintWrapperPtr createConstraintPointOnEntity(
       std::dynamic_pointer_cast<GCS::Circle>(theEntity->entity());
     aNewConstr = GCSConstraintPtr(
         new GCS::ConstraintP2PDistance(*(thePoint->point()), aCirc->center, aCirc->rad));
+    break;
+    }
+  case ENTITY_ELLIPSE:
+  case ENTITY_ELLIPTICAL_ARC: {
+    std::shared_ptr<GCS::Ellipse> anEllipse =
+        std::dynamic_pointer_cast<GCS::Ellipse>(theEntity->entity());
+    aNewConstr = GCSConstraintPtr(new GCS::ConstraintPointOnEllipse(*(thePoint->point()), *anEllipse));
     break;
     }
   default:
@@ -567,7 +577,19 @@ ConstraintWrapperPtr createConstraintEqual(
     std::shared_ptr<GCS::Circle> aCirc2 =
         std::dynamic_pointer_cast<GCS::Circle>(theEntity2->entity());
 
-    aConstrList.push_back(GCSConstraintPtr(new GCS::ConstraintEqual(aCirc1->rad, aCirc2->rad)));
+    if (aCirc1 && aCirc2)
+      aConstrList.push_back(GCSConstraintPtr(new GCS::ConstraintEqual(aCirc1->rad, aCirc2->rad)));
+    else {
+      std::shared_ptr<GCS::Ellipse> anEllipse1 =
+          std::dynamic_pointer_cast<GCS::Ellipse>(theEntity1->entity());
+      std::shared_ptr<GCS::Ellipse> anEllipse2 =
+          std::dynamic_pointer_cast<GCS::Ellipse>(theEntity2->entity());
+
+      aConstrList.push_back(GCSConstraintPtr(
+          new GCS::ConstraintEqual(anEllipse1->radmin, anEllipse2->radmin)));
+      aConstrList.push_back(GCSConstraintPtr(
+          new GCS::ConstraintEqualMajorAxesConic(anEllipse1.get(), anEllipse2.get())));
+    }
   }
 
   std::shared_ptr<PlaneGCSSolver_ConstraintWrapper> aResult(
@@ -626,5 +648,18 @@ GCS::SET_pD arcParameters(const EdgeWrapperPtr& theArc)
   aParams.insert(anArc->startAngle);
   aParams.insert(anArc->endAngle);
   aParams.insert(anArc->rad);
+  return aParams;
+}
+
+GCS::SET_pD ellipseParameters(const EdgeWrapperPtr& theEllipse)
+{
+  GCS::SET_pD aParams;
+  std::shared_ptr<GCS::Ellipse> anEllipse =
+      std::dynamic_pointer_cast<GCS::Ellipse>(theEllipse->entity());
+  aParams.insert(anEllipse->center.x);
+  aParams.insert(anEllipse->center.y);
+  aParams.insert(anEllipse->focus1.x);
+  aParams.insert(anEllipse->focus1.y);
+  aParams.insert(anEllipse->radmin);
   return aParams;
 }

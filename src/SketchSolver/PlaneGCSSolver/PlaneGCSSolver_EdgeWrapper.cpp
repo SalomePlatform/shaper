@@ -31,6 +31,11 @@ PlaneGCSSolver_EdgeWrapper::PlaneGCSSolver_EdgeWrapper(const GCSCurvePtr theEnti
     else {
       std::shared_ptr<GCS::Circle> aCircle = std::dynamic_pointer_cast<GCS::Circle>(myEntity);
       if (aCircle) myType = ENTITY_CIRCLE;
+      else {
+        std::shared_ptr<GCS::Ellipse> anEllipse =
+            std::dynamic_pointer_cast<GCS::Ellipse>(myEntity);
+        if (anEllipse) myType = ENTITY_ELLIPSE;
+      }
     }
   }
 }
@@ -61,6 +66,10 @@ bool PlaneGCSSolver_EdgeWrapper::isDegenerated() const
     double aSqRadius = squareDistance(anArc->center, anArc->start);
     return aSqRadius < aSqTol || aSqRadius > aMaxRadius * aMaxRadius || // <- arc radius
            anAngleDiff < anAngleTol || fabs(anAngleDiff - 2*PI) < anAngleTol; // <- arc angle
+  }
+  else if (myType == ENTITY_ELLIPSE) {
+    std::shared_ptr<GCS::Ellipse> anEllipse = std::dynamic_pointer_cast<GCS::Ellipse>(myEntity);
+    return *anEllipse->radmin < tolerance;
   }
   return false;
 }

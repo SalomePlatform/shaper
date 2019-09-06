@@ -141,6 +141,16 @@ GCS::VEC_pD toParameters(const EntityWrapperPtr& theEntity)
     aParameters.push_back(anArc->endAngle);
     break;
     }
+  case ENTITY_ELLIPSE: {
+    std::shared_ptr<GCS::Ellipse> anEllipse =
+        std::dynamic_pointer_cast<GCS::Ellipse>(anEntity->entity());
+    aParameters.push_back(anEllipse->center.x);
+    aParameters.push_back(anEllipse->center.y);
+    aParameters.push_back(anEllipse->focus1.x);
+    aParameters.push_back(anEllipse->focus1.y);
+    aParameters.push_back(anEllipse->radmin);
+    break;
+    }
   default:
     break;
   }

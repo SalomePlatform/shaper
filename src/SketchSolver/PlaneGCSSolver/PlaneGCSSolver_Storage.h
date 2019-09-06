@@ -88,7 +88,7 @@ public:
 
   /// \brief Check the storage has constraints
   virtual bool isEmpty() const
-  { return SketchSolver_Storage::isEmpty() && myArcConstraintMap.empty(); }
+  { return SketchSolver_Storage::isEmpty() && myAuxConstraintMap.empty(); }
 
   /// \brief Make parametrization of arcs consistent.
   ///        Forward arcs should have the last parameter greater than the first parameter.
@@ -104,14 +104,17 @@ private:
   EntityWrapperPtr createAttribute(const AttributePtr&           theAttribute,
                                    PlaneGCSSolver_EntityBuilder* theBuilder);
 
-  void createArcConstraints(const EntityWrapperPtr& theArc);
-  void removeArcConstraints(const EntityWrapperPtr& theArc);
+  /// \brief Create additional constaints:
+  ///        * for arc to fix extra parameters;
+  ///        * for ellipse to keep auxiliary points on their places
+  void createAuxiliaryConstraints(const EntityWrapperPtr& theEntity);
+  void removeAuxiliaryConstraints(const EntityWrapperPtr& theEntity);
 
 private:
   ConstraintID myConstraintLastID;   ///< identifier of last added constraint
 
-  /// additional constraints for correct processing of the arcs
-  std::map<EntityWrapperPtr, ConstraintWrapperPtr> myArcConstraintMap;
+  /// additional constraints for correct processing of the arcs, ellipses, elliptical arcs
+  std::map<EntityWrapperPtr, ConstraintWrapperPtr> myAuxConstraintMap;
 
   /// list of removed constraints to notify solver
   std::list<GCSConstraintPtr> myRemovedConstraints;

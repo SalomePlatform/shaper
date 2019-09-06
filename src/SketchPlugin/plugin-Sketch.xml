@@ -5,6 +5,7 @@
         id="Sketch"
         nested="SketchPoint SketchIntersectionPoint SketchLine
                 SketchCircle SketchMacroCircle SketchArc SketchMacroArc
+                SketchEllipse SketchMacroEllipse
                 SketchRectangle
                 SketchProjection
                 SketchConstraintLength SketchConstraintRadius SketchConstraintDistance SketchConstraintDistanceHorizontal SketchConstraintDistanceVertical
@@ -364,7 +365,6 @@
       </feature>
     </group>
 
-<excluded>
     <group id="Elliptic geometry">
       <!-- SketchEllipse is a hidden feature. It is created inside SketchMacroEllipse. -->
       <feature id="SketchEllipse"
@@ -377,13 +377,38 @@
                                  tooltip="Center coordinates"
                                  accept_expressions="0"
                                  enable_value="enable_by_preferences"/>
-        <sketch-2dpoint_selector id="ellipse_focus"
-                                 title="Focus"
+        <sketch-2dpoint_selector id="ellipse_first_focus"
+                                 title="First focus"
                                  tooltip="Focus coordinates"
                                  accept_expressions="0"
                                  enable_value="enable_by_preferences"/>
+        <sketch-2dpoint_selector id="ellipse_second_focus"
+                                 title="Second focus"
+                                 tooltip="Focus coordinates"
+                                 accept_expressions="0"
+                                 enable_value="enable_by_preferences"/>
+        <sketch-2dpoint_selector id="ellipse_major_axis_start_point"
+                                 title="Major axis start"
+                                 tooltip="Coordinates of point on negative direction of major axis"
+                                 accept_expressions="0"
+                                 enable_value="enable_by_preferences"/>
+        <sketch-2dpoint_selector id="ellipse_major_axis_end_point"
+                                 title="Major axis end"
+                                 tooltip="Coordinates of point on positive direction of major axis"
+                                 accept_expressions="0"
+                                 enable_value="enable_by_preferences"/>
+        <sketch-2dpoint_selector id="ellipse_minor_axis_start_point"
+                                 title="Minor axis start"
+                                 tooltip="Coordinates of point on negative direction of minor axis"
+                                 accept_expressions="0"
+                                 enable_value="enable_by_preferences"/>
+        <sketch-2dpoint_selector id="ellipse_minor_axis_end_point"
+                                 title="Minor axis end"
+                                 tooltip="Coordinates of point on positive direction of minor axis"
+                                 accept_expressions="0"
+                                 enable_value="enable_by_preferences"/>
         <labelvalue id="ellipse_major_radius"
-                    icon="icons/Sketch/radius.png"
+                    icon="icons/Sketch/radius_major.png"
                     label="Major radius:"
                     tooltip="Set major radius"
                     default="computed"
@@ -391,7 +416,7 @@
                     enable_value="enable_by_preferences">
         </labelvalue>
         <labelvalue id="ellipse_minor_radius"
-                    icon="icons/Sketch/radius.png"
+                    icon="icons/Sketch/radius_minor.png"
                     label="Minor radius:"
                     tooltip="Set minor radius"
                     default="computed"
@@ -406,29 +431,57 @@
                title="Ellipse"
                tooltip="Create ellipse"
                helpfile="ellipseFeature.html">
-        <sketch-2dpoint_selector id="center_point"
-                                 reference_attribute="center_point_ref"
-                                 title="Center point"
-                                 tooltip="Center point coordinates"
-                                 accept_expressions="0"
-                                 enable_value="enable_by_preferences"/>
-        <sketch-2dpoint_selector id="major_axis_point"
-                                 reference_attribute="major_axis_point_ref"
-                                 title="Major axis point"
-                                 tooltip="Major axis point coordinates"
-                                 accept_expressions="0"
-                                 enable_value="enable_by_preferences"/>
-        <sketch-2dpoint_selector id="passed_point"
-                                 reference_attribute="passed_point_ref"
-                                 title="Passed point"
-                                 tooltip="Passed point coordinates"
-                                 accept_expressions="0"
-                                 enable_value="enable_by_preferences">
-<!--          <validator id="SketchPlugin_CirclePassedPointValidator"/> -->
-        </sketch-2dpoint_selector>
+        <toolbox id="ellipse_type" modified_in_edit="edit_ellipse_type">
+          <box id="by_center_axis_point"
+               icon="icons/Sketch/ellipse_cent_rad_32x32.png"
+               title="Center, major semi-axis and passing point">
+            <sketch-2dpoint_selector id="first_point"
+                                     reference_attribute="first_point_ref"
+                                     title="Center point"
+                                     tooltip="Center point coordinates"
+                                     accept_expressions="0"
+                                     enable_value="enable_by_preferences"/>
+            <sketch-2dpoint_selector id="second_point"
+                                     reference_attribute="second_point_ref"
+                                     title="Major axis point"
+                                     tooltip="Major axis point coordinates"
+                                     accept_expressions="0"
+                                     enable_value="enable_by_preferences"/>
+            <sketch-2dpoint_selector id="passed_point"
+                                     reference_attribute="passed_point_ref"
+                                     title="Passed point"
+                                     tooltip="Passed point coordinates"
+                                     accept_expressions="0"
+                                     enable_value="enable_by_preferences">
+              <!--          <validator id="SketchPlugin_CirclePassedPointValidator"/> -->
+            </sketch-2dpoint_selector>
+          </box>
+          <box id="by_major_axis_and_point"
+               icon="icons/Sketch/ellipse_axes_32x32.png"
+               title="Major axis and passing point">
+            <sketch-2dpoint_selector id="first_point"
+                                     reference_attribute="first_point_ref"
+                                     title="Major axis start point"
+                                     tooltip="Major axis start point coordinates"
+                                     accept_expressions="0"
+                                     enable_value="enable_by_preferences"/>
+            <sketch-2dpoint_selector id="second_point"
+                                     reference_attribute="second_point_ref"
+                                     title="Major axis end point"
+                                     tooltip="Major axis end point coordinates"
+                                     accept_expressions="0"
+                                     enable_value="enable_by_preferences"/>
+            <sketch-2dpoint_selector id="passed_point"
+                                     reference_attribute="passed_point_ref"
+                                     title="Passed point"
+                                     tooltip="Passed point coordinates"
+                                     accept_expressions="0"
+                                     enable_value="enable_by_preferences"/>
+          </box>
+        </toolbox>
 <!--        <validator id="GeomValidators_Different" parameters="center_point_ref,passed_point_ref"/> -->
-        <labelvalue id="ellipse_major_radius"
-                    icon="icons/Sketch/radius.png"
+        <labelvalue id="major_radius"
+                    icon="icons/Sketch/radius_major.png"
                     label="Major radius:"
                     tooltip="Set major radius"
                     default="computed"
@@ -437,8 +490,8 @@
                     enable_value="enable_by_preferences">
           <validator id="GeomValidators_Positive"/>
         </labelvalue>
-        <labelvalue id="ellipse_minor_radius"
-                    icon="icons/Sketch/radius.png"
+        <labelvalue id="minor_radius"
+                    icon="icons/Sketch/radius_minor.png"
                     label="Minor radius:"
                     tooltip="Set minor radius"
                     default="computed"
@@ -454,7 +507,6 @@
                    obligatory="0"/>
       </feature>
     </group>
-</excluded>
 
     <group id="Projection">
       <!-- Projected feature -->

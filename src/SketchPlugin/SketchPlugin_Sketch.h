@@ -230,6 +230,18 @@ class SketchPlugin_Sketch : public ModelAPI_CompositeFeature, public GeomAPI_ICu
                                   SketchPlugin_Sketch* theSketch,
                                   const std::string& theAttributeID, const int theIndex);
 
+  /// \brief Create a result for the segment given by a pair of attributes
+  /// \param theFeature a source feature
+  /// \param theSketch a sketch intance
+  /// \param theStartAttrID an attribute string
+  /// \param theEndAttrID an attribute string
+  /// \param theIndex an index of the result
+  static void createLine2DResult(ModelAPI_Feature* theFeature,
+                                 SketchPlugin_Sketch* theSketch,
+                                 const std::string& theStartAttrID,
+                                 const std::string& theEndAttrID,
+                                 const int theIndex = 0);
+
   /// Add new feature and fill the data of the feature by the data of the parameter feature.
   /// The name of the created feature stays unique.
   /// \param theFeature a source feature

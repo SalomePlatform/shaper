@@ -50,7 +50,9 @@ enum SketchSolver_EntityType {
   ENTITY_POINT,
   ENTITY_LINE,
   ENTITY_CIRCLE,
-  ENTITY_ARC
+  ENTITY_ARC,
+  ENTITY_ELLIPSE,
+  ENTITY_ELLIPTICAL_ARC
 };
 
 /// Types of constraints

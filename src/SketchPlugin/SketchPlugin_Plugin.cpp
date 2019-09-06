@@ -317,6 +317,7 @@ std::shared_ptr<ModelAPI_FeatureStateMessage> SketchPlugin_Plugin
       aMsg->setState(SketchPlugin_Trim::ID(), aHasSketchPlane);
       aMsg->setState(SketchPlugin_MacroArc::ID(), aHasSketchPlane);
       aMsg->setState(SketchPlugin_MacroCircle::ID(), aHasSketchPlane);
+      aMsg->setState(SketchPlugin_MacroEllipse::ID(), aHasSketchPlane);
       aMsg->setState(SketchPlugin_ConstraintDistanceHorizontal::ID(), aHasSketchPlane);
       aMsg->setState(SketchPlugin_ConstraintDistanceVertical::ID(), aHasSketchPlane);
       // SketchRectangle is a python feature, so its ID is passed just as a string

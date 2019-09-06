@@ -17,17 +17,18 @@
 // See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 
-// File:        SketchPlugin_Ellipse.cpp
-// Created:     26 April 2017
-// Author:      Artem ZHIDKOV
-
 #include <SketchPlugin_Ellipse.h>
 #include <SketchPlugin_Sketch.h>
 
 #include <GeomAlgoAPI_EdgeBuilder.h>
+
+#include <GeomAPI_Dir2d.h>
 #include <GeomAPI_Edge.h>
 #include <GeomAPI_Ellipse.h>
+#include <GeomAPI_Pnt2d.h>
+
 #include <GeomDataAPI_Point2D.h>
+
 #include <ModelAPI_AttributeDouble.h>
 #include <ModelAPI_ResultConstruction.h>
 #include <ModelAPI_Session.h>
@@ -44,7 +45,12 @@ SketchPlugin_Ellipse::SketchPlugin_Ellipse()
 void SketchPlugin_Ellipse::initDerivedClassAttributes()
 {
   data()->addAttribute(CENTER_ID(), GeomDataAPI_Point2D::typeId());
-  data()->addAttribute(FOCUS_ID(), GeomDataAPI_Point2D::typeId());
+  data()->addAttribute(FIRST_FOCUS_ID(), GeomDataAPI_Point2D::typeId());
+  data()->addAttribute(SECOND_FOCUS_ID(), GeomDataAPI_Point2D::typeId());
+  data()->addAttribute(MAJOR_AXIS_START_ID(), GeomDataAPI_Point2D::typeId());
+  data()->addAttribute(MAJOR_AXIS_END_ID(), GeomDataAPI_Point2D::typeId());
+  data()->addAttribute(MINOR_AXIS_START_ID(), GeomDataAPI_Point2D::typeId());
+  data()->addAttribute(MINOR_AXIS_END_ID(), GeomDataAPI_Point2D::typeId());
   data()->addAttribute(MAJOR_RADIUS_ID(), ModelAPI_AttributeDouble::typeId());
   data()->addAttribute(MINOR_RADIUS_ID(), ModelAPI_AttributeDouble::typeId());
 
@@ -59,50 +65,43 @@ void SketchPlugin_Ellipse::execute()
     return;
   }
 
-  // Compute a ellipse in 3D view.
-  std::shared_ptr<GeomDataAPI_Point2D> aCenterAttr =
-      std::dynamic_pointer_cast<GeomDataAPI_Point2D>(data()->attribute(CENTER_ID()));
-  std::shared_ptr<GeomDataAPI_Point2D> aFocusAttr =
-      std::dynamic_pointer_cast<GeomDataAPI_Point2D>(data()->attribute(FOCUS_ID()));
-  AttributeDoublePtr aMajorRadiusAttr = real(MAJOR_RADIUS_ID());
-  AttributeDoublePtr aMinorRadiusAttr = real(MINOR_RADIUS_ID());
-  if (!aCenterAttr->isInitialized() ||
-      !aFocusAttr->isInitialized() ||
-      !aMajorRadiusAttr->isInitialized() ||
-      !aMinorRadiusAttr->isInitialized()) {
-    return;
-  }
+  // Calculate all characteristics of the ellipse.
+  fillCharacteristicPoints();
 
-  double aMajorRadius = aMajorRadiusAttr->value();
-  double aMinorRadius = aMinorRadiusAttr->value();
-  if(aMajorRadius < tolerance || aMinorRadius < tolerance) {
-    return;
-  }
+  // Make visible points related to ellipse characteristics.
+  int aResultIndex = 0;
+  SketchPlugin_Sketch::createPoint2DResult(this, aSketch, CENTER_ID(), aResultIndex++);
+  SketchPlugin_Sketch::createPoint2DResult(this, aSketch, FIRST_FOCUS_ID(), aResultIndex++);
+  SketchPlugin_Sketch::createPoint2DResult(this, aSketch, SECOND_FOCUS_ID(), aResultIndex++);
+  SketchPlugin_Sketch::createPoint2DResult(this, aSketch, MAJOR_AXIS_START_ID(), aResultIndex++);
+  SketchPlugin_Sketch::createPoint2DResult(this, aSketch, MAJOR_AXIS_END_ID(), aResultIndex++);
+  SketchPlugin_Sketch::createPoint2DResult(this, aSketch, MINOR_AXIS_START_ID(), aResultIndex++);
+  SketchPlugin_Sketch::createPoint2DResult(this, aSketch, MINOR_AXIS_END_ID(), aResultIndex++);
 
-  // Make a visible point.
-  SketchPlugin_Sketch::createPoint2DResult(this, aSketch, CENTER_ID(), 0);
+  // Make auxiliary axes
+  SketchPlugin_Sketch::createLine2DResult(this, aSketch,
+      MAJOR_AXIS_START_ID(), MAJOR_AXIS_END_ID(), aResultIndex++);
+  SketchPlugin_Sketch::createLine2DResult(this, aSketch,
+      MINOR_AXIS_START_ID(), MINOR_AXIS_END_ID(), aResultIndex++);
 
-  std::shared_ptr<GeomDataAPI_Dir> aNDir = std::dynamic_pointer_cast<GeomDataAPI_Dir>(
-      aSketch->attribute(SketchPlugin_Sketch::NORM_ID()));
+  // Mark already created results auxiliary
+  myAuxiliaryResults.clear();
+  const std::list<ResultPtr>& aResults = results();
+  std::list<ResultPtr>::const_iterator anIt = aResults.begin();
+  for (int anIndex = 0; anIt != aResults.end() && anIndex < aResultIndex; ++anIt, ++anIndex)
+    myAuxiliaryResults.insert(*anIt);
 
   // Make a visible ellipse.
-  std::shared_ptr<GeomAPI_Pnt> aCenter(aSketch->to3D(aCenterAttr->x(), aCenterAttr->y()));
-  std::shared_ptr<GeomAPI_Pnt> aFocus(aSketch->to3D(aFocusAttr->x(), aFocusAttr->y()));
-  std::shared_ptr<GeomAPI_Dir> aNormal = aNDir->dir();
-  std::shared_ptr<GeomAPI_Dir> aMajorAxis(new GeomAPI_Dir(aFocus->x() - aCenter->x(),
-      aFocus->y() - aCenter->y(), aFocus->z() - aCenter->z()));
-
-  std::shared_ptr<GeomAPI_Shape> anEllipseShape =
-      GeomAlgoAPI_EdgeBuilder::ellipse(aCenter, aNormal, aMajorAxis, aMajorRadius, aMinorRadius);
-
-  std::shared_ptr<ModelAPI_ResultConstruction> aResult = document()->createConstruction(data(), 1);
-  aResult->setShape(anEllipseShape);
-  aResult->setIsInHistory(false);
-  setResult(aResult, 1);
+  createEllipse(aSketch, aResultIndex);
 }
 
 bool SketchPlugin_Ellipse::isFixed() {
   return data()->selection(EXTERNAL_ID())->context().get() != NULL;
+}
+
+bool SketchPlugin_Ellipse::isAuxiliary(ResultPtr theResult)
+{
+  return myAuxiliaryResults.find(theResult) != myAuxiliaryResults.end();
 }
 
 void SketchPlugin_Ellipse::attributeChanged(const std::string& theID) {
@@ -125,11 +124,95 @@ void SketchPlugin_Ellipse::attributeChanged(const std::string& theID) {
       aCenterAttr->setValue(sketch()->to2D(anEllipse->center()));
 
       std::shared_ptr<GeomDataAPI_Point2D> aFocusAttr =
-          std::dynamic_pointer_cast<GeomDataAPI_Point2D>(attribute(FOCUS_ID()));
+          std::dynamic_pointer_cast<GeomDataAPI_Point2D>(attribute(FIRST_FOCUS_ID()));
       aFocusAttr->setValue(sketch()->to2D(anEllipse->firstFocus()));
 
       real(MAJOR_RADIUS_ID())->setValue(anEllipse->majorRadius());
       real(MINOR_RADIUS_ID())->setValue(anEllipse->minorRadius());
     }
   }
+}
+
+bool SketchPlugin_Ellipse::fillCharacteristicPoints()
+{
+  std::shared_ptr<GeomDataAPI_Point2D> aCenterAttr =
+      std::dynamic_pointer_cast<GeomDataAPI_Point2D>(data()->attribute(CENTER_ID()));
+  std::shared_ptr<GeomDataAPI_Point2D> aFocusAttr =
+      std::dynamic_pointer_cast<GeomDataAPI_Point2D>(data()->attribute(FIRST_FOCUS_ID()));
+
+  AttributeDoublePtr aMajorRadiusAttr = real(MAJOR_RADIUS_ID());
+  AttributeDoublePtr aMinorRadiusAttr = real(MINOR_RADIUS_ID());
+
+  if (!aCenterAttr->isInitialized() ||
+      !aFocusAttr->isInitialized() ||
+      !aMajorRadiusAttr->isInitialized() ||
+      !aMinorRadiusAttr->isInitialized()) {
+    return false;
+  }
+
+  double aMajorRadius = aMajorRadiusAttr->value();
+  double aMinorRadius = aMinorRadiusAttr->value();
+  if (aMajorRadius < tolerance || aMinorRadius < tolerance) {
+    return false;
+  }
+
+  data()->blockSendAttributeUpdated(true);
+  GeomPnt2dPtr aCenter2d = aCenterAttr->pnt();
+  GeomPnt2dPtr aFocus2d = aFocusAttr->pnt();
+  GeomDir2dPtr aMajorDir2d(new GeomAPI_Dir2d(aFocus2d->x() - aCenter2d->x(),
+    aFocus2d->y() - aCenter2d->y()));
+  GeomDir2dPtr aMinorDir2d(new GeomAPI_Dir2d(-aMajorDir2d->y(), aMajorDir2d->x()));
+  std::dynamic_pointer_cast<GeomDataAPI_Point2D>(attribute(SECOND_FOCUS_ID()))
+    ->setValue(2.0 * aCenter2d->x() - aFocus2d->x(), 2.0 * aCenter2d->y() - aFocus2d->y());
+  std::dynamic_pointer_cast<GeomDataAPI_Point2D>(attribute(MAJOR_AXIS_START_ID()))
+      ->setValue(aCenter2d->x() - aMajorDir2d->x() * aMajorRadius,
+                 aCenter2d->y() - aMajorDir2d->y() * aMajorRadius);
+  std::dynamic_pointer_cast<GeomDataAPI_Point2D>(attribute(MAJOR_AXIS_END_ID()))
+      ->setValue(aCenter2d->x() + aMajorDir2d->x() * aMajorRadius,
+                 aCenter2d->y() + aMajorDir2d->y() * aMajorRadius);
+  std::dynamic_pointer_cast<GeomDataAPI_Point2D>(attribute(MINOR_AXIS_START_ID()))
+      ->setValue(aCenter2d->x() - aMinorDir2d->x() * aMinorRadius,
+                 aCenter2d->y() - aMinorDir2d->y() * aMinorRadius);
+  std::dynamic_pointer_cast<GeomDataAPI_Point2D>(attribute(MINOR_AXIS_END_ID()))
+      ->setValue(aCenter2d->x() + aMinorDir2d->x() * aMinorRadius,
+                 aCenter2d->y() + aMinorDir2d->y() * aMinorRadius);
+  data()->blockSendAttributeUpdated(false);
+
+  return true;
+}
+
+void SketchPlugin_Ellipse::createEllipse(SketchPlugin_Sketch* theSketch, const int theResultIndex)
+{
+  // Compute a ellipse in 3D view.
+  std::shared_ptr<GeomDataAPI_Point2D> aCenterAttr =
+    std::dynamic_pointer_cast<GeomDataAPI_Point2D>(data()->attribute(CENTER_ID()));
+  std::shared_ptr<GeomDataAPI_Point2D> aFocusAttr =
+    std::dynamic_pointer_cast<GeomDataAPI_Point2D>(data()->attribute(FIRST_FOCUS_ID()));
+
+  double aMajorRadius = real(MAJOR_RADIUS_ID())->value();
+  double aMinorRadius = real(MINOR_RADIUS_ID())->value();
+
+  std::shared_ptr<GeomDataAPI_Dir> aNDir = std::dynamic_pointer_cast<GeomDataAPI_Dir>(
+    theSketch->attribute(SketchPlugin_Sketch::NORM_ID()));
+
+  GeomPointPtr aCenter(theSketch->to3D(aCenterAttr->x(), aCenterAttr->y()));
+  GeomPointPtr aFocus(theSketch->to3D(aFocusAttr->x(), aFocusAttr->y()));
+  GeomDirPtr aNormal = aNDir->dir();
+  std::shared_ptr<GeomAPI_Shape> anEllipseShape;
+  if (aFocus->distance(aCenter) > tolerance) {
+    GeomDirPtr aMajorAxis(new GeomAPI_Dir(aFocus->x() - aCenter->x(),
+        aFocus->y() - aCenter->y(), aFocus->z() - aCenter->z()));
+
+    anEllipseShape =
+        GeomAlgoAPI_EdgeBuilder::ellipse(aCenter, aNormal, aMajorAxis, aMajorRadius, aMinorRadius);
+  }
+  else {
+    // build circle instead of ellipse
+    anEllipseShape = GeomAlgoAPI_EdgeBuilder::lineCircle(aCenter, aNormal, aMajorRadius);
+  }
+
+  ResultConstructionPtr aResult = document()->createConstruction(data(), theResultIndex);
+  aResult->setShape(anEllipseShape);
+  aResult->setIsInHistory(false);
+  setResult(aResult, theResultIndex);
 }

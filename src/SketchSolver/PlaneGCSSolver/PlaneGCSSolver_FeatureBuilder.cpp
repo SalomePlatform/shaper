@@ -25,6 +25,7 @@
 
 #include <SketchPlugin_Arc.h>
 #include <SketchPlugin_Circle.h>
+#include <SketchPlugin_Ellipse.h>
 #include <SketchPlugin_IntersectionPoint.h>
 #include <SketchPlugin_Line.h>
 #include <SketchPlugin_Point.h>
@@ -40,6 +41,7 @@ static EntityWrapperPtr createLine(const AttributeEntityMap& theAttributes);
 static EntityWrapperPtr createCircle(const AttributeEntityMap& theAttributes);
 static EntityWrapperPtr createArc(const AttributeEntityMap&    theAttributes,
                                   PlaneGCSSolver_Storage*      theStorage);
+static EntityWrapperPtr createEllipse(const AttributeEntityMap& theAttributes);
 
 
 PlaneGCSSolver_FeatureBuilder::PlaneGCSSolver_FeatureBuilder(
@@ -90,6 +92,9 @@ EntityWrapperPtr PlaneGCSSolver_FeatureBuilder::createFeature(FeaturePtr theFeat
   // Arc
   else if (aFeatureKind == SketchPlugin_Arc::ID())
     aResult = createArc(myAttributes, myStorage);
+  // Ellipse
+  else if (aFeatureKind == SketchPlugin_Ellipse::ID())
+    aResult = createEllipse(myAttributes);
   // Point (it has low probability to be an attribute of constraint, so it is checked at the end)
   else if (aFeatureKind == SketchPlugin_Point::ID() ||
            aFeatureKind == SketchPlugin_IntersectionPoint::ID()) {
@@ -210,6 +215,38 @@ EntityWrapperPtr createArc(const AttributeEntityMap&    theAttributes,
   return anArcWrapper;
 }
 
+EntityWrapperPtr createEllipse(const AttributeEntityMap& theAttributes)
+{
+  std::shared_ptr<GCS::Ellipse> aNewEllipse(new GCS::Ellipse);
+
+  std::map<std::string, EntityWrapperPtr> anAdditionalAttributes;
+
+  AttributeEntityMap::const_iterator anIt = theAttributes.begin();
+  for (; anIt != theAttributes.end(); ++anIt) {
+    std::shared_ptr<PlaneGCSSolver_PointWrapper> aPoint =
+        std::dynamic_pointer_cast<PlaneGCSSolver_PointWrapper>(anIt->second);
+    if (aPoint) {
+      if (anIt->first->id() == SketchPlugin_Ellipse::CENTER_ID())
+        aNewEllipse->center = *(aPoint->point());
+      else if (anIt->first->id() == SketchPlugin_Ellipse::FIRST_FOCUS_ID())
+        aNewEllipse->focus1 = *(aPoint->point());
+      else
+        anAdditionalAttributes[anIt->first->id()] = anIt->second;
+    }
+    else if (anIt->first->id() == SketchPlugin_Ellipse::MINOR_RADIUS_ID()) {
+      ScalarWrapperPtr aScalar =
+          std::dynamic_pointer_cast<PlaneGCSSolver_ScalarWrapper>(anIt->second);
+      aNewEllipse->radmin = aScalar->scalar();
+    }
+    else
+      anAdditionalAttributes[anIt->first->id()] = anIt->second;
+  }
+
+  EntityWrapperPtr anEllipseWrapper(new PlaneGCSSolver_EdgeWrapper(aNewEllipse));
+  anEllipseWrapper->setAdditionalAttributes(anAdditionalAttributes);
+  return anEllipseWrapper;
+}
+
 bool isAttributeApplicable(const std::string& theAttrName, const std::string& theOwnerName)
 {
   if (theOwnerName == SketchPlugin_Arc::ID()) {
@@ -225,6 +262,17 @@ bool isAttributeApplicable(const std::string& theAttrName, const std::string& th
   else if (theOwnerName == SketchPlugin_Line::ID()) {
     return theAttrName == SketchPlugin_Line::START_ID() ||
            theAttrName == SketchPlugin_Line::END_ID();
+  }
+  else if (theOwnerName == SketchPlugin_Ellipse::ID()) {
+    return theAttrName == SketchPlugin_Ellipse::CENTER_ID() ||
+           theAttrName == SketchPlugin_Ellipse::FIRST_FOCUS_ID() ||
+           theAttrName == SketchPlugin_Ellipse::SECOND_FOCUS_ID() ||
+           theAttrName == SketchPlugin_Ellipse::MAJOR_AXIS_START_ID() ||
+           theAttrName == SketchPlugin_Ellipse::MAJOR_AXIS_END_ID() ||
+           theAttrName == SketchPlugin_Ellipse::MINOR_AXIS_START_ID() ||
+           theAttrName == SketchPlugin_Ellipse::MINOR_AXIS_END_ID() ||
+           theAttrName == SketchPlugin_Ellipse::MAJOR_RADIUS_ID() ||
+           theAttrName == SketchPlugin_Ellipse::MINOR_RADIUS_ID();
   }
 
   // suppose that all remaining features are points
