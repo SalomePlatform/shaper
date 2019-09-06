@@ -174,13 +174,13 @@ QString XGUI_Workshop::MOVE_TO_END_COMMAND = QObject::tr("Move to the end");
 //#define DEBUG_CLEAN_HISTORY
 
 #ifdef HAVE_SALOME
-static QString MyFilter(QObject::tr("SHAPER files (*.shaper *.opp)"));
+static QString MyFilter(QObject::tr("SHAPER files (*.shaper *.cadbld)"));
 static QString MyFilter2(QObject::tr("SHAPER files (*.shaper)"));
 static QString MyExtension(".shaper");
 #else
-static QString MyFilter(QObject::tr("CAD Builder files (*.opp);;All files (*.*)"));
-static QString MyFilter2(QObject::tr("CAD Builder files (*.opp)"));
-static QString MyExtension(".opp");
+static QString MyFilter(QObject::tr("CAD Builder files (*.cadbld);;All files (*.*)"));
+static QString MyFilter2(QObject::tr("CAD Builder files (*.cadbld)"));
+static QString MyExtension(".cadbld");
 #endif
 
 
@@ -939,7 +939,11 @@ void XGUI_Workshop::onOpen()
   }
 
   //show file dialog, check if readable and open
-  QString aFile = QFileDialog::getOpenFileName(desktop(), tr("Open file"), QString(), MyFilter);
+  qreal aRatio = ModuleBase_Tools::currentPixelRatio();
+  // If the ratio is > 1 (HD screen) then QT has a bug in
+  // displaying of system open file dialog (too small)
+  QString aFile = QFileDialog::getOpenFileName(desktop(), tr("Open file"), QString(), MyFilter,
+    Q_NULLPTR, ((aRatio > 1)? QFileDialog::DontUseNativeDialog : QFileDialog::Options()));
   if (!aFile.isNull())
     openFile(aFile);
 }
@@ -1106,8 +1110,10 @@ bool XGUI_Workshop::onSaveAs()
 {
   if(!myOperationMgr->abortAllOperations(XGUI_OperationMgr::XGUI_InformationMessage))
     return false;
+  qreal aRatio = ModuleBase_Tools::currentPixelRatio();
   myCurrentFile = QFileDialog::getSaveFileName(desktop(), tr("Select name to save file..."),
-    QString(), MyFilter2);
+    QString(), MyFilter2,
+    Q_NULLPTR, ((aRatio > 1) ? QFileDialog::DontUseNativeDialog : QFileDialog::Options()));
   if (!myCurrentFile.isNull()) {
     if (!myCurrentFile.endsWith(MyExtension)) {
       myCurrentFile += MyExtension;
@@ -2468,14 +2474,16 @@ void XGUI_Workshop::changeTransparency(const QObjectPtrList& theObjects)
   QString aDescription = contextMenuMgr()->action("TRANSPARENCY_CMD")->text();
   aMgr->startOperation(aDescription.toStdString());
 
-  if (aDlg->exec() != QDialog::Accepted)
-    return;
+  if (aDlg->exec() == QDialog::Accepted) {
+    // 4. set the value to all results
+    aCurrentValue = aTransparencyWidget->getValue();
+    setTransparency(aCurrentValue, theObjects);
+    aMgr->finishOperation();
+  } else {
+    aMgr->abortOperation();
+    Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_TO_REDISPLAY));
+  }
 
-  // 4. set the value to all results
-  aCurrentValue = aTransparencyWidget->getValue();
-  setTransparency(aCurrentValue, theObjects);
-
-  aMgr->finishOperation();
   updateCommandStatus();
 }
 
@@ -2799,8 +2807,12 @@ void XGUI_Workshop::synchronizeResultTree(const ResultBodyPtr& theRes, bool theU
       if (aRes.get())
         synchronizeResultTree(aRes, theUpdateViewer);
     }
-  else
-    myDisplayer->display(theRes, theUpdateViewer);
+  else {
+    if (theRes->isDisplayed())
+      myDisplayer->display(theRes, theUpdateViewer);
+    else
+      myDisplayer->erase(theRes, theUpdateViewer);
+  }
 }
 #endif
 

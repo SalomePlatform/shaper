@@ -39,13 +39,14 @@ SketcherPrs_HVDirection::SketcherPrs_HVDirection(ModelAPI_Feature* theConstraint
 }
 
 bool SketcherPrs_HVDirection::IsReadyToDisplay(ModelAPI_Feature* theConstraint,
-                                               const std::shared_ptr<GeomAPI_Ax3>&/* thePlane*/)
+                                               const std::shared_ptr<GeomAPI_Ax3>& thePlane)
 {
   bool aReadyToDisplay = false;
-  ObjectPtr aObj =
-    SketcherPrs_Tools::getResult(theConstraint, SketchPlugin_Constraint::ENTITY_A());
-
-  aReadyToDisplay = SketcherPrs_Tools::getShape(aObj).get() != NULL;
+  if (thePlane.get()) {
+    ObjectPtr aObj =
+        SketcherPrs_Tools::getResult(theConstraint, SketchPlugin_Constraint::ENTITY_A());
+    aReadyToDisplay = SketcherPrs_Tools::getShape(aObj).get() != NULL;
+  }
   return aReadyToDisplay;
 }
 

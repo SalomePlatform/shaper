@@ -404,6 +404,8 @@ bool MODULEBASE_EXPORT isSameShape(const TopoDS_Shape& theShape1, const TopoDS_S
 std::string MODULEBASE_EXPORT generateName(const AttributePtr& theAttribute,
   ModuleBase_IWorkshop* theWorkshop);
 
+/// Returns pixel ratio of a screen where main window is displayed
+qreal MODULEBASE_EXPORT currentPixelRatio();
 }
 
 #endif

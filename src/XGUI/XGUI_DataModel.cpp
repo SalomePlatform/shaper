@@ -67,6 +67,13 @@ void XGUI_DataModel::processEvent(const std::shared_ptr<Events_Message>& theMess
     for (aIt = aObjects.cbegin(); aIt != aObjects.cend(); aIt++) {
       if ((*aIt)->isInHistory())
         aCreated.append(*aIt);
+      if ((*aIt)->groupName() == ModelAPI_ResultPart::group()) {
+        emit beforeTreeRebuild();
+        myRoot->update();
+        rebuildDataTree();
+        emit treeRebuilt();
+        return;
+      }
     }
     if (aCreated.length() == 0)
       return;
@@ -78,7 +85,6 @@ void XGUI_DataModel::processEvent(const std::shared_ptr<Events_Message>& theMess
     QModelIndex aParentIndex1, aParentIndex2;
     ObjectPtr aObj;
     bool aRebuildAll = false;
-    bool isInserted = false;
 
     foreach(ModuleBase_ITreeNode* aNode, aNodes) {
       aObj = aNode->object();
@@ -93,13 +99,10 @@ void XGUI_DataModel::processEvent(const std::shared_ptr<Events_Message>& theMess
         aParentIndex2 = getParentIndex(aNode, 2);
         insertRows(aRow, 1, aParentIndex1);
         dataChanged(aParentIndex1, aParentIndex2);
-        isInserted = true;
       }
     }
     if (aRebuildAll)
       rebuildDataTree();
-    else if (isInserted)
-      endInsertRows();
 
     emit treeRebuilt();
   }
@@ -216,8 +219,6 @@ void XGUI_DataModel::processEvent(const std::shared_ptr<Events_Message>& theMess
     }
     if (aCreated.length() == 0)
       return;
-    bool isInsert = false;
-    bool isRemove = false;
     emit beforeTreeRebuild();
     foreach(ObjectPtr aObj, aCreated) {
       ModuleBase_ITreeNode* aNode = myRoot->subNode(aObj);
@@ -231,22 +232,16 @@ void XGUI_DataModel::processEvent(const std::shared_ptr<Events_Message>& theMess
 
         if (aNewNb > aOldNb) {
           insertRows(aOldNb - 1, aNewNb - aOldNb, aFirstIdx);
-          isInsert = true;
         }
         else if (aNewNb < aOldNb) {
           if (aNewNb)
             removeRows(aNewNb - 1, aOldNb - aNewNb, aFirstIdx);
           else if (aOldNb)
             removeRows(0, aOldNb, aFirstIdx);
-          isRemove = aNewNb || aOldNb;
         }
         dataChanged(aFirstIdx, aLastIdx);
       }
     }
-    if (isRemove)
-      endRemoveRows();
-    if (isInsert)
-      endInsertRows();
     emit treeRebuilt();
   }
 }
@@ -347,6 +342,7 @@ bool XGUI_DataModel::hasChildren(const QModelIndex& theParent) const
 bool XGUI_DataModel::insertRows(int theRow, int theCount, const QModelIndex& theParent)
 {
   beginInsertRows(theParent, theRow, theRow + theCount - 1);
+  endInsertRows();
   return true;
 }
 
@@ -354,6 +350,7 @@ bool XGUI_DataModel::insertRows(int theRow, int theCount, const QModelIndex& the
 bool XGUI_DataModel::removeRows(int theRow, int theCount, const QModelIndex& theParent)
 {
   beginRemoveRows(theParent, theRow, theRow + theCount - 1);
+  endRemoveRows();
   return true;
 }
 

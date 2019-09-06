@@ -82,6 +82,8 @@
 #include <QMessageBox>
 #include <QAction>
 #include <QTextCodec>
+#include <QWindow>
+#include <QScreen>
 
 #include <sstream>
 #include <string>
@@ -152,7 +154,6 @@ void activateWindow(QWidget* theWidget, const QString& theInfo)
 
 void setFocus(QWidget* theWidget, const QString& theInfo)
 {
-  activateWindow(theWidget);
   theWidget->setFocus();
   // rectangle of focus is not visible on tool button widgets
   theWidget->update();
@@ -1318,6 +1319,14 @@ bool isSameShape(const TopoDS_Shape& theShape1, const TopoDS_Shape& theShape2)
       return false;
   }
   return true;
+}
+
+qreal currentPixelRatio()
+{
+  QWindowList aWnds = qApp->topLevelWindows();
+  if (aWnds.size() > 0)
+    return aWnds.first()->devicePixelRatio();
+  return qApp->primaryScreen()->devicePixelRatio();
 }
 
 

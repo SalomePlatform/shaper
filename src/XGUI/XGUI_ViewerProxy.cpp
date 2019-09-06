@@ -299,18 +299,34 @@ void XGUI_ViewerProxy::onMouseMove(AppElements_ViewWindow* theWnd, QMouseEvent* 
   if (myIs2dMode) {
     bool aHighlight2d =
       ModuleBase_Preferences::resourceMgr()->booleanValue("Viewer", "highlighting-2d", true);
-    if (aHighlight2d || myShowHighlight)
-      updateHighlight();
-    else
-      eraseHighlight();
+    if (aHighlight2d) {
+      if (myShowHighlight)
+        eraseHighlight();
+      else
+        updateHighlight();
+    }
+    else {
+      if (myShowHighlight)
+        updateHighlight();
+      else
+        eraseHighlight();
+    }
   }
   else {
     bool aHighlight3d =
       ModuleBase_Preferences::resourceMgr()->booleanValue("Viewer", "highlighting-3d", false);
-    if (aHighlight3d || myShowHighlight)
-      updateHighlight();
-    else
-      eraseHighlight();
+    if (aHighlight3d) {
+      if (myShowHighlight)
+        eraseHighlight();
+      else
+        updateHighlight();
+    }
+    else {
+      if (myShowHighlight)
+        updateHighlight();
+      else
+        eraseHighlight();
+    }
   }
   emit mouseMove(theWnd, theEvent);
 }
@@ -528,18 +544,34 @@ void XGUI_ViewerProxy::onMouseMove(ModuleBase_IViewWindow* theWnd, QMouseEvent* 
   if (myIs2dMode) {
     bool aHighlight2d =
       ModuleBase_Preferences::resourceMgr()->booleanValue("Viewer", "highlighting-2d", true);
-    if (aHighlight2d || myShowHighlight)
-      updateHighlight();
-    else
-      eraseHighlight();
+    if (aHighlight2d) {
+      if (myShowHighlight)
+        eraseHighlight();
+      else
+        updateHighlight();
+    }
+    else {
+      if (myShowHighlight)
+        updateHighlight();
+      else
+        eraseHighlight();
+    }
   }
   else {
     bool aHighlight3d =
       ModuleBase_Preferences::resourceMgr()->booleanValue("Viewer", "highlighting-3d", false);
-    if (aHighlight3d || myShowHighlight)
-      updateHighlight();
-    else
-      eraseHighlight();
+    if (aHighlight3d) {
+      if (myShowHighlight)
+        eraseHighlight();
+      else
+        updateHighlight();
+    }
+    else {
+      if (myShowHighlight)
+        updateHighlight();
+      else
+        eraseHighlight();
+    }
   }
   emit mouseMove(theWnd, theEvent);
 }
@@ -665,7 +697,7 @@ void XGUI_ViewerProxy::setupColorScale()
   double aH = aResMgr->doubleValue("Viewer", "scalar_bar_height", 0.5);
   setColorScaleSize(aW, aH);
 
-  QColor aColor = aResMgr->integerValue("Viewer", "scalar_bar_text_color", Qt::black);
+  QColor aColor = aResMgr->colorValue("Viewer", "scalar_bar_text_color", Qt::black);
   setColorScaleTextColor(aColor);
 
   int aT = aResMgr->integerValue("Viewer", "scalar_bar_text_height", 14);

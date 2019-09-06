@@ -1,15 +1,6 @@
 <plugin>
   <workbench id="Features" document="Part">
     <group id="Collections">
-      <feature id="Group"
-        title="Group"
-        tooltip="Create named collection of geometry entities"
-        icon="icons/Collection/shape_group.png"
-        apply_continue="true"
-        helpfile="groupFeature.html">
-        <source path="group_widget.xml"/>
-      </feature>
-
       <feature id="Field"
         title="Field"
         tooltip="Create fields for selected shapes"
@@ -20,6 +11,15 @@
           <validator id="GeomValidators_BodyShapes"/>
         </field-panel>
         <validator id="CollectionPlugin_FieldValidator"/>
+      </feature>
+
+      <feature id="Group"
+        title="Group"
+        tooltip="Create named collection of geometry entities"
+        icon="icons/Collection/shape_group.png"
+        apply_continue="true"
+        helpfile="groupFeature.html">
+        <source path="group_widget.xml"/>
       </feature>
 
       <feature id="GroupAddition"

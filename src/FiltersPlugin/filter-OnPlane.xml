@@ -2,7 +2,7 @@
   <multi_selector id="OnPlane__OnPlane"
                   label="Planes:"
                   tooltip="Select planes or planar faces."
-                  type_choice="faces">
+                  shape_types="faces">
     <validator id="GeomValidators_ShapeType" parameters="plane"/>
   </multi_selector>
 </filter>

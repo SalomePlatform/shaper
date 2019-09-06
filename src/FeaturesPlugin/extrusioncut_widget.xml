@@ -13,7 +13,7 @@
       label="Select a sketch face"
       icon="icons/Features/sketch.png"
       tooltip="Select a sketch face"
-      type_choice="wires faces shells"
+      shape_types="wires faces shells"
       concealment="true">
       <validator id="FeaturesPlugin_ValidatorBaseForGeneration" parameters="face,shell"/>
     </multi_selector>
@@ -89,7 +89,7 @@
     label="Cut from:"
     icon="icons/Features/cut_shape.png"
     tooltip="Objects to Cut"
-    type_choice="Objects"
+    shape_types="Objects"
     use_choice="false"
     concealment="true"
     main_argument="true">

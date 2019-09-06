@@ -36,8 +36,7 @@ class PartSet_GlobalFilter: public ModuleBase_ShapeDocumentFilter
 public:
   /// Constructor
   /// \param theWorkshop a pointer to workshop
-  PartSet_GlobalFilter(ModuleBase_IWorkshop* theWorkshop)
-    : ModuleBase_ShapeDocumentFilter(theWorkshop) {}
+  PartSet_GlobalFilter(ModuleBase_IWorkshop* theWorkshop);
 
   /// Returns True if selected presentation can be selected
   /// \param theOwner an owner of the persentation

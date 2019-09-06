@@ -140,12 +140,14 @@ void SketcherPrs_Coincident::Compute(
   Quantity_Color aExternalColor = aIsEdge ? Quantity_NOC_BLACK : Quantity_NOC_YELLOW;
   Quantity_Color aInternalColor = aIsEdge ? Quantity_NOC_YELLOW : Quantity_NOC_BLACK;
 
+  int aRatio = SketcherPrs_Tools::pixelRatio();
+
   // Create the presentation as a combination of standard point markers
   bool aCustomColor = myIsCustomColor;
   // The external yellow contour
   Handle(Graphic3d_AspectMarker3d) aPtA = new Graphic3d_AspectMarker3d();
   aPtA->SetType(Aspect_TOM_RING3);
-  aPtA->SetScale(2.);
+  aPtA->SetScale(2. * aRatio);
   aPtA->SetColor(!aCustomColor ? aExternalColor : myCustomColor);
 
   Handle(Graphic3d_Group) aGroup = Prs3d_Root::CurrentGroup(thePresentation);
@@ -157,7 +159,7 @@ void SketcherPrs_Coincident::Compute(
   // Make a black mid ring
   aPtA = new Graphic3d_AspectMarker3d();
   aPtA->SetType(aIsEdge ? Aspect_TOM_STAR : Aspect_TOM_RING1);
-  aPtA->SetScale(1.);
+  aPtA->SetScale(1. * aRatio);
   aPtA->SetColor(!aCustomColor ? aInternalColor : myCustomColor);
   aGroup->SetPrimitivesAspect(aPtA);
   aGroup->AddPrimitiveArray (aPntArray);
@@ -165,7 +167,7 @@ void SketcherPrs_Coincident::Compute(
   // Make an internal ring
   aPtA = new Graphic3d_AspectMarker3d();
   aPtA->SetType(Aspect_TOM_POINT);
-  aPtA->SetScale(5.);
+  aPtA->SetScale(5. * aRatio);
   aPtA->SetColor(!aCustomColor ? aInternalColor : myCustomColor);
   aGroup->SetPrimitivesAspect(aPtA);
   aGroup->AddPrimitiveArray (aPntArray);

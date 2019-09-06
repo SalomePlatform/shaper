@@ -58,6 +58,9 @@ class Model_ResultConstruction : public ModelAPI_ResultConstruction
   MODEL_EXPORT virtual int facesNum(const bool theUpdateNaming = true);
   /// if the construction result may be used as faces, this method returns face by zero based index
   MODEL_EXPORT virtual std::shared_ptr<GeomAPI_Face> face(const int theIndex);
+  /// Change the order of faces
+  MODEL_EXPORT
+  virtual void setFacesOrder(const std::list<std::shared_ptr<GeomAPI_Face> >& theFaces);
 
   /// By default object is not infinite.
   MODEL_EXPORT virtual bool isInfinite();

@@ -173,8 +173,7 @@ void FeaturesPlugin_MultiTranslation::performOneDirection()
     } else {
       std::string anError;
       ListOfShape aListOfShape;
-      std::shared_ptr<GeomAlgoAPI_MakeShapeList>
-          aListOfTranslationAlgo(new GeomAlgoAPI_MakeShapeList);
+      ListOfMakeShape aMakeShapeList;
 
       for (int i=0; i<nbCopies; i++) {
         std::shared_ptr<GeomAlgoAPI_Translation> aTranslationAlgo(
@@ -194,8 +193,12 @@ void FeaturesPlugin_MultiTranslation::performOneDirection()
           break;
         }
         aListOfShape.push_back(aTranslationAlgo->shape());
-        aListOfTranslationAlgo->appendAlgo(aTranslationAlgo);
+        aMakeShapeList.push_back(aTranslationAlgo);
       }
+
+      std::shared_ptr<GeomAlgoAPI_MakeShapeList>
+          aListOfTranslationAlgo(new GeomAlgoAPI_MakeShapeList(aMakeShapeList));
+
       std::shared_ptr<GeomAPI_Shape> aCompound =
         GeomAlgoAPI_CompoundBuilder::compound(aListOfShape);
       ResultBodyPtr aResultBody = document()->createBody(data(), aResultIndex);
@@ -366,8 +369,7 @@ void FeaturesPlugin_MultiTranslation::performTwoDirection()
     } else {
       std::string anError;
       ListOfShape aListOfShape;
-      std::shared_ptr<GeomAlgoAPI_MakeShapeList>
-          aListOfTranslationAlgo(new GeomAlgoAPI_MakeShapeList);
+      ListOfMakeShape aMakeShapeList;
 
       for (int j=0; j<aSecondNbCopies; j++) {
         for (int i=0; i<aFirstNbCopies; i++) {
@@ -391,9 +393,13 @@ void FeaturesPlugin_MultiTranslation::performTwoDirection()
             break;
           }
           aListOfShape.push_back(aTranslationAlgo->shape());
-          aListOfTranslationAlgo->appendAlgo(aTranslationAlgo);
+          aMakeShapeList.push_back(aTranslationAlgo);
         }
       }
+
+      std::shared_ptr<GeomAlgoAPI_MakeShapeList>
+          aListOfTranslationAlgo(new GeomAlgoAPI_MakeShapeList(aMakeShapeList));
+
       std::shared_ptr<GeomAPI_Shape> aCompound =
         GeomAlgoAPI_CompoundBuilder::compound(aListOfShape);
       ResultBodyPtr aResultBody = document()->createBody(data(), aResultIndex);

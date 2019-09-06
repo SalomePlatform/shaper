@@ -22,6 +22,7 @@
 
 #include "ModuleBase.h"
 #include "ModuleBase_IWorkshop.h"
+#include <ModuleBase_SelectionFilterType.h>
 
 #include <ModelAPI_Feature.h>
 #include <ModelAPI_Attribute.h>
@@ -76,7 +77,7 @@ class MODULEBASE_EXPORT ModuleBase_IModule : public QObject
    /// \param theParent instance of workshop interface
    ModuleBase_IModule(ModuleBase_IWorkshop* theParent);
 
-  virtual ~ModuleBase_IModule() {}
+   virtual ~ModuleBase_IModule();
 
   /// Stores the current selection
   virtual void storeSelection() {}
@@ -242,12 +243,18 @@ class MODULEBASE_EXPORT ModuleBase_IModule : public QObject
 
   /// Returns types of registered module selection filters
   /// \param theSelectionFilters [out] container of type value
-  virtual QIntList selectionFilters() { return QIntList(); }
+  virtual QIntList selectionFilters();
 
   /// Returns selection filter
   /// \param theType selection filter type
   /// \param theFilter instance of filter
-  virtual Handle(SelectMgr_Filter) selectionFilter(const int theType) = 0;
+  virtual Handle(SelectMgr_Filter) selectionFilter(const int theType);
+
+  /// Append selection filter into the module and type of the filter in internal container
+  /// \param theFilterType selection filter type
+  /// \param theFilter added filter
+  void registerSelectionFilter(const ModuleBase_SelectionFilterType theFilterType,
+    const Handle(SelectMgr_Filter)& theFilter);
 
   /// Return true if the custom presentation is activated
   /// \param theFlag a flag of level of customization, which means that only part of sub-elements
@@ -424,6 +431,9 @@ protected:
 
   /// Map of features in XML
   std::map<std::string, std::string> myFeaturesInFiles;
+
+  std::map<ModuleBase_SelectionFilterType, Handle(SelectMgr_Filter)> mySelectionFilters;
+
 };
 
 

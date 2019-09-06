@@ -30,7 +30,8 @@
 #include <QTextCodec>
 
 XGUI_ErrorDialog::XGUI_ErrorDialog(QWidget* parent)
-    : QDialog(parent)
+    : QDialog(parent, Qt::CustomizeWindowHint | Qt::WindowTitleHint |
+      Qt::WindowSystemMenuHint | Qt::WindowCloseButtonHint)
 {
   QVBoxLayout* aDlgLay = new QVBoxLayout(this);
   setWindowTitle(tr("Application errors"));

@@ -177,6 +177,19 @@ Handle(Image_AlienPixMap) SketcherPrs_SymbolPrs::icon()
   aFile += iconName();
   Handle(Image_AlienPixMap) aPixMap = new Image_AlienPixMap();
   if (aPixMap->Load(aFile.c_str())) {
+    int aRatio = SketcherPrs_Tools::pixelRatio();
+    if (aRatio > 1) {
+      Handle(Image_AlienPixMap) aSizedMap = new Image_AlienPixMap();
+      Standard_Size aWidth = aPixMap->Width() * aRatio;
+      Standard_Size aHeigh = aPixMap->Height() * aRatio;
+      aSizedMap->InitTrash(aPixMap->Format(), aWidth, aHeigh);
+      for (Standard_Size i = 0; i < aWidth; i++) {
+        for (Standard_Size j = 0; j < aHeigh; j++) {
+          aSizedMap->SetPixelColor(i, j, aPixMap->PixelColor(i / aRatio, j / aRatio));
+        }
+      }
+      aPixMap = aSizedMap;
+    }
     myIconsMap[iconName()] = aPixMap;
     return aPixMap;
   }

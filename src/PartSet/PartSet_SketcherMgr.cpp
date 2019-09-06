@@ -463,6 +463,10 @@ void PartSet_SketcherMgr::onMousePressed(ModuleBase_IViewWindow* theWnd, QMouseE
 
 void PartSet_SketcherMgr::onMouseReleased(ModuleBase_IViewWindow* theWnd, QMouseEvent* theEvent)
 {
+  ModuleBase_IWorkshop* aWorkshop = myModule->workshop();
+  if (myIsDragging)
+    aWorkshop->viewer()->enableDrawMode(myPreviousDrawModeEnabled);
+
   bool aWasDragging = myIsDragging;
   myIsDragging = false;
 
@@ -473,7 +477,6 @@ void PartSet_SketcherMgr::onMouseReleased(ModuleBase_IViewWindow* theWnd, QMouse
   if (!myIsMouseOverViewProcessed) {
     return;
   }
-  ModuleBase_IWorkshop* aWorkshop = myModule->workshop();
   ModuleBase_IViewer* aViewer = aWorkshop->viewer();
   //if (!aViewer->canDragByMouse())
   //  return;
@@ -510,7 +513,6 @@ void PartSet_SketcherMgr::onMouseReleased(ModuleBase_IViewWindow* theWnd, QMouse
     }
   }
 
-  aWorkshop->viewer()->enableDrawMode(myPreviousDrawModeEnabled);
 
   ModuleBase_ModelWidget* anActiveWidget = getActiveWidget();
   PartSet_MouseProcessor* aProcessor = dynamic_cast<PartSet_MouseProcessor*>(anActiveWidget);
@@ -988,6 +990,8 @@ void PartSet_SketcherMgr::startSketch(ModuleBase_Operation* theOperation)
   if (!aFOperation)
     return;
 
+  SketcherPrs_Tools::setPixelRatio(ModuleBase_Tools::currentPixelRatio());
+
   myModule->onViewTransformed();
 
   // Display all sketcher sub-Objects
@@ -1227,13 +1231,13 @@ void PartSet_SketcherMgr::commitNestedSketch(ModuleBase_Operation* theOperation)
   }
 }
 
-bool PartSet_SketcherMgr::sketchSelectionFilter(const XGUI_SelectionFilterType theFilterType)
+bool PartSet_SketcherMgr::sketchSelectionFilter(const ModuleBase_SelectionFilterType theFilterType)
 {
   return mySelectionFilterTypes.find(theFilterType) != mySelectionFilterTypes.end();
 }
 
-void PartSet_SketcherMgr::registerSelectionFilter(const XGUI_SelectionFilterType theFilterType,
-                                                  const Handle(SelectMgr_Filter)& theFilter)
+void PartSet_SketcherMgr::registerSelectionFilter(
+  const ModuleBase_SelectionFilterType theFilterType, const Handle(SelectMgr_Filter)& theFilter)
 {
   mySelectionFilterTypes.insert(theFilterType);
   myModule->registerSelectionFilter(theFilterType, theFilter);

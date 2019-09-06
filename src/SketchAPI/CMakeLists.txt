@@ -59,6 +59,7 @@ SET(PROJECT_SOURCES
 )
 
 SET(PROJECT_LIBRARIES
+  GeomAlgoAPI
   ModelAPI
   ModelHighAPI
   SketcherPrs
@@ -78,6 +79,7 @@ INCLUDE_DIRECTORIES(
   # TODO(spo): modify ConstructionPlugin headers to remove dependency on GeomAPI headers
   ${PROJECT_SOURCE_DIR}/src/Config
   ${PROJECT_SOURCE_DIR}/src/GeomAPI
+  ${PROJECT_SOURCE_DIR}/src/GeomAlgoAPI
   ${PROJECT_SOURCE_DIR}/src/SketchPlugin
 )
 

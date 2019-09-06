@@ -132,6 +132,10 @@ aFound = aPartDoc.findContainingFolder(Sketch_2.feature())
 assert(aFound[0].data().isEqual(aFolder.data()))
 assert(aFound[1] == 0)
 
+# check sketch is the last feature in the folder
+aLastFeature = Folder_2.lastVisibleFeature()
+assert(aLastFeature.getKind() == "Sketch")
+
 
 #=========================================================================
 # Test 3. Sketch could be removed from the folder

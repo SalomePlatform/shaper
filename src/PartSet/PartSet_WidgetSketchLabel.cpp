@@ -551,6 +551,12 @@ void PartSet_WidgetSketchLabel::deactivate()
 
   if (aHidePreview)
     myWorkshop->viewer()->update();
+
+  if (myOpenTransaction) {
+    SessionPtr aMgr = ModelAPI_Session::get();
+    aMgr->finishOperation();
+    myOpenTransaction = false;
+  }
 }
 
 void PartSet_WidgetSketchLabel::selectionModes(int& theModuleSelectionModes, QIntList& theModes)
@@ -691,6 +697,13 @@ void PartSet_WidgetSketchLabel::onChangePlane()
     mySizeOfViewWidget->setVisible(false);
     myRemoveExternal->setVisible(true);
     myStackWidget->setCurrentIndex(0);
+
+    bool aBodyIsVisualized = myPreviewPlanes->hasVisualizedBodies(myWorkshop);
+
+    if (!aBodyIsVisualized) {
+      // We have to select a plane before any operation
+      myPreviewPlanes->showPreviewPlanes(myWorkshop);
+    }
 
     CompositeFeaturePtr aSketch = std::dynamic_pointer_cast<ModelAPI_CompositeFeature>(myFeature);
     PartSet_Tools::nullifySketchPlane(aSketch);

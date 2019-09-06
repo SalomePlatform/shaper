@@ -5,7 +5,7 @@
                       label="Main objects"
                       icon="icons/Features/cut_shape.png"
                       tooltip="Select solid objects"
-                      type_choice="solid objects"
+                      shape_types="solid objects"
                       concealment="true">
         <validator id="FeaturesPlugin_ValidatorTransform"/>
       </multi_selector>
@@ -23,7 +23,7 @@
                       label="Main objects"
                       icon="icons/Features/cut_shape.png"
                       tooltip="Select solid objects"
-                      type_choice="solid objects"
+                      shape_types="solid objects"
                       concealment="true">
         <validator id="FeaturesPlugin_ValidatorTransform"/>
       </multi_selector>
@@ -42,7 +42,7 @@
                       label="Main objects"
                       icon="icons/Features/cut_shape.png"
                       tooltip="Select solid objects"
-                      type_choice="solid objects"
+                      shape_types="solid objects"
                       concealment="true">
         <validator id="FeaturesPlugin_ValidatorTransform"/>
       </multi_selector>

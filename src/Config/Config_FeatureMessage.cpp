@@ -147,6 +147,7 @@ void Config_FeatureMessage::setPluginLibrary(const std::string& myPluginLibrary)
   this->myPluginLibrary = myPluginLibrary;
 }
 
+// LCOV_EXCL_START
 bool Config_FeatureMessage::isUseInput() const
 {
   return myUseInput;
@@ -176,7 +177,7 @@ bool Config_FeatureMessage::isApplyContinue() const
 {
   return myIsApplyContinue;
 }
-
+// LCOV_EXCL_STOP
 
 void Config_FeatureMessage::setUseInput(bool isUseInput)
 {

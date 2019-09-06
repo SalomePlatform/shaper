@@ -3,7 +3,7 @@
     label="Main objects"
     icon=""
     tooltip="Select objects"
-    type_choice="vertices edges wires faces shells solids compsolids compounds"
+    shape_types="vertices edges wires faces shells solids compsolids compounds"
     use_choice="false"
     concealment="true">
     <validator id="PartSet_DifferentObjects"/>
@@ -13,7 +13,7 @@
     label="Tool objects"
     icon=""
     tooltip="Select tools"
-    type_choice="vertices edges wires faces shells solids compsolids compounds"
+    shape_types="vertices edges wires faces shells solids compsolids compounds"
     use_choice="false"
     concealment="true" >
     <validator id="PartSet_DifferentObjects"/>

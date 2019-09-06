@@ -165,19 +165,19 @@ def checkResultInGEOM():
 
   field_1_GEOM = getSubObject(geomObject_1, 5)
   assert field_1_GEOM.GetName() == 'Field_solids'
-  assert field_1_GEOM.GetStep(0).GetValues() == [3.0]
+  assert field_1_GEOM.GetStep(1).GetValues() == [3.0]
 
   field_2_GEOM = getSubObject(geomObject_1, 6)
   assert field_2_GEOM.GetName() == 'Field_faces'
-  assert field_2_GEOM.GetStep(0).GetValues() == [0.0, 0.0, 0.0, 0.0, 1.0, 2.0]
+  assert field_2_GEOM.GetStep(1).GetValues() == [0.0, 0.0, 0.0, 0.0, 1.0, 2.0]
 
   field_3_GEOM = getSubObject(geomObject_1, 7)
   assert field_3_GEOM.GetName() == 'Field_edges'
-  assert field_3_GEOM.GetStep(0).GetValues() == [0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 2.0, 0.0, 1.0, 0.0, 0.0, 0.0]
+  assert field_3_GEOM.GetStep(1).GetValues() == [0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 2.0, 0.0, 1.0, 0.0, 0.0, 0.0]
 
   field_4_GEOM = getSubObject(geomObject_1, 8)
   assert field_4_GEOM.GetName() == 'Field_vertices'
-  assert field_4_GEOM.GetStep(0).GetValues() == [0.0, 0.0, 0.0, 1.0, 3.0, 1.0, 3.0, 1.0]
+  assert field_4_GEOM.GetStep(1).GetValues() == [0.0, 0.0, 0.0, 1.0, 3.0, 1.0, 3.0, 1.0]
 
   pass
 

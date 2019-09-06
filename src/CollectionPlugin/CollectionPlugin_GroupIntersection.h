@@ -21,15 +21,15 @@
 #define COLLECTIONPLUGIN_GROUPINTERSECTION_H_
 
 #include "CollectionPlugin.h"
-#include "CollectionPlugin_Group.h"
+#include "CollectionPlugin_GroupOperation.h"
 
 /**\class CollectionPlugin_GroupIntersection
  * \ingroup Plugins
  * \brief Merge several groups of same shape type into single group.
  */
-class CollectionPlugin_GroupIntersection : public CollectionPlugin_Group
+class CollectionPlugin_GroupIntersection : public CollectionPlugin_GroupOperation
 {
- public:
+public:
   /// Extrusion kind
   inline static const std::string& ID()
   {
@@ -55,9 +55,6 @@ class CollectionPlugin_GroupIntersection : public CollectionPlugin_Group
 
   /// Request for initialization of data model of the feature: adding all attributes
   COLLECTIONPLUGIN_EXPORT virtual void initAttributes();
-
-  /// Result of groups is created on the fly and don't stored to the document
-  COLLECTIONPLUGIN_EXPORT virtual bool isPersistentResult() {return true;}
 
   /// Use plugin manager for features creation
   CollectionPlugin_GroupIntersection();

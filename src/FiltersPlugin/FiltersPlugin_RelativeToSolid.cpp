@@ -29,7 +29,7 @@
 
 bool FiltersPlugin_RelativeToSolid::isSupported(GeomAPI_Shape::ShapeType theType) const
 {
-  return true;
+  return theType >= GeomAPI_Shape::SHELL;
 }
 
 bool FiltersPlugin_RelativeToSolid::isOk(const GeomShapePtr& theShape, const ResultPtr&,

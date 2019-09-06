@@ -2,7 +2,7 @@
   <multi_selector id="base_objects"
                   label="Solids and CompSolids:"
                   tooltip="Select solids or compsolids."
-                  type_choice="faces shells solids compsolids"
+                  shape_types="faces shells solids compsolids"
                   concealment="true">
     <validator id="BuildPlugin_ValidatorBaseForBuild" parameters="face,shell,solid,compsolid"/>
   </multi_selector>

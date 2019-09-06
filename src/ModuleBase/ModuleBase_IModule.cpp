@@ -71,6 +71,18 @@ ModuleBase_IModule::ModuleBase_IModule(ModuleBase_IWorkshop* theParent)
   //        SLOT(onMouseDoubleClick(QMouseEvent*)));
 }
 
+ModuleBase_IModule::~ModuleBase_IModule()
+{
+  std::map<ModuleBase_SelectionFilterType, Handle(SelectMgr_Filter)>::const_iterator aFiltersIt =
+    mySelectionFilters.begin();
+  for (; aFiltersIt != mySelectionFilters.end(); aFiltersIt++) {
+    Handle(SelectMgr_Filter) aFilter = aFiltersIt->second;
+    if (!aFilter.IsNull())
+      aFilter.Nullify();
+  }
+}
+
+
 void ModuleBase_IModule::launchModal(const QString& theCmdId)
 {
   bool isCommitted;
@@ -322,4 +334,36 @@ void ModuleBase_IModule::getXMLRepresentation(const std::string& theFeatureId,
 
   theXmlCfg = aWdgReader.featureWidgetCfg(theFeatureId);
   theDescription = aWdgReader.featureDescription(theFeatureId);
+}
+
+
+//******************************************************
+QIntList ModuleBase_IModule::selectionFilters()
+{
+  QIntList aTypes;
+
+  std::map<ModuleBase_SelectionFilterType, Handle(SelectMgr_Filter)>::const_iterator aFiltersIt =
+    mySelectionFilters.begin();
+  for (; aFiltersIt != mySelectionFilters.end(); aFiltersIt++)
+    aTypes.append(aFiltersIt->first);
+
+  return aTypes;
+}
+
+//******************************************************
+void ModuleBase_IModule::registerSelectionFilter(const ModuleBase_SelectionFilterType theFilterType,
+  const Handle(SelectMgr_Filter)& theFilter)
+{
+  mySelectionFilters[theFilterType] = theFilter;
+}
+
+//******************************************************
+Handle(SelectMgr_Filter) ModuleBase_IModule::selectionFilter(const int theType)
+{
+  ModuleBase_SelectionFilterType aType = (ModuleBase_SelectionFilterType)theType;
+
+  if (mySelectionFilters.find(aType) != mySelectionFilters.end())
+    return mySelectionFilters[aType];
+  else
+    return Handle(SelectMgr_Filter)();
 }

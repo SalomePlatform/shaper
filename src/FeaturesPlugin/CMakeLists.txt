@@ -486,6 +486,7 @@ ADD_UNIT_TESTS(TestExtrusion.py
                Test2826.py
                Test2854.py
                Test2878.py
+               Test2971.py
                TestBooleanCommon_MultiLevelCompound_v0_1.py
                TestBooleanCommon_MultiLevelCompound_v0_2.py
                TestBooleanCommon_MultiLevelCompound_v20190506_1.py
@@ -523,4 +524,6 @@ ADD_UNIT_TESTS(TestExtrusion.py
                TestRemoveResultsConstruction.py
                TestRemoveResultsPart.py
                Test17000.py
+               Test17261.py
+               Test17281.py
 )

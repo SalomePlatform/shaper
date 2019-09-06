@@ -79,8 +79,8 @@ SET(XML_RESOURCES
 )
 
 ADD_DEFINITIONS(-DFILTERS_EXPORTS ${OpenCASCADE_DEFINITIONS})
-ADD_LIBRARY(Filters SHARED ${PROJECT_SOURCES} ${PROJECT_HEADERS} ${XML_RESOURCES})
-TARGET_LINK_LIBRARIES(Filters ${PROJECT_LIBRARIES})
+ADD_LIBRARY(FiltersPlugin SHARED ${PROJECT_SOURCES} ${PROJECT_HEADERS} ${XML_RESOURCES})
+TARGET_LINK_LIBRARIES(FiltersPlugin ${PROJECT_LIBRARIES})
 
 INCLUDE_DIRECTORIES(
   ${OpenCASCADE_INCLUDE_DIR}
@@ -94,7 +94,7 @@ INCLUDE_DIRECTORIES(
   ${PROJECT_SOURCE_DIR}/src/CollectionPlugin
 )
 
-INSTALL(TARGETS Filters DESTINATION ${SHAPER_INSTALL_PLUGIN_FILES})
+INSTALL(TARGETS FiltersPlugin DESTINATION ${SHAPER_INSTALL_PLUGIN_FILES})
 INSTALL(FILES ${XML_RESOURCES} DESTINATION ${SHAPER_INSTALL_XML_RESOURCES})
 INSTALL(FILES ${PROJECT_PYFILES} DESTINATION ${SHAPER_INSTALL_ADDONS})
 
@@ -119,11 +119,13 @@ ADD_UNIT_TESTS(
   TestFilter_OnGeometry_Face1.py
   TestFilter_OnGeometry_Face2.py
   TestFilter_OnGeometry_Face3.py
+  TestFilter_OnGeometry_Face4.py
   TestFilter_OnGeometry_Exclude_Edge1.py
   TestFilter_OnGeometry_Exclude_Edge2.py
   TestFilter_OnGeometry_Exclude_Face1.py
   TestFilter_OnGeometry_Exclude_Face2.py
   TestFilter_OnGeometry_Exclude_Face3.py
+  TestFilter_OnGeometry_Exclude_Face4.py
   TestFilter_OnPlaneSide_Face.py
   TestFilter_OnPlaneSide_Plane.py
   TestFilter_OnPlaneSide_Exclude_Face.py

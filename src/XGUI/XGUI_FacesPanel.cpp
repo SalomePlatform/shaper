@@ -18,26 +18,25 @@
 //
 
 #include "XGUI_FacesPanel.h"
+#include "XGUI_ObjectsBrowser.h"
+#include "XGUI_SelectionMgr.h"
+#include "XGUI_Tools.h"
+#include "XGUI_Workshop.h"
+
+#include <ModuleBase_IModule.h>
+#include <ModuleBase_ISelection.h>
+#include <ModuleBase_IWorkshop.h>
+#include <ModuleBase_ListView.h>
+#include <ModuleBase_ResultPrs.h>
+#include <ModuleBase_Tools.h>
+#include <ModuleBase_ViewerPrs.h>
+#include <ModuleBase_SelectionFilterType.h>
 
 #include <Config_PropManager.h>
 #include <Events_Loop.h>
 #include <GeomAlgoAPI_CompoundBuilder.h>
 
 #include <ModelAPI_Events.h>
-
-#include <ModuleBase_IModule.h>
-#include <ModuleBase_ISelection.h>
-#include "ModuleBase_IWorkshop.h"
-#include "ModuleBase_ListView.h"
-#include "ModuleBase_ResultPrs.h"
-#include "ModuleBase_Tools.h"
-#include "ModuleBase_ViewerPrs.h"
-
-#include "XGUI_ObjectsBrowser.h"
-#include "XGUI_SelectionMgr.h"
-#include "XGUI_SelectionFilterType.h"
-#include "XGUI_Tools.h"
-#include "XGUI_Workshop.h"
 
 #include <QAction>
 #include <QCheckBox>
@@ -256,18 +255,18 @@ void XGUI_FacesPanel::processSelection()
       continue;
     Handle(ModuleBase_ResultPrs) aResultPrs = anObjectToPrs.at(anObject);
 
-    if (aResultPrs->hasSubShapeVisible(anIt->second) || useTransparency()) // redisplay
-      ModelAPI_EventCreator::get()->sendUpdated(anObject, aDispEvent);
-    else { // erase object because it is entirely hidden
+    if (!aResultPrs->hasSubShapeVisible(anIt->second)) { // redisplay
+      // erase object because it is entirely hidden
       anObject->setDisplayed(false);
       myHiddenObjects.insert(anObject);
-      ModelAPI_EventCreator::get()->sendUpdated(anObject, aDispEvent);
     }
+    ModelAPI_EventCreator::get()->sendUpdated(anObject, aDispEvent);
   }
   if (isModified) {
     updateProcessedObjects(myItems, myItemObjects);
     flushRedisplay();
   }
+  onTransparencyChanged();
 }
 
 //********************************************************************

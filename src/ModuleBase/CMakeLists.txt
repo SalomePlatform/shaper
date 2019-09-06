@@ -105,6 +105,7 @@ SET(PROJECT_HEADERS
   ModuleBase_ITreeNode.h
   ModuleBase_WidgetSelectionFilter.h
   ModuleBase_IStepPrs.h
+  ModuleBase_SelectionFilterType.h
 )
 
 SET(PROJECT_MOC_HEADERS

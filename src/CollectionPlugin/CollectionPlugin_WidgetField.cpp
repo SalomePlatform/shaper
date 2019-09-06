@@ -975,6 +975,9 @@ void CollectionPlugin_WidgetField::onShapeTypeChanged(int theType)
   if (aTypeName == aSelList->selectionType())
     return;
   aSelList->setSelectionType(aTypeName);
+  // Updated event has to be sent here in case if type of shapes
+  // was changed from Part to any other in order to updater Apply button status
+  myFeature->data()->sendAttributeUpdated(aSelList.get());
 
   //Clear old selection
   clearData();

@@ -51,7 +51,7 @@ static bool isGroupTypeCorrect(const AttributeSelectionPtr& theSelection,
 {
   // applicable the groups only
   ResultPtr aGroupResult = theSelection->context();
-  if (aGroupResult->groupName() != ModelAPI_ResultGroup::group()) {
+  if (!aGroupResult.get() || aGroupResult->groupName() != ModelAPI_ResultGroup::group()) {
     theError = "Error: Groups can be selected only.";
     return false;
   }

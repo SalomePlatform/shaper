@@ -2,7 +2,7 @@
   <multi_selector id="base_objects"
     label="Base objects:"
     tooltip="Select objects for partitioning."
-    type_choice="objects"
+    shape_types="objects"
     concealment="true"
     clear_in_neutral_point="false">
     <validator id="FeaturesPlugin_ValidatorPartitionSelection" parameters="Plane"/>

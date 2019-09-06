@@ -33,6 +33,7 @@ SET(PROJECT_HEADERS
     CollectionPlugin_Group.h
     CollectionPlugin_GroupAddition.h
     CollectionPlugin_GroupIntersection.h
+    CollectionPlugin_GroupOperation.h
     CollectionPlugin_GroupSubstraction.h
     CollectionPlugin_Field.h
     CollectionPlugin_WidgetCreator.h
@@ -49,6 +50,7 @@ SET(PROJECT_SOURCES
     CollectionPlugin_Group.cpp
     CollectionPlugin_GroupAddition.cpp
     CollectionPlugin_GroupIntersection.cpp
+    CollectionPlugin_GroupOperation.cpp
     CollectionPlugin_GroupSubstraction.cpp
     CollectionPlugin_Field.cpp
     CollectionPlugin_WidgetCreator.cpp
@@ -144,4 +146,5 @@ ADD_UNIT_TESTS(
                TestGroupSubstraction.py
                TestGroupSubstraction_Error1.py
                TestGroupSubstraction_Error2.py
+               Test2977.py
 )

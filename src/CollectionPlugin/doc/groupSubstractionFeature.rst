@@ -34,7 +34,7 @@ Note, that operation is valid only if all the main groups and all the tool group
     :param part: The current part object
     :param list: A list of main groups
     :param list: A list of tool groups
-    :return: Created object.
+    :return: Created group.
 
 
 **See Also** a sample TUI Script of :ref:`tui_create_group_substraction` operation.

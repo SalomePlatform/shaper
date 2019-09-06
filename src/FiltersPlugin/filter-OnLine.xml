@@ -2,7 +2,7 @@
   <multi_selector id="OnLine__OnLine"
                   label="Lines:"
                   tooltip="Select vertices or segments."
-                  type_choice="edges">
+                  shape_types="edges">
     <validator id="GeomValidators_ShapeType" parameters="line"/>
   </multi_selector>
 </filter>

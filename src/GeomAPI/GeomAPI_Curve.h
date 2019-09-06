@@ -45,6 +45,10 @@ class GeomAPI_Curve : public GeomAPI_Interface
   GEOMAPI_EXPORT
   bool isNull() const;
 
+  /// Returns \c true if curves are equal
+  GEOMAPI_EXPORT
+  bool isEqual(const std::shared_ptr<GeomAPI_Curve>& theOther) const;
+
   /// Returns whether the curve is linear
   GEOMAPI_EXPORT
   virtual bool isLine() const;
@@ -61,10 +65,29 @@ class GeomAPI_Curve : public GeomAPI_Interface
   GEOMAPI_EXPORT
   double endParam() const { return myEnd; }
 
+  /// Returns \c true if the curve is trimmed
+  GEOMAPI_EXPORT
+  virtual bool isTrimmed() const;
+
+  /// Returns basis for the trimmed curve
+  GEOMAPI_EXPORT
+  virtual std::shared_ptr<GeomAPI_Curve> basisCurve() const;
+
   /// Returns point on the curve by parameter
   /// \param theParam parameter on the curve
   GEOMAPI_EXPORT
   std::shared_ptr<GeomAPI_Pnt> getPoint(double theParam);
+
+public:
+  /// \brief Compare addresses of curves
+  class Comparator
+  {
+  public:
+    /// Return \c true if the address of the first curve is less than the address of the second
+    GEOMAPI_EXPORT
+    bool operator ()(const std::shared_ptr<GeomAPI_Curve>& theCurve1,
+                     const std::shared_ptr<GeomAPI_Curve>& theCurve2) const;
+  };
 
 private:
   double myStart;

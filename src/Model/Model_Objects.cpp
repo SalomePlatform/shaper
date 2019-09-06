@@ -886,6 +886,19 @@ void Model_Objects::synchronizeFeatures(
             std::list<std::shared_ptr<ModelAPI_Attribute> >::iterator anAttr = anAttrs.begin();
             for(; anAttr != anAttrs.end(); anAttr++)
               (*anAttr)->reinit();
+            // if feature contains results, re-init them too
+            if (aFeature.get()) {
+              std::list<ResultPtr> aResults;
+              ModelAPI_Tools::allResults(aFeature, aResults);
+              std::list<ResultPtr>::iterator aResIter = aResults.begin();
+              for(; aResIter != aResults.end(); aResIter++) {
+                std::list<std::shared_ptr<ModelAPI_Attribute> > anAttrs =
+                  (*aResIter)->data()->attributes("");
+                std::list<std::shared_ptr<ModelAPI_Attribute> >::iterator anAttr = anAttrs.begin();
+                for(; anAttr != anAttrs.end(); anAttr++)
+                  (*anAttr)->reinit();
+              }
+            }
           }
         }
         ModelAPI_EventCreator::get()->sendUpdated(anObject, anUpdateEvent);
@@ -1835,6 +1848,10 @@ void Model_Objects::updateResults(FeaturePtr theFeature, std::set<FeaturePtr>& t
     }
   }
 
+  // it may be on undo
+  if (!theFeature->data() || !theFeature->data()->isValid() || theFeature->isDisabled())
+    return;
+
   // check the existing results and remove them if there is nothing on the label
   std::list<ResultPtr>::const_iterator aResIter = theFeature->results().cbegin();
   while(aResIter != theFeature->results().cend()) {
@@ -1851,9 +1868,6 @@ void Model_Objects::updateResults(FeaturePtr theFeature, std::set<FeaturePtr>& t
     }
     aResIter++;
   }
-  // it may be on undo
-  if (!theFeature->data() || !theFeature->data()->isValid() || theFeature->isDisabled())
-    return;
   // check that results are presented on all labels
   int aResSize = int(theFeature->results().size());
   TDF_ChildIterator aLabIter(resultLabel(theFeature->data(), 0).Father());
