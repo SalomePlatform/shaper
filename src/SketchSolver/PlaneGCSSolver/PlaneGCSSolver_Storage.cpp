@@ -299,16 +299,16 @@ static void createArcConstraints(const EntityWrapperPtr& theArc,
 
   // Additional constaints to fix arc's extra DoF (if the arc is not external):
   std::list<GCSConstraintPtr> anArcConstraints;
-  // constrain the start point on the arc
-  anArcConstraints.push_back(GCSConstraintPtr(new GCS::ConstraintCurveValue(
-    anArc->start, anArc->start.x, *anArc, anArc->startAngle)));
-  anArcConstraints.push_back(GCSConstraintPtr(new GCS::ConstraintCurveValue(
-    anArc->start, anArc->start.y, *anArc, anArc->startAngle)));
-  // constrain the end point on the arc
-  anArcConstraints.push_back(GCSConstraintPtr(new GCS::ConstraintCurveValue(
-    anArc->end, anArc->end.x, *anArc, anArc->endAngle)));
-  anArcConstraints.push_back(GCSConstraintPtr(new GCS::ConstraintCurveValue(
-    anArc->end, anArc->end.y, *anArc, anArc->endAngle)));
+  // 1. distances from center till start and end points are equal to radius
+  anArcConstraints.push_back(GCSConstraintPtr(new GCS::ConstraintP2PDistance(
+      anArc->center, anArc->start, anArc->rad)));
+  anArcConstraints.push_back(GCSConstraintPtr(new GCS::ConstraintP2PDistance(
+      anArc->center, anArc->end, anArc->rad)));
+  // 2. angles of start and end points should be equal to the arc angles
+  anArcConstraints.push_back(GCSConstraintPtr(new GCS::ConstraintP2PAngle(
+      anArc->center, anArc->start, anArc->startAngle)));
+  anArcConstraints.push_back(GCSConstraintPtr(new GCS::ConstraintP2PAngle(
+      anArc->center, anArc->end, anArc->endAngle)));
 
   ConstraintWrapperPtr aWrapper(
     new PlaneGCSSolver_ConstraintWrapper(anArcConstraints, CONSTRAINT_UNKNOWN));
