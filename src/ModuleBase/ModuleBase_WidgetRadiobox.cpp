@@ -56,11 +56,11 @@ int ModuleBase_WidgetRadiobox::addPage(ModuleBase_PageBase* thePage,
   QRadioButton* aButton;
   if (theIcon.isNull()) {
     aButton = new QRadioButton(theName, aWgt);
-    aButton->setToolTip(theTooltip);
+    aButton->setToolTip(translate(theTooltip.toStdString()));
   }
   else {
     aButton = new QRadioButton(aWgt);
-    aButton->setToolTip(theName);
+    aButton->setToolTip(translate(theName.toStdString()));
   }
   aLay->addStretch();
   aLay->addWidget(aButton);
