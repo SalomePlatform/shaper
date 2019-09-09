@@ -223,6 +223,30 @@ bool PlaneGCSSolver_Storage::update(FeaturePtr theFeature, bool theForce)
   if (sendNotify && isUpdated)
     notify(theFeature);
 
+  // update arc
+  if (aRelated && aRelated->type() == ENTITY_ARC) {
+    /// TODO: this code should be shared with FeatureBuilder somehow
+
+    std::shared_ptr<PlaneGCSSolver_EdgeWrapper> anEntity =
+      std::dynamic_pointer_cast<PlaneGCSSolver_EdgeWrapper>(aRelated);
+    std::shared_ptr<GCS::Arc> anArc = std::dynamic_pointer_cast<GCS::Arc>(anEntity->entity());
+
+    static std::shared_ptr<GeomAPI_Dir2d> OX(new GeomAPI_Dir2d(1.0, 0.0));
+    std::shared_ptr<GeomAPI_Pnt2d> aCenter(
+      new GeomAPI_Pnt2d(*anArc->center.x, *anArc->center.y));
+    std::shared_ptr<GeomAPI_Pnt2d> aStart(
+      new GeomAPI_Pnt2d(*anArc->start.x, *anArc->start.y));
+
+    *anArc->rad = aStart->distance(aCenter);
+
+    std::shared_ptr<GeomAPI_Dir2d> aDir(new GeomAPI_Dir2d(aStart->xy()->decreased(aCenter->xy())));
+    *anArc->startAngle = OX->angle(aDir);
+
+    aDir = std::shared_ptr<GeomAPI_Dir2d>(
+      new GeomAPI_Dir2d((*anArc->end.x) - aCenter->x(), (*anArc->end.y) - aCenter->y()));
+    *anArc->endAngle = OX->angle(aDir);
+  }
+
   return isUpdated;
 }
 
