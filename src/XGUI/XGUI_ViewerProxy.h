@@ -170,14 +170,14 @@ Q_OBJECT
   //virtual void Zfitall();
 
 #ifdef HAVE_SALOME
-  void setFitter(OCCViewer_Fitter* theFitter);
-  OCCViewer_Fitter* currentFitter() const;
+  virtual void setFitter(OCCViewer_Fitter* theFitter);
+  virtual OCCViewer_Fitter* currentFitter() const;
 #else
-  void setFitter(AppElements_Fitter* theFitter);
-  AppElements_Fitter* currentFitter() const;
+  virtual void setFitter(AppElements_Fitter* theFitter);
+  virtual AppElements_Fitter* currentFitter() const;
 #endif
 
-  void unsetFitter();
+  virtual void unsetFitter();
 
 signals:
   /// Emits by mouse entering the view port

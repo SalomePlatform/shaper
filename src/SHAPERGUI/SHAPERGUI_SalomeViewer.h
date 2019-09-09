@@ -208,6 +208,10 @@ Q_OBJECT
   // \param theText is a title
   virtual void setColorScaleTitle(const QString& theText);
 
+  virtual void setFitter(OCCViewer_Fitter* theFitter);
+  virtual OCCViewer_Fitter* currentFitter() const;
+  virtual void unsetFitter();
+
   // Fit all along Z (perpendicular to display)
   //virtual void Zfitall();
 

@@ -32,6 +32,11 @@ class QMouseEvent;
 class QKeyEvent;
 class QContextMenuEvent;
 class ModuleBase_IViewWindow;
+#ifdef HAVE_SALOME
+class OCCViewer_Fitter;
+#else
+class AppElements_Fitter;
+#endif
 
 /**
  * \ingroup GUI
@@ -192,7 +197,19 @@ Q_OBJECT
     myShowHighlight = false;
   }
 
+#ifdef HAVE_SALOME
+  virtual void setFitter(OCCViewer_Fitter* theFitter) = 0;
+  virtual OCCViewer_Fitter* currentFitter() const = 0;
+#else
+  virtual void setFitter(AppElements_Fitter* theFitter) = 0;
+  virtual AppElements_Fitter* currentFitter() const = 0;
+#endif
+
+  virtual void unsetFitter() = 0;
+
+
   static Handle(Prs3d_Drawer) DefaultHighlightDrawer;
+
 
 signals:
   /// Signal emited when last view window is closed

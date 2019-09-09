@@ -1101,16 +1101,14 @@ void PartSet_SketcherMgr::startSketch(ModuleBase_Operation* theOperation)
   workshop()->viewer()->set2dMode(true);
 
   PartSet_Fitter* aFitter = new PartSet_Fitter(myCurrentSketch);
-  XGUI_Workshop* aWorkshop = aConnector->workshop();
-  aWorkshop->viewer()->setFitter(aFitter);
+  myModule->workshop()->viewer()->setFitter(aFitter);
 }
 
 void PartSet_SketcherMgr::stopSketch(ModuleBase_Operation* theOperation)
 {
   XGUI_ModuleConnector* aConnector = dynamic_cast<XGUI_ModuleConnector*>(myModule->workshop());
-  XGUI_Workshop* aWorkshop = aConnector->workshop();
-  PartSet_Fitter* aFitter = (PartSet_Fitter*)aWorkshop->viewer()->currentFitter();
-  aWorkshop->viewer()->unsetFitter();
+  PartSet_Fitter* aFitter = (PartSet_Fitter*)myModule->workshop()->viewer()->currentFitter();
+  myModule->workshop()->viewer()->unsetFitter();
   delete aFitter;
 
   myIsMouseOverWindow = false;
