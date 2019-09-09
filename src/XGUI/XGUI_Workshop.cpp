@@ -1961,7 +1961,8 @@ void XGUI_Workshop::cleanHistory()
     QString anUnusedNames = aNames.join(", ");
 
     QString anActionId = "CLEAN_HISTORY_CMD";
-    QString aDescription = ModuleBase_Tools::translate("workshop", contextMenuMgr()->action(anActionId)->text().toStdString());
+    QString aDescription = ModuleBase_Tools::translate("workshop",
+        contextMenuMgr()->action(anActionId)->text().toStdString());
 
     QMessageBox aMessageBox(desktop());
     aMessageBox.setWindowTitle(aDescription);

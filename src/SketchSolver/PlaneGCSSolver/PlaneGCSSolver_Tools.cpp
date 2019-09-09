@@ -353,7 +353,8 @@ ConstraintWrapperPtr createConstraintPointOnEntity(
   case ENTITY_ELLIPTICAL_ARC: {
     std::shared_ptr<GCS::Ellipse> anEllipse =
         std::dynamic_pointer_cast<GCS::Ellipse>(theEntity->entity());
-    aNewConstr = GCSConstraintPtr(new GCS::ConstraintPointOnEllipse(*(thePoint->point()), *anEllipse));
+    aNewConstr = GCSConstraintPtr(
+        new GCS::ConstraintPointOnEllipse(*(thePoint->point()), *anEllipse));
     break;
     }
   default:

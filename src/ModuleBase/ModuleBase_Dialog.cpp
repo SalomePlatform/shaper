@@ -47,7 +47,8 @@ ModuleBase_Dialog::ModuleBase_Dialog(ModuleBase_IWorkshop* theParent, const QStr
                                      myActiveWidget(0)
 {
   ModuleBase_WidgetFactory aFactory(myDescription, myWorkshop);
-  QString aTitle = ModuleBase_Tools::translate("ModuleBase_Dialog", aFactory.widgetAPI()->getProperty(FEATURE_TEXT));
+  QString aTitle = ModuleBase_Tools::translate("ModuleBase_Dialog",
+      aFactory.widgetAPI()->getProperty(FEATURE_TEXT));
 
   setWindowTitle(aTitle);
 

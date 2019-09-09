@@ -352,10 +352,12 @@ static void createEllipseConstraints(
       anAlignmentX = GCS::EllipsePositiveMinorX;
 
     anEllipseConstraints.push_back(GCSConstraintPtr(
-        new GCS::ConstraintInternalAlignmentPoint2Ellipse(*anEllipse, *(aPoint->point()), anAlignmentX)));
+        new GCS::ConstraintInternalAlignmentPoint2Ellipse(
+        *anEllipse, *(aPoint->point()), anAlignmentX)));
     anAlignmentY = (GCS::InternalAlignmentType)((int)anAlignmentX + 1);
     anEllipseConstraints.push_back(GCSConstraintPtr(
-        new GCS::ConstraintInternalAlignmentPoint2Ellipse(*anEllipse, *(aPoint->point()), anAlignmentY)));
+        new GCS::ConstraintInternalAlignmentPoint2Ellipse(
+        *anEllipse, *(aPoint->point()), anAlignmentY)));
   }
 
   // constraint to bind the major radius value
