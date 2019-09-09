@@ -28,9 +28,14 @@
 #include <AIS_Trihedron.hxx>
 #include <AIS_ListOfInteractive.hxx>
 
-#ifndef HAVE_SALOME
+#ifdef HAVE_SALOME
+#include <OCCViewer_ViewModel.h>
+#else
+  #include <AppElements_Viewer.h>
   #include <AppElements_ViewWindow.h>
 #endif
+
+
 
 class XGUI_Workshop;
 /**
@@ -163,6 +168,16 @@ Q_OBJECT
 
   // Fit all along Z (perpendicular to display)
   //virtual void Zfitall();
+
+#ifdef HAVE_SALOME
+  void setFitter(OCCViewer_Fitter* theFitter);
+  OCCViewer_Fitter* currentFitter() const;
+#else
+  void setFitter(AppElements_Fitter* theFitter);
+  AppElements_Fitter* currentFitter() const;
+#endif
+
+  void unsetFitter();
 
 signals:
   /// Emits by mouse entering the view port

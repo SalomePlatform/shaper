@@ -21,6 +21,7 @@
 #define ModuleBase_IViewer_H
 
 #include "ModuleBase.h"
+
 #include <QObject>
 #include <QMap>
 #include <AIS_InteractiveContext.hxx>

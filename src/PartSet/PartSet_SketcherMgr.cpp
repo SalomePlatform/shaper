@@ -1099,10 +1099,20 @@ void PartSet_SketcherMgr::startSketch(ModuleBase_Operation* theOperation)
   myExternalPointsMgr = new PartSet_ExternalPointsMgr(myModule->workshop(), myCurrentSketch);
 
   workshop()->viewer()->set2dMode(true);
+
+  PartSet_Fitter* aFitter = new PartSet_Fitter(myCurrentSketch);
+  XGUI_Workshop* aWorkshop = aConnector->workshop();
+  aWorkshop->viewer()->setFitter(aFitter);
 }
 
 void PartSet_SketcherMgr::stopSketch(ModuleBase_Operation* theOperation)
 {
+  XGUI_ModuleConnector* aConnector = dynamic_cast<XGUI_ModuleConnector*>(myModule->workshop());
+  XGUI_Workshop* aWorkshop = aConnector->workshop();
+  PartSet_Fitter* aFitter = (PartSet_Fitter*)aWorkshop->viewer()->currentFitter();
+  aWorkshop->viewer()->unsetFitter();
+  delete aFitter;
+
   myIsMouseOverWindow = false;
   myIsConstraintsShown[PartSet_Tools::Geometrical] = true;
   myIsConstraintsShown[PartSet_Tools::Dimensional] = true;
@@ -1113,8 +1123,6 @@ void PartSet_SketcherMgr::stopSketch(ModuleBase_Operation* theOperation)
     myExternalPointsMgr = 0;
   }
   onShowPoints(false);
-
-  XGUI_ModuleConnector* aConnector = dynamic_cast<XGUI_ModuleConnector*>(myModule->workshop());
 
   DataPtr aData = myCurrentSketch->data();
   if (!aData->isValid()) {
@@ -2099,4 +2107,29 @@ void PartSet_SketcherMgr::onShowPoints(bool toShow)
   }
   if (aToUpdate)
     aViewer->update();
+}
+
+
+void PartSet_Fitter::fitScene(Handle(V3d_View) theView)
+{
+  Bnd_Box aBndBox;
+  int aNumberOfSubs = mySketch->numberOfSubs();
+  for (int i = 0; i < aNumberOfSubs; i++) {
+    FeaturePtr aFeature = mySketch->subFeature(i);
+    std::list<ResultPtr> aResults = aFeature->results();
+    std::list<ResultPtr>::const_iterator aIt;
+    ResultPtr aRes;
+    double aXmin, aYmin, aZmin, aXmax, aYmax, aZmax;
+    for (aIt = aResults.begin(); aIt != aResults.end(); ++aIt) {
+      aRes = (*aIt);
+      if (aRes->isDisplayed()) {
+        GeomShapePtr aShape = aRes->shape();
+        aShape->computeSize(aXmin, aYmin, aZmin, aXmax, aYmax, aZmax);
+        Bnd_Box aBox;
+        aBox.Update(aXmin, aYmin, aZmin, aXmax, aYmax, aZmax);
+        aBndBox.Add(aBox);
+      }
+    }
+  }
+  theView->FitAll(aBndBox, 0.01);
 }
