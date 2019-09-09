@@ -854,7 +854,8 @@ bool SketchPlugin_ArcTransversalPointValidator::isValid(
   }
   FeaturePtr anOwner = std::dynamic_pointer_cast<ModelAPI_Feature>(theAttribute->owner());
   AttributeStringPtr anArcTypeAttr = anOwner->string(SketchPlugin_MacroArc::ARC_TYPE());
-  if (anArcTypeAttr && anArcTypeAttr->value() != SketchPlugin_MacroArc::ARC_TYPE_BY_TRANSVERSAL_LINE())
+  if (anArcTypeAttr &&
+      anArcTypeAttr->value() != SketchPlugin_MacroArc::ARC_TYPE_BY_TRANSVERSAL_LINE())
     return true; // not applicable for non-transversal arcs
 
   AttributeRefAttrPtr aRefAttr = std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(theAttribute);
