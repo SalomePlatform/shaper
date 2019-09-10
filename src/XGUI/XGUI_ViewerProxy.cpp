@@ -724,3 +724,35 @@ void XGUI_ViewerProxy::setupColorScale()
 //  }
 //#endif
 //}
+
+
+#ifdef HAVE_SALOME
+void XGUI_ViewerProxy::setFitter(OCCViewer_Fitter* theFitter)
+{
+  myWorkshop->salomeConnector()->viewer()->setFitter(theFitter);
+}
+
+OCCViewer_Fitter* XGUI_ViewerProxy::currentFitter() const
+{
+  return myWorkshop->salomeConnector()->viewer()->currentFitter();
+}
+#else
+void XGUI_ViewerProxy::setFitter(AppElements_Fitter* theFitter)
+{
+  myWorkshop->mainWindow()->viewer()->setFitter(theFitter);
+}
+
+AppElements_Fitter* XGUI_ViewerProxy::currentFitter() const
+{
+  return myWorkshop->mainWindow()->viewer()->currentFitter();
+}
+#endif
+
+void XGUI_ViewerProxy::unsetFitter()
+{
+#ifdef HAVE_SALOME
+  myWorkshop->salomeConnector()->viewer()->unsetFitter();
+#else
+  myWorkshop->mainWindow()->viewer()->unsetFitter();
+#endif
+}
