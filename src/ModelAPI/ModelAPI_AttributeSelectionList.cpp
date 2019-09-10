@@ -27,7 +27,3 @@ std::string ModelAPI_AttributeSelectionList::attributeType()
 ModelAPI_AttributeSelectionList::~ModelAPI_AttributeSelectionList()
 {
 }
-
-MODELAPI_EXPORT ModelAPI_AttributeSelectionList::ModelAPI_AttributeSelectionList()
-{
-}
