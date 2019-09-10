@@ -233,7 +233,7 @@ ModuleBase_WidgetExprEditor::ModuleBase_WidgetExprEditor( QWidget* theParent,
   aMainLay->addWidget(myResultLabel);
   myEditor = new ExpressionEditor(this);
   myEditor->setMinimumHeight(20);
-  myEditor->setPlaceHolderText( QString::fromStdString( thePlaceHolder ) );
+  myEditor->setPlaceHolderText( translate( thePlaceHolder ) );
   aMainLay->addWidget(myEditor);
   this->setLayout(aMainLay);
 
