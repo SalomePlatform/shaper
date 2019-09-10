@@ -398,7 +398,7 @@ bool Model_AttributeSelectionList::isInitialized()
 }
 
 Model_AttributeSelectionList::Model_AttributeSelectionList(TDF_Label& theLabel)
-: myLab(theLabel)
+: ModelAPI_AttributeSelectionList(), myLab(theLabel)
 {
   reinit();
 }
