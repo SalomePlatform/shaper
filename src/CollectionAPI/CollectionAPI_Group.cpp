@@ -63,7 +63,10 @@ void CollectionAPI_Group::dump(ModelHighAPI_Dumper& theDumper) const
 
   AttributeSelectionListPtr anAttrList = aBase->selectionList(CollectionPlugin_Group::LIST_ID());
 
-  theDumper << aBase << " = model.addGroup(" << aDocName << ", " << anAttrList;
+  theDumper << aBase << " = model.addGroup(" << aDocName << ", ";
+  if (anAttrList->isWholeResultAllowed())
+    theDumper<<"\""<<anAttrList->selectionType()<<"\", ";
+  theDumper << anAttrList;
   if (anAttrList->isGeometricalSelection())
     theDumper <<", True";
   theDumper << ")" << std::endl;
@@ -75,6 +78,19 @@ GroupPtr addGroup(const std::shared_ptr<ModelAPI_Document>& thePart,
                   const bool theShareSameTopology)
 {
   std::shared_ptr<ModelAPI_Feature> aFeature = thePart->addFeature(CollectionAPI_Group::ID());
+  if (theShareSameTopology)
+    aFeature->selectionList(CollectionPlugin_Group::LIST_ID())->setGeometricalSelection(true);
+  return GroupPtr(new CollectionAPI_Group(aFeature, theGroupList));
+}
+
+//==================================================================================================
+GroupPtr addGroup(const std::shared_ptr<ModelAPI_Document>& thePart,
+  const std::string& theSelectionType,
+  const std::list<ModelHighAPI_Selection>& theGroupList,
+  const bool theShareSameTopology)
+{
+  std::shared_ptr<ModelAPI_Feature> aFeature = thePart->addFeature(CollectionAPI_Group::ID());
+  aFeature->selectionList(CollectionPlugin_Group::LIST_ID())->setSelectionType(theSelectionType);
   if (theShareSameTopology)
     aFeature->selectionList(CollectionPlugin_Group::LIST_ID())->setGeometricalSelection(true);
   return GroupPtr(new CollectionAPI_Group(aFeature, theGroupList));

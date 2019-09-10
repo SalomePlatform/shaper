@@ -193,7 +193,7 @@ void fillAttribute(const std::list<ModelHighAPI_Selection> & theValue,
 {
   theAttribute->clear();
 
-  if(!theValue.empty()) {
+  if(!theValue.empty() && theAttribute->selectionType().empty()) {
     const ModelHighAPI_Selection& aSelection = theValue.front();
     GeomAPI_Shape::ShapeType aSelectionType = getShapeType(aSelection);
     theAttribute->setSelectionType(strByShapeType(aSelectionType));
@@ -474,9 +474,9 @@ static bool dumpToPython(SessionPtr theSession,
   if (aDump.get()) {
     aDump->string("file_path")->setValue(theFilename);
     aDump->string("file_format")->setValue("py");
-    aDump->boolean("topological_naming")->setValue(theSelectionType & CHECK_NAMING);
-    aDump->boolean("geometric_selection")->setValue(theSelectionType & CHECK_GEOMETRICAL);
-    aDump->boolean("weak_naming")->setValue(theSelectionType & CHECK_WEAK);
+    aDump->boolean("topological_naming")->setValue((theSelectionType & CHECK_NAMING) != 0);
+    aDump->boolean("geometric_selection")->setValue((theSelectionType & CHECK_GEOMETRICAL) != 0);
+    aDump->boolean("weak_naming")->setValue((theSelectionType & CHECK_WEAK) != 0);
   }
   bool isProblem = !aDump.get() || !aDump->error().empty(); // after "finish" dump will be removed
   if (isProblem && aDump.get()) {

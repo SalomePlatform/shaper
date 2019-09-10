@@ -72,4 +72,12 @@ GroupPtr addGroup(const std::shared_ptr<ModelAPI_Document>& thePart,
                   const std::list<ModelHighAPI_Selection>& theGroupList,
                   const bool theShareSameTopology = false);
 
+/// \ingroup CPPHighAPI
+/// \brief Create Group with the additional selection type for case the whole result selected.
+COLLECTIONAPI_EXPORT
+GroupPtr addGroup(const std::shared_ptr<ModelAPI_Document>& thePart,
+  const std::string& theSelectionType,
+  const std::list<ModelHighAPI_Selection>& theGroupList,
+  const bool theShareSameTopology = false);
+
 #endif // CollectionAPI_Group_H_

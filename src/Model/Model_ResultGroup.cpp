@@ -22,6 +22,7 @@
 #include <ModelAPI_AttributeSelectionList.h>
 
 #include <GeomAlgoAPI_CompoundBuilder.h>
+#include <GeomAPI_ShapeExplorer.h>
 
 #include <Config_PropManager.h>
 
@@ -68,11 +69,33 @@ std::shared_ptr<GeomAPI_Shape> Model_ResultGroup::shape()
   if (!aResult && myOwnerData) {
     AttributeSelectionListPtr aList = myOwnerData->selectionList("group_list");
     if (aList) {
+      GeomAPI_DataMapOfShapeShape aShapesMap; // to avoid shapes duplication
       std::list<std::shared_ptr<GeomAPI_Shape> > aSubs;
       for(int a = aList->size() - 1; a >= 0; a--) {
         std::shared_ptr<GeomAPI_Shape> aSelection = aList->value(a)->value();
-        if (aSelection && !aSelection->isNull()) {
-          aSubs.push_back(aSelection);
+        if (aList->isWholeResultAllowed()) { // whole result selection, explode to sub-shapes
+          if (!aSelection.get() || aSelection->isNull()) {
+            ResultPtr aContext = aList->value(a)->context();
+            if (aContext)
+              aSelection = aContext->shape();
+          }
+          if (aSelection && !aSelection->isNull()) {
+            GeomAPI_Shape::ShapeType aType = GeomAPI_Shape::shapeTypeByStr(aList->selectionType());
+            if (aType == aSelection->shapeType()) {
+              if (aShapesMap.bind(aSelection, aSelection))
+                aSubs.push_back(aSelection);
+            } else {
+              for(GeomAPI_ShapeExplorer anExp(aSelection, aType); anExp.more(); anExp.next()) {
+                if (aShapesMap.bind(anExp.current(), anExp.current()))
+                  aSubs.push_back(anExp.current());
+              }
+            }
+          }
+        } else { // take selection as it is
+          if (aSelection && !aSelection->isNull()) {
+            if (aShapesMap.bind(aSelection, aSelection))
+              aSubs.push_back(aSelection);
+          }
         }
       }
       if (!aSubs.empty()) {
