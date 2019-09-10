@@ -38,6 +38,7 @@
 #include <GeomAlgoAPI_XAOExport.h>
 
 #include <GeomAPI_Shape.h>
+#include <GeomAPI_ShapeExplorer.h>
 
 #include <ModelAPI_AttributeSelectionList.h>
 #include <ModelAPI_AttributeString.h>
@@ -262,6 +263,21 @@ static bool isInResults(AttributeSelectionListPtr theSelection,
   return false;
 }
 
+/// Returns all sub-shapes of the given shape in theResult
+static void allSubShapes(const GeomShapePtr theShape, GeomAPI_Shape::ShapeType theType,
+  std::list<GeomShapePtr>& theResult)
+{
+  if (theShape->shapeType() == theType) {
+    theResult.push_back(theShape);
+  } else {
+    GeomAPI_DataMapOfShapeShape aUnique; // to keep only unique shapes
+    for(GeomAPI_ShapeExplorer anExp(theShape, theType); anExp.more(); anExp.next()) {
+      if (aUnique.bind(anExp.current(), anExp.current()))
+        theResult.push_back(anExp.current());
+    }
+  }
+}
+
 void ExchangePlugin_ExportFeature::exportXAO(const std::string& theFileName)
 {
   try {
@@ -366,6 +382,7 @@ void ExchangePlugin_ExportFeature::exportXAO(const std::string& theFileName)
 
       // conversion of dimension
       std::string aSelectionType = aSelectionList->selectionType();
+      GeomAPI_Shape::ShapeType aSelType = GeomAPI_Shape::shapeTypeByStr(aSelectionType);
       std::string aDimensionString =
         ExchangePlugin_Tools::selectionType2xaoDimension(aSelectionType);
       XAO::Dimension aGroupDimension = XAO::XaoUtils::stringToDimension(aDimensionString);
@@ -376,22 +393,24 @@ void ExchangePlugin_ExportFeature::exportXAO(const std::string& theFileName)
       try {
         for (int aSelectionIndex = 0; aSelectionIndex < aSelectionList->size(); ++aSelectionIndex){
           AttributeSelectionPtr aSelection = aSelectionList->value(aSelectionIndex);
+          GeomShapePtr aSelShape = aSelection->value();
+          if (!aSelShape.get() && aSelection->context().get()) {
+            aSelShape = aSelection->context()->shape();
+          }
 
-          // complex conversion of reference id to element index
-          // gives bad id in case the selection is done from python script
-          // => using GeomAlgoAPI_CompoundBuilder::id instead
-          // int aReferenceID_old = aSelection->Id();
+          std::list<GeomShapePtr> allSubs;
+          allSubShapes(aSelShape, aSelType, allSubs);
 
-          int aReferenceID = GeomAlgoAPI_CompoundBuilder::id(aShape, aSelection->value());
-
-          if (aReferenceID == 0) // selected value does not found in the exported shape
-            continue;
-
-          std::string aReferenceString = XAO::XaoUtils::intToString(aReferenceID);
-          int anElementID =
-            aXao.getGeometry()->getElementIndexByReference(aGroupDimension, aReferenceString);
-
-          aXaoGroup->add(anElementID);
+          std::list<GeomShapePtr>::iterator anIter = allSubs.begin();
+          for(; anIter != allSubs.end(); anIter++) {
+            int aReferenceID = GeomAlgoAPI_CompoundBuilder::id(aShape, *anIter);
+            if (aReferenceID == 0) // selected value does not found in the exported shape
+              continue;
+            std::string aReferenceString = XAO::XaoUtils::intToString(aReferenceID);
+            int anElementID =
+              aXao.getGeometry()->getElementIndexByReference(aGroupDimension, aReferenceString);
+            aXaoGroup->add(anElementID);
+          }
         }
       } catch (XAO::XAO_Exception& e) {
         // LCOV_EXCL_START
