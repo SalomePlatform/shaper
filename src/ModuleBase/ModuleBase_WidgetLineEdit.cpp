@@ -97,7 +97,7 @@ ModuleBase_WidgetLineEdit::ModuleBase_WidgetLineEdit(QWidget* theParent,
   if (!aLabelIcon.isEmpty())
     aLabel->setPixmap(ModuleBase_IconFactory::loadPixmap(aLabelIcon));
 
-  myLineEdit = new CustomLineEdit( this, QString::fromStdString( thePlaceHolder ) );
+  myLineEdit = new CustomLineEdit( this, translate( thePlaceHolder ) );
   // Here we do not use the Qt's standard method setPlaceHolderText() since it
   // draws the place holder only if there is no focus on widget;
   // we would like to see the place holder in the case of empty text
