@@ -21,6 +21,6 @@ SET(TEST_NAMES
   TestExportToGEOM
   TestExportToGEOMAllGroupsAndFields
   TestExportToGEOMPartSet
-  TestExportToGEOMWholeResult.py
+  TestExportToGEOMWholeResult
   Test2882
 )
