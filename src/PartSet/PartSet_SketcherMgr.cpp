@@ -2129,5 +2129,8 @@ void PartSet_Fitter::fitScene(Handle(V3d_View) theView)
       }
     }
   }
-  theView->FitAll(aBndBox, 0.01);
+  if (aBndBox.IsVoid())
+    theView->FitAll();
+  else
+    theView->FitAll(aBndBox, 0.01);
 }
