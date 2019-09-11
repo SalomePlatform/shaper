@@ -82,7 +82,7 @@ SET(PROJECT_HEADERS
     GeomAlgoAPI_Offset.h
     GeomAlgoAPI_SolidClassifier.h
     GeomAlgoAPI_MapShapesAndAncestors.h
-    GeomAlgoAPI_Projection.h
+    GeomAlgoAPI_Chamfer.h
 )
 
 SET(PROJECT_SOURCES
@@ -145,6 +145,7 @@ SET(PROJECT_SOURCES
     GeomAlgoAPI_SolidClassifier.cpp
     GeomAlgoAPI_MapShapesAndAncestors.cpp
     GeomAlgoAPI_Projection.cpp
+    GeomAlgoAPI_Chamfer.cpp
 )
 
 SET(PROJECT_LIBRARIES

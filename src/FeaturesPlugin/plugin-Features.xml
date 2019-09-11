@@ -106,6 +106,10 @@
                icon="icons/Features/fillet.png" auto_preview="true" helpfile="filletFeature.html">
         <source path="fillet_widget.xml"/>
       </feature>
+      <feature id="Chamfer" title="Chamfer" tooltip="Perform chamfer on face or edge"
+               icon="icons/Features/chamfer.png" auto_preview="true" helpfile="chamferFeature.html">
+        <source path="chamfer_widget.xml"/>
+      </feature>
       <feature id="FusionFaces" title="Fuse Faces" tooltip="Performs fusion of connected faces"
                icon="icons/Features/fusion_faces.png" auto_preview="true" helpfile="FeaturesPlugin/fusionFacesFeature.html">
         <source path="fusion_faces_widget.xml"/>

@@ -24,6 +24,7 @@
 #include <FeaturesPlugin_BooleanCommon.h>
 #include <FeaturesPlugin_BooleanSmash.h>
 #include <FeaturesPlugin_BooleanFill.h>
+#include <FeaturesPlugin_Chamfer.h>
 #include <FeaturesPlugin_Extrusion.h>
 #include <FeaturesPlugin_ExtrusionCut.h>
 #include <FeaturesPlugin_ExtrusionFuse.h>
@@ -176,6 +177,8 @@ FeaturePtr FeaturesPlugin_Plugin::createFeature(std::string theFeatureID)
     return FeaturePtr(new FeaturesPlugin_Measurement);
   } else if (theFeatureID == FeaturesPlugin_RemoveResults::ID()) {
     return FeaturePtr(new FeaturesPlugin_RemoveResults);
+  } else if (theFeatureID == FeaturesPlugin_Chamfer::ID()) {
+    return FeaturePtr(new FeaturesPlugin_Chamfer);
   }
 
   // feature of such kind is not found
