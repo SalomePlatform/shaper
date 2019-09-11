@@ -638,7 +638,27 @@
       <translation>AA</translation>
     </message>
   </context>
-
+  <context>
+    <name>Extrusion:direction_object</name>
+    <message>
+      <source>&lt;base normal&gt;</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>Extrusion:from_object</name>
+    <message>
+      <source>&lt;base sketch&gt;</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>Extrusion:to_object</name>
+    <message>
+      <source>&lt;base sketch&gt;</source>
+      <translation>AA</translation>
+    </message>
+  </context>
 
   <context>
     <name>ExtrusionCut:GeomValidators_ZeroOffset</name>
