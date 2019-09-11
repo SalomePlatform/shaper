@@ -43,6 +43,7 @@
 %shared_ptr(FeaturesAPI_BooleanCommon)
 %shared_ptr(FeaturesAPI_BooleanSmash)
 %shared_ptr(FeaturesAPI_BooleanFill)
+%shared_ptr(FeaturesAPI_Chamfer)
 %shared_ptr(FeaturesAPI_Extrusion)
 %shared_ptr(FeaturesAPI_ExtrusionBoolean)
 %shared_ptr(FeaturesAPI_ExtrusionCut)
@@ -74,6 +75,7 @@
 %include "FeaturesAPI_BooleanCommon.h"
 %include "FeaturesAPI_BooleanSmash.h"
 %include "FeaturesAPI_BooleanFill.h"
+%include "FeaturesAPI_Chamfer.h"
 %include "FeaturesAPI_Extrusion.h"
 %include "FeaturesAPI_ExtrusionBoolean.h"
 %include "FeaturesAPI_Fillet.h"

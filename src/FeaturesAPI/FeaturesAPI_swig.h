@@ -28,6 +28,7 @@
   #include "FeaturesAPI_BooleanCommon.h"
   #include "FeaturesAPI_BooleanSmash.h"
   #include "FeaturesAPI_BooleanFill.h"
+  #include "FeaturesAPI_Chamfer.h"
   #include "FeaturesAPI_Extrusion.h"
   #include "FeaturesAPI_ExtrusionBoolean.h"
   #include "FeaturesAPI_Fillet.h"
