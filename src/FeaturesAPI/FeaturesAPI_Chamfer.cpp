@@ -92,8 +92,6 @@ void FeaturesAPI_Chamfer::dump(ModelHighAPI_Dumper& theDumper) const
 
   AttributeSelectionListPtr anAttrObjects =
     aBase->selectionList(FeaturesPlugin_Chamfer::OBJECT_LIST_ID());
-    
-  std::cout << "dump" << std::endl;
 
   theDumper << aBase << " = model.addChamfer(" << aDocName << ", " << anAttrObjects;
 
