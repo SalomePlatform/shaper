@@ -199,14 +199,11 @@ Q_OBJECT
 
 #ifdef HAVE_SALOME
   virtual void setFitter(OCCViewer_Fitter* theFitter) = 0;
-  virtual OCCViewer_Fitter* currentFitter() const = 0;
+  virtual OCCViewer_Fitter* fitter() const = 0;
 #else
   virtual void setFitter(AppElements_Fitter* theFitter) = 0;
-  virtual AppElements_Fitter* currentFitter() const = 0;
+  virtual AppElements_Fitter* fitter() const = 0;
 #endif
-
-  virtual void unsetFitter() = 0;
-
 
   static Handle(Prs3d_Drawer) DefaultHighlightDrawer;
 

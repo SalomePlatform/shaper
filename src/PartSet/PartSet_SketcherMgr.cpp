@@ -1107,8 +1107,8 @@ void PartSet_SketcherMgr::startSketch(ModuleBase_Operation* theOperation)
 void PartSet_SketcherMgr::stopSketch(ModuleBase_Operation* theOperation)
 {
   XGUI_ModuleConnector* aConnector = dynamic_cast<XGUI_ModuleConnector*>(myModule->workshop());
-  PartSet_Fitter* aFitter = (PartSet_Fitter*)myModule->workshop()->viewer()->currentFitter();
-  myModule->workshop()->viewer()->unsetFitter();
+  PartSet_Fitter* aFitter = (PartSet_Fitter*)myModule->workshop()->viewer()->fitter();
+  myModule->workshop()->viewer()->setFitter(0);
   delete aFitter;
 
   myIsMouseOverWindow = false;
@@ -2108,7 +2108,7 @@ void PartSet_SketcherMgr::onShowPoints(bool toShow)
 }
 
 
-void PartSet_Fitter::fitScene(Handle(V3d_View) theView)
+void PartSet_Fitter::fitAll(Handle(V3d_View) theView)
 {
   Bnd_Box aBndBox;
   int aNumberOfSubs = mySketch->numberOfSubs();

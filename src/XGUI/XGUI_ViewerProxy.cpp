@@ -732,9 +732,9 @@ void XGUI_ViewerProxy::setFitter(OCCViewer_Fitter* theFitter)
   myWorkshop->salomeConnector()->viewer()->setFitter(theFitter);
 }
 
-OCCViewer_Fitter* XGUI_ViewerProxy::currentFitter() const
+OCCViewer_Fitter* XGUI_ViewerProxy::fitter() const
 {
-  return myWorkshop->salomeConnector()->viewer()->currentFitter();
+  return myWorkshop->salomeConnector()->viewer()->fitter();
 }
 #else
 void XGUI_ViewerProxy::setFitter(AppElements_Fitter* theFitter)
@@ -742,17 +742,8 @@ void XGUI_ViewerProxy::setFitter(AppElements_Fitter* theFitter)
   myWorkshop->mainWindow()->viewer()->setFitter(theFitter);
 }
 
-AppElements_Fitter* XGUI_ViewerProxy::currentFitter() const
+AppElements_Fitter* XGUI_ViewerProxy::fitter() const
 {
-  return myWorkshop->mainWindow()->viewer()->currentFitter();
+  return myWorkshop->mainWindow()->viewer()->fitter();
 }
 #endif
-
-void XGUI_ViewerProxy::unsetFitter()
-{
-#ifdef HAVE_SALOME
-  myWorkshop->salomeConnector()->viewer()->unsetFitter();
-#else
-  myWorkshop->mainWindow()->viewer()->unsetFitter();
-#endif
-}
