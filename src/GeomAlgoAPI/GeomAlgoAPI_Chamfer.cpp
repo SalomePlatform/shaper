@@ -61,7 +61,8 @@ void GeomAlgoAPI_Chamfer::build(const GeomShapePtr& theBaseSolid,
     if ((*anIt)->isEdge()) {
       TopoDS_Edge E = (*anIt)->impl<TopoDS_Edge>();
       if (aMapEdgeFace.find(*anIt) != aMapEdgeFace.end()) {
-        TopoDS_Face F = (aMapEdgeFace[*anIt])->impl<TopoDS_Face>();
+        //TopoDS_Face F = (aMapEdgeFace[*anIt])->impl<TopoDS_Face>();
+        TopoDS_Face F = (aMapEdgeFace.at(*anIt))->impl<TopoDS_Face>();
         if (!BRepTools::IsReallyClosed(E,F) && !BRep_Tool::Degenerated(E) && 
               M.FindFromKey(E).Extent() == 2) {
           if (performDistances) {
