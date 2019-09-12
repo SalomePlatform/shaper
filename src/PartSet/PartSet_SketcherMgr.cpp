@@ -2121,11 +2121,22 @@ void PartSet_Fitter::fitAll(Handle(V3d_View) theView)
     for (aIt = aResults.begin(); aIt != aResults.end(); ++aIt) {
       aRes = (*aIt);
       if (aRes->isDisplayed()) {
-        GeomShapePtr aShape = aRes->shape();
-        aShape->computeSize(aXmin, aYmin, aZmin, aXmax, aYmax, aZmax);
-        Bnd_Box aBox;
-        aBox.Update(aXmin, aYmin, aZmin, aXmax, aYmax, aZmax);
-        aBndBox.Add(aBox);
+        FeaturePtr aFeature = ModelAPI_Feature::feature(aRes);
+        if (aFeature.get()) {
+          std::shared_ptr<SketchPlugin_SketchEntity> aSPFeature =
+            std::dynamic_pointer_cast<SketchPlugin_SketchEntity>(aFeature);
+          if (aSPFeature.get()) {
+            bool isAxiliary =
+              aSPFeature->boolean(SketchPlugin_SketchEntity::AUXILIARY_ID())->value();
+            if (!(aSPFeature->isExternal() || isAxiliary)) {
+              GeomShapePtr aShape = aRes->shape();
+              aShape->computeSize(aXmin, aYmin, aZmin, aXmax, aYmax, aZmax);
+              Bnd_Box aBox;
+              aBox.Update(aXmin, aYmin, aZmin, aXmax, aYmax, aZmax);
+              aBndBox.Add(aBox);
+            }
+          }
+        }
       }
     }
   }
