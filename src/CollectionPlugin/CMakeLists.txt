@@ -148,4 +148,5 @@ ADD_UNIT_TESTS(
                TestGroupSubstraction_Error2.py
                Test2977.py
                TestGroupWholeResult1.py
+               TestGroupWholeResult2.py
 )

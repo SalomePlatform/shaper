@@ -256,8 +256,42 @@ static bool isInResults(AttributeSelectionListPtr theSelection,
   // if context is in results, return true
   for(int a = 0; a < theSelection->size(); a++) {
     AttributeSelectionPtr anAttr = theSelection->value(a);
-    ResultBodyPtr aSelected= std::dynamic_pointer_cast<ModelAPI_ResultBody>(anAttr->context());
-    if (aSelected.get() && theCashedResults.count(aSelected))
+    ResultPtr aContext = anAttr->context();
+    // check is it group selected for groups BOP
+    if (aContext.get() && aContext->groupName() == ModelAPI_ResultGroup::group()) {
+      // it is impossible by used results check which result is used in this group result,
+      // so check the results shapes is it in results of this document or not
+      FeaturePtr aSelFeature =
+        std::dynamic_pointer_cast<ModelAPI_Feature>(theSelection->owner());
+      if (!aSelFeature.get() || aSelFeature->results().empty())
+        continue;
+      GeomShapePtr aGroupResShape = aSelFeature->firstResult()->shape();
+
+      std::set<ResultPtr>::iterator allResultsIter = theCashedResults.begin();
+      for(; allResultsIter != theCashedResults.end(); allResultsIter++) {
+        GeomShapePtr aResultShape = (*allResultsIter)->shape();
+
+        GeomAPI_Shape::ShapeType aType =
+          GeomAPI_Shape::shapeTypeByStr(theSelection->selectionType());
+        GeomAPI_ShapeExplorer aGroupResExp(aGroupResShape, aType);
+        for(; aGroupResExp.more(); aGroupResExp.next()) {
+          if (aResultShape->isSubShape(aGroupResExp.current(), false))
+            return true; // at least one shape of the group is in the used results
+        }
+      }
+    }
+    ResultBodyPtr aSelected = std::dynamic_pointer_cast<ModelAPI_ResultBody>(anAttr->context());
+    if (!aSelected.get()) { // try to get selected feature and all its results
+      FeaturePtr aContextFeature = anAttr->contextFeature();
+      if (aContextFeature.get() && !aContextFeature->results().empty()) {
+        const std::list<ResultPtr>& allResluts = aContextFeature->results();
+        std::list<ResultPtr>::const_iterator aResIter = allResluts.cbegin();
+        for(; aResIter != allResluts.cend(); aResIter++) {
+          if (aResIter->get() && theCashedResults.count(*aResIter))
+            return true;
+        }
+      }
+    } else if (aSelected.get() && theCashedResults.count(aSelected))
       return true;
   }
   return false;
@@ -372,6 +406,8 @@ void ExchangePlugin_ExportFeature::exportXAO(const std::string& theFileName)
     for (int aGroupIndex = 0; aGroupIndex < aGroupCount; ++aGroupIndex) {
       ResultGroupPtr aResultGroup = std::dynamic_pointer_cast<ModelAPI_ResultGroup>(
           (*aDoc)->object(ModelAPI_ResultGroup::group(), aGroupIndex));
+      if (!aResultGroup.get() || !aResultGroup->shape().get())
+        continue;
 
       FeaturePtr aGroupFeature = (*aDoc)->feature(aResultGroup);
 
@@ -391,26 +427,15 @@ void ExchangePlugin_ExportFeature::exportXAO(const std::string& theFileName)
                                             aResultGroup->data()->name());
 
       try {
-        for (int aSelectionIndex = 0; aSelectionIndex < aSelectionList->size(); ++aSelectionIndex){
-          AttributeSelectionPtr aSelection = aSelectionList->value(aSelectionIndex);
-          GeomShapePtr aSelShape = aSelection->value();
-          if (!aSelShape.get() && aSelection->context().get()) {
-            aSelShape = aSelection->context()->shape();
-          }
-
-          std::list<GeomShapePtr> allSubs;
-          allSubShapes(aSelShape, aSelType, allSubs);
-
-          std::list<GeomShapePtr>::iterator anIter = allSubs.begin();
-          for(; anIter != allSubs.end(); anIter++) {
-            int aReferenceID = GeomAlgoAPI_CompoundBuilder::id(aShape, *anIter);
-            if (aReferenceID == 0) // selected value does not found in the exported shape
-              continue;
-            std::string aReferenceString = XAO::XaoUtils::intToString(aReferenceID);
-            int anElementID =
-              aXao.getGeometry()->getElementIndexByReference(aGroupDimension, aReferenceString);
-            aXaoGroup->add(anElementID);
-          }
+        GeomAPI_ShapeExplorer aGroupResExplorer(aResultGroup->shape(), aSelType);
+        for(; aGroupResExplorer.more(); aGroupResExplorer.next()) {
+          int aReferenceID = GeomAlgoAPI_CompoundBuilder::id(aShape, aGroupResExplorer.current());
+          if (aReferenceID == 0) // selected value does not found in the exported shape
+            continue;
+          std::string aReferenceString = XAO::XaoUtils::intToString(aReferenceID);
+          int anElementID =
+            aXao.getGeometry()->getElementIndexByReference(aGroupDimension, aReferenceString);
+          aXaoGroup->add(anElementID);
         }
       } catch (XAO::XAO_Exception& e) {
         // LCOV_EXCL_START
