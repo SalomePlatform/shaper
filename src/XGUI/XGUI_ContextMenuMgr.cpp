@@ -334,8 +334,9 @@ void XGUI_ContextMenuMgr::updateObjectBrowserMenu()
         {
           action("RENAME_CMD")->setEnabled(true);
           if (aObject->groupName() == ModelAPI_ResultConstruction::group()) {
+            ResultConstructionPtr aConstr = std::dynamic_pointer_cast<ModelAPI_ResultConstruction>(aObject);
             FeaturePtr aFeature = ModelAPI_Feature::feature(aObject);
-            canBeDeleted = aFeature->isInHistory();
+            canBeDeleted = !(!(aFeature->isInHistory()) && aConstr->isInfinite());
             action("DELETE_CMD")->setEnabled(canBeDeleted);
           }
           else
@@ -598,10 +599,6 @@ void XGUI_ContextMenuMgr::updateViewerMenu()
     }
   }
 
-  ModuleBase_IModule* aModule = myWorkshop->module();
-  if (aModule)
-    aModule->updateViewerMenu(myActions);
-
   if (myWorkshop->canChangeProperty("COLOR_CMD"))
     action("COLOR_CMD")->setEnabled(true);
 
@@ -611,8 +608,9 @@ void XGUI_ContextMenuMgr::updateViewerMenu()
   if (myWorkshop->canChangeProperty("TRANSPARENCY_CMD"))
     action("TRANSPARENCY_CMD")->setEnabled(true);
 
-  // Delete command is not used in viewer pop-up menu
-  action("DELETE_CMD")->setEnabled(false);
+  ModuleBase_IModule* aModule = myWorkshop->module();
+  if (aModule)
+    aModule->updateViewerMenu(myActions);
 }
 
 void XGUI_ContextMenuMgr::connectObjectBrowser()
