@@ -114,7 +114,7 @@ model.begin()
 model.exportToGEOM(Part_1_doc)
 model.end()
 
-# check that in GEOM module there are reuslts:
+# check that in GEOM module there are results:
 # extrusion of the first part
 # extrusion with group of the second part
 # extrusion with filed of the third part

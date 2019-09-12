@@ -86,7 +86,6 @@ def testExportToGEOM():
   Group_2 = model.addGroup(Part_1_doc, "FACE", [model.selection("COMPSOLID", "Partition_1_1")])
   model.do()
 
-  # First export to GEOM
   model.exportToGEOM(Part_1_doc)
   model.end()
 
