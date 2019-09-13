@@ -1,13 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
 <TS version="2.0" language="fr_FR">
+
   <context>
     <name>workshop</name>
     <message>
       <source>Scale</source>
       <translation>AA</translation>
     </message>
+    <message>
+      <source>Extrusion</source>
+      <translation>AA</translation>
+    </message>
   </context>
+
   <context>
     <name>Scale</name>
     <message>
@@ -95,13 +101,6 @@
     </message>
   </context>
 
-  <context>
-    <name>workshop</name>
-    <message>
-      <source>Extrusion</source>
-      <translation>AA</translation>
-    </message>
-  </context>
   <context>
     <name>Extrusion:GeomValidators_ZeroOffset</name>
     <message>
@@ -3932,8 +3931,295 @@
   <context>
     <name>FusionFaces:Model_FeatureValidator</name>
     <message>
-      <source>Attribute "base_shape" is not initialized.</source >
-      <translation>AA</translation >
+      <source>Attribute "base_shape" is not initialized.</source>
+      <translation>AA</translation>
     </message>
   </context>
+
+  <!-- MissedTranslations -->
+
+  <context>
+    <name>AngularCopy</name>
+    <message>
+      <source>Angular Copy</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Perform copy and rotate</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>Common</name>
+    <message>
+      <source>Common</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Perform boolean common operation with objects</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>Cut</name>
+    <message>
+      <source>Cut</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Perform boolean cut operation with objects</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>Fuse</name>
+    <message>
+      <source>Fuse</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Perform boolean fuse operation with objects</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>ExtrusionCut</name>
+    <message>
+      <source></source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>ExtrusionCut</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>ExtrusionFuse</name>
+    <message>
+      <source></source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>ExtrusionFuse</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>Fillet</name>
+    <message>
+      <source>Fillet</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Perform fillet on face or edge</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>FusionFaces</name>
+    <message>
+      <source>Fuse Faces</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Performs fusion of connected faces</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>Intersection</name>
+    <message>
+      <source>Intersect objects with tools</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Intersection</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>LinearCopy</name>
+    <message>
+      <source>Linear copy</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Perform copy and translate</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>Measurement</name>
+    <message>
+      <source>Calculate properties of objects</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Measurement</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>Partition</name>
+    <message>
+      <source>Partition</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Perform partition operations with solids</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>Pipe</name>
+    <message>
+      <source>Generates extrusion along a path</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Pipe</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>Placement</name>
+    <message>
+      <source>Place objects relatively to another one</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Placement</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>Recover</name>
+    <message>
+      <source>Recover</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Visualize concealed objects</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+
+  <context>
+    <name>Revolution</name>
+    <message>
+      <source>Create a solid by revolution of a face</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Revolution</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>RevolutionCut</name>
+    <message>
+      <source></source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>RevolutionCut</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>RevolutionFuse</name>
+    <message>
+      <source></source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>RevolutionFuse</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+
+  <context>
+    <name>Rotation</name>
+    <message>
+      <source>Perform rotation of objects around the axis to specified angle</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Rotation</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+
+  <context>
+    <name>Remove_SubShapes</name>
+    <message>
+      <source>Allows to remove sub-shapes from wires, shells, compsolids and compounds</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Remove Sub-Shapes</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+
+  <context>
+    <name>Smash</name>
+    <message>
+      <source>Perform boolean smash operation with objects</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Smash</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+
+  <context>
+    <name>Split</name>
+    <message>
+      <source>Perform boolean split operation with objects</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Split</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+
+  <context>
+    <name>Symmetry</name>
+    <message>
+      <source>Perform symmetry with respect to a point, an axis or a plane</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Symmetry</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+
+  <context>
+    <name>Translation</name>
+    <message>
+      <source>Perform translation of objects along the axis to specified distance</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Translation</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+
+  <context>
+    <name>Union</name>
+    <message>
+      <source>Perform union operations with shapes</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Union</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+
 </TS>

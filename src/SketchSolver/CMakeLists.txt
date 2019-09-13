@@ -91,6 +91,7 @@ SET(SKETCHSOLVER_LIBRARIES
 
 SET(SKETCHSOLVER_TEXT_RESOURCES
     SketchSolver_msg_en.ts
+    SketchSolver_msg_fr.ts
 )
 
 INCLUDE_DIRECTORIES(

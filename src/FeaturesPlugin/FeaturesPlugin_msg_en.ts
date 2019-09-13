@@ -3695,8 +3695,8 @@
   <context>
     <name>FusionFaces:Model_FeatureValidator</name>
     <message>
-      <source>Attribute "base_shape" is not initialized.</source >
-      <translation>Base shape is not selected.</translation >
+      <source>Attribute "base_shape" is not initialized.</source>
+      <translation>Base shape is not selected.</translation>
     </message>
   </context>
 </TS>
