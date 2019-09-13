@@ -277,7 +277,10 @@ public:
   bool enableUpdateViewer(const bool isEnabled);
 
   /// Returns true if the viewer update is not blocked
-  bool isUpdateEnabled() const;
+  bool isUpdateEnabled() const
+  {
+    return myViewerBlockedRecursiveCount == 0;
+  }
 
   /// Updates the viewer
   void updateViewer() const;

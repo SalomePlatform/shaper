@@ -619,12 +619,6 @@ bool XGUI_Displayer::enableUpdateViewer(const bool isEnabled)
 }
 
 //**************************************************************
-bool XGUI_Displayer::isUpdateEnabled() const
-{
-  return myViewerBlockedRecursiveCount == 0;
-}
-
-//**************************************************************
 void XGUI_Displayer::updateViewer() const
 {
   Handle(AIS_InteractiveContext) aContext = AISContext();
