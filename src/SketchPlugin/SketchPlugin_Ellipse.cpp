@@ -34,6 +34,8 @@
 #include <ModelAPI_Session.h>
 #include <ModelAPI_Validator.h>
 
+#include <cmath>
+
 static const double tolerance = 1e-7;
 
 
@@ -53,6 +55,13 @@ void SketchPlugin_Ellipse::initDerivedClassAttributes()
   data()->addAttribute(MINOR_AXIS_END_ID(), GeomDataAPI_Point2D::typeId());
   data()->addAttribute(MAJOR_RADIUS_ID(), ModelAPI_AttributeDouble::typeId());
   data()->addAttribute(MINOR_RADIUS_ID(), ModelAPI_AttributeDouble::typeId());
+
+  ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(), SECOND_FOCUS_ID());
+  ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(), MAJOR_AXIS_START_ID());
+  ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(), MAJOR_AXIS_END_ID());
+  ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(), MINOR_AXIS_START_ID());
+  ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(), MINOR_AXIS_END_ID());
+  ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(), MAJOR_RADIUS_ID());
 
   data()->addAttribute(EXTERNAL_ID(), ModelAPI_AttributeSelection::typeId());
   ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(), EXTERNAL_ID());
@@ -140,19 +149,16 @@ bool SketchPlugin_Ellipse::fillCharacteristicPoints()
   std::shared_ptr<GeomDataAPI_Point2D> aFocusAttr =
       std::dynamic_pointer_cast<GeomDataAPI_Point2D>(data()->attribute(FIRST_FOCUS_ID()));
 
-  AttributeDoublePtr aMajorRadiusAttr = real(MAJOR_RADIUS_ID());
   AttributeDoublePtr aMinorRadiusAttr = real(MINOR_RADIUS_ID());
 
   if (!aCenterAttr->isInitialized() ||
       !aFocusAttr->isInitialized() ||
-      !aMajorRadiusAttr->isInitialized() ||
       !aMinorRadiusAttr->isInitialized()) {
     return false;
   }
 
-  double aMajorRadius = aMajorRadiusAttr->value();
   double aMinorRadius = aMinorRadiusAttr->value();
-  if (aMajorRadius < tolerance || aMinorRadius < tolerance) {
+  if (aMinorRadius < tolerance) {
     return false;
   }
 
@@ -162,6 +168,12 @@ bool SketchPlugin_Ellipse::fillCharacteristicPoints()
   GeomDir2dPtr aMajorDir2d(new GeomAPI_Dir2d(aFocus2d->x() - aCenter2d->x(),
     aFocus2d->y() - aCenter2d->y()));
   GeomDir2dPtr aMinorDir2d(new GeomAPI_Dir2d(-aMajorDir2d->y(), aMajorDir2d->x()));
+
+  AttributeDoublePtr aMajorRadiusAttr = real(MAJOR_RADIUS_ID());
+  double aFocalDist = aCenter2d->distance(aFocus2d);
+  double aMajorRadius = sqrt(aFocalDist * aFocalDist + aMinorRadius * aMinorRadius);
+  aMajorRadiusAttr->setValue(aMajorRadius);
+
   std::dynamic_pointer_cast<GeomDataAPI_Point2D>(attribute(SECOND_FOCUS_ID()))
     ->setValue(2.0 * aCenter2d->x() - aFocus2d->x(), 2.0 * aCenter2d->y() - aFocus2d->y());
   std::dynamic_pointer_cast<GeomDataAPI_Point2D>(attribute(MAJOR_AXIS_START_ID()))

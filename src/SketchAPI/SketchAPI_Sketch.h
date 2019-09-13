@@ -42,6 +42,8 @@ class SketchAPI_Arc;
 class SketchAPI_MacroArc;
 class SketchAPI_Circle;
 class SketchAPI_MacroCircle;
+class SketchAPI_Ellipse;
+class SketchAPI_MacroEllipse;
 class SketchAPI_IntersectionPoint;
 class SketchAPI_Line;
 class SketchAPI_Mirror;
@@ -263,6 +265,39 @@ public:
   /// Add arc
   SKETCHAPI_EXPORT
   std::shared_ptr<SketchAPI_Arc> addArc(const std::string & theExternalName);
+
+  /// Add ellipse
+  SKETCHAPI_EXPORT
+  std::shared_ptr<SketchAPI_Ellipse> addEllipse(
+      double theCenterX, double theCenterY,
+      double theFocusX, double theFocusY,
+      double theMinorRadius);
+  /// Add ellipse
+  SKETCHAPI_EXPORT
+  std::shared_ptr<SketchAPI_Ellipse> addEllipse(
+      const std::shared_ptr<GeomAPI_Pnt2d>& theCenter,
+      const std::shared_ptr<GeomAPI_Pnt2d>& theFocus,
+      double theRadius);
+  /// Add ellipse
+  SKETCHAPI_EXPORT
+  std::shared_ptr<SketchAPI_MacroEllipse> addEllipse(
+      double thePoint1X, double thePoint1Y,
+      double thePoint2X, double thePoint2Y,
+      double thePassedX, double thePassedY,
+      bool isPoint1Center = true);
+  /// Add ellipse
+  SKETCHAPI_EXPORT
+  std::shared_ptr<SketchAPI_MacroEllipse> addEllipse(
+      const std::pair<std::shared_ptr<GeomAPI_Pnt2d>, ModelHighAPI_RefAttr>& thePoint1,
+      const std::pair<std::shared_ptr<GeomAPI_Pnt2d>, ModelHighAPI_RefAttr>& thePoint2,
+      const std::pair<std::shared_ptr<GeomAPI_Pnt2d>, ModelHighAPI_RefAttr>& thePassedPoint,
+      bool isPoint1Center = true);
+  /// Add ellipse
+  SKETCHAPI_EXPORT
+  std::shared_ptr<SketchAPI_Ellipse> addEllipse(const ModelHighAPI_Selection & theExternal);
+  /// Add ellipse
+  SKETCHAPI_EXPORT
+  std::shared_ptr<SketchAPI_Ellipse> addEllipse(const std::string & theExternalName);
 
   /// Add projection
   SKETCHAPI_EXPORT

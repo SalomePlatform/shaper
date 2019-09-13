@@ -122,7 +122,8 @@ void SketchPlugin_MacroEllipse::attributeChanged(const std::string& theID)
 
       AttributeRefAttrPtr aPointRef = refattr(aPointRefName[aPntIndex]);
       // calculate ellipse parameters
-      GeomPnt2dPtr aPassedPoint;
+      GeomPnt2dPtr aPassedPoint =
+          std::dynamic_pointer_cast<GeomDataAPI_Point2D>(aPointAttr)->pnt();
       GeomShapePtr aTangentCurve;
       SketchPlugin_Tools::convertRefAttrToPointOrTangentCurve(
         aPointRef, aPointAttr, aTangentCurve, aPassedPoint);
@@ -165,9 +166,6 @@ void SketchPlugin_MacroEllipse::attributeChanged(const std::string& theID)
     AttributeDoublePtr aMinorRadiusAttr = real(MINOR_RADIUS_ID());
 
     bool aWasBlocked = data()->blockSendAttributeUpdated(true);
-    // center attribute is used in processEvent() to set reference to reentrant arc
-////    std::dynamic_pointer_cast<GeomDataAPI_Point2D>(attribute(FIRST_POINT_ID()))
-////        ->setValue(myCenter);
     aMajorRadiusAttr->setValue(myMajorRadius);
     aMinorRadiusAttr->setValue(myMinorRadius);
     data()->blockSendAttributeUpdated(aWasBlocked, false);
