@@ -51,7 +51,6 @@
 #include <ModelAPI_Events.h>
 #include <ModelAPI_Session.h>
 #include <ModelAPI_ResultParameter.h>
-#include <ModelAPI_ResultConstruction.h>
 
 #include <QMainWindow>
 #include <QAction>
@@ -235,21 +234,6 @@ void PartSet_MenuMgr::updateViewerMenu(const QMap<QString, QAction*>& theStdActi
     theStdActions["SHOW_CMD"]->setEnabled(false);
     theStdActions["HIDE_CMD"]->setEnabled(false);
     theStdActions["HIDEALL_CMD"]->setEnabled(false);
-
-    ModuleBase_ISelection* aSelection = myModule->workshop()->selection();
-    QList<ModuleBase_ViewerPrsPtr> aPrsList = aSelection->getSelected(ModuleBase_ISelection::Viewer);
-    ResultConstructionPtr aResult;
-    bool canBeDeleted = true;
-    foreach(ModuleBase_ViewerPrsPtr aPrs, aPrsList) {
-      aResult = std::dynamic_pointer_cast<ModelAPI_ResultConstruction>(aPrs->object());
-      if (aResult.get() != NULL) {
-        FeaturePtr aFeature = ModelAPI_Feature::feature(aPrs->object());
-        canBeDeleted = !(!(aFeature->isInHistory()) && aResult->isInfinite());
-        if (!canBeDeleted)
-          break;
-      }
-    }
-    theStdActions["DELETE_CMD"]->setEnabled(canBeDeleted);
   }
 }
 

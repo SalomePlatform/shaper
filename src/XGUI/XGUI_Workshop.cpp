@@ -1813,6 +1813,19 @@ void XGUI_Workshop::deleteObjects()
   if (!(hasResult || hasFeature || hasParameter || hasFolder))
     return;
 
+  // Remove from the list non-deletable objects: infinite constuctions which are not in history
+  bool notDelete = true;
+  QObjectPtrList::iterator aIt;
+  for (aIt = anObjects.begin(); aIt != anObjects.end(); aIt++) {
+    ObjectPtr aObj = (*aIt);
+    ResultConstructionPtr aConstr = std::dynamic_pointer_cast<ModelAPI_ResultConstruction>(aObj);
+    FeaturePtr aFeature = ModelAPI_Feature::feature(aObj);
+    notDelete = (!aFeature->isInHistory()) && aConstr->isInfinite();
+    if (notDelete) {
+      anObjects.removeAll(aObj);
+      aIt--;
+    }
+  }
   // delete objects
   std::map<FeaturePtr, std::set<FeaturePtr> > aReferences;
   std::set<FeaturePtr> aFeatures;
