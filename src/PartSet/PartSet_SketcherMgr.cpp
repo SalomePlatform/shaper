@@ -2123,8 +2123,8 @@ void PartSet_Fitter::fitAll(Handle(V3d_View) theView)
       if (aRes->isDisplayed()) {
         FeaturePtr aFeature = ModelAPI_Feature::feature(aRes);
         if (aFeature.get()) {
-          std::shared_ptr<SketchPlugin_SketchEntity> aSPFeature =
-            std::dynamic_pointer_cast<SketchPlugin_SketchEntity>(aFeature);
+          std::shared_ptr<SketchPlugin_Feature> aSPFeature =
+            std::dynamic_pointer_cast<SketchPlugin_Feature>(aFeature);
           if (aSPFeature.get()) {
             bool isAxiliary =
               aSPFeature->boolean(SketchPlugin_SketchEntity::AUXILIARY_ID())->value();
