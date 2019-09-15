@@ -141,10 +141,12 @@ void SketchAPI_Ellipse::setMinorRadius(double theMinorRadius)
 
 ModelHighAPI_Selection SketchAPI_Ellipse::majorAxis() const
 {
+  return ModelHighAPI_Selection();
 }
 
 ModelHighAPI_Selection SketchAPI_Ellipse::minorAxis() const
 {
+  return ModelHighAPI_Selection();
 }
 
 void SketchAPI_Ellipse::dump(ModelHighAPI_Dumper& theDumper) const

@@ -116,9 +116,6 @@ class SketchPlugin_Ellipse: public SketchPlugin_SketchEntity
   /// Use plugin manager for features creation
   SketchPlugin_Ellipse();
 
-  /// Returns \c true if the result is marked as auxiliary
-  virtual bool isAuxiliary(ResultPtr theResult);
-
 protected:
   /// \brief Initializes attributes of derived class.
   virtual void initDerivedClassAttributes();
@@ -127,9 +124,6 @@ private:
   bool fillCharacteristicPoints();
 
   void createEllipse(SketchPlugin_Sketch* theSketch, const int theResultIndex);
-
-private:
-  std::set<ResultPtr> myAuxiliaryResults;
 };
 
 #endif

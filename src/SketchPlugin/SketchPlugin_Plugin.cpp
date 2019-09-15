@@ -27,6 +27,7 @@
 #include <SketchPlugin_Projection.h>
 #include <SketchPlugin_ConstraintAngle.h>
 #include <SketchPlugin_ConstraintCoincidence.h>
+#include <SketchPlugin_ConstraintCoincidenceInternal.h>
 #include <SketchPlugin_ConstraintCollinear.h>
 #include <SketchPlugin_ConstraintDistance.h>
 #include <SketchPlugin_ConstraintDistanceHorizontal.h>
@@ -198,6 +199,8 @@ FeaturePtr SketchPlugin_Plugin::createFeature(std::string theFeatureID)
     return FeaturePtr(new SketchPlugin_Projection);
   } else if (theFeatureID == SketchPlugin_ConstraintCoincidence::ID()) {
     return FeaturePtr(new SketchPlugin_ConstraintCoincidence);
+  } else if (theFeatureID == SketchPlugin_ConstraintCoincidenceInternal::ID()) {
+    return FeaturePtr(new SketchPlugin_ConstraintCoincidenceInternal);
   } else if (theFeatureID == SketchPlugin_ConstraintCollinear::ID()) {
     return FeaturePtr(new SketchPlugin_ConstraintCollinear);
   } else if (theFeatureID == SketchPlugin_ConstraintDistance::ID()) {
@@ -296,6 +299,7 @@ std::shared_ptr<ModelAPI_FeatureStateMessage> SketchPlugin_Plugin
       aMsg->setState(SketchPlugin_Ellipse::ID(), aHasSketchPlane);
       aMsg->setState(SketchPlugin_Projection::ID(), aHasSketchPlane);
       aMsg->setState(SketchPlugin_ConstraintCoincidence::ID(), aHasSketchPlane);
+      aMsg->setState(SketchPlugin_ConstraintCoincidenceInternal::ID(), aHasSketchPlane);
       aMsg->setState(SketchPlugin_ConstraintCollinear::ID(), aHasSketchPlane);
       aMsg->setState(SketchPlugin_ConstraintDistance::ID(), aHasSketchPlane);
       aMsg->setState(SketchPlugin_ConstraintLength::ID(), aHasSketchPlane);

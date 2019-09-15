@@ -25,7 +25,6 @@
 #include <SketchPlugin_SketchEntity.h>
 #include <GeomAPI_IPresentable.h>
 
-////class GeomAPI_Circ2d;
 class GeomAPI_Pnt2d;
 
 /**\class SketchPlugin_MacroEllipse
@@ -162,6 +161,12 @@ private:
   void constraintsForEllipseByMajoxAxisAndPassed(FeaturePtr theEllipseFeature);
 
   FeaturePtr createEllipseFeature();
+
+  void createAuxiliaryPoint(const AttributePtr& theEllipsePoint,
+                            const std::string& theName);
+  void createAuxiliaryAxis(const AttributePtr& theStartPoint, const AttributePtr& theEndPoint);
+
+  void createInternalConstraint(const AttributePtr& thePoint1, const AttributePtr& thePoint2);
 
 private:
   std::shared_ptr<GeomAPI_Pnt2d> myCenter;

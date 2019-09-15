@@ -77,40 +77,15 @@ void SketchPlugin_Ellipse::execute()
   // Calculate all characteristics of the ellipse.
   fillCharacteristicPoints();
 
-  // Make visible points related to ellipse characteristics.
+  // Make a visible center of the ellipse.
   int aResultIndex = 0;
   SketchPlugin_Sketch::createPoint2DResult(this, aSketch, CENTER_ID(), aResultIndex++);
-  SketchPlugin_Sketch::createPoint2DResult(this, aSketch, FIRST_FOCUS_ID(), aResultIndex++);
-  SketchPlugin_Sketch::createPoint2DResult(this, aSketch, SECOND_FOCUS_ID(), aResultIndex++);
-  SketchPlugin_Sketch::createPoint2DResult(this, aSketch, MAJOR_AXIS_START_ID(), aResultIndex++);
-  SketchPlugin_Sketch::createPoint2DResult(this, aSketch, MAJOR_AXIS_END_ID(), aResultIndex++);
-  SketchPlugin_Sketch::createPoint2DResult(this, aSketch, MINOR_AXIS_START_ID(), aResultIndex++);
-  SketchPlugin_Sketch::createPoint2DResult(this, aSketch, MINOR_AXIS_END_ID(), aResultIndex++);
-
-  // Make auxiliary axes
-  SketchPlugin_Sketch::createLine2DResult(this, aSketch,
-      MAJOR_AXIS_START_ID(), MAJOR_AXIS_END_ID(), aResultIndex++);
-  SketchPlugin_Sketch::createLine2DResult(this, aSketch,
-      MINOR_AXIS_START_ID(), MINOR_AXIS_END_ID(), aResultIndex++);
-
-  // Mark already created results auxiliary
-  myAuxiliaryResults.clear();
-  const std::list<ResultPtr>& aResults = results();
-  std::list<ResultPtr>::const_iterator anIt = aResults.begin();
-  for (int anIndex = 0; anIt != aResults.end() && anIndex < aResultIndex; ++anIt, ++anIndex)
-    myAuxiliaryResults.insert(*anIt);
-
   // Make a visible ellipse.
   createEllipse(aSketch, aResultIndex);
 }
 
 bool SketchPlugin_Ellipse::isFixed() {
   return data()->selection(EXTERNAL_ID())->context().get() != NULL;
-}
-
-bool SketchPlugin_Ellipse::isAuxiliary(ResultPtr theResult)
-{
-  return myAuxiliaryResults.find(theResult) != myAuxiliaryResults.end();
 }
 
 void SketchPlugin_Ellipse::attributeChanged(const std::string& theID) {

@@ -26,6 +26,7 @@
 #include <SketchSolver_Constraint.h>
 #include <SketchSolver_ConstraintAngle.h>
 #include <SketchSolver_ConstraintCoincidence.h>
+#include <SketchPlugin_ConstraintCoincidenceInternal.h>
 #include <SketchSolver_ConstraintCollinear.h>
 #include <SketchSolver_ConstraintDistance.h>
 #include <SketchSolver_ConstraintEqual.h>
@@ -122,7 +123,8 @@ static GCS::SET_pD ellipseParameters(const EdgeWrapperPtr& theEllipse);
 
 SolverConstraintPtr PlaneGCSSolver_Tools::createConstraint(ConstraintPtr theConstraint)
 {
-  if (theConstraint->getKind() == SketchPlugin_ConstraintCoincidence::ID()) {
+  if (theConstraint->getKind() == SketchPlugin_ConstraintCoincidence::ID() ||
+      theConstraint->getKind() == SketchPlugin_ConstraintCoincidenceInternal::ID()) {
     return SolverConstraintPtr(new SketchSolver_ConstraintCoincidence(theConstraint));
   } else if (theConstraint->getKind() == SketchPlugin_ConstraintCollinear::ID()) {
     return SolverConstraintPtr(new SketchSolver_ConstraintCollinear(theConstraint));

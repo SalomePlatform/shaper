@@ -19,8 +19,11 @@
 
 #include <SketchPlugin_MacroEllipse.h>
 
+#include <SketchPlugin_ConstraintCoincidenceInternal.h>
 #include <SketchPlugin_Ellipse.h>
+#include <SketchPlugin_Line.h>
 #include <SketchPlugin_MacroArcReentrantMessage.h>
+#include <SketchPlugin_Point.h>
 #include <SketchPlugin_Tools.h>
 #include <SketchPlugin_Sketch.h>
 
@@ -284,7 +287,65 @@ FeaturePtr SketchPlugin_MacroEllipse::createEllipseFeature()
       boolean(AUXILIARY_ID())->value());
 
   aEllipseFeature->execute();
+
+  // create auxiliary points
+  createAuxiliaryPoint(aEllipseFeature->attribute(SketchPlugin_Ellipse::FIRST_FOCUS_ID()), "FirstFocus");
+  createAuxiliaryPoint(aEllipseFeature->attribute(SketchPlugin_Ellipse::SECOND_FOCUS_ID()), "SecondFocus");
+  createAuxiliaryPoint(aEllipseFeature->attribute(SketchPlugin_Ellipse::MAJOR_AXIS_START_ID()), "MajorAxisNegative");
+  createAuxiliaryPoint(aEllipseFeature->attribute(SketchPlugin_Ellipse::MAJOR_AXIS_END_ID()), "MajorAxisPositive");
+  createAuxiliaryPoint(aEllipseFeature->attribute(SketchPlugin_Ellipse::MINOR_AXIS_START_ID()), "MinorAxisNegative");
+  createAuxiliaryPoint(aEllipseFeature->attribute(SketchPlugin_Ellipse::MINOR_AXIS_END_ID()), "MinorAxisPositive");
+  // create auxiliary axes
+  createAuxiliaryAxis(aEllipseFeature->attribute(SketchPlugin_Ellipse::MAJOR_AXIS_START_ID()),
+                      aEllipseFeature->attribute(SketchPlugin_Ellipse::MAJOR_AXIS_END_ID()));
+  createAuxiliaryAxis(aEllipseFeature->attribute(SketchPlugin_Ellipse::MINOR_AXIS_START_ID()),
+                      aEllipseFeature->attribute(SketchPlugin_Ellipse::MINOR_AXIS_END_ID()));
+
   return aEllipseFeature;
+}
+
+void SketchPlugin_MacroEllipse::createAuxiliaryPoint(const AttributePtr& theEllipsePoint,
+                                                     const std::string& theName)
+{
+  FeaturePtr aPointFeature = sketch()->addFeature(SketchPlugin_Point::ID());
+  aPointFeature->data()->setName(theName);
+  aPointFeature->boolean(SketchPlugin_Point::AUXILIARY_ID())->setValue(true);
+
+  AttributePoint2DPtr anElPoint = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(theEllipsePoint);
+
+  AttributePoint2DPtr aCoord = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
+      aPointFeature->attribute(SketchPlugin_Point::COORD_ID()));
+  aCoord->setValue(anElPoint->x(), anElPoint->y());
+
+  createInternalConstraint(anElPoint, aCoord);
+}
+
+void SketchPlugin_MacroEllipse::createAuxiliaryAxis(const AttributePtr& theStartPoint,
+                                                    const AttributePtr& theEndPoint)
+{
+  FeaturePtr aLineFeature = sketch()->addFeature(SketchPlugin_Line::ID());
+  aLineFeature->boolean(SketchPlugin_Point::AUXILIARY_ID())->setValue(true);
+
+  AttributePoint2DPtr aStartPoint = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(theStartPoint);
+  AttributePoint2DPtr aEndPoint = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(theEndPoint);
+
+  AttributePoint2DPtr aLineStart = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
+      aLineFeature->attribute(SketchPlugin_Line::START_ID()));
+  aLineStart->setValue(aStartPoint->x(), aStartPoint->y());
+
+  AttributePoint2DPtr aLineEnd = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
+      aLineFeature->attribute(SketchPlugin_Line::END_ID()));
+  aLineEnd->setValue(aEndPoint->x(), aEndPoint->y());
+
+  createInternalConstraint(aStartPoint, aLineStart);
+  createInternalConstraint(aEndPoint, aLineEnd);
+}
+
+void SketchPlugin_MacroEllipse::createInternalConstraint(const AttributePtr& thePoint1,
+                                                         const AttributePtr& thePoint2)
+{
+  SketchPlugin_Tools::createConstraintAttrAttr(
+      sketch(), SketchPlugin_ConstraintCoincidenceInternal::ID(), thePoint1, thePoint2);
 }
 
 AISObjectPtr SketchPlugin_MacroEllipse::getAISObject(AISObjectPtr thePrevious)

@@ -30,6 +30,7 @@
 
 #include <SketchPlugin_ConstraintAngle.h>
 #include <SketchPlugin_ConstraintCoincidence.h>
+#include <SketchPlugin_ConstraintCoincidenceInternal.h>
 #include <SketchPlugin_ConstraintCollinear.h>
 #include <SketchPlugin_ConstraintDistance.h>
 #include <SketchPlugin_ConstraintEqual.h>
@@ -76,7 +77,8 @@ void SketchSolver_Constraint::blockEvents(bool isBlocked)
 SketchSolver_ConstraintType SketchSolver_Constraint::TYPE(ConstraintPtr theConstraint)
 {
   const std::string& aType = theConstraint->getKind();
-  if (aType == SketchPlugin_ConstraintCoincidence::ID())
+  if (aType == SketchPlugin_ConstraintCoincidence::ID() ||
+      aType == SketchPlugin_ConstraintCoincidenceInternal::ID())
     return CONSTRAINT_COINCIDENCE;
   else if (aType == SketchPlugin_ConstraintRigid::ID())
     return CONSTRAINT_FIXED;

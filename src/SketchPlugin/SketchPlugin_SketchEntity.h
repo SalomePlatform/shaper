@@ -112,10 +112,6 @@ class SketchPlugin_SketchEntity : public SketchPlugin_Feature, public GeomAPI_IC
   }
 
 // LCOV_EXCL_START
-  /// Returns \c true if the result is marked as auxiliary
-  virtual bool isAuxiliary(ResultPtr theResult)
-  { return false; }
-
   /// Customize presentation of the feature
   virtual bool customisePresentation(ResultPtr theResult, AISObjectPtr thePrs,
                                      std::shared_ptr<GeomAPI_ICustomPrs> theDefaultPrs)
@@ -146,8 +142,7 @@ class SketchPlugin_SketchEntity : public SketchPlugin_Feature, public GeomAPI_IC
     std::vector<int> aColor;
     std::shared_ptr<ModelAPI_AttributeBoolean> anAuxiliaryAttr =
                                     data()->boolean(SketchPlugin_SketchEntity::AUXILIARY_ID());
-    bool isConstruction = (anAuxiliaryAttr.get() != NULL && anAuxiliaryAttr->value())
-                       || isAuxiliary(theResult);
+    bool isConstruction = anAuxiliaryAttr.get() != NULL && anAuxiliaryAttr->value();
     if (isConstruction) {
       aColor = Config_PropManager::color("Visualization", "sketch_auxiliary_color");
     }
