@@ -144,6 +144,7 @@ ADD_UNIT_TESTS(
                TestGroupIntersection.py
                TestGroupIntersection_Error.py
                TestGroupSubstraction.py
+               TestGroupSubstraction2.py
                TestGroupSubstraction_Error1.py
                TestGroupSubstraction_Error2.py
                Test2977.py

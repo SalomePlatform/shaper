@@ -30,7 +30,7 @@
 #include <GeomAlgoAPI_CompoundBuilder.h>
 #include <GeomAlgoAPI_ShapeTools.h>
 
-typedef std::set<GeomShapePtr, GeomAPI_Shape::ComparatorWithOri> SetOfShape;
+typedef std::set<GeomShapePtr, GeomAPI_Shape::Comparator> SetOfShape;
 
 CollectionPlugin_GroupSubstraction::CollectionPlugin_GroupSubstraction()
 {
