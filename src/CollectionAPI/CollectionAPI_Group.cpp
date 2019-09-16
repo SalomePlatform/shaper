@@ -64,7 +64,7 @@ void CollectionAPI_Group::dump(ModelHighAPI_Dumper& theDumper) const
   AttributeSelectionListPtr anAttrList = aBase->selectionList(CollectionPlugin_Group::LIST_ID());
 
   theDumper << aBase << " = model.addGroup(" << aDocName << ", ";
-  if (anAttrList->isWholeResultAllowed())
+  if (anAttrList->isWholeResultAllowed() && !anAttrList->selectionType().empty())
     theDumper<<"\""<<anAttrList->selectionType()<<"\", ";
   theDumper << anAttrList;
   if (anAttrList->isGeometricalSelection())
