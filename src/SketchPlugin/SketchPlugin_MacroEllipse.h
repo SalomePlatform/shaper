@@ -162,8 +162,7 @@ private:
 
   FeaturePtr createEllipseFeature();
 
-  void createAuxiliaryPoint(const AttributePtr& theEllipsePoint,
-                            const std::string& theName);
+  void createAuxiliaryPoint(const AttributePtr& theEllipsePoint);
   void createAuxiliaryAxis(const AttributePtr& theStartPoint, const AttributePtr& theEndPoint);
 
   void createInternalConstraint(const AttributePtr& thePoint1, const AttributePtr& thePoint2);

@@ -289,12 +289,12 @@ FeaturePtr SketchPlugin_MacroEllipse::createEllipseFeature()
   aEllipseFeature->execute();
 
   // create auxiliary points
-  createAuxiliaryPoint(aEllipseFeature->attribute(SketchPlugin_Ellipse::FIRST_FOCUS_ID()), "FirstFocus");
-  createAuxiliaryPoint(aEllipseFeature->attribute(SketchPlugin_Ellipse::SECOND_FOCUS_ID()), "SecondFocus");
-  createAuxiliaryPoint(aEllipseFeature->attribute(SketchPlugin_Ellipse::MAJOR_AXIS_START_ID()), "MajorAxisNegative");
-  createAuxiliaryPoint(aEllipseFeature->attribute(SketchPlugin_Ellipse::MAJOR_AXIS_END_ID()), "MajorAxisPositive");
-  createAuxiliaryPoint(aEllipseFeature->attribute(SketchPlugin_Ellipse::MINOR_AXIS_START_ID()), "MinorAxisNegative");
-  createAuxiliaryPoint(aEllipseFeature->attribute(SketchPlugin_Ellipse::MINOR_AXIS_END_ID()), "MinorAxisPositive");
+  createAuxiliaryPoint(aEllipseFeature->attribute(SketchPlugin_Ellipse::FIRST_FOCUS_ID()));
+  createAuxiliaryPoint(aEllipseFeature->attribute(SketchPlugin_Ellipse::SECOND_FOCUS_ID()));
+  createAuxiliaryPoint(aEllipseFeature->attribute(SketchPlugin_Ellipse::MAJOR_AXIS_START_ID()));
+  createAuxiliaryPoint(aEllipseFeature->attribute(SketchPlugin_Ellipse::MAJOR_AXIS_END_ID()));
+  createAuxiliaryPoint(aEllipseFeature->attribute(SketchPlugin_Ellipse::MINOR_AXIS_START_ID()));
+  createAuxiliaryPoint(aEllipseFeature->attribute(SketchPlugin_Ellipse::MINOR_AXIS_END_ID()));
   // create auxiliary axes
   createAuxiliaryAxis(aEllipseFeature->attribute(SketchPlugin_Ellipse::MAJOR_AXIS_START_ID()),
                       aEllipseFeature->attribute(SketchPlugin_Ellipse::MAJOR_AXIS_END_ID()));
@@ -304,11 +304,9 @@ FeaturePtr SketchPlugin_MacroEllipse::createEllipseFeature()
   return aEllipseFeature;
 }
 
-void SketchPlugin_MacroEllipse::createAuxiliaryPoint(const AttributePtr& theEllipsePoint,
-                                                     const std::string& theName)
+void SketchPlugin_MacroEllipse::createAuxiliaryPoint(const AttributePtr& theEllipsePoint)
 {
   FeaturePtr aPointFeature = sketch()->addFeature(SketchPlugin_Point::ID());
-  aPointFeature->data()->setName(theName);
   aPointFeature->boolean(SketchPlugin_Point::AUXILIARY_ID())->setValue(true);
 
   AttributePoint2DPtr anElPoint = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(theEllipsePoint);
