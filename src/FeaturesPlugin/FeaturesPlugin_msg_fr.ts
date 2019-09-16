@@ -2,18 +2,1308 @@
 <!DOCTYPE TS>
 <TS version="2.0" language="fr_FR">
 
+  <!-- workshop -->
   <context>
     <name>workshop</name>
     <message>
-      <source>Scale</source>
+      <source>Common</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Cut</source>
       <translation>AA</translation>
     </message>
     <message>
       <source>Extrusion</source>
       <translation>AA</translation>
     </message>
+    <message>
+      <source>ExtrusionCut</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>ExtrusionFuse</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Fillet</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Fuse</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Fuse Faces</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Intersection</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Partition</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Pipe</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Recover</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Remove Sub-Shapes</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Revolution</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>RevolutionCut</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>RevolutionFuse</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Scale</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Smash</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Split</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Union</source>
+      <translation>AA</translation>
+    </message>
   </context>
 
+  <!-- AngularCopy -->
+  <context>
+    <name>AngularCopy</name>
+    <message>
+      <source>Angular Copy</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Perform copy and rotate</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+
+  <!-- Common -->
+  <context>
+    <name>Common</name>
+    <message>
+      <source>Common</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Perform boolean common operation with objects</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>Common:FeaturesPlugin_ValidatorBooleanCommonArguments</name>
+    <message>
+      <source>Not enough arguments for Fuse operation.</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>Common:creation_method</name>
+    <message>
+      <source>Simple</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>advanced</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>Common:main_objects</name>
+    <message>
+      <source>Main objects</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Objects</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Select objects</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>Common:tool_objects</name>
+    <message>
+      <source>Select tools</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Tool objects</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+
+  <!-- Cut -->
+  <context>
+    <name>Cut</name>
+    <message>
+      <source>Cut</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Perform boolean cut operation with objects</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>Cut:FeaturesPlugin_ValidatorBooleanArguments</name>
+    <message>
+      <source>Objects not selected.</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>Cut:main_objects</name>
+    <message>
+      <source>Main objects</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Select objects</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>Cut:tool_objects</name>
+    <message>
+      <source>Select tools</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Tool objects</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+
+  <!-- ExtrusionCut -->
+  <context>
+    <name>ExtrusionCut</name>
+    <message>
+      <source>ExtrusionCut</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>ExtrusionCut:CreationMethod</name>
+    <message>
+      <source>By bounding planes and offsets</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>By sizes</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>ExtrusionCut:Model_FeatureValidator</name>
+    <message>
+      <source>Attribute "base" is not initialized.</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>ExtrusionCut:base</name>
+    <message>
+      <source>Select a sketch face</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>ExtrusionCut:direction_object</name>
+    <message>
+      <source>&lt;base normal&gt;</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Direction</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Select an edge for direction</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>ExtrusionCut:from_object</name>
+    <message>
+      <source>&lt;base sketch&gt;</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Bounding plane (select a planar face)</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Plane face</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>ExtrusionCut:from_offset</name>
+    <message>
+      <source>Offset</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Offset for bounding plane</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>ExtrusionCut:from_size</name>
+    <message>
+      <source>From size</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Size</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>ExtrusionCut:main_objects</name>
+    <message>
+      <source>Cut from:</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Objects to Cut</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>ExtrusionCut:to_object</name>
+    <message>
+      <source>&lt;base sketch&gt;</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Bounding plane (select a planar face)</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Plane face</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>ExtrusionCut:to_offset</name>
+    <message>
+      <source>Offset</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Offset for bounding plane</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>ExtrusionCut:to_size</name>
+    <message>
+      <source>Size</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>To size</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+
+  <!-- ExtrusionFuse -->
+  <context>
+    <name>ExtrusionFuse</name>
+    <message>
+      <source>ExtrusionFuse</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>ExtrusionFuse:CreationMethod</name>
+    <message>
+      <source>By bounding planes and offsets</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>By sizes</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>ExtrusionFuse:base</name>
+    <message>
+      <source>Select a sketch face</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>ExtrusionFuse:direction_object</name>
+    <message>
+      <source>&lt;base normal&gt;</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Direction</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Select an edge for direction</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>ExtrusionFuse:from_object</name>
+    <message>
+      <source>&lt;base sketch&gt;</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Bounding plane (select a planar face)</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Plane face</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>ExtrusionFuse:from_offset</name>
+    <message>
+      <source>Offset</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Offset for bounding plane</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>ExtrusionFuse:from_size</name>
+    <message>
+      <source>From size</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Size</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>ExtrusionFuse:main_objects</name>
+    <message>
+      <source>Fuse with:</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Objects to Fuse</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>ExtrusionFuse:to_object</name>
+    <message>
+      <source>&lt;base sketch&gt;</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Bounding plane (select a planar face)</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Plane face</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>ExtrusionFuse:to_offset</name>
+    <message>
+      <source>Offset</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Offset for bounding plane</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>ExtrusionFuse:to_size</name>
+    <message>
+      <source>Size</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>To size</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+
+  <!-- Fillet -->
+  <context>
+    <name>Fillet</name>
+    <message>
+      <source>Fillet</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Perform fillet on face or edge</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>Fillet:Model_FeatureValidator</name>
+    <message>
+      <source>Attribute "main_objects" is not initialized.</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>Fillet:creation_method</name>
+    <message>
+      <source>Fixed radius</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Varying radius</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>Fillet:main_objects</name>
+    <message>
+      <source>Faces or/and edges</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Select objects</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>Fillet:radius1</name>
+    <message>
+      <source>Fillet radius at start point.</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Fillet radius.</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Radius</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Start radius</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>Fillet:radius2</name>
+    <message>
+      <source>End radius</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Fillet radius at end point.</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+
+  <!-- Fuse -->
+  <context>
+    <name>Fuse</name>
+    <message>
+      <source>Fuse</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Perform boolean fuse operation with objects</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>Fuse:FeaturesPlugin_ValidatorBooleanFuseArguments</name>
+    <message>
+      <source>Not enough arguments for Fuse operation.</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>Fuse:creation_method</name>
+    <message>
+      <source>Simple</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>advanced</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>Fuse:main_objects</name>
+    <message>
+      <source>Main objects</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Objects</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Select objects</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>Fuse:remove_intersection_edges</name>
+    <message>
+      <source>Remove intersection edges</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Remove intersection edges if they laying on the same surface</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>Fuse:tool_objects</name>
+    <message>
+      <source>Select tools</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Tool objects</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+
+  <!-- FusionFaces -->
+  <context>
+    <name>FusionFaces</name>
+    <message>
+      <source>Fuse Faces</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Performs fusion of connected faces</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>FusionFaces:base_shape</name>
+    <message>
+      <source>Select a shape to modify.</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Shape:</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>FusionFaces:base_shape:GeomValidators_BodyShapes</name>
+    <message>
+      <source>Error: Context is empty.</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+
+  <!-- Intersection -->
+  <context>
+    <name>Intersection</name>
+    <message>
+      <source>Intersect objects with tools</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Intersection</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>Intersection:main_objects</name>
+    <message>
+      <source>Objects</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Select objects(compounds, compsolids, solids, shells, faces or edges)</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+
+  <!-- LinearCopy -->
+  <context>
+    <name>LinearCopy</name>
+    <message>
+      <source>Linear copy</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Perform copy and translate</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+
+  <!-- Measurement -->
+  <context>
+    <name>Measurement</name>
+    <message>
+      <source>Calculate properties of objects</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Measurement</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+
+  <!-- Partition -->
+  <context>
+    <name>Partition</name>
+    <message>
+      <source>Partition</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Perform partition operations with solids</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>Partition:GeomValidators_MinObjectsSelected</name>
+    <message>
+      <source>Error: Attribute "%1" should contain at least %2 items.</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>Partition:base_objects</name>
+    <message>
+      <source>Base objects:</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Select objects for partitioning.</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+
+  <!-- Pipe -->
+  <context>
+    <name>Pipe</name>
+    <message>
+      <source>Generates extrusion along a path</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Pipe</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>Pipe:base_objects</name>
+    <message>
+      <source>Base objects:</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Select a base objects</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>Pipe:binormal</name>
+    <message>
+      <source>Bi-Normal:</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Select an edge for Bi-Normal</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>Pipe:creation_method</name>
+    <message>
+      <source>Pipe by objects, path and Bi-Normal</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Pipe by objects, path and locations</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Simple pipe by objects and path</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>Pipe:locations_objects</name>
+    <message>
+      <source>Locations:</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Select one or more vertices to specify the locations</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>Pipe:locations_objects:FeaturesPlugin_ValidatorPipeLocations</name>
+    <message>
+      <source>Error: Empty selection context.</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>Pipe:path_object</name>
+    <message>
+      <source>Path object:</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Select an edge or wire for path</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+
+  <!-- Placement -->
+  <context>
+    <name>Placement</name>
+    <message>
+      <source>Place objects relatively to another one</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Placement</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+
+  <!-- Recover -->
+  <context>
+    <name>Recover</name>
+    <message>
+      <source>Recover</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Visualize concealed objects</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>Recover:Model_FeatureValidator</name>
+    <message>
+      <source>Attribute "base_feature" is not initialized.</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>Recover:base_feature</name>
+    <message>
+      <source>Feature:</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Select a feature that conceals results.</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>Recover:base_feature:FeaturesPlugin_ValidatorConcealedResult</name>
+    <message>
+      <source>Error: Empty feature.</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>Recover:method</name>
+    <message>
+      <source>Concealed compounds</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Concealed results</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+
+  <!-- Rotation -->
+  <context>
+    <name>Rotation</name>
+    <message>
+      <source>Perform rotation of objects around the axis to specified angle</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Rotation</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+
+  <!-- Remove_SubShapes -->
+  <context>
+    <name>Remove_SubShapes</name>
+    <message>
+      <source>Allows to remove sub-shapes from wires, shells, compsolids and compounds</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Remove Sub-Shapes</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>Remove_SubShapes:base_shape</name>
+    <message>
+      <source>Select a shape to modify.</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Shape:</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>Remove_SubShapes:creation_method</name>
+    <message>
+      <source>By keeping sub-shapes</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>By removing sub-shapes</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>Remove_SubShapes:subshapes_to_keep</name>
+    <message>
+      <source>Select shapes to keep.</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Sub-Shapes to keep:</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>Remove_SubShapes:subshapes_to_keep:FeaturesPlugin_ValidatorRemoveSubShapesSelection</name>
+    <message>
+      <source>Error: Empty context.</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>Remove_SubShapes:subshapes_to_remove</name>
+    <message>
+      <source>Select shapes to remove.</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Sub-Shapes to remove:</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>Remove_SubShapes:subshapes_to_remove:FeaturesPlugin_ValidatorRemoveSubShapesSelection</name>
+    <message>
+      <source>Error: Empty context.</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+
+  <!-- Revolution -->
+  <context>
+    <name>Revolution</name>
+    <message>
+      <source>Create a solid by revolution of a face</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Revolution</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>Revolution:CreationMethod</name>
+    <message>
+      <source>By angles</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>By bounding planes and angles</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>Revolution:axis_object</name>
+    <message>
+      <source>Axis</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Select an edge for axis</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>Revolution:base</name>
+    <message>
+      <source>Base objects:</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Select a base objects</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>Revolution:from_angle</name>
+    <message>
+      <source>Angle</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>From angle</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>Revolution:from_object</name>
+    <message>
+      <source>&lt;base sketch&gt;</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Bounding plane (select a planar face)</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Plane face</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>Revolution:from_offset</name>
+    <message>
+      <source>Angle</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Angle for "from" bounding plane</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>Revolution:to_angle</name>
+    <message>
+      <source>Angle</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>To angle</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>Revolution:to_object</name>
+    <message>
+      <source>&lt;base sketch&gt;</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Bounding plane (select a planar face)</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Plane face</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>Revolution:to_offset</name>
+    <message>
+      <source>Angle</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Angle for "to" bounding plane</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+
+  <!-- RevolutionCut -->
+  <context>
+    <name>RevolutionCut</name>
+    <message>
+      <source>RevolutionCut</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>RevolutionCut:CreationMethod</name>
+    <message>
+      <source>By angles</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>By bounding planes and angles</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>RevolutionCut:axis_object</name>
+    <message>
+      <source>Axis</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Select an edge for axis</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>RevolutionCut:base</name>
+    <message>
+      <source>Select a sketch face</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>RevolutionCut:from_angle</name>
+    <message>
+      <source>Angle</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>From angle</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>RevolutionCut:from_object</name>
+    <message>
+      <source>&lt;sketch&gt;</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Bounding plane (select a planar face)</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Plane face</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>RevolutionCut:from_offset</name>
+    <message>
+      <source>Angle</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Angle for "from" bounding plane</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>RevolutionCut:main_objects</name>
+    <message>
+      <source>Cut from:</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Objects to Cut</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>RevolutionCut:to_angle</name>
+    <message>
+      <source>Angle</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>To angle</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>RevolutionCut:to_object</name>
+    <message>
+      <source>&lt;sketch&gt;</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Bounding plane (select a planar face)</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Plane face</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>RevolutionCut:to_offset</name>
+    <message>
+      <source>Angle</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Angle for "to" bounding plane</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+
+  <!-- RevolutionFuse -->
+  <context>
+    <name>RevolutionFuse</name>
+    <message>
+      <source>RevolutionFuse</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>RevolutionFuse:CreationMethod</name>
+    <message>
+      <source>By angles</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>By bounding planes and angles</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>RevolutionFuse:axis_object</name>
+    <message>
+      <source>Axis</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Select an edge for axis</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>RevolutionFuse:base</name>
+    <message>
+      <source>Select a sketch face</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>RevolutionFuse:from_angle</name>
+    <message>
+      <source>Angle</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>From angle</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>RevolutionFuse:from_object</name>
+    <message>
+      <source>&lt;sketch&gt;</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Bounding plane (select a planar face)</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Plane face</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>RevolutionFuse:from_offset</name>
+    <message>
+      <source>Angle</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Angle for "from" for bounding plane</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>RevolutionFuse:main_objects</name>
+    <message>
+      <source>Fuse with:</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Objects to Fuse</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>RevolutionFuse:to_angle</name>
+    <message>
+      <source>Angle</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>To angle</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>RevolutionFuse:to_object</name>
+    <message>
+      <source>&lt;sketch&gt;</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Bounding plane (select a planar face)</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Plane face</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>RevolutionFuse:to_offset</name>
+    <message>
+      <source>Angle</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Angle for "to" bounding plane</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+
+  <!-- Scale -->
   <context>
     <name>Scale</name>
     <message>
@@ -37,13 +1327,6 @@
     </message>
   </context>
   <context>
-    <name>Scale:Model_FeatureValidator</name>
-    <message>
-      <source>Attribute "center_point" is not initialized.</source>
-      <translation>AA</translation>
-    </message>
-  </context>
-  <context>
     <name>Scale:center_point</name>
     <message>
       <source>Center point</source>
@@ -51,13 +1334,6 @@
     </message>
     <message>
       <source>Select the center point</source>
-      <translation>AA</translation>
-    </message>
-  </context>
-  <context>
-    <name>Scale:center_point:GeomValidators_ConstructionComposite</name>
-    <message>
-      <source>The result is empty</source>
       <translation>AA</translation>
     </message>
   </context>
@@ -101,6 +1377,156 @@
     </message>
   </context>
 
+  <!-- Smash -->
+  <context>
+    <name>Smash</name>
+    <message>
+      <source>Perform boolean smash operation with objects</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Smash</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>Smash:FeaturesPlugin_ValidatorBooleanArguments</name>
+    <message>
+      <source>Objects not selected.</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>Smash:main_objects</name>
+    <message>
+      <source>Main objects</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Select objects</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>Smash:tool_objects</name>
+    <message>
+      <source>Select tools</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Tool objects</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+
+  <!-- Split -->
+  <context>
+    <name>Split</name>
+    <message>
+      <source>Perform boolean split operation with objects</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Split</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>Split:FeaturesPlugin_ValidatorBooleanArguments</name>
+    <message>
+      <source>Objects not selected.</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>Split:main_objects</name>
+    <message>
+      <source>Main objects</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Select objects</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>Split:tool_objects</name>
+    <message>
+      <source>Select tools</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Tool objects</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+
+  <!-- Symmetry -->
+  <context>
+    <name>Symmetry</name>
+    <message>
+      <source>Perform symmetry with respect to a point, an axis or a plane</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Symmetry</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+
+  <!-- Translation -->
+  <context>
+    <name>Translation</name>
+    <message>
+      <source>Perform translation of objects along the axis to specified distance</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Translation</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+
+  <!-- Union -->
+  <context>
+    <name>Union</name>
+    <message>
+      <source>Perform union operations with shapes</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Union</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>Union:base_objects</name>
+    <message>
+      <source>Base objects:</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Select solids for union.</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+
+  <!-- Validators -->
+
+  <context>
+    <name>Scale:Model_FeatureValidator</name>
+    <message>
+      <source>Attribute "center_point" is not initialized.</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>Scale:center_point:GeomValidators_ConstructionComposite</name>
+    <message>
+      <source>The result is empty</source>
+      <translation>AA</translation>
+    </message>
+  </context>
   <context>
     <name>Extrusion:GeomValidators_ZeroOffset</name>
     <message>
@@ -3932,292 +5358,6 @@
     <name>FusionFaces:Model_FeatureValidator</name>
     <message>
       <source>Attribute "base_shape" is not initialized.</source>
-      <translation>AA</translation>
-    </message>
-  </context>
-
-  <!-- MissedTranslations -->
-
-  <context>
-    <name>AngularCopy</name>
-    <message>
-      <source>Angular Copy</source>
-      <translation>AA</translation>
-    </message>
-    <message>
-      <source>Perform copy and rotate</source>
-      <translation>AA</translation>
-    </message>
-  </context>
-  <context>
-    <name>Common</name>
-    <message>
-      <source>Common</source>
-      <translation>AA</translation>
-    </message>
-    <message>
-      <source>Perform boolean common operation with objects</source>
-      <translation>AA</translation>
-    </message>
-  </context>
-  <context>
-    <name>Cut</name>
-    <message>
-      <source>Cut</source>
-      <translation>AA</translation>
-    </message>
-    <message>
-      <source>Perform boolean cut operation with objects</source>
-      <translation>AA</translation>
-    </message>
-  </context>
-  <context>
-    <name>Fuse</name>
-    <message>
-      <source>Fuse</source>
-      <translation>AA</translation>
-    </message>
-    <message>
-      <source>Perform boolean fuse operation with objects</source>
-      <translation>AA</translation>
-    </message>
-  </context>
-  <context>
-    <name>ExtrusionCut</name>
-    <message>
-      <source></source>
-      <translation>AA</translation>
-    </message>
-    <message>
-      <source>ExtrusionCut</source>
-      <translation>AA</translation>
-    </message>
-  </context>
-  <context>
-    <name>ExtrusionFuse</name>
-    <message>
-      <source></source>
-      <translation>AA</translation>
-    </message>
-    <message>
-      <source>ExtrusionFuse</source>
-      <translation>AA</translation>
-    </message>
-  </context>
-  <context>
-    <name>Fillet</name>
-    <message>
-      <source>Fillet</source>
-      <translation>AA</translation>
-    </message>
-    <message>
-      <source>Perform fillet on face or edge</source>
-      <translation>AA</translation>
-    </message>
-  </context>
-  <context>
-    <name>FusionFaces</name>
-    <message>
-      <source>Fuse Faces</source>
-      <translation>AA</translation>
-    </message>
-    <message>
-      <source>Performs fusion of connected faces</source>
-      <translation>AA</translation>
-    </message>
-  </context>
-  <context>
-    <name>Intersection</name>
-    <message>
-      <source>Intersect objects with tools</source>
-      <translation>AA</translation>
-    </message>
-    <message>
-      <source>Intersection</source>
-      <translation>AA</translation>
-    </message>
-  </context>
-  <context>
-    <name>LinearCopy</name>
-    <message>
-      <source>Linear copy</source>
-      <translation>AA</translation>
-    </message>
-    <message>
-      <source>Perform copy and translate</source>
-      <translation>AA</translation>
-    </message>
-  </context>
-  <context>
-    <name>Measurement</name>
-    <message>
-      <source>Calculate properties of objects</source>
-      <translation>AA</translation>
-    </message>
-    <message>
-      <source>Measurement</source>
-      <translation>AA</translation>
-    </message>
-  </context>
-  <context>
-    <name>Partition</name>
-    <message>
-      <source>Partition</source>
-      <translation>AA</translation>
-    </message>
-    <message>
-      <source>Perform partition operations with solids</source>
-      <translation>AA</translation>
-    </message>
-  </context>
-  <context>
-    <name>Pipe</name>
-    <message>
-      <source>Generates extrusion along a path</source>
-      <translation>AA</translation>
-    </message>
-    <message>
-      <source>Pipe</source>
-      <translation>AA</translation>
-    </message>
-  </context>
-  <context>
-    <name>Placement</name>
-    <message>
-      <source>Place objects relatively to another one</source>
-      <translation>AA</translation>
-    </message>
-    <message>
-      <source>Placement</source>
-      <translation>AA</translation>
-    </message>
-  </context>
-  <context>
-    <name>Recover</name>
-    <message>
-      <source>Recover</source>
-      <translation>AA</translation>
-    </message>
-    <message>
-      <source>Visualize concealed objects</source>
-      <translation>AA</translation>
-    </message>
-  </context>
-
-  <context>
-    <name>Revolution</name>
-    <message>
-      <source>Create a solid by revolution of a face</source>
-      <translation>AA</translation>
-    </message>
-    <message>
-      <source>Revolution</source>
-      <translation>AA</translation>
-    </message>
-  </context>
-  <context>
-    <name>RevolutionCut</name>
-    <message>
-      <source></source>
-      <translation>AA</translation>
-    </message>
-    <message>
-      <source>RevolutionCut</source>
-      <translation>AA</translation>
-    </message>
-  </context>
-  <context>
-    <name>RevolutionFuse</name>
-    <message>
-      <source></source>
-      <translation>AA</translation>
-    </message>
-    <message>
-      <source>RevolutionFuse</source>
-      <translation>AA</translation>
-    </message>
-  </context>
-
-  <context>
-    <name>Rotation</name>
-    <message>
-      <source>Perform rotation of objects around the axis to specified angle</source>
-      <translation>AA</translation>
-    </message>
-    <message>
-      <source>Rotation</source>
-      <translation>AA</translation>
-    </message>
-  </context>
-
-  <context>
-    <name>Remove_SubShapes</name>
-    <message>
-      <source>Allows to remove sub-shapes from wires, shells, compsolids and compounds</source>
-      <translation>AA</translation>
-    </message>
-    <message>
-      <source>Remove Sub-Shapes</source>
-      <translation>AA</translation>
-    </message>
-  </context>
-
-  <context>
-    <name>Smash</name>
-    <message>
-      <source>Perform boolean smash operation with objects</source>
-      <translation>AA</translation>
-    </message>
-    <message>
-      <source>Smash</source>
-      <translation>AA</translation>
-    </message>
-  </context>
-
-  <context>
-    <name>Split</name>
-    <message>
-      <source>Perform boolean split operation with objects</source>
-      <translation>AA</translation>
-    </message>
-    <message>
-      <source>Split</source>
-      <translation>AA</translation>
-    </message>
-  </context>
-
-  <context>
-    <name>Symmetry</name>
-    <message>
-      <source>Perform symmetry with respect to a point, an axis or a plane</source>
-      <translation>AA</translation>
-    </message>
-    <message>
-      <source>Symmetry</source>
-      <translation>AA</translation>
-    </message>
-  </context>
-
-  <context>
-    <name>Translation</name>
-    <message>
-      <source>Perform translation of objects along the axis to specified distance</source>
-      <translation>AA</translation>
-    </message>
-    <message>
-      <source>Translation</source>
-      <translation>AA</translation>
-    </message>
-  </context>
-
-  <context>
-    <name>Union</name>
-    <message>
-      <source>Perform union operations with shapes</source>
-      <translation>AA</translation>
-    </message>
-    <message>
-      <source>Union</source>
       <translation>AA</translation>
     </message>
   </context>
