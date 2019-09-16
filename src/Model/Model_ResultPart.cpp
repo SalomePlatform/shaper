@@ -285,7 +285,7 @@ std::string Model_ResultPart::nameInPart(const std::shared_ptr<GeomAPI_Shape>& t
       TopoDS_Shape aBodyShape = *(aBody->shape()->implPtr<TopoDS_Shape>());
       // check is body contain the selected sub-shape
       for(TopExp_Explorer anExp(aBodyShape, aShape.ShapeType()); anExp.More(); anExp.Next()) {
-        if (aShape.IsEqual(anExp.Current())) {
+        if (aShape.IsSame(anExp.Current())) {
           aContext = aBody;
           break;
         }
