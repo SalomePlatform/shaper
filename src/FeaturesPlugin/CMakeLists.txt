@@ -176,6 +176,7 @@ ADD_UNIT_TESTS(TestExtrusion.py
                TestExtrusionCut.py
                TestExtrusionCut_BySize.py
                TestExtrusionCut_ByPlanesAndOffsets.py
+               TestExtrusionCut_ByFaces.py
                TestExtrusionFuse.py
                TestExtrusionFuse_BySize.py
                TestExtrusionFuse_ByPlanesAndOffsets.py

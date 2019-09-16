@@ -537,7 +537,7 @@ void GeomAlgoAPI_Prism::buildByFaces(const GeomShapePtr             theBaseShape
   gp_Vec anExtVec = theDirection->impl<gp_Dir>();
 
   // Moving prism bounding faces according to "from" and "to" sizes.
-  GeomShapePtr aBoundingFromShape = buildOffset(theFromShape, theFromSize, theDirection, *this);
+  GeomShapePtr aBoundingFromShape = buildOffset(theFromShape, -theFromSize, theDirection, *this);
   GeomShapePtr aBoundingToShape   = buildOffset(theToShape, theToSize, theDirection, *this);
 
   // Bounding box for shapes used in prism building.

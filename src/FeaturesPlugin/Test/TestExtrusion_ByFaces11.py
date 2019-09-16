@@ -139,7 +139,7 @@ model.testNbSubShapes(Extrusion_1, GeomAPI_Shape.VERTEX, [128])
 model.testResultsVolumes(Extrusion_1, [7626.2279286])
 
 # offset "From" face
-ParamFrom.setValue(-20)
+ParamFrom.setValue(20)
 model.do()
 model.testNbResults(Extrusion_1, 1)
 model.testNbSubResults(Extrusion_1, [2])
@@ -149,7 +149,7 @@ model.testNbSubShapes(Extrusion_1, GeomAPI_Shape.EDGE, [68])
 model.testNbSubShapes(Extrusion_1, GeomAPI_Shape.VERTEX, [136])
 model.testResultsVolumes(Extrusion_1, [21514.8965])
 
-ParamFrom.setValue(20)
+ParamFrom.setValue(-20)
 model.do()
 model.testNbResults(Extrusion_1, 1)
 model.testNbSubResults(Extrusion_1, [2])
