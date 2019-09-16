@@ -598,7 +598,7 @@ std::shared_ptr<SketchAPI_MacroEllipse> SketchAPI_Sketch::addEllipse(
   std::shared_ptr<ModelAPI_Feature> aFeature =
       compositeFeature()->addFeature(SketchPlugin_MacroEllipse::ID());
   return MacroEllipsePtr(new SketchAPI_MacroEllipse(aFeature,
-      thePoint1X, thePoint1Y, thePoint2X, thePoint1Y, thePassedX, thePassedY, isPoint1Center));
+      thePoint1X, thePoint1Y, thePoint2X, thePoint2Y, thePassedX, thePassedY, isPoint1Center));
 }
 
 std::shared_ptr<SketchAPI_MacroEllipse> SketchAPI_Sketch::addEllipse(
@@ -1093,6 +1093,13 @@ static std::shared_ptr<GeomAPI_Pnt2d> middlePointOnArc(const FeaturePtr& theFeat
   return std::shared_ptr<GeomAPI_Pnt2d>(new GeomAPI_Pnt2d(x, y));
 }
 
+static std::shared_ptr<GeomAPI_Pnt2d> pointOnEllipse(const FeaturePtr& theFeature)
+{
+  AttributePoint2DPtr aMajorAxisEnd = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
+      theFeature->attribute(SketchPlugin_Ellipse::MAJOR_AXIS_END_ID()));
+  return aMajorAxisEnd ? aMajorAxisEnd->pnt() : std::shared_ptr<GeomAPI_Pnt2d>();
+}
+
 static std::shared_ptr<GeomAPI_Pnt2d> middlePoint(const ObjectPtr& theObject)
 {
   std::shared_ptr<GeomAPI_Pnt2d> aMiddlePoint;
@@ -1108,6 +1115,8 @@ static std::shared_ptr<GeomAPI_Pnt2d> middlePoint(const ObjectPtr& theObject)
       aMiddlePoint = pointOnCircle(aFeature);
     else if (aFeatureKind == SketchPlugin_Arc::ID())
       aMiddlePoint = middlePointOnArc(aFeature);
+    else if (aFeatureKind == SketchPlugin_Ellipse::ID())
+      aMiddlePoint = pointOnEllipse(aFeature);
   }
   return aMiddlePoint;
 }

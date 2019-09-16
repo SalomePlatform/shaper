@@ -44,6 +44,9 @@
 %include "std_pair.i"
 %include "std_shared_ptr.i"
 
+// function with named parameters
+%feature("kwargs") SketchAPI_Ellipse::construction;
+
 // shared pointers
 %shared_ptr(SketchAPI_Arc)
 %shared_ptr(SketchAPI_MacroArc)

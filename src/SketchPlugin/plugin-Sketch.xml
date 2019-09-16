@@ -966,9 +966,9 @@
       <feature id="SketchConstraintRigid" title="Fixed" tooltip="Fix an object" icon="icons/Sketch/fixed.png"
                helpfile="rigidFeature.html">
         <sketch_shape_selector id="ConstraintEntityA" label="Object"
-                        tooltip="Select point, line end point, line, center of circle or arc."
+                        tooltip="Select point, curve or its boundary point."
                         shape_types="edge vertex">
-          <validator id="GeomValidators_ShapeType" parameters="vertex,line,circle"/>
+          <validator id="GeomValidators_ShapeType" parameters="vertex,edge"/>
           <validator id="SketchPlugin_NotFixed"/>
         </sketch_shape_selector>
         <validator id="PartSet_RigidSelection"/>

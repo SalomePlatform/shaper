@@ -102,6 +102,8 @@ void SketchSolver_ConstraintCoincidence::getAttributes(
       myType = CONSTRAINT_PT_ON_LINE;
     else if (anEntType == ENTITY_CIRCLE || anEntType == ENTITY_ARC)
       myType = CONSTRAINT_PT_ON_CIRCLE;
+    else if (anEntType == ENTITY_ELLIPSE || anEntType == ENTITY_ELLIPTICAL_ARC)
+      myType = CONSTRAINT_PT_ON_ELLIPSE;
     else
       myErrorMsg = SketchSolver_Error::INCORRECT_ATTRIBUTE();
 

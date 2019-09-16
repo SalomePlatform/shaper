@@ -135,6 +135,22 @@ public:
   SKETCHAPI_EXPORT
   ModelHighAPI_Selection minorAxis() const;
 
+  /// Create construction elements (focuses, axes etc.).
+  /// Empty value for each parameter shows that the corresponding feature has been removed.
+  /// Value "aux" marks this feature as auxiliary.
+  /// And the name of the feature shows that it is a regular feature.
+  SKETCHAPI_EXPORT
+  std::list<std::shared_ptr<SketchAPI_SketchEntity> > construction(
+      const std::string& center = std::string(),
+      const std::string& firstFocus = std::string(),
+      const std::string& secondFocus = std::string(),
+      const std::string& majorAxisStart = std::string(),
+      const std::string& majorAxisEnd = std::string(),
+      const std::string& minorAxisStart = std::string(),
+      const std::string& minorAxisEnd = std::string(),
+      const std::string& majorAxis = std::string(),
+      const std::string& minorAxis = std::string()) const;
+
   /// Dump wrapped feature
   SKETCHAPI_EXPORT
   virtual void dump(ModelHighAPI_Dumper& theDumper) const;

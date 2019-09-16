@@ -230,6 +230,9 @@ ADD_UNIT_TESTS(
   TestCreateCircleByCenterAndPassed.py
   TestCreateCircleByThreePoints.py
   TestCreateCircleChangeType.py
+  TestCreateEllipseByCenterSemiaxisAndPassed.py
+  TestCreateEllipseByMajorAxisAndPassed.py
+  TestCreateEllipseByExternal.py
   TestDegeneratedGeometry.py
   TestDistanceDump.py
   TestDistanceSignedVsUnsigned01.py
@@ -294,6 +297,7 @@ if(${SKETCHER_CHANGE_RADIUS_WHEN_MOVE})
   ADD_UNIT_TESTS(
     TestMoveArc.py
     TestMoveCircle.py
+    TestMoveEllipse.py
     TestMoveLine.py
     TestMovementComplex.py
     TestMovePoint.py

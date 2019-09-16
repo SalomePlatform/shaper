@@ -244,9 +244,12 @@ void SketchPlugin_MacroEllipse::constraintsForEllipseByCenterAxisAndPassed(
       this, SECOND_POINT_REF_ID(),
       theEllipseFeature->attribute(SketchPlugin_Ellipse::MAJOR_AXIS_END_ID()),
       ObjectPtr(), isTangencyApplicable);
-  SketchPlugin_Tools::createCoincidenceOrTangency(
-      this, PASSED_POINT_REF_ID(), AttributePtr(),
-      theEllipseFeature->lastResult(), isTangencyApplicable);
+  // make coincidence only if PASSED_POINT_REF_ID() refers a point but not an object
+  if (!refattr(PASSED_POINT_REF_ID())->isObject()) {
+    SketchPlugin_Tools::createCoincidenceOrTangency(
+        this, PASSED_POINT_REF_ID(), AttributePtr(),
+        theEllipseFeature->lastResult(), isTangencyApplicable);
+  }
 }
 
 void SketchPlugin_MacroEllipse::constraintsForEllipseByMajoxAxisAndPassed(
@@ -263,9 +266,12 @@ void SketchPlugin_MacroEllipse::constraintsForEllipseByMajoxAxisAndPassed(
       this, SECOND_POINT_REF_ID(),
       theEllipseFeature->attribute(SketchPlugin_Ellipse::MAJOR_AXIS_END_ID()),
       ObjectPtr(), isTangencyApplicable);
-  SketchPlugin_Tools::createCoincidenceOrTangency(
-      this, PASSED_POINT_REF_ID(), AttributePtr(),
-      theEllipseFeature->lastResult(), isTangencyApplicable);
+  // make coincidence only if PASSED_POINT_REF_ID() refers a point but not an object
+  if (!refattr(PASSED_POINT_REF_ID())->isObject()) {
+    SketchPlugin_Tools::createCoincidenceOrTangency(
+        this, PASSED_POINT_REF_ID(), AttributePtr(),
+        theEllipseFeature->lastResult(), isTangencyApplicable);
+  }
 }
 
 FeaturePtr SketchPlugin_MacroEllipse::createEllipseFeature()
@@ -289,6 +295,7 @@ FeaturePtr SketchPlugin_MacroEllipse::createEllipseFeature()
   aEllipseFeature->execute();
 
   // create auxiliary points
+  createAuxiliaryPoint(aEllipseFeature->attribute(SketchPlugin_Ellipse::CENTER_ID()));
   createAuxiliaryPoint(aEllipseFeature->attribute(SketchPlugin_Ellipse::FIRST_FOCUS_ID()));
   createAuxiliaryPoint(aEllipseFeature->attribute(SketchPlugin_Ellipse::SECOND_FOCUS_ID()));
   createAuxiliaryPoint(aEllipseFeature->attribute(SketchPlugin_Ellipse::MAJOR_AXIS_START_ID()));

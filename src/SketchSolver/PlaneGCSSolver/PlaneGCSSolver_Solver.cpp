@@ -21,7 +21,7 @@
 #include <Events_LongOp.h>
 
 // Multiplier to correlate IDs of SketchPlugin constraint and primitive PlaneGCS constraints
-static const int THE_CONSTRAINT_MULT = 10;
+static const int THE_CONSTRAINT_MULT = 100;
 
 
 PlaneGCSSolver_Solver::PlaneGCSSolver_Solver()

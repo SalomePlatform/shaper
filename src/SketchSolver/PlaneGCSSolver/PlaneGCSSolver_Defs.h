@@ -62,6 +62,7 @@ enum SketchSolver_ConstraintType {
   CONSTRAINT_PT_PT_COINCIDENT,
   CONSTRAINT_PT_ON_LINE,
   CONSTRAINT_PT_ON_CIRCLE,
+  CONSTRAINT_PT_ON_ELLIPSE,
   CONSTRAINT_MIDDLE_POINT,
   CONSTRAINT_DISTANCE,         // base distance if we don't know the measured objects yet
   CONSTRAINT_PT_PT_DISTANCE,

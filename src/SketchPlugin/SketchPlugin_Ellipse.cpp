@@ -77,11 +77,8 @@ void SketchPlugin_Ellipse::execute()
   // Calculate all characteristics of the ellipse.
   fillCharacteristicPoints();
 
-  // Make a visible center of the ellipse.
-  int aResultIndex = 0;
-  SketchPlugin_Sketch::createPoint2DResult(this, aSketch, CENTER_ID(), aResultIndex++);
   // Make a visible ellipse.
-  createEllipse(aSketch, aResultIndex);
+  createEllipse(aSketch, 0);
 }
 
 bool SketchPlugin_Ellipse::isFixed() {

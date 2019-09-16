@@ -192,6 +192,7 @@ ConstraintWrapperPtr PlaneGCSSolver_Tools::createConstraint(
     break;
   case CONSTRAINT_PT_ON_LINE:
   case CONSTRAINT_PT_ON_CIRCLE:
+  case CONSTRAINT_PT_ON_ELLIPSE:
     aResult = createConstraintPointOnEntity(theType, aPoint1, GCS_EDGE_WRAPPER(theEntity1));
     break;
   case CONSTRAINT_MIDDLE_POINT:
