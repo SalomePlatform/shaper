@@ -242,6 +242,7 @@ ADD_UNIT_TESTS(TestConstants.py
                TestSaveOpen1.py
                TestSaveOpen2.py
                TestSelectionInitialization.py
+               TestSelectionCircleCenter.py
                Test2828.py
                TestSelectionRestore.py
                Test2491.py

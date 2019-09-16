@@ -69,6 +69,7 @@
 #include <TDF_ChildIDIterator.hxx>
 #include <Geom_Circle.hxx>
 #include <Geom_Ellipse.hxx>
+#include <Geom_TrimmedCurve.hxx>
 #include <BRep_Builder.hxx>
 
 //#define DEB_NAMING 1
@@ -272,11 +273,15 @@ GeomShapePtr centerByEdge(GeomShapePtr theEdge, ModelAPI_AttributeSelection::Cen
         TopoDS_Vertex aVertex;
         BRep_Builder aBuilder;
         if (theType == ModelAPI_AttributeSelection::CIRCLE_CENTER) {
+          while(!aCurve.IsNull() && aCurve->DynamicType() == STANDARD_TYPE(Geom_TrimmedCurve))
+            aCurve = Handle(Geom_TrimmedCurve)::DownCast(aCurve)->BasisCurve();
           Handle(Geom_Circle) aCirc = Handle(Geom_Circle)::DownCast(aCurve);
           if (!aCirc.IsNull()) {
             aBuilder.MakeVertex(aVertex, aCirc->Location(), Precision::Confusion());
           }
         } else { // ellipse
+          while(!aCurve.IsNull() && aCurve->DynamicType() == STANDARD_TYPE(Geom_TrimmedCurve))
+            aCurve = Handle(Geom_TrimmedCurve)::DownCast(aCurve)->BasisCurve();
           Handle(Geom_Ellipse) anEll = Handle(Geom_Ellipse)::DownCast(aCurve);
           if (!anEll.IsNull()) {
             aBuilder.MakeVertex(aVertex,
