@@ -82,7 +82,7 @@ PartSet_WidgetSketchCreator::PartSet_WidgetSketchCreator(QWidget* theParent,
 
   ModuleBase_Tools::adjustMargins(aLayout);
 
-  QString aLabelText = QString::fromStdString(theData->widgetLabel());
+  QString aLabelText = translate(theData->widgetLabel());
   QString aLabelIcon = QString::fromStdString(theData->widgetIcon());
 
   // Size of the View control

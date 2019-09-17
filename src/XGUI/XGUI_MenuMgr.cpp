@@ -40,6 +40,7 @@
 #endif
 
 #include <ModuleBase_IModule.h>
+#include <ModuleBase_Tools.h>
 
 #include <QObject>
 #include <QAction>
@@ -74,15 +75,16 @@ void XGUI_MenuMgr::addFeature(const std::shared_ptr<Config_FeatureMessage>& theM
 #endif
     return;
   }
+  QString aWchName = ModuleBase_Tools::translate("workshop", theMessage->workbenchId());
 #ifdef HAVE_SALOME
-  std::shared_ptr<XGUI_MenuWorkbench> aWorkbench = findWorkbench(theMessage->workbenchId());
+  std::string aWchNameString = aWchName.toStdString();
+  std::shared_ptr<XGUI_MenuWorkbench> aWorkbench = findWorkbench(aWchNameString);
   std::shared_ptr<XGUI_MenuGroup> aGroup = aWorkbench->findGroup(theMessage->groupId());
   aGroup->setFeatureInfo(theMessage);
 #else
   ActionInfo aFeatureInfo;
   aFeatureInfo.initFrom(theMessage);
 
-  QString aWchName = QString::fromStdString(theMessage->workbenchId());
   QStringList aNestedFeatures =
       QString::fromStdString(theMessage->nestedFeatures()).split(" ", QString::SkipEmptyParts);
   QList<QAction*> aNestedActList;
