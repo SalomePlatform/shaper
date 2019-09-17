@@ -297,21 +297,6 @@ static bool isInResults(AttributeSelectionListPtr theSelection,
   return false;
 }
 
-/// Returns all sub-shapes of the given shape in theResult
-static void allSubShapes(const GeomShapePtr theShape, GeomAPI_Shape::ShapeType theType,
-  std::list<GeomShapePtr>& theResult)
-{
-  if (theShape->shapeType() == theType) {
-    theResult.push_back(theShape);
-  } else {
-    GeomAPI_DataMapOfShapeShape aUnique; // to keep only unique shapes
-    for(GeomAPI_ShapeExplorer anExp(theShape, theType); anExp.more(); anExp.next()) {
-      if (aUnique.bind(anExp.current(), anExp.current()))
-        theResult.push_back(anExp.current());
-    }
-  }
-}
-
 void ExchangePlugin_ExportFeature::exportXAO(const std::string& theFileName)
 {
   try {
