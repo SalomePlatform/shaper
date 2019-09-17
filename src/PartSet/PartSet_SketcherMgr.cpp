@@ -1107,8 +1107,8 @@ void PartSet_SketcherMgr::startSketch(ModuleBase_Operation* theOperation)
 void PartSet_SketcherMgr::stopSketch(ModuleBase_Operation* theOperation)
 {
   XGUI_ModuleConnector* aConnector = dynamic_cast<XGUI_ModuleConnector*>(myModule->workshop());
-  PartSet_Fitter* aFitter = (PartSet_Fitter*)myModule->workshop()->viewer()->currentFitter();
-  myModule->workshop()->viewer()->unsetFitter();
+  PartSet_Fitter* aFitter = (PartSet_Fitter*)myModule->workshop()->viewer()->fitter();
+  myModule->workshop()->viewer()->setFitter(0);
   delete aFitter;
 
   myIsMouseOverWindow = false;
@@ -2108,7 +2108,7 @@ void PartSet_SketcherMgr::onShowPoints(bool toShow)
 }
 
 
-void PartSet_Fitter::fitScene(Handle(V3d_View) theView)
+void PartSet_Fitter::fitAll(Handle(V3d_View) theView)
 {
   Bnd_Box aBndBox;
   int aNumberOfSubs = mySketch->numberOfSubs();
@@ -2121,11 +2121,22 @@ void PartSet_Fitter::fitScene(Handle(V3d_View) theView)
     for (aIt = aResults.begin(); aIt != aResults.end(); ++aIt) {
       aRes = (*aIt);
       if (aRes->isDisplayed()) {
-        GeomShapePtr aShape = aRes->shape();
-        aShape->computeSize(aXmin, aYmin, aZmin, aXmax, aYmax, aZmax);
-        Bnd_Box aBox;
-        aBox.Update(aXmin, aYmin, aZmin, aXmax, aYmax, aZmax);
-        aBndBox.Add(aBox);
+        FeaturePtr aFeature = ModelAPI_Feature::feature(aRes);
+        if (aFeature.get()) {
+          std::shared_ptr<SketchPlugin_SketchEntity> aSPFeature =
+            std::dynamic_pointer_cast<SketchPlugin_SketchEntity>(aFeature);
+          if (aSPFeature.get()) {
+            bool isAxiliary =
+              aSPFeature->boolean(SketchPlugin_SketchEntity::AUXILIARY_ID())->value();
+            if (!(aSPFeature->isExternal() || isAxiliary)) {
+              GeomShapePtr aShape = aRes->shape();
+              aShape->computeSize(aXmin, aYmin, aZmin, aXmax, aYmax, aZmax);
+              Bnd_Box aBox;
+              aBox.Update(aXmin, aYmin, aZmin, aXmax, aYmax, aZmax);
+              aBndBox.Add(aBox);
+            }
+          }
+        }
       }
     }
   }

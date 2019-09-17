@@ -582,17 +582,11 @@ void SHAPERGUI_SalomeViewer::setFitter(OCCViewer_Fitter* theFitter)
     mySelector->viewer()->setFitter(theFitter);
 }
 
-OCCViewer_Fitter* SHAPERGUI_SalomeViewer::currentFitter() const
+OCCViewer_Fitter* SHAPERGUI_SalomeViewer::fitter() const
 {
   if (mySelector)
-    return mySelector->viewer()->currentFitter();
+    return mySelector->viewer()->fitter();
   return 0;
-}
-
-void SHAPERGUI_SalomeViewer::unsetFitter()
-{
-  if (mySelector)
-    mySelector->viewer()->unsetFitter();
 }
 
 

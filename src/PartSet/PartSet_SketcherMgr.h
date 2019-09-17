@@ -82,7 +82,7 @@ public:
 
   /// A method which has top be reimplemented to provide alterantive implementation FitAll command
   /// \param theView - a view which has to be fit
-  virtual void fitScene(Handle(V3d_View) theView);
+  virtual void fitAll(Handle(V3d_View) theView);
 
 private:
   CompositeFeaturePtr mySketch;
