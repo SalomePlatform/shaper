@@ -63,6 +63,13 @@ class SketchPlugin_Line : public SketchPlugin_SketchEntity,
     return MY_LENGTH;
   }
 
+  /// Reference to the parent feature
+  inline static const std::string& PARENT_ID()
+  {
+    static const std::string& MY_PARENT_ID("ParentFeature");
+    return MY_PARENT_ID;
+  }
+
   /// Returns the kind of a feature
   SKETCHPLUGIN_EXPORT virtual const std::string& getKind();
 

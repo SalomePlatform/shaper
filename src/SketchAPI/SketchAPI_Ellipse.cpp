@@ -177,16 +177,23 @@ static void createInternalConstraint(const CompositeFeaturePtr& theSketch,
 }
 
 static FeaturePtr createPoint(const CompositeFeaturePtr& theSketch,
-                              const AttributePtr& theCoincident,
+                              const FeaturePtr& theEllipse,
+                              const std::string& theCoincident,
                               const std::string& theAuxOrName)
 {
-  AttributePoint2DPtr anElPoint = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(theCoincident);
+  AttributePoint2DPtr anElPoint = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
+      theEllipse->attribute(theCoincident));
 
   FeaturePtr aPointFeature = theSketch->addFeature(SketchPlugin_Point::ID());
   AttributePoint2DPtr aCoord = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
       aPointFeature->attribute(SketchPlugin_Point::COORD_ID()));
   aCoord->setValue(anElPoint->x(), anElPoint->y());
+  aPointFeature->reference(SketchPlugin_Point::PARENT_ID())->setValue(theEllipse);
   aPointFeature->execute();
+
+  std::string aName = theEllipse->name() + "_" + theCoincident;
+  aPointFeature->data()->setName(aName);
+  aPointFeature->lastResult()->data()->setName(aName);
 
   if (theAuxOrName == AUXILIARY_VALUE)
     aPointFeature->boolean(SketchPlugin_Point::AUXILIARY_ID())->setValue(true);
@@ -201,14 +208,15 @@ static FeaturePtr createPoint(const CompositeFeaturePtr& theSketch,
 }
 
 static FeaturePtr createAxis(const CompositeFeaturePtr& theSketch,
-                             const AttributePtr& theCoincidentStart,
-                             const AttributePtr& theCoincidentEnd,
+                             const FeaturePtr& theEllipse,
+                             const std::string& theCoincidentStart,
+                             const std::string& theCoincidentEnd,
                              const std::string& theAuxOrName)
 {
   AttributePoint2DPtr aStartPoint =
-      std::dynamic_pointer_cast<GeomDataAPI_Point2D>(theCoincidentStart);
+      std::dynamic_pointer_cast<GeomDataAPI_Point2D>(theEllipse->attribute(theCoincidentStart));
   AttributePoint2DPtr aEndPoint =
-      std::dynamic_pointer_cast<GeomDataAPI_Point2D>(theCoincidentEnd);
+      std::dynamic_pointer_cast<GeomDataAPI_Point2D>(theEllipse->attribute(theCoincidentEnd));
 
   FeaturePtr aLineFeature = theSketch->addFeature(SketchPlugin_Line::ID());
   AttributePoint2DPtr aLineStart = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
@@ -217,10 +225,17 @@ static FeaturePtr createAxis(const CompositeFeaturePtr& theSketch,
   AttributePoint2DPtr aLineEnd = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
       aLineFeature->attribute(SketchPlugin_Line::END_ID()));
   aLineEnd->setValue(aEndPoint->x(), aEndPoint->y());
+  aLineFeature->reference(SketchPlugin_Point::PARENT_ID())->setValue(theEllipse);
   aLineFeature->execute();
 
+  std::string aName = theEllipse->name() + "_" +
+      (theCoincidentStart == SketchPlugin_Ellipse::MAJOR_AXIS_START_ID() ?
+       "major_axis" : "minor_axis");
+  aLineFeature->data()->setName(aName);
+  aLineFeature->lastResult()->data()->setName(aName);
+
   if (theAuxOrName == AUXILIARY_VALUE)
-    aLineFeature->boolean(SketchPlugin_Point::AUXILIARY_ID())->setValue(true);
+    aLineFeature->boolean(SketchPlugin_Line::AUXILIARY_ID())->setValue(true);
   else if (!theAuxOrName.empty()) {
     aLineFeature->data()->setName(theAuxOrName);
     aLineFeature->lastResult()->data()->setName(theAuxOrName);
@@ -248,42 +263,40 @@ std::list<std::shared_ptr<SketchAPI_SketchEntity> > SketchAPI_Ellipse::construct
 
   std::list<FeaturePtr> anEntities;
   if (!center.empty()) {
-    AttributePtr aCenterAttr = anEllipse->attribute(SketchPlugin_Ellipse::CENTER_ID());
-    anEntities.push_back(createPoint(aSketch, aCenterAttr, center));
+    anEntities.push_back(
+        createPoint(aSketch, anEllipse, SketchPlugin_Ellipse::CENTER_ID(), center));
   }
   if (!firstFocus.empty()) {
-    AttributePtr aFocusAttr = anEllipse->attribute(SketchPlugin_Ellipse::FIRST_FOCUS_ID());
-    anEntities.push_back(createPoint(aSketch, aFocusAttr, firstFocus));
+    anEntities.push_back(
+        createPoint(aSketch, anEllipse, SketchPlugin_Ellipse::FIRST_FOCUS_ID(), firstFocus));
   }
   if (!secondFocus.empty()) {
-    AttributePtr aFocusAttr = anEllipse->attribute(SketchPlugin_Ellipse::SECOND_FOCUS_ID());
-    anEntities.push_back(createPoint(aSketch, aFocusAttr, secondFocus));
+    anEntities.push_back(
+        createPoint(aSketch, anEllipse, SketchPlugin_Ellipse::SECOND_FOCUS_ID(), secondFocus));
   }
   if (!majorAxisStart.empty()) {
-    AttributePtr aStartAttr = anEllipse->attribute(SketchPlugin_Ellipse::MAJOR_AXIS_START_ID());
-    anEntities.push_back(createPoint(aSketch, aStartAttr, majorAxisStart));
+    anEntities.push_back(
+        createPoint(aSketch, anEllipse, SketchPlugin_Ellipse::MAJOR_AXIS_START_ID(), majorAxisStart));
   }
   if (!majorAxisEnd.empty()) {
-    AttributePtr aEndAttr = anEllipse->attribute(SketchPlugin_Ellipse::MAJOR_AXIS_END_ID());
-    anEntities.push_back(createPoint(aSketch, aEndAttr, majorAxisEnd));
+    anEntities.push_back(
+        createPoint(aSketch, anEllipse, SketchPlugin_Ellipse::MAJOR_AXIS_END_ID(), majorAxisEnd));
   }
   if (!minorAxisStart.empty()) {
-    AttributePtr aStartAttr = anEllipse->attribute(SketchPlugin_Ellipse::MINOR_AXIS_START_ID());
-    anEntities.push_back(createPoint(aSketch, aStartAttr, minorAxisStart));
+    anEntities.push_back(
+        createPoint(aSketch, anEllipse, SketchPlugin_Ellipse::MINOR_AXIS_START_ID(), minorAxisStart));
   }
   if (!minorAxisEnd.empty()) {
-    AttributePtr aEndAttr = anEllipse->attribute(SketchPlugin_Ellipse::MINOR_AXIS_END_ID());
-    anEntities.push_back(createPoint(aSketch, aEndAttr, minorAxisEnd));
+    anEntities.push_back(
+        createPoint(aSketch, anEllipse, SketchPlugin_Ellipse::MINOR_AXIS_END_ID(), minorAxisEnd));
   }
   if (!majorAxis.empty()) {
-    AttributePtr aStartAttr = anEllipse->attribute(SketchPlugin_Ellipse::MAJOR_AXIS_START_ID());
-    AttributePtr aEndAttr = anEllipse->attribute(SketchPlugin_Ellipse::MAJOR_AXIS_END_ID());
-    anEntities.push_back(createAxis(aSketch, aStartAttr, aEndAttr, majorAxis));
+    anEntities.push_back(createAxis(aSketch, anEllipse, SketchPlugin_Ellipse::MAJOR_AXIS_START_ID(),
+                                    SketchPlugin_Ellipse::MAJOR_AXIS_END_ID(), majorAxis));
   }
   if (!minorAxis.empty()) {
-    AttributePtr aStartAttr = anEllipse->attribute(SketchPlugin_Ellipse::MINOR_AXIS_START_ID());
-    AttributePtr aEndAttr = anEllipse->attribute(SketchPlugin_Ellipse::MINOR_AXIS_END_ID());
-    anEntities.push_back(createAxis(aSketch, aStartAttr, aEndAttr, minorAxis));
+    anEntities.push_back(createAxis(aSketch, anEllipse, SketchPlugin_Ellipse::MINOR_AXIS_START_ID(),
+                                    SketchPlugin_Ellipse::MINOR_AXIS_END_ID(), minorAxis));
   }
 
   return SketchAPI_SketchEntity::wrap(anEntities);

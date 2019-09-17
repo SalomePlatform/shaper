@@ -47,6 +47,9 @@ void SketchPlugin_Line::initAttributes()
   /// new attributes should be added to end of the feature in order to provide
   /// correct attribute values in previous saved studies
   data()->addAttribute(LENGTH_ID(), ModelAPI_AttributeDouble::typeId());
+
+  data()->addAttribute(PARENT_ID(), ModelAPI_AttributeReference::typeId());
+  ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(), PARENT_ID());
 }
 
 void SketchPlugin_Line::initDerivedClassAttributes()

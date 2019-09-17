@@ -403,6 +403,10 @@ std::string storeFeatures(const std::string& theDocName, DocumentPtr theDoc,
   std::list<ObjectPtr>::iterator allIter = allObjects.begin();
   for(; allIter != allObjects.end(); allIter++) {
     ObjectPtr anObject = *allIter;
+    FeaturePtr aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(anObject);
+    if (aFeature->getKind() == "SketchConstraintCoincidenceInternal")
+      continue; // no need to dump and check internal constraints
+
     if (theCompare) {
       std::map<std::string, ModelHighAPI_FeatureStore>::iterator
         anObjFind = aDocFind->second.find(anObject->data()->name());
@@ -420,7 +424,6 @@ std::string storeFeatures(const std::string& theDocName, DocumentPtr theDoc,
       theStore[theDocName][anObject->data()->name()] = ModelHighAPI_FeatureStore(anObject);
     }
 
-    FeaturePtr aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(anObject);
     if (aFeature) {
       // iterate all results of this feature
       std::list<ResultPtr> allResults;

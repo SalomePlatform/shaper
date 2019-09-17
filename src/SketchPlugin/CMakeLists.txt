@@ -263,6 +263,7 @@ ADD_UNIT_TESTS(
   TestProjectionIntoResult.py
   TestProjectionUpdate.py
   TestRectangle.py
+  TestRemoveEllipse.py
   TestRemoveSketch.py
   TestSignedDistancePointLine.py
   TestSignedDistancePointPoint.py
