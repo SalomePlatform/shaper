@@ -85,17 +85,33 @@
       <source>Union</source>
       <translation>AA</translation>
     </message>
-  </context>
-
-  <!-- AngularCopy -->
-  <context>
-    <name>AngularCopy</name>
+    <!-- Part menu -->
     <message>
       <source>Angular Copy</source>
       <translation>AA</translation>
     </message>
     <message>
-      <source>Perform copy and rotate</source>
+      <source>Linear copy</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Measurement</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Placement</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Rotation</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Symmetry</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Translation</source>
       <translation>AA</translation>
     </message>
   </context>
@@ -655,32 +671,6 @@
     </message>
   </context>
 
-  <!-- LinearCopy -->
-  <context>
-    <name>LinearCopy</name>
-    <message>
-      <source>Linear copy</source>
-      <translation>AA</translation>
-    </message>
-    <message>
-      <source>Perform copy and translate</source>
-      <translation>AA</translation>
-    </message>
-  </context>
-
-  <!-- Measurement -->
-  <context>
-    <name>Measurement</name>
-    <message>
-      <source>Calculate properties of objects</source>
-      <translation>AA</translation>
-    </message>
-    <message>
-      <source>Measurement</source>
-      <translation>AA</translation>
-    </message>
-  </context>
-
   <!-- Partition -->
   <context>
     <name>Partition</name>
@@ -791,19 +781,6 @@
     </message>
   </context>
 
-  <!-- Placement -->
-  <context>
-    <name>Placement</name>
-    <message>
-      <source>Place objects relatively to another one</source>
-      <translation>AA</translation>
-    </message>
-    <message>
-      <source>Placement</source>
-      <translation>AA</translation>
-    </message>
-  </context>
-
   <!-- Recover -->
   <context>
     <name>Recover</name>
@@ -849,19 +826,6 @@
     </message>
     <message>
       <source>Concealed results</source>
-      <translation>AA</translation>
-    </message>
-  </context>
-
-  <!-- Rotation -->
-  <context>
-    <name>Rotation</name>
-    <message>
-      <source>Perform rotation of objects around the axis to specified angle</source>
-      <translation>AA</translation>
-    </message>
-    <message>
-      <source>Rotation</source>
       <translation>AA</translation>
     </message>
   </context>
@@ -1457,32 +1421,6 @@
     </message>
     <message>
       <source>Tool objects</source>
-      <translation>AA</translation>
-    </message>
-  </context>
-
-  <!-- Symmetry -->
-  <context>
-    <name>Symmetry</name>
-    <message>
-      <source>Perform symmetry with respect to a point, an axis or a plane</source>
-      <translation>AA</translation>
-    </message>
-    <message>
-      <source>Symmetry</source>
-      <translation>AA</translation>
-    </message>
-  </context>
-
-  <!-- Translation -->
-  <context>
-    <name>Translation</name>
-    <message>
-      <source>Perform translation of objects along the axis to specified distance</source>
-      <translation>AA</translation>
-    </message>
-    <message>
-      <source>Translation</source>
       <translation>AA</translation>
     </message>
   </context>
@@ -5358,6 +5296,831 @@
     <name>FusionFaces:Model_FeatureValidator</name>
     <message>
       <source>Attribute "base_shape" is not initialized.</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+
+  <!-- Part menu -->
+
+  <!-- AngularCopy -->
+  <context>
+    <name>AngularCopy</name>
+    <message>
+      <source>Angular Copy</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Perform copy and rotate</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>AngularCopy:Model_FeatureValidator</name>
+    <message>
+      <source>Attribute "axis_angular" is not initialized.</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>AngularCopy:axis_angular</name>
+    <message>
+      <source>Axis</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Select an edge for the axis of rotation</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>AngularCopy:axis_angular:GeomValidators_ShapeType</name>
+    <message>
+      <source>The object is empty</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>AngularCopy:main_objects</name>
+    <message>
+      <source>Main objects</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Select objects</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>AngularCopy:nb_angular</name>
+    <message>
+      <source>Nb copies</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Number of copies for the angular copy</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>AngularCopy:step_angular</name>
+    <message>
+      <source>Angular step</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Step for the angular direction</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+
+  <!-- LinearCopy -->
+  <context>
+    <name>LinearCopy</name>
+    <message>
+      <source>Linear copy</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Perform copy and translate</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>LinearCopy:Model_FeatureValidator</name>
+    <message>
+      <source>Attribute "axis_first_dir" is not initialized.</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>LinearCopy:axis_first_dir</name>
+    <message>
+      <source>Axis</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Select an edge for the first direction</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>LinearCopy:axis_first_dir:GeomValidators_ShapeType</name>
+    <message>
+      <source>The object is empty</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>LinearCopy:axis_second_dir</name>
+    <message>
+      <source>Axis</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Select an edge for the second direction</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>LinearCopy:main_objects</name>
+    <message>
+      <source>Main objects</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Select objects</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>LinearCopy:nb_first_dir</name>
+    <message>
+      <source>Nb copies</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Number of copies for the first direction</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>LinearCopy:nb_second_dir</name>
+    <message>
+      <source>Nb copies</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Number of copies for the second direction</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>LinearCopy:step_first_dir</name>
+    <message>
+      <source>Step</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Step for the first direction</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>LinearCopy:step_second_dir</name>
+    <message>
+      <source>Step</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Step for the second direction</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>LinearCopy:use_second_dir</name>
+    <message>
+      <source>Second direction</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+
+  <!-- Measurement -->
+  <context>
+    <name>Measurement</name>
+    <message>
+      <source>Calculate properties of objects</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Measurement</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>Measurement:MeasureKind</name>
+    <message>
+      <source>Angle between edges</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Angle by 3 points</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Distance between objects</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Edge length</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Radius of circular</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>Measurement:Model_FeatureValidator</name>
+    <message>
+      <source>Attribute "angle_from" is not initialized.</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Attribute "angle_point_1" is not initialized.</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Attribute "circular" is not initialized.</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Attribute "distance_from" is not initialized.</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Attribute "edge_for_length" is not initialized.</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>Measurement:angle_from</name>
+    <message>
+      <source>First edge</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Select an edge</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>Measurement:angle_from:GeomValidators_ShapeType</name>
+    <message>
+      <source>The object is empty</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>Measurement:angle_point_1</name>
+    <message>
+      <source>Select a point</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Start point</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>Measurement:angle_point_1:GeomValidators_ShapeType</name>
+    <message>
+      <source>The object is empty</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>Measurement:angle_point_2</name>
+    <message>
+      <source>Angle apex</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Select a point</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>Measurement:angle_point_2:GeomValidators_ShapeType</name>
+    <message>
+      <source>The object is empty</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>Measurement:angle_point_3</name>
+    <message>
+      <source>End point</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Select a point</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>Measurement:angle_point_3:GeomValidators_ShapeType</name>
+    <message>
+      <source>The object is empty</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>Measurement:angle_to</name>
+    <message>
+      <source>Second edge</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Select an edge</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>Measurement:angle_to:GeomValidators_ShapeType</name>
+    <message>
+      <source>The object is empty</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>Measurement:circular</name>
+    <message>
+      <source>Object</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Select an edge or face</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>Measurement:distance_from</name>
+    <message>
+      <source>From</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Select a shape</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>Measurement:distance_to</name>
+    <message>
+      <source>Select a shape</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>To</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>Measurement:edge_for_length</name>
+    <message>
+      <source>Edge</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Select an edge</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>Measurement:edge_for_length:GeomValidators_ShapeType</name>
+    <message>
+      <source>The object is empty</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+
+  <!-- Placement -->
+  <context>
+    <name>Placement</name>
+    <message>
+      <source>Place objects relatively to another one</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Placement</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>Placement:placement_centering</name>
+    <message>
+      <source>Center faces under placement</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Centering</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>Placement:placement_end_shape</name>
+    <message>
+      <source>Select an end face, edge or vertex</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Select an object</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>Placement:placement_end_shape:GeomValidators_BodyShapes</name>
+    <message>
+      <source>Error: Context is empty.</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>Placement:placement_objects_list</name>
+    <message>
+      <source>Select objects</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Select objects to move</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>Placement:placement_reverse_direction</name>
+    <message>
+      <source>Reverse</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Reverse placement direction</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>Placement:placement_start_shape</name>
+    <message>
+      <source>Select a start face, edge or vertex</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Select an object</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>Placement:placement_start_shape:GeomValidators_BodyShapes</name>
+    <message>
+      <source>Error: Context is empty.</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+
+  <!-- Rotation -->
+  <context>
+    <name>Rotation</name>
+    <message>
+      <source>Perform rotation of objects around the axis to specified angle</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Rotation</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>Rotation:CreationMethod</name>
+    <message>
+      <source>By a center and two points</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>By an axis and an angle</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>Rotation:Model_FeatureValidator</name>
+    <message>
+      <source>Attribute "center_point" is not initialized.</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>Rotation:angle</name>
+    <message>
+      <source>Angle</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>Rotation:axis_object</name>
+    <message>
+      <source>Axis</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Select an edge for axis</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>Rotation:center_point</name>
+    <message>
+      <source>Center point</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Select a center point</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>Rotation:center_point:GeomValidators_ConstructionComposite</name>
+    <message>
+      <source>The result is empty</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>Rotation:end_point</name>
+    <message>
+      <source>End point</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Select an end point</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>Rotation:end_point:GeomValidators_ConstructionComposite</name>
+    <message>
+      <source>The result is empty</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>Rotation:main_objects</name>
+    <message>
+      <source>Main objects</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Select solid objects</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>Rotation:start_point</name>
+    <message>
+      <source>Select a starting point</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Start point</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>Rotation:start_point:GeomValidators_ConstructionComposite</name>
+    <message>
+      <source>The result is empty</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+
+  <!-- Symmetry -->
+  <context>
+    <name>Symmetry</name>
+    <message>
+      <source>Perform symmetry with respect to a point, an axis or a plane</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Symmetry</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>Symmetry:CreationMethod</name>
+    <message>
+      <source>Axis reflection</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Plane reflection</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Point reflection</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>Symmetry:Model_FeatureValidator</name>
+    <message>
+      <source>Attribute "axis_object" is not initialized.</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Attribute "main_objects" is not initialized.</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>Symmetry:axis_object</name>
+    <message>
+      <source>Axis</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Select an axis</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>Symmetry:axis_object:GeomValidators_ShapeType</name>
+    <message>
+      <source>The object is empty</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>Symmetry:keep_original</name>
+    <message>
+      <source>Do not remove original shape</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Keep original result</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>Symmetry:main_objects</name>
+    <message>
+      <source>Main objects</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Select solid objects</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>Symmetry:plane_object</name>
+    <message>
+      <source>Plane</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Select a plane</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>Symmetry:point_object</name>
+    <message>
+      <source>Point</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Select a point</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>Symmetry:point_object:GeomValidators_ShapeType</name>
+    <message>
+      <source>The object is empty</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+
+  <!-- Translation -->
+  <context>
+    <name>Translation</name>
+    <message>
+      <source>Perform translation of objects along the axis to specified distance</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Translation</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>Translation:CreationMethod</name>
+    <message>
+      <source>By X, Y and Z dimensions</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>By an axis and a distance</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>By two points</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>Translation:Model_FeatureValidator</name>
+    <message>
+      <source>Attribute "end_point" is not initialized.</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Attribute "main_objects" is not initialized.</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>Translation:axis_object</name>
+    <message>
+      <source>Axis</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Select an edge for axis</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>Translation:distance</name>
+    <message>
+      <source>Distance</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>Translation:dx</name>
+    <message>
+      <source>DX</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Dimension in X</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>Translation:dy</name>
+    <message>
+      <source>DY</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Dimension in Y</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>Translation:dz</name>
+    <message>
+      <source>DZ</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Dimension in Z</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>Translation:end_point</name>
+    <message>
+      <source>End point</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Select the end point to define the axis</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>Translation:end_point:GeomValidators_ConstructionComposite</name>
+    <message>
+      <source>The result is empty</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>Translation:main_objects</name>
+    <message>
+      <source>Main objects</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Select solid objects</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>Translation:start_point</name>
+    <message>
+      <source>Select the start point to define the axis</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Start point</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>Translation:start_point:GeomValidators_ConstructionComposite</name>
+    <message>
+      <source>The result is empty</source>
       <translation>AA</translation>
     </message>
   </context>

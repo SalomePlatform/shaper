@@ -2,6 +2,58 @@
 <!DOCTYPE TS>
 <TS version="2.0" language="fr_FR">
 
+  <context>
+    <name>workshop</name>
+    <message>
+      <source>CompSolid</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Compound</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Edge</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Face</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Filling</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Interpolation</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Polyline</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Shell</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Solid</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Sub-Shapes</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Vertex</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Wire</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+
   <!-- Validators -->
 
   <context>
@@ -477,6 +529,31 @@
       <translation>AA</translation>
     </message>
   </context>
+  <context>
+    <name>CompSolid:BuildPlugin_ValidatorBaseForSolids</name>
+    <message>
+      <source>Empty selection list.</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>CompSolid:base_objects</name>
+    <message>
+      <source>Select solids or compsolids.</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Solids and CompSolids:</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>CompSolid:base_objects:BuildPlugin_ValidatorBaseForBuild</name>
+    <message>
+      <source>Empty selection list.</source>
+      <translation>AA</translation>
+    </message>
+  </context>
 
   <context>
     <name>Compound</name>
@@ -486,6 +563,24 @@
     </message>
     <message>
       <source>Create a compound of objects</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>Compound:Model_FeatureValidator</name>
+    <message>
+      <source>Attribute "base_objects" is not initialized.</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>Compound:base_objects</name>
+    <message>
+      <source>Objects:</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Select any kind of objects.</source>
       <translation>AA</translation>
     </message>
   </context>
@@ -501,6 +596,71 @@
       <translation>AA</translation>
     </message>
   </context>
+  <context>
+    <name>Edge:Model_FeatureValidator</name>
+    <message>
+      <source>Attribute "first_point" is not initialized.</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>Edge:base_objects</name>
+    <message>
+      <source>Edges:</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Select edges on sketch or edges objects.</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>Edge:creation_method</name>
+    <message>
+      <source>By segments</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>By two points</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>Edge:first_point</name>
+    <message>
+      <source>First point</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Select a first point</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>Edge:first_point:GeomValidators_ConstructionComposite</name>
+    <message>
+      <source>The result is empty</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>Edge:second_point</name>
+    <message>
+      <source>Second point</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Select a second point</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>Edge:second_point:GeomValidators_ConstructionComposite</name>
+    <message>
+      <source>The result is empty</source>
+      <translation>AA</translation>
+    </message>
+  </context>
 
   <context>
     <name>Face</name>
@@ -510,6 +670,17 @@
     </message>
     <message>
       <source>Face</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>Face:base_objects</name>
+    <message>
+      <source>Objects:</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Select edges, wires or faces.</source>
       <translation>AA</translation>
     </message>
   </context>
@@ -525,6 +696,81 @@
       <translation>AA</translation>
     </message>
   </context>
+  <context>
+    <name>Filling:advanced_options</name>
+    <message>
+      <source>Advanced options</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>Filling:approximation</name>
+    <message>
+      <source>Approximation</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>Filling:base_objects</name>
+    <message>
+      <source>Segments and wires:</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Select edges or wires.</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>Filling:max_degree</name>
+    <message>
+      <source>Max deg</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>Filling:min_degree</name>
+    <message>
+      <source>Min deg</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>Filling:nb_iter</name>
+    <message>
+      <source>Nb iter</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>Filling:orientation</name>
+    <message>
+      <source>Auto-correct edges orientation</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Use curve information</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Use edges orientation</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>Filling:tol_2d</name>
+    <message>
+      <source>Tol 2D</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>Filling:tol_3d</name>
+    <message>
+      <source>Tol 3D</source>
+      <translation>AA</translation>
+    </message>
+  </context>
 
   <context>
     <name>Interpolation</name>
@@ -534,6 +780,72 @@
     </message>
     <message>
       <source>Interpolation</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>Interpolation:base_objects</name>
+    <message>
+      <source>Points and vertices:</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Select points or vertices objects.</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>Interpolation:closed</name>
+    <message>
+      <source>Closed</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>Interpolation:reorder</name>
+    <message>
+      <source>Changes the order of points to construct the shortest curve.</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Reorder</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>Interpolation:tangent_end</name>
+    <message>
+      <source>&lt;end&gt;</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>End</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Select vector tangent to the end of curve</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>Interpolation:tangent_start</name>
+    <message>
+      <source>&lt;start&gt;</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Select vector tangent to the start of curve</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Start</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>Interpolation:use_tangents</name>
+    <message>
+      <source>Tangents</source>
       <translation>AA</translation>
     </message>
   </context>
@@ -549,6 +861,28 @@
       <translation>AA</translation>
     </message>
   </context>
+  <context>
+    <name>Polyline:base_objects</name>
+    <message>
+      <source>Points and vertices:</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Select points or vertices objects.</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>Polyline:closed</name>
+    <message>
+      <source>Closed</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Makes the polyline closed.</source>
+      <translation>AA</translation>
+    </message>
+  </context>
 
   <context>
     <name>Shell</name>
@@ -558,6 +892,24 @@
     </message>
     <message>
       <source>Shell</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>Shell:base_objects</name>
+    <message>
+      <source>Faces and shells:</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Select faces or shells objects.</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>Shell:base_objects:BuildPlugin_ValidatorBaseForBuild</name>
+    <message>
+      <source>Empty selection list.</source>
       <translation>AA</translation>
     </message>
   </context>
@@ -573,6 +925,31 @@
       <translation>AA</translation>
     </message>
   </context>
+  <context>
+    <name>Solid:BuildPlugin_ValidatorBaseForSolids</name>
+    <message>
+      <source>Empty selection list.</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>Solid:base_objects</name>
+    <message>
+      <source>Faces and shells:</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Select faces or shells.</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>Solid:base_objects:BuildPlugin_ValidatorBaseForBuild</name>
+    <message>
+      <source>Empty selection list.</source>
+      <translation>AA</translation>
+    </message>
+  </context>
 
   <context>
     <name>SubShapes</name>
@@ -582,6 +959,28 @@
     </message>
     <message>
       <source>Sub-Shapes</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>SubShapes:base_shape</name>
+    <message>
+      <source>Select a shape to modify.</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Shape:</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>SubShapes:subshapes</name>
+    <message>
+      <source>Select shapes on sketch to add.</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Sub-Shapes:</source>
       <translation>AA</translation>
     </message>
   </context>
@@ -597,6 +996,17 @@
       <translation>AA</translation>
     </message>
   </context>
+  <context>
+    <name>Vertex:base_objects</name>
+    <message>
+      <source>Select vertices on sketch or vertex objects.</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Vertices:</source>
+      <translation>AA</translation>
+    </message>
+  </context>
 
   <context>
     <name>Wire</name>
@@ -606,6 +1016,28 @@
     </message>
     <message>
       <source>Wire</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>Wire:add_contour</name>
+    <message>
+      <source>Add contour</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Adds to the list of segments other segments of the sketcher connected to the already selected ones to create a closed contour.</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>Wire:base_objects</name>
+    <message>
+      <source>Segments and wires:</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Select edges on sketch, edges or wires objects.</source>
       <translation>AA</translation>
     </message>
   </context>

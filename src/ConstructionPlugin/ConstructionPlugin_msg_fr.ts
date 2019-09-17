@@ -3,17 +3,16 @@
 <TS version="2.0" language="fr_FR">
 
   <context>
-    <name>Axis:CylindricalFace:GeomValidators_Face</name>
-    <message>
-      <source>The attribute with the %1 type is not processed</source>
-      <translation>AA</translation>
-    </message>
-  </context>
-
-  <context>
     <name>workshop</name>
     <message>
       <source>Axis</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>Axis:CylindricalFace:GeomValidators_Face</name>
+    <message>
+      <source>The attribute with the %1 type is not processed</source>
       <translation>AA</translation>
     </message>
   </context>
@@ -436,6 +435,33 @@
     </message>
     <message>
       <source>Y dimension</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>Axis:CreationMethod</name>
+    <message>
+      <source>As axis of cylindrical face</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>By line</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>By plane and point</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>By three dimensions</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>By two planes</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>By two points</source>
       <translation>AA</translation>
     </message>
   </context>

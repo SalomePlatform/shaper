@@ -2,6 +2,131 @@
 <!DOCTYPE TS>
 <TS version="2.0" language="fr_FR">
 
+  <!-- ??? -->
+  <context>
+    <name><!-- ??? --></name>
+    <message>
+      <source>Attribute "%1" is locked by modification value in the viewer.</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Attribute "%1" is not initialized.</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+
+  <context>
+    <name>workshop</name>
+    <message>
+      <source>Sketch drawer</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Angle</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Angular copy</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Arc</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Circle</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Coincident</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Collinear</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Distance</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Ellipse</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Equal</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Fixed</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Horizontal</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Horizontal Distance</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Length</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Line</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Middle point</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Mirror copy</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Parallel</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Perpendicular</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Projection</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Radius</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Rectangle</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Sketch</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Tangent</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Trim</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Vertical</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Vertical Distance</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+
   <!-- Validators -->
 
   <context>
@@ -2060,7 +2185,38 @@
       <source>Sketch</source>
       <translation>AA</translation>
     </message>
+    <message>
+      <source>DoF (degrees of freedom) = 2</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>DoF (degrees of freedom) = 4</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>DoF (degrees of freedom) = 5</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Sketch is fully fixed (DoF = 0)</source>
+      <translation>AA</translation>
+    </message>
   </context>
+  <context>
+    <name>Sketch:External</name>
+    <message>
+      <source>Select a plane on which to create a sketch</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>Sketch:SketchPlugin_SolverErrorValidator</name>
+    <message>
+      <source>The constraint is conflicting with others. To fix this, you can either undo your operation or remove a conflicting constraint.</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+
   <context>
     <name>SketchConstraintAngle</name>
     <message>
@@ -2073,6 +2229,85 @@
     </message>
   </context>
   <context>
+    <name>SketchConstraintAngle:AngleType</name>
+    <message>
+      <source>Additional</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Angle type</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Complementary</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Direct</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>SketchConstraintAngle:AngleValue</name>
+    <message>
+      <source>Angle</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Value</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>SketchConstraintAngle:ConstraintEntityA</name>
+    <message>
+      <source>Line 1</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Select a line</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>SketchConstraintAngle:ConstraintEntityB</name>
+    <message>
+      <source>Line 2</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Select a line</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>SketchConstraintAngle:LocationType</name>
+    <message>
+      <source>Automatic</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Left</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Right</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Text location</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>SketchConstraintAngle:Model_FeatureValidator</name>
+    <message>
+      <source>Attribute "AngleReversedLine1" is not initialized.</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+
+  <context>
     <name>SketchConstraintCoincidence</name>
     <message>
       <source>Coincident</source>
@@ -2083,6 +2318,29 @@
       <translation>AA</translation>
     </message>
   </context>
+  <context>
+    <name>SketchConstraintCoincidence:ConstraintEntityA</name>
+    <message>
+      <source>First object</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Select a first object</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>SketchConstraintCoincidence:ConstraintEntityB</name>
+    <message>
+      <source>Second object</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Select a second object</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+
   <context>
     <name>SketchConstraintCollinear</name>
     <message>
@@ -2095,6 +2353,50 @@
     </message>
   </context>
   <context>
+    <name>SketchConstraintCollinear:ConstraintEntityA</name>
+    <message>
+      <source>First line</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Select a line</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>SketchConstraintCollinear:ConstraintEntityA:GeomValidators_ShapeType</name>
+    <message>
+      <source>The object is empty</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>SketchConstraintCollinear:ConstraintEntityB</name>
+    <message>
+      <source>Second line</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Select a line</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>SketchConstraintCollinear:ConstraintEntityB:GeomValidators_ShapeType</name>
+    <message>
+      <source>The object is empty</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>SketchConstraintCollinear:Model_FeatureValidator</name>
+    <message>
+      <source>Attribute "ConstraintEntityA" is not initialized.</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+
+  <context>
     <name>SketchConstraintDistance</name>
     <message>
       <source>Distance</source>
@@ -2105,6 +2407,77 @@
       <translation>AA</translation>
     </message>
   </context>
+  <context>
+    <name>SketchConstraintDistance</name>
+    <message>
+      <source>Select objects for distance definition. Following objects can be accepted: point, line or arc end point, center of circle or arc.</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>SketchConstraintDistance:ConstraintEntityA</name>
+    <message>
+      <source>First object</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Select point, line end point, line, center of circle or arc.</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>SketchConstraintDistance:ConstraintEntityB</name>
+    <message>
+      <source>Second object</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Select point, line end point, line, center of circle or arc.</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>SketchConstraintDistance:ConstraintValue</name>
+    <message>
+      <source>Distance</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Value</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>SketchConstraintDistance:LocationType</name>
+    <message>
+      <source>Automatic</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Left</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Right</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Text location</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>SketchConstraintDistance:SignedDistance</name>
+    <message>
+      <source>Keep distance orientation</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Keep orientation</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+
   <context>
     <name>SketchConstraintDistanceHorizontal</name>
     <message>
@@ -2117,6 +2490,94 @@
     </message>
   </context>
   <context>
+    <name>SketchConstraintDistanceHorizontal</name>
+    <message>
+      <source>Select points for distance definition.</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>SketchConstraintDistanceHorizontal:ConstraintEntityA</name>
+    <message>
+      <source>First point</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Select point.</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>SketchConstraintDistanceHorizontal:ConstraintEntityA:GeomValidators_ShapeType</name>
+    <message>
+      <source>The object is empty</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>SketchConstraintDistanceHorizontal:ConstraintEntityB</name>
+    <message>
+      <source>Second point</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Select point.</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>SketchConstraintDistanceHorizontal:ConstraintEntityB:GeomValidators_ShapeType</name>
+    <message>
+      <source>The object is empty</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>SketchConstraintDistanceHorizontal:DistanceValue</name>
+    <message>
+      <source>Distance</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Value</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>SketchConstraintDistanceHorizontal:DistanceValue:GeomValidators_Positive</name>
+    <message>
+      <source>Double is not initialized.</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>SketchConstraintDistanceHorizontal:LocationType</name>
+    <message>
+      <source>Automatic</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Left</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Right</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Text location</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>SketchConstraintDistanceHorizontal:Model_FeatureValidator</name>
+    <message>
+      <source>Attribute "ConstraintEntityA" is not initialized.</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+
+  <context>
     <name>SketchConstraintDistanceVertical</name>
     <message>
       <source>Set vertical distance between two points</source>
@@ -2127,6 +2588,94 @@
       <translation>AA</translation>
     </message>
   </context>
+  <context>
+    <name>SketchConstraintDistanceVertical</name>
+    <message>
+      <source>Select points for distance definition.</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>SketchConstraintDistanceVertical:ConstraintEntityA</name>
+    <message>
+      <source>First point</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Select point.</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>SketchConstraintDistanceVertical:ConstraintEntityA:GeomValidators_ShapeType</name>
+    <message>
+      <source>The object is empty</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>SketchConstraintDistanceVertical:ConstraintEntityB</name>
+    <message>
+      <source>Second point</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Select point.</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>SketchConstraintDistanceVertical:ConstraintEntityB:GeomValidators_ShapeType</name>
+    <message>
+      <source>The object is empty</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>SketchConstraintDistanceVertical:DistanceValue</name>
+    <message>
+      <source>Distance</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Value</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>SketchConstraintDistanceVertical:DistanceValue:GeomValidators_Positive</name>
+    <message>
+      <source>Double is not initialized.</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>SketchConstraintDistanceVertical:LocationType</name>
+    <message>
+      <source>Automatic</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Left</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Right</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Text location</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>SketchConstraintDistanceVertical:Model_FeatureValidator</name>
+    <message>
+      <source>Attribute "ConstraintEntityA" is not initialized.</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+
   <context>
     <name>SketchConstraintEqual</name>
     <message>
@@ -2139,6 +2688,29 @@
     </message>
   </context>
   <context>
+    <name>SketchConstraintEqual:ConstraintEntityA</name>
+    <message>
+      <source>First object</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Select line, circle or arc</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>SketchConstraintEqual:ConstraintEntityB</name>
+    <message>
+      <source>Second object</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Select line, circle or arc</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+
+  <context>
     <name>SketchConstraintHorizontal</name>
     <message>
       <source>Create constraint defining horizontal line</source>
@@ -2149,6 +2721,18 @@
       <translation>AA</translation>
     </message>
   </context>
+  <context>
+    <name>SketchConstraintHorizontal:ConstraintEntityA</name>
+    <message>
+      <source>Line</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Select a line</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+
   <context>
     <name>SketchConstraintLength</name>
     <message>
@@ -2161,6 +2745,55 @@
     </message>
   </context>
   <context>
+    <name>SketchConstraintLength</name>
+    <message>
+      <source>Select a line on which to calculate length</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>SketchConstraintLength:ConstraintEntityA</name>
+    <message>
+      <source>Line</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Select a line</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>SketchConstraintLength:ConstraintValue</name>
+    <message>
+      <source>Length</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Value</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>SketchConstraintLength:LocationType</name>
+    <message>
+      <source>Automatic</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Left</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Right</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Text location</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+
+  <context>
     <name>SketchConstraintMiddle</name>
     <message>
       <source>Create constraint for setting middle point on a line</source>
@@ -2171,6 +2804,29 @@
       <translation>AA</translation>
     </message>
   </context>
+  <context>
+    <name>SketchConstraintMiddle:ConstraintEntityA</name>
+    <message>
+      <source>First object</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Select a first object</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>SketchConstraintMiddle:ConstraintEntityB</name>
+    <message>
+      <source>Second object</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Select a second object</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+
   <context>
     <name>SketchConstraintMirror</name>
     <message>
@@ -2183,6 +2839,29 @@
     </message>
   </context>
   <context>
+    <name>SketchConstraintMirror:ConstraintEntityA</name>
+    <message>
+      <source>Mirror line</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Select mirror line</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>SketchConstraintMirror:ConstraintMirrorList</name>
+    <message>
+      <source>Segments:</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Select list of objects to be mirrored</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+
+  <context>
     <name>SketchConstraintParallel</name>
     <message>
       <source>Create constraint defining two parallel lines</source>
@@ -2193,6 +2872,29 @@
       <translation>AA</translation>
     </message>
   </context>
+  <context>
+    <name>SketchConstraintParallel:ConstraintEntityA</name>
+    <message>
+      <source>First line</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Select a line</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>SketchConstraintParallel:ConstraintEntityB</name>
+    <message>
+      <source>Second line</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Select a line</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+
   <context>
     <name>SketchConstraintPerpendicular</name>
     <message>
@@ -2205,6 +2907,29 @@
     </message>
   </context>
   <context>
+    <name>SketchConstraintPerpendicular:ConstraintEntityA</name>
+    <message>
+      <source>First object</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Select line or arc</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>SketchConstraintPerpendicular:ConstraintEntityB</name>
+    <message>
+      <source>Second object</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Select line or arc</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+
+  <context>
     <name>SketchConstraintRadius</name>
     <message>
       <source>Radius</source>
@@ -2215,6 +2940,55 @@
       <translation>AA</translation>
     </message>
   </context>
+  <context>
+    <name>SketchConstraintRadius</name>
+    <message>
+      <source>Select a circle or an arc on which to calculate radius</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>SketchConstraintRadius:ConstraintEntityA</name>
+    <message>
+      <source>Circle or Arc</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Select a circle or an arc</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>SketchConstraintRadius:ConstraintValue</name>
+    <message>
+      <source>Radius</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Value</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>SketchConstraintRadius:LocationType</name>
+    <message>
+      <source>Automatic</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Left</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Right</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Text location</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+
   <context>
     <name>SketchConstraintRigid</name>
     <message>
@@ -2227,6 +3001,18 @@
     </message>
   </context>
   <context>
+    <name>SketchConstraintRigid:ConstraintEntityA</name>
+    <message>
+      <source>Object</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Select point, line end point, line, center of circle or arc.</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+
+  <context>
     <name>SketchConstraintTangent</name>
     <message>
       <source>Create constraint defining tangency of two segments with common coincident point</source>
@@ -2237,6 +3023,29 @@
       <translation>AA</translation>
     </message>
   </context>
+  <context>
+    <name>SketchConstraintTangent:ConstraintEntityA</name>
+    <message>
+      <source>First object</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Select line or arc</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>SketchConstraintTangent:ConstraintEntityB</name>
+    <message>
+      <source>Second object</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Select line or arc</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+
   <context>
     <name>SketchConstraintVertical</name>
     <message>
@@ -2249,6 +3058,19 @@
     </message>
   </context>
   <context>
+    <name>SketchConstraintVertical:ConstraintEntityA</name>
+    <message>
+      <source>Line</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Select a line</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+
+  <!-- SketchDrawer -->
+  <context>
     <name>SketchDrawer</name>
     <message>
       <source>Creates sketch using elements of selected shape belonging to selected plane</source>
@@ -2259,6 +3081,47 @@
       <translation>AA</translation>
     </message>
   </context>
+  <context>
+    <name>SketchDrawer:Model_FeatureValidator</name>
+    <message>
+      <source>Attribute "base_shape" is not initialized.</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>SketchDrawer:add_dimensions</name>
+    <message>
+      <source>Create dimensions</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>To add dimensions into created sketch</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>SketchDrawer:base_shape</name>
+    <message>
+      <source>Select a shape for extraction to sketch.</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Shape:</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>SketchDrawer:plane</name>
+    <message>
+      <source>Plane:</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Select plane for sketch</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+
   <context>
     <name>SketchFillet</name>
     <message>
@@ -2271,6 +3134,36 @@
     </message>
   </context>
   <context>
+    <name>SketchFillet:Model_FeatureValidator</name>
+    <message>
+      <source>Attribute "fillet_point" is not initialized.</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>SketchFillet:fillet_point</name>
+    <message>
+      <source>Point</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Select point for fillet (should be shared by two entities only)</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>SketchFillet:fillet_point:SketchPlugin_FilletVertexValidator</name>
+    <message>
+      <source>Error: Bad point selected.</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Error: Edges in selected point has tangent constraint.</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+
+  <context>
     <name>SketchIntersectionPoint</name>
     <message>
       <source>Intersect edge with sketch plane</source>
@@ -2281,6 +3174,43 @@
       <translation>AA</translation>
     </message>
   </context>
+  <context>
+    <name>SketchIntersectionPoint:ExternalFeature</name>
+    <message>
+      <source>Object</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Select external edge.</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>SketchIntersectionPoint:ExternalFeature:SketchPlugin_IntersectionValidator</name>
+    <message>
+      <source>The attribute %1 should be an edge</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>SketchIntersectionPoint:IncludeToResult</name>
+    <message>
+      <source>Include into the sketch result</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Include projected feature into the sketch result</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>SketchIntersectionPoint:Model_FeatureValidator</name>
+    <message>
+      <source>Attribute "ExternalFeature" is not initialized.</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+
   <context>
     <name>SketchLine</name>
     <message>
@@ -2293,6 +3223,29 @@
     </message>
   </context>
   <context>
+    <name>SketchLine:Auxiliary</name>
+    <message>
+      <source>Auxiliary</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Construction element</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>SketchLine:LineLength</name>
+    <message>
+      <source>Length:</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Line length</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+
+  <context>
     <name>SketchMacroArc</name>
     <message>
       <source>Arc</source>
@@ -2303,6 +3256,114 @@
       <translation>AA</translation>
     </message>
   </context>
+  <context>
+    <name>SketchMacroArc:Auxiliary</name>
+    <message>
+      <source>Auxiliary</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Construction element</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>SketchMacroArc:Model_FeatureValidator</name>
+    <message>
+      <source>Attribute "center_point" is not initialized.</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Attribute "end_point_1" is not initialized.</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Attribute "end_point_2" is not initialized.</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Attribute "end_point_3" is not initialized.</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>SketchMacroArc:angle</name>
+    <message>
+      <source>Angle:</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Set angle</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>SketchMacroArc:arc_type</name>
+    <message>
+      <source>Center and two points</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Perpendicular to line</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Tangent with edge</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Three points on arc</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>SketchMacroArc:passed_point:SketchPlugin_ThirdPointValidator</name>
+    <message>
+      <source>Selected points are on the same line</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>SketchMacroArc:radius</name>
+    <message>
+      <source>Radius:</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Set radius</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>SketchMacroArc:tangent_point</name>
+    <message>
+      <source>Select point on line</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Tangent point</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Transversal point</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>SketchMacroArc:tangent_point:SketchPlugin_ArcTangentPoint</name>
+    <message>
+      <source>The attribute %1 should be a point</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>SketchMacroArc:tangent_point:SketchPlugin_ArcTransversalPoint</name>
+    <message>
+      <source>The attribute %1 should be a point</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+
   <context>
     <name>SketchMacroCircle</name>
     <message>
@@ -2315,6 +3376,69 @@
     </message>
   </context>
   <context>
+    <name>SketchMacroCircle:Auxiliary</name>
+    <message>
+      <source>Auxiliary</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Construction element</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>SketchMacroCircle:Model_FeatureValidator</name>
+    <message>
+      <source>Attribute "center_point" is not initialized.</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Attribute "first_point" is not initialized.</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Attribute "passed_point" is not initialized.</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>SketchMacroCircle:circle_radius</name>
+    <message>
+      <source>Radius:</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Set radius</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>SketchMacroCircle:circle_radius:GeomValidators_Positive</name>
+    <message>
+      <source>Value is too small.</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>SketchMacroCircle:circle_type</name>
+    <message>
+      <source>Center and passed points</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Three points</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>SketchMacroCircle:third_point:SketchPlugin_ThirdPointValidator</name>
+    <message>
+      <source>Selected points are on the same line</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+
+  <context>
     <name>SketchMacroEllipse</name>
     <message>
       <source>Create ellipse</source>
@@ -2325,6 +3449,76 @@
       <translation>AA</translation>
     </message>
   </context>
+  <context>
+    <name>SketchMacroEllipse:Auxiliary</name>
+    <message>
+      <source>Auxiliary</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Construction element</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>SketchMacroEllipse:Model_FeatureValidator</name>
+    <message>
+      <source>Attribute "first_point" is not initialized.</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Attribute "passed_point" is not initialized.</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>SketchMacroEllipse:ellipse_type</name>
+    <message>
+      <source>Center, major semi-axis and passing point</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Major axis and passing point</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>SketchMacroEllipse:major_radius</name>
+    <message>
+      <source>Major radius:</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Set major radius</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>SketchMacroEllipse:major_radius:GeomValidators_Positive</name>
+    <message>
+      <source>Double is not initialized.</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>SketchMacroEllipse:minor_radius</name>
+    <message>
+      <source>Minor radius:</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Set minor radius</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>SketchMacroEllipse:minor_radius:GeomValidators_Positive</name>
+    <message>
+      <source>Double is not initialized.</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+
   <context>
     <name>SketchMultiRotation</name>
     <message>
@@ -2337,6 +3531,65 @@
     </message>
   </context>
   <context>
+    <name>SketchMultiRotation:AngleType</name>
+    <message>
+      <source>Full angle</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Single angle</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>SketchMultiRotation:MultiRotationAngle</name>
+    <message>
+      <source>Angle</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Rotation angle</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>SketchMultiRotation:MultiRotationCenter</name>
+    <message>
+      <source>Center of rotation</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>SketchMultiRotation:MultiRotationList</name>
+    <message>
+      <source>Segments:</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Select list of objects to be rotated</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>SketchMultiRotation:MultiRotationObjects</name>
+    <message>
+      <source>Total number of objects</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>SketchMultiRotation:MultiRotationReversed</name>
+    <message>
+      <source>Reverse angular copy</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Reversed</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+
+  <context>
     <name>SketchMultiTranslation</name>
     <message>
       <source>Copy objects and move</source>
@@ -2347,6 +3600,58 @@
       <translation>AA</translation>
     </message>
   </context>
+  <context>
+    <name>SketchMultiTranslation:MultiTranslationEndPoint</name>
+    <message>
+      <source>End point</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Final point of translation</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>SketchMultiTranslation:MultiTranslationList</name>
+    <message>
+      <source>Segments:</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Select list of objects to be translated</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>SketchMultiTranslation:MultiTranslationObjects</name>
+    <message>
+      <source>Total number of objects</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>SketchMultiTranslation:MultiTranslationStartPoint</name>
+    <message>
+      <source>Start point</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Start point of translation</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>SketchMultiTranslation:ValueType</name>
+    <message>
+      <source>Full value</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Single value</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+
   <context>
     <name>SketchPoint</name>
     <message>
@@ -2359,6 +3664,18 @@
     </message>
   </context>
   <context>
+    <name>SketchPoint:Auxiliary</name>
+    <message>
+      <source>Auxiliary</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Construction element</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+
+  <context>
     <name>SketchProjection</name>
     <message>
       <source>Project feature onto sketch plane</source>
@@ -2369,6 +3686,36 @@
       <translation>AA</translation>
     </message>
   </context>
+  <context>
+    <name>SketchProjection:ExternalFeature</name>
+    <message>
+      <source>Object</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Select external edge or vertex.</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>SketchProjection:ExternalFeature:SketchPlugin_ProjectionValidator</name>
+    <message>
+      <source>The attribute %1 should be an edge or vertex</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>SketchProjection:IncludeToResult</name>
+    <message>
+      <source>Include into the sketch result</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Include projected feature into the sketch result</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+
   <context>
     <name>SketchRectangle</name>
     <message>
@@ -2381,6 +3728,18 @@
     </message>
   </context>
   <context>
+    <name>SketchRectangle:Auxiliary</name>
+    <message>
+      <source>Auxiliary</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Construction element</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+
+  <context>
     <name>SketchSplit</name>
     <message>
       <source>Cut selected segment arc or circle on existing coincident points</source>
@@ -2392,6 +3751,32 @@
     </message>
   </context>
   <context>
+    <name>SketchSplit:Model_FeatureValidator</name>
+    <message>
+      <source>Attribute "SelectedObject" is not initialized.</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>SketchSplit:SelectedObject</name>
+    <message>
+      <source>Segment</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Select segment for split</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>SketchSplit:SelectedObject:SketchPlugin_SplitValidator</name>
+    <message>
+      <source>Unknown error.</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+
+  <context>
     <name>SketchTrim</name>
     <message>
       <source>Trim</source>
@@ -2399,6 +3784,31 @@
     </message>
     <message>
       <source>Trim selected segment arc or circle on intersection points nearest to the graphic selection</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>SketchTrim:Model_FeatureValidator</name>
+    <message>
+      <source>Attribute "SelectedObject" is not initialized.</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>SketchTrim:SelectedObject</name>
+    <message>
+      <source>Segment</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Select segment for trim</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>SketchTrim:SelectedObject:SketchPlugin_TrimValidator</name>
+    <message>
+      <source>Unknown error.</source>
       <translation>AA</translation>
     </message>
   </context>
