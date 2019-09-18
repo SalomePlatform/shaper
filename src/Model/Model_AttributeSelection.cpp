@@ -1296,6 +1296,8 @@ void Model_AttributeSelection::concealedFeature(
     std::list<ResultPtr> allRes;
     allRes.push_back(*aRootIter);
     ResultBodyPtr aRootBody = ModelAPI_Tools::bodyOwner(*aRootIter, true);
+    if (!aRootBody.get())
+      aRootBody = std::dynamic_pointer_cast<ModelAPI_ResultBody>(*aRootIter);
     if (aRootBody.get()) {
       ModelAPI_Tools::allSubs(aRootBody, allRes);
     }
