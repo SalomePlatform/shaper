@@ -404,7 +404,7 @@ std::string storeFeatures(const std::string& theDocName, DocumentPtr theDoc,
   for(; allIter != allObjects.end(); allIter++) {
     ObjectPtr anObject = *allIter;
     FeaturePtr aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(anObject);
-    if (aFeature->getKind() == "SketchConstraintCoincidenceInternal")
+    if (aFeature && aFeature->getKind() == "SketchConstraintCoincidenceInternal")
       continue; // no need to dump and check internal constraints
 
     if (theCompare) {
