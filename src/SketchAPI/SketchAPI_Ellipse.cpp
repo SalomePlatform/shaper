@@ -275,28 +275,30 @@ std::list<std::shared_ptr<SketchAPI_SketchEntity> > SketchAPI_Ellipse::construct
         createPoint(aSketch, anEllipse, SketchPlugin_Ellipse::SECOND_FOCUS_ID(), secondFocus));
   }
   if (!majorAxisStart.empty()) {
-    anEntities.push_back(
-        createPoint(aSketch, anEllipse, SketchPlugin_Ellipse::MAJOR_AXIS_START_ID(), majorAxisStart));
+    anEntities.push_back(createPoint(aSketch, anEllipse,
+        SketchPlugin_Ellipse::MAJOR_AXIS_START_ID(), majorAxisStart));
   }
   if (!majorAxisEnd.empty()) {
-    anEntities.push_back(
-        createPoint(aSketch, anEllipse, SketchPlugin_Ellipse::MAJOR_AXIS_END_ID(), majorAxisEnd));
+    anEntities.push_back(createPoint(aSketch, anEllipse,
+        SketchPlugin_Ellipse::MAJOR_AXIS_END_ID(), majorAxisEnd));
   }
   if (!minorAxisStart.empty()) {
-    anEntities.push_back(
-        createPoint(aSketch, anEllipse, SketchPlugin_Ellipse::MINOR_AXIS_START_ID(), minorAxisStart));
+    anEntities.push_back(createPoint(aSketch, anEllipse,
+        SketchPlugin_Ellipse::MINOR_AXIS_START_ID(), minorAxisStart));
   }
   if (!minorAxisEnd.empty()) {
-    anEntities.push_back(
-        createPoint(aSketch, anEllipse, SketchPlugin_Ellipse::MINOR_AXIS_END_ID(), minorAxisEnd));
+    anEntities.push_back(createPoint(aSketch, anEllipse,
+        SketchPlugin_Ellipse::MINOR_AXIS_END_ID(), minorAxisEnd));
   }
   if (!majorAxis.empty()) {
-    anEntities.push_back(createAxis(aSketch, anEllipse, SketchPlugin_Ellipse::MAJOR_AXIS_START_ID(),
-                                    SketchPlugin_Ellipse::MAJOR_AXIS_END_ID(), majorAxis));
+    anEntities.push_back(
+        createAxis(aSketch, anEllipse, SketchPlugin_Ellipse::MAJOR_AXIS_START_ID(),
+                   SketchPlugin_Ellipse::MAJOR_AXIS_END_ID(), majorAxis));
   }
   if (!minorAxis.empty()) {
-    anEntities.push_back(createAxis(aSketch, anEllipse, SketchPlugin_Ellipse::MINOR_AXIS_START_ID(),
-                                    SketchPlugin_Ellipse::MINOR_AXIS_END_ID(), minorAxis));
+    anEntities.push_back(
+        createAxis(aSketch, anEllipse, SketchPlugin_Ellipse::MINOR_AXIS_START_ID(),
+                   SketchPlugin_Ellipse::MINOR_AXIS_END_ID(), minorAxis));
   }
 
   return SketchAPI_SketchEntity::wrap(anEntities);
