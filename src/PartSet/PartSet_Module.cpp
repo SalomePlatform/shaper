@@ -43,6 +43,10 @@
 #include "PartSet_Filters.h"
 #include "PartSet_FilterInfinite.h"
 
+#ifdef _DEBUG
+#include <QDebug>
+#endif
+
 #include <PartSetPlugin_Remove.h>
 #include <PartSetPlugin_Part.h>
 #include <PartSetPlugin_Duplicate.h>
@@ -139,10 +143,6 @@
 #include <GeomDataAPI_Dir.h>
 
 #include <SelectMgr_ListIteratorOfListOfFilter.hxx>
-
-#ifdef _DEBUG
-#include <QDebug>
-#endif
 
 /*!Create and return new instance of XGUI_Module*/
 extern "C" PARTSET_EXPORT ModuleBase_IModule* createModule(ModuleBase_IWorkshop* theWshop)
