@@ -26,6 +26,8 @@
 #include <SketchPlugin_MacroEllipse.h>
 
 class ModelHighAPI_RefAttr;
+class SketchAPI_Point;
+class SketchAPI_Line;
 
 /// \class SketchAPI_MacroEllipse
 /// \ingroup CPPHighAPI
@@ -68,25 +70,28 @@ public:
   SKETCHAPI_EXPORT
   virtual ~SketchAPI_MacroEllipse();
 
-  INTERFACE_9(SketchPlugin_MacroEllipse::ID(),
+  INTERFACE_1(SketchPlugin_MacroEllipse::ID(),
               ellipseType, SketchPlugin_MacroEllipse::ELLIPSE_TYPE(),
-              ModelAPI_AttributeString, /** Ellipse type */,
-              centerPoint, SketchPlugin_MacroEllipse::FIRST_POINT_ID(),
-              GeomDataAPI_Point2D, /** Center point */,
-              centerPointRef, SketchPlugin_MacroEllipse::FIRST_POINT_REF_ID(),
-              ModelAPI_AttributeRefAttr, /** Reference to a center point */,
-              majorAxisNegativePoint, SketchPlugin_MacroEllipse::FIRST_POINT_ID(),
-              GeomDataAPI_Point2D, /** Major axis negative point point */,
-              majorAxisNegativePointRef, SketchPlugin_MacroEllipse::FIRST_POINT_REF_ID(),
-              ModelAPI_AttributeRefAttr, /** Reference to the negative point on a major axis */,
-              majorAxisPositivePoint, SketchPlugin_MacroEllipse::SECOND_POINT_ID(),
-              GeomDataAPI_Point2D, /** Major axis positive point point */,
-              majorAxisPositivePointRef, SketchPlugin_MacroEllipse::SECOND_POINT_REF_ID(),
-              ModelAPI_AttributeRefAttr, /** Reference to the positive point on a major axis */,
-              passedPoint, SketchPlugin_MacroEllipse::PASSED_POINT_ID(),
-              GeomDataAPI_Point2D, /** Passed point */,
-              passedPointRef, SketchPlugin_MacroEllipse::PASSED_POINT_REF_ID(),
-              ModelAPI_AttributeRefAttr, /** Reference to a passed point */)
+              ModelAPI_AttributeString, /** Ellipse type */)
+
+  /// Return created auxiliary center point
+  SKETCHAPI_EXPORT std::shared_ptr<SketchAPI_Point> center();
+  /// Return created auxiliary focus in the positive direction of major axis
+  SKETCHAPI_EXPORT std::shared_ptr<SketchAPI_Point> focus1();
+  /// Return created auxiliary focus in the negative direction of major axis
+  SKETCHAPI_EXPORT std::shared_ptr<SketchAPI_Point> focus2();
+  /// Return created auxiliary point - start of major axis
+  SKETCHAPI_EXPORT std::shared_ptr<SketchAPI_Point> majorAxisStart();
+  /// Return created auxiliary point - end of major axis
+  SKETCHAPI_EXPORT std::shared_ptr<SketchAPI_Point> majorAxisEnd();
+  /// Return created auxiliary point - start of minor axis
+  SKETCHAPI_EXPORT std::shared_ptr<SketchAPI_Point> minorAxisStart();
+  /// Return created auxiliary point - end of minor axis
+  SKETCHAPI_EXPORT std::shared_ptr<SketchAPI_Point> minorAxisEnd();
+  /// Return created auxiliary major axis
+  SKETCHAPI_EXPORT std::shared_ptr<SketchAPI_Line> majorAxis();
+  /// Return created auxiliary minor axis
+  SKETCHAPI_EXPORT std::shared_ptr<SketchAPI_Line> minorAxis();
 
 private:
   /// Set flag of creation by center, major semi-axis and passed point.
@@ -111,6 +116,21 @@ private:
                         const ModelHighAPI_RefAttr&           theMajorAxisPoint2Ref,
                         const std::shared_ptr<GeomAPI_Pnt2d>& thePassedPoint,
                         const ModelHighAPI_RefAttr&           thePassedPointRef);
+
+  /// Collect auxiliary features
+  void collectAuxiliary();
+
+private:
+  CompositeFeaturePtr mySketch;
+  std::shared_ptr<SketchAPI_Point> myCenter;
+  std::shared_ptr<SketchAPI_Point> myFocus1;
+  std::shared_ptr<SketchAPI_Point> myFocus2;
+  std::shared_ptr<SketchAPI_Point> myMajorAxisStart;
+  std::shared_ptr<SketchAPI_Point> myMajorAxisEnd;
+  std::shared_ptr<SketchAPI_Point> myMinorAxisStart;
+  std::shared_ptr<SketchAPI_Point> myMinorAxisEnd;
+  std::shared_ptr<SketchAPI_Line>  myMajorAxis;
+  std::shared_ptr<SketchAPI_Line>  myMinorAxis;
 };
 
 /// Pointer on Circle object.

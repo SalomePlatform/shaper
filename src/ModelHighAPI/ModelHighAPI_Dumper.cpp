@@ -1227,7 +1227,8 @@ ModelHighAPI_Dumper& ModelHighAPI_Dumper::operator<<(const AttributePtr& theAttr
   // Check the attribute belongs to copied (in multi-translation or multi-rotation) feature.
   // In this case we need to cast explicitly feature to appropriate type.
   AttributeBooleanPtr isCopy = anOwner->boolean("Copy");
-  if (isCopy.get() && isCopy->value()) {
+  AttributeReferencePtr hasParent = anOwner->reference("ParentFeature");
+  if ((isCopy.get() && isCopy->value()) || (hasParent && hasParent->value())) {
     aWrapperPrefix = featureWrapper(anOwner) + "(";
     aWrapperSuffix = ")";
     importModule("SketchAPI");
