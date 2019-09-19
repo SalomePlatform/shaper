@@ -11,11 +11,11 @@
                icon="icons/Features/extrusion.png" helpfile="extrusionFeature.html">
           <source path="extrusion_widget.xml"/>
       </feature>
-      <feature id="ExtrusionCut" title="ExtrusionCut" tooltip=""
+      <feature id="ExtrusionCut" title="ExtrusionCut" tooltip="Cuts an extrusion from a solid"
                icon="icons/Features/extrusion_cut.png" helpfile="extrusionCutFeature.html">
         <source path="extrusioncut_widget.xml"/>
       </feature>
-      <feature id="ExtrusionFuse" title="ExtrusionFuse" tooltip=""
+      <feature id="ExtrusionFuse" title="ExtrusionFuse" tooltip="Fuses an extrusion with a solid"
                icon="icons/Features/extrusion_fuse.png" helpfile="extrusionFuseFeature.html">
         <source path="extrusionfuse_widget.xml"/>
       </feature>
@@ -25,11 +25,11 @@
                icon="icons/Features/revol.png" helpfile="revolutionFeature.html">
           <source path="revolution_widget.xml"/>
       </feature>
-      <feature id="RevolutionCut" title="RevolutionCut" tooltip=""
+      <feature id="RevolutionCut" title="RevolutionCut" tooltip="Cuts a revolution from a solid"
                icon="icons/Features/revol_cut.png" helpfile="revolutionCutFeature.html">
         <source path="revolutioncut_widget.xml"/>
       </feature>
-      <feature id="RevolutionFuse" title="RevolutionFuse" tooltip=""
+      <feature id="RevolutionFuse" title="RevolutionFuse" tooltip="Fuses a revolution with a solid"
                icon="icons/Features/revol_fuse.png" helpfile="revolutionFuseFeature.html">
         <source path="revolutionfuse_widget.xml"/>
       </feature>

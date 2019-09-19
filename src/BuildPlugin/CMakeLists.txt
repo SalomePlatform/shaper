@@ -83,6 +83,7 @@ SET(XML_RESOURCES
 
 SET(TEXT_RESOURCES
     BuildPlugin_msg_en.ts
+    BuildPlugin_msg_fr.ts
 )
 
 SOURCE_GROUP ("Resource Files" FILES ${TEXT_RESOURCES})
