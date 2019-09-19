@@ -5,6 +5,10 @@
   <context>
     <name>workshop</name>
     <message>
+      <source>Build</source>
+      <translation>AA-Build</translation>
+    </message>
+    <message>
       <source>CompSolid</source>
       <translation>AA</translation>
     </message>

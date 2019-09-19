@@ -5,6 +5,10 @@
   <context>
     <name>workshop</name>
     <message>
+      <source>Primitives</source>
+      <translation>AA-Primitives</translation>
+    </message>
+    <message>
       <source>Box</source>
       <translation>AA</translation>
     </message>

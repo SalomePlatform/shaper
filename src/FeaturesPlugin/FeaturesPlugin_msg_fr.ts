@@ -6,6 +6,10 @@
   <context>
     <name>workshop</name>
     <message>
+      <source>Features</source>
+      <translation>AA-Features</translation>
+    </message>
+    <message>
       <source>Common</source>
       <translation>AA</translation>
     </message>
@@ -222,6 +226,22 @@
       <source>ExtrusionCut</source>
       <translation>AA</translation>
     </message>
+    <message>
+      <source>Cuts an extrusion from a solid</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Extrusion</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>From</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>To</source>
+      <translation>AA</translation>
+    </message>
   </context>
   <context>
     <name>ExtrusionCut:CreationMethod</name>
@@ -348,12 +368,35 @@
       <translation>AA</translation>
     </message>
   </context>
+  <context>
+    <name>ExtrusionCut:sketch</name>
+    <message>
+      <source>Select:<br /> 1. Planar face of non-sketch object or a plane. Sketch creation will be started.<br /> 2. An existing sketch face or contour. Extrusion will be filled by it.<br /> 3. An existing result shape of kind: wires/edge/vertices.Extrusion will be filled by it.</source>
+      <translation>AA</translation>
+    </message>
+  </context>
 
   <!-- ExtrusionFuse -->
   <context>
     <name>ExtrusionFuse</name>
     <message>
       <source>ExtrusionFuse</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Fuses an extrusion with a solid</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Extrusion</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>From</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>To</source>
       <translation>AA</translation>
     </message>
   </context>
@@ -472,6 +515,13 @@
     </message>
     <message>
       <source>To size</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>ExtrusionFuse:sketch</name>
+    <message>
+      <source>Select:<br /> 1. Planar face of non-sketch object or a plane. Sketch creation will be started.<br /> 2. An existing sketch face or contour. Extrusion will be filled by it.<br /> 3. An existing result shape of kind: wires/edge/vertices.Extrusion will be filled by it.</source>
       <translation>AA</translation>
     </message>
   </context>
@@ -1028,6 +1078,22 @@
       <source>RevolutionCut</source>
       <translation>AA</translation>
     </message>
+    <message>
+      <source>Cuts a revolution from a solid</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>From</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Revolution</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>To</source>
+      <translation>AA</translation>
+    </message>
   </context>
   <context>
     <name>RevolutionCut:CreationMethod</name>
@@ -1143,12 +1209,35 @@
       <translation>AA</translation>
     </message>
   </context>
+  <context>
+    <name>RevolutionCut:sketch</name>
+    <message>
+      <source>Select:<br /> 1. Planar face of non-sketch object or a plane. Sketch creation will be started.<br /> 2. An existing sketch face or contour. Extrusion will be filled by it.<br /> 3. An existing result shape of kind: wires/edge/vertices.Extrusion will be filled by it.</source>
+      <translation>AA</translation>
+    </message>
+  </context>
 
   <!-- RevolutionFuse -->
   <context>
     <name>RevolutionFuse</name>
     <message>
       <source>RevolutionFuse</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Fuses a revolution with a solid</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>From</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Revolution</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>To</source>
       <translation>AA</translation>
     </message>
   </context>
@@ -1263,6 +1352,13 @@
     </message>
     <message>
       <source>Angle for "to" bounding plane</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>RevolutionFuse:sketch</name>
+    <message>
+      <source>Select:<br /> 1. Planar face of non-sketch object or a plane. Sketch creation will be started.<br /> 2. An existing sketch face or contour. Extrusion will be filled by it.<br /> 3. An existing result shape of kind: wires/edge/vertices.Extrusion will be filled by it.</source>
       <translation>AA</translation>
     </message>
   </context>

@@ -3,6 +3,14 @@
 <TS version="2.0" language="fr_FR">
 
   <context>
+    <name>workshop</name>
+    <message>
+      <source>Part</source>
+      <translation>AA-Part</translation>
+    </message>
+  </context>
+
+  <context>
     <name>Duplicate</name>
     <message>
       <source>Duplicate active part</source>

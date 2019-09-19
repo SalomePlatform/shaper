@@ -5,6 +5,14 @@
   <context>
     <name>workshop</name>
     <message>
+      <source>Construction</source>
+      <translation>AA-Construction</translation>
+    </message>
+  </context>
+
+  <context>
+    <name>workshop</name>
+    <message>
       <source>Axis</source>
       <translation>AA</translation>
     </message>

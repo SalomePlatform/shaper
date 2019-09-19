@@ -2,21 +2,16 @@
 <!DOCTYPE TS>
 <TS version="2.0" language="fr_FR">
 
-  <!-- ??? -->
-  <context>
-    <name><!-- ??? --></name>
-    <message>
-      <source>Attribute "%1" is locked by modification value in the viewer.</source>
-      <translation>AA</translation>
-    </message>
-    <message>
-      <source>Attribute "%1" is not initialized.</source>
-      <translation>AA</translation>
-    </message>
-  </context>
-
   <context>
     <name>workshop</name>
+    <message>
+      <source>Macros</source>
+      <translation>AA-Macros</translation>
+    </message>
+    <message>
+      <source>Sketch</source>
+      <translation>AA-Sketch</translation>
+    </message>
     <message>
       <source>Sketch drawer</source>
       <translation>AA</translation>
@@ -103,10 +98,6 @@
     </message>
     <message>
       <source>Rectangle</source>
-      <translation>AA</translation>
-    </message>
-    <message>
-      <source>Sketch</source>
       <translation>AA</translation>
     </message>
     <message>
@@ -1098,7 +1089,6 @@
       <source>The object is empty</source>
       <translation>AA</translation>
     </message>
-
   </context>
   <context>
     <name>SketchMultiTranslation:MultiTranslationObjects:GeomValidators_Positive</name>
@@ -3268,6 +3258,13 @@
     </message>
   </context>
   <context>
+    <name>SketchMacroArc:center_point</name>
+    <message>
+      <source>Attribute "%1" is not initialized.</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
     <name>SketchMacroArc:Model_FeatureValidator</name>
     <message>
       <source>Attribute "center_point" is not initialized.</source>
@@ -3483,6 +3480,17 @@
     </message>
   </context>
   <context>
+    <name>SketchMacroEllipse:first_point</name>
+    <message>
+      <source>Attribute "%1" is locked by modification value in the viewer.</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Attribute "%1" is not initialized.</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
     <name>SketchMacroEllipse:major_radius</name>
     <message>
       <source>Major radius:</source>
@@ -3593,6 +3601,10 @@
     <name>SketchMultiTranslation</name>
     <message>
       <source>Copy objects and move</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Direction</source>
       <translation>AA</translation>
     </message>
     <message>
