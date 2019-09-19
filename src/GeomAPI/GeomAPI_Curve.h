@@ -57,6 +57,10 @@ class GeomAPI_Curve : public GeomAPI_Interface
   GEOMAPI_EXPORT
   virtual bool isCircle() const;
 
+  /// Returns whether the curve is elliptic
+  GEOMAPI_EXPORT
+  virtual bool isEllipse() const;
+
   /// Returns start parameter of the curve
   GEOMAPI_EXPORT
   double startParam() const { return myStart; }

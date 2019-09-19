@@ -214,6 +214,7 @@ ADD_UNIT_TESTS(
   TestConstraintDistanceHorizontal.py
   TestConstraintDistanceVertical.py
   TestConstraintEqual.py
+  TestConstraintEqualEllipse.py
   TestConstraintFixed.py
   TestConstraintHorizontal.py
   TestConstraintHorizontalValidator.py

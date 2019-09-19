@@ -189,7 +189,7 @@ gp_Vec getVector(ObjectPtr theShape, GeomDirPtr theDir, gp_Pnt theP)
     std::shared_ptr<GeomAPI_Curve> aCurve =
       std::shared_ptr<GeomAPI_Curve>(new GeomAPI_Curve(aShape));
 
-    if (aCurve->isCircle()) {
+    if (aCurve->isCircle() || aCurve->isEllipse()) {
       Handle(Geom_Curve) aCurv = aCurve->impl<Handle_Geom_Curve>();
       GeomAPI_ProjectPointOnCurve anExtr(theP, aCurv);
       double aParam = anExtr.LowerDistanceParameter();

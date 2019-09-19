@@ -39,7 +39,7 @@ typedef int ConstraintID;
 // Predefined values for identifiers
 const ConstraintID CID_UNKNOWN  =  0;
 const ConstraintID CID_MOVEMENT = -1;
-const ConstraintID CID_FICTIVE = 1024;
+const ConstraintID CID_FICTIVE  = 99;
 
 /// Types of entities
 enum SketchSolver_EntityType {

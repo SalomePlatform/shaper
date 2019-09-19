@@ -38,6 +38,7 @@ void SketchSolver_ConstraintEqual::getAttributes(
   int aNbLines = 0;
   int aNbArcs = 0;
   int aNbCircs = 0;
+  int aNbEllipses = 0;
   bool isArcFirst = false; // in line-arc equivalence, the line should be first
   std::vector<EntityWrapperPtr>::iterator anAttrIt = theAttributes.begin() + 2;
   for (; anAttrIt != theAttributes.end(); ++anAttrIt) {
@@ -50,10 +51,12 @@ void SketchSolver_ConstraintEqual::getAttributes(
       ++aNbArcs;
       isArcFirst = (aNbLines == 0);
     }
+    else if (aType == ENTITY_ELLIPSE || aType == ENTITY_ELLIPTICAL_ARC)
+      ++aNbEllipses;
   }
 
-  if (aNbLines + aNbArcs + aNbCircs != 2 ||
-     (aNbLines == aNbCircs && aNbArcs == 0)) {
+  if (aNbLines + aNbArcs + aNbCircs + aNbEllipses != 2 ||
+     (aNbArcs == 1 && aNbEllipses != 0) || aNbEllipses == 1) {
     myErrorMsg = SketchSolver_Error::INCORRECT_ATTRIBUTE();
     return;
   }

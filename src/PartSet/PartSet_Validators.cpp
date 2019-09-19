@@ -335,12 +335,12 @@ bool PartSet_EqualSelection::isValid(const ModuleBase_ISelection* theSelection,
             aType = 1;
           else if (aType != 1)
             return false;
-        } else if (aEdge.isCircle()) {
+        } else if (aEdge.isCircle() || aEdge.isArc()) {
           if (aCount == 1)
             aType = 2;
           else if (aType != 2)
             return false;
-        } else if (aEdge.isArc()) {
+        } else if (aEdge.isEllipse()) {
           if (aCount == 1)
             aType = 3;
           else if (aType != 3)

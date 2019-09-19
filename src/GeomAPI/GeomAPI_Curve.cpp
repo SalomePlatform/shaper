@@ -23,6 +23,7 @@
 #include <TopoDS_Shape.hxx>
 #include <Geom_Circle.hxx>
 #include <Geom_Curve.hxx>
+#include <Geom_Ellipse.hxx>
 #include <Geom_Line.hxx>
 #include <Geom_TrimmedCurve.hxx>
 #include <BRep_Tool.hxx>
@@ -63,6 +64,11 @@ bool GeomAPI_Curve::isLine() const
 bool GeomAPI_Curve::isCircle() const
 {
   return !isNull() && MY_CURVE->DynamicType() == STANDARD_TYPE(Geom_Circle);
+}
+
+bool GeomAPI_Curve::isEllipse() const
+{
+  return !isNull() && MY_CURVE->DynamicType() == STANDARD_TYPE(Geom_Ellipse);
 }
 
 std::shared_ptr<GeomAPI_Pnt> GeomAPI_Curve::getPoint(double theParam)

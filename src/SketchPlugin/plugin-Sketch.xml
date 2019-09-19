@@ -1087,13 +1087,13 @@
         icon="icons/Sketch/equal.png"
                helpfile="equalFeature.html">
         <sketch_shape_selector id="ConstraintEntityA"
-            label="First object" tooltip="Select line, circle or arc" shape_types="edge">
+            label="First object" tooltip="Select edge" shape_types="edge">
           <validator id="PartSet_DifferentObjects"/>
           <validator id="SketchPlugin_ExternalValidator" parameters="ConstraintEntityB"/>
         </sketch_shape_selector>
 
         <sketch_shape_selector id="ConstraintEntityB"
-            label="Second object" tooltip="Select line, circle or arc" shape_types="edge">
+            label="Second object" tooltip="Select edge" shape_types="edge">
           <validator id="SketchPlugin_EqualAttr" parameters="ConstraintEntityA"/>
           <validator id="PartSet_DifferentObjects"/>
           <validator id="SketchPlugin_ExternalValidator" parameters="ConstraintEntityA"/>
