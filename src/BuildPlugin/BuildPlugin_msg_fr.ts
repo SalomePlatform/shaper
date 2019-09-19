@@ -519,9 +519,6 @@
       <translation>AA</translation>
     </message>
   </context>
-
-  <!-- MissedTranslations -->
-
   <context>
     <name>CompSolid</name>
     <message>

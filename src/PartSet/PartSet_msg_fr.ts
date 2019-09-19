@@ -68,6 +68,11 @@ Error: %1</source>
 <context>
     <name>PartSet_WidgetSketchLabel</name>
     <message>
+        <location filename="PartSet_WidgetSketchLabel.cpp" line="105"/>
+        <source>Size of the view</source>
+        <translation>AA</translation>
+    </message>
+    <message>
         <location filename="PartSet_WidgetSketchLabel.cpp" line="126"/>
         <source>Remove external dependencies</source>
         <translation>AA</translation>

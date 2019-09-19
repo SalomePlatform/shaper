@@ -102,7 +102,7 @@ PartSet_WidgetPoint2D::PartSet_WidgetPoint2D(QWidget* theParent,
 
   // the control should accept the focus, so the boolean flag is corrected to be true
   myIsObligatory = true;
-  QString aPageName = QString::fromStdString(theData->getProperty(CONTAINER_PAGE_NAME));
+  QString aPageName = translate(theData->getProperty(CONTAINER_PAGE_NAME));
   myGroupBox = new QGroupBox(aPageName, theParent);
   myGroupBox->setFlat(false);
 

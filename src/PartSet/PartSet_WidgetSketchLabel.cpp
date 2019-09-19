@@ -102,7 +102,7 @@ myIsSelection(false)
   // Size of the View control
   mySizeOfViewWidget = new QWidget(aFirstWgt);
   QHBoxLayout* aSizeLayout = new QHBoxLayout(mySizeOfViewWidget);
-  aSizeLayout->addWidget(new QLabel("Size of the view", mySizeOfViewWidget));
+  aSizeLayout->addWidget(new QLabel(tr("Size of the view"), mySizeOfViewWidget));
   mySizeOfView = new QLineEdit(mySizeOfViewWidget);
 
   QDoubleValidator* aValidator = new QDoubleValidator(0, DBL_MAX, 12, mySizeOfView);

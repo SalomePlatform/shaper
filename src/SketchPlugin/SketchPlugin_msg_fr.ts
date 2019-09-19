@@ -282,7 +282,116 @@
       <translation>AA</translation>
     </message>
   </context>
-  
+  <context>
+    <name>SketchMacroCircle:Model_FeatureValidator</name>
+    <message>
+      <source>Attribute "circle_type" is not initialized.</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>SketchMacroCircle:center_point</name>
+    <message>
+      <source>Attribute "%1" is locked by modification value in the viewer.</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Attribute "%1" is not initialized.</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>SketchMacroCircle:passed_point</name>
+    <message>
+      <source>Attribute "%1" is locked by modification value in the viewer.</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>SketchMacroCircle:Model_FeatureValidator</name>
+    <message>
+      <source>Attribute "circle_type" is not initialized.</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Attribute "second_point" is not initialized.</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>SketchMacroCircle:center_point</name>
+    <message>
+      <source>Attribute "%1" is locked by modification value in the viewer.</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Center point</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>SketchMacroCircle:first_point</name>
+    <message>
+      <source>First point</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>SketchMacroCircle:passed_point</name>
+    <message>
+      <source>Attribute "%1" is locked by modification value in the viewer.</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Passed point</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>SketchMacroCircle:second_point</name>
+    <message>
+      <source>Second point</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+
+  <context>
+    <name>SketchMacroCircle:third_point</name>
+    <message>
+      <source>Third point</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>SketchCircle:Auxiliary</name>
+    <message>
+      <source>Auxiliary</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Construction element</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>SketchCircle:circle_center</name>
+    <message>
+      <source>Center</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>SketchCircle:circle_radius</name>
+    <message>
+      <source>Radius:</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Set radius</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+
   <context>
     <name>SketchConstraintHorizontal:Model_FeatureValidator</name>
     <message>
@@ -686,6 +795,28 @@
       <translation>AA</translation>
     </message>
   </context>
+  <context>
+    <name>SketchLine:EndPoint</name>
+    <message>
+      <source>Attribute "%1" is locked by modification value in the viewer.</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>End point</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>SketchLine:StartPoint</name>
+    <message>
+      <source>Attribute "%1" is locked by modification value in the viewer.</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Start point</source>
+      <translation>AA</translation>
+    </message>
+  </context>
 
   <context>
     <name>SketchPoint:Model_FeatureValidator</name>
@@ -698,6 +829,13 @@
     <name>SketchPoint:PointCoordinates</name>
     <message>
       <source>Attribute "PointCoordinates" is locked by modification value in the viewer.</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>SketchPoint:PointCoordinates</name>
+    <message>
+      <source>Point</source>
       <translation>AA</translation>
     </message>
   </context>
@@ -734,6 +872,28 @@
     <name>SketchRectangle:Model_FeatureValidator</name>
     <message>
       <source>Attribute "RectEndPoint" is not initialized.</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>SketchRectangle:RectEndPoint</name>
+    <message>
+      <source>Attribute "%1" is locked by modification value in the viewer.</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>End point</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>SketchRectangle:RectStartPoint</name>
+    <message>
+      <source>Attribute "%1" is locked by modification value in the viewer.</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Start point</source>
       <translation>AA</translation>
     </message>
   </context>
@@ -868,6 +1028,60 @@
     <name>SketchArc:Model_FeatureValidator</name>
     <message>
       <source>Attribute "ArcTangentPoint" is not initialized.</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>SketchArc:Auxiliary</name>
+    <message>
+      <source>Auxiliary</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Construction element</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>SketchArc:angle</name>
+    <message>
+      <source>Angle:</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Set angle</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>SketchArc:center_point</name>
+    <message>
+      <source>Center</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>SketchArc:end_point</name>
+    <message>
+      <source>End point</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>SketchArc:radius</name>
+    <message>
+      <source>Radius:</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Set radius</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>SketchArc:start_point</name>
+    <message>
+      <source>Start point</source>
       <translation>AA</translation>
     </message>
   </context>
@@ -2162,9 +2376,6 @@
       <translation>AA</translation>
     </message>
   </context>
-
-  <!-- MissedTranslations -->
-
   <context>
     <name>Sketch</name>
     <message>
@@ -2176,15 +2387,7 @@
       <translation>AA</translation>
     </message>
     <message>
-      <source>DoF (degrees of freedom) = 2</source>
-      <translation>AA</translation>
-    </message>
-    <message>
-      <source>DoF (degrees of freedom) = 4</source>
-      <translation>AA</translation>
-    </message>
-    <message>
-      <source>DoF (degrees of freedom) = 5</source>
+      <source>DoF (degrees of freedom) = %1</source>
       <translation>AA</translation>
     </message>
     <message>
@@ -3360,6 +3563,74 @@
       <translation>AA</translation>
     </message>
   </context>
+  <context>
+    <name>SketchMacroArc:Model_FeatureValidator</name>
+    <message>
+      <source>Attribute "arc_type" is not initialized.</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>SketchMacroArc:center_point</name>
+    <message>
+      <source>Attribute "%1" is locked by modification value in the viewer.</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Center point</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>SketchMacroArc:end_point_1</name>
+    <message>
+      <source>Attribute "%1" is locked by modification value in the viewer.</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>End point</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>SketchMacroArc:end_point_2</name>
+    <message>
+      <source>End point</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>SketchMacroArc:end_point_3</name>
+    <message>
+      <source>End point</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>SketchMacroArc:passed_point</name>
+    <message>
+      <source>Passed point</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>SketchMacroArc:start_point_1</name>
+    <message>
+      <source>Attribute "%1" is locked by modification value in the viewer.</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Start point</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>SketchMacroArc:start_point_2</name>
+    <message>
+      <source>Start point</source>
+      <translation>AA</translation>
+    </message>
+  </context>
 
   <context>
     <name>SketchMacroCircle</name>
@@ -3431,6 +3702,38 @@
     <name>SketchMacroCircle:third_point:SketchPlugin_ThirdPointValidator</name>
     <message>
       <source>Selected points are on the same line</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>SketchMacroCircle:Model_FeatureValidator</name>
+    <message>
+      <source>Attribute "third_point" is not initialized.</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>SketchMacroCircle:first_point</name>
+    <message>
+      <source>Attribute "%1" is locked by modification value in the viewer.</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Attribute "%1" is not initialized.</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>SketchMacroCircle:second_point</name>
+    <message>
+      <source>Attribute "%1" is locked by modification value in the viewer.</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>SketchMacroCircle:third_point</name>
+    <message>
+      <source>Attribute "%1" is locked by modification value in the viewer.</source>
       <translation>AA</translation>
     </message>
   </context>
@@ -3523,6 +3826,133 @@
     <name>SketchMacroEllipse:minor_radius:GeomValidators_Positive</name>
     <message>
       <source>Double is not initialized.</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>SketchMacroEllipse:Model_FeatureValidator</name>
+    <message>
+      <source>Attribute "ellipse_type" is not initialized.</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>SketchMacroEllipse:first_point</name>
+    <message>
+      <source>Center point</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Major axis start point</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>SketchMacroEllipse:passed_point</name>
+    <message>
+      <source>Attribute "%1" is locked by modification value in the viewer.</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Passed point</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>SketchMacroEllipse:second_point</name>
+    <message>
+      <source>Attribute "%1" is locked by modification value in the viewer.</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Major axis end point</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Major axis point</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+
+  <context>
+    <name>SketchEllipse:Auxiliary</name>
+    <message>
+      <source>Auxiliary</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Construction element</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>SketchEllipse:ellipse_center</name>
+    <message>
+      <source>Center</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>SketchEllipse:ellipse_first_focus</name>
+    <message>
+      <source>First focus</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>SketchEllipse:ellipse_major_axis_end_point</name>
+    <message>
+      <source>Major axis end</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>SketchEllipse:ellipse_major_axis_start_point</name>
+    <message>
+      <source>Major axis start</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>SketchEllipse:ellipse_major_radius</name>
+    <message>
+      <source>Major radius:</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Set major radius</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>SketchEllipse:ellipse_minor_axis_end_point</name>
+    <message>
+      <source>Minor axis end</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>SketchEllipse:ellipse_minor_axis_start_point</name>
+    <message>
+      <source>Minor axis start</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>SketchEllipse:ellipse_minor_radius</name>
+    <message>
+      <source>Minor radius:</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Set minor radius</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>SketchEllipse:ellipse_second_focus</name>
+    <message>
+      <source>Second focus</source>
       <translation>AA</translation>
     </message>
   </context>
