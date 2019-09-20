@@ -57,9 +57,8 @@ bool Model_FeatureValidator::isValid(const std::shared_ptr<ModelAPI_Feature>& th
         myNotObligatory.find(theFeature->getKind());
       if (aFeatureFind == myNotObligatory.end() || // and it is obligatory for filling
           aFeatureFind->second.find(*it) == aFeatureFind->second.end()) {
-        // TODO(spo): exceptional case for translation
-        theError = "Attribute \"" + anAttr->id() + "\" is not initialized.";
-//        theError.arg(anAttr->id());
+        theError = "Attribute \"%1\" is not initialized.";
+        theError.addParameter(anAttr->id());
         return false;
       }
     }

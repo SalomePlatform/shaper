@@ -60,7 +60,6 @@ enum ColumnType {
 
 const char* NoName = "<NoName>";
 const char* NoValue = "<NoValue>";
-const char* NotValid = "<NotValid>";
 
 /*!
  * \ingroup GUI
@@ -435,13 +434,13 @@ QList<QStringList> ParametersPlugin_WidgetParamsMgr::
 
     std::string aName = aParameter->string(ParametersPlugin_Parameter::VARIABLE_ID())->value();
     if (aName.empty()) {
-      aValues << NoName;
+      aValues << translate(NoName);
     } else
       aValues << aName.c_str();
 
     std::string aExpr = aParameter->string(ParametersPlugin_Parameter::EXPRESSION_ID())->value();
     if (aName.empty()) {
-      aValues << NoValue;
+      aValues << translate(NoValue);
     } else
       aValues << aExpr.c_str();
 
@@ -574,8 +573,8 @@ FeaturePtr ParametersPlugin_WidgetParamsMgr::createParameter() const
 QTreeWidgetItem* ParametersPlugin_WidgetParamsMgr::createNewItem(QTreeWidgetItem* theParent) const
 {
   QStringList aValues;
-  aValues << NoName;
-  aValues << NoValue;
+  aValues << translate(NoName);
+  aValues << translate(NoValue);
 
   QTreeWidgetItem* aItem = new QTreeWidgetItem(aValues);
   if (theParent == myParameters) {
@@ -819,7 +818,7 @@ bool ParametersPlugin_WidgetParamsMgr::isValid()
   for(int i = 0; i < myParameters->childCount(); i++) {
     aItem = myParameters->child(i);
     if ((aItem->text(Col_Name) == NoName) ||
-        (aItem->text(Col_Equation) == NoValue) ||
+        (aItem->text(Col_Equation) == translate(NoValue)) ||
         (!ModelAPI_Expression::isVariable(aItem->text(Col_Name).toStdString())) ) {
       return false;
     }

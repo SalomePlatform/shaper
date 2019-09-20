@@ -33,6 +33,8 @@
 #include <SketchPlugin_MultiRotation.h>
 #include <SketchPlugin_MultiTranslation.h>
 
+#include <Config_Translator.h>
+
 
 static void sendMessage(const char* theMessageName)
 {
@@ -352,13 +354,19 @@ bool SketchSolver_Group::resolveConstraints()
 void SketchSolver_Group::computeDoF()
 {
   std::ostringstream aDoFMsg;
+  static const std::string aMsgContext("Sketch");
   int aDoF = mySketchSolver->dof();
   /// "DoF = 0" content of string value is used in PartSet by Sketch edit
   /// If it is changed, it should be corrected also there
-  if (aDoF == 0)
-    aDoFMsg << "Sketch is fully fixed (DoF = 0)";
-  else
-    aDoFMsg << "DoF (degrees of freedom) = " << aDoF;
+  if (aDoF == 0) {
+    static const std::string aMsgDoF("Sketch is fully fixed (DoF = 0)");
+    aDoFMsg << Config_Translator::translate(aMsgContext, aMsgDoF).c_str();
+  } else {
+    static const std::string aMsgDoF("DoF (degrees of freedom) = %1");
+    Events_InfoMessage aMsg(aMsgContext, aMsgDoF);
+    aMsg.arg(aDoF);
+    aDoFMsg << Config_Translator::translate(aMsg).c_str();
+  }
   mySketch->string(SketchPlugin_Sketch::SOLVER_DOF())->setValue(aDoFMsg.str());
 
   if (aDoF > 0 && myDOF <= 0)

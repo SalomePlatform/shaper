@@ -82,10 +82,6 @@
       <source>Error: Result construction selected.</source>
       <translation>AA</translation>
     </message>
-    <message>
-      <source>Error: Attribute \"%1\" does not supported by this validator.</source>
-      <translation>AA</translation>
-    </message>
   </context>
   <context>
     <name>Group:Model_FeatureValidator</name>

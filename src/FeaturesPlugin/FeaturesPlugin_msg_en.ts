@@ -227,13 +227,6 @@
     </message>
   </context>
   <context>
-    <name>Extrusion:base :FeaturesPlugin_ValidatorBaseForGeneration</name>
-    <message>
-      <source>Error: Attribute \"%1\" does not supported by this validator.</source>
-      <translation></translation>
-    </message>
-  </context>
-  <context>
     <name>Extrusion:direction_object:GeomValidators_ShapeType</name>
     <message>
       <source>It does not contain element with acceptable shape type. The type should be one of the next: %1</source>
@@ -655,13 +648,6 @@
     </message>
   </context>
   <context>
-    <name>ExtrusionCut:base:FeaturesPlugin_ValidatorBaseForGeneration</name>
-    <message>
-      <source>Error: Attribute \"%1\" does not supported by this validator.</source>
-      <translation></translation>
-    </message>
-  </context>
-  <context>
     <name>ExtrusionCut:direction_object:GeomValidators_ShapeType</name>
     <message>
       <source>It does not contain element with acceptable shape type. The type should be one of the next: %1</source>
@@ -1117,13 +1103,6 @@
     </message>
   </context>
   <context>
-    <name>Revolution:base:FeaturesPlugin_ValidatorBaseForGeneration</name>
-    <message>
-      <source>Error: Attribute \"%1\" does not supported by this validator.</source>
-      <translation></translation>
-    </message>
-  </context>
-  <context>
     <name>Revolution:axis_object:GeomValidators_ShapeType</name>
     <message>
       <source>It does not contain element with acceptable shape type. The type should be one of the next: %1</source>
@@ -1520,13 +1499,6 @@
     <message>
       <source>Error: Selected shape has unacceptable type. Acceptable types are: faces or wires on sketch, whole sketch(if it has at least one face), and whole objects with shape types: %1</source>
       <translation>Selected shape has unacceptable type. Acceptable types are: faces or wires on sketch, whole sketch(if it has at least one face), and whole objects with shape types: %1</translation>
-    </message>
-  </context>
-  <context>
-    <name>RevolutionCut:base:FeaturesPlugin_ValidatorBaseForGeneration</name>
-    <message>
-      <source>Error: Attribute \"%1\" does not supported by this validator.</source>
-      <translation></translation>
     </message>
   </context>
   <context>
@@ -1950,13 +1922,6 @@
     </message>
   </context>
   <context>
-    <name>ExtrusionFuse:base:FeaturesPlugin_ValidatorBaseForGeneration</name>
-    <message>
-      <source>Error: Attribute \"%1\" does not supported by this validator.</source>
-      <translation></translation>
-    </message>
-  </context>
-  <context>
     <name>ExtrusionFuse:direction_object:GeomValidators_ShapeType</name>
     <message>
       <source>It does not contain element with acceptable shape type. The type should be one of the next: %1</source>
@@ -2447,13 +2412,6 @@
     </message>
   </context>
   <context>
-    <name>RevolutionFuse:base:FeaturesPlugin_ValidatorBaseForGeneration</name>
-    <message>
-      <source>Error: Attribute \"%1\" does not supported by this validator.</source>
-      <translation></translation>
-    </message>
-  </context>
-  <context>
     <name>RevolutionFuse:axis_object:GeomValidators_ShapeType</name>
     <message>
       <source>It does not contain element with acceptable shape type. The type should be one of the next: %1</source>
@@ -2862,13 +2820,6 @@
   <context>
     <name>Pipe:FeaturesPlugin_ValidatorPipeLocations</name>
     <message>
-      <source>Error: Feature \"%1\" does not supported by this validator.</source>
-      <translation>Feature "%1" does not supported validator "FeaturesPlugin_ValidatorPipeLocations".</translation>
-    </message>
-  </context>
-  <context>
-    <name>Pipe:FeaturesPlugin_ValidatorPipeLocations</name>
-    <message>
       <source>Error: Could not get \"%1\" attribute.</source>
       <translation>Could not get "%1" attribute</translation>
     </message>
@@ -3007,13 +2958,6 @@
     </message>
   </context>
   <context>
-    <name>Pipe:base_objects:FeaturesPlugin_ValidatorBaseForGeneration</name>
-    <message>
-      <source>Error: Attribute \"%1\" does not supported by this validator.</source>
-      <translation></translation>
-    </message>
-  </context>
-  <context>
     <name>Pipe:path_object:FeaturesPlugin_ValidatorPipePath</name>
     <message>
       <source>Error: This validator can only work with path selector in \"Pipe\" feature.</source>
@@ -3102,13 +3046,6 @@
     <message>
       <source>Error: Empty context.</source>
       <translation>Selected object has empty context.</translation>
-    </message>
-  </context>
-  <context>
-    <name>Remove_SubShapes:FeaturesPlugin_ValidatorRemoveSubShapesResult</name>
-    <message>
-      <source>Error: Feature \"%1\" does not supported by this validator.</source>
-      <translation>Feature "%1" does not supported validator "FeaturesPlugin_ValidatorRemoveSubShapesResult".</translation>
     </message>
   </context>
   <context>
@@ -3206,13 +3143,6 @@
     <name>Remove_SubShapes:base_shape:GeomValidators_BodyShapes</name>
     <message>
       <source>Error: Result construction selected.</source>
-      <translation></translation>
-    </message>
-  </context>
-  <context>
-    <name>Remove_SubShapes:base_shape:GeomValidators_BodyShapes</name>
-    <message>
-      <source>Error: Attribute \"%1\" does not supported by this validator.</source>
       <translation></translation>
     </message>
   </context>
@@ -3627,13 +3557,6 @@
     <message>
       <source>Objects from the %1 group can be selected in the %2 document, but an objects from the %3 group is selected.</source>
       <translation>Objects from the %1 group can be selected in the %2 document, but an objects from the %3 group is selected.</translation>
-    </message>
-  </context>
-  <context>
-    <name>Union:FeaturesPlugin_ValidatorUnionArguments</name>
-    <message>
-      <source>Error: This validator supports only \"%1\" feature.</source>
-      <translation>This validator "FeaturesPlugin_ValidatorUnionArguments" supports only "%1" feature.</translation>
     </message>
   </context>
   <context>

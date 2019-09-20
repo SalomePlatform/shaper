@@ -123,14 +123,7 @@
   <context>
     <name>Sketch:Model_FeatureValidator</name>
     <message>
-      <source>Attribute "DirX" is not initialized.</source>
-      <translation>AA</translation>
-    </message>
-  </context>
-  <context>
-    <name>Sketch:Model_FeatureValidator</name>
-    <message>
-      <source>Attribute "Features" is not initialized.</source>
+      <source>Attribute "%1" is not initialized.</source>
       <translation>AA</translation>
     </message>
   </context>
@@ -172,21 +165,7 @@
   <context>
     <name>Sketch:Model_FeatureValidator</name>
     <message>
-      <source>Attribute "External" is not initialized.</source>
-      <translation>AA</translation>
-    </message>
-  </context>
-  <context>
-    <name>Sketch:Model_FeatureValidator</name>
-    <message>
-      <source>Attribute "SolverDOF" is not initialized.</source>
-      <translation>AA</translation>
-    </message>
-  </context>
-  <context>
-    <name>Sketch:Model_FeatureValidator</name>
-    <message>
-      <source>Attribute "SolverError" is not initialized.</source>
+      <source>Attribute "%1" is not initialized.</source>
       <translation>AA</translation>
     </message>
   </context>
@@ -201,28 +180,7 @@
   <context>
     <name>SketchMacroCircle:Model_FeatureValidator</name>
     <message>
-      <source>Attribute "circle_center" is not initialized.</source>
-      <translation>AA</translation>
-    </message>
-  </context>
-  <context>
-    <name>SketchMacroCircle:Model_FeatureValidator</name>
-    <message>
-      <source>Attribute "FirstPoint" is not initialized.</source>
-      <translation>AA</translation>
-    </message>
-  </context>
-  <context>
-    <name>SketchMacroCircle:Model_FeatureValidator</name>
-    <message>
-      <source>Attribute "SecondPoint" is not initialized.</source>
-      <translation>AA</translation>
-    </message>
-  </context>
-  <context>
-    <name>SketchMacroCircle:Model_FeatureValidator</name>
-    <message>
-      <source>Attribute "ThirdPoint" is not initialized.</source>
+      <source>Attribute "%1" is not initialized.</source>
       <translation>AA</translation>
     </message>
   </context>
@@ -276,20 +234,6 @@
     </message>
   </context>
   <context>
-    <name>SketchMacroCircle:Model_FeatureValidator</name>
-    <message>
-      <source>Attribute "circle_radius" is not initialized.</source>
-      <translation>AA</translation>
-    </message>
-  </context>
-  <context>
-    <name>SketchMacroCircle:Model_FeatureValidator</name>
-    <message>
-      <source>Attribute "circle_type" is not initialized.</source>
-      <translation>AA</translation>
-    </message>
-  </context>
-  <context>
     <name>SketchMacroCircle:center_point</name>
     <message>
       <source>Attribute "%1" is locked by modification value in the viewer.</source>
@@ -310,11 +254,7 @@
   <context>
     <name>SketchMacroCircle:Model_FeatureValidator</name>
     <message>
-      <source>Attribute "circle_type" is not initialized.</source>
-      <translation>AA</translation>
-    </message>
-    <message>
-      <source>Attribute "second_point" is not initialized.</source>
+      <source>Attribute "%1" is not initialized.</source>
       <translation>AA</translation>
     </message>
   </context>
@@ -395,7 +335,7 @@
   <context>
     <name>SketchConstraintHorizontal:Model_FeatureValidator</name>
     <message>
-      <source>Attribute "ConstraintEntityA" is not initialized.</source>
+      <source>Attribute "%1" is not initialized.</source>
       <translation>AA</translation>
     </message>
   </context>
@@ -459,14 +399,7 @@
   <context>
     <name>SketchConstraintPerpendicular:Model_FeatureValidator</name>
     <message>
-      <source>Attribute "ConstraintEntityA" is not initialized.</source>
-      <translation>AA</translation>
-    </message>
-  </context>
-  <context>
-    <name>SketchConstraintPerpendicular:Model_FeatureValidator</name>
-    <message>
-      <source>Attribute "ConstraintEntityB" is not initialized.</source>
+      <source>Attribute "%1" is not initialized.</source>
       <translation>AA</translation>
     </message>
   </context>
@@ -586,7 +519,7 @@
   <context>
     <name>SketchConstraintRadius:Model_FeatureValidator</name>
     <message>
-      <source>Attribute "ConstraintEntityA" is not initialized.</source>
+      <source>Attribute "%1" is not initialized.</source>
       <translation>AA</translation>
     </message>
   </context>
@@ -629,13 +562,6 @@
     <name>SketchConstraintRadius:ConstraintValue:GeomValidators_Positive</name>
     <message>
       <source>Integer is not positive.</source>
-      <translation>AA</translation>
-    </message>
-  </context>
-  <context>
-    <name>SketchConstraintRadius:Model_FeatureValidator</name>
-    <message>
-      <source>Attribute "ConstraintValue" is not initialized.</source>
       <translation>AA</translation>
     </message>
   </context>
@@ -692,7 +618,7 @@
   <context>
     <name>SketchConstraintVertical:Model_FeatureValidator</name>
     <message>
-      <source>Attribute "ConstraintEntityA" is not initialized.</source>
+      <source>Attribute "%1" is not initialized.</source>
       <translation>AA</translation>
     </message>
   </context>
@@ -756,7 +682,7 @@
   <context>
     <name>SketchLine:Model_FeatureValidator</name>
     <message>
-      <source>Attribute "EndPoint" is not initialized.</source>
+      <source>Attribute "%1" is not initialized.</source>
       <translation>AA</translation>
     </message>
   </context>
@@ -777,21 +703,21 @@
   <context>
     <name>SketchLine:StartPoint</name>
     <message>
-      <source>Attribute "StartPoint" is not initialized.</source>
+      <source>Attribute "%1" is not initialized.</source>
       <translation>AA</translation>
     </message>
   </context>
   <context>
     <name>SketchLine:EndPoint</name>
     <message>
-      <source>Attribute "EndPoint" is not initialized.</source>
+      <source>Attribute "%1" is not initialized.</source>
       <translation>AA</translation>
     </message>
   </context>
   <context>
     <name>SketchLine:Model_FeatureValidator</name>
     <message>
-      <source>Attribute "StartPoint" is not initialized.</source>
+      <source>Attribute "%1" is not initialized.</source>
       <translation>AA</translation>
     </message>
   </context>
@@ -821,7 +747,7 @@
   <context>
     <name>SketchPoint:Model_FeatureValidator</name>
     <message>
-      <source>Attribute "PointCoordinates" is not initialized.</source>
+      <source>Attribute "%1" is not initialized.</source>
       <translation>AA</translation>
     </message>
   </context>
@@ -864,14 +790,7 @@
   <context>
     <name>SketchRectangle:Model_FeatureValidator</name>
     <message>
-      <source>Attribute "RectStartPoint" is not initialized.</source>
-      <translation>AA</translation>
-    </message>
-  </context>
-  <context>
-    <name>SketchRectangle:Model_FeatureValidator</name>
-    <message>
-      <source>Attribute "RectEndPoint" is not initialized.</source>
+      <source>Attribute "%1" is not initialized.</source>
       <translation>AA</translation>
     </message>
   </context>
@@ -922,7 +841,7 @@
   <context>
     <name>SketchArc:ArcCenter</name>
     <message>
-      <source>Attribute "center_point" is not initialized.</source>
+      <source>Attribute "%1" is not initialized.</source>
       <translation>AA</translation>
     </message>
   </context>
@@ -964,14 +883,7 @@
   <context>
     <name>SketchArc:Model_FeatureValidator</name>
     <message>
-      <source>Attribute "ArcEndPoint" is not initialized.</source>
-      <translation>AA</translation>
-    </message>
-  </context>
-  <context>
-    <name>SketchArc:Model_FeatureValidator</name>
-    <message>
-      <source>Attribute "ArcPassedPoint" is not initialized.</source>
+      <source>Attribute "%1" is not initialized.</source>
       <translation>AA</translation>
     </message>
   </context>
@@ -997,37 +909,9 @@
     </message>
   </context>
   <context>
-    <name>SketchArc:Model_FeatureValidator</name>
-    <message>
-      <source>Attribute "center_point" is not initialized.</source>
-      <translation>AA</translation>
-    </message>
-  </context>
-  <context>
     <name>SketchArc:Model_FeatureValidator:ArcStartPoint</name>
     <message>
-      <source>Attribute "start_point" is not initialized.</source>
-      <translation>AA</translation>
-    </message>
-  </context>
-  <context>
-    <name>SketchArc:Model_FeatureValidator</name>
-    <message>
-      <source>Attribute "end_point" is not initialized.</source>
-      <translation>AA</translation>
-    </message>
-  </context>
-  <context>
-    <name>SketchArc:Model_FeatureValidator</name>
-    <message>
-      <source>Attribute "ArcPassedPoint" is not initialized.</source>
-      <translation>AA</translation>
-    </message>
-  </context>
-  <context>
-    <name>SketchArc:Model_FeatureValidator</name>
-    <message>
-      <source>Attribute "ArcTangentPoint" is not initialized.</source>
+      <source>Attribute "%1" is not initialized.</source>
       <translation>AA</translation>
     </message>
   </context>
@@ -1095,14 +979,7 @@
   <context>
     <name>SketchConstraintMirror:Model_FeatureValidator</name>
     <message>
-      <source>Attribute "ConstraintEntityA" is not initialized.</source>
-      <translation>AA</translation>
-    </message>
-  </context>
-  <context>
-    <name>SketchConstraintMirror:Model_FeatureValidator</name>
-    <message>
-      <source>Attribute "ConstraintMirrorList" is not initialized.</source>
+      <source>Attribute "%1" is not initialized.</source>
       <translation>AA</translation>
     </message>
   </context>
@@ -1152,14 +1029,7 @@
   <context>
     <name>SketchMultiRotation:Model_FeatureValidator</name>
     <message>
-      <source>Attribute "AngleType" is not initialized.</source>
-      <translation>AA</translation>
-    </message>
-  </context>
-  <context>
-    <name>SketchMultiRotation:Model_FeatureValidator</name>
-    <message>
-      <source>Attribute "MultiRotationCenter" is not initialized.</source>
+      <source>Attribute "%1" is not initialized.</source>
       <translation>AA</translation>
     </message>
   </context>
@@ -1195,27 +1065,6 @@
     <name>SketchMultiRotation:MultiRotationObjects:GeomValidators_Positive</name>
     <message>
       <source>Integer is not positive.</source>
-      <translation>AA</translation>
-    </message>
-  </context>
-  <context>
-    <name>SketchMultiRotation:Model_FeatureValidator</name>
-    <message>
-      <source>Attribute "MultiRotationList" is not initialized.</source>
-      <translation>AA</translation>
-    </message>
-  </context>
-  <context>
-    <name>SketchMultiRotation:Model_FeatureValidator</name>
-    <message>
-      <source>Attribute "MultiRotationAngle" is not initialized.</source>
-      <translation>AA</translation>
-    </message>
-  </context>
-  <context>
-    <name>SketchMultiRotation:Model_FeatureValidator</name>
-    <message>
-      <source>Attribute "MultiRotationObjects" is not initialized.</source>
       <translation>AA</translation>
     </message>
   </context>
@@ -1279,14 +1128,7 @@
   <context>
     <name>SketchMultiTranslation:Model_FeatureValidator</name>
     <message>
-      <source>Attribute "MultiTranslationEndPoint" is not initialized.</source>
-      <translation>AA</translation>
-    </message>
-  </context>
-  <context>
-    <name>SketchMultiTranslation:Model_FeatureValidator</name>
-    <message>
-      <source>Attribute "MultiTranslationList" is not initialized.</source>
+      <source>Attribute "%1" is not initialized.</source>
       <translation>AA</translation>
     </message>
   </context>
@@ -1329,21 +1171,6 @@
     <name>SketchMultiTranslation:MultiTranslationObjects:GeomValidators_Positive</name>
     <message>
       <source>Integer is not positive.</source>
-      <translation>AA</translation>
-    </message>
-
-  </context>
-  <context>
-    <name>SketchMultiTranslation:Model_FeatureValidator</name>
-    <message>
-      <source>Attribute "MultiTranslationStartPoint" is not initialized.</source>
-      <translation>AA</translation>
-    </message>
-  </context>
-  <context>
-    <name>SketchMultiTranslation:Model_FeatureValidator</name>
-    <message>
-      <source>Attribute "MultiTranslationObjects" is not initialized.</source>
       <translation>AA</translation>
     </message>
   </context>
@@ -1491,28 +1318,7 @@
   <context>
     <name>SketchConstraintAngle:Model_FeatureValidator</name>
     <message>
-      <source>Attribute "ConstraintEntityA" is not initialized.</source>
-      <translation>AA</translation>
-    </message>
-  </context>
-  <context>
-    <name>SketchConstraintAngle:Model_FeatureValidator</name>
-    <message>
-      <source>Attribute "ConstraintEntityB" is not initialized.</source>
-      <translation>AA</translation>
-    </message>
-  </context>
-  <context>
-    <name>SketchConstraintAngle:Model_FeatureValidator</name>
-    <message>
-      <source>Attribute "AngleValue" is not initialized.</source>
-      <translation>AA</translation>
-    </message>
-  </context>
-  <context>
-    <name>SketchConstraintAngle:Model_FeatureValidator</name>
-    <message>
-      <source>Attribute "AngleType" is not initialized.</source>
+      <source>Attribute "%1" is not initialized.</source>
       <translation>AA</translation>
     </message>
   </context>
@@ -1625,14 +1431,7 @@
   <context>
     <name>SketchConstraintCoincidence:Model_FeatureValidator</name>
     <message>
-      <source>Attribute "ConstraintEntityA" is not initialized.</source>
-      <translation>AA</translation>
-    </message>
-  </context>
-  <context>
-    <name>SketchConstraintCoincidence:Model_FeatureValidator</name>
-    <message>
-      <source>Attribute "ConstraintEntityB" is not initialized.</source>
+      <source>Attribute "%1" is not initialized.</source>
       <translation>AA</translation>
     </message>
   </context>
@@ -1687,13 +1486,6 @@
     </message>
   </context>
   <context>
-    <name>SketchConstraintDistance:Model_FeatureValidator</name>
-    <message>
-      <source>Attribute "ConstraintEntityB" is not initialized.</source>
-      <translation>AA</translation>
-    </message>
-  </context>
-  <context>
     <name>SketchConstraintDistance:ConstraintValue:GeomValidators_Positive</name>
     <message>
       <source>Value is too small.</source>
@@ -1711,27 +1503,6 @@
     <name>SketchConstraintDistance:ConstraintValue:GeomValidators_Positive</name>
     <message>
       <source>Integer is not positive.</source>
-      <translation>AA</translation>
-    </message>
-  </context>
-  <context>
-    <name>SketchConstraintDistance:Model_FeatureValidator</name>
-    <message>
-      <source>Attribute "ConstraintEntityA" is not initialized.</source>
-      <translation>AA</translation>
-    </message>
-  </context>
-  <context>
-    <name>SketchConstraintDistance:Model_FeatureValidator</name>
-    <message>
-      <source>Attribute "ConstraintEntityB" is not initialized.</source>
-      <translation>AA</translation>
-    </message>
-  </context>
-  <context>
-    <name>SketchConstraintDistance:Model_FeatureValidator</name>
-    <message>
-      <source>Attribute "ConstraintValue" is not initialized.</source>
       <translation>AA</translation>
     </message>
   </context>
@@ -1858,14 +1629,7 @@
   <context>
     <name>SketchConstraintEqual:Model_FeatureValidator</name>
     <message>
-      <source>Attribute "ConstraintEntityA" is not initialized.</source>
-      <translation>AA</translation>
-    </message>
-  </context>
-  <context>
-    <name>SketchConstraintEqual:Model_FeatureValidator</name>
-    <message>
-      <source>Attribute "ConstraintEntityB" is not initialized.</source>
+      <source>Attribute "%1" is not initialized.</source>
       <translation>AA</translation>
     </message>
   </context>
@@ -1908,7 +1672,7 @@
   <context>
     <name>SketchConstraintLength:Model_FeatureValidator</name>
     <message>
-      <source>Attribute "ConstraintEntityA" is not initialized.</source>
+      <source>Attribute "%1" is not initialized.</source>
       <translation>AA</translation>
     </message>
   </context>
@@ -1930,21 +1694,6 @@
     <name>SketchConstraintLength:ConstraintValue:GeomValidators_Positive</name>
     <message>
       <source>Integer is not positive.</source>
-      <translation>AA</translation>
-    </message>
-
-  </context>
-  <context>
-    <name>SketchConstraintLength:Model_FeatureValidator</name>
-    <message>
-      <source>Attribute "ConstraintEntityA" is not initialized.</source>
-      <translation>AA</translation>
-    </message>
-  </context>
-  <context>
-    <name>SketchConstraintLength:Model_FeatureValidator</name>
-    <message>
-      <source>Attribute "ConstraintValue" is not initialized.</source>
       <translation>AA</translation>
     </message>
   </context>
@@ -2015,14 +1764,7 @@
   <context>
     <name>SketchConstraintMiddle:Model_FeatureValidator</name>
     <message>
-      <source>Attribute "ConstraintEntityA" is not initialized.</source>
-      <translation>AA</translation>
-    </message>
-  </context>
-  <context>
-    <name>SketchConstraintMiddle:Model_FeatureValidator</name>
-    <message>
-      <source>Attribute "ConstraintEntityB" is not initialized.</source>
+      <source>Attribute "%1" is not initialized.</source>
       <translation>AA</translation>
     </message>
   </context>
@@ -2058,14 +1800,7 @@
   <context>
     <name>SketchConstraintParallel:Model_FeatureValidator</name>
     <message>
-      <source>Attribute "ConstraintEntityA" is not initialized.</source>
-      <translation>AA</translation>
-    </message>
-  </context>
-  <context>
-    <name>SketchConstraintParallel:Model_FeatureValidator</name>
-    <message>
-      <source>Attribute "ConstraintEntityB" is not initialized.</source>
+      <source>Attribute "%1" is not initialized.</source>
       <translation>AA</translation>
     </message>
   </context>
@@ -2178,7 +1913,7 @@
   <context>
     <name>SketchConstraintRigid:Model_FeatureValidator</name>
     <message>
-      <source>Attribute "ConstraintEntityA" is not initialized.</source>
+      <source>Attribute "%1" is not initialized.</source>
       <translation>AA</translation>
     </message>
   </context>
@@ -2249,14 +1984,7 @@
   <context>
     <name>SketchConstraintTangent:Model_FeatureValidator</name>
     <message>
-      <source>Attribute "ConstraintEntityA" is not initialized.</source>
-      <translation>AA</translation>
-    </message>
-  </context>
-  <context>
-    <name>SketchConstraintTangent:Model_FeatureValidator</name>
-    <message>
-      <source>Attribute "ConstraintEntityB" is not initialized.</source>
+      <source>Attribute "%1" is not initialized.</source>
       <translation>AA</translation>
     </message>
   </context>
@@ -2300,14 +2028,7 @@
   <context>
     <name>SketchFillet:Model_FeatureValidator</name>
     <message>
-      <source>Attribute "ConstraintEntityA" is not initialized.</source>
-      <translation>AA</translation>
-    </message>
-  </context>
-  <context>
-    <name>SketchFillet:Model_FeatureValidator</name>
-    <message>
-      <source>Attribute "ConstraintValue" is not initialized.</source>
+      <source>Attribute "%1" is not initialized.</source>
       <translation>AA</translation>
     </message>
   </context>
@@ -2372,7 +2093,7 @@
   <context>
     <name>SketchProjection:Model_FeatureValidator</name>
     <message>
-      <source>Attribute "ExternalFeature" is not initialized.</source>
+      <source>Attribute "%1" is not initialized.</source>
       <translation>AA</translation>
     </message>
   </context>
@@ -2495,7 +2216,7 @@
   <context>
     <name>SketchConstraintAngle:Model_FeatureValidator</name>
     <message>
-      <source>Attribute "AngleReversedLine1" is not initialized.</source>
+      <source>Attribute "%1" is not initialized.</source>
       <translation>AA</translation>
     </message>
   </context>
@@ -2584,7 +2305,7 @@
   <context>
     <name>SketchConstraintCollinear:Model_FeatureValidator</name>
     <message>
-      <source>Attribute "ConstraintEntityA" is not initialized.</source>
+      <source>Attribute "%1" is not initialized.</source>
       <translation>AA</translation>
     </message>
   </context>
@@ -2765,7 +2486,7 @@
   <context>
     <name>SketchConstraintDistanceHorizontal:Model_FeatureValidator</name>
     <message>
-      <source>Attribute "ConstraintEntityA" is not initialized.</source>
+      <source>Attribute "%1" is not initialized.</source>
       <translation>AA</translation>
     </message>
   </context>
@@ -2864,7 +2585,7 @@
   <context>
     <name>SketchConstraintDistanceVertical:Model_FeatureValidator</name>
     <message>
-      <source>Attribute "ConstraintEntityA" is not initialized.</source>
+      <source>Attribute "%1" is not initialized.</source>
       <translation>AA</translation>
     </message>
   </context>
@@ -3277,7 +2998,7 @@
   <context>
     <name>SketchDrawer:Model_FeatureValidator</name>
     <message>
-      <source>Attribute "base_shape" is not initialized.</source>
+      <source>Attribute "%1" is not initialized.</source>
       <translation>AA</translation>
     </message>
   </context>
@@ -3329,7 +3050,7 @@
   <context>
     <name>SketchFillet:Model_FeatureValidator</name>
     <message>
-      <source>Attribute "fillet_point" is not initialized.</source>
+      <source>Attribute "%1" is not initialized.</source>
       <translation>AA</translation>
     </message>
   </context>
@@ -3399,7 +3120,7 @@
   <context>
     <name>SketchIntersectionPoint:Model_FeatureValidator</name>
     <message>
-      <source>Attribute "ExternalFeature" is not initialized.</source>
+      <source>Attribute "%1" is not initialized.</source>
       <translation>AA</translation>
     </message>
   </context>
@@ -3470,19 +3191,7 @@
   <context>
     <name>SketchMacroArc:Model_FeatureValidator</name>
     <message>
-      <source>Attribute "center_point" is not initialized.</source>
-      <translation>AA</translation>
-    </message>
-    <message>
-      <source>Attribute "end_point_1" is not initialized.</source>
-      <translation>AA</translation>
-    </message>
-    <message>
-      <source>Attribute "end_point_2" is not initialized.</source>
-      <translation>AA</translation>
-    </message>
-    <message>
-      <source>Attribute "end_point_3" is not initialized.</source>
+      <source>Attribute "%1" is not initialized.</source>
       <translation>AA</translation>
     </message>
   </context>
@@ -3560,13 +3269,6 @@
     <name>SketchMacroArc:tangent_point:SketchPlugin_ArcTransversalPoint</name>
     <message>
       <source>The attribute %1 should be a point</source>
-      <translation>AA</translation>
-    </message>
-  </context>
-  <context>
-    <name>SketchMacroArc:Model_FeatureValidator</name>
-    <message>
-      <source>Attribute "arc_type" is not initialized.</source>
       <translation>AA</translation>
     </message>
   </context>
@@ -3657,15 +3359,7 @@
   <context>
     <name>SketchMacroCircle:Model_FeatureValidator</name>
     <message>
-      <source>Attribute "center_point" is not initialized.</source>
-      <translation>AA</translation>
-    </message>
-    <message>
-      <source>Attribute "first_point" is not initialized.</source>
-      <translation>AA</translation>
-    </message>
-    <message>
-      <source>Attribute "passed_point" is not initialized.</source>
+      <source>Attribute "%1" is not initialized.</source>
       <translation>AA</translation>
     </message>
   </context>
@@ -3702,13 +3396,6 @@
     <name>SketchMacroCircle:third_point:SketchPlugin_ThirdPointValidator</name>
     <message>
       <source>Selected points are on the same line</source>
-      <translation>AA</translation>
-    </message>
-  </context>
-  <context>
-    <name>SketchMacroCircle:Model_FeatureValidator</name>
-    <message>
-      <source>Attribute "third_point" is not initialized.</source>
       <translation>AA</translation>
     </message>
   </context>
@@ -3763,11 +3450,7 @@
   <context>
     <name>SketchMacroEllipse:Model_FeatureValidator</name>
     <message>
-      <source>Attribute "first_point" is not initialized.</source>
-      <translation>AA</translation>
-    </message>
-    <message>
-      <source>Attribute "passed_point" is not initialized.</source>
+      <source>Attribute "%1" is not initialized.</source>
       <translation>AA</translation>
     </message>
   </context>
@@ -3832,7 +3515,7 @@
   <context>
     <name>SketchMacroEllipse:Model_FeatureValidator</name>
     <message>
-      <source>Attribute "ellipse_type" is not initialized.</source>
+      <source>Attribute "%1" is not initialized.</source>
       <translation>AA</translation>
     </message>
   </context>
@@ -4195,7 +3878,7 @@
   <context>
     <name>SketchSplit:Model_FeatureValidator</name>
     <message>
-      <source>Attribute "SelectedObject" is not initialized.</source>
+      <source>Attribute "%1" is not initialized.</source>
       <translation>AA</translation>
     </message>
   </context>
@@ -4232,7 +3915,7 @@
   <context>
     <name>SketchTrim:Model_FeatureValidator</name>
     <message>
-      <source>Attribute "SelectedObject" is not initialized.</source>
+      <source>Attribute "%1" is not initialized.</source>
       <translation>AA</translation>
     </message>
   </context>

@@ -133,6 +133,14 @@
       <source>See preview</source>
       <translation>AA</translation>
     </message>
+    <message>
+      <source>&lt;NoName&gt;</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+    <source>&lt;NoValue&gt;</source>
+    <translation>AA</translation>
+  </message>
   </context>
 
   <context>

@@ -63,7 +63,7 @@
           <doublevalue id="from_offset" label="Angle"
             step="1.0" default="0"
             icon="icons/Features/angle_up_down.png"
-            tooltip="Angle for &quot;from&quot; for bounding plane">
+            tooltip="Angle for &quot;from&quot; bounding plane">
           </doublevalue>
         </groupbox>
         <groupbox title="To">

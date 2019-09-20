@@ -45,7 +45,7 @@
                                  enable_value="enable_by_preferences"/>
         <sketch-2dpoint_selector id="EndPoint" accept_expressions="0" title="End point" tooltip="End point coordinates"
                                  enable_value="enable_by_preferences"/>
-        <labelvalue id="LineLength" accept_expressions="0" label="Length:" default="computed" icon="icons/Sketch/distance_value.png"
+        <labelvalue id="LineLength" accept_expressions="0" label="Length" default="computed" icon="icons/Sketch/distance_value.png"
                      tooltip="Line length" obligatory="0" enable_value="false"/>
         <boolvalue id="Auxiliary" label="Auxiliary" default="false" tooltip="Construction element" obligatory="0"/>
         <validator id="GeomValidators_Different" parameters="StartPoint,EndPoint"/>
@@ -65,7 +65,7 @@
                                  enable_value="enable_by_preferences"/>
         <labelvalue id="circle_radius"
                     icon="icons/Sketch/radius.png"
-                    label="Radius:"
+                    label="Radius"
                     tooltip="Set radius"
                     default="computed"
                     accept_expressions="0"
@@ -130,7 +130,7 @@
         </toolbox>
         <labelvalue id="circle_radius"
                     icon="icons/Sketch/radius.png"
-                    label="Radius:"
+                    label="Radius"
                     tooltip="Set radius"
                     default="computed"
                     accept_expressions="0"
@@ -169,7 +169,7 @@
         <validator id="GeomValidators_Different" parameters="center_point,start_point,end_point"/>
         <labelvalue id="radius"
                     icon="icons/Sketch/radius.png"
-                    label="Radius:"
+                    label="Radius"
                     tooltip="Set radius"
                     accept_expressions="0"
                     min="0"
@@ -179,7 +179,7 @@
         </labelvalue>
         <labelvalue id="angle"
                     icon="icons/Sketch/angle.png"
-                    label="Angle:"
+                    label="Angle"
                     tooltip="Set angle"
                     default="0"
                     use_reset="false"
@@ -294,7 +294,7 @@
         </toolbox>
         <labelvalue id="radius"
                     icon="icons/Sketch/radius.png"
-                    label="Radius:"
+                    label="Radius"
                     tooltip="Set radius"
                     accept_expressions="0"
                     min="0"
@@ -304,7 +304,7 @@
         </labelvalue>
         <labelvalue id="angle"
                     icon="icons/Sketch/angle.png"
-                    label="Angle:"
+                    label="Angle"
                     tooltip="Set angle"
                     default="0"
                     use_reset="false"
@@ -409,7 +409,7 @@
                                  enable_value="enable_by_preferences"/>
         <labelvalue id="ellipse_major_radius"
                     icon="icons/Sketch/radius_major.png"
-                    label="Major radius:"
+                    label="Major radius"
                     tooltip="Set major radius"
                     default="computed"
                     accept_expressions="0"
@@ -417,7 +417,7 @@
         </labelvalue>
         <labelvalue id="ellipse_minor_radius"
                     icon="icons/Sketch/radius_minor.png"
-                    label="Minor radius:"
+                    label="Minor radius"
                     tooltip="Set minor radius"
                     default="computed"
                     accept_expressions="0"
@@ -482,7 +482,7 @@
 <!--        <validator id="GeomValidators_Different" parameters="center_point_ref,passed_point_ref"/> -->
         <labelvalue id="major_radius"
                     icon="icons/Sketch/radius_major.png"
-                    label="Major radius:"
+                    label="Major radius"
                     tooltip="Set major radius"
                     default="computed"
                     accept_expressions="0"
@@ -492,7 +492,7 @@
         </labelvalue>
         <labelvalue id="minor_radius"
                     icon="icons/Sketch/radius_minor.png"
-                    label="Minor radius:"
+                    label="Minor radius"
                     tooltip="Set minor radius"
                     default="computed"
                     accept_expressions="0"
@@ -565,7 +565,7 @@
           <validator id="SketchPlugin_ReplicationReference" parameters="ConstraintEntityC"/>
         </sketch_shape_selector>
         <sketch_multi_selector id="ConstraintMirrorList"
-            label="Segments:"
+            label="Segments"
             tooltip="Select list of objects to be mirrored"
             shape_types="Edges"
             use_external="true"
@@ -582,7 +582,7 @@
         tooltip="Copy objects and move"
         helpfile="translationFeature.html">
         <sketch_multi_selector id="MultiTranslationList"
-            label="Segments:"
+            label="Segments"
             tooltip="Select list of objects to be translated"
             shape_types="Edges"
             use_external="true"
@@ -651,7 +651,7 @@
         tooltip="Copy objects and rotate"
         helpfile="rotationFeature.html">
         <sketch_multi_selector id="MultiRotationList"
-            label="Segments:"
+            label="Segments"
             tooltip="Select list of objects to be rotated"
             shape_types="Edges"
             use_external="true"

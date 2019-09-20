@@ -17,13 +17,6 @@
     </message>
   </context>
   <context>
-    <name>Group:group_list:GeomValidators_BodyShapes</name>
-    <message>
-      <source>Error: Attribute \"%1\" does not supported by this validator.</source>
-      <translation>Attribute "%1" does not supported by "GeomValidators_BodyShapes" validator.</translation>
-    </message>
-  </context>
-  <context>
     <name>Group:Model_FeatureValidator</name>
     <message>
       <source>Attribute "group_list" is not initialized.</source>
