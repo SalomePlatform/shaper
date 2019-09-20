@@ -219,6 +219,140 @@
     </message>
   </context>
 
+  <!-- Extrusion -->
+  <context>
+    <name>Extrusion</name>
+    <message>
+      <source>Create a solid by extrusion of a face</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Extrusion</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>From</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>To</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>Extrusion:CreationMethod</name>
+    <message>
+      <source>By bounding faces and offsets</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>By sizes</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>Extrusion:base</name>
+    <message>
+      <source>Base objects:</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Select a base objects</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>Extrusion:direction_object</name>
+    <message>
+      <source>Direction</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Select an edge for direction</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>Extrusion:from_object</name>
+    <message>
+      <source>From face</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>&lt;base sketch&gt;</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>Extrusion:from_offset</name>
+    <message>
+      <source>Offset</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Offset for "from" bounding plane</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>Extrusion:from_size</name>
+    <message>
+      <source>From size</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Size</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>Extrusion:to_object</name>
+    <message>
+      <source>To face</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>&lt;base sketch&gt;</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>Extrusion:to_offset</name>
+    <message>
+      <source>Offset</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Offset for "to" bounding plane</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>Extrusion:to_size</name>
+    <message>
+      <source>Size</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>To size</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>Extrusion:direction_object</name>
+    <message>
+      <source>&lt;base normal&gt;</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>Extrusion:sketch</name>
+    <message>
+      <source>Select:&lt;br /&gt; 1. Planar face of non-sketch object or a plane. Sketch creation will be started.&lt;br /&gt; 2. An existing sketch face or contour. Extrusion will be filled by it.&lt;br /&gt; 3. An existing result shape of kind: wires/edge/vertices.Extrusion will be filled by it.</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+
   <!-- ExtrusionCut -->
   <context>
     <name>ExtrusionCut</name>
@@ -246,7 +380,7 @@
   <context>
     <name>ExtrusionCut:CreationMethod</name>
     <message>
-      <source>By bounding planes and offsets</source>
+      <source>By bounding faces and offsets</source>
       <translation>AA</translation>
     </message>
     <message>
@@ -285,6 +419,10 @@
   </context>
   <context>
     <name>ExtrusionCut:from_object</name>
+    <message>
+      <source>From face</source>
+      <translation>AA</translation>
+    </message>
     <message>
       <source>&lt;base sketch&gt;</source>
       <translation>AA</translation>
@@ -338,6 +476,10 @@
       <translation>AA</translation>
     </message>
     <message>
+      <source>To face</source>
+      <translation>AA</translation>
+    </message>
+    <message>
       <source>Bounding plane (select a planar face)</source>
       <translation>AA</translation>
     </message>
@@ -371,7 +513,7 @@
   <context>
     <name>ExtrusionCut:sketch</name>
     <message>
-      <source>Select:<br /> 1. Planar face of non-sketch object or a plane. Sketch creation will be started.<br /> 2. An existing sketch face or contour. Extrusion will be filled by it.<br /> 3. An existing result shape of kind: wires/edge/vertices.Extrusion will be filled by it.</source>
+      <source>Select:&lt;br /&gt; 1. Planar face of non-sketch object or a plane. Sketch creation will be started.&lt;br /&gt; 2. An existing sketch face or contour. Extrusion will be filled by it.&lt;br /&gt; 3. An existing result shape of kind: wires/edge/vertices.Extrusion will be filled by it.</source>
       <translation>AA</translation>
     </message>
   </context>
@@ -403,7 +545,7 @@
   <context>
     <name>ExtrusionFuse:CreationMethod</name>
     <message>
-      <source>By bounding planes and offsets</source>
+      <source>By bounding faces and offsets</source>
       <translation>AA</translation>
     </message>
     <message>
@@ -435,6 +577,10 @@
   </context>
   <context>
     <name>ExtrusionFuse:from_object</name>
+    <message>
+      <source>From face</source>
+      <translation>AA</translation>
+    </message>
     <message>
       <source>&lt;base sketch&gt;</source>
       <translation>AA</translation>
@@ -484,6 +630,10 @@
   <context>
     <name>ExtrusionFuse:to_object</name>
     <message>
+      <source>To face</source>
+      <translation>AA</translation>
+    </message>
+    <message>
       <source>&lt;base sketch&gt;</source>
       <translation>AA</translation>
     </message>
@@ -521,7 +671,7 @@
   <context>
     <name>ExtrusionFuse:sketch</name>
     <message>
-      <source>Select:<br /> 1. Planar face of non-sketch object or a plane. Sketch creation will be started.<br /> 2. An existing sketch face or contour. Extrusion will be filled by it.<br /> 3. An existing result shape of kind: wires/edge/vertices.Extrusion will be filled by it.</source>
+      <source>Select:&lt;br /&gt; 1. Planar face of non-sketch object or a plane. Sketch creation will be started.&lt;br /&gt; 2. An existing sketch face or contour. Extrusion will be filled by it.&lt;br /&gt; 3. An existing result shape of kind: wires/edge/vertices.Extrusion will be filled by it.</source>
       <translation>AA</translation>
     </message>
   </context>
@@ -962,6 +1112,14 @@
       <source>Revolution</source>
       <translation>AA</translation>
     </message>
+    <message>
+      <source>From</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>To</source>
+      <translation>AA</translation>
+    </message>
   </context>
   <context>
     <name>Revolution:CreationMethod</name>
@@ -1067,6 +1225,13 @@
     </message>
     <message>
       <source>Angle for "to" bounding plane</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>Revolution:sketch</name>
+    <message>
+      <source>Select:&lt;br /&gt; 1. Planar face of non-sketch object or a plane. Sketch creation will be started.&lt;br /&gt; 2. An existing sketch face or contour. Extrusion will be filled by it.&lt;br /&gt; 3. An existing result shape of kind: wires/edge/vertices.Extrusion will be filled by it.</source>
       <translation>AA</translation>
     </message>
   </context>
@@ -1212,7 +1377,7 @@
   <context>
     <name>RevolutionCut:sketch</name>
     <message>
-      <source>Select:<br /> 1. Planar face of non-sketch object or a plane. Sketch creation will be started.<br /> 2. An existing sketch face or contour. Extrusion will be filled by it.<br /> 3. An existing result shape of kind: wires/edge/vertices.Extrusion will be filled by it.</source>
+      <source>Select:&lt;br /&gt; 1. Planar face of non-sketch object or a plane. Sketch creation will be started.&lt;br /&gt; 2. An existing sketch face or contour. Extrusion will be filled by it.&lt;br /&gt; 3. An existing result shape of kind: wires/edge/vertices.Extrusion will be filled by it.</source>
       <translation>AA</translation>
     </message>
   </context>
@@ -1358,7 +1523,7 @@
   <context>
     <name>RevolutionFuse:sketch</name>
     <message>
-      <source>Select:<br /> 1. Planar face of non-sketch object or a plane. Sketch creation will be started.<br /> 2. An existing sketch face or contour. Extrusion will be filled by it.<br /> 3. An existing result shape of kind: wires/edge/vertices.Extrusion will be filled by it.</source>
+      <source>Select:&lt;br /&gt; 1. Planar face of non-sketch object or a plane. Sketch creation will be started.&lt;br /&gt; 2. An existing sketch face or contour. Extrusion will be filled by it.&lt;br /&gt; 3. An existing result shape of kind: wires/edge/vertices.Extrusion will be filled by it.</source>
       <translation>AA</translation>
     </message>
   </context>
@@ -1982,108 +2147,6 @@
     </message>
   </context>
   <context>
-    <name>Extrusion</name>
-    <message>
-      <source>Create a solid by extrusion of a face</source>
-      <translation>AA</translation>
-    </message>
-    <message>
-      <source>Extrusion</source>
-      <translation>AA</translation>
-    </message>
-  </context>
-  <context>
-    <name>Extrusion:CreationMethod</name>
-    <message>
-      <source>By bounding faces and offsets</source>
-      <translation>AA</translation>
-    </message>
-    <message>
-      <source>By sizes</source>
-      <translation>AA</translation>
-    </message>
-  </context>
-  <context>
-    <name>Extrusion:base</name>
-    <message>
-      <source>Base objects:</source>
-      <translation>AA</translation>
-    </message>
-    <message>
-      <source>Select a base objects</source>
-      <translation>AA</translation>
-    </message>
-  </context>
-  <context>
-    <name>Extrusion:direction_object</name>
-    <message>
-      <source>Direction</source>
-      <translation>AA</translation>
-    </message>
-    <message>
-      <source>Select an edge for direction</source>
-      <translation>AA</translation>
-    </message>
-  </context>
-  <context>
-    <name>Extrusion:from_object</name>
-    <message>
-      <source>From face</source>
-      <translation>AA</translation>
-    </message>
-  </context>
-  <context>
-    <name>Extrusion:from_offset</name>
-    <message>
-      <source>Offset</source>
-      <translation>AA</translation>
-    </message>
-    <message>
-      <source>Offset for "from" bounding plane</source>
-      <translation>AA</translation>
-    </message>
-  </context>
-  <context>
-    <name>Extrusion:from_size</name>
-    <message>
-      <source>From size</source>
-      <translation>AA</translation>
-    </message>
-    <message>
-      <source>Size</source>
-      <translation>AA</translation>
-    </message>
-  </context>
-  <context>
-    <name>Extrusion:to_object</name>
-    <message>
-      <source>To face</source>
-      <translation>AA</translation>
-    </message>
-  </context>
-  <context>
-    <name>Extrusion:to_offset</name>
-    <message>
-      <source>Offset</source>
-      <translation>AA</translation>
-    </message>
-    <message>
-      <source>Offset for "to" bounding plane</source>
-      <translation>AA</translation>
-    </message>
-  </context>
-  <context>
-    <name>Extrusion:to_size</name>
-    <message>
-      <source>Size</source>
-      <translation>AA</translation>
-    </message>
-    <message>
-      <source>To size</source>
-      <translation>AA</translation>
-    </message>
-  </context>
-  <context>
     <name>Extrusion:from_object:FeaturesPlugin_ValidatorExtrusionBoundary</name>
     <message>
       <source>Error: Extrusion algorithm failed.</source>
@@ -2094,27 +2157,6 @@
     <name>Extrusion:to_object:FeaturesPlugin_ValidatorExtrusionBoundary</name>
     <message>
       <source>Error: Extrusion algorithm failed.</source>
-      <translation>AA</translation>
-    </message>
-  </context>
-  <context>
-    <name>Extrusion:direction_object</name>
-    <message>
-      <source>&lt;base normal&gt;</source>
-      <translation>AA</translation>
-    </message>
-  </context>
-  <context>
-    <name>Extrusion:from_object</name>
-    <message>
-      <source>&lt;base sketch&gt;</source>
-      <translation>AA</translation>
-    </message>
-  </context>
-  <context>
-    <name>Extrusion:to_object</name>
-    <message>
-      <source>&lt;base sketch&gt;</source>
       <translation>AA</translation>
     </message>
   </context>
@@ -2603,13 +2645,6 @@
     </message>
   </context>
   <context>
-    <name>Revolution:sketch:FeaturesPlugin_ValidatorCompositeLauncher</name>
-    <message>
-      <source>The object is empty</source>
-      <translation>AA</translation>
-    </message>
-  </context>
-  <context>
     <name>Revolution:GeomValidators_ZeroOffset</name>
     <message>
       <source>Wrong number of validator arguments in xml(expected 9).</source>
@@ -2690,6 +2725,13 @@
     <name>Revolution:Model_FeatureValidator</name>
     <message>
       <source>Attribute "to_offset" is not initialized.</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>Revolution:sketch:FeaturesPlugin_ValidatorCompositeLauncher</name>
+    <message>
+      <source>The object is empty</source>
       <translation>AA</translation>
     </message>
   </context>
