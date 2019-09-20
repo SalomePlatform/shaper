@@ -208,12 +208,12 @@
         <translation>AA</translation>
     </message>
     <message>
-        <location filename="XGUI_ContextMenuMgr.cpp" line="811"/>
+        <location filename="XGUI_ContextMenuMgr.cpp" line="806"/>
         <source>Selection mode</source>
         <translation>AA</translation>
     </message>
     <message>
-        <location filename="XGUI_ContextMenuMgr.cpp" line="864"/>
+        <location filename="XGUI_ContextMenuMgr.cpp" line="859"/>
         <source>Windows</source>
         <translation>AA</translation>
     </message>
@@ -239,6 +239,15 @@
     <message>
         <location filename="XGUI_ErrorDialog.cpp" line="37"/>
         <source>Application errors</source>
+        <translation>AA</translation>
+    </message>
+</context>
+<context>
+    <name>XGUI_ErrorMgr</name>
+    <message>
+        <location filename="XGUI_ErrorMgr.cpp" line="204"/>
+        <location filename="XGUI_ErrorMgr.cpp" line="209"/>
+        <source>Errors:</source>
         <translation>AA</translation>
     </message>
 </context>
@@ -698,75 +707,80 @@
         <translation>AA</translation>
     </message>
     <message>
-        <location filename="XGUI_Workshop.cpp" line="930"/>
-        <location filename="XGUI_Workshop.cpp" line="1029"/>
+        <location filename="XGUI_Workshop.cpp" line="931"/>
+        <location filename="XGUI_Workshop.cpp" line="1034"/>
         <source>Save current file</source>
         <translation>AA</translation>
     </message>
     <message>
-        <location filename="XGUI_Workshop.cpp" line="931"/>
+        <location filename="XGUI_Workshop.cpp" line="932"/>
         <source>The document is modified, save before opening another?</source>
         <translation>AA</translation>
     </message>
     <message>
-        <location filename="XGUI_Workshop.cpp" line="942"/>
+        <location filename="XGUI_Workshop.cpp" line="946"/>
         <source>Open file</source>
         <translation>AA</translation>
     </message>
     <message>
-        <location filename="XGUI_Workshop.cpp" line="1109"/>
+        <location filename="XGUI_Workshop.cpp" line="1115"/>
         <source>Select name to save file...</source>
         <translation>AA</translation>
     </message>
     <message>
-        <location filename="XGUI_Workshop.cpp" line="1772"/>
+        <location filename="XGUI_Workshop.cpp" line="1779"/>
         <source>Show object</source>
         <translation>AA</translation>
     </message>
     <message>
-        <location filename="XGUI_Workshop.cpp" line="1773"/>
+        <location filename="XGUI_Workshop.cpp" line="1780"/>
         <source>&apos;%1&apos;
  are hidden by %2:
 Remove objects from the panel to be displayed?</source>
         <translation>AA</translation>
     </message>
     <message>
-        <location filename="XGUI_Workshop.cpp" line="956"/>
+        <location filename="XGUI_Workshop.cpp" line="961"/>
         <source>Warning</source>
         <translation>AA</translation>
     </message>
     <message>
-        <location filename="XGUI_Workshop.cpp" line="956"/>
+        <location filename="XGUI_Workshop.cpp" line="961"/>
         <source>Unable to open the file.</source>
         <translation>AA</translation>
     </message>
     <message>
-        <location filename="XGUI_Workshop.cpp" line="1029"/>
+        <location filename="XGUI_Workshop.cpp" line="1034"/>
         <source>The document is modified, save before exit?</source>
         <translation>AA</translation>
     </message>
     <message>
-        <location filename="XGUI_Workshop.cpp" line="1241"/>
+        <location filename="XGUI_Workshop.cpp" line="1248"/>
         <source>Information about module &quot;%1&quot; doesn&apos;t exist.</source>
         <translation>AA</translation>
     </message>
     <message>
-        <location filename="XGUI_Workshop.cpp" line="1402"/>
+        <location filename="XGUI_Workshop.cpp" line="1409"/>
         <source>Object browser</source>
         <translation>AA</translation>
     </message>
     <message>
-        <location filename="XGUI_Workshop.cpp" line="2005"/>
+        <location filename="XGUI_Workshop.cpp" line="2026"/>
         <source>All features are relevant, there is nothing to be deleted</source>
         <translation>AA</translation>
     </message>
     <message>
-        <location filename="XGUI_Workshop.cpp" line="2827"/>
+        <location filename="XGUI_Workshop.cpp" line="2480"/>
+        <source>Transparency</source>
+        <translation>AA</translation>
+    </message>
+    <message>
+        <location filename="XGUI_Workshop.cpp" line="2860"/>
         <source>Find results</source>
         <translation>AA</translation>
     </message>
     <message>
-        <location filename="XGUI_Workshop.cpp" line="2828"/>
+        <location filename="XGUI_Workshop.cpp" line="2861"/>
         <source>Results not found</source>
         <translation>AA</translation>
     </message>

@@ -95,5 +95,56 @@
       <translation>AA</translation>
     </message>
   </context>
+  <context>
+    <name>ParametersMgr</name>
+    <message>
+      <source>Add</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Comment</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Expression</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Features</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Insert</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Name</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Remove</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Result</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>See preview</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+
+  <context>
+    <name>ParametersPlugin</name>
+    <message>
+      <source>Warning</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Selected objects can be used in Part documents which are not loaded: %1. Would you like to continue?</source>
+      <translation>AA</translation>
+    </message>
+  </context>
 
 </TS>
