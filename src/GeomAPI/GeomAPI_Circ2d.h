@@ -35,7 +35,11 @@ class GeomAPI_Shape;
 
 class GeomAPI_Circ2d : public GeomAPI_Interface
 {
- public:
+public:
+  /// Creation of circle defined by center point and circle radius
+  GEOMAPI_EXPORT
+  GeomAPI_Circ2d(const double theCenterX, const double theCenterY, const double theRadius);
+
   /// Creation of circle defined by center point and circle radius
   GEOMAPI_EXPORT
   GeomAPI_Circ2d(const std::shared_ptr<GeomAPI_Pnt2d>& theCenter,

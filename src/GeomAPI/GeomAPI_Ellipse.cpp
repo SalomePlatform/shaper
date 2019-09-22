@@ -23,8 +23,11 @@
 
 #include "GeomAPI_Ellipse.h"
 #include "GeomAPI_Ax2.h"
+#include "GeomAPI_Curve.h"
 #include "GeomAPI_Pnt.h"
 
+#include <Geom_Ellipse.hxx>
+#include <GeomAPI_ProjectPointOnCurve.hxx>
 #include <gp_Elips.hxx>
 
 #define MY_ELIPS implPtr<gp_Elips>()
@@ -33,6 +36,15 @@ GeomAPI_Ellipse::GeomAPI_Ellipse(const std::shared_ptr<GeomAPI_Ax2>& theAx2,
                                  double theMajorRadius, double theMinorRadius)
 : GeomAPI_Interface(new gp_Elips(theAx2->impl<gp_Ax2>(), theMajorRadius, theMinorRadius))
 {
+}
+
+GeomAPI_Ellipse::GeomAPI_Ellipse(GeomCurvePtr theCurve)
+{
+  Handle(Geom_Curve) aCurve = theCurve->impl<Handle(Geom_Curve)>();
+  Handle(Geom_Ellipse) anEllipse = Handle(Geom_Ellipse)::DownCast(aCurve);
+  if (anEllipse.IsNull())
+    throw Standard_ConstructionError("GeomAPI_Ellipse: Curve is not an ellipse");
+  setImpl(new gp_Elips(anEllipse->Elips()));
 }
 
 std::shared_ptr<GeomAPI_Pnt> GeomAPI_Ellipse::center() const
@@ -68,4 +80,24 @@ double GeomAPI_Ellipse::minorRadius() const
 double GeomAPI_Ellipse::majorRadius() const
 {
   return MY_ELIPS->MajorRadius();
+}
+
+const std::shared_ptr<GeomAPI_Pnt> GeomAPI_Ellipse::project(
+    const std::shared_ptr<GeomAPI_Pnt>& thePoint) const
+{
+  std::shared_ptr<GeomAPI_Pnt> aResult;
+  if (!MY_ELIPS)
+    return aResult;
+
+  Handle(Geom_Ellipse) aEllipse = new Geom_Ellipse(*MY_ELIPS);
+
+  const gp_Pnt& aPoint = thePoint->impl<gp_Pnt>();
+
+  GeomAPI_ProjectPointOnCurve aProj(aPoint, aEllipse);
+  Standard_Integer aNbPoint = aProj.NbPoints();
+  if (aNbPoint > 0) {
+    gp_Pnt aNearest = aProj.NearestPoint();
+    aResult = GeomPointPtr(new GeomAPI_Pnt(aNearest.X(), aNearest.Y(), aNearest.Z()));
+  }
+  return aResult;
 }

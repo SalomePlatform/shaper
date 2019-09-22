@@ -96,17 +96,7 @@ void SketchSolver_ConstraintCoincidence::getAttributes(
   if (theAttributes[1])
     myType = CONSTRAINT_PT_PT_COINCIDENT;
   else if (theAttributes[2]) {
-    // check the type of entity (line or circle)
-    SketchSolver_EntityType anEntType = theAttributes[2]->type();
-    if (anEntType == ENTITY_LINE)
-      myType = CONSTRAINT_PT_ON_LINE;
-    else if (anEntType == ENTITY_CIRCLE || anEntType == ENTITY_ARC)
-      myType = CONSTRAINT_PT_ON_CIRCLE;
-    else if (anEntType == ENTITY_ELLIPSE || anEntType == ENTITY_ELLIPTICAL_ARC)
-      myType = CONSTRAINT_PT_ON_ELLIPSE;
-    else
-      myErrorMsg = SketchSolver_Error::INCORRECT_ATTRIBUTE();
-
+    myType = CONSTRAINT_PT_ON_CURVE;
     // obtain extremity points of the coincident feature for further checking of multi-coincidence
     getCoincidentFeatureExtremities(myBaseConstraint, myStorage, myFeatureExtremities);
   } else

@@ -26,8 +26,10 @@
 
 #include <GeomAPI_Interface.h>
 
-class GeomAPI_Pnt2d;
+class GeomAPI_Circ2d;
 class GeomAPI_Dir2d;
+class GeomAPI_Lin2d;
+class GeomAPI_Pnt2d;
 
 /**\class GeomAPI_Ellipse2d
  * \ingroup DataModel
@@ -63,6 +65,24 @@ public:
 
   /// Returns major radius of the ellipse
   GEOMAPI_EXPORT double majorRadius() const;
+
+  /// Calculate minimal distance between the ellipse and a line.
+  /// Return corresponding points on the ellipse and on the line.
+  GEOMAPI_EXPORT double distance(const std::shared_ptr<GeomAPI_Lin2d>& theLine,
+                                 std::shared_ptr<GeomAPI_Pnt2d>& thePointOnMe,
+                                 std::shared_ptr<GeomAPI_Pnt2d>& thePointOnLine);
+
+  /// Calculate minimal distance between the ellipse and a circle.
+  /// Return corresponding points on the ellipse and on the circle.
+  GEOMAPI_EXPORT double distance(const std::shared_ptr<GeomAPI_Circ2d>& theCircle,
+                                 std::shared_ptr<GeomAPI_Pnt2d>& thePointOnMe,
+                                 std::shared_ptr<GeomAPI_Pnt2d>& thePointOnCircle);
+
+  /// Calculate minimal distance between two ellipses.
+  /// Return corresponding points on the ellipses.
+  GEOMAPI_EXPORT double distance(const std::shared_ptr<GeomAPI_Ellipse2d>& theEllipse,
+                                 std::shared_ptr<GeomAPI_Pnt2d>& thePointOnMe,
+                                 std::shared_ptr<GeomAPI_Pnt2d>& thePointOnEllipse);
 };
 
 #endif

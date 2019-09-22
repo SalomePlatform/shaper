@@ -282,26 +282,19 @@ bool PartSet_TangentSelection::isValid(const ModuleBase_ISelection* theSelection
       return false;
     GeomAPI_Edge aEdge1(aShape);
 
-    if (aEdge1.isLine() || aEdge1.isArc()) {
-      if (aList.size() == 2) {
-        // Check second selection
-        aPrs = aList.last();
-        const GeomShapePtr& aShape2 = aPrs->shape();
-        if (!aShape2.get() || aShape2->isNull() || aShape2->shapeType() != GeomAPI_Shape::EDGE)
-          return false;
-        GeomAPI_Edge aEdge2(aShape2);
+    if (aList.size() == 2) {
+      // Check second selection
+      aPrs = aList.last();
+      const GeomShapePtr& aShape2 = aPrs->shape();
+      if (!aShape2.get() || aShape2->isNull() || aShape2->shapeType() != GeomAPI_Shape::EDGE)
+        return false;
+      GeomAPI_Edge aEdge2(aShape2);
 
-        if (aEdge1.isLine() && aEdge2.isArc())
-          return true;
-        else if (aEdge1.isArc() && aEdge2.isLine())
-          return true;
-        else
-          return false;
-      } else
-        return true;
+      if (aEdge1.isLine() && aEdge2.isLine())
+        return false;
     }
-    return false;
   }
+  return true;
 }
 
 bool PartSet_AngleSelection::isValid(const ModuleBase_ISelection* theSelection,

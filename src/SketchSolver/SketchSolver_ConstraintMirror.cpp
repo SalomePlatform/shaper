@@ -23,6 +23,8 @@
 #include <PlaneGCSSolver_Tools.h>
 #include <PlaneGCSSolver_UpdateFeature.h>
 
+#include <GeomAPI_Lin2d.h>
+#include <GeomAPI_Pnt2d.h>
 #include <GeomAPI_XY.h>
 #include <GeomDataAPI_Point2D.h>
 #include <ModelAPI_AttributeRefList.h>

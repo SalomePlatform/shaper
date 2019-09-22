@@ -227,6 +227,7 @@ ADD_UNIT_TESTS(
   TestConstraintRadius.py
   TestConstraintRadiusFailure.py
   TestConstraintTangent.py
+  TestConstraintTangentEllipse.py
   TestConstraintVertical.py
   TestCreateArcByCenterStartEnd.py
   TestCreateArcByTangentEdge.py

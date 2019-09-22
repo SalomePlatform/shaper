@@ -22,9 +22,15 @@
 // Author:      Artem ZHIDKOV
 
 #include <GeomAPI_Ellipse2d.h>
+#include <GeomAPI_Circ2d.h>
 #include <GeomAPI_Dir2d.h>
+#include <GeomAPI_Lin2d.h>
 #include <GeomAPI_Pnt2d.h>
 
+#include <Extrema_ExtCC2d.hxx>
+#include <Extrema_ExtElC2d.hxx>
+#include <Geom2d_Ellipse.hxx>
+#include <Geom2dAdaptor_Curve.hxx>
 #include <gp_Ax22d.hxx>
 #include <gp_Elips2d.hxx>
 #include <Precision.hxx>
@@ -111,4 +117,55 @@ double GeomAPI_Ellipse2d::minorRadius() const
 double GeomAPI_Ellipse2d::majorRadius() const
 {
   return MY_ELLIPSE->MajorRadius();
+}
+
+template <typename EXTREMAPTR>
+static double extrema(EXTREMAPTR theAlgo,
+                      GeomPnt2dPtr& thePoint1,
+                      GeomPnt2dPtr& thePoint2)
+{
+  double aDistance = Precision::Infinite();
+  if (theAlgo->IsDone() && theAlgo->NbExt() > 0) {
+    Extrema_POnCurv2d aP1, aP2;
+    for (int i = 1; i <= theAlgo->NbExt(); ++i)
+      if (theAlgo->SquareDistance(i) < aDistance) {
+        aDistance = Sqrt(theAlgo->SquareDistance(i));
+        theAlgo->Points(i, aP1, aP2);
+      }
+
+    aDistance = Sqrt(aDistance);
+    thePoint1 = GeomPnt2dPtr(new GeomAPI_Pnt2d(aP1.Value().X(), aP1.Value().Y()));
+    thePoint2 = GeomPnt2dPtr(new GeomAPI_Pnt2d(aP2.Value().X(), aP2.Value().Y()));
+  }
+  return aDistance;
+}
+
+double GeomAPI_Ellipse2d::distance(const std::shared_ptr<GeomAPI_Lin2d>& theLine,
+                                   std::shared_ptr<GeomAPI_Pnt2d>& thePointOnMe,
+                                   std::shared_ptr<GeomAPI_Pnt2d>& thePointOnLine)
+{
+  Extrema_ExtElC2d anExtema(theLine->impl<gp_Lin2d>(), *MY_ELLIPSE);
+  return extrema(&anExtema, thePointOnLine, thePointOnMe);
+}
+
+double GeomAPI_Ellipse2d::distance(const std::shared_ptr<GeomAPI_Circ2d>& theCircle,
+                                   std::shared_ptr<GeomAPI_Pnt2d>& thePointOnMe,
+                                   std::shared_ptr<GeomAPI_Pnt2d>& thePointOnCircle)
+{
+  Extrema_ExtElC2d anExtema(theCircle->impl<gp_Circ2d>(), *MY_ELLIPSE);
+  return extrema(&anExtema, thePointOnCircle, thePointOnMe);
+}
+
+double GeomAPI_Ellipse2d::distance(const std::shared_ptr<GeomAPI_Ellipse2d>& theEllipse,
+                                   std::shared_ptr<GeomAPI_Pnt2d>& thePointOnMe,
+                                   std::shared_ptr<GeomAPI_Pnt2d>& thePointOnEllipse)
+{
+  Handle(Geom2d_Ellipse) anEllipse1 = new Geom2d_Ellipse(theEllipse->impl<gp_Elips2d>());
+  Handle(Geom2d_Ellipse) anEllipse2 = new Geom2d_Ellipse(*MY_ELLIPSE);
+
+  Extrema_ExtCC2d* anExtema =
+      new Extrema_ExtCC2d(Geom2dAdaptor_Curve(anEllipse1), Geom2dAdaptor_Curve(anEllipse2));
+  double aDistance = extrema(anExtema, thePointOnEllipse, thePointOnMe);
+  delete anExtema;
+  return aDistance;
 }

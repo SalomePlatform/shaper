@@ -162,31 +162,9 @@ bool SketchPlugin_TangentAttrValidator::isValid(const AttributePtr& theAttribute
     if (!aOtherFea)
       return true;
 
-    if (aRefFea->getKind() == SketchPlugin_Line::ID()) {
-      if (aOtherFea->getKind() != SketchPlugin_Arc::ID() &&
-          aOtherFea->getKind() != SketchPlugin_Circle::ID()) {
-        theError = "It refers to a %1, but %2 is neither an %3 nor %4";
-        theError.arg(SketchPlugin_Line::ID()).arg(aParamA)
-            .arg(SketchPlugin_Arc::ID()).arg(SketchPlugin_Circle::ID());
-        return false;
-      }
-    }
-    else if (aRefFea->getKind() == SketchPlugin_Arc::ID() ||
-             aRefFea->getKind() == SketchPlugin_Circle::ID()) {
-      if (aOtherFea->getKind() != SketchPlugin_Line::ID() &&
-          aOtherFea->getKind() != SketchPlugin_Arc::ID() &&
-          aOtherFea->getKind() != SketchPlugin_Circle::ID()) {
-        theError = "It refers to an %1, but %2 is not a %3 or an %4 or a %5";
-        theError.arg(SketchPlugin_Arc::ID()).arg(aParamA)
-            .arg(SketchPlugin_Line::ID()).arg(SketchPlugin_Arc::ID())
-            .arg(SketchPlugin_Circle::ID());
-        return false;
-      }
-    }
-    else {
-      theError = "It refers to %1, but should refer to %2 or %3 or %4";
-      theError.arg(aRefFea->getKind()).arg(SketchPlugin_Line::ID())
-          .arg(SketchPlugin_Arc::ID()).arg(SketchPlugin_Circle::ID());
+    if (aRefFea->getKind() == SketchPlugin_Line::ID() &&
+        aOtherFea->getKind() == SketchPlugin_Line::ID()) {
+      theError = "Two segments cannot be tangent";
       return false;
     }
     return true;

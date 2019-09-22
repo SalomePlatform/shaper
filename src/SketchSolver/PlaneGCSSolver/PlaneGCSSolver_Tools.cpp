@@ -54,6 +54,12 @@
 #include <SketchPlugin_MultiRotation.h>
 #include <SketchPlugin_MultiTranslation.h>
 
+#include <GeomAPI_Circ2d.h>
+#include <GeomAPI_Dir2d.h>
+#include <GeomAPI_Ellipse2d.h>
+#include <GeomAPI_Lin2d.h>
+#include <GeomAPI_Pnt2d.h>
+
 #include <cmath>
 
 
@@ -190,9 +196,7 @@ ConstraintWrapperPtr PlaneGCSSolver_Tools::createConstraint(
   case CONSTRAINT_PT_PT_COINCIDENT:
     aResult = createConstraintCoincidence(aPoint1, aPoint2);
     break;
-  case CONSTRAINT_PT_ON_LINE:
-  case CONSTRAINT_PT_ON_CIRCLE:
-  case CONSTRAINT_PT_ON_ELLIPSE:
+  case CONSTRAINT_PT_ON_CURVE:
     aResult = createConstraintPointOnEntity(theType, aPoint1, GCS_EDGE_WRAPPER(theEntity1));
     break;
   case CONSTRAINT_MIDDLE_POINT:
@@ -284,6 +288,39 @@ std::shared_ptr<GeomAPI_Lin2d> PlaneGCSSolver_Tools::line(FeaturePtr theFeature)
 
   return std::shared_ptr<GeomAPI_Lin2d>(new GeomAPI_Lin2d(aStart->pnt(), aEnd->pnt()));
 }
+
+std::shared_ptr<GeomAPI_Circ2d> PlaneGCSSolver_Tools::circle(EntityWrapperPtr theEntity)
+{
+  if (theEntity->type() != ENTITY_CIRCLE && theEntity->type() != ENTITY_ARC)
+    return std::shared_ptr<GeomAPI_Circ2d>();
+
+  std::shared_ptr<PlaneGCSSolver_EdgeWrapper> anEntity =
+    std::dynamic_pointer_cast<PlaneGCSSolver_EdgeWrapper>(theEntity);
+  std::shared_ptr<GCS::Circle> aCirc = std::dynamic_pointer_cast<GCS::Circle>(anEntity->entity());
+  return std::shared_ptr<GeomAPI_Circ2d>(
+    new GeomAPI_Circ2d(*(aCirc->center.x), *(aCirc->center.y), *(aCirc->rad)));
+}
+
+std::shared_ptr<GeomAPI_Ellipse2d> PlaneGCSSolver_Tools::ellipse(EntityWrapperPtr theEntity)
+{
+  if (theEntity->type() != ENTITY_ELLIPSE && theEntity->type() != ENTITY_ELLIPTICAL_ARC)
+    return std::shared_ptr<GeomAPI_Ellipse2d>();
+
+  std::shared_ptr<PlaneGCSSolver_EdgeWrapper> anEntity =
+    std::dynamic_pointer_cast<PlaneGCSSolver_EdgeWrapper>(theEntity);
+  std::shared_ptr<GCS::Ellipse> anEllipse =
+      std::dynamic_pointer_cast<GCS::Ellipse>(anEntity->entity());
+
+  std::shared_ptr<GeomAPI_Pnt2d> aCenter(
+      new GeomAPI_Pnt2d(*(anEllipse->center.x), *(anEllipse->center.y)));
+  std::shared_ptr<GeomAPI_Dir2d> anAxis(new GeomAPI_Dir2d(
+      *(anEllipse->focus1.x) - *(anEllipse->center.x),
+      *(anEllipse->focus1.y) - *(anEllipse->center.y)));
+
+  return std::shared_ptr<GeomAPI_Ellipse2d>(
+      new GeomAPI_Ellipse2d(aCenter, anAxis, anEllipse->getRadMaj(), *anEllipse->radmin));
+}
+
 
 
 GCS::SET_pD PlaneGCSSolver_Tools::parameters(const EntityWrapperPtr& theEntity)

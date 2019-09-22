@@ -28,6 +28,7 @@
 #include <memory>
 
 class GeomAPI_Ax2;
+class GeomAPI_Curve;
 class GeomAPI_Dir;
 class GeomAPI_Pnt;
 
@@ -53,6 +54,8 @@ public:
   GEOMAPI_EXPORT GeomAPI_Ellipse(const std::shared_ptr<GeomAPI_Ax2>& theAx2,
                                  double theMajorRadius, double theMinorRadius);
 
+  GEOMAPI_EXPORT GeomAPI_Ellipse(std::shared_ptr<GeomAPI_Curve> theCurve);
+
   /// Returns center of the ellipse
   GEOMAPI_EXPORT std::shared_ptr<GeomAPI_Pnt> center() const;
 
@@ -71,6 +74,9 @@ public:
   /// Returns major radius of the ellipse
   GEOMAPI_EXPORT double majorRadius() const;
 
+  /// Project point on ellipse
+  GEOMAPI_EXPORT const std::shared_ptr<GeomAPI_Pnt> project(
+      const std::shared_ptr<GeomAPI_Pnt>& thePoint) const;
 };
 
 //! Pointer on the object
