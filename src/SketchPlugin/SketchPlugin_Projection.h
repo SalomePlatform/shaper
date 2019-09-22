@@ -88,6 +88,12 @@ private:
   /// \brief Find projection of a feature onto sketch plane
   void computeProjection(const std::string& theID);
 
+  /// \brief Delete already calculated projected feature
+  ///        if the selection of the projection is changed
+  bool rebuildProjectedFeature(FeaturePtr& theProjection,
+                               const std::string& theResultType,
+                               bool theRemoveOnly = false);
+
   bool myIsComputing;
 };
 

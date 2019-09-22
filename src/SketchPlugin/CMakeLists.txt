@@ -267,6 +267,7 @@ ADD_UNIT_TESTS(
   TestMultiTranslation.py
   TestPresentation.py
   TestProjection.py
+  TestProjectionEllipse.py
   TestProjectionIntoResult.py
   TestProjectionUpdate.py
   TestRectangle.py
