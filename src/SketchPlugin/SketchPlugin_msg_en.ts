@@ -1652,6 +1652,14 @@
       <source>An empty object is used.</source>
       <translation>An empty object is used</translation>
     </message>
+    <message>
+      <source>The %1 feature is not supported by the Equal constraint.</source>
+      <translation>The %1 feature is not supported by the Equal constraint.</translation>
+    </message>
+    <message>
+      <source>Features with kinds %1 and %2 can not be equal.</source>
+      <translation>Features with kinds %1 and %2 can not be equal.</translation>
+    </message>
   </context>
   <context>
     <name>SketchConstraintEqual:Model_FeatureValidator</name>
@@ -2038,6 +2046,13 @@
     </message>
   </context>
   <context>
+    <name>SketchConstraintTangent:ConstraintEntityA:SketchPlugin_TangentAttr</name>
+    <message>
+      <source>Two segments cannot be tangent</source>
+      <translation>Two segments cannot be tangent</translation>
+    </message>
+  </context>
+  <context>
     <name>SketchConstraintTangent:ConstraintEntityB:SketchPlugin_TangentAttr</name>
     <message>
       <source>It uses an empty object</source>
@@ -2151,22 +2166,43 @@
       <source>The attribute with the %1 type is not processed</source>
       <translation>An argument of type %1 of the projection feature is not supported</translation>
     </message>
-  </context>
-  <context>
-    <name>SketchProjection:ExternalFeature:SketchPlugin_ProjectionValidator</name>
     <message>
-      <source>The attribute %1 should be an edge</source>
-      <translation>The projected item must be an edge</translation>
+      <source>The attribute %1 should be an edge or vertex</source>
+      <translation>The projected item must be an edge or a vertex</translation>
     </message>
-  </context>
-  <context>
-    <name>SketchProjection:ExternalFeature:SketchPlugin_ProjectionValidator</name>
     <message>
       <source>There is no sketch referring to the current feature</source>
       <translation>The projection feature has no sketch</translation>
     </message>
+    <message>
+      <source>Unable to project feature from the same sketch</source>
+      <translation>Feature from the current sketch cannot be projected</translation>
+    </message>
+    <message>
+      <source>Error: Line is orthogonal to the sketch plane.</source>
+      <translation>Error: Line is orthogonal to the sketch plane.</translation>
+    </message>
+    <message>
+      <source>Error: Circle is orthogonal to the sketch plane.</source>
+      <translation>Error: Circle is orthogonal to the sketch plane.</translation>
+    </message>
+    <message>
+      <source>Error: Arc is orthogonal to the sketch plane.</source>
+      <translation>Error: Arc is orthogonal to the sketch plane.</translation>
+    </message>
+    <message>
+      <source>Error: Ellipse is orthogonal to the sketch plane.</source>
+      <translation>Error: Ellipse is orthogonal to the sketch plane.</translation>
+    </message>
+    <message>
+      <source>Error: Elliptic Arc is orthogonal to the sketch plane.</source>
+      <translation>Error: Elliptic Arc is orthogonal to the sketch plane.</translation>
+    </message>
+    <message>
+      <source>Error: Selected object is not supported for projection.</source>
+      <translation>Error: Selected object is not supported for projection.</translation>
+    </message>
   </context>
-  
   <context>
     <name>SketchProjection:Model_FeatureValidator</name>
     <message>

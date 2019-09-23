@@ -1625,6 +1625,14 @@
       <source>An empty object is used.</source>
       <translation>AA</translation>
     </message>
+    <message>
+      <source>The %1 feature is not supported by the Equal constraint.</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Features with kinds %1 and %2 can not be equal.</source>
+      <translation>AA</translation>
+    </message>
   </context>
   <context>
     <name>SketchConstraintEqual:Model_FeatureValidator</name>
@@ -1971,6 +1979,13 @@
     <name>SketchConstraintTangent:ConstraintEntityB:PartSet_DifferentObjects</name>
     <message>
       <source>The feature uses one  object in ConstraintEntityB and ConstraintEntityA attributes.</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>SketchConstraintTangent:ConstraintEntityA:SketchPlugin_TangentAttr</name>
+    <message>
+      <source>Two segments cannot be tangent</source>
       <translation>AA</translation>
     </message>
   </context>
@@ -3825,7 +3840,43 @@
   <context>
     <name>SketchProjection:ExternalFeature:SketchPlugin_ProjectionValidator</name>
     <message>
+      <source>The attribute with the %1 type is not processed</source>
+      <translation>AA</translation>
+    </message>
+    <message>
       <source>The attribute %1 should be an edge or vertex</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>There is no sketch referring to the current feature</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Unable to project feature from the same sketch</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Error: Line is orthogonal to the sketch plane.</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Error: Circle is orthogonal to the sketch plane.</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Error: Arc is orthogonal to the sketch plane.</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Error: Ellipse is orthogonal to the sketch plane.</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Error: Elliptic Arc is orthogonal to the sketch plane.</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Error: Selected object is not supported for projection.</source>
       <translation>AA</translation>
     </message>
   </context>

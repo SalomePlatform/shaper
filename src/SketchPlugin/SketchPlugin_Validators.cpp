@@ -308,10 +308,8 @@ bool SketchPlugin_EqualAttrValidator::isValid(const AttributePtr& theAttribute,
         aFeature->getKind() != SketchPlugin_Circle::ID() &&
         aFeature->getKind() != SketchPlugin_Arc::ID() &&
         aFeature->getKind() != SketchPlugin_Ellipse::ID()) {
-      theError = "The %1 feature kind of attribute is wrong. It should be %2 or %3 or %4 or %5";
-      theError.arg(aFeature->getKind()).arg(SketchPlugin_Line::ID())
-          .arg(SketchPlugin_Circle::ID()).arg(SketchPlugin_Arc::ID())
-          .arg(SketchPlugin_Ellipse::ID());
+      theError = "The %1 feature is not supported by the Equal constraint.";
+      theError.arg(aFeature->getKind());
       // wrong type of attribute
       return false;
     }
@@ -328,7 +326,7 @@ bool SketchPlugin_EqualAttrValidator::isValid(const AttributePtr& theAttribute,
     // TODO
   }
   if (!isOk) {
-    theError = "Feature with kinds %1 and %2 can not be equal.";
+    theError = "Features with kinds %1 and %2 can not be equal.";
     theError.arg(aType[0]).arg(aType[1]);
     return false;
   }
