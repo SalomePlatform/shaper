@@ -219,7 +219,7 @@ class TestCoincidenceEllipse(unittest.TestCase):
 
     # move ellipse and set coincidence once again
     model.begin()
-    self.mySketch.move(self.myCenter, 20, 10)
+    self.mySketch.move(self.myMinorStart, 20, 10)
     model.do()
     self.mySketch.setCoincident(self.myMinorAxis.results()[-1], self.myOrigin.coordinates())
     model.do()
