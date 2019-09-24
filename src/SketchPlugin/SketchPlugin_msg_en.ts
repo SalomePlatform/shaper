@@ -701,6 +701,13 @@
   <context>
     <name>SketchPoint:PointCoordinates</name>
     <message>
+      <source>Attribute "%1" is not initialized.</source>
+      <translation>Select a point</translation>
+    </message>
+  </context>
+  <context>
+    <name>SketchPoint:PointCoordinates</name>
+    <message>
       <source>Attribute "%1" is locked by modification value in the viewer.</source>
       <translation>Select a point</translation>
     </message>

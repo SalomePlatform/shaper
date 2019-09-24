@@ -187,14 +187,14 @@
   <context>
     <name>SketchMacroCircle:CircleCenter</name>
     <message>
-      <source>Attribute "circle_center" is locked by modification value in the viewer.</source>
+      <source>Attribute "%1" is locked by modification value in the viewer.</source>
       <translation>AA</translation>
     </message>
   </context>
   <context>
     <name>SketchMacroCircle:FirstPoint</name>
     <message>
-      <source>Attribute "FirstPoint" is locked by modification value in the viewer.</source>
+      <source>Attribute "%1" is locked by modification value in the viewer.</source>
       <translation>AA</translation>
     </message>
   </context>
@@ -208,14 +208,14 @@
   <context>
     <name>SketchMacroCircle:ThirdPoint</name>
     <message>
-      <source>Attribute "ThirdPoint" is locked by modification value in the viewer.</source>
+      <source>Attribute "%1" is locked by modification value in the viewer.</source>
       <translation>AA</translation>
     </message>
   </context>
   <context>
     <name>SketchMacroCircle:CircleRadius</name>
     <message>
-      <source>Attribute "circle_radius" is locked by modification value in the viewer.</source>
+      <source>Attribute "%1" is locked by modification value in the viewer.</source>
       <translation>AA</translation>
     </message>
   </context>
@@ -294,6 +294,27 @@
       <translation>AA</translation>
     </message>
   </context>
+  <context>
+    <name>SketchMacroCircle:circle_radius</name>
+    <message>
+      <source>Radius</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>SketchMacroCircle:passed_point</name>
+    <message>
+      <source>Attribute "%1" is not initialized.</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>SketchMacroCircle:third_point</name>
+    <message>
+      <source>Attribute "%1" is not initialized.</source>
+      <translation>AA</translation>
+    </message>
+  </context>
 
   <context>
     <name>SketchMacroCircle:third_point</name>
@@ -323,11 +344,14 @@
   <context>
     <name>SketchCircle:circle_radius</name>
     <message>
-      <source>Radius:</source>
+      <source>Set radius</source>
       <translation>AA</translation>
     </message>
+  </context>
+  <context>
+    <name>SketchCircle:circle_radius</name>
     <message>
-      <source>Set radius</source>
+      <source>Radius</source>
       <translation>AA</translation>
     </message>
   </context>
@@ -526,7 +550,7 @@
   <context>
     <name>SketchConstraintRadius:ConstraintFlyoutValuePnt</name>
     <message>
-      <source>Attribute "ConstraintFlyoutValuePnt" is locked by modification value in the viewer.</source>
+      <source>Attribute "%1" is locked by modification value in the viewer.</source>
       <translation>AA</translation>
     </message>
   </context>
@@ -689,14 +713,14 @@
   <context>
     <name>SketchLine:EndPoint</name>
     <message>
-      <source>Attribute "EndPoint" is locked by modification value in the viewer.</source>
+      <source>Attribute "%1" is locked by modification value in the viewer.</source>
       <translation>AA</translation>
     </message>
   </context>
   <context>
     <name>SketchLine:StartPoint</name>
     <message>
-      <source>Attribute "StartPoint" is locked by modification value in the viewer.</source>
+      <source>Attribute "%1" is locked by modification value in the viewer.</source>
       <translation>AA</translation>
     </message>
   </context>
@@ -743,6 +767,13 @@
       <translation>AA</translation>
     </message>
   </context>
+  <context>
+    <name>SketchLine:LineLength</name>
+    <message>
+      <source>Length</source>
+      <translation>AA</translation>
+    </message>
+  </context>
 
   <context>
     <name>SketchPoint:Model_FeatureValidator</name>
@@ -754,7 +785,14 @@
   <context>
     <name>SketchPoint:PointCoordinates</name>
     <message>
-      <source>Attribute "PointCoordinates" is locked by modification value in the viewer.</source>
+      <source>Attribute "%1" is not initialized.</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>SketchPoint:PointCoordinates</name>
+    <message>
+      <source>Attribute "%1" is locked by modification value in the viewer.</source>
       <translation>AA</translation>
     </message>
   </context>
@@ -776,14 +814,14 @@
   <context>
     <name>SketchRectangle:RectEndPoint</name>
     <message>
-      <source>Attribute "RectEndPoint" is locked by modification value in the viewer.</source>
+      <source>Attribute "%1" is locked by modification value in the viewer.</source>
       <translation>AA</translation>
     </message>
   </context>
   <context>
     <name>SketchRectangle:RectStartPoint</name>
     <message>
-      <source>Attribute "RectStartPoint" is locked by modification value in the viewer.</source>
+      <source>Attribute "%1" is locked by modification value in the viewer.</source>
       <translation>AA</translation>
     </message>
   </context>
@@ -816,6 +854,20 @@
       <translation>AA</translation>
     </message>
   </context>
+  <context>
+    <name>SketchRectangle:RectEndPoint</name>
+    <message>
+      <source>Attribute "%1" is not initialized.</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>SketchRectangle:RectStartPoint</name>
+    <message>
+      <source>Attribute "%1" is not initialized.</source>
+      <translation>AA</translation>
+    </message>
+  </context>
 
   <context>
     <name>SketchArc:ArcRadius:GeomValidators_Positive</name>
@@ -834,7 +886,7 @@
   <context>
     <name>SketchArc:ArcCenter</name>
     <message>
-      <source>Attribute "center_point" is locked by modification value in the viewer.</source>
+      <source>Attribute "%1" is locked by modification value in the viewer.</source>
       <translation>AA</translation>
     </message>
   </context>
@@ -848,21 +900,21 @@
   <context>
     <name>SketchArc:ArcEndPoint</name>
     <message>
-      <source>Attribute "ArcEndPoint" is locked by modification value in the viewer.</source>
+      <source>Attribute "%1" is locked by modification value in the viewer.</source>
       <translation>AA</translation>
     </message>
   </context>
   <context>
     <name>SketchArc:ArcPassedPoint</name>
     <message>
-      <source>Attribute "ArcPassedPoint" is locked by modification value in the viewer.</source>
+      <source>Attribute "%1" is locked by modification value in the viewer.</source>
       <translation>AA</translation>
     </message>
   </context>
   <context>
     <name>SketchArc:ArcStartPoint</name>
     <message>
-      <source>Attribute "ArcStartPoint" is locked by modification value in the viewer.</source>
+      <source>Attribute "%1" is locked by modification value in the viewer.</source>
       <translation>AA</translation>
     </message>
   </context>
@@ -929,10 +981,6 @@
   <context>
     <name>SketchArc:angle</name>
     <message>
-      <source>Angle:</source>
-      <translation>AA</translation>
-    </message>
-    <message>
       <source>Set angle</source>
       <translation>AA</translation>
     </message>
@@ -954,10 +1002,6 @@
   <context>
     <name>SketchArc:radius</name>
     <message>
-      <source>Radius:</source>
-      <translation>AA</translation>
-    </message>
-    <message>
       <source>Set radius</source>
       <translation>AA</translation>
     </message>
@@ -966,6 +1010,28 @@
     <name>SketchArc:start_point</name>
     <message>
       <source>Start point</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>SketchArc:angle</name>
+    <message>
+      <source>Angle</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>SketchArc:radius</name>
+    <message>
+      <source>Radius</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+
+  <context>
+    <name>SketchConstraintMirror:ConstraintMirrorList</name>
+    <message>
+      <source>Segments</source>
       <translation>AA</translation>
     </message>
   </context>
@@ -1121,6 +1187,13 @@
     <name>SketchMultiRotation:MultiRotationCenter:GeomValidators_ShapeType</name>
     <message>
       <source>The shape is empty</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>SketchMultiRotation:MultiRotationList</name>
+    <message>
+      <source>Segments</source>
       <translation>AA</translation>
     </message>
   </context>
@@ -1286,11 +1359,18 @@
       <translation>AA</translation>
     </message>
   </context>
+  <context>
+    <name>SketchMultiTranslation:MultiTranslationList</name>
+    <message>
+      <source>Segments</source>
+      <translation>AA</translation>
+    </message>
+  </context>
 
   <context>
     <name>SketchConstraintAngle:ConstraintFlyoutValuePnt</name>
     <message>
-      <source>Attribute "ConstraintFlyoutValuePnt" is locked by modification value in the viewer.</source>
+      <source>Attribute "%1" is locked by modification value in the viewer.</source>
       <translation>AA</translation>
     </message>
   </context>
@@ -1453,7 +1533,7 @@
   <context>
     <name>SketchConstraintDistance:ConstraintFlyoutValuePnt</name>
     <message>
-      <source>Attribute "ConstraintFlyoutValuePnt" is locked by modification value in the viewer.</source>
+      <source>Attribute "%1" is locked by modification value in the viewer.</source>
       <translation>AA</translation>
     </message>
   </context>
@@ -1481,7 +1561,7 @@
   <context>
     <name>SketchConstraintDistance:Model_FeatureValidator</name>
     <message>
-      <source>Attribute "ConstraintEntityA" is not initialized.</source>
+      <source>Attribute "%1" is not initialized.</source>
       <translation>AA</translation>
     </message>
   </context>
@@ -1655,11 +1735,25 @@
       <translation>AA</translation>
     </message>
   </context>
+  <context>
+    <name>SketchConstraintEqual:ConstraintEntityA</name>
+    <message>
+      <source>Select edge</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>SketchConstraintEqual:ConstraintEntityB</name>
+    <message>
+      <source>Select edge</source>
+      <translation>AA</translation>
+    </message>
+  </context>
 
   <context>
     <name>SketchConstraintLength:ConstraintFlyoutValuePnt</name>
     <message>
-      <source>Attribute "ConstraintFlyoutValuePnt" is locked by modification value in the viewer.</source>
+      <source>Attribute "%1" is locked by modification value in the viewer.</source>
       <translation>AA</translation>
     </message>
   </context>
@@ -1967,6 +2061,13 @@
       <translation>AA</translation>
     </message>
   </context>
+  <context>
+    <name>SketchConstraintRigid:ConstraintEntityA</name>
+    <message>
+      <source>Select point, curve or its boundary point.</source>
+      <translation>AA</translation>
+    </message>
+  </context>
 
   <context>
     <name>SketchConstraintTangent:ConstraintEntityA:PartSet_DifferentObjects</name>
@@ -2142,6 +2243,13 @@
     <name>Sketch:SketchPlugin_SolverErrorValidator</name>
     <message>
       <source>The constraint is conflicting with others. To fix this, you can either undo your operation or remove a conflicting constraint.</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>Sketch:SketchPlugin_SolverErrorValidator</name>
+    <message>
+      <source>The set of constraints lead to degenerated geometry. To fix this, you can either undo your operation or remove a constraint or the degenerated geometry.</source>
       <translation>AA</translation>
     </message>
   </context>
@@ -2505,6 +2613,13 @@
       <translation>AA</translation>
     </message>
   </context>
+  <context>
+    <name>SketchConstraintDistanceHorizontal:ConstraintFlyoutValuePnt</name>
+    <message>
+      <source>Attribute "%1" is locked by modification value in the viewer.</source>
+      <translation>AA</translation>
+    </message>
+  </context>
 
   <context>
     <name>SketchConstraintDistanceVertical</name>
@@ -2601,6 +2716,20 @@
     <name>SketchConstraintDistanceVertical:Model_FeatureValidator</name>
     <message>
       <source>Attribute "%1" is not initialized.</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>SketchConstraintDistanceVertical:ConstraintFlyoutValuePnt</name>
+    <message>
+      <source>Attribute "%1" is locked by modification value in the viewer.</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>SketchConstraintDistanceVertical:DistanceValue:GeomValidators_Positive</name>
+    <message>
+      <source>Value is too small.</source>
       <translation>AA</translation>
     </message>
   </context>
@@ -2780,10 +2909,6 @@
   </context>
   <context>
     <name>SketchConstraintMirror:ConstraintMirrorList</name>
-    <message>
-      <source>Segments:</source>
-      <translation>AA</translation>
-    </message>
     <message>
       <source>Select list of objects to be mirrored</source>
       <translation>AA</translation>
@@ -3213,10 +3338,6 @@
   <context>
     <name>SketchMacroArc:angle</name>
     <message>
-      <source>Angle:</source>
-      <translation>AA</translation>
-    </message>
-    <message>
       <source>Set angle</source>
       <translation>AA</translation>
     </message>
@@ -3249,10 +3370,6 @@
   </context>
   <context>
     <name>SketchMacroArc:radius</name>
-    <message>
-      <source>Radius:</source>
-      <translation>AA</translation>
-    </message>
     <message>
       <source>Set radius</source>
       <translation>AA</translation>
@@ -3348,6 +3465,48 @@
       <translation>AA</translation>
     </message>
   </context>
+  <context>
+    <name>SketchMacroArc:angle</name>
+    <message>
+      <source>Angle</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>SketchMacroArc:end_point_2</name>
+    <message>
+      <source>Attribute "%1" is not initialized.</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>SketchMacroArc:radius</name>
+    <message>
+      <source>Radius</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>SketchMacroArc:start_point_1</name>
+    <message>
+      <source>Attribute "%1" is not initialized.</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>SketchMacroArc:start_point_2</name>
+    <message>
+      <source>Attribute "%1" is not initialized.</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>SketchMacroArc:tangent_point:SketchPlugin_ArcTransversalPoint</name>
+    <message>
+      <source>Unable to build transversal arc on %1</source>
+      <translation>AA</translation>
+    </message>
+  </context>
 
   <context>
     <name>SketchMacroCircle</name>
@@ -3380,10 +3539,6 @@
   </context>
   <context>
     <name>SketchMacroCircle:circle_radius</name>
-    <message>
-      <source>Radius:</source>
-      <translation>AA</translation>
-    </message>
     <message>
       <source>Set radius</source>
       <translation>AA</translation>
@@ -3494,10 +3649,6 @@
   <context>
     <name>SketchMacroEllipse:major_radius</name>
     <message>
-      <source>Major radius:</source>
-      <translation>AA</translation>
-    </message>
-    <message>
       <source>Set major radius</source>
       <translation>AA</translation>
     </message>
@@ -3511,10 +3662,6 @@
   </context>
   <context>
     <name>SketchMacroEllipse:minor_radius</name>
-    <message>
-      <source>Minor radius:</source>
-      <translation>AA</translation>
-    </message>
     <message>
       <source>Set minor radius</source>
       <translation>AA</translation>
@@ -3571,6 +3718,13 @@
       <translation>AA</translation>
     </message>
   </context>
+  <context>
+    <name>SketchMacroEllipse:second_point</name>
+    <message>
+      <source>Attribute "%1" is not initialized.</source>
+      <translation>AA</translation>
+    </message>
+  </context>
 
   <context>
     <name>SketchEllipse:Auxiliary</name>
@@ -3614,10 +3768,6 @@
   <context>
     <name>SketchEllipse:ellipse_major_radius</name>
     <message>
-      <source>Major radius:</source>
-      <translation>AA</translation>
-    </message>
-    <message>
       <source>Set major radius</source>
       <translation>AA</translation>
     </message>
@@ -3639,10 +3789,6 @@
   <context>
     <name>SketchEllipse:ellipse_minor_radius</name>
     <message>
-      <source>Minor radius:</source>
-      <translation>AA</translation>
-    </message>
-    <message>
       <source>Set minor radius</source>
       <translation>AA</translation>
     </message>
@@ -3651,6 +3797,34 @@
     <name>SketchEllipse:ellipse_second_focus</name>
     <message>
       <source>Second focus</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>SketchEllipse:ellipse_major_radius</name>
+    <message>
+      <source>Major radius</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>SketchEllipse:ellipse_minor_radius</name>
+    <message>
+      <source>Minor radius</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>SketchMacroEllipse:major_radius</name>
+    <message>
+      <source>Major radius</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>SketchMacroEllipse:minor_radius</name>
+    <message>
+      <source>Minor radius</source>
       <translation>AA</translation>
     </message>
   </context>

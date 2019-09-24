@@ -176,6 +176,13 @@
       <translation>AA</translation>
     </message>
   </context>
+  <context>
+   <name>Model_Data</name>
+    <message>
+      <source>%1 has failed during the update</source>
+      <translation>AA</translation>
+    </message>
+  </context>
 
   <!-- Cut -->
   <context>
