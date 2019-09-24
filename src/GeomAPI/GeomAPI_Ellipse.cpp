@@ -28,6 +28,7 @@
 
 #include <Geom_Ellipse.hxx>
 #include <GeomAPI_ProjectPointOnCurve.hxx>
+#include <GeomLib_Tool.hxx>
 #include <gp_Elips.hxx>
 
 #define MY_ELIPS implPtr<gp_Elips>()
@@ -100,4 +101,13 @@ const std::shared_ptr<GeomAPI_Pnt> GeomAPI_Ellipse::project(
     aResult = GeomPointPtr(new GeomAPI_Pnt(aNearest.X(), aNearest.Y(), aNearest.Z()));
   }
   return aResult;
+}
+
+const bool GeomAPI_Ellipse::parameter(const std::shared_ptr<GeomAPI_Pnt> thePoint,
+                                      const double theTolerance,
+                                      double& theParameter) const
+{
+  Handle(Geom_Ellipse) aCurve = new Geom_Ellipse(*MY_ELIPS);
+  return GeomLib_Tool::Parameter(aCurve, thePoint->impl<gp_Pnt>(),
+                                 theTolerance, theParameter) == Standard_True;
 }

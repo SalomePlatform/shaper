@@ -5,7 +5,7 @@
         id="Sketch"
         nested="SketchPoint SketchIntersectionPoint SketchLine
                 SketchCircle SketchMacroCircle SketchArc SketchMacroArc
-                SketchEllipse SketchMacroEllipse
+                SketchEllipse SketchMacroEllipse SketchEllipticArc SketchMacroEllipticArc
                 SketchRectangle
                 SketchProjection
                 SketchConstraintLength SketchConstraintRadius SketchConstraintDistance SketchConstraintDistanceHorizontal SketchConstraintDistanceVertical
@@ -51,7 +51,7 @@
         <validator id="GeomValidators_Different" parameters="StartPoint,EndPoint"/>
       </feature>
     </group>
-    <group id="Circular geometry">
+    <group id="Conical geometry">
       <!-- SketchCircle is a hidden feature. It is created inside SketchMacroCircle. -->
       <feature id="SketchCircle"
                title="Circle"
@@ -331,41 +331,7 @@
         </sketch_shape_selector>
         <!--<validator id="PartSet_FilletSelection"/>-->
       </feature>
-      <!--  SketchSplit  -->
-      <feature id="SketchSplit" title="Split"
-               tooltip="Cut selected segment arc or circle on existing coincident points"
-               icon="icons/Sketch/split.png"
-               helpfile="splitFeature.html">
-        <sketch_feature_point_selector
-            id="SelectedObject"
-            selection_attributes="SelectedObject SelectedPoint PreviewObject PreviewPoint"
-            label="Segment"
-            tooltip="Select segment for split"
-            shape_types="edge"
-            use_external="false">
-          <validator id="SketchPlugin_SplitValidator"/>
-        </sketch_feature_point_selector>
-        <validator id="PartSet_SplitSelection"/>
-      </feature>
-      <!--  SketchTrim  -->
-      <feature id="SketchTrim" title="Trim"
-               tooltip="Trim selected segment arc or circle on intersection points nearest to the graphic selection"
-               icon="icons/Sketch/trim.png"
-               helpfile="trimFeature.html">
-        <sketch_feature_point_selector
-            id="SelectedObject"
-            selection_attributes="SelectedObject SelectedPoint PreviewObject PreviewPoint"
-            label="Segment"
-            tooltip="Select segment for trim"
-            shape_types="edge"
-            use_external="false">
-          <validator id="SketchPlugin_TrimValidator"/>
-        </sketch_feature_point_selector>
-        <validator id="PartSet_SplitSelection"/>
-      </feature>
-    </group>
 
-    <group id="Elliptic geometry">
       <!-- SketchEllipse is a hidden feature. It is created inside SketchMacroEllipse. -->
       <feature id="SketchEllipse"
                title="Ellipse"
@@ -452,9 +418,7 @@
                                      title="Passed point"
                                      tooltip="Passed point coordinates"
                                      accept_expressions="0"
-                                     enable_value="enable_by_preferences">
-              <!--          <validator id="SketchPlugin_CirclePassedPointValidator"/> -->
-            </sketch-2dpoint_selector>
+                                     enable_value="enable_by_preferences"/>
           </box>
           <box id="by_major_axis_and_point"
                icon="icons/Sketch/ellipse_axes_32x32.png"
@@ -479,7 +443,6 @@
                                      enable_value="enable_by_preferences"/>
           </box>
         </toolbox>
-<!--        <validator id="GeomValidators_Different" parameters="center_point_ref,passed_point_ref"/> -->
         <labelvalue id="major_radius"
                     icon="icons/Sketch/radius_major.png"
                     label="Major radius"
@@ -505,6 +468,167 @@
                    label="Auxiliary"
                    default="false"
                    obligatory="0"/>
+      </feature>
+
+      <!-- SketchEllipticArc is a hidden feature. It is created inside SketchMacroEllipse. -->
+      <feature id="SketchEllipticArc"
+               title="Elliptic Arc"
+               tooltip="Create elliptic arc"
+               icon="icons/Sketch/elliptic_arc.png"
+               internal="1">
+        <sketch-2dpoint_selector id="ellipse_center"
+                                 title="Center"
+                                 tooltip="Center coordinates"
+                                 accept_expressions="0"
+                                 enable_value="enable_by_preferences"/>
+        <sketch-2dpoint_selector id="ellipse_first_focus"
+                                 title="First focus"
+                                 tooltip="Focus coordinates"
+                                 accept_expressions="0"
+                                 enable_value="enable_by_preferences"/>
+        <sketch-2dpoint_selector id="ellipse_second_focus"
+                                 title="Second focus"
+                                 tooltip="Focus coordinates"
+                                 accept_expressions="0"
+                                 enable_value="enable_by_preferences"/>
+        <sketch-2dpoint_selector id="ellipse_major_axis_start_point"
+                                 title="Major axis start"
+                                 tooltip="Coordinates of point on negative direction of major axis"
+                                 accept_expressions="0"
+                                 enable_value="enable_by_preferences"/>
+        <sketch-2dpoint_selector id="ellipse_major_axis_end_point"
+                                 title="Major axis end"
+                                 tooltip="Coordinates of point on positive direction of major axis"
+                                 accept_expressions="0"
+                                 enable_value="enable_by_preferences"/>
+        <sketch-2dpoint_selector id="ellipse_minor_axis_start_point"
+                                 title="Minor axis start"
+                                 tooltip="Coordinates of point on negative direction of minor axis"
+                                 accept_expressions="0"
+                                 enable_value="enable_by_preferences"/>
+        <sketch-2dpoint_selector id="ellipse_minor_axis_end_point"
+                                 title="Minor axis end"
+                                 tooltip="Coordinates of point on positive direction of minor axis"
+                                 accept_expressions="0"
+                                 enable_value="enable_by_preferences"/>
+        <sketch-2dpoint_selector id="start_point"
+                                 title="Start point"
+                                 tooltip="Arc start point coordinates"
+                                 accept_expressions="0"
+                                 enable_value="enable_by_preferences"/>
+        <sketch-2dpoint_selector id="end_point"
+                                 title="End point"
+                                 tooltip="Arc end point coordinates"
+                                 accept_expressions="0"
+                                 enable_value="enable_by_preferences"/>
+        <labelvalue id="ellipse_major_radius"
+                    icon="icons/Sketch/radius_major.png"
+                    label="Major radius"
+                    tooltip="Set major radius"
+                    default="computed"
+                    accept_expressions="0"
+                    enable_value="enable_by_preferences">
+        </labelvalue>
+        <labelvalue id="ellipse_minor_radius"
+                    icon="icons/Sketch/radius_minor.png"
+                    label="Minor radius"
+                    tooltip="Set minor radius"
+                    default="computed"
+                    accept_expressions="0"
+                    enable_value="enable_by_preferences">
+        </labelvalue>
+        <boolvalue id="Auxiliary" label="Auxiliary" default="false" tooltip="Construction element" obligatory="0"/>
+      </feature>
+      <!-- SketchMacroEllipticArc -->
+      <feature id="SketchMacroEllipticArc"
+               icon="icons/Sketch/elliptic_arc.png"
+               title="Elliptical arc"
+               tooltip="Create elliptical arc"
+               helpfile="ellipseFeature.html">
+        <sketch-2dpoint_selector id="center"
+                                 reference_attribute="center_ref"
+                                 title="Center point"
+                                 tooltip="Center point coordinates"
+                                 accept_expressions="0"
+                                 enable_value="enable_by_preferences"/>
+        <sketch-2dpoint_selector id="major_axis_point"
+                                 reference_attribute="major_axis_point_ref"
+                                 title="Major axis point"
+                                 tooltip="Major axis point coordinates"
+                                 accept_expressions="0"
+                                 enable_value="enable_by_preferences"/>
+        <sketch-2dpoint_selector id="start_point"
+                                 reference_attribute="start_point_ref"
+                                 title="Start point"
+                                 tooltip="Arc start point coordinates"
+                                 accept_expressions="0"
+                                 enable_value="enable_by_preferences"/>
+        <sketch-2dpoint_selector id="end_point"
+                                 reference_attribute="end_point_ref"
+                                 title="End point"
+                                 tooltip="Arc end point coordinates"
+                                 accept_expressions="0"
+                                 enable_value="enable_by_preferences"/>
+        <labelvalue id="major_radius"
+                    icon="icons/Sketch/radius_major.png"
+                    label="Major radius"
+                    tooltip="Set major radius"
+                    default="computed"
+                    accept_expressions="0"
+                    obligatory="0"
+                    enable_value="enable_by_preferences">
+          <validator id="GeomValidators_Positive"/>
+        </labelvalue>
+        <labelvalue id="minor_radius"
+                    icon="icons/Sketch/radius_minor.png"
+                    label="Minor radius"
+                    tooltip="Set minor radius"
+                    default="computed"
+                    accept_expressions="0"
+                    obligatory="0"
+                    enable_value="enable_by_preferences">
+          <validator id="GeomValidators_Positive"/>
+        </labelvalue>
+        <boolvalue id="Auxiliary"
+                   tooltip="Construction element"
+                   label="Auxiliary"
+                   default="false"
+                   obligatory="0"/>
+      </feature>
+    </group>
+
+    <group id="Segmentation">
+      <!--  SketchSplit  -->
+      <feature id="SketchSplit" title="Split"
+               tooltip="Cut selected segment arc or circle on existing coincident points"
+               icon="icons/Sketch/split.png"
+               helpfile="splitFeature.html">
+        <sketch_feature_point_selector
+            id="SelectedObject"
+            selection_attributes="SelectedObject SelectedPoint PreviewObject PreviewPoint"
+            label="Segment"
+            tooltip="Select segment for split"
+            shape_types="edge"
+            use_external="false">
+          <validator id="SketchPlugin_SplitValidator"/>
+        </sketch_feature_point_selector>
+        <validator id="PartSet_SplitSelection"/>
+      </feature>
+      <!--  SketchTrim  -->
+      <feature id="SketchTrim" title="Trim"
+               tooltip="Trim selected segment arc or circle on intersection points nearest to the graphic selection"
+               icon="icons/Sketch/trim.png"
+               helpfile="trimFeature.html">
+        <sketch_feature_point_selector
+            id="SelectedObject"
+            selection_attributes="SelectedObject SelectedPoint PreviewObject PreviewPoint"
+            label="Segment"
+            tooltip="Select segment for trim"
+            shape_types="edge"
+            use_external="false">
+          <validator id="SketchPlugin_TrimValidator"/>
+        </sketch_feature_point_selector>
+        <validator id="PartSet_SplitSelection"/>
       </feature>
     </group>
 

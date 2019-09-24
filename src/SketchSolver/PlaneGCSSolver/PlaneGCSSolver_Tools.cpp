@@ -122,6 +122,9 @@ static GCS::SET_pD lineParameters(const EdgeWrapperPtr& theLine);
 static GCS::SET_pD circleParameters(const EdgeWrapperPtr& theCircle);
 static GCS::SET_pD arcParameters(const EdgeWrapperPtr& theArc);
 static GCS::SET_pD ellipseParameters(const EdgeWrapperPtr& theEllipse);
+static GCS::SET_pD ellipticArcParameters(const EdgeWrapperPtr& theEllipticArc);
+
+static double distance(const GCS::Point& thePnt1, const GCS::Point& thePnt2);
 
 
 
@@ -321,6 +324,54 @@ std::shared_ptr<GeomAPI_Ellipse2d> PlaneGCSSolver_Tools::ellipse(EntityWrapperPt
       new GeomAPI_Ellipse2d(aCenter, anAxis, anEllipse->getRadMaj(), *anEllipse->radmin));
 }
 
+void PlaneGCSSolver_Tools::recalculateArcParameters(EntityWrapperPtr theArc)
+{
+  std::shared_ptr<PlaneGCSSolver_EdgeWrapper> anEdge =
+      std::dynamic_pointer_cast<PlaneGCSSolver_EdgeWrapper>(theArc);
+  if (!anEdge)
+    return;
+
+  GCS::Point aCenter, aStartPnt, aEndPnt;
+  double *aStartAngle, *aEndAngle;
+  GeomDir2dPtr OX;
+
+  if (anEdge->type() == ENTITY_ARC) {
+    std::shared_ptr<GCS::Arc> anArc = std::dynamic_pointer_cast<GCS::Arc>(anEdge->entity());
+
+    aCenter = anArc->center;
+    aStartPnt = anArc->start;
+    aEndPnt = anArc->end;
+
+    *anArc->rad = distance(aCenter, aStartPnt);
+
+    aStartAngle = anArc->startAngle;
+    aEndAngle = anArc->endAngle;
+
+    OX.reset(new GeomAPI_Dir2d(1.0, 0.0));
+  }
+  else if (anEdge->type() == ENTITY_ELLIPTICAL_ARC) {
+    std::shared_ptr<GCS::ArcOfEllipse> aEllArc =
+        std::dynamic_pointer_cast<GCS::ArcOfEllipse>(anEdge->entity());
+
+    aCenter = aEllArc->center;
+    aStartPnt = aEllArc->start;
+    aEndPnt = aEllArc->end;
+
+    aStartAngle = aEllArc->startAngle;
+    aEndAngle = aEllArc->endAngle;
+
+    OX.reset(new GeomAPI_Dir2d(*aEllArc->focus1.x - *aCenter.x, *aEllArc->focus1.y - *aCenter.y));
+  }
+  else // skip other type of entities
+    return;
+
+  GeomDir2dPtr aDir(new GeomAPI_Dir2d(*aStartPnt.x - *aCenter.x, *aStartPnt.y - *aCenter.y));
+  *aStartAngle = OX->angle(aDir);
+
+  aDir.reset(new GeomAPI_Dir2d(*aEndPnt.x - *aCenter.x, *aEndPnt.y - *aCenter.y));
+  *aEndAngle = OX->angle(aDir);
+}
+
 
 
 GCS::SET_pD PlaneGCSSolver_Tools::parameters(const EntityWrapperPtr& theEntity)
@@ -339,6 +390,8 @@ GCS::SET_pD PlaneGCSSolver_Tools::parameters(const EntityWrapperPtr& theEntity)
     return arcParameters(GCS_EDGE_WRAPPER(theEntity));
   case ENTITY_ELLIPSE:
     return ellipseParameters(GCS_EDGE_WRAPPER(theEntity));
+  case ENTITY_ELLIPTICAL_ARC:
+    return ellipticArcParameters(GCS_EDGE_WRAPPER(theEntity));
   default: break;
   }
   return GCS::SET_pD();
@@ -608,10 +661,7 @@ ConstraintWrapperPtr createConstraintEqual(
     aConstrList.push_back(GCSConstraintPtr(
         new GCS::ConstraintP2PDistance(aLine2->p1, aLine2->p2, theIntermed->scalar())));
     // update value of intermediate parameter
-    double x = *aLine1->p1.x - *aLine1->p2.x;
-    double y = *aLine1->p1.y - *aLine1->p2.y;
-    double aLen = sqrt(x*x + y*y);
-    theIntermed->setValue(aLen);
+    theIntermed->setValue(distance(aLine1->p1, aLine1->p2));
   } else {
     std::shared_ptr<GCS::Circle> aCirc1 =
         std::dynamic_pointer_cast<GCS::Circle>(theEntity1->entity());
@@ -678,17 +728,14 @@ GCS::SET_pD circleParameters(const EdgeWrapperPtr& theCircle)
 
 GCS::SET_pD arcParameters(const EdgeWrapperPtr& theArc)
 {
-  GCS::SET_pD aParams;
+  GCS::SET_pD aParams = circleParameters(theArc);
   std::shared_ptr<GCS::Arc> anArc = std::dynamic_pointer_cast<GCS::Arc>(theArc->entity());
-  aParams.insert(anArc->center.x);
-  aParams.insert(anArc->center.y);
   aParams.insert(anArc->start.x);
   aParams.insert(anArc->start.y);
   aParams.insert(anArc->end.x);
   aParams.insert(anArc->end.y);
   aParams.insert(anArc->startAngle);
   aParams.insert(anArc->endAngle);
-  aParams.insert(anArc->rad);
   return aParams;
 }
 
@@ -703,4 +750,25 @@ GCS::SET_pD ellipseParameters(const EdgeWrapperPtr& theEllipse)
   aParams.insert(anEllipse->focus1.y);
   aParams.insert(anEllipse->radmin);
   return aParams;
+}
+
+GCS::SET_pD ellipticArcParameters(const EdgeWrapperPtr& theEllipticArc)
+{
+  GCS::SET_pD aParams = ellipseParameters(theEllipticArc);
+  std::shared_ptr<GCS::ArcOfEllipse> anArc =
+      std::dynamic_pointer_cast<GCS::ArcOfEllipse>(theEllipticArc->entity());
+  aParams.insert(anArc->start.x);
+  aParams.insert(anArc->start.y);
+  aParams.insert(anArc->end.x);
+  aParams.insert(anArc->end.y);
+  aParams.insert(anArc->startAngle);
+  aParams.insert(anArc->endAngle);
+  return aParams;
+}
+
+double distance(const GCS::Point& thePnt1, const GCS::Point& thePnt2)
+{
+  double x = *thePnt1.x - *thePnt2.x;
+  double y = *thePnt1.y - *thePnt2.y;
+  return sqrt(x*x + y*y);
 }

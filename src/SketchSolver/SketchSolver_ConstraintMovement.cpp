@@ -27,6 +27,7 @@
 #include <SketchPlugin_Arc.h>
 #include <SketchPlugin_Circle.h>
 #include <SketchPlugin_Ellipse.h>
+#include <SketchPlugin_EllipticArc.h>
 #include <SketchPlugin_Line.h>
 #include <SketchPlugin_Point.h>
 
@@ -92,9 +93,11 @@ static bool isSimpleMove(FeaturePtr theMovedFeature, AttributePtr theDraggedPoin
   if (theMovedFeature->getKind() == SketchPlugin_Circle::ID() ||
       theMovedFeature->getKind() == SketchPlugin_Ellipse::ID())
     isSimple = (theDraggedPoint.get() != 0);
-  else if (theMovedFeature->getKind() == SketchPlugin_Arc::ID()) {
+  else if (theMovedFeature->getKind() == SketchPlugin_Arc::ID() ||
+           theMovedFeature->getKind() == SketchPlugin_EllipticArc::ID()) {
     isSimple = (theDraggedPoint.get() != 0 &&
-                theDraggedPoint->id() == SketchPlugin_Arc::CENTER_ID());
+               (theDraggedPoint->id() == SketchPlugin_Arc::CENTER_ID() ||
+                theDraggedPoint->id() == SketchPlugin_EllipticArc::CENTER_ID()));
   }
 #endif
   return isSimple;
@@ -152,12 +155,21 @@ ConstraintWrapperPtr SketchSolver_ConstraintMovement::fixArcExtremity(
       myStorage->entity(myMovedFeature));
   std::shared_ptr<GCS::Arc> anArc =
       std::dynamic_pointer_cast<GCS::Arc>(aCircularEntity->entity());
+  std::shared_ptr<GCS::ArcOfEllipse> anEllArc =
+      std::dynamic_pointer_cast<GCS::ArcOfEllipse>(aCircularEntity->entity());
 
   PointWrapperPtr aPoint =
       std::dynamic_pointer_cast<PlaneGCSSolver_PointWrapper>(theArcExtremity);
 
-  double* aParams[nbParams] = { aPoint->point()->x, aPoint->point()->y,
-                                anArc->center.x, anArc->center.y };
+  double* aParams[nbParams] = { aPoint->point()->x, aPoint->point()->y, 0, 0 };
+  if (anArc) {
+    aParams[2] = anArc->center.x;
+    aParams[3] = anArc->center.y;
+  }
+  else if (anEllArc) {
+    aParams[2] = anEllArc->center.x;
+    aParams[3] = anEllArc->center.y;
+  }
 
   std::list<GCSConstraintPtr> aConstraints;
   for (int i = 0; i < nbParams; ++i) {

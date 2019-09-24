@@ -78,6 +78,17 @@ class GEOMALGOAPI_EXPORT GeomAlgoAPI_EdgeBuilder
                                                const std::shared_ptr<GeomAPI_Dir>& theMajorAxis,
                                                const double                        theMajorRadius,
                                                const double                        theMinorRadius);
+
+
+  /// Creates elliptic edge
+  static std::shared_ptr<GeomAPI_Edge> ellipticArc(
+      const std::shared_ptr<GeomAPI_Pnt>& theCenter,
+      const std::shared_ptr<GeomAPI_Dir>& theNormal,
+      const std::shared_ptr<GeomAPI_Dir>& theMajorAxis,
+      const double                        theMajorRadius,
+      const double                        theMinorRadius,
+      const std::shared_ptr<GeomAPI_Pnt>& theStart,
+      const std::shared_ptr<GeomAPI_Pnt>& theEnd);
 };
 
 #endif

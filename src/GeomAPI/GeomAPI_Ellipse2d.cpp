@@ -31,6 +31,8 @@
 #include <Extrema_ExtElC2d.hxx>
 #include <Geom2d_Ellipse.hxx>
 #include <Geom2dAdaptor_Curve.hxx>
+#include <Geom2dAPI_ProjectPointOnCurve.hxx>
+#include <GeomLib_Tool.hxx>
 #include <gp_Ax22d.hxx>
 #include <gp_Elips2d.hxx>
 #include <Precision.hxx>
@@ -168,4 +170,33 @@ double GeomAPI_Ellipse2d::distance(const std::shared_ptr<GeomAPI_Ellipse2d>& the
   double aDistance = extrema(anExtema, thePointOnEllipse, thePointOnMe);
   delete anExtema;
   return aDistance;
+}
+
+const std::shared_ptr<GeomAPI_Pnt2d> GeomAPI_Ellipse2d::project(
+    const std::shared_ptr<GeomAPI_Pnt2d>& thePoint) const
+{
+  std::shared_ptr<GeomAPI_Pnt2d> aResult;
+  if (!MY_ELLIPSE)
+    return aResult;
+
+  Handle(Geom2d_Ellipse) aEllipse = new Geom2d_Ellipse(*MY_ELLIPSE);
+
+  const gp_Pnt2d& aPoint = thePoint->impl<gp_Pnt2d>();
+
+  Geom2dAPI_ProjectPointOnCurve aProj(aPoint, aEllipse);
+  Standard_Integer aNbPoint = aProj.NbPoints();
+  if (aNbPoint > 0) {
+    gp_Pnt2d aNearest = aProj.NearestPoint();
+    aResult.reset(new GeomAPI_Pnt2d(aNearest.X(), aNearest.Y()));
+  }
+  return aResult;
+}
+
+const bool GeomAPI_Ellipse2d::parameter(const std::shared_ptr<GeomAPI_Pnt2d> thePoint,
+                                        const double theTolerance,
+                                        double& theParameter) const
+{
+  Handle(Geom2d_Ellipse) aCurve = new Geom2d_Ellipse(*MY_ELLIPSE);
+  return GeomLib_Tool::Parameter(aCurve, thePoint->impl<gp_Pnt2d>(),
+                                 theTolerance, theParameter) == Standard_True;
 }

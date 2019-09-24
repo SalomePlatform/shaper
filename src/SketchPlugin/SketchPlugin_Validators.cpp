@@ -1150,7 +1150,7 @@ bool SketchPlugin_ProjectionValidator::isValid(const AttributePtr& theAttribute,
     return aValid;
   }
 
-  theError = "Error: Selected object is not line, circle or arc.";
+  theError = "Error: Selected object is not supported for projection.";
   return false;
 }
 

@@ -66,6 +66,23 @@ public:
   /// Returns major radius of the ellipse
   GEOMAPI_EXPORT double majorRadius() const;
 
+  /// Project point on ellipse
+  GEOMAPI_EXPORT const std::shared_ptr<GeomAPI_Pnt2d> project(
+      const std::shared_ptr<GeomAPI_Pnt2d>& thePoint) const;
+
+  /** \brief Computes the parameter of a given point on an ellipse. The point must be
+   *         located either on the circle itself or relatively to the latter
+   *         at a distance less than the tolerance value. Return FALSE if the point
+   *         is beyond the tolerance limit or if computation fails.
+   *         Max Tolerance value is currently limited to 1.e-4
+   *  \param[in]  thePoint point of origin.
+   *  \param[in]  theTolerance tolerance of computation.
+   *  \param[out] theParameter resulting parameter.
+   */
+  GEOMAPI_EXPORT const bool parameter(const std::shared_ptr<GeomAPI_Pnt2d> thePoint,
+                                      const double theTolerance,
+                                      double& theParameter) const;
+
   /// Calculate minimal distance between the ellipse and a line.
   /// Return corresponding points on the ellipse and on the line.
   GEOMAPI_EXPORT double distance(const std::shared_ptr<GeomAPI_Lin2d>& theLine,

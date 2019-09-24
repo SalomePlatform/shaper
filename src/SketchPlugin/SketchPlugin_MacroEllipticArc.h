@@ -17,8 +17,8 @@
 // See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 
-#ifndef SketchPlugin_MacroEllipse_H_
-#define SketchPlugin_MacroEllipse_H_
+#ifndef SketchPlugin_MacroEllipticArc_H_
+#define SketchPlugin_MacroEllipticArc_H_
 
 #include <ModelAPI_IReentrant.h>
 #include <SketchPlugin.h>
@@ -26,85 +26,77 @@
 #include <GeomAPI_IPresentable.h>
 
 class GeomAPI_Pnt2d;
+class GeomAPI_Shape;
 
-/**\class SketchPlugin_MacroEllipse
+/**\class SketchPlugin_MacroEllipticArc
  * \ingroup Plugins
- * \brief Feature for creation of the new ellipse in Sketch.
+ * \brief Feature for creation of the new elliptical arc in Sketch.
  */
-class SketchPlugin_MacroEllipse: public SketchPlugin_SketchEntity,
-                                 public GeomAPI_IPresentable,
-                                 public ModelAPI_IReentrant
+class SketchPlugin_MacroEllipticArc: public SketchPlugin_SketchEntity,
+                                     public GeomAPI_IPresentable,
+                                     public ModelAPI_IReentrant
 {
  public:
-  /// Ellipse feature kind
+  /// Elliptical arc feature kind
   inline static const std::string& ID()
   {
-    static const std::string ID("SketchMacroEllipse");
+    static const std::string ID("SketchMacroEllipticArc");
     return ID;
   }
 
-  static const std::string& ELLIPSE_TYPE()
+  /// Attribute for the central point selected during elliptic arc creation.
+  inline static const std::string& CENTER_ID()
   {
-    static const std::string ID("ellipse_type");
+    static const std::string ID("center");
     return ID;
   }
 
-  static const std::string& ELLIPSE_TYPE_BY_CENTER_AXIS_POINT()
+  /// Reference to the first selected point (center of ellipse).
+  inline static const std::string& CENTER_REF_ID()
   {
-    static const std::string ID("by_center_axis_point");
-    return ID;
-  }
-  static const std::string& ELLIPSE_TYPE_BY_AXIS_AND_POINT()
-  {
-    static const std::string ID("by_major_axis_and_point");
+    static const std::string ID("center_ref");
     return ID;
   }
 
-  static const std::string& EDIT_ELLIPSE_TYPE()
+  /// Attribute for the point on major semi-axis selected during elliptic arc creation.
+  inline static const std::string& MAJOR_AXIS_POINT_ID()
   {
-    static const std::string ID("edit_ellipse_type");
+    static const std::string ID("major_axis_point");
     return ID;
   }
 
-  /// Attribute for the first point selected during ellipse creation.
-  inline static const std::string& FIRST_POINT_ID()
+  /// Reference to the second selected point (major semi-axis of the ellipse).
+  inline static const std::string& MAJOR_AXIS_POINT_REF_ID()
   {
-    static const std::string ID("first_point");
+    static const std::string ID("major_axis_point_ref");
     return ID;
   }
 
-  /// Reference to the first selected point.
-  inline static const std::string& FIRST_POINT_REF_ID()
+  /// Attribute for the start point of the elliptic arc selected during creation.
+  inline static const std::string& START_POINT_ID()
   {
-    static const std::string ID("first_point_ref");
+    static const std::string ID("start_point");
     return ID;
   }
 
-  /// Attribute for the second point selected during ellipse creation.
-  inline static const std::string& SECOND_POINT_ID()
+  /// Reference for the start point selection.
+  inline static const std::string& START_POINT_REF_ID()
   {
-    static const std::string ID("second_point");
+    static const std::string ID("start_point_ref");
     return ID;
   }
 
-  /// Reference to the second selected point.
-  inline static const std::string& SECOND_POINT_REF_ID()
+  /// Attribute for the end point of the elliptic arc selected during creation.
+  inline static const std::string& END_POINT_ID()
   {
-    static const std::string ID("second_point_ref");
+    static const std::string ID("end_point");
     return ID;
   }
 
-  /// Attribute for the third point selected during ellipse creation.
-  inline static const std::string& PASSED_POINT_ID()
+  /// Reference for the end point selection.
+  inline static const std::string& END_POINT_REF_ID()
   {
-    static const std::string ID("passed_point");
-    return ID;
-  }
-
-  /// Reference for passed point selection.
-  inline static const std::string& PASSED_POINT_REF_ID()
-  {
-    static const std::string ID("passed_point_ref");
+    static const std::string ID("end_point_ref");
     return ID;
   }
 
@@ -122,10 +114,17 @@ class SketchPlugin_MacroEllipse: public SketchPlugin_SketchEntity,
     return ID;
   }
 
+  /// Flag the arc is reversed
+  inline static const std::string& REVERSED_ID()
+  {
+    static const std::string ID("reversed");
+    return ID;
+  }
+
   /// Returns the kind of a feature
   SKETCHPLUGIN_EXPORT virtual const std::string& getKind()
   {
-    static std::string MY_KIND = SketchPlugin_MacroEllipse::ID();
+    static std::string MY_KIND = SketchPlugin_MacroEllipticArc::ID();
     return MY_KIND;
   }
 
@@ -154,19 +153,24 @@ class SketchPlugin_MacroEllipse: public SketchPlugin_SketchEntity,
   virtual std::string processEvent(const std::shared_ptr<Events_Message>& theMessage);
 
   /// Use plugin manager for features creation
-  SketchPlugin_MacroEllipse();
+  SketchPlugin_MacroEllipticArc();
 
 private:
-  void constraintsForEllipseByCenterAxisAndPassed(FeaturePtr theEllipseFeature);
-  void constraintsForEllipseByMajoxAxisAndPassed(FeaturePtr theEllipseFeature);
+  std::shared_ptr<GeomAPI_Shape> getArcShape();
 
-  FeaturePtr createEllipseFeature();
+////  void constraintsForEllipseByCenterAxisAndPassed(FeaturePtr theEllipseFeature);
+////  void constraintsForEllipseByMajoxAxisAndPassed(FeaturePtr theEllipseFeature);
+
+  FeaturePtr createEllipticArcFeature();
 
 private:
   std::shared_ptr<GeomAPI_Pnt2d> myCenter;
-  std::shared_ptr<GeomAPI_Pnt2d> myFocus;
-  double                         myMajorRadius;
-  double                         myMinorRadius;
+  std::shared_ptr<GeomAPI_Pnt2d> myMajorAxis;
+  std::shared_ptr<GeomAPI_Pnt2d> myStartPnt;
+  std::shared_ptr<GeomAPI_Pnt2d> myEndPnt;
+  double myMajorRadius;
+  double myMinorRadius;
+  double myParamDelta;
 };
 
 #endif

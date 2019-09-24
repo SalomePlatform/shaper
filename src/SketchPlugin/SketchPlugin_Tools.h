@@ -103,6 +103,21 @@ void createCoincidenceOrTangency(SketchPlugin_Feature* theFeature,
                                  const ObjectPtr theObject,
                                  const bool theIsCanBeTangent);
 
+/// Creates auxiliary point for ellipse and corresponding internal constraint.
+/// \param[in] theEllipse   base ellipse feature
+/// \param[in] theAttrName  name of the attribute of the ellipse,
+///                         the new point should be constrained
+void createAuxiliaryPointOnEllipse(const FeaturePtr& theEllipseFeature,
+                                   const std::string& theAttrName);
+
+/// Creates auxiliary axis for ellipse and corresponding internal constraints.
+/// \param[in] theEllipse   base ellipse feature
+/// \param[in] theStartAttr name of the attribute of the ellipse, the line is started
+/// \param[in] theEndAttr   name of the attribute of the ellipse, the line is ended
+void createAuxiliaryAxisOfEllipse(const FeaturePtr& theEllipseFeature,
+                                  const std::string& theStartAttr,
+                                  const std::string& theEndAttr);
+
 /// Creates passing point or tangent curve basing on the given attributes are initialized.
 /// \param[in]  theRefAttr       prefered attribute to be converted
 /// \param[in]  theDefaultAttr   default attribute if theRefAttr is not initialized

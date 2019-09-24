@@ -47,6 +47,7 @@ SET(PROJECT_HEADERS
     SketchPlugin_ConstraintTangent.h
     SketchPlugin_ConstraintVertical.h
     SketchPlugin_Ellipse.h
+    SketchPlugin_EllipticArc.h
     SketchPlugin_ExternalValidator.h
     SketchPlugin_Feature.h
     SketchPlugin_IntersectionPoint.h
@@ -55,6 +56,7 @@ SET(PROJECT_HEADERS
     SketchPlugin_MacroArcReentrantMessage.h
     SketchPlugin_MacroCircle.h
     SketchPlugin_MacroEllipse.h
+    SketchPlugin_MacroEllipticArc.h
     SketchPlugin_MultiRotation.h
     SketchPlugin_MultiTranslation.h
     SketchPlugin_Plugin.h
@@ -94,6 +96,7 @@ SET(PROJECT_SOURCES
     SketchPlugin_ConstraintTangent.cpp
     SketchPlugin_ConstraintVertical.cpp
     SketchPlugin_Ellipse.cpp
+    SketchPlugin_EllipticArc.cpp
     SketchPlugin_ExternalValidator.cpp
     SketchPlugin_Feature.cpp
     SketchPlugin_IntersectionPoint.cpp
@@ -101,6 +104,7 @@ SET(PROJECT_SOURCES
     SketchPlugin_MacroArc.cpp
     SketchPlugin_MacroCircle.cpp
     SketchPlugin_MacroEllipse.cpp
+    SketchPlugin_MacroEllipticArc.cpp
     SketchPlugin_MultiRotation.cpp
     SketchPlugin_MultiTranslation.cpp
     SketchPlugin_Plugin.cpp

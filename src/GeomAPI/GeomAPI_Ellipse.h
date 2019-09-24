@@ -77,6 +77,19 @@ public:
   /// Project point on ellipse
   GEOMAPI_EXPORT const std::shared_ptr<GeomAPI_Pnt> project(
       const std::shared_ptr<GeomAPI_Pnt>& thePoint) const;
+
+  /** \brief Computes the parameter of a given point on an ellipse. The point must be
+   *         located either on the circle itself or relatively to the latter
+   *         at a distance less than the tolerance value. Return FALSE if the point
+   *         is beyond the tolerance limit or if computation fails.
+   *         Max Tolerance value is currently limited to 1.e-4
+   *  \param[in]  thePoint point of origin.
+   *  \param[in]  theTolerance tolerance of computation.
+   *  \param[out] theParameter resulting parameter.
+   */
+  GEOMAPI_EXPORT const bool parameter(const std::shared_ptr<GeomAPI_Pnt> thePoint,
+                                      const double theTolerance,
+                                      double& theParameter) const;
 };
 
 //! Pointer on the object

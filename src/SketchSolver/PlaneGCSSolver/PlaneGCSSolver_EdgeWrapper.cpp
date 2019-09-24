@@ -20,24 +20,45 @@
 #include <PlaneGCSSolver_EdgeWrapper.h>
 #include <cmath>
 
+static bool isLine(const GCSCurvePtr& theEntity)
+{
+  return std::dynamic_pointer_cast<GCS::Line>(theEntity).get();
+}
+
+static bool isCircle(const GCSCurvePtr& theEntity)
+{
+  return std::dynamic_pointer_cast<GCS::Circle>(theEntity).get();
+}
+
+static bool isArc(const GCSCurvePtr& theEntity)
+{
+  return std::dynamic_pointer_cast<GCS::Arc>(theEntity).get();
+}
+
+static bool isEllipse(const GCSCurvePtr& theEntity)
+{
+  return std::dynamic_pointer_cast<GCS::Ellipse>(theEntity).get();
+}
+
+static bool isEllipticArc(const GCSCurvePtr& theEntity)
+{
+  return std::dynamic_pointer_cast<GCS::ArcOfEllipse>(theEntity).get();
+}
+
+
 PlaneGCSSolver_EdgeWrapper::PlaneGCSSolver_EdgeWrapper(const GCSCurvePtr theEntity)
   : myEntity(theEntity)
 {
-  std::shared_ptr<GCS::Line> aLine = std::dynamic_pointer_cast<GCS::Line>(myEntity);
-  if (aLine) myType = ENTITY_LINE;
-  else {
-    std::shared_ptr<GCS::Arc> anArc = std::dynamic_pointer_cast<GCS::Arc>(myEntity);
-    if (anArc) myType = ENTITY_ARC;
-    else {
-      std::shared_ptr<GCS::Circle> aCircle = std::dynamic_pointer_cast<GCS::Circle>(myEntity);
-      if (aCircle) myType = ENTITY_CIRCLE;
-      else {
-        std::shared_ptr<GCS::Ellipse> anEllipse =
-            std::dynamic_pointer_cast<GCS::Ellipse>(myEntity);
-        if (anEllipse) myType = ENTITY_ELLIPSE;
-      }
-    }
-  }
+  if (isLine(myEntity))
+    myType = ENTITY_LINE;
+  else if (isArc(myEntity))
+    myType = ENTITY_ARC;
+  else if (isCircle(myEntity))
+    myType = ENTITY_CIRCLE;
+  else if (isEllipticArc(myEntity))
+    myType = ENTITY_ELLIPTICAL_ARC;
+  else if (isEllipse(myEntity))
+    myType = ENTITY_ELLIPSE;
 }
 
 static double squareDistance(const GCS::Point& theP1, const GCS::Point& theP2)
@@ -49,27 +70,36 @@ static double squareDistance(const GCS::Point& theP1, const GCS::Point& theP2)
 
 bool PlaneGCSSolver_EdgeWrapper::isDegenerated() const
 {
-  static const double aSqTol = tolerance * 1e-2;
-  static const double aMaxRadius = 1e8;
+  static const double THE_SQ_TOL = tolerance * 1e-2;
+  static const double THE_ANGLE_TOL = 1.e-5;
+  static const double THE_MAX_RADIUS = 1e8;
+  static const double THE_SQ_MAX_RADIUS = THE_MAX_RADIUS * THE_MAX_RADIUS;
+
   if (myType == ENTITY_LINE) {
     std::shared_ptr<GCS::Line> aLine = std::dynamic_pointer_cast<GCS::Line>(myEntity);
-    return squareDistance(aLine->p1, aLine->p2) < aSqTol;
+    return squareDistance(aLine->p1, aLine->p2) < THE_SQ_TOL;
   }
   else if (myType == ENTITY_CIRCLE) {
     std::shared_ptr<GCS::Circle> aCircle = std::dynamic_pointer_cast<GCS::Circle>(myEntity);
-    return *aCircle->rad < tolerance || *aCircle->rad > aMaxRadius;
+    return *aCircle->rad < tolerance || *aCircle->rad > THE_MAX_RADIUS;
   }
   else if (myType == ENTITY_ARC) {
-    static const double anAngleTol = 1.e-5;
     std::shared_ptr<GCS::Arc> anArc = std::dynamic_pointer_cast<GCS::Arc>(myEntity);
     double anAngleDiff = fabs(*anArc->startAngle - *anArc->endAngle);
     double aSqRadius = squareDistance(anArc->center, anArc->start);
-    return aSqRadius < aSqTol || aSqRadius > aMaxRadius * aMaxRadius || // <- arc radius
-           anAngleDiff < anAngleTol || fabs(anAngleDiff - 2*PI) < anAngleTol; // <- arc angle
+    return aSqRadius < THE_SQ_TOL || aSqRadius > THE_SQ_MAX_RADIUS || // <- arc radius
+           anAngleDiff < THE_ANGLE_TOL || fabs(anAngleDiff - 2*PI) < THE_ANGLE_TOL; // <- arc angle
   }
   else if (myType == ENTITY_ELLIPSE) {
     std::shared_ptr<GCS::Ellipse> anEllipse = std::dynamic_pointer_cast<GCS::Ellipse>(myEntity);
-    return *anEllipse->radmin < tolerance;
+    return *anEllipse->radmin < tolerance || anEllipse->getRadMaj() > THE_MAX_RADIUS;
+  }
+  else if (myType == ENTITY_ELLIPTICAL_ARC) {
+    std::shared_ptr<GCS::ArcOfEllipse> anArc =
+        std::dynamic_pointer_cast<GCS::ArcOfEllipse>(myEntity);
+    double anAngleDiff = fabs(*anArc->startAngle - *anArc->endAngle);
+    return *anArc->radmin < THE_SQ_TOL || anArc->getRadMaj() > THE_SQ_MAX_RADIUS || // <- arc radius
+           anAngleDiff < THE_ANGLE_TOL || fabs(anAngleDiff - 2*PI) < THE_ANGLE_TOL; // <- arc angle
   }
   return false;
 }

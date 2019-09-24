@@ -20,8 +20,10 @@
 #include "SketchPlugin_Tools.h"
 
 #include "SketchPlugin_ConstraintCoincidence.h"
+#include "SketchPlugin_ConstraintCoincidenceInternal.h"
 #include "SketchPlugin_ConstraintLength.h"
 #include "SketchPlugin_ConstraintTangent.h"
+#include "SketchPlugin_Ellipse.h"
 #include "SketchPlugin_Line.h"
 #include "SketchPlugin_Point.h"
 #include "SketchPlugin_SketchEntity.h"
@@ -427,6 +429,68 @@ FeaturePtr createConstraintObjectObject(SketchPlugin_Sketch* theSketch,
 #endif
 
   return aConstraint;
+}
+
+void createAuxiliaryPointOnEllipse(const FeaturePtr& theEllipseFeature,
+                                   const std::string& theEllipsePoint)
+{
+  SketchPlugin_Sketch* aSketch =
+      std::dynamic_pointer_cast<SketchPlugin_Feature>(theEllipseFeature)->sketch();
+
+  FeaturePtr aPointFeature = aSketch->addFeature(SketchPlugin_Point::ID());
+  aPointFeature->boolean(SketchPlugin_Point::AUXILIARY_ID())->setValue(true);
+  aPointFeature->reference(SketchPlugin_Point::PARENT_ID())->setValue(theEllipseFeature);
+
+  AttributePoint2DPtr anElPoint = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
+    theEllipseFeature->attribute(theEllipsePoint));
+
+  AttributePoint2DPtr aCoord = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
+    aPointFeature->attribute(SketchPlugin_Point::COORD_ID()));
+  aCoord->setValue(anElPoint->x(), anElPoint->y());
+
+  aPointFeature->execute();
+  std::string aName = theEllipseFeature->name() + "_" + theEllipsePoint;
+  aPointFeature->data()->setName(aName);
+  aPointFeature->lastResult()->data()->setName(aName);
+
+  createConstraintAttrAttr(aSketch,
+      SketchPlugin_ConstraintCoincidenceInternal::ID(), anElPoint, aCoord);
+}
+
+void createAuxiliaryAxisOfEllipse(const FeaturePtr& theEllipseFeature,
+                                  const std::string& theStartPoint,
+                                  const std::string& theEndPoint)
+{
+  SketchPlugin_Sketch* aSketch =
+      std::dynamic_pointer_cast<SketchPlugin_Feature>(theEllipseFeature)->sketch();
+
+  FeaturePtr aLineFeature = aSketch->addFeature(SketchPlugin_Line::ID());
+  aLineFeature->boolean(SketchPlugin_Point::AUXILIARY_ID())->setValue(true);
+  aLineFeature->reference(SketchPlugin_Point::PARENT_ID())->setValue(theEllipseFeature);
+
+  AttributePoint2DPtr aStartPoint = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
+    theEllipseFeature->attribute(theStartPoint));
+  AttributePoint2DPtr aEndPoint = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
+    theEllipseFeature->attribute(theEndPoint));
+
+  AttributePoint2DPtr aLineStart = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
+    aLineFeature->attribute(SketchPlugin_Line::START_ID()));
+  aLineStart->setValue(aStartPoint->x(), aStartPoint->y());
+
+  AttributePoint2DPtr aLineEnd = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
+    aLineFeature->attribute(SketchPlugin_Line::END_ID()));
+  aLineEnd->setValue(aEndPoint->x(), aEndPoint->y());
+
+  aLineFeature->execute();
+  std::string aName = theEllipseFeature->name() + "_" +
+    (theStartPoint == SketchPlugin_Ellipse::MAJOR_AXIS_START_ID() ? "major_axis" : "minor_axis");
+  aLineFeature->data()->setName(aName);
+  aLineFeature->lastResult()->data()->setName(aName);
+
+  createConstraintAttrAttr(aSketch,
+      SketchPlugin_ConstraintCoincidenceInternal::ID(), aStartPoint, aLineStart);
+  createConstraintAttrAttr(aSketch,
+      SketchPlugin_ConstraintCoincidenceInternal::ID(), aEndPoint, aLineEnd);
 }
 
 GeomPnt2dPtr flyoutPointCoordinates(const ConstraintPtr& theConstraint)
