@@ -30,14 +30,14 @@ class GeomAPI_Shape;
 
 /**\class SketchPlugin_MacroEllipticArc
  * \ingroup Plugins
- * \brief Feature for creation of the new elliptical arc in Sketch.
+ * \brief Feature for creation of the new elliptic arc in Sketch.
  */
 class SketchPlugin_MacroEllipticArc: public SketchPlugin_SketchEntity,
                                      public GeomAPI_IPresentable,
                                      public ModelAPI_IReentrant
 {
  public:
-  /// Elliptical arc feature kind
+  /// Elliptic arc feature kind
   inline static const std::string& ID()
   {
     static const std::string ID("SketchMacroEllipticArc");

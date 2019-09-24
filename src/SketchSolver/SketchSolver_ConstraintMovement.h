@@ -69,7 +69,7 @@ protected:
   /// \brief Create constraint to fix moved point on circle/arc
   ConstraintWrapperPtr fixPointOnCircle(const EntityWrapperPtr& theCircular);
 
-  /// \brief Create constraint to fix moved point on ellipse/elliptical arc
+  /// \brief Create constraint to fix moved point on ellipse/elliptic arc
   ConstraintWrapperPtr fixPointOnEllipse(const EntityWrapperPtr& theConic);
 
 private:

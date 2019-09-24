@@ -56,7 +56,7 @@ PlaneGCSSolver_EdgeWrapper::PlaneGCSSolver_EdgeWrapper(const GCSCurvePtr theEnti
   else if (isCircle(myEntity))
     myType = ENTITY_CIRCLE;
   else if (isEllipticArc(myEntity))
-    myType = ENTITY_ELLIPTICAL_ARC;
+    myType = ENTITY_ELLIPTIC_ARC;
   else if (isEllipse(myEntity))
     myType = ENTITY_ELLIPSE;
 }
@@ -94,7 +94,7 @@ bool PlaneGCSSolver_EdgeWrapper::isDegenerated() const
     std::shared_ptr<GCS::Ellipse> anEllipse = std::dynamic_pointer_cast<GCS::Ellipse>(myEntity);
     return *anEllipse->radmin < tolerance || anEllipse->getRadMaj() > THE_MAX_RADIUS;
   }
-  else if (myType == ENTITY_ELLIPTICAL_ARC) {
+  else if (myType == ENTITY_ELLIPTIC_ARC) {
     std::shared_ptr<GCS::ArcOfEllipse> anArc =
         std::dynamic_pointer_cast<GCS::ArcOfEllipse>(myEntity);
     double anAngleDiff = fabs(*anArc->startAngle - *anArc->endAngle);

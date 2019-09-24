@@ -51,7 +51,7 @@ void SketchSolver_ConstraintEqual::getAttributes(
       ++aNbArcs;
       isArcFirst = (aNbLines == 0);
     }
-    else if (aType == ENTITY_ELLIPSE || aType == ENTITY_ELLIPTICAL_ARC)
+    else if (aType == ENTITY_ELLIPSE || aType == ENTITY_ELLIPTIC_ARC)
       ++aNbEllipses;
   }
 

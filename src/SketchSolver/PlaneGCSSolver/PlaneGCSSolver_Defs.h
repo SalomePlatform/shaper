@@ -52,7 +52,7 @@ enum SketchSolver_EntityType {
   ENTITY_CIRCLE,
   ENTITY_ARC,
   ENTITY_ELLIPSE,
-  ENTITY_ELLIPTICAL_ARC
+  ENTITY_ELLIPTIC_ARC
 };
 
 /// Types of constraints

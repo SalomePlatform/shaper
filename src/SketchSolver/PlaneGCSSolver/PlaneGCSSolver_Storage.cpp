@@ -422,7 +422,7 @@ void PlaneGCSSolver_Storage::createAuxiliaryConstraints(const EntityWrapperPtr& 
     createArcConstraints(theEntity, mySketchSolver, ++myConstraintLastID, myAuxConstraintMap);
   else if (theEntity->type() == ENTITY_ELLIPSE)
     createEllipseConstraints(theEntity, mySketchSolver, ++myConstraintLastID, myAuxConstraintMap);
-  else if (theEntity->type() == ENTITY_ELLIPTICAL_ARC) {
+  else if (theEntity->type() == ENTITY_ELLIPTIC_ARC) {
     createEllipticArcConstraints(theEntity, mySketchSolver,
                                  ++myConstraintLastID, myAuxConstraintMap);
   }

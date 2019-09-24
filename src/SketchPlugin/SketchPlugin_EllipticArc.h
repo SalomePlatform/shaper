@@ -25,7 +25,7 @@
 
 /**\class SketchPlugin_EllipticArc
  * \ingroup Plugins
- * \brief Feature for creation of the new elliptical arc in Sketch.
+ * \brief Feature for creation of the new elliptic arc in Sketch.
  */
 class SketchPlugin_EllipticArc: public SketchPlugin_SketchEntity
 {

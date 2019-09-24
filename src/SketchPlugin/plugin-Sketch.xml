@@ -472,7 +472,7 @@
 
       <!-- SketchEllipticArc is a hidden feature. It is created inside SketchMacroEllipse. -->
       <feature id="SketchEllipticArc"
-               title="Elliptic Arc"
+               title="Elliptic arc"
                tooltip="Create elliptic arc"
                icon="icons/Sketch/elliptic_arc.png"
                internal="1">
@@ -542,8 +542,8 @@
       <!-- SketchMacroEllipticArc -->
       <feature id="SketchMacroEllipticArc"
                icon="icons/Sketch/elliptic_arc.png"
-               title="Elliptical arc"
-               tooltip="Create elliptical arc"
+               title="Elliptic arc"
+               tooltip="Create elliptic arc"
                helpfile="ellipseFeature.html">
         <sketch-2dpoint_selector id="center"
                                  reference_attribute="center_ref"

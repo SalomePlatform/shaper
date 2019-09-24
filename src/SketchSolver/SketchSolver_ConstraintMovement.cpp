@@ -136,8 +136,8 @@ ConstraintWrapperPtr SketchSolver_ConstraintMovement::initMovement()
       // arc or circle has been moved
       aConstraint = fixPointOnCircle(anEntity);
     }
-    else if (anEntity->type() == ENTITY_ELLIPSE || anEntity->type() == ENTITY_ELLIPTICAL_ARC) {
-      // ellipse or elliptical arc has been moved
+    else if (anEntity->type() == ENTITY_ELLIPSE || anEntity->type() == ENTITY_ELLIPTIC_ARC) {
+      // ellipse or elliptic arc has been moved
       aConstraint = fixPointOnEllipse(anEntity);
     }
   }

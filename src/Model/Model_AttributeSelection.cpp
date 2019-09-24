@@ -260,7 +260,7 @@ void Model_AttributeSelection::removeTemporaryValues()
   }
 }
 
-// returns the center of the edge: circular or elliptical
+// returns the center of the edge: circular or elliptic
 GeomShapePtr centerByEdge(GeomShapePtr theEdge, ModelAPI_AttributeSelection::CenterType theType)
 {
   if (theType != ModelAPI_AttributeSelection::NOT_CENTER && theEdge.get() != NULL) {

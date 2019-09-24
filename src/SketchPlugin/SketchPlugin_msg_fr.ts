@@ -3830,6 +3830,231 @@
   </context>
 
   <context>
+    <name>SketchEllipticArc:Auxiliary</name>
+    <message>
+      <source>Auxiliary</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Construction element</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>SketchEllipticArc:ellipse_center</name>
+    <message>
+      <source>Center</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>SketchEllipticArc:ellipse_first_focus</name>
+    <message>
+      <source>First focus</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>SketchEllipticArc:ellipse_major_axis_end_point</name>
+    <message>
+      <source>Major axis end</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>SketchEllipticArc:ellipse_major_axis_start_point</name>
+    <message>
+      <source>Major axis start</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>SketchEllipticArc:ellipse_major_radius</name>
+    <message>
+      <source>Major radius</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Set major radius</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>SketchEllipticArc:ellipse_minor_axis_end_point</name>
+    <message>
+      <source>Minor axis end</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>SketchEllipticArc:ellipse_minor_axis_start_point</name>
+    <message>
+      <source>Minor axis start</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>SketchEllipticArc:ellipse_minor_radius</name>
+    <message>
+      <source>Minor radius</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Set minor radius</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>SketchEllipticArc:ellipse_second_focus</name>
+    <message>
+      <source>Second focus</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>SketchEllipticArc:end_point</name>
+    <message>
+      <source>End point</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>SketchEllipticArc:start_point</name>
+    <message>
+      <source>Start point</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>SketchMacroEllipticArc</name>
+    <message>
+      <source>Create elliptic arc</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Elliptic arc</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>SketchMacroEllipticArc:Auxiliary</name>
+    <message>
+      <source>Auxiliary</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Construction element</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>SketchMacroEllipticArc:Model_FeatureValidator</name>
+    <message>
+      <source>Attribute "%1" is not initialized.</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>SketchMacroEllipticArc:center</name>
+    <message>
+      <source>Attribute "%1" is locked by modification value in the viewer.</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Attribute "%1" is not initialized.</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Center point</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>SketchMacroEllipticArc:end_point</name>
+    <message>
+      <source>Attribute "%1" is locked by modification value in the viewer.</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Attribute "%1" is not initialized.</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>End point</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>SketchMacroEllipticArc:major_axis_point</name>
+    <message>
+      <source>Attribute "%1" is locked by modification value in the viewer.</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Attribute "%1" is not initialized.</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Major axis point</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>SketchMacroEllipticArc:major_radius</name>
+    <message>
+      <source>Major radius</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Set major radius</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>SketchMacroEllipticArc:major_radius:GeomValidators_Positive</name>
+    <message>
+      <source>Double is not initialized.</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>SketchMacroEllipticArc:minor_radius</name>
+    <message>
+      <source>Minor radius</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Set minor radius</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>SketchMacroEllipticArc:minor_radius:GeomValidators_Positive</name>
+    <message>
+      <source>Double is not initialized.</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>SketchMacroEllipticArc:start_point</name>
+    <message>
+      <source>Attribute "%1" is locked by modification value in the viewer.</source>
+      <translation>AA</translation>
+    </message>
+    <message>
+      <source>Start point</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+  <context>
+    <name>workshop</name>
+    <message>
+      <source>Elliptic arc</source>
+      <translation>AA</translation>
+    </message>
+  </context>
+
+  <context>
     <name>SketchMultiRotation</name>
     <message>
       <source>Angular copy</source>

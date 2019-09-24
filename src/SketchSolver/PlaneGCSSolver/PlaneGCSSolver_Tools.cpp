@@ -306,7 +306,7 @@ std::shared_ptr<GeomAPI_Circ2d> PlaneGCSSolver_Tools::circle(EntityWrapperPtr th
 
 std::shared_ptr<GeomAPI_Ellipse2d> PlaneGCSSolver_Tools::ellipse(EntityWrapperPtr theEntity)
 {
-  if (theEntity->type() != ENTITY_ELLIPSE && theEntity->type() != ENTITY_ELLIPTICAL_ARC)
+  if (theEntity->type() != ENTITY_ELLIPSE && theEntity->type() != ENTITY_ELLIPTIC_ARC)
     return std::shared_ptr<GeomAPI_Ellipse2d>();
 
   std::shared_ptr<PlaneGCSSolver_EdgeWrapper> anEntity =
@@ -349,7 +349,7 @@ void PlaneGCSSolver_Tools::recalculateArcParameters(EntityWrapperPtr theArc)
 
     OX.reset(new GeomAPI_Dir2d(1.0, 0.0));
   }
-  else if (anEdge->type() == ENTITY_ELLIPTICAL_ARC) {
+  else if (anEdge->type() == ENTITY_ELLIPTIC_ARC) {
     std::shared_ptr<GCS::ArcOfEllipse> aEllArc =
         std::dynamic_pointer_cast<GCS::ArcOfEllipse>(anEdge->entity());
 
@@ -390,7 +390,7 @@ GCS::SET_pD PlaneGCSSolver_Tools::parameters(const EntityWrapperPtr& theEntity)
     return arcParameters(GCS_EDGE_WRAPPER(theEntity));
   case ENTITY_ELLIPSE:
     return ellipseParameters(GCS_EDGE_WRAPPER(theEntity));
-  case ENTITY_ELLIPTICAL_ARC:
+  case ENTITY_ELLIPTIC_ARC:
     return ellipticArcParameters(GCS_EDGE_WRAPPER(theEntity));
   default: break;
   }
@@ -443,7 +443,7 @@ ConstraintWrapperPtr createConstraintPointOnEntity(
     break;
     }
   case ENTITY_ELLIPSE:
-  case ENTITY_ELLIPTICAL_ARC: {
+  case ENTITY_ELLIPTIC_ARC: {
     std::shared_ptr<GCS::Ellipse> anEllipse =
         std::dynamic_pointer_cast<GCS::Ellipse>(theEntity->entity());
     aNewConstr = GCSConstraintPtr(

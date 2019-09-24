@@ -273,6 +273,47 @@
   </context>
 
   <context>
+    <name>SketchMacroEllipticArc:Model_FeatureValidator</name>
+    <message>
+      <source>Attribute "%1" is not initialized.</source>
+      <translation>Select a point.</translation>
+    </message>
+  </context>
+  <context>
+    <name>SketchMacroEllipticArc:center</name>
+    <message>
+      <source>Attribute "%1" is locked by modification value in the viewer.</source>
+      <translation>Select a point.</translation>
+    </message>
+    <message>
+      <source>Attribute "%1" is not initialized.</source>
+      <translation>Select a center point.</translation>
+    </message>
+  </context>
+  <context>
+    <name>SketchMacroEllipticArc:end_point</name>
+    <message>
+      <source>Attribute "%1" is locked by modification value in the viewer.</source>
+      <translation>Select an end point.</translation>
+    </message>
+    <message>
+      <source>Attribute "%1" is not initialized.</source>
+      <translation>Select an end point.</translation>
+    </message>
+  </context>
+  <context>
+    <name>SketchMacroEllipticArc:major_axis_point</name>
+    <message>
+      <source>Attribute "%1" is locked by modification value in the viewer.</source>
+      <translation>Select a major axis point.</translation>
+    </message>
+    <message>
+      <source>Attribute "%1" is not initialized.</source>
+      <translation>Select a major axis point.</translation>
+    </message>
+  </context>
+
+  <context>
     <name>SketchSplit:Model_FeatureValidator</name>
     <message>
       <source>Attribute "%1" is not initialized.</source>

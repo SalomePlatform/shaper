@@ -127,7 +127,7 @@ void SketchSolver_ConstraintTangent::rebuild()
       ++aNbLines;
     else if ((*anEntIt)->type() == ENTITY_ARC || (*anEntIt)->type() == ENTITY_CIRCLE)
       ++aNbCircles;
-    else if ((*anEntIt)->type() == ENTITY_ELLIPSE || (*anEntIt)->type() == ENTITY_ELLIPTICAL_ARC)
+    else if ((*anEntIt)->type() == ENTITY_ELLIPSE || (*anEntIt)->type() == ENTITY_ELLIPTIC_ARC)
       ++aNbEllipses;
   }
 
@@ -521,7 +521,7 @@ void calculateTangencyPoint(EntityWrapperPtr theCurve1, EntityWrapperPtr theCurv
     std::shared_ptr<GeomAPI_Circ2d> aCircle = PlaneGCSSolver_Tools::circle(aCurve2);
     anEllipse->distance(aCircle, aP1, aP2);
   }
-  else if (aCurve2->type() == ENTITY_ELLIPSE || aCurve2->type() == ENTITY_ELLIPTICAL_ARC) {
+  else if (aCurve2->type() == ENTITY_ELLIPSE || aCurve2->type() == ENTITY_ELLIPTIC_ARC) {
     std::shared_ptr<GeomAPI_Ellipse2d> anEl2 = PlaneGCSSolver_Tools::ellipse(aCurve2);
     anEllipse->distance(anEl2, aP1, aP2);
   }

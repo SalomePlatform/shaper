@@ -113,7 +113,7 @@ private:
 private:
   ConstraintID myConstraintLastID;   ///< identifier of last added constraint
 
-  /// additional constraints for correct processing of the arcs, ellipses, elliptical arcs
+  /// additional constraints for correct processing of the arcs, ellipses, elliptic arcs
   std::map<EntityWrapperPtr, ConstraintWrapperPtr> myAuxConstraintMap;
 
   /// list of removed constraints to notify solver

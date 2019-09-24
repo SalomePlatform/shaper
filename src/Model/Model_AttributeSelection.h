@@ -63,7 +63,7 @@ public:
     const ObjectPtr& theContext, const std::shared_ptr<GeomAPI_Shape>& theSubShape,
     const bool theTemporarily = false);
 
-  /// Same as SetValue, but it takes an edge (on circular or elliptical curve)
+  /// Same as SetValue, but it takes an edge (on circular or elliptic curve)
   /// and stores the vertex of the central point (for ellipse the first or the second focus point)
   MODEL_EXPORT virtual void setValueCenter(
     const ObjectPtr& theContext, const std::shared_ptr<GeomAPI_Edge>& theEdge,
