@@ -241,6 +241,7 @@ ConstraintWrapperPtr PlaneGCSSolver_Tools::createConstraint(
                                             GCS_EDGE_WRAPPER(theEntity2));
     break;
   case CONSTRAINT_EQUAL_LINES:
+  case CONSTRAINT_EQUAL_ELLIPSES:
     anIntermediate = GCS_SCALAR_WRAPPER(theValue); // parameter is used to store length of lines
   case CONSTRAINT_EQUAL_LINE_ARC:
   case CONSTRAINT_EQUAL_RADIUS:
@@ -654,25 +655,28 @@ ConstraintWrapperPtr createConstraintEqual(
         new GCS::ConstraintP2PDistance(aLine2->p1, aLine2->p2, theIntermed->scalar())));
     // update value of intermediate parameter
     theIntermed->setValue(distance(aLine1->p1, aLine1->p2));
-  } else {
+  }
+  else if (theType == CONSTRAINT_EQUAL_ELLIPSES) {
+    std::shared_ptr<GCS::Ellipse> anEllipse1 =
+        std::dynamic_pointer_cast<GCS::Ellipse>(theEntity1->entity());
+    std::shared_ptr<GCS::Ellipse> anEllipse2 =
+        std::dynamic_pointer_cast<GCS::Ellipse>(theEntity2->entity());
+
+    aConstrList.push_back(GCSConstraintPtr(
+        new GCS::ConstraintEqual(anEllipse1->radmin, anEllipse2->radmin)));
+    aConstrList.push_back(GCSConstraintPtr(new GCS::ConstraintP2PDistance(
+        anEllipse1->center, anEllipse1->focus1, theIntermed->scalar())));
+    aConstrList.push_back(GCSConstraintPtr(new GCS::ConstraintP2PDistance(
+        anEllipse2->center, anEllipse2->focus1, theIntermed->scalar())));
+    // update value of intermediate parameter
+    theIntermed->setValue(distance(anEllipse1->center, anEllipse1->focus1));
+  }
+  else {
     std::shared_ptr<GCS::Circle> aCirc1 =
         std::dynamic_pointer_cast<GCS::Circle>(theEntity1->entity());
     std::shared_ptr<GCS::Circle> aCirc2 =
         std::dynamic_pointer_cast<GCS::Circle>(theEntity2->entity());
-
-    if (aCirc1 && aCirc2)
-      aConstrList.push_back(GCSConstraintPtr(new GCS::ConstraintEqual(aCirc1->rad, aCirc2->rad)));
-    else {
-      std::shared_ptr<GCS::Ellipse> anEllipse1 =
-          std::dynamic_pointer_cast<GCS::Ellipse>(theEntity1->entity());
-      std::shared_ptr<GCS::Ellipse> anEllipse2 =
-          std::dynamic_pointer_cast<GCS::Ellipse>(theEntity2->entity());
-
-      aConstrList.push_back(GCSConstraintPtr(
-          new GCS::ConstraintEqual(anEllipse1->radmin, anEllipse2->radmin)));
-      aConstrList.push_back(GCSConstraintPtr(
-          new GCS::ConstraintEqualMajorAxesConic(anEllipse1.get(), anEllipse2.get())));
-    }
+    aConstrList.push_back(GCSConstraintPtr(new GCS::ConstraintEqual(aCirc1->rad, aCirc2->rad)));
   }
 
   std::shared_ptr<PlaneGCSSolver_ConstraintWrapper> aResult(

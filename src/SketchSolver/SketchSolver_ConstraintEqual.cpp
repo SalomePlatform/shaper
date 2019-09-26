@@ -63,7 +63,12 @@ void SketchSolver_ConstraintEqual::getAttributes(
 
   switch (aNbLines) {
   case 0:
-    myType = CONSTRAINT_EQUAL_RADIUS;
+    if (aNbEllipses == 2) {
+      myType = CONSTRAINT_EQUAL_ELLIPSES;
+      theValue = ScalarWrapperPtr(new PlaneGCSSolver_ScalarWrapper(&myAuxValue));
+    }
+    else
+      myType = CONSTRAINT_EQUAL_RADIUS;
     break;
   case 1:
     myType = CONSTRAINT_EQUAL_LINE_ARC;

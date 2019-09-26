@@ -40,6 +40,9 @@ protected:
   /// \param[out] theAttributes list of attributes to be filled
   virtual void getAttributes(EntityWrapperPtr&              theValue,
                              std::vector<EntityWrapperPtr>& theAttributes);
+
+private:
+  double myAuxValue; ///< scalar value to store ellipses focus distance
 };
 
 #endif

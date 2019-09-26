@@ -26,6 +26,7 @@
 #include "SketchPlugin_ConstraintRigid.h"
 #include "SketchPlugin_ConstraintTangent.h"
 #include "SketchPlugin_Ellipse.h"
+#include "SketchPlugin_EllipticArc.h"
 #include "SketchPlugin_Fillet.h"
 #include "SketchPlugin_Line.h"
 #include "SketchPlugin_MacroArc.h"
@@ -307,7 +308,8 @@ bool SketchPlugin_EqualAttrValidator::isValid(const AttributePtr& theAttribute,
     if (aFeature->getKind() != SketchPlugin_Line::ID() &&
         aFeature->getKind() != SketchPlugin_Circle::ID() &&
         aFeature->getKind() != SketchPlugin_Arc::ID() &&
-        aFeature->getKind() != SketchPlugin_Ellipse::ID()) {
+        aFeature->getKind() != SketchPlugin_Ellipse::ID() &&
+        aFeature->getKind() != SketchPlugin_EllipticArc::ID()) {
       theError = "The %1 feature is not supported by the Equal constraint.";
       theError.arg(aFeature->getKind());
       // wrong type of attribute
@@ -323,7 +325,8 @@ bool SketchPlugin_EqualAttrValidator::isValid(const AttributePtr& theAttribute,
   }
   if (!isOk) {
     // ellipse and elliptic arc may be equal
-    // TODO
+    isOk = (aType[0] == SketchPlugin_EllipticArc::ID() && aType[1] == SketchPlugin_Ellipse::ID())
+        || (aType[0] == SketchPlugin_Ellipse::ID() && aType[1] == SketchPlugin_EllipticArc::ID());
   }
   if (!isOk) {
     theError = "Features with kinds %1 and %2 can not be equal.";
