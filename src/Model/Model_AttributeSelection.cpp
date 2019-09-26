@@ -785,13 +785,12 @@ std::string Model_AttributeSelection::namingName(const std::string& theDefaultNa
   if (aCont->groupName() == ModelAPI_ResultPart::group()) {
     ResultPartPtr aPart = std::dynamic_pointer_cast<ModelAPI_ResultPart>(aCont);
     int anIndex;
-    GeomShapePtr aValue = value();
-    if (aValue.get())
-      return aPart->data()->name() + "/" + aPart->nameInPart(aValue, anIndex);
-    else
-      return aPart->data()->name();
+    std::string aResult = aSubSh.get() ?
+      aPart->data()->name() + "/" + aPart->nameInPart(aSubSh, anIndex) : aPart->data()->name();
+    if (aCenterType != NOT_CENTER)
+      aResult += centersMap()[aCenterType];
+    return aResult;
   }
-
 
   // whole infinitive construction
   if (aCont->groupName() == ModelAPI_ResultConstruction::group()) {
