@@ -58,7 +58,7 @@ static void fillAttribute(const std::shared_ptr<GeomAPI_Pnt2d>& thePoint,
   fillAttribute(aPoint, thePointAttr);
 }
 
-SketchAPI_MacroEllipticArc::SketchAPI_MacroEllipticArc(const std::shared_ptr<ModelAPI_Feature>& theFeature)
+SketchAPI_MacroEllipticArc::SketchAPI_MacroEllipticArc(const FeaturePtr& theFeature)
   : SketchAPI_MacroEllipse(theFeature)
 {
 }

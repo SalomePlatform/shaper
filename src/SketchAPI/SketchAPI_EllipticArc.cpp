@@ -213,7 +213,8 @@ void SketchAPI_EllipticArc::dump(ModelHighAPI_Dumper& theDumper) const
   AttributeSelectionPtr anExternal = aBase->selection(SketchPlugin_SketchEntity::EXTERNAL_ID());
   if (anExternal->context()) {
     // circle is external
-    theDumper << aBase << " = " << aSketchName << ".addEllipticArc(" << anExternal << ")" << std::endl;
+    theDumper << aBase << " = " << aSketchName << ".addEllipticArc("
+              << anExternal << ")" << std::endl;
   } else {
     // ellipse given by center, focus and radius
     theDumper << aBase << " = " << aSketchName << ".addEllipticArc("
