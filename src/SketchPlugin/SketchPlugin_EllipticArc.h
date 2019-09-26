@@ -144,6 +144,9 @@ private:
   bool fillCharacteristicPoints();
 
   void createEllipticArc(SketchPlugin_Sketch* theSketch);
+
+private:
+  double myParamDelta;
 };
 
 #endif

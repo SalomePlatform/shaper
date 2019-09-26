@@ -30,6 +30,7 @@
 #include <ModelAPI_AttributeRefList.h>
 #include <SketchPlugin_Arc.h>
 #include <SketchPlugin_Circle.h>
+#include <SketchPlugin_EllipticArc.h>
 
 
 static void mirrorPoints(const std::shared_ptr<GeomAPI_Lin2d>& theMirrorLine,
@@ -193,6 +194,11 @@ void mirrorEntities(const std::shared_ptr<GeomAPI_Lin2d>& theMirrorLine,
     // radius of the circle
     theMirrored->real(SketchPlugin_Circle::RADIUS_ID())->setValue(
         theOriginal->real(SketchPlugin_Circle::RADIUS_ID())->value());
+  }
+  else if (theOriginal->getKind() == SketchPlugin_EllipticArc::ID()) {
+    // orientation of arc
+    theMirrored->boolean(SketchPlugin_EllipticArc::REVERSED_ID())->setValue(
+        !theOriginal->boolean(SketchPlugin_EllipticArc::REVERSED_ID())->value());
   }
 
   // mirror all initialized points of features

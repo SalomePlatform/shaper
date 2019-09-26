@@ -46,6 +46,7 @@
 
 // function with named parameters
 %feature("kwargs") SketchAPI_Ellipse::construction;
+%feature("kwargs") SketchAPI_EllipticArc::construction;
 
 // shared pointers
 %shared_ptr(SketchAPI_Arc)
@@ -54,6 +55,8 @@
 %shared_ptr(SketchAPI_MacroCircle)
 %shared_ptr(SketchAPI_Ellipse)
 %shared_ptr(SketchAPI_MacroEllipse)
+%shared_ptr(SketchAPI_EllipticArc)
+%shared_ptr(SketchAPI_MacroEllipticArc)
 %shared_ptr(SketchAPI_Constraint)
 %shared_ptr(SketchAPI_ConstraintAngle)
 %shared_ptr(SketchAPI_IntersectionPoint)
@@ -343,6 +346,8 @@
 %include "SketchAPI_MacroArc.h"
 %include "SketchAPI_Ellipse.h"
 %include "SketchAPI_MacroEllipse.h"
+%include "SketchAPI_EllipticArc.h"
+%include "SketchAPI_MacroEllipticArc.h"
 %include "SketchAPI_Projection.h"
 %include "SketchAPI_Mirror.h"
 %include "SketchAPI_Translation.h"

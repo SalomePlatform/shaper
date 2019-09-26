@@ -59,7 +59,8 @@ static CompositeFeaturePtr sketch(FeaturePtr theFeature)
 SketchAPI_MacroEllipse::SketchAPI_MacroEllipse(const std::shared_ptr<ModelAPI_Feature>& theFeature)
 : SketchAPI_SketchEntity(theFeature)
 {
-  initialize();
+  if (initialize())
+    mySketch = sketch(theFeature);
 }
 
 SketchAPI_MacroEllipse::SketchAPI_MacroEllipse(const std::shared_ptr<ModelAPI_Feature>& theFeature,

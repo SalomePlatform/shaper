@@ -19,11 +19,8 @@
 
 #include <SketchPlugin_MacroEllipticArc.h>
 
-////#include <SketchPlugin_ConstraintCoincidenceInternal.h>
 #include <SketchPlugin_EllipticArc.h>
-////#include <SketchPlugin_Line.h>
 #include <SketchPlugin_MacroArcReentrantMessage.h>
-////#include <SketchPlugin_Point.h>
 #include <SketchPlugin_Tools.h>
 #include <SketchPlugin_Sketch.h>
 
@@ -228,50 +225,6 @@ std::string SketchPlugin_MacroEllipticArc::processEvent(
 }
 // LCOV_EXCL_STOP
 
-////void SketchPlugin_MacroEllipticArc::constraintsForEllipseByCenterAxisAndPassed(
-////    FeaturePtr theEllipseFeature)
-////{
-////  // tangency on-the-fly is not applicable for ellipses
-////  static const bool isTangencyApplicable = false;
-////  // Create constraints.
-////  SketchPlugin_Tools::createCoincidenceOrTangency(
-////      this, FIRST_POINT_REF_ID(),
-////      theEllipseFeature->attribute(SketchPlugin_Ellipse::CENTER_ID()),
-////      ObjectPtr(), isTangencyApplicable);
-////  SketchPlugin_Tools::createCoincidenceOrTangency(
-////      this, SECOND_POINT_REF_ID(),
-////      theEllipseFeature->attribute(SketchPlugin_Ellipse::MAJOR_AXIS_END_ID()),
-////      ObjectPtr(), isTangencyApplicable);
-////  // make coincidence only if PASSED_POINT_REF_ID() refers a point but not an object
-////  if (!refattr(PASSED_POINT_REF_ID())->isObject()) {
-////    SketchPlugin_Tools::createCoincidenceOrTangency(
-////        this, PASSED_POINT_REF_ID(), AttributePtr(),
-////        theEllipseFeature->lastResult(), isTangencyApplicable);
-////  }
-////}
-////
-////void SketchPlugin_MacroEllipticArc::constraintsForEllipseByMajoxAxisAndPassed(
-////    FeaturePtr theEllipseFeature)
-////{
-////  // tangency on-the-fly is not applicable for ellipses
-////  static const bool isTangencyApplicable = false;
-////  // Create constraints.
-////  SketchPlugin_Tools::createCoincidenceOrTangency(
-////      this, FIRST_POINT_REF_ID(),
-////      theEllipseFeature->attribute(SketchPlugin_Ellipse::MAJOR_AXIS_START_ID()),
-////      ObjectPtr(), isTangencyApplicable);
-////  SketchPlugin_Tools::createCoincidenceOrTangency(
-////      this, SECOND_POINT_REF_ID(),
-////      theEllipseFeature->attribute(SketchPlugin_Ellipse::MAJOR_AXIS_END_ID()),
-////      ObjectPtr(), isTangencyApplicable);
-////  // make coincidence only if PASSED_POINT_REF_ID() refers a point but not an object
-////  if (!refattr(PASSED_POINT_REF_ID())->isObject()) {
-////    SketchPlugin_Tools::createCoincidenceOrTangency(
-////        this, PASSED_POINT_REF_ID(), AttributePtr(),
-////        theEllipseFeature->lastResult(), isTangencyApplicable);
-////  }
-////}
-
 FeaturePtr SketchPlugin_MacroEllipticArc::createEllipticArcFeature()
 {
   GeomShapePtr anArc = getArcShape();
@@ -281,6 +234,8 @@ FeaturePtr SketchPlugin_MacroEllipticArc::createEllipticArcFeature()
     GeomEdgePtr anArcEdge = anArc->edge();
     aStartPoint = anArcEdge->firstPoint();
     aEndPoint = anArcEdge->lastPoint();
+    if (boolean(REVERSED_ID())->value())
+      std::swap(aStartPoint, aEndPoint);
 
     if (anArcEdge->isEllipse())
       anEllipse = anArcEdge->ellipse();

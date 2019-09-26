@@ -331,45 +331,37 @@ void PlaneGCSSolver_Tools::recalculateArcParameters(EntityWrapperPtr theArc)
   if (!anEdge)
     return;
 
-  GCS::Point aCenter, aStartPnt, aEndPnt;
-  double *aStartAngle, *aEndAngle;
-  GeomDir2dPtr OX;
-
   if (anEdge->type() == ENTITY_ARC) {
     std::shared_ptr<GCS::Arc> anArc = std::dynamic_pointer_cast<GCS::Arc>(anEdge->entity());
 
-    aCenter = anArc->center;
-    aStartPnt = anArc->start;
-    aEndPnt = anArc->end;
+    GCS::Point aCenter = anArc->center;
+    GCS::Point aStartPnt = anArc->start;
+    GCS::Point aEndPnt = anArc->end;
 
     *anArc->rad = distance(aCenter, aStartPnt);
 
-    aStartAngle = anArc->startAngle;
-    aEndAngle = anArc->endAngle;
+    static GeomDir2dPtr OX(new GeomAPI_Dir2d(1.0, 0.0));
 
-    OX.reset(new GeomAPI_Dir2d(1.0, 0.0));
+    GeomDir2dPtr aDir(new GeomAPI_Dir2d(*aStartPnt.x - *aCenter.x, *aStartPnt.y - *aCenter.y));
+    *anArc->startAngle = OX->angle(aDir);
+
+    aDir.reset(new GeomAPI_Dir2d(*aEndPnt.x - *aCenter.x, *aEndPnt.y - *aCenter.y));
+    *anArc->endAngle = OX->angle(aDir);
   }
   else if (anEdge->type() == ENTITY_ELLIPTIC_ARC) {
     std::shared_ptr<GCS::ArcOfEllipse> aEllArc =
         std::dynamic_pointer_cast<GCS::ArcOfEllipse>(anEdge->entity());
 
-    aCenter = aEllArc->center;
-    aStartPnt = aEllArc->start;
-    aEndPnt = aEllArc->end;
+    GeomPnt2dPtr aCenter(new GeomAPI_Pnt2d(*aEllArc->center.x, *aEllArc->center.y));
+    GeomPnt2dPtr aStartPnt(new GeomAPI_Pnt2d(*aEllArc->start.x, *aEllArc->start.y));
+    GeomPnt2dPtr aEndPnt(new GeomAPI_Pnt2d(*aEllArc->end.x, *aEllArc->end.y));
 
-    aStartAngle = aEllArc->startAngle;
-    aEndAngle = aEllArc->endAngle;
-
-    OX.reset(new GeomAPI_Dir2d(*aEllArc->focus1.x - *aCenter.x, *aEllArc->focus1.y - *aCenter.y));
+    GeomDir2dPtr anAxis(new GeomAPI_Dir2d(*aEllArc->focus1.x - aCenter->x(),
+                                          *aEllArc->focus1.y - aCenter->y()));
+    GeomAPI_Ellipse2d anEllipse(aCenter, anAxis, aEllArc->getRadMaj(), *aEllArc->radmin);
+    anEllipse.parameter(aStartPnt, 1.e-4, *aEllArc->startAngle);
+    anEllipse.parameter(aEndPnt, 1.e-4, *aEllArc->endAngle);
   }
-  else // skip other type of entities
-    return;
-
-  GeomDir2dPtr aDir(new GeomAPI_Dir2d(*aStartPnt.x - *aCenter.x, *aStartPnt.y - *aCenter.y));
-  *aStartAngle = OX->angle(aDir);
-
-  aDir.reset(new GeomAPI_Dir2d(*aEndPnt.x - *aCenter.x, *aEndPnt.y - *aCenter.y));
-  *aEndAngle = OX->angle(aDir);
 }
 
 

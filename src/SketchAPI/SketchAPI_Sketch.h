@@ -44,6 +44,8 @@ class SketchAPI_Circle;
 class SketchAPI_MacroCircle;
 class SketchAPI_Ellipse;
 class SketchAPI_MacroEllipse;
+class SketchAPI_EllipticArc;
+class SketchAPI_MacroEllipticArc;
 class SketchAPI_IntersectionPoint;
 class SketchAPI_Line;
 class SketchAPI_Mirror;
@@ -298,6 +300,37 @@ public:
   /// Add ellipse
   SKETCHAPI_EXPORT
   std::shared_ptr<SketchAPI_Ellipse> addEllipse(const std::string & theExternalName);
+
+  /// Add elliptic arc
+  SKETCHAPI_EXPORT
+  std::shared_ptr<SketchAPI_EllipticArc> addEllipticArc(
+      double theCenterX, double theCenterY,
+      double theFocusX, double theFocusY,
+      double theStartX, double theStartY,
+      double theEndX, double theEndY,
+      bool theInversed = false);
+  /// Add elliptic arc
+  SKETCHAPI_EXPORT
+  std::shared_ptr<SketchAPI_EllipticArc> addEllipticArc(
+      const std::shared_ptr<GeomAPI_Pnt2d>& theCenter,
+      const std::shared_ptr<GeomAPI_Pnt2d>& theFocus,
+      const std::shared_ptr<GeomAPI_Pnt2d>& theStart,
+      const std::shared_ptr<GeomAPI_Pnt2d>& theEnd,
+      bool theInversed = false);
+  /// Add elliptic arc
+  SKETCHAPI_EXPORT
+  std::shared_ptr<SketchAPI_MacroEllipticArc> addEllipticArc(
+      const std::pair<std::shared_ptr<GeomAPI_Pnt2d>, ModelHighAPI_RefAttr>& theCenter,
+      const std::pair<std::shared_ptr<GeomAPI_Pnt2d>, ModelHighAPI_RefAttr>& theMajorAxisPoint,
+      const std::pair<std::shared_ptr<GeomAPI_Pnt2d>, ModelHighAPI_RefAttr>& theStartPoint,
+      const std::pair<std::shared_ptr<GeomAPI_Pnt2d>, ModelHighAPI_RefAttr>& theEndPoint,
+      bool theInversed = false);
+  /// Add elliptic arc
+  SKETCHAPI_EXPORT
+  std::shared_ptr<SketchAPI_EllipticArc> addEllipticArc(const ModelHighAPI_Selection & theExternal);
+  /// Add elliptic arc
+  SKETCHAPI_EXPORT
+  std::shared_ptr<SketchAPI_EllipticArc> addEllipticArc(const std::string & theExternalName);
 
   /// Add projection
   SKETCHAPI_EXPORT

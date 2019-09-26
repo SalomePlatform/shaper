@@ -470,10 +470,10 @@ void PlaneGCSSolver_Storage::adjustParametrizationOfArcs()
     if (anArc)
       adjustArcParametrization(*anArc, anEdge->isReversed());
     else {
-////      std::shared_ptr<GCS::ArcOfEllipse> aEllArc =
-////          std::dynamic_pointer_cast<GCS::ArcOfEllipse>(anEdge->entity());
-////      if (aEllArc)
-////        adjustArcParametrization(*aEllArc, anEdge->isReversed());
+      std::shared_ptr<GCS::ArcOfEllipse> aEllArc =
+          std::dynamic_pointer_cast<GCS::ArcOfEllipse>(anEdge->entity());
+      if (aEllArc)
+        adjustArcParametrization(*aEllArc, anEdge->isReversed());
     }
   }
 

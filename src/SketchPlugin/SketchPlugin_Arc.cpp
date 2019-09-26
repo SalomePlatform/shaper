@@ -52,9 +52,9 @@
 // for sqrt on Linux
 #include <cmath>
 
-const double tolerance = 1e-7;
-const double paramTolerance = 1.e-4;
-const double PI = 3.141592653589793238463;
+static const double tolerance = 1e-7;
+static const double paramTolerance = 1.e-4;
+static const double PI = 3.141592653589793238463;
 
 
 SketchPlugin_Arc::SketchPlugin_Arc()

@@ -158,9 +158,6 @@ class SketchPlugin_MacroEllipticArc: public SketchPlugin_SketchEntity,
 private:
   std::shared_ptr<GeomAPI_Shape> getArcShape();
 
-////  void constraintsForEllipseByCenterAxisAndPassed(FeaturePtr theEllipseFeature);
-////  void constraintsForEllipseByMajoxAxisAndPassed(FeaturePtr theEllipseFeature);
-
   FeaturePtr createEllipticArcFeature();
 
 private:

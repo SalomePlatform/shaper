@@ -29,6 +29,8 @@
   #include "SketchAPI_MacroCircle.h"
   #include "SketchAPI_Ellipse.h"
   #include "SketchAPI_MacroEllipse.h"
+  #include "SketchAPI_EllipticArc.h"
+  #include "SketchAPI_MacroEllipticArc.h"
   #include "SketchAPI_Constraint.h"
   #include "SketchAPI_ConstraintAngle.h"
   #include "SketchAPI_IntersectionPoint.h"

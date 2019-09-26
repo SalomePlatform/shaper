@@ -27,6 +27,8 @@
 
 class ModelHighAPI_Selection;
 
+typedef std::pair<std::string, std::string> PairOfStrings;
+
 /// \class SketchAPI_Ellipse
 /// \ingroup CPPHighAPI
 /// \brief Interface for Ellipse feature.
@@ -113,7 +115,7 @@ public:
 
   /// Set center.
   SKETCHAPI_EXPORT
-  void setCenter(const std::shared_ptr<GeomAPI_Pnt2d> & theCenter);
+  void setCenter(const std::shared_ptr<GeomAPI_Pnt2d>& theCenter);
 
   /// Set focus.
   SKETCHAPI_EXPORT
@@ -121,19 +123,11 @@ public:
 
   /// Set focus.
   SKETCHAPI_EXPORT
-  void setFocus(const std::shared_ptr<GeomAPI_Pnt2d> & theCenter);
+  void setFocus(const std::shared_ptr<GeomAPI_Pnt2d>& theFocus);
 
   /// Set radius.
   SKETCHAPI_EXPORT
   void setMinorRadius(double theRadius);
-
-  /// Return major axis of the ellipse
-  SKETCHAPI_EXPORT
-  ModelHighAPI_Selection majorAxis() const;
-
-  /// Return minor axis of the ellipse
-  SKETCHAPI_EXPORT
-  ModelHighAPI_Selection minorAxis() const;
 
   /// Create construction elements (focuses, axes etc.).
   /// Empty value for each parameter shows that the corresponding feature has been removed.
@@ -154,6 +148,44 @@ public:
   /// Dump wrapped feature
   SKETCHAPI_EXPORT
   virtual void dump(ModelHighAPI_Dumper& theDumper) const;
+
+private:
+  /// Find all features connected with theEllipse by the internal coincidence.
+  /// \param[in]  theEllipse        ellipse or elliptic arc
+  /// \param[in]  theMajorAxis      names of attributes composing a major axis of ellipse
+  /// \param[in]  theMinorAxis      names of attributes composing a minor axis of ellipse
+  /// \param[out] theAttrToFeature  map attribute of ellipse and coincident auxiliary feature
+  static void collectAuxiliaryFeatures(FeaturePtr theEllipse,
+                                       const PairOfStrings& theMajorAxis,
+                                       const PairOfStrings& theMinorAxis,
+                                       std::map<std::string, FeaturePtr>& theAttrToFeature);
+
+  /// \brief Dump the construction features (points, axes) for the ellipse.
+  /// \param[in] theDumper      dumper instance
+  /// \param[in] theAttributes  list of attributes the construction points are
+  ///                           connected with, and their dump names
+  /// \param[in] theAuxFeatures list of construction features
+  static void dumpConstructionEntities(ModelHighAPI_Dumper& theDumper,
+                                       const FeaturePtr& theEllipse,
+                                       const std::list<PairOfStrings>& theAttributes,
+                                       const std::map<std::string, FeaturePtr>& theAuxFeatures);
+
+  /// \brief Create construction features for the ellipse connected
+  ///        with corresponding attribute of ellipse.
+  static std::list<std::shared_ptr<SketchAPI_SketchEntity> > buildConstructionEntities(
+      const FeaturePtr& theEllipse,
+      const std::list<PairOfStrings>& theAttributes,
+      const std::string& theCenter,
+      const std::string& theFirstFocus,
+      const std::string& theSecondFocus,
+      const std::string& theMajorAxisStart,
+      const std::string& theMajorAxisEnd,
+      const std::string& theMinorAxisStart,
+      const std::string& theMinorAxisEnd,
+      const std::string& theMajorAxis,
+      const std::string& theMinorAxis);
+
+  friend class SketchAPI_EllipticArc;
 };
 
 /// Pointer on Ellipse object.

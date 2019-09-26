@@ -147,14 +147,26 @@ void SketchAPI_Ellipse::setMinorRadius(double theMinorRadius)
   execute();
 }
 
-ModelHighAPI_Selection SketchAPI_Ellipse::majorAxis() const
+static const std::list<PairOfStrings>& ellipseAttrAndDumpNames()
 {
-  return ModelHighAPI_Selection();
-}
-
-ModelHighAPI_Selection SketchAPI_Ellipse::minorAxis() const
-{
-  return ModelHighAPI_Selection();
+  static std::list<PairOfStrings> anAttributes;
+  if (anAttributes.empty()) {
+    anAttributes.push_back(
+        PairOfStrings(SketchPlugin_Ellipse::CENTER_ID(), "center"));
+    anAttributes.push_back(
+        PairOfStrings(SketchPlugin_Ellipse::FIRST_FOCUS_ID(), "firstFocus"));
+    anAttributes.push_back(
+        PairOfStrings(SketchPlugin_Ellipse::SECOND_FOCUS_ID(), "secondFocus"));
+    anAttributes.push_back(
+        PairOfStrings(SketchPlugin_Ellipse::MAJOR_AXIS_START_ID(), "majorAxisStart"));
+    anAttributes.push_back(
+        PairOfStrings(SketchPlugin_Ellipse::MAJOR_AXIS_END_ID(), "majorAxisEnd"));
+    anAttributes.push_back(
+        PairOfStrings(SketchPlugin_Ellipse::MINOR_AXIS_START_ID(), "minorAxisStart"));
+    anAttributes.push_back(
+        PairOfStrings(SketchPlugin_Ellipse::MINOR_AXIS_END_ID(), "minorAxisEnd"));
+  }
+  return anAttributes;
 }
 
 static CompositeFeaturePtr sketchForFeature(FeaturePtr theFeature)
@@ -176,11 +188,15 @@ static void createInternalConstraint(const CompositeFeaturePtr& theSketch,
   aConstraint->execute();
 }
 
-static FeaturePtr createPoint(const CompositeFeaturePtr& theSketch,
-                              const FeaturePtr& theEllipse,
-                              const std::string& theCoincident,
-                              const std::string& theAuxOrName)
+static void createPoint(const CompositeFeaturePtr& theSketch,
+                        const FeaturePtr& theEllipse,
+                        const std::string& theCoincident,
+                        const std::string& theAuxOrName,
+                        std::list<FeaturePtr>& theEntities)
 {
+  if (theAuxOrName.empty())
+    return;
+
   AttributePoint2DPtr anElPoint = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
       theEllipse->attribute(theCoincident));
 
@@ -204,15 +220,19 @@ static FeaturePtr createPoint(const CompositeFeaturePtr& theSketch,
 
   createInternalConstraint(theSketch, anElPoint, aCoord);
 
-  return aPointFeature;
+  theEntities.push_back(aPointFeature);
 }
 
-static FeaturePtr createAxis(const CompositeFeaturePtr& theSketch,
-                             const FeaturePtr& theEllipse,
-                             const std::string& theCoincidentStart,
-                             const std::string& theCoincidentEnd,
-                             const std::string& theAuxOrName)
+static void createAxis(const CompositeFeaturePtr& theSketch,
+                       const FeaturePtr& theEllipse,
+                       const std::string& theCoincidentStart,
+                       const std::string& theCoincidentEnd,
+                       const std::string& theAuxOrName,
+                       std::list<FeaturePtr>& theEntities)
 {
+  if (theAuxOrName.empty())
+    return;
+
   AttributePoint2DPtr aStartPoint =
       std::dynamic_pointer_cast<GeomDataAPI_Point2D>(theEllipse->attribute(theCoincidentStart));
   AttributePoint2DPtr aEndPoint =
@@ -244,7 +264,7 @@ static FeaturePtr createAxis(const CompositeFeaturePtr& theSketch,
   createInternalConstraint(theSketch, aStartPoint, aLineStart);
   createInternalConstraint(theSketch, aEndPoint, aLineEnd);
 
-  return aLineFeature;
+  theEntities.push_back(aLineFeature);
 }
 
 std::list<std::shared_ptr<SketchAPI_SketchEntity> > SketchAPI_Ellipse::construction(
@@ -259,53 +279,54 @@ std::list<std::shared_ptr<SketchAPI_SketchEntity> > SketchAPI_Ellipse::construct
     const std::string& minorAxis) const
 {
   FeaturePtr anEllipse = feature();
-  CompositeFeaturePtr aSketch = sketchForFeature(anEllipse);
+
+  std::list<PairOfStrings> anAttributes = ellipseAttrAndDumpNames();
+  // append start and end attributes for axes
+  anAttributes.push_back(PairOfStrings(SketchPlugin_Ellipse::MAJOR_AXIS_START_ID(),
+                                       SketchPlugin_Ellipse::MAJOR_AXIS_END_ID()));
+  anAttributes.push_back(PairOfStrings(SketchPlugin_Ellipse::MINOR_AXIS_START_ID(),
+                                       SketchPlugin_Ellipse::MINOR_AXIS_END_ID()));
+
+  return buildConstructionEntities(anEllipse, anAttributes, center, firstFocus, secondFocus,
+            majorAxisStart, majorAxisEnd, minorAxisStart, minorAxisEnd, majorAxis, minorAxis);
+}
+
+std::list<std::shared_ptr<SketchAPI_SketchEntity> > SketchAPI_Ellipse::buildConstructionEntities(
+      const FeaturePtr& theEllipse,
+      const std::list<PairOfStrings>& theAttributes,
+      const std::string& theCenter,
+      const std::string& theFirstFocus,
+      const std::string& theSecondFocus,
+      const std::string& theMajorAxisStart,
+      const std::string& theMajorAxisEnd,
+      const std::string& theMinorAxisStart,
+      const std::string& theMinorAxisEnd,
+      const std::string& theMajorAxis,
+      const std::string& theMinorAxis)
+{
+  CompositeFeaturePtr aSketch = sketchForFeature(theEllipse);
 
   std::list<FeaturePtr> anEntities;
-  if (!center.empty()) {
-    anEntities.push_back(
-        createPoint(aSketch, anEllipse, SketchPlugin_Ellipse::CENTER_ID(), center));
-  }
-  if (!firstFocus.empty()) {
-    anEntities.push_back(
-        createPoint(aSketch, anEllipse, SketchPlugin_Ellipse::FIRST_FOCUS_ID(), firstFocus));
-  }
-  if (!secondFocus.empty()) {
-    anEntities.push_back(
-        createPoint(aSketch, anEllipse, SketchPlugin_Ellipse::SECOND_FOCUS_ID(), secondFocus));
-  }
-  if (!majorAxisStart.empty()) {
-    anEntities.push_back(createPoint(aSketch, anEllipse,
-        SketchPlugin_Ellipse::MAJOR_AXIS_START_ID(), majorAxisStart));
-  }
-  if (!majorAxisEnd.empty()) {
-    anEntities.push_back(createPoint(aSketch, anEllipse,
-        SketchPlugin_Ellipse::MAJOR_AXIS_END_ID(), majorAxisEnd));
-  }
-  if (!minorAxisStart.empty()) {
-    anEntities.push_back(createPoint(aSketch, anEllipse,
-        SketchPlugin_Ellipse::MINOR_AXIS_START_ID(), minorAxisStart));
-  }
-  if (!minorAxisEnd.empty()) {
-    anEntities.push_back(createPoint(aSketch, anEllipse,
-        SketchPlugin_Ellipse::MINOR_AXIS_END_ID(), minorAxisEnd));
-  }
-  if (!majorAxis.empty()) {
-    anEntities.push_back(
-        createAxis(aSketch, anEllipse, SketchPlugin_Ellipse::MAJOR_AXIS_START_ID(),
-                   SketchPlugin_Ellipse::MAJOR_AXIS_END_ID(), majorAxis));
-  }
-  if (!minorAxis.empty()) {
-    anEntities.push_back(
-        createAxis(aSketch, anEllipse, SketchPlugin_Ellipse::MINOR_AXIS_START_ID(),
-                   SketchPlugin_Ellipse::MINOR_AXIS_END_ID(), minorAxis));
-  }
+  std::list<PairOfStrings>::const_iterator anAttrIt = theAttributes.begin();
+  createPoint(aSketch, theEllipse, (anAttrIt++)->first, theCenter, anEntities);
+  createPoint(aSketch, theEllipse, (anAttrIt++)->first, theFirstFocus, anEntities);
+  createPoint(aSketch, theEllipse, (anAttrIt++)->first, theSecondFocus, anEntities);
+  createPoint(aSketch, theEllipse, (anAttrIt++)->first, theMajorAxisStart, anEntities);
+  createPoint(aSketch, theEllipse, (anAttrIt++)->first, theMajorAxisEnd, anEntities);
+  createPoint(aSketch, theEllipse, (anAttrIt++)->first, theMinorAxisStart, anEntities);
+  createPoint(aSketch, theEllipse, (anAttrIt++)->first, theMinorAxisEnd, anEntities);
+
+  createAxis(aSketch, theEllipse, anAttrIt->first, anAttrIt->second, theMajorAxis, anEntities);
+  ++anAttrIt;
+  createAxis(aSketch, theEllipse, anAttrIt->first, anAttrIt->second, theMinorAxis, anEntities);
 
   return SketchAPI_SketchEntity::wrap(anEntities);
 }
 
 static void ellipseAttributeAndAuxiliaryFeature(
     const FeaturePtr& theInternalConstraint,
+    const std::pair<std::string, std::string>& theMajorAxisStartEnd,
+    const std::pair<std::string, std::string>& theMinorAxisStartEnd,
     std::map<std::string, FeaturePtr>& theAttrToFeature)
 {
   AttributeRefAttrPtr aRefAttrA =
@@ -325,12 +346,27 @@ static void ellipseAttributeAndAuxiliaryFeature(
     theAttrToFeature[aRefAttrA->attr()->id()] = anAuxFeature;
   else {
     const std::string& anAttrID = aRefAttrA->attr()->id();
-    if (anAttrID == SketchPlugin_Ellipse::MAJOR_AXIS_START_ID() ||
-        anAttrID == SketchPlugin_Ellipse::MAJOR_AXIS_END_ID())
+    if (anAttrID == theMajorAxisStartEnd.first || anAttrID == theMajorAxisStartEnd.second)
       theAttrToFeature[MAJOR_AXIS_ID] = anAuxFeature;
-    else if (anAttrID == SketchPlugin_Ellipse::MINOR_AXIS_START_ID() ||
-             anAttrID == SketchPlugin_Ellipse::MINOR_AXIS_END_ID())
+    else if (anAttrID == theMinorAxisStartEnd.first || anAttrID == theMinorAxisStartEnd.second)
       theAttrToFeature[MINOR_AXIS_ID] = anAuxFeature;
+  }
+}
+
+void SketchAPI_Ellipse::collectAuxiliaryFeatures(
+    FeaturePtr theEllipse,
+    const std::pair<std::string, std::string>& theMajorAxis,
+    const std::pair<std::string, std::string>& theMinorAxis,
+    std::map<std::string, FeaturePtr>& theAttrToFeature)
+{
+  const std::set<AttributePtr>& aRefs = theEllipse->data()->refsToMe();
+  for (std::set<AttributePtr>::const_iterator aRefIt = aRefs.begin();
+       aRefIt != aRefs.end(); ++aRefIt) {
+    FeaturePtr anOwner = ModelAPI_Feature::feature((*aRefIt)->owner());
+    if (anOwner->getKind() == SketchPlugin_ConstraintCoincidenceInternal::ID()) {
+      // process internal constraints only
+      ellipseAttributeAndAuxiliaryFeature(anOwner, theMajorAxis, theMinorAxis, theAttrToFeature);
+    }
   }
 }
 
@@ -356,58 +392,61 @@ void SketchAPI_Ellipse::dump(ModelHighAPI_Dumper& theDumper) const
 
   // dump auxiliary features produced by ellipse
   std::map<std::string, FeaturePtr> anAuxFeatures;
-  const std::set<AttributePtr>& aRefs = aBase->data()->refsToMe();
-  for (std::set<AttributePtr>::const_iterator aRefIt = aRefs.begin();
-       aRefIt != aRefs.end(); ++aRefIt) {
-    FeaturePtr anOwner = ModelAPI_Feature::feature((*aRefIt)->owner());
-    if (anOwner->getKind() != SketchPlugin_ConstraintCoincidenceInternal::ID())
-      continue; // process internal constraints only
-    ellipseAttributeAndAuxiliaryFeature(anOwner, anAuxFeatures);
-  }
-  if (!anAuxFeatures.empty()) {
-    typedef std::pair<std::string, std::string> PairOfStrings;
-    static PairOfStrings anAttributes[] = {
-        PairOfStrings(SketchPlugin_Ellipse::CENTER_ID(), "center"),
-        PairOfStrings(SketchPlugin_Ellipse::FIRST_FOCUS_ID(), "firstFocus"),
-        PairOfStrings(SketchPlugin_Ellipse::SECOND_FOCUS_ID(), "secondFocus"),
-        PairOfStrings(SketchPlugin_Ellipse::MAJOR_AXIS_START_ID(), "majorAxisStart"),
-        PairOfStrings(SketchPlugin_Ellipse::MAJOR_AXIS_END_ID(), "majorAxisEnd"),
-        PairOfStrings(SketchPlugin_Ellipse::MINOR_AXIS_START_ID(), "minorAxisStart"),
-        PairOfStrings(SketchPlugin_Ellipse::MINOR_AXIS_END_ID(), "minorAxisEnd"),
-        PairOfStrings(MAJOR_AXIS_ID, MAJOR_AXIS_ID),
-        PairOfStrings(MINOR_AXIS_ID, MINOR_AXIS_ID)
-    };
+  static const std::pair<std::string, std::string> aMajorAxis(
+      SketchPlugin_Ellipse::MAJOR_AXIS_START_ID(),
+      SketchPlugin_Ellipse::MAJOR_AXIS_END_ID());
+  static const std::pair<std::string, std::string> aMinorAxis(
+      SketchPlugin_Ellipse::MINOR_AXIS_START_ID(),
+      SketchPlugin_Ellipse::MINOR_AXIS_END_ID());
+  collectAuxiliaryFeatures(aBase, aMajorAxis, aMinorAxis, anAuxFeatures);
 
-    theDumper << "[";
-    bool isFirst = true;
-    for (PairOfStrings* anIt = std::begin(anAttributes);
-         anIt != std::end(anAttributes); ++anIt) {
-      std::map<std::string, FeaturePtr>::iterator aFound = anAuxFeatures.find(anIt->first);
-      if (aFound == anAuxFeatures.end())
-        continue;
-      if (!isFirst)
-        theDumper << ", ";
-      theDumper << theDumper.name(aFound->second, false);
-      theDumper.doNotDumpFeature(aFound->second);
-      isFirst = false;
-    }
-    theDumper << "] = " << theDumper.name(aBase) << ".construction(";
-    isFirst = true;
-    for (PairOfStrings* anIt = std::begin(anAttributes);
-         anIt != std::end(anAttributes); ++anIt) {
-      std::map<std::string, FeaturePtr>::iterator aFound = anAuxFeatures.find(anIt->first);
-      if (aFound == anAuxFeatures.end())
-        continue;
-      if (!isFirst)
-        theDumper << ", ";
-      isFirst = false;
-      theDumper << anIt->second << " = \"";
-      if (aFound->second->boolean(SketchPlugin_SketchEntity::AUXILIARY_ID())->value())
-        theDumper << AUXILIARY_VALUE;
-      else
-        theDumper << aFound->second->name();
-      theDumper << "\"";
-    }
-    theDumper << ")" << std::endl;
+  if (!anAuxFeatures.empty()) {
+    // a list of attributes to write features in special order
+    const std::list<PairOfStrings>& anAttributes = ellipseAttrAndDumpNames();
+    dumpConstructionEntities(theDumper, aBase, anAttributes, anAuxFeatures);
   }
+}
+
+void SketchAPI_Ellipse::dumpConstructionEntities(
+    ModelHighAPI_Dumper& theDumper,
+    const FeaturePtr& theEllipse,
+    const std::list<PairOfStrings>& theAttributes,
+    const std::map<std::string, FeaturePtr>& theAuxFeatures)
+{
+  std::list<PairOfStrings> anAttributes = theAttributes;
+  // append axes
+  anAttributes.push_back(PairOfStrings(MAJOR_AXIS_ID, MAJOR_AXIS_ID));
+  anAttributes.push_back(PairOfStrings(MINOR_AXIS_ID, MINOR_AXIS_ID));
+
+  theDumper << "[";
+  bool isFirst = true;
+  for (std::list<PairOfStrings>::iterator anIt = anAttributes.begin();
+        anIt != anAttributes.end(); ++anIt) {
+    std::map<std::string, FeaturePtr>::const_iterator aFound = theAuxFeatures.find(anIt->first);
+    if (aFound == theAuxFeatures.end())
+      continue;
+    if (!isFirst)
+      theDumper << ", ";
+    theDumper << theDumper.name(aFound->second, false);
+    theDumper.doNotDumpFeature(aFound->second);
+    isFirst = false;
+  }
+  theDumper << "] = " << theDumper.name(theEllipse) << ".construction(";
+  isFirst = true;
+  for (std::list<PairOfStrings>::iterator anIt = anAttributes.begin();
+        anIt != anAttributes.end(); ++anIt) {
+    std::map<std::string, FeaturePtr>::const_iterator aFound = theAuxFeatures.find(anIt->first);
+    if (aFound == theAuxFeatures.end())
+      continue;
+    if (!isFirst)
+      theDumper << ", ";
+    isFirst = false;
+    theDumper << anIt->second << " = \"";
+    if (aFound->second->boolean(SketchPlugin_SketchEntity::AUXILIARY_ID())->value())
+      theDumper << AUXILIARY_VALUE;
+    else
+      theDumper << aFound->second->name();
+    theDumper << "\"";
+  }
+  theDumper << ")" << std::endl;
 }
