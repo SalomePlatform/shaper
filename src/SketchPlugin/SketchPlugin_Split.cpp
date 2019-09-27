@@ -27,7 +27,6 @@
 #include <GeomAPI_XY.h>
 #include <GeomDataAPI_Point2D.h>
 #include <GeomAlgoAPI_ShapeTools.h>
-#include <GeomAlgoAPI_CompoundBuilder.h>
 
 #include <ModelAPI_AttributeBoolean.h>
 #include <ModelAPI_AttributeDouble.h>
@@ -50,11 +49,12 @@
 #include <SketchPlugin_ConstraintMirror.h>
 #include <SketchPlugin_ConstraintParallel.h>
 #include <SketchPlugin_ConstraintTangent.h>
+#include <SketchPlugin_Ellipse.h>
+#include <SketchPlugin_EllipticArc.h>
 #include <SketchPlugin_Line.h>
 #include <SketchPlugin_MultiRotation.h>
 #include <SketchPlugin_MultiTranslation.h>
 #include <SketchPlugin_Point.h>
-#include <SketchPlugin_Tools.h>
 
 #include <ModelGeomAlgo_Point2D.h>
 #include <ModelAPI_EventReentrantMessage.h>
@@ -88,11 +88,6 @@ void SketchPlugin_Split::initAttributes()
 
   ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(), PREVIEW_POINT());
   ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(), PREVIEW_OBJECT());
-
-  // TODO: remove
-  //data()->addAttribute(SketchPlugin_Constraint::VALUE(), ModelAPI_AttributeReference::typeId());
-  //data()->addAttribute(SketchPlugin_Constraint::ENTITY_A(), ModelAPI_AttributeRefAttr::typeId());
-  //data()->addAttribute(SketchPlugin_Constraint::ENTITY_B(), ModelAPI_AttributeRefAttr::typeId());
 }
 
 void SketchPlugin_Split::execute()
@@ -102,26 +97,21 @@ void SketchPlugin_Split::execute()
   // Check the base objects are initialized.
   AttributeReferencePtr aBaseObjectAttr = std::dynamic_pointer_cast<ModelAPI_AttributeReference>(
                                                            data()->attribute(SELECTED_OBJECT()));
-  //ObjectPtr aBaseObject = anObjectAttr->value();
-  //AttributeReferencePtr aBaseObjectAttr = std::dynamic_pointer_cast<ModelAPI_AttributeReference>(
-  //                                          aData->attribute(SketchPlugin_Constraint::VALUE()));
   if(!aBaseObjectAttr->isInitialized()) {
     setError("Error: Base object is not initialized.");
     return;
   }
   ObjectPtr aBaseObject = aBaseObjectAttr->value();
   AttributePoint2DPtr aFirstPointAttrOfSplit = getPointAttribute(true);
-  //  getPointOfRefAttr(aData->attribute(SketchPlugin_Constraint::ENTITY_A()));
   AttributePoint2DPtr aSecondPointAttrOfSplit = getPointAttribute(false);
-  //  getPointOfRefAttr(aData->attribute(SketchPlugin_Constraint::ENTITY_B()));
   if (!aFirstPointAttrOfSplit.get() || !aFirstPointAttrOfSplit->isInitialized() ||
       !aSecondPointAttrOfSplit.get() || !aSecondPointAttrOfSplit->isInitialized()) {
     setError("Error: Sub-shape is not initialized.");
     return;
   }
 
-  /// Remove reference of this feature to feature used in preview, it is not necessary anymore
-  /// as trim will be removed after execute
+  // Remove reference of this feature to feature used in preview, it is not necessary anymore
+  // as trim will be removed after execute
   AttributeReferencePtr aPreviewObjectAttr =
                      std::dynamic_pointer_cast<ModelAPI_AttributeReference>(
                      data()->attribute(PREVIEW_OBJECT()));
@@ -142,7 +132,7 @@ void SketchPlugin_Split::execute()
 
   // Find feature constraints
   FeaturePtr aBaseFeature = ModelAPI_Feature::feature(aBaseObject);
-  ResultPtr aBaseFeatureResult = getFeatureResult(aBaseFeature);
+  ResultPtr aBaseFeatureResult = aBaseFeature->lastResult();
   std::set<FeaturePtr> aFeaturesToDelete, aFeaturesToUpdate;
 
   //std::map<FeaturePtr, IdToPointPair> aTangentFeatures;
@@ -152,7 +142,8 @@ void SketchPlugin_Split::execute()
 
   std::map<AttributePtr, std::list<AttributePtr> > aBaseRefAttributes;
   std::list<AttributePtr> aRefsToFeature;
-  getRefAttributes(aBaseFeature, aBaseRefAttributes, aRefsToFeature);
+  SketchPlugin_SegmentationTools::getRefAttributes(
+      aBaseFeature, aBaseRefAttributes, aRefsToFeature);
 
   std::map<AttributePtr, AttributePtr> aBasePointModifiedAttributes;
 
@@ -256,7 +247,7 @@ void SketchPlugin_Split::execute()
     aReplacingFeature = splitCircle(aSplitFeature, aBaseFeature, anAfterFeature,
                                     aFurtherCoincidences, aCreatedFeatures, aModifiedAttributes);
 
-    updateRefFeatureConstraints(getFeatureResult(aBaseFeature), aRefsToFeature);
+    updateRefFeatureConstraints(aBaseFeature->lastResult(), aRefsToFeature);
 
     AttributePtr aCenterAttr = aCircleFeature->attribute(SketchPlugin_Circle::CENTER_ID());
     aFeaturesToDelete.insert(aCircleFeature);
@@ -315,15 +306,15 @@ void SketchPlugin_Split::execute()
 #endif
 
   std::set<ResultPtr> aFeatureResults;
-  aFeatureResults.insert(getFeatureResult(aBaseFeature));
+  aFeatureResults.insert(aBaseFeature->lastResult());
   if (anAfterFeature.get() && anAfterFeature != aBaseFeature)
-    aFeatureResults.insert(getFeatureResult(anAfterFeature));
+    aFeatureResults.insert(anAfterFeature->lastResult());
 
   // coincidence to feature
   updateCoincidenceConstraintsToFeature(aCoincidenceToFeature, aFurtherCoincidences,
                                         aFeatureResults, aSplitFeature, aFeaturesToDelete);
 
-  updateRefAttConstraints(aBaseRefAttributes, aModifiedAttributes);
+  SketchPlugin_SegmentationTools::updateRefAttConstraints(aBaseRefAttributes, aModifiedAttributes);
 
   // delete constraints
 #ifdef DEBUG_SPLIT
@@ -347,7 +338,7 @@ void SketchPlugin_Split::execute()
     std::cout << std::endl;
   }
 #endif
-  updateFeaturesAfterSplit(aFeaturesToUpdate);
+  SketchPlugin_SegmentationTools::updateFeaturesAfterOperation(aFeaturesToUpdate);
 
   // Send events to update the sub-features by the solver.
   if(isUpdateFlushed) {
@@ -360,7 +351,7 @@ void SketchPlugin_Split::execute()
     ResultPtr aReplacingResult;
     if (aReplacingFeature.get()) {
       aReplacingFeature->execute(); // need it to obtain result
-      aReplacingResult = getFeatureResult(aReplacingFeature);
+      aReplacingResult = aReplacingFeature->lastResult();
     }
     if (aReplacingResult.get()) { // base object was removed
       aPreviewObject = aReplacingResult;
@@ -387,7 +378,7 @@ void SketchPlugin_Split::execute()
       aPreviewObject = ObjectPtr();
 
       aBaseFeature->execute(); // should recompute shapes of result to do not check obsolete one
-      aBaseObject = getFeatureResult(aBaseFeature);
+      aBaseObject = aBaseFeature->lastResult();
       std::shared_ptr<GeomAPI_Pnt> aPreviewPnt = sketch()->to3D(aPreviewPnt2d->x(),
                                                                 aPreviewPnt2d->y());
       ResultPtr aBaseResult = std::dynamic_pointer_cast<ModelAPI_Result>(aBaseObject);
@@ -398,7 +389,7 @@ void SketchPlugin_Split::execute()
           aPreviewObject = aBaseResult;
       }
       if (!aPreviewObject.get() && aNewFeature.get()) {
-        ResultPtr aNewFeatureResult = getFeatureResult(aNewFeature);
+        ResultPtr aNewFeatureResult = aNewFeature->lastResult();
         if (aNewFeatureResult.get()) {
           GeomShapePtr aShape = aNewFeatureResult->shape();
           std::shared_ptr<GeomAPI_Pnt> aProjectedPoint;
@@ -440,10 +431,10 @@ std::string SketchPlugin_Split::processEvent(const std::shared_ptr<Events_Messag
     std::shared_ptr<GeomAPI_Pnt2d> aPoint = aMessage->clickedPoint();
 
     if (anObject.get() && aPoint.get()) {
-      //if (myCashedShapes.find(anObject) == myCashedShapes.end())
-      //  fillObjectShapes(anObject, sketch()->data()->owner(), myCashedShapes, myObjectToPoints);
-      if (myCashedShapes.find(anObject) == myCashedShapes.end())
-        fillObjectShapes(anObject, sketch()->data()->owner());
+      if (myCashedShapes.find(anObject) == myCashedShapes.end()) {
+        SketchPlugin_SegmentationTools::fillObjectShapes(
+            this, anObject, myCashedShapes, myCashedReferences);
+      }
       const std::set<GeomShapePtr>& aShapes = myCashedShapes[anObject];
       if (aShapes.size() > 1) {
         std::shared_ptr<ModelAPI_AttributeReference> aRefSelectedAttr =
@@ -466,7 +457,8 @@ std::string SketchPlugin_Split::processEvent(const std::shared_ptr<Events_Messag
 
         Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_UPDATED));
 
-        GeomShapePtr aSelectedShape = getSubShape(SELECTED_OBJECT(), SELECTED_POINT());
+        GeomShapePtr aSelectedShape = SketchPlugin_SegmentationTools::getSubShape(this,
+            SELECTED_OBJECT(), SELECTED_POINT(), myCashedShapes, myCashedReferences);
         if (aSelectedShape.get()) {
           aFilledAttributeName = SELECTED_OBJECT();
         }
@@ -493,255 +485,11 @@ std::string SketchPlugin_Split::processEvent(const std::shared_ptr<Events_Messag
 
 AISObjectPtr SketchPlugin_Split::getAISObject(AISObjectPtr thePrevious)
 {
-  /*AttributeReferencePtr aBaseObjectAttr = std::dynamic_pointer_cast<ModelAPI_AttributeReference>(
-                                           data()->attribute(SketchPlugin_Constraint::VALUE()));
-  FeaturePtr aBaseFeature = ModelAPI_Feature::feature(aBaseObjectAttr->value());
-
-  AttributePoint2DPtr aFirstPointAttrOfSplit = getPointOfRefAttr(
-                                        data()->attribute(SketchPlugin_Constraint::ENTITY_A()));
-  AttributePoint2DPtr aSecondPointAttrOfSplit = getPointOfRefAttr(
-                                        data()->attribute(SketchPlugin_Constraint::ENTITY_B()));
-
-  if (aBaseObjectAttr->isInitialized() && aBaseFeature.get() &&
-      aFirstPointAttrOfSplit->isInitialized() &&
-      aSecondPointAttrOfSplit->isInitialized()) {
-
-    ResultPtr aResult = getFeatureResult(aBaseFeature);
-    GeomShapePtr aBaseShape = aResult->shape();
-    std::list<std::shared_ptr<GeomAPI_Pnt> > aPoints;
-
-    std::shared_ptr<GeomAPI_Pnt2d> aStartPnt2d = aFirstPointAttrOfSplit->pnt();
-    std::shared_ptr<GeomAPI_Pnt> aStartPoint = sketch()->to3D(aStartPnt2d->x(), aStartPnt2d->y());
-    aPoints.push_back(aStartPoint);
-
-    std::shared_ptr<GeomAPI_Pnt2d> aSecondPnt2d = aSecondPointAttrOfSplit->pnt();
-    std::shared_ptr<GeomAPI_Pnt> aSecondPoint =
-      sketch()->to3D(aSecondPnt2d->x(), aSecondPnt2d->y());
-    aPoints.push_back(aSecondPoint);
-
-    std::set<std::shared_ptr<GeomAPI_Shape> > aSplitShapes;
-
-    GeomAlgoAPI_ShapeTools::splitShape_p(aBaseShape, aPoints, aSplitShapes);
-    std::shared_ptr<GeomAPI_Shape> aShape =
-      GeomAlgoAPI_ShapeTools::findShape(aPoints, aSplitShapes);
-
-    AISObjectPtr anAIS = thePrevious;
-    if (aShape) {
-      if (!anAIS)
-        anAIS = AISObjectPtr(new GeomAPI_AISObject);
-      anAIS->createShape(aShape);
-      std::shared_ptr<ModelAPI_AttributeBoolean> anAuxiliaryAttr =
-             aBaseFeature->data()->boolean(SketchPlugin_SketchEntity::AUXILIARY_ID());
-
-      bool isConstruction = anAuxiliaryAttr.get() != NULL && anAuxiliaryAttr->value();
-
-      std::vector<int> aColor;
-      double aWidth = SketchPlugin_SketchEntity::SKETCH_LINE_WIDTH();
-      int aLineStyle = SketchPlugin_SketchEntity::SKETCH_LINE_STYLE();
-      if (isConstruction) {
-        aColor = Config_PropManager::color("Visualization", "sketch_auxiliary_color");
-        aWidth = SketchPlugin_SketchEntity::SKETCH_LINE_WIDTH_AUXILIARY();
-        aLineStyle = SketchPlugin_SketchEntity::SKETCH_LINE_STYLE_AUXILIARY();
-      }
-      else {
-        aColor = Config_PropManager::color("Visualization", "sketch_entity_color");
-      }
-      anAIS->setColor(aColor[0], aColor[1], aColor[2]);
-      anAIS->setWidth(aWidth + 1);
-      anAIS->setLineStyle(aLineStyle);
-    }
-    return anAIS;
-  }
-  return AISObjectPtr();*/
-#ifdef DEBUG_SPLIT
-  std::cout << "SketchPlugin_Split::getAISObject: " << data()->name() << std::endl;
-#endif
-
-  AISObjectPtr anAIS = thePrevious;
-
-  std::list<std::shared_ptr<GeomAPI_Shape> > aShapes;
-  GeomShapePtr aPreviewShape = getSubShape(PREVIEW_OBJECT(), PREVIEW_POINT());
-  if (aPreviewShape.get())
-    aShapes.push_back(aPreviewShape);
-  GeomShapePtr aSelectedShape = getSubShape(SELECTED_OBJECT(), SELECTED_POINT());
-  if (aSelectedShape.get())
-    aShapes.push_back(aSelectedShape);
-
-  if (aShapes.empty())
-    return AISObjectPtr();
-
-  GeomShapePtr aBaseShape = GeomAlgoAPI_CompoundBuilder::compound(aShapes);
-  if (!aBaseShape.get())
-    return AISObjectPtr();
-
-  if (aBaseShape.get()) {
-    if (!anAIS)
-      anAIS = AISObjectPtr(new GeomAPI_AISObject);
-    anAIS->createShape(aBaseShape);
-
-    std::vector<int> aColor;
-    aColor = Config_PropManager::color("Visualization", "operation_remove_feature_color");
-    double aWidth = SketchPlugin_SketchEntity::SKETCH_LINE_WIDTH();
-    int aLineStyle = SketchPlugin_SketchEntity::SKETCH_LINE_STYLE();
-    anAIS->setColor(aColor[0], aColor[1], aColor[2]);
-    // width when there is not base object should be extened in several points
-    // in order to see this preview over highlight
-    anAIS->setWidth(aWidth+4);
-    anAIS->setLineStyle(aLineStyle);
-  }
-  else
-    anAIS = AISObjectPtr();
-  return anAIS;
+  return SketchPlugin_SegmentationTools::getAISObject(thePrevious,
+      this, PREVIEW_OBJECT(), PREVIEW_POINT(), SELECTED_OBJECT(), SELECTED_POINT());
 }
 
 //********************************************************************
-void SketchPlugin_Split::fillObjectShapes(const ObjectPtr& theObject,
-                                          const ObjectPtr& theSketch)
-{
-  std::set<std::shared_ptr<GeomAPI_Shape> > aShapes;
-  std::map<std::shared_ptr<GeomDataAPI_Point2D>, std::shared_ptr<GeomAPI_Pnt> > aPointToAttributes;
-  std::set<std::shared_ptr<GeomDataAPI_Point2D> > aRefAttributes;
-  // current feature
-  FeaturePtr aFeature = ModelAPI_Feature::feature(theObject);
-  // edges on feature
-  std::set<ResultPtr> anEdgeResults;
-  ModelGeomAlgo_Shape::shapesOfType(aFeature, GeomAPI_Shape::EDGE, anEdgeResults);
-  if (!anEdgeResults.empty()) {
-    GeomShapePtr aFeatureShape = (*anEdgeResults.begin())->shape();
-
-    // coincidences to the feature
-    ModelGeomAlgo_Point2D::getPointsOfReference(aFeature, SketchPlugin_ConstraintCoincidence::ID(),
-                         aRefAttributes, SketchPlugin_Point::ID(), SketchPlugin_Point::COORD_ID());
-    // layed on feature coincidences to divide it on several shapes
-    std::shared_ptr<ModelAPI_Data> aData = theSketch->data();
-    std::shared_ptr<GeomDataAPI_Point> aC = std::dynamic_pointer_cast<GeomDataAPI_Point>(
-        aData->attribute(SketchPlugin_Sketch::ORIGIN_ID()));
-    std::shared_ptr<GeomDataAPI_Dir> aX = std::dynamic_pointer_cast<GeomDataAPI_Dir>(
-        aData->attribute(SketchPlugin_Sketch::DIRX_ID()));
-    std::shared_ptr<GeomDataAPI_Dir> aNorm = std::dynamic_pointer_cast<GeomDataAPI_Dir>(
-        aData->attribute(SketchPlugin_Sketch::NORM_ID()));
-    std::shared_ptr<GeomAPI_Dir> aY(new GeomAPI_Dir(aNorm->dir()->cross(aX->dir())));
-    std::list<std::shared_ptr<GeomAPI_Pnt> > aPoints;
-    ModelGeomAlgo_Point2D::getPointsInsideShape_p(aFeatureShape, aRefAttributes, aC->pnt(),
-                                                aX->dir(), aY, aPoints, aPointToAttributes);
-
-    if (!aPoints.empty())
-      GeomAlgoAPI_ShapeTools::splitShape_p(aFeatureShape, aPoints, aShapes);
-  }
-  myCashedShapes[theObject] = aShapes;
-  myCashedReferences[theObject] = aPointToAttributes;
-}
-
-GeomShapePtr SketchPlugin_Split::getSubShape(const std::string& theObjectAttributeId,
-                                             const std::string& thePointAttributeId)
-{
-  GeomShapePtr aBaseShape;
-
-  AttributeReferencePtr anObjectAttr = std::dynamic_pointer_cast<ModelAPI_AttributeReference>(
-                                                       data()->attribute(theObjectAttributeId));
-  ObjectPtr aBaseObject = anObjectAttr->value();
-  if (!aBaseObject.get())
-    return aBaseShape;
-
-  // point on feature
-  AttributePoint2DPtr aPointAttr = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
-                                           data()->attribute(thePointAttributeId));
-  std::shared_ptr<GeomAPI_Pnt2d> anAttributePnt2d = aPointAttr->pnt();
-  std::shared_ptr<GeomAPI_Pnt> anAttributePnt = sketch()->to3D(anAttributePnt2d->x(),
-                                                               anAttributePnt2d->y());
-
-#ifdef TRIM_SHAPE
-  if (myCashedShapes.find(aBaseObject) == myCashedShapes.end())
-    fillObjectShapes(aBaseObject, sketch()->data()->owner(), myCashedShapes, myObjectToPoints);
-
-  const std::set<GeomShapePtr>& aShapes = myCashedShapes[aBaseObject];
-  if (!aShapes.empty()) {
-    std::set<GeomShapePtr>::const_iterator anIt = aShapes.begin(), aLast = aShapes.end();
-    for (; anIt != aLast; anIt++) {
-      GeomShapePtr aShape = *anIt;
-      std::shared_ptr<GeomAPI_Pnt> aProjectedPoint;
-      if (ModelGeomAlgo_Point2D::isPointOnEdge(aShape, anAttributePnt, aProjectedPoint))
-        aBaseShape = aShape;
-    }
-  }
-#else
-  if (myCashedShapes.find(aBaseObject) == myCashedShapes.end())
-    fillObjectShapes(aBaseObject, sketch()->data()->owner());
-
-  std::shared_ptr<GeomAPI_Pnt> aStartPoint;
-  std::shared_ptr<GeomAPI_Pnt> aSecondPoint;
-  const std::set<GeomShapePtr>& aShapes = myCashedShapes[aBaseObject];
-  std::set<GeomShapePtr>::const_iterator anIt = aShapes.begin(), aLast = aShapes.end();
-  for (; anIt != aLast; anIt++) {
-    GeomShapePtr aCurrentShape = *anIt;
-    std::shared_ptr<GeomAPI_Pnt> aProjectedPoint;
-    if (ModelGeomAlgo_Point2D::isPointOnEdge(aCurrentShape, anAttributePnt, aProjectedPoint)) {
-      if (aCurrentShape->shapeType() == GeomAPI_Shape::EDGE) {
-        std::shared_ptr<GeomAPI_Edge> anEdge(new GeomAPI_Edge(aCurrentShape));
-        aStartPoint = anEdge->firstPoint();
-        aSecondPoint = anEdge->lastPoint();
-      }
-      break;
-    }
-  }
-
-  if (!aStartPoint.get() || !aSecondPoint.get())
-    return aBaseShape;
-
-  //AttributeReferencePtr aBaseObjectAttr = std::dynamic_pointer_cast<ModelAPI_AttributeReference>(
-  //                                         data()->attribute(SketchPlugin_Constraint::VALUE()));
-  FeaturePtr aBaseFeature = ModelAPI_Feature::feature(aBaseObject/*aBaseObjectAttr->value()*/);
-
-  //AttributePoint2DPtr aFirstPointAttrOfSplit = getPointOfRefAttr(
-  //                                      data()->attribute(SketchPlugin_Constraint::ENTITY_A()));
-  //AttributePoint2DPtr aSecondPointAttrOfSplit = getPointOfRefAttr(
-  //                                      data()->attribute(SketchPlugin_Constraint::ENTITY_B()));
-  if (anObjectAttr->isInitialized() && aBaseFeature.get() && aPointAttr->isInitialized()) {
-      //aFirstPointAttrOfSplit->isInitialized() &&
-      //aSecondPointAttrOfSplit->isInitialized()) {
-    ResultPtr aResult = getFeatureResult(aBaseFeature);
-    GeomShapePtr aResultShape = aResult->shape();
-    std::list<std::shared_ptr<GeomAPI_Pnt> > aPoints;
-
-    //std::shared_ptr<GeomAPI_Pnt2d> aStartPnt2d = aFirstPointAttrOfSplit->pnt();
-    //std::shared_ptr<GeomAPI_Pnt> aStartPoint = sketch()->to3D(aStartPnt2d->x(), aStartPnt2d->y());
-    aPoints.push_back(aStartPoint);
-
-    //std::shared_ptr<GeomAPI_Pnt2d> aSecondPnt2d = aSecondPointAttrOfSplit->pnt();
-    //std::shared_ptr<GeomAPI_Pnt> aSecondPoint =
-    //  sketch()->to3D(aSecondPnt2d->x(), aSecondPnt2d->y());
-    aPoints.push_back(aSecondPoint);
-
-    std::set<std::shared_ptr<GeomAPI_Shape> > aSplitShapes;
-    GeomAlgoAPI_ShapeTools::splitShape_p(aResultShape, aPoints, aSplitShapes);
-    aBaseShape = GeomAlgoAPI_ShapeTools::findShape(aPoints, aSplitShapes);
-#endif
-  }
-  return aBaseShape;
-}
-
-void SketchPlugin_Split::getFeaturePoints(const FeaturePtr& theFeature,
-                                                    AttributePoint2DPtr& theStartPointAttr,
-                                                    AttributePoint2DPtr& theEndPointAttr)
-{
-  std::string aFeatureKind = theFeature->getKind();
-  std::string aStartAttributeName, anEndAttributeName;
-  if (aFeatureKind == SketchPlugin_Line::ID()) {
-    aStartAttributeName = SketchPlugin_Line::START_ID();
-    anEndAttributeName = SketchPlugin_Line::END_ID();
-  }
-  else if (aFeatureKind == SketchPlugin_Arc::ID()) {
-    aStartAttributeName = SketchPlugin_Arc::START_ID();
-    anEndAttributeName = SketchPlugin_Arc::END_ID();
-  }
-  if (!aStartAttributeName.empty() && !anEndAttributeName.empty()) {
-    theStartPointAttr = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
-                                         theFeature->attribute(aStartAttributeName));
-    theEndPointAttr = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
-                                         theFeature->attribute(anEndAttributeName));
-  }
-}
-
 void SketchPlugin_Split::getConstraints(std::set<FeaturePtr>& theFeaturesToDelete,
                                     std::set<FeaturePtr>& theFeaturesToUpdate,
                                     std::map<FeaturePtr, IdToPointPair>& theCoincidenceToFeature)
@@ -751,10 +499,8 @@ void SketchPlugin_Split::getConstraints(std::set<FeaturePtr>& theFeaturesToDelet
   // Check the base objects are initialized.
   AttributeReferencePtr aBaseObjectAttr = std::dynamic_pointer_cast<ModelAPI_AttributeReference>(
                                                            data()->attribute(SELECTED_OBJECT()));
-  //AttributeReferencePtr aBaseObjectAttr = std::dynamic_pointer_cast<ModelAPI_AttributeReference>(
-  //                                          aData->attribute(SketchPlugin_Constraint::VALUE()));
   FeaturePtr aBaseFeature = ModelAPI_Feature::feature(aBaseObjectAttr->value());
-  ResultPtr aBaseFeatureResult = getFeatureResult(aBaseFeature);
+  ResultPtr aBaseFeatureResult = aBaseFeature->lastResult();
 
   std::set<AttributePtr> aRefsList = aBaseFeatureResult->data()->refsToMe();
   std::set<AttributePtr> aFRefsList = aBaseFeature->data()->refsToMe();
@@ -778,7 +524,7 @@ void SketchPlugin_Split::getConstraints(std::set<FeaturePtr>& theFeaturesToDelet
       AttributeRefAttrPtr anAttrA = aRefFeature->refattr(SketchPlugin_Constraint::ENTITY_A());
       AttributeRefAttrPtr anAttrB = aRefFeature->refattr(SketchPlugin_Constraint::ENTITY_B());
       bool isToFeature = false;
-      if (anAttrA->isObject() || anAttrB->isObject()) { /// coincidence to base feature
+      if (anAttrA->isObject() || anAttrB->isObject()) { // coincidence to base feature
         FeaturePtr aFeature = anAttrA->isObject() ? ModelAPI_Feature::feature(anAttrA->object())
                                                   : FeaturePtr();
         isToFeature = aFeature.get() && aFeature == aBaseFeature;
@@ -792,7 +538,7 @@ void SketchPlugin_Split::getConstraints(std::set<FeaturePtr>& theFeaturesToDelet
         if (isToFeature)
           aCoincidentPoint = SketchPlugin_ConstraintCoincidence::getPoint(aRefFeature);
       }
-      if (!isToFeature) { /// coincidence to point on base feature
+      if (!isToFeature) { // coincidence to point on base feature
         AttributePtr anAttribute;
 
         if (!anAttrA->isObject()) {
@@ -825,52 +571,6 @@ void SketchPlugin_Split::getConstraints(std::set<FeaturePtr>& theFeaturesToDelet
   }
 }
 
-void SketchPlugin_Split::getRefAttributes(const FeaturePtr& theFeature,
-                                    std::map<AttributePtr, std::list<AttributePtr> >& theRefs,
-                                    std::list<AttributePtr>& theRefsToFeature)
-{
-  theRefs.clear();
-
-  std::list<AttributePtr> aPointAttributes =
-    theFeature->data()->attributes(GeomDataAPI_Point2D::typeId());
-  std::set<AttributePtr> aPointAttributesSet;
-
-  std::list<AttributePtr>::const_iterator aPIt =
-    aPointAttributes.begin(), aPLast = aPointAttributes.end();
-  for (; aPIt != aPLast; aPIt++)
-    aPointAttributesSet.insert(*aPIt);
-
-  std::set<AttributePtr> aRefsAttributes = getFeatureResult(theFeature)->data()->refsToMe();
-  std::set<AttributePtr> aFRefsList = theFeature->data()->refsToMe();
-  aRefsAttributes.insert(aFRefsList.begin(), aFRefsList.end());
-
-  std::set<AttributePtr>::const_iterator aIt;
-  for (aIt = aRefsAttributes.cbegin(); aIt != aRefsAttributes.cend(); ++aIt) {
-    AttributePtr anAttr = (*aIt);
-    FeaturePtr anAttrFeature = ModelAPI_Feature::feature(anAttr->owner());
-    if (anAttrFeature.get() != this &&
-        anAttr.get() && anAttr->attributeType() == ModelAPI_AttributeRefAttr::typeId()) {
-      AttributeRefAttrPtr aRefAttr = std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(anAttr);
-      if (!aRefAttr->isObject()) { /// find attributes referenced to feature point attributes
-        AttributePtr anAttrInRef = aRefAttr->attr();
-        if (anAttrInRef.get() &&
-            aPointAttributesSet.find(anAttrInRef) != aPointAttributesSet.end()) {
-          if (theRefs.find(anAttrInRef) != theRefs.end())
-            theRefs[anAttrInRef].push_back(aRefAttr);
-          else {
-            std::list<AttributePtr> anAttrList;
-            anAttrList.push_back(aRefAttr);
-            theRefs[anAttrInRef] = anAttrList;
-          }
-        }
-      }
-      else { /// find attributes referenced to feature itself
-        theRefsToFeature.push_back(anAttr);
-      }
-    }
-  }
-}
-
 void SketchPlugin_Split::updateCoincidenceConstraintsToFeature(
       const std::map<std::shared_ptr<ModelAPI_Feature>, IdToPointPair>& theCoincidenceToFeature,
       const std::set<std::shared_ptr<GeomDataAPI_Point2D> >& theFurtherCoincidences,
@@ -884,7 +584,8 @@ void SketchPlugin_Split::updateCoincidenceConstraintsToFeature(
   // we should build coincidence constraints to end of the split feature
   std::set<std::shared_ptr<GeomDataAPI_Point2D> > aNewCoincidencesToSplitFeature;
   AttributePoint2DPtr aStartPointAttr, anEndPointAttr;
-  getFeaturePoints(theSplitFeature, aStartPointAttr, anEndPointAttr);
+  SketchPlugin_SegmentationTools::getFeaturePoints(
+      theSplitFeature, aStartPointAttr, anEndPointAttr);
   if (theFurtherCoincidences.find(aStartPointAttr) == theFurtherCoincidences.end())
     aNewCoincidencesToSplitFeature.insert(aStartPointAttr);
   if (theFurtherCoincidences.find(anEndPointAttr) == theFurtherCoincidences.end())
@@ -931,7 +632,7 @@ void SketchPlugin_Split::updateCoincidenceConstraintsToFeature(
       }
     }
     else {
-      /// find feature by shape intersected the point
+      // find feature by shape intersected the point
       ResultPtr aResultForCoincidence = *(theFeatureResults.begin());
 
       if (theFeatureResults.size() > 1) { // try to find point on additional feature
@@ -966,40 +667,6 @@ void SketchPlugin_Split::updateRefFeatureConstraints(
   }
 }
 
-void SketchPlugin_Split::updateRefAttConstraints(
-                    const std::map<AttributePtr, std::list<AttributePtr> >& theBaseRefAttributes,
-                    const std::set<std::pair<AttributePtr, AttributePtr> >& theModifiedAttributes)
-{
-#ifdef DEBUG_SPLIT
-  std::cout << "SketchPlugin_Split::updateRefAttConstraints" << std::endl;
-#endif
-
-  std::set<std::pair<AttributePtr, AttributePtr> >::const_iterator
-    anIt = theModifiedAttributes.begin(),  aLast = theModifiedAttributes.end();
-  for (; anIt != aLast; anIt++) {
-    AttributePtr anAttribute = anIt->first;
-
-    /// not found in references
-    if (theBaseRefAttributes.find(anAttribute) == theBaseRefAttributes.end())
-      continue;
-    std::list<AttributePtr> aRefAttributes = theBaseRefAttributes.at(anAttribute);
-    std::list<AttributePtr>::const_iterator aRefIt = aRefAttributes.begin(),
-                                            aRLast = aRefAttributes.end();
-
-    AttributePtr aNewAttribute = anIt->second;
-    for (; aRefIt != aRLast; aRefIt++) {
-      AttributeRefAttrPtr aRefAttr = std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(*aRefIt);
-      if (aRefAttr.get()) {
-        aRefAttr->setAttr(aNewAttribute);
-#ifdef DEBUG_SPLIT
-        FeaturePtr aFeature = ModelAPI_Feature::feature(aRefAttr->owner());
-        std::cout << " -" << getFeatureInfo(aFeature) << std::endl;
-#endif
-      }
-    }
-  }
-}
-
 FeaturePtr SketchPlugin_Split::splitLine(FeaturePtr& theSplitFeature,
                                              FeaturePtr& theBaseFeatureModified,
                                              FeaturePtr& theAfterFeature,
@@ -1019,20 +686,17 @@ FeaturePtr SketchPlugin_Split::splitLine(FeaturePtr& theSplitFeature,
 
   AttributeReferencePtr aBaseObjectAttr = std::dynamic_pointer_cast<ModelAPI_AttributeReference>(
                                                            data()->attribute(SELECTED_OBJECT()));
-  //AttributeReferencePtr aBaseObjectAttr = std::dynamic_pointer_cast<ModelAPI_AttributeReference>(
-  //                                         data()->attribute(SketchPlugin_Constraint::VALUE()));
   FeaturePtr aBaseFeature = ModelAPI_Feature::feature(aBaseObjectAttr->value());
   std::string aFeatureKind = aBaseFeature->getKind();
   if (aFeatureKind != SketchPlugin_Line::ID())
     return anNewFeature;
 
   AttributePoint2DPtr aFirstPointAttrOfSplit = getPointAttribute(true);
-    //getPointOfRefAttr(data()->attribute(SketchPlugin_Constraint::ENTITY_A()));
   AttributePoint2DPtr aSecondPointAttrOfSplit = getPointAttribute(false);
-    //getPointOfRefAttr(data()->attribute(SketchPlugin_Constraint::ENTITY_B()));
   AttributePoint2DPtr aStartPointAttrOfBase, anEndPointAttrOfBase;
 
-  getFeaturePoints(aBaseFeature, aStartPointAttrOfBase, anEndPointAttrOfBase);
+  SketchPlugin_SegmentationTools::getFeaturePoints(
+      aBaseFeature, aStartPointAttrOfBase, anEndPointAttrOfBase);
   if (!aStartPointAttrOfBase.get() && !anEndPointAttrOfBase.get()) {
     setError("Error: Feature has no start and end points.");
     return anNewFeature;
@@ -1053,7 +717,7 @@ FeaturePtr SketchPlugin_Split::splitLine(FeaturePtr& theSplitFeature,
     ModelGeomAlgo_Point2D::getPointAttributeInfo(anEndPointAttrOfBase) << std::endl;
 #endif
 
-  /// create a split feature
+  // create a split feature
   theSplitFeature =
     createLineFeature(aBaseFeature, aFirstPointAttrOfSplit, aSecondPointAttrOfSplit);
   theCreatedFeatures.insert(theSplitFeature);
@@ -1064,15 +728,15 @@ FeaturePtr SketchPlugin_Split::splitLine(FeaturePtr& theSplitFeature,
                                         theSplitFeature->attribute(SketchPlugin_Line::START_ID())));
   }
   else {
-    theBaseFeatureModified = aBaseFeature; ///< use base feature to store all constraints here
-    /// move end arc point to start of split
+    theBaseFeatureModified = aBaseFeature; // use base feature to store all constraints here
+    // move end arc point to start of split
   }
 
   // after split feature
   if (!aSecondPointAttrOfSplit->pnt()->isEqual(anEndPointAttrOfBase->pnt())) {
     FeaturePtr aFeature;
     if (!theBaseFeatureModified.get()) {
-      aFeature = aBaseFeature; ///< use base feature to store all constraints here
+      aFeature = aBaseFeature; // use base feature to store all constraints here
       fillAttribute(aFeature->attribute(SketchPlugin_Line::START_ID()), aSecondPointAttrOfSplit);
       aFeature->execute(); // to update result
     }
@@ -1109,7 +773,7 @@ FeaturePtr SketchPlugin_Split::splitLine(FeaturePtr& theSplitFeature,
   // (after the after feature creation). Otherwise modified value will be used in after feature
   // before split feature
   if (!aStartPointAttrOfBase->pnt()->isEqual(aFirstPointAttrOfSplit->pnt())) {
-    /// move end arc point to start of split
+    // move end arc point to start of split
     fillAttribute(theBaseFeatureModified->attribute(SketchPlugin_Line::END_ID()),
                                                     aFirstPointAttrOfSplit);
     theBaseFeatureModified->execute(); // to update result
@@ -1132,14 +796,14 @@ FeaturePtr SketchPlugin_Split::splitLine(FeaturePtr& theSplitFeature,
   // additional constraints between split and base features
   aConstraintFeature = SketchPlugin_Tools::createConstraint(sketch(),
           SketchPlugin_ConstraintParallel::ID(),
-          getFeatureResult(aBaseFeature),
-          getFeatureResult(theSplitFeature));
+          aBaseFeature->lastResult(),
+          theSplitFeature->lastResult());
   theCreatedFeatures.insert(aConstraintFeature);
   if (theAfterFeature.get()) {
     aConstraintFeature = SketchPlugin_Tools::createConstraint(sketch(),
           SketchPlugin_ConstraintParallel::ID(),
-          getFeatureResult(aBaseFeature),
-          getFeatureResult(theAfterFeature));
+          aBaseFeature->lastResult(),
+          theAfterFeature->lastResult());
     theCreatedFeatures.insert(aConstraintFeature);
   }
 #endif
@@ -1165,19 +829,16 @@ FeaturePtr SketchPlugin_Split::splitArc(FeaturePtr& theSplitFeature,
 
   AttributeReferencePtr aBaseObjectAttr = std::dynamic_pointer_cast<ModelAPI_AttributeReference>(
                                                            data()->attribute(SELECTED_OBJECT()));
-  //AttributeReferencePtr aBaseObjectAttr = std::dynamic_pointer_cast<ModelAPI_AttributeReference>(
-  //                                         data()->attribute(SketchPlugin_Constraint::VALUE()));
   FeaturePtr aBaseFeature = ModelAPI_Feature::feature(aBaseObjectAttr->value());
   std::string aFeatureKind = aBaseFeature->getKind();
   if (aFeatureKind != SketchPlugin_Arc::ID())
     return anNewFeature;
 
   AttributePoint2DPtr aFirstPointAttrOfSplit = getPointAttribute(true);
-    //getPointOfRefAttr(data()->attribute(SketchPlugin_Constraint::ENTITY_A()));
   AttributePoint2DPtr aSecondPointAttrOfSplit = getPointAttribute(false);
-    //getPointOfRefAttr(data()->attribute(SketchPlugin_Constraint::ENTITY_B()));
   AttributePoint2DPtr aStartPointAttrOfBase, anEndPointAttrOfBase;
-  getFeaturePoints(aBaseFeature, aStartPointAttrOfBase, anEndPointAttrOfBase);
+  SketchPlugin_SegmentationTools::getFeaturePoints(
+      aBaseFeature, aStartPointAttrOfBase, anEndPointAttrOfBase);
   if (!aStartPointAttrOfBase.get() && !anEndPointAttrOfBase.get()) {
     setError("Error: Feature has no start and end points.");
     return anNewFeature;
@@ -1197,7 +858,7 @@ FeaturePtr SketchPlugin_Split::splitArc(FeaturePtr& theSplitFeature,
     ModelGeomAlgo_Point2D::getPointAttributeInfo(anEndPointAttrOfBase) << std::endl;
 #endif
 
-  /// split feature
+  // split feature
   theSplitFeature = createArcFeature(aBaseFeature, aFirstPointAttrOfSplit, aSecondPointAttrOfSplit);
   theCreatedFeatures.insert(theSplitFeature);
 
@@ -1207,15 +868,15 @@ FeaturePtr SketchPlugin_Split::splitArc(FeaturePtr& theSplitFeature,
                                   theSplitFeature->attribute(SketchPlugin_Arc::START_ID())));
   }
   else {
-    theBaseFeatureModified = aBaseFeature; ///< use base feature to store all constraints here
-    /// move end arc point to start of split
+    theBaseFeatureModified = aBaseFeature; // use base feature to store all constraints here
+    // move end arc point to start of split
   }
 
   // after split feature
   if (!aSecondPointAttrOfSplit->pnt()->isEqual(anEndPointAttrOfBase->pnt())) {
     FeaturePtr aFeature;
     if (!theBaseFeatureModified.get()) {
-      aFeature = aBaseFeature; ///< use base feature to store all constraints here
+      aFeature = aBaseFeature; // use base feature to store all constraints here
       fillAttribute(aFeature->attribute(SketchPlugin_Arc::START_ID()), aSecondPointAttrOfSplit);
       aFeature->execute(); // to update result
     }
@@ -1252,7 +913,7 @@ FeaturePtr SketchPlugin_Split::splitArc(FeaturePtr& theSplitFeature,
   // (after the after feature creation). Otherwise modified value will be used in after feature
   // before split feature
   if (!aStartPointAttrOfBase->pnt()->isEqual(aFirstPointAttrOfSplit->pnt())) {
-    /// move end arc point to start of split
+    // move end arc point to start of split
     fillAttribute(theBaseFeatureModified->attribute(SketchPlugin_Arc::END_ID()),
                                                     aFirstPointAttrOfSplit);
     theBaseFeatureModified->execute(); // to update result
@@ -1275,24 +936,24 @@ FeaturePtr SketchPlugin_Split::splitArc(FeaturePtr& theSplitFeature,
 #ifdef CREATE_CONSTRAINTS
   aConstraintFeature = SketchPlugin_Tools::createConstraint(sketch(),
           SketchPlugin_ConstraintEqual::ID(),
-          getFeatureResult(aBaseFeature),
-          getFeatureResult(theSplitFeature));
+          aBaseFeature->lastResult(),
+          theSplitFeature->lastResult());
   theCreatedFeatures.insert(aConstraintFeature);
   aConstraintFeature = SketchPlugin_Tools::createConstraint(sketch(),
           SketchPlugin_ConstraintTangent::ID(),
-          getFeatureResult(theSplitFeature),
-          getFeatureResult(aBaseFeature));
+          theSplitFeature->lastResult(),
+          aBaseFeature->lastResult());
   theCreatedFeatures.insert(aConstraintFeature);
   if (theAfterFeature.get()) {
     aConstraintFeature = SketchPlugin_Tools::createConstraint(sketch(),
                 SketchPlugin_ConstraintEqual::ID(),
-                getFeatureResult(aBaseFeature),
-                getFeatureResult(theAfterFeature));
+                aBaseFeature->lastResult(),
+                theAfterFeature->lastResult());
     theCreatedFeatures.insert(aConstraintFeature);
     aConstraintFeature = SketchPlugin_Tools::createConstraint(sketch(),
                 SketchPlugin_ConstraintTangent::ID(),
-                getFeatureResult(theSplitFeature),
-                getFeatureResult(theAfterFeature));
+                theSplitFeature->lastResult(),
+                theAfterFeature->lastResult());
     theCreatedFeatures.insert(aConstraintFeature);
   }
 #endif
@@ -1318,25 +979,21 @@ FeaturePtr SketchPlugin_Split::splitCircle(FeaturePtr& theSplitFeature,
 
   AttributeReferencePtr aBaseObjectAttr = std::dynamic_pointer_cast<ModelAPI_AttributeReference>(
                                                            data()->attribute(SELECTED_OBJECT()));
-  //AttributeReferencePtr aBaseObjectAttr = std::dynamic_pointer_cast<ModelAPI_AttributeReference>(
-  //                                         data()->attribute(SketchPlugin_Constraint::VALUE()));
   FeaturePtr aBaseFeature = ModelAPI_Feature::feature(aBaseObjectAttr->value());
   std::string aFeatureKind = aBaseFeature->getKind();
   if (aFeatureKind != SketchPlugin_Circle::ID())
     return anNewFeature;
 
   AttributePoint2DPtr aFirstPointAttrOfSplit = getPointAttribute(true);
-    //getPointOfRefAttr(data()->attribute(SketchPlugin_Constraint::ENTITY_A()));
   AttributePoint2DPtr aSecondPointAttrOfSplit = getPointAttribute(false);
-    //getPointOfRefAttr(data()->attribute(SketchPlugin_Constraint::ENTITY_B()));
 
-  /// split feature
+  // split feature
   theSplitFeature =
     createArcFeature(aBaseFeature, aFirstPointAttrOfSplit, aSecondPointAttrOfSplit);
   bool aSplitReversed = std::dynamic_pointer_cast<SketchPlugin_Arc>(theSplitFeature)->isReversed();
   theCreatedFeatures.insert(theSplitFeature);
 
-  /// base feature is a left part of the circle
+  // base feature is a left part of the circle
   theBaseFeatureModified = createArcFeature(aBaseFeature,
     aFirstPointAttrOfSplit, aSecondPointAttrOfSplit);
   anNewFeature = theBaseFeatureModified;
@@ -1370,8 +1027,8 @@ FeaturePtr SketchPlugin_Split::splitCircle(FeaturePtr& theSplitFeature,
 #ifdef CREATE_CONSTRAINTS
   aConstraintFeature = SketchPlugin_Tools::createConstraint(sketch(),
                      SketchPlugin_ConstraintTangent::ID(),
-                     getFeatureResult(theSplitFeature),
-                     getFeatureResult(theBaseFeatureModified));
+                     theSplitFeature->lastResult(),
+                     theBaseFeatureModified->lastResult());
   theCreatedFeatures.insert(aConstraintFeature);
 #endif
   return anNewFeature;
@@ -1476,8 +1133,8 @@ FeaturePtr SketchPlugin_Split::createLineFeature(const FeaturePtr& theBaseFeatur
 }
 
 FeaturePtr SketchPlugin_Split::createArcFeature(const FeaturePtr& theBaseFeature,
-                                                          const AttributePtr& theFirstPointAttr,
-                                                          const AttributePtr& theSecondPointAttr)
+                                                const AttributePtr& theFirstPointAttr,
+                                                const AttributePtr& theSecondPointAttr)
 {
   FeaturePtr aFeature;
   SketchPlugin_Sketch* aSketch = sketch();
@@ -1507,7 +1164,7 @@ FeaturePtr SketchPlugin_Split::createArcFeature(const FeaturePtr& theBaseFeature
   fillAttribute(aFeature->attribute(SketchPlugin_SketchEntity::AUXILIARY_ID()),
                 theBaseFeature->attribute(SketchPlugin_SketchEntity::AUXILIARY_ID()));
 
-  /// fill referersed state of created arc as it is on the base arc
+  // fill referersed state of created arc as it is on the base arc
   if (theBaseFeature->getKind() == SketchPlugin_Arc::ID()) {
     bool aReversed = theBaseFeature->boolean(SketchPlugin_Arc::REVERSED_ID())->value();
     aFeature->boolean(SketchPlugin_Arc::REVERSED_ID())->setValue(aReversed);
@@ -1516,44 +1173,6 @@ FeaturePtr SketchPlugin_Split::createArcFeature(const FeaturePtr& theBaseFeature
   aFeature->execute(); // to obtain result
 
   return aFeature;
-}
-
-void SketchPlugin_Split::updateFeaturesAfterSplit(
-                                                   const std::set<FeaturePtr>& theFeaturesToUpdate)
-{
-  std::set<FeaturePtr>::const_iterator anIt = theFeaturesToUpdate.begin(),
-                                       aLast = theFeaturesToUpdate.end();
-  for (; anIt != aLast; anIt++) {
-    FeaturePtr aRefFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(*anIt);
-    std::string aRefFeatureKind = aRefFeature->getKind();
-    if (aRefFeatureKind == SketchPlugin_ConstraintLength::ID()) {
-      std::shared_ptr<SketchPlugin_ConstraintLength> aLenghtFeature =
-                              std::dynamic_pointer_cast<SketchPlugin_ConstraintLength>(*anIt);
-      if (aLenghtFeature.get()) {
-        std::shared_ptr<ModelAPI_AttributeDouble> aValueAttr = std::dynamic_pointer_cast<
-            ModelAPI_AttributeDouble>(aLenghtFeature->attribute(SketchPlugin_Constraint::VALUE()));
-        double aValue;
-        if (aLenghtFeature->computeLenghtValue(aValue) && aValueAttr.get())
-          aValueAttr->setValue(aValue);
-      }
-    }
-  }
-}
-
-std::shared_ptr<ModelAPI_Result> SketchPlugin_Split::getFeatureResult(
-                                    const std::shared_ptr<ModelAPI_Feature>& theFeature)
-{
-  std::shared_ptr<ModelAPI_Result> aResult;
-
-  std::string aFeatureKind = theFeature->getKind();
-  if (aFeatureKind == SketchPlugin_Line::ID())
-    aResult = theFeature->firstResult();
-  else if (aFeatureKind == SketchPlugin_Arc::ID())
-    aResult = theFeature->lastResult();
-  else if (aFeatureKind == SketchPlugin_Circle::ID())
-    aResult = theFeature->lastResult();
-
-  return aResult;
 }
 
 #ifdef _DEBUG
@@ -1571,6 +1190,10 @@ std::set<std::shared_ptr<ModelAPI_Attribute> > SketchPlugin_Split::getEdgeAttrib
     anAttributes.insert(theFeature->attribute(SketchPlugin_Arc::START_ID()));
     anAttributes.insert(theFeature->attribute(SketchPlugin_Arc::END_ID()));
   }
+  else if (aFeatureKind == SketchPlugin_EllipticArc::ID()) {
+    anAttributes.insert(theFeature->attribute(SketchPlugin_EllipticArc::START_POINT_ID()));
+    anAttributes.insert(theFeature->attribute(SketchPlugin_EllipticArc::END_POINT_ID()));
+  }
   else if (aFeatureKind == SketchPlugin_Circle::ID()) {
   }
 
@@ -1583,7 +1206,8 @@ std::shared_ptr<GeomDataAPI_Point2D> SketchPlugin_Split::getPointAttribute
 {
   std::shared_ptr<GeomDataAPI_Point2D> anAttribute;
 
-  GeomShapePtr aSelectedShape = getSubShape(SELECTED_OBJECT(), SELECTED_POINT());
+  GeomShapePtr aSelectedShape = SketchPlugin_SegmentationTools::getSubShape(this,
+      SELECTED_OBJECT(), SELECTED_POINT(), myCashedShapes, myCashedReferences);
   if (!aSelectedShape.get())
     return anAttribute;
 
@@ -1602,7 +1226,7 @@ std::shared_ptr<GeomDataAPI_Point2D> SketchPlugin_Split::getPointAttribute
   std::shared_ptr<GeomAPI_Pnt> aLastPnt = anEdge->lastPoint();
 
   std::shared_ptr<GeomDataAPI_Point2D> aFirstPointAttr, aLastPointAttr;
-  /// find the points in feature attributes
+  // find the points in feature attributes
   FeaturePtr aBaseFeature = ModelAPI_Feature::feature(aBaseObject);
   std::list<AttributePtr> a2DPointAttributes = aBaseFeature->data()->attributes(
                                                     GeomDataAPI_Point2D::typeId());
@@ -1619,17 +1243,17 @@ std::shared_ptr<GeomDataAPI_Point2D> SketchPlugin_Split::getPointAttribute
       aLastPointAttr = anAttributePoint;
   }
 
-  /// find the points in coincident features
-  PntToAttributesMap aRefAttributes = myCashedReferences[aBaseObject];
-  PntToAttributesMap::const_iterator
+  // find the points in coincident features
+  const GeomAlgoAPI_ShapeTools::PointToRefsMap& aRefAttributes = myCashedReferences.at(aBaseObject);
+  GeomAlgoAPI_ShapeTools::PointToRefsMap::const_iterator
     aRIt = aRefAttributes.begin(), aRLast = aRefAttributes.end();
   for (; aRIt != aRLast; aRIt++) {
-    std::shared_ptr<GeomDataAPI_Point2D> anAttribute = aRIt->first;
-    std::shared_ptr<GeomAPI_Pnt> aPoint = aRIt->second;
+    const std::list<AttributePoint2DPtr>& anAttributes = aRIt->second.first;
+    GeomPointPtr aPoint = aRIt->first;
     if (!aFirstPointAttr.get() && aFirstPnt->isEqual(aPoint))
-      aFirstPointAttr = anAttribute;
+      aFirstPointAttr = anAttributes.front();
     if (!aLastPointAttr.get() && aLastPnt->isEqual(aPoint))
-      aLastPointAttr = anAttribute;
+      aLastPointAttr = anAttributes.front();
     if (aFirstPointAttr.get() && aLastPointAttr.get())
       break;
   }
@@ -1654,13 +1278,13 @@ std::string SketchPlugin_Split::getFeatureInfo(const std::shared_ptr<ModelAPI_Fe
   if (isUseAttributesInfo) {
     std::string aPointsInfo = ModelGeomAlgo_Point2D::getPontAttributesInfo(theFeature,
                                                              getEdgeAttributes(theFeature));
-    /// processing of feature with point 2d attributes, like line, arc, circle
+    // processing of feature with point 2d attributes, like line, arc, circle
     if (!aPointsInfo.empty()) {
       anInfo += ": ";
       anInfo += "\n";
       anInfo += aPointsInfo;
     }
-    else { /// process constraint coincidence, find points in ref attr attributes
+    else { // process constraint coincidence, find points in ref attr attributes
       std::list<AttributePtr> anAttrs = theFeature->data()->attributes(
                                                        ModelAPI_AttributeRefAttr::typeId());
       std::list<AttributePtr>::const_iterator anIt = anAttrs.begin(), aLast = anAttrs.end();

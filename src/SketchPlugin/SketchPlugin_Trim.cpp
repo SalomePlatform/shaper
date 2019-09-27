@@ -25,7 +25,6 @@
 #include <GeomAPI_XY.h>
 #include <GeomDataAPI_Point2D.h>
 #include <GeomAlgoAPI_ShapeTools.h>
-#include <GeomAlgoAPI_CompoundBuilder.h>
 
 #include <ModelAPI_AttributeReference.h>
 #include <ModelAPI_AttributeString.h>
@@ -52,8 +51,6 @@
 #include <SketchPlugin_MultiRotation.h>
 #include <SketchPlugin_MultiTranslation.h>
 #include <SketchPlugin_Point.h>
-#include <SketchPlugin_Projection.h>
-#include <SketchPlugin_Tools.h>
 
 #include <ModelAPI_EventReentrantMessage.h>
 
@@ -115,8 +112,10 @@ void SketchPlugin_Trim::findShapePoints(const std::string& theObjectAttributeId,
   std::shared_ptr<GeomAPI_Pnt> anAttributePnt = sketch()->to3D(anAttributePnt2d->x(),
                                                                anAttributePnt2d->y());
 
-  if (myCashedShapes.find(aBaseObject) == myCashedShapes.end())
-    fillObjectShapes(aBaseObject, sketch()->data()->owner(), myCashedShapes, myObjectToPoints);
+  if (myCashedShapes.find(aBaseObject) == myCashedShapes.end()) {
+    SketchPlugin_SegmentationTools::fillObjectShapes(
+        this, aBaseObject, myCashedShapes, myObjectToPoints);
+  }
 
   const std::set<GeomShapePtr>& aShapes = myCashedShapes[aBaseObject];
   if (!aShapes.empty()) {
@@ -163,12 +162,14 @@ std::shared_ptr<GeomAPI_Pnt2d> SketchPlugin_Trim::convertPoint(
   AttributeReferencePtr aBaseObjectAttr = std::dynamic_pointer_cast<ModelAPI_AttributeReference>(
                                         data()->attribute(SketchPlugin_Trim::SELECTED_OBJECT()));
   ObjectPtr aBaseObject = aBaseObjectAttr->value();
-  if (myObjectToPoints.find(aBaseObject) == myObjectToPoints.end())
-    fillObjectShapes(aBaseObject, sketch()->data()->owner(), myCashedShapes, myObjectToPoints);
+  if (myObjectToPoints.find(aBaseObject) == myObjectToPoints.end()) {
+    SketchPlugin_SegmentationTools::fillObjectShapes(
+        this, aBaseObject, myCashedShapes, myObjectToPoints);
+  }
 
   bool aFound = false;
-  const PointToRefsMap& aRefsMap = myObjectToPoints.at(aBaseObject);
-  for (PointToRefsMap::const_iterator aPointIt = aRefsMap.begin();
+  const GeomAlgoAPI_ShapeTools::PointToRefsMap& aRefsMap = myObjectToPoints.at(aBaseObject);
+  for (GeomAlgoAPI_ShapeTools::PointToRefsMap::const_iterator aPointIt = aRefsMap.begin();
        aPointIt != aRefsMap.end() && !aFound; aPointIt++) {
     if (aPointIt->first->isEqual(thePoint)) {
       const std::pair<std::list<AttributePoint2DPtr >,
@@ -252,7 +253,8 @@ void SketchPlugin_Trim::execute()
   // find references(attributes and features) to the base feature
   std::map<AttributePtr, std::list<AttributePtr> > aBaseRefAttributes;
   std::list<AttributePtr> aRefsToFeature;
-  getRefAttributes(aBaseFeature, aBaseRefAttributes, aRefsToFeature);
+  SketchPlugin_SegmentationTools::getRefAttributes(
+      aBaseFeature, aBaseRefAttributes, aRefsToFeature);
 #ifdef DEBUG_TRIM
   std::cout << "---- getRefAttributes ----" << std::endl;
   std::map<AttributePtr, std::list<AttributePtr> >::const_iterator
@@ -324,11 +326,13 @@ void SketchPlugin_Trim::execute()
   restoreCurrentFeature();
 
   // constraints to end points of trim feature
-  if (myObjectToPoints.find(aBaseObject) == myObjectToPoints.end())
-    fillObjectShapes(aBaseObject, sketch()->data()->owner(), myCashedShapes, myObjectToPoints);
+  if (myObjectToPoints.find(aBaseObject) == myObjectToPoints.end()) {
+    SketchPlugin_SegmentationTools::fillObjectShapes(
+        this, aBaseObject, myCashedShapes, myObjectToPoints);
+  }
 
   // create coincidence to objects, intersected the base object
-  const PointToRefsMap& aRefsMap = myObjectToPoints.at(aBaseObject);
+  const GeomAlgoAPI_ShapeTools::PointToRefsMap& aRefsMap = myObjectToPoints.at(aBaseObject);
   for (std::set<AttributePoint2DPtr>::const_iterator anIt = aFurtherCoincidences.begin(),
                                                      aLast = aFurtherCoincidences.end();
        anIt != aLast; anIt++) {
@@ -356,8 +360,8 @@ void SketchPlugin_Trim::execute()
       continue;
 
     std::pair<std::list<AttributePoint2DPtr >, std::list<ObjectPtr > > anInfo;
-    for (PointToRefsMap::const_iterator aRefIt = aRefsMap.begin(); aRefIt != aRefsMap.end();
-         aRefIt++)
+    for (GeomAlgoAPI_ShapeTools::PointToRefsMap::const_iterator aRefIt = aRefsMap.begin();
+         aRefIt != aRefsMap.end(); aRefIt++)
     {
       if (aRefIt->first->isEqual(aPoint)) {
         anInfo = aRefIt->second;
@@ -406,7 +410,7 @@ void SketchPlugin_Trim::execute()
     }
   }
 
-  updateRefAttConstraints(aBaseRefAttributes, aModifiedAttributes, aFeaturesToDelete);
+  SketchPlugin_SegmentationTools::updateRefAttConstraints(aBaseRefAttributes, aModifiedAttributes);
 
   // Wait all constraints being created, then send update events
   static Events_ID anUpdateEvent = Events_Loop::eventByName(EVENT_OBJECT_UPDATED);
@@ -429,7 +433,7 @@ void SketchPlugin_Trim::execute()
   ModelAPI_Tools::removeFeaturesAndReferences(aFeaturesToDelete);
   Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_DELETED));
 
-  updateFeaturesAfterTrim(aFeaturesToUpdate);
+  SketchPlugin_SegmentationTools::updateFeaturesAfterOperation(aFeaturesToUpdate);
 
   // Send events to update the sub-features by the solver.
   if(isUpdateFlushed) {
@@ -501,8 +505,10 @@ std::string SketchPlugin_Trim::processEvent(const std::shared_ptr<Events_Message
     std::shared_ptr<GeomAPI_Pnt2d> aPoint = aMessage->clickedPoint();
 
     if (anObject.get() && aPoint.get()) {
-      if (myCashedShapes.find(anObject) == myCashedShapes.end())
-        fillObjectShapes(anObject, sketch()->data()->owner(), myCashedShapes, myObjectToPoints);
+      if (myCashedShapes.find(anObject) == myCashedShapes.end()) {
+        SketchPlugin_SegmentationTools::fillObjectShapes(
+            this, anObject, myCashedShapes, myObjectToPoints);
+      }
       const std::set<GeomShapePtr>& aShapes = myCashedShapes[anObject];
       if (aShapes.size() > 1) {
         std::shared_ptr<ModelAPI_AttributeReference> aRefSelectedAttr =
@@ -525,7 +531,8 @@ std::string SketchPlugin_Trim::processEvent(const std::shared_ptr<Events_Message
 
         Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_UPDATED));
 
-        GeomShapePtr aSelectedShape = getSubShape(SELECTED_OBJECT(), SELECTED_POINT());
+        GeomShapePtr aSelectedShape = SketchPlugin_SegmentationTools::getSubShape(this,
+            SELECTED_OBJECT(), SELECTED_POINT(), myCashedShapes, myObjectToPoints);
   #ifdef DEBUG_TRIM_METHODS
         if (!aSelectedShape.get())
           std::cout << "Set empty selected object" << std::endl;
@@ -593,7 +600,7 @@ bool SketchPlugin_Trim::moveTangency(const AttributePtr& theAttribute,
   // get shape of the feature of the attribute
   FeaturePtr anAttributeFeature = ModelAPI_Feature::feature(aRefAttr->object());
   anAttributeFeature->execute(); // the modified value should be applyed to recompute shape
-  PointToRefsMap aPointToAttributeOrObject;
+  GeomAlgoAPI_ShapeTools::PointToRefsMap aPointToAttributeOrObject;
   std::list<FeaturePtr> aFeatures;
   aFeatures.push_back(anAttributeFeature);
   ModelGeomAlgo_Point2D::getPointsIntersectedShape(aTangentFeature, aFeatures,
@@ -623,102 +630,8 @@ bool SketchPlugin_Trim::moveTangency(const AttributePtr& theAttribute,
 
 AISObjectPtr SketchPlugin_Trim::getAISObject(AISObjectPtr thePrevious)
 {
-#ifdef DEBUG_TRIM_METHODS
-  std::cout << "SketchPlugin_Trim::getAISObject: " << data()->name() << std::endl;
-#endif
-
-  AISObjectPtr anAIS = thePrevious;
-
-  std::list<std::shared_ptr<GeomAPI_Shape> > aShapes;
-  GeomShapePtr aPreviewShape = getSubShape(PREVIEW_OBJECT(), PREVIEW_POINT());
-  if (aPreviewShape.get())
-    aShapes.push_back(aPreviewShape);
-  GeomShapePtr aSelectedShape = getSubShape(SELECTED_OBJECT(), SELECTED_POINT());
-  if (aSelectedShape.get())
-    aShapes.push_back(aSelectedShape);
-
-  if (aShapes.empty())
-    return AISObjectPtr();
-
-  GeomShapePtr aBaseShape = GeomAlgoAPI_CompoundBuilder::compound(aShapes);
-  if (!aBaseShape.get())
-    return AISObjectPtr();
-
-  if (aBaseShape.get()) {
-    if (!anAIS)
-      anAIS = AISObjectPtr(new GeomAPI_AISObject);
-    anAIS->createShape(aBaseShape);
-
-    std::vector<int> aColor;
-    aColor = Config_PropManager::color("Visualization", "operation_remove_feature_color");
-    double aWidth = SketchPlugin_SketchEntity::SKETCH_LINE_WIDTH();
-    int aLineStyle = SketchPlugin_SketchEntity::SKETCH_LINE_STYLE();
-    anAIS->setColor(aColor[0], aColor[1], aColor[2]);
-    // width when there is not base object should be extened in several points
-    // in order to see this preview over highlight
-    anAIS->setWidth(aWidth+4);
-    anAIS->setLineStyle(aLineStyle);
-  }
-  else
-    anAIS = AISObjectPtr();
-
-  return anAIS;
-}
-
-GeomShapePtr SketchPlugin_Trim::getSubShape(const std::string& theObjectAttributeId,
-                                            const std::string& thePointAttributeId)
-{
-  GeomShapePtr aBaseShape;
-
-  AttributeReferencePtr anObjectAttr = std::dynamic_pointer_cast<ModelAPI_AttributeReference>(
-                                                       data()->attribute(theObjectAttributeId));
-  ObjectPtr aBaseObject = anObjectAttr->value();
-  if (!aBaseObject.get())
-    return aBaseShape;
-
-  // point on feature
-  AttributePoint2DPtr aPointAttr = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
-                                           data()->attribute(thePointAttributeId));
-  std::shared_ptr<GeomAPI_Pnt2d> anAttributePnt2d = aPointAttr->pnt();
-  std::shared_ptr<GeomAPI_Pnt> anAttributePnt = sketch()->to3D(anAttributePnt2d->x(),
-                                                               anAttributePnt2d->y());
-
-  if (myCashedShapes.find(aBaseObject) == myCashedShapes.end())
-    fillObjectShapes(aBaseObject, sketch()->data()->owner(), myCashedShapes, myObjectToPoints);
-
-  const std::set<GeomShapePtr>& aShapes = myCashedShapes[aBaseObject];
-  if (!aShapes.empty()) {
-    std::set<GeomShapePtr>::const_iterator anIt = aShapes.begin(), aLast = aShapes.end();
-    for (; anIt != aLast; anIt++) {
-      GeomShapePtr aShape = *anIt;
-      std::shared_ptr<GeomAPI_Pnt> aProjectedPoint;
-      if (ModelGeomAlgo_Point2D::isPointOnEdge(aShape, anAttributePnt, aProjectedPoint))
-        aBaseShape = aShape;
-    }
-  }
-  return aBaseShape;
-}
-
-void SketchPlugin_Trim::getFeaturePoints(const FeaturePtr& theFeature,
-                                         AttributePoint2DPtr& theStartPointAttr,
-                                         AttributePoint2DPtr& theEndPointAttr)
-{
-  std::string aFeatureKind = theFeature->getKind();
-  std::string aStartAttributeName, anEndAttributeName;
-  if (aFeatureKind == SketchPlugin_Line::ID()) {
-    aStartAttributeName = SketchPlugin_Line::START_ID();
-    anEndAttributeName = SketchPlugin_Line::END_ID();
-  }
-  else if (aFeatureKind == SketchPlugin_Arc::ID()) {
-    aStartAttributeName = SketchPlugin_Arc::START_ID();
-    anEndAttributeName = SketchPlugin_Arc::END_ID();
-  }
-  if (!aStartAttributeName.empty() && !anEndAttributeName.empty()) {
-    theStartPointAttr = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
-                                         theFeature->attribute(aStartAttributeName));
-    theEndPointAttr = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
-                                         theFeature->attribute(anEndAttributeName));
-  }
+  return SketchPlugin_SegmentationTools::getAISObject(thePrevious,
+      this, PREVIEW_OBJECT(), PREVIEW_POINT(), SELECTED_OBJECT(), SELECTED_POINT());
 }
 
 void SketchPlugin_Trim::getConstraints(std::set<FeaturePtr>& theFeaturesToDelete,
@@ -752,86 +665,6 @@ void SketchPlugin_Trim::getConstraints(std::set<FeaturePtr>& theFeaturesToDelete
       theFeaturesToDelete.insert(aRefFeature);
     else if (aRefFeatureKind == SketchPlugin_ConstraintLength::ID())
       theFeaturesToUpdate.insert(aRefFeature);
-  }
-}
-
-void SketchPlugin_Trim::getRefAttributes(const FeaturePtr& theFeature,
-                                    std::map<AttributePtr, std::list<AttributePtr> >& theRefs,
-                                    std::list<AttributePtr>& theRefsToFeature)
-{
-  theRefs.clear();
-
-  std::list<AttributePtr> aPointAttributes =
-    theFeature->data()->attributes(GeomDataAPI_Point2D::typeId());
-  std::set<AttributePtr> aPointAttributesSet;
-
-  std::list<AttributePtr>::const_iterator aPIt =
-    aPointAttributes.begin(), aPLast = aPointAttributes.end();
-  for (; aPIt != aPLast; aPIt++)
-    aPointAttributesSet.insert(*aPIt);
-
-  std::set<AttributePtr> aRefsAttributes = getFeatureResult(theFeature)->data()->refsToMe();
-  std::set<AttributePtr> aFRefsList = theFeature->data()->refsToMe();
-  aRefsAttributes.insert(aFRefsList.begin(), aFRefsList.end());
-
-  std::set<AttributePtr>::const_iterator aIt;
-  for (aIt = aRefsAttributes.cbegin(); aIt != aRefsAttributes.cend(); ++aIt) {
-    AttributePtr anAttr = (*aIt);
-    FeaturePtr anAttrFeature = ModelAPI_Feature::feature(anAttr->owner());
-    if (anAttrFeature.get() != this &&
-        anAttr.get() && anAttr->attributeType() == ModelAPI_AttributeRefAttr::typeId()) {
-      AttributeRefAttrPtr aRefAttr = std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(anAttr);
-      if (!aRefAttr->isObject()) { /// find attributes referenced to feature point attributes
-        AttributePtr anAttrInRef = aRefAttr->attr();
-        if (anAttrInRef.get() &&
-            aPointAttributesSet.find(anAttrInRef) != aPointAttributesSet.end()) {
-          if (theRefs.find(anAttrInRef) != theRefs.end())
-            theRefs[anAttrInRef].push_back(aRefAttr);
-          else {
-            std::list<AttributePtr> anAttrList;
-            anAttrList.push_back(aRefAttr);
-            theRefs[anAttrInRef] = anAttrList;
-          }
-        }
-      }
-      else { /// find attributes referenced to feature itself
-        theRefsToFeature.push_back(anAttr);
-      }
-    }
-  }
-}
-
-void SketchPlugin_Trim::updateRefAttConstraints(
-                    const std::map<AttributePtr, std::list<AttributePtr> >& theBaseRefAttributes,
-                    const std::set<std::pair<AttributePtr, AttributePtr> >& theModifiedAttributes,
-                    std::set<FeaturePtr>& theFeaturesToDelete)
-{
-#ifdef DEBUG_TRIM
-  std::cout << "SketchPlugin_Trim::updateRefAttConstraints" << std::endl;
-#endif
-
-  std::set<std::pair<AttributePtr, AttributePtr> >::const_iterator
-    anIt = theModifiedAttributes.begin(),  aLast = theModifiedAttributes.end();
-  for (; anIt != aLast; anIt++) {
-    AttributePtr anAttribute = anIt->first;
-
-    /// not found in references
-    if (theBaseRefAttributes.find(anAttribute) == theBaseRefAttributes.end())
-      continue;
-    std::list<AttributePtr> aRefAttributes = theBaseRefAttributes.at(anAttribute);
-    std::list<AttributePtr>::const_iterator aRefIt = aRefAttributes.begin(),
-                                            aRLast = aRefAttributes.end();
-
-    AttributePtr aNewAttribute = anIt->second;
-    if (aNewAttribute.get()) {
-      for (; aRefIt != aRLast; aRefIt++) {
-        AttributeRefAttrPtr aRefAttr =
-                        std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(*aRefIt);
-        if (aRefAttr.get()) {
-            aRefAttr->setAttr(aNewAttribute);
-        }
-      }
-    }
   }
 }
 
@@ -870,27 +703,6 @@ void SketchPlugin_Trim::removeReferencesToAttribute(const AttributePtr& theAttri
   Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_DELETED));
 }
 
-void SketchPlugin_Trim::updateFeaturesAfterTrim(const std::set<FeaturePtr>& theFeaturesToUpdate)
-{
-  std::set<FeaturePtr>::const_iterator anIt = theFeaturesToUpdate.begin(),
-                                       aLast = theFeaturesToUpdate.end();
-  for (; anIt != aLast; anIt++) {
-    FeaturePtr aRefFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(*anIt);
-    std::string aRefFeatureKind = aRefFeature->getKind();
-    if (aRefFeatureKind == SketchPlugin_ConstraintLength::ID()) {
-      std::shared_ptr<SketchPlugin_ConstraintLength> aLenghtFeature =
-                              std::dynamic_pointer_cast<SketchPlugin_ConstraintLength>(*anIt);
-      if (aLenghtFeature.get()) {
-        std::shared_ptr<ModelAPI_AttributeDouble> aValueAttr = std::dynamic_pointer_cast<
-            ModelAPI_AttributeDouble>(aLenghtFeature->attribute(SketchPlugin_Constraint::VALUE()));
-        double aValue;
-        if (aLenghtFeature->computeLenghtValue(aValue) && aValueAttr.get())
-          aValueAttr->setValue(aValue);
-      }
-    }
-  }
-}
-
 FeaturePtr SketchPlugin_Trim::trimLine(const std::shared_ptr<GeomAPI_Pnt2d>& theStartShapePoint,
                   const std::shared_ptr<GeomAPI_Pnt2d>& theLastShapePoint,
                   std::map<AttributePtr, std::list<AttributePtr> >& theBaseRefAttributes,
@@ -907,7 +719,8 @@ FeaturePtr SketchPlugin_Trim::trimLine(const std::shared_ptr<GeomAPI_Pnt2d>& the
 
   /// points of trim
   AttributePoint2DPtr aStartPointAttrOfBase, anEndPointAttrOfBase;
-  getFeaturePoints(aBaseFeature, aStartPointAttrOfBase, anEndPointAttrOfBase);
+  SketchPlugin_SegmentationTools::getFeaturePoints(
+      aBaseFeature, aStartPointAttrOfBase, anEndPointAttrOfBase);
 
   std::shared_ptr<GeomAPI_Pnt2d> aStartFeaturePoint = aStartPointAttrOfBase->pnt();
   std::shared_ptr<GeomAPI_Pnt2d> aLastFeaturePoint = anEndPointAttrOfBase->pnt();
@@ -997,7 +810,8 @@ FeaturePtr SketchPlugin_Trim::trimArc(const std::shared_ptr<GeomAPI_Pnt2d>& theS
 
   /// points of trim
   AttributePoint2DPtr aStartPointAttrOfBase, anEndPointAttrOfBase;
-  getFeaturePoints(aBaseFeature, aStartPointAttrOfBase, anEndPointAttrOfBase);
+  SketchPlugin_SegmentationTools::getFeaturePoints(
+      aBaseFeature, aStartPointAttrOfBase, anEndPointAttrOfBase);
 
   std::shared_ptr<GeomAPI_Pnt2d> aStartArcPoint = aStartPointAttrOfBase->pnt();
   std::shared_ptr<GeomAPI_Pnt2d> aLastArcPoint = anEndPointAttrOfBase->pnt();
@@ -1304,59 +1118,4 @@ std::shared_ptr<ModelAPI_Result> SketchPlugin_Trim::getFeatureResult(
     aResult = theFeature->lastResult();
 
   return aResult;
-}
-
-//********************************************************************
-void SketchPlugin_Trim::fillObjectShapes(const ObjectPtr& theObject,
-                const ObjectPtr& theSketch,
-                std::map<ObjectPtr, std::set<GeomShapePtr> >& theCashedShapes,
-                std::map<ObjectPtr, PointToRefsMap>& theObjectToPoints)
-{
-  PointToRefsMap aPointsInfo;
-
-  std::set<std::shared_ptr<GeomAPI_Shape> > aShapes;
-  std::map<std::shared_ptr<GeomAPI_Pnt>,
-                           std::list< AttributePoint2DPtr > > aPointToAttributes;
-  std::map<std::shared_ptr<GeomAPI_Pnt>,
-                           std::list< ObjectPtr > > aPointToObjects;
-
-  std::set<AttributePoint2DPtr > aRefAttributes;
-  // current feature
-  FeaturePtr aFeature = ModelAPI_Feature::feature(theObject);
-  std::set<ResultPtr> anEdgeShapes;
-  // edges on feature
-  ModelGeomAlgo_Shape::shapesOfType(aFeature, GeomAPI_Shape::EDGE, anEdgeShapes);
-  if (!anEdgeShapes.empty()) {
-    GeomShapePtr aFeatureShape = (*anEdgeShapes.begin())->shape();
-
-    // coincidences to the feature
-    ModelGeomAlgo_Point2D::getPointsOfReference(aFeature, SketchPlugin_ConstraintCoincidence::ID(),
-                         aRefAttributes, SketchPlugin_Point::ID(), SketchPlugin_Point::COORD_ID());
-    // layed on feature coincidences to divide it on several shapes
-    std::shared_ptr<ModelAPI_Data> aData = theSketch->data();
-    std::shared_ptr<GeomDataAPI_Point> aC = std::dynamic_pointer_cast<GeomDataAPI_Point>(
-        aData->attribute(SketchPlugin_Sketch::ORIGIN_ID()));
-    std::shared_ptr<GeomDataAPI_Dir> aX = std::dynamic_pointer_cast<GeomDataAPI_Dir>(
-        aData->attribute(SketchPlugin_Sketch::DIRX_ID()));
-    std::shared_ptr<GeomDataAPI_Dir> aNorm = std::dynamic_pointer_cast<GeomDataAPI_Dir>(
-        aData->attribute(SketchPlugin_Sketch::NORM_ID()));
-    std::shared_ptr<GeomAPI_Dir> aY(new GeomAPI_Dir(aNorm->dir()->cross(aX->dir())));
-
-    ModelGeomAlgo_Point2D::getPointsInsideShape(aFeatureShape, aRefAttributes, aC->pnt(),
-                                                aX->dir(), aY, aPointsInfo);
-
-    std::list<FeaturePtr> aFeatures;
-    CompositeFeaturePtr aSketchComposite =
-                         std::dynamic_pointer_cast<ModelAPI_CompositeFeature>(theSketch);
-    for (int i = 0; i < aSketchComposite->numberOfSubs(); i++) {
-      FeaturePtr aFeature = aSketchComposite->subFeature(i);
-      if (aFeature.get() && aFeature->getKind() != SketchPlugin_Projection::ID())
-        aFeatures.push_back(aFeature);
-    }
-    ModelGeomAlgo_Point2D::getPointsIntersectedShape(aFeature, aFeatures, aPointsInfo);
-
-    GeomAlgoAPI_ShapeTools::splitShape(aFeatureShape, aPointsInfo, aShapes);
-  }
-  theObjectToPoints[theObject] = aPointsInfo;
-  theCashedShapes[theObject] = aShapes;
 }

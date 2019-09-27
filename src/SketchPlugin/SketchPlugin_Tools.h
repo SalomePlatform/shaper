@@ -25,7 +25,14 @@
 #include <ModelAPI_Feature.h>
 #include <ModelAPI_Attribute.h>
 #include <ModelAPI_AttributeRefAttr.h>
+#include <GeomAPI_Shape.h>
 #include <GeomDataAPI_Point2D.h>
+#include <GeomAlgoAPI_ShapeTools.h>
+
+#include <list>
+#include <map>
+
+class GeomAPI_AISObject;
 
 class SketchPlugin_Constraint;
 class SketchPlugin_Feature;
@@ -132,5 +139,73 @@ void convertRefAttrToPointOrTangentCurve(const AttributeRefAttrPtr&      theRefA
 /// Calculate global coordinates for flyout point of Length constraint
 GeomPnt2dPtr flyoutPointCoordinates(const std::shared_ptr<SketchPlugin_Constraint>& theConstraint);
 }; // namespace SketchPlugin_Tools
+
+namespace SketchPlugin_SegmentationTools
+{
+  /// Returns geom point attribute of the feature bounds. It processes line or arc.
+  /// For circle/ellipse feature, the result attributes are null
+  /// \param theFeature        a source feature
+  /// \param theStartPointAttr an out attribute to start point
+  /// \param theEndPointAttr   an out attribute to end point
+  void getFeaturePoints(const FeaturePtr& theFeature,
+                        std::shared_ptr<GeomDataAPI_Point2D>& theStartPointAttr,
+                        std::shared_ptr<GeomDataAPI_Point2D>& theEndPointAttr);
+
+  /// Obtains references to feature point attributes and to feature,
+  /// e.g. for feature line: 1st container is
+  ///             <1st line point, list<entity_a in distance, entity_b in parallel> >
+  ///             <2nd line point, list<> >
+  ///      for feature circle 2nd container is <entity_a in Radius, entity_b in equal, ...>
+  /// \param theFeature an investigated feature
+  /// \param theRefs a container of list of referenced attributes
+  /// \param theRefsToFeature references to the feature result
+  void getRefAttributes(const FeaturePtr& theFeature,
+                        std::map<AttributePtr, std::list<AttributePtr> >& theRefs,
+                        std::list<AttributePtr>& theRefsToFeature);
+
+  /// Obtains a part of shape selected/highlighted in the viewer for Split/Trim operation
+  /// \param[in] theFeature            Split/Trim feature
+  /// \param[in] theObjectAttributeId  name of attribute containing selected object
+  /// \param[in] thePointAttributeId   name of attribute containing point selected on the object
+  GeomShapePtr getSubShape(
+      SketchPlugin_Feature* theFeature,
+      const std::string& theObjectAttributeId,
+      const std::string& thePointAttributeId,
+      std::map<ObjectPtr, std::set<GeomShapePtr> >& theCashedShapes,
+      std::map<ObjectPtr, GeomAlgoAPI_ShapeTools::PointToRefsMap>& theObjectToPoints);
+
+  /// Fulfill an internal containers by shapes obtained from the parameter object
+  /// Shapes are results of Split/Trim operation by points coincident to shape of the object
+  /// \param theOpFeture an operation feature (Split/Trim)
+  /// \param theObject a source object (will be splitted)
+  void fillObjectShapes(
+      SketchPlugin_Feature* theOpFeature,
+      const ObjectPtr& theObject,
+      std::map<ObjectPtr, std::set<GeomShapePtr> >& theCashedShapes,
+      std::map<ObjectPtr, GeomAlgoAPI_ShapeTools::PointToRefsMap>& theObjectToPoints);
+
+  /// AIS object for selected/highlighted part of splitting/triming feature
+  /// \param[in] thePrevious  previous presentation
+  /// \param[in] theOpFeture  an operation feature (Split/Trim)
+  std::shared_ptr<GeomAPI_AISObject> getAISObject(std::shared_ptr<GeomAPI_AISObject> thePrevious,
+                                                  SketchPlugin_Feature* theOpFeature,
+                                                  const std::string& thePreviewObjectAttrName,
+                                                  const std::string& thePreviewPointAttrName,
+                                                  const std::string& theSelectedObjectAttrName,
+                                                  const std::string& theSelectedPointAttrName);
+
+  /// Move constraints from attribute of base feature to attribute after modification
+  /// \param theBaseRefAttributes container of references to the attributes of base feature
+  /// \param theModifiedAttributes container of attributes placed instead of base attributes
+  /// at the same place
+  void updateRefAttConstraints(
+      const std::map<AttributePtr, std::list<AttributePtr> >& theBaseRefAttributes,
+      const std::set<std::pair<AttributePtr, AttributePtr> >& theModifiedAttributes);
+
+  /// Updates line length if it exist in the list
+  /// \param theFeaturesToUpdate a constraint index
+  void updateFeaturesAfterOperation(const std::set<FeaturePtr>& theFeaturesToUpdate);
+
+}; // namespace SketchPlugin_SegmentationTools
 
 #endif // SKETCHPLUGIN_TOOLS_H_

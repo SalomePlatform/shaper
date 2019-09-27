@@ -26,6 +26,7 @@
 #include <Geom_Ellipse.hxx>
 #include <Geom_Line.hxx>
 #include <Geom_TrimmedCurve.hxx>
+#include <GeomAPI_ProjectPointOnCurve.hxx>
 #include <BRep_Tool.hxx>
 #include <TopoDS_Edge.hxx>
 #include <TopoDS.hxx>
@@ -101,6 +102,25 @@ GeomCurvePtr GeomAPI_Curve::basisCurve() const
   return aNewCurve;
 }
 // LCOV_EXCL_STOP
+
+
+const std::shared_ptr<GeomAPI_Pnt> GeomAPI_Curve::project(
+    const std::shared_ptr<GeomAPI_Pnt>& thePoint) const
+{
+  std::shared_ptr<GeomAPI_Pnt> aResult;
+  if (MY_CURVE.IsNull())
+    return aResult;
+
+  const gp_Pnt& aPoint = thePoint->impl<gp_Pnt>();
+
+  GeomAPI_ProjectPointOnCurve aProj(aPoint, MY_CURVE);
+  Standard_Integer aNbPoint = aProj.NbPoints();
+  if (aNbPoint > 0) {
+    gp_Pnt aNearest = aProj.NearestPoint();
+    aResult = GeomPointPtr(new GeomAPI_Pnt(aNearest.X(), aNearest.Y(), aNearest.Z()));
+  }
+  return aResult;
+}
 
 // ================================================================================================
 

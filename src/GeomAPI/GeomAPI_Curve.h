@@ -82,6 +82,10 @@ class GeomAPI_Curve : public GeomAPI_Interface
   GEOMAPI_EXPORT
   std::shared_ptr<GeomAPI_Pnt> getPoint(double theParam);
 
+  /// Project point on curve
+  GEOMAPI_EXPORT const std::shared_ptr<GeomAPI_Pnt> project(
+      const std::shared_ptr<GeomAPI_Pnt>& thePoint) const;
+
 public:
   /// \brief Compare addresses of curves
   class Comparator
