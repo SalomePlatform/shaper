@@ -151,10 +151,19 @@ private:
 
   /// Make the base object is splitted by the point attributes
   /// \param thePoints a list of points where coincidences will be build
-  FeaturePtr trimCircle(const std::shared_ptr<GeomAPI_Pnt2d>& theStartShapePoint,
-                  const std::shared_ptr<GeomAPI_Pnt2d>& theLastShapePoint,
-                  std::set<std::shared_ptr<GeomDataAPI_Point2D> >& thePoints,
-                  std::set<std::pair<AttributePtr, AttributePtr>>& theModifiedAttributes);
+  /// \return new elliptic arc if it was created
+  FeaturePtr trimEllipticArc(const std::shared_ptr<GeomAPI_Pnt2d>& theStartShapePoint,
+               const std::shared_ptr<GeomAPI_Pnt2d>& theLastShapePoint,
+               std::map<AttributePtr, std::list<AttributePtr> >& theBaseRefAttributes,
+               std::set<std::shared_ptr<GeomDataAPI_Point2D> >& thePoints,
+               std::set<std::pair<AttributePtr, AttributePtr>>& theModifiedAttributes);
+
+  /// Make the base object is splitted by the point attributes
+  /// \param thePoints a list of points where coincidences will be build
+  FeaturePtr trimClosed(const std::shared_ptr<GeomAPI_Pnt2d>& theStartShapePoint,
+                        const std::shared_ptr<GeomAPI_Pnt2d>& theLastShapePoint,
+                        std::set<std::shared_ptr<GeomDataAPI_Point2D> >& thePoints,
+                        std::set<std::pair<AttributePtr, AttributePtr>>& theModifiedAttributes);
 
   /// Correct the first and the second point to provide condition that the first is closer to
   /// the start point and the second point - to the last end of current segment. To rearrange
@@ -193,28 +202,6 @@ private:
   /// \param thePoint a point value
   void fillPointAttribute(const AttributePtr& theModifiedAttribute,
                           const std::shared_ptr<GeomAPI_Pnt2d>& thePoint);
-
-  /// Creates a line feature filled by center of base feature and given points
-  /// \param theBaseFeature another arc feature
-  /// \param theFirstAttribute an attribute with coordinates for the start point
-  /// \param theSecondAttribute an attribute with coordinates for the end point
-  FeaturePtr createLineFeature(const FeaturePtr& theBaseFeature,
-                               const std::shared_ptr<GeomAPI_Pnt2d>& theFirstPoint,
-                               const std::shared_ptr<GeomAPI_Pnt2d>& theSecondPoint);
-
-  /// Creates an arc feature filled by center of base feature and given points
-  /// \param theBaseFeature another arc feature
-  /// \param theFirstAttribute an attribute with coordinates for the start point
-  /// \param theSecondAttribute an attribute with coordinates for the end point
-  FeaturePtr createArcFeature(const FeaturePtr& theBaseFeature,
-                              const std::shared_ptr<GeomAPI_Pnt2d>& theFirstPoint,
-                              const std::shared_ptr<GeomAPI_Pnt2d>& theSecondPoint);
-
-  /// Result result of the feature to build constraint with. For arc, circle it is an edge result.
-  /// \param theFeature a feature
-  /// \return result object
-  std::shared_ptr<ModelAPI_Result> getFeatureResult(
-                                    const std::shared_ptr<ModelAPI_Feature>& theFeature);
 
 private:
   void findShapePoints(const std::string& theObjectAttributeId,

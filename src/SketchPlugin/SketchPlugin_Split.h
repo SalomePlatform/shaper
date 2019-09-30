@@ -196,8 +196,22 @@ private:
   /// \param theAfterFeature a feature between last point of split feature and the end point
   /// \param thePoints a list of points where coincidences will be build
   /// \param theCreatedFeatures a container of created features
+  /// \return new elliptic arc if it was created
+  FeaturePtr splitEllipticArc(std::shared_ptr<ModelAPI_Feature>& theSplitFeature,
+                std::shared_ptr<ModelAPI_Feature>& theBeforeFeature,
+                std::shared_ptr<ModelAPI_Feature>& theAfterFeature,
+                std::set<std::shared_ptr<GeomDataAPI_Point2D> >& thePoints,
+                std::set<std::shared_ptr<ModelAPI_Feature>>& theCreatedFeatures,
+                std::set<std::pair<AttributePtr, AttributePtr>>& theModifiedAttributes);
+
+  /// Make the base object is splitted by the point attributes
+  /// \param theSplitFeature a result split feature
+  /// \param theBeforeFeature a feature between start point and the 1st point of split feature
+  /// \param theAfterFeature a feature between last point of split feature and the end point
+  /// \param thePoints a list of points where coincidences will be build
+  /// \param theCreatedFeatures a container of created features
   /// \return new arc if it was created
-  FeaturePtr splitCircle(std::shared_ptr<ModelAPI_Feature>& theSplitFeature,
+  FeaturePtr splitClosed(std::shared_ptr<ModelAPI_Feature>& theSplitFeature,
                    std::shared_ptr<ModelAPI_Feature>& theBeforeFeature,
                    std::shared_ptr<ModelAPI_Feature>& theAfterFeature,
                    std::set<std::shared_ptr<GeomDataAPI_Point2D> >& thePoints,
@@ -235,22 +249,6 @@ private:
   /// \param theSourceAttribute an attribute of GeomDataAPI_Point2D to obtain data
   void fillAttribute(const AttributePtr& theModifiedAttribute,
                      const AttributePtr& theSourceAttribute);
-
-  /// Creates a line feature filled by center of base feature and given points
-  /// \param theBaseFeature another arc feature
-  /// \param theFirstAttribute an attribute with coordinates for the start point
-  /// \param theSecondAttribute an attribute with coordinates for the end point
-  FeaturePtr createLineFeature(const FeaturePtr& theBaseFeature,
-                               const AttributePtr& theFirstPointAttr,
-                               const AttributePtr& theSecondPointAttr);
-
-  /// Creates an arc feature filled by center of base feature and given points
-  /// \param theBaseFeature another arc feature
-  /// \param theFirstAttribute an attribute with coordinates for the start point
-  /// \param theSecondAttribute an attribute with coordinates for the end point
-  FeaturePtr createArcFeature(const FeaturePtr& theBaseFeature,
-                              const AttributePtr& theFirstPointAttr,
-                              const AttributePtr& theSecondPointAttr);
 
   /// Returns attributes of the feature, used in edge build, for arc it is end and start points
   /// \param theFeature a feature

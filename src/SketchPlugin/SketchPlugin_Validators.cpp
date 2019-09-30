@@ -965,6 +965,8 @@ bool SketchPlugin_SplitValidator::isValid(const AttributePtr& theAttribute,
   GeomShapePtr anAttrShape = (*anEdgeShapes.begin())->shape();
   std::shared_ptr<SketchPlugin_Feature> aSFeature =
                                 std::dynamic_pointer_cast<SketchPlugin_Feature>(anAttrFeature);
+  if (!aSFeature)
+    return false;
   SketchPlugin_Sketch* aSketch = aSFeature->sketch();
 
   std::shared_ptr<ModelAPI_Data> aData = aSketch->data();

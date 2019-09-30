@@ -77,6 +77,10 @@ static ConstraintWrapperPtr
                                 std::shared_ptr<PlaneGCSSolver_PointWrapper> thePoint,
                                 std::shared_ptr<PlaneGCSSolver_EdgeWrapper> theEntity);
 static ConstraintWrapperPtr
+  createConstraintPointsCollinear(std::shared_ptr<PlaneGCSSolver_PointWrapper> thePoint1,
+                                  std::shared_ptr<PlaneGCSSolver_PointWrapper> thePoint2,
+                                  std::shared_ptr<PlaneGCSSolver_PointWrapper> thePoint3);
+static ConstraintWrapperPtr
   createConstraintDistancePointPoint(std::shared_ptr<PlaneGCSSolver_ScalarWrapper> theValue,
                                      std::shared_ptr<PlaneGCSSolver_PointWrapper> thePoint1,
                                      std::shared_ptr<PlaneGCSSolver_PointWrapper> thePoint2);
@@ -194,13 +198,15 @@ ConstraintWrapperPtr PlaneGCSSolver_Tools::createConstraint(
 
   std::shared_ptr<PlaneGCSSolver_PointWrapper> aPoint1 = GCS_POINT_WRAPPER(thePoint1);
   std::shared_ptr<PlaneGCSSolver_PointWrapper> aPoint2 = GCS_POINT_WRAPPER(thePoint2);
+  std::shared_ptr<PlaneGCSSolver_EdgeWrapper> anEntity1 = GCS_EDGE_WRAPPER(theEntity1);
 
   switch (theType) {
   case CONSTRAINT_PT_PT_COINCIDENT:
     aResult = createConstraintCoincidence(aPoint1, aPoint2);
     break;
   case CONSTRAINT_PT_ON_CURVE:
-    aResult = createConstraintPointOnEntity(theType, aPoint1, GCS_EDGE_WRAPPER(theEntity1));
+    aResult = anEntity1 ? createConstraintPointOnEntity(theType, aPoint1, anEntity1):
+              createConstraintPointsCollinear(aPoint1, aPoint2, GCS_POINT_WRAPPER(theEntity1));
     break;
   case CONSTRAINT_MIDDLE_POINT:
     aResult = createConstraintMiddlePoint(aPoint1, GCS_EDGE_WRAPPER(theEntity1), aPoint2);
@@ -211,34 +217,31 @@ ConstraintWrapperPtr PlaneGCSSolver_Tools::createConstraint(
   case CONSTRAINT_PT_LINE_DISTANCE:
     aResult = createConstraintDistancePointLine(GCS_SCALAR_WRAPPER(theValue),
                                                 aPoint1,
-                                                GCS_EDGE_WRAPPER(theEntity1));
+                                                anEntity1);
     break;
   case CONSTRAINT_HORIZONTAL_DISTANCE:
   case CONSTRAINT_VERTICAL_DISTANCE:
     aResult = createConstraintHVDistance(theType, GCS_SCALAR_WRAPPER(theValue), aPoint1, aPoint2);
     break;
   case CONSTRAINT_RADIUS:
-    aResult = createConstraintRadius(GCS_SCALAR_WRAPPER(theValue),
-                                     GCS_EDGE_WRAPPER(theEntity1));
+    aResult = createConstraintRadius(GCS_SCALAR_WRAPPER(theValue), anEntity1);
     break;
   case CONSTRAINT_ANGLE:
     aResult = createConstraintAngle(theConstraint,
                   GCS_SCALAR_WRAPPER(theValue),
-                  GCS_EDGE_WRAPPER(theEntity1), GCS_EDGE_WRAPPER(theEntity2));
+                  anEntity1, GCS_EDGE_WRAPPER(theEntity2));
     break;
   case CONSTRAINT_FIXED:
     break;
   case CONSTRAINT_HORIZONTAL:
   case CONSTRAINT_VERTICAL:
-    aResult = createConstraintHorizVert(theType, GCS_EDGE_WRAPPER(theEntity1));
+    aResult = createConstraintHorizVert(theType, anEntity1);
     break;
   case CONSTRAINT_PARALLEL:
-    aResult = createConstraintParallel(GCS_EDGE_WRAPPER(theEntity1),
-                                       GCS_EDGE_WRAPPER(theEntity2));
+    aResult = createConstraintParallel(anEntity1, GCS_EDGE_WRAPPER(theEntity2));
     break;
   case CONSTRAINT_PERPENDICULAR:
-    aResult = createConstraintPerpendicular(GCS_EDGE_WRAPPER(theEntity1),
-                                            GCS_EDGE_WRAPPER(theEntity2));
+    aResult = createConstraintPerpendicular(anEntity1, GCS_EDGE_WRAPPER(theEntity2));
     break;
   case CONSTRAINT_EQUAL_LINES:
   case CONSTRAINT_EQUAL_ELLIPSES:
@@ -246,7 +249,7 @@ ConstraintWrapperPtr PlaneGCSSolver_Tools::createConstraint(
   case CONSTRAINT_EQUAL_LINE_ARC:
   case CONSTRAINT_EQUAL_RADIUS:
     aResult = createConstraintEqual(theType,
-                                    GCS_EDGE_WRAPPER(theEntity1),
+                                    anEntity1,
                                     GCS_EDGE_WRAPPER(theEntity2),
                                     anIntermediate);
     break;
@@ -448,6 +451,17 @@ ConstraintWrapperPtr createConstraintPointOnEntity(
   }
 
   return ConstraintWrapperPtr(new PlaneGCSSolver_ConstraintWrapper(aNewConstr, theType));
+}
+
+ConstraintWrapperPtr createConstraintPointsCollinear(
+    std::shared_ptr<PlaneGCSSolver_PointWrapper> thePoint1,
+    std::shared_ptr<PlaneGCSSolver_PointWrapper> thePoint2,
+    std::shared_ptr<PlaneGCSSolver_PointWrapper> thePoint3)
+{
+  GCSConstraintPtr aNewConstr(new GCS::ConstraintPointOnLine(
+      *(thePoint1->point()), *(thePoint2->point()), *(thePoint3->point())));
+  return ConstraintWrapperPtr(
+      new PlaneGCSSolver_ConstraintWrapper(aNewConstr, CONSTRAINT_PT_ON_CURVE));
 }
 
 ConstraintWrapperPtr createConstraintMiddlePoint(

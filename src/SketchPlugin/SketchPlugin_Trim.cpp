@@ -47,6 +47,8 @@
 #include <SketchPlugin_ConstraintLength.h>
 #include <SketchPlugin_ConstraintMirror.h>
 #include <SketchPlugin_ConstraintCollinear.h>
+#include <SketchPlugin_Ellipse.h>
+#include <SketchPlugin_EllipticArc.h>
 #include <SketchPlugin_Line.h>
 #include <SketchPlugin_MultiRotation.h>
 #include <SketchPlugin_MultiTranslation.h>
@@ -64,6 +66,7 @@
 
 #include <cmath>
 
+#define DEBUG_TRIM
 #ifdef DEBUG_TRIM
 #include <iostream>
 #endif
@@ -304,8 +307,9 @@ void SketchPlugin_Trim::execute()
   std::set<std::pair<AttributePtr, AttributePtr>> aModifiedAttributes;
   const std::string& aKind = aBaseFeature->getKind();
   FeaturePtr aReplacingFeature, aNewFeature;
-  if (aKind == SketchPlugin_Circle::ID()) {
-    aReplacingFeature = trimCircle(aStartShapePoint2d, aLastShapePoint2d,
+  if (aKind == SketchPlugin_Circle::ID() ||
+      aKind == SketchPlugin_Ellipse::ID()) {
+    aReplacingFeature = trimClosed(aStartShapePoint2d, aLastShapePoint2d,
                aFurtherCoincidences, aModifiedAttributes);
 
     aFeaturesToDelete.insert(aBaseFeature);
@@ -320,6 +324,10 @@ void SketchPlugin_Trim::execute()
   }
   else if (aKind == SketchPlugin_Arc::ID()) {
     aNewFeature = trimArc(aStartShapePoint2d, aLastShapePoint2d, aBaseRefAttributes,
+                          aFurtherCoincidences, aModifiedAttributes);
+  }
+  else if (aKind == SketchPlugin_EllipticArc::ID()) {
+    aNewFeature = trimEllipticArc(aStartShapePoint2d, aLastShapePoint2d, aBaseRefAttributes,
                           aFurtherCoincidences, aModifiedAttributes);
   }
 
@@ -382,7 +390,7 @@ void SketchPlugin_Trim::execute()
   ResultPtr aReplacingResult;
   if (aReplacingFeature.get()) {
     aReplacingFeature->execute(); // need it to obtain result
-    aReplacingResult = getFeatureResult(aReplacingFeature);
+    aReplacingResult = aReplacingFeature->lastResult();
   }
   for(std::list<AttributePtr>::const_iterator anIt = aRefsToFeature.begin(),
                                           aLast = aRefsToFeature.end();
@@ -457,7 +465,7 @@ void SketchPlugin_Trim::execute()
       aPreviewObject = ObjectPtr();
 
       aBaseFeature->execute(); // should recompute shapes of result to do not check obsolete one
-      aBaseObject = getFeatureResult(aBaseFeature);
+      aBaseObject = aBaseFeature->lastResult();
       std::shared_ptr<GeomAPI_Pnt> aPreviewPnt = sketch()->to3D(aPreviewPnt2d->x(),
                                                                 aPreviewPnt2d->y());
       ResultPtr aBaseResult = std::dynamic_pointer_cast<ModelAPI_Result>(aBaseObject);
@@ -468,7 +476,7 @@ void SketchPlugin_Trim::execute()
           aPreviewObject = aBaseResult;
       }
       if (!aPreviewObject.get() && aNewFeature.get()) {
-        ResultPtr aNewFeatureResult = getFeatureResult(aNewFeature);
+        ResultPtr aNewFeatureResult = aNewFeature->lastResult();
         if (aNewFeatureResult.get()) {
           GeomShapePtr aShape = aNewFeatureResult->shape();
           std::shared_ptr<GeomAPI_Pnt> aProjectedPoint;
@@ -643,7 +651,7 @@ void SketchPlugin_Trim::getConstraints(std::set<FeaturePtr>& theFeaturesToDelete
   AttributeReferencePtr aBaseObjectAttr = std::dynamic_pointer_cast<ModelAPI_AttributeReference>(
                                          aData->attribute(SketchPlugin_Trim::SELECTED_OBJECT()));
   FeaturePtr aBaseFeature = ModelAPI_Feature::feature(aBaseObjectAttr->value());
-  ResultPtr aBaseFeatureResult = getFeatureResult(aBaseFeature);
+  ResultPtr aBaseFeatureResult = aBaseFeature->lastResult();
 
   std::set<AttributePtr> aRefsList = aBaseFeatureResult->data()->refsToMe();
   std::set<AttributePtr> aFRefsList = aBaseFeature->data()->refsToMe();
@@ -771,7 +779,8 @@ FeaturePtr SketchPlugin_Trim::trimLine(const std::shared_ptr<GeomAPI_Pnt2d>& the
     // result is two lines: start line point - start shape point,
     // last shape point - last line point
     // create second line
-    anNewFeature = createLineFeature(aBaseFeature, aLastShapePoint, aLastFeaturePoint);
+    anNewFeature = SketchPlugin_SegmentationTools::createLineFeature(
+        aBaseFeature, aLastShapePoint, aLastFeaturePoint);
     thePoints.insert(std::dynamic_pointer_cast<GeomDataAPI_Point2D>
                                (anNewFeature->attribute(SketchPlugin_Line::START_ID())));
 
@@ -789,8 +798,8 @@ FeaturePtr SketchPlugin_Trim::trimLine(const std::shared_ptr<GeomAPI_Pnt2d>& the
     // Collinear constraint for lines
     SketchPlugin_Tools::createConstraintObjectObject(sketch(),
                                          SketchPlugin_ConstraintCollinear::ID(),
-                                         getFeatureResult(aBaseFeature),
-                                         getFeatureResult(anNewFeature));
+                                         aBaseFeature->lastResult(),
+                                         anNewFeature->lastResult());
   }
   return anNewFeature;
 }
@@ -857,7 +866,8 @@ FeaturePtr SketchPlugin_Trim::trimArc(const std::shared_ptr<GeomAPI_Pnt2d>& theS
   else {
     // result is two arcs: start arc point - start shape point, last shape point - last arc point
     // create second arc
-    anNewFeature = createArcFeature(aBaseFeature, aLastShapePoint, aLastArcPoint);
+    anNewFeature = SketchPlugin_SegmentationTools::createArcFeature(
+        aBaseFeature, aLastShapePoint, aLastArcPoint);
     thePoints.insert(std::dynamic_pointer_cast<GeomDataAPI_Point2D>
                                (anNewFeature->attribute(SketchPlugin_Arc::START_ID())));
 
@@ -875,8 +885,8 @@ FeaturePtr SketchPlugin_Trim::trimArc(const std::shared_ptr<GeomAPI_Pnt2d>& theS
     // equal Radius constraint for arcs
     SketchPlugin_Tools::createConstraintObjectObject(sketch(),
                                          SketchPlugin_ConstraintEqual::ID(),
-                                         getFeatureResult(aBaseFeature),
-                                         getFeatureResult(anNewFeature));
+                                         aBaseFeature->lastResult(),
+                                         anNewFeature->lastResult());
     // coincident centers constraint
     SketchPlugin_Tools::createConstraintAttrAttr(sketch(),
                                          SketchPlugin_ConstraintCoincidence::ID(),
@@ -892,34 +902,172 @@ FeaturePtr SketchPlugin_Trim::trimArc(const std::shared_ptr<GeomAPI_Pnt2d>& theS
   return anNewFeature;
 }
 
-FeaturePtr SketchPlugin_Trim::trimCircle(const std::shared_ptr<GeomAPI_Pnt2d>& theStartShapePoint,
-                                   const std::shared_ptr<GeomAPI_Pnt2d>& theLastShapePoint,
-                                   std::set<AttributePoint2DPtr>& thePoints,
+FeaturePtr SketchPlugin_Trim::trimEllipticArc(
+                 const std::shared_ptr<GeomAPI_Pnt2d>& theStartShapePoint,
+                 const std::shared_ptr<GeomAPI_Pnt2d>& theLastShapePoint,
+                 std::map<AttributePtr, std::list<AttributePtr> >& theBaseRefAttributes,
+                 std::set<AttributePoint2DPtr>& thePoints,
                  std::set<std::pair<AttributePtr, AttributePtr>>& theModifiedAttributes)
 {
+  FeaturePtr anNewFeature;
   // Check the base objects are initialized.
-  AttributeReferencePtr aBaseObjectAttr = std::dynamic_pointer_cast<ModelAPI_AttributeReference>(
-                                        data()->attribute(SketchPlugin_Trim::SELECTED_OBJECT()));
+  AttributeReferencePtr aBaseObjectAttr = reference(SELECTED_OBJECT());
   ObjectPtr aBaseObject = aBaseObjectAttr->value();
   FeaturePtr aBaseFeature = ModelAPI_Feature::feature(aBaseObjectAttr->value());
 
-  /// points of trim
-  //AttributePoint2DPtr aStartPointAttrOfBase, anEndPointAttrOfBase;
-  //getFeaturePoints(aBaseFeature, aStartPointAttrOfBase, anEndPointAttrOfBase);
+  // points of trim
+  AttributePoint2DPtr aStartPointAttrOfBase, anEndPointAttrOfBase;
+  SketchPlugin_SegmentationTools::getFeaturePoints(
+      aBaseFeature, aStartPointAttrOfBase, anEndPointAttrOfBase);
 
-  /// trim feature
-  FeaturePtr anNewFeature = createArcFeature(aBaseFeature, theStartShapePoint, theLastShapePoint);
+  std::shared_ptr<GeomAPI_Pnt2d> aStartArcPoint = aStartPointAttrOfBase->pnt();
+  std::shared_ptr<GeomAPI_Pnt2d> aLastArcPoint = anEndPointAttrOfBase->pnt();
+
+  std::shared_ptr<GeomAPI_Pnt2d> aStartShapePoint = theStartShapePoint;
+  std::shared_ptr<GeomAPI_Pnt2d> aLastShapePoint = theLastShapePoint;
+  arrangePointsOnArc(aBaseFeature, aStartPointAttrOfBase, anEndPointAttrOfBase,
+                     aStartShapePoint, aLastShapePoint);
+#ifdef DEBUG_TRIM
+  std::cout << "Arranged points (to build split between 1st and 2nd points:" << std::endl;
+  if (aStartShapePoint.get())
+    std::cout << "Start shape point: [" << aStartShapePoint->x() << ", " <<
+                                       aStartShapePoint->y() << "]" << std::endl;
+  std::cout << "Start arc attribute point:   [" << aStartArcPoint->x() << ", " <<
+                                   aStartArcPoint->y() << "]" << std::endl;
+  if (aLastShapePoint.get())
+    std::cout << "Last shape point:   [" << aLastShapePoint->x() << ", " <<
+                                     aLastShapePoint->y() << "]" << std::endl;
+  std::cout << "Last arc attribute point:   [" << aLastArcPoint->x() << ", " <<
+                                   aLastArcPoint->y() << "]" << std::endl;
+#endif
+
+  bool isStartPoint = !aStartShapePoint.get() || aStartArcPoint->isEqual(aStartShapePoint);
+  bool isLastPoint = !aLastShapePoint.get() || aLastArcPoint->isEqual(aLastShapePoint);
+  if (isStartPoint || isLastPoint) {
+    // result is one arc: changed existing arc
+    std::string aModifiedAttribute = isStartPoint ? SketchPlugin_EllipticArc::START_POINT_ID()
+                                                  : SketchPlugin_EllipticArc::END_POINT_ID();
+    std::shared_ptr<GeomAPI_Pnt2d> aPoint;
+    if (aStartShapePoint.get() && aLastShapePoint.get())
+      aPoint = isStartPoint ? aLastShapePoint : aStartShapePoint;
+    else
+      aPoint = aStartShapePoint.get() ? aStartShapePoint : aLastShapePoint;
+
+    removeReferencesToAttribute(aBaseFeature->attribute(aModifiedAttribute),
+                                theBaseRefAttributes);
+
+    fillPointAttribute(aBaseFeature->attribute(aModifiedAttribute), aPoint);
+
+    thePoints.insert(std::dynamic_pointer_cast<GeomDataAPI_Point2D>
+                               (aBaseFeature->attribute(aModifiedAttribute)));
+  }
+  else {
+    // result is two arcs: start arc point - start shape point, last shape point - last arc point
+    // create second arc
+    anNewFeature = SketchPlugin_SegmentationTools::createArcFeature(
+        aBaseFeature, aLastShapePoint, aLastArcPoint);
+    thePoints.insert(std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
+                     anNewFeature->attribute(SketchPlugin_EllipticArc::START_POINT_ID())));
+
+    std::string aModifiedAttribute = SketchPlugin_EllipticArc::END_POINT_ID();
+    theModifiedAttributes.insert(
+      std::make_pair(aBaseFeature->attribute(aModifiedAttribute),
+                     anNewFeature->attribute(SketchPlugin_EllipticArc::END_POINT_ID())));
+
+    // modify base arc
+    fillPointAttribute(aBaseFeature->attribute(aModifiedAttribute), aStartShapePoint);
+
+    thePoints.insert(std::dynamic_pointer_cast<GeomDataAPI_Point2D>
+                               (aBaseFeature->attribute(aModifiedAttribute)));
+
+    // make elliptic arcs equal
+    SketchPlugin_Tools::createConstraintObjectObject(sketch(),
+                                         SketchPlugin_ConstraintEqual::ID(),
+                                         aBaseFeature->lastResult(),
+                                         anNewFeature->lastResult());
+    // coincident centers constraint
+    SketchPlugin_Tools::createConstraintAttrAttr(sketch(),
+        SketchPlugin_ConstraintCoincidence::ID(),
+        aBaseFeature->attribute(SketchPlugin_EllipticArc::CENTER_ID()),
+        anNewFeature->attribute(SketchPlugin_EllipticArc::CENTER_ID()));
+
+#ifdef DEBUG_TRIM
+    std::cout << "Created arc on points:" << std::endl;
+    std::cout << "Start shape point: [" << aStartShapePoint->x() << ", " <<
+                                           aStartShapePoint->y() << "]" << std::endl;
+#endif
+  }
+  return anNewFeature;
+}
+
+FeaturePtr SketchPlugin_Trim::trimClosed(const std::shared_ptr<GeomAPI_Pnt2d>& theStartShapePoint,
+                                         const std::shared_ptr<GeomAPI_Pnt2d>& theLastShapePoint,
+                                         std::set<AttributePoint2DPtr>& thePoints,
+                           std::set<std::pair<AttributePtr, AttributePtr>>& theModifiedAttributes)
+{
+  // Check the base objects are initialized.
+  AttributeReferencePtr aBaseObjectAttr = reference(SELECTED_OBJECT());
+  ObjectPtr aBaseObject = aBaseObjectAttr->value();
+  FeaturePtr aBaseFeature = ModelAPI_Feature::feature(aBaseObjectAttr->value());
+
+  // trim feature
+  FeaturePtr anNewFeature = SketchPlugin_SegmentationTools::createArcFeature(
+      aBaseFeature, theStartShapePoint, theLastShapePoint);
   // arc created by trim of circle is always correct, that means that it is not inversed
-  anNewFeature->boolean(SketchPlugin_Arc::REVERSED_ID())->setValue(false);
+  const std::string& aReversedAttrName = anNewFeature->getKind() == SketchPlugin_Arc::ID() ?
+      SketchPlugin_Arc::REVERSED_ID() : SketchPlugin_EllipticArc::REVERSED_ID();
+  anNewFeature->boolean(aReversedAttrName)->setValue(false);
 
-  theModifiedAttributes.insert(
-    std::make_pair(aBaseFeature->attribute(SketchPlugin_Circle::CENTER_ID()),
-                   anNewFeature->attribute(SketchPlugin_Arc::CENTER_ID())));
+  if (aBaseFeature->getKind() == SketchPlugin_Circle::ID()) {
+    theModifiedAttributes.insert(
+      std::make_pair(aBaseFeature->attribute(SketchPlugin_Circle::CENTER_ID()),
+                     anNewFeature->attribute(SketchPlugin_Arc::CENTER_ID())));
+  }
+  else if (aBaseFeature->getKind() == SketchPlugin_Ellipse::ID()) {
+    theModifiedAttributes.insert(std::make_pair(
+        aBaseFeature->attribute(SketchPlugin_Ellipse::CENTER_ID()),
+        anNewFeature->attribute(SketchPlugin_EllipticArc::CENTER_ID())));
+    theModifiedAttributes.insert(std::make_pair(
+        aBaseFeature->attribute(SketchPlugin_Ellipse::FIRST_FOCUS_ID()),
+        anNewFeature->attribute(SketchPlugin_EllipticArc::FIRST_FOCUS_ID())));
+    theModifiedAttributes.insert(std::make_pair(
+        aBaseFeature->attribute(SketchPlugin_Ellipse::SECOND_FOCUS_ID()),
+        anNewFeature->attribute(SketchPlugin_EllipticArc::SECOND_FOCUS_ID())));
+    theModifiedAttributes.insert(std::make_pair(
+        aBaseFeature->attribute(SketchPlugin_Ellipse::MAJOR_AXIS_START_ID()),
+        anNewFeature->attribute(SketchPlugin_EllipticArc::MAJOR_AXIS_START_ID())));
+    theModifiedAttributes.insert(std::make_pair(
+        aBaseFeature->attribute(SketchPlugin_Ellipse::MAJOR_AXIS_END_ID()),
+        anNewFeature->attribute(SketchPlugin_EllipticArc::MAJOR_AXIS_END_ID())));
+    theModifiedAttributes.insert(std::make_pair(
+        aBaseFeature->attribute(SketchPlugin_Ellipse::MINOR_AXIS_START_ID()),
+        anNewFeature->attribute(SketchPlugin_EllipticArc::MINOR_AXIS_START_ID())));
+    theModifiedAttributes.insert(std::make_pair(
+        aBaseFeature->attribute(SketchPlugin_Ellipse::MINOR_AXIS_END_ID()),
+        anNewFeature->attribute(SketchPlugin_EllipticArc::MINOR_AXIS_END_ID())));
+
+    // update the PARENT_ID reference for all the features created by the ellipse
+    const std::set<AttributePtr>& aRefs = aBaseFeature->data()->refsToMe();
+    std::list<AttributePtr> aRefsToParent;
+    for (std::set<AttributePtr>::const_iterator aRef = aRefs.begin(); aRef != aRefs.end(); ++aRef) {
+      if ((*aRef)->id() == SketchPlugin_Line::PARENT_ID() ||
+          (*aRef)->id() == SketchPlugin_Point::PARENT_ID())
+        aRefsToParent.push_back(*aRef);
+    }
+    for (std::list<AttributePtr>::iterator aRef = aRefsToParent.begin();
+         aRef != aRefsToParent.end(); ++aRef)
+      std::dynamic_pointer_cast<ModelAPI_AttributeReference>(*aRef)->setValue(anNewFeature);
+  }
+
+  const std::string& aStartAttrName = anNewFeature->getKind() == SketchPlugin_Arc::ID() ?
+      SketchPlugin_Arc::START_ID() : SketchPlugin_EllipticArc::START_POINT_ID();
+  const std::string& aEndAttrName = anNewFeature->getKind() == SketchPlugin_Arc::ID() ?
+      SketchPlugin_Arc::END_ID() : SketchPlugin_EllipticArc::END_POINT_ID();
 
   thePoints.insert(std::dynamic_pointer_cast<GeomDataAPI_Point2D>
-                             (anNewFeature->attribute(SketchPlugin_Arc::START_ID())));
+                             (anNewFeature->attribute(aStartAttrName)));
   thePoints.insert(std::dynamic_pointer_cast<GeomDataAPI_Point2D>
-                             (anNewFeature->attribute(SketchPlugin_Arc::END_ID())));
+                             (anNewFeature->attribute(aEndAttrName)));
 
   return anNewFeature;
 }
@@ -952,9 +1100,14 @@ void SketchPlugin_Trim::arrangePointsOnArc(const FeaturePtr& theArc,
 
   static const double anAngleTol = 1.e-12;
 
+  const std::string& aCenterAttrName = theArc->getKind() == SketchPlugin_Arc::ID() ?
+      SketchPlugin_Arc::CENTER_ID() : SketchPlugin_EllipticArc::CENTER_ID();
+  const std::string& aReversedAttrName = theArc->getKind() == SketchPlugin_Arc::ID() ?
+      SketchPlugin_Arc::REVERSED_ID() : SketchPlugin_EllipticArc::REVERSED_ID();
+
   std::shared_ptr<GeomAPI_Pnt2d> aCenter = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
-      theArc->attribute(SketchPlugin_Arc::CENTER_ID()))->pnt();
-  bool isReversed = theArc->boolean(SketchPlugin_Arc::REVERSED_ID())->value();
+      theArc->attribute(aCenterAttrName))->pnt();
+  bool isReversed = theArc->boolean(aReversedAttrName)->value();
 
   // collect directions to each point
   std::shared_ptr<GeomAPI_Dir2d> aStartDir(
@@ -998,7 +1151,6 @@ void SketchPlugin_Trim::fillPointAttribute(const AttributePtr& theModifiedAttrib
   }
 }
 
-
 void SketchPlugin_Trim::fillAttribute(const AttributePtr& theModifiedAttribute,
                                       const AttributePtr& theSourceAttribute)
 {
@@ -1021,101 +1173,4 @@ void SketchPlugin_Trim::fillAttribute(const AttributePtr& theModifiedAttribute,
     if (aModifiedAttribute.get() && aSourceAttribute.get())
       aModifiedAttribute->setValue(aSourceAttribute->value());
   }
-}
-
-FeaturePtr SketchPlugin_Trim::createLineFeature(const FeaturePtr& theBaseFeature,
-                                        const std::shared_ptr<GeomAPI_Pnt2d>& theFirstPoint,
-                                        const std::shared_ptr<GeomAPI_Pnt2d>& theSecondPoint)
-{
-#ifdef DEBUG_TRIM
-  std::cout << "---- createLineFeature ---" << std::endl;
-#endif
-
-  FeaturePtr aFeature;
-  SketchPlugin_Sketch* aSketch = sketch();
-  if (!aSketch || !theBaseFeature.get())
-    return aFeature;
-
-  aFeature = aSketch->addFeature(SketchPlugin_Line::ID());
-
-  fillPointAttribute(aFeature->attribute(SketchPlugin_Line::START_ID()), theFirstPoint);
-  fillPointAttribute(aFeature->attribute(SketchPlugin_Line::END_ID()), theSecondPoint);
-
-  fillAttribute(aFeature->attribute(SketchPlugin_SketchEntity::AUXILIARY_ID()),
-                theBaseFeature->attribute(SketchPlugin_SketchEntity::AUXILIARY_ID()));
-
-  aFeature->execute(); // to obtain result
-
-#ifdef DEBUG_TRIM
-  std::cout << "---- createLineFeature:end ---" << std::endl;
-#endif
-
-  return aFeature;
-}
-
-FeaturePtr SketchPlugin_Trim::createArcFeature(const FeaturePtr& theBaseFeature,
-                                               const std::shared_ptr<GeomAPI_Pnt2d>& theFirstPoint,
-                                               const std::shared_ptr<GeomAPI_Pnt2d>& theSecondPoint)
-{
-  FeaturePtr aFeature;
-  SketchPlugin_Sketch* aSketch = sketch();
-  if (!aSketch || !theBaseFeature.get())
-    return aFeature;
-
-  std::string aCenterAttributeId;
-  if (theBaseFeature->getKind() == SketchPlugin_Arc::ID())
-    aCenterAttributeId = SketchPlugin_Arc::CENTER_ID();
-  else if (theBaseFeature->getKind() == SketchPlugin_Circle::ID())
-    aCenterAttributeId = SketchPlugin_Circle::CENTER_ID();
-
-  if (aCenterAttributeId.empty())
-    return aFeature;
-
-#ifdef DEBUG_TRIM
-  std::cout << "---- createArcFeature ---" << std::endl;
-#endif
-
-  aFeature = aSketch->addFeature(SketchPlugin_Arc::ID());
-  // update fillet arc: make the arc correct for sure, so, it is not needed to process
-  // the "attribute updated"
-  // by arc; moreover, it may cause cyclicity in hte mechanism of updater
-  bool aWasBlocked = aFeature->data()->blockSendAttributeUpdated(true);
-
-  fillAttribute(aFeature->attribute(SketchPlugin_Arc::CENTER_ID()),
-                theBaseFeature->attribute(aCenterAttributeId));
-  fillPointAttribute(aFeature->attribute(SketchPlugin_Arc::START_ID()), theFirstPoint);
-  fillPointAttribute(aFeature->attribute(SketchPlugin_Arc::END_ID()), theSecondPoint);
-
-  fillAttribute(aFeature->attribute(SketchPlugin_SketchEntity::AUXILIARY_ID()),
-                theBaseFeature->attribute(SketchPlugin_SketchEntity::AUXILIARY_ID()));
-
-  /// fill referersed state of created arc as it is on the base arc
-  if (theBaseFeature->getKind() == SketchPlugin_Arc::ID()) {
-    bool aReversed = theBaseFeature->boolean(SketchPlugin_Arc::REVERSED_ID())->value();
-    aFeature->boolean(SketchPlugin_Arc::REVERSED_ID())->setValue(aReversed);
-  }
-  aFeature->execute(); // to obtain result (need to calculate arc parameters before sending Update)
-  aFeature->data()->blockSendAttributeUpdated(aWasBlocked);
-
-  #ifdef DEBUG_TRIM
-  std::cout << "---- createArcFeature:end ---" << std::endl;
-  #endif
-
-  return aFeature;
-}
-
-std::shared_ptr<ModelAPI_Result> SketchPlugin_Trim::getFeatureResult(
-                                    const std::shared_ptr<ModelAPI_Feature>& theFeature)
-{
-  std::shared_ptr<ModelAPI_Result> aResult;
-
-  std::string aFeatureKind = theFeature->getKind();
-  if (aFeatureKind == SketchPlugin_Line::ID())
-    aResult = theFeature->firstResult();
-  else if (aFeatureKind == SketchPlugin_Arc::ID())
-    aResult = theFeature->lastResult();
-  else if (aFeatureKind == SketchPlugin_Circle::ID())
-    aResult = theFeature->lastResult();
-
-  return aResult;
 }

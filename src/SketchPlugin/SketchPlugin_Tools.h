@@ -206,6 +206,25 @@ namespace SketchPlugin_SegmentationTools
   /// \param theFeaturesToUpdate a constraint index
   void updateFeaturesAfterOperation(const std::set<FeaturePtr>& theFeaturesToUpdate);
 
+
+  /// Creates a line feature filled by center of base feature and given points
+  /// \param theBaseFeature another arc feature
+  /// \param theFirstAttribute an attribute with coordinates for the start point
+  /// \param theSecondAttribute an attribute with coordinates for the end point
+  FeaturePtr createLineFeature(const FeaturePtr& theBaseFeature,
+                               const std::shared_ptr<GeomAPI_Pnt2d>& theFirstPoint,
+                               const std::shared_ptr<GeomAPI_Pnt2d>& theSecondPoint);
+
+  /// Creates a circular/elliptic arc feature filled by center
+  /// (or by center and focus for elliptic arc) of base feature and given points
+  /// \param theBaseFeature     another circle or ellipse or circular/elliptic arc
+  /// \param theFirstAttribute  an attribute with coordinates for the start point
+  /// \param theSecondAttribute an attribute with coordinates for the end point
+  FeaturePtr createArcFeature(
+      const FeaturePtr& theBaseFeature,
+      const std::shared_ptr<GeomAPI_Pnt2d>& theFirstPoint,
+      const std::shared_ptr<GeomAPI_Pnt2d>& theSecondPoint);
+
 }; // namespace SketchPlugin_SegmentationTools
 
 #endif // SKETCHPLUGIN_TOOLS_H_

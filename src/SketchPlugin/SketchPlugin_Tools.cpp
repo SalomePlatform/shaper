@@ -20,6 +20,7 @@
 #include "SketchPlugin_Tools.h"
 
 #include "SketchPlugin_Arc.h"
+#include "SketchPlugin_Circle.h"
 #include "SketchPlugin_ConstraintCoincidence.h"
 #include "SketchPlugin_ConstraintCoincidenceInternal.h"
 #include "SketchPlugin_ConstraintLength.h"
@@ -844,4 +845,119 @@ AISObjectPtr SketchPlugin_SegmentationTools::getAISObject(
   else
     anAIS = AISObjectPtr();
   return anAIS;
+}
+
+#define GEOM_DATA_POINT2D(f, a) std::dynamic_pointer_cast<GeomDataAPI_Point2D>((f)->attribute(a))
+
+FeaturePtr SketchPlugin_SegmentationTools::createLineFeature(
+    const FeaturePtr& theBaseFeature,
+    const std::shared_ptr<GeomAPI_Pnt2d>& theFirstPoint,
+    const std::shared_ptr<GeomAPI_Pnt2d>& theSecondPoint)
+{
+  FeaturePtr aFeature;
+  std::shared_ptr<SketchPlugin_Feature> aSketchFeature =
+      std::dynamic_pointer_cast<SketchPlugin_Feature>(theBaseFeature);
+  SketchPlugin_Sketch* aSketch = aSketchFeature->sketch();
+  if (!aSketch || !theBaseFeature.get())
+    return aFeature;
+
+  aFeature = aSketch->addFeature(SketchPlugin_Line::ID());
+
+  GEOM_DATA_POINT2D(aFeature, SketchPlugin_Line::START_ID())->setValue(theFirstPoint);
+  GEOM_DATA_POINT2D(aFeature, SketchPlugin_Line::END_ID())->setValue(theSecondPoint);
+
+  aFeature->boolean(SketchPlugin_SketchEntity::AUXILIARY_ID())->setValue(
+      theBaseFeature->boolean(SketchPlugin_SketchEntity::AUXILIARY_ID())->value());
+  aFeature->execute(); // to obtain result
+
+  return aFeature;
+}
+
+struct ArcAttributes
+{
+  std::string myKind;
+  std::string myCenter;
+  std::string myFocus;
+  std::string myStart;
+  std::string myEnd;
+  std::string myReversed;
+
+  ArcAttributes() {}
+
+  ArcAttributes(const std::string& theKind) : myKind(theKind)
+  {
+    if (myKind == SketchPlugin_Arc::ID()) {
+      myCenter = SketchPlugin_Arc::CENTER_ID();
+      myStart = SketchPlugin_Arc::START_ID();
+      myEnd = SketchPlugin_Arc::END_ID();
+      myReversed = SketchPlugin_Arc::REVERSED_ID();
+    }
+    else if (myKind == SketchPlugin_Circle::ID()) {
+      myCenter = SketchPlugin_Circle::CENTER_ID();
+    }
+    else if (myKind == SketchPlugin_Ellipse::ID()) {
+      myCenter = SketchPlugin_Ellipse::CENTER_ID();
+      myFocus = SketchPlugin_Ellipse::FIRST_FOCUS_ID();
+    }
+    else if (myKind == SketchPlugin_EllipticArc::ID()) {
+      myCenter = SketchPlugin_EllipticArc::CENTER_ID();
+      myFocus = SketchPlugin_EllipticArc::FIRST_FOCUS_ID();
+      myStart = SketchPlugin_EllipticArc::START_POINT_ID();
+      myEnd = SketchPlugin_EllipticArc::END_POINT_ID();
+      myReversed = SketchPlugin_EllipticArc::REVERSED_ID();
+    }
+  }
+};
+
+FeaturePtr SketchPlugin_SegmentationTools::createArcFeature(
+    const FeaturePtr& theBaseFeature,
+    const std::shared_ptr<GeomAPI_Pnt2d>& theFirstPoint,
+    const std::shared_ptr<GeomAPI_Pnt2d>& theSecondPoint)
+{
+  FeaturePtr aFeature;
+  std::shared_ptr<SketchPlugin_Feature> aSketchFeature =
+      std::dynamic_pointer_cast<SketchPlugin_Feature>(theBaseFeature);
+  SketchPlugin_Sketch* aSketch = aSketchFeature->sketch();
+  if (!aSketch || !theBaseFeature.get())
+    return aFeature;
+
+  ArcAttributes aBaseAttrs(theBaseFeature->getKind());
+  ArcAttributes aTargetAttrs;
+  if (aBaseAttrs.myKind == SketchPlugin_Arc::ID() ||
+      aBaseAttrs.myKind == SketchPlugin_Circle::ID())
+    aTargetAttrs = ArcAttributes(SketchPlugin_Arc::ID());
+  else if (aBaseAttrs.myKind == SketchPlugin_Ellipse::ID() ||
+           aBaseAttrs.myKind == SketchPlugin_EllipticArc::ID())
+    aTargetAttrs = ArcAttributes(SketchPlugin_EllipticArc::ID());
+
+  if (aTargetAttrs.myKind.empty())
+    return aFeature;
+
+  aFeature = aSketch->addFeature(aTargetAttrs.myKind);
+  // update fillet arc: make the arc correct for sure, so, it is not needed to process
+  // the "attribute updated"
+  // by arc; moreover, it may cause cyclicity in hte mechanism of updater
+  bool aWasBlocked = aFeature->data()->blockSendAttributeUpdated(true);
+
+  GEOM_DATA_POINT2D(aFeature, aTargetAttrs.myCenter)->setValue(
+      GEOM_DATA_POINT2D(theBaseFeature, aBaseAttrs.myCenter)->pnt());
+  if (!aTargetAttrs.myFocus.empty()) {
+    GEOM_DATA_POINT2D(aFeature, aTargetAttrs.myFocus)->setValue(
+        GEOM_DATA_POINT2D(theBaseFeature, aBaseAttrs.myFocus)->pnt());
+  }
+  GEOM_DATA_POINT2D(aFeature, aTargetAttrs.myStart)->setValue(theFirstPoint);
+  GEOM_DATA_POINT2D(aFeature, aTargetAttrs.myEnd)->setValue(theSecondPoint);
+
+  aFeature->boolean(SketchPlugin_SketchEntity::AUXILIARY_ID())->setValue(
+      theBaseFeature->boolean(SketchPlugin_SketchEntity::AUXILIARY_ID())->value());
+
+  /// fill referersed state of created arc as it is on the base arc
+  bool aReversed = aBaseAttrs.myReversed.empty() ? false :
+                   theBaseFeature->boolean(aBaseAttrs.myReversed)->value();
+  aFeature->boolean(aTargetAttrs.myReversed)->setValue(aReversed);
+
+  aFeature->execute(); // to obtain result (need to calculate arc parameters before sending Update)
+  aFeature->data()->blockSendAttributeUpdated(aWasBlocked);
+
+  return aFeature;
 }

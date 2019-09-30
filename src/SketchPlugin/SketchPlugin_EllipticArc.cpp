@@ -145,13 +145,8 @@ static void calculateRadii(const GeomPnt2dPtr& theCenter,
       theCenter->xy()->multiplied(2.0)->decreased(theFocus->xy())));
   theMajorRadius = 0.5 * (thePassed->distance(theFocus) + thePassed->distance(aSecondFocus));
 
-  GeomDir2dPtr aXAxis(new GeomAPI_Dir2d(theFocus->x() - theCenter->x(),
-                                        theFocus->y() - theCenter->y()));
-  std::shared_ptr<GeomAPI_XY> aPassedVec = thePassed->xy()->decreased(theCenter->xy());
-
-  double x = aPassedVec->dot(aXAxis->xy()) / theMajorRadius;
-  double y = abs(aPassedVec->cross(aXAxis->xy()));
-  theMinorRadius = y / sqrt(1.0 - x * x);
+  double aFocalDist = theCenter->distance(theFocus);
+  theMinorRadius = sqrt(theMajorRadius * theMajorRadius - aFocalDist * aFocalDist);
 }
 
 bool SketchPlugin_EllipticArc::fillCharacteristicPoints()
@@ -162,6 +157,8 @@ bool SketchPlugin_EllipticArc::fillCharacteristicPoints()
     std::dynamic_pointer_cast<GeomDataAPI_Point2D>(data()->attribute(FIRST_FOCUS_ID()));
   std::shared_ptr<GeomDataAPI_Point2D> aStartPointAttr =
     std::dynamic_pointer_cast<GeomDataAPI_Point2D>(data()->attribute(START_POINT_ID()));
+  std::shared_ptr<GeomDataAPI_Point2D> aEndPointAttr =
+    std::dynamic_pointer_cast<GeomDataAPI_Point2D>(data()->attribute(END_POINT_ID()));
 
   if (!aCenterAttr->isInitialized() ||
     !aFocusAttr->isInitialized() ||
@@ -176,7 +173,7 @@ bool SketchPlugin_EllipticArc::fillCharacteristicPoints()
 
   double aMajorRadius = 0.0, aMinorRadius = 0.0;
   calculateRadii(aCenter2d, aFocus2d, aStart2d, aMajorRadius, aMinorRadius);
-  if (aMinorRadius < tolerance)
+  if (aMinorRadius < tolerance *aMajorRadius)
     return false;
   real(MAJOR_RADIUS_ID())->setValue(aMajorRadius);
   real(MINOR_RADIUS_ID())->setValue(aMinorRadius);
@@ -200,8 +197,6 @@ bool SketchPlugin_EllipticArc::fillCharacteristicPoints()
     ->setValue(aCenter2d->x() + aMinorDir2d->x() * aMinorRadius,
       aCenter2d->y() + aMinorDir2d->y() * aMinorRadius);
 
-  std::shared_ptr<GeomDataAPI_Point2D> aEndPointAttr =
-    std::dynamic_pointer_cast<GeomDataAPI_Point2D>(data()->attribute(END_POINT_ID()));
   if (aEndPointAttr->isInitialized()) {
     // recalculate REVERSED flag
     std::shared_ptr<GeomAPI_Ellipse2d> anEllipseForArc(
