@@ -1137,10 +1137,10 @@ bool SketchPlugin_ProjectionValidator::isValid(const AttributePtr& theAttribute,
     std::shared_ptr<GeomAPI_Ellipse> anEllipse = anEdge->ellipse();
     std::shared_ptr<GeomAPI_Dir> anEllipseNormal = anEllipse->normal();
     double aDot = fabs(aNormal->dot(anEllipseNormal));
-    bool aValid = aDot >= tolerance * tolerance;
+    bool aValid = fabs(aDot - 1.0) <= tolerance * tolerance;
     if (!aValid)
-      theError.arg(anEdge->isEllipse() ? "Error: Ellipse is orthogonal to the sketch plane."
-                                       : "Error: Elliptic Arc is orthogonal to the sketch plane.");
+      theError.arg(anEdge->isClosed() ? "Error: Ellipse is orthogonal to the sketch plane."
+                                      : "Error: Elliptic Arc is orthogonal to the sketch plane.");
     return aValid;
   }
 

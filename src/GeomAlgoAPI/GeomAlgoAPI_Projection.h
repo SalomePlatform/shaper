@@ -33,14 +33,16 @@ class GeomAPI_Edge;
  * \ingroup DataAlgo
  * \brief Project curve onto a plane
  */
-class GEOMALGOAPI_EXPORT GeomAlgoAPI_Projection
+class GeomAlgoAPI_Projection
 {
 public:
-  GeomAlgoAPI_Projection(const std::shared_ptr<GeomAPI_Pln>& thePlane);
+  GEOMALGOAPI_EXPORT GeomAlgoAPI_Projection(const std::shared_ptr<GeomAPI_Pln>& thePlane);
 
   /// Project curve to the plane
+  GEOMALGOAPI_EXPORT
   std::shared_ptr<GeomAPI_Curve> project(const std::shared_ptr<GeomAPI_Curve>& theCurve);
   /// Project edge to the plane
+  GEOMALGOAPI_EXPORT
   std::shared_ptr<GeomAPI_Curve> project(const std::shared_ptr<GeomAPI_Edge>& theEdge);
 
 private:

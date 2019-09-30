@@ -63,11 +63,11 @@ class GeomAPI_Curve : public GeomAPI_Interface
 
   /// Returns start parameter of the curve
   GEOMAPI_EXPORT
-  double startParam() const { return myStart; }
+  double startParam();
 
   /// Returns end parameter of the curve
   GEOMAPI_EXPORT
-  double endParam() const { return myEnd; }
+  double endParam();
 
   /// Returns \c true if the curve is trimmed
   GEOMAPI_EXPORT

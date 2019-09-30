@@ -49,11 +49,12 @@ model.end()
 
 from GeomAPI import *
 
-circle2 = SketchCircle_2.results()[-1].resultSubShapePair()[0].shape()
-assert(circle2.isEdge() and circle2.edge().isCircle())
 ellipse1 = SketchEllipse_1.results()[-1].resultSubShapePair()[0].shape()
 assert(ellipse1.isEdge() and ellipse1.edge().isEllipse())
 ellipse2 = SketchEllipse_2.results()[-1].resultSubShapePair()[0].shape()
 assert(ellipse2.isEdge() and ellipse2.edge().isEllipse())
+
+# TODO [limitation]: projection of an ellipse to non-parallel plane is forbiden (OCCT issue #31016)
+assert(Sketch_2.feature().error() != "")
 
 assert(model.checkPythonDump())

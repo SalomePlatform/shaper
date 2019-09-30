@@ -22,6 +22,7 @@
 #include <SketchPlugin_Arc.h>
 #include <SketchPlugin_Circle.h>
 #include <SketchPlugin_Ellipse.h>
+#include <SketchPlugin_EllipticArc.h>
 #include <SketchPlugin_Line.h>
 #include <SketchPlugin_Point.h>
 #include <SketchPlugin_Sketch.h>
@@ -104,22 +105,59 @@ void SketchPlugin_Projection::attributeChanged(const std::string& theID)
   }
 }
 
-static const std::string& projectionType(GeomEdgePtr theEdge,
-                                         GeomVertexPtr theVertex)
+static const std::set<std::string>& POINT_PROJECTION()
+{
+  static std::set<std::string> aProj;
+  if (aProj.empty())
+    aProj.insert(SketchPlugin_Point::ID());
+  return aProj;
+}
+
+static const std::set<std::string>& LINE_PROJECTION()
+{
+  static std::set<std::string> aProj;
+  if (aProj.empty())
+    aProj.insert(SketchPlugin_Line::ID());
+  return aProj;
+}
+
+static const std::set<std::string>& CIRCLE_ELLIPSE_PROJECTION()
+{
+  static std::set<std::string> aProj;
+  if (aProj.empty()) {
+    aProj.insert(SketchPlugin_Circle::ID());
+    aProj.insert(SketchPlugin_Ellipse::ID());
+  }
+  return aProj;
+}
+
+static const std::set<std::string>& ARC_PROJECTION()
+{
+  static std::set<std::string> aProj;
+  if (aProj.empty()) {
+    aProj.insert(SketchPlugin_Arc::ID());
+    aProj.insert(SketchPlugin_EllipticArc::ID());
+  }
+  return aProj;
+}
+
+
+static const std::set<std::string>& possibleProjectionTypes(GeomEdgePtr theEdge,
+                                                            GeomVertexPtr theVertex)
 {
   if (theVertex)
-    return SketchPlugin_Point::ID();
+    return POINT_PROJECTION();
   if (theEdge) {
     if (theEdge->isLine())
-      return SketchPlugin_Line::ID();
-    else if (theEdge->isCircle())
-      return SketchPlugin_Circle::ID();
-    else if (theEdge->isArc())
-      return SketchPlugin_Arc::ID();
-    else if (theEdge->isEllipse())
-      return SketchPlugin_Ellipse::ID();
+      return LINE_PROJECTION();
+    else if (theEdge->isCircle() || theEdge->isArc() || theEdge->isEllipse()) {
+      if (theEdge->isClosed())
+        return CIRCLE_ELLIPSE_PROJECTION();
+      else
+        return ARC_PROJECTION();
+    }
   }
-  static const std::string DUMMY;
+  static const std::set<std::string> DUMMY;
   return DUMMY;
 }
 
@@ -144,7 +182,7 @@ void SketchPlugin_Projection::computeProjection(const std::string& theID)
   if (!anEdge && !aVertex)
     return;
 
-  const std::string& aProjType = projectionType(anEdge, aVertex);
+  const std::set<std::string>& aProjType = possibleProjectionTypes(anEdge, aVertex);
 
   AttributeRefAttrPtr aRefAttr = data()->refattr(PROJECTED_FEATURE_ID());
   FeaturePtr aProjection;
@@ -152,7 +190,7 @@ void SketchPlugin_Projection::computeProjection(const std::string& theID)
     aProjection = ModelAPI_Feature::feature(aRefAttr->object());
 
   // if the type of feature differs with already selected, remove it and create once again
-  bool isRebuild = rebuildProjectedFeature(aProjection, aProjType, true);
+  bool isRebuild = rebuildProjectedFeature(aProjection, aProjType);
 
   std::shared_ptr<GeomAPI_Pln> aSketchPlane = sketch()->plane();
 
@@ -170,7 +208,7 @@ void SketchPlugin_Projection::computeProjection(const std::string& theID)
     std::shared_ptr<GeomAPI_Pnt> aPrjPnt = aSketchPlane->project(aVertex->point());
     std::shared_ptr<GeomAPI_Pnt2d> aPntInSketch = sketch()->to2D(aPrjPnt);
 
-    rebuildProjectedFeature(aProjection, SketchPlugin_Point::ID());
+    rebuildProjectedFeature(aProjection, POINT_PROJECTION(), SketchPlugin_Point::ID());
 
     // update coordinates of projection
     std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
@@ -185,7 +223,7 @@ void SketchPlugin_Projection::computeProjection(const std::string& theID)
     if (aFirstInSketch->distance(aLastInSketch) < tolerance)
       return; // line is semi-orthogonal to the sketch plane
 
-    rebuildProjectedFeature(aProjection, SketchPlugin_Line::ID());
+    rebuildProjectedFeature(aProjection, LINE_PROJECTION(), SketchPlugin_Line::ID());
 
     // update attributes of projection
     std::shared_ptr<GeomDataAPI_Point2D> aStartPnt = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
@@ -195,84 +233,127 @@ void SketchPlugin_Projection::computeProjection(const std::string& theID)
     aStartPnt->setValue(aFirstInSketch);
     aEndPnt->setValue(aLastInSketch);
   }
-  else if (anEdge->isCircle() || anEdge->isEllipse()) {
+  else if (anEdge->isCircle() || anEdge->isArc() || anEdge->isEllipse()) {
     GeomAlgoAPI_Projection aProjAlgo(aSketchPlane);
     GeomCurvePtr aProjectedCurve = aProjAlgo.project(anEdge);
 
     if (aProjectedCurve->isCircle()) {
-      rebuildProjectedFeature(aProjection, SketchPlugin_Circle::ID());
-
       GeomAPI_Circ aCircle(aProjectedCurve);
-      std::shared_ptr<GeomAPI_Pnt> aCenter = aSketchPlane->project(aCircle.center());
-      std::shared_ptr<GeomAPI_Pnt2d> aCenterInSketch = sketch()->to2D(aCenter);
+      GeomPointPtr aCenter = aSketchPlane->project(aCircle.center());
+      GeomPnt2dPtr aCenterInSketch = sketch()->to2D(aCenter);
 
-      // update attributes of projection
-      std::shared_ptr<GeomDataAPI_Point2D> aCenterPnt =
-          std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
-          aProjection->attribute(SketchPlugin_Circle::CENTER_ID()));
-      aCenterPnt->setValue(aCenterInSketch);
-      aProjection->real(SketchPlugin_Circle::RADIUS_ID())->setValue(aCircle.radius());
+      if (aProjectedCurve->isTrimmed()) {
+        // ARC is a projection
+        rebuildProjectedFeature(aProjection, ARC_PROJECTION(), SketchPlugin_Arc::ID());
+
+        GeomPointPtr aFirst = aProjectedCurve->getPoint(aProjectedCurve->startParam());
+        GeomPointPtr aLast = aProjectedCurve->getPoint(aProjectedCurve->endParam());
+        GeomPnt2dPtr aFirstInSketch = sketch()->to2D(aSketchPlane->project(aFirst));
+        GeomPnt2dPtr aLastInSketch = sketch()->to2D(aSketchPlane->project(aLast));
+
+        double aNormalsDot = aCircle.normal()->dot(aSketchPlane->direction());
+        if (fabs(fabs(aNormalsDot) - 1.0) > tolerance)
+          return; // arc is not in the plane, parallel to the sketch plane
+
+        bool isInversed = aNormalsDot < 0.;
+
+        bool aWasBlocked = aProjection->data()->blockSendAttributeUpdated(true);
+
+        // update attributes of projection
+        std::shared_ptr<GeomDataAPI_Point2D> aCenterPnt =
+            std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
+            aProjection->attribute(SketchPlugin_Arc::CENTER_ID()));
+        std::shared_ptr<GeomDataAPI_Point2D> aStartPnt =
+            std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
+            aProjection->attribute(SketchPlugin_Arc::START_ID()));
+        std::shared_ptr<GeomDataAPI_Point2D> aEndPnt =
+            std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
+            aProjection->attribute(SketchPlugin_Arc::END_ID()));
+        aStartPnt->setValue(aFirstInSketch);
+        aEndPnt->setValue(aLastInSketch);
+        aCenterPnt->setValue(aCenterInSketch);
+        aProjection->boolean(SketchPlugin_Arc::REVERSED_ID())->setValue(isInversed);
+
+        aProjection->data()->blockSendAttributeUpdated(aWasBlocked);
+      }
+      else {
+        // CIRCLE is a projection
+        rebuildProjectedFeature(aProjection, CIRCLE_ELLIPSE_PROJECTION(),
+                                SketchPlugin_Circle::ID());
+
+        // update attributes of projection
+        std::shared_ptr<GeomDataAPI_Point2D> aCenterPnt =
+            std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
+            aProjection->attribute(SketchPlugin_Circle::CENTER_ID()));
+        aCenterPnt->setValue(aCenterInSketch);
+        aProjection->real(SketchPlugin_Circle::RADIUS_ID())->setValue(aCircle.radius());
+      }
     }
     else if (aProjectedCurve->isEllipse()) {
-      rebuildProjectedFeature(aProjection, SketchPlugin_Ellipse::ID());
-
       GeomAPI_Ellipse anEllipse(aProjectedCurve);
-      std::shared_ptr<GeomAPI_Pnt> aCenter = aSketchPlane->project(anEllipse.center());
-      std::shared_ptr<GeomAPI_Pnt2d> aCenterInSketch = sketch()->to2D(aCenter);
-      std::shared_ptr<GeomAPI_Pnt> aFocus = aSketchPlane->project(anEllipse.firstFocus());
-      std::shared_ptr<GeomAPI_Pnt2d> aFocusInSketch = sketch()->to2D(aFocus);
+      GeomPointPtr aCenter = aSketchPlane->project(anEllipse.center());
+      GeomPnt2dPtr aCenterInSketch = sketch()->to2D(aCenter);
+      GeomPointPtr aFocus = aSketchPlane->project(anEllipse.firstFocus());
+      GeomPnt2dPtr aFocusInSketch = sketch()->to2D(aFocus);
 
-      // update attributes of projection
-      std::shared_ptr<GeomDataAPI_Point2D> aCenterPnt =
-          std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
-          aProjection->attribute(SketchPlugin_Ellipse::CENTER_ID()));
-      aCenterPnt->setValue(aCenterInSketch);
-      std::shared_ptr<GeomDataAPI_Point2D> aFocusPnt =
-          std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
-          aProjection->attribute(SketchPlugin_Ellipse::FIRST_FOCUS_ID()));
-      aFocusPnt->setValue(aFocusInSketch);
-      aProjection->real(SketchPlugin_Ellipse::MINOR_RADIUS_ID())->setValue(
-          anEllipse.minorRadius());
+      if (aProjectedCurve->isTrimmed()) {
+        // ELLIPTIC ARC is a projection
+        rebuildProjectedFeature(aProjection, ARC_PROJECTION(), SketchPlugin_EllipticArc::ID());
+
+        GeomPointPtr aFirst = aProjectedCurve->getPoint(aProjectedCurve->startParam());
+        GeomPointPtr aLast = aProjectedCurve->getPoint(aProjectedCurve->endParam());
+        GeomPnt2dPtr aFirstInSketch = sketch()->to2D(aSketchPlane->project(aFirst));
+        GeomPnt2dPtr aLastInSketch = sketch()->to2D(aSketchPlane->project(aLast));
+
+        double aNormalsDot = anEllipse.normal()->dot(aSketchPlane->direction());
+        if (fabs(fabs(aNormalsDot) - 1.0) > tolerance)
+          return; // arc is not in the plane, parallel to the sketch plane
+
+        bool isInversed = aNormalsDot < 0.;
+
+        bool aWasBlocked = aProjection->data()->blockSendAttributeUpdated(true);
+
+        // update attributes of projection
+        std::shared_ptr<GeomDataAPI_Point2D> aCenterPnt =
+            std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
+            aProjection->attribute(SketchPlugin_EllipticArc::CENTER_ID()));
+        std::shared_ptr<GeomDataAPI_Point2D> aFocusPnt =
+            std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
+            aProjection->attribute(SketchPlugin_EllipticArc::FIRST_FOCUS_ID()));
+        std::shared_ptr<GeomDataAPI_Point2D> aStartPnt =
+            std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
+            aProjection->attribute(SketchPlugin_EllipticArc::START_POINT_ID()));
+        std::shared_ptr<GeomDataAPI_Point2D> aEndPnt =
+            std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
+            aProjection->attribute(SketchPlugin_EllipticArc::END_POINT_ID()));
+        aStartPnt->setValue(aFirstInSketch);
+        aEndPnt->setValue(aLastInSketch);
+        aCenterPnt->setValue(aCenterInSketch);
+        aFocusPnt->setValue(aFocusInSketch);
+        aProjection->boolean(SketchPlugin_EllipticArc::REVERSED_ID())->setValue(isInversed);
+
+        aProjection->data()->blockSendAttributeUpdated(aWasBlocked);
+      }
+      else {
+        // ELLIPSE is a projection
+        rebuildProjectedFeature(aProjection, CIRCLE_ELLIPSE_PROJECTION(),
+                                SketchPlugin_Ellipse::ID());
+
+        // update attributes of projection
+        std::shared_ptr<GeomDataAPI_Point2D> aCenterPnt =
+            std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
+            aProjection->attribute(SketchPlugin_Ellipse::CENTER_ID()));
+        aCenterPnt->setValue(aCenterInSketch);
+        std::shared_ptr<GeomDataAPI_Point2D> aFocusPnt =
+            std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
+            aProjection->attribute(SketchPlugin_Ellipse::FIRST_FOCUS_ID()));
+        aFocusPnt->setValue(aFocusInSketch);
+        aProjection->real(SketchPlugin_Ellipse::MINOR_RADIUS_ID())->setValue(
+            anEllipse.minorRadius());
+      }
     }
     else
       return;
-  }
-  else if (anEdge->isArc()) {
-    std::shared_ptr<GeomAPI_Pnt> aFirst = aSketchPlane->project(anEdge->firstPoint());
-    std::shared_ptr<GeomAPI_Pnt> aLast = aSketchPlane->project(anEdge->lastPoint());
-    std::shared_ptr<GeomAPI_Pnt2d> aFirstInSketch = sketch()->to2D(aFirst);
-    std::shared_ptr<GeomAPI_Pnt2d> aLastInSketch = sketch()->to2D(aLast);
-
-    std::shared_ptr<GeomAPI_Circ> aCircle = anEdge->circle();
-    std::shared_ptr<GeomAPI_Pnt> aCenter = aSketchPlane->project(aCircle->center());
-    std::shared_ptr<GeomAPI_Pnt2d> aCenterInSketch = sketch()->to2D(aCenter);
-
-    double aNormalsDot = aCircle->normal()->dot(aSketchPlane->direction());
-    if (fabs(fabs(aNormalsDot) - 1.0) > tolerance)
-      return; // arc is not in the plane, parallel to the sketch plane
-
-    bool isInversed = aNormalsDot < 0.;
-
-    rebuildProjectedFeature(aProjection, SketchPlugin_Arc::ID());
-
-    bool aWasBlocked = aProjection->data()->blockSendAttributeUpdated(true);
-
-    // update attributes of projection
-    std::shared_ptr<GeomDataAPI_Point2D> aCenterPnt =
-      std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
-        aProjection->attribute(SketchPlugin_Arc::CENTER_ID()));
-    std::shared_ptr<GeomDataAPI_Point2D> aStartPnt =
-      std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
-        aProjection->attribute(SketchPlugin_Arc::START_ID()));
-    std::shared_ptr<GeomDataAPI_Point2D> aEndPnt =
-      std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
-        aProjection->attribute(SketchPlugin_Arc::END_ID()));
-    aStartPnt->setValue(aFirstInSketch);
-    aEndPnt->setValue(aLastInSketch);
-    aCenterPnt->setValue(aCenterInSketch);
-    aProjection->boolean(SketchPlugin_Arc::REVERSED_ID())->setValue(isInversed);
-
-    aProjection->data()->blockSendAttributeUpdated(aWasBlocked);
   } else
     return;
 
@@ -294,12 +375,15 @@ void SketchPlugin_Projection::computeProjection(const std::string& theID)
   }
 }
 
-bool SketchPlugin_Projection::rebuildProjectedFeature(FeaturePtr& theProjection,
-                                                      const std::string& theResultType,
-                                                      bool theRemoveOnly)
+bool SketchPlugin_Projection::rebuildProjectedFeature(
+    FeaturePtr& theProjection,
+    const std::set<std::string>& theSupportedTypes,
+    const std::string& theRequestedFeature)
 {
   bool isRebuild = false;
-  if (theProjection && theProjection->getKind() != theResultType) {
+  if (theProjection &&
+      (theSupportedTypes.find(theProjection->getKind()) == theSupportedTypes.end() ||
+      (!theRequestedFeature.empty() && theProjection->getKind() != theRequestedFeature))) {
     DocumentPtr aDoc = sketch()->document();
 
     AttributeRefAttrPtr aRefAttr = data()->refattr(PROJECTED_FEATURE_ID());
@@ -312,7 +396,7 @@ bool SketchPlugin_Projection::rebuildProjectedFeature(FeaturePtr& theProjection,
     isRebuild = true;
   }
 
-  if (!theProjection && !theRemoveOnly)
-    theProjection = sketch()->addFeature(theResultType);
+  if (!theProjection && !theRequestedFeature.empty())
+    theProjection = sketch()->addFeature(theRequestedFeature);
   return isRebuild;
 }

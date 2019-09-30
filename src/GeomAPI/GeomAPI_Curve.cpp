@@ -35,7 +35,9 @@
 #define MY_CURVE (*(implPtr<Handle_Geom_Curve>()))
 
 GeomAPI_Curve::GeomAPI_Curve()
-    : GeomAPI_Interface(new Handle_Geom_Curve()), myStart(0), myEnd(1)
+    : GeomAPI_Interface(new Handle_Geom_Curve()),
+      myStart(-Precision::Infinite()),
+      myEnd(Precision::Infinite())
 {
 }
 
@@ -47,6 +49,8 @@ GeomAPI_Curve::GeomAPI_Curve(const std::shared_ptr<GeomAPI_Shape>& theShape)
   if (!anEdge.IsNull()) {
     Handle(Geom_Curve) aCurve = BRep_Tool::Curve(anEdge, myStart, myEnd);
     if (!aCurve.IsNull()) {
+      if (!BRep_Tool::IsClosed(anEdge))
+        aCurve = new Geom_TrimmedCurve(aCurve, myStart, myEnd);
       setImpl(new Handle(Geom_Curve)(aCurve));
     }
   }
@@ -57,19 +61,53 @@ bool GeomAPI_Curve::isNull() const
   return MY_CURVE.IsNull() == Standard_True;
 }
 
+static bool isCurveType(const Handle(Geom_Curve)& theCurve, const Handle(Standard_Type)& theType)
+{
+  if (theCurve.IsNull())
+    return false;
+  Handle(Geom_Curve) aCurve = theCurve;
+  if (aCurve->DynamicType() == STANDARD_TYPE(Geom_TrimmedCurve))
+    aCurve = Handle(Geom_TrimmedCurve)::DownCast(aCurve)->BasisCurve();
+  return aCurve->DynamicType() == theType;
+}
+
 bool GeomAPI_Curve::isLine() const
 {
-  return !isNull() && MY_CURVE->DynamicType() == STANDARD_TYPE(Geom_Line);
+  return isCurveType(MY_CURVE, STANDARD_TYPE(Geom_Line));
 }
 
 bool GeomAPI_Curve::isCircle() const
 {
-  return !isNull() && MY_CURVE->DynamicType() == STANDARD_TYPE(Geom_Circle);
+  return isCurveType(MY_CURVE, STANDARD_TYPE(Geom_Circle));
 }
 
 bool GeomAPI_Curve::isEllipse() const
 {
-  return !isNull() && MY_CURVE->DynamicType() == STANDARD_TYPE(Geom_Ellipse);
+  return isCurveType(MY_CURVE, STANDARD_TYPE(Geom_Ellipse));
+}
+
+double GeomAPI_Curve::startParam()
+{
+  if (Precision::IsInfinite(myStart)) {
+    if (isTrimmed()) {
+      myStart = Handle(Geom_TrimmedCurve)::DownCast(MY_CURVE)->FirstParameter();
+    }
+    else if (MY_CURVE->IsClosed() && MY_CURVE->IsPeriodic())
+      myStart = 0.0;
+  }
+  return myStart;
+}
+
+double GeomAPI_Curve::endParam()
+{
+  if (Precision::IsInfinite(myEnd)) {
+    if (isTrimmed()) {
+      myEnd = Handle(Geom_TrimmedCurve)::DownCast(MY_CURVE)->LastParameter();
+    }
+    else if (MY_CURVE->IsClosed() && MY_CURVE->IsPeriodic())
+      myEnd = MY_CURVE->Period();
+  }
+  return myEnd;
 }
 
 std::shared_ptr<GeomAPI_Pnt> GeomAPI_Curve::getPoint(double theParam)

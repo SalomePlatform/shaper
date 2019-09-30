@@ -41,7 +41,8 @@ GeomAPI_Ellipse::GeomAPI_Ellipse(const std::shared_ptr<GeomAPI_Ax2>& theAx2,
 
 GeomAPI_Ellipse::GeomAPI_Ellipse(GeomCurvePtr theCurve)
 {
-  Handle(Geom_Curve) aCurve = theCurve->impl<Handle(Geom_Curve)>();
+  GeomCurvePtr anUntrimmedCurve = theCurve->basisCurve();
+  Handle(Geom_Curve) aCurve = anUntrimmedCurve->impl<Handle(Geom_Curve)>();
   Handle(Geom_Ellipse) anEllipse = Handle(Geom_Ellipse)::DownCast(aCurve);
   if (anEllipse.IsNull())
     throw Standard_ConstructionError("GeomAPI_Ellipse: Curve is not an ellipse");
