@@ -187,7 +187,7 @@ void PartSet_ExternalPointsMgr::updateCenterPresentations()
     else
       myPresentations[aPrs->object()] = aList;
     foreach(AISObjectPtr anAIS, aList) {
-      aDisplayer->displayAIS(anAIS, false);
+      aDisplayer->displayAIS(anAIS, false, 0, false);
       aWorkshop->selectionActivate()->activateAIS(anAIS->impl<Handle(AIS_InteractiveObject)>(),
         TopAbs_VERTEX, false);
     }

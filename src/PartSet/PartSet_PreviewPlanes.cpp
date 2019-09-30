@@ -139,9 +139,9 @@ void PartSet_PreviewPlanes::showPreviewPlanes(ModuleBase_IWorkshop* theWorkshop)
     myXYPlane = createPreviewPlane(anOrigin, aXYDir, aB);
   }
   XGUI_Displayer* aDisp = XGUI_Tools::workshop(theWorkshop)->displayer();
-  aDisp->displayAIS(myYZPlane, true, false);
-  aDisp->displayAIS(myXZPlane, true, false);
-  aDisp->displayAIS(myXYPlane, true, false);
+  aDisp->displayAIS(myYZPlane, true, 0, false);
+  aDisp->displayAIS(myXZPlane, true, 0, false);
+  aDisp->displayAIS(myXYPlane, true, 0, false);
   myPreviewDisplayed = true;
 }
 

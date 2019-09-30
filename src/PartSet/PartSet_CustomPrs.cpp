@@ -140,7 +140,7 @@ bool PartSet_CustomPrs::displayPresentation(
       PartSet_Module* aModule = dynamic_cast<PartSet_Module*>(myWorkshop->module());
       XGUI_Workshop* aWorkshop = workshop();
       aRedisplayed = aWorkshop->displayer()->displayAIS(myPresentations[theFlag],
-                                         false/*load object in selection*/, false);
+                                         false/*load object in selection*/, 0, false);
       aContext->SetZLayer(anOperationPrs, aModule->getVisualLayerId());
       isModified = true;
     }
