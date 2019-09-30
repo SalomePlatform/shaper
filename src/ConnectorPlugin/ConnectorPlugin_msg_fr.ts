@@ -4,7 +4,7 @@
   <context>
     <name>ExportToGEOM</name>
     <message>
-      <source>Export all bodies and groups into GEOM module</source>
+      <source>Export all results and groups into GEOM module</source>
       <translation>Exporter tous les résultats et groupes dans le module GEOM</translation>
     </message>
     <message>

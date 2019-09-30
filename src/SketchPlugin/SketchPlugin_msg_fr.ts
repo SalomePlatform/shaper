@@ -2158,7 +2158,7 @@
   <context>
     <name>SketchFillet:ConstraintEntityA:SketchPlugin_FilletVertexValidator</name>
     <message>
-      <source>Error: one of the selected point does not have coicidence.</source>
+      <source>Error: one of the selected point does not have coincidence.</source>
       <translation>Un des points sélectionné n&apos;a pas de coïncidence</translation>
     </message>
   </context>
@@ -2737,7 +2737,7 @@
   <context>
     <name>SketchConstraintEqual</name>
     <message>
-      <source>Create constraint defining equal lengths of two lines or line and arc or equal radii of two arcs or two circles or arc and circle</source>
+      <source>Create constraint defining equal lengths of two lines or line and arc or equal radiuses of two arcs or two circles or arc and circle</source>
       <translation>Créer une contrainte définissant des longueurs égales de deux lignes, ou une ligne et un arc, ou des rayons égaux de deux arcs ou de deux cercles ou d&apos;un arc et d&apos;un cercle</translation>
     </message>
     <message>

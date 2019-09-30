@@ -4,7 +4,7 @@
                    label="Select:&lt;br /&gt;
 1. Planar face of non-sketch object or a plane. Sketch creation will be started.&lt;br /&gt;
 2. An existing sketch face or contour. Extrusion will be filled by it.&lt;br /&gt;
-3. An existing result shape of kind: wires/edge/vertices.Extrusion will be filled by it."
+3. An existing result shape of kind: wires/edge/vertices. Extrusion will be filled by it."
                    shape_types="vertices edges wires faces shells compounds">
     <validator id="FeaturesPlugin_ValidatorCompositeLauncher" parameters="base,Sketch"/>
   </sketch_launcher>

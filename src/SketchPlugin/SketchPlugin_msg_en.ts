@@ -1458,14 +1458,14 @@
     <name>SketchConstraintCoincidence:ConstraintEntityA:PartSet_DifferentObjects</name>
     <message>
       <source>The feature uses one  object in ConstraintEntityA and ConstraintEntityB attributes.</source>
-      <translation>Diferent objects should be selected</translation>
+      <translation>Different objects should be selected</translation>
     </message>
   </context>
   <context>
     <name>SketchConstraintCoincidence:ConstraintEntityB:PartSet_DifferentObjects</name>
     <message>
       <source>The feature uses one  object in ConstraintEntityB and ConstraintEntityA attributes.</source>
-      <translation>Diferent objects should be selected</translation>
+      <translation>Different objects should be selected</translation>
     </message>
   </context>
   <context>
@@ -1684,14 +1684,14 @@
     <name>SketchConstraintEqual:ConstraintEntityA:PartSet_DifferentObjects</name>
     <message>
       <source>The feature uses one  object in ConstraintEntityA and ConstraintEntityB attributes.</source>
-      <translation>Diferent objects should be selected</translation>
+      <translation>Different objects should be selected</translation>
     </message>
   </context>
   <context>
     <name>SketchConstraintEqual:ConstraintEntityB:PartSet_DifferentObjects</name>
     <message>
       <source>The feature uses one  object in ConstraintEntityB and ConstraintEntityA attributes.</source>
-      <translation>Diferent objects should be selected</translation>
+      <translation>Different objects should be selected</translation>
     </message>
   </context>
   <context>
@@ -1849,14 +1849,14 @@
     <name>SketchConstraintMiddle:ConstraintEntityA:PartSet_DifferentObjects</name>
     <message>
       <source>The feature uses one  object in ConstraintEntityA and ConstraintEntityB attributes.</source>
-      <translation>Diferent objects should be selected</translation>
+      <translation>Different objects should be selected</translation>
     </message>
   </context>
   <context>
     <name>SketchConstraintMiddle:ConstraintEntityB:PartSet_DifferentObjects</name>
     <message>
       <source>The feature uses one  object in ConstraintEntityB and ConstraintEntityA attributes.</source>
-      <translation>Diferent objects should be selected</translation>
+      <translation>Different objects should be selected</translation>
     </message>
   </context>
   <context>
@@ -2083,14 +2083,14 @@
     <name>SketchConstraintTangent:ConstraintEntityA:PartSet_DifferentObjects</name>
     <message>
       <source>The feature uses one  object in ConstraintEntityA and ConstraintEntityB attributes.</source>
-      <translation>Diferent objects should be selected</translation>
+      <translation>Different objects should be selected</translation>
     </message>
   </context>
   <context>
     <name>SketchConstraintTangent:ConstraintEntityB:PartSet_DifferentObjects</name>
     <message>
       <source>The feature uses one  object in ConstraintEntityB and ConstraintEntityA attributes.</source>
-      <translation>Diferent objects should be selected</translation>
+      <translation>Different objects should be selected</translation>
     </message>
   </context>
   <context>
@@ -2182,8 +2182,8 @@
   <context>
     <name>SketchFillet:ConstraintEntityA:SketchPlugin_FilletVertexValidator</name>
     <message>
-      <source>Error: one of the selected point does not have coicidence.</source>
-      <translation>One of the selected point does not have coicidence</translation>
+      <source>Error: one of the selected point does not have coincidence.</source>
+      <translation>One of the selected point does not have coincidence</translation>
     </message>
   </context>
   <context>

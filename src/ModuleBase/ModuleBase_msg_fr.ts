@@ -314,7 +314,7 @@
     <name>QObject</name>
     <message>
       <location filename="ModuleBase_Tools.cpp" line="942"/>
-      <source>Selected objects can be used in Part documents which are not loaded:%1.
+      <source>Selected objects can be used in Part documents which are not loaded: %1.
 </source>
       <translation>Les objets sélectionnés peuvent être utilisés dans les documents de pièce non chargés : %1.
 </translation>

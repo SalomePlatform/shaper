@@ -1207,7 +1207,7 @@
 
       <!--  SketchConstraintEqual  -->
       <feature id="SketchConstraintEqual" title="Equal"
-        tooltip="Create constraint defining equal lengths of two lines or line and arc or equal radii of two arcs or two circles or arc and circle"
+        tooltip="Create constraint defining equal lengths of two lines or line and arc or equal radiuses of two arcs or two circles or arc and circle"
         icon="icons/Sketch/equal.png"
                helpfile="equalFeature.html">
         <sketch_shape_selector id="ConstraintEntityA"

@@ -26,8 +26,8 @@
       <translation>Déverser</translation>
     </message>
     <message>
-      <source>Dump python script</source>
-      <translation>Déverser dans un  script Python</translation>
+      <source>Dump Python script</source>
+      <translation>Déverser dans un script Python</translation>
     </message>
   </context>
   <context>

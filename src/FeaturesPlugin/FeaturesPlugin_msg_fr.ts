@@ -23,11 +23,11 @@
     </message>
     <message>
       <source>ExtrusionCut</source>
-      <translation>ExtrusionCut</translation>
+      <translation>Enlèvement de matière extrudé</translation>
     </message>
     <message>
       <source>ExtrusionFuse</source>
-      <translation>ExtrusionFuse</translation>
+      <translation>Bossage extrudé</translation>
     </message>
     <message>
       <source>Fillet</source>
@@ -67,11 +67,11 @@
     </message>
     <message>
       <source>RevolutionCut</source>
-      <translation>RevolutionCut</translation>
+      <translation>Enlèvement de matière avec révolution</translation>
     </message>
     <message>
       <source>RevolutionFuse</source>
-      <translation>RevolutionFuse</translation>
+      <translation>Bossage avec révolution</translation>
     </message>
     <message>
       <source>Scale</source>
@@ -355,7 +355,7 @@
   <context>
     <name>Extrusion:sketch</name>
     <message>
-      <source>Select:&lt;br /&gt; 1. Planar face of non-sketch object or a plane. Sketch creation will be started.&lt;br /&gt; 2. An existing sketch face or contour. Extrusion will be filled by it.&lt;br /&gt; 3. An existing result shape of kind: wires/edge/vertices.Extrusion will be filled by it.</source>
+      <source>Select:&lt;br /&gt; 1. Planar face of non-sketch object or a plane. Sketch creation will be started.&lt;br /&gt; 2. An existing sketch face or contour. Extrusion will be filled by it.&lt;br /&gt; 3. An existing result shape of kind: wires/edge/vertices. Extrusion will be filled by it.</source>
       <translation>Sélectionnez : &lt;br /&gt; 1. Face plane d&apos;un objet non esquissé ou d&apos;un plan. La création de l’esquisse sera lancée. &lt;br /&gt; 2. Une face ou un contour d’esquisse existant. L&apos;extrusion sera remplie par elle. &lt;br /&gt; 3. Une forme de résultat existante de type: contours / arête / sommets. L&apos;extrusion sera remplie par elle.</translation>
     </message>
   </context>
@@ -365,7 +365,7 @@
     <name>ExtrusionCut</name>
     <message>
       <source>ExtrusionCut</source>
-      <translation>ExtrusionCut</translation>
+      <translation>Enlèvement de matière extrudé</translation>
     </message>
     <message>
       <source>Cuts an extrusion from a solid</source>
@@ -520,7 +520,7 @@
   <context>
     <name>ExtrusionCut:sketch</name>
     <message>
-      <source>Select:&lt;br /&gt; 1. Planar face of non-sketch object or a plane. Sketch creation will be started.&lt;br /&gt; 2. An existing sketch face or contour. Extrusion will be filled by it.&lt;br /&gt; 3. An existing result shape of kind: wires/edge/vertices.Extrusion will be filled by it.</source>
+      <source>Select:&lt;br /&gt; 1. Planar face of non-sketch object or a plane. Sketch creation will be started.&lt;br /&gt; 2. An existing sketch face or contour. Extrusion will be filled by it.&lt;br /&gt; 3. An existing result shape of kind: wires/edge/vertices. Extrusion will be filled by it.</source>
       <translation>Sélectionnez : &lt;br /&gt; 1. Face plane d&apos;un objet non esquissé ou d&apos;un plan. La création de l’esquisse sera lancée. &lt;br /&gt; 2. Une face ou un contour d’esquisse existant. L&apos;extrusion sera remplie par elle. &lt;br /&gt; 3. Une forme de résultat existante de type: contours / arête / sommets. L&apos;extrusion sera remplie par elle.</translation>
     </message>
   </context>
@@ -530,7 +530,7 @@
     <name>ExtrusionFuse</name>
     <message>
       <source>ExtrusionFuse</source>
-      <translation>ExtrusionFuse</translation>
+      <translation>Bossage extrudé</translation>
     </message>
     <message>
       <source>Fuses an extrusion with a solid</source>
@@ -678,7 +678,7 @@
   <context>
     <name>ExtrusionFuse:sketch</name>
     <message>
-      <source>Select:&lt;br /&gt; 1. Planar face of non-sketch object or a plane. Sketch creation will be started.&lt;br /&gt; 2. An existing sketch face or contour. Extrusion will be filled by it.&lt;br /&gt; 3. An existing result shape of kind: wires/edge/vertices.Extrusion will be filled by it.</source>
+      <source>Select:&lt;br /&gt; 1. Planar face of non-sketch object or a plane. Sketch creation will be started.&lt;br /&gt; 2. An existing sketch face or contour. Extrusion will be filled by it.&lt;br /&gt; 3. An existing result shape of kind: wires/edge/vertices. Extrusion will be filled by it.</source>
       <translation>Sélectionnez : &lt;br /&gt; 1. Face plane d&apos;un objet non esquissé ou d&apos;un plan. La création de l’esquisse sera lancée. &lt;br /&gt; 2. Une face ou un contour d’esquisse existant. L&apos;extrusion sera remplie par elle. &lt;br /&gt; 3. Une forme de résultat existante de type: contours / arête / sommets. L&apos;extrusion sera remplie par elle.</translation>
     </message>
   </context>
@@ -873,7 +873,7 @@
       <translation>Objets</translation>
     </message>
     <message>
-      <source>Select objects(compounds, compsolids, solids, shells, faces or edges)</source>
+      <source>Select objects (compounds, compsolids, solids, shells, faces or edges)</source>
       <translation>Sélectionner des objets (assemblages, solides composites, coques, faces ou arêtes)</translation>
     </message>
   </context>
@@ -1238,7 +1238,7 @@
   <context>
     <name>Revolution:sketch</name>
     <message>
-      <source>Select:&lt;br /&gt; 1. Planar face of non-sketch object or a plane. Sketch creation will be started.&lt;br /&gt; 2. An existing sketch face or contour. Extrusion will be filled by it.&lt;br /&gt; 3. An existing result shape of kind: wires/edge/vertices.Extrusion will be filled by it.</source>
+      <source>Select:&lt;br /&gt; 1. Planar face of non-sketch object or a plane. Sketch creation will be started.&lt;br /&gt; 2. An existing sketch face or contour. Extrusion will be filled by it.&lt;br /&gt; 3. An existing result shape of kind: wires/edge/vertices. Extrusion will be filled by it.</source>
       <translation>Sélectionnez : &lt;br /&gt; 1. Face plane d&apos;un objet non esquissé ou d&apos;un plan. La création de l’esquisse sera lancée. &lt;br /&gt; 2. Une face ou un contour d’esquisse existant. L&apos;extrusion sera remplie par elle. &lt;br /&gt; 3. Une forme de résultat existante de type: contours / arête / sommets. L&apos;extrusion sera remplie par elle.</translation>
     </message>
   </context>
@@ -1248,7 +1248,7 @@
     <name>RevolutionCut</name>
     <message>
       <source>RevolutionCut</source>
-      <translation>RevolutionCut</translation>
+      <translation>Enlèvement de matière avec révolution</translation>
     </message>
     <message>
       <source>Cuts a revolution from a solid</source>
@@ -1384,7 +1384,7 @@
   <context>
     <name>RevolutionCut:sketch</name>
     <message>
-      <source>Select:&lt;br /&gt; 1. Planar face of non-sketch object or a plane. Sketch creation will be started.&lt;br /&gt; 2. An existing sketch face or contour. Extrusion will be filled by it.&lt;br /&gt; 3. An existing result shape of kind: wires/edge/vertices.Extrusion will be filled by it.</source>
+      <source>Select:&lt;br /&gt; 1. Planar face of non-sketch object or a plane. Sketch creation will be started.&lt;br /&gt; 2. An existing sketch face or contour. Extrusion will be filled by it.&lt;br /&gt; 3. An existing result shape of kind: wires/edge/vertices. Extrusion will be filled by it.</source>
       <translation>Sélectionnez : &lt;br /&gt; 1. Face plane d&apos;un objet non esquissé ou d&apos;un plan. La création de l’esquisse sera lancée. &lt;br /&gt; 2. Une face ou un contour d’esquisse existant. L&apos;extrusion sera remplie par elle. &lt;br /&gt; 3. Une forme de résultat existante de type: contours / arête / sommets. L&apos;extrusion sera remplie par elle.</translation>
     </message>
   </context>
@@ -1394,7 +1394,7 @@
     <name>RevolutionFuse</name>
     <message>
       <source>RevolutionFuse</source>
-      <translation>RevolutionFuse</translation>
+      <translation>Bossage avec révolution</translation>
     </message>
     <message>
       <source>Fuses a revolution with a solid</source>
@@ -1530,7 +1530,7 @@
   <context>
     <name>RevolutionFuse:sketch</name>
     <message>
-      <source>Select:&lt;br /&gt; 1. Planar face of non-sketch object or a plane. Sketch creation will be started.&lt;br /&gt; 2. An existing sketch face or contour. Extrusion will be filled by it.&lt;br /&gt; 3. An existing result shape of kind: wires/edge/vertices.Extrusion will be filled by it.</source>
+      <source>Select:&lt;br /&gt; 1. Planar face of non-sketch object or a plane. Sketch creation will be started.&lt;br /&gt; 2. An existing sketch face or contour. Extrusion will be filled by it.&lt;br /&gt; 3. An existing result shape of kind: wires/edge/vertices. Extrusion will be filled by it.</source>
       <translation>Sélectionnez : &lt;br /&gt; 1. Face plane d&apos;un objet non esquissé ou d&apos;un plan. La création de l’esquisse sera lancée. &lt;br /&gt; 2. Une face ou un contour d’esquisse existant. L&apos;extrusion sera remplie par elle. &lt;br /&gt; 3. Une forme de résultat existante de type: contours / arête / sommets. L&apos;extrusion sera remplie par elle.</translation>
     </message>
   </context>
@@ -1911,7 +1911,7 @@
   <context>
     <name>Extrusion:base:FeaturesPlugin_ValidatorBaseForGeneration</name>
     <message>
-      <source>Error: Objects with such wire already selected. Don't allow to select this object.</source>
+      <source>Error: Objects with this wire already selected. Don't allow to select this object.</source>
       <translation>Les objets de ce contour sont déjà sélectionnés. Ne pas autoriser à sélectionner cet objet.</translation>
     </message>
   </context>
@@ -1953,7 +1953,7 @@
   <context>
     <name>Extrusion:base:FeaturesPlugin_ValidatorBaseForGeneration</name>
     <message>
-      <source>Error: Selected shape has unacceptable type. Acceptable types are: faces or wires on sketch, whole sketch(if it has at least one face), and whole objects with shape types: %1</source>
+      <source>Error: Selected shape has unacceptable type. Acceptable types are: faces or wires on sketch, whole sketch (if it has at least one face), and whole objects with shape types: %1</source>
       <translation>Le type de la forme sélectionnée n’est pas autorisé. Les types acceptables sont les suivants: faces ou contours sur l&apos;esquisse, esquisse entière (si elle possède au moins une face) et objets entiers des types de forme: %1</translation>
     </message>
   </context>
@@ -2093,7 +2093,7 @@
   <context>
     <name>Extrusion:GeomValidators_ZeroOffset</name>
     <message>
-      <source>Wrong number of validator arguments in xml(expected 9).</source>
+      <source>Wrong number of validator arguments in xml (expected 9).</source>
       <translation>Nombre incorrect d&apos;arguments de validation dans XML (9 prévus).</translation>
     </message>
   </context>
@@ -2346,7 +2346,7 @@
   <context>
     <name>ExtrusionCut:base:FeaturesPlugin_ValidatorBaseForGeneration</name>
     <message>
-      <source>Error: Objects with such wire already selected. Don't allow to select this object.</source>
+      <source>Error: Objects with this wire already selected. Don't allow to select this object.</source>
       <translation>Les objets de ce contour sont déjà sélectionnés. Ne pas autoriser à sélectionner cet objet.</translation>
     </message>
   </context>
@@ -2388,7 +2388,7 @@
   <context>
     <name>ExtrusionCut:base:FeaturesPlugin_ValidatorBaseForGeneration</name>
     <message>
-      <source>Error: Selected shape has unacceptable type. Acceptable types are: faces or wires on sketch, whole sketch(if it has at least one face), and whole objects with shape types: %1</source>
+      <source>Error: Selected shape has unacceptable type. Acceptable types are: faces or wires on sketch, whole sketch (if it has at least one face), and whole objects with shape types: %1</source>
       <translation>Le type de la forme sélectionnée n’est pas autorisé. Les types acceptables sont les suivants: faces ou contours sur l&apos;esquisse, esquisse entière (si elle possède au moins une face) et objets entiers des types de forme: %1</translation>
     </message>
   </context>
@@ -2577,7 +2577,7 @@
   <context>
     <name>ExtrusionCut:GeomValidators_ZeroOffset</name>
     <message>
-      <source>Wrong number of validator arguments in xml(expected 9).</source>
+      <source>Wrong number of validator arguments in xml (expected 9).</source>
       <translation>Nombre incorrect d&apos;arguments de validation dans XML (9 prévus).</translation>
     </message>
   </context>
@@ -2640,7 +2640,7 @@
   <context>
     <name>Revolution:GeomValidators_ZeroOffset</name>
     <message>
-      <source>Wrong number of validator arguments in xml(expected 9).</source>
+      <source>Wrong number of validator arguments in xml (expected 9).</source>
       <translation>Nombre incorrect d&apos;arguments du validateur &quot;GeomValidators_ZeroOffset&quot; en XML (9 attendus).</translation>
     </message>
   </context>
@@ -2801,7 +2801,7 @@
   <context>
     <name>Revolution:base:FeaturesPlugin_ValidatorBaseForGeneration</name>
     <message>
-      <source>Error: Objects with such wire already selected. Don't allow to select this object.</source>
+      <source>Error: Objects with this wire already selected. Don't allow to select this object.</source>
       <translation>Les objets de ce contour sont déjà sélectionnés. Ne pas autoriser à sélectionner cet objet.</translation>
     </message>
   </context>
@@ -2843,7 +2843,7 @@
   <context>
     <name>Revolution:base:FeaturesPlugin_ValidatorBaseForGeneration</name>
     <message>
-      <source>Error: Selected shape has unacceptable type. Acceptable types are: faces or wires on sketch, whole sketch(if it has at least one face), and whole objects with shape types: %1</source>
+      <source>Error: Selected shape has unacceptable type. Acceptable types are: faces or wires on sketch, whole sketch (if it has at least one face), and whole objects with shape types: %1</source>
       <translation>Le type de la forme sélectionnée n’est pas autorisé. Les types acceptables sont les suivants: faces ou contours sur l&apos;esquisse, esquisse entière (si elle possède au moins une face) et objets entiers des types de forme: %1</translation>
     </message>
   </context>
@@ -3032,7 +3032,7 @@
   <context>
     <name>RevolutionCut:GeomValidators_ZeroOffset</name>
     <message>
-      <source>Wrong number of validator arguments in xml(expected 9).</source>
+      <source>Wrong number of validator arguments in xml (expected 9).</source>
       <translation>Nombre incorrect d&apos;arguments du validateur &quot;GeomValidators_ZeroOffset&quot; en XML (9 attendus).</translation>
     </message>
   </context>
@@ -3200,7 +3200,7 @@
   <context>
     <name>RevolutionCut:base:FeaturesPlugin_ValidatorBaseForGeneration</name>
     <message>
-      <source>Error: Objects with such wire already selected. Don't allow to select this object.</source>
+      <source>Error: Objects with this wire already selected. Don't allow to select this object.</source>
       <translation>Les objets de ce contour sont déjà sélectionnés. Ne pas autoriser à sélectionner cet objet.</translation>
     </message>
   </context>
@@ -3242,7 +3242,7 @@
   <context>
     <name>RevolutionCut:base:FeaturesPlugin_ValidatorBaseForGeneration</name>
     <message>
-      <source>Error: Selected shape has unacceptable type. Acceptable types are: faces or wires on sketch, whole sketch(if it has at least one face), and whole objects with shape types: %1</source>
+      <source>Error: Selected shape has unacceptable type. Acceptable types are: faces or wires on sketch, whole sketch (if it has at least one face), and whole objects with shape types: %1</source>
       <translation>Le type de la forme sélectionnée n’est pas autorisé. Les types acceptables sont les suivants: faces ou contours sur l&apos;esquisse, esquisse entière (si elle possède au moins une face) et objets entiers des types de forme: %1</translation>
     </message>
   </context>
@@ -3620,7 +3620,7 @@
   <context>
     <name>ExtrusionFuse:base:FeaturesPlugin_ValidatorBaseForGeneration</name>
     <message>
-      <source>Error: Objects with such wire already selected. Don't allow to select this object.</source>
+      <source>Error: Objects with this wire already selected. Don't allow to select this object.</source>
       <translation>Les objets de ce contour sont déjà sélectionnés. Ne pas autoriser à sélectionner cet objet.</translation>
     </message>
   </context>
@@ -3662,7 +3662,7 @@
   <context>
     <name>ExtrusionFuse:base:FeaturesPlugin_ValidatorBaseForGeneration</name>
     <message>
-      <source>Error: Selected shape has unacceptable type. Acceptable types are: faces or wires on sketch, whole sketch(if it has at least one face), and whole objects with shape types: %1</source>
+      <source>Error: Selected shape has unacceptable type. Acceptable types are: faces or wires on sketch, whole sketch (if it has at least one face), and whole objects with shape types: %1</source>
       <translation>Le type de la forme sélectionnée n’est pas autorisé. Les types acceptables sont les suivants: faces ou contours sur l&apos;esquisse, esquisse entière (si elle possède au moins une face) et objets entiers des types de forme: %1</translation>
     </message>
   </context>
@@ -3851,7 +3851,7 @@
   <context>
     <name>ExtrusionFuse:GeomValidators_ZeroOffset</name>
     <message>
-      <source>Wrong number of validator arguments in xml(expected 9).</source>
+      <source>Wrong number of validator arguments in xml (expected 9).</source>
       <translation>Nombre incorrect d&apos;arguments de validation dans XML (9 prévus).</translation>
     </message>
   </context>
@@ -3942,7 +3942,7 @@
   <context>
     <name>RevolutionFuse:GeomValidators_ZeroOffset</name>
     <message>
-      <source>Wrong number of validator arguments in xml(expected 9).</source>
+      <source>Wrong number of validator arguments in xml (expected 9).</source>
       <translation>Nombre incorrect d&apos;arguments du validateur &quot;GeomValidators_ZeroOffset&quot; en XML (9 attendus).</translation>
     </message>
   </context>
@@ -4110,7 +4110,7 @@
   <context>
     <name>RevolutionFuse:base:FeaturesPlugin_ValidatorBaseForGeneration</name>
     <message>
-      <source>Error: Objects with such wire already selected. Don't allow to select this object.</source>
+      <source>Error: Objects with this wire already selected. Don't allow to select this object.</source>
       <translation>Les objets de ce contour sont déjà sélectionnés. Ne pas autoriser à sélectionner cet objet.</translation>
     </message>
   </context>
@@ -4152,7 +4152,7 @@
   <context>
     <name>RevolutionFuse:base:FeaturesPlugin_ValidatorBaseForGeneration</name>
     <message>
-      <source>Error: Selected shape has unacceptable type. Acceptable types are: faces or wires on sketch, whole sketch(if it has at least one face), and whole objects with shape types: %1</source>
+      <source>Error: Selected shape has unacceptable type. Acceptable types are: faces or wires on sketch, whole sketch (if it has at least one face), and whole objects with shape types: %1</source>
       <translation>Le type de la forme sélectionnée n’est pas autorisé. Les types acceptables sont les suivants: faces ou contours sur l&apos;esquisse, esquisse entière (si elle possède au moins une face) et objets entiers des types de forme: %1</translation>
     </message>
   </context>
@@ -4656,7 +4656,7 @@
   <context>
     <name>Pipe:base_objects:FeaturesPlugin_ValidatorBaseForGeneration</name>
     <message>
-      <source>Error: Objects with such wire already selected. Don't allow to select this object.</source>
+      <source>Error: Objects with this wire already selected. Don't allow to select this object.</source>
       <translation>Les objets de ce contour sont déjà sélectionnés. Ne pas autoriser à sélectionner cet objet.</translation>
     </message>
   </context>
@@ -4698,7 +4698,7 @@
   <context>
     <name>Pipe:base_objects:FeaturesPlugin_ValidatorBaseForGeneration</name>
     <message>
-      <source>Error: Selected shape has unacceptable type. Acceptable types are: faces or wires on sketch, whole sketch(if it has at least one face), and whole objects with shape types: %1</source>
+      <source>Error: Selected shape has unacceptable type. Acceptable types are: faces or wires on sketch, whole sketch (if it has at least one face), and whole objects with shape types: %1</source>
       <translation>Le type de la forme sélectionnée n’est pas autorisé. Les types acceptables sont les suivants: faces ou contours sur l&apos;esquisse, esquisse entière (si elle possède au moins une face) et objets entiers des types de forme: %1</translation>
     </message>
   </context>
@@ -5583,8 +5583,8 @@
       <translation>Longueur de bord</translation>
     </message>
     <message>
-      <source>Radius of circular</source>
-      <translation>Rayon circulaire</translation>
+      <source>Radius of circular edge, cylindrical surface or sphere</source>
+      <translation>Rayon du bord circulaire, de la surface cylindrique ou de la sphère</translation>
     </message>
   </context>
   <context>

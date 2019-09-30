@@ -71,7 +71,7 @@ class FeaturesPlugin_ValidatorPipeLocationsNumber: public ModelAPI_FeatureValida
 /// \class FeaturesPlugin_ValidatorBaseForGeneration
 /// \ingroup Validators
 /// \brief A validator for selection base for generation. Allows to select faces on sketch,
-/// whole sketch(if it has at least one face), and following objects: vertex, edge, wire, face.
+/// whole sketch (if it has at least one face), and following objects: vertex, edge, wire, face.
 class FeaturesPlugin_ValidatorBaseForGeneration: public ModelAPI_AttributeValidator
 {
 public:

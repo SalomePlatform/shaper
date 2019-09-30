@@ -98,7 +98,7 @@
   <context>
     <name>Edge:base_objects:BuildPlugin_ValidatorBaseForBuild</name>
     <message>
-      <source>Inifinte objects not acceptable.</source>
+      <source>Infinite objects not acceptable.</source>
       <translation>Les objets infinis ne sont pas acceptés.</translation>
     </message>
   </context>
@@ -189,7 +189,7 @@
   <context>
     <name>Face:base_objects:BuildPlugin_ValidatorBaseForBuild</name>
     <message>
-      <source>Inifinte objects not acceptable.</source>
+      <source>Infinite objects not acceptable.</source>
       <translation>Les objets infinis ne sont pas acceptés.</translation>
     </message>
   </context>
@@ -402,7 +402,7 @@
   <context>
     <name>Vertex:base_objects:BuildPlugin_ValidatorBaseForBuild</name>
     <message>
-      <source>Inifinte objects not acceptable.</source>
+      <source>Infinite objects not acceptable.</source>
       <translation>Les objets infinis ne sont pas acceptés.</translation>
     </message>
   </context>
@@ -487,7 +487,7 @@
   <context>
     <name>Wire:base_objects:BuildPlugin_ValidatorBaseForBuild</name>
     <message>
-      <source>Inifinte objects not acceptable.</source>
+      <source>Infinite objects not acceptable.</source>
       <translation>Les objets infinis ne sont pas acceptés.</translation>
     </message>
   </context>
@@ -880,7 +880,7 @@
       <translation>Fermé</translation>
     </message>
     <message>
-      <source>Makes the polyline closed.</source>
+      <source>Closes the polyline.</source>
       <translation>Ferme la polyligne.</translation>
     </message>
   </context>

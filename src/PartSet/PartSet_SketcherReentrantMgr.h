@@ -197,7 +197,7 @@ private:
   /// \param theSourceFeature a source feature
   /// \param theNewFeature a new feature
   /// \param theSketch an active sketch
-  /// \param isTemporary is used to do not create additional features(e.g. coicidence for line)
+  /// \param isTemporary is used to do not create additional features(e.g. coincidence for line)
   /// \return true is something is copied
   static bool copyReetntrantAttributes(const FeaturePtr& theSourceFeature,
                                       const FeaturePtr& theNewFeature,

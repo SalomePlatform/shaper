@@ -606,7 +606,7 @@ bool SketchPlugin_FilletVertexValidator::isValid(const AttributePtr& theAttribut
   }
 
   if(!aConstraintCoincidence.get()) {
-    theError = "Error: one of the selected point does not have coicidence.";
+    theError = "Error: one of the selected point does not have coincidence.";
     return false;
   }
 

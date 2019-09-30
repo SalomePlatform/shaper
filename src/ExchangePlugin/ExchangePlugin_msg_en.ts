@@ -42,7 +42,7 @@
     <name>Export:selection_list:GeomValidators_Finite</name>
     <message>
       <source>Infinite result is selected.</source>
-      <translation>Olny finitive shapes can be exported</translation>
+      <translation>Only finitive shapes can be exported</translation>
     </message>
   </context>
   <context>

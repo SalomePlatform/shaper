@@ -2,7 +2,7 @@
   <multi_selector id="main_objects"
     label="Objects"
     icon="icons/Features/cut_shape.png"
-    tooltip="Select objects(compounds, compsolids, solids, shells, faces or edges)"
+    tooltip="Select objects (compounds, compsolids, solids, shells, faces or edges)"
     shape_types="edges faces shells solids compsolids compounds"
     use_choice="false"
     concealment="true">

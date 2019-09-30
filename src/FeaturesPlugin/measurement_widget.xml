@@ -26,7 +26,7 @@
                       default="">
       </shape_selector>
     </box>
-    <box id="Radius" title="Radius of circular" icon="icons/Features/meas_radius_32x32.png">
+    <box id="Radius" title="Radius of circular edge, cylindrical surface or sphere" icon="icons/Features/meas_radius_32x32.png">
       <shape_selector id="circular"
                       icon=""
                       label="Object"

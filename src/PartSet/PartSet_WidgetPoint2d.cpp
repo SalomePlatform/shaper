@@ -520,7 +520,7 @@ bool PartSet_WidgetPoint2D::setConstraintToPoint(double theClickedX, double theC
     AttributePoint2DPtr aFeaturePoint;
     if (aFeature->isMacro()) {
       // the macro feature will be removed after the operation is stopped, so we need to build
-      // coicidence to possible sub-features
+      // coincidence to possible sub-features
       aFeaturePoint = findFirstEqualPointInArgumentFeatures(aFeature, aClickedPoint);
     }
     else {
@@ -549,7 +549,7 @@ bool PartSet_WidgetPoint2D::setConstraintToObject(const ObjectPtr& theObject)
       AttributePoint2DPtr anAttrPoint = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(aThisAttr);
       if (anAttrPoint.get()) {
         // the macro feature will be removed after the operation is stopped, so we need to build
-        // coicidence to possible sub-features
+        // coincidence to possible sub-features
         aFeaturePoint = findFirstEqualPointInArgumentFeatures(feature(),
                                                                    anAttrPoint->pnt());
       }

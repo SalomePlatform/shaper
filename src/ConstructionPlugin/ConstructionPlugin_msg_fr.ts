@@ -333,7 +333,7 @@
   <context>
     <name>Axis:plane1:ConstructionPlugin_ValidatorAxisTwoNotParallelPlanes</name>
     <message>
-      <source>One of the attribute not initialized.</source>
+      <source>One of the attribute is not initialized.</source>
       <translation>Un des attributs n’est pas initialisé.</translation>
     </message>
   </context>
@@ -351,7 +351,7 @@
   <context>
     <name>Axis:plane2:ConstructionPlugin_ValidatorAxisTwoNotParallelPlanes</name>
     <message>
-      <source>One of the attribute not initialized.</source>
+      <source>One of the attribute is not initialized.</source>
       <translation>Un des attributs n’est pas initialisé.</translation>
     </message>
   </context>
@@ -667,7 +667,7 @@
   <context>
     <name>Plane:line:ConstructionPlugin_ValidatorPlaneLinePoint</name>
     <message>
-      <source>One of the attribute not initialized.</source>
+      <source>One of the attribute is not initialized.</source>
       <translation>Un des attributs n’est pas initialisé.</translation>
     </message>
   </context>
@@ -707,7 +707,7 @@
   <context>
     <name>Plane:plane1:ConstructionPlugin_ValidatorPlaneTwoParallelPlanes</name>
     <message>
-      <source>One of the attribute not initialized.</source>
+      <source>One of the attribute is not initialized.</source>
       <translation>Un des attributs n’est pas initialisé.</translation>
     </message>
   </context>
@@ -725,7 +725,7 @@
   <context>
     <name>Plane:plane2:ConstructionPlugin_ValidatorPlaneTwoParallelPlanes</name>
     <message>
-      <source>One of the attribute not initialized.</source>
+      <source>One of the attribute is not initialized.</source>
       <translation>Un des attributs n’est pas initialisé.</translation>
     </message>
   </context>
@@ -754,7 +754,7 @@
   <context>
     <name>Plane:point1:ConstructionPlugin_ValidatorPlaneThreePoints</name>
     <message>
-      <source>One of the attribute not initialized.</source>
+      <source>One of the attribute is not initialized.</source>
       <translation>Un des attributs n’est pas initialisé.</translation>
     </message>
   </context>
@@ -772,7 +772,7 @@
   <context>
     <name>Plane:point2:ConstructionPlugin_ValidatorPlaneThreePoints</name>
     <message>
-      <source>One of the attribute not initialized.</source>
+      <source>One of the attribute is not initialized.</source>
       <translation>Un des attributs n’est pas initialisé.</translation>
     </message>
   </context>
@@ -790,14 +790,14 @@
   <context>
     <name>Plane:point3:ConstructionPlugin_ValidatorPlaneThreePoints</name>
     <message>
-      <source>One of the attribute not initialized.</source>
+      <source>One of the attribute is not initialized.</source>
       <translation>Un des attributs n’est pas initialisé.</translation>
     </message>
   </context>
   <context>
     <name>Plane:point:ConstructionPlugin_ValidatorPlaneLinePoint</name>
     <message>
-      <source>One of the attribute not initialized.</source>
+      <source>One of the attribute is not initialized.</source>
       <translation>Un des attributs n’est pas initialisé.</translation>
     </message>
   </context>
@@ -919,7 +919,7 @@
   <context>
     <name>Point:intersection_line_1:ConstructionPlugin_ValidatorPointLines</name>
     <message>
-      <source>One of the attribute not initialized.</source>
+      <source>One of the attribute is not initialized.</source>
       <translation>Un des attributs n’est pas initialisé.</translation>
     </message>
   </context>
@@ -937,7 +937,7 @@
   <context>
     <name>Point:intersection_line_2:ConstructionPlugin_ValidatorPointLines</name>
     <message>
-      <source>One of the attribute not initialized.</source>
+      <source>One of the attribute is not initialized.</source>
       <translation>Un des attributs n’est pas initialisé.</translation>
     </message>
   </context>
@@ -1112,35 +1112,35 @@
   <context>
     <name>Point:intersection_line:ConstructionPlugin_ValidatorPointEdgeAndPlaneNotParallel</name>
     <message>
-      <source>One of the attribute not initialized.</source>
+      <source>One of the attribute is not initialized.</source>
       <translation>Un des attributs n’est pas initialisé.</translation>
     </message>
   </context>
   <context>
     <name>Point:intersection_plane:ConstructionPlugin_ValidatorPointEdgeAndPlaneNotParallel</name>
     <message>
-      <source>One of the attribute not initialized.</source>
+      <source>One of the attribute is not initialized.</source>
       <translation>Un des attributs n’est pas initialisé.</translation>
     </message>
   </context>
   <context>
     <name>Point:intersection_plane_1:ConstructionPlugin_ValidatorPointThreeNonParallelPlanes</name>
     <message>
-      <source>One of the attribute not initialized.</source>
+      <source>One of the attribute is not initialized.</source>
       <translation>Un des attributs n’est pas initialisé.</translation>
     </message>
   </context>
   <context>
     <name>Point:intersection_plane_2:ConstructionPlugin_ValidatorPointThreeNonParallelPlanes</name>
     <message>
-      <source>One of the attribute not initialized.</source>
+      <source>One of the attribute is not initialized.</source>
       <translation>Un des attributs n’est pas initialisé.</translation>
     </message>
   </context>
   <context>
     <name>Point:intersection_plane_3:ConstructionPlugin_ValidatorPointThreeNonParallelPlanes</name>
     <message>
-      <source>One of the attribute not initialized.</source>
+      <source>One of the attribute is not initialized.</source>
       <translation>Un des attributs n’est pas initialisé.</translation>
     </message>
   </context>
@@ -1203,35 +1203,35 @@
   <context>
     <name>Point:intersection_line:ConstructionPlugin_ValidatorPointEdgeAndPlaneNotParallel</name>
     <message>
-      <source>One of the attribute not initialized.</source>
+      <source>One of the attribute is not initialized.</source>
       <translation>Un des attributs n’est pas initialisé.</translation>
     </message>
   </context>
   <context>
     <name>Point:intersection_plane:ConstructionPlugin_ValidatorPointEdgeAndPlaneNotParallel</name>
     <message>
-      <source>One of the attribute not initialized.</source>
+      <source>One of the attribute is not initialized.</source>
       <translation>Un des attributs n’est pas initialisé.</translation>
     </message>
   </context>
   <context>
     <name>Point:intersection_plane_1:ConstructionPlugin_ValidatorPointThreeNonParallelPlanes</name>
     <message>
-      <source>One of the attribute not initialized.</source>
+      <source>One of the attribute is not initialized.</source>
       <translation>Un des attributs n’est pas initialisé.</translation>
     </message>
   </context>
   <context>
     <name>Point:intersection_plane_2:ConstructionPlugin_ValidatorPointThreeNonParallelPlanes</name>
     <message>
-      <source>One of the attribute not initialized.</source>
+      <source>One of the attribute is not initialized.</source>
       <translation>Un des attributs n’est pas initialisé.</translation>
     </message>
   </context>
   <context>
     <name>Point:intersection_plane_3:ConstructionPlugin_ValidatorPointThreeNonParallelPlanes</name>
     <message>
-      <source>One of the attribute not initialized.</source>
+      <source>One of the attribute is not initialized.</source>
       <translation>Un des attributs n’est pas initialisé.</translation>
     </message>
   </context>

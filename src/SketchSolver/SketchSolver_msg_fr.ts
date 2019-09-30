@@ -12,7 +12,7 @@
       <translation>Il existe une référence circulaire entre les entités d&apos;esquisse copiées et leurs originaux. Pour résoudre ce problème, vous pouvez annuler votre opération ou supprimer une contrainte incorrecte.</translation>
     </message>
     <message>
-      <source>Caution: SolveSpace crash! Constraints are wrong</source>
+      <source>Caution: SolveSpace crashed! Constraints are wrong</source>
       <translation>Attention : Plantage de SolveSpace ! Les contraintes sont fausses</translation>
     </message>
     <message>

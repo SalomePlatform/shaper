@@ -12,8 +12,8 @@
       <translation>There is a circular reference between copied sketch entities and their originals. To fix this, you can either undo your operation or remove wrong constraint.</translation>
     </message>
     <message>
-      <source>Caution: SolveSpace crash! Constraints are wrong</source>
-      <translation>Caution: SolveSpace crash! Constraints are wrong</translation>
+      <source>Caution: SolveSpace crashed! Constraints are wrong</source>
+      <translation>Caution: SolveSpace crashed! Constraints are wrong</translation>
     </message>
     <message>
       <source>The set of constraints lead to degenerated geometry. To fix this, you can either undo your operation or remove a constraint or the degenerated geometry.</source>

@@ -4,7 +4,7 @@
       <feature
         id="ExportToGEOM"
         title="Export to GEOM"
-        tooltip="Export all bodies and groups into GEOM module"
+        tooltip="Export all results and groups into GEOM module"
         icon="icons/Connector/geom_export.png"
         helpfile="ConnectorPlugin/ConnectorPlugin.html"/>
     </group>
