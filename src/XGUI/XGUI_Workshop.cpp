@@ -1238,6 +1238,7 @@ void XGUI_Workshop::onValuesChanged()
 void XGUI_Workshop::onWidgetObjectUpdated()
 {
   operationMgr()->onValidateOperation();
+  myDisplayer->updateViewer();
 }
 
 //******************************************************
