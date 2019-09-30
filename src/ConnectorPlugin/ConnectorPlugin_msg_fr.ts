@@ -5,11 +5,11 @@
     <name>ExportToGEOM</name>
     <message>
       <source>Export all bodies and groups into GEOM module</source>
-      <translation>AA</translation>
+      <translation>Exporter tous les résultats et groupes dans le module GEOM</translation>
     </message>
     <message>
       <source>Export to GEOM</source>
-      <translation>AA</translation>
+      <translation>Exporter vers GEOM</translation>
     </message>
   </context>
 </TS>

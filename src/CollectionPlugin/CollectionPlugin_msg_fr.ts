@@ -6,23 +6,23 @@
     <name>workshop</name>
     <message>
       <source>Field</source>
-      <translation>AA</translation>
+      <translation>Champ</translation>
     </message>
     <message>
       <source>Group</source>
-      <translation>AA</translation>
+      <translation>Groupe</translation>
     </message>
     <message>
       <source>Group Addition</source>
-      <translation>AA</translation>
+      <translation>Addition de groupes</translation>
     </message>
     <message>
       <source>Group Intersection</source>
-      <translation>AA</translation>
+      <translation>Intersection de groupes</translation>
     </message>
     <message>
       <source>Group Substraction</source>
-      <translation>AA</translation>
+      <translation>Soustraction de groupes</translation>
     </message>
   </context>
 
@@ -31,25 +31,25 @@
     <name>Field</name>
     <message>
       <source>Create fields for selected shapes</source>
-      <translation>AA</translation>
+      <translation>Créer des champs pour les formes sélectionnées</translation>
     </message>
     <message>
       <source>Field</source>
-      <translation>AA</translation>
+      <translation>Champ</translation>
     </message>
   </context>
   <context>
     <name>Field:Model_FeatureValidator</name>
     <message>
       <source>Attribute "components_names" is not initialized.</source>
-      <translation>AA</translation>
+      <translation>Les composants ne sont pas sélectionnés</translation>
     </message>
   </context>
   <context>
     <name>Field:CollectionPlugin_FieldValidator</name>
     <message>
       <source>Selection list is not initialized</source>
-      <translation>AA</translation>
+      <translation>La liste de sélection n&apos;est pas initialisée</translation>
     </message>
   </context>
 
@@ -58,47 +58,47 @@
     <name>Group</name>
     <message>
       <source>Create named collection of geometry entities</source>
-      <translation>AA</translation>
+      <translation>Créer une collection nommée d&apos;entités géométriques</translation>
     </message>
     <message>
       <source>Group</source>
-      <translation>AA</translation>
+      <translation>Groupe</translation>
     </message>
   </context>
   <context>
     <name>Group:group_list</name>
     <message>
       <source>Select a set of objects</source>
-      <translation>AA</translation>
+      <translation>Sélectionnez un ensemble d&apos;objets</translation>
     </message>
   </context>
   <context>
     <name>Group:group_list:GeomValidators_BodyShapes</name>
     <message>
       <source>Error: Context is empty.</source>
-      <translation>AA</translation>
+      <translation>L&apos;objet sélectionné a un contexte vide.</translation>
     </message>
     <message>
       <source>Error: Result construction selected.</source>
-      <translation>AA</translation>
+      <translation>Constructions non autorisées pour la sélection.</translation>
     </message>
   </context>
   <context>
     <name>Group:Model_FeatureValidator</name>
     <message>
       <source>Attribute "group_list" is not initialized.</source>
-      <translation>AA</translation>
+      <translation>Objets non sélectionnés.</translation>
     </message>
   </context>
   <context>
     <name>Group:name</name>
     <message>
       <source>Name</source>
-      <translation>AA</translation>
+      <translation>Nom</translation>
     </message>
     <message>
       <source>Please input the group name</source>
-      <translation>AA</translation>
+      <translation>S&apos;il vous plaît entrer le nom du groupe</translation>
     </message>
   </context>
 
@@ -107,11 +107,11 @@
     <name>GroupAddition</name>
     <message>
       <source>Group Addition</source>
-      <translation>AA</translation>
+      <translation>Addition de groupes</translation>
     </message>
     <message>
       <source>Join several groups to single group</source>
-      <translation>AA</translation>
+      <translation>Joindre plusieurs groupes pour former un seul groupe</translation>
     </message>
   </context>
   <context>
@@ -125,22 +125,22 @@
     <name>GroupAddition:group_list</name>
     <message>
       <source>Base groups:</source>
-      <translation>AA</translation>
+      <translation>Groupes de base:</translation>
     </message>
     <message>
       <source>Select a set of groups</source>
-      <translation>AA</translation>
+      <translation>Sélectionnez un ensemble de groupes</translation>
     </message>
   </context>
   <context>
     <name>GroupAddition:name</name>
     <message>
       <source>Name</source>
-      <translation>AA</translation>
+      <translation>Nom</translation>
     </message>
     <message>
       <source>Please input the group name</source>
-      <translation>AA</translation>
+      <translation>S&apos;il vous plaît entrer le nom du groupe</translation>
     </message>
   </context>
 
@@ -149,18 +149,18 @@
     <name>GroupIntersection</name>
     <message>
       <source>Get elements existing in all groups</source>
-      <translation>AA</translation>
+      <translation>Obtenir les éléments existants dans tous les groupes</translation>
     </message>
     <message>
       <source>Group Intersection</source>
-      <translation>AA</translation>
+      <translation>Intersection de groupes</translation>
     </message>
   </context>
   <context>
     <name>GroupIntersection:EmptyResult</name>
     <message>
       <source>Error: Empty result.</source>
-      <translation>AA</translation>
+      <translation>Erreur : résultat vide.</translation>
     </message>
   </context>
   <context>
@@ -174,22 +174,22 @@
     <name>GroupIntersection:group_list</name>
     <message>
       <source>Base groups:</source>
-      <translation>AA</translation>
+      <translation>Groupes de base:</translation>
     </message>
     <message>
       <source>Select a set of groups</source>
-      <translation>AA</translation>
+      <translation>Sélectionnez un ensemble de groupes</translation>
     </message>
   </context>
   <context>
     <name>GroupIntersection:name</name>
     <message>
       <source>Name</source>
-      <translation>AA</translation>
+      <translation>Nom</translation>
     </message>
     <message>
       <source>Please input the group name</source>
-      <translation>AA</translation>
+      <translation>S&apos;il vous plaît entrer le nom du groupe</translation>
     </message>
   </context>
 
@@ -198,11 +198,11 @@
     <name>GroupSubstraction</name>
     <message>
       <source>Exclude elements existing tool groups</source>
-      <translation>AA</translation>
+      <translation>Exclure des éléments des groupes d&apos;outils existants</translation>
     </message>
     <message>
       <source>Group Substraction</source>
-      <translation>AA</translation>
+      <translation>Soustraction de groupes</translation>
     </message>
   </context>
   <context>
@@ -216,33 +216,33 @@
     <name>GroupSubstraction:group_list</name>
     <message>
       <source>Main groups:</source>
-      <translation>AA</translation>
+      <translation>Groupes principaux:</translation>
     </message>
     <message>
       <source>Select a set of groups</source>
-      <translation>AA</translation>
+      <translation>Sélectionnez un ensemble de groupes</translation>
     </message>
   </context>
   <context>
     <name>GroupSubstraction:name</name>
     <message>
       <source>Name</source>
-      <translation>AA</translation>
+      <translation>Nom</translation>
     </message>
     <message>
       <source>Please input the group name</source>
-      <translation>AA</translation>
+      <translation>S&apos;il vous plaît entrer le nom du groupe</translation>
     </message>
   </context>
   <context>
     <name>GroupSubstraction:tools_list</name>
     <message>
       <source>Select a set of groups</source>
-      <translation>AA</translation>
+      <translation>Sélectionnez un ensemble de groupes</translation>
     </message>
     <message>
       <source>Tool groups:</source>
-      <translation>AA</translation>
+      <translation>Groupes d&apos;outils:</translation>
     </message>
   </context>
 

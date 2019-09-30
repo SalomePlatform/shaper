@@ -6,7 +6,7 @@
     <name>workshop</name>
     <message>
       <source>Part</source>
-      <translation>AA-Part</translation>
+      <translation>Pièce</translation>
     </message>
   </context>
 
@@ -14,11 +14,11 @@
     <name>Duplicate</name>
     <message>
       <source>Duplicate active part</source>
-      <translation>AA</translation>
+      <translation>Dupliquer la pièce active</translation>
     </message>
     <message>
       <source>Duplicate part</source>
-      <translation>AA</translation>
+      <translation>Dupliquer pièce</translation>
     </message>
   </context>
 
@@ -26,11 +26,11 @@
     <name>Part</name>
     <message>
       <source>Create part</source>
-      <translation>AA</translation>
+      <translation>Créer une pièce</translation>
     </message>
     <message>
       <source>New part</source>
-      <translation>AA</translation>
+      <translation>Nouvelle pièce</translation>
     </message>
   </context>
 
@@ -38,11 +38,11 @@
     <name>Remove</name>
     <message>
       <source>Remove active part</source>
-      <translation>AA</translation>
+      <translation>Supprimer la pièce active</translation>
     </message>
     <message>
       <source>Remove part</source>
-      <translation>AA</translation>
+      <translation>Supprimer une partie</translation>
     </message>
   </context>
 
