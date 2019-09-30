@@ -358,7 +358,9 @@ void XGUI_WorkshopListener::
   if (aRedisplayed || isCustomized) {
     Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_EMPTY_AIS_PRESENTATION));
 
-    aDisplayer->updateViewer();
+    // Do not update viewer here because it can be called in a loop
+    // In this case Update has to be called after redisplay event
+    //aDisplayer->updateViewer();
   }
 }
 
