@@ -2043,10 +2043,6 @@ void XGUI_Workshop::moveObjects()
 
   SessionPtr aMgr = ModelAPI_Session::get();
 
-  QString anActionId = "MOVE_CMD";
-  QString aDescription = contextMenuMgr()->action(anActionId)->text();
-  aMgr->startOperation(aDescription.toStdString());
-
   QObjectPtrList anObjects = mySelector->selection()->selectedObjects();
   // It is necessary to clear selection in order to avoid selection changed event during
   // moving and negative consequences connected with processing of already moved items
@@ -2056,6 +2052,10 @@ void XGUI_Workshop::moveObjects()
   ModuleBase_Tools::convertToFeatures(anObjects, aFeatures);
   if (!XGUI_Tools::canRemoveOrRename(desktop(), aFeatures))
     return;
+
+  QString anActionId = "MOVE_CMD";
+  QString aDescription = contextMenuMgr()->action(anActionId)->text();
+  aMgr->startOperation(aDescription.toStdString());
 
   // Sort features by index in document
   std::list<FeaturePtr> aFList(aFeatures.begin(), aFeatures.end());
@@ -2073,6 +2073,7 @@ void XGUI_Workshop::moveObjects()
     aCurrentFeature = anActiveDocument->currentFeature(true);
   }
   aMgr->finishOperation();
+  updateCommandStatus();
 }
 
 //**************************************************************
