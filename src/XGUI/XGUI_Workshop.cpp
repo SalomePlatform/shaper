@@ -268,7 +268,7 @@ XGUI_Workshop::XGUI_Workshop(XGUI_SalomeConnector* theConnector)
 
 #ifndef HAVE_SALOME
   connect(myMainWindow, SIGNAL(exitKeySequence()), SLOT(onExit()));
-  onTrihedronVisibilityChanged(true);
+  myDisplayer->displayTrihedron(true);
 #endif
 
   connect(myEventsListener, SIGNAL(errorOccurred(std::shared_ptr<Events_InfoMessage>)),
@@ -1070,8 +1070,10 @@ void XGUI_Workshop::onPreferences()
 void XGUI_Workshop::onTrihedronVisibilityChanged(bool theState)
 {
   XGUI_Displayer* aDisplayer = displayer();
-  if (aDisplayer)
+  if (aDisplayer) {
     aDisplayer->displayTrihedron(theState);
+    aDisplayer->updateViewer();
+  }
 }
 
 //******************************************************

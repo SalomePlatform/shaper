@@ -1055,8 +1055,6 @@ void XGUI_Displayer::displayTrihedron(bool theToDisplay) const
     if (getCallBack()) getCallBack()->Remove(aTrihedron);
     #endif
   }
-
-  updateViewer();
 }
 
 //**************************************************************
