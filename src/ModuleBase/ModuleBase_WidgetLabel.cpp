@@ -25,7 +25,9 @@
 #include <ModuleBase_Tools.h>
 
 #include <ModelAPI_AttributeString.h>
+#include <Config_Translator.h>
 
+#include <QTextCodec>
 #include <QLabel>
 #include <QVBoxLayout>
 
@@ -71,11 +73,21 @@ bool ModuleBase_WidgetLabel::restoreValueCustom()
   DataPtr aData = myFeature->data();
   AttributeStringPtr aStrAttr = aData->string(attributeID());
   if (aStrAttr.get()) {
-    std::string aMsg;
+    QString aText;
     if (aStrAttr.get()) {
-      aMsg = aStrAttr->value();
+      if (aStrAttr->isUValue()) { // already translated text
+        char16_t* aStr = aStrAttr->valueU();
+        std::wstring aWStr((wchar_t*)aStr);
+        static const int aBufSize = 1000;
+        static char aMBStr[aBufSize];
+        size_t aLen = wcstombs(aMBStr, aWStr.c_str(), aBufSize);
+        std::string aCodec = Config_Translator::codec("");
+        aText = QTextCodec::codecForName(aCodec.c_str())->toUnicode(aMBStr);
+      } else {
+        std::string aMsg = aStrAttr->value();
+        aText = ModuleBase_Tools::translate(myFeature->getKind(), aMsg);
+      }
     }
-    QString aText = ModuleBase_Tools::translate(myFeature->getKind(), aMsg);
     myLabel->setText(aText);
   }
   return true;

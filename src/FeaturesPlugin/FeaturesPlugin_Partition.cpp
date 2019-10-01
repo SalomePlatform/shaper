@@ -128,7 +128,7 @@ void FeaturesPlugin_Partition::execute()
 
   int aPartitionVersion = version();
   if (aPartitionVersion < THE_PARTITION_VERSION_1) {
-    // default behaviours of Partition
+    // default behaviors of Partition
     if(aResultShape->shapeType() == GeomAPI_Shape::COMPOUND) {
       for(GeomAPI_ShapeIterator anIt(aResultShape); anIt.more(); anIt.next()) {
         storeResult(aBaseObjects, aPlanes, anIt.current(), aMakeShapeList, aResultIndex);
