@@ -83,6 +83,7 @@ void SketchPlugin_MacroEllipticArc::initAttributes()
 void SketchPlugin_MacroEllipticArc::execute()
 {
   FeaturePtr anEllipse = createEllipticArcFeature();
+  constraintsForEllipticArc(anEllipse);
 
   // message to init reentrant operation
   static Events_ID anId = SketchPlugin_MacroArcReentrantMessage::eventId();
@@ -299,6 +300,32 @@ FeaturePtr SketchPlugin_MacroEllipticArc::createEllipticArcFeature()
                       SketchPlugin_EllipticArc::MINOR_AXIS_END_ID());
 
   return aEllipseFeature;
+}
+
+void SketchPlugin_MacroEllipticArc::constraintsForEllipticArc(FeaturePtr theEllipticArc)
+{
+  // tangency on-the-fly is not applicable for elliptic arcs
+  static const bool isTangencyApplicable = false;
+  // Create constraints.
+  SketchPlugin_Tools::createCoincidenceOrTangency(
+      this, CENTER_REF_ID(),
+      theEllipticArc->attribute(SketchPlugin_EllipticArc::CENTER_ID()),
+      ObjectPtr(), isTangencyApplicable);
+  // make coincidence only if PASSED_POINT_REF_ID() refers a point but not an object
+  if (!refattr(MAJOR_AXIS_POINT_REF_ID())->isObject()) {
+    SketchPlugin_Tools::createCoincidenceOrTangency(
+        this, MAJOR_AXIS_POINT_REF_ID(),
+        AttributePtr(),
+        theEllipticArc->lastResult(), isTangencyApplicable);
+  }
+  SketchPlugin_Tools::createCoincidenceOrTangency(
+      this, START_POINT_REF_ID(),
+      theEllipticArc->attribute(SketchPlugin_EllipticArc::START_POINT_ID()),
+      ObjectPtr(), isTangencyApplicable);
+  SketchPlugin_Tools::createCoincidenceOrTangency(
+      this, END_POINT_REF_ID(),
+      theEllipticArc->attribute(SketchPlugin_EllipticArc::END_POINT_ID()),
+      ObjectPtr(), isTangencyApplicable);
 }
 
 AISObjectPtr SketchPlugin_MacroEllipticArc::getAISObject(AISObjectPtr thePrevious)

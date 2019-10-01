@@ -36,7 +36,7 @@ class SketchPlugin_MacroEllipticArc: public SketchPlugin_SketchEntity,
                                      public GeomAPI_IPresentable,
                                      public ModelAPI_IReentrant
 {
- public:
+public:
   /// Elliptic arc feature kind
   inline static const std::string& ID()
   {
@@ -159,6 +159,7 @@ private:
   std::shared_ptr<GeomAPI_Shape> getArcShape();
 
   FeaturePtr createEllipticArcFeature();
+  void constraintsForEllipticArc(FeaturePtr theEllipticArc);
 
 private:
   std::shared_ptr<GeomAPI_Pnt2d> myCenter;
