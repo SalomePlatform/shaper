@@ -2,6 +2,7 @@
 Author: Nathalie Gore
 """
 
+from qtsalome import QMessageBox
 from salome.shaper import model
 from salome.shaper import geom
 import ModelAPI
@@ -77,6 +78,9 @@ class compoundVertices(model.Feature):
             with open(filepath) as file:
                 for line in file:
                     coord = line.split(self.separator)
+                    if len(coord) != 3:
+                        #QMessageBox.warning( self, 'Error!', '3D coords waited!' )
+                        return
                     x = float(coord[0]); y = float(coord[1]); z = float(coord[2]);
                     point = model.addPoint(part, x,y,z); point.execute(True); self.lfeatures.append(point)
                     vertex = model.addVertex(part, [point.result()]); vertex.execute(True); self.lfeatures.append(vertex)
