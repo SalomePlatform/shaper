@@ -206,6 +206,7 @@ ADD_UNIT_TESTS(
   TestChangeSketchPlane1.py
   TestChangeSketchPlane2.py
   TestChangeSketchPlane3.py
+  TestChangeSketchPlane4.py
   TestConstraintAngle.py
   TestConstraintAngleEllipse.py
   TestConstraintCoincidence.py
