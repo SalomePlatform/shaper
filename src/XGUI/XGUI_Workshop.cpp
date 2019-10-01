@@ -1884,6 +1884,8 @@ void XGUI_Workshop::deleteObjects()
     operationMgr()->commitOperation();
   else
     operationMgr()->abortOperation(operationMgr()->currentOperation());
+
+  myDisplayer->updateViewer();
 }
 
 //**************************************************************
