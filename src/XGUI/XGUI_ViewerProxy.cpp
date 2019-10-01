@@ -527,14 +527,14 @@ void XGUI_ViewerProxy::updateHighlight()
           else {
             myResult = ResultPtr();
           }
-          aContext->UpdateCurrentViewer();
+          update();
         }
         isDisplayed = aRes.get();
       }
     }
     if (!isDisplayed) {
       if (eraseHighlight()) {
-        aContext->UpdateCurrentViewer();
+        update();
       }
       myResult = ResultPtr();
     }

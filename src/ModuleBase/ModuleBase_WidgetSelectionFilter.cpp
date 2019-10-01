@@ -325,7 +325,7 @@ ModuleBase_WidgetSelectionFilter::~ModuleBase_WidgetSelectionFilter()
       myListIO.Clear();
       myShowBtn->setChecked(false);
     }
-    aCtx->UpdateCurrentViewer();
+    myWorkshop->viewer()->update();
   }
   SelectorFeature = FeaturePtr();
   AttributeId = "";
@@ -535,7 +535,7 @@ void ModuleBase_WidgetSelectionFilter::onShowOnly(bool theShow)
       }
     }
   }
-  aCtx->UpdateCurrentViewer();
+  myWorkshop->viewer()->update();
 }
 
 void ModuleBase_WidgetSelectionFilter::updateSelectBtn()
