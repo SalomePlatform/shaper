@@ -121,7 +121,7 @@ class TestCollinearEllipse(unittest.TestCase):
   def test_collinear_ellipse_axes(self):
     """ Test 3. Set collinear axes of an ellipse. Check conflicting constraints.
     """
-    self.mySketch.setCollinear(self.myEllipse.majorAxis(), self.myEllipse.minorAxis())
+    self.mySketch.setCollinear(self.myMajorAxis, self.myMinorAxis)
     model.end()
     self.assertNotEqual(self.mySketch.solverError(), "")
     model.undo()
