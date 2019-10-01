@@ -538,6 +538,10 @@ void PartSet_SketcherMgr::onMouseMoved(ModuleBase_IViewWindow* theWnd, QMouseEve
   if (myModule->sketchReentranceMgr()->processMouseMoved(theWnd, theEvent))
     return;
 
+  ModuleBase_IWorkshop* aWorkshop = myModule->workshop();
+  XGUI_ModuleConnector* aConnector = dynamic_cast<XGUI_ModuleConnector*>(aWorkshop);
+  XGUI_Displayer* aDisplayer = aConnector->workshop()->displayer();
+
   if (isNestedCreateOperation(getCurrentOperation(), activeSketch())) {
 #ifdef DRAGGING_DEBUG
     QTime t;
@@ -562,6 +566,7 @@ void PartSet_SketcherMgr::onMouseMoved(ModuleBase_IViewWindow* theWnd, QMouseEve
         visualizeFeature(aFeature, aFOperation->isEditOperation(), canDisplayObject(aFeature));
       }
     }
+    aDisplayer->updateViewer();
 #ifdef DRAGGING_DEBUG
     cout << "Mouse move processing " << t.elapsed() << endl;
 #endif
@@ -595,9 +600,6 @@ void PartSet_SketcherMgr::onMouseMoved(ModuleBase_IViewWindow* theWnd, QMouseEve
     std::shared_ptr<GeomAPI_Pnt2d> aCurrentPosition = std::shared_ptr<GeomAPI_Pnt2d>(
       new GeomAPI_Pnt2d(aMousePnt.myCurX, aMousePnt.myCurY));
 
-    ModuleBase_IWorkshop* aWorkshop = myModule->workshop();
-    XGUI_ModuleConnector* aConnector = dynamic_cast<XGUI_ModuleConnector*>(aWorkshop);
-    XGUI_Displayer* aDisplayer = aConnector->workshop()->displayer();
     // 3. the flag to disable the update viewer should be set in order to avoid blinking in the
     // viewer happens by deselect/select the modified objects. The flag should be restored after
     // the selection processing. The update viewer should be also called.
