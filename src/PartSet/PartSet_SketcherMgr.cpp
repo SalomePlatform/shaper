@@ -70,6 +70,8 @@
 #include <SketchPlugin_Point.h>
 #include <SketchPlugin_Arc.h>
 #include <SketchPlugin_Circle.h>
+#include <SketchPlugin_Ellipse.h>
+#include <SketchPlugin_EllipticArc.h>
 #include <SketchPlugin_ConstraintLength.h>
 #include <SketchPlugin_ConstraintDistance.h>
 #include <SketchPlugin_ConstraintParallel.h>
@@ -957,7 +959,9 @@ bool PartSet_SketcherMgr::isEntity(const std::string& theId)
   return (theId == SketchPlugin_Line::ID()) ||
          (theId == SketchPlugin_Point::ID()) ||
          (theId == SketchPlugin_Arc::ID()) ||
-         (theId == SketchPlugin_Circle::ID());
+         (theId == SketchPlugin_Circle::ID()) ||
+         (theId == SketchPlugin_Ellipse::ID()) ||
+         (theId == SketchPlugin_EllipticArc::ID());
 }
 
 bool PartSet_SketcherMgr::isExternalFeature(const FeaturePtr& theFeature)
