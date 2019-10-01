@@ -27,6 +27,11 @@
 #include <Geom_Plane.hxx>
 #include <GeomProjLib.hxx>
 
+#include <BRep_Tool.hxx>
+#include <Geom_TrimmedCurve.hxx>
+#include <TopoDS.hxx>
+#include <TopoDS_Edge.hxx>
+
 GeomAlgoAPI_Projection::GeomAlgoAPI_Projection(const GeomPlanePtr& thePlane)
   : myPlane(thePlane)
 {
@@ -46,6 +51,17 @@ GeomCurvePtr GeomAlgoAPI_Projection::project(const GeomCurvePtr& theCurve)
 
 GeomCurvePtr GeomAlgoAPI_Projection::project(const GeomEdgePtr& theEdge)
 {
-  GeomCurvePtr aCurve(new GeomAPI_Curve(theEdge));
+  GeomCurvePtr aCurve(new GeomAPI_Curve);
+
+  const TopoDS_Shape& aShape = theEdge->impl<TopoDS_Shape>();
+  TopoDS_Edge anEdge = TopoDS::Edge(aShape);
+  if (!anEdge.IsNull()) {
+    double aStart, aEnd;
+    Handle(Geom_Curve) anEdgeCurve = BRep_Tool::Curve(anEdge, aStart, aEnd);
+    if (!anEdgeCurve.IsNull() && !BRep_Tool::IsClosed(anEdge))
+      anEdgeCurve = new Geom_TrimmedCurve(anEdgeCurve, aStart, aEnd);
+    aCurve->setImpl(new Handle_Geom_Curve(anEdgeCurve));
+  }
+
   return project(aCurve);
 }

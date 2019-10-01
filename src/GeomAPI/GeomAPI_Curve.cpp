@@ -49,8 +49,6 @@ GeomAPI_Curve::GeomAPI_Curve(const std::shared_ptr<GeomAPI_Shape>& theShape)
   if (!anEdge.IsNull()) {
     Handle(Geom_Curve) aCurve = BRep_Tool::Curve(anEdge, myStart, myEnd);
     if (!aCurve.IsNull()) {
-      if (!BRep_Tool::IsClosed(anEdge))
-        aCurve = new Geom_TrimmedCurve(aCurve, myStart, myEnd);
       setImpl(new Handle(Geom_Curve)(aCurve));
     }
   }
