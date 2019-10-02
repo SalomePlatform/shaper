@@ -36,31 +36,35 @@ public:
   /// Run chamfer operation with two distances or with a distance and an angle .
   /// \param theBaseSolid      a changing solid
   /// \param theChamferShapes  list of edges the chamfer is performed on
-  /// \param aMapEdgeFace      map that associates an edge to a face when the chamfer is applied to a face
-  /// \param performDistances  boolean that indicates whether the operation is performed with two distances or not
-  /// \param aVal1             double D1 if performDistances is true or D
-  /// \param aVal2             double D2 if performDistances is true or Angle
+  /// \param theMapEdgeFace    map that associates an edge to a face when the chamfer is applied
+  ///                          to a face
+  /// \param performDistances  boolean that indicates whether the operation is performed with
+  ///                          two distances or not
+  /// \param theVal1           double D1 if performDistances is true or D
+  /// \param theVal2           double D2 if performDistances is true or Angle
   GEOMALGOAPI_EXPORT GeomAlgoAPI_Chamfer(const GeomShapePtr& theBaseSolid,
                                          const ListOfShape&  theChamferShapes,
-                                         const std::map<GeomShapePtr, GeomShapePtr> aMapEdgeFace,
+                                         const std::map<GeomShapePtr, GeomShapePtr> theMapEdgeFace,
                                          const bool performDistances,
-                                         const double aVal1,
-                                         const double aVal2);
+                                         const double theVal1,
+                                         const double theVal2);
 
 private:
   /// Perform chamfer operation.
-  /// \param theBaseSolid    a changing solid
-  /// \param theChamferShapes  list of edges the chamfer is performed on
-  /// \param aMapEdgeFace      map that associates an edge to a face when the chamfer is applied to a face
-  /// \param performDistances  boolean that indicates whether the operation is performed with two distances or not
-  /// \param aVal1             double D1 if performDistances is true or D
-  /// \param aVal2             double D2 if performDistances is true or Angle
+  /// \param theBaseSolid     a changing solid
+  /// \param theChamferShapes list of edges the chamfer is performed on
+  /// \param theMapEdgeFace   map that associates an edge to a face when the chamfer is applied
+  ///                         to a face
+  /// \param performDistances boolean that indicates whether the operation is performed with two
+  ///                         distances or not
+  /// \param theVal1          double D1 if performDistances is true or D
+  /// \param theVal2          double D2 if performDistances is true or Angle
   GEOMALGOAPI_EXPORT void build(const GeomShapePtr& theBaseSolid,
                                 const ListOfShape&  theChamferShapes,
-                                const std::map<GeomShapePtr, GeomShapePtr> aMapEdgeFace,
+                                const std::map<GeomShapePtr, GeomShapePtr> theMapEdgeFace,
                                 const bool performDistances,
-                                const double aVal1,
-                                const double aVal2);
+                                const double theVal1,
+                                const double theVal2);
 };
 
 #endif

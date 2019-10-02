@@ -87,8 +87,10 @@ FeaturesPlugin_Chamfer::FeaturesPlugin_Chamfer()
 
 void FeaturesPlugin_Chamfer::initAttributes()
 {
-  data()->addAttribute(FeaturesPlugin_Chamfer::CREATION_METHOD(), ModelAPI_AttributeString::typeId());
-  data()->addAttribute(FeaturesPlugin_Chamfer::OBJECT_LIST_ID(), ModelAPI_AttributeSelectionList::typeId());
+  data()->addAttribute(FeaturesPlugin_Chamfer::CREATION_METHOD(),
+                       ModelAPI_AttributeString::typeId());
+  data()->addAttribute(FeaturesPlugin_Chamfer::OBJECT_LIST_ID(),
+                       ModelAPI_AttributeSelectionList::typeId());
   data()->addAttribute(FeaturesPlugin_Chamfer::D1_ID(), ModelAPI_AttributeDouble::typeId());
   data()->addAttribute(FeaturesPlugin_Chamfer::D2_ID(), ModelAPI_AttributeDouble::typeId());
   data()->addAttribute(FeaturesPlugin_Chamfer::D_ID(), ModelAPI_AttributeDouble::typeId());
@@ -185,9 +187,11 @@ void FeaturesPlugin_Chamfer::execute()
 
      ListOfShape aFilletEdges = selectEdges(aFilletEdgesAndVertices);
      if (aCreationMethod->value() == CREATION_METHOD_DISTANCE_DISTANCE()) {
-       aChamferBuilder.reset(new GeomAlgoAPI_Chamfer(aSolid, aFilletEdges, aMapEdgeFace, true, aD1, aD2));
+       aChamferBuilder.reset(new GeomAlgoAPI_Chamfer(
+         aSolid, aFilletEdges, aMapEdgeFace, true, aD1, aD2));
      } else {
-       aChamferBuilder.reset(new GeomAlgoAPI_Chamfer(aSolid, aFilletEdges, aMapEdgeFace, false, aD, anAngle));
+       aChamferBuilder.reset(new GeomAlgoAPI_Chamfer(
+         aSolid, aFilletEdges, aMapEdgeFace, false, aD, anAngle));
      }
 
      if (GeomAlgoAPI_Tools::AlgoError::isAlgorithmFailed(aChamferBuilder, getKind(), anError)) {
