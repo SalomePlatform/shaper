@@ -1743,7 +1743,7 @@
   <context>
     <name>Extrusion:Model_FeatureValidator</name>
     <message>
-      <source>Attribute "base" is not initialized.</source>
+      <source>Attribute "%1" is not initialized.</source>
       <translation>L&apos;objet de base pour l&apos;extrusion n&apos;est pas sélectionné.</translation>
     </message>
   </context>

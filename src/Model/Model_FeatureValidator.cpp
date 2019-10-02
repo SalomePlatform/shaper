@@ -59,6 +59,7 @@ bool Model_FeatureValidator::isValid(const std::shared_ptr<ModelAPI_Feature>& th
           aFeatureFind->second.find(*it) == aFeatureFind->second.end()) {
         theError = "Attribute \"%1\" is not initialized.";
         theError.addParameter(anAttr->id());
+        theError.setContext(theFeature->getKind() + ":" + anAttr->id());
         return false;
       }
     }

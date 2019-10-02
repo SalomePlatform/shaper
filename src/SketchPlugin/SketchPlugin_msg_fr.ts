@@ -3499,6 +3499,38 @@
       <translation>Impossible de créer un arc perpendiculaire sur %1</translation>
     </message>
   </context>
+  <context>
+    <name>SketchMacroArc:end_point_2</name>
+    <message>
+      <source>Attribute "%1" is locked by modification value in the viewer.</source>
+      <translation>Sélectionnez un point dans la vue</translation>
+    </message>
+  </context>
+  <context>
+    <name>SketchMacroArc:end_point_3</name>
+    <message>
+      <source>Attribute "%1" is locked by modification value in the viewer.</source>
+      <translation>Sélectionnez un point dans la vue.</translation>
+    </message>
+    <message>
+      <source>Attribute "%1" is not initialized.</source>
+      <translation>Sélectionnez un point dans la vue.</translation>
+    </message>
+  </context>
+  <context>
+    <name>SketchMacroArc:passed_point</name>
+    <message>
+      <source>Attribute "%1" is locked by modification value in the viewer.</source>
+      <translation>Sélectionnez un point dans la vue.</translation>
+    </message>
+  </context>
+  <context>
+    <name>SketchMacroArc:start_point_2</name>
+    <message>
+      <source>Attribute "%1" is locked by modification value in the viewer.</source>
+      <translation>Sélectionnez un point dans la vue.</translation>
+    </message>
+  </context>
 
   <context>
     <name>SketchMacroCircle</name>
