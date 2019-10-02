@@ -30,21 +30,21 @@
 //=================================================================================================
 GeomAlgoAPI_Chamfer::GeomAlgoAPI_Chamfer(const GeomShapePtr& theBaseSolid,
                                          const ListOfShape&  theChamferShapes,
-                                         const std::map<GeomShapePtr, GeomShapePtr> aMapEdgeFace,
+                                         const std::map<GeomShapePtr, GeomShapePtr> theMapEdgeFace,
                                          const bool performDistances,
-                                         const double aVal1,
-                                         const double aVal2)
+                                         const double theVal1,
+                                         const double theVal2)
 {
-  build(theBaseSolid, theChamferShapes, aMapEdgeFace, performDistances, aVal1, aVal2);
+  build(theBaseSolid, theChamferShapes, theMapEdgeFace, performDistances, theVal1, theVal2);
 }
 
 //=================================================================================================
 void GeomAlgoAPI_Chamfer::build(const GeomShapePtr& theBaseSolid,
                                 const ListOfShape&  theChamferShapes,
-                                const std::map<GeomShapePtr, GeomShapePtr> aMapEdgeFace,
+                                const std::map<GeomShapePtr, GeomShapePtr> theMapEdgeFace,
                                 const bool performDistances,
-                                const double aVal1,
-                                const double aVal2)
+                                const double theVal1,
+                                const double theVal2)
 {
   TopoDS_Shape aShapeBase = theBaseSolid->impl<TopoDS_Shape>();
   TopTools_IndexedDataMapOfShapeListOfShape M;
@@ -60,24 +60,24 @@ void GeomAlgoAPI_Chamfer::build(const GeomShapePtr& theBaseSolid,
      anIt != theChamferShapes.end(); ++anIt) {
     if ((*anIt)->isEdge()) {
       TopoDS_Edge E = (*anIt)->impl<TopoDS_Edge>();
-      if (aMapEdgeFace.find(*anIt) != aMapEdgeFace.end()) {
-        //TopoDS_Face F = (aMapEdgeFace[*anIt])->impl<TopoDS_Face>();
-        TopoDS_Face F = (aMapEdgeFace.at(*anIt))->impl<TopoDS_Face>();
+      if (theMapEdgeFace.find(*anIt) != theMapEdgeFace.end()) {
+        //TopoDS_Face F = (theMapEdgeFace[*anIt])->impl<TopoDS_Face>();
+        TopoDS_Face F = (theMapEdgeFace.at(*anIt))->impl<TopoDS_Face>();
         if (!BRepTools::IsReallyClosed(E,F) && !BRep_Tool::Degenerated(E) && 
               M.FindFromKey(E).Extent() == 2) {
           if (performDistances) {
-              aChamferBuilder->Add(aVal1, aVal2, E, F);
+              aChamferBuilder->Add(theVal1, theVal2, E, F);
             } else {
-              aChamferBuilder->AddDA(aVal1, aVal2 * M_PI / 180., E, F);
+              aChamferBuilder->AddDA(theVal1, theVal2 * M_PI / 180., E, F);
             }
           }
       } else {
         const TopTools_ListOfShape& aFacesList = M.FindFromKey(E);
         TopoDS_Face F = TopoDS::Face(aFacesList.First());
         if (performDistances) {
-          aChamferBuilder->Add(aVal1, aVal2, E, F);
+          aChamferBuilder->Add(theVal1, theVal2, E, F);
         } else {
-          aChamferBuilder->AddDA(aVal1, aVal2 * M_PI / 180., E, F);
+          aChamferBuilder->AddDA(theVal1, theVal2 * M_PI / 180., E, F);
         }
       }
     }
