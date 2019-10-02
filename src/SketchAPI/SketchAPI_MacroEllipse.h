@@ -94,6 +94,10 @@ public:
   /// Return created auxiliary minor axis
   SKETCHAPI_EXPORT std::shared_ptr<SketchAPI_Line> minorAxis();
 
+protected:
+  // find a parent sketch
+  void storeSketch(const std::shared_ptr<ModelAPI_Feature>& theFeature);
+
 private:
   /// Set flag of creation by center, major semi-axis and passed point.
   void setByCenterAndPassedPoints();

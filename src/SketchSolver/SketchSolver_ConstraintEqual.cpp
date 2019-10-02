@@ -65,7 +65,10 @@ void SketchSolver_ConstraintEqual::getAttributes(
   case 0:
     if (aNbEllipses == 2) {
       myType = CONSTRAINT_EQUAL_ELLIPSES;
-      theValue = ScalarWrapperPtr(new PlaneGCSSolver_ScalarWrapper(&myAuxValue));
+      std::shared_ptr<PlaneGCSSolver_Storage> aStorage =
+          std::dynamic_pointer_cast<PlaneGCSSolver_Storage>(myStorage);
+      myAuxValue = ScalarWrapperPtr(new PlaneGCSSolver_ScalarWrapper(aStorage->createParameter()));
+      theValue = myAuxValue;
     }
     else
       myType = CONSTRAINT_EQUAL_RADIUS;
@@ -92,4 +95,16 @@ void SketchSolver_ConstraintEqual::getAttributes(
     }
     break;
   }
+}
+
+bool SketchSolver_ConstraintEqual::remove()
+{
+  if (myAuxValue) {
+    std::shared_ptr<PlaneGCSSolver_Storage> aStorage =
+        std::dynamic_pointer_cast<PlaneGCSSolver_Storage>(myStorage);
+    GCS::SET_pD aParams;
+    aParams.insert(myAuxValue->scalar());
+    aStorage->removeParameters(aParams);
+  }
+  return SketchSolver_Constraint::remove();
 }

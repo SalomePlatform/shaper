@@ -42,26 +42,12 @@
 #define PASSED_POINT_REF (feature()->refattr(SketchPlugin_MacroEllipse::PASSED_POINT_REF_ID()))
 
 
-// find a parent sketch
-static CompositeFeaturePtr sketch(FeaturePtr theFeature)
-{
-  CompositeFeaturePtr aSketch;
-  const std::set<AttributePtr>& aRefs = theFeature->data()->refsToMe();
-  for (std::set<AttributePtr>::const_iterator anIt = aRefs.begin(); anIt != aRefs.end(); ++anIt)
-    if ((*anIt)->id() == SketchPlugin_Sketch::FEATURES_ID()) {
-      aSketch = std::dynamic_pointer_cast<ModelAPI_CompositeFeature>((*anIt)->owner());
-      break;
-    }
-  return aSketch;
-}
-
-
 SketchAPI_MacroEllipse::SketchAPI_MacroEllipse(const std::shared_ptr<ModelAPI_Feature>& theFeature,
                                                bool callInitialize)
 : SketchAPI_SketchEntity(theFeature)
 {
   if (callInitialize && initialize())
-    mySketch = sketch(theFeature);
+    storeSketch(theFeature);
 }
 
 SketchAPI_MacroEllipse::SketchAPI_MacroEllipse(const std::shared_ptr<ModelAPI_Feature>& theFeature,
@@ -140,7 +126,7 @@ void SketchAPI_MacroEllipse::initializePoints(double theX1, double theY1,
   fillAttribute(MAJOR_AXIS_POSITIVE, theX2, theY2);
   fillAttribute(PASSED_POINT, theX3, theY3);
 
-  mySketch = sketch(feature());
+  storeSketch(feature());
   execute();
 }
 
@@ -152,7 +138,7 @@ void SketchAPI_MacroEllipse::initializePoints(const std::shared_ptr<GeomAPI_Pnt2
   fillAttribute(thePoint2, MAJOR_AXIS_POSITIVE);
   fillAttribute(thePoint3, PASSED_POINT);
 
-  mySketch = sketch(feature());
+  storeSketch(feature());
   execute();
 }
 
@@ -187,8 +173,18 @@ void SketchAPI_MacroEllipse::initializePoints(
   fillAttribute(thePassedPoint, thePassedPointRef,
                 PASSED_POINT, PASSED_POINT_REF);
 
-  mySketch = sketch(feature());
+  storeSketch(feature());
   execute();
+}
+
+void SketchAPI_MacroEllipse::storeSketch(const FeaturePtr& theFeature)
+{
+  const std::set<AttributePtr>& aRefs = theFeature->data()->refsToMe();
+  for (std::set<AttributePtr>::const_iterator anIt = aRefs.begin(); anIt != aRefs.end(); ++anIt)
+    if ((*anIt)->id() == SketchPlugin_Sketch::FEATURES_ID()) {
+      mySketch = std::dynamic_pointer_cast<ModelAPI_CompositeFeature>((*anIt)->owner());
+      break;
+    }
 }
 
 std::shared_ptr<SketchAPI_Point> SketchAPI_MacroEllipse::center()

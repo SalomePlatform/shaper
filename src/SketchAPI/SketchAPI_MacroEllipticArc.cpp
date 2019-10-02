@@ -86,6 +86,7 @@ SketchAPI_MacroEllipticArc::SketchAPI_MacroEllipticArc(
 
     fillAttribute(theReversed, reversed());
 
+    storeSketch(theFeature);
     execute();
   }
 }

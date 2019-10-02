@@ -34,6 +34,11 @@ public:
       SketchSolver_Constraint(theConstraint)
   {}
 
+  /// \brief Tries to remove constraint
+  /// \return \c false, if current constraint contains another SketchPlugin constraints
+  /// (like for multiple coincidence)
+  virtual bool remove();
+
 protected:
   /// \brief Generate list of attributes of constraint in order useful for constraints
   /// \param[out] theValue      numerical characteristic of constraint (e.g. distance)
@@ -42,7 +47,7 @@ protected:
                              std::vector<EntityWrapperPtr>& theAttributes);
 
 private:
-  double myAuxValue; ///< scalar value to store ellipses focus distance
+  ScalarWrapperPtr myAuxValue; ///< scalar value to store ellipses focus distance
 };
 
 #endif

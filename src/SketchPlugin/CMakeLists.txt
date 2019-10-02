@@ -211,6 +211,7 @@ ADD_UNIT_TESTS(
   TestConstraintAngleEllipse.py
   TestConstraintCoincidence.py
   TestConstraintCoincidenceEllipse.py
+  TestConstraintCoincidenceEllipticArc.py
   TestConstraintCollinear.py
   TestConstraintCollinearEllipse.py
   TestConstraintDistance.py
