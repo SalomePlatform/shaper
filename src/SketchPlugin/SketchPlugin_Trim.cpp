@@ -66,7 +66,6 @@
 
 #include <cmath>
 
-#define DEBUG_TRIM
 #ifdef DEBUG_TRIM
 #include <iostream>
 #endif
