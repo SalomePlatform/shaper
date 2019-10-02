@@ -11,11 +11,12 @@ Features plug-in provides a set of common topological operations. It implements 
    :maxdepth: 1
 
    angularCopyFeature.rst
+   chamferFeature.rst
    commonFeature.rst
    cutFeature.rst
    extrusionCutFeature.rst
    extrusionFeature.rst
-   extrusionFuseFeature.
+   extrusionFuseFeature.rst
    filletFeature.rst
    fuseFeature.rst
    fuseFeatureFaces.rst
@@ -31,7 +32,7 @@ Features plug-in provides a set of common topological operations. It implements 
    revolutionFeature.rst
    revolutionFuseFeature.rst
    rotationFeature.rst
-   smashFeature.rstrst
+   smashFeature.rst
    splitFeature.rst
    symmetryFeature.rst
    transformationFeature.rst

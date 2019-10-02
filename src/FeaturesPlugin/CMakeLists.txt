@@ -60,6 +60,7 @@ SET(PROJECT_HEADERS
     FeaturesPlugin_Measurement.h
     FeaturesPlugin_FusionFaces.h
     FeaturesPlugin_RemoveResults.h
+    FeaturesPlugin_Chamfer.h
 )
 
 SET(PROJECT_SOURCES
@@ -101,6 +102,7 @@ SET(PROJECT_SOURCES
     FeaturesPlugin_Measurement.cpp
     FeaturesPlugin_FusionFaces.cpp
     FeaturesPlugin_RemoveResults.cpp
+    FeaturesPlugin_Chamfer.cpp
 )
 
 SET(XML_RESOURCES
@@ -132,6 +134,7 @@ SET(XML_RESOURCES
   fillet_widget.xml
   measurement_widget.xml
   fusion_faces_widget.xml
+  chamfer_widget.xml
 )
 
 SET(TEXT_RESOURCES

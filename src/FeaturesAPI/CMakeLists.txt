@@ -26,6 +26,7 @@ SET(PROJECT_HEADERS
   FeaturesAPI_BooleanCommon.h
   FeaturesAPI_BooleanSmash.h
   FeaturesAPI_BooleanFill.h
+  FeaturesAPI_Chamfer.h
   FeaturesAPI_Extrusion.h
   FeaturesAPI_ExtrusionBoolean.h
   FeaturesAPI_Fillet.h
@@ -55,6 +56,7 @@ SET(PROJECT_SOURCES
   FeaturesAPI_BooleanCommon.cpp
   FeaturesAPI_BooleanSmash.cpp
   FeaturesAPI_BooleanFill.cpp
+  FeaturesAPI_Chamfer.cpp
   FeaturesAPI_Extrusion.cpp
   FeaturesAPI_ExtrusionBoolean.cpp
   FeaturesAPI_Fillet.cpp

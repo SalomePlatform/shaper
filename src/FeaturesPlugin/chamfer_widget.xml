@@ -1,0 +1,63 @@
+<source>
+  <toolbox id="creation_method">
+    <box id="distance_distance"
+         title="Two distances"
+         tooltip="Chamfer with two distances"
+         icon="icons/Features/chamfer_distances.png">
+      <multi_selector id="main_objects"
+                      label="Faces or/and edges"
+                      icon=""
+                      tooltip="Select objects"
+                      shape_types="edges faces"
+                      use_choice="false"
+                      concealment="true">
+        <validator id="PartSet_DifferentObjects"/>
+        <validator id="FeaturesPlugin_ValidatorFilletSelection"/>
+      </multi_selector>
+      <doublevalue id="d1"
+                   label="D1"
+                   tooltip="First distance."
+                   min="0"
+                   default="2">
+        <validator id="GeomValidators_Positive"/>
+      </doublevalue>
+      <doublevalue id="d2"
+                   label="D2"
+                   tooltip="Second distance."
+                   min="0"
+                   default="2">
+        <validator id="GeomValidators_Positive"/>
+      </doublevalue>
+    </box>
+    <box id="distance_angle"
+         title="Distance and angle"
+         tooltip="Chamfer with a distance and an angle"
+         icon="icons/Features/chamfer_dist_angle.png">
+      <multi_selector id="main_objects"
+                      label="Faces or/and edges"
+                      icon=""
+                      tooltip="Select objects"
+                      shape_types="edges faces"
+                      use_choice="false"
+                      concealment="true">
+        <validator id="PartSet_DifferentObjects"/>
+        <validator id="FeaturesPlugin_ValidatorFilletSelection"/>
+      </multi_selector>
+      <doublevalue id="d"
+                   label="D"
+                   tooltip="Distance."
+                   min="0"
+                   default="2">
+        <validator id="GeomValidators_Positive"/>
+      </doublevalue>
+      <doublevalue id="angle"
+                   label="Angle"
+                   tooltip="Angle."
+                   min="0"
+                   max="90"
+                   default="25">
+        <validator id="GeomValidators_Positive"/>
+      </doublevalue>
+    </box>
+  </toolbox>
+</source>
