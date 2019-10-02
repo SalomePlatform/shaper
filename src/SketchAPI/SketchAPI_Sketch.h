@@ -311,14 +311,6 @@ public:
       bool theInversed = false);
   /// Add elliptic arc
   SKETCHAPI_EXPORT
-  std::shared_ptr<SketchAPI_EllipticArc> addEllipticArc(
-      const std::shared_ptr<GeomAPI_Pnt2d>& theCenter,
-      const std::shared_ptr<GeomAPI_Pnt2d>& theFocus,
-      const std::shared_ptr<GeomAPI_Pnt2d>& theStart,
-      const std::shared_ptr<GeomAPI_Pnt2d>& theEnd,
-      bool theInversed = false);
-  /// Add elliptic arc
-  SKETCHAPI_EXPORT
   std::shared_ptr<SketchAPI_MacroEllipticArc> addEllipticArc(
       const std::pair<std::shared_ptr<GeomAPI_Pnt2d>, ModelHighAPI_RefAttr>& theCenter,
       const std::pair<std::shared_ptr<GeomAPI_Pnt2d>, ModelHighAPI_RefAttr>& theMajorAxisPoint,

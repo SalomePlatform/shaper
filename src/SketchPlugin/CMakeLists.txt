@@ -245,6 +245,8 @@ ADD_UNIT_TESTS(
   TestCreateEllipseByCenterSemiaxisAndPassed.py
   TestCreateEllipseByMajorAxisAndPassed.py
   TestCreateEllipseByExternal.py
+  TestCreateEllipticArc.py
+  TestCreateEllipticArcByExternal.py
   TestDegeneratedGeometry.py
   TestDistanceDump.py
   TestDistanceSignedVsUnsigned01.py
@@ -277,6 +279,7 @@ ADD_UNIT_TESTS(
   TestProjectionUpdate.py
   TestRectangle.py
   TestRemoveEllipse.py
+  TestRemoveEllipticArc.py
   TestRemoveSketch.py
   TestSignedDistancePointLine.py
   TestSignedDistancePointPoint.py

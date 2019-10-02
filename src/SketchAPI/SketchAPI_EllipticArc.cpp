@@ -92,11 +92,12 @@ void SketchAPI_EllipticArc::setByCenterFocusAndPoints(double theCenterX, double 
                                                       double theEndX, double theEndY,
                                                       bool theInversed)
 {
-  fillAttribute(center(), theCenterX, theCenterY);
-  fillAttribute(firstFocus(), theFocusX, theFocusY);
-  fillAttribute(startPoint(), theStartX, theStartY);
-  fillAttribute(endPoint(), theEndX, theEndY);
+  // the order of attribute initialization is reversed to avoid odd recalculation of an elliptic arc
   fillAttribute(theInversed, reversed());
+  fillAttribute(endPoint(), theEndX, theEndY);
+  fillAttribute(startPoint(), theStartX, theStartY);
+  fillAttribute(firstFocus(), theFocusX, theFocusY);
+  fillAttribute(center(), theCenterX, theCenterY);
 
   execute();
 }
@@ -108,11 +109,12 @@ void SketchAPI_EllipticArc::setByCenterFocusAndPoints(
     const std::shared_ptr<GeomAPI_Pnt2d>& theEnd,
     bool theInversed)
 {
-  fillAttribute(theCenter, center());
-  fillAttribute(theFocus, firstFocus());
-  fillAttribute(theStart, startPoint());
-  fillAttribute(theEnd, endPoint());
+  // the order of attribute initialization is reversed to avoid odd recalculation of an elliptic arc
   fillAttribute(theInversed, reversed());
+  fillAttribute(theEnd, endPoint());
+  fillAttribute(theStart, startPoint());
+  fillAttribute(theFocus, firstFocus());
+  fillAttribute(theCenter, center());
 
   execute();
 }

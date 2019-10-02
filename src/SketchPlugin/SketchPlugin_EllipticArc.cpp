@@ -110,6 +110,7 @@ void SketchPlugin_EllipticArc::attributeChanged(const std::string& theID) {
       std::shared_ptr<GeomAPI_Edge> anEdge(new GeomAPI_Edge(aSelection));
       std::shared_ptr<GeomAPI_Ellipse> anEllipse = anEdge->ellipse();
 
+      bool aWasBlocked = data()->blockSendAttributeUpdated(true);
       std::shared_ptr<GeomDataAPI_Point2D> aCenterAttr =
         std::dynamic_pointer_cast<GeomDataAPI_Point2D>(attribute(CENTER_ID()));
       aCenterAttr->setValue(sketch()->to2D(anEllipse->center()));
@@ -128,11 +129,27 @@ void SketchPlugin_EllipticArc::attributeChanged(const std::string& theID) {
 
       real(MAJOR_RADIUS_ID())->setValue(anEllipse->majorRadius());
       real(MINOR_RADIUS_ID())->setValue(anEllipse->minorRadius());
+
+      double aStartParam, aMidParam, aEndParam;
+      anEllipse->parameter(anEdge->firstPoint(), tolerance, aStartParam);
+      anEllipse->parameter(anEdge->middlePoint(), tolerance, aMidParam);
+      anEllipse->parameter(anEdge->lastPoint(), tolerance, aEndParam);
+      if (aEndParam < aStartParam)
+        aEndParam += 2.0 * PI;
+      if (aMidParam < aStartParam)
+        aMidParam += 2.0 * PI;
+      boolean(REVERSED_ID())->setValue(aMidParam > aEndParam);
+
+      data()->blockSendAttributeUpdated(aWasBlocked, false);
+
+      fillCharacteristicPoints();
     }
   }
   else if (theID == CENTER_ID() || theID == FIRST_FOCUS_ID() ||
            theID == START_POINT_ID() || theID == END_POINT_ID())
     fillCharacteristicPoints();
+  else if (theID == REVERSED_ID() && myParamDelta == 0.0)
+    myParamDelta = 2.0 * PI;
 }
 
 static void calculateRadii(const GeomPnt2dPtr& theCenter,
@@ -152,29 +169,30 @@ static void calculateRadii(const GeomPnt2dPtr& theCenter,
 bool SketchPlugin_EllipticArc::fillCharacteristicPoints()
 {
   std::shared_ptr<GeomDataAPI_Point2D> aCenterAttr =
-    std::dynamic_pointer_cast<GeomDataAPI_Point2D>(data()->attribute(CENTER_ID()));
+      std::dynamic_pointer_cast<GeomDataAPI_Point2D>(data()->attribute(CENTER_ID()));
   std::shared_ptr<GeomDataAPI_Point2D> aFocusAttr =
-    std::dynamic_pointer_cast<GeomDataAPI_Point2D>(data()->attribute(FIRST_FOCUS_ID()));
+      std::dynamic_pointer_cast<GeomDataAPI_Point2D>(data()->attribute(FIRST_FOCUS_ID()));
   std::shared_ptr<GeomDataAPI_Point2D> aStartPointAttr =
-    std::dynamic_pointer_cast<GeomDataAPI_Point2D>(data()->attribute(START_POINT_ID()));
+      std::dynamic_pointer_cast<GeomDataAPI_Point2D>(data()->attribute(START_POINT_ID()));
   std::shared_ptr<GeomDataAPI_Point2D> aEndPointAttr =
-    std::dynamic_pointer_cast<GeomDataAPI_Point2D>(data()->attribute(END_POINT_ID()));
+      std::dynamic_pointer_cast<GeomDataAPI_Point2D>(data()->attribute(END_POINT_ID()));
 
   if (!aCenterAttr->isInitialized() ||
-    !aFocusAttr->isInitialized() ||
-    !aStartPointAttr->isInitialized()) {
+      !aFocusAttr->isInitialized() ||
+      !aStartPointAttr->isInitialized()) {
     return false;
   }
 
-  data()->blockSendAttributeUpdated(true);
   GeomPnt2dPtr aCenter2d = aCenterAttr->pnt();
   GeomPnt2dPtr aFocus2d = aFocusAttr->pnt();
   GeomPnt2dPtr aStart2d = aStartPointAttr->pnt();
 
   double aMajorRadius = 0.0, aMinorRadius = 0.0;
   calculateRadii(aCenter2d, aFocus2d, aStart2d, aMajorRadius, aMinorRadius);
-  if (aMinorRadius < tolerance *aMajorRadius)
+  if (aMinorRadius < tolerance * aMajorRadius)
     return false;
+
+  bool aWasBlocked = data()->blockSendAttributeUpdated(true);
   real(MAJOR_RADIUS_ID())->setValue(aMajorRadius);
   real(MINOR_RADIUS_ID())->setValue(aMinorRadius);
 
@@ -186,16 +204,16 @@ bool SketchPlugin_EllipticArc::fillCharacteristicPoints()
     ->setValue(2.0 * aCenter2d->x() - aFocus2d->x(), 2.0 * aCenter2d->y() - aFocus2d->y());
   std::dynamic_pointer_cast<GeomDataAPI_Point2D>(attribute(MAJOR_AXIS_START_ID()))
     ->setValue(aCenter2d->x() - aMajorDir2d->x() * aMajorRadius,
-      aCenter2d->y() - aMajorDir2d->y() * aMajorRadius);
+               aCenter2d->y() - aMajorDir2d->y() * aMajorRadius);
   std::dynamic_pointer_cast<GeomDataAPI_Point2D>(attribute(MAJOR_AXIS_END_ID()))
     ->setValue(aCenter2d->x() + aMajorDir2d->x() * aMajorRadius,
-      aCenter2d->y() + aMajorDir2d->y() * aMajorRadius);
+               aCenter2d->y() + aMajorDir2d->y() * aMajorRadius);
   std::dynamic_pointer_cast<GeomDataAPI_Point2D>(attribute(MINOR_AXIS_START_ID()))
     ->setValue(aCenter2d->x() - aMinorDir2d->x() * aMinorRadius,
-      aCenter2d->y() - aMinorDir2d->y() * aMinorRadius);
+               aCenter2d->y() - aMinorDir2d->y() * aMinorRadius);
   std::dynamic_pointer_cast<GeomDataAPI_Point2D>(attribute(MINOR_AXIS_END_ID()))
     ->setValue(aCenter2d->x() + aMinorDir2d->x() * aMinorRadius,
-      aCenter2d->y() + aMinorDir2d->y() * aMinorRadius);
+               aCenter2d->y() + aMinorDir2d->y() * aMinorRadius);
 
   if (aEndPointAttr->isInitialized()) {
     // recalculate REVERSED flag
@@ -211,17 +229,17 @@ bool SketchPlugin_EllipticArc::fillCharacteristicPoints()
       aParamEnd -= aParamStart;
 
       if (myParamDelta >= 0.0 && myParamDelta <= PI * 0.5 &&
-          aParamEnd < 0 && aParamEnd >= -PI * 0.5) {
+          aParamEnd < 0.0 && aParamEnd >= -PI * 0.5) {
         boolean(REVERSED_ID())->setValue(true);
       }
       else if (myParamDelta <= 0.0 && myParamDelta >= -PI * 0.5 &&
                aParamEnd > 0.0 && aParamEnd <= PI * 0.5) {
         boolean(REVERSED_ID())->setValue(false);
       }
+      myParamDelta = aParamEnd;
     }
-    myParamDelta = aParamEnd;
   }
-  data()->blockSendAttributeUpdated(false);
+  data()->blockSendAttributeUpdated(aWasBlocked, false);
 
   return true;
 }

@@ -59,7 +59,7 @@ static void fillAttribute(const std::shared_ptr<GeomAPI_Pnt2d>& thePoint,
 }
 
 SketchAPI_MacroEllipticArc::SketchAPI_MacroEllipticArc(const FeaturePtr& theFeature)
-  : SketchAPI_MacroEllipse(theFeature)
+  : SketchAPI_MacroEllipse(theFeature, false)
 {
 }
 
@@ -74,7 +74,7 @@ SketchAPI_MacroEllipticArc::SketchAPI_MacroEllipticArc(
     const std::shared_ptr<GeomAPI_Pnt2d>&    theArcEnd,
     const ModelHighAPI_RefAttr&              theArcEndRef,
     const bool                               theReversed)
-  : SketchAPI_MacroEllipse(theFeature)
+  : SketchAPI_MacroEllipse(theFeature, false)
 {
   if (initialize()) {
     fillAttribute(theCenter, theCenterRef,

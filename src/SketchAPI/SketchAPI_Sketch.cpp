@@ -662,19 +662,6 @@ std::shared_ptr<SketchAPI_EllipticArc> SketchAPI_Sketch::addEllipticArc(
       theInversed));
 }
 
-std::shared_ptr<SketchAPI_EllipticArc> SketchAPI_Sketch::addEllipticArc(
-    const std::shared_ptr<GeomAPI_Pnt2d>& theCenter,
-    const std::shared_ptr<GeomAPI_Pnt2d>& theFocus,
-    const std::shared_ptr<GeomAPI_Pnt2d>& theStart,
-    const std::shared_ptr<GeomAPI_Pnt2d>& theEnd,
-    bool theInversed)
-{
-  std::shared_ptr<ModelAPI_Feature> aFeature =
-      compositeFeature()->addFeature(SketchPlugin_EllipticArc::ID());
-  return EllipticArcPtr(new SketchAPI_EllipticArc(aFeature,
-      theCenter, theFocus, theStart, theEnd, theInversed));
-}
-
 std::shared_ptr<SketchAPI_MacroEllipticArc> SketchAPI_Sketch::addEllipticArc(
     const std::pair<std::shared_ptr<GeomAPI_Pnt2d>, ModelHighAPI_RefAttr>& theCenter,
     const std::pair<std::shared_ptr<GeomAPI_Pnt2d>, ModelHighAPI_RefAttr>& theMajorAxisPoint,

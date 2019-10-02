@@ -37,7 +37,8 @@ class SketchAPI_MacroEllipse: public SketchAPI_SketchEntity
 public:
   /// Constructor without values.
   SKETCHAPI_EXPORT
-  explicit SketchAPI_MacroEllipse(const std::shared_ptr<ModelAPI_Feature>& theFeature);
+  explicit SketchAPI_MacroEllipse(const std::shared_ptr<ModelAPI_Feature>& theFeature,
+                                  bool callInitialize = true);
 
   /// Constructor with values.
   SKETCHAPI_EXPORT
