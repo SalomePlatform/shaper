@@ -46,6 +46,7 @@ public:
 
   static std::string ID() { return ModelAPI_Folder::ID(); }
   virtual std::string getID() { return ID(); }
+  const std::shared_ptr<ModelAPI_Folder>& folder() const {return myFolder;}
 
   /// First feature reference
   std::shared_ptr<ModelAPI_AttributeReference> firstFeature() const
@@ -62,6 +63,11 @@ public:
   /// Shortcut for data()->name()
   MODELHIGHAPI_EXPORT
   std::string name() const;
+
+  /// To update the folder state
+  /// \param isForce start execution of feature instead of sending events
+  //MODELHIGHAPI_EXPORT void execute();
+
 
   /// Dump wrapped feature
   MODELHIGHAPI_EXPORT virtual void dump(ModelHighAPI_Dumper& theDumper) const;
@@ -90,5 +96,10 @@ MODELHIGHAPI_EXPORT
 std::shared_ptr<ModelHighAPI_Folder> addFolder(const std::shared_ptr<ModelAPI_Document>& theDoc,
                                                const ModelHighAPI_Reference& theFirstFeature,
                                                const ModelHighAPI_Reference& theLastFeature);
+/**\ingroup CPPHighAPI
+* \brief Removes Folder feature
+*/
+MODELHIGHAPI_EXPORT
+void removeFolder(std::shared_ptr<ModelHighAPI_Folder>& theFolder);
 //--------------------------------------------------------------------------------------
 #endif /* SRC_MODELHIGHAPI_MODELHIGHAPI_FOLDER_H_ */

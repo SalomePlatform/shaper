@@ -1,0 +1,17 @@
+<source>
+  <workbench id="Macros" document="Part">
+    <group id="Samples">
+      <feature
+        id="compoundVertices"
+        title="Points set"
+        tooltip="Import a set of construction points"
+        icon="icons/Addons/import.png"
+        helpfile="compoundVerticesFeature.html">
+        <file_selector id="file_path" title="Import txt file (X Y Z)" path="">
+        </file_selector>
+        <stringvalue id="separator"  label="Separator (optional): ">
+        </stringvalue>
+      </feature>
+    </group>
+  </workbench>
+</source>
