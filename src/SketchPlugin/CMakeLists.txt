@@ -202,6 +202,7 @@ ADD_UNIT_TESTS(
   Test2824.py
   Test2860.py
   Test2894.py
+  Test3019.py
   TestArcBehavior.py
   TestChangeSketchPlane1.py
   TestChangeSketchPlane2.py
