@@ -334,7 +334,7 @@
     <message>
         <location filename="XGUI_InspectionPanel.cpp" line="142"/>
         <source>SHELL</source>
-        <translation>SHELL</translation>
+        <translation>COQUE</translation>
     </message>
     <message>
         <location filename="XGUI_InspectionPanel.cpp" line="142"/>
@@ -354,7 +354,7 @@
     <message>
         <location filename="XGUI_InspectionPanel.cpp" line="142"/>
         <source>VERTEX</source>
-        <translation>VERTEX</translation>
+        <translation>SOMMET</translation>
     </message>
     <message>
         <location filename="XGUI_InspectionPanel.cpp" line="165"/>
