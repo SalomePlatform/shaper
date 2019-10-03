@@ -74,6 +74,7 @@ enum SketchSolver_ConstraintType {
   CONSTRAINT_VERTICAL,
   CONSTRAINT_PARALLEL,
   CONSTRAINT_PERPENDICULAR,
+  CONSTRAINT_PERPENDICULAR_CURVES,
   CONSTRAINT_SYMMETRIC,
   CONSTRAINT_EQUAL,           // base equality if we don't know the measured objects yet
   CONSTRAINT_EQUAL_LINES,

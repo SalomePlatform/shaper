@@ -34,6 +34,7 @@
 #include <SketchSolver_ConstraintLength.h>
 #include <SketchSolver_ConstraintMiddle.h>
 #include <SketchSolver_ConstraintMirror.h>
+#include <SketchSolver_ConstraintPerpendicular.h>
 #include <SketchSolver_ConstraintTangent.h>
 #include <SketchSolver_ConstraintMultiRotation.h>
 #include <SketchSolver_ConstraintMultiTranslation.h>
@@ -49,6 +50,7 @@
 #include <SketchPlugin_ConstraintMiddle.h>
 #include <SketchPlugin_ConstraintMirror.h>
 #include <SketchPlugin_ConstraintRigid.h>
+#include <SketchPlugin_ConstraintPerpendicular.h>
 #include <SketchPlugin_ConstraintTangent.h>
 #include <SketchPlugin_Line.h>
 #include <SketchPlugin_MultiRotation.h>
@@ -119,6 +121,11 @@ static ConstraintWrapperPtr
   createConstraintMiddlePoint(std::shared_ptr<PlaneGCSSolver_PointWrapper> thePoint,
                               std::shared_ptr<PlaneGCSSolver_EdgeWrapper>  theEntity,
                               std::shared_ptr<PlaneGCSSolver_PointWrapper> theAuxParameters);
+static ConstraintWrapperPtr
+  createConstraintAngleBetweenCurves(std::shared_ptr<PlaneGCSSolver_ScalarWrapper> theValue,
+                                     std::shared_ptr<PlaneGCSSolver_PointWrapper> thePoint,
+                                     std::shared_ptr<PlaneGCSSolver_EdgeWrapper> theEntity1,
+                                     std::shared_ptr<PlaneGCSSolver_EdgeWrapper> theEntity2);
 
 static GCS::SET_pD scalarParameters(const ScalarWrapperPtr& theScalar);
 static GCS::SET_pD pointParameters(const PointWrapperPtr& thePoint);
@@ -163,6 +170,8 @@ SolverConstraintPtr PlaneGCSSolver_Tools::createConstraint(ConstraintPtr theCons
     return SolverConstraintPtr(new SketchSolver_ConstraintMultiRotation(theConstraint));
   } else if (theConstraint->getKind() == SketchPlugin_ConstraintAngle::ID()) {
     return SolverConstraintPtr(new SketchSolver_ConstraintAngle(theConstraint));
+  } else if (theConstraint->getKind() == SketchPlugin_ConstraintPerpendicular::ID()) {
+    return SolverConstraintPtr(new SketchSolver_ConstraintPerpendicular(theConstraint));
   }
   // All other types of constraints
   return SolverConstraintPtr(new SketchSolver_Constraint(theConstraint));
@@ -242,6 +251,10 @@ ConstraintWrapperPtr PlaneGCSSolver_Tools::createConstraint(
     break;
   case CONSTRAINT_PERPENDICULAR:
     aResult = createConstraintPerpendicular(anEntity1, GCS_EDGE_WRAPPER(theEntity2));
+    break;
+  case CONSTRAINT_PERPENDICULAR_CURVES:
+    aResult = createConstraintAngleBetweenCurves(GCS_SCALAR_WRAPPER(theValue),
+                  aPoint1, anEntity1, GCS_EDGE_WRAPPER(theEntity2));
     break;
   case CONSTRAINT_EQUAL_LINES:
   case CONSTRAINT_EQUAL_ELLIPSES:
@@ -661,6 +674,18 @@ ConstraintWrapperPtr createConstraintPerpendicular(
 
   return ConstraintWrapperPtr(
       new PlaneGCSSolver_ConstraintWrapper(aNewConstr, CONSTRAINT_PERPENDICULAR));
+}
+
+ConstraintWrapperPtr createConstraintAngleBetweenCurves(
+    std::shared_ptr<PlaneGCSSolver_ScalarWrapper> theValue,
+    std::shared_ptr<PlaneGCSSolver_PointWrapper> thePoint,
+    std::shared_ptr<PlaneGCSSolver_EdgeWrapper> theEntity1,
+    std::shared_ptr<PlaneGCSSolver_EdgeWrapper> theEntity2)
+{
+  GCSConstraintPtr aNewConstr(new GCS::ConstraintAngleViaPoint(
+      *theEntity1->entity(), *theEntity2->entity(), *thePoint->point(), theValue->scalar()));
+  return ConstraintWrapperPtr(
+      new PlaneGCSSolver_ConstraintWrapper(aNewConstr, CONSTRAINT_PERPENDICULAR_CURVES));
 }
 
 ConstraintWrapperPtr createConstraintEqual(
