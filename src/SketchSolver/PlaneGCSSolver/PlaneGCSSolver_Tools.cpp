@@ -464,6 +464,27 @@ ConstraintWrapperPtr createConstraintPointsCollinear(
       new PlaneGCSSolver_ConstraintWrapper(aNewConstr, CONSTRAINT_PT_ON_CURVE));
 }
 
+template <typename ARCTYPE>
+void createConstraintMiddlePointOnArc(ARCTYPE theArc,
+                                      GCSPointPtr thePoint,
+                                      std::shared_ptr<PlaneGCSSolver_PointWrapper> theAuxParameters,
+                                      std::list<GCSConstraintPtr>& theConstraints)
+{
+  double* u = theAuxParameters->point()->x;
+  double* diff = theAuxParameters->point()->y;
+  *u = (*theArc->startAngle + *theArc->endAngle) * 0.5;
+  *diff = (*theArc->endAngle - *theArc->startAngle) * 0.5;
+
+  theConstraints.push_back(GCSConstraintPtr(
+      new GCS::ConstraintCurveValue(*thePoint, thePoint->x, *theArc, u)));
+  theConstraints.push_back(GCSConstraintPtr(
+      new GCS::ConstraintCurveValue(*thePoint, thePoint->y, *theArc, u)));
+  theConstraints.push_back(GCSConstraintPtr(
+      new GCS::ConstraintDifference(theArc->startAngle, u, diff)));
+  theConstraints.push_back(GCSConstraintPtr(
+      new GCS::ConstraintDifference(u, theArc->endAngle, diff)));
+}
+
 ConstraintWrapperPtr createConstraintMiddlePoint(
     std::shared_ptr<PlaneGCSSolver_PointWrapper> thePoint,
     std::shared_ptr<PlaneGCSSolver_EdgeWrapper> theEntity,
@@ -480,20 +501,13 @@ ConstraintWrapperPtr createConstraintMiddlePoint(
   }
   else {
     std::shared_ptr<GCS::Arc> anArc = std::dynamic_pointer_cast<GCS::Arc>(theEntity->entity());
-    if (anArc) {
-      double* u = theAuxParameters->point()->x;
-      double* diff = theAuxParameters->point()->y;
-      *u = (*anArc->startAngle + *anArc->endAngle) * 0.5;
-      *diff = (*anArc->endAngle - *anArc->startAngle) * 0.5;
-
-      aConstrList.push_back(GCSConstraintPtr(
-          new GCS::ConstraintCurveValue(*aPoint, aPoint->x, *anArc, u)));
-      aConstrList.push_back(GCSConstraintPtr(
-          new GCS::ConstraintCurveValue(*aPoint, aPoint->y, *anArc, u)));
-      aConstrList.push_back(GCSConstraintPtr(
-          new GCS::ConstraintDifference(anArc->startAngle, u, diff)));
-      aConstrList.push_back(GCSConstraintPtr(
-          new GCS::ConstraintDifference(u, anArc->endAngle, diff)));
+    if (anArc)
+      createConstraintMiddlePointOnArc(anArc, aPoint, theAuxParameters, aConstrList);
+    else {
+      std::shared_ptr<GCS::ArcOfEllipse> aEllArc =
+          std::dynamic_pointer_cast<GCS::ArcOfEllipse>(theEntity->entity());
+      if (aEllArc)
+        createConstraintMiddlePointOnArc(aEllArc, aPoint, theAuxParameters, aConstrList);
     }
   }
 

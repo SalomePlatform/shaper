@@ -25,6 +25,11 @@
 #include <PlaneGCSSolver_Tools.h>
 #include <PlaneGCSSolver_UpdateCoincidence.h>
 
+static bool isArc(EntityWrapperPtr theEntity)
+{
+  return theEntity->type() == ENTITY_ARC || theEntity->type() == ENTITY_ELLIPTIC_ARC;
+}
+
 void SketchSolver_ConstraintMiddle::getAttributes(
     EntityWrapperPtr& theValue,
     std::vector<EntityWrapperPtr>& theAttributes)
@@ -32,7 +37,7 @@ void SketchSolver_ConstraintMiddle::getAttributes(
   SketchSolver_Constraint::getAttributes(theValue, theAttributes);
 
   // create auxiliary point if middle point on arc is specified
-  if (theAttributes[2]->type() == ENTITY_ARC) {
+  if (isArc(theAttributes[2])) {
     std::shared_ptr<PlaneGCSSolver_Storage> aStorage =
         std::dynamic_pointer_cast<PlaneGCSSolver_Storage>(myStorage);
 
@@ -65,16 +70,25 @@ void SketchSolver_ConstraintMiddle::notify(const FeaturePtr&      theFeature,
     // update the middle point parameter if the constraint is "point-on-arc".
     if (myOddPoint) {
       EntityWrapperPtr anArcEntity =
-          myAttributes.front()->type() == ENTITY_ARC ? myAttributes.front() : myAttributes.back();
+          isArc(myAttributes.front()) ? myAttributes.front() : myAttributes.back();
       EdgeWrapperPtr anArcEdge =
           std::dynamic_pointer_cast<PlaneGCSSolver_EdgeWrapper>(anArcEntity);
-      std::shared_ptr<GCS::Arc> anArc;
-      if (anArcEdge)
-        anArc = std::dynamic_pointer_cast<GCS::Arc>(anArcEdge->entity());
-      if (anArc) {
-        // recalculate parameters of middle point according to arc
-        *myOddPoint->x = (*anArc->startAngle + *anArc->endAngle) * 0.5;
-        *myOddPoint->y = (*anArc->endAngle - *anArc->startAngle) * 0.5;
+      if (anArcEdge) {
+        std::shared_ptr<GCS::Arc> anArc = std::dynamic_pointer_cast<GCS::Arc>(anArcEdge->entity());
+        if (anArc) {
+          // recalculate parameters of middle point according to arc
+          *myOddPoint->x = (*anArc->startAngle + *anArc->endAngle) * 0.5;
+          *myOddPoint->y = (*anArc->endAngle - *anArc->startAngle) * 0.5;
+        }
+        else {
+          std::shared_ptr<GCS::ArcOfEllipse> aEllArc =
+              std::dynamic_pointer_cast<GCS::ArcOfEllipse>(anArcEdge->entity());
+          if (aEllArc) {
+            // recalculate parameters of middle point according to arc
+            *myOddPoint->x = (*aEllArc->startAngle + *aEllArc->endAngle) * 0.5;
+            *myOddPoint->y = (*aEllArc->endAngle - *aEllArc->startAngle) * 0.5;
+          }
+        }
       }
     }
     return;

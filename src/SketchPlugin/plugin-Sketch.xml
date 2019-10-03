@@ -1128,7 +1128,7 @@
           <validator id="PartSet_DifferentObjects"/>
           <validator id="SketchPlugin_ExternalValidator" parameters="ConstraintEntityB"/>
           <validator id="SketchPlugin_PerpendicularAttr" parameters="ConstraintEntityB"/>
-          <validator id="GeomValidators_ShapeType" parameters="line,circle"/>
+          <validator id="GeomValidators_ShapeType" parameters="edge"/>
         </sketch_shape_selector>
 
         <sketch_shape_selector id="ConstraintEntityB"
@@ -1137,7 +1137,7 @@
           <validator id="PartSet_DifferentObjects"/>
           <validator id="SketchPlugin_ExternalValidator" parameters="ConstraintEntityA"/>
           <validator id="SketchPlugin_PerpendicularAttr" parameters="ConstraintEntityA"/>
-          <validator id="GeomValidators_ShapeType" parameters="line,circle"/>
+          <validator id="GeomValidators_ShapeType" parameters="edge"/>
         </sketch_shape_selector>
         <validator id="PartSet_PerpendicularSelection"/>
       </feature>
