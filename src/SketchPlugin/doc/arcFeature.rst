@@ -135,6 +135,6 @@ Created arc appears in the view.
 	   :align: center
 
 .. centered::
-   Circle created
+   Arc created
 
 **See Also** a sample TUI Script of :ref:`tui_create_arc` operation.

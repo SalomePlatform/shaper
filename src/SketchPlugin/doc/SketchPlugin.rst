@@ -88,6 +88,8 @@ The plug-in includes the following features for creation of 2D objects:
    rectangleFeature.rst
    circleFeature.rst
    arcFeature.rst
+   ellipseFeature.rst
+   arcEllipseFeature.rst
 
 .. _sketch_constraints:
 
