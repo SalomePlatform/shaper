@@ -1642,7 +1642,8 @@ void Model_AttributeSelection::updateInHistory(bool& theRemove)
         continue;
 
       if (isWholeResult && aNewValues.Value().IsNull())
-        if ((*aNewCont)->shape()->shapeType() != allowedType)
+        if (allowedType != GeomAPI_Shape::SHAPE &&
+            (*aNewCont)->shape()->shapeType() != allowedType)
           continue; // there is better result exists with the better shape type (issue #3031)
 
       GeomShapePtr aValueShape;
