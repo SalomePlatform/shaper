@@ -153,6 +153,12 @@ void FeaturesPlugin_Partition::execute()
       keepUnusedSubsOfCompound(aFirstShape, anObjects, ObjectHierarchy(), aMakeShapeList);
 
     if (anIt.more()) {
+      if (aResultCompound->shapeType() != GeomAPI_Shape::COMPOUND) {
+        // put the shape into compound
+        ListOfShape aShapes;
+        aShapes.push_back(aResultCompound);
+        aResultCompound = GeomAlgoAPI_CompoundBuilder::compound(aShapes);
+      }
       std::shared_ptr<GeomAlgoAPI_ShapeBuilder> aBuilder(new GeomAlgoAPI_ShapeBuilder);
       for (; anIt.more(); anIt.next())
         aBuilder->add(aResultCompound, anIt.current());
