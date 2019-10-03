@@ -76,7 +76,8 @@ void XGUI_MenuMgr::addFeature(const std::shared_ptr<Config_FeatureMessage>& theM
     return;
   }
   QString aWchName = ModuleBase_Tools::translate("workshop", theMessage->workbenchId());
-  theMessage->setToolBarId(ModuleBase_Tools::translate("workshop", theMessage->workbenchId()).toStdString());
+  theMessage->setToolBarId(ModuleBase_Tools::translate("workshop",
+      theMessage->workbenchId()).toStdString());
 #ifdef HAVE_SALOME
   std::string aWchNameString = aWchName.toStdString();
   std::shared_ptr<XGUI_MenuWorkbench> aWorkbench = findWorkbench(aWchNameString);
