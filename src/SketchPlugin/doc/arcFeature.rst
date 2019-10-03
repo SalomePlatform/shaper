@@ -79,8 +79,8 @@ and finally move the mouse and click a third time to set the passed point.
     :param real: Passed Y.
     :return: Result object.
 
-By tangent point and point
-""""""""""""""""""""""""""
+By tangent point and end point
+""""""""""""""""""""""""""""""
 
 .. image:: images/Arc_panel_tang.png
    :align: center
@@ -102,8 +102,8 @@ The tangent point by itself is a start point. The edge on which it lies will be 
     :param boolean: Is inversed.
     :return: Result object.
 
-By transveral point and point
-"""""""""""""""""""""""""""""
+By point on perpendicular line and end point
+""""""""""""""""""""""""""""""""""""""""""""
 
 .. image:: images/Arc_panel_perp.png
    :align: center
