@@ -152,10 +152,7 @@ protected:
     return true;
   }
 
-  virtual bool restoreValueCustom()
-  {
-    return true;
-  }
+  virtual bool restoreValueCustom();
 
   /// The methiod called when widget is activated
   virtual void activateCustom();
@@ -236,6 +233,8 @@ private:
   QWidget* mySizeOfViewWidget; ///< Size of view widget, visualized if preview planes are shown
   QLineEdit* mySizeOfView; ///< Value of square of size of View
   QStackedWidget* myStackWidget;
+
+  QLabel* myDoFLabel;
 
   bool myOpenTransaction;
   bool myIsSelection;

@@ -358,20 +358,24 @@ void SketchSolver_Group::computeDoF()
   int aDoF = mySketchSolver->dof();
   /// "DoF = 0" content of string value is used in PartSet by Sketch edit
   /// If it is changed, it should be corrected also there
-  if (aDoF == 0) {
-    static const std::string aMsgDoF("Sketch is fully fixed (DoF = 0)");
-    aDoFMsg = Config_Translator::translate(aMsgContext, aMsgDoF);
-  } else {
-    static const std::string aMsgDoF("DoF (degrees of freedom) = %1");
-    Events_InfoMessage aMsg(aMsgContext, aMsgDoF);
-    aMsg.addParameter(aDoF);
-    aDoFMsg = Config_Translator::translate(aMsg);
-  }
-  // store Unicode value for translated message about DoF
-  size_t aLen = aDoFMsg.size();
-  std::wstring aWStr(aLen, L'#');
-  mbstowcs(&aWStr[0], aDoFMsg.c_str(), aLen);
-  mySketch->string(SketchPlugin_Sketch::SOLVER_DOF())->setValue(aWStr);
+  //if (aDoF == 0) {
+  //  static const std::string aMsgDoF("Sketch is fully fixed (DoF = 0)");
+  //  aDoFMsg = Config_Translator::translate(aMsgContext, aMsgDoF);
+  //} else {
+  //  static const std::string aMsgDoF("DoF (degrees of freedom) = %1");
+  //  Events_InfoMessage aMsg(aMsgContext, aMsgDoF);
+  //  aMsg.addParameter(aDoF);
+  //  aDoFMsg = Config_Translator::translate(aMsg);
+  //}
+  //// store Unicode value for translated message about DoF
+  //size_t aLen = aDoFMsg.size();
+  //std::wstring aWStr(aLen, L'#');
+  //mbstowcs(&aWStr[0], aDoFMsg.c_str(), aLen);
+  //mySketch->string(SketchPlugin_Sketch::SOLVER_DOF())->setValue(aWStr);
+
+  std::ostringstream aStr;
+  aStr << aDoF;
+  mySketch->string(SketchPlugin_Sketch::SOLVER_DOF())->setValue(aStr.str());
 
   if (aDoF > 0 && myDOF <= 0)
     sendMessage(EVENT_SKETCH_UNDER_CONSTRAINED, mySketch, aDoF);

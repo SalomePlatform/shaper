@@ -37,6 +37,7 @@
 
 #include <ModelAPI_ResultBody.h>
 #include <ModelAPI_Tools.h>
+#include <ModelAPI_AttributeString.h>
 
 #include <ModuleBase_Operation.h>
 #include <ModuleBase_ViewerPrs.h>
@@ -179,6 +180,9 @@ myIsSelection(false)
   QPushButton* aPlaneBtn = new QPushButton(tr("Change sketch plane"), aSecondWgt);
   connect(aPlaneBtn, SIGNAL(clicked(bool)), SLOT(onChangePlane()));
   aLayout->addWidget(aPlaneBtn);
+
+  myDoFLabel = new QLabel("", aSecondWgt);
+  aLayout->addWidget(myDoFLabel);
 
   myStackWidget->addWidget(aSecondWgt);
   //setLayout(aLayout);
@@ -729,4 +733,31 @@ void PartSet_WidgetSketchLabel::setShowPointsState(bool theState)
   bool aBlock = myShowPoints->blockSignals(true);
   myShowPoints->setChecked(theState);
   myShowPoints->blockSignals(aBlock);
+}
+
+bool PartSet_WidgetSketchLabel::restoreValueCustom()
+{
+  if (myFeature.get()) {
+    CompositeFeaturePtr aSketch = std::dynamic_pointer_cast<ModelAPI_CompositeFeature>(myFeature);
+    if (aSketch.get() && (aSketch->numberOfSubs() > 0)) {
+      AttributeStringPtr aDOFStr = aSketch->string("SolverDOF");
+      if (aDOFStr.get()) {
+        QString aVal(aDOFStr->value().c_str());
+        if (aVal.contains('=')) {
+          // to support old data
+          aVal = aVal.right(aVal.length() - aVal.lastIndexOf('='));
+        }
+        int aDoF = aVal.toInt();
+        if (aDoF == 0) {
+          myDoFLabel->setText(tr("Sketch is fully fixed (DoF = 0)"));
+        } else {
+          myDoFLabel->setText(tr("DoF (degrees of freedom) = ") + aVal);
+        }
+      }
+    }
+    else {
+      myDoFLabel->setText("");
+    }
+  }
+  return true;
 }

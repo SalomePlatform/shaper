@@ -2223,14 +2223,6 @@
       <source>Sketch</source>
       <translation>Esquisse</translation>
     </message>
-    <message>
-      <source>DoF (degrees of freedom) = %1</source>
-      <translation>DdL (degrés de liberté) = %1</translation>
-    </message>
-    <message>
-      <source>Sketch is fully fixed (DoF = 0)</source>
-      <translation>L&apos;esquisse est entièrement fixée (DdL = 0)</translation>
-    </message>
   </context>
   <context>
     <name>Sketch:External</name>
