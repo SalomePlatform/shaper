@@ -1598,12 +1598,52 @@ void Model_AttributeSelection::updateInHistory(bool& theRemove)
         aListShapeType = GeomAPI_Shape::FACE;
     }
 
+    // issue #3031: skip topology if there is more convenient shape type presents in the
+    // same context as a result of this
+    bool isWholeResult = myParent && myParent->isWholeResultAllowed() && !aSubShape.get();
+    GeomAPI_Shape::ShapeType allowedType = GeomAPI_Shape::SHAPE;
+    if (isWholeResult) {
+      std::list<ResultPtr>::iterator aNewCont = aNewContexts.begin();
+      TopTools_ListIteratorOfListOfShape aNewValues(aValShapes);
+      for(; aNewCont != aNewContexts.end(); aNewCont++, aNewValues.Next()) {
+        if (aNewValues.Value().IsNull()) { // only for the whole context
+          GeomAPI_Shape::ShapeType aShapeType = (*aNewCont)->shape()->shapeType();
+          if (allowedType == GeomAPI_Shape::SHAPE) { // just set this one
+            allowedType = aShapeType;
+          } else {
+            GeomAPI_Shape::ShapeType anAllowed = allowedType;
+            if (anAllowed != aShapeType) { // select the best, nearest to the origin
+              GeomAPI_Shape::ShapeType anOldShapeType = aContext->shape()->shapeType();
+              GeomAPI_Shape::ShapeType aDeltaAllowed =
+                (GeomAPI_Shape::ShapeType)(anOldShapeType - anAllowed);
+              if (aDeltaAllowed < 0)
+                aDeltaAllowed = (GeomAPI_Shape::ShapeType)(-aDeltaAllowed);
+              GeomAPI_Shape::ShapeType aDeltaThis =
+                (GeomAPI_Shape::ShapeType)(anOldShapeType - aShapeType);
+              if (aDeltaThis < 0)
+                aDeltaThis = (GeomAPI_Shape::ShapeType)(-aDeltaThis);
+              if (aDeltaThis == aDeltaAllowed) { // equal distance to context, select complicated
+                if (anOldShapeType < anAllowed)
+                  allowedType = aShapeType;
+              } else if (aDeltaAllowed > aDeltaThis) { // this wins
+                allowedType = aShapeType;
+              }
+            }
+          }
+        }
+      }
+    }
+
     std::list<ResultPtr>::iterator aNewCont = aNewContexts.begin();
     TopTools_ListIteratorOfListOfShape aNewValues(aValShapes);
     bool aFirst = true; // first is set to this, next are appended to parent
     for(; aNewCont != aNewContexts.end(); aNewCont++, aNewValues.Next()) {
       if (aSkippedContext.count(*aNewCont))
         continue;
+
+      if (isWholeResult && aNewValues.Value().IsNull())
+        if ((*aNewCont)->shape()->shapeType() != allowedType)
+          continue; // there is better result exists with the better shape type (issue #3031)
 
       GeomShapePtr aValueShape;
       if (!aNewValues.Value().IsNull()) {
@@ -1619,7 +1659,7 @@ void Model_AttributeSelection::updateInHistory(bool& theRemove)
       }
       if (aListShapeType != GeomAPI_Shape::SHAPE && aListShapeType != aShapeShapeType) {
         // exception is for whole results selected
-        if (!myParent || !myParent->isWholeResultAllowed() || aSubShape.get()) {
+        if (!isWholeResult) {
           continue;
         }
       }
