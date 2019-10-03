@@ -119,17 +119,22 @@ Erreur : %1</translation>
         <translation>Contraintes automatiques</translation>
     </message>
     <message>
-        <location filename="PartSet_WidgetSketchLabel.cpp" line="180"/>
+        <location filename="PartSet_WidgetSketchLabel.cpp" line="177"/>
+        <source>Automatic vertical and horizontal constraints</source>
+        <translation>Automatique des contraintes verticales et horizontales</translation>
+    </message>
+    <message>
+        <location filename="PartSet_WidgetSketchLabel.cpp" line="181"/>
         <source>Change sketch plane</source>
         <translation>Changer le plan d&apos;esquisse</translation>
     </message>
     <message>
-        <location filename="PartSet_WidgetSketchLabel.cpp" line="752"/>
+        <location filename="PartSet_WidgetSketchLabel.cpp" line="753"/>
         <source>Sketch is fully fixed (DoF = 0)</source>
         <translation>L&apos;esquisse est entièrement fixée (DdL = 0)</translation>
     </message>
     <message>
-        <location filename="PartSet_WidgetSketchLabel.cpp" line="754"/>
+        <location filename="PartSet_WidgetSketchLabel.cpp" line="755"/>
         <source>DoF (degrees of freedom) = </source>
         <translation>DdL (degrés de liberté) = </translation>
     </message>

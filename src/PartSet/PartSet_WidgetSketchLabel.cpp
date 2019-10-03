@@ -174,6 +174,7 @@ myIsSelection(false)
   aLayout->addWidget(myShowPoints);
 
   myAutoConstraints = new QCheckBox(tr("Automatic constraints"), this);
+  myAutoConstraints->setToolTip(tr("Automatic vertical and horizontal constraints"));
   connect(myAutoConstraints, SIGNAL(toggled(bool)), this, SIGNAL(autoConstraints(bool)));
   aLayout->addWidget(myAutoConstraints);
 
