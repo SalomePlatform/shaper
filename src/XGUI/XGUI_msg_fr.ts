@@ -57,9 +57,34 @@
         <translation>Le raccourci %1 est déjà défini. Ignorer.</translation>
     </message>
     <message>
+        <location filename="XGUI_ActionsMgr.cpp" line="254"/>
+        <source>Apply</source>
+        <translation>Appliquer</translation>
+    </message>
+    <message>
+        <location filename="XGUI_ActionsMgr.cpp" line="259"/>
+        <source>Apply and continue</source>
+        <translation>Appliquer et continuer</translation>
+    </message>
+    <message>
+        <location filename="XGUI_ActionsMgr.cpp" line="264"/>
+        <source>Cancel</source>
+        <translation>Annuler</translation>
+    </message>
+    <message>
+        <location filename="XGUI_ActionsMgr.cpp" line="269"/>
+        <source>Help</source>
+        <translation>Aide</translation>
+    </message>
+    <message>
         <location filename="XGUI_ActionsMgr.cpp" line="274"/>
         <source>See preview</source>
         <translation>Voir l&apos;aperçu</translation>
+    </message>
+    <message>
+        <location filename="XGUI_ActionsMgr.cpp" line="275"/>
+        <source>Compute preview</source>
+        <translation>Calculer l&apos;aperçu avant impression</translation>
     </message>
 </context>
 <context>

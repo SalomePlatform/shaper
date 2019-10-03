@@ -251,28 +251,28 @@ QAction* XGUI_ActionsMgr::operationStateAction(OperationStateActionId theId)
       case Accept:
       case AcceptAll: {
         aResult = ModuleBase_Tools::createAction(QIcon(":pictures/button_ok.png"),
-                            "Apply" /*empty to show error*/, aParent);
+                            tr("Apply"), aParent);
       }
       break;
       case AcceptPlus: {
         aResult = ModuleBase_Tools::createAction(QIcon(":pictures/button_ok-plus.png"),
-                            "Apply and continue" /*empty to show error*/, aParent);
+                            tr("Apply and continue"), aParent);
       }
       break;
       case Abort:
       case AbortAll: {
-        aResult = ModuleBase_Tools::createAction(QIcon(":pictures/button_cancel.png"), "Cancel",
+        aResult = ModuleBase_Tools::createAction(QIcon(":pictures/button_cancel.png"), tr("Cancel"),
                                                  aParent);
       }
       break;
       case Help: {
-        aResult = ModuleBase_Tools::createAction(QIcon(":pictures/button_help.png"), "Help",
+        aResult = ModuleBase_Tools::createAction(QIcon(":pictures/button_help.png"), tr("Help"),
                                                  aParent);
       }
       break;
       case Preview: {
         aResult = ModuleBase_Tools::createAction(QIcon(), tr("See preview"),
-                                                 aParent, 0, 0, "Compute preview");
+                                                 aParent, 0, 0, tr("Compute preview"));
         aResult->setStatusTip(aResult->toolTip());
       }
       break;
