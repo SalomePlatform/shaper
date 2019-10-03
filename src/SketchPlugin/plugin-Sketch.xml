@@ -277,7 +277,7 @@
                icon="icons/Sketch/arc_perp_32x32.png"
                title="Perpendicular to line">
             <sketch_shape_selector id="tangent_point"
-                                   label="Transversal point"
+                                   label="Point on the perpendicular line"
                                    tooltip="Select point on line"
                                    shape_types="vertex">
               <validator id="SketchPlugin_ArcTransversalPoint"/>

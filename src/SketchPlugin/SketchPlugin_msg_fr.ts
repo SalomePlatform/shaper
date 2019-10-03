@@ -3378,8 +3378,8 @@
       <translation>Point tangent</translation>
     </message>
     <message>
-      <source>Transversal point</source>
-      <translation>Point transversal</translation>
+      <source>Point on the perpendicular line</source>
+      <translation>Point sur la perpendiculaire</translation>
     </message>
   </context>
   <context>
@@ -3495,8 +3495,8 @@
   <context>
     <name>SketchMacroArc:tangent_point:SketchPlugin_ArcTransversalPoint</name>
     <message>
-      <source>Unable to build transversal arc on %1</source>
-      <translation>Impossible de créer un arc transversal sur %1</translation>
+      <source>Unable to build perpendicular arc on %1</source>
+      <translation>Impossible de créer un arc perpendiculaire sur %1</translation>
     </message>
   </context>
 

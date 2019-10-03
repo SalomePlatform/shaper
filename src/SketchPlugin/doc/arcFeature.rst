@@ -26,7 +26,7 @@ There are 4 algorithms for creation of an Arc:
 
 .. image:: images/arc_perp_32x32.png
    :align: left
-**By transversal point and end point** creates an arc segment perpendicular to a straight line with the start point, connected with boundary of this line, and the end point.
+**By point on perpendicular line and end point** creates an arc segment perpendicular to a straight line with the start point, connected with boundary of this line, and the end point.
 
 By center and two points
 """"""""""""""""""""""""
@@ -108,22 +108,22 @@ By transveral point and point
 .. image:: images/Arc_panel_perp.png
    :align: center
 
-Select a point on a straight segment in the view to set the transversal point, then move the mouse and click to set the end point.
-The transversal point by itself is a start point. The edge on which it lies will be perpendicular to the arc (the center of the arc is lying on the edge).
+Select a point on a straight segment in the view to set the start point, then move the mouse and click to set the end point.
+The edge on which the start point lies will be perpendicular to the arc (the center of the arc is lying on the edge).
 
-- When entering a transversal point by selecting a point on segment, a Perpendicular constraint is created.
+- When entering a start point by selecting a point on segment, a Perpendicular constraint is created.
 - When entering an end point by selecting a segment, a Coincident constraint is created.
 - When entering an end point, only segments are selectable.
 
 **TUI Command**:
 
-.. py:function:: Sketch_1.addArc(TransversalPoint, EndX, EndY, Inversed, True)
+.. py:function:: Sketch_1.addArc(StartPoint, EndX, EndY, Inversed, True)
 
-    :param object: Transversal Point.
+    :param object: Start Point.
     :param real: End X.
     :param real: End Y.
     :param boolean: Is inversed.
-    :param boolean: Arc is transversal (always True).
+    :param boolean: Arc is perpendicular (always True).
     :return: Result object.
 
 Result

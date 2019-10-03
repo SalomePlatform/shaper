@@ -871,7 +871,7 @@ bool SketchPlugin_ArcTransversalPointValidator::isValid(
     }
   }
   else {
-    theError = "Unable to build transversal arc on %1";
+    theError = "Unable to build perpendicular arc on %1";
     theError.arg(anAttrFeature->getKind());
     return false;
   }
