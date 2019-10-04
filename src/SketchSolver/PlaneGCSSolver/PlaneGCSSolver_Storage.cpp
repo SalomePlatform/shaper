@@ -105,7 +105,7 @@ EntityWrapperPtr PlaneGCSSolver_Storage::createAttribute(
 /// \brief Update value
 static bool updateValue(const double& theSource, double& theDest)
 {
-  static const double aTol = 1000. * tolerance;
+  static const double aTol = 1.e4 * tolerance;
   bool isUpdated = fabs(theSource - theDest) > aTol;
   if (isUpdated)
     theDest = theSource;

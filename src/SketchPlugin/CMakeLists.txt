@@ -228,13 +228,16 @@ ADD_UNIT_TESTS(
   TestConstraintLength.py
   TestConstraintMiddlePoint.py
   TestConstraintMiddlePointOnArc.py
+  TestConstraintMiddlePointOnEllipticArc.py
   TestConstraintParallel.py
   TestConstraintPerpendicular.py
   TestConstraintPerpendicularArcLine.py
+  TestConstraintPerpendicularEllipseLine.py
   TestConstraintRadius.py
   TestConstraintRadiusFailure.py
   TestConstraintTangent.py
   TestConstraintTangentEllipse.py
+  TestConstraintTangentEllipticArc.py
   TestConstraintVertical.py
   TestCreateArcByCenterStartEnd.py
   TestCreateArcByTangentEdge.py
@@ -277,6 +280,7 @@ ADD_UNIT_TESTS(
   TestPresentation.py
   TestProjection.py
   TestProjectionEllipse.py
+  TestProjectionEllipticArc.py
   TestProjectionIntoResult.py
   TestProjectionUpdate.py
   TestRectangle.py
@@ -289,6 +293,7 @@ ADD_UNIT_TESTS(
   TestSketchPointLine.py
   TestSnowflake.py
   TestSplit.py
+  TestSplitEllipse.py
   TestSplitLine.py
   TestSplitPreview.py
   TestTrimArc01.py
@@ -305,6 +310,7 @@ ADD_UNIT_TESTS(
   TestTrimCircle04.py
   TestTrimCircle05.py
   TestTrimCircleAndArc01.py
+  TestTrimEllipse.py
   TestTrimLine01.py
   TestTrimLine02.py
   TestTrimLine03.py
