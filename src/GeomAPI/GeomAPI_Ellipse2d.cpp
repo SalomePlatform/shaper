@@ -196,7 +196,8 @@ double GeomAPI_Ellipse2d::distance(const std::shared_ptr<GeomAPI_Ellipse2d>& the
   IntAna2d_AnaIntersection anInter(theEllipse->impl<gp_Elips2d>(), IntAna2d_Conic(*MY_ELLIPSE));
   Extrema_ExtCC2d* anExtema =
       new Extrema_ExtCC2d(Geom2dAdaptor_Curve(anEllipse1), Geom2dAdaptor_Curve(anEllipse2));
-  double aDistance = extrema(&anInter, anExtema, theEllipse->firstFocus(), thePointOnEllipse, thePointOnMe);
+  double aDistance = extrema(&anInter, anExtema, theEllipse->firstFocus(),
+                             thePointOnEllipse, thePointOnMe);
   delete anExtema;
   return aDistance;
 }
