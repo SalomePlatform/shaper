@@ -1106,7 +1106,7 @@ void PartSet_SketcherMgr::startSketch(ModuleBase_Operation* theOperation)
 
   workshop()->viewer()->set2dMode(true);
 
-  PartSet_Fitter* aFitter = new PartSet_Fitter(myCurrentSketch);
+  PartSet_Fitter* aFitter = new PartSet_Fitter(this);
   myModule->workshop()->viewer()->setFitter(aFitter);
 }
 
@@ -2116,30 +2116,47 @@ void PartSet_SketcherMgr::onShowPoints(bool toShow)
 
 void PartSet_Fitter::fitAll(Handle(V3d_View) theView)
 {
+  CompositeFeaturePtr aSketch = mySketchMgr->activeSketch();
+
+  ModuleBase_IWorkshop* aWorkshop = mySketchMgr->module()->workshop();
+  XGUI_ModuleConnector* aConnector = dynamic_cast<XGUI_ModuleConnector*>(aWorkshop);
+  XGUI_Displayer* aDisplayer = aConnector->workshop()->displayer();
+
   Bnd_Box aBndBox;
-  int aNumberOfSubs = mySketch->numberOfSubs();
+  int aNumberOfSubs = aSketch->numberOfSubs();
+  double aXmin, aYmin, aZmin, aXmax, aYmax, aZmax;
   for (int i = 0; i < aNumberOfSubs; i++) {
-    FeaturePtr aFeature = mySketch->subFeature(i);
-    std::list<ResultPtr> aResults = aFeature->results();
-    std::list<ResultPtr>::const_iterator aIt;
-    ResultPtr aRes;
-    double aXmin, aYmin, aZmin, aXmax, aYmax, aZmax;
-    for (aIt = aResults.begin(); aIt != aResults.end(); ++aIt) {
-      aRes = (*aIt);
-      if (aRes->isDisplayed()) {
-        FeaturePtr aFeature = ModelAPI_Feature::feature(aRes);
-        if (aFeature.get()) {
-          std::shared_ptr<SketchPlugin_Feature> aSPFeature =
-            std::dynamic_pointer_cast<SketchPlugin_Feature>(aFeature);
-          if (aSPFeature.get()) {
-            bool isAxiliary =
-              aSPFeature->boolean(SketchPlugin_SketchEntity::AUXILIARY_ID())->value();
-            if (!(aSPFeature->isExternal() || isAxiliary)) {
-              GeomShapePtr aShape = aRes->shape();
-              aShape->computeSize(aXmin, aYmin, aZmin, aXmax, aYmax, aZmax);
-              Bnd_Box aBox;
-              aBox.Update(aXmin, aYmin, aZmin, aXmax, aYmax, aZmax);
-              aBndBox.Add(aBox);
+    FeaturePtr aFeature = aSketch->subFeature(i);
+    if (aDisplayer->isVisible(aFeature)) {
+      AISObjectPtr aAisPtr = aDisplayer->getAISObject(aFeature);
+      Handle(AIS_InteractiveObject) aAisObj = aAisPtr->impl<Handle(AIS_InteractiveObject)>();
+      if (!aAisObj->IsInfinite()) {
+        Bnd_Box aBox;
+        aAisObj->BoundingBox(aBox);
+        aBndBox.Add(aBox);
+      }
+    }
+    else {
+      std::list<ResultPtr> aResults = aFeature->results();
+      std::list<ResultPtr>::const_iterator aIt;
+      ResultPtr aRes;
+      for (aIt = aResults.begin(); aIt != aResults.end(); ++aIt) {
+        aRes = (*aIt);
+        if (aRes->isDisplayed()) {
+          FeaturePtr aFeature = ModelAPI_Feature::feature(aRes);
+          if (aFeature.get()) {
+            std::shared_ptr<SketchPlugin_Feature> aSPFeature =
+              std::dynamic_pointer_cast<SketchPlugin_Feature>(aFeature);
+            if (aSPFeature.get()) {
+              bool isAxiliary =
+                aSPFeature->boolean(SketchPlugin_SketchEntity::AUXILIARY_ID())->value();
+              if (!(aSPFeature->isExternal() || isAxiliary)) {
+                GeomShapePtr aShape = aRes->shape();
+                aShape->computeSize(aXmin, aYmin, aZmin, aXmax, aYmax, aZmax);
+                Bnd_Box aBox;
+                aBox.Update(aXmin, aYmin, aZmin, aXmax, aYmax, aZmax);
+                aBndBox.Add(aBox);
+              }
             }
           }
         }

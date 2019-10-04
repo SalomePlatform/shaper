@@ -68,7 +68,7 @@ class PartSet_ExternalPointsMgr;
 class AIS_InteractiveObject;
 
 class QMouseEvent;
-
+class PartSet_SketcherMgr;
 
 #ifdef HAVE_SALOME
 class PartSet_Fitter : public OCCViewer_Fitter
@@ -77,15 +77,15 @@ class PartSet_Fitter : public AppElements_Fitter
 #endif
 {
 public:
-  PartSet_Fitter(CompositeFeaturePtr theCurrentSketch):
-    mySketch(theCurrentSketch) {}
+  PartSet_Fitter(PartSet_SketcherMgr* theSketchMgr):
+    mySketchMgr(theSketchMgr) {}
 
   /// A method which has top be reimplemented to provide alterantive implementation FitAll command
   /// \param theView - a view which has to be fit
   virtual void fitAll(Handle(V3d_View) theView);
 
 private:
-  CompositeFeaturePtr mySketch;
+  PartSet_SketcherMgr* mySketchMgr;
 };
 
 
@@ -368,6 +368,8 @@ public:
   bool isShowFreePointsShown() const {
     return myPointsHighlight.size() > 0;
   }
+
+  PartSet_Module* module() const { return myModule; }
 
 public slots:
   /// Process sketch plane selected event
