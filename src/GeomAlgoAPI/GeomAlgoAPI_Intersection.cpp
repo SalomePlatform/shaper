@@ -81,6 +81,7 @@ void GeomAlgoAPI_Intersection::build(const ListOfShape& theObjects)
   anOperation->SetCheckInverted(true);
 
   anOperation->PerformWithFiller(*aDSFiller); // it references a filler fields, so keep the filler
+  myFiller = 0;
   if(anOperation->HasErrors()) {
     return;
   }

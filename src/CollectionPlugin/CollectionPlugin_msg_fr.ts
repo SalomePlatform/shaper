@@ -101,6 +101,13 @@
       <translation>S&apos;il vous plaît entrer le nom du groupe</translation>
     </message>
   </context>
+  <context>
+    <name>Group:group_list</name>
+    <message>
+      <source>Attribute "%1" is not initialized.</source>
+      <translation>Sélectionnez un ensemble d&apos;objets.</translation>
+    </message>
+  </context>
 
   <!-- GroupAddition -->
   <context>
@@ -143,6 +150,13 @@
       <translation>S&apos;il vous plaît entrer le nom du groupe</translation>
     </message>
   </context>
+  <context>
+    <name>GroupAddition:group_list</name>
+    <message>
+      <source>Attribute "%1" is not initialized.</source>
+      <translation>Sélectionnez un ensemble de groupes.</translation>
+    </message>
+  </context>
 
   <!-- GroupIntersection -->
   <context>
@@ -161,13 +175,6 @@
     <message>
       <source>Error: Empty result.</source>
       <translation>Erreur : résultat vide.</translation>
-    </message>
-  </context>
-  <context>
-    <name>GroupIntersection:Model_FeatureValidator</name>
-    <message>
-      <source>Attribute "group_list" is not initialized.</source>
-      <translation>AA</translation>
     </message>
   </context>
   <context>
@@ -192,6 +199,13 @@
       <translation>S&apos;il vous plaît entrer le nom du groupe</translation>
     </message>
   </context>
+  <context>
+    <name>GroupIntersection:group_list</name>
+    <message>
+      <source>Attribute "%1" is not initialized.</source>
+      <translation>Sélectionnez un ensemble de groupes.</translation>
+    </message>
+  </context>
 
   <!-- GroupSubstraction -->
   <context>
@@ -203,13 +217,6 @@
     <message>
       <source>Group Substraction</source>
       <translation>Soustraction de groupes</translation>
-    </message>
-  </context>
-  <context>
-    <name>GroupSubstraction:Model_FeatureValidator</name>
-    <message>
-      <source>Attribute "group_list" is not initialized.</source>
-      <translation>AA</translation>
     </message>
   </context>
   <context>
@@ -243,6 +250,13 @@
     <message>
       <source>Tool groups:</source>
       <translation>Groupes d&apos;outils:</translation>
+    </message>
+  </context>
+  <context>
+    <name>GroupSubstraction:group_list</name>
+    <message>
+      <source>Attribute "%1" is not initialized.</source>
+      <translation>Sélectionnez un ensemble de groupes.</translation>
     </message>
   </context>
 

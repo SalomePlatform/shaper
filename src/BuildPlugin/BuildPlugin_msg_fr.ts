@@ -116,6 +116,27 @@
       <translation>Objets non sélectionnés.</translation>
     </message>
   </context>
+  <context>
+    <name>Edge:base_objects</name>
+    <message>
+      <source>Attribute "%1" is not initialized.</source>
+      <translation>Objets non sélectionnés.</translation>
+    </message>
+  </context>
+  <context>
+    <name>Edge:first_point</name>
+    <message>
+      <source>Attribute "%1" is not initialized.</source>
+      <translation>Sélectionnez un point de départ</translation>
+    </message>
+  </context>
+  <context>
+    <name>Edge:second_point</name>
+    <message>
+      <source>Attribute "%1" is not initialized.</source>
+      <translation>Sélectionnez un deuxième point</translation>
+    </message>
+  </context>
 
   <context>
     <name>Face:BuildPlugin_ValidatorBaseForFace</name>
@@ -148,6 +169,13 @@
     <name>Face:Model_FeatureValidator</name>
     <message>
       <source>Attribute "base_objects" is not initialized.</source>
+      <translation>Objets non sélectionnés.</translation>
+    </message>
+  </context>
+  <context>
+    <name>Face:base_objects</name>
+    <message>
+      <source>Attribute "%1" is not initialized.</source>
       <translation>Objets non sélectionnés.</translation>
     </message>
   </context>
@@ -205,7 +233,7 @@
     <name>Shell:base_objects:GeomValidators_ShapeType</name>
     <message>
       <source>It does not contain element with acceptable shape type. The type should be one of the next: %1</source>
-      <translation>Il ne contient pas d&apos;élément avec un type de forme acceptable. Le type devrait être l&apos;un des suivants : %1</translation>
+      <translation>Il ne contient pas d&apos;élément avec un type de forme acceptable. Le type devrait être l&apos;un des suivants: %1</translation>
     </message>
   </context>
   <context>
@@ -257,6 +285,13 @@
       <translation>Objets non sélectionnés.</translation>
     </message>
   </context>
+  <context>
+    <name>Shell:base_objects</name>
+    <message>
+      <source>Attribute "%1" is not initialized.</source>
+      <translation>Objets non sélectionnés.</translation>
+    </message>
+  </context>
 
   <context>
     <name>SubShapes:subshapes:BuildPlugin_ValidatorSubShapesSelection</name>
@@ -297,6 +332,13 @@
     <name>SubShapes:Model_FeatureValidator</name>
     <message>
       <source>Attribute "base_shape" is not initialized.</source>
+      <translation>Forme de base non sélectionnée.</translation>
+    </message>
+  </context>
+  <context>
+    <name>SubShapes:base_shape</name>
+    <message>
+      <source>Attribute "%1" is not initialized.</source>
       <translation>Forme de base non sélectionnée.</translation>
     </message>
   </context>
@@ -420,6 +462,13 @@
       <translation>Objets non sélectionnés.</translation>
     </message>
   </context>
+  <context>
+    <name>Vertex:base_objects</name>
+    <message>
+      <source>Attribute "%1" is not initialized.</source>
+      <translation>Objets non sélectionnés.</translation>
+    </message>
+  </context>
 
   <context>
     <name>Wire:BuildPlugin_ValidatorBaseForWire</name>
@@ -440,13 +489,6 @@
     <message>
       <source>Attribute "base_objects" is not initialized.</source>
       <translation>Objets non sélectionnés.</translation>
-    </message>
-  </context>
-  <context>
-    <name>Wire</name>
-    <message>
-      <source>Model_FeatureValidator: Attribute "add_contour" is not initialized.</source>
-      <translation>AA</translation>
     </message>
   </context>
   <context>
@@ -499,12 +541,28 @@
     </message>
   </context>
   <context>
+    <name>Wire:base_objects</name>
+    <message>
+      <source>Attribute "%1" is not initialized.</source>
+      <translation>Objets non sélectionnés.</translation>
+    </message>
+  </context>
+  <context>
+    <name>Wire:base_objects:BuildPlugin_ValidatorBaseForBuild</name>
+    <message>
+      <source>It does not contain element with acceptable shape type. The type should be one of the next: %1</source>
+      <translation>Il ne contient pas d&apos;élément avec un type de forme acceptable. Le type devrait être l'un des suivants : %1</translation>
+    </message>
+  </context>
+
+  <context>
     <name>Filling:GeomValidators_MinObjectsSelected</name>
     <message>
       <source>Error: Attribute "%1" should contain at least %2 items.</source>
       <translation>La liste des segments et des contours doit contenir au moins 2 éléments.</translation>
     </message>
   </context>
+
   <context>
     <name>Polyline:GeomValidators_MinObjectsSelected</name>
     <message>
@@ -513,12 +571,35 @@
     </message>
   </context>
   <context>
+    <name>Model_Data</name>
+    <message>
+      <source>Error: Result polyline has self-intersections.</source>
+      <translation>La polyligne a des auto-intersections.</translation>
+    </message>
+  </context>
+  <context>
+    <name>Polyline</name>
+    <message>
+      <source>Error: Result polyline has self-intersections.</source>
+      <translation>La polyligne a des auto-intersections.</translation>
+    </message>
+  </context>
+
+  <context>
     <name>Interpolation:GeomValidators_MinObjectsSelected</name>
     <message>
       <source>Error: Attribute "%1" should contain at least %2 items.</source>
       <translation>La liste de points doit contenir au moins 2 éléments</translation>
     </message>
   </context>
+  <context>
+    <name>Interpolation:tangent_end</name>
+    <message>
+      <source>Attribute "%1" is not initialized.</source>
+      <translation>Sélectionnez le vecteur tangent à la fin de la courbe</translation>
+    </message>
+  </context>
+
   <context>
     <name>CompSolid</name>
     <message>
@@ -555,6 +636,13 @@
       <translation>Liste de sélection vide.</translation>
     </message>
   </context>
+  <context>
+    <name>CompSolid:BuildPlugin_ValidatorBaseForSolids</name>
+    <message>
+      <source>Unable to build a solid</source>
+      <translation>Impossible de créer un solide.</translation>
+    </message>
+  </context>
 
   <context>
     <name>Compound</name>
@@ -568,13 +656,6 @@
     </message>
   </context>
   <context>
-    <name>Compound:Model_FeatureValidator</name>
-    <message>
-      <source>Attribute "base_objects" is not initialized.</source>
-      <translation>AA</translation>
-    </message>
-  </context>
-  <context>
     <name>Compound:base_objects</name>
     <message>
       <source>Objects:</source>
@@ -583,6 +664,13 @@
     <message>
       <source>Select any kind of objects.</source>
       <translation>Sélectionnez n&apos;importe quel type d&apos;objets.</translation>
+    </message>
+  </context>
+  <context>
+    <name>Compound:base_objects</name>
+    <message>
+      <source>Attribute "%1" is not initialized.</source>
+      <translation>Sélectionner des objets de base.</translation>
     </message>
   </context>
 
@@ -931,6 +1019,10 @@
     <message>
       <source>Empty selection list.</source>
       <translation>Liste de sélection vide.</translation>
+    </message>
+    <message>
+      <source>Unable to build a solid</source>
+      <translation>Impossible de construire un solide</translation>
     </message>
   </context>
   <context>

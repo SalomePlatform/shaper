@@ -128,6 +128,13 @@
     </message>
   </context>
   <context>
+    <name>Sketch:DirX</name>
+    <message>
+      <source>Attribute "%1" is not initialized.</source>
+      <translation>Sélectionnez un plan pour l&apos;esquisse</translation>
+    </message>
+  </context>
+  <context>
     <name>Sketch:External:GeomValidators_Face</name>
     <message>
       <source>The attribute with the %1 type is not processed</source>
@@ -167,6 +174,13 @@
     <message>
       <source>Attribute "%1" is not initialized.</source>
       <translation>Sélectionnez un plan pour l&apos;esquisse</translation>
+    </message>
+  </context>
+  <context>
+    <name>Sketch:Features</name>
+    <message>
+      <source>Attribute "%1" is not initialized.</source>
+      <translation>Les objets d&apos;esquisse ne sont pas définis</translation>
     </message>
   </context>
 
@@ -305,14 +319,14 @@
     <name>SketchMacroCircle:passed_point</name>
     <message>
       <source>Attribute "%1" is not initialized.</source>
-      <translation>L&apos;attribut &quot;%1&quot; n&apos;est pas initialisé.</translation>
+      <translation>Sélectionnez un point dans la vue.</translation>
     </message>
   </context>
   <context>
     <name>SketchMacroCircle:third_point</name>
     <message>
       <source>Attribute "%1" is not initialized.</source>
-      <translation>L&apos;attribut &quot;%1&quot; n&apos;est pas initialisé.</translation>
+      <translation>Sélectionnez un point dans la vue.</translation>
     </message>
   </context>
 
@@ -417,6 +431,13 @@
     <message>
       <source>The shape is empty</source>
       <translation>L&apos;argument de contrainte fait référence à la forme vide</translation>
+    </message>
+  </context>
+  <context>
+    <name>SketchConstraintHorizontal:ConstraintEntityA</name>
+    <message>
+      <source>Attribute "%1" is not initialized.</source>
+      <translation>La ligne n&apos;est pas sélectionnée</translation>
     </message>
   </context>
 
@@ -539,9 +560,30 @@
       <translation>Deux lignes externes ne peuvent pas être contraintes comme perpendiculaires</translation>
     </message>
   </context>
+  <context>
+    <name>SketchConstraintPerpendicular:ConstraintEntityA</name>
+    <message>
+      <source>Attribute "%1" is not initialized.</source>
+      <translation>Le premier objet n&apos;est pas sélectionné</translation>
+    </message>
+  </context>
+  <context>
+    <name>SketchConstraintPerpendicular:ConstraintEntityB</name>
+    <message>
+      <source>Attribute "%1" is not initialized.</source>
+      <translation>Le deuxième objet n&apos;est pas sélectionné</translation>
+    </message>
+  </context>
 
   <context>
     <name>SketchConstraintRadius:Model_FeatureValidator</name>
+    <message>
+      <source>Attribute "%1" is not initialized.</source>
+      <translation>Le cercle n&apos;est pas sélectionné</translation>
+    </message>
+  </context>
+  <context>
+    <name>SketchConstraintRadius:ConstraintEntityA</name>
     <message>
       <source>Attribute "%1" is not initialized.</source>
       <translation>Le cercle n&apos;est pas sélectionné</translation>
@@ -641,6 +683,13 @@
   </context>
   <context>
     <name>SketchConstraintVertical:Model_FeatureValidator</name>
+    <message>
+      <source>Attribute "%1" is not initialized.</source>
+      <translation>La ligne n&apos;est pas sélectionnée</translation>
+    </message>
+  </context>
+  <context>
+    <name>SketchConstraintVertical:ConstraintEntityA</name>
     <message>
       <source>Attribute "%1" is not initialized.</source>
       <translation>La ligne n&apos;est pas sélectionnée</translation>
@@ -1043,6 +1092,13 @@
     </message>
   </context>
   <context>
+    <name>SketchConstraintMirror:ConstraintEntityA</name>
+    <message>
+      <source>Attribute "%1" is not initialized.</source>
+      <translation>La ligne miroir n&apos;est pas sélectionnée</translation>
+    </message>
+  </context>
+  <context>
     <name>SketchConstraintMirror:Model_FeatureValidator</name>
     <message>
       <source>Attribute "%1" is not initialized.</source>
@@ -1089,6 +1145,13 @@
     <message>
       <source>The shape is empty</source>
       <translation>La ligne en miroir fait référence à la forme vide</translation>
+    </message>
+  </context>
+  <context>
+    <name>SketchConstraintMirror:ConstraintMirrorList</name>
+    <message>
+      <source>Attribute "%1" is not initialized.</source>
+      <translation>Sélectionner des objets</translation>
     </message>
   </context>
 
@@ -1200,6 +1263,13 @@
 
   <context>
     <name>SketchMultiTranslation:Model_FeatureValidator</name>
+    <message>
+      <source>Attribute "%1" is not initialized.</source>
+      <translation>Le point final du vecteur de translation n&apos;est pas défini</translation>
+    </message>
+  </context>
+  <context>
+    <name>SketchMultiTranslation:MultiTranslationEndPoint</name>
     <message>
       <source>Attribute "%1" is not initialized.</source>
       <translation>Le point final du vecteur de translation n&apos;est pas défini</translation>
@@ -1403,6 +1473,13 @@
     </message>
   </context>
   <context>
+    <name>SketchConstraintAngle:AngleReversedLine1</name>
+    <message>
+      <source>Attribute "%1" is not initialized.</source>
+      <translation>Le premier objet n&apos;est pas sélectionné</translation>
+    </message>
+  </context>
+  <context>
     <name>SketchConstraintAngle:ConstraintEntityA:GeomValidators_ShapeType</name>
     <message>
       <source>It does not contain element with acceptable shape type. The type should be one of the next: %1</source>
@@ -1516,10 +1593,24 @@
     </message>
   </context>
   <context>
+    <name>SketchConstraintCoincidence:ConstraintEntityA</name>
+    <message>
+      <source>Attribute "%1" is not initialized.</source>
+      <translation>Le premier objet n&apos;est pas sélectionné</translation>
+    </message>
+  </context>
+  <context>
     <name>SketchConstraintCoincidence:ConstraintEntityB:SketchPlugin_ExternalValidator</name>
     <message>
       <source>Both features, attribute and attribute in parameter, are external.</source>
       <translation>Une coïncidence ne peut pas être créée entre deux objets externes</translation>
+    </message>
+  </context>
+  <context>
+    <name>SketchConstraintCoincidence:ConstraintEntityB</name>
+    <message>
+      <source>Attribute "%1" is not initialized.</source>
+      <translation>Le deuxième objet n&apos;est pas sélectionné</translation>
     </message>
   </context>
   <context>
@@ -1545,9 +1636,23 @@
     </message>
   </context>
   <context>
+    <name>SketchConstraintDistance:ConstraintEntityA</name>
+    <message>
+      <source>Attribute "%1" is not initialized.</source>
+      <translation>Le premier objet n&apos;est pas sélectionné</translation>
+    </message>
+  </context>
+  <context>
     <name>SketchConstraintDistance:ConstraintEntityB:GeomValidators_ShapeType</name>
     <message>
       <source>The object is empty</source>
+      <translation>Le deuxième objet n&apos;est pas sélectionné</translation>
+    </message>
+  </context>
+  <context>
+    <name>SketchConstraintDistance:ConstraintEntityB</name>
+    <message>
+      <source>Attribute "%1" is not initialized.</source>
       <translation>Le deuxième objet n&apos;est pas sélectionné</translation>
     </message>
   </context>
@@ -1749,6 +1854,20 @@
       <translation>Sélectionnez une arête</translation>
     </message>
   </context>
+  <context>
+    <name>SketchConstraintEqual:ConstraintEntityA</name>
+    <message>
+      <source>Attribute "%1" is not initialized.</source>
+      <translation>Sélectionnez le premier arête</translation>
+    </message>
+  </context>
+  <context>
+    <name>SketchConstraintEqual:ConstraintEntityB</name>
+    <message>
+      <source>Attribute "%1" is not initialized.</source>
+      <translation>Sélectionnez le deuxième arête</translation>
+    </message>
+  </context>
 
   <context>
     <name>SketchConstraintLength:ConstraintFlyoutValuePnt</name>
@@ -1841,6 +1960,13 @@
       <translation>L&apos;argument de contrainte fait référence à la forme vide</translation>
     </message>
   </context>
+  <context>
+    <name>SketchConstraintLength:ConstraintEntityA</name>
+    <message>
+      <source>Attribute "%1" is not initialized.</source>
+      <translation>La ligne n&apos;est pas sélectionnée</translation>
+    </message>
+  </context>
 
   <context>
     <name>SketchConstraintMiddle:ConstraintEntityA:PartSet_DifferentObjects</name>
@@ -1882,6 +2008,20 @@
     <message>
       <source>Both features, attribute and attribute in parameter, are external.</source>
       <translation>Un milieu ne peut pas être défini pour deux objets externes</translation>
+    </message>
+  </context>
+  <context>
+    <name>SketchConstraintMiddle:ConstraintEntityA</name>
+    <message>
+      <source>Attribute "%1" is not initialized.</source>
+      <translation>Le premier objet n&apos;est pas sélectionné</translation>
+    </message>
+  </context>
+  <context>
+    <name>SketchConstraintMiddle:ConstraintEntityB</name>
+    <message>
+      <source>Attribute "%1" is not initialized.</source>
+      <translation>Le deuxième objet n&apos;est pas sélectionné</translation>
     </message>
   </context>
 
@@ -2004,6 +2144,20 @@
       <translation>L&apos;argument de contrainte fait référence à la forme vide</translation>
     </message>
   </context>
+  <context>
+    <name>SketchConstraintParallel:ConstraintEntityA</name>
+    <message>
+      <source>Attribute "%1" is not initialized.</source>
+      <translation>Le premier objet n&apos;est pas sélectionné</translation>
+    </message>
+  </context>
+  <context>
+    <name>SketchConstraintParallel:ConstraintEntityB</name>
+    <message>
+      <source>Attribute "%1" is not initialized.</source>
+      <translation>Le deuxième objet n&apos;est pas sélectionné</translation>
+    </message>
+  </context>
 
   <context>
     <name>SketchConstraintRigid:ConstraintEntityA:GeomValidators_ShapeType</name>
@@ -2014,6 +2168,13 @@
   </context>
   <context>
     <name>SketchConstraintRigid:Model_FeatureValidator</name>
+    <message>
+      <source>Attribute "%1" is not initialized.</source>
+      <translation>L&apos;objet n&apos;est pas sélectionné</translation>
+    </message>
+  </context>
+  <context>
+    <name>SketchConstraintRigid:ConstraintEntityA</name>
     <message>
       <source>Attribute "%1" is not initialized.</source>
       <translation>L&apos;objet n&apos;est pas sélectionné</translation>
@@ -2104,6 +2265,20 @@
       <translation>Le premier objet n&apos;est pas sélectionné</translation>
     </message>
   </context>
+  <context>
+    <name>SketchConstraintTangent:ConstraintEntityA</name>
+    <message>
+      <source>Attribute "%1" is not initialized.</source>
+      <translation>Le premier objet n&apos;est pas sélectionné</translation>
+    </message>
+  </context>
+  <context>
+    <name>SketchConstraintTangent:ConstraintEntityB</name>
+    <message>
+      <source>Attribute "%1" is not initialized.</source>
+      <translation>Le deuxième objet n&apos;est pas sélectionné</translation>
+    </message>
+  </context>
 
   <context>
     <name>SketchConstraintSplit:ConstraintEntityA:SketchPlugin_SplitValidator</name>
@@ -2143,6 +2318,13 @@
   </context>
   <context>
     <name>SketchFillet:Model_FeatureValidator</name>
+    <message>
+      <source>Attribute "%1" is not initialized.</source>
+      <translation>Sélectionnez un ou plusieurs points pour le congé</translation>
+    </message>
+  </context>
+  <context>
+    <name>SketchFillet:fillet_point</name>
     <message>
       <source>Attribute "%1" is not initialized.</source>
       <translation>Sélectionnez un ou plusieurs points pour le congé</translation>
@@ -2205,7 +2387,6 @@
       <translation>La fonction de projection n&apos;a pas d&apos;esquisse</translation>
     </message>
   </context>
-
   <context>
     <name>SketchProjection:Model_FeatureValidator</name>
     <message>
@@ -2213,6 +2394,14 @@
       <translation>L&apos;attribut &quot;%1&quot; n&apos;est pas initialisé.</translation>
     </message>
   </context>
+  <context>
+    <name>SketchProjection:ExternalFeature</name>
+    <message>
+      <source>Attribute "%1" is not initialized.</source>
+      <translation>L&apos;attribut &quot;%1&quot; n&apos;est pas initialisé.</translation>
+    </message>
+  </context>
+
   <context>
     <name>Sketch</name>
     <message>
@@ -2424,6 +2613,20 @@
       <translation>L&apos;attribut &quot;%1&quot; n&apos;est pas initialisé.</translation>
     </message>
   </context>
+  <context>
+    <name>SketchConstraintCollinear:ConstraintEntityA</name>
+    <message>
+      <source>Attribute "%1" is not initialized.</source>
+      <translation>Sélectionnez le premier ligne</translation>
+    </message>
+  </context>
+  <context>
+    <name>SketchConstraintCollinear:ConstraintEntityB</name>
+    <message>
+      <source>Attribute "%1" is not initialized.</source>
+      <translation>Sélectionnez le deuxième ligne</translation>
+    </message>
+  </context>
 
   <context>
     <name>SketchConstraintDistance</name>
@@ -2519,6 +2722,13 @@
     </message>
   </context>
   <context>
+    <name>SketchConstraintDistanceHorizontal:ConstraintEntityA</name>
+    <message>
+      <source>Attribute "%1" is not initialized.</source>
+      <translation>Sélectionnez un point.</translation>
+    </message>
+  </context>
+  <context>
     <name>SketchConstraintDistanceHorizontal</name>
     <message>
       <source>Select points for distance definition.</source>
@@ -2555,6 +2765,13 @@
     </message>
   </context>
   <context>
+    <name>SketchConstraintDistanceHorizontal:ConstraintEntityB</name>
+    <message>
+      <source>Attribute "%1" is not initialized.</source>
+      <translation>Sélectionnez un point.</translation>
+    </message>
+  </context>
+  <context>
     <name>SketchConstraintDistanceHorizontal:ConstraintEntityB:GeomValidators_ShapeType</name>
     <message>
       <source>The object is empty</source>
@@ -2577,6 +2794,13 @@
     <message>
       <source>Double is not initialized.</source>
       <translation>Double n&apos;est pas initialisé.</translation>
+    </message>
+  </context>
+  <context>
+    <name>SketchConstraintDistanceHorizontal:DistanceValue:GeomValidators_Positive</name>
+    <message>
+      <source>Value is too small.</source>
+      <translation>La valeur est trop petite</translation>
     </message>
   </context>
   <context>
@@ -3256,6 +3480,13 @@
       <translation>L&apos;attribut &quot;%1&quot; n&apos;est pas initialisé.</translation>
     </message>
   </context>
+  <context>
+    <name>SketchIntersectionPoint:ExternalFeature</name>
+    <message>
+      <source>Attribute "%1" is not initialized.</source>
+      <translation>Sélectionnez le bord externe.</translation>
+    </message>
+  </context>
 
   <context>
     <name>SketchLine</name>
@@ -3328,6 +3559,13 @@
     </message>
   </context>
   <context>
+    <name>SketchMacroArc:arc_type</name>
+    <message>
+      <source>Attribute "%1" is not initialized.</source>
+      <translation>L&apos;attribut &quot;%1&quot; n&apos;est pas initialisé.</translation>
+    </message>
+  </context>
+  <context>
     <name>SketchMacroArc:angle</name>
     <message>
       <source>Set angle</source>
@@ -3397,6 +3635,13 @@
     </message>
   </context>
   <context>
+    <name>SketchMacroArc:tangent_point</name>
+    <message>
+      <source>Attribute "%1" is not initialized.</source>
+      <translation>Sélectionnez un point dans la vue.</translation>
+    </message>
+  </context>
+  <context>
     <name>SketchMacroArc:center_point</name>
     <message>
       <source>Attribute "%1" is locked by modification value in the viewer.</source>
@@ -3419,6 +3664,13 @@
     </message>
   </context>
   <context>
+    <name>SketchMacroArc:end_point_1</name>
+    <message>
+      <source>Attribute "%1" is not initialized.</source>
+      <translation>Sélectionnez un point d&apos;arrivée dans la vue.</translation>
+    </message>
+  </context>
+  <context>
     <name>SketchMacroArc:end_point_2</name>
     <message>
       <source>End point</source>
@@ -3437,6 +3689,13 @@
     <message>
       <source>Passed point</source>
       <translation>Point passé</translation>
+    </message>
+  </context>
+  <context>
+    <name>SketchMacroArc:passed_point</name>
+    <message>
+      <source>Attribute "%1" is not initialized.</source>
+      <translation>Sélectionnez un point dans la vue.</translation>
     </message>
   </context>
   <context>
@@ -3618,6 +3877,20 @@
       <translation>L&apos;attribut &quot;%1&quot; est verrouillé par la valeur de modification dans la vue.</translation>
     </message>
   </context>
+  <context>
+    <name>SketchMacroCircle:circle_type</name>
+    <message>
+      <source>Attribute "%1" is not initialized.</source>
+      <translation>L&apos;attribut &quot;%1&quot; n&apos;est pas initialisé.</translation>
+    </message>
+  </context>
+  <context>
+    <name>SketchMacroCircle:second_point</name>
+    <message>
+      <source>Attribute "%1" is not initialized.</source>
+      <translation>Sélectionnez le deuxième point.</translation>
+    </message>
+  </context>
 
   <context>
     <name>SketchMacroEllipse</name>
@@ -3643,6 +3916,20 @@
   </context>
   <context>
     <name>SketchMacroEllipse:Model_FeatureValidator</name>
+    <message>
+      <source>Attribute "%1" is not initialized.</source>
+      <translation>Sélectionnez un point.</translation>
+    </message>
+  </context>
+  <context>
+    <name>SketchMacroEllipse:ellipse_type</name>
+    <message>
+      <source>Attribute "%1" is not initialized.</source>
+      <translation>L&apos;attribut &quot;%1&quot; n&apos;est pas initialisé.</translation>
+    </message>
+  </context>
+  <context>
+    <name>SketchMacroEllipse:passed_point</name>
     <message>
       <source>Attribute "%1" is not initialized.</source>
       <translation>Sélectionnez un point.</translation>
@@ -4374,6 +4661,13 @@
       <translation>Erreur inconnue.</translation>
     </message>
   </context>
+  <context>
+    <name>SketchSplit:SelectedObject</name>
+    <message>
+      <source>Attribute "%1" is not initialized.</source>
+      <translation>Sélectionnez le segment à diviser</translation>
+    </message>
+  </context>
 
   <context>
     <name>SketchTrim</name>
@@ -4409,6 +4703,13 @@
     <message>
       <source>Unknown error.</source>
       <translation>Erreur inconnue.</translation>
+    </message>
+  </context>
+  <context>
+    <name>SketchTrim:SelectedObject</name>
+    <message>
+      <source>Attribute "%1" is not initialized.</source>
+      <translation>Sélectionner un segment pour la coupe</translation>
     </message>
   </context>
 

@@ -31,10 +31,10 @@
     </message>
   </context>
   <context>
-    <name>Dump:Model_FeatureValidator</name>
+    <name>Dump:file_format</name>
     <message>
-      <source>Attribute "file_format" is not initialized.</source>
-      <translation>AA</translation>
+      <source>Attribute "%1" is not initialized.</source>
+      <translation>L&apos;attribut "%1" n&apos;est pas initialisé.</translation>
     </message>
   </context>
   <context>

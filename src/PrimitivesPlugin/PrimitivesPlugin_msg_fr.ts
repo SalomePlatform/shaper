@@ -64,10 +64,17 @@
     </message>
   </context>
   <context>
-    <name>Box:Model_FeatureValidator</name>
+    <name>Box:FirstPoint</name>
     <message>
-      <source>Attribute "FirstPoint" is not initialized.</source>
-      <translation>AA</translation>
+      <source>Attribute "%1" is not initialized.</source>
+      <translation>Sélectionnez un premier point.</translation>
+    </message>
+  </context>
+  <context>
+    <name>Box:SecondPoint</name>
+    <message>
+      <source>Attribute "%1" is not initialized.</source>
+      <translation>Sélectionnez un deuxième point.</translation>
     </message>
   </context>
   <context>
@@ -181,6 +188,20 @@
       <translation>Rayon supérieur</translation>
     </message>
   </context>
+  <context>
+    <name>Cone:base_point</name>
+    <message>
+      <source>Attribute "%1" is not initialized.</source>
+      <translation>Sélectionnez le centre de la base du cône.</translation>
+    </message>
+  </context>
+  <context>
+    <name>Cone:base_point:GeomValidators_ConstructionComposite</name>
+    <message>
+      <source>The result is empty</source>
+      <translation>Le résultat est vide</translation>
+    </message>
+  </context>
 
   <context>
     <name>Cylinder</name>
@@ -257,6 +278,20 @@
     <message>
       <source>radius</source>
       <translation>rayon</translation>
+    </message>
+  </context>
+  <context>
+    <name>Cylinder:base_point</name>
+    <message>
+      <source>Attribute "%1" is not initialized.</source>
+      <translation>Sélectionnez le centre de la base du cylindre.</translation>
+    </message>
+  </context>
+  <context>
+    <name>Cylinder:base_point:GeomValidators_ConstructionComposite</name>
+    <message>
+      <source>The result is empty</source>
+      <translation>Le résultat est vide</translation>
     </message>
   </context>
 

@@ -171,6 +171,13 @@
       <source>Select tools</source>
       <translation>Sélectionnez des outils</translation>
     </message>
+    <context>
+      <name>Common:tool_objects</name>
+      <message>
+        <source>Attribute "%1" is not initialized.</source>
+        <translation>Sélectionnez des outils.</translation>
+      </message>
+    </context>
     <message>
       <source>Tool objects</source>
       <translation>Objets outils</translation>
@@ -201,6 +208,13 @@
     <message>
       <source>Objects not selected.</source>
       <translation>Objets non sélectionnés.</translation>
+    </message>
+  </context>
+  <context>
+    <name>Cut:FeaturesPlugin_ValidatorBooleanArguments</name>
+    <message>
+      <source>Tools not selected.</source>
+      <translation>Les objets outils ne sont pas sélectionnés.</translation>
     </message>
   </context>
   <context>
@@ -266,6 +280,13 @@
     <message>
       <source>Select a base objects</source>
       <translation>Sélectionnez un objet de base</translation>
+    </message>
+  </context>
+  <context>
+    <name>Extrusion:base</name>
+    <message>
+      <source>Attribute "%1" is not initialized.</source>
+      <translation>Sélectionnez un objet de base.</translation>
     </message>
   </context>
   <context>
@@ -396,17 +417,17 @@
     </message>
   </context>
   <context>
-    <name>ExtrusionCut:Model_FeatureValidator</name>
+    <name>ExtrusionCut:base</name>
     <message>
-      <source>Attribute "base" is not initialized.</source>
-      <translation>AA</translation>
+      <source>Select a sketch face</source>
+      <translation>Sélectionnez une face d&apos;esquisse</translation>
     </message>
   </context>
   <context>
     <name>ExtrusionCut:base</name>
     <message>
-      <source>Select a sketch face</source>
-      <translation>Sélectionnez une face d&apos;esquisse</translation>
+      <source>Attribute "%1" is not initialized.</source>
+      <translation>Sélectionnez une face d&apos;esquisse.</translation>
     </message>
   </context>
   <context>
@@ -522,6 +543,27 @@
     <message>
       <source>Select:&lt;br /&gt; 1. Planar face of non-sketch object or a plane. Sketch creation will be started.&lt;br /&gt; 2. An existing sketch face or contour. Extrusion will be filled by it.&lt;br /&gt; 3. An existing result shape of kind: wires/edge/vertices. Extrusion will be filled by it.</source>
       <translation>Sélectionnez : &lt;br /&gt; 1. Face plane d&apos;un objet non esquissé ou d&apos;un plan. La création de l’esquisse sera lancée. &lt;br /&gt; 2. Une face ou un contour d’esquisse existant. L&apos;extrusion sera remplie par elle. &lt;br /&gt; 3. Une forme de résultat existante de type: contours / arête / sommets. L&apos;extrusion sera remplie par elle.</translation>
+    </message>
+  </context>
+  <context>
+    <name>ExtrusionCut:from_object:FeaturesPlugin_ValidatorExtrusionBoundary</name>
+    <message>
+      <source>Error: Extrusion algorithm failed.</source>
+      <translation>Erreur : l&apos;algorithme d&apos;extrusion a échoué.</translation>
+    </message>
+  </context>
+  <context>
+    <name>ExtrusionCut:main_objects</name>
+    <message>
+      <source>Attribute "%1" is not initialized.</source>
+      <translation>Les objets principaux ne sont pas sélectionnés</translation>
+    </message>
+  </context>
+  <context>
+    <name>ExtrusionCut:to_object:FeaturesPlugin_ValidatorExtrusionBoundary</name>
+    <message>
+      <source>Error: Extrusion algorithm failed.</source>
+      <translation>Erreur : l&apos;algorithme d&apos;extrusion a échoué.</translation>
     </message>
   </context>
 
@@ -682,6 +724,35 @@
       <translation>Sélectionnez : &lt;br /&gt; 1. Face plane d&apos;un objet non esquissé ou d&apos;un plan. La création de l’esquisse sera lancée. &lt;br /&gt; 2. Une face ou un contour d’esquisse existant. L&apos;extrusion sera remplie par elle. &lt;br /&gt; 3. Une forme de résultat existante de type: contours / arête / sommets. L&apos;extrusion sera remplie par elle.</translation>
     </message>
   </context>
+  <context>
+    <name>ExtrusionFuse:base</name>
+    <message>
+      <source>Attribute "%1" is not initialized.</source>
+      <translation>Sélectionner des objets de base.</translation>
+    </message>
+  </context>
+  <context>
+    <name>ExtrusionFuse:from_object:FeaturesPlugin_ValidatorExtrusionBoundary</name>
+    <message>
+      <source>Error: Extrusion algorithm failed.</source>
+      <translation>Erreur : l&apos;algorithme d&apos;extrusion a échoué.</translation>
+    </message>
+  </context>
+  <context>
+    <name>ExtrusionFuse:main_objects</name>
+    <message>
+      <source>Attribute "%1" is not initialized.</source>
+      <translation>Les objets principaux ne sont pas sélectionnés</translation>
+    </message>
+  </context>
+  <context>
+    <name>ExtrusionFuse:to_object:FeaturesPlugin_ValidatorExtrusionBoundary</name>
+    <message>
+      <source>Error: Extrusion algorithm failed.</source>
+      <translation>Erreur : l&apos;algorithme d&apos;extrusion a échoué.</translation>
+    </message>
+  </context>
+
 
   <!-- Fillet -->
   <context>
@@ -987,6 +1058,27 @@
       <translation>Sélectionnez une arête ou un contour pour le chemin</translation>
     </message>
   </context>
+  <context>
+    <name>Pipe:base_objects</name>
+    <message>
+      <source>Attribute "%1" is not initialized.</source>
+      <translation>Sélectionner des objets de base.</translation>
+    </message>
+  </context>
+  <context>
+    <name>Pipe:binormal</name>
+    <message>
+      <source>Attribute "%1" is not initialized.</source>
+      <translation>Le vecteur binormal n&apos;est pas sélectionné</translation>
+    </message>
+  </context>
+  <context>
+    <name>Pipe:path_object</name>
+    <message>
+      <source>Attribute "%1" is not initialized.</source>
+      <translation>Sélectionnez une arête ou un contour pour le chemin.</translation>
+    </message>
+  </context>
 
   <!-- Recover -->
   <context>
@@ -998,13 +1090,6 @@
     <message>
       <source>Visualize concealed objects</source>
       <translation>Visualiser les objets cachés</translation>
-    </message>
-  </context>
-  <context>
-    <name>Recover:Model_FeatureValidator</name>
-    <message>
-      <source>Attribute "base_feature" is not initialized.</source>
-      <translation>AA</translation>
     </message>
   </context>
   <context>
@@ -1242,6 +1327,20 @@
       <translation>Sélectionnez : &lt;br /&gt; 1. Face plane d&apos;un objet non esquissé ou d&apos;un plan. La création de l’esquisse sera lancée. &lt;br /&gt; 2. Une face ou un contour d’esquisse existant. L&apos;extrusion sera remplie par elle. &lt;br /&gt; 3. Une forme de résultat existante de type: contours / arête / sommets. L&apos;extrusion sera remplie par elle.</translation>
     </message>
   </context>
+  <context>
+    <name>Revolution:GeomValidators_ZeroOffset</name>
+    <message>
+      <source>FromSize = -ToSize and bounding planes are coincident.</source>
+      <translation>FromSize = -ToSize et les plans de délimitation coïncident</translation>
+    </message>
+  </context>
+  <context>
+    <name>Revolution:axis_object</name>
+    <message>
+      <source>Attribute "%1" is not initialized.</source>
+      <translation>L&apos;axe de révolution n&apos;est pas sélectionné</translation>
+    </message>
+  </context>
 
   <!-- RevolutionCut -->
   <context>
@@ -1386,6 +1485,20 @@
     <message>
       <source>Select:&lt;br /&gt; 1. Planar face of non-sketch object or a plane. Sketch creation will be started.&lt;br /&gt; 2. An existing sketch face or contour. Extrusion will be filled by it.&lt;br /&gt; 3. An existing result shape of kind: wires/edge/vertices. Extrusion will be filled by it.</source>
       <translation>Sélectionnez : &lt;br /&gt; 1. Face plane d&apos;un objet non esquissé ou d&apos;un plan. La création de l’esquisse sera lancée. &lt;br /&gt; 2. Une face ou un contour d’esquisse existant. L&apos;extrusion sera remplie par elle. &lt;br /&gt; 3. Une forme de résultat existante de type: contours / arête / sommets. L&apos;extrusion sera remplie par elle.</translation>
+    </message>
+  </context>
+  <context>
+    <name>RevolutionCut:axis_object</name>
+    <message>
+      <source>Attribute "%1" is not initialized.</source>
+      <translation>L&apos;axe de révolution n&apos;est pas sélectionné</translation>
+    </message>
+  </context>
+  <context>
+    <name>RevolutionCut:main_objects</name>
+    <message>
+      <source>Attribute "%1" is not initialized.</source>
+      <translation>Les objets principaux ne sont pas sélectionnés</translation>
     </message>
   </context>
 
@@ -1534,6 +1647,20 @@
       <translation>Sélectionnez : &lt;br /&gt; 1. Face plane d&apos;un objet non esquissé ou d&apos;un plan. La création de l’esquisse sera lancée. &lt;br /&gt; 2. Une face ou un contour d’esquisse existant. L&apos;extrusion sera remplie par elle. &lt;br /&gt; 3. Une forme de résultat existante de type: contours / arête / sommets. L&apos;extrusion sera remplie par elle.</translation>
     </message>
   </context>
+  <context>
+    <name>RevolutionFuse:axis_object</name>
+    <message>
+      <source>Attribute "%1" is not initialized.</source>
+      <translation>L&apos;axe de révolution n&apos;est pas sélectionné</translation>
+    </message>
+  </context>
+  <context>
+    <name>RevolutionFuse:main_objects</name>
+    <message>
+      <source>Attribute "%1" is not initialized.</source>
+      <translation>Les objets principaux ne sont pas sélectionnés</translation>
+    </message>
+  </context>
 
   <!-- Scale -->
   <context>
@@ -1648,6 +1775,13 @@
     <message>
       <source>Tool objects</source>
       <translation>Objets outils</translation>
+    </message>
+  </context>
+  <context>
+    <name>Smash:FeaturesPlugin_ValidatorBooleanArguments</name>
+    <message>
+      <source>Tools not selected.</source>
+      <translation>Les objets outils ne sont pas sélectionnés.</translation>
     </message>
   </context>
 

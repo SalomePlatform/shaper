@@ -243,21 +243,6 @@
     </message>
   </context>
   <context>
-    <name>Axis:Model_FeatureValidator</name>
-    <message>
-      <source>Attribute "line" is not initialized.</source>
-      <translation>AA</translation>
-    </message>
-    <message>
-      <source>Attribute "plane" is not initialized.</source>
-      <translation>AA</translation>
-    </message>
-    <message>
-      <source>Attribute "plane1" is not initialized.</source>
-      <translation>AA</translation>
-    </message>
-  </context>
-  <context>
     <name>Axis:SecondPoint</name>
     <message>
       <source>Second point</source>
@@ -471,6 +456,41 @@
     <message>
       <source>By two points</source>
       <translation>Par deux points</translation>
+    </message>
+  </context>
+  <context>
+    <name>Axis:CylindricalFace</name>
+    <message>
+      <source>Attribute "%1" is not initialized.</source>
+      <translation>Sélectionnez un objet cylindrique.</translation>
+    </message>
+  </context>
+  <context>
+    <name>Axis:FirstPoint</name>
+    <message>
+      <source>Attribute "%1" is not initialized.</source>
+      <translation>Sélectionnez un premier point.</translation>
+    </message>
+  </context>
+  <context>
+    <name>Axis:line</name>
+    <message>
+      <source>Attribute "%1" is not initialized.</source>
+      <translation>Sélectionnez une ligne.</translation>
+    </message>
+  </context>
+  <context>
+    <name>Axis:plane</name>
+    <message>
+      <source>Attribute "%1" is not initialized.</source>
+      <translation>Sélectionnez un plan.</translation>
+    </message>
+  </context>
+  <context>
+    <name>Axis:plane1</name>
+    <message>
+      <source>Attribute "%1" is not initialized.</source>
+      <translation>Sélectionnez un plan.</translation>
     </message>
   </context>
 
