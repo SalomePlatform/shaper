@@ -549,14 +549,16 @@ void XGUI_SelectionActivate::deactivateTrihedron(const bool theUpdateViewer) con
 void XGUI_SelectionActivate::deactivateTrihedronInSelectionModes()
 {
   Handle(AIS_InteractiveContext) aContext = AISContext();
-  Handle(AIS_Trihedron) aTrihedron = Handle(AIS_Trihedron)::DownCast(getTrihedron());
-  /// deactivate trihedron in selection modes
-  TColStd_ListOfInteger aTColModes;
-  aContext->ActivatedModes(aTrihedron, aTColModes);
-  TColStd_ListIteratorOfListOfInteger itr( aTColModes );
-  for (; itr.More(); itr.Next() ) {
-    Standard_Integer aMode = itr.Value();
-    aContext->Deactivate(aTrihedron, aMode);
+  if (!aContext.IsNull()) {
+    Handle(AIS_Trihedron) aTrihedron = Handle(AIS_Trihedron)::DownCast(getTrihedron());
+    /// deactivate trihedron in selection modes
+    TColStd_ListOfInteger aTColModes;
+    aContext->ActivatedModes(aTrihedron, aTColModes);
+    TColStd_ListIteratorOfListOfInteger itr(aTColModes);
+    for (; itr.More(); itr.Next()) {
+      Standard_Integer aMode = itr.Value();
+      aContext->Deactivate(aTrihedron, aMode);
+    }
   }
 }
 
