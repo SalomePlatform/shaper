@@ -78,9 +78,11 @@ void SketchPlugin_MacroEllipse::initAttributes()
   string(EDIT_ELLIPSE_TYPE())->setValue("");
 
   ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(), CENTER_POINT_REF_ID());
-  ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(), MAJOR_AXIS_POINT_REF_ID());
+  ModelAPI_Session::get()->validators()->registerNotObligatory(
+      getKind(), MAJOR_AXIS_POINT_REF_ID());
   ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(), PASSED_POINT_REF_ID());
-  ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(), MAJOR_AXIS_START_REF_ID());
+  ModelAPI_Session::get()->validators()->registerNotObligatory(
+      getKind(), MAJOR_AXIS_START_REF_ID());
   ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(), MAJOR_AXIS_END_REF_ID());
   ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(), PASSED_POINT_1_REF_ID());
   ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(), EDIT_ELLIPSE_TYPE());
