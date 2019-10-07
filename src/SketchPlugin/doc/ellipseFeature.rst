@@ -30,13 +30,15 @@ Click in the view once to set the center point, then move the mouse and click to
 
 **TUI Command**:
 
-.. py:function:: SketchEllipse_1 = Sketch_1.addEllipse(X1, Y1, X2, Y2, X3)
-.. py:function:: [SketchPoint_1, SketchPoint_2, SketchPoint_3, SketchPoint_4, SketchPoint_5, SketchPoint_6, SketchPoint_7, SketchLine_1, SketchLine_2] = SketchEllipse_1.construction(center = "aux", firstFocus = "aux", secondFocus = "aux", majorAxisStart = "aux", majorAxisEnd = "aux", minorAxisStart = "aux", minorAxisEnd = "aux", majorAxis = "aux", minorAxis = "aux")
+.. py:function:: Sketch_1.addEllipse(CenterX, CenterY, MajorAxisX, MajorAxisY, PassedX, PassedY, True)
 
-    :param real: Start X.
-    :param real: Start Y.
+    :param real: Center X.
+    :param real: Center Y.
+    :param real: Major Axis X.
+    :param real: Major Axis Y.
     :param real: Passed X.
     :param real: Passed Y.
+    :param boolean: True mentions that the first coordinates define the center of the ellipse.
     :return: Result object.
 
 By major axis and passing point
@@ -49,13 +51,15 @@ Click in the view once to set a first point of a first axis, then move the mouse
 
 **TUI Command**:
 
-.. py:function:: SketchEllipse_1 = Sketch_1.addEllipse(X1, Y1, X2, Y2, X3)
-.. py:function:: [SketchPoint_1, SketchPoint_2, SketchPoint_3, SketchPoint_4, SketchPoint_5, SketchPoint_6, SketchPoint_7, SketchLine_1, SketchLine_2] = SketchEllipse_1.construction(center = "aux", firstFocus = "aux", secondFocus = "aux", majorAxisStart = "aux", majorAxisEnd = "aux", minorAxisStart = "aux", minorAxisEnd = "aux", majorAxis = "aux", minorAxis = "aux")
+.. py:function:: Sketch_1.addEllipse(MajorAxisStartX, MajorAxisStartY, MajorAxisEndX, MajorAxisEndY, PassedX, PassedY, False)
 
-    :param real: Start X.
-    :param real: Start Y.
+    :param real: Major Axis Start X.
+    :param real: Major Axis Start Y.
+    :param real: Major Axis End X.
+    :param real: Major Axis End Y.
     :param real: Passed X.
     :param real: Passed Y.
+    :param boolean: False mentions that the first coordinates define the start point of major axis of the ellipse.
     :return: Result object.
 
 Result

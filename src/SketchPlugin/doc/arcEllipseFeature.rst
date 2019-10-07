@@ -19,11 +19,12 @@ Click in the view to set the center point, then move the mouse and click a secon
 
 **TUI Command**:
 
-.. py:function:: SketchEllipticArc_1 = Sketch_1.addEllipticArc(X1, Y1, X2, Y2, X3, Y3, X4, Y4, False)
-.. py:function:: [SketchPoint_1, SketchPoint_2, SketchPoint_3, SketchPoint_4, SketchPoint_5, SketchPoint_6, SketchPoint_7, SketchLine_1, SketchLine_2] = SketchEllipticArc_1.construction(center = "aux", firstFocus = "aux", secondFocus = "aux", majorAxisStart = "aux", majorAxisEnd = "aux", minorAxisStart = "aux", minorAxisEnd = "aux", majorAxis = "aux", minorAxis = "aux")
+.. py:function:: Sketch_1.addEllipticArc(CenterX, CenterY, FocusX, FocusY, StartX, StartY, EndX, EndY, Inversed)
 
     :param real: Center X.
     :param real: Center Y.
+    :param real: Focus X.
+    :param real: Focus Y.
     :param real: Start X.
     :param real: Start Y.
     :param real: End X.
