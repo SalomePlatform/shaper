@@ -28,11 +28,11 @@ CENTER = geom.Pnt2d(10, 10)
 MAJOR_RADIUS = 50
 MINOR_RADIUS = 30
 
-DOF = 10
+DOF = 11
 NB_LINES = 3
 NB_ELLIPSES = 1
 NB_ELLIPTIC_ARCS = 0
-NB_COINCIDENCES = 6
+NB_COINCIDENCES = 5
 
 TOLERANCE = 1.e-6
 
@@ -67,13 +67,12 @@ Sketch_1 = model.addSketch(Part_1_doc, model.defaultPlane("XOY"))
 SketchEllipse_1 = Sketch_1.addEllipse(CENTER.x(), CENTER.y(), CENTER.x() + math.sqrt(MAJOR_RADIUS**2 - MINOR_RADIUS**2), CENTER.y(), MINOR_RADIUS)
 SketchLine_1 = Sketch_1.addLine(-16.74176451428603, -15.34869012470842, -16.85909682653373, 35.30399198463829)
 SketchConstraintCoincidence_1 = Sketch_1.setCoincident(SketchLine_1.startPoint(), SketchEllipse_1.result())
-SketchConstraintCoincidence_2 = Sketch_1.setCoincident(SketchLine_1.endPoint(), SketchEllipse_1.result())
 SketchLine_2 = Sketch_1.addLine(-16.85909682653373, 35.30399198463829, 20.9032928583277, -19.27802168426675)
-SketchConstraintCoincidence_3 = Sketch_1.setCoincident(SketchLine_1.endPoint(), SketchLine_2.startPoint())
-SketchConstraintCoincidence_4 = Sketch_1.setCoincident(SketchLine_2.endPoint(), SketchEllipse_1.result())
+SketchConstraintCoincidence_2 = Sketch_1.setCoincident(SketchLine_1.endPoint(), SketchLine_2.startPoint())
+SketchConstraintCoincidence_3 = Sketch_1.setCoincident(SketchLine_2.endPoint(), SketchEllipse_1.result())
 SketchLine_3 = Sketch_1.addLine(34.69765676551338, 36.08465583643841, 35.0422024535432, -15.96612629290852)
-SketchConstraintCoincidence_5 = Sketch_1.setCoincident(SketchLine_3.startPoint(), SketchEllipse_1.result())
-SketchConstraintCoincidence_6 = Sketch_1.setCoincident(SketchLine_3.endPoint(), SketchEllipse_1.result())
+SketchConstraintCoincidence_4 = Sketch_1.setCoincident(SketchLine_3.startPoint(), SketchEllipse_1.result())
+SketchConstraintCoincidence_5 = Sketch_1.setCoincident(SketchLine_3.endPoint(), SketchEllipse_1.result())
 model.do()
 
 checkFeaturesQuantity(Sketch_1)
@@ -115,6 +114,7 @@ model.undo()
 model.begin()
 Part_1_doc.removeFeature(SketchSplit.feature())
 model.do()
+Sketch_1.setCoincident(SketchLine_1.endPoint(), EllipticArc.result())
 Sketch_1.setCoincident(SketchLine_2.startPoint(), EllipticArc.result())
 model.do()
 NB_COINCIDENCES += 1
@@ -124,7 +124,7 @@ DOF -= 1
 SketchSplit = Sketch_1.addSplit(EllipticArc, geom.Pnt2d(CENTER.x() - MAJOR_RADIUS, CENTER.y()))
 model.do()
 NB_ELLIPTIC_ARCS += 1
-NB_COINCIDENCES += 2
+NB_COINCIDENCES += 4
 DOF += 4
 
 checkFeaturesQuantity(Sketch_1)
