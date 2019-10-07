@@ -101,18 +101,20 @@ void ModuleBase_WidgetValidated::restoreAttributeValue(const AttributePtr& theAt
 bool ModuleBase_WidgetValidated::isValidInFilters(const ModuleBase_ViewerPrsPtr& thePrs)
 {
   bool aValid = true;
-  Handle(SelectMgr_EntityOwner) anOwner = thePrs->owner();
+  AIS_NListOfEntityOwner aOwnersList;
+  if (!thePrs->owner().IsNull())
+    aOwnersList.Append(thePrs->owner());
 
   // if an owner is null, the selection happens in the Object browser.
   // creates a selection owner on the base of object shape and the object AIS object
-  if (anOwner.IsNull() && thePrs->owner().IsNull() && thePrs->object().get()) {
+  if ((aOwnersList.Size() > 0) && thePrs->object().get()) {
     ResultPtr aResult = myWorkshop->selection()->getResult(thePrs);
     GeomShapePtr aShape = aResult.get() ? aResult->shape() : GeomShapePtr();
     // some results have no shape, e.g. the parameter one. So, they should not be validated
     if (aShape.get()) {
       const TopoDS_Shape aTDShape = aShape->impl<TopoDS_Shape>();
       Handle(AIS_InteractiveObject) anIO = myWorkshop->selection()->getIO(thePrs);
-      anOwner = new StdSelect_BRepOwner(aTDShape, anIO);
+      aOwnersList.Append(new StdSelect_BRepOwner(aTDShape, anIO));
       myPresentedObject = aResult;
     }
     else {
@@ -137,7 +139,7 @@ bool ModuleBase_WidgetValidated::isValidInFilters(const ModuleBase_ViewerPrsPtr&
           if (aShape.get()) {
             const TopoDS_Shape aTDShape = aShape->impl<TopoDS_Shape>();
             Handle(AIS_InteractiveObject) anIO = myWorkshop->selection()->getIO(thePrs);
-            anOwner = new StdSelect_BRepOwner(aTDShape, anIO);
+            aOwnersList.Append(new StdSelect_BRepOwner(aTDShape, anIO));
           }
           else
             aValid = false;
@@ -152,18 +154,21 @@ bool ModuleBase_WidgetValidated::isValidInFilters(const ModuleBase_ViewerPrsPtr&
               AISObjectPtr aIOPtr = myWorkshop->findPresentation(aResult);
               if (aIOPtr.get()) {
                 Handle(AIS_InteractiveObject) anIO = aIOPtr->impl<Handle(AIS_InteractiveObject)>();
-                anOwner = new StdSelect_BRepOwner(aTDShape, anIO);
+                aOwnersList.Append(new StdSelect_BRepOwner(aTDShape, anIO));
+              }
+              else {
+                aOwnersList.Append(new StdSelect_BRepOwner(aTDShape));
               }
             }
           }
-          aValid = !anOwner.IsNull(); // only results with a shape can be filtered
+          aValid = (aOwnersList.Size() > 0); // only results with a shape can be filtered
         }
       } else
         aValid = false; // only results with a shape can be filtered
     }
   }
   // checks the owner by the AIS context activated filters
-  if (!anOwner.IsNull()) {
+  if (aOwnersList.Size() > 0) {
     // the widget validator filter should be active, but during check by preselection
     // it is not yet activated, so we need to activate/deactivate it manually
     bool isActivated = isFilterActivated();
@@ -179,13 +184,19 @@ bool ModuleBase_WidgetValidated::isValidInFilters(const ModuleBase_ViewerPrsPtr&
     if (!aContext.IsNull()) {
       const SelectMgr_ListOfFilter& aFilters = aContext->Filters();
       SelectMgr_ListIteratorOfListOfFilter anIt(aFilters);
+      AIS_NListOfEntityOwner::Iterator aOIt;
       for (; anIt.More() && aValid; anIt.Next()) {
         Handle(SelectMgr_Filter) aFilter = anIt.Value();
-        aValid = aFilter->IsOk(anOwner);
+        for (aOIt.Init(aOwnersList); aOIt.More(); aOIt.Next()) {
+          aValid = aFilter->IsOk(aOIt.Value());
+          if (!aValid)
+            break;
+        }
+        if (!aValid)
+          break;
       }
     }
-    if (!isActivated)
-    {
+    if (!isActivated) {
       // reset filters set in activateSelectionFilters above
       myWorkshop->selectionActivate()->updateSelectionFilters();
       clearValidatedCash();
@@ -193,8 +204,7 @@ bool ModuleBase_WidgetValidated::isValidInFilters(const ModuleBase_ViewerPrsPtr&
   }
 
   // removes created owner
-  if (!anOwner.IsNull() && anOwner != thePrs->owner()) {
-    anOwner.Nullify();
+  if (aOwnersList.Size() > 0 && thePrs->owner().IsNull()) {
     myPresentedObject = ObjectPtr();
   }
   if (!aValid) {
