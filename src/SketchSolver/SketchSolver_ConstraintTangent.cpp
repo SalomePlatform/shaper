@@ -34,6 +34,7 @@
 #include <SketchPlugin_Arc.h>
 #include <SketchPlugin_Circle.h>
 #include <SketchPlugin_ConstraintCoincidence.h>
+#include <SketchPlugin_ConstraintCoincidenceInternal.h>
 #include <SketchPlugin_ConstraintMiddle.h>
 
 #include <cmath>
@@ -368,6 +369,7 @@ static std::set<AttributePtr> pointsOnFeature(FeaturePtr theFeature)
   for (std::set<AttributePtr>::const_iterator anIt = aRefs.begin(); anIt != aRefs.end(); ++anIt) {
     FeaturePtr aRef = ModelAPI_Feature::feature((*anIt)->owner());
     if (aRef && (aRef->getKind() == SketchPlugin_ConstraintCoincidence::ID() ||
+                 aRef->getKind() == SketchPlugin_ConstraintCoincidenceInternal::ID() ||
                  aRef->getKind() == SketchPlugin_ConstraintMiddle::ID())) {
       for (int i = 0; i < CONSTRAINT_ATTR_SIZE; ++i) {
         AttributeRefAttrPtr aRefAttr = aRef->refattr(SketchPlugin_Constraint::ATTRIBUTE(i));

@@ -136,13 +136,20 @@ static double extrema(IntAna2d_AnaIntersection* theIntersectionAlgo,
     gp_Pnt2d anArrangePoint(theArrangePoint->x(), theArrangePoint->y());
     gp_Pnt2d anInterPnt = theIntersectionAlgo->Point(1).Value();
     aDistance = anArrangePoint.SquareDistance(anInterPnt);
-    // get solution nearest to theArrangePoint
+    int aNbMergedPoints = 1;
+    // get solution nearest to theArrangePoint,
+    // if there are several point near each other, calculate average coordinates
     for (int i = 2; i <= theIntersectionAlgo->NbPoints(); ++i) {
       const IntAna2d_IntPoint& aPnt = theIntersectionAlgo->Point(i);
       double aSqDist = aPnt.Value().SquareDistance(anArrangePoint);
-      if (aSqDist < aDistance) {
+      if (aSqDist - aDistance < -Precision::Confusion() * aDistance) {
         aDistance = aSqDist;
         anInterPnt = aPnt.Value();
+        aNbMergedPoints = 1;
+      } else if (aSqDist - aDistance < Precision::Confusion() * aDistance) {
+        anInterPnt.ChangeCoord() =
+            (anInterPnt.XY() * aNbMergedPoints + aPnt.Value().XY()) / (aNbMergedPoints + 1);
+        ++aNbMergedPoints;
       }
     }
 
@@ -181,9 +188,7 @@ double GeomAPI_Ellipse2d::distance(const std::shared_ptr<GeomAPI_Circ2d>& theCir
 {
   IntAna2d_AnaIntersection anInter(theCircle->impl<gp_Circ2d>(), IntAna2d_Conic(*MY_ELLIPSE));
   Extrema_ExtElC2d anExtema(theCircle->impl<gp_Circ2d>(), *MY_ELLIPSE);
-  GeomPnt2dPtr aCircleStart;
-  theCircle->D0(0.0, aCircleStart);
-  return extrema(&anInter, &anExtema, aCircleStart, thePointOnCircle, thePointOnMe);
+  return extrema(&anInter, &anExtema, firstFocus(), thePointOnCircle, thePointOnMe);
 }
 
 double GeomAPI_Ellipse2d::distance(const std::shared_ptr<GeomAPI_Ellipse2d>& theEllipse,

@@ -32,7 +32,7 @@ DOF = 11
 NB_LINES = 3
 NB_ELLIPSES = 1
 NB_ELLIPTIC_ARCS = 0
-NB_COINCIDENCES = 5
+NB_COINCIDENCES = 6
 NB_EQUALS = 0
 
 TOLERANCE = 1.e-6
@@ -72,9 +72,10 @@ SketchConstraintCoincidence_1 = Sketch_1.setCoincident(SketchLine_1.startPoint()
 SketchConstraintCoincidence_2 = Sketch_1.setCoincident(SketchLine_1.endPoint(), SketchEllipse_1.result())
 SketchLine_2 = Sketch_1.addLine(-16.85909682653373, 35.30399198463829, 20.9032928583277, -19.27802168426675)
 SketchConstraintCoincidence_3 = Sketch_1.setCoincident(SketchLine_1.endPoint(), SketchLine_2.startPoint())
-SketchConstraintCoincidence_4 = Sketch_1.setCoincident(SketchLine_2.endPoint(), SketchEllipse_1.result())
+SketchConstraintCoincidence_4 = Sketch_1.setCoincident(SketchLine_2.startPoint(), SketchEllipse_1.result())
+SketchConstraintCoincidence_5 = Sketch_1.setCoincident(SketchLine_2.endPoint(), SketchEllipse_1.result())
 SketchLine_3 = Sketch_1.addLine(34.69765676551338, 36.08465583643841, 35.0422024535432, -17.96612629290852)
-SketchConstraintCoincidence_5 = Sketch_1.setCoincident(SketchLine_3.startPoint(), SketchEllipse_1.result())
+SketchConstraintCoincidence_6 = Sketch_1.setCoincident(SketchLine_3.startPoint(), SketchEllipse_1.result())
 model.do()
 
 checkFeaturesQuantity(Sketch_1)
