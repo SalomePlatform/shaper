@@ -258,6 +258,43 @@ class TestCoincidenceEllipticArc(unittest.TestCase):
     self.checkPointOnEllipse(self.myOrigin.coordinates(), self.myEllipticArc)
 
 
+  def test_start_on_major_axis(self):
+    """ Test 22. Make coincident the start point of the arc and the end of its major axis
+    """
+    self.myEllipticArc.startPoint().setValue(38, -2)
+    model.do()
+    self.mySketch.setCoincident(self.myEllipticArc.startPoint(), self.myMajorAxis.endPoint())
+    self.myDOF -= 1
+    model.do()
+    self.assertPoints(self.myMajorAxis.endPoint(), self.myEllipticArc.startPoint())
+
+  def test_end_on_major_axis(self):
+    """ Test 23. Make coincident the end point of the arc and the start of its major axis
+    """
+    self.myEllipticArc.endPoint().setValue(-58, 12)
+    model.do()
+    self.mySketch.setCoincident(self.myMajorAxis.startPoint(), self.myEllipticArc.endPoint())
+    self.myDOF -= 1
+    model.do()
+    self.assertPoints(self.myMajorAxis.startPoint(), self.myEllipticArc.endPoint())
+
+  def test_start_on_minor_axis(self):
+    """ Test 22. Make coincident the start point of the arc and the end of its minor axis
+    """
+    self.mySketch.setCoincident(self.myMinorAxis.endPoint(), self.myEllipticArc.startPoint())
+    self.myDOF -= 1
+    model.do()
+    self.assertPoints(self.myMinorAxis.endPoint(), self.myEllipticArc.startPoint())
+
+  def test_end_on_minor_axis(self):
+    """ Test 23. Make coincident the end point of the arc and the start of its minor axis
+    """
+    self.mySketch.setCoincident(self.myEllipticArc.endPoint(), self.myMinorAxis.startPoint())
+    self.myDOF -= 1
+    model.do()
+    self.assertPoints(self.myMinorAxis.startPoint(), self.myEllipticArc.endPoint())
+
+
 if __name__ == "__main__":
     test_program = unittest.main(exit=False)
     assert test_program.result.wasSuccessful(), "Test failed"
