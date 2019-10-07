@@ -100,27 +100,19 @@ protected:
 
 private:
   /// Set flag of creation by center, major semi-axis and passed point.
-  void setByCenterAndPassedPoints();
+  void setByCenterAndPassedPoints(const std::shared_ptr<GeomAPI_Pnt2d>& theCenter,
+                                  const ModelHighAPI_RefAttr&           theCenterRef,
+                                  const std::shared_ptr<GeomAPI_Pnt2d>& theMajorAxisPoint,
+                                  const ModelHighAPI_RefAttr&           theMajorAxisPointRef,
+                                  const std::shared_ptr<GeomAPI_Pnt2d>& thePassedPoint,
+                                  const ModelHighAPI_RefAttr&           thePassedPointRef);
   /// Set flag of creation by major axis and passed point.
-  void setByMajorAxisAndPassedPoint();
-
-  /// Set points of ellipse.
-  void initializePoints(double theMajorAxisX1, double theMajorAxisY1,
-                        double theMajorAxisX2, double theMajorAxisY2,
-                        double thePassedX, double thePassedY);
-
-  /// Set points of ellipse.
-  void initializePoints(const std::shared_ptr<GeomAPI_Pnt2d>& theMajorAxisPoint1,
-                        const std::shared_ptr<GeomAPI_Pnt2d>& theMajorAxisPoint2,
-                        const std::shared_ptr<GeomAPI_Pnt2d>& thePassedPoint);
-
-  /// Set points of ellipse.
-  void initializePoints(const std::shared_ptr<GeomAPI_Pnt2d>& theMajorAxisPoint1,
-                        const ModelHighAPI_RefAttr&           theMajorAxisPoint1Ref,
-                        const std::shared_ptr<GeomAPI_Pnt2d>& theMajorAxisPoint2,
-                        const ModelHighAPI_RefAttr&           theMajorAxisPoint2Ref,
-                        const std::shared_ptr<GeomAPI_Pnt2d>& thePassedPoint,
-                        const ModelHighAPI_RefAttr&           thePassedPointRef);
+  void setByMajorAxisAndPassedPoint(const std::shared_ptr<GeomAPI_Pnt2d>& theMajorAxisStart,
+                                    const ModelHighAPI_RefAttr&           theMajorAxisStartRef,
+                                    const std::shared_ptr<GeomAPI_Pnt2d>& theMajorAxisEnd,
+                                    const ModelHighAPI_RefAttr&           theMajorAxisEndRef,
+                                    const std::shared_ptr<GeomAPI_Pnt2d>& thePassedPoint,
+                                    const ModelHighAPI_RefAttr&           thePassedPointRef);
 
   /// Collect auxiliary features
   void collectAuxiliary();

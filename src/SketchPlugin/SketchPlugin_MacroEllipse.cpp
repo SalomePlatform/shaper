@@ -57,12 +57,19 @@ void SketchPlugin_MacroEllipse::initAttributes()
   data()->addAttribute(ELLIPSE_TYPE(), ModelAPI_AttributeString::typeId());
   data()->addAttribute(EDIT_ELLIPSE_TYPE(), ModelAPI_AttributeString::typeId());
 
-  data()->addAttribute(FIRST_POINT_ID(), GeomDataAPI_Point2D::typeId());
-  data()->addAttribute(FIRST_POINT_REF_ID(), ModelAPI_AttributeRefAttr::typeId());
-  data()->addAttribute(SECOND_POINT_ID(), GeomDataAPI_Point2D::typeId());
-  data()->addAttribute(SECOND_POINT_REF_ID(), ModelAPI_AttributeRefAttr::typeId());
+  data()->addAttribute(CENTER_POINT_ID(), GeomDataAPI_Point2D::typeId());
+  data()->addAttribute(CENTER_POINT_REF_ID(), ModelAPI_AttributeRefAttr::typeId());
+  data()->addAttribute(MAJOR_AXIS_POINT_ID(), GeomDataAPI_Point2D::typeId());
+  data()->addAttribute(MAJOR_AXIS_POINT_REF_ID(), ModelAPI_AttributeRefAttr::typeId());
   data()->addAttribute(PASSED_POINT_ID(), GeomDataAPI_Point2D::typeId());
   data()->addAttribute(PASSED_POINT_REF_ID(), ModelAPI_AttributeRefAttr::typeId());
+
+  data()->addAttribute(MAJOR_AXIS_START_ID(), GeomDataAPI_Point2D::typeId());
+  data()->addAttribute(MAJOR_AXIS_START_REF_ID(), ModelAPI_AttributeRefAttr::typeId());
+  data()->addAttribute(MAJOR_AXIS_END_ID(), GeomDataAPI_Point2D::typeId());
+  data()->addAttribute(MAJOR_AXIS_END_REF_ID(), ModelAPI_AttributeRefAttr::typeId());
+  data()->addAttribute(PASSED_POINT_1_ID(), GeomDataAPI_Point2D::typeId());
+  data()->addAttribute(PASSED_POINT_1_REF_ID(), ModelAPI_AttributeRefAttr::typeId());
 
   data()->addAttribute(MAJOR_RADIUS_ID(), ModelAPI_AttributeDouble::typeId());
   data()->addAttribute(MINOR_RADIUS_ID(), ModelAPI_AttributeDouble::typeId());
@@ -70,9 +77,12 @@ void SketchPlugin_MacroEllipse::initAttributes()
 
   string(EDIT_ELLIPSE_TYPE())->setValue("");
 
-  ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(), FIRST_POINT_REF_ID());
-  ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(), SECOND_POINT_REF_ID());
+  ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(), CENTER_POINT_REF_ID());
+  ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(), MAJOR_AXIS_POINT_REF_ID());
   ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(), PASSED_POINT_REF_ID());
+  ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(), MAJOR_AXIS_START_REF_ID());
+  ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(), MAJOR_AXIS_END_REF_ID());
+  ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(), PASSED_POINT_1_REF_ID());
   ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(), EDIT_ELLIPSE_TYPE());
 }
 
@@ -100,12 +110,25 @@ void SketchPlugin_MacroEllipse::execute()
 void SketchPlugin_MacroEllipse::attributeChanged(const std::string& theID)
 {
   static const int NB_POINTS = 3;
-  std::string aPointAttrName[NB_POINTS] = { FIRST_POINT_ID(),
-                                            SECOND_POINT_ID(),
-                                            PASSED_POINT_ID() };
-  std::string aPointRefName[NB_POINTS] = { FIRST_POINT_REF_ID(),
-                                           SECOND_POINT_REF_ID(),
-                                           PASSED_POINT_REF_ID() };
+  std::string aPointAttrName[NB_POINTS];
+  std::string aPointRefName[NB_POINTS];
+  if (string(ELLIPSE_TYPE())->value() == ELLIPSE_TYPE_BY_CENTER_AXIS_POINT()) {
+    aPointAttrName[0] = CENTER_POINT_ID();
+    aPointAttrName[1] = MAJOR_AXIS_POINT_ID();
+    aPointAttrName[2] = PASSED_POINT_ID();
+    aPointRefName[0] = CENTER_POINT_REF_ID();
+    aPointRefName[1] = MAJOR_AXIS_POINT_REF_ID();
+    aPointRefName[2] = PASSED_POINT_REF_ID();
+  } else if (string(ELLIPSE_TYPE())->value() == ELLIPSE_TYPE_BY_AXIS_AND_POINT()) {
+    aPointAttrName[0] = MAJOR_AXIS_START_ID();
+    aPointAttrName[1] = MAJOR_AXIS_END_ID();
+    aPointAttrName[2] = PASSED_POINT_1_ID();
+    aPointRefName[0] = MAJOR_AXIS_START_REF_ID();
+    aPointRefName[1] = MAJOR_AXIS_END_REF_ID();
+    aPointRefName[2] = PASSED_POINT_1_REF_ID();
+  }
+  else
+    return;
 
   // type of ellipse switched, thus reset all attributes
   if (theID == ELLIPSE_TYPE()) {
@@ -195,8 +218,12 @@ std::string SketchPlugin_MacroEllipse::processEvent(
     std::shared_ptr<GeomAPI_Pnt2d> aClickedPoint = aReentrantMessage->clickedPoint();
 
     if (aClickedPoint && (anObject || anAttribute)) {
-      aFilledAttributeName = FIRST_POINT_ID();
-      std::string aReferenceAttributeName = FIRST_POINT_REF_ID();
+      aFilledAttributeName = CENTER_POINT_ID();
+      std::string aReferenceAttributeName = CENTER_POINT_REF_ID();
+      if (anEllipseType == ELLIPSE_TYPE_BY_AXIS_AND_POINT()) {
+        aFilledAttributeName = MAJOR_AXIS_START_ID();
+        aReferenceAttributeName = MAJOR_AXIS_START_REF_ID();
+      }
 
       // fill 2d point attribute
       AttributePoint2DPtr aPointAttr =
@@ -208,7 +235,7 @@ std::string SketchPlugin_MacroEllipse::processEvent(
           std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(attribute(aReferenceAttributeName));
       if (anAttribute) {
         if (!anAttribute->owner() || !anAttribute->owner()->data()->isValid()) {
-          if (aCreatedFeature && anAttribute->id() == FIRST_POINT_ID())
+          if (aCreatedFeature && anAttribute->id() == CENTER_POINT_ID())
             anAttribute = aCreatedFeature->attribute(
                 anEllipseType == ELLIPSE_TYPE_BY_CENTER_AXIS_POINT() ?
                 SketchPlugin_Ellipse::CENTER_ID() :
@@ -237,11 +264,11 @@ void SketchPlugin_MacroEllipse::constraintsForEllipseByCenterAxisAndPassed(
   static const bool isTangencyApplicable = false;
   // Create constraints.
   SketchPlugin_Tools::createCoincidenceOrTangency(
-      this, FIRST_POINT_REF_ID(),
+      this, CENTER_POINT_REF_ID(),
       theEllipseFeature->attribute(SketchPlugin_Ellipse::CENTER_ID()),
       ObjectPtr(), isTangencyApplicable);
   SketchPlugin_Tools::createCoincidenceOrTangency(
-      this, SECOND_POINT_REF_ID(),
+      this, MAJOR_AXIS_POINT_REF_ID(),
       theEllipseFeature->attribute(SketchPlugin_Ellipse::MAJOR_AXIS_END_ID()),
       ObjectPtr(), isTangencyApplicable);
   // make coincidence only if PASSED_POINT_REF_ID() refers a point but not an object
@@ -259,17 +286,17 @@ void SketchPlugin_MacroEllipse::constraintsForEllipseByMajoxAxisAndPassed(
   static const bool isTangencyApplicable = false;
   // Create constraints.
   SketchPlugin_Tools::createCoincidenceOrTangency(
-      this, FIRST_POINT_REF_ID(),
+      this, MAJOR_AXIS_START_REF_ID(),
       theEllipseFeature->attribute(SketchPlugin_Ellipse::MAJOR_AXIS_START_ID()),
       ObjectPtr(), isTangencyApplicable);
   SketchPlugin_Tools::createCoincidenceOrTangency(
-      this, SECOND_POINT_REF_ID(),
+      this, MAJOR_AXIS_END_REF_ID(),
       theEllipseFeature->attribute(SketchPlugin_Ellipse::MAJOR_AXIS_END_ID()),
       ObjectPtr(), isTangencyApplicable);
   // make coincidence only if PASSED_POINT_REF_ID() refers a point but not an object
-  if (!refattr(PASSED_POINT_REF_ID())->isObject()) {
+  if (!refattr(PASSED_POINT_1_REF_ID())->isObject()) {
     SketchPlugin_Tools::createCoincidenceOrTangency(
-        this, PASSED_POINT_REF_ID(), AttributePtr(),
+        this, PASSED_POINT_1_REF_ID(), AttributePtr(),
         theEllipseFeature->lastResult(), isTangencyApplicable);
   }
 }

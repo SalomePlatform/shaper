@@ -28,18 +28,8 @@
 
 #include <SketchPlugin_Sketch.h>
 
-#define MAJOR_AXIS_NEGATIVE (std::dynamic_pointer_cast<GeomDataAPI_Point2D>( \
-                             feature()->attribute(SketchPlugin_MacroEllipse::FIRST_POINT_ID())))
-#define MAJOR_AXIS_POSITIVE (std::dynamic_pointer_cast<GeomDataAPI_Point2D>( \
-                             feature()->attribute(SketchPlugin_MacroEllipse::SECOND_POINT_ID())))
-#define PASSED_POINT (std::dynamic_pointer_cast<GeomDataAPI_Point2D>( \
-                      feature()->attribute(SketchPlugin_MacroEllipse::PASSED_POINT_ID())))
-
-#define MAJOR_AXIS_NEGATIVE_REF (feature()->refattr( \
-                                 SketchPlugin_MacroEllipse::FIRST_POINT_REF_ID()))
-#define MAJOR_AXIS_POSITIVE_REF (feature()->refattr( \
-                                 SketchPlugin_MacroEllipse::SECOND_POINT_REF_ID()))
-#define PASSED_POINT_REF (feature()->refattr(SketchPlugin_MacroEllipse::PASSED_POINT_REF_ID()))
+#define POINT_ATTR(x) (std::dynamic_pointer_cast<GeomDataAPI_Point2D>(feature()->attribute((x))))
+#define POINT_REF(x)  (feature()->refattr((x)))
 
 
 SketchAPI_MacroEllipse::SketchAPI_MacroEllipse(const std::shared_ptr<ModelAPI_Feature>& theFeature,
@@ -58,12 +48,16 @@ SketchAPI_MacroEllipse::SketchAPI_MacroEllipse(const std::shared_ptr<ModelAPI_Fe
   : SketchAPI_SketchEntity(theFeature)
 {
   if (initialize()) {
-    if (byCenter)
-      setByCenterAndPassedPoints();
-    else
-      setByMajorAxisAndPassedPoint();
+    static const ModelHighAPI_RefAttr DUMMY_REF;
 
-    initializePoints(theX1, theY1, theX2, theY2, theX3, theY3);
+    GeomPnt2dPtr aPnt1(new GeomAPI_Pnt2d(theX1, theY1));
+    GeomPnt2dPtr aPnt2(new GeomAPI_Pnt2d(theX2, theY2));
+    GeomPnt2dPtr aPnt3(new GeomAPI_Pnt2d(theX3, theY3));
+
+    if (byCenter)
+      setByCenterAndPassedPoints(aPnt1, DUMMY_REF, aPnt2, DUMMY_REF, aPnt3, DUMMY_REF);
+    else
+      setByMajorAxisAndPassedPoint(aPnt1, DUMMY_REF, aPnt2, DUMMY_REF, aPnt3, DUMMY_REF);
   }
 }
 
@@ -75,12 +69,14 @@ SketchAPI_MacroEllipse::SketchAPI_MacroEllipse(const std::shared_ptr<ModelAPI_Fe
   : SketchAPI_SketchEntity(theFeature)
 {
   if (initialize()) {
+    static const ModelHighAPI_RefAttr DUMMY_REF;
     if (byCenter)
-      setByCenterAndPassedPoints();
-    else
-      setByMajorAxisAndPassedPoint();
-
-    initializePoints(thePoint1, thePoint2, thePoint3);
+      setByCenterAndPassedPoints(thePoint1, DUMMY_REF, thePoint2, DUMMY_REF, thePoint3, DUMMY_REF);
+    else {
+      setByMajorAxisAndPassedPoint(thePoint1, DUMMY_REF,
+                                   thePoint2, DUMMY_REF,
+                                   thePoint3, DUMMY_REF);
+    }
   }
 }
 
@@ -95,51 +91,21 @@ SketchAPI_MacroEllipse::SketchAPI_MacroEllipse(const std::shared_ptr<ModelAPI_Fe
   : SketchAPI_SketchEntity(theFeature)
 {
   if (initialize()) {
-    if (byCenter)
-      setByCenterAndPassedPoints();
-    else
-      setByMajorAxisAndPassedPoint();
-
-    initializePoints(thePoint1, thePoint1Ref, thePoint2, thePoint2Ref, thePoint3, thePoint3Ref);
+    if (byCenter) {
+      setByCenterAndPassedPoints(thePoint1, thePoint1Ref,
+                                 thePoint2, thePoint2Ref,
+                                 thePoint3, thePoint3Ref);
+    }
+    else {
+      setByMajorAxisAndPassedPoint(thePoint1, thePoint1Ref,
+                                   thePoint2, thePoint2Ref,
+                                   thePoint3, thePoint3Ref);
+    }
   }
 }
 
 SketchAPI_MacroEllipse::~SketchAPI_MacroEllipse()
 {
-}
-
-void SketchAPI_MacroEllipse::setByCenterAndPassedPoints()
-{
-  fillAttribute(SketchPlugin_MacroEllipse::ELLIPSE_TYPE_BY_CENTER_AXIS_POINT(), myellipseType);
-}
-
-void SketchAPI_MacroEllipse::setByMajorAxisAndPassedPoint()
-{
-  fillAttribute(SketchPlugin_MacroEllipse::ELLIPSE_TYPE_BY_AXIS_AND_POINT(), myellipseType);
-}
-
-void SketchAPI_MacroEllipse::initializePoints(double theX1, double theY1,
-                                              double theX2, double theY2,
-                                              double theX3, double theY3)
-{
-  fillAttribute(MAJOR_AXIS_NEGATIVE, theX1, theY1);
-  fillAttribute(MAJOR_AXIS_POSITIVE, theX2, theY2);
-  fillAttribute(PASSED_POINT, theX3, theY3);
-
-  storeSketch(feature());
-  execute();
-}
-
-void SketchAPI_MacroEllipse::initializePoints(const std::shared_ptr<GeomAPI_Pnt2d>& thePoint1,
-                                              const std::shared_ptr<GeomAPI_Pnt2d>& thePoint2,
-                                              const std::shared_ptr<GeomAPI_Pnt2d>& thePoint3)
-{
-  fillAttribute(thePoint1, MAJOR_AXIS_NEGATIVE);
-  fillAttribute(thePoint2, MAJOR_AXIS_POSITIVE);
-  fillAttribute(thePoint3, PASSED_POINT);
-
-  storeSketch(feature());
-  execute();
 }
 
 static void fillAttribute(const std::shared_ptr<GeomAPI_Pnt2d>& thePoint,
@@ -158,20 +124,58 @@ static void fillAttribute(const std::shared_ptr<GeomAPI_Pnt2d>& thePoint,
   fillAttribute(aPoint, thePointAttr);
 }
 
-void SketchAPI_MacroEllipse::initializePoints(
-    const std::shared_ptr<GeomAPI_Pnt2d>& theMajorAxisPoint1,
-    const ModelHighAPI_RefAttr&           theMajorAxisPoint1Ref,
-    const std::shared_ptr<GeomAPI_Pnt2d>& theMajorAxisPoint2,
-    const ModelHighAPI_RefAttr&           theMajorAxisPoint2Ref,
+void SketchAPI_MacroEllipse::setByCenterAndPassedPoints(
+    const std::shared_ptr<GeomAPI_Pnt2d>& theCenter,
+    const ModelHighAPI_RefAttr&           theCenterRef,
+    const std::shared_ptr<GeomAPI_Pnt2d>& theMajorAxisPoint,
+    const ModelHighAPI_RefAttr&           theMajorAxisPointRef,
     const std::shared_ptr<GeomAPI_Pnt2d>& thePassedPoint,
     const ModelHighAPI_RefAttr&           thePassedPointRef)
 {
-  fillAttribute(theMajorAxisPoint1, theMajorAxisPoint1Ref,
-                MAJOR_AXIS_NEGATIVE, MAJOR_AXIS_NEGATIVE_REF);
-  fillAttribute(theMajorAxisPoint2, theMajorAxisPoint2Ref,
-                MAJOR_AXIS_POSITIVE, MAJOR_AXIS_POSITIVE_REF);
-  fillAttribute(thePassedPoint, thePassedPointRef,
-                PASSED_POINT, PASSED_POINT_REF);
+  fillAttribute(SketchPlugin_MacroEllipse::ELLIPSE_TYPE_BY_CENTER_AXIS_POINT(), myellipseType);
+
+  AttributePoint2DPtr aCenterAttr = POINT_ATTR(SketchPlugin_MacroEllipse::CENTER_POINT_ID());
+  AttributePoint2DPtr aMajorAxisAttr = POINT_ATTR(SketchPlugin_MacroEllipse::MAJOR_AXIS_POINT_ID());
+  AttributePoint2DPtr aPassedAttr = POINT_ATTR(SketchPlugin_MacroEllipse::PASSED_POINT_ID());
+
+  AttributeRefAttrPtr aCenterRef = POINT_REF(SketchPlugin_MacroEllipse::CENTER_POINT_REF_ID());
+  AttributeRefAttrPtr aMajorAxisRef =
+      POINT_REF(SketchPlugin_MacroEllipse::MAJOR_AXIS_POINT_REF_ID());
+  AttributeRefAttrPtr aPassedRef = POINT_REF(SketchPlugin_MacroEllipse::PASSED_POINT_REF_ID());
+
+  fillAttribute(theCenter, theCenterRef, aCenterAttr, aCenterRef);
+  fillAttribute(theMajorAxisPoint, theMajorAxisPointRef, aMajorAxisAttr, aMajorAxisRef);
+  fillAttribute(thePassedPoint, thePassedPointRef, aPassedAttr, aPassedRef);
+
+  storeSketch(feature());
+  execute();
+}
+
+void SketchAPI_MacroEllipse::setByMajorAxisAndPassedPoint(
+    const std::shared_ptr<GeomAPI_Pnt2d>& theMajorAxisStart,
+    const ModelHighAPI_RefAttr&           theMajorAxisStartRef,
+    const std::shared_ptr<GeomAPI_Pnt2d>& theMajorAxisEnd,
+    const ModelHighAPI_RefAttr&           theMajorAxisEndRef,
+    const std::shared_ptr<GeomAPI_Pnt2d>& thePassedPoint,
+    const ModelHighAPI_RefAttr&           thePassedPointRef)
+{
+  fillAttribute(SketchPlugin_MacroEllipse::ELLIPSE_TYPE_BY_AXIS_AND_POINT(), myellipseType);
+
+  AttributePoint2DPtr aMajorAxisStartAttr =
+      POINT_ATTR(SketchPlugin_MacroEllipse::MAJOR_AXIS_START_ID());
+  AttributePoint2DPtr aMajorAxisEndAttr =
+      POINT_ATTR(SketchPlugin_MacroEllipse::MAJOR_AXIS_END_ID());
+  AttributePoint2DPtr aPassedAttr = POINT_ATTR(SketchPlugin_MacroEllipse::PASSED_POINT_1_ID());
+
+  AttributeRefAttrPtr aMajorAxisStartRef =
+      POINT_REF(SketchPlugin_MacroEllipse::MAJOR_AXIS_START_REF_ID());
+  AttributeRefAttrPtr aMajorAxisEndRef =
+      POINT_REF(SketchPlugin_MacroEllipse::MAJOR_AXIS_END_REF_ID());
+  AttributeRefAttrPtr aPassedRef = POINT_REF(SketchPlugin_MacroEllipse::PASSED_POINT_1_REF_ID());
+
+  fillAttribute(theMajorAxisStart, theMajorAxisStartRef, aMajorAxisStartAttr, aMajorAxisStartRef);
+  fillAttribute(theMajorAxisEnd, theMajorAxisEndRef, aMajorAxisEndAttr, aMajorAxisEndRef);
+  fillAttribute(thePassedPoint, thePassedPointRef, aPassedAttr, aPassedRef);
 
   storeSketch(feature());
   execute();

@@ -67,28 +67,28 @@ class SketchPlugin_MacroEllipse: public SketchPlugin_SketchEntity,
   }
 
   /// Attribute for the first point selected during ellipse creation.
-  inline static const std::string& FIRST_POINT_ID()
+  inline static const std::string& CENTER_POINT_ID()
   {
     static const std::string ID("first_point");
     return ID;
   }
 
   /// Reference to the first selected point.
-  inline static const std::string& FIRST_POINT_REF_ID()
+  inline static const std::string& CENTER_POINT_REF_ID()
   {
     static const std::string ID("first_point_ref");
     return ID;
   }
 
   /// Attribute for the second point selected during ellipse creation.
-  inline static const std::string& SECOND_POINT_ID()
+  inline static const std::string& MAJOR_AXIS_POINT_ID()
   {
     static const std::string ID("second_point");
     return ID;
   }
 
   /// Reference to the second selected point.
-  inline static const std::string& SECOND_POINT_REF_ID()
+  inline static const std::string& MAJOR_AXIS_POINT_REF_ID()
   {
     static const std::string ID("second_point_ref");
     return ID;
@@ -105,6 +105,48 @@ class SketchPlugin_MacroEllipse: public SketchPlugin_SketchEntity,
   inline static const std::string& PASSED_POINT_REF_ID()
   {
     static const std::string ID("passed_point_ref");
+    return ID;
+  }
+
+  /// Attribute for the first point selected during ellipse creation.
+  inline static const std::string& MAJOR_AXIS_START_ID()
+  {
+    static const std::string ID("first_point_1");
+    return ID;
+  }
+
+  /// Reference to the first selected point.
+  inline static const std::string& MAJOR_AXIS_START_REF_ID()
+  {
+    static const std::string ID("first_point_ref_1");
+    return ID;
+  }
+
+  /// Attribute for the second point selected during ellipse creation.
+  inline static const std::string& MAJOR_AXIS_END_ID()
+  {
+    static const std::string ID("second_point_1");
+    return ID;
+  }
+
+  /// Reference to the second selected point.
+  inline static const std::string& MAJOR_AXIS_END_REF_ID()
+  {
+    static const std::string ID("second_point_ref_1");
+    return ID;
+  }
+
+  /// Attribute for the third point selected during ellipse creation.
+  inline static const std::string& PASSED_POINT_1_ID()
+  {
+    static const std::string ID("passed_point_1");
+    return ID;
+  }
+
+  /// Reference for passed point selection.
+  inline static const std::string& PASSED_POINT_1_REF_ID()
+  {
+    static const std::string ID("passed_point_ref_1");
     return ID;
   }
 
