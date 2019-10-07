@@ -156,7 +156,7 @@ class SketchPlugin_SketchEntity : public SketchPlugin_Feature, public GeomAPI_IC
       if (theResult.get() && ModelAPI_Session::get()->isOperation()) {
         AttributeIntArrayPtr aColorAttr = theResult->data()->intArray(ModelAPI_Result::COLOR_ID());
         aColorAttr->setSize(3);
-        // Set the color attribute in order do not use default colors in the perasentation object
+        // Set the color attribute in order do not use default colors in the presentation object
         for (int i = 0; i < 3; i++)
           aColorAttr->setValue(i, aColor[i]);
       }

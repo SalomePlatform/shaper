@@ -17,6 +17,10 @@
   <section name="resources">
     <!-- Module resources -->
     <parameter name="SHAPER" value="%SHAPER_ROOT_DIR%/share/salome/resources/shaper"/>
+    <parameter name="SHAPERGUI" value="%SHAPER_ROOT_DIR%/share/salome/resources/shaper"/>
+    <parameter name="ModuleBase" value="%SHAPER_ROOT_DIR%/share/salome/resources/shaper"/>
+    <parameter name="PartSet" value="%SHAPER_ROOT_DIR%/share/salome/resources/shaper"/>
+    <parameter name="XGUI" value="%SHAPER_ROOT_DIR%/share/salome/resources/shaper"/>
   </section>
   <section name="Viewer" >
     <!-- Viewer preferences -->

@@ -31,6 +31,7 @@ aBoxResult = Box_1.feature().results()[0]
 aShell = GeomAPI_ShapeExplorer(aBoxResult.shape(), GeomAPI_Shape.SHELL)
 aGroup = Part_1_doc.addFeature("Group")
 aGroup.selectionList("group_list").append(aBoxResult, aShell.current())
+aGroup.selectionList("group_list").setSelectionType("SHELL") # to compute the shape for the whole result selection correctly
 model.end()
 
 # check that the resulting group is correct

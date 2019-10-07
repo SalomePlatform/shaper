@@ -25,6 +25,8 @@
 #include "SketchPlugin_ConstraintDistance.h"
 #include "SketchPlugin_ConstraintRigid.h"
 #include "SketchPlugin_ConstraintTangent.h"
+#include "SketchPlugin_Ellipse.h"
+#include "SketchPlugin_EllipticArc.h"
 #include "SketchPlugin_Fillet.h"
 #include "SketchPlugin_Line.h"
 #include "SketchPlugin_MacroArc.h"
@@ -59,6 +61,7 @@
 
 #include <GeomAPI_Circ.h>
 #include <GeomAPI_Dir2d.h>
+#include <GeomAPI_Ellipse.h>
 #include <GeomAPI_Lin.h>
 #include <GeomAPI_Edge.h>
 #include <GeomAPI_Vertex.h>
@@ -161,34 +164,56 @@ bool SketchPlugin_TangentAttrValidator::isValid(const AttributePtr& theAttribute
     if (!aOtherFea)
       return true;
 
-    if (aRefFea->getKind() == SketchPlugin_Line::ID()) {
-      if (aOtherFea->getKind() != SketchPlugin_Arc::ID() &&
-          aOtherFea->getKind() != SketchPlugin_Circle::ID()) {
-        theError = "It refers to a %1, but %2 is neither an %3 nor %4";
-        theError.arg(SketchPlugin_Line::ID()).arg(aParamA)
-            .arg(SketchPlugin_Arc::ID()).arg(SketchPlugin_Circle::ID());
-        return false;
-      }
-    }
-    else if (aRefFea->getKind() == SketchPlugin_Arc::ID() ||
-             aRefFea->getKind() == SketchPlugin_Circle::ID()) {
-      if (aOtherFea->getKind() != SketchPlugin_Line::ID() &&
-          aOtherFea->getKind() != SketchPlugin_Arc::ID() &&
-          aOtherFea->getKind() != SketchPlugin_Circle::ID()) {
-        theError = "It refers to an %1, but %2 is not a %3 or an %4 or a %5";
-        theError.arg(SketchPlugin_Arc::ID()).arg(aParamA)
-            .arg(SketchPlugin_Line::ID()).arg(SketchPlugin_Arc::ID())
-            .arg(SketchPlugin_Circle::ID());
-        return false;
-      }
-    }
-    else {
-      theError = "It refers to %1, but should refer to %2 or %3 or %4";
-      theError.arg(aRefFea->getKind()).arg(SketchPlugin_Line::ID())
-          .arg(SketchPlugin_Arc::ID()).arg(SketchPlugin_Circle::ID());
+    if (aRefFea->getKind() == SketchPlugin_Line::ID() &&
+        aOtherFea->getKind() == SketchPlugin_Line::ID()) {
+      theError = "Two segments cannot be tangent";
       return false;
     }
     return true;
+  }
+  else {
+    theError = "It uses an empty object";
+    return false;
+  }
+
+  return true;
+}
+
+bool SketchPlugin_PerpendicularAttrValidator::isValid(const AttributePtr& theAttribute,
+                                                      const std::list<std::string>& theArguments,
+                                                      Events_InfoMessage& theError) const
+{
+  if (theAttribute->attributeType() != ModelAPI_AttributeRefAttr::typeId()) {
+    theError = "The attribute with the %1 type is not processed";
+    theError.arg(theAttribute->attributeType());
+    return false;
+  }
+
+  std::string aParamA = theArguments.front();
+  SessionPtr aMgr = ModelAPI_Session::get();
+  ModelAPI_ValidatorsFactory* aFactory = aMgr->validators();
+
+  FeaturePtr anOwner = std::dynamic_pointer_cast<ModelAPI_Feature>(theAttribute->owner());
+  AttributeRefAttrPtr aRefAttr =
+      std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(theAttribute);
+
+  bool isObject = aRefAttr->isObject();
+  ObjectPtr anObject = aRefAttr->object();
+  if (isObject && anObject.get()) {
+    FeaturePtr aRefFea = ModelAPI_Feature::feature(anObject);
+
+    AttributeRefAttrPtr aOtherAttr = anOwner->refattr(aParamA);
+    ObjectPtr aOtherObject = aOtherAttr->object();
+    FeaturePtr aOtherFea = ModelAPI_Feature::feature(aOtherObject);
+    if (!aOtherFea)
+      return true;
+
+    // at least one feature should be a line
+    if (aRefFea->getKind() != SketchPlugin_Line::ID() &&
+        aOtherFea->getKind() != SketchPlugin_Line::ID()) {
+      theError = "At least one feature should be a line";
+      return false;
+    }
   }
   else {
     theError = "It uses an empty object";
@@ -282,18 +307,29 @@ bool SketchPlugin_EqualAttrValidator::isValid(const AttributePtr& theAttribute,
     aType[i] = aFeature->getKind();
     if (aFeature->getKind() != SketchPlugin_Line::ID() &&
         aFeature->getKind() != SketchPlugin_Circle::ID() &&
-        aFeature->getKind() != SketchPlugin_Arc::ID()) {
-      theError = "The %1 feature kind of attribute is wrong. It should be %2 or %3 or %4";
-      theError.arg(aFeature->getKind()).arg(SketchPlugin_Line::ID())
-          .arg(SketchPlugin_Circle::ID()).arg(SketchPlugin_Arc::ID());
+        aFeature->getKind() != SketchPlugin_Arc::ID() &&
+        aFeature->getKind() != SketchPlugin_Ellipse::ID() &&
+        aFeature->getKind() != SketchPlugin_EllipticArc::ID()) {
+      theError = "The %1 feature is not supported by the Equal constraint.";
+      theError.arg(aFeature->getKind());
       // wrong type of attribute
       return false;
     }
   }
 
-  if ((aType[0] == SketchPlugin_Line::ID() || aType[1] == SketchPlugin_Line::ID()) &&
-      aType[0] != aType[1]) {
-    theError = "Feature with kinds %1 and %2 can not be equal.";
+  bool isOk = aType[0] == aType[1];
+  if (!isOk) {
+    // circle and arc may be equal
+    isOk = (aType[0] == SketchPlugin_Arc::ID() && aType[1] == SketchPlugin_Circle::ID())
+        || (aType[0] == SketchPlugin_Circle::ID() && aType[1] == SketchPlugin_Arc::ID());
+  }
+  if (!isOk) {
+    // ellipse and elliptic arc may be equal
+    isOk = (aType[0] == SketchPlugin_EllipticArc::ID() && aType[1] == SketchPlugin_Ellipse::ID())
+        || (aType[0] == SketchPlugin_Ellipse::ID() && aType[1] == SketchPlugin_EllipticArc::ID());
+  }
+  if (!isOk) {
+    theError = "Features with kinds %1 and %2 can not be equal.";
     theError.arg(aType[0]).arg(aType[1]);
     return false;
   }
@@ -570,7 +606,7 @@ bool SketchPlugin_FilletVertexValidator::isValid(const AttributePtr& theAttribut
   }
 
   if(!aConstraintCoincidence.get()) {
-    theError = "Error: one of the selected point does not have coicidence.";
+    theError = "Error: one of the selected point does not have coincidence.";
     return false;
   }
 
@@ -734,7 +770,9 @@ bool SketchPlugin_MiddlePointAttrValidator::isValid(const AttributePtr& theAttri
 
       if (aFeature->getKind() == SketchPlugin_Point::ID())
         ++aNbPoints;
-      else if (aFeature->getKind() == SketchPlugin_Line::ID())
+      else if (aFeature->getKind() == SketchPlugin_Line::ID() ||
+               aFeature->getKind() == SketchPlugin_Arc::ID() ||
+               aFeature->getKind() == SketchPlugin_EllipticArc::ID())
         ++aNbLines;
     }
   }
@@ -755,6 +793,11 @@ bool SketchPlugin_ArcTangentPointValidator::isValid(const AttributePtr& theAttri
     theError.arg(theAttribute->attributeType());
     return false;
   }
+  FeaturePtr anOwner = std::dynamic_pointer_cast<ModelAPI_Feature>(theAttribute->owner());
+  AttributeStringPtr anArcTypeAttr = anOwner->string(SketchPlugin_MacroArc::ARC_TYPE());
+  if (anArcTypeAttr && anArcTypeAttr->value() != SketchPlugin_MacroArc::ARC_TYPE_BY_TANGENT_EDGE())
+    return true; // not applicable for non-tangent arcs
+
   AttributeRefAttrPtr aRefAttr = std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(theAttribute);
   AttributePtr anAttr = aRefAttr->attr();
   if (!anAttr) {
@@ -785,6 +828,50 @@ bool SketchPlugin_ArcTangentPointValidator::isValid(const AttributePtr& theAttri
   }
   else {
     theError = "Unable to build tangent arc on %1";
+    theError.arg(anAttrFeature->getKind());
+    return false;
+  }
+
+  return true;
+}
+
+bool SketchPlugin_ArcTransversalPointValidator::isValid(
+    const AttributePtr& theAttribute,
+    const std::list<std::string>& /*theArguments*/,
+    Events_InfoMessage& theError) const
+{
+  if (theAttribute->attributeType() != ModelAPI_AttributeRefAttr::typeId()) {
+    theError = "The attribute with the %1 type is not processed";
+    theError.arg(theAttribute->attributeType());
+    return false;
+  }
+  FeaturePtr anOwner = std::dynamic_pointer_cast<ModelAPI_Feature>(theAttribute->owner());
+  AttributeStringPtr anArcTypeAttr = anOwner->string(SketchPlugin_MacroArc::ARC_TYPE());
+  if (anArcTypeAttr &&
+      anArcTypeAttr->value() != SketchPlugin_MacroArc::ARC_TYPE_BY_TRANSVERSAL_LINE())
+    return true; // not applicable for non-transversal arcs
+
+  AttributeRefAttrPtr aRefAttr = std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(theAttribute);
+  AttributePtr anAttr = aRefAttr->attr();
+  if (!anAttr) {
+    theError = "The attribute %1 should be a point";
+    theError.arg(theAttribute->id());
+    return false;
+  }
+
+  FeaturePtr anAttrFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(anAttr->owner());
+  const std::string& aFeatureType = anAttrFeature->getKind();
+  if (aFeatureType == SketchPlugin_Line::ID()) {
+    // selected point should be bound point of line
+    const std::string& aPntId = anAttr->id();
+    if (aPntId != SketchPlugin_Line::START_ID() && aPntId != SketchPlugin_Line::END_ID()) {
+      theError = "The attribute %1 is not supported";
+      theError.arg(aPntId);
+      return false;
+    }
+  }
+  else {
+    theError = "Unable to build perpendicular arc on %1";
     theError.arg(anAttrFeature->getKind());
     return false;
   }
@@ -865,49 +952,46 @@ bool SketchPlugin_SplitValidator::isValid(const AttributePtr& theAttribute,
   if (!anAttrFeature)
     return aValid;
 
-  std::string aKind = anAttrFeature->getKind();
-  if (aKind == SketchPlugin_Line::ID() ||
-      aKind == SketchPlugin_Arc::ID() ||
-      aKind == SketchPlugin_Circle::ID()) {
+  std::set<ResultPtr> anEdgeShapes;
+  ModelGeomAlgo_Shape::shapesOfType(anAttrFeature, GeomAPI_Shape::EDGE, anEdgeShapes);
+  if (anEdgeShapes.empty() || anEdgeShapes.size() > 1 /*there case has not existed yet*/)
+    return aValid;
 
-    std::set<ResultPtr> anEdgeShapes;
-    ModelGeomAlgo_Shape::shapesOfType(anAttrFeature, GeomAPI_Shape::EDGE, anEdgeShapes);
-    if (anEdgeShapes.empty() || anEdgeShapes.size() > 1 /*there case has not existed yet*/)
-      return aValid;
+  // coincidences to the feature
+  std::set<std::shared_ptr<GeomDataAPI_Point2D> > aRefAttributes;
+  ModelGeomAlgo_Point2D::getPointsOfReference(anAttrFeature,
+                      SketchPlugin_ConstraintCoincidence::ID(),
+                      aRefAttributes, SketchPlugin_Point::ID(), SketchPlugin_Point::COORD_ID());
 
-    // coincidences to the feature
-    std::set<std::shared_ptr<GeomDataAPI_Point2D> > aRefAttributes;
-    ModelGeomAlgo_Point2D::getPointsOfReference(anAttrFeature,
-                        SketchPlugin_ConstraintCoincidence::ID(),
-                        aRefAttributes, SketchPlugin_Point::ID(), SketchPlugin_Point::COORD_ID());
+  GeomShapePtr anAttrShape = (*anEdgeShapes.begin())->shape();
+  std::shared_ptr<SketchPlugin_Feature> aSFeature =
+                                std::dynamic_pointer_cast<SketchPlugin_Feature>(anAttrFeature);
+  if (!aSFeature)
+    return false;
+  SketchPlugin_Sketch* aSketch = aSFeature->sketch();
 
-    GeomShapePtr anAttrShape = (*anEdgeShapes.begin())->shape();
-    std::shared_ptr<SketchPlugin_Feature> aSFeature =
-                                 std::dynamic_pointer_cast<SketchPlugin_Feature>(anAttrFeature);
-    SketchPlugin_Sketch* aSketch = aSFeature->sketch();
+  std::shared_ptr<ModelAPI_Data> aData = aSketch->data();
+  std::shared_ptr<GeomDataAPI_Point> aC = std::dynamic_pointer_cast<GeomDataAPI_Point>(
+      aData->attribute(SketchPlugin_Sketch::ORIGIN_ID()));
+  std::shared_ptr<GeomDataAPI_Dir> aX = std::dynamic_pointer_cast<GeomDataAPI_Dir>(
+      aData->attribute(SketchPlugin_Sketch::DIRX_ID()));
+  std::shared_ptr<GeomDataAPI_Dir> aNorm = std::dynamic_pointer_cast<GeomDataAPI_Dir>(
+      aData->attribute(SketchPlugin_Sketch::NORM_ID()));
+  std::shared_ptr<GeomAPI_Dir> aDirY(new GeomAPI_Dir(aNorm->dir()->cross(aX->dir())));
 
-    std::shared_ptr<ModelAPI_Data> aData = aSketch->data();
-    std::shared_ptr<GeomDataAPI_Point> aC = std::dynamic_pointer_cast<GeomDataAPI_Point>(
-        aData->attribute(SketchPlugin_Sketch::ORIGIN_ID()));
-    std::shared_ptr<GeomDataAPI_Dir> aX = std::dynamic_pointer_cast<GeomDataAPI_Dir>(
-        aData->attribute(SketchPlugin_Sketch::DIRX_ID()));
-    std::shared_ptr<GeomDataAPI_Dir> aNorm = std::dynamic_pointer_cast<GeomDataAPI_Dir>(
-        aData->attribute(SketchPlugin_Sketch::NORM_ID()));
-    std::shared_ptr<GeomAPI_Dir> aDirY(new GeomAPI_Dir(aNorm->dir()->cross(aX->dir())));
+  typedef std::map<std::shared_ptr<GeomAPI_Pnt>,
+                    std::pair<std::list<std::shared_ptr<GeomDataAPI_Point2D> >,
+                              std::list<std::shared_ptr<ModelAPI_Object> > > > PointToRefsMap;
+  PointToRefsMap aPointsInfo;
 
-    typedef std::map<std::shared_ptr<GeomAPI_Pnt>,
-                     std::pair<std::list<std::shared_ptr<GeomDataAPI_Point2D> >,
-                               std::list<std::shared_ptr<ModelAPI_Object> > > > PointToRefsMap;
-    PointToRefsMap aPointsInfo;
-
-    ModelGeomAlgo_Point2D::getPointsInsideShape(anAttrShape, aRefAttributes, aC->pnt(),
-                                                aX->dir(), aDirY, aPointsInfo);
-    int aCoincidentToFeature = (int)aPointsInfo.size();
-    if (aKind == SketchPlugin_Circle::ID())
-      aValid = aCoincidentToFeature >= 2;
-    else
-      aValid = aCoincidentToFeature >= 1;
-  }
+  ModelGeomAlgo_Point2D::getPointsInsideShape(anAttrShape, aRefAttributes, aC->pnt(),
+                                              aX->dir(), aDirY, aPointsInfo);
+  int aCoincidentToFeature = (int)aPointsInfo.size();
+  if (anAttrFeature->getKind() == SketchPlugin_Circle::ID() ||
+      anAttrFeature->getKind() == SketchPlugin_Ellipse::ID())
+    aValid = aCoincidentToFeature >= 2;
+  else
+    aValid = aCoincidentToFeature >= 1;
 
   return aValid;
 }
@@ -945,12 +1029,6 @@ bool SketchPlugin_TrimValidator::isValid(const AttributePtr& theAttribute,
   if (!aSketchFeature.get() || aSketchFeature->isCopy())
     return aValid;
 
-  std::string aKind = aBaseFeature->getKind();
-  if (aKind != SketchPlugin_Line::ID() &&
-      aKind != SketchPlugin_Arc::ID() &&
-      aKind != SketchPlugin_Circle::ID())
-    return aValid;
-
   // point on feature
   AttributePoint2DPtr aPoint = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
                        aTrimFeature->data()->attribute(SketchPlugin_Trim::PREVIEW_POINT()));
@@ -965,8 +1043,8 @@ bool SketchPlugin_TrimValidator::isValid(const AttributePtr& theAttribute,
   std::map<ObjectPtr, std::map<std::shared_ptr<GeomAPI_Pnt>,
            std::pair<std::list<std::shared_ptr<GeomDataAPI_Point2D> >,
                      std::list<std::shared_ptr<ModelAPI_Object> > > > > anObjectToPoints;
-  SketchPlugin_Trim::fillObjectShapes(aBaseObject, aSketch->data()->owner(),
-                                      aCashedShapes, anObjectToPoints);
+  SketchPlugin_SegmentationTools::fillObjectShapes(
+      aTrimFeature.get(), aBaseObject, aCashedShapes, anObjectToPoints);
   const std::set<GeomShapePtr>& aShapes = aCashedShapes[aBaseObject];
 
   return aShapes.size() > 1;
@@ -1043,21 +1121,31 @@ bool SketchPlugin_ProjectionValidator::isValid(const AttributePtr& theAttribute,
     double aDot = fabs(aNormal->dot(aLineDir));
     bool aValid = fabs(aDot - 1.0) >= tolerance * tolerance;
     if (!aValid)
-      theError = "Error: Edge is already in the sketch plane.";
+      theError = "Error: Line is orthogonal to the sketch plane.";
     return aValid;
   }
   else if (anEdge->isCircle() || anEdge->isArc()) {
     std::shared_ptr<GeomAPI_Circ> aCircle = anEdge->circle();
     std::shared_ptr<GeomAPI_Dir> aCircNormal = aCircle->normal();
     double aDot = fabs(aNormal->dot(aCircNormal));
-    bool aValid = fabs(aDot - 1.0) < tolerance * tolerance;
+    bool aValid = aDot >= tolerance * tolerance;
     if (!aValid)
-      theError.arg(anEdge->isCircle() ? "Error: Cirlce is already in the sketch plane."
-                                      : "Error: Arc is already in the sketch plane.");
+      theError.arg(anEdge->isCircle() ? "Error: Circle is orthogonal to the sketch plane."
+                                      : "Error: Arc is orthogonal to the sketch plane.");
+    return aValid;
+  }
+  else if (anEdge->isEllipse()) {
+    std::shared_ptr<GeomAPI_Ellipse> anEllipse = anEdge->ellipse();
+    std::shared_ptr<GeomAPI_Dir> anEllipseNormal = anEllipse->normal();
+    double aDot = fabs(aNormal->dot(anEllipseNormal));
+    bool aValid = fabs(aDot - 1.0) <= tolerance * tolerance;
+    if (!aValid)
+      theError.arg(anEdge->isClosed() ? "Error: Ellipse is orthogonal to the sketch plane."
+                                      : "Error: Elliptic Arc is orthogonal to the sketch plane.");
     return aValid;
   }
 
-  theError = "Error: Selected object is not line, circle or arc.";
+  theError = "Error: Selected object is not supported for projection.";
   return false;
 }
 

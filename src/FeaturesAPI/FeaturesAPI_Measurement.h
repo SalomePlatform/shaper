@@ -42,7 +42,7 @@ double measureDistance(const std::shared_ptr<ModelAPI_Document>& thePart,
                        const ModelHighAPI_Selection& theTo);
 
 /// \ingroup CPPHighAPI
-/// \brief Calculate radius of circular.
+/// \brief Calculate radius of circular edge, cylindrical surface or sphere.
 FEATURESAPI_EXPORT
 double measureRadius(const std::shared_ptr<ModelAPI_Document>& thePart,
                      const ModelHighAPI_Selection& theObject);

@@ -68,6 +68,7 @@ SET(XML_RESOURCES
 
 SET(TEXT_RESOURCES
     CollectionPlugin_msg_en.ts
+    CollectionPlugin_msg_fr.ts
 )
 
 # sources / moc wrappings
@@ -138,13 +139,22 @@ ADD_UNIT_TESTS(
                TestGroupMove18.py
                TestGroupMove19.py
                TestGroupMove20.py
+               TestGroupMove21.py
+               TestGroupMove22.py
+               TestGroupMove23.py
+               TestGroupMove24.py
+               TestGroupMove25.py
                TestGroupShareTopology.py
                TestGroupAddition.py
                TestGroupAddition_Error.py
                TestGroupIntersection.py
                TestGroupIntersection_Error.py
                TestGroupSubstraction.py
+               TestGroupSubstraction2.py
                TestGroupSubstraction_Error1.py
                TestGroupSubstraction_Error2.py
                Test2977.py
+               TestGroupWholeResult1.py
+               TestGroupWholeResult2.py
+               Test3031.py
 )

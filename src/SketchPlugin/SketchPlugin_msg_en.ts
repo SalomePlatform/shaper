@@ -4,14 +4,14 @@
   <context>
     <name>Sketch:Model_FeatureValidator</name>
     <message>
-      <source>Attribute "DirX" is not initialized.</source>
+      <source>Attribute "%1" is not initialized.</source>
       <translation>Select a plane for the sketch</translation>
     </message>
   </context>
   <context>
     <name>Sketch:Model_FeatureValidator</name>
     <message>
-      <source>Attribute "Features" is not initialized.</source>
+      <source>Attribute "%1" is not initialized.</source>
       <translation>Sketch objects are not defined</translation>
     </message>
   </context>
@@ -53,25 +53,43 @@
   <context>
     <name>Sketch:Model_FeatureValidator</name>
     <message>
-      <source>Attribute "External" is not initialized.</source>
+      <source>Attribute "%1" is not initialized.</source>
       <translation>Select the sketch plane</translation>
     </message>
   </context>
   <context>
     <name>Sketch:Model_FeatureValidator</name>
     <message>
-      <source>Attribute "SolverDOF" is not initialized.</source>
+      <source>Attribute "%1" is not initialized.</source>
       <translation>Can not compute degrees of freedom</translation>
     </message>
   </context>
   <context>
     <name>Sketch:Model_FeatureValidator</name>
     <message>
-      <source>Attribute "SolverError" is not initialized.</source>
+      <source>Attribute "%1" is not initialized.</source>
       <translation>Can not compute the solver error</translation>
     </message>
   </context>
   
+  <context>
+    <name>SketchMacroCircle:center_point</name>
+    <message>
+      <source>Attribute "%1" is locked by modification value in the viewer.</source>
+      <translation>Select a point in the viewer</translation>
+    </message>
+    <message>
+      <source>Attribute "%1" is not initialized.</source>
+      <translation>Select a point in the viewer</translation>
+    </message>
+  </context>
+  <context>
+    <name>SketchMacroCircle:passed_point</name>
+    <message>
+      <source>Attribute "%1" is locked by modification value in the viewer.</source>
+      <translation>Select a point in the viewer</translation>
+    </message>
+  </context>
   <context>
     <name>SketchMacroCircle:CircleRadius:GeomValidators_Positive</name>
     <message>
@@ -82,28 +100,28 @@
   <context>
     <name>SketchMacroCircle:Model_FeatureValidator</name>
     <message>
-      <source>Attribute "circle_center" is not initialized.</source>
+      <source>Attribute "%1" is not initialized.</source>
       <translation>A center point is not selected</translation>
     </message>
   </context>
   <context>
     <name>SketchMacroCircle:Model_FeatureValidator</name>
     <message>
-      <source>Attribute "FirstPoint" is not initialized.</source>
+      <source>Attribute "%1" is not initialized.</source>
       <translation>A first point is not selected</translation>
     </message>
   </context>
   <context>
     <name>SketchMacroCircle:Model_FeatureValidator</name>
     <message>
-      <source>Attribute "SecondPoint" is not initialized.</source>
+      <source>Attribute "%1" is not initialized.</source>
       <translation>A second point is not selected</translation>
     </message>
   </context>
   <context>
     <name>SketchMacroCircle:Model_FeatureValidator</name>
     <message>
-      <source>Attribute "ThirdPoint" is not initialized.</source>
+      <source>Attribute "%1" is not initialized.</source>
       <translation>A third point is not selected</translation>
     </message>
   </context>
@@ -159,15 +177,161 @@
   <context>
     <name>SketchMacroCircle:Model_FeatureValidator</name>
     <message>
-      <source>Attribute "circle_radius" is not initialized.</source>
+      <source>Attribute "%1" is not initialized.</source>
       <translation>Set the circle radius</translation>
+    </message>
+  </context>
+
+  <context>
+    <name>SketchMacroArc:Model_FeatureValidator</name>
+    <message>
+      <source>Attribute "%1" is not initialized.</source>
+      <translation>Select a point.</translation>
+    </message>
+  </context>
+  <context>
+    <name>SketchMacroArc:center_point</name>
+    <message>
+      <source>Attribute "%1" is locked by modification value in the viewer.</source>
+      <translation>Select a center point.</translation>
+    </message>
+  </context>
+  <context>
+    <name>SketchMacroArc:end_point_1</name>
+    <message>
+      <source>Attribute "%1" is locked by modification value in the viewer.</source>
+      <translation>Select an end point in the viewer.</translation>
+    </message>
+  </context>
+  <context>
+    <name>SketchMacroArc:end_point_2</name>
+    <message>
+      <source>Attribute "%1" is locked by modification value in the viewer.</source>
+      <translation>Select an end point in the viewer.</translation>
+    </message>
+  </context>
+  <context>
+    <name>SketchMacroArc:end_point_3</name>
+    <message>
+      <source>Attribute "%1" is locked by modification value in the viewer.</source>
+      <translation>Select an end point in the viewer.</translation>
+    </message>
+    <message>
+      <source>Attribute "%1" is not initialized.</source>
+      <translation>Select an end point in the viewer.</translation>
+    </message>
+  </context>
+  <context>
+    <name>SketchMacroArc:passed_point</name>
+    <message>
+      <source>Attribute "%1" is locked by modification value in the viewer.</source>
+      <translation>Select an passed point in the viewer.</translation>
+    </message>
+  </context>
+  <context>
+    <name>SketchMacroArc:start_point_1</name>
+    <message>
+      <source>Attribute "%1" is locked by modification value in the viewer.</source>
+      <translation>Select a start point.</translation>
+    </message>
+  </context>
+  <context>
+    <name>SketchMacroArc:start_point_2</name>
+    <message>
+      <source>Attribute "%1" is locked by modification value in the viewer.</source>
+      <translation>Select a start point.</translation>
+    </message>
+  </context>
+
+  <context>
+    <name>SketchMacroEllipse:Model_FeatureValidator</name>
+    <message>
+      <source>Attribute "%1" is not initialized.</source>
+      <translation>Select a point.</translation>
+    </message>
+  </context>
+  <context>
+    <name>SketchMacroEllipse:first_point</name>
+    <message>
+      <source>Attribute "%1" is locked by modification value in the viewer.</source>
+      <translation>Select a first point in the viewer.</translation>
+    </message>
+  </context>
+  <context>
+    <name>SketchMacroEllipse:passed_point</name>
+    <message>
+      <source>Attribute "%1" is locked by modification value in the viewer.</source>
+      <translation>Select a passed point.</translation>
+    </message>
+  </context>
+  <context>
+    <name>SketchMacroEllipse:second_point</name>
+    <message>
+      <source>Attribute "%1" is locked by modification value in the viewer.</source>
+      <translation>Select a second point.</translation>
+    </message>
+  </context>
+
+  <context>
+    <name>SketchMacroEllipticArc:Model_FeatureValidator</name>
+    <message>
+      <source>Attribute "%1" is not initialized.</source>
+      <translation>Select a point.</translation>
+    </message>
+  </context>
+  <context>
+    <name>SketchMacroEllipticArc:center</name>
+    <message>
+      <source>Attribute "%1" is locked by modification value in the viewer.</source>
+      <translation>Select a point.</translation>
+    </message>
+    <message>
+      <source>Attribute "%1" is not initialized.</source>
+      <translation>Select a center point.</translation>
+    </message>
+  </context>
+  <context>
+    <name>SketchMacroEllipticArc:end_point</name>
+    <message>
+      <source>Attribute "%1" is locked by modification value in the viewer.</source>
+      <translation>Select an end point.</translation>
+    </message>
+    <message>
+      <source>Attribute "%1" is not initialized.</source>
+      <translation>Select an end point.</translation>
+    </message>
+  </context>
+  <context>
+    <name>SketchMacroEllipticArc:major_axis_point</name>
+    <message>
+      <source>Attribute "%1" is locked by modification value in the viewer.</source>
+      <translation>Select a major axis point.</translation>
+    </message>
+    <message>
+      <source>Attribute "%1" is not initialized.</source>
+      <translation>Select a major axis point.</translation>
+    </message>
+  </context>
+
+  <context>
+    <name>SketchSplit:Model_FeatureValidator</name>
+    <message>
+      <source>Attribute "%1" is not initialized.</source>
+      <translation>Select a segment to split in the viewer.</translation>
+    </message>
+  </context>
+  <context>
+    <name>SketchSplit:SelectedObject:SketchPlugin_SplitValidator</name>
+    <message>
+      <source>Select a segment to split in the viewer.</source>
+      <translation></translation>
     </message>
   </context>
   
   <context>
     <name>SketchConstraintHorizontal:Model_FeatureValidator</name>
     <message>
-      <source>Attribute "ConstraintEntityA" is not initialized.</source>
+      <source>Attribute "%1" is not initialized.</source>
       <translation>Line is not selected</translation>
     </message>
   </context>
@@ -231,14 +395,14 @@
   <context>
     <name>SketchConstraintPerpendicular:Model_FeatureValidator</name>
     <message>
-      <source>Attribute "ConstraintEntityA" is not initialized.</source>
+      <source>Attribute "%1" is not initialized.</source>
       <translation>First line is not selected</translation>
     </message>
   </context>
   <context>
     <name>SketchConstraintPerpendicular:Model_FeatureValidator</name>
     <message>
-      <source>Attribute "ConstraintEntityB" is not initialized.</source>
+      <source>Attribute "%1" is not initialized.</source>
       <translation>Second line is not selected</translation>
     </message>
   </context>
@@ -358,7 +522,7 @@
   <context>
     <name>SketchConstraintRadius:Model_FeatureValidator</name>
     <message>
-      <source>Attribute "ConstraintEntityA" is not initialized.</source>
+      <source>Attribute "%1" is not initialized.</source>
       <translation>Circle is not selected</translation>
     </message>
   </context>
@@ -407,7 +571,7 @@
   <context>
     <name>SketchConstraintRadius:Model_FeatureValidator</name>
     <message>
-      <source>Attribute "ConstraintValue" is not initialized.</source>
+      <source>Attribute "%1" is not initialized.</source>
       <translation>Set the radius</translation>
     </message>
   </context>
@@ -464,7 +628,7 @@
   <context>
     <name>SketchConstraintVertical:Model_FeatureValidator</name>
     <message>
-      <source>Attribute "ConstraintEntityA" is not initialized.</source>
+      <source>Attribute "%1" is not initialized.</source>
       <translation>Line is not selected</translation>
     </message>
   </context>
@@ -528,42 +692,42 @@
   <context>
     <name>SketchLine:Model_FeatureValidator</name>
     <message>
-      <source>Attribute "EndPoint" is not initialized.</source>
+      <source>Attribute "%1" is not initialized.</source>
       <translation>End point is not selected</translation>
     </message>
   </context>
   <context>
     <name>SketchLine:EndPoint</name>
     <message>
-      <source>Attribute "EndPoint" is locked by modification value in the viewer.</source>
+      <source>Attribute "%1" is locked by modification value in the viewer.</source>
       <translation>Select an end point in the viewer</translation>
     </message>
   </context>
   <context>
     <name>SketchLine:StartPoint</name>
     <message>
-      <source>Attribute "StartPoint" is locked by modification value in the viewer.</source>
+      <source>Attribute "%1" is locked by modification value in the viewer.</source>
       <translation>Select a start point in the viewer</translation>
     </message>
   </context>
   <context>
     <name>SketchLine:StartPoint</name>
     <message>
-      <source>Attribute "StartPoint" is not initialized.</source>
+      <source>Attribute "%1" is not initialized.</source>
       <translation>Start point is not selected</translation>
     </message>
   </context>
   <context>
     <name>SketchLine:EndPoint</name>
     <message>
-      <source>Attribute "EndPoint" is not initialized.</source>
+      <source>Attribute "%1" is not initialized.</source>
       <translation>End point is not selected</translation>
     </message>
   </context>
   <context>
     <name>SketchLine:Model_FeatureValidator</name>
     <message>
-      <source>Attribute "StartPoint" is not initialized.</source>
+      <source>Attribute "%1" is not initialized.</source>
       <translation>Select a start point</translation>
     </message>
   </context>
@@ -571,14 +735,21 @@
   <context>
     <name>SketchPoint:Model_FeatureValidator</name>
     <message>
-      <source>Attribute "PointCoordinates" is not initialized.</source>
+      <source>Attribute "%1" is not initialized.</source>
       <translation>Point is not defined</translation>
     </message>
   </context>
   <context>
     <name>SketchPoint:PointCoordinates</name>
     <message>
-      <source>Attribute "PointCoordinates" is locked by modification value in the viewer.</source>
+      <source>Attribute "%1" is not initialized.</source>
+      <translation>Select a point</translation>
+    </message>
+  </context>
+  <context>
+    <name>SketchPoint:PointCoordinates</name>
+    <message>
+      <source>Attribute "%1" is locked by modification value in the viewer.</source>
       <translation>Select a point</translation>
     </message>
   </context>
@@ -593,29 +764,36 @@
   <context>
     <name>SketchRectangle:RectEndPoint</name>
     <message>
-      <source>Attribute "RectEndPoint" is locked by modification value in the viewer.</source>
-      <translation>Select an end point of the rectangle</translation>
+      <source>Attribute "%1" is locked by modification value in the viewer.</source>
+      <translation>Select an end point of the rectangle.</translation>
     </message>
   </context>
   <context>
     <name>SketchRectangle:RectStartPoint</name>
     <message>
-      <source>Attribute "RectStartPoint" is locked by modification value in the viewer.</source>
-      <translation>Select a first point of the rectangle</translation>
+      <source>Attribute "%1" is locked by modification value in the viewer.</source>
+      <translation>Select a point.</translation>
     </message>
   </context>
   <context>
     <name>SketchRectangle:Model_FeatureValidator</name>
     <message>
-      <source>Attribute "RectStartPoint" is not initialized.</source>
-      <translation>Select a first point of the rectangle</translation>
+      <source>Attribute "%1" is not initialized.</source>
+      <translation>Select a point.</translation>
     </message>
   </context>
   <context>
-    <name>SketchRectangle:Model_FeatureValidator</name>
+    <name>SketchRectangle:RectEndPoint</name>
     <message>
-      <source>Attribute "RectEndPoint" is not initialized.</source>
-      <translation>Select an end point of the rectangle</translation>
+      <source>Attribute "%1" is locked by modification value in the viewer.</source>
+      <translation>Select a point.</translation>
+    </message>
+  </context>
+  <context>
+    <name>SketchRectangle:RectStartPoint</name>
+    <message>
+      <source>Attribute "%1" is locked by modification value in the viewer.</source>
+      <translation>Select an point.</translation>
     </message>
   </context>
 
@@ -636,35 +814,35 @@
   <context>
     <name>SketchArc:ArcCenter</name>
     <message>
-      <source>Attribute "center_point" is locked by modification value in the viewer.</source>
+      <source>Attribute "%1" is locked by modification value in the viewer.</source>
       <translation>Select a center point</translation>
     </message>
   </context>
   <context>
     <name>SketchArc:ArcCenter</name>
     <message>
-      <source>Attribute "center_point" is not initialized.</source>
+      <source>Attribute "%1" is not initialized.</source>
       <translation>Center point is not defined</translation>
     </message>
   </context>
   <context>
     <name>SketchArc:ArcEndPoint</name>
     <message>
-      <source>Attribute "ArcEndPoint" is locked by modification value in the viewer.</source>
+      <source>Attribute "%1" is locked by modification value in the viewer.</source>
       <translation>Select an end point</translation>
     </message>
   </context>
   <context>
     <name>SketchArc:ArcPassedPoint</name>
     <message>
-      <source>Attribute "ArcPassedPoint" is locked by modification value in the viewer.</source>
+      <source>Attribute "%1" is locked by modification value in the viewer.</source>
       <translation>Select an intermediate point</translation>
     </message>
   </context>
   <context>
     <name>SketchArc:ArcStartPoint</name>
     <message>
-      <source>Attribute "ArcStartPoint" is locked by modification value in the viewer.</source>
+      <source>Attribute "%1" is locked by modification value in the viewer.</source>
       <translation>Select a start point</translation>
     </message>
   </context>
@@ -685,14 +863,14 @@
   <context>
     <name>SketchArc:Model_FeatureValidator</name>
     <message>
-      <source>Attribute "ArcEndPoint" is not initialized.</source>
+      <source>Attribute "%1" is not initialized.</source>
       <translation>End point is not defined</translation>
     </message>
   </context>
   <context>
     <name>SketchArc:Model_FeatureValidator</name>
     <message>
-      <source>Attribute "ArcPassedPoint" is not initialized.</source>
+      <source>Attribute "%1" is not initialized.</source>
       <translation>Intermediate point is not defined</translation>
     </message>
   </context>
@@ -720,35 +898,35 @@
   <context>
     <name>SketchArc:Model_FeatureValidator</name>
     <message>
-      <source>Attribute "center_point" is not initialized.</source>
+      <source>Attribute "%1" is not initialized.</source>
       <translation>Select an arc center</translation>
     </message>
   </context>
   <context>
     <name>SketchArc:Model_FeatureValidator:ArcStartPoint</name>
     <message>
-      <source>Attribute "start_point" is not initialized.</source>
+      <source>Attribute "%1" is not initialized.</source>
       <translation>Select an arc start point</translation>
     </message>
   </context>
   <context>
     <name>SketchArc:Model_FeatureValidator</name>
     <message>
-      <source>Attribute "end_point" is not initialized.</source>
+      <source>Attribute "%1" is not initialized.</source>
       <translation>Select an arc end point</translation>
     </message>
   </context>
   <context>
     <name>SketchArc:Model_FeatureValidator</name>
     <message>
-      <source>Attribute "ArcPassedPoint" is not initialized.</source>
+      <source>Attribute "%1" is not initialized.</source>
       <translation>Select an arc passed point</translation>
     </message>
   </context>
   <context>
     <name>SketchArc:Model_FeatureValidator</name>
     <message>
-      <source>Attribute "ArcTangentPoint" is not initialized.</source>
+      <source>Attribute "%1" is not initialized.</source>
       <translation>Select an arc tangent point</translation>
     </message>
   </context>
@@ -762,14 +940,14 @@
   <context>
     <name>SketchConstraintMirror:Model_FeatureValidator</name>
     <message>
-      <source>Attribute "ConstraintEntityA" is not initialized.</source>
+      <source>Attribute "%1" is not initialized.</source>
       <translation>Mirror line is not selected</translation>
     </message>
   </context>
   <context>
     <name>SketchConstraintMirror:Model_FeatureValidator</name>
     <message>
-      <source>Attribute "ConstraintMirrorList" is not initialized.</source>
+      <source>Attribute "%1" is not initialized.</source>
       <translation>Objects for mirror are not selected</translation>
     </message>
   </context>
@@ -819,14 +997,14 @@
   <context>
     <name>SketchMultiRotation:Model_FeatureValidator</name>
     <message>
-      <source>Attribute "AngleType" is not initialized.</source>
+      <source>Attribute "%1" is not initialized.</source>
       <translation>Type of angle is not defined</translation>
     </message>
   </context>
   <context>
     <name>SketchMultiRotation:Model_FeatureValidator</name>
     <message>
-      <source>Attribute "MultiRotationCenter" is not initialized.</source>
+      <source>Attribute "%1" is not initialized.</source>
       <translation>Rotation center is not selected</translation>
     </message>
   </context>
@@ -868,21 +1046,21 @@
   <context>
     <name>SketchMultiRotation:Model_FeatureValidator</name>
     <message>
-      <source>Attribute "MultiRotationList" is not initialized.</source>
+      <source>Attribute "%1" is not initialized.</source>
       <translation>Select objects to rotate</translation>
     </message>
   </context>
   <context>
     <name>SketchMultiRotation:Model_FeatureValidator</name>
     <message>
-      <source>Attribute "MultiRotationAngle" is not initialized.</source>
+      <source>Attribute "%1" is not initialized.</source>
       <translation>Set rotation angle</translation>
     </message>
   </context>
   <context>
     <name>SketchMultiRotation:Model_FeatureValidator</name>
     <message>
-      <source>Attribute "MultiRotationObjects" is not initialized.</source>
+      <source>Attribute "%1" is not initialized.</source>
       <translation>Set the number of resulting objects</translation>
     </message>
   </context>
@@ -946,14 +1124,14 @@
   <context>
     <name>SketchMultiTranslation:Model_FeatureValidator</name>
     <message>
-      <source>Attribute "MultiTranslationEndPoint" is not initialized.</source>
+      <source>Attribute "%1" is not initialized.</source>
       <translation>End point of translation vector is not defined</translation>
     </message>
   </context>
   <context>
     <name>SketchMultiTranslation:Model_FeatureValidator</name>
     <message>
-      <source>Attribute "MultiTranslationList" is not initialized.</source>
+      <source>Attribute "%1" is not initialized.</source>
       <translation>Objects for translation are not selected</translation>
     </message>
   </context>
@@ -1004,14 +1182,14 @@
   <context>
     <name>SketchMultiTranslation:Model_FeatureValidator</name>
     <message>
-      <source>Attribute "MultiTranslationStartPoint" is not initialized.</source>
+      <source>Attribute "%1" is not initialized.</source>
       <translation>Select a start point</translation>
     </message>
   </context>
   <context>
     <name>SketchMultiTranslation:Model_FeatureValidator</name>
     <message>
-      <source>Attribute "MultiTranslationObjects" is not initialized.</source>
+      <source>Attribute "%1" is not initialized.</source>
       <translation>Select a total number of objects</translation>
     </message>
   </context>
@@ -1159,28 +1337,28 @@
   <context>
     <name>SketchConstraintAngle:Model_FeatureValidator</name>
     <message>
-      <source>Attribute "ConstraintEntityA" is not initialized.</source>
+      <source>Attribute "%1" is not initialized.</source>
       <translation>First object is not selected</translation>
     </message>
   </context>
   <context>
     <name>SketchConstraintAngle:Model_FeatureValidator</name>
     <message>
-      <source>Attribute "ConstraintEntityB" is not initialized.</source>
+      <source>Attribute "%1" is not initialized.</source>
       <translation>Second object is not selected</translation>
     </message>
   </context>
   <context>
     <name>SketchConstraintAngle:Model_FeatureValidator</name>
     <message>
-      <source>Attribute "AngleValue" is not initialized.</source>
+      <source>Attribute "%1" is not initialized.</source>
       <translation>Set the angle value</translation>
     </message>
   </context>
   <context>
     <name>SketchConstraintAngle:Model_FeatureValidator</name>
     <message>
-      <source>Attribute "AngleType" is not initialized.</source>
+      <source>Attribute "%1" is not initialized.</source>
       <translation>Type of angle is not set</translation>
     </message>
   </context>
@@ -1280,27 +1458,27 @@
     <name>SketchConstraintCoincidence:ConstraintEntityA:PartSet_DifferentObjects</name>
     <message>
       <source>The feature uses one  object in ConstraintEntityA and ConstraintEntityB attributes.</source>
-      <translation>Diferent objects should be selected</translation>
+      <translation>Different objects should be selected</translation>
     </message>
   </context>
   <context>
     <name>SketchConstraintCoincidence:ConstraintEntityB:PartSet_DifferentObjects</name>
     <message>
       <source>The feature uses one  object in ConstraintEntityB and ConstraintEntityA attributes.</source>
-      <translation>Diferent objects should be selected</translation>
+      <translation>Different objects should be selected</translation>
     </message>
   </context>
   <context>
     <name>SketchConstraintCoincidence:Model_FeatureValidator</name>
     <message>
-      <source>Attribute "ConstraintEntityA" is not initialized.</source>
+      <source>Attribute "%1" is not initialized.</source>
       <translation>First object is not selected</translation>
     </message>
   </context>
   <context>
     <name>SketchConstraintCoincidence:Model_FeatureValidator</name>
     <message>
-      <source>Attribute "ConstraintEntityB" is not initialized.</source>
+      <source>Attribute "%1" is not initialized.</source>
       <translation>Second object is not selected</translation>
     </message>
   </context>
@@ -1350,14 +1528,14 @@
   <context>
     <name>SketchConstraintDistance:Model_FeatureValidator</name>
     <message>
-      <source>Attribute "ConstraintEntityA" is not initialized.</source>
+      <source>Attribute "%1" is not initialized.</source>
       <translation>First object is not selected</translation>
     </message>
   </context>
   <context>
     <name>SketchConstraintDistance:Model_FeatureValidator</name>
     <message>
-      <source>Attribute "ConstraintEntityB" is not initialized.</source>
+      <source>Attribute "%1" is not initialized.</source>
       <translation>Second object is not selected</translation>
     </message>
   </context>
@@ -1385,21 +1563,21 @@
   <context>
     <name>SketchConstraintDistance:Model_FeatureValidator</name>
     <message>
-      <source>Attribute "ConstraintEntityA" is not initialized.</source>
+      <source>Attribute "%1" is not initialized.</source>
       <translation>First object is not selected</translation>
     </message>
   </context>
   <context>
     <name>SketchConstraintDistance:Model_FeatureValidator</name>
     <message>
-      <source>Attribute "ConstraintEntityB" is not initialized.</source>
+      <source>Attribute "%1" is not initialized.</source>
       <translation>Second object is not selected</translation>
     </message>
   </context>
   <context>
     <name>SketchConstraintDistance:Model_FeatureValidator</name>
     <message>
-      <source>Attribute "ConstraintValue" is not initialized.</source>
+      <source>Attribute "%1" is not initialized.</source>
       <translation>Set the distance</translation>
     </message>
   </context>
@@ -1506,14 +1684,14 @@
     <name>SketchConstraintEqual:ConstraintEntityA:PartSet_DifferentObjects</name>
     <message>
       <source>The feature uses one  object in ConstraintEntityA and ConstraintEntityB attributes.</source>
-      <translation>Diferent objects should be selected</translation>
+      <translation>Different objects should be selected</translation>
     </message>
   </context>
   <context>
     <name>SketchConstraintEqual:ConstraintEntityB:PartSet_DifferentObjects</name>
     <message>
       <source>The feature uses one  object in ConstraintEntityB and ConstraintEntityA attributes.</source>
-      <translation>Diferent objects should be selected</translation>
+      <translation>Different objects should be selected</translation>
     </message>
   </context>
   <context>
@@ -1522,18 +1700,26 @@
       <source>An empty object is used.</source>
       <translation>An empty object is used</translation>
     </message>
+    <message>
+      <source>The %1 feature is not supported by the Equal constraint.</source>
+      <translation>The %1 feature is not supported by the Equal constraint.</translation>
+    </message>
+    <message>
+      <source>Features with kinds %1 and %2 can not be equal.</source>
+      <translation>Features with kinds %1 and %2 can not be equal.</translation>
+    </message>
   </context>
   <context>
     <name>SketchConstraintEqual:Model_FeatureValidator</name>
     <message>
-      <source>Attribute "ConstraintEntityA" is not initialized.</source>
+      <source>Attribute "%1" is not initialized.</source>
       <translation>First object is not selected</translation>
     </message>
   </context>
   <context>
     <name>SketchConstraintEqual:Model_FeatureValidator</name>
     <message>
-      <source>Attribute "ConstraintEntityB" is not initialized.</source>
+      <source>Attribute "%1" is not initialized.</source>
       <translation>Second object is not selected</translation>
     </message>
   </context>
@@ -1576,7 +1762,7 @@
   <context>
     <name>SketchConstraintLength:Model_FeatureValidator</name>
     <message>
-      <source>Attribute "ConstraintEntityA" is not initialized.</source>
+      <source>Attribute "%1" is not initialized.</source>
       <translation>Line is not selected</translation>
     </message>
   </context>
@@ -1605,14 +1791,14 @@
   <context>
     <name>SketchConstraintLength:Model_FeatureValidator</name>
     <message>
-      <source>Attribute "ConstraintEntityA" is not initialized.</source>
+      <source>Attribute "%1" is not initialized.</source>
       <translation>Line is not selected</translation>
     </message>
   </context>
   <context>
     <name>SketchConstraintLength:Model_FeatureValidator</name>
     <message>
-      <source>Attribute "ConstraintValue" is not initialized.</source>
+      <source>Attribute "%1" is not initialized.</source>
       <translation>Set the length value</translation>
     </message>
   </context>
@@ -1663,14 +1849,14 @@
     <name>SketchConstraintMiddle:ConstraintEntityA:PartSet_DifferentObjects</name>
     <message>
       <source>The feature uses one  object in ConstraintEntityA and ConstraintEntityB attributes.</source>
-      <translation>Diferent objects should be selected</translation>
+      <translation>Different objects should be selected</translation>
     </message>
   </context>
   <context>
     <name>SketchConstraintMiddle:ConstraintEntityB:PartSet_DifferentObjects</name>
     <message>
       <source>The feature uses one  object in ConstraintEntityB and ConstraintEntityA attributes.</source>
-      <translation>Diferent objects should be selected</translation>
+      <translation>Different objects should be selected</translation>
     </message>
   </context>
   <context>
@@ -1683,14 +1869,14 @@
   <context>
     <name>SketchConstraintMiddle:Model_FeatureValidator</name>
     <message>
-      <source>Attribute "ConstraintEntityA" is not initialized.</source>
+      <source>Attribute "%1" is not initialized.</source>
       <translation>First object is not selected</translation>
     </message>
   </context>
   <context>
     <name>SketchConstraintMiddle:Model_FeatureValidator</name>
     <message>
-      <source>Attribute "ConstraintEntityB" is not initialized.</source>
+      <source>Attribute "%1" is not initialized.</source>
       <translation>Second object is not selected</translation>
     </message>
   </context>
@@ -1726,14 +1912,14 @@
   <context>
     <name>SketchConstraintParallel:Model_FeatureValidator</name>
     <message>
-      <source>Attribute "ConstraintEntityA" is not initialized.</source>
+      <source>Attribute "%1" is not initialized.</source>
       <translation>First line is not selected</translation>
     </message>
   </context>
   <context>
     <name>SketchConstraintParallel:Model_FeatureValidator</name>
     <message>
-      <source>Attribute "ConstraintEntityB" is not initialized.</source>
+      <source>Attribute "%1" is not initialized.</source>
       <translation>Second line is not selected</translation>
     </message>
   </context>
@@ -1846,7 +2032,7 @@
   <context>
     <name>SketchConstraintRigid:Model_FeatureValidator</name>
     <message>
-      <source>Attribute "ConstraintEntityA" is not initialized.</source>
+      <source>Attribute "%1" is not initialized.</source>
       <translation>Object is not selected</translation>
     </message>
   </context>
@@ -1897,14 +2083,21 @@
     <name>SketchConstraintTangent:ConstraintEntityA:PartSet_DifferentObjects</name>
     <message>
       <source>The feature uses one  object in ConstraintEntityA and ConstraintEntityB attributes.</source>
-      <translation>Diferent objects should be selected</translation>
+      <translation>Different objects should be selected</translation>
     </message>
   </context>
   <context>
     <name>SketchConstraintTangent:ConstraintEntityB:PartSet_DifferentObjects</name>
     <message>
       <source>The feature uses one  object in ConstraintEntityB and ConstraintEntityA attributes.</source>
-      <translation>Diferent objects should be selected</translation>
+      <translation>Different objects should be selected</translation>
+    </message>
+  </context>
+  <context>
+    <name>SketchConstraintTangent:ConstraintEntityA:SketchPlugin_TangentAttr</name>
+    <message>
+      <source>Two segments cannot be tangent</source>
+      <translation>Two segments cannot be tangent</translation>
     </message>
   </context>
   <context>
@@ -1917,14 +2110,14 @@
   <context>
     <name>SketchConstraintTangent:Model_FeatureValidator</name>
     <message>
-      <source>Attribute "ConstraintEntityA" is not initialized.</source>
+      <source>Attribute "%1" is not initialized.</source>
       <translation>First object is not selected</translation>
     </message>
   </context>
   <context>
     <name>SketchConstraintTangent:Model_FeatureValidator</name>
     <message>
-      <source>Attribute "ConstraintEntityB" is not initialized.</source>
+      <source>Attribute "%1" is not initialized.</source>
       <translation>Second object is not selected</translation>
     </message>
   </context>
@@ -1968,14 +2161,14 @@
   <context>
     <name>SketchFillet:Model_FeatureValidator</name>
     <message>
-      <source>Attribute "ConstraintEntityA" is not initialized.</source>
+      <source>Attribute "%1" is not initialized.</source>
       <translation>Select one or several points for filet</translation>
     </message>
   </context>
   <context>
     <name>SketchFillet:Model_FeatureValidator</name>
     <message>
-      <source>Attribute "ConstraintValue" is not initialized.</source>
+      <source>Attribute "%1" is not initialized.</source>
       <translation>Set the fillet radius</translation>
     </message>
   </context>
@@ -1989,8 +2182,8 @@
   <context>
     <name>SketchFillet:ConstraintEntityA:SketchPlugin_FilletVertexValidator</name>
     <message>
-      <source>Error: one of the selected point does not have coicidence.</source>
-      <translation>One of the selected point does not have coicidence</translation>
+      <source>Error: one of the selected point does not have coincidence.</source>
+      <translation>One of the selected point does not have coincidence</translation>
     </message>
   </context>
   <context>
@@ -2021,26 +2214,47 @@
       <source>The attribute with the %1 type is not processed</source>
       <translation>An argument of type %1 of the projection feature is not supported</translation>
     </message>
-  </context>
-  <context>
-    <name>SketchProjection:ExternalFeature:SketchPlugin_ProjectionValidator</name>
     <message>
-      <source>The attribute %1 should be an edge</source>
-      <translation>The projected item must be an edge</translation>
+      <source>The attribute %1 should be an edge or vertex</source>
+      <translation>The projected item must be an edge or a vertex</translation>
     </message>
-  </context>
-  <context>
-    <name>SketchProjection:ExternalFeature:SketchPlugin_ProjectionValidator</name>
     <message>
       <source>There is no sketch referring to the current feature</source>
       <translation>The projection feature has no sketch</translation>
     </message>
+    <message>
+      <source>Unable to project feature from the same sketch</source>
+      <translation>Feature from the current sketch cannot be projected</translation>
+    </message>
+    <message>
+      <source>Error: Line is orthogonal to the sketch plane.</source>
+      <translation>Error: Line is orthogonal to the sketch plane.</translation>
+    </message>
+    <message>
+      <source>Error: Circle is orthogonal to the sketch plane.</source>
+      <translation>Error: Circle is orthogonal to the sketch plane.</translation>
+    </message>
+    <message>
+      <source>Error: Arc is orthogonal to the sketch plane.</source>
+      <translation>Error: Arc is orthogonal to the sketch plane.</translation>
+    </message>
+    <message>
+      <source>Error: Ellipse is orthogonal to the sketch plane.</source>
+      <translation>Error: Ellipse is orthogonal to the sketch plane.</translation>
+    </message>
+    <message>
+      <source>Error: Elliptic Arc is orthogonal to the sketch plane.</source>
+      <translation>Error: Elliptic Arc is orthogonal to the sketch plane.</translation>
+    </message>
+    <message>
+      <source>Error: Selected object is not supported for projection.</source>
+      <translation>Error: Selected object is not supported for projection.</translation>
+    </message>
   </context>
-  
   <context>
     <name>SketchProjection:Model_FeatureValidator</name>
     <message>
-      <source>Attribute "ExternalFeature" is not initialized.</source>
+      <source>Attribute "%1" is not initialized.</source>
       <translation></translation>
     </message>
   </context>

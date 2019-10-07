@@ -142,6 +142,7 @@ SET(PROJECT_SOURCES
     GeomAlgoAPI_Offset.cpp
     GeomAlgoAPI_SolidClassifier.cpp
     GeomAlgoAPI_MapShapesAndAncestors.cpp
+    GeomAlgoAPI_Projection.cpp
     GeomAlgoAPI_Chamfer.cpp
 )
 

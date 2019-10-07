@@ -180,8 +180,8 @@
   <context>
     <name>Extrusion:base:FeaturesPlugin_ValidatorBaseForGeneration</name>
     <message>
-      <source>Error: Objects with such wire already selected. Don't allow to select this object.</source>
-      <translation>Objects with such wire already selected. Don't allow to select this object.</translation>
+      <source>Error: Objects with this wire already selected. Don't allow to select this object.</source>
+      <translation>Objects with this wire already selected. Don't allow to select this object.</translation>
     </message>
   </context>
   <context>
@@ -222,15 +222,8 @@
   <context>
     <name>Extrusion:base:FeaturesPlugin_ValidatorBaseForGeneration</name>
     <message>
-      <source>Error: Selected shape has unacceptable type. Acceptable types are: faces or wires on sketch, whole sketch(if it has at least one face), and whole objects with shape types: %1</source>
-      <translation>Selected shape has unacceptable type. Acceptable types are: faces or wires on sketch, whole sketch(if it has at least one face), and whole objects with shape types: %1</translation>
-    </message>
-  </context>
-  <context>
-    <name>Extrusion:base :FeaturesPlugin_ValidatorBaseForGeneration</name>
-    <message>
-      <source>Error: Attribute \"%1\" does not supported by this validator.</source>
-      <translation></translation>
+      <source>Error: Selected shape has unacceptable type. Acceptable types are: faces or wires on sketch, whole sketch (if it has at least one face), and whole objects with shape types: %1</source>
+      <translation>Selected shape has unacceptable type. Acceptable types are: faces or wires on sketch, whole sketch (if it has at least one face), and whole objects with shape types: %1</translation>
     </message>
   </context>
   <context>
@@ -369,8 +362,8 @@
   <context>
     <name>Extrusion:GeomValidators_ZeroOffset</name>
     <message>
-      <source>Wrong number of validator arguments in xml(expected 9).</source>
-      <translation>Wrong number of validator arguments in xml(expected 9).</translation>
+      <source>Wrong number of validator arguments in xml (expected 9).</source>
+      <translation>Wrong number of validator arguments in xml (expected 9).</translation>
     </message>
   </context>
   <context>
@@ -608,8 +601,8 @@
   <context>
     <name>ExtrusionCut:base:FeaturesPlugin_ValidatorBaseForGeneration</name>
     <message>
-      <source>Error: Objects with such wire already selected. Don't allow to select this object.</source>
-      <translation>Objects with such wire already selected. Don't allow to select this object.</translation>
+      <source>Error: Objects with this wire already selected. Don't allow to select this object.</source>
+      <translation>Objects with this wire already selected. Don't allow to select this object.</translation>
     </message>
   </context>
   <context>
@@ -650,15 +643,8 @@
   <context>
     <name>ExtrusionCut:base:FeaturesPlugin_ValidatorBaseForGeneration</name>
     <message>
-      <source>Error: Selected shape has unacceptable type. Acceptable types are: faces or wires on sketch, whole sketch(if it has at least one face), and whole objects with shape types: %1</source>
-      <translation>Selected shape has unacceptable type. Acceptable types are: faces or wires on sketch, whole sketch(if it has at least one face), and whole objects with shape types: %1</translation>
-    </message>
-  </context>
-  <context>
-    <name>ExtrusionCut:base:FeaturesPlugin_ValidatorBaseForGeneration</name>
-    <message>
-      <source>Error: Attribute \"%1\" does not supported by this validator.</source>
-      <translation></translation>
+      <source>Error: Selected shape has unacceptable type. Acceptable types are: faces or wires on sketch, whole sketch (if it has at least one face), and whole objects with shape types: %1</source>
+      <translation>Selected shape has unacceptable type. Acceptable types are: faces or wires on sketch, whole sketch (if it has at least one face), and whole objects with shape types: %1</translation>
     </message>
   </context>
   <context>
@@ -846,7 +832,7 @@
   <context>
     <name>ExtrusionCut:GeomValidators_ZeroOffset</name>
     <message>
-      <source>Wrong number of validator arguments in xml(expected 9).</source>
+      <source>Wrong number of validator arguments in xml (expected 9).</source>
       <translation></translation>
     </message>
   </context>
@@ -916,8 +902,8 @@
   <context>
     <name>Revolution:GeomValidators_ZeroOffset</name>
     <message>
-      <source>Wrong number of validator arguments in xml(expected 9).</source>
-      <translation>Wrong number of validator "GeomValidators_ZeroOffset" arguments in xml(expected 9).</translation>
+      <source>Wrong number of validator arguments in xml (expected 9).</source>
+      <translation>Wrong number of validator "GeomValidators_ZeroOffset" arguments in xml (expected 9).</translation>
     </message>
   </context>
   <context>
@@ -1070,8 +1056,8 @@
   <context>
     <name>Revolution:base:FeaturesPlugin_ValidatorBaseForGeneration</name>
     <message>
-      <source>Error: Objects with such wire already selected. Don't allow to select this object.</source>
-      <translation>Objects with such wire already selected. Don't allow to select this object.</translation>
+      <source>Error: Objects with this wire already selected. Don't allow to select this object.</source>
+      <translation>Objects with this wire already selected. Don't allow to select this object.</translation>
     </message>
   </context>
   <context>
@@ -1112,15 +1098,8 @@
   <context>
     <name>Revolution:base:FeaturesPlugin_ValidatorBaseForGeneration</name>
     <message>
-      <source>Error: Selected shape has unacceptable type. Acceptable types are: faces or wires on sketch, whole sketch(if it has at least one face), and whole objects with shape types: %1</source>
-      <translation>Selected shape has unacceptable type. Acceptable types are: faces or wires on sketch, whole sketch(if it has at least one face), and whole objects with shape types: %1</translation>
-    </message>
-  </context>
-  <context>
-    <name>Revolution:base:FeaturesPlugin_ValidatorBaseForGeneration</name>
-    <message>
-      <source>Error: Attribute \"%1\" does not supported by this validator.</source>
-      <translation></translation>
+      <source>Error: Selected shape has unacceptable type. Acceptable types are: faces or wires on sketch, whole sketch (if it has at least one face), and whole objects with shape types: %1</source>
+      <translation>Selected shape has unacceptable type. Acceptable types are: faces or wires on sketch, whole sketch (if it has at least one face), and whole objects with shape types: %1</translation>
     </message>
   </context>
   <context>
@@ -1308,8 +1287,8 @@
   <context>
     <name>RevolutionCut:GeomValidators_ZeroOffset</name>
     <message>
-      <source>Wrong number of validator arguments in xml(expected 9).</source>
-      <translation>Wrong number of validator "GeomValidators_ZeroOffset" arguments in xml(expected 9).</translation>
+      <source>Wrong number of validator arguments in xml (expected 9).</source>
+      <translation>Wrong number of validator "GeomValidators_ZeroOffset" arguments in xml (expected 9).</translation>
     </message>
   </context>
   <context>
@@ -1400,7 +1379,7 @@
     <name>RevolutionCut:Model_FeatureValidator</name>
     <message>
       <source>Attribute "main_objects" is not initialized.</source>
-      <translation>Objects for cut is not selected.</translation>
+      <translation>Objects for cut are not selected.</translation>
     </message>
   </context>
   <context>
@@ -1476,8 +1455,8 @@
   <context>
     <name>RevolutionCut:base:FeaturesPlugin_ValidatorBaseForGeneration</name>
     <message>
-      <source>Error: Objects with such wire already selected. Don't allow to select this object.</source>
-      <translation>Objects with such wire already selected. Don't allow to select this object.</translation>
+      <source>Error: Objects with this wire already selected. Don't allow to select this object.</source>
+      <translation>Objects with this wire already selected. Don't allow to select this object.</translation>
     </message>
   </context>
   <context>
@@ -1518,15 +1497,8 @@
   <context>
     <name>RevolutionCut:base:FeaturesPlugin_ValidatorBaseForGeneration</name>
     <message>
-      <source>Error: Selected shape has unacceptable type. Acceptable types are: faces or wires on sketch, whole sketch(if it has at least one face), and whole objects with shape types: %1</source>
-      <translation>Selected shape has unacceptable type. Acceptable types are: faces or wires on sketch, whole sketch(if it has at least one face), and whole objects with shape types: %1</translation>
-    </message>
-  </context>
-  <context>
-    <name>RevolutionCut:base:FeaturesPlugin_ValidatorBaseForGeneration</name>
-    <message>
-      <source>Error: Attribute \"%1\" does not supported by this validator.</source>
-      <translation></translation>
+      <source>Error: Selected shape has unacceptable type. Acceptable types are: faces or wires on sketch, whole sketch (if it has at least one face), and whole objects with shape types: %1</source>
+      <translation>Selected shape has unacceptable type. Acceptable types are: faces or wires on sketch, whole sketch (if it has at least one face), and whole objects with shape types: %1</translation>
     </message>
   </context>
   <context>
@@ -1903,8 +1875,8 @@
   <context>
     <name>ExtrusionFuse:base:FeaturesPlugin_ValidatorBaseForGeneration</name>
     <message>
-      <source>Error: Objects with such wire already selected. Don't allow to select this object.</source>
-      <translation>Objects with such wire already selected. Don't allow to select this object.</translation>
+      <source>Error: Objects with this wire already selected. Don't allow to select this object.</source>
+      <translation>Objects with this wire already selected. Don't allow to select this object.</translation>
     </message>
   </context>
   <context>
@@ -1945,15 +1917,8 @@
   <context>
     <name>ExtrusionFuse:base:FeaturesPlugin_ValidatorBaseForGeneration</name>
     <message>
-      <source>Error: Selected shape has unacceptable type. Acceptable types are: faces or wires on sketch, whole sketch(if it has at least one face), and whole objects with shape types: %1</source>
-      <translation>Selected shape has unacceptable type. Acceptable types are: faces or wires on sketch, whole sketch(if it has at least one face), and whole objects with shape types: %1</translation>
-    </message>
-  </context>
-  <context>
-    <name>ExtrusionFuse:base:FeaturesPlugin_ValidatorBaseForGeneration</name>
-    <message>
-      <source>Error: Attribute \"%1\" does not supported by this validator.</source>
-      <translation></translation>
+      <source>Error: Selected shape has unacceptable type. Acceptable types are: faces or wires on sketch, whole sketch (if it has at least one face), and whole objects with shape types: %1</source>
+      <translation>Selected shape has unacceptable type. Acceptable types are: faces or wires on sketch, whole sketch (if it has at least one face), and whole objects with shape types: %1</translation>
     </message>
   </context>
   <context>
@@ -2141,7 +2106,7 @@
   <context>
     <name>ExtrusionFuse:GeomValidators_ZeroOffset</name>
     <message>
-      <source>Wrong number of validator arguments in xml(expected 9).</source>
+      <source>Wrong number of validator arguments in xml (expected 9).</source>
       <translation></translation>
     </message>
   </context>
@@ -2232,8 +2197,8 @@
   <context>
     <name>RevolutionFuse:GeomValidators_ZeroOffset</name>
     <message>
-      <source>Wrong number of validator arguments in xml(expected 9).</source>
-      <translation>Wrong number of validator "GeomValidators_ZeroOffset" arguments in xml(expected 9).</translation>
+      <source>Wrong number of validator arguments in xml (expected 9).</source>
+      <translation>Wrong number of validator "GeomValidators_ZeroOffset" arguments in xml (expected 9).</translation>
     </message>
   </context>
   <context>
@@ -2400,8 +2365,8 @@
   <context>
     <name>RevolutionFuse:base:FeaturesPlugin_ValidatorBaseForGeneration</name>
     <message>
-      <source>Error: Objects with such wire already selected. Don't allow to select this object.</source>
-      <translation>Objects with such wire already selected. Don't allow to select this object.</translation>
+      <source>Error: Objects with this wire already selected. Don't allow to select this object.</source>
+      <translation>Objects with this wire already selected. Don't allow to select this object.</translation>
     </message>
   </context>
   <context>
@@ -2442,15 +2407,8 @@
   <context>
     <name>RevolutionFuse:base:FeaturesPlugin_ValidatorBaseForGeneration</name>
     <message>
-      <source>Error: Selected shape has unacceptable type. Acceptable types are: faces or wires on sketch, whole sketch(if it has at least one face), and whole objects with shape types: %1</source>
-      <translation>Selected shape has unacceptable type. Acceptable types are: faces or wires on sketch, whole sketch(if it has at least one face), and whole objects with shape types: %1</translation>
-    </message>
-  </context>
-  <context>
-    <name>RevolutionFuse:base:FeaturesPlugin_ValidatorBaseForGeneration</name>
-    <message>
-      <source>Error: Attribute \"%1\" does not supported by this validator.</source>
-      <translation></translation>
+      <source>Error: Selected shape has unacceptable type. Acceptable types are: faces or wires on sketch, whole sketch (if it has at least one face), and whole objects with shape types: %1</source>
+      <translation>Selected shape has unacceptable type. Acceptable types are: faces or wires on sketch, whole sketch (if it has at least one face), and whole objects with shape types: %1</translation>
     </message>
   </context>
   <context>
@@ -2786,7 +2744,7 @@
     <name>Partition:GeomValidators_MinObjectsSelected</name>
     <message>
       <source>Error: Wrong number of arguments (expected 2): selection list id and min number of objects</source>
-      <translation>Wrong number of validator "GeomValidators_MinObjectsSelected" arguments(expected 2): selection list id and min number of objects.</translation>
+      <translation>Wrong number of validator "GeomValidators_MinObjectsSelected" arguments (expected 2): selection list id and min number of objects.</translation>
     </message>
   </context>
   <context>
@@ -2857,13 +2815,6 @@
     <message>
       <source>Error: Empty context.</source>
       <translation>Object for pipe path is not selected.</translation>
-    </message>
-  </context>
-  <context>
-    <name>Pipe:FeaturesPlugin_ValidatorPipeLocations</name>
-    <message>
-      <source>Error: Feature \"%1\" does not supported by this validator.</source>
-      <translation>Feature "%1" does not supported validator "FeaturesPlugin_ValidatorPipeLocations".</translation>
     </message>
   </context>
   <context>
@@ -2960,8 +2911,8 @@
   <context>
     <name>Pipe:base_objects:FeaturesPlugin_ValidatorBaseForGeneration</name>
     <message>
-      <source>Error: Objects with such wire already selected. Don't allow to select this object.</source>
-      <translation>Objects with such wire already selected. Don't allow to select this object.</translation>
+      <source>Error: Objects with this wire already selected. Don't allow to select this object.</source>
+      <translation>Objects with this wire already selected. Don't allow to select this object.</translation>
     </message>
   </context>
   <context>
@@ -3002,15 +2953,8 @@
   <context>
     <name>Pipe:base_objects:FeaturesPlugin_ValidatorBaseForGeneration</name>
     <message>
-      <source>Error: Selected shape has unacceptable type. Acceptable types are: faces or wires on sketch, whole sketch(if it has at least one face), and whole objects with shape types: %1</source>
-      <translation>Selected shape has unacceptable type. Acceptable types are: faces or wires on sketch, whole sketch(if it has at least one face), and whole objects with shape types: %1</translation>
-    </message>
-  </context>
-  <context>
-    <name>Pipe:base_objects:FeaturesPlugin_ValidatorBaseForGeneration</name>
-    <message>
-      <source>Error: Attribute \"%1\" does not supported by this validator.</source>
-      <translation></translation>
+      <source>Error: Selected shape has unacceptable type. Acceptable types are: faces or wires on sketch, whole sketch (if it has at least one face), and whole objects with shape types: %1</source>
+      <translation>Selected shape has unacceptable type. Acceptable types are: faces or wires on sketch, whole sketch (if it has at least one face), and whole objects with shape types: %1</translation>
     </message>
   </context>
   <context>
@@ -3102,13 +3046,6 @@
     <message>
       <source>Error: Empty context.</source>
       <translation>Selected object has empty context.</translation>
-    </message>
-  </context>
-  <context>
-    <name>Remove_SubShapes:FeaturesPlugin_ValidatorRemoveSubShapesResult</name>
-    <message>
-      <source>Error: Feature \"%1\" does not supported by this validator.</source>
-      <translation>Feature "%1" does not supported validator "FeaturesPlugin_ValidatorRemoveSubShapesResult".</translation>
     </message>
   </context>
   <context>
@@ -3210,13 +3147,6 @@
     </message>
   </context>
   <context>
-    <name>Remove_SubShapes:base_shape:GeomValidators_BodyShapes</name>
-    <message>
-      <source>Error: Attribute \"%1\" does not supported by this validator.</source>
-      <translation></translation>
-    </message>
-  </context>
-  <context>
     <name>Remove_SubShapes:subshapes:FeaturesPlugin_ValidatorRemoveSubShapesSelection</name>
     <message>
       <source>Error: This validator can only work with selection list in \"Remove Sub-Shapes\" feature.</source>
@@ -3290,7 +3220,7 @@
     <name>Intersection:tool_objects:GeomValidators_IntersectionSelection</name>
     <message>
       <source>Error: empty feature.</source>
-      <translation>Selected objects has empty feature.</translation>
+      <translation>Selected objects have empty feature.</translation>
     </message>
   </context>
   <context>
@@ -3632,13 +3562,6 @@
   <context>
     <name>Union:FeaturesPlugin_ValidatorUnionArguments</name>
     <message>
-      <source>Error: This validator supports only \"%1\" feature.</source>
-      <translation>This validator "FeaturesPlugin_ValidatorUnionArguments" supports only "%1" feature.</translation>
-    </message>
-  </context>
-  <context>
-    <name>Union:FeaturesPlugin_ValidatorUnionArguments</name>
-    <message>
       <source>Error: Could not get \"%1\" attribute.</source>
       <translation>Could not get "%1" attribute.</translation>
     </message>
@@ -3695,8 +3618,8 @@
   <context>
     <name>FusionFaces:Model_FeatureValidator</name>
     <message>
-      <source>Attribute "base_shape" is not initialized.</source >
-      <translation>Base shape is not selected.</translation >
+      <source>Attribute "base_shape" is not initialized.</source>
+      <translation>Base shape is not selected.</translation>
     </message>
   </context>
 </TS>

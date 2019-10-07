@@ -63,7 +63,7 @@ public:
     const ObjectPtr& theContext, const std::shared_ptr<GeomAPI_Shape>& theSubShape,
     const bool theTemporarily = false);
 
-  /// Same as SetValue, but it takes an edge (on circular or elliptical curve)
+  /// Same as SetValue, but it takes an edge (on circular or elliptic curve)
   /// and stores the vertex of the central point (for ellipse the first or the second focus point)
   MODEL_EXPORT virtual void setValueCenter(
     const ObjectPtr& theContext, const std::shared_ptr<GeomAPI_Edge>& theEdge,
@@ -201,6 +201,10 @@ protected:
   /// Returns the module document label if this selection attribute is not in this document.
   /// Returns null label otherwise.
   TDF_Label baseDocumentLab();
+
+  /// Returns features that conceals theFeature and located in history before theStop
+  void concealedFeature(
+    const FeaturePtr theFeature, const FeaturePtr theStop, std::list<FeaturePtr>& theConcealers);
 
   friend class Model_Data;
   friend class Model_AttributeSelectionList;

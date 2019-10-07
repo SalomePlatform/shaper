@@ -22,11 +22,21 @@
 // Author:      Artem ZHIDKOV
 
 #include <GeomAPI_Ellipse2d.h>
+#include <GeomAPI_Circ2d.h>
 #include <GeomAPI_Dir2d.h>
+#include <GeomAPI_Lin2d.h>
 #include <GeomAPI_Pnt2d.h>
 
+#include <Extrema_ExtCC2d.hxx>
+#include <Extrema_ExtElC2d.hxx>
+#include <Geom2d_Ellipse.hxx>
+#include <Geom2dAdaptor_Curve.hxx>
+#include <Geom2dAPI_ProjectPointOnCurve.hxx>
+#include <GeomLib_Tool.hxx>
 #include <gp_Ax22d.hxx>
 #include <gp_Elips2d.hxx>
+#include <IntAna2d_AnaIntersection.hxx>
+#include <IntAna2d_Conic.hxx>
 #include <Precision.hxx>
 
 #define MY_ELLIPSE implPtr<gp_Elips2d>()
@@ -111,4 +121,117 @@ double GeomAPI_Ellipse2d::minorRadius() const
 double GeomAPI_Ellipse2d::majorRadius() const
 {
   return MY_ELLIPSE->MajorRadius();
+}
+
+// theArrangePoint is used to select the nearest solution point if intersection is detected
+template <typename EXTREMAPTR>
+static double extrema(IntAna2d_AnaIntersection* theIntersectionAlgo,
+                      EXTREMAPTR theExtremaAlgo,
+                      GeomPnt2dPtr theArrangePoint,
+                      GeomPnt2dPtr& thePoint1,
+                      GeomPnt2dPtr& thePoint2)
+{
+  double aDistance = Precision::Infinite();
+  if (theIntersectionAlgo->IsDone() && theIntersectionAlgo->NbPoints() > 0) {
+    gp_Pnt2d anArrangePoint(theArrangePoint->x(), theArrangePoint->y());
+    gp_Pnt2d anInterPnt = theIntersectionAlgo->Point(1).Value();
+    aDistance = anArrangePoint.SquareDistance(anInterPnt);
+    int aNbMergedPoints = 1;
+    // get solution nearest to theArrangePoint,
+    // if there are several point near each other, calculate average coordinates
+    for (int i = 2; i <= theIntersectionAlgo->NbPoints(); ++i) {
+      const IntAna2d_IntPoint& aPnt = theIntersectionAlgo->Point(i);
+      double aSqDist = aPnt.Value().SquareDistance(anArrangePoint);
+      if (aSqDist - aDistance < -Precision::Confusion() * aDistance) {
+        aDistance = aSqDist;
+        anInterPnt = aPnt.Value();
+        aNbMergedPoints = 1;
+      } else if (aSqDist - aDistance < Precision::Confusion() * aDistance) {
+        anInterPnt.ChangeCoord() =
+            (anInterPnt.XY() * aNbMergedPoints + aPnt.Value().XY()) / (aNbMergedPoints + 1);
+        ++aNbMergedPoints;
+      }
+    }
+
+    aDistance = 0.0; // curves are intersected
+    thePoint1 = GeomPnt2dPtr(new GeomAPI_Pnt2d(anInterPnt.X(), anInterPnt.Y()));
+    thePoint2 = GeomPnt2dPtr(new GeomAPI_Pnt2d(anInterPnt.X(), anInterPnt.Y()));
+  }
+  else if (theExtremaAlgo->IsDone() && theExtremaAlgo->NbExt() > 0) {
+    Extrema_POnCurv2d aP1, aP2;
+    for (int i = 1; i <= theExtremaAlgo->NbExt(); ++i) {
+      double aSqDist = theExtremaAlgo->SquareDistance(i);
+      if (aSqDist < aDistance) {
+        aDistance = aSqDist;
+        theExtremaAlgo->Points(i, aP1, aP2);
+      }
+    }
+    aDistance = Sqrt(aDistance);
+    thePoint1 = GeomPnt2dPtr(new GeomAPI_Pnt2d(aP1.Value().X(), aP1.Value().Y()));
+    thePoint2 = GeomPnt2dPtr(new GeomAPI_Pnt2d(aP2.Value().X(), aP2.Value().Y()));
+  }
+  return aDistance;
+}
+
+double GeomAPI_Ellipse2d::distance(const std::shared_ptr<GeomAPI_Lin2d>& theLine,
+                                   std::shared_ptr<GeomAPI_Pnt2d>& thePointOnMe,
+                                   std::shared_ptr<GeomAPI_Pnt2d>& thePointOnLine)
+{
+  IntAna2d_AnaIntersection anInter(theLine->impl<gp_Lin2d>(), IntAna2d_Conic(*MY_ELLIPSE));
+  Extrema_ExtElC2d anExtema(theLine->impl<gp_Lin2d>(), *MY_ELLIPSE);
+  return extrema(&anInter, &anExtema, theLine->location(), thePointOnLine, thePointOnMe);
+}
+
+double GeomAPI_Ellipse2d::distance(const std::shared_ptr<GeomAPI_Circ2d>& theCircle,
+                                   std::shared_ptr<GeomAPI_Pnt2d>& thePointOnMe,
+                                   std::shared_ptr<GeomAPI_Pnt2d>& thePointOnCircle)
+{
+  IntAna2d_AnaIntersection anInter(theCircle->impl<gp_Circ2d>(), IntAna2d_Conic(*MY_ELLIPSE));
+  Extrema_ExtElC2d anExtema(theCircle->impl<gp_Circ2d>(), *MY_ELLIPSE);
+  return extrema(&anInter, &anExtema, firstFocus(), thePointOnCircle, thePointOnMe);
+}
+
+double GeomAPI_Ellipse2d::distance(const std::shared_ptr<GeomAPI_Ellipse2d>& theEllipse,
+                                   std::shared_ptr<GeomAPI_Pnt2d>& thePointOnMe,
+                                   std::shared_ptr<GeomAPI_Pnt2d>& thePointOnEllipse)
+{
+  Handle(Geom2d_Ellipse) anEllipse1 = new Geom2d_Ellipse(theEllipse->impl<gp_Elips2d>());
+  Handle(Geom2d_Ellipse) anEllipse2 = new Geom2d_Ellipse(*MY_ELLIPSE);
+
+  IntAna2d_AnaIntersection anInter(theEllipse->impl<gp_Elips2d>(), IntAna2d_Conic(*MY_ELLIPSE));
+  Extrema_ExtCC2d* anExtema =
+      new Extrema_ExtCC2d(Geom2dAdaptor_Curve(anEllipse1), Geom2dAdaptor_Curve(anEllipse2));
+  double aDistance = extrema(&anInter, anExtema, theEllipse->firstFocus(),
+                             thePointOnEllipse, thePointOnMe);
+  delete anExtema;
+  return aDistance;
+}
+
+const std::shared_ptr<GeomAPI_Pnt2d> GeomAPI_Ellipse2d::project(
+    const std::shared_ptr<GeomAPI_Pnt2d>& thePoint) const
+{
+  std::shared_ptr<GeomAPI_Pnt2d> aResult;
+  if (!MY_ELLIPSE)
+    return aResult;
+
+  Handle(Geom2d_Ellipse) aEllipse = new Geom2d_Ellipse(*MY_ELLIPSE);
+
+  const gp_Pnt2d& aPoint = thePoint->impl<gp_Pnt2d>();
+
+  Geom2dAPI_ProjectPointOnCurve aProj(aPoint, aEllipse);
+  Standard_Integer aNbPoint = aProj.NbPoints();
+  if (aNbPoint > 0) {
+    gp_Pnt2d aNearest = aProj.NearestPoint();
+    aResult.reset(new GeomAPI_Pnt2d(aNearest.X(), aNearest.Y()));
+  }
+  return aResult;
+}
+
+const bool GeomAPI_Ellipse2d::parameter(const std::shared_ptr<GeomAPI_Pnt2d> thePoint,
+                                        const double theTolerance,
+                                        double& theParameter) const
+{
+  Handle(Geom2d_Ellipse) aCurve = new Geom2d_Ellipse(*MY_ELLIPSE);
+  return GeomLib_Tool::Parameter(aCurve, thePoint->impl<gp_Pnt2d>(),
+                                 theTolerance, theParameter) == Standard_True;
 }

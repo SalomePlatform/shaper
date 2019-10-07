@@ -30,11 +30,11 @@
 #include <ModelAPI_Validator.h>
 #include <ModelAPI_Session.h>
 
-#include <GeomAPI_Pnt.h>
+#include <GeomAPI_Edge.h>
 #include <GeomAPI_Lin2d.h>
+#include <GeomAPI_Pnt.h>
 #include <GeomAPI_Pnt2d.h>
 
-#include <GeomAlgoAPI_EdgeBuilder.h>
 #include <GeomDataAPI_Point2D.h>
 
 SketchPlugin_Line::SketchPlugin_Line()
@@ -47,6 +47,9 @@ void SketchPlugin_Line::initAttributes()
   /// new attributes should be added to end of the feature in order to provide
   /// correct attribute values in previous saved studies
   data()->addAttribute(LENGTH_ID(), ModelAPI_AttributeDouble::typeId());
+
+  data()->addAttribute(PARENT_ID(), ModelAPI_AttributeReference::typeId());
+  ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(), PARENT_ID());
 }
 
 void SketchPlugin_Line::initDerivedClassAttributes()
@@ -68,18 +71,7 @@ void SketchPlugin_Line::execute()
     std::shared_ptr<GeomDataAPI_Point2D> anEndAttr = std::dynamic_pointer_cast<
         GeomDataAPI_Point2D>(data()->attribute(END_ID()));
     if (aStartAttr->isInitialized() && anEndAttr->isInitialized()) {
-      std::shared_ptr<GeomAPI_Pnt> aStart(aSketch->to3D(aStartAttr->x(), aStartAttr->y()));
-      std::shared_ptr<GeomAPI_Pnt> anEnd(aSketch->to3D(anEndAttr->x(), anEndAttr->y()));
-      //std::cout<<"Execute line "<<aStart->x()<<" "<<aStart->y()<<" "<<aStart->z()<<" - "
-      //  <<anEnd->x()<<" "<<anEnd->y()<<" "<<anEnd->z()<<std::endl;
-      // make linear edge
-      std::shared_ptr<GeomAPI_Edge> anEdge = GeomAlgoAPI_EdgeBuilder::line(aStart, anEnd);
-      // store the result
-      std::shared_ptr<ModelAPI_ResultConstruction> aConstr = document()->createConstruction(
-          data());
-      aConstr->setShape(anEdge);
-      aConstr->setIsInHistory(false);
-      setResult(aConstr);
+      SketchPlugin_Sketch::createLine2DResult(this, aSketch, START_ID(), END_ID());
 
       static Events_ID anId = ModelAPI_EventReentrantMessage::eventId();
       std::shared_ptr<ModelAPI_EventReentrantMessage> aMessage = std::shared_ptr

@@ -11,7 +11,7 @@
                helpfile="exportFeature.html">
         <source path="export_widget.xml" />
       </feature>
-      <feature id="Dump" title="Dump" tooltip="Dump python script" icon="icons/Exchange/dump.png"
+      <feature id="Dump" title="Dump" tooltip="Dump Python script" icon="icons/Exchange/dump.png"
                helpfile="dumpFeature.html">
         <export_file_selector id="file_path"
                               type="save"

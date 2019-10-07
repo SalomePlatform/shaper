@@ -205,6 +205,9 @@ bool SketcherPrs_LengthDimension::readyToDisplay(ModelAPI_Feature* theConstraint
                                                  const std::shared_ptr<GeomAPI_Ax3>& thePlane,
                                                  gp_Pnt& thePnt1, gp_Pnt& thePnt2)
 {
+  if (!thePlane)
+    return false;
+
   DataPtr aData = theConstraint->data();
   if (theConstraint->getKind() == SketchPlugin_ConstraintLength::ID()) {
     // The constraint is length

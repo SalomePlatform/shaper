@@ -21,7 +21,7 @@
 #include <Events_LongOp.h>
 
 // Multiplier to correlate IDs of SketchPlugin constraint and primitive PlaneGCS constraints
-static const int THE_CONSTRAINT_MULT = 10;
+static const int THE_CONSTRAINT_MULT = 100;
 
 
 PlaneGCSSolver_Solver::PlaneGCSSolver_Solver()
@@ -245,9 +245,12 @@ void PlaneGCSSolver_Solver::diagnose(const GCS::Algorithm& theAlgo)
 
 void PlaneGCSSolver_Solver::addFictiveConstraintIfNecessary()
 {
-  if (!myConstraints.empty() &&
-      myConstraints.find(CID_MOVEMENT) == myConstraints.end())
-    return;
+  bool hasOnlyMovement = true;
+  for (ConstraintMap::iterator anIt = myConstraints.begin();
+       anIt != myConstraints.end() && hasOnlyMovement; ++anIt)
+    hasOnlyMovement = anIt->first == CID_MOVEMENT;
+  if (!hasOnlyMovement)
+    return; // regular constraints are available too
 
   if (myFictiveConstraint)
     return; // no need several fictive constraints
@@ -266,12 +269,14 @@ void PlaneGCSSolver_Solver::addFictiveConstraintIfNecessary()
 void PlaneGCSSolver_Solver::removeFictiveConstraint()
 {
   if (myFictiveConstraint) {
-    myEquationSystem->removeConstraint(myFictiveConstraint);
+    myEquationSystem->clearByTag(myFictiveConstraint->getTag());
     myParameters.pop_back();
 
     GCS::VEC_pD aParams = myFictiveConstraint->params();
-    for (GCS::VEC_pD::iterator anIt = aParams.begin(); anIt != aParams.end(); ++ anIt)
-      delete *anIt;
+    for (GCS::VEC_pD::iterator anIt = aParams.begin(); anIt != aParams.end(); ++anIt) {
+      double* aPar = *anIt;
+      delete aPar;
+    }
     delete myFictiveConstraint;
     myFictiveConstraint = 0;
   }

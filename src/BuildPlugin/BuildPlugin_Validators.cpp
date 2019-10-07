@@ -99,7 +99,7 @@ bool BuildPlugin_ValidatorBaseForBuild::isValid(const AttributePtr& theAttribute
       std::dynamic_pointer_cast<ModelAPI_ResultConstruction>(aContext);
     if(aConstruction.get()) {
       if(aConstruction->isInfinite()) {
-        theError = "Inifinte objects not acceptable.";
+        theError = "Infinite objects not acceptable.";
         return false;
       }
 

@@ -103,6 +103,17 @@
   }
 }
 
+%typemap(in) double & (double temp) {
+  if (PyLong_Check($input)) {
+    temp = PyLong_AsLong($input);
+    $1 = &temp;
+  }
+}
+
+%typemap(argout) double & {
+  $result = PyFloat_FromDouble(*$1);
+}
+
 
 // all supported interfaces
 %include "GeomAPI_Interface.h"

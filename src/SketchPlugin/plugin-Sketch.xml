@@ -5,6 +5,7 @@
         id="Sketch"
         nested="SketchPoint SketchIntersectionPoint SketchLine
                 SketchCircle SketchMacroCircle SketchArc SketchMacroArc
+                SketchEllipse SketchMacroEllipse SketchEllipticArc SketchMacroEllipticArc
                 SketchRectangle
                 SketchProjection
                 SketchConstraintLength SketchConstraintRadius SketchConstraintDistance SketchConstraintDistanceHorizontal SketchConstraintDistanceVertical
@@ -12,7 +13,7 @@
                 SketchConstraintRigid SketchConstraintHorizontal SketchConstraintVertical
                 SketchConstraintEqual SketchConstraintTangent
                 SketchFillet SketchSplit SketchTrim
-                SketchConstraintCoincidence
+                SketchConstraintCoincidence SketchConstraintCoincidenceInternal
                 SketchConstraintMirror SketchConstraintAngle
                 SketchMultiRotation SketchMultiTranslation
                 SketchConstraintCollinear SketchConstraintMiddle"
@@ -24,7 +25,7 @@
         <sketch-start-label id="External" geometrical_selection="true" title="Select a plane on which to create a sketch" tooltip="Select a plane on which to create a sketch">
           <validator id="GeomValidators_Face" parameters="plane"/>
         </sketch-start-label>
-        <label id="SolverDOF"/>
+        <!-- <label id="SolverDOF"/>  -->
         <label id="SolverError" styleSheet="color : red; font : bold"/>
         <validator id="SketchPlugin_SolverErrorValidator"/>
       </feature>
@@ -44,13 +45,13 @@
                                  enable_value="enable_by_preferences"/>
         <sketch-2dpoint_selector id="EndPoint" accept_expressions="0" title="End point" tooltip="End point coordinates"
                                  enable_value="enable_by_preferences"/>
-        <labelvalue id="LineLength" accept_expressions="0" label="Length:" default="computed" icon="icons/Sketch/distance_value.png"
+        <labelvalue id="LineLength" accept_expressions="0" label="Length" default="computed" icon="icons/Sketch/distance_value.png"
                      tooltip="Line length" obligatory="0" enable_value="false"/>
         <boolvalue id="Auxiliary" label="Auxiliary" default="false" tooltip="Construction element" obligatory="0"/>
         <validator id="GeomValidators_Different" parameters="StartPoint,EndPoint"/>
       </feature>
     </group>
-    <group id="Circular geometry">
+    <group id="Conical geometry">
       <!-- SketchCircle is a hidden feature. It is created inside SketchMacroCircle. -->
       <feature id="SketchCircle"
                title="Circle"
@@ -64,7 +65,7 @@
                                  enable_value="enable_by_preferences"/>
         <labelvalue id="circle_radius"
                     icon="icons/Sketch/radius.png"
-                    label="Radius:"
+                    label="Radius"
                     tooltip="Set radius"
                     default="computed"
                     accept_expressions="0"
@@ -129,13 +130,12 @@
         </toolbox>
         <labelvalue id="circle_radius"
                     icon="icons/Sketch/radius.png"
-                    label="Radius:"
+                    label="Radius"
                     tooltip="Set radius"
                     default="computed"
                     accept_expressions="0"
                     obligatory="0"
                     enable_value="enable_by_preferences">
-          <validator id="GeomValidators_Positive"/>
         </labelvalue>
         <boolvalue id="Auxiliary"
                    tooltip="Construction element"
@@ -168,7 +168,7 @@
         <validator id="GeomValidators_Different" parameters="center_point,start_point,end_point"/>
         <labelvalue id="radius"
                     icon="icons/Sketch/radius.png"
-                    label="Radius:"
+                    label="Radius"
                     tooltip="Set radius"
                     accept_expressions="0"
                     min="0"
@@ -178,7 +178,7 @@
         </labelvalue>
         <labelvalue id="angle"
                     icon="icons/Sketch/angle.png"
-                    label="Angle:"
+                    label="Angle"
                     tooltip="Set angle"
                     default="0"
                     use_reset="false"
@@ -272,10 +272,28 @@
               <validator id="SketchPlugin_ArcEndPointValidator" parameters="end_point_ref"/>
             </sketch-2dpoint_selector>
           </box>
+          <box id="by_transversal_line"
+               icon="icons/Sketch/arc_perp_32x32.png"
+               title="Perpendicular to line">
+            <sketch_shape_selector id="tangent_point"
+                                   label="Point on the perpendicular line"
+                                   tooltip="Select point on line"
+                                   shape_types="vertex">
+              <validator id="SketchPlugin_ArcTransversalPoint"/>
+            </sketch_shape_selector>
+            <sketch-2dpoint_selector id="end_point_3"
+                                     reference_attribute="end_point_ref"
+                                     title="End point"
+                                     tooltip="End point"
+                                     accept_expressions="0"
+                                     enable_value="enable_by_preferences">
+              <validator id="SketchPlugin_ArcEndPointValidator" parameters="end_point_ref"/>
+            </sketch-2dpoint_selector>
+          </box>
         </toolbox>
         <labelvalue id="radius"
                     icon="icons/Sketch/radius.png"
-                    label="Radius:"
+                    label="Radius"
                     tooltip="Set radius"
                     accept_expressions="0"
                     min="0"
@@ -285,7 +303,7 @@
         </labelvalue>
         <labelvalue id="angle"
                     icon="icons/Sketch/angle.png"
-                    label="Angle:"
+                    label="Angle"
                     tooltip="Set angle"
                     default="0"
                     use_reset="false"
@@ -312,6 +330,269 @@
         </sketch_shape_selector>
         <!--<validator id="PartSet_FilletSelection"/>-->
       </feature>
+
+      <!-- SketchEllipse is a hidden feature. It is created inside SketchMacroEllipse. -->
+      <feature id="SketchEllipse"
+               title="Ellipse"
+               tooltip="Create ellipse"
+               icon="icons/Sketch/ellipse.png"
+               internal="1">
+        <sketch-2dpoint_selector id="ellipse_center"
+                                 title="Center"
+                                 tooltip="Center coordinates"
+                                 accept_expressions="0"
+                                 enable_value="enable_by_preferences"/>
+        <sketch-2dpoint_selector id="ellipse_first_focus"
+                                 title="First focus"
+                                 tooltip="Focus coordinates"
+                                 accept_expressions="0"
+                                 enable_value="enable_by_preferences"/>
+        <sketch-2dpoint_selector id="ellipse_second_focus"
+                                 title="Second focus"
+                                 tooltip="Focus coordinates"
+                                 accept_expressions="0"
+                                 enable_value="enable_by_preferences"/>
+        <sketch-2dpoint_selector id="ellipse_major_axis_start_point"
+                                 title="Major axis start"
+                                 tooltip="Coordinates of point on negative direction of major axis"
+                                 accept_expressions="0"
+                                 enable_value="enable_by_preferences"/>
+        <sketch-2dpoint_selector id="ellipse_major_axis_end_point"
+                                 title="Major axis end"
+                                 tooltip="Coordinates of point on positive direction of major axis"
+                                 accept_expressions="0"
+                                 enable_value="enable_by_preferences"/>
+        <sketch-2dpoint_selector id="ellipse_minor_axis_start_point"
+                                 title="Minor axis start"
+                                 tooltip="Coordinates of point on negative direction of minor axis"
+                                 accept_expressions="0"
+                                 enable_value="enable_by_preferences"/>
+        <sketch-2dpoint_selector id="ellipse_minor_axis_end_point"
+                                 title="Minor axis end"
+                                 tooltip="Coordinates of point on positive direction of minor axis"
+                                 accept_expressions="0"
+                                 enable_value="enable_by_preferences"/>
+        <labelvalue id="ellipse_major_radius"
+                    icon="icons/Sketch/radius_major.png"
+                    label="Major radius"
+                    tooltip="Set major radius"
+                    default="computed"
+                    accept_expressions="0"
+                    enable_value="enable_by_preferences">
+        </labelvalue>
+        <labelvalue id="ellipse_minor_radius"
+                    icon="icons/Sketch/radius_minor.png"
+                    label="Minor radius"
+                    tooltip="Set minor radius"
+                    default="computed"
+                    accept_expressions="0"
+                    enable_value="enable_by_preferences">
+        </labelvalue>
+        <boolvalue id="Auxiliary" label="Auxiliary" default="false" tooltip="Construction element" obligatory="0"/>
+      </feature>
+      <!-- SketchMacroEllipse -->
+      <feature id="SketchMacroEllipse"
+               icon="icons/Sketch/ellipse.png"
+               title="Ellipse"
+               tooltip="Create ellipse"
+               helpfile="ellipseFeature.html">
+        <toolbox id="ellipse_type" modified_in_edit="edit_ellipse_type">
+          <box id="by_center_axis_point"
+               icon="icons/Sketch/ellipse_cent_rad_32x32.png"
+               title="Center, major semi-axis and passing point">
+            <sketch-2dpoint_selector id="first_point"
+                                     reference_attribute="first_point_ref"
+                                     title="Center point"
+                                     tooltip="Center point coordinates"
+                                     accept_expressions="0"
+                                     enable_value="enable_by_preferences"/>
+            <sketch-2dpoint_selector id="second_point"
+                                     reference_attribute="second_point_ref"
+                                     title="Major axis point"
+                                     tooltip="Major axis point coordinates"
+                                     accept_expressions="0"
+                                     enable_value="enable_by_preferences"/>
+            <sketch-2dpoint_selector id="passed_point"
+                                     reference_attribute="passed_point_ref"
+                                     title="Passed point"
+                                     tooltip="Passed point coordinates"
+                                     accept_expressions="0"
+                                     enable_value="enable_by_preferences"/>
+          </box>
+          <box id="by_major_axis_and_point"
+               icon="icons/Sketch/ellipse_axes_32x32.png"
+               title="Major axis and passing point">
+            <sketch-2dpoint_selector id="first_point_1"
+                                     reference_attribute="first_point_ref_1"
+                                     title="Major axis start point"
+                                     tooltip="Major axis start point coordinates"
+                                     accept_expressions="0"
+                                     enable_value="enable_by_preferences"/>
+            <sketch-2dpoint_selector id="second_point_1"
+                                     reference_attribute="second_point_ref_1"
+                                     title="Major axis end point"
+                                     tooltip="Major axis end point coordinates"
+                                     accept_expressions="0"
+                                     enable_value="enable_by_preferences"/>
+            <sketch-2dpoint_selector id="passed_point_1"
+                                     reference_attribute="passed_point_ref_1"
+                                     title="Passed point"
+                                     tooltip="Passed point coordinates"
+                                     accept_expressions="0"
+                                     enable_value="enable_by_preferences"/>
+          </box>
+        </toolbox>
+        <labelvalue id="major_radius"
+                    icon="icons/Sketch/radius_major.png"
+                    label="Major radius"
+                    tooltip="Set major radius"
+                    default="computed"
+                    accept_expressions="0"
+                    obligatory="0"
+                    enable_value="enable_by_preferences">
+        </labelvalue>
+        <labelvalue id="minor_radius"
+                    icon="icons/Sketch/radius_minor.png"
+                    label="Minor radius"
+                    tooltip="Set minor radius"
+                    default="computed"
+                    accept_expressions="0"
+                    obligatory="0"
+                    enable_value="enable_by_preferences">
+        </labelvalue>
+        <boolvalue id="Auxiliary"
+                   tooltip="Construction element"
+                   label="Auxiliary"
+                   default="false"
+                   obligatory="0"/>
+      </feature>
+
+      <!-- SketchEllipticArc is a hidden feature. It is created inside SketchMacroEllipse. -->
+      <feature id="SketchEllipticArc"
+               title="Elliptic arc"
+               tooltip="Create elliptic arc"
+               icon="icons/Sketch/elliptic_arc.png"
+               internal="1">
+        <sketch-2dpoint_selector id="ellipse_center"
+                                 title="Center"
+                                 tooltip="Center coordinates"
+                                 accept_expressions="0"
+                                 enable_value="enable_by_preferences"/>
+        <sketch-2dpoint_selector id="ellipse_first_focus"
+                                 title="First focus"
+                                 tooltip="Focus coordinates"
+                                 accept_expressions="0"
+                                 enable_value="enable_by_preferences"/>
+        <sketch-2dpoint_selector id="ellipse_second_focus"
+                                 title="Second focus"
+                                 tooltip="Focus coordinates"
+                                 accept_expressions="0"
+                                 enable_value="enable_by_preferences"/>
+        <sketch-2dpoint_selector id="ellipse_major_axis_start_point"
+                                 title="Major axis start"
+                                 tooltip="Coordinates of point on negative direction of major axis"
+                                 accept_expressions="0"
+                                 enable_value="enable_by_preferences"/>
+        <sketch-2dpoint_selector id="ellipse_major_axis_end_point"
+                                 title="Major axis end"
+                                 tooltip="Coordinates of point on positive direction of major axis"
+                                 accept_expressions="0"
+                                 enable_value="enable_by_preferences"/>
+        <sketch-2dpoint_selector id="ellipse_minor_axis_start_point"
+                                 title="Minor axis start"
+                                 tooltip="Coordinates of point on negative direction of minor axis"
+                                 accept_expressions="0"
+                                 enable_value="enable_by_preferences"/>
+        <sketch-2dpoint_selector id="ellipse_minor_axis_end_point"
+                                 title="Minor axis end"
+                                 tooltip="Coordinates of point on positive direction of minor axis"
+                                 accept_expressions="0"
+                                 enable_value="enable_by_preferences"/>
+        <sketch-2dpoint_selector id="start_point"
+                                 title="Start point"
+                                 tooltip="Arc start point coordinates"
+                                 accept_expressions="0"
+                                 enable_value="enable_by_preferences"/>
+        <sketch-2dpoint_selector id="end_point"
+                                 title="End point"
+                                 tooltip="Arc end point coordinates"
+                                 accept_expressions="0"
+                                 enable_value="enable_by_preferences"/>
+        <labelvalue id="ellipse_major_radius"
+                    icon="icons/Sketch/radius_major.png"
+                    label="Major radius"
+                    tooltip="Set major radius"
+                    default="computed"
+                    accept_expressions="0"
+                    enable_value="enable_by_preferences">
+        </labelvalue>
+        <labelvalue id="ellipse_minor_radius"
+                    icon="icons/Sketch/radius_minor.png"
+                    label="Minor radius"
+                    tooltip="Set minor radius"
+                    default="computed"
+                    accept_expressions="0"
+                    enable_value="enable_by_preferences">
+        </labelvalue>
+        <boolvalue id="Auxiliary" label="Auxiliary" default="false" tooltip="Construction element" obligatory="0"/>
+      </feature>
+      <!-- SketchMacroEllipticArc -->
+      <feature id="SketchMacroEllipticArc"
+               icon="icons/Sketch/elliptic_arc.png"
+               title="Elliptic arc"
+               tooltip="Create elliptic arc"
+               helpfile="ellipseFeature.html">
+        <sketch-2dpoint_selector id="center"
+                                 reference_attribute="center_ref"
+                                 title="Center point"
+                                 tooltip="Center point coordinates"
+                                 accept_expressions="0"
+                                 enable_value="enable_by_preferences"/>
+        <sketch-2dpoint_selector id="major_axis_point"
+                                 reference_attribute="major_axis_point_ref"
+                                 title="Major axis point"
+                                 tooltip="Major axis point coordinates"
+                                 accept_expressions="0"
+                                 enable_value="enable_by_preferences"/>
+        <sketch-2dpoint_selector id="start_point"
+                                 reference_attribute="start_point_ref"
+                                 title="Start point"
+                                 tooltip="Arc start point coordinates"
+                                 accept_expressions="0"
+                                 enable_value="enable_by_preferences"/>
+        <sketch-2dpoint_selector id="end_point"
+                                 reference_attribute="end_point_ref"
+                                 title="End point"
+                                 tooltip="Arc end point coordinates"
+                                 accept_expressions="0"
+                                 enable_value="enable_by_preferences"/>
+        <labelvalue id="major_radius"
+                    icon="icons/Sketch/radius_major.png"
+                    label="Major radius"
+                    tooltip="Set major radius"
+                    default="computed"
+                    accept_expressions="0"
+                    obligatory="0"
+                    enable_value="enable_by_preferences">
+        </labelvalue>
+        <labelvalue id="minor_radius"
+                    icon="icons/Sketch/radius_minor.png"
+                    label="Minor radius"
+                    tooltip="Set minor radius"
+                    default="computed"
+                    accept_expressions="0"
+                    obligatory="0"
+                    enable_value="enable_by_preferences">
+        </labelvalue>
+        <boolvalue id="Auxiliary"
+                   tooltip="Construction element"
+                   label="Auxiliary"
+                   default="false"
+                   obligatory="0"/>
+      </feature>
+    </group>
+
+    <group id="Segmentation">
       <!--  SketchSplit  -->
       <feature id="SketchSplit" title="Split"
                tooltip="Cut selected segment arc or circle on existing coincident points"
@@ -345,98 +626,6 @@
         <validator id="PartSet_SplitSelection"/>
       </feature>
     </group>
-
-<excluded>
-    <group id="Elliptic geometry">
-      <!-- SketchEllipse is a hidden feature. It is created inside SketchMacroEllipse. -->
-      <feature id="SketchEllipse"
-               title="Ellipse"
-               tooltip="Create ellipse"
-               icon="icons/Sketch/ellipse.png"
-               internal="1">
-        <sketch-2dpoint_selector id="ellipse_center"
-                                 title="Center"
-                                 tooltip="Center coordinates"
-                                 accept_expressions="0"
-                                 enable_value="enable_by_preferences"/>
-        <sketch-2dpoint_selector id="ellipse_focus"
-                                 title="Focus"
-                                 tooltip="Focus coordinates"
-                                 accept_expressions="0"
-                                 enable_value="enable_by_preferences"/>
-        <labelvalue id="ellipse_major_radius"
-                    icon="icons/Sketch/radius.png"
-                    label="Major radius:"
-                    tooltip="Set major radius"
-                    default="computed"
-                    accept_expressions="0"
-                    enable_value="enable_by_preferences">
-        </labelvalue>
-        <labelvalue id="ellipse_minor_radius"
-                    icon="icons/Sketch/radius.png"
-                    label="Minor radius:"
-                    tooltip="Set minor radius"
-                    default="computed"
-                    accept_expressions="0"
-                    enable_value="enable_by_preferences">
-        </labelvalue>
-        <boolvalue id="Auxiliary" label="Auxiliary" default="false" tooltip="Construction element" obligatory="0"/>
-      </feature>
-      <!-- SketchMacroEllipse -->
-      <feature id="SketchMacroEllipse"
-               icon="icons/Sketch/ellipse.png"
-               title="Ellipse"
-               tooltip="Create ellipse"
-               helpfile="ellipseFeature.html">
-        <sketch-2dpoint_selector id="center_point"
-                                 reference_attribute="center_point_ref"
-                                 title="Center point"
-                                 tooltip="Center point coordinates"
-                                 accept_expressions="0"
-                                 enable_value="enable_by_preferences"/>
-        <sketch-2dpoint_selector id="major_axis_point"
-                                 reference_attribute="major_axis_point_ref"
-                                 title="Major axis point"
-                                 tooltip="Major axis point coordinates"
-                                 accept_expressions="0"
-                                 enable_value="enable_by_preferences"/>
-        <sketch-2dpoint_selector id="passed_point"
-                                 reference_attribute="passed_point_ref"
-                                 title="Passed point"
-                                 tooltip="Passed point coordinates"
-                                 accept_expressions="0"
-                                 enable_value="enable_by_preferences">
-<!--          <validator id="SketchPlugin_CirclePassedPointValidator"/> -->
-        </sketch-2dpoint_selector>
-<!--        <validator id="GeomValidators_Different" parameters="center_point_ref,passed_point_ref"/> -->
-        <labelvalue id="ellipse_major_radius"
-                    icon="icons/Sketch/radius.png"
-                    label="Major radius:"
-                    tooltip="Set major radius"
-                    default="computed"
-                    accept_expressions="0"
-                    obligatory="0"
-                    enable_value="enable_by_preferences">
-          <validator id="GeomValidators_Positive"/>
-        </labelvalue>
-        <labelvalue id="ellipse_minor_radius"
-                    icon="icons/Sketch/radius.png"
-                    label="Minor radius:"
-                    tooltip="Set minor radius"
-                    default="computed"
-                    accept_expressions="0"
-                    obligatory="0"
-                    enable_value="enable_by_preferences">
-          <validator id="GeomValidators_Positive"/>
-        </labelvalue>
-        <boolvalue id="Auxiliary"
-                   tooltip="Construction element"
-                   label="Auxiliary"
-                   default="false"
-                   obligatory="0"/>
-      </feature>
-    </group>
-</excluded>
 
     <group id="Projection">
       <!-- Projected feature -->
@@ -495,7 +684,7 @@
           <validator id="SketchPlugin_ReplicationReference" parameters="ConstraintEntityC"/>
         </sketch_shape_selector>
         <sketch_multi_selector id="ConstraintMirrorList"
-            label="Segments:"
+            label="Segments"
             tooltip="Select list of objects to be mirrored"
             shape_types="Edges"
             use_external="true"
@@ -512,7 +701,7 @@
         tooltip="Copy objects and move"
         helpfile="translationFeature.html">
         <sketch_multi_selector id="MultiTranslationList"
-            label="Segments:"
+            label="Segments"
             tooltip="Select list of objects to be translated"
             shape_types="Edges"
             use_external="true"
@@ -581,7 +770,7 @@
         tooltip="Copy objects and rotate"
         helpfile="rotationFeature.html">
         <sketch_multi_selector id="MultiRotationList"
-            label="Segments:"
+            label="Segments"
             tooltip="Select list of objects to be rotated"
             shape_types="Edges"
             use_external="true"
@@ -639,7 +828,7 @@
     </group>
 
     <group id="Dimensional constraints">
-    <!--  SketchConstraintDistance  -->
+      <!--  SketchConstraintDistance  -->
       <feature
         id="SketchConstraintDistance"
         title="Distance"
@@ -896,9 +1085,9 @@
       <feature id="SketchConstraintRigid" title="Fixed" tooltip="Fix an object" icon="icons/Sketch/fixed.png"
                helpfile="rigidFeature.html">
         <sketch_shape_selector id="ConstraintEntityA" label="Object"
-                        tooltip="Select point, line end point, line, center of circle or arc."
+                        tooltip="Select point, curve or its boundary point."
                         shape_types="edge vertex">
-          <validator id="GeomValidators_ShapeType" parameters="vertex,line,circle"/>
+          <validator id="GeomValidators_ShapeType" parameters="vertex,edge"/>
           <validator id="SketchPlugin_NotFixed"/>
         </sketch_shape_selector>
         <validator id="PartSet_RigidSelection"/>
@@ -923,25 +1112,27 @@
         <validator id="PartSet_ParallelSelection"/>
       </feature>
 
-    <!--  SketchConstraintPerpendicular  -->
+      <!--  SketchConstraintPerpendicular  -->
       <feature id="SketchConstraintPerpendicular" title="Perpendicular"
-               tooltip="Create constraint defining two perpendicular lines"
+               tooltip="Create constraint defining two orthogonal objects"
                icon="icons/Sketch/perpendicular.png"
                helpfile="perpendicularFeature.html">
         <sketch_shape_selector id="ConstraintEntityA"
-            label="First line" tooltip="Select a line"
+            label="First object" tooltip="Select line or arc"
             shape_types="edge">
           <validator id="PartSet_DifferentObjects"/>
           <validator id="SketchPlugin_ExternalValidator" parameters="ConstraintEntityB"/>
-            <validator id="GeomValidators_ShapeType" parameters="line"/>
+          <validator id="SketchPlugin_PerpendicularAttr" parameters="ConstraintEntityB"/>
+          <validator id="GeomValidators_ShapeType" parameters="edge"/>
         </sketch_shape_selector>
 
         <sketch_shape_selector id="ConstraintEntityB"
-            label="Second line" tooltip="Select a line"
+            label="Second object" tooltip="Select line or arc"
             shape_types="edge">
-            <validator id="PartSet_DifferentObjects"/>
+          <validator id="PartSet_DifferentObjects"/>
           <validator id="SketchPlugin_ExternalValidator" parameters="ConstraintEntityA"/>
-            <validator id="GeomValidators_ShapeType" parameters="line"/>
+          <validator id="SketchPlugin_PerpendicularAttr" parameters="ConstraintEntityA"/>
+          <validator id="GeomValidators_ShapeType" parameters="edge"/>
         </sketch_shape_selector>
         <validator id="PartSet_PerpendicularSelection"/>
       </feature>
@@ -977,6 +1168,20 @@
         </sketch_shape_selector>
         <validator id="PartSet_CoincidentSelection"/>
       </feature>
+      <!--  SketchConstraintCoincidenceInternal  -->
+      <feature id="SketchConstraintCoincidenceInternal" title="Internal Coincidence" tooltip="Internal coincidence" icon="icons/Sketch/coincedence.png"
+               helpfile="coincedenceFeature.html" internal="1">
+        <sketch_shape_selector id="ConstraintEntityA" label="First object" tooltip="Select a first object" shape_types="vertex">
+          <validator id="PartSet_DifferentObjects"/>
+          <validator id="SketchPlugin_ExternalValidator" parameters="ConstraintEntityB"/>
+        </sketch_shape_selector>
+        <sketch_shape_selector id="ConstraintEntityB" label="Second object" tooltip="Select a second object" shape_types="vertex">
+          <validator id="PartSet_DifferentObjects"/>
+          <validator id="SketchPlugin_ExternalValidator" parameters="ConstraintEntityA"/>
+          <validator id="SketchPlugin_CoincidenceAttr" parameters="ConstraintEntityA"/>
+        </sketch_shape_selector>
+        <validator id="PartSet_CoincidentSelection"/>
+      </feature>
 
       <!--  SketchConstraintMiddle  -->
       <feature id="SketchConstraintMiddle" title="Middle point" tooltip="Create constraint for setting middle point on a line"
@@ -997,17 +1202,17 @@
 
       <!--  SketchConstraintEqual  -->
       <feature id="SketchConstraintEqual" title="Equal"
-        tooltip="Create constraint defining equal lengths of two lines or line and arc or equal radii of two arcs or two circles or arc and circle"
+        tooltip="Create constraint defining equal lengths of two lines or line and arc or equal radiuses of two arcs or two circles or arc and circle"
         icon="icons/Sketch/equal.png"
                helpfile="equalFeature.html">
         <sketch_shape_selector id="ConstraintEntityA"
-            label="First object" tooltip="Select line, circle or arc" shape_types="edge">
+            label="First object" tooltip="Select edge" shape_types="edge">
           <validator id="PartSet_DifferentObjects"/>
           <validator id="SketchPlugin_ExternalValidator" parameters="ConstraintEntityB"/>
         </sketch_shape_selector>
 
         <sketch_shape_selector id="ConstraintEntityB"
-            label="Second object" tooltip="Select line, circle or arc" shape_types="edge">
+            label="Second object" tooltip="Select edge" shape_types="edge">
           <validator id="SketchPlugin_EqualAttr" parameters="ConstraintEntityA"/>
           <validator id="PartSet_DifferentObjects"/>
           <validator id="SketchPlugin_ExternalValidator" parameters="ConstraintEntityA"/>
@@ -1015,7 +1220,7 @@
         <validator id="PartSet_EqualSelection"/>
       </feature>
 
-    <!--  SketchConstraintCollinear  -->
+      <!--  SketchConstraintCollinear  -->
       <feature id="SketchConstraintCollinear" title="Collinear" tooltip="Create constraint defining collinearity of two lines"
                icon="icons/Sketch/collinear.png"
                helpfile="collinearFeature.html">

@@ -21,5 +21,7 @@ SET(TEST_NAMES
   TestExportToGEOM
   TestExportToGEOMAllGroupsAndFields
   TestExportToGEOMPartSet
+  TestExportToGEOMWholeResult
+  TestExportToGEOMWholeFeature
   Test2882
 )

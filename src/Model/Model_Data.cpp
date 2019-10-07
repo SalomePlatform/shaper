@@ -810,6 +810,12 @@ static void copyAttrs(TDF_Label theSource, TDF_Label theDestination) {
     // no special relocation, empty map, but self-relocation is on: copy references w/o changes
     Handle(TDF_RelocationTable) aRelocTable = new TDF_RelocationTable(Standard_True);
     anAttrIter.Value()->Paste(aTargetAttr, aRelocTable);
+    // an exception: if a source reference refers itself, a copy must also refer itself
+    if (aTargetAttr->ID() == TDF_Reference::GetID()) {
+      Handle(TDF_Reference) aTargetRef = Handle(TDF_Reference)::DownCast(aTargetAttr);
+      if (aTargetRef->Get().IsEqual(anAttrIter.Value()->Label()))
+        aTargetRef->Set(aTargetRef->Label());
+    }
   }
   // copy the sub-labels content
   TDF_ChildIterator aSubLabsIter(theSource);

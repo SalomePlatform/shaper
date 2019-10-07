@@ -57,13 +57,17 @@ class GeomAPI_Curve : public GeomAPI_Interface
   GEOMAPI_EXPORT
   virtual bool isCircle() const;
 
+  /// Returns whether the curve is elliptic
+  GEOMAPI_EXPORT
+  virtual bool isEllipse() const;
+
   /// Returns start parameter of the curve
   GEOMAPI_EXPORT
-  double startParam() const { return myStart; }
+  double startParam();
 
   /// Returns end parameter of the curve
   GEOMAPI_EXPORT
-  double endParam() const { return myEnd; }
+  double endParam();
 
   /// Returns \c true if the curve is trimmed
   GEOMAPI_EXPORT
@@ -77,6 +81,10 @@ class GeomAPI_Curve : public GeomAPI_Interface
   /// \param theParam parameter on the curve
   GEOMAPI_EXPORT
   std::shared_ptr<GeomAPI_Pnt> getPoint(double theParam);
+
+  /// Project point on curve
+  GEOMAPI_EXPORT const std::shared_ptr<GeomAPI_Pnt> project(
+      const std::shared_ptr<GeomAPI_Pnt>& thePoint) const;
 
 public:
   /// \brief Compare addresses of curves

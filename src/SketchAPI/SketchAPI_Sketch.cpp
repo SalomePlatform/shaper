@@ -53,11 +53,15 @@
 #include <ModelHighAPI_Tools.h>
 //--------------------------------------------------------------------------------------
 #include "SketchAPI_Arc.h"
-#include "SketchAPI_MacroArc.h"
 #include "SketchAPI_Circle.h"
+#include "SketchAPI_Ellipse.h"
+#include "SketchAPI_EllipticArc.h"
 #include "SketchAPI_IntersectionPoint.h"
 #include "SketchAPI_Line.h"
+#include "SketchAPI_MacroArc.h"
 #include "SketchAPI_MacroCircle.h"
+#include "SketchAPI_MacroEllipse.h"
+#include "SketchAPI_MacroEllipticArc.h"
 #include "SketchAPI_Mirror.h"
 #include "SketchAPI_Point.h"
 #include "SketchAPI_Projection.h"
@@ -466,7 +470,6 @@ std::shared_ptr<SketchAPI_Circle>
 
 std::shared_ptr<SketchAPI_Circle> SketchAPI_Sketch::addCircle(const std::string & theExternalName)
 {
-  // TODO(spo): Add constraint SketchConstraintRigid like in PythonAPI. Is it necessary?
   std::shared_ptr<ModelAPI_Feature> aFeature =
     compositeFeature()->addFeature(SketchPlugin_Circle::ID());
   return CirclePtr(new SketchAPI_Circle(aFeature, theExternalName));
@@ -523,22 +526,33 @@ std::shared_ptr<SketchAPI_MacroArc> SketchAPI_Sketch::addArc(
 std::shared_ptr<SketchAPI_MacroArc> SketchAPI_Sketch::addArc(
                                                 const ModelHighAPI_RefAttr& theTangentPoint,
                                                 double theEndX, double theEndY,
-                                                bool theInversed)
+                                                bool theInversed,
+                                                bool theTransversal)
 {
   std::shared_ptr<ModelAPI_Feature> aFeature =
     compositeFeature()->addFeature(SketchPlugin_MacroArc::ID());
-  return MacroArcPtr(new SketchAPI_MacroArc(
-    aFeature, theTangentPoint, theEndX, theEndY, theInversed));
+  MacroArcPtr aMacroArc(new SketchAPI_MacroArc(aFeature));
+  if (theTransversal)
+    aMacroArc->setByTransversal(theTangentPoint, theEndX, theEndY, theInversed);
+  else
+    aMacroArc->setByTangent(theTangentPoint, theEndX, theEndY, theInversed);
+  return aMacroArc;
 }
 
 std::shared_ptr<SketchAPI_MacroArc> SketchAPI_Sketch::addArc(
                                               const ModelHighAPI_RefAttr& theTangentPoint,
                                               const std::shared_ptr<GeomAPI_Pnt2d>& theEnd,
-                                              bool theInversed)
+                                              bool theInversed,
+                                              bool theTransversal)
 {
   std::shared_ptr<ModelAPI_Feature> aFeature =
     compositeFeature()->addFeature(SketchPlugin_MacroArc::ID());
-  return MacroArcPtr(new SketchAPI_MacroArc(aFeature, theTangentPoint, theEnd, theInversed));
+  MacroArcPtr aMacroArc(new SketchAPI_MacroArc(aFeature));
+  if (theTransversal)
+    aMacroArc->setByTransversal(theTangentPoint, theEnd, theInversed);
+  else
+    aMacroArc->setByTangent(theTangentPoint, theEnd, theInversed);
+  return aMacroArc;
 }
 
 std::shared_ptr<SketchAPI_Arc> SketchAPI_Sketch::addArc(const ModelHighAPI_Selection & theExternal)
@@ -550,10 +564,135 @@ std::shared_ptr<SketchAPI_Arc> SketchAPI_Sketch::addArc(const ModelHighAPI_Selec
 
 std::shared_ptr<SketchAPI_Arc> SketchAPI_Sketch::addArc(const std::string & theExternalName)
 {
-  // TODO(spo): Add constraint SketchConstraintRigid like in PythonAPI. Is it necessary?
   std::shared_ptr<ModelAPI_Feature> aFeature =
     compositeFeature()->addFeature(SketchPlugin_Arc::ID());
   return ArcPtr(new SketchAPI_Arc(aFeature, theExternalName));
+}
+
+//--------------------------------------------------------------------------------------
+std::shared_ptr<SketchAPI_Ellipse> SketchAPI_Sketch::addEllipse(
+    double theCenterX, double theCenterY,
+    double theFocusX, double theFocusY,
+    double theMinorRadius)
+{
+  std::shared_ptr<ModelAPI_Feature> aFeature =
+      compositeFeature()->addFeature(SketchPlugin_Ellipse::ID());
+  return EllipsePtr(new SketchAPI_Ellipse(aFeature,
+      theCenterX, theCenterY, theFocusX, theFocusY, theMinorRadius));
+}
+
+std::shared_ptr<SketchAPI_Ellipse> SketchAPI_Sketch::addEllipse(
+    const std::shared_ptr<GeomAPI_Pnt2d>& theCenter,
+    const std::shared_ptr<GeomAPI_Pnt2d>& theFocus,
+    double theMinorRadius)
+{
+  std::shared_ptr<ModelAPI_Feature> aFeature =
+      compositeFeature()->addFeature(SketchPlugin_Ellipse::ID());
+  return EllipsePtr(new SketchAPI_Ellipse(aFeature, theCenter, theFocus, theMinorRadius));
+}
+
+std::shared_ptr<SketchAPI_MacroEllipse> SketchAPI_Sketch::addEllipse(
+    double thePoint1X, double thePoint1Y,
+    double thePoint2X, double thePoint2Y,
+    double thePassedX, double thePassedY,
+    bool isPoint1Center)
+{
+  std::shared_ptr<ModelAPI_Feature> aFeature =
+      compositeFeature()->addFeature(SketchPlugin_MacroEllipse::ID());
+  return MacroEllipsePtr(new SketchAPI_MacroEllipse(aFeature,
+      thePoint1X, thePoint1Y, thePoint2X, thePoint2Y, thePassedX, thePassedY, isPoint1Center));
+}
+
+std::shared_ptr<SketchAPI_MacroEllipse> SketchAPI_Sketch::addEllipse(
+    const std::pair<std::shared_ptr<GeomAPI_Pnt2d>, ModelHighAPI_RefAttr>& thePoint1,
+    const std::pair<std::shared_ptr<GeomAPI_Pnt2d>, ModelHighAPI_RefAttr>& thePoint2,
+    const std::pair<std::shared_ptr<GeomAPI_Pnt2d>, ModelHighAPI_RefAttr>& thePassedPoint,
+    bool isPoint1Center)
+{
+  std::shared_ptr<ModelAPI_Feature> aFeature =
+      compositeFeature()->addFeature(SketchPlugin_MacroEllipse::ID());
+  MacroEllipsePtr anEllipse;
+  if (thePoint1.second.isEmpty() &&
+      thePoint2.second.isEmpty() &&
+      thePassedPoint.second.isEmpty()) {
+    anEllipse.reset(new SketchAPI_MacroEllipse(aFeature,
+        thePoint1.first, thePoint2.first, thePassedPoint.first, isPoint1Center));
+  }
+  else {
+    anEllipse.reset(new SketchAPI_MacroEllipse(aFeature,
+        thePoint1.first, thePoint1.second,
+        thePoint2.first, thePoint2.second,
+        thePassedPoint.first, thePassedPoint.second,
+        isPoint1Center));
+  }
+  return anEllipse;
+}
+
+std::shared_ptr<SketchAPI_Ellipse> SketchAPI_Sketch::addEllipse(
+    const ModelHighAPI_Selection & theExternal)
+{
+  std::shared_ptr<ModelAPI_Feature> aFeature =
+      compositeFeature()->addFeature(SketchPlugin_Ellipse::ID());
+  return EllipsePtr(new SketchAPI_Ellipse(aFeature, theExternal));
+}
+
+std::shared_ptr<SketchAPI_Ellipse> SketchAPI_Sketch::addEllipse(
+    const std::string & theExternalName)
+{
+  std::shared_ptr<ModelAPI_Feature> aFeature =
+      compositeFeature()->addFeature(SketchPlugin_Ellipse::ID());
+  return EllipsePtr(new SketchAPI_Ellipse(aFeature, theExternalName));
+}
+
+//--------------------------------------------------------------------------------------
+std::shared_ptr<SketchAPI_EllipticArc> SketchAPI_Sketch::addEllipticArc(
+    double theCenterX, double theCenterY,
+    double theFocusX, double theFocusY,
+    double theStartX, double theStartY,
+    double theEndX, double theEndY,
+    bool theInversed)
+{
+  std::shared_ptr<ModelAPI_Feature> aFeature =
+      compositeFeature()->addFeature(SketchPlugin_EllipticArc::ID());
+  return EllipticArcPtr(new SketchAPI_EllipticArc(aFeature,
+      theCenterX, theCenterY,
+      theFocusX, theFocusY,
+      theStartX, theStartY,
+      theEndX, theEndY,
+      theInversed));
+}
+
+std::shared_ptr<SketchAPI_MacroEllipticArc> SketchAPI_Sketch::addEllipticArc(
+    const std::pair<std::shared_ptr<GeomAPI_Pnt2d>, ModelHighAPI_RefAttr>& theCenter,
+    const std::pair<std::shared_ptr<GeomAPI_Pnt2d>, ModelHighAPI_RefAttr>& theMajorAxisPoint,
+    const std::pair<std::shared_ptr<GeomAPI_Pnt2d>, ModelHighAPI_RefAttr>& theStartPoint,
+    const std::pair<std::shared_ptr<GeomAPI_Pnt2d>, ModelHighAPI_RefAttr>& theEndPoint,
+    bool theInversed)
+{
+  std::shared_ptr<ModelAPI_Feature> aFeature =
+      compositeFeature()->addFeature(SketchPlugin_MacroEllipticArc::ID());
+  return MacroEllipticArcPtr(new SketchAPI_MacroEllipticArc(aFeature,
+      theCenter.first, theCenter.second,
+      theMajorAxisPoint.first, theMajorAxisPoint.second,
+      theStartPoint.first, theStartPoint.second,
+      theEndPoint.first, theEndPoint.second,
+      theInversed));
+}
+
+std::shared_ptr<SketchAPI_EllipticArc> SketchAPI_Sketch::addEllipticArc(
+    const ModelHighAPI_Selection & theExternal)
+{
+  std::shared_ptr<ModelAPI_Feature> aFeature =
+      compositeFeature()->addFeature(SketchPlugin_EllipticArc::ID());
+  return EllipticArcPtr(new SketchAPI_EllipticArc(aFeature, theExternal));
+}
+
+std::shared_ptr<SketchAPI_EllipticArc> SketchAPI_Sketch::addEllipticArc(
+    const std::string & theExternalName)
+{
+  std::shared_ptr<ModelAPI_Feature> aFeature =
+      compositeFeature()->addFeature(SketchPlugin_EllipticArc::ID());
+  return EllipticArcPtr(new SketchAPI_EllipticArc(aFeature, theExternalName));
 }
 
 //--------------------------------------------------------------------------------------
@@ -1007,6 +1146,13 @@ static std::shared_ptr<GeomAPI_Pnt2d> middlePointOnArc(const FeaturePtr& theFeat
   return std::shared_ptr<GeomAPI_Pnt2d>(new GeomAPI_Pnt2d(x, y));
 }
 
+static std::shared_ptr<GeomAPI_Pnt2d> pointOnEllipse(const FeaturePtr& theFeature)
+{
+  AttributePoint2DPtr aMajorAxisEnd = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
+      theFeature->attribute(SketchPlugin_Ellipse::MAJOR_AXIS_END_ID()));
+  return aMajorAxisEnd ? aMajorAxisEnd->pnt() : std::shared_ptr<GeomAPI_Pnt2d>();
+}
+
 static std::shared_ptr<GeomAPI_Pnt2d> middlePoint(const ObjectPtr& theObject)
 {
   std::shared_ptr<GeomAPI_Pnt2d> aMiddlePoint;
@@ -1022,6 +1168,8 @@ static std::shared_ptr<GeomAPI_Pnt2d> middlePoint(const ObjectPtr& theObject)
       aMiddlePoint = pointOnCircle(aFeature);
     else if (aFeatureKind == SketchPlugin_Arc::ID())
       aMiddlePoint = middlePointOnArc(aFeature);
+    else if (aFeatureKind == SketchPlugin_Ellipse::ID())
+      aMiddlePoint = pointOnEllipse(aFeature);
   }
   return aMiddlePoint;
 }

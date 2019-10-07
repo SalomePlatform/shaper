@@ -349,15 +349,8 @@ bool ModelGeomAlgo_Point2D::isPointOnEdge(const std::shared_ptr<GeomAPI_Shape> t
 {
   bool isInside = false;
   if (theBaseShape->shapeType() == GeomAPI_Shape::EDGE) {
-    std::shared_ptr<GeomAPI_Edge> anEdge(new GeomAPI_Edge(theBaseShape));
-    if (anEdge->isLine()) {
-      std::shared_ptr<GeomAPI_Lin> aLine = anEdge->line();
-      theProjectedPoint = aLine->project(thePoint);
-    }
-    else if (anEdge->isCircle() || anEdge->isArc()) {
-      std::shared_ptr<GeomAPI_Circ> aCircle = anEdge->circle();
-      theProjectedPoint = aCircle->project(thePoint);
-    }
+    GeomCurvePtr aCurve(new GeomAPI_Curve(theBaseShape->edge()));
+    theProjectedPoint = aCurve->project(thePoint);
     if (theProjectedPoint.get()) {
       std::shared_ptr<GeomAPI_Vertex> aVertexShape(new GeomAPI_Vertex(theProjectedPoint->x(),
                                                 theProjectedPoint->y(), theProjectedPoint->z()));
@@ -375,7 +368,7 @@ bool ModelGeomAlgo_Point2D::isInnerPointOnEdge(const std::shared_ptr<GeomAPI_Sha
   bool isInside = isPointOnEdge(theBaseShape, thePoint, theProjectedPoint);
   if (isInside) {
     std::shared_ptr<GeomAPI_Edge> anEdge(new GeomAPI_Edge(theBaseShape));
-    if (!anEdge->isCircle()) {
+    if (!anEdge->isClosed()) {
       // check the point is not on the boundary
       GeomVertexPtr aVertex(new GeomAPI_Vertex(theProjectedPoint->x(),
           theProjectedPoint->y(), theProjectedPoint->z()));

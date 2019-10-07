@@ -153,7 +153,7 @@
     <name>Axis:SecondPoint:GeomValidators_ShapeType</name>
     <message>
       <source>It does not contain element with acceptable shape type. The type should be one of the next: %1</source>
-      <translation>THe second point does not contain element with acceptable shape type. The type should be: %1</translation>
+      <translation>The second point does not contain element with acceptable shape type. The type should be: %1</translation>
     </message>
   </context>
   <context>

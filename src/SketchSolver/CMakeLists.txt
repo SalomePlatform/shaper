@@ -50,6 +50,7 @@ SET(SKETCHSOLVER_CONSTRAINT_HEADERS
     SketchSolver_ConstraintMiddle.h
     SketchSolver_ConstraintMirror.h
     SketchSolver_ConstraintFixed.h
+    SketchSolver_ConstraintPerpendicular.h
     SketchSolver_ConstraintTangent.h
     SketchSolver_ConstraintMulti.h
     SketchSolver_ConstraintMultiRotation.h
@@ -74,6 +75,7 @@ SET(SKETCHSOLVER_CONSTRAINT_SOURCES
     SketchSolver_ConstraintMiddle.cpp
     SketchSolver_ConstraintMirror.cpp
     SketchSolver_ConstraintFixed.cpp
+    SketchSolver_ConstraintPerpendicular.cpp
     SketchSolver_ConstraintTangent.cpp
     SketchSolver_ConstraintMulti.cpp
     SketchSolver_ConstraintMultiRotation.cpp
@@ -91,6 +93,7 @@ SET(SKETCHSOLVER_LIBRARIES
 
 SET(SKETCHSOLVER_TEXT_RESOURCES
     SketchSolver_msg_en.ts
+    SketchSolver_msg_fr.ts
 )
 
 INCLUDE_DIRECTORIES(

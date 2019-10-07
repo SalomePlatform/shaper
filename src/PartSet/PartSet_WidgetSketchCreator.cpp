@@ -82,13 +82,13 @@ PartSet_WidgetSketchCreator::PartSet_WidgetSketchCreator(QWidget* theParent,
 
   ModuleBase_Tools::adjustMargins(aLayout);
 
-  QString aLabelText = QString::fromStdString(theData->widgetLabel());
+  QString aLabelText = translate(theData->widgetLabel());
   QString aLabelIcon = QString::fromStdString(theData->widgetIcon());
 
   // Size of the View control
   mySizeOfViewWidget = new QWidget(this);
   QHBoxLayout* aSizeLayout = new QHBoxLayout(mySizeOfViewWidget);
-  aSizeLayout->addWidget(new QLabel("Size of the view", mySizeOfViewWidget));
+  aSizeLayout->addWidget(new QLabel(tr("Size of the view"), mySizeOfViewWidget));
   mySizeOfView = new QLineEdit(mySizeOfViewWidget);
 
   QDoubleValidator* aValidator = new QDoubleValidator(0, DBL_MAX, 12, mySizeOfView);

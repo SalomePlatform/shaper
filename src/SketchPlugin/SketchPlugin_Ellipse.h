@@ -17,10 +17,6 @@
 // See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 
-// File:        SketchPlugin_Ellipse.h
-// Created:     26 April 2017
-// Author:      Artem ZHIDKOV
-
 #ifndef SketchPlugin_Ellipse_H_
 #define SketchPlugin_Ellipse_H_
 
@@ -49,9 +45,41 @@ class SketchPlugin_Ellipse: public SketchPlugin_SketchEntity
   }
 
   /// 2D point - focus of the ellipse
-  inline static const std::string& FOCUS_ID()
+  inline static const std::string& FIRST_FOCUS_ID()
   {
-    static const std::string ID("ellipse_focus");
+    static const std::string ID("ellipse_first_focus");
+    return ID;
+  }
+  /// 2D point - second focus of the ellipse
+  inline static const std::string& SECOND_FOCUS_ID()
+  {
+    static const std::string ID("ellipse_second_focus");
+    return ID;
+  }
+
+  /// 2D point - start point of major axis
+  inline static const std::string& MAJOR_AXIS_START_ID()
+  {
+    static const std::string ID("ellipse_major_axis_start_point");
+    return ID;
+  }
+  /// 2D point - end point of major axis
+  inline static const std::string& MAJOR_AXIS_END_ID()
+  {
+    static const std::string ID("ellipse_major_axis_end_point");
+    return ID;
+  }
+
+  /// 2D point - start point of minor axis
+  inline static const std::string& MINOR_AXIS_START_ID()
+  {
+    static const std::string ID("ellipse_minor_axis_start_point");
+    return ID;
+  }
+  /// 2D point - end point of minor axis
+  inline static const std::string& MINOR_AXIS_END_ID()
+  {
+    static const std::string ID("ellipse_minor_axis_end_point");
     return ID;
   }
 
@@ -91,6 +119,11 @@ class SketchPlugin_Ellipse: public SketchPlugin_SketchEntity
 protected:
   /// \brief Initializes attributes of derived class.
   virtual void initDerivedClassAttributes();
+
+private:
+  bool fillCharacteristicPoints();
+
+  void createEllipse(SketchPlugin_Sketch* theSketch, const int theResultIndex);
 };
 
 #endif

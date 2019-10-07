@@ -27,6 +27,7 @@
 #include <SketchPlugin_Projection.h>
 #include <SketchPlugin_ConstraintAngle.h>
 #include <SketchPlugin_ConstraintCoincidence.h>
+#include <SketchPlugin_ConstraintCoincidenceInternal.h>
 #include <SketchPlugin_ConstraintCollinear.h>
 #include <SketchPlugin_ConstraintDistance.h>
 #include <SketchPlugin_ConstraintDistanceHorizontal.h>
@@ -53,6 +54,8 @@
 #include <SketchPlugin_ExternalValidator.h>
 #include <SketchPlugin_Ellipse.h>
 #include <SketchPlugin_MacroEllipse.h>
+#include <SketchPlugin_EllipticArc.h>
+#include <SketchPlugin_MacroEllipticArc.h>
 #include <SketchPlugin_SketchDrawer.h>
 
 #include <SketcherPrs_Tools.h>
@@ -95,6 +98,8 @@ SketchPlugin_Plugin::SketchPlugin_Plugin()
                               new SketchPlugin_ExternalValidator);
   aFactory->registerValidator("SketchPlugin_TangentAttr",
                               new SketchPlugin_TangentAttrValidator);
+  aFactory->registerValidator("SketchPlugin_PerpendicularAttr",
+                              new SketchPlugin_PerpendicularAttrValidator);
   aFactory->registerValidator("SketchPlugin_NotFixed",
                               new SketchPlugin_NotFixedValidator);
   aFactory->registerValidator("SketchPlugin_EqualAttr",
@@ -117,6 +122,8 @@ SketchPlugin_Plugin::SketchPlugin_Plugin()
                               new SketchPlugin_MiddlePointAttrValidator);
   aFactory->registerValidator("SketchPlugin_ArcTangentPoint",
                               new SketchPlugin_ArcTangentPointValidator);
+  aFactory->registerValidator("SketchPlugin_ArcTransversalPoint",
+                              new SketchPlugin_ArcTransversalPointValidator);
   aFactory->registerValidator("SketchPlugin_IntersectionValidator",
                               new SketchPlugin_IntersectionValidator);
   aFactory->registerValidator("SketchPlugin_ProjectionValidator",
@@ -194,6 +201,8 @@ FeaturePtr SketchPlugin_Plugin::createFeature(std::string theFeatureID)
     return FeaturePtr(new SketchPlugin_Projection);
   } else if (theFeatureID == SketchPlugin_ConstraintCoincidence::ID()) {
     return FeaturePtr(new SketchPlugin_ConstraintCoincidence);
+  } else if (theFeatureID == SketchPlugin_ConstraintCoincidenceInternal::ID()) {
+    return FeaturePtr(new SketchPlugin_ConstraintCoincidenceInternal);
   } else if (theFeatureID == SketchPlugin_ConstraintCollinear::ID()) {
     return FeaturePtr(new SketchPlugin_ConstraintCollinear);
   } else if (theFeatureID == SketchPlugin_ConstraintDistance::ID()) {
@@ -244,6 +253,10 @@ FeaturePtr SketchPlugin_Plugin::createFeature(std::string theFeatureID)
     return FeaturePtr(new SketchPlugin_Ellipse);
   } else if (theFeatureID == SketchPlugin_MacroEllipse::ID()) {
     return FeaturePtr(new SketchPlugin_MacroEllipse);
+  } else if (theFeatureID == SketchPlugin_EllipticArc::ID()) {
+    return FeaturePtr(new SketchPlugin_EllipticArc);
+  } else if (theFeatureID == SketchPlugin_MacroEllipticArc::ID()) {
+    return FeaturePtr(new SketchPlugin_MacroEllipticArc);
   } else if (theFeatureID == SketchPlugin_SketchDrawer::ID()) {
     return FeaturePtr(new SketchPlugin_SketchDrawer);
   }
@@ -290,8 +303,10 @@ std::shared_ptr<ModelAPI_FeatureStateMessage> SketchPlugin_Plugin
       aMsg->setState(SketchPlugin_Circle::ID(), aHasSketchPlane);
       aMsg->setState(SketchPlugin_Arc::ID(), aHasSketchPlane);
       aMsg->setState(SketchPlugin_Ellipse::ID(), aHasSketchPlane);
+      aMsg->setState(SketchPlugin_EllipticArc::ID(), aHasSketchPlane);
       aMsg->setState(SketchPlugin_Projection::ID(), aHasSketchPlane);
       aMsg->setState(SketchPlugin_ConstraintCoincidence::ID(), aHasSketchPlane);
+      aMsg->setState(SketchPlugin_ConstraintCoincidenceInternal::ID(), aHasSketchPlane);
       aMsg->setState(SketchPlugin_ConstraintCollinear::ID(), aHasSketchPlane);
       aMsg->setState(SketchPlugin_ConstraintDistance::ID(), aHasSketchPlane);
       aMsg->setState(SketchPlugin_ConstraintLength::ID(), aHasSketchPlane);
@@ -313,6 +328,8 @@ std::shared_ptr<ModelAPI_FeatureStateMessage> SketchPlugin_Plugin
       aMsg->setState(SketchPlugin_Trim::ID(), aHasSketchPlane);
       aMsg->setState(SketchPlugin_MacroArc::ID(), aHasSketchPlane);
       aMsg->setState(SketchPlugin_MacroCircle::ID(), aHasSketchPlane);
+      aMsg->setState(SketchPlugin_MacroEllipse::ID(), aHasSketchPlane);
+      aMsg->setState(SketchPlugin_MacroEllipticArc::ID(), aHasSketchPlane);
       aMsg->setState(SketchPlugin_ConstraintDistanceHorizontal::ID(), aHasSketchPlane);
       aMsg->setState(SketchPlugin_ConstraintDistanceVertical::ID(), aHasSketchPlane);
       // SketchRectangle is a python feature, so its ID is passed just as a string

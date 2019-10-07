@@ -21,8 +21,9 @@
 #define SketchPlugin_Trim_H_
 
 #include "SketchPlugin.h"
+#include <SketchPlugin_Tools.h>
 
-#include "GeomAPI_IPresentable.h"
+#include <GeomAPI_IPresentable.h>
 #include <ModelAPI_IReentrant.h>
 #include <SketchPlugin_Sketch.h>
 
@@ -105,15 +106,6 @@ class SketchPlugin_Trim : public SketchPlugin_Feature, public GeomAPI_IPresentab
   /// Apply information of the message to current object. It fills selected point and object
   virtual std::string processEvent(const std::shared_ptr<Events_Message>& theMessage);
 
-  typedef std::map<std::shared_ptr<GeomAPI_Pnt>,
-                   std::pair<std::list<std::shared_ptr<GeomDataAPI_Point2D> >,
-                             std::list<std::shared_ptr<ModelAPI_Object> > > > PointToRefsMap;
-
-  static void fillObjectShapes(const std::shared_ptr<ModelAPI_Object>& theObject,
-    const std::shared_ptr<ModelAPI_Object>& theSketch,
-    std::map<std::shared_ptr<ModelAPI_Object>, std::set<GeomShapePtr> >& theCashedShapes,
-    std::map<std::shared_ptr<ModelAPI_Object>, PointToRefsMap>& theObjectToPoints);
-
 private:
   bool setCoincidenceToAttribute(const AttributePtr& theAttribute,
             const std::set<std::shared_ptr<GeomDataAPI_Point2D> >& theFurtherCoincidences,
@@ -123,18 +115,6 @@ private:
   /// \param theFeature a feature that can be set into the attribute
   bool moveTangency(const AttributePtr& theAttribute, const FeaturePtr& theFeature);
 
-  GeomShapePtr getSubShape(const std::string& theObjectAttributeId,
-                           const std::string& thePointAttributeId);
-
-  /// Returns geom point attribute of the feature bounds. It processes line or arc.
-  /// For circle feature, the result attributes are null
-  /// \param theFeature a source feature
-  /// \param theStartPointAttr an out attribute to start point
-  /// \param theStartPointAttr an out attribute to end point
-  void getFeaturePoints(const FeaturePtr& theFeature,
-                        std::shared_ptr<GeomDataAPI_Point2D>& theStartPointAttr,
-                        std::shared_ptr<GeomDataAPI_Point2D>& theEndPointAttr);
-
   /// Obtains those constraints of the feature that should be modified. output maps contain
   /// point of coincidence and attribute id to be modified after split
   /// \param theFeaturesToDelete [out] constrains that will be deleted after split
@@ -142,35 +122,11 @@ private:
   void getConstraints(std::set<std::shared_ptr<ModelAPI_Feature>>& theFeaturesToDelete,
                       std::set<FeaturePtr>& theFeaturesToUpdate);
 
-  /// Obtains references to feature point attributes and to feature,
-  /// e.g. for feature line: 1st container is
-  ///             <1st line point, list<entity_a in distance, entity_b in parallel> >
-  ///             <2nd line point, list<> >
-  ///      for feature circle 2nd container is <entity_a in Radius, entity_b in equal, ...>
-  /// \param theFeature an investigated feature
-  /// \param theRefs a container of list of referenced attributes
-  void getRefAttributes(const FeaturePtr& theFeature,
-                        std::map<AttributePtr, std::list<AttributePtr> >& theRefs,
-                        std::list<AttributePtr>& theRefsToFeature);
-
-  /// Move constraints from attribute of base feature to attribute after modification
-  /// \param theBaseRefAttributes container of references to the attributes of base feature
-  /// \param theModifiedAttributes container of attributes placed instead of base attributes
-  /// at the same place
-  void updateRefAttConstraints(
-               const std::map<AttributePtr, std::list<AttributePtr> >& theBaseRefAttributes,
-               const std::set<std::pair<AttributePtr, AttributePtr> >& theModifiedAttributes,
-               std::set<std::shared_ptr<ModelAPI_Feature>>& theFeaturesToDelete);
-
   /// Remove references constraints from attribute of base feature refer to the given attribute
   /// \param theAttribute an attribute
   /// \param theModifiedAttributes modifiable container of attributes
   void removeReferencesToAttribute(const AttributePtr& theAttribute,
                   std::map<AttributePtr, std::list<AttributePtr> >& theBaseRefAttributes);
-
-   /// Updates line length if it exist in the list
-  /// \param theFeaturesToUpdate a constraints container
-  void updateFeaturesAfterTrim(const std::set<FeaturePtr>& theFeaturesToUpdate);
 
   /// Make the base object is splitted by the point attributes
   /// \param theBaseRefAttributes container of references to the attributes of base feature
@@ -195,10 +151,19 @@ private:
 
   /// Make the base object is splitted by the point attributes
   /// \param thePoints a list of points where coincidences will be build
-  FeaturePtr trimCircle(const std::shared_ptr<GeomAPI_Pnt2d>& theStartShapePoint,
-                  const std::shared_ptr<GeomAPI_Pnt2d>& theLastShapePoint,
-                  std::set<std::shared_ptr<GeomDataAPI_Point2D> >& thePoints,
-                  std::set<std::pair<AttributePtr, AttributePtr>>& theModifiedAttributes);
+  /// \return new elliptic arc if it was created
+  FeaturePtr trimEllipticArc(const std::shared_ptr<GeomAPI_Pnt2d>& theStartShapePoint,
+               const std::shared_ptr<GeomAPI_Pnt2d>& theLastShapePoint,
+               std::map<AttributePtr, std::list<AttributePtr> >& theBaseRefAttributes,
+               std::set<std::shared_ptr<GeomDataAPI_Point2D> >& thePoints,
+               std::set<std::pair<AttributePtr, AttributePtr>>& theModifiedAttributes);
+
+  /// Make the base object is splitted by the point attributes
+  /// \param thePoints a list of points where coincidences will be build
+  FeaturePtr trimClosed(const std::shared_ptr<GeomAPI_Pnt2d>& theStartShapePoint,
+                        const std::shared_ptr<GeomAPI_Pnt2d>& theLastShapePoint,
+                        std::set<std::shared_ptr<GeomDataAPI_Point2D> >& thePoints,
+                        std::set<std::pair<AttributePtr, AttributePtr>>& theModifiedAttributes);
 
   /// Correct the first and the second point to provide condition that the first is closer to
   /// the start point and the second point - to the last end of current segment. To rearrange
@@ -238,28 +203,6 @@ private:
   void fillPointAttribute(const AttributePtr& theModifiedAttribute,
                           const std::shared_ptr<GeomAPI_Pnt2d>& thePoint);
 
-  /// Creates a line feature filled by center of base feature and given points
-  /// \param theBaseFeature another arc feature
-  /// \param theFirstAttribute an attribute with coordinates for the start point
-  /// \param theSecondAttribute an attribute with coordinates for the end point
-  FeaturePtr createLineFeature(const FeaturePtr& theBaseFeature,
-                               const std::shared_ptr<GeomAPI_Pnt2d>& theFirstPoint,
-                               const std::shared_ptr<GeomAPI_Pnt2d>& theSecondPoint);
-
-  /// Creates an arc feature filled by center of base feature and given points
-  /// \param theBaseFeature another arc feature
-  /// \param theFirstAttribute an attribute with coordinates for the start point
-  /// \param theSecondAttribute an attribute with coordinates for the end point
-  FeaturePtr createArcFeature(const FeaturePtr& theBaseFeature,
-                              const std::shared_ptr<GeomAPI_Pnt2d>& theFirstPoint,
-                              const std::shared_ptr<GeomAPI_Pnt2d>& theSecondPoint);
-
-  /// Result result of the feature to build constraint with. For arc, circle it is an edge result.
-  /// \param theFeature a feature
-  /// \return result object
-  std::shared_ptr<ModelAPI_Result> getFeatureResult(
-                                    const std::shared_ptr<ModelAPI_Feature>& theFeature);
-
 private:
   void findShapePoints(const std::string& theObjectAttributeId,
                        const std::string& thePointAttributeId,
@@ -270,7 +213,8 @@ private:
 
 private:
   std::map<std::shared_ptr<ModelAPI_Object>, std::set<GeomShapePtr> > myCashedShapes;
-  std::map<std::shared_ptr<ModelAPI_Object>, PointToRefsMap> myObjectToPoints;
+  std::map<std::shared_ptr<ModelAPI_Object>,
+           GeomAlgoAPI_ShapeTools::PointToRefsMap> myObjectToPoints;
 };
 
 #endif

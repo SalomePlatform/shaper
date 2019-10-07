@@ -20,21 +20,23 @@
 #include "SketcherPrs_PositionMgr.h"
 #include "SketcherPrs_Tools.h"
 
-#include <GeomAPI_Edge.h>
-#include <GeomAPI_Curve.h>
-#include <GeomAPI_Vertex.h>
-#include <GeomAPI_Dir.h>
 #include <GeomAPI_Ax3.h>
 #include <GeomAPI_Circ.h>
+#include <GeomAPI_Curve.h>
+#include <GeomAPI_Edge.h>
+#include <GeomAPI_Ellipse.h>
+#include <GeomAPI_Dir.h>
 #include <GeomAPI_Lin2d.h>
+#include <GeomAPI_Vertex.h>
 
 #include <GeomDataAPI_Point2D.h>
 
-#include <SketchPlugin_Line.h>
-#include <SketchPlugin_Circle.h>
 #include <SketchPlugin_Arc.h>
-#include <SketchPlugin_ConstraintTangent.h>
+#include <SketchPlugin_Circle.h>
+#include <SketchPlugin_Ellipse.h>
+#include <SketchPlugin_Line.h>
 #include <SketchPlugin_ConstraintPerpendicular.h>
+#include <SketchPlugin_ConstraintTangent.h>
 
 #include <TopoDS_Vertex.hxx>
 #include <Geom_Curve.hxx>
@@ -189,7 +191,7 @@ gp_Vec getVector(ObjectPtr theShape, GeomDirPtr theDir, gp_Pnt theP)
     std::shared_ptr<GeomAPI_Curve> aCurve =
       std::shared_ptr<GeomAPI_Curve>(new GeomAPI_Curve(aShape));
 
-    if (aCurve->isCircle()) {
+    if (aCurve->isCircle() || aCurve->isEllipse()) {
       Handle(Geom_Curve) aCurv = aCurve->impl<Handle_Geom_Curve>();
       GeomAPI_ProjectPointOnCurve anExtr(theP, aCurv);
       double aParam = anExtr.LowerDistanceParameter();
@@ -328,8 +330,7 @@ std::list<ObjectPtr> getCurves(const GeomPointPtr& thePnt, const SketcherPrs_Sym
         if (aDist <= Precision::Confusion())
           aList.push_back(aFeature->firstResult());
       }
-    } else if ((aFeature->getKind() == SketchPlugin_Circle::ID()) ||
-              (aFeature->getKind() == SketchPlugin_Arc::ID())) {
+    } else {
       GeomCurvePtr aCurve;
       ObjectPtr aResObj;
       std::list<ResultPtr> aResults = aFeature->results();
@@ -343,10 +344,16 @@ std::list<ObjectPtr> getCurves(const GeomPointPtr& thePnt, const SketcherPrs_Sym
         }
       }
       if (aCurve.get()) {
-        double aStart = aCurve->startParam();
-        double aEnd = aCurve->endParam();
-        GeomCirclePtr  aCircle = GeomCirclePtr(new GeomAPI_Circ(aCurve));
-        GeomPointPtr aProjPnt = aCircle->project(thePnt);
+        GeomPointPtr aProjPnt;
+        if (aFeature->getKind() == SketchPlugin_Circle::ID() ||
+            aFeature->getKind() == SketchPlugin_Arc::ID()) {
+          GeomCirclePtr aCircle = GeomCirclePtr(new GeomAPI_Circ(aCurve));
+          aProjPnt = aCircle->project(thePnt);
+        }
+        else if (aFeature->getKind() == SketchPlugin_Ellipse::ID()) {
+          GeomEllipsePtr anEllipse = GeomEllipsePtr(new GeomAPI_Ellipse(aCurve));
+          aProjPnt = anEllipse->project(thePnt);
+        }
         if (aProjPnt && thePnt->distance(aProjPnt) <= Precision::Confusion())
           aList.push_back(aResObj);
       }

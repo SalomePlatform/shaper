@@ -193,7 +193,7 @@ void fillAttribute(const std::list<ModelHighAPI_Selection> & theValue,
 {
   theAttribute->clear();
 
-  if(!theValue.empty()) {
+  if(!theValue.empty() && theAttribute->selectionType().empty()) {
     const ModelHighAPI_Selection& aSelection = theValue.front();
     GeomAPI_Shape::ShapeType aSelectionType = getShapeType(aSelection);
     theAttribute->setSelectionType(strByShapeType(aSelectionType));
@@ -403,6 +403,10 @@ std::string storeFeatures(const std::string& theDocName, DocumentPtr theDoc,
   std::list<ObjectPtr>::iterator allIter = allObjects.begin();
   for(; allIter != allObjects.end(); allIter++) {
     ObjectPtr anObject = *allIter;
+    FeaturePtr aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(anObject);
+    if (aFeature && aFeature->getKind() == "SketchConstraintCoincidenceInternal")
+      continue; // no need to dump and check internal constraints
+
     if (theCompare) {
       std::map<std::string, ModelHighAPI_FeatureStore>::iterator
         anObjFind = aDocFind->second.find(anObject->data()->name());
@@ -420,7 +424,6 @@ std::string storeFeatures(const std::string& theDocName, DocumentPtr theDoc,
       theStore[theDocName][anObject->data()->name()] = ModelHighAPI_FeatureStore(anObject);
     }
 
-    FeaturePtr aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(anObject);
     if (aFeature) {
       // iterate all results of this feature
       std::list<ResultPtr> allResults;
@@ -474,9 +477,9 @@ static bool dumpToPython(SessionPtr theSession,
   if (aDump.get()) {
     aDump->string("file_path")->setValue(theFilename);
     aDump->string("file_format")->setValue("py");
-    aDump->boolean("topological_naming")->setValue(theSelectionType & CHECK_NAMING);
-    aDump->boolean("geometric_selection")->setValue(theSelectionType & CHECK_GEOMETRICAL);
-    aDump->boolean("weak_naming")->setValue(theSelectionType & CHECK_WEAK);
+    aDump->boolean("topological_naming")->setValue((theSelectionType & CHECK_NAMING) != 0);
+    aDump->boolean("geometric_selection")->setValue((theSelectionType & CHECK_GEOMETRICAL) != 0);
+    aDump->boolean("weak_naming")->setValue((theSelectionType & CHECK_WEAK) != 0);
   }
   bool isProblem = !aDump.get() || !aDump->error().empty(); // after "finish" dump will be removed
   if (isProblem && aDump.get()) {

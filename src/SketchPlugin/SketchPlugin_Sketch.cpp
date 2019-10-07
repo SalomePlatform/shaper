@@ -377,6 +377,35 @@ void SketchPlugin_Sketch::createPoint2DResult(ModelAPI_Feature* theFeature,
   theFeature->setResult(aResult, theIndex);
 }
 
+void SketchPlugin_Sketch::createLine2DResult(ModelAPI_Feature* theFeature,
+                                             SketchPlugin_Sketch* theSketch,
+                                             const std::string& theStartAttrID,
+                                             const std::string& theEndAttrID,
+                                             const int theIndex)
+{
+  std::shared_ptr<GeomDataAPI_Point2D> aStartAttr =
+      std::dynamic_pointer_cast<GeomDataAPI_Point2D>(theFeature->attribute(theStartAttrID));
+  std::shared_ptr<GeomDataAPI_Point2D> anEndAttr =
+      std::dynamic_pointer_cast<GeomDataAPI_Point2D>(theFeature->attribute(theEndAttrID));
+
+  if (!aStartAttr || !aStartAttr->isInitialized() ||
+      !anEndAttr || !anEndAttr->isInitialized())
+    return;
+
+  std::shared_ptr<GeomAPI_Pnt> aStart(theSketch->to3D(aStartAttr->x(), aStartAttr->y()));
+  std::shared_ptr<GeomAPI_Pnt> anEnd(theSketch->to3D(anEndAttr->x(), anEndAttr->y()));
+  //std::cout<<"Execute line "<<aStart->x()<<" "<<aStart->y()<<" "<<aStart->z()<<" - "
+  //  <<anEnd->x()<<" "<<anEnd->y()<<" "<<anEnd->z()<<std::endl;
+  // make linear edge
+  std::shared_ptr<GeomAPI_Edge> anEdge = GeomAlgoAPI_EdgeBuilder::line(aStart, anEnd);
+  // store the result
+  std::shared_ptr<ModelAPI_ResultConstruction> aResult =
+      theFeature->document()->createConstruction(theFeature->data(), theIndex);
+  aResult->setShape(anEdge);
+  aResult->setIsInHistory(false);
+  theFeature->setResult(aResult, theIndex);
+}
+
 FeaturePtr SketchPlugin_Sketch::addUniqueNamedCopiedFeature(FeaturePtr theFeature,
                                                             SketchPlugin_Sketch* theSketch,
                                                             const bool theIsCopy)

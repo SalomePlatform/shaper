@@ -70,6 +70,8 @@
 #include <SketchPlugin_Point.h>
 #include <SketchPlugin_Arc.h>
 #include <SketchPlugin_Circle.h>
+#include <SketchPlugin_Ellipse.h>
+#include <SketchPlugin_EllipticArc.h>
 #include <SketchPlugin_ConstraintLength.h>
 #include <SketchPlugin_ConstraintDistance.h>
 #include <SketchPlugin_ConstraintParallel.h>
@@ -168,7 +170,7 @@ PartSet_SketcherMgr::PartSet_SketcherMgr(PartSet_Module* theModule)
   : QObject(theModule), myModule(theModule), myIsEditLaunching(false), myIsDragging(false),
     myDragDone(false), myIsMouseOverWindow(false),
     myIsMouseOverViewProcessed(true), myPreviousUpdateViewerEnabled(true),
-    myIsPopupMenuActive(false), myExternalPointsMgr(0)
+    myIsPopupMenuActive(false), myExternalPointsMgr(0), myNoDragMoving(false)
 {
   ModuleBase_IWorkshop* anIWorkshop = myModule->workshop();
   ModuleBase_IViewer* aViewer = anIWorkshop->viewer();
@@ -353,15 +355,23 @@ void PartSet_SketcherMgr::onMousePressed(ModuleBase_IViewWindow* theWnd, QMouseE
 
   ModuleBase_IWorkshop* aWorkshop = myModule->workshop();
   ModuleBase_IViewer* aViewer = aWorkshop->viewer();
-  if (!aViewer->canDragByMouse())
-    return;
+  //if (!aViewer->canDragByMouse())
+  //  return;
 
   ModuleBase_OperationFeature* aFOperation = dynamic_cast<ModuleBase_OperationFeature*>
                                                                (getCurrentOperation());
   if (!aFOperation)
     return;
 
-  if (aFOperation->isEditOperation()) {
+  bool isEditing = aFOperation->isEditOperation();
+  bool aCanDrag = aViewer->canDragByMouse();
+
+  //if (!aViewer->canDragByMouse() && isEditing) {
+  //  // Do not edit by dragging
+  //  return;
+  //}
+
+  if (isEditing) {
     // If the current widget is a selector, do nothing, it processes the mouse press
     ModuleBase_ModelWidget* anActiveWidget = getActiveWidget();
     if(anActiveWidget && anActiveWidget->isViewerSelector()) {
@@ -381,15 +391,9 @@ void PartSet_SketcherMgr::onMousePressed(ModuleBase_IViewWindow* theWnd, QMouseE
     if ((!isSketchOpe) && (!isSketcher))
       return;
 
-    bool isEditing = aFOperation->isEditOperation();
-
     // Ignore creation sketch operation
     if ((!isSketcher) && (!isEditing))
       return;
-
-    Handle(AIS_InteractiveContext) aContext = aViewer->AISContext();
-    // Remember highlighted objects for editing
-    ModuleBase_ISelection* aSelect = aWorkshop->selection();
 
     bool aHasShift = (theEvent->modifiers() & Qt::ShiftModifier);
     storeSelection(aHasShift ? ST_SelectAndHighlightType : ST_HighlightType, myCurrentSelection);
@@ -406,9 +410,10 @@ void PartSet_SketcherMgr::onMousePressed(ModuleBase_IViewWindow* theWnd, QMouseE
 
     get2dPoint(theWnd, theEvent, myCurrentPoint);
     if (isSketcher) {
-      myIsDragging = true;
-      myDragDone = false;
-
+      if (aCanDrag) {
+        myIsDragging = true;
+        myDragDone = false;
+      }
       myPreviousDrawModeEnabled = aViewer->enableDrawMode(false);
       launchEditing();
       if (aFeature.get() != NULL) {
@@ -434,9 +439,10 @@ void PartSet_SketcherMgr::onMousePressed(ModuleBase_IViewWindow* theWnd, QMouseE
       myIsEditLaunching = !myModule->sketchReentranceMgr()->isInternalEditActive();
       aFOperation->commit();
 
-      myIsDragging = true;
-      myDragDone = false;
-
+      if (aCanDrag) {
+        myIsDragging = true;
+        myDragDone = false;
+      }
       myPreviousDrawModeEnabled = aViewer->enableDrawMode(false);
       launchEditing();
       myIsEditLaunching = aPrevLaunchingState;
@@ -466,27 +472,44 @@ void PartSet_SketcherMgr::onMouseReleased(ModuleBase_IViewWindow* theWnd, QMouse
   bool aWasDragging = myIsDragging;
   myIsDragging = false;
 
-  if (myModule->sketchReentranceMgr()->processMouseReleased(theWnd, theEvent))
+  if (myModule->sketchReentranceMgr()->processMouseReleased(theWnd, theEvent)) {
     return;
-
+  }
   // if mouse is pressed when it was over view and at release the mouse is out of view, do nothing
-  if (!myIsMouseOverViewProcessed)
+  if (!myIsMouseOverViewProcessed) {
     return;
-
+  }
   ModuleBase_IViewer* aViewer = aWorkshop->viewer();
-  if (!aViewer->canDragByMouse())
-    return;
-  ModuleBase_Operation* aOp = getCurrentOperation();
+  //if (!aViewer->canDragByMouse())
+  //  return;
+  ModuleBase_OperationFeature* aOp =
+      dynamic_cast<ModuleBase_OperationFeature*>(getCurrentOperation());
   if (aOp) {
-    if (isNestedSketchOperation(aOp)) {
-      // Only for sketcher operations
-      if (aWasDragging) {
-        if (myDragDone) {
-          /// the previous selection is lost by mouse release in the viewer(Select method), but
-          /// it is still stored in myCurrentSelection. So, it is possible to restore selection
-          /// It is important for drag(edit with mouse) of sketch entities.
-          restoreSelection(myCurrentSelection);
-          myCurrentSelection.clear();
+    bool aStartNoDragOperation = !aViewer->canDragByMouse() && aOp->isEditOperation();
+    if (aStartNoDragOperation || myNoDragMoving) {
+      // Process edit operation without dragging
+      if (myCurrentSelection.size() > 0)
+        myNoDragMoving = !myNoDragMoving;
+      else
+        myNoDragMoving = false;
+      if (myNoDragMoving)
+        return;
+      else {
+        restoreSelection(myCurrentSelection);
+        myCurrentSelection.clear();
+      }
+    }
+    else {
+      if (isNestedSketchOperation(aOp)) {
+        // Only for sketcher operations
+        if (aWasDragging) {
+          if (myDragDone) {
+            /// the previous selection is lost by mouse release in the viewer(Select method), but
+            /// it is still stored in myCurrentSelection. So, it is possible to restore selection
+            /// It is important for drag(edit with mouse) of sketch entities.
+            restoreSelection(myCurrentSelection);
+            myCurrentSelection.clear();
+          }
         }
       }
     }
@@ -514,9 +537,12 @@ void PartSet_SketcherMgr::onMouseMoved(ModuleBase_IViewWindow* theWnd, QMouseEve
     qDebug(QString("%1").arg(anInfo.size()).arg(anInfoStr).toStdString().c_str());
   }
 #endif
-
   if (myModule->sketchReentranceMgr()->processMouseMoved(theWnd, theEvent))
     return;
+
+  ModuleBase_IWorkshop* aWorkshop = myModule->workshop();
+  XGUI_ModuleConnector* aConnector = dynamic_cast<XGUI_ModuleConnector*>(aWorkshop);
+  XGUI_Displayer* aDisplayer = aConnector->workshop()->displayer();
 
   if (isNestedCreateOperation(getCurrentOperation(), activeSketch())) {
 #ifdef DRAGGING_DEBUG
@@ -536,30 +562,35 @@ void PartSet_SketcherMgr::onMouseMoved(ModuleBase_IViewWindow* theWnd, QMouseEve
       // the feature is to be erased here, but it is correct to call canDisplayObject because
       // there can be additional check (e.g. editor widget in distance constraint)
       ModuleBase_OperationFeature* aFOperation = dynamic_cast<ModuleBase_OperationFeature*>
-                                                 (getCurrentOperation());
+        (getCurrentOperation());
       if (aFOperation) {
         FeaturePtr aFeature = aFOperation->feature();
         visualizeFeature(aFeature, aFOperation->isEditOperation(), canDisplayObject(aFeature));
       }
     }
+    aDisplayer->updateViewer();
 #ifdef DRAGGING_DEBUG
     cout << "Mouse move processing " << t.elapsed() << endl;
 #endif
   }
   //myClickedPoint.clear();
 
-  if (myIsDragging) {
+  if (myIsDragging || myNoDragMoving) {
     // 1. the current selection is saved in the mouse press method in order to restore it after
     //    moving
     // 2. the enable selection in the viewer should be temporary switched off in order to ignore
     // mouse press signal in the viewer(it call Select for AIS context and the dragged objects are
     // deselected). This flag should be restored in the slot, processed the mouse release signal.
-
     ModuleBase_Operation* aCurrentOperation = getCurrentOperation();
     if (!aCurrentOperation)
       return;
     if (isSketchOperation(aCurrentOperation))
       return; // No edit operation activated
+
+#ifdef DRAGGING_DEBUG
+    QTime t;
+    t.start();
+#endif
 
     Handle(V3d_View) aView = theWnd->v3dView();
     gp_Pnt aPoint = PartSet_Tools::convertClickToPoint(theEvent->pos(), aView);
@@ -567,13 +598,10 @@ void PartSet_SketcherMgr::onMouseMoved(ModuleBase_IViewWindow* theWnd, QMouseEve
     get2dPoint(theWnd, theEvent, aMousePnt);
 
     std::shared_ptr<GeomAPI_Pnt2d> anOriginalPosition = std::shared_ptr<GeomAPI_Pnt2d>(
-                            new GeomAPI_Pnt2d(myCurrentPoint.myCurX, myCurrentPoint.myCurY));
+      new GeomAPI_Pnt2d(myCurrentPoint.myCurX, myCurrentPoint.myCurY));
     std::shared_ptr<GeomAPI_Pnt2d> aCurrentPosition = std::shared_ptr<GeomAPI_Pnt2d>(
-                            new GeomAPI_Pnt2d(aMousePnt.myCurX, aMousePnt.myCurY));
+      new GeomAPI_Pnt2d(aMousePnt.myCurX, aMousePnt.myCurY));
 
-    ModuleBase_IWorkshop* aWorkshop = myModule->workshop();
-    XGUI_ModuleConnector* aConnector = dynamic_cast<XGUI_ModuleConnector*>(aWorkshop);
-    XGUI_Displayer* aDisplayer = aConnector->workshop()->displayer();
     // 3. the flag to disable the update viewer should be set in order to avoid blinking in the
     // viewer happens by deselect/select the modified objects. The flag should be restored after
     // the selection processing. The update viewer should be also called.
@@ -582,7 +610,7 @@ void PartSet_SketcherMgr::onMouseMoved(ModuleBase_IViewWindow* theWnd, QMouseEve
     static Events_ID aMoveEvent = Events_Loop::eventByName(EVENT_OBJECT_MOVED);
     //static Events_ID aUpdateEvent = Events_Loop::eventByName(EVENT_OBJECT_UPDATED);
     FeatureToSelectionMap::const_iterator anIt = myCurrentSelection.begin(),
-                                          aLast = myCurrentSelection.end();
+      aLast = myCurrentSelection.end();
     // 4. the features and attributes modification(move)
     bool isModified = false;
     for (; anIt != aLast; anIt++) {
@@ -592,7 +620,7 @@ void PartSet_SketcherMgr::onMouseMoved(ModuleBase_IViewWindow* theWnd, QMouseEve
       // Process selection by attribute: the priority to the attribute
       if (!anAttributes.empty()) {
         std::set<AttributePtr>::const_iterator anAttIt = anAttributes.begin(),
-                                               anAttLast = anAttributes.end();
+          anAttLast = anAttributes.end();
         for (; anAttIt != anAttLast; anAttIt++) {
           AttributePtr anAttr = *anAttIt;
           if (anAttr.get() == NULL)
@@ -606,7 +634,7 @@ void PartSet_SketcherMgr::onMouseMoved(ModuleBase_IViewWindow* theWnd, QMouseEve
               bool isImmutable = aPoint->setImmutable(true);
 
               std::shared_ptr<ModelAPI_ObjectMovedMessage> aMessage = std::shared_ptr
-                       <ModelAPI_ObjectMovedMessage>(new ModelAPI_ObjectMovedMessage(this));
+                <ModelAPI_ObjectMovedMessage>(new ModelAPI_ObjectMovedMessage(this));
               aMessage->setMovedAttribute(aPoint);
               aMessage->setOriginalPosition(anOriginalPosition);
               aMessage->setCurrentPosition(aCurrentPosition);
@@ -617,13 +645,14 @@ void PartSet_SketcherMgr::onMouseMoved(ModuleBase_IViewWindow* theWnd, QMouseEve
             }
           }
         }
-      } else {
+      }
+      else {
         // Process selection by feature
         std::shared_ptr<SketchPlugin_Feature> aSketchFeature =
           std::dynamic_pointer_cast<SketchPlugin_Feature>(aFeature);
         if (aSketchFeature) {
           std::shared_ptr<ModelAPI_ObjectMovedMessage> aMessage = std::shared_ptr
-                    <ModelAPI_ObjectMovedMessage>(new ModelAPI_ObjectMovedMessage(this));
+            <ModelAPI_ObjectMovedMessage>(new ModelAPI_ObjectMovedMessage(this));
           aMessage->setMovedObject(aFeature);
           aMessage->setOriginalPosition(anOriginalPosition);
           aMessage->setCurrentPosition(aCurrentPosition);
@@ -645,6 +674,10 @@ void PartSet_SketcherMgr::onMouseMoved(ModuleBase_IViewWindow* theWnd, QMouseEve
     // 6. restore the update viewer flag and call this update
     aDisplayer->enableUpdateViewer(isEnableUpdateViewer);
     aDisplayer->updateViewer();
+
+#ifdef DRAGGING_DEBUG
+    cout << "Mouse move processing " << t.elapsed() << endl;
+#endif
 
     myDragDone = true;
     myCurrentPoint = aMousePnt;
@@ -926,7 +959,9 @@ bool PartSet_SketcherMgr::isEntity(const std::string& theId)
   return (theId == SketchPlugin_Line::ID()) ||
          (theId == SketchPlugin_Point::ID()) ||
          (theId == SketchPlugin_Arc::ID()) ||
-         (theId == SketchPlugin_Circle::ID());
+         (theId == SketchPlugin_Circle::ID()) ||
+         (theId == SketchPlugin_Ellipse::ID()) ||
+         (theId == SketchPlugin_EllipticArc::ID());
 }
 
 bool PartSet_SketcherMgr::isExternalFeature(const FeaturePtr& theFeature)
@@ -1070,10 +1105,18 @@ void PartSet_SketcherMgr::startSketch(ModuleBase_Operation* theOperation)
   myExternalPointsMgr = new PartSet_ExternalPointsMgr(myModule->workshop(), myCurrentSketch);
 
   workshop()->viewer()->set2dMode(true);
+
+  PartSet_Fitter* aFitter = new PartSet_Fitter(this);
+  myModule->workshop()->viewer()->setFitter(aFitter);
 }
 
 void PartSet_SketcherMgr::stopSketch(ModuleBase_Operation* theOperation)
 {
+  XGUI_ModuleConnector* aConnector = dynamic_cast<XGUI_ModuleConnector*>(myModule->workshop());
+  PartSet_Fitter* aFitter = (PartSet_Fitter*)myModule->workshop()->viewer()->fitter();
+  myModule->workshop()->viewer()->setFitter(0);
+  delete aFitter;
+
   myIsMouseOverWindow = false;
   myIsConstraintsShown[PartSet_Tools::Geometrical] = true;
   myIsConstraintsShown[PartSet_Tools::Dimensional] = true;
@@ -1084,8 +1127,6 @@ void PartSet_SketcherMgr::stopSketch(ModuleBase_Operation* theOperation)
     myExternalPointsMgr = 0;
   }
   onShowPoints(false);
-
-  XGUI_ModuleConnector* aConnector = dynamic_cast<XGUI_ModuleConnector*>(myModule->workshop());
 
   DataPtr aData = myCurrentSketch->data();
   if (!aData->isValid()) {
@@ -2070,4 +2111,60 @@ void PartSet_SketcherMgr::onShowPoints(bool toShow)
   }
   if (aToUpdate)
     aViewer->update();
+}
+
+
+void PartSet_Fitter::fitAll(Handle(V3d_View) theView)
+{
+  CompositeFeaturePtr aSketch = mySketchMgr->activeSketch();
+
+  ModuleBase_IWorkshop* aWorkshop = mySketchMgr->module()->workshop();
+  XGUI_ModuleConnector* aConnector = dynamic_cast<XGUI_ModuleConnector*>(aWorkshop);
+  XGUI_Displayer* aDisplayer = aConnector->workshop()->displayer();
+
+  Bnd_Box aBndBox;
+  int aNumberOfSubs = aSketch->numberOfSubs();
+  double aXmin, aYmin, aZmin, aXmax, aYmax, aZmax;
+  for (int i = 0; i < aNumberOfSubs; i++) {
+    FeaturePtr aFeature = aSketch->subFeature(i);
+    if (aDisplayer->isVisible(aFeature)) {
+      AISObjectPtr aAisPtr = aDisplayer->getAISObject(aFeature);
+      Handle(AIS_InteractiveObject) aAisObj = aAisPtr->impl<Handle(AIS_InteractiveObject)>();
+      if (!aAisObj->IsInfinite()) {
+        Bnd_Box aBox;
+        aAisObj->BoundingBox(aBox);
+        aBndBox.Add(aBox);
+      }
+    }
+    else {
+      std::list<ResultPtr> aResults = aFeature->results();
+      std::list<ResultPtr>::const_iterator aIt;
+      ResultPtr aRes;
+      for (aIt = aResults.begin(); aIt != aResults.end(); ++aIt) {
+        aRes = (*aIt);
+        if (aRes->isDisplayed()) {
+          FeaturePtr aFeature = ModelAPI_Feature::feature(aRes);
+          if (aFeature.get()) {
+            std::shared_ptr<SketchPlugin_Feature> aSPFeature =
+              std::dynamic_pointer_cast<SketchPlugin_Feature>(aFeature);
+            if (aSPFeature.get()) {
+              bool isAxiliary =
+                aSPFeature->boolean(SketchPlugin_SketchEntity::AUXILIARY_ID())->value();
+              if (!(aSPFeature->isExternal() || isAxiliary)) {
+                GeomShapePtr aShape = aRes->shape();
+                aShape->computeSize(aXmin, aYmin, aZmin, aXmax, aYmax, aZmax);
+                Bnd_Box aBox;
+                aBox.Update(aXmin, aYmin, aZmin, aXmax, aYmax, aZmax);
+                aBndBox.Add(aBox);
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+  if (aBndBox.IsVoid())
+    theView->FitAll();
+  else
+    theView->FitAll(aBndBox, 0.01);
 }

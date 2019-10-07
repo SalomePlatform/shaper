@@ -37,6 +37,8 @@
 #include <Geom_SphericalSurface.hxx>
 #include <Geom_ConicalSurface.hxx>
 #include <Geom_CylindricalSurface.hxx>
+#include <Geom_OffsetSurface.hxx>
+#include <Geom_Plane.hxx>
 #include <Geom_RectangularTrimmedSurface.hxx>
 #include <Geom_SweptSurface.hxx>
 #include <Geom_ToroidalSurface.hxx>
@@ -203,20 +205,35 @@ std::shared_ptr<GeomAPI_Pln> GeomAPI_Face::getPlane() const
   Handle(Geom_Surface) aSurf = BRep_Tool::Surface(aFace);
   if (aSurf.IsNull())
     return aResult;  // no surface
-  GeomLib_IsPlanarSurface isPlanar(aSurf);
-  if(!isPlanar.IsPlanar()) {
-    return aResult;
+  GeomLib_IsPlanarSurface isPlanarSurf(aSurf);
+  gp_Pln aPln;
+  bool isPlanar = false;
+  if (isPlanarSurf.IsPlanar()) {
+    aPln = isPlanarSurf.Plan();
+    isPlanar = true;
   }
-  gp_Pln aPln = isPlanar.Plan();
-  double aA, aB, aC, aD;
-  aPln.Coefficients(aA, aB, aC, aD);
-  if (aFace.Orientation() == TopAbs_REVERSED) {
-    aA = -aA;
-    aB = -aB;
-    aC = -aC;
-    aD = -aD;
+  else if (aSurf->IsKind(STANDARD_TYPE(Geom_OffsetSurface))) {
+    Handle(Geom_OffsetSurface) anOffsetSurf = Handle(Geom_OffsetSurface)::DownCast(aSurf);
+    Handle(Geom_Surface) aBasisSurf = anOffsetSurf->BasisSurface();
+    if (aBasisSurf->IsKind(STANDARD_TYPE(Geom_Plane))) {
+      aPln = Handle(Geom_Plane)::DownCast(aBasisSurf)->Pln();
+      gp_Vec aTranslation(aPln.Axis().Direction().XYZ() * anOffsetSurf->Offset());
+      aPln.Translate(aTranslation);
+      isPlanar = true;
+    }
   }
-  aResult = std::shared_ptr<GeomAPI_Pln>(new GeomAPI_Pln(aA, aB, aC, aD));
+
+  if (isPlanar) {
+    double aA, aB, aC, aD;
+    aPln.Coefficients(aA, aB, aC, aD);
+    if (aFace.Orientation() == TopAbs_REVERSED) {
+      aA = -aA;
+      aB = -aB;
+      aC = -aC;
+      aD = -aD;
+    }
+    aResult = std::shared_ptr<GeomAPI_Pln>(new GeomAPI_Pln(aA, aB, aC, aD));
+  }
   return aResult;
 }
 

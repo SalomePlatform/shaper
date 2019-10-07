@@ -211,7 +211,7 @@ private:
   void computeLength();
   /// Compute minimal distance between pair of shapes
   void computeDistance();
-  /// Compute radius of circular edge or cylindrical face
+  /// Compute radius of circular edge, cylindrical surface or sphere.
   void computeRadius();
   /// Compute angle(s) between pair of edges if they are intersected
   void computeAngle();

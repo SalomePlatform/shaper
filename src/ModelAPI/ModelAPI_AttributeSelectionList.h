@@ -35,6 +35,10 @@ class GeomAPI_Shape;
 
 class ModelAPI_AttributeSelectionList : public ModelAPI_Attribute
 {
+  /// Flag that indicates that the whole result selection is allowed while the selection type
+  /// may be sub-objects, so, it is the same as all sub-shapes are selected (#3005). It is "false"
+  /// by default.
+  bool myIsWholeResultAllowed;
  public:
   /// Adds the new reference to the end of the list
   /// \param theContext object where the sub-shape was selected
@@ -121,9 +125,20 @@ class ModelAPI_AttributeSelectionList : public ModelAPI_Attribute
   /// Sets a selection filters feature if it is defined for this selection list
   MODELAPI_EXPORT virtual void setFilters(FiltersFeaturePtr theFeature) = 0;
 
+  /// Returns true if the whole result selection corresponds to selection of all sub-shapes.
+  MODELAPI_EXPORT virtual const bool isWholeResultAllowed() const {
+    return myIsWholeResultAllowed;
+  }
+
+  /// Sets whether the whole result selection corresponds to selection of all sub-shapes.
+  MODELAPI_EXPORT virtual void setWholeResultAllowed(const bool theFlag)  {
+    myIsWholeResultAllowed = theFlag;
+  }
+
 protected:
-  /// Objects are created for features automatically
-  MODELAPI_EXPORT ModelAPI_AttributeSelectionList();
+  /// Default constructor
+  MODELAPI_EXPORT ModelAPI_AttributeSelectionList() : ModelAPI_Attribute()
+  {myIsWholeResultAllowed = false;}
 
 };
 

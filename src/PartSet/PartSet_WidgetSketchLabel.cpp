@@ -21,6 +21,7 @@
 #include "PartSet_Tools.h"
 #include "PartSet_Module.h"
 #include "PartSet_PreviewPlanes.h"
+#include "PartSet_SketcherReentrantMgr.h"
 
 #include "SketchPlugin_SketchEntity.h"
 
@@ -36,6 +37,7 @@
 
 #include <ModelAPI_ResultBody.h>
 #include <ModelAPI_Tools.h>
+#include <ModelAPI_AttributeString.h>
 
 #include <ModuleBase_Operation.h>
 #include <ModuleBase_ViewerPrs.h>
@@ -101,7 +103,7 @@ myIsSelection(false)
   // Size of the View control
   mySizeOfViewWidget = new QWidget(aFirstWgt);
   QHBoxLayout* aSizeLayout = new QHBoxLayout(mySizeOfViewWidget);
-  aSizeLayout->addWidget(new QLabel("Size of the view", mySizeOfViewWidget));
+  aSizeLayout->addWidget(new QLabel(tr("Size of the view"), mySizeOfViewWidget));
   mySizeOfView = new QLineEdit(mySizeOfViewWidget);
 
   QDoubleValidator* aValidator = new QDoubleValidator(0, DBL_MAX, 12, mySizeOfView);
@@ -110,10 +112,10 @@ myIsSelection(false)
   mySizeOfView->setValidator(aValidator);
   aSizeLayout->addWidget(mySizeOfView);
 
-  QString aText = QString::fromStdString(theData->getProperty("title"));
+  QString aText = translate(theData->getProperty("title"));
   QLabel* aLabel = new QLabel(aText, aFirstWgt);
   aLabel->setWordWrap(true);
-  QString aTooltip = QString::fromStdString(theData->getProperty("tooltip"));
+  QString aTooltip = translate(theData->getProperty("tooltip"));
   aLabel->setToolTip(aTooltip);
   aLabel->setIndent(5);
 
@@ -171,9 +173,17 @@ myIsSelection(false)
   connect(myShowPoints, SIGNAL(toggled(bool)), this, SIGNAL(showFreePoints(bool)));
   aLayout->addWidget(myShowPoints);
 
+  myAutoConstraints = new QCheckBox(tr("Automatic constraints"), this);
+  myAutoConstraints->setToolTip(tr("Automatic vertical and horizontal constraints"));
+  connect(myAutoConstraints, SIGNAL(toggled(bool)), this, SIGNAL(autoConstraints(bool)));
+  aLayout->addWidget(myAutoConstraints);
+
   QPushButton* aPlaneBtn = new QPushButton(tr("Change sketch plane"), aSecondWgt);
   connect(aPlaneBtn, SIGNAL(clicked(bool)), SLOT(onChangePlane()));
   aLayout->addWidget(aPlaneBtn);
+
+  myDoFLabel = new QLabel("", aSecondWgt);
+  aLayout->addWidget(myDoFLabel);
 
   myStackWidget->addWidget(aSecondWgt);
   //setLayout(aLayout);
@@ -508,6 +518,13 @@ bool PartSet_WidgetSketchLabel::fillSketchPlaneBySelection(const ModuleBase_View
 
 void PartSet_WidgetSketchLabel::activateCustom()
 {
+  PartSet_Module* aModule = dynamic_cast<PartSet_Module*>(myWorkshop->module());
+  if (aModule) {
+    bool isBlocked = myAutoConstraints->blockSignals(true);
+    myAutoConstraints->setChecked(aModule->sketchReentranceMgr()->isAutoConstraints());
+    myAutoConstraints->blockSignals(isBlocked);
+  }
+
   std::shared_ptr<GeomAPI_Pln> aPlane = plane();
   if (aPlane.get()) {
     myStackWidget->setCurrentIndex(1);
@@ -717,4 +734,31 @@ void PartSet_WidgetSketchLabel::setShowPointsState(bool theState)
   bool aBlock = myShowPoints->blockSignals(true);
   myShowPoints->setChecked(theState);
   myShowPoints->blockSignals(aBlock);
+}
+
+bool PartSet_WidgetSketchLabel::restoreValueCustom()
+{
+  if (myFeature.get()) {
+    CompositeFeaturePtr aSketch = std::dynamic_pointer_cast<ModelAPI_CompositeFeature>(myFeature);
+    if (aSketch.get() && (aSketch->numberOfSubs() > 0)) {
+      AttributeStringPtr aDOFStr = aSketch->string("SolverDOF");
+      if (aDOFStr.get()) {
+        QString aVal(aDOFStr->value().c_str());
+        if (aVal.contains('=')) {
+          // to support old data
+          aVal = aVal.right(aVal.length() - aVal.lastIndexOf('='));
+        }
+        int aDoF = aVal.toInt();
+        if (aDoF == 0) {
+          myDoFLabel->setText(tr("Sketch is fully fixed (DoF = 0)"));
+        } else {
+          myDoFLabel->setText(tr("DoF (degrees of freedom) = ") + aVal);
+        }
+      }
+    }
+    else {
+      myDoFLabel->setText("");
+    }
+  }
+  return true;
 }

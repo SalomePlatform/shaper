@@ -114,8 +114,6 @@ public:
                angle, SketchPlugin_MacroArc::ANGLE_ID(),
                ModelAPI_AttributeDouble, /** Angle */)
 
-private:
-
   /// Set by center and start, end point.
   SKETCHAPI_EXPORT
   void setByCenterStartEnd(double theCenterX, double theCenterY,
@@ -153,6 +151,18 @@ private:
   void setByTangent(const ModelHighAPI_RefAttr& theTangentPoint,
                     const std::shared_ptr<GeomAPI_Pnt2d>& theEnd,
                     bool theInversed);
+
+  /// Set by tangent and end point.
+  SKETCHAPI_EXPORT
+  void setByTransversal(const ModelHighAPI_RefAttr& theTransversalPoint,
+                        double theEndX, double theEndY,
+                        bool theInversed);
+
+  /// Set by tangent and end point.
+  SKETCHAPI_EXPORT
+  void setByTransversal(const ModelHighAPI_RefAttr& theTransversalPoint,
+                        const std::shared_ptr<GeomAPI_Pnt2d>& theEnd,
+                        bool theInversed);
 };
 
 /// Pointer on Arc object.

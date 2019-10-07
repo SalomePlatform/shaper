@@ -84,7 +84,7 @@ namespace ModelGeomAlgo_Shape
     return aFoundSubs;
   }
 
-  // Find circular/elliptical edge, which center/focus coincide with the given point
+  // Find circular/elliptic edge, which center/focus coincide with the given point
   static GeomShapePtr findEdgeByCenter(const GeomShapePtr& theBaseShape,
                                        const GeomPointPtr& theCenter,
                                        const double theTolerance,

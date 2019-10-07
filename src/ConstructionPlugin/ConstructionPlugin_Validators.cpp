@@ -54,7 +54,7 @@ bool ConstructionPlugin_ValidatorPointLines::isValid(const AttributePtr& theAttr
   GeomShapePtr aLineShape1 = aLineAttribute1->value();
   ResultPtr aContext1 = aLineAttribute1->context();
   if(!aContext1.get()) {
-    theError = "One of the attribute not initialized.";
+    theError = "One of the attribute is not initialized.";
     return false;
   }
   if(!aLineShape1.get()) {
@@ -120,7 +120,7 @@ bool ConstructionPlugin_ValidatorPointEdgeAndPlaneNotParallel::isValid(
   GeomShapePtr aShape1 = anAttribute1->value();
   ResultPtr aContext1 = anAttribute1->context();
   if(!aContext1.get()) {
-    theError = "One of the attribute not initialized.";
+    theError = "One of the attribute is not initialized.";
     return false;
   }
   if(!aShape1.get()) {
@@ -174,7 +174,7 @@ bool ConstructionPlugin_ValidatorPlaneThreePoints::isValid(const AttributePtr& t
   GeomShapePtr aPointShape1 = aPointAttribute1->value();
   ResultPtr aContext1 = aPointAttribute1->context();
   if(!aContext1.get()) {
-    theError = "One of the attribute not initialized.";
+    theError = "One of the attribute is not initialized.";
     return false;
   }
   if(!aPointShape1.get()) {
@@ -252,7 +252,7 @@ bool ConstructionPlugin_ValidatorPlaneLinePoint::isValid(
   GeomShapePtr aShape1 = anAttribute1->value();
   ResultPtr aContext1 = anAttribute1->context();
   if(!aContext1.get()) {
-    theError = "One of the attribute not initialized.";
+    theError = "One of the attribute is not initialized.";
     return false;
   }
   if(!aShape1.get()) {
@@ -310,7 +310,7 @@ bool ConstructionPlugin_ValidatorPlaneTwoParallelPlanes::isValid(
   GeomShapePtr aShape1 = anAttribute1->value();
   ResultPtr aContext1 = anAttribute1->context();
   if(!aContext1.get()) {
-    theError = "One of the attribute not initialized.";
+    theError = "One of the attribute is not initialized.";
     return false;
   }
   if(!aShape1.get()) {
@@ -363,7 +363,7 @@ bool ConstructionPlugin_ValidatorAxisTwoNotParallelPlanes::isValid(
   GeomShapePtr aShape1 = anAttribute1->value();
   ResultPtr aContext1 = anAttribute1->context();
   if(!aContext1.get()) {
-    theError = "One of the attribute not initialized.";
+    theError = "One of the attribute is not initialized.";
     return false;
   }
   if(!aShape1.get()) {
@@ -414,7 +414,7 @@ bool ConstructionPlugin_ValidatorPointThreeNonParallelPlanes::isValid(
   GeomShapePtr aShape1 = anAttribute1->value();
   ResultPtr aContext1 = anAttribute1->context();
   if (!aContext1.get()) {
-    theError = "One of the attribute not initialized.";
+    theError = "One of the attribute is not initialized.";
     return false;
   }
   if (!aShape1.get()) {

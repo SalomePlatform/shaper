@@ -43,6 +43,7 @@
 #include <StdSelect_BRepOwner.hxx>
 #include <TopoDS_Compound.hxx>
 #include <BRep_Builder.hxx>
+#include <TopExp_Explorer.hxx>
 
 #include <QLayout>
 #include <QPushButton>
@@ -324,7 +325,7 @@ ModuleBase_WidgetSelectionFilter::~ModuleBase_WidgetSelectionFilter()
       myListIO.Clear();
       myShowBtn->setChecked(false);
     }
-    aCtx->UpdateCurrentViewer();
+    myWorkshop->viewer()->update();
   }
   SelectorFeature = FeaturePtr();
   AttributeId = "";
@@ -534,7 +535,7 @@ void ModuleBase_WidgetSelectionFilter::onShowOnly(bool theShow)
       }
     }
   }
-  aCtx->UpdateCurrentViewer();
+  myWorkshop->viewer()->update();
 }
 
 void ModuleBase_WidgetSelectionFilter::updateSelectBtn()
@@ -572,12 +573,60 @@ void ModuleBase_WidgetSelectionFilter::clearCurrentSelection(bool toUpdate)
   }
 }
 
+void replaceSubShapesByResult(QList<ModuleBase_ViewerPrsPtr>& theResults, int theShapeType)
+{
+  QMap<ObjectPtr, QList<GeomShapePtr>> myResShapes;
+  // Sort sub-shapes by result
+  foreach (ModuleBase_ViewerPrsPtr aPrs, theResults) {
+    if (myResShapes.contains(aPrs->object()))
+      myResShapes[aPrs->object()].append(aPrs->shape());
+    else {
+      QList<GeomShapePtr> aShapes;
+      aShapes << aPrs->shape();
+      myResShapes[aPrs->object()] = aShapes;
+    }
+  }
+  // Find Results to replace by whole result
+  QList<GeomShapePtr> aShapes;
+  QList<ObjectPtr> aToReplace;
+  std::list<GeomShapePtr> aSubShapes;
+  foreach(ObjectPtr aObj, myResShapes.keys()) {
+    aShapes = myResShapes[aObj];
+    ResultPtr aRes = std::dynamic_pointer_cast<ModelAPI_Result>(aObj);
+    TopTools_MapOfShape aShapesMap;
+    if (aRes.get()) {
+      GeomShapePtr aSubShape = aRes->shape();
+      const TopoDS_Shape& aShape = aSubShape->impl<TopoDS_Shape>();
+      for (TopExp_Explorer anExp(aShape, (TopAbs_ShapeEnum)theShapeType);
+        anExp.More(); anExp.Next()) {
+        aShapesMap.Add(anExp.Current());
+      }
+    }
+    if (aShapes.count() == aShapesMap.Size())
+      aToReplace.append(aObj);
+  }
+  // Replace the found results
+  QList<ModuleBase_ViewerPrsPtr>::iterator aIt;
+  foreach(ObjectPtr aObj, aToReplace) {
+    for (aIt = theResults.begin(); aIt != theResults.end(); aIt++) {
+      if ((*aIt)->object() == aObj) {
+        theResults.removeAll(*aIt);
+        aIt--;
+      }
+    }
+    ModuleBase_ViewerPrsPtr aValue(new ModuleBase_ViewerPrs(aObj));
+    theResults.append(aValue);
+  }
+}
+
 void ModuleBase_WidgetSelectionFilter::onFeatureAccepted()
 {
   AttributePtr aAttr = mySelectorFeature->attribute(mySelectorAttribute);
   AttributeSelectionListPtr aSelListAttr =
     std::dynamic_pointer_cast<ModelAPI_AttributeSelectionList>(aAttr);
   aSelListAttr->clear();
+  if (aSelListAttr->isWholeResultAllowed())
+    replaceSubShapesByResult(myValues, selectionType(aSelListAttr->selectionType().c_str()));
   foreach(ModuleBase_ViewerPrsPtr aPrs, myValues) {
     aSelListAttr->append(aPrs->object(), aPrs->shape());
   }

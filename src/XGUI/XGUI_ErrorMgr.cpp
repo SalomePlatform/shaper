@@ -201,12 +201,12 @@ void XGUI_ErrorMgr::updateToolTip(ModuleBase_ModelWidget* theWidget,
     if (aLabel) continue;
 
     // Get the original tool tip of the widget
-    QString aTTip = aWidget->toolTip().section("Errors:\n", 0, 0).trimmed();
+    QString aTTip = aWidget->toolTip().section(tr("Errors:") + "\n", 0, 0).trimmed();
     // Add the error message into the tool tip
     if (!theError.isEmpty()) {
       if (!aTTip.isEmpty())
         aTTip.append('\n');
-      aTTip += "Errors:\n" + theError;
+      aTTip += tr("Errors:") + "\n" + theError;
     }
     aWidget->setToolTip(aTTip);
     //aWidget->setStyleSheet(anError.isEmpty() ? "" : "background-color:pink;");

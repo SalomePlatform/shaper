@@ -28,9 +28,14 @@
 #include <AIS_Trihedron.hxx>
 #include <AIS_ListOfInteractive.hxx>
 
-#ifndef HAVE_SALOME
+#ifdef HAVE_SALOME
+#include <OCCViewer_ViewModel.h>
+#else
+  #include <AppElements_Viewer.h>
   #include <AppElements_ViewWindow.h>
 #endif
+
+
 
 class XGUI_Workshop;
 /**
@@ -164,6 +169,14 @@ Q_OBJECT
   // Fit all along Z (perpendicular to display)
   //virtual void Zfitall();
 
+#ifdef HAVE_SALOME
+  virtual void setFitter(OCCViewer_Fitter* theFitter);
+  virtual OCCViewer_Fitter* fitter() const;
+#else
+  virtual void setFitter(AppElements_Fitter* theFitter);
+  virtual AppElements_Fitter* fitter() const;
+#endif
+
 signals:
   /// Emits by mouse entering the view port
   void enterViewPort();
@@ -203,7 +216,7 @@ private slots:
 
  private:
    void displayHighlight(FeaturePtr theFeature, const TopoDS_Shape& theIgnoreShape);
-   void eraseHighlight();
+   bool eraseHighlight();
 
 
   XGUI_Workshop* myWorkshop;

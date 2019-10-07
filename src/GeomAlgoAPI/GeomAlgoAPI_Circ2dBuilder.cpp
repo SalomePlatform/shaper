@@ -26,6 +26,7 @@
 
 #include <BRep_Tool.hxx>
 #include <ElCLib.hxx>
+#include <GccAna_Circ2d2TanOn.hxx>
 #include <GccAna_Circ2d2TanRad.hxx>
 #include <GccAna_Circ2d3Tan.hxx>
 #include <GccAna_Circ2dTanCen.hxx>
@@ -48,6 +49,7 @@ typedef std::vector< std::shared_ptr<GccEnt_QualifiedLin> >  VectorOfGccLine;
 // Provide different mechanisms to create circle:
 // * by passing points
 // * by tangent edges
+// * by transversal line
 // * with specified radius
 // * etc.
 class CircleBuilder
@@ -83,6 +85,19 @@ public:
     }
   }
 
+  void setTransversalLine(const std::shared_ptr<GeomAPI_Shape>& theLine)
+  {
+    if (!theLine)
+      return;
+
+    const TopoDS_Edge& anEdge = TopoDS::Edge(theLine->impl<TopoDS_Shape>());
+
+    double aFirst, aLast;
+    TopLoc_Location aLoc;
+    Handle(Geom2d_Curve) aCurve = BRep_Tool::CurveOnSurface(anEdge, myPlane, aLoc, aFirst, aLast);
+    myTransversalLine = CurveAdaptorPtr(new Geom2dAdaptor_Curve(aCurve, aFirst, aLast));
+  }
+
   void setPassingPoints(const std::vector< std::shared_ptr<GeomAPI_Pnt2d> >& thePoints)
   {
     std::vector< std::shared_ptr<GeomAPI_Pnt2d> >::const_iterator aPIt;
@@ -115,9 +130,13 @@ public:
       case 1:
         aResult = circleByPointAndTwoTangentCurves();
         break;
-      case 2:
-        aResult = circleByTwoPointsAndTangentCurve();
+      case 2: {
+        if (myTransversalLine)
+          aResult = circleByTwoPointsAndTransversalLine();
+        else
+          aResult = circleByTwoPointsAndTangentCurve();
         break;
+      }
       case 3:
         aResult = circleByThreePassingPoints();
         break;
@@ -342,6 +361,22 @@ private:
   }
 
 
+  Circ2dPtr circleByTwoPointsAndTransversalLine()
+  {
+    const gp_Pnt2d& aPoint1 = myPassingPoints[0];
+    const gp_Pnt2d& aPoint2 = myPassingPoints[1];
+
+    if (myTransversalLine && myTransversalLine->GetType() == GeomAbs_Line) {
+      GccAna_Circ2d2TanOn aCircleBuilder(aPoint1, aPoint2, myTransversalLine->Line(),
+                                         Precision::Confusion());
+      if (aCircleBuilder.NbSolutions() > 0)
+        return Circ2dPtr(new gp_Circ2d(aCircleBuilder.ThisSolution(1)));
+    }
+
+    return Circ2dPtr();
+  }
+
+
   Circ2dPtr circleByRadiusAndTwoTangentCurves()
   {
     VectorOfGccCirc aTgCirc;
@@ -467,6 +502,7 @@ private:
   std::shared_ptr<GeomAPI_Pnt2d> myCenter;
   std::vector<gp_Pnt2d> myPassingPoints;
   std::vector<CurveAdaptorPtr> myTangentShapes;
+  CurveAdaptorPtr myTransversalLine;
   double myRadius;
   std::shared_ptr<GeomAPI_Pnt2d> myClosestPoint;
 };
@@ -495,6 +531,12 @@ void GeomAlgoAPI_Circ2dBuilder::addTangentCurve(const std::shared_ptr<GeomAPI_Sh
 {
   if (theEdge->isEdge())
     myTangentShapes.push_back(theEdge);
+}
+
+void GeomAlgoAPI_Circ2dBuilder::setTransversalLine(const std::shared_ptr<GeomAPI_Shape>& theEdge)
+{
+  if (theEdge->isEdge())
+    myTransversalLine = theEdge;
 }
 
 void GeomAlgoAPI_Circ2dBuilder::addPassingPoint(const std::shared_ptr<GeomAPI_Pnt2d>& thePoint)
@@ -526,6 +568,7 @@ std::shared_ptr<GeomAPI_Circ2d> GeomAlgoAPI_Circ2dBuilder::circle()
   CircleBuilder aCircleBuilder(myPlane);
   aCircleBuilder.setCenter(myCenter);
   aCircleBuilder.setTangentCurves(myTangentShapes);
+  aCircleBuilder.setTransversalLine(myTransversalLine);
   aCircleBuilder.setPassingPoints(myPassingPoints);
   aCircleBuilder.setClosestPoint(myClosestPoint);
   aCircleBuilder.setRadius(myRadius);

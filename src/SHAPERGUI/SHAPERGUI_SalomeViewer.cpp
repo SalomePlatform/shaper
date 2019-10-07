@@ -576,6 +576,18 @@ void SHAPERGUI_SalomeViewer::setColorScaleTitle(const QString& theText)
   }
 }
 
+void SHAPERGUI_SalomeViewer::setFitter(OCCViewer_Fitter* theFitter)
+{
+  if (mySelector)
+    mySelector->viewer()->setFitter(theFitter);
+}
+
+OCCViewer_Fitter* SHAPERGUI_SalomeViewer::fitter() const
+{
+  if (mySelector)
+    return mySelector->viewer()->fitter();
+  return 0;
+}
 
 
 //void SHAPERGUI_SalomeViewer::Zfitall()

@@ -22,13 +22,20 @@
 
 #include <PlaneGCSSolver_EdgeWrapper.h>
 #include <PlaneGCSSolver_PointWrapper.h>
+#include <PlaneGCSSolver_Storage.h>
 #include <PlaneGCSSolver_Tools.h>
 #include <PlaneGCSSolver_UpdateCoincidence.h>
 
+#include <GeomAPI_Circ2d.h>
+#include <GeomAPI_Lin2d.h>
 #include <GeomAPI_Pnt2d.h>
+#include <GeomAPI_Ellipse2d.h>
+
 #include <SketchPlugin_Arc.h>
 #include <SketchPlugin_Circle.h>
 #include <SketchPlugin_ConstraintCoincidence.h>
+#include <SketchPlugin_ConstraintCoincidenceInternal.h>
+#include <SketchPlugin_ConstraintMiddle.h>
 
 #include <cmath>
 
@@ -47,6 +54,9 @@ static std::set<FeaturePtr> collectCoincidences(FeaturePtr theFeature1, FeatureP
 static std::set<AttributePtr> coincidentBoundaryPoints(FeaturePtr theFeature1,
                                                        FeaturePtr theFeature2);
 
+/// \brief Collect points coincident with each of two features
+static std::set<AttributePtr> coincidentPoints(FeaturePtr theFeature1, FeaturePtr theFeature2);
+
 /// \brief Check if two connected arcs have centers
 ///        in same direction relatively to connection point
 static bool isArcArcTangencyInternal(EntityWrapperPtr theArc1,
@@ -59,11 +69,14 @@ static ConstraintWrapperPtr
                         double*          theAngle = 0);
 
 static ConstraintWrapperPtr
-  createArcArcTangency(EntityWrapperPtr theEntity1,
-                       EntityWrapperPtr theEntity2,
-                       bool             theInternalTangency,
-                       EntityWrapperPtr theSharedPoint = EntityWrapperPtr(),
-                       double*          theAngle = 0);
+  createCurveCurveTangency(EntityWrapperPtr theEntity1,
+                           EntityWrapperPtr theEntity2,
+                           bool             theInternalTangency,
+                           EntityWrapperPtr theSharedPoint = EntityWrapperPtr(),
+                           double*          theAngle = 0);
+
+static void calculateTangencyPoint(EntityWrapperPtr theCurve1, EntityWrapperPtr theCurve2,
+                                   GCSPointPtr& theTangencyPoint);
 
 
 void SketchSolver_ConstraintTangent::process()
@@ -92,12 +105,21 @@ void SketchSolver_ConstraintTangent::rebuild()
   if (mySolverConstraint)
     myStorage->removeConstraint(myBaseConstraint);
 
+  std::shared_ptr<PlaneGCSSolver_Storage> aStorage =
+      std::dynamic_pointer_cast<PlaneGCSSolver_Storage>(myStorage);
+
   mySolverConstraint = ConstraintWrapperPtr();
   mySharedPoint = AttributePtr();
+  if (myAuxPoint) {
+    GCS::SET_pD aParams = PlaneGCSSolver_Tools::parameters(myAuxPoint);
+    aStorage->removeParameters(aParams);
+    myAuxPoint = EntityWrapperPtr();
+  }
 
   // Check the quantity of entities of each type and their order (arcs first)
   int aNbLines = 0;
   int aNbCircles = 0;
+  int aNbEllipses = 0;
   std::list<EntityWrapperPtr>::iterator anEntIt = myAttributes.begin();
   for (; anEntIt != myAttributes.end(); ++anEntIt) {
     if (!(*anEntIt).get())
@@ -106,17 +128,19 @@ void SketchSolver_ConstraintTangent::rebuild()
       ++aNbLines;
     else if ((*anEntIt)->type() == ENTITY_ARC || (*anEntIt)->type() == ENTITY_CIRCLE)
       ++aNbCircles;
+    else if ((*anEntIt)->type() == ENTITY_ELLIPSE || (*anEntIt)->type() == ENTITY_ELLIPTIC_ARC)
+      ++aNbEllipses;
   }
 
-  if (aNbCircles < 1) {
+  if (aNbCircles + aNbEllipses < 1) {
     myErrorMsg = SketchSolver_Error::INCORRECT_TANGENCY_ATTRIBUTE();
     return;
   }
   if (aNbLines == 1 && aNbCircles == 1) {
     myType = CONSTRAINT_TANGENT_CIRCLE_LINE;
   }
-  else if (aNbCircles == 2) {
-    myType = CONSTRAINT_TANGENT_CIRCLE_CIRCLE;
+  else if (aNbLines + aNbCircles + aNbEllipses == 2) {
+    myType = CONSTRAINT_TANGENT_CURVE_CURVE;
     isArcArcInternal = isArcArcTangencyInternal(myAttributes.front(), myAttributes.back());
   }
   else {
@@ -134,18 +158,50 @@ void SketchSolver_ConstraintTangent::rebuild()
     return;
   }
 
+  // Try to find non-boundary points coincident with both features.
+  // It is necesasry to create tangency with ellipse
+  if (aCoincidentPoints.empty() && aNbEllipses > 0)
+    aCoincidentPoints = coincidentPoints(aFeature1, aFeature2);
+
   EntityWrapperPtr aSharedPointEntity;
+  std::list<GCSConstraintPtr> anAuxConstraints;
   if (!aCoincidentPoints.empty()) {
     mySharedPoint = *aCoincidentPoints.begin();
     aSharedPointEntity = myStorage->entity(mySharedPoint);
+  }
+  else if (aNbEllipses > 0) {
+    // create auxiliary point
+    GCSPointPtr aPoint(new GCS::Point);
+    aPoint->x = aStorage->createParameter();
+    aPoint->y = aStorage->createParameter();
+    calculateTangencyPoint(myAttributes.front(), myAttributes.back(), aPoint);
+
+    myAuxPoint.reset(new PlaneGCSSolver_PointWrapper(aPoint));
+    aSharedPointEntity = myAuxPoint;
+
+    // create auxiliary coincident constraints for tangency with ellipse
+    EntityWrapperPtr aDummy;
+    ConstraintWrapperPtr aCoincidence = PlaneGCSSolver_Tools::createConstraint(ConstraintPtr(),
+        CONSTRAINT_PT_ON_CURVE, aDummy, aSharedPointEntity, aDummy, myAttributes.front(), aDummy);
+    anAuxConstraints = aCoincidence->constraints();
+    aCoincidence = PlaneGCSSolver_Tools::createConstraint(ConstraintPtr(),
+        CONSTRAINT_PT_ON_CURVE, aDummy, aSharedPointEntity, aDummy, myAttributes.back(), aDummy);
+    anAuxConstraints.insert(anAuxConstraints.end(),
+        aCoincidence->constraints().begin(), aCoincidence->constraints().end());
   }
 
   if (myType == CONSTRAINT_TANGENT_CIRCLE_LINE) {
     mySolverConstraint = createArcLineTangency(myAttributes.front(), myAttributes.back(),
                                            aSharedPointEntity, &myCurveCurveAngle);
   } else {
-    mySolverConstraint = createArcArcTangency(myAttributes.front(), myAttributes.back(),
+    mySolverConstraint = createCurveCurveTangency(myAttributes.front(), myAttributes.back(),
                             isArcArcInternal, aSharedPointEntity, &myCurveCurveAngle);
+  }
+
+  if (!anAuxConstraints.empty()) {
+    anAuxConstraints.insert(anAuxConstraints.end(), mySolverConstraint->constraints().begin(),
+        mySolverConstraint->constraints().end());
+    mySolverConstraint->setConstraints(anAuxConstraints);
   }
 
   myStorage->addConstraint(myBaseConstraint, mySolverConstraint);
@@ -153,7 +209,7 @@ void SketchSolver_ConstraintTangent::rebuild()
 
 void SketchSolver_ConstraintTangent::adjustConstraint()
 {
-  if (myType == CONSTRAINT_TANGENT_CIRCLE_CIRCLE) {
+  if (myType == CONSTRAINT_TANGENT_CURVE_CURVE) {
     EntityWrapperPtr anEntity1 =
         myStorage->entity(myBaseConstraint->attribute(SketchPlugin_Constraint::ENTITY_A()));
     EntityWrapperPtr anEntity2 =
@@ -204,15 +260,22 @@ void SketchSolver_ConstraintTangent::notify(const FeaturePtr&      theFeature,
     }
   }
 
-  if (mySharedPoint && !isRebuild) {
-    // The features are tangent in the shared point, but the coincidence has been removed/updated.
-    // Check if the coincidence is the same.
-    std::set<AttributePtr> aCoincidentPoints = coincidentBoundaryPoints(aTgFeat1, aTgFeat2);
-    isRebuild = true;
-    std::set<AttributePtr>::iterator anIt = aCoincidentPoints.begin();
-    for (; anIt != aCoincidentPoints.end() && isRebuild; ++anIt)
-      if (*anIt == mySharedPoint)
-        isRebuild = false; // the coincidence is still exists => nothing to change
+  if (!isRebuild) {
+    if (mySharedPoint) {
+      // The features are tangent in the shared point, but the coincidence has been removed/updated.
+      // Check if the coincidence is the same.
+      std::set<AttributePtr> aCoincidentPoints = coincidentBoundaryPoints(aTgFeat1, aTgFeat2);
+      isRebuild = true;
+      std::set<AttributePtr>::iterator anIt = aCoincidentPoints.begin();
+      for (; anIt != aCoincidentPoints.end() && isRebuild; ++anIt)
+        if (*anIt == mySharedPoint)
+          isRebuild = false; // the coincidence is still exists => nothing to change
+    }
+    else {
+      // check both features have a coincident point
+      std::set<AttributePtr> aCoincidentPoints = coincidentPoints(aTgFeat1, aTgFeat2);
+      isRebuild = (bool)(myAuxPoint.get()) == (!aCoincidentPoints.empty());
+    }
   }
 
   if (isRebuild)
@@ -283,6 +346,56 @@ std::set<AttributePtr> coincidentBoundaryPoints(FeaturePtr theFeature1, FeatureP
     }
   }
   return aCoincidentPoints;
+}
+
+static std::set<AttributePtr> refsToFeatureAndResults(FeaturePtr theFeature)
+{
+  std::set<AttributePtr> aRefs = theFeature->data()->refsToMe();
+  const std::list<ResultPtr>& aResults = theFeature->results();
+  for (std::list<ResultPtr>::const_iterator anIt = aResults.begin();
+      anIt != aResults.end(); ++anIt) {
+    const std::set<AttributePtr>& aResRefs = (*anIt)->data()->refsToMe();
+    aRefs.insert(aResRefs.begin(), aResRefs.end());
+  }
+  return aRefs;
+}
+
+// collect all points coincident with the feature
+static std::set<AttributePtr> pointsOnFeature(FeaturePtr theFeature)
+{
+  std::set<AttributePtr> aPoints;
+
+  std::set<AttributePtr> aRefs = refsToFeatureAndResults(theFeature);
+  for (std::set<AttributePtr>::const_iterator anIt = aRefs.begin(); anIt != aRefs.end(); ++anIt) {
+    FeaturePtr aRef = ModelAPI_Feature::feature((*anIt)->owner());
+    if (aRef && (aRef->getKind() == SketchPlugin_ConstraintCoincidence::ID() ||
+                 aRef->getKind() == SketchPlugin_ConstraintCoincidenceInternal::ID() ||
+                 aRef->getKind() == SketchPlugin_ConstraintMiddle::ID())) {
+      for (int i = 0; i < CONSTRAINT_ATTR_SIZE; ++i) {
+        AttributeRefAttrPtr aRefAttr = aRef->refattr(SketchPlugin_Constraint::ATTRIBUTE(i));
+        if (aRefAttr) {
+          AttributePtr anAttr = aRefAttr->attr();
+          if (anAttr && anAttr->id() != SketchPlugin_Arc::CENTER_ID() &&
+                        anAttr->id() != SketchPlugin_Circle::CENTER_ID())
+            aPoints.insert(anAttr);
+        }
+      }
+    }
+  }
+  return aPoints;
+}
+
+std::set<AttributePtr> coincidentPoints(FeaturePtr theFeature1, FeaturePtr theFeature2)
+{
+  std::set<AttributePtr> aPointsOnF1 = pointsOnFeature(theFeature1);
+  std::set<AttributePtr> aPointsOnF2 = pointsOnFeature(theFeature2);
+
+  std::set<AttributePtr> aCommonPoints;
+  for (std::set<AttributePtr>::iterator anIt = aPointsOnF1.begin();
+       anIt != aPointsOnF1.end(); ++anIt)
+    if (aPointsOnF2.find(*anIt) != aPointsOnF2.end())
+      aCommonPoints.insert(*anIt);
+  return aCommonPoints;
 }
 
 bool isArcArcTangencyInternal(EntityWrapperPtr theArc1, EntityWrapperPtr theArc2)
@@ -358,30 +471,65 @@ ConstraintWrapperPtr createArcLineTangency(EntityWrapperPtr theEntity1,
       new PlaneGCSSolver_ConstraintWrapper(aNewConstr, CONSTRAINT_TANGENT_CIRCLE_LINE));
 }
 
-ConstraintWrapperPtr createArcArcTangency(EntityWrapperPtr theEntity1,
-                                          EntityWrapperPtr theEntity2,
-                                          bool             theInternalTangency,
-                                          EntityWrapperPtr theSharedPoint,
-                                          double*          theAngle)
+ConstraintWrapperPtr createCurveCurveTangency(EntityWrapperPtr theEntity1,
+                                              EntityWrapperPtr theEntity2,
+                                              bool             theInternalTangency,
+                                              EntityWrapperPtr theSharedPoint,
+                                              double*          theAngle)
 {
-  std::shared_ptr<GCS::Circle> aCirc1 =
-    std::dynamic_pointer_cast<GCS::Circle>(GCS_EDGE_WRAPPER(theEntity1)->entity());
-  std::shared_ptr<GCS::Circle> aCirc2 =
-    std::dynamic_pointer_cast<GCS::Circle>(GCS_EDGE_WRAPPER(theEntity2)->entity());
+  GCSCurvePtr aCurve1 =
+    std::dynamic_pointer_cast<GCS::Curve>(GCS_EDGE_WRAPPER(theEntity1)->entity());
+  GCSCurvePtr aCurve2 =
+    std::dynamic_pointer_cast<GCS::Curve>(GCS_EDGE_WRAPPER(theEntity2)->entity());
 
   GCSConstraintPtr aNewConstr;
   if (theSharedPoint) {
     GCSPointPtr aPoint =
         std::dynamic_pointer_cast<PlaneGCSSolver_PointWrapper>(theSharedPoint)->point();
 
-    adjustAngleBetweenCurves(aCirc1, aCirc2, aPoint, theAngle);
+    adjustAngleBetweenCurves(aCurve1, aCurve2, aPoint, theAngle);
     aNewConstr =
-        GCSConstraintPtr(new GCS::ConstraintAngleViaPoint(*aCirc1, *aCirc2, *aPoint, theAngle));
+        GCSConstraintPtr(new GCS::ConstraintAngleViaPoint(*aCurve1, *aCurve2, *aPoint, theAngle));
   } else {
+    std::shared_ptr<GCS::Circle> aCirc1 = std::dynamic_pointer_cast<GCS::Circle>(aCurve1);
+    std::shared_ptr<GCS::Circle> aCirc2 = std::dynamic_pointer_cast<GCS::Circle>(aCurve2);
     aNewConstr = GCSConstraintPtr(new GCS::ConstraintTangentCircumf(aCirc1->center, aCirc2->center,
                                   aCirc1->rad, aCirc2->rad, theInternalTangency));
   }
 
   return ConstraintWrapperPtr(
-      new PlaneGCSSolver_ConstraintWrapper(aNewConstr, CONSTRAINT_TANGENT_CIRCLE_CIRCLE));
+      new PlaneGCSSolver_ConstraintWrapper(aNewConstr, CONSTRAINT_TANGENT_CURVE_CURVE));
+}
+
+void calculateTangencyPoint(EntityWrapperPtr theCurve1, EntityWrapperPtr theCurve2,
+                            GCSPointPtr& theTangencyPoint)
+{
+  std::shared_ptr<GeomAPI_Ellipse2d> anEllipse = PlaneGCSSolver_Tools::ellipse(theCurve1);
+  EntityWrapperPtr aCurve2 = theCurve2;
+  if (!anEllipse) {
+    // try converting to ellipse the second curve
+    anEllipse = PlaneGCSSolver_Tools::ellipse(theCurve2);
+    if (!anEllipse)
+      return; // no one curve is ellipse
+    aCurve2 = theCurve1;
+  }
+
+  GeomPnt2dPtr aP1, aP2;
+  if (aCurve2->type() == ENTITY_LINE) {
+    std::shared_ptr<GeomAPI_Lin2d> aLine = PlaneGCSSolver_Tools::line(aCurve2);
+    anEllipse->distance(aLine, aP1, aP2);
+  }
+  else if (aCurve2->type() == ENTITY_ARC || aCurve2->type() == ENTITY_CIRCLE) {
+    std::shared_ptr<GeomAPI_Circ2d> aCircle = PlaneGCSSolver_Tools::circle(aCurve2);
+    anEllipse->distance(aCircle, aP1, aP2);
+  }
+  else if (aCurve2->type() == ENTITY_ELLIPSE || aCurve2->type() == ENTITY_ELLIPTIC_ARC) {
+    std::shared_ptr<GeomAPI_Ellipse2d> anEl2 = PlaneGCSSolver_Tools::ellipse(aCurve2);
+    anEllipse->distance(anEl2, aP1, aP2);
+  }
+
+  if (aP1 && aP2) {
+    *theTangencyPoint->x = 0.5 * (aP1->x() + aP2->x());
+    *theTangencyPoint->y = 0.5 * (aP1->y() + aP2->y());
+  }
 }

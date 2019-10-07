@@ -34,7 +34,7 @@ class GeomAPI_Pnt;
 class ModelAPI_AttributeSelection : public ModelAPI_Attribute
 {
  public:
-   /// Type of the center of the circular of elliptical edge
+   /// Type of the center of the circular of elliptic edge
    enum CenterType {
      NOT_CENTER, ///< this is not a center
      CIRCLE_CENTER, ///< center of the circle
@@ -52,7 +52,7 @@ class ModelAPI_AttributeSelection : public ModelAPI_Attribute
     const ObjectPtr& theContext, const std::shared_ptr<GeomAPI_Shape>& theSubShape,
     const bool theTemporarily = false) = 0;
 
-  /// Same as SetValue, but it takes an edge (on circular or elliptical curve)
+  /// Same as SetValue, but it takes an edge (on circular or elliptic curve)
   /// and stores the vertex of the central point (for ellipse the first or the second focus point)
   virtual void setValueCenter(
     const ObjectPtr& theContext, const std::shared_ptr<GeomAPI_Edge>& theEdge,

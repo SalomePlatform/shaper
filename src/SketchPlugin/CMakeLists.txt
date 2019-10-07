@@ -28,6 +28,7 @@ SET(PROJECT_HEADERS
     SketchPlugin_ConstraintAngle.h
     SketchPlugin_ConstraintBase.h
     SketchPlugin_ConstraintCoincidence.h
+    SketchPlugin_ConstraintCoincidenceInternal.h
     SketchPlugin_ConstraintCollinear.h
     SketchPlugin_ConstraintDistance.h
     SketchPlugin_ConstraintDistanceAlongDir.h
@@ -46,6 +47,7 @@ SET(PROJECT_HEADERS
     SketchPlugin_ConstraintTangent.h
     SketchPlugin_ConstraintVertical.h
     SketchPlugin_Ellipse.h
+    SketchPlugin_EllipticArc.h
     SketchPlugin_ExternalValidator.h
     SketchPlugin_Feature.h
     SketchPlugin_IntersectionPoint.h
@@ -54,6 +56,7 @@ SET(PROJECT_HEADERS
     SketchPlugin_MacroArcReentrantMessage.h
     SketchPlugin_MacroCircle.h
     SketchPlugin_MacroEllipse.h
+    SketchPlugin_MacroEllipticArc.h
     SketchPlugin_MultiRotation.h
     SketchPlugin_MultiTranslation.h
     SketchPlugin_Plugin.h
@@ -74,6 +77,7 @@ SET(PROJECT_SOURCES
     SketchPlugin_Constraint.cpp
     SketchPlugin_ConstraintAngle.cpp
     SketchPlugin_ConstraintCoincidence.cpp
+    SketchPlugin_ConstraintCoincidenceInternal.cpp
     SketchPlugin_ConstraintCollinear.cpp
     SketchPlugin_ConstraintDistance.cpp
     SketchPlugin_ConstraintDistanceAlongDir.cpp
@@ -92,6 +96,7 @@ SET(PROJECT_SOURCES
     SketchPlugin_ConstraintTangent.cpp
     SketchPlugin_ConstraintVertical.cpp
     SketchPlugin_Ellipse.cpp
+    SketchPlugin_EllipticArc.cpp
     SketchPlugin_ExternalValidator.cpp
     SketchPlugin_Feature.cpp
     SketchPlugin_IntersectionPoint.cpp
@@ -99,6 +104,7 @@ SET(PROJECT_SOURCES
     SketchPlugin_MacroArc.cpp
     SketchPlugin_MacroCircle.cpp
     SketchPlugin_MacroEllipse.cpp
+    SketchPlugin_MacroEllipticArc.cpp
     SketchPlugin_MultiRotation.cpp
     SketchPlugin_MultiTranslation.cpp
     SketchPlugin_Plugin.cpp
@@ -130,6 +136,7 @@ SET(XML_RESOURCES
 
 SET(TEXT_RESOURCES
 	SketchPlugin_msg_en.ts
+	SketchPlugin_msg_fr.ts
 )
 
 SOURCE_GROUP ("Resource Files" FILES ${TEXT_RESOURCES})
@@ -195,36 +202,56 @@ ADD_UNIT_TESTS(
   Test2824.py
   Test2860.py
   Test2894.py
+  Test3019.py
   TestArcBehavior.py
   TestChangeSketchPlane1.py
   TestChangeSketchPlane2.py
   TestChangeSketchPlane3.py
+  TestChangeSketchPlane4.py
   TestConstraintAngle.py
+  TestConstraintAngleEllipse.py
   TestConstraintCoincidence.py
+  TestConstraintCoincidenceEllipse.py
+  TestConstraintCoincidenceEllipticArc.py
   TestConstraintCollinear.py
+  TestConstraintCollinearEllipse.py
   TestConstraintDistance.py
+  TestConstraintDistanceEllipse.py
   TestConstraintDistanceBehavior.py
   TestConstraintDistanceHorizontal.py
   TestConstraintDistanceVertical.py
   TestConstraintEqual.py
+  TestConstraintEqualEllipse.py
   TestConstraintFixed.py
   TestConstraintHorizontal.py
   TestConstraintHorizontalValidator.py
   TestConstraintLength.py
   TestConstraintMiddlePoint.py
+  TestConstraintMiddlePointOnArc.py
+  TestConstraintMiddlePointOnEllipticArc.py
   TestConstraintParallel.py
   TestConstraintPerpendicular.py
+  TestConstraintPerpendicularArcLine.py
+  TestConstraintPerpendicularEllipseLine.py
   TestConstraintRadius.py
   TestConstraintRadiusFailure.py
   TestConstraintTangent.py
+  TestConstraintTangentEllipse.py
+  TestConstraintTangentEllipticArc.py
   TestConstraintVertical.py
   TestCreateArcByCenterStartEnd.py
   TestCreateArcByTangentEdge.py
   TestCreateArcByThreePoints.py
+  TestCreateArcByTransversalLine.py
   TestCreateArcChangeType.py
   TestCreateCircleByCenterAndPassed.py
   TestCreateCircleByThreePoints.py
   TestCreateCircleChangeType.py
+  TestCreateEllipseByCenterSemiaxisAndPassed.py
+  TestCreateEllipseByMajorAxisAndPassed.py
+  TestCreateEllipseByExternal.py
+  TestCreateEllipticArc.py
+  TestCreateEllipticArcByExternal.py
   TestDegeneratedGeometry.py
   TestDistanceDump.py
   TestDistanceSignedVsUnsigned01.py
@@ -252,9 +279,13 @@ ADD_UNIT_TESTS(
   TestMultiTranslation.py
   TestPresentation.py
   TestProjection.py
+  TestProjectionEllipse.py
+  TestProjectionEllipticArc.py
   TestProjectionIntoResult.py
   TestProjectionUpdate.py
   TestRectangle.py
+  TestRemoveEllipse.py
+  TestRemoveEllipticArc.py
   TestRemoveSketch.py
   TestSignedDistancePointLine.py
   TestSignedDistancePointPoint.py
@@ -262,6 +293,7 @@ ADD_UNIT_TESTS(
   TestSketchPointLine.py
   TestSnowflake.py
   TestSplit.py
+  TestSplitEllipse.py
   TestSplitLine.py
   TestSplitPreview.py
   TestTrimArc01.py
@@ -278,6 +310,7 @@ ADD_UNIT_TESTS(
   TestTrimCircle04.py
   TestTrimCircle05.py
   TestTrimCircleAndArc01.py
+  TestTrimEllipse.py
   TestTrimLine01.py
   TestTrimLine02.py
   TestTrimLine03.py
@@ -289,6 +322,7 @@ if(${SKETCHER_CHANGE_RADIUS_WHEN_MOVE})
   ADD_UNIT_TESTS(
     TestMoveArc.py
     TestMoveCircle.py
+    TestMoveEllipse.py
     TestMoveLine.py
     TestMovementComplex.py
     TestMovePoint.py

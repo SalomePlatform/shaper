@@ -24,8 +24,10 @@
 #include <SketchSolver_ConstraintMovement.h>
 #include <SketchPlugin_Constraint.h>
 
-#include <GeomAPI_Lin2d.h>
-#include <GeomAPI_Pnt2d.h>
+class GeomAPI_Circ2d;
+class GeomAPI_Ellipse2d;
+class GeomAPI_Lin2d;
+class GeomAPI_Pnt2d;
 
 /** \namespace  PlaneGCSSolver_Tools
  *  \ingroup    Plugins
@@ -68,10 +70,21 @@ namespace PlaneGCSSolver_Tools
   /// \brief Convert entity to line
   /// \return empty pointer if the entity is not a line
   std::shared_ptr<GeomAPI_Lin2d> line(EntityWrapperPtr theEntity);
+  /// \brief Convert entity to circle
+  /// \return empty pointer if the entity is not a circle
+  std::shared_ptr<GeomAPI_Circ2d> circle(EntityWrapperPtr theEntity);
+  /// \brief Convert entity to ellipse
+  /// \return empty pointer if the entity is not an ellipse
+  std::shared_ptr<GeomAPI_Ellipse2d> ellipse(EntityWrapperPtr theEntity);
 
   /// \brief Convert entity to line
   /// \return empty pointer if the entity is not a line
   std::shared_ptr<GeomAPI_Lin2d> line(FeaturePtr theFeature);
+
+  /// \brief Update start and end parameters of circular and elliptic arcs
+  ///        respectively to start and end points on the arc.
+  ///        For the circular arc, the radius is calculated too.
+  void recalculateArcParameters(EntityWrapperPtr theArc);
 
   /// brief Return list of parameters for the given entity
   GCS::SET_pD parameters(const EntityWrapperPtr& theEntity);

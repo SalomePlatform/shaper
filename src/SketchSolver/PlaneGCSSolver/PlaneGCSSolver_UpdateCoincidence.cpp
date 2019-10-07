@@ -23,6 +23,7 @@
 #include <SketchSolver_Constraint.h>
 
 #include <SketchPlugin_ConstraintCoincidence.h>
+#include <SketchPlugin_ConstraintCoincidenceInternal.h>
 #include <SketchPlugin_ConstraintCollinear.h>
 #include <SketchPlugin_ConstraintMiddle.h>
 
@@ -48,6 +49,7 @@ void PlaneGCSSolver_UpdateCoincidence::attach(SketchSolver_Constraint* theObserv
 void PlaneGCSSolver_UpdateCoincidence::update(const FeaturePtr& theFeature)
 {
   if (theFeature->getKind() == SketchPlugin_ConstraintCoincidence::ID() ||
+      theFeature->getKind() == SketchPlugin_ConstraintCoincidenceInternal::ID() ||
       theFeature->getKind() == SketchPlugin_ConstraintMiddle::ID() ||
       theFeature->getKind() == SketchPlugin_ConstraintCollinear::ID()) {
     myCoincident.clear();

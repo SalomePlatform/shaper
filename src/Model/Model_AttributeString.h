@@ -47,6 +47,8 @@ class Model_AttributeString : public ModelAPI_AttributeString
   MODEL_EXPORT virtual std::string value();
   /// Returns a pointer to Unicode string
   MODEL_EXPORT virtual char16_t* valueU();
+  /// Returns true if Unicode string was stored
+  MODEL_EXPORT virtual bool isUValue() const;
 
  protected:
   /// Initializes attributes

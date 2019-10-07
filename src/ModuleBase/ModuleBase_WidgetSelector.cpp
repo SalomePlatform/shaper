@@ -209,7 +209,9 @@ bool ModuleBase_WidgetSelector::isValidSelectionCustom(const ModuleBase_ViewerPr
 {
   GeomShapePtr aShape = myWorkshop->selection()->getShape(thePrs);
   ResultPtr aResult = myWorkshop->selection()->getResult(thePrs);
-  bool aValid = acceptSubShape(aShape, aResult);
+  bool aValid = aResult.get();
+  if (!isWholeResultAllowed())
+    aValid = acceptSubShape(aShape, aResult);
 
   if (aValid) {
     // In order to avoid selection of the same object
@@ -251,4 +253,17 @@ void ModuleBase_WidgetSelector::deactivate()
                       std::dynamic_pointer_cast<ModelAPI_AttributeSelectionList>(anAttribute);
     aSelectAttr->removeTemporaryValues();
   }
+}
+
+//********************************************************************
+bool ModuleBase_WidgetSelector::isWholeResultAllowed() const
+{
+  AttributePtr anAttribute = attribute();
+  if (anAttribute.get()) {
+    AttributeSelectionListPtr aSelAttr =
+      std::dynamic_pointer_cast<ModelAPI_AttributeSelectionList>(anAttribute);
+    if (aSelAttr.get())
+      return aSelAttr->isWholeResultAllowed();
+  }
+  return false;
 }

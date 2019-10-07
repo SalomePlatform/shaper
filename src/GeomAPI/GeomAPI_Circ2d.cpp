@@ -54,6 +54,12 @@ static gp_Circ2d* newCirc2d(const double theCenterX, const double theCenterY,
 }
 
 
+GeomAPI_Circ2d::GeomAPI_Circ2d(const double theCenterX,
+                               const double theCenterY,
+                               const double theRadius)
+  : GeomAPI_Interface(newCirc2d(theCenterX, theCenterY, gp::DX2d(), theRadius))
+{
+}
 
 GeomAPI_Circ2d::GeomAPI_Circ2d(const std::shared_ptr<GeomAPI_Pnt2d>& theCenter,
                                const std::shared_ptr<GeomAPI_Pnt2d>& theCirclePoint)

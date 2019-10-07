@@ -55,6 +55,7 @@ private:
   bool isArcArcInternal;
   double myCurveCurveAngle;
   AttributePtr mySharedPoint;
+  EntityWrapperPtr myAuxPoint;
 };
 
 #endif

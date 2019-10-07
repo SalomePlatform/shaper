@@ -207,7 +207,7 @@ void XGUI_PropertyPanel::updateContentWidget(FeaturePtr theFeature)
     eachWidget->restoreValue();
   }
   // the repaint is used here to immediately react in GUI to the values change.
-  repaint();
+  update();
 }
 
 void XGUI_PropertyPanel::createContentPanel(FeaturePtr theFeature)

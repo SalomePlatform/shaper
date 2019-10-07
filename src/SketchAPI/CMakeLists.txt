@@ -25,17 +25,21 @@ SET(PROJECT_HEADERS
   SketchAPI_Circle.h
   SketchAPI_Constraint.h
   SketchAPI_ConstraintAngle.h
+  SketchAPI_Ellipse.h
+  SketchAPI_EllipticArc.h
   SketchAPI_IntersectionPoint.h
   SketchAPI_Line.h
   SketchAPI_MacroArc.h
   SketchAPI_MacroCircle.h
+  SketchAPI_MacroEllipse.h
+  SketchAPI_MacroEllipticArc.h
   SketchAPI_Mirror.h
-  SketchAPI_Sketch.h
-  SketchAPI_SketchEntity.h
   SketchAPI_Point.h
   SketchAPI_Projection.h
   SketchAPI_Rectangle.h
   SketchAPI_Rotation.h
+  SketchAPI_Sketch.h
+  SketchAPI_SketchEntity.h
   SketchAPI_Translation.h
 )
 
@@ -44,17 +48,21 @@ SET(PROJECT_SOURCES
   SketchAPI_Circle.cpp
   SketchAPI_Constraint.cpp
   SketchAPI_ConstraintAngle.cpp
+  SketchAPI_Ellipse.cpp
+  SketchAPI_EllipticArc.cpp
   SketchAPI_IntersectionPoint.cpp
   SketchAPI_Line.cpp
   SketchAPI_MacroArc.cpp
   SketchAPI_MacroCircle.cpp
+  SketchAPI_MacroEllipse.cpp
+  SketchAPI_MacroEllipticArc.cpp
   SketchAPI_Mirror.cpp
-  SketchAPI_Sketch.cpp
-  SketchAPI_SketchEntity.cpp
   SketchAPI_Point.cpp
   SketchAPI_Projection.cpp
   SketchAPI_Rectangle.cpp
   SketchAPI_Rotation.cpp
+  SketchAPI_Sketch.cpp
+  SketchAPI_SketchEntity.cpp
   SketchAPI_Translation.cpp
 )
 

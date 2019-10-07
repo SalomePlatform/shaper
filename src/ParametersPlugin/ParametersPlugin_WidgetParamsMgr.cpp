@@ -60,7 +60,6 @@ enum ColumnType {
 
 const char* NoName = "<NoName>";
 const char* NoValue = "<NoValue>";
-const char* NotValid = "<NotValid>";
 
 /*!
  * \ingroup GUI
@@ -186,7 +185,8 @@ ParametersPlugin_WidgetParamsMgr::ParametersPlugin_WidgetParamsMgr(QWidget* theP
   myTable = new ParametersPlugin_TreeWidget(this);
   myTable->setColumnCount(4);
   QStringList aHeaders;
-  aHeaders << tr("Name") << tr("Expression") << tr("Result") << tr("Comment");
+  aHeaders << translate("Name") << translate("Expression")
+           << translate("Result") << translate("Comment");
   myTable->setHeaderLabels(aHeaders);
   myTable->setColumnWidth(Col_Name, 200);
   myTable->setColumnWidth(Col_Equation, 100);
@@ -209,13 +209,13 @@ ParametersPlugin_WidgetParamsMgr::ParametersPlugin_WidgetParamsMgr(QWidget* theP
 
   // Define root nodes
   QStringList aNames;
-  aNames<<tr("Parameters");
+  aNames<<translate("Parameters");
   myParameters = new QTreeWidgetItem(aNames);
   myParameters->setFlags(Qt::ItemIsEnabled);
   myTable->addTopLevelItem(myParameters);
 
   aNames.clear();
-  aNames<<tr("Features");
+  aNames<<translate("Features");
   myFeatures = new QTreeWidgetItem(aNames);
   myFeatures->setFlags(Qt::ItemIsEnabled);
   myTable->addTopLevelItem(myFeatures);
@@ -234,15 +234,15 @@ ParametersPlugin_WidgetParamsMgr::ParametersPlugin_WidgetParamsMgr(QWidget* theP
 
   aBtnLayout->addStretch();
 
-  myAddBtn = new QPushButton(tr("Add"), this);
+  myAddBtn = new QPushButton(translate("Add"), this);
   connect(myAddBtn, SIGNAL(clicked(bool)), SLOT(onAdd()));
   aBtnLayout->addWidget(myAddBtn);
 
-  myInsertBtn = new QPushButton(tr("Insert"), this);
+  myInsertBtn = new QPushButton(translate("Insert"), this);
   connect(myInsertBtn, SIGNAL(clicked(bool)), SLOT(onInsert()));
   aBtnLayout->addWidget(myInsertBtn);
 
-  myRemoveBtn = new QPushButton(tr("Remove"), this);
+  myRemoveBtn = new QPushButton(translate("Remove"), this);
   connect(myRemoveBtn, SIGNAL(clicked(bool)), SLOT(onRemove()));
   aBtnLayout->addWidget(myRemoveBtn);
 
@@ -258,7 +258,7 @@ void ParametersPlugin_WidgetParamsMgr::setDialogButtons(QDialogButtonBox* theBut
   QWidget* aBtnParentWgt = myOkCancelBtn->parentWidget();
   QHBoxLayout* aBtnParentLayout = dynamic_cast<QHBoxLayout*>(aBtnParentWgt->layout());
 
-  QPushButton* aPreviewBtn = new QPushButton(tr("See preview"), aBtnParentWgt);
+  QPushButton* aPreviewBtn = new QPushButton(translate("See preview"), aBtnParentWgt);
   aBtnParentLayout->insertWidget(0, aPreviewBtn);
   aBtnParentLayout->insertStretch(1, 1);
   connect(aPreviewBtn, SIGNAL(clicked(bool)), SLOT(onShowPreview()));
@@ -293,8 +293,7 @@ bool ParametersPlugin_WidgetParamsMgr::storeValueCustom()
   int aId = 0;
   foreach(FeaturePtr aFeature, myParametersList) {
     if (!aValidator.isValid(aFeature->attribute(aAttrId), aArgs, aErr)) {
-      // TODO(spo): translate
-      QMessageBox::warning(this, tr("Warning"), aErr.messageString().c_str());
+      QMessageBox::warning(this, translate("Warning"), aErr.messageString().c_str());
       selectItemScroll(myParameters->child(aId));
       return false;
     }
@@ -435,13 +434,13 @@ QList<QStringList> ParametersPlugin_WidgetParamsMgr::
 
     std::string aName = aParameter->string(ParametersPlugin_Parameter::VARIABLE_ID())->value();
     if (aName.empty()) {
-      aValues << NoName;
+      aValues << translate(NoName);
     } else
       aValues << aName.c_str();
 
     std::string aExpr = aParameter->string(ParametersPlugin_Parameter::EXPRESSION_ID())->value();
     if (aName.empty()) {
-      aValues << NoValue;
+      aValues << translate(NoValue);
     } else
       aValues << aExpr.c_str();
 
@@ -486,7 +485,7 @@ void ParametersPlugin_WidgetParamsMgr::onCloseEditor(QWidget* theEditor,
           aText.replace(" ", "");
         }
         if (hasName(aText)) {
-          myMessage = tr("Name '%1' already exists.").arg(aText);
+          myMessage = translate("Name '%1' already exists.").arg(aText);
           QTimer::singleShot(50, this, SLOT(sendWarning()));
           return;
         }
@@ -574,8 +573,8 @@ FeaturePtr ParametersPlugin_WidgetParamsMgr::createParameter() const
 QTreeWidgetItem* ParametersPlugin_WidgetParamsMgr::createNewItem(QTreeWidgetItem* theParent) const
 {
   QStringList aValues;
-  aValues << NoName;
-  aValues << NoValue;
+  aValues << translate(NoName);
+  aValues << translate(NoValue);
 
   QTreeWidgetItem* aItem = new QTreeWidgetItem(aValues);
   if (theParent == myParameters) {
@@ -768,7 +767,7 @@ bool ParametersPlugin_WidgetParamsMgr::hasName(const QString& theName) const
 
 void ParametersPlugin_WidgetParamsMgr::sendWarning()
 {
-  QMessageBox::warning(this, tr("Warning"), myMessage);
+  QMessageBox::warning(this, translate("Warning"), myMessage);
   QTreeWidgetItem* aItem = myTable->currentItem();
   if (aItem)
     myTable->editItem(aItem);
@@ -819,7 +818,7 @@ bool ParametersPlugin_WidgetParamsMgr::isValid()
   for(int i = 0; i < myParameters->childCount(); i++) {
     aItem = myParameters->child(i);
     if ((aItem->text(Col_Name) == NoName) ||
-        (aItem->text(Col_Equation) == NoValue) ||
+        (aItem->text(Col_Equation) == translate(NoValue)) ||
         (!ModelAPI_Expression::isVariable(aItem->text(Col_Name).toStdString())) ) {
       return false;
     }

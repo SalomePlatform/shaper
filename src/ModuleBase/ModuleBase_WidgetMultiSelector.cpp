@@ -165,7 +165,7 @@ ModuleBase_WidgetMultiSelector::ModuleBase_WidgetMultiSelector(QWidget* theParen
     }
   }
 
-  QString aToolTip = QString::fromStdString(theData->widgetTooltip());
+  QString aToolTip = translate(theData->widgetTooltip());
   QString anObjName = QString::fromStdString(attributeID());
   myListView = new ModuleBase_ListView(this, anObjName, aToolTip);
   connect(myListView->getControl(), SIGNAL(itemSelectionChanged()), SLOT(onListSelection()));
@@ -809,7 +809,7 @@ void ModuleBase_WidgetMultiSelector::updateSelectionList()
   }
 
   // We have to call repaint because sometimes the List control is not updated
-  myListView->getControl()->repaint();
+  myListView->getControl()->update();
 }
 
 //********************************************************************

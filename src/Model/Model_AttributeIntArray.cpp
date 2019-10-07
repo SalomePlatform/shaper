@@ -39,7 +39,7 @@ int Model_AttributeIntArray::size()
     myIsInitialized = myLab.FindAttribute(TDataStd_IntegerArray::GetID(), myArray) == Standard_True;
   }
   // checking the validity because attribute (as a field) may be presented,
-  // but without label: it is undoed
+  // but without label: it is undone
   return (myArray.IsNull() || !myArray->IsValid()) ? 0 : myArray->Length();
 }
 
@@ -52,7 +52,7 @@ void Model_AttributeIntArray::setSize(const int theSize)
     }
   } else { // reset the old array
     if (theSize) {
-      if (theSize != myArray->Length()) { // old data is not keept, a new array is created
+      if (theSize != myArray->Length()) { // old data is not kept, a new array is created
         Handle(TColStd_HArray1OfInteger) aNewArray = new TColStd_HArray1OfInteger(0, theSize - 1);
         myArray->ChangeArray(aNewArray);
         owner()->data()->sendAttributeUpdated(this);

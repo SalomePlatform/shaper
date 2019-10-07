@@ -17,19 +17,19 @@
 // See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 
-// File:        SketchPlugin_MacroEllipse.cpp
-// Created:     26 April 2017
-// Author:      Artem ZHIDKOV
-
 #include <SketchPlugin_MacroEllipse.h>
 
+#include <SketchPlugin_ConstraintCoincidenceInternal.h>
 #include <SketchPlugin_Ellipse.h>
+#include <SketchPlugin_Line.h>
+#include <SketchPlugin_MacroArcReentrantMessage.h>
+#include <SketchPlugin_Point.h>
 #include <SketchPlugin_Tools.h>
 #include <SketchPlugin_Sketch.h>
 
 #include <ModelAPI_AttributeDouble.h>
 #include <ModelAPI_AttributeRefAttr.h>
-#include <ModelAPI_EventReentrantMessage.h>
+#include <ModelAPI_AttributeString.h>
 #include <ModelAPI_Session.h>
 #include <ModelAPI_Validator.h>
 #include <ModelAPI_Events.h>
@@ -37,7 +37,6 @@
 #include <GeomDataAPI_Point2D.h>
 
 #include <GeomAPI_Dir2d.h>
-#include <GeomAPI_Pnt2d.h>
 #include <GeomAPI_Ellipse2d.h>
 #include <GeomAPI_Vertex.h>
 
@@ -55,6 +54,9 @@ SketchPlugin_MacroEllipse::SketchPlugin_MacroEllipse()
 
 void SketchPlugin_MacroEllipse::initAttributes()
 {
+  data()->addAttribute(ELLIPSE_TYPE(), ModelAPI_AttributeString::typeId());
+  data()->addAttribute(EDIT_ELLIPSE_TYPE(), ModelAPI_AttributeString::typeId());
+
   data()->addAttribute(CENTER_POINT_ID(), GeomDataAPI_Point2D::typeId());
   data()->addAttribute(CENTER_POINT_REF_ID(), ModelAPI_AttributeRefAttr::typeId());
   data()->addAttribute(MAJOR_AXIS_POINT_ID(), GeomDataAPI_Point2D::typeId());
@@ -62,24 +64,47 @@ void SketchPlugin_MacroEllipse::initAttributes()
   data()->addAttribute(PASSED_POINT_ID(), GeomDataAPI_Point2D::typeId());
   data()->addAttribute(PASSED_POINT_REF_ID(), ModelAPI_AttributeRefAttr::typeId());
 
+  data()->addAttribute(MAJOR_AXIS_START_ID(), GeomDataAPI_Point2D::typeId());
+  data()->addAttribute(MAJOR_AXIS_START_REF_ID(), ModelAPI_AttributeRefAttr::typeId());
+  data()->addAttribute(MAJOR_AXIS_END_ID(), GeomDataAPI_Point2D::typeId());
+  data()->addAttribute(MAJOR_AXIS_END_REF_ID(), ModelAPI_AttributeRefAttr::typeId());
+  data()->addAttribute(PASSED_POINT_1_ID(), GeomDataAPI_Point2D::typeId());
+  data()->addAttribute(PASSED_POINT_1_REF_ID(), ModelAPI_AttributeRefAttr::typeId());
+
   data()->addAttribute(MAJOR_RADIUS_ID(), ModelAPI_AttributeDouble::typeId());
   data()->addAttribute(MINOR_RADIUS_ID(), ModelAPI_AttributeDouble::typeId());
   data()->addAttribute(AUXILIARY_ID(), ModelAPI_AttributeBoolean::typeId());
 
+  string(EDIT_ELLIPSE_TYPE())->setValue("");
+
   ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(), CENTER_POINT_REF_ID());
-  ModelAPI_Session::get()->validators()->
-      registerNotObligatory(getKind(), MAJOR_AXIS_POINT_REF_ID());
+  ModelAPI_Session::get()->validators()->registerNotObligatory(
+      getKind(), MAJOR_AXIS_POINT_REF_ID());
   ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(), PASSED_POINT_REF_ID());
+  ModelAPI_Session::get()->validators()->registerNotObligatory(
+      getKind(), MAJOR_AXIS_START_REF_ID());
+  ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(), MAJOR_AXIS_END_REF_ID());
+  ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(), PASSED_POINT_1_REF_ID());
+  ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(), EDIT_ELLIPSE_TYPE());
 }
 
 void SketchPlugin_MacroEllipse::execute()
 {
   FeaturePtr anEllipse = createEllipseFeature();
-  constraintsForEllipse(anEllipse);
+
+  std::string aType = string(ELLIPSE_TYPE())->value();
+  if (aType == ELLIPSE_TYPE_BY_CENTER_AXIS_POINT())
+    constraintsForEllipseByCenterAxisAndPassed(anEllipse);
+  else if (aType == ELLIPSE_TYPE_BY_AXIS_AND_POINT())
+    constraintsForEllipseByMajoxAxisAndPassed(anEllipse);
 
   // message to init reentrant operation
-  static Events_ID anId = ModelAPI_EventReentrantMessage::eventId();
-  ReentrantMessagePtr aMessage(new ModelAPI_EventReentrantMessage(anId, this));
+  static Events_ID anId = SketchPlugin_MacroArcReentrantMessage::eventId();
+  std::shared_ptr<SketchPlugin_MacroArcReentrantMessage> aMessage = std::shared_ptr
+    <SketchPlugin_MacroArcReentrantMessage>(new SketchPlugin_MacroArcReentrantMessage(anId, this));
+
+  std::string anEditType = string(EDIT_ELLIPSE_TYPE())->value();
+  aMessage->setTypeOfCreation(!anEditType.empty() ? anEditType : aType);
   aMessage->setCreatedFeature(anEllipse);
   Events_Loop::loop()->send(aMessage);
 }
@@ -87,72 +112,109 @@ void SketchPlugin_MacroEllipse::execute()
 void SketchPlugin_MacroEllipse::attributeChanged(const std::string& theID)
 {
   static const int NB_POINTS = 3;
-  std::string aPointAttrName[NB_POINTS] = { CENTER_POINT_ID(),
-                                            MAJOR_AXIS_POINT_ID(),
-                                            PASSED_POINT_ID() };
-  std::string aPointRefName[NB_POINTS] = { CENTER_POINT_REF_ID(),
-                                           MAJOR_AXIS_POINT_REF_ID(),
-                                           PASSED_POINT_REF_ID() };
-
-  int aNbInitialized = 0;
-  std::shared_ptr<GeomAPI_Pnt2d> anEllipsePoints[NB_POINTS];
-
-  for (int aPntIndex = 0; aPntIndex < NB_POINTS; ++aPntIndex) {
-    AttributePtr aPointAttr = attribute(aPointAttrName[aPntIndex]);
-    if (!aPointAttr->isInitialized())
-      continue;
-
-    AttributeRefAttrPtr aPointRef = refattr(aPointRefName[aPntIndex]);
-    // calculate ellipse parameters
-    std::shared_ptr<GeomAPI_Pnt2d> aPassedPoint;
-    std::shared_ptr<GeomAPI_Shape> aTangentCurve;
-    SketchPlugin_Tools::convertRefAttrToPointOrTangentCurve(
-        aPointRef, aPointAttr, aTangentCurve, aPassedPoint);
-
-    anEllipsePoints[aNbInitialized++] = aPassedPoint;
+  std::string aPointAttrName[NB_POINTS];
+  std::string aPointRefName[NB_POINTS];
+  if (string(ELLIPSE_TYPE())->value() == ELLIPSE_TYPE_BY_CENTER_AXIS_POINT()) {
+    aPointAttrName[0] = CENTER_POINT_ID();
+    aPointAttrName[1] = MAJOR_AXIS_POINT_ID();
+    aPointAttrName[2] = PASSED_POINT_ID();
+    aPointRefName[0] = CENTER_POINT_REF_ID();
+    aPointRefName[1] = MAJOR_AXIS_POINT_REF_ID();
+    aPointRefName[2] = PASSED_POINT_REF_ID();
+  } else if (string(ELLIPSE_TYPE())->value() == ELLIPSE_TYPE_BY_AXIS_AND_POINT()) {
+    aPointAttrName[0] = MAJOR_AXIS_START_ID();
+    aPointAttrName[1] = MAJOR_AXIS_END_ID();
+    aPointAttrName[2] = PASSED_POINT_1_ID();
+    aPointRefName[0] = MAJOR_AXIS_START_REF_ID();
+    aPointRefName[1] = MAJOR_AXIS_END_REF_ID();
+    aPointRefName[2] = PASSED_POINT_1_REF_ID();
   }
-
-  std::shared_ptr<GeomAPI_Ellipse2d> anEllipse;
-  if (aNbInitialized == 2) {
-    std::shared_ptr<GeomAPI_Dir2d> aXDir(new GeomAPI_Dir2d(
-        anEllipsePoints[1]->x() - anEllipsePoints[0]->x(),
-        anEllipsePoints[1]->y() - anEllipsePoints[0]->y()));
-    double aMajorRad = anEllipsePoints[1]->distance(anEllipsePoints[0]);
-    anEllipse = std::shared_ptr<GeomAPI_Ellipse2d>(
-        new GeomAPI_Ellipse2d(anEllipsePoints[0], aXDir, aMajorRad, 0.5 * aMajorRad));
-  } else if (aNbInitialized == 3) {
-    anEllipse = std::shared_ptr<GeomAPI_Ellipse2d>(
-        new GeomAPI_Ellipse2d(anEllipsePoints[0], anEllipsePoints[1], anEllipsePoints[2]));
-  }
-
-  if (!anEllipse || anEllipse->implPtr<void>() == 0)
+  else
     return;
 
-  myCenter = anEllipse->center();
-  myFocus = anEllipse->firstFocus();
-  myMajorRadius = anEllipse->majorRadius();
-  myMinorRadius = anEllipse->minorRadius();
+  // type of ellipse switched, thus reset all attributes
+  if (theID == ELLIPSE_TYPE()) {
+    for (int aPntIndex = 0; aPntIndex < NB_POINTS; ++aPntIndex) {
+      SketchPlugin_Tools::resetAttribute(this, aPointAttrName[aPntIndex]);
+      SketchPlugin_Tools::resetAttribute(this, aPointRefName[aPntIndex]);
+    }
+  }
+  else {
+    int aNbInitialized = 0;
+    GeomPnt2dPtr anEllipsePoints[NB_POINTS];
 
-  AttributeDoublePtr aMajorRadiusAttr = real(MAJOR_RADIUS_ID());
-  AttributeDoublePtr aMinorRadiusAttr = real(MINOR_RADIUS_ID());
+    for (int aPntIndex = 0; aPntIndex < NB_POINTS; ++aPntIndex) {
+      AttributePtr aPointAttr = attribute(aPointAttrName[aPntIndex]);
+      if (!aPointAttr->isInitialized())
+        continue;
 
-  bool aWasBlocked = data()->blockSendAttributeUpdated(true);
-  // center attribute is used in processEvent() to set reference to reentrant arc
-  std::dynamic_pointer_cast<GeomDataAPI_Point2D>(attribute(CENTER_POINT_ID()))->setValue(myCenter);
-  aMajorRadiusAttr->setValue(myMajorRadius);
-  aMinorRadiusAttr->setValue(myMinorRadius);
-  data()->blockSendAttributeUpdated(aWasBlocked, false);
+      AttributeRefAttrPtr aPointRef = refattr(aPointRefName[aPntIndex]);
+      // calculate ellipse parameters
+      GeomPnt2dPtr aPassedPoint =
+          std::dynamic_pointer_cast<GeomDataAPI_Point2D>(aPointAttr)->pnt();
+      GeomShapePtr aTangentCurve;
+      SketchPlugin_Tools::convertRefAttrToPointOrTangentCurve(
+        aPointRef, aPointAttr, aTangentCurve, aPassedPoint);
+
+      anEllipsePoints[aNbInitialized++] = aPassedPoint;
+    }
+
+    if (aNbInitialized <= 1)
+      return; // too few points for the ellipse
+
+    if (string(ELLIPSE_TYPE())->value() == ELLIPSE_TYPE_BY_AXIS_AND_POINT()) {
+      // ellipse is given by major axis and passing point,
+      // recalculate the first point to be a center
+      anEllipsePoints[0]->setX(0.5 * (anEllipsePoints[0]->x() + anEllipsePoints[1]->x()));
+      anEllipsePoints[0]->setY(0.5 * (anEllipsePoints[0]->y() + anEllipsePoints[1]->y()));
+    }
+
+    std::shared_ptr<GeomAPI_Ellipse2d> anEllipse;
+    if (aNbInitialized == 2) {
+      GeomDir2dPtr aXDir(new GeomAPI_Dir2d(anEllipsePoints[1]->x() - anEllipsePoints[0]->x(),
+                                           anEllipsePoints[1]->y() - anEllipsePoints[0]->y()));
+      double aMajorRad = anEllipsePoints[1]->distance(anEllipsePoints[0]);
+      anEllipse = std::shared_ptr<GeomAPI_Ellipse2d>(
+          new GeomAPI_Ellipse2d(anEllipsePoints[0], aXDir, aMajorRad, 0.5 * aMajorRad));
+    }
+    else if (aNbInitialized == 3) {
+      anEllipse = std::shared_ptr<GeomAPI_Ellipse2d>(
+        new GeomAPI_Ellipse2d(anEllipsePoints[0], anEllipsePoints[1], anEllipsePoints[2]));
+    }
+
+    if (!anEllipse || anEllipse->implPtr<void>() == 0)
+      return;
+
+    myCenter = anEllipse->center();
+    myFocus = anEllipse->firstFocus();
+    myMajorRadius = anEllipse->majorRadius();
+    myMinorRadius = anEllipse->minorRadius();
+
+    AttributeDoublePtr aMajorRadiusAttr = real(MAJOR_RADIUS_ID());
+    AttributeDoublePtr aMinorRadiusAttr = real(MINOR_RADIUS_ID());
+
+    bool aWasBlocked = data()->blockSendAttributeUpdated(true);
+    aMajorRadiusAttr->setValue(myMajorRadius);
+    aMinorRadiusAttr->setValue(myMinorRadius);
+    data()->blockSendAttributeUpdated(aWasBlocked, false);
+  }
 }
 
+// LCOV_EXCL_START
 std::string SketchPlugin_MacroEllipse::processEvent(
                                               const std::shared_ptr<Events_Message>& theMessage)
 {
   std::string aFilledAttributeName;
 
-  ReentrantMessagePtr aReentrantMessage =
-        std::dynamic_pointer_cast<ModelAPI_EventReentrantMessage>(theMessage);
+  std::shared_ptr<SketchPlugin_MacroArcReentrantMessage> aReentrantMessage =
+      std::dynamic_pointer_cast<SketchPlugin_MacroArcReentrantMessage>(theMessage);
   if (aReentrantMessage) {
     FeaturePtr aCreatedFeature = aReentrantMessage->createdFeature();
+    std::string anEllipseType = aReentrantMessage->typeOfCreation();
+
+    string(ELLIPSE_TYPE())->setValue(anEllipseType);
+
+    aFilledAttributeName = ELLIPSE_TYPE();
     ObjectPtr anObject = aReentrantMessage->selectedObject();
     AttributePtr anAttribute = aReentrantMessage->selectedAttribute();
     std::shared_ptr<GeomAPI_Pnt2d> aClickedPoint = aReentrantMessage->clickedPoint();
@@ -160,6 +222,10 @@ std::string SketchPlugin_MacroEllipse::processEvent(
     if (aClickedPoint && (anObject || anAttribute)) {
       aFilledAttributeName = CENTER_POINT_ID();
       std::string aReferenceAttributeName = CENTER_POINT_REF_ID();
+      if (anEllipseType == ELLIPSE_TYPE_BY_AXIS_AND_POINT()) {
+        aFilledAttributeName = MAJOR_AXIS_START_ID();
+        aReferenceAttributeName = MAJOR_AXIS_START_REF_ID();
+      }
 
       // fill 2d point attribute
       AttributePoint2DPtr aPointAttr =
@@ -172,36 +238,69 @@ std::string SketchPlugin_MacroEllipse::processEvent(
       if (anAttribute) {
         if (!anAttribute->owner() || !anAttribute->owner()->data()->isValid()) {
           if (aCreatedFeature && anAttribute->id() == CENTER_POINT_ID())
-            anAttribute = aCreatedFeature->attribute(SketchPlugin_Ellipse::CENTER_ID());
+            anAttribute = aCreatedFeature->attribute(
+                anEllipseType == ELLIPSE_TYPE_BY_CENTER_AXIS_POINT() ?
+                SketchPlugin_Ellipse::CENTER_ID() :
+                SketchPlugin_Ellipse::MAJOR_AXIS_START_ID());
         }
         aRefAttr->setAttr(anAttribute);
       }
       else if (anObject.get()) {
-        // if presentation of previous reentrant macro arc is used, the object is invalid,
-        // we should use result of previous feature of the message(Arc)
-        if (!anObject->data()->isValid())
-          anObject = aCreatedFeature->lastResult();
-        aRefAttr->setObject(anObject);
+        // if attribute is NULL, only object is defined, it should be processed outside
+        // the feature because it might be an external feature, that will be
+        // removed/created again after restart operation
+        // #2468 - Crash when sketching circles successively on a repetition
+        aFilledAttributeName = ELLIPSE_TYPE();
       }
     }
     Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_UPDATED));
   }
   return aFilledAttributeName;
 }
+// LCOV_EXCL_STOP
 
-void SketchPlugin_MacroEllipse::constraintsForEllipse(FeaturePtr theEllipseFeature)
+void SketchPlugin_MacroEllipse::constraintsForEllipseByCenterAxisAndPassed(
+    FeaturePtr theEllipseFeature)
 {
+  // tangency on-the-fly is not applicable for ellipses
+  static const bool isTangencyApplicable = false;
   // Create constraints.
   SketchPlugin_Tools::createCoincidenceOrTangency(
       this, CENTER_POINT_REF_ID(),
       theEllipseFeature->attribute(SketchPlugin_Ellipse::CENTER_ID()),
-      ObjectPtr(), false);
+      ObjectPtr(), isTangencyApplicable);
   SketchPlugin_Tools::createCoincidenceOrTangency(
-      this, MAJOR_AXIS_POINT_REF_ID(), AttributePtr(),
-      theEllipseFeature->lastResult(), true);
+      this, MAJOR_AXIS_POINT_REF_ID(),
+      theEllipseFeature->attribute(SketchPlugin_Ellipse::MAJOR_AXIS_END_ID()),
+      ObjectPtr(), isTangencyApplicable);
+  // make coincidence only if PASSED_POINT_REF_ID() refers a point but not an object
+  if (!refattr(PASSED_POINT_REF_ID())->isObject()) {
+    SketchPlugin_Tools::createCoincidenceOrTangency(
+        this, PASSED_POINT_REF_ID(), AttributePtr(),
+        theEllipseFeature->lastResult(), isTangencyApplicable);
+  }
+}
+
+void SketchPlugin_MacroEllipse::constraintsForEllipseByMajoxAxisAndPassed(
+    FeaturePtr theEllipseFeature)
+{
+  // tangency on-the-fly is not applicable for ellipses
+  static const bool isTangencyApplicable = false;
+  // Create constraints.
   SketchPlugin_Tools::createCoincidenceOrTangency(
-      this, PASSED_POINT_REF_ID(), AttributePtr(),
-      theEllipseFeature->lastResult(), true);
+      this, MAJOR_AXIS_START_REF_ID(),
+      theEllipseFeature->attribute(SketchPlugin_Ellipse::MAJOR_AXIS_START_ID()),
+      ObjectPtr(), isTangencyApplicable);
+  SketchPlugin_Tools::createCoincidenceOrTangency(
+      this, MAJOR_AXIS_END_REF_ID(),
+      theEllipseFeature->attribute(SketchPlugin_Ellipse::MAJOR_AXIS_END_ID()),
+      ObjectPtr(), isTangencyApplicable);
+  // make coincidence only if PASSED_POINT_REF_ID() refers a point but not an object
+  if (!refattr(PASSED_POINT_1_REF_ID())->isObject()) {
+    SketchPlugin_Tools::createCoincidenceOrTangency(
+        this, PASSED_POINT_1_REF_ID(), AttributePtr(),
+        theEllipseFeature->lastResult(), isTangencyApplicable);
+  }
 }
 
 FeaturePtr SketchPlugin_MacroEllipse::createEllipseFeature()
@@ -213,7 +312,7 @@ FeaturePtr SketchPlugin_MacroEllipse::createEllipseFeature()
   aCenterAttr->setValue(myCenter->x(), myCenter->y());
 
   AttributePoint2DPtr aFocusAttr = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
-      aEllipseFeature->attribute(SketchPlugin_Ellipse::FOCUS_ID()));
+      aEllipseFeature->attribute(SketchPlugin_Ellipse::FIRST_FOCUS_ID()));
   aFocusAttr->setValue(myFocus->x(), myFocus->y());
 
   aEllipseFeature->real(SketchPlugin_Ellipse::MAJOR_RADIUS_ID())->setValue(myMajorRadius);
@@ -223,6 +322,30 @@ FeaturePtr SketchPlugin_MacroEllipse::createEllipseFeature()
       boolean(AUXILIARY_ID())->value());
 
   aEllipseFeature->execute();
+
+  // create auxiliary points
+  SketchPlugin_Tools::createAuxiliaryPointOnEllipse(
+      aEllipseFeature, SketchPlugin_Ellipse::CENTER_ID());
+  SketchPlugin_Tools::createAuxiliaryPointOnEllipse(
+      aEllipseFeature, SketchPlugin_Ellipse::FIRST_FOCUS_ID());
+  SketchPlugin_Tools::createAuxiliaryPointOnEllipse(
+      aEllipseFeature, SketchPlugin_Ellipse::SECOND_FOCUS_ID());
+  SketchPlugin_Tools::createAuxiliaryPointOnEllipse(
+      aEllipseFeature, SketchPlugin_Ellipse::MAJOR_AXIS_START_ID());
+  SketchPlugin_Tools::createAuxiliaryPointOnEllipse(
+      aEllipseFeature, SketchPlugin_Ellipse::MAJOR_AXIS_END_ID());
+  SketchPlugin_Tools::createAuxiliaryPointOnEllipse(
+      aEllipseFeature, SketchPlugin_Ellipse::MINOR_AXIS_START_ID());
+  SketchPlugin_Tools::createAuxiliaryPointOnEllipse(
+      aEllipseFeature, SketchPlugin_Ellipse::MINOR_AXIS_END_ID());
+  // create auxiliary axes
+  SketchPlugin_Tools::createAuxiliaryAxisOfEllipse(aEllipseFeature,
+                      SketchPlugin_Ellipse::MAJOR_AXIS_START_ID(),
+                      SketchPlugin_Ellipse::MAJOR_AXIS_END_ID());
+  SketchPlugin_Tools::createAuxiliaryAxisOfEllipse(aEllipseFeature,
+                      SketchPlugin_Ellipse::MINOR_AXIS_START_ID(),
+                      SketchPlugin_Ellipse::MINOR_AXIS_END_ID());
+
   return aEllipseFeature;
 }
 
@@ -236,10 +359,10 @@ AISObjectPtr SketchPlugin_MacroEllipse::getAISObject(AISObjectPtr thePrevious)
       aSketch->data()->attribute(SketchPlugin_Sketch::NORM_ID()));
 
   // Compute a ellipse in 3D view.
-  std::shared_ptr<GeomAPI_Pnt> aCenter(aSketch->to3D(myCenter->x(), myCenter->y()));
-  std::shared_ptr<GeomAPI_Pnt> aFocus(aSketch->to3D(myFocus->x(), myFocus->y()));
-  std::shared_ptr<GeomAPI_Dir> aNormal = aNDir->dir();
-  std::shared_ptr<GeomAPI_Dir> aMajorAxis(new GeomAPI_Dir(aFocus->x() - aCenter->x(),
+  GeomPointPtr aCenter(aSketch->to3D(myCenter->x(), myCenter->y()));
+  GeomPointPtr aFocus(aSketch->to3D(myFocus->x(), myFocus->y()));
+  GeomDirPtr aNormal = aNDir->dir();
+  GeomDirPtr aMajorAxis(new GeomAPI_Dir(aFocus->x() - aCenter->x(),
       aFocus->y() - aCenter->y(), aFocus->z() - aCenter->z()));
 
   std::shared_ptr<GeomAPI_Shape> anEllipseShape =

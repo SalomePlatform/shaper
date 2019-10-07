@@ -43,6 +43,10 @@
 #include "PartSet_Filters.h"
 #include "PartSet_FilterInfinite.h"
 
+#ifdef _DEBUG
+#include <QDebug>
+#endif
+
 #include <PartSetPlugin_Remove.h>
 #include <PartSetPlugin_Part.h>
 #include <PartSetPlugin_Duplicate.h>
@@ -139,10 +143,6 @@
 #include <GeomDataAPI_Dir.h>
 
 #include <SelectMgr_ListIteratorOfListOfFilter.hxx>
-
-#ifdef _DEBUG
-#include <QDebug>
-#endif
 
 /*!Create and return new instance of XGUI_Module*/
 extern "C" PARTSET_EXPORT ModuleBase_IModule* createModule(ModuleBase_IWorkshop* theWshop)
@@ -441,8 +441,8 @@ void PartSet_Module::updatePresentationsOnStart(ModuleBase_Operation* theOperati
   ModuleBase_OperationFeature* aFOperation =
     dynamic_cast<ModuleBase_OperationFeature*>(theOperation);
   if (aFOperation) {
-    myCustomPrs->activate(aFOperation->feature(), ModuleBase_IModule::CustomizeArguments, true);
-    myCustomPrs->activate(aFOperation->feature(), ModuleBase_IModule::CustomizeResults, true);
+    myCustomPrs->activate(aFOperation->feature(), ModuleBase_IModule::CustomizeArguments, false);
+    myCustomPrs->activate(aFOperation->feature(), ModuleBase_IModule::CustomizeResults, false);
   }
 }
 
@@ -454,8 +454,8 @@ void PartSet_Module::operationResumed(ModuleBase_Operation* theOperation)
   ModuleBase_OperationFeature* aFOperation =
     dynamic_cast<ModuleBase_OperationFeature*>(theOperation);
   if (aFOperation) {
-    myCustomPrs->activate(aFOperation->feature(), ModuleBase_IModule::CustomizeArguments, true);
-    myCustomPrs->activate(aFOperation->feature(), ModuleBase_IModule::CustomizeResults, true);
+    myCustomPrs->activate(aFOperation->feature(), ModuleBase_IModule::CustomizeArguments, false);
+    myCustomPrs->activate(aFOperation->feature(), ModuleBase_IModule::CustomizeResults, false);
   }
 }
 
@@ -857,6 +857,8 @@ ModuleBase_ModelWidget* PartSet_Module::createWidgetByType(const std::string& th
     connect(aLabelWgt, SIGNAL(showConstraintToggled(int, bool)),
       mySketchMgr, SLOT(onShowConstraintsToggle(int, bool)));
     connect(aLabelWgt, SIGNAL(showFreePoints(bool)), mySketchMgr, SLOT(onShowPoints(bool)));
+    connect(aLabelWgt, SIGNAL(autoConstraints(bool)),
+      sketchReentranceMgr(), SLOT(onAutoConstraints(bool)));
     aLabelWgt->setShowPointsState(mySketchMgr->isShowFreePointsShown());
     aWgt = aLabelWgt;
   } else if (theType == "sketch-2dpoint_selector") {
@@ -1444,16 +1446,20 @@ void PartSet_Module::processEvent(const std::shared_ptr<Events_Message>& theMess
     XGUI_Displayer* aDisplayer = aWorkshop->displayer();
     QObjectPtrList aObjects = aDisplayer->displayedObjects();
     bool aHidden;
+    bool aUpdateViewer = false;
     foreach(ObjectPtr aObj, aObjects) {
       aHidden = !aObj->data() || !aObj->data()->isValid() ||
         aObj->isDisabled() || (!aObj->isDisplayed());
-      if (!aHidden)
+      if (!aHidden) {
         aDisplayer->redisplay(aObj, false);
+        aUpdateViewer = true;
+      }
     }
-    aDisplayer->updateViewer();
+    if (aUpdateViewer)
+     aDisplayer->updateViewer();
     // Update tree items if they are expanded
     if (needUpdate) {
-      aTreeView->viewport()->repaint(aTreeView->viewport()->rect());
+      aTreeView->viewport()->update(aTreeView->viewport()->rect());
     }
   } else if (theMessage->eventID() == Events_Loop::loop()->eventByName(EVENT_OBJECT_CREATED)) {
     std::shared_ptr<ModelAPI_ObjectUpdatedMessage> aUpdMsg =

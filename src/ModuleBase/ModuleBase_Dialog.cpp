@@ -23,6 +23,7 @@
 #include "ModuleBase_IPropertyPanel.h"
 #include "ModuleBase_PageWidget.h"
 #include "ModuleBase_ModelDialogWidget.h"
+#include "ModuleBase_Tools.h"
 
 #include <ModelAPI_Session.h>
 #include <ModelAPI_Events.h>
@@ -46,9 +47,10 @@ ModuleBase_Dialog::ModuleBase_Dialog(ModuleBase_IWorkshop* theParent, const QStr
                                      myActiveWidget(0)
 {
   ModuleBase_WidgetFactory aFactory(myDescription, myWorkshop);
-  std::string aTitle = aFactory.widgetAPI()->getProperty(FEATURE_TEXT);
+  QString aTitle = ModuleBase_Tools::translate("ModuleBase_Dialog",
+      aFactory.widgetAPI()->getProperty(FEATURE_TEXT));
 
-  setWindowTitle(aTitle.c_str());
+  setWindowTitle(aTitle);
 
   SessionPtr aMgr = ModelAPI_Session::get();
   std::shared_ptr<ModelAPI_Document> aDoc = aMgr->activeDocument();

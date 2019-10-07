@@ -19,6 +19,7 @@
 
 #include <PlaneGCSSolver_Storage.h>
 #include <PlaneGCSSolver_Solver.h>
+#include <PlaneGCSSolver_BooleanWrapper.h>
 #include <PlaneGCSSolver_ConstraintWrapper.h>
 #include <PlaneGCSSolver_EdgeWrapper.h>
 #include <PlaneGCSSolver_PointWrapper.h>
@@ -33,6 +34,7 @@
 #include <GeomAPI_XY.h>
 #include <GeomDataAPI_Point2D.h>
 #include <ModelAPI_AttributeRefAttr.h>
+#include <SketchPlugin_Ellipse.h>
 #include <SketchPlugin_Projection.h>
 
 #include <cmath>
@@ -103,7 +105,7 @@ EntityWrapperPtr PlaneGCSSolver_Storage::createAttribute(
 /// \brief Update value
 static bool updateValue(const double& theSource, double& theDest)
 {
-  static const double aTol = 1000. * tolerance;
+  static const double aTol = 1.e4 * tolerance;
   bool isUpdated = fabs(theSource - theDest) > aTol;
   if (isUpdated)
     theDest = theSource;
@@ -134,6 +136,15 @@ static bool updateValues(AttributePtr& theAttribute, EntityWrapperPtr& theEntity
       isUpdated = updateValue(aScalar->value(), aValue);
       if (isUpdated)
         aWrapper->setValue(aValue);
+    } else {
+      AttributeBooleanPtr aBoolean =
+          std::dynamic_pointer_cast<ModelAPI_AttributeBoolean>(theAttribute);
+      if (aBoolean) {
+        BooleanWrapperPtr aWrapper =
+            std::dynamic_pointer_cast<PlaneGCSSolver_BooleanWrapper>(theEntity);
+        isUpdated = aWrapper->value() != aBoolean->value();
+        aWrapper->setValue(aBoolean->value());
+      }
     }
   }
 
@@ -185,7 +196,7 @@ bool PlaneGCSSolver_Storage::update(FeaturePtr theFeature, bool theForce)
     // (do not want to add several copies of it while adding attributes)
     aRelated = createFeature(theFeature, &aBuilder);
     myFeatureMap[theFeature] = aRelated;
-    createArcConstraints(aRelated);
+    createAuxiliaryConstraints(aRelated);
     isUpdated = true;
   }
 
@@ -193,7 +204,8 @@ bool PlaneGCSSolver_Storage::update(FeaturePtr theFeature, bool theForce)
   std::list<AttributePtr>::iterator anAttrIt = anAttributes.begin();
   for (; anAttrIt != anAttributes.end(); ++anAttrIt)
     if ((*anAttrIt)->attributeType() == GeomDataAPI_Point2D::typeId() ||
-        (*anAttrIt)->attributeType() == ModelAPI_AttributeDouble::typeId())
+        (*anAttrIt)->attributeType() == ModelAPI_AttributeDouble::typeId() ||
+        (*anAttrIt)->attributeType() == ModelAPI_AttributeBoolean::typeId())
       isUpdated = update(*anAttrIt) || isUpdated;
 
   // check external attribute is changed
@@ -212,28 +224,8 @@ bool PlaneGCSSolver_Storage::update(FeaturePtr theFeature, bool theForce)
     notify(theFeature);
 
   // update arc
-  if (aRelated && aRelated->type() == ENTITY_ARC) {
-    /// TODO: this code should be shared with FeatureBuilder somehow
-
-    std::shared_ptr<PlaneGCSSolver_EdgeWrapper> anEntity =
-        std::dynamic_pointer_cast<PlaneGCSSolver_EdgeWrapper>(aRelated);
-    std::shared_ptr<GCS::Arc> anArc = std::dynamic_pointer_cast<GCS::Arc>(anEntity->entity());
-
-    static std::shared_ptr<GeomAPI_Dir2d> OX(new GeomAPI_Dir2d(1.0, 0.0));
-    std::shared_ptr<GeomAPI_Pnt2d> aCenter(
-        new GeomAPI_Pnt2d(*anArc->center.x, *anArc->center.y));
-    std::shared_ptr<GeomAPI_Pnt2d> aStart(
-        new GeomAPI_Pnt2d(*anArc->start.x, *anArc->start.y));
-
-    *anArc->rad = aStart->distance(aCenter);
-
-    std::shared_ptr<GeomAPI_Dir2d> aDir(new GeomAPI_Dir2d(aStart->xy()->decreased(aCenter->xy())));
-    *anArc->startAngle = OX->angle(aDir);
-
-    aDir = std::shared_ptr<GeomAPI_Dir2d>(
-        new GeomAPI_Dir2d((*anArc->end.x) - aCenter->x(), (*anArc->end.y) - aCenter->y()));
-    *anArc->endAngle = OX->angle(aDir);
-  }
+  if (aRelated)
+    PlaneGCSSolver_Tools::recalculateArcParameters(aRelated);
 
   return isUpdated;
 }
@@ -278,7 +270,7 @@ void PlaneGCSSolver_Storage::makeExternal(const EntityWrapperPtr& theEntity)
   if (theEntity->isExternal())
     return;
 
-  removeArcConstraints(theEntity);
+  removeAuxiliaryConstraints(theEntity);
 
   GCS::SET_pD aParameters = PlaneGCSSolver_Tools::parameters(theEntity);
   mySketchSolver->removeParameters(aParameters);
@@ -295,17 +287,17 @@ void PlaneGCSSolver_Storage::makeNonExternal(const EntityWrapperPtr& theEntity)
   mySketchSolver->addParameters(aParameters);
   theEntity->setExternal(false);
 
-  createArcConstraints(theEntity);
+  createAuxiliaryConstraints(theEntity);
 
   myNeedToResolve = true;
 }
 
 
-void PlaneGCSSolver_Storage::createArcConstraints(const EntityWrapperPtr& theArc)
+static void createArcConstraints(const EntityWrapperPtr& theArc,
+                                 const SolverPtr& theSolver,
+                                 const ConstraintID theConstraintID,
+                                 std::map<EntityWrapperPtr, ConstraintWrapperPtr>& theConstraints)
 {
-  if (!theArc || theArc->type() != ENTITY_ARC || theArc->isExternal())
-    return;
-
   EdgeWrapperPtr anEdge = std::dynamic_pointer_cast<PlaneGCSSolver_EdgeWrapper>(theArc);
   std::shared_ptr<GCS::Arc> anArc = std::dynamic_pointer_cast<GCS::Arc>(anEdge->entity());
 
@@ -323,21 +315,174 @@ void PlaneGCSSolver_Storage::createArcConstraints(const EntityWrapperPtr& theArc
       anArc->center, anArc->end, anArc->endAngle)));
 
   ConstraintWrapperPtr aWrapper(
-      new PlaneGCSSolver_ConstraintWrapper(anArcConstraints, CONSTRAINT_UNKNOWN));
-  aWrapper->setId(++myConstraintLastID);
-  constraintsToSolver(aWrapper, mySketchSolver);
+    new PlaneGCSSolver_ConstraintWrapper(anArcConstraints, CONSTRAINT_UNKNOWN));
+  aWrapper->setId(theConstraintID);
+  constraintsToSolver(aWrapper, theSolver);
 
-  myArcConstraintMap[theArc] = aWrapper;
+  theConstraints[theArc] = aWrapper;
 }
 
-void PlaneGCSSolver_Storage::removeArcConstraints(const EntityWrapperPtr& theArc)
+static void createEllipseConstraints(
+    const EntityWrapperPtr& theEllipse,
+    const SolverPtr& theSolver,
+    const ConstraintID theConstraintID,
+    std::map<EntityWrapperPtr, ConstraintWrapperPtr>& theConstraints)
+{
+  EdgeWrapperPtr anEdge = std::dynamic_pointer_cast<PlaneGCSSolver_EdgeWrapper>(theEllipse);
+  std::shared_ptr<GCS::Ellipse> anEllipse =
+      std::dynamic_pointer_cast<GCS::Ellipse>(anEdge->entity());
+
+  // Additional constaints to fix ellipse's extra points
+  std::list<GCSConstraintPtr> anEllipseConstraints;
+
+  const std::map<std::string, EntityWrapperPtr>& anAttributes = theEllipse->additionalAttributes();
+  for (std::map<std::string, EntityWrapperPtr>::const_iterator anIt = anAttributes.begin();
+       anIt != anAttributes.end(); ++anIt) {
+    std::shared_ptr<PlaneGCSSolver_PointWrapper> aPoint =
+        std::dynamic_pointer_cast<PlaneGCSSolver_PointWrapper>(anIt->second);
+    if (!aPoint)
+      continue;
+
+    GCS::InternalAlignmentType anAlignmentX, anAlignmentY;
+    if (anIt->first == SketchPlugin_Ellipse::SECOND_FOCUS_ID())
+      anAlignmentX = GCS::EllipseFocus2X;
+    else if (anIt->first == SketchPlugin_Ellipse::MAJOR_AXIS_START_ID())
+      anAlignmentX = GCS::EllipseNegativeMajorX;
+    else if (anIt->first == SketchPlugin_Ellipse::MAJOR_AXIS_END_ID())
+      anAlignmentX = GCS::EllipsePositiveMajorX;
+    else if (anIt->first == SketchPlugin_Ellipse::MINOR_AXIS_START_ID())
+      anAlignmentX = GCS::EllipseNegativeMinorX;
+    else if (anIt->first == SketchPlugin_Ellipse::MINOR_AXIS_END_ID())
+      anAlignmentX = GCS::EllipsePositiveMinorX;
+
+    anEllipseConstraints.push_back(GCSConstraintPtr(
+        new GCS::ConstraintInternalAlignmentPoint2Ellipse(
+        *anEllipse, *(aPoint->point()), anAlignmentX)));
+    anAlignmentY = (GCS::InternalAlignmentType)((int)anAlignmentX + 1);
+    anEllipseConstraints.push_back(GCSConstraintPtr(
+        new GCS::ConstraintInternalAlignmentPoint2Ellipse(
+        *anEllipse, *(aPoint->point()), anAlignmentY)));
+  }
+
+  // constraint to bind the major radius value
+  std::shared_ptr<PlaneGCSSolver_PointWrapper> aMajorAxisStart =
+      std::dynamic_pointer_cast<PlaneGCSSolver_PointWrapper>(
+      anAttributes.at(SketchPlugin_Ellipse::MAJOR_AXIS_START_ID()));
+  ScalarWrapperPtr aMajorRadius =
+      std::dynamic_pointer_cast<PlaneGCSSolver_ScalarWrapper>(
+      anAttributes.at(SketchPlugin_Ellipse::MAJOR_RADIUS_ID()));
+  anEllipseConstraints.push_back(GCSConstraintPtr(new GCS::ConstraintP2PDistance(
+      anEllipse->center, *(aMajorAxisStart->point()), aMajorRadius->scalar())));
+
+  ConstraintWrapperPtr aWrapper(
+    new PlaneGCSSolver_ConstraintWrapper(anEllipseConstraints, CONSTRAINT_UNKNOWN));
+  aWrapper->setId(theConstraintID);
+  if (theSolver)
+    constraintsToSolver(aWrapper, theSolver);
+
+  theConstraints[theEllipse] = aWrapper;
+}
+
+static void createEllipticArcConstraints(
+    const EntityWrapperPtr& theEllipticArc,
+    const SolverPtr& theSolver,
+    const ConstraintID theConstraintID,
+    std::map<EntityWrapperPtr, ConstraintWrapperPtr>& theConstraints)
+{
+  // create base constraints for the ellipse without adding them to solver
+  createEllipseConstraints(theEllipticArc, SolverPtr(), theConstraintID, theConstraints);
+
+  ConstraintWrapperPtr& aConstraint = theConstraints[theEllipticArc];
+  std::list<GCSConstraintPtr> anEllArcConstraints = aConstraint->constraints();
+
+  // constrain extremities of the elliptic arc
+  EdgeWrapperPtr anEdge = std::dynamic_pointer_cast<PlaneGCSSolver_EdgeWrapper>(theEllipticArc);
+  std::shared_ptr<GCS::ArcOfEllipse> anArc =
+      std::dynamic_pointer_cast<GCS::ArcOfEllipse>(anEdge->entity());
+
+  anEllArcConstraints.push_back(GCSConstraintPtr(
+      new GCS::ConstraintCurveValue(anArc->start, anArc->start.x, *anArc, anArc->startAngle)));
+  anEllArcConstraints.push_back(GCSConstraintPtr(
+      new GCS::ConstraintCurveValue(anArc->start, anArc->start.y, *anArc, anArc->startAngle)));
+  anEllArcConstraints.push_back(GCSConstraintPtr(
+      new GCS::ConstraintCurveValue(anArc->end, anArc->end.x, *anArc, anArc->endAngle)));
+  anEllArcConstraints.push_back(GCSConstraintPtr(
+      new GCS::ConstraintCurveValue(anArc->end, anArc->end.y, *anArc, anArc->endAngle)));
+
+  aConstraint->setConstraints(anEllArcConstraints);
+  constraintsToSolver(aConstraint, theSolver);
+}
+
+void PlaneGCSSolver_Storage::createAuxiliaryConstraints(const EntityWrapperPtr& theEntity)
+{
+  if (!theEntity || theEntity->isExternal())
+    return;
+
+  if (theEntity->type() == ENTITY_ARC)
+    createArcConstraints(theEntity, mySketchSolver, ++myConstraintLastID, myAuxConstraintMap);
+  else if (theEntity->type() == ENTITY_ELLIPSE)
+    createEllipseConstraints(theEntity, mySketchSolver, ++myConstraintLastID, myAuxConstraintMap);
+  else if (theEntity->type() == ENTITY_ELLIPTIC_ARC) {
+    createEllipticArcConstraints(theEntity, mySketchSolver,
+                                 ++myConstraintLastID, myAuxConstraintMap);
+  }
+}
+
+void PlaneGCSSolver_Storage::removeAuxiliaryConstraints(const EntityWrapperPtr& theEntity)
 {
   std::map<EntityWrapperPtr, ConstraintWrapperPtr>::iterator
-      aFound = myArcConstraintMap.find(theArc);
-  if (aFound != myArcConstraintMap.end()) {
+      aFound = myAuxConstraintMap.find(theEntity);
+  if (aFound != myAuxConstraintMap.end()) {
     mySketchSolver->removeConstraint(aFound->second->id());
-    myArcConstraintMap.erase(aFound);
+    myAuxConstraintMap.erase(aFound);
   }
+}
+
+template <typename ARCTYPE>
+void adjustArcParametrization(ARCTYPE& theArc, bool theReversed)
+{
+  // tune start angle of the arc to be in [0, 2PI]
+  while (*theArc.startAngle < -PI)
+    *theArc.startAngle += 2.0 * PI;
+  while (*theArc.startAngle >= PI)
+    *theArc.startAngle -= 2.0 * PI;
+  // adjust end angle of the arc
+  if (theReversed) {
+    while (*theArc.endAngle > *theArc.startAngle)
+      *theArc.endAngle -= 2.0 * PI;
+    while (*theArc.endAngle + 2 * PI < *theArc.startAngle)
+      *theArc.endAngle += 2.0 * PI;
+  }
+  else {
+    while (*theArc.endAngle < *theArc.startAngle)
+      *theArc.endAngle += 2.0 * PI;
+    while (*theArc.endAngle > *theArc.startAngle + 2 * PI)
+      *theArc.endAngle -= 2.0 * PI;
+  }
+}
+
+void PlaneGCSSolver_Storage::adjustParametrizationOfArcs()
+{
+  std::map<EntityWrapperPtr, ConstraintWrapperPtr>::iterator anIt = myAuxConstraintMap.begin();
+  for (; anIt != myAuxConstraintMap.end(); ++anIt) {
+    EdgeWrapperPtr anEdge = std::dynamic_pointer_cast<PlaneGCSSolver_EdgeWrapper>(anIt->first);
+    std::shared_ptr<GCS::Arc> anArc = std::dynamic_pointer_cast<GCS::Arc>(anEdge->entity());
+    if (anArc)
+      adjustArcParametrization(*anArc, anEdge->isReversed());
+    else {
+      std::shared_ptr<GCS::ArcOfEllipse> aEllArc =
+          std::dynamic_pointer_cast<GCS::ArcOfEllipse>(anEdge->entity());
+      if (aEllArc)
+        adjustArcParametrization(*aEllArc, anEdge->isReversed());
+    }
+  }
+
+  // update parameters of Middle point constraint for point on arc
+  std::map<ConstraintPtr, ConstraintWrapperPtr>::iterator aCIt = myConstraintMap.begin();
+  for (; aCIt != myConstraintMap.end(); ++aCIt)
+    if (aCIt->second->type() == CONSTRAINT_MIDDLE_POINT) {
+      notify(aCIt->first);
+    }
 }
 
 
@@ -397,7 +542,7 @@ void PlaneGCSSolver_Storage::removeInvalidEntities()
         aDestroyer.remove(aFIter->second);
 
       // remove invalid arc
-      removeArcConstraints(aFIter->second);
+      removeAuxiliaryConstraints(aFIter->second);
     }
   std::list<FeaturePtr>::const_iterator anInvFIt = anInvalidFeatures.begin();
   for (; anInvFIt != anInvalidFeatures.end(); ++anInvFIt)

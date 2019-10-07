@@ -28,6 +28,7 @@
 #include <memory>
 
 class GeomAPI_Ax2;
+class GeomAPI_Curve;
 class GeomAPI_Dir;
 class GeomAPI_Pnt;
 
@@ -53,6 +54,8 @@ public:
   GEOMAPI_EXPORT GeomAPI_Ellipse(const std::shared_ptr<GeomAPI_Ax2>& theAx2,
                                  double theMajorRadius, double theMinorRadius);
 
+  GEOMAPI_EXPORT GeomAPI_Ellipse(std::shared_ptr<GeomAPI_Curve> theCurve);
+
   /// Returns center of the ellipse
   GEOMAPI_EXPORT std::shared_ptr<GeomAPI_Pnt> center() const;
 
@@ -71,6 +74,22 @@ public:
   /// Returns major radius of the ellipse
   GEOMAPI_EXPORT double majorRadius() const;
 
+  /// Project point on ellipse
+  GEOMAPI_EXPORT const std::shared_ptr<GeomAPI_Pnt> project(
+      const std::shared_ptr<GeomAPI_Pnt>& thePoint) const;
+
+  /** \brief Computes the parameter of a given point on an ellipse. The point must be
+   *         located either on the circle itself or relatively to the latter
+   *         at a distance less than the tolerance value. Return FALSE if the point
+   *         is beyond the tolerance limit or if computation fails.
+   *         Max Tolerance value is currently limited to 1.e-4
+   *  \param[in]  thePoint point of origin.
+   *  \param[in]  theTolerance tolerance of computation.
+   *  \param[out] theParameter resulting parameter.
+   */
+  GEOMAPI_EXPORT const bool parameter(const std::shared_ptr<GeomAPI_Pnt> thePoint,
+                                      const double theTolerance,
+                                      double& theParameter) const;
 };
 
 //! Pointer on the object

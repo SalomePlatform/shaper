@@ -26,12 +26,24 @@
 
 #include <SketchPlugin_Arc.h>
 #include <SketchPlugin_Circle.h>
+#include <SketchPlugin_Ellipse.h>
+#include <SketchPlugin_EllipticArc.h>
 #include <SketchPlugin_Line.h>
 #include <SketchPlugin_Point.h>
 
 #include <GeomDataAPI_Point2D.h>
 
 #include <GeomAPI_Pnt2d.h>
+
+#include <cmath>
+
+static GCS::Point createGCSPoint(double* x, double* y)
+{
+  GCS::Point aPoint;
+  aPoint.x = x;
+  aPoint.y = y;
+  return aPoint;
+}
 
 
 SketchSolver_ConstraintMovement::SketchSolver_ConstraintMovement(FeaturePtr theFeature)
@@ -78,11 +90,14 @@ static bool isSimpleMove(FeaturePtr theMovedFeature, AttributePtr theDraggedPoin
 {
   bool isSimple = true;
 #ifdef CHANGE_RADIUS_WHILE_MOVE
-  if (theMovedFeature->getKind() == SketchPlugin_Circle::ID())
+  if (theMovedFeature->getKind() == SketchPlugin_Circle::ID() ||
+      theMovedFeature->getKind() == SketchPlugin_Ellipse::ID())
     isSimple = (theDraggedPoint.get() != 0);
-  else if (theMovedFeature->getKind() == SketchPlugin_Arc::ID()) {
+  else if (theMovedFeature->getKind() == SketchPlugin_Arc::ID() ||
+           theMovedFeature->getKind() == SketchPlugin_EllipticArc::ID()) {
     isSimple = (theDraggedPoint.get() != 0 &&
-                theDraggedPoint->id() == SketchPlugin_Arc::CENTER_ID());
+               (theDraggedPoint->id() == SketchPlugin_Arc::CENTER_ID() ||
+                theDraggedPoint->id() == SketchPlugin_EllipticArc::CENTER_ID()));
   }
 #endif
   return isSimple;
@@ -117,8 +132,14 @@ ConstraintWrapperPtr SketchSolver_ConstraintMovement::initMovement()
   else {
     if (myDraggedPoint) // start or end point of arc has been moved
       aConstraint = fixArcExtremity(anEntity);
-    else // arc or circle has been moved
+    else if (anEntity->type() == ENTITY_CIRCLE || anEntity->type() == ENTITY_ARC) {
+      // arc or circle has been moved
       aConstraint = fixPointOnCircle(anEntity);
+    }
+    else if (anEntity->type() == ENTITY_ELLIPSE || anEntity->type() == ENTITY_ELLIPTIC_ARC) {
+      // ellipse or elliptic arc has been moved
+      aConstraint = fixPointOnEllipse(anEntity);
+    }
   }
 
   return aConstraint;
@@ -134,12 +155,21 @@ ConstraintWrapperPtr SketchSolver_ConstraintMovement::fixArcExtremity(
       myStorage->entity(myMovedFeature));
   std::shared_ptr<GCS::Arc> anArc =
       std::dynamic_pointer_cast<GCS::Arc>(aCircularEntity->entity());
+  std::shared_ptr<GCS::ArcOfEllipse> anEllArc =
+      std::dynamic_pointer_cast<GCS::ArcOfEllipse>(aCircularEntity->entity());
 
   PointWrapperPtr aPoint =
       std::dynamic_pointer_cast<PlaneGCSSolver_PointWrapper>(theArcExtremity);
 
-  double* aParams[nbParams] = { aPoint->point()->x, aPoint->point()->y,
-                                anArc->center.x, anArc->center.y };
+  double* aParams[nbParams] = { aPoint->point()->x, aPoint->point()->y, 0, 0 };
+  if (anArc) {
+    aParams[2] = anArc->center.x;
+    aParams[3] = anArc->center.y;
+  }
+  else if (anEllArc) {
+    aParams[2] = anEllArc->center.x;
+    aParams[3] = anEllArc->center.y;
+  }
 
   std::list<GCSConstraintPtr> aConstraints;
   for (int i = 0; i < nbParams; ++i) {
@@ -172,9 +202,7 @@ ConstraintWrapperPtr SketchSolver_ConstraintMovement::fixPointOnCircle(
   myFixedValues.push_back(*aCircular->center.y);
 
   // create a moved point
-  GCS::Point aPointOnCircle;
-  aPointOnCircle.x = &myFixedValues[0];
-  aPointOnCircle.y = &myFixedValues[1];
+  GCS::Point aPointOnCircle = createGCSPoint(&myFixedValues[0], &myFixedValues[1]);
 
   std::list<GCSConstraintPtr> aConstraints;
   // point-on-circle
@@ -197,6 +225,69 @@ ConstraintWrapperPtr SketchSolver_ConstraintMovement::fixPointOnCircle(
       new PlaneGCSSolver_ConstraintWrapper(aConstraints, getType()));
 }
 
+ConstraintWrapperPtr SketchSolver_ConstraintMovement::fixPointOnEllipse(
+    const EntityWrapperPtr& theConic)
+{
+  static const double scale = 0.01;
+  static const int nbParams = 6;
+  myFixedValues.reserve(nbParams); // moved point; center and focus of ellipse
+
+  EdgeWrapperPtr anEdge = std::dynamic_pointer_cast<PlaneGCSSolver_EdgeWrapper>(theConic);
+  std::shared_ptr<GCS::Ellipse> aConic = std::dynamic_pointer_cast<GCS::Ellipse>(anEdge->entity());
+
+  // major axis direction
+  double dx = *aConic->focus1.x - *aConic->center.x;
+  double dy = *aConic->focus1.y - *aConic->center.y;
+  double norm = sqrt(dx * dx + dy* dy);
+  if (norm < tolerance) {
+    dx = 1.0;
+    dy = 0.0;
+  }
+  else {
+    dx /= norm;
+    dy /= norm;
+  }
+
+  double aMajorRad = aConic->getRadMaj();
+
+  // initialize fixed values
+  myFixedValues.push_back(*aConic->center.x + dx * aMajorRad);
+  myFixedValues.push_back(*aConic->center.y + dy * aMajorRad);
+  myFixedValues.push_back(*aConic->center.x);
+  myFixedValues.push_back(*aConic->center.y);
+  myFixedValues.push_back(*aConic->focus1.x);
+  myFixedValues.push_back(*aConic->focus1.y);
+
+  // create a moved point
+  GCS::Point aPointOnEllipse = createGCSPoint(&myFixedValues[0], &myFixedValues[1]);
+
+  std::list<GCSConstraintPtr> aConstraints;
+  // point-on-circle
+  GCSConstraintPtr aNewConstraint(
+    new GCS::ConstraintPointOnEllipse(aPointOnEllipse, *aConic));
+  aNewConstraint->rescale(scale);
+  aConstraints.push_back(aNewConstraint);
+  // fixed center (x)
+  aNewConstraint = GCSConstraintPtr(
+    new GCS::ConstraintEqual(&myFixedValues[2], aConic->center.x));
+  aNewConstraint->rescale(scale);
+  aConstraints.push_back(aNewConstraint);
+  // fixed center (y)
+  aNewConstraint = GCSConstraintPtr(
+    new GCS::ConstraintEqual(&myFixedValues[3], aConic->center.y));
+  aNewConstraint->rescale(scale);
+  aConstraints.push_back(aNewConstraint);
+  // focus on the major axis
+  GCS::Point aStartPoint = createGCSPoint(&myFixedValues[2], &myFixedValues[3]);
+  GCS::Point aEndPoint   = createGCSPoint(&myFixedValues[4], &myFixedValues[5]);
+  aNewConstraint = GCSConstraintPtr(
+    new GCS::ConstraintPointOnLine(aConic->focus1, aStartPoint, aEndPoint));
+  aNewConstraint->rescale(scale);
+  aConstraints.push_back(aNewConstraint);
+
+  return ConstraintWrapperPtr(
+    new PlaneGCSSolver_ConstraintWrapper(aConstraints, getType()));
+}
 
 void SketchSolver_ConstraintMovement::startPoint(
     const std::shared_ptr<GeomAPI_Pnt2d>& theStartPoint)

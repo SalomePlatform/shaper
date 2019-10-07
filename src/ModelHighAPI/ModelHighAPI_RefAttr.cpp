@@ -79,7 +79,7 @@ void ModelHighAPI_RefAttr::appendToList(
 //--------------------------------------------------------------------------------------
 bool ModelHighAPI_RefAttr::isEmpty() const
 {
-  return !(myAttribute && myObject);
+  return !(myAttribute || myObject);
 }
 
 //--------------------------------------------------------------------------------------

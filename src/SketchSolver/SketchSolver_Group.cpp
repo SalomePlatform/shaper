@@ -33,6 +33,8 @@
 #include <SketchPlugin_MultiRotation.h>
 #include <SketchPlugin_MultiTranslation.h>
 
+#include <Config_Translator.h>
+
 
 static void sendMessage(const char* theMessageName)
 {
@@ -179,6 +181,7 @@ static SolverConstraintPtr move(StoragePtr theStorage,
     SolverConstraintPtr(aConstraint)->process(theStorage, theEventsBlocked);
     if (aConstraint->error().empty()) {
       aConstraint->startPoint(theFrom);
+      theStorage->adjustParametrizationOfArcs();
       theSketchSolver->initialize();
       aConstraint->moveTo(theTo);
       theStorage->setNeedToResolve(true);
@@ -236,8 +239,10 @@ bool SketchSolver_Group::resolveConstraints()
 
     PlaneGCSSolver_Solver::SolveStatus aResult = PlaneGCSSolver_Solver::STATUS_OK;
     try {
-      if (!isGroupEmpty)
+      if (!isGroupEmpty) {
+        myStorage->adjustParametrizationOfArcs();
         aResult = mySketchSolver->solve();
+      }
       if (aResult == PlaneGCSSolver_Solver::STATUS_FAILED &&
           !myTempConstraints.empty()) {
         mySketchSolver->undo();
@@ -348,15 +353,29 @@ bool SketchSolver_Group::resolveConstraints()
 // ============================================================================
 void SketchSolver_Group::computeDoF()
 {
-  std::ostringstream aDoFMsg;
+  std::string aDoFMsg;
+  static const std::string aMsgContext("Sketch");
   int aDoF = mySketchSolver->dof();
   /// "DoF = 0" content of string value is used in PartSet by Sketch edit
   /// If it is changed, it should be corrected also there
-  if (aDoF == 0)
-    aDoFMsg << "Sketch is fully fixed (DoF = 0)";
-  else
-    aDoFMsg << "DoF (degrees of freedom) = " << aDoF;
-  mySketch->string(SketchPlugin_Sketch::SOLVER_DOF())->setValue(aDoFMsg.str());
+  //if (aDoF == 0) {
+  //  static const std::string aMsgDoF("Sketch is fully fixed (DoF = 0)");
+  //  aDoFMsg = Config_Translator::translate(aMsgContext, aMsgDoF);
+  //} else {
+  //  static const std::string aMsgDoF("DoF (degrees of freedom) = %1");
+  //  Events_InfoMessage aMsg(aMsgContext, aMsgDoF);
+  //  aMsg.addParameter(aDoF);
+  //  aDoFMsg = Config_Translator::translate(aMsg);
+  //}
+  //// store Unicode value for translated message about DoF
+  //size_t aLen = aDoFMsg.size();
+  //std::wstring aWStr(aLen, L'#');
+  //mbstowcs(&aWStr[0], aDoFMsg.c_str(), aLen);
+  //mySketch->string(SketchPlugin_Sketch::SOLVER_DOF())->setValue(aWStr);
+
+  std::ostringstream aStr;
+  aStr << aDoF;
+  mySketch->string(SketchPlugin_Sketch::SOLVER_DOF())->setValue(aStr.str());
 
   if (aDoF > 0 && myDOF <= 0)
     sendMessage(EVENT_SKETCH_UNDER_CONSTRAINED, mySketch, aDoF);

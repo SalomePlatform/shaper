@@ -5,7 +5,7 @@
       label="Select:&lt;br /&gt;
 1. Planar face of non-sketch object or a plane. Sketch creation will be started.&lt;br /&gt;
 2. An existing sketch face or contour. Extrusion will be filled by it.&lt;br /&gt;
-3. An existing result shape of kind: wires/edge/vertices.Extrusion will be filled by it."
+3. An existing result shape of kind: wires/edge/vertices. Extrusion will be filled by it."
       shape_types="wires faces shells">
       <validator id="FeaturesPlugin_ValidatorCompositeLauncher" parameters="base,Sketch"/>
     </sketch_launcher>
@@ -49,16 +49,16 @@
           </doublevalue>
         </groupbox>
       </box>
-      <box id="ByPlanesAndOffsets" title="By bounding planes and offsets" icon="icons/Features/plane_inverted_32x32.png">
+      <box id="ByPlanesAndOffsets" title="By bounding faces and offsets" icon="icons/Features/plane_inverted_32x32.png">
         <groupbox title="From">
           <shape_selector id="from_object"
                           icon="icons/Features/plane.png"
-                          label="Plane face"
-                          tooltip="Bounding plane (select a planar face)"
+                          label="From face"
+                          tooltip="From face"
                           shape_types="face"
                           geometrical_selection="true"
                           default="&lt;base sketch&gt;">
-            <validator id="GeomValidators_Face" parameters="plane"/>
+            <validator id="FeaturesPlugin_ValidatorExtrusionBoundary"/>
           </shape_selector>
           <doublevalue id="from_offset"
             label="Offset" step="1.0" default="0"
@@ -69,12 +69,12 @@
         <groupbox title="To">
           <shape_selector id="to_object"
                           icon="icons/Features/plane_inverted.png"
-                          label="Plane face"
-                          tooltip="Bounding plane (select a planar face)"
+                          label="To face"
+                          tooltip="To face"
                           shape_types="face"
                           geometrical_selection="true"
                           default="&lt;base sketch&gt;">
-            <validator id="GeomValidators_Face" parameters="plane"/>
+            <validator id="FeaturesPlugin_ValidatorExtrusionBoundary"/>
           </shape_selector>
           <doublevalue  id="to_offset"
             label="Offset" step="1.0" default="0"

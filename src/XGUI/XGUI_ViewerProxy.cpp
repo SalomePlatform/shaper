@@ -486,16 +486,18 @@ void XGUI_ViewerProxy::displayHighlight(FeaturePtr theFeature, const TopoDS_Shap
   }
 }
 
-void XGUI_ViewerProxy::eraseHighlight()
+bool XGUI_ViewerProxy::eraseHighlight()
 {
   Handle(AIS_InteractiveContext) aContext = AISContext();
   Handle(AIS_InteractiveObject) anAISIO;
   AIS_ListIteratorOfListOfInteractive aLIt;
+  bool isErased = myHighlights.Extent() > 0;
   for (aLIt.Initialize(myHighlights); aLIt.More(); aLIt.Next()) {
     anAISIO = aLIt.Value();
     aContext->Remove(anAISIO, false);
   }
   myHighlights.Clear();
+  return isErased;
 }
 
 void XGUI_ViewerProxy::updateHighlight()
@@ -525,14 +527,15 @@ void XGUI_ViewerProxy::updateHighlight()
           else {
             myResult = ResultPtr();
           }
-          aContext->UpdateCurrentViewer();
+          update();
         }
         isDisplayed = aRes.get();
       }
     }
     if (!isDisplayed) {
-      eraseHighlight();
-      aContext->UpdateCurrentViewer();
+      if (eraseHighlight()) {
+        update();
+      }
       myResult = ResultPtr();
     }
   }
@@ -724,3 +727,26 @@ void XGUI_ViewerProxy::setupColorScale()
 //  }
 //#endif
 //}
+
+
+#ifdef HAVE_SALOME
+void XGUI_ViewerProxy::setFitter(OCCViewer_Fitter* theFitter)
+{
+  myWorkshop->salomeConnector()->viewer()->setFitter(theFitter);
+}
+
+OCCViewer_Fitter* XGUI_ViewerProxy::fitter() const
+{
+  return myWorkshop->salomeConnector()->viewer()->fitter();
+}
+#else
+void XGUI_ViewerProxy::setFitter(AppElements_Fitter* theFitter)
+{
+  myWorkshop->mainWindow()->viewer()->setFitter(theFitter);
+}
+
+AppElements_Fitter* XGUI_ViewerProxy::fitter() const
+{
+  return myWorkshop->mainWindow()->viewer()->fitter();
+}
+#endif

@@ -10,7 +10,7 @@ To add a new Arc to the Sketch:
 #. select in the Main Menu *Sketch - > Arc* item  or
 #. click |arc.icon| **Arc** button in Sketch toolbar:
 
-There are 3 algorithms for creation of an Arc:
+There are 4 algorithms for creation of an Arc:
 
 .. image:: images/arc_base_32x32.png
    :align: left
@@ -23,6 +23,10 @@ There are 3 algorithms for creation of an Arc:
 .. image:: images/arc_tang_32x32.png
    :align: left
 **By tangent point and end point** creates an arc segment with the tangent point and the end point.
+
+.. image:: images/arc_perp_32x32.png
+   :align: left
+**By point on perpendicular line and end point** creates an arc segment perpendicular to a straight line with the start point, connected with boundary of this line, and the end point.
 
 By center and two points
 """"""""""""""""""""""""
@@ -75,8 +79,8 @@ and finally move the mouse and click a third time to set the passed point.
     :param real: Passed Y.
     :return: Result object.
 
-By tangent point and point
-""""""""""""""""""""""""""
+By tangent point and end point
+""""""""""""""""""""""""""""""
 
 .. image:: images/Arc_panel_tang.png
    :align: center
@@ -90,12 +94,36 @@ The tangent point by itself is a start point. The edge on which it lies will be 
 
 **TUI Command**:
 
-.. py:function:: Sketch_1.addArc(TangetPoint, EndX, EndY, Inversed)
+.. py:function:: Sketch_1.addArc(TangentPoint, EndX, EndY, Inversed)
 
-    :param object: Tanget Point.
+    :param object: Tangent Point.
     :param real: End X.
     :param real: End Y.
     :param boolean: Is inversed.
+    :return: Result object.
+
+By point on perpendicular line and end point
+""""""""""""""""""""""""""""""""""""""""""""
+
+.. image:: images/Arc_panel_perp.png
+   :align: center
+
+Select a point on a straight segment in the view to set the start point, then move the mouse and click to set the end point.
+The edge on which the start point lies will be perpendicular to the arc (the center of the arc is lying on the edge).
+
+- When entering a start point by selecting a point on segment, a Perpendicular constraint is created.
+- When entering an end point by selecting a segment, a Coincident constraint is created.
+- When entering an end point, only segments are selectable.
+
+**TUI Command**:
+
+.. py:function:: Sketch_1.addArc(StartPoint, EndX, EndY, Inversed, True)
+
+    :param object: Start Point.
+    :param real: End X.
+    :param real: End Y.
+    :param boolean: Is inversed.
+    :param boolean: Arc is perpendicular (always True).
     :return: Result object.
 
 Result
@@ -107,6 +135,6 @@ Created arc appears in the view.
 	   :align: center
 
 .. centered::
-   Circle created
+   Arc created
 
 **See Also** a sample TUI Script of :ref:`tui_create_arc` operation.

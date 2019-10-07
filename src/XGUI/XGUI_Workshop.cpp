@@ -219,11 +219,16 @@ XGUI_Workshop::XGUI_Workshop(XGUI_SalomeConnector* theConnector)
 
   // Load translations
   QStringList aLangs;
-  aLangs << "*_en.ts"; // load by default eng translations
+#ifdef MAKE_TRANSLATION
   QString aCurrLang = aResMgr->stringValue("language", "language", "en");
-  if(aCurrLang != "en") {
+  if(aCurrLang == "en") {
+    aLangs << "*_en.ts";
+  } else {
     aLangs << "*_" + aCurrLang + ".ts"; // then replace with translated files
   }
+#else
+  aLangs << "*_en.ts"; // load by default eng translations
+#endif
 
   foreach(QString aLang, aLangs) {
     QStringList aFilters;
@@ -268,7 +273,7 @@ XGUI_Workshop::XGUI_Workshop(XGUI_SalomeConnector* theConnector)
 
 #ifndef HAVE_SALOME
   connect(myMainWindow, SIGNAL(exitKeySequence()), SLOT(onExit()));
-  onTrihedronVisibilityChanged(true);
+  myDisplayer->displayTrihedron(true);
 #endif
 
   connect(myEventsListener, SIGNAL(errorOccurred(std::shared_ptr<Events_InfoMessage>)),
@@ -752,12 +757,13 @@ void XGUI_Workshop::fillPropertyPanel(ModuleBase_Operation* theOperation)
   myModule->propertyPanelDefined(theOperation);
 
 #ifndef DEBUG_FEATURE_NAME
-  myPropertyPanel->setWindowTitle(theOperation->getDescription()->description());
+  myPropertyPanel->setWindowTitle(ModuleBase_Tools::translate("workshop",
+    theOperation->getDescription()->description().toStdString()));
 #else
   std::string aFeatureName = aFeature->name();
   myPropertyPanel->setWindowTitle(QString("%1: %2")
-    .arg(theOperation->getDescription()->description())
-    .arg(aFeatureName.c_str()));
+    .arg(translate(theOperation->getDescription()->description()))
+    .arg(translate(aFeatureName.c_str())));
 #endif
 
   myErrorMgr->setPropertyPanel(myPropertyPanel);
@@ -1069,8 +1075,10 @@ void XGUI_Workshop::onPreferences()
 void XGUI_Workshop::onTrihedronVisibilityChanged(bool theState)
 {
   XGUI_Displayer* aDisplayer = displayer();
-  if (aDisplayer)
+  if (aDisplayer) {
     aDisplayer->displayTrihedron(theState);
+    aDisplayer->updateViewer();
+  }
 }
 
 //******************************************************
@@ -1237,6 +1245,7 @@ void XGUI_Workshop::onValuesChanged()
 void XGUI_Workshop::onWidgetObjectUpdated()
 {
   operationMgr()->onValidateOperation();
+  myDisplayer->updateViewer();
 }
 
 //******************************************************
@@ -1812,6 +1821,19 @@ void XGUI_Workshop::deleteObjects()
   if (!(hasResult || hasFeature || hasParameter || hasFolder))
     return;
 
+  // Remove from the list non-deletable objects: infinite constuctions which are not in history
+  bool notDelete = true;
+  QObjectPtrList::iterator aIt;
+  for (aIt = anObjects.begin(); aIt != anObjects.end(); aIt++) {
+    ObjectPtr aObj = (*aIt);
+    ResultConstructionPtr aConstr = std::dynamic_pointer_cast<ModelAPI_ResultConstruction>(aObj);
+    FeaturePtr aFeature = ModelAPI_Feature::feature(aObj);
+    notDelete = (!aFeature->isInHistory()) && aConstr->isInfinite();
+    if (notDelete) {
+      anObjects.removeAll(aObj);
+      aIt--;
+    }
+  }
   // delete objects
   std::map<FeaturePtr, std::set<FeaturePtr> > aReferences;
   std::set<FeaturePtr> aFeatures;
@@ -1867,6 +1889,8 @@ void XGUI_Workshop::deleteObjects()
     operationMgr()->commitOperation();
   else
     operationMgr()->abortOperation(operationMgr()->currentOperation());
+
+  myDisplayer->updateViewer();
 }
 
 //**************************************************************
@@ -1960,7 +1984,8 @@ void XGUI_Workshop::cleanHistory()
     QString anUnusedNames = aNames.join(", ");
 
     QString anActionId = "CLEAN_HISTORY_CMD";
-    QString aDescription = contextMenuMgr()->action(anActionId)->text();
+    QString aDescription = ModuleBase_Tools::translate("workshop",
+        contextMenuMgr()->action(anActionId)->text().toStdString());
 
     QMessageBox aMessageBox(desktop());
     aMessageBox.setWindowTitle(aDescription);
@@ -2017,16 +2042,16 @@ void XGUI_Workshop::cleanHistory()
 }
 
 //**************************************************************
+bool compareFeature(const FeaturePtr& theF1, const FeaturePtr& theF2) {
+  DocumentPtr aDoc = theF1->document();
+  return aDoc->index(theF1) < aDoc->index(theF2);
+}
 void XGUI_Workshop::moveObjects()
 {
   if (!abortAllOperations())
     return;
 
   SessionPtr aMgr = ModelAPI_Session::get();
-
-  QString anActionId = "MOVE_CMD";
-  QString aDescription = contextMenuMgr()->action(anActionId)->text();
-  aMgr->startOperation(aDescription.toStdString());
 
   QObjectPtrList anObjects = mySelector->selection()->selectedObjects();
   // It is necessary to clear selection in order to avoid selection changed event during
@@ -2038,9 +2063,17 @@ void XGUI_Workshop::moveObjects()
   if (!XGUI_Tools::canRemoveOrRename(desktop(), aFeatures))
     return;
 
+  QString anActionId = "MOVE_CMD";
+  QString aDescription = contextMenuMgr()->action(anActionId)->text();
+  aMgr->startOperation(aDescription.toStdString());
+
+  // Sort features by index in document
+  std::list<FeaturePtr> aFList(aFeatures.begin(), aFeatures.end());
+  aFList.sort(compareFeature);
+
   DocumentPtr anActiveDocument = aMgr->activeDocument();
   FeaturePtr aCurrentFeature = anActiveDocument->currentFeature(true);
-  std::set<FeaturePtr>::const_iterator anIt = aFeatures.begin(), aLast = aFeatures.end();
+  std::list<FeaturePtr>::const_iterator anIt = aFList.begin(), aLast = aFList.end();
   for (; anIt != aLast; anIt++) {
     FeaturePtr aFeature = *anIt;
     if (!aFeature.get() || !myModule->canApplyAction(aFeature, anActionId))
@@ -2050,6 +2083,7 @@ void XGUI_Workshop::moveObjects()
     aCurrentFeature = anActiveDocument->currentFeature(true);
   }
   aMgr->finishOperation();
+  updateCommandStatus();
 }
 
 //**************************************************************
@@ -2454,7 +2488,7 @@ void XGUI_Workshop::changeTransparency(const QObjectPtrList& theObjects)
 
   // 2. show the dialog to change the value
   XGUI_PropertyDialog* aDlg = new XGUI_PropertyDialog(desktop());
-  aDlg->setWindowTitle("Transparency");
+  aDlg->setWindowTitle(tr("Transparency"));
   XGUI_TransparencyWidget* aTransparencyWidget = new XGUI_TransparencyWidget(aDlg);
   connect(aTransparencyWidget, SIGNAL(transparencyValueChanged()),
           this, SLOT(onTransparencyValueChanged()));

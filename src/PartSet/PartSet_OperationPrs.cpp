@@ -127,6 +127,9 @@ void PartSet_OperationPrs::Compute(
     // change deviation coefficient to provide more precise circle
     // as there is no result, the shape is processed to correct deviation. To be unified
     ModuleBase_Tools::setDefaultDeviationCoefficient(aShape, aDrawer);
+    Handle(Prs3d_Drawer) aHighlightDrawer = DynamicHilightAttributes();
+    if (!aHighlightDrawer.IsNull())
+      ModuleBase_Tools::setDefaultDeviationCoefficient(aShape, aHighlightDrawer);
 
     if (myUseAISWidth) {
       Handle(AIS_InteractiveObject) anIO = anIter.Value();

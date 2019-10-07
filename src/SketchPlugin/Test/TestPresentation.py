@@ -89,6 +89,8 @@ assert(featureToPresentation(SketchConstraintMirror_1.feature()).getAISObject(No
 assert(featureToPresentation(SketchMultiTranslation_1.feature()).getAISObject(None) is not None)
 assert(featureToPresentation(SketchMultiRotation_1.feature()).getAISObject(None) is not None)
 
+model.end()
+
 # Test presentation for Fillet on low-level
 aSession = ModelAPI_Session.get()
 aSketchFeature = featureToCompositeFeature(Sketch_1.feature())
@@ -126,4 +128,30 @@ anArcPnt3.setValue(0, 5)
 assert(featureToPresentation(anArc).getAISObject(None) is not None)
 aSession.finishOperation()
 
-model.end()
+# Test presentation for MacroEllipse on low-level
+aSession.startOperation()
+anEllipse = aSketchFeature.addFeature("SketchMacroEllipse")
+anEllipsePnt1 = geomDataAPI_Point2D(anEllipse.attribute("first_point"))
+anEllipsePnt2 = geomDataAPI_Point2D(anEllipse.attribute("second_point"))
+anEllipsePnt3 = geomDataAPI_Point2D(anEllipse.attribute("passed_point"))
+anEllipseType = anEllipse.string("ellipse_type")
+anEllipseType.setValue("by_center_axis_point")
+anEllipsePnt1.setValue(10, 0)
+anEllipsePnt2.setValue(-10, 0)
+anEllipsePnt3.setValue(0, 5)
+assert(featureToPresentation(anEllipse).getAISObject(None) is not None)
+aSession.finishOperation()
+
+# Test presentation for MacroEllipticArc on low-level
+aSession.startOperation()
+anEllipticArc = aSketchFeature.addFeature("SketchMacroEllipticArc")
+anEllipticArcPnt1 = geomDataAPI_Point2D(anEllipticArc.attribute("center"))
+anEllipticArcPnt2 = geomDataAPI_Point2D(anEllipticArc.attribute("major_axis_point"))
+anEllipticArcPnt3 = geomDataAPI_Point2D(anEllipticArc.attribute("start_point"))
+anEllipticArcPnt4 = geomDataAPI_Point2D(anEllipticArc.attribute("end_point"))
+anEllipticArcPnt1.setValue(0, 0)
+anEllipticArcPnt2.setValue(10, 0)
+anEllipticArcPnt3.setValue(0, 5)
+anEllipticArcPnt4.setValue(-10, 0)
+assert(featureToPresentation(anEllipticArc).getAISObject(None) is not None)
+aSession.finishOperation()

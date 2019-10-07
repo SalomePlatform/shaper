@@ -39,17 +39,20 @@ typedef int ConstraintID;
 // Predefined values for identifiers
 const ConstraintID CID_UNKNOWN  =  0;
 const ConstraintID CID_MOVEMENT = -1;
-const ConstraintID CID_FICTIVE = 1024;
+const ConstraintID CID_FICTIVE  = 99;
 
 /// Types of entities
 enum SketchSolver_EntityType {
   ENTITY_UNKNOWN = 0,
+  ENTITY_BOOLEAN,
   ENTITY_SCALAR,
   ENTITY_ANGLE,
   ENTITY_POINT,
   ENTITY_LINE,
   ENTITY_CIRCLE,
-  ENTITY_ARC
+  ENTITY_ARC,
+  ENTITY_ELLIPSE,
+  ENTITY_ELLIPTIC_ARC
 };
 
 /// Types of constraints
@@ -57,8 +60,7 @@ enum SketchSolver_ConstraintType {
   CONSTRAINT_UNKNOWN = 0,
   CONSTRAINT_COINCIDENCE,      // base coincidence if we don't know exact type yet
   CONSTRAINT_PT_PT_COINCIDENT,
-  CONSTRAINT_PT_ON_LINE,
-  CONSTRAINT_PT_ON_CIRCLE,
+  CONSTRAINT_PT_ON_CURVE,
   CONSTRAINT_MIDDLE_POINT,
   CONSTRAINT_DISTANCE,         // base distance if we don't know the measured objects yet
   CONSTRAINT_PT_PT_DISTANCE,
@@ -72,14 +74,16 @@ enum SketchSolver_ConstraintType {
   CONSTRAINT_VERTICAL,
   CONSTRAINT_PARALLEL,
   CONSTRAINT_PERPENDICULAR,
+  CONSTRAINT_PERPENDICULAR_CURVES,
   CONSTRAINT_SYMMETRIC,
   CONSTRAINT_EQUAL,           // base equality if we don't know the measured objects yet
   CONSTRAINT_EQUAL_LINES,
   CONSTRAINT_EQUAL_LINE_ARC,
   CONSTRAINT_EQUAL_RADIUS,
+  CONSTRAINT_EQUAL_ELLIPSES,
   CONSTRAINT_TANGENT,         // base tangency if we don't know the measured objects yet
   CONSTRAINT_TANGENT_CIRCLE_LINE,
-  CONSTRAINT_TANGENT_CIRCLE_CIRCLE,
+  CONSTRAINT_TANGENT_CURVE_CURVE,
   CONSTRAINT_COLLINEAR,
   CONSTRAINT_MULTI_TRANSLATION,
   CONSTRAINT_MULTI_ROTATION

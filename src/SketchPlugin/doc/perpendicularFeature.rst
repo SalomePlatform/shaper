@@ -1,15 +1,16 @@
 .. _sketchPerpendicular:
-.. |perpendicular.icon|    image:: images/perpendicular.png
+.. |Perpendicular.icon|    image:: images/Perpendicular.png
 
 Perpendicular constraint
 ========================
 
 Perpendicular constraint fixes two lines at 90 degrees to one another.
+For a line and a circle/arc the perpendicular constraint fixes the center of circle/arc to be on a line.
 
 To create a Perpendicular constraint in the active Sketch:
 
 #. select in the Main Menu *Sketch - > Perpendicular* item  or
-#. click |perpendicular.icon| **Perpendicular** button in Sketch toolbar:
+#. click |Perpendicular.icon| **Perpendicular** button in Sketch toolbar:
 
 Property panel:
 
@@ -18,10 +19,12 @@ Property panel:
 
 Input fields:
 
-- **First line** is the first line selected in the view.
-- **Second line** is the second line selected in the view.
+- **First object** is the first line, circle or arc selected in the view.
+- **Second object** is the second line, circle or arc selected in the view.
 
-After the lines are selected, a special sign will be added to each of them in the view.
+After the objects are selected, a special sign will be added to each of them in the view.
+
+If one of selected objects is circular, then another has to be a straight line.
 
 **TUI Command**:
 
@@ -37,7 +40,7 @@ Result
 Created Perpendicular constraint appears in the view.
 
 .. image:: images/Perpendicular_res.png
-	   :align: center
+           :align: center
 
 .. centered::
    Created perpendicular constraint

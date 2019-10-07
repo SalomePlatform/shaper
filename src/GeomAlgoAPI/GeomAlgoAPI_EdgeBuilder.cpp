@@ -18,6 +18,10 @@
 //
 
 #include <GeomAlgoAPI_EdgeBuilder.h>
+
+#include <GeomAPI_Ax2.h>
+#include <GeomAPI_Ellipse.h>
+
 #include <gp_Pln.hxx>
 #include <BRepBuilderAPI_MakeEdge.hxx>
 #include <TopoDS_Edge.hxx>
@@ -232,6 +236,32 @@ std::shared_ptr<GeomAPI_Edge> GeomAlgoAPI_EdgeBuilder::ellipse(
 
   BRepBuilderAPI_MakeEdge anEdgeBuilder(anEllipse);
   std::shared_ptr<GeomAPI_Edge> aRes(new GeomAPI_Edge);
+  TopoDS_Edge anEdge = anEdgeBuilder.Edge();
+  aRes->setImpl(new TopoDS_Shape(anEdge));
+  return aRes;
+}
+
+std::shared_ptr<GeomAPI_Edge> GeomAlgoAPI_EdgeBuilder::ellipticArc(
+    const std::shared_ptr<GeomAPI_Pnt>& theCenter,
+    const std::shared_ptr<GeomAPI_Dir>& theNormal,
+    const std::shared_ptr<GeomAPI_Dir>& theMajorAxis,
+    const double                        theMajorRadius,
+    const double                        theMinorRadius,
+    const std::shared_ptr<GeomAPI_Pnt>& theStart,
+    const std::shared_ptr<GeomAPI_Pnt>& theEnd)
+{
+  std::shared_ptr<GeomAPI_Ax2> anAx2(new GeomAPI_Ax2(theCenter, theNormal, theMajorAxis));
+  GeomAPI_Ellipse anEllipse(anAx2, theMajorRadius, theMinorRadius);
+
+  GeomPointPtr aStartPnt = anEllipse.project(theStart);
+  GeomPointPtr aEndPnt   = anEllipse.project(theEnd);
+
+  double aStartParam, aEndParam;
+  anEllipse.parameter(aStartPnt, Precision::Confusion(), aStartParam);
+  anEllipse.parameter(aEndPnt, Precision::Confusion(), aEndParam);
+
+  BRepBuilderAPI_MakeEdge anEdgeBuilder(anEllipse.impl<gp_Elips>(), aStartParam, aEndParam);
+  GeomEdgePtr aRes(new GeomAPI_Edge);
   TopoDS_Edge anEdge = anEdgeBuilder.Edge();
   aRes->setImpl(new TopoDS_Shape(anEdge));
   return aRes;

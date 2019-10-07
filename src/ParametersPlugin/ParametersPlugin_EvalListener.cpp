@@ -40,6 +40,8 @@
 
 #include <QMessageBox>
 
+#include <ModuleBase_Tools.h>
+
 #include <string>
 #include <set>
 #include <sstream>
@@ -282,10 +284,16 @@ void ParametersPlugin_EvalListener::processObjectRenamedEvent(
 
   std::string aNotActivatedNames;
   if (!ModelAPI_Tools::allDocumentsActivated(aNotActivatedNames)) {
-    QMessageBox::StandardButton aRes = QMessageBox::warning(0, QObject::tr("Warning"),
-               QObject::tr("Selected objects can be used in Part documents which are not loaded: "
-                           "%1. Whould you like to continue?").arg(aNotActivatedNames.c_str()),
-               QMessageBox::No | QMessageBox::Yes, QMessageBox::No);
+    static const std::string aMsgContext("ParametersPlugin");
+    static const std::string aMsgText =
+      "Selected objects can be used in Part documents which are not loaded: " +
+      std::string("%1. Would you like to continue?");
+    Events_InfoMessage aMsg(aMsgContext, aMsgText);
+    aMsg.arg(aNotActivatedNames.c_str());
+    QMessageBox::StandardButton aRes =
+      QMessageBox::warning(0, ModuleBase_Tools::translate(aMsgContext, "Warning"),
+        ModuleBase_Tools::translate(aMsg),
+        QMessageBox::No | QMessageBox::Yes, QMessageBox::No);
     if (aRes != QMessageBox::Yes) {
       setParameterName(aResultParameter, aMessage->oldName());
       return;

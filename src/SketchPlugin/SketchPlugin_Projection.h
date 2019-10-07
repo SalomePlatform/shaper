@@ -88,6 +88,16 @@ private:
   /// \brief Find projection of a feature onto sketch plane
   void computeProjection(const std::string& theID);
 
+  /// \brief Delete already calculated projected feature
+  ///        if the selection of the projection is changed
+  /// \param[in/out] theProjection   projected feature
+  /// \param[in] theSupportedTypes   types supported relatively to the base selection
+  /// \param[in] theRequestedFeature type of the new feature to be created
+  ///                                (remove only if empty string).
+  bool rebuildProjectedFeature(FeaturePtr& theProjection,
+                               const std::set<std::string>& theSupportedTypes,
+                               const std::string& theRequestedFeature = std::string());
+
   bool myIsComputing;
 };
 

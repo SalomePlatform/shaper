@@ -159,7 +159,7 @@ testProjections(Part_1_doc, Sketch_7, aProjectedList, aFailedIDs)
 
 # Test projection to slope side face of the prism
 Sketch_8 = model.addSketch(Part_1_doc, model.selection("FACE", "Extrusion_1_1/Generated_Face&Sketch_2/SketchLine_2"))
-aFailedIDs = set([0, 1])
+aFailedIDs = set()
 testProjections(Part_1_doc, Sketch_8, aProjectedList, aFailedIDs)
 
 model.end()

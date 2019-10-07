@@ -74,8 +74,13 @@ void PartSet_OverconstraintListener::setActive(const bool& theActive)
     PartSet_Module* aModule = module();
     CompositeFeaturePtr aSketch = aModule->sketchMgr()->activeSketch();
     if (aSketch.get()) {
-      std::string aDOFMessage = aSketch->string(SketchPlugin_Sketch::SOLVER_DOF())->value();
-      myIsFullyConstrained = QString(aDOFMessage.c_str()).contains("DoF = 0");
+      QString aDOFMessage(aSketch->string(SketchPlugin_Sketch::SOLVER_DOF())->value().c_str());
+      if (aDOFMessage.contains('=')) {
+        // to support old data
+        aDOFMessage =
+          aDOFMessage.right(aDOFMessage.length() - aDOFMessage.lastIndexOf('=')).trimmed();
+      }
+      myIsFullyConstrained = (aDOFMessage == "0");
     }
   }
 }

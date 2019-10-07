@@ -299,7 +299,7 @@ bool FeaturesPlugin_ValidatorBaseForGeneration::isValid(const AttributePtr& theA
 
           if(aSelectedWiresFromObjects.isBound(aWire)) {
             theError =
-              "Error: Objects with such wire already selected. Don't allow to select this object.";
+              "Error: Objects with this wire already selected. Don't allow to select this object.";
             return false;
           }
 
@@ -461,7 +461,7 @@ bool FeaturesPlugin_ValidatorBaseForGeneration::isValidAttribute(const Attribute
     GeomValidators_ShapeType aShapeTypeValidator;
     if(!aShapeTypeValidator.isValid(anAttr, theArguments, theError)) {
       theError = "Error: Selected shape has unacceptable type. Acceptable types are: faces or "
-                 "wires on sketch, whole sketch(if it has at least one face), "
+                 "wires on sketch, whole sketch (if it has at least one face), "
                  "and whole objects with shape types: %1";
       std::string anArgumentString;
       for(auto anIt = theArguments.cbegin(); anIt != theArguments.cend(); ++anIt) {

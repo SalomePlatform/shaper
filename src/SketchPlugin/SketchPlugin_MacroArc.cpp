@@ -20,6 +20,7 @@
 #include "SketchPlugin_MacroArc.h"
 
 #include "SketchPlugin_Arc.h"
+#include "SketchPlugin_ConstraintPerpendicular.h"
 #include "SketchPlugin_ConstraintTangent.h"
 #include "SketchPlugin_Sketch.h"
 #include "SketchPlugin_Tools.h"
@@ -209,7 +210,9 @@ void SketchPlugin_MacroArc::attributeChanged(const std::string& theID)
   else if(anArcType == ARC_TYPE_BY_THREE_POINTS())
     fillByThreePassedPoints();
   else if(anArcType == ARC_TYPE_BY_TANGENT_EDGE())
-    fillByTangentEdge();
+    fillByEdge(false);
+  else if (anArcType == ARC_TYPE_BY_TRANSVERSAL_LINE())
+    fillByEdge(true);
 
   double aRadius = 0;
   double anAngle = 0;
@@ -339,19 +342,27 @@ void SketchPlugin_MacroArc::execute()
                                          AttributePtr(),
                                          anArcFeature->lastResult(),
                                          true);
-  } else if(anArcType == ARC_TYPE_BY_TANGENT_EDGE()) {
-    // constraints for tangent arc
+  } else {
+    // coincident with connection point
     SketchPlugin_Tools::createCoincidenceOrTangency(this,
                                          TANGENT_POINT_ID(),
                                          anArcFeature->attribute(SketchPlugin_Arc::START_ID()),
                                          ObjectPtr(),
                                          false);
-    FeaturePtr aTangent = sketch()->addFeature(SketchPlugin_ConstraintTangent::ID());
-    AttributeRefAttrPtr aRefAttrA = aTangent->refattr(SketchPlugin_Constraint::ENTITY_A());
+    // tangent or perpendicular constraint
+    FeaturePtr aStartPointConstraint;
+    if (anArcType == ARC_TYPE_BY_TANGENT_EDGE())
+      aStartPointConstraint = sketch()->addFeature(SketchPlugin_ConstraintTangent::ID());
+    else
+      aStartPointConstraint = sketch()->addFeature(SketchPlugin_ConstraintPerpendicular::ID());
+    // setting attributes of the start point constraint
+    AttributeRefAttrPtr aRefAttrA =
+        aStartPointConstraint->refattr(SketchPlugin_Constraint::ENTITY_A());
     AttributeRefAttrPtr aTgPntRefAttr = refattr(TANGENT_POINT_ID());
     FeaturePtr aTgFeature = ModelAPI_Feature::feature(aTgPntRefAttr->attr()->owner());
     aRefAttrA->setObject(aTgFeature->lastResult());
-    AttributeRefAttrPtr aRefAttrB = aTangent->refattr(SketchPlugin_Constraint::ENTITY_B());
+    AttributeRefAttrPtr aRefAttrB =
+        aStartPointConstraint->refattr(SketchPlugin_Constraint::ENTITY_B());
     aRefAttrB->setObject(anArcFeature->lastResult());
     // constraint for end point
     SketchPlugin_Tools::createCoincidenceOrTangency(this,
@@ -596,15 +607,15 @@ void SketchPlugin_MacroArc::recalculateReversedFlagByPassed(
   myParamBefore = aEndParam;
 }
 
-void SketchPlugin_MacroArc::fillByTangentEdge()
+void SketchPlugin_MacroArc::fillByEdge(bool theTransversal)
 {
   AttributeRefAttrPtr aTangentAttr = refattr(TANGENT_POINT_ID());
   if (!aTangentAttr->isInitialized())
     return;
 
-  AttributePoint2DPtr aTangentPointAttr =
+  AttributePoint2DPtr aConnectionPointAttr =
       std::dynamic_pointer_cast<GeomDataAPI_Point2D>(aTangentAttr->attr());
-  if (!aTangentPointAttr->isInitialized())
+  if (!aConnectionPointAttr->isInitialized())
     return;
 
   AttributePoint2DPtr anEndPointAttr =
@@ -612,19 +623,22 @@ void SketchPlugin_MacroArc::fillByTangentEdge()
   if (!anEndPointAttr->isInitialized())
     return;
 
-  myStart = aTangentPointAttr->pnt();
+  myStart = aConnectionPointAttr->pnt();
   myEnd = anEndPointAttr->pnt();
   if (myStart->isEqual(myEnd))
     return;
 
   // obtain a shape the tangent point belongs to
-  FeaturePtr aTangentFeature = ModelAPI_Feature::feature(aTangentPointAttr->owner());
-  std::shared_ptr<GeomAPI_Shape> aTangentShape = aTangentFeature->lastResult()->shape();
+  FeaturePtr aConnectedFeature = ModelAPI_Feature::feature(aConnectionPointAttr->owner());
+  std::shared_ptr<GeomAPI_Shape> aTangentShape = aConnectedFeature->lastResult()->shape();
 
   GeomAlgoAPI_Circ2dBuilder aCircBuilder(SketchPlugin_Sketch::plane(sketch()));
   aCircBuilder.addPassingPoint(myStart);
   aCircBuilder.addPassingPoint(myEnd);
-  aCircBuilder.addTangentCurve(aTangentShape);
+  if (theTransversal)
+    aCircBuilder.setTransversalLine(aTangentShape);
+  else
+    aCircBuilder.addTangentCurve(aTangentShape);
 
   std::shared_ptr<GeomAPI_Circ2d> aCircle = aCircBuilder.circle();
   if (!aCircle)

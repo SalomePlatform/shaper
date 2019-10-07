@@ -38,6 +38,9 @@ public:
   virtual void notify(const FeaturePtr&      theFeature,
                       PlaneGCSSolver_Update* theUpdater);
 
+  /// \brief Remove constraint
+  virtual bool remove();
+
 protected:
   /// \brief Generate list of attributes of constraint in order useful for constraints
   /// \param[out] theValue      numerical characteristic of constraint (e.g. distance)
@@ -47,6 +50,7 @@ protected:
 
 private:
   ConstraintWrapperPtr myMiddle;
+  GCSPointPtr myOddPoint; ///< auxiliary point to adjust midpoint-on-arc
 };
 
 #endif

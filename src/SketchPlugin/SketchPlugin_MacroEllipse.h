@@ -17,10 +17,6 @@
 // See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 
-// File:        SketchPlugin_MacroEllipse.h
-// Created:     26 April 2017
-// Author:      Artem ZHIDKOV
-
 #ifndef SketchPlugin_MacroEllipse_H_
 #define SketchPlugin_MacroEllipse_H_
 
@@ -29,7 +25,6 @@
 #include <SketchPlugin_SketchEntity.h>
 #include <GeomAPI_IPresentable.h>
 
-////class GeomAPI_Circ2d;
 class GeomAPI_Pnt2d;
 
 /**\class SketchPlugin_MacroEllipse
@@ -48,35 +43,58 @@ class SketchPlugin_MacroEllipse: public SketchPlugin_SketchEntity,
     return ID;
   }
 
-  /// 2D point - center of the ellipse.
+  static const std::string& ELLIPSE_TYPE()
+  {
+    static const std::string ID("ellipse_type");
+    return ID;
+  }
+
+  static const std::string& ELLIPSE_TYPE_BY_CENTER_AXIS_POINT()
+  {
+    static const std::string ID("by_center_axis_point");
+    return ID;
+  }
+  static const std::string& ELLIPSE_TYPE_BY_AXIS_AND_POINT()
+  {
+    static const std::string ID("by_major_axis_and_point");
+    return ID;
+  }
+
+  static const std::string& EDIT_ELLIPSE_TYPE()
+  {
+    static const std::string ID("edit_ellipse_type");
+    return ID;
+  }
+
+  /// Attribute for the first point selected during ellipse creation.
   inline static const std::string& CENTER_POINT_ID()
   {
-    static const std::string ID("center_point");
+    static const std::string ID("first_point");
     return ID;
   }
 
-  /// Reference for center point selection.
+  /// Reference to the first selected point.
   inline static const std::string& CENTER_POINT_REF_ID()
   {
-    static const std::string ID("center_point_ref");
+    static const std::string ID("first_point_ref");
     return ID;
   }
 
-  /// 2D point - major axis point of the ellipse.
+  /// Attribute for the second point selected during ellipse creation.
   inline static const std::string& MAJOR_AXIS_POINT_ID()
   {
-    static const std::string ID("major_axis_point");
+    static const std::string ID("second_point");
     return ID;
   }
 
-  /// Reference for major axis point selection.
+  /// Reference to the second selected point.
   inline static const std::string& MAJOR_AXIS_POINT_REF_ID()
   {
-    static const std::string ID("major_axis_point_ref");
+    static const std::string ID("second_point_ref");
     return ID;
   }
 
-  /// 2D point - passed point of the ellipse
+  /// Attribute for the third point selected during ellipse creation.
   inline static const std::string& PASSED_POINT_ID()
   {
     static const std::string ID("passed_point");
@@ -90,17 +108,59 @@ class SketchPlugin_MacroEllipse: public SketchPlugin_SketchEntity,
     return ID;
   }
 
+  /// Attribute for the first point selected during ellipse creation.
+  inline static const std::string& MAJOR_AXIS_START_ID()
+  {
+    static const std::string ID("first_point_1");
+    return ID;
+  }
+
+  /// Reference to the first selected point.
+  inline static const std::string& MAJOR_AXIS_START_REF_ID()
+  {
+    static const std::string ID("first_point_ref_1");
+    return ID;
+  }
+
+  /// Attribute for the second point selected during ellipse creation.
+  inline static const std::string& MAJOR_AXIS_END_ID()
+  {
+    static const std::string ID("second_point_1");
+    return ID;
+  }
+
+  /// Reference to the second selected point.
+  inline static const std::string& MAJOR_AXIS_END_REF_ID()
+  {
+    static const std::string ID("second_point_ref_1");
+    return ID;
+  }
+
+  /// Attribute for the third point selected during ellipse creation.
+  inline static const std::string& PASSED_POINT_1_ID()
+  {
+    static const std::string ID("passed_point_1");
+    return ID;
+  }
+
+  /// Reference for passed point selection.
+  inline static const std::string& PASSED_POINT_1_REF_ID()
+  {
+    static const std::string ID("passed_point_ref_1");
+    return ID;
+  }
+
   /// Major radius of the ellipse
   inline static const std::string& MAJOR_RADIUS_ID()
   {
-    static const std::string ID("ellipse_major_radius");
+    static const std::string ID("major_radius");
     return ID;
   }
 
   /// Minor radius of the ellipse
   inline static const std::string& MINOR_RADIUS_ID()
   {
-    static const std::string ID("ellipse_minor_radius");
+    static const std::string ID("minor_radius");
     return ID;
   }
 
@@ -139,7 +199,8 @@ class SketchPlugin_MacroEllipse: public SketchPlugin_SketchEntity,
   SketchPlugin_MacroEllipse();
 
 private:
-  void constraintsForEllipse(FeaturePtr theEllipseFeature);
+  void constraintsForEllipseByCenterAxisAndPassed(FeaturePtr theEllipseFeature);
+  void constraintsForEllipseByMajoxAxisAndPassed(FeaturePtr theEllipseFeature);
 
   FeaturePtr createEllipseFeature();
 

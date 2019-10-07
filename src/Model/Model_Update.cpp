@@ -647,7 +647,12 @@ bool Model_Update::processFeature(FeaturePtr theFeature)
     }
     // searching for the next not used reason
     aProcessedReasons.insert(aReason);
-    aReasons.erase(aReason);
+    // check theFeature is still in the list of modified, because it may be removed sometimes
+    // while updating SketchPlugin_Ellipse
+    if (myModified.find(theFeature) != myModified.end())
+      aReasons.erase(aReason);
+    else
+      break;
   }
   // restore the modified reasons: they will be used in the update of arguments
   if (allSubsUsed) { // restore theFeature in this set

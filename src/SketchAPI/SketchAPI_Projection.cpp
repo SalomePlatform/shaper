@@ -21,11 +21,15 @@
 
 #include <SketchPlugin_Line.h>
 #include <SketchPlugin_Circle.h>
+#include <SketchPlugin_Ellipse.h>
+#include <SketchPlugin_EllipticArc.h>
 #include <SketchPlugin_Point.h>
 
-#include <SketchAPI_Line.h>
-#include <SketchAPI_Circle.h>
 #include <SketchAPI_Arc.h>
+#include <SketchAPI_Circle.h>
+#include <SketchAPI_Ellipse.h>
+#include <SketchAPI_EllipticArc.h>
+#include <SketchAPI_Line.h>
 #include <SketchAPI_Point.h>
 
 #include <ModelHighAPI_Dumper.h>
@@ -100,6 +104,10 @@ std::shared_ptr<SketchAPI_SketchEntity> SketchAPI_Projection::createdFeature() c
     anEntity.reset(new SketchAPI_Circle(aProjectedFeature));
   else if (aProjectedFeature->getKind() == SketchPlugin_Arc::ID())
     anEntity.reset(new SketchAPI_Arc(aProjectedFeature));
+  else if (aProjectedFeature->getKind() == SketchPlugin_Ellipse::ID())
+    anEntity.reset(new SketchAPI_Ellipse(aProjectedFeature));
+  else if (aProjectedFeature->getKind() == SketchPlugin_EllipticArc::ID())
+    anEntity.reset(new SketchAPI_EllipticArc(aProjectedFeature));
   else if (aProjectedFeature->getKind() == SketchPlugin_Point::ID())
     anEntity.reset(new SketchAPI_Point(aProjectedFeature));
 

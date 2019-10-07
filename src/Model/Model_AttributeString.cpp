@@ -23,11 +23,15 @@
 #include <ModelAPI_Data.h>
 #include <ModelAPI_Object.h>
 
+#include <TDataStd_UAttribute.hxx>
 #include <Standard_TypeDef.hxx>
 #include <TCollection_AsciiString.hxx>
 #include <TCollection_ExtendedString.hxx>
 
 #include <string>
+
+// on myLabel if the Unicode string was stored
+static const Standard_GUID kUVALUE_IDENTIFIER("04cac509-b2fc-4887-b442-d2a86f2fd7bd");
 
 void Model_AttributeString::setValue(const std::string& theValue)
 {
@@ -36,6 +40,7 @@ void Model_AttributeString::setValue(const std::string& theValue)
     if (myString.IsNull())
       myString = TDataStd_Name::Set(myLab, TCollection_ExtendedString());
     myString->Set(aValue);
+    myLab.ForgetAttribute(kUVALUE_IDENTIFIER);
     owner()->data()->sendAttributeUpdated(this);
   }
 }
@@ -47,6 +52,7 @@ void Model_AttributeString::setValue(const std::wstring& theValue)
     if (myString.IsNull())
       myString = TDataStd_Name::Set(myLab, TCollection_ExtendedString());
     myString->Set(aValue);
+    TDataStd_UAttribute::Set(myLab, kUVALUE_IDENTIFIER);
     owner()->data()->sendAttributeUpdated(this);
   }
 }
@@ -57,6 +63,7 @@ std::string Model_AttributeString::value()
     return "";  // not initialized
   return TCollection_AsciiString(myString->Get()).ToCString();
 }
+
 char16_t* Model_AttributeString::valueU()
 {
   if (myString.IsNull()) {   // not initialized
@@ -64,6 +71,10 @@ char16_t* Model_AttributeString::valueU()
     return (char16_t*)(anEmpty.ToExtString());
   }
   return (char16_t*)(myString->Get().ToExtString());
+}
+
+bool Model_AttributeString::isUValue() const {
+  return !myLab.IsNull() && myLab.IsAttribute(kUVALUE_IDENTIFIER);
 }
 
 Model_AttributeString::Model_AttributeString(TDF_Label& theLabel)

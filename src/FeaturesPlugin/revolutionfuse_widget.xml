@@ -5,7 +5,7 @@
       label="Select:&lt;br /&gt;
 1. Planar face of non-sketch object or a plane. Sketch creation will be started.&lt;br /&gt;
 2. An existing sketch face or contour. Extrusion will be filled by it.&lt;br /&gt;
-3. An existing result shape of kind: wires/edge/vertices.Extrusion will be filled by it."
+3. An existing result shape of kind: wires/edge/vertices. Extrusion will be filled by it."
       shape_types="vertices edges wires faces shells compounds">
       <validator id="FeaturesPlugin_ValidatorCompositeLauncher" parameters="base,Sketch"/>
     </sketch_launcher>
@@ -63,7 +63,7 @@
           <doublevalue id="from_offset" label="Angle"
             step="1.0" default="0"
             icon="icons/Features/angle_up_down.png"
-            tooltip="Angle for &quot;from&quot; for bounding plane">
+            tooltip="Angle for &quot;from&quot; bounding plane">
           </doublevalue>
         </groupbox>
         <groupbox title="To">

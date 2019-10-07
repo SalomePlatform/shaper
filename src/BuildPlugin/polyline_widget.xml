@@ -6,6 +6,6 @@
                   concealment="true">
     <validator id="GeomValidators_DifferentShapes"/>
   </multi_selector>
-  <boolvalue id="closed" label="Closed" tooltip="Makes the polyline closed." default="false"/>
+  <boolvalue id="closed" label="Closed" tooltip="Closes the polyline." default="false"/>
   <validator id="GeomValidators_MinObjectsSelected" parameters="base_objects,2"/>
 </source>

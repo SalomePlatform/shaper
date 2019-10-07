@@ -118,7 +118,13 @@ signals:
   /// \param theState a state of the check box
   void showConstraintToggled(int theType, bool theState);
 
+  /// The signal is emitted when user checks "Show free points" button
+  /// \param toShow a state of the check box
   void showFreePoints(bool toShow);
+
+  /// The signal is emitted when user checks "Automatic constraints" button
+  /// \param isOn a state of the check box
+  void autoConstraints(bool isOn);
 
 protected:
   /// Creates a backup of the current values of the attribute
@@ -146,10 +152,7 @@ protected:
     return true;
   }
 
-  virtual bool restoreValueCustom()
-  {
-    return true;
-  }
+  virtual bool restoreValueCustom();
 
   /// The methiod called when widget is activated
   virtual void activateCustom();
@@ -223,12 +226,15 @@ private:
   QCheckBox* myViewInverted;
   QCheckBox* myRemoveExternal;
   QCheckBox* myShowPoints;
+  QCheckBox* myAutoConstraints;
 
   QMap<PartSet_Tools::ConstraintVisibleState, QCheckBox*> myShowConstraints;
 
   QWidget* mySizeOfViewWidget; ///< Size of view widget, visualized if preview planes are shown
   QLineEdit* mySizeOfView; ///< Value of square of size of View
   QStackedWidget* myStackWidget;
+
+  QLabel* myDoFLabel;
 
   bool myOpenTransaction;
   bool myIsSelection;

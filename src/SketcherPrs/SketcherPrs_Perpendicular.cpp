@@ -29,6 +29,7 @@
 #include <GeomAPI_Curve.h>
 #include <GeomAPI_Edge.h>
 #include <GeomAPI_Lin.h>
+#include <GeomAPI_Vertex.h>
 
 
 IMPLEMENT_STANDARD_RTTIEXT(SketcherPrs_Perpendicular, SketcherPrs_SymbolPrs);
@@ -72,22 +73,10 @@ bool SketcherPrs_Perpendicular::updateIfReadyToDisplay(double theStep, bool with
   GeomEdgePtr aEdge1(new GeomAPI_Edge(aShp1));
   GeomEdgePtr aEdge2(new GeomAPI_Edge(aShp2));
 
-  std::shared_ptr<GeomAPI_Lin> aLin1 = aEdge1->line();
-  std::shared_ptr<GeomAPI_Lin> aLin2 = aEdge2->line();
-
-  std::shared_ptr<GeomAPI_Pnt> aPnt = aLin1->intersect(aLin2);
-  double aParam1 = aLin1->projParam(aPnt);
-  double aParam2 = aLin2->projParam(aPnt);
-
-  GeomAPI_Curve aCurve1(aShp1);
-  GeomAPI_Curve aCurve2(aShp2);
-  bool isInside1 = (aParam1 >= (aCurve1.startParam() - Precision::Confusion())) &&
-    (aParam1 <= (aCurve1.endParam() + Precision::Confusion()));
-  bool isInside2 = (aParam2 >= (aCurve2.startParam() - Precision::Confusion())) &&
-    (aParam2 <= (aCurve2.endParam() + Precision::Confusion()));
-
-  if (!(isInside1 && isInside2))
-    aPnt = std::shared_ptr<GeomAPI_Pnt>();
+  GeomShapePtr anInter = aEdge1->intersect(aEdge2);
+  std::shared_ptr<GeomAPI_Pnt> aPnt;
+  if (anInter && anInter->isVertex())
+    aPnt = anInter->vertex()->point();
 
   // Compute position of symbols
   SketcherPrs_PositionMgr* aMgr = SketcherPrs_PositionMgr::get();
@@ -105,14 +94,13 @@ bool SketcherPrs_Perpendicular::updateIfReadyToDisplay(double theStep, bool with
 void SketcherPrs_Perpendicular::drawLines(const Handle(Prs3d_Presentation)& thePrs,
                                           Quantity_Color theColor) const
 {
-  Handle(Graphic3d_Group) aGroup = Prs3d_Root::CurrentGroup(thePrs);
-
-  Handle(Graphic3d_AspectLine3d) aLineAspect =
-    new Graphic3d_AspectLine3d(theColor, Aspect_TOL_SOLID, 2);
-  aGroup->SetPrimitivesAspect(aLineAspect);
-
   // Draw constrained lines
-  addLine(aGroup, SketchPlugin_Constraint::ENTITY_A());
-  addLine(aGroup, SketchPlugin_Constraint::ENTITY_B());
+  for (int i = 0; i < 2; ++i) {
+    ObjectPtr anObj =
+        SketcherPrs_Tools::getResult(myConstraint, SketchPlugin_Constraint::ATTRIBUTE(i));
+    GeomShapePtr aShape = SketcherPrs_Tools::getShape(anObj);
+    if (!aShape)
+      return;
+    drawShape(aShape, thePrs, theColor);
+  }
 }
-

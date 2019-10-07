@@ -281,6 +281,12 @@ std::string ModelHighAPI_FeatureStore::dumpAttr(const AttributePtr& theAttr) {
     std::list<std::string> aResList; // list of resulting strings
     for(std::list<ObjectPtr>::iterator aL = aList.begin(); aL != aList.end(); aL++) {
       if (aL->get()) {
+        if (isSketchFeatures) {
+          // do not control construction features of an ellipse and other
+          FeaturePtr aFeature = ModelAPI_Feature::feature(*aL);
+          if (aFeature->getKind() == "SketchConstraintCoincidenceInternal")
+            continue; // skip internal constraints
+        }
         aResList.push_back((*aL)->data()->name());
       } else if (!isSketchFeatures) {
         aResList.push_back("__empty__");

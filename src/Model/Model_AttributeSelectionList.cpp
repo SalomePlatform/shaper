@@ -293,17 +293,19 @@ bool Model_AttributeSelectionList::isInList(const ObjectPtr& theContext,
                                             const std::shared_ptr<GeomAPI_Shape>& theSubShape,
                                             const bool theTemporarily)
 {
-  ResultPtr aResCont = std::dynamic_pointer_cast<ModelAPI_Result>(theContext);
   if (myIsCashed) { // the cashing is active
-    if (aResCont.get()) {
-      std::map<ResultPtr, std::list<std::shared_ptr<GeomAPI_Shape> > >::iterator aContext =
-        myCash.find(aResCont);
+    if (theContext.get()) {
+      std::map<ObjectPtr, std::list<std::shared_ptr<GeomAPI_Shape> > >::iterator aContext =
+        myCash.find(theContext);
       if (aContext != myCash.end()) {
         // iterate shapes because "isSame" method must be called for each shape
         std::list<std::shared_ptr<GeomAPI_Shape> >::iterator aShapes = aContext->second.begin();
         for(; aShapes != aContext->second.end(); aShapes++) {
           if (!theSubShape.get()) {
-            if (!aShapes->get() || (*aShapes)->isSame(aContext->first->shape()))
+            if (!aShapes->get())
+              return true;
+            ResultPtr aRes = std::dynamic_pointer_cast<ModelAPI_Result>(aContext->first);
+            if (aRes.get() && (*aShapes)->isSame(aRes->shape()))
               return true;
           } else {
             // we need to call here isSame instead of isEqual to do not check shapes orientation
@@ -316,15 +318,21 @@ bool Model_AttributeSelectionList::isInList(const ObjectPtr& theContext,
     }
   }
   // no-cash method
+  bool isFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(theContext).get() != NULL;
+  ResultPtr aRes;
+  if (!isFeature)
+    aRes = std::dynamic_pointer_cast<ModelAPI_Result>(theContext);
   for(int anIndex = size() - 1; anIndex >= 0; anIndex--) {
     AttributeSelectionPtr anAttr = value(anIndex);
     if (anAttr.get()) {
-      if (anAttr->context() == theContext) { // contexts are equal, so, check that values are also
+      if (isFeature && anAttr->contextFeature() == theContext)
+        return true; // for the feature value should not be compared
+      if (!isFeature && anAttr->context() == theContext) {
+        // contexts are equal, so, check that values are also
         std::shared_ptr<GeomAPI_Shape> aValue = anAttr->value();
         if (!theSubShape.get()) {
-          if (!aValue.get() || (aResCont.get() && aValue->isSame(aResCont->shape()))) {// both null
+          if (!aValue.get() || (aRes.get() && aValue->isSame(aRes->shape())))
             return true;
-          }
         } else {
           // we need to call here isSame instead of isEqual to do not check shapes orientation
           if (isIn(aValue, theSubShape)) // shapes are equal
@@ -398,7 +406,7 @@ bool Model_AttributeSelectionList::isInitialized()
 }
 
 Model_AttributeSelectionList::Model_AttributeSelectionList(TDF_Label& theLabel)
-: myLab(theLabel)
+: ModelAPI_AttributeSelectionList(), myLab(theLabel)
 {
   reinit();
 }

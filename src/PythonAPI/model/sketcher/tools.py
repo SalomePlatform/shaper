@@ -18,6 +18,7 @@
 #
 
 import ModelHighAPI
+from GeomAPI import *
 from GeomDataAPI import *
 from ModelAPI import *
 import math
@@ -110,6 +111,8 @@ def toList(thePoint):
     if issubclass(type(thePoint), list):
         return thePoint
     elif issubclass(type(thePoint), GeomDataAPI_Point2D):
+        return [thePoint.x(), thePoint.y()]
+    elif issubclass(type(thePoint), GeomAPI_Pnt2d):
         return [thePoint.x(), thePoint.y()]
     else:
         aFeature = toSketchFeature(thePoint)

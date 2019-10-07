@@ -32,8 +32,9 @@ CollectionPlugin_Group::CollectionPlugin_Group()
 
 void CollectionPlugin_Group::initAttributes()
 {
-  data()->addAttribute(CollectionPlugin_Group::LIST_ID(),
-                       ModelAPI_AttributeSelectionList::typeId());
+  AttributeSelectionListPtr aList = std::dynamic_pointer_cast<ModelAPI_AttributeSelectionList>(
+    data()->addAttribute(LIST_ID(), ModelAPI_AttributeSelectionList::typeId()));
+  aList->setWholeResultAllowed(true); // allow to select the whole result
 }
 
 void CollectionPlugin_Group::execute()

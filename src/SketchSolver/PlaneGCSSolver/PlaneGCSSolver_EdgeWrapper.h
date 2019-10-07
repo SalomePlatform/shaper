@@ -21,6 +21,7 @@
 #define PlaneGCSSolver_EdgeWrapper_H_
 
 #include <PlaneGCSSolver_Defs.h>
+#include <PlaneGCSSolver_BooleanWrapper.h>
 #include <PlaneGCSSolver_EntityWrapper.h>
 
 /**
@@ -44,9 +45,16 @@ public:
 
   bool isDegenerated() const;
 
+  void setReversed(BooleanWrapperPtr theReversed)
+  { myReversed = theReversed; }
+
+  bool isReversed() const
+  { return myReversed ? myReversed->value() : false; }
+
 private:
   SketchSolver_EntityType myType;
   GCSCurvePtr myEntity;
+  BooleanWrapperPtr myReversed; // preferably used to control arc orientation
 };
 
 typedef std::shared_ptr<PlaneGCSSolver_EdgeWrapper> EdgeWrapperPtr;

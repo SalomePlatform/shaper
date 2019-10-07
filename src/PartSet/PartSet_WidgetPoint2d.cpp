@@ -102,7 +102,7 @@ PartSet_WidgetPoint2D::PartSet_WidgetPoint2D(QWidget* theParent,
 
   // the control should accept the focus, so the boolean flag is corrected to be true
   myIsObligatory = true;
-  QString aPageName = QString::fromStdString(theData->getProperty(CONTAINER_PAGE_NAME));
+  QString aPageName = translate(theData->getProperty(CONTAINER_PAGE_NAME));
   myGroupBox = new QGroupBox(aPageName, theParent);
   myGroupBox->setFlat(false);
 
@@ -520,7 +520,7 @@ bool PartSet_WidgetPoint2D::setConstraintToPoint(double theClickedX, double theC
     AttributePoint2DPtr aFeaturePoint;
     if (aFeature->isMacro()) {
       // the macro feature will be removed after the operation is stopped, so we need to build
-      // coicidence to possible sub-features
+      // coincidence to possible sub-features
       aFeaturePoint = findFirstEqualPointInArgumentFeatures(aFeature, aClickedPoint);
     }
     else {
@@ -549,7 +549,7 @@ bool PartSet_WidgetPoint2D::setConstraintToObject(const ObjectPtr& theObject)
       AttributePoint2DPtr anAttrPoint = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(aThisAttr);
       if (anAttrPoint.get()) {
         // the macro feature will be removed after the operation is stopped, so we need to build
-        // coicidence to possible sub-features
+        // coincidence to possible sub-features
         aFeaturePoint = findFirstEqualPointInArgumentFeatures(feature(),
                                                                    anAttrPoint->pnt());
       }

@@ -678,7 +678,7 @@ bool XGUI_OperationMgr::onKeyReleased(QObject *theObject, QKeyEvent* theEvent)
             aContext->HilightNextDetected(aView);
           else if ((theEvent->key() == Qt::Key_P))
             aContext->HilightPreviousDetected(aView);
-          //aViewer->updateHighlight();
+          aViewer->updateHighlight();
           isAccepted = true;
         }
       }

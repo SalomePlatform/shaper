@@ -39,8 +39,8 @@
   <context>
     <name>Edge:base_objects:BuildPlugin_ValidatorBaseForBuild</name>
     <message>
-      <source>Inifinte objects not acceptable.</source>
-      <translation>Inifinte objects not acceptable.</translation>
+      <source>Infinite objects not acceptable.</source>
+      <translation>Infinite objects not acceptable.</translation>
     </message>
   </context>
   <context>
@@ -130,8 +130,8 @@
   <context>
     <name>Face:base_objects:BuildPlugin_ValidatorBaseForBuild</name>
     <message>
-      <source>Inifinte objects not acceptable.</source>
-      <translation>Inifinte objects not acceptable.</translation>
+      <source>Infinite objects not acceptable.</source>
+      <translation>Infinite objects not acceptable.</translation>
     </message>
   </context>
   <context>
@@ -343,8 +343,8 @@
   <context>
     <name>Vertex:base_objects:BuildPlugin_ValidatorBaseForBuild</name>
     <message>
-      <source>Inifinte objects not acceptable.</source>
-      <translation>Inifinte objects not acceptable.</translation>
+      <source>Infinite objects not acceptable.</source>
+      <translation>Infinite objects not acceptable.</translation>
     </message>
   </context>
   <context>
@@ -428,8 +428,8 @@
   <context>
     <name>Wire:base_objects:BuildPlugin_ValidatorBaseForBuild</name>
     <message>
-      <source>Inifinte objects not acceptable.</source>
-      <translation>Inifinte objects not acceptable.</translation>
+      <source>Infinite objects not acceptable.</source>
+      <translation>Infinite objects not acceptable.</translation>
     </message>
   </context>
   <context>

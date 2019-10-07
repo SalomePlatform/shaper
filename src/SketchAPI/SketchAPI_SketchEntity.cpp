@@ -20,6 +20,8 @@
 #include "SketchAPI_SketchEntity.h"
 #include <SketchAPI_Arc.h>
 #include <SketchAPI_Circle.h>
+#include <SketchAPI_Ellipse.h>
+#include <SketchAPI_EllipticArc.h>
 #include <SketchAPI_IntersectionPoint.h>
 #include <SketchAPI_Line.h>
 #include <SketchAPI_Point.h>
@@ -29,6 +31,7 @@
 
 #include <SketchPlugin_Arc.h>
 #include <SketchPlugin_Circle.h>
+#include <SketchPlugin_Ellipse.h>
 #include <SketchPlugin_IntersectionPoint.h>
 #include <SketchPlugin_Line.h>
 #include <SketchPlugin_Point.h>
@@ -96,6 +99,10 @@ SketchAPI_SketchEntity::wrap(const std::list<std::shared_ptr<ModelAPI_Feature> >
       aResult.push_back(std::shared_ptr<SketchAPI_SketchEntity>(new SketchAPI_Arc(*anIt)));
     else if ((*anIt)->getKind() == SketchPlugin_Circle::ID())
       aResult.push_back(std::shared_ptr<SketchAPI_SketchEntity>(new SketchAPI_Circle(*anIt)));
+    else if ((*anIt)->getKind() == SketchPlugin_Ellipse::ID())
+      aResult.push_back(std::shared_ptr<SketchAPI_SketchEntity>(new SketchAPI_Ellipse(*anIt)));
+    else if ((*anIt)->getKind() == SketchPlugin_EllipticArc::ID())
+      aResult.push_back(std::shared_ptr<SketchAPI_SketchEntity>(new SketchAPI_EllipticArc(*anIt)));
     else if ((*anIt)->getKind() == SketchPlugin_Point::ID())
       aResult.push_back(std::shared_ptr<SketchAPI_SketchEntity>(new SketchAPI_Point(*anIt)));
     else if ((*anIt)->getKind() == SketchPlugin_IntersectionPoint::ID())

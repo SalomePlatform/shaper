@@ -293,7 +293,6 @@ void XGUI_ContextMenuMgr::updateObjectBrowserMenu()
     bool hasCompositeOwner = false;
     bool hasResultInHistory = false;
     bool hasFolder = false;
-    bool canBeDeleted = true;
     ModuleBase_Tools::checkObjects(aObjects, hasResult, hasFeature, hasParameter,
                                    hasCompositeOwner, hasResultInHistory, hasFolder);
     //Process Feature
@@ -333,13 +332,7 @@ void XGUI_ContextMenuMgr::updateObjectBrowserMenu()
         if( aMgr->activeDocument() == aObject->document() )
         {
           action("RENAME_CMD")->setEnabled(true);
-          if (aObject->groupName() == ModelAPI_ResultConstruction::group()) {
-            FeaturePtr aFeature = ModelAPI_Feature::feature(aObject);
-            canBeDeleted = aFeature->isInHistory();
-            action("DELETE_CMD")->setEnabled(canBeDeleted);
-          }
-          else
-            action("DELETE_CMD")->setEnabled(!hasCompositeOwner);
+          action("DELETE_CMD")->setEnabled(!hasCompositeOwner);
           action("CLEAN_HISTORY_CMD")->setEnabled(!hasCompositeOwner &&
                                                   (hasFeature || hasParameter));
         }
@@ -353,16 +346,9 @@ void XGUI_ContextMenuMgr::updateObjectBrowserMenu()
         action("SHOW_ONLY_CMD")->setEnabled(true);
         action("SHADING_CMD")->setEnabled(true);
         action("WIREFRAME_CMD")->setEnabled(true);
-
-        foreach(ObjectPtr aObj, aObjects) {
-          FeaturePtr aFeature = ModelAPI_Feature::feature(aObj);
-          if (!aFeature->isInHistory()) {
-            canBeDeleted = false;
-            break;
-          }
-        }
-        action("DELETE_CMD")->setEnabled(canBeDeleted);
       }
+      if (hasFeature && myWorkshop->canMoveFeature())
+        action("MOVE_CMD")->setEnabled(true);
     } // end multi-selection
 
     // Check folder management commands state if only features are selected
@@ -462,8 +448,8 @@ void XGUI_ContextMenuMgr::updateObjectBrowserMenu()
         break;
       }
     if (!hasCompositeOwner && allActive ) {
-      if (hasResult || hasFeature || hasParameter)  // #2924 results can be erased
-        action("DELETE_CMD")->setEnabled(canBeDeleted);
+      if (hasResult || hasFeature || hasParameter) // #2924 results can be erased
+        action("DELETE_CMD")->setEnabled(true);
     }
     if (!hasCompositeOwner && allActive && (hasFeature|| hasParameter))
       action("CLEAN_HISTORY_CMD")->setEnabled(true);
@@ -609,8 +595,7 @@ void XGUI_ContextMenuMgr::updateViewerMenu()
   if (myWorkshop->canChangeProperty("TRANSPARENCY_CMD"))
     action("TRANSPARENCY_CMD")->setEnabled(true);
 
-  // Delete command is not used in viewer pop-up menu
-  action("DELETE_CMD")->setEnabled(false);
+  action("DELETE_CMD")->setEnabled(true);
 }
 
 void XGUI_ContextMenuMgr::connectObjectBrowser()
@@ -784,7 +769,7 @@ void XGUI_ContextMenuMgr::addObjBrowserMenu(QMenu* theMenu) const
       aActions.append(action("ADD_OUT_FOLDER_BEFORE_CMD"));
       aActions.append(action("ADD_OUT_FOLDER_AFTER_CMD"));
       aActions.append(mySeparator3);
-      //aActions.append(action("MOVE_CMD"));
+      aActions.append(action("MOVE_CMD"));
       aActions.append(action("COLOR_CMD"));
       aActions.append(action("DEFLECTION_CMD"));
       aActions.append(action("TRANSPARENCY_CMD"));

@@ -23,8 +23,10 @@
 #include <TopoDS_Shape.hxx>
 #include <Geom_Circle.hxx>
 #include <Geom_Curve.hxx>
+#include <Geom_Ellipse.hxx>
 #include <Geom_Line.hxx>
 #include <Geom_TrimmedCurve.hxx>
+#include <GeomAPI_ProjectPointOnCurve.hxx>
 #include <BRep_Tool.hxx>
 #include <TopoDS_Edge.hxx>
 #include <TopoDS.hxx>
@@ -33,7 +35,9 @@
 #define MY_CURVE (*(implPtr<Handle_Geom_Curve>()))
 
 GeomAPI_Curve::GeomAPI_Curve()
-    : GeomAPI_Interface(new Handle_Geom_Curve()), myStart(0), myEnd(1)
+    : GeomAPI_Interface(new Handle_Geom_Curve()),
+      myStart(-Precision::Infinite()),
+      myEnd(Precision::Infinite())
 {
 }
 
@@ -55,14 +59,53 @@ bool GeomAPI_Curve::isNull() const
   return MY_CURVE.IsNull() == Standard_True;
 }
 
+static bool isCurveType(const Handle(Geom_Curve)& theCurve, const Handle(Standard_Type)& theType)
+{
+  if (theCurve.IsNull())
+    return false;
+  Handle(Geom_Curve) aCurve = theCurve;
+  if (aCurve->DynamicType() == STANDARD_TYPE(Geom_TrimmedCurve))
+    aCurve = Handle(Geom_TrimmedCurve)::DownCast(aCurve)->BasisCurve();
+  return aCurve->DynamicType() == theType;
+}
+
 bool GeomAPI_Curve::isLine() const
 {
-  return !isNull() && MY_CURVE->DynamicType() == STANDARD_TYPE(Geom_Line);
+  return isCurveType(MY_CURVE, STANDARD_TYPE(Geom_Line));
 }
 
 bool GeomAPI_Curve::isCircle() const
 {
-  return !isNull() && MY_CURVE->DynamicType() == STANDARD_TYPE(Geom_Circle);
+  return isCurveType(MY_CURVE, STANDARD_TYPE(Geom_Circle));
+}
+
+bool GeomAPI_Curve::isEllipse() const
+{
+  return isCurveType(MY_CURVE, STANDARD_TYPE(Geom_Ellipse));
+}
+
+double GeomAPI_Curve::startParam()
+{
+  if (Precision::IsInfinite(myStart)) {
+    if (isTrimmed()) {
+      myStart = Handle(Geom_TrimmedCurve)::DownCast(MY_CURVE)->FirstParameter();
+    }
+    else if (MY_CURVE->IsClosed() && MY_CURVE->IsPeriodic())
+      myStart = 0.0;
+  }
+  return myStart;
+}
+
+double GeomAPI_Curve::endParam()
+{
+  if (Precision::IsInfinite(myEnd)) {
+    if (isTrimmed()) {
+      myEnd = Handle(Geom_TrimmedCurve)::DownCast(MY_CURVE)->LastParameter();
+    }
+    else if (MY_CURVE->IsClosed() && MY_CURVE->IsPeriodic())
+      myEnd = MY_CURVE->Period();
+  }
+  return myEnd;
 }
 
 std::shared_ptr<GeomAPI_Pnt> GeomAPI_Curve::getPoint(double theParam)
@@ -82,8 +125,6 @@ bool GeomAPI_Curve::isTrimmed() const
   return !isNull() && MY_CURVE->DynamicType() == STANDARD_TYPE(Geom_TrimmedCurve);
 }
 
-// unused in the unit tests for now
-// LCOV_EXCL_START
 GeomCurvePtr GeomAPI_Curve::basisCurve() const
 {
   Handle(Geom_Curve) aCurve = MY_CURVE;
@@ -94,7 +135,25 @@ GeomCurvePtr GeomAPI_Curve::basisCurve() const
   aNewCurve->setImpl(new Handle(Geom_Curve)(aCurve));
   return aNewCurve;
 }
-// LCOV_EXCL_STOP
+
+
+const std::shared_ptr<GeomAPI_Pnt> GeomAPI_Curve::project(
+    const std::shared_ptr<GeomAPI_Pnt>& thePoint) const
+{
+  std::shared_ptr<GeomAPI_Pnt> aResult;
+  if (MY_CURVE.IsNull())
+    return aResult;
+
+  const gp_Pnt& aPoint = thePoint->impl<gp_Pnt>();
+
+  GeomAPI_ProjectPointOnCurve aProj(aPoint, MY_CURVE);
+  Standard_Integer aNbPoint = aProj.NbPoints();
+  if (aNbPoint > 0) {
+    gp_Pnt aNearest = aProj.NearestPoint();
+    aResult = GeomPointPtr(new GeomAPI_Pnt(aNearest.X(), aNearest.Y(), aNearest.Z()));
+  }
+  return aResult;
+}
 
 // ================================================================================================
 

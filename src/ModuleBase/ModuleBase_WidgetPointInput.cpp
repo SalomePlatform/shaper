@@ -60,7 +60,7 @@ ModuleBase_WidgetPointInput::ModuleBase_WidgetPointInput(QWidget* theParent,
 
   myXSpin = new ModuleBase_ParamSpinBox(this);
   myXSpin->setAcceptVariables(aAcceptVariables);
-  myXSpin->setToolTip("X coordinate");
+  myXSpin->setToolTip(tr("X coordinate"));
   myXSpin->setValue(myDefaultValue[0]);
   QLabel* aXLbl = new QLabel(this);
   aXLbl->setPixmap(QPixmap(":pictures/x_size.png"));
@@ -68,7 +68,7 @@ ModuleBase_WidgetPointInput::ModuleBase_WidgetPointInput(QWidget* theParent,
 
   myYSpin = new ModuleBase_ParamSpinBox(this);
   myYSpin->setAcceptVariables(aAcceptVariables);
-  myYSpin->setToolTip("Y coordinate");
+  myYSpin->setToolTip(tr("Y coordinate"));
   myYSpin->setValue(myDefaultValue[1]);
   QLabel* aYLbl = new QLabel(this);
   aYLbl->setPixmap(QPixmap(":pictures/y_size.png"));
@@ -76,7 +76,7 @@ ModuleBase_WidgetPointInput::ModuleBase_WidgetPointInput(QWidget* theParent,
 
   myZSpin = new ModuleBase_ParamSpinBox(this);
   myZSpin->setAcceptVariables(aAcceptVariables);
-  myZSpin->setToolTip("Z coordinate");
+  myZSpin->setToolTip(tr("Z coordinate"));
   myZSpin->setValue(myDefaultValue[2]);
   QLabel* aZLbl = new QLabel(this);
   aZLbl->setPixmap(QPixmap(":pictures/z_size.png"));

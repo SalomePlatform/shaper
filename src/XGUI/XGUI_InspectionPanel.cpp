@@ -138,8 +138,8 @@ XGUI_InspectionPanel::XGUI_InspectionPanel(QWidget* theParent, XGUI_SelectionMgr
   mySubShapesTab->setHorizontalHeaderLabels(aTitles);
 
   QStringList aSubShapes;
-  aSubShapes << "SHAPE" << "COMPOUND" << "COMPSOLID" <<
-    "SOLID" << "SHELL" << "FACE" << "WIRE" << "EDGE" << "VERTEX";
+  aSubShapes << tr("SHAPE") << tr("COMPOUND") << tr("COMPSOLID") <<
+    tr("SOLID") << tr("SHELL") << tr("FACE") << tr("WIRE") << tr("EDGE") << tr("VERTEX");
   int i = 0;
   foreach(QString aType, aSubShapes) {
     QTableWidgetItem* aItem = new QTableWidgetItem(aType);

@@ -36,6 +36,13 @@
 
 #include <GeomAPI_Pln.h>
 
+#ifdef HAVE_SALOME
+  #include <OCCViewer_ViewModel.h>
+#else
+  #include <AppElements_Viewer.h>
+#endif
+
+
 #include <SelectMgr_IndexedMapOfOwner.hxx>
 #include <SelectMgr_ListOfFilter.hxx>
 
@@ -55,11 +62,33 @@ class ModuleBase_ModelWidget;
 class ModuleBase_Operation;
 class XGUI_OperationMgr;
 class XGUI_Workshop;
+class XGUI_Displayer;
 class PartSet_ExternalPointsMgr;
 
 class AIS_InteractiveObject;
 
 class QMouseEvent;
+class PartSet_SketcherMgr;
+
+#ifdef HAVE_SALOME
+class PartSet_Fitter : public OCCViewer_Fitter
+#else
+class PartSet_Fitter : public AppElements_Fitter
+#endif
+{
+public:
+  PartSet_Fitter(PartSet_SketcherMgr* theSketchMgr):
+    mySketchMgr(theSketchMgr) {}
+
+  /// A method which has top be reimplemented to provide alterantive implementation FitAll command
+  /// \param theView - a view which has to be fit
+  virtual void fitAll(Handle(V3d_View) theView);
+
+private:
+  PartSet_SketcherMgr* mySketchMgr;
+};
+
+
 
 /**
 * \ingroup Modules
@@ -340,10 +369,14 @@ public:
     return myPointsHighlight.size() > 0;
   }
 
+  PartSet_Module* module() const { return myModule; }
+
 public slots:
   /// Process sketch plane selected event
   void onPlaneSelected(const std::shared_ptr<GeomAPI_Pln>& thePln);
 
+  /// The slot is called when user checks "Show free points" button
+  /// \param toShow a state of the check box
   void onShowPoints(bool toShow);
 
 private slots:
@@ -461,6 +494,8 @@ private:
   PartSet_ExternalPointsMgr* myExternalPointsMgr;
 
   QMap<ResultPtr, Handle(AIS_Shape)> myPointsHighlight;
+
+  bool myNoDragMoving;
 };
 
 

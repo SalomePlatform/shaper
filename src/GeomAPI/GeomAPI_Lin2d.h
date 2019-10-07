@@ -76,5 +76,9 @@ class GeomAPI_Lin2d : public GeomAPI_Interface
   std::shared_ptr<GeomAPI_Pnt2d> shiftedLocation(double theShift) const;
 };
 
+
+//! Pointer on the object
+typedef std::shared_ptr<GeomAPI_Lin2d> GeomLine2dPtr;
+
 #endif
 

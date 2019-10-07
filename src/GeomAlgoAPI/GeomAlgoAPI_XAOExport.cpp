@@ -67,7 +67,14 @@ bool XAOExport(const std::string& theFileName,
   }
 
   try {
+    XAO::BrepGeometry* aGeometry = dynamic_cast<XAO::BrepGeometry*>(theXao->getGeometry());
+    TopoDS_Shape aShape = aGeometry->getTopoDS_Shape();
+    bool aWasFree = aShape.Free(); // make top level topology free, same as imported
+    if (!aWasFree)
+      aShape.Free(Standard_True);
     XAO::XaoExporter::saveToFile(theXao, theFileName, "");
+    if (!aWasFree)
+      aShape.Free(Standard_False);
   } catch (XAO::XAO_Exception& e) {
     theError = e.what();
     return false;

@@ -274,7 +274,8 @@ ModuleBase_PageBase* ModuleBase_WidgetFactory::createPageByType(const std::strin
   if (theType == WDG_GROUP) {
     QString aGroupName = qs(myWidgetApi->getProperty(CONTAINER_PAGE_NAME));
     ModuleBase_PageGroupBox* aPage = new ModuleBase_PageGroupBox(theParent);
-    aPage->setTitle(aGroupName);
+    aPage->setTitle(ModuleBase_Tools::translate(
+      myWidgetApi->myFeatureId, aGroupName.toStdString()));
     aResult = aPage;
   }
   else if (theType == WDG_OPTIONALBOX) {

@@ -21,8 +21,9 @@
 #define SketchPlugin_Split_H_
 
 #include "SketchPlugin.h"
+#include "SketchPlugin_Tools.h"
 
-#include "GeomAPI_IPresentable.h"
+#include <GeomAPI_IPresentable.h>
 #include <ModelAPI_IReentrant.h>
 
 #include <SketchPlugin_Sketch.h>
@@ -37,13 +38,14 @@ typedef std::pair<std::string, std::shared_ptr<GeomDataAPI_Point2D> > IdToPointP
  *  \ingroup Plugins
  *  \brief Feature for creation of a new constraint splitting object. Entities for split:
  * - Linear segment by point(s) on this line
- * - Arc by point(s) on this arc
- * - Circle by at least 2 split-points on this circle
+ * - Circular/elliptic arc by point(s) on this arc
+ * - Circle/ellipse by at least 2 split-points on it
  *
  * The following constraints will be applied after split to keep the divided segments geometry:
  * - Coincident constraints for both parts of created segments in the point of splitting
- * - For linear segments parallel, for circles - tangent constraint, for arc - tangent and equal
- *   constraints. In case of three segments in result two couple of constraints are created
+ * - For linear segments parallel, for circles/ellipses - tangent constraint,
+ *   for arc - tangent and equal constraints. In case of three segments in result
+ *   two couple of constraints are created
  *    - parallel and equal constraints: the first is between 1st and middle entity, the second is
  *      between 1st and 3rd.
  *    - tangency constraints: the first between 1st and 2nd, the second between 2nd and 3rd.
@@ -57,11 +59,6 @@ typedef std::pair<std::string, std::shared_ptr<GeomDataAPI_Point2D> > IdToPointP
  *      start point of arc/line.
  *    - Replication constraint used split feature will be deleted in the same way as it is deleted
  *      by any of entity delete in sketch which is used in this constraint.
- *
- *  This constraint has three attributes:
- *  SketchPlugin_Constraint::VALUE() contains reference object to be splitted
- *  SketchPlugin_Constraint::ENTITY_A() and SketchPlugin_Constraint::ENTITY_B() for the points of split;
- *
  */
 class SketchPlugin_Split : public SketchPlugin_Feature, public GeomAPI_IPresentable,
                            public ModelAPI_IReentrant
@@ -131,23 +128,6 @@ class SketchPlugin_Split : public SketchPlugin_Feature, public GeomAPI_IPresenta
   virtual std::string processEvent(const std::shared_ptr<Events_Message>& theMessage);
 
 private:
-  /// Fulfill an internal container by shapes obtained from the parameter object
-  /// Shapes are result of split operation by points coincident to shape of the object
-  /// \param theObject a source object (will be splitted)
-  /// \param theSketch a sketch object
-  void fillObjectShapes(const ObjectPtr& theObject, const ObjectPtr& theSketch);
-
-  GeomShapePtr getSubShape(const std::string& theObjectAttributeId,
-                           const std::string& thePointAttributeId);
-  /// Returns geom point attribute of the feature bounds. It processes line or arc.
-  /// For circle feature, the result attributes are null
-  /// \param theFeature a source feature
-  /// \param theStartPointAttr an out attribute to start point
-  /// \param theStartPointAttr an out attribute to end point
-  void getFeaturePoints(const FeaturePtr& theFeature,
-                        std::shared_ptr<GeomDataAPI_Point2D>& theStartPointAttr,
-                        std::shared_ptr<GeomDataAPI_Point2D>& theEndPointAttr);
-
   /// Obtains those constraints of the feature that should be modified. output maps contain
   /// point of coincidence and attribute id to be modified after split
   /// \param theFeaturesToDelete [out] constrains that will be deleted after split
@@ -158,17 +138,6 @@ private:
   void getConstraints(std::set<std::shared_ptr<ModelAPI_Feature>>& theFeaturesToDelete,
               std::set<std::shared_ptr<ModelAPI_Feature>>& theFeaturesToUpdate,
               std::map<std::shared_ptr<ModelAPI_Feature>, IdToPointPair>& theCoincidenceToFeature);
-
-  /// Obtains references to feature point attributes and to feature,
-  /// e.g. for feature line: 1st container is
-  ///             <1st line point, list<entity_a in distance, entity_b in parallel> >
-  ///             <2nd line point, list<> >
-  ///      for feature circle 2nd container is <entity_a in Radius, entity_b in equal, ...>
-  /// \param theFeature an investigated feature
-  /// \param theRefs a container of list of referenced attributes
-  void getRefAttributes(const FeaturePtr& theFeature,
-                        std::map<AttributePtr, std::list<AttributePtr> >& theRefs,
-                        std::list<AttributePtr>& theRefsToFeature);
 
   /// Move coincidence constraint from feature to point if it is found
   /// \param theCoincidenceToFeature coincidence to feature to be connected to new feature
@@ -190,14 +159,6 @@ private:
   /// \param theRefsToFeature list of attributes referenced to base feature
   void updateRefFeatureConstraints(const std::shared_ptr<ModelAPI_Result>& theFeatureBaseResult,
                                    const std::list<AttributePtr>& theRefsToFeature);
-
-  /// Move constraints from attribute of base feature to attribute after modification
-  /// \param theBaseRefAttributes container of references to the attributes of base feature
-  /// \param theModifiedAttributes container of attributes placed instead of base attributes
-  /// at the same place
-  void updateRefAttConstraints(
-               const std::map<AttributePtr, std::list<AttributePtr> >& theBaseRefAttributes,
-               const std::set<std::pair<AttributePtr, AttributePtr> >& theModifiedAttributes);
 
   /// Make the base object is splitted by the point attributes
   /// \param theSplitFeature a result split feature
@@ -235,8 +196,22 @@ private:
   /// \param theAfterFeature a feature between last point of split feature and the end point
   /// \param thePoints a list of points where coincidences will be build
   /// \param theCreatedFeatures a container of created features
+  /// \return new elliptic arc if it was created
+  FeaturePtr splitEllipticArc(std::shared_ptr<ModelAPI_Feature>& theSplitFeature,
+                std::shared_ptr<ModelAPI_Feature>& theBeforeFeature,
+                std::shared_ptr<ModelAPI_Feature>& theAfterFeature,
+                std::set<std::shared_ptr<GeomDataAPI_Point2D> >& thePoints,
+                std::set<std::shared_ptr<ModelAPI_Feature>>& theCreatedFeatures,
+                std::set<std::pair<AttributePtr, AttributePtr>>& theModifiedAttributes);
+
+  /// Make the base object is splitted by the point attributes
+  /// \param theSplitFeature a result split feature
+  /// \param theBeforeFeature a feature between start point and the 1st point of split feature
+  /// \param theAfterFeature a feature between last point of split feature and the end point
+  /// \param thePoints a list of points where coincidences will be build
+  /// \param theCreatedFeatures a container of created features
   /// \return new arc if it was created
-  FeaturePtr splitCircle(std::shared_ptr<ModelAPI_Feature>& theSplitFeature,
+  FeaturePtr splitClosed(std::shared_ptr<ModelAPI_Feature>& theSplitFeature,
                    std::shared_ptr<ModelAPI_Feature>& theBeforeFeature,
                    std::shared_ptr<ModelAPI_Feature>& theAfterFeature,
                    std::set<std::shared_ptr<GeomDataAPI_Point2D> >& thePoints,
@@ -275,32 +250,6 @@ private:
   void fillAttribute(const AttributePtr& theModifiedAttribute,
                      const AttributePtr& theSourceAttribute);
 
-  /// Creates a line feature filled by center of base feature and given points
-  /// \param theBaseFeature another arc feature
-  /// \param theFirstAttribute an attribute with coordinates for the start point
-  /// \param theSecondAttribute an attribute with coordinates for the end point
-  FeaturePtr createLineFeature(const FeaturePtr& theBaseFeature,
-                               const AttributePtr& theFirstPointAttr,
-                               const AttributePtr& theSecondPointAttr);
-
-  /// Creates an arc feature filled by center of base feature and given points
-  /// \param theBaseFeature another arc feature
-  /// \param theFirstAttribute an attribute with coordinates for the start point
-  /// \param theSecondAttribute an attribute with coordinates for the end point
-  FeaturePtr createArcFeature(const FeaturePtr& theBaseFeature,
-                              const AttributePtr& theFirstPointAttr,
-                              const AttributePtr& theSecondPointAttr);
-
-  /// Add feature coincidence constraint between given attributes
-  /// \param theFeaturesToUpdate a constraint index
-  void updateFeaturesAfterSplit(const std::set<FeaturePtr>& theFeaturesToUpdate);
-
-  /// Result result of the feature to build constraint with. For arc, circle it is an edge result.
-  /// \param theFeature a feature
-  /// \return result object
-  std::shared_ptr<ModelAPI_Result> getFeatureResult(
-                                    const std::shared_ptr<ModelAPI_Feature>& theFeature);
-
   /// Returns attributes of the feature, used in edge build, for arc it is end and start points
   /// \param theFeature a feature
   /// \return container of attributes
@@ -320,11 +269,10 @@ private:
                              const bool isUseAttributesInfo = true);
 #endif
 private:
-  typedef std::map<std::shared_ptr<GeomDataAPI_Point2D>,
-                   std::shared_ptr<GeomAPI_Pnt> > PntToAttributesMap;
 
   std::map<std::shared_ptr<ModelAPI_Object>, std::set<GeomShapePtr> > myCashedShapes;
-  std::map<std::shared_ptr<ModelAPI_Object>, PntToAttributesMap> myCashedReferences;
+  std::map<std::shared_ptr<ModelAPI_Object>,
+           GeomAlgoAPI_ShapeTools::PointToRefsMap> myCashedReferences;
 };
 
 #endif

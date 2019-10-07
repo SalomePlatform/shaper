@@ -128,7 +128,7 @@ void FeaturesPlugin_Partition::execute()
 
   int aPartitionVersion = version();
   if (aPartitionVersion < THE_PARTITION_VERSION_1) {
-    // default behaviours of Partition
+    // default behaviors of Partition
     if(aResultShape->shapeType() == GeomAPI_Shape::COMPOUND) {
       for(GeomAPI_ShapeIterator anIt(aResultShape); anIt.more(); anIt.next()) {
         storeResult(aBaseObjects, aPlanes, anIt.current(), aMakeShapeList, aResultIndex);
@@ -153,6 +153,12 @@ void FeaturesPlugin_Partition::execute()
       keepUnusedSubsOfCompound(aFirstShape, anObjects, ObjectHierarchy(), aMakeShapeList);
 
     if (anIt.more()) {
+      if (aResultCompound->shapeType() != GeomAPI_Shape::COMPOUND) {
+        // put the shape into compound
+        ListOfShape aShapes;
+        aShapes.push_back(aResultCompound);
+        aResultCompound = GeomAlgoAPI_CompoundBuilder::compound(aShapes);
+      }
       std::shared_ptr<GeomAlgoAPI_ShapeBuilder> aBuilder(new GeomAlgoAPI_ShapeBuilder);
       for (; anIt.more(); anIt.next())
         aBuilder->add(aResultCompound, anIt.current());

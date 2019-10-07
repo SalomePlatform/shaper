@@ -155,6 +155,7 @@ void ModuleBase_ModelWidget::processValueState()
 Events_InfoMessage ModuleBase_ModelWidget::getValueStateError() const
 {
   Events_InfoMessage aMessage;
+  aMessage.setContext(context());
 
   ModuleBase_ModelWidget::ValueState aState = getValueState();
   if (aState != ModuleBase_ModelWidget::Stored) {

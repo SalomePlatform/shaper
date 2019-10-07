@@ -81,6 +81,8 @@ Q_OBJECT
   /// a shape. If the attribute do not uses the shape, it is empty
   virtual QList<std::shared_ptr<ModuleBase_ViewerPrs>> getAttributeSelection() const;
 
+  virtual bool isWholeResultAllowed() const;
+
 protected:
   /// Returns true if envent is processed. The default implementation is empty, returns false.
   virtual bool processSelection();

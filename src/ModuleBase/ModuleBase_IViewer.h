@@ -21,6 +21,7 @@
 #define ModuleBase_IViewer_H
 
 #include "ModuleBase.h"
+
 #include <QObject>
 #include <QMap>
 #include <AIS_InteractiveContext.hxx>
@@ -31,6 +32,11 @@ class QMouseEvent;
 class QKeyEvent;
 class QContextMenuEvent;
 class ModuleBase_IViewWindow;
+#ifdef HAVE_SALOME
+class OCCViewer_Fitter;
+#else
+class AppElements_Fitter;
+#endif
 
 /**
  * \ingroup GUI
@@ -191,7 +197,16 @@ Q_OBJECT
     myShowHighlight = false;
   }
 
+#ifdef HAVE_SALOME
+  virtual void setFitter(OCCViewer_Fitter* theFitter) = 0;
+  virtual OCCViewer_Fitter* fitter() const = 0;
+#else
+  virtual void setFitter(AppElements_Fitter* theFitter) = 0;
+  virtual AppElements_Fitter* fitter() const = 0;
+#endif
+
   static Handle(Prs3d_Drawer) DefaultHighlightDrawer;
+
 
 signals:
   /// Signal emited when last view window is closed

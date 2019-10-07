@@ -69,6 +69,7 @@
 #include <TDF_ChildIDIterator.hxx>
 #include <Geom_Circle.hxx>
 #include <Geom_Ellipse.hxx>
+#include <Geom_TrimmedCurve.hxx>
 #include <BRep_Builder.hxx>
 
 //#define DEB_NAMING 1
@@ -259,7 +260,7 @@ void Model_AttributeSelection::removeTemporaryValues()
   }
 }
 
-// returns the center of the edge: circular or elliptical
+// returns the center of the edge: circular or elliptic
 GeomShapePtr centerByEdge(GeomShapePtr theEdge, ModelAPI_AttributeSelection::CenterType theType)
 {
   if (theType != ModelAPI_AttributeSelection::NOT_CENTER && theEdge.get() != NULL) {
@@ -272,11 +273,15 @@ GeomShapePtr centerByEdge(GeomShapePtr theEdge, ModelAPI_AttributeSelection::Cen
         TopoDS_Vertex aVertex;
         BRep_Builder aBuilder;
         if (theType == ModelAPI_AttributeSelection::CIRCLE_CENTER) {
+          while(!aCurve.IsNull() && aCurve->DynamicType() == STANDARD_TYPE(Geom_TrimmedCurve))
+            aCurve = Handle(Geom_TrimmedCurve)::DownCast(aCurve)->BasisCurve();
           Handle(Geom_Circle) aCirc = Handle(Geom_Circle)::DownCast(aCurve);
           if (!aCirc.IsNull()) {
             aBuilder.MakeVertex(aVertex, aCirc->Location(), Precision::Confusion());
           }
         } else { // ellipse
+          while(!aCurve.IsNull() && aCurve->DynamicType() == STANDARD_TYPE(Geom_TrimmedCurve))
+            aCurve = Handle(Geom_TrimmedCurve)::DownCast(aCurve)->BasisCurve();
           Handle(Geom_Ellipse) anEll = Handle(Geom_Ellipse)::DownCast(aCurve);
           if (!anEll.IsNull()) {
             aBuilder.MakeVertex(aVertex,
@@ -780,13 +785,12 @@ std::string Model_AttributeSelection::namingName(const std::string& theDefaultNa
   if (aCont->groupName() == ModelAPI_ResultPart::group()) {
     ResultPartPtr aPart = std::dynamic_pointer_cast<ModelAPI_ResultPart>(aCont);
     int anIndex;
-    GeomShapePtr aValue = value();
-    if (aValue.get())
-      return aPart->data()->name() + "/" + aPart->nameInPart(aValue, anIndex);
-    else
-      return aPart->data()->name();
+    std::string aResult = aSubSh.get() ?
+      aPart->data()->name() + "/" + aPart->nameInPart(aSubSh, anIndex) : aPart->data()->name();
+    if (aCenterType != NOT_CENTER)
+      aResult += centersMap()[aCenterType];
+    return aResult;
   }
-
 
   // whole infinitive construction
   if (aCont->groupName() == ModelAPI_ResultConstruction::group()) {
@@ -1276,6 +1280,58 @@ void Model_AttributeSelection::computeValues(
   }
 }
 
+
+void Model_AttributeSelection::concealedFeature(
+  const FeaturePtr theFeature, const FeaturePtr theStop, std::list<FeaturePtr>& theConcealers)
+{
+  std::set<FeaturePtr> alreadyProcessed;
+  alreadyProcessed.insert(theFeature);
+  if (theStop.get())
+    alreadyProcessed.insert(theStop);
+  /// iterate all results to find the concealment-attribute
+  const std::list<ResultPtr>& aRootRes = theFeature->results();
+  std::list<ResultPtr>::const_iterator aRootIter = aRootRes.cbegin();
+  for(; aRootIter != aRootRes.cend(); aRootIter++) {
+    std::list<ResultPtr> allRes;
+    allRes.push_back(*aRootIter);
+    ResultBodyPtr aRootBody = ModelAPI_Tools::bodyOwner(*aRootIter, true);
+    if (!aRootBody.get())
+      aRootBody = std::dynamic_pointer_cast<ModelAPI_ResultBody>(*aRootIter);
+    if (aRootBody.get()) {
+      ModelAPI_Tools::allSubs(aRootBody, allRes);
+    }
+    for(std::list<ResultPtr>::iterator aRIter = allRes.begin(); aRIter != allRes.end(); aRIter++) {
+      const std::set<AttributePtr>& aRefs = (*aRIter)->data()->refsToMe();
+      std::set<AttributePtr>::const_iterator aRef = aRefs.cbegin();
+      for (; aRef != aRefs.cend(); aRef++) {
+        if (!aRef->get() || !(*aRef)->owner().get())
+          continue;
+        // concealed attribute only
+        FeaturePtr aRefFeat = std::dynamic_pointer_cast<ModelAPI_Feature>((*aRef)->owner());
+        if (alreadyProcessed.find(aRefFeat) != alreadyProcessed.end()) // optimization
+          continue;
+        alreadyProcessed.insert(aRefFeat);
+        if (ModelAPI_Session::get()->validators()->isConcealed(aRefFeat->getKind(), (*aRef)->id()))
+        {
+          // for extrusion cut in python script the nested sketch reference may be concealed before
+          // it is nested, so, check this composite feature is valid
+          static ModelAPI_ValidatorsFactory* aFactory = ModelAPI_Session::get()->validators();
+          // need to be validated to update the "Apply" state if not previewed
+          if (aFactory->validate(aRefFeat)) {
+            if (theStop.get()) {
+              std::shared_ptr<Model_Document> aDoc =
+                std::dynamic_pointer_cast<Model_Document>(theStop->document());
+              if (!aDoc->isLaterByDep(theStop, aRefFeat)) // skip feature later than stop
+                continue;
+            }
+            theConcealers.push_back(aRefFeat);
+          }
+        }
+      }
+    }
+  }
+}
+
 bool Model_AttributeSelection::searchNewContext(std::shared_ptr<Model_Document> theDoc,
   const TopoDS_Shape theContShape, ResultPtr theContext, TopoDS_Shape theValShape,
   TDF_Label theAccessLabel,
@@ -1339,59 +1395,29 @@ bool Model_AttributeSelection::searchNewContext(std::shared_ptr<Model_Document> 
 
   if (aResults.empty()) {
     // check the context become concealed by operation which is earlier than this selection
-    std::list<ResultPtr> allRes;
-    ResultPtr aRoot = ModelAPI_Tools::bodyOwner(theContext, true);
-    if (!aRoot.get())
-      aRoot = theContext;
-    ResultBodyPtr aRootBody = std::dynamic_pointer_cast<ModelAPI_ResultBody>(aRoot);
-    if (aRootBody.get()) {
-      ModelAPI_Tools::allSubs(aRootBody, allRes);
-      allRes.push_back(aRootBody);
-    } else
-      allRes.push_back(aRoot);
-
     FeaturePtr aThisFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(owner());
-    for (std::list<ResultPtr>::iterator aSub = allRes.begin(); aSub != allRes.end(); aSub++) {
-      ResultPtr aResCont = *aSub;
-      const std::set<AttributePtr>& aRefs = aResCont->data()->refsToMe();
-      std::set<AttributePtr>::const_iterator aRef = aRefs.begin();
-      for (; aRef != aRefs.end(); aRef++) {
-        if (!aRef->get() || !(*aRef)->owner().get())
+    FeaturePtr aContextOwner = theDoc->feature(theContext);
+    std::list<FeaturePtr> aConcealers;
+    concealedFeature(aContextOwner, aThisFeature, aConcealers);
+    std::list<FeaturePtr>::iterator aConcealer = aConcealers.begin();
+    for(; aConcealer != aConcealers.end(); aConcealer++) {
+      std::list<ResultPtr> aRefResults;
+      ModelAPI_Tools::allResults(*aConcealer, aRefResults);
+      std::list<ResultPtr>::iterator aRefIter = aRefResults.begin();
+      for(; aRefIter != aRefResults.end(); aRefIter++) {
+        ResultBodyPtr aRefBody = std::dynamic_pointer_cast<ModelAPI_ResultBody>(*aRefIter);
+        if (!aRefBody.get() || aRefBody->numberOfSubs() != 0) // iterate only leafs
           continue;
-        // concealed attribute only
-        FeaturePtr aRefFeat = std::dynamic_pointer_cast<ModelAPI_Feature>((*aRef)->owner());
-        if (aRefFeat == aThisFeature)
+        GeomShapePtr aRefShape = aRefBody->shape();
+        if (!aRefShape.get() || aRefShape->isNull())
           continue;
-        if (!ModelAPI_Session::get()->validators()->isConcealed(
-          aRefFeat->getKind(), (*aRef)->id()))
-          continue;
-        if (theDoc->isLaterByDep(aThisFeature, aRefFeat)) {
-          // for extrusion cut in python script the nested sketch reference may be concealed before
-          // it is nested, so, check this composite feature is valid
-          static ModelAPI_ValidatorsFactory* aFactory = ModelAPI_Session::get()->validators();
-          // need to be validated to update the "Apply" state if not previewed
-          if (aFactory->validate(aRefFeat)) {
-            // there could be a reference to unmodified object, check result contain same shape
-            std::list<ResultPtr> aRefResults;
-            ModelAPI_Tools::allResults(aRefFeat, aRefResults);
-            std::list<ResultPtr>::iterator aRefIter = aRefResults.begin();
-            for(; aRefIter != aRefResults.end(); aRefIter++) {
-              ResultBodyPtr aRefBody = std::dynamic_pointer_cast<ModelAPI_ResultBody>(*aRefIter);
-              if (!aRefBody.get() || aRefBody->numberOfSubs() != 0) // iterate only leafs
-                continue;
-              GeomShapePtr aRefShape = aRefBody->shape();
-              if (!aRefShape.get() || aRefShape->isNull())
-                continue;
-              if (aRefShape->impl<TopoDS_Shape>().IsSame(theContShape)) {
-                // add the new context result with the same shape
-                aResults.insert(aRefBody);
-              }
-            }
-            if (aResults.empty())
-              return true; // feature conceals result, return true, so the context will be removed
-          }
+        if (aRefShape->impl<TopoDS_Shape>().IsSame(theContShape)) {
+          // add the new context result with the same shape
+          aResults.insert(aRefBody);
         }
       }
+      if (aResults.empty())
+        return true; // feature conceals result, return true, so the context will be removed
     }
     if (aResults.empty())
       return false; // no modifications found, must stay the same
@@ -1434,11 +1460,42 @@ bool Model_AttributeSelection::searchNewContext(std::shared_ptr<Model_Document> 
 
 void Model_AttributeSelection::updateInHistory(bool& theRemove)
 {
+  static std::shared_ptr<GeomAPI_Shape> anEmptyShape;
+
   ResultPtr aContext = std::dynamic_pointer_cast<ModelAPI_Result>(myRef.value());
-  // only bodies and parts may be modified later in the history, don't do anything otherwise
   if (!aContext.get() || (aContext->groupName() != ModelAPI_ResultBody::group() &&
-      aContext->groupName() != ModelAPI_ResultPart::group()))
-    return;
+      aContext->groupName() != ModelAPI_ResultPart::group())) {
+    // but check the case the whole results are allowed: whole features may be selected
+    if (myParent && myParent->isWholeResultAllowed()) {
+      FeaturePtr aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(myRef.value());
+      if (aFeature.get()) {
+        FeaturePtr aThisFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(owner());
+        std::list<FeaturePtr> aConcealers;
+        concealedFeature(aFeature, aThisFeature, aConcealers);
+        if (aConcealers.empty())
+          return;
+        bool aChanged = false;
+        std::list<FeaturePtr>::iterator aConcealer = aConcealers.begin();
+        for(; aConcealer != aConcealers.end(); aConcealer++)
+          if (!myParent->isInList(*aConcealer, anEmptyShape)) {// avoid addition of duplicates
+            setValue(*aConcealer, anEmptyShape);
+            aChanged = true;
+          }
+        if (aConcealer == aConcealers.end()) {
+          if (!aChanged) // remove this
+            theRemove = true;
+        } else { // append new
+          for(aConcealer++; aConcealer != aConcealers.end(); aConcealer++)
+            if (!myParent->isInList(*aConcealer, anEmptyShape)) // avoid addition of duplicates
+              myParent->append(*aConcealer, anEmptyShape);
+        }
+        if (aChanged) // searching for the further modifications
+          updateInHistory(theRemove);
+      }
+    }
+    return;// only bodies and parts may be modified later in the history, skip otherwise
+  }
+
   std::shared_ptr<Model_Document> aDoc =
     std::dynamic_pointer_cast<Model_Document>(aContext->document());
   std::shared_ptr<Model_Data> aContData = std::dynamic_pointer_cast<Model_Data>(aContext->data());
@@ -1541,12 +1598,53 @@ void Model_AttributeSelection::updateInHistory(bool& theRemove)
         aListShapeType = GeomAPI_Shape::FACE;
     }
 
+    // issue #3031: skip topology if there is more convenient shape type presents in the
+    // same context as a result of this
+    bool isWholeResult = myParent && myParent->isWholeResultAllowed() && !aSubShape.get();
+    GeomAPI_Shape::ShapeType allowedType = GeomAPI_Shape::SHAPE;
+    if (isWholeResult) {
+      std::list<ResultPtr>::iterator aNewCont = aNewContexts.begin();
+      TopTools_ListIteratorOfListOfShape aNewValues(aValShapes);
+      for(; aNewCont != aNewContexts.end(); aNewCont++, aNewValues.Next()) {
+        if (aNewValues.Value().IsNull()) { // only for the whole context
+          GeomAPI_Shape::ShapeType aShapeType = (*aNewCont)->shape()->shapeType();
+          if (allowedType == GeomAPI_Shape::SHAPE) { // just set this one
+            allowedType = aShapeType;
+          } else {
+            GeomAPI_Shape::ShapeType anAllowed = allowedType;
+            if (anAllowed != aShapeType) { // select the best, nearest to the origin
+              GeomAPI_Shape::ShapeType anOldShapeType = aContext->shape()->shapeType();
+              GeomAPI_Shape::ShapeType aDeltaAllowed =
+                (GeomAPI_Shape::ShapeType)(anOldShapeType - anAllowed);
+              if (aDeltaAllowed < 0)
+                aDeltaAllowed = (GeomAPI_Shape::ShapeType)(-aDeltaAllowed);
+              GeomAPI_Shape::ShapeType aDeltaThis =
+                (GeomAPI_Shape::ShapeType)(anOldShapeType - aShapeType);
+              if (aDeltaThis < 0)
+                aDeltaThis = (GeomAPI_Shape::ShapeType)(-aDeltaThis);
+              if (aDeltaThis == aDeltaAllowed) { // equal distance to context, select complicated
+                if (anOldShapeType < anAllowed)
+                  allowedType = aShapeType;
+              } else if (aDeltaAllowed > aDeltaThis) { // this wins
+                allowedType = aShapeType;
+              }
+            }
+          }
+        }
+      }
+    }
+
     std::list<ResultPtr>::iterator aNewCont = aNewContexts.begin();
     TopTools_ListIteratorOfListOfShape aNewValues(aValShapes);
     bool aFirst = true; // first is set to this, next are appended to parent
     for(; aNewCont != aNewContexts.end(); aNewCont++, aNewValues.Next()) {
       if (aSkippedContext.count(*aNewCont))
         continue;
+
+      if (isWholeResult && aNewValues.Value().IsNull())
+        if (allowedType != GeomAPI_Shape::SHAPE &&
+            (*aNewCont)->shape()->shapeType() != allowedType)
+          continue; // there is better result exists with the better shape type (issue #3031)
 
       GeomShapePtr aValueShape;
       if (!aNewValues.Value().IsNull()) {
@@ -1561,7 +1659,10 @@ void Model_AttributeSelection::updateInHistory(bool& theRemove)
         aShapeShapeType = (*aNewCont)->shape()->shapeType();
       }
       if (aListShapeType != GeomAPI_Shape::SHAPE && aListShapeType != aShapeShapeType) {
-        continue;
+        // exception is for whole results selected
+        if (!isWholeResult) {
+          continue;
+        }
       }
 
       ResultPtr aNewContext = *aNewCont;
@@ -1596,8 +1697,7 @@ void Model_AttributeSelection::updateInHistory(bool& theRemove)
       if (myParent) {
         theRemove = true;
       } else {
-        ResultPtr anEmptyContext;
-        std::shared_ptr<GeomAPI_Shape> anEmptyShape;
+        static ResultPtr anEmptyContext;
         setValue(anEmptyContext, anEmptyShape); // nullify the selection
         return;
       }
