@@ -38,6 +38,7 @@
 #include <ModelAPI_ResultBody.h>
 #include <ModelAPI_Tools.h>
 #include <ModelAPI_AttributeString.h>
+#include <ModelAPI_Events.h>
 
 #include <ModuleBase_Operation.h>
 #include <ModuleBase_ViewerPrs.h>
@@ -761,7 +762,9 @@ bool PartSet_WidgetSketchLabel::restoreValueCustom()
           myShowDOFBtn->hide();
         } else {
           myDoFLabel->setText(tr("DoF (degrees of freedom) = ") + aVal);
-          myShowDOFBtn->show();
+          CompositeFeaturePtr aCompFeature = std::dynamic_pointer_cast<ModelAPI_CompositeFeature>(myFeature);
+          if (aCompFeature.get() && aCompFeature->numberOfSubs() > 1)
+            myShowDOFBtn->show();
         }
       }
     }
@@ -776,5 +779,10 @@ bool PartSet_WidgetSketchLabel::restoreValueCustom()
 
 void PartSet_WidgetSketchLabel::onShowDOF()
 {
-
+  CompositeFeaturePtr aCompFeature = std::dynamic_pointer_cast<ModelAPI_CompositeFeature>(myFeature);
+  if (aCompFeature.get() && aCompFeature->numberOfSubs() > 1) {
+    static const Events_ID anEvent = Events_Loop::eventByName(EVENT_GET_DOF_OBJECTS);
+    ModelAPI_EventCreator::get()->sendUpdated(aCompFeature->subFeature(0), anEvent);
+    Events_Loop::loop()->flush(anEvent);
+  }
 }

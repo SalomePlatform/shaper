@@ -129,7 +129,7 @@ public:
   std::set<ObjectPtr> getConflictingConstraints(SolverPtr theSolver) const;
 
   /// \brief Return list of features which are not fully constrained
-  virtual void getUnderconstrainedGeometry(std::set<FeaturePtr>& theFeatures) const = 0;
+  virtual void getUnderconstrainedGeometry(std::set<ObjectPtr>& theFeatures) const = 0;
 
   /// \brief Verify, the sketch contains degenerated geometry
   ///        after resolving the set of constraints

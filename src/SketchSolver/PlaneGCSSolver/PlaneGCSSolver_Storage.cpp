@@ -656,7 +656,7 @@ PlaneGCSSolver_Solver::SolveStatus PlaneGCSSolver_Storage::checkDegeneratedGeome
 }
 
 
-void PlaneGCSSolver_Storage::getUnderconstrainedGeometry(std::set<FeaturePtr>& theFeatures) const
+void PlaneGCSSolver_Storage::getUnderconstrainedGeometry(std::set<ObjectPtr>& theFeatures) const
 {
   std::vector<double*> aFreeParams;
   mySketchSolver->getFreeParameters(aFreeParams);

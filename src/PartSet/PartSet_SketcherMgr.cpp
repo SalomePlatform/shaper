@@ -118,6 +118,8 @@
 #include <QMessageBox>
 #include <QMainWindow>
 
+#include <set>
+
 //#define DEBUG_DO_NOT_BY_ENTER
 //#define DEBUG_SKETCHER_ENTITIES
 //#define DEBUG_SKETCH_ENTITIES_ON_MOVE
@@ -201,6 +203,8 @@ PartSet_SketcherMgr::PartSet_SketcherMgr(PartSet_Module* theModule)
 
   registerSelectionFilter(SF_SketchCirclePointFilter, new PartSet_CirclePointFilter(anIWorkshop));
   registerSelectionFilter(SF_SketchPlaneFilter, new ModuleBase_ShapeInPlaneFilter());
+
+  Events_Loop::loop()->registerListener(this, Events_Loop::eventByName(EVENT_DOF_OBJECTS));
 }
 
 PartSet_SketcherMgr::~PartSet_SketcherMgr()
@@ -2113,6 +2117,30 @@ void PartSet_SketcherMgr::onShowPoints(bool toShow)
     aViewer->update();
 }
 
+void PartSet_SketcherMgr::processEvent(const std::shared_ptr<Events_Message>& theMessage)
+{
+  if (theMessage->eventID() == Events_Loop::loop()->eventByName(EVENT_DOF_OBJECTS)) {
+    std::shared_ptr<ModelAPI_ObjectUpdatedMessage> anUpdateMsg =
+      std::dynamic_pointer_cast<ModelAPI_ObjectUpdatedMessage>(theMessage);
+    std::set<ObjectPtr> aObjects = anUpdateMsg->objects();
+    std::set<ObjectPtr>::const_iterator aIt;
+    QList<ModuleBase_ViewerPrsPtr> aPrsList;
+    for (aIt = aObjects.cbegin(); aIt != aObjects.cend(); aIt++) {
+      FeaturePtr aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(*aIt);
+      if (aFeature.get()) {
+        std::list<ResultPtr> aRes = aFeature->results();
+        std::list<ResultPtr>::const_iterator aIt;
+        for (aIt = aRes.cbegin(); aIt != aRes.cend(); ++aIt) {
+          ModuleBase_ViewerPrsPtr aPrsPtr(new ModuleBase_ViewerPrs(*aIt));
+          aPrsList.append(aPrsPtr);
+        }
+      }
+    }
+    if (aPrsList.size() > 0) {
+      myModule->workshop()->setSelected(aPrsList);
+    }
+  }
+}
 
 void PartSet_Fitter::fitAll(Handle(V3d_View) theView)
 {

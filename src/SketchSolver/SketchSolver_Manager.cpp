@@ -114,6 +114,7 @@ SketchSolver_Manager::SketchSolver_Manager()
   ////Events_Loop::loop()->registerListener(this, Events_Loop::eventByName(EVENT_SOLVER_FAILED));
   ////Events_Loop::loop()->registerListener(this, Events_Loop::eventByName(EVENT_SOLVER_REPAIRED));
   Events_Loop::loop()->registerListener(this, Events_Loop::eventByName(EVENT_SKETCH_PREPARED));
+  Events_Loop::loop()->registerListener(this, Events_Loop::eventByName(EVENT_GET_DOF_OBJECTS));
 }
 
 SketchSolver_Manager::~SketchSolver_Manager()
@@ -223,19 +224,35 @@ void SketchSolver_Manager::processEvent(
     }
     myIsComputed = false;
   }
-////  else if (theMessage->eventID() == Events_Loop::loop()->eventByName(EVENT_FEATURES_OF_FREEDOM)) {
-////    FeaturePtr aComposite = theMessage->sketch();
-////    std::shared_ptr<SketchPlugin_Feature> aSketch =
-////        std::dynamic_pointer_cast<SketchPlugin_Feature>(aComposite);
-////    if (aSketch) {
-////      SketchGroupPtr aGroup = findGroup(aSketch);
-////
-////      std::set<FeaturePtr> aFreeFeatures;
-////      aGroup->underconstrainedFeatures(aFreeFeatures);
-////
-////      // TODO: send features to GUI
-////    }
-////  }
+  else if (theMessage->eventID() == Events_Loop::loop()->eventByName(EVENT_GET_DOF_OBJECTS)) {
+    std::shared_ptr<ModelAPI_ObjectUpdatedMessage> anUpdateMsg =
+      std::dynamic_pointer_cast<ModelAPI_ObjectUpdatedMessage>(theMessage);
+    std::set<ObjectPtr> aObjects = anUpdateMsg->objects();
+    if (aObjects.size() == 1) {
+      std::set<ObjectPtr>::const_iterator aIt;
+      for (aIt = aObjects.cbegin(); aIt != aObjects.cend(); aIt++) {
+        std::shared_ptr<SketchPlugin_Feature> aFeature =
+          std::dynamic_pointer_cast<SketchPlugin_Feature>(*aIt);
+        if (aFeature) {
+          SketchGroupPtr aGroup = findGroup(aFeature);
+
+          std::set<ObjectPtr> aFreeFeatures;
+          aGroup->underconstrainedFeatures(aFreeFeatures);
+
+          std::list<ObjectPtr> aFeatures;
+          std::set<ObjectPtr>::const_iterator aIt;
+          for (aIt = aFreeFeatures.cbegin(); aIt != aFreeFeatures.cend(); ++aIt) {
+            aFeatures.push_back(*aIt);
+          }
+
+          // TODO: send features to GUI
+          static const Events_ID anEvent = Events_Loop::eventByName(EVENT_DOF_OBJECTS);
+          ModelAPI_EventCreator::get()->sendUpdated(aFeatures, anEvent);
+          Events_Loop::loop()->flush(anEvent);
+        }
+      }
+    }
+  }
 
   // resolve constraints if needed
   bool needToUpdate = needToResolve && resolveConstraints();

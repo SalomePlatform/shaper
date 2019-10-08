@@ -96,7 +96,7 @@ public:
   virtual void adjustParametrizationOfArcs();
 
   /// \brief Return list of features which are not fully constrained
-  virtual void getUnderconstrainedGeometry(std::set<FeaturePtr>& theFeatures) const;
+  virtual void getUnderconstrainedGeometry(std::set<ObjectPtr>& theFeatures) const;
 
 private:
   /// \brief Convert feature using specified builder.

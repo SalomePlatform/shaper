@@ -29,6 +29,7 @@
 #include <ModelAPI_Attribute.h>
 #include <ModelAPI_CompositeFeature.h>
 #include <ModelAPI_Result.h>
+#include <Events_Listener.h>
 #include <ModuleBase_SelectionFilterType.h>
 
 #include <ModuleBase_Definitions.h>
@@ -97,7 +98,7 @@ private:
   displayed in the viewer. After the sketch create/edit operation is finished, the sub-feature
   are hidden, the sketch feature result is displayed
 */
-class PARTSET_EXPORT PartSet_SketcherMgr : public QObject
+class PARTSET_EXPORT PartSet_SketcherMgr : public QObject, public Events_Listener
 {
   Q_OBJECT
   /// Struct to define gp point, with the state is the point is initialized
@@ -370,6 +371,11 @@ public:
   }
 
   PartSet_Module* module() const { return myModule; }
+
+  /** \brief Implementation of Event Listener method
+  *  \param[in] theMessage the data of the event
+  */
+  virtual void processEvent(const std::shared_ptr<Events_Message>& theMessage);
 
 public slots:
   /// Process sketch plane selected event

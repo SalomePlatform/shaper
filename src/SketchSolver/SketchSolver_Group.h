@@ -116,7 +116,7 @@ class SketchSolver_Group
   bool resolveConstraints();
 
   /// \brief Find the list of features, which are not fully constrained.
-  void underconstrainedFeatures(std::set<FeaturePtr>& theFeatures) const;
+  void underconstrainedFeatures(std::set<ObjectPtr>& theFeatures) const;
 
   /// \brief Block or unblock events sent by features in this group
   void blockEvents(bool isBlocked);
