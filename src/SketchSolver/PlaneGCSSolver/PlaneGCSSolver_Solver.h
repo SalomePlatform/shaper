@@ -79,6 +79,9 @@ public:
   /// \brief Check conflicting/redundant constraints and DoF
   void diagnose(const GCS::Algorithm& theAlgo = GCS::DogLeg);
 
+  /// \brief Return the list of modifiable parameters
+  void getFreeParameters(GCS::VEC_pD& theFreeParams) const;
+
   /// \brief Degrees of freedom
   int dof();
 

@@ -243,6 +243,11 @@ void PlaneGCSSolver_Solver::diagnose(const GCS::Algorithm& theAlgo)
   myDiagnoseBeforeSolve = false;
 }
 
+void PlaneGCSSolver_Solver::getFreeParameters(GCS::VEC_pD& theFreeParams) const
+{
+  myEquationSystem->getDependentParams(theFreeParams);
+}
+
 void PlaneGCSSolver_Solver::addFictiveConstraintIfNecessary()
 {
   bool hasOnlyMovement = true;

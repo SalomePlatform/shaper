@@ -223,6 +223,19 @@ void SketchSolver_Manager::processEvent(
     }
     myIsComputed = false;
   }
+////  else if (theMessage->eventID() == Events_Loop::loop()->eventByName(EVENT_FEATURES_OF_FREEDOM)) {
+////    FeaturePtr aComposite = theMessage->sketch();
+////    std::shared_ptr<SketchPlugin_Feature> aSketch =
+////        std::dynamic_pointer_cast<SketchPlugin_Feature>(aComposite);
+////    if (aSketch) {
+////      SketchGroupPtr aGroup = findGroup(aSketch);
+////
+////      std::set<FeaturePtr> aFreeFeatures;
+////      aGroup->underconstrainedFeatures(aFreeFeatures);
+////
+////      // TODO: send features to GUI
+////    }
+////  }
 
   // resolve constraints if needed
   bool needToUpdate = needToResolve && resolveConstraints();

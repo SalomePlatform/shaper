@@ -95,6 +95,9 @@ public:
   ///        Reversed arcs should have the last parameter lesser than the first parameter.
   virtual void adjustParametrizationOfArcs();
 
+  /// \brief Return list of features which are not fully constrained
+  virtual void getUnderconstrainedGeometry(std::set<FeaturePtr>& theFeatures) const;
+
 private:
   /// \brief Convert feature using specified builder.
   EntityWrapperPtr createFeature(const FeaturePtr&             theFeature,

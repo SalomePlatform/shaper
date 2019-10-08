@@ -654,3 +654,27 @@ PlaneGCSSolver_Solver::SolveStatus PlaneGCSSolver_Storage::checkDegeneratedGeome
   }
   return PlaneGCSSolver_Solver::STATUS_OK;
 }
+
+
+void PlaneGCSSolver_Storage::getUnderconstrainedGeometry(std::set<FeaturePtr>& theFeatures) const
+{
+  std::vector<double*> aFreeParams;
+  mySketchSolver->getFreeParameters(aFreeParams);
+  if (aFreeParams.empty())
+    return;
+
+  std::map<double*, FeaturePtr> aParamOfFeatures;
+  for (std::map<FeaturePtr, EntityWrapperPtr>::const_iterator aFIt = myFeatureMap.begin();
+       aFIt != myFeatureMap.end(); ++aFIt) {
+    GCS::SET_pD aParams = PlaneGCSSolver_Tools::parameters(aFIt->second);
+    for (GCS::SET_pD::iterator aPIt = aParams.begin(); aPIt != aParams.end(); ++aPIt)
+      aParamOfFeatures[*aPIt] = aFIt->first;
+  }
+
+  for (std::vector<double*>::iterator anIt = aFreeParams.begin();
+       anIt != aFreeParams.end(); ++anIt) {
+    std::map<double*, FeaturePtr>::iterator aFound = aParamOfFeatures.find(*anIt);
+    if (aFound != aParamOfFeatures.end())
+      theFeatures.insert(aFound->second);
+  }
+}

@@ -128,6 +128,9 @@ public:
   /// \brief Return list of conflicting constraints
   std::set<ObjectPtr> getConflictingConstraints(SolverPtr theSolver) const;
 
+  /// \brief Return list of features which are not fully constrained
+  virtual void getUnderconstrainedGeometry(std::set<FeaturePtr>& theFeatures) const = 0;
+
   /// \brief Verify, the sketch contains degenerated geometry
   ///        after resolving the set of constraints
   /// \return STATUS_OK if the geometry is valid, STATUS_DEGENERATED otherwise.
