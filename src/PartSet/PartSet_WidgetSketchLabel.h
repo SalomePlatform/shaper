@@ -41,6 +41,7 @@ class XGUI_Workshop;
 class QCheckBox;
 class QStackedWidget;
 class QLineEdit;
+class QPushButton;
 
 /**
 * \ingroup Modules
@@ -203,6 +204,8 @@ private slots:
 
   void onChangePlane();
 
+  void onShowDOF();
+
 private:
   /// Set sketch plane by shape
   /// \param theShape a planar face
@@ -235,6 +238,7 @@ private:
   QStackedWidget* myStackWidget;
 
   QLabel* myDoFLabel;
+  QPushButton* myShowDOFBtn;
 
   bool myOpenTransaction;
   bool myIsSelection;

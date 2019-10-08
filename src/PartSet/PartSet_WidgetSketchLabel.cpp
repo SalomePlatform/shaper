@@ -182,8 +182,15 @@ myIsSelection(false)
   connect(aPlaneBtn, SIGNAL(clicked(bool)), SLOT(onChangePlane()));
   aLayout->addWidget(aPlaneBtn);
 
+  aLayout->addSpacing(15);
+
   myDoFLabel = new QLabel("", aSecondWgt);
   aLayout->addWidget(myDoFLabel);
+
+  myShowDOFBtn = new QPushButton(tr("Show remaining DoFs"), aSecondWgt);
+  aLayout->addWidget(myShowDOFBtn);
+  myShowDOFBtn->hide();
+  connect(myShowDOFBtn, SIGNAL(clicked(bool)), SLOT(onShowDOF()));
 
   myStackWidget->addWidget(aSecondWgt);
   //setLayout(aLayout);
@@ -751,14 +758,23 @@ bool PartSet_WidgetSketchLabel::restoreValueCustom()
         int aDoF = aVal.toInt();
         if (aDoF == 0) {
           myDoFLabel->setText(tr("Sketch is fully fixed (DoF = 0)"));
+          myShowDOFBtn->hide();
         } else {
           myDoFLabel->setText(tr("DoF (degrees of freedom) = ") + aVal);
+          myShowDOFBtn->show();
         }
       }
     }
     else {
       myDoFLabel->setText("");
+      myShowDOFBtn->hide();
     }
   }
   return true;
+}
+
+
+void PartSet_WidgetSketchLabel::onShowDOF()
+{
+
 }
