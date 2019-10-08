@@ -26,6 +26,7 @@
 #include <ModuleBase_IModule.h>
 #include <ModuleBase_ISelection.h>
 #include <ModuleBase_IWorkshop.h>
+#include <ModuleBase_IViewer.h>
 #include <ModuleBase_ListView.h>
 #include <ModuleBase_ResultPrs.h>
 #include <ModuleBase_Tools.h>
@@ -294,10 +295,13 @@ bool XGUI_FacesPanel::processDelete()
     bool isRedisplayed = redisplayObjects(aRestoredObjects);
     isRedisplayed = displayHiddenObjects(aRestoredObjects, myHiddenObjects)
                     || isRedisplayed;
-    if (isRedisplayed)
+    if (isRedisplayed) {
       flushRedisplay();
+      myWorkshop->viewer()->update();
+    }
     // should be after flush of redisplay to have items object to be updated
     updateProcessedObjects(myItems, myItemObjects);
+
   }
 
   myListView->removeSelectedItems();
