@@ -20,6 +20,7 @@
 #include "ModuleBase_ISelection.h"
 
 #include "ModuleBase_ViewerPrs.h"
+#include "ModelAPI_Feature.h"
 
 #include <StdSelect_BRepOwner.hxx>
 #include <TopoDS_Vertex.hxx>
@@ -53,8 +54,16 @@ ResultPtr ModuleBase_ISelection::getResult(const ModuleBase_ViewerPrsPtr& thePrs
 {
   ResultPtr aResult;
 
-  if (thePrs->object().get())
-    aResult = std::dynamic_pointer_cast<ModelAPI_Result>(thePrs->object());
+  if (thePrs->object().get()) {
+    ObjectPtr aObject = thePrs->object();
+    aResult = std::dynamic_pointer_cast<ModelAPI_Result>(aObject);
+    if (!aResult.get()) {
+      FeaturePtr aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(aObject);
+      if (aFeature.get()) {
+        aResult = aFeature->firstResult();
+      }
+    }
+  }
   else if (!thePrs->owner().IsNull()) {
     ObjectPtr anObject = getSelectableObject(thePrs->owner());
     aResult = std::dynamic_pointer_cast<ModelAPI_Result>(anObject);
