@@ -107,7 +107,7 @@ bool ModuleBase_WidgetValidated::isValidInFilters(const ModuleBase_ViewerPrsPtr&
 
   // if an owner is null, the selection happens in the Object browser.
   // creates a selection owner on the base of object shape and the object AIS object
-  if ((aOwnersList.Size() > 0) && thePrs->object().get()) {
+  if ((aOwnersList.Size() == 0) && thePrs->object().get()) {
     ResultPtr aResult = myWorkshop->selection()->getResult(thePrs);
     GeomShapePtr aShape = aResult.get() ? aResult->shape() : GeomShapePtr();
     // some results have no shape, e.g. the parameter one. So, they should not be validated
