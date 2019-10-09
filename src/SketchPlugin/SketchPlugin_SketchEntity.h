@@ -74,7 +74,7 @@ class SketchPlugin_SketchEntity : public SketchPlugin_Feature, public GeomAPI_IC
   /// Width of the line
   inline static const double SKETCH_LINE_WIDTH()
   {
-    return 3;
+    return Config_PropManager::integer("Visualization", "sketch_line_width");
   }
 
   /// Style of the auxiliary line
@@ -109,6 +109,24 @@ class SketchPlugin_SketchEntity : public SketchPlugin_Feature, public GeomAPI_IC
       return anAttr->value();
     }
     return false;
+  }
+
+  virtual bool isIncludeToResult() const
+  {
+    AttributeBooleanPtr anAttr;
+    std::set<AttributePtr> aRefsToMe = data()->refsToMe();
+    std::set<AttributePtr>::const_iterator aIt;
+    for (aIt = aRefsToMe.cbegin(); aIt != aRefsToMe.cend(); ++aIt) {
+      if ((*aIt)->id() == "ProjectedFeature") {
+        FeaturePtr aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>((*aIt)->owner());
+        if (aFeature.get()) {
+          anAttr = aFeature->data()->boolean("IncludeToResult");
+          if (anAttr.get())
+            return anAttr->value();
+        }
+      }
+    }
+    return true;
   }
 
 // LCOV_EXCL_START
@@ -181,7 +199,7 @@ class SketchPlugin_SketchEntity : public SketchPlugin_Feature, public GeomAPI_IC
       thePrs->setWidth(17);
     //  thePrs->setPointMarker(1, 1.); // Set point as a '+' symbol
     }
-    if(isCopy()) {
+    if(isCopy() && !isIncludeToResult()) {
       double aWidth = thePrs->width();
       isCustomized = thePrs->setWidth(aWidth / 2.5) || isCustomized;
     }
