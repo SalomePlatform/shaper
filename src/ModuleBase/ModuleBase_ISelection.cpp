@@ -57,6 +57,12 @@ ResultPtr ModuleBase_ISelection::getResult(const ModuleBase_ViewerPrsPtr& thePrs
   if (thePrs->object().get()) {
     ObjectPtr aObject = thePrs->object();
     aResult = std::dynamic_pointer_cast<ModelAPI_Result>(aObject);
+    if (!aResult.get()) {
+      FeaturePtr aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(aObject);
+      if (aFeature.get()) {
+        aResult = aFeature->firstResult();
+      }
+    }
   }
   else if (!thePrs->owner().IsNull()) {
     ObjectPtr anObject = getSelectableObject(thePrs->owner());
