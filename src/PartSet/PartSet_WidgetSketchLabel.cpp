@@ -190,7 +190,7 @@ myIsSelection(false)
 
   myShowDOFBtn = new QPushButton(tr("Show remaining DoFs"), aSecondWgt);
   aLayout->addWidget(myShowDOFBtn);
-  myShowDOFBtn->hide();
+  myShowDOFBtn->setEnabled(false);
   connect(myShowDOFBtn, SIGNAL(clicked(bool)), SLOT(onShowDOF()));
 
   myStackWidget->addWidget(aSecondWgt);
@@ -759,18 +759,16 @@ bool PartSet_WidgetSketchLabel::restoreValueCustom()
         int aDoF = aVal.toInt();
         if (aDoF == 0) {
           myDoFLabel->setText(tr("Sketch is fully fixed (DoF = 0)"));
-          myShowDOFBtn->hide();
+          myShowDOFBtn->setEnabled(false);
         } else {
           myDoFLabel->setText(tr("DoF (degrees of freedom) = ") + aVal);
-          CompositeFeaturePtr aCompFeature = std::dynamic_pointer_cast<ModelAPI_CompositeFeature>(myFeature);
-          if (aCompFeature.get() && aCompFeature->numberOfSubs() > 1)
-            myShowDOFBtn->show();
+          myShowDOFBtn->setEnabled(true);
         }
       }
     }
     else {
       myDoFLabel->setText("");
-      myShowDOFBtn->hide();
+      myShowDOFBtn->setEnabled(false);
     }
   }
   return true;
