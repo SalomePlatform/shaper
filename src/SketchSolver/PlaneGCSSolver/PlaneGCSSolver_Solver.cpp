@@ -245,7 +245,10 @@ void PlaneGCSSolver_Solver::diagnose(const GCS::Algorithm& theAlgo)
 
 void PlaneGCSSolver_Solver::getFreeParameters(GCS::VEC_pD& theFreeParams) const
 {
-  myEquationSystem->getDependentParams(theFreeParams);
+  if (myConstraints.empty())
+    theFreeParams = myParameters;
+  else
+    myEquationSystem->getDependentParams(theFreeParams);
 }
 
 void PlaneGCSSolver_Solver::addFictiveConstraintIfNecessary()
