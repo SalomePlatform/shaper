@@ -30,6 +30,7 @@ from GeomAPI import *
 from SketchAPI import *
 
 __updated__ = "2019-09-12"
+TOLERANCE = 1.e-7
 
 class TestDistanceEllipse(unittest.TestCase):
   def setUp(self):
@@ -56,7 +57,7 @@ class TestDistanceEllipse(unittest.TestCase):
     self.myMinorStart = macroEllipse.minorAxisStart()
     self.myMinorEnd = macroEllipse.minorAxisEnd()
     self.myExpectFailure = False
-    self.myDistance = 20
+    self.myDistance = 50
 
   def tearDown(self):
     model.end()
@@ -91,7 +92,8 @@ class TestDistanceEllipse(unittest.TestCase):
     self.myDOF -= 1
     model.do()
     if not self.myExpectFailure:
-      self.assertAlmostEqual(model.distancePointPoint(thePoint1, thePoint2), self.myDistance)
+      NB_DIGITS = math.floor(-math.log10(TOLERANCE) - math.log10(self.myDistance))
+      self.assertAlmostEqual(model.distancePointPoint(thePoint1, thePoint2), self.myDistance, NB_DIGITS)
       self.assertGreater(self.myEllipse.majorRadius().value(), 0.0)
       self.assertGreater(self.myEllipse.minorRadius().value(), 0.0)
 
@@ -99,13 +101,15 @@ class TestDistanceEllipse(unittest.TestCase):
     self.mySketch.setDistance(thePoint, theLine.result(), self.myDistance)
     self.myDOF -= 1
     model.do()
-    self.assertAlmostEqual(model.distancePointLine(thePoint, theLine), self.myDistance)
+    NB_DIGITS = math.floor(-math.log10(TOLERANCE) - math.log10(self.myDistance))
+    self.assertAlmostEqual(model.distancePointLine(thePoint, theLine), self.myDistance, NB_DIGITS)
     self.assertGreater(self.myEllipse.majorRadius().value(), 0.0)
     self.assertGreater(self.myEllipse.minorRadius().value(), 0.0)
 
   def assertPoints(self, thePoint1, thePoint2):
-    self.assertAlmostEqual(thePoint1.x(), thePoint2.x())
-    self.assertAlmostEqual(thePoint1.y(), thePoint2.y())
+    NB_DIGITS = math.floor(-math.log10(TOLERANCE) - math.log10(self.myDistance))
+    self.assertAlmostEqual(thePoint1.x(), thePoint2.x(), NB_DIGITS)
+    self.assertAlmostEqual(thePoint1.y(), thePoint2.y(), NB_DIGITS)
 
 
   def test_distance_center(self):
