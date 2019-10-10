@@ -438,7 +438,7 @@ class TestTangentEllipticArc(unittest.TestCase):
     """ Test 16. Set tangency between two elliptic arcs, if their extremities are coincident
     """
     anEllipticArc = self.mySketch.addEllipticArc(35, 20, 60, 30, 40, 40, 20, -0.4890968089561491, True)
-    self.mySketch.setCoincident(anEllipticArc.startPoint(), self.myEllipticArc.endPoint())
+    self.mySketch.setCoincident(anEllipticArc.startPoint(), self.myEllipticArc.startPoint())
     self.myNbEllipticArcs += 1
     self.myNbCoincidence += 1
     self.myDOF += 5
