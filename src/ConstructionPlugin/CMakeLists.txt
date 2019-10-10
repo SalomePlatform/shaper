@@ -46,7 +46,6 @@ SET(XML_RESOURCES
 
 SET(TEXT_RESOURCES
   ConstructionPlugin_msg_en.ts
-  ConstructionPlugin_msg_fr.ts
 )
 
 SET(PROJECT_LIBRARIES

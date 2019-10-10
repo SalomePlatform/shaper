@@ -68,7 +68,6 @@ SET(XML_RESOURCES
 
 SET(TEXT_RESOURCES
     CollectionPlugin_msg_en.ts
-    CollectionPlugin_msg_fr.ts
 )
 
 # sources / moc wrappings
