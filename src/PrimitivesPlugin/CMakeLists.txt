@@ -46,7 +46,7 @@ SET(XML_RESOURCES
 )
 
 SET(TEXT_RESOURCES
-    PrimitivesPlugin_msg_fr.ts
+#    PrimitivesPlugin_msg_fr.ts
 )
 
 SOURCE_GROUP ("Resource Files" FILES ${TEXT_RESOURCES})

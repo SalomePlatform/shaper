@@ -218,16 +218,11 @@ XGUI_Workshop::XGUI_Workshop(XGUI_SalomeConnector* theConnector)
 
   // Load translations
   QStringList aLangs;
-#ifdef MAKE_TRANSLATION
+  aLangs << "*_en.ts"; // load by default eng translations
   QString aCurrLang = aResMgr->stringValue("language", "language", "en");
-  if(aCurrLang == "en") {
-    aLangs << "*_en.ts";
-  } else {
+  if(aCurrLang != "en") {
     aLangs << "*_" + aCurrLang + ".ts"; // then replace with translated files
   }
-#else
-  aLangs << "*_en.ts"; // load by default eng translations
-#endif
 
   foreach(QString aLang, aLangs) {
     QStringList aFilters;

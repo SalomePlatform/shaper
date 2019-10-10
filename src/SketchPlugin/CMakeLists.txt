@@ -136,7 +136,6 @@ SET(XML_RESOURCES
 
 SET(TEXT_RESOURCES
 	SketchPlugin_msg_en.ts
-	SketchPlugin_msg_fr.ts
 )
 
 SOURCE_GROUP ("Resource Files" FILES ${TEXT_RESOURCES})

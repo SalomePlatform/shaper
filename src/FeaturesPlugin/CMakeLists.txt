@@ -139,7 +139,6 @@ SET(XML_RESOURCES
 
 SET(TEXT_RESOURCES
     FeaturesPlugin_msg_en.ts
-    FeaturesPlugin_msg_fr.ts
     FeaturesPlugin_msg_ru.ts
 )
 
