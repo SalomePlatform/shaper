@@ -225,17 +225,20 @@ bool FeaturesPlugin_CompositeBoolean::makeBoolean(const ListOfShape& theTools,
         aMakeShapeList->appendAlgo(aBoolAlgo);
 
         // Add result to not used solids from compsolid.
-        aShapesToAdd.push_back(aBoolAlgo->shape());
-        std::shared_ptr<GeomAlgoAPI_PaveFiller> aFillerAlgo(
-          new GeomAlgoAPI_PaveFiller(aShapesToAdd, true));
-        if(!aFillerAlgo->isDone() || aFillerAlgo->shape()->isNull() || !aFillerAlgo->isValid()) {
-          myFeature->setError("Error: PaveFiller algorithm failed.");
-          return false;
+        GeomShapePtr aBoolRes = aBoolAlgo->shape();
+        if (!aShapesToAdd.empty()) {
+          aShapesToAdd.push_back(aBoolRes);
+          std::shared_ptr<GeomAlgoAPI_PaveFiller> aFillerAlgo(
+            new GeomAlgoAPI_PaveFiller(aShapesToAdd, true));
+          if(!aFillerAlgo->isDone() || aFillerAlgo->shape()->isNull() || !aFillerAlgo->isValid()) {
+            myFeature->setError("Error: PaveFiller algorithm failed.");
+            return false;
+          }
+          aBoolRes = aFillerAlgo->shape();
+          aMakeShapeList->appendAlgo(aFillerAlgo);
         }
 
-        aMakeShapeList->appendAlgo(aFillerAlgo);
-
-        if(GeomAlgoAPI_ShapeTools::volume(aFillerAlgo->shape()) > 1.e-27) {
+        if(GeomAlgoAPI_ShapeTools::volume(aBoolRes) > 1.e-27) {
           theObjects.push_back(aCompSolid);
           theMakeShapes.push_back(aMakeShapeList);
         }
