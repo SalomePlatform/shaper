@@ -203,8 +203,10 @@ protected:
   TDF_Label baseDocumentLab();
 
   /// Returns features that conceals theFeature and located in history before theStop
+  /// theResultOfFeature if not null defines exact referenced result of a feature
   void concealedFeature(
-    const FeaturePtr theFeature, const FeaturePtr theStop, std::list<FeaturePtr>& theConcealers);
+    const FeaturePtr theFeature, const FeaturePtr theStop, std::list<FeaturePtr>& theConcealers,
+    const ResultPtr theResultOfFeature);
 
   friend class Model_Data;
   friend class Model_AttributeSelectionList;
