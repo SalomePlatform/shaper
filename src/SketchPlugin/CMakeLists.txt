@@ -284,6 +284,7 @@ ADD_UNIT_TESTS(
   TestProjectionIntoResult.py
   TestProjectionUpdate.py
   TestRectangle.py
+  TestRemainingDoF.py
   TestRemoveEllipse.py
   TestRemoveEllipticArc.py
   TestRemoveSketch.py

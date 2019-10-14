@@ -62,11 +62,11 @@ void PlaneGCSSolver_Solver::addConstraint(const ConstraintID& theMultiConstraint
     GCSConstraintPtr aConstraint = *anIt;
     aConstraint->setTag(anID);
     myEquationSystem->addConstraint(aConstraint.get());
-    myConstraints[theMultiConstraintID].insert(aConstraint);
 
     if (anID > CID_UNKNOWN)
       ++anID;
   }
+  myConstraints[theMultiConstraintID] = theConstraints;
 
   if (theMultiConstraintID >= CID_UNKNOWN)
     myDOF = -1;
@@ -77,7 +77,7 @@ void PlaneGCSSolver_Solver::removeConstraint(const ConstraintID& theID)
 {
   ConstraintMap::iterator aFound = myConstraints.find(theID);
   if (aFound != myConstraints.end()) {
-    for (std::set<GCSConstraintPtr>::iterator anIt = aFound->second.begin();
+    for (std::list<GCSConstraintPtr>::iterator anIt = aFound->second.begin();
          anIt != aFound->second.end(); ++anIt)
       myEquationSystem->clearByTag((*anIt)->getTag());
 
@@ -243,12 +243,30 @@ void PlaneGCSSolver_Solver::diagnose(const GCS::Algorithm& theAlgo)
   myDiagnoseBeforeSolve = false;
 }
 
-void PlaneGCSSolver_Solver::getFreeParameters(GCS::VEC_pD& theFreeParams) const
+void PlaneGCSSolver_Solver::getFreeParameters(GCS::VEC_pD& theFreeParams)
 {
   if (myConstraints.empty())
     theFreeParams = myParameters;
-  else
+  else {
+    GCS::VEC_pD aParametersCopy = myParameters;
+    ConstraintMap aConstraintCopy = myConstraints;
+
+    // clear the set of equations
+    clear();
+    // reset constraints
+    myParameters = aParametersCopy;
+    for (ConstraintMap::iterator anIt = aConstraintCopy.begin();
+         anIt != aConstraintCopy.end(); ++anIt)
+      addConstraint(anIt->first, anIt->second);
+
+    // parameters detection works for Dense QR only
+    GCS::QRAlgorithm aQRAlgo = myEquationSystem->qrAlgorithm;
+    myEquationSystem->qrAlgorithm = GCS::EigenDenseQR;
+    diagnose();
     myEquationSystem->getDependentParams(theFreeParams);
+    // revert QR decomposition algorithm
+    myEquationSystem->qrAlgorithm = aQRAlgo;
+  }
 }
 
 void PlaneGCSSolver_Solver::addFictiveConstraintIfNecessary()

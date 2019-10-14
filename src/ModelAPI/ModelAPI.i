@@ -36,6 +36,7 @@
 
 // import other modules
 %import "GeomAPI.i"
+%import "Events.i"
 
 // to avoid error on this
 #define MODELAPI_EXPORT
@@ -96,6 +97,7 @@
 %shared_ptr(ModelAPI_ResultField)
 %shared_ptr(ModelAPI_ResultParameter)
 %shared_ptr(ModelAPI_ResultCompSolid)
+%shared_ptr(ModelAPI_ObjectUpdatedMessage)
 
 %typecheck(SWIG_TYPECHECK_POINTER) const ModelAPI_AttributeTables::Value {
   $1 = (PyFloat_Check($input) || PyLong_Check($input) || PyUnicode_Check($input) || PyBool_Check($input)) ? 1 : 0;
@@ -125,6 +127,7 @@
 
 // all supported interfaces
 %include "ModelAPI_Entity.h"
+%include "ModelAPI_Events.h"
 %include "ModelAPI_Document.h"
 %include "ModelAPI_Session.h"
 %include "ModelAPI_Plugin.h"
@@ -175,6 +178,7 @@
 // std::set -> []
 %template(AttributeSet) std::set<std::shared_ptr<ModelAPI_Attribute> >;
 %template(FeatureSet) std::set<std::shared_ptr<ModelAPI_Feature> >;
+%template(ObjectSet) std::set<std::shared_ptr<ModelAPI_Object> >;
 
 // std::dynamic_pointer_cast
 template<class T1, class T2> std::shared_ptr<T1> shared_ptr_cast(std::shared_ptr<T2> theObject);
@@ -191,6 +195,8 @@ template<class T1, class T2> std::shared_ptr<T1> shared_ptr_cast(std::shared_ptr
 %template(modelAPI_ResultParameter) shared_ptr_cast<ModelAPI_ResultParameter, ModelAPI_Result>;
 %template(modelAPI_ResultGroup) shared_ptr_cast<ModelAPI_ResultGroup, ModelAPI_Result>;
 %template(modelAPI_ResultField) shared_ptr_cast<ModelAPI_ResultField, ModelAPI_Result>;
+
+%template(messageToUpdatedMessage) shared_ptr_cast<ModelAPI_ObjectUpdatedMessage, Events_Message>;
 
 // Attribute casts
 %template(modelAPI_AttributeDocRef)        shared_ptr_cast<ModelAPI_AttributeDocRef, ModelAPI_Attribute>;
