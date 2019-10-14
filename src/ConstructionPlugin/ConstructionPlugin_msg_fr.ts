@@ -562,33 +562,6 @@
     </message>
   </context>
   <context>
-    <name>Plane:Model_FeatureValidator</name>
-    <message>
-      <source>Attribute "axis" is not initialized.</source>
-      <translation>AA</translation>
-    </message>
-    <message>
-      <source>Attribute "coincident_point" is not initialized.</source>
-      <translation>AA</translation>
-    </message>
-    <message>
-      <source>Attribute "line" is not initialized.</source>
-      <translation>AA</translation>
-    </message>
-    <message>
-      <source>Attribute "plane" is not initialized.</source>
-      <translation>AA</translation>
-    </message>
-    <message>
-      <source>Attribute "plane1" is not initialized.</source>
-      <translation>AA</translation>
-    </message>
-    <message>
-      <source>Attribute "point1" is not initialized.</source>
-      <translation>AA</translation>
-    </message>
-  </context>
-  <context>
     <name>Plane:angle</name>
     <message>
       <source>Angle</source>
@@ -852,25 +825,6 @@
     </message>
   </context>
   <context>
-    <name>Point:Model_FeatureValidator</name>
-    <message>
-      <source>Attribute "edge" is not initialized.</source>
-      <translation>AA</translation>
-    </message>
-    <message>
-      <source>Attribute "edge_for_point_projection" is not initialized.</source>
-      <translation>AA</translation>
-    </message>
-    <message>
-      <source>Attribute "intersection_line_1" is not initialized.</source>
-      <translation>AA</translation>
-    </message>
-    <message>
-      <source>Attribute "object_for_center_of_gravity" is not initialized.</source>
-      <translation>AA</translation>
-    </message>
-  </context>
-  <context>
     <name>Point:distance</name>
     <message>
       <source>Distance</source>
@@ -1111,25 +1065,6 @@
     </message>
   </context>
   <context>
-    <name>Point:Model_FeatureValidator</name>
-    <message>
-      <source>Attribute "face_for_point_projection" is not initialized.</source>
-      <translation>AA</translation>
-    </message>
-    <message>
-      <source>Attribute "intersection_line" is not initialized.</source>
-      <translation>AA</translation>
-    </message>
-    <message>
-      <source>Attribute "intersection_plane_1" is not initialized.</source>
-      <translation>AA</translation>
-    </message>
-    <message>
-      <source>Attribute "object_for_center_of_circle" is not initialized.</source>
-      <translation>AA</translation>
-    </message>
-  </context>
-  <context>
     <name>Point:intersection_line:ConstructionPlugin_ValidatorPointEdgeAndPlaneNotParallel</name>
     <message>
       <source>One of the attribute is not initialized.</source>
@@ -1169,21 +1104,6 @@
     <message>
       <source>The object is empty</source>
       <translation>L&apos;objet est vide</translation>
-    </message>
-  </context>
-  <context>
-    <name>Point:Model_FeatureValidator</name>
-    <message>
-      <source>Attribute "face_for_point_projection" is not initialized.</source>
-      <translation>AA</translation>
-    </message>
-    <message>
-      <source>Attribute "intersection_line" is not initialized.</source>
-      <translation>AA</translation>
-    </message>
-    <message>
-      <source>Attribute "intersection_plane_1" is not initialized.</source>
-      <translation>AA</translation>
     </message>
   </context>
   <context>

@@ -240,10 +240,5 @@
       <source>Delete toolbar</source>
       <translation>Supprimer la barre d&apos;outils</translation>
     </message>
-    <message>
-      <location filename="SHAPERGUI_ToolbarsMgr.cpp" line="224"/>
-      <source> (%1 commands)</source>
-      <translation>AA</translation>
-    </message>
   </context>
 </TS>

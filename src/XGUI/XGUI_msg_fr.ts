@@ -680,11 +680,6 @@
         <translation>Annuler la dernière commande</translation>
     </message>
     <message>
-        <location filename="XGUI_Workshop.cpp" line="432"/>
-        <source>INF_DESK_TOOLBAR_STANDARD</source>
-        <translation>AA</translation>
-    </message>
-    <message>
         <location filename="XGUI_Workshop.cpp" line="438"/>
         <location filename="XGUI_Workshop.cpp" line="498"/>
         <source>Redo</source>

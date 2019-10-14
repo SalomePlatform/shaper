@@ -767,13 +767,6 @@
     </message>
   </context>
   <context>
-    <name>Fillet:Model_FeatureValidator</name>
-    <message>
-      <source>Attribute "main_objects" is not initialized.</source>
-      <translation>AA</translation>
-    </message>
-  </context>
-  <context>
     <name>Fillet:creation_method</name>
     <message>
       <source>Fixed radius</source>
@@ -1854,13 +1847,6 @@
   <!-- Validators -->
 
   <context>
-    <name>Scale:Model_FeatureValidator</name>
-    <message>
-      <source>Attribute "center_point" is not initialized.</source>
-      <translation>AA</translation>
-    </message>
-  </context>
-  <context>
     <name>Scale:center_point:GeomValidators_ConstructionComposite</name>
     <message>
       <source>The result is empty</source>
@@ -1933,20 +1919,6 @@
   <context>
     <name>Extrusion:Model_FeatureValidator</name>
     <message>
-      <source>Attribute "to_size" is not initialized.</source>
-      <translation>AA</translation>
-    </message>
-  </context>
-  <context>
-    <name>Extrusion:Model_FeatureValidator</name>
-    <message>
-      <source>Attribute "from_size" is not initialized.</source>
-      <translation>AA</translation>
-    </message>
-  </context>
-  <context>
-    <name>Extrusion:Model_FeatureValidator</name>
-    <message>
       <source>Attribute "from_object" is not initialized.</source>
       <translation>L’objet de départ pour l&apos;extrusion n&apos;est pas sélectionné.</translation>
     </message>
@@ -1954,22 +1926,8 @@
   <context>
     <name>Extrusion:Model_FeatureValidator</name>
     <message>
-      <source>Attribute "from_offset" is not initialized.</source>
-      <translation>AA</translation>
-    </message>
-  </context>
-  <context>
-    <name>Extrusion:Model_FeatureValidator</name>
-    <message>
       <source>Attribute "to_object" is not initialized.</source>
       <translation>L’objet destination de l&apos;extrusion n&apos;est pas sélectionné.</translation>
-    </message>
-  </context>
-  <context>
-    <name>Extrusion:Model_FeatureValidator</name>
-    <message>
-      <source>Attribute "to_offset" is not initialized.</source>
-      <translation>AA</translation>
     </message>
   </context>
   <context>
@@ -2150,27 +2108,6 @@
   <context>
     <name>Extrusion:from_object:GeomValidators_Face</name>
     <message>
-      <source>The shape is not a face.</source>
-      <translation>AA</translation>
-    </message>
-  </context>
-  <context>
-    <name>Extrusion:from_object:GeomValidators_Face</name>
-    <message>
-      <source>The shape is not a face.</source>
-      <translation>AA</translation>
-    </message>
-  </context>
-  <context>
-    <name>Extrusion:from_object:GeomValidators_Face</name>
-    <message>
-      <source>The shape is not a plane.</source>
-      <translation>AA</translation>
-    </message>
-  </context>
-  <context>
-    <name>Extrusion:from_object:GeomValidators_Face</name>
-    <message>
       <source>The shape is not a cylinder.</source>
       <translation>La forme n&apos;est pas un cylindre.</translation>
     </message>
@@ -2187,27 +2124,6 @@
     <message>
       <source>The attribute with the %1 type is not processed</source>
       <translation>L&apos;attribut avec le type %1 n&apos;est pas traité</translation>
-    </message>
-  </context>
-  <context>
-    <name>Extrusion:to_object:GeomValidators_Face</name>
-    <message>
-      <source>The shape is not a face.</source>
-      <translation>AA</translation>
-    </message>
-  </context>
-  <context>
-    <name>Extrusion:to_object:GeomValidators_Face</name>
-    <message>
-      <source>The shape is not a face.</source>
-      <translation>AA</translation>
-    </message>
-  </context>
-  <context>
-    <name>Extrusion:to_object:GeomValidators_Face</name>
-    <message>
-      <source>The shape is not a plane.</source>
-      <translation>AA</translation>
     </message>
   </context>
   <context>
@@ -2361,29 +2277,8 @@
   <context>
     <name>ExtrusionCut:Model_FeatureValidator</name>
     <message>
-      <source>Attribute "to_size" is not initialized.</source>
-      <translation>AA</translation>
-    </message>
-  </context>
-  <context>
-    <name>ExtrusionCut:Model_FeatureValidator</name>
-    <message>
-      <source>Attribute "from_size" is not initialized.</source>
-      <translation>AA</translation>
-    </message>
-  </context>
-  <context>
-    <name>ExtrusionCut:Model_FeatureValidator</name>
-    <message>
       <source>Attribute "from_object" is not initialized.</source>
       <translation>L’objet de départ pour l&apos;extrusion n&apos;est pas sélectionné.</translation>
-    </message>
-  </context>
-  <context>
-    <name>ExtrusionCut:Model_FeatureValidator</name>
-    <message>
-      <source>Attribute "from_offset" is not initialized.</source>
-      <translation>AA</translation>
     </message>
   </context>
   <context>
@@ -2585,27 +2480,6 @@
   <context>
     <name>ExtrusionCut:from_object:GeomValidators_Face</name>
     <message>
-      <source>The shape is not a face.</source>
-      <translation>AA</translation>
-    </message>
-  </context>
-  <context>
-    <name>ExtrusionCut:from_object:GeomValidators_Face</name>
-    <message>
-      <source>The shape is not a face.</source>
-      <translation>AA</translation>
-    </message>
-  </context>
-  <context>
-    <name>ExtrusionCut:from_object:GeomValidators_Face</name>
-    <message>
-      <source>The shape is not a plane.</source>
-      <translation>AA</translation>
-    </message>
-  </context>
-  <context>
-    <name>ExtrusionCut:from_object:GeomValidators_Face</name>
-    <message>
       <source>The shape is not a cylinder.</source>
       <translation>La forme n&apos;est pas un cylindre.</translation>
     </message>
@@ -2622,27 +2496,6 @@
     <message>
       <source>The attribute with the %1 type is not processed</source>
       <translation>L&apos;attribut avec le type %1 n&apos;est pas traité</translation>
-    </message>
-  </context>
-  <context>
-    <name>ExtrusionCut:to_object:GeomValidators_Face</name>
-    <message>
-      <source>The shape is not a face.</source>
-      <translation>AA</translation>
-    </message>
-  </context>
-  <context>
-    <name>ExtrusionCut:to_object:GeomValidators_Face</name>
-    <message>
-      <source>The shape is not a face.</source>
-      <translation>AA</translation>
-    </message>
-  </context>
-  <context>
-    <name>ExtrusionCut:to_object:GeomValidators_Face</name>
-    <message>
-      <source>The shape is not a plane.</source>
-      <translation>AA</translation>
     </message>
   </context>
   <context>
@@ -2816,20 +2669,6 @@
   <context>
     <name>Revolution:Model_FeatureValidator</name>
     <message>
-      <source>Attribute "to_angle" is not initialized.</source>
-      <translation>AA</translation>
-    </message>
-  </context>
-  <context>
-    <name>Revolution:Model_FeatureValidator</name>
-    <message>
-      <source>Attribute "from_angle" is not initialized.</source>
-      <translation>AA</translation>
-    </message>
-  </context>
-  <context>
-    <name>Revolution:Model_FeatureValidator</name>
-    <message>
       <source>Attribute "from_object" is not initialized.</source>
       <translation>L&apos;objet de départ pour la révolution n&apos;est pas sélectionné.</translation>
     </message>
@@ -2837,22 +2676,8 @@
   <context>
     <name>Revolution:Model_FeatureValidator</name>
     <message>
-      <source>Attribute "from_offset" is not initialized.</source>
-      <translation>AA</translation>
-    </message>
-  </context>
-  <context>
-    <name>Revolution:Model_FeatureValidator</name>
-    <message>
       <source>Attribute "to_object" is not initialized.</source>
       <translation>L’objet destination de la révolution n&apos;est pas sélectionné.</translation>
-    </message>
-  </context>
-  <context>
-    <name>Revolution:Model_FeatureValidator</name>
-    <message>
-      <source>Attribute "to_offset" is not initialized.</source>
-      <translation>AA</translation>
     </message>
   </context>
   <context>
@@ -3040,27 +2865,6 @@
   <context>
     <name>Revolution:from_object:GeomValidators_Face</name>
     <message>
-      <source>The shape is not a face.</source>
-      <translation>AA</translation>
-    </message>
-  </context>
-  <context>
-    <name>Revolution:from_object:GeomValidators_Face</name>
-    <message>
-      <source>The shape is not a face.</source>
-      <translation>AA</translation>
-    </message>
-  </context>
-  <context>
-    <name>Revolution:from_object:GeomValidators_Face</name>
-    <message>
-      <source>The shape is not a plane.</source>
-      <translation>AA</translation>
-    </message>
-  </context>
-  <context>
-    <name>Revolution:from_object:GeomValidators_Face</name>
-    <message>
       <source>The shape is not a cylinder.</source>
       <translation>La forme n&apos;est pas un cylindre.</translation>
     </message>
@@ -3077,34 +2881,6 @@
     <message>
       <source>The attribute with the %1 type is not processed</source>
       <translation>L&apos;attribut avec le type %1 n&apos;est pas traité</translation>
-    </message>
-  </context>
-  <context>
-    <name>Revolution:to_object:GeomValidators_Face</name>
-    <message>
-      <source>The shape is not a face.</source>
-      <translation>AA</translation>
-    </message>
-  </context>
-  <context>
-    <name>Revolution:to_object:GeomValidators_Face</name>
-    <message>
-      <source>The shape is not a face.</source>
-      <translation>AA</translation>
-    </message>
-  </context>
-  <context>
-    <name>Revolution:to_object:GeomValidators_Face</name>
-    <message>
-      <source>The shape is not a face.</source>
-      <translation>AA</translation>
-    </message>
-  </context>
-  <context>
-    <name>Revolution:to_object:GeomValidators_Face</name>
-    <message>
-      <source>The shape is not a plane.</source>
-      <translation>AA</translation>
     </message>
   </context>
   <context>
@@ -3215,20 +2991,6 @@
   <context>
     <name>RevolutionCut:Model_FeatureValidator</name>
     <message>
-      <source>Attribute "to_angle" is not initialized.</source>
-      <translation>AA</translation>
-    </message>
-  </context>
-  <context>
-    <name>RevolutionCut:Model_FeatureValidator</name>
-    <message>
-      <source>Attribute "from_angle" is not initialized.</source>
-      <translation>AA</translation>
-    </message>
-  </context>
-  <context>
-    <name>RevolutionCut:Model_FeatureValidator</name>
-    <message>
       <source>Attribute "from_object" is not initialized.</source>
       <translation>L&apos;objet de départ pour la révolution n&apos;est pas sélectionné.</translation>
     </message>
@@ -3236,22 +2998,8 @@
   <context>
     <name>RevolutionCut:Model_FeatureValidator</name>
     <message>
-      <source>Attribute "from_offset" is not initialized.</source>
-      <translation>AA</translation>
-    </message>
-  </context>
-  <context>
-    <name>RevolutionCut:Model_FeatureValidator</name>
-    <message>
       <source>Attribute "to_object" is not initialized.</source>
       <translation>L’objet destination de la révolution n&apos;est pas sélectionné.</translation>
-    </message>
-  </context>
-  <context>
-    <name>RevolutionCut:Model_FeatureValidator</name>
-    <message>
-      <source>Attribute "to_offset" is not initialized.</source>
-      <translation>AA</translation>
     </message>
   </context>
   <context>
@@ -3439,27 +3187,6 @@
   <context>
     <name>RevolutionCut:from_object:GeomValidators_Face</name>
     <message>
-      <source>The shape is not a face.</source>
-      <translation>AA</translation>
-    </message>
-  </context>
-  <context>
-    <name>RevolutionCut:from_object:GeomValidators_Face</name>
-    <message>
-      <source>The shape is not a face.</source>
-      <translation>AA</translation>
-    </message>
-  </context>
-  <context>
-    <name>RevolutionCut:from_object:GeomValidators_Face</name>
-    <message>
-      <source>The shape is not a plane.</source>
-      <translation>AA</translation>
-    </message>
-  </context>
-  <context>
-    <name>RevolutionCut:from_object:GeomValidators_Face</name>
-    <message>
       <source>The shape is not a cylinder.</source>
       <translation>La forme n&apos;est pas un cylindre.</translation>
     </message>
@@ -3476,27 +3203,6 @@
     <message>
       <source>The attribute with the %1 type is not processed</source>
       <translation>L&apos;attribut avec le type %1 n&apos;est pas traité</translation>
-    </message>
-  </context>
-  <context>
-    <name>RevolutionCut:to_object:GeomValidators_Face</name>
-    <message>
-      <source>The shape is not a face.</source>
-      <translation>AA</translation>
-    </message>
-  </context>
-  <context>
-    <name>RevolutionCut:to_object:GeomValidators_Face</name>
-    <message>
-      <source>The shape is not a face.</source>
-      <translation>AA</translation>
-    </message>
-  </context>
-  <context>
-    <name>RevolutionCut:to_object:GeomValidators_Face</name>
-    <message>
-      <source>The shape is not a plane.</source>
-      <translation>AA</translation>
     </message>
   </context>
   <context>
@@ -3635,20 +3341,6 @@
   <context>
     <name>ExtrusionFuse:Model_FeatureValidator</name>
     <message>
-      <source>Attribute "to_size" is not initialized.</source>
-      <translation>AA</translation>
-    </message>
-  </context>
-  <context>
-    <name>ExtrusionFuse:Model_FeatureValidator</name>
-    <message>
-      <source>Attribute "from_size" is not initialized.</source>
-      <translation>AA</translation>
-    </message>
-  </context>
-  <context>
-    <name>ExtrusionFuse:Model_FeatureValidator</name>
-    <message>
       <source>Attribute "from_object" is not initialized.</source>
       <translation>L’objet de départ pour l&apos;extrusion n&apos;est pas sélectionné.</translation>
     </message>
@@ -3656,22 +3348,8 @@
   <context>
     <name>ExtrusionFuse:Model_FeatureValidator</name>
     <message>
-      <source>Attribute "from_offset" is not initialized.</source>
-      <translation>AA</translation>
-    </message>
-  </context>
-  <context>
-    <name>ExtrusionFuse:Model_FeatureValidator</name>
-    <message>
       <source>Attribute "to_object" is not initialized.</source>
       <translation>L’objet destination de l&apos;extrusion n&apos;est pas sélectionné.</translation>
-    </message>
-  </context>
-  <context>
-    <name>ExtrusionFuse:Model_FeatureValidator</name>
-    <message>
-      <source>Attribute "to_offset" is not initialized.</source>
-      <translation>AA</translation>
     </message>
   </context>
   <context>
@@ -3859,27 +3537,6 @@
   <context>
     <name>ExtrusionFuse:from_object:GeomValidators_Face</name>
     <message>
-      <source>The shape is not a face.</source>
-      <translation>AA</translation>
-    </message>
-  </context>
-  <context>
-    <name>ExtrusionFuse:from_object:GeomValidators_Face</name>
-    <message>
-      <source>The shape is not a face.</source>
-      <translation>AA</translation>
-    </message>
-  </context>
-  <context>
-    <name>ExtrusionFuse:from_object:GeomValidators_Face</name>
-    <message>
-      <source>The shape is not a plane.</source>
-      <translation>AA</translation>
-    </message>
-  </context>
-  <context>
-    <name>ExtrusionFuse:from_object:GeomValidators_Face</name>
-    <message>
       <source>The shape is not a cylinder.</source>
       <translation>La forme n&apos;est pas un cylindre.</translation>
     </message>
@@ -3896,27 +3553,6 @@
     <message>
       <source>The attribute with the %1 type is not processed</source>
       <translation>L&apos;attribut avec le type %1 n&apos;est pas traité</translation>
-    </message>
-  </context>
-  <context>
-    <name>ExtrusionFuse:to_object:GeomValidators_Face</name>
-    <message>
-      <source>The shape is not a face.</source>
-      <translation>AA</translation>
-    </message>
-  </context>
-  <context>
-    <name>ExtrusionFuse:to_object:GeomValidators_Face</name>
-    <message>
-      <source>The shape is not a face.</source>
-      <translation>AA</translation>
-    </message>
-  </context>
-  <context>
-    <name>ExtrusionFuse:to_object:GeomValidators_Face</name>
-    <message>
-      <source>The shape is not a plane.</source>
-      <translation>AA</translation>
     </message>
   </context>
   <context>
@@ -4125,20 +3761,6 @@
   <context>
     <name>RevolutionFuse:Model_FeatureValidator</name>
     <message>
-      <source>Attribute "to_angle" is not initialized.</source>
-      <translation>AA</translation>
-    </message>
-  </context>
-  <context>
-    <name>RevolutionFuse:Model_FeatureValidator</name>
-    <message>
-      <source>Attribute "from_angle" is not initialized.</source>
-      <translation>AA</translation>
-    </message>
-  </context>
-  <context>
-    <name>RevolutionFuse:Model_FeatureValidator</name>
-    <message>
       <source>Attribute "from_object" is not initialized.</source>
       <translation>L&apos;objet de départ pour la révolution n&apos;est pas sélectionné.</translation>
     </message>
@@ -4146,22 +3768,8 @@
   <context>
     <name>RevolutionFuse:Model_FeatureValidator</name>
     <message>
-      <source>Attribute "from_offset" is not initialized.</source>
-      <translation>AA</translation>
-    </message>
-  </context>
-  <context>
-    <name>RevolutionFuse:Model_FeatureValidator</name>
-    <message>
       <source>Attribute "to_object" is not initialized.</source>
       <translation>L’objet destination de la révolution n&apos;est pas sélectionné.</translation>
-    </message>
-  </context>
-  <context>
-    <name>RevolutionFuse:Model_FeatureValidator</name>
-    <message>
-      <source>Attribute "to_offset" is not initialized.</source>
-      <translation>AA</translation>
     </message>
   </context>
   <context>
@@ -4349,27 +3957,6 @@
   <context>
     <name>RevolutionFuse:from_object:GeomValidators_Face</name>
     <message>
-      <source>The shape is not a face.</source>
-      <translation>AA</translation>
-    </message>
-  </context>
-  <context>
-    <name>RevolutionFuse:from_object:GeomValidators_Face</name>
-    <message>
-      <source>The shape is not a face.</source>
-      <translation>AA</translation>
-    </message>
-  </context>
-  <context>
-    <name>RevolutionFuse:from_object:GeomValidators_Face</name>
-    <message>
-      <source>The shape is not a plane.</source>
-      <translation>AA</translation>
-    </message>
-  </context>
-  <context>
-    <name>RevolutionFuse:from_object:GeomValidators_Face</name>
-    <message>
       <source>The shape is not a cylinder.</source>
       <translation>La forme n&apos;est pas un cylindre.</translation>
     </message>
@@ -4386,27 +3973,6 @@
     <message>
       <source>The attribute with the %1 type is not processed</source>
       <translation>L&apos;attribut avec le type %1 n&apos;est pas traité</translation>
-    </message>
-  </context>
-  <context>
-    <name>RevolutionFuse:to_object:GeomValidators_Face</name>
-    <message>
-      <source>The shape is not a face.</source>
-      <translation>AA</translation>
-    </message>
-  </context>
-  <context>
-    <name>RevolutionFuse:to_object:GeomValidators_Face</name>
-    <message>
-      <source>The shape is not a face.</source>
-      <translation>AA</translation>
-    </message>
-  </context>
-  <context>
-    <name>RevolutionFuse:to_object:GeomValidators_Face</name>
-    <message>
-      <source>The shape is not a plane.</source>
-      <translation>AA</translation>
     </message>
   </context>
   <context>
@@ -5210,13 +4776,6 @@
   <context>
     <name>Placement:Model_FeatureValidator</name>
     <message>
-      <source>Attribute "placement_centering" is not initialized.</source>
-      <translation>AA</translation>
-    </message>
-  </context>
-  <context>
-    <name>Placement:Model_FeatureValidator</name>
-    <message>
       <source>Attribute "placement_objects_list" is not initialized.</source>
       <translation>Les objets à placer ne sont pas sélectionnés.</translation>
     </message>
@@ -5240,13 +4799,6 @@
     <message>
       <source>Attribute "placement_start_shape" is not initialized.</source>
       <translation>La forme de départ n&apos;est pas définie.</translation>
-    </message>
-  </context>
-  <context>
-    <name>Placement:Model_FeatureValidator</name>
-    <message>
-      <source>Attribute "placement_reverse_direction" is not initialized.</source>
-      <translation>AA</translation>
     </message>
   </context>
   <context>
@@ -5418,13 +4970,6 @@
     </message>
   </context>
   <context>
-    <name>Translation:Model_FeatureValidator</name>
-    <message>
-      <source>Attribute "distance" is not initialized.</source>
-      <translation>AA</translation>
-    </message>
-  </context>
-  <context>
     <name>Translation:main_objects:FeaturesPlugin_ValidatorTransform</name>
     <message>
       <source>The attribute with the %1 type is not processed</source>
@@ -5488,13 +5033,6 @@
     </message>
   </context>
   <context>
-    <name>Union:GeomValidators_MinObjectsSelected</name>
-    <message>
-      <source>Error: Attribute "%1" should contain at least %2 items.</source>
-      <translation>AA</translation>
-    </message>
-  </context>
-  <context>
     <name>FusionFaces:Model_FeatureValidator</name>
     <message>
       <source>Attribute "base_shape" is not initialized.</source>
@@ -5514,13 +5052,6 @@
     <message>
       <source>Perform copy and rotate</source>
       <translation>Effectuer une copie et une rotation</translation>
-    </message>
-  </context>
-  <context>
-    <name>AngularCopy:Model_FeatureValidator</name>
-    <message>
-      <source>Attribute "axis_angular" is not initialized.</source>
-      <translation>AA</translation>
     </message>
   </context>
   <context>
@@ -5585,13 +5116,6 @@
     <message>
       <source>Perform copy and translate</source>
       <translation>Effectuer la copie et la translation</translation>
-    </message>
-  </context>
-  <context>
-    <name>LinearCopy:Model_FeatureValidator</name>
-    <message>
-      <source>Attribute "axis_first_dir" is not initialized.</source>
-      <translation>AA</translation>
     </message>
   </context>
   <context>
@@ -5719,29 +5243,6 @@
     <message>
       <source>Radius of circular edge, cylindrical surface or sphere</source>
       <translation>Rayon du bord circulaire, de la surface cylindrique ou de la sphère</translation>
-    </message>
-  </context>
-  <context>
-    <name>Measurement:Model_FeatureValidator</name>
-    <message>
-      <source>Attribute "angle_from" is not initialized.</source>
-      <translation>AA</translation>
-    </message>
-    <message>
-      <source>Attribute "angle_point_1" is not initialized.</source>
-      <translation>AA</translation>
-    </message>
-    <message>
-      <source>Attribute "circular" is not initialized.</source>
-      <translation>AA</translation>
-    </message>
-    <message>
-      <source>Attribute "distance_from" is not initialized.</source>
-      <translation>AA</translation>
-    </message>
-    <message>
-      <source>Attribute "edge_for_length" is not initialized.</source>
-      <translation>AA</translation>
     </message>
   </context>
   <context>
@@ -5992,13 +5493,6 @@
     </message>
   </context>
   <context>
-    <name>Rotation:Model_FeatureValidator</name>
-    <message>
-      <source>Attribute "center_point" is not initialized.</source>
-      <translation>AA</translation>
-    </message>
-  </context>
-  <context>
     <name>Rotation:angle</name>
     <message>
       <source>Angle</source>
@@ -6110,17 +5604,6 @@
     </message>
   </context>
   <context>
-    <name>Symmetry:Model_FeatureValidator</name>
-    <message>
-      <source>Attribute "axis_object" is not initialized.</source>
-      <translation>AA</translation>
-    </message>
-    <message>
-      <source>Attribute "main_objects" is not initialized.</source>
-      <translation>AA</translation>
-    </message>
-  </context>
-  <context>
     <name>Symmetry:axis_object</name>
     <message>
       <source>Axis</source>
@@ -6215,17 +5698,6 @@
     <message>
       <source>By two points</source>
       <translation>Par deux points</translation>
-    </message>
-  </context>
-  <context>
-    <name>Translation:Model_FeatureValidator</name>
-    <message>
-      <source>Attribute "end_point" is not initialized.</source>
-      <translation>AA</translation>
-    </message>
-    <message>
-      <source>Attribute "main_objects" is not initialized.</source>
-      <translation>AA</translation>
     </message>
   </context>
   <context>

@@ -686,13 +686,6 @@
     </message>
   </context>
   <context>
-    <name>Edge:Model_FeatureValidator</name>
-    <message>
-      <source>Attribute "first_point" is not initialized.</source>
-      <translation>AA</translation>
-    </message>
-  </context>
-  <context>
     <name>Edge:base_objects</name>
     <message>
       <source>Edges:</source>

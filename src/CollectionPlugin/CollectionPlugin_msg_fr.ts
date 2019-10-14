@@ -122,13 +122,6 @@
     </message>
   </context>
   <context>
-    <name>GroupAddition:Model_FeatureValidator</name>
-    <message>
-      <source>Attribute "group_list" is not initialized.</source>
-      <translation>AA</translation>
-    </message>
-  </context>
-  <context>
     <name>GroupAddition:group_list</name>
     <message>
       <source>Base groups:</source>
