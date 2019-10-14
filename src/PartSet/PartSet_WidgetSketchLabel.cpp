@@ -777,7 +777,8 @@ bool PartSet_WidgetSketchLabel::restoreValueCustom()
 
 void PartSet_WidgetSketchLabel::onShowDOF()
 {
-  CompositeFeaturePtr aCompFeature = std::dynamic_pointer_cast<ModelAPI_CompositeFeature>(myFeature);
+  CompositeFeaturePtr aCompFeature =
+    std::dynamic_pointer_cast<ModelAPI_CompositeFeature>(myFeature);
   if (aCompFeature.get()) {
     static const Events_ID anEvent = Events_Loop::eventByName(EVENT_GET_DOF_OBJECTS);
     ModelAPI_EventCreator::get()->sendUpdated(aCompFeature, anEvent);
