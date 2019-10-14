@@ -19,7 +19,7 @@
 
 INSTALL(DIRECTORY geom model examples DESTINATION ${SHAPER_INSTALL_PYTHON_API})
 INSTALL(FILES __init__.py DESTINATION ${SHAPER_INSTALL_PYTHON_API})
-INSTALL(FILES __init__.py DESTINATION ${_pydir}/salome)
+#INSTALL(FILES __init__.py DESTINATION ${_pydir}/salome)
 INSTALL(FILES initConfig.py DESTINATION ${SHAPER_INSTALL_PYTHON_API})
 
 # --------- Unit tests -----------
