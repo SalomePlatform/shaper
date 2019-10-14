@@ -46,7 +46,9 @@ void FeaturesPlugin_Recover::initAttributes()
   data()->addAttribute(METHOD(), ModelAPI_AttributeString::typeId());
   if (!string(METHOD())->isInitialized()) {
     myClearListOnTypeChange = false;
+    data()->blockSendAttributeUpdated(true, false);
     string(METHOD())->setValue(METHOD_DEFAULT());
+    data()->blockSendAttributeUpdated(false, false);
     myClearListOnTypeChange = true;
   }
   ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(), METHOD());

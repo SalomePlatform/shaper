@@ -1282,14 +1282,21 @@ void Model_AttributeSelection::computeValues(
 
 
 void Model_AttributeSelection::concealedFeature(
-  const FeaturePtr theFeature, const FeaturePtr theStop, std::list<FeaturePtr>& theConcealers)
+  const FeaturePtr theFeature, const FeaturePtr theStop, std::list<FeaturePtr>& theConcealers,
+  const ResultPtr theResultOfFeature)
 {
   std::set<FeaturePtr> alreadyProcessed;
   alreadyProcessed.insert(theFeature);
   if (theStop.get())
     alreadyProcessed.insert(theStop);
   /// iterate all results to find the concealment-attribute
-  const std::list<ResultPtr>& aRootRes = theFeature->results();
+  std::list<ResultPtr> aRootRes;
+  if (theResultOfFeature.get()) {
+    ResultPtr aRoot = ModelAPI_Tools::bodyOwner(theResultOfFeature, true);
+    aRootRes.push_back(aRoot ? aRoot : theResultOfFeature);
+  } else { // all results of a feature
+   aRootRes = theFeature->results();
+  }
   std::list<ResultPtr>::const_iterator aRootIter = aRootRes.cbegin();
   for(; aRootIter != aRootRes.cend(); aRootIter++) {
     std::list<ResultPtr> allRes;
@@ -1398,7 +1405,7 @@ bool Model_AttributeSelection::searchNewContext(std::shared_ptr<Model_Document> 
     FeaturePtr aThisFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(owner());
     FeaturePtr aContextOwner = theDoc->feature(theContext);
     std::list<FeaturePtr> aConcealers;
-    concealedFeature(aContextOwner, aThisFeature, aConcealers);
+    concealedFeature(aContextOwner, aThisFeature, aConcealers, theContext);
     std::list<FeaturePtr>::iterator aConcealer = aConcealers.begin();
     for(; aConcealer != aConcealers.end(); aConcealer++) {
       std::list<ResultPtr> aRefResults;
@@ -1471,7 +1478,7 @@ void Model_AttributeSelection::updateInHistory(bool& theRemove)
       if (aFeature.get()) {
         FeaturePtr aThisFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(owner());
         std::list<FeaturePtr> aConcealers;
-        concealedFeature(aFeature, aThisFeature, aConcealers);
+        concealedFeature(aFeature, aThisFeature, aConcealers, ResultPtr());
         if (aConcealers.empty())
           return;
         bool aChanged = false;
