@@ -1146,10 +1146,13 @@ static std::shared_ptr<GeomAPI_Pnt2d> middlePointOnArc(const FeaturePtr& theFeat
   return std::shared_ptr<GeomAPI_Pnt2d>(new GeomAPI_Pnt2d(x, y));
 }
 
-static std::shared_ptr<GeomAPI_Pnt2d> pointOnEllipse(const FeaturePtr& theFeature)
+static std::shared_ptr<GeomAPI_Pnt2d> pointOnEllipse(const FeaturePtr& theFeature,
+                                                     bool isEllipse = true)
 {
+  const std::string& anAttrName = isEllipse ? SketchPlugin_Ellipse::MAJOR_AXIS_END_ID() :
+                                  SketchPlugin_EllipticArc::MAJOR_AXIS_END_ID();
   AttributePoint2DPtr aMajorAxisEnd = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
-      theFeature->attribute(SketchPlugin_Ellipse::MAJOR_AXIS_END_ID()));
+      theFeature->attribute(anAttrName));
   return aMajorAxisEnd ? aMajorAxisEnd->pnt() : std::shared_ptr<GeomAPI_Pnt2d>();
 }
 
@@ -1170,6 +1173,8 @@ static std::shared_ptr<GeomAPI_Pnt2d> middlePoint(const ObjectPtr& theObject)
       aMiddlePoint = middlePointOnArc(aFeature);
     else if (aFeatureKind == SketchPlugin_Ellipse::ID())
       aMiddlePoint = pointOnEllipse(aFeature);
+    else if (aFeatureKind == SketchPlugin_EllipticArc::ID())
+      aMiddlePoint = pointOnEllipse(aFeature, false);
   }
   return aMiddlePoint;
 }

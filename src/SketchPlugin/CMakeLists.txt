@@ -324,6 +324,7 @@ if(${SKETCHER_CHANGE_RADIUS_WHEN_MOVE})
     TestMoveArc.py
     TestMoveCircle.py
     TestMoveEllipse.py
+    TestMoveEllipticArc.py
     TestMoveLine.py
     TestMovementComplex.py
     TestMovePoint.py
