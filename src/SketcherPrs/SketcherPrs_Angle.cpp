@@ -165,6 +165,8 @@ void SketcherPrs_Angle::Compute(const Handle(PrsMgr_PresentationManager3d)& theP
                                 const Handle(Prs3d_Presentation)& thePresentation,
                                 const Standard_Integer theMode)
 {
+  if (!plane().get())
+    return;
   gp_Pnt aFirstPoint, aSecondPoint, aCenterPoint;
   bool aReadyToDisplay = readyToDisplay(myConstraint, plane(),
                                         aFirstPoint, aSecondPoint, aCenterPoint);
