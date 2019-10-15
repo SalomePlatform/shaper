@@ -147,6 +147,8 @@ void SketcherPrs_LengthDimension::Compute(
   const Handle(Prs3d_Presentation)& thePresentation,
   const Standard_Integer theMode)
 {
+  if (!plane().get())
+    return;
   gp_Pnt aPnt1, aPnt2;
   bool aReadyToDisplay = readyToDisplay(myConstraint, plane(), aPnt1, aPnt2);
   if (aReadyToDisplay) {

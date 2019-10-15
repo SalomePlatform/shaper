@@ -274,6 +274,8 @@ void SketcherPrs_SymbolPrs::Compute(
                 const Handle(Prs3d_Presentation)& thePresentation,
                 const Standard_Integer theMode)
 {
+  if (!plane().get())
+    return;
   // Create an icon
   prepareAspect();
 

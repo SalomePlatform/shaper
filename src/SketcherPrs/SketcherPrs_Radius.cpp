@@ -145,6 +145,8 @@ void SketcherPrs_Radius::Compute(
   const Handle(Prs3d_Presentation)& thePresentation,
   const Standard_Integer theMode)
 {
+  if (!plane().get())
+    return;
   gp_Circ aCircle;
   gp_Pnt anAnchorPoint;
   bool aReadyToDisplay = readyToDisplay(myConstraint, plane(), aCircle, anAnchorPoint);

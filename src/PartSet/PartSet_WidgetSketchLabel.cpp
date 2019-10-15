@@ -726,6 +726,7 @@ void PartSet_WidgetSketchLabel::onChangePlane()
     SessionPtr aMgr = ModelAPI_Session::get();
     aMgr->startOperation("Change Sketch plane");
     myOpenTransaction = true;
+    myWorkshop->viewer()->update();
   }
 }
 
