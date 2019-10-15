@@ -21,6 +21,7 @@
 #include <SketchPlugin_Point.h>
 #include <SketchPlugin_Circle.h>
 #include <SketchPlugin_Line.h>
+#include <SketchPlugin_Tools.h>
 
 #include <SketcherPrs_Tools.h>
 #include <SketcherPrs_Factory.h>
@@ -95,6 +96,8 @@ AISObjectPtr SketchPlugin_ConstraintDistance::getAISObject(AISObjectPtr thePrevi
   AISObjectPtr anAIS = SketcherPrs_Factory::lengthDimensionConstraint(this,
                                                                       sketch(),
                                                                       thePrevious);
+  if (anAIS.get() && !thePrevious.get())
+    SketchPlugin_Tools::setDimensionColor(anAIS);
   return anAIS;
 }
 

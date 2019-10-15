@@ -409,7 +409,7 @@ bool ModuleBase_WidgetMultiSelector::setSelection(QList<ModuleBase_ViewerPrsPtr>
     theValues.append(anInvalidValues);
 
   if (isDone) // may be the feature's result is not displayed, but attributes should be
-    myWorkshop->module()->customizeObject(myFeature, ModuleBase_IModule::CustomizeArguments,
+    myWorkshop->module()->customizeFeature(myFeature, ModuleBase_IModule::CustomizeArguments,
                              true);/// hope that something is redisplayed by object updated
 
   return isDone;
@@ -553,7 +553,7 @@ bool ModuleBase_WidgetMultiSelector::processDelete()
     myWorkshop->setSelected(getAttributeSelection());
 
     // may be the feature's result is not displayed, but attributes should be
-    myWorkshop->module()->customizeObject(myFeature, ModuleBase_IModule::CustomizeArguments,
+    myWorkshop->module()->customizeFeature(myFeature, ModuleBase_IModule::CustomizeArguments,
                               true); /// hope that something is redisplayed by object updated
   }
 
@@ -616,7 +616,7 @@ void ModuleBase_WidgetMultiSelector::onSelectionTypeChanged()
   restoreValue();
   myWorkshop->setSelected(getAttributeSelection());
   // may be the feature's result is not displayed, but attributes should be
-  myWorkshop->module()->customizeObject(myFeature, ModuleBase_IModule::CustomizeArguments,
+  myWorkshop->module()->customizeFeature(myFeature, ModuleBase_IModule::CustomizeArguments,
                             true); /// hope that something is redisplayed by object updated
   // clear history should follow after set selected to do not increase history by setSelected
   clearSelectedHistory();
@@ -853,8 +853,8 @@ void ModuleBase_WidgetMultiSelector::onDeleteItem()
 //********************************************************************
 void ModuleBase_WidgetMultiSelector::onListSelection()
 {
-  myWorkshop->module()->customizeObject(myFeature, ModuleBase_IModule::CustomizeHighlightedObjects,
-                                        true);
+  myWorkshop->module()->customizeFeature(myFeature, ModuleBase_IModule::CustomizeHighlightedObjects,
+                                         true);
 }
 
 //********************************************************************

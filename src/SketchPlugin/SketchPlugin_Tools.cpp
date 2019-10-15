@@ -537,6 +537,32 @@ GeomPnt2dPtr flyoutPointCoordinates(const ConstraintPtr& theConstraint)
   return GeomPnt2dPtr(new GeomAPI_Pnt2d(X, Y));
 }
 
+
+void customizeFeaturePrs(const AISObjectPtr& thePrs, bool isAxiliary)
+{
+  std::vector<int> aColor;
+  int aWidth = 1;
+  if (isAxiliary) {
+    thePrs->setLineStyle(SketchPlugin_SketchEntity::SKETCH_LINE_STYLE_AUXILIARY());
+    aColor = Config_PropManager::color("Visualization", "sketch_auxiliary_color");
+    aWidth = SketchPlugin_SketchEntity::SKETCH_LINE_WIDTH_AUXILIARY();
+  }
+  else {
+    thePrs->setLineStyle(SketchPlugin_SketchEntity::SKETCH_LINE_STYLE());
+    aColor = Config_PropManager::color("Visualization", "sketch_entity_color");
+    aWidth = Config_PropManager::integer("Visualization", "sketch_line_width");
+  }
+  thePrs->setWidth(aWidth);
+  thePrs->setColor(aColor[0], aColor[1], aColor[2]);
+}
+
+void setDimensionColor(const AISObjectPtr& theDimPrs)
+{
+  std::vector<int> aColor = Config_PropManager::color("Visualization", "sketch_dimension_color");
+  if (aColor.size() == 3)
+    theDimPrs->setColor(aColor[0], aColor[1], aColor[2]);
+}
+
 } // namespace SketchPlugin_Tools
 
 

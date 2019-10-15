@@ -19,7 +19,6 @@
 
 #include "XGUI_Displayer.h"
 
-#include "XGUI_CustomPrs.h"
 #include "XGUI_FacesPanel.h"
 #include "XGUI_Selection.h"
 #include "XGUI_SelectionActivate.h"
@@ -42,7 +41,6 @@
 #include <ModuleBase_BRepOwner.h>
 #include <ModuleBase_IModule.h>
 #include <ModuleBase_Preferences.h>
-#include <ModuleBase_ResultPrs.h>
 #include <ModuleBase_Tools.h>
 #include <ModuleBase_ViewerPrs.h>
 #include <ModuleBase_IViewer.h>
@@ -125,7 +123,6 @@ XGUI_Displayer::XGUI_Displayer(XGUI_Workshop* theWorkshop)
 : myWorkshop(theWorkshop), myNeedUpdate(false),
   myViewerBlockedRecursiveCount(0), myIsFirstAISContextUse(true)
 {
-  myCustomPrs = std::shared_ptr<GeomAPI_ICustomPrs>(new XGUI_CustomPrs(theWorkshop));
 }
 
 //**************************************************************
@@ -157,25 +154,10 @@ bool XGUI_Displayer::display(ObjectPtr theObject, bool theUpdateViewer)
       }
       anAIS = aPrs->getAISObject(anAIS);
     } else {
-      Handle(AIS_InteractiveObject) anAISPrs =
-        myWorkshop->module()->createPresentation(theObject);
-      if (anAISPrs.IsNull()) {
-        ResultPtr aResult = std::dynamic_pointer_cast<ModelAPI_Result>(theObject);
-        if (aResult.get() != NULL) {
-          std::shared_ptr<GeomAPI_Shape> aShapePtr = ModelAPI_Tools::shape(aResult);
-          if (aShapePtr.get() != NULL) {
-             anAISPrs = new ModuleBase_ResultPrs(aResult);
-          }
-        }
-      }
-      Handle(AIS_Shape) aShapePrs = Handle(AIS_Shape)::DownCast(anAISPrs);
-      if (!aShapePrs.IsNull())
-        ModuleBase_Tools::setPointBallHighlighting((AIS_Shape*)aShapePrs.get());
-      anAIS = AISObjectPtr(new GeomAPI_AISObject());
-      anAIS->setImpl(new Handle(AIS_InteractiveObject)(anAISPrs));
+      anAIS = myWorkshop->module()->createPresentation(theObject);
       isShading = true;
     }
-    if (anAIS)
+    if (anAIS.get())
       aDisplayed = display(theObject, anAIS, isShading, theUpdateViewer);
   }
   return aDisplayed;
@@ -215,7 +197,7 @@ bool XGUI_Displayer::display(ObjectPtr theObject, AISObjectPtr theAIS,
   if (!anAISIO.IsNull()) {
     appendResultObject(theObject, theAIS);
 
-    bool isCustomized = customizeObject(theObject);
+    //bool isCustomized = customizeObject(theObject);
 
     int aDispMode = isShading? Shading : Wireframe;
     if (isShading)
@@ -278,11 +260,15 @@ bool XGUI_Displayer::erase(ObjectPtr theObject, const bool theUpdateViewer)
 bool XGUI_Displayer::redisplay(ObjectPtr theObject, bool theUpdateViewer)
 {
   bool aRedisplayed = false;
+  Handle(AIS_InteractiveContext) aContext = AISContext();
+  if (aContext.IsNull())
+    return aRedisplayed;
+
   if (!isVisible(theObject))
     return aRedisplayed;
 
   AISObjectPtr aAISObj = getAISObject(theObject);
-  Handle(AIS_InteractiveObject) aAISIO = aAISObj->impl<Handle(AIS_InteractiveObject)>();
+  Handle(AIS_InteractiveObject) aAISIO;
 
   GeomPresentablePtr aPrs = std::dynamic_pointer_cast<GeomAPI_IPresentable>(theObject);
   if (aPrs) {
@@ -302,9 +288,11 @@ bool XGUI_Displayer::redisplay(ObjectPtr theObject, bool theUpdateViewer)
     }
     aAISIO = aAIS_Obj->impl<Handle(AIS_InteractiveObject)>();
   }
+  else {
+    aAISIO = aAISObj->impl<Handle(AIS_InteractiveObject)>();
+  }
 
-  Handle(AIS_InteractiveContext) aContext = AISContext();
-  if (!aContext.IsNull() && !aAISIO.IsNull()) {
+  if (!aAISIO.IsNull()) {
     // Check that the visualized shape is the same and the redisplay is not necessary
     // Redisplay of AIS object leads to this object selection compute and the selection
     // in the browser is lost
@@ -312,54 +300,56 @@ bool XGUI_Displayer::redisplay(ObjectPtr theObject, bool theUpdateViewer)
     // before and after the values modification.
     // Moreother, this check avoids customize and redisplay presentation if the presentable
     // parameter is changed.
-    bool isEqualShapes = false;
-    ResultPtr aResult = std::dynamic_pointer_cast<ModelAPI_Result>(theObject);
-    if (aResult.get() != NULL) {
-      Handle(AIS_Shape) aShapePrs = Handle(AIS_Shape)::DownCast(aAISIO);
-      if (!aShapePrs.IsNull()) {
-        std::shared_ptr<GeomAPI_Shape> aShapePtr = ModelAPI_Tools::shape(aResult);
-        if (aShapePtr.get()) {
-          const TopoDS_Shape& aOldShape = aShapePrs->Shape();
-          if (!aOldShape.IsNull())
-            isEqualShapes = aOldShape.IsEqual(aShapePtr->impl<TopoDS_Shape>());
-        }
-      }
-    }
+    //bool isEqualShapes = false;
+    //ResultPtr aResult = std::dynamic_pointer_cast<ModelAPI_Result>(theObject);
+    //if (aResult.get() != NULL) {
+    //  Handle(AIS_Shape) aShapePrs = Handle(AIS_Shape)::DownCast(aAISIO);
+    //  if (!aShapePrs.IsNull()) {
+    //    std::shared_ptr<GeomAPI_Shape> aShapePtr = ModelAPI_Tools::shape(aResult);
+    //    if (aShapePtr.get()) {
+    //      const TopoDS_Shape& aOldShape = aShapePrs->Shape();
+    //      if (!aOldShape.IsNull())
+    //        isEqualShapes = aOldShape.IsEqual(aShapePtr->impl<TopoDS_Shape>());
+    //    }
+    //  }
+    //}
     // Customization of presentation
-    bool isCustomized = customizeObject(theObject);
+    //bool isCustomized = customizeObject(theObject);
     #ifdef DEBUG_FEATURE_REDISPLAY
-      qDebug(QString("Redisplay: %1, isEqualShapes=%2, isCustomized=%3").
-        arg(!isEqualShapes || isCustomized).arg(isEqualShapes)
-        .arg(isCustomized).toStdString().c_str());
+      qDebug(QString("Redisplay: %1, isEqualShapes=%2").
+        arg(!isEqualShapes/* || isCustomized*/).arg(isEqualShapes)
+        .toStdString().c_str());
     #endif
-    if (!isEqualShapes || isCustomized) {
-      /// if shapes are equal and presentation are customized, selection should be restored
-      bool aNeedToRestoreSelection = isEqualShapes && isCustomized;
-      if (aNeedToRestoreSelection)
-        myWorkshop->module()->storeSelection();
+    //if (!isEqualShapes/* || isCustomized*/) {
+    //  /// if shapes are equal and presentation are customized, selection should be restored
+    //  bool aNeedToRestoreSelection = isEqualShapes/* && isCustomized*/;
+    //  if (aNeedToRestoreSelection)
+      if (aAISObj.get() && myWorkshop->facesPanel())
+        myWorkshop->facesPanel()->customizeObject(theObject, aAISObj);
+
+    myWorkshop->module()->storeSelection();
 
 #ifdef CLEAR_OUTDATED_SELECTION_BEFORE_REDISPLAY
-      myWorkshop->selector()->deselectPresentation(aAISIO);
+    myWorkshop->selector()->deselectPresentation(aAISIO);
 #endif
-      if (aContext->IsDisplayed(aAISIO))
-        aContext->Redisplay(aAISIO, false);
-      else
-        aContext->Display(aAISIO, false);
-
+    if (aContext->IsDisplayed(aAISIO))
+      aContext->Redisplay(aAISIO, false);
+    else {
+      aContext->Display(aAISIO, false);
+    }
       #ifdef TINSPECTOR
       if (getCallBack()) getCallBack()->Redisplay(aAISIO);
       #endif
 
-      if (aNeedToRestoreSelection)
-        myWorkshop->module()->restoreSelection();
+      //if (aNeedToRestoreSelection)
+    myWorkshop->module()->restoreSelection();
 
-      aRedisplayed = true;
-      #ifdef DEBUG_FEATURE_REDISPLAY
-        qDebug("  Redisplay happens");
-      #endif
-      if (theUpdateViewer)
-        updateViewer();
-    }
+    aRedisplayed = true;
+    #ifdef DEBUG_FEATURE_REDISPLAY
+      qDebug("  Redisplay happens");
+    #endif
+    if (theUpdateViewer)
+      updateViewer();
   }
   return aRedisplayed;
 }
@@ -886,37 +876,37 @@ bool XGUI_Displayer::canBeShaded(ObjectPtr theObject) const
 }
 
 //**************************************************************
-bool XGUI_Displayer::customizeObject(ObjectPtr theObject)
-{
-  AISObjectPtr anAISObj = getAISObject(theObject);
-  // correct the result's color it it has the attribute
-  ResultPtr aResult = std::dynamic_pointer_cast<ModelAPI_Result>(theObject);
-
-  // Customization of presentation
-  GeomCustomPrsPtr aCustomPrs;
-  FeaturePtr aFeature = ModelAPI_Feature::feature(theObject);
-  if (aFeature.get() != NULL) {
-    GeomCustomPrsPtr aCustPrs = std::dynamic_pointer_cast<GeomAPI_ICustomPrs>(aFeature);
-    if (aCustPrs.get() != NULL)
-      aCustomPrs = aCustPrs;
-  }
-  if (aCustomPrs.get() == NULL) {
-    GeomPresentablePtr aPrs = std::dynamic_pointer_cast<GeomAPI_IPresentable>(theObject);
-    // we ignore presentable not customized objects
-    if (aPrs.get() == NULL)
-      aCustomPrs = myCustomPrs;
-  }
-  bool isCustomized = aCustomPrs.get() &&
-                      aCustomPrs->customisePresentation(aResult, anAISObj, myCustomPrs);
-  isCustomized = myWorkshop->module()->afterCustomisePresentation(aResult, anAISObj, myCustomPrs)
-                 || isCustomized;
-
-  // update presentation state if faces panel is active
-  if (anAISObj.get() && myWorkshop->facesPanel())
-    isCustomized = myWorkshop->facesPanel()->customizeObject(theObject, anAISObj) || isCustomized;
-
-  return isCustomized;
-}
+//bool XGUI_Displayer::customizeObject(ObjectPtr theObject)
+//{
+//  AISObjectPtr anAISObj = getAISObject(theObject);
+//  // correct the result's color it it has the attribute
+//  ResultPtr aResult = std::dynamic_pointer_cast<ModelAPI_Result>(theObject);
+//
+//  // Customization of presentation
+//  GeomCustomPrsPtr aCustomPrs;
+//  FeaturePtr aFeature = ModelAPI_Feature::feature(theObject);
+//  if (aFeature.get() != NULL) {
+//    GeomCustomPrsPtr aCustPrs = std::dynamic_pointer_cast<GeomAPI_ICustomPrs>(aFeature);
+//    if (aCustPrs.get() != NULL)
+//      aCustomPrs = aCustPrs;
+//  }
+//  if (aCustomPrs.get() == NULL) {
+//    GeomPresentablePtr aPrs = std::dynamic_pointer_cast<GeomAPI_IPresentable>(theObject);
+//    // we ignore presentable not customized objects
+//    if (aPrs.get() == NULL)
+//      aCustomPrs = myCustomPrs;
+//  }
+//  bool isCustomized = aCustomPrs.get() &&
+//                      aCustomPrs->customisePresentation(aResult, anAISObj, myCustomPrs);
+//  isCustomized = myWorkshop->module()->afterCustomisePresentation(aResult, anAISObj, myCustomPrs)
+//                 || isCustomized;
+//
+//  // update presentation state if faces panel is active
+//  if (anAISObj.get() && myWorkshop->facesPanel())
+//    isCustomized = myWorkshop->facesPanel()->customizeObject(theObject, anAISObj) || isCustomized;
+//
+//  return isCustomized;
+//}
 
 //**************************************************************
 QColor XGUI_Displayer::setObjectColor(ObjectPtr theObject,

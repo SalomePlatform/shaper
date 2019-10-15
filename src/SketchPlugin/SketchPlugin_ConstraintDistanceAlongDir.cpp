@@ -22,6 +22,7 @@
 // Author:  Artem ZHIDKOV
 
 #include <SketchPlugin_ConstraintDistanceAlongDir.h>
+#include <SketchPlugin_Tools.h>
 
 #include <SketcherPrs_Tools.h>
 #include <SketcherPrs_Factory.h>
@@ -84,6 +85,8 @@ AISObjectPtr SketchPlugin_ConstraintDistanceAlongDir::getAISObject(AISObjectPtr 
   AISObjectPtr anAIS = SketcherPrs_Factory::lengthDimensionConstraint(this,
                                                                       sketch(),
                                                                       thePrevious);
+  if (anAIS.get() && !thePrevious.get())
+    SketchPlugin_Tools::setDimensionColor(anAIS);
   return anAIS;
 }
 

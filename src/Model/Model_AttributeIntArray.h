@@ -51,7 +51,8 @@ class Model_AttributeIntArray : public ModelAPI_AttributeIntArray
 
   /// Defines the value of the array by index [0; size-1]
   MODEL_EXPORT virtual void setValue(const int theIndex,
-                                     const int theValue);
+                                     const int theValue,
+                                     bool sendUpdated = true);
 
   /// Returns the value by the index
   MODEL_EXPORT virtual int value(const int theIndex);

@@ -19,6 +19,7 @@
 
 #include "SketchPlugin_ConstraintAngle.h"
 #include <SketchPlugin_Line.h>
+#include <SketchPlugin_Tools.h>
 #include <SketcherPrs_Tools.h>
 
 #include <ModelAPI_AttributeDouble.h>
@@ -117,6 +118,8 @@ AISObjectPtr SketchPlugin_ConstraintAngle::getAISObject(AISObjectPtr thePrevious
 
   AISObjectPtr anAIS = SketcherPrs_Factory::angleConstraint(this, sketch(),
                                                             thePrevious);
+  if (anAIS.get() && !thePrevious.get())
+    SketchPlugin_Tools::setDimensionColor(anAIS);
   return anAIS;
 }
 

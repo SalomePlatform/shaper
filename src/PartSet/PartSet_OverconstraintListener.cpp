@@ -25,7 +25,6 @@
 #include <PartSet_SketcherMgr.h>
 #include <PartSet_SketcherReentrantMgr.h>
 
-#include "XGUI_CustomPrs.h"
 #include "XGUI_Displayer.h"
 #include "XGUI_ModuleConnector.h"
 #include "XGUI_OperationMgr.h"
@@ -284,7 +283,7 @@ void PartSet_OverconstraintListener::redisplayObjects(
 {
   static Events_Loop* aLoop = Events_Loop::loop();
 
-  static Events_ID EVENT_DISP = aLoop->eventByName(EVENT_OBJECT_TO_REDISPLAY);
+  static Events_ID EVENT_DISP = aLoop->eventByName(EVENT_VISUAL_ATTRIBUTES);
   static const ModelAPI_EventCreator* aECreator = ModelAPI_EventCreator::get();
 
   std::set<ObjectPtr>::const_iterator anIt = theObjects.begin(), aLast = theObjects.end();

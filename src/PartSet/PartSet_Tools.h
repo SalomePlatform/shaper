@@ -297,7 +297,26 @@ public:
                                                FeaturePtr& theCreatedFeature);
 
 
-  static void getFirstAndLastIndexInFolder(const ObjectPtr& theFolder, int& theFirst, int& theLast);
+  static void getFirstAndLastIndexInFolder(const ObjectPtr& theFolder,
+    int& theFirst, int& theLast);
+
+
+  /**
+  * Returns default color value for the given object
+  */
+  static void getDefaultColor(ObjectPtr theObject, const bool isEmptyColorValid,
+    std::vector<int>& theColor);
+
+  /**
+  * Returns default deflection value for the given object
+  */
+  static double getDefaultDeflection(const ObjectPtr& theObject);
+
+
+  /**
+  * Returns default transparency value
+  */
+  static double getDefaultTransparency();
 };
 
 #endif

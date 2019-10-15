@@ -23,7 +23,6 @@
 #include "XGUI.h"
 
 #include <GeomAPI_AISObject.h>
-#include <GeomAPI_ICustomPrs.h>
 #include <GeomAPI_Pln.h>
 
 #include <ModelAPI_Result.h>
@@ -452,10 +451,6 @@ private:
   Handle(VInspectorAPI_CallBack) myVCallBack;
 #endif
   Handle(SelectMgr_AndFilter) myAndFilter; ///< A container for selection filters
-
-  /// A default custom presentation, which is used if the displayed feature is not
-  /// a custom presentation
-  GeomCustomPrsPtr myCustomPrs;
 
   /// Definition of a type of map which defines correspondance between objects and presentations
 #ifdef OPTIMIZE_PRS

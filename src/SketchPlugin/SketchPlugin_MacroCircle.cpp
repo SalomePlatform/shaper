@@ -389,6 +389,10 @@ AISObjectPtr SketchPlugin_MacroCircle::getAISObject(AISObjectPtr thePrevious)
     anAIS.reset(new GeomAPI_AISObject());
   }
   anAIS->createShape(aCompound);
+
+  // Modify attributes
+  SketchPlugin_Tools::customizeFeaturePrs(anAIS, boolean(AUXILIARY_ID())->value());
+
   return anAIS;
 }
 

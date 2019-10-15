@@ -159,9 +159,9 @@ void ModuleBase_IModule::launchOperation(const QString& theCmdId,
   }
 }
 
-Handle(AIS_InteractiveObject) ModuleBase_IModule::createPresentation(const ObjectPtr& theResult)
+AISObjectPtr ModuleBase_IModule::createPresentation(const ObjectPtr& theResult)
 {
-  return Handle(AIS_InteractiveObject)();
+  return AISObjectPtr();
 }
 
 bool ModuleBase_IModule::canBeShaded(Handle(AIS_InteractiveObject) theAIS) const
@@ -184,13 +184,6 @@ void ModuleBase_IModule::grantedOperationIds(ModuleBase_Operation* theOperation,
 ModuleBase_Operation* ModuleBase_IModule::getNewOperation(const std::string& theFeatureId)
 {
   return new ModuleBase_OperationFeature(theFeatureId.c_str(), this);
-}
-
-bool ModuleBase_IModule::customizeObject(ObjectPtr theObject,
-                              const ModuleBase_IModule::ModuleBase_CustomizeFlag& theFlag,
-                              const bool theUpdateViewer)
-{
-  return false;
 }
 
 ModuleBase_Operation* ModuleBase_IModule::createOperation(const std::string& theFeatureId)

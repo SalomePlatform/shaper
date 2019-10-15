@@ -172,7 +172,8 @@ PartSet_SketcherMgr::PartSet_SketcherMgr(PartSet_Module* theModule)
   : QObject(theModule), myModule(theModule), myIsEditLaunching(false), myIsDragging(false),
     myDragDone(false), myIsMouseOverWindow(false),
     myIsMouseOverViewProcessed(true), myPreviousUpdateViewerEnabled(true),
-    myIsPopupMenuActive(false), myExternalPointsMgr(0), myNoDragMoving(false)
+    myIsPopupMenuActive(false), myExternalPointsMgr(0), myNoDragMoving(false),
+    myIsSketchStarted(false)
 {
   ModuleBase_IWorkshop* anIWorkshop = myModule->workshop();
   ModuleBase_IViewer* aViewer = anIWorkshop->viewer();
@@ -470,8 +471,9 @@ void PartSet_SketcherMgr::onMousePressed(ModuleBase_IViewWindow* theWnd, QMouseE
 void PartSet_SketcherMgr::onMouseReleased(ModuleBase_IViewWindow* theWnd, QMouseEvent* theEvent)
 {
   ModuleBase_IWorkshop* aWorkshop = myModule->workshop();
+  ModuleBase_IViewer* aViewer = aWorkshop->viewer();
   if (myIsDragging)
-    aWorkshop->viewer()->enableDrawMode(myPreviousDrawModeEnabled);
+    aViewer->enableDrawMode(myPreviousDrawModeEnabled);
 
   bool aWasDragging = myIsDragging;
   myIsDragging = false;
@@ -483,11 +485,10 @@ void PartSet_SketcherMgr::onMouseReleased(ModuleBase_IViewWindow* theWnd, QMouse
   if (!myIsMouseOverViewProcessed) {
     return;
   }
-  ModuleBase_IViewer* aViewer = aWorkshop->viewer();
   //if (!aViewer->canDragByMouse())
   //  return;
   ModuleBase_OperationFeature* aOp =
-      dynamic_cast<ModuleBase_OperationFeature*>(getCurrentOperation());
+    dynamic_cast<ModuleBase_OperationFeature*>(getCurrentOperation());
   if (aOp) {
     bool aStartNoDragOperation = !aViewer->canDragByMouse() && aOp->isEditOperation();
     if (aStartNoDragOperation || myNoDragMoving) {
@@ -887,13 +888,15 @@ void PartSet_SketcherMgr::sketchSelectionModes(const CompositeFeaturePtr& theSke
   theModes.append(TopAbs_EDGE);
 }
 
-Handle(AIS_InteractiveObject) PartSet_SketcherMgr::createPresentation(const ResultPtr& theResult)
+Handle(AIS_InteractiveObject) PartSet_SketcherMgr::createPresentation(const ObjectPtr& theObj)
 {
   Handle(AIS_InteractiveObject) aPrs;
 
-  FeaturePtr aFeature = ModelAPI_Feature::feature(theResult);
+  FeaturePtr aFeature = ModelAPI_Feature::feature(theObj);
   if (aFeature.get() && aFeature->getKind() == SketchPlugin_Sketch::ID()) {
-    aPrs = new PartSet_ResultSketchPrs(theResult);
+    ResultPtr aResult = std::dynamic_pointer_cast<ModelAPI_Result>(theObj);
+    if (aResult.get())
+      aPrs = new PartSet_ResultSketchPrs(aResult);
   }
   return aPrs;
 }
@@ -995,11 +998,15 @@ bool PartSet_SketcherMgr::isDistanceKind(std::string& theKind)
 
 void PartSet_SketcherMgr::startSketch(ModuleBase_Operation* theOperation)
 {
+  static Events_ID EVENT_ATTR = Events_Loop::loop()->eventByName(EVENT_VISUAL_ATTRIBUTES);
+  static Events_ID EVENT_DISP = Events_Loop::loop()->eventByName(EVENT_OBJECT_TO_REDISPLAY);
+
   ModuleBase_OperationFeature* aFOperation = dynamic_cast<ModuleBase_OperationFeature*>
                                                                (getCurrentOperation());
   if (!aFOperation)
     return;
 
+  myIsSketchStarted = true;
   SketcherPrs_Tools::setPixelRatio(ModuleBase_Tools::currentPixelRatio());
 
   myModule->onViewTransformed();
@@ -1067,7 +1074,6 @@ void PartSet_SketcherMgr::startSketch(ModuleBase_Operation* theOperation)
   myModule->overconstraintListener()->setActive(true);
   // Display sketcher objects
   QStringList anInfo;
-  Events_ID EVENT_DISP = Events_Loop::loop()->eventByName(EVENT_OBJECT_TO_REDISPLAY);
   const ModelAPI_EventCreator* aECreator = ModelAPI_EventCreator::get();
   aNumberOfSubs = myCurrentSketch->numberOfSubs();
   for (int i = 0; i < aNumberOfSubs; i++) {
@@ -1088,6 +1094,7 @@ void PartSet_SketcherMgr::startSketch(ModuleBase_Operation* theOperation)
       aECreator->sendUpdated(aFeature, EVENT_DISP);
     else
       aFeature->setDisplayed(true);
+    aECreator->sendUpdated(aFeature, EVENT_ATTR);
   }
 #ifdef DEBUG_SKETCHER_ENTITIES
   QString anInfoStr = anInfo.join(";\t");
@@ -1104,7 +1111,8 @@ void PartSet_SketcherMgr::startSketch(ModuleBase_Operation* theOperation)
   workshop()->selectionActivate()->updateSelectionFilters();
   workshop()->selectionActivate()->updateSelectionModes();
 
-  Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_TO_REDISPLAY));
+  Events_Loop::loop()->flush(EVENT_DISP);
+  Events_Loop::loop()->flush(EVENT_ATTR);
 
   myExternalPointsMgr = new PartSet_ExternalPointsMgr(myModule->workshop(), myCurrentSketch);
 
@@ -1120,6 +1128,8 @@ void PartSet_SketcherMgr::stopSketch(ModuleBase_Operation* theOperation)
   PartSet_Fitter* aFitter = (PartSet_Fitter*)myModule->workshop()->viewer()->fitter();
   myModule->workshop()->viewer()->setFitter(0);
   delete aFitter;
+
+  myIsSketchStarted = false;
 
   myIsMouseOverWindow = false;
   myIsConstraintsShown[PartSet_Tools::Geometrical] = true;
@@ -1779,26 +1789,26 @@ void PartSet_SketcherMgr::widgetStateChanged(int thePreviousState)
   }
 }
 
-void PartSet_SketcherMgr::customizePresentation(const ObjectPtr& theObject)
-{
-  ModuleBase_OperationFeature* aFOperation = dynamic_cast<ModuleBase_OperationFeature*>
-                                                                           (getCurrentOperation());
-  if (aFOperation && (PartSet_SketcherMgr::isSketchOperation(aFOperation) ||
-                      isNestedSketchOperation(aFOperation)))
-    SketcherPrs_Tools::sendExpressionShownEvent(myIsConstraintsShown[PartSet_Tools::Expressions]);
-
-  // update entities selection priorities
-  FeaturePtr aFeature = ModelAPI_Feature::feature(theObject);
-  if (aFeature.get() && PartSet_SketcherMgr::isEntity(aFeature->getKind())) {
-    // update priority for feature
-    updateSelectionPriority(aFeature, aFeature);
-    // update priority for results of the feature
-    std::list<ResultPtr> aResults = aFeature->results();
-    std::list<ResultPtr>::const_iterator anIt = aResults.begin(), aLastIt = aResults.end();
-    for (; anIt != aLastIt; anIt++)
-      updateSelectionPriority(*anIt, aFeature);
-  }
-}
+//void PartSet_SketcherMgr::customisePresentation(const ObjectPtr& theObject)
+//{
+//  ModuleBase_OperationFeature* aFOperation = dynamic_cast<ModuleBase_OperationFeature*>
+//                                                                           (getCurrentOperation());
+//  if (aFOperation && (PartSet_SketcherMgr::isSketchOperation(aFOperation) ||
+//                      isNestedSketchOperation(aFOperation)))
+//    SketcherPrs_Tools::sendExpressionShownEvent(myIsConstraintsShown[PartSet_Tools::Expressions]);
+//
+//  // update entities selection priorities
+//  FeaturePtr aFeature = ModelAPI_Feature::feature(theObject);
+//  if (aFeature.get() && PartSet_SketcherMgr::isEntity(aFeature->getKind())) {
+//    // update priority for feature
+//    updateSelectionPriority(aFeature, aFeature);
+//    // update priority for results of the feature
+//    std::list<ResultPtr> aResults = aFeature->results();
+//    std::list<ResultPtr>::const_iterator anIt = aResults.begin(), aLastIt = aResults.end();
+//    for (; anIt != aLastIt; anIt++)
+//      updateSelectionPriority(*anIt, aFeature);
+//  }
+//}
 
 ModuleBase_Operation* PartSet_SketcherMgr::getCurrentOperation() const
 {
@@ -2142,6 +2152,128 @@ void PartSet_SketcherMgr::processEvent(const std::shared_ptr<Events_Message>& th
   }
 }
 
+bool isExternal(const ObjectPtr& theObject)
+{
+  AttributeSelectionPtr aAttr =
+    theObject->data()->selection(SketchPlugin_SketchEntity::EXTERNAL_ID());
+  if (aAttr)
+    return aAttr->context().get() != NULL && !aAttr->isInvalid();
+  return false;
+}
+
+bool isCopy(const ObjectPtr& theObject)
+{
+  AttributeBooleanPtr anAttr = theObject->data()->boolean(SketchPlugin_SketchEntity::COPY_ID());
+  if (anAttr.get())
+    return anAttr->value();
+  return false;
+}
+
+bool isIncludeToResult(const ObjectPtr& theObject)
+{
+  AttributeBooleanPtr anAttr;
+  std::set<AttributePtr> aRefsToMe = theObject->data()->refsToMe();
+  std::set<AttributePtr>::const_iterator aIt;
+  for (aIt = aRefsToMe.cbegin(); aIt != aRefsToMe.cend(); ++aIt) {
+    if ((*aIt)->id() == SketchPlugin_Projection::PROJECTED_FEATURE_ID()) {
+      FeaturePtr aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>((*aIt)->owner());
+      if (aFeature.get()) {
+        anAttr = aFeature->data()->boolean(SketchPlugin_Projection::INCLUDE_INTO_RESULT());
+        if (anAttr.get())
+          return anAttr->value();
+      }
+    }
+  }
+  return true;
+}
+
+
+void PartSet_SketcherMgr::customizeSketchPresentation(const ObjectPtr& theObject,
+  const AISObjectPtr& thePrs) const
+{
+  FeaturePtr aFeature = ModelAPI_Feature::feature(theObject);
+  PartSet_OverconstraintListener* aOCListener = myModule->overconstraintListener();
+
+  // Check constraints objects
+  const QStringList& aConstrIds = constraintsIdList();
+  std::string aKind = aFeature->getKind();
+  if (aConstrIds.contains(QString(aKind.c_str()))) {
+    std::vector<int> aColor;
+    if (aOCListener->isConflictingObject(theObject))
+      aColor = Config_PropManager::color("Visualization", "sketch_overconstraint_color");
+    else if (isDistanceKind(aKind))
+      aColor = Config_PropManager::color("Visualization", "sketch_dimension_color");
+
+    if (!aColor.empty())
+      thePrs->setColor(aColor[0], aColor[1], aColor[2]);
+    return;
+  }
+  int aShapeType = thePrs->getShapeType();
+  // a compound is processed like the edge because the
+  // arc feature uses the compound for presentable AIS
+  if (aShapeType != 6/*an edge*/ && aShapeType != 7/*a vertex*/ && aShapeType != 0/*compound*/)
+    return;
+
+  // set color from preferences
+  std::shared_ptr<ModelAPI_AttributeBoolean> anAuxiliaryAttr =
+    aFeature->data()->boolean(SketchPlugin_SketchEntity::AUXILIARY_ID());
+  bool isConstruction = anAuxiliaryAttr.get() != NULL && anAuxiliaryAttr->value();
+
+  std::vector<int> aColor;
+  if (aOCListener->isFullyConstrained())
+    aColor = Config_PropManager::color("Visualization", "sketch_fully_constrained_color");
+  else if (aOCListener->isConflictingObject(theObject))
+    aColor = Config_PropManager::color("Visualization", "sketch_overconstraint_color");
+  else {
+    if (isConstruction)
+      aColor = Config_PropManager::color("Visualization", "sketch_auxiliary_color");
+    else if (isExternal(aFeature))
+      aColor = Config_PropManager::color("Visualization", "sketch_external_color");
+    else
+      aColor = Config_PropManager::color("Visualization", "sketch_entity_color");
+  }
+  if (!aColor.empty()) {
+    // The code below causes redisplay again
+    if (ModelAPI_Session::get()->isOperation()) {
+      AttributeIntArrayPtr aColorAttr = theObject->data()->intArray(ModelAPI_Result::COLOR_ID());
+      if (aColorAttr.get()) {
+        aColorAttr->setSize(3);
+        // Set the color attribute in order do not use default colors in the presentation object
+        for (int i = 0; i < 3; i++)
+          aColorAttr->setValue(i, aColor[i], false);
+      }
+    }
+    thePrs->setColor(aColor[0], aColor[1], aColor[2]);
+  }
+
+  if (aShapeType == 6 || aShapeType == 0) { // if this is an edge or a compound
+    if (isConstruction) {
+      // Set axilliary line
+      thePrs->setWidth(SketchPlugin_SketchEntity::SKETCH_LINE_WIDTH_AUXILIARY());
+      thePrs->setLineStyle(SketchPlugin_SketchEntity::SKETCH_LINE_STYLE_AUXILIARY());
+    }
+    else {
+      int aWidth = Config_PropManager::integer("Visualization", "sketch_line_width");
+      thePrs->setWidth(aWidth);
+      thePrs->setLineStyle(SketchPlugin_SketchEntity::SKETCH_LINE_STYLE());
+    }
+  }
+  else if (aShapeType == 7) { // otherwise this is a vertex
+                              // The width value do not have effect on the point presentation.
+                              // It is defined in order to extend selection area of the object.
+    thePrs->setWidth(17);
+    //  thePrs->setPointMarker(1, 1.); // Set point as a '+' symbol
+  }
+  if (isCopy(aFeature) && !isIncludeToResult(aFeature)) {
+    double aWidth = thePrs->width();
+    thePrs->setWidth(aWidth / 2.5);
+  }
+
+  double aDeflection = Config_PropManager::real("Visualization", "construction_deflection");
+  thePrs->setDeflection(aDeflection);
+}
+
+//*************************************************************************************
 void PartSet_Fitter::fitAll(Handle(V3d_View) theView)
 {
   CompositeFeaturePtr aSketch = mySketchMgr->activeSketch();

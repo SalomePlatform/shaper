@@ -45,7 +45,6 @@
 #include "XGUI_Tools.h"
 #include "XGUI_ViewerProxy.h"
 #include "XGUI_WorkshopListener.h"
-#include <XGUI_CustomPrs.h>
 #include <XGUI_HistoryMenu.h>
 #include <XGUI_QtEvents.h>
 #include <XGUI_DataModel.h>
@@ -278,22 +277,6 @@ XGUI_Workshop::XGUI_Workshop(XGUI_SalomeConnector* theConnector)
 
   connect(myEventsListener, SIGNAL(errorOccurred(std::shared_ptr<Events_InfoMessage>)),
           myErrorDlg, SLOT(addError(std::shared_ptr<Events_InfoMessage>)));
-
-  //Config_PropManager::registerProp("Visualization", "object_default_color", "Object color",
-  //                                 Config_Prop::Color, "225,225,225");
-
-  Config_PropManager::registerProp("Visualization", "result_body_color", "Result color",
-                                   Config_Prop::Color, ModelAPI_ResultBody::DEFAULT_COLOR());
-  Config_PropManager::registerProp("Visualization", "result_group_color", "Group color",
-                                   Config_Prop::Color, ModelAPI_ResultGroup::DEFAULT_COLOR());
-  Config_PropManager::registerProp("Visualization", "result_construction_color",
-                                   "Construction color",
-                                   Config_Prop::Color,
-                                   ModelAPI_ResultConstruction::DEFAULT_COLOR());
-  Config_PropManager::registerProp("Visualization", "result_part_color", "Part color",
-                                   Config_Prop::Color, ModelAPI_ResultPart::DEFAULT_COLOR());
-  Config_PropManager::registerProp("Visualization", "result_field_color", "Field color",
-                                   Config_Prop::Color, ModelAPI_ResultField::DEFAULT_COLOR());
 
   if (ModuleBase_Preferences::resourceMgr()->booleanValue("Viewer", "face-selection", true))
     myViewerSelMode.append(TopAbs_FACE);
@@ -2299,7 +2282,7 @@ void XGUI_Workshop::changeColor(const QObjectPtrList& theObjects)
   foreach(ObjectPtr anObject, theObjects) {
     ResultPtr aResult = std::dynamic_pointer_cast<ModelAPI_Result>(anObject);
     if (aResult.get()) {
-      XGUI_CustomPrs::getResultColor(aResult, aColor);
+      ModelAPI_Tools::getColor(aResult, aColor);
     }
     else {
       // TODO: remove the obtaining a color from the AIS object
@@ -2412,7 +2395,7 @@ void XGUI_Workshop::changeDeflection(const QObjectPtrList& theObjects)
   foreach(ObjectPtr anObject, theObjects) {
     ResultPtr aResult = std::dynamic_pointer_cast<ModelAPI_Result>(anObject);
     if (aResult.get()) {
-      aDeflection = XGUI_CustomPrs::getResultDeflection(aResult);
+      aDeflection = ModelAPI_Tools::getDeflection(aResult);
     }
     else {
       // TODO: remove the obtaining a property from the AIS object
@@ -2475,7 +2458,7 @@ void XGUI_Workshop::changeTransparency(const QObjectPtrList& theObjects)
   foreach(ObjectPtr anObject, theObjects) {
     ResultPtr aResult = std::dynamic_pointer_cast<ModelAPI_Result>(anObject);
     if (aResult.get()) {
-      aCurrentValue = XGUI_CustomPrs::getResultTransparency(aResult);
+      aCurrentValue = ModelAPI_Tools::getTransparency(aResult);
     }
     if (aCurrentValue > 0)
       break;

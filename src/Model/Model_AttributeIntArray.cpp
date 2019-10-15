@@ -68,11 +68,13 @@ void Model_AttributeIntArray::setSize(const int theSize)
 }
 
 void Model_AttributeIntArray::setValue(const int theIndex,
-                                       const int theValue)
+                                       const int theValue,
+                                       bool sendUpdated)
 {
   if (myArray->Value(theIndex) != theValue) {
     myArray->SetValue(theIndex, theValue);
-    owner()->data()->sendAttributeUpdated(this);
+    if (sendUpdated)
+      owner()->data()->sendAttributeUpdated(this);
   }
 }
 

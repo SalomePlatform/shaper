@@ -97,7 +97,7 @@ protected:
   ///                   if forced redisplay is false
   /// \param theForceRedisplay a flag to customize object even always
   /// \return true if the object is modified
-  bool customizeCurrentObject(const std::set<ObjectPtr>& theObjects, bool theForceRedisplay);
+  bool customizeFeature(const std::set<ObjectPtr>& theObjects, bool theForceRedisplay);
 
   /// Returns the workshop
   XGUI_Workshop* workshop() const;

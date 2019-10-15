@@ -445,6 +445,8 @@ private:
   bool myIsValueStateBlocked;
   /// do not flush updated signal
   bool myFlushUpdateBlocked;
+
+  bool myUpdateVisualAttributes;
 };
 
 #endif

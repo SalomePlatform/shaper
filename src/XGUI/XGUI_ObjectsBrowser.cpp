@@ -31,6 +31,7 @@
 #include <ModuleBase_ITreeNode.h>
 
 #include <XGUI_Workshop.h>
+#include <XGUI_Displayer.h>
 
 #include <QLayout>
 #include <QLineEdit>
@@ -227,6 +228,8 @@ void XGUI_DataTree::processHistoryChange(const QModelIndex& theIndex)
     update(aModel->index(i, 1, aParent));
     update(aModel->index(i, 2, aParent));
   }
+  XGUI_ObjectsBrowser* aObjBrowser = qobject_cast<XGUI_ObjectsBrowser*>(parent());
+  aObjBrowser->workshop()->displayer()->updateViewer();
 }
 
 void XGUI_DataTree::processEyeClick(const QModelIndex& theIndex)

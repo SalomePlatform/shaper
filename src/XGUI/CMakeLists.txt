@@ -36,7 +36,6 @@ SET(PROJECT_HEADERS
     XGUI_ActiveControlSelector.h
     XGUI_ColorDialog.h
     XGUI_ContextMenuMgr.h
-    XGUI_CustomPrs.h
     XGUI_DataModel.h
     XGUI_DeflectionDialog.h
     XGUI_Displayer.h
@@ -104,7 +103,6 @@ SET(PROJECT_SOURCES
     XGUI_ActiveControlMgr.cpp
     XGUI_ColorDialog.cpp
     XGUI_ContextMenuMgr.cpp
-    XGUI_CustomPrs.cpp
     XGUI_DataModel.cpp
     XGUI_DeflectionDialog.cpp
     XGUI_Displayer.cpp

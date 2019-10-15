@@ -17,10 +17,11 @@
 // See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 
-#include <PartSet_CustomPrs.h>
-#include <PartSet_Module.h>
+#include "PartSet_CustomPrs.h"
+#include "PartSet_Module.h"
 #include "PartSet_OperationPrs.h"
 #include "PartSet_OverconstraintListener.h"
+#include "PartSet_SketcherMgr.h"
 
 #include <XGUI_ModuleConnector.h>
 #include <XGUI_Workshop.h>
@@ -29,6 +30,9 @@
 #include <ModuleBase_IWorkshop.h>
 #include <ModuleBase_IViewer.h>
 #include <ModuleBase_Tools.h>
+
+#include <ModelAPI_Tools.h>
+#include <SketchPlugin_Sketch.h>
 
 #include <Config_PropManager.h>
 #include <Events_Loop.h>
@@ -68,12 +72,22 @@ bool PartSet_CustomPrs::activate(const FeaturePtr& theFeature,
 #ifdef DO_NOT_VISUALIZE_CUSTOM_PRESENTATION
   return false;
 #endif
-
-  myIsActive[theFlag] = true;
-  myFeature = theFeature;
-
   bool isModified = false;
+
+  // Do not call customisation for sketcher and all its sub-objects
+  if (theFeature->getKind() == SketchPlugin_Sketch::ID())
+    return isModified;
+
+  FeaturePtr aParent = ModelAPI_Tools::compositeOwner(theFeature);
+  if (aParent.get()) {
+    std::string aType = aParent->getKind();
+    if (aType == SketchPlugin_Sketch::ID())
+      return isModified;
+  }
+
   if (theFeature.get()) {
+    myIsActive[theFlag] = true;
+    myFeature = theFeature;
     displayPresentation(theFlag, theUpdateViewer);
     isModified = true;
   }

@@ -50,13 +50,13 @@
 
 //**************************************************************
 ModuleBase_ModelWidget::ModuleBase_ModelWidget(QWidget* theParent,
-                                               const Config_WidgetAPI* theData)
-    : QWidget(theParent),
-      myIsEditing(false),
-      myState(Stored),
-      myIsValueStateBlocked(false),
-      myFlushUpdateBlocked(false),
-      myWidgetValidator(0)
+  const Config_WidgetAPI* theData)
+  : QWidget(theParent),
+  myIsEditing(false),
+  myState(Stored),
+  myIsValueStateBlocked(false),
+  myFlushUpdateBlocked(false),
+  myWidgetValidator(0)
 {
 #ifdef DEBUG_WIDGET_INSTANCE
   qDebug("ModuleBase_ModelWidget::ModuleBase_ModelWidget");
@@ -67,6 +67,8 @@ ModuleBase_ModelWidget::ModuleBase_ModelWidget(QWidget* theParent,
   myIsInternal = theData->getBooleanAttribute(ATTR_INTERNAL, false);
 
   myIsModifiedInEdit = theData->getProperty(ATTR_MODIFIED_IN_EDIT);
+
+  myUpdateVisualAttributes = theData->getBooleanAttribute(ATTR_VISUAL_CHANGED, false);
 
   myDefaultValue = theData->getProperty(ATTR_DEFAULT);
   myUseReset = theData->getBooleanAttribute(ATTR_USE_RESET, true);
@@ -437,6 +439,10 @@ void ModuleBase_ModelWidget::updateObject(ObjectPtr theObject)
 #ifdef DEBUG_WIDGET_INSTANCE
     qDebug("ModuleBase_ModelWidget::updateObject");
 #endif
+    if (myFeature.get() && myUpdateVisualAttributes) {
+      static const Events_ID anEvent = Events_Loop::eventByName(EVENT_VISUAL_ATTRIBUTES);
+      ModelAPI_EventCreator::get()->sendUpdated(myFeature, anEvent);
+    }
     ModuleBase_Tools::flushUpdated(theObject);
     emit objectUpdated();
   }

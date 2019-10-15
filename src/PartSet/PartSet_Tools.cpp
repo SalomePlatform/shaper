@@ -36,6 +36,7 @@
 #include <ModelGeomAlgo_Point2D.h>
 
 #include <Events_Loop.h>
+#include <Events_InfoMessage.h>
 
 #include <SketcherPrs_Tools.h>
 
@@ -53,6 +54,7 @@
 #include <GeomAPI_Pnt.h>
 #include <GeomAPI_Edge.h>
 #include <GeomAPI_Vertex.h>
+#include <GeomAPI_ShapeExplorer.h>
 
 #include <GeomAPI_Dir.h>
 #include <GeomAPI_XYZ.h>
@@ -789,4 +791,59 @@ void PartSet_Tools::getFirstAndLastIndexInFolder(const ObjectPtr& theFolder,
 
   theFirst = aDoc->index(aFirstFeatureInFolder);
   theLast = aDoc->index(aLastFeatureInFolder);
+}
+
+
+void PartSet_Tools::getDefaultColor(ObjectPtr theObject, const bool isEmptyColorValid,
+  std::vector<int>& theColor)
+{
+  theColor.clear();
+  // get default color from the preferences manager for the given result
+  if (theColor.empty()) {
+    std::string aSection, aName, aDefault;
+    theObject->colorConfigInfo(aSection, aName, aDefault);
+    if (!aSection.empty() && !aName.empty()) {
+      theColor = Config_PropManager::color(aSection, aName);
+    }
+  }
+  if (!isEmptyColorValid && theColor.empty()) {
+    // all AIS objects, where the color is not set, are in black.
+    // The color should be defined in XML or set in the attribute
+    theColor = Config_PropManager::color("Visualization", "object_default_color");
+    Events_InfoMessage("PartSet_Tools",
+      "A default color is not defined in the preferences for this result type").send();
+  }
+}
+
+double PartSet_Tools::getDefaultDeflection(const ObjectPtr& theObject)
+{
+  double aDeflection = -1;
+  ResultPtr aResult = std::dynamic_pointer_cast<ModelAPI_Result>(theObject);
+  if (aResult.get()) {
+    bool isConstruction = false;
+
+    std::string aResultGroup = aResult->groupName();
+    if (aResultGroup == ModelAPI_ResultConstruction::group())
+      isConstruction = true;
+    else if (aResultGroup == ModelAPI_ResultBody::group()) {
+      GeomShapePtr aGeomShape = aResult->shape();
+      if (aGeomShape.get()) {
+        // if the shape could not be exploded on faces, it contains only wires, edges, and vertices
+        // correction of deviation for them should not influence to the application performance
+        GeomAPI_ShapeExplorer anExp(aGeomShape, GeomAPI_Shape::FACE);
+        isConstruction = !anExp.more();
+      }
+    }
+    if (isConstruction)
+      aDeflection = Config_PropManager::real("Visualization", "construction_deflection");
+    else
+      aDeflection = Config_PropManager::real("Visualization", "body_deflection");
+  }
+  return aDeflection;
+}
+
+
+double PartSet_Tools::getDefaultTransparency()
+{
+  return Config_PropManager::integer("Visualization", "shaper_default_transparency") / 100.;
 }

@@ -26,6 +26,7 @@
 #include <ModelAPI_Attribute.h>
 #include <ModelAPI_AttributeRefAttr.h>
 #include <GeomAPI_Shape.h>
+#include <GeomAPI_AISObject.h>
 #include <GeomDataAPI_Point2D.h>
 #include <GeomAlgoAPI_ShapeTools.h>
 
@@ -135,9 +136,16 @@ void convertRefAttrToPointOrTangentCurve(const AttributeRefAttrPtr&      theRefA
                                          std::shared_ptr<GeomAPI_Shape>& theTangentCurve,
                                          std::shared_ptr<GeomAPI_Pnt2d>& thePassingPoint);
 
-
 /// Calculate global coordinates for flyout point of Length constraint
 GeomPnt2dPtr flyoutPointCoordinates(const std::shared_ptr<SketchPlugin_Constraint>& theConstraint);
+
+/// Sets attributes of feature presentation
+/// \param[in] thePrs a presentation
+/// \param[in] isAxiliary is axiliary flag
+void customizeFeaturePrs(const AISObjectPtr& thePrs, bool isAxiliary);
+
+void setDimensionColor(const AISObjectPtr& theDimPrs);
+
 }; // namespace SketchPlugin_Tools
 
 namespace SketchPlugin_SegmentationTools

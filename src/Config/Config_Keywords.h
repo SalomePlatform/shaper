@@ -104,6 +104,7 @@ const static char* ATTR_GREED = "greed";
 const static char* ATTR_MODIFIED_IN_EDIT = "modified_in_edit";
 const static char* ATTR_MAIN_ARG = "main_argument";
 const static char* ATTR_GEOMETRICAL_SELECTION = "geometrical_selection";
+const static char* ATTR_VISUAL_CHANGED = "change_visual_attributes";
 
 
 // WDG_INFO properties
