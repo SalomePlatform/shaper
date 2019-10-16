@@ -49,6 +49,7 @@ After the plane for sketch is selected, the following property panel will be ope
 - **Show dimensional constraints** check box - displays/hides dimensional constraints; 
 - **Show existing expressions** check box - displays/hides expressions.
 - **Show free points** check box - highlights free points in the current sketch if it is checked.
+- **Automatic constraints** - automatically crerate horizontal or vertical constraints if angle between created line and horizontal or vertical less then angular tolerance (defined in preferences).
 - **Change sketch plane** button - allows to change working plane of the current sketch.
 
 Now it is possible to:
