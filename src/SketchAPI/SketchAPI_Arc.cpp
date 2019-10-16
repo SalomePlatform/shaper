@@ -29,9 +29,6 @@
 #include <SketchPlugin_ConstraintCoincidence.h>
 #include <SketchPlugin_ConstraintTangent.h>
 
-/// Obtain constraints prepared by tangent arc
-static std::list<FeaturePtr> tangentArcConstraints(const FeaturePtr& theArc);
-
 //================================================================================================
 SketchAPI_Arc::SketchAPI_Arc(const std::shared_ptr<ModelAPI_Feature> & theFeature)
 : SketchAPI_SketchEntity(theFeature)

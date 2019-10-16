@@ -132,6 +132,13 @@ class SketchPlugin_MacroArc: public SketchPlugin_SketchEntity,
     return ID;
   }
 
+  /// End 2D point of the arc
+  inline static const std::string& END_POINT_4_ID()
+  {
+    static const std::string ID = "end_point_4";
+    return ID;
+  }
+
   inline static const std::string& END_POINT_REF_ID()
   {
     static const std::string ID = "end_point_ref";
@@ -154,6 +161,12 @@ class SketchPlugin_MacroArc: public SketchPlugin_SketchEntity,
   static const std::string& TANGENT_POINT_ID()
   {
     static const std::string ID("tangent_point");
+    return ID;
+  }
+
+  static const std::string& TRANSVERSAL_POINT_ID()
+  {
+    static const std::string ID("transversal_point");
     return ID;
   }
 

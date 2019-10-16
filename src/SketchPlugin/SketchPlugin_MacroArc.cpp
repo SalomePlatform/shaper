@@ -154,6 +154,9 @@ void SketchPlugin_MacroArc::initAttributes()
   data()->addAttribute(TANGENT_POINT_ID(), ModelAPI_AttributeRefAttr::typeId());
   data()->addAttribute(END_POINT_3_ID(), GeomDataAPI_Point2D::typeId());
 
+  data()->addAttribute(TRANSVERSAL_POINT_ID(), ModelAPI_AttributeRefAttr::typeId());
+  data()->addAttribute(END_POINT_4_ID(), GeomDataAPI_Point2D::typeId());
+
   data()->addAttribute(REVERSED_ID(), ModelAPI_AttributeBoolean::typeId());
 
   data()->addAttribute(RADIUS_ID(), ModelAPI_AttributeDouble::typeId());
@@ -196,6 +199,8 @@ void SketchPlugin_MacroArc::attributeChanged(const std::string& theID)
     SketchPlugin_Tools::resetAttribute(this, PASSED_POINT_REF_ID());
     SketchPlugin_Tools::resetAttribute(this, TANGENT_POINT_ID());
     SketchPlugin_Tools::resetAttribute(this, END_POINT_3_ID());
+    SketchPlugin_Tools::resetAttribute(this, TRANSVERSAL_POINT_ID());
+    SketchPlugin_Tools::resetAttribute(this, END_POINT_4_ID());
     SketchPlugin_Tools::resetAttribute(this, REVERSED_ID());
     SketchPlugin_Tools::resetAttribute(this, RADIUS_ID());
     SketchPlugin_Tools::resetAttribute(this, ANGLE_ID());
@@ -344,8 +349,10 @@ void SketchPlugin_MacroArc::execute()
                                          true);
   } else {
     // coincident with connection point
+    const std::string& aPointAttr = anArcType == ARC_TYPE_BY_TANGENT_EDGE() ?
+                                                 TANGENT_POINT_ID() : TRANSVERSAL_POINT_ID();
     SketchPlugin_Tools::createCoincidenceOrTangency(this,
-                                         TANGENT_POINT_ID(),
+                                         aPointAttr,
                                          anArcFeature->attribute(SketchPlugin_Arc::START_ID()),
                                          ObjectPtr(),
                                          false);
@@ -358,7 +365,7 @@ void SketchPlugin_MacroArc::execute()
     // setting attributes of the start point constraint
     AttributeRefAttrPtr aRefAttrA =
         aStartPointConstraint->refattr(SketchPlugin_Constraint::ENTITY_A());
-    AttributeRefAttrPtr aTgPntRefAttr = refattr(TANGENT_POINT_ID());
+    AttributeRefAttrPtr aTgPntRefAttr = refattr(aPointAttr);
     FeaturePtr aTgFeature = ModelAPI_Feature::feature(aTgPntRefAttr->attr()->owner());
     aRefAttrA->setObject(aTgFeature->lastResult());
     AttributeRefAttrPtr aRefAttrB =
@@ -398,10 +405,17 @@ std::string SketchPlugin_MacroArc::processEvent(const std::shared_ptr<Events_Mes
     aFilledAttributeName = ARC_TYPE();
     if(anArcType == ARC_TYPE_BY_TANGENT_EDGE()) {
       aFilledAttributeName = TANGENT_POINT_ID();
-      AttributeRefAttrPtr aRefAttr = std::dynamic_pointer_cast<ModelAPI_AttributeRefAttr>(
-                                                        attribute(aFilledAttributeName));
+      AttributeRefAttrPtr aRefAttr = refattr(aFilledAttributeName);
       FeaturePtr aCreatedFeature = aReentrantMessage->createdFeature();
       aRefAttr->setAttr(aCreatedFeature->attribute(SketchPlugin_Arc::END_ID()));
+    }
+    else if (anArcType == ARC_TYPE_BY_TRANSVERSAL_LINE()) {
+      AttributeRefAttrPtr aRefAttr = refattr(TRANSVERSAL_POINT_ID());
+      AttributePtr anAttribute = aReentrantMessage->selectedAttribute();
+      if (anAttribute) {
+        aRefAttr->setAttr(anAttribute);
+        aFilledAttributeName = TRANSVERSAL_POINT_ID();
+      }
     }
     else {
       ObjectPtr anObject = aReentrantMessage->selectedObject();
@@ -609,7 +623,10 @@ void SketchPlugin_MacroArc::recalculateReversedFlagByPassed(
 
 void SketchPlugin_MacroArc::fillByEdge(bool theTransversal)
 {
-  AttributeRefAttrPtr aTangentAttr = refattr(TANGENT_POINT_ID());
+  const std::string& aStartPoint = theTransversal ? TRANSVERSAL_POINT_ID() : TANGENT_POINT_ID();
+  const std::string& aEndPoint = theTransversal ? END_POINT_4_ID() : END_POINT_3_ID();
+
+  AttributeRefAttrPtr aTangentAttr = refattr(aStartPoint);
   if (!aTangentAttr->isInitialized())
     return;
 
@@ -619,7 +636,7 @@ void SketchPlugin_MacroArc::fillByEdge(bool theTransversal)
     return;
 
   AttributePoint2DPtr anEndPointAttr =
-      std::dynamic_pointer_cast<GeomDataAPI_Point2D>(attribute(END_POINT_3_ID()));
+      std::dynamic_pointer_cast<GeomDataAPI_Point2D>(attribute(aEndPoint));
   if (!anEndPointAttr->isInitialized())
     return;
 
