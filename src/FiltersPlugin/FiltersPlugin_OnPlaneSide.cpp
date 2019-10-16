@@ -42,8 +42,12 @@ bool FiltersPlugin_OnPlaneSide::isOk(const GeomShapePtr& theShape, const ResultP
   if (!aList.get())
     return false;
   GeomShapePtr aPlanarShape = aList->value();
-  if (!aPlanarShape)
-    aPlanarShape = aList->context()->shape();
+  if (!aPlanarShape) {
+    ResultPtr aContext = aList->context();
+    if (!aContext)
+      return false;
+    aPlanarShape = aContext->shape();
+  }
 
   GeomPlanePtr aPlane = aPlanarShape->face()->getPlane();
   GeomPointPtr aPlaneLoc = aPlane->location();
