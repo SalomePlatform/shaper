@@ -330,7 +330,9 @@ bool ModuleBase_WidgetMultiSelector::restoreValueCustom()
   if (aType == ModelAPI_AttributeSelectionList::typeId()) {
     // Restore shape type
     std::string aSelectionType = aSelectionListAttr->selectionType().c_str();
-    if (!aSelectionType.empty()) {
+    if (aSelectionType.empty())
+      aSelectionListAttr->setSelectionType(myDefMode);
+    else {
       setCurrentShapeType(ModuleBase_Tools::shapeType(aSelectionType.c_str()));
       myDefMode = aSelectionType;
       myIsFirst = false;
