@@ -83,8 +83,8 @@ class compoundVertices(model.Feature):
                         return
                     x = float(coord[0]); y = float(coord[1]); z = float(coord[2]);
                     point = model.addPoint(part, x,y,z); point.execute(True); self.lfeatures.append(point)
-                    vertex = model.addVertex(part, [point.result()]); vertex.execute(True); self.lfeatures.append(vertex)
-                    lVertices.append(vertex.result())
+                    #vertex = model.addVertex(part, [point.result()]); vertex.execute(True); self.lfeatures.append(vertex)
+                    lVertices.append(point.result())
                 file.close()
                 compound = model.addCompound(part, lVertices)
                 compound.execute(True); self.lfeatures.append(compound)
