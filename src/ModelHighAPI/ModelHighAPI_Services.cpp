@@ -27,6 +27,7 @@
 #include <ModelAPI_Events.h>
 
 #include <cmath>
+#include <sstream>
 
 //--------------------------------------------------------------------------------------
 std::shared_ptr<ModelAPI_Document> moduleDocument()
@@ -97,7 +98,10 @@ std::shared_ptr<ModelAPI_Result> standardPlane(const std::string & theName){
 //--------------------------------------------------------------------------------------
 void begin()
 {
-  ModelAPI_Session::get()->startOperation();
+  static int aTransactionID = 0;
+  std::ostringstream aTransactionName;
+  aTransactionName << "Operation_" << ++aTransactionID;
+  ModelAPI_Session::get()->startOperation(aTransactionName.str());
 }
 
 void end()
@@ -119,7 +123,7 @@ void apply()
 {
   auto aSession = ModelAPI_Session::get();
   aSession->finishOperation();
-  aSession->startOperation();
+  begin();
 }
 
 void updateFeatures()

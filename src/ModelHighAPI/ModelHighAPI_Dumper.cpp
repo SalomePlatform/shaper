@@ -663,8 +663,12 @@ bool ModelHighAPI_Dumper::process(const std::shared_ptr<ModelAPI_Document>& theD
   // dump all other features
   for (anObjIt = anObjects.begin(); anObjIt != anObjects.end(); ++anObjIt) {
     CompositeFeaturePtr aCompFeat = std::dynamic_pointer_cast<ModelAPI_CompositeFeature>(*anObjIt);
-    if (aCompFeat) // iteratively process composite features
-      isOk = process(aCompFeat) && isOk;
+    if (aCompFeat) {
+      // iteratively process composite features,
+      // if the composite feature is the last in the document, no need to dump "model.do()" action
+      std::list<ObjectPtr>::const_iterator aNext = anObjIt;
+      isOk = process(aCompFeat, false, ++aNext != anObjects.end()) && isOk;
+    }
     else if (!isDumped(EntityPtr(*anObjIt))) {
       // dump folder
       FolderPtr aFolder = std::dynamic_pointer_cast<ModelAPI_Folder>(*anObjIt);
@@ -683,7 +687,7 @@ bool ModelHighAPI_Dumper::process(const std::shared_ptr<ModelAPI_Document>& theD
 }
 
 bool ModelHighAPI_Dumper::process(const std::shared_ptr<ModelAPI_CompositeFeature>& theComposite,
-                                  bool isForce)
+                                  bool isForce, bool isDumpModelDo)
 {
   // increase composite features stack
   ++gCompositeStackDepth;
@@ -716,7 +720,9 @@ bool ModelHighAPI_Dumper::process(const std::shared_ptr<ModelAPI_CompositeFeatur
     *this << aDocName << " = " << aPartName << ".document()" << std::endl;
     // dump features in the document
     bool aRes = process(aSubDoc);
-    *this << "model.do()" << std::endl;
+    if (isDumpModelDo)
+      *this << "model.do()\n";
+    *this << std::endl;
     return aRes;
   }
 
