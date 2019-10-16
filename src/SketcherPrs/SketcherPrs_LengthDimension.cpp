@@ -122,12 +122,7 @@ SketcherPrs_LengthDimension::SketcherPrs_LengthDimension(ModelAPI_Feature* theCo
   SetDimensionAspect(createDimensionAspect());
   myStyleListener = new SketcherPrs_DimensionStyleListener();
 
-#ifdef OCCT_28850_FIXED
-  if (theConstraint->getKind() == SketchPlugin_ConstraintDistanceHorizontal::ID())
-    SetDirection(plane()->dirX()->impl<gp_Dir>(), true);
-  else if (theConstraint->getKind() == SketchPlugin_ConstraintDistanceVertical::ID())
-    SetDirection(plane()->dirY()->impl<gp_Dir>(), true);
-#endif
+  setDirection(theConstraint, plane());
 }
 
 SketcherPrs_LengthDimension::~SketcherPrs_LengthDimension()
@@ -166,6 +161,8 @@ void SketcherPrs_LengthDimension::Compute(
     else
       anAttributeValue = aData->real(SketchPlugin_Constraint::VALUE());
     myValue.init(anAttributeValue);
+
+    setDirection(myConstraint, plane());
   }
 
   // compute flyout distance
@@ -317,4 +314,15 @@ void SketcherPrs_LengthDimension::ComputeSelection(const Handle(SelectMgr_Select
   }
   SetSelToleranceForText2d(SketcherPrs_Tools::getArrowSize()/5.);
   AIS_LengthDimension::ComputeSelection(aSelection, aMode);
+}
+
+void SketcherPrs_LengthDimension::setDirection(ModelAPI_Feature* theConstraint,
+                                               const std::shared_ptr<GeomAPI_Ax3>& thePlane)
+{
+#ifdef OCCT_28850_FIXED
+  if (theConstraint->getKind() == SketchPlugin_ConstraintDistanceHorizontal::ID())
+    SetDirection(thePlane->dirX()->impl<gp_Dir>(), true);
+  else if (theConstraint->getKind() == SketchPlugin_ConstraintDistanceVertical::ID())
+    SetDirection(thePlane->dirY()->impl<gp_Dir>(), true);
+#endif
 }
