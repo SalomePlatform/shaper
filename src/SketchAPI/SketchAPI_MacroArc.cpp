@@ -29,9 +29,6 @@
 #include <SketchPlugin_ConstraintCoincidence.h>
 #include <SketchPlugin_ConstraintTangent.h>
 
-/// Obtain constraints prepared by tangent arc
-static std::list<FeaturePtr> tangentArcConstraints(const FeaturePtr& theArc);
-
 //================================================================================================
 SketchAPI_MacroArc::SketchAPI_MacroArc(const std::shared_ptr<ModelAPI_Feature> & theFeature)
 : SketchAPI_SketchEntity(theFeature)
@@ -195,7 +192,7 @@ void SketchAPI_MacroArc::setByTangent(const ModelHighAPI_RefAttr& theTangentPoin
                                  bool theInversed)
 {
   fillAttribute(SketchPlugin_MacroArc::ARC_TYPE_BY_TANGENT_EDGE(), myarcType);
-  fillAttribute(theTangentPoint, mytangentPoint);
+  fillAttribute(theTangentPoint, mytransversalPoint);
   fillAttribute(theEnd, myendPoint3);
   fillAttribute(theInversed, myreversed);
 
@@ -208,8 +205,8 @@ void SketchAPI_MacroArc::setByTransversal(const ModelHighAPI_RefAttr& theTransve
                                           bool theInversed)
 {
   fillAttribute(SketchPlugin_MacroArc::ARC_TYPE_BY_TRANSVERSAL_LINE(), myarcType);
-  fillAttribute(theTransversalPoint, mytangentPoint);
-  fillAttribute(endPoint3(), theEndX, theEndY);
+  fillAttribute(theTransversalPoint, mytransversalPoint);
+  fillAttribute(endPoint4(), theEndX, theEndY);
   fillAttribute(theInversed, myreversed);
 
   execute();
@@ -221,8 +218,8 @@ void SketchAPI_MacroArc::setByTransversal(const ModelHighAPI_RefAttr& theTransve
                                           bool theInversed)
 {
   fillAttribute(SketchPlugin_MacroArc::ARC_TYPE_BY_TRANSVERSAL_LINE(), myarcType);
-  fillAttribute(theTransversalPoint, mytangentPoint);
-  fillAttribute(theEnd, myendPoint3);
+  fillAttribute(theTransversalPoint, mytransversalPoint);
+  fillAttribute(theEnd, myendPoint4);
   fillAttribute(theInversed, myreversed);
 
   execute();

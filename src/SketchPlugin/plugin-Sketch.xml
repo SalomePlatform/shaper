@@ -277,13 +277,13 @@
           <box id="by_transversal_line"
                icon="icons/Sketch/arc_perp_32x32.png"
                title="Perpendicular to line">
-            <sketch_shape_selector id="tangent_point"
+            <sketch_shape_selector id="transversal_point"
                                    label="Point on the perpendicular line"
                                    tooltip="Select point on line"
                                    shape_types="vertex">
               <validator id="SketchPlugin_ArcTransversalPoint"/>
             </sketch_shape_selector>
-            <sketch-2dpoint_selector id="end_point_3"
+            <sketch-2dpoint_selector id="end_point_4"
                                      reference_attribute="end_point_ref"
                                      title="End point"
                                      tooltip="End point"

@@ -88,7 +88,7 @@ public:
   SKETCHAPI_EXPORT
   virtual ~SketchAPI_MacroArc();
 
-  INTERFACE_12(SketchPlugin_MacroArc::ID(),
+  INTERFACE_14(SketchPlugin_MacroArc::ID(),
                arcType, SketchPlugin_MacroArc::ARC_TYPE(),
                ModelAPI_AttributeString, /** Arc type */,
                center, SketchPlugin_MacroArc::CENTER_POINT_ID(),
@@ -106,6 +106,10 @@ public:
                tangentPoint, SketchPlugin_MacroArc::TANGENT_POINT_ID(),
                ModelAPI_AttributeRefAttr, /** Tangent point */,
                endPoint3, SketchPlugin_MacroArc::END_POINT_3_ID(),
+               GeomDataAPI_Point2D, /** End point */,
+               transversalPoint, SketchPlugin_MacroArc::TRANSVERSAL_POINT_ID(),
+               ModelAPI_AttributeRefAttr, /** Transversal point */,
+               endPoint4, SketchPlugin_MacroArc::END_POINT_4_ID(),
                GeomDataAPI_Point2D, /** End point */,
                reversed, SketchPlugin_MacroArc::REVERSED_ID(),
                ModelAPI_AttributeBoolean, /** Reversed flag */,
