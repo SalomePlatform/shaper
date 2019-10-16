@@ -348,7 +348,8 @@ private:
 
   /// Dump composite feature and all it sub-features
   bool process(const std::shared_ptr<ModelAPI_CompositeFeature>& theComposite,
-               bool isForce = false);
+               bool isForce = false,
+               bool isDumpModelDo = true);
 
   /// Iterate all features in composite feature and dump them into intermediate buffer
   /// \param theComposite   [in] parent composite feature
