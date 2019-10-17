@@ -49,4 +49,3 @@ separator = anImportFeature.string(aSeparatorName)
 separator.setValue(" ")
 aSession.finishOperation()
 
-assert(model.checkPythonDump())
