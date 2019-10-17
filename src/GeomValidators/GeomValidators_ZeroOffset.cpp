@@ -52,6 +52,7 @@ bool GeomValidators_ZeroOffset::isValid(const std::shared_ptr<ModelAPI_Feature>&
   if(theFeature->string(*anIt)) {
     aSelectedMethod = theFeature->string(*anIt)->value();
   }
+  if (aSelectedMethod == "ThroughAll") return true;
   anIt++;
   std::string aCreationMethod = *anIt;
   anIt++;

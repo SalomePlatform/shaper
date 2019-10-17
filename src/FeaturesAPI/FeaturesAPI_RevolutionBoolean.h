@@ -132,6 +132,13 @@ public:
   explicit FeaturesAPI_RevolutionCut(const std::shared_ptr<ModelAPI_Feature>& theFeature,
                                      const std::list<ModelHighAPI_Selection>& theBaseObjects,
                                      const ModelHighAPI_Selection& theAxis,
+                                     const std::list<ModelHighAPI_Selection>& theBooleanObjects);
+
+  /// Constructor with values.
+  FEATURESAPI_EXPORT
+  explicit FeaturesAPI_RevolutionCut(const std::shared_ptr<ModelAPI_Feature>& theFeature,
+                                     const std::list<ModelHighAPI_Selection>& theBaseObjects,
+                                     const ModelHighAPI_Selection& theAxis,
                                      const ModelHighAPI_Double& theAngle,
                                      const std::list<ModelHighAPI_Selection>& theBooleanObjects);
 
@@ -158,6 +165,14 @@ public:
 
 /// Pointer on RevolutionCut object.
 typedef std::shared_ptr<FeaturesAPI_RevolutionCut> RevolutionCutPtr;
+
+/// \ingroup CPPHighAPI
+/// \brief Create RevolutionCut feature.
+FEATURESAPI_EXPORT
+RevolutionCutPtr addRevolutionCut(const std::shared_ptr<ModelAPI_Document>& thePart,
+                                  const std::list<ModelHighAPI_Selection>& theBaseObjects,
+                                  const ModelHighAPI_Selection& theAxis,
+                                  const std::list<ModelHighAPI_Selection>& theBooleanObjects);
 
 /// \ingroup CPPHighAPI
 /// \brief Create RevolutionCut feature.
@@ -209,6 +224,13 @@ public:
   explicit FeaturesAPI_RevolutionFuse(const std::shared_ptr<ModelAPI_Feature>& theFeature,
                                       const std::list<ModelHighAPI_Selection>& theBaseObjects,
                                       const ModelHighAPI_Selection& theAxis,
+                                      const std::list<ModelHighAPI_Selection>& theBooleanObjects);
+
+  /// Constructor with values.
+  FEATURESAPI_EXPORT
+  explicit FeaturesAPI_RevolutionFuse(const std::shared_ptr<ModelAPI_Feature>& theFeature,
+                                      const std::list<ModelHighAPI_Selection>& theBaseObjects,
+                                      const ModelHighAPI_Selection& theAxis,
                                       const ModelHighAPI_Double& theAngle,
                                       const std::list<ModelHighAPI_Selection>& theBooleanObjects);
 
@@ -235,6 +257,14 @@ public:
 
 /// Pointer on RevolutionFuse object.
 typedef std::shared_ptr<FeaturesAPI_RevolutionFuse> RevolutionFusePtr;
+
+/// \ingroup CPPHighAPI
+/// \brief Create RevolutionFuse feature.
+FEATURESAPI_EXPORT
+RevolutionFusePtr addRevolutionFuse(const std::shared_ptr<ModelAPI_Document>& thePart,
+                                    const std::list<ModelHighAPI_Selection>& theBaseObjects,
+                                    const ModelHighAPI_Selection& theAxis,
+                                    const std::list<ModelHighAPI_Selection>& theBooleanObjects);
 
 /// \ingroup CPPHighAPI
 /// \brief Create RevolutionFuse feature.

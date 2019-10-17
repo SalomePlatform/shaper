@@ -210,9 +210,11 @@ ADD_UNIT_TESTS(TestExtrusion.py
                TestRevolutionCut.py
                TestRevolutionCut_ByAngle.py
                TestRevolutionCut_ByPlanesAndOffsets.py
+               TestRevolutionCut_ThroughAll.py
                TestRevolutionFuse.py
                TestRevolutionFuse_ByAngle.py
                TestRevolutionFuse_ByPlanesAndOffsets.py
+               TestRevolutionFuse_ThroughAll.py
                TestCompositeFeaturesOnCompSolids.py
                TestPartition.py
                TestPartition_ErrorMsg.py

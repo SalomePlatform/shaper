@@ -18,7 +18,7 @@ The following property panel will be opened:
 .. centered::
   Start sketch
   
-There are two variants of the property panel for Revolution Fuse depending on the chosen option:
+There are three variants of the property panel for Revolution Fuse depending on the chosen option:
 
 .. image:: images/revolution_by_angles.png
    :align: left
@@ -27,6 +27,10 @@ There are two variants of the property panel for Revolution Fuse depending on th
 .. image:: images/revolution_by_bounding_planes.png
    :align: left
 **By Bounding Planes** revolves objects by specifying bounding planes and angles.
+
+.. image:: images/revolution_through_all.png
+   :align: left
+**Through All** revolves objects by 360 degrees.
 
 
 By angles
@@ -121,3 +125,39 @@ The Result of the operation will be a revolved shape:
    **Revolution Fuse created**
 
 **See Also** a sample TUI Script of :ref:`tui_create_revolution_fuse_by_bounding_planes` operation.
+
+Through All
+-----------
+
+.. image:: images/RevolutionFuse3.png
+  :align: center
+
+.. centered::
+  Revolution Fuse: definition by bounding planes
+
+- **Base objects** - contains a list of objects selected in the Object Browser or in the Viewer, which will be revolved.
+- **Axis** - axis of revolution.
+- **Fuse with** - contains a list of objects which will be fused with the result of revolution.
+
+**TUI Command**:
+
+.. py:function:: model.addRevolutionFuse(part, objectsToRevolve, axis, objectToFuse)
+
+    :param part: The current part object.
+    :param list: A list of objects for revolution.
+    :param object: An axis.
+    :param list: A list of objects to fuse with.
+    :return: Created object.
+
+Result
+""""""
+
+The Result of the operation will be a revolved shape:
+
+.. image:: images/revolution_fuse_through_all_result.png
+	   :align: center
+
+.. centered::
+   **Revolution Fuse created**
+
+**See Also** a sample TUI Script of :ref:`tui_create_revolution_fuse_through_all` operation.
