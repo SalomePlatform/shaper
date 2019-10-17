@@ -650,6 +650,7 @@ AttributePtr PartSet_Tools::findAttributeBy2dPoint(ObjectPtr theObj,
           aFeature->data()->attributes(GeomDataAPI_Point2D::typeId());
         std::list<AttributePtr>::const_iterator anIt = anAttiributes.begin(),
                                                 aLast = anAttiributes.end();
+        double aMinDistance = 1.e-6; // searching for point with minimal distance and < 1.e-6
         for (; anIt != aLast && !anAttribute; anIt++) {
           std::shared_ptr<GeomDataAPI_Point2D> aCurPoint =
             std::dynamic_pointer_cast<GeomDataAPI_Point2D>(*anIt);
@@ -658,9 +659,12 @@ AttributePtr PartSet_Tools::findAttributeBy2dPoint(ObjectPtr theObj,
 
           std::shared_ptr<GeomAPI_Pnt> aPnt =
             convertTo3D(aCurPoint->x(), aCurPoint->y(), theSketch);
-          if (aPnt && (aPnt->distance(aValue) < Precision::Confusion())) {
-            anAttribute = aCurPoint;
-            break;
+          if (aPnt) {
+            double aDistance = aPnt->distance(aValue);
+            if (aDistance < aMinDistance) {
+              anAttribute = aCurPoint;
+              aMinDistance = aPnt->distance(aValue);
+            }
           }
         }
       }
