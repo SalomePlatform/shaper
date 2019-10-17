@@ -85,8 +85,6 @@ class Model_Document : public ModelAPI_Document
   MODEL_EXPORT virtual bool canUndo();
   //! Undoes last operation
   MODEL_EXPORT virtual void undo();
-  //! Clean the undo list
-  MODEL_EXPORT virtual void clearUndos();
   //! Returns True if there are available Redo-s
   MODEL_EXPORT virtual bool canRedo();
   //! Redoes last operation

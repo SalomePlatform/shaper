@@ -852,13 +852,6 @@ bool Model_Document::isModified()
   return myTransactions.size() != myTransactionSave || isOperation();
 }
 
-void Model_Document::clearUndos()
-{
-  myDoc->ClearUndos();
-  myTransactions.clear();
-  myRedos.clear();
-}
-
 bool Model_Document::canUndo()
 {
   // issue 406 : if transaction is opened, but nothing to undo behind, can not undo

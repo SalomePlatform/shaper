@@ -78,8 +78,6 @@ class MODELAPI_EXPORT ModelAPI_Session
   virtual bool canUndo() = 0;
   //! Undoes last operation
   virtual void undo() = 0;
-  //! Clean the undo list
-  virtual void clearUndos() = 0;
   //! Returns True if there are available Redos
   virtual bool canRedo() = 0;
   //! Redoes last operation

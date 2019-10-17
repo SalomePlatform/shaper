@@ -116,8 +116,6 @@ void end()
   }
 
   ModelAPI_Session::get()->finishOperation();
-  // issue #3044: clear undo/redo lists
-  ModelAPI_Session::get()->clearUndos();
   // to update data tree in the end of dumped script execution
   ModelAPI_EventCreator::get()->sendReordered(FeaturePtr());
 }

@@ -87,8 +87,6 @@ class Model_Session : public ModelAPI_Session, public Events_Listener
   MODEL_EXPORT virtual bool canUndo();
   //! Undoes last operation
   MODEL_EXPORT virtual void undo();
-  //! Clean the undo list
-  MODEL_EXPORT virtual void clearUndos();
   //! Returns True if there are available Redos
   MODEL_EXPORT virtual bool canRedo();
   //! Redoes last operation
