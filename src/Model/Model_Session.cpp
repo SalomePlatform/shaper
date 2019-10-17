@@ -143,11 +143,6 @@ bool Model_Session::isModified()
   return ROOT_DOC->isModified();
 }
 
-void Model_Session::clearUndos()
-{
-  ROOT_DOC->clearUndos();
-}
-
 bool Model_Session::canUndo()
 {
   return ROOT_DOC->canUndo();
