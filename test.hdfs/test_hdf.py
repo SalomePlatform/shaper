@@ -17,7 +17,7 @@
 # See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 #
 
-import salome, os, sys
+import salome, salome_utils, os, sys
 import SalomePyQt
 
 import unittest
@@ -84,7 +84,8 @@ if __name__ == "__main__":
   errFile.close()
 
   # close Salome GUI
-  proc = subprocess.Popen(salomeKernelDir + "/bin/salome/killSalome.py")
+  port = salome_utils.getPortNumber()
+  proc = subprocess.Popen([salomeKernelDir + "/bin/salome/killSalomeWithPort.py", "{}".format(port)])
 
   try:
     os.remove(salomePortFile)
