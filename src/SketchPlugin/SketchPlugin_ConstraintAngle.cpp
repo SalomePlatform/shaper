@@ -307,9 +307,19 @@ bool SketchPlugin_ConstraintAngle::compute(const std::string& theAttributeId)
   if (aStartA->distance(aEndA) < tolerance)
     return false;
 
+  std::shared_ptr<GeomDataAPI_Point2D> aPointB1 = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
+      aLineB->attribute(SketchPlugin_Line::START_ID()));
+  std::shared_ptr<GeomDataAPI_Point2D> aPointB2 = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
+      aLineB->attribute(SketchPlugin_Line::END_ID()));
+
+  std::shared_ptr<GeomAPI_Pnt2d> aStartB = aPointB1->pnt();
+  std::shared_ptr<GeomAPI_Pnt2d> aEndB = aPointB2->pnt();
+  if (aStartB->distance(aEndB) < tolerance)
+    return false;
+
   myFlyoutUpdate = true;
-  double aX = (aStartA->x() + aEndA->x()) / 2.;
-  double aY = (aStartA->y() + aEndA->y()) / 2.;
+  double aX = (aStartA->x() + aEndA->x() + aStartB->x() + aEndB->x()) / 4.;
+  double aY = (aStartA->y() + aEndA->y() + aStartB->y() + aEndB->y()) / 4.;
 
   aFlyOutAttr->setValue(aX, aY);
   myFlyoutUpdate = false;
