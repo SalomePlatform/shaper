@@ -47,4 +47,6 @@ INCLUDE(UnitTest)
 
 ADD_UNIT_TESTS(
   TestRectangle.py
+  TestcompoundVertices.py
+  TestimportParameters.py
 )
