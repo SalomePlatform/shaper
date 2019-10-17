@@ -29,6 +29,7 @@ from salome.shaper import model
 class SketchTestCase(unittest.TestCase):
 
     def setUp(self):
+        model.begin()
         self.session = ModelAPI.ModelAPI_Session.get()
         aPartSet = self.session.moduleDocument()
         self.doc = model.addPart(aPartSet).document()

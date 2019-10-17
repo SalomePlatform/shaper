@@ -192,7 +192,7 @@ void SketchAPI_MacroArc::setByTangent(const ModelHighAPI_RefAttr& theTangentPoin
                                  bool theInversed)
 {
   fillAttribute(SketchPlugin_MacroArc::ARC_TYPE_BY_TANGENT_EDGE(), myarcType);
-  fillAttribute(theTangentPoint, mytransversalPoint);
+  fillAttribute(theTangentPoint, mytangentPoint);
   fillAttribute(theEnd, myendPoint3);
   fillAttribute(theInversed, myreversed);
 
