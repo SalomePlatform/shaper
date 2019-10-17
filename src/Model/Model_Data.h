@@ -326,7 +326,6 @@ private:
   MODEL_EXPORT virtual bool isPrecedingAttribute(const std::string& theAttribute1,
                                                  const std::string& theAttribute2) const;
 
-  friend class Model_Objects;
 };
 
 /// Generic method to register back reference, used in referencing attributes.
