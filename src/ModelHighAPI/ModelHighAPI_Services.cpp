@@ -98,9 +98,16 @@ std::shared_ptr<ModelAPI_Result> standardPlane(const std::string & theName){
 //--------------------------------------------------------------------------------------
 void begin()
 {
-  static int aTransactionID = 0;
+  static size_t aTransactionID = 0;
+  static size_t aNbTransactions = -1;
+  size_t aNbUndo = ModelAPI_Session::get()->undoList().size();
+  if (aNbUndo != aNbTransactions) {
+    // the last transaction was not empty, thus increase the ID
+    aNbTransactions = aNbUndo;
+    ++aTransactionID;
+  }
   std::ostringstream aTransactionName;
-  aTransactionName << "Operation_" << ++aTransactionID;
+  aTransactionName << "Operation_" << aTransactionID;
   ModelAPI_Session::get()->startOperation(aTransactionName.str());
 }
 
@@ -123,6 +130,7 @@ void apply()
 {
   auto aSession = ModelAPI_Session::get();
   aSession->finishOperation();
+  // start the next operation
   begin();
 }
 
