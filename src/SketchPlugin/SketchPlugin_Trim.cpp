@@ -372,7 +372,19 @@ void SketchPlugin_Trim::execute()
     {
       if (aRefIt->first->isEqual(aPoint)) {
         anInfo = aRefIt->second;
-        break;
+        // prefer a segment instead of a point, because further coincidence with a segment
+        // decreases only 1 DoF (instead of 2 for point) and prevents an overconstraint situation.
+        bool isEdge = false;
+        for (std::list<ObjectPtr>::const_iterator anIt = anInfo.second.begin();
+             anIt != anInfo.second.end() && !isEdge; ++anIt) {
+          ResultPtr aResult = std::dynamic_pointer_cast<ModelAPI_Result>(*anIt);
+          if (aResult) {
+            GeomShapePtr aShape = aResult->shape();
+            isEdge = aShape && aShape->isEdge();
+          }
+        }
+        if (isEdge)
+          break;
       }
     }
     const std::list<ObjectPtr>& anObjects = anInfo.second;
