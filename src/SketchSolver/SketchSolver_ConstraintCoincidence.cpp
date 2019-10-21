@@ -76,15 +76,9 @@ static void getPointOwnerAndParent(const AttributeRefAttrPtr theRefAttr,
   if (thePoint) {
     theOwner = ModelAPI_Feature::feature(thePoint->owner());
     if (theOwner) {
-      std::string aParentRefID;
-      if (theOwner->getKind() == SketchPlugin_Line::ID())
-        aParentRefID = SketchPlugin_Line::PARENT_ID();
-      else if (theOwner->getKind() == SketchPlugin_Point::ID())
-        aParentRefID = SketchPlugin_Point::PARENT_ID();
-      if (!aParentRefID.empty()) {
-        AttributeReferencePtr aParentRef = theOwner->reference(aParentRefID);
-        theParent = aParentRef ? ModelAPI_Feature::feature(aParentRef->value()) : FeaturePtr();
-      }
+      AttributeReferencePtr aParentRef =
+          theOwner->reference(SketchPlugin_SketchEntity::PARENT_ID());
+      theParent = aParentRef ? ModelAPI_Feature::feature(aParentRef->value()) : FeaturePtr();
     }
   }
 }

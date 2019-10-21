@@ -46,6 +46,7 @@ Model_AttributeDocRef::Model_AttributeDocRef(TDF_Label& theLabel)
   if (!myIsInitialized) {
     int aNewID = Model_Application::getApplication()->generateDocumentId();
     myID = TDataStd_Integer::Set(theLabel, aNewID);
+    myIsInitialized = true;
   }
 }
 

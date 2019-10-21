@@ -18,6 +18,7 @@
 #
 
 if __name__ == "__main__":
+  aPartFeature = locals()["Part_1"]
   model.testNbResults(aPartFeature, 1)
   model.testNbSubResults(aPartFeature, [0])
   model.testNbSubShapes(aPartFeature, GeomAPI_Shape.SOLID, [48])

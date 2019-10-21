@@ -44,12 +44,6 @@ class SketchPlugin_Point : public SketchPlugin_SketchEntity
     static const std::string MY_COORD_ID("PointCoordinates");
     return MY_COORD_ID;
   }
-  /// Reference to the parent feature
-  inline static const std::string& PARENT_ID()
-  {
-    static const std::string& MY_PARENT_ID("ParentFeature");
-    return MY_PARENT_ID;
-  }
   /// Returns the kind of a feature
   SKETCHPLUGIN_EXPORT virtual const std::string& getKind()
   {

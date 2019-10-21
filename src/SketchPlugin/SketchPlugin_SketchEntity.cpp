@@ -19,6 +19,7 @@
 
 #include "SketchPlugin_SketchEntity.h"
 
+#include <ModelAPI_AttributeReference.h>
 #include <ModelAPI_Session.h>
 #include <ModelAPI_Validator.h>
 
@@ -38,4 +39,8 @@ void SketchPlugin_SketchEntity::initAttributes()
   anAttr->setIsArgument(false);
   ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(),
     SketchPlugin_SketchEntity::COPY_ID());
+
+  anAttr = data()->addAttribute(PARENT_ID(), ModelAPI_AttributeReference::typeId());
+  anAttr->setIsArgument(false);
+  ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(), PARENT_ID());
 }

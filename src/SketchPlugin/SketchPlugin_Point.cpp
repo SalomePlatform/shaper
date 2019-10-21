@@ -22,7 +22,6 @@
 
 #include <ModelAPI_Data.h>
 #include <ModelAPI_ResultConstruction.h>
-#include <ModelAPI_AttributeReference.h>
 #include <ModelAPI_AttributeSelection.h>
 #include <ModelAPI_Validator.h>
 #include <ModelAPI_Session.h>
@@ -42,9 +41,6 @@ void SketchPlugin_Point::initDerivedClassAttributes()
   data()->addAttribute(SketchPlugin_Point::COORD_ID(), GeomDataAPI_Point2D::typeId());
   data()->addAttribute(EXTERNAL_ID(), ModelAPI_AttributeSelection::typeId());
   ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(), EXTERNAL_ID());
-
-  data()->addAttribute(PARENT_ID(), ModelAPI_AttributeReference::typeId());
-  ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(), PARENT_ID());
 }
 
 void SketchPlugin_Point::execute()

@@ -20,6 +20,7 @@
 #include <ModelHighAPI_FeatureStore.h>
 
 #include <ModelAPI_Tools.h>
+#include <ModelAPI_ResultConstruction.h>
 #include <ModelAPI_ResultPart.h>
 #include <ModelAPI_Session.h>
 #include <ModelAPI_AttributeBoolean.h>
@@ -198,6 +199,8 @@ std::string ModelHighAPI_FeatureStore::dumpAttr(const AttributePtr& theAttr) {
     // do not dump a type of ConstraintAngle, because it can be changed due dumping
     if (anAttr->id() == "AngleType") {
       return "";
+    } else if (anAttr->id() == "LocationType") {
+      return "__notinitialized__";
     }
     if (anAttr->text().empty())
       aResult<<anAttr->value();
@@ -273,7 +276,7 @@ std::string ModelHighAPI_FeatureStore::dumpAttr(const AttributePtr& theAttr) {
     }
   } else if (aType == ModelAPI_AttributeRefList::typeId()) {
     AttributeRefListPtr anAttr =
-      std::dynamic_pointer_cast<ModelAPI_AttributeRefList>(theAttr);
+        std::dynamic_pointer_cast<ModelAPI_AttributeRefList>(theAttr);
     // for sketch sub-features the empty values may be skipped and order is not important
     bool isSketchFeatures = anAttr->id() == "Features" &&
       std::dynamic_pointer_cast<ModelAPI_Feature>(anAttr->owner())->getKind() == "Sketch";
@@ -316,6 +319,12 @@ std::string ModelHighAPI_FeatureStore::dumpAttr(const AttributePtr& theAttr) {
       }
     }
   } else if (aType == ModelAPI_AttributeIntArray::typeId()) {
+    if (theAttr->id() == "Color") {
+      ResultConstructionPtr aResConstr =
+          std::dynamic_pointer_cast<ModelAPI_ResultConstruction>(theAttr->owner());
+      if (aResConstr.get())
+        return "__notinitialized__";
+    }
     AttributeIntArrayPtr anAttr =
       std::dynamic_pointer_cast<ModelAPI_AttributeIntArray>(theAttr);
     for(int a = 0; a < anAttr->size(); a++)
@@ -391,9 +400,15 @@ std::string ModelHighAPI_FeatureStore::dumpShape(std::shared_ptr<GeomAPI_Shape>&
     aResult<<": "<<aCount<<std::endl;
   }
   // output the main characteristics
-  if (GeomAlgoAPI_ShapeTools::volume(theShape) > 1.e-5) {
-    aResult<<"Volume: "<<
-      std::fixed<<setprecision(3)<<GeomAlgoAPI_ShapeTools::volume(theShape)<<std::endl;
+  double aVolume = GeomAlgoAPI_ShapeTools::volume(theShape);
+  if (aVolume > 1.e-5) {
+    aResult<<"Volume: ";
+    // volumes of too huge shapes write in the scientific format
+    if (aVolume >= 1.e5)
+      aResult<<std::scientific<<setprecision(7);
+    else
+      aResult<<std::fixed<<setprecision(3);
+    aResult<<aVolume<<std::endl;
   }
   std::shared_ptr<GeomAPI_Pnt> aCenter = GeomAlgoAPI_ShapeTools::centreOfMass(theShape);
   aResult<<"Center of mass: ";

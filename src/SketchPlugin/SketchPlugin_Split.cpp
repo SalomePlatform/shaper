@@ -1160,8 +1160,7 @@ FeaturePtr SketchPlugin_Split::splitClosed(FeaturePtr& theSplitFeature,
     const std::set<AttributePtr>& aRefs = aBaseFeature->data()->refsToMe();
     std::list<AttributePtr> aRefsToParent;
     for (std::set<AttributePtr>::const_iterator aRef = aRefs.begin(); aRef != aRefs.end(); ++aRef) {
-      if ((*aRef)->id() == SketchPlugin_Line::PARENT_ID() ||
-          (*aRef)->id() == SketchPlugin_Point::PARENT_ID())
+      if ((*aRef)->id() == SketchPlugin_SketchEntity::PARENT_ID())
         aRefsToParent.push_back(*aRef);
     }
     for (std::list<AttributePtr>::iterator aRef = aRefsToParent.begin();
