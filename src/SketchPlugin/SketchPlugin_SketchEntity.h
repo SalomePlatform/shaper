@@ -65,6 +65,13 @@ class SketchPlugin_SketchEntity : public SketchPlugin_Feature //, public GeomAPI
     return MY_COPY_ID;
   }
 
+  /// Reference to the parent feature if exist
+  inline static const std::string& PARENT_ID()
+  {
+    static const std::string& MY_PARENT_ID("ParentFeature");
+    return MY_PARENT_ID;
+  }
+
   /// Width of the auxiliary line
   inline static const int SKETCH_LINE_WIDTH_AUXILIARY()
   {

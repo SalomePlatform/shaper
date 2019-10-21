@@ -55,7 +55,7 @@ class TestHDF(unittest.TestCase):
 
   def test_hdf_file(self):
     self.assertTrue(self.partSet.size("Parts") > 0)
-    aPartsList = []
+    aPartsList = dict()
     for aPartIndex in range(self.partSet.size("Parts")):
       self.session.startOperation()
       aPart = ModelAPI.modelAPI_ResultPart(ModelAPI.objectToResult(self.partSet.object("Parts", aPartIndex)))
@@ -63,8 +63,10 @@ class TestHDF(unittest.TestCase):
       self.session.finishOperation()
 
       aPartFeature = PartSetAPI.PartSetAPI_Part(self.partSet.currentFeature(True))
-      # check reference data
-      exec(open(self.reffile, "rb").read())
+      aPartsList["Part_{}".format(aPartIndex+1)] = aPartFeature
+
+    # check reference data
+    exec(open(self.reffile, "rb").read(), globals(), aPartsList)
 
 
 if __name__ == "__main__":

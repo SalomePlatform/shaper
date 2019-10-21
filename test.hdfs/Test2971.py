@@ -1,4 +1,4 @@
-# Copyright (C) 2014-2019  CEA/DEN, EDF R&D
+# Copyright (C) 2019  CEA/DEN, EDF R&D
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -18,11 +18,16 @@
 #
 
 if __name__ == "__main__":
-  aPartFeature = locals()["Part_1"]
-  model.testNbResults(aPartFeature, 1)
-  model.testNbSubResults(aPartFeature, [0])
-  model.testNbSubShapes(aPartFeature, GeomAPI_Shape.SOLID, [319])
-  model.testNbSubShapes(aPartFeature, GeomAPI_Shape.FACE, [2138])
-  model.testNbSubShapes(aPartFeature, GeomAPI_Shape.EDGE, [9022])
-  model.testNbSubShapes(aPartFeature, GeomAPI_Shape.VERTEX, [18044])
-  model.testResultsVolumes(aPartFeature, [0.0837941287])
+  parts = locals()
+  for key in list(parts.keys()):
+    if key.startswith("Part_"):
+      part = parts[key]
+      model.testNbResults(part, 1)
+      model.testNbSubResults(part, [0])
+      model.testNbSubShapes(part, GeomAPI_Shape.SOLID, [12])
+      model.testNbSubShapes(part, GeomAPI_Shape.FACE, [103])
+      model.testNbSubShapes(part, GeomAPI_Shape.EDGE, [475])
+      model.testNbSubShapes(part, GeomAPI_Shape.VERTEX, [950])
+      model.testResultsVolumes(part, [6487764903.02328777])
+
+  assert(model.checkPythonDump(model.ModelHighAPI.CHECK_NAMING))

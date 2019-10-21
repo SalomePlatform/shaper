@@ -41,7 +41,8 @@ if (EXISTS ${RESTRICTED_ROOT_DIR})
     GET_FILENAME_COMPONENT(aTestName ${eachFilePath} NAME_WE)
     # Check corresponding ".py" file with reference data exists
     IF(NOT EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/${aTestName}.py")
-      MESSGAGE(WARNING "File ${aTestName}.py containing reference data does not exist")
+      MESSAGE(WARNING "File ${aTestName}.py containing reference data does not exist")
+      continue()
     ENDIF()
 
     # Add "SubprojectName_" prefix
