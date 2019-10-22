@@ -256,7 +256,7 @@ void setSpinValue(QDoubleSpinBox* theSpin, double theValue)
 
 void setSpinValue(ModuleBase_ParamSpinBox* theSpin, double theValue)
 {
-  if (fabs(theSpin->value() - theValue) < tolerance)
+  if (!theSpin->text().isEmpty() && fabs(theSpin->value() - theValue) < tolerance)
     return;
   bool isBlocked = theSpin->blockSignals(true);
   theSpin->setValue(theValue);

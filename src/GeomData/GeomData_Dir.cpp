@@ -79,5 +79,6 @@ void GeomData_Dir::reinit()
   if (!myIsInitialized) {
     // create attribute: not initialized by value yet, just zero
     myCoords = TDataStd_RealArray::Set(myLab, 0, 2);
+    myIsInitialized = true;
   }
 }

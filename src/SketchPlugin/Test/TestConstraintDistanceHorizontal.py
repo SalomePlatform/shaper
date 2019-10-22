@@ -117,17 +117,14 @@ assert (model.dof(aSketchFeature) == 3)
 #=========================================================================
 # Change a distance value
 #=========================================================================
-d = DISTANCE1 + 20.
+d = DISTANCE1 + 21.
 dStep = -5.
 while d >= -30.:
     aSession.startOperation()
     DISTANCE1 = d
     aDistance.setValue(DISTANCE1)
     aSession.finishOperation()
-    if DISTANCE1 == 0:
-        assert(aHDist1.error() != "")
-    else:
-        assert math.fabs(horizontalDistance(aPoint1Coords, aPoint2Coords) - DISTANCE1) < 1.e-5, "Distance values are different: {0} != {1}".format(horizontalDistance(aPoint1Coords, aPoint2Coords), DISTANCE1)
+    assert math.fabs(horizontalDistance(aPoint1Coords, aPoint2Coords) - DISTANCE1) < 1.e-5, "Distance values are different: {0} != {1}".format(horizontalDistance(aPoint1Coords, aPoint2Coords), DISTANCE1)
     d += dStep
 assert (model.dof(aSketchFeature) == 3)
 
@@ -154,18 +151,15 @@ assert (model.dof(aSketchFeature) == 2)
 # Change a distance value (check previous constraint is applied too)
 #=========================================================================
 d = DISTANCE2
-dStep = -5.
+dStep = -7.
 while d >= -50.:
     aSession.startOperation()
     DISTANCE2 = d
     aDistance.setValue(DISTANCE2)
     aSession.finishOperation()
-    if DISTANCE2 == 0:
-        assert(aHDist2.error() != "")
-    else:
-        assert math.fabs(horizontalDistance(anExtCoords, aPoint1Coords) - DISTANCE2) < 1.e-5, "Distance values are different: {0} != {1}".format(horizontalDistance(anExtCoords, aPoint1Coords), DISTANCE2)
-        assert math.fabs(aPoint1Coords.x() - DISTANCE2) < 1.e-5, "Wrong point coordinates ({}, {}), expected x = {}".format(aPoint1Coords.x(), aPoint1Coords.y(), DISTANCE2)
-        assert math.fabs(horizontalDistance(aPoint1Coords, aPoint2Coords) - DISTANCE1) < 1.e-5, "Distance values are different: {0} != {1}".format(horizontalDistance(aPoint1Coords, aPoint2Coords), DISTANCE1)
+    assert math.fabs(horizontalDistance(anExtCoords, aPoint1Coords) - DISTANCE2) < 1.e-5, "Distance values are different: {0} != {1}".format(horizontalDistance(anExtCoords, aPoint1Coords), DISTANCE2)
+    assert math.fabs(aPoint1Coords.x() - DISTANCE2) < 1.e-5, "Wrong point coordinates ({}, {}), expected x = {}".format(aPoint1Coords.x(), aPoint1Coords.y(), DISTANCE2)
+    assert math.fabs(horizontalDistance(aPoint1Coords, aPoint2Coords) - DISTANCE1) < 1.e-5, "Distance values are different: {0} != {1}".format(horizontalDistance(aPoint1Coords, aPoint2Coords), DISTANCE1)
     d += dStep
 assert (model.dof(aSketchFeature) == 2)
 
@@ -216,16 +210,13 @@ assert (model.dof(aSketchFeature) == 6)
 # Change a distance value
 #=========================================================================
 d = DISTANCE3
-dStep = -5.
+dStep = -7.
 while d >= -50.:
     aSession.startOperation()
     DISTANCE3 = d
     aDistance.setValue(DISTANCE3)
     aSession.finishOperation()
-    if DISTANCE3 == 0:
-        assert(aHDist3.error() != "")
-    else:
-        assert math.fabs(horizontalDistance(aStartPoint, aEndPoint) - DISTANCE3) < 1.e-5, "Distance values are different: {0} != {1}".format(horizontalDistance(aStartPoint, aEndPoint), DISTANCE3)
+    assert math.fabs(horizontalDistance(aStartPoint, aEndPoint) - DISTANCE3) < 1.e-5, "Distance values are different: {0} != {1}".format(horizontalDistance(aStartPoint, aEndPoint), DISTANCE3)
     d += dStep
 assert (model.dof(aSketchFeature) == 6)
 

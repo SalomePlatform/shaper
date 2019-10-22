@@ -64,6 +64,14 @@ class SketchPlugin_ConstraintDistance : public SketchPlugin_ConstraintBase
     return MY_SIGNED;
   }
 
+  /// \brief The direction from the first object to the second.
+  ///        To change distance value from zero to non-zero correctly.
+  inline static const std::string& DIRECTION_ID()
+  {
+    static const std::string MY_DIRECTION_ID("DistanceDirection");
+    return MY_DIRECTION_ID;
+  }
+
   /// attribute name of dimension location type
   inline static const std::string& LOCATION_TYPE_ID()
   {

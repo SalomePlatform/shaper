@@ -104,28 +104,6 @@ std::string SketchPlugin_Line::processEvent(const std::shared_ptr<Events_Message
 }
 // LCOV_EXCL_STOP
 
-double SketchPlugin_Line::distanceToPoint(const std::shared_ptr<GeomAPI_Pnt2d>& thePoint)
-{
-  double aDelta = 0;
-
-  std::shared_ptr<ModelAPI_Data> aData = data();
-  std::shared_ptr<GeomDataAPI_Point2D> aPoint1 =
-    std::dynamic_pointer_cast<GeomDataAPI_Point2D>(aData->attribute(START_ID()));
-  std::shared_ptr<GeomDataAPI_Point2D> aPoint2 =
-    std::dynamic_pointer_cast<GeomDataAPI_Point2D>(aData->attribute(END_ID()));
-
-  GeomAPI_Lin2d aLin2d(aPoint1->x(), aPoint1->y(), aPoint2->x(), aPoint2->y());
-
-  if (false/*projection*/) {  // TODO: if it has not been necessary, remove this block
-    std::shared_ptr<GeomAPI_Pnt2d> aResult = aLin2d.project(thePoint);
-    aDelta = aResult->distance(thePoint);
-  } else {  // distance
-    aDelta = aLin2d.distance(thePoint);
-  }
-
-  return aDelta;
-}
-
 const std::string& SketchPlugin_Line::getKind()
 {
   static std::string MY_KIND = SketchPlugin_Line::ID();

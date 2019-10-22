@@ -80,10 +80,6 @@ class SketchPlugin_Line : public SketchPlugin_SketchEntity,
   /// if message has selected object
   virtual std::string processEvent(const std::shared_ptr<Events_Message>& theMessage);
 
-  /// Return the distance between the feature and the point
-  /// \param thePoint the point
-  double distanceToPoint(const std::shared_ptr<GeomAPI_Pnt2d>& thePoint);
-
   /// Called on change of any argument-attribute of this object
   SKETCHPLUGIN_EXPORT virtual void attributeChanged(const std::string& theID);
 
