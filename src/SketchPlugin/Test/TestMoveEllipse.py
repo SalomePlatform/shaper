@@ -42,6 +42,7 @@ class TestMoveEllipse(unittest.TestCase):
     model.do()
     self.checkDOF()
     self.myMajorRadius = self.myEllipse.majorRadius().value()
+    self.NB_DIGITS_RADIUS = 7 - math.floor(math.log10(self.myMinorRadius))
 
   def tearDown(self):
     self.checkDOF()
@@ -94,8 +95,8 @@ class TestMoveEllipse(unittest.TestCase):
     self.mySketch.move(self.myEllipse.center(), newPosition[0], newPosition[1])
     model.do()
     self.checkPointCoordinates(self.myEllipse.center(), newPosition)
-    self.assertAlmostEqual(self.myEllipse.minorRadius().value(), self.myMinorRadius)
-    self.assertAlmostEqual(self.myEllipse.majorRadius().value(), self.myMajorRadius)
+    self.assertAlmostEqual(self.myEllipse.minorRadius().value(), self.myMinorRadius, self.NB_DIGITS_RADIUS)
+    self.assertAlmostEqual(self.myEllipse.majorRadius().value(), self.myMajorRadius, self.NB_DIGITS_RADIUS)
 
   def test_move_free_ellipse(self):
     """ Test 2. Movement of a free ellipse dragging the edge
@@ -117,8 +118,8 @@ class TestMoveEllipse(unittest.TestCase):
     self.mySketch.move(self.myEllipse.center(), newPosition[0], newPosition[1])
     model.do()
     self.checkPointCoordinates(self.myEllipse.center(), newPosition)
-    self.assertAlmostEqual(self.myEllipse.minorRadius().value(), self.myMinorRadius)
-    self.assertAlmostEqual(self.myEllipse.majorRadius().value(), self.myMajorRadius)
+    self.assertAlmostEqual(self.myEllipse.minorRadius().value(), self.myMinorRadius, self.NB_DIGITS_RADIUS)
+    self.assertAlmostEqual(self.myEllipse.majorRadius().value(), self.myMajorRadius, self.NB_DIGITS_RADIUS)
 
   def test_move_ellipse_fixed_major_radius(self):
     """ Test 4. Movement of ellipse with fixed major radius
@@ -130,7 +131,7 @@ class TestMoveEllipse(unittest.TestCase):
     model.do()
     self.checkPointOnEllipse(newPosition, self.myEllipse)
     self.assertNotEqual(self.myEllipse.minorRadius().value(), self.myMinorRadius)
-    self.assertAlmostEqual(self.myEllipse.majorRadius().value(), self.myMajorRadius)
+    self.assertAlmostEqual(self.myEllipse.majorRadius().value(), self.myMajorRadius, self.NB_DIGITS_RADIUS)
 
   def test_move_center_ellipse_fixed_minor_radius(self):
     """ Test 5. Movement of central point of ellipse with fixed minor radius
@@ -141,8 +142,8 @@ class TestMoveEllipse(unittest.TestCase):
     self.mySketch.move(self.myEllipse.center(), newPosition[0], newPosition[1])
     model.do()
     self.checkPointCoordinates(self.myEllipse.center(), newPosition)
-    self.assertAlmostEqual(self.myEllipse.minorRadius().value(), self.myMinorRadius)
-    self.assertAlmostEqual(self.myEllipse.majorRadius().value(), self.myMajorRadius)
+    self.assertAlmostEqual(self.myEllipse.minorRadius().value(), self.myMinorRadius, self.NB_DIGITS_RADIUS)
+    self.assertAlmostEqual(self.myEllipse.majorRadius().value(), self.myMajorRadius, self.NB_DIGITS_RADIUS)
 
   def test_move_ellipse_fixed_minor_radius(self):
     """ Test 6. Movement of ellipse with fixed minor radius
@@ -153,7 +154,7 @@ class TestMoveEllipse(unittest.TestCase):
     self.mySketch.move(self.myEllipse.defaultResult(), newPosition.x(), newPosition.y())
     model.do()
     self.checkPointOnEllipse(newPosition, self.myEllipse)
-    self.assertAlmostEqual(self.myEllipse.minorRadius().value(), self.myMinorRadius)
+    self.assertAlmostEqual(self.myEllipse.minorRadius().value(), self.myMinorRadius, self.NB_DIGITS_RADIUS)
     self.assertNotEqual(self.myEllipse.majorRadius().value(), self.myMajorRadius)
 
   def test_move_center_ellipse_fixed_center(self):
@@ -165,8 +166,8 @@ class TestMoveEllipse(unittest.TestCase):
     self.mySketch.move(self.myEllipse.center(), newPosition[0], newPosition[1])
     model.do()
     self.checkPointCoordinates(self.myEllipse.center(), self.myCenter)
-    self.assertAlmostEqual(self.myEllipse.minorRadius().value(), self.myMinorRadius)
-    self.assertAlmostEqual(self.myEllipse.majorRadius().value(), self.myMajorRadius)
+    self.assertAlmostEqual(self.myEllipse.minorRadius().value(), self.myMinorRadius, self.NB_DIGITS_RADIUS)
+    self.assertAlmostEqual(self.myEllipse.majorRadius().value(), self.myMajorRadius, self.NB_DIGITS_RADIUS)
 
   def test_move_ellipse_fixed_center(self):
     """ Test 8. Movement of ellipse with fixed center
@@ -202,8 +203,8 @@ class TestMoveEllipse(unittest.TestCase):
     self.mySketch.move(self.myEllipse.firstFocus(), newPosition.x(), newPosition.y())
     model.do()
     self.checkPointCoordinates(self.myEllipse.firstFocus(), self.myFocus)
-    self.assertAlmostEqual(self.myEllipse.minorRadius().value(), self.myMinorRadius)
-    self.assertAlmostEqual(self.myEllipse.majorRadius().value(), self.myMajorRadius)
+    self.assertAlmostEqual(self.myEllipse.minorRadius().value(), self.myMinorRadius, self.NB_DIGITS_RADIUS)
+    self.assertAlmostEqual(self.myEllipse.majorRadius().value(), self.myMajorRadius, self.NB_DIGITS_RADIUS)
 
   def test_move_ellipse_fixed_focus(self):
     """ Test 11. Movement of ellipse with fixed focus
@@ -231,7 +232,7 @@ class TestMoveEllipse(unittest.TestCase):
     model.do()
     self.checkPointCoordinates(self.myEllipse.center(), self.myCenter)
     self.checkPointCoordinates(self.myEllipse.firstFocus(), self.myFocus)
-    self.assertAlmostEqual(self.myEllipse.minorRadius().value(), self.myMinorRadius)
+    self.assertAlmostEqual(self.myEllipse.minorRadius().value(), self.myMinorRadius, self.NB_DIGITS_RADIUS)
 
 
 if __name__ == "__main__":
