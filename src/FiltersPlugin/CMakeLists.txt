@@ -104,6 +104,7 @@ ADD_UNIT_TESTS(
   TestFilters_Mixed1.py
   TestFilters_Mixed2.py
   TestFilters_Supported.py
+  TestFilters_Validator.py
   TestFilters_Xml.py
   TestFilters_FilterName.py
   TestFilters_IsReversed.py

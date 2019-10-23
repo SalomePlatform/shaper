@@ -46,6 +46,9 @@ class Config_ValidatorReader : public Config_XMLReader
   /// Set feature ID for cases when XML for validators is parsed from memory
   CONFIG_EXPORT void setFeatureId(const std::string& theId) { myExtFeatureId = theId; }
 
+  // for correct SWIG wrapping
+  using Config_XMLReader::readAll;
+
  protected:
   /*!
    * \brief Allows to customize reader's behavior for a node. Virtual.
