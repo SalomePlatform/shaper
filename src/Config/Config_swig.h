@@ -23,5 +23,7 @@
   #include "Config_ModuleReader.h"
   #include "Config_Prop.h"
   #include "Config_PropManager.h"
+  #include "Config_ValidatorReader.h"
+  #include "Config_XMLReader.h"
 
 #endif /* SRC_CONFIG_SWIG_H_ */
