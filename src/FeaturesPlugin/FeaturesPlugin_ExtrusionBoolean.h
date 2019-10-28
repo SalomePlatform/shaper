@@ -44,6 +44,10 @@ protected:
   void storeGenerationHistory(ResultBodyPtr theResultBody,
                               const GeomShapePtr theBaseShape,
                               const std::shared_ptr<GeomAlgoAPI_MakeShape> theMakeShape);
+
+  /// Calculate prism sizes to ensure that it passes through all objects
+  /// Redefined from FeaturesPlugin_Extrusion
+  virtual void getSizes(double& theToSize, double& theFromSize);
 };
 
 #endif

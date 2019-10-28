@@ -30,14 +30,17 @@
 #include <GeomAPI_Wire.h>
 
 #include <Bnd_Box.hxx>
+
+#include <BRep_Tool.hxx>
 #include <BRep_Builder.hxx>
-#include <BRepAdaptor_Curve.hxx>
 #include <BRepAlgo.hxx>
 #include <BRepAlgo_FaceRestrictor.hxx>
+#include <BRepAdaptor_Curve.hxx>
 #include <BRepBndLib.hxx>
 #include <BRepBuilderAPI_FindPlane.hxx>
 #include <BRepBuilderAPI_MakeEdge.hxx>
 #include <BRepBuilderAPI_MakeFace.hxx>
+#include <BRepBuilderAPI_MakeVertex.hxx>
 #include <BRepCheck_Analyzer.hxx>
 #include <BRepExtrema_DistShapeShape.hxx>
 #include <BRepExtrema_ExtCF.hxx>
@@ -46,40 +49,48 @@
 #include <BRepTools_WireExplorer.hxx>
 #include <BRepTopAdaptor_FClass2d.hxx>
 #include <BRepClass_FaceClassifier.hxx>
-#include <Geom2d_Curve.hxx>
-#include <Geom2d_Curve.hxx>
 #include <BRepLib_CheckCurveOnSurface.hxx>
-#include <BRep_Tool.hxx>
-#include  <Geom_CylindricalSurface.hxx>
+
+#include <BOPAlgo_Builder.hxx>
+
+#include <Geom2d_Curve.hxx>
+#include <Geom2d_Curve.hxx>
+
+#include <Geom_CylindricalSurface.hxx>
 #include <Geom_Line.hxx>
 #include <Geom_Plane.hxx>
+#include <Geom_RectangularTrimmedSurface.hxx>
+
 #include <GeomAPI_ProjectPointOnCurve.hxx>
 #include <GeomAPI_ShapeIterator.h>
+
 #include <GeomLib_IsPlanarSurface.hxx>
 #include <GeomLib_Tool.hxx>
 #include <GeomAPI_IntCS.hxx>
+
 #include <gp_Pln.hxx>
 #include <GProp_GProps.hxx>
+
 #include <IntAna_IntConicQuad.hxx>
 #include <IntAna_Quadric.hxx>
-#include <NCollection_Vector.hxx>
+
 #include <ShapeAnalysis.hxx>
 #include <ShapeAnalysis_Surface.hxx>
-#include <TopoDS_Builder.hxx>
+
+#include <TopoDS.hxx>
 #include <TopoDS_Edge.hxx>
 #include <TopoDS_Face.hxx>
 #include <TopoDS_Shape.hxx>
 #include <TopoDS_Shell.hxx>
 #include <TopoDS_Vertex.hxx>
-#include <TopoDS.hxx>
+#include <TopoDS_Builder.hxx>
+
 #include <TopExp.hxx>
 #include <TopExp_Explorer.hxx>
+
 #include <TopTools_ListIteratorOfListOfShape.hxx>
 
-
-#include <BOPAlgo_Builder.hxx>
-#include <BRepBuilderAPI_MakeVertex.hxx>
-#include <TopoDS_Edge.hxx>
+#include <NCollection_Vector.hxx>
 
 //==================================================================================================
 static GProp_GProps props(const TopoDS_Shape& theShape)
@@ -1076,6 +1087,7 @@ static TopoDS_Wire fixParametricGaps(const TopoDS_Wire& theWire)
   return aFixedWire;
 }
 
+//==================================================================================================
 std::shared_ptr<GeomAPI_Edge> GeomAlgoAPI_ShapeTools::wireToEdge(
       const std::shared_ptr<GeomAPI_Wire>& theWire)
 {
@@ -1094,6 +1106,7 @@ std::shared_ptr<GeomAPI_Edge> GeomAlgoAPI_ShapeTools::wireToEdge(
   return anEdge;
 }
 
+//==================================================================================================
 ListOfShape GeomAlgoAPI_ShapeTools::getLowLevelSubShapes(const GeomShapePtr& theShape)
 {
   ListOfShape aSubShapes;
@@ -1114,4 +1127,123 @@ ListOfShape GeomAlgoAPI_ShapeTools::getLowLevelSubShapes(const GeomShapePtr& the
   }
 
   return aSubShapes;
+}
+
+//==================================================================================================
+static void getMinMaxPointsOnLine(const std::list<std::shared_ptr<GeomAPI_Pnt> >& thePoints,
+                                  const gp_Dir theDir,
+                                  double& theMin, double& theMax)
+{
+  theMin = RealLast();
+  theMax = RealFirst();
+  // Project bounding points on theDir
+  for (std::list<std::shared_ptr<GeomAPI_Pnt> >::const_iterator
+         aPointsIt = thePoints.begin(); aPointsIt != thePoints.end(); aPointsIt++) {
+    const gp_Pnt& aPnt = (*aPointsIt)->impl<gp_Pnt>();
+    gp_Dir aPntDir (aPnt.XYZ());
+    Standard_Real proj = (theDir*aPntDir) * aPnt.XYZ().Modulus();
+    if (proj < theMin) theMin = proj;
+    if (proj > theMax) theMax = proj;
+  }
+}
+
+//==================================================================================================
+void GeomAlgoAPI_ShapeTools::computeThroughAll(const ListOfShape& theObjects,
+                                               const ListOfShape& theBaseShapes,
+                                               const std::shared_ptr<GeomAPI_Dir> theDir,
+                                               double& theToSize, double& theFromSize)
+{
+  // Bounding box of objects
+  std::list<std::shared_ptr<GeomAPI_Pnt> > aBndObjs = GeomAlgoAPI_ShapeTools::getBoundingBox(theObjects);
+  if (aBndObjs.size() != 8) {
+    return;
+  }
+
+  // Prism direction
+  if (theDir.get()) {
+    // One direction for all prisms
+    gp_Dir aDir = theDir->impl<gp_Dir>();
+
+    // Bounding box of the base
+    std::list<std::shared_ptr<GeomAPI_Pnt> > aBndBases = GeomAlgoAPI_ShapeTools::getBoundingBox(theBaseShapes);
+    if (aBndBases.size() != 8) {
+      return;
+    }
+
+    // Objects bounds
+    Standard_Real lowBnd, upperBnd;
+    getMinMaxPointsOnLine(aBndObjs, aDir, lowBnd, upperBnd);
+
+    // Base bounds
+    Standard_Real lowBase, upperBase;
+    getMinMaxPointsOnLine(aBndBases, aDir, lowBase, upperBase);
+
+    // ----------.-----.---------.--------------.-----------> theDir
+    //       lowBnd   lowBase   upperBase    upperBnd
+
+    theToSize = upperBnd - lowBase;
+    theFromSize = upperBase - lowBnd;
+  } else {
+    // Direction is a normal to each base shape (different normals to bases)
+    // So we calculate own sizes for each base shape
+    theToSize = 0.0;
+    theFromSize = 0.0;
+
+    for (ListOfShape::const_iterator anIt = theBaseShapes.begin(); anIt != theBaseShapes.end(); ++anIt) {
+      const GeomShapePtr& aBaseShape_i = (*anIt);
+      ListOfShape aBaseShapes_i;
+      aBaseShapes_i.push_back(aBaseShape_i);
+
+      // Bounding box of the base
+      std::list<std::shared_ptr<GeomAPI_Pnt> > aBndBases = GeomAlgoAPI_ShapeTools::getBoundingBox(aBaseShapes_i);
+      if (aBndBases.size() != 8) {
+        return;
+      }
+
+      // Direction (normal to aBaseShapes_i)
+      // Code like in GeomAlgoAPI_Prism
+      gp_Dir aDir;
+      const TopoDS_Shape& aBaseShape = aBaseShape_i->impl<TopoDS_Shape>();
+      BRepBuilderAPI_FindPlane aFindPlane(aBaseShape);
+      if (aFindPlane.Found() == Standard_True) {
+        Handle(Geom_Plane) aPlane;
+        if (aBaseShape.ShapeType() == TopAbs_FACE || aBaseShape.ShapeType() == TopAbs_SHELL) {
+          TopExp_Explorer anExp(aBaseShape, TopAbs_FACE);
+          const TopoDS_Shape& aFace = anExp.Current();
+          Handle(Geom_Surface) aSurface = BRep_Tool::Surface(TopoDS::Face(aFace));
+          if(aSurface->DynamicType() == STANDARD_TYPE(Geom_RectangularTrimmedSurface)) {
+            Handle(Geom_RectangularTrimmedSurface) aTrimSurface =
+              Handle(Geom_RectangularTrimmedSurface)::DownCast(aSurface);
+            aSurface = aTrimSurface->BasisSurface();
+          }
+          if(aSurface->DynamicType() != STANDARD_TYPE(Geom_Plane)) {
+            return;
+          }
+          aPlane = Handle(Geom_Plane)::DownCast(aSurface);
+        } else {
+          aPlane = aFindPlane.Plane();
+        }
+        aDir = aPlane->Axis().Direction();
+      } else {
+        return;
+      }
+
+      // Objects bounds
+      Standard_Real lowBnd, upperBnd;
+      getMinMaxPointsOnLine(aBndObjs, aDir, lowBnd, upperBnd);
+
+      // Base bounds
+      Standard_Real lowBase, upperBase;
+      getMinMaxPointsOnLine(aBndBases, aDir, lowBase, upperBase);
+
+      // ----------.-----.---------.--------------.-----------> theDir
+      //       lowBnd   lowBase   upperBase    upperBnd
+
+      double aToSize_i = upperBnd - lowBase;
+      double aFromSize_i = upperBase - lowBnd;
+
+      if (aToSize_i > theToSize) theToSize = aToSize_i;
+      if (aFromSize_i > theFromSize) theFromSize = aFromSize_i;
+    }
+  }
 }

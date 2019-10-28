@@ -67,6 +67,13 @@ public:
     return MY_CREATION_METHOD_ID;
   }
 
+  /// Attribute name for creation method.
+  inline static const std::string& CREATION_METHOD_THROUGH_ALL()
+  {
+    static const std::string MY_CREATION_METHOD_ID("ThroughAll");
+    return MY_CREATION_METHOD_ID;
+  }
+
   /// Attribute name of an object to which the extrusion grows.
   inline static const std::string& DIRECTION_OBJECT_ID()
   {
@@ -144,6 +151,12 @@ protected:
                                  const ListOfShape& theBoundaryShapes,
                                  const std::shared_ptr<GeomAlgoAPI_MakeShape> theMakeShape,
                                  const int theIndex = 0);
+
+  /// Retrieve direction argument.
+  void getDirection(std::shared_ptr<GeomAPI_Dir>& theDir);
+
+  /// Retrieve or calculate prism sizes.
+  virtual void getSizes(double& theToSize, double& theFromSize);
 };
 
 #endif

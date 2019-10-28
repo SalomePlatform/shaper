@@ -83,6 +83,8 @@
           </doublevalue>
         </groupbox>
       </box>
+      <box id="ThroughAll" title="Through all" icon="icons/Features/extrusion_throughall_32x32.png">
+      </box>
     </toolbox>
   </groupbox>
   <multi_selector id="main_objects"

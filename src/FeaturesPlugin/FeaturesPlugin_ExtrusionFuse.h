@@ -28,7 +28,7 @@
 ///        fuse result with other objects in a single operation.
 class FeaturesPlugin_ExtrusionFuse : public FeaturesPlugin_ExtrusionBoolean
 {
-public:
+ public:
   /// Use plugin manager for features creation.
   FeaturesPlugin_ExtrusionFuse();
 
@@ -48,6 +48,9 @@ public:
 
   /// Creates a new part document if needed.
   FEATURESPLUGIN_EXPORT virtual void execute();
+
+ private:
+  void executeFuseThroughAll();
 };
 
 #endif

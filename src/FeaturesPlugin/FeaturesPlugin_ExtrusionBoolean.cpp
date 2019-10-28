@@ -19,6 +19,11 @@
 
 #include "FeaturesPlugin_ExtrusionBoolean.h"
 
+#include <ModelAPI_AttributeSelectionList.h>
+#include <ModelAPI_AttributeString.h>
+
+#include <GeomAlgoAPI_ShapeTools.h>
+
 //=================================================================================================
 void FeaturesPlugin_ExtrusionBoolean::initAttributes()
 {
@@ -41,4 +46,36 @@ void FeaturesPlugin_ExtrusionBoolean::storeGenerationHistory(ResultBodyPtr theRe
                                         const std::shared_ptr<GeomAlgoAPI_MakeShape> theMakeShape)
 {
   FeaturesPlugin_Extrusion::storeGenerationHistory(theResultBody, theBaseShape, theMakeShape);
+}
+
+//=================================================================================================
+void FeaturesPlugin_ExtrusionBoolean::getSizes(double& theToSize, double& theFromSize)
+{
+  if (string(CREATION_METHOD())->value() != CREATION_METHOD_THROUGH_ALL()) {
+    FeaturesPlugin_Extrusion::getSizes(theToSize, theFromSize);
+  } else {
+    // Getting objects.
+    ListOfShape anObjects;
+    AttributeSelectionListPtr anObjectsSelList = myFeature->selectionList(OBJECTS_ID());
+    for (int anObjectsIndex = 0; anObjectsIndex < anObjectsSelList->size(); anObjectsIndex++) {
+      AttributeSelectionPtr anObjectAttr = anObjectsSelList->value(anObjectsIndex);
+      GeomShapePtr anObject = anObjectAttr->value();
+      if (!anObject.get()) {
+        myFeature->setError("Error: Could not get object.");
+        return;
+      }
+      anObjects.push_back(anObject);
+    }
+
+    // Getting prism bases.
+    ListOfShape aBaseShapes;
+    getBaseShapes(aBaseShapes);
+
+    // Getting prism direction.
+    std::shared_ptr<GeomAPI_Dir> aDir;
+    getDirection(aDir);
+
+    // Calculate sizes
+    GeomAlgoAPI_ShapeTools::computeThroughAll(anObjects, aBaseShapes, aDir, theToSize, theFromSize);
+  }
 }

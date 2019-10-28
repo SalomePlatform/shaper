@@ -101,53 +101,20 @@ bool FeaturesPlugin_Extrusion::makeExtrusions(ListOfShape& theBaseShapes,
   getBaseShapes(theBaseShapes);
 
   //Getting direction.
-  static const std::string aSelectionError = "Error: The direction shape selection is bad.";
-  AttributeSelectionPtr aSelection = selection(DIRECTION_OBJECT_ID());
-  GeomShapePtr aShape = aSelection->value();
-  if (!aShape.get()) {
-    if (aSelection->context().get()) {
-      aShape = aSelection->context()->shape();
-    }
-  }
-
-  GeomEdgePtr anEdge;
-  if (aShape.get()) {
-    if (aShape->isEdge())
-    {
-      anEdge = aShape->edge();
-    }
-    else if (aShape->isCompound())
-    {
-      GeomAPI_ShapeIterator anIt(aShape);
-      anEdge = anIt.current()->edge();
-    }
-  }
-
   std::shared_ptr<GeomAPI_Dir> aDir;
-  if(anEdge.get()) {
-    if(anEdge->isLine()) {
-      aDir = anEdge->line()->direction();
-    }
-  }
+  getDirection(aDir);
 
   // Getting sizes.
   double aToSize = 0.0;
   double aFromSize = 0.0;
-
-  if(string(CREATION_METHOD())->value() == CREATION_METHOD_BY_SIZES()) {
-    aToSize = real(TO_SIZE_ID())->value();
-    aFromSize = real(FROM_SIZE_ID())->value();
-  } else {
-    aToSize = real(TO_OFFSET_ID())->value();
-    aFromSize = real(FROM_OFFSET_ID())->value();
-  }
+  getSizes(aToSize, aFromSize);
 
   // Getting bounding planes.
   GeomShapePtr aToShape;
   GeomShapePtr aFromShape;
 
   if(string(CREATION_METHOD())->value() == CREATION_METHOD_BY_PLANES()) {
-    aSelection = selection(TO_OBJECT_ID());
+    AttributeSelectionPtr aSelection = selection(TO_OBJECT_ID());
     if(aSelection.get()) {
       aToShape = std::dynamic_pointer_cast<GeomAPI_Shape>(aSelection->value());
       if(!aToShape.get() && aSelection->context().get()) {
@@ -213,4 +180,49 @@ void FeaturesPlugin_Extrusion::storeResultWithBoundaries(
   storeGenerationHistory(aResultBody, theBaseShape, theMakeShape);
 
   setResult(aResultBody, theIndex);
+}
+
+//=================================================================================================
+void FeaturesPlugin_Extrusion::getDirection(std::shared_ptr<GeomAPI_Dir>& theDir)
+{
+  static const std::string aSelectionError = "Error: The direction shape selection is bad.";
+  AttributeSelectionPtr aSelection = selection(DIRECTION_OBJECT_ID());
+  GeomShapePtr aShape = aSelection->value();
+  if (!aShape.get()) {
+    if (aSelection->context().get()) {
+      aShape = aSelection->context()->shape();
+    }
+  }
+
+  GeomEdgePtr anEdge;
+  if (aShape.get()) {
+    if (aShape->isEdge())
+    {
+      anEdge = aShape->edge();
+    }
+    else if (aShape->isCompound())
+    {
+      GeomAPI_ShapeIterator anIt(aShape);
+      anEdge = anIt.current()->edge();
+    }
+  }
+
+  if (anEdge.get()) {
+    if (anEdge->isLine()) {
+      theDir = anEdge->line()->direction();
+    }
+  }
+}
+
+//=================================================================================================
+void FeaturesPlugin_Extrusion::getSizes(double& theToSize, double& theFromSize)
+{
+  if (string(CREATION_METHOD())->value() == CREATION_METHOD_BY_SIZES()) {
+    theToSize = real(TO_SIZE_ID())->value();
+    theFromSize = real(FROM_SIZE_ID())->value();
+  } if (string(CREATION_METHOD())->value() == CREATION_METHOD_BY_PLANES()) {
+    theToSize = real(TO_OFFSET_ID())->value();
+    theFromSize = real(FROM_OFFSET_ID())->value();
+  } else {
+  }
 }

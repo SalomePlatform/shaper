@@ -18,7 +18,7 @@ The following property panel will be opened:
 .. centered::
   Start sketch
 
-There are two variants of the property panel for Extrusion Fuse depending on the chosen option:
+There are three variants of the property panel for Extrusion Fuse depending on the chosen option:
 
 .. image:: images/extrusion_by_sizes.png
    :align: left
@@ -27,6 +27,10 @@ There are two variants of the property panel for Extrusion Fuse depending on the
 .. image:: images/extrusion_by_bounding_planes.png
    :align: left
 **By Bounding Planes** extrudes objects by specifying bounding planes and offsets.
+
+.. image:: images/extrusion_through_all.png
+   :align: left
+**Through All** extrudes base objects to pass through all objects fuse with.
 
 
 By sizes
@@ -149,3 +153,46 @@ The Result of the operation will be an extruded shape:
    **Extrusion Fuse created**
 
 **See Also** a sample TUI Script of :ref:`tui_create_extrusion_fuse_by_bounding_planes` operation.
+
+Through all
+-----------
+
+.. image:: images/ExtrusionFuse3.png
+  :align: center
+
+.. centered::
+  Extrusion Fuse: definition through all objects
+
+- **Base objects** - contains a list of objects selected in the Object Browser or in the Viewer, which will be extruded.
+- **Axis** - if selected, it will be the direction of extrusion, otherwise objects normals will be used.
+- **Fuse with** - contains a list of objects which will be fused with the result of extrusion.
+
+**TUI Commands**:
+
+.. py:function:: model.addExtrusionFuse(part, objectsToExtrude, objectsToFuse)
+
+    :param part: The current part object.
+    :param list: A list of objects for extrusion.
+    :param list: A list of objects to fuse with.
+    :return: Created object.
+
+.. py:function:: model.addExtrusionFuse(part, objectsToExtrude, direction, objectsToFuse)
+
+    :param part: The current part object.
+    :param list: A list of objects for extrusion.
+    :param object: A direction of extrusion
+    :param list: A list of objects to fuse with.
+    :return: Created object.
+
+Result
+""""""
+
+The Result of the operation will be an extruded shape:
+
+.. image:: images/extrusion_fuse_through_all_result.png
+	   :align: center
+
+.. centered::
+   **Extrusion Fuse created**
+
+**See Also** a sample TUI Script of :ref:`tui_create_extrusion_fuse_through_all` operation.
