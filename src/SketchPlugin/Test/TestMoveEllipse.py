@@ -67,7 +67,7 @@ class TestMoveEllipse(unittest.TestCase):
     distPF1 = model.distancePointPoint(firstFocus2d,  point)
     secondFocus2d = GeomAPI_Pnt2d(theEllipse.secondFocus().x(), theEllipse.secondFocus().y())
     distPF2 = model.distancePointPoint(secondFocus2d,  point)
-    self.assertAlmostEqual(distPF1 + distPF2, 2.0 * theEllipse.majorRadius().value(), 7 - math.floor(math.log10(theEllipse.majorRadius().value())))
+    self.assertAlmostEqual(distPF1 + distPF2, 2.0 * theEllipse.majorRadius().value(), 7 - math.floor(math.log10(2.0 * theEllipse.majorRadius().value())))
 
   def fixMajorRadius(self):
     self.mySketch.setDistance(self.myEllipse.center(), self.myEllipse.majorAxisPositive(), self.myMajorRadius)
@@ -238,4 +238,3 @@ class TestMoveEllipse(unittest.TestCase):
 if __name__ == "__main__":
     test_program = unittest.main(exit=False)
     assert test_program.result.wasSuccessful(), "Test failed"
-    assert(model.checkPythonDump())
