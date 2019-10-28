@@ -35,6 +35,9 @@
 #include <Model_AttributeTables.h>
 #include <Model_Events.h>
 #include <Model_Expression.h>
+#include <Model_Tools.h>
+#include <Model_Validator.h>
+
 #include <ModelAPI_Feature.h>
 #include <ModelAPI_Result.h>
 #include <ModelAPI_ResultParameter.h>
@@ -43,7 +46,6 @@
 #include <ModelAPI_Session.h>
 #include <ModelAPI_ResultPart.h>
 #include <ModelAPI_Tools.h>
-#include <Model_Validator.h>
 
 #include <GeomDataAPI_Point.h>
 #include <GeomDataAPI_Point2D.h>
@@ -56,13 +58,8 @@
 
 #include <TDataStd_Name.hxx>
 #include <TDataStd_AsciiString.hxx>
-#include <TDataStd_IntegerArray.hxx>
 #include <TDataStd_UAttribute.hxx>
-#include <TDF_AttributeIterator.hxx>
-#include <TDF_ChildIterator.hxx>
-#include <TDF_RelocationTable.hxx>
 #include <TDF_ChildIDIterator.hxx>
-#include <TColStd_HArray1OfByte.hxx>
 
 #include <string>
 
@@ -797,37 +794,10 @@ void Model_Data::referencesToObjects(
   }
 }
 
-/// makes copy of all attributes on the given label and all sub-labels
-static void copyAttrs(TDF_Label theSource, TDF_Label theDestination) {
-  TDF_AttributeIterator anAttrIter(theSource);
-  for(; anAttrIter.More(); anAttrIter.Next()) {
-    Handle(TDF_Attribute) aTargetAttr;
-    if (!theDestination.FindAttribute(anAttrIter.Value()->ID(), aTargetAttr)) {
-      // create a new attribute if not yet exists in the destination
-	    aTargetAttr = anAttrIter.Value()->NewEmpty();
-      theDestination.AddAttribute(aTargetAttr);
-    }
-    // no special relocation, empty map, but self-relocation is on: copy references w/o changes
-    Handle(TDF_RelocationTable) aRelocTable = new TDF_RelocationTable(Standard_True);
-    anAttrIter.Value()->Paste(aTargetAttr, aRelocTable);
-    // an exception: if a source reference refers itself, a copy must also refer itself
-    if (aTargetAttr->ID() == TDF_Reference::GetID()) {
-      Handle(TDF_Reference) aTargetRef = Handle(TDF_Reference)::DownCast(aTargetAttr);
-      if (aTargetRef->Get().IsEqual(anAttrIter.Value()->Label()))
-        aTargetRef->Set(aTargetRef->Label());
-    }
-  }
-  // copy the sub-labels content
-  TDF_ChildIterator aSubLabsIter(theSource);
-  for(; aSubLabsIter.More(); aSubLabsIter.Next()) {
-    copyAttrs(aSubLabsIter.Value(), theDestination.FindChild(aSubLabsIter.Value().Tag()));
-  }
-}
-
 void Model_Data::copyTo(std::shared_ptr<ModelAPI_Data> theTarget)
 {
   TDF_Label aTargetRoot = std::dynamic_pointer_cast<Model_Data>(theTarget)->label();
-  copyAttrs(myLab, aTargetRoot);
+  Model_Tools::copyAttrs(myLab, aTargetRoot);
   // reinitialize Model_Attributes by TDF_Attributes set
   std::shared_ptr<Model_Data> aTData = std::dynamic_pointer_cast<Model_Data>(theTarget);
   aTData->myAttrs.clear();

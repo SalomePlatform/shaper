@@ -22,6 +22,8 @@
 
 #include <ModelAPI_Events.h>
 
+#include <PCDM_RetrievalDriver.hxx>
+
 IMPLEMENT_STANDARD_RTTIEXT(Model_Application, TDocStd_Application)
 
 static Handle_Model_Application TheApplication = new Model_Application;
@@ -168,6 +170,14 @@ Model_Application::Model_Application()
   // store handle to the application to avoid nullification
   static Handle(Model_Application) TheKeepHandle;
   TheKeepHandle = this;
+  // additional file format supported
+  static TCollection_ExtendedString THE_DOC_FORMAT("BinOcaf"/*"BinShaperPart"*/);
+  static TCollection_ExtendedString THE_FILE_EXT("shaperpart");
+  Handle(PCDM_RetrievalDriver) aReader =
+      Handle(PCDM_RetrievalDriver)::DownCast(TheKeepHandle->ReaderFromFormat("BinOcaf"));
+  Handle(PCDM_StorageDriver) aWriter = TheKeepHandle->WriterFromFormat("BinOcaf");
+  TheKeepHandle->DefineFormat(THE_DOC_FORMAT, "Shaper Part document", THE_FILE_EXT,
+                              aReader, aWriter);
 }
 
 //=======================================================================

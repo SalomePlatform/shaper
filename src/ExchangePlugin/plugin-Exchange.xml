@@ -33,6 +33,29 @@
              tooltip="To use geometrical order for identification of selected shapes"
              default="false"/> -->
       </feature>
+
+      <feature id="ImportPart" title="Import part" tooltip="Import features from file" icon="icons/Exchange/import_part.png"
+               helpfile="importPart.html"
+               internal="1">
+        <file_selector id="file_path" title="Import file" path="">
+          <validator id="ExchangePlugin_ImportFormat" parameters="shaperpart:Part" />
+        </file_selector>
+      </feature>
+      <feature id="ExportPart" title="Export part" tooltip="Export structure of the Part to file" icon="icons/Exchange/export_part.png"
+               helpfile="exportPart.html"
+               internal="1">
+        <export_file_selector id="file_path"
+                              type="save"
+                              title="Export file"
+                              path="">
+          <validator id="ExchangePlugin_ExportFormat"
+                     parameters="shaperpart:Part" />
+        </export_file_selector>
+        <multi_selector id="selection_list"
+                        tooltip="Select features or results"
+                        shape_types="Vertices Edges Faces Solids Compsolids Objects">
+        </multi_selector>
+      </feature>
     </group>
   </workbench>
 </plugin>

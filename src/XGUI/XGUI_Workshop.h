@@ -397,6 +397,12 @@ signals:
   /// Create a new document
   void onNew();
 
+  /// Import part structure from a file
+  void onImportPart();
+
+  /// Export features to a file
+  void onExportPart();
+
 #ifndef HAVE_SALOME
   /// Exit application
   void onExit();

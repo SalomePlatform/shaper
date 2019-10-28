@@ -67,6 +67,7 @@
 #include <ModelAPI_AttributeDocRef.h>
 #include <ModelAPI_AttributeIntArray.h>
 #include <ModelAPI_AttributeDouble.h>
+#include <ModelAPI_AttributeString.h>
 #include <ModelAPI_Data.h>
 #include <ModelAPI_Events.h>
 #include <ModelAPI_Feature.h>
@@ -86,6 +87,9 @@
 #include <Events_Loop.h>
 #include <Events_InfoMessage.h>
 #include <Events_LongOp.h>
+
+#include <ExchangePlugin_ExportPart.h>
+#include <ExchangePlugin_ImportPart.h>
 
 #include <GeomAPI_Pnt.h>
 
@@ -182,6 +186,8 @@ static QString MyFilter(QObject::tr("CAD Builder files (*.cadbld);;All files (*.
 static QString MyFilter2(QObject::tr("CAD Builder files (*.cadbld)"));
 static QString MyExtension(".cadbld");
 #endif
+
+static QString MyImportPartFilter(QObject::tr("Part files (*.shaperpart);;All files (*.*)"));
 
 
 //******************************************************
@@ -468,6 +474,19 @@ void XGUI_Workshop::initMenu()
                                               QIcon(), QKeySequence(),
                                               false, "MEN_DESK_FILE");
   connect(aAction, SIGNAL(triggered(bool)), this, SLOT(onOpen()));
+  salomeConnector()->addDesktopMenuSeparator("MEN_DESK_FILE");
+
+  aAction = salomeConnector()->addDesktopCommand("EXPORT_PART_CMD", tr("Export part..."),
+                                          tr("Export a part of the current document into a file"),
+                                          QIcon(), QKeySequence(),
+                                          false, "MEN_DESK_FILE");
+  connect(aAction, SIGNAL(triggered(bool)), this, SLOT(onExportPart()));
+
+  aAction = salomeConnector()->addDesktopCommand("IMPORT_PART_CMD", tr("Import part..."),
+                                          tr("Import structure of a part"),
+                                          QIcon(), QKeySequence(),
+                                          false, "MEN_DESK_FILE");
+  connect(aAction, SIGNAL(triggered(bool)), this, SLOT(onImportPart()));
   salomeConnector()->addDesktopMenuSeparator("MEN_DESK_FILE");
 
 #else
@@ -1241,6 +1260,42 @@ void XGUI_Workshop::onWidgetObjectUpdated()
 {
   operationMgr()->onValidateOperation();
   myDisplayer->updateViewer();
+}
+
+//******************************************************
+void XGUI_Workshop::onImportPart()
+{
+  if (!abortAllOperations())
+    return;
+
+  //show file dialog, check if readable and open
+  qreal aRatio = ModuleBase_Tools::currentPixelRatio();
+  // If the ratio is > 1 (HD screen) then QT has a bug in
+  // displaying of system open file dialog (too small)
+  QString aFile = QFileDialog::getOpenFileName(desktop(), tr("Import part"), QString(),
+        MyImportPartFilter, Q_NULLPTR,
+        ((aRatio > 1) ? QFileDialog::DontUseNativeDialog : QFileDialog::Options()));
+  if (!aFile.isNull()) {
+    ModuleBase_OperationFeature* anImportPartOp = dynamic_cast<ModuleBase_OperationFeature*>(
+        module()->createOperation(ExchangePlugin_ImportPart::ID()));
+    if (operationMgr()->startOperation(anImportPartOp)) {
+      // initialize the filename to be imported
+      FeaturePtr aFeature = anImportPartOp->feature();
+      aFeature->string(ExchangePlugin_ImportPart::FILE_PATH_ID())->setValue(aFile.toStdString());
+      ModuleBase_Tools::flushUpdated(aFeature);
+      operationMgr()->commitOperation();
+    }
+  }
+}
+
+//******************************************************
+void XGUI_Workshop::onExportPart()
+{
+  if (abortAllOperations()) {
+    ModuleBase_OperationFeature* anExportPartOp = dynamic_cast<ModuleBase_OperationFeature*>(
+        module()->createOperation(ExchangePlugin_ExportPart::ID()));
+    operationMgr()->startOperation(anExportPartOp);
+  }
 }
 
 //******************************************************

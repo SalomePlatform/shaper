@@ -23,6 +23,7 @@
 #include <Model_Application.h>
 #include <Model_Session.h>
 #include <Model_Events.h>
+#include <Model_Tools.h>
 #include <ModelAPI_ResultPart.h>
 #include <ModelAPI_Validator.h>
 #include <ModelAPI_CompositeFeature.h>
@@ -59,7 +60,7 @@
 #include <TNaming_Iterator.hxx>
 #include <TNaming_NamedShape.hxx>
 #include <TNaming_Tool.hxx>
-#include<TNaming_OldShapeIterator.hxx>
+#include <TNaming_OldShapeIterator.hxx>
 #include <TopTools_DataMapOfShapeShape.hxx>
 #include <TopTools_ListOfShape.hxx>
 
@@ -221,24 +222,20 @@ static void updateShapesFromRoot(const TDF_Label theThisAccess, const TDF_Label 
 }
 // LCOV_EXCL_STOP
 
-bool Model_Document::load(const char* theDirName, const char* theFileName, DocumentPtr theThis)
+static bool loadDocument(Handle(Model_Application) theApp,
+                         Handle(TDocStd_Document)& theDoc,
+                         const TCollection_ExtendedString& theFilename)
 {
-  Handle(Model_Application) anApp = Model_Application::getApplication();
-  if (isRoot()) {
-    anApp->setLoadPath(theDirName);
-  }
-  TCollection_ExtendedString aPath(DocFileName(theDirName, theFileName));
-  PCDM_ReaderStatus aStatus = (PCDM_ReaderStatus) -1;
-  Handle(TDocStd_Document) aLoaded;
+  PCDM_ReaderStatus aStatus = (PCDM_ReaderStatus)-1;
   try {
-    aStatus = anApp->Open(aPath, aLoaded);
+    aStatus = theApp->Open(theFilename, theDoc);
   } catch (Standard_Failure const& anException) {
     Events_InfoMessage("Model_Document",
         "Exception in opening of document: %1").arg(anException.GetMessageString()).send();
     return false;
   }
-  bool isError = aStatus != PCDM_RS_OK;
-  if (isError) {
+  bool isOk = aStatus == PCDM_RS_OK;
+  if (!isOk) {
     // LCOV_EXCL_START
     switch (aStatus) {
       case PCDM_RS_UnknownDocument:
@@ -296,9 +293,22 @@ bool Model_Document::load(const char* theDirName, const char* theFileName, Docum
     }
     // LCOV_EXCL_STOP
   }
+  return isOk;
+}
+
+bool Model_Document::load(const char* theDirName, const char* theFileName, DocumentPtr theThis)
+{
+  Handle(Model_Application) anApp = Model_Application::getApplication();
+  if (isRoot()) {
+    anApp->setLoadPath(theDirName);
+  }
+  TCollection_ExtendedString aPath(DocFileName(theDirName, theFileName));
+  Handle(TDocStd_Document) aLoaded;
+  bool isOk = loadDocument(anApp, aLoaded, aPath);
+
   std::shared_ptr<Model_Session> aSession =
     std::dynamic_pointer_cast<Model_Session>(Model_Session::get());
-  if (!isError) {
+  if (isOk) {
     myDoc = aLoaded;
     myDoc->SetUndoLimit(UNDO_LIMIT);
 
@@ -333,7 +343,89 @@ bool Model_Document::load(const char* theDirName, const char* theFileName, Docum
   } else { // open failed, but new document was created to work with it: inform the model
     aSession->setActiveDocument(Model_Session::get()->moduleDocument(), false);
   }
-  return !isError;
+  return isOk;
+}
+
+bool Model_Document::import(const char* theFileName)
+{
+  Handle(Model_Application) anApp = Model_Application::getApplication();
+  TCollection_ExtendedString aFormat;
+  if (!anApp->Format(theFileName, aFormat))
+    return false;
+
+  Handle(TDocStd_Document) aTempDoc;
+  bool isOk = loadDocument(anApp, aTempDoc, theFileName);
+
+  // copy features from the temporary document to the current
+  Handle(TDF_RelocationTable) aRelocTable = new TDF_RelocationTable(Standard_True);
+  TDF_LabelList anAllNewFeatures;
+  // Perform the copying twice for correct references:
+  // 1. copy labels hierarchy and fill the relocation table
+  TDF_Label aMain = myDoc->Main();
+  for (TDF_ChildIterator anIt(aTempDoc->Main()); anIt.More(); anIt.Next()) {
+    TDF_Label aCurrentLab = anIt.Value();
+    Handle(TDataStd_Comment) aFeatureID;
+    TDF_Label aNewFeatuerLab;
+    if (aCurrentLab.FindAttribute(TDataStd_Comment::GetID(), aFeatureID)) {
+      TCollection_AsciiString anID(aFeatureID->Get());
+      FeaturePtr aNewFeature = addFeature(anID.ToCString());
+      std::shared_ptr<Model_Data> aData =
+          std::dynamic_pointer_cast<Model_Data>(aNewFeature->data());
+      aNewFeatuerLab = aData->label().Father();
+      Model_Tools::copyLabels(aCurrentLab, aNewFeatuerLab, aRelocTable);
+    }
+    anAllNewFeatures.Append(aNewFeatuerLab);
+  }
+  // 2. copy attributes
+  TDF_ListIteratorOfLabelList aNewIt(anAllNewFeatures);
+  for (TDF_ChildIterator anIt(aTempDoc->Main()); anIt.More(); anIt.Next()) {
+    TDF_Label aCurrentLab = anIt.Value();
+    TDF_Label aFeatureLab = aNewIt.Value();
+    if (aFeatureLab.IsNull())
+      anAllNewFeatures.Remove(aNewIt);
+    else {
+      Model_Tools::copyAttrs(aCurrentLab, aFeatureLab, aRelocTable);
+      aNewIt.Next();
+    }
+  }
+
+  myObjs->synchronizeFeatures(anAllNewFeatures, true, false, false, true);
+
+  if (aTempDoc->CanClose() == CDM_CCS_OK)
+    aTempDoc->Close();
+  return isOk;
+}
+
+static bool saveDocument(Handle(Model_Application) theApp,
+                         Handle(TDocStd_Document) theDoc,
+                         const TCollection_ExtendedString& theFilename)
+{
+  PCDM_StoreStatus aStatus;
+  try {
+    aStatus = theApp->SaveAs(theDoc, theFilename);
+  }
+  catch (Standard_Failure const& anException) {
+    Events_InfoMessage("Model_Document",
+      "Exception in saving of document: %1").arg(anException.GetMessageString()).send();
+    return false;
+  }
+  bool isDone = aStatus == PCDM_SS_OK || aStatus == PCDM_SS_No_Obj;
+  if (!isDone) {
+    switch (aStatus) {
+    case PCDM_SS_DriverFailure:
+      Events_InfoMessage("Model_Document",
+        "Can not save document: save driver-library failure").send();
+      break;
+    case PCDM_SS_WriteFailure:
+      Events_InfoMessage("Model_Document", "Can not save document: file writing failure").send();
+      break;
+    case PCDM_SS_Failure:
+    default:
+      Events_InfoMessage("Model_Document", "Can not save document").send();
+      break;
+    }
+  }
+  return isDone;
 }
 
 bool Model_Document::save(
@@ -374,34 +466,7 @@ bool Model_Document::save(
   }
   // filename in the dir is id of document inside of the given directory
   TCollection_ExtendedString aPath(DocFileName(theDirName, theFileName));
-  PCDM_StoreStatus aStatus;
-  try {
-    aStatus = anApp->SaveAs(myDoc, aPath);
-  } catch (Standard_Failure const& anException) {
-    Events_InfoMessage("Model_Document",
-        "Exception in saving of document: %1").arg(anException.GetMessageString()).send();
-    if (aWasCurrent.get()) { // return the current feature to the initial position
-      setCurrentFeature(aWasCurrent, false);
-      aSession->setCheckTransactions(true);
-    }
-    return false;
-  }
-  bool isDone = aStatus == PCDM_SS_OK || aStatus == PCDM_SS_No_Obj;
-  if (!isDone) {
-    switch (aStatus) {
-      case PCDM_SS_DriverFailure:
-        Events_InfoMessage("Model_Document",
-                           "Can not save document: save driver-library failure").send();
-        break;
-      case PCDM_SS_WriteFailure:
-        Events_InfoMessage("Model_Document", "Can not save document: file writing failure").send();
-        break;
-      case PCDM_SS_Failure:
-      default:
-        Events_InfoMessage("Model_Document", "Can not save document").send();
-        break;
-    }
-  }
+  bool isDone = saveDocument(anApp, myDoc, aPath);
 
   if (aWasCurrent.get()) { // return the current feature to the initial position
     setCurrentFeature(aWasCurrent, false);
@@ -441,6 +506,41 @@ bool Model_Document::save(
       }
     }
   }
+  return isDone;
+}
+
+bool Model_Document::save(const char* theFilename,
+                          const std::list<FeaturePtr>& theExportFeatures) const
+{
+  Handle(Model_Application) anApp = Model_Application::getApplication();
+  TCollection_ExtendedString aFormat;
+  if (!anApp->Format(theFilename, aFormat))
+    return false;
+
+  Handle(TDocStd_Document) aTempDoc = new TDocStd_Document(aFormat);
+  TDF_Label aMain = aTempDoc->Main();
+
+  Handle(TDF_RelocationTable) aRelocTable = new TDF_RelocationTable(Standard_True);
+  std::list<FeaturePtr>::const_iterator anIt = theExportFeatures.begin();
+  // Perform the copying twice for correct references:
+  // 1. copy labels hierarchy and fill the relocation table
+  for (; anIt != theExportFeatures.end(); ++anIt) {
+    TDF_Label aFeatureLab = aMain.NewChild();
+    std::shared_ptr<Model_Data> aData = std::dynamic_pointer_cast<Model_Data>((*anIt)->data());
+    Model_Tools::copyLabels(aData->label().Father(), aFeatureLab, aRelocTable);
+  }
+  // 2. copy attributes
+  TDF_ChildIterator aChildIt(aMain);
+  for (anIt = theExportFeatures.begin(); anIt != theExportFeatures.end(); ++anIt) {
+    TDF_Label aFeatureLab = aChildIt.Value();
+    std::shared_ptr<Model_Data> aData = std::dynamic_pointer_cast<Model_Data>((*anIt)->data());
+    Model_Tools::copyAttrs(aData->label().Father(), aFeatureLab, aRelocTable);
+    aChildIt.Next();
+  }
+
+  bool isDone = saveDocument(anApp, aTempDoc, theFilename);
+  if (aTempDoc->CanClose() == CDM_CCS_OK)
+    aTempDoc->Close();
   return isDone;
 }
 
