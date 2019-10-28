@@ -2525,6 +2525,7 @@ void XGUI_Workshop::showObjects(const QObjectPtrList& theList, bool isVisible)
   myObjectBrowser->updateAllIndexes();
 
   updateColorScaleVisibility();
+  displayer()->updateViewer();
 }
 
 //**************************************************************
@@ -2565,6 +2566,7 @@ void XGUI_Workshop::showOnlyObjects(const QObjectPtrList& theList)
   // Necessary for update icons in ObjectBrowser on Linux
   myObjectBrowser->updateAllIndexes();
   updateColorScaleVisibility();
+  displayer()->updateViewer();
 }
 
 
