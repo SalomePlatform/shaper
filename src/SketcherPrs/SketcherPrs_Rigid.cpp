@@ -59,6 +59,8 @@ bool SketcherPrs_Rigid::IsReadyToDisplay(ModelAPI_Feature* theConstraint,
                                          const std::shared_ptr<GeomAPI_Ax3>& thePlane)
 {
   bool aReadyToDisplay = false;
+  if (!thePlane)
+    return aReadyToDisplay;
 
   std::shared_ptr<ModelAPI_Data> aData = theConstraint->data();
   std::shared_ptr<ModelAPI_AttributeRefAttr> anAttr =

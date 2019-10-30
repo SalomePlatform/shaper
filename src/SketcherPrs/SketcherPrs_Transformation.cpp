@@ -48,9 +48,11 @@ SketcherPrs_Transformation::SketcherPrs_Transformation(ModelAPI_Feature* theCons
 }
 
 bool SketcherPrs_Transformation::IsReadyToDisplay(ModelAPI_Feature* theConstraint,
-                                                  const std::shared_ptr<GeomAPI_Ax3>&/* thePlane*/)
+                                                  const std::shared_ptr<GeomAPI_Ax3>& thePlane)
 {
   bool aReadyToDisplay = false;
+  if (!thePlane)
+    return aReadyToDisplay;
 
   std::shared_ptr<ModelAPI_Data> aData = theConstraint->data();
   // Get transformated objects list

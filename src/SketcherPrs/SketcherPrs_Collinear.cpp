@@ -38,18 +38,18 @@ SketcherPrs_Collinear::SketcherPrs_Collinear(ModelAPI_Feature* theConstraint,
 }
 
 bool SketcherPrs_Collinear::IsReadyToDisplay(ModelAPI_Feature* theConstraint,
-                                         const std::shared_ptr<GeomAPI_Ax3>&/* thePlane*/)
+                                         const std::shared_ptr<GeomAPI_Ax3>& thePlane)
 {
   bool aReadyToDisplay = false;
+  if (thePlane) {
+    ObjectPtr aObj1 =
+      SketcherPrs_Tools::getResult(theConstraint, SketchPlugin_Constraint::ENTITY_A());
+    ObjectPtr aObj2 =
+      SketcherPrs_Tools::getResult(theConstraint, SketchPlugin_Constraint::ENTITY_B());
 
-  ObjectPtr aObj1 =
-    SketcherPrs_Tools::getResult(theConstraint, SketchPlugin_Constraint::ENTITY_A());
-  ObjectPtr aObj2 =
-    SketcherPrs_Tools::getResult(theConstraint, SketchPlugin_Constraint::ENTITY_B());
-
-  aReadyToDisplay = SketcherPrs_Tools::getShape(aObj1).get() != NULL &&
-                    SketcherPrs_Tools::getShape(aObj2).get() != NULL;
-
+    aReadyToDisplay = SketcherPrs_Tools::getShape(aObj1).get() != NULL &&
+                      SketcherPrs_Tools::getShape(aObj2).get() != NULL;
+  }
   return aReadyToDisplay;
 }
 

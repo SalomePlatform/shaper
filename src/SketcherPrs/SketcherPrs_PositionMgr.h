@@ -36,22 +36,22 @@
 * A class Position Manager which manages position of constraints symbols along a source object line.
 * it expects that symbol icons have size 16x16 px
 */
-class SKETCHERPRS_EXPORT SketcherPrs_PositionMgr
+class SketcherPrs_PositionMgr
 {
 public:
   /// Returns current instance of position manager
-  static SketcherPrs_PositionMgr* get();
+  SKETCHERPRS_EXPORT static SketcherPrs_PositionMgr* get();
 
   /// Returns position of symbol for the given presentation
   /// \param theLine constrained object
   /// \param thePrs a presentation of constraint
   /// \param theStep step between symbols
-  gp_Pnt getPosition(ObjectPtr theLine, const SketcherPrs_SymbolPrs* thePrs,
-                     double theStep = 20, GeomPointPtr thePnt = GeomPointPtr());
+  SKETCHERPRS_EXPORT gp_Pnt getPosition(ObjectPtr theLine, const SketcherPrs_SymbolPrs* thePrs,
+                                        double theStep = 20, GeomPointPtr thePnt = GeomPointPtr());
 
   /// Deletes constraint object from internal structures. Has to be called on constraint delete.
   /// \param thePrs a constraint presentation
-  void deleteConstraint(const SketcherPrs_SymbolPrs* thePrs);
+  SKETCHERPRS_EXPORT void deleteConstraint(const SketcherPrs_SymbolPrs* thePrs);
 
   /// Cleares all stored positions for all constraints
   void clearAll()  { myShapes.clear(); myPntShapes.clear(); }
