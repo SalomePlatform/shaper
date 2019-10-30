@@ -40,9 +40,11 @@ SketcherPrs_Mirror::SketcherPrs_Mirror(ModelAPI_Feature* theConstraint,
 }
 
 bool SketcherPrs_Mirror::IsReadyToDisplay(ModelAPI_Feature* theConstraint,
-                                          const std::shared_ptr<GeomAPI_Ax3>&/* thePlane*/)
+                                          const std::shared_ptr<GeomAPI_Ax3>& thePlane)
 {
   bool aReadyToDisplay = false;
+  if (!thePlane)
+    return aReadyToDisplay;
 
   // Get axis of mirror
   ObjectPtr aAxisObj =

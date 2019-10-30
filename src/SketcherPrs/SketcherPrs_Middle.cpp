@@ -38,20 +38,20 @@ SketcherPrs_Middle::SketcherPrs_Middle(ModelAPI_Feature* theConstraint,
 }
 
 bool SketcherPrs_Middle::IsReadyToDisplay(ModelAPI_Feature* theConstraint,
-                                         const std::shared_ptr<GeomAPI_Ax3>&/* thePlane*/)
+                                         const std::shared_ptr<GeomAPI_Ax3>& thePlane)
 {
   bool aReadyToDisplay = false;
+  if (thePlane) {
+    ObjectPtr aObj1 =
+      SketcherPrs_Tools::getResult(theConstraint, SketchPlugin_Constraint::ENTITY_A());
+    ObjectPtr aObj2 =
+      SketcherPrs_Tools::getResult(theConstraint, SketchPlugin_Constraint::ENTITY_B());
 
-  ObjectPtr aObj1 =
-    SketcherPrs_Tools::getResult(theConstraint, SketchPlugin_Constraint::ENTITY_A());
-  ObjectPtr aObj2 =
-    SketcherPrs_Tools::getResult(theConstraint, SketchPlugin_Constraint::ENTITY_B());
-
-  // one object is a feature Line, other object is a point result. We check shape of point result
-  aReadyToDisplay = aObj1.get() && aObj2.get() &&
-                    (SketcherPrs_Tools::getShape(aObj1).get() != NULL ||
-                     SketcherPrs_Tools::getShape(aObj2).get() != NULL);
-
+    // one object is a feature Line, other object is a point result. We check shape of point result
+    aReadyToDisplay = aObj1.get() && aObj2.get() &&
+                      (SketcherPrs_Tools::getShape(aObj1).get() != NULL ||
+                       SketcherPrs_Tools::getShape(aObj2).get() != NULL);
+  }
   return aReadyToDisplay;
 }
 
