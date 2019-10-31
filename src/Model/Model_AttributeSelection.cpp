@@ -602,18 +602,29 @@ bool Model_AttributeSelection::update()
     TopoDS_Shape aContextShape = aContext->shape()->impl<TopoDS_Shape>();
     Selector_Selector aSelector(aSelLab, baseDocumentLab());
     aResult = aSelector.restore(aContextShape);
+    bool aWasInvalid = aSelLab.IsAttribute(kINVALID_SELECTION);
     setInvalidIfFalse(aSelLab, aResult);
 
     TopoDS_Shape aNewShape;
     if (aSelLab.FindAttribute(TNaming_NamedShape::GetID(), aNS))
       aNewShape = aNS->Get();
 
-    if (anOldShape.IsNull() || aNewShape.IsNull() || !anOldShape.IsEqual(aNewShape)) {
+    if (anOldShape.IsNull() || aNewShape.IsNull() || !anOldShape.IsEqual(aNewShape) || aWasInvalid)
+    {
       // shape type should not be changed: if shape becomes compound of such shapes, then split
       if (myParent && !anOldShape.IsNull() && !aNewShape.IsNull() &&
           anOldShape.ShapeType() != aNewShape.ShapeType() &&
           aNewShape.ShapeType() == TopAbs_COMPOUND) {
         split(aContext, aNewShape, anOldShape.ShapeType());
+      }
+      // for issue #3076 check that the new value belongs to the new context
+      if (!aNewShape.IsNull() && !aContextShape.IsNull()) {
+        TopExp_Explorer anExp(aContextShape, aNewShape.ShapeType());
+        for(; anExp.More(); anExp.Next()) {
+          if (anExp.Current().IsSame(aNewShape))
+            break;
+        }
+        aResult = setInvalidIfFalse(aSelLab, anExp.More());
       }
       owner()->data()->sendAttributeUpdated(this);  // send updated if shape is changed
     }
