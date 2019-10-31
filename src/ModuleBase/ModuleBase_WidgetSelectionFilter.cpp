@@ -662,7 +662,7 @@ bool ModuleBase_WidgetSelectionFilter::restoreValueCustom()
   }
 
   QList<QWidget*> aWidgets;
-  QList<ModuleBase_FilterItem*> aItems = myFiltersWgt->findChildren<ModuleBase_FilterItem*>();
+  QList<ModuleBase_FilterItem*> aItems = myFiltersLayout->findChildren<ModuleBase_FilterItem*>();
   foreach(ModuleBase_FilterItem* aItem, aItems) {
     QList<ModuleBase_ModelWidget*> aSubList = aItem->widgets();
     foreach(ModuleBase_ModelWidget* aWgt, aSubList) {
