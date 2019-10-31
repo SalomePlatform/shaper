@@ -68,6 +68,8 @@ Selector_Algo::Selector_Algo()
 
 static TDF_Label findGoodLabelWithShape(const TDF_Label theAccess, const TopoDS_Shape& theShape) {
   TDF_Label aResult;
+  TDF_Label aMyOpLab;
+  bool aMyOpLabIsComputed = false;
   if (TNaming_Tool::HasLabel(theAccess, theShape)) { // selection and delete evolution are not used
     for(TNaming_SameShapeIterator aShapes(theShape, theAccess); aShapes.More(); aShapes.Next())
     {
@@ -75,6 +77,22 @@ static TDF_Label findGoodLabelWithShape(const TDF_Label theAccess, const TopoDS_
       if (aShapes.Label().FindAttribute(TNaming_NamedShape::GetID(), aNS)) {
         if (aNS->Evolution() == TNaming_MODIFY || aNS->Evolution() == TNaming_GENERATED ||
             aNS->Evolution() == TNaming_PRIMITIVE) {
+          // getting label of this operation to avoid usage of ready shapes of this
+          if (!aMyOpLabIsComputed) {
+            aMyOpLab = theAccess;
+            if (!aMyOpLab.IsNull()) {
+              int aDepth = aMyOpLab.Depth();
+              if (aDepth < 3)
+                aMyOpLab.Nullify();
+              else {
+                for(; aDepth != 3; aDepth--)
+                  aMyOpLab = aMyOpLab.Father();
+              }
+            }
+            aMyOpLabIsComputed = true;
+          }
+          if (!aMyOpLab.IsNull() && aNS->Label().IsDescendant(aMyOpLab))
+            continue;
           aResult = aNS->Label();
           break;
         }
@@ -158,6 +176,17 @@ Selector_Algo* Selector_Algo::select(const TopoDS_Shape theContext, const TopoDS
     }
     return NULL; // not found value in the tree, not found context shape in the tree also
   }
+  // getting label of this operation to avoid usage of ready shapes of this
+  TDF_Label aMyOpLab = theAccess;
+  if (!aMyOpLab.IsNull()) {
+    int aDepth = aMyOpLab.Depth();
+    if (aDepth < 3)
+      aMyOpLab.Nullify();
+    else {
+      for(; aDepth != 3; aDepth--)
+        aMyOpLab = aMyOpLab.Father();
+    }
+  }
   // searching for the base shapes of the value
   Handle(TNaming_NamedShape) aPrimitiveNS;
   NCollection_List<Handle(TNaming_NamedShape)> aModifList;
@@ -170,6 +199,10 @@ Selector_Algo* Selector_Algo::select(const TopoDS_Shape theContext, const TopoDS
       Handle(TNaming_NamedShape) aNS;
       if (aShapes.Label().FindAttribute(TNaming_NamedShape::GetID(), aNS)) {
         TNaming_Evolution anEvolution = aNS->Evolution();
+        if (anEvolution == TNaming_SELECTED || anEvolution == TNaming_DELETE)
+          continue;
+        if (!aMyOpLab.IsNull() && aNS->Label().IsDescendant(aMyOpLab))
+          continue;
         if (anEvolution == TNaming_PRIMITIVE) { // the value shape is declared as PRIMITIVE
           aPrimitiveNS = aNS;
           break;
