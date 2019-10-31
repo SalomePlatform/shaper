@@ -417,19 +417,12 @@ GeomShapePtr FeaturesPlugin_VersionedBoolean::keepUnusedSubsOfCompound(
 
   GeomShapePtr aResultShape = theResult;
   if (!aCompounds.empty()) {
-    aResultShape = aCompounds.front();
-    aCompounds.pop_front();
-
-    std::shared_ptr<GeomAlgoAPI_ShapeBuilder> aBuilder(new GeomAlgoAPI_ShapeBuilder);
-    for (ListOfShape::iterator anIt = aCompounds.begin(); anIt != aCompounds.end(); ++anIt) {
-      for (GeomAPI_ShapeIterator aSub(*anIt); aSub.more(); aSub.next())
-        aBuilder->add(aResultShape, aSub.current());
-    }
-
-    if (theResult)
+    aResultShape = GeomAlgoAPI_CompoundBuilder::compound(aCompounds);
+    if (theResult) {
+      std::shared_ptr<GeomAlgoAPI_ShapeBuilder> aBuilder(new GeomAlgoAPI_ShapeBuilder);
       aBuilder->add(aResultShape, theResult);
-
-    theMakeShapeList->appendAlgo(aBuilder);
+      theMakeShapeList->appendAlgo(aBuilder);
+    }
   }
   return aResultShape;
 }

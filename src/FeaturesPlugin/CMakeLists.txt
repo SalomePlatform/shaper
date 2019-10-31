@@ -494,6 +494,7 @@ ADD_UNIT_TESTS(TestExtrusion.py
                Test2826.py
                Test2854.py
                Test2878.py
+               Test2920.py
                Test2971.py
                Test3014.py
                TestBooleanCommon_MultiLevelCompound_v0_1.py
