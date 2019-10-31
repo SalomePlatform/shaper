@@ -95,5 +95,8 @@ class GeomAPI_Trsf : public GeomAPI_Interface
   GEOMAPI_EXPORT void setSymmetry(const std::shared_ptr<GeomAPI_Ax2> thePlane);
 };
 
+//! Pointer on the object
+typedef std::shared_ptr<GeomAPI_Trsf> GeomTrsfPtr;
+
 #endif
 

@@ -415,3 +415,10 @@ void Model_ResultPart::setTrsf(std::shared_ptr<ModelAPI_Result> theThis,
   static Events_ID EVENT_DISP = aLoop->eventByName(EVENT_OBJECT_TO_REDISPLAY);
   ModelAPI_EventCreator::get()->sendUpdated(theThis, EVENT_DISP); // flush is in preview-update
 }
+
+std::shared_ptr<GeomAPI_Trsf> Model_ResultPart::summaryTrsf()
+{
+  GeomTrsfPtr aResult(new GeomAPI_Trsf);
+  aResult->setImpl<gp_Trsf>(new gp_Trsf(sumTrsf()));
+  return aResult;
+}

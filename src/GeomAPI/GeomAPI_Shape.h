@@ -33,6 +33,7 @@ class GeomAPI_Wire;
 class GeomAPI_Face;
 class GeomAPI_Shell;
 class GeomAPI_Solid;
+class GeomAPI_Trsf;
 
 /**\class GeomAPI_Shape
  * \ingroup DataModel
@@ -204,6 +205,10 @@ public:
   /// Translates the shape along the direction for the given offset
   GEOMAPI_EXPORT
   void translate(const std::shared_ptr<GeomAPI_Dir> theDir, const double theOffset);
+
+  /// Moves the shape with the given transformation matrix.
+  GEOMAPI_EXPORT
+    void move(const std::shared_ptr<GeomAPI_Trsf> theTransformation);
 
   /// Returns type of shapes in the compound.
   // If shapes are of different type then it will return SHAPE type

@@ -26,6 +26,7 @@
 #include <GeomAPI_Face.h>
 #include <GeomAPI_Shell.h>
 #include <GeomAPI_Solid.h>
+#include <GeomAPI_Trsf.h>
 
 #include <BRep_Tool.hxx>
 #include <BRepAlgoAPI_Section.hxx>
@@ -696,6 +697,12 @@ void GeomAPI_Shape::translate(const std::shared_ptr<GeomAPI_Dir> theDir, const d
   gp_Trsf aTranslation;
   aTranslation.SetTranslation(aTrsfVec);
   TopoDS_Shape aResult = MY_SHAPE->Moved(aTranslation);
+  setImpl(new TopoDS_Shape(aResult));
+}
+
+void GeomAPI_Shape::move(const std::shared_ptr<GeomAPI_Trsf> theTransformation)
+{
+  TopoDS_Shape aResult = MY_SHAPE->Moved(theTransformation->impl<gp_Trsf>());
   setImpl(new TopoDS_Shape(aResult));
 }
 

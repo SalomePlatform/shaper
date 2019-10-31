@@ -85,6 +85,8 @@ class Model_ResultPart : public ModelAPI_ResultPart
   /// Applies the additional transformation of the part
   MODEL_EXPORT virtual void setTrsf(std::shared_ptr<ModelAPI_Result> theThis,
     const std::shared_ptr<GeomAPI_Trsf>& theTransformation);
+  /// Returns the summary transformations of all references to the origin
+  MODEL_EXPORT virtual std::shared_ptr<GeomAPI_Trsf> summaryTrsf();
 
   /// Returns the parameters of color definition in the resources config manager
   MODEL_EXPORT virtual void colorConfigInfo(std::string& theSection, std::string& theName,
