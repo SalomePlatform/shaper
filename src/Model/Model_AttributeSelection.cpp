@@ -618,7 +618,9 @@ bool Model_AttributeSelection::update()
         split(aContext, aNewShape, anOldShape.ShapeType());
       }
       // for issue #3076 check that the new value belongs to the new context
-      if (!aNewShape.IsNull() && !aContextShape.IsNull()) {
+      if (!aNewShape.IsNull() && !aContextShape.IsNull() &&
+          (aNewShape.ShapeType() == TopAbs_VERTEX || aNewShape.ShapeType() == TopAbs_EDGE ||
+           aNewShape.ShapeType() == TopAbs_FACE)) {
         TopExp_Explorer anExp(aContextShape, aNewShape.ShapeType());
         for(; anExp.More(); anExp.Next()) {
           if (anExp.Current().IsSame(aNewShape))
