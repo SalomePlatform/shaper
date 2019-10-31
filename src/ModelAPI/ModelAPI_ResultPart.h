@@ -82,6 +82,9 @@ class ModelAPI_ResultPart : public ModelAPI_Result
   virtual void setTrsf(std::shared_ptr<ModelAPI_Result> theThis,
     const std::shared_ptr<GeomAPI_Trsf>& theTransformation) = 0;
 
+  /// Returns the summary transformations of all references to the origin
+  virtual std::shared_ptr<GeomAPI_Trsf> summaryTrsf() = 0;
+
   /// Returns the shape by the name in the part
   virtual std::shared_ptr<GeomAPI_Shape> shapeInPart(
     const std::string& theName, const std::string& theType, int& theIndex) = 0;

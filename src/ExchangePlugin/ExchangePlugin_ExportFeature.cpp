@@ -39,6 +39,7 @@
 
 #include <GeomAPI_Shape.h>
 #include <GeomAPI_ShapeExplorer.h>
+#include <GeomAPI_Trsf.h>
 
 #include <ModelAPI_AttributeSelectionList.h>
 #include <ModelAPI_AttributeString.h>
@@ -313,6 +314,7 @@ void ExchangePlugin_ExportFeature::exportXAO(const std::string& theFileName)
   std::list<GeomShapePtr> aShapes;
   std::list<ResultPtr> aResults;
   std::list<DocumentPtr> aDocuments; /// documents of Parts selected and used in export
+  std::map<DocumentPtr, GeomTrsfPtr> aDocTrsf; /// translation of the part
 
   AttributeSelectionListPtr aSelection = selectionList(SELECTION_LIST_ID());
   bool aIsSelection = aSelection->isInitialized() && aSelection->size() > 0;
@@ -336,6 +338,7 @@ void ExchangePlugin_ExportFeature::exportXAO(const std::string& theFileName)
             return;
           } else {
             aDocuments.push_back(aPartDoc);
+            aDocTrsf[aPartDoc] = aResPart->summaryTrsf();
           }
         }
       }
@@ -414,7 +417,10 @@ void ExchangePlugin_ExportFeature::exportXAO(const std::string& theFileName)
       try {
         GeomAPI_ShapeExplorer aGroupResExplorer(aResultGroup->shape(), aSelType);
         for(; aGroupResExplorer.more(); aGroupResExplorer.next()) {
-          int aReferenceID = GeomAlgoAPI_CompoundBuilder::id(aShape, aGroupResExplorer.current());
+          GeomShapePtr aGroupShape = aGroupResExplorer.current();
+          if (aDocTrsf.find(*aDoc) != aDocTrsf.end())
+            aGroupShape->move(aDocTrsf[*aDoc]);
+          int aReferenceID = GeomAlgoAPI_CompoundBuilder::id(aShape, aGroupShape);
           if (aReferenceID == 0) // selected value does not found in the exported shape
             continue;
           std::string aReferenceString = XAO::XaoUtils::intToString(aReferenceID);

@@ -22,6 +22,7 @@
 #include <TopoDS_Compound.hxx>
 #include <TopTools_IndexedMapOfShape.hxx>
 #include <TopExp.hxx>
+#include <TopExp_Explorer.hxx>
 
 std::shared_ptr<GeomAPI_Shape> GeomAlgoAPI_CompoundBuilder::compound(
     std::list<std::shared_ptr<GeomAPI_Shape> > theShapes)
@@ -41,6 +42,20 @@ std::shared_ptr<GeomAPI_Shape> GeomAlgoAPI_CompoundBuilder::compound(
   return aRes;
 }
 
+// Returns true if transformations are equal with the given precision
+static bool isEqual(const gp_Trsf& theT1, const gp_Trsf& theT2, const double thePrecision)
+{
+  for(int aRow = 1; aRow < 4; aRow++) {
+    for(int aCol = 1; aCol < 5; aCol++) {
+      double aDiff = theT1.Value(aRow, aCol) - theT2.Value(aRow, aCol);
+      if (aDiff < 0) aDiff = -aDiff;
+      if (aDiff > thePrecision)
+        return false;
+    }
+  }
+  return true;
+}
+
 int GeomAlgoAPI_CompoundBuilder::id(
       std::shared_ptr<GeomAPI_Shape> theContext, std::shared_ptr<GeomAPI_Shape> theSub)
 {
@@ -51,6 +66,18 @@ int GeomAlgoAPI_CompoundBuilder::id(
     TopTools_IndexedMapOfShape aSubShapesMap;
     TopExp::MapShapes(aMainShape, aSubShapesMap);
     anID = aSubShapesMap.FindIndex(aSubShape);
+    if (anID == 0) { // try to search shape with the same location if TopLoc_Location is different
+      TopExp_Explorer anExp(aMainShape, aSubShape.ShapeType());
+      for(; anExp.More(); anExp.Next()) {
+        if (anExp.Current().TShape() == aSubShape.TShape()) {
+          const TopLoc_Location aLoc1 = anExp.Current().Location();
+          if (isEqual(aLoc1.Transformation(), aSubShape.Location().Transformation(), 1.e-7)) {
+            anID = aSubShapesMap.FindIndex(anExp.Current());
+            break;
+          }
+        }
+      }
+    }
   }
 
   return anID;
