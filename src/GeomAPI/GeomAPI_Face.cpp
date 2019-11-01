@@ -23,6 +23,7 @@
 #include "GeomAPI_Pln.h"
 #include "GeomAPI_Pnt.h"
 #include "GeomAPI_Sphere.h"
+#include "GeomAPI_Curve.h"
 #include "GeomAPI_Cylinder.h"
 #include "GeomAPI_Cone.h"
 #include "GeomAPI_Torus.h"
@@ -40,9 +41,12 @@
 #include <Geom_OffsetSurface.hxx>
 #include <Geom_Plane.hxx>
 #include <Geom_RectangularTrimmedSurface.hxx>
+#include <Geom_SurfaceOfLinearExtrusion.hxx>
+#include <Geom_SurfaceOfRevolution.hxx>
 #include <Geom_SweptSurface.hxx>
 #include <Geom_ToroidalSurface.hxx>
 #include <GeomAdaptor_HSurface.hxx>
+#include <GeomAPI_ExtremaCurveCurve.hxx>
 #include <GeomLib_IsPlanarSurface.hxx>
 #include <IntPatch_ImpImpIntersection.hxx>
 #include <IntTools_Context.hxx>
@@ -174,7 +178,28 @@ bool GeomAPI_Face::isSameGeometry(const std::shared_ptr<GeomAPI_Shape> theShape)
   {
     GeomCylinderPtr anOwnCyl = getCylinder();
     GeomCylinderPtr anOtherCyl = anOther->getCylinder();
-    return anOwnCyl && anOtherCyl && anOwnCyl->isCoincident(anOtherCyl);
+    if (anOwnCyl && anOtherCyl)
+      return anOwnCyl->isCoincident(anOtherCyl);
+
+    // compare two swept surfaces of the same type
+    if ((anOwnSurf->IsKind(STANDARD_TYPE(Geom_SurfaceOfLinearExtrusion)) &&
+         anOtherSurf->IsKind(STANDARD_TYPE(Geom_SurfaceOfLinearExtrusion))) ||
+        (anOwnSurf->IsKind(STANDARD_TYPE(Geom_SurfaceOfRevolution)) &&
+         anOtherSurf->IsKind(STANDARD_TYPE(Geom_SurfaceOfRevolution)))) {
+      Handle(Geom_SweptSurface) anOwnSwept = Handle(Geom_SweptSurface)::DownCast(anOwnSurf);
+      Handle(Geom_SweptSurface) anOtherSwept = Handle(Geom_SweptSurface)::DownCast(anOtherSurf);
+
+      const gp_Dir& anOwnDir = anOwnSwept->Direction();
+      const gp_Dir& anOtherDir = anOtherSwept->Direction();
+
+      if (anOwnDir.IsParallel(anOtherDir, Precision::Angular())) {
+        Handle(Geom_Curve) anOwnCurve = anOwnSwept->BasisCurve();
+        Handle(Geom_Curve) anOtherCurve = anOtherSwept->BasisCurve();
+        GeomAPI_ExtremaCurveCurve anExtrema(anOwnCurve, anOtherCurve);
+        return anExtrema.Extrema().IsParallel() &&
+               anExtrema.TotalLowerDistance() < Precision::Confusion();
+      }
+    }
   }
 
   return false;
