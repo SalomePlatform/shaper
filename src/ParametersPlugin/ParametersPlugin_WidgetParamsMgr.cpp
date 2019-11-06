@@ -39,6 +39,7 @@
 #include <ModuleBase_Tools.h>
 
 #include <Events_Loop.h>
+#include <Config_PropManager.h>
 
 #include <QLayout>
 #include <QPushButton>
@@ -50,6 +51,7 @@
 #include <QEvent>
 #include <QKeyEvent>
 #include <QDialogButtonBox>
+#include <QShortcut>
 
 enum ColumnType {
   Col_Name,
@@ -237,6 +239,13 @@ ParametersPlugin_WidgetParamsMgr::ParametersPlugin_WidgetParamsMgr(QWidget* theP
   myAddBtn = new QPushButton(translate("Add"), this);
   connect(myAddBtn, SIGNAL(clicked(bool)), SLOT(onAdd()));
   aBtnLayout->addWidget(myAddBtn);
+
+  QString aAddStr(Config_PropManager::string("Shortcuts", "add_parameter_shortcut").c_str());
+  if (aAddStr.isEmpty())
+    aAddStr = "Ctrl+A";
+
+  QShortcut* aAddShc = new QShortcut(QKeySequence(aAddStr), myAddBtn);
+  connect(aAddShc, SIGNAL(activated()), SLOT(onAdd()));
 
   myInsertBtn = new QPushButton(translate("Insert"), this);
   connect(myInsertBtn, SIGNAL(clicked(bool)), SLOT(onInsert()));

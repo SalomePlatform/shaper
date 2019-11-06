@@ -228,6 +228,10 @@ PartSet_Module::PartSet_Module(ModuleBase_IWorkshop* theWshop)
   Config_PropManager::registerProp("Visualization", "sketch_dimension_color",
     "Dimension color",
     Config_Prop::Color, SKETCH_DIMENSION_COLOR);
+
+  Config_PropManager::registerProp("Shortcuts", "add_parameter_shortcut",
+    "Add parameter in parameters manager dialog",
+    Config_Prop::Shortcut, "Ctrl+A");
 }
 
 //******************************************************
