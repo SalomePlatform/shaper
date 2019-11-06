@@ -296,6 +296,9 @@ XGUI_Workshop::XGUI_Workshop(XGUI_SalomeConnector* theConnector)
   Config_PropManager::registerProp("Visualization", "result_field_color", "Field color",
                                    Config_Prop::Color, ModelAPI_ResultField::DEFAULT_COLOR());
 
+  Config_PropManager::registerProp("Visualization", "selection_color", "Selection color",
+    Config_Prop::Color, "255,255,255");
+
   if (ModuleBase_Preferences::resourceMgr()->booleanValue("Viewer", "face-selection", true))
     myViewerSelMode.append(TopAbs_FACE);
   if (ModuleBase_Preferences::resourceMgr()->booleanValue("Viewer", "edge-selection", true))
@@ -352,6 +355,15 @@ void XGUI_Workshop::startApplication()
   // Calling of  loadCustomProps before activating module is required
   // by Config_PropManger to restore user-defined path to plugins
   ModuleBase_Preferences::loadCustomProps();
+  std::vector<int> aColor;
+  try {
+    aColor = Config_PropManager::color("Visualization", "selection_color");
+  }
+  catch (...) {
+  }
+  if (aColor.size() == 3)
+    myDisplayer->setSelectionColor(aColor);
+
   createModule();
 
 #ifndef HAVE_SALOME
@@ -1071,8 +1083,7 @@ void XGUI_Workshop::onPreferences()
   ModuleBase_Preferences::editPreferences(aModif);
   if (aModif.size() > 0) {
     QString aSection;
-    foreach (ModuleBase_Pref aPref, aModif)
-    {
+    foreach (ModuleBase_Pref aPref, aModif) {
       aSection = aPref.first;
       if (aSection == ModuleBase_Preferences::VIEWER_SECTION) {
         myMainWindow->viewer()->updateFromResources();
@@ -1080,6 +1091,15 @@ void XGUI_Workshop::onPreferences()
         myMainWindow->menuObject()->updateFromResources();
       }
     }
+    std::vector<int> aColor;
+    try {
+      aColor = Config_PropManager::color("Visualization", "selection_color");
+    }
+    catch (...) {
+    }
+    if (aColor.size() == 3)
+      displayer()->setSelectionColor(aColor);
+
     displayer()->redisplayObjects();
   }
 }

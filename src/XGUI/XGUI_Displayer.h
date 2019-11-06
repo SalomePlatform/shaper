@@ -378,6 +378,8 @@ public:
   /// Returns scale of active view
   double getViewScale() const;
 
+  void setSelectionColor(const std::vector<int>& theColor);
+
 signals:
   /// Signal on object display
   /// \param theObject a data object

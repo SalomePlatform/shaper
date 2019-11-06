@@ -649,6 +649,8 @@ Handle(AIS_InteractiveContext) XGUI_Displayer::AISContext() const
     aContext->DefaultDrawer()->UIsoAspect()->SetNumber(0);
 
     ModuleBase_IViewer::DefaultHighlightDrawer = aContext->HighlightStyle();
+
+
     // Commented out according to discussion in bug #2825
     //Handle(Prs3d_Drawer) aSelStyle = aContext->SelectionStyle();
     //double aDeflection =
@@ -662,6 +664,20 @@ Handle(AIS_InteractiveContext) XGUI_Displayer::AISContext() const
   }
   return aContext;
 }
+
+//**************************************************************
+void XGUI_Displayer::setSelectionColor(const std::vector<int>& theColor)
+{
+  Handle(AIS_InteractiveContext) aContext = AISContext();
+  if (!aContext.IsNull()) {
+    Quantity_Color aQColor(theColor[0] / 255.,
+                           theColor[1] / 255.,
+                           theColor[2] / 255., Quantity_TOC_RGB);
+    aContext->SelectionStyle()->SetColor(aQColor);
+    aContext->HighlightStyle(Prs3d_TypeOfHighlight_LocalSelected)->SetColor(aQColor);
+  }
+}
+
 
 //**************************************************************
 Handle(SelectMgr_AndFilter) XGUI_Displayer::GetFilter()
