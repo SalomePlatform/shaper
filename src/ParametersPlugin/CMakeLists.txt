@@ -78,6 +78,7 @@ ADD_DEFINITIONS(-DPARAMETERSPLUGIN_EXPORTS ${OpenCASCADE_DEFINITIONS})
 SET(TEXT_RESOURCES
 	ParametersPlugin_msg_ru.ts
 	ParametersPlugin_msg_en.ts
+	ParametersPlugin_msg_fr.ts
 )
 
 # QT4_CREATE_TRANSLATION(QM_RESOURCES

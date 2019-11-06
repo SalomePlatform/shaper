@@ -39,7 +39,7 @@ SET(XML_RESOURCES
 )
 
 SET(TEXT_RESOURCES
-#    PartSetPlugin_msg_fr.ts
+    PartSetPlugin_msg_fr.ts
 )
 
 SOURCE_GROUP ("Resource Files" FILES ${TEXT_RESOURCES})
