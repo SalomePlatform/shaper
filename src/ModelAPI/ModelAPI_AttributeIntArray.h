@@ -40,7 +40,8 @@ class ModelAPI_AttributeIntArray : public ModelAPI_Attribute
   MODELAPI_EXPORT virtual int size() = 0;
 
   /// Sets the new size of the array. The previous data is erased.
-  MODELAPI_EXPORT virtual void setSize(const int theSize) = 0;
+  MODELAPI_EXPORT virtual void setSize(const int theSize,
+                                       bool sendUpdated = true) = 0;
 
   /// Defines the value of the array by index [0; size-1]
   MODELAPI_EXPORT virtual void setValue(const int theIndex,

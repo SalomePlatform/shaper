@@ -2237,7 +2237,7 @@ void PartSet_SketcherMgr::customizeSketchPresentation(const ObjectPtr& theObject
     if (ModelAPI_Session::get()->isOperation()) {
       AttributeIntArrayPtr aColorAttr = theObject->data()->intArray(ModelAPI_Result::COLOR_ID());
       if (aColorAttr.get()) {
-        aColorAttr->setSize(3);
+        aColorAttr->setSize(3, false);
         // Set the color attribute in order do not use default colors in the presentation object
         for (int i = 0; i < 3; i++)
           aColorAttr->setValue(i, aColor[i], false);
