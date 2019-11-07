@@ -680,6 +680,21 @@ void XGUI_Displayer::setSelectionColor(const std::vector<int>& theColor)
 
 
 //**************************************************************
+std::vector<int> XGUI_Displayer::selectionColor() const
+{
+  std::vector<int> aColor;
+  Handle(AIS_InteractiveContext) aContext = AISContext();
+  if (!aContext.IsNull()) {
+    Quantity_Color aQColor = aContext->SelectionStyle()->Color();
+    aColor.push_back((int)(aQColor.Red() * 255));
+    aColor.push_back((int)(aQColor.Green() * 255));
+    aColor.push_back((int)(aQColor.Blue() * 255));
+  }
+  return aColor;
+}
+
+
+//**************************************************************
 Handle(SelectMgr_AndFilter) XGUI_Displayer::GetFilter()
 {
   Handle(AIS_InteractiveContext) aContext = AISContext();
