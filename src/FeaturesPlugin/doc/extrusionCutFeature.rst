@@ -18,7 +18,7 @@ The following property panel will be opened:
 .. centered::
   Start sketch
 
-There are two variants of the property panel for Extrusion Cut depending on the chosen option:
+There are three variants of the property panel for Extrusion Cut depending on the chosen option:
 
 .. image:: images/extrusion_by_sizes.png
    :align: left
@@ -27,6 +27,10 @@ There are two variants of the property panel for Extrusion Cut depending on the 
 .. image:: images/extrusion_by_bounding_planes.png
    :align: left
 **By Bounding Planes** extrudes objects by specifying bounding planes and offsets.
+
+.. image:: images/extrusion_through_all.png
+   :align: left
+**Through All** extrudes base objects through all objects to be cut.
 
 
 By sizes
@@ -42,7 +46,7 @@ By sizes
 - **Axis** - if selected, it will be the direction of extrusion, otherwise objects normals will be used.
 - **To size**  - size for extrusion in the direction.
 - **From size** - size for extrusion in the opposite direction.
-- **Cut from** - contains a list of objects which will be cut from the result of extrusion.
+- **Cut from** - contains a list of objects to be cut by the result of extrusion.
 
 **TUI Commands**:  
 
@@ -110,7 +114,7 @@ By bounding planes
 - **To offset** - offset for extrusion or for a bounding plane, if selected.
 - **From plane** - a planar face can be selected to bound extrusion from the other side.
 - **From offset** - offset for extrusion or for a bounding plane, if selected.
-- **Cut from** - contains a list of objects which will be cut from the result of extrusion.
+- **Cut from** - contains a list of objects which will be cut by the result of extrusion.
 
 **TUI Commands**:
 
@@ -149,3 +153,46 @@ The Result of the operation will be an extruded shape:
    **Created Extrusion Cut**
 
 **See Also** a sample TUI Script of :ref:`tui_create_extrusion_cut_by_bounding_planes` operation.
+
+Through all
+-----------
+
+.. image:: images/ExtrusionCut3.png
+  :align: center
+
+.. centered::
+  Extrusion Cut: definition through all objects
+
+- **Base objects** - contains a list of objects selected in the Object Browser or in the Viewer, which will be extruded.
+- **Axis** - if selected, it will be the direction of extrusion, otherwise objects normals will be used.
+- **Cut from** - contains a list of objects to be cut by the result of extrusion.
+
+**TUI Commands**:  
+
+.. py:function:: model.addExtrusionCut(part, objectsToExtrude, objectsToCut)
+
+    :param part: The current part object.
+    :param list: A list of objects for extrusion.
+    :param list: A list of objects to cut from.
+    :return: Created object.
+
+.. py:function:: model.addExtrusionCut(part, objects, direction, objectsToCut)
+
+    :param part: The current part object.
+    :param list: A list of objects for extrusion.
+    :param object: A direction of extrusion
+    :param list: A list of objects to cut from.
+    :return: Created object.
+
+Result
+""""""
+
+The Result of the operation will be an extruded shape:
+
+.. image:: images/extrusion_cut_through_all_result.png
+	   :align: center
+
+.. centered::
+   **Created Extrusion Cut**
+
+**See Also** a sample TUI Script of :ref:`tui_create_extrusion_cut_through_all` operation.

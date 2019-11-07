@@ -415,6 +415,10 @@
       <source>By sizes</source>
       <translation>Par tailles</translation>
     </message>
+    <message>
+      <source>Through all</source>
+      <translation>À travers tous</translation>
+    </message>
   </context>
   <context>
     <name>ExtrusionCut:base</name>
@@ -600,6 +604,10 @@
     <message>
       <source>By sizes</source>
       <translation>Par tailles</translation>
+    </message>
+    <message>
+      <source>Through all</source>
+      <translation>À travers tous</translation>
     </message>
   </context>
   <context>
@@ -1369,6 +1377,10 @@
       <source>By bounding planes and angles</source>
       <translation>En délimitant des plans et des angles</translation>
     </message>
+    <message>
+      <source>Through all</source>
+      <translation>À travers tous</translation>
+    </message>
   </context>
   <context>
     <name>RevolutionCut:axis_object</name>
@@ -1528,6 +1540,10 @@
     <message>
       <source>By bounding planes and angles</source>
       <translation>En délimitant des plans et des angles</translation>
+    </message>
+    <message>
+      <source>Through all</source>
+      <translation>À travers tous</translation>
     </message>
   </context>
   <context>
@@ -5709,6 +5725,10 @@
     <message>
       <source>Select an edge for axis</source>
       <translation>Sélectionnez une arête pour l&apos;axe</translation>
+    </message>
+    <message>
+      <source>Attribute "%1" is not initialized.</source>
+      <translation>L&apos;axe de translation n&apos;est pas sélectionné.</translation>
     </message>
   </context>
   <context>
