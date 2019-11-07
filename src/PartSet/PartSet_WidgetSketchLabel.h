@@ -41,6 +41,7 @@ class XGUI_Workshop;
 class QCheckBox;
 class QStackedWidget;
 class QLineEdit;
+class QDialog;
 
 /**
 * \ingroup Modules
@@ -193,6 +194,9 @@ protected:
   /// \param thePrs a presentation
   bool fillSketchPlaneBySelection(const std::shared_ptr<ModuleBase_ViewerPrs>& thePrs);
 
+
+  virtual void showEvent(QShowEvent* theEvent);
+
 private slots:
   /// A slot called on set sketch plane view
   void onSetPlaneView();
@@ -238,6 +242,9 @@ private:
 
   bool myOpenTransaction;
   bool myIsSelection;
+
+  QDialog* myPartSetMessage;
+  QDialog* mySizeMessage;
 };
 
 #endif
