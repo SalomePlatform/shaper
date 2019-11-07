@@ -19,6 +19,8 @@
 
 #include "ExchangeAPI_Export.h"
 //--------------------------------------------------------------------------------------
+#include <ExchangePlugin_ExportPart.h>
+//--------------------------------------------------------------------------------------
 #include <ModelAPI_Document.h>
 #include <ModelAPI_Feature.h>
 #include <ModelHighAPI_Tools.h>
@@ -188,4 +190,17 @@ ExportPtr exportToXAO(const std::shared_ptr<ModelAPI_Document> & thePart,
   return ExportPtr(new ExchangeAPI_Export(aFeature, theFilePath, theSelectedShape, "XAO"));
 }
 
+void exportPart(const std::shared_ptr<ModelAPI_Document> & thePart,
+                const std::string & theFilePath,
+                const std::list<ModelHighAPI_Selection> & theSelected)
+{
+  FeaturePtr aFeature = thePart->addFeature(ExchangePlugin_ExportPart::ID());
+  aFeature->string(ExchangePlugin_ExportPart::FILE_PATH_ID())->setValue(theFilePath);
+  if (!theSelected.empty()) {
+    fillAttribute(theSelected,
+        aFeature->selectionList(ExchangePlugin_ExportPart::SELECTION_LIST_ID()));
+  }
+  // restart transaction to execute and delete the marcro-feature
+  apply();
+}
 //--------------------------------------------------------------------------------------

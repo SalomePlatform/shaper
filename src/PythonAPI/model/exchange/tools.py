@@ -1,4 +1,4 @@
-# Copyright (C) 2015-2019  CEA/DEN, EDF R&D
+# Copyright (C) 2019  CEA/DEN, EDF R&D
 #
 # This library is free software; you can redistribute it and/or
 # modify it under the terms of the GNU Lesser General Public
@@ -16,10 +16,16 @@
 #
 # See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 #
-"""Package for Exchange plugin for the Parametric Geometry API of the Modeler.
-"""
 
-from ExchangeAPI import addImport, exportToFile, exportToXAO
-from ExchangeAPI import exportPart, importPart
+import os
+import tempfile
 
-from .tools import *
+# Generate temporary file name
+def tempFileName():
+    tempDir = tempfile.TemporaryDirectory()
+    return os.path.join(tempDir.name, "temp.shaperpart")
+
+def removeFile(theFilename):
+    try: os.remove(theFilename)
+    except OSError: pass
+    assert not os.path.exists(theFilename), "Cannot remove file {}".format(theFilename)

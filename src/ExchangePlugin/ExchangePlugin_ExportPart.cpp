@@ -40,6 +40,7 @@ void ExchangePlugin_ExportPart::initAttributes()
 {
   data()->addAttribute(FILE_PATH_ID(), ModelAPI_AttributeString::typeId());
   data()->addAttribute(FILE_FORMAT_ID(), ModelAPI_AttributeString::typeId());
+  ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(), FILE_FORMAT_ID());
   data()->addAttribute(SELECTION_LIST_ID(), ModelAPI_AttributeSelectionList::typeId());
   ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(), SELECTION_LIST_ID());
 }

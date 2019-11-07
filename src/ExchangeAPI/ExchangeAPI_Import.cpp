@@ -19,7 +19,10 @@
 
 #include "ExchangeAPI_Import.h"
 //--------------------------------------------------------------------------------------
+#include <ExchangePlugin_ImportPart.h>
+//--------------------------------------------------------------------------------------
 #include <ModelHighAPI_Dumper.h>
+#include <ModelHighAPI_Services.h>
 #include <ModelHighAPI_Tools.h>
 //--------------------------------------------------------------------------------------
 #include <algorithm>
@@ -93,4 +96,25 @@ ImportPtr addImport(
 {
   std::shared_ptr<ModelAPI_Feature> aFeature = thePart->addFeature(ExchangeAPI_Import::ID());
   return ImportPtr(new ExchangeAPI_Import(aFeature, theFilePath));
+}
+
+void importPart(const std::shared_ptr<ModelAPI_Document> & thePart,
+                const std::string & theFilePath,
+                const ModelHighAPI_Reference & theAfterThis)
+{
+  static const bool THE_VISIBLE_FEATURE = false;
+  FeaturePtr aCurrentFeature;
+  if (theAfterThis.feature()) {
+    aCurrentFeature = thePart->currentFeature(THE_VISIBLE_FEATURE);
+    thePart->setCurrentFeature(theAfterThis.feature(), THE_VISIBLE_FEATURE);
+  }
+
+  FeaturePtr aFeature = thePart->addFeature(ExchangePlugin_ImportPart::ID());
+  aFeature->string(ExchangePlugin_ImportPart::FILE_PATH_ID())->setValue(theFilePath);
+  // restart transaction to execute and delete the marcro-feature
+  apply();
+
+  // restore current feature
+  if (aCurrentFeature)
+    thePart->setCurrentFeature(aCurrentFeature, THE_VISIBLE_FEATURE);
 }

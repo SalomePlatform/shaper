@@ -67,10 +67,13 @@
 #include <TopExp_Explorer.hxx>
 #include <TopoDS_Shape.hxx>
 
+#include <OSD_Directory.hxx>
 #include <OSD_File.hxx>
 #include <OSD_Path.hxx>
+#include <OSD_Protection.hxx>
 #include <CDF_Session.hxx>
 #include <CDF_Directory.hxx>
+#include <UTL.hxx>
 
 #include <climits>
 #ifndef WIN32
@@ -402,6 +405,14 @@ static bool saveDocument(Handle(Model_Application) theApp,
 {
   PCDM_StoreStatus aStatus;
   try {
+    // create the directory to save the document
+    OSD_Path aPathToFile = UTL::Path(theFilename);
+    aPathToFile.SetName("");
+    aPathToFile.SetExtension("");
+    OSD_Directory aBaseDir(aPathToFile);
+    if (!aBaseDir.Exists())
+      aBaseDir.Build(OSD_Protection());
+    // save the document
     aStatus = theApp->SaveAs(theDoc, theFilename);
   }
   catch (Standard_Failure const& anException) {

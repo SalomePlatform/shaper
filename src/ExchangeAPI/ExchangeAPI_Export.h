@@ -123,6 +123,15 @@ ExportPtr exportToXAO(const std::shared_ptr<ModelAPI_Document> & thePart,
   const std::string & theAuthor = std::string(),
   const std::string & theGeometryName = std::string());
 
+
+/** \ingroup CPPHighAPI
+ *  \brief Export selected features or the whole part to the binary file.
+ */
+EXCHANGEAPI_EXPORT void exportPart(
+    const std::shared_ptr<ModelAPI_Document> & thePart,
+    const std::string & theFilePath,
+    const std::list<ModelHighAPI_Selection> & theSelected = std::list<ModelHighAPI_Selection>());
+
 //--------------------------------------------------------------------------------------
 //--------------------------------------------------------------------------------------
 #endif /* SRC_EXCHANGEAPI_EXCHANGEAPI_EXPORT_H_ */

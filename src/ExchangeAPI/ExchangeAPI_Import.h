@@ -29,6 +29,8 @@
 
 #include <ModelHighAPI_Interface.h>
 #include <ModelHighAPI_Macro.h>
+#include <ModelHighAPI_Reference.h>
+#include <ModelHighAPI_Selection.h>
 //--------------------------------------------------------------------------------------
 /**\class ExchangeAPI_Import
  * \ingroup CPPHighAPI
@@ -71,6 +73,14 @@ typedef std::shared_ptr<ExchangeAPI_Import> ImportPtr;
 EXCHANGEAPI_EXPORT
 ImportPtr addImport(const std::shared_ptr<ModelAPI_Document> & thePart,
                     const std::string & theFilePath);
+
+/** \ingroup CPPHighAPI
+ *  \brief Import features from the file to the document after the current feature (or to the end).
+ */
+EXCHANGEAPI_EXPORT void importPart(
+    const std::shared_ptr<ModelAPI_Document> & thePart,
+    const std::string & theFilePath,
+    const ModelHighAPI_Reference & theAfterThis = ModelHighAPI_Reference());
 
 //--------------------------------------------------------------------------------------
 //--------------------------------------------------------------------------------------
