@@ -233,3 +233,37 @@ void XGUI_ModuleConnector::applyCurrentSelectionModes(const AISObjectPtr& theAIS
   Handle(AIS_InteractiveObject) anIO = theAIS->impl<Handle(AIS_InteractiveObject)>();
   myWorkshop->selectionActivate()->activate(anIO, false);
 }
+
+
+void XGUI_ModuleConnector::undo()
+{
+  myWorkshop->onUndo();
+}
+
+void XGUI_ModuleConnector::setCancelEnabled(bool toEnable)
+{
+  XGUI_ActionsMgr* anActionsMgr = workshop()->actionsMgr();
+  QAction* aAbortAction = anActionsMgr->operationStateAction(XGUI_ActionsMgr::AbortAll);
+  QAction* aAbortAllAction = anActionsMgr->operationStateAction(XGUI_ActionsMgr::Abort);
+  if (aAbortAction) {
+    aAbortAction->setEnabled(toEnable);
+  }
+  if (aAbortAllAction) {
+    aAbortAllAction->setEnabled(toEnable);
+  }
+}
+
+bool XGUI_ModuleConnector::isCancelEnabled() const
+{
+  XGUI_ActionsMgr* anActionsMgr = workshop()->actionsMgr();
+  QAction* aAbortAction = anActionsMgr->operationStateAction(XGUI_ActionsMgr::AbortAll);
+  QAction* aAbortAllAction = anActionsMgr->operationStateAction(XGUI_ActionsMgr::Abort);
+  bool isEnabled = false;
+  if (aAbortAction) {
+    isEnabled = true;
+  }
+  if (aAbortAllAction) {
+    isEnabled &= true;
+  }
+  return isEnabled;
+}

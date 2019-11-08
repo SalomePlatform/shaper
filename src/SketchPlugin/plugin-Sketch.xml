@@ -25,8 +25,7 @@
         <sketch-start-label id="External" geometrical_selection="true" title="Select a plane on which to create a sketch" tooltip="Select a plane on which to create a sketch">
           <validator id="GeomValidators_Face" parameters="plane"/>
         </sketch-start-label>
-        <!-- <label id="SolverDOF"/>  -->
-        <label id="SolverError" styleSheet="color : red; font : bold"/>
+        <undo_label id="SolverError" isHTML="true" />
         <validator id="SketchPlugin_SolverErrorValidator"/>
       </feature>
 

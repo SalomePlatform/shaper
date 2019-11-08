@@ -108,6 +108,7 @@ SET(PROJECT_HEADERS
   ModuleBase_WidgetSelectionFilter.h
   ModuleBase_IStepPrs.h
   ModuleBase_SelectionFilterType.h
+  ModuleBase_WidgetUndoLabel.h
 )
 
 SET(PROJECT_MOC_HEADERS
@@ -158,6 +159,7 @@ SET(PROJECT_MOC_HEADERS
   ModuleBase_WidgetRadiobox.h
   ModuleBase_WidgetPointInput.h
   ModuleBase_WidgetSelectionFilter.h
+  ModuleBase_WidgetUndoLabel.h
 )
 
 SET(PROJECT_SOURCES
@@ -228,6 +230,7 @@ SET(PROJECT_SOURCES
   ModuleBase_WidgetPointInput.cpp
   ModuleBase_WidgetSelectionFilter.cpp
   ModuleBase_IStepPrs.cpp
+  ModuleBase_WidgetUndoLabel.cpp
 )
 
 SET(TEXT_RESOURCES

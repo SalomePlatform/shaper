@@ -40,6 +40,7 @@
 #include <ModuleBase_WidgetMultiSelector.h>
 #include <ModuleBase_WidgetConcealedObjects.h>
 #include <ModuleBase_WidgetLabel.h>
+#include <ModuleBase_WidgetUndoLabel.h>
 #include <ModuleBase_WidgetToolbox.h>
 #include <ModuleBase_WidgetRadiobox.h>
 #include <ModuleBase_PageBase.h>
@@ -303,6 +304,8 @@ ModuleBase_ModelWidget* ModuleBase_WidgetFactory::createWidgetByType(const std::
     result = new ModuleBase_WidgetLabel(theParent, myWidgetApi);
   } else if (theType == WDG_DOUBLEVALUE) {
     result = new ModuleBase_WidgetDoubleValue(theParent, myWidgetApi);
+  } else if (theType == WDG_UNDOLABEL) {
+    result = new ModuleBase_WidgetUndoLabel(theParent, myWorkshop, myWidgetApi);
   } else if (theType == WDG_DOUBLEVALUELABEL) {
     result = new ModuleBase_WidgetLabelValue(theParent, myWidgetApi);
   } else if (theType == WDG_INTEGERVALUE) {
