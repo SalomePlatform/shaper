@@ -37,7 +37,7 @@ bool FiltersPlugin_BelongsTo::isOk(const GeomShapePtr& theShape, const ResultPtr
   for (int i = 0; i < aList->size(); i++) {
     AttributeSelectionPtr aAttr = aList->value(i);
     GeomShapePtr aGeom = aAttr->value();
-    if (aGeom->isSubShape(theShape))
+    if (aGeom && aGeom->isSubShape(theShape))
       return true;
   }
   return false;
