@@ -192,4 +192,5 @@ ADD_UNIT_TESTS(
   Test2946.py
   Test2951.py
   Test17924.py
+  Test17962.py
 )
