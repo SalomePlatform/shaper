@@ -282,10 +282,8 @@ Q_OBJECT
   /// Has to be called in order to display objects from a specifed group
   /// with visibility status = true
   /// \param theDoc the document for objects synchronisation
-  /// \param theGroup the group name
   /// \param theUpdateViewer update viewer flag
   void synchronizeGroupInViewer(const DocumentPtr& theDoc,
-                                const std::string& theGroup,
                                 bool theUpdateViewer);
 
   void synchronizeResultTree(const ResultBodyPtr& theRes, bool theUpdateViewer);

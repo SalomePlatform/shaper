@@ -516,7 +516,8 @@ void PartSet_MenuMgr::activatePartSet() const
   if (isNewTransaction)
     aMgr->startOperation("Activation");
   aMgr->setActiveDocument(aMgr->moduleDocument());
-  if (isNewTransaction) aMgr->finishOperation();
+  if (isNewTransaction)
+    aMgr->finishOperation();
 
   myModule->workshop()->updateCommandStatus();
 }

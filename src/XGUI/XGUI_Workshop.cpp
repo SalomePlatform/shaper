@@ -2791,33 +2791,43 @@ void XGUI_Workshop::synchronizeViewer()
   aDocs.append(aMgr->moduleDocument());
 
   foreach(DocumentPtr aDoc, aDocs) {
-    synchronizeGroupInViewer(aDoc, ModelAPI_ResultConstruction::group(), false);
-    synchronizeGroupInViewer(aDoc, ModelAPI_ResultBody::group(), false);
-    synchronizeGroupInViewer(aDoc, ModelAPI_ResultPart::group(), false);
-    synchronizeGroupInViewer(aDoc, ModelAPI_ResultGroup::group(), false);
+    synchronizeGroupInViewer(aDoc, false);
   }
 }
 
 //******************************************************
 void XGUI_Workshop::synchronizeGroupInViewer(const DocumentPtr& theDoc,
-                                             const std::string& theGroup,
                                              bool theUpdateViewer)
 {
-  ObjectPtr aObj;
-  int aSize = theDoc->size(theGroup);
+  FeaturePtr aFeature;
+  ResultPtr aRes;
+  int aSize = theDoc->numInternalFeatures();
   for (int i = 0; i < aSize; i++) {
-    aObj = theDoc->object(theGroup, i);
-    if (aObj->isDisplayed()) {
-      // Hide the presentation with an empty shape. But isDisplayed state of the object should not
-      // be changed to the object becomes visible when the shape becomes not empty
-      ResultPtr aRes = std::dynamic_pointer_cast<ModelAPI_Result>(aObj);
-      if (aRes.get() && (!aRes->shape().get() || aRes->shape()->isNull()))
-        continue;
-      ResultBodyPtr aResBody = std::dynamic_pointer_cast<ModelAPI_ResultBody>(aObj);
-      if (aResBody.get())
-        synchronizeResultTree(aResBody, false);
-      else
-        myDisplayer->display(aObj, false);
+    aFeature = theDoc->internalFeature(i);
+    const std::list<ResultPtr>& aResults = aFeature->results();
+    std::list<ResultPtr>::const_iterator aIt;
+    aFeature->setDisplayed(false);
+    for (aIt = aResults.cbegin(); aIt != aResults.cend(); aIt++) {
+      aRes = (*aIt);
+      if (aRes->isDisplayed() && !aRes->isConcealed()) {
+        // Hide the presentation with an empty shape. But isDisplayed state of the object should not
+        // be changed to the object becomes visible when the shape becomes not empty
+        if (!aRes->shape().get() || aRes->shape()->isNull())
+          continue;
+        ResultBodyPtr aResBody = std::dynamic_pointer_cast<ModelAPI_ResultBody>(aRes);
+        if (aResBody.get())
+          synchronizeResultTree(aResBody, false);
+        else {
+          if (aRes->isInHistory()) {
+            if (aRes->isDisplayed())
+              myDisplayer->display(aRes, false);
+            else
+              myDisplayer->erase(aRes, false);
+          }
+          else
+            aRes->setDisplayed(false);
+        }
+      }
     }
   }
   if (theUpdateViewer)

@@ -232,6 +232,9 @@ void PartSet_ObjectNode::update()
 
     // If the object is a field result then delete extra sub-objects
     if (aFieldRes.get()) {
+      // Call shape in order to update content of Field.
+      // It is necessary to do for cases when field was created by script when module is inactive.
+      aFieldRes->shape();
       while (myChildren.size() > aNb) {
         ModuleBase_ITreeNode* aNode = myChildren.last();
         myChildren.removeAll(aNode);
@@ -274,15 +277,17 @@ void PartSet_ObjectNode::update()
       }
       else if (aFieldRes.get()) {
         FieldStepPtr aStep = aFieldRes->step(i);
-        if (i < myChildren.size()) {
-          PartSet_StepNode* aStepNode = static_cast<PartSet_StepNode*>(myChildren.at(i));
-          if (aStepNode->object() != aStep) {
-            aStepNode->setObject(aStep);
+        if (aStep.get()) {
+          if (i < myChildren.size()) {
+            PartSet_StepNode* aStepNode = static_cast<PartSet_StepNode*>(myChildren.at(i));
+            if (aStepNode->object() != aStep) {
+              aStepNode->setObject(aStep);
+            }
           }
-        }
-        else {
-          aNode = new PartSet_StepNode(aStep, this);
-          myChildren.append(aNode);
+          else {
+            aNode = new PartSet_StepNode(aStep, this);
+            myChildren.append(aNode);
+          }
         }
       }
     }
@@ -309,6 +314,10 @@ QTreeNodesList PartSet_ObjectNode::objectCreated(const QObjectPtrList& theObject
     ResultFieldPtr aFieldRes = std::dynamic_pointer_cast<ModelAPI_ResultField>(myObject);
     ObjectPtr aBody;
     int i;
+    // Call shape in order to update content of Field.
+    // It is necessary to do for cases when field was created by script when module is inactive.
+    if (aFieldRes.get())
+      aFieldRes->shape();
     for (i = 0; i < aNb; i++) {
       aBody = subObject(i);
       if (aBody.get()) {
@@ -328,15 +337,17 @@ QTreeNodesList PartSet_ObjectNode::objectCreated(const QObjectPtrList& theObject
       }
       else {
         FieldStepPtr aStep = aFieldRes->step(i);
-        if (i < myChildren.size()) {
-          PartSet_StepNode* aStepNode = static_cast<PartSet_StepNode*>(myChildren.at(i));
-          if (aStepNode->object() != aStep) {
-            aStepNode->setObject(aStep);
+        if (aStep.get()) {
+          if (i < myChildren.size()) {
+            PartSet_StepNode* aStepNode = static_cast<PartSet_StepNode*>(myChildren.at(i));
+            if (aStepNode->object() != aStep) {
+              aStepNode->setObject(aStep);
+            }
           }
-        }
-        else {
-          aNode = new PartSet_StepNode(aStep, this);
-          myChildren.append(aNode);
+          else {
+            aNode = new PartSet_StepNode(aStep, this);
+            myChildren.append(aNode);
+          }
         }
       }
     }

@@ -500,6 +500,7 @@ void SHAPERGUI::onScriptLoaded()
   SUIT_DataBrowser* aBrowser = getApp()->objectBrowser();
   if (aBrowser)
     delete aBrowser;
+  myWorkshop->displayer()->updateViewer();
 }
 
 //******************************************************
