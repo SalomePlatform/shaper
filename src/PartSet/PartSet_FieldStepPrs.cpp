@@ -123,18 +123,28 @@ QList<double> PartSet_FieldStepPrs::range(double& theMin, double& theMax) const
   }
   QList<double> aShapeData;
   double aRangeMin = aFieldStepData.first(), aRangeMax = aFieldStepData.last();
-  for (int aRow = 0; aRow < aRows - aStart; aRow++) {
-    double aNorm = 0;
-    int aBaseIndex = aRow * aCols;
-    for (int aCol = 0; aCol < aCols; aCol++) {
-      int anIndex = aCol + aBaseIndex;
-      double aValue = aFieldStepData.at(anIndex);
-      aNorm += aValue * aValue;
+  if (aCols == 1) {
+    for (int aRow = 0; aRow < aRows - aStart; aRow++) {
+      double aValue = aFieldStepData.at(aRow);
+      aRangeMin = Min(aRangeMin, aValue);
+      aRangeMax = Max(aRangeMax, aValue);
+      aShapeData << aValue;
     }
-    aNorm = pow(aNorm, 0.5);
-    aRangeMin = Min(aRangeMin, aNorm);
-    aRangeMax = Max(aRangeMax, aNorm);
-    aShapeData << aNorm;
+  }
+  else {
+    for (int aRow = 0; aRow < aRows - aStart; aRow++) {
+      double aNorm = 0;
+      int aBaseIndex = aRow * aCols;
+      for (int aCol = 0; aCol < aCols; aCol++) {
+        int anIndex = aCol + aBaseIndex;
+        double aValue = aFieldStepData.at(anIndex);
+        aNorm += aValue * aValue;
+      }
+      aNorm = pow(aNorm, 0.5);
+      aRangeMin = Min(aRangeMin, aNorm);
+      aRangeMax = Max(aRangeMax, aNorm);
+      aShapeData << aNorm;
+    }
   }
   theMin = aRangeMin;
   theMax = aRangeMax;
