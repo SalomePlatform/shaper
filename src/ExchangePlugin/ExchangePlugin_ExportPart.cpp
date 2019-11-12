@@ -25,6 +25,10 @@
 #include <ModelAPI_Session.h>
 #include <ModelAPI_Validator.h>
 
+#include <ConstructionPlugin_Axis.h>
+#include <ConstructionPlugin_Plane.h>
+#include <ConstructionPlugin_Point.h>
+
 // Obtain all features to be exported to get the list of selected results.
 static void collectFeatures(AttributeSelectionListPtr theSelected,
                             std::list<FeaturePtr>& theExport);
@@ -145,7 +149,19 @@ void collectConstructions(DocumentPtr theDocument, std::list<FeaturePtr>& theExp
   // keep constructions only
   std::list<FeaturePtr>::iterator anIt = theExport.begin();
   while (anIt != theExport.end()) {
-    if ((*anIt)->lastResult()->groupName() == ModelAPI_ResultConstruction::group())
+    FeaturePtr aCurFeature = *anIt;
+    ResultPtr aCurResult = aCurFeature->lastResult();
+
+    bool isApplicable =
+        (!aCurResult || aCurResult->groupName() == ModelAPI_ResultConstruction::group());
+
+    if (isApplicable && !aCurFeature->isInHistory()) {
+      isApplicable = aCurFeature->getKind() != ConstructionPlugin_Point::ID() &&
+                     aCurFeature->getKind() != ConstructionPlugin_Axis::ID() &&
+                     aCurFeature->getKind() != ConstructionPlugin_Plane::ID();
+    }
+
+    if (isApplicable)
       ++anIt;
     else {
       std::list<FeaturePtr>::iterator aRemoveIt = anIt++;

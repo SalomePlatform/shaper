@@ -20,7 +20,10 @@
 #include <ExchangePlugin_ImportPart.h>
 
 #include <ModelAPI_AttributeString.h>
+#include <ModelAPI_ResultPart.h>
 #include <ModelAPI_Session.h>
+
+#include <PartSetPlugin_Part.h>
 
 ExchangePlugin_ImportPart::ExchangePlugin_ImportPart()
 {
@@ -42,6 +45,20 @@ void ExchangePlugin_ImportPart::execute()
 
   // load the file into the active document
   SessionPtr aSession = ModelAPI_Session::get();
-  if (!aSession->activeDocument()->import(aFilename.c_str()))
+  DocumentPtr aDoc = aSession->activeDocument();
+  bool isPartSet = aDoc == aSession->moduleDocument();
+  bool isOk = aDoc->import(aFilename.c_str(), isPartSet);
+  if (!isOk && isPartSet) {
+    // there are features not appropriate for PartSet,
+    // create new part and load there
+    FeaturePtr aPartFeature = aDoc->addFeature(PartSetPlugin_Part::ID());
+    ResultPartPtr aPartResult;
+    if (aPartFeature) {
+      aPartFeature->execute();
+      aPartResult = std::dynamic_pointer_cast<ModelAPI_ResultPart>(aPartFeature->lastResult());
+    }
+    isOk = aPartResult && aPartResult->partDoc()->import(aFilename.c_str());
+  }
+  if (!isOk)
     setError("Cannot import the document.");
 }

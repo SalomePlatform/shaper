@@ -349,7 +349,7 @@ bool Model_Document::load(const char* theDirName, const char* theFileName, Docum
   return isOk;
 }
 
-bool Model_Document::import(const char* theFileName)
+bool Model_Document::import(const char* theFileName, bool theCheckBefore)
 {
   Handle(Model_Application) anApp = Model_Application::getApplication();
   TCollection_ExtendedString aFormat;
@@ -359,43 +359,67 @@ bool Model_Document::import(const char* theFileName)
   Handle(TDocStd_Document) aTempDoc;
   bool isOk = loadDocument(anApp, aTempDoc, theFileName);
 
-  // copy features from the temporary document to the current
-  Handle(TDF_RelocationTable) aRelocTable = new TDF_RelocationTable(Standard_True);
-  TDF_LabelList anAllNewFeatures;
-  // Perform the copying twice for correct references:
-  // 1. copy labels hierarchy and fill the relocation table
-  TDF_Label aMain = myDoc->Main();
-  for (TDF_ChildIterator anIt(aTempDoc->Main()); anIt.More(); anIt.Next()) {
-    TDF_Label aCurrentLab = anIt.Value();
-    Handle(TDataStd_Comment) aFeatureID;
-    TDF_Label aNewFeatuerLab;
-    if (aCurrentLab.FindAttribute(TDataStd_Comment::GetID(), aFeatureID)) {
-      TCollection_AsciiString anID(aFeatureID->Get());
-      FeaturePtr aNewFeature = addFeature(anID.ToCString());
-      std::shared_ptr<Model_Data> aData =
-          std::dynamic_pointer_cast<Model_Data>(aNewFeature->data());
-      aNewFeatuerLab = aData->label().Father();
-      Model_Tools::copyLabels(aCurrentLab, aNewFeatuerLab, aRelocTable);
-    }
-    anAllNewFeatures.Append(aNewFeatuerLab);
-  }
-  // 2. copy attributes
-  TDF_ListIteratorOfLabelList aNewIt(anAllNewFeatures);
-  for (TDF_ChildIterator anIt(aTempDoc->Main()); anIt.More(); anIt.Next()) {
-    TDF_Label aCurrentLab = anIt.Value();
-    TDF_Label aFeatureLab = aNewIt.Value();
-    if (aFeatureLab.IsNull())
-      anAllNewFeatures.Remove(aNewIt);
-    else {
-      Model_Tools::copyAttrs(aCurrentLab, aFeatureLab, aRelocTable);
-      aNewIt.Next();
+  if (isOk && theCheckBefore) {
+    // verify all features are applicable for the current document type (e.g. PartSet)
+    std::shared_ptr<Model_Session> aSession =
+        std::dynamic_pointer_cast<Model_Session>(ModelAPI_Session::get());
+    for (TDF_ChildIterator anIt(aTempDoc->Main()); anIt.More() && isOk; anIt.Next()) {
+      TDF_Label aCurrentLab = anIt.Value();
+      Handle(TDataStd_Comment) aFeatureID;
+      TDF_Label aNewFeatuerLab;
+      if (aCurrentLab.FindAttribute(TDataStd_Comment::GetID(), aFeatureID)) {
+        TCollection_AsciiString anID(aFeatureID->Get());
+        std::string aFeatureKind(anID.ToCString());
+        if (aSession->myPlugins.find(aFeatureKind) != aSession->myPlugins.end()) {
+          std::string& aDocKind = aSession->myPlugins[aFeatureKind].second;
+          isOk = aDocKind.empty() || aDocKind == kind();
+        }
+      }
     }
   }
 
-  myObjs->synchronizeFeatures(anAllNewFeatures, true, false, false, true);
+  if (isOk) {
+    // copy features from the temporary document to the current
+    Handle(TDF_RelocationTable) aRelocTable = new TDF_RelocationTable();
+    TDF_LabelList anAllNewFeatures;
+    // Perform the copying twice for correct references:
+    // 1. copy labels hierarchy and fill the relocation table
+    TDF_Label aMain = myDoc->Main();
+    for (TDF_ChildIterator anIt(aTempDoc->Main()); anIt.More(); anIt.Next()) {
+      TDF_Label aCurrentLab = anIt.Value();
+      Handle(TDataStd_Comment) aFeatureID;
+      TDF_Label aNewFeatuerLab;
+      if (aCurrentLab.FindAttribute(TDataStd_Comment::GetID(), aFeatureID)) {
+        TCollection_AsciiString anID(aFeatureID->Get());
+        FeaturePtr aNewFeature = addFeature(anID.ToCString());
+        std::shared_ptr<Model_Data> aData =
+            std::dynamic_pointer_cast<Model_Data>(aNewFeature->data());
+        aNewFeatuerLab = aData->label().Father();
+        Model_Tools::copyLabels(aCurrentLab, aNewFeatuerLab, aRelocTable);
+      }
+      anAllNewFeatures.Append(aNewFeatuerLab);
+    }
+    // 2. copy attributes
+    std::set<TCollection_AsciiString> aCoordinateLabels;
+    Model_Tools::labelsOfCoordinates(aCoordinateLabels, aRelocTable);
+    TDF_ListIteratorOfLabelList aNewIt(anAllNewFeatures);
+    for (TDF_ChildIterator anIt(aTempDoc->Main()); anIt.More(); anIt.Next()) {
+      TDF_Label aCurrentLab = anIt.Value();
+      TDF_Label aFeatureLab = aNewIt.Value();
+      if (aFeatureLab.IsNull())
+        anAllNewFeatures.Remove(aNewIt);
+      else {
+        Model_Tools::copyAttrsAndKeepRefsToCoordinates(
+            aCurrentLab, aFeatureLab, aCoordinateLabels, aRelocTable);
+        aNewIt.Next();
+      }
+    }
 
-  if (aTempDoc->CanClose() == CDM_CCS_OK)
-    aTempDoc->Close();
+    myObjs->synchronizeFeatures(anAllNewFeatures, true, false, false, true);
+  }
+
+  if (anApp->CanClose(aTempDoc) == CDM_CCS_OK)
+    anApp->Close(aTempDoc);
   return isOk;
 }
 
@@ -531,7 +555,7 @@ bool Model_Document::save(const char* theFilename,
   Handle(TDocStd_Document) aTempDoc = new TDocStd_Document(aFormat);
   TDF_Label aMain = aTempDoc->Main();
 
-  Handle(TDF_RelocationTable) aRelocTable = new TDF_RelocationTable(Standard_True);
+  Handle(TDF_RelocationTable) aRelocTable = new TDF_RelocationTable();
   std::list<FeaturePtr>::const_iterator anIt = theExportFeatures.begin();
   // Perform the copying twice for correct references:
   // 1. copy labels hierarchy and fill the relocation table
@@ -541,11 +565,14 @@ bool Model_Document::save(const char* theFilename,
     Model_Tools::copyLabels(aData->label().Father(), aFeatureLab, aRelocTable);
   }
   // 2. copy attributes
+  std::set<TCollection_AsciiString> aCoordinateLabels;
+  Model_Tools::labelsOfCoordinates(aCoordinateLabels, aRelocTable);
   TDF_ChildIterator aChildIt(aMain);
   for (anIt = theExportFeatures.begin(); anIt != theExportFeatures.end(); ++anIt) {
     TDF_Label aFeatureLab = aChildIt.Value();
     std::shared_ptr<Model_Data> aData = std::dynamic_pointer_cast<Model_Data>((*anIt)->data());
-    Model_Tools::copyAttrs(aData->label().Father(), aFeatureLab, aRelocTable);
+    Model_Tools::copyAttrsAndKeepRefsToCoordinates(
+        aData->label().Father(), aFeatureLab, aCoordinateLabels, aRelocTable);
     aChildIt.Next();
   }
 

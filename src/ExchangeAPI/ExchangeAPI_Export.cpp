@@ -200,7 +200,7 @@ void exportPart(const std::shared_ptr<ModelAPI_Document> & thePart,
     fillAttribute(theSelected,
         aFeature->selectionList(ExchangePlugin_ExportPart::SELECTION_LIST_ID()));
   }
-  // restart transaction to execute and delete the marcro-feature
+  // restart transaction to execute and delete the macro-feature
   apply();
 }
 //--------------------------------------------------------------------------------------

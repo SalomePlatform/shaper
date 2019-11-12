@@ -25,17 +25,32 @@
 #include <TDF_Label.hxx>
 #include <TDF_RelocationTable.hxx>
 
+#include <memory>
+#include <set>
+
 /// A collection of methods useful for different parts of data model.
-namespace Model_Tools
+class Model_Tools
 {
+public:
   /// makes copy of label and all its sub-labels without copying the attributes;
   /// and feel the relocation table
-  void copyLabels(TDF_Label theSource, TDF_Label theDestination,
-                  Handle(TDF_RelocationTable) theRelocTable);
+  static void copyLabels(TDF_Label theSource, TDF_Label theDestination,
+                         Handle(TDF_RelocationTable) theRelocTable);
 
   /// makes copy of all attributes on the given label and all sub-labels
-  void copyAttrs(TDF_Label theSource, TDF_Label theDestination,
-                 Handle(TDF_RelocationTable) theRelocTable = Handle(TDF_RelocationTable)());
+  static void copyAttrs(TDF_Label theSource, TDF_Label theDestination,
+                        Handle(TDF_RelocationTable) theRelocTable = Handle(TDF_RelocationTable)());
+
+  /// makes copy of all attributes on the given label and all sub-labels,
+  /// but keep references to the Origin, coordinate axes and coordinate planes
+  static void copyAttrsAndKeepRefsToCoordinates(TDF_Label theSource, TDF_Label theDestination,
+      const std::set<TCollection_AsciiString>& theCoordinateLabels,
+      Handle(TDF_RelocationTable) theRelocTable);
+
+  /// collect labels of coordinate planes, axes, and origin
+  static void labelsOfCoordinates(
+      std::set<TCollection_AsciiString>& theCoordinateLabels,
+      Handle(TDF_RelocationTable) theRelocTable);
 };
 
 #endif

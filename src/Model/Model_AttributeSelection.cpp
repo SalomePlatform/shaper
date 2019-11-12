@@ -421,32 +421,29 @@ bool Model_AttributeSelection::isInvalid()
 
 bool Model_AttributeSelection::isInitialized()
 {
-  if (ModelAPI_AttributeSelection::isInitialized()) { // additional checks if it is initialized
-    std::shared_ptr<GeomAPI_Shape> aResult;
-    if (myRef.isInitialized()) {
-      TDF_Label aSelLab = selectionLabel();
-      // it is just reference to shape, not sub-shape
-      if (aSelLab.IsAttribute(kSIMPLE_REF_ID) || aSelLab.IsAttribute(kPART_REF_ID)) {
-        ResultPtr aContext = context();
-        return aContext.get() != NULL;
-      }
-      Handle(TNaming_NamedShape) aSelection;
-      if (selectionLabel().FindAttribute(TNaming_NamedShape::GetID(), aSelection)) {
-        return !aSelection->Get().IsNull();
-      } else { // for simple construction element: just shape of this construction element
-        if (myRef.value().get())
-          return true;
-        // check that this is on open of document, so, results are not initialized yet
-        TDF_Label aRefLab = myRef.myRef->Get();
-        if (aRefLab.IsNull() || !owner().get())
-          return false;
-        std::shared_ptr<Model_Document> aMyDoc =
-          std::dynamic_pointer_cast<Model_Document>(owner()->document());
-        if (!aMyDoc.get())
-          return false;
-        // check at least the feature exists
-        return aMyDoc->featureByLab(aRefLab).get() != NULL;
-      }
+  if (myRef.isInitialized()) {
+    TDF_Label aSelLab = selectionLabel();
+    // it is just reference to shape, not sub-shape
+    if (aSelLab.IsAttribute(kSIMPLE_REF_ID) || aSelLab.IsAttribute(kPART_REF_ID)) {
+      ResultPtr aContext = context();
+      return aContext.get() != NULL;
+    }
+    Handle(TNaming_NamedShape) aSelection;
+    if (selectionLabel().FindAttribute(TNaming_NamedShape::GetID(), aSelection)) {
+      return !aSelection->Get().IsNull();
+    } else { // for simple construction element: just shape of this construction element
+      if (myRef.value().get())
+        return true;
+      // check that this is on open of document, so, results are not initialized yet
+      TDF_Label aRefLab = myRef.myRef->Get();
+      if (aRefLab.IsNull() || !owner().get())
+        return false;
+      std::shared_ptr<Model_Document> aMyDoc =
+        std::dynamic_pointer_cast<Model_Document>(owner()->document());
+      if (!aMyDoc.get())
+        return false;
+      // check at least the feature exists
+      return aMyDoc->featureByLab(aRefLab).get() != NULL;
     }
   }
   return false;
@@ -476,7 +473,7 @@ void Model_AttributeSelection::setID(const std::string theID)
 
 ResultPtr Model_AttributeSelection::context()
 {
-  if (!ModelAPI_AttributeSelection::isInitialized() && !myTmpContext.get() && !myTmpSubShape.get())
+  if (!myRef.isInitialized() && !myTmpContext.get() && !myTmpSubShape.get())
     return ResultPtr();
 
   if (myTmpContext.get() || myTmpSubShape.get()) {

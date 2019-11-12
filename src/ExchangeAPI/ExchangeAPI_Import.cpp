@@ -111,7 +111,7 @@ void importPart(const std::shared_ptr<ModelAPI_Document> & thePart,
 
   FeaturePtr aFeature = thePart->addFeature(ExchangePlugin_ImportPart::ID());
   aFeature->string(ExchangePlugin_ImportPart::FILE_PATH_ID())->setValue(theFilePath);
-  // restart transaction to execute and delete the marcro-feature
+  // restart transaction to execute and delete the macro-feature
   apply();
 
   // restore current feature

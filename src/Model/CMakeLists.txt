@@ -117,6 +117,7 @@ SET(PROJECT_INCLUDES
   ../GeomAlgoAPI
   ../GeomAPI
   ../ModelGeomAlgo
+  ../ConstructionPlugin
   ${OpenCASCADE_INCLUDE_DIR}
 )
 
