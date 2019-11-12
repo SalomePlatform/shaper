@@ -475,7 +475,7 @@ private:
   /// Number of blocking of the viewer update. The viewer is updated only if it is zero
   int myViewerBlockedRecursiveCount;
 
-  bool myIsFirstAISContextUse; ///< Flag: first asking of AIS context: trihedron activation
+  mutable void* myContextId;
   mutable bool myNeedUpdate; ///< A flag that update was requested but not done
 };
 

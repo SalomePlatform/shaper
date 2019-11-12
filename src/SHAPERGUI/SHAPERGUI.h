@@ -279,6 +279,7 @@ private slots:
   bool myIsToolbarsModified;
 
   std::vector<int> myOldSelectionColor;
+  Handle(Graphic3d_AspectMarker3d) myHighlightPointAspect;
 };
 
 #endif
