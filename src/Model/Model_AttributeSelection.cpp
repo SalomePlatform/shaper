@@ -302,7 +302,7 @@ GeomShapePtr centerByEdge(GeomShapePtr theEdge, ModelAPI_AttributeSelection::Cen
 
 std::shared_ptr<GeomAPI_Shape> Model_AttributeSelection::value()
 {
-  if (!ModelAPI_AttributeSelection::isInitialized() && !myTmpContext.get() && !myTmpSubShape.get())
+  if (!myRef.isInitialized() && !myTmpContext.get() && !myTmpSubShape.get())
     return std::shared_ptr<GeomAPI_Shape>();
   CenterType aType = NOT_CENTER;
   std::shared_ptr<GeomAPI_Shape> aResult = internalValue(aType);

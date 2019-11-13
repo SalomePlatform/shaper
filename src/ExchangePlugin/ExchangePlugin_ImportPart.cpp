@@ -39,13 +39,13 @@ void ExchangePlugin_ImportPart::execute()
   AttributeStringPtr aFilePathAttr = string(FILE_PATH_ID());
   std::string aFilename = aFilePathAttr->value();
   if (aFilename.empty()) {
-    setError("File path is empty.");
+    setError("File name is empty.");
     return;
   }
 
   // load the file into the active document
   SessionPtr aSession = ModelAPI_Session::get();
-  DocumentPtr aDoc = aSession->activeDocument();
+  DocumentPtr aDoc = document();
   bool isPartSet = aDoc == aSession->moduleDocument();
   bool isOk = aDoc->import(aFilename.c_str(), isPartSet);
   if (!isOk && isPartSet) {
