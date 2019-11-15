@@ -647,9 +647,9 @@ Handle(AIS_InteractiveContext) XGUI_Displayer::AISContext() const
     aContext->DefaultDrawer()->VIsoAspect()->SetNumber(0);
     aContext->DefaultDrawer()->UIsoAspect()->SetNumber(0);
 
-    Handle(AIS_Trihedron) aTrihedron = myWorkshop->viewer()->trihedron();
-    aTrihedron->getHighlightPointAspect()->SetScale(2.0);
-    aTrihedron->getHighlightPointAspect()->SetTypeOfMarker(Aspect_TOM_O_STAR);
+    //Handle(AIS_Trihedron) aTrihedron = myWorkshop->viewer()->trihedron();
+    //aTrihedron->getHighlightPointAspect()->SetScale(2.0);
+    //aTrihedron->getHighlightPointAspect()->SetTypeOfMarker(Aspect_TOM_O_STAR);
 
     // Commented out according to discussion in bug #2825
     //ModuleBase_IViewer::DefaultHighlightDrawer = aContext->HighlightStyle();
