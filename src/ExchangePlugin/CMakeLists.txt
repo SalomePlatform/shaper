@@ -107,10 +107,19 @@ ADD_UNIT_TESTS(
   TestExportPart_Results_6.py
   TestExportPart_Results_7.py
   TestExportPart_Results_8.py
+  TestImportPart_AfterCurrent_1.py
+  TestImportPart_AfterCurrent_2.py
+  TestImportPart_AfterLast_1.py
+  TestImportPart_AfterLast_2.py
+  TestImportPart_AfterLast_3.py
+  TestImportPart_AfterLast_4.py
+  TestImportPart_AfterLast_5.py
+  TestImportPart_AfterLast_6.py
   TestImportPart_Construction_1.py
   TestImportPart_Construction_2.py
   TestImportPart_Construction_3.py
   TestImportPart_Construction_4.py
+  TestImportPart_Multiple.py
   TestImportPart_ToEmptyPart.py
   TestImportPart_ToEmptyPartSet.py
 )

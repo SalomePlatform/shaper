@@ -349,7 +349,9 @@ bool Model_Document::load(const char* theDirName, const char* theFileName, Docum
   return isOk;
 }
 
-bool Model_Document::import(const char* theFileName, bool theCheckBefore)
+bool Model_Document::import(const char* theFileName,
+                            std::list<std::shared_ptr<ModelAPI_Feature> >& theImported,
+                            bool theCheckBefore)
 {
   Handle(Model_Application) anApp = Model_Application::getApplication();
   TCollection_ExtendedString aFormat;
@@ -396,6 +398,7 @@ bool Model_Document::import(const char* theFileName, bool theCheckBefore)
             std::dynamic_pointer_cast<Model_Data>(aNewFeature->data());
         aNewFeatuerLab = aData->label().Father();
         Model_Tools::copyLabels(aCurrentLab, aNewFeatuerLab, aRelocTable);
+        theImported.push_back(aNewFeature);
       }
       anAllNewFeatures.Append(aNewFeatuerLab);
     }

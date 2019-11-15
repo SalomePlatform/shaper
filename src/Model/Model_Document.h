@@ -59,10 +59,13 @@ class Model_Document : public ModelAPI_Document
   //! Loads the OCAF document from the file into the current document.
   //! All the features are added after the active feature.
   //! \param theFileName name of the file to import
+  //! \param theImported list of features imported from the file
   //! \param theCheckBefore verify the document does not contain unappropriate features
   //!                       (useful for import to PartSet)
   //! \returns true if file was loaded successfully
-  MODEL_EXPORT virtual bool import(const char* theFileName, bool theCheckBefore = false);
+  MODEL_EXPORT virtual bool import(const char* theFileName,
+                                   std::list<std::shared_ptr<ModelAPI_Feature> >& theImported,
+                                   bool theCheckBefore = false);
 
   //! Saves the OCAF document to the file.
   //! \param theDirName directory where the document will be saved

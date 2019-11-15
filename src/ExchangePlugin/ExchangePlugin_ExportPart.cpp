@@ -142,6 +142,14 @@ void ExchangePlugin_ExportPart::execute()
 
 // ================================     Auxiliary functions     ===================================
 
+static bool isCoordinate(FeaturePtr theFeature)
+{
+  return !theFeature->isInHistory() &&
+          (theFeature->getKind() == ConstructionPlugin_Point::ID() ||
+           theFeature->getKind() == ConstructionPlugin_Axis::ID() ||
+           theFeature->getKind() == ConstructionPlugin_Plane::ID());
+}
+
 static void allReferencedFeatures(const std::set<FeaturePtr>& theFeatures,
                                   std::set<FeaturePtr>& theReferencedFeatures)
 {
@@ -158,7 +166,8 @@ static void allReferencedFeatures(const std::set<FeaturePtr>& theFeatures,
       for (std::list<ObjectPtr>::iterator anObjIt = aRIt->second.begin();
            anObjIt != aRIt->second.end(); ++anObjIt) {
         FeaturePtr aFeature = ModelAPI_Feature::feature(*anObjIt);
-        if (aFeature && theReferencedFeatures.find(aFeature) == theReferencedFeatures.end())
+        if (aFeature && !isCoordinate(aFeature) &&
+            theReferencedFeatures.find(aFeature) == theReferencedFeatures.end())
           aReferences.insert(aFeature);
       }
     }
@@ -168,19 +177,20 @@ static void allReferencedFeatures(const std::set<FeaturePtr>& theFeatures,
     allReferencedFeatures(aReferences, theReferencedFeatures);
 }
 
-static bool isCoordinate(FeaturePtr theFeature)
-{
-  return !theFeature->isInHistory() &&
-          (theFeature->getKind() == ConstructionPlugin_Point::ID() ||
-           theFeature->getKind() == ConstructionPlugin_Axis::ID() ||
-           theFeature->getKind() == ConstructionPlugin_Plane::ID());
-}
-
 void collectFeatures(DocumentPtr theDocument,
                      AttributeSelectionListPtr theSelected,
                      std::list<FeaturePtr>& theExport)
 {
   theExport = theDocument->allFeatures();
+
+  // remove all features after the current one
+  FeaturePtr aCurrentFeature = theDocument->currentFeature(false);
+  std::list<FeaturePtr>::iterator anIt = theExport.begin();
+  for (; anIt != theExport.end(); ++anIt)
+    if (*anIt == aCurrentFeature) {
+      theExport.erase(++anIt, theExport.end());
+      break;
+    }
 
   if (!theSelected || theSelected->size() == 0) {
     // nothing is selected, return all features of the document
@@ -199,7 +209,7 @@ void collectFeatures(DocumentPtr theDocument,
   allReferencedFeatures(aFeaturesToExport, aFeaturesToExport);
 
   // remove the features which are not affect the selected results
-  std::list<FeaturePtr>::iterator anIt = theExport.begin();
+  anIt = theExport.begin();
   while (anIt != theExport.end()) {
     if (aFeaturesToExport.find(*anIt) == aFeaturesToExport.end()) {
       std::list<FeaturePtr>::iterator aRemoveIt = anIt++;
