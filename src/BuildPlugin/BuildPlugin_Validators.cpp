@@ -464,7 +464,7 @@ bool BuildPlugin_ValidatorFillingSelection::isValid(const AttributePtr& theAttri
     return false;
   }
 
-  FeaturePtr anOwner = ModelAPI_Feature::feature(theAttribute->owner());
+  //FeaturePtr anOwner = ModelAPI_Feature::feature(theAttribute->owner());
 
   // Check selected shapes.
   for (int anIndex = 0; anIndex < aSelectionList->size(); ++anIndex) {
@@ -486,6 +486,64 @@ bool BuildPlugin_ValidatorFillingSelection::isValid(const AttributePtr& theAttri
     if (aType != GeomAPI_Shape::EDGE && aType != GeomAPI_Shape::WIRE) {
       theError = "Incorrect objects selected";
       return false;
+    }
+  }
+
+  return true;
+}
+
+
+//=================================================================================================
+bool BuildPlugin_ValidatorBaseForVertex::isValid(const AttributePtr& theAttribute,
+                                                 const std::list<std::string>& /*theArguments*/,
+                                                 Events_InfoMessage& theError) const
+{
+  if (!theAttribute.get()) {
+    theError = "Error: empty selection.";
+    return false;
+  }
+
+  AttributeSelectionListPtr aSelectionList =
+    std::dynamic_pointer_cast<ModelAPI_AttributeSelectionList>(theAttribute);
+  if (!aSelectionList.get()) {
+    theError = "Could not get selection list.";
+    return false;
+  }
+
+  for (int anIndex = 0; anIndex < aSelectionList->size(); ++anIndex) {
+    AttributeSelectionPtr aSelectionAttr = aSelectionList->value(anIndex);
+    if (!aSelectionAttr.get()) {
+      theError = "Empty attribute in list.";
+      return false;
+    }
+
+    // Vertex?
+    bool isVertex = false;
+    GeomShapePtr aShapeInList = aSelectionAttr->value();
+    if (aShapeInList.get()) {
+      isVertex = (aShapeInList->shapeType() == GeomAPI_Shape::VERTEX);
+    }
+
+    if (!isVertex) {
+      // Sketch?
+      FeaturePtr aFeature = aSelectionAttr->contextFeature();
+      if (!aFeature.get()) {
+        ResultPtr aContext = aSelectionAttr->context();
+        if (aContext.get()) {
+          aFeature = ModelAPI_Feature::feature(aContext);
+        }
+      }
+
+      if (aFeature.get()) {
+        std::string aFeatureKind = aFeature->getKind();
+        if (aFeatureKind != "Sketch" &&
+            aFeatureKind != "Point" &&
+            aFeatureKind != "Vertex") {
+          theError = "Error: %1 shape is not allowed for selection.";
+          theError.arg(aFeatureKind);
+          return false;
+        }
+      }
     }
   }
 

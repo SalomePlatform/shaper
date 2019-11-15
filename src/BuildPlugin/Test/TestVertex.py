@@ -81,7 +81,7 @@ aVertexFeature2 = aPart.addFeature("Vertex")
 aBaseObjectsList = aVertexFeature2.selectionList("base_objects")
 aBaseObjectsList.append(aSketchResult, None)
 aSession.finishOperation()
-assert (len(aVertexFeature2.results()) == 0)
+assert (len(aVertexFeature2.results()) == 10)
 
 aSession.startOperation()
 aLine = aSketchFeature.addFeature("SketchLine")
@@ -94,11 +94,14 @@ aBaseObjectsList.append(aSketchResult, aLine.lastResult().shape())
 aSession.finishOperation()
 assert (len(aVertexFeature2.results()) == 0)
 
+# Check Vertex feature failed on incorrect input
+# TODO
+
 # remove failed feature
-aSession.startOperation()
-aPart.removeFeature(aVertexFeature2)
-aPart.setCurrentFeature(aVertexFeature, True)
-aSession.finishOperation()
+#aSession.startOperation()
+#aPart.removeFeature(aVertexFeature2)
+#aPart.setCurrentFeature(aVertexFeature, True)
+#aSession.finishOperation()
 
 from salome.shaper import model
 assert(model.checkPythonDump())

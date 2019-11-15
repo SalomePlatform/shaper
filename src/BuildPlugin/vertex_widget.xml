@@ -1,8 +1,10 @@
 <source>
   <multi_selector id="base_objects"
-                  label="Vertices:"
-                  tooltip="Select vertices on sketch or vertex objects."
-                  shape_types="vertices"
+                  label="Vertices and sketches:"
+                  tooltip="Select vertices or sketch objects or features."
+                  shape_types="vertices objects"
                   concealment="true">
+    <validator id="BuildPlugin_ValidatorBaseForVertex"/>
   </multi_selector>
+  <boolvalue id="intersect" label="Compute intersections" tooltip="Compute intersections of all sketch edges." default="false"/>
 </source>

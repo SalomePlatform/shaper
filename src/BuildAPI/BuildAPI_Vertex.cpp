@@ -35,6 +35,19 @@ BuildAPI_Vertex::BuildAPI_Vertex(const std::shared_ptr<ModelAPI_Feature>& theFea
 : ModelHighAPI_Interface(theFeature)
 {
   if(initialize()) {
+    fillAttribute(false, mydoIntersect);
+    setBase(theBaseObjects);
+  }
+}
+
+//==================================================================================================
+BuildAPI_Vertex::BuildAPI_Vertex(const std::shared_ptr<ModelAPI_Feature>& theFeature,
+                                 const std::list<ModelHighAPI_Selection>& theBaseObjects,
+                                 const bool theDoIntersect)
+: ModelHighAPI_Interface(theFeature)
+{
+  if(initialize()) {
+    fillAttribute(theDoIntersect, mydoIntersect);
     setBase(theBaseObjects);
   }
 }
@@ -62,11 +75,21 @@ VertexPtr addVertex(const std::shared_ptr<ModelAPI_Document>& thePart,
 }
 
 //==================================================================================================
+VertexPtr addVertex(const std::shared_ptr<ModelAPI_Document>& thePart,
+                    const std::list<ModelHighAPI_Selection>& theBaseObjects,
+                    const bool theDoIntersect)
+{
+  std::shared_ptr<ModelAPI_Feature> aFeature = thePart->addFeature(BuildAPI_Vertex::ID());
+  return VertexPtr(new BuildAPI_Vertex(aFeature, theBaseObjects, theDoIntersect));
+}
+
+//==================================================================================================
 void BuildAPI_Vertex::dump(ModelHighAPI_Dumper& theDumper) const
 {
   FeaturePtr aBase = feature();
   std::string aPartName = theDumper.name(aBase->document());
 
   theDumper << aBase << " = model.addVertex(" << aPartName << ", "
-            << aBase->selectionList(BuildPlugin_Vertex::BASE_OBJECTS_ID()) << ")" << std::endl;
+            << aBase->selectionList(BuildPlugin_Vertex::BASE_OBJECTS_ID()) << ", "
+            << aBase->boolean(BuildPlugin_Vertex::INTERSECT_ID()) << ")" << std::endl;
 }

@@ -23,6 +23,7 @@
 #include "BuildPlugin.h"
 
 #include <ModelAPI_Feature.h>
+#include <GeomAPI_Shape.h>
 
 /// \class BuildPlugin_Vertex
 /// \ingroup Plugins
@@ -47,6 +48,13 @@ public:
     return MY_BASE_OBJECTS_ID;
   }
 
+  /// Attribute name of "Compute intersections" checkbox.
+  inline static const std::string& INTERSECT_ID()
+  {
+    static const std::string MY_INTERSECT_ID("intersect");
+    return MY_INTERSECT_ID;
+  }
+
   /// \return the kind of a feature.
   BUILDPLUGIN_EXPORT virtual const std::string& getKind()
   {
@@ -59,6 +67,15 @@ public:
 
   /// Creates a new part document if needed.
   BUILDPLUGIN_EXPORT virtual void execute();
+
+ protected:
+  bool buildVertices(GeomShapePtr theShape,
+                     bool isIntersect,
+                     int& theResultIndex);
+
+  bool buildVertices(FeaturePtr theFeature,
+                     bool isIntersect,
+                     int& theResultIndex);
 };
 
 #endif

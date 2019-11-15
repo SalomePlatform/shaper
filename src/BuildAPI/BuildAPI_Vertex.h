@@ -44,13 +44,21 @@ public:
   explicit BuildAPI_Vertex(const std::shared_ptr<ModelAPI_Feature>& theFeature,
                            const std::list<ModelHighAPI_Selection>& theBaseObjects);
 
+  /// Constructor with values.
+  BUILDAPI_EXPORT
+  explicit BuildAPI_Vertex(const std::shared_ptr<ModelAPI_Feature>& theFeature,
+                           const std::list<ModelHighAPI_Selection>& theBaseObjects,
+                           const bool theDoIntersect);
+
   /// Destructor.
   BUILDAPI_EXPORT
   virtual ~BuildAPI_Vertex();
 
-  INTERFACE_1(BuildPlugin_Vertex::ID(),
+  INTERFACE_2(BuildPlugin_Vertex::ID(),
               baseObjects, BuildPlugin_Vertex::BASE_OBJECTS_ID(),
-              ModelAPI_AttributeSelectionList, /** Base objects */)
+              ModelAPI_AttributeSelectionList, /** Base objects */,
+              doIntersect, BuildPlugin_Vertex::INTERSECT_ID(),
+              ModelAPI_AttributeBoolean, /** Compute intersections */)
 
   /// Modify base attribute of the feature.
   BUILDAPI_EXPORT
@@ -69,5 +77,12 @@ typedef std::shared_ptr<BuildAPI_Vertex> VertexPtr;
 BUILDAPI_EXPORT
 VertexPtr addVertex(const std::shared_ptr<ModelAPI_Document>& thePart,
                     const std::list<ModelHighAPI_Selection>& theBaseObjects);
+
+/// \ingroup CPPHighAPI
+/// \brief Create Vertex feature.
+BUILDAPI_EXPORT
+VertexPtr addVertex(const std::shared_ptr<ModelAPI_Document>& thePart,
+                    const std::list<ModelHighAPI_Selection>& theBaseObjects,
+                    const bool theDoIntersect);
 
 #endif // BuildAPI_Vertex_H_
