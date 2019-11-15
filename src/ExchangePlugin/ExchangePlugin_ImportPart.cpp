@@ -93,7 +93,8 @@ bool splitName(std::string& theName, int& theIndex)
   return isOk;
 }
 
-void addIndexedName(const std::string& theName, std::map<std::string, std::set<int> >& theIndexedNames)
+void addIndexedName(const std::string& theName,
+                    std::map<std::string, std::set<int> >& theIndexedNames)
 {
   std::string aName = theName;
   int anIndex = 0;
