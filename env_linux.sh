@@ -24,6 +24,8 @@ export PATH=${CPPLINT_ROOT_DIR}:${PATH}
 ##
 
 #------ SHAPER ------
-export PATH=${SHAPER_ROOT_DIR}/bin/salome:${PATH}
-export PYTHONPATH=${SHAPER_ROOT_DIR}/bin/salome:${SHAPER_ROOT_DIR}/lib/python3.6/site-packages/salome:${PYTHONPATH}
+export SHAPER_BIN_DIR=${SHAPER_ROOT_DIR}/bin/salome
+export SHAPER_PYTHON_SCRIPTS_DIR=${SHAPER_ROOT_DIR}/lib/python3.6/site-packages/salome
+export PATH=${SHAPER_BIN_DIR}:${PATH}
+export PYTHONPATH=${SHAPER_BIN_DIR}:${SHAPER_PYTHON_SCRIPTS_DIR}:${PYTHONPATH}
 export LD_LIBRARY_PATH=${SHAPER_ROOT_DIR}/lib/salome:${LD_LIBRARY_PATH}
