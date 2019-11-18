@@ -78,6 +78,8 @@ void ExchangePlugin_ImportPart::execute()
 
 // ================================     Auxiliary functions     ===================================
 
+typedef std::map<std::string, std::map<std::string, std::set<int> > > ObjectNameMap;
+
 bool splitName(std::string& theName, int& theIndex)
 {
   size_t aLastUndercore = theName.find_last_of('_');
@@ -93,13 +95,13 @@ bool splitName(std::string& theName, int& theIndex)
   return isOk;
 }
 
-void addIndexedName(const std::string& theName,
-                    std::map<std::string, std::set<int> >& theIndexedNames)
+void addIndexedName(const ObjectPtr& theObject, ObjectNameMap& theIndexedNames)
 {
-  std::string aName = theName;
+  std::string aName = theObject->data()->name();
+  std::string aGroup = theObject->groupName();
   int anIndex = 0;
   bool isIndexed = splitName(aName, anIndex);
-  std::set<int>& anIndices = theIndexedNames[aName];
+  std::set<int>& anIndices = theIndexedNames[aGroup][aName];
   if (isIndexed)
     anIndices.insert(anIndex);
 }
@@ -110,7 +112,7 @@ void addIndexedName(const std::string& theName,
 // 'Point_1', 'Point_2' => {'Point', [1, 2]}.
 // Thus, the new point should have index 3 and therefore the name 'Point_3'.
 static void collectOldNames(DocumentPtr theDocument, std::list<FeaturePtr>& theAvoided,
-                            std::map<std::string, std::set<int> >& theIndexedNames)
+                            ObjectNameMap& theIndexedNames)
 {
   std::list<FeaturePtr> anAllFeatures = theDocument->allFeatures();
   std::list<FeaturePtr>::iterator aFIt = anAllFeatures.begin();
@@ -123,26 +125,36 @@ static void collectOldNames(DocumentPtr theDocument, std::list<FeaturePtr>& theA
     }
 
     // store name of feature
-    addIndexedName((*aFIt)->data()->name(), theIndexedNames);
+    addIndexedName(*aFIt, theIndexedNames);
     // store names of results
     const std::list<ResultPtr>& aResults = (*aFIt)->results();
     for (std::list<ResultPtr>::const_iterator aRIt = aResults.begin();
          aRIt != aResults.end(); ++aRIt)
-      addIndexedName((*aRIt)->data()->name(), theIndexedNames);
+      addIndexedName(*aRIt, theIndexedNames);
   }
 }
 
-static std::string uniqueName(const std::string& theName,
-                              std::map<std::string, std::set<int> >& theExistingNames)
+static std::string uniqueName(const ObjectPtr& theObject, ObjectNameMap& theExistingNames)
 {
-  std::string aName = theName;
+  std::string aName = theObject->data()->name();
+  std::string aGroup = theObject->groupName();
   int anIndex = 1;
   splitName(aName, anIndex);
 
-  std::map<std::string, std::set<int> >::iterator aFound = theExistingNames.find(aName);
-  bool isUnique = false;
-  if (aFound == theExistingNames.end())
-    isUnique = true;
+  ObjectNameMap::iterator aFoundGroup = theExistingNames.find(aGroup);
+  bool isUnique = aFoundGroup == theExistingNames.end();
+
+  std::map<std::string, std::set<int> >::iterator aFound;
+  if (!isUnique) {
+    aFound = aFoundGroup->second.find(aName);
+    isUnique = aFound == aFoundGroup->second.end();
+  }
+
+  if (isUnique) {
+    // name is unique
+    aName = theObject->data()->name();
+    addIndexedName(theObject, theExistingNames);
+  }
   else {
     // search the appropriate index
     std::set<int>::iterator aFoundIndex = aFound->second.find(anIndex);
@@ -157,29 +169,24 @@ static std::string uniqueName(const std::string& theName,
     aFound->second.insert(anIndex);
   }
 
-  if (isUnique) {
-    // name is unique
-    aName = theName;
-    addIndexedName(theName, theExistingNames);
-  }
   return aName;
 }
 
 void correntNonUniqueNames(DocumentPtr theDocument, std::list<FeaturePtr>& theImported)
 {
-  std::map<std::string, std::set<int> > aNames;
+  ObjectNameMap aNames;
   collectOldNames(theDocument, theImported, aNames);
 
   for (std::list<FeaturePtr>::iterator anIt = theImported.begin();
        anIt != theImported.end(); ++anIt) {
     // update name of feature
-    std::string aNewName = uniqueName((*anIt)->data()->name(), aNames);
+    std::string aNewName = uniqueName(*anIt, aNames);
     (*anIt)->data()->setName(aNewName);
     // update names of results
     const std::list<ResultPtr>& aResults = (*anIt)->results();
     for (std::list<ResultPtr>::const_iterator aRIt = aResults.begin();
          aRIt != aResults.end(); ++aRIt) {
-      aNewName = uniqueName((*aRIt)->data()->name(), aNames);
+      aNewName = uniqueName(*aRIt, aNames);
       (*aRIt)->data()->setName(aNewName);
     }
   }

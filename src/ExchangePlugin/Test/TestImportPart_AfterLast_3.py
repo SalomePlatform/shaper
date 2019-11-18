@@ -64,7 +64,7 @@ model.do()
 
 model.end()
 
-filename = model.tempFileName()
+filename = 'check_export.shaperpart'
 model.removeFile(filename)
 
 featureToExport = Box_1

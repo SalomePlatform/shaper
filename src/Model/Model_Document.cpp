@@ -437,7 +437,7 @@ static bool saveDocument(Handle(Model_Application) theApp,
     aPathToFile.SetName("");
     aPathToFile.SetExtension("");
     OSD_Directory aBaseDir(aPathToFile);
-    if (!aBaseDir.Exists())
+    if (aPathToFile.TrekLength() != 0 && !aBaseDir.Exists())
       aBaseDir.Build(OSD_Protection());
     // save the document
     aStatus = theApp->SaveAs(theDoc, theFilename);

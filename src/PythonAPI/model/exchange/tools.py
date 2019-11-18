@@ -18,12 +18,6 @@
 #
 
 import os
-import tempfile
-
-# Generate temporary file name
-def tempFileName():
-    tempDir = tempfile.TemporaryDirectory()
-    return os.path.join(tempDir.name, "temp.shaperpart")
 
 def removeFile(theFilename):
     try: os.remove(theFilename)
