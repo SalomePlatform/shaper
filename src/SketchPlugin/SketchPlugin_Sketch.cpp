@@ -327,8 +327,7 @@ void SketchPlugin_Sketch::attributeChanged(const std::string& theID) {
             data()->attribute(SketchPlugin_Sketch::DIRX_ID()));
           aDirX->setValue(aXDir);
           std::shared_ptr<GeomAPI_Dir> aDir = aPlane->direction();
-          if (aWasBlocked)
-            data()->blockSendAttributeUpdated(false);
+          data()->blockSendAttributeUpdated(aWasBlocked, false);
         }
       }
     }
