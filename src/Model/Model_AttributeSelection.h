@@ -143,6 +143,9 @@ public:
   /// Makes the current local selection becomes all sub-shapes with same base geometry.
   MODEL_EXPORT virtual void combineGeometrical();
 
+  /// Resets attribute to deafult state
+  MODEL_EXPORT virtual void reset();
+
 protected:
   /// Objects are created for features automatically
   MODEL_EXPORT Model_AttributeSelection(TDF_Label& theLabel);

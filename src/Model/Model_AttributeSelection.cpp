@@ -2018,3 +2018,9 @@ TDF_Label Model_AttributeSelection::baseDocumentLab()
   static TDF_Label anEmpty;
   return anEmpty;
 }
+
+void Model_AttributeSelection::reset()
+{
+  ModelAPI_AttributeSelection::reset();
+  myRef.reset();
+}

@@ -171,7 +171,7 @@ Model_Application::Model_Application()
   static Handle(Model_Application) TheKeepHandle;
   TheKeepHandle = this;
   // additional file format supported
-  static TCollection_ExtendedString THE_DOC_FORMAT("BinOcaf"/*"BinShaperPart"*/);
+  static TCollection_ExtendedString THE_DOC_FORMAT("BinShaperPart");
   static TCollection_ExtendedString THE_FILE_EXT("shaperpart");
   Handle(PCDM_RetrievalDriver) aReader =
       Handle(PCDM_RetrievalDriver)::DownCast(TheKeepHandle->ReaderFromFormat("BinOcaf"));

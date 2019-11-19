@@ -326,8 +326,7 @@ void SketchPlugin_Sketch::attributeChanged(const std::string& theID) {
           std::shared_ptr<GeomDataAPI_Dir> aDirX = std::dynamic_pointer_cast<GeomDataAPI_Dir>(
             data()->attribute(SketchPlugin_Sketch::DIRX_ID()));
           aDirX->setValue(aXDir);
-          std::shared_ptr<GeomAPI_Dir> aDir = aPlane->direction();
-          data()->blockSendAttributeUpdated(aWasBlocked, false);
+          data()->blockSendAttributeUpdated(aWasBlocked, true);
         }
       }
     }
