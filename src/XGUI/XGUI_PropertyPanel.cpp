@@ -303,6 +303,7 @@ void XGUI_PropertyPanel::activateNextWidget(ModuleBase_ModelWidget* theWidget,
 
   QList<ModuleBase_ModelWidget*>::const_iterator anIt = myWidgets.begin(), aLast = myWidgets.end();
   bool isFoundWidget = false;
+  ModuleBase_Tools::activateWindow(this, "XGUI_PropertyPanel::activateNextWidget()");
   for (; anIt != aLast; anIt++) {
     ModuleBase_ModelWidget* aCurrentWidget = *anIt;
     if (isFoundWidget || !theWidget) {
