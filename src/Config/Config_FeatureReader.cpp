@@ -179,6 +179,9 @@ void Config_FeatureReader::fillFeature(xmlNodePtr theFeatureNode,
   if (!aHelpFile.empty())
     outFeatureMessage->setHelpFileName(myLibraryName + "/" + aHelpFile);
 
+  bool isHideFaces = getBooleanAttribute(theFeatureNode, HIDEFACES_PANEL, false);
+  outFeatureMessage->setHideFacesPanel(isHideFaces);
+
   //if (isInternal) {
   //  //Internal feature has no visual representation.
   //  return;

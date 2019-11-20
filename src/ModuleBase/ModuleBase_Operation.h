@@ -105,6 +105,10 @@ Q_OBJECT
     myHelpFileName = theName;
   }
 
+  void setHideFacesVisible(bool isVisible) { myHideFacesVisibilityState = isVisible; }
+
+  bool isHideFacesVisible() const { return myHideFacesVisibilityState; }
+
 signals:
   /// The operation is started
   void beforeStarted();
@@ -209,6 +213,9 @@ private:
   ModuleBase_IPropertyPanel* myPropertyPanel;
 
   QString myHelpFileName;
+
+  /// Visibility state of HideFaces panel before the operation launch
+  bool myHideFacesVisibilityState;
 };
 
 #endif

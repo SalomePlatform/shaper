@@ -18,7 +18,8 @@
         tooltip="Create named collection of geometry entities"
         icon="icons/Collection/shape_group.png"
         apply_continue="true"
-        helpfile="groupFeature.html">
+        helpfile="groupFeature.html"
+        hidefaces_panel="true">
         <source path="group_widget.xml"/>
       </feature>
 

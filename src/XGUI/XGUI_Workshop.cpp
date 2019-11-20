@@ -707,7 +707,6 @@ void XGUI_Workshop::fillPropertyPanel(ModuleBase_Operation* theOperation)
   if (!aFOperation)
     return;
 
-  showPanel(myPropertyPanel);
   myPropertyPanel->cleanContent();
 
   QList<ModuleBase_ModelWidget*> aWidgets;
@@ -793,6 +792,10 @@ void XGUI_Workshop::fillPropertyPanel(ModuleBase_Operation* theOperation)
 #endif
 
   myErrorMgr->setPropertyPanel(myPropertyPanel);
+  theOperation->setHideFacesVisible(myFacesPanel->isVisible());
+  if (aFeatureInfo->isHideFacesPanel() && !myFacesPanel->isVisible())
+    myFacesPanel->show();
+  showPanel(myPropertyPanel);
 }
 
 //******************************************************
@@ -874,6 +877,9 @@ void XGUI_Workshop::onOperationStopped(ModuleBase_Operation* theOperation)
     }
   }
   activateObjectsSelection(anObjects);
+
+  if (!theOperation->isHideFacesVisible())
+    myFacesPanel->hide();
 }
 
 //******************************************************
@@ -1518,7 +1524,7 @@ void XGUI_Workshop::createDockWidgets()
 
   hidePanel(myPropertyPanel);  ///<! Invisible by default
 
-  myFacesPanel = new XGUI_FacesPanel(aDesktop, myModuleConnector);
+  myFacesPanel = new XGUI_FacesPanel(aDesktop, this);
   myActiveControlMgr->addSelector(new XGUI_FacesPanelSelector(myFacesPanel));
   myFacesPanel->setAllowedAreas(Qt::LeftDockWidgetArea |
                                 Qt::RightDockWidgetArea |

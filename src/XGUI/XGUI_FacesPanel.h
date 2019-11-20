@@ -27,8 +27,10 @@
 #include <ModuleBase_ActionType.h>
 #include <ModuleBase_Definitions.h>
 #include <ModuleBase_ViewerPrs.h>
+#include <ModuleBase_ResultPrs.h>
 
 #include <SelectMgr_ListOfFilter.hxx>
+#include <TopoDS_Shape.hxx>
 
 #include <QDockWidget>
 #include <QObject>
@@ -40,7 +42,7 @@ class AIS_InteractiveObject;
 
 class GeomAPI_AISObject;
 
-class ModuleBase_IWorkshop;
+class XGUI_Workshop;
 class ModuleBase_ListView;
 
 class QAction;
@@ -69,7 +71,7 @@ class XGUI_EXPORT XGUI_FacesPanel : public QDockWidget
 public:
   /// Constructor
   /// \param theParent is a parent of the property panel
-  XGUI_FacesPanel(QWidget* theParent, ModuleBase_IWorkshop* theWorkshop);
+  XGUI_FacesPanel(QWidget* theParent, XGUI_Workshop* theWorkshop);
   ~XGUI_FacesPanel() {}
 
   /// Clear content of list widget
@@ -94,10 +96,6 @@ public:
   /// Stores the state if panel is active and highlight the panel in an active color
   /// \param theIsActive state whether the panel should be activated or deactivated
   void setActivePanel(const bool theIsActive);
-
-  /// Returns true if transparency choice is checked
-  /// \return boolean value
-  bool useTransparency() const;
 
   /// Returns true if the object is in internal container of hidden objects by this panel
   /// \param theObject a checked object
@@ -135,6 +133,10 @@ public:
   bool customizeObject(const std::shared_ptr<ModelAPI_Object>& theObject,
     const std::shared_ptr<GeomAPI_AISObject>& thePresentation);
 
+
+  XGUI_Workshop* workshop() const { return myWorkshop; }
+
+
 protected:
   /// Reimplementation to emit a signal about the panel close
   virtual void closeEvent(QCloseEvent* theEvent);
@@ -153,22 +155,27 @@ private:
   /// \return true if some of objects was redisplayed
   static bool redisplayObjects(const std::set<std::shared_ptr<ModelAPI_Object> >& theObjects);
 
-  /// Display objects if the objects are in a container of hidden by this pane.
-  /// \param theObjects container of objects
-  /// \param theHiddenObjects hidden objects, if object is in the container, it should be removed
-  /// \return true if some of objects was redisplayed
-  static bool displayHiddenObjects(const std::set<std::shared_ptr<ModelAPI_Object> >& theObjects,
-                                   std::set<std::shared_ptr<ModelAPI_Object> >& theHiddenObjects);
-
-  /// Iterates by items and hide objects where all sub-shapes are hidden
-  /// \return true if some of objects was redisplayed
-  bool hideEmptyObjects();
-
   /// Container of objects participating in the panel, it is filled by internal container
   /// \param theItems container of selected values
   /// \param theObjects [out] container of objects
   static void updateProcessedObjects(QMap<int, std::shared_ptr<ModuleBase_ViewerPrs> > theItems,
                                      std::set<std::shared_ptr<ModelAPI_Object> >& theObjects);
+
+  /// Returns maps of shapes and presentations. If object is a body result then it returns
+  /// its ruslts. If it is a group then it returns result of shapes included into the gropup
+  /// The function doesn't clear content of input maps.
+  /// \param thePrs a selected presintation
+  /// \param theObjectsToShapes map of objects to shapes list
+  /// \param theObjectToPrs map of objects to presentations
+  void getObjectsMapFromPrs(ModuleBase_ViewerPrsPtr thePrs,
+    std::map<ObjectPtr, TopoDS_ListOfShape>& theObjectsToShapes,
+    std::map<ObjectPtr, Handle(ModuleBase_ResultPrs) >& theObjectToPrs);
+
+  /// Returns true if transparency choice is checked
+  /// \return boolean value
+  bool useTransparency() const;
+
+  double transparency() const;
 
 protected slots:
   /// Deletes element in list of items
@@ -188,14 +195,15 @@ private:
 protected:
   QCheckBox* myHiddenOrTransparent; ///< if checked - transparent, else hidden
   ModuleBase_ListView* myListView; ///< list control of processed faces
-  ModuleBase_IWorkshop* myWorkshop; ///< workshop
+  XGUI_Workshop* myWorkshop; ///< workshop
 
   bool myIsActive; ///< current state about the panel is active
   int myLastItemIndex; ///< last index to be used in the map of items for the next added item
 
-  QMap<int, std::shared_ptr<ModuleBase_ViewerPrs> > myItems; ///< selected face items
+  QMap<int, ModuleBase_ViewerPrsPtr> myItems; ///< selected face items
   std::set<std::shared_ptr<ModelAPI_Object> > myItemObjects; ///< cached objects of myItems
   std::set<std::shared_ptr<ModelAPI_Object> > myHiddenObjects; ///< hidden objects
+  std::set<std::shared_ptr<ModelAPI_Object> > myHiddenGroups; ///< hidden objects
 };
 
 #endif

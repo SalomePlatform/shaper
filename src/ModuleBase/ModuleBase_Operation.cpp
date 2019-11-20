@@ -50,7 +50,8 @@
 ModuleBase_Operation::ModuleBase_Operation(const QString& theId, QObject* theParent)
     : QObject(theParent),
       myIsModified(false),
-      myPropertyPanel(NULL)
+      myPropertyPanel(NULL),
+  myHideFacesVisibilityState(false)
 {
   myDescription = new ModuleBase_OperationDescription(theId);
 }
