@@ -113,9 +113,11 @@ void FeaturesPlugin_BooleanFuse::execute()
 
   // Collecting solids from compsolids which will not be modified
   // in boolean operation and will be added to result.
+  bool isProcessCompsolid = !isSimpleCreation || aFuseVersion >= THE_FUSE_VERSION_1;
   ListOfShape aShapesToAdd;
   for (ObjectHierarchy::Iterator anObjectsIt = anObjectsHierarchy.Begin();
-       anObjectsIt != anObjectsHierarchy.End(); ++anObjectsIt) {
+       isProcessCompsolid && anObjectsIt != anObjectsHierarchy.End();
+       ++anObjectsIt) {
     GeomShapePtr anObject = *anObjectsIt;
     GeomShapePtr aParent = anObjectsHierarchy.Parent(anObject, false);
 
@@ -143,8 +145,11 @@ void FeaturesPlugin_BooleanFuse::execute()
       aMakeShapeList->appendAlgo(aCutAlgo);
     }
   }
-  anOriginalShapes.insert(anOriginalShapes.end(), anEdgesAndFaces.begin(),
-                          anEdgesAndFaces.end());
+
+  if (aShapesToAdd.empty() || !aCuttedEdgesAndFaces) {
+    anOriginalShapes.insert(anOriginalShapes.end(), anEdgesAndFaces.begin(),
+                            anEdgesAndFaces.end());
+  }
 
   // If we have compsolids then cut with not used solids all others.
   if (!aShapesToAdd.empty()) {

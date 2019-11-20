@@ -78,4 +78,12 @@ Compound_1 = model.addCompound(Part_1_doc, [model.selection("COMPSOLID", "Extrus
 Fuse_1 = model.addFuse(Part_1_doc, [model.selection("SOLID", "Compound_1_1_1_1")], [model.selection("SOLID", "LinearCopy_2_1_1_1"), model.selection("FACE", "Compound_1_1_2")], True, 20190506)
 model.end()
 
-assert(Fuse_1.feature().error() != "")
+from GeomAPI import *
+
+model.testNbResults(Fuse_1, 1)
+model.testNbSubResults(Fuse_1, [5])
+model.testNbSubShapes(Fuse_1, GeomAPI_Shape.SOLID, [9])
+model.testNbSubShapes(Fuse_1, GeomAPI_Shape.FACE, [44])
+model.testNbSubShapes(Fuse_1, GeomAPI_Shape.EDGE, [160])
+model.testNbSubShapes(Fuse_1, GeomAPI_Shape.VERTEX, [320])
+model.testResultsVolumes(Fuse_1, [6516.03943965772123])
