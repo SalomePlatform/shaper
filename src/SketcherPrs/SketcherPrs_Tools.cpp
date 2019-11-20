@@ -202,17 +202,28 @@ std::list<ResultPtr> getFreePoints(const CompositeFeaturePtr& theSketch)
        anObjIt != anObjects.end(); ++anObjIt) {
     FeaturePtr aCurrent = ModelAPI_Feature::feature(*anObjIt);
     if (aCurrent && aCurrent->getKind() == SketchPlugin_Point::ID()) {
-      // check point is not referred by any constraints
-      const std::set<AttributePtr>& aRefs = aCurrent->data()->refsToMe();
-      std::set<AttributePtr>::iterator aRIt = aRefs.begin();
-      for (; aRIt != aRefs.end(); ++aRIt) {
-        FeaturePtr aRefFeat = ModelAPI_Feature::feature((*aRIt)->owner());
-        std::shared_ptr<SketchPlugin_Constraint> aRefConstr =
-            std::dynamic_pointer_cast<SketchPlugin_Constraint>(aRefFeat);
-        if (aRefConstr)
-          break;
+      // check point is not referred by any constraints: the feature and result of point
+      bool aIsFree = true;
+      for(int aKind = 0; aIsFree && aKind < 2; aKind++) { // 0 for feature, 1 for result
+        ObjectPtr aReferenced = aCurrent;
+        if (aKind == 1)
+          if (!aCurrent->results().empty())
+            aReferenced = aCurrent->firstResult();
+          else
+            break;
+        const std::set<AttributePtr>& aRefs = aReferenced->data()->refsToMe();
+        std::set<AttributePtr>::iterator aRIt = aRefs.begin();
+        for (; aRIt != aRefs.end(); ++aRIt) {
+          FeaturePtr aRefFeat = ModelAPI_Feature::feature((*aRIt)->owner());
+          std::shared_ptr<SketchPlugin_Constraint> aRefConstr =
+              std::dynamic_pointer_cast<SketchPlugin_Constraint>(aRefFeat);
+          if (aRefConstr) {
+            aIsFree = false;
+            break;
+          }
+        }
       }
-      if (aRIt == aRefs.end())
+      if (aIsFree)
         aFreePoints.push_back(aCurrent->lastResult());
     }
   }

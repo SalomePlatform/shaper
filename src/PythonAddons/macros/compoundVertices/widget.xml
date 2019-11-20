@@ -1,7 +1,6 @@
 <source>
   <workbench id="Macros" document="Part">
     <group id="Samples">
-
       <feature
         id="compoundVertices"
         title="Points set"
@@ -13,7 +12,6 @@
         <stringvalue id="separator"  label="Separator (optional): ">
         </stringvalue>
       </feature>
-
     </group>
-  </workbench>  
+  </workbench>
 </source>

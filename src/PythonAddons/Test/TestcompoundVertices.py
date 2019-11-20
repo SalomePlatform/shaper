@@ -48,4 +48,3 @@ aSeparatorName = "separator"
 separator = anImportFeature.string(aSeparatorName)
 separator.setValue(" ")
 aSession.finishOperation()
-

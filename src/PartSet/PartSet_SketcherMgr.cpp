@@ -1964,6 +1964,7 @@ void PartSet_SketcherMgr::onShowConstraintsToggle(int theType, bool theState)
   PartSet_Tools::ConstraintVisibleState aType = (PartSet_Tools::ConstraintVisibleState)theType;
 
   updateBySketchParameters(aType, theState);
+  myModule->workshop()->viewer()->update();
 }
 
 void PartSet_SketcherMgr::updateBySketchParameters(

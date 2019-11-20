@@ -49,13 +49,13 @@ void GeomAlgoAPI_Chamfer::build(const GeomShapePtr& theBaseSolid,
   TopoDS_Shape aShapeBase = theBaseSolid->impl<TopoDS_Shape>();
   TopTools_IndexedDataMapOfShapeListOfShape M;
   TopExp::MapShapesAndAncestors(aShapeBase, TopAbs_EDGE, TopAbs_FACE, M);
- 
+
   // create chamfer builder
   BRepFilletAPI_MakeChamfer* aChamferBuilder =
       new BRepFilletAPI_MakeChamfer(aShapeBase);
   setImpl(aChamferBuilder);
   setBuilderType(OCCT_BRepBuilderAPI_MakeShape);
-  
+
   for (ListOfShape::const_iterator anIt = theChamferShapes.begin();
      anIt != theChamferShapes.end(); ++anIt) {
     if ((*anIt)->isEdge()) {
@@ -63,7 +63,7 @@ void GeomAlgoAPI_Chamfer::build(const GeomShapePtr& theBaseSolid,
       if (theMapEdgeFace.find(*anIt) != theMapEdgeFace.end()) {
         //TopoDS_Face F = (theMapEdgeFace[*anIt])->impl<TopoDS_Face>();
         TopoDS_Face F = (theMapEdgeFace.at(*anIt))->impl<TopoDS_Face>();
-        if (!BRepTools::IsReallyClosed(E,F) && !BRep_Tool::Degenerated(E) && 
+        if (!BRepTools::IsReallyClosed(E,F) && !BRep_Tool::Degenerated(E) &&
               M.FindFromKey(E).Extent() == 2) {
           if (performDistances) {
               aChamferBuilder->Add(theVal1, theVal2, E, F);

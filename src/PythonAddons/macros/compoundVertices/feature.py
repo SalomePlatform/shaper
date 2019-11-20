@@ -60,7 +60,7 @@ class compoundVertices(model.Feature):
 
         filepath = apath.value()
         if filepath != "" :
-            part = model.activeDocument()            
+            part = model.activeDocument()
             if self.lfeatures :
                 for feature in self.lfeatures:
                    part.removeFeature(feature.feature())
@@ -90,7 +90,7 @@ class compoundVertices(model.Feature):
                 self.folder = model.addFolder(part, self.lfeatures[0], compound)
                 self.folder.setName(nameRes)
                 return
-        
+
             setError("The file does not exist")
 
     def isMacro(self):

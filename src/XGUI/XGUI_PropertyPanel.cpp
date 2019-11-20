@@ -53,6 +53,7 @@
 #include <QGridLayout>
 #include <QWidget>
 #include <QAction>
+#include <QScrollArea>
 
 #ifdef _DEBUG
 #include <iostream>
@@ -75,12 +76,18 @@ XGUI_PropertyPanel::XGUI_PropertyPanel(QWidget* theParent, XGUI_OperationMgr* th
   setObjectName(PROP_PANEL);
   setStyleSheet("::title { position: relative; padding-left: 5px; text-align: left center }");
 
-  QWidget* aContent = new QWidget(this);
+  QScrollArea* aScroll = new QScrollArea(this);
+  aScroll->setWidgetResizable(true);
+  aScroll->setFrameStyle(QFrame::NoFrame);
+
+  QWidget* aContent = new QWidget(aScroll);
   QGridLayout* aMainLayout = new QGridLayout(aContent);
   const int kPanelColumn = 0;
   int aPanelRow = 0;
   aMainLayout->setContentsMargins(3, 3, 3, 3);
-  setWidget(aContent);
+  aScroll->setWidget(aContent);
+
+  setWidget(aScroll);
 
   QFrame* aFrm = new QFrame(aContent);
   aFrm->setFrameStyle(QFrame::Raised);
@@ -183,6 +190,7 @@ void XGUI_PropertyPanel::setModelWidgets(const QList<ModuleBase_ModelWidget*>& t
             this,    SIGNAL(enterClicked(QObject*)));
   }
 }
+
 
 const QList<ModuleBase_ModelWidget*>& XGUI_PropertyPanel::modelWidgets() const
 {
@@ -295,6 +303,7 @@ void XGUI_PropertyPanel::activateNextWidget(ModuleBase_ModelWidget* theWidget,
 
   QList<ModuleBase_ModelWidget*>::const_iterator anIt = myWidgets.begin(), aLast = myWidgets.end();
   bool isFoundWidget = false;
+  ModuleBase_Tools::activateWindow(this, "XGUI_PropertyPanel::activateNextWidget()");
   for (; anIt != aLast; anIt++) {
     ModuleBase_ModelWidget* aCurrentWidget = *anIt;
     if (isFoundWidget || !theWidget) {

@@ -48,7 +48,7 @@ public:
                                          const bool performDistances,
                                          const double theVal1,
                                          const double theVal2);
-  
+
 private:
   /// Perform chamfer operation.
   /// \param theBaseSolid     a changing solid

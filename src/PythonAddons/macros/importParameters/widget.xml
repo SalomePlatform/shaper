@@ -1,7 +1,6 @@
 <source>
   <workbench id="Macros" document="Part">
     <group id="Samples">
-
       <feature id="importParameters"
         title="List of Parameters"
         tooltip="Import a set of parameters"
@@ -10,7 +9,6 @@
         <file_selector id="file_path" title="Import file" path="">
         </file_selector>
       </feature>
-
     </group>
-  </workbench>  
+  </workbench>
 </source>

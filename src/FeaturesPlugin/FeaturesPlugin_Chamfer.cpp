@@ -103,10 +103,10 @@ void FeaturesPlugin_Chamfer::execute()
    AttributeStringPtr aCreationMethod = string(CREATION_METHOD());
    if (!aCreationMethod)
      return;
- 
-   std::list<std::pair<GeomShapePtr, ListOfShape> > aSolidsAndSubs; 
+
+   std::list<std::pair<GeomShapePtr, ListOfShape> > aSolidsAndSubs;
    std::map<GeomShapePtr, GeomShapePtr> aMapEdgeFace;
- 
+
    // getting objects and sort them according to parent solids
    AttributeSelectionListPtr anObjectsSelList = selectionList(OBJECT_LIST_ID());
    for (int anObjectsIndex = 0; anObjectsIndex < anObjectsSelList->size(); ++anObjectsIndex) {
@@ -114,7 +114,7 @@ void FeaturesPlugin_Chamfer::execute()
      GeomShapePtr anObject = anObjectAttr->value();
      if (!anObject)
        return;
-     
+
      ResultPtr aContext = anObjectAttr->context();
      GeomShapePtr aParent;
      if (aContext.get()) {
@@ -128,7 +128,7 @@ void FeaturesPlugin_Chamfer::execute()
      }
      if (!aParent)
        return;
- 
+
      // searching this parent is already in the list aSolidsAndSubs
      std::list<std::pair<GeomShapePtr, ListOfShape> >::iterator aSearch = aSolidsAndSubs.begin();
      ListOfShape* aFound;
@@ -149,7 +149,7 @@ void FeaturesPlugin_Chamfer::execute()
     for (ListOfShape::iterator aEIt = anEdgesAndVertices.begin();
          aEIt != anEdgesAndVertices.end(); ++aEIt)
       aFound->push_back(*aEIt);
-     
+
      if (anObject->isFace()) {
        for (ListOfShape::iterator aEIt = anEdgesAndVertices.begin();
           aEIt != anEdgesAndVertices.end(); ++aEIt) {
@@ -159,7 +159,7 @@ void FeaturesPlugin_Chamfer::execute()
        }
      }
    }
- 
+
    //bool isOption1 = true;
    double aD1 = 0.0, aD2 = 0.0, aD = 0.0, anAngle = 0.0;
    if (aCreationMethod->value() == CREATION_METHOD_DISTANCE_DISTANCE()) {
@@ -169,22 +169,22 @@ void FeaturesPlugin_Chamfer::execute()
      aD = real(FeaturesPlugin_Chamfer::D_ID())->value();
      anAngle = real(FeaturesPlugin_Chamfer::ANGLE_ID())->value();
    }
- 
+
    // Perform chamfer operation
    GeomAlgoAPI_MakeShapeList aMakeShapeList;
    std::shared_ptr<GeomAlgoAPI_Chamfer> aChamferBuilder;
    int aResultIndex = 0;
    std::string anError;
-   
- 
+
+
    std::vector<FeaturesPlugin_Tools::ResultBaseAlgo> aResultBaseAlgoList;
    ListOfShape anOriginalShapesList, aResultShapesList;
- 
+
    std::list<std::pair<GeomShapePtr, ListOfShape> >::iterator anIt = aSolidsAndSubs.begin();
    for (; anIt != aSolidsAndSubs.end(); ++anIt) {
      GeomShapePtr aSolid = anIt->first;
      ListOfShape aFilletEdgesAndVertices = anIt->second;
- 
+
      ListOfShape aFilletEdges = selectEdges(aFilletEdgesAndVertices);
      if (aCreationMethod->value() == CREATION_METHOD_DISTANCE_DISTANCE()) {
        aChamferBuilder.reset(new GeomAlgoAPI_Chamfer(
@@ -193,12 +193,12 @@ void FeaturesPlugin_Chamfer::execute()
        aChamferBuilder.reset(new GeomAlgoAPI_Chamfer(
          aSolid, aFilletEdges, aMapEdgeFace, false, aD, anAngle));
      }
-     
+
      if (GeomAlgoAPI_Tools::AlgoError::isAlgorithmFailed(aChamferBuilder, getKind(), anError)) {
        setError(anError);
        return;
      }
- 
+
     GeomShapePtr aResult = unwrapCompound(aChamferBuilder->shape());
     std::shared_ptr<ModelAPI_ResultBody> aResultBody =
         document()->createBody(data(), aResultIndex);
