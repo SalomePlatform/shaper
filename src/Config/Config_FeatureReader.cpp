@@ -179,10 +179,10 @@ void Config_FeatureReader::fillFeature(xmlNodePtr theFeatureNode,
   if (!aHelpFile.empty())
     outFeatureMessage->setHelpFileName(myLibraryName + "/" + aHelpFile);
 
-  if (isInternal) {
-    //Internal feature has no visual representation.
-    return;
-  }
+  //if (isInternal) {
+  //  //Internal feature has no visual representation.
+  //  return;
+  //}
 
   std::string aText = Config_Translator::translate(anId, getProperty(theFeatureNode, FEATURE_TEXT));
   outFeatureMessage->setText(aText);

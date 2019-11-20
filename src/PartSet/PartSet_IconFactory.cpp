@@ -163,11 +163,9 @@ void PartSet_IconFactory::processEvent(const std::shared_ptr<Events_Message>& th
       Events_Loop::loop()->eventByName(Config_FeatureMessage::GUI_EVENT())) {
     std::shared_ptr<Config_FeatureMessage> aFeatureMsg =
        std::dynamic_pointer_cast<Config_FeatureMessage>(theMessage);
-    if (!aFeatureMsg->isInternal()) {
-      ActionInfo aFeatureInfo;
-      aFeatureInfo.initFrom(aFeatureMsg);
-      // Remember features icons
-      myIcons[QString::fromStdString(aFeatureMsg->id())] = aFeatureInfo.iconFile;
-    }
+    ActionInfo aFeatureInfo;
+    aFeatureInfo.initFrom(aFeatureMsg);
+    // Remember features icons
+    myIcons[QString::fromStdString(aFeatureMsg->id())] = aFeatureInfo.iconFile;
   }
 }
