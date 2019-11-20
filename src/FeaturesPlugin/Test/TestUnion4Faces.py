@@ -57,11 +57,11 @@ Face_2 = model.addFace(Part_1_doc, Face_2_objects)
 Partition_1_objects = [model.selection("FACE", "Face_2_1"), model.selection("FACE", "Face_1_1"), model.selection("FACE", "PartSet/YOZ")]
 Partition_1 = model.addPartition(Part_1_doc, Partition_1_objects)
 Union_1_objects = [model.selection("FACE", "Partition_1_1_1"), model.selection("FACE", "Partition_1_1_3"), model.selection("FACE", "Partition_1_1_4")]
-Union_1 = model.addUnion(Part_1_doc, Union_1_objects)
+Union_1 = model.addFuse(Part_1_doc, Union_1_objects, True, 20190506)
 model.do()
 
 model.checkResult(Union_1,model,1,[2],[0],[2],[13],[26])
-#model.testHaveNamingSubshapes(Union_1,model,Part_1_doc)
+model.testHaveNamingSubshapes(Union_1,model,Part_1_doc)
 
 model.end()
 

@@ -115,8 +115,7 @@ void FeaturesPlugin_BooleanFuse::execute()
   // in boolean operation and will be added to result.
   ListOfShape aShapesToAdd;
   for (ObjectHierarchy::Iterator anObjectsIt = anObjectsHierarchy.Begin();
-       !isSimpleCreation && anObjectsIt != anObjectsHierarchy.End();
-       ++anObjectsIt) {
+       anObjectsIt != anObjectsHierarchy.End(); ++anObjectsIt) {
     GeomShapePtr anObject = *anObjectsIt;
     GeomShapePtr aParent = anObjectsHierarchy.Parent(anObject, false);
 

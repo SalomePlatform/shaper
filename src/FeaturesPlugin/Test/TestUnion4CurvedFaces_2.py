@@ -39,7 +39,7 @@ Revolution_1 = model.addRevolution(Part_1_doc, [model.selection("EDGE", "Edge_1_
 Partition_1_objects = [model.selection("FACE", "PartSet/YOZ"), model.selection("FACE", "PartSet/XOZ"), model.selection("FACE", "PartSet/XOY"), model.selection("FACE", "Revolution_1_1")]
 Partition_1 = model.addPartition(Part_1_doc, Partition_1_objects)
 Union_1_objects = [model.selection("FACE", "Partition_1_1_1"), model.selection("FACE", "Partition_1_1_2"), model.selection("FACE", "Partition_1_1_3"), model.selection("FACE", "Partition_1_1_4")]
-Union_1 = model.addUnion(Part_1_doc, Union_1_objects)
+Union_1 = model.addFuse(Part_1_doc, Union_1_objects, True)
 model.testHaveNamingSubshapes(Union_1,model,Part_1_doc)
 model.do()
 model.end()

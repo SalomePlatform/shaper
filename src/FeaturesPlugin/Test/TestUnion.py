@@ -84,10 +84,12 @@ anExtrusionResult = modelAPI_ResultBody(anExtrusionFeature.firstResult())
 # Make union on extrusion
 #=========================================================================
 aSession.startOperation()
-aUnionFeature = aPart.addFeature("Union")
-aUnionFeature.selectionList("base_objects").append(anExtrusionResult.subResult(0), None);
-aUnionFeature.selectionList("base_objects").append(anExtrusionResult.subResult(1), None);
-aUnionFeature.selectionList("base_objects").append(anExtrusionResult.subResult(2), None);
+aUnionFeature = aPart.addFeature("Fuse")
+aUnionFeature.string("creation_method").setValue("simple")
+aUnionFeature.selectionList("main_objects").append(anExtrusionResult.subResult(0), None);
+aUnionFeature.selectionList("main_objects").append(anExtrusionResult.subResult(1), None);
+aUnionFeature.selectionList("main_objects").append(anExtrusionResult.subResult(2), None);
+aUnionFeature.boolean("remove_intersection_edges").setValue(False)
 aSession.finishOperation()
 assert (len(aUnionFeature.results()) > 0)
 anUnionResult = modelAPI_ResultBody(aUnionFeature.firstResult())

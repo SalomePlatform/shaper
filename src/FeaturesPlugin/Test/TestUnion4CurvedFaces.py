@@ -37,7 +37,7 @@ model.do()
 Edge_1 = model.addEdge(Part_1_doc, [model.selection("EDGE", "Sketch_1/SketchArc_1_2")])
 Revolution_1 = model.addRevolution(Part_1_doc, [model.selection("EDGE", "Edge_1_1")], model.selection("EDGE", "PartSet/OY"), 200, 0)
 Partition_1 = model.addPartition(Part_1_doc, [model.selection("FACE", "PartSet/XOZ"), model.selection("FACE", "Revolution_1_1")])
-Union_1 = model.addUnion(Part_1_doc, [model.selection("FACE", "Partition_1_1_1"), model.selection("FACE", "Partition_1_1_2")])
+Union_1 = model.addFuse(Part_1_doc, [model.selection("FACE", "Partition_1_1_1"), model.selection("FACE", "Partition_1_1_2")], True)
 model.do()
 
 model.checkResult(Union_1,model,1,[0],[0],[1],[4],[8])
