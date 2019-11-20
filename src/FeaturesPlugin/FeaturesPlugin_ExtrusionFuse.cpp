@@ -73,10 +73,12 @@ void FeaturesPlugin_ExtrusionFuse::executeFuseThroughAll()
   for (ListOfMakeShape::const_iterator
          anIt = aGenMakeShapes.cbegin(); anIt != aGenMakeShapes.cend(); ++anIt) {
     GeomMakeShapePtr anAlgo = (*anIt);
-    std::shared_ptr<GeomAlgoAPI_Prism> aPrismAlgo = std::dynamic_pointer_cast<GeomAlgoAPI_Prism>(anAlgo);
+    std::shared_ptr<GeomAlgoAPI_Prism> aPrismAlgo =
+        std::dynamic_pointer_cast<GeomAlgoAPI_Prism>(anAlgo);
 
     // Cut the prism by all objects and throw away end pieces
-    std::shared_ptr<GeomAlgoAPI_ThroughAll> aToolAlgo (new GeomAlgoAPI_ThroughAll(aPrismAlgo, anObjects));
+    std::shared_ptr<GeomAlgoAPI_ThroughAll> aToolAlgo (
+        new GeomAlgoAPI_ThroughAll(aPrismAlgo, anObjects));
 
     // Checking that the algorithm worked properly
     if (!aToolAlgo->isDone() || aToolAlgo->shape()->isNull() || !aToolAlgo->isValid()) {

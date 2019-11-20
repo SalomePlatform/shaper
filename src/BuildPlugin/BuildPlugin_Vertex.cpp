@@ -77,7 +77,8 @@ bool BuildPlugin_Vertex::buildVertices(GeomShapePtr theShape,
     GeomAPI_DataMapOfShapeShape alreadyProcessed;
 
     // 1. Explode on Vertices
-    for (GeomAPI_ShapeExplorer anExp (theShape, GeomAPI_Shape::VERTEX); anExp.more(); anExp.next()) {
+    for (GeomAPI_ShapeExplorer anExp (theShape, GeomAPI_Shape::VERTEX);
+         anExp.more(); anExp.next()) {
       GeomShapePtr aSubShape = anExp.current();
 
       if (alreadyProcessed.bind(aSubShape, aSubShape)) {
@@ -94,7 +95,8 @@ bool BuildPlugin_Vertex::buildVertices(GeomShapePtr theShape,
       // Partition
       ListOfShape anObjList, aTools;
       anObjList.push_back(theShape);
-      std::shared_ptr<GeomAlgoAPI_Partition> aPartitionAlgo (new GeomAlgoAPI_Partition(anObjList, aTools));
+      std::shared_ptr<GeomAlgoAPI_Partition> aPartitionAlgo (
+          new GeomAlgoAPI_Partition(anObjList, aTools));
 
       std::string anError;
       if (GeomAlgoAPI_Tools::AlgoError::isAlgorithmFailed(aPartitionAlgo, getKind(), anError)) {
@@ -104,7 +106,8 @@ bool BuildPlugin_Vertex::buildVertices(GeomShapePtr theShape,
       GeomShapePtr aSplittedSketch = aPartitionAlgo->shape();
 
       // Explode on Vertices, skip vertices of initial sketch
-      for (GeomAPI_ShapeExplorer anExp (aSplittedSketch, GeomAPI_Shape::VERTEX); anExp.more(); anExp.next()) {
+      for (GeomAPI_ShapeExplorer anExp (aSplittedSketch, GeomAPI_Shape::VERTEX);
+           anExp.more(); anExp.next()) {
         GeomShapePtr aSubShape = anExp.current();
 
         //if (!theShape->isSubShape(aSubShape)) { // skip vertices of initial sketch
@@ -160,7 +163,8 @@ bool BuildPlugin_Vertex::buildVertices(FeaturePtr theFeature,
     // Partition
     ListOfShape anObjList, aTools;
     anObjList.push_back(theShape);
-    std::shared_ptr<GeomAlgoAPI_Partition> aPartitionAlgo (new GeomAlgoAPI_Partition(anObjList, aTools));
+    std::shared_ptr<GeomAlgoAPI_Partition> aPartitionAlgo (
+        new GeomAlgoAPI_Partition(anObjList, aTools));
 
     std::string anError;
     if (GeomAlgoAPI_Tools::AlgoError::isAlgorithmFailed(aPartitionAlgo, getKind(), anError)) {
@@ -170,7 +174,8 @@ bool BuildPlugin_Vertex::buildVertices(FeaturePtr theFeature,
     GeomShapePtr aSplittedSketch = aPartitionAlgo->shape();
 
     // Explode on Vertices, skip vertices of initial sketch
-    for (GeomAPI_ShapeExplorer anExp (aSplittedSketch, GeomAPI_Shape::VERTEX); anExp.more(); anExp.next()) {
+    for (GeomAPI_ShapeExplorer anExp (aSplittedSketch, GeomAPI_Shape::VERTEX);
+         anExp.more(); anExp.next()) {
       GeomShapePtr aSubShape = anExp.current();
 
       //if (!theShape->isSubShape(aSubShape)) { // skip vertices of initial sketch
@@ -196,7 +201,8 @@ bool BuildPlugin_Vertex::buildVertices(FeaturePtr theFeature,
         // Sub-result i
         GeomShapePtr aSubResShape = aRes->shape();
 
-        for (GeomAPI_ShapeExplorer anExp (aSubResShape, GeomAPI_Shape::VERTEX); anExp.more(); anExp.next()) {
+        for (GeomAPI_ShapeExplorer anExp (aSubResShape, GeomAPI_Shape::VERTEX);
+             anExp.more(); anExp.next()) {
           GeomShapePtr aSubShape = anExp.current();
 
           if (alreadyProcessed.bind(aSubShape, aSubShape)) {

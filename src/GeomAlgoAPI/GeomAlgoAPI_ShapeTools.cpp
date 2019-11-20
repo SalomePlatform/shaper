@@ -1154,7 +1154,8 @@ void GeomAlgoAPI_ShapeTools::computeThroughAll(const ListOfShape& theObjects,
                                                double& theToSize, double& theFromSize)
 {
   // Bounding box of objects
-  std::list<std::shared_ptr<GeomAPI_Pnt> > aBndObjs = GeomAlgoAPI_ShapeTools::getBoundingBox(theObjects);
+  std::list<std::shared_ptr<GeomAPI_Pnt> > aBndObjs =
+      GeomAlgoAPI_ShapeTools::getBoundingBox(theObjects);
   if (aBndObjs.size() != 8) {
     return;
   }
@@ -1165,7 +1166,8 @@ void GeomAlgoAPI_ShapeTools::computeThroughAll(const ListOfShape& theObjects,
     gp_Dir aDir = theDir->impl<gp_Dir>();
 
     // Bounding box of the base
-    std::list<std::shared_ptr<GeomAPI_Pnt> > aBndBases = GeomAlgoAPI_ShapeTools::getBoundingBox(theBaseShapes);
+    std::list<std::shared_ptr<GeomAPI_Pnt> > aBndBases =
+        GeomAlgoAPI_ShapeTools::getBoundingBox(theBaseShapes);
     if (aBndBases.size() != 8) {
       return;
     }
@@ -1189,13 +1191,15 @@ void GeomAlgoAPI_ShapeTools::computeThroughAll(const ListOfShape& theObjects,
     theToSize = 0.0;
     theFromSize = 0.0;
 
-    for (ListOfShape::const_iterator anIt = theBaseShapes.begin(); anIt != theBaseShapes.end(); ++anIt) {
+    for (ListOfShape::const_iterator anIt = theBaseShapes.begin();
+         anIt != theBaseShapes.end(); ++anIt) {
       const GeomShapePtr& aBaseShape_i = (*anIt);
       ListOfShape aBaseShapes_i;
       aBaseShapes_i.push_back(aBaseShape_i);
 
       // Bounding box of the base
-      std::list<std::shared_ptr<GeomAPI_Pnt> > aBndBases = GeomAlgoAPI_ShapeTools::getBoundingBox(aBaseShapes_i);
+      std::list<std::shared_ptr<GeomAPI_Pnt> > aBndBases =
+          GeomAlgoAPI_ShapeTools::getBoundingBox(aBaseShapes_i);
       if (aBndBases.size() != 8) {
         return;
       }

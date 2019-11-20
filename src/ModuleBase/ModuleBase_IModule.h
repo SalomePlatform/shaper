@@ -323,7 +323,8 @@ class MODULEBASE_EXPORT ModuleBase_IModule : public QObject
   /// Customize presentation according to objects attributes
   /// \param theObject an object for presentation
   /// \param thePrs a presentation object
-  virtual void customizePresentation(const ObjectPtr& theObject, const AISObjectPtr& thePrs) const {}
+  virtual void customizePresentation(const ObjectPtr& theObject, const AISObjectPtr& thePrs) const
+  {}
 
   //! Returns data object by AIS
   virtual ObjectPtr findPresentedObject(const AISObjectPtr& theAIS) const = 0;
