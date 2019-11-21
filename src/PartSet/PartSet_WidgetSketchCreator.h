@@ -83,6 +83,9 @@ public:
   /// \return a boolean value
   virtual bool isValidSelection(const std::shared_ptr<ModuleBase_ViewerPrs>& theValue);
 
+  /// Returns True in case if the widget contains useful information for inspection tool
+  virtual bool isInformative() const { return false; }
+
 protected:
   /// If there is no operation in current session, start operation for modify parameters
   /// \return true if the operation was not opened

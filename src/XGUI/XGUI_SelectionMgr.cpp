@@ -106,6 +106,7 @@ void XGUI_SelectionMgr::setSelectedOwners(const SelectMgr_IndexedMapOfOwner& the
 //**************************************************************
 void XGUI_SelectionMgr::onObjectBrowserSelection()
 {
+  myLastSelectionPlace = ModuleBase_ISelection::Browser;
   QList<ModuleBase_ViewerPrsPtr> aSelectedPrs =
     myWorkshop->selector()->selection()->getSelected(ModuleBase_ISelection::Browser);
   XGUI_Displayer* aDisplayer = myWorkshop->displayer();
@@ -138,6 +139,7 @@ void XGUI_SelectionMgr::onObjectBrowserSelection()
 //**************************************************************
 void XGUI_SelectionMgr::onViewerSelection()
 {
+  myLastSelectionPlace = ModuleBase_ISelection::Viewer;
   QList<ModuleBase_ViewerPrsPtr> aValues;
   Handle(AIS_InteractiveContext) aContext = myWorkshop->viewer()->AISContext();
   if (!aContext.IsNull())

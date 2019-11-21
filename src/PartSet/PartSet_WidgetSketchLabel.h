@@ -31,6 +31,7 @@
 
 #include <TopoDS_Shape.hxx>
 
+#include <QStackedWidget>
 #include <QMap>
 
 class PartSet_PreviewPlanes;
@@ -109,6 +110,12 @@ public:
   /// Returns True if the selected presentation can be used for plane definition
   /// \param thePrs a presentation
   static bool canFillSketch(const std::shared_ptr<ModuleBase_ViewerPrs>& thePrs);
+
+  /// If widgets has several panels then this method has to show a page which contains information
+  /// for current feature. By default does nothing
+  virtual void showInformativePage() {
+    if (myStackWidget) myStackWidget->setCurrentIndex(1);
+  }
 
 signals:
   /// Signal on plane selection

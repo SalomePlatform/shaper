@@ -57,6 +57,10 @@ Q_OBJECT
     return mySelection;
   }
 
+  ModuleBase_ISelection::SelectionPlace placeOfSelection() const {
+    return myLastSelectionPlace;
+  }
+
   //! Connects the manager to all viewers accessible by Workshop
   void connectViewers();
 
@@ -111,6 +115,8 @@ private:
 
   /// Current selection object
   XGUI_Selection* mySelection;
+
+  ModuleBase_ISelection::SelectionPlace myLastSelectionPlace;
 };
 
 #endif

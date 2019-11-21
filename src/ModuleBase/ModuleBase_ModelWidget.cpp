@@ -423,6 +423,12 @@ bool ModuleBase_ModelWidget::blockValueState(const bool theBlocked)
 //**************************************************************
 bool ModuleBase_ModelWidget::restoreValue()
 {
+  if (!isEnabled()) {
+    // This code works in inspection panel
+    ModelAPI_ValidatorsFactory* aValidators = ModelAPI_Session::get()->validators();
+    if (!aValidators->isCase(myFeature, attributeID()))
+      return false; // if it is not an active case for the widget
+  }
   emit beforeValuesRestored();
   bool isDone = restoreValueCustom();
   emit afterValuesRestored();

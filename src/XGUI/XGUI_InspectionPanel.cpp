@@ -18,12 +18,19 @@
 //
 
 #include "XGUI_InspectionPanel.h"
+#include "XGUI_Workshop.h"
 #include "XGUI_SelectionMgr.h"
 #include "XGUI_Selection.h"
 #include "XGUI_Tools.h"
+#include "XGUI_ModuleConnector.h"
 
 #include <ModuleBase_ViewerPrs.h>
 #include <ModuleBase_Tools.h>
+#include <ModuleBase_OperationDescription.h>
+#include <ModuleBase_WidgetFactory.h>
+#include <ModuleBase_IModule.h>
+#include <ModuleBase_PageWidget.h>
+
 #include <ModelAPI_ResultField.h>
 
 #include <ModelAPI_Result.h>
@@ -54,12 +61,14 @@
 #include <QTextBrowser>
 #include <QResizeEvent>
 #include <QSplitter>
+#include <QStackedWidget>
 
 #include <BRepBndLib.hxx>
 #include <TopoDS_Iterator.hxx>
 #include <TopTools_MapOfShape.hxx>
 #include <TopTools_ListOfShape.hxx>
 #include <Standard_ErrorHandler.hxx> // CAREFUL ! position of this file is critic
+
 
 // ================     Auxiliary functions     ================
 #define TITLE(val) ("<b>" + (val) + "</b>")
@@ -108,15 +117,18 @@ static void appendNamedValueToParameters(const QString& theName,
 
 // ================     XGUI_InspectionPanel    ================
 
-XGUI_InspectionPanel::XGUI_InspectionPanel(QWidget* theParent, XGUI_SelectionMgr* theMgr)
+XGUI_InspectionPanel::XGUI_InspectionPanel(QWidget* theParent, XGUI_Workshop* theWorkshop)
   : QDockWidget(theParent),
-  mySelectionMgr(theMgr)
+  myWorkshop(theWorkshop)
 {
   setWindowTitle(tr("Inspection Panel"));
   setObjectName(INSPECTION_PANEL);
   setStyleSheet("::title { position: relative; padding-left: 5px; text-align: left center }");
 
-  QSplitter* aSplitter = new QSplitter(Qt::Vertical, this);
+  myStackWgt = new QStackedWidget(this);
+
+  // Create shape selection page
+  QSplitter* aSplitter = new QSplitter(Qt::Vertical, myStackWgt);
 
   // Create an internal widget
   QWidget* aNameWgt = new QWidget(aSplitter);
@@ -184,9 +196,23 @@ XGUI_InspectionPanel::XGUI_InspectionPanel(QWidget* theParent, XGUI_SelectionMgr
   aSizes << 10 << 140 << 10;
   aSplitter->setSizes(aSizes);
 
-  setWidget(aSplitter);
+  myShapePanelId = myStackWgt->addWidget(aSplitter);
 
-  connect(mySelectionMgr, SIGNAL(selectionChanged()), SLOT(onSelectionChanged()));
+  // Create feature selection page
+  QScrollArea* aScroll = new QScrollArea(myStackWgt);
+  aScroll->setWidgetResizable(true);
+  aScroll->setFrameStyle(QFrame::NoFrame);
+
+  myFeaturePane = new ModuleBase_PageWidget(aScroll);
+  myFeatureLayout = new QGridLayout(myFeaturePane);
+  myFeatureLayout->setContentsMargins(3, 3, 3, 3);
+  aScroll->setWidget(myFeaturePane);
+  //myFeaturePane->setEnabled(false);
+
+  myFeaturePanelId = myStackWgt->addWidget(aScroll);
+
+  setWidget(myStackWgt);
+  connect(myWorkshop->selector(), SIGNAL(selectionChanged()), SLOT(onSelectionChanged()));
 }
 
 //********************************************************************
@@ -209,20 +235,21 @@ void XGUI_InspectionPanel::clearContent()
   }
   myTypeLbl->setText("");
   setParamsText("");
+
+  myFeaturePane->clearPage();
 }
 
 //********************************************************************
 void XGUI_InspectionPanel::onSelectionChanged()
 {
-  clearContent();
-  XGUI_Selection* aSelection = mySelectionMgr->selection();
-  QList<ModuleBase_ViewerPrsPtr> aSelectedList =
-    aSelection->getSelected(ModuleBase_ISelection::Viewer);
+  if (!isVisible())
+    return;
 
-  QList<ModuleBase_ViewerPrsPtr> anOBSelected =
-    aSelection->getSelected(ModuleBase_ISelection::Browser);
-  if (!anOBSelected.isEmpty())
-    ModuleBase_ISelection::appendSelected(anOBSelected, aSelectedList);
+  clearContent();
+
+  XGUI_Selection* aSelection = myWorkshop->selector()->selection();
+  QList<ModuleBase_ViewerPrsPtr> aSelectedList =
+    aSelection->getSelected(myWorkshop->selector()->placeOfSelection());
 
   if (aSelectedList.count() > 0) {
     ModuleBase_ViewerPrsPtr aPrs = aSelectedList.first();
@@ -230,25 +257,33 @@ void XGUI_InspectionPanel::onSelectionChanged()
       std::dynamic_pointer_cast<ModelAPI_ResultField::ModelAPI_FieldStep>(aPrs->object());
     if (aStep)
       return;
-    TopoDS_Shape aShape = ModuleBase_Tools::getSelectedShape(aPrs);
-    if (aShape.IsNull()) {
-      ResultPtr aRes = std::dynamic_pointer_cast<ModelAPI_Result>(aPrs->object());
-      if (aRes.get()) {
-        GeomShapePtr aShpPtr = aRes->shape();
-        if (aShpPtr.get()) {
-          aShape = aShpPtr->impl<TopoDS_Shape>();
+    FeaturePtr aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(aPrs->object());
+    if (aFeature.get()) {
+      myStackWgt->setCurrentIndex(myFeaturePanelId);
+      buildFeaturePane(aFeature);
+    }
+    else {
+      myStackWgt->setCurrentIndex(myShapePanelId);
+      TopoDS_Shape aShape = ModuleBase_Tools::getSelectedShape(aPrs);
+      if (aShape.IsNull()) {
+        ResultPtr aRes = std::dynamic_pointer_cast<ModelAPI_Result>(aPrs->object());
+        if (aRes.get()) {
+          GeomShapePtr aShpPtr = aRes->shape();
+          if (aShpPtr.get()) {
+            aShape = aShpPtr->impl<TopoDS_Shape>();
+          }
         }
       }
-    }
-    if (aShape.IsNull())
-      return;
-    GeomShapePtr aShapePtr(new GeomAPI_Shape());
-    aShapePtr->setImpl(new TopoDS_Shape(aShape));
+      if (aShape.IsNull())
+        return;
+      GeomShapePtr aShapePtr(new GeomAPI_Shape());
+      aShapePtr->setImpl(new TopoDS_Shape(aShape));
 
-    ModuleBase_ViewerPrsPtr aPrsCopy(new ModuleBase_ViewerPrs(aPrs->object(), aShapePtr));
-    setName(XGUI_Tools::generateName(aPrsCopy));
-    setShapeContent(aShape);
-    setShapeParams(aShape);
+      ModuleBase_ViewerPrsPtr aPrsCopy(new ModuleBase_ViewerPrs(aPrs->object(), aShapePtr));
+      setName(XGUI_Tools::generateName(aPrsCopy));
+      setShapeContent(aShape);
+      setShapeParams(aShape);
+    }
   }
 }
 
@@ -606,6 +641,7 @@ void XGUI_InspectionPanel::fillContainer(const GeomShapePtr& theShape)
   appendPointToParameters(tr("Maximal corner"), aMaxPoint, aParams);
 }
 
+//********************************************************************
 void XGUI_InspectionPanel::setPlaneType(const QString& theTitle,
                                         const std::shared_ptr<GeomAPI_Pln>& thePlane)
 {
@@ -616,6 +652,7 @@ void XGUI_InspectionPanel::setPlaneType(const QString& theTitle,
   setParamsText(aParams);
 }
 
+//********************************************************************
 void XGUI_InspectionPanel::setSphereType(const QString& theTitle,
                                          const std::shared_ptr<GeomAPI_Sphere>& theSphere)
 {
@@ -627,6 +664,7 @@ void XGUI_InspectionPanel::setSphereType(const QString& theTitle,
   setParamsText(aParams);
 }
 
+//********************************************************************
 void XGUI_InspectionPanel::setCylinderType(const QString& theTitle,
                                            const std::shared_ptr<GeomAPI_Cylinder>& theCyl)
 {
@@ -640,6 +678,7 @@ void XGUI_InspectionPanel::setCylinderType(const QString& theTitle,
   setParamsText(aParams);
 }
 
+//********************************************************************
 void XGUI_InspectionPanel::setConeType(const QString& theTitle,
                                        const std::shared_ptr<GeomAPI_Cone>& theCone)
 {
@@ -654,6 +693,7 @@ void XGUI_InspectionPanel::setConeType(const QString& theTitle,
   setParamsText(aParams);
 }
 
+//********************************************************************
 void XGUI_InspectionPanel::setTorusType(const QString& theTitle,
                                         const std::shared_ptr<GeomAPI_Torus>& theTorus)
 {
@@ -667,6 +707,7 @@ void XGUI_InspectionPanel::setTorusType(const QString& theTitle,
   setParamsText(aParams);
 }
 
+//********************************************************************
 void XGUI_InspectionPanel::setBoxType(const QString& theTitle,
                                       const std::shared_ptr<GeomAPI_Box>& theBox)
 {
@@ -680,6 +721,7 @@ void XGUI_InspectionPanel::setBoxType(const QString& theTitle,
   setParamsText(aParams);
 }
 
+//********************************************************************
 void XGUI_InspectionPanel::setRotatedBoxType(const QString& theTitle,
                                              const std::shared_ptr<GeomAPI_Box>& theBox)
 {
@@ -697,7 +739,43 @@ void XGUI_InspectionPanel::setRotatedBoxType(const QString& theTitle,
 }
 
 
+//********************************************************************
 void XGUI_InspectionPanel::setParamsText(const QString& theText)
 {
   myTypeParams->setText(theText);
+}
+
+//********************************************************************
+void XGUI_InspectionPanel::buildFeaturePane(const FeaturePtr& theFeature)
+{
+  std::string aXmlCfg, aDescription;
+  myWorkshop->module()->getXMLRepresentation(theFeature->getKind(), aXmlCfg, aDescription);
+  if (!aXmlCfg.empty()) {
+    QList<ModuleBase_ModelWidget*> aWidgets;
+    if (!myWorkshop->module()->createWidgets(theFeature, aXmlCfg.c_str(), aWidgets)) {
+      ModuleBase_WidgetFactory aFactory(aXmlCfg, myWorkshop->moduleConnector());
+      aFactory.createWidget(myFeaturePane);
+      aWidgets = aFactory.getModelWidgets();
+    }
+    foreach(ModuleBase_ModelWidget* aWgt, aWidgets) {
+      if (aWgt->isInformative()) {
+        aWgt->setEnabled(false);
+        aWgt->setFeature(theFeature, false, false);
+        aWgt->setEditingMode(true);
+        aWgt->restoreValue();
+        aWgt->showInformativePage();
+      }
+      else {
+        aWgt->setFeature(theFeature, false, false);
+        aWgt->setEditingMode(true);
+        aWgt->hide();
+      }
+    }
+  }
+}
+
+void XGUI_InspectionPanel::showEvent(QShowEvent* theEvent)
+{
+  QDockWidget::showEvent(theEvent);
+  onSelectionChanged();
 }

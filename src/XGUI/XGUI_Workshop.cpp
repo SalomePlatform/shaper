@@ -710,8 +710,8 @@ void XGUI_Workshop::fillPropertyPanel(ModuleBase_Operation* theOperation)
   myPropertyPanel->cleanContent();
 
   QList<ModuleBase_ModelWidget*> aWidgets;
-  if (!module()->createWidgets(theOperation, aWidgets)) {
-    QString aXmlRepr = aFOperation->getDescription()->xmlRepresentation();
+  QString aXmlRepr = aFOperation->getDescription()->xmlRepresentation();
+  if (!module()->createWidgets(aFOperation->feature(), aXmlRepr, aWidgets)) {
     ModuleBase_WidgetFactory aFactory(aXmlRepr.toStdString(), myModuleConnector);
     aFactory.createWidget(myPropertyPanel->contentWidget());
     aWidgets = aFactory.getModelWidgets();
@@ -1531,7 +1531,7 @@ void XGUI_Workshop::createDockWidgets()
                                 Qt::BottomDockWidgetArea);
   connect(myFacesPanel, SIGNAL(closed()), myFacesPanel, SLOT(onClosed()));
 
-  myInspectionPanel = new XGUI_InspectionPanel(aDesktop, mySelector);
+  myInspectionPanel = new XGUI_InspectionPanel(aDesktop, this);
   myInspectionPanel->setAllowedAreas(Qt::LeftDockWidgetArea |
     Qt::RightDockWidgetArea);
   aDesktop->addDockWidget(Qt::RightDockWidgetArea, myInspectionPanel);

@@ -29,6 +29,9 @@
 #include <QRadioButton>
 #include <QToolButton>
 
+const QString AStyle = "QToolButton:checked {border: 1px solid black; background-color:#C0DCF3}";
+
+
 ModuleBase_ChoiceCtrl::ModuleBase_ChoiceCtrl(QWidget* theParent,
                                              const QStringList& theChoiceList,
                                              const QStringList& theIconsList,
@@ -68,6 +71,7 @@ ModuleBase_ChoiceCtrl::ModuleBase_ChoiceCtrl(QWidget* theParent,
           QPixmap aIcon = ModuleBase_IconFactory::loadPixmap(theIconsList.at(aId));
           aBtn->setIcon(aIcon);
           aBtn->setIconSize(aIcon.size());
+          aBtn->setStyleSheet(AStyle);
 
           aBtnLayout->addWidget(aBtn);
           myButtons->addButton(aBtn, aId++);

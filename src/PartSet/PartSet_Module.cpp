@@ -753,16 +753,14 @@ void PartSet_Module::propertyPanelDefined(ModuleBase_Operation* theOperation)
 }
 
 //******************************************************
-bool PartSet_Module::createWidgets(ModuleBase_Operation* theOperation,
+bool PartSet_Module::createWidgets(const FeaturePtr& theFeature, const QString& theXmlRepr,
                                    QList<ModuleBase_ModelWidget*>& theWidgets) const
 {
   bool aProcessed = false;
 
-  ModuleBase_OperationFeature* aFOperation =
-    dynamic_cast<ModuleBase_OperationFeature*>(theOperation);
   XGUI_Workshop* aWorkshop = getWorkshop();
   XGUI_PropertyPanel* aPropertyPanel = aWorkshop->propertyPanel();
-  if (mySketchMgr->activeSketch().get() && aFOperation && aPropertyPanel) {
+  if (mySketchMgr->activeSketch().get() && aPropertyPanel) {
     ModuleBase_ISelection* aSelection = workshop()->selection();
     // click on a point in sketch leads here with the point is highlighted, not yet selected
     QList<ModuleBase_ViewerPrsPtr> aPreselection = aSelection->getHighlighted();
@@ -771,11 +769,10 @@ bool PartSet_Module::createWidgets(ModuleBase_Operation* theOperation,
       ObjectPtr anObject = aSelectedPrs->object();
 
       FeaturePtr aFeature = ModelAPI_Feature::feature(anObject);
-      FeaturePtr anOpFeature = aFOperation->feature();
       GeomShapePtr aShape = aSelectedPrs->shape();
       // click on the digit of dimension constrain comes here
       // with an empty shape, so we need the check
-      if (aFeature == anOpFeature && aShape.get() && !aShape->isNull()) {
+      if (aFeature == theFeature && aShape.get() && !aShape->isNull()) {
         // if feature has only one result and shape of result is equal to selected shape
         // this attribute is not processed. It is a case of Sketch Point.
         if (aFeature->results().size() == 1) {
@@ -787,8 +784,7 @@ bool PartSet_Module::createWidgets(ModuleBase_Operation* theOperation,
         AttributePtr anAttribute = PartSet_Tools::findAttributeBy2dPoint(anObject, aTDShape,
                                                                mySketchMgr->activeSketch());
         if (anAttribute.get()) {
-          QString aXmlRepr = aFOperation->getDescription()->xmlRepresentation();
-          ModuleBase_WidgetFactory aFactory(aXmlRepr.toStdString(), workshop());
+          ModuleBase_WidgetFactory aFactory(theXmlRepr.toStdString(), workshop());
 
           const std::string anAttributeId = anAttribute->id();
           aFactory.createWidget(aPropertyPanel->contentWidget(), anAttributeId);

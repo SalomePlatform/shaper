@@ -75,7 +75,6 @@
 #include <QCheckBox>
 #include <QGroupBox>
 #include <QPushButton>
-#include <QStackedWidget>
 #include <QLineEdit>
 #include <QDoubleValidator>
 #include <QDialog>

@@ -28,6 +28,9 @@
 
 #include <ModuleBase_PagedContainer.h>
 
+const QString AStyle = "QToolButton:checked {border: 1px solid black; background-color:#C0DCF3}";
+
+
 ModuleBase_ToolBox::ModuleBase_ToolBox(QWidget* theParent, const bool theUseFrameStyleBox)
 : QFrame(theParent)
 {
@@ -71,6 +74,7 @@ void ModuleBase_ToolBox::addItem(QWidget* thePage, const QString& theName, const
   QToolButton* aButton = new QToolButton(myButtonsFrame);
   aButton->setFocusPolicy(Qt::StrongFocus);
   aButton->setCheckable(true);
+  aButton->setStyleSheet(AStyle);
   if (theIcon.isNull())
     aButton->setText(theName);
   else {

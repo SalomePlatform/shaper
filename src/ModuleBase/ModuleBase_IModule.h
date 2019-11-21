@@ -169,10 +169,11 @@ class MODULEBASE_EXPORT ModuleBase_IModule : public QObject
 
   /// Have an opportunity to create widgets for the current operation
   /// instead of standard creation in workshop
-  /// \param theOperation a started operation
+  /// \param theFeature a feature of the started operation
+  /// \param theXmlRepr an XML representation of the operation
   /// \param theWidgets a list of created widgets
   /// \return boolean result, false by default
-  virtual bool createWidgets(ModuleBase_Operation* theOperation,
+  virtual bool createWidgets(const FeaturePtr& theFeature, const QString& theXmlRepr,
                              QList<ModuleBase_ModelWidget*>& theWidgets) const { return false; }
 
   //! Returns True if there are available Undos and there is not an active operation
