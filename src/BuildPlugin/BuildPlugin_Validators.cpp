@@ -39,6 +39,8 @@
 #include <GeomValidators_FeatureKind.h>
 #include <GeomValidators_ShapeType.h>
 
+#include <SketchPlugin_Sketch.h>
+
 #include <Events_InfoMessage.h>
 
 //=================================================================================================
@@ -519,30 +521,33 @@ bool BuildPlugin_ValidatorBaseForVertex::isValid(const AttributePtr& theAttribut
 
     // Vertex?
     bool isVertex = false;
-    GeomShapePtr aShapeInList = aSelectionAttr->value();
-    if (aShapeInList.get()) {
-      isVertex = (aShapeInList->shapeType() == GeomAPI_Shape::VERTEX);
-    }
+    GeomShapePtr aShape = aSelectionAttr->value();
+    ResultPtr aContext = aSelectionAttr->context();
+    if (!aShape.get() && aContext.get())
+      aShape = aContext->shape();
+    if (aShape.get())
+      isVertex = (aShape->shapeType() == GeomAPI_Shape::VERTEX);
 
     if (!isVertex) {
       // Sketch?
       FeaturePtr aFeature = aSelectionAttr->contextFeature();
       if (!aFeature.get()) {
-        ResultPtr aContext = aSelectionAttr->context();
-        if (aContext.get()) {
+        GeomShapePtr aValue = aSelectionAttr->value();
+        // whole sketch is allowed only
+        if (aContext.get() && !aValue.get()) {
           aFeature = ModelAPI_Feature::feature(aContext);
         }
       }
 
-      if (aFeature.get()) {
-        std::string aFeatureKind = aFeature->getKind();
-        if (aFeatureKind != "Sketch" &&
-            aFeatureKind != "Point" &&
-            aFeatureKind != "Vertex") {
-          theError = "Error: %1 shape is not allowed for selection.";
-          theError.arg(aFeatureKind);
-          return false;
-        }
+      if (!aFeature.get()) {
+        theError = "Error: Incorrect selection.";
+        return false;
+      }
+
+      if (aFeature->getKind() != SketchPlugin_Sketch::ID()) {
+        theError = "Error: %1 shape is not allowed for selection.";
+        theError.arg(aFeature->getKind());
+        return false;
       }
     }
   }

@@ -68,14 +68,8 @@ public:
   /// Creates a new part document if needed.
   BUILDPLUGIN_EXPORT virtual void execute();
 
- protected:
-  bool buildVertices(GeomShapePtr theShape,
-                     bool isIntersect,
-                     int& theResultIndex);
-
-  bool buildVertices(FeaturePtr theFeature,
-                     bool isIntersect,
-                     int& theResultIndex);
+protected:
+  void buildVertices(const ListOfShape& theShapes, bool isIntersect);
 };
 
 #endif

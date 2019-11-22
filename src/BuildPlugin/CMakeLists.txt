@@ -25,7 +25,9 @@ INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR}/src/Events
                     ${PROJECT_SOURCE_DIR}/src/ModelAPI
                     ${PROJECT_SOURCE_DIR}/src/GeomAPI
                     ${PROJECT_SOURCE_DIR}/src/GeomAlgoAPI
+                    ${PROJECT_SOURCE_DIR}/src/GeomDataAPI
                     ${PROJECT_SOURCE_DIR}/src/GeomValidators
+                    ${PROJECT_SOURCE_DIR}/src/SketchPlugin
 )
 
 SET(PROJECT_HEADERS
@@ -108,6 +110,8 @@ INSTALL(DIRECTORY icons/ DESTINATION ${SHAPER_INSTALL_XML_RESOURCES}/icons/Build
 
 ADD_UNIT_TESTS(TestVertex.py
                TestVertex_ErrorMsg.py
+               TestVertex_WholeSketch_1.py
+               TestVertex_WholeSketch_2.py
                TestEdge.py
                TestEdge_ByPoints.py
                TestEdge_ErrorMsg.py
