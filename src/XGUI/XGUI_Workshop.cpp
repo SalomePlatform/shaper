@@ -2804,6 +2804,8 @@ void XGUI_Workshop::synchronizeGroupInViewer(const DocumentPtr& theDoc,
   int aSize = theDoc->numInternalFeatures();
   for (int i = 0; i < aSize; i++) {
     aFeature = theDoc->internalFeature(i);
+    if (!aFeature.get())
+      continue;
     const std::list<ResultPtr>& aResults = aFeature->results();
     std::list<ResultPtr>::const_iterator aIt;
     aFeature->setDisplayed(false);
