@@ -78,3 +78,14 @@ ModuleBase_ModelWidget* ModuleBase_IPropertyPanel::findFirstAcceptingValueWidget
   }
   return aFirstWidget;
 }
+
+bool ModuleBase_IPropertyPanel::isModified() const
+{
+  bool isModified = false;
+  QList<ModuleBase_ModelWidget*> aWidgets = modelWidgets();
+  foreach(ModuleBase_ModelWidget* aWgt, aWidgets) {
+    bool aRes = aWgt->isModified();
+    isModified |= aRes;
+  }
+  return isModified;
+}

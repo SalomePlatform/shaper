@@ -103,7 +103,6 @@
 #include <ModuleBase_Tools.h>
 #include <ModuleBase_WidgetFactory.h>
 #include <ModuleBase_OperationFeature.h>
-#include <ModuleBase_OperationAction.h>
 #include <ModuleBase_PagedContainer.h>
 #include <ModuleBase_WidgetValidated.h>
 #include <ModuleBase_ModelWidget.h>
@@ -1924,7 +1923,7 @@ void XGUI_Workshop::deleteObjects()
   bool aDone = false;
   QString aDescription = contextMenuMgr()->action("DELETE_CMD")->text() + " %1";
   aDescription = aDescription.arg(XGUI_Tools::unionOfObjectNames(anObjects, ", "));
-  ModuleBase_OperationAction* anOpAction = new ModuleBase_OperationAction(aDescription, module());
+  ModuleBase_Operation* anOpAction = new ModuleBase_Operation(aDescription, module());
 
   operationMgr()->startOperation(anOpAction);
 
@@ -2081,7 +2080,7 @@ void XGUI_Workshop::cleanHistory()
     // 1. start operation
     aDescription += "by deleting of " +
       aDescription.arg(XGUI_Tools::unionOfObjectNames(anObjects, ", "));
-    ModuleBase_OperationAction* anOpAction = new ModuleBase_OperationAction(aDescription, module());
+    ModuleBase_Operation* anOpAction = new ModuleBase_Operation(aDescription, module());
     operationMgr()->startOperation(anOpAction);
 
     // WORKAROUND, should be done before each object remove, if it presents in XGUI_DataModel tree

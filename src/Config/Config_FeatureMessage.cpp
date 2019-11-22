@@ -41,6 +41,7 @@ Config_FeatureMessage::Config_FeatureMessage(const Events_ID theId, const void* 
   myIsTitleInToolbar = true;
   myIsApplyContinue = false;
   myHideFacesPanel = false;
+  myAbortConfirmation = true;
 }
 
 Config_FeatureMessage::~Config_FeatureMessage()
@@ -249,4 +250,14 @@ bool Config_FeatureMessage::isHideFacesPanel() const
 void Config_FeatureMessage::setHideFacesPanel(bool theValue)
 {
   myHideFacesPanel = theValue;
+}
+
+bool Config_FeatureMessage::isAbortConfirmation() const
+{
+  return myAbortConfirmation;
+}
+
+void Config_FeatureMessage::setAbortConfirmation(bool theValue)
+{
+  myAbortConfirmation = theValue;
 }

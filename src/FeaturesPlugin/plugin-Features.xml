@@ -145,7 +145,7 @@
     </group>
     <group id="Measurement">
       <feature id="Measurement" title="Measurement" tooltip="Calculate properties of objects"
-               icon="icons/Features/measurement.png" helpfile="measurementFeature.html">
+               icon="icons/Features/measurement.png" helpfile="measurementFeature.html" abort_confirmation="false">
         <source path="measurement_widget.xml"/>
       </feature>
     </group>

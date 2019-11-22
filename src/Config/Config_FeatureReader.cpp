@@ -182,6 +182,9 @@ void Config_FeatureReader::fillFeature(xmlNodePtr theFeatureNode,
   bool isHideFaces = getBooleanAttribute(theFeatureNode, HIDEFACES_PANEL, false);
   outFeatureMessage->setHideFacesPanel(isHideFaces);
 
+  bool isConfirmAbort = getBooleanAttribute(theFeatureNode, ABORT_CONFIRMATION, true);
+  outFeatureMessage->setAbortConfirmation(isConfirmAbort);
+
   //if (isInternal) {
   //  //Internal feature has no visual representation.
   //  return;

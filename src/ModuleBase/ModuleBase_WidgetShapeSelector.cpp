@@ -238,3 +238,9 @@ void ModuleBase_WidgetShapeSelector::updateSelectionName()
     }
   }
 }
+
+//********************************************************************
+bool ModuleBase_WidgetShapeSelector::isModified() const
+{
+  return !myTextLine->text().isEmpty();
+}

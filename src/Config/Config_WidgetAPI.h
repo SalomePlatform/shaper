@@ -77,7 +77,6 @@ class Config_WidgetAPI
    */
   CONFIG_EXPORT bool getBooleanAttribute(const char* theAttributeName, bool theDefault) const;
 
- protected:
   /// These fields are accessible for ModuleBase_WidgetFactory only
   CONFIG_EXPORT Config_WidgetAPI(std::string theRawXml);
   //! Pass to the next (sibling) node of widget's xml definition. If impossible, returns false

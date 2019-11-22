@@ -175,22 +175,6 @@ FeaturePtr ModuleBase_OperationFeature::createFeature(const bool theFlushMessage
     std::shared_ptr<ModelAPI_Document> aDoc = ModelAPI_Session::get()->activeDocument();
     myFeature = aDoc->addFeature(getDescription()->operationId().toStdString());
   }
-  if (myFeature) {  // TODO: generate an error if feature was not created
-    setIsModified(true);
-    // Model update should call "execute" of a feature.
-    //myFeature->execute();
-    // Init default values
-    /*QList<ModuleBase_ModelWidget*> aWidgets = getDescription()->modelWidgets();
-     QList<ModuleBase_ModelWidget*>::const_iterator anIt = aWidgets.begin(), aLast = aWidgets.end();
-     for (; anIt != aLast; anIt++) {
-     (*anIt)->storeValue(aFeature);
-     }*/
-  }
-
-  //if (theFlushMessage) {
-  //  Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_CREATED));
-  //  Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_UPDATED));
-  //}
   return myFeature;
 }
 
@@ -249,7 +233,6 @@ bool ModuleBase_OperationFeature::start()
 #ifdef DEBUG_OPERATION_START
   qDebug("ModuleBase_OperationFeature::start -- begin");
 #endif
-  setIsModified(false);
   QString anId = getDescription()->operationId();
   if (myIsEditing) {
     anId = anId.append(EditSuffix());

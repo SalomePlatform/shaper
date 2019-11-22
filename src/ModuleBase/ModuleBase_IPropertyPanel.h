@@ -88,6 +88,9 @@ public:
   /// The method is called on accepting of operation
   virtual void onAcceptData() = 0;
 
+  /// Returns True if data of its feature was modified during operation
+  virtual bool isModified() const;
+
   /// Returns the first widget, where canAcceptFocus returns true
   /// \return a widget or null
   static ModuleBase_ModelWidget* findFirstAcceptingValueWidget(

@@ -310,6 +310,9 @@ Q_OBJECT
   /// for current feature. By default does nothing
   virtual void showInformativePage() {}
 
+  /// Returns True if data of its attribute was modified
+  virtual bool isModified() const { return false; }
+
 signals:
   /// The signal about widget values are to be changed
   void beforeValuesChanged();

@@ -54,7 +54,6 @@
 #include <SketchPlugin_ConstraintCoincidence.h>
 
 #include <ModuleBase_Operation.h>
-#include <ModuleBase_OperationAction.h>
 #include <ModuleBase_IViewer.h>
 #include <ModuleBase_IViewWindow.h>
 #include <ModuleBase_IPropertyPanel.h>
@@ -968,7 +967,7 @@ bool PartSet_Module::deleteObjects()
 
     // 3. start operation
     QString aDescription = aWorkshop->contextMenuMgr()->action("DELETE_CMD")->text();
-    ModuleBase_OperationAction* anOpAction = new ModuleBase_OperationAction(aDescription, this);
+    ModuleBase_Operation* anOpAction = new ModuleBase_Operation(aDescription, this);
 
     // the active nested sketch operation should be aborted unconditionally
     // the Delete action should be additionally granted for the Sketch operation

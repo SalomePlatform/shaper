@@ -55,7 +55,6 @@ SET(PROJECT_HEADERS
   ModuleBase_ListView.h
   ModuleBase_ModelWidget.h
   ModuleBase_Operation.h
-  ModuleBase_OperationAction.h
   ModuleBase_OperationDescription.h
   ModuleBase_OperationFeature.h
   ModuleBase_PageBase.h
@@ -125,7 +124,6 @@ SET(PROJECT_MOC_HEADERS
   ModuleBase_ModelDialogWidget.h
   ModuleBase_ModelWidget.h
   ModuleBase_Operation.h
-  ModuleBase_OperationAction.h
   ModuleBase_OperationFeature.h
   ModuleBase_PagedContainer.h
   ModuleBase_PageGroupBox.h
@@ -182,7 +180,6 @@ SET(PROJECT_SOURCES
   ModuleBase_ListView.cpp
   ModuleBase_ModelWidget.cpp
   ModuleBase_Operation.cpp
-  ModuleBase_OperationAction.cpp
   ModuleBase_OperationDescription.cpp
   ModuleBase_OperationFeature.cpp
   ModuleBase_PageBase.cpp

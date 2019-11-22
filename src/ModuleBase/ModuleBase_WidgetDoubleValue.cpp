@@ -230,3 +230,18 @@ bool ModuleBase_WidgetDoubleValue::processEnter()
   }
   return isModified;
 }
+
+bool ModuleBase_WidgetDoubleValue::isModified() const
+{
+  QString aText = mySpinBox->text();
+  if (aText.isEmpty())
+    return false;
+
+  if (myHasDefault) {
+    bool aOk = false;
+    double aVal = aText.toDouble(&aOk);
+    if (!aOk || aVal == myDefaultVal)
+      return false;
+  }
+  return true;
+}

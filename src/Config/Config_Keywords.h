@@ -78,6 +78,7 @@ const static char* GROUP_TOOLBAR = "toolbar";
 const static char* FEATURE_ICON = "icon";
 const static char* FEATURE_TEXT = "title";
 const static char* HELP_FILE = "helpfile";
+const static char* ABORT_CONFIRMATION = "abort_confirmation";
 const static char* HIDEFACES_PANEL = "hidefaces_panel";
 const static char* FEATURE_KEYSEQUENCE = "keysequence";
 const static char* FEATURE_NESTED = "nested";

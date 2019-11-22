@@ -58,6 +58,9 @@ Q_OBJECT
   /// \return a control list
   virtual QList<QWidget*> getControls() const;
 
+  /// Returns True if data of its feature was modified during operation
+  virtual bool isModified() const;
+
 protected:
   /// Returns true if the event is processed.
   virtual bool processEnter();

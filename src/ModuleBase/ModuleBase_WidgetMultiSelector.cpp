@@ -1180,3 +1180,8 @@ void ModuleBase_WidgetMultiSelector::onShowOnly(bool theChecked)
   } else
     Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_TO_REDISPLAY));
 }
+
+bool ModuleBase_WidgetMultiSelector::isModified() const
+{
+  return myListView->getControl()->count() > 0;
+}

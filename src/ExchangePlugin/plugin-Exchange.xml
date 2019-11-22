@@ -12,7 +12,7 @@
         <source path="export_widget.xml" />
       </feature>
       <feature id="Dump" title="Dump" tooltip="Dump Python script" icon="icons/Exchange/dump.png"
-               helpfile="dumpFeature.html">
+               helpfile="dumpFeature.html" abort_confirmation="false">
         <export_file_selector id="file_path"
                               type="save"
                               title="Dump to file"

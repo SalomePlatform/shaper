@@ -51,6 +51,9 @@ class MODULEBASE_EXPORT ModuleBase_WidgetLineEdit : public ModuleBase_ModelWidge
   /// Redefinition of virtual method
   virtual QList<QWidget*> getControls() const;
 
+  /// Returns True if data of its feature was modified during operation
+  virtual bool isModified() const;
+
 protected:
   /// Returns true if the event is processed.
   virtual bool processEnter();
