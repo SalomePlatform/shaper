@@ -29,6 +29,7 @@ from GeomDataAPI import *
 
 from ConfigAPI import *
 Config_PropManager().registerProp("Visualization", "dimension_value_size", "Dimension value size", Config_Prop.IntSpin, "16")
+Config_PropManager().registerProp("Visualization", "sketch_dimension_color", "Dimension color", Config_Prop.Color, "64,128,255")
 
 model.begin()
 partSet = model.moduleDocument()
