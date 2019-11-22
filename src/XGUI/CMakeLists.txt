@@ -181,7 +181,7 @@ IF (${UPDATE_TRANSLATION})
     QT5_CREATE_TRANSLATION(QM_RESOURCES
                            ${PROJECT_FILES}
                            ${TEXT_RESOURCES}
-                           OPTIONS -extensions cpp -no-recursive
+                           OPTIONS -extensions cpp -no-recursive -locations none
                           )
 ELSE(${UPDATE_TRANSLATION})
     IF(${MAKE_TRANSLATION})
