@@ -104,17 +104,6 @@ bool BuildPlugin_ValidatorBaseForBuild::isValid(const AttributePtr& theAttribute
         theError = "Infinite objects not acceptable.";
         return false;
       }
-
-      std::shared_ptr<GeomAPI_PlanarEdges> anEdges =
-        std::dynamic_pointer_cast<GeomAPI_PlanarEdges>(aContextShape);
-      if(anEdges.get()) {
-        if(aShape->isEqual(aContextShape)) {
-          // It is whole sketch.
-          return false;
-        }
-
-        continue;
-      }
     }
   }
 
@@ -198,7 +187,11 @@ bool BuildPlugin_ValidatorBaseForFace::isValid(const std::shared_ptr<ModelAPI_Fe
       }
       aShape = aSelection->context()->shape();
     }
-    if (aShape->shapeType() == GeomAPI_Shape::FACE) {
+    ResultConstructionPtr aSketchRes =
+        std::dynamic_pointer_cast<ModelAPI_ResultConstruction>(aSelection->context());
+
+    if (aShape->shapeType() == GeomAPI_Shape::FACE ||
+        (!aSelection->value() && aSketchRes && aSketchRes->facesNum() > 0)) {
       // skip faces exploding
       hasFaces = true;
       continue;

@@ -121,7 +121,11 @@ ADD_UNIT_TESTS(TestVertex.py
                TestInterpolation.py
                TestFace.py
                TestFace_ErrorMsg.py
+               TestFace_WholeSketch_1.py
+               TestFace_WholeSketch_2.py
                TestShell.py
+               TestShell_WholeSketch_1.py
+               TestShell_WholeSketch_2.py
                TestSolid.py
                TestSolid_ErrorMsg.py
                TestCompSolid.py
