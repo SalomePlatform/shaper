@@ -785,6 +785,8 @@ void removeResults(const std::list<ResultPtr>& theResults)
   }
 }
 
+// used by GUI only
+// LCOV_EXCL_START
 double getDeflection(const std::shared_ptr<ModelAPI_Result>& theResult)
 {
   double aDeflection = -1;
@@ -830,5 +832,6 @@ double getTransparency(const std::shared_ptr<ModelAPI_Result>& theResult)
   }
   return aTransparency;
 }
+// LCOV_EXCL_STOP
 
 } // namespace ModelAPI_Tools
