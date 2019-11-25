@@ -4,6 +4,6 @@
                   tooltip="Select faces or shells objects."
                   shape_types="faces shells"
                   concealment="true">
-    <validator id="BuildPlugin_ValidatorBaseForBuild" parameters="face,shell"/>
+    <validator id="BuildPlugin_ValidatorBaseForBuild" parameters="face,shell,compound"/>
   </multi_selector>
 </source>

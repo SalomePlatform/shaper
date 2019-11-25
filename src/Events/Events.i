@@ -18,11 +18,22 @@
 //
 
 /* Events.i */
-%module EventsAPI
+%module(directors="1") EventsAPI
+%feature("director:except") {
+    if ($error != NULL) {
+      PyErr_Print();
+      std::cerr << std::endl;
+      throw Swig::DirectorMethodException();
+    }
+}
+
 %{
   #include "Events.h"
   #include "Events_InfoMessage.h"
+  #include "Events_Listener.h"
+  #include "Events_Loop.h"
   #include "Events_Message.h"
+  #include "Events_MessageGroup.h"
 %}
 
 
@@ -33,6 +44,12 @@
 %include "typemaps.i"
 %include "std_string.i"
 
+// directors
+%feature("director") Events_Listener;
+
 // all supported interfaces
 %include "Events_Message.h"
 %include "Events_InfoMessage.h"
+%include "Events_Listener.h"
+%include "Events_Loop.h"
+%include "Events_MessageGroup.h"

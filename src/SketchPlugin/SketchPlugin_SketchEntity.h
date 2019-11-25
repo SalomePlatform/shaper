@@ -41,7 +41,7 @@
  * This is an abstract class to give
  * an interface to create the entity features such as line, circle, arc and point.
  */
-class SketchPlugin_SketchEntity : public SketchPlugin_Feature, public GeomAPI_ICustomPrs
+class SketchPlugin_SketchEntity : public SketchPlugin_Feature //, public GeomAPI_ICustomPrs
 {
  public:
   /// Reference to the construction type of the feature
@@ -73,15 +73,15 @@ class SketchPlugin_SketchEntity : public SketchPlugin_Feature, public GeomAPI_IC
   }
 
   /// Width of the auxiliary line
-  inline static const double SKETCH_LINE_WIDTH_AUXILIARY()
+  inline static const int SKETCH_LINE_WIDTH_AUXILIARY()
   {
     return 2;
   }
 
   /// Width of the line
-  inline static const double SKETCH_LINE_WIDTH()
+  inline static const int SKETCH_LINE_WIDTH()
   {
-    return 3;
+    return Config_PropManager::integer("Visualization", "sketch_line_width");
   }
 
   /// Style of the auxiliary line
@@ -118,87 +118,106 @@ class SketchPlugin_SketchEntity : public SketchPlugin_Feature, public GeomAPI_IC
     return false;
   }
 
+  //virtual bool isIncludeToResult() const
+  //{
+  //  AttributeBooleanPtr anAttr;
+  //  std::set<AttributePtr> aRefsToMe = data()->refsToMe();
+  //  std::set<AttributePtr>::const_iterator aIt;
+  //  for (aIt = aRefsToMe.cbegin(); aIt != aRefsToMe.cend(); ++aIt) {
+  //    if ((*aIt)->id() == "ProjectedFeature") {
+  //      FeaturePtr aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>((*aIt)->owner());
+  //      if (aFeature.get()) {
+  //        anAttr = aFeature->data()->boolean("IncludeToResult");
+  //        if (anAttr.get())
+  //          return anAttr->value();
+  //      }
+  //    }
+  //  }
+  //  return true;
+  //}
+
 // LCOV_EXCL_START
   /// Customize presentation of the feature
-  virtual bool customisePresentation(ResultPtr theResult, AISObjectPtr thePrs,
-                                     std::shared_ptr<GeomAPI_ICustomPrs> theDefaultPrs)
-  {
-    /// Store previous color values of the presentation to check it after setting specific entity
-    /// color. Default color is set into presentation to have not modified isCustomized state
-    /// after default customize prs is completed.
-    std::vector<int> aPrevColor;
-    aPrevColor.resize(3);
-    thePrs->getColor(aPrevColor[0], aPrevColor[1], aPrevColor[2]);
-    if (theResult.get()) {
-      std::string aSection, aName, aDefault;
-      theResult->colorConfigInfo(aSection, aName, aDefault);
-      std::vector<int> aColor;
-      aColor = Config_PropManager::color(aSection, aName);
-      thePrs->setColor(aColor[0], aColor[1], aColor[2]);
-    }
+  //virtual bool customisePresentation(ResultPtr theResult, AISObjectPtr thePrs,
+  //                                   std::shared_ptr<GeomAPI_ICustomPrs> theDefaultPrs)
+  //{
+  //  /// Store previous color values of the presentation to check it after setting specific entity
+  //  /// color. Default color is set into presentation to have not modified isCustomized state
+  //  /// after default customize prs is completed.
+  //  std::vector<int> aPrevColor;
+  //  aPrevColor.resize(3);
+  //  thePrs->getColor(aPrevColor[0], aPrevColor[1], aPrevColor[2]);
+  //  if (theResult.get()) {
+  //    std::string aSection, aName, aDefault;
+  //    theResult->colorConfigInfo(aSection, aName, aDefault);
+  //    std::vector<int> aColor;
+  //    aColor = Config_PropManager::color(aSection, aName);
+  //    thePrs->setColor(aColor[0], aColor[1], aColor[2]);
+  //  }
 
-    bool isCustomized = theDefaultPrs.get() != NULL &&
-                        theDefaultPrs->customisePresentation(theResult, thePrs, theDefaultPrs);
-    int aShapeType = thePrs->getShapeType();
-    // a compound is processed like the edge because the
-    // arc feature uses the compound for presentable AIS
-    if (aShapeType != 6/*an edge*/ && aShapeType != 7/*a vertex*/ && aShapeType != 0/*compound*/)
-      return false;
+  //  bool isCustomized = theDefaultPrs.get() != NULL &&
+  //                      theDefaultPrs->customisePresentation(theResult, thePrs, theDefaultPrs);
+  //  int aShapeType = thePrs->getShapeType();
+  //  // a compound is processed like the edge because the
+  //  // arc feature uses the compound for presentable AIS
+  //  if (aShapeType != 6/*an edge*/ && aShapeType != 7/*a vertex*/ && aShapeType != 0/*compound*/)
+  //    return false;
 
-    // set color from preferences
-    std::vector<int> aColor;
-    std::shared_ptr<ModelAPI_AttributeBoolean> anAuxiliaryAttr =
-                                    data()->boolean(SketchPlugin_SketchEntity::AUXILIARY_ID());
-    bool isConstruction = anAuxiliaryAttr.get() != NULL && anAuxiliaryAttr->value();
-    if (isConstruction) {
-      aColor = Config_PropManager::color("Visualization", "sketch_auxiliary_color");
-    }
-    else if (isExternal()) {
-      aColor = Config_PropManager::color("Visualization", "sketch_external_color");
-    }
-    else {
-      aColor = Config_PropManager::color("Visualization", "sketch_entity_color");
-    }
-    if (!aColor.empty()) {
-      if (theResult.get() && ModelAPI_Session::get()->isOperation()) {
-        AttributeIntArrayPtr aColorAttr = theResult->data()->intArray(ModelAPI_Result::COLOR_ID());
-        aColorAttr->setSize(3);
-        // Set the color attribute in order do not use default colors in the presentation object
-        for (int i = 0; i < 3; i++)
-          aColorAttr->setValue(i, aColor[i]);
-      }
-      thePrs->setColor(aColor[0], aColor[1], aColor[2]);
-      for (int i = 0; i < 3 && !isCustomized; i++)
-        isCustomized = aColor[i] != aPrevColor[i];
-    }
+  //  // set color from preferences
+  //  std::vector<int> aColor;
+  //  std::shared_ptr<ModelAPI_AttributeBoolean> anAuxiliaryAttr =
+  //                                  data()->boolean(SketchPlugin_SketchEntity::AUXILIARY_ID());
+  //  bool isConstruction = anAuxiliaryAttr.get() != NULL && anAuxiliaryAttr->value();
+  //  if (isConstruction) {
+  //    aColor = Config_PropManager::color("Visualization", "sketch_auxiliary_color");
+  //  }
+  //  else if (isExternal()) {
+  //    aColor = Config_PropManager::color("Visualization", "sketch_external_color");
+  //  }
+  //  else {
+  //    aColor = Config_PropManager::color("Visualization", "sketch_entity_color");
+  //  }
+  //  if (!aColor.empty()) {
+  //    if (theResult.get() && ModelAPI_Session::get()->isOperation()) {
+  //      AttributeIntArrayPtr aColorAttr =
+  //          theResult->data()->intArray(ModelAPI_Result::COLOR_ID());
+  //      aColorAttr->setSize(3);
+  //      // Set the color attribute in order do not use default colors in the presentation object
+  //      for (int i = 0; i < 3; i++)
+  //        aColorAttr->setValue(i, aColor[i]);
+  //    }
+  //    thePrs->setColor(aColor[0], aColor[1], aColor[2]);
+  //    for (int i = 0; i < 3 && !isCustomized; i++)
+  //      isCustomized = aColor[i] != aPrevColor[i];
+  //  }
 
-    if (aShapeType == 6 || aShapeType == 0) { // if this is an edge or a compound
-      if (isConstruction) {
-        isCustomized = thePrs->setWidth(SKETCH_LINE_WIDTH_AUXILIARY()) || isCustomized;
-        isCustomized = thePrs->setLineStyle(SKETCH_LINE_STYLE_AUXILIARY()) || isCustomized;
-      }
-      else {
-        isCustomized = thePrs->setWidth(SKETCH_LINE_WIDTH()) || isCustomized;
-        isCustomized = thePrs->setLineStyle(SKETCH_LINE_STYLE()) || isCustomized;
-      }
-    }
-    else if (aShapeType == 7) { // otherwise this is a vertex
-      // The width value do not have effect on the point presentation.
-      // It is defined in order to extend selection area of the object.
-      thePrs->setWidth(17);
-    //  thePrs->setPointMarker(1, 1.); // Set point as a '+' symbol
-    }
-    if(isCopy()) {
-      double aWidth = thePrs->width();
-      isCustomized = thePrs->setWidth(aWidth / 2.5) || isCustomized;
-    }
+  //  if (aShapeType == 6 || aShapeType == 0) { // if this is an edge or a compound
+  //    if (isConstruction) {
+  //      isCustomized = thePrs->setWidth(SKETCH_LINE_WIDTH_AUXILIARY()) || isCustomized;
+  //      isCustomized = thePrs->setLineStyle(SKETCH_LINE_STYLE_AUXILIARY()) || isCustomized;
+  //    }
+  //    else {
+  //      isCustomized = thePrs->setWidth(SKETCH_LINE_WIDTH()) || isCustomized;
+  //      isCustomized = thePrs->setLineStyle(SKETCH_LINE_STYLE()) || isCustomized;
+  //    }
+  //  }
+  //  else if (aShapeType == 7) { // otherwise this is a vertex
+  //    // The width value do not have effect on the point presentation.
+  //    // It is defined in order to extend selection area of the object.
+  //    thePrs->setWidth(17);
+  //  //  thePrs->setPointMarker(1, 1.); // Set point as a '+' symbol
+  //  }
+  //  if(isCopy() && !isIncludeToResult()) {
+  //    double aWidth = thePrs->width();
+  //    isCustomized = thePrs->setWidth(aWidth / 2.5) || isCustomized;
+  //  }
 
-    if (!theResult.get()) {
-      double aDeflection = Config_PropManager::real("Visualization", "construction_deflection");
-      thePrs->setDeflection(aDeflection);
-    }
-    return isCustomized;
-  }
+  //  if (!theResult.get()) {
+  //    double aDeflection = Config_PropManager::real("Visualization", "construction_deflection");
+  //    thePrs->setDeflection(aDeflection);
+  //  }
+  //  return isCustomized;
+  //}
 // LCOV_EXCL_STOP
 
 protected:

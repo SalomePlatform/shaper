@@ -67,8 +67,9 @@
 #include <ModuleBase_WidgetFactory.h>
 #include <ModuleBase_OperationDescription.h>
 #include <ModuleBase_ViewerPrs.h>
-#include <ModelAPI_ResultField.h>
+#include <ModuleBase_ResultPrs.h>
 
+#include <ModelAPI_ResultField.h>
 #include <ModelAPI_Object.h>
 #include <ModelAPI_Events.h>
 #include <ModelAPI_Validator.h>
@@ -80,6 +81,7 @@
 #include <ModelAPI_Tools.h>
 #include <ModelAPI_ResultConstruction.h>
 #include <ModelAPI_AttributeIntArray.h>
+#include <ModelAPI_ResultGroup.h>
 
 #include <GeomDataAPI_Point2D.h>
 #include <GeomDataAPI_Point.h>
@@ -89,7 +91,6 @@
 #include <XGUI_ActiveControlSelector.h>
 #include <XGUI_ActionsMgr.h>
 #include <XGUI_ContextMenuMgr.h>
-#include <XGUI_CustomPrs.h>
 #include <XGUI_DataModel.h>
 #include <XGUI_Displayer.h>
 #include <XGUI_ErrorMgr.h>
@@ -190,6 +191,26 @@ PartSet_Module::PartSet_Module(ModuleBase_IWorkshop* theWshop)
   registerSelectionFilter(SF_ResultGroupNameFilter, aCRFilter);
 
   setDefaultConstraintShown();
+
+  //Config_PropManager::registerProp("Visualization", "object_default_color", "Object color",
+  //                                 Config_Prop::Color, "225,225,225");
+
+  Config_PropManager::registerProp("Visualization", "result_body_color", "Result color",
+    Config_Prop::Color, ModelAPI_ResultBody::DEFAULT_COLOR());
+
+  Config_PropManager::registerProp("Visualization", "result_group_color", "Group color",
+    Config_Prop::Color, ModelAPI_ResultGroup::DEFAULT_COLOR());
+
+  Config_PropManager::registerProp("Visualization", "result_construction_color",
+    "Construction color",
+    Config_Prop::Color,
+    ModelAPI_ResultConstruction::DEFAULT_COLOR());
+
+  Config_PropManager::registerProp("Visualization", "result_part_color", "Part color",
+    Config_Prop::Color, ModelAPI_ResultPart::DEFAULT_COLOR());
+
+  Config_PropManager::registerProp("Visualization", "result_field_color", "Field color",
+    Config_Prop::Color, ModelAPI_ResultField::DEFAULT_COLOR());
 
   Config_PropManager::registerProp("Visualization", "operation_parameter_color",
                           "Reference shape wireframe color in operation", Config_Prop::Color,
@@ -1166,75 +1187,75 @@ void PartSet_Module::deactivateCustomPrs(const ModuleBase_CustomizeFlag& theFlag
 }
 
 //******************************************************
-bool PartSet_Module::customisePresentation(ResultPtr theResult, AISObjectPtr thePrs,
-                                           std::shared_ptr<GeomAPI_ICustomPrs> theCustomPrs)
-{
-  bool aCustomized = false;
-
-  XGUI_Workshop* aWorkshop = getWorkshop();
-  XGUI_Displayer* aDisplayer = aWorkshop->displayer();
-  ObjectPtr anObject = aDisplayer->getObject(thePrs);
-  if (!anObject)
-    return aCustomized;
-
-  if (!theResult.get()) {
-    std::vector<int> aColor;
-    XGUI_CustomPrs::getDefaultColor(anObject, true, aColor);
-    if (!aColor.empty()) {
-      aCustomized = thePrs->setColor(aColor[0], aColor[1], aColor[2]);
-    }
-  }
-  // customize dimentional constrains
-  sketchMgr()->customizePresentation(anObject);
-
-  return aCustomized;
-}
+//bool PartSet_Module::customisePresentation(ResultPtr theResult, AISObjectPtr thePrs,
+//                                           std::shared_ptr<GeomAPI_ICustomPrs> theCustomPrs)
+//{
+//  bool aCustomized = false;
+//
+//  XGUI_Workshop* aWorkshop = getWorkshop();
+//  XGUI_Displayer* aDisplayer = aWorkshop->displayer();
+//  ObjectPtr anObject = aDisplayer->getObject(thePrs);
+//  if (!anObject)
+//    return aCustomized;
+//
+//  if (!theResult.get()) {
+//    std::vector<int> aColor;
+//    XGUI_CustomPrs::getDefaultColor(anObject, true, aColor);
+//    if (!aColor.empty()) {
+//      aCustomized = thePrs->setColor(aColor[0], aColor[1], aColor[2]);
+//    }
+//  }
+//  // customize dimentional constrains
+//  sketchMgr()->customisePresentation(anObject);
+//
+//  return aCustomized;
+//}
+//
+////******************************************************
+//bool PartSet_Module::afterCustomisePresentation(std::shared_ptr<ModelAPI_Result> theResult,
+//                                                AISObjectPtr thePrs,
+//                                                GeomCustomPrsPtr theCustomPrs)
+//{
+//  bool aCustomized = false;
+//
+//  XGUI_Workshop* aWorkshop = getWorkshop();
+//  XGUI_Displayer* aDisplayer = aWorkshop->displayer();
+//  ObjectPtr anObject = aDisplayer->getObject(thePrs);
+//  if (!anObject)
+//    return aCustomized;
+//
+//  std::vector<int> aColor;
+//  bool aUseCustomColor = true;
+//  if (aUseCustomColor)
+//    myOverconstraintListener->getCustomColor(anObject, aColor);
+//  // customize sketch symbol presentation
+//  Handle(AIS_InteractiveObject) anAISIO = thePrs->impl<Handle(AIS_InteractiveObject)>();
+//  if (!anAISIO.IsNull()) {
+//    if (!Handle(SketcherPrs_SymbolPrs)::DownCast(anAISIO).IsNull()) {
+//      Handle(SketcherPrs_SymbolPrs) aPrs = Handle(SketcherPrs_SymbolPrs)::DownCast(anAISIO);
+//      if (!aPrs.IsNull()) {
+//        aPrs->SetCustomColor(aColor);
+//        aCustomized = true;
+//      }
+//    } else if (!Handle(SketcherPrs_Coincident)::DownCast(anAISIO).IsNull()) {
+//      Handle(SketcherPrs_Coincident) aPrs = Handle(SketcherPrs_Coincident)::DownCast(anAISIO);
+//      if (!aPrs.IsNull()) {
+//        aPrs->SetCustomColor(aColor);
+//        aCustomized = true;
+//      }
+//    }
+//  }
+//  // customize sketch dimension constraint presentation
+//  if (!aCustomized) {
+//    if (!aColor.empty()) { // otherwise presentation has the default color
+//      aCustomized = thePrs->setColor(aColor[0], aColor[1], aColor[2]);
+//    }
+//  }
+//  return aCustomized;
+//}
 
 //******************************************************
-bool PartSet_Module::afterCustomisePresentation(std::shared_ptr<ModelAPI_Result> theResult,
-                                                AISObjectPtr thePrs,
-                                                GeomCustomPrsPtr theCustomPrs)
-{
-  bool aCustomized = false;
-
-  XGUI_Workshop* aWorkshop = getWorkshop();
-  XGUI_Displayer* aDisplayer = aWorkshop->displayer();
-  ObjectPtr anObject = aDisplayer->getObject(thePrs);
-  if (!anObject)
-    return aCustomized;
-
-  std::vector<int> aColor;
-  bool aUseCustomColor = true;
-  if (aUseCustomColor)
-    myOverconstraintListener->getCustomColor(anObject, aColor);
-  // customize sketch symbol presentation
-  Handle(AIS_InteractiveObject) anAISIO = thePrs->impl<Handle(AIS_InteractiveObject)>();
-  if (!anAISIO.IsNull()) {
-    if (!Handle(SketcherPrs_SymbolPrs)::DownCast(anAISIO).IsNull()) {
-      Handle(SketcherPrs_SymbolPrs) aPrs = Handle(SketcherPrs_SymbolPrs)::DownCast(anAISIO);
-      if (!aPrs.IsNull()) {
-        aPrs->SetCustomColor(aColor);
-        aCustomized = true;
-      }
-    } else if (!Handle(SketcherPrs_Coincident)::DownCast(anAISIO).IsNull()) {
-      Handle(SketcherPrs_Coincident) aPrs = Handle(SketcherPrs_Coincident)::DownCast(anAISIO);
-      if (!aPrs.IsNull()) {
-        aPrs->SetCustomColor(aColor);
-        aCustomized = true;
-      }
-    }
-  }
-  // customize sketch dimension constraint presentation
-  if (!aCustomized) {
-    if (!aColor.empty()) { // otherwise presentation has the default color
-      aCustomized = thePrs->setColor(aColor[0], aColor[1], aColor[2]);
-    }
-  }
-  return aCustomized;
-}
-
-//******************************************************
-bool PartSet_Module::customizeObject(ObjectPtr theObject, const ModuleBase_CustomizeFlag& theFlag,
+bool PartSet_Module::customizeFeature(ObjectPtr theObject, const ModuleBase_CustomizeFlag& theFlag,
                                      const bool theUpdateViewer)
 {
   bool isRedisplayed = false;
@@ -1279,20 +1300,100 @@ void PartSet_Module::onActiveDocPopup(const QPoint& thePnt)
 }
 
 //******************************************************
-Handle(AIS_InteractiveObject) PartSet_Module::createPresentation(const ObjectPtr& theObject)
+AISObjectPtr PartSet_Module::createPresentation(const ObjectPtr& theObject)
 {
-  ResultPtr aResult = std::dynamic_pointer_cast<ModelAPI_Result>(theObject);
-  if (aResult.get())
-    return mySketchMgr->createPresentation(aResult);
-  else {
-    FieldStepPtr aStep =
-      std::dynamic_pointer_cast<ModelAPI_ResultField::ModelAPI_FieldStep>(theObject);
-    if (aStep.get()) {
-      return new PartSet_FieldStepPrs(aStep);
+  Handle(AIS_InteractiveObject) anAISPrs = mySketchMgr->createPresentation(theObject);
+  if (anAISPrs.IsNull()) {
+    ResultPtr aResult = std::dynamic_pointer_cast<ModelAPI_Result>(theObject);
+    if (aResult.get()) {
+      std::shared_ptr<GeomAPI_Shape> aShapePtr = ModelAPI_Tools::shape(aResult);
+      if (aShapePtr.get() != NULL)
+        anAISPrs = new ModuleBase_ResultPrs(aResult);
+    }
+    else {
+      FieldStepPtr aStep =
+        std::dynamic_pointer_cast<ModelAPI_ResultField::ModelAPI_FieldStep>(theObject);
+      if (aStep.get()) {
+        anAISPrs = new PartSet_FieldStepPrs(aStep);
+      }
     }
   }
-  return Handle(AIS_InteractiveObject)();
+  AISObjectPtr anAIS;
+  if (!anAISPrs.IsNull()) {
+    Handle(AIS_Shape) aShapePrs = Handle(AIS_Shape)::DownCast(anAISPrs);
+    if (!aShapePrs.IsNull())
+      ModuleBase_Tools::setPointBallHighlighting((AIS_Shape*)aShapePrs.get());
+
+    anAIS = AISObjectPtr(new GeomAPI_AISObject());
+    anAIS->setImpl(new Handle(AIS_InteractiveObject)(anAISPrs));
+    customizePresentation(theObject, anAIS);
+  }
+  return anAIS;
 }
+
+//******************************************************
+void getResultColor(const ResultPtr& theResult, std::vector<int>& theColor)
+{
+  ModelAPI_Tools::getColor(theResult, theColor);
+  if (theColor.empty())
+    PartSet_Tools::getDefaultColor(theResult, false, theColor);
+}
+
+//******************************************************
+double getResultDeflection(const ResultPtr& theResult)
+{
+  double aDeflection = ModelAPI_Tools::getDeflection(theResult);
+  if (aDeflection < 0)
+    aDeflection = PartSet_Tools::getDefaultDeflection(theResult);
+  return aDeflection;
+}
+
+//******************************************************
+double getResultTransparency(const ResultPtr& theResult)
+{
+  double aTransparency = ModelAPI_Tools::getTransparency(theResult);
+  if (aTransparency < 0)
+    aTransparency = PartSet_Tools::getDefaultTransparency();
+  return aTransparency;
+}
+
+
+//******************************************************
+void PartSet_Module::customizePresentation(const ObjectPtr& theObject,
+                                           const AISObjectPtr& thePrs) const
+{
+  if (mySketchMgr->isSketchStarted()) {
+    mySketchMgr->customizeSketchPresentation(theObject, thePrs);
+  }
+  else {
+    ResultPtr aResult = std::dynamic_pointer_cast<ModelAPI_Result>(theObject);
+    if (aResult.get()) {
+      std::vector<int> aColor;
+      getResultColor(aResult, aColor);
+
+      SessionPtr aMgr = ModelAPI_Session::get();
+      if (aMgr->activeDocument() != aResult->document()) {
+        QColor aQColor(aColor[0], aColor[1], aColor[2]);
+        QColor aNewColor =
+          QColor::fromHsvF(aQColor.hueF(), aQColor.saturationF() / 3., aQColor.valueF());
+        aColor[0] = aNewColor.red();
+        aColor[1] = aNewColor.green();
+        aColor[2] = aNewColor.blue();
+      }
+      thePrs->setColor(aColor[0], aColor[1], aColor[2]);
+
+      thePrs->setDeflection(getResultDeflection(aResult));
+
+      thePrs->setTransparency(getResultTransparency(aResult));
+    }
+    FeaturePtr aFeature = ModelAPI_Feature::feature(theObject);
+    if (aFeature.get()) {
+      if (aFeature->getKind() == SketchPlugin_Sketch::ID())
+        thePrs->setWidth(2);
+    }
+  }
+}
+
 
 //******************************************************
 ObjectPtr PartSet_Module::findPresentedObject(const AISObjectPtr& theAIS) const

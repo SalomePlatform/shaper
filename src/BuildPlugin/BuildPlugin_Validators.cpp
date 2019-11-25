@@ -39,6 +39,8 @@
 #include <GeomValidators_FeatureKind.h>
 #include <GeomValidators_ShapeType.h>
 
+#include <SketchPlugin_Sketch.h>
+
 #include <Events_InfoMessage.h>
 
 //=================================================================================================
@@ -101,17 +103,6 @@ bool BuildPlugin_ValidatorBaseForBuild::isValid(const AttributePtr& theAttribute
       if(aConstruction->isInfinite()) {
         theError = "Infinite objects not acceptable.";
         return false;
-      }
-
-      std::shared_ptr<GeomAPI_PlanarEdges> anEdges =
-        std::dynamic_pointer_cast<GeomAPI_PlanarEdges>(aContextShape);
-      if(anEdges.get()) {
-        if(aShape->isEqual(aContextShape)) {
-          // It is whole sketch.
-          return false;
-        }
-
-        continue;
       }
     }
   }
@@ -196,7 +187,11 @@ bool BuildPlugin_ValidatorBaseForFace::isValid(const std::shared_ptr<ModelAPI_Fe
       }
       aShape = aSelection->context()->shape();
     }
-    if (aShape->shapeType() == GeomAPI_Shape::FACE) {
+    ResultConstructionPtr aSketchRes =
+        std::dynamic_pointer_cast<ModelAPI_ResultConstruction>(aSelection->context());
+
+    if (aShape->shapeType() == GeomAPI_Shape::FACE ||
+        (!aSelection->value() && aSketchRes && aSketchRes->facesNum() > 0)) {
       // skip faces exploding
       hasFaces = true;
       continue;
@@ -464,7 +459,7 @@ bool BuildPlugin_ValidatorFillingSelection::isValid(const AttributePtr& theAttri
     return false;
   }
 
-  FeaturePtr anOwner = ModelAPI_Feature::feature(theAttribute->owner());
+  //FeaturePtr anOwner = ModelAPI_Feature::feature(theAttribute->owner());
 
   // Check selected shapes.
   for (int anIndex = 0; anIndex < aSelectionList->size(); ++anIndex) {
@@ -486,6 +481,67 @@ bool BuildPlugin_ValidatorFillingSelection::isValid(const AttributePtr& theAttri
     if (aType != GeomAPI_Shape::EDGE && aType != GeomAPI_Shape::WIRE) {
       theError = "Incorrect objects selected";
       return false;
+    }
+  }
+
+  return true;
+}
+
+
+//=================================================================================================
+bool BuildPlugin_ValidatorBaseForVertex::isValid(const AttributePtr& theAttribute,
+                                                 const std::list<std::string>& /*theArguments*/,
+                                                 Events_InfoMessage& theError) const
+{
+  if (!theAttribute.get()) {
+    theError = "Error: empty selection.";
+    return false;
+  }
+
+  AttributeSelectionListPtr aSelectionList =
+    std::dynamic_pointer_cast<ModelAPI_AttributeSelectionList>(theAttribute);
+  if (!aSelectionList.get()) {
+    theError = "Could not get selection list.";
+    return false;
+  }
+
+  for (int anIndex = 0; anIndex < aSelectionList->size(); ++anIndex) {
+    AttributeSelectionPtr aSelectionAttr = aSelectionList->value(anIndex);
+    if (!aSelectionAttr.get()) {
+      theError = "Empty attribute in list.";
+      return false;
+    }
+
+    // Vertex?
+    bool isVertex = false;
+    GeomShapePtr aShape = aSelectionAttr->value();
+    ResultPtr aContext = aSelectionAttr->context();
+    if (!aShape.get() && aContext.get())
+      aShape = aContext->shape();
+    if (aShape.get())
+      isVertex = (aShape->shapeType() == GeomAPI_Shape::VERTEX);
+
+    if (!isVertex) {
+      // Sketch?
+      FeaturePtr aFeature = aSelectionAttr->contextFeature();
+      if (!aFeature.get()) {
+        GeomShapePtr aValue = aSelectionAttr->value();
+        // whole sketch is allowed only
+        if (aContext.get() && !aValue.get()) {
+          aFeature = ModelAPI_Feature::feature(aContext);
+        }
+      }
+
+      if (!aFeature.get()) {
+        theError = "Error: Incorrect selection.";
+        return false;
+      }
+
+      if (aFeature->getKind() != SketchPlugin_Sketch::ID()) {
+        theError = "Error: %1 shape is not allowed for selection.";
+        theError.arg(aFeature->getKind());
+        return false;
+      }
     }
   }
 

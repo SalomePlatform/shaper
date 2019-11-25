@@ -49,6 +49,24 @@ public:
   /// Returns true if the current edge is geometrically equal to the given edge.
   GEOMAPI_EXPORT
   virtual bool isEqual(const std::shared_ptr<GeomAPI_Shape> theVert) const;
+
+public:
+  /// \brief Compare vertices geometrically
+  class GeometricComparator
+  {
+  public:
+    GEOMAPI_EXPORT
+    GeometricComparator(const double theTolerance = 1.e-7) : myTolerance(theTolerance)
+    {}
+
+    /// Return \c true if the first vertex is less than the second
+    GEOMAPI_EXPORT
+    bool operator ()(const std::shared_ptr<GeomAPI_Vertex>& theVertex1,
+                     const std::shared_ptr<GeomAPI_Vertex>& theVertex2) const;
+  private:
+    double myTolerance;
+  };
+
 };
 
 //! Pointer on the object

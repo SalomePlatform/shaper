@@ -29,12 +29,14 @@
 #include <ModelAPI_Attribute.h>
 #include <ModelAPI_CompositeFeature.h>
 #include <ModelAPI_Result.h>
+#include <Events_Listener.h>
 #include <ModuleBase_SelectionFilterType.h>
 
 #include <ModuleBase_Definitions.h>
 #include <ModuleBase_ModelWidget.h>
 
 #include <GeomAPI_Pln.h>
+#include <GeomAPI_AISObject.h>
 
 #ifdef HAVE_SALOME
   #include <OCCViewer_ViewModel.h>
@@ -97,7 +99,7 @@ private:
   displayed in the viewer. After the sketch create/edit operation is finished, the sub-feature
   are hidden, the sketch feature result is displayed
 */
-class PARTSET_EXPORT PartSet_SketcherMgr : public QObject
+class PARTSET_EXPORT PartSet_SketcherMgr : public QObject, public Events_Listener
 {
   Q_OBJECT
   /// Struct to define gp point, with the state is the point is initialized
@@ -343,7 +345,7 @@ public:
   /// Create specific for the module presentation
   /// \param theResult an object for presentation
   /// \return created presentation or NULL(default value)
-  virtual Handle(AIS_InteractiveObject) createPresentation(const ResultPtr& theResult);
+  Handle(AIS_InteractiveObject) createPresentation(const ObjectPtr& theResult);
 
   /// Connects or disconnects to the value changed signal of the property panel widgets
   /// \param theWidget a property contol widget
@@ -357,7 +359,9 @@ public:
   /// If the current operation is a dimention one, the style of dimension visualization is send for
   /// the current object
   /// \param theObject an object to be customized
-  void customizePresentation(const ObjectPtr& theObject);
+  //void customisePresentation(const ObjectPtr& theObject);
+
+  void customizeSketchPresentation(const ObjectPtr& theObject, const AISObjectPtr& thePrs) const;
 
   /// Update sketch presentations according to the the state
   /// \param theType a type of sketch visualization style
@@ -370,6 +374,14 @@ public:
   }
 
   PartSet_Module* module() const { return myModule; }
+
+  /** \brief Implementation of Event Listener method
+  *  \param[in] theMessage the data of the event
+  */
+  virtual void processEvent(const std::shared_ptr<Events_Message>& theMessage);
+
+  bool isSketchStarted() const { return myIsSketchStarted; }
+
 
 public slots:
   /// Process sketch plane selected event
@@ -496,6 +508,8 @@ private:
   QMap<ResultPtr, Handle(AIS_Shape)> myPointsHighlight;
 
   bool myNoDragMoving;
+
+  bool myIsSketchStarted;
 };
 
 

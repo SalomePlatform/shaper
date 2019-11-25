@@ -350,6 +350,7 @@ AISObjectPtr SketchPlugin_MacroEllipticArc::getAISObject(AISObjectPtr thePreviou
   if (!anAIS)
     anAIS.reset(new GeomAPI_AISObject());
   anAIS->createShape(aCompound);
+  SketchPlugin_Tools::customizeFeaturePrs(anAIS, boolean(AUXILIARY_ID())->value());
   return anAIS;
 }
 

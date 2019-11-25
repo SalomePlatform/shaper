@@ -193,6 +193,11 @@ AISObjectPtr SketchPlugin_Fillet::getAISObject(AISObjectPtr thePrevious)
     anAISObject = AISObjectPtr(new GeomAPI_AISObject);
   }
   anAISObject->createShape(anArcShape);
+  bool isAxiliary = false;
+  AttributeBooleanPtr aAttr = boolean(AUXILIARY_ID());
+  if (aAttr.get())
+    isAxiliary = aAttr->value();
+  SketchPlugin_Tools::customizeFeaturePrs(anAISObject, isAxiliary);
   return anAISObject;
 }
 

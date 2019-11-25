@@ -139,12 +139,16 @@ bool FeaturesPlugin_Revolution::makeRevolutions(ListOfShape& theBaseShapes,
   double aToAngle = 0.0;
   double aFromAngle = 0.0;
 
-  if(string(CREATION_METHOD())->value() == CREATION_METHOD_BY_ANGLES()) {
+  if (string(CREATION_METHOD())->value() == CREATION_METHOD_BY_ANGLES()) {
     aToAngle = real(TO_ANGLE_ID())->value();
     aFromAngle = real(FROM_ANGLE_ID())->value();
-  } else {
+  } else if (string(CREATION_METHOD())->value() == CREATION_METHOD_BY_PLANES()) {
     aToAngle = real(TO_OFFSET_ID())->value();
     aFromAngle = real(FROM_OFFSET_ID())->value();
+  } else if (string(CREATION_METHOD())->value() == CREATION_METHOD_THROUGH_ALL()) {
+    aToAngle = 360.0;
+    aFromAngle = 0.0;
+  } else {
   }
 
   // Getting bounding planes.

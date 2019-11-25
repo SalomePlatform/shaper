@@ -75,29 +75,33 @@ aSession.finishOperation()
 # Test results
 assert (len(aVertexFeature.results()) == aNumOfPoints)
 
-# Check Vertex feature failed on incorrect input
+# Check Vertex feature correct on a whole sketch
 aSession.startOperation()
 aVertexFeature2 = aPart.addFeature("Vertex")
 aBaseObjectsList = aVertexFeature2.selectionList("base_objects")
 aBaseObjectsList.append(aSketchResult, None)
 aSession.finishOperation()
-assert (len(aVertexFeature2.results()) == 0)
+assert (len(aVertexFeature2.results()) == aNumOfPoints)
 
+# Check Vertex feature failed on incorrect input
 aSession.startOperation()
 aLine = aSketchFeature.addFeature("SketchLine")
 geomDataAPI_Point2D(aLine.attribute("StartPoint")).setValue(0, 0)
 geomDataAPI_Point2D(aLine.attribute("EndPoint")).setValue(100, 100)
 aSession.finishOperation()
 aSession.startOperation()
-aBaseObjectsList.clear()
+aPart.setCurrentFeature(aVertexFeature2, False)
+aSession.finishOperation()
+aSession.startOperation()
+aVertexFeature3 = aPart.addFeature("Vertex")
+aBaseObjectsList = aVertexFeature3.selectionList("base_objects")
 aBaseObjectsList.append(aSketchResult, aLine.lastResult().shape())
 aSession.finishOperation()
-assert (len(aVertexFeature2.results()) == 0)
+assert (len(aVertexFeature3.results()) == 0)
 
 # remove failed feature
 aSession.startOperation()
-aPart.removeFeature(aVertexFeature2)
-aPart.setCurrentFeature(aVertexFeature, True)
+aPart.removeFeature(aVertexFeature3)
 aSession.finishOperation()
 
 from salome.shaper import model

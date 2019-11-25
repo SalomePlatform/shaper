@@ -18,7 +18,7 @@ The following property panel will be opened:
 .. centered::
   Start sketch
 
-There are two variants of the property panel for Revolution Cut depending on the chosen option:
+There are three variants of the property panel for Revolution Cut depending on the chosen option:
 
 .. image:: images/revolution_by_angles.png
    :align: left
@@ -27,6 +27,10 @@ There are two variants of the property panel for Revolution Cut depending on the
 .. image:: images/revolution_by_bounding_planes.png
    :align: left
 **By Bounding Planes** revolves objects by specifying bounding planes and angles.
+
+.. image:: images/revolution_through_all.png
+   :align: left
+**Through All** revolves objects by 360 degrees.
 
 
 By angles
@@ -121,3 +125,39 @@ The Result of the operation will be a revolved shape:
    **Revolution Cut created**
 
 **See Also** a sample TUI Script of :ref:`tui_create_revolution_cut_by_bounding_planes` operation.
+
+Through all
+--------
+
+.. image:: images/RevolutionCut3.png
+  :align: center
+
+.. centered::
+  Revolution Cut: revolving through all the space
+
+- **Base objects** - contains a list of objects selected in the Object Browser or in the Viewer, which will be revolved.
+- **Axis** - axis of revolution.
+- **Cut from** - contains a list of objects which will but cut with the result of revolution.
+
+**TUI Commands**:
+
+.. py:function:: model.addRevolutionCut(part, objectsToRevolve, axis, objectToCut)
+
+    :param part: The current part object.
+    :param list: A list of objects for revolution.
+    :param object: An axis.
+    :param list: A list of objects to cut from.
+    :return: Created object.
+
+Result
+""""""
+
+The Result of the operation will be a revolved shape:
+
+.. image:: images/revolution_cut_through_all_result.png
+	   :align: center
+
+.. centered::
+   **Revolution Cut created**
+
+**See Also** a sample TUI Script of :ref:`tui_create_revolution_cut_through_all` operation.

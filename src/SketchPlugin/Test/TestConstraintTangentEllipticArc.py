@@ -189,7 +189,7 @@ class TestTangentEllipticArc(unittest.TestCase):
     self.myDOF += 4
     model.do()
 
-    self.mySketch.setTangent(self.myEllipticArc.result(), aLine.result())
+    self.mySketch.setTangent(aLine.result(), self.myEllipticArc.result())
     self.myNbTangency += 1
     self.myDOF -= 1
     model.do()

@@ -41,6 +41,7 @@ SET(PROJECT_LIBRARIES
 
 INCLUDE_DIRECTORIES(
   ../GeomAPI        # only for SWIG
+  ../Events         # only for SWIG
   ../ModelAPI
 )
 

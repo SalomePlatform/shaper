@@ -496,3 +496,8 @@ bool SketchSolver_Group::areConstraintsValid() const
       return false;
   return true;
 }
+
+void SketchSolver_Group::underconstrainedFeatures(std::set<ObjectPtr>& theFeatures) const
+{
+  myStorage->getUnderconstrainedGeometry(theFeatures);
+}

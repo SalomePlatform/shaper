@@ -21,6 +21,7 @@
 
 #include <ModelAPI_AttributeSelectionList.h>
 #include <ModelAPI_ResultBody.h>
+#include <ModelAPI_ResultConstruction.h>
 
 #include <GeomAPI_Edge.h>
 #include <GeomAPI_PlanarEdges.h>
@@ -71,10 +72,20 @@ void BuildPlugin_Face::execute()
     if(!aShape.get()) {
       aShape = aContext;
     }
-    // keep selected faces "as is"
     if (aShape->shapeType() == GeomAPI_Shape::FACE) {
+      // keep selected faces "as is"
       anOriginalFaces.push_back(aShape);
       continue;
+    }
+    else if (!aSelection->value() && aShape->shapeType() == GeomAPI_Shape::COMPOUND) {
+      // collect faces from the sketch
+      ResultConstructionPtr aSketch =
+          std::dynamic_pointer_cast<ModelAPI_ResultConstruction>(aSelection->context());
+      if (aSketch && aSketch->facesNum() > 0) {
+        for (int i = 0; i < aSketch->facesNum(); ++i)
+          anOriginalFaces.push_back(aSketch->face(i));
+        continue;
+      }
     }
 
     for(GeomAPI_ShapeExplorer anExp(aShape, GeomAPI_Shape::EDGE); anExp.more(); anExp.next()) {

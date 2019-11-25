@@ -231,7 +231,7 @@ SET(PROJECT_SOURCES
 )
 
 SET(TEXT_RESOURCES
-#    ModuleBase_msg_fr.ts
+    ModuleBase_msg_fr.ts
 )
 
 SET(PROJECT_LIBRARIES
@@ -258,10 +258,12 @@ IF (${UPDATE_TRANSLATION})
     QT5_CREATE_TRANSLATION(QM_RESOURCES
                            ${PROJECT_FILES}
                            ${TEXT_RESOURCES}
-                           OPTIONS -extensions cpp -no-recursive
+                           OPTIONS -extensions cpp -no-recursive -locations none
                           )
 ELSE(${UPDATE_TRANSLATION})
-    QT5_ADD_TRANSLATION(QM_RESOURCES ${TEXT_RESOURCES})
+    IF(${MAKE_TRANSLATION})
+        QT5_ADD_TRANSLATION(QM_RESOURCES ${TEXT_RESOURCES})
+    ENDIF(${MAKE_TRANSLATION})
 ENDIF(${UPDATE_TRANSLATION})
 
 SOURCE_GROUP ("Generated Files" FILES ${PROJECT_AUTOMOC} ${PROJECT_COMPILED_RESOURCES} ${QM_RESOURCES})

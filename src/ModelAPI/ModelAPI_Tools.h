@@ -209,6 +209,26 @@ MODELAPI_EXPORT std::set<std::shared_ptr<ModelAPI_Feature> >
 /*! Creates a remove result features with the given results
 */
 MODELAPI_EXPORT void removeResults(const std::list<std::shared_ptr<ModelAPI_Result> >& theResults);
+
+/*! Returns current deflection in the given result
+* \param theResult a result object
+* \return a deflection value or -1 if it was not defined
+*/
+MODELAPI_EXPORT double getDeflection(const std::shared_ptr<ModelAPI_Result>& theResult);
+
+/*! Returns current color of the current result
+* \param[in] theResult a result object
+* \param[out] theColor a color values if it is defined
+*/
+MODELAPI_EXPORT void getColor(const std::shared_ptr<ModelAPI_Result>& theResult,
+  std::vector<int>& theColor);
+
+/*! Returns current transparency in the given result
+* \param theResult a result object
+* \return a transparency value or -1 if it was not defined
+*/
+MODELAPI_EXPORT double getTransparency(const std::shared_ptr<ModelAPI_Result>& theResult);
+
 }
 
 #endif

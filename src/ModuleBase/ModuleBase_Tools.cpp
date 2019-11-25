@@ -763,6 +763,7 @@ void flushUpdated(ObjectPtr theObject)
   // (for the sketch result) to start processing of the sketch in the solver.
   // TODO: these flushes should be moved in a separate method provided by Model
   Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_CREATED));
+  Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_VISUAL_ATTRIBUTES));
   Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_UPDATED));
   Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_DELETED));
 

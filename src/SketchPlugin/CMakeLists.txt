@@ -136,6 +136,7 @@ SET(XML_RESOURCES
 
 SET(TEXT_RESOURCES
 	SketchPlugin_msg_en.ts
+	SketchPlugin_msg_fr.ts
 )
 
 SOURCE_GROUP ("Resource Files" FILES ${TEXT_RESOURCES})
@@ -283,6 +284,7 @@ ADD_UNIT_TESTS(
   TestProjectionIntoResult.py
   TestProjectionUpdate.py
   TestRectangle.py
+  TestRemainingDoF.py
   TestRemoveEllipse.py
   TestRemoveEllipticArc.py
   TestRemoveSketch.py
@@ -322,6 +324,7 @@ if(${SKETCHER_CHANGE_RADIUS_WHEN_MOVE})
     TestMoveArc.py
     TestMoveCircle.py
     TestMoveEllipse.py
+    TestMoveEllipticArc.py
     TestMoveLine.py
     TestMovementComplex.py
     TestMovePoint.py

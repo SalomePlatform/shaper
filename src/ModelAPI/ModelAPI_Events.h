@@ -101,6 +101,15 @@ static const char * EVENT_STABILITY_CHANGED = "StabilityChanged";
 /// Event ID that the sketch is prepared and all grouped messages for the solver may be flushed
 static const char * EVENT_SKETCH_PREPARED = "SketchPrepared";
 
+/// Event ID that provides a request for list of non-fixed objects necessary for DoF = 0
+static const char * EVENT_GET_DOF_OBJECTS = "GetDoFObjects";
+
+/// Event ID that provides a request for list of non-fixed objects necessary for DoF = 0
+static const char * EVENT_DOF_OBJECTS = "DoFObjects";
+
+/// Event ID that requests updates visual attributes for presentations
+static const char * EVENT_VISUAL_ATTRIBUTES = "UpdateVisualAttributes";
+
 /// Message that feature was changed (used for Object Browser update): moved, updated and deleted
 class MODELAPI_EXPORT ModelAPI_ObjectUpdatedMessage : public Events_MessageGroup
 {

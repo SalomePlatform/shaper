@@ -35,6 +35,9 @@
 #include <ModelAPI_Session.h>
 #include <ModelAPI_Validator.h>
 #include <ModelAPI_Tools.h>
+#include <ModelAPI_Events.h>
+
+#include <Events_Loop.h>
 
 #include <GeomAPI_Circ.h>
 #include <GeomAPI_Edge.h>
@@ -50,6 +53,7 @@
 #include <cmath>
 
 static const double tolerance = 1.e-7;
+
 
 SketchPlugin_Projection::SketchPlugin_Projection()
     : SketchPlugin_SketchEntity(),
@@ -371,6 +375,9 @@ void SketchPlugin_Projection::computeProjection(const std::string& theID)
       setResult(aResult);
       GeomShapePtr anEmptyVal;
       aProjection->selection(EXTERNAL_ID())->setValue(lastResult(), anEmptyVal);
+
+      static const Events_ID anEvent = Events_Loop::eventByName(EVENT_VISUAL_ATTRIBUTES);
+      ModelAPI_EventCreator::get()->sendUpdated(aProjection, anEvent, false);
     }
   }
 }

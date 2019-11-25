@@ -38,7 +38,9 @@ class Events_Listener {
   /// map from event ID to groupped messages (for flush for groupMessages=true listeners)
   std::map<char*, std::shared_ptr<Events_Message> > myGroups;
 
- public:
+public:
+  virtual ~Events_Listener() {}
+
   //! This method is called by loop when the event is started to process.
   EVENTS_EXPORT virtual void processEvent(const std::shared_ptr<Events_Message>& theMessage) = 0;
 

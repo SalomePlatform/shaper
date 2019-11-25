@@ -112,6 +112,11 @@ private:
    *  \return Pointer to corresponding group or NULL if the group cannot be created.
    */
   SketchGroupPtr findGroup(std::shared_ptr<SketchPlugin_Feature> theFeature);
+  /** \brief Searches group related to specified composite feature
+   *  \param[in]  theSketch  sketch to be found
+   *  \return Pointer to corresponding group or NULL if the group cannot be created.
+   */
+  SketchGroupPtr findGroup(std::shared_ptr<ModelAPI_CompositeFeature> theSketch);
 
   /// \brief Stop sending the Update event until all features updated
   /// \return \c true, if the last flushed event is Update

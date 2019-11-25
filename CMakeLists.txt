@@ -120,7 +120,9 @@ ENDIF(${HAVE_SALOME})
 # Sketcher: Change radius of circular edges while dragging a point on the edge
 SET(SKETCHER_CHANGE_RADIUS_WHEN_MOVE TRUE)
 
+SET(MAKE_TRANSLATION YES)
 
+    ADD_DEFINITIONS( -DMAKE_TRANSLATION )
 ADD_SUBDIRECTORY (src/Config)
 ADD_SUBDIRECTORY (src/Events)
 ADD_SUBDIRECTORY (src/Selector)

@@ -38,6 +38,7 @@
 #include <ModelAPI_ResultBody.h>
 #include <ModelAPI_Tools.h>
 #include <ModelAPI_AttributeString.h>
+#include <ModelAPI_Events.h>
 
 #include <ModuleBase_Operation.h>
 #include <ModuleBase_ViewerPrs.h>
@@ -182,8 +183,15 @@ myIsSelection(false)
   connect(aPlaneBtn, SIGNAL(clicked(bool)), SLOT(onChangePlane()));
   aLayout->addWidget(aPlaneBtn);
 
+  aLayout->addSpacing(15);
+
   myDoFLabel = new QLabel("", aSecondWgt);
   aLayout->addWidget(myDoFLabel);
+
+  myShowDOFBtn = new QPushButton(tr("Show remaining DoFs"), aSecondWgt);
+  aLayout->addWidget(myShowDOFBtn);
+  myShowDOFBtn->setEnabled(false);
+  connect(myShowDOFBtn, SIGNAL(clicked(bool)), SLOT(onShowDOF()));
 
   myStackWidget->addWidget(aSecondWgt);
   //setLayout(aLayout);
@@ -752,14 +760,29 @@ bool PartSet_WidgetSketchLabel::restoreValueCustom()
         int aDoF = aVal.toInt();
         if (aDoF == 0) {
           myDoFLabel->setText(tr("Sketch is fully fixed (DoF = 0)"));
+          myShowDOFBtn->setEnabled(false);
         } else {
           myDoFLabel->setText(tr("DoF (degrees of freedom) = ") + aVal);
+          myShowDOFBtn->setEnabled(true);
         }
       }
     }
     else {
       myDoFLabel->setText("");
+      myShowDOFBtn->setEnabled(false);
     }
   }
   return true;
+}
+
+
+void PartSet_WidgetSketchLabel::onShowDOF()
+{
+  CompositeFeaturePtr aCompFeature =
+    std::dynamic_pointer_cast<ModelAPI_CompositeFeature>(myFeature);
+  if (aCompFeature.get()) {
+    static const Events_ID anEvent = Events_Loop::eventByName(EVENT_GET_DOF_OBJECTS);
+    ModelAPI_EventCreator::get()->sendUpdated(aCompFeature, anEvent);
+    Events_Loop::loop()->flush(anEvent);
+  }
 }

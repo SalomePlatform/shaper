@@ -58,6 +58,14 @@ public:
   /// Redefinition of Events_Listener method
   virtual void processEvent(const std::shared_ptr<Events_Message>& theMessage);
 
+
+  bool isConflictingObject(const ObjectPtr& theObject) const
+  {
+    return (myConflictingObjects.find(theObject) != myConflictingObjects.end());
+  }
+
+  bool isFullyConstrained() const { return myIsFullyConstrained; }
+
 protected:
   /// Append objects to the internal container of conflicting object, redisplay necessary objects
   /// \param theObjects a list of new conflicting objects

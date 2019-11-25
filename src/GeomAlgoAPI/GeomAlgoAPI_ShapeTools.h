@@ -193,6 +193,17 @@ public:
   /// \param[in] theShape shape that should be exploded
   /// \return list of sub-shapes (vertices, edges, faces, solids)
   GEOMALGOAPI_EXPORT static ListOfShape getLowLevelSubShapes(const GeomShapePtr& theShape);
+
+  /// \brief Calculate prism sizes to ensure that it passes through all objects
+  /// \param[in] theObjects objects to be joined/cutted by the prism
+  /// \param[in] theBaseShapes bases of the prism
+  /// \param[in] theDir direction of the prism
+  /// \param[out] theToSize upper offset of the prism
+  /// \param[out] theFromSize lower offset of the prism
+  GEOMALGOAPI_EXPORT static void computeThroughAll(const ListOfShape& theObjects,
+                                                   const ListOfShape& theBaseShapes,
+                                                   const std::shared_ptr<GeomAPI_Dir> theDir,
+                                                   double& theToSize, double& theFromSize);
 };
 
 #endif

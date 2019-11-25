@@ -290,14 +290,14 @@ public:
                                    const bool theUpdateViewer);
 
   /// Modifies the given presentation in the custom way.
-  virtual bool customisePresentation(std::shared_ptr<ModelAPI_Result> theResult,
-                                     AISObjectPtr thePrs,
-                                     std::shared_ptr<GeomAPI_ICustomPrs> theCustomPrs);
+  //virtual bool customisePresentation(std::shared_ptr<ModelAPI_Result> theResult,
+  //                                   AISObjectPtr thePrs,
+  //                                   std::shared_ptr<GeomAPI_ICustomPrs> theCustomPrs);
 
-  /// Modifies the given presentation in the custom way after usual customize is performed.
-  virtual bool afterCustomisePresentation(std::shared_ptr<ModelAPI_Result> theResult,
-                                          AISObjectPtr thePrs,
-                                          GeomCustomPrsPtr theCustomPrs);
+  ///// Modifies the given presentation in the custom way after usual customize is performed.
+  //virtual bool afterCustomisePresentation(std::shared_ptr<ModelAPI_Result> theResult,
+  //                                        AISObjectPtr thePrs,
+  //                                        GeomCustomPrsPtr theCustomPrs);
 
   /// Update the object presentable properties such as color, lines width and other
   /// If the object is result with the color attribute value set, it is used,
@@ -307,8 +307,8 @@ public:
   /// should be updated(e.g. only highlighted elements)
   /// \param theUpdateViewer the parameter whether the viewer should be update immediatelly
   /// \returns true if the object is modified
-  virtual bool customizeObject(ObjectPtr theObject, const ModuleBase_CustomizeFlag& theFlag,
-                               const bool theUpdateViewer);
+  virtual bool customizeFeature(ObjectPtr theObject, const ModuleBase_CustomizeFlag& theFlag,
+                                const bool theUpdateViewer);
 
   /// Disable displaying of custom mode
   /// \param theMode a mode to disable
@@ -327,7 +327,12 @@ public:
   /// Create specific for the module presentation
   /// \param theResult an object for presentation
   /// \return created presentation or NULL(default value)
-  virtual Handle(AIS_InteractiveObject) createPresentation(const ObjectPtr& theResult);
+  virtual AISObjectPtr createPresentation(const ObjectPtr& theResult);
+
+  /// Customize presentation according to objects attributes
+  /// \param theObject an object for presentation
+  /// \param thePrs a presentation object
+  virtual void customizePresentation(const ObjectPtr& theObject, const AISObjectPtr& thePrs) const;
 
   //! Returns data object by AIS
   virtual ObjectPtr findPresentedObject(const AISObjectPtr& theAIS) const;

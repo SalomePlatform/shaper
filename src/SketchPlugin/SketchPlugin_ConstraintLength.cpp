@@ -19,6 +19,7 @@
 
 #include "SketchPlugin_ConstraintLength.h"
 #include <SketchPlugin_Line.h>
+#include <SketchPlugin_Tools.h>
 
 #include <GeomDataAPI_Point2D.h>
 
@@ -171,6 +172,8 @@ AISObjectPtr SketchPlugin_ConstraintLength::getAISObject(AISObjectPtr thePreviou
 
   AISObjectPtr anAIS = SketcherPrs_Factory::lengthDimensionConstraint(this,
     sketch(), thePrevious);
+  if (anAIS.get() && !thePrevious.get())
+    SketchPlugin_Tools::setDimensionColor(anAIS);
   return anAIS;
 }
 

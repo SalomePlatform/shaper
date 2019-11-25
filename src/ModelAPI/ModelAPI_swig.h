@@ -24,6 +24,7 @@
 
   #include "ModelAPI.h"
   #include "ModelAPI_Entity.h"
+  #include "ModelAPI_Events.h"
   #include "ModelAPI_Document.h"
   #include "ModelAPI_Session.h"
   #include "ModelAPI_Object.h"

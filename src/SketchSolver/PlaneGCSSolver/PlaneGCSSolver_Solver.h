@@ -79,6 +79,9 @@ public:
   /// \brief Check conflicting/redundant constraints and DoF
   void diagnose(const GCS::Algorithm& theAlgo = GCS::DogLeg);
 
+  /// \brief Return the list of modifiable parameters
+  void getFreeParameters(GCS::VEC_pD& theFreeParams);
+
   /// \brief Degrees of freedom
   int dof();
 
@@ -91,7 +94,7 @@ private:
   void removeFictiveConstraint();
 
 private:
-  typedef std::map<ConstraintID, std::set<GCSConstraintPtr> > ConstraintMap;
+  typedef std::map<ConstraintID, std::list<GCSConstraintPtr> > ConstraintMap;
 
   GCS::VEC_pD                  myParameters;     ///< list of unknowns
   ConstraintMap                myConstraints;    ///< list of constraints

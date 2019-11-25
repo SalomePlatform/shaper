@@ -33,6 +33,7 @@ SET(PROJECT_HEADERS
     GeomAlgoAPI_Prism.h
     GeomAlgoAPI_Revolution.h
     GeomAlgoAPI_Boolean.h
+    GeomAlgoAPI_ThroughAll.h
     GeomAlgoAPI_Rotation.h
     GeomAlgoAPI_Translation.h
     GeomAlgoAPI_MakeShape.h
@@ -81,6 +82,7 @@ SET(PROJECT_HEADERS
     GeomAlgoAPI_Offset.h
     GeomAlgoAPI_SolidClassifier.h
     GeomAlgoAPI_MapShapesAndAncestors.h
+    GeomAlgoAPI_Projection.h
     GeomAlgoAPI_Chamfer.h
 )
 
@@ -94,6 +96,7 @@ SET(PROJECT_SOURCES
     GeomAlgoAPI_Prism.cpp
     GeomAlgoAPI_Revolution.cpp
     GeomAlgoAPI_Boolean.cpp
+    GeomAlgoAPI_ThroughAll.cpp
     GeomAlgoAPI_Rotation.cpp
     GeomAlgoAPI_Translation.cpp
     GeomAlgoAPI_MakeShape.cpp

@@ -75,3 +75,23 @@ bool GeomAPI_Vertex::isEqual(const std::shared_ptr<GeomAPI_Shape> theVert) const
 
   return aPoint1.IsEqual(aPoint2, Precision::Confusion()) == Standard_True;
 }
+
+
+
+bool GeomAPI_Vertex::GeometricComparator::operator()(const GeomVertexPtr& theVertex1,
+                                                     const GeomVertexPtr& theVertex2) const
+{
+  const TopoDS_Vertex& aVertex1 = theVertex1->impl<TopoDS_Vertex>();
+  const TopoDS_Vertex& aVertex2 = theVertex2->impl<TopoDS_Vertex>();
+
+  gp_Pnt aPnt1 = BRep_Tool::Pnt(aVertex1);
+  gp_Pnt aPnt2 = BRep_Tool::Pnt(aVertex2);
+
+  bool isLess = aPnt1.X() + myTolerance < aPnt2.X();
+  if (!isLess && aPnt1.X() <= aPnt2.X() + myTolerance) {
+    isLess = aPnt1.Y() + myTolerance < aPnt2.Y();
+    if (!isLess && aPnt1.Y() <= aPnt2.Y() + myTolerance)
+      isLess = aPnt1.Z() + myTolerance < aPnt2.Z();
+  }
+  return isLess;
+}

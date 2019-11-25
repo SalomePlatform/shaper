@@ -139,6 +139,7 @@ SET(XML_RESOURCES
 
 SET(TEXT_RESOURCES
     FeaturesPlugin_msg_en.ts
+    FeaturesPlugin_msg_fr.ts
     FeaturesPlugin_msg_ru.ts
 )
 
@@ -180,9 +181,11 @@ ADD_UNIT_TESTS(TestExtrusion.py
                TestExtrusionCut_BySize.py
                TestExtrusionCut_ByPlanesAndOffsets.py
                TestExtrusionCut_ByFaces.py
+               TestExtrusionCut_ThroughAll.py
                TestExtrusionFuse.py
                TestExtrusionFuse_BySize.py
                TestExtrusionFuse_ByPlanesAndOffsets.py
+               TestExtrusionFuse_ThroughAll.py
                TestExtrusion_ErrorMsg.py
                TestExtrusion_ZeroOffsetError.py
                TestExtrusion_ByFaces01.py
@@ -212,9 +215,11 @@ ADD_UNIT_TESTS(TestExtrusion.py
                TestRevolutionCut.py
                TestRevolutionCut_ByAngle.py
                TestRevolutionCut_ByPlanesAndOffsets.py
+               TestRevolutionCut_ThroughAll.py
                TestRevolutionFuse.py
                TestRevolutionFuse_ByAngle.py
                TestRevolutionFuse_ByPlanesAndOffsets.py
+               TestRevolutionFuse_ThroughAll.py
                TestCompositeFeaturesOnCompSolids.py
                TestPartition.py
                TestPartition_ErrorMsg.py

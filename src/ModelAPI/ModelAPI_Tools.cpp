@@ -29,6 +29,7 @@
 #include <ModelAPI_ResultPart.h>
 #include <ModelAPI_AttributeDocRef.h>
 #include <ModelAPI_Validator.h>
+#include <ModelAPI_AttributeIntArray.h>
 #include <list>
 #include <map>
 #include <iostream>
@@ -783,5 +784,54 @@ void removeResults(const std::list<ResultPtr>& theResults)
     }
   }
 }
+
+// used by GUI only
+// LCOV_EXCL_START
+double getDeflection(const std::shared_ptr<ModelAPI_Result>& theResult)
+{
+  double aDeflection = -1;
+  // get deflection from the attribute of the result
+  if (theResult.get() != NULL &&
+    theResult->data()->attribute(ModelAPI_Result::DEFLECTION_ID()).get() != NULL) {
+    AttributeDoublePtr aDoubleAttr = theResult->data()->real(ModelAPI_Result::DEFLECTION_ID());
+    if (aDoubleAttr.get() && aDoubleAttr->isInitialized()) {
+      double aValue = aDoubleAttr->value();
+      if (aValue > 0) /// zero value should not be used as a deflection(previous studies)
+        aDeflection = aDoubleAttr->value();
+    }
+  }
+  return aDeflection;
+}
+
+
+void getColor(const std::shared_ptr<ModelAPI_Result>& theResult, std::vector<int>& theColor)
+{
+  theColor.clear();
+  // get color from the attribute of the result
+  if (theResult.get() != NULL &&
+    theResult->data()->attribute(ModelAPI_Result::COLOR_ID()).get() != NULL) {
+    AttributeIntArrayPtr aColorAttr = theResult->data()->intArray(ModelAPI_Result::COLOR_ID());
+    if (aColorAttr.get() && aColorAttr->size()) {
+      theColor.push_back(aColorAttr->value(0));
+      theColor.push_back(aColorAttr->value(1));
+      theColor.push_back(aColorAttr->value(2));
+    }
+  }
+}
+
+double getTransparency(const std::shared_ptr<ModelAPI_Result>& theResult)
+{
+  double aTransparency = -1;
+  // get transparency from the attribute of the result
+  if (theResult.get() != NULL &&
+    theResult->data()->attribute(ModelAPI_Result::TRANSPARENCY_ID()).get() != NULL) {
+    AttributeDoublePtr aDoubleAttr = theResult->data()->real(ModelAPI_Result::TRANSPARENCY_ID());
+    if (aDoubleAttr.get() && aDoubleAttr->isInitialized()) {
+      aTransparency = aDoubleAttr->value();
+    }
+  }
+  return aTransparency;
+}
+// LCOV_EXCL_STOP
 
 } // namespace ModelAPI_Tools

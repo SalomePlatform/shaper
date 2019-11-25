@@ -22,6 +22,7 @@
 #include <SketchPlugin_Arc.h>
 #include <SketchPlugin_Circle.h>
 #include <SketchPlugin_Point.h>
+#include <SketchPlugin_Tools.h>
 
 #include <SketcherPrs_Factory.h>
 #include <SketcherPrs_Tools.h>
@@ -177,6 +178,8 @@ AISObjectPtr SketchPlugin_ConstraintRadius::getAISObject(AISObjectPtr thePreviou
 
   AISObjectPtr anAIS = SketcherPrs_Factory::radiusConstraint(this, sketch(),
                                                              thePrevious);
+  if (anAIS.get() && !thePrevious.get())
+    SketchPlugin_Tools::setDimensionColor(anAIS);
   return anAIS;
 }
 

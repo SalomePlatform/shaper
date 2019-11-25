@@ -48,6 +48,18 @@ void BuildPlugin_Shell::execute()
   ListOfShape aShapes, aContexts;
   getOriginalShapesAndContexts(BASE_OBJECTS_ID(), aShapes, aContexts);
 
+  // Collect sketch faces.
+  for (int anIndex = 0; anIndex < aSelectionList->size(); ++anIndex) {
+    AttributeSelectionPtr aSelection = aSelectionList->value(anIndex);
+    GeomShapePtr aShape = aSelection->value();
+    ResultConstructionPtr aContext =
+        std::dynamic_pointer_cast<ModelAPI_ResultConstruction>(aSelection->context());
+    if (!aShape && aContext) {
+      for (int i = 0; i < aContext->facesNum(); ++i)
+        aShapes.push_back(aContext->face(i));
+    }
+  }
+
   // Sew faces.
   GeomMakeShapePtr aSewingAlgo(new GeomAlgoAPI_Sewing(aShapes));
 

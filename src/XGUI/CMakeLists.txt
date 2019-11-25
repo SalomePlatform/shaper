@@ -36,7 +36,6 @@ SET(PROJECT_HEADERS
     XGUI_ActiveControlSelector.h
     XGUI_ColorDialog.h
     XGUI_ContextMenuMgr.h
-    XGUI_CustomPrs.h
     XGUI_DataModel.h
     XGUI_DeflectionDialog.h
     XGUI_Displayer.h
@@ -104,7 +103,6 @@ SET(PROJECT_SOURCES
     XGUI_ActiveControlMgr.cpp
     XGUI_ColorDialog.cpp
     XGUI_ContextMenuMgr.cpp
-    XGUI_CustomPrs.cpp
     XGUI_DataModel.cpp
     XGUI_DeflectionDialog.cpp
     XGUI_Displayer.cpp
@@ -145,7 +143,7 @@ SET(PREFERENCES_XML
 )
 
 SET(TEXT_RESOURCES
-#    XGUI_msg_fr.ts
+    XGUI_msg_fr.ts
 )
 
 SET(PROJECT_LIBRARIES
@@ -179,14 +177,16 @@ QT_ADD_RESOURCES(PROJECT_COMPILED_RESOURCES ${PROJECT_RESOURCES})
 
 
 IF (${UPDATE_TRANSLATION})
-    SET(PROJECT_FILES ${PROJECT_SOURCES} ${ROJECT_HEADERS} )
+    SET(PROJECT_FILES ${PROJECT_SOURCES} ${PROJECT_HEADERS} )
     QT5_CREATE_TRANSLATION(QM_RESOURCES
                            ${PROJECT_FILES}
                            ${TEXT_RESOURCES}
-                           OPTIONS -extensions cpp -no-recursive
+                           OPTIONS -extensions cpp -no-recursive -locations none
                           )
 ELSE(${UPDATE_TRANSLATION})
-    QT5_ADD_TRANSLATION(QM_RESOURCES ${TEXT_RESOURCES})
+    IF(${MAKE_TRANSLATION})
+        QT5_ADD_TRANSLATION(QM_RESOURCES ${TEXT_RESOURCES})
+    ENDIF(${MAKE_TRANSLATION})
 ENDIF(${UPDATE_TRANSLATION})
 
 

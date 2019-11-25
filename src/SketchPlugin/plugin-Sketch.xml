@@ -35,7 +35,7 @@
                 helpfile="pointFeature.html">
         <sketch-2dpoint_selector id="PointCoordinates" accept_expressions="0" title="Point" tooltip="Point coordinates"
                                  enable_value="enable_by_preferences"/>
-        <boolvalue id="Auxiliary" label="Auxiliary" default="false" tooltip="Construction element" obligatory="0"/>
+        <boolvalue id="Auxiliary" label="Auxiliary" default="false" tooltip="Construction element" obligatory="0" change_visual_attributes="true"/>
       </feature>
 
       <!-- SketchLine -->
@@ -47,7 +47,7 @@
                                  enable_value="enable_by_preferences"/>
         <labelvalue id="LineLength" accept_expressions="0" label="Length" default="computed" icon="icons/Sketch/distance_value.png"
                      tooltip="Line length" obligatory="0" enable_value="false"/>
-        <boolvalue id="Auxiliary" label="Auxiliary" default="false" tooltip="Construction element" obligatory="0"/>
+        <boolvalue id="Auxiliary" label="Auxiliary" default="false" tooltip="Construction element" obligatory="0" change_visual_attributes="true"/>
         <validator id="GeomValidators_Different" parameters="StartPoint,EndPoint"/>
       </feature>
     </group>
@@ -71,7 +71,7 @@
                     accept_expressions="0"
                     enable_value="enable_by_preferences">
         </labelvalue>
-        <boolvalue id="Auxiliary" label="Auxiliary" default="false" tooltip="Construction element" obligatory="0"/>
+        <boolvalue id="Auxiliary" label="Auxiliary" default="false" tooltip="Construction element" obligatory="0" change_visual_attributes="true"/>
       </feature>
       <!-- SketchMacroCircle -->
       <feature id="SketchMacroCircle"
@@ -141,7 +141,8 @@
                    tooltip="Construction element"
                    label="Auxiliary"
                    default="false"
-                   obligatory="0"/>
+                   obligatory="0"
+                   change_visual_attributes="true"/>
       </feature>
 
       <!-- SketchArc -->
@@ -188,7 +189,8 @@
                    label="Auxiliary"
                    tooltip="Construction element"
                    default="false"
-                   obligatory="0"/>
+                   obligatory="0"
+                   change_visual_attributes="true"/>
       </feature>
 
       <!-- SketchMacroArc -->
@@ -313,7 +315,8 @@
                    label="Auxiliary"
                    tooltip="Construction element"
                    default="false"
-                   obligatory="0"/>
+                   obligatory="0"
+                   change_visual_attributes="true"/>
       </feature>
 
       <!--  SketchFillet  -->
@@ -388,7 +391,7 @@
                     accept_expressions="0"
                     enable_value="enable_by_preferences">
         </labelvalue>
-        <boolvalue id="Auxiliary" label="Auxiliary" default="false" tooltip="Construction element" obligatory="0"/>
+        <boolvalue id="Auxiliary" label="Auxiliary" default="false" tooltip="Construction element" obligatory="0" change_visual_attributes="true"/>
       </feature>
       <!-- SketchMacroEllipse -->
       <feature id="SketchMacroEllipse"
@@ -464,7 +467,8 @@
                    tooltip="Construction element"
                    label="Auxiliary"
                    default="false"
-                   obligatory="0"/>
+                   obligatory="0"
+                   change_visual_attributes="true"/>
       </feature>
 
       <!-- SketchEllipticArc is a hidden feature. It is created inside SketchMacroEllipse. -->
@@ -534,7 +538,7 @@
                     accept_expressions="0"
                     enable_value="enable_by_preferences">
         </labelvalue>
-        <boolvalue id="Auxiliary" label="Auxiliary" default="false" tooltip="Construction element" obligatory="0"/>
+        <boolvalue id="Auxiliary" label="Auxiliary" default="false" tooltip="Construction element" obligatory="0" change_visual_attributes="true"/>
       </feature>
       <!-- SketchMacroEllipticArc -->
       <feature id="SketchMacroEllipticArc"
@@ -588,7 +592,8 @@
                    tooltip="Construction element"
                    label="Auxiliary"
                    default="false"
-                   obligatory="0"/>
+                   obligatory="0"
+                   change_visual_attributes="true"/>
       </feature>
     </group>
 
@@ -645,7 +650,8 @@
               use_sketch_plane="false">
           <validator id="SketchPlugin_ProjectionValidator"/>
         </sketch_shape_selector>
-        <boolvalue id="IncludeToResult" label="Include into the sketch result" default="true" tooltip="Include projected feature into the sketch result"/>
+        <boolvalue id="IncludeToResult" label="Include into the sketch result" default="true" tooltip="Include projected feature into the sketch result"
+                   change_visual_attributes="true"/>
         <validator id="PartSet_ProjectionSelection"/>
       </feature>
 
@@ -666,7 +672,8 @@
               use_sketch_plane="false">
           <validator id="SketchPlugin_IntersectionValidator"/>
         </sketch_shape_selector>
-        <boolvalue id="IncludeToResult" label="Include into the sketch result" default="true" tooltip="Include projected feature into the sketch result"/>
+        <boolvalue id="IncludeToResult" label="Include into the sketch result" default="true" tooltip="Include projected feature into the sketch result"
+                   change_visual_attributes="true"/>
         <validator id="PartSet_IntersectionSelection"/>
       </feature>
     </group>

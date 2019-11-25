@@ -171,6 +171,10 @@ SketchPlugin_Plugin::SketchPlugin_Plugin()
                                    "Sketch fully constrained color",
                                    Config_Prop::Color, SKETCH_FULLY_CONSTRAINED_COLOR);
 
+  Config_PropManager::registerProp("Visualization", "sketch_line_width",
+                                   "Sketch line width",
+                                   Config_Prop::IntSpin, "3");
+
   // register sketcher properties
 #ifdef SET_PLANES_COLOR_IN_PREFERENCES
   Config_PropManager::registerProp("Visualization", "yz_plane_color", "YZ plane color",

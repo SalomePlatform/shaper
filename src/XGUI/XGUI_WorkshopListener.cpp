@@ -103,6 +103,7 @@ void XGUI_WorkshopListener::initializeEventListening()
   aLoop->registerListener(this, Events_Loop::eventByName(EVENT_OBJECT_UPDATED));
   aLoop->registerListener(this, Events_Loop::eventByName(EVENT_OBJECT_CREATED));
   aLoop->registerListener(this, Events_Loop::eventByName(EVENT_OBJECT_TO_REDISPLAY));
+  aLoop->registerListener(this, Events_Loop::eventByName(EVENT_VISUAL_ATTRIBUTES));
   aLoop->registerListener(this, Events_LongOp::eventID());
   aLoop->registerListener(this, Events_Loop::eventByName(EVENT_PLUGIN_LOADED));
 
@@ -149,8 +150,32 @@ void XGUI_WorkshopListener::processEvent(const std::shared_ptr<Events_Message>& 
   // Redisplay feature
   else if (theMessage->eventID() == Events_Loop::loop()->eventByName(EVENT_OBJECT_TO_REDISPLAY)) {
     std::shared_ptr<ModelAPI_ObjectUpdatedMessage> aUpdMsg =
-        std::dynamic_pointer_cast<ModelAPI_ObjectUpdatedMessage>(theMessage);
+      std::dynamic_pointer_cast<ModelAPI_ObjectUpdatedMessage>(theMessage);
     onFeatureRedisplayMsg(aUpdMsg);
+  }
+  else if (theMessage->eventID() == Events_Loop::loop()->eventByName(EVENT_VISUAL_ATTRIBUTES)) {
+    std::shared_ptr<ModelAPI_ObjectUpdatedMessage> aUpdMsg =
+      std::dynamic_pointer_cast<ModelAPI_ObjectUpdatedMessage>(theMessage);
+    std::set<ObjectPtr> aObjList = aUpdMsg->objects();
+    std::set<ObjectPtr>::const_iterator aIt;
+    std::list<ResultPtr>::const_iterator aResIt;
+    XGUI_Displayer* aDisplayer = workshop()->displayer();
+    AISObjectPtr aAIS;
+    for (aIt = aObjList.begin(); aIt != aObjList.end(); ++aIt) {
+      FeaturePtr aFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(*aIt);
+      if (aFeature) {
+        aAIS = aDisplayer->getAISObject(aFeature);
+        if (aAIS.get())
+          workshop()->module()->customizePresentation(aFeature, aAIS);
+
+        std::list<ResultPtr> aResults = aFeature->results();
+        for (aResIt = aResults.begin(); aResIt != aResults.end(); ++aResIt) {
+          aAIS = aDisplayer->getAISObject(*aResIt);
+          if (aAIS.get())
+            workshop()->module()->customizePresentation(*aResIt, aAIS);
+        }
+      }
+    }
   } else if (theMessage->eventID() == Events_Loop::eventByName(EVENT_EMPTY_AIS_PRESENTATION)) {
     std::shared_ptr<ModelAPI_ObjectUpdatedMessage> aUpdMsg =
         std::dynamic_pointer_cast<ModelAPI_ObjectUpdatedMessage>(theMessage);
@@ -354,7 +379,7 @@ void XGUI_WorkshopListener::
   //if (aHiddenObjects.size() > 0)
   //  myWorkshop->module()->processHiddenObject(aHiddenObjects);
 
-  bool isCustomized = customizeCurrentObject(anObjects, aRedisplayed);
+  bool isCustomized = customizeFeature(anObjects, aRedisplayed);
   if (aRedisplayed || isCustomized) {
     Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_EMPTY_AIS_PRESENTATION));
 
@@ -423,7 +448,7 @@ void XGUI_WorkshopListener::
     }
   }
 
-  bool isCustomized = customizeCurrentObject(anObjects, aDisplayed);
+  bool isCustomized = customizeFeature(anObjects, aDisplayed);
 
   //if (myObjectBrowser)
   //  myObjectBrowser->processEvent(theMsg);
@@ -501,7 +526,7 @@ bool XGUI_WorkshopListener::displayObject(ObjectPtr theObj)
   return aDisplayer->display(theObj, false);
 }
 
-bool XGUI_WorkshopListener::customizeCurrentObject(const std::set<ObjectPtr>& theObjects,
+bool XGUI_WorkshopListener::customizeFeature(const std::set<ObjectPtr>& theObjects,
                                                    bool theForceRedisplay)
 {
   XGUI_OperationMgr* anOperationMgr = workshop()->operationMgr();
@@ -521,11 +546,11 @@ bool XGUI_WorkshopListener::customizeCurrentObject(const std::set<ObjectPtr>& th
     // the feature is hidden, but arguments of the feature are modified
     // e.g. extrusion is hidden(h=0) but sketch is chosen
     if (theForceRedisplay || theObjects.find(aCurrentFeature) != theObjects.end()) {
-      aCustomized = myWorkshop->module()->customizeObject(aCurrentFeature,
+      aCustomized = myWorkshop->module()->customizeFeature(aCurrentFeature,
                                  ModuleBase_IModule::CustomizeArguments, false) || aCustomized;
-      aCustomized = myWorkshop->module()->customizeObject(aCurrentFeature,
+      aCustomized = myWorkshop->module()->customizeFeature(aCurrentFeature,
                                    ModuleBase_IModule::CustomizeResults, false) || aCustomized;
-      aCustomized = myWorkshop->module()->customizeObject(aCurrentFeature,
+      aCustomized = myWorkshop->module()->customizeFeature(aCurrentFeature,
                         ModuleBase_IModule::CustomizeHighlightedObjects, false) || aCustomized;
     }
   }

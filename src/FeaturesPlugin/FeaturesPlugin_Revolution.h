@@ -49,6 +49,13 @@ public:
   }
 
   /// Attribute name for creation method.
+  inline static const std::string& CREATION_METHOD_THROUGH_ALL()
+  {
+    static const std::string MY_CREATION_METHOD_ID("ThroughAll");
+    return MY_CREATION_METHOD_ID;
+  }
+
+  /// Attribute name for creation method.
   inline static const std::string& CREATION_METHOD_BY_ANGLES()
   {
     static const std::string MY_CREATION_METHOD_ID("ByAngles");

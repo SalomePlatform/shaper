@@ -43,7 +43,7 @@
  * \ingroup Plugins
  * \brief Feature for creation of the new part in PartSet.
  */
-class SketchPlugin_Sketch : public ModelAPI_CompositeFeature, public GeomAPI_ICustomPrs
+class SketchPlugin_Sketch : public ModelAPI_CompositeFeature//, public GeomAPI_ICustomPrs
 {
  public:
   /// Sketch feature kind
@@ -257,18 +257,18 @@ class SketchPlugin_Sketch : public ModelAPI_CompositeFeature, public GeomAPI_ICu
   static std::shared_ptr<GeomAPI_Ax3> plane(SketchPlugin_Sketch* theSketch);
 
   /// Customize presentation of the feature
-  virtual bool customisePresentation(ResultPtr theResult, AISObjectPtr thePrs,
-                                     std::shared_ptr<GeomAPI_ICustomPrs> theDefaultPrs)
-  {
-    bool isCustomized = false;
-    // apply the color of the result to the presentation
-    if (theDefaultPrs.get())
-      isCustomized = theDefaultPrs->customisePresentation(theResult, thePrs, theDefaultPrs);
-    // set the sketch presentation bold
-    isCustomized = thePrs->setWidth(2) || isCustomized;
+  //virtual bool customisePresentation(ResultPtr theResult, AISObjectPtr thePrs,
+  //                                   std::shared_ptr<GeomAPI_ICustomPrs> theDefaultPrs)
+  //{
+  //  bool isCustomized = false;
+  //  // apply the color of the result to the presentation
+  //  if (theDefaultPrs.get())
+  //    isCustomized = theDefaultPrs->customisePresentation(theResult, thePrs, theDefaultPrs);
+  //  // set the sketch presentation bold
+  //  isCustomized = thePrs->setWidth(2) || isCustomized;
 
-    return isCustomized;
-  }
+  //  return isCustomized;
+  //}
 
 private:
   /// Substitute all links to external objects by newly created features.

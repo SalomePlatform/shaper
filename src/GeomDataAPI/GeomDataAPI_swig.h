@@ -22,6 +22,7 @@
 
   #include <GeomAPI_swig.h>
   #include <ModelAPI_swig.h>
+  #include <Events_MessageGroup.h>
 
   #include "GeomDataAPI.h"
   #include "GeomDataAPI_Point.h"

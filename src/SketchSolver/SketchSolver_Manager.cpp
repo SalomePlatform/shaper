@@ -114,6 +114,7 @@ SketchSolver_Manager::SketchSolver_Manager()
   ////Events_Loop::loop()->registerListener(this, Events_Loop::eventByName(EVENT_SOLVER_FAILED));
   ////Events_Loop::loop()->registerListener(this, Events_Loop::eventByName(EVENT_SOLVER_REPAIRED));
   Events_Loop::loop()->registerListener(this, Events_Loop::eventByName(EVENT_SKETCH_PREPARED));
+  Events_Loop::loop()->registerListener(this, Events_Loop::eventByName(EVENT_GET_DOF_OBJECTS));
 }
 
 SketchSolver_Manager::~SketchSolver_Manager()
@@ -222,6 +223,35 @@ void SketchSolver_Manager::processEvent(
       }
     }
     myIsComputed = false;
+  }
+  else if (theMessage->eventID() == Events_Loop::loop()->eventByName(EVENT_GET_DOF_OBJECTS)) {
+    std::shared_ptr<ModelAPI_ObjectUpdatedMessage> anUpdateMsg =
+      std::dynamic_pointer_cast<ModelAPI_ObjectUpdatedMessage>(theMessage);
+    std::set<ObjectPtr> aObjects = anUpdateMsg->objects();
+    if (aObjects.size() == 1) {
+      std::set<ObjectPtr>::const_iterator aIt;
+      for (aIt = aObjects.cbegin(); aIt != aObjects.cend(); aIt++) {
+        CompositeFeaturePtr aFeature =
+            std::dynamic_pointer_cast<ModelAPI_CompositeFeature>(*aIt);
+        if (aFeature) {
+          SketchGroupPtr aGroup = findGroup(aFeature);
+
+          std::set<ObjectPtr> aFreeFeatures;
+          aGroup->underconstrainedFeatures(aFreeFeatures);
+
+          std::list<ObjectPtr> aFeatures;
+          std::set<ObjectPtr>::const_iterator aIt;
+          for (aIt = aFreeFeatures.cbegin(); aIt != aFreeFeatures.cend(); ++aIt) {
+            aFeatures.push_back(*aIt);
+          }
+
+          // send features to GUI
+          static const Events_ID anEvent = Events_Loop::eventByName(EVENT_DOF_OBJECTS);
+          ModelAPI_EventCreator::get()->sendUpdated(aFeatures, anEvent);
+          Events_Loop::loop()->flush(anEvent);
+        }
+      }
+    }
   }
 
   // resolve constraints if needed
@@ -352,7 +382,7 @@ bool SketchSolver_Manager::moveAttribute(
 //  Purpose:  search groups of entities interacting with given feature
 // ============================================================================
 SketchGroupPtr SketchSolver_Manager::findGroup(
-    std::shared_ptr<SketchPlugin_Feature> theFeature)
+  std::shared_ptr<SketchPlugin_Feature> theFeature)
 {
   if (!isFeatureValid(theFeature))
     return SketchGroupPtr(); // do not process wrong features
@@ -368,17 +398,21 @@ SketchGroupPtr SketchSolver_Manager::findGroup(
       break;
     }
   }
+  return findGroup(aSketch);
+}
 
-  if (!aSketch)
+SketchGroupPtr SketchSolver_Manager::findGroup(CompositeFeaturePtr theSketch)
+{
+  if (!theSketch)
     return SketchGroupPtr(); // not a sketch's feature
 
   std::list<SketchGroupPtr>::const_iterator aGroupIt;
   for (aGroupIt = myGroups.begin(); aGroupIt != myGroups.end(); ++aGroupIt)
-    if ((*aGroupIt)->getWorkplane() == aSketch)
+    if ((*aGroupIt)->getWorkplane() == theSketch)
       return *aGroupIt;
 
   // group for the sketch does not created yet
-  SketchGroupPtr aNewGroup = SketchGroupPtr(new SketchSolver_Group(aSketch));
+  SketchGroupPtr aNewGroup = SketchGroupPtr(new SketchSolver_Group(theSketch));
   myGroups.push_back(aNewGroup);
   return aNewGroup;
 }

@@ -134,7 +134,20 @@ public:
   FEATURESAPI_EXPORT
   explicit FeaturesAPI_ExtrusionCut(const std::shared_ptr<ModelAPI_Feature>& theFeature,
                                     const std::list<ModelHighAPI_Selection>& theBaseObjects,
+                                    const std::list<ModelHighAPI_Selection>& theBooleanObjects);
+
+  /// Constructor with values.
+  FEATURESAPI_EXPORT
+  explicit FeaturesAPI_ExtrusionCut(const std::shared_ptr<ModelAPI_Feature>& theFeature,
+                                    const std::list<ModelHighAPI_Selection>& theBaseObjects,
                                     const ModelHighAPI_Double& theSize,
+                                    const std::list<ModelHighAPI_Selection>& theBooleanObjects);
+
+  /// Constructor with values.
+  FEATURESAPI_EXPORT
+  explicit FeaturesAPI_ExtrusionCut(const std::shared_ptr<ModelAPI_Feature>& theFeature,
+                                    const std::list<ModelHighAPI_Selection>& theBaseObjects,
+                                    const ModelHighAPI_Selection& theDirection,
                                     const std::list<ModelHighAPI_Selection>& theBooleanObjects);
 
   /// Constructor with values.
@@ -192,7 +205,22 @@ typedef std::shared_ptr<FeaturesAPI_ExtrusionCut> ExtrusionCutPtr;
 FEATURESAPI_EXPORT
 ExtrusionCutPtr addExtrusionCut(const std::shared_ptr<ModelAPI_Document>& thePart,
                                 const std::list<ModelHighAPI_Selection>& theBaseObjects,
+                                const std::list<ModelHighAPI_Selection>& theBooleanObjects);
+
+/// \ingroup CPPHighAPI
+/// \brief Create ExtrusionCut feature.
+FEATURESAPI_EXPORT
+ExtrusionCutPtr addExtrusionCut(const std::shared_ptr<ModelAPI_Document>& thePart,
+                                const std::list<ModelHighAPI_Selection>& theBaseObjects,
                                 const ModelHighAPI_Double& theSize,
+                                const std::list<ModelHighAPI_Selection>& theBooleanObjects);
+
+/// \ingroup CPPHighAPI
+/// \brief Create ExtrusionCut feature.
+FEATURESAPI_EXPORT
+ExtrusionCutPtr addExtrusionCut(const std::shared_ptr<ModelAPI_Document>& thePart,
+                                const std::list<ModelHighAPI_Selection>& theBaseObjects,
+                                const ModelHighAPI_Selection& theDirection,
                                 const std::list<ModelHighAPI_Selection>& theBooleanObjects);
 
 /// \ingroup CPPHighAPI
@@ -263,7 +291,20 @@ public:
   FEATURESAPI_EXPORT
   explicit FeaturesAPI_ExtrusionFuse(const std::shared_ptr<ModelAPI_Feature>& theFeature,
                                      const std::list<ModelHighAPI_Selection>& theBaseObjects,
+                                     const std::list<ModelHighAPI_Selection>& theBooleanObjects);
+
+  /// Constructor with values.
+  FEATURESAPI_EXPORT
+  explicit FeaturesAPI_ExtrusionFuse(const std::shared_ptr<ModelAPI_Feature>& theFeature,
+                                     const std::list<ModelHighAPI_Selection>& theBaseObjects,
                                      const ModelHighAPI_Double& theSize,
+                                     const std::list<ModelHighAPI_Selection>& theBooleanObjects);
+
+  /// Constructor with values.
+  FEATURESAPI_EXPORT
+  explicit FeaturesAPI_ExtrusionFuse(const std::shared_ptr<ModelAPI_Feature>& theFeature,
+                                     const std::list<ModelHighAPI_Selection>& theBaseObjects,
+                                     const ModelHighAPI_Selection& theDirection,
                                      const std::list<ModelHighAPI_Selection>& theBooleanObjects);
 
   /// Constructor with values.
@@ -321,7 +362,22 @@ typedef std::shared_ptr<FeaturesAPI_ExtrusionFuse> ExtrusionFusePtr;
 FEATURESAPI_EXPORT
 ExtrusionFusePtr addExtrusionFuse(const std::shared_ptr<ModelAPI_Document>& thePart,
                                   const std::list<ModelHighAPI_Selection>& theBaseObjects,
+                                  const std::list<ModelHighAPI_Selection>& theBooleanObjects);
+
+/// \ingroup CPPHighAPI
+/// \brief Create ExtrusionFuse feature.
+FEATURESAPI_EXPORT
+ExtrusionFusePtr addExtrusionFuse(const std::shared_ptr<ModelAPI_Document>& thePart,
+                                  const std::list<ModelHighAPI_Selection>& theBaseObjects,
                                   const ModelHighAPI_Double& theSize,
+                                  const std::list<ModelHighAPI_Selection>& theBooleanObjects);
+
+/// \ingroup CPPHighAPI
+/// \brief Create ExtrusionFuse feature.
+FEATURESAPI_EXPORT
+ExtrusionFusePtr addExtrusionFuse(const std::shared_ptr<ModelAPI_Document>& thePart,
+                                  const std::list<ModelHighAPI_Selection>& theBaseObjects,
+                                  const ModelHighAPI_Selection& theDirection,
                                   const std::list<ModelHighAPI_Selection>& theBooleanObjects);
 
 /// \ingroup CPPHighAPI
