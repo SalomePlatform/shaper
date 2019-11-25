@@ -665,6 +665,8 @@ void XGUI_Displayer::setSelectionColor(const std::vector<int>& theColor)
                            theColor[1] / 255.,
                            theColor[2] / 255., Quantity_TOC_RGB);
     aContext->SelectionStyle()->SetColor(aQColor);
+    aContext->SelectionStyle()->PointAspect()->SetColor(aQColor);
+    aContext->SelectionStyle()->LineAspect()->SetColor(aQColor);
     aContext->HighlightStyle(Prs3d_TypeOfHighlight_LocalSelected)->SetColor(aQColor);
   }
 }

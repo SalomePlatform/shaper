@@ -479,6 +479,9 @@ private:
   /// Returns operation manager
   XGUI_OperationMgr* operationMgr() const;
 
+  std::vector<int> colorOfObject(const ObjectPtr& theObject,
+    const FeaturePtr& aFeature, bool isConstruction) const;
+
 private:
   PartSet_Module* myModule;
   PartSet_PreviewSketchPlane* mySketchPlane; // display/erase sketch plane on start/stop sketch

@@ -75,6 +75,7 @@ void Model_AttributeIntArray::setValue(const int theIndex,
                                        bool sendUpdated)
 {
   if (myArray->Value(theIndex) != theValue) {
+    setInitialized();
     myArray->SetValue(theIndex, theValue);
     if (sendUpdated)
       owner()->data()->sendAttributeUpdated(this);

@@ -2190,51 +2190,45 @@ bool isIncludeToResult(const ObjectPtr& theObject)
   return true;
 }
 
+//**************************************************************************************
+std::vector<int> PartSet_SketcherMgr::colorOfObject(const ObjectPtr& theObject,
+  const FeaturePtr& theFeature, bool isConstruction) const
+{
+  static const QStringList& aConstrIds = constraintsIdList();
+  PartSet_OverconstraintListener* aOCListener = myModule->overconstraintListener();
+  std::string aKind = theFeature->getKind();
 
+  if (isDistanceKind(aKind)) {
+    if (aOCListener->isConflictingObject(theObject))
+      return Config_PropManager::color("Visualization", "sketch_overconstraint_color");
+    return Config_PropManager::color("Visualization", "sketch_dimension_color");
+  }
+  if (isExternal(theFeature))
+    return Config_PropManager::color("Visualization", "sketch_external_color");
+  if (isConstruction)
+    return Config_PropManager::color("Visualization", "sketch_auxiliary_color");
+
+  if (aOCListener->isFullyConstrained()) {
+    return Config_PropManager::color("Visualization", "sketch_fully_constrained_color");
+  }
+  else if (aOCListener->isConflictingObject(theObject)) {
+    return Config_PropManager::color("Visualization", "sketch_overconstraint_color");
+  }
+  return Config_PropManager::color("Visualization", "sketch_entity_color");
+}
+
+//**************************************************************************************
 void PartSet_SketcherMgr::customizeSketchPresentation(const ObjectPtr& theObject,
   const AISObjectPtr& thePrs) const
 {
   FeaturePtr aFeature = ModelAPI_Feature::feature(theObject);
-  PartSet_OverconstraintListener* aOCListener = myModule->overconstraintListener();
-
-  // Check constraints objects
-  const QStringList& aConstrIds = constraintsIdList();
-  std::string aKind = aFeature->getKind();
-  if (aConstrIds.contains(QString(aKind.c_str()))) {
-    std::vector<int> aColor;
-    if (aOCListener->isConflictingObject(theObject))
-      aColor = Config_PropManager::color("Visualization", "sketch_overconstraint_color");
-    else if (isDistanceKind(aKind))
-      aColor = Config_PropManager::color("Visualization", "sketch_dimension_color");
-
-    if (!aColor.empty())
-      thePrs->setColor(aColor[0], aColor[1], aColor[2]);
-    return;
-  }
-  int aShapeType = thePrs->getShapeType();
-  // a compound is processed like the edge because the
-  // arc feature uses the compound for presentable AIS
-  if (aShapeType != 6/*an edge*/ && aShapeType != 7/*a vertex*/ && aShapeType != 0/*compound*/)
-    return;
 
   // set color from preferences
   std::shared_ptr<ModelAPI_AttributeBoolean> anAuxiliaryAttr =
     aFeature->data()->boolean(SketchPlugin_SketchEntity::AUXILIARY_ID());
   bool isConstruction = anAuxiliaryAttr.get() != NULL && anAuxiliaryAttr->value();
 
-  std::vector<int> aColor;
-  if (aOCListener->isFullyConstrained())
-    aColor = Config_PropManager::color("Visualization", "sketch_fully_constrained_color");
-  else if (aOCListener->isConflictingObject(theObject))
-    aColor = Config_PropManager::color("Visualization", "sketch_overconstraint_color");
-  else {
-    if (isConstruction)
-      aColor = Config_PropManager::color("Visualization", "sketch_auxiliary_color");
-    else if (isExternal(aFeature))
-      aColor = Config_PropManager::color("Visualization", "sketch_external_color");
-    else
-      aColor = Config_PropManager::color("Visualization", "sketch_entity_color");
-  }
+  std::vector<int> aColor = colorOfObject(theObject, aFeature, isConstruction);
   if (!aColor.empty()) {
     // The code below causes redisplay again
     if (ModelAPI_Session::get()->isOperation()) {
@@ -2248,6 +2242,20 @@ void PartSet_SketcherMgr::customizeSketchPresentation(const ObjectPtr& theObject
     }
     thePrs->setColor(aColor[0], aColor[1], aColor[2]);
   }
+
+  int aShapeType = thePrs->getShapeType();
+  // a compound is processed like the edge because the
+  // arc feature uses the compound for presentable AIS
+  if (aShapeType != 6/*an edge*/ && aShapeType != 7/*a vertex*/ && aShapeType != 0/*compound*/)
+    return;
+
+  if (isExternal(aFeature)) {
+    thePrs->setWidth(1);
+    return;
+  }
+  std::string aKind = aFeature->getKind();
+  if (isDistanceKind(aKind))
+    return;
 
   if (aShapeType == 6 || aShapeType == 0) { // if this is an edge or a compound
     if (isConstruction) {
