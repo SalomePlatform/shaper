@@ -22,17 +22,21 @@
 
 #include "XGUI.h"
 
+#include <ModelAPI_Feature.h>
+
 #include <QDockWidget>
 
 #include <memory>
 
-class XGUI_SelectionMgr;
+class XGUI_Workshop;
 class QLineEdit;
 class QTableWidget;
 class QLabel;
 class QTextBrowser;
 class QVBoxLayout;
 class QResizeEvent;
+class QStackedWidget;
+class QGridLayout;
 
 class TopoDS_Shape;
 
@@ -50,6 +54,7 @@ class GeomAPI_Cylinder;
 class GeomAPI_Cone;
 class GeomAPI_Torus;
 class GeomAPI_Box;
+class ModuleBase_PageWidget;
 
 /// Internal name of property panel widget
 const static char* INSPECTION_PANEL = "inspection_panel_dock";
@@ -78,11 +83,13 @@ public:
   /// Constructor
   /// \param theParent is a parent of the property panel
   /// \param theMgr operation manager
-  XGUI_InspectionPanel(QWidget* theParent, XGUI_SelectionMgr* theMgr);
+  XGUI_InspectionPanel(QWidget* theParent, XGUI_Workshop* theWorkshop);
 
   // Destructor
   virtual ~XGUI_InspectionPanel();
 
+protected:
+  virtual void showEvent(QShowEvent* theEvent);
 
 private slots:
   /// A slot to react on selection changed
@@ -172,20 +179,27 @@ private:
   /// \param theBox the box
   void setRotatedBoxType(const QString& theTitle, const std::shared_ptr<GeomAPI_Box>& theBox);
 
-
   /// Set text into parameters area
   /// \param theText the text
   void setParamsText(const QString& theText);
 
-private:
-  XGUI_SelectionMgr* mySelectionMgr; //> selection manager
+  /// Fills Feature panel with controls specific to the given feature
+  /// \param theFeature the selected feature
+  void buildFeaturePane(const FeaturePtr& theFeature);
 
-  QLineEdit* myNameEdt; //> Name field
-  QTableWidget* mySubShapesTab; //> table of sub-shapes
-  QLabel* myTypeLbl; //> label of a type
-  QTextBrowser* myTypeParams; //> parameters area
-  QVBoxLayout* myMainLayout; //> main layout
-  //QWidget* myMainWidget;  //> main widget
+private:
+  XGUI_Workshop* myWorkshop; //> selection manager
+
+  QLineEdit* myNameEdt; ///> Name field
+  QTableWidget* mySubShapesTab; ///> table of sub-shapes
+  QLabel* myTypeLbl; ///> label of a type
+  QTextBrowser* myTypeParams; ///> parameters area
+  QVBoxLayout* myMainLayout; ///> main layout
+  ModuleBase_PageWidget* myFeaturePane; ///> Content of feature property panel
+  QGridLayout* myFeatureLayout; ///> Layout of feature panel
+  QStackedWidget* myStackWgt; ///> base widget of the panel
+  int myShapePanelId;
+  int myFeaturePanelId;
 };
 
 #endif

@@ -37,6 +37,8 @@ ModuleBase_WidgetLabel::ModuleBase_WidgetLabel(QWidget* theParent,
 : ModuleBase_ModelWidget(theParent, theData)
 {
   QString aText = translate(theData->getProperty("title"));
+  bool aIsHtml = theData->getBooleanAttribute(ATTR_HTML_STYLE, false);
+
   QString aLabelIcon = QString::fromStdString(theData->getProperty("icon"));
   myLabel = new QLabel(aText, theParent);
   if (!aLabelIcon.isEmpty()) {
@@ -48,13 +50,15 @@ ModuleBase_WidgetLabel::ModuleBase_WidgetLabel(QWidget* theParent,
   myLabel->setWordWrap(true);
   myLabel->setIndent(5);
   myLabel->setContentsMargins(0,0,0,4);
+  if (aIsHtml)
+    myLabel->setTextFormat(Qt::RichText);
 
   QVBoxLayout* aLayout = new QVBoxLayout(this);
   ModuleBase_Tools::zeroMargins(aLayout);
   aLayout->addWidget(myLabel);
   setLayout(aLayout);
 
-  std::string aStyleSheet = theData->getProperty(ATTR_STYLE_SHEET).c_str();
+  std::string aStyleSheet = theData->getProperty(ATTR_STYLE_SHEET);
   if (!aStyleSheet.empty())
     myLabel->setStyleSheet(QString("QLabel {%1}").arg(aStyleSheet.c_str()));
 }

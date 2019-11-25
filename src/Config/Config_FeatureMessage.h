@@ -55,6 +55,8 @@ class Config_FeatureMessage : public Events_Message
   bool myModal;     ///<True if the feature has to be represented by modal dialog box
   bool myIsAutoPreview; ///< Preview computation is performed automatically
   bool myIsTitleInToolbar; ///< False if title should not be displayed in the toolbar
+  bool myHideFacesPanel; ///< Show or Hide HideFaces panel. By default is False
+  bool myAbortConfirmation; ///< Ask confirmation of abort of the feature from user
 
   /// True if the feature can have Apply/Continue button in its property panel
   bool myIsApplyContinue;
@@ -120,6 +122,9 @@ class Config_FeatureMessage : public Events_Message
   CONFIG_EXPORT bool isAutoPreview() const;
   /// If true - title should normally be displayed in the toolbar
   CONFIG_EXPORT bool isTitleInToolbar() const;
+  /// If true - then HideFaces panel has to be shown
+  CONFIG_EXPORT bool isHideFacesPanel() const;
+  CONFIG_EXPORT bool isAbortConfirmation() const;
 
   ///Set feature's Id
   CONFIG_EXPORT void setId(const std::string& id);
@@ -157,6 +162,10 @@ class Config_FeatureMessage : public Events_Message
   CONFIG_EXPORT void setModal(bool isModal);
   ///Set flag to display title in toolbar
   CONFIG_EXPORT void setTitleInToolbar(bool theValue);
+  ///Set flag to display title in toolbar
+  CONFIG_EXPORT void setHideFacesPanel(bool theValue);
+  ///Set flag to display title in toolbar
+  CONFIG_EXPORT void setAbortConfirmation(bool theValue);
   ///Set Apply/Continue state;
   ///If true - the feature can have Apply/Continue button in its property panel
   CONFIG_EXPORT void setApplyContinue(bool isModal);

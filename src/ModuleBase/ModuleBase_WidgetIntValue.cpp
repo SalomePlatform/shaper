@@ -230,3 +230,18 @@ bool ModuleBase_WidgetIntValue::processEnter()
   }
   return isModified;
 }
+
+bool ModuleBase_WidgetIntValue::isModified() const
+{
+  QString aText = mySpinBox->text();
+  if (aText.isEmpty())
+    return false;
+
+  if (myHasDefault) {
+    bool aOk = false;
+    int aVal = aText.toInt(&aOk);
+    if (!aOk || aVal == myDefVal)
+      return false;
+  }
+  return true;
+}

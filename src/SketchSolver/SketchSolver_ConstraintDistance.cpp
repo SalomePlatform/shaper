@@ -25,6 +25,7 @@
 #include <PlaneGCSSolver_PointWrapper.h>
 #include <PlaneGCSSolver_Storage.h>
 #include <PlaneGCSSolver_Tools.h>
+#include <PlaneGCSSolver_UpdateCoincidence.h>
 
 #include <SketchPlugin_ConstraintDistanceHorizontal.h>
 #include <SketchPlugin_ConstraintDistanceVertical.h>
@@ -71,6 +72,86 @@ static void adjustOddPoint(const EntityWrapperPtr& theDistPoint,
   *(theOddPoint->y) = aProjectedPnt->y();
 }
 
+static FeaturePtr getFeature(AttributeRefAttrPtr theRefAttr)
+{
+  ObjectPtr anObj;
+  if (theRefAttr->isObject())
+    anObj = theRefAttr->object();
+  else
+    anObj = theRefAttr->attr()->owner();
+  return ModelAPI_Feature::feature(anObj);
+}
+
+static void calculateDistanceDirection(const ConstraintPtr& theConstraint,
+                                       const StoragePtr& theStorage,
+                                       double& theDirX, double& theDirY)
+{
+  std::shared_ptr<GeomDataAPI_Dir> aDistDir = std::dynamic_pointer_cast<GeomDataAPI_Dir>(
+      theConstraint->attribute(SketchPlugin_ConstraintDistance::DIRECTION_ID()));
+  if (aDistDir && aDistDir->isInitialized()) {
+    theDirX = aDistDir->x();
+    theDirY = aDistDir->y();
+    if (fabs(theDirX) > tolerance || fabs(theDirY) > tolerance)
+      return;
+  }
+
+  AttributeRefAttrPtr aRefAttrA = theConstraint->refattr(SketchPlugin_Constraint::ENTITY_A());
+  AttributeRefAttrPtr aRefAttrB = theConstraint->refattr(SketchPlugin_Constraint::ENTITY_B());
+
+  EntityWrapperPtr aEntityA = theStorage->entity(aRefAttrA);
+  EntityWrapperPtr aEntityB = theStorage->entity(aRefAttrB);
+
+  GCSPointPtr aPoint;
+  if (aEntityA->type() != ENTITY_LINE && aEntityB->type() != ENTITY_LINE) {
+    aPoint = std::dynamic_pointer_cast<PlaneGCSSolver_PointWrapper>(aEntityA)->point();
+    theDirX = 1.0;
+    theDirY = 0.0;
+
+    EdgeWrapperPtr anEdgeA = std::dynamic_pointer_cast<PlaneGCSSolver_EdgeWrapper>(
+        theStorage->entity(getFeature(aRefAttrA)));
+    EdgeWrapperPtr anEdgeB = std::dynamic_pointer_cast<PlaneGCSSolver_EdgeWrapper>(
+        theStorage->entity(getFeature(aRefAttrB)));
+
+    if (anEdgeA && anEdgeB) {
+      GCS::DeriVector2 aDirA = anEdgeA->entity()->CalculateNormal(*aPoint);
+      GCS::DeriVector2 aDirB = anEdgeB->entity()->CalculateNormal(*aPoint);
+      double x = -aDirA.x + aDirB.x;
+      double y = -aDirA.y + aDirB.y;
+      double norm = sqrt(x*x + y*y);
+      if (norm > tolerance) {
+        theDirX = x / norm;
+        theDirY = y / norm;
+      }
+    }
+  }
+}
+
+static void moveEntity(const ConstraintPtr& theConstraint,
+                       const StoragePtr& theStorage,
+                       const double theDX, const double theDY)
+{
+  static const double THE_SHIFT = 1.e-4;
+
+  AttributeRefAttrPtr aRefAttrA = theConstraint->refattr(SketchPlugin_Constraint::ENTITY_A());
+  AttributeRefAttrPtr aRefAttrB = theConstraint->refattr(SketchPlugin_Constraint::ENTITY_B());
+
+  EntityWrapperPtr aEntityA = theStorage->entity(aRefAttrA);
+  EntityWrapperPtr aEntityB = theStorage->entity(aRefAttrB);
+
+  PointWrapperPtr aPointA = std::dynamic_pointer_cast<PlaneGCSSolver_PointWrapper>(aEntityA);
+  PointWrapperPtr aPointB = std::dynamic_pointer_cast<PlaneGCSSolver_PointWrapper>(aEntityB);
+
+  if (aPointA) {
+    *aPointA->point()->x -= THE_SHIFT * theDX;
+    *aPointA->point()->y -= THE_SHIFT * theDY;
+  }
+  else if (aPointB) {
+    *aPointB->point()->x += THE_SHIFT * theDX;
+    *aPointB->point()->y += THE_SHIFT * theDY;
+  }
+}
+
+
 
 void SketchSolver_ConstraintDistance::getAttributes(
     EntityWrapperPtr& theValue,
@@ -82,21 +163,30 @@ void SketchSolver_ConstraintDistance::getAttributes(
     return;
   }
 
+  ScalarWrapperPtr aValue = std::dynamic_pointer_cast<PlaneGCSSolver_ScalarWrapper>(theValue);
+  bool isCoincidence = fabs(aValue->value()) < tolerance;
+
   if (theAttributes[1]) {
     if (myBaseConstraint->getKind() == SketchPlugin_ConstraintDistanceHorizontal::ID())
       myType = CONSTRAINT_HORIZONTAL_DISTANCE;
     else if (myBaseConstraint->getKind() == SketchPlugin_ConstraintDistanceVertical::ID())
       myType = CONSTRAINT_VERTICAL_DISTANCE;
     else
-      myType = CONSTRAINT_PT_PT_DISTANCE;
+      myType = isCoincidence ? CONSTRAINT_PT_PT_COINCIDENT : CONSTRAINT_PT_PT_DISTANCE;
   } else if (theAttributes[2] && theAttributes[2]->type() == ENTITY_LINE)
-    myType = CONSTRAINT_PT_LINE_DISTANCE;
+    myType = isCoincidence ? CONSTRAINT_PT_ON_CURVE : CONSTRAINT_PT_LINE_DISTANCE;
   else
     theAttributes.clear();
 
+  if (myType == CONSTRAINT_HORIZONTAL_DISTANCE || myType == CONSTRAINT_VERTICAL_DISTANCE)
+    mySignValue = aValue->value() < 0.0 ? -1.0 : 1.0;
+
   myPrevValue = 0.0;
 
-  myStorage->subscribeUpdates(this, PlaneGCSSolver_UpdateFeature::GROUP());
+  if (isCoincidence)
+    myStorage->subscribeUpdates(this, PlaneGCSSolver_UpdateCoincidence::GROUP());
+  else
+    myStorage->subscribeUpdates(this, PlaneGCSSolver_UpdateFeature::GROUP());
 }
 
 void SketchSolver_ConstraintDistance::adjustConstraint()
@@ -127,7 +217,41 @@ void SketchSolver_ConstraintDistance::update()
   ConstraintWrapperPtr aConstraint = myStorage->constraint(myBaseConstraint);
   myPrevValue = aConstraint->value();
 
-  SketchSolver_Constraint::update();
+  bool isDistanceAlognDir =
+    myBaseConstraint->getKind() == SketchPlugin_ConstraintDistanceHorizontal::ID() ||
+    myBaseConstraint->getKind() == SketchPlugin_ConstraintDistanceVertical::ID();
+
+  AttributeDoublePtr aCurValue = myBaseConstraint->real(SketchPlugin_Constraint::VALUE());
+  bool isZeroSwitch = fabs(myPrevValue) < tolerance && fabs(aCurValue->value()) > tolerance;
+  bool isNonZeroSwitch = fabs(myPrevValue) > tolerance && fabs(aCurValue->value()) < tolerance;
+
+  if (!isDistanceAlognDir && (isZeroSwitch || isNonZeroSwitch)) {
+    // the value is changed from non-zero to zero or vice versa
+    remove();
+    process();
+
+    // move entities to avoid conflicting constraints
+    if (isZeroSwitch) {
+      double aDirX, aDirY;
+      // calculate the direction basing on the distanced objects
+      calculateDistanceDirection(myBaseConstraint, myStorage, aDirX, aDirY);
+      moveEntity(myBaseConstraint, myStorage, aDirX, aDirY);
+
+      if (myOddPoint) {
+        removeConstraintsKeepingSign();
+        addConstraintsToKeepSign();
+      }
+    }
+  }
+  else {
+    SketchSolver_Constraint::update();
+    if (isDistanceAlognDir && mySignValue * aConstraint->value() < 0.0) {
+      if (isZeroSwitch)
+        aConstraint->setValue(-aConstraint->value());
+      else
+        mySignValue *= -1.0;
+    }
+  }
 }
 
 bool SketchSolver_ConstraintDistance::remove()

@@ -118,6 +118,10 @@ public:
   /// \param theIndices an output container for indices
   void getSelectedIndices(std::set<int>& theIndices);
 
+  /// Selects items with indices
+  /// \param theIndices indices
+  void selectIndices(const std::set<int>& theIndices);
+
   /// Removes selected items from the list widget
   void removeSelectedItems();
 

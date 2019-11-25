@@ -44,7 +44,7 @@ SketchConstraintDistanceHorizontal_1.feature().real("ConstraintValue").setText(D
 model.do()
 
 # changing the parameter
-for param in range(-30, 31, 2):
+for param in range(-31, 30, 2):
     if param == 0:
         continue
     DistanceParam.setValue(param)
@@ -68,7 +68,7 @@ SketchConstraintDistanceVertical_1.feature().real("ConstraintValue").setText(Dis
 model.do()
 
 # changing the parameter
-for param in range(-30, 31, 2):
+for param in range(-31, 30, 2):
     if param == 0:
         continue
     DistanceParam.setValue(param)
@@ -94,8 +94,10 @@ model.do()
 for param in range(-30, 31, 2):
     DistanceParam.setValue(param)
     model.do()
-    if param <= 0:
+    if param < 0:
         assert SketchConstraintDistance_1.feature().error() != '', "ERROR: Sketch should not be valid due to negative distance value"
+    elif param == 0: # constraint is valid, but lead to degenerated geometry
+        assert Sketch_1.feature().error() != '', "ERROR: Sketch should not be valid due to negative distance value"
     else:
         dist = model.distancePointPoint(firstPoint, secondPoint)
         assert math.fabs(dist - math.fabs(param)) < TOLERANCE, "Incorrect distance {}, expected {}".format(dist, math.fabs(param))

@@ -125,6 +125,7 @@ void Model_AttributeReference::reinit()
   myIsInitialized = myLab.FindAttribute(TDF_Reference::GetID(), myRef) == Standard_True;
   if (!myIsInitialized) {
     myRef = TDF_Reference::Set(myLab, myLab);  // not initialized references to itself
+    myIsInitialized = true;
   } else {
     if (owner()) {
       std::shared_ptr<Model_Document> aDoc =

@@ -35,7 +35,6 @@
 
 #include <ModuleBase_ISelection.h>
 #include <ModuleBase_Operation.h>
-#include <ModuleBase_OperationAction.h>
 #include <ModuleBase_OperationFeature.h>
 #include <ModuleBase_ViewerPrs.h>
 #include <ModuleBase_Tools.h>
@@ -313,8 +312,8 @@ void PartSet_MenuMgr::onLineDetach(QAction* theAction)
     XGUI_Workshop* aWorkshop = aConnector->workshop();
     ModuleBase_Operation* anOperation = myModule->workshop()->currentOperation();
 
-    ModuleBase_OperationAction* anOpAction = new ModuleBase_OperationAction(
-                                   tr("Detach %1").arg(aLine->data()->name().c_str()), myModule);
+    ModuleBase_Operation* anOpAction =
+      new ModuleBase_Operation(tr("Detach %1").arg(aLine->data()->name().c_str()), myModule);
     bool isSketchOp = PartSet_SketcherMgr::isSketchOperation(anOperation);
     XGUI_OperationMgr* anOpMgr = aConnector->workshop()->operationMgr();
     // the active nested sketch operation should be aborted unconditionally
@@ -373,11 +372,11 @@ void PartSet_MenuMgr::setAuxiliary(const bool isChecked)
 
   QAction* anAction = action("AUXILIARY_CMD");
   //SessionPtr aMgr = ModelAPI_Session::get();
-  ModuleBase_OperationAction* anOpAction = 0;
+  ModuleBase_Operation* anOpAction = 0;
   XGUI_ModuleConnector* aConnector = dynamic_cast<XGUI_ModuleConnector*>(myModule->workshop());
   XGUI_OperationMgr* anOpMgr = aConnector->workshop()->operationMgr();
   if (isUseTransaction) {
-    anOpAction = new ModuleBase_OperationAction(anAction->text(), myModule);
+    anOpAction = new ModuleBase_Operation(anAction->text(), myModule);
     bool isSketchOp = PartSet_SketcherMgr::isSketchOperation(anOperation);
 
     bool isCommitted;

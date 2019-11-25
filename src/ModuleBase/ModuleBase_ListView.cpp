@@ -78,6 +78,19 @@ void ModuleBase_ListView::getSelectedIndices(std::set<int>& theIndices)
 }
 
 //********************************************************************
+void  ModuleBase_ListView::selectIndices(const std::set<int>& theIndices)
+{
+  myListControl->clearSelection();
+  for (int i = 0; i < myListControl->count(); i++) {
+    QListWidgetItem* anItem = myListControl->item(i);
+    int aId = anItem->data(ATTRIBUTE_SELECTION_INDEX_ROLE).toInt();
+    if (theIndices.find(aId) != theIndices.end()) {
+      anItem->setSelected(true);
+    }
+  }
+}
+
+//********************************************************************
 void ModuleBase_ListView::removeSelectedItems()
 {
   QList<QListWidgetItem*> aItems = myListControl->selectedItems();

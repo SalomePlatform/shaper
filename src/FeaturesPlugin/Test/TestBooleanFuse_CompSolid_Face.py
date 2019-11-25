@@ -60,6 +60,12 @@ model.testNbSubShapes(Fuse_1, GeomAPI_Shape.VERTEX, [32])
 model.testResultsVolumes(Fuse_1, [785.398163397447774514148477465])
 
 Fuse_2 = model.addFuse(Part_1_doc, [model.selection("SOLID", "Extrusion_1_1_3"), model.selection("SOLID", "Extrusion_1_1_1")], [model.selection("FACE", "Fuse_1_1_1")])
-assert(Fuse_2.feature().error() != "")
 
+model.testNbResults(Fuse_2, 1)
+model.testNbSubResults(Fuse_2, [2])
+model.testNbSubShapes(Fuse_2, GeomAPI_Shape.SOLID, [2])
+model.testNbSubShapes(Fuse_2, GeomAPI_Shape.FACE, [19])
+model.testNbSubShapes(Fuse_2, GeomAPI_Shape.EDGE, [82])
+model.testNbSubShapes(Fuse_2, GeomAPI_Shape.VERTEX, [164])
+model.testResultsVolumes(Fuse_2, [25803.607097738855372881516814232])
 model.end()

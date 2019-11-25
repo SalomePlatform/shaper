@@ -160,3 +160,8 @@ bool ModuleBase_WidgetLineEdit::processEnter()
   }
   return isModified;
 }
+
+bool ModuleBase_WidgetLineEdit::isModified() const
+{
+  return !myLineEdit->text().isEmpty();
+}

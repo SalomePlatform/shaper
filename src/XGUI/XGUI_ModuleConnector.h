@@ -136,6 +136,15 @@ Q_OBJECT
   //! \param theAIS the object which has to be activated
   virtual void applyCurrentSelectionModes(const AISObjectPtr& theAIS);
 
+  //! Undo last command
+  virtual void undo();
+
+  //! Set enabled state of cancel button in property panel
+  virtual void setCancelEnabled(bool toEnable);
+
+  //! Returns current state of cancel button
+  virtual bool isCancelEnabled() const;
+
 private:
   QObjectPtrList activeObjects(const QObjectPtrList& theObjList) const;
 

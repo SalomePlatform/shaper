@@ -91,17 +91,21 @@ public:
   /// Visual state of the face is controlled by the second parameter
   /// \param theShapes a container of shape objects
   /// \returns true if the presentation is changed, or false (if for example it was hidden)
-  Standard_EXPORT bool setSubShapeHidden(const NCollection_List<TopoDS_Shape>& theShapes);
+  Standard_EXPORT void setSubShapeHidden(const TopoDS_ListOfShape& theShapes);
 
   /// Returns true if parameter shape has been hidden
   /// \param theShape sub-shape of the presentation shape
   /// \return boolean value
   Standard_EXPORT bool isSubShapeHidden(const TopoDS_Shape& theShape);
 
+  /// Returns hidden sub shapes list
+  Standard_EXPORT const TopoDS_ListOfShape& hiddenSubShapes() const
+  { return myHiddenSubShapes; }
+
   /// Returns true if there are no hidden sub shapes or original shape has at least one not hidden
   /// \param theShapesToSkip container of shape to be hidden in the presentation (faces)
   /// \return boolean value
-  Standard_EXPORT bool hasSubShapeVisible(const NCollection_List<TopoDS_Shape>& theShapesToSkip);
+  Standard_EXPORT bool hasSubShapeVisible(const TopoDS_ListOfShape& theShapesToSkip);
 
   /// Set transparency of hidden sub shapes: if value is 1, shapes are entirely hidden
   /// \param theTransparency transparency value
@@ -144,7 +148,7 @@ private:
   /// \param theShape the processed shape
   /// \param theHiddenSubShapes container of shapes to be skipped (faces)
   void collectSubShapes(BRep_Builder& theBuilder, TopoDS_Shape& theCompound,
-    const TopoDS_Shape& theShape, const NCollection_List<TopoDS_Shape>& theHiddenSubShapes);
+    const TopoDS_Shape& theShape, const TopoDS_ListOfShape& theHiddenSubShapes);
 
   void setEdgesDefaultColor();
 
@@ -158,7 +162,8 @@ private:
   bool myIsSubstituted;
 
   /// Container of original Shape sub shape to be hidden and not selectable
-  NCollection_List<TopoDS_Shape> myHiddenSubShapes;
+  TopoDS_ListOfShape myHiddenSubShapes;
+  TopoDS_Compound myVisibleCompound; /// compound of hidden sub shapes
   TopoDS_Compound myHiddenCompound; /// compound of hidden sub shapes
   double myTransparency; ///< transparency of hidden shapes, where 0 - there is no transparency
   Handle(AIS_ColoredDrawer) myHiddenSubShapesDrawer; ///< drawer for hidden sub shapes

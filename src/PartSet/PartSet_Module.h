@@ -105,10 +105,11 @@ public:
   /// If there is found selected attribute, widgets are created and contains
   /// only a widget for the attribute
   /// It is important for Property Panel filling by sketch point attribute
-  /// \param theOperation a started operation
+  /// \param theFeature a feature of the started operation
+  /// \param theXmlRepr an XML representation of the operation
   /// \param theWidgets a list of created widgets
   /// \return boolean result, false by default
-  virtual bool createWidgets(ModuleBase_Operation* theOperation,
+  virtual bool createWidgets(const FeaturePtr& theFeature, const QString& theXmlRepr,
                              QList<ModuleBase_ModelWidget*>& theWidgets) const;
 
   /// Launching of a edit operation on the feature

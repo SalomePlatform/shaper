@@ -377,6 +377,13 @@ public:
   /// Returns scale of active view
   double getViewScale() const;
 
+  /// Set color of selection
+  /// \param theColor R,G,B values of color
+  void setSelectionColor(const std::vector<int>& theColor);
+
+  /// Returns current selection color
+  std::vector<int> selectionColor() const;
+
 signals:
   /// Signal on object display
   /// \param theObject a data object
@@ -463,7 +470,7 @@ private:
   /// Number of blocking of the viewer update. The viewer is updated only if it is zero
   int myViewerBlockedRecursiveCount;
 
-  bool myIsFirstAISContextUse; ///< Flag: first asking of AIS context: trihedron activation
+  mutable void* myContextId;
   mutable bool myNeedUpdate; ///< A flag that update was requested but not done
 };
 

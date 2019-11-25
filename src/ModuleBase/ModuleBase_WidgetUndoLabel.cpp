@@ -17,22 +17,38 @@
 // See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 
-#include "ModuleBase_OperationAction.h"
+#include "ModuleBase_WidgetUndoLabel.h"
+#include "ModuleBase_IWorkshop.h"
 
-ModuleBase_OperationAction::ModuleBase_OperationAction(const QString& theId, QObject* theParent)
- : ModuleBase_Operation(theId, theParent)
+#include <QPushButton>
+#include <QLayout>
+#include <QString>
+#include <QLabel>
+
+ModuleBase_WidgetUndoLabel::ModuleBase_WidgetUndoLabel(QWidget* theParent,
+  ModuleBase_IWorkshop* theWorkshop,
+  const Config_WidgetAPI* theData)
+  : ModuleBase_WidgetLabel(theParent, theData),
+  myWorkshop(theWorkshop)
 {
+  myUndoBtn = new QPushButton(tr("Undo"), this);
+  myUndoBtn->hide();
+  layout()->addWidget(myUndoBtn);
+  connect(myUndoBtn, SIGNAL(clicked(bool)), SLOT(onUndo()));
 }
 
-ModuleBase_OperationAction::~ModuleBase_OperationAction()
+
+bool ModuleBase_WidgetUndoLabel::restoreValueCustom()
 {
+  bool aRes = ModuleBase_WidgetLabel::restoreValueCustom();
+  bool aError = myLabel->text().length() > 0;
+  myUndoBtn->setVisible(aError);
+  myWorkshop->setCancelEnabled(!aError);
+  return aRes;
 }
 
-bool ModuleBase_OperationAction::commit()
-{
-  // the action is supposed to perform a single modification,
-  // so the operation returns modified state
-  setIsModified(true);
 
-  return ModuleBase_Operation::commit();
+void ModuleBase_WidgetUndoLabel::onUndo()
+{
+  myWorkshop->undo();
 }

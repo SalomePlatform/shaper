@@ -303,6 +303,16 @@ Q_OBJECT
   /// By default this slot does nothing
   virtual void onFeatureAccepted() {}
 
+  /// Returns True in case if the widget contains useful information for inspection tool
+  virtual bool isInformative() const { return true; }
+
+  /// If widgets has several panels then this method has to show a page which contains information
+  /// for current feature. By default does nothing
+  virtual void showInformativePage() {}
+
+  /// Returns True if data of its attribute was modified
+  virtual bool isModified() const { return false; }
+
 signals:
   /// The signal about widget values are to be changed
   void beforeValuesChanged();

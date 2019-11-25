@@ -6,6 +6,7 @@
         title="Point"
         tooltip="Create point"
         icon="icons/Construction/point.png"
+        apply_continue="true"
         helpfile="pointFeature.html">
         <source path="point_widget.xml" />
       </feature>

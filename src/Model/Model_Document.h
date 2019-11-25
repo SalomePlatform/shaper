@@ -56,6 +56,17 @@ class Model_Document : public ModelAPI_Document
   MODEL_EXPORT virtual bool load(
     const char* theDirName, const char* theFileName, DocumentPtr theThis);
 
+  //! Loads the OCAF document from the file into the current document.
+  //! All the features are added after the active feature.
+  //! \param theFileName name of the file to import
+  //! \param theImported list of features imported from the file
+  //! \param theCheckBefore verify the document does not contain unappropriate features
+  //!                       (useful for import to PartSet)
+  //! \returns true if file was loaded successfully
+  MODEL_EXPORT virtual bool import(const char* theFileName,
+                                   std::list<std::shared_ptr<ModelAPI_Feature> >& theImported,
+                                   bool theCheckBefore = false);
+
   //! Saves the OCAF document to the file.
   //! \param theDirName directory where the document will be saved
   //! \param theFileName a name of the document file to store
@@ -63,6 +74,12 @@ class Model_Document : public ModelAPI_Document
   //! \returns true if file was stored successfully
   MODEL_EXPORT virtual bool save(
     const char* theDirName, const char* theFileName, std::list<std::string>& theResults);
+
+  //! Export the list of features to the file
+  //! \param theFilename path to save the file
+  //! \param theExportFeatures list of features to export
+  MODEL_EXPORT virtual bool save(const char* theFilename,
+    const std::list<std::shared_ptr<ModelAPI_Feature> >& theExportFeatures) const;
 
   //! Removes document data
   //! \param theForever if it is false, document is just hidden

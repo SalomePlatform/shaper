@@ -33,16 +33,18 @@ class SketchSolver_Error
   /// The value parameter for the constraint
   inline static const std::string& CONSTRAINTS()
   {
-    static const std::string MY_ERROR_VALUE("The constraint is conflicting with others. "
-      "To fix this, you can either undo your operation or remove a conflicting constraint.");
+    static const std::string MY_ERROR_VALUE("<b>The constraint is conflicting with others. "
+      "To fix this, you can either <font color='red'>undo (Ctrl+Z)</font> your operation or "
+      "<font color='red'>remove</font> a conflicting constraint.</b>");
     return MY_ERROR_VALUE;
   }
   /// Cyclic dependency of copied features with their originals
   inline static const std::string& INFINITE_LOOP()
   {
     static const std::string MY_ERROR_VALUE(
-      "There is a circular reference between copied sketch entities and their originals. "
-      "To fix this, you can either undo your operation or remove wrong constraint.");
+      "<b>There is a circular reference between copied sketch entities and their originals. "
+      "To fix this, you can either <font color='red'>undo (Ctrl+Z)</font> your operation or "
+      "<font color='red'>remove</font> wrong constraint.</b>");
     return MY_ERROR_VALUE;
   }
   /// Constraints should use objects instead of features as attributes

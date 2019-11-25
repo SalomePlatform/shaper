@@ -31,11 +31,13 @@ assert(Fuse_1.feature().error() != "")
 Part_1_doc.removeFeature(Fuse_1.feature())
 
 Fuse_1 = model.addFuse(Part_1_doc, [model.selection("SOLID", "Partition_1_1_1"), model.selection("SOLID", "Partition_1_1_2")])
-assert(Fuse_1.feature().error() != "")
+# after merging Union and Fuse features, fusing of solids in the same composolid should work (issue #3062)
+assert(Fuse_1.feature().error() == "")
 Part_1_doc.removeFeature(Fuse_1.feature())
 
 Fuse_1 = model.addFuse(Part_1_doc, [model.selection("SOLID", "Partition_1_1_1")], [model.selection("SOLID", "Partition_1_1_2")])
-assert(Fuse_1.feature().error() != "")
+# after merging Union and Fuse features, fusing of solids in the same composolid should work (issue #3062)
+assert(Fuse_1.feature().error() == "")
 Part_1_doc.removeFeature(Fuse_1.feature())
 model.end()
 

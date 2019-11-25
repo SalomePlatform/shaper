@@ -35,6 +35,7 @@ const static char* PROPERTY_PANEL_ID = "property_panel_id";
 
 // Widgets
 const static char* WDG_INFO = "label";
+const static char* WDG_UNDOLABEL = "undo_label";
 const static char* WDG_DOUBLEVALUE = "doublevalue";
 const static char* WDG_DOUBLEVALUELABEL = "labelvalue";
 const static char* WDG_INTEGERVALUE = "integervalue";
@@ -77,6 +78,8 @@ const static char* GROUP_TOOLBAR = "toolbar";
 const static char* FEATURE_ICON = "icon";
 const static char* FEATURE_TEXT = "title";
 const static char* HELP_FILE = "helpfile";
+const static char* ABORT_CONFIRMATION = "abort_confirmation";
+const static char* HIDEFACES_PANEL = "hidefaces_panel";
 const static char* FEATURE_KEYSEQUENCE = "keysequence";
 const static char* FEATURE_NESTED = "nested";
 const static char* FEATURE_WHEN_NESTED = "when_nested";
@@ -95,6 +98,7 @@ const static char* ATTR_TOOLTIP = FEATURE_TOOLTIP;
 const static char* ATTR_ICON = FEATURE_ICON;
 const static char* ATTR_LABEL = "label";
 const static char* ATTR_STYLE_SHEET = "styleSheet";
+const static char* ATTR_HTML_STYLE = "isHTML";
 const static char* ATTR_DEFAULT = "default";
 const static char* ATTR_INTERNAL = "internal";
 const static char* ATTR_OBLIGATORY = "obligatory";

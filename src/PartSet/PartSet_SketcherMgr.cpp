@@ -225,15 +225,17 @@ void PartSet_SketcherMgr::onEnterViewPort()
   return;
   #endif
 
-  if (canChangeCursor(getCurrentOperation())) {
-    QCursor* aCurrentCursor = QApplication::overrideCursor();
-    if (!aCurrentCursor || aCurrentCursor->shape() != Qt::CrossCursor) {
-      QApplication::setOverrideCursor(QCursor(Qt::CrossCursor));
-#ifdef DEBUG_CURSOR
-      qDebug("onEnterViewPort() : Qt::CrossCursor");
-#endif
-    }
-  }
+  // It is switched off because of
+  // Task #3067: 5.2.2 Drawing in the sketcher: change the mouse cursor arrow
+  //  if (canChangeCursor(getCurrentOperation())) {
+  //    QCursor* aCurrentCursor = QApplication::overrideCursor();
+  //    if (!aCurrentCursor || aCurrentCursor->shape() != Qt::CrossCursor) {
+  //      QApplication::setOverrideCursor(QCursor(Qt::CrossCursor));
+  //#ifdef DEBUG_CURSOR
+  //      qDebug("onEnterViewPort() : Qt::CrossCursor");
+  //#endif
+  //    }
+  //  }
 
   if (!isNestedCreateOperation(getCurrentOperation(), activeSketch()))
     return;
@@ -265,12 +267,12 @@ void PartSet_SketcherMgr::onLeaveViewPort()
   return;
   #endif
 
-  if (canChangeCursor(getCurrentOperation())) {
-    QApplication::restoreOverrideCursor();
-#ifdef DEBUG_CURSOR
-    qDebug("onLeaveViewPort() : None");
-#endif
-  }
+//  if (canChangeCursor(getCurrentOperation())) {
+//    QApplication::restoreOverrideCursor();
+//#ifdef DEBUG_CURSOR
+//    qDebug("onLeaveViewPort() : None");
+//#endif
+//  }
 
   if (!isNestedCreateOperation(getCurrentOperation(), activeSketch()))
     return;
@@ -1198,18 +1200,18 @@ void PartSet_SketcherMgr::stopSketch(ModuleBase_Operation* theOperation)
   workshop()->viewer()->set2dMode(false);
 }
 
-void PartSet_SketcherMgr::startNestedSketch(ModuleBase_Operation* theOperation)
-{
-  if (canChangeCursor(theOperation) && myIsMouseOverWindow) {
-    QCursor* aCurrentCursor = QApplication::overrideCursor();
-    if (!aCurrentCursor || aCurrentCursor->shape() != Qt::CrossCursor) {
-      QApplication::setOverrideCursor(QCursor(Qt::CrossCursor));
-#ifdef DEBUG_CURSOR
-      qDebug("startNestedSketch() : Qt::CrossCursor");
-#endif
-    }
-  }
-}
+//void PartSet_SketcherMgr::startNestedSketch(ModuleBase_Operation* theOperation)
+//{
+//  if (canChangeCursor(theOperation) && myIsMouseOverWindow) {
+//    QCursor* aCurrentCursor = QApplication::overrideCursor();
+//    if (!aCurrentCursor || aCurrentCursor->shape() != Qt::CrossCursor) {
+//      QApplication::setOverrideCursor(QCursor(Qt::CrossCursor));
+//#ifdef DEBUG_CURSOR
+//      qDebug("startNestedSketch() : Qt::CrossCursor");
+//#endif
+//    }
+//  }
+//}
 
 void PartSet_SketcherMgr::stopNestedSketch(ModuleBase_Operation* theOperation)
 {
@@ -1217,7 +1219,7 @@ void PartSet_SketcherMgr::stopNestedSketch(ModuleBase_Operation* theOperation)
   operationMgr()->onValidateOperation();
   // when sketch nested operation is stopped the cursor should be restored unconditionally
   //if (canChangeCursor(theOperation)) {
-    QApplication::restoreOverrideCursor();
+    //QApplication::restoreOverrideCursor();
 #ifdef DEBUG_CURSOR
     qDebug("stopNestedSketch() : None");
 #endif

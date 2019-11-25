@@ -80,10 +80,7 @@ Q_OBJECT
   virtual bool isGranted(QString theId) const;
 
   /// Returns True if data of its feature was modified during operation
-  virtual bool isModified() const { return myIsModified; }
-
-  /// Change the modified state of the operation
-  void setIsModified(const bool theIsModified) { myIsModified = theIsModified;  }
+  virtual bool isModified() const;
 
   /// Returns operations Id from it's description
   QString id() const;
@@ -104,6 +101,10 @@ Q_OBJECT
   void setHelpFileName(QString theName) {
     myHelpFileName = theName;
   }
+
+  void setHideFacesVisible(bool isVisible) { myHideFacesVisibilityState = isVisible; }
+
+  bool isHideFacesVisible() const { return myHideFacesVisibilityState; }
 
 signals:
   /// The operation is started
@@ -209,6 +210,9 @@ private:
   ModuleBase_IPropertyPanel* myPropertyPanel;
 
   QString myHelpFileName;
+
+  /// Visibility state of HideFaces panel before the operation launch
+  bool myHideFacesVisibilityState;
 };
 
 #endif

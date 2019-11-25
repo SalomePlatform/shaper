@@ -91,4 +91,32 @@
       <translation>Attribute %1 is not a string.</translation>
     </message>
   </context>
+
+  <context>
+    <name>Export:ExchangePlugin_ExportPart</name>
+    <message>
+      <source>Cannot save the document.</source>
+      <translation>Cannot save the document.</translation>
+    </message>
+    <message>
+      <source>Selected features cannot be exported from the document.</source>
+      <translation>Selected features cannot be exported from the document.</translation>
+    </message>
+    <message>
+      <source>The selected results were created using external references outside of this Part from features %1. Please, remove these references or select another sub-set of results to be able to export.</source>
+      <translation>The selected results were created using external references outside of this Part from features %1. Please, remove these references or select another sub-set of results to be able to export.</translation>
+    </message>
+    <message>
+      <source>The selected results were created using references to results of Parts %1. Please, remove these references or select another sub-set of results to be able to export.</source>
+      <translation>The selected results were created using references to results of Parts %1. Please, remove these references or select another sub-set of results to be able to export.</translation>
+    </message>
+  </context>
+
+  <context>
+    <name>Import:ExchangePlugin_ImportPart</name>
+    <message>
+      <source>Cannot import the document.</source>
+      <translation>Cannot import the document.</translation>
+    </message>
+  </context>
 </TS>

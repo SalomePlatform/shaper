@@ -53,6 +53,7 @@ SET(PROJECT_HEADERS
     Model_ResultField.h
     Model_ResultGroup.h
     Model_ResultParameter.h
+    Model_Tools.h
     Model_Update.h
     Model_Validator.h
 )
@@ -90,6 +91,7 @@ SET(PROJECT_SOURCES
     Model_ResultField.cpp
     Model_ResultGroup.cpp
     Model_ResultParameter.cpp
+    Model_Tools.cpp
     Model_Update.cpp
     Model_Validator.cpp
 )
@@ -115,6 +117,7 @@ SET(PROJECT_INCLUDES
   ../GeomAlgoAPI
   ../GeomAPI
   ../ModelGeomAlgo
+  ../ConstructionPlugin
   ${OpenCASCADE_INCLUDE_DIR}
 )
 

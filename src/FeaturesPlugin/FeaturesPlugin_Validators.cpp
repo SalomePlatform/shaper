@@ -1742,9 +1742,6 @@ bool FeaturesPlugin_ValidatorBooleanFuseArguments::isValid(
   if (anObjectsNb + aToolsNb < 2) {
     theError = "Not enough arguments for Fuse operation.";
     return false;
-  } else if (isAllInSameCompSolid) {
-    theError = "Operations only between sub-shapes of the same shape not allowed.";
-    return false;
   }
 
   return true;

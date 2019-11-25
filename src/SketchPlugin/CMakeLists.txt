@@ -220,6 +220,9 @@ ADD_UNIT_TESTS(
   TestConstraintDistanceBehavior.py
   TestConstraintDistanceHorizontal.py
   TestConstraintDistanceVertical.py
+  TestConstraintDistanceZero.py
+  TestConstraintDistanceHorizontalZero.py
+  TestConstraintDistanceVerticalZero.py
   TestConstraintEqual.py
   TestConstraintEqualEllipse.py
   TestConstraintFixed.py

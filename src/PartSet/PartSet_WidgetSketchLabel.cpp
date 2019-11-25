@@ -76,9 +76,9 @@
 #include <QCheckBox>
 #include <QGroupBox>
 #include <QPushButton>
-#include <QStackedWidget>
 #include <QLineEdit>
 #include <QDoubleValidator>
+#include <QDialog>
 
 #ifndef DBL_MAX
 #define DBL_MAX 1.7976931348623158e+308
@@ -112,6 +112,23 @@ myIsSelection(false)
   aValidator->setNotation(QDoubleValidator::StandardNotation);
   mySizeOfView->setValidator(aValidator);
   aSizeLayout->addWidget(mySizeOfView);
+
+  myPartSetMessage = new QDialog(this, Qt::ToolTip);
+  myPartSetMessage->setModal(false);
+  myPartSetMessage->setStyleSheet("background-color:lightyellow;");
+  QVBoxLayout* aMsgLay = new QVBoxLayout(myPartSetMessage);
+  QString aMsg = tr("The Sketch is created in PartSet.\n"
+    "It will be necessary to create a Part in order to use this sketch for body creation");
+  aMsgLay->addWidget(new QLabel(aMsg, myPartSetMessage));
+  myPartSetMessage->hide();
+
+  mySizeMessage = new QDialog(mySizeOfView, Qt::ToolTip);
+  mySizeMessage->setModal(false);
+  mySizeMessage->setStyleSheet("background-color:lightyellow;");
+  aMsgLay = new QVBoxLayout(mySizeMessage);
+  aMsg = tr("A size of Sketch view can be defined here.");
+  aMsgLay->addWidget(new QLabel(aMsg, mySizeMessage));
+  mySizeMessage->hide();
 
   QString aText = translate(theData->getProperty("title"));
   QLabel* aLabel = new QLabel(aText, aFirstWgt);
@@ -317,6 +334,10 @@ void PartSet_WidgetSketchLabel::updateByPlaneSelected(const ModuleBase_ViewerPrs
   GeomPlanePtr aPlane = plane();
   if (!aPlane.get())
     return;
+
+  myPartSetMessage->hide();
+  mySizeMessage->hide();
+
   // 1. hide main planes if they have been displayed and display sketch preview plane
   myPreviewPlanes->erasePreviewPlanes(myWorkshop);
 
@@ -555,6 +576,21 @@ void PartSet_WidgetSketchLabel::activateCustom()
   else
     mySizeOfViewWidget->setVisible(false);
 }
+
+void PartSet_WidgetSketchLabel::showEvent(QShowEvent* theEvent)
+{
+  if (mySizeOfViewWidget->isVisible()) {
+    DocumentPtr aDoc = feature()->document();
+    DocumentPtr aModDoc = ModelAPI_Session::get()->moduleDocument();
+    if (aModDoc == aDoc) {
+      myPartSetMessage->move(mapToGlobal(geometry().bottomLeft()));
+      myPartSetMessage->show();
+    }
+    mySizeMessage->move(mySizeOfView->mapToGlobal(mySizeOfView->geometry().center()));
+    mySizeMessage->show();
+  }
+}
+
 
 void PartSet_WidgetSketchLabel::deactivate()
 {

@@ -28,8 +28,8 @@ Plane_4 = model.addPlane(Part_1_doc, model.selection("FACE", "Box_1_1/Left"), 5,
 Plane_5 = model.addPlane(Part_1_doc, model.selection("FACE", "Box_1_1/Front"), 5, True)
 Partition_1_objects = [model.selection("FACE", "Plane_1"), model.selection("FACE", "Plane_2"), model.selection("SOLID", "Box_1_1")]
 Partition_1 = model.addPartition(Part_1_doc, Partition_1_objects)
-Union_1 = model.addUnion(Part_1_doc, [model.selection("SOLID", "Partition_1_1_3"), model.selection("SOLID", "Partition_1_1_1")])
-Union_2 = model.addUnion(Part_1_doc, [model.selection("SOLID", "Union_1_1_2"), model.selection("SOLID", "Union_1_1_1")])
+Union_1 = model.addFuse(Part_1_doc, [model.selection("SOLID", "Partition_1_1_3"), model.selection("SOLID", "Partition_1_1_1")], False, 20190506)
+Union_2 = model.addFuse(Part_1_doc, [model.selection("SOLID", "Fuse_1_1_2"), model.selection("SOLID", "Fuse_1_1_1")], False, 20190506)
 model.do()
 model.end()
 

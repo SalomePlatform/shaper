@@ -259,6 +259,23 @@ public:
   MODELAPI_EXPORT virtual std::shared_ptr<ModelAPI_Feature> nextFeature(
     std::shared_ptr<ModelAPI_Feature> theCurrent, const bool theReverse = false) const = 0;
 
+  /// Loads the OCAF document from the file into the current document.
+  /// All the features are added after the active feature.
+  /// \param theFileName name of the file to import
+  /// \param theImported list of features imported from the file
+  /// \param theCheckBefore verify the document does not contain unappropriate features
+  ///                       (useful for import to PartSet)
+  /// \returns true if file was loaded successfully
+  MODELAPI_EXPORT virtual bool import(const char* theFileName,
+                                      std::list<std::shared_ptr<ModelAPI_Feature> >& theImported,
+                                      bool theCheckBefore = false) = 0;
+
+  /// Export the list of features to the file
+  /// \param theFilename path to save the file
+  /// \param theExportFeatures list of features to export
+  MODELAPI_EXPORT virtual bool save(const char* theFilename,
+    const std::list<std::shared_ptr<ModelAPI_Feature> >& theExportFeatures) const = 0;
+
 protected:
   //! Only for SWIG wrapping it is here
   MODELAPI_EXPORT ModelAPI_Document();

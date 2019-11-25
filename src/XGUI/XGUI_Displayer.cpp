@@ -121,7 +121,7 @@ QString qIntListInfo(const QIntList& theValues, const QString& theSeparator = QS
 //**************************************************************
 XGUI_Displayer::XGUI_Displayer(XGUI_Workshop* theWorkshop)
 : myWorkshop(theWorkshop), myNeedUpdate(false),
-  myViewerBlockedRecursiveCount(0), myIsFirstAISContextUse(true)
+  myViewerBlockedRecursiveCount(0), myContextId(0)
 {
 }
 
@@ -630,16 +630,19 @@ void XGUI_Displayer::updateViewer() const
 Handle(AIS_InteractiveContext) XGUI_Displayer::AISContext() const
 {
   Handle(AIS_InteractiveContext) aContext = myWorkshop->viewer()->AISContext();
-  if (!aContext.IsNull() && myIsFirstAISContextUse/*&& !aContext->HasOpenedContext()*/) {
-    XGUI_Displayer* aDisplayer = (XGUI_Displayer*)this;
-    aDisplayer->myIsFirstAISContextUse = false;
+  if (!aContext.IsNull() && (myContextId != aContext.get())) {
+    myContextId = aContext.get();
     if (!myWorkshop->selectionActivate()->isTrihedronActive())
       selectionActivate()->deactivateTrihedron(true);
     aContext->DefaultDrawer()->VIsoAspect()->SetNumber(0);
     aContext->DefaultDrawer()->UIsoAspect()->SetNumber(0);
 
-    ModuleBase_IViewer::DefaultHighlightDrawer = aContext->HighlightStyle();
+    //Handle(AIS_Trihedron) aTrihedron = myWorkshop->viewer()->trihedron();
+    //aTrihedron->getHighlightPointAspect()->SetScale(2.0);
+    //aTrihedron->getHighlightPointAspect()->SetTypeOfMarker(Aspect_TOM_O_STAR);
+
     // Commented out according to discussion in bug #2825
+    //ModuleBase_IViewer::DefaultHighlightDrawer = aContext->HighlightStyle();
     //Handle(Prs3d_Drawer) aSelStyle = aContext->SelectionStyle();
     //double aDeflection =
     //  QString(ModelAPI_ResultConstruction::DEFAULT_DEFLECTION().c_str()).toDouble();
@@ -652,6 +655,35 @@ Handle(AIS_InteractiveContext) XGUI_Displayer::AISContext() const
   }
   return aContext;
 }
+
+//**************************************************************
+void XGUI_Displayer::setSelectionColor(const std::vector<int>& theColor)
+{
+  Handle(AIS_InteractiveContext) aContext = AISContext();
+  if (!aContext.IsNull()) {
+    Quantity_Color aQColor(theColor[0] / 255.,
+                           theColor[1] / 255.,
+                           theColor[2] / 255., Quantity_TOC_RGB);
+    aContext->SelectionStyle()->SetColor(aQColor);
+    aContext->HighlightStyle(Prs3d_TypeOfHighlight_LocalSelected)->SetColor(aQColor);
+  }
+}
+
+
+//**************************************************************
+std::vector<int> XGUI_Displayer::selectionColor() const
+{
+  std::vector<int> aColor;
+  Handle(AIS_InteractiveContext) aContext = AISContext();
+  if (!aContext.IsNull()) {
+    Quantity_Color aQColor = aContext->SelectionStyle()->Color();
+    aColor.push_back((int)(aQColor.Red() * 255));
+    aColor.push_back((int)(aQColor.Green() * 255));
+    aColor.push_back((int)(aQColor.Blue() * 255));
+  }
+  return aColor;
+}
+
 
 //**************************************************************
 Handle(SelectMgr_AndFilter) XGUI_Displayer::GetFilter()

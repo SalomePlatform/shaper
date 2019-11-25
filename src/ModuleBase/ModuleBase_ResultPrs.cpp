@@ -145,7 +145,7 @@ void ModuleBase_ResultPrs::setEdgesDefaultColor()
 
 
 //********************************************************************
-bool ModuleBase_ResultPrs::setSubShapeHidden(const NCollection_List<TopoDS_Shape>& theShapes)
+void ModuleBase_ResultPrs::setSubShapeHidden(const TopoDS_ListOfShape& theShapes)
 {
   bool isModified = false;
 
@@ -153,48 +153,16 @@ bool ModuleBase_ResultPrs::setSubShapeHidden(const NCollection_List<TopoDS_Shape
   BRep_Builder aBBuilder;
   aBBuilder.MakeCompound (aCompound);
 
-  TopoDS_Compound aShownComp;
-  if (myIsSubstituted)
-    aShownComp = TopoDS::Compound(Shape());
+  myHiddenSubShapes = theShapes;
+  collectSubShapes(aBBuilder, aCompound, myOriginalShape, myHiddenSubShapes);
+  myVisibleCompound = aCompound;
 
-  // restore hidden shapes if there are not the shapes in parameter container
-  NCollection_List<TopoDS_Shape> aVisibleSubShapes;
-  NCollection_List<TopoDS_Shape>::Iterator aHiddenIt(myHiddenSubShapes);
-  for (; aHiddenIt.More(); aHiddenIt.Next()) {
-    if (!theShapes.Contains(aHiddenIt.Value())) {
-      aVisibleSubShapes.Append(aHiddenIt.Value());
-    }
-    else {
-      aBBuilder.Add(aCompound, aHiddenIt.Value());
-      if (!aShownComp.IsNull())
-        aBBuilder.Remove(aShownComp, aHiddenIt.Value());
-    }
-  }
-  isModified = !aVisibleSubShapes.IsEmpty();
-  NCollection_List<TopoDS_Shape>::Iterator aVisibleIt(aVisibleSubShapes);
-  for (; aVisibleIt.More(); aVisibleIt.Next()) {
-    if (myHiddenSubShapes.Contains(aVisibleIt.Value())) {
-      myHiddenSubShapes.Remove(aVisibleIt.Value());
-      if (!aShownComp.IsNull())
-        aBBuilder.Add(aShownComp, aVisibleIt.Value());
-    }
-  }
-  // append hidden shapes into internal container if there are not these shapes
-  NCollection_List<TopoDS_Shape>::Iterator aShapeIt(theShapes);
-  for (; aShapeIt.More(); aShapeIt.Next()) {
-    if (aShapeIt.Value().ShapeType() != TopAbs_FACE) // only face shape can be hidden
-      continue;
-
-    if (!myHiddenSubShapes.Contains(aShapeIt.Value())) {
-      myHiddenSubShapes.Append(aShapeIt.Value());
-      aBBuilder.Add (aCompound, aShapeIt.Value());
-      if (!aShownComp.IsNull())
-        aBBuilder.Remove(aShownComp, aShapeIt.Value());
-      isModified = true;
-    }
+  aBBuilder.MakeCompound (aCompound);
+  TopoDS_ListOfShape::Iterator aIt(myHiddenSubShapes);
+  for (; aIt.More(); aIt.Next()) {
+    aBBuilder.Add(aCompound, aIt.Value());
   }
   myHiddenCompound = aCompound;
-  return isModified;
 }
 
 //********************************************************************
@@ -204,9 +172,8 @@ bool ModuleBase_ResultPrs::isSubShapeHidden(const TopoDS_Shape& theShape)
     return false;
 
   // orientation of parameter shape(come from selection) may be wrong, check isEqual() to be sure
-  for (NCollection_List<TopoDS_Shape>::Iterator aShapeIt(myHiddenSubShapes); aShapeIt.More();
-    aShapeIt.Next())
-  {
+  TopoDS_ListOfShape::Iterator aShapeIt(myHiddenSubShapes);
+  for (; aShapeIt.More(); aShapeIt.Next()) {
     if (theShape.IsSame(aShapeIt.Value()))
       return true;
   }
@@ -216,14 +183,15 @@ bool ModuleBase_ResultPrs::isSubShapeHidden(const TopoDS_Shape& theShape)
 
 //********************************************************************
 bool ModuleBase_ResultPrs::hasSubShapeVisible(
-  const NCollection_List<TopoDS_Shape>& theShapesToSkip)
+  const TopoDS_ListOfShape& theShapesToSkip)
 {
   TopoDS_Compound aCompound;
   BRep_Builder aBuilder;
   aBuilder.MakeCompound (aCompound);
-  NCollection_List<TopoDS_Shape> aShapesToSkip;
-  aShapesToSkip.Append(myHiddenSubShapes);
-  for (NCollection_List<TopoDS_Shape>::Iterator anIt(theShapesToSkip); anIt.More(); anIt.Next())
+  TopoDS_ListOfShape aShapesToSkip;
+  TopoDS_ListOfShape aHiddenCopy(myHiddenSubShapes);
+  aShapesToSkip.Append(aHiddenCopy);
+  for (TopoDS_ListOfShape::Iterator anIt(theShapesToSkip); anIt.More(); anIt.Next())
     aShapesToSkip.Append(anIt.Value());
 
   collectSubShapes(aBuilder, aCompound, myOriginalShape, aShapesToSkip);
@@ -258,17 +226,8 @@ void ModuleBase_ResultPrs::Compute(
       }
     }
     else { // convert shape into SHELL
-      TopoDS_Compound aCompound;
-      if (!myIsSubstituted) {
-        BRep_Builder aBuilder;
-        aBuilder.MakeCompound(aCompound);
-        collectSubShapes(aBuilder, aCompound, myOriginalShape, myHiddenSubShapes);
-      }
-      else {
-        aCompound = TopoDS::Compound(Shape());
-      }
-      bool isEmptyShape = BOPTools_AlgoTools3D::IsEmptyShape(aCompound);
-      Set(aCompound);
+      bool isEmptyShape = BOPTools_AlgoTools3D::IsEmptyShape(myVisibleCompound);
+      Set(myVisibleCompound);
       myIsSubstituted = true;
       if (isEmptyShape)
         aReadyToDisplay = false;
@@ -301,7 +260,7 @@ void ModuleBase_ResultPrs::Compute(
 //********************************************************************
 void ModuleBase_ResultPrs::collectSubShapes(BRep_Builder& theBuilder,
   TopoDS_Shape& theCompound, const TopoDS_Shape& theShape,
-  const NCollection_List<TopoDS_Shape>& theHiddenSubShapes)
+  const TopoDS_ListOfShape& theHiddenSubShapes)
 {
   switch (theShape.ShapeType()) {
     case TopAbs_COMPSOLID:

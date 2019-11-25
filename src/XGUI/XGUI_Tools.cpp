@@ -250,40 +250,42 @@ QString generateName(const ModuleBase_ViewerPrsPtr& thePrs)
   if (aContext.get()) {
     GeomShapePtr aSubShape(new GeomAPI_Shape());
     TopoDS_Shape aShape = ModuleBase_Tools::getSelectedShape(thePrs);
-    aSubShape->setImpl(new TopoDS_Shape(aShape));
-    if (!aSubShape->isEqual(aContext)) {
-      QString aTypeName;
-      switch (aShape.ShapeType()) {
-      case TopAbs_COMPOUND:
-        aTypeName = "compound";
-        break;
-      case TopAbs_COMPSOLID:
-        aTypeName = "compsolid";
-        break;
-      case TopAbs_SOLID:
-        aTypeName = "solid";
-        break;
-      case TopAbs_SHELL:
-        aTypeName = "shell";
-        break;
-      case TopAbs_FACE:
-        aTypeName = "face";
-        break;
-      case TopAbs_WIRE:
-        aTypeName = "wire";
-        break;
-      case TopAbs_EDGE:
-        aTypeName = "edge";
-        break;
-      case TopAbs_VERTEX:
-        aTypeName = "vertex";
-        break;
-      case TopAbs_SHAPE:
-        aTypeName = "shape";
-        break;
+    if (!aShape.IsNull()) {
+      aSubShape->setImpl(new TopoDS_Shape(aShape));
+      if (!aSubShape->isEqual(aContext)) {
+        QString aTypeName;
+        switch (aShape.ShapeType()) {
+        case TopAbs_COMPOUND:
+          aTypeName = "compound";
+          break;
+        case TopAbs_COMPSOLID:
+          aTypeName = "compsolid";
+          break;
+        case TopAbs_SOLID:
+          aTypeName = "solid";
+          break;
+        case TopAbs_SHELL:
+          aTypeName = "shell";
+          break;
+        case TopAbs_FACE:
+          aTypeName = "face";
+          break;
+        case TopAbs_WIRE:
+          aTypeName = "wire";
+          break;
+        case TopAbs_EDGE:
+          aTypeName = "edge";
+          break;
+        case TopAbs_VERTEX:
+          aTypeName = "vertex";
+          break;
+        case TopAbs_SHAPE:
+          aTypeName = "shape";
+          break;
+        }
+        int aId = GeomAlgoAPI_CompoundBuilder::id(aContext, aSubShape);
+        aName += QString("/%1_%2").arg(aTypeName).arg(aId);
       }
-      int aId = GeomAlgoAPI_CompoundBuilder::id(aContext, aSubShape);
-      aName += QString("/%1_%2").arg(aTypeName).arg(aId);
     }
   }
   return aName;

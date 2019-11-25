@@ -66,6 +66,7 @@
 #include <ModelAPI_AttributeDocRef.h>
 #include <ModelAPI_AttributeIntArray.h>
 #include <ModelAPI_AttributeDouble.h>
+#include <ModelAPI_AttributeString.h>
 #include <ModelAPI_Data.h>
 #include <ModelAPI_Events.h>
 #include <ModelAPI_Feature.h>
@@ -86,6 +87,9 @@
 #include <Events_InfoMessage.h>
 #include <Events_LongOp.h>
 
+#include <ExchangePlugin_ExportPart.h>
+#include <ExchangePlugin_ImportPart.h>
+
 #include <GeomAPI_Pnt.h>
 
 #include <ModuleBase_IModule.h>
@@ -98,7 +102,6 @@
 #include <ModuleBase_Tools.h>
 #include <ModuleBase_WidgetFactory.h>
 #include <ModuleBase_OperationFeature.h>
-#include <ModuleBase_OperationAction.h>
 #include <ModuleBase_PagedContainer.h>
 #include <ModuleBase_WidgetValidated.h>
 #include <ModuleBase_ModelWidget.h>
@@ -181,6 +184,8 @@ static QString MyFilter(QObject::tr("CAD Builder files (*.cadbld);;All files (*.
 static QString MyFilter2(QObject::tr("CAD Builder files (*.cadbld)"));
 static QString MyExtension(".cadbld");
 #endif
+
+static QString MyImportPartFilter(QObject::tr("Part files (*.shaperpart);;All files (*.*)"));
 
 
 //******************************************************
@@ -273,6 +278,9 @@ XGUI_Workshop::XGUI_Workshop(XGUI_SalomeConnector* theConnector)
   connect(myEventsListener, SIGNAL(errorOccurred(std::shared_ptr<Events_InfoMessage>)),
           myErrorDlg, SLOT(addError(std::shared_ptr<Events_InfoMessage>)));
 
+  Config_PropManager::registerProp("Visualization", "selection_color", "Selection color",
+    Config_Prop::Color, "255,255,255");
+
   if (ModuleBase_Preferences::resourceMgr()->booleanValue("Viewer", "face-selection", true))
     myViewerSelMode.append(TopAbs_FACE);
   if (ModuleBase_Preferences::resourceMgr()->booleanValue("Viewer", "edge-selection", true))
@@ -329,6 +337,15 @@ void XGUI_Workshop::startApplication()
   // Calling of  loadCustomProps before activating module is required
   // by Config_PropManger to restore user-defined path to plugins
   ModuleBase_Preferences::loadCustomProps();
+  std::vector<int> aColor;
+  try {
+    aColor = Config_PropManager::color("Visualization", "selection_color");
+  }
+  catch (...) {
+  }
+  if (aColor.size() == 3)
+    myDisplayer->setSelectionColor(aColor);
+
   createModule();
 
 #ifndef HAVE_SALOME
@@ -451,6 +468,19 @@ void XGUI_Workshop::initMenu()
                                               QIcon(), QKeySequence(),
                                               false, "MEN_DESK_FILE");
   connect(aAction, SIGNAL(triggered(bool)), this, SLOT(onOpen()));
+  salomeConnector()->addDesktopMenuSeparator("MEN_DESK_FILE");
+
+  aAction = salomeConnector()->addDesktopCommand("EXPORT_PART_CMD", tr("Export part..."),
+                                          tr("Export a part of the current document into a file"),
+                                          QIcon(), QKeySequence(),
+                                          false, "MEN_DESK_FILE");
+  connect(aAction, SIGNAL(triggered(bool)), this, SLOT(onExportPart()));
+
+  aAction = salomeConnector()->addDesktopCommand("IMPORT_PART_CMD", tr("Import part..."),
+                                          tr("Import structure of a part"),
+                                          QIcon(), QKeySequence(),
+                                          false, "MEN_DESK_FILE");
+  connect(aAction, SIGNAL(triggered(bool)), this, SLOT(onImportPart()));
   salomeConnector()->addDesktopMenuSeparator("MEN_DESK_FILE");
 
 #else
@@ -659,12 +689,11 @@ void XGUI_Workshop::fillPropertyPanel(ModuleBase_Operation* theOperation)
   if (!aFOperation)
     return;
 
-  showPanel(myPropertyPanel);
   myPropertyPanel->cleanContent();
 
   QList<ModuleBase_ModelWidget*> aWidgets;
-  if (!module()->createWidgets(theOperation, aWidgets)) {
-    QString aXmlRepr = aFOperation->getDescription()->xmlRepresentation();
+  QString aXmlRepr = aFOperation->getDescription()->xmlRepresentation();
+  if (!module()->createWidgets(aFOperation->feature(), aXmlRepr, aWidgets)) {
     ModuleBase_WidgetFactory aFactory(aXmlRepr.toStdString(), myModuleConnector);
     aFactory.createWidget(myPropertyPanel->contentWidget());
     aWidgets = aFactory.getModelWidgets();
@@ -745,6 +774,10 @@ void XGUI_Workshop::fillPropertyPanel(ModuleBase_Operation* theOperation)
 #endif
 
   myErrorMgr->setPropertyPanel(myPropertyPanel);
+  theOperation->setHideFacesVisible(myFacesPanel->isVisible());
+  if (aFeatureInfo->isHideFacesPanel() && !myFacesPanel->isVisible())
+    myFacesPanel->show();
+  showPanel(myPropertyPanel);
 }
 
 //******************************************************
@@ -826,6 +859,9 @@ void XGUI_Workshop::onOperationStopped(ModuleBase_Operation* theOperation)
     }
   }
   activateObjectsSelection(anObjects);
+
+  if (!theOperation->isHideFacesVisible())
+    myFacesPanel->hide();
 }
 
 //******************************************************
@@ -1035,8 +1071,7 @@ void XGUI_Workshop::onPreferences()
   ModuleBase_Preferences::editPreferences(aModif);
   if (aModif.size() > 0) {
     QString aSection;
-    foreach (ModuleBase_Pref aPref, aModif)
-    {
+    foreach (ModuleBase_Pref aPref, aModif) {
       aSection = aPref.first;
       if (aSection == ModuleBase_Preferences::VIEWER_SECTION) {
         myMainWindow->viewer()->updateFromResources();
@@ -1044,6 +1079,15 @@ void XGUI_Workshop::onPreferences()
         myMainWindow->menuObject()->updateFromResources();
       }
     }
+    std::vector<int> aColor;
+    try {
+      aColor = Config_PropManager::color("Visualization", "selection_color");
+    }
+    catch (...) {
+    }
+    if (aColor.size() == 3)
+      displayer()->setSelectionColor(aColor);
+
     displayer()->redisplayObjects();
   }
 }
@@ -1224,6 +1268,42 @@ void XGUI_Workshop::onWidgetObjectUpdated()
 {
   operationMgr()->onValidateOperation();
   myDisplayer->updateViewer();
+}
+
+//******************************************************
+void XGUI_Workshop::onImportPart()
+{
+  if (!abortAllOperations())
+    return;
+
+  //show file dialog, check if readable and open
+  qreal aRatio = ModuleBase_Tools::currentPixelRatio();
+  // If the ratio is > 1 (HD screen) then QT has a bug in
+  // displaying of system open file dialog (too small)
+  QString aFile = QFileDialog::getOpenFileName(desktop(), tr("Import part"), QString(),
+        MyImportPartFilter, Q_NULLPTR,
+        ((aRatio > 1) ? QFileDialog::DontUseNativeDialog : QFileDialog::Options()));
+  if (!aFile.isNull()) {
+    ModuleBase_OperationFeature* anImportPartOp = dynamic_cast<ModuleBase_OperationFeature*>(
+        module()->createOperation(ExchangePlugin_ImportPart::ID()));
+    if (operationMgr()->startOperation(anImportPartOp)) {
+      // initialize the filename to be imported
+      FeaturePtr aFeature = anImportPartOp->feature();
+      aFeature->string(ExchangePlugin_ImportPart::FILE_PATH_ID())->setValue(aFile.toStdString());
+      ModuleBase_Tools::flushUpdated(aFeature);
+      operationMgr()->commitOperation();
+    }
+  }
+}
+
+//******************************************************
+void XGUI_Workshop::onExportPart()
+{
+  if (abortAllOperations()) {
+    ModuleBase_OperationFeature* anExportPartOp = dynamic_cast<ModuleBase_OperationFeature*>(
+        module()->createOperation(ExchangePlugin_ExportPart::ID()));
+    operationMgr()->startOperation(anExportPartOp);
+  }
 }
 
 //******************************************************
@@ -1426,14 +1506,14 @@ void XGUI_Workshop::createDockWidgets()
 
   hidePanel(myPropertyPanel);  ///<! Invisible by default
 
-  myFacesPanel = new XGUI_FacesPanel(aDesktop, myModuleConnector);
+  myFacesPanel = new XGUI_FacesPanel(aDesktop, this);
   myActiveControlMgr->addSelector(new XGUI_FacesPanelSelector(myFacesPanel));
   myFacesPanel->setAllowedAreas(Qt::LeftDockWidgetArea |
                                 Qt::RightDockWidgetArea |
                                 Qt::BottomDockWidgetArea);
   connect(myFacesPanel, SIGNAL(closed()), myFacesPanel, SLOT(onClosed()));
 
-  myInspectionPanel = new XGUI_InspectionPanel(aDesktop, mySelector);
+  myInspectionPanel = new XGUI_InspectionPanel(aDesktop, this);
   myInspectionPanel->setAllowedAreas(Qt::LeftDockWidgetArea |
     Qt::RightDockWidgetArea);
   aDesktop->addDockWidget(Qt::RightDockWidgetArea, myInspectionPanel);
@@ -1826,7 +1906,7 @@ void XGUI_Workshop::deleteObjects()
   bool aDone = false;
   QString aDescription = contextMenuMgr()->action("DELETE_CMD")->text() + " %1";
   aDescription = aDescription.arg(XGUI_Tools::unionOfObjectNames(anObjects, ", "));
-  ModuleBase_OperationAction* anOpAction = new ModuleBase_OperationAction(aDescription, module());
+  ModuleBase_Operation* anOpAction = new ModuleBase_Operation(aDescription, module());
 
   operationMgr()->startOperation(anOpAction);
 
@@ -1983,7 +2063,7 @@ void XGUI_Workshop::cleanHistory()
     // 1. start operation
     aDescription += "by deleting of " +
       aDescription.arg(XGUI_Tools::unionOfObjectNames(anObjects, ", "));
-    ModuleBase_OperationAction* anOpAction = new ModuleBase_OperationAction(aDescription, module());
+    ModuleBase_Operation* anOpAction = new ModuleBase_Operation(aDescription, module());
     operationMgr()->startOperation(anOpAction);
 
     // WORKAROUND, should be done before each object remove, if it presents in XGUI_DataModel tree

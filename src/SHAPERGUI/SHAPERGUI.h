@@ -277,6 +277,9 @@ private slots:
   QMap<QString, QIntList> myToolbars;
   QMap<QString, QIntList> myDefaultToolbars;
   bool myIsToolbarsModified;
+
+  std::vector<int> myOldSelectionColor;
+  Handle(Graphic3d_AspectMarker3d) myHighlightPointAspect;
 };
 
 #endif

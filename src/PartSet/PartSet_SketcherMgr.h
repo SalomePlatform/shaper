@@ -219,7 +219,7 @@ public:
 
   /// Starts sketch operation, connects to the opeation property panel
   /// \param theOperation a committed operation
-  void startNestedSketch(ModuleBase_Operation* theOperation);
+  //void startNestedSketch(ModuleBase_Operation* theOperation);
 
   /// Stop sketch operation, disconnects from the opeation property panel
   /// \param theOperation a stopped operation

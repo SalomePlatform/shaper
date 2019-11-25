@@ -195,18 +195,6 @@ bool ModuleBase_WidgetDoubleValue::restoreValueCustom()
   std::string aTextRepr = aRef->text();
   if (!aTextRepr.empty()) {
     QString aText = QString::fromStdString(aTextRepr);
-    //if (aText.endsWith('=')) {
-    //  if (!myParameter.get()) {
-    //    QString aName = aText.left(aText.indexOf('=')).trimmed();
-    //    myParameter = ModuleBase_Tools::findParameter(aName);
-    //  }
-    //  /// If myParameter is empty then it was not created because of an error
-    //  if (!myParameter.get())
-    //    return false;
-
-    //  AttributeStringPtr aExprAttr = myParameter->string("expression");
-    //  aText += aExprAttr->value().c_str();
-    //}
     ModuleBase_Tools::setSpinText(mySpinBox, aText);
   }
   else {
@@ -241,4 +229,19 @@ bool ModuleBase_WidgetDoubleValue::processEnter()
     mySpinBox->selectAll();
   }
   return isModified;
+}
+
+bool ModuleBase_WidgetDoubleValue::isModified() const
+{
+  QString aText = mySpinBox->text();
+  if (aText.isEmpty())
+    return false;
+
+  if (myHasDefault) {
+    bool aOk = false;
+    double aVal = aText.toDouble(&aOk);
+    if (!aOk || aVal == myDefaultVal)
+      return false;
+  }
+  return true;
 }

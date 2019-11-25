@@ -94,6 +94,9 @@ Q_OBJECT
   /// \return a control list
   virtual QList<QWidget*> getControls() const;
 
+  /// Returns True if data of its feature was modified during operation
+  virtual bool isModified() const;
+
  protected:
   /// Saves the internal parameters to the given feature
   /// \return True in success

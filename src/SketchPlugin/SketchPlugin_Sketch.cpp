@@ -315,6 +315,7 @@ void SketchPlugin_Sketch::attributeChanged(const std::string& theID) {
           std::shared_ptr<GeomAPI_Dir> aYDir(new GeomAPI_Dir(aNormDir->cross(aTempDir)));
           std::shared_ptr<GeomAPI_Dir> aXDir(new GeomAPI_Dir(aYDir->cross(aNormDir)));
 
+          bool aWasBlocked = data()->blockSendAttributeUpdated(true);
           // update position of the sketch
           std::shared_ptr<GeomDataAPI_Point> anOrigin = std::dynamic_pointer_cast
             <GeomDataAPI_Point>(data()->attribute(SketchPlugin_Sketch::ORIGIN_ID()));
@@ -325,7 +326,7 @@ void SketchPlugin_Sketch::attributeChanged(const std::string& theID) {
           std::shared_ptr<GeomDataAPI_Dir> aDirX = std::dynamic_pointer_cast<GeomDataAPI_Dir>(
             data()->attribute(SketchPlugin_Sketch::DIRX_ID()));
           aDirX->setValue(aXDir);
-          std::shared_ptr<GeomAPI_Dir> aDir = aPlane->direction();
+          data()->blockSendAttributeUpdated(aWasBlocked, true);
         }
       }
     }

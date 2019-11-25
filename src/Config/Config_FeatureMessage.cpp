@@ -40,6 +40,8 @@ Config_FeatureMessage::Config_FeatureMessage(const Events_ID theId, const void* 
   myModal = false;
   myIsTitleInToolbar = true;
   myIsApplyContinue = false;
+  myHideFacesPanel = false;
+  myAbortConfirmation = true;
 }
 
 Config_FeatureMessage::~Config_FeatureMessage()
@@ -237,4 +239,25 @@ void Config_FeatureMessage::setHelpFileName(const std::string& aName)
 void Config_FeatureMessage::setTitleInToolbar(bool theValue)
 {
   myIsTitleInToolbar = theValue;
+}
+
+bool Config_FeatureMessage::isHideFacesPanel() const
+{
+  return myHideFacesPanel;
+}
+
+
+void Config_FeatureMessage::setHideFacesPanel(bool theValue)
+{
+  myHideFacesPanel = theValue;
+}
+
+bool Config_FeatureMessage::isAbortConfirmation() const
+{
+  return myAbortConfirmation;
+}
+
+void Config_FeatureMessage::setAbortConfirmation(bool theValue)
+{
+  myAbortConfirmation = theValue;
 }

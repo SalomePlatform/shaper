@@ -40,6 +40,8 @@
 #include <GeomAPI_Pnt2d.h>
 
 #include <Events_Loop.h>
+#include <Config_WidgetAPI.h>
+#include <Config_Keywords.h>
 
 #include <QTimer>
 
@@ -50,7 +52,8 @@
 ModuleBase_Operation::ModuleBase_Operation(const QString& theId, QObject* theParent)
     : QObject(theParent),
       myIsModified(false),
-      myPropertyPanel(NULL)
+      myPropertyPanel(NULL),
+  myHideFacesVisibilityState(false)
 {
   myDescription = new ModuleBase_OperationDescription(theId);
 }
@@ -175,4 +178,18 @@ void ModuleBase_Operation::setPropertyPanel(ModuleBase_IPropertyPanel* theProp)
 bool ModuleBase_Operation::isGranted(QString theId) const
 {
   return myGrantedIds.contains(theId);
+}
+
+bool  ModuleBase_Operation::isModified() const
+{
+  if (myDescription->hasXmlRepresentation()) {
+    Config_WidgetAPI aWidgetApi(myDescription->xmlRepresentation().toStdString());
+    if (!aWidgetApi.getBooleanAttribute(ABORT_CONFIRMATION, true))
+      return false;
+  }
+  //if (myPropertyPanel)
+  //  return myPropertyPanel->isModified();
+  //return false;
+  // Most of operation causes creation of a feature
+  return true;
 }

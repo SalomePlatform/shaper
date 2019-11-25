@@ -20,6 +20,7 @@
 #include "GeomAlgoAPI_UnifySameDomain.h"
 
 #include <GeomAlgoAPI_CompoundBuilder.h>
+#include <GeomAlgoAPI_DFLoader.h>
 #include <GeomAlgoAPI_ShapeTools.h>
 
 #include <ShapeUpgrade_UnifySameDomain.hxx>
@@ -112,6 +113,10 @@ void GeomAlgoAPI_UnifySameDomain::build(const GeomShapePtr& theShape,
   TopoDS_Shape aResult = aUnifyAlgo->Shape();
   if (aResult.IsNull()) {
     return;
+  }
+  // taske off the compound if it consists of single sub-shape
+  if (aResult.ShapeType() == TopAbs_COMPOUND) {
+    aResult = GeomAlgoAPI_DFLoader::refineResult(aResult);
   }
 
   if (theIsToSimplifyShell && aResult.ShapeType() == TopAbs_SHELL) {

@@ -54,5 +54,5 @@ void PlaneGCSSolver_ConstraintWrapper::setValue(const double& theValue)
 
 double PlaneGCSSolver_ConstraintWrapper::value() const
 {
-  return myValueParam->value();
+  return myValueParam ? myValueParam->value() : 0.0;
 }

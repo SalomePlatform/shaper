@@ -115,6 +115,9 @@ class MODULEBASE_EXPORT ModuleBase_WidgetMultiSelector : public ModuleBase_Widge
   /// The slot is called when user press Ok or OkPlus buttons in the parent property panel
   virtual void onFeatureAccepted();
 
+  /// Returns True if data of its feature was modified during operation
+  virtual bool isModified() const;
+
 public slots:
   /// Slot is called on selection type changed
   void onSelectionTypeChanged();

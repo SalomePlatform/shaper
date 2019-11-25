@@ -322,6 +322,14 @@ bool SHAPERGUI::activateModule(SUIT_Study* theStudy)
     XGUI_Displayer* aDisp = myWorkshop->displayer();
     QObjectPtrList aObjList = aDisp->displayedObjects();
 
+    //if (myHighlightPointAspect.IsNull()) {
+    //  Handle(AIS_Trihedron) aTrihedron = mySelector->viewer()->getTrihedron();
+    //  myHighlightPointAspect =
+    //    new Graphic3d_AspectMarker3d(aTrihedron->getHighlightPointAspect()->Aspect().operator*());
+    //}
+    if (myOldSelectionColor.size() == 0)
+      myOldSelectionColor = aDisp->selectionColor();
+
     AIS_ListOfInteractive aList;
     aContext->DisplayedObjects(aList);
     AIS_ListIteratorOfListOfInteractive aLIt;
@@ -400,6 +408,12 @@ bool SHAPERGUI::deactivateModule(SUIT_Study* theStudy)
   }
   // Delete selector because it has to be redefined on next activation
   if (mySelector) {
+    //if (!myHighlightPointAspect.IsNull()) {
+    //  Handle(AIS_Trihedron) aTrihedron = mySelector->viewer()->getTrihedron();
+    //  aTrihedron->getHighlightPointAspect()->SetAspect(myHighlightPointAspect);
+    //  myHighlightPointAspect.Nullify();
+    //}
+    myWorkshop->displayer()->setSelectionColor(myOldSelectionColor);
     myProxyViewer->setSelector(0);
     delete mySelector;
     mySelector = 0;
@@ -411,6 +425,8 @@ bool SHAPERGUI::deactivateModule(SUIT_Study* theStudy)
   SUIT_ResourceMgr* aResMgr = application()->resourceMgr();
   aResMgr->setValue("Study", "store_positions", myIsStorePositions);
   getApp()->setEditEnabled(myIsEditEnabled);
+
+  myOldSelectionColor.clear();
 
   // Post-processing for LoadScriptId to remove created(if it was created) SALOME Object Browser
   disconnect(getApp()->action(LightApp_Application::UserID+1), SIGNAL(triggered(bool)),
@@ -532,6 +548,12 @@ SHAPERGUI_OCCSelector* SHAPERGUI::createSelector(SUIT_ViewManager* theMgr)
 {
   if (theMgr->getType() == OCCViewer_Viewer::Type()) {
     OCCViewer_Viewer* aViewer = static_cast<OCCViewer_Viewer*>(theMgr->getViewModel());
+
+    //if (myHighlightPointAspect.IsNull()) {
+    //  Handle(AIS_Trihedron) aTrihedron = aViewer->getTrihedron();
+    //  myHighlightPointAspect =
+    //    new Graphic3d_AspectMarker3d(aTrihedron->getHighlightPointAspect()->Aspect().operator*());
+    //}
     SHAPERGUI_OCCSelector* aSelector = new SHAPERGUI_OCCSelector(aViewer,
                                                                  getApp()->selectionMgr());
 #ifdef SALOME_PATCH_FOR_CTRL_WHEEL
@@ -545,6 +567,12 @@ SHAPERGUI_OCCSelector* SHAPERGUI::createSelector(SUIT_ViewManager* theMgr)
       aSel->setEnabled(aSel == aSelector);
     }
     myProxyViewer->setSelector(aSelector);
+
+    if (myOldSelectionColor.size() == 0)
+      myOldSelectionColor = myWorkshop->displayer()->selectionColor();
+
+    std::vector<int> aColor = Config_PropManager::color("Visualization", "selection_color");
+    myWorkshop->displayer()->setSelectionColor(aColor);
     return aSelector;
   }
   return 0;
@@ -856,6 +884,11 @@ void SHAPERGUI::preferencesChanged(const QString& theSection, const QString& the
       pref->retrieve();
   }
   aProp->setValue(aValue);
+
+  if ((theSection == "Visualization") && (theParam == "selection_color")) {
+    std::vector<int> aColor = Config_PropManager::color("Visualization", "selection_color");
+    myWorkshop->displayer()->setSelectionColor(aColor);
+  }
 
   myWorkshop->displayer()->redisplayObjects();
 }

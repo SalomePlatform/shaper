@@ -368,6 +368,8 @@ std::string ModelHighAPI_FeatureStore::dumpAttr(const AttributePtr& theAttr) {
     double aValues[3] = {anAttr->x(), anAttr->y(), anAttr->z()};
     dumpArray(aResult, aValues, 3);
   } else if (aType == GeomDataAPI_Dir::typeId()) {
+    if (theAttr->id() == "DistanceDirection")
+      return "__notcase__";
     AttributeDirPtr anAttr = std::dynamic_pointer_cast<GeomDataAPI_Dir>(theAttr);
     double aValues[3] = {anAttr->x(), anAttr->y(), anAttr->z()};
     dumpArray(aResult, aValues, 3);

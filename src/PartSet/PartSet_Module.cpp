@@ -54,7 +54,6 @@
 #include <SketchPlugin_ConstraintCoincidence.h>
 
 #include <ModuleBase_Operation.h>
-#include <ModuleBase_OperationAction.h>
 #include <ModuleBase_IViewer.h>
 #include <ModuleBase_IViewWindow.h>
 #include <ModuleBase_IPropertyPanel.h>
@@ -249,6 +248,10 @@ PartSet_Module::PartSet_Module(ModuleBase_IWorkshop* theWshop)
   Config_PropManager::registerProp("Visualization", "sketch_dimension_color",
     "Dimension color",
     Config_Prop::Color, SKETCH_DIMENSION_COLOR);
+
+  Config_PropManager::registerProp("Shortcuts", "add_parameter_shortcut",
+    "Add parameter in parameters manager dialog",
+    Config_Prop::Shortcut, "Ctrl+A");
 }
 
 //******************************************************
@@ -451,9 +454,11 @@ void PartSet_Module::updateSketcherOnStart(ModuleBase_Operation* theOperation)
   if (PartSet_SketcherMgr::isSketchOperation(theOperation)) {
     mySketchMgr->startSketch(theOperation);
   }
-  else if (sketchMgr()->isNestedSketchOperation(theOperation)) {
-    mySketchMgr->startNestedSketch(theOperation);
-  }
+  // It is switched off because of
+  // Task #3067: 5.2.2 Drawing in the sketcher: change the mouse cursor arrow
+  //else if (sketchMgr()->isNestedSketchOperation(theOperation)) {
+  //  mySketchMgr->startNestedSketch(theOperation);
+  //}
 }
 
 //******************************************************
@@ -768,16 +773,14 @@ void PartSet_Module::propertyPanelDefined(ModuleBase_Operation* theOperation)
 }
 
 //******************************************************
-bool PartSet_Module::createWidgets(ModuleBase_Operation* theOperation,
+bool PartSet_Module::createWidgets(const FeaturePtr& theFeature, const QString& theXmlRepr,
                                    QList<ModuleBase_ModelWidget*>& theWidgets) const
 {
   bool aProcessed = false;
 
-  ModuleBase_OperationFeature* aFOperation =
-    dynamic_cast<ModuleBase_OperationFeature*>(theOperation);
   XGUI_Workshop* aWorkshop = getWorkshop();
   XGUI_PropertyPanel* aPropertyPanel = aWorkshop->propertyPanel();
-  if (mySketchMgr->activeSketch().get() && aFOperation && aPropertyPanel) {
+  if (mySketchMgr->activeSketch().get() && aPropertyPanel) {
     ModuleBase_ISelection* aSelection = workshop()->selection();
     // click on a point in sketch leads here with the point is highlighted, not yet selected
     QList<ModuleBase_ViewerPrsPtr> aPreselection = aSelection->getHighlighted();
@@ -786,11 +789,10 @@ bool PartSet_Module::createWidgets(ModuleBase_Operation* theOperation,
       ObjectPtr anObject = aSelectedPrs->object();
 
       FeaturePtr aFeature = ModelAPI_Feature::feature(anObject);
-      FeaturePtr anOpFeature = aFOperation->feature();
       GeomShapePtr aShape = aSelectedPrs->shape();
       // click on the digit of dimension constrain comes here
       // with an empty shape, so we need the check
-      if (aFeature == anOpFeature && aShape.get() && !aShape->isNull()) {
+      if (aFeature == theFeature && aShape.get() && !aShape->isNull()) {
         // if feature has only one result and shape of result is equal to selected shape
         // this attribute is not processed. It is a case of Sketch Point.
         if (aFeature->results().size() == 1) {
@@ -802,8 +804,7 @@ bool PartSet_Module::createWidgets(ModuleBase_Operation* theOperation,
         AttributePtr anAttribute = PartSet_Tools::findAttributeBy2dPoint(anObject, aTDShape,
                                                                mySketchMgr->activeSketch());
         if (anAttribute.get()) {
-          QString aXmlRepr = aFOperation->getDescription()->xmlRepresentation();
-          ModuleBase_WidgetFactory aFactory(aXmlRepr.toStdString(), workshop());
+          ModuleBase_WidgetFactory aFactory(theXmlRepr.toStdString(), workshop());
 
           const std::string anAttributeId = anAttribute->id();
           aFactory.createWidget(aPropertyPanel->contentWidget(), anAttributeId);
@@ -987,7 +988,7 @@ bool PartSet_Module::deleteObjects()
 
     // 3. start operation
     QString aDescription = aWorkshop->contextMenuMgr()->action("DELETE_CMD")->text();
-    ModuleBase_OperationAction* anOpAction = new ModuleBase_OperationAction(aDescription, this);
+    ModuleBase_Operation* anOpAction = new ModuleBase_Operation(aDescription, this);
 
     // the active nested sketch operation should be aborted unconditionally
     // the Delete action should be additionally granted for the Sketch operation

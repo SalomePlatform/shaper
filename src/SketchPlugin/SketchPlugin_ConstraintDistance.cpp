@@ -31,6 +31,7 @@
 #include <GeomAPI_Pnt2d.h>
 #include <GeomAPI_XY.h>
 #include <GeomDataAPI_Point2D.h>
+#include <GeomDataAPI_Dir.h>
 
 #include <ModelAPI_AttributeDouble.h>
 #include <ModelAPI_AttributeInteger.h>
@@ -62,6 +63,11 @@ void SketchPlugin_ConstraintDistance::initAttributes()
   data()->addAttribute(SketchPlugin_ConstraintDistance::LOCATION_TYPE_ID(),
                        ModelAPI_AttributeInteger::typeId());
   ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(), LOCATION_TYPE_ID());
+
+  AttributePtr anAttr = data()->addAttribute(SketchPlugin_ConstraintDistance::DIRECTION_ID(),
+                                             GeomDataAPI_Dir::typeId());
+  anAttr->setIsArgument(false);
+  ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(), DIRECTION_ID());
 }
 
 void SketchPlugin_ConstraintDistance::colorConfigInfo(std::string& theSection, std::string& theName,
@@ -101,6 +107,20 @@ AISObjectPtr SketchPlugin_ConstraintDistance::getAISObject(AISObjectPtr thePrevi
   return anAIS;
 }
 
+static std::shared_ptr<GeomAPI_Lin2d> getLine(DataPtr theData, const std::string& theAttrName)
+{
+  FeaturePtr aLineFeature = SketcherPrs_Tools::getFeatureLine(theData, theAttrName);
+  if (!aLineFeature)
+    return GeomLine2dPtr();
+
+  std::shared_ptr<GeomDataAPI_Point2D> aStart = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
+      aLineFeature->attribute(SketchPlugin_Line::START_ID()));
+  std::shared_ptr<GeomDataAPI_Point2D> aEnd = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
+      aLineFeature->attribute(SketchPlugin_Line::END_ID()));
+
+  return GeomLine2dPtr(new GeomAPI_Lin2d(aStart->x(), aStart->y(), aEnd->x(), aEnd->y()));
+}
+
 double SketchPlugin_ConstraintDistance::calculateCurrentDistance()
 {
   double aDistance = -1.;
@@ -112,25 +132,39 @@ double SketchPlugin_ConstraintDistance::calculateCurrentDistance()
   std::shared_ptr<GeomDataAPI_Point2D> aPointB =
       SketcherPrs_Tools::getFeaturePoint(aData, SketchPlugin_Constraint::ENTITY_B(), aPlane);
 
+  GeomPnt2dPtr aGeomPntA, aGeomPntB;
+  GeomLine2dPtr aLine;
   if (aPointA.get() && aPointB.get()) {  // both points
-    aDistance = aPointA->pnt()->distance(aPointB->pnt());
+    aGeomPntA = aPointA->pnt();
+    aGeomPntB = aPointB->pnt();
   } else {
-    FeaturePtr aLineFeature;
-    std::shared_ptr<SketchPlugin_Line> aLine;
     if (!aPointA.get() && aPointB.get()) {  //Line and point
-      aLineFeature = SketcherPrs_Tools::getFeatureLine(aData, SketchPlugin_Constraint::ENTITY_A());
-      aLine = std::dynamic_pointer_cast<SketchPlugin_Line>(aLineFeature);
-      if (aLine.get()) {
-        aDistance = aLine->distanceToPoint(aPointB->pnt());
-      }
+      aLine = getLine(aData, SketchPlugin_Constraint::ENTITY_A());
+      aGeomPntB = aPointB->pnt();
+      aGeomPntA = aLine ? aLine->project(aGeomPntB) : GeomPnt2dPtr();
     } else if (aPointA.get() && !aPointB.get()) {  // Point and line
-      aLineFeature = SketcherPrs_Tools::getFeatureLine(aData, SketchPlugin_Constraint::ENTITY_B());
-      aLine = std::dynamic_pointer_cast<SketchPlugin_Line>(aLineFeature);
-      if (aLine.get()) {
-        aDistance = aLine->distanceToPoint(aPointA->pnt());
-      }
+      aLine = getLine(aData, SketchPlugin_Constraint::ENTITY_B());
+      aGeomPntA = aPointA->pnt();
+      aGeomPntB = aLine ? aLine->project(aGeomPntA) : GeomPnt2dPtr();
     }
   }
+
+  if (aGeomPntA.get() && aGeomPntB.get()) {
+    aDistance = aGeomPntA->distance(aGeomPntB);
+    if (aDistance < tolerance)
+      aDistance = 0.0;
+  }
+
+  // keep the direction between arguments for processing of the zero distance
+  std::shared_ptr<GeomDataAPI_Dir> aPointPointDir =
+      std::dynamic_pointer_cast<GeomDataAPI_Dir>(attribute(DIRECTION_ID()));
+  if (aDistance > tolerance)
+    aPointPointDir->setValue(aGeomPntB->x() - aGeomPntA->x(), aGeomPntB->y() - aGeomPntA->y(), 0.0);
+  else if (aLine) {
+    GeomDir2dPtr aLineDir = aLine->direction();
+    aPointPointDir->setValue(-aLineDir->y(), aLineDir->x(), 0.0);
+  }
+
   return aDistance;
 }
 
@@ -170,7 +204,7 @@ void SketchPlugin_ConstraintDistance::attributeChanged(const std::string& theID)
     if (!aValueAttr->isInitialized()) {
       // only if it is not initialized, try to compute the current value
       double aDistance = calculateCurrentDistance();
-      if (aDistance > 0) { // set as value the length of updated references
+      if (aDistance >= 0) { // set as value the length of updated references
         aValueAttr->setValue(aDistance);
       }
     }
@@ -215,16 +249,16 @@ void SketchPlugin_ConstraintDistance::attributeChanged(const std::string& theID)
     } else
       return;
 
-    if (aEndPnt->distance(aStartPnt) < tolerance)
-      return;
-
     myFlyoutUpdate = true;
-    std::shared_ptr<GeomAPI_Dir2d> aLineDir(new GeomAPI_Dir2d(aEndPnt->decreased(aStartPnt)));
     std::shared_ptr<GeomAPI_XY> aFlyoutDir = aFlyoutPnt->xy()->decreased(aStartPnt);
-
-    double X = aFlyoutDir->dot(aLineDir->xy());
-    double Y = -aFlyoutDir->cross(aLineDir->xy());
-    aFlyoutAttr->setValue(X, Y);
+    if (aEndPnt->distance(aStartPnt) >= tolerance) {
+      std::shared_ptr<GeomAPI_Dir2d> aLineDir(new GeomAPI_Dir2d(aEndPnt->decreased(aStartPnt)));
+      double X = aFlyoutDir->dot(aLineDir->xy());
+      double Y = -aFlyoutDir->cross(aLineDir->xy());
+      aFlyoutAttr->setValue(X, Y);
+    }
+    else
+      aFlyoutAttr->setValue(aFlyoutDir->x(), aFlyoutDir->y());
     myFlyoutUpdate = false;
   }
 }

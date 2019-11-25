@@ -628,8 +628,8 @@ void XGUI_OperationMgr::onOperationStopped()
     }
   }
   if (aResultOp) {
-    bool isModified = aCurrentOperation->isModified();
-    aResultOp->setIsModified(aResultOp->isModified() || isModified);
+    //bool isModified = aCurrentOperation->isModified();
+    //aResultOp->setIsModified(aResultOp->isModified() || isModified);
     resumeOperation(aResultOp);
     onValidateOperation();
   }

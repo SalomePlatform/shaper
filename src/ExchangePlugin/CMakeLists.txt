@@ -27,6 +27,8 @@ INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR}/src/Events
                     ${PROJECT_SOURCE_DIR}/src/GeomAPI
                     ${PROJECT_SOURCE_DIR}/src/GeomAlgoAPI
                     ${PROJECT_SOURCE_DIR}/src/XAO
+                    ${PROJECT_SOURCE_DIR}/src/ConstructionPlugin
+                    ${PROJECT_SOURCE_DIR}/src/PartSetPlugin
 )
 
 SET(PROJECT_HEADERS
@@ -37,6 +39,8 @@ SET(PROJECT_HEADERS
     ExchangePlugin_Validators.h
     ExchangePlugin_Tools.h
     ExchangePlugin_Dump.h
+    ExchangePlugin_ImportPart.h
+    ExchangePlugin_ExportPart.h
 )
 
 SET(PROJECT_SOURCES
@@ -46,6 +50,8 @@ SET(PROJECT_SOURCES
     ExchangePlugin_Validators.cpp
     ExchangePlugin_Tools.cpp
     ExchangePlugin_Dump.cpp
+    ExchangePlugin_ImportPart.cpp
+    ExchangePlugin_ExportPart.cpp
 )
 
 SET(XML_RESOURCES
@@ -79,11 +85,42 @@ INSTALL(FILES ${XML_RESOURCES} DESTINATION ${SHAPER_INSTALL_XML_RESOURCES})
 INSTALL(DIRECTORY icons/ DESTINATION ${SHAPER_INSTALL_XML_RESOURCES}/icons/Exchange)
 INSTALL(FILES ${TEXT_RESOURCES} DESTINATION ${SHAPER_INSTALL_XML_RESOURCES})
 
-ADD_UNIT_TESTS(TestImport.py
-               TestExport.py
-               Test2290.py
-               Test2459.py
-               TestExportToXAOWithFields.py
-               TestExportToXAOWithGroupNotUpdated.py
-               TestExport_FiniteValidator.py
+ADD_UNIT_TESTS(
+  TestImport.py
+  TestExport.py
+  Test2290.py
+  Test2459.py
+  TestExportToXAOWithFields.py
+  TestExportToXAOWithGroupNotUpdated.py
+  TestExport_FiniteValidator.py
+  TestExportPart_Failure_1.py
+  TestExportPart_Failure_2.py
+  TestExportPart_Failure_3.py
+  TestExportPart_FullPartSet.py
+  TestExportPart_FullPart_1.py
+  TestExportPart_FullPart_2.py
+  TestExportPart_PartSet.py
+  TestExportPart_Results_1.py
+  TestExportPart_Results_2.py
+  TestExportPart_Results_3.py
+  TestExportPart_Results_4.py
+  TestExportPart_Results_5.py
+  TestExportPart_Results_6.py
+  TestExportPart_Results_7.py
+  TestExportPart_Results_8.py
+  TestImportPart_AfterCurrent_1.py
+  TestImportPart_AfterCurrent_2.py
+  TestImportPart_AfterLast_1.py
+  TestImportPart_AfterLast_2.py
+  TestImportPart_AfterLast_3.py
+  TestImportPart_AfterLast_4.py
+  TestImportPart_AfterLast_5.py
+  TestImportPart_AfterLast_6.py
+  TestImportPart_Construction_1.py
+  TestImportPart_Construction_2.py
+  TestImportPart_Construction_3.py
+  TestImportPart_Construction_4.py
+  TestImportPart_Multiple.py
+  TestImportPart_ToEmptyPart.py
+  TestImportPart_ToEmptyPartSet.py
 )
