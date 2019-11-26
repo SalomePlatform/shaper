@@ -243,10 +243,10 @@ void PlaneGCSSolver_Solver::diagnose(const GCS::Algorithm& theAlgo)
   myDiagnoseBeforeSolve = false;
 }
 
-void PlaneGCSSolver_Solver::getFreeParameters(GCS::VEC_pD& theFreeParams)
+void PlaneGCSSolver_Solver::getFreeParameters(GCS::SET_pD& theFreeParams)
 {
   if (myConstraints.empty())
-    theFreeParams = myParameters;
+    theFreeParams.insert(myParameters.begin(), myParameters.end());
   else {
     GCS::VEC_pD aParametersCopy = myParameters;
     ConstraintMap aConstraintCopy = myConstraints;
@@ -263,9 +263,76 @@ void PlaneGCSSolver_Solver::getFreeParameters(GCS::VEC_pD& theFreeParams)
     GCS::QRAlgorithm aQRAlgo = myEquationSystem->qrAlgorithm;
     myEquationSystem->qrAlgorithm = GCS::EigenDenseQR;
     diagnose();
-    myEquationSystem->getDependentParams(theFreeParams);
+    GCS::VEC_pD aFreeParams;
+    myEquationSystem->getDependentParams(aFreeParams);
+    theFreeParams.insert(aFreeParams.begin(), aFreeParams.end());
     // revert QR decomposition algorithm
     myEquationSystem->qrAlgorithm = aQRAlgo;
+  }
+
+  if (theFreeParams.empty())
+    return;
+
+  // find all equal parameters too
+  struct EqualParameters
+  {
+    typedef std::map<double*, std::list<GCS::SET_pD>::iterator> MapParamGroup;
+
+    std::list<GCS::SET_pD> myEqualParams;
+    MapParamGroup myGroups;
+
+    void add(double* theParam1, double* theParam2)
+    {
+      MapParamGroup::iterator aFound1 = myGroups.find(theParam1);
+      MapParamGroup::iterator aFound2 = myGroups.find(theParam2);
+
+      if (aFound1 == myGroups.end()) {
+        if (aFound2 == myGroups.end()) {
+          // create new group
+          myEqualParams.push_back(GCS::SET_pD());
+          std::list<GCS::SET_pD>::iterator aGroup = --myEqualParams.end();
+          aGroup->insert(theParam1);
+          aGroup->insert(theParam2);
+          myGroups[theParam1] = aGroup;
+          myGroups[theParam2] = aGroup;
+        }
+        else {
+          // add first parameter to the second group
+          aFound2->second->insert(theParam1);
+          myGroups[theParam1] = aFound2->second;
+        }
+      }
+      else {
+        if (aFound2 == myGroups.end()) {
+          // add second parameter to the first group
+          aFound1->second->insert(theParam2);
+          myGroups[theParam2] = aFound1->second;
+        }
+        else if (aFound1 != aFound2) {
+          // merge two groups
+          GCS::SET_pD aCopy = *(aFound2->second);
+          myEqualParams.erase(aFound2->second);
+          for (GCS::SET_pD::iterator anIt = aCopy.begin(); anIt != aCopy.end(); ++anIt)
+            myGroups[*anIt] = aFound1->second;
+          aFound1->second->insert(aCopy.begin(), aCopy.end());
+        }
+      }
+    }
+  } anEqualParams;
+
+  for (ConstraintMap::iterator anIt = myConstraints.begin(); anIt != myConstraints.end(); ++anIt)
+    for (std::list<GCSConstraintPtr>::iterator aCIt = anIt->second.begin();
+         aCIt != anIt->second.end(); ++aCIt) {
+      if ((*aCIt)->getTypeId() == GCS::Equal)
+        anEqualParams.add((*aCIt)->params()[0], (*aCIt)->params()[1]);
+    }
+
+  GCS::SET_pD aFreeParamsCopy = theFreeParams;
+  for (GCS::SET_pD::iterator anIt = aFreeParamsCopy.begin();
+       anIt != aFreeParamsCopy.end(); ++anIt) {
+    EqualParameters::MapParamGroup::iterator aFound = anEqualParams.myGroups.find(*anIt);
+    if (aFound != anEqualParams.myGroups.end())
+      theFreeParams.insert(aFound->second->begin(), aFound->second->end());
   }
 }
 

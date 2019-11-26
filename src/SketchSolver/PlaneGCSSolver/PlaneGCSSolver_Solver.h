@@ -80,7 +80,7 @@ public:
   void diagnose(const GCS::Algorithm& theAlgo = GCS::DogLeg);
 
   /// \brief Return the list of modifiable parameters
-  void getFreeParameters(GCS::VEC_pD& theFreeParams);
+  void getFreeParameters(GCS::SET_pD& theFreeParams);
 
   /// \brief Degrees of freedom
   int dof();
