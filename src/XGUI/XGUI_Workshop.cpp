@@ -775,7 +775,7 @@ void XGUI_Workshop::fillPropertyPanel(ModuleBase_Operation* theOperation)
 
   myErrorMgr->setPropertyPanel(myPropertyPanel);
   theOperation->setHideFacesVisible(myFacesPanel->isVisible());
-  if (aFeatureInfo->isHideFacesPanel() && !myFacesPanel->isVisible())
+  if (aFeatureInfo.get() && aFeatureInfo->isHideFacesPanel() && !myFacesPanel->isVisible())
     myFacesPanel->show();
   showPanel(myPropertyPanel);
 }
