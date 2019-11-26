@@ -114,7 +114,7 @@ void GeomAlgoAPI_UnifySameDomain::build(const GeomShapePtr& theShape,
   if (aResult.IsNull()) {
     return;
   }
-  // taske off the compound if it consists of single sub-shape
+  // take off the compound if it consists of single sub-shape
   if (aResult.ShapeType() == TopAbs_COMPOUND) {
     aResult = GeomAlgoAPI_DFLoader::refineResult(aResult);
   }

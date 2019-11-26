@@ -10,7 +10,8 @@
   <shape_selector id="path_object"
                   label="Path object:"
                   tooltip="Select an edge or wire for path"
-                  shape_types="edge wire">
+                  shape_types="edge wire"
+                  concealment="true">
     <validator id="FeaturesPlugin_ValidatorPipePath"/>
   </shape_selector>
   <toolbox id="creation_method">
@@ -19,7 +20,8 @@
       <shape_selector id="binormal"
                       label="Bi-Normal:"
                       tooltip="Select an edge for Bi-Normal"
-                      shape_types="edge">
+                      shape_types="edge"
+                      concealment="true">
         <validator id="GeomValidators_ShapeType" parameters="line"/>
       </shape_selector>
     </box>
@@ -27,7 +29,8 @@
       <multi_selector id="locations_objects"
                       label="Locations:"
                       tooltip="Select one or more vertices to specify the locations"
-                      shape_types="vertex">
+                      shape_types="vertex"
+                      concealment="true">
         <validator id="FeaturesPlugin_ValidatorPipeLocations"/>
       </multi_selector>
     </box>
