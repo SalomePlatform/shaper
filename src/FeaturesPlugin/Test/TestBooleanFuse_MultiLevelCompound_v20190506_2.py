@@ -85,7 +85,7 @@ model.end()
 from GeomAPI import GeomAPI_Shape
 
 model.testNbResults(Fuse_1, 1)
-model.testNbSubResults(Fuse_1, [3])
+model.testNbSubResults(Fuse_1, [2])
 model.testNbSubShapes(Fuse_1, GeomAPI_Shape.SOLID, [7])
 model.testNbSubShapes(Fuse_1, GeomAPI_Shape.FACE, [31])
 model.testNbSubShapes(Fuse_1, GeomAPI_Shape.EDGE, [108])
