@@ -1292,6 +1292,7 @@ void XGUI_Workshop::onImportPart()
       aFeature->string(ExchangePlugin_ImportPart::FILE_PATH_ID())->setValue(aFile.toStdString());
       ModuleBase_Tools::flushUpdated(aFeature);
       operationMgr()->commitOperation();
+      setStatusBarMessage("");
     }
   }
 }
