@@ -48,8 +48,6 @@
 #include <list>
 #include <sstream>
 
-static const int THE_PARTITION_VERSION_1 = 20190506;
-
 
 //=================================================================================================
 FeaturesPlugin_Partition::FeaturesPlugin_Partition()
@@ -60,7 +58,7 @@ FeaturesPlugin_Partition::FeaturesPlugin_Partition()
 void FeaturesPlugin_Partition::initAttributes()
 {
   data()->addAttribute(BASE_OBJECTS_ID(), ModelAPI_AttributeSelectionList::typeId());
-  initVersion(THE_PARTITION_VERSION_1, selectionList(BASE_OBJECTS_ID()));
+  initVersion(THE_VERSION_1, selectionList(BASE_OBJECTS_ID()));
 }
 
 //=================================================================================================
@@ -127,7 +125,7 @@ void FeaturesPlugin_Partition::execute()
   int aResultIndex = 0;
 
   int aPartitionVersion = version();
-  if (aPartitionVersion < THE_PARTITION_VERSION_1) {
+  if (aPartitionVersion < THE_VERSION_1) {
     // default behaviors of Partition
     if(aResultShape->shapeType() == GeomAPI_Shape::COMPOUND) {
       for(GeomAPI_ShapeIterator anIt(aResultShape); anIt.more(); anIt.next()) {

@@ -89,8 +89,9 @@ void FeaturesAPI_BooleanFill::dump(ModelHighAPI_Dumper& theDumper) const
 
   theDumper << "(" << aDocName << ", " << anObjects << ", " << aTools;
 
-  if (aVersion && aVersion->isInitialized())
-    theDumper << ", " << aVersion->value();
+  if (aVersion && aVersion->isInitialized() &&
+      aVersion->value() == FeaturesPlugin_VersionedBoolean::THE_VERSION_1)
+    theDumper << ", keepSubResults = True";
 
   theDumper << ")" << std::endl;
 }
@@ -99,11 +100,13 @@ void FeaturesAPI_BooleanFill::dump(ModelHighAPI_Dumper& theDumper) const
 BooleanFillPtr addSplit(const std::shared_ptr<ModelAPI_Document>& thePart,
                         const std::list<ModelHighAPI_Selection>& theMainObjects,
                         const std::list<ModelHighAPI_Selection>& theToolObjects,
-                        const int theVersion)
+                        const bool keepSubResults)
 {
   std::shared_ptr<ModelAPI_Feature> aFeature = thePart->addFeature(FeaturesAPI_BooleanFill::ID());
+  int aVersion = keepSubResults ? FeaturesPlugin_VersionedBoolean::THE_VERSION_1
+                                : FeaturesPlugin_VersionedBoolean::THE_VERSION_0;
   return BooleanFillPtr(new FeaturesAPI_BooleanFill(aFeature,
                                                     theMainObjects,
                                                     theToolObjects,
-                                                    theVersion));
+                                                    aVersion));
 }

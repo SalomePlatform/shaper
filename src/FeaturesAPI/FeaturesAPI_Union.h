@@ -71,6 +71,6 @@ typedef std::shared_ptr<FeaturesAPI_Union> UnionPtr;
 FEATURESAPI_EXPORT
 UnionPtr addUnion(const std::shared_ptr<ModelAPI_Document>& thePart,
                   const std::list<ModelHighAPI_Selection>& theBaseObjects,
-                  const int theVersion = 0);
+                  const bool keepSubResults = false);
 
 #endif // FeaturesAPI_Union_H_

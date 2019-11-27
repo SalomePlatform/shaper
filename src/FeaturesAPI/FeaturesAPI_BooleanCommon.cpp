@@ -124,31 +124,44 @@ void FeaturesAPI_BooleanCommon::dump(ModelHighAPI_Dumper& theDumper) const
     theDumper << ", " << aTools;
   }
 
-  if (aVersion && aVersion->isInitialized()) {
-    theDumper << ", " << aVersion->value();
+  if (aVersion && aVersion->isInitialized() &&
+      aVersion->value() == FeaturesPlugin_VersionedBoolean::THE_VERSION_1) {
+    theDumper << ", keepSubResults = True";
   }
 
   theDumper << ")" << std::endl;
 }
 
 //==================================================================================================
-BooleanCommonPtr addCommon(const std::shared_ptr<ModelAPI_Document>& thePart,
-                           const std::list<ModelHighAPI_Selection>& theMainObjects,
-                           const int theVersion)
+static BooleanCommonPtr addCommon(const std::shared_ptr<ModelAPI_Document>& thePart,
+                                  const std::list<ModelHighAPI_Selection>& theMainObjects,
+                                  const int theVersion)
 {
   std::shared_ptr<ModelAPI_Feature> aFeature = thePart->addFeature(FeaturesAPI_BooleanCommon::ID());
   return BooleanCommonPtr(new FeaturesAPI_BooleanCommon(aFeature, theMainObjects, theVersion));
 }
 
 //==================================================================================================
-BooleanCommonPtr addCommon(const std::shared_ptr<ModelAPI_Document>& thePart,
-                           const std::list<ModelHighAPI_Selection>& theMainObjects,
-                           const std::list<ModelHighAPI_Selection>& theToolObjects,
-                           const int theVersion)
+static BooleanCommonPtr addCommon(const std::shared_ptr<ModelAPI_Document>& thePart,
+                                  const std::list<ModelHighAPI_Selection>& theMainObjects,
+                                  const std::list<ModelHighAPI_Selection>& theToolObjects,
+                                  const int theVersion)
 {
   std::shared_ptr<ModelAPI_Feature> aFeature = thePart->addFeature(FeaturesAPI_BooleanCommon::ID());
   return BooleanCommonPtr(new FeaturesAPI_BooleanCommon(aFeature,
                                                         theMainObjects,
                                                         theToolObjects,
                                                         theVersion));
+}
+
+//==================================================================================================
+BooleanCommonPtr addCommon(const std::shared_ptr<ModelAPI_Document>& thePart,
+                           const std::list<ModelHighAPI_Selection>& theMainObjects,
+                           const std::list<ModelHighAPI_Selection>& theToolObjects,
+                           const bool keepSubResults)
+{
+  int aVersion = keepSubResults ? FeaturesPlugin_VersionedBoolean::THE_VERSION_1
+                                : FeaturesPlugin_VersionedBoolean::THE_VERSION_0;
+  return theToolObjects.empty() ? addCommon(thePart, theMainObjects, aVersion)
+                                : addCommon(thePart, theMainObjects, theToolObjects, aVersion);
 }

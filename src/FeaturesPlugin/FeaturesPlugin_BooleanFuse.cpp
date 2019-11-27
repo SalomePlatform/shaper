@@ -41,8 +41,6 @@
 #include <GeomAPI_ShapeExplorer.h>
 #include <GeomAPI_ShapeIterator.h>
 
-static const int THE_FUSE_VERSION_1 = 20190506;
-
 //==================================================================================================
 FeaturesPlugin_BooleanFuse::FeaturesPlugin_BooleanFuse()
 : FeaturesPlugin_Boolean(FeaturesPlugin_Boolean::BOOL_FUSE)
@@ -62,7 +60,7 @@ void FeaturesPlugin_BooleanFuse::initAttributes()
   ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(), OBJECT_LIST_ID());
   ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(), TOOL_LIST_ID());
 
-  initVersion(THE_FUSE_VERSION_1, selectionList(OBJECT_LIST_ID()), selectionList(TOOL_LIST_ID()));
+  initVersion(THE_VERSION_1, selectionList(OBJECT_LIST_ID()), selectionList(TOOL_LIST_ID()));
 }
 
 //==================================================================================================
@@ -236,7 +234,7 @@ void FeaturesPlugin_BooleanFuse::execute()
     aMakeShapeList->appendAlgo(aUnifyAlgo);
   }
 
-  if (aFuseVersion == THE_FUSE_VERSION_1) {
+  if (aFuseVersion == THE_VERSION_1) {
     // merge hierarchies of compounds containing objects and tools
     // and append the result of the FUSE operation
     aShape = keepUnusedSubsOfCompound(aShape, anObjectsHierarchy, aToolsHierarchy, aMakeShapeList);

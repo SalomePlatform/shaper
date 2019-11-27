@@ -78,7 +78,7 @@ Compound_1.result().subResult(0).subResult(1).setColor(0, 170, 0)
 Compound_1.result().subResult(1).subResult(0).setColor(0, 255, 0)
 Compound_1.result().subResult(1).subResult(1).setColor(0, 255, 0)
 Fuse_1_objects_1 = [model.selection("SOLID", "LinearCopy_2_1_1_1"), model.selection("SOLID", "Compound_1_1_1_1"), model.selection("COMPOUND", "Compound_1_1_2")]
-Fuse_1 = model.addFuse(Part_1_doc, Fuse_1_objects_1, False, 20190506)
+Fuse_1 = model.addFuse(Part_1_doc, Fuse_1_objects_1, False, keepSubResults = True)
 
 model.testHaveNamingSubshapes(Fuse_1, model, Part_1_doc)
 

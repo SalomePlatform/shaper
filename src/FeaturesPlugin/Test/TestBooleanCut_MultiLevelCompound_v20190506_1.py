@@ -44,7 +44,7 @@ SketchConstraintCoincidence_1 = Sketch_2.setCoincident(SketchPoint_2.result(), S
 SketchConstraintRadius_2 = Sketch_2.setRadius(SketchCircle_2.results()[1], 3)
 model.do()
 Extrusion_2 = model.addExtrusion(Part_1_doc, [model.selection("FACE", "Sketch_2/Face-SketchCircle_2_2f")], model.selection(), 5, 5)
-Cut_1 = model.addCut(Part_1_doc, [model.selection("SOLID", "LinearCopy_1_1_1_2")], [model.selection("SOLID", "Extrusion_2_1")], 20190506)
+Cut_1 = model.addCut(Part_1_doc, [model.selection("SOLID", "LinearCopy_1_1_1_2")], [model.selection("SOLID", "Extrusion_2_1")], keepSubResults = True)
 
 model.testHaveNamingSubshapes(Cut_1, model, Part_1_doc)
 

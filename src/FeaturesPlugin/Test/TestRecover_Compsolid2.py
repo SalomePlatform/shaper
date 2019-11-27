@@ -26,7 +26,7 @@ Part_1_doc = Part_1.document()
 Box_1 = model.addBox(Part_1_doc, 100, 100, 100)
 Translation_1 = model.addTranslation(Part_1_doc, [model.selection("SOLID", "Box_1_1")], -50, -50, -50)
 Partition_1_objects = [model.selection("SOLID", "Translation_1_1"), model.selection("FACE", "PartSet/XOY"), model.selection("FACE", "PartSet/YOZ"), model.selection("FACE", "PartSet/XOZ")]
-Partition_1 = model.addPartition(Part_1_doc, Partition_1_objects, 20190506)
+Partition_1 = model.addPartition(Part_1_doc, Partition_1_objects, keepSubResults = True)
 CompSolid_1_objects = [model.selection("SOLID", "Partition_1_1_1"), model.selection("SOLID", "Partition_1_1_5"), model.selection("SOLID", "Partition_1_1_6"), model.selection("SOLID", "Partition_1_1_8")]
 CompSolid_1 = model.addCompSolid(Part_1_doc, CompSolid_1_objects)
 Recover_1 = model.addRecover(Part_1_doc, CompSolid_1, [Partition_1.result()], True)

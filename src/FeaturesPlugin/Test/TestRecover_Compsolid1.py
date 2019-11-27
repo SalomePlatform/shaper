@@ -48,7 +48,7 @@ Sketch_2 = model.addSketch(Part_1_doc, model.selection("FACE", "Extrusion_1_1_2/
 SketchCircle_1 = Sketch_2.addCircle(-4.420087352215441, 24.04732854606771, 12.87676926472621)
 model.do()
 Extrusion_2 = model.addExtrusion(Part_1_doc, [model.selection("WIRE", "Sketch_2/Face-SketchCircle_1_2r_wire")], model.selection(), 20, 80)
-Cut_1 = model.addCut(Part_1_doc, [model.selection("SOLID", "Extrusion_1_1_2")], [model.selection("SOLID", "Extrusion_2_1")], 20190506)
+Cut_1 = model.addCut(Part_1_doc, [model.selection("SOLID", "Extrusion_1_1_2")], [model.selection("SOLID", "Extrusion_2_1")], keepSubResults = True)
 Recover_1 = model.addRecover(Part_1_doc, Cut_1, [Extrusion_1.result()], True)
 model.end()
 

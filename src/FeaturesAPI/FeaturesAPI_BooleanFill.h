@@ -79,6 +79,6 @@ FEATURESAPI_EXPORT
 BooleanFillPtr addSplit(const std::shared_ptr<ModelAPI_Document>& thePart,
                         const std::list<ModelHighAPI_Selection>& theMainObjects,
                         const std::list<ModelHighAPI_Selection>& theToolObjects,
-                        const int theVersion = 0);
+                        const bool keepSubResults = false);
 
 #endif // FeaturesAPI_BooleanFill_H_

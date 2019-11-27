@@ -68,8 +68,9 @@ void FeaturesAPI_Union::dump(ModelHighAPI_Dumper& theDumper) const
 
   theDumper << aBase << " = model.addUnion(" << aDocName << ", " << anAttrObjects;
 
-  if (aVersion && aVersion->isInitialized())
-    theDumper << ", " << aVersion->value();
+  if (aVersion && aVersion->isInitialized() &&
+      aVersion->value() == FeaturesPlugin_VersionedBoolean::THE_VERSION_1)
+    theDumper << ", keepSubResults = True";
 
   theDumper << ")" << std::endl;
 }
@@ -77,8 +78,10 @@ void FeaturesAPI_Union::dump(ModelHighAPI_Dumper& theDumper) const
 //==================================================================================================
 UnionPtr addUnion(const std::shared_ptr<ModelAPI_Document>& thePart,
                   const std::list<ModelHighAPI_Selection>& theBaseObjects,
-                  const int theVersion)
+                  const bool keepSubResults)
 {
+  int aVersion = keepSubResults ? FeaturesPlugin_VersionedBoolean::THE_VERSION_1
+                                : FeaturesPlugin_VersionedBoolean::THE_VERSION_0;
   std::shared_ptr<ModelAPI_Feature> aFeature = thePart->addFeature(FeaturesAPI_Union::ID());
-  return UnionPtr(new FeaturesAPI_Union(aFeature, theBaseObjects, theVersion));
+  return UnionPtr(new FeaturesAPI_Union(aFeature, theBaseObjects, aVersion));
 }

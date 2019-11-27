@@ -68,7 +68,7 @@ Extrusion_1 = model.addExtrusion(Part_1_doc, [model.selection("COMPOUND", "Sketc
 Compound_1_objects = [model.selection("COMPSOLID", "Extrusion_1_1"), model.selection("SOLID", "Extrusion_1_2"), model.selection("SOLID", "Extrusion_1_3"), model.selection("SOLID", "Extrusion_1_4"), model.selection("SOLID", "Extrusion_1_5"), model.selection("SOLID", "Extrusion_1_6"), model.selection("SOLID", "Extrusion_1_7"), model.selection("SOLID", "Extrusion_1_8"), model.selection("SOLID", "Extrusion_1_9")]
 Compound_1 = model.addCompound(Part_1_doc, Compound_1_objects)
 Union_1_objects = [model.selection("SOLID", "Compound_1_1_1_1"), model.selection("SOLID", "Compound_1_1_1_2"), model.selection("SOLID", "Compound_1_1_1_3")]
-Union_1 = model.addUnion(Part_1_doc, Union_1_objects, 20190506)
+Union_1 = model.addUnion(Part_1_doc, Union_1_objects, keepSubResults = True)
 
 model.testHaveNamingSubshapes(Union_1, model, Part_1_doc)
 

@@ -35,8 +35,6 @@
 #include <GeomAPI_ShapeExplorer.h>
 #include <GeomAPI_ShapeIterator.h>
 
-static const int THE_SMASH_VERSION_1 = 20190506;
-
 //==================================================================================================
 FeaturesPlugin_BooleanSmash::FeaturesPlugin_BooleanSmash()
 : FeaturesPlugin_Boolean(FeaturesPlugin_Boolean::BOOL_SMASH)
@@ -49,7 +47,7 @@ void FeaturesPlugin_BooleanSmash::initAttributes()
   data()->addAttribute(OBJECT_LIST_ID(), ModelAPI_AttributeSelectionList::typeId());
   data()->addAttribute(TOOL_LIST_ID(), ModelAPI_AttributeSelectionList::typeId());
 
-  initVersion(THE_SMASH_VERSION_1, selectionList(OBJECT_LIST_ID()), selectionList(TOOL_LIST_ID()));
+  initVersion(THE_VERSION_1, selectionList(OBJECT_LIST_ID()), selectionList(TOOL_LIST_ID()));
 }
 
 //==================================================================================================
@@ -170,7 +168,7 @@ void FeaturesPlugin_BooleanSmash::execute()
 
   // take into account a version of SMASH feature
   int aSmashVersion = version();
-  if (aSmashVersion == THE_SMASH_VERSION_1) {
+  if (aSmashVersion == THE_VERSION_1) {
     // merge hierarchies of compounds containing objects and tools
     // and append the result of the FUSE operation
     aShape = keepUnusedSubsOfCompound(aShape, anObjectsHistory, aToolsHistory, aMakeShapeList);

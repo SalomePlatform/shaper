@@ -76,7 +76,7 @@ SketchCircle_3 = Sketch_3.addCircle(-2.3396523840492e-15, 15, 5)
 SketchConstraintCoincidence_6 = Sketch_3.setCoincident(SketchPoint_2.result(), SketchCircle_3.center())
 SketchConstraintRadius_3 = Sketch_3.setRadius(SketchCircle_3.results()[1], 5)
 ExtrusionCut_1.setNestedSketch(Sketch_3)
-Fuse_1 = model.addFuse(Part_1_doc, [model.selection("SOLID", "ExtrusionCut_1_1"), model.selection("SOLID", "ExtrusionCut_1_2")], True, 20190506)
+Fuse_1 = model.addFuse(Part_1_doc, [model.selection("SOLID", "ExtrusionCut_1_1"), model.selection("SOLID", "ExtrusionCut_1_2")], True, keepSubResults = True)
 model.do()
 # move groups after the final fuse
 Part_1_doc.moveFeature(Group_1.feature(), Fuse_1.feature())

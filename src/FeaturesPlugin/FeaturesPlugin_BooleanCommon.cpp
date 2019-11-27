@@ -38,8 +38,6 @@
 #include <GeomAlgoAPI_CompoundBuilder.h>
 #include <GeomAlgoAPI_Tools.h>
 
-static const int THE_COMMON_VERSION_1 = 20190506;
-
 //==================================================================================================
 FeaturesPlugin_BooleanCommon::FeaturesPlugin_BooleanCommon()
 : FeaturesPlugin_Boolean(FeaturesPlugin_Boolean::BOOL_COMMON)
@@ -54,7 +52,7 @@ void FeaturesPlugin_BooleanCommon::initAttributes()
   data()->addAttribute(OBJECT_LIST_ID(), ModelAPI_AttributeSelectionList::typeId());
   data()->addAttribute(TOOL_LIST_ID(), ModelAPI_AttributeSelectionList::typeId());
 
-  initVersion(THE_COMMON_VERSION_1, selectionList(OBJECT_LIST_ID()), selectionList(TOOL_LIST_ID()));
+  initVersion(THE_VERSION_1, selectionList(OBJECT_LIST_ID()), selectionList(TOOL_LIST_ID()));
 }
 
 //==================================================================================================
@@ -117,7 +115,7 @@ void FeaturesPlugin_BooleanCommon::execute()
       aMakeShapeList->appendAlgo(aCommonAlgo);
     }
 
-    if (aCommonVersion == THE_COMMON_VERSION_1) {
+    if (aCommonVersion == THE_VERSION_1) {
       // merge hierarchies of compounds containing objects and tools
       // and append the result of the FUSE operation
       aShape = keepUnusedSubsOfCompound(aShape, anObjects, aTools, aMakeShapeList);
@@ -149,7 +147,7 @@ void FeaturesPlugin_BooleanCommon::execute()
       aResultShapesList.push_back(aShape);
     }
   } else {
-    if (aCommonVersion == THE_COMMON_VERSION_1) {
+    if (aCommonVersion == THE_VERSION_1) {
       // merge hierarchies of compounds containing objects and tools
       aResultCompound =
           keepUnusedSubsOfCompound(GeomShapePtr(), anObjects, aTools, aMakeShapeList);

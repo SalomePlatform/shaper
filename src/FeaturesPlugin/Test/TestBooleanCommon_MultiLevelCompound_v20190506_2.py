@@ -102,7 +102,7 @@ Compound_3.result().subResult(0).setColor(0, 170, 0)
 Compound_3.result().subResult(1).setColor(0, 255, 0)
 Compound_3.result().subResult(1).subResult(0).setColor(0, 255, 0)
 Compound_3.result().subResult(1).subResult(1).setColor(0, 255, 0)
-Common_1 = model.addCommon(Part_1_doc, [model.selection("SOLID", "Compound_2_1_1_1"), model.selection("SOLID", "Compound_2_1_2_3")], [model.selection("COMPOUND", "Compound_3_1_2")], 20190506)
+Common_1 = model.addCommon(Part_1_doc, [model.selection("SOLID", "Compound_2_1_1_1"), model.selection("SOLID", "Compound_2_1_2_3")], [model.selection("COMPOUND", "Compound_3_1_2")], keepSubResults = True)
 
 model.testHaveNamingSubshapes(Common_1, model, Part_1_doc)
 

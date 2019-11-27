@@ -34,7 +34,7 @@ model.do()
 Face_1 = model.addFace(Part_1_doc, [model.selection("FACE", "Sketch_1/Face-SketchCircle_1_2r")])
 Edge_1 = model.addEdge(Part_1_doc, [model.selection("EDGE", "Sketch_2/SketchLine_1")])
 Group_1 = model.addGroup(Part_1_doc, "Edges", [model.selection("EDGE", "Edge_1_1")])
-Partition_1 = model.addPartition(Part_1_doc, [model.selection("FACE", "Face_1_1"), model.selection("EDGE", "Edge_1_1")], 20190506)
+Partition_1 = model.addPartition(Part_1_doc, [model.selection("FACE", "Face_1_1"), model.selection("EDGE", "Edge_1_1")], keepSubResults = True)
 model.do()
 # move group after the partition
 Part_1_doc.moveFeature(Group_1.feature(), Partition_1.feature())

@@ -29,7 +29,7 @@ Plane_4 = model.addPlane(Part_1_doc, model.selection("FACE", "PartSet/XOY"), mod
 Plane_5 = model.addPlane(Part_1_doc, model.selection("FACE", "PartSet/YOZ"), model.selection("EDGE", "PartSet/OY"), 30)
 Plane_6 = model.addPlane(Part_1_doc, model.selection("FACE", "PartSet/XOZ"), model.selection("EDGE", "PartSet/OZ"), 30)
 Partition_1_objects = [model.selection("SOLID", "Translation_1_1"), model.selection("FACE", "Plane_1"), model.selection("FACE", "Plane_2"), model.selection("FACE", "Plane_3")]
-Partition_1 = model.addPartition(Part_1_doc, Partition_1_objects, 20190506)
+Partition_1 = model.addPartition(Part_1_doc, Partition_1_objects, keepSubResults = True)
 Filters = model.filters(Part_1_doc, [model.addFilter(name = "OppositeToEdge", exclude = True, args = [model.selection("EDGE", "Partition_1_1_7/Generated_Edge&Plane_2/Plane_2&Plane_1/Plane_1")])])
 model.end()
 

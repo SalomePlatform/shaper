@@ -105,7 +105,7 @@ model.do()
 Extrusion_3 = model.addExtrusion(Part_1_doc, [model.selection("FACE", "Sketch_3/Face-SketchLine_19r-SketchLine_18r-SketchLine_17r-SketchLine_16r-SketchLine_15r-SketchLine_20f-SketchLine_21f-SketchLine_22f-SketchLine_23f-SketchLine_24f")], model.selection(), 10, 0)
 Extrusion_3.result().setName("C")
 Extrusion_3.result().setColor(0, 85, 255)
-Cut_1 = model.addCut(Part_1_doc, [model.selection("SOLID", "Compound_1_1_1"), model.selection("SOLID", "Compound_2_1_2")], [model.selection("SOLID", "C")], 20190506)
+Cut_1 = model.addCut(Part_1_doc, [model.selection("SOLID", "Compound_1_1_1"), model.selection("SOLID", "Compound_2_1_2")], [model.selection("SOLID", "C")], keepSubResults = True)
 model.end()
 
 from GeomAPI import GeomAPI_Shape

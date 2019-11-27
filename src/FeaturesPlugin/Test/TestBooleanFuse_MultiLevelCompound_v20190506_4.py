@@ -75,7 +75,7 @@ model.do()
 Edge_1 = model.addEdge(Part_1_doc, [model.selection("EDGE", "Sketch_2/SketchLine_9")])
 Extrusion_2 = model.addExtrusion(Part_1_doc, [model.selection("EDGE", "Edge_1_1")], model.selection("EDGE", "PartSet/OZ"), 13, 3)
 Compound_1 = model.addCompound(Part_1_doc, [model.selection("COMPSOLID", "Extrusion_1_1"), model.selection("FACE", "Extrusion_2_1")])
-Fuse_1 = model.addFuse(Part_1_doc, [model.selection("SOLID", "Compound_1_1_1_1")], [model.selection("SOLID", "LinearCopy_2_1_1_1")], False, 20190506)
+Fuse_1 = model.addFuse(Part_1_doc, [model.selection("SOLID", "Compound_1_1_1_1")], [model.selection("SOLID", "LinearCopy_2_1_1_1")], False, keepSubResults = True)
 
 model.testHaveNamingSubshapes(Fuse_1, model, Part_1_doc)
 
