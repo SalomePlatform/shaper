@@ -77,7 +77,7 @@ Compound_1.result().subResult(0).subResult(0).setColor(0, 170, 0)
 Compound_1.result().subResult(0).subResult(1).setColor(0, 170, 0)
 Compound_1.result().subResult(1).subResult(0).setColor(0, 255, 0)
 Compound_1.result().subResult(1).subResult(1).setColor(0, 255, 0)
-Smash_1 = model.addSmash(Part_1_doc, [model.selection("SOLID", "LinearCopy_2_1_1_1")], [model.selection("SOLID", "Compound_1_1_2_1"), model.selection("SOLID", "Compound_1_1_2_2")], 20190506)
+Smash_1 = model.addSmash(Part_1_doc, [model.selection("SOLID", "LinearCopy_2_1_1_1")], [model.selection("SOLID", "Compound_1_1_2_1"), model.selection("SOLID", "Compound_1_1_2_2")], keepSubResults = True)
 
 model.testHaveNamingSubshapes(Smash_1, model, Part_1_doc)
 

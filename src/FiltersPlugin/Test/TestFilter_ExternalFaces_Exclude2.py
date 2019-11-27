@@ -48,7 +48,7 @@ SketchConstraintDistance_3 = Sketch_1.setDistance(SketchAPI_Point(SketchPoint_1)
 SketchConstraintDistance_4 = Sketch_1.setDistance(SketchAPI_Point(SketchPoint_1).coordinates(), SketchLine_3.result(), 8, True)
 model.do()
 Face_1 = model.addFace(Part_1_doc, [model.selection("FACE", "Sketch_1/Face-SketchLine_4r-SketchLine_3r-SketchLine_2r-SketchLine_1r")])
-Partition_1 = model.addPartition(Part_1_doc, [model.selection("SOLID", "Box_1_1"), model.selection("FACE", "Face_1_1")], 20190506)
+Partition_1 = model.addPartition(Part_1_doc, [model.selection("SOLID", "Box_1_1"), model.selection("FACE", "Face_1_1")], keepSubResults = True)
 Filters = model.filters(Part_1_doc, [model.addFilter(name = "ExternalFaces", exclude = True)])
 model.end()
 

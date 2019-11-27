@@ -35,8 +35,6 @@
 #include <GeomAPI_ShapeExplorer.h>
 #include <GeomAPI_ShapeIterator.h>
 
-static const int THE_CUT_VERSION_1 = 20190506;
-
 //==================================================================================================
 FeaturesPlugin_BooleanCut::FeaturesPlugin_BooleanCut()
 : FeaturesPlugin_Boolean(FeaturesPlugin_Boolean::BOOL_CUT)
@@ -47,7 +45,7 @@ FeaturesPlugin_BooleanCut::FeaturesPlugin_BooleanCut()
 void FeaturesPlugin_BooleanCut::initAttributes()
 {
   FeaturesPlugin_Boolean::initAttributes();
-  initVersion(THE_CUT_VERSION_1, selectionList(OBJECT_LIST_ID()), selectionList(TOOL_LIST_ID()));
+  initVersion(THE_VERSION_1, selectionList(OBJECT_LIST_ID()), selectionList(TOOL_LIST_ID()));
 }
 
 //==================================================================================================
@@ -79,7 +77,7 @@ void FeaturesPlugin_BooleanCut::execute()
   std::shared_ptr<GeomAlgoAPI_MakeShapeList> aMakeShapeList(new GeomAlgoAPI_MakeShapeList());
 
   GeomShapePtr aResultCompound;
-  if (aCutVersion == THE_CUT_VERSION_1) {
+  if (aCutVersion == THE_VERSION_1) {
     // merge hierarchies of compounds containing objects and tools
     aResultCompound =
         keepUnusedSubsOfCompound(GeomShapePtr(), anObjects, aTools, aMakeShapeList);

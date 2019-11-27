@@ -93,21 +93,16 @@ public:
 /// Pointer on Boolean object.
 typedef std::shared_ptr<FeaturesAPI_BooleanFuse> BooleanFusePtr;
 
-/// \ingroup CPPHighAPI
-/// \brief Create Boolean Fuse feature.
-FEATURESAPI_EXPORT
-BooleanFusePtr addFuse(const std::shared_ptr<ModelAPI_Document>& thePart,
-                       const std::list<ModelHighAPI_Selection>& theObjects,
-                       const bool theRemoveEdges = false,
-                       const int theVersion = 0);
+#define DUMMY_TOOLS std::pair<std::list<ModelHighAPI_Selection>, bool>\
+                    (std::list<ModelHighAPI_Selection>(), false)
 
 /// \ingroup CPPHighAPI
 /// \brief Create Boolean Fuse feature.
-FEATURESAPI_EXPORT
-BooleanFusePtr addFuse(const std::shared_ptr<ModelAPI_Document>& thePart,
-                       const std::list<ModelHighAPI_Selection>& theMainObjects,
-                       const std::list<ModelHighAPI_Selection>& theToolObjects,
-                       const bool theRemoveEdges = false,
-                       const int theVersion = 0);
+FEATURESAPI_EXPORT BooleanFusePtr addFuse(
+    const std::shared_ptr<ModelAPI_Document>& part,
+    const std::list<ModelHighAPI_Selection>& objects,
+    const std::pair<std::list<ModelHighAPI_Selection>, bool>& tools = DUMMY_TOOLS,
+    const bool removeEdges = false,
+    const bool keepSubResults = false);
 
 #endif // FeaturesAPI_BooleanFuse_H_

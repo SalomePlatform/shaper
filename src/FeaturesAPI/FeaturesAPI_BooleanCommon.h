@@ -87,17 +87,10 @@ typedef std::shared_ptr<FeaturesAPI_BooleanCommon> BooleanCommonPtr;
 
 /// \ingroup CPPHighAPI
 /// \brief Create Boolean Common feature.
-FEATURESAPI_EXPORT
-BooleanCommonPtr addCommon(const std::shared_ptr<ModelAPI_Document>& thePart,
-                           const std::list<ModelHighAPI_Selection>& theMainObjects,
-                           const int theVersion = 0);
-
-/// \ingroup CPPHighAPI
-/// \brief Create Boolean Common feature.
-FEATURESAPI_EXPORT
-BooleanCommonPtr addCommon(const std::shared_ptr<ModelAPI_Document>& thePart,
-                           const std::list<ModelHighAPI_Selection>& theMainObjects,
-                           const std::list<ModelHighAPI_Selection>& theToolObjects,
-                           const int theVersion = 0);
+FEATURESAPI_EXPORT BooleanCommonPtr addCommon(
+    const std::shared_ptr<ModelAPI_Document>& part,
+    const std::list<ModelHighAPI_Selection>& objects,
+    const std::list<ModelHighAPI_Selection>& tools = std::list<ModelHighAPI_Selection>(),
+    const bool keepSubResults = false);
 
 #endif // FeaturesAPI_BooleanCommon_H_

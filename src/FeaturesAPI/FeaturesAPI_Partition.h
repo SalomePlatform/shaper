@@ -71,6 +71,6 @@ typedef std::shared_ptr<FeaturesAPI_Partition> PartitionPtr;
 FEATURESAPI_EXPORT
 PartitionPtr addPartition(const std::shared_ptr<ModelAPI_Document>& thePart,
                           const std::list<ModelHighAPI_Selection>& theBaseObjects,
-                          const int theVersion = 0);
+                          const bool keepSubResults = false);
 
 #endif // FeaturesAPI_Partition_H_

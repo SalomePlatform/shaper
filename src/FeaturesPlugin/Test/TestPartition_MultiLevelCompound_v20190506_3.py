@@ -79,7 +79,7 @@ Compound_1.result().subResult(0).subResult(1).setColor(0, 170, 0)
 Compound_1.result().subResult(1).subResult(0).setColor(0, 255, 0)
 Compound_1.result().subResult(1).subResult(1).setColor(0, 255, 0)
 Partition_1_objects = [model.selection("SOLID", "LinearCopy_2_1_1_1"), model.selection("SOLID", "Compound_1_1_2_2"), model.selection("SOLID", "LinearCopy_2_1_2_2"), model.selection("SOLID", "Compound_1_1_1_2")]
-Partition_1 = model.addPartition(Part_1_doc, Partition_1_objects, 20190506)
+Partition_1 = model.addPartition(Part_1_doc, Partition_1_objects, keepSubResults = True)
 model.do()
 
 model.testNbResults(Partition_1, 1)

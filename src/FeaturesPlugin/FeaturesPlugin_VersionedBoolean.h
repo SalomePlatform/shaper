@@ -37,6 +37,9 @@ class GeomAlgoAPI_MakeShapeList;
 class FeaturesPlugin_VersionedBoolean : public ModelAPI_Feature
 {
 public:
+  static const int THE_VERSION_0 = 0;
+  static const int THE_VERSION_1 = 20190506;
+
   /// Attribute name of the version of Boolean feature
   inline static const std::string& VERSION_ID()
   {

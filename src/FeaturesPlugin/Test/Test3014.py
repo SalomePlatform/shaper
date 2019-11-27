@@ -38,7 +38,7 @@ SketchMultiRotation_1 = Sketch_1.addRotation([SketchCircle_1.results()[1]], Sket
 model.do()
 Extrusion_1 = model.addExtrusion(Part_1_doc, [model.selection("COMPOUND", "all-in-Sketch_1")], model.selection(), "h", 0)
 Plane_4 = model.addPlane(Part_1_doc, model.selection("FACE", "Extrusion_1_4/To_Face"), "h/2", True)
-Partition_1 = model.addPartition(Part_1_doc, [model.selection("FACE", "Plane_1"), model.selection("COMPOUND", "all-in-Extrusion_1")], 20190506)
+Partition_1 = model.addPartition(Part_1_doc, [model.selection("FACE", "Plane_1"), model.selection("COMPOUND", "all-in-Extrusion_1")], keepSubResults = True)
 model.end()
 
 assert(Partition_1.feature().error() == "")

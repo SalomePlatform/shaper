@@ -28,7 +28,7 @@ Box_1 = model.addBox(Part_1_doc, 10, 10, 10)
 Plane_4 = model.addPlane(Part_1_doc, model.selection("FACE", "Box_1_1/Left"), model.selection("FACE", "Box_1_1/Right"))
 Plane_5 = model.addPlane(Part_1_doc, model.selection("FACE", "Box_1_1/Front"), model.selection("FACE", "Box_1_1/Back"))
 Partition_1_objects = [model.selection("SOLID", "Box_1_1"), model.selection("FACE", "Plane_1"), model.selection("FACE", "Plane_2")]
-Partition_1 = model.addPartition(Part_1_doc, Partition_1_objects, 20190506)
+Partition_1 = model.addPartition(Part_1_doc, Partition_1_objects, keepSubResults = True)
 Cylinder_1 = model.addCylinder(Part_1_doc, model.selection("VERTEX", "PartSet/Origin"), model.selection("EDGE", "PartSet/OZ"), 5, 10)
 Filters = model.filters(Part_1_doc, [model.addFilter(name = "TopoConnectedFaces", exclude = True, args = [model.selection("FACE", "Cylinder_1_1/Face_3"), False])])
 model.end()

@@ -29,7 +29,7 @@ model.do()
 Face_1 = model.addFace(Part_1_doc, [model.selection("EDGE", "Sketch_1/SketchCircle_1_2")])
 Partition_1_objects = [model.selection("FACE", "Face_1_1"), model.selection("FACE", "PartSet/YOZ"), model.selection("FACE", "PartSet/XOZ")]
 Partition_1 = model.addPartition(Part_1_doc, Partition_1_objects)
-Union_1 = model.addUnion(Part_1_doc, [model.selection("FACE", "Partition_1_1_1"), model.selection("FACE", "Partition_1_1_2")], 20190506)
+Union_1 = model.addUnion(Part_1_doc, [model.selection("FACE", "Partition_1_1_1"), model.selection("FACE", "Partition_1_1_2")], keepSubResults = True)
 model.do()
 model.end()
 

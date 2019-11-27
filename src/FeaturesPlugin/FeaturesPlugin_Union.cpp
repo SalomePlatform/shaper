@@ -33,8 +33,6 @@
 #include <ModelAPI_ResultBody.h>
 #include <ModelAPI_Tools.h>
 
-static const int THE_UNION_VERSION_1 = 20190506;
-
 //=================================================================================================
 FeaturesPlugin_Union::FeaturesPlugin_Union()
 {
@@ -44,7 +42,7 @@ FeaturesPlugin_Union::FeaturesPlugin_Union()
 void FeaturesPlugin_Union::initAttributes()
 {
   data()->addAttribute(BASE_OBJECTS_ID(), ModelAPI_AttributeSelectionList::typeId());
-  initVersion(THE_UNION_VERSION_1, selectionList(BASE_OBJECTS_ID()));
+  initVersion(THE_VERSION_1, selectionList(BASE_OBJECTS_ID()));
 }
 
 //=================================================================================================
@@ -104,7 +102,7 @@ void FeaturesPlugin_Union::execute()
 
   GeomShapePtr aShape;
   GeomAPI_ShapeIterator aCIt(aResultCompound);
-  if (aUnionVersion < THE_UNION_VERSION_1) {
+  if (aUnionVersion < THE_VERSION_1) {
     // if the compound consists of a single sub-shape, take it,
     // otherwise, take the full compound
     aShape = aCIt.current();

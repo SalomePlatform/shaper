@@ -40,8 +40,6 @@
 #include <algorithm>
 #include <map>
 
-static const int THE_SPLIT_VERSION_1 = 20190506;
-
 //=================================================================================================
 FeaturesPlugin_BooleanFill::FeaturesPlugin_BooleanFill()
   : FeaturesPlugin_Boolean(FeaturesPlugin_Boolean::BOOL_FILL)
@@ -52,7 +50,7 @@ FeaturesPlugin_BooleanFill::FeaturesPlugin_BooleanFill()
 void FeaturesPlugin_BooleanFill::initAttributes()
 {
   FeaturesPlugin_Boolean::initAttributes();
-  initVersion(THE_SPLIT_VERSION_1, selectionList(OBJECT_LIST_ID()), selectionList(TOOL_LIST_ID()));
+  initVersion(THE_VERSION_1, selectionList(OBJECT_LIST_ID()), selectionList(TOOL_LIST_ID()));
 }
 
 //=================================================================================================
@@ -89,7 +87,7 @@ void FeaturesPlugin_BooleanFill::execute()
   std::shared_ptr<GeomAlgoAPI_MakeShapeList> aMakeShapeList(new GeomAlgoAPI_MakeShapeList());
 
   GeomShapePtr aResultCompound;
-  if (aSplitVersion == THE_SPLIT_VERSION_1) {
+  if (aSplitVersion == THE_VERSION_1) {
     // merge hierarchies of compounds containing objects and tools
     aResultCompound =
         keepUnusedSubsOfCompound(GeomShapePtr(), anObjects, aTools, aMakeShapeList);
