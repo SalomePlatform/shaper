@@ -130,13 +130,7 @@ void XGUI_ModuleConnector::setSelected(const QList<ModuleBase_ViewerPrsPtr>& the
     myWorkshop->selector()->clearSelection();
     aBrowser->treeView()->clearSelection();
   } else {
-    aDisp->setSelected(theValues);
-    // Synchronise the selection with Object browser
-    QObjectPtrList anObjects;
-    foreach(ModuleBase_ViewerPrsPtr aVal, theValues) {
-      anObjects.append(aVal->object());
-    }
-    aBrowser->setObjectsSelected(anObjects);
+    myWorkshop->selector()->setSelected(theValues);
   }
 }
 

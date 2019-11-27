@@ -1861,6 +1861,7 @@ void XGUI_Workshop::deleteObjects()
   // allow the module to delete objects, do nothing if it has succeed
   if (aModule->deleteObjects()) {
     updateCommandStatus();
+    myDisplayer->updateViewer();
     return;
   }
 
