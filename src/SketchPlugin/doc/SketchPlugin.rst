@@ -51,6 +51,7 @@ After the plane for sketch is selected, the following property panel will be ope
 - **Show free points** check box - highlights free points in the current sketch if it is checked.
 - **Automatic constraints** - automatically create horizontal or vertical constraints if angle between created line and horizontal or vertical less then angular tolerance (defined in preferences).
 - **Change sketch plane** button - allows to change working plane of the current sketch.
+- **Show remaining DoFs** button - highlights all sketch edges which are not fully constrained.
 
 Now it is possible to:
 
