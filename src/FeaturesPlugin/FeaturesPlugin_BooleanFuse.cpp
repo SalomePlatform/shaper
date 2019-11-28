@@ -111,7 +111,7 @@ void FeaturesPlugin_BooleanFuse::execute()
 
   // Collecting solids from compsolids which will not be modified
   // in boolean operation and will be added to result.
-  bool isProcessCompsolid = !isSimpleCreation || aFuseVersion >= THE_FUSE_VERSION_1;
+  bool isProcessCompsolid = !isSimpleCreation || aFuseVersion >= THE_VERSION_1;
   ListOfShape aShapesToAdd;
   for (ObjectHierarchy::Iterator anObjectsIt = anObjectsHierarchy.Begin();
        isProcessCompsolid && anObjectsIt != anObjectsHierarchy.End();
