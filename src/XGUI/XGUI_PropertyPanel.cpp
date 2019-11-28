@@ -76,18 +76,12 @@ XGUI_PropertyPanel::XGUI_PropertyPanel(QWidget* theParent, XGUI_OperationMgr* th
   setObjectName(PROP_PANEL);
   setStyleSheet("::title { position: relative; padding-left: 5px; text-align: left center }");
 
-  QScrollArea* aScroll = new QScrollArea(this);
-  aScroll->setWidgetResizable(true);
-  aScroll->setFrameStyle(QFrame::NoFrame);
-
-  QWidget* aContent = new QWidget(aScroll);
+  QWidget* aContent = new QWidget(this);
   QGridLayout* aMainLayout = new QGridLayout(aContent);
   const int kPanelColumn = 0;
   int aPanelRow = 0;
   aMainLayout->setContentsMargins(3, 3, 3, 3);
-  aScroll->setWidget(aContent);
-
-  setWidget(aScroll);
+  setWidget(aContent);
 
   QFrame* aFrm = new QFrame(aContent);
   aFrm->setFrameStyle(QFrame::Raised);
@@ -100,9 +94,9 @@ XGUI_PropertyPanel::XGUI_PropertyPanel(QWidget* theParent, XGUI_OperationMgr* th
 
   QStringList aBtnNames;
   aBtnNames << QString(PROP_PANEL_HELP)
-            << QString(PROP_PANEL_OK)
-            << QString(PROP_PANEL_OK_PLUS)
-            << QString(PROP_PANEL_CANCEL);
+    << QString(PROP_PANEL_OK)
+    << QString(PROP_PANEL_OK_PLUS)
+    << QString(PROP_PANEL_CANCEL);
   foreach(QString eachBtnName, aBtnNames) {
     QToolButton* aBtn = new QToolButton(aFrm);
     aBtn->setObjectName(eachBtnName);
