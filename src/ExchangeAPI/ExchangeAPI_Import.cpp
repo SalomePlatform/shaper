@@ -25,6 +25,10 @@
 #include <ModelHighAPI_Services.h>
 #include <ModelHighAPI_Tools.h>
 //--------------------------------------------------------------------------------------
+#include <ModelAPI_AttributeStringArray.h>
+#include <ModelAPI_Session.h>
+#include <ModelAPI_Tools.h>
+//--------------------------------------------------------------------------------------
 #include <algorithm>
 
 ExchangeAPI_Import::ExchangeAPI_Import(
@@ -111,6 +115,24 @@ void importPart(const std::shared_ptr<ModelAPI_Document> & thePart,
 
   FeaturePtr aFeature = thePart->addFeature(ExchangePlugin_ImportPart::ID());
   aFeature->string(ExchangePlugin_ImportPart::FILE_PATH_ID())->setValue(theFilePath);
+
+  // specify the ID of selected document
+  int aTargetPartIndex = 0;
+  SessionPtr aSession = ModelAPI_Session::get();
+  if (aSession->moduleDocument() == thePart) {
+    // Importing to PartSet has 2 choices: import directly to PartSet (if possible)
+    // or create a new part. Because then importing to existing part the document
+    // has to be specified explicitly.
+    // As a result, parse the list of possible target documents and generate new part
+    // if the import document is not applicable on PartSet level
+    // (there is no 'PartSet' in the list of applicable documents).
+    AttributeStringArrayPtr aDocsList =
+        aFeature->stringArray(ExchangePlugin_ImportPart::TARGET_PARTS_LIST_ID());
+    if (aDocsList->size() > 1 && aDocsList->value(1) == "PartSet")
+      aTargetPartIndex = 1;
+  }
+  aFeature->integer(ExchangePlugin_ImportPart::TARGET_PART_ID())->setValue(aTargetPartIndex);
+
   // restart transaction to execute and delete the macro-feature
   apply();
 

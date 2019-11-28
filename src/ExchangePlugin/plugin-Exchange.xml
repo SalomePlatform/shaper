@@ -40,6 +40,10 @@
         <file_selector id="file_path" title="Import file" path="">
           <validator id="ExchangePlugin_ImportFormat" parameters="shaperpart:Part" />
         </file_selector>
+        <choice id="target_part"
+                string_list_attribute="target_parts_list"
+                label="Import to"
+                tooltip="Select the part to import the document" />
       </feature>
       <feature id="ExportPart" title="Export part" tooltip="Export structure of the Part to file" icon="icons/Exchange/export_part.png"
                helpfile="exportPart.html"

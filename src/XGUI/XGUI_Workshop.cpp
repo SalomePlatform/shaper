@@ -1273,27 +1273,10 @@ void XGUI_Workshop::onWidgetObjectUpdated()
 //******************************************************
 void XGUI_Workshop::onImportPart()
 {
-  if (!abortAllOperations())
-    return;
-
-  //show file dialog, check if readable and open
-  qreal aRatio = ModuleBase_Tools::currentPixelRatio();
-  // If the ratio is > 1 (HD screen) then QT has a bug in
-  // displaying of system open file dialog (too small)
-  QString aFile = QFileDialog::getOpenFileName(desktop(), tr("Import part"), QString(),
-        MyImportPartFilter, Q_NULLPTR,
-        ((aRatio > 1) ? QFileDialog::DontUseNativeDialog : QFileDialog::Options()));
-  if (!aFile.isNull()) {
+  if (abortAllOperations()) {
     ModuleBase_OperationFeature* anImportPartOp = dynamic_cast<ModuleBase_OperationFeature*>(
         module()->createOperation(ExchangePlugin_ImportPart::ID()));
-    if (operationMgr()->startOperation(anImportPartOp)) {
-      // initialize the filename to be imported
-      FeaturePtr aFeature = anImportPartOp->feature();
-      aFeature->string(ExchangePlugin_ImportPart::FILE_PATH_ID())->setValue(aFile.toStdString());
-      ModuleBase_Tools::flushUpdated(aFeature);
-      operationMgr()->commitOperation();
-      setStatusBarMessage("");
-    }
+    operationMgr()->startOperation(anImportPartOp);
   }
 }
 

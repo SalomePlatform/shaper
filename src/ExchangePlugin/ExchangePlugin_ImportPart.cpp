@@ -19,17 +19,25 @@
 
 #include <ExchangePlugin_ImportPart.h>
 
+#include <ModelAPI_AttributeInteger.h>
 #include <ModelAPI_AttributeString.h>
+#include <ModelAPI_AttributeStringArray.h>
 #include <ModelAPI_ResultPart.h>
 #include <ModelAPI_Session.h>
+#include <ModelAPI_Tools.h>
 
 #include <PartSetPlugin_Part.h>
 
 #include <map>
 #include <sstream>
 
+static const std::string THE_NEW_PART_STR("New Part");
+static const std::string THE_PART_SET_STR("PartSet");
+
 // Update names of imported features/results concurent with existing objects.
 static void correntNonUniqueNames(DocumentPtr theDocument, std::list<FeaturePtr>& theImported);
+// Find the document according to its name or create the new one.
+static DocumentPtr findDocument(DocumentPtr thePartSetDoc, const std::string& thePartName);
 
 ExchangePlugin_ImportPart::ExchangePlugin_ImportPart()
 {
@@ -38,7 +46,10 @@ ExchangePlugin_ImportPart::ExchangePlugin_ImportPart()
 void ExchangePlugin_ImportPart::initAttributes()
 {
   data()->addAttribute(FILE_PATH_ID(), ModelAPI_AttributeString::typeId());
+  data()->addAttribute(TARGET_PART_ID(), ModelAPI_AttributeInteger::typeId());
+  data()->addAttribute(TARGET_PARTS_LIST_ID(), ModelAPI_AttributeStringArray::typeId());
 }
+
 
 void ExchangePlugin_ImportPart::execute()
 {
@@ -49,34 +60,109 @@ void ExchangePlugin_ImportPart::execute()
     return;
   }
 
-  // load the file into the active document
+  // get the document where to import
+  AttributeStringArrayPtr aPartsAttr = stringArray(TARGET_PARTS_LIST_ID());
+  AttributeIntegerPtr aTargetAttr = integer(TARGET_PART_ID());
   SessionPtr aSession = ModelAPI_Session::get();
-  DocumentPtr aDoc = document();
-  bool isPartSet = aDoc == aSession->moduleDocument();
+  DocumentPtr aDoc =
+      findDocument(aSession->moduleDocument(), aPartsAttr->value(aTargetAttr->value()));
+
+  // load the file into the document
   std::list<FeaturePtr> anImportedFeatures;
-  bool isOk = aDoc->import(aFilename.c_str(), anImportedFeatures, isPartSet);
-  if (!isOk && isPartSet) {
-    // there are features not appropriate for PartSet,
-    // create new part and load there
-    FeaturePtr aPartFeature = aDoc->addFeature(PartSetPlugin_Part::ID());
-    ResultPartPtr aPartResult;
-    if (aPartFeature) {
-      aPartFeature->execute();
-      aPartResult = std::dynamic_pointer_cast<ModelAPI_ResultPart>(aPartFeature->lastResult());
-    }
-    if (aPartResult) {
-      aDoc = aPartResult->partDoc();
-      isOk = aDoc->import(aFilename.c_str(), anImportedFeatures);
-    }
-  }
-  if (isOk)
+  if (aDoc && aDoc->importPart(aFilename.c_str(), anImportedFeatures))
     correntNonUniqueNames(aDoc, anImportedFeatures);
   else
     setError("Cannot import the document.");
 }
 
+void ExchangePlugin_ImportPart::attributeChanged(const std::string& theID)
+{
+  if (theID == FILE_PATH_ID()) {
+    AttributeStringPtr aFilePathAttr = string(FILE_PATH_ID());
+    if (aFilePathAttr->value().empty())
+      return;
+
+    AttributeStringArrayPtr aPartsAttr = stringArray(TARGET_PARTS_LIST_ID());
+    AttributeIntegerPtr aTargetAttr = integer(TARGET_PART_ID());
+
+    // update the list of target parts
+    SessionPtr aSession = ModelAPI_Session::get();
+    DocumentPtr aDoc = document();
+    bool isPartSet = aDoc == aSession->moduleDocument();
+    if (isPartSet) {
+      std::list<std::string> anAcceptedValues;
+      anAcceptedValues.push_back(THE_NEW_PART_STR);
+
+      std::list<FeaturePtr> anImportedFeatures;
+      if (aDoc->importPart(aFilePathAttr->value().c_str(), anImportedFeatures, isPartSet))
+        anAcceptedValues.push_back(THE_PART_SET_STR);
+
+      // append names of all parts
+      std::list<FeaturePtr> aSubFeatures = aDoc->allFeatures();
+      for (std::list<FeaturePtr>::iterator aFIt = aSubFeatures.begin();
+           aFIt != aSubFeatures.end(); ++aFIt) {
+        if ((*aFIt)->getKind() == PartSetPlugin_Part::ID())
+          anAcceptedValues.push_back((*aFIt)->name());
+      }
+
+      if (aPartsAttr->size() != anAcceptedValues.size())
+        aTargetAttr->setValue(0);
+
+      aPartsAttr->setSize((int)anAcceptedValues.size());
+      std::list<std::string>::iterator anIt = anAcceptedValues.begin();
+      for (int anInd = 0; anIt != anAcceptedValues.end(); ++anIt, ++anInd)
+        aPartsAttr->setValue(anInd, *anIt);
+    }
+    else {
+      // keep only the name of the current part
+      if (aPartsAttr->size() == 0) {
+        FeaturePtr aPartFeature = ModelAPI_Tools::findPartFeature(aSession->moduleDocument(), aDoc);
+
+        aPartsAttr->setSize(1);
+        aPartsAttr->setValue(0, aPartFeature->name());
+        aTargetAttr->setValue(0);
+      }
+    }
+  }
+}
+
 
 // ================================     Auxiliary functions     ===================================
+
+DocumentPtr findDocument(DocumentPtr thePartSetDoc, const std::string& thePartName)
+{
+  DocumentPtr aDoc;
+  if (thePartName == THE_PART_SET_STR)
+    aDoc = thePartSetDoc;
+  else {
+    FeaturePtr aPartFeature;
+    if (thePartName == THE_NEW_PART_STR) {
+      // create new part
+      aPartFeature = thePartSetDoc->addFeature(PartSetPlugin_Part::ID());
+      if (aPartFeature)
+        aPartFeature->execute();
+    }
+    else {
+      // find existing part by its name
+      std::list<FeaturePtr> aSubFeatures = thePartSetDoc->allFeatures();
+      for (std::list<FeaturePtr>::iterator aFIt = aSubFeatures.begin();
+           aFIt != aSubFeatures.end(); ++aFIt) {
+        if ((*aFIt)->getKind() == PartSetPlugin_Part::ID() && (*aFIt)->name() == thePartName) {
+          aPartFeature = *aFIt;
+          break;
+        }
+      }
+    }
+
+    if (aPartFeature) {
+      ResultPartPtr aPartResult =
+          std::dynamic_pointer_cast<ModelAPI_ResultPart>(aPartFeature->lastResult());
+      if (aPartResult)
+        aDoc = aPartResult->partDoc();
+    }
+  }
+  return aDoc;
+}
 
 typedef std::map<std::string, std::map<std::string, std::set<int> > > ObjectNameMap;
 

@@ -349,9 +349,9 @@ bool Model_Document::load(const char* theDirName, const char* theFileName, Docum
   return isOk;
 }
 
-bool Model_Document::import(const char* theFileName,
-                            std::list<std::shared_ptr<ModelAPI_Feature> >& theImported,
-                            bool theCheckBefore)
+bool Model_Document::importPart(const char* theFileName,
+                                std::list<std::shared_ptr<ModelAPI_Feature> >& theImported,
+                                bool theCheckOnly)
 {
   Handle(Model_Application) anApp = Model_Application::getApplication();
   TCollection_ExtendedString aFormat;
@@ -361,7 +361,7 @@ bool Model_Document::import(const char* theFileName,
   Handle(TDocStd_Document) aTempDoc;
   bool isOk = loadDocument(anApp, aTempDoc, theFileName);
 
-  if (isOk && theCheckBefore) {
+  if (isOk && theCheckOnly) {
     // verify all features are applicable for the current document type (e.g. PartSet)
     std::shared_ptr<Model_Session> aSession =
         std::dynamic_pointer_cast<Model_Session>(ModelAPI_Session::get());
@@ -380,7 +380,7 @@ bool Model_Document::import(const char* theFileName,
     }
   }
 
-  if (isOk) {
+  if (isOk && !theCheckOnly) {
     // copy features from the temporary document to the current
     Handle(TDF_RelocationTable) aRelocTable = new TDF_RelocationTable();
     TDF_LabelList anAllNewFeatures;

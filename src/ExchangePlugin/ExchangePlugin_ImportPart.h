@@ -43,6 +43,18 @@ public:
     static const std::string MY_FILE_PATH_ID("file_path");
     return MY_FILE_PATH_ID;
   }
+  /// attribute name of target part
+  inline static const std::string& TARGET_PART_ID()
+  {
+    static const std::string MY_TARGET_PART_ID("target_part");
+    return MY_TARGET_PART_ID;
+  }
+  /// attribute name of list of target parts
+  inline static const std::string& TARGET_PARTS_LIST_ID()
+  {
+    static const std::string MY_TARGET_PARTS_LIST_ID("target_parts_list");
+    return MY_TARGET_PARTS_LIST_ID;
+  }
   /// Default constructor
   ExchangePlugin_ImportPart();
 
@@ -54,6 +66,10 @@ public:
 
   /// Request for initialization of data model of the feature: adding all attributes
   EXCHANGEPLUGIN_EXPORT virtual void initAttributes();
+
+  /// Called on change of any argument-attribute of this object
+  /// \param theID identifier of changed attribute
+  EXCHANGEPLUGIN_EXPORT virtual void attributeChanged(const std::string& theID);
 
   /// Computes or recomputes the results
   EXCHANGEPLUGIN_EXPORT virtual void execute();

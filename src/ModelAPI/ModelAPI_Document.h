@@ -263,12 +263,12 @@ public:
   /// All the features are added after the active feature.
   /// \param theFileName name of the file to import
   /// \param theImported list of features imported from the file
-  /// \param theCheckBefore verify the document does not contain unappropriate features
-  ///                       (useful for import to PartSet)
+  /// \param theCheckOnly verify the document does not contain unappropriate features
+  ///                     (useful for import to PartSet), but do not import it
   /// \returns true if file was loaded successfully
-  MODELAPI_EXPORT virtual bool import(const char* theFileName,
+  MODELAPI_EXPORT virtual bool importPart(const char* theFileName,
                                       std::list<std::shared_ptr<ModelAPI_Feature> >& theImported,
-                                      bool theCheckBefore = false) = 0;
+                                      bool theCheckOnly = false) = 0;
 
   /// Export the list of features to the file
   /// \param theFilename path to save the file
