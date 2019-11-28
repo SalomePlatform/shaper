@@ -299,6 +299,9 @@ void XGUI_FacesPanel::processSelection()
   QList<ModuleBase_ViewerPrsPtr> aSelected =
     myWorkshop->selector()->selection()->getSelected(ModuleBase_ISelection::Viewer);
 
+  if (aSelected.size() == 0)
+    return;
+
   bool isModified = false;
   static Events_ID aDispEvent = Events_Loop::loop()->eventByName(EVENT_OBJECT_TO_REDISPLAY);
 
@@ -313,16 +316,25 @@ void XGUI_FacesPanel::processSelection()
       continue;
 
     ResultGroupPtr aResGroup = std::dynamic_pointer_cast<ModelAPI_ResultGroup>(anObject);
-    if (!aResGroup.get()) {
+    if (aResGroup.get()) {
+      FeaturePtr aFeature = ModelAPI_Feature::feature(aResGroup);
+      if (aFeature.get()) {
+        AttributeSelectionListPtr aSelectionListAttr = aFeature->data()->selectionList("group_list");
+        std::string aType = aSelectionListAttr->selectionType();
+        if (aType != "Faces")
+          continue;
+      }
+    }
+    else {
       GeomShapePtr aShapePtr = aPrs->shape();
       if (!aShapePtr.get() || !aShapePtr->isFace())
-        return;
+        continue;
     }
 
     QString aItemName = aResGroup.get()?
       aResGroup->data()->name().c_str() : XGUI_Tools::generateName(aPrs);
     if (myListView->hasItem(aItemName))
-      return;
+      continue;
 
     getObjectsMapFromPrs(aPrs, anObjectToShapes, anObjectToPrs);
     if (aResGroup.get() && aResGroup->isDisplayed()) {
