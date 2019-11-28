@@ -37,6 +37,7 @@ SET(PROJECT_HEADERS
     GeomValidators_ValueOrder.h
     GeomValidators_Intersected.h
     GeomValidators_NotSelfIntersected.h
+    GeomValidators_GlobalSelection.h
 )
 
 SET(PROJECT_SOURCES
@@ -56,6 +57,7 @@ SET(PROJECT_SOURCES
     GeomValidators_ValueOrder.cpp
     GeomValidators_Intersected.cpp
     GeomValidators_NotSelfIntersected.cpp
+    GeomValidators_GlobalSelection.cpp
 )
 
 SET(PROJECT_LIBRARIES

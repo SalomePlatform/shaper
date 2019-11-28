@@ -27,6 +27,7 @@
 #include <ModelAPI_Object.h>
 #include <ModelAPI_Session.h>
 #include <ModelAPI_AttributeString.h>
+#include <ModelAPI_AttributeSelectionList.h>
 
 #include <list>
 #include <string>
@@ -97,4 +98,46 @@ bool ExchangePlugin_FormatValidator::isValid(const AttributePtr& theAttribute,
   }
   theError = "File name does not end with any available format.";
   return false;
+}
+
+
+bool ExchangePlugin_InHistoryValidator::isValid(const AttributePtr& theAttribute,
+                                                const std::list<std::string>& theArguments,
+                                                Events_InfoMessage& theError) const
+{
+  std::string anAttributeType = theAttribute->attributeType();
+  if(anAttributeType == ModelAPI_AttributeSelection::typeId()) {
+    AttributeSelectionPtr anAttrSelection =
+      std::dynamic_pointer_cast<ModelAPI_AttributeSelection>(theAttribute);
+    ResultPtr aContext = anAttrSelection->context();
+    if (!aContext.get()) {
+      theError = "Error: Context is empty.";
+      return false;
+    }
+
+    FeaturePtr aFeature = ModelAPI_Feature::feature(aContext);
+    if (!aFeature->isInHistory()) {
+      theError = "Error: Feature is not in history.";
+      return false;
+    }
+  } else if(anAttributeType == ModelAPI_AttributeSelectionList::typeId()) {
+    AttributeSelectionListPtr anAttrSelectionList =
+      std::dynamic_pointer_cast<ModelAPI_AttributeSelectionList>(theAttribute);
+
+    // All objects should not be result constructions.
+    for(int anIndex = 0, aSize = anAttrSelectionList->size(); anIndex < aSize; ++anIndex) {
+      AttributeSelectionPtr anAttrSelection = anAttrSelectionList->value(anIndex);
+      if(!isValid(anAttrSelection, theArguments, theError)) {
+        return false;
+      }
+    }
+  } else {
+// LCOV_EXCL_START
+    theError = "Error: Attribute \"%1\" does not supported by this validator.";
+    theError.arg(anAttributeType);
+    return false;
+// LCOV_EXCL_STOP
+  }
+
+  return true;
 }

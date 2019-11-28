@@ -45,6 +45,8 @@ ExchangePlugin_Plugin::ExchangePlugin_Plugin()
                               new ExchangePlugin_ImportFormatValidator);
   aFactory->registerValidator("ExchangePlugin_ExportFormat",
                               new ExchangePlugin_ExportFormatValidator);
+  aFactory->registerValidator("ExchangePlugin_InHistory",
+                              new ExchangePlugin_InHistoryValidator);
 }
 
 FeaturePtr ExchangePlugin_Plugin::createFeature(std::string theFeatureID)

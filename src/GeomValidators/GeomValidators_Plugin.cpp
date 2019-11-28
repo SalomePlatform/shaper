@@ -25,6 +25,7 @@
 #include <GeomValidators_DifferentShapes.h>
 #include <GeomValidators_Face.h>
 #include <GeomValidators_Finite.h>
+#include <GeomValidators_GlobalSelection.h>
 #include <GeomValidators_ShapeType.h>
 #include <GeomValidators_ZeroOffset.h>
 #include <GeomValidators_FeatureKind.h>
@@ -60,6 +61,7 @@ GeomValidators_Plugin::GeomValidators_Plugin()
   aFactory->registerValidator("GeomValidators_Intersected", new GeomValidators_Intersected);
   aFactory->registerValidator("GeomValidators_NotSelfIntersected",
                               new GeomValidators_NotSelfIntersected);
+  aFactory->registerValidator("GeomValidators_GlobalSelection", new GeomValidators_GlobalSelection);
 
   // Do not register this plugin because it doesn't create features
   //ModelAPI_Session::get()->registerPlugin(this);

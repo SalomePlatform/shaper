@@ -54,6 +54,8 @@
         <multi_selector id="selection_list"
                         tooltip="Select features or results"
                         shape_types="Vertices Edges Faces Solids Compsolids Objects">
+          <validator id="GeomValidators_GlobalSelection" />
+          <validator id="ExchangePlugin_InHistory" />
         </multi_selector>
       </feature>
     </group>

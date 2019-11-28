@@ -26,6 +26,7 @@ INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR}/src/Events
                     ${PROJECT_SOURCE_DIR}/src/ModelHighAPI
                     ${PROJECT_SOURCE_DIR}/src/GeomAPI
                     ${PROJECT_SOURCE_DIR}/src/GeomAlgoAPI
+                    ${PROJECT_SOURCE_DIR}/src/GeomValidators
                     ${PROJECT_SOURCE_DIR}/src/XAO
                     ${PROJECT_SOURCE_DIR}/src/ConstructionPlugin
                     ${PROJECT_SOURCE_DIR}/src/PartSetPlugin
@@ -71,6 +72,7 @@ SET(PROJECT_LIBRARIES
     ModelHighAPI
     GeomAPI
     GeomAlgoAPI
+    GeomValidators
     XAOShaper
 )
 SOURCE_GROUP ("Resource Files" FILES ${TEXT_RESOURCES})

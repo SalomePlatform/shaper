@@ -71,4 +71,20 @@ class ExchangePlugin_ExportFormatValidator : public ExchangePlugin_FormatValidat
 
 };
 
+/**
+ *  Check the selected result is in history (avoid Origin and coordinate axes and planes).
+ */
+class ExchangePlugin_InHistoryValidator : public ModelAPI_AttributeValidator
+{
+public:
+  /// \return True if the attribute is valid.
+  ///         It checks whether the selected object is in history.
+  /// \param[in] theAttribute an attribute to check
+  /// \param[in] theArguments a filter parameters
+  /// \param[out] theError error message.
+  virtual bool isValid(const AttributePtr& theAttribute,
+                       const std::list<std::string>& theArguments,
+                       Events_InfoMessage& theError) const;
+};
+
 #endif
