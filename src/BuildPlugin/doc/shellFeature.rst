@@ -18,7 +18,7 @@ The following property panel will be opened:
 .. centered::
   Create a shell
   
-Select one or several faces in the viewer.
+Select one or several faces in the viewer. Additionally, it is allowed to select a whole sketch result from the object browser. In this case, the result shell will contain faces corresponding to all smallest closed contours of the sketch.
 
 **Apply** button creates a shell.
 

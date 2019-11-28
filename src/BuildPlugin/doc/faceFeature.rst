@@ -21,6 +21,8 @@ The following property panel will be opened:
   
 Select one or several faces in viewer. Additionally, a face can be build by a closed wire or a set of edges composing a closed wire.
 
+It also allowed to select a whole sketch result from the object browser. In this case, the smallest closed contour of the sketch will be transformed to the planar face.
+
 **Apply** button creates faces.
 
 **Cancel** button cancels the operation. 

@@ -18,7 +18,7 @@ The following property panel will be opened:
 .. centered::
   Create vertices
 
-Select one or several vertices in the viewer.
+Select one or several vertices in the viewer. It also allowed to select a whole sketch result in the object browser, then all start and end points of the sketch segments will be added into result. Checkbox **Compute intersections** forces to include intersection vertices of edges of the selected sketch.
 
 **Apply** button creates vertices.
 
@@ -26,10 +26,11 @@ Select one or several vertices in the viewer.
 
 **TUI Command**:
 
-.. py:function:: model.addVertex(Part_doc, Shapes)
+.. py:function:: model.addVertex(Part_doc, Shapes, doIntersect)
 
     :param part: The current part object.
     :param list: A list of shapes.
+    :param bool: Intersect edges (applicable for sketch only). False by default.
     :return: Result object.
 
 Result
