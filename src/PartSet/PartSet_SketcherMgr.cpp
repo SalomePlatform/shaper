@@ -2001,6 +2001,7 @@ void PartSet_SketcherMgr::updateBySketchParameters(
       if (aPrevState != theState) {
         /// call all sketch features redisplay, the expression state will be corrected in customize
         /// of distance presentation
+        SketcherPrs_Tools::sendExpressionShownEvent(myIsConstraintsShown[PartSet_Tools::Expressions]);
         Events_ID anEventId = Events_Loop::loop()->eventByName(EVENT_OBJECT_TO_REDISPLAY);
         PartSet_Tools::sendSubFeaturesEvent(myCurrentSketch, anEventId);
       }
