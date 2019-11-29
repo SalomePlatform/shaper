@@ -178,7 +178,8 @@ bool ModuleBase_WidgetValidated::isValidInFilters(const ModuleBase_ViewerPrsPtr&
                 TopoDS_Shape aTDShape = aShapePtr->impl<TopoDS_Shape>();
                 AISObjectPtr aIOPtr = myWorkshop->findPresentation(aResult);
                 if (aIOPtr.get()) {
-                  Handle(AIS_InteractiveObject) anIO = aIOPtr->impl<Handle(AIS_InteractiveObject)>();
+                  Handle(AIS_InteractiveObject) anIO =
+                    aIOPtr->impl<Handle(AIS_InteractiveObject)>();
                   aOwnersList.Append(new StdSelect_BRepOwner(aTDShape, anIO));
                 }
                 else

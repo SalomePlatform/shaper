@@ -970,6 +970,8 @@ bool PartSet_SketcherMgr::isEntity(const std::string& theId)
          (theId == SketchPlugin_Arc::ID()) ||
          (theId == SketchPlugin_Circle::ID()) ||
          (theId == SketchPlugin_Ellipse::ID()) ||
+         (theId == SketchPlugin_Projection::ID()) ||
+         (theId == SketchPlugin_IntersectionPoint::ID()) ||
          (theId == SketchPlugin_EllipticArc::ID());
 }
 
