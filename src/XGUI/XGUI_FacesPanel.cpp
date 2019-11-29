@@ -319,7 +319,8 @@ void XGUI_FacesPanel::processSelection()
     if (aResGroup.get()) {
       FeaturePtr aFeature = ModelAPI_Feature::feature(aResGroup);
       if (aFeature.get()) {
-        AttributeSelectionListPtr aSelectionListAttr = aFeature->data()->selectionList("group_list");
+        AttributeSelectionListPtr aSelectionListAttr =
+          aFeature->data()->selectionList("group_list");
         std::string aType = aSelectionListAttr->selectionType();
         if (aType != "Faces")
           continue;
