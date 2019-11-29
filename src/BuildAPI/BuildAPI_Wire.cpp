@@ -31,10 +31,12 @@ BuildAPI_Wire::BuildAPI_Wire(const std::shared_ptr<ModelAPI_Feature>& theFeature
 
 //==================================================================================================
 BuildAPI_Wire::BuildAPI_Wire(const std::shared_ptr<ModelAPI_Feature>& theFeature,
-                             const std::list<ModelHighAPI_Selection>& theBaseObjects)
+                             const std::list<ModelHighAPI_Selection>& theBaseObjects,
+                             const bool theComputeIntersections)
 : ModelHighAPI_Interface(theFeature)
 {
   if(initialize()) {
+    fillAttribute(theComputeIntersections, mycomputeIntersections);
     setBase(theBaseObjects);
   }
 }
@@ -60,7 +62,13 @@ void BuildAPI_Wire::dump(ModelHighAPI_Dumper& theDumper) const
   std::string aPartName = theDumper.name(aBase->document());
 
   theDumper << aBase << " = model.addWire(" << aPartName << ", "
-            << aBase->selectionList(BuildPlugin_Wire::BASE_OBJECTS_ID()) << ")" << std::endl;
+            << aBase->selectionList(BuildPlugin_Wire::BASE_OBJECTS_ID());
+
+  AttributeBooleanPtr isIntersect = aBase->boolean(BuildPlugin_Wire::INTERSECT_ID());
+  if (isIntersect->isInitialized())
+    theDumper << ", " << isIntersect;
+
+  theDumper << ")" << std::endl;
 }
 
 //==================================================================================================
@@ -71,8 +79,9 @@ void BuildAPI_Wire::addContour()
 
 //==================================================================================================
 WirePtr addWire(const std::shared_ptr<ModelAPI_Document>& thePart,
-                const std::list<ModelHighAPI_Selection>& theBaseObjects)
+                const std::list<ModelHighAPI_Selection>& theBaseObjects,
+                const bool theComputeIntersections)
 {
   std::shared_ptr<ModelAPI_Feature> aFeature = thePart->addFeature(BuildAPI_Wire::ID());
-  return WirePtr(new BuildAPI_Wire(aFeature, theBaseObjects));
+  return WirePtr(new BuildAPI_Wire(aFeature, theBaseObjects, theComputeIntersections));
 }

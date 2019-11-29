@@ -27,6 +27,7 @@ class GeomAPI_Pnt;
 class GeomAPI_Circ;
 class GeomAPI_Lin;
 class GeomAPI_Ellipse;
+class GeomAPI_Vertex;
 
 /**\class GeomAPI_Edge
 * \ingroup DataModel
@@ -43,6 +44,11 @@ public:
    /// Creation of edge by the edge-shape
   GEOMAPI_EXPORT
    GeomAPI_Edge(const std::shared_ptr<GeomAPI_Shape>& theShape);
+
+  /// Return vertices of the edge;
+  GEOMAPI_EXPORT
+  void vertices(std::shared_ptr<GeomAPI_Vertex>& theStartVertex,
+                std::shared_ptr<GeomAPI_Vertex>& theEndVertex) const;
 
   /// Returns \c true if edges have same underlying curve
   GEOMAPI_EXPORT

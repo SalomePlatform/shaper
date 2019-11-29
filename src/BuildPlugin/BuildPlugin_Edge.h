@@ -89,6 +89,13 @@ public:
     return MY_SECOND_POINT_ID;
   }
 
+  /// Attribute name of "Compute intersections" checkbox.
+  inline static const std::string& INTERSECT_ID()
+  {
+    static const std::string MY_INTERSECT_ID("intersect");
+    return MY_INTERSECT_ID;
+  }
+
   /// Request for initialization of data model of the feature: adding all attributes.
   BUILDPLUGIN_EXPORT virtual void initAttributes();
 

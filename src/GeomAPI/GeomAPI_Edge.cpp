@@ -25,6 +25,7 @@
 #include<GeomAPI_Lin.h>
 #include<GeomAPI_Ax2.h>
 #include<GeomAPI_Ellipse.h>
+#include<GeomAPI_Vertex.h>
 
 #include <BRepAdaptor_Curve.hxx>
 
@@ -67,6 +68,18 @@ GeomAPI_Edge::GeomAPI_Edge(const std::shared_ptr<GeomAPI_Shape>& theShape)
   if (!theShape->isNull() && theShape->isEdge()) {
     setImpl(new TopoDS_Shape(theShape->impl<TopoDS_Shape>()));
   }
+}
+
+void GeomAPI_Edge::vertices(std::shared_ptr<GeomAPI_Vertex>& theStartVertex,
+                            std::shared_ptr<GeomAPI_Vertex>& theEndVertex) const
+{
+  const TopoDS_Edge& anEdge = impl<TopoDS_Edge>();
+  TopoDS_Vertex aStart, aEnd;
+  TopExp::Vertices(anEdge, aStart, aEnd);
+  theStartVertex.reset(new GeomAPI_Vertex);
+  theStartVertex->setImpl(new TopoDS_Vertex(aStart));
+  theEndVertex.reset(new GeomAPI_Vertex);
+  theEndVertex->setImpl(new TopoDS_Vertex(aEnd));
 }
 
 static Handle(Geom_Curve) baseCurve(const TopoDS_Edge& theEdge)

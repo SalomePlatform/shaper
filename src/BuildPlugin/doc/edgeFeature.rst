@@ -14,7 +14,7 @@ The options to create edges:
 
 .. image:: images/edge_by_segments_32x32.png
    :align: left
-**By edges** creates edges using already existing edges in other shapes.
+**By edges** creates edges using already existing edges in other shapes or full sketches.
 
 .. image:: images/edge_by_points_32x32.png
    :align: left
@@ -30,7 +30,8 @@ By edges
 .. centered::
   Create by edges
 
-Select one or several edges in the viewer.
+Select one or several edges in the viewer. Also, the full sketch can be selected. In this case, all edges of the sketch will be processed.
+Checkbox **Compute intersections** forces to split sketch edges in the points of intersection.
 
 **Apply** button creates edges.
 
@@ -38,10 +39,11 @@ Select one or several edges in the viewer.
 
 **TUI Command**:
 
-.. py:function:: model.addEdge(Part_doc, Shapes)
+.. py:function:: model.addEdge(Part_doc, Shapes, Intersect)
 
     :param part: The current part object.
     :param list: A list of shapes.
+    :param bool: Split edges by intersection points. False by default.
     :return: Result object.
 
 Result

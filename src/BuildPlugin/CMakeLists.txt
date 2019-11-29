@@ -115,8 +115,18 @@ ADD_UNIT_TESTS(TestVertex.py
                TestEdge.py
                TestEdge_ByPoints.py
                TestEdge_ErrorMsg.py
+               TestEdge_WholeSketch_1.py
+               TestEdge_WholeSketch_2.py
+               TestEdge_WholeSketch_3.py
+               TestEdge_WholeSketch_4.py
                TestWire.py
                TestWire_ErrorMsg.py
+               TestWire_WholeSketch_1.py
+               TestWire_WholeSketch_2.py
+               TestWire_WholeSketch_3.py
+               TestWire_WholeSketch_4.py
+               TestWire_WholeSketch_5.py
+               TestWire_WholeSketch_6.py
                TestPolyline.py
                TestInterpolation.py
                TestFace.py

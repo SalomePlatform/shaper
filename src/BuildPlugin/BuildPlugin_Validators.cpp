@@ -116,12 +116,6 @@ bool BuildPlugin_ValidatorBaseForWire::isValid(const std::shared_ptr<ModelAPI_Fe
                                                Events_InfoMessage& theError) const
 {
   // Get attribute.
-  if(theArguments.size() != 1) {
-    std::string aMsg = "Error: BuildPlugin_ValidatorBaseForWire should be used only "
-                       "with 1 parameter (ID of base objects list).";
-    Events_InfoMessage("BuildPlugin_Validators", aMsg).send();
-    return false;
-  }
   AttributeSelectionListPtr aSelectionList = theFeature->selectionList(theArguments.front());
   if(!aSelectionList.get()) {
     theError = "Empty attribute \"%1\".";
@@ -129,25 +123,53 @@ bool BuildPlugin_ValidatorBaseForWire::isValid(const std::shared_ptr<ModelAPI_Fe
     return false;
   }
 
+  GeomAPI_Shape::ShapeType aShapeType = GeomAPI_Shape::shapeTypeByStr(theArguments.back());
 
   // Collect base shapes.
   ListOfShape aListOfShapes;
   for(int anIndex = 0; anIndex < aSelectionList->size(); ++anIndex) {
     AttributeSelectionPtr aSelection = aSelectionList->value(anIndex);
     GeomShapePtr aShape = aSelection->value();
-    if(!aShape.get()) {
-      if (aSelection->context().get())
-        aShape = aSelection->context()->shape();
-    }
-    if (aShape.get())
+    ResultPtr aContext = aSelection->context();
+    if (!aShape.get() && aContext.get())
+      aShape = aContext->shape();
+
+    bool isProper = aShape.get() &&
+        (aShape->shapeType() == GeomAPI_Shape::EDGE || aShape->shapeType() == aShapeType);
+
+    if (isProper)
       aListOfShapes.push_back(aShape);
+    else {
+      // is it a sketch?
+      FeaturePtr aFeature = aSelection->contextFeature();
+      if (!aFeature.get()) {
+        GeomShapePtr aValue = aSelection->value();
+        // whole sketch is allowed only
+        if (aContext.get() && !aValue.get()) {
+          aFeature = ModelAPI_Feature::feature(aContext);
+        }
+      }
+
+      if (!aFeature.get()) {
+        theError = "Error: Incorrect selection.";
+        return false;
+      }
+
+      if (aFeature->getKind() != SketchPlugin_Sketch::ID()) {
+        theError = "Error: %1 shape is not allowed for selection.";
+        theError.arg(aFeature->getKind());
+        return false;
+      }
+    }
   }
 
-  // Create wire.
-  GeomShapePtr aWire = GeomAlgoAPI_WireBuilder::wire(aListOfShapes);
-  if(!aWire.get()) {
-    theError = "Result wire empty. Probably it has disconnected edges or non-manifold.";
-    return false;
+  if (aShapeType == GeomAPI_Shape::WIRE) {
+    // Create wire.
+    GeomShapePtr aWire = GeomAlgoAPI_WireBuilder::wire(aListOfShapes);
+    if (!aWire.get() && !aListOfShapes.empty()) {
+      theError = "Result wire empty. Probably it has disconnected edges or non-manifold.";
+      return false;
+    }
   }
 
   return true;

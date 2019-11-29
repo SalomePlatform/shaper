@@ -2,12 +2,14 @@
   <toolbox id="creation_method">
     <box id="by_segments" title="By segments" icon="icons/Build/edge_by_segments_32x32.png">
       <multi_selector id="base_objects"
-                      label="Edges:"
+                      label="Edges or sketches:"
                       tooltip="Select edges on sketch or edges objects."
                       shape_types="edges"
                       concealment="true">
-        <validator id="BuildPlugin_ValidatorBaseForBuild" parameters="edge"/>
+        <validator id="BuildPlugin_ValidatorBaseForBuild" parameters="edge,compound"/>
       </multi_selector>
+      <boolvalue id="intersect" label="Compute intersections" tooltip="Divide sketch edges in intersection points." default="false"/>
+      <validator id="BuildPlugin_ValidatorBaseForWire" parameters="base_objects,edge"/>
     </box>
     <box id="by_points" title="By two points" icon="icons/Build/edge_by_points_32x32.png">
       <shape_selector id="first_point"

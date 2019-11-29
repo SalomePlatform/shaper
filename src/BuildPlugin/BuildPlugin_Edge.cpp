@@ -19,14 +19,18 @@
 
 #include "BuildPlugin_Edge.h"
 
+#include <ModelAPI_AttributeBoolean.h>
 #include <ModelAPI_AttributeSelectionList.h>
 #include <ModelAPI_AttributeString.h>
 #include <ModelAPI_ResultBody.h>
 #include <ModelAPI_Session.h>
 #include <ModelAPI_Validator.h>
 
+#include <GeomAlgoAPI_CompoundBuilder.h>
 #include <GeomAlgoAPI_Copy.h>
 #include <GeomAlgoAPI_EdgeBuilder.h>
+#include <GeomAlgoAPI_MakeShapeList.h>
+#include <GeomAlgoAPI_Partition.h>
 #include <GeomAlgoAPI_Tools.h>
 
 #include <GeomAPI_Edge.h>
@@ -64,6 +68,9 @@ void BuildPlugin_Edge::initAttributes()
 
   data()->addAttribute(FIRST_POINT(), ModelAPI_AttributeSelection::typeId());
   data()->addAttribute(SECOND_POINT(), ModelAPI_AttributeSelection::typeId());
+
+  data()->addAttribute(INTERSECT_ID(), ModelAPI_AttributeBoolean::typeId());
+  ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(), INTERSECT_ID());
 }
 
 //=================================================================================================
@@ -96,7 +103,6 @@ void BuildPlugin_Edge::edgesBySegments()
   // Collect base shapes.
   ListOfShape aListOfShapes;
   std::string aError;
-  int aResultIndex = 0;
   for(int anIndex = 0; anIndex < aSelectionList->size(); ++anIndex) {
     AttributeSelectionPtr aSelection = aSelectionList->value(anIndex);
     GeomShapePtr aShape;
@@ -108,29 +114,48 @@ void BuildPlugin_Edge::edgesBySegments()
       setError("Error: Empty shape selected.");
       return;
     }
+    aListOfShapes.push_back(aShape);
+  }
 
-    if(aShape->shapeType() != GeomAPI_Shape::EDGE) {
-      setError("Error: Selected shape has wrong type. Only edges acceptable.");
-      return;
-    }
+  AttributeBooleanPtr isIntersect = boolean(INTERSECT_ID());
 
-    // Copy shape.
-    GeomMakeShapePtr aCopyAlgo(new GeomAlgoAPI_Copy(aShape));
+  GeomShapePtr aResult;
+  std::shared_ptr<GeomAlgoAPI_Partition> aPartitionAlgo;
+  if (isIntersect->isInitialized() && isIntersect->value()) {
+    aPartitionAlgo.reset(new GeomAlgoAPI_Partition(aListOfShapes, ListOfShape()));
 
     std::string anError;
-    if (GeomAlgoAPI_Tools::AlgoError::isAlgorithmFailed(aCopyAlgo, getKind(), anError)) {
+    if (GeomAlgoAPI_Tools::AlgoError::isAlgorithmFailed(aPartitionAlgo, getKind(), anError)) {
       setError(anError);
       return;
     }
 
+    aResult = aPartitionAlgo->shape();
+  }
+  else
+    aResult = GeomAlgoAPI_CompoundBuilder::compound(aListOfShapes);
+
+  int aResultIndex = 0;
+
+  // Explode on edges
+  std::set<GeomShapePtr, GeomAPI_Shape::Comparator> aProcessed;
+  for (GeomAPI_ShapeExplorer anExp(aResult, GeomAPI_Shape::EDGE); anExp.more(); anExp.next()) {
+    GeomShapePtr anEdge = anExp.current();
+    if (aProcessed.find(anEdge) != aProcessed.end())
+      continue; // vertex is already processed
+    aProcessed.insert(anEdge);
+
+    std::shared_ptr<GeomAlgoAPI_Copy> aCopyAlgo(new GeomAlgoAPI_Copy(anEdge));
+
+    std::shared_ptr<GeomAlgoAPI_MakeShapeList> aMakeShapeList(new GeomAlgoAPI_MakeShapeList);
+    if (aPartitionAlgo)
+      aMakeShapeList->appendAlgo(aPartitionAlgo);
+    aMakeShapeList->appendAlgo(aCopyAlgo);
+
     // Store result.
     ResultBodyPtr aResultBody = document()->createBody(data(), aResultIndex);
-
-    ListOfShape aBaseShapes;
-    aBaseShapes.push_back(aShape);
-    aResultBody->storeModified(aBaseShapes, aCopyAlgo->shape(), aCopyAlgo);
-    aResultBody->loadModifiedShapes(aCopyAlgo, aShape, GeomAPI_Shape::VERTEX);
-
+    aResultBody->storeModified(aListOfShapes, aCopyAlgo->shape(), aMakeShapeList);
+    aResultBody->loadModifiedShapes(aMakeShapeList, anEdge, GeomAPI_Shape::VERTEX);
     setResult(aResultBody, aResultIndex);
     ++aResultIndex;
   }

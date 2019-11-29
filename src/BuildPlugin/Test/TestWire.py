@@ -145,7 +145,7 @@ aSession.finishOperation()
 assert (len(aWireFeature2.results()) == 1)
 
 # =============================================================================
-# Test 4. Check Wire feature failed on incorrect input
+# Test 4. Check Wire feature on the whole sketch
 # =============================================================================
 
 aSession.startOperation()
@@ -153,10 +153,15 @@ aWireFeature3 = aPart.addFeature("Wire")
 aBaseObjectsList = aWireFeature3.selectionList("base_objects")
 aBaseObjectsList.append(aSketchResult, None)
 aSession.finishOperation()
-assert (len(aWireFeature3.results()) == 0)
+assert (len(aWireFeature3.results()) == 1)
+
+# =============================================================================
+# Test 5. Check Wire feature failed on incorrect input
+# =============================================================================
 
 aSession.startOperation()
-aBaseObjectsList.clear()
+aWireFeature3 = aPart.addFeature("Wire")
+aBaseObjectsList = aWireFeature3.selectionList("base_objects")
 aShapeExplorer = GeomAPI_ShapeExplorer(aBoxShape, GeomAPI_Shape.VERTEX)
 aShape = aShapeExplorer.current()
 aBaseObjectsList.append(aBoxResult, aShape)

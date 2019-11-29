@@ -54,6 +54,13 @@ public:
     return MY_ADD_CONTOUR_ACTION_ID;
   }
 
+  /// Attribute name of "Compute intersections" checkbox.
+  inline static const std::string& INTERSECT_ID()
+  {
+    static const std::string MY_INTERSECT_ID("intersect");
+    return MY_INTERSECT_ID;
+  }
+
   /// \return the kind of a feature.
   BUILDPLUGIN_EXPORT virtual const std::string& getKind()
   {

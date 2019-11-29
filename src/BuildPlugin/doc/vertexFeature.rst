@@ -26,7 +26,7 @@ Select one or several vertices in the viewer. It also allowed to select a whole 
 
 **TUI Command**:
 
-.. py:function:: model.addVertex(Part_doc, Shapes, doIntersect)
+.. py:function:: model.addVertex(Part_doc, Shapes, Intersect)
 
     :param part: The current part object.
     :param list: A list of shapes.

@@ -42,7 +42,8 @@ public:
   /// Constructor with values.
   BUILDAPI_EXPORT
   explicit BuildAPI_Edge(const std::shared_ptr<ModelAPI_Feature>& theFeature,
-                         const std::list<ModelHighAPI_Selection>& theBaseObjects);
+                         const std::list<ModelHighAPI_Selection>& theBaseObjects,
+                         const bool theComputeIntersections = false);
 
   /// Constructor by points.
   BUILDAPI_EXPORT
@@ -54,7 +55,7 @@ public:
   BUILDAPI_EXPORT
   virtual ~BuildAPI_Edge();
 
-  INTERFACE_4(BuildPlugin_Edge::ID(),
+  INTERFACE_5(BuildPlugin_Edge::ID(),
               baseObjects, BuildPlugin_Edge::BASE_OBJECTS_ID(),
               ModelAPI_AttributeSelectionList, /** Base objects */,
               creationMethod, BuildPlugin_Edge::CREATION_METHOD(),
@@ -62,7 +63,9 @@ public:
               firstPoint, BuildPlugin_Edge::FIRST_POINT(),
               ModelAPI_AttributeSelection, /** First point */,
               secondPoint, BuildPlugin_Edge::SECOND_POINT(),
-              ModelAPI_AttributeSelection, /** Second point */)
+              ModelAPI_AttributeSelection, /** Second point */,
+              computeIntersections, BuildPlugin_Edge::INTERSECT_ID(),
+              ModelAPI_AttributeBoolean, /** Intersect edges */)
 
   /// Modify base attribute of the feature.
   BUILDAPI_EXPORT
@@ -80,7 +83,8 @@ typedef std::shared_ptr<BuildAPI_Edge> EdgePtr;
 /// \brief Create Edge feature.
 BUILDAPI_EXPORT
 EdgePtr addEdge(const std::shared_ptr<ModelAPI_Document>& thePart,
-                const std::list<ModelHighAPI_Selection>& theBaseObjects);
+                const std::list<ModelHighAPI_Selection>& theBaseObjects,
+                const bool theComputeIntersection = false);
 /// \ingroup CPPHighAPI
 /// \brief Create Edge feature.
 BUILDAPI_EXPORT

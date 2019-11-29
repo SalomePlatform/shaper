@@ -42,15 +42,18 @@ public:
   /// Constructor with values.
   BUILDAPI_EXPORT
   explicit BuildAPI_Wire(const std::shared_ptr<ModelAPI_Feature>& theFeature,
-                         const std::list<ModelHighAPI_Selection>& theBaseObjects);
+                         const std::list<ModelHighAPI_Selection>& theBaseObjects,
+                         const bool theComputeIntersections = false);
 
   /// Destructor.
   BUILDAPI_EXPORT
   virtual ~BuildAPI_Wire();
 
-  INTERFACE_1(BuildPlugin_Wire::ID(),
+  INTERFACE_2(BuildPlugin_Wire::ID(),
               baseObjects, BuildPlugin_Wire::BASE_OBJECTS_ID(),
-              ModelAPI_AttributeSelectionList, /** Base objects */)
+              ModelAPI_AttributeSelectionList, /** Base objects */,
+              computeIntersections, BuildPlugin_Wire::INTERSECT_ID(),
+              ModelAPI_AttributeBoolean, /** Intersect edges */)
 
   /// Modify base attribute of the feature.
   BUILDAPI_EXPORT
@@ -72,6 +75,7 @@ typedef std::shared_ptr<BuildAPI_Wire> WirePtr;
 /// \brief Create Wire feature.
 BUILDAPI_EXPORT
 WirePtr addWire(const std::shared_ptr<ModelAPI_Document>& thePart,
-                const std::list<ModelHighAPI_Selection>& theBaseObjects);
+                const std::list<ModelHighAPI_Selection>& theBaseObjects,
+                const bool theComputeIntersections = false);
 
 #endif // BuildAPI_Wire_H_
