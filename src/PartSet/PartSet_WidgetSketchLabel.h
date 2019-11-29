@@ -217,6 +217,8 @@ private slots:
 
   void onShowDOF();
 
+  void onShowPanel();
+
 private:
   /// Set sketch plane by shape
   /// \param theShape a planar face

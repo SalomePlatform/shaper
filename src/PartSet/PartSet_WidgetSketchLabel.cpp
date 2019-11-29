@@ -79,6 +79,7 @@
 #include <QLineEdit>
 #include <QDoubleValidator>
 #include <QDialog>
+#include <QTimer>
 
 #ifndef DBL_MAX
 #define DBL_MAX 1.7976931348623158e+308
@@ -579,6 +580,12 @@ void PartSet_WidgetSketchLabel::activateCustom()
 
 void PartSet_WidgetSketchLabel::showEvent(QShowEvent* theEvent)
 {
+  ModuleBase_WidgetValidated::showEvent(theEvent);
+  QTimer::singleShot(10, this, SLOT(onShowPanel()));
+}
+
+void PartSet_WidgetSketchLabel::onShowPanel()
+{
   if (mySizeOfViewWidget->isVisible()) {
     DocumentPtr aDoc = feature()->document();
     DocumentPtr aModDoc = ModelAPI_Session::get()->moduleDocument();
@@ -586,11 +593,11 @@ void PartSet_WidgetSketchLabel::showEvent(QShowEvent* theEvent)
       myPartSetMessage->move(mapToGlobal(geometry().bottomLeft()));
       myPartSetMessage->show();
     }
-    mySizeMessage->move(mySizeOfView->mapToGlobal(mySizeOfView->geometry().center()));
+    QPoint aPnt = mySizeOfView->mapToGlobal(mySizeOfView->geometry().center());
+    mySizeMessage->move(aPnt);
     mySizeMessage->show();
   }
 }
-
 
 void PartSet_WidgetSketchLabel::deactivate()
 {
