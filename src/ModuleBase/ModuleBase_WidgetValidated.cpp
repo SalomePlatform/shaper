@@ -32,7 +32,6 @@
 #include <ModelAPI_Validator.h>
 #include <ModelAPI_AttributeValidator.h>
 #include <ModelAPI_Events.h>
-#include <ModelAPI_ResultBody.h>
 #include <ModelAPI_Tools.h>
 #include <ModelAPI_AttributeSelection.h>
 
@@ -97,6 +96,31 @@ void ModuleBase_WidgetValidated::restoreAttributeValue(const AttributePtr& theAt
   myAttributeStore->restoreAttributeValue(theAttribute, myWorkshop);
 }
 
+
+//********************************************************************
+void ModuleBase_WidgetValidated::collectSubBodies(const ResultBodyPtr& theBody,
+                                                  AIS_NListOfEntityOwner& theList)
+{
+  AISObjectPtr aIOPtr;
+  TopoDS_Shape aTDShape;
+  int aNb = theBody->numberOfSubs();
+  for (int i = 0; i < aNb; i++) {
+    ResultBodyPtr aSub = theBody->subResult(i);
+    if (aSub->numberOfSubs() > 0)
+      collectSubBodies(aSub, theList);
+    else {
+      aTDShape = aSub->shape()->impl<TopoDS_Shape>();
+      aIOPtr = myWorkshop->findPresentation(aSub);
+      if (aIOPtr.get()) {
+        Handle(AIS_InteractiveObject) anIO = aIOPtr->impl<Handle(AIS_InteractiveObject)>();
+        theList.Append(new StdSelect_BRepOwner(aTDShape, anIO));
+      }
+      else
+        theList.Append(new StdSelect_BRepOwner(aTDShape));
+    }
+  }
+}
+
 //********************************************************************
 bool ModuleBase_WidgetValidated::isValidInFilters(const ModuleBase_ViewerPrsPtr& thePrs)
 {
@@ -141,32 +165,33 @@ bool ModuleBase_WidgetValidated::isValidInFilters(const ModuleBase_ViewerPrsPtr&
             Handle(AIS_InteractiveObject) anIO = myWorkshop->selection()->getIO(thePrs);
             aOwnersList.Append(new StdSelect_BRepOwner(aTDShape, anIO));
           }
-          else
-            aValid = false;
-          //aSelectAttr->setValue(ObjectPtr(), GeomShapePtr(), true);
         }
         else {
           ResultPtr aResult = aFeature->firstResult();
           if (aResult.get()) {
-            GeomShapePtr aShapePtr = ModelAPI_Tools::shape(aResult);
-            if (aShapePtr.get()) {
-              const TopoDS_Shape aTDShape = aShapePtr->impl<TopoDS_Shape>();
-              AISObjectPtr aIOPtr = myWorkshop->findPresentation(aResult);
-              if (aIOPtr.get()) {
-                Handle(AIS_InteractiveObject) anIO = aIOPtr->impl<Handle(AIS_InteractiveObject)>();
-                aOwnersList.Append(new StdSelect_BRepOwner(aTDShape, anIO));
-              }
-              else {
-                aOwnersList.Append(new StdSelect_BRepOwner(aTDShape));
+            ResultBodyPtr aBody = std::dynamic_pointer_cast<ModelAPI_ResultBody>(aResult);
+            if (aBody.get() && (aBody->numberOfSubs() > 0))
+              collectSubBodies(aBody, aOwnersList);
+            else {
+              GeomShapePtr aShapePtr = ModelAPI_Tools::shape(aResult);
+              if (aShapePtr.get()) {
+                TopoDS_Shape aTDShape = aShapePtr->impl<TopoDS_Shape>();
+                AISObjectPtr aIOPtr = myWorkshop->findPresentation(aResult);
+                if (aIOPtr.get()) {
+                  Handle(AIS_InteractiveObject) anIO = aIOPtr->impl<Handle(AIS_InteractiveObject)>();
+                  aOwnersList.Append(new StdSelect_BRepOwner(aTDShape, anIO));
+                }
+                else
+                  aOwnersList.Append(new StdSelect_BRepOwner(aTDShape));
               }
             }
           }
-          aValid = (aOwnersList.Size() > 0); // only results with a shape can be filtered
         }
-      } else
-        aValid = false; // only results with a shape can be filtered
+      }
     }
   }
+  aValid = (aOwnersList.Size() > 0); // only results with a shape can be filtered
+
   // checks the owner by the AIS context activated filters
   if (aOwnersList.Size() > 0) {
     // the widget validator filter should be active, but during check by preselection

@@ -27,10 +27,12 @@
 #include <GeomAPI_AISObject.h>
 #include <ModelAPI_Object.h>
 #include <ModelAPI_Attribute.h>
+#include <ModelAPI_ResultBody.h>
 
 #include <SelectMgr_ListOfFilter.hxx>
 #include <NCollection_DataMap.hxx>
 #include <TopoDS_Shape.hxx>
+#include <AIS_NListOfEntityOwner.hxx>
 
 #include <QList>
 #include <QMap>
@@ -189,6 +191,8 @@ private:
   /// Remove subshapes of compsolids if whole compsolid is present.
   /// \param theValues a list of presentations.
   void filterCompSolids(QList<std::shared_ptr<ModuleBase_ViewerPrs>>& theValues);
+
+  void collectSubBodies(const ResultBodyPtr& theBody, AIS_NListOfEntityOwner& theList);
 
 protected:
   /// Reference to workshop
