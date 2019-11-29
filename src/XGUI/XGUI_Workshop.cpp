@@ -774,9 +774,11 @@ void XGUI_Workshop::fillPropertyPanel(ModuleBase_Operation* theOperation)
 #endif
 
   myErrorMgr->setPropertyPanel(myPropertyPanel);
-  theOperation->setHideFacesVisible(myFacesPanel->isVisible());
-  if (aFeatureInfo.get() && aFeatureInfo->isHideFacesPanel() && !myFacesPanel->isVisible())
-    myFacesPanel->show();
+  if (Config_PropManager::boolean("Windows", "use_hide_faces_panel")) {
+    theOperation->setHideFacesVisible(myFacesPanel->isVisible());
+    if (aFeatureInfo.get() && aFeatureInfo->isHideFacesPanel() && !myFacesPanel->isVisible())
+      myFacesPanel->show();
+  }
   showPanel(myPropertyPanel);
 }
 
@@ -860,8 +862,10 @@ void XGUI_Workshop::onOperationStopped(ModuleBase_Operation* theOperation)
   }
   activateObjectsSelection(anObjects);
 
-  if (!theOperation->isHideFacesVisible())
-    myFacesPanel->hide();
+  if (Config_PropManager::boolean("Windows", "use_hide_faces_panel")) {
+    if (!theOperation->isHideFacesVisible())
+      myFacesPanel->hide();
+  }
 }
 
 //******************************************************
