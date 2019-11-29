@@ -1179,6 +1179,7 @@ void ModuleBase_WidgetMultiSelector::onShowOnly(bool theChecked)
     myVisibleObjects.clear();
   } else
     Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_TO_REDISPLAY));
+  myWorkshop->viewer()->update();
 }
 
 bool ModuleBase_WidgetMultiSelector::isModified() const
