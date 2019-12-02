@@ -142,6 +142,26 @@ The plug-in includes the following constraints:
 
 .. _sketch_operations:
 
+Overconstraned state
+--------------------
+
+Sketcher comes into overconstrained state when an extra constraint was defined. The following picture shows an example of the overconstrained state:
+
+.. image:: images/Overconstrained.png
+   :align: center
+
+.. centered::
+  Overconstrained Sketch
+
+When Sketcher becomes into the state then:
+
+- buttons Apply and Cancel for the whole Sketcher are blocked;
+- a constraint which causes the overconstraint state is highlightid by red color;
+- a warning message in sketcher Property Panel is shown with recomendation what to do in this case;
+- an additional Undo button is shown under the warning messages;
+
+After undoing the last operation or deletion of a conflicting constraint Sketcher will become into a normal state.
+
 Operations
 ----------
 Operations modify existing features of the sketch or create new ones by copying them.
