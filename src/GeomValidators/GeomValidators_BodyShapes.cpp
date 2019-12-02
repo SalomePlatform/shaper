@@ -65,7 +65,7 @@ bool GeomValidators_BodyShapes::isValid(const AttributePtr& theAttribute,
           break;
       }
       if (aIt == aResList.cend()) {
-        theError = "Error: Feature doesn't creates body.";
+        theError = "Error: Feature doesn't create body.";
         return false;
       }
     }
