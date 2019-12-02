@@ -414,7 +414,6 @@ void PartSet_SketcherMgr::onMousePressed(ModuleBase_IViewWindow* theWnd, QMouseE
     }
     // Init flyout point for radius rotation
     FeaturePtr aFeature = myCurrentSelection.begin().key();
-
     get2dPoint(theWnd, theEvent, myCurrentPoint);
     if (isSketcher) {
       if (aCanDrag) {
@@ -444,14 +443,33 @@ void PartSet_SketcherMgr::onMousePressed(ModuleBase_IViewWindow* theWnd, QMouseE
       /// Internal edit should not be stored as editing operation as the result will be a
       /// creation operation, where previous selection should not be used(and will be cleared)
       myIsEditLaunching = !myModule->sketchReentranceMgr()->isInternalEditActive();
-      aFOperation->commit();
+
+      std::shared_ptr<SketchPlugin_Feature> aSPFeature =
+        std::dynamic_pointer_cast<SketchPlugin_Feature>(aFOperation->feature());
+      bool isRelaunchEditing = true;
+      if (aSPFeature->isExternal()) {
+        foreach(FeaturePtr aF, myCurrentSelection.keys()) {
+          FeaturePtr aProducerFeature = PartSet_Tools::findRefsToMeFeature(aF,
+            aSPFeature->getKind());
+          if (aProducerFeature == aSPFeature) {
+            isRelaunchEditing = false;
+            break;
+          }
+        }
+      }
+      else
+        isRelaunchEditing = !myCurrentSelection.contains(aSPFeature);
+
+      if (isRelaunchEditing)
+        aFOperation->commit();
 
       if (aCanDrag) {
         myIsDragging = true;
         myDragDone = false;
       }
       myPreviousDrawModeEnabled = aViewer->enableDrawMode(false);
-      launchEditing();
+      if (isRelaunchEditing)
+        launchEditing();
       myIsEditLaunching = aPrevLaunchingState;
       if (aFeature.get() != NULL) {
         std::shared_ptr<SketchPlugin_Feature> aSPFeature =
