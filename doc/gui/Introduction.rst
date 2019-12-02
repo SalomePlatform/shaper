@@ -491,6 +491,7 @@ This tab defines presentation of objects displayed in OCC 3D viewer.
 
 **Input fields**:
 
+- **Selection color** defines a color for selected objects;
 - **Result color** selects default shading color for objects from **Results** branch;
 - **Group color** selects default color for objects from **Groups** branch;
 - **Construction color** selects default color for objects from **Constructions** branch;
@@ -558,6 +559,32 @@ Plugins tab defines folders where plugins and resources are located.
    
 .. _sketch_preferences:
    
+Shortcuts tab
+^^^^^^^^^^^^^
+
+Shortcuts tab defines shortcut keys for different operations.
+
+.. image:: images/shortcuts_preferences.png
+   :align: center
+
+.. centered::
+   Preferences - Shortcuts tab
+   
+- **Add parameter in parameters manager dialog** defines shortcut keys for adding parameter in parameters manager dialog box.
+   
+Windows tab
+^^^^^^^^^^^
+
+Windows tab contains definitions for the module windows management.
+
+.. image:: images/windows_preferences.png
+   :align: center
+
+.. centered::
+   Preferences - Windows tab
+
+- **Use HideFaces panel in operation** if the checkbox is checked then HideFaces panel will be launched automatically on launching an operation where using of this panel is considered.
+
 Sketch tab
 ^^^^^^^^^^
 
@@ -574,6 +601,7 @@ Sketch tab defines properties of coordinate planes shown for selection of sketch
 - **Size** defines size of coordinate planes;
 - **Thickness**  defines thickness of coordinate plane borders; 
 - **Rotate to plane when selected** check-box turns on/off automatic switch the viewer to the top view for the selected sketch plane.  
+- **Angular tolerance** defines defines an angular tolerance for automatic creation of horizontal and vertical constraints;
 
    
 .. _viewer_preferences:
