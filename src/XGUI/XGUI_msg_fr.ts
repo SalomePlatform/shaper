@@ -4,518 +4,518 @@
 <context>
     <name>QObject</name>
     <message>
-        <source>Move to the end</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>SHAPER files (*.shaper *.cadbld)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>SHAPER files (*.shaper)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>CAD Builder files (*.cadbld);;All files (*.*)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>CAD Builder files (*.cadbld)</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Warning</source>
-        <translation type="unfinished"></translation>
+        <translation>Attention</translation>
     </message>
     <message>
         <source>Name %2 already exists in %1.</source>
-        <translation type="unfinished"></translation>
+        <translation>Le nom %2 existe déjà dans %1.</translation>
+    </message>
+    <message>
+        <source>Move to the end</source>
+        <translation>Aller à la fin</translation>
+    </message>
+    <message>
+        <source>SHAPER files (*.shaper *.cadbld)</source>
+        <translation>Fichiers SHAPER (*.shaper *.cadbld)</translation>
+    </message>
+    <message>
+        <source>SHAPER files (*.shaper)</source>
+        <translation>Fichiers SHAPER (*.shaper)</translation>
+    </message>
+    <message>
+        <source>CAD Builder files (*.cadbld);;All files (*.*)</source>
+        <translation>Fichiers CAD Builder (*.cadbld);;Tous les fichiers (*. *)</translation>
+    </message>
+    <message>
+        <source>CAD Builder files (*.cadbld)</source>
+        <translation>Fichiers CAD Builder (*.cadbld)</translation>
     </message>
     <message>
         <source>Abort operation</source>
-        <translation type="unfinished"></translation>
+        <translation>Abandonner l&apos;opération</translation>
     </message>
     <message>
         <source>Validate operation</source>
-        <translation type="unfinished"></translation>
+        <translation>Valider l&apos;opération</translation>
     </message>
 </context>
 <context>
     <name>XGUI_ActionsMgr</name>
     <message>
         <source>Shortcut %1 is already defined. Ignore.</source>
-        <translation type="unfinished"></translation>
+        <translation>Le raccourci %1 est déjà défini. Ignorer.</translation>
     </message>
     <message>
         <source>Apply</source>
-        <translation type="unfinished"></translation>
+        <translation>Appliquer</translation>
     </message>
     <message>
         <source>Apply and continue</source>
-        <translation type="unfinished"></translation>
+        <translation>Appliquer et continuer</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation type="unfinished"></translation>
+        <translation>Annuler</translation>
     </message>
     <message>
         <source>Help</source>
-        <translation type="unfinished"></translation>
+        <translation>Aide</translation>
     </message>
     <message>
         <source>See preview</source>
-        <translation type="unfinished"></translation>
+        <translation>Voir l&apos;aperçu</translation>
     </message>
     <message>
         <source>Compute preview</source>
-        <translation type="unfinished"></translation>
+        <translation>Calculer l&apos;aperçu avant impression</translation>
     </message>
 </context>
 <context>
     <name>XGUI_ColorDialog</name>
     <message>
         <source>Color</source>
-        <translation type="unfinished"></translation>
+        <translation>Couleur</translation>
     </message>
     <message>
         <source>Random</source>
-        <translation type="unfinished"></translation>
+        <translation>Aléatoire</translation>
     </message>
 </context>
 <context>
     <name>XGUI_ContextMenuMgr</name>
     <message>
         <source>Delete</source>
-        <translation type="unfinished"></translation>
+        <translation>Effacer</translation>
     </message>
     <message>
         <source>Rename</source>
-        <translation type="unfinished"></translation>
+        <translation>Renommer</translation>
     </message>
     <message>
         <source>Clean history</source>
-        <translation type="unfinished"></translation>
+        <translation>Vider l’historique</translation>
     </message>
     <message>
         <source>Color...</source>
-        <translation type="unfinished"></translation>
+        <translation>Couleur...</translation>
     </message>
     <message>
         <source>Deflection...</source>
-        <translation type="unfinished"></translation>
+        <translation>Déviation...</translation>
     </message>
     <message>
         <source>Transparency...</source>
-        <translation type="unfinished"></translation>
+        <translation>Transparence...</translation>
     </message>
     <message>
         <source>Show</source>
-        <translation type="unfinished"></translation>
+        <translation>Afficher</translation>
     </message>
     <message>
         <source>Show only</source>
-        <translation type="unfinished"></translation>
+        <translation>Montrer seulement</translation>
     </message>
     <message>
         <source>Hide</source>
-        <translation type="unfinished"></translation>
+        <translation>Cacher</translation>
     </message>
     <message>
         <source>Hide all</source>
-        <translation type="unfinished"></translation>
+        <translation>Cacher tout</translation>
     </message>
     <message>
         <source>Shading</source>
-        <translation type="unfinished"></translation>
+        <translation>Ombrage</translation>
     </message>
     <message>
         <source>Wireframe</source>
-        <translation type="unfinished"></translation>
+        <translation>Fil de fer</translation>
     </message>
     <message>
         <source>Vertices</source>
-        <translation type="unfinished"></translation>
+        <translation>Sommets</translation>
     </message>
     <message>
         <source>Edges</source>
-        <translation type="unfinished"></translation>
+        <translation>Arêtes</translation>
     </message>
     <message>
         <source>Faces</source>
-        <translation type="unfinished"></translation>
+        <translation>Faces</translation>
     </message>
     <message>
         <source>Results</source>
-        <translation type="unfinished"></translation>
+        <translation>Résultats</translation>
     </message>
     <message>
         <source>Select results</source>
-        <translation type="unfinished"></translation>
+        <translation>Sélectionnez les résultats</translation>
     </message>
     <message>
         <source>Select parent feature</source>
-        <translation type="unfinished"></translation>
+        <translation>Sélectionner une entité parente</translation>
     </message>
     <message>
         <source>TInspector</source>
-        <translation type="unfinished"></translation>
+        <translation>TInspector</translation>
     </message>
     <message>
         <source>Insert a folder before</source>
-        <translation type="unfinished"></translation>
+        <translation>Insérer un dossier avant</translation>
     </message>
     <message>
         <source>Move into the previous folder</source>
-        <translation type="unfinished"></translation>
+        <translation>Déplacer dans le dossier précédent</translation>
     </message>
     <message>
         <source>Move into the next folder</source>
-        <translation type="unfinished"></translation>
+        <translation>Se déplacer dans le dossier suivant</translation>
     </message>
     <message>
         <source>Move out before the folder</source>
-        <translation type="unfinished"></translation>
+        <translation>Sortir avant le dossier</translation>
     </message>
     <message>
         <source>Move out after the folder</source>
-        <translation type="unfinished"></translation>
+        <translation>Sortir après le dossier</translation>
     </message>
     <message>
         <source>Set view by inverted normal to face</source>
-        <translation type="unfinished"></translation>
+        <translation>Définir la vue par normale inversée à la face</translation>
     </message>
     <message>
         <source>Set view by normal to face</source>
-        <translation type="unfinished"></translation>
+        <translation>Définir la vue par la normale à la face</translation>
     </message>
     <message>
         <source>Selection mode</source>
-        <translation type="unfinished"></translation>
+        <translation>Mode de sélection</translation>
     </message>
     <message>
         <source>Windows</source>
-        <translation type="unfinished"></translation>
+        <translation>Fenêtres</translation>
     </message>
 </context>
 <context>
     <name>XGUI_DataTree</name>
     <message>
         <source>History change</source>
-        <translation type="unfinished"></translation>
+        <translation>Changement l&apos;historique</translation>
     </message>
 </context>
 <context>
     <name>XGUI_DeflectionDialog</name>
     <message>
         <source>Deflection</source>
-        <translation type="unfinished"></translation>
+        <translation>Déviation</translation>
     </message>
 </context>
 <context>
     <name>XGUI_ErrorDialog</name>
     <message>
         <source>Application errors</source>
-        <translation type="unfinished"></translation>
+        <translation>Erreurs d&apos;application</translation>
     </message>
 </context>
 <context>
     <name>XGUI_ErrorMgr</name>
     <message>
         <source>Errors:</source>
-        <translation type="unfinished"></translation>
+        <translation>Erreurs:</translation>
     </message>
 </context>
 <context>
     <name>XGUI_FacesPanel</name>
     <message>
         <source>Hide Faces</source>
-        <translation type="unfinished"></translation>
+        <translation>Masquer les faces</translation>
     </message>
     <message>
         <source>Transparent</source>
-        <translation type="unfinished"></translation>
+        <translation>Transparent</translation>
     </message>
 </context>
 <context>
     <name>XGUI_InspectionPanel</name>
     <message>
         <source>Inspection Panel</source>
-        <translation type="unfinished"></translation>
+        <translation>Panneau d&apos;inspection</translation>
     </message>
     <message>
         <source>Object</source>
-        <translation type="unfinished"></translation>
+        <translation>Objet</translation>
     </message>
     <message>
         <source>Sub-shapes</source>
-        <translation type="unfinished"></translation>
+        <translation>Sous-formes</translation>
     </message>
     <message>
         <source>Number</source>
-        <translation type="unfinished"></translation>
+        <translation>Nombre</translation>
     </message>
     <message>
         <source>SHAPE</source>
-        <translation type="unfinished"></translation>
+        <translation>FORME</translation>
     </message>
     <message>
         <source>COMPOUND</source>
-        <translation type="unfinished"></translation>
+        <translation>ASSEMBLAGE</translation>
     </message>
     <message>
         <source>COMPSOLID</source>
-        <translation type="unfinished"></translation>
+        <translation>COMPSOLIDE</translation>
     </message>
     <message>
         <source>SOLID</source>
-        <translation type="unfinished"></translation>
+        <translation>SOLIDE</translation>
     </message>
     <message>
         <source>SHELL</source>
-        <translation type="unfinished"></translation>
+        <translation>COQUE</translation>
     </message>
     <message>
         <source>FACE</source>
-        <translation type="unfinished"></translation>
+        <translation>FACE</translation>
     </message>
     <message>
         <source>WIRE</source>
-        <translation type="unfinished"></translation>
+        <translation>CONTOUR</translation>
     </message>
     <message>
         <source>EDGE</source>
-        <translation type="unfinished"></translation>
+        <translation>BORD</translation>
     </message>
     <message>
         <source>VERTEX</source>
-        <translation type="unfinished"></translation>
+        <translation>SOMMET</translation>
     </message>
     <message>
         <source>Type:</source>
-        <translation type="unfinished"></translation>
+        <translation>Type:</translation>
     </message>
     <message>
         <source>Vertex</source>
-        <translation type="unfinished"></translation>
+        <translation>Sommet</translation>
     </message>
     <message>
         <source>Coordinates</source>
-        <translation type="unfinished"></translation>
+        <translation>Coordonnées</translation>
     </message>
     <message>
         <source>Degenerated</source>
-        <translation type="unfinished"></translation>
+        <translation>Dégénéré</translation>
     </message>
     <message>
         <source>Line segment</source>
-        <translation type="unfinished"></translation>
+        <translation>Segment de ligne</translation>
     </message>
     <message>
         <source>Center</source>
-        <translation type="unfinished"></translation>
+        <translation>Centre</translation>
     </message>
     <message>
         <source>Normal</source>
-        <translation type="unfinished"></translation>
+        <translation>Normale</translation>
     </message>
     <message>
         <source>Dimensions</source>
-        <translation type="unfinished"></translation>
+        <translation>Dimensions</translation>
     </message>
     <message>
         <source>Radius</source>
-        <translation type="unfinished"></translation>
+        <translation>Rayon</translation>
     </message>
     <message>
         <source>Major radius</source>
-        <translation type="unfinished"></translation>
+        <translation>Rayon majeur</translation>
     </message>
     <message>
         <source>Minor radius</source>
-        <translation type="unfinished"></translation>
+        <translation>Rayon mineur</translation>
     </message>
     <message>
         <source>Edge</source>
-        <translation type="unfinished"></translation>
+        <translation>Bord</translation>
     </message>
     <message>
         <source>Start point</source>
-        <translation type="unfinished"></translation>
+        <translation>Point de départ</translation>
     </message>
     <message>
         <source>End point</source>
-        <translation type="unfinished"></translation>
+        <translation>Point final</translation>
     </message>
     <message>
         <source>Closed</source>
-        <translation type="unfinished"></translation>
+        <translation>Fermé</translation>
     </message>
     <message>
         <source>Polygon</source>
-        <translation type="unfinished"></translation>
+        <translation>Polygone</translation>
     </message>
     <message>
         <source>Point</source>
-        <translation type="unfinished"></translation>
+        <translation>Point</translation>
     </message>
     <message>
         <source>Wire</source>
-        <translation type="unfinished"></translation>
+        <translation>Contour</translation>
     </message>
     <message>
         <source>Rectangle</source>
-        <translation type="unfinished"></translation>
+        <translation>Rectangle</translation>
     </message>
     <message>
         <source>Corner</source>
-        <translation type="unfinished"></translation>
+        <translation>Coin</translation>
     </message>
     <message>
         <source>Width</source>
-        <translation type="unfinished"></translation>
+        <translation>Largeur</translation>
     </message>
     <message>
         <source>Height</source>
-        <translation type="unfinished"></translation>
+        <translation>Hauteur</translation>
     </message>
     <message>
         <source>Plane</source>
-        <translation type="unfinished"></translation>
+        <translation>Plan</translation>
     </message>
     <message>
         <source>Sphere</source>
-        <translation type="unfinished"></translation>
+        <translation>Sphère</translation>
     </message>
     <message>
         <source>Cylinder</source>
-        <translation type="unfinished"></translation>
+        <translation>Cylindre</translation>
     </message>
     <message>
         <source>Cone</source>
-        <translation type="unfinished"></translation>
+        <translation>Cône</translation>
     </message>
     <message>
         <source>Torus</source>
-        <translation type="unfinished"></translation>
+        <translation>Tore</translation>
     </message>
     <message>
         <source>Face</source>
-        <translation type="unfinished"></translation>
+        <translation>Face</translation>
     </message>
     <message>
         <source>Box</source>
-        <translation type="unfinished"></translation>
+        <translation>Boîte</translation>
     </message>
     <message>
         <source>Rotated Box</source>
-        <translation type="unfinished"></translation>
+        <translation>Boîte tournée</translation>
     </message>
     <message>
         <source>Shell</source>
-        <translation type="unfinished"></translation>
+        <translation>Coque</translation>
     </message>
     <message>
         <source>Solid</source>
-        <translation type="unfinished"></translation>
+        <translation>Solide</translation>
     </message>
     <message>
         <source>Bounding box</source>
-        <translation type="unfinished"></translation>
+        <translation>Boîte englobante</translation>
     </message>
     <message>
         <source>Minimal corner</source>
-        <translation type="unfinished"></translation>
+        <translation>Coin minimal</translation>
     </message>
     <message>
         <source>Maximal corner</source>
-        <translation type="unfinished"></translation>
+        <translation>Coin maximal</translation>
     </message>
     <message>
         <source>Origin</source>
-        <translation type="unfinished"></translation>
+        <translation>Origine</translation>
     </message>
     <message>
         <source>Position</source>
-        <translation type="unfinished"></translation>
+        <translation>Position</translation>
     </message>
     <message>
         <source>Axis</source>
-        <translation type="unfinished"></translation>
+        <translation>Axe</translation>
     </message>
     <message>
         <source>Radius 1</source>
-        <translation type="unfinished"></translation>
+        <translation>Rayon 1</translation>
     </message>
     <message>
         <source>Radius 2</source>
-        <translation type="unfinished"></translation>
+        <translation>Rayon 2</translation>
     </message>
     <message>
         <source>Depth</source>
-        <translation type="unfinished"></translation>
+        <translation>Profondeur</translation>
     </message>
     <message>
         <source>Z axis</source>
-        <translation type="unfinished"></translation>
+        <translation>Axe Z</translation>
     </message>
     <message>
         <source>X axis</source>
-        <translation type="unfinished"></translation>
+        <translation>Axe X</translation>
     </message>
 </context>
 <context>
     <name>XGUI_ObjectsBrowser</name>
     <message>
         <source>Part set</source>
-        <translation type="unfinished"></translation>
+        <translation>Ensemble</translation>
     </message>
 </context>
 <context>
     <name>XGUI_OperationMgr</name>
     <message>
         <source>All active operations will be aborted.</source>
-        <translation type="unfinished"></translation>
+        <translation>Toutes les opérations actives seront annulées.</translation>
     </message>
     <message>
         <source>Please validate all your active operations before saving.</source>
-        <translation type="unfinished"></translation>
+        <translation>Veuillez valider toutes vos opérations actives avant de sauvegarder.</translation>
     </message>
     <message>
         <source>%1 operation will be aborted.</source>
-        <translation type="unfinished"></translation>
+        <translation>%1 opération sera abandonnée.</translation>
     </message>
     <message>
         <source>Please validate your %1 before saving.</source>
-        <translation type="unfinished"></translation>
+        <translation>Veuillez valider votre %1 avant de sauvegarder.</translation>
     </message>
 </context>
 <context>
     <name>XGUI_PropertyPanel</name>
     <message>
         <source>Property Panel</source>
-        <translation type="unfinished"></translation>
+        <translation>Panneau de propriété</translation>
     </message>
 </context>
 <context>
     <name>XGUI_TransparencyWidget</name>
     <message>
         <source>Opaque</source>
-        <translation type="unfinished"></translation>
+        <translation>Opaque</translation>
     </message>
     <message>
         <source>Transparent</source>
-        <translation type="unfinished"></translation>
+        <translation>Transparent</translation>
     </message>
 </context>
 <context>
     <name>XGUI_Workshop</name>
     <message>
         <source>Undo</source>
-        <translation type="unfinished"></translation>
+        <translation>Annuler</translation>
     </message>
     <message>
         <source>Undo last command</source>
-        <translation type="unfinished"></translation>
+        <translation>Annuler la dernière commande</translation>
     </message>
     <message>
         <source>INF_DESK_TOOLBAR_STANDARD</source>
@@ -523,137 +523,139 @@
     </message>
     <message>
         <source>Redo</source>
-        <translation type="unfinished"></translation>
+        <translation>Refaire</translation>
     </message>
     <message>
         <source>Redo last command</source>
-        <translation type="unfinished"></translation>
+        <translation>Refaire la dernière commande</translation>
     </message>
     <message>
         <source>Export native...</source>
-        <translation type="unfinished"></translation>
+        <translation>Exporter natif...</translation>
     </message>
     <message>
         <source>Export the current document into a native file</source>
-        <translation type="unfinished"></translation>
+        <translation>Exporter le document actuel dans un fichier natif</translation>
     </message>
     <message>
         <source>Import native...</source>
-        <translation type="unfinished"></translation>
+        <translation>Importer natif...</translation>
     </message>
     <message>
         <source>Import native file</source>
-        <translation type="unfinished"></translation>
+        <translation>Importer un fichier natif</translation>
     </message>
     <message>
         <source>Save</source>
-        <translation type="unfinished"></translation>
+        <translation>Enregistrer</translation>
     </message>
     <message>
         <source>Save the document</source>
-        <translation type="unfinished"></translation>
+        <translation>Enregistrer le document</translation>
     </message>
     <message>
         <source>Save as...</source>
-        <translation type="unfinished"></translation>
+        <translation>Enregistrer sous...</translation>
     </message>
     <message>
         <source>Save the document into a file</source>
-        <translation type="unfinished"></translation>
+        <translation>Enregistrer le document dans un fichier</translation>
     </message>
     <message>
         <source>Open...</source>
-        <translation type="unfinished"></translation>
+        <translation>Ouvrir...</translation>
     </message>
     <message>
         <source>Open a new document</source>
-        <translation type="unfinished"></translation>
+        <translation>Ouvrir un nouveau document</translation>
     </message>
     <message>
         <source>Auto rebuild</source>
-        <translation type="unfinished"></translation>
+        <translation>Reconstruction automatique</translation>
     </message>
     <message>
         <source>Blocks immediate apply of modifications</source>
-        <translation type="unfinished"></translation>
+        <translation>Bloque l&apos;application immédiate des modifications</translation>
     </message>
     <message>
         <source>Preferences</source>
-        <translation type="unfinished"></translation>
+        <translation>Préférences</translation>
     </message>
     <message>
         <source>Edit preferences</source>
-        <translation type="unfinished"></translation>
+        <translation>Modifier les préférences</translation>
     </message>
     <message>
         <source>Exit</source>
-        <translation type="unfinished"></translation>
+        <translation>Quitter</translation>
     </message>
     <message>
         <source>Exit application</source>
-        <translation type="unfinished"></translation>
+        <translation>Quitter l’application</translation>
     </message>
     <message>
         <source>Save current file</source>
-        <translation type="unfinished"></translation>
+        <translation>Enregistrer le fichier courant</translation>
     </message>
     <message>
         <source>The document is modified, save before opening another?</source>
-        <translation type="unfinished"></translation>
+        <translation>Le document est modifié, sauvegarder avant d&apos;en ouvrir un autre ?</translation>
     </message>
     <message>
         <source>Open file</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Warning</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Unable to open the file.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>The document is modified, save before exit?</source>
-        <translation type="unfinished"></translation>
+        <translation>Fichier ouvert</translation>
     </message>
     <message>
         <source>Select name to save file...</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Information about module &quot;%1&quot; doesn&apos;t exist.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Object browser</source>
-        <translation type="unfinished"></translation>
+        <translation>Sélectionnez le nom pour enregistrer le fichier...</translation>
     </message>
     <message>
         <source>Show object</source>
-        <translation type="unfinished"></translation>
+        <translation>Montrer l&apos;objet</translation>
     </message>
     <message>
         <source>&apos;%1&apos;
  are hidden by %2:
 Remove objects from the panel to be displayed?</source>
-        <translation type="unfinished"></translation>
+        <translation>&apos;%1&apos;
+ est caché par %2 :
+Supprimer des objets du panneau à afficher ?</translation>
+    </message>
+    <message>
+        <source>Warning</source>
+        <translation>Attention</translation>
+    </message>
+    <message>
+        <source>Unable to open the file.</source>
+        <translation>Impossible d&apos;ouvrir le fichier.</translation>
+    </message>
+    <message>
+        <source>The document is modified, save before exit?</source>
+        <translation>Le document est modifié, enregistrer avant de quitter ?</translation>
+    </message>
+    <message>
+        <source>Information about module &quot;%1&quot; doesn&apos;t exist.</source>
+        <translation>Les informations sur le module &quot;%1&quot; n&apos;existent pas.</translation>
+    </message>
+    <message>
+        <source>Object browser</source>
+        <translation>Navigateur d&apos;objet</translation>
     </message>
     <message>
         <source>All features are relevant, there is nothing to be deleted</source>
-        <translation type="unfinished"></translation>
+        <translation>Toutes les fonctionnalités sont pertinentes, il n&apos;y a rien à supprimer</translation>
     </message>
     <message>
         <source>Transparency</source>
-        <translation type="unfinished"></translation>
+        <translation>Transparence</translation>
     </message>
     <message>
         <source>Find results</source>
-        <translation type="unfinished"></translation>
+        <translation>Trouver des résultats</translation>
     </message>
     <message>
         <source>Results not found</source>
-        <translation type="unfinished"></translation>
+        <translation>Résultats non trouvés</translation>
     </message>
 </context>
 </TS>
