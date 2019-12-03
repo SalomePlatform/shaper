@@ -25,4 +25,4 @@ if __name__ == "__main__":
   model.testNbSubShapes(aPartFeature, GeomAPI_Shape.FACE, [875])
   model.testNbSubShapes(aPartFeature, GeomAPI_Shape.EDGE, [4659])
   model.testNbSubShapes(aPartFeature, GeomAPI_Shape.VERTEX, [9318])
-  model.testResultsVolumes(aPartFeature, [146125516.28660])
+  model.testResultsVolumes(aPartFeature, [145241798.70546785])
