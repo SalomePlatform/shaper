@@ -233,8 +233,8 @@ MODELAPI_EXPORT double getTransparency(const std::shared_ptr<ModelAPI_Result>& t
 * \param theSource a result that contains the copied attributes
 * \param theDest a destination result that takes the visualization attributes
 */
-MODELAPI_EXPORT void copyVisualizationAttrs(std::shared_ptr<ModelAPI_Result>& theSource,
-                                            std::shared_ptr<ModelAPI_Result>& theDest);
+MODELAPI_EXPORT void copyVisualizationAttrs(std::shared_ptr<ModelAPI_Result> theSource,
+                                            std::shared_ptr<ModelAPI_Result> theDest);
 
 }
 

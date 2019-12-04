@@ -835,7 +835,7 @@ double getTransparency(const std::shared_ptr<ModelAPI_Result>& theResult)
 // LCOV_EXCL_STOP
 
 void copyVisualizationAttrs(
-  std::shared_ptr<ModelAPI_Result>& theSource, std::shared_ptr<ModelAPI_Result>& theDest)
+  std::shared_ptr<ModelAPI_Result> theSource, std::shared_ptr<ModelAPI_Result> theDest)
 {
   // color
   AttributeIntArrayPtr aSourceColor = theSource->data()->intArray(ModelAPI_Result::COLOR_ID());
