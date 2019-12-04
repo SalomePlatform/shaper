@@ -299,7 +299,9 @@ bool XGUI_Displayer::redisplay(ObjectPtr theObject, bool theUpdateViewer)
       std::vector<int> aColor;
       ModelAPI_Tools::getColor(aResult, aColor);
       if (aColor.size() > 0) {
-        aAISIO->SetColor(Quantity_Color(aColor[0] / 255., aColor[1] / 255., aColor[2] / 255., Quantity_TOC_RGB));
+        Quantity_Color
+          aCol(aColor[0] / 255., aColor[1] / 255., aColor[2] / 255., Quantity_TOC_RGB);
+        aAISIO->SetColor(aCol);
       }
       // Set deflection
       double aDeflection = ModelAPI_Tools::getDeflection(aResult);
