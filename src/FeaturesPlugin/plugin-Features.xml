@@ -81,7 +81,7 @@
           <source path="boolean_split_widget.xml"/>
       </feature>
       <feature id="Union" title="Union" tooltip="Perform union operations with shapes"
-               icon="icons/Features/union.png" helpfile="unionFeature.html" internal="1">
+               icon="icons/Features/union.png" helpfile="unionFeature.html">
           <source path="union_widget.xml"/>
       </feature>
       <feature id="Remove_SubShapes" title="Remove Sub-Shapes" tooltip="Allows to remove sub-shapes from wires, shells, compsolids and compounds"
