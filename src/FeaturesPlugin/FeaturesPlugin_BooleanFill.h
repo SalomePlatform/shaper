@@ -46,7 +46,7 @@ public:
   /// Request for initialization of data model of the feature: adding all attributes.
   FEATURESPLUGIN_EXPORT virtual void initAttributes();
 
-  /// Creates a new part document if needed.
+  /// Performs the algorithm and stores results it in the data structure.
   FEATURESPLUGIN_EXPORT virtual void execute();
 
 public:

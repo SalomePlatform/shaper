@@ -113,7 +113,7 @@ class FeaturesPlugin_Symmetry : public ModelAPI_Feature
     return MY_KIND;
   }
 
-  /// Creates a new part document if needed.
+  /// Performs the algorithm and stores results it in the data structure.
   FEATURESPLUGIN_EXPORT virtual void execute();
 
   /// Request for initialization of data model of the feature: adding all attributes.

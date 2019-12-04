@@ -95,7 +95,7 @@ public:
     return START_RADIUS_ID();
   }
 
-  /// Creates a new part document if needed.
+  /// Performs the fillet algorithm and stores it in the data structure.
   FEATURESPLUGIN_EXPORT virtual void execute();
 
   /// Request for initialization of data model of the feature: adding all attributes.

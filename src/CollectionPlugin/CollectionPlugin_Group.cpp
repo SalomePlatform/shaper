@@ -26,6 +26,7 @@
 #include <ModelAPI_AttributeSelectionList.h>
 #include <ModelAPI_AttributeIntArray.h>
 #include <ModelAPI_ResultGroup.h>
+#include <ModelAPI_Tools.h>
 #include <sstream>
 
 CollectionPlugin_Group::CollectionPlugin_Group()
@@ -108,6 +109,7 @@ bool CollectionPlugin_Group::customAction(const std::string& theActionId)
       AttributeSelectionListPtr aNewList = aNew->selectionList(LIST_ID());
       aNewList->setSelectionType(aList->selectionType());
       aNewList->append(anOldAttr->contextObject(), anOldAttr->value());
+      aNew->execute();
       aResults.push_front(aNew); // to keep the order
     }
     aResults.push_back(data()->owner());
@@ -123,18 +125,7 @@ bool CollectionPlugin_Group::customAction(const std::string& theActionId)
           int aResSuf = aSuffix - 1;
           std::string aResName = findName(firstResult()->data()->name(), aResSuf, aResNames);
           aFeat->firstResult()->data()->setName(aResName);
-          // set the same color of result as in origin
-          if (firstResult()->data()->attribute(ModelAPI_Result::COLOR_ID()).get()) {
-            AttributeIntArrayPtr aSourceColor =
-              firstResult()->data()->intArray(ModelAPI_Result::COLOR_ID());
-            if (aSourceColor.get() && aSourceColor->size()) {
-              AttributeIntArrayPtr aDestColor =
-                aFeat->firstResult()->data()->intArray(ModelAPI_Result::COLOR_ID());
-              aDestColor->setSize(aSourceColor->size());
-              for(int a = 0; a < aSourceColor->size(); a++)
-                aDestColor->setValue(a, aSourceColor->value(a));
-            }
-          }
+          ModelAPI_Tools::copyVisualizationAttrs(firstResult(), aFeat->firstResult());
         }
       }
       // remove also filters if split performed

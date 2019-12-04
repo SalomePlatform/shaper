@@ -834,4 +834,35 @@ double getTransparency(const std::shared_ptr<ModelAPI_Result>& theResult)
 }
 // LCOV_EXCL_STOP
 
+void copyVisualizationAttrs(
+  std::shared_ptr<ModelAPI_Result>& theSource, std::shared_ptr<ModelAPI_Result>& theDest)
+{
+  // color
+  AttributeIntArrayPtr aSourceColor = theSource->data()->intArray(ModelAPI_Result::COLOR_ID());
+  if (aSourceColor.get() && aSourceColor->isInitialized() && aSourceColor->size()) {
+    AttributeIntArrayPtr aDestColor = theDest->data()->intArray(ModelAPI_Result::COLOR_ID());
+    if (aDestColor.get()) {
+      aDestColor->setSize(aSourceColor->size());
+      for(int a = 0; a < aSourceColor->size(); a++)
+        aDestColor->setValue(a, aSourceColor->value(a));
+    }
+  }
+  // deflection
+  AttributeDoublePtr aSourceDefl = theSource->data()->real(ModelAPI_Result::DEFLECTION_ID());
+  if (aSourceDefl.get() && aSourceDefl->isInitialized()) {
+    AttributeDoublePtr aDestDefl = theDest->data()->real(ModelAPI_Result::DEFLECTION_ID());
+    if (aDestDefl.get()) {
+      aDestDefl->setValue(aSourceDefl->value());
+    }
+  }
+  // transparency
+  AttributeDoublePtr aSourceTransp = theSource->data()->real(ModelAPI_Result::TRANSPARENCY_ID());
+  if (aSourceTransp.get() && aSourceTransp->isInitialized()) {
+    AttributeDoublePtr aDestTransp = theDest->data()->real(ModelAPI_Result::TRANSPARENCY_ID());
+    if (aDestTransp.get()) {
+      aDestTransp->setValue(aSourceTransp->value());
+    }
+  }
+}
+
 } // namespace ModelAPI_Tools
