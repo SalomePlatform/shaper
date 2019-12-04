@@ -122,18 +122,6 @@ public:
   /// \param theEvent an event
   virtual bool eventFilter(QObject* theObject, QEvent *theEvent);
 
-  /// Hide/show faces of the object if:
-  /// - face selector is active
-  /// - object is mentioned in the list of selected elements
-  /// If the object is displayed, all panel faces selected on it will be moved into presentation
-  /// or, if redisplayed, fuction return if the object should be redisplayed or not
-  /// \param theObject a customized object
-  /// \param thePresentation visualized presentation of the object
-  /// \return true if the presentation is customized
-  bool customizeObject(const std::shared_ptr<ModelAPI_Object>& theObject,
-    const std::shared_ptr<GeomAPI_AISObject>& thePresentation);
-
-
   XGUI_Workshop* workshop() const { return myWorkshop; }
 
 

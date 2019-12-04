@@ -293,45 +293,30 @@ bool XGUI_Displayer::redisplay(ObjectPtr theObject, bool theUpdateViewer)
   }
 
   if (!aAISIO.IsNull()) {
-    // Check that the visualized shape is the same and the redisplay is not necessary
-    // Redisplay of AIS object leads to this object selection compute and the selection
-    // in the browser is lost
-    // this check is not necessary anymore because the selection store/restore is realized
-    // before and after the values modification.
-    // Moreother, this check avoids customize and redisplay presentation if the presentable
-    // parameter is changed.
-    //bool isEqualShapes = false;
-    //ResultPtr aResult = std::dynamic_pointer_cast<ModelAPI_Result>(theObject);
-    //if (aResult.get() != NULL) {
-    //  Handle(AIS_Shape) aShapePrs = Handle(AIS_Shape)::DownCast(aAISIO);
-    //  if (!aShapePrs.IsNull()) {
-    //    std::shared_ptr<GeomAPI_Shape> aShapePtr = ModelAPI_Tools::shape(aResult);
-    //    if (aShapePtr.get()) {
-    //      const TopoDS_Shape& aOldShape = aShapePrs->Shape();
-    //      if (!aOldShape.IsNull())
-    //        isEqualShapes = aOldShape.IsEqual(aShapePtr->impl<TopoDS_Shape>());
-    //    }
-    //  }
-    //}
-    // Customization of presentation
-    //bool isCustomized = customizeObject(theObject);
-    #ifdef DEBUG_FEATURE_REDISPLAY
-      qDebug(QString("Redisplay: %1, isEqualShapes=%2").
-        arg(!isEqualShapes/* || isCustomized*/).arg(isEqualShapes)
-        .toStdString().c_str());
-    #endif
-    //if (!isEqualShapes/* || isCustomized*/) {
-    //  /// if shapes are equal and presentation are customized, selection should be restored
-    //  bool aNeedToRestoreSelection = isEqualShapes/* && isCustomized*/;
-    //  if (aNeedToRestoreSelection)
-      if (aAISObj.get() && myWorkshop->facesPanel())
-        myWorkshop->facesPanel()->customizeObject(theObject, aAISObj);
+    ResultPtr aResult = std::dynamic_pointer_cast<ModelAPI_Result>(theObject);
+    if (aResult.get()) {
+      // Set color
+      std::vector<int> aColor;
+      ModelAPI_Tools::getColor(aResult, aColor);
+      if (aColor.size() > 0) {
+        aAISIO->SetColor(Quantity_Color(aColor[0] / 255., aColor[1] / 255., aColor[2] / 255., Quantity_TOC_RGB));
+      }
+      // Set deflection
+      double aDeflection = ModelAPI_Tools::getDeflection(aResult);
+      if ((aDeflection >= 0) && (aDeflection != aAISObj->getDeflection()))
+        aAISObj->setDeflection(aDeflection);
 
+      // Set transparency
+      double aTransparency = ModelAPI_Tools::getTransparency(aResult);
+      if ((aTransparency >= 0) && (aTransparency != aAISObj->getTransparency()))
+        aAISObj->setTransparency(aTransparency);
+    }
     myWorkshop->module()->storeSelection();
 
 #ifdef CLEAR_OUTDATED_SELECTION_BEFORE_REDISPLAY
     myWorkshop->selector()->deselectPresentation(aAISIO);
 #endif
+
     if (aContext->IsDisplayed(aAISIO))
       aContext->Redisplay(aAISIO, false);
     else {

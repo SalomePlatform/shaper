@@ -431,7 +431,8 @@ void Model_Data::sendAttributeUpdated(ModelAPI_Attribute* theAttr)
     }
   } else {
     // trim: need to redisplay or set color in the python script
-    if (myObject && (theAttr->attributeType() == "Point2D" || theAttr->id() == "Color")) {
+    if (myObject && (theAttr->attributeType() == "Point2D" || theAttr->id() == "Color" ||
+      theAttr->id() == "Transparency" || theAttr->id() == "Deflection")) {
       static const Events_ID anEvent = Events_Loop::eventByName(EVENT_OBJECT_TO_REDISPLAY);
       ModelAPI_EventCreator::get()->sendUpdated(myObject, anEvent);
     }

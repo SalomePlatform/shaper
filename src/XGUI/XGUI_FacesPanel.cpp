@@ -530,13 +530,6 @@ void XGUI_FacesPanel::closeEvent(QCloseEvent* theEvent)
 }
 
 //********************************************************************
-bool XGUI_FacesPanel::customizeObject(const ObjectPtr& theObject,
-  const AISObjectPtr& thePresentation)
-{
-  return myItems.size() > 0;
-}
-
-//********************************************************************
 void XGUI_FacesPanel::onDeleteItem()
 {
   processDelete();

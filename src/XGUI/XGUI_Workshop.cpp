@@ -91,6 +91,7 @@
 #include <ExchangePlugin_ImportPart.h>
 
 #include <GeomAPI_Pnt.h>
+#include <GeomAPI_ShapeExplorer.h>
 
 #include <ModuleBase_IModule.h>
 #include <ModuleBase_IViewer.h>
@@ -2334,9 +2335,28 @@ void setColor(ResultPtr theResult, const std::vector<int>& theColor)
     aColorAttr->setValue(1, theColor[1]);
     aColorAttr->setValue(2, theColor[2]);
   }
-  static const Events_ID kRedisplayEvent =
-    Events_Loop::loop()->eventByName(EVENT_OBJECT_TO_REDISPLAY);
-  ModelAPI_EventCreator::get()->sendUpdated(theResult, kRedisplayEvent);
+}
+
+//**************************************************************
+void getDefaultColor(ObjectPtr theObject, const bool isEmptyColorValid,
+  std::vector<int>& theColor)
+{
+  theColor.clear();
+  // get default color from the preferences manager for the given result
+  if (theColor.empty()) {
+    std::string aSection, aName, aDefault;
+    theObject->colorConfigInfo(aSection, aName, aDefault);
+    if (!aSection.empty() && !aName.empty()) {
+      theColor = Config_PropManager::color(aSection, aName);
+    }
+  }
+  if (!isEmptyColorValid && theColor.empty()) {
+    // all AIS objects, where the color is not set, are in black.
+    // The color should be defined in XML or set in the attribute
+    theColor = Config_PropManager::color("Visualization", "object_default_color");
+    Events_InfoMessage("XGUI_CustomPrs",
+      "A default color is not defined in the preferences for this kind of result").send();
+  }
 }
 
 //**************************************************************
@@ -2351,6 +2371,8 @@ void XGUI_Workshop::changeColor(const QObjectPtrList& theObjects)
     ResultPtr aResult = std::dynamic_pointer_cast<ModelAPI_Result>(anObject);
     if (aResult.get()) {
       ModelAPI_Tools::getColor(aResult, aColor);
+      if (aColor.empty())
+        getDefaultColor(aResult, false, aColor);
     }
     else {
       // TODO: remove the obtaining a color from the AIS object
@@ -2402,8 +2424,10 @@ void XGUI_Workshop::changeColor(const QObjectPtrList& theObjects)
       setColor(aResult, !isRandomColor ? aColorResult : aDlg->getRandomColor());
     }
   }
+  Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_TO_REDISPLAY));
   aMgr->finishOperation();
   updateCommandStatus();
+  myViewerProxy->update();
 }
 
 //**************************************************************
@@ -2413,11 +2437,9 @@ void setDeflection(ResultPtr theResult, const double theDeflection)
     return;
 
   AttributeDoublePtr aDeflectionAttr = theResult->data()->real(ModelAPI_Result::DEFLECTION_ID());
-  if (aDeflectionAttr.get() != NULL)
+  if (aDeflectionAttr.get() != NULL) {
     aDeflectionAttr->setValue(theDeflection);
-  static const Events_ID kRedisplayEvent =
-    Events_Loop::loop()->eventByName(EVENT_OBJECT_TO_REDISPLAY);
-  ModelAPI_EventCreator::get()->sendUpdated(theResult, kRedisplayEvent);
+  }
 }
 
 //**************************************************************
@@ -2427,11 +2449,9 @@ void setTransparency(ResultPtr theResult, double theTransparency)
     return;
 
   AttributeDoublePtr anAttribute = theResult->data()->real(ModelAPI_Result::TRANSPARENCY_ID());
-  if (anAttribute.get() != NULL)
+  if (anAttribute.get() != NULL) {
     anAttribute->setValue(theTransparency);
-  static const Events_ID kRedisplayEvent =
-    Events_Loop::loop()->eventByName(EVENT_OBJECT_TO_REDISPLAY);
-  ModelAPI_EventCreator::get()->sendUpdated(theResult, kRedisplayEvent);
+  }
 }
 
 //**************************************************************
@@ -2444,13 +2464,42 @@ void setTransparency(double theTransparency, const QObjectPtrList& theObjects)
       if (aBodyResult.get() != NULL) { // change property for all sub-solids
         std::list<ResultPtr> allRes;
         ModelAPI_Tools::allSubs(aBodyResult, allRes);
-        for(std::list<ResultPtr>::iterator aRes = allRes.begin(); aRes != allRes.end(); aRes++) {
+        std::list<ResultPtr>::iterator aRes;
+        for(aRes = allRes.begin(); aRes != allRes.end(); aRes++) {
           setTransparency(*aRes, theTransparency);
         }
       }
       setTransparency(aResult, theTransparency);
     }
   }
+}
+
+//**************************************************************
+double getDefaultDeflection(const ObjectPtr& theObject)
+{
+  double aDeflection = -1;
+  ResultPtr aResult = std::dynamic_pointer_cast<ModelAPI_Result>(theObject);
+  if (aResult.get()) {
+    bool isConstruction = false;
+
+    std::string aResultGroup = aResult->groupName();
+    if (aResultGroup == ModelAPI_ResultConstruction::group())
+      isConstruction = true;
+    else if (aResultGroup == ModelAPI_ResultBody::group()) {
+      GeomShapePtr aGeomShape = aResult->shape();
+      if (aGeomShape.get()) {
+        // if the shape could not be exploded on faces, it contains only wires, edges, and vertices
+        // correction of deviation for them should not influence to the application performance
+        GeomAPI_ShapeExplorer anExp(aGeomShape, GeomAPI_Shape::FACE);
+        isConstruction = !anExp.more();
+      }
+    }
+    if (isConstruction)
+      aDeflection = Config_PropManager::real("Visualization", "construction_deflection");
+    else
+      aDeflection = Config_PropManager::real("Visualization", "body_deflection");
+  }
+  return aDeflection;
 }
 
 //**************************************************************
@@ -2464,6 +2513,8 @@ void XGUI_Workshop::changeDeflection(const QObjectPtrList& theObjects)
     ResultPtr aResult = std::dynamic_pointer_cast<ModelAPI_Result>(anObject);
     if (aResult.get()) {
       aDeflection = ModelAPI_Tools::getDeflection(aResult);
+      if (aDeflection < 0)
+        aDeflection = getDefaultDeflection(aResult);
     }
     else {
       // TODO: remove the obtaining a property from the AIS object
@@ -2512,8 +2563,15 @@ void XGUI_Workshop::changeDeflection(const QObjectPtrList& theObjects)
       setDeflection(aResult, aDeflection);
     }
   }
+  Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_TO_REDISPLAY));
   aMgr->finishOperation();
   updateCommandStatus();
+}
+
+//**************************************************************
+double getDefaultTransparency(const ResultPtr& theResult)
+{
+  return Config_PropManager::integer("Visualization", "shaper_default_transparency") / 100.;
 }
 
 //**************************************************************
@@ -2527,6 +2585,8 @@ void XGUI_Workshop::changeTransparency(const QObjectPtrList& theObjects)
     ResultPtr aResult = std::dynamic_pointer_cast<ModelAPI_Result>(anObject);
     if (aResult.get()) {
       aCurrentValue = ModelAPI_Tools::getTransparency(aResult);
+      if (aCurrentValue < 0)
+        aCurrentValue = getDefaultTransparency(aResult);
     }
     if (aCurrentValue > 0)
       break;
@@ -2573,7 +2633,11 @@ void XGUI_Workshop::onTransparencyValueChanged()
 
   QObjectPtrList anObjects = mySelector->selection()->selectedObjects();
   setTransparency(aTransparencyWidget->getValue(), anObjects);
-  Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_TO_REDISPLAY));
+  static const Events_ID kRedisplayEvent =
+    Events_Loop::loop()->eventByName(EVENT_OBJECT_TO_REDISPLAY);
+  Events_Loop::loop()->flush(kRedisplayEvent);
+
+  myViewerProxy->update();
 }
 
 
