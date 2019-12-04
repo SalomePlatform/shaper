@@ -16,6 +16,10 @@
         <translation>Aller à la fin</translation>
     </message>
     <message>
+        <source>Move to the end and split</source>
+        <translation>Aller à la fin et diviser</translation>
+    </message>
+    <message>
         <source>SHAPER files (*.shaper *.cadbld)</source>
         <translation>Fichiers SHAPER (*.shaper *.cadbld)</translation>
     </message>

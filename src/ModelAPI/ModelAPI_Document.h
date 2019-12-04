@@ -81,7 +81,8 @@ public:
 
   //! Moves the feature to make it after the given one in the history.
   virtual void moveFeature(std::shared_ptr<ModelAPI_Feature> theMoved,
-                           std::shared_ptr<ModelAPI_Feature> theAfterThis) = 0;
+                           std::shared_ptr<ModelAPI_Feature> theAfterThis,
+                           const bool theSplit = false) = 0;
 
   ///! Returns the id of the document
   virtual const int id() const = 0;

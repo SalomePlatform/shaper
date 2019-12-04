@@ -66,6 +66,8 @@ class CollectionPlugin_Group : public ModelAPI_Feature
   /// Use plugin manager for features creation
   CollectionPlugin_Group();
 
+  /// Used for the split action of the group (Move to the end and split)
+  COLLECTIONPLUGIN_EXPORT virtual bool customAction(const std::string& theActionId);
 };
 
 #endif

@@ -160,4 +160,7 @@ ADD_UNIT_TESTS(
                Test3031.py
                TestGroupWholeFeature1.py
                TestGroupWholeFeature2.py
+               TestGroupMoveAndSplit1.py
+               TestGroupMoveAndSplit2.py
+               TestGroupMoveAndSplit3.py
 )

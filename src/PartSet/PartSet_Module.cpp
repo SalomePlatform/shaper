@@ -553,7 +553,7 @@ bool PartSet_Module::canRedo() const
 bool PartSet_Module::canApplyAction(const ObjectPtr& theObject, const QString& theActionId) const
 {
   bool aValid = true;
-  if (theActionId == "MOVE_CMD") {
+  if (theActionId == "MOVE_CMD" || theActionId == "MOVE_SPLIT_CMD") {
     FeaturePtr aFeature = ModelAPI_Feature::feature(theObject);
     if (aFeature) {
       ResultPtr aResult = ModuleBase_Tools::firstResult(aFeature);

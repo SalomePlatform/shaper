@@ -96,9 +96,13 @@ void XGUI_ContextMenuMgr::createActions()
                                            aDesktop, this, SLOT(onRename()));
   addAction("RENAME_CMD", aAction);
 
-  aAction = ModuleBase_Tools::createAction(QIcon(":pictures/move.png"),
+  aAction = ModuleBase_Tools::createAction(QIcon(":pictures/move_to_end.png"),
                                            XGUI_Workshop::MOVE_TO_END_COMMAND, this);
   addAction("MOVE_CMD", aAction);
+
+  aAction = ModuleBase_Tools::createAction(QIcon(":pictures/move_to_end_split.png"),
+    XGUI_Workshop::MOVE_TO_END_SPLIT_COMMAND, this);
+  addAction("MOVE_SPLIT_CMD", aAction);
 
   aAction = ModuleBase_Tools::createAction(QIcon(":pictures/clean_history.png"),
                                            tr("Clean history"), aDesktop);
@@ -326,8 +330,10 @@ void XGUI_ContextMenuMgr::updateObjectBrowserMenu()
           if (!(hasParameter || hasFeature))
             action("SHOW_ONLY_CMD")->setEnabled(true);
         }
-        else if (hasFeature && myWorkshop->canMoveFeature())
+        else if (hasFeature && myWorkshop->canMoveFeature()) {
           action("MOVE_CMD")->setEnabled(true);
+          action("MOVE_SPLIT_CMD")->setEnabled(true);
+        }
 
         if( aMgr->activeDocument() == aObject->document() )
         {
@@ -347,8 +353,10 @@ void XGUI_ContextMenuMgr::updateObjectBrowserMenu()
         action("SHADING_CMD")->setEnabled(true);
         action("WIREFRAME_CMD")->setEnabled(true);
       }
-      if (hasFeature && myWorkshop->canMoveFeature())
+      if (hasFeature && myWorkshop->canMoveFeature()) {
         action("MOVE_CMD")->setEnabled(true);
+        action("MOVE_SPLIT_CMD")->setEnabled(true);
+      }
     } // end multi-selection
 
     // Check folder management commands state if only features are selected
@@ -662,6 +670,7 @@ void XGUI_ContextMenuMgr::buildObjBrowserMenu()
   aList.append(action("RENAME_CMD"));
   aList.append(action("SHOW_RESULTS_CMD"));
   aList.append(action("MOVE_CMD"));
+  aList.append(action("MOVE_SPLIT_CMD"));
   aList.append(mySeparator1);
   aList.append(action("INSERT_FOLDER_CMD"));
   aList.append(action("ADD_TO_FOLDER_BEFORE_CMD"));
@@ -770,6 +779,7 @@ void XGUI_ContextMenuMgr::addObjBrowserMenu(QMenu* theMenu) const
       aActions.append(action("ADD_OUT_FOLDER_AFTER_CMD"));
       aActions.append(mySeparator3);
       aActions.append(action("MOVE_CMD"));
+      aActions.append(action("MOVE_SPLIT_CMD"));
       aActions.append(action("COLOR_CMD"));
       aActions.append(action("DEFLECTION_CMD"));
       aActions.append(action("TRANSPARENCY_CMD"));

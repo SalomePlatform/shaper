@@ -127,7 +127,8 @@ class Model_Document : public ModelAPI_Document
   MODEL_EXPORT virtual void removeFeature(FeaturePtr theFeature);
 
   //! Moves the feature to make it after the given one in the history.
-  MODEL_EXPORT virtual void moveFeature(FeaturePtr theMoved, FeaturePtr theAfterThis);
+  MODEL_EXPORT virtual void moveFeature(
+    FeaturePtr theMoved, FeaturePtr theAfterThis, const bool theSplit = false);
 
   //! Returns the first found object in the group by the object name
   //! \param theGroupID group that contains an object

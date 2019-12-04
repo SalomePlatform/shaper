@@ -90,5 +90,7 @@
      <file>pictures/color.png</file>
      <file>pictures/normal-view-inversed.png</file>
      <file>pictures/normal-view.png</file>
+     <file>pictures/move_to_end.png</file>
+     <file>pictures/move_to_end_split.png</file>
  </qresource>
  </RCC>

@@ -186,7 +186,7 @@ Q_OBJECT
   bool canMoveFeature();
 
   /// Move selected features to be after the current feature
-  void moveObjects();
+  void moveObjects(const bool theSplit);
 
   /// Returns true if the object can be shaded. If the object is a compsolid result, the method
   /// checks subobjects of the result
@@ -316,6 +316,9 @@ Q_OBJECT
   /// A constant string used for "Move to end" command definition
   /// It is used for specific processing of Undo/Redo for this command.
   static QString MOVE_TO_END_COMMAND;
+  /// A constant string used for "Move to end and split" command definition
+  /// It is used for specific processing of Undo/Redo for this command.
+  static QString MOVE_TO_END_SPLIT_COMMAND;
 
   /// Closes all in the current session and load the directory
   /// \param theDirectory a path to directory

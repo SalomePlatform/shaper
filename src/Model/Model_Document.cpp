@@ -1239,7 +1239,7 @@ static bool isSub(const CompositeFeaturePtr theMain, const FeaturePtr theSub) {
   return isSub(theMain, aParent);
 }
 
-void Model_Document::moveFeature(FeaturePtr theMoved, FeaturePtr theAfterThis)
+void Model_Document::moveFeature(FeaturePtr theMoved, FeaturePtr theAfterThis, const bool theSplit)
 {
   bool aCurrentUp = theMoved == currentFeature(false);
   if (aCurrentUp) {
@@ -1264,11 +1264,20 @@ void Model_Document::moveFeature(FeaturePtr theMoved, FeaturePtr theAfterThis)
   }
 
   myObjs->moveFeature(theMoved, anAfterThisSub);
+
+  if (theSplit) { // split the group into sub-features
+    theMoved->customAction("split");
+  }
+
   if (aCurrentUp) { // make the moved feature enabled or disabled due to the real status
     setCurrentFeature(currentFeature(false), false);
   } else if (theAfterThis == currentFeature(false) || anAfterThisSub == currentFeature(false)) {
     // must be after move to make enabled all features which are before theMoved
     setCurrentFeature(theMoved, true);
+  }
+
+  if (theSplit) { // split the group into sub-features
+    theMoved->customAction("split");
   }
 }
 

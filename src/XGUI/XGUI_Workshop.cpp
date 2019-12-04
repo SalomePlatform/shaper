@@ -170,6 +170,7 @@ static Handle(VInspector_CallBack) MyVCallBack;
 //#define DEBUG_WITH_MESSAGE_REPORT
 
 QString XGUI_Workshop::MOVE_TO_END_COMMAND = QObject::tr("Move to the end");
+QString XGUI_Workshop::MOVE_TO_END_SPLIT_COMMAND = QObject::tr("Move to the end and split");
 
 //#define DEBUG_DELETE
 //#define DEBUG_FEATURE_NAME
@@ -1215,7 +1216,8 @@ void XGUI_Workshop::processUndoRedo(const ModuleBase_ActionType theActionType, i
     else
       aMgr->redo();
 
-    if (QString((*aIt).c_str()) == MOVE_TO_END_COMMAND)
+    if (QString((*aIt).c_str()) == MOVE_TO_END_COMMAND ||
+        QString((*aIt).c_str()) == MOVE_TO_END_SPLIT_COMMAND)
       myObjectBrowser->rebuildDataTree();
   }
   operationMgr()->updateApplyOfOperations();
@@ -1636,8 +1638,8 @@ void XGUI_Workshop::onContextMenuCommand(const QString& theId, bool isChecked)
     deleteObjects();
   else if (theId == "CLEAN_HISTORY_CMD")
     cleanHistory();
-  else if (theId == "MOVE_CMD")
-    moveObjects();
+  else if (theId == "MOVE_CMD" || theId == "MOVE_SPLIT_CMD")
+    moveObjects(theId == "MOVE_SPLIT_CMD");
   else if (theId == "COLOR_CMD")
     changeColor(aObjects);
   else if (theId == "DEFLECTION_CMD")
@@ -2095,7 +2097,7 @@ bool compareFeature(const FeaturePtr& theF1, const FeaturePtr& theF2) {
   DocumentPtr aDoc = theF1->document();
   return aDoc->index(theF1) < aDoc->index(theF2);
 }
-void XGUI_Workshop::moveObjects()
+void XGUI_Workshop::moveObjects(const bool theSplit)
 {
   if (!abortAllOperations())
     return;
@@ -2112,7 +2114,7 @@ void XGUI_Workshop::moveObjects()
   if (!XGUI_Tools::canRemoveOrRename(desktop(), aFeatures))
     return;
 
-  QString anActionId = "MOVE_CMD";
+  QString anActionId = theSplit ? "MOVE_CMD" : "MOVE_SPLIT_CMD";
   QString aDescription = contextMenuMgr()->action(anActionId)->text();
   aMgr->startOperation(aDescription.toStdString());
 
@@ -2128,7 +2130,7 @@ void XGUI_Workshop::moveObjects()
     if (!aFeature.get() || !myModule->canApplyAction(aFeature, anActionId))
       continue;
 
-    anActiveDocument->moveFeature(aFeature, aCurrentFeature);
+    anActiveDocument->moveFeature(aFeature, aCurrentFeature, theSplit);
     aCurrentFeature = anActiveDocument->currentFeature(true);
   }
   aMgr->finishOperation();
