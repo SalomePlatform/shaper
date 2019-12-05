@@ -380,8 +380,6 @@ public:
   */
   virtual void processEvent(const std::shared_ptr<Events_Message>& theMessage);
 
-  bool isSketchStarted() const { return myIsSketchStarted; }
-
 
 public slots:
   /// Process sketch plane selected event
@@ -511,8 +509,6 @@ private:
   QMap<ResultPtr, Handle(AIS_Shape)> myPointsHighlight;
 
   bool myNoDragMoving;
-
-  bool myIsSketchStarted;
 };
 
 

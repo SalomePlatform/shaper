@@ -385,6 +385,7 @@ void PartSet_MenuMgr::setAuxiliary(const bool isChecked)
 
     anOpMgr->startOperation(anOpAction);
   }
+  static const Events_ID anVisualEvent = Events_Loop::eventByName(EVENT_VISUAL_ATTRIBUTES);
   if (anObjects.size() > 0) {
     QObjectPtrList::const_iterator anIt = anObjects.begin(), aLast = anObjects.end();
     for (; anIt != aLast; anIt++) {
@@ -400,6 +401,7 @@ void PartSet_MenuMgr::setAuxiliary(const bool isChecked)
             aSketchFeature->data()->attribute(anAttribute));
           if (anAuxiliaryAttr)
             anAuxiliaryAttr->setValue(isChecked);
+          ModelAPI_EventCreator::get()->sendUpdated(aSketchFeature, anVisualEvent);
         }
       }
     }
@@ -408,6 +410,7 @@ void PartSet_MenuMgr::setAuxiliary(const bool isChecked)
     anOpMgr->commitOperation();
 
   Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_UPDATED));
+  Events_Loop::loop()->flush(anVisualEvent);
 }
 
 bool PartSet_MenuMgr::canSetAuxiliary(bool& theValue) const

@@ -172,8 +172,7 @@ PartSet_SketcherMgr::PartSet_SketcherMgr(PartSet_Module* theModule)
   : QObject(theModule), myModule(theModule), myIsEditLaunching(false), myIsDragging(false),
     myDragDone(false), myIsMouseOverWindow(false),
     myIsMouseOverViewProcessed(true), myPreviousUpdateViewerEnabled(true),
-    myIsPopupMenuActive(false), myExternalPointsMgr(0), myNoDragMoving(false),
-    myIsSketchStarted(false)
+    myIsPopupMenuActive(false), myExternalPointsMgr(0), myNoDragMoving(false)
 {
   ModuleBase_IWorkshop* anIWorkshop = myModule->workshop();
   ModuleBase_IViewer* aViewer = anIWorkshop->viewer();
@@ -1028,7 +1027,6 @@ void PartSet_SketcherMgr::startSketch(ModuleBase_Operation* theOperation)
   if (!aFOperation)
     return;
 
-  myIsSketchStarted = true;
   SketcherPrs_Tools::setPixelRatio(ModuleBase_Tools::currentPixelRatio());
 
   myModule->onViewTransformed();
@@ -1150,8 +1148,6 @@ void PartSet_SketcherMgr::stopSketch(ModuleBase_Operation* theOperation)
   PartSet_Fitter* aFitter = (PartSet_Fitter*)myModule->workshop()->viewer()->fitter();
   myModule->workshop()->viewer()->setFitter(0);
   delete aFitter;
-
-  myIsSketchStarted = false;
 
   myIsMouseOverWindow = false;
   myIsConstraintsShown[PartSet_Tools::Geometrical] = true;
@@ -1578,17 +1574,19 @@ const QMap<PartSet_Tools::ConstraintVisibleState, bool>& PartSet_SketcherMgr::sh
 
 bool PartSet_SketcherMgr::isObjectOfSketch(const ObjectPtr& theObject) const
 {
-  bool isFoundObject = false;
-
+  if (!myCurrentSketch.get())
+    return false;
   FeaturePtr anObjectFeature = ModelAPI_Feature::feature(theObject);
   if (anObjectFeature.get()) {
     int aSize = myCurrentSketch->numberOfSubs();
-    for (int i = 0; i < aSize && !isFoundObject; i++) {
-      FeaturePtr aCurrentFeature = myCurrentSketch->subFeature(i);
-      isFoundObject = myCurrentSketch->subFeature(i) == anObjectFeature;
+    FeaturePtr aCurrentFeature;
+    for (int i = 0; i < aSize; i++) {
+      aCurrentFeature = myCurrentSketch->subFeature(i);
+      if (myCurrentSketch->subFeature(i) == anObjectFeature)
+        return true;
     }
   }
-  return isFoundObject;
+  return false;
 }
 
 void PartSet_SketcherMgr::onPlaneSelected(const std::shared_ptr<GeomAPI_Pln>& thePlane)

@@ -1366,7 +1366,7 @@ double getResultTransparency(const ResultPtr& theResult)
 void PartSet_Module::customizePresentation(const ObjectPtr& theObject,
                                            const AISObjectPtr& thePrs) const
 {
-  if (mySketchMgr->isSketchStarted()) {
+  if (mySketchMgr->isObjectOfSketch(theObject)) {
     mySketchMgr->customizeSketchPresentation(theObject, thePrs);
   }
   else {
