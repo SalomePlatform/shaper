@@ -26,7 +26,7 @@ IF(WIN32)
   CMAKE_POLICY(SET CMP0020 OLD) # disable automatic linking to qtmain.lib
 ENDIF(WIN32)
 
-SET (SHAPER_Version 9.3.0)
+SET (SHAPER_Version 9.4.0)
 
 SET(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/CMakeCommon" ${CMAKE_MODULE_PATH})
 
