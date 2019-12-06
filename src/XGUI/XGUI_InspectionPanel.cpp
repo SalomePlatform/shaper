@@ -759,8 +759,8 @@ void XGUI_InspectionPanel::buildFeaturePane(const FeaturePtr& theFeature)
     }
     foreach(ModuleBase_ModelWidget* aWgt, aWidgets) {
       if (aWgt->isInformative()) {
-        aWgt->setEnabled(false);
         aWgt->setFeature(theFeature, false, false);
+        aWgt->setReadOnly(true);
         aWgt->setEditingMode(true);
         aWgt->restoreValue();
         aWgt->showInformativePage();

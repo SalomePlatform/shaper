@@ -37,7 +37,8 @@
 
 class QWidget;
 class QCheckBox;
-//class QComboBox;
+class QPushButton;
+class QVBoxLayout;
 class ModuleBase_ListView;
 class ModuleBase_IWorkshop;
 class ModuleBase_ChoiceCtrl;
@@ -117,6 +118,8 @@ class MODULEBASE_EXPORT ModuleBase_WidgetMultiSelector : public ModuleBase_Widge
 
   /// Returns True if data of its feature was modified during operation
   virtual bool isModified() const;
+
+  virtual void setReadOnly(bool isReadOnly);
 
 public slots:
   /// Slot is called on selection type changed
@@ -256,12 +259,15 @@ protected:
   bool myIsFirst;
   std::string myDefMode;
 
+  QVBoxLayout* myMainLayout;
   QCheckBox* myGeomCheck;
   ModuleBase_FilterStarter* myFiltersWgt;
+  QPushButton* myShowOnlyBtn;
 
   QObjectPtrList myVisibleObjects;
   QStringList myAllowedObjects;
   QStringList myTmpAllowed;
+  std::string myUseFilters;
 };
 
 #endif /* MODULEBASE_WIDGETFILESELECTOR_H_ */

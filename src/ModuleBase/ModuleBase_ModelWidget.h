@@ -313,6 +313,10 @@ Q_OBJECT
   /// Returns True if data of its attribute was modified
   virtual bool isModified() const { return false; }
 
+  virtual void setReadOnly(bool isReadOnly) { setEnabled(!isReadOnly); }
+
+  virtual bool isReadOnly() const { return !isEnabled(); }
+
 signals:
   /// The signal about widget values are to be changed
   void beforeValuesChanged();

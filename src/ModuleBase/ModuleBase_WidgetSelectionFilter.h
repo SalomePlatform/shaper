@@ -139,13 +139,16 @@ class ModuleBase_WidgetSelectionFilter : public ModuleBase_ModelWidget
 {
   Q_OBJECT
 public:
+  static FeaturePtr SelectorFeature;
+  static std::string AttributeId;
+
 
   /// Constructor
   /// \param theParent the parent object
   /// \param theData the widget configuration. The attribute of the model widget is obtained from
   /// a low-level API for reading xml definitions of widgets
   ModuleBase_WidgetSelectionFilter(QWidget* theParent, ModuleBase_IWorkshop* theWorkshop,
-    const Config_WidgetAPI* theData);
+    const Config_WidgetAPI* theData, bool theReadOnly = false);
 
   /// Destructor
   ~ModuleBase_WidgetSelectionFilter();

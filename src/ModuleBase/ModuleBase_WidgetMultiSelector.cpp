@@ -114,7 +114,7 @@ ModuleBase_WidgetMultiSelector::ModuleBase_WidgetMultiSelector(QWidget* theParen
                                                                const Config_WidgetAPI* theData)
 : ModuleBase_WidgetSelector(theParent, theWorkshop, theData),
   myIsSetSelectionBlocked(false), myCurrentHistoryIndex(-1),
-  myIsFirst(true), myFiltersWgt(0)
+  myIsFirst(true), myFiltersWgt(0), myShowOnlyBtn(0)
 {
   std::string aPropertyTypes = theData->getProperty("shape_types");
   QString aTypesStr = aPropertyTypes.c_str();
@@ -125,8 +125,8 @@ ModuleBase_WidgetMultiSelector::ModuleBase_WidgetMultiSelector(QWidget* theParen
   if (!aAllowedList.isEmpty())
     myAllowedObjects = aAllowedList.split(' ', QString::SkipEmptyParts);
 
-  QVBoxLayout* aMainLay = new QVBoxLayout(this);
-  ModuleBase_Tools::adjustMargins(aMainLay);
+  myMainLayout = new QVBoxLayout(this);
+  ModuleBase_Tools::adjustMargins(myMainLayout);
 
   QStringList aIconsList = getIconsList(myShapeTypes);
   myTypeCtrl = new ModuleBase_ChoiceCtrl(this, myShapeTypes, aIconsList);
@@ -135,7 +135,7 @@ ModuleBase_WidgetMultiSelector::ModuleBase_WidgetMultiSelector(QWidget* theParen
     myTypeCtrl->setValue(0);
     myDefMode = myShapeTypes.first().toStdString();
   }
-  aMainLay->addWidget(myTypeCtrl);
+  myMainLayout->addWidget(myTypeCtrl);
 
   // There is no sense to parameterize list of types while we can not parameterize selection mode
   // if the xml definition contains one type, the controls to select a type should not be shown
@@ -148,7 +148,7 @@ ModuleBase_WidgetMultiSelector::ModuleBase_WidgetMultiSelector(QWidget* theParen
     QWidget* aLabelWgt = new QWidget(this);
     QHBoxLayout* aLabelLayout = new QHBoxLayout(aLabelWgt);
     aLabelLayout->setContentsMargins(0, 0, 0, 0);
-    aMainLay->addWidget(aLabelWgt);
+    myMainLayout->addWidget(aLabelWgt);
 
     QLabel* aListLabel = new QLabel(aLabelText, this);
     aLabelLayout->addWidget(aListLabel);
@@ -172,32 +172,32 @@ ModuleBase_WidgetMultiSelector::ModuleBase_WidgetMultiSelector(QWidget* theParen
   connect(myListView, SIGNAL(deleteActionClicked()), SLOT(onDeleteItem()));
   connect(myListView, SIGNAL(listActivated()), SLOT(onListActivated()));
 
-  aMainLay->addWidget(myListView->getControl());
+  myMainLayout->addWidget(myListView->getControl());
   connect(myTypeCtrl, SIGNAL(valueChanged(int)), this, SLOT(onSelectionTypeChanged()));
 
-  std::string aUseFilters = theData->getProperty("use_filters");
-  if (aUseFilters.length() > 0) {
+  myUseFilters = theData->getProperty("use_filters");
+  if (myUseFilters.length() > 0) {
     QWidget* aFltrWgt = new QWidget(this);
     QHBoxLayout* aFltrLayout = new QHBoxLayout(aFltrWgt);
 
-    myFiltersWgt = new ModuleBase_FilterStarter(aUseFilters.c_str(), aFltrWgt, theWorkshop);
+    myFiltersWgt = new ModuleBase_FilterStarter(myUseFilters, aFltrWgt, theWorkshop);
     aFltrLayout->addWidget(myFiltersWgt);
 
     aFltrLayout->addStretch();
 
-    QPushButton* aShowBtn = new QPushButton(tr("Show only"), aFltrWgt);
-    aShowBtn->setCheckable(true);
-    aShowBtn->setChecked(false);
-    connect(aShowBtn, SIGNAL(toggled(bool)), SLOT(onShowOnly(bool)));
-    aFltrLayout->addWidget(aShowBtn);
+    myShowOnlyBtn = new QPushButton(tr("Show only"), aFltrWgt);
+    myShowOnlyBtn->setCheckable(true);
+    myShowOnlyBtn->setChecked(false);
+    connect(myShowOnlyBtn, SIGNAL(toggled(bool)), SLOT(onShowOnly(bool)));
+    aFltrLayout->addWidget(myShowOnlyBtn);
 
-    aMainLay->addWidget(aFltrWgt);
+    myMainLayout->addWidget(aFltrWgt);
   }
 
   bool aSameTop = theData->getBooleanAttribute("same_topology", false);
   if (aSameTop) {
     myGeomCheck = new QCheckBox(tr("Add elements that share the same topology"), this);
-    aMainLay->addWidget(myGeomCheck);
+    myMainLayout->addWidget(myGeomCheck);
     connect(myGeomCheck, SIGNAL(toggled(bool)), SLOT(onSameTopology(bool)));
   }
   else
@@ -1185,4 +1185,34 @@ void ModuleBase_WidgetMultiSelector::onShowOnly(bool theChecked)
 bool ModuleBase_WidgetMultiSelector::isModified() const
 {
   return myListView->getControl()->count() > 0;
+}
+
+
+void ModuleBase_WidgetMultiSelector::setReadOnly(bool isReadOnly)
+{
+  ModuleBase_WidgetSelector::setReadOnly(isReadOnly);
+  if (myShowOnlyBtn)
+    myShowOnlyBtn->hide();
+  if (myFiltersWgt) {
+    myFiltersWgt->hide();
+
+    AttributeSelectionListPtr aAttrList = feature()->selectionList(attributeID());
+    if (aAttrList.get()) {
+      FiltersFeaturePtr aFilters = aAttrList->filters();
+      if (aFilters.get()) {
+        ModuleBase_WidgetSelectionFilter::SelectorFeature = feature();
+        ModuleBase_WidgetSelectionFilter::AttributeId = attributeID();
+
+        std::string aXmlCfg, aDescription;
+        myWorkshop->module()->getXMLRepresentation(myUseFilters, aXmlCfg, aDescription);
+
+        ModuleBase_WidgetSelectionFilter* aWgt =
+          new ModuleBase_WidgetSelectionFilter(this, myWorkshop,
+            new Config_WidgetAPI(aDescription), true);
+        aWgt->setFeature(aFilters);
+        aWgt->restoreValue();
+        myMainLayout->addWidget(aWgt);
+      }
+    }
+  }
 }

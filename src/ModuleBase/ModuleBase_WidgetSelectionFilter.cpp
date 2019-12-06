@@ -55,8 +55,8 @@
 #include <QCheckBox>
 #include <QDir>
 
-static FeaturePtr SelectorFeature;
-static std::string AttributeId;
+FeaturePtr ModuleBase_WidgetSelectionFilter::SelectorFeature;
+std::string ModuleBase_WidgetSelectionFilter::AttributeId;
 
 
 GeomAPI_Shape::ShapeType selectionType(const QString& theType)
@@ -118,14 +118,16 @@ void ModuleBase_FilterStarter::onFiltersLaunch()
   }
   if (!aSelector)
     return;
-  SelectorFeature = aSelector->feature();
-  AttributeId = aSelector->attributeID();
+  ModuleBase_WidgetSelectionFilter::SelectorFeature = aSelector->feature();
+  ModuleBase_WidgetSelectionFilter::AttributeId = aSelector->attributeID();
 
   // Launch Filters operation
   ModuleBase_OperationFeature* aFOperation = dynamic_cast<ModuleBase_OperationFeature*>
     (myWorkshop->module()->createOperation(myFeatureName));
 
-  AttributeSelectionListPtr aAttrList = SelectorFeature->selectionList(AttributeId);
+  AttributeSelectionListPtr aAttrList =
+    ModuleBase_WidgetSelectionFilter::SelectorFeature->selectionList(
+      ModuleBase_WidgetSelectionFilter::AttributeId);
   FiltersFeaturePtr aFilters = aAttrList->filters();
   if (aFilters.get())
     aFOperation->setFeature(aFilters);
@@ -225,16 +227,18 @@ void ModuleBase_FilterItem::onDelete()
 //*****************************************************************************
 //*****************************************************************************
 ModuleBase_WidgetSelectionFilter::ModuleBase_WidgetSelectionFilter(QWidget* theParent,
-  ModuleBase_IWorkshop* theWorkshop, const Config_WidgetAPI* theData)
+  ModuleBase_IWorkshop* theWorkshop, const Config_WidgetAPI* theData, bool theReadOnly)
   : ModuleBase_ModelWidget(theParent, theData),
   myWorkshop(theWorkshop),
-  mySelectorFeature(SelectorFeature),
-  mySelectorAttribute(AttributeId)
+  mySelectorFeature(ModuleBase_WidgetSelectionFilter::SelectorFeature),
+  mySelectorAttribute(ModuleBase_WidgetSelectionFilter::AttributeId)
 {
   // Clear Old selection
-  AttributeSelectionListPtr aAttrList = mySelectorFeature->selectionList(mySelectorAttribute);
-  mySelectionType = selectionType(aAttrList->selectionType().c_str());
-  aAttrList->clear();
+    AttributeSelectionListPtr aAttrList = mySelectorFeature->selectionList(mySelectorAttribute);
+    mySelectionType = selectionType(aAttrList->selectionType().c_str());
+  if (!theReadOnly) {
+    aAttrList->clear();
+  }
 
   // Define widgets
   QVBoxLayout* aMainLayout = new QVBoxLayout(this);
@@ -300,6 +304,12 @@ ModuleBase_WidgetSelectionFilter::ModuleBase_WidgetSelectionFilter(QWidget* theP
   aMainLayout->addStretch(1);
 
   updateSelectBtn();
+  if (theReadOnly) {
+    myFiltersCombo->hide();
+    mySelectBtn->hide();
+    aLblWgt->hide();
+    myShowBtn->hide();
+  }
 }
 
 ModuleBase_WidgetSelectionFilter::~ModuleBase_WidgetSelectionFilter()
@@ -645,28 +655,28 @@ bool ModuleBase_WidgetSelectionFilter::restoreValueCustom()
 {
   ModelAPI_FiltersFactory* aFactory = ModelAPI_Session::get()->filters();
   FiltersFeaturePtr aFiltersFeature = std::dynamic_pointer_cast<ModelAPI_FiltersFeature>(myFeature);
-  std::list<std::string> aFilters = aFiltersFeature->filters();
-  std::list<std::string>::const_iterator aIt;
-  for (aIt = aFilters.cbegin(); aIt != aFilters.cend(); aIt++) {
-    std::string aStr = (*aIt);
-    onAddFilter(aStr);
-    FilterPtr aFilterObj = aFactory->filter(aStr);
-    int aId = myFiltersCombo->findText(aFilterObj->name().c_str());
-    if (aId != -1)
-      myFiltersCombo->removeItem(aId);
-  }
+
   // Init filters member of the parent attribute
   AttributeSelectionListPtr aAttrList = mySelectorFeature->selectionList(mySelectorAttribute);
   if (aAttrList->filters() != aFiltersFeature) {
     aAttrList->setFilters(aFiltersFeature);
   }
 
-  QList<QWidget*> aWidgets;
-  QList<ModuleBase_FilterItem*> aItems = myFiltersLayout->findChildren<ModuleBase_FilterItem*>();
-  foreach(ModuleBase_FilterItem* aItem, aItems) {
-    QList<ModuleBase_ModelWidget*> aSubList = aItem->widgets();
-    foreach(ModuleBase_ModelWidget* aWgt, aSubList) {
-      aWgt->restoreValue();
+  std::list<std::string> aFilters = aFiltersFeature->filters();
+  std::list<std::string>::const_iterator aIt;
+  for (aIt = aFilters.cbegin(); aIt != aFilters.cend(); aIt++) {
+    std::string aStr = (*aIt);
+    ModuleBase_FilterItem* aItem = onAddFilter(aStr);
+    FilterPtr aFilterObj = aFactory->filter(aStr);
+    int aId = myFiltersCombo->findText(aFilterObj->name().c_str());
+    if (aId != -1)
+      myFiltersCombo->removeItem(aId);
+
+    if (aItem) {
+      QList<ModuleBase_ModelWidget*> aSubList = aItem->widgets();
+      foreach(ModuleBase_ModelWidget* aWgt, aSubList) {
+        aWgt->restoreValue();
+      }
     }
   }
   return true;
