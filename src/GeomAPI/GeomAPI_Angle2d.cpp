@@ -144,9 +144,7 @@ double GeomAPI_Angle2d::angleRadian()
   ThreePoints2d* anAngle = MY_ANGLE;
   gp_Dir2d aDir1(anAngle->myFirst.XY() - anAngle->myCenter.XY());
   gp_Dir2d aDir2(anAngle->mySecond.XY() - anAngle->myCenter.XY());
-  double aRes = aDir1.Angle(aDir2);
-  if (aRes < 0.0) aRes += 2 * PI;
-  return aRes;
+  return aDir1.Angle(aDir2);
 }
 
 bool GeomAPI_Angle2d::isReversed(int theIndex)

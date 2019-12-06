@@ -94,8 +94,12 @@ std::shared_ptr<GeomAPI_Shape> getShape(ObjectPtr theObject)
 std::shared_ptr<GeomAPI_Pnt2d> getPoint(ModelAPI_Feature* theFeature,
                                         const std::string& theAttribute)
 {
-  std::shared_ptr<GeomDataAPI_Point2D> aPointAttr = ModelGeomAlgo_Point2D::getPointOfRefAttr(
+  std::shared_ptr<GeomDataAPI_Point2D> aPointAttr =
+    std::dynamic_pointer_cast<GeomDataAPI_Point2D>(theFeature->attribute(theAttribute));
+  if (!aPointAttr.get() || !aPointAttr->isInitialized()) {
+    aPointAttr = ModelGeomAlgo_Point2D::getPointOfRefAttr(
                theFeature, theAttribute, SketchPlugin_Point::ID(), SketchPlugin_Point::COORD_ID());
+  }
   if (aPointAttr.get() != NULL)
     return aPointAttr->pnt();
   return std::shared_ptr<GeomAPI_Pnt2d>();

@@ -81,6 +81,19 @@ class SketchPlugin_ConstraintAngle : public SketchPlugin_ConstraintBase
     return MY_LOCATION_TYPE_ID;
   }
 
+  /// attribute name indicating the first point selected
+  inline static const std::string& SELECTED_FIRST_POINT_ID()
+  {
+    static const std::string MY_SELECTED_FIRST_POINT_ID("SelectedPointA");
+    return MY_SELECTED_FIRST_POINT_ID;
+  }
+
+  /// attribute name indicating the second point selected
+  inline static const std::string& SELECTED_SECOND_POINT_ID()
+  {
+    static const std::string MY_SELECTED_SECOND_POINT_ID("SelectedPointB");
+    return MY_SELECTED_SECOND_POINT_ID;
+  }
 
   /// \brief Creates a new part document if needed
   SKETCHPLUGIN_EXPORT virtual void execute();
@@ -104,24 +117,28 @@ class SketchPlugin_ConstraintAngle : public SketchPlugin_ConstraintBase
   /// Returns the AIS preview
   SKETCHPLUGIN_EXPORT virtual AISObjectPtr getAISObject(AISObjectPtr thePrevious);
 
+  /// \brief Use plugin manager for features creation
+  SketchPlugin_ConstraintAngle();
+
+protected:
   /// Calculate current value of the angle
-  double calculateAngle();
+  void calculateAngle();
+
+  /// Compute the position of the angle presentation (the quarter selected by the user)
+  void calculateAnglePosition();
 
   /// Converts the angle value according to the current angle type and sketch plane normal.
   /// The in/out angle is in degree.
   /// \param theAngle a source for the calculated angle
-  /// \param isPreviousValueObtuse a flag if obtuse should be processed
   /// \param a double angle value
-  double getAngleForType(double theAngle, bool isPreviousValueObtuse = false);
+  double getAngleForType(double theAngle);
 
-  /// Update value of VALUE attribute by the combination of the current angle type and angle value
-  void updateConstraintValueByAngleValue();
-
-  /// \brief Use plugin manager for features creation
-  SketchPlugin_ConstraintAngle();
+  /// Update value of ANGLE_VALUE attribute according to the current type
+  void updateAngleValue();
 
 private:
   bool myFlyoutUpdate; ///< to avoid cyclic dependencies on automatic updates of flyout point
+  int myPrevAngleType;
 };
 
 #endif

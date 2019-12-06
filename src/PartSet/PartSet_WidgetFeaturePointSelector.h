@@ -38,6 +38,7 @@ class ModuleBase_IViewWindow;
 class ModuleBase_ViewerPrs;
 
 class GeomAPI_Pnt;
+class GeomAPI_Pnt2d;
 class GeomDataAPI_Point2D;
 
 class QWidget;
@@ -132,6 +133,10 @@ protected:
   std::string mySelectedPointAttribute;
   std::string myPreviewObjectAttribute;
   std::string myPreviewPointAttribute;
+
+  bool myHasPreview;
+  std::shared_ptr<ModelAPI_Object> myPreviewObject;
+  std::shared_ptr<GeomAPI_Pnt2d>   myPreviewPoint;
 };
 
 #endif

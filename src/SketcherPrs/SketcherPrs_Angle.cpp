@@ -145,15 +145,24 @@ bool SketcherPrs_Angle::readyToDisplay(ModelAPI_Feature* theConstraint,
       new GeomAPI_Angle2d(aLine1, isReversed1, aLine2, isReversed2));
   }
 
-  gp_Pnt2d aFirstPoint = anAng->firstPoint()->impl<gp_Pnt2d>();
+  gp_Pnt2d aCenterPoint = anAng->center()->impl<gp_Pnt2d>();
+  gp_Pnt2d aFirstPoint, aSecondPoint;
+  if (anAng->angleRadian() > 0.0) {
+    aFirstPoint = anAng->firstPoint()->impl<gp_Pnt2d>();
+    aSecondPoint = anAng->secondPoint()->impl<gp_Pnt2d>();
+  }
+  else {
+    aFirstPoint = anAng->secondPoint()->impl<gp_Pnt2d>();
+    aSecondPoint = anAng->firstPoint()->impl<gp_Pnt2d>();
+  }
+
+
   std::shared_ptr<GeomAPI_Pnt> aPoint = thePlane->to3D(aFirstPoint.X(), aFirstPoint.Y());
   theFirstPoint = aPoint->impl<gp_Pnt>();
 
-  gp_Pnt2d aCenterPoint = anAng->center()->impl<gp_Pnt2d>();
   aPoint = thePlane->to3D(aCenterPoint.X(), aCenterPoint.Y());
   theCenterPoint = aPoint->impl<gp_Pnt>();
 
-  gp_Pnt2d aSecondPoint = anAng->secondPoint()->impl<gp_Pnt2d>();
   aPoint = thePlane->to3D(aSecondPoint.X(), aSecondPoint.Y());
   theSecondPoint = aPoint->impl<gp_Pnt>();
 
@@ -167,6 +176,9 @@ void SketcherPrs_Angle::Compute(const Handle(PrsMgr_PresentationManager3d)& theP
 {
   if (!plane().get())
     return;
+
+  DataPtr aData = myConstraint->data();
+
   gp_Pnt aFirstPoint, aSecondPoint, aCenterPoint;
   bool aReadyToDisplay = readyToDisplay(myConstraint, plane(),
                                         aFirstPoint, aSecondPoint, aCenterPoint);
@@ -175,7 +187,6 @@ void SketcherPrs_Angle::Compute(const Handle(PrsMgr_PresentationManager3d)& theP
     mySecondPoint = aSecondPoint;
     myCenterPoint = aCenterPoint;
 
-    DataPtr aData = myConstraint->data();
     AttributeDoublePtr anAttributeValue =
       aData->real(SketchPlugin_ConstraintAngle::ANGLE_VALUE_ID());
     myValue.init(anAttributeValue);
@@ -188,7 +199,6 @@ void SketcherPrs_Angle::Compute(const Handle(PrsMgr_PresentationManager3d)& theP
     myFlyOutPoint = aFlyoutPnt->impl<gp_Pnt>();
   }
 
-  DataPtr aData = myConstraint->data();
   std::shared_ptr<ModelAPI_AttributeInteger> aTypeAttr = std::dynamic_pointer_cast<
       ModelAPI_AttributeInteger>(aData->attribute(SketchPlugin_ConstraintAngle::TYPE_ID()));
   SketcherPrs_Tools::AngleType anAngleType = (SketcherPrs_Tools::AngleType)(aTypeAttr->value());
@@ -197,7 +207,7 @@ void SketcherPrs_Angle::Compute(const Handle(PrsMgr_PresentationManager3d)& theP
   switch (anAngleType) {
     case SketcherPrs_Tools::ANGLE_DIRECT: {
 #ifndef COMPILATION_CORRECTION
-      SetArrowsVisibility(AIS_TOAV_Second);
+      SetArrowsVisibility(AIS_TOAV_Both);
 #endif
       SetMeasuredGeometry(myFirstPoint, myCenterPoint, mySecondPoint);
 #ifndef COMPILATION_CORRECTION
@@ -219,7 +229,7 @@ void SketcherPrs_Angle::Compute(const Handle(PrsMgr_PresentationManager3d)& theP
     break;
     case SketcherPrs_Tools::ANGLE_BACKWARD: {
 #ifndef COMPILATION_CORRECTION
-      SetArrowsVisibility(AIS_TOAV_Second);
+      SetArrowsVisibility(AIS_TOAV_Both);
 #endif
       SetMeasuredGeometry(myFirstPoint, myCenterPoint, mySecondPoint);
       bool isReversedPlanes = isAnglePlaneReversedToSketchPlane();

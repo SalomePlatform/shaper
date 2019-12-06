@@ -38,7 +38,9 @@
 #include <SketcherPrs_Factory.h>
 #include <SketcherPrs_Tools.h>
 
-#include <math.h>
+#include <cmath>
+#include <regex>
+#include <sstream>
 
 const double tolerance = 1.e-7;
 #define PI 3.1415926535897932
@@ -54,24 +56,34 @@ SketchPlugin_ConstraintAngle::SketchPlugin_ConstraintAngle()
 
 void SketchPlugin_ConstraintAngle::initAttributes()
 {
+  ModelAPI_ValidatorsFactory* aValidators = ModelAPI_Session::get()->validators();
+
   data()->addAttribute(SketchPlugin_Constraint::VALUE(), ModelAPI_AttributeDouble::typeId());
   data()->addAttribute(SketchPlugin_Constraint::ENTITY_A(), ModelAPI_AttributeRefAttr::typeId());
   data()->addAttribute(SketchPlugin_Constraint::ENTITY_B(), ModelAPI_AttributeRefAttr::typeId());
   data()->addAttribute(SketchPlugin_Constraint::FLYOUT_VALUE_PNT(), GeomDataAPI_Point2D::typeId());
 
-  data()->addAttribute(SketchPlugin_ConstraintAngle::ANGLE_VALUE_ID(),
-                       ModelAPI_AttributeDouble::typeId());
-  data()->addAttribute(SketchPlugin_ConstraintAngle::TYPE_ID(),
-                       ModelAPI_AttributeInteger::typeId());
+  data()->addAttribute(ANGLE_VALUE_ID(), ModelAPI_AttributeDouble::typeId());
+  data()->addAttribute(TYPE_ID(), ModelAPI_AttributeInteger::typeId());
 
-  data()->addAttribute(SketchPlugin_ConstraintAngle::ANGLE_REVERSED_FIRST_LINE_ID(),
-                       ModelAPI_AttributeBoolean::typeId());
-  data()->addAttribute(SketchPlugin_ConstraintAngle::ANGLE_REVERSED_SECOND_LINE_ID(),
-                       ModelAPI_AttributeBoolean::typeId());
+  data()->addAttribute(ANGLE_REVERSED_FIRST_LINE_ID(), ModelAPI_AttributeBoolean::typeId());
+  data()->addAttribute(ANGLE_REVERSED_SECOND_LINE_ID(), ModelAPI_AttributeBoolean::typeId());
 
-  data()->addAttribute(SketchPlugin_ConstraintAngle::LOCATION_TYPE_ID(),
-                       ModelAPI_AttributeInteger::typeId());
-  ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(), LOCATION_TYPE_ID());
+  data()->addAttribute(LOCATION_TYPE_ID(), ModelAPI_AttributeInteger::typeId());
+  aValidators->registerNotObligatory(getKind(), LOCATION_TYPE_ID());
+
+  data()->addAttribute(SELECTED_FIRST_POINT_ID(), GeomDataAPI_Point2D::typeId());
+  data()->attribute(SELECTED_FIRST_POINT_ID())->setIsArgument(false);
+  aValidators->registerNotObligatory(getKind(), SELECTED_FIRST_POINT_ID());
+
+  data()->addAttribute(SELECTED_SECOND_POINT_ID(), GeomDataAPI_Point2D::typeId());
+  data()->attribute(SELECTED_SECOND_POINT_ID())->setIsArgument(false);
+  aValidators->registerNotObligatory(getKind(), SELECTED_SECOND_POINT_ID());
+
+  if (attribute(TYPE_ID())->isInitialized())
+    myPrevAngleType = integer(TYPE_ID())->value();
+  else
+    myPrevAngleType = (int)SketcherPrs_Tools::ANGLE_DIRECT;
 }
 
 void SketchPlugin_ConstraintAngle::colorConfigInfo(std::string& theSection, std::string& theName,
@@ -86,21 +98,15 @@ void SketchPlugin_ConstraintAngle::execute()
 {
   std::shared_ptr<ModelAPI_Data> aData = data();
 
-  std::shared_ptr<ModelAPI_AttributeRefAttr> anAttrA =
-    aData->refattr(SketchPlugin_Constraint::ENTITY_A());
-  std::shared_ptr<ModelAPI_AttributeRefAttr> anAttrB =
-    aData->refattr(SketchPlugin_Constraint::ENTITY_B());
+  AttributeRefAttrPtr anAttrA = aData->refattr(SketchPlugin_Constraint::ENTITY_A());
+  AttributeRefAttrPtr anAttrB = aData->refattr(SketchPlugin_Constraint::ENTITY_B());
   if (!anAttrA->isInitialized() || !anAttrB->isInitialized())
     return;
 
-  AttributeDoublePtr anAttrValue = std::dynamic_pointer_cast<ModelAPI_AttributeDouble>(
-      aData->attribute(SketchPlugin_ConstraintAngle::ANGLE_VALUE_ID()));
+  AttributeDoublePtr anAttrValue = real(ANGLE_VALUE_ID());
+  if (!anAttrValue->isInitialized())
+    calculateAngle();
 
-  if (!anAttrValue->isInitialized()) {
-    double anAngle = calculateAngle();
-    anAttrValue->setValue(anAngle);
-    updateConstraintValueByAngleValue();
-  }
   // the value should to be computed here, not in the
   // getAISObject in order to change the model value
   // inside the object transaction. This is important for creating a constraint by preselection.
@@ -128,37 +134,26 @@ void SketchPlugin_ConstraintAngle::attributeChanged(const std::string& theID)
   std::shared_ptr<ModelAPI_Data> aData = data();
   if (!aData)
     return;
-  FeaturePtr aLineA = SketcherPrs_Tools::getFeatureLine(aData, SketchPlugin_Constraint::ENTITY_A());
-  FeaturePtr aLineB = SketcherPrs_Tools::getFeatureLine(aData, SketchPlugin_Constraint::ENTITY_B());
+
+  if (theID == TYPE_ID())
+    updateAngleValue();
+
+  FeaturePtr aLineA = SketcherPrs_Tools::getFeatureLine(aData, ENTITY_A());
+  FeaturePtr aLineB = SketcherPrs_Tools::getFeatureLine(aData, ENTITY_B());
   if (!aLineA || !aLineB)
     return;
 
-  if (theID == SketchPlugin_Constraint::ENTITY_A() ||
-      theID == SketchPlugin_Constraint::ENTITY_B()) {
-    AttributeDoublePtr aValueAttr = real(SketchPlugin_ConstraintAngle::ANGLE_VALUE_ID());
-    AttributeDoublePtr aConstrValueAttr = real(SketchPlugin_Constraint::VALUE());
-    // only if one of attributes is not initialized, try to compute the current value
-    if (!aValueAttr->isInitialized() || !aConstrValueAttr->isInitialized()) {
-      if (aValueAttr->isInitialized() && !aConstrValueAttr->isInitialized())
-        // initialize base value of constraint
-        updateConstraintValueByAngleValue();
-      double anAngle = calculateAngle();
-      aValueAttr->setValue(anAngle);
-      updateConstraintValueByAngleValue();
-    }
-  } else if (theID == SketchPlugin_Constraint::FLYOUT_VALUE_PNT() && !myFlyoutUpdate) {
+  if (theID == ENTITY_A() || theID == ENTITY_B() ||
+      theID == TYPE_ID() || theID == ANGLE_VALUE_ID()) {
+    calculateAngle();
+  } else if (theID == FLYOUT_VALUE_PNT() && !myFlyoutUpdate) {
     // Recalculate flyout point in local coordinates
     // coordinates are calculated according to the center of shapes intersection
     std::shared_ptr<GeomDataAPI_Point2D> aFlyoutAttr =
-      std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
-      attribute(SketchPlugin_Constraint::FLYOUT_VALUE_PNT()));
+      std::dynamic_pointer_cast<GeomDataAPI_Point2D>(attribute(FLYOUT_VALUE_PNT()));
 
     std::shared_ptr<ModelAPI_Data> aData = data();
     std::shared_ptr<GeomAPI_Ax3> aPlane = SketchPlugin_Sketch::plane(sketch());
-    FeaturePtr aLineA =
-      SketcherPrs_Tools::getFeatureLine(aData, SketchPlugin_Constraint::ENTITY_A());
-    FeaturePtr aLineB =
-      SketcherPrs_Tools::getFeatureLine(aData, SketchPlugin_Constraint::ENTITY_B());
 
     // Intersection of lines
     std::shared_ptr<GeomAPI_Pnt2d> anInter = intersect(aLineA, aLineB);
@@ -171,111 +166,167 @@ void SketchPlugin_ConstraintAngle::attributeChanged(const std::string& theID)
       aFlyoutAttr->setValue(aFlyoutAttr->x() + tolerance, aFlyoutAttr->y());
     myFlyoutUpdate = false;
   }
-  else if (theID == SketchPlugin_ConstraintAngle::TYPE_ID()) {
-    std::shared_ptr<ModelAPI_AttributeDouble> aValueAttr = std::dynamic_pointer_cast<
-      ModelAPI_AttributeDouble>(data()->attribute(SketchPlugin_ConstraintAngle::ANGLE_VALUE_ID()));
-    double anAngle = calculateAngle();
-    if (aValueAttr->text().empty())
-      aValueAttr->setValue(anAngle);
-    else {
-      aValueAttr = std::dynamic_pointer_cast<
-        ModelAPI_AttributeDouble>(data()->attribute(SketchPlugin_ConstraintAngle::VALUE()));
-      aValueAttr->setValue(anAngle);
-    }
-  }
-  else if (theID == SketchPlugin_ConstraintAngle::ANGLE_VALUE_ID()) {
-    updateConstraintValueByAngleValue();
-  }
 }
 
-double SketchPlugin_ConstraintAngle::calculateAngle()
+void SketchPlugin_ConstraintAngle::calculateAngle()
 {
+  // update *_REVERSED_* flags
+  calculateAnglePosition();
+
   std::shared_ptr<ModelAPI_Data> aData = data();
   std::shared_ptr<GeomAPI_Ax3> aPlane = SketchPlugin_Sketch::plane(sketch());
-  FeaturePtr aLineA = SketcherPrs_Tools::getFeatureLine(aData, SketchPlugin_Constraint::ENTITY_A());
-  FeaturePtr aLineB = SketcherPrs_Tools::getFeatureLine(aData, SketchPlugin_Constraint::ENTITY_B());
+  FeaturePtr aLineA = SketcherPrs_Tools::getFeatureLine(aData, ENTITY_A());
+  FeaturePtr aLineB = SketcherPrs_Tools::getFeatureLine(aData, ENTITY_B());
 
-  std::shared_ptr<GeomDataAPI_Point2D> aStartA = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
-      aLineA->attribute(SketchPlugin_Line::START_ID()));
-  std::shared_ptr<GeomDataAPI_Point2D> aEndA = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
-      aLineA->attribute(SketchPlugin_Line::END_ID()));
-  std::shared_ptr<GeomDataAPI_Point2D> aStartB = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
-      aLineB->attribute(SketchPlugin_Line::START_ID()));
-  std::shared_ptr<GeomDataAPI_Point2D> aEndB = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
-      aLineB->attribute(SketchPlugin_Line::END_ID()));
+  GeomPnt2dPtr aStartA = SketcherPrs_Tools::getPoint(aLineA.get(), SketchPlugin_Line::START_ID());
+  GeomPnt2dPtr aEndA = SketcherPrs_Tools::getPoint(aLineA.get(), SketchPlugin_Line::END_ID());
+  GeomPnt2dPtr aStartB = SketcherPrs_Tools::getPoint(aLineB.get(), SketchPlugin_Line::START_ID());
+  GeomPnt2dPtr aEndB = SketcherPrs_Tools::getPoint(aLineB.get(), SketchPlugin_Line::END_ID());
 
-  std::shared_ptr<GeomAPI_Angle2d> anAng;
-  if (!attribute(ANGLE_REVERSED_FIRST_LINE_ID())->isInitialized() ||
-      !attribute(ANGLE_REVERSED_SECOND_LINE_ID())->isInitialized())
-    anAng = std::shared_ptr<GeomAPI_Angle2d>(new GeomAPI_Angle2d(
-        aStartA->pnt(), aEndA->pnt(), aStartB->pnt(), aEndB->pnt()));
-  else {
-    std::shared_ptr<GeomAPI_Lin2d> aLine1(new GeomAPI_Lin2d(aStartA->pnt(), aEndA->pnt()));
-    bool isReversed1 = boolean(ANGLE_REVERSED_FIRST_LINE_ID())->value();
-    std::shared_ptr<GeomAPI_Lin2d> aLine2(new GeomAPI_Lin2d(aStartB->pnt(), aEndB->pnt()));
-    bool isReversed2 = boolean(ANGLE_REVERSED_SECOND_LINE_ID())->value();
-    anAng = std::shared_ptr<GeomAPI_Angle2d>(
+  std::shared_ptr<GeomAPI_Lin2d> aLine1(new GeomAPI_Lin2d(aStartA, aEndA));
+  std::shared_ptr<GeomAPI_Lin2d> aLine2(new GeomAPI_Lin2d(aStartB, aEndB));
+
+  bool isReversed1 = boolean(ANGLE_REVERSED_FIRST_LINE_ID())->value();
+  bool isReversed2 = boolean(ANGLE_REVERSED_SECOND_LINE_ID())->value();
+
+  std::shared_ptr<GeomAPI_Angle2d> anAng(
       new GeomAPI_Angle2d(aLine1, isReversed1, aLine2, isReversed2));
-  }
   double anAngle = anAng->angleDegree();
-  std::shared_ptr<ModelAPI_AttributeDouble> aValueAttr = std::dynamic_pointer_cast<
-      ModelAPI_AttributeDouble>(data()->attribute(VALUE()));
-  std::shared_ptr<ModelAPI_AttributeDouble> anAngleValueAttr = std::dynamic_pointer_cast<
-      ModelAPI_AttributeDouble>(data()->attribute(ANGLE_VALUE_ID()));
-  if (!aValueAttr->isInitialized())
-    aValueAttr->setValue(anAngle);
-  /// an angle value should be corrected by the current angle type
-  anAngle = getAngleForType(anAngleValueAttr->text().empty() ?
-                            anAngle : anAngleValueAttr->value());
-  boolean(ANGLE_REVERSED_FIRST_LINE_ID())->setValue(anAng->isReversed(0));
-  boolean(ANGLE_REVERSED_SECOND_LINE_ID())->setValue(anAng->isReversed(1));
-  return anAngle;
+
+  AttributeDoublePtr anAngleValueAttr = real(ANGLE_VALUE_ID());
+  if (!anAngleValueAttr->isInitialized())
+    anAngleValueAttr->setValue(getAngleForType(fabs(anAngle)));
+
+  anAngle /= fabs(anAngle);
+  anAngle *= getAngleForType(anAngleValueAttr->value());
+
+  // update value of the constraint to be passed to the solver
+  real(SketchPlugin_Constraint::VALUE())->setValue(anAngle);
 }
 
-double SketchPlugin_ConstraintAngle::getAngleForType(double theAngle, bool isPreviousValueObtuse)
+void SketchPlugin_ConstraintAngle::calculateAnglePosition()
+{
+  if (attribute(ANGLE_REVERSED_FIRST_LINE_ID())->isInitialized() &&
+      attribute(ANGLE_REVERSED_SECOND_LINE_ID())->isInitialized())
+    return; // already calculated
+
+  DataPtr aData = data();
+  FeaturePtr aLineA = SketcherPrs_Tools::getFeatureLine(aData, ENTITY_A());
+  FeaturePtr aLineB = SketcherPrs_Tools::getFeatureLine(aData, ENTITY_B());
+
+  GeomPnt2dPtr aStartA = SketcherPrs_Tools::getPoint(aLineA.get(), SketchPlugin_Line::START_ID());
+  GeomPnt2dPtr aEndA = SketcherPrs_Tools::getPoint(aLineA.get(), SketchPlugin_Line::END_ID());
+  GeomPnt2dPtr aStartB = SketcherPrs_Tools::getPoint(aLineB.get(), SketchPlugin_Line::START_ID());
+  GeomPnt2dPtr aEndB = SketcherPrs_Tools::getPoint(aLineB.get(), SketchPlugin_Line::END_ID());
+
+  bool isReversed1 = false;
+  bool isReversed2 = false;
+
+  GeomPnt2dPtr aSelected1 = SketcherPrs_Tools::getPoint(this, SELECTED_FIRST_POINT_ID());
+  GeomPnt2dPtr aSelected2 = SketcherPrs_Tools::getPoint(this, SELECTED_SECOND_POINT_ID());
+  if (aSelected1 && aSelected2) {
+    GeomPnt2dPtr anInterPnt = intersect(aLineA, aLineB);
+    if (!anInterPnt)
+      return;
+    std::shared_ptr<GeomAPI_XY> anInterXY = anInterPnt->xy();
+    isReversed1 = aSelected1->xy()->decreased(anInterXY)->dot(
+                  aEndA->xy()->decreased(aStartA->xy())) < -tolerance;
+    isReversed2 = aSelected2->xy()->decreased(anInterXY)->dot(
+                  aEndB->xy()->decreased(aStartB->xy())) < -tolerance;
+  }
+  else {
+    // no point is selected (document opened or Python script is loaded),
+    // calculate basing on the value
+    std::shared_ptr<GeomAPI_Angle2d> anAng(new GeomAPI_Angle2d(aStartA, aEndA, aStartB, aEndB));
+    isReversed1 = anAng->isReversed(0);
+    isReversed2 = anAng->isReversed(1);
+  }
+
+  // adjust reversed flags according to the angle type
+  AttributeIntegerPtr aTypeAttr = integer(TYPE_ID());
+  if (aTypeAttr && aTypeAttr->isInitialized() &&
+     (SketcherPrs_Tools::AngleType)(aTypeAttr->value()) == SketcherPrs_Tools::ANGLE_COMPLEMENTARY)
+    isReversed1 = !isReversed1;
+
+  boolean(ANGLE_REVERSED_FIRST_LINE_ID())->setValue(isReversed1);
+  boolean(ANGLE_REVERSED_SECOND_LINE_ID())->setValue(isReversed2);
+}
+
+static double angleForType(const double theAngle, const int theType)
 {
   double anAngle = theAngle;
-
-  std::shared_ptr<ModelAPI_Data> aData = data();
-  std::shared_ptr<ModelAPI_AttributeInteger> aTypeAttr = std::dynamic_pointer_cast<
-      ModelAPI_AttributeInteger>(aData->attribute(SketchPlugin_ConstraintAngle::TYPE_ID()));
-  SketcherPrs_Tools::AngleType anAngleType = (SketcherPrs_Tools::AngleType)(aTypeAttr->value());
-  switch (anAngleType) {
+  switch ((SketcherPrs_Tools::AngleType)theType) {
     case SketcherPrs_Tools::ANGLE_DIRECT:
       anAngle = theAngle;
-    break;
-    case SketcherPrs_Tools::ANGLE_COMPLEMENTARY: {
-      if (theAngle > 180 || isPreviousValueObtuse)
-        anAngle = theAngle - 180.0;
-      else
-        anAngle = 180.0 - theAngle;
-
-      if (anAngle < 0.0)
-        anAngle += 360.0;
-    }
-    break;
+      break;
+    case SketcherPrs_Tools::ANGLE_COMPLEMENTARY:
+      anAngle = 180.0 - theAngle;
+      break;
     case SketcherPrs_Tools::ANGLE_BACKWARD:
       anAngle = 360.0 - theAngle;
-    break;
+      break;
     default:
       break;
   }
   return anAngle;
 }
 
-void SketchPlugin_ConstraintAngle::updateConstraintValueByAngleValue()
+double SketchPlugin_ConstraintAngle::getAngleForType(double theAngle)
 {
-  std::shared_ptr<ModelAPI_AttributeDouble> aValueAttr = std::dynamic_pointer_cast<
-    ModelAPI_AttributeDouble>(data()->attribute(SketchPlugin_ConstraintAngle::ANGLE_VALUE_ID()));
-  double anAngle = aValueAttr->value();
+  return angleForType(theAngle, integer(TYPE_ID())->value());
+}
 
-  /// an angle value should be corrected by the current angle type
-  aValueAttr = std::dynamic_pointer_cast<
-                  ModelAPI_AttributeDouble>(data()->attribute(SketchPlugin_Constraint::VALUE()));
-  if (!aValueAttr->isInitialized())
-    calculateAngle();
-  anAngle = getAngleForType(anAngle, aValueAttr->value() > 180.0);
-  aValueAttr->setValue(anAngle);
+void SketchPlugin_ConstraintAngle::updateAngleValue()
+{
+  AttributeIntegerPtr anAngleType = integer(TYPE_ID());
+  AttributeDoublePtr anAngleValueAttr = real(ANGLE_VALUE_ID());
+  if (anAngleValueAttr->isInitialized()) {
+    if (anAngleValueAttr->text().empty()) {
+      // calculate value related to the type twice:
+      // the first time - to return to direct angle,
+      // the second time - to apply new type
+      double aValue = angleForType(anAngleValueAttr->value(), myPrevAngleType);
+      aValue = angleForType(aValue, anAngleType->value());
+      anAngleValueAttr->setValue(aValue);
+    }
+    else {
+      // process the parametric value
+      std::string anAngleText = anAngleValueAttr->text();
+      std::regex anAngleRegex("\\s*([-+]?[0-9]*\\.?[0-9]*)\\s*([-+])\\s*\\((.*)\\)",
+                              std::regex_constants::ECMAScript);
+
+      double anAnglePrefix = 0.0;
+      static const char aSignPrefix[2] = { '-', '+' };
+      int aSignInd = 1;
+
+      std::smatch aResult;
+      if (std::regex_search(anAngleText, aResult, anAngleRegex)) {
+        anAnglePrefix = std::atof(aResult[1].str().c_str());
+        aSignInd = aResult[2].str()[0] == aSignPrefix[0] ? 0 : 1;
+        anAngleText = aResult[3].str();
+      }
+
+      if (myPrevAngleType != SketcherPrs_Tools::ANGLE_DIRECT)
+        aSignInd = 1 - aSignInd;
+      anAnglePrefix = angleForType(anAnglePrefix, myPrevAngleType);
+
+      if (anAngleType->value() != SketcherPrs_Tools::ANGLE_DIRECT)
+        aSignInd = 1 - aSignInd;
+      anAnglePrefix = angleForType(anAnglePrefix, anAngleType->value());
+
+      std::ostringstream aText;
+      bool isPrintSign = true;
+      if (fabs(anAnglePrefix) > tolerance)
+        aText << anAnglePrefix;
+      else
+        isPrintSign = aSignInd == 0;
+      if (isPrintSign)
+        aText << " " << aSignPrefix[aSignInd] << " (";
+      aText << anAngleText << (isPrintSign ? ")" : "");
+      anAngleValueAttr->setText(aText.str());
+    }
+  }
+  myPrevAngleType = anAngleType->value();
 }
 
 bool SketchPlugin_ConstraintAngle::compute(const std::string& theAttributeId)
@@ -300,23 +351,13 @@ bool SketchPlugin_ConstraintAngle::compute(const std::string& theAttributeId)
     return false;
 
   // Start and end points of lines
-  std::shared_ptr<GeomDataAPI_Point2D> aPointA1 = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
-      aLineA->attribute(SketchPlugin_Line::START_ID()));
-  std::shared_ptr<GeomDataAPI_Point2D> aPointA2 = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
-      aLineA->attribute(SketchPlugin_Line::END_ID()));
-
-  std::shared_ptr<GeomAPI_Pnt2d> aStartA = aPointA1->pnt();
-  std::shared_ptr<GeomAPI_Pnt2d> aEndA   = aPointA2->pnt();
+  GeomPnt2dPtr aStartA = SketcherPrs_Tools::getPoint(aLineA.get(), SketchPlugin_Line::START_ID());
+  GeomPnt2dPtr aEndA   = SketcherPrs_Tools::getPoint(aLineA.get(), SketchPlugin_Line::END_ID());
   if (aStartA->distance(aEndA) < tolerance)
     return false;
 
-  std::shared_ptr<GeomDataAPI_Point2D> aPointB1 = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
-      aLineB->attribute(SketchPlugin_Line::START_ID()));
-  std::shared_ptr<GeomDataAPI_Point2D> aPointB2 = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
-      aLineB->attribute(SketchPlugin_Line::END_ID()));
-
-  std::shared_ptr<GeomAPI_Pnt2d> aStartB = aPointB1->pnt();
-  std::shared_ptr<GeomAPI_Pnt2d> aEndB = aPointB2->pnt();
+  GeomPnt2dPtr aStartB = SketcherPrs_Tools::getPoint(aLineB.get(), SketchPlugin_Line::START_ID());
+  GeomPnt2dPtr aEndB   = SketcherPrs_Tools::getPoint(aLineB.get(), SketchPlugin_Line::END_ID());
   if (aStartB->distance(aEndB) < tolerance)
     return false;
 
@@ -335,20 +376,12 @@ bool SketchPlugin_ConstraintAngle::compute(const std::string& theAttributeId)
 std::shared_ptr<GeomAPI_Pnt2d> intersect(FeaturePtr theLine1, FeaturePtr theLine2)
 {
   // Start and end points of lines
-  std::shared_ptr<GeomDataAPI_Point2D> aPointA1 = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
-      theLine1->attribute(SketchPlugin_Line::START_ID()));
-  std::shared_ptr<GeomDataAPI_Point2D> aPointA2 = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
-      theLine1->attribute(SketchPlugin_Line::END_ID()));
-
-  std::shared_ptr<GeomDataAPI_Point2D> aPointB1 = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
-      theLine2->attribute(SketchPlugin_Line::START_ID()));
-  std::shared_ptr<GeomDataAPI_Point2D> aPointB2 = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
-      theLine2->attribute(SketchPlugin_Line::END_ID()));
-
-  std::shared_ptr<GeomAPI_Pnt2d> aStartA = aPointA1->pnt();
-  std::shared_ptr<GeomAPI_Pnt2d> aEndA   = aPointA2->pnt();
-  std::shared_ptr<GeomAPI_Pnt2d> aStartB = aPointB1->pnt();
-  std::shared_ptr<GeomAPI_Pnt2d> aEndB   = aPointB2->pnt();
+  const std::string& aLineStartAttr = SketchPlugin_Line::START_ID();
+  const std::string& aLineEndAttr = SketchPlugin_Line::END_ID();
+  GeomPnt2dPtr aStartA = SketcherPrs_Tools::getPoint(theLine1.get(), aLineStartAttr);
+  GeomPnt2dPtr aEndA   = SketcherPrs_Tools::getPoint(theLine1.get(), aLineEndAttr);
+  GeomPnt2dPtr aStartB = SketcherPrs_Tools::getPoint(theLine2.get(), aLineStartAttr);
+  GeomPnt2dPtr aEndB   = SketcherPrs_Tools::getPoint(theLine2.get(), aLineEndAttr);
   if (aStartA->distance(aEndA) < tolerance || aStartB->distance(aEndB) < tolerance)
     std::shared_ptr<GeomAPI_Pnt2d>();
 

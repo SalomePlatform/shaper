@@ -30,6 +30,7 @@
 #include <ModuleBase_ISelection.h>
 #include <ModuleBase_ViewerPrs.h>
 
+#include <ModelAPI_AttributeRefAttr.h>
 #include <ModelAPI_AttributeReference.h>
 #include <ModelAPI_Events.h>
 #include <ModelAPI_Feature.h>
@@ -66,10 +67,14 @@ PartSet_WidgetFeaturePointSelector::PartSet_WidgetFeaturePointSelector(QWidget* 
   std::string anAttributes = theData->getProperty("selection_attributes");
   QStringList anAttributesList = QString(anAttributes.c_str()).split(' ', QString::SkipEmptyParts);
 
+  myHasPreview = anAttributesList.size() >= 4;
+
   mySelectedObjectAttribute = anAttributesList[0].toStdString();
   mySelectedPointAttribute = anAttributesList[1].toStdString();
-  myPreviewObjectAttribute = anAttributesList[2].toStdString();
-  myPreviewPointAttribute = anAttributesList[3].toStdString();
+  if (myHasPreview) {
+    myPreviewObjectAttribute = anAttributesList[2].toStdString();
+    myPreviewPointAttribute = anAttributesList[3].toStdString();
+  }
 }
 
 PartSet_WidgetFeaturePointSelector::~PartSet_WidgetFeaturePointSelector()
@@ -150,27 +155,42 @@ void PartSet_WidgetFeaturePointSelector::mouseReleased(ModuleBase_IViewWindow* t
   if (theEvent->button() != Qt::LeftButton)
     return;
 
-  std::shared_ptr<ModelAPI_AttributeReference> aRefPreviewAttr =
-                          std::dynamic_pointer_cast<ModelAPI_AttributeReference>(
-                          feature()->data()->attribute(myPreviewObjectAttribute));
-  ObjectPtr aPreviewObject = aRefPreviewAttr->value();
+  ObjectPtr aPreviewObject;
+  GeomPnt2dPtr aPreviewPoint;
+  if (myHasPreview) {
+    std::shared_ptr<ModelAPI_AttributeReference> aRefPreviewAttr =
+                            std::dynamic_pointer_cast<ModelAPI_AttributeReference>(
+                            feature()->data()->attribute(myPreviewObjectAttribute));
+    aPreviewObject = aRefPreviewAttr->value();
+
+    std::shared_ptr<GeomDataAPI_Point2D> aPointPreviewAttr =
+                            std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
+                            feature()->data()->attribute(myPreviewPointAttribute));
+    aPreviewPoint = aPointPreviewAttr->pnt();
+  }
+  else {
+    aPreviewObject = myPreviewObject;
+    aPreviewPoint = myPreviewPoint;
+  }
+
   // do not move focus from the current widget if the object is not highlighted/selected
   if (!aPreviewObject.get())
     return;
 
   // set parameters of preview into parameters of selection in the feature
-  std::shared_ptr<ModelAPI_AttributeReference> aRefSelectedAttr =
-                          std::dynamic_pointer_cast<ModelAPI_AttributeReference>(
-                          feature()->data()->attribute(mySelectedObjectAttribute));
-  aRefSelectedAttr->setValue(aRefPreviewAttr->value());
-
   std::shared_ptr<GeomDataAPI_Point2D> aPointSelectedAttr =
                           std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
                           feature()->data()->attribute(mySelectedPointAttribute));
-  std::shared_ptr<GeomDataAPI_Point2D> aPointPreviewAttr =
-                          std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
-                          feature()->data()->attribute(myPreviewPointAttribute));
-  aPointSelectedAttr->setValue(aPointPreviewAttr->x(), aPointPreviewAttr->y());
+  aPointSelectedAttr->setValue(aPreviewPoint);
+
+  AttributeReferencePtr aRefSelectedAttr = feature()->reference(mySelectedObjectAttribute);
+  if (aRefSelectedAttr)
+    aRefSelectedAttr->setValue(aPreviewObject);
+  else {
+    AttributeRefAttrPtr aRefAttrSelectedAttr = feature()->refattr(mySelectedObjectAttribute);
+    if (aRefAttrSelectedAttr)
+      aRefAttrSelectedAttr->setObject(aPreviewObject);
+  }
 
   updateObject(feature());
 
@@ -189,20 +209,21 @@ bool PartSet_WidgetFeaturePointSelector::fillFeature(
                             QMouseEvent* theEvent)
 {
   bool aFilled = false;
-  ObjectPtr anObject;
   if (theSelectedPrs.get() && theSelectedPrs->object().get())
-    anObject = theSelectedPrs->object();
+    myPreviewObject = theSelectedPrs->object();
+  myPreviewPoint = PartSet_Tools::getPnt2d(theEvent, theWindow, mySketch);
 
-  std::shared_ptr<ModelAPI_AttributeReference> aRef =
-                          std::dynamic_pointer_cast<ModelAPI_AttributeReference>(
-                          feature()->data()->attribute(myPreviewObjectAttribute));
-  aRef->setValue(anObject);
+  if (myHasPreview) {
+    std::shared_ptr<ModelAPI_AttributeReference> aRef =
+                            std::dynamic_pointer_cast<ModelAPI_AttributeReference>(
+                            feature()->data()->attribute(myPreviewObjectAttribute));
+    aRef->setValue(myPreviewObject);
 
-  std::shared_ptr<GeomDataAPI_Point2D> anAttributePoint =
-                  std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
-                  feature()->data()->attribute(myPreviewPointAttribute));
-  std::shared_ptr<GeomAPI_Pnt2d> aPoint = PartSet_Tools::getPnt2d(theEvent, theWindow, mySketch);
-  anAttributePoint->setValue(aPoint);
+    std::shared_ptr<GeomDataAPI_Point2D> anAttributePoint =
+                    std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
+                    feature()->data()->attribute(myPreviewPointAttribute));
+    anAttributePoint->setValue(myPreviewPoint);
+  }
   // redisplay AIS presentation in viewer
 #ifndef HIGHLIGHT_STAYS_PROBLEM
   // an attempt to clear highlighted item in the viewer: but of OCCT
