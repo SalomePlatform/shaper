@@ -1582,7 +1582,7 @@ void XGUI_Workshop::showPanel(QDockWidget* theDockWidget)
   // in order to operation manager could process key events of the panel.
   // otherwise they are ignored. It happens only if the same(activateWindow) is
   // not happened by property panel activation(e.g. resume operation of Sketch)
-  ModuleBase_Tools::setFocus(theDockWidget, "XGUI_Workshop::showPanel()");
+  //ModuleBase_Tools::setFocus(theDockWidget, "XGUI_Workshop::showPanel()");
 }
 
 //******************************************************
