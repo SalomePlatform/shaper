@@ -1044,6 +1044,8 @@ void XGUI_Workshop::onNew()
   QMdiSubWindow* aWnd = myMainWindow->viewer()->createView();
   aWnd->showMaximized();
   updateCommandStatus();
+  PyConsole_Console* aConsole = myMainWindow->pythonConsole();
+  connect(aConsole, SIGNAL(scriptLoaded()), SLOT(updateCommandStatus()));
 #endif
   myContextMenuMgr->connectViewer();
   QApplication::restoreOverrideCursor();
