@@ -2136,6 +2136,7 @@ void XGUI_Workshop::moveObjects(const bool theSplit)
   }
   aMgr->finishOperation();
   updateCommandStatus();
+  myViewerProxy->update();
 }
 
 //**************************************************************
