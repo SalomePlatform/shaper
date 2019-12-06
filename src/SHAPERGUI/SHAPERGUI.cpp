@@ -517,6 +517,7 @@ void SHAPERGUI::onScriptLoaded()
   if (aBrowser)
     delete aBrowser;
   myWorkshop->displayer()->updateViewer();
+  myWorkshop->updateCommandStatus();
 }
 
 //******************************************************
