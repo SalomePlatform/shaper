@@ -58,6 +58,10 @@
       <translation>Récupérer</translation>
     </message>
     <message>
+      <source>Copy</source>
+      <translation>Copie</translation>
+    </message>
+    <message>
       <source>Remove Sub-Shapes</source>
       <translation>Supprimer les sous-formes</translation>
     </message>
@@ -1120,6 +1124,41 @@
     <message>
       <source>Concealed results</source>
       <translation>Résultats cachés</translation>
+    </message>
+  </context>
+
+  <!-- Copy -->
+  <context>
+    <name>Copy</name>
+    <message>
+      <source>Copy</source>
+      <translation>Copie</translation>
+    </message>
+    <message>
+      <source>Copies results or sub-results</source>
+      <translation>Copie les résultats ou les sous-résultats</translation>
+    </message>
+  </context>
+  <context>
+    <name>Recover:objects</name>
+    <message>
+      <source>Sources:</source>
+      <translation>Sources:</translation>
+    </message>
+    <message>
+      <source>Select copied objects</source>
+      <translation>Sélectionnez les objets copiés</translation>
+    </message>
+  </context>
+  <context>
+    <name>Recover:number</name>
+    <message>
+      <source>Nb copies</source>
+      <translation>Nb de copies</translation>
+    </message>
+    <message>
+      <source>Number of copies</source>
+      <translation>Nombre de copies</translation>
     </message>
   </context>
 

@@ -29,7 +29,7 @@ Here it is necessary to select some objects. Only faces with shared edges or sol
 .. py:function:: model.addUnion(Part_doc, objects)
 
     :param part: The current part object.
-    :param list: A list of objects.
+    :param objects: A list of objects.
     :return: Result object.
 
 Result

@@ -59,8 +59,9 @@ from ModelAPI import *
 aFactory = ModelAPI_Session.get().validators()
 assert(aFactory.validate(Group_1.feature()))
 selectionList = Group_1.feature().selectionList("group_list")
-assert(selectionList.size() == 1) # still the same solid
+assert(selectionList.size() == 2) # still the same solid + the copied and filleted
 
-assert(selectionList.value(0).namingName() == "Fillet_1_1_1")
+assert(selectionList.value(0).namingName() == "Extrusion_1_1_1")
+assert(selectionList.value(1).namingName() == "Fillet_1_1_1")
 
 assert(model.checkPythonDump())

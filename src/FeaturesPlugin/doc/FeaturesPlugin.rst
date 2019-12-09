@@ -13,6 +13,7 @@ Features plug-in provides a set of common topological operations. It implements 
    angularCopyFeature.rst
    chamferFeature.rst
    commonFeature.rst
+   copyFeature.rst
    cutFeature.rst
    extrusionCutFeature.rst
    extrusionFeature.rst
