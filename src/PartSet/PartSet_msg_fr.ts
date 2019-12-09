@@ -112,7 +112,17 @@ Erreur : %1</translation>
     </message>
     <message>
         <source>Show remaining DoFs</source>
-        <translation type="unfinished"></translation>
+        <translation>Afficher le reste DoFs</translation>
+    </message>
+    <message>
+        <source>The Sketch is created in PartSet.
+It will be necessary to create a Part in order to use this sketch for body creation</source>
+        <translation>L&apos;esquisse est créée dans PartSet.
+Il sera nécessaire de créer une pièce afin d&apos;utiliser cette esquisse pour la création du corps</translation>
+    </message>
+    <message>
+        <source>A size of Sketch view can be defined here.</source>
+        <translation>Une taille de vue Esquisse peut être définie ici.</translation>
     </message>
 </context>
 <context>

@@ -254,6 +254,13 @@
     </message>
 </context>
 <context>
+    <name>ModuleBase_WidgetUndoLabel</name>
+    <message>
+        <source>Undo</source>
+        <translation>Undo</translation>
+    </message>
+</context>
+<context>
     <name>QObject</name>
     <message>
         <source>Selected objects can be used in Part documents which are not loaded: %1.

@@ -43,6 +43,10 @@
         <source>Validate operation</source>
         <translation>Valider l&apos;opération</translation>
     </message>
+    <message>
+        <source>Part files (*.shaperpart);;All files (*.*)</source>
+        <translation>Fichiers pièces (*.shaperpart);;Tous les fichiers (*.*)</translation>
+    </message>
 </context>
 <context>
     <name>XGUI_ActionsMgr</name>
@@ -523,7 +527,7 @@
     </message>
     <message>
         <source>INF_DESK_TOOLBAR_STANDARD</source>
-        <translation type="unfinished"></translation>
+        <translation>INF_DESK_TOOLBAR_STANDARD</translation>
     </message>
     <message>
         <source>Redo</source>
@@ -660,6 +664,22 @@ Supprimer des objets du panneau à afficher ?</translation>
     <message>
         <source>Results not found</source>
         <translation>Résultats non trouvés</translation>
+    </message>
+    <message>
+        <source>Export part...</source>
+        <translation>Partie export...</translation>
+    </message>
+    <message>
+        <source>Export a part of the current document into a file</source>
+        <translation>Exporter une partie du document courant dans un fichier</translation>
+    </message>
+    <message>
+        <source>Import part...</source>
+        <translation>Importer une partie...</translation>
+    </message>
+    <message>
+        <source>Import structure of a part</source>
+        <translation>Structure d&apos;importation d&apos;une pièce</translation>
     </message>
 </context>
 </TS>
