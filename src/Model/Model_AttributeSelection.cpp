@@ -1292,8 +1292,8 @@ void Model_AttributeSelection::computeValues(
 
 
 void Model_AttributeSelection::concealedFeature(
-  const FeaturePtr theFeature, const FeaturePtr theStop, std::list<FeaturePtr>& theConcealers,
-  const ResultPtr theResultOfFeature)
+  const FeaturePtr theFeature, const FeaturePtr theStop, const bool theCheckCopy,
+  std::list<FeaturePtr>& theConcealers, const ResultPtr theResultOfFeature)
 {
   std::set<FeaturePtr> alreadyProcessed;
   alreadyProcessed.insert(theFeature);
@@ -1328,7 +1328,9 @@ void Model_AttributeSelection::concealedFeature(
         if (alreadyProcessed.find(aRefFeat) != alreadyProcessed.end()) // optimization
           continue;
         alreadyProcessed.insert(aRefFeat);
-        if (ModelAPI_Session::get()->validators()->isConcealed(aRefFeat->getKind(), (*aRef)->id()))
+        if (ModelAPI_Session::get()->validators()->isConcealed(aRefFeat->getKind(), (*aRef)->id())
+          || (theCheckCopy &&
+              std::dynamic_pointer_cast<ModelAPI_FeatureCopyInterface>(aRefFeat).get()))
         {
           // for extrusion cut in python script the nested sketch reference may be concealed before
           // it is nested, so, check this composite feature is valid
@@ -1410,12 +1412,13 @@ bool Model_AttributeSelection::searchNewContext(std::shared_ptr<Model_Document> 
     } else aResIter++;
   }
 
+  bool aStaySame = false;
   if (aResults.empty()) {
     // check the context become concealed by operation which is earlier than this selection
     FeaturePtr aThisFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(owner());
     FeaturePtr aContextOwner = theDoc->feature(theContext);
     std::list<FeaturePtr> aConcealers;
-    concealedFeature(aContextOwner, aThisFeature, aConcealers, theContext);
+    concealedFeature(aContextOwner, aThisFeature, false, aConcealers, theContext);
     std::list<FeaturePtr>::iterator aConcealer = aConcealers.begin();
     for(; aConcealer != aConcealers.end(); aConcealer++) {
       std::list<ResultPtr> aRefResults;
@@ -1436,26 +1439,87 @@ bool Model_AttributeSelection::searchNewContext(std::shared_ptr<Model_Document> 
       if (aResults.empty())
         return true; // feature conceals result, return true, so the context will be removed
     }
-    if (aResults.empty())
-      return false; // no modifications found, must stay the same
+    aStaySame = aResults.empty();
   }
+  if (myParent && myParent->isMakeCopy()) {
+    // check there are copies before the new results, so, make a copy
+    std::set<ResultPtr>::iterator aResIter = aResults.begin();
+    std::list<ObjectPtr> aCopyContext;
+    std::list<GeomShapePtr> aCopyVals;
+    // features between the new and the old: check the "Move" interface to get a copy
+    FeaturePtr aRootOwner = theDoc->feature(theContext);
+    FeaturePtr anOwner = ModelAPI_Tools::compositeOwner(aRootOwner);
+    for(; anOwner.get(); anOwner = ModelAPI_Tools::compositeOwner(anOwner))
+      aRootOwner = anOwner;
+    FeaturePtr aThisFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(owner());
+    // iterate all results to find a "Copy" features between the new and one and to add the
+    // copy-results also to results if this attribute refers to the copied shape
+    int anIndex = kUNDEFINED_FEATURE_INDEX;
+    for(FeaturePtr aFeat = theDoc->objects()->nextFeature(aRootOwner, anIndex); aFeat.get() &&
+        aFeat != aThisFeature; aFeat = theDoc->objects()->nextFeature(aFeat, anIndex)) {
+      std::shared_ptr<ModelAPI_FeatureCopyInterface> aCopier =
+        std::dynamic_pointer_cast<ModelAPI_FeatureCopyInterface>(aFeat);
+      if (aCopier.get()) {
+        GeomShapePtr aValShape(new GeomAPI_Shape);
+        aValShape->setImpl<TopoDS_Shape>(new TopoDS_Shape(
+          theValShape.IsNull() ? theContShape : theValShape));
+        aCopier->getCopies(theContext, aValShape, aCopyContext, aCopyVals);
+      }
+    }
+    // check for the further modifications of the copy contexts and values
+    std::list<ObjectPtr>::iterator aCopyContIter = aCopyContext.begin();
+    std::list<GeomShapePtr>::iterator aCopyValIter = aCopyVals.begin();
+    for(; aCopyContIter != aCopyContext.end(); aCopyContIter++, aCopyValIter++) {
+      ResultPtr aNewCont = std::dynamic_pointer_cast<ModelAPI_Result>(*aCopyContIter);
+      TopoDS_Shape aNewContShape = aNewCont->shape()->impl<TopoDS_Shape>();
+      GeomShapePtr aNewVal = *aCopyValIter;
+      TopoDS_Shape aNewValShape;
+      if (aNewVal.get() && !aNewVal->isNull())
+        aNewValShape = aNewVal->impl<TopoDS_Shape>();
+      std::list<ResultPtr> aNewRes;
+      TopTools_ListOfShape aNewUpdatedVal;
+      if (searchNewContext(theDoc, aNewContShape, aNewCont, aNewValShape,
+          theAccessLabel, aNewRes, aNewUpdatedVal)) {
+        // append new results instead of the current ones
+        std::list<ResultPtr>::iterator aNewIter = aNewRes.begin();
+        TopTools_ListIteratorOfListOfShape aNewUpdVal(aNewUpdatedVal);
+        for(; aNewIter != aNewRes.end(); aNewIter++, aNewUpdVal.Next()) {
+          theResults.push_back(*aNewIter);
+          theValShapes.Append(aNewUpdVal.Value());
+        }
+      } else { // the current result is good
+        theResults.push_back(aNewCont);
+        theValShapes.Append(aNewValShape);
+      }
+    }
+    if (aStaySame && !theResults.empty()) { // no changes except copy, so, keep the origin as first
+      theResults.push_front(theContext);
+      theValShapes.Prepend(theValShape);
+      return true;
+    }
+  }
+  if (aStaySame)
+    return false;
+
   // iterate all results to find further modifications
   std::set<ResultPtr>::iterator aResIter = aResults.begin();
-  for(; aResIter != aResults.end(); aResIter++) {
+  for(aResIter = aResults.begin(); aResIter != aResults.end(); aResIter++) {
     if (aResIter->get() != NULL) {
+      ResultPtr aNewResObj = *aResIter;
       // compute new values by two contexts: the old and the new
       TopTools_ListOfShape aValShapes;
-      computeValues(theContext, *aResIter, theValShape, aValShapes);
+      computeValues(theContext, aNewResObj, theValShape, aValShapes);
 
       TopTools_ListIteratorOfListOfShape aNewVal(aValShapes);
       for(; aNewVal.More(); aNewVal.Next()) {
         std::list<ResultPtr> aNewRes;
         TopTools_ListOfShape aNewUpdatedVal;
         TopoDS_Shape aNewValSh = aNewVal.Value();
-        TopoDS_Shape aNewContShape = (*aResIter)->shape()->impl<TopoDS_Shape>();
+        TopoDS_Shape aNewContShape = aNewResObj->shape()->impl<TopoDS_Shape>();
+
         if (theValShape.IsNull() && aNewContShape.IsSame(aNewValSh))
           aNewValSh.Nullify();
-        if (searchNewContext(theDoc, aNewContShape, *aResIter, aNewValSh,
+        if (searchNewContext(theDoc, aNewContShape, aNewResObj, aNewValSh,
                              theAccessLabel, aNewRes, aNewUpdatedVal))
         {
           // append new results instead of the current ones
@@ -1466,7 +1530,7 @@ bool Model_AttributeSelection::searchNewContext(std::shared_ptr<Model_Document> 
             theValShapes.Append(aNewUpdVal.Value());
           }
         } else { // the current result is good
-          theResults.push_back(*aResIter);
+          theResults.push_back(aNewResObj);
           theValShapes.Append(aNewValSh);
         }
       }
@@ -1488,25 +1552,40 @@ void Model_AttributeSelection::updateInHistory(bool& theRemove)
       if (aFeature.get()) {
         FeaturePtr aThisFeature = std::dynamic_pointer_cast<ModelAPI_Feature>(owner());
         std::list<FeaturePtr> aConcealers;
-        concealedFeature(aFeature, aThisFeature, aConcealers, ResultPtr());
+        bool aCopyPossible = myParent && myParent->isMakeCopy();
+        concealedFeature(aFeature, aThisFeature, aCopyPossible, aConcealers, ResultPtr());
         if (aConcealers.empty())
           return;
+        // if there are copies, but no direct modification, keep the original
+        bool aKeepOrigin = false;
+        if (aCopyPossible) {
+          std::list<FeaturePtr>::iterator aConcealer = aConcealers.begin();
+          for(aKeepOrigin = true; aConcealer != aConcealers.end(); aConcealer++)
+            if (!std::dynamic_pointer_cast<ModelAPI_FeatureCopyInterface>(*aConcealer).get()) {
+              aKeepOrigin = false;
+              break;
+            }
+          if (aKeepOrigin) {
+            aConcealers.push_front(aFeature);
+          }
+        }
         bool aChanged = false;
         std::list<FeaturePtr>::iterator aConcealer = aConcealers.begin();
         for(; aConcealer != aConcealers.end(); aConcealer++)
-          if (!myParent->isInList(*aConcealer, anEmptyShape)) {// avoid addition of duplicates
-            setValue(*aConcealer, anEmptyShape);
-            aChanged = true;
-          }
-        if (aConcealer == aConcealers.end()) {
-          if (!aChanged) // remove this
-            theRemove = true;
-        } else { // append new
-          for(aConcealer++; aConcealer != aConcealers.end(); aConcealer++)
-            if (!myParent->isInList(*aConcealer, anEmptyShape)) // avoid addition of duplicates
+          if (aChanged) {
+            if (aKeepOrigin || !myParent->isInList(*aConcealer, anEmptyShape))
               myParent->append(*aConcealer, anEmptyShape);
-        }
-        if (aChanged) // searching for the further modifications
+          } else {
+            if (!myParent->isInList(*aConcealer, anEmptyShape)) {// avoid addition of duplicates
+              setValue(*aConcealer, anEmptyShape);
+              aChanged = true;
+            } else if (aCopyPossible && *aConcealer == aFeature) { // keep the origin in case of copy
+              aChanged = true;
+            }
+          }
+        if (!aChanged) // remove this
+          theRemove = true;
+        else if (!aKeepOrigin) // searching further modifications only if current changed
           updateInHistory(theRemove);
       }
     }
@@ -1703,6 +1782,9 @@ void Model_AttributeSelection::updateInHistory(bool& theRemove)
       if (aFirst) {
         if (!myParent || !myParent->isInList(aNewContext, aValueShape)) { // avoid duplicates
           setValue(aNewContext, aValueShape);
+          aFirst = false;
+        } else if (aNewContext == aContext && myParent && myParent->isMakeCopy()) {
+          // this may be exactly the old one, not modified in case of copy
           aFirst = false;
         }
       } else if (myParent) {

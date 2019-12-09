@@ -113,6 +113,21 @@ void Model_ResultBody::loadModifiedShapes(const std::shared_ptr<GeomAlgoAPI_Make
   }
 }
 
+void Model_ResultBody::loadFirstLevel(GeomShapePtr theShape, const std::string& theName)
+{
+  if (mySubs.size()) { // consists of subs
+    for (std::vector<ResultBodyPtr>::const_iterator aSubIter = mySubs.cbegin();
+      aSubIter != mySubs.cend();
+      ++aSubIter)
+    {
+      const ResultBodyPtr& aSub = *aSubIter;
+      aSub->loadFirstLevel(theShape, theName);
+    }
+  } else { // do for this directly
+    myBuilder->loadFirstLevel(theShape, theName);
+  }
+}
+
 int Model_ResultBody::numberOfSubs(bool forTree) const
 {
   return int(mySubs.size());

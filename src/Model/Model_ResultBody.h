@@ -78,6 +78,8 @@ public:
                                   const GeomAPI_Shape::ShapeType theShapeTypeToExplore,
                                   const std::string& theName = "") override;
 
+  /// load shapes of the first level (to be used during shape import)
+  MODEL_EXPORT virtual void loadFirstLevel(GeomShapePtr theShape, const std::string& theName);
 
   /// Returns the number of sub-elements
   MODEL_EXPORT virtual int numberOfSubs(bool forTree = false) const;

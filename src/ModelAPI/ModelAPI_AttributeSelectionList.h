@@ -39,7 +39,10 @@ class ModelAPI_AttributeSelectionList : public ModelAPI_Attribute
   /// may be sub-objects, so, it is the same as all sub-shapes are selected (#3005). It is "false"
   /// by default.
   bool myIsWholeResultAllowed;
- public:
+  /// Flag that indicates that update in history must check the copy-features
+  /// and make a copy of selection for them.
+  bool myMakeCopy;
+public:
   /// Adds the new reference to the end of the list
   /// \param theContext object where the sub-shape was selected
   /// \param theSubShape selected sub-shape (if null, the whole context is selected)
@@ -135,10 +138,20 @@ class ModelAPI_AttributeSelectionList : public ModelAPI_Attribute
     myIsWholeResultAllowed = theFlag;
   }
 
+  /// Returns true if a copy features must be used in update in history.
+  MODELAPI_EXPORT virtual const bool isMakeCopy() const {
+    return myMakeCopy;
+  }
+
+  /// Sets true if a copy features must be used in update in history.
+  MODELAPI_EXPORT virtual void setMakeCopy(const bool theFlag)  {
+    myMakeCopy = theFlag;
+  }
+
 protected:
   /// Default constructor
   MODELAPI_EXPORT ModelAPI_AttributeSelectionList() : ModelAPI_Attribute()
-  {myIsWholeResultAllowed = false;}
+  {myIsWholeResultAllowed = false; myMakeCopy = false;}
 
 };
 

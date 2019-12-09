@@ -139,12 +139,6 @@ void ModelAPI_ResultBody::loadDeletedShapes(const GeomMakeShapePtr& theAlgo,
   myBuilder->loadDeletedShapes(theAlgo, theOldShape, theShapeTypeToExplore, theShapesToExclude);
 }
 
-void ModelAPI_ResultBody::loadFirstLevel(GeomShapePtr theShape,
-                                         const std::string& theName)
-{
-  myBuilder->loadFirstLevel(theShape, theName);
-}
-
 // LCOV_EXCL_START
 bool ModelAPI_ResultBody::isConnectedTopology()
 {

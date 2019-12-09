@@ -48,6 +48,7 @@
 #include <FeaturesPlugin_Union.h>
 #include <FeaturesPlugin_FusionFaces.h>
 #include <FeaturesPlugin_RemoveResults.h>
+#include <FeaturesPlugin_Copy.h>
 #include <FeaturesPlugin_ValidatorTransform.h>
 #include <FeaturesPlugin_Validators.h>
 
@@ -179,7 +180,10 @@ FeaturePtr FeaturesPlugin_Plugin::createFeature(std::string theFeatureID)
     return FeaturePtr(new FeaturesPlugin_RemoveResults);
   } else if (theFeatureID == FeaturesPlugin_Chamfer::ID()) {
     return FeaturePtr(new FeaturesPlugin_Chamfer);
+  } else if (theFeatureID == FeaturesPlugin_Copy::ID()) {
+    return FeaturePtr(new FeaturesPlugin_Copy);
   }
+
 
   // feature of such kind is not found
   return FeaturePtr();

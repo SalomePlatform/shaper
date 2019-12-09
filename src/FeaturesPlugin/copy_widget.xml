@@ -1,0 +1,16 @@
+<source>
+  <multi_selector id="objects"
+                  label="Sources:"
+                  tooltip="Select copied objects"
+                  shape_types="vertices edges wires faces shells compsolids objects"
+                  use_choice="false"
+                  concealment="false">
+  </multi_selector>
+  <integervalue id="number"
+                label="Nb copies"
+                step="1"
+                default="1"
+                min="1"
+                tooltip="Number of copies">
+  </integervalue>
+</source>

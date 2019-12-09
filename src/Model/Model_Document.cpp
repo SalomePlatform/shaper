@@ -1263,6 +1263,12 @@ void Model_Document::moveFeature(FeaturePtr theMoved, FeaturePtr theAfterThis, c
     } while (aSub.get());
   }
 
+  AttributeSelectionListPtr aMovedList;
+  if (theMoved->getKind() == "Group") {
+    aMovedList = theMoved->selectionList("group_list");
+    if (aMovedList.get())
+      aMovedList->setMakeCopy(true);
+  }
   myObjs->moveFeature(theMoved, anAfterThisSub);
 
   if (theSplit) { // split the group into sub-features
@@ -1275,10 +1281,8 @@ void Model_Document::moveFeature(FeaturePtr theMoved, FeaturePtr theAfterThis, c
     // must be after move to make enabled all features which are before theMoved
     setCurrentFeature(theMoved, true);
   }
-
-  if (theSplit) { // split the group into sub-features
-    theMoved->customAction("split");
-  }
+  if (aMovedList.get())
+    aMovedList->setMakeCopy(false);
 }
 
 void Model_Document::updateHistory(const std::shared_ptr<ModelAPI_Object> theObject)

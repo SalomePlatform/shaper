@@ -250,5 +250,17 @@ class ModelAPI_Feature : public ModelAPI_Object
 //! Pointer on feature object
 typedef std::shared_ptr<ModelAPI_Feature> FeaturePtr;
 
-#endif
+//! An interface for performing special copy actions. To give feature which is moved (a group)
+//! over this feature.
+class ModelAPI_FeatureCopyInterface {
+public:
+  /// An algorithm to update the moved feature by the separate Copy feature
+  /// \param theContext the original context object
+  /// \param theValue the original shape
+  /// \param theCopies resulting copy-context will be appended here
+  virtual void getCopies(ObjectPtr theContext, std::shared_ptr<GeomAPI_Shape> theValue,
+                         std::list<ObjectPtr>& theCopyContext,
+                         std::list<std::shared_ptr<GeomAPI_Shape> >& theCopyVals) = 0;
+};
 
+#endif

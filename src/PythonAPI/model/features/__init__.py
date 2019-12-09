@@ -31,3 +31,4 @@ from FeaturesAPI import addFillet, addChamfer
 from FeaturesAPI import addFusionFaces
 from FeaturesAPI import measureLength, measureDistance, measureRadius, measureAngle
 from FeaturesAPI import addRemoveResults
+from FeaturesAPI import addCopy

@@ -162,7 +162,7 @@ public:
 
   /// load shapes of the first level (to be used during shape import)
   MODELAPI_EXPORT virtual void loadFirstLevel(GeomShapePtr theShape,
-                                              const std::string& theName);
+                                              const std::string& theName) = 0;
 
   /// Returns true is the topology is connected.
   MODELAPI_EXPORT virtual bool isConnectedTopology() = 0;

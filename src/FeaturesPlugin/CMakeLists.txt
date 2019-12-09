@@ -61,6 +61,7 @@ SET(PROJECT_HEADERS
     FeaturesPlugin_FusionFaces.h
     FeaturesPlugin_RemoveResults.h
     FeaturesPlugin_Chamfer.h
+    FeaturesPlugin_Copy.h
 )
 
 SET(PROJECT_SOURCES
@@ -103,6 +104,7 @@ SET(PROJECT_SOURCES
     FeaturesPlugin_FusionFaces.cpp
     FeaturesPlugin_RemoveResults.cpp
     FeaturesPlugin_Chamfer.cpp
+    FeaturesPlugin_Copy.cpp
 )
 
 SET(XML_RESOURCES
@@ -135,6 +137,7 @@ SET(XML_RESOURCES
   measurement_widget.xml
   fusion_faces_widget.xml
   chamfer_widget.xml
+  copy_widget.xml
 )
 
 SET(TEXT_RESOURCES
@@ -541,4 +544,11 @@ ADD_UNIT_TESTS(TestExtrusion.py
                Test3033.py
                Test3076.py
                Test17909.py
+               TestCopyFeature.py
+               TestCopyFeatureMoveGroupOfFeature.py
+               TestCopyMoveResult.py
+               TestCopyMoveSubShapes.py
+               TestCopyNames.py
+               TestCopySubShapes.py
+               TestCopyWholeFeature.py
 )
