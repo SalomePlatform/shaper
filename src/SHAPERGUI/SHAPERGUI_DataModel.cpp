@@ -85,6 +85,9 @@ bool SHAPERGUI_DataModel::open(const QString& thePath, CAM_Study* theStudy, QStr
 
 bool SHAPERGUI_DataModel::save(QStringList& theFiles)
 {
+  // Pyblish to study before saving of the data model
+  myModule->publishToStudy();
+
   LightApp_DataModel::save( theFiles );
   XGUI_Workshop* aWorkShop = myModule->workshop();
   std::list<std::string> aFileNames;
@@ -125,6 +128,7 @@ bool SHAPERGUI_DataModel::saveAs(const QString& thePath, CAM_Study* theStudy, QS
 
 bool SHAPERGUI_DataModel::close()
 {
+  myModule->publishToStudy();
   myModule->workshop()->closeDocument();
   return LightApp_DataModel::close();
 }
@@ -174,6 +178,8 @@ bool SHAPERGUI_DataModel::dumpPython(const QString& thePath, CAM_Study* theStudy
   LightApp_Study* aStudy = dynamic_cast<LightApp_Study*>(theStudy);
   if (!aStudy)
     return false;
+
+  myModule->publishToStudy();
 
   std::shared_ptr<ModelAPI_Document> aDoc = ModelAPI_Session::get()->activeDocument();
   ModelAPI_Session::get()->startOperation(ExchangePlugin_Dump::ID());

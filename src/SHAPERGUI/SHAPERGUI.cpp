@@ -442,6 +442,8 @@ bool SHAPERGUI::deactivateModule(SUIT_Study* theStudy)
   connect(getApp()->action(LightApp_Application::FileSaveAsId), SIGNAL(triggered(bool)),
           getApp(), SLOT(onSaveAsDoc()));
 
+  publishToStudy();
+
   return LightApp_Module::deactivateModule(theStudy);
 }
 
@@ -1175,4 +1177,9 @@ void SHAPERGUI::resetToolbars()
   myIsToolbarsModified = false;
   SUIT_ResourceMgr* aResMgr = application()->resourceMgr();
   aResMgr->remove(ToolbarsSection);
+}
+
+void SHAPERGUI::publishToStudy()
+{
+  myWorkshop->module()->launchOperation("PublishToStudy", false);
 }

@@ -22,6 +22,7 @@ INCLUDE(Common)
 SET(PYTHON_FILES
     ConnectorPlugin.py
     ConnectorPlugin_ExportFeature.py
+    ConnectorPlugin_PublishToStudyFeature.py
 )
 
 SET(XML_RESOURCES
