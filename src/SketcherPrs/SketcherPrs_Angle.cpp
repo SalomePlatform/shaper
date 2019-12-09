@@ -91,6 +91,8 @@ bool SketcherPrs_Angle::readyToDisplay(ModelAPI_Feature* theConstraint,
                                        gp_Pnt& theCenterPoint)
 {
   bool aReadyToDisplay = false;
+  if (!thePlane)
+    return aReadyToDisplay;
 
   DataPtr aData = theConstraint->data();
 
@@ -141,6 +143,11 @@ bool SketcherPrs_Angle::readyToDisplay(ModelAPI_Feature* theConstraint,
     std::shared_ptr<GeomAPI_Lin2d> aLine2(new GeomAPI_Lin2d(aStartB->pnt(), aEndB->pnt()));
     bool isReversed2 =
       aData->boolean(SketchPlugin_ConstraintAngle::ANGLE_REVERSED_SECOND_LINE_ID())->value();
+
+    if (aData->integer(SketchPlugin_ConstraintAngle::TYPE_ID())->value() ==
+        (int)SketcherPrs_Tools::ANGLE_COMPLEMENTARY)
+      isReversed1 = !isReversed1;
+
     anAng = std::shared_ptr<GeomAPI_Angle2d>(
       new GeomAPI_Angle2d(aLine1, isReversed1, aLine2, isReversed2));
   }
@@ -156,6 +163,9 @@ bool SketcherPrs_Angle::readyToDisplay(ModelAPI_Feature* theConstraint,
     aSecondPoint = anAng->firstPoint()->impl<gp_Pnt2d>();
   }
 
+  if (aData->integer(SketchPlugin_ConstraintAngle::TYPE_ID())->value() ==
+      (int)SketcherPrs_Tools::ANGLE_BACKWARD)
+    std::swap(aFirstPoint, aSecondPoint);
 
   std::shared_ptr<GeomAPI_Pnt> aPoint = thePlane->to3D(aFirstPoint.X(), aFirstPoint.Y());
   theFirstPoint = aPoint->impl<gp_Pnt>();
@@ -199,48 +209,15 @@ void SketcherPrs_Angle::Compute(const Handle(PrsMgr_PresentationManager3d)& theP
     myFlyOutPoint = aFlyoutPnt->impl<gp_Pnt>();
   }
 
-  std::shared_ptr<ModelAPI_AttributeInteger> aTypeAttr = std::dynamic_pointer_cast<
-      ModelAPI_AttributeInteger>(aData->attribute(SketchPlugin_ConstraintAngle::TYPE_ID()));
-  SketcherPrs_Tools::AngleType anAngleType = (SketcherPrs_Tools::AngleType)(aTypeAttr->value());
-
   double aDist = -1;
-  switch (anAngleType) {
-    case SketcherPrs_Tools::ANGLE_DIRECT: {
 #ifndef COMPILATION_CORRECTION
-      SetArrowsVisibility(AIS_TOAV_Both);
+  SetArrowsVisibility(AIS_TOAV_Both);
 #endif
-      SetMeasuredGeometry(myFirstPoint, myCenterPoint, mySecondPoint);
+  SetMeasuredGeometry(myFirstPoint, myCenterPoint, mySecondPoint);
 #ifndef COMPILATION_CORRECTION
-      bool isReversedPlanes = isAnglePlaneReversedToSketchPlane();
-      SetType(!isReversedPlanes ? AIS_TOA_Exterior : AIS_TOA_Interior);
+  bool isReversedPlanes = isAnglePlaneReversedToSketchPlane();
+  SetType(!isReversedPlanes ? AIS_TOA_Exterior : AIS_TOA_Interior);
 #endif
-    }
-    break;
-    case SketcherPrs_Tools::ANGLE_COMPLEMENTARY: {
-      double anEdge1Length = aCenterPoint.Distance(myFirstPoint);
-      //aDist = calculateDistanceToFlyoutPoint();
-      gp_Pnt aFirstPoint = aCenterPoint.Translated(
-                          gp_Vec(myCenterPoint, myFirstPoint).Normalized() * (-anEdge1Length));
-      SetMeasuredGeometry(aFirstPoint, myCenterPoint, mySecondPoint);
-#ifndef COMPILATION_CORRECTION
-      SetType(AIS_TOA_Interior);
-#endif
-    }
-    break;
-    case SketcherPrs_Tools::ANGLE_BACKWARD: {
-#ifndef COMPILATION_CORRECTION
-      SetArrowsVisibility(AIS_TOAV_Both);
-#endif
-      SetMeasuredGeometry(myFirstPoint, myCenterPoint, mySecondPoint);
-      bool isReversedPlanes = isAnglePlaneReversedToSketchPlane();
-#ifndef COMPILATION_CORRECTION
-      SetType(isReversedPlanes ? AIS_TOA_Exterior : AIS_TOA_Interior);
-#endif
-    }
-    break;
-    default:
-      break;
-  }
   if (aDist < 0) /// it was not calculated yet
     aDist = calculateDistanceToFlyoutPoint();
   SetFlyout(aDist);

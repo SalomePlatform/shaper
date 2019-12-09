@@ -72,6 +72,12 @@ void SketchPlugin_ConstraintAngle::initAttributes()
   data()->addAttribute(LOCATION_TYPE_ID(), ModelAPI_AttributeInteger::typeId());
   aValidators->registerNotObligatory(getKind(), LOCATION_TYPE_ID());
 
+  data()->addAttribute(PREV_TYPE_ID(), ModelAPI_AttributeInteger::typeId());
+  data()->attribute(PREV_TYPE_ID())->setIsArgument(false);
+  aValidators->registerNotObligatory(getKind(), PREV_TYPE_ID());
+  if (attribute(TYPE_ID())->isInitialized())
+    integer(PREV_TYPE_ID())->setValue(integer(TYPE_ID())->value());
+
   data()->addAttribute(SELECTED_FIRST_POINT_ID(), GeomDataAPI_Point2D::typeId());
   data()->attribute(SELECTED_FIRST_POINT_ID())->setIsArgument(false);
   aValidators->registerNotObligatory(getKind(), SELECTED_FIRST_POINT_ID());
@@ -79,11 +85,6 @@ void SketchPlugin_ConstraintAngle::initAttributes()
   data()->addAttribute(SELECTED_SECOND_POINT_ID(), GeomDataAPI_Point2D::typeId());
   data()->attribute(SELECTED_SECOND_POINT_ID())->setIsArgument(false);
   aValidators->registerNotObligatory(getKind(), SELECTED_SECOND_POINT_ID());
-
-  if (attribute(TYPE_ID())->isInitialized())
-    myPrevAngleType = integer(TYPE_ID())->value();
-  else
-    myPrevAngleType = (int)SketcherPrs_Tools::ANGLE_DIRECT;
 }
 
 void SketchPlugin_ConstraintAngle::colorConfigInfo(std::string& theSection, std::string& theName,
@@ -131,6 +132,9 @@ AISObjectPtr SketchPlugin_ConstraintAngle::getAISObject(AISObjectPtr thePrevious
 
 void SketchPlugin_ConstraintAngle::attributeChanged(const std::string& theID)
 {
+  if (myFlyoutUpdate)
+    return;
+
   std::shared_ptr<ModelAPI_Data> aData = data();
   if (!aData)
     return;
@@ -146,25 +150,8 @@ void SketchPlugin_ConstraintAngle::attributeChanged(const std::string& theID)
   if (theID == ENTITY_A() || theID == ENTITY_B() ||
       theID == TYPE_ID() || theID == ANGLE_VALUE_ID()) {
     calculateAngle();
-  } else if (theID == FLYOUT_VALUE_PNT() && !myFlyoutUpdate) {
-    // Recalculate flyout point in local coordinates
-    // coordinates are calculated according to the center of shapes intersection
-    std::shared_ptr<GeomDataAPI_Point2D> aFlyoutAttr =
-      std::dynamic_pointer_cast<GeomDataAPI_Point2D>(attribute(FLYOUT_VALUE_PNT()));
-
-    std::shared_ptr<ModelAPI_Data> aData = data();
-    std::shared_ptr<GeomAPI_Ax3> aPlane = SketchPlugin_Sketch::plane(sketch());
-
-    // Intersection of lines
-    std::shared_ptr<GeomAPI_Pnt2d> anInter = intersect(aLineA, aLineB);
-    if (!anInter)
-      return;
-
-    myFlyoutUpdate = true;
-    std::shared_ptr<GeomAPI_XY> aFlyoutDir = aFlyoutAttr->pnt()->xy()->decreased(anInter->xy());
-    if (aFlyoutDir->dot(aFlyoutDir) < tolerance * tolerance)
-      aFlyoutAttr->setValue(aFlyoutAttr->x() + tolerance, aFlyoutAttr->y());
-    myFlyoutUpdate = false;
+  } else if (theID == FLYOUT_VALUE_PNT()) {
+    compute(theID);
   }
 }
 
@@ -189,16 +176,18 @@ void SketchPlugin_ConstraintAngle::calculateAngle()
   bool isReversed1 = boolean(ANGLE_REVERSED_FIRST_LINE_ID())->value();
   bool isReversed2 = boolean(ANGLE_REVERSED_SECOND_LINE_ID())->value();
 
-  std::shared_ptr<GeomAPI_Angle2d> anAng(
-      new GeomAPI_Angle2d(aLine1, isReversed1, aLine2, isReversed2));
+  AttributeDoublePtr anAngleValueAttr = real(ANGLE_VALUE_ID());
+  if (!anAngleValueAttr->isInitialized()) {
+    std::shared_ptr<GeomAPI_Angle2d> anAng(
+        new GeomAPI_Angle2d(aLine1, isReversed1, aLine2, isReversed2));
+    anAngleValueAttr->setValue(getAngleForType(fabs(anAng->angleDegree())));
+  }
+
+  std::shared_ptr<GeomAPI_Angle2d> anAng(new GeomAPI_Angle2d(aLine1, false, aLine2, false));
   double anAngle = anAng->angleDegree();
 
-  AttributeDoublePtr anAngleValueAttr = real(ANGLE_VALUE_ID());
-  if (!anAngleValueAttr->isInitialized())
-    anAngleValueAttr->setValue(getAngleForType(fabs(anAngle)));
-
   anAngle /= fabs(anAngle);
-  anAngle *= getAngleForType(anAngleValueAttr->value());
+  anAngle *= getAngleForType(anAngleValueAttr->value(), isReversed1, isReversed2);
 
   // update value of the constraint to be passed to the solver
   real(SketchPlugin_Constraint::VALUE())->setValue(anAngle);
@@ -252,6 +241,7 @@ void SketchPlugin_ConstraintAngle::calculateAnglePosition()
   boolean(ANGLE_REVERSED_SECOND_LINE_ID())->setValue(isReversed2);
 }
 
+// Convert angle value from the DIRECT to any given type.
 static double angleForType(const double theAngle, const int theType)
 {
   double anAngle = theAngle;
@@ -271,27 +261,32 @@ static double angleForType(const double theAngle, const int theType)
   return anAngle;
 }
 
-double SketchPlugin_ConstraintAngle::getAngleForType(double theAngle)
+double SketchPlugin_ConstraintAngle::getAngleForType(double theAngle,
+                                                     bool isReversed1,
+                                                     bool isReversed2)
 {
-  return angleForType(theAngle, integer(TYPE_ID())->value());
+  double anAngle = angleForType(theAngle, integer(TYPE_ID())->value());
+  if (isReversed1 != isReversed2)
+    anAngle = 180.0 - anAngle;
+  return anAngle;
 }
 
-void SketchPlugin_ConstraintAngle::updateAngleValue()
+// Convert angle value or a text expression from one angle type to another
+static void convertAngle(AttributeDoublePtr& theAngle,
+                         const int thePrevType, const int theNewType)
 {
-  AttributeIntegerPtr anAngleType = integer(TYPE_ID());
-  AttributeDoublePtr anAngleValueAttr = real(ANGLE_VALUE_ID());
-  if (anAngleValueAttr->isInitialized()) {
-    if (anAngleValueAttr->text().empty()) {
+  if (theAngle->isInitialized()) {
+    if (theAngle->text().empty()) {
       // calculate value related to the type twice:
       // the first time - to return to direct angle,
       // the second time - to apply new type
-      double aValue = angleForType(anAngleValueAttr->value(), myPrevAngleType);
-      aValue = angleForType(aValue, anAngleType->value());
-      anAngleValueAttr->setValue(aValue);
+      double aValue = angleForType(theAngle->value(), thePrevType);
+      aValue = angleForType(aValue, theNewType);
+      theAngle->setValue(aValue);
     }
     else {
       // process the parametric value
-      std::string anAngleText = anAngleValueAttr->text();
+      std::string anAngleText = theAngle->text();
       std::regex anAngleRegex("\\s*([-+]?[0-9]*\\.?[0-9]*)\\s*([-+])\\s*\\((.*)\\)",
                               std::regex_constants::ECMAScript);
 
@@ -306,13 +301,13 @@ void SketchPlugin_ConstraintAngle::updateAngleValue()
         anAngleText = aResult[3].str();
       }
 
-      if (myPrevAngleType != SketcherPrs_Tools::ANGLE_DIRECT)
+      if (thePrevType != SketcherPrs_Tools::ANGLE_DIRECT)
         aSignInd = 1 - aSignInd;
-      anAnglePrefix = angleForType(anAnglePrefix, myPrevAngleType);
+      anAnglePrefix = angleForType(anAnglePrefix, thePrevType);
 
-      if (anAngleType->value() != SketcherPrs_Tools::ANGLE_DIRECT)
+      if (theNewType != SketcherPrs_Tools::ANGLE_DIRECT)
         aSignInd = 1 - aSignInd;
-      anAnglePrefix = angleForType(anAnglePrefix, anAngleType->value());
+      anAnglePrefix = angleForType(anAnglePrefix, theNewType);
 
       std::ostringstream aText;
       bool isPrintSign = true;
@@ -323,10 +318,17 @@ void SketchPlugin_ConstraintAngle::updateAngleValue()
       if (isPrintSign)
         aText << " " << aSignPrefix[aSignInd] << " (";
       aText << anAngleText << (isPrintSign ? ")" : "");
-      anAngleValueAttr->setText(aText.str());
+      theAngle->setText(aText.str());
     }
   }
-  myPrevAngleType = anAngleType->value();
+}
+
+void SketchPlugin_ConstraintAngle::updateAngleValue()
+{
+  AttributeIntegerPtr anAngleType = integer(TYPE_ID());
+  AttributeIntegerPtr aPrevAngleType = integer(PREV_TYPE_ID());
+  convertAngle(real(ANGLE_VALUE_ID()), aPrevAngleType->value(), anAngleType->value());
+  aPrevAngleType->setValue(anAngleType->value());
 }
 
 bool SketchPlugin_ConstraintAngle::compute(const std::string& theAttributeId)
@@ -338,34 +340,75 @@ bool SketchPlugin_ConstraintAngle::compute(const std::string& theAttributeId)
 
   std::shared_ptr<GeomDataAPI_Point2D> aFlyOutAttr = std::dynamic_pointer_cast<
                            GeomDataAPI_Point2D>(attribute(theAttributeId));
-  if (aFlyOutAttr->isInitialized() &&
-      (fabs(aFlyOutAttr->x()) >= tolerance || fabs(aFlyOutAttr->y()) >= tolerance))
-    return false;
 
   DataPtr aData = data();
   std::shared_ptr<GeomAPI_Ax3> aPlane = SketchPlugin_Sketch::plane(sketch());
-  FeaturePtr aLineA = SketcherPrs_Tools::getFeatureLine(aData, SketchPlugin_Constraint::ENTITY_A());
-  FeaturePtr aLineB = SketcherPrs_Tools::getFeatureLine(aData, SketchPlugin_Constraint::ENTITY_B());
+  FeaturePtr aLineA = SketcherPrs_Tools::getFeatureLine(aData, ENTITY_A());
+  FeaturePtr aLineB = SketcherPrs_Tools::getFeatureLine(aData, ENTITY_B());
 
   if ((aLineA.get() == NULL) || (aLineB.get() == NULL))
     return false;
 
-  // Start and end points of lines
-  GeomPnt2dPtr aStartA = SketcherPrs_Tools::getPoint(aLineA.get(), SketchPlugin_Line::START_ID());
-  GeomPnt2dPtr aEndA   = SketcherPrs_Tools::getPoint(aLineA.get(), SketchPlugin_Line::END_ID());
-  if (aStartA->distance(aEndA) < tolerance)
+  // Intersection of lines
+  std::shared_ptr<GeomAPI_Pnt2d> anInter = intersect(aLineA, aLineB);
+  if (!anInter)
     return false;
 
-  GeomPnt2dPtr aStartB = SketcherPrs_Tools::getPoint(aLineB.get(), SketchPlugin_Line::START_ID());
-  GeomPnt2dPtr aEndB   = SketcherPrs_Tools::getPoint(aLineB.get(), SketchPlugin_Line::END_ID());
-  if (aStartB->distance(aEndB) < tolerance)
-    return false;
+  bool isReversed1 = boolean(ANGLE_REVERSED_FIRST_LINE_ID())->value();
+  bool isReversed2 = boolean(ANGLE_REVERSED_SECOND_LINE_ID())->value();
+
+  int anAngleType = integer(TYPE_ID())->value();
+
+  bool isSupplementary = anAngleType == (int)SketcherPrs_Tools::ANGLE_COMPLEMENTARY;
+
+  // point on lines to compose an angle
+  GeomPnt2dPtr aPointA = SketcherPrs_Tools::getPoint(aLineA.get(),
+      (isReversed1 ^ isSupplementary) ?
+      SketchPlugin_Line::START_ID() : SketchPlugin_Line::END_ID());
+  GeomPnt2dPtr aPointB = SketcherPrs_Tools::getPoint(aLineB.get(),
+      isReversed2 ? SketchPlugin_Line::START_ID() : SketchPlugin_Line::END_ID());
 
   myFlyoutUpdate = true;
-  double aX = (aStartA->x() + aEndA->x() + aStartB->x() + aEndB->x()) / 4.;
-  double aY = (aStartA->y() + aEndA->y() + aStartB->y() + aEndB->y()) / 4.;
+  if (aFlyOutAttr->isInitialized()) {
+    std::shared_ptr<GeomAPI_XY> aFlyoutPoint = aFlyOutAttr->pnt()->xy();
+    std::shared_ptr<GeomAPI_XY> anInterXY = anInter->xy();
+    std::shared_ptr<GeomAPI_XY> aDirIF = aFlyoutPoint->decreased(anInterXY);
+    std::shared_ptr<GeomAPI_XY> aDirIA = aPointA->xy()->decreased(anInterXY);
+    std::shared_ptr<GeomAPI_XY> aDirIB = aPointB->xy()->decreased(anInterXY);
+    double aSign = aDirIA->cross(aDirIB);
+    aSign /= fabs(aSign);
+    if (anAngleType == (int)SketcherPrs_Tools::ANGLE_BACKWARD)
+      aSign *= -1.0;
 
-  aFlyOutAttr->setValue(aX, aY);
+    double cross1 = aSign * aDirIA->cross(aDirIF);
+    if (cross1 < -tolerance)
+      boolean(ANGLE_REVERSED_SECOND_LINE_ID())->setValue(!isReversed2);
+    double cross2 = aSign * aDirIF->cross(aDirIB);
+    if (cross2 < -tolerance)
+      boolean(ANGLE_REVERSED_FIRST_LINE_ID())->setValue(!isReversed1);
+
+    // the direction is reversed only once
+    if ((cross1 + tolerance) * (cross2 + tolerance) < 0.0) {
+      if (anAngleType == (int)SketcherPrs_Tools::ANGLE_BACKWARD) {
+        convertAngle(real(ANGLE_VALUE_ID()), (int)SketcherPrs_Tools::ANGLE_BACKWARD,
+                     (int)SketcherPrs_Tools::ANGLE_DIRECT);
+      }
+      convertAngle(real(ANGLE_VALUE_ID()), (int)SketcherPrs_Tools::ANGLE_DIRECT,
+                   (int)SketcherPrs_Tools::ANGLE_COMPLEMENTARY);
+      if (anAngleType == (int)SketcherPrs_Tools::ANGLE_BACKWARD) {
+        convertAngle(real(ANGLE_VALUE_ID()), (int)SketcherPrs_Tools::ANGLE_DIRECT,
+                     (int)SketcherPrs_Tools::ANGLE_BACKWARD);
+      }
+    }
+
+    calculateAngle();
+  }
+  else {
+    // default position of the presentation
+    double aX = (aPointA->x() + aPointB->x() + anInter->x()) / 3.;
+    double aY = (aPointA->y() + aPointB->y() + anInter->y()) / 3.;
+    aFlyOutAttr->setValue(aX, aY);
+  }
   myFlyoutUpdate = false;
 
   return true;

@@ -602,19 +602,10 @@ ConstraintWrapperPtr createConstraintAngle(
     std::shared_ptr<PlaneGCSSolver_EdgeWrapper> theEntity2)
 {
   std::shared_ptr<GCS::Line> aLine1 = std::dynamic_pointer_cast<GCS::Line>(theEntity1->entity());
-  bool isLine1Rev = theConstraint->boolean(
-      SketchPlugin_ConstraintAngle::ANGLE_REVERSED_FIRST_LINE_ID())->value();
-  GCS::Point aLine1Pt1 = isLine1Rev ? aLine1->p2 : aLine1->p1;
-  GCS::Point aLine1Pt2 = isLine1Rev ? aLine1->p1 : aLine1->p2;
-
   std::shared_ptr<GCS::Line> aLine2 = std::dynamic_pointer_cast<GCS::Line>(theEntity2->entity());
-  bool isLine2Rev = theConstraint->boolean(
-      SketchPlugin_ConstraintAngle::ANGLE_REVERSED_SECOND_LINE_ID())->value();
-  GCS::Point aLine2Pt1 = isLine2Rev ? aLine2->p2 : aLine2->p1;
-  GCS::Point aLine2Pt2 = isLine2Rev ? aLine2->p1 : aLine2->p2;
 
   GCSConstraintPtr aNewConstr(new GCS::ConstraintL2LAngle(
-      aLine1Pt1, aLine1Pt2, aLine2Pt1, aLine2Pt2, theValue->scalar()));
+      aLine1->p1, aLine1->p2, aLine2->p1, aLine2->p2, theValue->scalar()));
 
   std::shared_ptr<PlaneGCSSolver_ConstraintWrapper> aResult(
       new PlaneGCSSolver_ConstraintWrapper(aNewConstr, CONSTRAINT_ANGLE));

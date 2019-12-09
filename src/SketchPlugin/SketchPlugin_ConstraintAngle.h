@@ -53,6 +53,12 @@ class SketchPlugin_ConstraintAngle : public SketchPlugin_ConstraintBase
     static const std::string MY_TYPE_ID("AngleType");
     return MY_TYPE_ID;
   }
+  /// attribute name of previous value of operation type
+  inline static const std::string& PREV_TYPE_ID()
+  {
+    static const std::string MY_TYPE_ID("AngleTypePrevious");
+    return MY_TYPE_ID;
+  }
 
   /// attribute name of operation type
   inline static const std::string& ANGLE_VALUE_ID()
@@ -131,14 +137,13 @@ protected:
   /// The in/out angle is in degree.
   /// \param theAngle a source for the calculated angle
   /// \param a double angle value
-  double getAngleForType(double theAngle);
+  double getAngleForType(double theAngle, bool isReversed1 = false, bool isReversed2 = false);
 
   /// Update value of ANGLE_VALUE attribute according to the current type
   void updateAngleValue();
 
 private:
   bool myFlyoutUpdate; ///< to avoid cyclic dependencies on automatic updates of flyout point
-  int myPrevAngleType;
 };
 
 #endif
