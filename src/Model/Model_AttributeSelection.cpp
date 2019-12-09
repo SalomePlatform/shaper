@@ -1579,7 +1579,7 @@ void Model_AttributeSelection::updateInHistory(bool& theRemove)
             if (!myParent->isInList(*aConcealer, anEmptyShape)) {// avoid addition of duplicates
               setValue(*aConcealer, anEmptyShape);
               aChanged = true;
-            } else if (aCopyPossible && *aConcealer == aFeature) { // keep the origin in case of copy
+            } else if (aCopyPossible && *aConcealer == aFeature) {// keep origin in case of copy
               aChanged = true;
             }
           }
