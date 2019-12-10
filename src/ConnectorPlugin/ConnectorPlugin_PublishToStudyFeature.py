@@ -28,6 +28,7 @@ import salome
 from salome.shaper import model
 
 import os
+import salome
 
 
 ## @ingroup Plugins
@@ -58,10 +59,12 @@ class PublishToStudyFeature(ModelAPI.ModelAPI_Feature):
 
     ## Exports all shapes and groups into the GEOM module.
     def execute(self):
-        aSession = ModelAPI.ModelAPI_Session.get()
-        ## Get active document
-        self.Part = aSession.activeDocument()
-        salome.salome_init(1)
+        print("### Execution of PublishToStudy")
 
-        print("### Excutation of PublishToStudy")
-        pass
+        ## Get SHAPER active document
+        aSession = ModelAPI.ModelAPI_Session.get()
+        # find a shaper-study component
+        salome.salome_init(1)
+        import SHAPERSTUDY_utils
+        SHAPERSTUDY_utils.findOrCreateComponent()
+        anEngine = SHAPERSTUDY_utils.getEngine()
