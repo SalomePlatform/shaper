@@ -61,10 +61,22 @@ class PublishToStudyFeature(ModelAPI.ModelAPI_Feature):
     def execute(self):
         print("### Execution of PublishToStudy")
 
-        ## Get SHAPER active document
-        aSession = ModelAPI.ModelAPI_Session.get()
         # find a shaper-study component
         salome.salome_init(1)
         import SHAPERSTUDY_utils
         SHAPERSTUDY_utils.findOrCreateComponent()
         anEngine = SHAPERSTUDY_utils.getEngine()
+
+        # iterate all parts and all results to publish them in SHAPER_STUDY
+        aSession = ModelAPI.ModelAPI_Session.get()
+        aPartSet = aSession.moduleDocument()
+        for aPartId in range(aPartSet.size(model.ModelAPI_ResultPart_group())):
+          aPartObject = aPartSet.object(model.ModelAPI_ResultPart_group(), aPartId)
+          aPart = ModelAPI.modelAPI_ResultPart(ModelAPI.modelAPI_Result(aPartObject)).partDoc()
+          for aResId in range(aPart.size(model.ModelAPI_ResultBody_group())):
+            aResObject = aPart.object(model.ModelAPI_ResultBody_group(), aResId)
+            aRes = model.objectToResult(aResObject)
+            print("Found a result to publish ", aRes.data().name())
+            aSShape = anEngine.CreateShape()
+            aSShape.SetShapeByStream(aRes.shape().getShapeStream())
+            anEngine.AddInStudy(aSShape, aRes.data().name(), None)
