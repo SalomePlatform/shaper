@@ -33,7 +33,7 @@
  */
 class SketchPlugin_ConstraintAngle : public SketchPlugin_ConstraintBase
 {
- public:
+public:
   /// Angle constraint kind
   inline static const std::string& ID()
   {
@@ -101,6 +101,18 @@ class SketchPlugin_ConstraintAngle : public SketchPlugin_ConstraintBase
     return MY_SELECTED_SECOND_POINT_ID;
   }
 
+public:
+  static const int THE_VERSION_0 = 0;
+  static const int THE_VERSION_1 = 20191210;
+
+  /// Attribute name of the version of Angle feature
+  inline static const std::string& VERSION_ID()
+  {
+    static const std::string MY_VERSION_ID("version");
+    return MY_VERSION_ID;
+  }
+
+public:
   /// \brief Creates a new part document if needed
   SKETCHPLUGIN_EXPORT virtual void execute();
 
@@ -141,6 +153,9 @@ protected:
 
   /// Update value of ANGLE_VALUE attribute according to the current type
   void updateAngleValue();
+
+  /// Update parameters of the Angle to meet requirements for the latest version
+  void updateVersion();
 
 private:
   bool myFlyoutUpdate; ///< to avoid cyclic dependencies on automatic updates of flyout point

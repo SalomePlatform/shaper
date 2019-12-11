@@ -76,13 +76,9 @@ static void calculatePossibleValuesOfAngle(FeaturePtr theFeature,
 
   std::shared_ptr<GeomAPI_Angle2d> anAng(new GeomAPI_Angle2d(
       aStartA->pnt(), aEndA->pnt(), aStartB->pnt(), aEndB->pnt()));
-  theAngleDirect = anAng->angleDegree();
+  theAngleDirect = fabs(anAng->angleDegree());
+  theAngleComplementary = 180.0 - theAngleDirect;
   theAngleBackward = 360.0 - theAngleDirect;
-
-  if (theAngleDirect > 180.0)
-    theAngleComplementary = theAngleDirect - 180.0;
-  else
-    theAngleComplementary = 180.0 - theAngleDirect;
 }
 
 static std::string angleTypeToString(FeaturePtr theFeature)

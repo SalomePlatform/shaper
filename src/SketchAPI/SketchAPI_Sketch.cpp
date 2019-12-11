@@ -802,12 +802,14 @@ std::shared_ptr<ModelHighAPI_Interface> SketchAPI_Sketch::setAngle(
 {
   std::shared_ptr<ModelAPI_Feature> aFeature =
       compositeFeature()->addFeature(SketchPlugin_ConstraintAngle::ID());
+  fillAttribute(SketchPlugin_ConstraintAngle::THE_VERSION_0,
+      aFeature->integer(SketchPlugin_ConstraintAngle::VERSION_ID()));
   fillAttribute(SketcherPrs_Tools::ANGLE_DIRECT,
       aFeature->integer(SketchPlugin_ConstraintAngle::TYPE_ID()));
-  // fill the value before llines to avoid calculation of angle value by the Angle feature
+  // fill the value before lines to avoid calculation of angle value by the Angle feature
+  fillAttribute(theValue, aFeature->real(SketchPlugin_ConstraintAngle::ANGLE_VALUE_ID()));
   fillAttribute(theLine1, aFeature->refattr(SketchPlugin_Constraint::ENTITY_A()));
   fillAttribute(theLine2, aFeature->refattr(SketchPlugin_Constraint::ENTITY_B()));
-  fillAttribute(theValue, aFeature->real(SketchPlugin_ConstraintAngle::ANGLE_VALUE_ID()));
   aFeature->execute();
   return InterfacePtr(new ModelHighAPI_Interface(aFeature));
 }
@@ -819,11 +821,13 @@ std::shared_ptr<ModelHighAPI_Interface> SketchAPI_Sketch::setAngleComplementary(
 {
   std::shared_ptr<ModelAPI_Feature> aFeature =
       compositeFeature()->addFeature(SketchPlugin_ConstraintAngle::ID());
+  fillAttribute(SketchPlugin_ConstraintAngle::THE_VERSION_0,
+      aFeature->integer(SketchPlugin_ConstraintAngle::VERSION_ID()));
   fillAttribute(SketcherPrs_Tools::ANGLE_COMPLEMENTARY,
       aFeature->integer(SketchPlugin_ConstraintAngle::TYPE_ID()));
+  fillAttribute(theValue, aFeature->real(SketchPlugin_ConstraintAngle::ANGLE_VALUE_ID()));
   fillAttribute(theLine1, aFeature->refattr(SketchPlugin_Constraint::ENTITY_A()));
   fillAttribute(theLine2, aFeature->refattr(SketchPlugin_Constraint::ENTITY_B()));
-  fillAttribute(theValue, aFeature->real(SketchPlugin_ConstraintAngle::ANGLE_VALUE_ID()));
   aFeature->execute();
   return InterfacePtr(new ModelHighAPI_Interface(aFeature));
 }
@@ -835,11 +839,13 @@ std::shared_ptr<ModelHighAPI_Interface> SketchAPI_Sketch::setAngleBackward(
 {
   std::shared_ptr<ModelAPI_Feature> aFeature =
       compositeFeature()->addFeature(SketchPlugin_ConstraintAngle::ID());
+  fillAttribute(SketchPlugin_ConstraintAngle::THE_VERSION_0,
+      aFeature->integer(SketchPlugin_ConstraintAngle::VERSION_ID()));
   fillAttribute(SketcherPrs_Tools::ANGLE_BACKWARD,
       aFeature->integer(SketchPlugin_ConstraintAngle::TYPE_ID()));
+  fillAttribute(theValue, aFeature->real(SketchPlugin_ConstraintAngle::ANGLE_VALUE_ID()));
   fillAttribute(theLine1, aFeature->refattr(SketchPlugin_Constraint::ENTITY_A()));
   fillAttribute(theLine2, aFeature->refattr(SketchPlugin_Constraint::ENTITY_B()));
-  fillAttribute(theValue, aFeature->real(SketchPlugin_ConstraintAngle::ANGLE_VALUE_ID()));
   aFeature->execute();
   return InterfacePtr(new ModelHighAPI_Interface(aFeature));
 }

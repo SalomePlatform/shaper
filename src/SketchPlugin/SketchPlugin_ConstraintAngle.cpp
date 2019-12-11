@@ -85,6 +85,16 @@ void SketchPlugin_ConstraintAngle::initAttributes()
   data()->addAttribute(SELECTED_SECOND_POINT_ID(), GeomDataAPI_Point2D::typeId());
   data()->attribute(SELECTED_SECOND_POINT_ID())->setIsArgument(false);
   aValidators->registerNotObligatory(getKind(), SELECTED_SECOND_POINT_ID());
+
+  AttributeIntegerPtr aVerAttr = std::dynamic_pointer_cast<ModelAPI_AttributeInteger>(
+      data()->addAttribute(VERSION_ID(), ModelAPI_AttributeInteger::typeId()));
+  aVerAttr->setIsArgument(false);
+  ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(), VERSION_ID());
+  if (!aVerAttr->isInitialized()) {
+    // this is a newly created feature (not read from file),
+    // so, initialize the latest version
+    aVerAttr->setValue(THE_VERSION_1);
+  }
 }
 
 void SketchPlugin_ConstraintAngle::colorConfigInfo(std::string& theSection, std::string& theName,
@@ -103,6 +113,10 @@ void SketchPlugin_ConstraintAngle::execute()
   AttributeRefAttrPtr anAttrB = aData->refattr(SketchPlugin_Constraint::ENTITY_B());
   if (!anAttrA->isInitialized() || !anAttrB->isInitialized())
     return;
+
+  AttributeIntegerPtr aVersion = integer(VERSION_ID());
+  if (!aVersion->isInitialized() || aVersion->value() < THE_VERSION_1)
+    updateVersion();
 
   AttributeDoublePtr anAttrValue = real(ANGLE_VALUE_ID());
   if (!anAttrValue->isInitialized())
@@ -146,6 +160,10 @@ void SketchPlugin_ConstraintAngle::attributeChanged(const std::string& theID)
   FeaturePtr aLineB = SketcherPrs_Tools::getFeatureLine(aData, ENTITY_B());
   if (!aLineA || !aLineB)
     return;
+
+  AttributeIntegerPtr aVersion = integer(VERSION_ID());
+  if (!aVersion->isInitialized() || aVersion->value() < THE_VERSION_1)
+    updateVersion();
 
   if (theID == ENTITY_A() || theID == ENTITY_B() ||
       theID == TYPE_ID() || theID == ANGLE_VALUE_ID()) {
@@ -287,7 +305,7 @@ static void convertAngle(AttributeDoublePtr& theAngle,
     else {
       // process the parametric value
       std::string anAngleText = theAngle->text();
-      std::regex anAngleRegex("\\s*([-+]?[0-9]*\\.?[0-9]*)\\s*([-+])\\s*\\((.*)\\)",
+      std::regex anAngleRegex("\\s*([-+]?[0-9]*\\.?[0-9]*)\\s*([-+])\\s*\\((.*)\\)$",
                               std::regex_constants::ECMAScript);
 
       double anAnglePrefix = 0.0;
@@ -331,6 +349,22 @@ void SketchPlugin_ConstraintAngle::updateAngleValue()
   aPrevAngleType->setValue(anAngleType->value());
 }
 
+static GeomPnt2dPtr lineBoundary(const FeaturePtr& theLine, const bool theReversed,
+                                 const GeomPnt2dPtr& thePointToAvoid)
+{
+  GeomPnt2dPtr aPoint = SketcherPrs_Tools::getPoint(theLine.get(),
+      theReversed ? SketchPlugin_Line::START_ID() : SketchPlugin_Line::END_ID());
+  if (aPoint->distance(thePointToAvoid) < tolerance) {
+    // extremity is equal to the intersection point,
+    // thus recalculate it using another boundary point
+    aPoint = SketcherPrs_Tools::getPoint(theLine.get(),
+        theReversed ? SketchPlugin_Line::END_ID() : SketchPlugin_Line::START_ID());
+    aPoint->setX(thePointToAvoid->x() * 2.0 - aPoint->x());
+    aPoint->setY(thePointToAvoid->y() * 2.0 - aPoint->y());
+  }
+  return aPoint;
+}
+
 bool SketchPlugin_ConstraintAngle::compute(const std::string& theAttributeId)
 {
   if (theAttributeId != SketchPlugin_Constraint::FLYOUT_VALUE_PNT())
@@ -362,11 +396,8 @@ bool SketchPlugin_ConstraintAngle::compute(const std::string& theAttributeId)
   bool isSupplementary = anAngleType == (int)SketcherPrs_Tools::ANGLE_COMPLEMENTARY;
 
   // point on lines to compose an angle
-  GeomPnt2dPtr aPointA = SketcherPrs_Tools::getPoint(aLineA.get(),
-      (isReversed1 ^ isSupplementary) ?
-      SketchPlugin_Line::START_ID() : SketchPlugin_Line::END_ID());
-  GeomPnt2dPtr aPointB = SketcherPrs_Tools::getPoint(aLineB.get(),
-      isReversed2 ? SketchPlugin_Line::START_ID() : SketchPlugin_Line::END_ID());
+  GeomPnt2dPtr aPointA = lineBoundary(aLineA, isReversed1 ^ isSupplementary, anInter);
+  GeomPnt2dPtr aPointB = lineBoundary(aLineB, isReversed2, anInter);
 
   myFlyoutUpdate = true;
   if (aFlyOutAttr->isInitialized()) {
@@ -412,6 +443,62 @@ bool SketchPlugin_ConstraintAngle::compute(const std::string& theAttributeId)
   myFlyoutUpdate = false;
 
   return true;
+}
+
+void SketchPlugin_ConstraintAngle::updateVersion()
+{
+  bool aWasBlocked = data()->blockSendAttributeUpdated(true);
+
+  // Calculate angle value by the old algorithm and
+  // update the corresponding attribute to meet the new requirements.
+  FeaturePtr aLineA = SketcherPrs_Tools::getFeatureLine(data(), ENTITY_A());
+  FeaturePtr aLineB = SketcherPrs_Tools::getFeatureLine(data(), ENTITY_B());
+
+  GeomPnt2dPtr aStartA = SketcherPrs_Tools::getPoint(aLineA.get(), SketchPlugin_Line::START_ID());
+  GeomPnt2dPtr aEndA = SketcherPrs_Tools::getPoint(aLineA.get(), SketchPlugin_Line::END_ID());
+  GeomPnt2dPtr aStartB = SketcherPrs_Tools::getPoint(aLineB.get(), SketchPlugin_Line::START_ID());
+  GeomPnt2dPtr aEndB = SketcherPrs_Tools::getPoint(aLineB.get(), SketchPlugin_Line::END_ID());
+
+  std::shared_ptr<GeomAPI_Angle2d> anAng;
+
+  if (boolean(ANGLE_REVERSED_FIRST_LINE_ID())->isInitialized() &&
+      boolean(ANGLE_REVERSED_SECOND_LINE_ID())->isInitialized()) {
+    bool isReversed1 = boolean(ANGLE_REVERSED_FIRST_LINE_ID())->value();
+    bool isReversed2 = boolean(ANGLE_REVERSED_SECOND_LINE_ID())->value();
+
+    std::shared_ptr<GeomAPI_Lin2d> aLine1(new GeomAPI_Lin2d(aStartA, aEndA));
+    std::shared_ptr<GeomAPI_Lin2d> aLine2(new GeomAPI_Lin2d(aStartB, aEndB));
+    anAng.reset(new GeomAPI_Angle2d(aLine1, isReversed1, aLine2, isReversed2));
+  }
+  else {
+    anAng.reset(new GeomAPI_Angle2d(aStartA, aEndA, aStartB, aEndB));
+
+    bool isReversed1 = anAng->isReversed(0);
+    bool isReversed2 = anAng->isReversed(1);
+
+    boolean(ANGLE_REVERSED_FIRST_LINE_ID())->setValue(isReversed1);
+    boolean(ANGLE_REVERSED_SECOND_LINE_ID())->setValue(isReversed2);
+  }
+  double anAngleValue = anAng->angleDegree();
+  double aConstValue = real(ANGLE_VALUE_ID())->value();
+
+  AttributeIntegerPtr aType = integer(TYPE_ID());
+  switch ((SketcherPrs_Tools::AngleType)aType->value()) {
+  case SketcherPrs_Tools::ANGLE_DIRECT:
+    if (anAngleValue < 0.0 && aConstValue > 180.0)
+      convertAngle(real(ANGLE_VALUE_ID()), SketcherPrs_Tools::ANGLE_BACKWARD,
+                                           SketcherPrs_Tools::ANGLE_DIRECT);
+    break;
+  case SketcherPrs_Tools::ANGLE_BACKWARD:
+    if (anAngleValue < 0.0 && aConstValue < 180.0)
+      convertAngle(real(ANGLE_VALUE_ID()), SketcherPrs_Tools::ANGLE_DIRECT,
+                                           SketcherPrs_Tools::ANGLE_BACKWARD);
+    break;
+  default:
+    break;
+  }
+  data()->blockSendAttributeUpdated(aWasBlocked, false);
+  integer(VERSION_ID())->setValue(THE_VERSION_1);
 }
 
 
