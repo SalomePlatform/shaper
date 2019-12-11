@@ -197,7 +197,7 @@ std::string ModelHighAPI_FeatureStore::dumpAttr(const AttributePtr& theAttr) {
   } else if (aType == ModelAPI_AttributeInteger::typeId()) {
     AttributeIntegerPtr anAttr = std::dynamic_pointer_cast<ModelAPI_AttributeInteger>(theAttr);
     // do not dump a type of ConstraintAngle, because it can be changed due dumping
-    if (anAttr->id() == "AngleType") {
+    if (anAttr->id() == "AngleType" || anAttr->id() == "AngleTypePrevious") {
       return "";
     } else if (anAttr->id() == "LocationType") {
       return "__notinitialized__";
