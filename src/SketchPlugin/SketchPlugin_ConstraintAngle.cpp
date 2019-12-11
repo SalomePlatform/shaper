@@ -290,7 +290,7 @@ double SketchPlugin_ConstraintAngle::getAngleForType(double theAngle,
 }
 
 // Convert angle value or a text expression from one angle type to another
-static void convertAngle(AttributeDoublePtr& theAngle,
+static void convertAngle(AttributeDoublePtr theAngle,
                          const int thePrevType, const int theNewType)
 {
   if (theAngle->isInitialized()) {
