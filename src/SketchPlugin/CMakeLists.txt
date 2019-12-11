@@ -211,6 +211,10 @@ ADD_UNIT_TESTS(
   TestChangeSketchPlane3.py
   TestChangeSketchPlane4.py
   TestConstraintAngle.py
+  TestConstraintAngle_v0_1.py
+  TestConstraintAngle_v0_2.py
+  TestConstraintAngle_v20191210_1.py
+  TestConstraintAngle_v20191210_2.py
   TestConstraintAngleEllipse.py
   TestConstraintCoincidence.py
   TestConstraintCoincidenceEllipse.py

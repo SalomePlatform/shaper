@@ -47,6 +47,7 @@
 // function with named parameters
 %feature("kwargs") SketchAPI_Ellipse::construction;
 %feature("kwargs") SketchAPI_EllipticArc::construction;
+%feature("kwargs") SketchAPI_Sketch::setAngle;
 
 // shared pointers
 %shared_ptr(SketchAPI_Arc)

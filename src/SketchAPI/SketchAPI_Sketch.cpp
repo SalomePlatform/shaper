@@ -75,6 +75,8 @@
 #include <GeomAPI_ShapeExplorer.h>
 #include <GeomAPI_XY.h>
 #include <GeomAlgoAPI_SketchBuilder.h>
+
+#include <algorithm>
 #include <cmath>
 //--------------------------------------------------------------------------------------
 SketchAPI_Sketch::SketchAPI_Sketch(
@@ -798,18 +800,38 @@ std::shared_ptr<ModelHighAPI_Interface> SketchAPI_Sketch::addTrim(
 std::shared_ptr<ModelHighAPI_Interface> SketchAPI_Sketch::setAngle(
     const ModelHighAPI_RefAttr & theLine1,
     const ModelHighAPI_RefAttr & theLine2,
-    const ModelHighAPI_Double & theValue)
+    const ModelHighAPI_Double & theValue,
+    const std::string& theType)
 {
   std::shared_ptr<ModelAPI_Feature> aFeature =
       compositeFeature()->addFeature(SketchPlugin_ConstraintAngle::ID());
-  fillAttribute(SketchPlugin_ConstraintAngle::THE_VERSION_0,
-      aFeature->integer(SketchPlugin_ConstraintAngle::VERSION_ID()));
-  fillAttribute(SketcherPrs_Tools::ANGLE_DIRECT,
-      aFeature->integer(SketchPlugin_ConstraintAngle::TYPE_ID()));
-  // fill the value before lines to avoid calculation of angle value by the Angle feature
-  fillAttribute(theValue, aFeature->real(SketchPlugin_ConstraintAngle::ANGLE_VALUE_ID()));
+
+  const int aVersion = theType.empty() ? SketchPlugin_ConstraintAngle::THE_VERSION_0
+                                       : SketchPlugin_ConstraintAngle::THE_VERSION_1;
+  fillAttribute(aVersion, aFeature->integer(SketchPlugin_ConstraintAngle::VERSION_ID()));
+
+  int aType = (int)SketcherPrs_Tools::ANGLE_DIRECT;
+  fillAttribute(aType, aFeature->integer(SketchPlugin_ConstraintAngle::PREV_TYPE_ID()));
+  fillAttribute(aType, aFeature->integer(SketchPlugin_ConstraintAngle::TYPE_ID()));
+
+  if (aVersion == SketchPlugin_ConstraintAngle::THE_VERSION_0)
+    fillAttribute(theValue, aFeature->real(SketchPlugin_ConstraintAngle::ANGLE_VALUE_ID()));
+
   fillAttribute(theLine1, aFeature->refattr(SketchPlugin_Constraint::ENTITY_A()));
   fillAttribute(theLine2, aFeature->refattr(SketchPlugin_Constraint::ENTITY_B()));
+
+  if (aVersion == SketchPlugin_ConstraintAngle::THE_VERSION_1) {
+    std::string aTypeLC = theType;
+    std::transform(aTypeLC.begin(), aTypeLC.end(), aTypeLC.begin(), ::tolower);
+    if (aTypeLC == "supplementary")
+      aType = (int)SketcherPrs_Tools::ANGLE_COMPLEMENTARY;
+    else if (aTypeLC == "backward")
+      aType = (int)SketcherPrs_Tools::ANGLE_BACKWARD;
+
+    fillAttribute(aType, aFeature->integer(SketchPlugin_ConstraintAngle::TYPE_ID()));
+    fillAttribute(theValue, aFeature->real(SketchPlugin_ConstraintAngle::ANGLE_VALUE_ID()));
+  }
+
   aFeature->execute();
   return InterfacePtr(new ModelHighAPI_Interface(aFeature));
 }

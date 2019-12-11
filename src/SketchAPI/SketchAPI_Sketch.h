@@ -377,7 +377,8 @@ public:
   std::shared_ptr<ModelHighAPI_Interface> setAngle(
       const ModelHighAPI_RefAttr & theLine1,
       const ModelHighAPI_RefAttr & theLine2,
-      const ModelHighAPI_Double & theValue);
+      const ModelHighAPI_Double & theValue,
+      const std::string& type = std::string());
 
   /// Set complementary angle
   SKETCHAPI_EXPORT

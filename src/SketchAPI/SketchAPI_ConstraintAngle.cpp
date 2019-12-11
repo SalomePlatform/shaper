@@ -84,6 +84,10 @@ static void calculatePossibleValuesOfAngle(FeaturePtr theFeature,
 static std::string angleTypeToString(FeaturePtr theFeature)
 {
   static const double TOLERANCE = 1.e-7;
+  static const std::string THE_ANGLE_DIRECT("Direct");
+  static const std::string THE_ANGLE_SUPPLEMENTARY("Supplementary");
+  static const std::string THE_ANGLE_BACKWARD("Backward");
+
   double anAngleDirect, anAngleComplmentary, anAngleBackward;
   calculatePossibleValuesOfAngle(theFeature, anAngleDirect, anAngleComplmentary, anAngleBackward);
 
@@ -100,18 +104,17 @@ static std::string angleTypeToString(FeaturePtr theFeature)
   // find the minimal difference
   std::string aType;
   if (isDirect && aDirectDiff < TOLERANCE) {
-    // Nothing to do.
-    // This case is empty and going the first to check the direct angle before the others.
+    aType = THE_ANGLE_DIRECT;
   }
   else if (isComplementary && aComplementaryDiff < TOLERANCE)
-    aType = "Complementary";
+    aType = THE_ANGLE_SUPPLEMENTARY;
   else if (isBackward && aBackwardDiff < TOLERANCE)
-    aType = "Backward";
+    aType = THE_ANGLE_BACKWARD;
   else {
     if (aComplementaryDiff < aDirectDiff && aComplementaryDiff < aBackwardDiff)
-      aType = "Complementary";
+      aType = THE_ANGLE_SUPPLEMENTARY;
     else if (aBackwardDiff < aDirectDiff && aBackwardDiff < aComplementaryDiff)
-      aType = "Backward";
+      aType = THE_ANGLE_BACKWARD;
   }
   return aType;
 }
@@ -124,10 +127,9 @@ void SketchAPI_ConstraintAngle::dump(ModelHighAPI_Dumper& theDumper) const
 
   // calculate angle value as it was just applied to the attributes
   FeaturePtr aBase = feature();
-  std::string aSetterSuffix = angleTypeToString(aBase);
 
   const std::string& aSketchName = theDumper.parentName(aBase);
-  theDumper << aBase << " = " << aSketchName << "." << "setAngle" << aSetterSuffix << "(";
+  theDumper << aBase << " = " << aSketchName << "." << "setAngle(";
 
   bool isFirstAttr = true;
   for (int i = 0; i < CONSTRAINT_ATTR_SIZE; ++i) {
@@ -142,5 +144,6 @@ void SketchAPI_ConstraintAngle::dump(ModelHighAPI_Dumper& theDumper) const
   if (aValueAttr && aValueAttr->isInitialized())
     theDumper << ", " << aValueAttr;
 
-  theDumper << ")" << std::endl;
+  std::string aType = angleTypeToString(aBase);
+  theDumper << ", type = \"" << aType << "\")" << std::endl;
 }
