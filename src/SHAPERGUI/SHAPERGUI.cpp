@@ -168,7 +168,7 @@ void SHAPERGUI::initialize(CAM_Application* theApp)
   }
 
   int aMenu = createMenu(tr("Inspection"), -1, -1, 30);
-  int aSubMenu = createMenu(tr("Information"), aMenu);
+  int aSubMenu = createMenu(tr("Information"), aMenu, -1, -1, 0);
 
   int aId = getNextCommandId();
   myActionsList.append(aId);
@@ -180,7 +180,7 @@ void SHAPERGUI::initialize(CAM_Application* theApp)
   myWhatIsAction->setData("INSPECTION_CMD");
   createMenu(aId, aSubMenu, 0);
 
-  QString aToolName = tr("Inspection tool");
+  QString aToolName = tr("Inspection");
   int aTool = createTool(aToolName);
   int aToolId = createTool(myWhatIsAction, aTool);
   registerCommandToolbar(aToolName, aId);

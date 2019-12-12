@@ -150,6 +150,8 @@
         <source path="multirotation_widget.xml"/>
       </feature>
     </group>
+  </workbench>
+  <workbench id="Inspection">
     <group id="Measurement">
       <feature id="Measurement" title="Measurement" tooltip="Calculate properties of objects"
                icon="icons/Features/measurement.png" helpfile="measurementFeature.html" abort_confirmation="false">
