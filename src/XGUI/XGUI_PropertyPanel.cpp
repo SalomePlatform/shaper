@@ -220,8 +220,8 @@ void XGUI_PropertyPanel::createContentPanel(FeaturePtr theFeature)
   if (theFeature->isAction() || !theFeature->data())
     return;
 
+  ModuleBase_Operation* anOperation = myOperationMgr->currentOperation();
   if (myWidgets.empty()) {
-    ModuleBase_Operation* anOperation = myOperationMgr->currentOperation();
     QString aXmlRepr = anOperation->getDescription()->xmlRepresentation();
 
     ModuleBase_WidgetFactory aFactory(aXmlRepr.toStdString(), myOperationMgr->workshop());
@@ -229,7 +229,12 @@ void XGUI_PropertyPanel::createContentPanel(FeaturePtr theFeature)
     /// Apply button should be update if the feature was modified by the panel
     myOperationMgr->onValidateOperation();
   }
-  updateApplyPlusButton(theFeature);
+  ModuleBase_OperationFeature* aFeatureOp =
+    dynamic_cast<ModuleBase_OperationFeature*>(anOperation);
+  if (aFeatureOp && (!aFeatureOp->isEditOperation()))
+    updateApplyPlusButton(theFeature);
+  else
+    findButton(PROP_PANEL_OK_PLUS)->setVisible(false);
 }
 
 void XGUI_PropertyPanel::updateApplyPlusButton(FeaturePtr theFeature)
