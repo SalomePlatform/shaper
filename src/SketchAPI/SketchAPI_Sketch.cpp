@@ -1423,5 +1423,7 @@ void SketchAPI_Sketch::dump(ModelHighAPI_Dumper& theDumper) const
       theDumper << *aFIt;
     }
     theDumper << "\n" << aSpaceShift << " ])" << std::endl;
+    // call model.do() for correct update of the document's labels related to the changed faces
+    theDumper << "model.do()" << std::endl;
   }
 }
