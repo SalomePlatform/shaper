@@ -26,7 +26,7 @@ SET(PROJECT_HEADERS
     SketcherPrs.h
     SketcherPrs_Coincident.h
     SketcherPrs_Collinear.h
-    SketcherPrs_DimensionStyleListener.h
+    SketcherPrs_DimensionStyle.h
     SketcherPrs_Factory.h
     SketcherPrs_Parallel.h
     SketcherPrs_Tools.h
@@ -49,7 +49,7 @@ SET(PROJECT_HEADERS
 SET(PROJECT_SOURCES
     SketcherPrs_Coincident.cpp
     SketcherPrs_Collinear.cpp
-    SketcherPrs_DimensionStyleListener.cpp
+    SketcherPrs_DimensionStyle.cpp
     SketcherPrs_Factory.cpp
     SketcherPrs_Parallel.cpp
     SketcherPrs_Tools.cpp

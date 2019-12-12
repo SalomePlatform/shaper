@@ -27,7 +27,7 @@
 #include <AIS_AngleDimension.hxx>
 #include <Standard_DefineHandle.hxx>
 
-#include <SketcherPrs_DimensionStyleListener.h>
+#include <SketcherPrs_DimensionStyle.h>
 
 DEFINE_STANDARD_HANDLE(SketcherPrs_Angle, AIS_AngleDimension)
 
@@ -99,7 +99,7 @@ private:
   Handle(Prs3d_DimensionAspect) myAspect;
 
   /// Listener to update dimension visualization style
-  SketcherPrs_DimensionStyleListener* myStyleListener;
+  SketcherPrs_DimensionStyle* myStyleListener;
 
   /// container of values obtained from the constraint, which are necessary to fill the presentation
   gp_Pnt myFirstPoint; ///< the dimension first point for measured geometry
@@ -107,7 +107,7 @@ private:
   gp_Pnt myCenterPoint; ///< the dimension center point for measured geometry
   gp_Pnt myFlyOutPoint;  ///< the dimension fly out point for measured geometry
 
-  SketcherPrs_DimensionStyleListener::DimensionValue myValue; /// the structure filled by constraint
+  SketcherPrs_DimensionStyle::DimensionValue myValue; /// the structure filled by constraint
 };
 
 

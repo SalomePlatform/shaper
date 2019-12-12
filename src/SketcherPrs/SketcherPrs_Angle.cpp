@@ -18,7 +18,7 @@
 //
 
 #include "SketcherPrs_Angle.h"
-#include "SketcherPrs_DimensionStyleListener.h"
+#include "SketcherPrs_DimensionStyle.h"
 #include "SketcherPrs_Tools.h"
 
 #include <SketchPlugin_ConstraintAngle.h>
@@ -70,7 +70,7 @@ SketcherPrs_Angle::SketcherPrs_Angle(ModelAPI_Feature* theConstraint,
 
   SetDimensionAspect(myAspect);
 
-  myStyleListener = new SketcherPrs_DimensionStyleListener();
+  myStyleListener = new SketcherPrs_DimensionStyle();
 }
 
 SketcherPrs_Angle::~SketcherPrs_Angle()

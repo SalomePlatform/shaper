@@ -19,7 +19,7 @@
 
 #include "SketcherPrs_Radius.h"
 #include "SketcherPrs_Tools.h"
-#include "SketcherPrs_DimensionStyleListener.h"
+#include "SketcherPrs_DimensionStyle.h"
 
 #include <SketchPlugin_ConstraintRadius.h>
 #include <SketchPlugin_Constraint.h>
@@ -59,7 +59,7 @@ SketcherPrs_Radius::SketcherPrs_Radius(ModelAPI_Feature* theConstraint,
   myValue(1, false, "")
 {
   SetDimensionAspect(createDimensionAspect());
-  myStyleListener = new SketcherPrs_DimensionStyleListener();
+  myStyleListener = new SketcherPrs_DimensionStyle();
 }
 
 SketcherPrs_Radius::~SketcherPrs_Radius()

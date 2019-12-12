@@ -30,7 +30,7 @@
 #include <gp_Pln.hxx>
 #include <string>
 
-#include <SketcherPrs_DimensionStyleListener.h>
+#include <SketcherPrs_DimensionStyle.h>
 
 DEFINE_STANDARD_HANDLE(SketcherPrs_LengthDimension, AIS_LengthDimension)
 
@@ -96,7 +96,7 @@ private:
   //Handle(Prs3d_DimensionAspect) myAspect;
 
   /// Listener to update dimension visualization style
-  SketcherPrs_DimensionStyleListener* myStyleListener;
+  SketcherPrs_DimensionStyle* myStyleListener;
 
   /// container of values obtained from the constraint, which are necessary
   /// to fill the presentation
@@ -106,7 +106,7 @@ private:
   double myDistance; ///< the flyout distance
 
   /// the structure filled by constraint
-  SketcherPrs_DimensionStyleListener::DimensionValue myValue;
+  SketcherPrs_DimensionStyle::DimensionValue myValue;
 };
 
 #endif

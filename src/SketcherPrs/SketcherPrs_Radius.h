@@ -27,7 +27,7 @@
 #include <AIS_RadiusDimension.hxx>
 #include <Standard_DefineHandle.hxx>
 
-#include <SketcherPrs_DimensionStyleListener.h>
+#include <SketcherPrs_DimensionStyle.h>
 
 DEFINE_STANDARD_HANDLE(SketcherPrs_Radius, AIS_RadiusDimension)
 
@@ -91,13 +91,13 @@ private:
   SketchPlugin_Sketch* mySketcher;
 
   /// Listener to update dimension visualization style
-  SketcherPrs_DimensionStyleListener* myStyleListener;
+  SketcherPrs_DimensionStyle* myStyleListener;
 
   /// container of values obtained from the constraint, which are necessary to fill the presentation
   gp_Circ myCircle; ///< the radius circle
   gp_Pnt myAnchorPoint; ///< an ancor for the radius value visualization
 
-  SketcherPrs_DimensionStyleListener::DimensionValue myValue; /// the structure filled by constraint
+  SketcherPrs_DimensionStyle::DimensionValue myValue; /// the structure filled by constraint
 };
 
 #endif

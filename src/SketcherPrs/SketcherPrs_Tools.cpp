@@ -51,6 +51,18 @@
 
 namespace SketcherPrs_Tools {
 
+static ParameterStyle MyStyle = ParameterValue;
+
+void setParameterStyle(ParameterStyle theStyle)
+{
+  MyStyle = theStyle;
+}
+
+ParameterStyle parameterStyle()
+{
+  return MyStyle;
+}
+
 AttributePtr getAttribute(ModelAPI_Feature* theFeature, const std::string& theAttrName)
 {
   AttributePtr anAttribute;
@@ -367,17 +379,6 @@ std::shared_ptr<GeomAPI_Pnt> getAnchorPoint(const ModelAPI_Feature* theConstrain
   aFlyoutPnt->setX(aCenter->x() + aFlyoutPnt->x() * aRadius / aLen);
   aFlyoutPnt->setY(aCenter->y() + aFlyoutPnt->y() * aRadius / aLen);
   return thePlane->to3D(aFlyoutPnt->x(), aFlyoutPnt->y());
-}
-
-void sendExpressionShownEvent(const bool& theState)
-{
-  static Events_ID anId = SketcherPrs_ParameterStyleMessage::eventId();
-  std::shared_ptr<SketcherPrs_ParameterStyleMessage> aMessage = std::shared_ptr
-    <SketcherPrs_ParameterStyleMessage>(new SketcherPrs_ParameterStyleMessage(anId, 0));
-  aMessage->setStyle(theState ? SketcherPrs_ParameterStyleMessage::ParameterText
-                              : SketcherPrs_ParameterStyleMessage::ParameterValue);
-  Events_Loop::loop()->send(aMessage);
-  Events_Loop::loop()->flush(anId);
 }
 
 void sendEmptyPresentationError(ModelAPI_Feature* theFeature, const std::string theError)

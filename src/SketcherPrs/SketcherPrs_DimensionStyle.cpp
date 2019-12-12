@@ -17,7 +17,7 @@
 // See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 
-#include "SketcherPrs_DimensionStyleListener.h"
+#include "SketcherPrs_DimensionStyle.h"
 #include <Prs3d_DimensionAspect.hxx>
 #include "SketcherPrs_Tools.h"
 
@@ -35,7 +35,8 @@
 static const Standard_ExtCharacter MyEmptySymbol(' ');
 static const Standard_ExtCharacter MySigmaSymbol('=');//0x03A3); // using equal instead of sigma
 
-SketcherPrs_DimensionStyleListener::DimensionValue::DimensionValue(double theDoubleValue,
+
+SketcherPrs_DimensionStyle::DimensionValue::DimensionValue(double theDoubleValue,
                                      bool theHasParameters, const std::string& theTextValue)
 : myDoubleValue(theDoubleValue),
   myHasParameters(theHasParameters),
@@ -43,7 +44,7 @@ SketcherPrs_DimensionStyleListener::DimensionValue::DimensionValue(double theDou
 {
 }
 
-void SketcherPrs_DimensionStyleListener::DimensionValue::init(
+void SketcherPrs_DimensionStyle::DimensionValue::init(
                                                 const AttributeDoublePtr& theAttributeValue)
 {
   myDoubleValue = theAttributeValue->value();
@@ -51,33 +52,16 @@ void SketcherPrs_DimensionStyleListener::DimensionValue::init(
   myTextValue = theAttributeValue->text();
 }
 
-SketcherPrs_DimensionStyleListener::SketcherPrs_DimensionStyleListener()
+SketcherPrs_DimensionStyle::SketcherPrs_DimensionStyle()
 {
-  Events_Loop* aLoop = Events_Loop::loop();
-  const Events_ID kDocCreatedEvent =
-                SketcherPrs_ParameterStyleMessage::eventId();
-  aLoop->registerListener(this, kDocCreatedEvent, NULL, false);
 }
 
-SketcherPrs_DimensionStyleListener::~SketcherPrs_DimensionStyleListener()
+SketcherPrs_DimensionStyle::~SketcherPrs_DimensionStyle()
 {
-  Events_Loop* aLoop = Events_Loop::loop();
-  aLoop->removeListener(this);
 }
 
-void SketcherPrs_DimensionStyleListener::processEvent(
-  const std::shared_ptr<Events_Message>& theMessage)
-{
-  const Events_ID kParameterStyleEvent = SketcherPrs_ParameterStyleMessage::eventId();
-  if (theMessage->eventID() == kParameterStyleEvent) {
-    std::shared_ptr<SketcherPrs_ParameterStyleMessage> aMessage = std::dynamic_pointer_cast<
-                                            SketcherPrs_ParameterStyleMessage>(theMessage);
-    myStyle = aMessage->style();
-  }
-}
-
-void SketcherPrs_DimensionStyleListener::updateDimensions(AIS_Dimension* theDimension,
-          const SketcherPrs_DimensionStyleListener::DimensionValue& theDimensionValue)
+void SketcherPrs_DimensionStyle::updateDimensions(AIS_Dimension* theDimension,
+          const SketcherPrs_DimensionStyle::DimensionValue& theDimensionValue)
 {
   if (!theDimension)
     return;
@@ -85,7 +69,7 @@ void SketcherPrs_DimensionStyleListener::updateDimensions(AIS_Dimension* theDime
                    theDimensionValue.myTextValue, theDimensionValue.myDoubleValue);
 }
 
-void SketcherPrs_DimensionStyleListener::updateDimensions(AIS_Dimension* theDimension,
+void SketcherPrs_DimensionStyle::updateDimensions(AIS_Dimension* theDimension,
                                                           const bool theHasParameters,
                                                           const std::string& theTextValue,
                                                           const double theDoubleValue)
@@ -93,13 +77,16 @@ void SketcherPrs_DimensionStyleListener::updateDimensions(AIS_Dimension* theDime
   if (!theDimension)
     return;
 
-  /// do not show special symbols of dimension: previous implementation did not allow to unite them
+  /// do not show special symbols of dimension:
+  ///   previous implementation did not allow to unite them
   theDimension->SetSpecialSymbol(MyEmptySymbol);
   theDimension->SetDisplaySpecialSymbol(AIS_DSS_No);
 
   TCollection_ExtendedString aCustomValue;
   if (theHasParameters) {
-    bool isParameterTextStyle = myStyle == SketcherPrs_ParameterStyleMessage::ParameterText;
+    //bool isParameterTextStyle = myStyle == SketcherPrs_ParameterStyleMessage::ParameterText;
+    bool isParameterTextStyle =
+      SketcherPrs_Tools::parameterStyle() == SketcherPrs_Tools::ParameterText;
 
     if (isParameterTextStyle)
       aCustomValue = theTextValue.c_str();
@@ -128,4 +115,3 @@ void SketcherPrs_DimensionStyleListener::updateDimensions(AIS_Dimension* theDime
   theDimension->SetCustomValue(aCustomValue);
 #endif
 }
-

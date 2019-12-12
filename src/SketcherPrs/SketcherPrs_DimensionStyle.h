@@ -20,7 +20,7 @@
 #ifndef SketcherPrs_DimensionStyleListener_H
 #define SketcherPrs_DimensionStyleListener_H
 
-#include <Events_Listener.h>
+//#include <Events_Listener.h>
 
 #include <ModelAPI_AttributeDouble.h>
 
@@ -36,7 +36,7 @@
 * A class for representation of linear dimension constraint.
 * It supports SketchPlugin_ConstraintLength and SketchPlugin_ConstraintDistance features.
 */
-class SketcherPrs_DimensionStyleListener : public Events_Listener
+class SketcherPrs_DimensionStyle
 {
 public:
   class DimensionValue {
@@ -54,14 +54,10 @@ public:
 
 public:
   /// Constructor
-  Standard_EXPORT SketcherPrs_DimensionStyleListener();
+  Standard_EXPORT SketcherPrs_DimensionStyle();
 
   /// Destructor
-  Standard_EXPORT ~SketcherPrs_DimensionStyleListener();
-
-  /// Process the ModelAPI_DocumentCreatedMessage to fulfill a document
-  /// from the message with origin and planes
-  virtual void processEvent(const std::shared_ptr<Events_Message>& theMessage);
+  Standard_EXPORT ~SketcherPrs_DimensionStyle();
 
   /// Visualizes the dimension text or dimension value depending on the has parameters state
   /// \param theDimension a modified dimension
@@ -79,9 +75,6 @@ private:
                         const bool theHasParameters,
                         const std::string& theTextValue,
                         const double theDoubleValue);
-private:
-  /// Style how the parameter of dimension should be visualized
-  SketcherPrs_ParameterStyleMessage::ParameterStyle myStyle;
 };
 
 #endif

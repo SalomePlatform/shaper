@@ -37,41 +37,20 @@
 class GeomDataAPI_Point2D;
 class AIS_Dimension;
 
-//#define MyTextHeight 20
+namespace SketcherPrs_Tools {
 
-/// Message that style of visualization of parameter is changed.
-/// It will be shown as expression or value
-class SketcherPrs_ParameterStyleMessage : public Events_Message
-{
-public:
   /// \enum ParameterStyle lists styles of parameter
   enum ParameterStyle {
     ParameterValue, ///< using symbol with the parameter value
     ParameterText ///< using parameter text
   };
 
-public:
-  /// Creates an empty message
-  SKETCHERPRS_EXPORT SketcherPrs_ParameterStyleMessage(const Events_ID theID,
-                                                    const void* theSender = 0)
-  : Events_Message(theID, theSender) {}
-  /// The virtual destructor
-  SKETCHERPRS_EXPORT virtual ~SketcherPrs_ParameterStyleMessage() {}
-  /// Static. Returns EventID of the message.
-  SKETCHERPRS_EXPORT static Events_ID eventId()
-  {
-    static const char * MY_EVENT_PARAMETER_STYLE_ID("ParameterStyle");
-    return Events_Loop::eventByName(MY_EVENT_PARAMETER_STYLE_ID);
-  }
-  /// Returns a document stored in the message
-  SKETCHERPRS_EXPORT ParameterStyle style() const { return myStyle; }
-  /// Sets a document to the message
-  SKETCHERPRS_EXPORT void setStyle(ParameterStyle theStyle) { myStyle = theStyle; }
-private:
-  ParameterStyle myStyle; /// style of the parameter visualization
-};
+  /// Set dimensions parameters style
+  /// \param theStyle new style
+  SKETCHERPRS_EXPORT void setParameterStyle(ParameterStyle theStyle);
 
-namespace SketcherPrs_Tools {
+  /// Return dimensions parameters style
+  SKETCHERPRS_EXPORT ParameterStyle parameterStyle();
 
   /// Enumeration with modes for activation of selection custom presentations
   enum SelectionModes {
@@ -195,11 +174,6 @@ namespace SketcherPrs_Tools {
   SKETCHERPRS_EXPORT std::shared_ptr<GeomAPI_Pnt> getAnchorPoint(
                                               const ModelAPI_Feature* theConstraint,
                                               const std::shared_ptr<GeomAPI_Ax3>& thePlane);
-
-  /// Sends event about expression visualization type is changed for dimension presentations
-  /// Sends event to redisplay all sub-features of composite feature
-  /// \param theState a new state
-  SKETCHERPRS_EXPORT void sendExpressionShownEvent(const bool& theState);
 
   /// Throws an exception(in debug mode) and sends a signal about necessity to hide the object
   /// \param theFeature a feature where AIS presentation is empty

@@ -19,7 +19,7 @@
 
 #include "SketcherPrs_LengthDimension.h"
 #include "SketcherPrs_Tools.h"
-#include "SketcherPrs_DimensionStyleListener.h"
+#include "SketcherPrs_DimensionStyle.h"
 
 #include <SketchPlugin_Constraint.h>
 #include <SketchPlugin_ConstraintLength.h>
@@ -120,7 +120,7 @@ SketcherPrs_LengthDimension::SketcherPrs_LengthDimension(ModelAPI_Feature* theCo
   myValue(0., false, "")
 {
   SetDimensionAspect(createDimensionAspect());
-  myStyleListener = new SketcherPrs_DimensionStyleListener();
+  myStyleListener = new SketcherPrs_DimensionStyle();
 
   setDirection(theConstraint, plane());
 }
