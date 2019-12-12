@@ -22,12 +22,14 @@
 
 #include "XGUI.h"
 
-#include <ModelAPI_Object.h>
-
 #include <ModuleBase_ActionType.h>
 #include <ModuleBase_Definitions.h>
 #include <ModuleBase_ViewerPrs.h>
 #include <ModuleBase_ResultPrs.h>
+
+#include <ModelAPI_Object.h>
+#include <ModelAPI_ResultGroup.h>
+#include <ModelAPI_Feature.h>
 
 #include <SelectMgr_ListOfFilter.hxx>
 #include <TopoDS_Shape.hxx>
@@ -155,8 +157,12 @@ private:
   /// \param thePrs a selected presintation
   /// \param theObjectsToShapes map of objects to shapes list
   /// \param theObjectToPrs map of objects to presentations
-  void getObjectsMapFromPrs(ModuleBase_ViewerPrsPtr thePrs,
+  void getObjectsMapFromResult(ResultGroupPtr theResGroup, FeaturePtr theGroupFeature,
     std::map<ObjectPtr, TopoDS_ListOfShape>& theObjectsToShapes,
+    std::map<ObjectPtr, Handle(ModuleBase_ResultPrs) >& theObjectToPrs);
+
+  void getObjectsMapFromPrs(ModuleBase_ViewerPrsPtr thePrs,
+    std::map<ObjectPtr, TopoDS_ListOfShape>& theObjectToShapes,
     std::map<ObjectPtr, Handle(ModuleBase_ResultPrs) >& theObjectToPrs);
 
   /// Returns true if transparency choice is checked
