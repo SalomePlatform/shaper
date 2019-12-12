@@ -263,7 +263,6 @@ void XGUI_InspectionPanel::onSelectionChanged()
       buildFeaturePane(aFeature);
     }
     else {
-      myStackWgt->setCurrentIndex(myShapePanelId);
       TopoDS_Shape aShape = ModuleBase_Tools::getSelectedShape(aPrs);
       if (aShape.IsNull()) {
         ResultPtr aRes = std::dynamic_pointer_cast<ModelAPI_Result>(aPrs->object());
@@ -274,8 +273,11 @@ void XGUI_InspectionPanel::onSelectionChanged()
           }
         }
       }
-      if (aShape.IsNull())
+      if (aShape.IsNull()) {
+        myStackWgt->setCurrentIndex(myFeaturePanelId);
         return;
+      }
+      myStackWgt->setCurrentIndex(myShapePanelId);
       GeomShapePtr aShapePtr(new GeomAPI_Shape());
       aShapePtr->setImpl(new TopoDS_Shape(aShape));
 
