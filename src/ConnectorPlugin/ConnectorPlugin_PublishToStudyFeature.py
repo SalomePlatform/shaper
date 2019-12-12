@@ -72,11 +72,18 @@ class PublishToStudyFeature(ModelAPI.ModelAPI_Feature):
         aPartSet = aSession.moduleDocument()
         for aPartId in range(aPartSet.size(model.ModelAPI_ResultPart_group())):
           aPartObject = aPartSet.object(model.ModelAPI_ResultPart_group(), aPartId)
-          aPart = ModelAPI.modelAPI_ResultPart(ModelAPI.modelAPI_Result(aPartObject)).partDoc()
-          for aResId in range(aPart.size(model.ModelAPI_ResultBody_group())):
-            aResObject = aPart.object(model.ModelAPI_ResultBody_group(), aResId)
+          aPartRes = ModelAPI.modelAPI_ResultPart(ModelAPI.modelAPI_Result(aPartObject))
+          aPartDoc = aPartRes.partDoc()
+          if aPartDoc is None and aPartObject is not None:
+            EventsAPI.Events_InfoMessage("PublishToStudy", "For publish to SHAPER-STUDY some Part is not activated", self).send()
+            break
+          aPartFeatureId = aPartSet.feature(aPartRes).data().featureId()
+          for aResId in range(aPartDoc.size(model.ModelAPI_ResultBody_group())):
+            aResObject = aPartDoc.object(model.ModelAPI_ResultBody_group(), aResId)
             aRes = model.objectToResult(aResObject)
             print("Found a result to publish ", aRes.data().name())
-            aSShape = anEngine.CreateShape()
+            aResFeatureId = aPartDoc.feature(aRes).data().featureId()
+            aSSEntry = str(aPartFeatureId) + ":" + str(aResFeatureId)
+            aSShape = anEngine.CreateShape(aSSEntry)
             aSShape.SetShapeByStream(aRes.shape().getShapeStream())
             anEngine.AddInStudy(aSShape, aRes.data().name(), None)
