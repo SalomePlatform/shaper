@@ -21,8 +21,10 @@
 #define SketchPlugin_ConstraintAngle_H_
 
 #include "SketchPlugin.h"
-#include <SketchPlugin_Sketch.h>
+#include "SketchPlugin_Sketch.h"
 #include "SketchPlugin_ConstraintBase.h"
+
+#include <ModelAPI_IReentrant.h>
 
 /** \class SketchPlugin_ConstraintAngle
  *  \ingroup Plugins
@@ -31,7 +33,8 @@
  *  This constraint has two attributes:
  *  SketchPlugin_Constraint::ENTITY_A() and SketchPlugin_Constraint::ENTITY_B()
  */
-class SketchPlugin_ConstraintAngle : public SketchPlugin_ConstraintBase
+class SketchPlugin_ConstraintAngle : public SketchPlugin_ConstraintBase,
+                                     public ModelAPI_IReentrant
 {
 public:
   /// Angle constraint kind
@@ -134,6 +137,10 @@ public:
 
   /// Returns the AIS preview
   SKETCHPLUGIN_EXPORT virtual AISObjectPtr getAISObject(AISObjectPtr thePrevious);
+
+  /// Apply information of the message to current object.
+  /// It fills selected point and the first object.
+  virtual std::string processEvent(const std::shared_ptr<Events_Message>& theMessage);
 
   /// \brief Use plugin manager for features creation
   SketchPlugin_ConstraintAngle();

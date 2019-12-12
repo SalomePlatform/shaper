@@ -24,6 +24,7 @@
 
 #include <ModelAPI_AttributeDouble.h>
 #include <ModelAPI_AttributeInteger.h>
+#include <ModelAPI_EventReentrantMessage.h>
 #include <ModelAPI_Session.h>
 #include <ModelAPI_Validator.h>
 
@@ -130,6 +131,11 @@ void SketchPlugin_ConstraintAngle::execute()
       GeomDataAPI_Point2D>(aData->attribute(SketchPlugin_Constraint::FLYOUT_VALUE_PNT()));
   if(!aFlyOutAttr->isInitialized())
     compute(SketchPlugin_Constraint::FLYOUT_VALUE_PNT());
+
+  static Events_ID anId = ModelAPI_EventReentrantMessage::eventId();
+  std::shared_ptr<ModelAPI_EventReentrantMessage> aMessage(
+      new ModelAPI_EventReentrantMessage(anId, this));
+  Events_Loop::loop()->send(aMessage);
 }
 
 AISObjectPtr SketchPlugin_ConstraintAngle::getAISObject(AISObjectPtr thePrevious)
@@ -143,6 +149,24 @@ AISObjectPtr SketchPlugin_ConstraintAngle::getAISObject(AISObjectPtr thePrevious
     SketchPlugin_Tools::setDimensionColor(anAIS);
   return anAIS;
 }
+
+// LCOV_EXCL_START
+std::string SketchPlugin_ConstraintAngle::processEvent(
+    const std::shared_ptr<Events_Message>& theMessage)
+{
+  std::string aFilledAttributeName;
+
+  std::shared_ptr<ModelAPI_EventReentrantMessage> aReentrantMessage =
+      std::dynamic_pointer_cast<ModelAPI_EventReentrantMessage>(theMessage);
+  if (aReentrantMessage.get()) {
+    aFilledAttributeName = ENTITY_A();
+    refattr(ENTITY_A())->setObject(aReentrantMessage->selectedObject());
+    std::dynamic_pointer_cast<GeomDataAPI_Point2D>(attribute(SELECTED_FIRST_POINT_ID()))
+        ->setValue(aReentrantMessage->clickedPoint());
+  }
+  return aFilledAttributeName;
+}
+// LCOV_EXCL_STOP
 
 void SketchPlugin_ConstraintAngle::attributeChanged(const std::string& theID)
 {
