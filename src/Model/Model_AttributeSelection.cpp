@@ -185,10 +185,11 @@ bool Model_AttributeSelection::setValue(const ObjectPtr& theContext,
   } else if (theContext->groupName() == ModelAPI_ResultGroup::group()) {
     aSelLab.ForgetAllAttributes(true);
     TDataStd_UAttribute::Set(aSelLab, kSIMPLE_REF_ID);
-  } else { // check the feature context: parent-Part of this feature should not be used
+  } else { // check the feature context: only construction features of PartSet could be selected
     FeaturePtr aFeatureContext = std::dynamic_pointer_cast<ModelAPI_Feature>(theContext);
-    if (aFeatureContext.get()) {
-      if (owner()->document() != aFeatureContext->document()) {
+    if (aFeatureContext.get() && owner()->document() != aFeatureContext->document()) {
+      if (aFeatureContext->results().empty() ||
+          aFeatureContext->firstResult()->groupName() != ModelAPI_ResultConstruction::group()) {
         aSelLab.ForgetAllAttributes(true);
         myRef.setValue(ObjectPtr());
         if (aToUnblock)
@@ -773,19 +774,22 @@ std::string Model_AttributeSelection::namingName(const std::string& theDefaultNa
 
   CenterType aCenterType = NOT_CENTER;
   std::shared_ptr<GeomAPI_Shape> aSubSh = internalValue(aCenterType);
-  ResultPtr aCont = context();
 
-  if (!aCont.get() ||
-      (aCont->groupName() == ModelAPI_ResultConstruction::group() && contextFeature().get())) {
+  FeaturePtr aContFeature = contextFeature();
+  if (aContFeature.get()) {
+    std::string aResName;
+    // checking part-owner
+    if (aContFeature->document() != owner()->document())
+        aResName += aContFeature->document()->kind() + "/";
     // selection of a full feature
-    FeaturePtr aFeatureCont = contextFeature();
-    if (aFeatureCont.get()) {
-      return kWHOLE_FEATURE + aFeatureCont->name();
+    if (aContFeature.get()) {
+      return aResName + kWHOLE_FEATURE + aContFeature->name();
     }
     // in case of selection of removed result
     return "";
   }
 
+  ResultPtr aCont = context();
   TDF_Label aSelLab = selectionLabel();
   if (aSelLab.IsAttribute(kSIMPLE_REF_ID)) { // whole context, no value
     return contextName(aCont);
