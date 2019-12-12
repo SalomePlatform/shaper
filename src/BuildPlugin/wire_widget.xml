@@ -1,7 +1,7 @@
 <source>
   <multi_selector id="base_objects"
-                  label="Segments and wires:"
-                  tooltip="Select edges on sketch, edges or wires objects."
+                  label="Segments, wires or sketches:"
+                  tooltip="Select edges on sketch (or the whole sketch), edges or wires objects."
                   shape_types="edges wires"
                   concealment="true">
     <validator id="BuildPlugin_ValidatorBaseForBuild" parameters="edge,wire,compound"/>
