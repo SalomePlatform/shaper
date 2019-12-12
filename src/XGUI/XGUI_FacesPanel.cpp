@@ -258,7 +258,8 @@ bool XGUI_FacesPanel::processAction(ModuleBase_ActionType theActionType)
 }
 
 //********************************************************************
-void XGUI_FacesPanel::getObjectsMapFromResult(ResultGroupPtr theResGroup, FeaturePtr theGroupFeature,
+void XGUI_FacesPanel::getObjectsMapFromResult(ResultGroupPtr theResGroup,
+  FeaturePtr theGroupFeature,
   std::map<ObjectPtr, TopoDS_ListOfShape>& theObjectToShapes,
   std::map<ObjectPtr, Handle(ModuleBase_ResultPrs) >& theObjectToPrs)
 {
