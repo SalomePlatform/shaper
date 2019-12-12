@@ -535,21 +535,6 @@ bool Model_Update::processFeature(FeaturePtr theFeature)
       return false;
   }
 
-  if (myProcessed.find(theFeature) == myProcessed.end()) {
-    myProcessed[theFeature] = 0;
-  } else {
-    int aCount = myProcessed[theFeature];
-    if (aCount > 100) {
-      // too many repetition of processing (in VS it may crash on 330 with stack overflow)
-      Events_InfoMessage("Model_Update",
-        "Feature '%1' is updated in infinitive loop").arg(theFeature->data()->name()).send();
-      // to stop iteration
-      myModified.clear();
-      return false;
-    }
-    myProcessed[theFeature] = aCount + 1;
-  }
-
   // check this feature is not yet checked or processed
   bool aIsModified = myModified.find(theFeature) != myModified.end();
   if (!aIsModified && myIsFinish) { // get info about the modification for features without preview
@@ -560,6 +545,21 @@ bool Model_Update::processFeature(FeaturePtr theFeature)
       aNewSet.insert(theFeature);
       myModified[theFeature] = aNewSet;
     }
+  }
+
+  if (myProcessed.find(theFeature) == myProcessed.end()) {
+    myProcessed[theFeature] = 0;
+  } else if (aIsModified) {
+    int aCount = myProcessed[theFeature];
+    if (aCount > 100) {
+      // too many repetition of processing (in VS it may crash on 330 with stack overflow)
+      Events_InfoMessage("Model_Update",
+        "Feature '%1' is updated in infinitive loop").arg(theFeature->data()->name()).send();
+      // to stop iteration
+      myModified.clear();
+      return false;
+    }
+    myProcessed[theFeature] = aCount + 1;
   }
 
 #ifdef DEB_UPDATE
