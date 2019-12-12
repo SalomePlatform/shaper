@@ -70,7 +70,7 @@ bool getGroup(ModuleBase_ViewerPrsPtr thePrs, ResultGroupPtr& theResGroup,
     if (theGroupFeature.get())
       theResGroup = std::dynamic_pointer_cast<ModelAPI_ResultGroup>(theGroupFeature->firstResult());
   }
-  return true;
+  return theGroupFeature.get() && theResGroup.get();
 }
 
 //********************************************************************
