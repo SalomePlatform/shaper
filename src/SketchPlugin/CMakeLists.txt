@@ -215,6 +215,11 @@ ADD_UNIT_TESTS(
   TestConstraintAngle_v0_2.py
   TestConstraintAngle_v20191210_1.py
   TestConstraintAngle_v20191210_2.py
+  TestConstraintAngleBehaviorDirect.py
+  TestConstraintAngleBehaviorSupplementary_1.py
+  TestConstraintAngleBehaviorSupplementary_2.py
+  TestConstraintAngleBehaviorBackward_1.py
+  TestConstraintAngleBehaviorBackward_2.py
   TestConstraintAngleEllipse.py
   TestConstraintCoincidence.py
   TestConstraintCoincidenceEllipse.py
