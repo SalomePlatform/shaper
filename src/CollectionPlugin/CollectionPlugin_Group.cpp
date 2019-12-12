@@ -96,7 +96,7 @@ bool CollectionPlugin_Group::customAction(const std::string& theActionId)
     std::list<ObjectPtr> aResults;
     for(int aNext = aList->size() - 1; aNext >= 0; aNext--) {
       AttributeSelectionPtr anOldAttr = aList->value(aNext);
-      if (anOldAttr->isInvalid() || !anOldAttr->context().get()) {// remove invalids
+      if (anOldAttr->isInvalid() || !anOldAttr->contextObject().get()) {// remove invalids
         aRemoved.insert(aNext);
         continue;
       }
