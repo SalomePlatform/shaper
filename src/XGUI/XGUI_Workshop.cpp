@@ -866,7 +866,7 @@ void XGUI_Workshop::onOperationStopped(ModuleBase_Operation* theOperation)
 
   if (Config_PropManager::boolean("Windows", "use_hide_faces_panel")) {
     if (!theOperation->isHideFacesVisible())
-      myFacesPanel->hide();
+      myFacesPanel->close();
   }
 }
 

@@ -31,6 +31,8 @@
 #include <ModelAPI_ResultGroup.h>
 #include <ModelAPI_Feature.h>
 
+#include <GeomAPI_AISObject.h>
+
 #include <SelectMgr_ListOfFilter.hxx>
 #include <TopoDS_Shape.hxx>
 
@@ -102,12 +104,12 @@ public:
   /// Returns true if the object is in internal container of hidden objects by this panel
   /// \param theObject a checked object
   /// \return boolean value
-  bool isObjectHiddenByPanel(const std::shared_ptr<ModelAPI_Object>& theObject) const
+  bool isObjectHiddenByPanel(const ObjectPtr& theObject) const
   { return myHiddenObjects.find(theObject) != myHiddenObjects.end(); }
 
   /// Removed faces of the objects from the panel
   /// \param container of objects
-  void restoreObjects(const std::set<std::shared_ptr<ModelAPI_Object> >& theHiddenObjects);
+  void restoreObjects(const std::set<ObjectPtr >& theHiddenObjects);
 
   /// Returns true if the event is processed. The default implementation is empty, returns false.
   virtual bool processAction(ModuleBase_ActionType theActionType);
@@ -126,6 +128,9 @@ public:
 
   XGUI_Workshop* workshop() const { return myWorkshop; }
 
+public slots:
+  /// Slot called on an object erase
+  void onObjectDisplay(ObjectPtr theObject, AISObjectPtr theAIS);
 
 protected:
   /// Reimplementation to emit a signal about the panel close
@@ -143,13 +148,13 @@ private:
   /// Redisplay objects.
   /// \param theObjects container of objects
   /// \return true if some of objects was redisplayed
-  static bool redisplayObjects(const std::set<std::shared_ptr<ModelAPI_Object> >& theObjects);
+  static bool redisplayObjects(const std::set<ObjectPtr>& theObjects);
 
   /// Container of objects participating in the panel, it is filled by internal container
   /// \param theItems container of selected values
   /// \param theObjects [out] container of objects
-  static void updateProcessedObjects(QMap<int, std::shared_ptr<ModuleBase_ViewerPrs> > theItems,
-                                     std::set<std::shared_ptr<ModelAPI_Object> >& theObjects);
+  static void updateProcessedObjects(QMap<int, ModuleBase_ViewerPrsPtr> theItems,
+                                     std::set<ObjectPtr>& theObjects);
 
   /// Returns maps of shapes and presentations. If object is a body result then it returns
   /// its ruslts. If it is a group then it returns result of shapes included into the gropup
@@ -171,6 +176,8 @@ private:
 
   double transparency() const;
 
+  void removeItems(std::set<int> theIds);
+
 protected slots:
   /// Deletes element in list of items
   void onDeleteItem();
@@ -181,12 +188,12 @@ protected slots:
   /// Closes faces panel restore all hidden faces by calling reset()
   void onClosed();
 
-private:
   /// Flushes redisplay event and perform update of object browser icons
   /// (objects might be hidden/shown)
   void flushRedisplay() const;
 
-protected:
+private:
+
   QCheckBox* myHiddenOrTransparent; ///< if checked - transparent, else hidden
   ModuleBase_ListView* myListView; ///< list control of processed faces
   XGUI_Workshop* myWorkshop; ///< workshop
@@ -195,9 +202,9 @@ protected:
   int myLastItemIndex; ///< last index to be used in the map of items for the next added item
 
   QMap<int, ModuleBase_ViewerPrsPtr> myItems; ///< selected face items
-  std::set<std::shared_ptr<ModelAPI_Object> > myItemObjects; ///< cached objects of myItems
-  std::set<std::shared_ptr<ModelAPI_Object> > myHiddenObjects; ///< hidden objects
-  std::set<std::shared_ptr<ModelAPI_Object> > myHiddenGroups; ///< hidden objects
+  std::set<ObjectPtr > myItemObjects; ///< cached objects of myItems
+  std::set<ObjectPtr > myHiddenObjects; ///< hidden objects
+  std::set<ObjectPtr > myHiddenGroups; ///< hidden objects
 };
 
 #endif
