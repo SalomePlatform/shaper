@@ -105,13 +105,26 @@ The Result of the operation will be a construction point created on edge:
 By projection on edge or plane
 ------------------------------
 
+To create a point by projection it is necessary to select an existing point or wertex which will be projected and an edge or a plane (planar face) on which it will be projected:
+
+**On an edge:**
+
 .. image:: images/Point3.png
    :align: center
 	
 .. centered::
-   **By projection**
+   **By projection on an edge**
 
-To create a point, select an existing point or vertex and an edge or face. The new point will be created by projection of the selected point on the edge or face.
+**On a plane:**
+
+.. image:: images/Point3-1.png
+   :align: center
+	
+.. centered::
+   **By projection on a plane**
+
+
+The new point will be created by projection of the selected point on the selected object.
 
 **TUI Commands**:
 
@@ -138,17 +151,33 @@ The Result of the operation will be a construction point created by projection o
 By intersection of objects
 --------------------------
 
+A point can be created by intersection of selected objects:
+
+**Two edges**
+
 .. image:: images/Point4.png
    :align: center
 	
 .. centered::
-   **Intersection of objects**
+   **Intersection of edges**
 
-To create a point, select:
+**Edge and plane**
 
-#. two edges,
-#. edge and plane,
-#. three planes
+.. image:: images/Point4-1.png
+   :align: center
+	
+.. centered::
+   **Intersection of and edge and a plane**
+
+In this case it is possible to define an offset from a plane along the plane normal for the created point.
+
+**Three planes**
+
+.. image:: images/Point4-2.png
+   :align: center
+	
+.. centered::
+   **Intersection of three planes**
 
 The new point will be defined by intersection of the selected objects.
 
@@ -179,13 +208,25 @@ The Result of the operation will be a construction point created by intersection
 By geometrical property of object
 ---------------------------------
 
+It is possible to use the following property of selected object:
+
+**A center of gravity**
+
 .. image:: images/Point5.png
    :align: center
 	
 .. centered::
-   **By geometrical property**
+   **By center of gravity**
 
-In this case the new point can be defined as a center of gravity of the selected object or as a center of a circle. To create a point, select the desirable object.
+**A center of circle or arc**
+
+.. image:: images/Point5-1.png
+   :align: center
+	
+.. centered::
+   **By center of a circle**
+   
+To create a point, select a desirable object.
 
 **TUI Commands**:
 
