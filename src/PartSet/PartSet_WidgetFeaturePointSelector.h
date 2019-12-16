@@ -36,6 +36,7 @@ class ModuleBase_IWorkshop;
 class Config_WidgetAPI;
 class ModuleBase_IViewWindow;
 class ModuleBase_ViewerPrs;
+class PartSet_ExternalObjectsMgr;
 
 class GeomAPI_Pnt;
 class GeomAPI_Pnt2d;
@@ -115,9 +116,22 @@ protected:
   /// a shape. If the attribute do not uses the shape, it is empty
   virtual QList<std::shared_ptr<ModuleBase_ViewerPrs>> getAttributeSelection() const;
 
-protected:
   /// The methiod called when widget is activated
   virtual void activateCustom();
+
+  /// Return an object and geom shape by the viewer presentation
+  /// \param thePrs a selection
+  /// \param theObject an output object
+  /// \param theShape a shape of the selection
+  virtual void getGeomSelection(const std::shared_ptr<ModuleBase_ViewerPrs>& thePrs,
+    ObjectPtr& theObject, GeomShapePtr& theShape);
+
+  /// Creates a backup of the current values of the attribute
+  /// It should be realized in the specific widget because of different
+  /// parameters of the current attribute
+  /// \param theAttribute an attribute
+  /// \param theValid a boolean flag, if restore happens for valid parameters
+  void restoreAttributeValue(const AttributePtr& theAttribute, const bool theValid);
 
 protected:
   bool fillFeature(const std::shared_ptr<ModuleBase_ViewerPrs>& theSelectedPrs,
@@ -137,6 +151,7 @@ protected:
   bool myHasPreview;
   std::shared_ptr<ModelAPI_Object> myPreviewObject;
   std::shared_ptr<GeomAPI_Pnt2d>   myPreviewPoint;
+  PartSet_ExternalObjectsMgr* myExternalObjectMgr; ///< reference to external objects manager
 };
 
 #endif

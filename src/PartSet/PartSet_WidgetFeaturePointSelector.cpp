@@ -17,6 +17,10 @@
 // See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 
+#include "PartSet_WidgetFeaturePointSelector.h"
+#include "PartSet_Tools.h"
+#include "PartSet_ExternalObjectsMgr.h"
+
 #include <Config_WidgetAPI.h>
 
 #include <Events_Loop.h>
@@ -39,9 +43,6 @@
 #include <ModuleBase_IViewWindow.h>
 #include <ModuleBase_IWorkshop.h>
 #include <ModuleBase_IModule.h>
-
-#include "PartSet_WidgetFeaturePointSelector.h"
-#include "PartSet_Tools.h"
 
 #include <SketchPlugin_Point.h>
 
@@ -75,10 +76,13 @@ PartSet_WidgetFeaturePointSelector::PartSet_WidgetFeaturePointSelector(QWidget* 
     myPreviewObjectAttribute = anAttributesList[2].toStdString();
     myPreviewPointAttribute = anAttributesList[3].toStdString();
   }
+  myExternalObjectMgr = new PartSet_ExternalObjectsMgr(theData->getProperty("use_external"),
+    theData->getProperty("can_create_external"), true);
 }
 
 PartSet_WidgetFeaturePointSelector::~PartSet_WidgetFeaturePointSelector()
 {
+  delete myExternalObjectMgr;
 }
 
 //********************************************************************
@@ -154,6 +158,19 @@ void PartSet_WidgetFeaturePointSelector::mouseReleased(ModuleBase_IViewWindow* t
   // the contex menu release by the right button should not be processed by this widget
   if (theEvent->button() != Qt::LeftButton)
     return;
+
+  ModuleBase_ISelection* aSelection = myWorkshop->selection();
+  QList<ModuleBase_ViewerPrsPtr> aSelected = aSelection->getSelected(ModuleBase_ISelection::Viewer);
+
+  ModuleBase_ViewerPrsPtr aPrs =
+    !aSelected.empty() ? aSelected.first() : ModuleBase_ViewerPrsPtr();
+  if (aPrs.get() && aPrs->object().get()) {
+    myPreviewObject = aSelection->getResult(aPrs);
+    GeomShapePtr aShape = aSelection->getShape(aPrs);
+    myExternalObjectMgr->getGeomSelection(aPrs, myPreviewObject, aShape,
+      myWorkshop, sketch(), true);
+  }
+  myPreviewPoint = PartSet_Tools::getPnt2d(theEvent, theWindow, mySketch);
 
   ObjectPtr aPreviewObject;
   GeomPnt2dPtr aPreviewPoint;
@@ -260,4 +277,24 @@ void PartSet_WidgetFeaturePointSelector::setPreSelection(
   // the method is empty because firstly by starging of the feature there is no selection of
   // sub-segments in the viewer, secondly preselection of restart operation is processed by
   // special reentrant message sent by the feature
+}
+
+//********************************************************************
+void PartSet_WidgetFeaturePointSelector::getGeomSelection(const ModuleBase_ViewerPrsPtr& thePrs,
+  ObjectPtr& theObject, GeomShapePtr& theShape)
+{
+  ModuleBase_WidgetShapeSelector::getGeomSelection(thePrs, theObject, theShape);
+
+  myExternalObjectMgr->getGeomSelection(thePrs, theObject, theShape,
+    myWorkshop, sketch(), myIsInValidate);
+  myPreviewObject = theObject;
+}
+
+//********************************************************************
+void PartSet_WidgetFeaturePointSelector::restoreAttributeValue(const AttributePtr& theAttribute,
+  const bool theValid)
+{
+  ModuleBase_WidgetShapeSelector::restoreAttributeValue(theAttribute, theValid);
+  myExternalObjectMgr->removeExternal(sketch(), myFeature, myWorkshop, true);
+  myPreviewObject = ObjectPtr();
 }
