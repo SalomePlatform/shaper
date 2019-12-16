@@ -660,7 +660,8 @@ void XGUI_FacesPanel::onObjectDisplay(ObjectPtr theObject, AISObjectPtr theAIS)
           aIdsToRem.insert(aIt.key());
         }
         else {
-          std::map<ObjectPtr, Handle(ModuleBase_ResultPrs)>::iterator aPIt = aObjectToPrs.find(theObject);
+          std::map<ObjectPtr, Handle(ModuleBase_ResultPrs)>::iterator aPIt =
+            aObjectToPrs.find(theObject);
           if (aPIt != aObjectToPrs.end()) {
             ObjectPtr aObj = aPIt->first;
             if (aObj == theObject) {
