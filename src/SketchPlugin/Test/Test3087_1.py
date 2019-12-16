@@ -61,3 +61,5 @@ if __name__ == "__main__":
     Events_Loop.loop().flush(event);
 
     assert(listener.myEventProcessed)
+    # explicitly remove the listener to improve code coverage
+    listener.__del__()
