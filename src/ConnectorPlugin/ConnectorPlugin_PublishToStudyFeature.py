@@ -84,6 +84,7 @@ class PublishToStudyFeature(ModelAPI.ModelAPI_Feature):
             print("Found a result to publish ", aRes.data().name())
             aResFeatureId = aPartDoc.feature(aRes).data().featureId()
             aSSEntry = str(aPartFeatureId) + ":" + str(aResFeatureId)
-            aSShape = anEngine.CreateShape(aSSEntry)
-            aSShape.SetShapeByStream(aRes.shape().getShapeStream())
-            anEngine.AddInStudy(aSShape, aRes.data().name(), None)
+            aSShape = anEngine.FindOrCreateShape(aSSEntry)
+            aSShape.SetShapeByStream(aRes.shape().getShapeStream(False))
+            if not aSShape.GetSO(): # publish in case it is a new shape
+              anEngine.AddInStudy(aSShape, aRes.data().name(), None)

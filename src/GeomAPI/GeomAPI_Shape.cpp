@@ -32,6 +32,7 @@
 #include <BRepAlgoAPI_Section.hxx>
 #include <BRepBndLib.hxx>
 #include <BRepBuilderAPI_FindPlane.hxx>
+#include <BRepBuilderAPI_Copy.hxx>
 #include <BRepExtrema_DistShapeShape.hxx>
 #include <BRepTools.hxx>
 #include <Bnd_Box.hxx>
@@ -638,11 +639,17 @@ GeomPointPtr GeomAPI_Shape::middlePoint() const
 }
 
 // LCOV_EXCL_START
-std::string GeomAPI_Shape::getShapeStream() const
+std::string GeomAPI_Shape::getShapeStream(const bool theWithTriangulation) const
 {
   std::ostringstream aStream;
   const TopoDS_Shape& aShape = const_cast<GeomAPI_Shape*>(this)->impl<TopoDS_Shape>();
-  BRepTools::Write(aShape, aStream);
+  if (!theWithTriangulation) { // make a copy of shape without triangulation
+    BRepBuilderAPI_Copy aCopy(aShape, Standard_False, Standard_False);
+    const TopoDS_Shape& aCopyShape = aCopy.Shape();
+    BRepTools::Write(aCopyShape, aStream);
+  } else {
+    BRepTools::Write(aShape, aStream);
+  }
   return aStream.str();
 }
 // LCOV_EXCL_STOP
