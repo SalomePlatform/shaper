@@ -8,7 +8,7 @@ pushd %PARENT_DIR%
 popd
 
 @SET OCC_LIB_PREFIX=d
-call env_Salome.bat d
+call env_Salome.bat d run
 
 @SET SHAPER_ROOT_DIR=%ROOT_DIR%\install
 @SET SalomeAppConfig=%SHAPER_ROOT_DIR%\share\salome\resources\shaper;%GUI_ROOT_DIR%\share\salome\resources\gui
