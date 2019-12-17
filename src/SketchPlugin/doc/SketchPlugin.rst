@@ -153,14 +153,14 @@ Sketcher comes into overconstrained state when an extra constraint was defined. 
 .. centered::
   Overconstrained Sketch
 
-When Sketcher becomes into the state then:
+When Sketcher gets this state then:
 
 - buttons Apply and Cancel for the whole Sketcher are blocked;
 - a constraint which causes the overconstraint state is highlightid by red color;
 - a warning message in sketcher Property Panel is shown with recomendation what to do in this case;
 - an additional Undo button is shown under the warning messages;
 
-After undoing the last operation or deletion of a conflicting constraint Sketcher will become into a normal state.
+After undoing the last operation or deletion of a conflicting constraint Sketcher will be reverted into a normal state.
 
 Operations
 ----------
