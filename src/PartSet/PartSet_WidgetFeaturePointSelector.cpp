@@ -194,6 +194,10 @@ void PartSet_WidgetFeaturePointSelector::mouseReleased(ModuleBase_IViewWindow* t
   if (!aPreviewObject.get())
     return;
 
+  // Do not use non-sketcher objects
+  if (!sketch()->isSub(myPreviewObject))
+    return;
+
   // set parameters of preview into parameters of selection in the feature
   std::shared_ptr<GeomDataAPI_Point2D> aPointSelectedAttr =
                           std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
