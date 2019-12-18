@@ -66,7 +66,8 @@ PartSet_WidgetFeaturePointSelector::PartSet_WidgetFeaturePointSelector(QWidget* 
 : ModuleBase_WidgetShapeSelector(theParent, theWorkshop, theData)
 {
   std::string anAttributes = theData->getProperty("selection_attributes");
-  QStringList anAttributesList = QString(anAttributes.c_str()).split(' ', QString::SkipEmptyParts);
+  QStringList anAttributesList =
+    QString(anAttributes.c_str()).split(' ', QString::SkipEmptyParts);
 
   myHasPreview = anAttributesList.size() >= 4;
 
@@ -138,7 +139,8 @@ void PartSet_WidgetFeaturePointSelector::mouseReleased(ModuleBase_IViewWindow* t
     return;
 
   ModuleBase_ISelection* aSelection = myWorkshop->selection();
-  QList<ModuleBase_ViewerPrsPtr> aSelected = aSelection->getSelected(ModuleBase_ISelection::Viewer);
+  QList<ModuleBase_ViewerPrsPtr> aSelected =
+    aSelection->getSelected(ModuleBase_ISelection::Viewer);
 
   ModuleBase_ViewerPrsPtr aPrs =
     !aSelected.empty() ? aSelected.first() : ModuleBase_ViewerPrsPtr();
