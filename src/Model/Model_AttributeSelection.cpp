@@ -790,6 +790,9 @@ std::string Model_AttributeSelection::namingName(const std::string& theDefaultNa
   }
 
   ResultPtr aCont = context();
+  if (!aCont.get()) {
+    return ""; // invalid case
+  }
   TDF_Label aSelLab = selectionLabel();
   if (aSelLab.IsAttribute(kSIMPLE_REF_ID)) { // whole context, no value
     return contextName(aCont);
