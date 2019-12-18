@@ -131,11 +131,6 @@ void SketchPlugin_ConstraintAngle::execute()
       GeomDataAPI_Point2D>(aData->attribute(SketchPlugin_Constraint::FLYOUT_VALUE_PNT()));
   if(!aFlyOutAttr->isInitialized())
     compute(SketchPlugin_Constraint::FLYOUT_VALUE_PNT());
-
-  static Events_ID anId = ModelAPI_EventReentrantMessage::eventId();
-  std::shared_ptr<ModelAPI_EventReentrantMessage> aMessage(
-      new ModelAPI_EventReentrantMessage(anId, this));
-  Events_Loop::loop()->send(aMessage);
 }
 
 AISObjectPtr SketchPlugin_ConstraintAngle::getAISObject(AISObjectPtr thePrevious)

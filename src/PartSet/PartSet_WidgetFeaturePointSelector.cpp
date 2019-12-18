@@ -94,37 +94,6 @@ bool PartSet_WidgetFeaturePointSelector::isValidSelection(
 }
 
 //********************************************************************
-void PartSet_WidgetFeaturePointSelector::updateSelectionModesAndFilters(bool toActivate)
-{
-#ifdef HIGHLIGHT_STAYS_PROBLEM
-  Handle(AIS_InteractiveContext) aContext =
-                            XGUI_Tools::workshop(myWorkshop)->viewer()->AISContext();
-  Quantity_Color aColor;
-  Handle(Prs3d_Drawer) aHStyle = aContext->HighlightStyle();
-  Handle(Prs3d_Drawer) aSStyle = aContext->SelectionStyle();
-  if (toActivate) {
-    std::vector<int> aColors;
-    aColors = Config_PropManager::color("Visualization", "sketch_entity_color");
-    aColor = Quantity_Color(aColors[0] / 255., aColors[1] / 255., aColors[2] / 255.,
-                            Quantity_TOC_RGB);
-    myHighlightColor = aHStyle->Color();
-    mySelectionColor = aSStyle->Color();
-  }
-  else {
-    aColor = myHighlightColor;
-  }
-  aHStyle->SetColor(aColor);
-  aContext->SetHighlightStyle(aHStyle);
-
-  aSStyle->SetColor(aColor);
-  aContext->SetSelectionStyle(aSStyle);
-
-#endif
-
-  ModuleBase_WidgetShapeSelector::updateSelectionModesAndFilters(toActivate);
-}
-
-//********************************************************************
 void PartSet_WidgetFeaturePointSelector::activateCustom()
 {
   ModuleBase_WidgetShapeSelector::activateCustom();
@@ -148,7 +117,16 @@ void PartSet_WidgetFeaturePointSelector::mouseMoved(ModuleBase_IViewWindow* theW
 
   ModuleBase_ViewerPrsPtr aPrs = !aHighlighted.empty() ? aHighlighted.first()
                                                        : ModuleBase_ViewerPrsPtr();
-  fillFeature(aPrs, theWindow, theEvent);
+  myPreviewPoint = PartSet_Tools::getPnt2d(theEvent, theWindow, mySketch);
+  if (myHasPreview) {
+    if (aPrs.get() && aPrs->object().get())
+      myPreviewObject = aPrs->object();
+    else
+      myPreviewObject = ObjectPtr();
+    fillFeature();
+    updateObject(feature());
+    Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_TO_REDISPLAY));
+  }
 }
 
 //********************************************************************
@@ -195,7 +173,7 @@ void PartSet_WidgetFeaturePointSelector::mouseReleased(ModuleBase_IViewWindow* t
     return;
 
   // Do not use non-sketcher objects
-  if (!sketch()->isSub(myPreviewObject))
+  if (!sketch()->isSub(aPreviewObject))
     return;
 
   // set parameters of preview into parameters of selection in the feature
@@ -224,38 +202,47 @@ void PartSet_WidgetFeaturePointSelector::mouseReleased(ModuleBase_IViewWindow* t
 }
 
 //********************************************************************
-bool PartSet_WidgetFeaturePointSelector::fillFeature(
-                            const std::shared_ptr<ModuleBase_ViewerPrs>& theSelectedPrs,
-                            ModuleBase_IViewWindow* theWindow,
-                            QMouseEvent* theEvent)
+bool PartSet_WidgetFeaturePointSelector::fillFeature()
 {
-  bool aFilled = false;
-  if (theSelectedPrs.get() && theSelectedPrs->object().get())
-    myPreviewObject = theSelectedPrs->object();
-  myPreviewPoint = PartSet_Tools::getPnt2d(theEvent, theWindow, mySketch);
-
   if (myHasPreview) {
     std::shared_ptr<ModelAPI_AttributeReference> aRef =
                             std::dynamic_pointer_cast<ModelAPI_AttributeReference>(
                             feature()->data()->attribute(myPreviewObjectAttribute));
     aRef->setValue(myPreviewObject);
+    if (myPreviewPoint.get()) {
+      std::shared_ptr<GeomDataAPI_Point2D> anAttributePoint =
+        std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
+          feature()->data()->attribute(myPreviewPointAttribute));
+      anAttributePoint->setValue(myPreviewPoint);
+    }
+  }
+  else {
+    // Do not use non-sketcher objects
+    if (!sketch()->isSub(myPreviewObject))
+      return false;
 
-    std::shared_ptr<GeomDataAPI_Point2D> anAttributePoint =
-                    std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
-                    feature()->data()->attribute(myPreviewPointAttribute));
-    anAttributePoint->setValue(myPreviewPoint);
+    // set parameters of preview into parameters of selection in the feature
+    if (myPreviewPoint.get()) {
+      std::shared_ptr<GeomDataAPI_Point2D> aPointSelectedAttr =
+        std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
+          feature()->data()->attribute(mySelectedPointAttribute));
+      aPointSelectedAttr->setValue(myPreviewPoint);
+    }
+    AttributeReferencePtr aRefSelectedAttr = feature()->reference(mySelectedObjectAttribute);
+    if (aRefSelectedAttr)
+      aRefSelectedAttr->setValue(myPreviewObject);
+    else {
+      AttributeRefAttrPtr aRefAttrSelectedAttr = feature()->refattr(mySelectedObjectAttribute);
+      if (aRefAttrSelectedAttr)
+        aRefAttrSelectedAttr->setObject(myPreviewObject);
+    }
   }
   // redisplay AIS presentation in viewer
 #ifndef HIGHLIGHT_STAYS_PROBLEM
   // an attempt to clear highlighted item in the viewer: but of OCCT
   XGUI_Tools::workshop(myWorkshop)->displayer()->clearSelected(true);
 #endif
-  updateObject(feature());
-  Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_TO_REDISPLAY));
-
-  aFilled = true;
-
-  return aFilled;
+  return true;
 }
 
 //********************************************************************
@@ -265,16 +252,22 @@ QList<ModuleBase_ViewerPrsPtr> PartSet_WidgetFeaturePointSelector::getAttributeS
 }
 
 //********************************************************************
-bool PartSet_WidgetFeaturePointSelector::setSelection(
-                                          QList<std::shared_ptr<ModuleBase_ViewerPrs>>& theValues,
-                                          const bool theToValidate)
+bool PartSet_WidgetFeaturePointSelector::setSelectionCustom(const ModuleBase_ViewerPrsPtr& thePrs)
 {
-  // false is returned to do not emit focus out widget by selected sub-shape
-  return false;
+  if (!thePrs.get() || !thePrs->object().get())
+    return false;
+
+  ModuleBase_ISelection* aSelection = myWorkshop->selection();
+  myPreviewObject = aSelection->getResult(thePrs);
+  GeomShapePtr aShape = aSelection->getShape(thePrs);
+  myExternalObjectMgr->getGeomSelection(thePrs, myPreviewObject, aShape, myWorkshop,
+    sketch(), true);
+  return fillFeature();
 }
 
+//********************************************************************
 void PartSet_WidgetFeaturePointSelector::setPreSelection(
-                                  const std::shared_ptr<ModuleBase_ViewerPrs>& thePreSelected,
+                                  const ModuleBase_ViewerPrsPtr& thePreSelected,
                                   ModuleBase_IViewWindow* theWnd,
                                   QMouseEvent* theEvent)
 {

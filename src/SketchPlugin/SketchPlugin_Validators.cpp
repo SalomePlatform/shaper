@@ -946,8 +946,16 @@ bool SketchPlugin_SplitValidator::isValid(const AttributePtr& theAttribute,
   }
   AttributeReferencePtr aFeatureAttr =
             std::dynamic_pointer_cast<ModelAPI_AttributeReference>(theAttribute);
+  std::shared_ptr<SketchPlugin_Feature> aSplitFeature =
+    std::dynamic_pointer_cast<SketchPlugin_Feature>(theAttribute->owner());
 
   ObjectPtr anAttrObject = aFeatureAttr->value();
+  if (!anAttrObject) {
+    AttributePtr aPreviewAttr = aSplitFeature->attribute(SketchPlugin_Trim::PREVIEW_OBJECT());
+    aFeatureAttr = std::dynamic_pointer_cast<ModelAPI_AttributeReference>(aPreviewAttr);
+    anAttrObject = aFeatureAttr->value();
+  }
+
   FeaturePtr anAttrFeature = ModelAPI_Feature::feature(anAttrObject);
   if (!anAttrFeature)
     return aValid;

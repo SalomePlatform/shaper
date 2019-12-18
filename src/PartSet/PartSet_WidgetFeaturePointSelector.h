@@ -22,6 +22,7 @@
 
 #include <ModelAPI_CompositeFeature.h>
 #include <ModuleBase_WidgetShapeSelector.h>
+#include <ModuleBase_ViewerPrs.h>
 
 #include "PartSet.h"
 #include "PartSet_MouseProcessor.h"
@@ -73,10 +74,6 @@ Q_OBJECT
   /// \return a boolean value
   virtual bool isValidSelection(const std::shared_ptr<ModuleBase_ViewerPrs>& theValue);
 
-  /// Activate or deactivate selection and selection filters
-  /// \return true if the selection filter of the widget is activated in viewer context
-  virtual void updateSelectionModesAndFilters(bool toActivate);
-
   /// Set sketcher
   /// \param theSketch a sketcher object
   void setSketcher(CompositeFeaturePtr theSketch) { mySketch = theSketch; }
@@ -97,17 +94,13 @@ Q_OBJECT
   /// \param theEvent a mouse event
   virtual void mouseReleased(ModuleBase_IViewWindow* theWindow, QMouseEvent* theEvent);
 
-  /// Set the given wrapped value to the current widget
-  /// This value should be processed in the widget according to the needs
-  /// The method is called by the current operation to process the operation preselection.
-  /// It is redefined to fill attributes responsible for the sub selection
-  /// \param theValues the wrapped selection values
-  /// \param theToValidate a flag on validation of the values
-  virtual bool setSelection(QList<std::shared_ptr<ModuleBase_ViewerPrs>>& theValues,
-                            const bool theToValidate);
+
+  /// Fills the attribute with the value of the selected owner
+  /// \param thePrs a selected owner
+  virtual bool setSelectionCustom(const ModuleBase_ViewerPrsPtr& thePrs);
 
   /// Fill preselection used in mouseReleased
-  virtual void setPreSelection(const std::shared_ptr<ModuleBase_ViewerPrs>& thePreSelected,
+  virtual void setPreSelection(const ModuleBase_ViewerPrsPtr& thePreSelected,
                                ModuleBase_IViewWindow* theWnd,
                                QMouseEvent* theEvent);
 protected:
@@ -134,9 +127,7 @@ protected:
   void restoreAttributeValue(const AttributePtr& theAttribute, const bool theValid);
 
 protected:
-  bool fillFeature(const std::shared_ptr<ModuleBase_ViewerPrs>& theSelectedPrs,
-                   ModuleBase_IViewWindow* theWnd,
-                   QMouseEvent* theEvent);
+  bool fillFeature();
 
   /// Pointer to a sketch
   CompositeFeaturePtr mySketch;
