@@ -76,7 +76,7 @@ By distance on edge
 .. centered::
    **Along an edge**
 
-To create a point, select an edge in a viewer and define a distance along the edge, where point will be defined. This distance can be defined by an absolute value or by a relative one as a ratio to the edge length. The direction of the edge can be reversed by the corresponded check box.
+To create a point, select an edge in a viewer and define a distance along the edge, where point will be defined. This distance can be defined by an absolute value or by a relative one as a ratio to the edge length. The direction of the edge can be reversed by the corresponding check-box.
 
 **TUI Commands**:
 

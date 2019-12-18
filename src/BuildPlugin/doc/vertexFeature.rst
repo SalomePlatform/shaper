@@ -18,7 +18,7 @@ The following property panel will be opened:
 .. centered::
   Create vertices
 
-Select one or several vertices in the viewer. It also allowed to select a whole sketch result in the object browser, then all start and end points of the sketch segments will be added into result. Checkbox **Compute intersections** forces to include intersection vertices of edges of the selected sketch.
+Select one or several vertices in the viewer. It is also possible to select a whole sketch result or feature in the object browser, then all start and end points of the sketch segments will be added into result. Checkbox **Compute intersections** forces to include intersection vertices of edges of the selected sketch.
 
 **Apply** button creates vertices.
 
