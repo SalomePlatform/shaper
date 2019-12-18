@@ -586,16 +586,19 @@ void PartSet_WidgetSketchLabel::showEvent(QShowEvent* theEvent)
 
 void PartSet_WidgetSketchLabel::onShowPanel()
 {
-  if (mySizeOfViewWidget->isVisible()) {
+  //if (mySizeOfViewWidget->isVisible()) {
+  if (myStackWidget->currentIndex() == 0) {
     DocumentPtr aDoc = feature()->document();
     DocumentPtr aModDoc = ModelAPI_Session::get()->moduleDocument();
     if (aModDoc == aDoc) {
       myPartSetMessage->move(mapToGlobal(geometry().bottomLeft()));
       myPartSetMessage->show();
     }
-    QPoint aPnt = mySizeOfView->mapToGlobal(mySizeOfView->geometry().center());
-    mySizeMessage->move(aPnt);
-    mySizeMessage->show();
+    if (mySizeOfViewWidget->isVisible()) {
+      QPoint aPnt = mySizeOfView->mapToGlobal(mySizeOfView->geometry().center());
+      mySizeMessage->move(aPnt);
+      mySizeMessage->show();
+    }
   }
 }
 
