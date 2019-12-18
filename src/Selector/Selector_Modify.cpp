@@ -48,32 +48,34 @@ static void findBases(TDF_Label theAccess, Handle(TNaming_NamedShape) theFinal,
   bool aMustBeAtFinal, const TDF_Label& theAdditionalDocument, TDF_LabelList& theResult)
 {
   bool aFoundAnyShape = false;
-  TNaming_SameShapeIterator aLabIter(theValue, theAccess);
-  for(; aLabIter.More(); aLabIter.Next()) {
-    Handle(TNaming_NamedShape) aNS;
-    if (aLabIter.Label().FindAttribute(TNaming_NamedShape::GetID(), aNS)) {
-      if (aMustBeAtFinal && aNS != theFinal)
-        continue; // looking for old at the same final label only
-      TNaming_Evolution anEvolution = aNS->Evolution();
-      if (anEvolution == TNaming_PRIMITIVE) {
-        // check that this is not in the results already
-        const TDF_Label aResult = aNS->Label();
-        TDF_LabelList::Iterator aResIter(theResult);
-        for(; aResIter.More(); aResIter.Next()) {
-          if (aResIter.Value().IsEqual(aResult))
-            break;
+  if (TNaming_Tool::HasLabel(theAccess, theValue)) {
+    TNaming_SameShapeIterator aLabIter(theValue, theAccess);
+    for(; aLabIter.More(); aLabIter.Next()) {
+      Handle(TNaming_NamedShape) aNS;
+      if (aLabIter.Label().FindAttribute(TNaming_NamedShape::GetID(), aNS)) {
+        if (aMustBeAtFinal && aNS != theFinal)
+          continue; // looking for old at the same final label only
+        TNaming_Evolution anEvolution = aNS->Evolution();
+        if (anEvolution == TNaming_PRIMITIVE) {
+          // check that this is not in the results already
+          const TDF_Label aResult = aNS->Label();
+          TDF_LabelList::Iterator aResIter(theResult);
+          for(; aResIter.More(); aResIter.Next()) {
+            if (aResIter.Value().IsEqual(aResult))
+              break;
+          }
+          if (!aResIter.More()) // not found, so add this new
+            theResult.Append(aResult);
+          aFoundAnyShape = true;
         }
-        if (!aResIter.More()) // not found, so add this new
-          theResult.Append(aResult);
-        aFoundAnyShape = true;
-      }
-      if (anEvolution == TNaming_GENERATED || anEvolution == TNaming_MODIFY) {
-        for(TNaming_Iterator aThisIter(aNS); aThisIter.More(); aThisIter.Next()) {
-          if (aThisIter.NewShape().IsSame(theValue)) {
-            // continue recursively, null NS means that any NS are ok
-            findBases(theAccess, theFinal, aThisIter.OldShape(),
-              false, theAdditionalDocument, theResult);
-            aFoundAnyShape = true;
+        if (anEvolution == TNaming_GENERATED || anEvolution == TNaming_MODIFY) {
+          for(TNaming_Iterator aThisIter(aNS); aThisIter.More(); aThisIter.Next()) {
+            if (aThisIter.NewShape().IsSame(theValue)) {
+              // continue recursively, null NS means that any NS are ok
+              findBases(theAccess, theFinal, aThisIter.OldShape(),
+                false, theAdditionalDocument, theResult);
+              aFoundAnyShape = true;
+            }
           }
         }
       }
