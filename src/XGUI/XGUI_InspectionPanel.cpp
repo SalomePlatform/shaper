@@ -229,6 +229,7 @@ void XGUI_InspectionPanel::setSubShapeValue(SudShape theId, int theVal)
 //********************************************************************
 void XGUI_InspectionPanel::clearContent()
 {
+  myStackWgt->setCurrentIndex(myFeaturePanelId);
   setName("");
   for (int i = 0; i <= VertexId; i++) {
     mySubShapesTab->item((SudShape)i, 1)->setText("");
