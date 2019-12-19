@@ -143,6 +143,7 @@ Standard dock windows are:
 
 - :ref:`object_browser`
 - :ref:`inspection_panel`
+- :ref:`hidefaces_panel`
 - :ref:`python console`
 - :ref:`property_panel`
 
@@ -353,6 +354,28 @@ The information about  Plane, Face additionally shows coordinates of center poin
 
 .. centered::
    Inspection panel for Face 
+
+.. _hidefaces_panel:
+
+Hide Faces panel
+^^^^^^^^^^^^^^^^
+
+**Hide Faces** panel makes possible to hide temporary faces of any displayed object. **Hide Faces** panel looks like following:
+
+.. image:: images/hide_faces_panel.png
+   :align: center
+
+.. centered::
+   Hide Faces panel
+
+- If this panel is activated it "listens" user selection.
+- If a face is selected then its name will be shown in the panel's list and hidden in the viewer. 
+- If user selects a group of faces (or at least a one face of this group) then whole group will be hidden and also all faces from all objects referenced by this group.
+- If user will display the hidden group again (by a show operation) then the group will be removed from Hide Faces list and visibility of all referenced faces will be restored.
+
+Also it is possible do not to hide faces, but make them transparent. For this purpose **"Transparent"** check-box can be used. Value of the transparency can be changed in **Visualization** tab of **Preferences** dialog box.
+Closing of **Hide Faces** panel restores visibility state of all objects. If it is necessary to deactivete the **Hide Faces** panel (preserving the current display state) then user has to press **"Esc"** button.
+
 
 .. _python console:
 
