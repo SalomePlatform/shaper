@@ -250,7 +250,7 @@ void ModuleBase_WidgetMultiSelector::deactivate()
 
   ModuleBase_WidgetSelector::deactivate();
   if (myVisibleObjects.size())
-    onShowOnly(false);
+    myShowOnlyBtn->setChecked(false);
 
   myWorkshop->module()->deactivateCustomPrs(ModuleBase_IModule::CustomizeHighlightedObjects, true);
   clearSelectedHistory();
