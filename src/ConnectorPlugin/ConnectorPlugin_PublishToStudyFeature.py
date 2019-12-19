@@ -28,8 +28,8 @@ import salome
 from salome.shaper import model
 
 import os
-import salome
 
+import SHAPERSTUDY_ORB
 
 ## @ingroup Plugins
 #  Feature to export all shapes and groups into the GEOM module
@@ -59,17 +59,25 @@ class PublishToStudyFeature(ModelAPI.ModelAPI_Feature):
 
     ## Exports all shapes and groups into the GEOM module.
     def execute(self):
-        print("### Execution of PublishToStudy")
-
+        aSession = ModelAPI.ModelAPI_Session.get()
+        aPartSet = aSession.moduleDocument()
+        # check that the PartSet document current feature is the last to avoid problems with all
+        # features update
+        if aPartSet.size(model.ModelAPI_Feature_group()) > 0:
+          aLastFeature = ModelAPI.objectToFeature(aPartSet.object(model.ModelAPI_Feature_group(), aPartSet.size(model.ModelAPI_Feature_group()) - 1))
+          aCurrentFeature = aPartSet.currentFeature(True)
+          if aLastFeature.data().featureId() != aCurrentFeature.data().featureId():
+            EventsAPI.Events_InfoMessage("PublishToStudy", "Not all PartSet parts are up-to-date, nothing is published. Please, make the last PartSet feature as current.", self).send()
+            return
         # find a shaper-study component
         salome.salome_init(1)
         import SHAPERSTUDY_utils
-        SHAPERSTUDY_utils.findOrCreateComponent()
+        aComponent = SHAPERSTUDY_utils.findOrCreateComponent()
         anEngine = SHAPERSTUDY_utils.getEngine()
+        # collect all processed internal entries to break the link of unprocessed later
+        allProcessed = []
 
         # iterate all parts and all results to publish them in SHAPER_STUDY
-        aSession = ModelAPI.ModelAPI_Session.get()
-        aPartSet = aSession.moduleDocument()
         for aPartId in range(aPartSet.size(model.ModelAPI_ResultPart_group())):
           aPartObject = aPartSet.object(model.ModelAPI_ResultPart_group(), aPartId)
           aPartRes = ModelAPI.modelAPI_ResultPart(ModelAPI.modelAPI_Result(aPartObject))
@@ -88,3 +96,35 @@ class PublishToStudyFeature(ModelAPI.ModelAPI_Feature):
             aSShape.SetShapeByStream(aRes.shape().getShapeStream(False))
             if not aSShape.GetSO(): # publish in case it is a new shape
               anEngine.AddInStudy(aSShape, aRes.data().name(), None)
+            allProcessed.append(aSSEntry)
+
+        # process all SHAPER-STUDY shapes to find dead
+        deadNames = []
+        aSOIter = SHAPERSTUDY_utils.getStudy().NewChildIterator(aComponent)
+        while aSOIter.More():
+          aSO = aSOIter.Value()
+          anIOR = aSO.GetIOR()
+          anObj = salome.orb.string_to_object(anIOR)
+          if isinstance(anObj, SHAPERSTUDY_ORB._objref_SHAPER_Object):
+            anEntry = anObj.GetEntry()
+            if len(anEntry) == 0:
+              continue;
+            elif anEntry.startswith("dead"):
+              deadNames.append(anObj.GetEntry())
+            elif anEntry not in allProcessed: # found a removed shape: make it dead
+              anIndex = 1
+              aName = "dead" + str(anIndex) + "_" + anEntry
+              while aName in deadNames:
+                anIndex = anIndex + 1
+                aName = "dead" + str(anIndex) + "_" + anEntry
+              anObj.SetEntry(aName)
+              aSO.SetAttrString("AttributeName", aSO.GetName() + " (" + str(anIndex) + ")")
+              # remove the reference - red node
+              aSOIter2 = SHAPERSTUDY_utils.getStudy().NewChildIterator(aSO)
+              while aSOIter2.More():
+                aSO2 = aSOIter2.Value()
+                if aSO2.ReferencedObject()[0] and aSO2.ReferencedObject()[1].GetID() == aSO.GetID():
+                  aBuilder = SHAPERSTUDY_utils.getStudy().NewBuilder()
+                  aBuilder.RemoveReference(aSO2)
+                aSOIter2.Next()
+          aSOIter.Next()
