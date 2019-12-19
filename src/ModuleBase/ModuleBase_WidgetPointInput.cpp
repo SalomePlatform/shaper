@@ -151,6 +151,7 @@ bool ModuleBase_WidgetPointInput::storeValueCustom()
         }
         aAttr->setText(aXText, aYText, aZText);
       } else {
+        aAttr->setText("", "", "");
         aAttr->setValue(myXSpin->value(), myYSpin->value(), myZSpin->value());
       }
     } else {
@@ -196,6 +197,7 @@ bool ModuleBase_WidgetPointInput::restoreValueCustom()
       myYSpin->setValue(myDefaultValue[1]);
       myZSpin->setValue(myDefaultValue[2]);
     }
+    setValueState(Stored);
     return true;
   }
   return false;

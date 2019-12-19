@@ -478,7 +478,7 @@ bool XGUI_PropertyPanel::focusNextPrevChild(bool theIsNext)
     ModuleBase_ModelWidget* aNewFocusMWidget = ModuleBase_ModelWidget::findModelWidget(this,
                                                                               aNewFocusWidget);
     if (aNewFocusMWidget) {
-      if (aFocusMWidget) {
+      if (aFocusMWidget && (aFocusMWidget != aNewFocusMWidget)) {
         aFocusMWidget->setHighlighted(false);
       }
       aNewFocusMWidget->emitFocusInWidget();
