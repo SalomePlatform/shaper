@@ -1472,6 +1472,7 @@ QDockWidget* XGUI_Workshop::createObjectBrowser(QWidget* theParent)
   myObjectBrowser->initialize(myModule->rootNode());
   myModule->customizeObjectBrowser(myObjectBrowser);
   aObjDock->setWidget(myObjectBrowser);
+  aObjDock->setObjectName("Object browser");
 
   connect(myObjectBrowser, SIGNAL(sizeChanged()), SLOT(onDockSizeChanged()));
 

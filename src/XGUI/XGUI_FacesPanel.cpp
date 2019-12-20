@@ -91,6 +91,8 @@ XGUI_FacesPanel::XGUI_FacesPanel(QWidget* theParent, XGUI_Workshop* theWorkshop)
   : QDockWidget(theParent), myIsActive(false), myWorkshop(theWorkshop)
 {
   setWindowTitle(tr("Hide Faces"));
+  setObjectName("Hide Faces");
+
   QAction* aViewAct = toggleViewAction();
   setStyleSheet("::title { position: relative; padding-left: 5px; text-align: left center }");
 
