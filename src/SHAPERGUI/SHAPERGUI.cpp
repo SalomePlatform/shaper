@@ -1181,5 +1181,6 @@ void SHAPERGUI::resetToolbars()
 
 void SHAPERGUI::publishToStudy()
 {
-  myWorkshop->module()->launchOperation("PublishToStudy", false);
+  if (isActiveModule())
+    myWorkshop->module()->launchOperation("PublishToStudy", false);
 }

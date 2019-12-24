@@ -157,13 +157,13 @@ void SHAPERGUI_DataModel::update(LightApp_DataObject* theObj, LightApp_Study* th
 
 void SHAPERGUI_DataModel::initRootObject()
 {
-  //LightApp_Study* study = dynamic_cast<LightApp_Study*>( module()->application()->activeStudy() );
-  //CAM_ModuleObject *aModelRoot = dynamic_cast<CAM_ModuleObject*>(root());
-  //if(study && aModelRoot == NULL) {
-  //  aModelRoot = createModuleObject( study->root() );
-  //  aModelRoot->setDataModel( this );
-  //  setRoot(aModelRoot);
-  //}
+  LightApp_Study* study = dynamic_cast<LightApp_Study*>( module()->application()->activeStudy() );
+  CAM_ModuleObject *aModelRoot = dynamic_cast<CAM_ModuleObject*>(root());
+  if(study && aModelRoot == NULL) {
+    aModelRoot = createModuleObject( study->root() );
+    aModelRoot->setDataModel( this );
+    setRoot(aModelRoot);
+  }
 }
 
 void SHAPERGUI_DataModel::removeDirectory(const QString& theDirectoryName)
