@@ -85,7 +85,7 @@ bool SHAPERGUI_DataModel::open(const QString& thePath, CAM_Study* theStudy, QStr
 
 bool SHAPERGUI_DataModel::save(QStringList& theFiles)
 {
-  // Pyblish to study before saving of the data model
+  // Publish to study before saving of the data model
   myModule->publishToStudy();
 
   LightApp_DataModel::save( theFiles );

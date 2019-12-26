@@ -96,35 +96,33 @@ class PublishToStudyFeature(ModelAPI.ModelAPI_Feature):
             aSShape.SetShapeByStream(aRes.shape().getShapeStream(False))
             if not aSShape.GetSO(): # publish in case it is a new shape
               anEngine.AddInStudy(aSShape, aRes.data().name(), None)
+            else: # restore a red reference if it was deleted
+              aRes, aSO2 = aSShape.GetSO().FindSubObject(1)
+              if aRes:
+                aRes, aRef = aSO2.ReferencedObject()
+                if not aRes:
+                  aBuilder = SHAPERSTUDY_utils.getStudy().NewBuilder()
+                  aBuilder.Addreference(aSO2, aSShape.GetSO())
+
             allProcessed.append(aSSEntry)
 
         # process all SHAPER-STUDY shapes to find dead
-        deadNames = []
         aSOIter = SHAPERSTUDY_utils.getStudy().NewChildIterator(aComponent)
         while aSOIter.More():
           aSO = aSOIter.Value()
           anIOR = aSO.GetIOR()
-          anObj = salome.orb.string_to_object(anIOR)
-          if isinstance(anObj, SHAPERSTUDY_ORB._objref_SHAPER_Object):
-            anEntry = anObj.GetEntry()
-            if len(anEntry) == 0:
-              continue;
-            elif anEntry.startswith("dead"):
-              deadNames.append(anObj.GetEntry())
-            elif anEntry not in allProcessed: # found a removed shape: make it dead
-              anIndex = 1
-              aName = "dead" + str(anIndex) + "_" + anEntry
-              while aName in deadNames:
-                anIndex = anIndex + 1
-                aName = "dead" + str(anIndex) + "_" + anEntry
-              anObj.SetEntry(aName)
-              aSO.SetAttrString("AttributeName", aSO.GetName() + " (" + str(anIndex) + ")")
-              # remove the reference - red node
-              aSOIter2 = SHAPERSTUDY_utils.getStudy().NewChildIterator(aSO)
-              while aSOIter2.More():
-                aSO2 = aSOIter2.Value()
-                if aSO2.ReferencedObject()[0] and aSO2.ReferencedObject()[1].GetID() == aSO.GetID():
-                  aBuilder = SHAPERSTUDY_utils.getStudy().NewBuilder()
-                  aBuilder.RemoveReference(aSO2)
-                aSOIter2.Next()
+          if len(anIOR):
+            anObj = salome.orb.string_to_object(anIOR)
+            if isinstance(anObj, SHAPERSTUDY_ORB._objref_SHAPER_Object):
+              anEntry = anObj.GetEntry()
+              if len(anEntry) == 0:
+                continue;
+              elif anEntry not in allProcessed: # found a removed shape: make it dead for the moment
+                # remove the reference - red node
+                aRes, aSO2 = aSO.FindSubObject(1)
+                if aRes:
+                  aRes, aRef = aSO2.ReferencedObject()
+                  if aRes:
+                    aBuilder = SHAPERSTUDY_utils.getStudy().NewBuilder()
+                    aBuilder.RemoveReference(aSO2)
           aSOIter.Next()
