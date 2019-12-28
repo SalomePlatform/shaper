@@ -483,6 +483,24 @@ std::shared_ptr<GeomAPI_Pnt2d> PartSet_Tools::getPnt2d(QMouseEvent* theEvent,
   return std::shared_ptr<GeomAPI_Pnt2d>(new GeomAPI_Pnt2d(aX, anY));
 }
 
+std::shared_ptr<GeomAPI_Pnt2d> PartSet_Tools::getPnt2d(const Handle(V3d_View)& theView,
+                                                       const TopoDS_Shape& theShape,
+                                                       const FeaturePtr& theSketch)
+{
+  GeomPnt2dPtr aPoint2D;
+  if (!theShape.IsNull() && theShape.ShapeType() == TopAbs_VERTEX) {
+    const TopoDS_Vertex& aVertex = TopoDS::Vertex(theShape);
+    if (!aVertex.IsNull()) {
+      // the case when the point is taken from the existing vertex
+      gp_Pnt aPoint = BRep_Tool::Pnt(aVertex);
+      double aX, aY;
+      PartSet_Tools::convertTo2D(aPoint, theSketch, theView, aX, aY);
+      aPoint2D.reset(new GeomAPI_Pnt2d(aX, aY));
+    }
+  }
+  return aPoint2D;
+}
+
 FeaturePtr findFirstCoincidenceByData(const DataPtr& theData,
                                       std::shared_ptr<GeomAPI_Pnt2d> thePoint)
 {

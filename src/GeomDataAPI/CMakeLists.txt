@@ -27,12 +27,14 @@ SET(PROJECT_HEADERS
     GeomDataAPI_Point.h
     GeomDataAPI_Dir.h
     GeomDataAPI_Point2D.h
+    GeomDataAPI_Point2DArray.h
 )
 
 SET(PROJECT_SOURCES
     GeomDataAPI_Point.cpp
     GeomDataAPI_Dir.cpp
     GeomDataAPI_Point2D.cpp
+    GeomDataAPI_Point2DArray.cpp
 )
 
 SET(PROJECT_LIBRARIES

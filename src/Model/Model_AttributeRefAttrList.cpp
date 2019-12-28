@@ -27,8 +27,13 @@
 
 void Model_AttributeRefAttrList::append(ObjectPtr theObject)
 {
-  std::shared_ptr<Model_Data> aData = std::dynamic_pointer_cast<Model_Data>(theObject->data());
-  myRef->Append(aData->label().Father());  // store label of the object
+  TDF_Label aLabel;
+  if (theObject) {
+    std::shared_ptr<Model_Data> aData = std::dynamic_pointer_cast<Model_Data>(theObject->data());
+    aLabel = aData->label().Father();
+  }
+
+  myRef->Append(aLabel); // store label of the object
   myIDs->Append(""); // for the object store an empty string
   // do it before the transaction finish to make just created/removed objects know dependencies
   // and reference from composite feature is removed automatically
@@ -306,7 +311,9 @@ void Model_AttributeRefAttrList::remove(const std::set<int>& theIndices)
         myIDs->Append(anIDIter.Value());
       } else { // found, so need to update the dependencies
         aOneisDeleted = true;
-        ObjectPtr anObj = aDoc->objects()->object(aRefIter.Value());
+        ObjectPtr anObj;
+        if (!aRefIter.Value().IsNull())
+          anObj = aDoc->objects()->object(aRefIter.Value());
         if (anObj.get()) {
           REMOVE_BACK_REF(anObj);
         }

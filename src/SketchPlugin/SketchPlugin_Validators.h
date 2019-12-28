@@ -531,4 +531,19 @@ class SketchPlugin_MultiRotationAngleValidator : public ModelAPI_AttributeValida
                        Events_InfoMessage& theError) const;
 };
 
+/**\class SketchPlugin_BSplineValidator
+ * \ingroup Validators
+ * \brief Validator for checking poles/weights of B-spline curve.
+ */
+class SketchPlugin_BSplineValidator : public ModelAPI_AttributeValidator
+{
+  //! returns true if attribute is valid
+  //! \param theAttribute the checked attribute
+  //! \param theArguments arguments of the attribute
+  //! \param theError error message
+  virtual bool isValid(const AttributePtr& theAttribute,
+                       const std::list<std::string>& theArguments,
+                       Events_InfoMessage& theError) const;
+};
+
 #endif

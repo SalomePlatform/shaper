@@ -191,6 +191,13 @@ std::shared_ptr<SketchSolver_ConstraintMovement> PlaneGCSSolver_Tools::createMov
       new SketchSolver_ConstraintMovement(theMovedAttribute));
 }
 
+std::shared_ptr<SketchSolver_ConstraintMovement> PlaneGCSSolver_Tools::createMovementConstraint(
+    const std::pair<AttributePtr, int>& theMovedPointInArray)
+{
+  return std::shared_ptr<SketchSolver_ConstraintMovement>(
+      new SketchSolver_ConstraintMovement(theMovedPointInArray.first, theMovedPointInArray.second));
+}
+
 
 
 ConstraintWrapperPtr PlaneGCSSolver_Tools::createConstraint(

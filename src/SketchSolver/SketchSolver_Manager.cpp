@@ -22,6 +22,7 @@
 
 #include <Events_Loop.h>
 #include <GeomDataAPI_Point2D.h>
+#include <GeomDataAPI_Point2DArray.h>
 #include <ModelAPI_Events.h>
 #include <ModelAPI_ResultConstruction.h>
 #include <ModelAPI_Session.h>
@@ -85,6 +86,19 @@ static void featuresOrderedByType(const std::set<ObjectPtr>& theOriginalFeatures
         theSketch = aSketch;
     }
   }
+}
+
+static void setPoint(AttributePtr theAttribute,
+                     const int thePointIndex,
+                     const std::shared_ptr<GeomAPI_Pnt2d> theValue)
+{
+  AttributePoint2DPtr aPointAttr = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(theAttribute);
+  AttributePoint2DArrayPtr aPointArrayAttr =
+      std::dynamic_pointer_cast<GeomDataAPI_Point2DArray>(theAttribute);
+  if (aPointAttr)
+    aPointAttr->setValue(theValue);
+  else if (aPointArrayAttr && thePointIndex >= 0)
+    aPointArrayAttr->setPnt(thePointIndex, theValue);
 }
 
 
@@ -180,8 +194,8 @@ void SketchSolver_Manager::processEvent(
         std::dynamic_pointer_cast<ModelAPI_ObjectMovedMessage>(theMessage);
 
     ObjectPtr aMovedObject = aMoveMsg->movedObject();
-    std::shared_ptr<GeomDataAPI_Point2D> aMovedPoint =
-        std::dynamic_pointer_cast<GeomDataAPI_Point2D>(aMoveMsg->movedAttribute());
+    AttributePtr aMovedAttribute = aMoveMsg->movedAttribute();
+    int aMovedPoint = aMoveMsg->movedPointIndex();
 
     const std::shared_ptr<GeomAPI_Pnt2d>& aFrom = aMoveMsg->originalPosition();
     const std::shared_ptr<GeomAPI_Pnt2d>& aTo = aMoveMsg->currentPosition();
@@ -192,8 +206,8 @@ void SketchSolver_Manager::processEvent(
           std::dynamic_pointer_cast<SketchPlugin_Feature>(aMovedFeature);
       if (aSketchFeature && !aSketchFeature->isMacro())
         needToResolve = moveFeature(aSketchFeature, aFrom, aTo);
-    } else if (aMovedPoint)
-      needToResolve = moveAttribute(aMovedPoint, aFrom, aTo);
+    } else if (aMovedAttribute)
+      needToResolve = moveAttribute(aMovedAttribute, aMovedPoint, aFrom, aTo);
 
   } else if (theMessage->eventID() == Events_Loop::loop()->eventByName(EVENT_OBJECT_DELETED)) {
     std::shared_ptr<ModelAPI_ObjectDeletedMessage> aDeleteMsg =
@@ -349,7 +363,8 @@ bool SketchSolver_Manager::moveFeature(
 //  Purpose:  move given attribute in appropriate group
 // ============================================================================
 bool SketchSolver_Manager::moveAttribute(
-    const std::shared_ptr<GeomDataAPI_Point2D>& theMovedAttribute,
+    const std::shared_ptr<ModelAPI_Attribute>& theMovedAttribute,
+    const int theMovedPointIndex,
     const std::shared_ptr<GeomAPI_Pnt2d>& theFrom,
     const std::shared_ptr<GeomAPI_Pnt2d>& theTo)
 {
@@ -358,7 +373,7 @@ bool SketchSolver_Manager::moveAttribute(
       std::dynamic_pointer_cast<SketchPlugin_Constraint>(anOwner);
   if (aConstraint)
   {
-    theMovedAttribute->setValue(theTo);
+    setPoint(theMovedAttribute, theMovedPointIndex, theTo);
     Events_Loop::loop()->flush(Events_Loop::eventByName(EVENT_OBJECT_UPDATED));
     return true;
   }
@@ -369,12 +384,12 @@ bool SketchSolver_Manager::moveAttribute(
   if (aSketchFeature)
     aGroup = findGroup(aSketchFeature);
   if (!aGroup) {
-    theMovedAttribute->setValue(theTo);
+    setPoint(theMovedAttribute, theMovedPointIndex, theTo);
     return false;
   }
 
   aGroup->blockEvents(true);
-  return aGroup->movePoint(theMovedAttribute, theFrom, theTo);
+  return aGroup->movePoint(theMovedAttribute, theMovedPointIndex, theFrom, theTo);
 }
 
 // ============================================================================

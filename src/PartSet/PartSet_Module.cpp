@@ -22,6 +22,7 @@
 #include "PartSet_Validators.h"
 #include "PartSet_Tools.h"
 #include "PartSet_PreviewPlanes.h"
+#include "PartSet_WidgetBSplinePoints.h"
 #include "PartSet_WidgetPoint2d.h"
 #include "PartSet_WidgetPoint2DFlyout.h"
 #include "PartSet_WidgetShapeSelector.h"
@@ -914,6 +915,12 @@ ModuleBase_ModelWidget* PartSet_Module::createWidgetByType(const std::string& th
             new PartSet_WidgetFeaturePointSelector(theParent, aWorkshop, theWidgetApi);
     aPointSelectorWgt->setSketcher(mySketchMgr->activeSketch());
     aWgt = aPointSelectorWgt;
+  }
+  else if (theType == "sketch-bspline_selector") {
+    PartSet_WidgetBSplinePoints* aBSplineWgt =
+        new PartSet_WidgetBSplinePoints(theParent, aWorkshop, theWidgetApi);
+    aBSplineWgt->setSketch(mySketchMgr->activeSketch());
+    aWgt = aBSplineWgt;
   }
   else if (theType == WDG_DOUBLEVALUE_EDITOR) {
     aWgt = new PartSet_WidgetEditor(theParent, aWorkshop, theWidgetApi);

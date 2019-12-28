@@ -1,4 +1,4 @@
-// Copyright (C) 2014-2019  CEA/DEN, EDF R&D
+// Copyright (C) 2019-2020  CEA/DEN, EDF R&D
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -17,19 +17,17 @@
 // See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 
-#include <PlaneGCSSolver_ScalarWrapper.h>
+#include <GeomDataAPI_Point2DArray.h>
 
-PlaneGCSSolver_ScalarWrapper::PlaneGCSSolver_ScalarWrapper(double *const theParam)
-  : myValue(theParam)
+std::string GeomDataAPI_Point2DArray::attributeType()
+{
+  return typeId();
+}
+
+GeomDataAPI_Point2DArray::GeomDataAPI_Point2DArray()
 {
 }
 
-void PlaneGCSSolver_ScalarWrapper::setValue(double theValue)
+GeomDataAPI_Point2DArray::~GeomDataAPI_Point2DArray()
 {
-  *myValue = theValue;
-}
-
-double PlaneGCSSolver_ScalarWrapper::value() const
-{
-  return *myValue;
 }

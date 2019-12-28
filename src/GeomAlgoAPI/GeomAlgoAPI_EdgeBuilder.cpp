@@ -28,6 +28,7 @@
 #include <TopoDS_Face.hxx>
 #include <TopoDS.hxx>
 #include <BRep_Tool.hxx>
+#include <Geom_BSplineCurve.hxx>
 #include <Geom_Plane.hxx>
 #include <Geom_CylindricalSurface.hxx>
 #include <Geom_RectangularTrimmedSurface.hxx>
@@ -261,6 +262,55 @@ std::shared_ptr<GeomAPI_Edge> GeomAlgoAPI_EdgeBuilder::ellipticArc(
   anEllipse.parameter(aEndPnt, Precision::Confusion(), aEndParam);
 
   BRepBuilderAPI_MakeEdge anEdgeBuilder(anEllipse.impl<gp_Elips>(), aStartParam, aEndParam);
+  GeomEdgePtr aRes(new GeomAPI_Edge);
+  TopoDS_Edge anEdge = anEdgeBuilder.Edge();
+  aRes->setImpl(new TopoDS_Shape(anEdge));
+  return aRes;
+}
+
+GeomEdgePtr GeomAlgoAPI_EdgeBuilder::bspline(const std::vector<GeomPointPtr>& thePoles,
+                                             const std::vector<double>& theWeights,
+                                             const bool thePeriodic)
+{
+  int aDegree = 3;
+  if ((int)thePoles.size() <= aDegree)
+    aDegree = (int)thePoles.size() - 1;
+  if (aDegree <= 0)
+    return GeomEdgePtr();
+
+  int aNbKnots = (int)thePoles.size() - aDegree + 1;
+
+  // collect arrays of poles, weights, knots and multiplicities
+  TColgp_Array1OfPnt aPoles(1, (int)thePoles.size());
+  TColStd_Array1OfReal aWeights(1, (int)theWeights.size());
+  TColStd_Array1OfReal aKnots(1, aNbKnots);
+  TColStd_Array1OfInteger aMults(1, aNbKnots);
+
+  int anIndex = 1;
+  for (std::vector<GeomPointPtr>::const_iterator aPIt = thePoles.begin();
+       aPIt != thePoles.end(); ++aPIt, ++anIndex)
+    aPoles.SetValue(anIndex, gp_Pnt((*aPIt)->x(), (*aPIt)->y(), (*aPIt)->z()));
+  anIndex = 1;
+  for (std::vector<double>::const_iterator aWIt = theWeights.begin();
+       aWIt != theWeights.end(); ++aWIt, ++anIndex)
+    aWeights.SetValue(anIndex, *aWIt);
+  anIndex = 1;
+  static const double aStartParam = 0.0;
+  static const double aEndParam = 1.0;
+  double aStep = aEndParam / (aNbKnots - 1);
+  for (double aKnot = aStartParam; anIndex < aNbKnots; ++anIndex, aKnot += aStep)
+    aKnots.SetValue(anIndex, aKnot);
+  aKnots.ChangeLast() = aEndParam;
+  anIndex = 1;
+  aMults.SetValue(anIndex, aDegree + 1);
+  for (++anIndex; anIndex < aNbKnots; ++anIndex)
+    aMults.SetValue(anIndex, 1);
+  aMults.SetValue(aNbKnots, aDegree + 1);
+
+  Handle(Geom_BSplineCurve) aCurve =
+      new Geom_BSplineCurve(aPoles, aWeights, aKnots, aMults, aDegree, thePeriodic);
+
+  BRepBuilderAPI_MakeEdge anEdgeBuilder(aCurve, aStartParam, aEndParam);
   GeomEdgePtr aRes(new GeomAPI_Edge);
   TopoDS_Edge anEdge = anEdgeBuilder.Edge();
   aRes->setImpl(new TopoDS_Shape(anEdge));

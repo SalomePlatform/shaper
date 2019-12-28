@@ -49,9 +49,11 @@
 
 #include <GeomDataAPI_Point.h>
 #include <GeomDataAPI_Point2D.h>
+#include <GeomDataAPI_Point2DArray.h>
 
 #include <GeomData_Point.h>
 #include <GeomData_Point2D.h>
+#include <GeomData_Point2DArray.h>
 #include <GeomData_Dir.h>
 #include <Events_Loop.h>
 #include <Events_InfoMessage.h>
@@ -217,7 +219,10 @@ AttributePtr Model_Data::addAttribute(
     }
     anAttribute->myIsInitialized = anAllInitialized;
     anAttr = anAttribute;
+  } else if (theAttrType == GeomData_Point2DArray::typeId()) {
+    anAttr = new GeomData_Point2DArray(anAttrLab);
   }
+
   if (anAttr) {
     aResult = std::shared_ptr<ModelAPI_Attribute>(anAttr);
     myAttrs[theID] = std::pair<AttributePtr, int>(aResult, anAttrIndex);

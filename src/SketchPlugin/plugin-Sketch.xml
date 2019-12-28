@@ -6,6 +6,7 @@
         nested="SketchPoint SketchIntersectionPoint SketchLine
                 SketchCircle SketchMacroCircle SketchArc SketchMacroArc
                 SketchEllipse SketchMacroEllipse SketchEllipticArc SketchMacroEllipticArc
+                SketchBSpline SketchMacroBSpline
                 SketchRectangle
                 SketchProjection
                 SketchConstraintLength SketchConstraintRadius SketchConstraintDistance SketchConstraintDistanceHorizontal SketchConstraintDistanceVertical
@@ -591,6 +592,52 @@
                    tooltip="Construction element"
                    label="Auxiliary"
                    default="false"
+                   obligatory="0"
+                   change_visual_attributes="true"/>
+      </feature>
+    </group>
+
+    <group id="Parametric curves">
+      <!-- SketchBSpline is a hidden feature. It is created inside SketchMacroBSpline. -->
+      <feature id="SketchBSpline"
+               title="B-spline"
+               tooltip="Create B-spline curve"
+               icon="icons/Sketch/bspline.png"
+               helpfile="bsplineFeature.html"
+               internal="1">
+        <sketch-bspline_selector id="poles"
+                                 weights="weights"
+                                 title="Poles and weights"
+                                 tooltip="B-spline poles and weights"
+                                 enable_value="enable_by_preferences">
+          <validator id="SketchPlugin_BSplineValidator"/>
+        </sketch-bspline_selector>
+        <boolvalue id="Auxiliary"
+                   label="Auxiliary"
+                   default="false"
+                   tooltip="Construction element"
+                   obligatory="0"
+                   change_visual_attributes="true"/>
+      </feature>
+
+      <!-- SketchMacroBSpline -->
+      <feature id="SketchMacroBSpline"
+               title="B-spline"
+               tooltip="Create B-spline curve"
+               icon="icons/Sketch/bspline.png"
+               helpfile="bsplineFeature.html">
+        <sketch-bspline_selector id="poles"
+                                 weights="weights"
+                                 reference_attribute="poles_ref"
+                                 title="Poles and weights"
+                                 tooltip="B-spline poles and weights"
+                                 enable_value="enable_by_preferences">
+          <validator id="SketchPlugin_BSplineValidator"/>
+        </sketch-bspline_selector>
+        <boolvalue id="Auxiliary"
+                   label="Auxiliary"
+                   default="false"
+                   tooltip="Construction element"
                    obligatory="0"
                    change_visual_attributes="true"/>
       </feature>

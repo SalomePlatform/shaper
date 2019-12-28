@@ -59,8 +59,9 @@ SET(PROJECT_HEADERS
     PartSet_WidgetSketchLabel.h
     PartSet_CenterPrs.h
     PartSet_ExternalPointsMgr.h
-	PartSet_TreeNodes.h
-	PartSet_FieldStepPrs.h
+    PartSet_TreeNodes.h
+    PartSet_FieldStepPrs.h
+    PartSet_WidgetBSplinePoints.h
 )
 
 SET(PROJECT_MOC_HEADERS
@@ -78,6 +79,7 @@ SET(PROJECT_MOC_HEADERS
     PartSet_WidgetShapeSelector.h
     PartSet_WidgetSketchCreator.h
     PartSet_WidgetSketchLabel.h
+    PartSet_WidgetBSplinePoints.h
     PartSet_ExternalPointsMgr.h
 )
 
@@ -109,8 +111,9 @@ SET(PROJECT_SOURCES
     PartSet_WidgetSketchLabel.cpp
     PartSet_CenterPrs.cpp
     PartSet_ExternalPointsMgr.cpp
-	PartSet_TreeNodes.cpp
-	PartSet_FieldStepPrs.cpp
+    PartSet_TreeNodes.cpp
+    PartSet_FieldStepPrs.cpp
+    PartSet_WidgetBSplinePoints.cpp
 )
 
 SET(PROJECT_RESOURCES

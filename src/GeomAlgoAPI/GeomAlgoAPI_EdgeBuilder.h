@@ -27,6 +27,7 @@
 #include <GeomAPI_Lin.h>
 #include <GeomAPI_Circ.h>
 #include <memory>
+#include <vector>
 
 /**\class GeomAlgoAPI_EdgeBuilder
  * \ingroup DataAlgo
@@ -89,6 +90,11 @@ class GEOMALGOAPI_EXPORT GeomAlgoAPI_EdgeBuilder
       const double                        theMinorRadius,
       const std::shared_ptr<GeomAPI_Pnt>& theStart,
       const std::shared_ptr<GeomAPI_Pnt>& theEnd);
+
+  /// Creates B-spline edge
+  static GeomEdgePtr bspline(const std::vector<GeomPointPtr>& thePoles,
+                             const std::vector<double>& theWeights,
+                             const bool thePeriodic);
 };
 
 #endif

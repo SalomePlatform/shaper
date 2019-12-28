@@ -23,6 +23,8 @@
 #include <PlaneGCSSolver_ConstraintWrapper.h>
 #include <PlaneGCSSolver_EdgeWrapper.h>
 #include <PlaneGCSSolver_PointWrapper.h>
+#include <PlaneGCSSolver_PointArrayWrapper.h>
+#include <PlaneGCSSolver_ScalarArrayWrapper.h>
 #include <PlaneGCSSolver_Tools.h>
 
 #include <PlaneGCSSolver_AttributeBuilder.h>
@@ -33,6 +35,8 @@
 #include <GeomAPI_Pnt2d.h>
 #include <GeomAPI_XY.h>
 #include <GeomDataAPI_Point2D.h>
+#include <GeomDataAPI_Point2DArray.h>
+#include <ModelAPI_AttributeDoubleArray.h>
 #include <ModelAPI_AttributeRefAttr.h>
 #include <SketchPlugin_Ellipse.h>
 #include <SketchPlugin_Projection.h>
@@ -626,6 +630,23 @@ void PlaneGCSSolver_Storage::refresh() const
       }
       continue;
     }
+    std::shared_ptr<GeomDataAPI_Point2DArray> aPointArray =
+        std::dynamic_pointer_cast<GeomDataAPI_Point2DArray>(anIt->first);
+    if (aPointArray) {
+      std::shared_ptr<PlaneGCSSolver_PointArrayWrapper> anArrayWrapper =
+          std::dynamic_pointer_cast<PlaneGCSSolver_PointArrayWrapper>(anIt->second);
+      int aSize = aPointArray->size();
+      for (int anIndex = 0; anIndex < aSize; ++anIndex) {
+        GeomPnt2dPtr anOriginal = aPointArray->pnt(anIndex);
+        GCSPointPtr aGCSPoint = anArrayWrapper->value(anIndex)->point();
+        if (fabs(anOriginal->x() - (*aGCSPoint->x)) > aTol ||
+            fabs(anOriginal->y() - (*aGCSPoint->y)) > aTol) {
+          aPointArray->setPnt(anIndex, *aGCSPoint->x, *aGCSPoint->y);
+          addOwnerToSet(anIt->first, anUpdatedFeatures);
+        }
+      }
+      continue;
+    }
     AttributeDoublePtr aScalar = std::dynamic_pointer_cast<ModelAPI_AttributeDouble>(anIt->first);
     if (aScalar) {
       ScalarWrapperPtr aScalarWrapper =
@@ -633,6 +654,20 @@ void PlaneGCSSolver_Storage::refresh() const
       if (fabs(aScalar->value() - aScalarWrapper->value()) > aTol) {
         aScalar->setValue(aScalarWrapper->value());
         addOwnerToSet(anIt->first, anUpdatedFeatures);
+      }
+      continue;
+    }
+    AttributeDoubleArrayPtr aRealArray =
+        std::dynamic_pointer_cast<ModelAPI_AttributeDoubleArray>(anIt->first);
+    if (aRealArray) {
+      std::shared_ptr<PlaneGCSSolver_ScalarArrayWrapper> anArrayWrapper =
+          std::dynamic_pointer_cast<PlaneGCSSolver_ScalarArrayWrapper>(anIt->second);
+      int aSize = aRealArray->size();
+      for (int anIndex = 0; anIndex < aSize; ++anIndex) {
+        if (fabs(aRealArray->value(anIndex) - *anArrayWrapper->array()[anIndex]) > aTol) {
+          aRealArray->setValue(anIndex, *anArrayWrapper->array()[anIndex]);
+          addOwnerToSet(anIt->first, anUpdatedFeatures);
+        }
       }
       continue;
     }

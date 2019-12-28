@@ -20,45 +20,28 @@
 #include <PlaneGCSSolver_EdgeWrapper.h>
 #include <cmath>
 
-static bool isLine(const GCSCurvePtr& theEntity)
+template <typename TYPE>
+static bool isCurve(const GCSCurvePtr& theEntity)
 {
-  return std::dynamic_pointer_cast<GCS::Line>(theEntity).get();
-}
-
-static bool isCircle(const GCSCurvePtr& theEntity)
-{
-  return std::dynamic_pointer_cast<GCS::Circle>(theEntity).get();
-}
-
-static bool isArc(const GCSCurvePtr& theEntity)
-{
-  return std::dynamic_pointer_cast<GCS::Arc>(theEntity).get();
-}
-
-static bool isEllipse(const GCSCurvePtr& theEntity)
-{
-  return std::dynamic_pointer_cast<GCS::Ellipse>(theEntity).get();
-}
-
-static bool isEllipticArc(const GCSCurvePtr& theEntity)
-{
-  return std::dynamic_pointer_cast<GCS::ArcOfEllipse>(theEntity).get();
+  return std::dynamic_pointer_cast<TYPE>(theEntity).get();
 }
 
 
 PlaneGCSSolver_EdgeWrapper::PlaneGCSSolver_EdgeWrapper(const GCSCurvePtr theEntity)
   : myEntity(theEntity)
 {
-  if (isLine(myEntity))
+  if (isCurve<GCS::Line>(myEntity))
     myType = ENTITY_LINE;
-  else if (isArc(myEntity))
+  else if (isCurve<GCS::Arc>(myEntity))
     myType = ENTITY_ARC;
-  else if (isCircle(myEntity))
+  else if (isCurve<GCS::Circle>(myEntity))
     myType = ENTITY_CIRCLE;
-  else if (isEllipticArc(myEntity))
+  else if (isCurve<GCS::ArcOfEllipse>(myEntity))
     myType = ENTITY_ELLIPTIC_ARC;
-  else if (isEllipse(myEntity))
+  else if (isCurve<GCS::Ellipse>(myEntity))
     myType = ENTITY_ELLIPSE;
+  else if (isCurve<GCS::BSpline>(myEntity))
+    myType = ENTITY_BSPLINE;
 }
 
 static double squareDistance(const GCS::Point& theP1, const GCS::Point& theP2)

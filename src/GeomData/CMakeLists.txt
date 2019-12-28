@@ -24,12 +24,14 @@ SET(PROJECT_HEADERS
     GeomData_Point.h
     GeomData_Dir.h
     GeomData_Point2D.h
+    GeomData_Point2DArray.h
 )
 
 SET(PROJECT_SOURCES
     GeomData_Point.cpp
     GeomData_Dir.cpp
     GeomData_Point2D.cpp
+    GeomData_Point2DArray.cpp
 )
 
 SET(PROJECT_LIBRARIES

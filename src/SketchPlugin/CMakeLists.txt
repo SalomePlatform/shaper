@@ -23,6 +23,7 @@ INCLUDE(UnitTest)
 SET(PROJECT_HEADERS
     SketchPlugin.h
     SketchPlugin_Arc.h
+    SketchPlugin_BSpline.h
     SketchPlugin_Circle.h
     SketchPlugin_Constraint.h
     SketchPlugin_ConstraintAngle.h
@@ -54,6 +55,7 @@ SET(PROJECT_HEADERS
     SketchPlugin_Line.h
     SketchPlugin_MacroArc.h
     SketchPlugin_MacroArcReentrantMessage.h
+    SketchPlugin_MacroBSpline.h
     SketchPlugin_MacroCircle.h
     SketchPlugin_MacroEllipse.h
     SketchPlugin_MacroEllipticArc.h
@@ -73,6 +75,7 @@ SET(PROJECT_HEADERS
 
 SET(PROJECT_SOURCES
     SketchPlugin_Arc.cpp
+    SketchPlugin_BSpline.cpp
     SketchPlugin_Circle.cpp
     SketchPlugin_Constraint.cpp
     SketchPlugin_ConstraintAngle.cpp
@@ -102,6 +105,7 @@ SET(PROJECT_SOURCES
     SketchPlugin_IntersectionPoint.cpp
     SketchPlugin_Line.cpp
     SketchPlugin_MacroArc.cpp
+    SketchPlugin_MacroBSpline.cpp
     SketchPlugin_MacroCircle.cpp
     SketchPlugin_MacroEllipse.cpp
     SketchPlugin_MacroEllipticArc.cpp

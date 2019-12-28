@@ -24,6 +24,7 @@
 #include <SketchPlugin_IntersectionPoint.h>
 #include <SketchPlugin_Circle.h>
 #include <SketchPlugin_Arc.h>
+#include <SketchPlugin_BSpline.h>
 #include <SketchPlugin_Projection.h>
 #include <SketchPlugin_ConstraintAngle.h>
 #include <SketchPlugin_ConstraintCoincidence.h>
@@ -45,6 +46,7 @@
 #include <SketchPlugin_ConstraintTangent.h>
 #include <SketchPlugin_ConstraintVertical.h>
 #include <SketchPlugin_MacroArc.h>
+#include <SketchPlugin_MacroBSpline.h>
 #include <SketchPlugin_MacroCircle.h>
 #include <SketchPlugin_MultiRotation.h>
 #include <SketchPlugin_MultiTranslation.h>
@@ -147,6 +149,8 @@ SketchPlugin_Plugin::SketchPlugin_Plugin()
                               new SketchPlugin_SketchFeatureValidator);
   aFactory->registerValidator("SketchPlugin_MultiRotationAngleValidator",
                               new SketchPlugin_MultiRotationAngleValidator);
+  aFactory->registerValidator("SketchPlugin_BSplineValidator",
+                              new SketchPlugin_BSplineValidator);
 
   // register this plugin
   ModelAPI_Session::get()->registerPlugin(this);
@@ -201,6 +205,8 @@ FeaturePtr SketchPlugin_Plugin::createFeature(std::string theFeatureID)
     return FeaturePtr(new SketchPlugin_Circle);
   } else if (theFeatureID == SketchPlugin_Arc::ID()) {
     return FeaturePtr(new SketchPlugin_Arc);
+  } else if (theFeatureID == SketchPlugin_BSpline::ID()) {
+    return FeaturePtr(new SketchPlugin_BSpline);
   } else if (theFeatureID == SketchPlugin_Projection::ID()) {
     return FeaturePtr(new SketchPlugin_Projection);
   } else if (theFeatureID == SketchPlugin_ConstraintCoincidence::ID()) {
@@ -251,6 +257,8 @@ FeaturePtr SketchPlugin_Plugin::createFeature(std::string theFeatureID)
     return FeaturePtr(new SketchPlugin_Trim);
   } else if (theFeatureID == SketchPlugin_MacroArc::ID()) {
     return FeaturePtr(new SketchPlugin_MacroArc);
+  } else if (theFeatureID == SketchPlugin_MacroBSpline::ID()) {
+    return FeaturePtr(new SketchPlugin_MacroBSpline);
   } else if (theFeatureID == SketchPlugin_MacroCircle::ID()) {
     return FeaturePtr(new SketchPlugin_MacroCircle);
   } else if (theFeatureID == SketchPlugin_Ellipse::ID()) {
@@ -306,6 +314,7 @@ std::shared_ptr<ModelAPI_FeatureStateMessage> SketchPlugin_Plugin
       aMsg->setState(SketchPlugin_Line::ID(), aHasSketchPlane);
       aMsg->setState(SketchPlugin_Circle::ID(), aHasSketchPlane);
       aMsg->setState(SketchPlugin_Arc::ID(), aHasSketchPlane);
+      aMsg->setState(SketchPlugin_BSpline::ID(), aHasSketchPlane);
       aMsg->setState(SketchPlugin_Ellipse::ID(), aHasSketchPlane);
       aMsg->setState(SketchPlugin_EllipticArc::ID(), aHasSketchPlane);
       aMsg->setState(SketchPlugin_Projection::ID(), aHasSketchPlane);
@@ -331,6 +340,7 @@ std::shared_ptr<ModelAPI_FeatureStateMessage> SketchPlugin_Plugin
       aMsg->setState(SketchPlugin_Split::ID(), aHasSketchPlane);
       aMsg->setState(SketchPlugin_Trim::ID(), aHasSketchPlane);
       aMsg->setState(SketchPlugin_MacroArc::ID(), aHasSketchPlane);
+      aMsg->setState(SketchPlugin_MacroBSpline::ID(), aHasSketchPlane);
       aMsg->setState(SketchPlugin_MacroCircle::ID(), aHasSketchPlane);
       aMsg->setState(SketchPlugin_MacroEllipse::ID(), aHasSketchPlane);
       aMsg->setState(SketchPlugin_MacroEllipticArc::ID(), aHasSketchPlane);

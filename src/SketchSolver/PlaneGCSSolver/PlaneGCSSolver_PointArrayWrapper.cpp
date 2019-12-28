@@ -1,4 +1,4 @@
-// Copyright (C) 2014-2019  CEA/DEN, EDF R&D
+// Copyright (C) 2019-2020  CEA/DEN, EDF R&D
 //
 // This library is free software; you can redistribute it and/or
 // modify it under the terms of the GNU Lesser General Public
@@ -17,19 +17,10 @@
 // See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 
-#include <PlaneGCSSolver_ScalarWrapper.h>
+#include <PlaneGCSSolver_PointArrayWrapper.h>
 
-PlaneGCSSolver_ScalarWrapper::PlaneGCSSolver_ScalarWrapper(double *const theParam)
-  : myValue(theParam)
+PlaneGCSSolver_PointArrayWrapper::PlaneGCSSolver_PointArrayWrapper(
+    const std::vector<PointWrapperPtr>& thePoints)
+  : myPoints(thePoints)
 {
-}
-
-void PlaneGCSSolver_ScalarWrapper::setValue(double theValue)
-{
-  *myValue = theValue;
-}
-
-double PlaneGCSSolver_ScalarWrapper::value() const
-{
-  return *myValue;
 }

@@ -19,12 +19,17 @@
 
 #include <PlaneGCSSolver_AngleWrapper.h>
 #include <PlaneGCSSolver_AttributeBuilder.h>
+#include <PlaneGCSSolver_PointArrayWrapper.h>
 #include <PlaneGCSSolver_PointWrapper.h>
 #include <PlaneGCSSolver_ScalarWrapper.h>
+#include <PlaneGCSSolver_ScalarArrayWrapper.h>
 #include <PlaneGCSSolver_BooleanWrapper.h>
 
+#include <GeomAPI_Pnt2d.h>
 #include <GeomDataAPI_Point2D.h>
+#include <GeomDataAPI_Point2DArray.h>
 #include <ModelAPI_AttributeDouble.h>
+#include <ModelAPI_AttributeDoubleArray.h>
 #include <SketchPlugin_ConstraintAngle.h>
 #include <SketchPlugin_MultiRotation.h>
 
@@ -80,6 +85,40 @@ static EntityWrapperPtr createScalar(const AttributePtr&     theAttribute,
   return aWrapper;
 }
 
+static EntityWrapperPtr createScalarArray(const AttributePtr&     theAttribute,
+                                          PlaneGCSSolver_Storage* theStorage)
+{
+  AttributeDoubleArrayPtr anArray =
+      std::dynamic_pointer_cast<ModelAPI_AttributeDoubleArray>(theAttribute);
+  if (!anArray || !anArray->isInitialized())
+    return EntityWrapperPtr();
+
+  int aSize = anArray->size();
+  GCS::VEC_pD aParameters;
+  aParameters.reserve(aSize);
+  for (int index = 0; index < aSize; ++index) {
+    double* aParam = createParameter(theStorage);
+    *aParam = anArray->value(index);
+    aParameters.push_back(aParam);
+  }
+
+  return EntityWrapperPtr(new PlaneGCSSolver_ScalarArrayWrapper(aParameters));
+}
+
+static PointWrapperPtr createPoint(const GeomPnt2dPtr& thePoint, PlaneGCSSolver_Storage* theStorage)
+{
+  GCSPointPtr aNewPoint(new GCS::Point);
+
+  aNewPoint->x = createParameter(theStorage);
+  aNewPoint->y = createParameter(theStorage);
+  if (thePoint) {
+    *(aNewPoint->x) = thePoint->x();
+    *(aNewPoint->y) = thePoint->y();
+  }
+
+  return PointWrapperPtr(new PlaneGCSSolver_PointWrapper(aNewPoint));
+}
+
 static EntityWrapperPtr createPoint(const AttributePtr&     theAttribute,
                                     PlaneGCSSolver_Storage* theStorage)
 {
@@ -88,16 +127,29 @@ static EntityWrapperPtr createPoint(const AttributePtr&     theAttribute,
   if (!aPoint2D)
     return EntityWrapperPtr();
 
-  GCSPointPtr aNewPoint(new GCS::Point);
+  GeomPnt2dPtr aPnt;
+  if (aPoint2D->isInitialized())
+    aPnt = aPoint2D->pnt();
 
-  aNewPoint->x = createParameter(theStorage);
-  aNewPoint->y = createParameter(theStorage);
-  if (aPoint2D->isInitialized()) {
-    *(aNewPoint->x) = aPoint2D->x();
-    *(aNewPoint->y) = aPoint2D->y();
-  }
+  return createPoint(aPnt, theStorage);
+}
 
-  return EntityWrapperPtr(new PlaneGCSSolver_PointWrapper(aNewPoint));
+static EntityWrapperPtr createPointArray(const AttributePtr& theAttribute,
+                                         PlaneGCSSolver_Storage* theStorage)
+{
+  std::shared_ptr<GeomDataAPI_Point2DArray> aPointArray =
+      std::dynamic_pointer_cast<GeomDataAPI_Point2DArray>(theAttribute);
+  if (!aPointArray)
+    return EntityWrapperPtr();
+
+  int aSize = aPointArray->size();
+
+  std::vector<PointWrapperPtr> aPointWrappers;
+  aPointWrappers.reserve(aSize);
+  for (int index = 0; index < aSize; ++index)
+    aPointWrappers.push_back(createPoint(aPointArray->pnt(index), theStorage));
+
+  return EntityWrapperPtr(new PlaneGCSSolver_PointArrayWrapper(aPointWrappers));
 }
 
 EntityWrapperPtr PlaneGCSSolver_AttributeBuilder::createAttribute(
@@ -112,6 +164,10 @@ EntityWrapperPtr PlaneGCSSolver_AttributeBuilder::createAttribute(
     aResult = createScalar(theAttribute, myStorage);
   if (!aResult)
     aResult = createBoolean(theAttribute);
+  if (!aResult)
+    aResult = createPointArray(theAttribute, myStorage);
+  if (!aResult)
+    aResult = createScalarArray(theAttribute, myStorage);
   if (aResult && !myStorage)
     aResult->setExternal(true);
   return aResult;

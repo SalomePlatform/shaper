@@ -65,7 +65,9 @@
 #include <GeomAPI_Lin.h>
 #include <GeomAPI_Edge.h>
 #include <GeomAPI_Vertex.h>
+
 #include <GeomDataAPI_Point2D.h>
+#include <GeomDataAPI_Point2DArray.h>
 
 #include <algorithm>
 #include <cmath>
@@ -1775,6 +1777,23 @@ bool SketchPlugin_MultiRotationAngleValidator::isValid(const AttributePtr& theAt
       theError = "Rotation full angle should be in range [0, 360]";
       return false;
     }
+  }
+
+  return true;
+}
+
+bool SketchPlugin_BSplineValidator::isValid(const AttributePtr& theAttribute,
+                                            const std::list<std::string>& theArguments,
+                                            Events_InfoMessage& theError) const
+{
+  AttributePoint2DArrayPtr aPolesArray =
+      std::dynamic_pointer_cast<GeomDataAPI_Point2DArray>(theAttribute);
+  if (!aPolesArray)
+    return false;
+
+  if (aPolesArray->size() < 2) {
+    theError = "Number of B-spline poles should be 2 and more";
+    return false;
   }
 
   return true;

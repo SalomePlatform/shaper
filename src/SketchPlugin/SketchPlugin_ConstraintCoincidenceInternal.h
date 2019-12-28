@@ -30,7 +30,7 @@
 class SketchPlugin_ConstraintCoincidenceInternal : public SketchPlugin_ConstraintCoincidence
 {
   public:
-  /// Coincidence constraint kind
+  /// \brief Coincidence constraint kind
   inline static const std::string& ID()
   {
     static const std::string MY_CONSTRAINT_COINCIDENCE_ID("SketchConstraintCoincidenceInternal");
@@ -43,7 +43,20 @@ class SketchPlugin_ConstraintCoincidenceInternal : public SketchPlugin_Constrain
     return MY_KIND;
   }
 
-  /// Returns the AIS preview
+  /// \brief Index of point in the array if the first attribute is an array
+  inline static const std::string& INDEX_ENTITY_A()
+  {
+    static const std::string MY_INDEX("ConstraintEntityA_Index");
+    return MY_INDEX;
+  }
+  /// \brief Index of point in the array if the second attribute is an array
+  inline static const std::string& INDEX_ENTITY_B()
+  {
+    static const std::string MY_INDEX("ConstraintEntityB_Index");
+    return MY_INDEX;
+  }
+
+  /// \brief Returns the AIS preview
   SKETCHPLUGIN_EXPORT virtual AISObjectPtr getAISObject(AISObjectPtr thePrevious);
 
   /// \brief Creates a new part document if needed

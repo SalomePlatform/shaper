@@ -164,10 +164,11 @@ static SolverConstraintPtr move(StoragePtr theStorage,
                                 int theSketchDOF,
                                 bool theEventsBlocked,
                                 Type theFeatureOrPoint,
+                                const EntityWrapperPtr& theSolverEntity,
                                 const std::shared_ptr<GeomAPI_Pnt2d>& theFrom,
                                 const std::shared_ptr<GeomAPI_Pnt2d>& theTo)
 {
-  bool isEntityExists = (theStorage->entity(theFeatureOrPoint).get() != 0);
+  bool isEntityExists = (theSolverEntity.get() != 0);
   if (theSketchDOF == 0 && isEntityExists) {
     // avoid moving elements of fully constrained sketch
     theStorage->refresh();
@@ -196,18 +197,29 @@ bool SketchSolver_Group::moveFeature(FeaturePtr theFeature,
                                      const std::shared_ptr<GeomAPI_Pnt2d>& theFrom,
                                      const std::shared_ptr<GeomAPI_Pnt2d>& theTo)
 {
-  SolverConstraintPtr aConstraint =
-      move(myStorage, mySketchSolver, myDOF, myIsEventsBlocked, theFeature, theFrom, theTo);
+  EntityWrapperPtr anEntity = myStorage->entity(theFeature);
+  SolverConstraintPtr aConstraint = move(myStorage, mySketchSolver, myDOF, myIsEventsBlocked,
+                                         theFeature, anEntity, theFrom, theTo);
   setTemporary(aConstraint);
   return true;
 }
 
 bool SketchSolver_Group::movePoint(AttributePtr theAttribute,
+                                   const int thePointIndex,
                                    const std::shared_ptr<GeomAPI_Pnt2d>& theFrom,
                                    const std::shared_ptr<GeomAPI_Pnt2d>& theTo)
 {
-  SolverConstraintPtr aConstraint =
-      move(myStorage, mySketchSolver, myDOF, myIsEventsBlocked, theAttribute, theFrom, theTo);
+  EntityWrapperPtr anEntity = myStorage->entity(theAttribute);
+  SolverConstraintPtr aConstraint;
+  if (thePointIndex < 0) {
+    aConstraint = move(myStorage, mySketchSolver, myDOF, myIsEventsBlocked,
+                       theAttribute, anEntity, theFrom, theTo);
+  }
+  else {
+    aConstraint = move(myStorage, mySketchSolver, myDOF, myIsEventsBlocked,
+                       std::pair<AttributePtr, int>(theAttribute, thePointIndex), anEntity,
+                       theFrom, theTo);
+  }
   setTemporary(aConstraint);
   return true;
 }

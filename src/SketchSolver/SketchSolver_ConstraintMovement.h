@@ -39,7 +39,7 @@ public:
   SketchSolver_ConstraintMovement(FeaturePtr theFeature);
 
   /// Creates movement constraint based on point
-  SketchSolver_ConstraintMovement(AttributePtr thePoint);
+  SketchSolver_ConstraintMovement(AttributePtr theMovedAttribute, const int thePointIndex = -1);
 
   /// \brief Set coordinates of the start point of the movement
   void startPoint(const std::shared_ptr<GeomAPI_Pnt2d>& theStartPoint);
@@ -74,7 +74,8 @@ protected:
 
 private:
   FeaturePtr       myMovedFeature; ///< fixed feature (if set, myBaseConstraint should be NULL)
-  AttributePtr     myDraggedPoint; ///< one of the feature points which has been moved
+  AttributePtr     myDraggedAttribute; ///< one of the feature points which has been moved
+  int              myDraggedPointIndex; ///< index of the point if the moved attribute is an array
   std::shared_ptr<GeomAPI_Pnt2d> myStartPoint; ///< start point of the movement
 
   bool mySimpleMove; ///< simple move, thus all parameters should be increased by movement delta

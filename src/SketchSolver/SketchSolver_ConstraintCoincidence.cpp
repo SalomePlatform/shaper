@@ -19,10 +19,13 @@
 
 #include <SketchSolver_ConstraintCoincidence.h>
 #include <SketchSolver_Error.h>
+#include <PlaneGCSSolver_PointArrayWrapper.h>
 #include <PlaneGCSSolver_Tools.h>
 #include <PlaneGCSSolver_UpdateCoincidence.h>
 
 #include <GeomDataAPI_Point2D.h>
+
+#include <ModelAPI_AttributeInteger.h>
 
 #include <SketchPlugin_Arc.h>
 #include <SketchPlugin_ConstraintCoincidenceInternal.h>
@@ -186,6 +189,20 @@ static void processEllipticArcExtremities(SketchSolver_ConstraintType& theType,
   }
 }
 
+static void getPointFromArray(EntityWrapperPtr& theArray,
+                              const ConstraintPtr& theConstraint,
+                              const std::string& theIndexAttrId)
+{
+  if (theArray && theArray->type() == ENTITY_POINT_ARRAY) {
+    AttributeIntegerPtr anIndexAttr = theConstraint->integer(theIndexAttrId);
+    if (anIndexAttr) {
+      PointArrayWrapperPtr aPointsArray =
+          std::dynamic_pointer_cast<PlaneGCSSolver_PointArrayWrapper>(theArray);
+      theArray = aPointsArray->value(anIndexAttr->value());
+    }
+  }
+}
+
 
 void SketchSolver_ConstraintCoincidence::process()
 {
@@ -244,6 +261,12 @@ void SketchSolver_ConstraintCoincidence::getAttributes(
     getCoincidentFeatureExtremities(myBaseConstraint, myStorage, myFeatureExtremities);
   } else
     myErrorMsg = SketchSolver_Error::INCORRECT_ATTRIBUTE();
+
+  // process internal coincidence with a point in the array of points
+  getPointFromArray(theAttributes[0], myBaseConstraint,
+                    SketchPlugin_ConstraintCoincidenceInternal::INDEX_ENTITY_A());
+  getPointFromArray(theAttributes[1], myBaseConstraint,
+                    SketchPlugin_ConstraintCoincidenceInternal::INDEX_ENTITY_B());
 }
 
 void SketchSolver_ConstraintCoincidence::notify(const FeaturePtr&      theFeature,

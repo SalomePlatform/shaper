@@ -45,6 +45,9 @@ namespace PlaneGCSSolver_Tools
   /// \brief Creates temporary constraint to fix the attribute after movement
   std::shared_ptr<SketchSolver_ConstraintMovement>
       createMovementConstraint(AttributePtr theMovedAttribute);
+  /// \brief Creates temporary constraint to fix the point in array after movement
+  std::shared_ptr<SketchSolver_ConstraintMovement>
+      createMovementConstraint(const std::pair<AttributePtr, int>& theMovedPointInArray);
 
   /// \brief Creates new constraint using given parameters
   /// \param theConstraint [in]  original constraint
