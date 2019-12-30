@@ -23,13 +23,14 @@
 import ModelAPI
 import ExchangeAPI
 import EventsAPI
+from GeomAPI import *
+import GeomAlgoAPI
 
 import salome
 from salome.shaper import model
 
-import os
-
 import SHAPERSTUDY_ORB
+import SHAPERSTUDY_utils
 
 ## @ingroup Plugins
 #  Feature to export all shapes and groups into the GEOM module
@@ -71,7 +72,6 @@ class PublishToStudyFeature(ModelAPI.ModelAPI_Feature):
             return
         # find a shaper-study component
         salome.salome_init(1)
-        import SHAPERSTUDY_utils
         aComponent = SHAPERSTUDY_utils.findOrCreateComponent()
         anEngine = SHAPERSTUDY_utils.getEngine()
         # collect all processed internal entries to break the link of unprocessed later
@@ -97,14 +97,67 @@ class PublishToStudyFeature(ModelAPI.ModelAPI_Feature):
             if not aSShape.GetSO(): # publish in case it is a new shape
               anEngine.AddInStudy(aSShape, aRes.data().name(), None)
             else: # restore a red reference if it was deleted
-              aRes, aSO2 = aSShape.GetSO().FindSubObject(1)
-              if aRes:
-                aRes, aRef = aSO2.ReferencedObject()
-                if not aRes:
+              aDone, aSO2 = aSShape.GetSO().FindSubObject(1)
+              if aDone:
+                aDone, aRef = aSO2.ReferencedObject()
+                if not aDone:
                   aBuilder = SHAPERSTUDY_utils.getStudy().NewBuilder()
                   aBuilder.Addreference(aSO2, aSShape.GetSO())
-
             allProcessed.append(aSSEntry)
+            # Groups
+            allGroupsProcessed = []
+            aRefGroups = ModelAPI.referencedFeatures(aRes, "Group", True)
+            for aRef in aRefGroups:
+              aGroupIndices = []
+              aGroupHasIndex = {}
+              aResShape = aRes.shape()
+              aSelList = aRef.selectionList("group_list")
+              aSelType = GeomAPI_Shape.shapeTypeByStr(aSelList.selectionType())
+              for aSelIndex in range(aSelList.size()):
+                aSelection = aSelList.value(aSelIndex)
+                if aSelection.contextObject():
+                  aShape = aSelection.value()
+                  if aShape:
+                    allShapesList = [] # collect all sub-shapes selected in the group
+                    if aShape.shapeType() == 0: # compound
+                      anExplorer = GeomAPI_ShapeExplorer(aShape, aSelType)
+                      while anExplorer.more():
+                        allShapesList.append(anExplorer.current())
+                        anExplorer.next()
+                    else:
+                      allShapesList.append(aShape)
+                    # get index of each selected shape: if 0, this sub-shape is not in our result
+                    for aSelected in allShapesList:
+                      anId = GeomAlgoAPI.GeomAlgoAPI_CompoundBuilder.id(aResShape, aSelected)
+                      if anId > 0 and not anId in aGroupHasIndex:
+                        aGroupIndices.append(anId)
+                        aGroupHasIndex[anId] = 0
+              if len(aGroupIndices): # create group
+                aGroupOp = anEngine.GetIGroupOperations()
+                aGroupFeatureId = aRef.data().featureId()
+                aGroupEntry = "group" + str(aPartFeatureId) + ":" + str(aGroupFeatureId)
+                aGroup = aGroupOp.FindGroup(aSShape, aGroupEntry)
+                if not aGroup: # create a new
+                  aGroup = aGroupOp.CreateGroup(aSShape, aSelType)
+                  aGroup.SetEntry(aGroupEntry)
+                  anEngine.AddInStudy(aGroup, aRef.firstResult().data().name(), aSShape.GetSO())
+                aGroup.SetSelection(aGroupIndices)
+                # a group takes shape from the main result
+                #aGroup.SetShapeByStream(aRef.firstResult().shape().getShapeStream(False)) # group shape
+                allGroupsProcessed.append(aGroupEntry)
+            # check all existing groups: if some does not processed, remove it from the tree
+            aSOIter = SHAPERSTUDY_utils.getStudy().NewChildIterator(aSShape.GetSO())
+            while aSOIter.More():
+              aSO = aSOIter.Value()
+              anIOR = aSO.GetIOR()
+              if len(anIOR):
+                anObj = salome.orb.string_to_object(anIOR)
+                if isinstance(anObj, SHAPERSTUDY_ORB._objref_SHAPER_Group):
+                  anEntry = anObj.GetEntry()
+                  if anEntry not in allGroupsProcessed: # found a removed group => remove
+                    aBuilder = SHAPERSTUDY_utils.getStudy().NewBuilder()
+                    aBuilder.RemoveObject(anObj.GetSO())
+              aSOIter.Next()
 
         # process all SHAPER-STUDY shapes to find dead
         aSOIter = SHAPERSTUDY_utils.getStudy().NewChildIterator(aComponent)
