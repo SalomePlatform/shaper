@@ -29,6 +29,8 @@
 #include <memory>
 #include <vector>
 
+class GeomAPI_BSpline2d;
+
 /**\class GeomAlgoAPI_EdgeBuilder
  * \ingroup DataAlgo
  * \brief Allows to create face-shapes by different parameters
@@ -91,10 +93,15 @@ class GEOMALGOAPI_EXPORT GeomAlgoAPI_EdgeBuilder
       const std::shared_ptr<GeomAPI_Pnt>& theStart,
       const std::shared_ptr<GeomAPI_Pnt>& theEnd);
 
-  /// Creates B-spline edge
-  static GeomEdgePtr bspline(const std::vector<GeomPointPtr>& thePoles,
-                             const std::vector<double>& theWeights,
-                             const bool thePeriodic);
+  /// Creates planar B-spline edge
+  static GeomEdgePtr bsplineOnPlane(const std::shared_ptr<GeomAPI_Pln>& thePlane,
+                                    const std::list<std::shared_ptr<GeomAPI_Pnt2d> >& thePoles,
+                                    const std::list<double>& theWeights,
+                                    const bool thePeriodic);
+
+  /// Creates planar B-spline edge
+  static GeomEdgePtr bsplineOnPlane(const std::shared_ptr<GeomAPI_Pln>& thePlane,
+                                    const std::shared_ptr<GeomAPI_BSpline2d>& theCurve);
 };
 
 #endif

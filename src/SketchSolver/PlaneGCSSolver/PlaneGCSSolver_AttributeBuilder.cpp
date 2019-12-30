@@ -30,6 +30,8 @@
 #include <GeomDataAPI_Point2DArray.h>
 #include <ModelAPI_AttributeDouble.h>
 #include <ModelAPI_AttributeDoubleArray.h>
+#include <ModelAPI_AttributeInteger.h>
+#include <SketchPlugin_BSpline.h>
 #include <SketchPlugin_ConstraintAngle.h>
 #include <SketchPlugin_MultiRotation.h>
 
@@ -63,9 +65,17 @@ static EntityWrapperPtr createBoolean(const AttributePtr& theAttribute)
 static EntityWrapperPtr createScalar(const AttributePtr&     theAttribute,
                                      PlaneGCSSolver_Storage* theStorage)
 {
-  AttributeDoublePtr aScalar = std::dynamic_pointer_cast<ModelAPI_AttributeDouble>(theAttribute);
-  if (!aScalar)
-    return EntityWrapperPtr();
+  double aValue = 0.0;
+  AttributeDoublePtr aDouble = std::dynamic_pointer_cast<ModelAPI_AttributeDouble>(theAttribute);
+  if (aDouble)
+    aValue = aDouble->isInitialized() ? aDouble->value() : 0.0;
+  else {
+    AttributeIntegerPtr anInt = std::dynamic_pointer_cast<ModelAPI_AttributeInteger>(theAttribute);
+    if (anInt)
+      aValue = anInt->isInitialized() ? anInt->value() : 0.0;
+    else
+      return EntityWrapperPtr();
+  }
 
   ScalarWrapperPtr aWrapper;
   // following attributes should be converted from degrees to radians
@@ -77,11 +87,14 @@ static EntityWrapperPtr createScalar(const AttributePtr&     theAttribute,
      (theAttribute->id() == SketchPlugin_MultiRotation::ANGLE_ID() &&
       anOwner->getKind() == SketchPlugin_MultiRotation::ID()))
     aWrapper = ScalarWrapperPtr(new PlaneGCSSolver_AngleWrapper(createParameter(theStorage)));
+  else if (anOwner->getKind() == SketchPlugin_BSpline::ID() &&
+           theAttribute->id() == SketchPlugin_BSpline::DEGREE_ID())
+    // Degree of B-spline is not processed by the solver
+    aWrapper = ScalarWrapperPtr(new PlaneGCSSolver_ScalarWrapper(createParameter(nullptr)));
   else
     aWrapper = ScalarWrapperPtr(new PlaneGCSSolver_ScalarWrapper(createParameter(theStorage)));
 
-  if (aScalar->isInitialized())
-    aWrapper->setValue(aScalar->value());
+  aWrapper->setValue(aValue);
   return aWrapper;
 }
 
@@ -93,11 +106,18 @@ static EntityWrapperPtr createScalarArray(const AttributePtr&     theAttribute,
   if (!anArray || !anArray->isInitialized())
     return EntityWrapperPtr();
 
+  PlaneGCSSolver_Storage* aStorage = theStorage;
+  // Weights of B-spline curve are not processed by the solver
+  FeaturePtr anOwner = ModelAPI_Feature::feature(theAttribute->owner());
+  if (anOwner->getKind() == SketchPlugin_BSpline::ID() &&
+      theAttribute->id() == SketchPlugin_BSpline::WEIGHTS_ID())
+    aStorage = 0;
+
   int aSize = anArray->size();
   GCS::VEC_pD aParameters;
   aParameters.reserve(aSize);
   for (int index = 0; index < aSize; ++index) {
-    double* aParam = createParameter(theStorage);
+    double* aParam = createParameter(aStorage);
     *aParam = anArray->value(index);
     aParameters.push_back(aParam);
   }

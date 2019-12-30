@@ -18,12 +18,13 @@
 //
 
 #include <PlaneGCSSolver_FeatureBuilder.h>
+#include <PlaneGCSSolver_BooleanWrapper.h>
 #include <PlaneGCSSolver_EdgeWrapper.h>
+#include <PlaneGCSSolver_GeoExtensions.h>
 #include <PlaneGCSSolver_PointWrapper.h>
 #include <PlaneGCSSolver_PointArrayWrapper.h>
 #include <PlaneGCSSolver_ScalarWrapper.h>
 #include <PlaneGCSSolver_ScalarArrayWrapper.h>
-#include <PlaneGCSSolver_BooleanWrapper.h>
 #include <PlaneGCSSolver_Tools.h>
 
 #include <SketchPlugin_Arc.h>
@@ -297,7 +298,7 @@ EntityWrapperPtr createEllipticArc(const AttributeEntityMap& theAttributes,
 
 EntityWrapperPtr createBSpline(const AttributeEntityMap& theAttributes)
 {
-  std::shared_ptr<GCS::BSpline> aNewSpline(new GCS::BSpline);
+  std::shared_ptr<GCS::BSplineImpl> aNewSpline(new GCS::BSplineImpl);
 
   aNewSpline->degree = 3;
   aNewSpline->periodic = false;
@@ -321,6 +322,11 @@ EntityWrapperPtr createBSpline(const AttributeEntityMap& theAttributes)
       ScalarArrayWrapperPtr anArray =
           std::dynamic_pointer_cast<PlaneGCSSolver_ScalarArrayWrapper>(anIt->second);
       aNewSpline->weights = anArray->array();
+    }
+    else if (anAttrID == SketchPlugin_BSpline::DEGREE_ID()) {
+      ScalarWrapperPtr aScalar =
+          std::dynamic_pointer_cast<PlaneGCSSolver_ScalarWrapper>(anIt->second);
+      aNewSpline->degree = (int)aScalar->value();
     }
   }
 
@@ -370,7 +376,8 @@ bool isAttributeApplicable(const std::string& theAttrName, const std::string& th
   }
   else if (theOwnerName == SketchPlugin_BSpline::ID()) {
     return theAttrName == SketchPlugin_BSpline::POLES_ID() ||
-           theAttrName == SketchPlugin_BSpline::WEIGHTS_ID();
+           theAttrName == SketchPlugin_BSpline::WEIGHTS_ID() ||
+           theAttrName == SketchPlugin_BSpline::DEGREE_ID();
   }
 
   // suppose that all remaining features are points

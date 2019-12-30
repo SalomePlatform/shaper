@@ -32,6 +32,7 @@
 #include <GeomDataAPI_Point2DArray.h>
 
 #include <ModelAPI_AttributeDoubleArray.h>
+#include <ModelAPI_AttributeInteger.h>
 #include <ModelAPI_ResultConstruction.h>
 #include <ModelAPI_Session.h>
 #include <ModelAPI_Validator.h>
@@ -52,6 +53,7 @@ void SketchPlugin_BSpline::initDerivedClassAttributes()
 {
   data()->addAttribute(POLES_ID(), GeomDataAPI_Point2DArray::typeId());
   data()->addAttribute(WEIGHTS_ID(), ModelAPI_AttributeDoubleArray::typeId());
+  data()->addAttribute(DEGREE_ID(), ModelAPI_AttributeInteger::typeId());
 
   data()->addAttribute(EXTERNAL_ID(), ModelAPI_AttributeSelection::typeId());
   ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(), EXTERNAL_ID());
@@ -68,21 +70,20 @@ void SketchPlugin_BSpline::execute()
       std::dynamic_pointer_cast<GeomDataAPI_Point2DArray>(attribute(POLES_ID()));
   AttributeDoubleArrayPtr aWeightsArray = data()->realArray(WEIGHTS_ID());
 
-  // convert poles to 3D
-  std::vector<GeomPointPtr> aPoles3D;
-  aPoles3D.reserve(aPolesArray->size());
+  // collect poles
+  std::list<GeomPnt2dPtr> aPoles2D;
   for (int anIndex = 0; anIndex < aPolesArray->size(); ++anIndex) {
     GeomPnt2dPtr aPole = aPolesArray->pnt(anIndex);
-    aPoles3D.push_back(aSketch->to3D(aPole->x(), aPole->y()));
+    aPoles2D.push_back(aPole);
   }
   // collect weights
-  std::vector<double> aWeights;
-  aWeights.reserve(aWeightsArray->size());
+  std::list<double> aWeights;
   for (int anIndex = 0; anIndex < aWeightsArray->size(); ++anIndex)
     aWeights.push_back(aWeightsArray->value(anIndex));
 
   // create result non-periodic B-spline curve
-  GeomShapePtr anEdge = GeomAlgoAPI_EdgeBuilder::bspline(aPoles3D, aWeights, false);
+  GeomShapePtr anEdge =
+      GeomAlgoAPI_EdgeBuilder::bsplineOnPlane(aSketch->plane(), aPoles2D, aWeights, false);
 
   ResultConstructionPtr aResult = document()->createConstruction(data(), 0);
   aResult->setShape(anEdge);

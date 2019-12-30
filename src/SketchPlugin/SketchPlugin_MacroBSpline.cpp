@@ -40,6 +40,8 @@
 #include <GeomAlgoAPI_EdgeBuilder.h>
 #include <GeomAlgoAPI_PointBuilder.h>
 
+#include <GeomAPI_BSpline2d.h>
+
 #include <sstream>
 
 // Create Point feature coincident with the B-spline pole
@@ -60,6 +62,7 @@ static void createInternalConstraint(SketchPlugin_Sketch* theSketch,
 
 SketchPlugin_MacroBSpline::SketchPlugin_MacroBSpline()
   : SketchPlugin_SketchEntity(),
+    myDegree(3),
     myIsPeriodic(false)
 {
 }
@@ -138,6 +141,8 @@ FeaturePtr SketchPlugin_MacroBSpline::createBSplineFeature()
 {
   FeaturePtr aBSpline = sketch()->addFeature(SketchPlugin_BSpline::ID());
 
+  aBSpline->integer(SketchPlugin_BSpline::DEGREE_ID())->setValue(myDegree);
+
   AttributePoint2DArrayPtr aPoles = std::dynamic_pointer_cast<GeomDataAPI_Point2DArray>(
       aBSpline->attribute(SketchPlugin_BSpline::POLES_ID()));
   AttributePoint2DArrayPtr aPolesMacro =
@@ -207,17 +212,20 @@ AISObjectPtr SketchPlugin_MacroBSpline::getAISObject(AISObjectPtr thePrevious)
   if (!aSketch)
     return AISObjectPtr();
 
+  static const bool PERIODIC = false;
+
   AttributePoint2DArrayPtr aPolesArray =
       std::dynamic_pointer_cast<GeomDataAPI_Point2DArray>(attribute(POLES_ID()));
   AttributeDoubleArrayPtr aWeightsArray = data()->realArray(WEIGHTS_ID());
 
+  if (aPolesArray->size() < 2)
+    return AISObjectPtr();
+
   std::list<GeomShapePtr> aShapes;
 
-  // convert poles to 3D and collect weights
-  std::vector<GeomPointPtr> aPoles3D;
-  aPoles3D.reserve(aPolesArray->size());
-  std::vector<double> aWeights;
-  aWeights.reserve(aWeightsArray->size());
+  // convert poles to vertices and collect weights
+  std::list<GeomPnt2dPtr> aPoles2D;
+  std::list<double> aWeights;
   for (int anIndex = 0; anIndex < aPolesArray->size(); ++anIndex) {
     double aWeight = aWeightsArray->value(anIndex);
     if (aWeight < 1.e-10)
@@ -226,15 +234,25 @@ AISObjectPtr SketchPlugin_MacroBSpline::getAISObject(AISObjectPtr thePrevious)
     aWeights.push_back(aWeight);
 
     GeomPnt2dPtr aPole = aPolesArray->pnt(anIndex);
+    aPoles2D.push_back(aPole);
     GeomPointPtr aPole3D = aSketch->to3D(aPole->x(), aPole->y());
-    aPoles3D.push_back(aPole3D);
     aShapes.push_back(GeomAlgoAPI_PointBuilder::vertex(aPole3D));
   }
 
   // create result non-periodic B-spline curve
-  GeomShapePtr anEdge = GeomAlgoAPI_EdgeBuilder::bspline(aPoles3D, aWeights, false);
+  std::shared_ptr<GeomAPI_BSpline2d> aBSplineCurve;
+  try {
+    aBSplineCurve.reset(new GeomAPI_BSpline2d(aPoles2D, aWeights, PERIODIC));
+  } catch (...) {
+    // cannot build a B-spline curve
+    return AISObjectPtr();
+  }
+  GeomShapePtr anEdge =
+      GeomAlgoAPI_EdgeBuilder::bsplineOnPlane(aSketch->plane(), aBSplineCurve);
   if (!anEdge)
     return AISObjectPtr();
+
+  myDegree = aBSplineCurve->degree();
 
   aShapes.push_back(anEdge);
   GeomShapePtr aCompound = GeomAlgoAPI_CompoundBuilder::compound(aShapes);

@@ -77,7 +77,8 @@ static ConstraintWrapperPtr
 static ConstraintWrapperPtr
   createConstraintPointOnEntity(const SketchSolver_ConstraintType& theType,
                                 std::shared_ptr<PlaneGCSSolver_PointWrapper> thePoint,
-                                std::shared_ptr<PlaneGCSSolver_EdgeWrapper> theEntity);
+                                std::shared_ptr<PlaneGCSSolver_EdgeWrapper> theEntity,
+                                std::shared_ptr<PlaneGCSSolver_ScalarWrapper> theValue);
 static ConstraintWrapperPtr
   createConstraintPointsCollinear(std::shared_ptr<PlaneGCSSolver_PointWrapper> thePoint1,
                                   std::shared_ptr<PlaneGCSSolver_PointWrapper> thePoint2,
@@ -134,6 +135,7 @@ static GCS::SET_pD circleParameters(const EdgeWrapperPtr& theCircle);
 static GCS::SET_pD arcParameters(const EdgeWrapperPtr& theArc);
 static GCS::SET_pD ellipseParameters(const EdgeWrapperPtr& theEllipse);
 static GCS::SET_pD ellipticArcParameters(const EdgeWrapperPtr& theEllipticArc);
+static GCS::SET_pD bsplineParameters(const EdgeWrapperPtr& theEdge);
 
 static double distance(const GCS::Point& thePnt1, const GCS::Point& thePnt2);
 
@@ -221,8 +223,9 @@ ConstraintWrapperPtr PlaneGCSSolver_Tools::createConstraint(
     aResult = createConstraintCoincidence(aPoint1, aPoint2);
     break;
   case CONSTRAINT_PT_ON_CURVE:
-    aResult = anEntity1 ? createConstraintPointOnEntity(theType, aPoint1, anEntity1):
-              createConstraintPointsCollinear(aPoint1, aPoint2, GCS_POINT_WRAPPER(theEntity1));
+    aResult = anEntity1 ?
+        createConstraintPointOnEntity(theType, aPoint1, anEntity1, GCS_SCALAR_WRAPPER(theValue)) :
+        createConstraintPointsCollinear(aPoint1, aPoint2, GCS_POINT_WRAPPER(theEntity1));
     break;
   case CONSTRAINT_MIDDLE_POINT:
     aResult = createConstraintMiddlePoint(aPoint1, GCS_EDGE_WRAPPER(theEntity1), aPoint2);
@@ -408,6 +411,8 @@ GCS::SET_pD PlaneGCSSolver_Tools::parameters(const EntityWrapperPtr& theEntity)
     return ellipseParameters(GCS_EDGE_WRAPPER(theEntity));
   case ENTITY_ELLIPTIC_ARC:
     return ellipticArcParameters(GCS_EDGE_WRAPPER(theEntity));
+  case ENTITY_BSPLINE:
+    return bsplineParameters(GCS_EDGE_WRAPPER(theEntity));
   default: break;
   }
   return GCS::SET_pD();
@@ -440,7 +445,8 @@ ConstraintWrapperPtr createConstraintCoincidence(
 ConstraintWrapperPtr createConstraintPointOnEntity(
     const SketchSolver_ConstraintType& theType,
     std::shared_ptr<PlaneGCSSolver_PointWrapper> thePoint,
-    std::shared_ptr<PlaneGCSSolver_EdgeWrapper> theEntity)
+    std::shared_ptr<PlaneGCSSolver_EdgeWrapper> theEntity,
+    std::shared_ptr<PlaneGCSSolver_ScalarWrapper> theValue)
 {
   GCSConstraintPtr aNewConstr;
 
@@ -466,6 +472,14 @@ ConstraintWrapperPtr createConstraintPointOnEntity(
         new GCS::ConstraintPointOnEllipse(*(thePoint->point()), *anEllipse));
     break;
     }
+  case ENTITY_BSPLINE: {
+    std::list<GCSConstraintPtr> aConstraints;
+    aConstraints.push_back(GCSConstraintPtr(new GCS::ConstraintCurveValue(
+        *thePoint->point(), thePoint->point()->x, *theEntity->entity(), theValue->scalar())));
+    aConstraints.push_back(GCSConstraintPtr(new GCS::ConstraintCurveValue(
+        *thePoint->point(), thePoint->point()->y, *theEntity->entity(), theValue->scalar())));
+    return ConstraintWrapperPtr(new PlaneGCSSolver_ConstraintWrapper(aConstraints, theType));
+  }
   default:
     return ConstraintWrapperPtr();
   }
@@ -810,6 +824,23 @@ GCS::SET_pD ellipticArcParameters(const EdgeWrapperPtr& theEllipticArc)
   aParams.insert(anArc->end.y);
   aParams.insert(anArc->startAngle);
   aParams.insert(anArc->endAngle);
+  return aParams;
+}
+
+GCS::SET_pD bsplineParameters(const EdgeWrapperPtr& theEdge)
+{
+  GCS::SET_pD aParams;
+
+  std::shared_ptr<GCS::BSpline> aBSpline =
+    std::dynamic_pointer_cast<GCS::BSpline>(theEdge->entity());
+
+  for (GCS::VEC_P::iterator it = aBSpline->poles.begin(); it != aBSpline->poles.end(); ++it) {
+    aParams.insert(it->x);
+    aParams.insert(it->y);
+  }
+  for (GCS::VEC_pD::iterator it = aBSpline->weights.begin(); it != aBSpline->weights.end(); ++it)
+    aParams.insert(*it);
+
   return aParams;
 }
 

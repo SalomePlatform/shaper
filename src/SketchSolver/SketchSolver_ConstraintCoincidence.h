@@ -55,6 +55,7 @@ protected:
 protected:
   bool myInSolver; ///< shows the constraint is added to the solver
   EntityWrapperPtr myFeatureExtremities[2]; ///< extremities of a feature, a point is coincident to
+  ScalarWrapperPtr myAuxValue; ///< parameter on B-spline curve
 };
 
 #endif

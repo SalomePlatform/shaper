@@ -20,6 +20,7 @@
 #include <SketchSolver_ConstraintCoincidence.h>
 #include <SketchSolver_Error.h>
 #include <PlaneGCSSolver_PointArrayWrapper.h>
+#include <PlaneGCSSolver_Storage.h>
 #include <PlaneGCSSolver_Tools.h>
 #include <PlaneGCSSolver_UpdateCoincidence.h>
 
@@ -224,7 +225,7 @@ void SketchSolver_ConstraintCoincidence::process()
 
   mySolverConstraint = PlaneGCSSolver_Tools::createConstraint(
       myBaseConstraint, getType(),
-      aValue, anAttributes[0], anAttributes[1], anAttributes[2], anAttributes[3]);
+      myAuxValue, anAttributes[0], anAttributes[1], anAttributes[2], anAttributes[3]);
 
   myStorage->subscribeUpdates(this, PlaneGCSSolver_UpdateCoincidence::GROUP());
   myStorage->notify(myBaseConstraint);
@@ -235,6 +236,13 @@ bool SketchSolver_ConstraintCoincidence::remove()
   myInSolver = false;
   myFeatureExtremities[0] = EntityWrapperPtr();
   myFeatureExtremities[1] = EntityWrapperPtr();
+  if (myAuxValue) {
+    std::shared_ptr<PlaneGCSSolver_Storage> aStorage =
+        std::dynamic_pointer_cast<PlaneGCSSolver_Storage>(myStorage);
+    GCS::SET_pD aParams;
+    aParams.insert(myAuxValue->scalar());
+    aStorage->removeParameters(aParams);
+  }
   return SketchSolver_Constraint::remove();
 }
 
@@ -257,8 +265,16 @@ void SketchSolver_ConstraintCoincidence::getAttributes(
                                   theAttributes, myFeatureExtremities);
   } else if (theAttributes[2]) {
     myType = CONSTRAINT_PT_ON_CURVE;
-    // obtain extremity points of the coincident feature for further checking of multi-coincidence
-    getCoincidentFeatureExtremities(myBaseConstraint, myStorage, myFeatureExtremities);
+    // point-on-bspline requires additional parameter
+    if (theAttributes[2]->type() == ENTITY_BSPLINE) {
+      std::shared_ptr<PlaneGCSSolver_Storage> aStorage =
+          std::dynamic_pointer_cast<PlaneGCSSolver_Storage>(myStorage);
+      myAuxValue.reset(new PlaneGCSSolver_ScalarWrapper(aStorage->createParameter()));
+    }
+    else {
+      // obtain extremity points of the coincident feature for further checking of multi-coincidence
+      getCoincidentFeatureExtremities(myBaseConstraint, myStorage, myFeatureExtremities);
+    }
   } else
     myErrorMsg = SketchSolver_Error::INCORRECT_ATTRIBUTE();
 

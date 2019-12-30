@@ -51,6 +51,13 @@ public:
     return ID;
   }
 
+  /// attribute to store the degree of B-spline
+  inline static const std::string& DEGREE_ID()
+  {
+    static const std::string ID("degree");
+    return ID;
+  }
+
   /// Returns the kind of a feature
   SKETCHPLUGIN_EXPORT virtual const std::string& getKind()
   {

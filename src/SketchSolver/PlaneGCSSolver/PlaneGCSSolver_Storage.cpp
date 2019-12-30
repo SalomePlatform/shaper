@@ -582,6 +582,8 @@ double* PlaneGCSSolver_Storage::createParameter()
 void PlaneGCSSolver_Storage::removeParameters(const GCS::SET_pD& theParams)
 {
   mySketchSolver->removeParameters(theParams);
+  for (GCS::SET_pD::iterator it = theParams.begin(); it != theParams.end(); ++it)
+    delete *it;
 }
 
 // indicates attribute containing in the external feature

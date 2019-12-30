@@ -20,7 +20,10 @@
 #include <GeomAlgoAPI_EdgeBuilder.h>
 
 #include <GeomAPI_Ax2.h>
+#include <GeomAPI_BSpline2d.h>
 #include <GeomAPI_Ellipse.h>
+#include <GeomAPI_Pln.h>
+#include <GeomAPI_Pnt2d.h>
 
 #include <gp_Pln.hxx>
 #include <BRepBuilderAPI_MakeEdge.hxx>
@@ -28,10 +31,11 @@
 #include <TopoDS_Face.hxx>
 #include <TopoDS.hxx>
 #include <BRep_Tool.hxx>
-#include <Geom_BSplineCurve.hxx>
+#include <Geom2d_BSplineCurve.hxx>
 #include <Geom_Plane.hxx>
 #include <Geom_CylindricalSurface.hxx>
 #include <Geom_RectangularTrimmedSurface.hxx>
+#include <GeomLib.hxx>
 
 #include <gp_Ax2.hxx>
 #include <gp_Circ.hxx>
@@ -268,49 +272,25 @@ std::shared_ptr<GeomAPI_Edge> GeomAlgoAPI_EdgeBuilder::ellipticArc(
   return aRes;
 }
 
-GeomEdgePtr GeomAlgoAPI_EdgeBuilder::bspline(const std::vector<GeomPointPtr>& thePoles,
-                                             const std::vector<double>& theWeights,
-                                             const bool thePeriodic)
+GeomEdgePtr GeomAlgoAPI_EdgeBuilder::bsplineOnPlane(
+    const std::shared_ptr<GeomAPI_Pln>& thePlane,
+    const std::list<GeomPnt2dPtr>& thePoles,
+    const std::list<double>& theWeights,
+    const bool thePeriodic)
 {
-  int aDegree = 3;
-  if ((int)thePoles.size() <= aDegree)
-    aDegree = (int)thePoles.size() - 1;
-  if (aDegree <= 0)
-    return GeomEdgePtr();
+  std::shared_ptr<GeomAPI_BSpline2d> aBSplineCurve(
+      new GeomAPI_BSpline2d(thePoles, theWeights, thePeriodic));
+  return bsplineOnPlane(thePlane, aBSplineCurve);
+}
 
-  int aNbKnots = (int)thePoles.size() - aDegree + 1;
+GeomEdgePtr GeomAlgoAPI_EdgeBuilder::bsplineOnPlane(
+    const std::shared_ptr<GeomAPI_Pln>& thePlane,
+    const std::shared_ptr<GeomAPI_BSpline2d>& theCurve)
+{
+  Handle(Geom_Curve) aCurve3D = GeomLib::To3d(thePlane->impl<gp_Pln>().Position().Ax2(),
+                                              theCurve->impl<Handle_Geom2d_BSplineCurve>());
 
-  // collect arrays of poles, weights, knots and multiplicities
-  TColgp_Array1OfPnt aPoles(1, (int)thePoles.size());
-  TColStd_Array1OfReal aWeights(1, (int)theWeights.size());
-  TColStd_Array1OfReal aKnots(1, aNbKnots);
-  TColStd_Array1OfInteger aMults(1, aNbKnots);
-
-  int anIndex = 1;
-  for (std::vector<GeomPointPtr>::const_iterator aPIt = thePoles.begin();
-       aPIt != thePoles.end(); ++aPIt, ++anIndex)
-    aPoles.SetValue(anIndex, gp_Pnt((*aPIt)->x(), (*aPIt)->y(), (*aPIt)->z()));
-  anIndex = 1;
-  for (std::vector<double>::const_iterator aWIt = theWeights.begin();
-       aWIt != theWeights.end(); ++aWIt, ++anIndex)
-    aWeights.SetValue(anIndex, *aWIt);
-  anIndex = 1;
-  static const double aStartParam = 0.0;
-  static const double aEndParam = 1.0;
-  double aStep = aEndParam / (aNbKnots - 1);
-  for (double aKnot = aStartParam; anIndex < aNbKnots; ++anIndex, aKnot += aStep)
-    aKnots.SetValue(anIndex, aKnot);
-  aKnots.ChangeLast() = aEndParam;
-  anIndex = 1;
-  aMults.SetValue(anIndex, aDegree + 1);
-  for (++anIndex; anIndex < aNbKnots; ++anIndex)
-    aMults.SetValue(anIndex, 1);
-  aMults.SetValue(aNbKnots, aDegree + 1);
-
-  Handle(Geom_BSplineCurve) aCurve =
-      new Geom_BSplineCurve(aPoles, aWeights, aKnots, aMults, aDegree, thePeriodic);
-
-  BRepBuilderAPI_MakeEdge anEdgeBuilder(aCurve, aStartParam, aEndParam);
+  BRepBuilderAPI_MakeEdge anEdgeBuilder(aCurve3D);
   GeomEdgePtr aRes(new GeomAPI_Edge);
   TopoDS_Edge anEdge = anEdgeBuilder.Edge();
   aRes->setImpl(new TopoDS_Shape(anEdge));

@@ -104,6 +104,7 @@ private:
   void createControlPolygon(FeaturePtr theBSpline, std::list<FeaturePtr>& thePoles);
   void constraintsForPoles(const std::list<FeaturePtr>& thePoles);
 
+  int myDegree;
   bool myIsPeriodic;
 };
 
