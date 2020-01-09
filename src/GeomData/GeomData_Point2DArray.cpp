@@ -49,6 +49,9 @@ bool GeomData_Point2DArray::assign(std::shared_ptr<GeomDataAPI_Point2DArray> the
 
   setSize(anOther->size());
   myArray->ChangeArray(anOther->myArray->Array(), false);
+  owner()->data()->sendAttributeUpdated(this);
+
+  return true;
 }
 
 int GeomData_Point2DArray::size()

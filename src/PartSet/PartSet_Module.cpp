@@ -805,12 +805,12 @@ bool PartSet_Module::createWidgets(const FeaturePtr& theFeature, const QString& 
             return aProcessed;
         }
         const TopoDS_Shape& aTDShape = aShape->impl<TopoDS_Shape>();
-        AttributePtr anAttribute = PartSet_Tools::findAttributeBy2dPoint(anObject, aTDShape,
-                                                               mySketchMgr->activeSketch());
-        if (anAttribute.get()) {
+        std::pair<AttributePtr, int> anAttribute =
+            PartSet_Tools::findAttributeBy2dPoint(anObject, aTDShape, mySketchMgr->activeSketch());
+        if (anAttribute.first.get()) {
           ModuleBase_WidgetFactory aFactory(theXmlRepr.toStdString(), workshop());
 
-          const std::string anAttributeId = anAttribute->id();
+          const std::string anAttributeId = anAttribute.first->id();
           aFactory.createWidget(aPropertyPanel->contentWidget(), anAttributeId);
 
           theWidgets = aFactory.getModelWidgets();
@@ -1735,8 +1735,9 @@ AttributePtr PartSet_Module::findAttribute(const ObjectPtr& theObject,
 
   if (aGeomShape.get()) {
     TopoDS_Shape aTDSShape = aGeomShape->impl<TopoDS_Shape>();
-    return PartSet_Tools::findAttributeBy2dPoint(theObject, aTDSShape,
-                                                 mySketchMgr->activeSketch());
+    std::pair<AttributePtr, int> anAttrAndIndex =
+        PartSet_Tools::findAttributeBy2dPoint(theObject, aTDSShape, mySketchMgr->activeSketch());
+    return anAttrAndIndex.first;
   }
   return anAttribute;
 }

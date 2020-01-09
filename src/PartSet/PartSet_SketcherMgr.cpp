@@ -60,6 +60,7 @@
 #include <ModuleBase_ViewerFilters.h>
 
 #include <GeomDataAPI_Point2D.h>
+#include <GeomDataAPI_Point2DArray.h>
 
 #include <GeomAPI_Shape.h>
 
@@ -142,7 +143,7 @@
 void getAttributesOrResults(const Handle(SelectMgr_EntityOwner)& theOwner,
                             const FeaturePtr& theFeature, const FeaturePtr& theSketch,
                             const ResultPtr& theResult,
-                            std::set<AttributePtr>& theSelectedAttributes,
+                            std::map<AttributePtr, int>& theSelectedAttributes,
                             std::set<ResultPtr>& theSelectedResults,
                             TopTools_MapOfShape& theShapes)
 {
@@ -156,10 +157,10 @@ void getAttributesOrResults(const Handle(SelectMgr_EntityOwner)& theOwner,
     theShapes.Add(aShape);
     TopAbs_ShapeEnum aShapeType = aShape.ShapeType();
     if (aShapeType == TopAbs_VERTEX) {
-      AttributePtr aPntAttr = PartSet_Tools::findAttributeBy2dPoint(theFeature,
-                                                                    aShape, theSketch);
-      if (aPntAttr.get() != NULL)
-        theSelectedAttributes.insert(aPntAttr);
+      std::pair<AttributePtr, int> aPntAttrIndex =
+          PartSet_Tools::findAttributeBy2dPoint(theFeature, aShape, theSketch);
+      if (aPntAttrIndex.first.get() != NULL)
+        theSelectedAttributes[aPntAttrIndex.first] = aPntAttrIndex.second;
     }
     else if (aShapeType == TopAbs_EDGE &&
              theSelectedResults.find(theResult) == theSelectedResults.end()) {
@@ -640,26 +641,26 @@ void PartSet_SketcherMgr::onMouseMoved(ModuleBase_IViewWindow* theWnd, QMouseEve
     for (; anIt != aLast; anIt++) {
       FeaturePtr aFeature = anIt.key();
 
-      std::set<AttributePtr> anAttributes = anIt.value().myAttributes;
+      std::map<AttributePtr, int> anAttributes = anIt.value().myAttributes;
       // Process selection by attribute: the priority to the attribute
       if (!anAttributes.empty()) {
-        std::set<AttributePtr>::const_iterator anAttIt = anAttributes.begin(),
+        std::map<AttributePtr, int>::const_iterator anAttIt = anAttributes.begin(),
           anAttLast = anAttributes.end();
         for (; anAttIt != anAttLast; anAttIt++) {
-          AttributePtr anAttr = *anAttIt;
+          AttributePtr anAttr = anAttIt->first;
           if (anAttr.get() == NULL)
             continue;
           std::string aAttrId = anAttr->id();
           DataPtr aData = aFeature->data();
           if (aData->isValid()) {
-            std::shared_ptr<GeomDataAPI_Point2D> aPoint =
-              std::dynamic_pointer_cast<GeomDataAPI_Point2D>(aData->attribute(aAttrId));
-            if (aPoint.get() != NULL) {
+            AttributePtr aPoint = aData->attribute(aAttrId);
+            if (aPoint->attributeType() == GeomDataAPI_Point2D::typeId() ||
+                aPoint->attributeType() == GeomDataAPI_Point2DArray::typeId()) {
               bool isImmutable = aPoint->setImmutable(true);
 
               std::shared_ptr<ModelAPI_ObjectMovedMessage> aMessage = std::shared_ptr
                 <ModelAPI_ObjectMovedMessage>(new ModelAPI_ObjectMovedMessage(this));
-              aMessage->setMovedAttribute(aPoint);
+              aMessage->setMovedAttribute(aPoint, anAttIt->second);
               aMessage->setOriginalPosition(anOriginalPosition);
               aMessage->setCurrentPosition(aCurrentPosition);
               Events_Loop::loop()->send(aMessage);
@@ -1685,7 +1686,7 @@ void PartSet_SketcherMgr::getSelectionOwners(const FeaturePtr& theFeature,
 
   FeatureToSelectionMap::const_iterator anIt = theSelection.find(theFeature);
   SelectionInfo anInfo = anIt.value();
-  std::set<AttributePtr> aSelectedAttributes = anInfo.myAttributes;
+  std::map<AttributePtr, int> aSelectedAttributes = anInfo.myAttributes;
   std::set<ResultPtr> aSelectedResults = anInfo.myResults;
 
   ModuleBase_IViewer* aViewer = theWorkshop->viewer();
@@ -1737,10 +1738,10 @@ void PartSet_SketcherMgr::getSelectionOwners(const FeaturePtr& theFeature,
       const TopoDS_Shape& aShape = anOwner->Shape();
       TopAbs_ShapeEnum aShapeType = aShape.ShapeType();
       if (aShapeType == TopAbs_VERTEX) {
-        AttributePtr aPntAttr =
+        std::pair<AttributePtr, int> aPntAttrIndex =
           PartSet_Tools::findAttributeBy2dPoint(theFeature, aShape, theSketch);
-        if (aPntAttr.get() != NULL &&
-            aSelectedAttributes.find(aPntAttr) != aSelectedAttributes.end())
+        if (aPntAttrIndex.first.get() != NULL &&
+            aSelectedAttributes.find(aPntAttrIndex.first) != aSelectedAttributes.end())
           theOwnersToSelect.Add(anOwner);
         else if (isSameShape && anInfo.myLocalSelectedShapes.Contains(aShape)) {
           theOwnersToSelect.Add(anOwner);

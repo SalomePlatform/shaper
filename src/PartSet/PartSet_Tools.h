@@ -192,9 +192,11 @@ public:
   * \param theObj - an object
   * \param theShape - a Shape
   * \param theSketch - a Sketch to get a plane of converting to 2d
+  * \return Found attribute and index of point if the attribute is an array
   */
-  static AttributePtr findAttributeBy2dPoint(ObjectPtr theObj, const TopoDS_Shape theShape,
-                                             FeaturePtr theSketch);
+  static std::pair<AttributePtr, int> findAttributeBy2dPoint(ObjectPtr theObj,
+                                                             const TopoDS_Shape theShape,
+                                                             FeaturePtr theSketch);
 
   /**
   * Finds an attribute value in attribute reference attribute value

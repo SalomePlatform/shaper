@@ -49,6 +49,7 @@
 #include <GeomDataAPI_Point.h>
 #include <GeomDataAPI_Dir.h>
 #include <GeomDataAPI_Point2D.h>
+#include <GeomDataAPI_Point2DArray.h>
 #include <GeomAPI_Pln.h>
 #include <GeomAPI_Pnt2d.h>
 #include <GeomAPI_Pnt.h>
@@ -443,9 +444,9 @@ GeomShapePtr PartSet_Tools::findShapeBy2DPoint(const AttributePtr& theAttribute,
               // attribute, returns the shape
               PartSet_Module* aModule = dynamic_cast<PartSet_Module*>(theWorkshop->module());
               PartSet_SketcherMgr* aSketchMgr = aModule->sketchMgr();
-              AttributePtr aPntAttr = PartSet_Tools::findAttributeBy2dPoint(anAttributeFeature,
-                                                        aBRepShape, aSketchMgr->activeSketch());
-              if (aPntAttr.get() != NULL && aPntAttr == theAttribute) {
+              std::pair<AttributePtr, int> aPntAttrIndex = PartSet_Tools::findAttributeBy2dPoint(
+                  anAttributeFeature, aBRepShape, aSketchMgr->activeSketch());
+              if (aPntAttrIndex.first.get() != NULL && aPntAttrIndex.first == theAttribute) {
                 aShape = std::shared_ptr<GeomAPI_Shape>(new GeomAPI_Shape);
                 aShape->setImpl(new TopoDS_Shape(aBRepShape));
                 break;
@@ -648,12 +649,44 @@ std::shared_ptr<GeomAPI_Pnt2d> PartSet_Tools::getCoincedencePoint(FeaturePtr the
   return aPnt;
 }
 
-AttributePtr PartSet_Tools::findAttributeBy2dPoint(ObjectPtr theObj,
-                                                   const TopoDS_Shape theShape,
-                                                   FeaturePtr theSketch)
+class PointWrapper
+{
+public:
+  PointWrapper(AttributePtr theAttribute)
+    : myPoint(std::dynamic_pointer_cast<GeomDataAPI_Point2D>(theAttribute)),
+      myArray(std::dynamic_pointer_cast<GeomDataAPI_Point2DArray>(theAttribute))
+  {}
+
+  int size() const { return myPoint.get() ? 1 : (myArray.get() ? myArray->size() : 0); }
+
+  GeomPointPtr point(int theIndex, FeaturePtr theSketch)
+  {
+    GeomPnt2dPtr aP2d;
+    if (myPoint.get())
+      aP2d = myPoint->pnt();
+    else if (myArray.get())
+      aP2d = myArray->pnt(theIndex);
+
+    GeomPointPtr aP3d;
+    if (aP2d.get())
+      aP3d = PartSet_Tools::convertTo3D(aP2d->x(), aP2d->y(), theSketch);
+    return aP3d;
+  }
+
+  bool isArray() const { return myArray.get(); }
+
+private:
+  AttributePoint2DPtr myPoint;
+  AttributePoint2DArrayPtr myArray;
+};
+
+std::pair<AttributePtr, int> PartSet_Tools::findAttributeBy2dPoint(ObjectPtr theObj,
+                                                                   const TopoDS_Shape theShape,
+                                                                   FeaturePtr theSketch)
 {
 
   AttributePtr anAttribute;
+  int aPointIndex = -1;
   FeaturePtr aFeature = ModelAPI_Feature::feature(theObj);
   if (aFeature) {
     if (theShape.ShapeType() == TopAbs_VERTEX) {
@@ -666,29 +699,32 @@ AttributePtr PartSet_Tools::findAttributeBy2dPoint(ObjectPtr theObj,
         // find the given point in the feature attributes
         std::list<AttributePtr> anAttiributes =
           aFeature->data()->attributes(GeomDataAPI_Point2D::typeId());
+        std::list<AttributePtr> anArrays =
+          aFeature->data()->attributes(GeomDataAPI_Point2DArray::typeId());
+        anAttiributes.insert(anAttiributes.end(), anArrays.begin(), anArrays.end());
+
         std::list<AttributePtr>::const_iterator anIt = anAttiributes.begin(),
                                                 aLast = anAttiributes.end();
         double aMinDistance = 1.e-6; // searching for point with minimal distance and < 1.e-6
         for (; anIt != aLast && !anAttribute; anIt++) {
-          std::shared_ptr<GeomDataAPI_Point2D> aCurPoint =
-            std::dynamic_pointer_cast<GeomDataAPI_Point2D>(*anIt);
-          if (!aCurPoint->isInitialized())
-            continue;
-
-          std::shared_ptr<GeomAPI_Pnt> aPnt =
-            convertTo3D(aCurPoint->x(), aCurPoint->y(), theSketch);
-          if (aPnt) {
-            double aDistance = aPnt->distance(aValue);
-            if (aDistance < aMinDistance) {
-              anAttribute = aCurPoint;
-              aMinDistance = aPnt->distance(aValue);
+          PointWrapper aWrapper(*anIt);
+          for (int anIndex = 0, aSize = aWrapper.size(); anIndex < aSize; ++anIndex) {
+            std::shared_ptr<GeomAPI_Pnt> aPnt = aWrapper.point(anIndex, theSketch);
+            if (aPnt) {
+              double aDistance = aPnt->distance(aValue);
+              if (aDistance < aMinDistance) {
+                anAttribute = *anIt;
+                if (aWrapper.isArray())
+                  aPointIndex = anIndex;
+                aMinDistance = aPnt->distance(aValue);
+              }
             }
           }
         }
       }
     }
   }
-  return anAttribute;
+  return std::pair<AttributePtr, int>(anAttribute, aPointIndex);
 }
 
 void PartSet_Tools::sendSubFeaturesEvent(const CompositeFeaturePtr& theComposite,
