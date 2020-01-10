@@ -2457,8 +2457,8 @@
       <translation>Type d&apos;angle</translation>
     </message>
     <message>
-      <source>Complementary</source>
-      <translation>Complémentaire</translation>
+      <source>Supplementary</source>
+      <translation>Supplémentaire</translation>
     </message>
     <message>
       <source>Direct</source>
