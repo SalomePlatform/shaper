@@ -101,24 +101,52 @@ static EntityWrapperPtr createScalar(const AttributePtr&     theAttribute,
 static EntityWrapperPtr createScalarArray(const AttributePtr&     theAttribute,
                                           PlaneGCSSolver_Storage* theStorage)
 {
-  AttributeDoubleArrayPtr anArray =
-      std::dynamic_pointer_cast<ModelAPI_AttributeDoubleArray>(theAttribute);
-  if (!anArray || !anArray->isInitialized())
+  class ArrayAttribute {
+  public:
+    ArrayAttribute(AttributePtr theAttribute)
+    {
+      myDouble = std::dynamic_pointer_cast<ModelAPI_AttributeDoubleArray>(theAttribute);
+      myInteger = std::dynamic_pointer_cast<ModelAPI_AttributeIntArray>(theAttribute);
+    }
+
+    bool isInitialized() const
+    {
+      return (myDouble && myDouble->isInitialized()) || (myInteger && myInteger->isInitialized());
+    }
+
+    int size() const
+    {
+      return myDouble.get() ? myDouble->size() : myInteger->size();
+    }
+
+    double value(const int theIndex) const
+    {
+      return myDouble.get() ? myDouble->value(theIndex) : myInteger->value(theIndex);
+    }
+
+  private:
+    AttributeDoubleArrayPtr myDouble;
+    AttributeIntArrayPtr myInteger;
+  } anArray(theAttribute);
+
+  if (!anArray.isInitialized())
     return EntityWrapperPtr();
 
   PlaneGCSSolver_Storage* aStorage = theStorage;
-  // Weights of B-spline curve are not processed by the solver
+  // Weights, knots and multiplicities of B-spline curve are not processed by the solver
   FeaturePtr anOwner = ModelAPI_Feature::feature(theAttribute->owner());
   if (anOwner->getKind() == SketchPlugin_BSpline::ID() &&
-      theAttribute->id() == SketchPlugin_BSpline::WEIGHTS_ID())
+      (theAttribute->id() == SketchPlugin_BSpline::WEIGHTS_ID() ||
+       theAttribute->id() == SketchPlugin_BSpline::KNOTS_ID() ||
+       theAttribute->id() == SketchPlugin_BSpline::MULTS_ID()))
     aStorage = 0;
 
-  int aSize = anArray->size();
+  int aSize = anArray.size();
   GCS::VEC_pD aParameters;
   aParameters.reserve(aSize);
   for (int index = 0; index < aSize; ++index) {
     double* aParam = createParameter(aStorage);
-    *aParam = anArray->value(index);
+    *aParam = anArray.value(index);
     aParameters.push_back(aParam);
   }
 

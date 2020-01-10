@@ -157,6 +157,22 @@ FeaturePtr SketchPlugin_MacroBSpline::createBSplineFeature()
   for (int index = 0; index < aSize; ++index)
     aWeights->setValue(index, aWeightsMacro->value(index));
 
+  AttributeDoubleArrayPtr aKnots =
+      aBSpline->data()->realArray(SketchPlugin_BSpline::KNOTS_ID());
+  aSize = (int)myKnots.size();
+  aKnots->setSize(aSize);
+  std::list<double>::iterator aKIt = myKnots.begin();
+  for (int index = 0; index < aSize; ++index, ++aKIt)
+    aKnots->setValue(index, *aKIt);
+
+  AttributeIntArrayPtr aMults =
+      aBSpline->data()->intArray(SketchPlugin_BSpline::MULTS_ID());
+  aSize = (int)myMultiplicities.size();
+  aMults->setSize(aSize);
+  std::list<int>::iterator aMIt = myMultiplicities.begin();
+  for (int index = 0; index < aSize; ++index, ++aMIt)
+    aMults->setValue(index, *aMIt);
+
   aBSpline->boolean(SketchPlugin_BSpline::AUXILIARY_ID())->setValue(
       boolean(AUXILIARY_ID())->value());
 
@@ -248,11 +264,14 @@ AISObjectPtr SketchPlugin_MacroBSpline::getAISObject(AISObjectPtr thePrevious)
     return AISObjectPtr();
   }
   GeomShapePtr anEdge =
-      GeomAlgoAPI_EdgeBuilder::bsplineOnPlane(aSketch->plane(), aBSplineCurve);
+      GeomAlgoAPI_EdgeBuilder::bsplineOnPlane(aSketch->coordinatePlane(), aBSplineCurve);
   if (!anEdge)
     return AISObjectPtr();
 
+  // store transient parameters of B-spline curve
   myDegree = aBSplineCurve->degree();
+  myKnots = aBSplineCurve->knots();
+  myMultiplicities = aBSplineCurve->mults();
 
   aShapes.push_back(anEdge);
   GeomShapePtr aCompound = GeomAlgoAPI_CompoundBuilder::compound(aShapes);

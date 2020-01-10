@@ -1125,38 +1125,35 @@ bool SketchPlugin_ProjectionValidator::isValid(const AttributePtr& theAttribute,
   std::shared_ptr<GeomAPI_Dir> aNormal = aPlane->direction();
   std::shared_ptr<GeomAPI_Pnt> anOrigin = aPlane->location();
 
+  bool aValid = true;
   if (anEdge->isLine()) {
     std::shared_ptr<GeomAPI_Lin> aLine = anEdge->line();
     std::shared_ptr<GeomAPI_Dir> aLineDir = aLine->direction();
     double aDot = fabs(aNormal->dot(aLineDir));
-    bool aValid = fabs(aDot - 1.0) >= tolerance * tolerance;
+    aValid = fabs(aDot - 1.0) >= tolerance * tolerance;
     if (!aValid)
       theError = "Error: Line is orthogonal to the sketch plane.";
-    return aValid;
   }
   else if (anEdge->isCircle() || anEdge->isArc()) {
     std::shared_ptr<GeomAPI_Circ> aCircle = anEdge->circle();
     std::shared_ptr<GeomAPI_Dir> aCircNormal = aCircle->normal();
     double aDot = fabs(aNormal->dot(aCircNormal));
-    bool aValid = aDot >= tolerance * tolerance;
+    aValid = aDot >= tolerance * tolerance;
     if (!aValid)
       theError.arg(anEdge->isCircle() ? "Error: Circle is orthogonal to the sketch plane."
                                       : "Error: Arc is orthogonal to the sketch plane.");
-    return aValid;
   }
   else if (anEdge->isEllipse()) {
     std::shared_ptr<GeomAPI_Ellipse> anEllipse = anEdge->ellipse();
     std::shared_ptr<GeomAPI_Dir> anEllipseNormal = anEllipse->normal();
     double aDot = fabs(aNormal->dot(anEllipseNormal));
-    bool aValid = fabs(aDot - 1.0) <= tolerance * tolerance;
+    aValid = fabs(aDot - 1.0) <= tolerance * tolerance;
     if (!aValid)
       theError.arg(anEdge->isClosed() ? "Error: Ellipse is orthogonal to the sketch plane."
                                       : "Error: Elliptic Arc is orthogonal to the sketch plane.");
-    return aValid;
   }
 
-  theError = "Error: Selected object is not supported for projection.";
-  return false;
+  return aValid;
 }
 
 

@@ -41,9 +41,11 @@ public:
                                    const bool thePeriodic = false);
 
   /// Creation of B-spline curve defined by list of poles and weights
-  GEOMAPI_EXPORT GeomAPI_BSpline2d(const std::list<std::shared_ptr<GeomAPI_Pnt2d> >& thePoles,
+  GEOMAPI_EXPORT GeomAPI_BSpline2d(const int theDegree,
+                                   const std::list<std::shared_ptr<GeomAPI_Pnt2d> >& thePoles,
                                    const std::list<double>& theWeights,
-                                   const int theDegree,
+                                   const std::list<double>& theKnots = std::list<double>(),
+                                   const std::list<int>& theMults = std::list<int>(),
                                    const bool thePeriodic = false);
 
   /// Returns true if curve is not initialized
@@ -51,6 +53,12 @@ public:
 
   /// Returns degree of the curve
   GEOMAPI_EXPORT int degree() const;
+
+  /// Knots of the curve
+  GEOMAPI_EXPORT std::list<double> knots() const;
+
+  /// Multiplicities of the knots
+  GEOMAPI_EXPORT std::list<int> mults() const;
 
   /// \brief Calculate point on B-spline curve accrding to the given parameter
   GEOMAPI_EXPORT void D0(const double theU, std::shared_ptr<GeomAPI_Pnt2d>& thePoint);

@@ -318,15 +318,24 @@ EntityWrapperPtr createBSpline(const AttributeEntityMap& theAttributes)
       aNewSpline->start = aNewSpline->poles.front();
       aNewSpline->end = aNewSpline->poles.back();
     }
-    else if (anAttrID == SketchPlugin_BSpline::WEIGHTS_ID()) {
-      ScalarArrayWrapperPtr anArray =
-          std::dynamic_pointer_cast<PlaneGCSSolver_ScalarArrayWrapper>(anIt->second);
-      aNewSpline->weights = anArray->array();
-    }
     else if (anAttrID == SketchPlugin_BSpline::DEGREE_ID()) {
       ScalarWrapperPtr aScalar =
           std::dynamic_pointer_cast<PlaneGCSSolver_ScalarWrapper>(anIt->second);
       aNewSpline->degree = (int)aScalar->value();
+    }
+    else {
+      ScalarArrayWrapperPtr anArray =
+          std::dynamic_pointer_cast<PlaneGCSSolver_ScalarArrayWrapper>(anIt->second);
+      if (anAttrID == SketchPlugin_BSpline::WEIGHTS_ID())
+        aNewSpline->weights = anArray->array();
+      else if (anAttrID == SketchPlugin_BSpline::KNOTS_ID())
+        aNewSpline->knots = anArray->array();
+      else if (anAttrID == SketchPlugin_BSpline::MULTS_ID()) {
+        const GCS::VEC_pD& aValues = anArray->array();
+        aNewSpline->mult.reserve(aValues.size());
+        for (GCS::VEC_pD::const_iterator anIt = aValues.begin(); anIt != aValues.end(); ++anIt)
+          aNewSpline->mult.push_back((int)(**anIt));
+      }
     }
   }
 
@@ -377,6 +386,8 @@ bool isAttributeApplicable(const std::string& theAttrName, const std::string& th
   else if (theOwnerName == SketchPlugin_BSpline::ID()) {
     return theAttrName == SketchPlugin_BSpline::POLES_ID() ||
            theAttrName == SketchPlugin_BSpline::WEIGHTS_ID() ||
+           theAttrName == SketchPlugin_BSpline::KNOTS_ID() ||
+           theAttrName == SketchPlugin_BSpline::MULTS_ID() ||
            theAttrName == SketchPlugin_BSpline::DEGREE_ID();
   }
 

@@ -29,18 +29,16 @@
 static Handle_Geom2d_BSplineCurve* newBSpline2d(
     const std::list<std::shared_ptr<GeomAPI_Pnt2d> >& thePoles,
     const std::list<double>& theWeights,
+    const std::list<double>& theKnots,
+    const std::list<int>& theMults,
     const int theDegree,
     const bool thePeriodic)
 {
-  int aNbKnots = (int)thePoles.size() - theDegree + 1;
-  if (aNbKnots < 2)
-    return new Handle_Geom2d_BSplineCurve();
-
   // collect arrays of poles, weights, knots and multiplicities
   TColgp_Array1OfPnt2d aPoles(1, (int)thePoles.size());
   TColStd_Array1OfReal aWeights(1, (int)theWeights.size());
-  TColStd_Array1OfReal aKnots(1, aNbKnots);
-  TColStd_Array1OfInteger aMults(1, aNbKnots);
+  TColStd_Array1OfReal aKnots(1, (int)theKnots.size());
+  TColStd_Array1OfInteger aMults(1, (int)theMults.size());
 
   int anIndex = 1;
   for (std::list<GeomPnt2dPtr>::const_iterator aPIt = thePoles.begin();
@@ -51,21 +49,43 @@ static Handle_Geom2d_BSplineCurve* newBSpline2d(
        aWIt != theWeights.end(); ++aWIt, ++anIndex)
     aWeights.SetValue(anIndex, *aWIt);
   anIndex = 1;
+  for (std::list<double>::const_iterator aKIt = theKnots.begin();
+       aKIt != theKnots.end(); ++aKIt, ++anIndex)
+    aKnots.SetValue(anIndex, *aKIt);
+  anIndex = 1;
+  for (std::list<int>::const_iterator aMIt = theMults.begin();
+       aMIt != theMults.end(); ++aMIt, ++anIndex)
+    aMults.SetValue(anIndex, *aMIt);
+
+  Handle(Geom2d_BSplineCurve) aCurve =
+      new Geom2d_BSplineCurve(aPoles, aWeights, aKnots, aMults, theDegree, thePeriodic);
+  return new Handle_Geom2d_BSplineCurve(aCurve);
+}
+
+static Handle_Geom2d_BSplineCurve* newBSpline2d(
+    const std::list<std::shared_ptr<GeomAPI_Pnt2d> >& thePoles,
+    const std::list<double>& theWeights,
+    const int theDegree,
+    const bool thePeriodic)
+{
+  int aNbKnots = (int)thePoles.size() - theDegree + 1;
+  if (aNbKnots < 2)
+    return new Handle_Geom2d_BSplineCurve();
+
   static const double aStartParam = 0.0;
   static const double aEndParam = 1.0;
   double aStep = aEndParam / (aNbKnots - 1);
+  int anIndex = 1;
+  std::list<double> aKnots;
   for (double aKnot = aStartParam; anIndex < aNbKnots; ++anIndex, aKnot += aStep)
-    aKnots.SetValue(anIndex, aKnot);
-  aKnots.ChangeLast() = aEndParam;
-  anIndex = 1;
-  aMults.SetValue(anIndex, theDegree + 1);
-  for (++anIndex; anIndex < aNbKnots; ++anIndex)
-    aMults.SetValue(anIndex, 1);
-  aMults.SetValue(aNbKnots, theDegree + 1);
+    aKnots.push_back(aKnot);
+  aKnots.push_back(aEndParam);
 
-  Handle(Geom2d_BSplineCurve) aCurve =
-    new Geom2d_BSplineCurve(aPoles, aWeights, aKnots, aMults, theDegree, thePeriodic);
-  return new Handle_Geom2d_BSplineCurve(aCurve);
+  std::list<int> aMults(aNbKnots - 2, 1);
+  aMults.push_front(theDegree + 1);
+  aMults.push_back(theDegree + 1);
+
+  return newBSpline2d(thePoles, theWeights, aKnots, aMults, theDegree, thePeriodic);
 }
 
 static Handle_Geom2d_BSplineCurve* newBSpline2d(
@@ -91,11 +111,14 @@ GeomAPI_BSpline2d::GeomAPI_BSpline2d(const std::list<std::shared_ptr<GeomAPI_Pnt
     throw Standard_ConstructionError("GeomAPI_BSpline2d: Impossible to create B-spline curve");
 }
 
-GeomAPI_BSpline2d::GeomAPI_BSpline2d(const std::list<std::shared_ptr<GeomAPI_Pnt2d> >& thePoles,
+GeomAPI_BSpline2d::GeomAPI_BSpline2d(const int theDegree,
+                                     const std::list<std::shared_ptr<GeomAPI_Pnt2d> >& thePoles,
                                      const std::list<double>& theWeights,
-                                     const int theDegree,
+                                     const std::list<double>& theKnots,
+                                     const std::list<int>& theMults,
                                      const bool thePeriodic)
-  : GeomAPI_Interface(newBSpline2d(thePoles, theWeights, theDegree, thePeriodic))
+  : GeomAPI_Interface(newBSpline2d(thePoles, theWeights, theKnots, theMults,
+                                   theDegree, thePeriodic))
 {
   if (isNull())
     throw Standard_ConstructionError("GeomAPI_BSpline2d: Impossible to create B-spline curve");
@@ -109,6 +132,18 @@ bool GeomAPI_BSpline2d::isNull() const
 int GeomAPI_BSpline2d::degree() const
 {
   return MY_BSPLINE->Degree();
+}
+
+std::list<double> GeomAPI_BSpline2d::knots() const
+{
+  const TColStd_Array1OfReal& aBSplKnots = MY_BSPLINE->Knots();
+  return std::list<double>(aBSplKnots.begin(), aBSplKnots.end());
+}
+
+std::list<int> GeomAPI_BSpline2d::mults() const
+{
+  const TColStd_Array1OfInteger& aBSplMults = MY_BSPLINE->Multiplicities();
+  return std::list<int>(aBSplMults.begin(), aBSplMults.end());
 }
 
 void GeomAPI_BSpline2d::D0(const double theU, std::shared_ptr<GeomAPI_Pnt2d>& thePoint)

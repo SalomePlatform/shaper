@@ -58,6 +58,20 @@ public:
     return ID;
   }
 
+  /// list of B-spline knots
+  inline static const std::string& KNOTS_ID()
+  {
+    static const std::string ID("knots");
+    return ID;
+  }
+
+  /// list of B-spline multiplicities
+  inline static const std::string& MULTS_ID()
+  {
+    static const std::string ID("multiplicities");
+    return ID;
+  }
+
   /// Returns the kind of a feature
   SKETCHPLUGIN_EXPORT virtual const std::string& getKind()
   {

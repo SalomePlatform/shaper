@@ -25,6 +25,7 @@ INCLUDE(UnitTest)
 
 SET(PROJECT_HEADERS
     GeomAPI.h
+    GeomAPI_BSpline.h
     GeomAPI_BSpline2d.h
     GeomAPI_Circ.h
     GeomAPI_Circ2d.h
@@ -72,6 +73,7 @@ SET(PROJECT_HEADERS
 )
 
 SET(PROJECT_SOURCES
+    GeomAPI_BSpline.cpp
     GeomAPI_BSpline2d.cpp
     GeomAPI_Circ.cpp
     GeomAPI_Circ2d.cpp

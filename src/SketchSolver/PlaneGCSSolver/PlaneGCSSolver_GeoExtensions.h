@@ -47,6 +47,8 @@ namespace GCS {
     std::shared_ptr<GeomAPI_BSpline2d> myCurve; /// cached B-spline curve
     std::list<std::shared_ptr<GeomAPI_Pnt2d> > myCachedPoles; /// cached B-spline poles
     std::list<double> myCachedWeights; /// cached B-spline weights
+    std::list<double> myCachedKnots; /// cached B-spline knots
+    std::list<int> myCachedMultiplicities; /// cached B-spline multiplicities
   };
 }
 

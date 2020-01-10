@@ -22,26 +22,16 @@
 
 #include <GeomAlgoAPI_EdgeBuilder.h>
 
-////#include <GeomAPI_Dir2d.h>
-////#include <GeomAPI_Edge.h>
-////#include <GeomAPI_Ellipse.h>
-////#include <GeomAPI_Ellipse2d.h>
 #include <GeomAPI_Pnt2d.h>
-////#include <GeomAPI_XY.h>
 
 #include <GeomDataAPI_Point2DArray.h>
 
 #include <ModelAPI_AttributeDoubleArray.h>
+#include <ModelAPI_AttributeIntArray.h>
 #include <ModelAPI_AttributeInteger.h>
 #include <ModelAPI_ResultConstruction.h>
 #include <ModelAPI_Session.h>
 #include <ModelAPI_Validator.h>
-
-////#include <cmath>
-////
-////static const double tolerance = 1e-7;
-////static const double paramTolerance = 1.e-4;
-////static const double PI = 3.141592653589793238463;
 
 
 SketchPlugin_BSpline::SketchPlugin_BSpline()
@@ -53,6 +43,8 @@ void SketchPlugin_BSpline::initDerivedClassAttributes()
 {
   data()->addAttribute(POLES_ID(), GeomDataAPI_Point2DArray::typeId());
   data()->addAttribute(WEIGHTS_ID(), ModelAPI_AttributeDoubleArray::typeId());
+  data()->addAttribute(KNOTS_ID(), ModelAPI_AttributeDoubleArray::typeId());
+  data()->addAttribute(MULTS_ID(), ModelAPI_AttributeIntArray::typeId());
   data()->addAttribute(DEGREE_ID(), ModelAPI_AttributeInteger::typeId());
 
   data()->addAttribute(EXTERNAL_ID(), ModelAPI_AttributeSelection::typeId());
@@ -69,6 +61,9 @@ void SketchPlugin_BSpline::execute()
   AttributePoint2DArrayPtr aPolesArray =
       std::dynamic_pointer_cast<GeomDataAPI_Point2DArray>(attribute(POLES_ID()));
   AttributeDoubleArrayPtr aWeightsArray = data()->realArray(WEIGHTS_ID());
+  AttributeDoubleArrayPtr aKnotsArray = data()->realArray(KNOTS_ID());
+  AttributeIntArrayPtr aMultsArray = data()->intArray(MULTS_ID());
+  AttributeIntegerPtr aDegreeAttr = data()->integer(DEGREE_ID());
 
   // collect poles
   std::list<GeomPnt2dPtr> aPoles2D;
@@ -80,10 +75,18 @@ void SketchPlugin_BSpline::execute()
   std::list<double> aWeights;
   for (int anIndex = 0; anIndex < aWeightsArray->size(); ++anIndex)
     aWeights.push_back(aWeightsArray->value(anIndex));
+  // collect knots
+  std::list<double> aKnots;
+  for (int anIndex = 0; anIndex < aKnotsArray->size(); ++anIndex)
+    aKnots.push_back(aKnotsArray->value(anIndex));
+  // collect multiplicities
+  std::list<int> aMults;
+  for (int anIndex = 0; anIndex < aMultsArray->size(); ++anIndex)
+    aMults.push_back(aMultsArray->value(anIndex));
 
   // create result non-periodic B-spline curve
-  GeomShapePtr anEdge =
-      GeomAlgoAPI_EdgeBuilder::bsplineOnPlane(aSketch->plane(), aPoles2D, aWeights, false);
+  GeomShapePtr anEdge = GeomAlgoAPI_EdgeBuilder::bsplineOnPlane(aSketch->coordinatePlane(),
+      aPoles2D, aWeights, aKnots, aMults, aDegreeAttr->value(), false);
 
   ResultConstructionPtr aResult = document()->createConstruction(data(), 0);
   aResult->setShape(anEdge);

@@ -75,13 +75,19 @@ void BSplineImpl::rebuildCache()
 {
   myCachedPoles.clear();
   myCachedWeights.clear();
+  myCachedKnots.clear();
+  myCachedMultiplicities.clear();
 
   for (GCS::VEC_P::iterator anIt = poles.begin(); anIt != poles.end(); ++anIt)
     myCachedPoles.push_back(GeomPnt2dPtr(new GeomAPI_Pnt2d(*anIt->x, *anIt->y)));
   for (GCS::VEC_pD::iterator anIt = weights.begin(); anIt != weights.end(); ++anIt)
     myCachedWeights.push_back(**anIt);
+  for (GCS::VEC_pD::iterator anIt = knots.begin(); anIt != knots.end(); ++anIt)
+    myCachedKnots.push_back(**anIt);
+  myCachedMultiplicities.assign(mult.begin(), mult.end());
 
-  myCurve.reset(new GeomAPI_BSpline2d(myCachedPoles, myCachedWeights, degree, periodic));
+  myCurve.reset(new GeomAPI_BSpline2d(degree, myCachedPoles, myCachedWeights,
+                                      myCachedKnots, myCachedMultiplicities, periodic));
 }
 
 } // namespace GCS

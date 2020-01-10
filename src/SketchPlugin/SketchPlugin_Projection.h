@@ -22,6 +22,8 @@
 
 #include "SketchPlugin_SketchEntity.h"
 
+class GeomAPI_Curve;
+
 /** \class SketchPlugin_Projection
  *  \ingroup Plugins
  *  \brief Feature for creation of external feature as a projection onto the sketch plane.
@@ -87,6 +89,34 @@ protected:
 private:
   /// \brief Find projection of a feature onto sketch plane
   void computeProjection(const std::string& theID);
+
+  /// \brief Project point to the sketch plane
+  bool projectPoint(FeaturePtr& theProjection, const std::shared_ptr<GeomAPI_Pnt>& thePoint);
+  /// \brief Project segment to the sketch plane
+  bool projectSegment(FeaturePtr& theProjection, const std::shared_ptr<GeomAPI_Edge>& theEdge);
+  /// \brief Project any edge to sketch plane
+  bool projectEdge(FeaturePtr& theProjection, const std::shared_ptr<GeomAPI_Edge>& theEdge);
+
+  /// \brief Fill attributes of the Arc feature
+  bool fillArc(FeaturePtr& theProjection,
+               const std::shared_ptr<GeomAPI_Curve>& theArc,
+               const std::shared_ptr<GeomAPI_Pln>& thePlane);
+  /// \brief Fill attributes of the Circle feature
+  bool fillCircle(FeaturePtr& theProjection,
+                  const std::shared_ptr<GeomAPI_Curve>& theCircle,
+                  const std::shared_ptr<GeomAPI_Pln>& thePlane);
+  /// \brief Fill attributes of the Ellipse feature
+  bool fillEllipse(FeaturePtr& theProjection,
+                   const std::shared_ptr<GeomAPI_Curve>& theEllipse,
+                   const std::shared_ptr<GeomAPI_Pln>& thePlane);
+  /// \brief Fill attributes of the EllipticArc feature
+  bool fillEllipticArc(FeaturePtr& theProjection,
+                       const std::shared_ptr<GeomAPI_Curve>& theEllipticArc,
+                       const std::shared_ptr<GeomAPI_Pln>& thePlane);
+  /// \brief Fill attributes of the B-spline feature
+  bool fillBSpline(FeaturePtr& theProjection,
+                   const std::shared_ptr<GeomAPI_Curve>& theCurve,
+                   const std::shared_ptr<GeomAPI_Pln>& thePlane);
 
   /// \brief Delete already calculated projected feature
   ///        if the selection of the projection is changed
