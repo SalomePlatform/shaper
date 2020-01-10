@@ -625,8 +625,9 @@ Handle(AIS_InteractiveContext) XGUI_Displayer::AISContext() const
     myContextId = aContext.get();
     if (!myWorkshop->selectionActivate()->isTrihedronActive())
       selectionActivate()->deactivateTrihedron(true);
-    aContext->DefaultDrawer()->VIsoAspect()->SetNumber(0);
-    aContext->DefaultDrawer()->UIsoAspect()->SetNumber(0);
+    // Do not modify default drawer. The same is done in ModuleBase_ResultPrs
+    //aContext->DefaultDrawer()->VIsoAspect()->SetNumber(0);
+    //aContext->DefaultDrawer()->UIsoAspect()->SetNumber(0);
 
     //Handle(AIS_Trihedron) aTrihedron = myWorkshop->viewer()->trihedron();
     //aTrihedron->getHighlightPointAspect()->SetScale(2.0);
