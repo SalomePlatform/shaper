@@ -53,7 +53,7 @@ Standard_Boolean SketcherPrs_SensitivePoint::Matches(SelectBasics_SelectingVolum
 #else
   gp_Pnt aPnt = Point();
   if (theMgr.Overlaps (aPnt, thePickResult))
-	return Standard_True;
+	  return Standard_True;
   return Standard_False;
 #endif
 }
