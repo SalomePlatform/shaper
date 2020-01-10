@@ -81,6 +81,9 @@ ModuleBase_ResultPrs::ModuleBase_ResultPrs(ResultPtr theResult)
     new Prs3d_LineAspect(Quantity_NOC_GREEN, Aspect_TOL_SOLID, 1);
   aDrawer->SetFreeBoundaryAspect(aFreeBndAspect);
 
+  aDrawer->VIsoAspect()->SetNumber(0);
+  aDrawer->UIsoAspect()->SetNumber(0);
+
   if (aDrawer->HasOwnPointAspect())
     aDrawer->PointAspect()->SetTypeOfMarker(Aspect_TOM_PLUS);
   else
