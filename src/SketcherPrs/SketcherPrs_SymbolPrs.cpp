@@ -195,7 +195,7 @@ Handle(Image_AlienPixMap) SketcherPrs_SymbolPrs::icon()
   }
   // The icon for constraint is not found
   static const char aMsg[] = "Error! constraint images are not found";
-  cout<<aMsg<<endl;
+  std::cout<<aMsg<<std::endl;
   Events_InfoMessage("SketcherPrs_SymbolPrs", aMsg).send();
   myIconsMap[iconName()] = Handle(Image_AlienPixMap)();
   return Handle(Image_AlienPixMap)();

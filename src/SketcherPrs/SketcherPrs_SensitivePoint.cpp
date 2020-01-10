@@ -18,9 +18,10 @@
 //
 
 #include "SketcherPrs_SensitivePoint.h"
+#include "SketcherPrs_SymbolPrs.h"
 
 #include <Graphic3d_ArrayOfPoints.hxx>
-#include "SketcherPrs_SymbolPrs.h"
+#include <Standard_Version.hxx>
 
 #define DEBUG_SENSITIVE_TO_BE_CORRECTED
 
@@ -36,18 +37,25 @@ SketcherPrs_SensitivePoint::SketcherPrs_SensitivePoint(
 Standard_Boolean SketcherPrs_SensitivePoint::Matches(SelectBasics_SelectingVolumeManager& theMgr,
                                                    SelectBasics_PickResult& thePickResult)
 {
-  Standard_Real aDepth      = RealLast();
-  Standard_Real aDistToCOG  = RealLast();
-  gp_Pnt aPnt = Point();
-  if (!theMgr.Overlaps (aPnt, aDepth))
-  {
-    thePickResult = SelectBasics_PickResult (aDepth, aDistToCOG);
-    return Standard_False;
-  }
+#if OCC_VERSION_HEX < 0x070400
+	Standard_Real aDepth = RealLast();
+	Standard_Real aDistToCOG = RealLast();
+	gp_Pnt aPnt = Point();
+	if (!theMgr.Overlaps(aPnt, aDepth))
+	{
+		thePickResult = SelectBasics_PickResult(aDepth, aDistToCOG);
+		return Standard_False;
+	}
 
-  aDistToCOG = aDepth;
-  thePickResult = SelectBasics_PickResult (aDepth, aDistToCOG);
-  return Standard_True;
+	aDistToCOG = aDepth;
+	thePickResult = SelectBasics_PickResult(aDepth, aDistToCOG);
+	return Standard_True;
+#else
+  gp_Pnt aPnt = Point();
+  if (theMgr.Overlaps (aPnt, thePickResult))
+	return Standard_True;
+  return Standard_False;
+#endif
 }
 
 gp_Pnt SketcherPrs_SensitivePoint::Point() const

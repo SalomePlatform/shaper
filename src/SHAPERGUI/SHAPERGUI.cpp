@@ -74,7 +74,9 @@
 #include <QMenu>
 #include <QToolBar>
 
-#define SALOME_PATCH_FOR_CTRL_WHEEL
+#if OCC_VERSION_HEX < 0x070400
+  #define SALOME_PATCH_FOR_CTRL_WHEEL
+#endif
 
 extern "C" {
 SHAPERGUI_EXPORT CAM_Module* createModule()

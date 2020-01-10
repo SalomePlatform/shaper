@@ -33,7 +33,9 @@
 #include <QMouseEvent>
 #include <QContextMenuEvent>
 
-#define SALOME_PATCH_FOR_CTRL_WHEEL
+#if OCC_VERSION_HEX < 0x070400
+  #define SALOME_PATCH_FOR_CTRL_WHEEL
+#endif
 
 SHAPERGUI_SalomeView::SHAPERGUI_SalomeView(OCCViewer_Viewer* theViewer)
 : ModuleBase_IViewWindow(), myCurrentView(0)

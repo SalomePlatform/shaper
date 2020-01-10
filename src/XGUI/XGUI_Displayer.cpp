@@ -105,7 +105,11 @@ const int MOUSE_SENSITIVITY_IN_PIXEL = 10;
 void displayedObjects(const Handle(AIS_InteractiveContext)& theAIS, AIS_ListOfInteractive& theList)
 {
   // Get from null point
-  theAIS->DisplayedObjects(theList, true);
+#if OCC_VERSION_HEX < 0x070400
+	theAIS->DisplayedObjects(theList, true);
+#else
+	theAIS->DisplayedObjects(theList);
+#endif
 }
 
 QString qIntListInfo(const QIntList& theValues, const QString& theSeparator = QString(", "))
