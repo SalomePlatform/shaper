@@ -17,23 +17,32 @@
 // See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 
-#include <PlaneGCSSolver_ScalarArrayWrapper.h>
-#include <PlaneGCSSolver_Tools.h>
+#include <SketchPlugin_WidgetCreator.h>
+#include <SketchPlugin_BSplineWidget.h>
 
-PlaneGCSSolver_ScalarArrayWrapper::PlaneGCSSolver_ScalarArrayWrapper(const GCS::VEC_pD& theParam)
-  : myValue(theParam)
+
+SketchPlugin_WidgetCreator::SketchPlugin_WidgetCreator()
+  : ModuleBase_IWidgetCreator()
 {
+  myPanelTypes.insert("bspline-panel");
 }
 
-bool PlaneGCSSolver_ScalarArrayWrapper::update(AttributePtr theAttribute)
+void SketchPlugin_WidgetCreator::panelTypes(std::set<std::string>& theTypes)
 {
-  bool isUpdated = false;
-  PlaneGCSSolver_Tools::AttributeArray anArray(theAttribute);
-  if (anArray.isInitialized() && anArray.size() == (int)myValue.size()) {
-    for (int anIndex = 0; anIndex < anArray.size(); ++anIndex) {
-      isUpdated = PlaneGCSSolver_Tools::updateValue(anArray.value(anIndex), *(myValue[anIndex]))
-          || isUpdated;
-    }
+  theTypes = myPanelTypes;
+}
+
+QWidget* SketchPlugin_WidgetCreator::createPanelByType(
+    const std::string& theType,
+    QWidget* theParent,
+    const FeaturePtr& theFeature,
+    Config_WidgetAPI* theWidgetApi)
+{
+  QWidget* aWidget = 0;
+  if (theType == "bspline-panel") {
+    SketchPlugin_BSplineWidget* aPanel = new SketchPlugin_BSplineWidget(theParent, theWidgetApi);
+    aPanel->setFeature(theFeature);
+    aWidget = aPanel;
   }
-  return isUpdated;
+  return aWidget;
 }

@@ -19,7 +19,9 @@
 
 #include <PlaneGCSSolver_Tools.h>
 #include <PlaneGCSSolver_EdgeWrapper.h>
+#include <PlaneGCSSolver_PointArrayWrapper.h>
 #include <PlaneGCSSolver_PointWrapper.h>
+#include <PlaneGCSSolver_ScalarArrayWrapper.h>
 #include <PlaneGCSSolver_ScalarWrapper.h>
 #include <PlaneGCSSolver_ConstraintWrapper.h>
 
@@ -39,6 +41,9 @@
 #include <SketchSolver_ConstraintMultiRotation.h>
 #include <SketchSolver_ConstraintMultiTranslation.h>
 
+#include <SketchPlugin_Arc.h>
+#include <SketchPlugin_BSpline.h>
+#include <SketchPlugin_Circle.h>
 #include <SketchPlugin_ConstraintAngle.h>
 #include <SketchPlugin_ConstraintCoincidence.h>
 #include <SketchPlugin_ConstraintCollinear.h>
@@ -52,15 +57,21 @@
 #include <SketchPlugin_ConstraintRigid.h>
 #include <SketchPlugin_ConstraintPerpendicular.h>
 #include <SketchPlugin_ConstraintTangent.h>
+#include <SketchPlugin_Ellipse.h>
+#include <SketchPlugin_EllipticArc.h>
 #include <SketchPlugin_Line.h>
 #include <SketchPlugin_MultiRotation.h>
 #include <SketchPlugin_MultiTranslation.h>
+#include <SketchPlugin_Point.h>
 
 #include <GeomAPI_Circ2d.h>
 #include <GeomAPI_Dir2d.h>
 #include <GeomAPI_Ellipse2d.h>
 #include <GeomAPI_Lin2d.h>
 #include <GeomAPI_Pnt2d.h>
+
+#include <ModelAPI_AttributeDoubleArray.h>
+#include <ModelAPI_AttributeIntArray.h>
 
 #include <cmath>
 
@@ -129,7 +140,9 @@ static ConstraintWrapperPtr
                                      std::shared_ptr<PlaneGCSSolver_EdgeWrapper> theEntity2);
 
 static GCS::SET_pD scalarParameters(const ScalarWrapperPtr& theScalar);
+static GCS::SET_pD scalarArrayParameters(const EntityWrapperPtr& theArray);
 static GCS::SET_pD pointParameters(const PointWrapperPtr& thePoint);
+static GCS::SET_pD pointArrayParameters(const EntityWrapperPtr& theArray);
 static GCS::SET_pD lineParameters(const EdgeWrapperPtr& theLine);
 static GCS::SET_pD circleParameters(const EdgeWrapperPtr& theCircle);
 static GCS::SET_pD arcParameters(const EdgeWrapperPtr& theArc);
@@ -399,8 +412,12 @@ GCS::SET_pD PlaneGCSSolver_Tools::parameters(const EntityWrapperPtr& theEntity)
   case ENTITY_SCALAR:
   case ENTITY_ANGLE:
     return scalarParameters(GCS_SCALAR_WRAPPER(theEntity));
+  case ENTITY_SCALAR_ARRAY:
+    return scalarArrayParameters(theEntity);
   case ENTITY_POINT:
     return pointParameters(GCS_POINT_WRAPPER(theEntity));
+  case ENTITY_POINT_ARRAY:
+    return pointArrayParameters(theEntity);
   case ENTITY_LINE:
     return lineParameters(GCS_EDGE_WRAPPER(theEntity));
   case ENTITY_CIRCLE:
@@ -416,6 +433,98 @@ GCS::SET_pD PlaneGCSSolver_Tools::parameters(const EntityWrapperPtr& theEntity)
   default: break;
   }
   return GCS::SET_pD();
+}
+
+bool PlaneGCSSolver_Tools::isAttributeApplicable(const std::string& theAttrName,
+                                                 const std::string& theOwnerName)
+{
+  if (theOwnerName == SketchPlugin_Arc::ID()) {
+    return theAttrName == SketchPlugin_Arc::CENTER_ID() ||
+           theAttrName == SketchPlugin_Arc::START_ID() ||
+           theAttrName == SketchPlugin_Arc::END_ID() ||
+           theAttrName == SketchPlugin_Arc::REVERSED_ID();
+  }
+  else if (theOwnerName == SketchPlugin_Circle::ID()) {
+    return theAttrName == SketchPlugin_Circle::CENTER_ID() ||
+           theAttrName == SketchPlugin_Circle::RADIUS_ID();
+  }
+  else if (theOwnerName == SketchPlugin_Line::ID()) {
+    return theAttrName == SketchPlugin_Line::START_ID() ||
+           theAttrName == SketchPlugin_Line::END_ID();
+  }
+  else if (theOwnerName == SketchPlugin_Ellipse::ID()) {
+    return theAttrName == SketchPlugin_Ellipse::CENTER_ID() ||
+           theAttrName == SketchPlugin_Ellipse::FIRST_FOCUS_ID() ||
+           theAttrName == SketchPlugin_Ellipse::SECOND_FOCUS_ID() ||
+           theAttrName == SketchPlugin_Ellipse::MAJOR_AXIS_START_ID() ||
+           theAttrName == SketchPlugin_Ellipse::MAJOR_AXIS_END_ID() ||
+           theAttrName == SketchPlugin_Ellipse::MINOR_AXIS_START_ID() ||
+           theAttrName == SketchPlugin_Ellipse::MINOR_AXIS_END_ID() ||
+           theAttrName == SketchPlugin_Ellipse::MAJOR_RADIUS_ID() ||
+           theAttrName == SketchPlugin_Ellipse::MINOR_RADIUS_ID();
+  }
+  else if (theOwnerName == SketchPlugin_EllipticArc::ID()) {
+    return theAttrName == SketchPlugin_EllipticArc::CENTER_ID() ||
+           theAttrName == SketchPlugin_EllipticArc::FIRST_FOCUS_ID() ||
+           theAttrName == SketchPlugin_EllipticArc::SECOND_FOCUS_ID() ||
+           theAttrName == SketchPlugin_EllipticArc::MAJOR_AXIS_START_ID() ||
+           theAttrName == SketchPlugin_EllipticArc::MAJOR_AXIS_END_ID() ||
+           theAttrName == SketchPlugin_EllipticArc::MINOR_AXIS_START_ID() ||
+           theAttrName == SketchPlugin_EllipticArc::MINOR_AXIS_END_ID() ||
+           theAttrName == SketchPlugin_EllipticArc::MAJOR_RADIUS_ID() ||
+           theAttrName == SketchPlugin_EllipticArc::MINOR_RADIUS_ID() ||
+           theAttrName == SketchPlugin_EllipticArc::START_POINT_ID() ||
+           theAttrName == SketchPlugin_EllipticArc::END_POINT_ID() ||
+           theAttrName == SketchPlugin_EllipticArc::REVERSED_ID();
+  }
+  else if (theOwnerName == SketchPlugin_BSpline::ID()) {
+    return theAttrName == SketchPlugin_BSpline::POLES_ID() ||
+           theAttrName == SketchPlugin_BSpline::WEIGHTS_ID() ||
+           theAttrName == SketchPlugin_BSpline::KNOTS_ID() ||
+           theAttrName == SketchPlugin_BSpline::MULTS_ID() ||
+           theAttrName == SketchPlugin_BSpline::DEGREE_ID() ||
+           theAttrName == SketchPlugin_BSpline::START_ID() ||
+           theAttrName == SketchPlugin_BSpline::END_ID();
+  }
+
+  // suppose that all remaining features are points
+  return theAttrName == SketchPlugin_Point::COORD_ID();
+}
+
+/// \brief Update value
+bool PlaneGCSSolver_Tools::updateValue(const double& theSource, double& theDest,
+                                       const double theTolerance)
+{
+  bool isUpdated = fabs(theSource - theDest) > theTolerance;
+  if (isUpdated)
+    theDest = theSource;
+  return isUpdated;
+}
+
+
+
+
+
+// ================   AttributeArray methods   ==========================
+PlaneGCSSolver_Tools::AttributeArray::AttributeArray(AttributePtr theAttribute)
+{
+  myDouble = std::dynamic_pointer_cast<ModelAPI_AttributeDoubleArray>(theAttribute);
+  myInteger = std::dynamic_pointer_cast<ModelAPI_AttributeIntArray>(theAttribute);
+}
+
+bool PlaneGCSSolver_Tools::AttributeArray::isInitialized() const
+{
+  return (myDouble && myDouble->isInitialized()) || (myInteger && myInteger->isInitialized());
+}
+
+int PlaneGCSSolver_Tools::AttributeArray::size() const
+{
+  return myDouble.get() ? myDouble->size() : myInteger->size();
+}
+
+double PlaneGCSSolver_Tools::AttributeArray::value(const int theIndex) const
+{
+  return myDouble.get() ? myDouble->value(theIndex) : myInteger->value(theIndex);
 }
 
 
@@ -758,11 +867,31 @@ GCS::SET_pD scalarParameters(const ScalarWrapperPtr& theScalar)
   return aParams;
 }
 
+GCS::SET_pD scalarArrayParameters(const EntityWrapperPtr& theArray)
+{
+  ScalarArrayWrapperPtr anArray =
+      std::dynamic_pointer_cast<PlaneGCSSolver_ScalarArrayWrapper>(theArray);
+  return GCS::SET_pD(anArray->array().begin(), anArray->array().end());
+}
+
 GCS::SET_pD pointParameters(const PointWrapperPtr& thePoint)
 {
   GCS::SET_pD aParams;
   aParams.insert(thePoint->point()->x);
   aParams.insert(thePoint->point()->y);
+  return aParams;
+}
+
+GCS::SET_pD pointArrayParameters(const EntityWrapperPtr& theArray)
+{
+  GCS::SET_pD aParams;
+  PointArrayWrapperPtr aPoints =
+      std::dynamic_pointer_cast<PlaneGCSSolver_PointArrayWrapper>(theArray);
+  for (std::vector<PointWrapperPtr>::const_iterator anIt = aPoints->array().begin();
+       anIt != aPoints->array().end(); ++anIt) {
+    GCS::SET_pD aPointParams = PlaneGCSSolver_Tools::parameters(*anIt);
+    aParams.insert(aPointParams.begin(), aPointParams.end());
+  }
   return aParams;
 }
 

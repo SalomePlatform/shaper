@@ -106,55 +106,6 @@ EntityWrapperPtr PlaneGCSSolver_Storage::createAttribute(
   return aResult;
 }
 
-/// \brief Update value
-static bool updateValue(const double& theSource, double& theDest)
-{
-  static const double aTol = 1.e4 * tolerance;
-  bool isUpdated = fabs(theSource - theDest) > aTol;
-  if (isUpdated)
-    theDest = theSource;
-  return isUpdated;
-}
-
-/// \brief Update coordinates of the point or scalar using its base attribute
-static bool updateValues(AttributePtr& theAttribute, EntityWrapperPtr& theEntity)
-{
-  bool isUpdated = false;
-
-  std::shared_ptr<GeomDataAPI_Point2D> aPoint2D =
-      std::dynamic_pointer_cast<GeomDataAPI_Point2D>(theAttribute);
-  if (aPoint2D) {
-    const GCSPointPtr& aGCSPoint =
-        std::dynamic_pointer_cast<PlaneGCSSolver_PointWrapper>(theEntity)->point();
-    isUpdated = updateValue(aPoint2D->x(), *(aGCSPoint->x)) || isUpdated;
-    isUpdated = updateValue(aPoint2D->y(), *(aGCSPoint->y)) || isUpdated;
-  } else {
-    AttributeDoublePtr aScalar =
-        std::dynamic_pointer_cast<ModelAPI_AttributeDouble>(theAttribute);
-    if (aScalar) {
-      ScalarWrapperPtr aWrapper =
-          std::dynamic_pointer_cast<PlaneGCSSolver_ScalarWrapper>(theEntity);
-      // There is possible angular value, which is converted between degrees and radians.
-      // So, we use its value instead of using direct pointer to value.
-      double aValue = aWrapper->value();
-      isUpdated = updateValue(aScalar->value(), aValue);
-      if (isUpdated)
-        aWrapper->setValue(aValue);
-    } else {
-      AttributeBooleanPtr aBoolean =
-          std::dynamic_pointer_cast<ModelAPI_AttributeBoolean>(theAttribute);
-      if (aBoolean) {
-        BooleanWrapperPtr aWrapper =
-            std::dynamic_pointer_cast<PlaneGCSSolver_BooleanWrapper>(theEntity);
-        isUpdated = aWrapper->value() != aBoolean->value();
-        aWrapper->setValue(aBoolean->value());
-      }
-    }
-  }
-
-  return isUpdated;
-}
-
 static bool hasReference(std::shared_ptr<SketchPlugin_Feature> theFeature,
                          const std::string& theFeatureKind)
 {
@@ -207,9 +158,7 @@ bool PlaneGCSSolver_Storage::update(FeaturePtr theFeature, bool theForce)
   std::list<AttributePtr> anAttributes = theFeature->data()->attributes(std::string());
   std::list<AttributePtr>::iterator anAttrIt = anAttributes.begin();
   for (; anAttrIt != anAttributes.end(); ++anAttrIt)
-    if ((*anAttrIt)->attributeType() == GeomDataAPI_Point2D::typeId() ||
-        (*anAttrIt)->attributeType() == ModelAPI_AttributeDouble::typeId() ||
-        (*anAttrIt)->attributeType() == ModelAPI_AttributeBoolean::typeId())
+    if (PlaneGCSSolver_Tools::isAttributeApplicable((*anAttrIt)->id(), theFeature->getKind()))
       isUpdated = update(*anAttrIt) || isUpdated;
 
   // check external attribute is changed
@@ -261,7 +210,8 @@ bool PlaneGCSSolver_Storage::update(AttributePtr theAttribute, bool theForce)
     return aRelated.get() != 0;
   }
 
-  bool isUpdated = updateValues(anAttribute, aRelated);
+  PlaneGCSSolver_AttributeBuilder aBuilder(aRelated->isExternal() ? 0 : this);
+  bool isUpdated = aBuilder.updateAttribute(anAttribute, aRelated);
   if (isUpdated) {
     setNeedToResolve(true);
     notify(aFeature);

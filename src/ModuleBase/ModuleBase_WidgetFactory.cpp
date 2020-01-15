@@ -161,8 +161,12 @@ void ModuleBase_WidgetFactory::createPanel(ModuleBase_PageBase* thePage,
   std::string aPanelName = myWidgetApi->getProperty(PROPERTY_PANEL_ID);
   if (!aPanelName.empty() && ModuleBase_WidgetCreatorFactory::get()->hasPanelWidget(aPanelName)) {
     QWidget* aPanel = ModuleBase_WidgetCreatorFactory::get()->createPanelByType(aPanelName,
-                                                               thePage->pageWidget(), theFeature);
-    thePage->addWidget(aPanel);
+        thePage->pageWidget(), theFeature, myWidgetApi);
+    ModuleBase_ModelWidget* aModelWdg = dynamic_cast<ModuleBase_ModelWidget*>(aPanel);
+    if (aModelWdg)
+      thePage->addModelWidget(aModelWdg);
+    else
+      thePage->addWidget(aPanel);
     thePage->alignToTop();
   }
 }

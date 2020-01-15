@@ -22,11 +22,10 @@
 
 #include <PlaneGCSSolver_Defs.h>
 
-#include <ModelAPI_Attribute.h>
-#include <ModelAPI_Feature.h>
-
-#include <list>
+#include <map>
 #include <memory>
+
+class ModelAPI_Attribute;
 
 class PlaneGCSSolver_EntityWrapper;
 typedef std::shared_ptr<PlaneGCSSolver_EntityWrapper> EntityWrapperPtr;
@@ -54,6 +53,14 @@ public:
   /// \brief Return the list of additional attributes
   const std::map<std::string, EntityWrapperPtr>& additionalAttributes() const
   { return myAdditionalAttributes; }
+
+protected:
+  /// \brief Update entity by the values of theAttribute
+  /// \return \c true if any value of attribute is not equal to the stored in the entity
+  virtual bool update(std::shared_ptr<ModelAPI_Attribute> theAttribute)
+  { return false; }
+
+  friend class PlaneGCSSolver_AttributeBuilder;
 
 private:
   bool myExternal;

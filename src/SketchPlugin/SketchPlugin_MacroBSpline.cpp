@@ -75,6 +75,8 @@ void SketchPlugin_MacroBSpline::initAttributes()
   data()->addAttribute(REF_POLES_ID(), ModelAPI_AttributeRefAttrList::typeId());
   ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(), REF_POLES_ID());
 
+  data()->addAttribute(CONTROL_POLYGON_ID(), ModelAPI_AttributeBoolean::typeId());
+
   data()->addAttribute(AUXILIARY_ID(), ModelAPI_AttributeBoolean::typeId());
 }
 
@@ -82,16 +84,18 @@ void SketchPlugin_MacroBSpline::execute()
 {
   FeaturePtr aBSpline = createBSplineFeature();
 
-  std::list<FeaturePtr> aControlPoles;
-  createControlPolygon(aBSpline, aControlPoles);
-  constraintsForPoles(aControlPoles);
+  if (boolean(CONTROL_POLYGON_ID())->value()) {
+    std::list<FeaturePtr> aControlPoles;
+    createControlPolygon(aBSpline, aControlPoles);
+    constraintsForPoles(aControlPoles);
 
-  // message to init reentrant operation
-  static Events_ID anId = ModelAPI_EventReentrantMessage::eventId();
-  ReentrantMessagePtr aMessage(new ModelAPI_EventReentrantMessage(anId, this));
-  // set here the last pole to make coincidence with the start point of the next B-spline curve
-  aMessage->setCreatedFeature(aControlPoles.back());
-  Events_Loop::loop()->send(aMessage);
+    // message to init reentrant operation
+    static Events_ID anId = ModelAPI_EventReentrantMessage::eventId();
+    ReentrantMessagePtr aMessage(new ModelAPI_EventReentrantMessage(anId, this));
+    // set here the last pole to make coincidence with the start point of the next B-spline curve
+    aMessage->setCreatedFeature(aControlPoles.back());
+    Events_Loop::loop()->send(aMessage);
+  }
 }
 
 // LCOV_EXCL_START
@@ -172,6 +176,21 @@ FeaturePtr SketchPlugin_MacroBSpline::createBSplineFeature()
   std::list<int>::iterator aMIt = myMultiplicities.begin();
   for (int index = 0; index < aSize; ++index, ++aMIt)
     aMults->setValue(index, *aMIt);
+
+  SketchPlugin_Sketch* aSketch =
+      std::dynamic_pointer_cast<SketchPlugin_Feature>(aBSpline)->sketch();
+
+  AttributePoint2DPtr aStartPoint = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
+      aBSpline->attribute(SketchPlugin_BSpline::START_ID()));
+  aStartPoint->setValue(aPoles->pnt(0));
+  // internal constraint to keep position of the point
+  createInternalConstraint(aSketch, aStartPoint, aPoles, 0);
+
+  AttributePoint2DPtr aEndPoint = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
+      aBSpline->attribute(SketchPlugin_BSpline::END_ID()));
+  aEndPoint->setValue(aPoles->pnt(aPoles->size() - 1));
+  // internal constraint to keep position of the point
+  createInternalConstraint(aSketch, aEndPoint, aPoles, aPoles->size() - 1);
 
   aBSpline->boolean(SketchPlugin_BSpline::AUXILIARY_ID())->setValue(
       boolean(AUXILIARY_ID())->value());

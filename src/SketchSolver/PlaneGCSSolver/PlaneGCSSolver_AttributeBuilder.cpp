@@ -24,6 +24,7 @@
 #include <PlaneGCSSolver_ScalarWrapper.h>
 #include <PlaneGCSSolver_ScalarArrayWrapper.h>
 #include <PlaneGCSSolver_BooleanWrapper.h>
+#include <PlaneGCSSolver_Tools.h>
 
 #include <GeomAPI_Pnt2d.h>
 #include <GeomDataAPI_Point2D.h>
@@ -101,33 +102,7 @@ static EntityWrapperPtr createScalar(const AttributePtr&     theAttribute,
 static EntityWrapperPtr createScalarArray(const AttributePtr&     theAttribute,
                                           PlaneGCSSolver_Storage* theStorage)
 {
-  class ArrayAttribute {
-  public:
-    ArrayAttribute(AttributePtr theAttribute)
-    {
-      myDouble = std::dynamic_pointer_cast<ModelAPI_AttributeDoubleArray>(theAttribute);
-      myInteger = std::dynamic_pointer_cast<ModelAPI_AttributeIntArray>(theAttribute);
-    }
-
-    bool isInitialized() const
-    {
-      return (myDouble && myDouble->isInitialized()) || (myInteger && myInteger->isInitialized());
-    }
-
-    int size() const
-    {
-      return myDouble.get() ? myDouble->size() : myInteger->size();
-    }
-
-    double value(const int theIndex) const
-    {
-      return myDouble.get() ? myDouble->value(theIndex) : myInteger->value(theIndex);
-    }
-
-  private:
-    AttributeDoubleArrayPtr myDouble;
-    AttributeIntArrayPtr myInteger;
-  } anArray(theAttribute);
+  PlaneGCSSolver_Tools::AttributeArray anArray(theAttribute);
 
   if (!anArray.isInitialized())
     return EntityWrapperPtr();
@@ -219,4 +194,60 @@ EntityWrapperPtr PlaneGCSSolver_AttributeBuilder::createAttribute(
   if (aResult && !myStorage)
     aResult->setExternal(true);
   return aResult;
+}
+
+bool PlaneGCSSolver_AttributeBuilder::updateAttribute(
+    AttributePtr theAttribute,
+    EntityWrapperPtr theEntity)
+{
+  bool isUpdated = false;
+  GCS::SET_pD aParamsToRemove;
+  // rebuild array if its size is changed
+  if (theEntity->type() == ENTITY_POINT_ARRAY) {
+    std::shared_ptr<PlaneGCSSolver_PointArrayWrapper> aWrapper =
+        std::dynamic_pointer_cast<PlaneGCSSolver_PointArrayWrapper>(theEntity);
+    std::shared_ptr<GeomDataAPI_Point2DArray> anAttribute =
+        std::dynamic_pointer_cast<GeomDataAPI_Point2DArray>(theAttribute);
+
+    if (aWrapper->size() != anAttribute->size()) {
+      std::vector<PointWrapperPtr> aPointsArray = aWrapper->array();
+      while (anAttribute->size() > (int)aPointsArray.size()) {
+        // add points to the middle of array
+        aPointsArray.insert(--aPointsArray.end(), createPoint(GeomPnt2dPtr(), myStorage));
+      }
+
+      while (anAttribute->size() < (int)aPointsArray.size()) {
+        // remove middle points
+        std::vector<PointWrapperPtr>::iterator anIt = --aPointsArray.end();
+        GCS::SET_pD aParams = PlaneGCSSolver_Tools::parameters(*anIt);
+        aParamsToRemove.insert(aParams.begin(), aParams.end());
+        aPointsArray.erase(anIt);
+      }
+
+      aWrapper->setArray(aPointsArray);
+    }
+  }
+  else if (theEntity->type() == ENTITY_SCALAR_ARRAY) {
+    std::shared_ptr<PlaneGCSSolver_ScalarArrayWrapper> aWrapper =
+        std::dynamic_pointer_cast<PlaneGCSSolver_ScalarArrayWrapper>(theEntity);
+    if (aWrapper->size() != PlaneGCSSolver_Tools::AttributeArray(theAttribute).size()) {
+      aParamsToRemove = PlaneGCSSolver_Tools::parameters(aWrapper);
+      std::shared_ptr<PlaneGCSSolver_ScalarArrayWrapper> aNewArray =
+          std::dynamic_pointer_cast<PlaneGCSSolver_ScalarArrayWrapper>(
+          createAttribute(theAttribute));
+      aWrapper->setArray(aNewArray->array());
+      isUpdated = true;
+    }
+  }
+
+  if (!aParamsToRemove.empty()) {
+    if (myStorage)
+      myStorage->removeParameters(aParamsToRemove);
+    else {
+      std::for_each(aParamsToRemove.begin(), aParamsToRemove.end(),
+                    [](double* theParam) { delete theParam; });
+    }
+  }
+
+  return isUpdated || theEntity->update(theAttribute);
 }

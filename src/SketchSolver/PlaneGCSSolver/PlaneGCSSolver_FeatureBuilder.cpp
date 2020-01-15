@@ -40,8 +40,6 @@
 #include <GeomAPI_Pnt2d.h>
 #include <GeomAPI_XY.h>
 
-static bool isAttributeApplicable(const std::string& theAttrName,
-                                  const std::string& theOwnerName);
 
 static EntityWrapperPtr createLine(const AttributeEntityMap& theAttributes);
 static EntityWrapperPtr createCircle(const AttributeEntityMap& theAttributes);
@@ -69,7 +67,7 @@ EntityWrapperPtr PlaneGCSSolver_FeatureBuilder::createAttribute(
 {
   FeaturePtr anOwner = ModelAPI_Feature::feature(theAttribute->owner());
   EntityWrapperPtr anAttr;
-  if (isAttributeApplicable(theAttribute->id(), anOwner->getKind()))
+  if (PlaneGCSSolver_Tools::isAttributeApplicable(theAttribute->id(), anOwner->getKind()))
     anAttr = PlaneGCSSolver_AttributeBuilder::createAttribute(theAttribute);
   if (anAttr)
     myAttributes[theAttribute] = anAttr;
@@ -340,57 +338,4 @@ EntityWrapperPtr createBSpline(const AttributeEntityMap& theAttributes)
   }
 
   return EdgeWrapperPtr(new PlaneGCSSolver_EdgeWrapper(aNewSpline));
-}
-
-bool isAttributeApplicable(const std::string& theAttrName, const std::string& theOwnerName)
-{
-  if (theOwnerName == SketchPlugin_Arc::ID()) {
-    return theAttrName == SketchPlugin_Arc::CENTER_ID() ||
-           theAttrName == SketchPlugin_Arc::START_ID() ||
-           theAttrName == SketchPlugin_Arc::END_ID() ||
-           theAttrName == SketchPlugin_Arc::REVERSED_ID();
-  }
-  else if (theOwnerName == SketchPlugin_Circle::ID()) {
-    return theAttrName == SketchPlugin_Circle::CENTER_ID() ||
-           theAttrName == SketchPlugin_Circle::RADIUS_ID();
-  }
-  else if (theOwnerName == SketchPlugin_Line::ID()) {
-    return theAttrName == SketchPlugin_Line::START_ID() ||
-           theAttrName == SketchPlugin_Line::END_ID();
-  }
-  else if (theOwnerName == SketchPlugin_Ellipse::ID()) {
-    return theAttrName == SketchPlugin_Ellipse::CENTER_ID() ||
-           theAttrName == SketchPlugin_Ellipse::FIRST_FOCUS_ID() ||
-           theAttrName == SketchPlugin_Ellipse::SECOND_FOCUS_ID() ||
-           theAttrName == SketchPlugin_Ellipse::MAJOR_AXIS_START_ID() ||
-           theAttrName == SketchPlugin_Ellipse::MAJOR_AXIS_END_ID() ||
-           theAttrName == SketchPlugin_Ellipse::MINOR_AXIS_START_ID() ||
-           theAttrName == SketchPlugin_Ellipse::MINOR_AXIS_END_ID() ||
-           theAttrName == SketchPlugin_Ellipse::MAJOR_RADIUS_ID() ||
-           theAttrName == SketchPlugin_Ellipse::MINOR_RADIUS_ID();
-  }
-  else if (theOwnerName == SketchPlugin_EllipticArc::ID()) {
-    return theAttrName == SketchPlugin_EllipticArc::CENTER_ID() ||
-           theAttrName == SketchPlugin_EllipticArc::FIRST_FOCUS_ID() ||
-           theAttrName == SketchPlugin_EllipticArc::SECOND_FOCUS_ID() ||
-           theAttrName == SketchPlugin_EllipticArc::MAJOR_AXIS_START_ID() ||
-           theAttrName == SketchPlugin_EllipticArc::MAJOR_AXIS_END_ID() ||
-           theAttrName == SketchPlugin_EllipticArc::MINOR_AXIS_START_ID() ||
-           theAttrName == SketchPlugin_EllipticArc::MINOR_AXIS_END_ID() ||
-           theAttrName == SketchPlugin_EllipticArc::MAJOR_RADIUS_ID() ||
-           theAttrName == SketchPlugin_EllipticArc::MINOR_RADIUS_ID() ||
-           theAttrName == SketchPlugin_EllipticArc::START_POINT_ID() ||
-           theAttrName == SketchPlugin_EllipticArc::END_POINT_ID() ||
-           theAttrName == SketchPlugin_EllipticArc::REVERSED_ID();
-  }
-  else if (theOwnerName == SketchPlugin_BSpline::ID()) {
-    return theAttrName == SketchPlugin_BSpline::POLES_ID() ||
-           theAttrName == SketchPlugin_BSpline::WEIGHTS_ID() ||
-           theAttrName == SketchPlugin_BSpline::KNOTS_ID() ||
-           theAttrName == SketchPlugin_BSpline::MULTS_ID() ||
-           theAttrName == SketchPlugin_BSpline::DEGREE_ID();
-  }
-
-  // suppose that all remaining features are points
-  return theAttrName == SketchPlugin_Point::COORD_ID();
 }

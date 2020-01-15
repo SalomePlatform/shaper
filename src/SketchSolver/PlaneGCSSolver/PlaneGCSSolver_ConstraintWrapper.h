@@ -23,6 +23,8 @@
 #include <PlaneGCSSolver_Defs.h>
 #include <PlaneGCSSolver_ScalarWrapper.h>
 
+#include <list>
+
 /**
  *  Wrapper providing operations with PlaneGCS constraints.
  */

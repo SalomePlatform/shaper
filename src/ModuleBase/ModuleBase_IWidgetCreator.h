@@ -68,10 +68,12 @@ public:
   /// \param theType a panel type
   /// \param theParent a parent widget
   /// \param theFeature a feature modified in the panel
+  /// \param theWidgetApi a low-level API for reading xml definitions of widget
   /// \return created widget or null
   virtual QWidget* createPanelByType(const std::string& theType,
                                      QWidget* theParent,
-                                     const FeaturePtr& theFeature);
+                                     const FeaturePtr& theFeature,
+                                     Config_WidgetAPI* theWidgetApi = 0);
 
   /// Create page by its type
   /// The default implementation is empty

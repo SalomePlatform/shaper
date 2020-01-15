@@ -18,8 +18,23 @@
 //
 
 #include <PlaneGCSSolver_PointWrapper.h>
+#include <PlaneGCSSolver_Tools.h>
+
+#include <GeomDataAPI_Point2D.h>
 
 PlaneGCSSolver_PointWrapper::PlaneGCSSolver_PointWrapper(const GCSPointPtr thePoint)
   : myPoint(thePoint)
 {
+}
+
+bool PlaneGCSSolver_PointWrapper::update(AttributePtr theAttribute)
+{
+  bool isUpdated = false;
+  std::shared_ptr<GeomDataAPI_Point2D> aPoint2D =
+      std::dynamic_pointer_cast<GeomDataAPI_Point2D>(theAttribute);
+  if (aPoint2D) {
+    isUpdated = PlaneGCSSolver_Tools::updateValue(aPoint2D->x(), *(myPoint->x)) || isUpdated;
+    isUpdated = PlaneGCSSolver_Tools::updateValue(aPoint2D->y(), *(myPoint->y)) || isUpdated;
+  }
+  return isUpdated;
 }

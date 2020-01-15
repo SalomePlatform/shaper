@@ -38,6 +38,10 @@ public:
   /// \return Created wrapper of the attribute applicable for specific solver
   virtual EntityWrapperPtr createAttribute(AttributePtr theAttribute);
 
+  /// \brief Update entity by the attribute values.
+  /// \return \c true if any value is updated.
+  virtual bool updateAttribute(AttributePtr theAttribute, EntityWrapperPtr theEntity);
+
   /// \brief Blank. To be defined in derived class.
   virtual EntityWrapperPtr createFeature(FeaturePtr)
   { return EntityWrapperPtr(); }

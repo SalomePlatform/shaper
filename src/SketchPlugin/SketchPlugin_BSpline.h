@@ -72,6 +72,19 @@ public:
     return ID;
   }
 
+  /// start point of B-spline curve
+  inline static const std::string& START_ID()
+  {
+    static const std::string ID("start_point");
+    return ID;
+  }
+  /// end point of B-spline curve
+  inline static const std::string& END_ID()
+  {
+    static const std::string ID("end_point");
+    return ID;
+  }
+
   /// Returns the kind of a feature
   SKETCHPLUGIN_EXPORT virtual const std::string& getKind()
   {

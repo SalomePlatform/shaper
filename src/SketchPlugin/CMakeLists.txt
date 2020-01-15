@@ -24,6 +24,7 @@ SET(PROJECT_HEADERS
     SketchPlugin.h
     SketchPlugin_Arc.h
     SketchPlugin_BSpline.h
+    SketchPlugin_BSplineWidget.h
     SketchPlugin_Circle.h
     SketchPlugin_Constraint.h
     SketchPlugin_ConstraintAngle.h
@@ -65,17 +66,23 @@ SET(PROJECT_HEADERS
     SketchPlugin_Point.h
     SketchPlugin_Projection.h
     SketchPlugin_Sketch.h
+    SketchPlugin_SketchDrawer.h
     SketchPlugin_SketchEntity.h
     SketchPlugin_Split.h
     SketchPlugin_Tools.h
     SketchPlugin_Trim.h
     SketchPlugin_Validators.h
-    SketchPlugin_SketchDrawer.h
+    SketchPlugin_WidgetCreator.h
+)
+
+SET(PROJECT_MOC_HEADERS
+    SketchPlugin_BSplineWidget.h
 )
 
 SET(PROJECT_SOURCES
     SketchPlugin_Arc.cpp
     SketchPlugin_BSpline.cpp
+    SketchPlugin_BSplineWidget.cpp
     SketchPlugin_Circle.cpp
     SketchPlugin_Constraint.cpp
     SketchPlugin_ConstraintAngle.cpp
@@ -115,12 +122,13 @@ SET(PROJECT_SOURCES
     SketchPlugin_Point.cpp
     SketchPlugin_Projection.cpp
     SketchPlugin_Sketch.cpp
+    SketchPlugin_SketchDrawer.cpp
     SketchPlugin_SketchEntity.cpp
     SketchPlugin_Split.cpp
     SketchPlugin_Tools.cpp
     SketchPlugin_Trim.cpp
     SketchPlugin_Validators.cpp
-    SketchPlugin_SketchDrawer.cpp
+    SketchPlugin_WidgetCreator.cpp
 )
 
 SET(PROJECT_LIBRARIES
@@ -129,6 +137,7 @@ SET(PROJECT_LIBRARIES
     GeomAlgoAPI
     ModelAPI
     ModelGeomAlgo
+    ModuleBase
     SketcherPrs
     GeomDataAPI
 )
@@ -139,14 +148,18 @@ SET(XML_RESOURCES
 )
 
 SET(TEXT_RESOURCES
-	SketchPlugin_msg_en.ts
-	SketchPlugin_msg_fr.ts
+    SketchPlugin_msg_en.ts
+    SketchPlugin_msg_fr.ts
 )
 
+# sources / moc wrappings
+QT_WRAP_MOC(PROJECT_AUTOMOC ${PROJECT_MOC_HEADERS})
+
+SOURCE_GROUP ("Generated Files" FILES ${PROJECT_AUTOMOC})
 SOURCE_GROUP ("Resource Files" FILES ${TEXT_RESOURCES})
 
 ADD_DEFINITIONS(-DSKETCHPLUGIN_EXPORTS)
-ADD_LIBRARY(SketchPlugin MODULE ${PROJECT_SOURCES} ${PROJECT_HEADERS} ${XML_RESOURCES} ${TEXT_RESOURCES})
+ADD_LIBRARY(SketchPlugin MODULE ${PROJECT_SOURCES} ${PROJECT_HEADERS} ${XML_RESOURCES} ${TEXT_RESOURCES} ${PROJECT_AUTOMOC})
 TARGET_LINK_LIBRARIES(SketchPlugin ${PROJECT_LIBRARIES})
 
 INCLUDE_DIRECTORIES(
@@ -154,10 +167,12 @@ INCLUDE_DIRECTORIES(
   ../Events
   ../ModelAPI
   ../ModelGeomAlgo
+  ../ModuleBase
   ../GeomAPI
   ../GeomAlgoAPI
   ../GeomDataAPI
   ../SketcherPrs
+  ${OpenCASCADE_INCLUDE_DIR}
 )
 
 INSTALL(TARGETS SketchPlugin DESTINATION ${SHAPER_INSTALL_PLUGIN_FILES})

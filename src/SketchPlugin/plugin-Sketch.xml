@@ -602,16 +602,21 @@
       <feature id="SketchBSpline"
                title="B-spline"
                tooltip="Create B-spline curve"
+               property_panel_id="bspline-panel"
                icon="icons/Sketch/bspline.png"
                helpfile="bsplineFeature.html"
                internal="1">
-        <sketch-bspline_selector id="poles"
-                                 weights="weights"
-                                 title="Poles and weights"
-                                 tooltip="B-spline poles and weights"
-                                 enable_value="enable_by_preferences">
+        <sketch-2dpoint_selector id="start_point" accept_expressions="0" title="Start point" tooltip="Start point coordinates"
+                                 enable_value="enable_by_preferences"/>
+        <sketch-2dpoint_selector id="end_point" accept_expressions="0" title="End point" tooltip="End point coordinates"
+                                 enable_value="enable_by_preferences"/>
+        <bspline-panel id="poles"
+                       weights="weights"
+                       title="Poles and weights"
+                       tooltip="B-spline poles and weights"
+                       enable_value="enable_by_preferences">
           <validator id="SketchPlugin_BSplineValidator"/>
-        </sketch-bspline_selector>
+        </bspline-panel>
         <boolvalue id="Auxiliary"
                    label="Auxiliary"
                    default="false"
@@ -634,6 +639,10 @@
                                  enable_value="enable_by_preferences">
           <validator id="SketchPlugin_BSplineValidator"/>
         </sketch-bspline_selector>
+        <boolvalue id="need_control_poly"
+                   label="Create control polygon"
+                   default="true"
+                   tooltip="Specify if the control polygon should be created"/>
         <boolvalue id="Auxiliary"
                    label="Auxiliary"
                    default="false"

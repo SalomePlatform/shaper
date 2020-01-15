@@ -24,6 +24,7 @@
 
 #include <GeomAPI_Pnt2d.h>
 
+#include <GeomDataAPI_Point2D.h>
 #include <GeomDataAPI_Point2DArray.h>
 
 #include <ModelAPI_AttributeDoubleArray.h>
@@ -41,6 +42,9 @@ SketchPlugin_BSpline::SketchPlugin_BSpline()
 
 void SketchPlugin_BSpline::initDerivedClassAttributes()
 {
+  data()->addAttribute(START_ID(), GeomDataAPI_Point2D::typeId());
+  data()->addAttribute(END_ID(), GeomDataAPI_Point2D::typeId());
+
   data()->addAttribute(POLES_ID(), GeomDataAPI_Point2DArray::typeId());
   data()->addAttribute(WEIGHTS_ID(), ModelAPI_AttributeDoubleArray::typeId());
   data()->addAttribute(KNOTS_ID(), ModelAPI_AttributeDoubleArray::typeId());

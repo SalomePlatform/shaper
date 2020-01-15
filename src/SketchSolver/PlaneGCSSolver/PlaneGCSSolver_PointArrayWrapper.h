@@ -38,9 +38,19 @@ public:
   /// \breif Size of array
   int size() const { return (int)myPoints.size(); }
 
+  /// \brief Return array of points
+  const std::vector<PointWrapperPtr>& array() const { return myPoints; }
+  /// \breif Set points
+  void setArray(const std::vector<PointWrapperPtr>& thePoints) { myPoints = thePoints; }
+
   /// \brief Return type of current entity
   virtual SketchSolver_EntityType type() const
   { return ENTITY_POINT_ARRAY; }
+
+protected:
+  /// \brief Update entity by the values of theAttribute
+  /// \return \c true if any value of attribute is not equal to the stored in the entity
+  virtual bool update(std::shared_ptr<ModelAPI_Attribute> theAttribute);
 
 private:
   std::vector<PointWrapperPtr> myPoints;

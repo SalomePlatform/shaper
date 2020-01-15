@@ -69,6 +69,13 @@ public:
     return ID;
   }
 
+  /// flag attribute whether control polygon is need to be created
+  inline static const std::string& CONTROL_POLYGON_ID()
+  {
+    static const std::string ID("need_control_poly");
+    return ID;
+  }
+
   /// Returns the kind of a feature
   SKETCHPLUGIN_EXPORT virtual const std::string& getKind()
   {

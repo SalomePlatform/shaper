@@ -45,6 +45,11 @@ public:
   { return ENTITY_SCALAR; }
 
 protected:
+  /// \brief Update entity by the values of theAttribute
+  /// \return \c true if any value of attribute is not equal to the stored in the entity
+  virtual bool update(std::shared_ptr<ModelAPI_Attribute> theAttribute);
+
+protected:
   double* myValue; ///< pointer to value provided by the storage
 };
 

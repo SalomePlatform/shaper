@@ -31,12 +31,22 @@ class PlaneGCSSolver_ScalarArrayWrapper : public PlaneGCSSolver_EntityWrapper
 public:
   PlaneGCSSolver_ScalarArrayWrapper(const GCS::VEC_pD& theParam);
 
+  /// \breif Size of array
+  int size() const { return (int)myValue.size(); }
+
   /// \brief Return array of PlaneGCS parameters
   const GCS::VEC_pD& array() const { return myValue; }
+  /// \breif Set array of parameters
+  void setArray(const GCS::VEC_pD& theParams) { myValue = theParams; }
 
   /// \brief Return type of current entity
   virtual SketchSolver_EntityType type() const
   { return ENTITY_SCALAR_ARRAY; }
+
+protected:
+  /// \brief Update entity by the values of theAttribute
+  /// \return \c true if any value of attribute is not equal to the stored in the entity
+  virtual bool update(std::shared_ptr<ModelAPI_Attribute> theAttribute);
 
 protected:
   GCS::VEC_pD myValue; ///< list of pointers to values provided by the storage

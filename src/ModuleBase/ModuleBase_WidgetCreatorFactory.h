@@ -65,9 +65,12 @@ class MODULEBASE_EXPORT ModuleBase_WidgetCreatorFactory
   /// \param theType a type
   /// \param theParent a parent widget
   /// \param theFeature a feature to fill the panel
+  /// \param theWidgetApi the widget configuration.
+  ///                     The attribute of the model widget is obtained from XML
   /// \return a created panel or null
   QWidget* createPanelByType(const std::string& theType, QWidget* theParent,
-                             const FeaturePtr& theFeature);
+                             const FeaturePtr& theFeature,
+                             Config_WidgetAPI* theWidgetApi = 0);
 
   /// Returns true if there is a creator, which can make a page by the type
   /// \param theType a type

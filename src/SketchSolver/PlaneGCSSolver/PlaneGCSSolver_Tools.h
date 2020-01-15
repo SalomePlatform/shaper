@@ -29,6 +29,9 @@ class GeomAPI_Ellipse2d;
 class GeomAPI_Lin2d;
 class GeomAPI_Pnt2d;
 
+class ModelAPI_AttributeDoubleArray;
+class ModelAPI_AttributeIntArray;
+
 /** \namespace  PlaneGCSSolver_Tools
  *  \ingroup    Plugins
  *  \brief      Converter tools
@@ -67,6 +70,12 @@ namespace PlaneGCSSolver_Tools
                                         const EntityWrapperPtr& theEntity3 = EntityWrapperPtr(),
                                         const EntityWrapperPtr& theEntity4 = EntityWrapperPtr());
 
+  /// \brief Return \c true if the attribute is used in PlaneGCS solver
+  /// \param[in] theAttrName  name of the attribute
+  /// \param[in] theOwnerName name of the parent feature
+  bool isAttributeApplicable(const std::string& theAttrName,
+                             const std::string& theOwnerName);
+
   /// \brief Convert entity to point
   /// \return empty pointer if the entity is not a point
   std::shared_ptr<GeomAPI_Pnt2d> point(EntityWrapperPtr theEntity);
@@ -91,6 +100,28 @@ namespace PlaneGCSSolver_Tools
 
   /// brief Return list of parameters for the given entity
   GCS::SET_pD parameters(const EntityWrapperPtr& theEntity);
+
+  /// \brief Update value in theDest if theSource is differ more than theTolerance
+  /// \return \c true if the value was updated.
+  bool updateValue(const double& theSource, double& theDest,
+                   const double theTolerance = 1.e-4 * tolerance);
+
+  /// \brief Provide an interface to access values in attribute which is an array of values
+  class AttributeArray
+  {
+  public:
+    AttributeArray(AttributePtr theAttribute);
+
+    bool isInitialized() const;
+
+    int size() const;
+
+    double value(const int theIndex) const;
+
+  private:
+    std::shared_ptr<ModelAPI_AttributeDoubleArray> myDouble;
+    std::shared_ptr<ModelAPI_AttributeIntArray> myInteger;
+  };
 };
 
 #endif
