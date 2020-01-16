@@ -177,14 +177,14 @@ class PublishToStudyFeature(ModelAPI.ModelAPI_Feature):
             aGroup = aGroupOp.FindGroup(theStudyShape, aGroupEntry)
           if not aGroup: # create a new
             if theFields:
-              aValType = aRef.tables("values").type() # type of the values
               aGroup = aFieldOp.CreateFieldByType(theStudyShape, aSelType)
-              aGroup.SetValuesType(aValType)
             else:
               aGroup = aGroupOp.CreateGroup(theStudyShape, aSelType)
             aGroup.SetEntry(aGroupEntry)
             theEngine.AddInStudy(aGroup, aRef.firstResult().data().name(), theStudyShape.GetSO())
           aGroup.SetSelection(aGroupIndices)
+          if theFields:
+            self.fillField(aGroup, aRef, theEngine, aGroupIndices)
           # a group takes shape from the main result
           #aGroup.SetShapeByStream(aRef.firstResult().shape().getShapeStream(False)) # group shape
           allGroupsProcessed.append(aGroupEntry)
@@ -202,3 +202,44 @@ class PublishToStudyFeature(ModelAPI.ModelAPI_Feature):
               aBuilder = SHAPERSTUDY_utils.getStudy().NewBuilder()
               aBuilder.RemoveObject(anObj.GetSO())
         aSOIter.Next()
+
+    # Part of the "execute" method: theFiled fields filling.
+    def fillField(self, theField, theFeature, theEngine, theSelectionIndices):
+      aTables = theFeature.tables("values")
+      aValType = aTables.type() # type of the values
+      theField.SetValuesType(aValType)
+      aNumSteps = aTables.tables() # number of steps is number of tables
+      aSteps = []
+      for aVal in range(aNumSteps):
+        aSteps.append(aVal + 1)
+      theField.SetSteps(aSteps)
+      aCompNames = []
+      aCompNamesAttr = theFeature.stringArray("components_names")
+      for anIndex in range(aCompNamesAttr.size()):
+        aCompNames.append(aCompNamesAttr.value(anIndex))
+      theField.SetComponents(aCompNames)
+      # prepare the sub-shapes indices: all values for all sub-shapes must be defined
+      aShapeOp = theEngine.GetIShapesOperations()
+      allIndices = aShapeOp.GetAllSubShapesIDs(theField.GetShape(), theField.GetSelectionType(), False)
+      # define steps
+      theField.ClearFieldSteps()
+      for aVal in range(aNumSteps):
+        aVals = []
+        for aCol in range(aTables.columns()):
+          #for aRow in range(aTables.rows()):
+          for anIndex in allIndices:
+            if anIndex in theSelectionIndices:
+              aRow = theSelectionIndices.index(anIndex) + 1 # starting from the first line
+            else:
+              aRow = 0 # default value
+            aStrVal = aTables.valueStr(aRow, aCol, aVal)
+            if aValType == 0: # boolean
+              if aStrVal == "True":
+                aVals.append(1)
+              else:
+                aVals.append(0)
+            elif aValType == 1: # int
+              aVals.append(int(aStrVal))
+            elif aValType == 2: # double
+              aVals.append(float(aStrVal))
+        theField.AddFieldStep(theFeature.intArray("stamps").value(aVal), aVal + 1, aVals)
