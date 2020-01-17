@@ -46,6 +46,7 @@ class SketchAPI_Ellipse;
 class SketchAPI_MacroEllipse;
 class SketchAPI_EllipticArc;
 class SketchAPI_MacroEllipticArc;
+class SketchAPI_BSpline;
 class SketchAPI_IntersectionPoint;
 class SketchAPI_Line;
 class SketchAPI_Mirror;
@@ -323,6 +324,26 @@ public:
   /// Add elliptic arc
   SKETCHAPI_EXPORT
   std::shared_ptr<SketchAPI_EllipticArc> addEllipticArc(const std::string & theExternalName);
+
+  /// Add B-spline
+  SKETCHAPI_EXPORT
+  std::shared_ptr<SketchAPI_BSpline> addSpline(
+      const std::list<std::shared_ptr<GeomAPI_Pnt2d> >& thePoles,
+      const std::list<ModelHighAPI_Double>& theWeights = std::list<ModelHighAPI_Double>());
+  /// Add B-spline
+  SKETCHAPI_EXPORT
+  std::shared_ptr<SketchAPI_BSpline> addSpline(
+      const int theDegree,
+      const std::list<std::shared_ptr<GeomAPI_Pnt2d> >& thePoles,
+      const std::list<ModelHighAPI_Double>& theWeights = std::list<ModelHighAPI_Double>(),
+      const std::list<ModelHighAPI_Double>& theKnots = std::list<ModelHighAPI_Double>(),
+      const std::list<ModelHighAPI_Integer>& theMults = std::list<ModelHighAPI_Integer>());
+  /// Add B-spline
+  SKETCHAPI_EXPORT
+  std::shared_ptr<SketchAPI_BSpline> addSpline(const ModelHighAPI_Selection & theExternal);
+  /// Add B-spline
+  SKETCHAPI_EXPORT
+  std::shared_ptr<SketchAPI_BSpline> addSpline(const std::string & theExternalName);
 
   /// Add projection
   SKETCHAPI_EXPORT

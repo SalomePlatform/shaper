@@ -37,9 +37,11 @@ class GeomAPI_Pnt2d;
 class GeomDataAPI_Dir;
 class GeomDataAPI_Point;
 class GeomDataAPI_Point2D;
+class GeomDataAPI_Point2DArray;
 //--------------------------------------------------------------------------------------
 class ModelAPI_AttributeBoolean;
 class ModelAPI_AttributeDouble;
+class ModelAPI_AttributeDoubleArray;
 class ModelAPI_AttributeIntArray;
 class ModelAPI_AttributeInteger;
 class ModelAPI_AttributeRefAttr;
@@ -145,6 +147,14 @@ void fillAttribute(const std::list<std::string> & theValue,
 MODELHIGHAPI_EXPORT
 void fillAttribute(const std::list<ModelHighAPI_Integer> & theValue,
                    const std::shared_ptr<ModelAPI_AttributeIntArray> & theAttribute);
+
+MODELHIGHAPI_EXPORT
+void fillAttribute(const std::list<ModelHighAPI_Double> & theValue,
+                   const std::shared_ptr<ModelAPI_AttributeDoubleArray> & theAttribute);
+
+MODELHIGHAPI_EXPORT
+void fillAttribute(const std::list<std::shared_ptr<GeomAPI_Pnt2d> > & theValue,
+                   const std::shared_ptr<GeomDataAPI_Point2DArray> & theAttribute);
 
 MODELHIGHAPI_EXPORT
 void fillAttribute(const ModelHighAPI_Double & theX,

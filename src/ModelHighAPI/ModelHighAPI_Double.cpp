@@ -46,6 +46,12 @@ ModelHighAPI_Double::~ModelHighAPI_Double()
 {
 }
 
+double ModelHighAPI_Double::value() const
+{
+  // needed for array of double, which supports no text
+  return myDouble;
+}
+
 //--------------------------------------------------------------------------------------
 void ModelHighAPI_Double::fillAttribute(
     const std::shared_ptr<ModelAPI_AttributeDouble> & theAttribute) const

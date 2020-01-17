@@ -27,10 +27,12 @@
 #include <GeomDataAPI_Dir.h>
 #include <GeomDataAPI_Point.h>
 #include <GeomDataAPI_Point2D.h>
+#include <GeomDataAPI_Point2DArray.h>
 //--------------------------------------------------------------------------------------
 #include <ModelAPI_AttributeBoolean.h>
 #include <ModelAPI_AttributeDocRef.h>
 #include <ModelAPI_AttributeDouble.h>
+#include <ModelAPI_AttributeDoubleArray.h>
 #include <ModelAPI_AttributeIntArray.h>
 #include <ModelAPI_AttributeInteger.h>
 #include <ModelAPI_AttributeRefAttr.h>
@@ -239,6 +241,29 @@ void fillAttribute(const std::list<ModelHighAPI_Integer> & theValue,
     theAttribute->setValue(anIndex, it->intValue()); // use only values, no text support in array
 }
 
+//--------------------------------------------------------------------------------------
+void fillAttribute(const std::list<ModelHighAPI_Double> & theValue,
+                   const std::shared_ptr<ModelAPI_AttributeDoubleArray> & theAttribute)
+{
+  theAttribute->setSize(int(theValue.size()));
+
+  int anIndex = 0;
+  for (auto it = theValue.begin(); it != theValue.end(); ++it, ++anIndex)
+    theAttribute->setValue(anIndex, it->value()); // use only values, no text support in array
+}
+
+//--------------------------------------------------------------------------------------
+void fillAttribute(const std::list<std::shared_ptr<GeomAPI_Pnt2d> > & theValue,
+                   const std::shared_ptr<GeomDataAPI_Point2DArray> & theAttribute)
+{
+  theAttribute->setSize(int(theValue.size()));
+
+  int anIndex = 0;
+  for (auto it = theValue.begin(); it != theValue.end(); ++it, ++anIndex)
+    theAttribute->setPnt(anIndex, *it);
+}
+
+//--------------------------------------------------------------------------------------
 void fillAttribute(const ModelHighAPI_Double & theX,
                    const ModelHighAPI_Double & theY,
                    const ModelHighAPI_Double & theZ,
@@ -246,7 +271,6 @@ void fillAttribute(const ModelHighAPI_Double & theX,
 {
   theX.fillAttribute(theAttribute, theX, theY, theZ);
 }
-
 
 //==================================================================================================
 GeomAPI_Shape::ShapeType shapeTypeByStr(std::string theShapeTypeStr)

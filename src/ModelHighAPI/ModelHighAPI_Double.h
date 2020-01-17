@@ -60,6 +60,9 @@ public:
     const ModelHighAPI_Double & theY,
     const ModelHighAPI_Double & theZ) const;
 
+  /// Value of the attribute
+  MODELHIGHAPI_EXPORT double value() const;
+
 private:
   enum VariantType { VT_DOUBLE, VT_STRING } myVariantType;
   double myDouble;

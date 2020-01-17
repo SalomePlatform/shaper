@@ -45,6 +45,8 @@
 %include "std_shared_ptr.i"
 
 // function with named parameters
+%feature("kwargs") SketchAPI_BSpline::controlPoles;
+%feature("kwargs") SketchAPI_BSpline::controlPolygon;
 %feature("kwargs") SketchAPI_Ellipse::construction;
 %feature("kwargs") SketchAPI_EllipticArc::construction;
 %feature("kwargs") SketchAPI_Sketch::setAngle;
@@ -58,6 +60,7 @@
 %shared_ptr(SketchAPI_MacroEllipse)
 %shared_ptr(SketchAPI_EllipticArc)
 %shared_ptr(SketchAPI_MacroEllipticArc)
+%shared_ptr(SketchAPI_BSpline)
 %shared_ptr(SketchAPI_Constraint)
 %shared_ptr(SketchAPI_ConstraintAngle)
 %shared_ptr(SketchAPI_IntersectionPoint)
@@ -75,6 +78,7 @@
 %template(InterfaceList) std::list<std::shared_ptr<ModelHighAPI_Interface> >;
 %template(EntityList)    std::list<std::shared_ptr<SketchAPI_SketchEntity> >;
 %template(SketchPointList) std::list<std::shared_ptr<SketchAPI_Point> >;
+%template(GeomPnt2dList) std::list<std::shared_ptr<GeomAPI_Pnt2d> >;
 // std::pair -> []
 %template(PointRefAttrPair) std::pair<std::shared_ptr<GeomAPI_Pnt2d>, ModelHighAPI_RefAttr>;
 
@@ -336,6 +340,76 @@
 // fix compilarion error: 'res*' was not declared in this scope
 %typemap(freearg) const std::pair<std::shared_ptr<GeomAPI_Pnt2d>, ModelHighAPI_RefAttr> & {}
 
+
+%typemap(in) const std::list<std::shared_ptr<GeomAPI_Pnt2d> > & (std::list<std::shared_ptr<GeomAPI_Pnt2d> > temp) {
+  std::shared_ptr<GeomAPI_Pnt2d> * temp_point = 0;
+  int newmem = 0;
+  if (PySequence_Check($input)) {
+    for (Py_ssize_t i = 0; i < PySequence_Size($input); ++i) {
+      PyObject * item = PySequence_GetItem($input, i);
+      if (PyTuple_Check(item)) {
+        if (PyTuple_Size(item) == 2) {
+          double x = (double)PyFloat_AsDouble(PySequence_GetItem(item, 0));
+          double y = (double)PyFloat_AsDouble(PySequence_GetItem(item, 1));
+          temp.push_back(std::shared_ptr<GeomAPI_Pnt2d>(new GeomAPI_Pnt2d(x, y)));
+        } else {
+          PyErr_SetString(PyExc_TypeError, "argument must a list of 2D points.");
+          return NULL;
+        }
+      } else
+      if ((SWIG_ConvertPtrAndOwn(item, (void **)&temp_point, $descriptor(std::shared_ptr<GeomAPI_Pnt2d> *), SWIG_POINTER_EXCEPTION, &newmem)) == 0) {
+        temp.push_back(*temp_point);
+        if (temp_point && (newmem & SWIG_CAST_NEW_MEMORY)) {
+          delete temp_point;
+        }
+      } else {
+        PyErr_SetString(PyExc_TypeError, "argument must a list of 2D points.");
+        return NULL;
+      }
+      Py_DECREF(item);
+    }
+    $1 = &temp;
+  } else {
+    PyErr_SetString(PyExc_ValueError, "argument must be a tuple of lists.");
+    return NULL;
+  }
+}
+
+%typecheck(SWIG_TYPECHECK_POINTER) std::list<std::shared_ptr<GeomAPI_Pnt2d> >, const std::list<std::shared_ptr<GeomAPI_Pnt2d> >& {
+  std::shared_ptr<GeomAPI_Pnt2d> * temp_point = 0;
+  int newmem = 0;
+  if (PySequence_Check($input)) {
+    for (Py_ssize_t i = 0; i < PySequence_Size($input) && $1; ++i) {
+      PyObject * item = PySequence_GetItem($input, i);
+      if (PyTuple_Check(item)) {
+        if (PyTuple_Size(item) == 2) {
+          if (PyNumber_Check(PySequence_GetItem(item, 0)) && PyNumber_Check(PySequence_GetItem(item, 1))) {
+            $1 = 1;
+          } else {
+            $1 = 0;
+          }
+        } else {
+          $1 = 0;
+        }
+      } else
+      if ((SWIG_ConvertPtrAndOwn(item, (void **)&temp_point, $descriptor(std::shared_ptr<GeomAPI_Pnt2d> *), SWIG_POINTER_EXCEPTION, &newmem)) == 0) {
+        if (temp_point) {
+          $1 = 1;
+        } else {
+          $1 = 0;
+        }
+      }
+      Py_DECREF(item);
+    }
+  } else {
+    $1 = 0;
+  }
+}
+
+// fix compilarion error: 'res*' was not declared in this scope
+%typemap(freearg) const std::list<std::shared_ptr<GeomAPI_Pnt2d> > & {}
+
+
 // all supported interfaces (the order is very important according dependencies: base class first)
 %include "SketchAPI_SketchEntity.h"
 %include "SketchAPI_Point.h"
@@ -349,6 +423,7 @@
 %include "SketchAPI_MacroEllipse.h"
 %include "SketchAPI_EllipticArc.h"
 %include "SketchAPI_MacroEllipticArc.h"
+%include "SketchAPI_BSpline.h"
 %include "SketchAPI_Projection.h"
 %include "SketchAPI_Mirror.h"
 %include "SketchAPI_Translation.h"

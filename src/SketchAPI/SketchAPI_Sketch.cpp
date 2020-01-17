@@ -53,6 +53,7 @@
 #include <ModelHighAPI_Tools.h>
 //--------------------------------------------------------------------------------------
 #include "SketchAPI_Arc.h"
+#include "SketchAPI_BSpline.h"
 #include "SketchAPI_Circle.h"
 #include "SketchAPI_Ellipse.h"
 #include "SketchAPI_EllipticArc.h"
@@ -695,6 +696,40 @@ std::shared_ptr<SketchAPI_EllipticArc> SketchAPI_Sketch::addEllipticArc(
   std::shared_ptr<ModelAPI_Feature> aFeature =
       compositeFeature()->addFeature(SketchPlugin_EllipticArc::ID());
   return EllipticArcPtr(new SketchAPI_EllipticArc(aFeature, theExternalName));
+}
+
+//--------------------------------------------------------------------------------------
+std::shared_ptr<SketchAPI_BSpline> SketchAPI_Sketch::addSpline(
+    const std::list<std::shared_ptr<GeomAPI_Pnt2d> >& thePoles,
+    const std::list<ModelHighAPI_Double>& theWeights)
+{
+  FeaturePtr aFeature = compositeFeature()->addFeature(SketchPlugin_BSpline::ID());
+  return BSplinePtr(new SketchAPI_BSpline(aFeature, thePoles, theWeights));
+}
+
+std::shared_ptr<SketchAPI_BSpline> SketchAPI_Sketch::addSpline(
+    const int theDegree,
+    const std::list<std::shared_ptr<GeomAPI_Pnt2d> >& thePoles,
+    const std::list<ModelHighAPI_Double>& theWeights,
+    const std::list<ModelHighAPI_Double>& theKnots,
+    const std::list<ModelHighAPI_Integer>& theMults)
+{
+  FeaturePtr aFeature = compositeFeature()->addFeature(SketchPlugin_BSpline::ID());
+  return BSplinePtr(new SketchAPI_BSpline(aFeature,
+      theDegree, thePoles, theWeights, theKnots, theMults));
+}
+
+std::shared_ptr<SketchAPI_BSpline> SketchAPI_Sketch::addSpline(
+    const ModelHighAPI_Selection & theExternal)
+{
+  FeaturePtr aFeature = compositeFeature()->addFeature(SketchPlugin_BSpline::ID());
+  return BSplinePtr(new SketchAPI_BSpline(aFeature, theExternal));
+}
+
+std::shared_ptr<SketchAPI_BSpline> SketchAPI_Sketch::addSpline(const std::string & theExternalName)
+{
+  FeaturePtr aFeature = compositeFeature()->addFeature(SketchPlugin_BSpline::ID());
+  return BSplinePtr(new SketchAPI_BSpline(aFeature, theExternalName));
 }
 
 //--------------------------------------------------------------------------------------

@@ -22,6 +22,7 @@
 #include <Config_PropManager.h>
 
 #include <GeomAPI_Pnt.h>
+#include <GeomAPI_Pnt2d.h>
 #include <GeomAPI_Dir.h>
 #include <GeomAPI_ShapeExplorer.h>
 #include <GeomAPI_ShapeIterator.h>
@@ -30,9 +31,11 @@
 #include <GeomDataAPI_Dir.h>
 #include <GeomDataAPI_Point.h>
 #include <GeomDataAPI_Point2D.h>
+#include <GeomDataAPI_Point2DArray.h>
 
 #include <ModelAPI_AttributeBoolean.h>
 #include <ModelAPI_AttributeDouble.h>
+#include <ModelAPI_AttributeDoubleArray.h>
 #include <ModelAPI_AttributeIntArray.h>
 #include <ModelAPI_AttributeInteger.h>
 #include <ModelAPI_AttributeRefAttr.h>
@@ -1083,6 +1086,43 @@ ModelHighAPI_Dumper& ModelHighAPI_Dumper::operator<<(
 }
 
 ModelHighAPI_Dumper& ModelHighAPI_Dumper::operator<<(
+  const std::shared_ptr<GeomDataAPI_Point2DArray>& thePointArray)
+{
+  static const int aThreshold = 4;
+  static bool aDumpAsIs = false;
+  static std::string aSeparator = "";
+  // if number of elements in the list if greater than a threshold,
+  // dump it in a separate line with specific name
+  int aSize = thePointArray->size();
+  if (aDumpAsIs || aSize <= aThreshold) {
+    *myDumpStorage << "[";
+    GeomPnt2dPtr aPoint = thePointArray->pnt(0);
+    *myDumpStorage << "(" << aPoint->x() << ", " << aPoint->y() << ")";
+    for (int anIndex = 1; anIndex < aSize; ++anIndex) {
+      aPoint = thePointArray->pnt(anIndex);
+      *myDumpStorage << "," << aSeparator << " (" << aPoint->x() << ", " << aPoint->y() << ")";
+    }
+    *myDumpStorage << aSeparator << "]";
+  }
+  else {
+    // name of list
+    FeaturePtr anOwner = ModelAPI_Feature::feature(thePointArray->owner());
+    std::string aListName = name(anOwner) + "_" + thePointArray->id();
+    // reserve dumped buffer and store list "as is"
+    myDumpStorage->reserveBuffer();
+    aDumpAsIs = true;
+    aSeparator = std::string("\n") + std::string(aListName.size() + 3, ' ');
+    *this << aListName << " = " << thePointArray << "\n";
+    aDumpAsIs = false;
+    aSeparator = "";
+    // append reserved data to the end of the current buffer
+    myDumpStorage->restoreReservedBuffer();
+    *myDumpStorage << aListName;
+  }
+  return *this;
+}
+
+ModelHighAPI_Dumper& ModelHighAPI_Dumper::operator<<(
     const std::shared_ptr<ModelAPI_AttributeBoolean>& theAttrBool)
 {
   *myDumpStorage << (theAttrBool->value() ? "True" : "False");
@@ -1108,6 +1148,20 @@ ModelHighAPI_Dumper& ModelHighAPI_Dumper::operator<<(
     *myDumpStorage << theAttrReal->value();
   else
     *myDumpStorage << "\"" << aText << "\"";
+  return *this;
+}
+
+ModelHighAPI_Dumper& ModelHighAPI_Dumper::operator<<(
+  const std::shared_ptr<ModelAPI_AttributeDoubleArray>& theArray)
+{
+  *myDumpStorage << "[";
+  int aSize = theArray->size();
+  if (aSize > 0) {
+    *myDumpStorage << theArray->value(0);
+    for (int anIndex = 1; anIndex < aSize; ++anIndex)
+      *myDumpStorage << ", " << theArray->value(anIndex);
+  }
+  *myDumpStorage << "]";
   return *this;
 }
 

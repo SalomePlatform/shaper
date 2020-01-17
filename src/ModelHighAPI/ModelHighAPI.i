@@ -362,8 +362,47 @@
   }
 }
 
+
+%typemap(in) const std::list<int> & (std::list<int> temp) {
+  int newmem = 0;
+  if (PySequence_Check($input)) {
+    for (Py_ssize_t i = 0; i < PySequence_Size($input); ++i) {
+      PyObject * item = PySequence_GetItem($input, i);
+      if (PyLong_Check(item)) {
+        temp.push_back((int)PyLong_AsLong(item));
+      } else {
+        PyErr_SetString(PyExc_TypeError, "argument must integet value.");
+        return NULL;
+      }
+      Py_DECREF(item);
+    }
+    $1 = &temp;
+  } else {
+    PyErr_SetString(PyExc_ValueError, "argument must be a tuple of integer values.");
+    return NULL;
+  }
+}
+
+%typecheck(SWIG_TYPECHECK_POINTER) std::list<int>, const std::list<int>& {
+  int newmem = 0;
+  if (PySequence_Check($input)) {
+    for (Py_ssize_t i = 0; i < PySequence_Size($input); ++i) {
+      PyObject * item = PySequence_GetItem($input, i);
+      if (PyLong_Check(item)) {
+        $1 = 1;
+      } else {
+        $1 = 0;
+        break;
+      }
+      Py_DECREF(item);
+    }
+  } else {
+    $1 = 0;
+  }
+}
+
+
 %typemap(in) const std::list<double> & (std::list<double> temp) {
-  double * temp_attribute;
   int newmem = 0;
   if (PyTuple_Check($input)) {
     for (Py_ssize_t i = 0; i < PyTuple_Size($input); ++i) {
@@ -384,8 +423,6 @@
 }
 
 %typecheck(SWIG_TYPECHECK_POINTER) std::list<double>, const std::list<double>& {
-  double * temp_object;
-  std::shared_ptr<ModelHighAPI_Interface> * temp_interface;
   int newmem = 0;
   if (PyTuple_Check($input)) {
     for (Py_ssize_t i = 0; i < PyTuple_Size($input); ++i) {
@@ -402,6 +439,44 @@
     $1 = 0;
   }
 }
+
+
+%typemap(in) const std::list<ModelHighAPI_Double> & (std::list<ModelHighAPI_Double> temp) {
+  ModelHighAPI_Double * temp_double;
+  if (PySequence_Check($input)) {
+    for (Py_ssize_t i = 0; i < PySequence_Size($input); ++i) {
+      PyObject * item = PySequence_GetItem($input, i);
+      if (PyFloat_Check(item) || PyLong_Check(item)) {
+        temp.push_back(ModelHighAPI_Double(PyFloat_AsDouble(item)));
+      } else if (PyUnicode_Check(item)) {
+        temp.push_back(ModelHighAPI_Double(PyUnicode_AsUTF8(item)));
+      } else if ((SWIG_ConvertPtr(item, (void **)&temp_double, $1_descriptor, SWIG_POINTER_EXCEPTION)) == 0) {
+        temp.push_back(*temp_double);
+      } else {
+        PyErr_SetString(PyExc_ValueError, "argument must be a list of ModelHighAPI_Double, float, int or string.");
+        return NULL;
+      }
+      Py_DECREF(item);
+    }
+    $1 = &temp;
+  } else {
+    PyErr_SetString(PyExc_ValueError, "argument must be a list of ModelHighAPI_Double, float, int or string.");
+    return NULL;
+  }
+}
+
+%typecheck(SWIG_TYPECHECK_POINTER) std::list<ModelHighAPI_Double>, const std::list<ModelHighAPI_Double> & {
+  if (PySequence_Check($input)) {
+    for (Py_ssize_t i = 0; i < PySequence_Size($input) && $1; ++i) {
+      PyObject * item = PySequence_GetItem($input, i);
+      $1 = ((PyFloat_Check(item) || PyLong_Check(item) || PyUnicode_Check(item)) && !PyBool_Check(item)) ? 1 : 0;
+      Py_DECREF(item);
+    }
+  } else {
+    $1 = 0;
+  }
+}
+
 
 // all supported interfaces
 %include "ModelHighAPI_Double.h"

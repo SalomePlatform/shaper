@@ -183,14 +183,10 @@ FeaturePtr SketchPlugin_MacroBSpline::createBSplineFeature()
   AttributePoint2DPtr aStartPoint = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
       aBSpline->attribute(SketchPlugin_BSpline::START_ID()));
   aStartPoint->setValue(aPoles->pnt(0));
-  // internal constraint to keep position of the point
-  createInternalConstraint(aSketch, aStartPoint, aPoles, 0);
 
   AttributePoint2DPtr aEndPoint = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
       aBSpline->attribute(SketchPlugin_BSpline::END_ID()));
   aEndPoint->setValue(aPoles->pnt(aPoles->size() - 1));
-  // internal constraint to keep position of the point
-  createInternalConstraint(aSketch, aEndPoint, aPoles, aPoles->size() - 1);
 
   aBSpline->boolean(SketchPlugin_BSpline::AUXILIARY_ID())->setValue(
       boolean(AUXILIARY_ID())->value());

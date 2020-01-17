@@ -38,6 +38,7 @@
 #include <GeomDataAPI_Point2DArray.h>
 #include <ModelAPI_AttributeDoubleArray.h>
 #include <ModelAPI_AttributeRefAttr.h>
+#include <SketchPlugin_BSpline.h>
 #include <SketchPlugin_Ellipse.h>
 #include <SketchPlugin_Projection.h>
 
@@ -367,6 +368,45 @@ static void createEllipticArcConstraints(
   constraintsToSolver(aConstraint, theSolver);
 }
 
+static void createBSplineConstraints(
+    const EntityWrapperPtr& theCurve,
+    const SolverPtr& theSolver,
+    const ConstraintID theConstraintID,
+    std::map<EntityWrapperPtr, ConstraintWrapperPtr>& theConstraints)
+{
+  // set start and end point of B-spline equal to first and last pole correspondingly
+  EdgeWrapperPtr anEdge = std::dynamic_pointer_cast<PlaneGCSSolver_EdgeWrapper>(theCurve);
+  std::shared_ptr<GCS::BSpline> aBSpline =
+      std::dynamic_pointer_cast<GCS::BSpline>(anEdge->entity());
+
+  std::list<GCSConstraintPtr> aBSplineConstraints;
+
+  const std::map<std::string, EntityWrapperPtr>& anAdditional = anEdge->additionalAttributes();
+  PointWrapperPtr aStartPoint = std::dynamic_pointer_cast<PlaneGCSSolver_PointWrapper>(
+      anAdditional.at(SketchPlugin_BSpline::START_ID()));
+
+  const GCS::Point& sp = *aStartPoint->point();
+  const GCS::Point& p0 = aBSpline->poles.front();
+  aBSplineConstraints.push_back(GCSConstraintPtr(new GCS::ConstraintEqual(p0.x, sp.x)));
+  aBSplineConstraints.push_back(GCSConstraintPtr(new GCS::ConstraintEqual(p0.y, sp.y)));
+
+  PointWrapperPtr aEndPoint = std::dynamic_pointer_cast<PlaneGCSSolver_PointWrapper>(
+      anAdditional.at(SketchPlugin_BSpline::END_ID()));
+
+  const GCS::Point& ep = *aEndPoint->point();
+  const GCS::Point& pN = aBSpline->poles.back();
+  aBSplineConstraints.push_back(GCSConstraintPtr(new GCS::ConstraintEqual(pN.x, ep.x)));
+  aBSplineConstraints.push_back(GCSConstraintPtr(new GCS::ConstraintEqual(pN.y, ep.y)));
+
+  ConstraintWrapperPtr aWrapper(
+      new PlaneGCSSolver_ConstraintWrapper(aBSplineConstraints, CONSTRAINT_UNKNOWN));
+  aWrapper->setId(theConstraintID);
+  if (theSolver)
+    constraintsToSolver(aWrapper, theSolver);
+
+  theConstraints[theCurve] = aWrapper;
+}
+
 void PlaneGCSSolver_Storage::createAuxiliaryConstraints(const EntityWrapperPtr& theEntity)
 {
   if (!theEntity || theEntity->isExternal())
@@ -380,6 +420,8 @@ void PlaneGCSSolver_Storage::createAuxiliaryConstraints(const EntityWrapperPtr& 
     createEllipticArcConstraints(theEntity, mySketchSolver,
                                  ++myConstraintLastID, myAuxConstraintMap);
   }
+  else if (theEntity->type() == ENTITY_BSPLINE)
+    createBSplineConstraints(theEntity, mySketchSolver, ++myConstraintLastID, myAuxConstraintMap);
 }
 
 void PlaneGCSSolver_Storage::removeAuxiliaryConstraints(const EntityWrapperPtr& theEntity)

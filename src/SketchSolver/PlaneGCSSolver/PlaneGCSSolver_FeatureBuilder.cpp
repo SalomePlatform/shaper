@@ -301,6 +301,8 @@ EntityWrapperPtr createBSpline(const AttributeEntityMap& theAttributes)
   aNewSpline->degree = 3;
   aNewSpline->periodic = false;
 
+  std::map<std::string, EntityWrapperPtr> anAdditionalAttributes;
+
   AttributeEntityMap::const_iterator anIt = theAttributes.begin();
   for (; anIt != theAttributes.end(); ++anIt) {
     const std::string& anAttrID = anIt->first->id();
@@ -321,6 +323,10 @@ EntityWrapperPtr createBSpline(const AttributeEntityMap& theAttributes)
           std::dynamic_pointer_cast<PlaneGCSSolver_ScalarWrapper>(anIt->second);
       aNewSpline->degree = (int)aScalar->value();
     }
+    else if (anAttrID == SketchPlugin_BSpline::START_ID() ||
+             anAttrID == SketchPlugin_BSpline::END_ID()) {
+      anAdditionalAttributes[anAttrID] = anIt->second;
+    }
     else {
       ScalarArrayWrapperPtr anArray =
           std::dynamic_pointer_cast<PlaneGCSSolver_ScalarArrayWrapper>(anIt->second);
@@ -337,5 +343,7 @@ EntityWrapperPtr createBSpline(const AttributeEntityMap& theAttributes)
     }
   }
 
-  return EdgeWrapperPtr(new PlaneGCSSolver_EdgeWrapper(aNewSpline));
+  EdgeWrapperPtr aWrapper(new PlaneGCSSolver_EdgeWrapper(aNewSpline));
+  aWrapper->setAdditionalAttributes(anAdditionalAttributes);
+  return aWrapper;
 }
