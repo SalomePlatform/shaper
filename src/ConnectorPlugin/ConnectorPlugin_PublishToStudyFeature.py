@@ -181,7 +181,7 @@ class PublishToStudyFeature(ModelAPI.ModelAPI_Feature):
             else:
               aGroup = aGroupOp.CreateGroup(theStudyShape, aSelType)
             aGroup.SetEntry(aGroupEntry)
-            theEngine.AddInStudy(aGroup, aRef.firstResult().data().name(), theStudyShape.GetSO())
+            theEngine.AddInStudy(aGroup, aRef.firstResult().data().name(), theStudyShape)
           aGroup.SetSelection(aGroupIndices)
           if theFields:
             self.fillField(aGroup, aRef, theEngine, aGroupIndices)
