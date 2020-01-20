@@ -17,7 +17,7 @@
 // See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 
-#include <SketchPlugin_BSplineWidget.h>
+#include <PartSet_BSplineWidget.h>
 
 #include <SketchPlugin_BSpline.h>
 
@@ -35,12 +35,13 @@
 #include <QVBoxLayout>
 
 
-SketchPlugin_BSplineWidget::SketchPlugin_BSplineWidget(
+PartSet_BSplineWidget::PartSet_BSplineWidget(
     QWidget* theParent,
     const Config_WidgetAPI* theData)
   : ModuleBase_ModelWidget(theParent, theData)
 {
   QVBoxLayout* aMainLayout = new QVBoxLayout(this);
+  ModuleBase_Tools::adjustMargins(aMainLayout);
 
   // GroupBox to keep widgets for B-spline poles and weights
   myPolesGroupBox = new QGroupBox(tr("Poles and weights"), theParent);
@@ -49,11 +50,12 @@ SketchPlugin_BSplineWidget::SketchPlugin_BSplineWidget(
   QGridLayout* aGroupLayout = new QGridLayout(myPolesGroupBox);
   aGroupLayout->setSpacing(4);
   aGroupLayout->setColumnStretch(1, 1);
+  ModuleBase_Tools::adjustMargins(aGroupLayout);
 
   restoreValueCustom();
 }
 
-void SketchPlugin_BSplineWidget::setFeature(const FeaturePtr& theFeature,
+void PartSet_BSplineWidget::setFeature(const FeaturePtr& theFeature,
                                             const bool theToStoreValue,
                                             const bool isUpdateFlushed)
 {
@@ -61,65 +63,64 @@ void SketchPlugin_BSplineWidget::setFeature(const FeaturePtr& theFeature,
   restoreValueCustom();
 }
 
-void SketchPlugin_BSplineWidget::deactivate()
+void PartSet_BSplineWidget::deactivate()
 {
   ModuleBase_ModelWidget::deactivate();
   storeValueCustom();
 }
 
 
-QList<QWidget*> SketchPlugin_BSplineWidget::getControls() const
+QList<QWidget*> PartSet_BSplineWidget::getControls() const
 {
   QList<QWidget*> aControls;
   std::list<BSplinePoleWidgets>::const_iterator anIt = myPoles.begin();
   for (; anIt != myPoles.end(); ++anIt) {
-    aControls.append(anIt->myX);
-    aControls.append(anIt->myY);
     aControls.append(anIt->myWeight);
   }
   return aControls;
 }
 
-void SketchPlugin_BSplineWidget::storePolesAndWeights() const
+void PartSet_BSplineWidget::storePolesAndWeights() const
 {
   std::shared_ptr<ModelAPI_Data> aData = myFeature->data();
-  AttributePoint2DArrayPtr aPointArray = std::dynamic_pointer_cast<GeomDataAPI_Point2DArray>(
-      aData->attribute(SketchPlugin_BSpline::POLES_ID()));
+  //AttributePoint2DArrayPtr aPointArray = std::dynamic_pointer_cast<GeomDataAPI_Point2DArray>(
+  //    aData->attribute(SketchPlugin_BSpline::POLES_ID()));
   AttributeDoubleArrayPtr aWeightsArray = aData->realArray(SketchPlugin_BSpline::WEIGHTS_ID());
 
-  aPointArray->setSize((int)myPoles.size());
-  aWeightsArray->setSize((int)myPoles.size());
+  //aPointArray->setSize((int)myPoles.size());
+  //aWeightsArray->setSize((int)myPoles.size());
 
   std::list<BSplinePoleWidgets>::const_iterator anIt = myPoles.begin();
   for (int anIndex = 0; anIt != myPoles.end(); ++anIndex, ++anIt) {
-    aPointArray->setPnt(anIndex, anIt->myX->value(), anIt->myY->value());
+    //aPointArray->setPnt(anIndex, anIt->myX->value(), anIt->myY->value());
     aWeightsArray->setValue(anIndex, anIt->myWeight->value());
   }
 }
 
-bool SketchPlugin_BSplineWidget::storeValueCustom()
+bool PartSet_BSplineWidget::storeValueCustom()
 {
   std::shared_ptr<ModelAPI_Data> aData = myFeature->data();
   if (!aData || !aData->isValid()) // can be on abort of sketcher element
     return false;
 
-  AttributePoint2DArrayPtr aPoles = std::dynamic_pointer_cast<GeomDataAPI_Point2DArray>(
-      aData->attribute(SketchPlugin_BSpline::POLES_ID()));
+  //AttributePoint2DArrayPtr aPoles = std::dynamic_pointer_cast<GeomDataAPI_Point2DArray>(
+  //    aData->attribute(SketchPlugin_BSpline::POLES_ID()));
   AttributeDoubleArrayPtr aWeights = aData->realArray(SketchPlugin_BSpline::WEIGHTS_ID());
 
   bool isBlocked = blockSignals(true);
-  bool isImmutable = aPoles->setImmutable(true);
+  //bool isImmutable = aPoles->setImmutable(true);
 
   storePolesAndWeights();
   ModuleBase_Tools::flushUpdated(myFeature);
 
-  aPoles->setImmutable(isImmutable);
+  //aPoles->setImmutable(isImmutable);
   blockSignals(isBlocked);
 
+  updateObject(myFeature);
   return true;
 }
 
-bool SketchPlugin_BSplineWidget::restoreValueCustom()
+bool PartSet_BSplineWidget::restoreValueCustom()
 {
   if (!myFeature)
     return false;
@@ -138,15 +139,18 @@ bool SketchPlugin_BSplineWidget::restoreValueCustom()
     GeomPnt2dPtr aPoint = aPoles->pnt(anIndex);
     anIt->myX->setValue(aPoint->x());
     anIt->myY->setValue(aPoint->y());
+    bool isBlocked = anIt->myWeight->blockSignals(true);
     anIt->myWeight->setValue(aWeights->value(anIndex));
+    anIt->myWeight->blockSignals(isBlocked);
   }
 
   return true;
 }
 
-void SketchPlugin_BSplineWidget::addPoleWidget()
+void PartSet_BSplineWidget::addPoleWidget()
 {
   QGridLayout* aGroupLay = dynamic_cast<QGridLayout*>(myPolesGroupBox->layout());
+  ModuleBase_Tools::adjustMargins(aGroupLay);
 
   int aNbPoles = (int)myPoles.size();
 
@@ -173,5 +177,5 @@ void SketchPlugin_BSplineWidget::addPoleWidget()
 
   // we should listen textChanged signal as valueChanged do not send when text is modified
   connect(aPoleWidgets.myWeight, SIGNAL(textChanged(const QString&)),
-          this, SIGNAL(valuesModified()));
+    this, SIGNAL(valuesChanged()));
 }

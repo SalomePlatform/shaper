@@ -52,12 +52,14 @@
 #include <GeomDataAPI_Point2DArray.h>
 
 #include <GeomAPI_Pnt2d.h>
+#include <GeomAPI_IPresentable.h>
 
-#include <SketchPlugin_ConstraintCoincidence.h>
+#include <SketchPlugin_Feature.h>
 
 #include <QGridLayout>
 #include <QGroupBox>
 #include <QMouseEvent>
+#include <QGraphicsEffect>
 
 static const double MaxCoordinate = 1e12;
 
@@ -103,7 +105,7 @@ void PartSet_WidgetBSplinePoints::createNextPoint()
   storeCurentValue();
 
   QGridLayout* aGroupLay = dynamic_cast<QGridLayout*>(myGroupBox->layout());
-  int row = (int)(myXSpin.size() + myWeightSpin.size());
+  int row = (int)myXSpin.size();
 
   QString aPoleStr = tr("Pole %1");
   aPoleStr = aPoleStr.arg(myXSpin.size() + 1);
@@ -121,18 +123,12 @@ void PartSet_WidgetBSplinePoints::createNextPoint()
 
   aGroupLay->addWidget(aPoleGroupBox, row, 1);
 
-  QString aWeightStr = tr("Weight %1");
-  aWeightStr = aWeightStr.arg(myWeightSpin.size() + 1);
-
-  myWeightSpin.push_back(new ModuleBase_LabelValue(myGroupBox, aWeightStr));
-  aGroupLay->addWidget(myWeightSpin.back(), ++row, 1);
+  setHighlighted(true);
 }
 
 void PartSet_WidgetBSplinePoints::removeLastPoint()
 {
   QGridLayout* aGroupLay = dynamic_cast<QGridLayout*>(myGroupBox->layout());
-  aGroupLay->removeWidget(myWeightSpin.back());
-  myWeightSpin.pop_back();
   aGroupLay->removeWidget(myYSpin.back());
   aGroupLay->removeWidget(myXSpin.back());
   aGroupLay->removeWidget(myXSpin.back()->parentWidget());
@@ -246,7 +242,6 @@ bool PartSet_WidgetBSplinePoints::resetCustom()
       // locking of the validating state.
       fillLabels(myXSpin, 0.0);
       fillLabels(myYSpin, 0.0);
-      fillLabels(myWeightSpin, 1.0);
 
       storeValueCustom();
       aDone = true;
@@ -267,7 +262,6 @@ bool PartSet_WidgetBSplinePoints::setPoint(double theX, double theY)
 
   myXSpin.back()->setValue(theX);
   myYSpin.back()->setValue(theY);
-  myWeightSpin.back()->setValue(1.0);
 
   storeValue();
   return true;
@@ -280,17 +274,18 @@ void PartSet_WidgetBSplinePoints::storePolesAndWeights() const
       aData->attribute(attributeID()));
   AttributeDoubleArrayPtr aWeightsArray = aData->realArray(myWeightsAttr);
 
-  aPointArray->setSize((int)myXSpin.size());
-  aWeightsArray->setSize((int)myWeightSpin.size());
+  int aSize = (int)myXSpin.size();
+  aPointArray->setSize(aSize);
+  aWeightsArray->setSize(aSize);
 
   std::vector<ModuleBase_LabelValue*>::const_iterator aXIt = myXSpin.begin();
   std::vector<ModuleBase_LabelValue*>::const_iterator aYIt = myYSpin.begin();
   for (int anIndex = 0; aXIt != myXSpin.end() && aYIt != myYSpin.end(); ++anIndex, ++aXIt, ++aYIt)
     aPointArray->setPnt(anIndex, (*aXIt)->value(), (*aYIt)->value());
 
-  std::vector<ModuleBase_LabelValue*>::const_iterator aWIt = myWeightSpin.begin();
-  for (int anIndex = 0; aWIt != myWeightSpin.end(); ++anIndex, ++aWIt)
-    aWeightsArray->setValue(anIndex, (*aWIt)->value());
+  double aWeight = Config_PropManager::real(SKETCH_TAB_NAME, "spline_weight");
+  for (int anIndex = 0; anIndex < aSize; ++anIndex)
+    aWeightsArray->setValue(anIndex, aWeight);
 }
 
 bool PartSet_WidgetBSplinePoints::storeValueCustom()
@@ -349,10 +344,6 @@ bool PartSet_WidgetBSplinePoints::restoreValueCustom()
       (*aXIt)->setValue(aPoint->x());
       (*aYIt)->setValue(aPoint->y());
     }
-
-    std::vector<ModuleBase_LabelValue*>::iterator aWIt = myWeightSpin.begin();
-    for (int anIndex = 0; aWIt != myWeightSpin.end(); ++anIndex, ++aWIt)
-      (*aWIt)->setValue(aWeightsArray->value(anIndex));
   }
   else {
     if (myXSpin.empty())
@@ -360,7 +351,6 @@ bool PartSet_WidgetBSplinePoints::restoreValueCustom()
 
     myXSpin.back()->setValue(0.0);
     myYSpin.back()->setValue(0.0);
-    myWeightSpin.back()->setValue(0.0);
   }
 
   return true;
@@ -384,7 +374,6 @@ void PartSet_WidgetBSplinePoints::storeCurentValue()
 
   storeArray(myXSpin, myXValueInCash);
   storeArray(myYSpin, myYValueInCash);
-  storeArray(myWeightSpin, myWeightInCash);
 }
 
 static void restoreArray(std::vector<double>& theCacheValues,
@@ -412,7 +401,6 @@ bool PartSet_WidgetBSplinePoints::restoreCurentValue()
   // fill the control widgets by the cashed value
   restoreArray(myXValueInCash, myXSpin);
   restoreArray(myYValueInCash, myYSpin);
-  restoreArray(myWeightInCash, myWeightSpin);
 
   // store value to the model
   storeValueCustom();
@@ -431,13 +419,20 @@ QList<QWidget*> PartSet_WidgetBSplinePoints::getControls() const
   QList<QWidget*> aControls;
   std::vector<ModuleBase_LabelValue*>::const_iterator aXIt = myXSpin.begin();
   std::vector<ModuleBase_LabelValue*>::const_iterator aYIt = myYSpin.begin();
-  std::vector<ModuleBase_LabelValue*>::const_iterator aWIt = myWeightSpin.begin();
-  for (; aXIt != myXSpin.end() && aYIt != myYSpin.end() && aWIt != myWeightSpin.end();
-       ++aXIt, ++aYIt, ++aWIt) {
-    aControls.append(*aXIt);
-    aControls.append(*aYIt);
-    aControls.append(*aWIt);
+  for (; (*aXIt) != myXSpin.back() && (*aYIt) != myYSpin.back(); ++aXIt, ++aYIt) {
+    //aControls.append(*aXIt);
+    //aControls.append(*aYIt);
+    QGraphicsEffect* anEffect = (*aXIt)->graphicsEffect();
+    if (anEffect)
+      anEffect->deleteLater();
+    anEffect = (*aYIt)->graphicsEffect();
+    if (anEffect)
+      anEffect->deleteLater();
+    (*aXIt)->setGraphicsEffect(0);
+    (*aYIt)->setGraphicsEffect(0);
   }
+  aControls.append(myXSpin.back());
+  aControls.append(myYSpin.back());
   return aControls;
 }
 

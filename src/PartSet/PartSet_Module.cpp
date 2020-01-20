@@ -40,6 +40,7 @@
 #include "PartSet_OverconstraintListener.h"
 #include "PartSet_TreeNodes.h"
 #include "PartSet_FieldStepPrs.h"
+#include "PartSet_BSplineWidget.h"
 
 #include "PartSet_Filters.h"
 #include "PartSet_FilterInfinite.h"
@@ -928,10 +929,15 @@ ModuleBase_ModelWidget* PartSet_Module::createWidgetByType(const std::string& th
     aWgt = new PartSet_WidgetFileSelector(theParent, aWorkshop, theWidgetApi);
   } else if (theType == "sketch_launcher") {
     aWgt = new PartSet_WidgetSketchCreator(theParent, this, theWidgetApi);
-  } else if (theType == "module_choice") {
+  }
+  else if (theType == "module_choice") {
     aWgt = new ModuleBase_WidgetChoice(theParent, theWidgetApi);
     connect(aWgt, SIGNAL(itemSelected(ModuleBase_ModelWidget*, int)),
-            this, SLOT(onChoiceChanged(ModuleBase_ModelWidget*, int)));
+      this, SLOT(onChoiceChanged(ModuleBase_ModelWidget*, int)));
+  } else if (theType == "bspline-panel") {
+    PartSet_BSplineWidget* aPanel = new PartSet_BSplineWidget(theParent, theWidgetApi);
+    //aPanel->setFeature(theFeature);
+    aWgt = aPanel;
   }
   return aWgt;
 }

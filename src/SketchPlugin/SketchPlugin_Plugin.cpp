@@ -59,7 +59,6 @@
 #include <SketchPlugin_EllipticArc.h>
 #include <SketchPlugin_MacroEllipticArc.h>
 #include <SketchPlugin_SketchDrawer.h>
-#include <SketchPlugin_WidgetCreator.h>
 
 #include <SketcherPrs_Tools.h>
 
@@ -70,8 +69,6 @@
 #include <ModelAPI_Document.h>
 #include <ModelAPI_Validator.h>
 #include <ModelAPI_Data.h>
-
-#include <ModuleBase_WidgetCreatorFactory.h>
 
 #include <Config_PropManager.h>
 
@@ -95,10 +92,6 @@ static SketchPlugin_Plugin* MY_SKETCH_INSTANCE = new SketchPlugin_Plugin();
 
 SketchPlugin_Plugin::SketchPlugin_Plugin()
 {
-  WidgetCreatorFactoryPtr aWidgetCreatorFactory = ModuleBase_WidgetCreatorFactory::get();
-  aWidgetCreatorFactory->registerCreator(
-      std::shared_ptr<SketchPlugin_WidgetCreator>(new SketchPlugin_WidgetCreator()));
-
   SessionPtr aMgr = ModelAPI_Session::get();
   ModelAPI_ValidatorsFactory* aFactory = aMgr->validators();
   aFactory->registerValidator("SketchPlugin_DistanceAttr",

@@ -62,6 +62,7 @@ SET(PROJECT_HEADERS
     PartSet_TreeNodes.h
     PartSet_FieldStepPrs.h
     PartSet_WidgetBSplinePoints.h
+    PartSet_BSplineWidget.h
 )
 
 SET(PROJECT_MOC_HEADERS
@@ -81,6 +82,7 @@ SET(PROJECT_MOC_HEADERS
     PartSet_WidgetSketchLabel.h
     PartSet_WidgetBSplinePoints.h
     PartSet_ExternalPointsMgr.h
+    PartSet_BSplineWidget.h
 )
 
 SET(PROJECT_SOURCES
@@ -114,6 +116,7 @@ SET(PROJECT_SOURCES
     PartSet_TreeNodes.cpp
     PartSet_FieldStepPrs.cpp
     PartSet_WidgetBSplinePoints.cpp
+    PartSet_BSplineWidget.cpp
 )
 
 SET(PROJECT_RESOURCES

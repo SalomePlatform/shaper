@@ -161,7 +161,6 @@ private:
   QGroupBox* myGroupBox;  ///< the parent group box for all intenal widgets
   std::vector<ModuleBase_LabelValue*> myXSpin; ///< the label for the X coordinate
   std::vector<ModuleBase_LabelValue*> myYSpin; ///< the label for the Y coordinate
-  std::vector<ModuleBase_LabelValue*> myWeightSpin; ///< the label for the weight
   PartSet_ExternalObjectsMgr* myExternalObjectMgr; ///< reference to external objects manager
 
   /// value used as selection in mouse release method

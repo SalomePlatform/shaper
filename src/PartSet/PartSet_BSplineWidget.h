@@ -17,11 +17,11 @@
 // See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 
-#ifndef SketchPlugin_BSplineWidget_H
-#define SketchPlugin_BSplineWidget_H
+#ifndef PartSet_BSplineWidget_H
+#define PartSet_BSplineWidget_H
 
 
-#include <SketchPlugin.h>
+#include <PartSet.h>
 
 #include <ModelAPI_Feature.h>
 
@@ -35,17 +35,17 @@ class QGroupBox;
 /** \brief Represent a content of the property panel to show/modify parameters of B-spline curve.
  *  \ingroup GUI
  */
-class SketchPlugin_BSplineWidget : public ModuleBase_ModelWidget
+class PartSet_BSplineWidget : public ModuleBase_ModelWidget
 {
 Q_OBJECT
 public:
   /// Constructor
   /// \param theParent the parent object
   /// \param theData the widget configuation. The attribute of the model widget is obtained from
-  SketchPlugin_BSplineWidget(QWidget* theParent,
+  PartSet_BSplineWidget(QWidget* theParent,
                              const Config_WidgetAPI* theData);
 
-  virtual ~SketchPlugin_BSplineWidget() {}
+  virtual ~PartSet_BSplineWidget() {}
 
   /// The methiod called when widget is deactivated
   virtual void deactivate();

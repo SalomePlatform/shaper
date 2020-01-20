@@ -24,7 +24,6 @@ SET(PROJECT_HEADERS
     SketchPlugin.h
     SketchPlugin_Arc.h
     SketchPlugin_BSpline.h
-    SketchPlugin_BSplineWidget.h
     SketchPlugin_Circle.h
     SketchPlugin_Constraint.h
     SketchPlugin_ConstraintAngle.h
@@ -72,17 +71,11 @@ SET(PROJECT_HEADERS
     SketchPlugin_Tools.h
     SketchPlugin_Trim.h
     SketchPlugin_Validators.h
-    SketchPlugin_WidgetCreator.h
-)
-
-SET(PROJECT_MOC_HEADERS
-    SketchPlugin_BSplineWidget.h
 )
 
 SET(PROJECT_SOURCES
     SketchPlugin_Arc.cpp
     SketchPlugin_BSpline.cpp
-    SketchPlugin_BSplineWidget.cpp
     SketchPlugin_Circle.cpp
     SketchPlugin_Constraint.cpp
     SketchPlugin_ConstraintAngle.cpp
@@ -128,7 +121,6 @@ SET(PROJECT_SOURCES
     SketchPlugin_Tools.cpp
     SketchPlugin_Trim.cpp
     SketchPlugin_Validators.cpp
-    SketchPlugin_WidgetCreator.cpp
 )
 
 SET(PROJECT_LIBRARIES
