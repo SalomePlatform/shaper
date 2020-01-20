@@ -70,6 +70,10 @@ public:
   GEOMAPI_EXPORT
   bool isEllipse() const;
 
+  /// Verifies that the edge is based on a B-spline curve
+  GEOMAPI_EXPORT
+  bool isBSpline() const;
+
   /// Returns the first vertex coordinates of the edge
   GEOMAPI_EXPORT
   std::shared_ptr<GeomAPI_Pnt> firstPoint();

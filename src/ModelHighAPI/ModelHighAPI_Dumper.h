@@ -42,6 +42,7 @@ class ModelAPI_Attribute;
 class ModelAPI_AttributeBoolean;
 class ModelAPI_AttributeDouble;
 class ModelAPI_AttributeDoubleArray;
+class ModelAPI_AttributeIntArray;
 class ModelAPI_AttributeInteger;
 class ModelAPI_AttributeRefAttr;
 class ModelAPI_AttributeRefAttrList;
@@ -274,6 +275,9 @@ public:
   /// Dump AttributeInteger
   MODELHIGHAPI_EXPORT
   ModelHighAPI_Dumper& operator<<(const std::shared_ptr<ModelAPI_AttributeInteger>& theAttrInt);
+  /// Dump AttributeIntArray
+  MODELHIGHAPI_EXPORT
+  ModelHighAPI_Dumper& operator<<(const std::shared_ptr<ModelAPI_AttributeIntArray>& theArray);
   /// Dump AttributeDouble
   MODELHIGHAPI_EXPORT
   ModelHighAPI_Dumper& operator<<(const std::shared_ptr<ModelAPI_AttributeDouble>& theAttrReal);

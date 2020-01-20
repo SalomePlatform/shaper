@@ -36,6 +36,7 @@
 #include <BRep_Tool.hxx>
 #include <ElCLib.hxx>
 #include <GCPnts_UniformAbscissa.hxx>
+#include <Geom_BSplineCurve.hxx>
 #include <Geom_Curve.hxx>
 #include <Geom_Line.hxx>
 #include <Geom_Circle.hxx>
@@ -177,6 +178,18 @@ bool GeomAPI_Edge::isEllipse() const
   if (aCurve->IsKind(STANDARD_TYPE(Geom_Ellipse)))
     return true;
   return false;
+}
+
+bool GeomAPI_Edge::isBSpline() const
+{
+  const TopoDS_Shape& aShape = const_cast<GeomAPI_Edge*>(this)->impl<TopoDS_Shape>();
+  double aFirst, aLast;
+  Handle(Geom_Curve) aCurve = BRep_Tool::Curve((const TopoDS_Edge&)aShape, aFirst, aLast);
+  if (aCurve.IsNull()) // degenerative edge
+    return false;
+  while (aCurve->IsKind(STANDARD_TYPE(Geom_TrimmedCurve)))
+    aCurve = Handle(Geom_TrimmedCurve)::DownCast(aCurve)->BasisCurve();
+  return aCurve->IsKind(STANDARD_TYPE(Geom_BSplineCurve));
 }
 
 std::shared_ptr<GeomAPI_Pnt> GeomAPI_Edge::firstPoint()

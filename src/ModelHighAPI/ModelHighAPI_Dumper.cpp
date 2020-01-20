@@ -1141,6 +1141,20 @@ ModelHighAPI_Dumper& ModelHighAPI_Dumper::operator<<(
 }
 
 ModelHighAPI_Dumper& ModelHighAPI_Dumper::operator<<(
+    const std::shared_ptr<ModelAPI_AttributeIntArray>& theArray)
+{
+  *myDumpStorage << "[";
+  int aSize = theArray->size();
+  if (aSize > 0) {
+    *myDumpStorage << theArray->value(0);
+    for (int anIndex = 1; anIndex < aSize; ++anIndex)
+      *myDumpStorage << ", " << theArray->value(anIndex);
+  }
+  *myDumpStorage << "]";
+  return *this;
+}
+
+ModelHighAPI_Dumper& ModelHighAPI_Dumper::operator<<(
     const std::shared_ptr<ModelAPI_AttributeDouble>& theAttrReal)
 {
   std::string aText = theAttrReal->text();

@@ -42,6 +42,8 @@
 %shared_ptr(GeomAPI_Ax2)
 %shared_ptr(GeomAPI_Ax3)
 %shared_ptr(GeomAPI_Box)
+%shared_ptr(GeomAPI_BSpline)
+%shared_ptr(GeomAPI_BSpline2d)
 %shared_ptr(GeomAPI_Circ)
 %shared_ptr(GeomAPI_Circ2d)
 %shared_ptr(GeomAPI_Cone)
@@ -125,6 +127,8 @@
 %include "GeomAPI_Ax2.h"
 %include "GeomAPI_Ax3.h"
 %include "GeomAPI_Box.h"
+%include "GeomAPI_BSpline.h"
+%include "GeomAPI_BSpline2d.h"
 %include "GeomAPI_Circ.h"
 %include "GeomAPI_Circ2d.h"
 %include "GeomAPI_Cone.h"

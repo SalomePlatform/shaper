@@ -1219,7 +1219,19 @@ static std::shared_ptr<GeomAPI_Pnt2d> pointOnEllipse(const FeaturePtr& theFeatur
   return aMajorAxisEnd ? aMajorAxisEnd->pnt() : std::shared_ptr<GeomAPI_Pnt2d>();
 }
 
-static std::shared_ptr<GeomAPI_Pnt2d> middlePoint(const ObjectPtr& theObject)
+static std::shared_ptr<GeomAPI_Pnt2d> middlePointOnBSpline(const FeaturePtr& theFeature,
+                                                           const CompositeFeaturePtr& theSketch)
+{
+  GeomAPI_Edge anEdge(theFeature->lastResult()->shape());
+  GeomPointPtr aMiddle = anEdge.middlePoint();
+
+  std::shared_ptr<SketchPlugin_Sketch> aSketch =
+      std::dynamic_pointer_cast<SketchPlugin_Sketch>(theSketch);
+  return aSketch->to2D(aMiddle);
+}
+
+static std::shared_ptr<GeomAPI_Pnt2d> middlePoint(const ObjectPtr& theObject,
+                                                  const CompositeFeaturePtr& theSketch)
 {
   std::shared_ptr<GeomAPI_Pnt2d> aMiddlePoint;
   FeaturePtr aFeature = ModelAPI_Feature::feature(theObject);
@@ -1238,6 +1250,8 @@ static std::shared_ptr<GeomAPI_Pnt2d> middlePoint(const ObjectPtr& theObject)
       aMiddlePoint = pointOnEllipse(aFeature);
     else if (aFeatureKind == SketchPlugin_EllipticArc::ID())
       aMiddlePoint = pointOnEllipse(aFeature, false);
+    else if (aFeatureKind == SketchPlugin_BSpline::ID())
+      aMiddlePoint = middlePointOnBSpline(aFeature, theSketch);
   }
   return aMiddlePoint;
 }
@@ -1252,7 +1266,7 @@ void SketchAPI_Sketch::move(const ModelHighAPI_RefAttr& theMovedEntity,
   if (aMessage->movedAttribute())
     anOriginalPosition = pointCoordinates(aMessage->movedAttribute());
   else
-    anOriginalPosition = middlePoint(aMessage->movedObject());
+    anOriginalPosition = middlePoint(aMessage->movedObject(), compositeFeature());
 
   if (!anOriginalPosition)
     return; // something has gone wrong, do not process movement

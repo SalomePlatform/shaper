@@ -277,6 +277,7 @@ ADD_UNIT_TESTS(
   TestCreateArcByThreePoints.py
   TestCreateArcByTransversalLine.py
   TestCreateArcChangeType.py
+  TestCreateBSpline.py
   TestCreateCircleByCenterAndPassed.py
   TestCreateCircleByThreePoints.py
   TestCreateCircleChangeType.py
@@ -312,12 +313,14 @@ ADD_UNIT_TESTS(
   TestMultiTranslation.py
   TestPresentation.py
   TestProjection.py
+  TestProjectionBSpline.py
   TestProjectionEllipse.py
   TestProjectionEllipticArc.py
   TestProjectionIntoResult.py
   TestProjectionUpdate.py
   TestRectangle.py
   TestRemainingDoF.py
+  TestRemoveBSpline.py
   TestRemoveEllipse.py
   TestRemoveEllipticArc.py
   TestRemoveSketch.py
@@ -355,6 +358,7 @@ ADD_UNIT_TESTS(
 if(${SKETCHER_CHANGE_RADIUS_WHEN_MOVE})
   ADD_UNIT_TESTS(
     TestMoveArc.py
+    TestMoveBSpline.py
     TestMoveCircle.py
     TestMoveEllipse.py
     TestMoveEllipticArc.py

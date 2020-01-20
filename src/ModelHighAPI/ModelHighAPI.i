@@ -467,9 +467,48 @@
 
 %typecheck(SWIG_TYPECHECK_POINTER) std::list<ModelHighAPI_Double>, const std::list<ModelHighAPI_Double> & {
   if (PySequence_Check($input)) {
+    $1 = 1;
     for (Py_ssize_t i = 0; i < PySequence_Size($input) && $1; ++i) {
       PyObject * item = PySequence_GetItem($input, i);
       $1 = ((PyFloat_Check(item) || PyLong_Check(item) || PyUnicode_Check(item)) && !PyBool_Check(item)) ? 1 : 0;
+      Py_DECREF(item);
+    }
+  } else {
+    $1 = 0;
+  }
+}
+
+
+%typemap(in) const std::list<ModelHighAPI_Integer> & (std::list<ModelHighAPI_Integer> temp) {
+  ModelHighAPI_Integer * temp_int;
+  if (PySequence_Check($input)) {
+    for (Py_ssize_t i = 0; i < PySequence_Size($input); ++i) {
+      PyObject * item = PySequence_GetItem($input, i);
+      if (PyLong_Check(item)) {
+        temp.push_back(ModelHighAPI_Integer(PyLong_AsLong(item)));
+      } else if (PyUnicode_Check(item)) {
+        temp.push_back(ModelHighAPI_Integer(PyUnicode_AsUTF8(item)));
+      } else if ((SWIG_ConvertPtr(item, (void **)&temp_int, $1_descriptor, SWIG_POINTER_EXCEPTION)) == 0) {
+        temp.push_back(*temp_int);
+      } else {
+        PyErr_SetString(PyExc_ValueError, "argument must be a list of ModelHighAPI_Integer, int or string.");
+        return NULL;
+      }
+      Py_DECREF(item);
+    }
+    $1 = &temp;
+  } else {
+    PyErr_SetString(PyExc_ValueError, "argument must be a list of ModelHighAPI_Integer, int or string.");
+    return NULL;
+  }
+}
+
+%typecheck(SWIG_TYPECHECK_POINTER) std::list<ModelHighAPI_Integer>, const std::list<ModelHighAPI_Integer> & {
+  if (PySequence_Check($input)) {
+    $1 = 1;
+    for (Py_ssize_t i = 0; i < PySequence_Size($input) && $1; ++i) {
+      PyObject * item = PySequence_GetItem($input, i);
+      $1 = ((PyLong_Check(item) || PyUnicode_Check(item)) && !PyBool_Check(item)) ? 1 : 0;
       Py_DECREF(item);
     }
   } else {

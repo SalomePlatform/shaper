@@ -152,9 +152,14 @@ void SketchPlugin_BSpline::attributeChanged(const std::string& theID) {
 ////      fillCharacteristicPoints();
 ////    }
   }
-////  else if (theID == CENTER_ID() || theID == FIRST_FOCUS_ID() ||
-////           theID == START_POINT_ID() || theID == END_POINT_ID())
-////    fillCharacteristicPoints();
+  else if (theID == POLES_ID()) {
+    AttributePoint2DArrayPtr aPolesArray =
+        std::dynamic_pointer_cast<GeomDataAPI_Point2DArray>(attribute(POLES_ID()));
+    std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
+        attribute(START_ID()))->setValue(aPolesArray->pnt(0));
+    std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
+        attribute(END_ID()))->setValue(aPolesArray->pnt(aPolesArray->size() - 1));
+  }
 ////  else if (theID == REVERSED_ID() && myParamDelta == 0.0)
 ////    myParamDelta = 2.0 * PI;
 }

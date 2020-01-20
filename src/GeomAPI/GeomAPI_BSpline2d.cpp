@@ -27,6 +27,13 @@
 
 
 static Handle_Geom2d_BSplineCurve* newBSpline2d(
+  const std::list<std::shared_ptr<GeomAPI_Pnt2d> >& thePoles,
+  const std::list<double>& theWeights,
+  const int theDegree,
+  const bool thePeriodic);
+
+
+static Handle_Geom2d_BSplineCurve* newBSpline2d(
     const std::list<std::shared_ptr<GeomAPI_Pnt2d> >& thePoles,
     const std::list<double>& theWeights,
     const std::list<double>& theKnots,
@@ -34,6 +41,9 @@ static Handle_Geom2d_BSplineCurve* newBSpline2d(
     const int theDegree,
     const bool thePeriodic)
 {
+  if (theKnots.empty() || theMults.empty())
+    return newBSpline2d(thePoles, theWeights, theDegree, thePeriodic);
+
   // collect arrays of poles, weights, knots and multiplicities
   TColgp_Array1OfPnt2d aPoles(1, (int)thePoles.size());
   TColStd_Array1OfReal aWeights(1, (int)theWeights.size());
@@ -62,7 +72,7 @@ static Handle_Geom2d_BSplineCurve* newBSpline2d(
   return new Handle_Geom2d_BSplineCurve(aCurve);
 }
 
-static Handle_Geom2d_BSplineCurve* newBSpline2d(
+Handle_Geom2d_BSplineCurve* newBSpline2d(
     const std::list<std::shared_ptr<GeomAPI_Pnt2d> >& thePoles,
     const std::list<double>& theWeights,
     const int theDegree,

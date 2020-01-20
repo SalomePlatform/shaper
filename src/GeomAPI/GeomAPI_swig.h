@@ -28,6 +28,8 @@
   #include "GeomAPI_Ax2.h"
   #include "GeomAPI_Ax3.h"
   #include "GeomAPI_Box.h"
+  #include "GeomAPI_BSpline.h"
+  #include "GeomAPI_BSpline2d.h"
   #include "GeomAPI_Circ.h"
   #include "GeomAPI_Circ2d.h"
   #include "GeomAPI_Cone.h"
