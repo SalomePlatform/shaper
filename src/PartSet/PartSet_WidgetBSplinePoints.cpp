@@ -461,7 +461,8 @@ void PartSet_WidgetBSplinePoints::deactivate()
   ModuleBase_ModelWidget::deactivate();
 }
 
-void PartSet_WidgetBSplinePoints::mouseReleased(ModuleBase_IViewWindow* theWindow, QMouseEvent* theEvent)
+void PartSet_WidgetBSplinePoints::mouseReleased(ModuleBase_IViewWindow* theWindow,
+                                                QMouseEvent* theEvent)
 {
   // the contex menu release by the right button should not be processed by this widget
   if (theEvent->button() != Qt::LeftButton)
@@ -543,7 +544,8 @@ void PartSet_WidgetBSplinePoints::mouseReleased(ModuleBase_IViewWindow* theWindo
   createNextPoint();
 }
 
-void PartSet_WidgetBSplinePoints::mouseMoved(ModuleBase_IViewWindow* theWindow, QMouseEvent* theEvent)
+void PartSet_WidgetBSplinePoints::mouseMoved(ModuleBase_IViewWindow* theWindow,
+                                             QMouseEvent* theEvent)
 {
   PartSet_Module* aModule = dynamic_cast<PartSet_Module*>(myWorkshop->module());
 
