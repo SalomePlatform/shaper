@@ -261,8 +261,8 @@
 %template(SelectionListList) std::list<std::list<ModelHighAPI_Selection> >;
 %template(RefAttrList) std::list<ModelHighAPI_RefAttr>;
 %template(RefList) std::list<ModelHighAPI_Reference>;
-%template(DoubleList) std::list<ModelHighAPI_Double>;
-%template(IntegerList) std::list<ModelHighAPI_Integer>;
+%template(DoubleAPIList) std::list<ModelHighAPI_Double>;
+%template(IntegerAPIList) std::list<ModelHighAPI_Integer>;
 
 // std::pair -> []
 %template(ResultSubShapePair) std::pair<std::shared_ptr<ModelAPI_Result>, std::shared_ptr<GeomAPI_Shape> >;
@@ -272,6 +272,8 @@
 // fix compilarion error: 'res*' was not declared in this scope
 %typemap(freearg) const std::list<ModelHighAPI_RefAttr> & {}
 %typemap(freearg) const std::list<std::shared_ptr<ModelAPI_Object> > & {}
+%typemap(freearg) const std::list<ModelHighAPI_Double> & {}
+%typemap(freearg) const std::list<ModelHighAPI_Integer> & {}
 
 %typemap(in) const std::list<ModelHighAPI_RefAttr> & (std::list<ModelHighAPI_RefAttr> temp) {
   std::shared_ptr<ModelAPI_Attribute> * temp_attribute;
