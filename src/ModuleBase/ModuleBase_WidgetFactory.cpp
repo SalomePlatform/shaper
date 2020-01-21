@@ -189,8 +189,8 @@ void ModuleBase_WidgetFactory::createWidget(ModuleBase_PageBase* thePage,
         aWidget->setVisible(false);
       }
     }
+    thePage->alignToTop();
   }
-  thePage->alignToTop();
 }
 
 void ModuleBase_WidgetFactory::getAttributeTitle(const std::string& theAttributeId,
