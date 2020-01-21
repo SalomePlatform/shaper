@@ -29,8 +29,9 @@
 
 #include <SketchPlugin_BSpline.h>
 
-class ModelHighAPI_Double;
-class ModelHighAPI_Integer;
+#include <ModelHighAPI_Double.h>
+#include <ModelHighAPI_Integer.h>
+
 class ModelHighAPI_Selection;
 
 /// \class SketchAPI_BSpline
