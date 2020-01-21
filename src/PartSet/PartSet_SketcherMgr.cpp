@@ -456,9 +456,10 @@ void PartSet_SketcherMgr::onMousePressed(ModuleBase_IViewWindow* theWnd, QMouseE
           }
         }
       }
-      else
-        isRelaunchEditing = !myCurrentSelection.contains(aSPFeature);
-
+      else {
+        if (myCurrentSelection.size() > 1)
+          isRelaunchEditing = !myCurrentSelection.contains(aSPFeature);
+      }
       if (isRelaunchEditing)
         aFOperation->commit();
 
