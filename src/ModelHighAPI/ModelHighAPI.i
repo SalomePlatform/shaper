@@ -261,6 +261,8 @@
 %template(SelectionListList) std::list<std::list<ModelHighAPI_Selection> >;
 %template(RefAttrList) std::list<ModelHighAPI_RefAttr>;
 %template(RefList) std::list<ModelHighAPI_Reference>;
+%template(DoubleList) std::list<ModelHighAPI_Double>;
+%template(IntegerList) std::list<ModelHighAPI_Integer>;
 
 // std::pair -> []
 %template(ResultSubShapePair) std::pair<std::shared_ptr<ModelAPI_Result>, std::shared_ptr<GeomAPI_Shape> >;
