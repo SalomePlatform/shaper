@@ -30,6 +30,7 @@
 #include <ModuleBase_ParamSpinBox.h>
 
 class QGroupBox;
+class QScrollArea;
 
 
 /** \brief Represent a content of the property panel to show/modify parameters of B-spline curve.
@@ -82,7 +83,9 @@ private:
     ModuleBase_ParamSpinBox* myWeight;
   };
 
-  QGroupBox* myPolesGroupBox; ///< widget to show poles and weights of B-spline curve
+  QWidget* myPolesWgt; ///< widget to show poles and weights of B-spline curve
+  QGroupBox* myPolesGroupBox;
+  QScrollArea* myScrollArea;
   std::list<BSplinePoleWidgets> myPoles; ///< list of B-spline poles and their weights
 };
 

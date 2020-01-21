@@ -32,6 +32,7 @@ class ModelAPI_CompositeFeature;
 class ModuleBase_LabelValue;
 class PartSet_ExternalObjectsMgr;
 class QGroupBox;
+class QScrollArea;
 
 /**\class PartSet_WidgetBSplinePoints
  * \ingroup Modules
@@ -158,7 +159,9 @@ protected:
   ModuleBase_IWorkshop* myWorkshop; ///< workshop
 
 private:
-  QGroupBox* myGroupBox;  ///< the parent group box for all intenal widgets
+  QGroupBox* myBox;
+  QWidget* myGroupBox;  ///< the parent group box for all intenal widgets
+  QScrollArea* myScrollArea;
   std::vector<ModuleBase_LabelValue*> myXSpin; ///< the label for the X coordinate
   std::vector<ModuleBase_LabelValue*> myYSpin; ///< the label for the Y coordinate
   PartSet_ExternalObjectsMgr* myExternalObjectMgr; ///< reference to external objects manager

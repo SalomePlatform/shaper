@@ -33,6 +33,7 @@
 #include <QGroupBox>
 #include <QLabel>
 #include <QVBoxLayout>
+#include <QScrollArea>
 
 
 PartSet_BSplineWidget::PartSet_BSplineWidget(
@@ -41,18 +42,36 @@ PartSet_BSplineWidget::PartSet_BSplineWidget(
   : ModuleBase_ModelWidget(theParent, theData)
 {
   QVBoxLayout* aMainLayout = new QVBoxLayout(this);
-  ModuleBase_Tools::adjustMargins(aMainLayout);
+  aMainLayout->setContentsMargins(0, 0, 0, 0);
 
   // GroupBox to keep widgets for B-spline poles and weights
-  myPolesGroupBox = new QGroupBox(tr("Poles and weights"), theParent);
+  myPolesGroupBox = new QGroupBox(tr("Poles and weights"), this);
   aMainLayout->addWidget(myPolesGroupBox);
+
+  QVBoxLayout* aLayout = new QVBoxLayout(myPolesGroupBox);
+  ModuleBase_Tools::adjustMargins(aLayout);
+
+  myScrollArea = new QScrollArea(myPolesGroupBox);
+  myScrollArea->setWidgetResizable(true);
+  myScrollArea->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+  myScrollArea->setFrameStyle(QFrame::NoFrame);
+  aLayout->addWidget(myScrollArea);
+
+  QWidget* aContainer = new QWidget(myScrollArea);
+  QVBoxLayout* aBoxLay = new QVBoxLayout(aContainer);
+  aBoxLay->setContentsMargins(0, 0, 0, 0);
+
   // layout of GroupBox
-  QGridLayout* aGroupLayout = new QGridLayout(myPolesGroupBox);
+  myPolesWgt = new QWidget(aContainer);
+  QGridLayout* aGroupLayout = new QGridLayout(myPolesWgt);
   aGroupLayout->setSpacing(4);
   aGroupLayout->setColumnStretch(1, 1);
   ModuleBase_Tools::adjustMargins(aGroupLayout);
 
   restoreValueCustom();
+  aBoxLay->addWidget(myPolesWgt);
+  aBoxLay->addStretch(1);
+  myScrollArea->setWidget(aContainer);
 }
 
 void PartSet_BSplineWidget::setFeature(const FeaturePtr& theFeature,
@@ -73,26 +92,17 @@ void PartSet_BSplineWidget::deactivate()
 QList<QWidget*> PartSet_BSplineWidget::getControls() const
 {
   QList<QWidget*> aControls;
-  std::list<BSplinePoleWidgets>::const_iterator anIt = myPoles.begin();
-  for (; anIt != myPoles.end(); ++anIt) {
-    aControls.append(anIt->myWeight);
-  }
+  aControls.append(myScrollArea);
   return aControls;
 }
 
 void PartSet_BSplineWidget::storePolesAndWeights() const
 {
   std::shared_ptr<ModelAPI_Data> aData = myFeature->data();
-  //AttributePoint2DArrayPtr aPointArray = std::dynamic_pointer_cast<GeomDataAPI_Point2DArray>(
-  //    aData->attribute(SketchPlugin_BSpline::POLES_ID()));
   AttributeDoubleArrayPtr aWeightsArray = aData->realArray(SketchPlugin_BSpline::WEIGHTS_ID());
-
-  //aPointArray->setSize((int)myPoles.size());
-  //aWeightsArray->setSize((int)myPoles.size());
 
   std::list<BSplinePoleWidgets>::const_iterator anIt = myPoles.begin();
   for (int anIndex = 0; anIt != myPoles.end(); ++anIndex, ++anIt) {
-    //aPointArray->setPnt(anIndex, anIt->myX->value(), anIt->myY->value());
     aWeightsArray->setValue(anIndex, anIt->myWeight->value());
   }
 }
@@ -103,17 +113,11 @@ bool PartSet_BSplineWidget::storeValueCustom()
   if (!aData || !aData->isValid()) // can be on abort of sketcher element
     return false;
 
-  //AttributePoint2DArrayPtr aPoles = std::dynamic_pointer_cast<GeomDataAPI_Point2DArray>(
-  //    aData->attribute(SketchPlugin_BSpline::POLES_ID()));
   AttributeDoubleArrayPtr aWeights = aData->realArray(SketchPlugin_BSpline::WEIGHTS_ID());
 
   bool isBlocked = blockSignals(true);
-  //bool isImmutable = aPoles->setImmutable(true);
-
   storePolesAndWeights();
   ModuleBase_Tools::flushUpdated(myFeature);
-
-  //aPoles->setImmutable(isImmutable);
   blockSignals(isBlocked);
 
   updateObject(myFeature);
@@ -149,7 +153,7 @@ bool PartSet_BSplineWidget::restoreValueCustom()
 
 void PartSet_BSplineWidget::addPoleWidget()
 {
-  QGridLayout* aGroupLay = dynamic_cast<QGridLayout*>(myPolesGroupBox->layout());
+  QGridLayout* aGroupLay = dynamic_cast<QGridLayout*>(myPolesWgt->layout());
   ModuleBase_Tools::adjustMargins(aGroupLay);
 
   int aNbPoles = (int)myPoles.size();
@@ -157,7 +161,7 @@ void PartSet_BSplineWidget::addPoleWidget()
   QString aPoleStr = tr("Pole %1");
   aPoleStr = aPoleStr.arg(aNbPoles + 1);
 
-  QGroupBox* aPoleGroupBox = new QGroupBox(aPoleStr, myPolesGroupBox);
+  QGroupBox* aPoleGroupBox = new QGroupBox(aPoleStr, myPolesWgt);
   QFormLayout* aPoleLay = new QFormLayout(aPoleGroupBox);
   ModuleBase_Tools::adjustMargins(aPoleLay);
   aPoleLay->setSpacing(2);

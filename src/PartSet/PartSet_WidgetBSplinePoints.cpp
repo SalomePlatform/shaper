@@ -60,8 +60,12 @@
 #include <QGroupBox>
 #include <QMouseEvent>
 #include <QGraphicsEffect>
+#include <QScrollArea>
 
 static const double MaxCoordinate = 1e12;
+
+static bool IsPointCreated = false;
+
 
 PartSet_WidgetBSplinePoints::PartSet_WidgetBSplinePoints(QWidget* theParent,
                                              ModuleBase_IWorkshop* theWorkshop,
@@ -72,28 +76,45 @@ PartSet_WidgetBSplinePoints::PartSet_WidgetBSplinePoints(QWidget* theParent,
   myPointIndex(0), myFinished(false)
 {
   myRefAttribute = theData->getProperty("reference_attribute");
+  QVBoxLayout* aMainLayout = new QVBoxLayout(this);
+  ModuleBase_Tools::zeroMargins(aMainLayout);
 
   // the control should accept the focus, so the boolean flag is corrected to be true
   myIsObligatory = true;
   QString aPageName = translate(theData->getProperty(CONTAINER_PAGE_NAME));
-  myGroupBox = new QGroupBox(aPageName, theParent);
-  myGroupBox->setFlat(false);
+  myBox = new QGroupBox(aPageName, theParent);
+  myBox->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+  myBox->setFlat(false);
+  aMainLayout->addWidget(myBox);
 
   bool aAcceptVariables = theData->getBooleanAttribute(DOUBLE_WDG_ACCEPT_EXPRESSIONS, true);
 
   // B-spline weights attribute
   myWeightsAttr = theData->getProperty("weights");
 
+  QVBoxLayout* aLayout = new QVBoxLayout(myBox);
+  ModuleBase_Tools::adjustMargins(aLayout);
+
+  myScrollArea = new QScrollArea(myBox);
+  myScrollArea->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+  myScrollArea->setWidgetResizable(true);
+  myScrollArea->setFrameStyle(QFrame::NoFrame);
+  aLayout->addWidget(myScrollArea);
+
+  QWidget* aContainer = new QWidget(myScrollArea);
+  QVBoxLayout* aBoxLay = new QVBoxLayout(aContainer);
+  aBoxLay->setContentsMargins(0, 0, 0, 0);
+
+  myGroupBox = new QWidget(aContainer);
   QGridLayout* aGroupLay = new QGridLayout(myGroupBox);
   ModuleBase_Tools::adjustMargins(aGroupLay);
   aGroupLay->setSpacing(4);
   aGroupLay->setColumnStretch(1, 1);
   createNextPoint();
+  aBoxLay->addWidget(myGroupBox);
+  aBoxLay->addStretch(1);
 
-  QVBoxLayout* aLayout = new QVBoxLayout(this);
-  ModuleBase_Tools::zeroMargins(aLayout);
-  aLayout->addWidget(myGroupBox);
-  setLayout(aLayout);
+  myScrollArea->setWidget(aContainer);
 
   myWidgetValidator = new ModuleBase_WidgetValidator(this, myWorkshop);
   myExternalObjectMgr = new PartSet_ExternalObjectsMgr(theData->getProperty("use_external"),
@@ -122,18 +143,23 @@ void PartSet_WidgetBSplinePoints::createNextPoint()
   aPoleLay->addWidget(myYSpin.back(), 1, 1);
 
   aGroupLay->addWidget(aPoleGroupBox, row, 1);
-
-  setHighlighted(true);
+  IsPointCreated = true;
 }
 
 void PartSet_WidgetBSplinePoints::removeLastPoint()
 {
   QGridLayout* aGroupLay = dynamic_cast<QGridLayout*>(myGroupBox->layout());
-  aGroupLay->removeWidget(myYSpin.back());
-  aGroupLay->removeWidget(myXSpin.back());
-  aGroupLay->removeWidget(myXSpin.back()->parentWidget());
+  QWidget* aXSpin = myXSpin.back();
+  QWidget* aYSpin = myYSpin.back();
+  QWidget* aBox = myXSpin.back()->parentWidget();
   myYSpin.pop_back();
   myXSpin.pop_back();
+
+  aGroupLay->removeWidget(aXSpin);
+  aGroupLay->removeWidget(aYSpin);
+  aGroupLay->removeWidget(aBox);
+
+  aBox->deleteLater();
 
   // update B-spline feature attributes
   storeValueCustom();
@@ -417,22 +443,7 @@ bool PartSet_WidgetBSplinePoints::restoreCurentValue()
 QList<QWidget*> PartSet_WidgetBSplinePoints::getControls() const
 {
   QList<QWidget*> aControls;
-  std::vector<ModuleBase_LabelValue*>::const_iterator aXIt = myXSpin.begin();
-  std::vector<ModuleBase_LabelValue*>::const_iterator aYIt = myYSpin.begin();
-  for (; (*aXIt) != myXSpin.back() && (*aYIt) != myYSpin.back(); ++aXIt, ++aYIt) {
-    //aControls.append(*aXIt);
-    //aControls.append(*aYIt);
-    QGraphicsEffect* anEffect = (*aXIt)->graphicsEffect();
-    if (anEffect)
-      anEffect->deleteLater();
-    anEffect = (*aYIt)->graphicsEffect();
-    if (anEffect)
-      anEffect->deleteLater();
-    (*aXIt)->setGraphicsEffect(0);
-    (*aYIt)->setGraphicsEffect(0);
-  }
-  aControls.append(myXSpin.back());
-  aControls.append(myYSpin.back());
+  aControls.append(myScrollArea);
   return aControls;
 }
 
@@ -558,6 +569,12 @@ void PartSet_WidgetBSplinePoints::mouseMoved(ModuleBase_IViewWindow* theWindow,
   setPoint(aX, aY);
   blockValueState(isBlocked);
   setValueState(ModifiedInViewer);
+
+  if (IsPointCreated) {
+    QPoint aPnt = myGroupBox->geometry().bottomLeft();
+    myScrollArea->ensureVisible(aPnt.x(), aPnt.y());
+    IsPointCreated = false;
+  }
 }
 
 bool PartSet_WidgetBSplinePoints::processEscape()
