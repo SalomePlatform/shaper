@@ -34,6 +34,7 @@
 #include <QLabel>
 #include <QVBoxLayout>
 #include <QScrollArea>
+#include <QToolButton>
 
 
 PartSet_BSplineWidget::PartSet_BSplineWidget(
@@ -64,7 +65,6 @@ PartSet_BSplineWidget::PartSet_BSplineWidget(
   // layout of GroupBox
   myPolesWgt = new QWidget(aContainer);
   QGridLayout* aGroupLayout = new QGridLayout(myPolesWgt);
-  aGroupLayout->setSpacing(4);
   aGroupLayout->setColumnStretch(1, 1);
   ModuleBase_Tools::adjustMargins(aGroupLayout);
 
@@ -154,32 +154,60 @@ bool PartSet_BSplineWidget::restoreValueCustom()
 void PartSet_BSplineWidget::addPoleWidget()
 {
   QGridLayout* aGroupLay = dynamic_cast<QGridLayout*>(myPolesWgt->layout());
-  ModuleBase_Tools::adjustMargins(aGroupLay);
-
   int aNbPoles = (int)myPoles.size();
-
-  QString aPoleStr = tr("Pole %1");
-  aPoleStr = aPoleStr.arg(aNbPoles + 1);
-
-  QGroupBox* aPoleGroupBox = new QGroupBox(aPoleStr, myPolesWgt);
-  QFormLayout* aPoleLay = new QFormLayout(aPoleGroupBox);
-  ModuleBase_Tools::adjustMargins(aPoleLay);
-  aPoleLay->setSpacing(2);
+  QString aPoleStr = tr("Pole %1").arg(aNbPoles + 1);
 
   myPoles.push_back(BSplinePoleWidgets());
-  BSplinePoleWidgets& aPoleWidgets = myPoles.back();
+  BSplinePoleWidgets& aPole = myPoles.back();
+  aGroupLay->addWidget(createPoleWidget(aPole, aPoleStr, myPolesWgt), aNbPoles, 1);
+}
 
-  aPoleWidgets.myX = new ModuleBase_LabelValue(aPoleGroupBox, tr("X"));
-  aPoleLay->addRow(aPoleWidgets.myX);
-  aPoleWidgets.myY = new ModuleBase_LabelValue(aPoleGroupBox, tr("Y"));
-  aPoleLay->addRow(aPoleWidgets.myY);
-  aPoleWidgets.myWeight = new ModuleBase_ParamSpinBox(aPoleGroupBox);
-  aPoleWidgets.myWeight->setMinimum(0.0);
-  aPoleLay->addRow(tr("Weight") + " : ", aPoleWidgets.myWeight);
+QGroupBox* PartSet_BSplineWidget::createPoleWidget(BSplinePoleWidgets& thePole,
+  const QString& theName, QWidget* theParent)
+{
+  QGroupBox* aPoleGroupBox = new QGroupBox(theName, theParent);
+  QGridLayout* aPoleLay = new QGridLayout(aPoleGroupBox);
+  aPoleLay->setSpacing(0);
+  ModuleBase_Tools::zeroMargins(aPoleLay);
 
-  aGroupLay->addWidget(aPoleGroupBox, aNbPoles, 1);
+  thePole.myX = new ModuleBase_LabelValue(aPoleGroupBox, tr("X"));
+  aPoleLay->addWidget(thePole.myX, 0, 0, 1, 3);
+  thePole.myY = new ModuleBase_LabelValue(aPoleGroupBox, tr("Y"));
+  aPoleLay->addWidget(thePole.myY, 1, 0, 1, 3);
+  thePole.myWeight = new ModuleBase_ParamSpinBox(aPoleGroupBox);
+  thePole.myWeight->setMinimum(0.0);
 
+  aPoleLay->addWidget(new QLabel(tr("Weight :"), aPoleGroupBox), 2, 0);
+  aPoleLay->addWidget(thePole.myWeight, 2, 1);
   // we should listen textChanged signal as valueChanged do not send when text is modified
-  connect(aPoleWidgets.myWeight, SIGNAL(textChanged(const QString&)),
+  connect(thePole.myWeight, SIGNAL(textChanged(const QString&)),
     this, SIGNAL(valuesChanged()));
+
+  thePole.myAddBtn = new QToolButton(aPoleGroupBox);
+  thePole.myAddBtn->setIcon(QIcon(":pictures/add.png"));
+  thePole.myAddBtn->setToolTip(tr("Add a new pole after the current"));
+  aPoleLay->addWidget(thePole.myAddBtn, 2, 2);
+  connect(thePole.myAddBtn, SIGNAL(clicked(bool)), SLOT(onAddPole()));
+
+  return aPoleGroupBox;
+}
+
+
+void PartSet_BSplineWidget::onAddPole()
+{
+  QObject* aObj = sender();
+  std::list<BSplinePoleWidgets>::const_iterator aIt;
+  int aId = 0;
+  bool aFound = false;
+  for (aIt = myPoles.cbegin(); aIt != myPoles.cend(); aIt++, aId++) {
+    if ((*aIt).myAddBtn == aObj) {
+      aFound = true;
+      break;
+    }
+  }
+  if (aFound) {
+    // TODO: add a new pole after found Id
+
+    restoreValueCustom();
+  }
 }

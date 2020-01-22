@@ -31,7 +31,7 @@
 
 class QGroupBox;
 class QScrollArea;
-
+class QToolButton;
 
 /** \brief Represent a content of the property panel to show/modify parameters of B-spline curve.
  *  \ingroup GUI
@@ -76,12 +76,18 @@ protected:
   /// Update attributes of B-spline feature
   void storePolesAndWeights() const;
 
+private slots:
+  void onAddPole();
+
 private:
   struct BSplinePoleWidgets {
     ModuleBase_LabelValue* myX;
     ModuleBase_LabelValue* myY;
     ModuleBase_ParamSpinBox* myWeight;
+    QToolButton* myAddBtn;
   };
+
+  QGroupBox* createPoleWidget(BSplinePoleWidgets& thePole, const QString& theName, QWidget* theParent);
 
   QWidget* myPolesWgt; ///< widget to show poles and weights of B-spline curve
   QGroupBox* myPolesGroupBox;
