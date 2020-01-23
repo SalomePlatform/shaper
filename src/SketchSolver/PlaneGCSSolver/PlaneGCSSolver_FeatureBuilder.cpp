@@ -29,6 +29,7 @@
 
 #include <SketchPlugin_Arc.h>
 #include <SketchPlugin_BSpline.h>
+#include <SketchPlugin_BSplinePeriodic.h>
 #include <SketchPlugin_Circle.h>
 #include <SketchPlugin_Ellipse.h>
 #include <SketchPlugin_EllipticArc.h>
@@ -48,6 +49,7 @@ static EntityWrapperPtr createArc(const AttributeEntityMap&    theAttributes,
 static EntityWrapperPtr createEllipse(const AttributeEntityMap& theAttributes);
 static EntityWrapperPtr createEllipticArc(const AttributeEntityMap& theAttributes,
                                           PlaneGCSSolver_Storage*   theStorage);
+template <typename TYPE>
 static EntityWrapperPtr createBSpline(const AttributeEntityMap& theAttributes);
 
 
@@ -107,7 +109,9 @@ EntityWrapperPtr PlaneGCSSolver_FeatureBuilder::createFeature(FeaturePtr theFeat
     aResult = createEllipticArc(myAttributes, myStorage);
   // B-spline curve
   else if (aFeatureKind == SketchPlugin_BSpline::ID())
-    aResult = createBSpline(myAttributes);
+    aResult = createBSpline<SketchPlugin_BSpline>(myAttributes);
+  else if (aFeatureKind == SketchPlugin_BSplinePeriodic::ID())
+    aResult = createBSpline<SketchPlugin_BSplinePeriodic>(myAttributes);
   // Point (it has low probability to be an attribute of constraint, so it is checked at the end)
   else if (aFeatureKind == SketchPlugin_Point::ID() ||
            aFeatureKind == SketchPlugin_IntersectionPoint::ID()) {
@@ -294,19 +298,20 @@ EntityWrapperPtr createEllipticArc(const AttributeEntityMap& theAttributes,
   return anEllipseWrapper;
 }
 
+template <typename TYPE>
 EntityWrapperPtr createBSpline(const AttributeEntityMap& theAttributes)
 {
   std::shared_ptr<GCS::BSplineImpl> aNewSpline(new GCS::BSplineImpl);
 
   aNewSpline->degree = 3;
-  aNewSpline->periodic = false;
+  aNewSpline->periodic = std::is_same<TYPE, SketchPlugin_BSplinePeriodic>();
 
   std::map<std::string, EntityWrapperPtr> anAdditionalAttributes;
 
   AttributeEntityMap::const_iterator anIt = theAttributes.begin();
   for (; anIt != theAttributes.end(); ++anIt) {
     const std::string& anAttrID = anIt->first->id();
-    if (anAttrID == SketchPlugin_BSpline::POLES_ID()) {
+    if (anAttrID == TYPE::POLES_ID()) {
       PointArrayWrapperPtr anArray =
           std::dynamic_pointer_cast<PlaneGCSSolver_PointArrayWrapper>(anIt->second);
 
@@ -318,7 +323,7 @@ EntityWrapperPtr createBSpline(const AttributeEntityMap& theAttributes)
       aNewSpline->start = aNewSpline->poles.front();
       aNewSpline->end = aNewSpline->poles.back();
     }
-    else if (anAttrID == SketchPlugin_BSpline::DEGREE_ID()) {
+    else if (anAttrID == TYPE::DEGREE_ID()) {
       ScalarWrapperPtr aScalar =
           std::dynamic_pointer_cast<PlaneGCSSolver_ScalarWrapper>(anIt->second);
       aNewSpline->degree = (int)aScalar->value();
@@ -330,11 +335,11 @@ EntityWrapperPtr createBSpline(const AttributeEntityMap& theAttributes)
     else {
       ScalarArrayWrapperPtr anArray =
           std::dynamic_pointer_cast<PlaneGCSSolver_ScalarArrayWrapper>(anIt->second);
-      if (anAttrID == SketchPlugin_BSpline::WEIGHTS_ID())
+      if (anAttrID == TYPE::WEIGHTS_ID())
         aNewSpline->weights = anArray->array();
-      else if (anAttrID == SketchPlugin_BSpline::KNOTS_ID())
+      else if (anAttrID == TYPE::KNOTS_ID())
         aNewSpline->knots = anArray->array();
-      else if (anAttrID == SketchPlugin_BSpline::MULTS_ID()) {
+      else if (anAttrID == TYPE::MULTS_ID()) {
         const GCS::VEC_pD& aValues = anArray->array();
         aNewSpline->mult.reserve(aValues.size());
         for (GCS::VEC_pD::const_iterator anIt = aValues.begin(); anIt != aValues.end(); ++anIt)

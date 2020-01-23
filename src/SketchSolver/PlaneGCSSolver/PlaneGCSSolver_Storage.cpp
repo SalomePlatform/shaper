@@ -378,6 +378,8 @@ static void createBSplineConstraints(
   EdgeWrapperPtr anEdge = std::dynamic_pointer_cast<PlaneGCSSolver_EdgeWrapper>(theCurve);
   std::shared_ptr<GCS::BSpline> aBSpline =
       std::dynamic_pointer_cast<GCS::BSpline>(anEdge->entity());
+  if (aBSpline->periodic)
+    return; // additional constraints are not necessary
 
   std::list<GCSConstraintPtr> aBSplineConstraints;
 

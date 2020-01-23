@@ -20,6 +20,7 @@
 #include <SketchPlugin_MacroBSpline.h>
 
 #include <SketchPlugin_BSpline.h>
+#include <SketchPlugin_BSplinePeriodic.h>
 #include <SketchPlugin_ConstraintCoincidenceInternal.h>
 #include <SketchPlugin_Line.h>
 #include <SketchPlugin_Point.h>
@@ -64,6 +65,13 @@ SketchPlugin_MacroBSpline::SketchPlugin_MacroBSpline()
   : SketchPlugin_SketchEntity(),
     myDegree(3),
     myIsPeriodic(false)
+{
+}
+
+SketchPlugin_MacroBSpline::SketchPlugin_MacroBSpline(bool isPeriodic)
+  : SketchPlugin_SketchEntity(),
+    myDegree(3),
+    myIsPeriodic(isPeriodic)
 {
 }
 
@@ -143,52 +151,55 @@ std::string SketchPlugin_MacroBSpline::processEvent(
 
 FeaturePtr SketchPlugin_MacroBSpline::createBSplineFeature()
 {
-  FeaturePtr aBSpline = sketch()->addFeature(SketchPlugin_BSpline::ID());
+  FeaturePtr aBSpline = sketch()->addFeature(
+      myIsPeriodic ? SketchPlugin_BSplinePeriodic::ID() : SketchPlugin_BSpline::ID());
 
-  aBSpline->integer(SketchPlugin_BSpline::DEGREE_ID())->setValue(myDegree);
+  aBSpline->integer(myIsPeriodic ? SketchPlugin_BSplinePeriodic::DEGREE_ID()
+                                 : SketchPlugin_BSpline::DEGREE_ID())->setValue(myDegree);
 
   AttributePoint2DArrayPtr aPoles = std::dynamic_pointer_cast<GeomDataAPI_Point2DArray>(
-      aBSpline->attribute(SketchPlugin_BSpline::POLES_ID()));
+      aBSpline->attribute(myIsPeriodic ? SketchPlugin_BSplinePeriodic::POLES_ID()
+                                       : SketchPlugin_BSpline::POLES_ID()));
   AttributePoint2DArrayPtr aPolesMacro =
       std::dynamic_pointer_cast<GeomDataAPI_Point2DArray>(attribute(POLES_ID()));
   aPoles->assign(aPolesMacro);
 
-  AttributeDoubleArrayPtr aWeights =
-      aBSpline->data()->realArray(SketchPlugin_BSpline::WEIGHTS_ID());
+  AttributeDoubleArrayPtr aWeights = aBSpline->data()->realArray(
+      myIsPeriodic ? SketchPlugin_BSplinePeriodic::WEIGHTS_ID()
+                   : SketchPlugin_BSpline::WEIGHTS_ID());
   AttributeDoubleArrayPtr aWeightsMacro = data()->realArray(WEIGHTS_ID());
   int aSize = aWeightsMacro->size();
   aWeights->setSize(aSize);
   for (int index = 0; index < aSize; ++index)
     aWeights->setValue(index, aWeightsMacro->value(index));
 
-  AttributeDoubleArrayPtr aKnots =
-      aBSpline->data()->realArray(SketchPlugin_BSpline::KNOTS_ID());
+  AttributeDoubleArrayPtr aKnots = aBSpline->data()->realArray(
+      myIsPeriodic ? SketchPlugin_BSplinePeriodic::KNOTS_ID() : SketchPlugin_BSpline::KNOTS_ID());
   aSize = (int)myKnots.size();
   aKnots->setSize(aSize);
   std::list<double>::iterator aKIt = myKnots.begin();
   for (int index = 0; index < aSize; ++index, ++aKIt)
     aKnots->setValue(index, *aKIt);
 
-  AttributeIntArrayPtr aMults =
-      aBSpline->data()->intArray(SketchPlugin_BSpline::MULTS_ID());
+  AttributeIntArrayPtr aMults = aBSpline->data()->intArray(
+      myIsPeriodic ? SketchPlugin_BSplinePeriodic::MULTS_ID() : SketchPlugin_BSpline::MULTS_ID());
   aSize = (int)myMultiplicities.size();
   aMults->setSize(aSize);
   std::list<int>::iterator aMIt = myMultiplicities.begin();
   for (int index = 0; index < aSize; ++index, ++aMIt)
     aMults->setValue(index, *aMIt);
 
-  SketchPlugin_Sketch* aSketch =
-      std::dynamic_pointer_cast<SketchPlugin_Feature>(aBSpline)->sketch();
+  if (!myIsPeriodic) {
+    AttributePoint2DPtr aStartPoint = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
+        aBSpline->attribute(SketchPlugin_BSpline::START_ID()));
+    aStartPoint->setValue(aPoles->pnt(0));
 
-  AttributePoint2DPtr aStartPoint = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
-      aBSpline->attribute(SketchPlugin_BSpline::START_ID()));
-  aStartPoint->setValue(aPoles->pnt(0));
+    AttributePoint2DPtr aEndPoint = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
+       aBSpline->attribute(SketchPlugin_BSpline::END_ID()));
+    aEndPoint->setValue(aPoles->pnt(aPoles->size() - 1));
+  }
 
-  AttributePoint2DPtr aEndPoint = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
-      aBSpline->attribute(SketchPlugin_BSpline::END_ID()));
-  aEndPoint->setValue(aPoles->pnt(aPoles->size() - 1));
-
-  aBSpline->boolean(SketchPlugin_BSpline::AUXILIARY_ID())->setValue(
+  aBSpline->boolean(SketchPlugin_SketchEntity::AUXILIARY_ID())->setValue(
       boolean(AUXILIARY_ID())->value());
 
   aBSpline->execute();
@@ -208,6 +219,10 @@ void SketchPlugin_MacroBSpline::createControlPolygon(FeaturePtr theBSpline,
   // segments
   for (int index = 1; index < aSize; ++index)
     createAuxiliarySegment(theBSpline, aPoles, index - 1, index);
+  if (myIsPeriodic) {
+    // additional segment to close the control polygon
+    createAuxiliarySegment(theBSpline, aPoles, aSize - 1, 0);
+  }
 }
 
 void SketchPlugin_MacroBSpline::constraintsForPoles(const std::list<FeaturePtr>& thePoles)
@@ -243,8 +258,6 @@ AISObjectPtr SketchPlugin_MacroBSpline::getAISObject(AISObjectPtr thePrevious)
   if (!aSketch)
     return AISObjectPtr();
 
-  static const bool PERIODIC = false;
-
   AttributePoint2DArrayPtr aPolesArray =
       std::dynamic_pointer_cast<GeomDataAPI_Point2DArray>(attribute(POLES_ID()));
   AttributeDoubleArrayPtr aWeightsArray = data()->realArray(WEIGHTS_ID());
@@ -273,7 +286,7 @@ AISObjectPtr SketchPlugin_MacroBSpline::getAISObject(AISObjectPtr thePrevious)
   // create result non-periodic B-spline curve
   std::shared_ptr<GeomAPI_BSpline2d> aBSplineCurve;
   try {
-    aBSplineCurve.reset(new GeomAPI_BSpline2d(aPoles2D, aWeights, PERIODIC));
+    aBSplineCurve.reset(new GeomAPI_BSpline2d(aPoles2D, aWeights, myIsPeriodic));
   } catch (...) {
     // cannot build a B-spline curve
     return AISObjectPtr();

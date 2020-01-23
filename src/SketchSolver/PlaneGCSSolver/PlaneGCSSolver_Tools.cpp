@@ -43,6 +43,7 @@
 
 #include <SketchPlugin_Arc.h>
 #include <SketchPlugin_BSpline.h>
+#include <SketchPlugin_BSplinePeriodic.h>
 #include <SketchPlugin_Circle.h>
 #include <SketchPlugin_ConstraintAngle.h>
 #include <SketchPlugin_ConstraintCoincidence.h>
@@ -482,6 +483,13 @@ bool PlaneGCSSolver_Tools::isAttributeApplicable(const std::string& theAttrName,
            theAttrName == SketchPlugin_BSpline::DEGREE_ID() ||
            theAttrName == SketchPlugin_BSpline::START_ID() ||
            theAttrName == SketchPlugin_BSpline::END_ID();
+  }
+  else if (theOwnerName == SketchPlugin_BSplinePeriodic::ID()) {
+    return theAttrName == SketchPlugin_BSplinePeriodic::POLES_ID() ||
+           theAttrName == SketchPlugin_BSplinePeriodic::WEIGHTS_ID() ||
+           theAttrName == SketchPlugin_BSplinePeriodic::KNOTS_ID() ||
+           theAttrName == SketchPlugin_BSplinePeriodic::MULTS_ID() ||
+           theAttrName == SketchPlugin_BSplinePeriodic::DEGREE_ID();
   }
 
   // suppose that all remaining features are points

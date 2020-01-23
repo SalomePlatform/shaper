@@ -105,6 +105,9 @@ public:
   /// Use plugin manager for features creation
   SketchPlugin_MacroBSpline();
 
+protected:
+  SketchPlugin_MacroBSpline(bool isPeriodic);
+
 private:
   FeaturePtr createBSplineFeature();
 
@@ -115,6 +118,31 @@ private:
   std::list<int> myMultiplicities;
   int myDegree;
   bool myIsPeriodic;
+};
+
+
+/**\class SketchPlugin_MacroBSpline
+* \ingroup Plugins
+* \brief Feature for creation of the new B-spline in Sketch.
+*/
+class SketchPlugin_MacroBSplinePeriodic : public SketchPlugin_MacroBSpline
+{
+public:
+  /// B-spline macro feature kind
+  inline static const std::string& ID()
+  {
+    static const std::string ID("SketchMacroBSplinePeriodic");
+    return ID;
+  }
+
+  /// Returns the kind of a feature
+  SKETCHPLUGIN_EXPORT virtual const std::string& getKind()
+  {
+    return SketchPlugin_MacroBSpline::ID();
+  }
+
+  /// Use plugin manager for features creation
+  SketchPlugin_MacroBSplinePeriodic() : SketchPlugin_MacroBSpline(true) {}
 };
 
 #endif

@@ -47,9 +47,13 @@ static Handle_Geom2d_BSplineCurve* newBSpline2d(
   if (theKnots.empty() || theMults.empty())
     return newBSpline2d(thePoles, theWeights, theDegree, thePeriodic);
 
+  int anAuxPole = 0;
+  if (thePeriodic && thePoles.front()->distance(thePoles.back()) > Precision::Confusion())
+    anAuxPole = 1;
+
   // collect arrays of poles, weights, knots and multiplicities
-  TColgp_Array1OfPnt2d aPoles(1, (int)thePoles.size());
-  TColStd_Array1OfReal aWeights(1, (int)theWeights.size());
+  TColgp_Array1OfPnt2d aPoles(1, (int)thePoles.size() + anAuxPole);
+  TColStd_Array1OfReal aWeights(1, (int)theWeights.size() + anAuxPole);
   TColStd_Array1OfReal aKnots(1, (int)theKnots.size());
   TColStd_Array1OfInteger aMults(1, (int)theMults.size());
 
@@ -70,6 +74,11 @@ static Handle_Geom2d_BSplineCurve* newBSpline2d(
        aMIt != theMults.end(); ++aMIt, ++anIndex)
     aMults.SetValue(anIndex, *aMIt);
 
+  if (thePeriodic) {
+    aPoles.ChangeLast() = aPoles.First();
+    aWeights.ChangeLast() = aWeights.First();
+  }
+
   Handle(Geom2d_BSplineCurve) aCurve =
       new Geom2d_BSplineCurve(aPoles, aWeights, aKnots, aMults, theDegree, thePeriodic);
   return new Handle_Geom2d_BSplineCurve(aCurve);
@@ -81,7 +90,21 @@ Handle_Geom2d_BSplineCurve* newBSpline2d(
     const int theDegree,
     const bool thePeriodic)
 {
+  std::list<std::shared_ptr<GeomAPI_Pnt2d> > aPoles = thePoles;
+  std::list<double> aWeights = theWeights;
+  int aMult = theDegree + 1;
   int aNbKnots = (int)thePoles.size() - theDegree + 1;
+  if (thePeriodic) {
+    if (aPoles.front()->distance(aPoles.back()) < Precision::Confusion()) {
+      aPoles.pop_back();
+      aWeights.pop_back();
+    }
+    aPoles.push_back(aPoles.front());
+    aWeights.push_back(aWeights.front());
+    aMult = 1;
+    aNbKnots = (int)aPoles.size() + 1;
+  }
+
   if (aNbKnots < 2)
     return new Handle_Geom2d_BSplineCurve();
 
@@ -95,10 +118,10 @@ Handle_Geom2d_BSplineCurve* newBSpline2d(
   aKnots.push_back(aEndParam);
 
   std::list<int> aMults(aNbKnots - 2, 1);
-  aMults.push_front(theDegree + 1);
-  aMults.push_back(theDegree + 1);
+  aMults.push_front(aMult);
+  aMults.push_back(aMult);
 
-  return newBSpline2d(thePoles, theWeights, aKnots, aMults, theDegree, thePeriodic);
+  return newBSpline2d(aPoles, aWeights, aKnots, aMults, theDegree, thePeriodic);
 }
 
 static Handle_Geom2d_BSplineCurve* newBSpline2d(

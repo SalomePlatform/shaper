@@ -6,7 +6,7 @@
         nested="SketchPoint SketchIntersectionPoint SketchLine
                 SketchCircle SketchMacroCircle SketchArc SketchMacroArc
                 SketchEllipse SketchMacroEllipse SketchEllipticArc SketchMacroEllipticArc
-                SketchBSpline SketchMacroBSpline
+                SketchBSpline SketchMacroBSpline SketchMacroBSplinePeriodic
                 SketchRectangle
                 SketchProjection
                 SketchConstraintLength SketchConstraintRadius SketchConstraintDistance SketchConstraintDistanceHorizontal SketchConstraintDistanceVertical
@@ -620,11 +620,59 @@
                    change_visual_attributes="true"/>
       </feature>
 
+      <!-- SketchBSplinePeriodic is a hidden feature. It is created inside SketchMacroBSplinePeriodic. -->
+      <feature id="SketchBSplinePeriodic"
+               title="Periodic B-spline"
+               tooltip="Create periodic B-spline curve"
+               icon="icons/Sketch/bspline_p.png"
+               helpfile="bsplineFeature.html"
+               internal="1">
+        <bspline-panel id="poles"
+                       weights="weights"
+                       title="Poles and weights"
+                       tooltip="B-spline poles and weights"
+                       enable_value="enable_by_preferences">
+          <validator id="SketchPlugin_BSplineValidator"/>
+        </bspline-panel>
+        <boolvalue id="Auxiliary"
+                   label="Auxiliary"
+                   default="false"
+                   tooltip="Construction element"
+                   obligatory="0"
+                   change_visual_attributes="true"/>
+      </feature>
+
       <!-- SketchMacroBSpline -->
       <feature id="SketchMacroBSpline"
                title="B-spline"
                tooltip="Create B-spline curve"
                icon="icons/Sketch/bspline.png"
+               helpfile="bsplineFeature.html">
+        <sketch-bspline_selector id="poles"
+                                 weights="weights"
+                                 reference_attribute="poles_ref"
+                                 title="Poles and weights"
+                                 tooltip="B-spline poles and weights"
+                                 enable_value="enable_by_preferences">
+          <validator id="SketchPlugin_BSplineValidator"/>
+        </sketch-bspline_selector>
+        <boolvalue id="need_control_poly"
+                   label="Create control polygon"
+                   default="true"
+                   tooltip="Specify if the control polygon should be created"/>
+        <boolvalue id="Auxiliary"
+                   label="Auxiliary"
+                   default="false"
+                   tooltip="Construction element"
+                   obligatory="0"
+                   change_visual_attributes="true"/>
+      </feature>
+
+      <!-- SketchMacroBSplinePeriodic -->
+      <feature id="SketchMacroBSplinePeriodic"
+               title="Periodic B-spline"
+               tooltip="Create periodic B-spline curve"
+               icon="icons/Sketch/bspline_p.png"
                helpfile="bsplineFeature.html">
         <sketch-bspline_selector id="poles"
                                  weights="weights"

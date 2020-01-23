@@ -17,7 +17,7 @@
 // See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 
-#include <SketchPlugin_BSpline.h>
+#include <SketchPlugin_BSplinePeriodic.h>
 #include <SketchPlugin_Sketch.h>
 
 #include <GeomAlgoAPI_EdgeBuilder.h>
@@ -35,16 +35,13 @@
 #include <ModelAPI_Validator.h>
 
 
-SketchPlugin_BSpline::SketchPlugin_BSpline()
+SketchPlugin_BSplinePeriodic::SketchPlugin_BSplinePeriodic()
   : SketchPlugin_SketchEntity()
 {
 }
 
-void SketchPlugin_BSpline::initDerivedClassAttributes()
+void SketchPlugin_BSplinePeriodic::initDerivedClassAttributes()
 {
-  data()->addAttribute(START_ID(), GeomDataAPI_Point2D::typeId());
-  data()->addAttribute(END_ID(), GeomDataAPI_Point2D::typeId());
-
   data()->addAttribute(POLES_ID(), GeomDataAPI_Point2DArray::typeId());
   data()->addAttribute(WEIGHTS_ID(), ModelAPI_AttributeDoubleArray::typeId());
   data()->addAttribute(KNOTS_ID(), ModelAPI_AttributeDoubleArray::typeId());
@@ -55,7 +52,7 @@ void SketchPlugin_BSpline::initDerivedClassAttributes()
   ModelAPI_Session::get()->validators()->registerNotObligatory(getKind(), EXTERNAL_ID());
 }
 
-void SketchPlugin_BSpline::execute()
+void SketchPlugin_BSplinePeriodic::execute()
 {
   SketchPlugin_Sketch* aSketch = sketch();
   if(!aSketch) {
@@ -90,7 +87,7 @@ void SketchPlugin_BSpline::execute()
 
   // create result non-periodic B-spline curve
   GeomShapePtr anEdge = GeomAlgoAPI_EdgeBuilder::bsplineOnPlane(aSketch->coordinatePlane(),
-      aPoles2D, aWeights, aKnots, aMults, aDegreeAttr->value(), false);
+      aPoles2D, aWeights, aKnots, aMults, aDegreeAttr->value(), true);
 
   ResultConstructionPtr aResult = document()->createConstruction(data(), 0);
   aResult->setShape(anEdge);
@@ -98,11 +95,11 @@ void SketchPlugin_BSpline::execute()
   setResult(aResult, 0);
 }
 
-bool SketchPlugin_BSpline::isFixed() {
+bool SketchPlugin_BSplinePeriodic::isFixed() {
   return data()->selection(EXTERNAL_ID())->context().get() != NULL;
 }
 
-void SketchPlugin_BSpline::attributeChanged(const std::string& theID) {
+void SketchPlugin_BSplinePeriodic::attributeChanged(const std::string& theID) {
   // the second condition for unability to move external segments anywhere
   if (theID == EXTERNAL_ID() || isFixed()) {
     std::shared_ptr<GeomAPI_Shape> aSelection = data()->selection(EXTERNAL_ID())->value();
@@ -151,13 +148,5 @@ void SketchPlugin_BSpline::attributeChanged(const std::string& theID) {
 ////
 ////      fillCharacteristicPoints();
 ////    }
-  }
-  else if (theID == POLES_ID()) {
-    AttributePoint2DArrayPtr aPolesArray =
-        std::dynamic_pointer_cast<GeomDataAPI_Point2DArray>(attribute(POLES_ID()));
-    std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
-        attribute(START_ID()))->setValue(aPolesArray->pnt(0));
-    std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
-        attribute(END_ID()))->setValue(aPolesArray->pnt(aPolesArray->size() - 1));
   }
 }

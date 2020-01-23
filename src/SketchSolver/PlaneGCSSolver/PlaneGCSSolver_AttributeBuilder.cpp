@@ -33,6 +33,7 @@
 #include <ModelAPI_AttributeDoubleArray.h>
 #include <ModelAPI_AttributeInteger.h>
 #include <SketchPlugin_BSpline.h>
+#include <SketchPlugin_BSplinePeriodic.h>
 #include <SketchPlugin_ConstraintAngle.h>
 #include <SketchPlugin_MultiRotation.h>
 
@@ -88,8 +89,10 @@ static EntityWrapperPtr createScalar(const AttributePtr&     theAttribute,
      (theAttribute->id() == SketchPlugin_MultiRotation::ANGLE_ID() &&
       anOwner->getKind() == SketchPlugin_MultiRotation::ID()))
     aWrapper = ScalarWrapperPtr(new PlaneGCSSolver_AngleWrapper(createParameter(theStorage)));
-  else if (anOwner->getKind() == SketchPlugin_BSpline::ID() &&
-           theAttribute->id() == SketchPlugin_BSpline::DEGREE_ID())
+  else if ((anOwner->getKind() == SketchPlugin_BSpline::ID() &&
+            theAttribute->id() == SketchPlugin_BSpline::DEGREE_ID()) ||
+           (anOwner->getKind() == SketchPlugin_BSplinePeriodic::ID() &&
+            theAttribute->id() == SketchPlugin_BSplinePeriodic::DEGREE_ID()))
     // Degree of B-spline is not processed by the solver
     aWrapper = ScalarWrapperPtr(new PlaneGCSSolver_ScalarWrapper(createParameter(nullptr)));
   else
@@ -97,6 +100,13 @@ static EntityWrapperPtr createScalar(const AttributePtr&     theAttribute,
 
   aWrapper->setValue(aValue);
   return aWrapper;
+}
+
+template <typename TYPE>
+static bool nonSolverAttribute(const FeaturePtr theOwner, const std::string& theAttrId)
+{
+  return theOwner->getKind() == TYPE::ID() && (theAttrId == TYPE::WEIGHTS_ID()
+      || theAttrId == TYPE::KNOTS_ID() || theAttrId == TYPE::MULTS_ID());
 }
 
 static EntityWrapperPtr createScalarArray(const AttributePtr&     theAttribute,
@@ -110,10 +120,8 @@ static EntityWrapperPtr createScalarArray(const AttributePtr&     theAttribute,
   PlaneGCSSolver_Storage* aStorage = theStorage;
   // Weights, knots and multiplicities of B-spline curve are not processed by the solver
   FeaturePtr anOwner = ModelAPI_Feature::feature(theAttribute->owner());
-  if (anOwner->getKind() == SketchPlugin_BSpline::ID() &&
-      (theAttribute->id() == SketchPlugin_BSpline::WEIGHTS_ID() ||
-       theAttribute->id() == SketchPlugin_BSpline::KNOTS_ID() ||
-       theAttribute->id() == SketchPlugin_BSpline::MULTS_ID()))
+  if (nonSolverAttribute<SketchPlugin_BSpline>(anOwner, theAttribute->id()) ||
+      nonSolverAttribute<SketchPlugin_BSplinePeriodic>(anOwner, theAttribute->id()))
     aStorage = 0;
 
   int aSize = anArray.size();

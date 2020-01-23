@@ -25,6 +25,7 @@
 #include <SketchPlugin_Circle.h>
 #include <SketchPlugin_Arc.h>
 #include <SketchPlugin_BSpline.h>
+#include <SketchPlugin_BSplinePeriodic.h>
 #include <SketchPlugin_Projection.h>
 #include <SketchPlugin_ConstraintAngle.h>
 #include <SketchPlugin_ConstraintCoincidence.h>
@@ -207,6 +208,8 @@ FeaturePtr SketchPlugin_Plugin::createFeature(std::string theFeatureID)
     return FeaturePtr(new SketchPlugin_Arc);
   } else if (theFeatureID == SketchPlugin_BSpline::ID()) {
     return FeaturePtr(new SketchPlugin_BSpline);
+  } else if (theFeatureID == SketchPlugin_BSplinePeriodic::ID()) {
+    return FeaturePtr(new SketchPlugin_BSplinePeriodic);
   } else if (theFeatureID == SketchPlugin_Projection::ID()) {
     return FeaturePtr(new SketchPlugin_Projection);
   } else if (theFeatureID == SketchPlugin_ConstraintCoincidence::ID()) {
@@ -259,6 +262,8 @@ FeaturePtr SketchPlugin_Plugin::createFeature(std::string theFeatureID)
     return FeaturePtr(new SketchPlugin_MacroArc);
   } else if (theFeatureID == SketchPlugin_MacroBSpline::ID()) {
     return FeaturePtr(new SketchPlugin_MacroBSpline);
+  } else if (theFeatureID == SketchPlugin_MacroBSplinePeriodic::ID()) {
+    return FeaturePtr(new SketchPlugin_MacroBSplinePeriodic);
   } else if (theFeatureID == SketchPlugin_MacroCircle::ID()) {
     return FeaturePtr(new SketchPlugin_MacroCircle);
   } else if (theFeatureID == SketchPlugin_Ellipse::ID()) {
@@ -315,6 +320,7 @@ std::shared_ptr<ModelAPI_FeatureStateMessage> SketchPlugin_Plugin
       aMsg->setState(SketchPlugin_Circle::ID(), aHasSketchPlane);
       aMsg->setState(SketchPlugin_Arc::ID(), aHasSketchPlane);
       aMsg->setState(SketchPlugin_BSpline::ID(), aHasSketchPlane);
+      aMsg->setState(SketchPlugin_BSplinePeriodic::ID(), aHasSketchPlane);
       aMsg->setState(SketchPlugin_Ellipse::ID(), aHasSketchPlane);
       aMsg->setState(SketchPlugin_EllipticArc::ID(), aHasSketchPlane);
       aMsg->setState(SketchPlugin_Projection::ID(), aHasSketchPlane);
@@ -341,6 +347,7 @@ std::shared_ptr<ModelAPI_FeatureStateMessage> SketchPlugin_Plugin
       aMsg->setState(SketchPlugin_Trim::ID(), aHasSketchPlane);
       aMsg->setState(SketchPlugin_MacroArc::ID(), aHasSketchPlane);
       aMsg->setState(SketchPlugin_MacroBSpline::ID(), aHasSketchPlane);
+      aMsg->setState(SketchPlugin_MacroBSplinePeriodic::ID(), aHasSketchPlane);
       aMsg->setState(SketchPlugin_MacroCircle::ID(), aHasSketchPlane);
       aMsg->setState(SketchPlugin_MacroEllipse::ID(), aHasSketchPlane);
       aMsg->setState(SketchPlugin_MacroEllipticArc::ID(), aHasSketchPlane);
