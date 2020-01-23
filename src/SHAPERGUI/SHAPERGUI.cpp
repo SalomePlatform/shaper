@@ -415,6 +415,14 @@ bool SHAPERGUI::deactivateModule(SUIT_Study* theStudy)
     //}
     myWorkshop->displayer()->setSelectionColor(myOldSelectionColor);
     myProxyViewer->setSelector(0);
+
+    LightApp_SelectionMgr* aMgr = getApp()->selectionMgr();
+    QList<SUIT_Selector*> aList;
+    aMgr->selectors(aList);
+    foreach(SUIT_Selector* aSel, aList) {
+      aSel->setEnabled(aSel != mySelector);
+    }
+
     delete mySelector;
     mySelector = 0;
   }
