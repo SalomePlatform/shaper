@@ -68,10 +68,4 @@
   #include <memory>
   #include <string>
 
-  template<class T1, class T2>
-  std::shared_ptr<T1> shared_ptr_cast(std::shared_ptr<T2> theObject)
-  {
-    return std::dynamic_pointer_cast<T1>(theObject);
-  }
-
 #endif /* SRC_MODELAPI_MODELAPI_SWIG_H_ */

@@ -261,6 +261,7 @@ ADD_UNIT_TESTS(
   TestConstraintRadius.py
   TestConstraintRadiusFailure.py
   TestConstraintTangent.py
+  TestConstraintTangentBSpline.py
   TestConstraintTangentEllipse.py
   TestConstraintTangentEllipticArc.py
   TestConstraintVertical.py

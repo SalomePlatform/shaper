@@ -106,6 +106,8 @@ namespace PlaneGCSSolver_Tools
   bool updateValue(const double& theSource, double& theDest,
                    const double theTolerance = 1.e-4 * tolerance);
 
+  double distance(const GCS::Point& thePnt1, const GCS::Point& thePnt2);
+
   /// \brief Provide an interface to access values in attribute which is an array of values
   class AttributeArray
   {

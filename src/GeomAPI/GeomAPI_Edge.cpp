@@ -307,13 +307,26 @@ bool GeomAPI_Edge::isEqual(const std::shared_ptr<GeomAPI_Shape> theEdge) const
   return true;
 }
 
-// LCOV_EXCL_START
+void GeomAPI_Edge::setRange(const double& theFirst, const double& theLast)
+{
+  TopoDS_Edge anEdge = impl<TopoDS_Edge>();
+  double aFirst, aLast;
+  Handle(Geom_Curve) aCurve = BRep_Tool::Curve(anEdge, aFirst, aLast);
+  double aTolerance = BRep_Tool::Tolerance(anEdge);
+  if (aCurve->DynamicType() == STANDARD_TYPE(Geom_TrimmedCurve)) {
+    aCurve = Handle(Geom_TrimmedCurve)::DownCast(aCurve)->BasisCurve();
+    BRep_Builder().UpdateEdge(anEdge, aCurve, aTolerance);
+  }
+  BRep_Builder().Range(anEdge, theFirst, theLast);
+}
+
 void GeomAPI_Edge::getRange(double& theFirst, double& theLast) const
 {
   const TopoDS_Shape& aShape = const_cast<GeomAPI_Edge*>(this)->impl<TopoDS_Shape>();
   Handle(Geom_Curve) aCurve = BRep_Tool::Curve((const TopoDS_Edge&)aShape, theFirst, theLast);
 }
 
+// LCOV_EXCL_START
 bool GeomAPI_Edge::isInPlane(std::shared_ptr<GeomAPI_Pln> thePlane) const
 {
   double aFirst, aLast;

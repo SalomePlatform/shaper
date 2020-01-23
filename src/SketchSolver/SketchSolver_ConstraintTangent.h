@@ -40,6 +40,11 @@ public:
   virtual void notify(const FeaturePtr&      theFeature,
                       PlaneGCSSolver_Update* theUpdater);
 
+  /// \brief Tries to remove constraint
+  /// \return \c false, if current constraint contains another SketchPlugin constraints
+  /// (like for multiple coincidence)
+  virtual bool remove();
+
 protected:
   /// \brief Converts SketchPlugin constraint to a list of solver constraints
   virtual void process();
@@ -56,6 +61,7 @@ private:
   double myCurveCurveAngle;
   AttributePtr mySharedPoint;
   EntityWrapperPtr myAuxPoint;
+  ScalarWrapperPtr myAuxParameters[2];
 };
 
 #endif

@@ -60,6 +60,18 @@ public:
   /// Multiplicities of the knots
   GEOMAPI_EXPORT std::list<int> mults() const;
 
+  /// \brief Computes the parameter of a given point on a circle. The point must be
+  ///        located either on the circle itself or relatively to the latter
+  ///        at a distance less than the tolerance value. Return FALSE if the point
+  ///        is beyond the tolerance limit or if computation fails.
+  ///        Max Tolerance value is currently limited to 1.e-4
+  /// \param[in] thePoint point of origin.
+  /// \param[in] theTolerance tolerance of computation.
+  /// \param[out] theParameter resulting parameter.
+  GEOMAPI_EXPORT const bool parameter(const std::shared_ptr<GeomAPI_Pnt2d> thePoint,
+                                      const double theTolerance,
+                                      double& theParameter) const;
+
   /// \brief Calculate point on B-spline curve accrding to the given parameter
   GEOMAPI_EXPORT void D0(const double theU, std::shared_ptr<GeomAPI_Pnt2d>& thePoint);
 

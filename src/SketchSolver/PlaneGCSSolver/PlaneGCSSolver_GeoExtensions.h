@@ -34,6 +34,7 @@ namespace GCS {
   {
   public:
     virtual DeriVector2 Value(double u, double du, double* derivparam = 0);
+    virtual DeriVector2 CalculateNormal(Point &p, double* derivparam = 0);
 
     virtual BSplineImpl* Copy();
 

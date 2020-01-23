@@ -105,16 +105,17 @@
   }
 }
 
-%typemap(in) double & (double temp) {
-  if (PyLong_Check($input)) {
-    temp = PyLong_AsLong($input);
-    $1 = &temp;
-  }
+%typemap(in, numinputs=0) double & (double temp) {
+  $1 = &temp;
 }
 
 %typemap(argout) double & {
-  $result = PyFloat_FromDouble(*$1);
+  $result = SWIG_Python_AppendOutput($result, PyFloat_FromDouble(*$1));
 }
+
+// std::dynamic_pointer_cast
+template<class T1, class T2> std::shared_ptr<T1> shared_ptr_cast(std::shared_ptr<T2> theObject);
+%template(shapeToEdge) shared_ptr_cast<GeomAPI_Edge, GeomAPI_Shape>;
 
 
 // all supported interfaces

@@ -22,6 +22,9 @@
 #include <GeomAPI_XY.h>
 
 #include <Geom2d_BSplineCurve.hxx>
+#include <Geom2dAPI_ProjectPointOnCurve.hxx>
+#include <GeomLib_Tool.hxx>
+#include <Precision.hxx>
 
 #define MY_BSPLINE (*(implPtr<Handle_Geom2d_BSplineCurve>()))
 
@@ -154,6 +157,14 @@ std::list<int> GeomAPI_BSpline2d::mults() const
 {
   const TColStd_Array1OfInteger& aBSplMults = MY_BSPLINE->Multiplicities();
   return std::list<int>(aBSplMults.begin(), aBSplMults.end());
+}
+
+const bool GeomAPI_BSpline2d::parameter(const std::shared_ptr<GeomAPI_Pnt2d> thePoint,
+                                        const double theTolerance,
+                                        double& theParameter) const
+{
+  return GeomLib_Tool::Parameter(MY_BSPLINE, thePoint->impl<gp_Pnt2d>(),
+                                 theTolerance, theParameter) == Standard_True;
 }
 
 void GeomAPI_BSpline2d::D0(const double theU, std::shared_ptr<GeomAPI_Pnt2d>& thePoint)

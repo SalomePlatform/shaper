@@ -150,9 +150,6 @@ static GCS::SET_pD ellipseParameters(const EdgeWrapperPtr& theEllipse);
 static GCS::SET_pD ellipticArcParameters(const EdgeWrapperPtr& theEllipticArc);
 static GCS::SET_pD bsplineParameters(const EdgeWrapperPtr& theEdge);
 
-static double distance(const GCS::Point& thePnt1, const GCS::Point& thePnt2);
-
-
 
 
 
@@ -502,6 +499,13 @@ bool PlaneGCSSolver_Tools::updateValue(const double& theSource, double& theDest,
 }
 
 
+double PlaneGCSSolver_Tools::distance(const GCS::Point& thePnt1, const GCS::Point& thePnt2)
+{
+  double x = *thePnt1.x - *thePnt2.x;
+  double y = *thePnt1.y - *thePnt2.y;
+  return sqrt(x*x + y*y);
+}
+
 
 
 
@@ -828,7 +832,7 @@ ConstraintWrapperPtr createConstraintEqual(
     aConstrList.push_back(GCSConstraintPtr(
         new GCS::ConstraintP2PDistance(aLine2->p1, aLine2->p2, theIntermed->scalar())));
     // update value of intermediate parameter
-    theIntermed->setValue(distance(aLine1->p1, aLine1->p2));
+    theIntermed->setValue(PlaneGCSSolver_Tools::distance(aLine1->p1, aLine1->p2));
   }
   else if (theType == CONSTRAINT_EQUAL_ELLIPSES) {
     std::shared_ptr<GCS::Ellipse> anEllipse1 =
@@ -843,7 +847,7 @@ ConstraintWrapperPtr createConstraintEqual(
     aConstrList.push_back(GCSConstraintPtr(new GCS::ConstraintP2PDistance(
         anEllipse2->center, anEllipse2->focus1, theIntermed->scalar())));
     // update value of intermediate parameter
-    theIntermed->setValue(distance(anEllipse1->center, anEllipse1->focus1));
+    theIntermed->setValue(PlaneGCSSolver_Tools::distance(anEllipse1->center, anEllipse1->focus1));
   }
   else {
     std::shared_ptr<GCS::Circle> aCirc1 =
@@ -971,11 +975,4 @@ GCS::SET_pD bsplineParameters(const EdgeWrapperPtr& theEdge)
     aParams.insert(*it);
 
   return aParams;
-}
-
-double distance(const GCS::Point& thePnt1, const GCS::Point& thePnt2)
-{
-  double x = *thePnt1.x - *thePnt2.x;
-  double y = *thePnt1.y - *thePnt2.y;
-  return sqrt(x*x + y*y);
 }

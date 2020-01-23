@@ -112,8 +112,13 @@ void SketchSolver_ConstraintTangent::rebuild()
   mySharedPoint = AttributePtr();
   if (myAuxPoint) {
     GCS::SET_pD aParams = PlaneGCSSolver_Tools::parameters(myAuxPoint);
+    if (myAuxParameters[0])
+      aParams.insert(myAuxParameters[0]->scalar());
+    if (myAuxParameters[1])
+      aParams.insert(myAuxParameters[1]->scalar());
     aStorage->removeParameters(aParams);
     myAuxPoint = EntityWrapperPtr();
+    myAuxParameters[0] = myAuxParameters[1] = ScalarWrapperPtr();
   }
 
   // Check the quantity of entities of each type and their order (arcs first)
@@ -128,7 +133,7 @@ void SketchSolver_ConstraintTangent::rebuild()
       ++aNbLines;
     else if ((*anEntIt)->type() == ENTITY_ARC || (*anEntIt)->type() == ENTITY_CIRCLE)
       ++aNbCircles;
-    else if ((*anEntIt)->type() == ENTITY_ELLIPSE || (*anEntIt)->type() == ENTITY_ELLIPTIC_ARC)
+    else if ((*anEntIt)->type() == ENTITY_ELLIPSE || (*anEntIt)->type() == ENTITY_ELLIPTIC_ARC || (*anEntIt)->type() == ENTITY_BSPLINE)
       ++aNbEllipses;
   }
 
@@ -179,13 +184,21 @@ void SketchSolver_ConstraintTangent::rebuild()
     myAuxPoint.reset(new PlaneGCSSolver_PointWrapper(aPoint));
     aSharedPointEntity = myAuxPoint;
 
+    // create auxiliary parameters for coincidence with B-spline
+    if (myAttributes.front()->type() == ENTITY_BSPLINE)
+      myAuxParameters[0].reset(new PlaneGCSSolver_ScalarWrapper(aStorage->createParameter()));
+    if (myAttributes.back()->type() == ENTITY_BSPLINE)
+      myAuxParameters[1].reset(new PlaneGCSSolver_ScalarWrapper(aStorage->createParameter()));
+
     // create auxiliary coincident constraints for tangency with ellipse
     EntityWrapperPtr aDummy;
     ConstraintWrapperPtr aCoincidence = PlaneGCSSolver_Tools::createConstraint(ConstraintPtr(),
-        CONSTRAINT_PT_ON_CURVE, aDummy, aSharedPointEntity, aDummy, myAttributes.front(), aDummy);
+        CONSTRAINT_PT_ON_CURVE, myAuxParameters[0],
+        aSharedPointEntity, aDummy, myAttributes.front(), aDummy);
     anAuxConstraints = aCoincidence->constraints();
     aCoincidence = PlaneGCSSolver_Tools::createConstraint(ConstraintPtr(),
-        CONSTRAINT_PT_ON_CURVE, aDummy, aSharedPointEntity, aDummy, myAttributes.back(), aDummy);
+        CONSTRAINT_PT_ON_CURVE, myAuxParameters[1],
+        aSharedPointEntity, aDummy, myAttributes.back(), aDummy);
     anAuxConstraints.insert(anAuxConstraints.end(),
         aCoincidence->constraints().begin(), aCoincidence->constraints().end());
   }
@@ -280,6 +293,24 @@ void SketchSolver_ConstraintTangent::notify(const FeaturePtr&      theFeature,
 
   if (isRebuild)
     rebuild();
+}
+
+bool SketchSolver_ConstraintTangent::remove()
+{
+  if (myAuxPoint) {
+    std::shared_ptr<PlaneGCSSolver_Storage> aStorage =
+        std::dynamic_pointer_cast<PlaneGCSSolver_Storage>(myStorage);
+
+    GCS::SET_pD aParams = PlaneGCSSolver_Tools::parameters(myAuxPoint);
+    if (myAuxParameters[0])
+      aParams.insert(myAuxParameters[0]->scalar());
+    if (myAuxParameters[1])
+      aParams.insert(myAuxParameters[1]->scalar());
+    aStorage->removeParameters(aParams);
+    myAuxPoint = EntityWrapperPtr();
+    myAuxParameters[0] = myAuxParameters[1] = ScalarWrapperPtr();
+  }
+  return SketchSolver_Constraint::remove();
 }
 
 

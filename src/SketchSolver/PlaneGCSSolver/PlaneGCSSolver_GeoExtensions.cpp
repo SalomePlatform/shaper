@@ -18,6 +18,7 @@
 //
 
 #include <PlaneGCSSolver_GeoExtensions.h>
+#include <PlaneGCSSolver_Tools.h>
 
 #include <GeomAPI_BSpline2d.h>
 #include <GeomAPI_Pnt2d.h>
@@ -38,6 +39,35 @@ DeriVector2 BSplineImpl::Value(double u, double du, double* derivparam)
   myCurve->D1(u, aValue, aDeriv);
 
   return DeriVector2(aValue->x(), aValue->y(), aDeriv->x() * du, aDeriv->y() * du);
+}
+
+DeriVector2 BSplineImpl::CalculateNormal(Point &p, double* derivparam)
+{
+  if (!isCacheValid())
+    rebuildCache();
+
+  double u = 0.0;
+  if (!myCurve->parameter(GeomPnt2dPtr(new GeomAPI_Pnt2d(*p.x, *p.y)), 1e100, u)) {
+    // Sometimes OCCT's Extrema algorithm cannot find the parameter on B-spline curve
+    // (usually, if the point is near the curve extremity).
+    // Workaround: compute distance to each boundary point
+    double aDistPS = PlaneGCSSolver_Tools::distance(p, poles.front());
+    double aDistPE = PlaneGCSSolver_Tools::distance(p, poles.back());
+    static const double THE_TOLERANCE = 1.e-6;
+    if (aDistPS < aDistPE && aDistPS < THE_TOLERANCE)
+      u = *knots.front();
+    else if (aDistPE < aDistPS && aDistPE < THE_TOLERANCE)
+      u = *knots.back();
+    else
+      return DeriVector2();
+  }
+
+  std::shared_ptr<GeomAPI_Pnt2d> aValue;
+  std::shared_ptr<GeomAPI_XY> aDeriv;
+  myCurve->D1(u, aValue, aDeriv);
+
+  DeriVector2 norm(aDeriv->x(), aDeriv->y(), 0.0, 0.0);
+  return norm.rotate90ccw();
 }
 
 BSplineImpl* BSplineImpl::Copy()

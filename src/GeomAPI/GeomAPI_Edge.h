@@ -98,6 +98,10 @@ public:
   GEOMAPI_EXPORT
   bool isEqual(const std::shared_ptr<GeomAPI_Shape> theEdge) const;
 
+  /// Change parametric range of the curve
+  GEOMAPI_EXPORT
+  void setRange(const double& theFirst, const double& theLast);
+
   /// Returns range of parameter on the curve
   GEOMAPI_EXPORT
   void getRange(double& theFirst, double& theLast) const;
