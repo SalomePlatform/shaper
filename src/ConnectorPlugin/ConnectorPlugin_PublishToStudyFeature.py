@@ -112,6 +112,7 @@ class PublishToStudyFeature(ModelAPI.ModelAPI_Feature):
         aSOIter = SHAPERSTUDY_utils.getStudy().NewChildIterator(aComponent)
         while aSOIter.More():
           aSO = aSOIter.Value()
+          aSOIter.Next() ### here because there is continue inside the loop!
           anIOR = aSO.GetIOR()
           if len(anIOR):
             anObj = salome.orb.string_to_object(anIOR)
@@ -127,7 +128,6 @@ class PublishToStudyFeature(ModelAPI.ModelAPI_Feature):
                   if aRes:
                     aBuilder = SHAPERSTUDY_utils.getStudy().NewBuilder()
                     aBuilder.RemoveReference(aSO2)
-          aSOIter.Next()
 
     # Part of the "execute" method: processes the Groups of theRes result publication.
     # If theFields is true, the same is performed for Fields.
