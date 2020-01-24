@@ -60,7 +60,15 @@ class Config_Prop
     ShortcutTree,
     BiColor,
     Background,
-    Directory
+    Directory,
+    Cursor
+  };
+
+  enum CursorType
+  {
+    ArrowCursor,
+    CrossCursor,
+    HandCursor
   };
 
   /** 

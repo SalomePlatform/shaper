@@ -851,3 +851,17 @@ double PartSet_Tools::getDefaultTransparency()
 {
   return Config_PropManager::integer("Visualization", "shaper_default_transparency") / 100.;
 }
+
+QCursor PartSet_Tools::getOperationCursor()
+{
+  int aId = Config_PropManager::integer(SKETCH_TAB_NAME, "operation_cursor");
+  switch (aId) {
+  case 0:
+    return QCursor(Qt::ArrowCursor);
+  case 1:
+    return QCursor(Qt::CrossCursor);
+  case 2:
+    return QCursor(Qt::PointingHandCursor);
+  }
+  return QCursor();
+}

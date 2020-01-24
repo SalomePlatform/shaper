@@ -26,6 +26,7 @@
 
 #include <QPoint>
 #include <QList>
+#include <QCursor>
 
 #include <ModelAPI_CompositeFeature.h>
 #include <ModelAPI_Object.h>
@@ -317,6 +318,11 @@ public:
   * Returns default transparency value
   */
   static double getDefaultTransparency();
+
+  /**
+  * Returns cursor according to (SKETCH_TAB_NAME, "operation_cursor") property value
+  */
+  static QCursor getOperationCursor();
 };
 
 #endif
