@@ -204,6 +204,8 @@ void ModuleBase_WidgetFactory::getAttributeTitle(const std::string& theAttribute
       theTitle =
       QString::fromStdString(myWidgetApi->getProperty(CONTAINER_PAGE_NAME)).toStdString().c_str();
   }
+  else
+    theTitle = theAttributeId;
 }
 
 void ModuleBase_WidgetFactory::getGreedAttribute(std::string& theAttributeId)
