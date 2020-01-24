@@ -48,8 +48,8 @@ static Handle_Geom2d_BSplineCurve* newBSpline2d(
     return newBSpline2d(thePoles, theWeights, theDegree, thePeriodic);
 
   int anAuxPole = 0;
-  if (thePeriodic && thePoles.front()->distance(thePoles.back()) > Precision::Confusion())
-    anAuxPole = 1;
+  if (thePeriodic && thePoles.front()->distance(thePoles.back()) < Precision::Confusion())
+    anAuxPole = -1;
 
   // collect arrays of poles, weights, knots and multiplicities
   TColgp_Array1OfPnt2d aPoles(1, (int)thePoles.size() + anAuxPole);
@@ -59,11 +59,11 @@ static Handle_Geom2d_BSplineCurve* newBSpline2d(
 
   int anIndex = 1;
   for (std::list<GeomPnt2dPtr>::const_iterator aPIt = thePoles.begin();
-       aPIt != thePoles.end(); ++aPIt, ++anIndex)
+       aPIt != thePoles.end() && anIndex <= aPoles.Upper(); ++aPIt, ++anIndex)
     aPoles.SetValue(anIndex, gp_Pnt2d((*aPIt)->x(), (*aPIt)->y()));
   anIndex = 1;
   for (std::list<double>::const_iterator aWIt = theWeights.begin();
-       aWIt != theWeights.end(); ++aWIt, ++anIndex)
+       aWIt != theWeights.end() && anIndex <= aWeights.Upper(); ++aWIt, ++anIndex)
     aWeights.SetValue(anIndex, *aWIt);
   anIndex = 1;
   for (std::list<double>::const_iterator aKIt = theKnots.begin();
@@ -73,11 +73,6 @@ static Handle_Geom2d_BSplineCurve* newBSpline2d(
   for (std::list<int>::const_iterator aMIt = theMults.begin();
        aMIt != theMults.end(); ++aMIt, ++anIndex)
     aMults.SetValue(anIndex, *aMIt);
-
-  if (thePeriodic) {
-    aPoles.ChangeLast() = aPoles.First();
-    aWeights.ChangeLast() = aWeights.First();
-  }
 
   Handle(Geom2d_BSplineCurve) aCurve =
       new Geom2d_BSplineCurve(aPoles, aWeights, aKnots, aMults, theDegree, thePeriodic);
@@ -99,8 +94,6 @@ Handle_Geom2d_BSplineCurve* newBSpline2d(
       aPoles.pop_back();
       aWeights.pop_back();
     }
-    aPoles.push_back(aPoles.front());
-    aWeights.push_back(aWeights.front());
     aMult = 1;
     aNbKnots = (int)aPoles.size() + 1;
   }

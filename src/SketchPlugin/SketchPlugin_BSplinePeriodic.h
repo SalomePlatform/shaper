@@ -20,55 +20,19 @@
 #ifndef SketchPlugin_BSplinePeriodic_H_
 #define SketchPlugin_BSplinePeriodic_H_
 
-#include <SketchPlugin.h>
-#include <SketchPlugin_SketchEntity.h>
+#include <SketchPlugin_BSplineBase.h>
 
 /**\class SketchPlugin_BSplinePeriodic
  * \ingroup Plugins
  * \brief Feature for creation of the periodic B-spline curve in the sketch.
  */
-class SketchPlugin_BSplinePeriodic : public SketchPlugin_SketchEntity
+class SketchPlugin_BSplinePeriodic : public SketchPlugin_BSplineBase
 {
 public:
-  /// Ellipse feature kind
+  /// B-spline feature kind
   inline static const std::string& ID()
   {
     static const std::string ID("SketchBSplinePeriodic");
-    return ID;
-  }
-
-  /// list of B-spline poles
-  inline static const std::string& POLES_ID()
-  {
-    static const std::string ID("poles");
-    return ID;
-  }
-
-  /// list of B-spline weights
-  inline static const std::string& WEIGHTS_ID()
-  {
-    static const std::string ID("weights");
-    return ID;
-  }
-
-  /// attribute to store the degree of B-spline
-  inline static const std::string& DEGREE_ID()
-  {
-    static const std::string ID("degree");
-    return ID;
-  }
-
-  /// list of B-spline knots
-  inline static const std::string& KNOTS_ID()
-  {
-    static const std::string ID("knots");
-    return ID;
-  }
-
-  /// list of B-spline multiplicities
-  inline static const std::string& MULTS_ID()
-  {
-    static const std::string ID("multiplicities");
     return ID;
   }
 
@@ -79,21 +43,11 @@ public:
     return MY_KIND;
   }
 
-  /// Returns true is sketch element is under the rigid constraint
-  SKETCHPLUGIN_EXPORT virtual bool isFixed();
-
-  /// Called on change of any argument-attribute of this object
-  SKETCHPLUGIN_EXPORT virtual void attributeChanged(const std::string& theID);
-
-  /// Creates a new part document if needed
-  SKETCHPLUGIN_EXPORT virtual void execute();
-
   /// Use plugin manager for features creation
   SketchPlugin_BSplinePeriodic();
 
 protected:
-  /// \brief Initializes attributes of derived class.
-  virtual void initDerivedClassAttributes();
+  virtual bool isPeriodic() const { return true; }
 };
 
 #endif
