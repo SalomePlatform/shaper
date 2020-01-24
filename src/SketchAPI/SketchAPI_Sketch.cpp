@@ -699,37 +699,29 @@ std::shared_ptr<SketchAPI_EllipticArc> SketchAPI_Sketch::addEllipticArc(
 }
 
 //--------------------------------------------------------------------------------------
-std::shared_ptr<SketchAPI_BSpline> SketchAPI_Sketch::addSpline(
-    const std::list<std::shared_ptr<GeomAPI_Pnt2d> >& thePoles,
-    const std::list<ModelHighAPI_Double>& theWeights)
-{
-  FeaturePtr aFeature = compositeFeature()->addFeature(SketchPlugin_BSpline::ID());
-  return BSplinePtr(new SketchAPI_BSpline(aFeature, thePoles, theWeights));
-}
 
 std::shared_ptr<SketchAPI_BSpline> SketchAPI_Sketch::addSpline(
-    const int theDegree,
-    const std::list<std::shared_ptr<GeomAPI_Pnt2d> >& thePoles,
-    const std::list<ModelHighAPI_Double>& theWeights,
-    const std::list<ModelHighAPI_Double>& theKnots,
-    const std::list<ModelHighAPI_Integer>& theMults)
+    const ModelHighAPI_Selection & external,
+    const int degree,
+    const std::list<std::shared_ptr<GeomAPI_Pnt2d> >& poles,
+    const std::list<ModelHighAPI_Double>& weights,
+    const std::list<ModelHighAPI_Double>& knots,
+    const std::list<ModelHighAPI_Integer>& multiplicities,
+    const bool periodic)
 {
-  FeaturePtr aFeature = compositeFeature()->addFeature(SketchPlugin_BSpline::ID());
-  return BSplinePtr(new SketchAPI_BSpline(aFeature,
-      theDegree, thePoles, theWeights, theKnots, theMults));
-}
+  FeaturePtr aFeature = compositeFeature()->addFeature(
+    periodic ? SketchPlugin_BSplinePeriodic::ID() : SketchPlugin_BSpline::ID());
 
-std::shared_ptr<SketchAPI_BSpline> SketchAPI_Sketch::addSpline(
-    const ModelHighAPI_Selection & theExternal)
-{
-  FeaturePtr aFeature = compositeFeature()->addFeature(SketchPlugin_BSpline::ID());
-  return BSplinePtr(new SketchAPI_BSpline(aFeature, theExternal));
-}
+  BSplinePtr aBSpline(periodic ? new SketchAPI_BSplinePeriodic(aFeature)
+                               : new SketchAPI_BSpline(aFeature));
+  if (external.variantType() != ModelHighAPI_Selection::VT_Empty)
+    aBSpline->setByExternal(external);
+  else if (knots.empty() || multiplicities.empty())
+    aBSpline->setByDegreePolesAndWeights(degree, poles, weights);
+  else
+    aBSpline->setByParameters(degree, poles, weights, knots, multiplicities);
 
-std::shared_ptr<SketchAPI_BSpline> SketchAPI_Sketch::addSpline(const std::string & theExternalName)
-{
-  FeaturePtr aFeature = compositeFeature()->addFeature(SketchPlugin_BSpline::ID());
-  return BSplinePtr(new SketchAPI_BSpline(aFeature, theExternalName));
+  return aBSpline;
 }
 
 //--------------------------------------------------------------------------------------
@@ -1250,7 +1242,8 @@ static std::shared_ptr<GeomAPI_Pnt2d> middlePoint(const ObjectPtr& theObject,
       aMiddlePoint = pointOnEllipse(aFeature);
     else if (aFeatureKind == SketchPlugin_EllipticArc::ID())
       aMiddlePoint = pointOnEllipse(aFeature, false);
-    else if (aFeatureKind == SketchPlugin_BSpline::ID())
+    else if (aFeatureKind == SketchPlugin_BSpline::ID() ||
+             aFeatureKind == SketchPlugin_BSplinePeriodic::ID())
       aMiddlePoint = middlePointOnBSpline(aFeature, theSketch);
   }
   return aMiddlePoint;

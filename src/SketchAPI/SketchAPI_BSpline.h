@@ -28,6 +28,7 @@
 #include <ModelAPI_AttributeDoubleArray.h>
 
 #include <SketchPlugin_BSpline.h>
+#include <SketchPlugin_BSplinePeriodic.h>
 
 #include <ModelHighAPI_Double.h>
 #include <ModelHighAPI_Integer.h>
@@ -44,51 +45,26 @@ public:
   SKETCHAPI_EXPORT
   explicit SketchAPI_BSpline(const std::shared_ptr<ModelAPI_Feature>& theFeature);
 
-  /// Constructor with values.
-  SKETCHAPI_EXPORT SketchAPI_BSpline(
-      const std::shared_ptr<ModelAPI_Feature>& theFeature,
-      const std::list<std::shared_ptr<GeomAPI_Pnt2d> >& thePoles,
-      const std::list<ModelHighAPI_Double>& theWeights = std::list<ModelHighAPI_Double>());
-
-  /// Constructor with values.
-  SKETCHAPI_EXPORT SketchAPI_BSpline(
-      const std::shared_ptr<ModelAPI_Feature>& theFeature,
-      const int theDegree,
-      const std::list<std::shared_ptr<GeomAPI_Pnt2d> >& thePoles,
-      const std::list<ModelHighAPI_Double>& theWeights = std::list<ModelHighAPI_Double>(),
-      const std::list<ModelHighAPI_Double>& theKnots = std::list<ModelHighAPI_Double>(),
-      const std::list<ModelHighAPI_Integer>& theMults = std::list<ModelHighAPI_Integer>());
-
-  /// Constructor with external.
-  SKETCHAPI_EXPORT
-  SketchAPI_BSpline(const std::shared_ptr<ModelAPI_Feature>& theFeature,
-                    const ModelHighAPI_Selection& theExternal);
-
-  /// Constructor with external.
-  SKETCHAPI_EXPORT
-  SketchAPI_BSpline(const std::shared_ptr<ModelAPI_Feature>& theFeature,
-                    const std::string& theExternalName);
-
   /// Destructor.
   SKETCHAPI_EXPORT
   virtual ~SketchAPI_BSpline();
 
   INTERFACE_8(SketchPlugin_BSpline::ID(),
-              poles, SketchPlugin_BSpline::POLES_ID(),
+              poles, SketchPlugin_BSplineBase::POLES_ID(),
               GeomDataAPI_Point2DArray, /** B-spline poles */,
-              weights, SketchPlugin_BSpline::WEIGHTS_ID(),
+              weights, SketchPlugin_BSplineBase::WEIGHTS_ID(),
               ModelAPI_AttributeDoubleArray, /** B-spline weights */,
-              knots, SketchPlugin_BSpline::KNOTS_ID(),
+              knots, SketchPlugin_BSplineBase::KNOTS_ID(),
               ModelAPI_AttributeDoubleArray, /** B-spline knots */,
-              multiplicities, SketchPlugin_BSpline::MULTS_ID(),
+              multiplicities, SketchPlugin_BSplineBase::MULTS_ID(),
               ModelAPI_AttributeIntArray, /** Knots multiplicities */,
-              degree, SketchPlugin_BSpline::DEGREE_ID(),
+              degree, SketchPlugin_BSplineBase::DEGREE_ID(),
               ModelAPI_AttributeInteger, /** B-spline degree */,
               startPoint, SketchPlugin_BSpline::START_ID(),
               GeomDataAPI_Point2D, /** First pole of B-spline */,
               endPoint, SketchPlugin_BSpline::END_ID(),
               GeomDataAPI_Point2D, /** Last pole of B-spline */,
-              external, SketchPlugin_BSpline::EXTERNAL_ID(),
+              external, SketchPlugin_BSplineBase::EXTERNAL_ID(),
               ModelAPI_AttributeSelection, /** External */)
 
   /// Set by poles and weights.
@@ -109,10 +85,6 @@ public:
   SKETCHAPI_EXPORT
   void setByExternal(const ModelHighAPI_Selection& theExternal);
 
-  /// Set by external name.
-  SKETCHAPI_EXPORT
-  void setByExternalName(const std::string& theExternalName);
-
   /// Generate list of construction points coincident with B-spline poles
   SKETCHAPI_EXPORT
   std::list<std::shared_ptr<SketchAPI_SketchEntity> > controlPoles(
@@ -128,6 +100,9 @@ public:
   /// Dump wrapped feature
   SKETCHAPI_EXPORT
   virtual void dump(ModelHighAPI_Dumper& theDumper) const;
+
+protected:
+  SketchAPI_BSpline(const std::shared_ptr<ModelAPI_Feature>& theFeature, bool theInitialize);
 
 private:
   /// Initialize start and end points of B-spline and apply internal coincidence
@@ -155,5 +130,25 @@ private:
 
 /// Pointer on B-spline object.
 typedef std::shared_ptr<SketchAPI_BSpline> BSplinePtr;
+
+
+
+/// \class SketchAPI_BSplinePeriodic
+/// \ingroup CPPHighAPI
+/// \brief Interface for BSplinePeriodic feature.
+class SketchAPI_BSplinePeriodic : public SketchAPI_BSpline
+{
+public:
+  /// Constructor without values.
+  SKETCHAPI_EXPORT
+  explicit SketchAPI_BSplinePeriodic(const std::shared_ptr<ModelAPI_Feature>& theFeature);
+
+  /// Destructor.
+  SKETCHAPI_EXPORT
+  virtual ~SketchAPI_BSplinePeriodic() {}
+
+  static std::string ID() { return SketchPlugin_BSplinePeriodic::ID(); }
+  virtual std::string getID() { return SketchPlugin_BSplinePeriodic::ID(); }
+};
 
 #endif // SketchAPI_BSpline_H_

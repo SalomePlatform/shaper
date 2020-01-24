@@ -89,10 +89,9 @@ static EntityWrapperPtr createScalar(const AttributePtr&     theAttribute,
      (theAttribute->id() == SketchPlugin_MultiRotation::ANGLE_ID() &&
       anOwner->getKind() == SketchPlugin_MultiRotation::ID()))
     aWrapper = ScalarWrapperPtr(new PlaneGCSSolver_AngleWrapper(createParameter(theStorage)));
-  else if ((anOwner->getKind() == SketchPlugin_BSpline::ID() &&
-            theAttribute->id() == SketchPlugin_BSpline::DEGREE_ID()) ||
-           (anOwner->getKind() == SketchPlugin_BSplinePeriodic::ID() &&
-            theAttribute->id() == SketchPlugin_BSplinePeriodic::DEGREE_ID()))
+  else if ((anOwner->getKind() == SketchPlugin_BSpline::ID() ||
+            anOwner->getKind() == SketchPlugin_BSplinePeriodic::ID()) &&
+           theAttribute->id() == SketchPlugin_BSplineBase::DEGREE_ID())
     // Degree of B-spline is not processed by the solver
     aWrapper = ScalarWrapperPtr(new PlaneGCSSolver_ScalarWrapper(createParameter(nullptr)));
   else

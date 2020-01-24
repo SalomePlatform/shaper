@@ -49,6 +49,7 @@
 %feature("kwargs") SketchAPI_BSpline::controlPolygon;
 %feature("kwargs") SketchAPI_Ellipse::construction;
 %feature("kwargs") SketchAPI_EllipticArc::construction;
+%feature("kwargs") SketchAPI_Sketch::addSpline;
 %feature("kwargs") SketchAPI_Sketch::setAngle;
 
 // shared pointers
@@ -61,6 +62,7 @@
 %shared_ptr(SketchAPI_EllipticArc)
 %shared_ptr(SketchAPI_MacroEllipticArc)
 %shared_ptr(SketchAPI_BSpline)
+%shared_ptr(SketchAPI_BSplinePeriodic)
 %shared_ptr(SketchAPI_Constraint)
 %shared_ptr(SketchAPI_ConstraintAngle)
 %shared_ptr(SketchAPI_IntersectionPoint)

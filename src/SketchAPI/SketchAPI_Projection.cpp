@@ -21,6 +21,7 @@
 
 #include <SketchPlugin_Line.h>
 #include <SketchPlugin_BSpline.h>
+#include <SketchPlugin_BSplinePeriodic.h>
 #include <SketchPlugin_Circle.h>
 #include <SketchPlugin_Ellipse.h>
 #include <SketchPlugin_EllipticArc.h>
@@ -112,6 +113,8 @@ std::shared_ptr<SketchAPI_SketchEntity> SketchAPI_Projection::createdFeature() c
     anEntity.reset(new SketchAPI_EllipticArc(aProjectedFeature));
   else if (aProjectedFeature->getKind() == SketchPlugin_BSpline::ID())
     anEntity.reset(new SketchAPI_BSpline(aProjectedFeature));
+  else if (aProjectedFeature->getKind() == SketchPlugin_BSplinePeriodic::ID())
+    anEntity.reset(new SketchAPI_BSplinePeriodic(aProjectedFeature));
   else if (aProjectedFeature->getKind() == SketchPlugin_Point::ID())
     anEntity.reset(new SketchAPI_Point(aProjectedFeature));
 

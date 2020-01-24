@@ -44,47 +44,11 @@ SketchAPI_BSpline::SketchAPI_BSpline(const std::shared_ptr<ModelAPI_Feature> & t
 }
 
 SketchAPI_BSpline::SketchAPI_BSpline(const std::shared_ptr<ModelAPI_Feature>& theFeature,
-                                     const std::list<GeomPnt2dPtr>& thePoles,
-                                     const std::list<ModelHighAPI_Double>& theWeights)
+                                     bool theInitialize)
   : SketchAPI_SketchEntity(theFeature)
 {
-  if (initialize()) {
-    setByDegreePolesAndWeights(ModelHighAPI_Integer(-1), thePoles, theWeights);
-  }
-}
-
-SketchAPI_BSpline::SketchAPI_BSpline(const std::shared_ptr<ModelAPI_Feature>& theFeature,
-                                     const int theDegree,
-                                     const std::list<GeomPnt2dPtr>& thePoles,
-                                     const std::list<ModelHighAPI_Double>& theWeights,
-                                     const std::list<ModelHighAPI_Double>& theKnots,
-                                     const std::list<ModelHighAPI_Integer>& theMults)
-  : SketchAPI_SketchEntity(theFeature)
-{
-  if (initialize()) {
-    if (theKnots.empty() || theMults.empty())
-      setByDegreePolesAndWeights(theDegree, thePoles, theWeights);
-    else
-      setByParameters(theDegree, thePoles, theWeights, theKnots, theMults);
-  }
-}
-
-SketchAPI_BSpline::SketchAPI_BSpline(const std::shared_ptr<ModelAPI_Feature>& theFeature,
-                                     const ModelHighAPI_Selection& theExternal)
-  : SketchAPI_SketchEntity(theFeature)
-{
-  if (initialize()) {
-    setByExternal(theExternal);
-  }
-}
-
-SketchAPI_BSpline::SketchAPI_BSpline(const std::shared_ptr<ModelAPI_Feature>& theFeature,
-                                     const std::string& theExternalName)
-  : SketchAPI_SketchEntity(theFeature)
-{
-  if (initialize()) {
-    setByExternalName(theExternalName);
-  }
+  if (theInitialize)
+    initialize();
 }
 
 SketchAPI_BSpline::~SketchAPI_BSpline()
@@ -133,7 +97,8 @@ void SketchAPI_BSpline::setByParameters(const ModelHighAPI_Integer& theDegree,
   fillAttribute(theKnots, knots());
   fillAttribute(theMults, multiplicities());
 
-  setStartAndEndPoints();
+  if (feature()->getKind() != SketchPlugin_BSplinePeriodic::ID())
+    setStartAndEndPoints();
   execute();
 }
 
@@ -146,12 +111,6 @@ void SketchAPI_BSpline::setStartAndEndPoints()
 void SketchAPI_BSpline::setByExternal(const ModelHighAPI_Selection & theExternal)
 {
   fillAttribute(theExternal, external());
-  execute();
-}
-
-void SketchAPI_BSpline::setByExternalName(const std::string & theExternalName)
-{
-  fillAttribute(ModelHighAPI_Selection("EDGE", theExternalName), external());
   execute();
 }
 
@@ -212,8 +171,9 @@ static void createSegment(const CompositeFeaturePtr& theSketch,
                           const bool theAuxiliary,
                           std::list<FeaturePtr>& theEntities)
 {
+  int aEndPoleIndex = (theStartPoleIndex + 1) % thePoles->size();
   GeomPnt2dPtr aStartPoint = thePoles->pnt(theStartPoleIndex);
-  GeomPnt2dPtr aEndPoint = thePoles->pnt(theStartPoleIndex + 1);
+  GeomPnt2dPtr aEndPoint = thePoles->pnt(aEndPoleIndex);
 
   FeaturePtr aLineFeature = theSketch->addFeature(SketchPlugin_Line::ID());
   AttributePoint2DPtr aLineStart = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
@@ -226,14 +186,14 @@ static void createSegment(const CompositeFeaturePtr& theSketch,
   aLineFeature->execute();
 
   std::ostringstream aName;
-  aName << theBSpline->name() << "_segment_" << theStartPoleIndex << "_" << theStartPoleIndex + 1;
+  aName << theBSpline->name() << "_segment_" << theStartPoleIndex << "_" << aEndPoleIndex;
   aLineFeature->data()->setName(aName.str());
   aLineFeature->lastResult()->data()->setName(aName.str());
 
   aLineFeature->boolean(SketchPlugin_Line::AUXILIARY_ID())->setValue(theAuxiliary);
 
   createInternalConstraint(theSketch, aLineStart, thePoles, theStartPoleIndex);
-  createInternalConstraint(theSketch, aLineEnd, thePoles, theStartPoleIndex + 1);
+  createInternalConstraint(theSketch, aLineEnd, thePoles, aEndPoleIndex);
 
   theEntities.push_back(aLineFeature);
 }
@@ -301,10 +261,13 @@ void SketchAPI_BSpline::getDefaultParameters(
          it != theWeights.end(); ++it)
       aWeights.push_back(it->value());
 
+    bool isPeriodic = feature()->getKind() == SketchPlugin_BSplinePeriodic::ID();
     if (theDegree.intValue() < 0)
-      aBSplineCurve.reset(new GeomAPI_BSpline2d(thePoles, aWeights));
-    else
-      aBSplineCurve.reset(new GeomAPI_BSpline2d(theDegree.intValue(), thePoles, aWeights));
+      aBSplineCurve.reset(new GeomAPI_BSpline2d(thePoles, aWeights, isPeriodic));
+    else {
+      aBSplineCurve.reset(new GeomAPI_BSpline2d(theDegree.intValue(), thePoles, aWeights,
+                                                std::list<double>(), std::list<int>(), isPeriodic));
+    }
   }
   catch (...) {
     // cannot build a B-spline curve
@@ -441,12 +404,14 @@ void SketchAPI_BSpline::dump(ModelHighAPI_Dumper& theDumper) const
 
     theDumper << aBase << " = " << aSketchName << ".addSpline(";
     if (!isDefaultDegree)
-      theDumper << degree() << ", ";
-    theDumper << poles();
+      theDumper << "degree = " << degree() << ", ";
+    theDumper << "poles = " << poles();
     if (!isDefaultWeights)
-      theDumper << ", " << weights();
+      theDumper << ", weights = " << weights();
     if (!isDefaultKnotsMults)
-      theDumper << ", " << knots() << ", " << multiplicities();
+      theDumper << ", knots = " << knots() << ", multiplicities = " << multiplicities();
+    if (aBase->getKind() == SketchPlugin_BSplinePeriodic::ID())
+      theDumper << ", periodic = True";
     theDumper << ")" << std::endl;
   }
   // dump "auxiliary" flag if necessary
@@ -506,4 +471,13 @@ void SketchAPI_BSpline::dumpControlPolygon(
   if (!anAuxiliary.empty())
     dumpList(theDumper, "auxiliary", anAuxiliary);
   theDumper << ")" << std::endl;
+}
+
+
+
+// =================================================================================================
+SketchAPI_BSplinePeriodic::SketchAPI_BSplinePeriodic(const FeaturePtr& theFeature)
+  : SketchAPI_BSpline(theFeature, false)
+{
+  initialize();
 }

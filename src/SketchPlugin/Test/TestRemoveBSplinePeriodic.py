@@ -18,7 +18,7 @@
 #
 
 """
-    Test removing B-spline curve and its construstion elements
+    Test removing peridoc B-spline curve and its construstion elements
 """
 
 from salome.shaper import model
@@ -27,7 +27,7 @@ from ModelAPI import *
 def assertNbSubs(theSketch, theNbPoints, theNbLines, theNbSplines, theNbInternalConstraints):
     model.testNbSubFeatures(theSketch, "SketchPoint", theNbPoints)
     model.testNbSubFeatures(theSketch, "SketchLine", theNbLines)
-    model.testNbSubFeatures(theSketch, "SketchBSpline", theNbSplines)
+    model.testNbSubFeatures(theSketch, "SketchBSplinePeriodic", theNbSplines)
     model.testNbSubFeatures(theSketch, "SketchConstraintCoincidenceInternal", theNbInternalConstraints)
 
 model.begin()
@@ -36,15 +36,15 @@ Part_1 = model.addPart(partSet)
 Part_1_doc = Part_1.document()
 Sketch_1 = model.addSketch(Part_1_doc, model.defaultPlane("XOY"))
 SketchBSpline_1_poles = [(-30, -10), (-15, 20), (0, -10), (15, 20), (30, -10)]
-SketchBSpline_1 = Sketch_1.addSpline(poles = SketchBSpline_1_poles)
+SketchBSpline_1 = Sketch_1.addSpline(poles = SketchBSpline_1_poles, periodic = True)
 controlPoles = SketchBSpline_1.controlPoles(auxiliary = [0, 1, 2, 3, 4])
-controlLines = SketchBSpline_1.controlPolygon(auxiliary = [0, 1, 2, 3])
+controlLines = SketchBSpline_1.controlPolygon(auxiliary = [0, 1, 2, 3, 4])
 model.do()
 model.end()
 
 DEFAULT_DOF = len(SketchBSpline_1_poles) * 2
 DEFAULT_POINTS = len(SketchBSpline_1_poles)
-DEFAULT_LINES = len(SketchBSpline_1_poles) - 1
+DEFAULT_LINES = len(SketchBSpline_1_poles)
 DEFAULT_BSPLINES = 1
 DEAFULT_INTERNALS = len(controlPoles) + len(controlLines) * 2
 
@@ -91,9 +91,9 @@ model.begin()
 partSet = model.moduleDocument()
 Sketch_2 = model.addSketch(Part_1_doc, model.defaultPlane("XOY"))
 SketchBSpline_2_poles = [(-30, -10), (-15, -40), (0, -10), (15, -40), (30, -10)]
-SketchBSpline_2 = Sketch_2.addSpline(poles = SketchBSpline_2_poles)
+SketchBSpline_2 = Sketch_2.addSpline(poles = SketchBSpline_2_poles, periodic = True)
 controlPoles2 = SketchBSpline_2.controlPoles(auxiliary = [0, 1, 2, 3, 4])
-controlLines2 = SketchBSpline_2.controlPolygon(auxiliary = [0, 1, 2, 3])
+controlLines2 = SketchBSpline_2.controlPolygon(auxiliary = [0, 1, 2, 3, 4])
 model.do()
 model.end()
 

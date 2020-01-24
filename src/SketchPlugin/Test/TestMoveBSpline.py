@@ -40,7 +40,7 @@ class TestMoveBSpline(unittest.TestCase):
                     GeomAPI_Pnt2d(80., 30.),
                     GeomAPI_Pnt2d(50., 10.),
                     GeomAPI_Pnt2d(90., -30.)]
-    self.mySpline = self.mySketch.addSpline(self.myPoles)
+    self.mySpline = self.mySketch.addSpline(poles = self.myPoles)
     self.myDOF = len(self.myPoles) * 2
     model.do()
     self.checkDOF()

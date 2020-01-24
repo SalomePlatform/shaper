@@ -154,35 +154,31 @@ FeaturePtr SketchPlugin_MacroBSpline::createBSplineFeature()
   FeaturePtr aBSpline = sketch()->addFeature(
       myIsPeriodic ? SketchPlugin_BSplinePeriodic::ID() : SketchPlugin_BSpline::ID());
 
-  aBSpline->integer(myIsPeriodic ? SketchPlugin_BSplinePeriodic::DEGREE_ID()
-                                 : SketchPlugin_BSpline::DEGREE_ID())->setValue(myDegree);
+  aBSpline->integer(SketchPlugin_BSplineBase::DEGREE_ID())->setValue(myDegree);
 
   AttributePoint2DArrayPtr aPoles = std::dynamic_pointer_cast<GeomDataAPI_Point2DArray>(
-      aBSpline->attribute(myIsPeriodic ? SketchPlugin_BSplinePeriodic::POLES_ID()
-                                       : SketchPlugin_BSpline::POLES_ID()));
+      aBSpline->attribute(SketchPlugin_BSplineBase::POLES_ID()));
   AttributePoint2DArrayPtr aPolesMacro =
       std::dynamic_pointer_cast<GeomDataAPI_Point2DArray>(attribute(POLES_ID()));
   aPoles->assign(aPolesMacro);
 
-  AttributeDoubleArrayPtr aWeights = aBSpline->data()->realArray(
-      myIsPeriodic ? SketchPlugin_BSplinePeriodic::WEIGHTS_ID()
-                   : SketchPlugin_BSpline::WEIGHTS_ID());
+  AttributeDoubleArrayPtr aWeights =
+      aBSpline->data()->realArray(SketchPlugin_BSplineBase::WEIGHTS_ID());
   AttributeDoubleArrayPtr aWeightsMacro = data()->realArray(WEIGHTS_ID());
   int aSize = aWeightsMacro->size();
   aWeights->setSize(aSize);
   for (int index = 0; index < aSize; ++index)
     aWeights->setValue(index, aWeightsMacro->value(index));
 
-  AttributeDoubleArrayPtr aKnots = aBSpline->data()->realArray(
-      myIsPeriodic ? SketchPlugin_BSplinePeriodic::KNOTS_ID() : SketchPlugin_BSpline::KNOTS_ID());
+  AttributeDoubleArrayPtr aKnots =
+      aBSpline->data()->realArray(SketchPlugin_BSplineBase::KNOTS_ID());
   aSize = (int)myKnots.size();
   aKnots->setSize(aSize);
   std::list<double>::iterator aKIt = myKnots.begin();
   for (int index = 0; index < aSize; ++index, ++aKIt)
     aKnots->setValue(index, *aKIt);
 
-  AttributeIntArrayPtr aMults = aBSpline->data()->intArray(
-      myIsPeriodic ? SketchPlugin_BSplinePeriodic::MULTS_ID() : SketchPlugin_BSpline::MULTS_ID());
+  AttributeIntArrayPtr aMults = aBSpline->data()->intArray(SketchPlugin_BSplineBase::MULTS_ID());
   aSize = (int)myMultiplicities.size();
   aMults->setSize(aSize);
   std::list<int>::iterator aMIt = myMultiplicities.begin();

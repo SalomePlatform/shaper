@@ -39,7 +39,7 @@ class TestTangentBSpline(unittest.TestCase):
     self.mySketch = model.addSketch(self.myDocument, model.defaultPlane("XOY"))
     self.myPoles = [GeomAPI_Pnt2d(-10, -30), GeomAPI_Pnt2d(20, -15), GeomAPI_Pnt2d(-10, 0), GeomAPI_Pnt2d(20, 15), GeomAPI_Pnt2d(-10, 30)]
     self.myWeights = [1, 3, 5, 3, 1]
-    self.mySpline = self.mySketch.addSpline(self.myPoles, self.myWeights)
+    self.mySpline = self.mySketch.addSpline(poles = self.myPoles, weights = self.myWeights)
     self.myControlPoles = self.mySpline.controlPoles(auxiliary = [0, 1, 2, 3, 4])
     self.myControlLines = self.mySpline.controlPolygon(auxiliary = [0, 1, 2, 3])
     model.do()
@@ -188,7 +188,7 @@ class TestTangentBSpline(unittest.TestCase):
   def test_spline_tangent(self):
     """ Test 6. Set tangency between two B-spline curves
     """
-    aSpline = self.mySketch.addSpline([(50, -20), (40, 0), (50, 20)])
+    aSpline = self.mySketch.addSpline(poles = [(50, -20), (40, 0), (50, 20)])
     self.myNbBSplines += 1
     self.myDOF += aSpline.poles().size() * 2
     model.do()
@@ -367,7 +367,7 @@ class TestTangentBSpline(unittest.TestCase):
   def test_spline_tangent_coincident_by_boundaries(self):
     """ Test 15. Set tangency between two B-spline curves coincident with B-spline start point
     """
-    aSpline = self.mySketch.addSpline([(50, -20), (40, 0), (50, 20)])
+    aSpline = self.mySketch.addSpline(poles = [(50, -20), (40, 0), (50, 20)])
     self.myNbBSplines += 1
     self.myDOF += aSpline.poles().size() * 2
     model.do()
@@ -449,7 +449,7 @@ class TestTangentBSpline(unittest.TestCase):
   def test_spline_tangent_coincident_by_aux(self):
     """ Test 19. Set tangency between two B-spline curves coincident with B-spline start point
     """
-    aSpline = self.mySketch.addSpline([(50, -20), (40, 0), (50, 20)])
+    aSpline = self.mySketch.addSpline(poles = [(50, -20), (40, 0), (50, 20)])
     self.myNbBSplines += 1
     self.myDOF += aSpline.poles().size() * 2
     model.do()
