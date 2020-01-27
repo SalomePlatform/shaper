@@ -20,6 +20,9 @@
 #include "ModuleBase_ViewerFilters.h"
 #include "ModuleBase_IWorkshop.h"
 #include "ModuleBase_IModule.h"
+#include "ModuleBase_Operation.h"
+#include "ModuleBase_IPropertyPanel.h"
+#include "ModuleBase_ModelWidget.h"
 
 #include <ModelAPI_Session.h>
 #include <ModelAPI_Document.h>
@@ -76,8 +79,12 @@ Standard_Boolean ModuleBase_ShapeDocumentFilter::IsOk(
     if (aObj) {
       DocumentPtr aDoc = aObj->document();
       SessionPtr aMgr = ModelAPI_Session::get();
-      // TODO: disable the next line for the ImportResult feature "objects" widget only
-      aValid = (aDoc == aMgr->activeDocument() || aDoc == aMgr->moduleDocument());
+
+      ModuleBase_ModelWidget* aWidget = anOperation->propertyPanel()->activeWidget();
+      if (aWidget && aWidget->canUseExternalParts())
+        aValid = Standard_True;
+      else
+        aValid = (aDoc == aMgr->activeDocument() || aDoc == aMgr->moduleDocument());
     }
     else {
       // This object is not controlled by the filter

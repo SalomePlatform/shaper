@@ -65,6 +65,7 @@ ModuleBase_ModelWidget::ModuleBase_ModelWidget(QWidget* theParent,
   myFeatureId = theData->featureId();
 
   myIsInternal = theData->getBooleanAttribute(ATTR_INTERNAL, false);
+  myUseExternalParts = theData->getBooleanAttribute("allow_parts_content", false);
 
   myIsModifiedInEdit = theData->getProperty(ATTR_MODIFIED_IN_EDIT);
 

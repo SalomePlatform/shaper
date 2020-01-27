@@ -317,6 +317,9 @@ Q_OBJECT
 
   virtual bool isReadOnly() const { return !isEnabled(); }
 
+  /// Returns true if the widget should have access to external parts
+  bool canUseExternalParts() const { return myUseExternalParts; }
+
 signals:
   /// The signal about widget values are to be changed
   void beforeValuesChanged();
@@ -461,6 +464,9 @@ private:
   bool myFlushUpdateBlocked;
 
   bool myUpdateVisualAttributes;
+
+  /// A flag which indicates that current widget should have access to external parts
+  bool myUseExternalParts;
 };
 
 #endif
