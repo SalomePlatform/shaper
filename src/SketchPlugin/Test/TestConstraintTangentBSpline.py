@@ -220,8 +220,8 @@ class TestTangentBSpline(unittest.TestCase):
     self.myDOF -= 1
     model.do()
 
-    self.assertPointLineDistance(aLine.startPoint(), self.myControlLines[0])
-    self.assertPointLineDistance(aLine.endPoint(), self.myControlLines[0])
+    self.assertPointLineDistance(self.mySpline.startPoint(), aLine)
+    self.assertTangentFeatures(aLine, self.mySpline)
 
   def test_circle_tangent_coincident_by_pole(self):
     """ Test 8. Set tangency between B-spline and a circle coincident with B-spline end point
@@ -241,7 +241,9 @@ class TestTangentBSpline(unittest.TestCase):
     self.myDOF -= 1
     model.do()
 
-    self.assertTangentLineCircle(SketchAPI_Line(self.myControlLines[0]), aCircle)
+    self.assertTangentFeatures(aCircle, self.mySpline)
+    dist = model.distancePointPoint(self.mySpline.startPoint(), aCircle.center())
+    self.assertAlmostEqual(dist, aCircle.radius().value())
 
   def test_arc_tangent_coincident_by_pole(self):
     """ Test 9. Set tangency between B-spline and an arc coincident with B-spline end point
@@ -261,7 +263,9 @@ class TestTangentBSpline(unittest.TestCase):
     self.myDOF -= 1
     model.do()
 
-    self.assertTangentLineCircle(SketchAPI_Line(self.myControlLines[-1]), anArc)
+    self.assertTangentFeatures(anArc, self.mySpline)
+    dist = model.distancePointPoint(self.mySpline.endPoint(), anArc.center())
+    self.assertAlmostEqual(dist, anArc.radius().value())
 
   def test_ellipse_tangent_coincident_by_pole(self):
     """ Test 10. Set tangency between B-spline and an ellipse coincident with B-spline start point
