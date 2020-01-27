@@ -533,11 +533,7 @@ void PartSet_WidgetBSplinePoints::mouseReleased(ModuleBase_IViewWindow* theWindo
   }
 
   GeomPnt2dPtr aSelectedPoint = PartSet_Tools::getPnt2d(aView, aSelectedShape, mySketch);
-  if (aSelectedPoint) {
-    // nullify selected object to add reference to attribute instead of its owner
-    aSelectedObject = ObjectPtr();
-  }
-  else {
+  if (!aSelectedPoint) {
     aSelectedPoint = PartSet_Tools::getPnt2d(theEvent, theWindow, mySketch);
     setValueState(Stored); // in case of edge selection, Apply state should also be updated
   }
