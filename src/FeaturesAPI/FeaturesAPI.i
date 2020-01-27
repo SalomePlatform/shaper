@@ -78,6 +78,7 @@
 %shared_ptr(FeaturesAPI_FusionFaces)
 %shared_ptr(FeaturesAPI_RemoveResults)
 %shared_ptr(FeaturesAPI_Copy)
+%shared_ptr(FeaturesAPI_ImportResult)
 
 
 %typecheck(SWIG_TYPECHECK_POINTER) std::pair<std::list<ModelHighAPI_Selection>, bool>, const std::pair<std::list<ModelHighAPI_Selection>, bool> & {
@@ -170,3 +171,4 @@
 %include "FeaturesAPI_FusionFaces.h"
 %include "FeaturesAPI_RemoveResults.h"
 %include "FeaturesAPI_Copy.h"
+%include "FeaturesAPI_ImportResult.h"

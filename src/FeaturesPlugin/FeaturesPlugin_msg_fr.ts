@@ -62,6 +62,10 @@
       <translation>Copie</translation>
     </message>
     <message>
+      <source>Import Result</source>
+      <translation>Importer le résultat</translation>
+    </message>
+    <message>
       <source>Remove Sub-Shapes</source>
       <translation>Supprimer les sous-formes</translation>
     </message>
@@ -1159,6 +1163,30 @@
     <message>
       <source>Number of copies</source>
       <translation>Nombre de copies</translation>
+    </message>
+  </context>
+
+  <!-- Import result -->
+  <context>
+    <name>ImportResult</name>
+    <message>
+      <source>ImportResult</source>
+      <translation>Importer le résultat</translation>
+    </message>
+    <message>
+      <source>Copies results from other parts</source>
+      <translation>Copie les résultats d'autres pièces</translation>
+    </message>
+  </context>
+  <context>
+    <name>ImportResult:objects</name>
+    <message>
+      <source>Sources:</source>
+      <translation>Sources:</translation>
+    </message>
+    <message>
+      <source>Select copied results</source>
+      <translation>Sélectionnez les résultats copiés</translation>
     </message>
   </context>
 

@@ -104,6 +104,13 @@
         helpfile="copyFeature.html">
         <source path="copy_widget.xml"/>
       </feature>
+      <feature id="ImportResult"
+        title="Import Result"
+        tooltip="Copies results from other parts"
+        icon="icons/Features/import_result.png"
+        helpfile="importResultFeature.html">
+        <source path="import_result_widget.xml"/>
+      </feature>
       <feature id="RemoveResults" title="Remove results" tooltip="Internal feature for results removal" internal="1">
         <multi_selector id="results" concealment="true"/>
       </feature>

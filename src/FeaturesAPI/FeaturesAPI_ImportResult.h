@@ -17,12 +17,12 @@
 // See http://www.salome-platform.org/ or email : webmaster.salome@opencascade.com
 //
 
-#ifndef FeaturesAPI_Copy_H_
-#define FeaturesAPI_Copy_H_
+#ifndef FeaturesAPI_ImportResult_H_
+#define FeaturesAPI_ImportResult_H_
 
 #include "FeaturesAPI.h"
 
-#include <FeaturesPlugin_Copy.h>
+#include <FeaturesPlugin_ImportResult.h>
 
 #include <ModelHighAPI_Interface.h>
 #include <ModelHighAPI_Macro.h>
@@ -30,49 +30,42 @@
 class ModelHighAPI_Dumper;
 class ModelHighAPI_Selection;
 
-/// \class FeaturesAPI_Copy
+/// \class FeaturesAPI_ImportResult
 /// \ingroup CPPHighAPI
-/// \brief Interface for Copy feature.
-class FeaturesAPI_Copy: public ModelHighAPI_Interface
+/// \brief Interface for ImportResult feature.
+class FeaturesAPI_ImportResult: public ModelHighAPI_Interface
 {
 public:
   /// Constructor without values.
   FEATURESAPI_EXPORT
-  explicit FeaturesAPI_Copy(const std::shared_ptr<ModelAPI_Feature>& theFeature);
+  explicit FeaturesAPI_ImportResult(const std::shared_ptr<ModelAPI_Feature>& theFeature);
 
   /// Constructor with values.
   FEATURESAPI_EXPORT
-  explicit FeaturesAPI_Copy(const std::shared_ptr<ModelAPI_Feature>& theFeature,
-                            const std::list<ModelHighAPI_Selection>& theBaseObjects,
-                            const int theNumber);
+  explicit FeaturesAPI_ImportResult(const std::shared_ptr<ModelAPI_Feature>& theFeature,
+                                    const std::list<ModelHighAPI_Selection>& theBaseObjects);
 
   /// Destructor.
-  FEATURESAPI_EXPORT virtual ~FeaturesAPI_Copy();
+  FEATURESAPI_EXPORT virtual ~FeaturesAPI_ImportResult();
 
-  INTERFACE_2(FeaturesPlugin_Copy::ID(),
-              objects, FeaturesPlugin_Copy::OBJECTS(),
-              ModelAPI_AttributeSelectionList, /** Source objects */,
-              number, FeaturesPlugin_Copy::NUMBER(),
-              ModelAPI_AttributeInteger, /** Number of copies */)
+  INTERFACE_1(FeaturesPlugin_ImportResult::ID(),
+              objects, FeaturesPlugin_ImportResult::OBJECTS(),
+              ModelAPI_AttributeSelectionList, /** Source objects */)
 
   /// Modify objects attribute of the feature.
   FEATURESAPI_EXPORT void setObjects(const std::list<ModelHighAPI_Selection>& theBaseObjects);
-
-  /// Modify number of copies attribute of the feature.
-  FEATURESAPI_EXPORT void setNumber(const int theNumber);
 
   /// Dump wrapped feature
   FEATURESAPI_EXPORT virtual void dump(ModelHighAPI_Dumper& theDumper) const;
 };
 
-/// Pointer on Copy object.
-typedef std::shared_ptr<FeaturesAPI_Copy> CopyPtr;
+/// Pointer on ImportResult object.
+typedef std::shared_ptr<FeaturesAPI_ImportResult> ImportResultPtr;
 
 /// \ingroup CPPHighAPI
-/// \brief Create Copy feature.
+/// \brief Create ImportResult feature.
 FEATURESAPI_EXPORT
-CopyPtr addCopy(const std::shared_ptr<ModelAPI_Document>& thePart,
-                const std::list<ModelHighAPI_Selection>& theObjects,
-                const int theNumber);
+ImportResultPtr addImportResult(const std::shared_ptr<ModelAPI_Document>& thePart,
+                                const std::list<ModelHighAPI_Selection>& theObjects);
 
-#endif // FeaturesAPI_Copy_H_
+#endif // FeaturesAPI_ImportResult_H_

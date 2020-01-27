@@ -76,6 +76,7 @@ Standard_Boolean ModuleBase_ShapeDocumentFilter::IsOk(
     if (aObj) {
       DocumentPtr aDoc = aObj->document();
       SessionPtr aMgr = ModelAPI_Session::get();
+      // TODO: disable the next line for the ImportResult feature "objects" widget only
       aValid = (aDoc == aMgr->activeDocument() || aDoc == aMgr->moduleDocument());
     }
     else {

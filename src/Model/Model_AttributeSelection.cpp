@@ -875,7 +875,8 @@ void Model_AttributeSelection::selectSubShape(
       if (aPartName == aRootDoc->kind()) {
         aDoc = std::dynamic_pointer_cast<Model_Document>(aRootDoc);
         aSubShapeName = aSubShapeName.substr(aPartEnd + 1);
-      } else {
+      }
+      else {
         ObjectPtr aFound =
           owner()->document()->objectByName(ModelAPI_ResultPart::group(), aPartName);
         if (aFound.get()) { // found such part, so asking it for the name
@@ -894,10 +895,27 @@ void Model_AttributeSelection::selectSubShape(
                 continue;
               std::shared_ptr<GeomAPI_Edge> aSelectedEdge(new GeomAPI_Edge(aSelected));
               setValueCenter(aPart, aSelectedEdge, aCenterType);
-            } else
+            }
+            else
               setValue(aPart, aSelected);
             TDataStd_Integer::Set(selectionLabel(), anIndex);
             return;
+          }
+        } else { // for the ImportResult feature Objects widget this may be a result in other part
+       // result may be hidden (like, tranlsatiomn of part) in PartSet, so iterate Part-features
+          int aNum = aRootDoc->size(ModelAPI_Feature::group());
+          for (int a = 0; a < aNum; a++) {
+            FeaturePtr aFeat = std::dynamic_pointer_cast<ModelAPI_Feature>(
+              aRootDoc->object(ModelAPI_Feature::group(), a));
+            if (aFeat.get() && aFeat->data() && aFeat->data()->isValid() &&
+              aFeat->getKind() == "Part" && aFeat->results().size()) {
+              ResultPartPtr aPart =
+                std::dynamic_pointer_cast<ModelAPI_ResultPart>(aFeat->firstResult());
+              if (aPart.get() && aPart->partDoc().get() && aPart->data()->name() == aPartName) {
+                aDoc = std::dynamic_pointer_cast<Model_Document>(aPart->partDoc());
+                aSubShapeName = aSubShapeName.substr(aPartEnd + 1);
+              }
+            }
           }
         }
       }

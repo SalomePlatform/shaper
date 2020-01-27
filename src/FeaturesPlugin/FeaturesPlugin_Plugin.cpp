@@ -49,6 +49,7 @@
 #include <FeaturesPlugin_FusionFaces.h>
 #include <FeaturesPlugin_RemoveResults.h>
 #include <FeaturesPlugin_Copy.h>
+#include <FeaturesPlugin_ImportResult.h>
 #include <FeaturesPlugin_ValidatorTransform.h>
 #include <FeaturesPlugin_Validators.h>
 
@@ -115,6 +116,8 @@ FeaturesPlugin_Plugin::FeaturesPlugin_Plugin()
                               new FeaturesPlugin_ValidatorBooleanCommonSelection);
   aFactory->registerValidator("FeaturesPlugin_ValidatorBooleanCommonArguments",
                               new FeaturesPlugin_ValidatorBooleanCommonArguments);
+  aFactory->registerValidator("FeaturesPlugin_ValidatorImportResults",
+                              new FeaturesPlugin_ValidatorImportResults);
 
   // register this plugin
   ModelAPI_Session::get()->registerPlugin(this);
@@ -182,6 +185,8 @@ FeaturePtr FeaturesPlugin_Plugin::createFeature(std::string theFeatureID)
     return FeaturePtr(new FeaturesPlugin_Chamfer);
   } else if (theFeatureID == FeaturesPlugin_Copy::ID()) {
     return FeaturePtr(new FeaturesPlugin_Copy);
+  } else if (theFeatureID == FeaturesPlugin_ImportResult::ID()) {
+    return FeaturePtr(new FeaturesPlugin_ImportResult);
   }
 
 

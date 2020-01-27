@@ -49,6 +49,7 @@ SET(PROJECT_HEADERS
   FeaturesAPI_Union.h
   FeaturesAPI_FusionFaces.h
   FeaturesAPI_Copy.h
+  FeaturesAPI_ImportResult.h
 )
 
 SET(PROJECT_SOURCES
@@ -80,6 +81,7 @@ SET(PROJECT_SOURCES
   FeaturesAPI_Union.cpp
   FeaturesAPI_FusionFaces.cpp
   FeaturesAPI_Copy.cpp
+  FeaturesAPI_ImportResult.cpp
 )
 
 SET(PROJECT_LIBRARIES
