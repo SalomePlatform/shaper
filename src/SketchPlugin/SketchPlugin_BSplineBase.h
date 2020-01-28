@@ -65,6 +65,13 @@ public:
     return ID;
   }
 
+  /// name for add pole action
+  inline static const std::string& ADD_POLE_ACTION_ID()
+  {
+    static const std::string ID("AddPole");
+    return ID;
+  }
+
   /// Returns true is sketch element is under the rigid constraint
   SKETCHPLUGIN_EXPORT virtual bool isFixed();
 
@@ -73,6 +80,11 @@ public:
 
   /// Creates a new part document if needed
   SKETCHPLUGIN_EXPORT virtual void execute();
+
+  /// Updates the B-spline curve.
+  /// \param[in] theActionId action key id (in following form: Action#Index)
+  /// \return \c false in case the action not performed.
+  SKETCHPLUGIN_EXPORT virtual bool customAction(const std::string& theActionId);
 
 protected:
   /// Called from the derived class
@@ -83,6 +95,9 @@ protected:
 
   /// \brief Return \c true if the B-spline curve is periodic
   virtual bool isPeriodic() const = 0;
+
+  /// Add new pole after the pole with the given index
+  bool addPole(const int theAfter);
 };
 
 #endif

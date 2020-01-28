@@ -31,6 +31,8 @@
 class GeomAPI_Circ2d;
 class GeomAPI_Pnt2d;
 
+class GeomDataAPI_Point2DArray;
+
 /**\class SketchPlugin_MacroBSpline
  * \ingroup Plugins
  * \brief Feature for creation of the new B-spline in Sketch.
@@ -114,6 +116,16 @@ private:
   void createControlPolygon(FeaturePtr theBSpline, std::list<FeaturePtr>& thePoles);
   void constraintsForPoles(const std::list<FeaturePtr>& thePoles);
 
+  /// Create Point feature coincident with the B-spline pole
+  static FeaturePtr createAuxiliaryPole(std::shared_ptr<GeomDataAPI_Point2DArray> theBSplinePoles,
+                                        const int thePoleIndex);
+  /// Create segment between consequtive B-spline poles
+  static void createAuxiliarySegment(std::shared_ptr<GeomDataAPI_Point2DArray> theBSplinePoles,
+                                     const int thePoleIndex1,
+                                     const int thePoleIndex2);
+  friend class SketchPlugin_BSplineBase;
+
+private:
   std::list<double> myKnots;
   std::list<int> myMultiplicities;
   int myDegree;

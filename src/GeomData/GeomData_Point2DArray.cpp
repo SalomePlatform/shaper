@@ -77,8 +77,10 @@ void GeomData_Point2DArray::setSize(const int theSize)
   }
   else { // reset the old array
     if (aValuesSize) {
-      if (aValuesSize != myArray->Length()) { // old data is not keept, a new array is created
+      if (aValuesSize != myArray->Length()) { // old data is kept in the new array
         Handle(TColStd_HArray1OfReal) aNewArray = new TColStd_HArray1OfReal(0, aValuesSize - 1);
+        for (int anIndex = 0; anIndex < aValuesSize && anIndex <= myArray->Upper(); ++anIndex)
+          aNewArray->SetValue(anIndex, myArray->Value(anIndex));
         myArray->ChangeArray(aNewArray);
         owner()->data()->sendAttributeUpdated(this);
       }

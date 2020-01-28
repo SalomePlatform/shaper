@@ -45,16 +45,7 @@
 
 #include <sstream>
 
-// Create Point feature coincident with the B-spline pole
-static FeaturePtr createAuxiliaryPole(FeaturePtr theBSpline,
-                                      AttributePoint2DArrayPtr theBSplinePoles,
-                                      const int thePoleIndex);
-// Create segment between consequtive B-spline poles
-static void createAuxiliarySegment(FeaturePtr theBSpline,
-                                   AttributePoint2DArrayPtr theBSplinePoles,
-                                   const int thePoleIndex1,
-                                   const int thePoleIndex2);
-// Create internal coincidence constraint with B-spline pole
+/// Create internal coincidence constraint with B-spline pole
 static void createInternalConstraint(SketchPlugin_Sketch* theSketch,
                                      AttributePtr thePoint,
                                      AttributePtr theBSplinePoles,
@@ -211,13 +202,13 @@ void SketchPlugin_MacroBSpline::createControlPolygon(FeaturePtr theBSpline,
   int aSize = aPoles->size();
   // poles
   for (int index = 0; index < aSize; ++index)
-    thePoles.push_back(createAuxiliaryPole(theBSpline, aPoles, index));
+    thePoles.push_back(createAuxiliaryPole(aPoles, index));
   // segments
   for (int index = 1; index < aSize; ++index)
-    createAuxiliarySegment(theBSpline, aPoles, index - 1, index);
+    createAuxiliarySegment(aPoles, index - 1, index);
   if (myIsPeriodic) {
     // additional segment to close the control polygon
-    createAuxiliarySegment(theBSpline, aPoles, aSize - 1, 0);
+    createAuxiliarySegment(aPoles, aSize - 1, 0);
   }
 }
 
@@ -315,17 +306,18 @@ AISObjectPtr SketchPlugin_MacroBSpline::getAISObject(AISObjectPtr thePrevious)
 
 // ==========================     Auxiliary functions    ===========================================
 
-FeaturePtr createAuxiliaryPole(FeaturePtr theBSpline,
-                               AttributePoint2DArrayPtr theBSplinePoles,
-                               const int thePoleIndex)
+FeaturePtr SketchPlugin_MacroBSpline::createAuxiliaryPole(AttributePoint2DArrayPtr theBSplinePoles,
+                                                          const int thePoleIndex)
 {
+  FeaturePtr aBSpline = ModelAPI_Feature::feature(theBSplinePoles->owner());
+
   SketchPlugin_Sketch* aSketch =
-      std::dynamic_pointer_cast<SketchPlugin_Feature>(theBSpline)->sketch();
+      std::dynamic_pointer_cast<SketchPlugin_Feature>(aBSpline)->sketch();
 
   // create child point equal to the B-spline's pole
   FeaturePtr aPointFeature = aSketch->addFeature(SketchPlugin_Point::ID());
   aPointFeature->boolean(SketchPlugin_Point::AUXILIARY_ID())->setValue(true);
-  aPointFeature->reference(SketchPlugin_Point::PARENT_ID())->setValue(theBSpline);
+  aPointFeature->reference(SketchPlugin_Point::PARENT_ID())->setValue(aBSpline);
 
   GeomPnt2dPtr aPole = theBSplinePoles->pnt(thePoleIndex);
 
@@ -336,7 +328,7 @@ FeaturePtr createAuxiliaryPole(FeaturePtr theBSpline,
   aPointFeature->execute();
 
   std::ostringstream aName;
-  aName << theBSpline->name() << "_" << theBSplinePoles->id() << "_" << thePoleIndex;
+  aName << aBSpline->name() << "_" << theBSplinePoles->id() << "_" << thePoleIndex;
   aPointFeature->data()->setName(aName.str());
   aPointFeature->lastResult()->data()->setName(aName.str());
 
@@ -346,18 +338,19 @@ FeaturePtr createAuxiliaryPole(FeaturePtr theBSpline,
   return aPointFeature;
 }
 
-void createAuxiliarySegment(FeaturePtr theBSpline,
-                            AttributePoint2DArrayPtr theBSplinePoles,
-                            const int thePoleIndex1,
-                            const int thePoleIndex2)
+void SketchPlugin_MacroBSpline::createAuxiliarySegment(AttributePoint2DArrayPtr theBSplinePoles,
+                                                       const int thePoleIndex1,
+                                                       const int thePoleIndex2)
 {
+  FeaturePtr aBSpline = ModelAPI_Feature::feature(theBSplinePoles->owner());
+
   SketchPlugin_Sketch* aSketch =
-    std::dynamic_pointer_cast<SketchPlugin_Feature>(theBSpline)->sketch();
+      std::dynamic_pointer_cast<SketchPlugin_Feature>(aBSpline)->sketch();
 
   // create child segment between B-spline poles
   FeaturePtr aLineFeature = aSketch->addFeature(SketchPlugin_Line::ID());
   aLineFeature->boolean(SketchPlugin_Point::AUXILIARY_ID())->setValue(true);
-  aLineFeature->reference(SketchPlugin_Point::PARENT_ID())->setValue(theBSpline);
+  aLineFeature->reference(SketchPlugin_Point::PARENT_ID())->setValue(aBSpline);
 
   AttributePoint2DPtr aLineStart = std::dynamic_pointer_cast<GeomDataAPI_Point2D>(
     aLineFeature->attribute(SketchPlugin_Line::START_ID()));
@@ -370,7 +363,7 @@ void createAuxiliarySegment(FeaturePtr theBSpline,
   aLineFeature->execute();
 
   std::ostringstream aName;
-  aName << theBSpline->name() << "_segment_" << thePoleIndex1 << "_" << thePoleIndex2;
+  aName << aBSpline->name() << "_segment_" << thePoleIndex1 << "_" << thePoleIndex2;
   aLineFeature->data()->setName(aName.str());
   aLineFeature->lastResult()->data()->setName(aName.str());
 

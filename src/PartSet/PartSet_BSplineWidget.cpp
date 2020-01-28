@@ -206,7 +206,11 @@ void PartSet_BSplineWidget::onAddPole()
     }
   }
   if (aFound) {
-    // TODO: add a new pole after found Id
+    // add a new pole after found Id
+    std::ostringstream anActionName;
+    anActionName << SketchPlugin_BSplineBase::ADD_POLE_ACTION_ID() << "#" << aId;
+    if (feature()->customAction(anActionName.str()))
+      updateObject(feature());
 
     restoreValueCustom();
   }

@@ -339,3 +339,18 @@ void SketchSolver_ConstraintCoincidence::notify(const FeaturePtr&      theFeatur
     }
   }
 }
+
+void SketchSolver_ConstraintCoincidence::adjustConstraint()
+{
+  if (myBaseConstraint->getKind() == SketchPlugin_ConstraintCoincidenceInternal::ID()) {
+    AttributeIntegerPtr anIndexA = myBaseConstraint->integer(
+        SketchPlugin_ConstraintCoincidenceInternal::INDEX_ENTITY_A());
+    AttributeIntegerPtr anIndexB = myBaseConstraint->integer(
+        SketchPlugin_ConstraintCoincidenceInternal::INDEX_ENTITY_B());
+    if ((anIndexA && anIndexA->isInitialized()) ||
+        (anIndexB && anIndexB->isInitialized())) {
+      remove();
+      process();
+    }
+  }
+}

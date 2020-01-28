@@ -218,9 +218,18 @@ bool PlaneGCSSolver_AttributeBuilder::updateAttribute(
 
     if (aWrapper->size() != anAttribute->size()) {
       std::vector<PointWrapperPtr> aPointsArray = aWrapper->array();
+      std::vector<PointWrapperPtr>::iterator aPos = aPointsArray.begin();
       while (anAttribute->size() > (int)aPointsArray.size()) {
         // add points to the middle of array
-        aPointsArray.insert(--aPointsArray.end(), createPoint(GeomPnt2dPtr(), myStorage));
+        GeomPnt2dPtr aValue;
+        for (; aPos != aPointsArray.end(); ++aPos) {
+          aValue = anAttribute->pnt(aPos - aPointsArray.begin());
+          if (aValue->distance(PlaneGCSSolver_Tools::point(*aPos)) > tolerance)
+            break;
+        }
+        int aShift = aPos - aPointsArray.begin();
+        aPointsArray.insert(aPos, createPoint(aValue, myStorage));
+        aPos = aPointsArray.begin() + aShift;
       }
 
       while (anAttribute->size() < (int)aPointsArray.size()) {
@@ -241,7 +250,7 @@ bool PlaneGCSSolver_AttributeBuilder::updateAttribute(
       aParamsToRemove = PlaneGCSSolver_Tools::parameters(aWrapper);
       std::shared_ptr<PlaneGCSSolver_ScalarArrayWrapper> aNewArray =
           std::dynamic_pointer_cast<PlaneGCSSolver_ScalarArrayWrapper>(
-          createAttribute(theAttribute));
+          createScalarArray(theAttribute, myStorage));
       aWrapper->setArray(aNewArray->array());
       isUpdated = true;
     }
