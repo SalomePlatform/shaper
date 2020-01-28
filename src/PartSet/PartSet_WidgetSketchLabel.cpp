@@ -451,6 +451,15 @@ void PartSet_WidgetSketchLabel::restoreAttributeValue(const AttributePtr& theAtt
     GeomShapePtr anEmptyShape;
     aSelAttr->setValue(anEmptyResult, anEmptyShape);
   }
+  std::shared_ptr<GeomDataAPI_Point> anOrigin = std::dynamic_pointer_cast<GeomDataAPI_Point>(
+    aData->attribute(SketchPlugin_Sketch::ORIGIN_ID()));
+  anOrigin->reset();
+  std::shared_ptr<GeomDataAPI_Dir> aNormal = std::dynamic_pointer_cast<GeomDataAPI_Dir>(
+    aData->attribute(SketchPlugin_Sketch::NORM_ID()));
+  aNormal->reset();
+  std::shared_ptr<GeomDataAPI_Dir> aDirX = std::dynamic_pointer_cast<GeomDataAPI_Dir>(
+    aData->attribute(SketchPlugin_Sketch::DIRX_ID()));
+  aDirX->reset();
 }
 
 bool PartSet_WidgetSketchLabel::setSelectionCustom(const ModuleBase_ViewerPrsPtr& thePrs)
