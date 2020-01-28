@@ -1789,7 +1789,7 @@ bool SketchPlugin_BSplineValidator::isValid(const AttributePtr& theAttribute,
     return false;
 
   if (aPolesArray->size() < 2) {
-    theError = "Number of B-spline poles should be 2 and more";
+    theError = "Number of B-spline poles should be 2 or more";
     return false;
   }
 

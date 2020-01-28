@@ -152,4 +152,42 @@ Il sera nécessaire de créer une pièce afin d&apos;utiliser cette esquisse pou
         <translation>Groupes</translation>
     </message>
 </context>
+<context>
+    <name>PartSet_BSplineWidget</name>
+    <message>
+        <source>Poles and weights</source>
+        <translation>Poteaux et poids</translation>
+    </message>
+    <message>
+        <source>B-spline poles and weights</source>
+        <translation>Poteaux et poids B-spline</translation>
+    </message>
+    <message>
+        <source>Pole %1</source>
+        <translation>Pôle %1</translation>
+    </message>
+    <message>
+        <source>Weight :</source>
+        <translation>Poids :</translation>
+    </message>
+    <message>
+        <source>Add a new pole after the current</source>
+        <translation>Ajouter un nouveau pôle après le courant</translation>
+    </message>
+</context>
+<context>
+    <name>PartSet_WidgetBSplinePoints</name>
+    <message>
+        <source>Pole %1</source>
+        <translation>Pôle %1</translation>
+    </message>
+    <message>
+        <source>Create control polygon</source>
+        <translation> Créer un polygone de contrôle</translation>
+    </message>
+    <message>
+        <source>Specify if the control polygon should be created</source>
+        <translation>Spécifiez si le polygone de contrôle doit être créé</translation>
+    </message>
+</context>
 </TS>
