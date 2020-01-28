@@ -634,7 +634,7 @@ Handle(AIS_InteractiveContext) XGUI_Displayer::AISContext() const
     //aTrihedron->getHighlightPointAspect()->SetTypeOfMarker(Aspect_TOM_O_STAR);
 
     // Commented out according to discussion in bug #2825
-    //ModuleBase_IViewer::DefaultHighlightDrawer = aContext->HighlightStyle();
+    ModuleBase_IViewer::DefaultHighlightDrawer = aContext->HighlightStyle();
     //Handle(Prs3d_Drawer) aSelStyle = aContext->SelectionStyle();
     //double aDeflection =
     //  QString(ModelAPI_ResultConstruction::DEFAULT_DEFLECTION().c_str()).toDouble();

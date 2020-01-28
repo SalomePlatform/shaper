@@ -18,6 +18,7 @@
 //
 
 #include "ModuleBase_ResultPrs.h"
+#include "ModuleBase_IViewer.h"
 
 #include <GeomAPI_PlanarEdges.h>
 
@@ -89,6 +90,18 @@ ModuleBase_ResultPrs::ModuleBase_ResultPrs(ResultPtr theResult)
   else
     aDrawer->SetPointAspect(new Prs3d_PointAspect(Aspect_TOM_PLUS, Quantity_NOC_YELLOW, 1.));
 
+  aDrawer = DynamicHilightAttributes();
+  if (aDrawer.IsNull()) {
+    if (!ModuleBase_IViewer::DefaultHighlightDrawer.IsNull()) {
+      aDrawer = new Prs3d_Drawer(*ModuleBase_IViewer::DefaultHighlightDrawer);
+      aDrawer->VIsoAspect()->SetNumber(0);
+      aDrawer->UIsoAspect()->SetNumber(0);
+      SetDynamicHilightAttributes(aDrawer);
+    }
+  } else {
+    aDrawer->VIsoAspect()->SetNumber(0);
+    aDrawer->UIsoAspect()->SetNumber(0);
+  }
   myHiddenSubShapesDrawer = new AIS_ColoredDrawer(myDrawer);
   Handle(Prs3d_ShadingAspect) aShadingAspect = new Prs3d_ShadingAspect();
   aShadingAspect->SetMaterial(Graphic3d_NOM_BRASS); //default value of context material
