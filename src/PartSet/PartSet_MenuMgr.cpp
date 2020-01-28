@@ -37,6 +37,7 @@
 #include <ModuleBase_Operation.h>
 #include <ModuleBase_OperationFeature.h>
 #include <ModuleBase_ViewerPrs.h>
+#include <ModuleBase_IViewer.h>
 #include <ModuleBase_Tools.h>
 
 #include <XGUI_ModuleConnector.h>
@@ -522,6 +523,7 @@ void PartSet_MenuMgr::activatePartSet() const
     aMgr->finishOperation();
 
   myModule->workshop()->updateCommandStatus();
+  myModule->workshop()->viewer()->update();
 }
 
 void PartSet_MenuMgr::grantedOperationIds(ModuleBase_Operation* theOperation,
