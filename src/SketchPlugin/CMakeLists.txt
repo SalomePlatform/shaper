@@ -237,6 +237,7 @@ ADD_UNIT_TESTS(
   TestConstraintAngleBehaviorBackward_2.py
   TestConstraintAngleEllipse.py
   TestConstraintCoincidence.py
+  TestConstraintCoincidenceBSpline.py
   TestConstraintCoincidenceEllipse.py
   TestConstraintCoincidenceEllipticArc.py
   TestConstraintCollinear.py
@@ -275,6 +276,7 @@ ADD_UNIT_TESTS(
   TestCreateArcByTransversalLine.py
   TestCreateArcChangeType.py
   TestCreateBSpline.py
+  TestCreateBSplinePeriodic.py
   TestCreateCircleByCenterAndPassed.py
   TestCreateCircleByThreePoints.py
   TestCreateCircleChangeType.py
@@ -311,6 +313,7 @@ ADD_UNIT_TESTS(
   TestPresentation.py
   TestProjection.py
   TestProjectionBSpline.py
+  TestProjectionBSplinePeriodic.py
   TestProjectionEllipse.py
   TestProjectionEllipticArc.py
   TestProjectionIntoResult.py
@@ -318,6 +321,7 @@ ADD_UNIT_TESTS(
   TestRectangle.py
   TestRemainingDoF.py
   TestRemoveBSpline.py
+  TestRemoveBSplinePeriodic.py
   TestRemoveEllipse.py
   TestRemoveEllipticArc.py
   TestRemoveSketch.py
@@ -356,6 +360,7 @@ if(${SKETCHER_CHANGE_RADIUS_WHEN_MOVE})
   ADD_UNIT_TESTS(
     TestMoveArc.py
     TestMoveBSpline.py
+    TestMoveBSplinePeriodic.py
     TestMoveCircle.py
     TestMoveEllipse.py
     TestMoveEllipticArc.py

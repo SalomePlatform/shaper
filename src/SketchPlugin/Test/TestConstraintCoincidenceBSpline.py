@@ -99,7 +99,7 @@ class TestCoincidenceBSpline(unittest.TestCase):
 
   def assertPointOnSpline(self, thePoint, theSpline):
     point = GeomAPI_Pnt(thePoint.x(), thePoint.y(), 0.0)
-    bspline = GeomAPI_BSpline(GeomAPI_Curve(theSpline.results()[-1].resultSubShapePair()[0].shape()))
+    bspline = GeomAPI_Curve(theSpline.results()[-1].resultSubShapePair()[0].shape())
     proj = bspline.project(point)
     self.assertAlmostEqual(point.distance(proj), 0.0)
 

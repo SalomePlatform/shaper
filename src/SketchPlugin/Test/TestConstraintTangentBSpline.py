@@ -205,7 +205,7 @@ class TestTangentBSpline(unittest.TestCase):
   def test_line_tangent_coincident_by_pole(self):
     """ Test 7. Set tangency between B-spline and a line coincident with B-spline start point
     """
-    aLine = self.mySketch.addLine(10, -10, 90, 40)
+    aLine = self.mySketch.addLine(-15, -25, 50, 40)
     self.myNbLines += 1
     self.myDOF += 4
     model.do()
