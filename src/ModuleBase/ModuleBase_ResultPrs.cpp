@@ -78,9 +78,10 @@ ModuleBase_ResultPrs::ModuleBase_ResultPrs(ResultPtr theResult)
   // Set own free boundaries aspect in order to have free
   // and unfree boundaries with different colors
   Handle(Prs3d_Drawer) aDrawer = Attributes();
-  Handle(Prs3d_LineAspect) aFreeBndAspect =
-    new Prs3d_LineAspect(Quantity_NOC_GREEN, Aspect_TOL_SOLID, 1);
-  aDrawer->SetFreeBoundaryAspect(aFreeBndAspect);
+  aDrawer->SetUnFreeBoundaryAspect(
+    new Prs3d_LineAspect(Quantity_NOC_YELLOW, Aspect_TOL_SOLID, 1));
+  aDrawer->SetFreeBoundaryAspect(new Prs3d_LineAspect(Quantity_NOC_GREEN, Aspect_TOL_SOLID, 1));
+  aDrawer->SetFaceBoundaryAspect(new Prs3d_LineAspect(Quantity_NOC_BLACK, Aspect_TOL_SOLID, 1));
 
   aDrawer->VIsoAspect()->SetNumber(0);
   aDrawer->UIsoAspect()->SetNumber(0);
@@ -105,6 +106,7 @@ ModuleBase_ResultPrs::ModuleBase_ResultPrs(ResultPtr theResult)
   myHiddenSubShapesDrawer = new AIS_ColoredDrawer(myDrawer);
   Handle(Prs3d_ShadingAspect) aShadingAspect = new Prs3d_ShadingAspect();
   aShadingAspect->SetMaterial(Graphic3d_NOM_BRASS); //default value of context material
+  aShadingAspect->Aspect()->SetEdgeColor(Quantity_NOC_BLACK);
   myHiddenSubShapesDrawer->SetShadingAspect(aShadingAspect);
 
   ModuleBase_Tools::setPointBallHighlighting(this);
@@ -133,28 +135,18 @@ void ModuleBase_ResultPrs::setEdgesDefaultColor()
     AttributeIntArrayPtr aColorAttr = myResult->data()->intArray(ModelAPI_Result::COLOR_ID());
     bool aHasColor = aColorAttr.get() && aColorAttr->isInitialized();
 
+    Handle(Prs3d_Drawer) aDrawer = Attributes();
+    aDrawer->SetFaceBoundaryDraw(Standard_True);
+    aDrawer->FaceBoundaryAspect()->SetColor(Quantity_NOC_BLACK);
+
     if (!aHasColor) {
-      Handle(Prs3d_Drawer) aDrawer = Attributes();
-      Handle(Prs3d_LineAspect) anAspect; // = aDrawer->LineAspect();
-      //anAspect->SetColor(Quantity_NOC_YELLOW);
-      //aDrawer->SetLineAspect(anAspect);
+      aDrawer->UnFreeBoundaryAspect()->SetColor(Quantity_NOC_YELLOW);
+      aDrawer->FreeBoundaryAspect()->SetColor(Quantity_NOC_GREEN);
+      aDrawer->WireAspect()->SetColor(Quantity_NOC_RED);
 
-      // - unfree boundaries color
-      anAspect = aDrawer->UnFreeBoundaryAspect();
-      anAspect->SetColor(Quantity_NOC_YELLOW);
-      aDrawer->SetUnFreeBoundaryAspect(anAspect);
-      aDrawer->SetUnFreeBoundaryDraw(true);
-
-      // - free boundaries color
-      anAspect = aDrawer->FreeBoundaryAspect();
-      anAspect->SetColor(Quantity_NOC_GREEN);
-      aDrawer->SetFreeBoundaryAspect(anAspect);
-      aDrawer->SetFreeBoundaryDraw(true);
-
-      // - standalone edges color
-      anAspect = aDrawer->WireAspect();
-      anAspect->SetColor(Quantity_NOC_RED);
-      aDrawer->SetWireAspect(anAspect);
+      aDrawer->SetUnFreeBoundaryDraw(Standard_True);
+      aDrawer->SetFreeBoundaryDraw(Standard_True);
+      aDrawer->SetWireDraw(Standard_True);
     }
   }
 }

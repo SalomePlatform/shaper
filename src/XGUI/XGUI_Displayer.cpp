@@ -204,8 +204,6 @@ bool XGUI_Displayer::display(ObjectPtr theObject, AISObjectPtr theAIS,
     //bool isCustomized = customizeObject(theObject);
 
     int aDispMode = isShading? Shading : Wireframe;
-    if (isShading)
-      anAISIO->Attributes()->SetFaceBoundaryDraw( Standard_True );
     anAISIO->SetDisplayMode(aDispMode);
     aContext->Display(anAISIO, aDispMode, 0, false, true, AIS_DS_Displayed);
     #ifdef TINSPECTOR
