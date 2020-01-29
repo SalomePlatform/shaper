@@ -25,6 +25,7 @@
 #include <FeaturesPlugin_BooleanSmash.h>
 #include <FeaturesPlugin_BooleanFill.h>
 #include <FeaturesPlugin_Chamfer.h>
+#include <FeaturesPlugin_Defeaturing.h>
 #include <FeaturesPlugin_Extrusion.h>
 #include <FeaturesPlugin_ExtrusionCut.h>
 #include <FeaturesPlugin_ExtrusionFuse.h>
@@ -118,6 +119,8 @@ FeaturesPlugin_Plugin::FeaturesPlugin_Plugin()
                               new FeaturesPlugin_ValidatorBooleanCommonArguments);
   aFactory->registerValidator("FeaturesPlugin_ValidatorImportResults",
                               new FeaturesPlugin_ValidatorImportResults);
+  aFactory->registerValidator("FeaturesPlugin_ValidatorDefeaturingSelection",
+                              new FeaturesPlugin_ValidatorDefeaturingSelection);
 
   // register this plugin
   ModelAPI_Session::get()->registerPlugin(this);
@@ -187,6 +190,8 @@ FeaturePtr FeaturesPlugin_Plugin::createFeature(std::string theFeatureID)
     return FeaturePtr(new FeaturesPlugin_Copy);
   } else if (theFeatureID == FeaturesPlugin_ImportResult::ID()) {
     return FeaturePtr(new FeaturesPlugin_ImportResult);
+  } else if (theFeatureID == FeaturesPlugin_Defeaturing::ID()) {
+    return FeaturePtr(new FeaturesPlugin_Defeaturing);
   }
 
 

@@ -249,6 +249,25 @@ public:
       bool operator ()(const std::shared_ptr<GeomAPI_Shape>& theShape1,
                        const std::shared_ptr<GeomAPI_Shape>& theShape2) const;
   };
+
+  /// \brief Hash code for the shape
+  class Hash
+  {
+  public:
+    /// Return Hash value according to the address of the shape
+    GEOMAPI_EXPORT
+    int operator ()(const std::shared_ptr<GeomAPI_Shape>& theShape) const;
+  };
+
+  /// \brief Compare addresses of shapes
+  class Equal
+  {
+  public:
+    /// Return \c true if the address of the shapes are equal
+    GEOMAPI_EXPORT
+    bool operator ()(const std::shared_ptr<GeomAPI_Shape>& theShape1,
+                     const std::shared_ptr<GeomAPI_Shape>& theShape2) const;
+  };
 };
 
 //! Pointer on list of shapes

@@ -79,6 +79,7 @@
 %shared_ptr(FeaturesAPI_RemoveResults)
 %shared_ptr(FeaturesAPI_Copy)
 %shared_ptr(FeaturesAPI_ImportResult)
+%shared_ptr(FeaturesAPI_Defeaturing)
 
 
 %typecheck(SWIG_TYPECHECK_POINTER) std::pair<std::list<ModelHighAPI_Selection>, bool>, const std::pair<std::list<ModelHighAPI_Selection>, bool> & {
@@ -149,6 +150,7 @@
 %include "FeaturesAPI_BooleanSmash.h"
 %include "FeaturesAPI_BooleanFill.h"
 %include "FeaturesAPI_Chamfer.h"
+%include "FeaturesAPI_Defeaturing.h"
 %include "FeaturesAPI_Extrusion.h"
 %include "FeaturesAPI_ExtrusionBoolean.h"
 %include "FeaturesAPI_Fillet.h"

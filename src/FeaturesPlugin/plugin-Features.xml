@@ -115,7 +115,7 @@
         <multi_selector id="results" concealment="true"/>
       </feature>
     </group>
-    <group id="Fillet">
+    <group id="Features">
       <feature id="Fillet" title="Fillet" tooltip="Perform fillet on face or edge"
                icon="icons/Features/fillet.png" auto_preview="true" helpfile="filletFeature.html">
         <source path="fillet_widget.xml"/>
@@ -127,6 +127,10 @@
       <feature id="FusionFaces" title="Fuse Faces" tooltip="Performs fusion of connected faces"
                icon="icons/Features/fusion_faces.png" auto_preview="true" helpfile="FeaturesPlugin/fusionFacesFeature.html">
         <source path="fusion_faces_widget.xml"/>
+      </feature>
+      <feature id="Defeaturing" title="Defeaturing" tooltip="Perform removing faces from solid"
+               icon="icons/Features/defeaturing.png" auto_preview="true" helpfile="defeaturingFeature.html">
+        <source path="defeaturing_widget.xml"/>
       </feature>
     </group>
   </workbench>

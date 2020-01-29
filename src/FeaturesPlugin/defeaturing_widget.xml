@@ -1,0 +1,12 @@
+<source>
+  <multi_selector id="main_objects"
+                  label="Faces to remove"
+                  icon=""
+                  tooltip="Select faces"
+                  shape_types="faces"
+                  use_choice="false"
+                  concealment="true">
+    <validator id="PartSet_DifferentObjects"/>
+    <validator id="FeaturesPlugin_ValidatorDefeaturingSelection"/>
+  </multi_selector>
+</source>

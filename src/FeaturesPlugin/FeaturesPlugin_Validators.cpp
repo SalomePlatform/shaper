@@ -1877,3 +1877,42 @@ bool FeaturesPlugin_ValidatorBooleanCommonArguments::isNotObligatory(
   return false;
 }
 // LCOV_EXCL_STOP
+
+//==================================================================================================
+bool FeaturesPlugin_ValidatorDefeaturingSelection::isValid(
+    const AttributePtr& theAttribute,
+    const std::list<std::string>& theArguments,
+    Events_InfoMessage& theError) const
+{
+  AttributeSelectionListPtr anAttrSelectionList =
+      std::dynamic_pointer_cast<ModelAPI_AttributeSelectionList>(theAttribute);
+  if (!anAttrSelectionList.get()) {
+    // LCOV_EXCL_START
+    theError = "Error: This validator can only work with selection list attributes.";
+    return false;
+    // LCOV_EXCL_STOP
+  }
+
+  // Check selected entities are sub-shapes of solid or compsolid
+  GeomShapePtr aBaseSolid;
+  for (int anIndex = 0; anIndex < anAttrSelectionList->size(); ++anIndex) {
+    AttributeSelectionPtr anAttrSelection = anAttrSelectionList->value(anIndex);
+    if (!anAttrSelection.get()) {
+      theError = "Error: Empty attribute selection.";
+      return false;
+    }
+    ResultPtr aContext = anAttrSelection->context();
+    if (!aContext.get()) {
+      theError = "Error: Empty selection context.";
+      return false;
+    }
+
+    GeomShapePtr aContextShape = aContext->shape();
+    if (aContextShape->shapeType() != GeomAPI_Shape::SOLID) {
+      theError = "Error: Not all selected shapes are sub-shapes of solids.";
+      return false;
+    }
+  }
+
+  return true;
+}

@@ -63,6 +63,7 @@ SET(PROJECT_HEADERS
     FeaturesPlugin_Chamfer.h
     FeaturesPlugin_Copy.h
     FeaturesPlugin_ImportResult.h
+    FeaturesPlugin_Defeaturing.h
 )
 
 SET(PROJECT_SOURCES
@@ -107,6 +108,7 @@ SET(PROJECT_SOURCES
     FeaturesPlugin_Chamfer.cpp
     FeaturesPlugin_Copy.cpp
     FeaturesPlugin_ImportResult.cpp
+    FeaturesPlugin_Defeaturing.cpp
 )
 
 SET(XML_RESOURCES
@@ -141,6 +143,7 @@ SET(XML_RESOURCES
   chamfer_widget.xml
   copy_widget.xml
   import_result_widget.xml
+  defeaturing_widget.xml
 )
 
 SET(TEXT_RESOURCES
@@ -555,4 +558,12 @@ ADD_UNIT_TESTS(TestExtrusion.py
                TestCopySubShapes.py
                TestCopyWholeFeature.py
                TestImportResult.py
+               TestDefeaturing_ErrorMsg.py
+               TestDefeaturing_OnSolid1.py
+               TestDefeaturing_OnSolid2.py
+               TestDefeaturing_OnSolid3.py
+               TestDefeaturing_OnCompsolid1.py
+               TestDefeaturing_OnCompsolid2.py
+               TestDefeaturing_OnCompsolid3.py
+               TestDefeaturing_OnCompound.py
 )

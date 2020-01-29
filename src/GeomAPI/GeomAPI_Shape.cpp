@@ -751,3 +751,21 @@ bool GeomAPI_Shape::ComparatorWithOri::operator()(
   }
   return isLess;
 }
+
+int GeomAPI_Shape::Hash::operator()(const std::shared_ptr<GeomAPI_Shape>& theShape) const
+{
+  const TopoDS_Shape& aShape = theShape->impl<TopoDS_Shape>();
+  return aShape.HashCode(IntegerLast());
+}
+
+bool GeomAPI_Shape::Equal::operator()(const std::shared_ptr<GeomAPI_Shape>& theShape1,
+                                      const std::shared_ptr<GeomAPI_Shape>& theShape2) const
+{
+  const TopoDS_Shape& aShape1 = theShape1->impl<TopoDS_Shape>();
+  const TopoDS_Shape& aShape2 = theShape2->impl<TopoDS_Shape>();
+
+  Standard_Integer aHash1 = aShape1.Location().HashCode(IntegerLast());
+  Standard_Integer aHash2 = aShape2.Location().HashCode(IntegerLast());
+
+  return aShape1.TShape() == aShape2.TShape() && aHash1 == aHash2;
+}
