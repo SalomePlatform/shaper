@@ -2271,8 +2271,9 @@ void PartSet_SketcherMgr::customizeSketchPresentation(const ObjectPtr& theObject
   if (aShapeType != 6/*an edge*/ && aShapeType != 7/*a vertex*/ && aShapeType != 0/*compound*/)
     return;
 
+  int aWidth = Config_PropManager::integer("Visualization", "sketch_line_width");
   if (isExternal(aFeature)) {
-    thePrs->setWidth(1);
+    thePrs->setWidth(isIncludeToResult(aFeature)? aWidth : 1);
     return;
   }
   std::string aKind = aFeature->getKind();
@@ -2286,7 +2287,6 @@ void PartSet_SketcherMgr::customizeSketchPresentation(const ObjectPtr& theObject
       thePrs->setLineStyle(SketchPlugin_SketchEntity::SKETCH_LINE_STYLE_AUXILIARY());
     }
     else {
-      int aWidth = Config_PropManager::integer("Visualization", "sketch_line_width");
       thePrs->setWidth(aWidth);
       thePrs->setLineStyle(SketchPlugin_SketchEntity::SKETCH_LINE_STYLE());
     }
