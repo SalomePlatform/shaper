@@ -183,7 +183,9 @@ void Model_BodyBuilder::store(const GeomShapePtr& theShape,
       return;  // null shape inside
 
     if(!theIsStoreSameShapes) {
-      Handle(TNaming_NamedShape) aNS = TNaming_Tool::NamedShape(aShape, aShapeLab);
+      Handle(TNaming_NamedShape) aNS;
+      if (TNaming_Tool::HasLabel(aShapeLab, aShape))
+        aNS = TNaming_Tool::NamedShape(aShape, aShapeLab);
       // the last condition is for the issue 2751 : existing shape may be found in compound-NS
       if(!aNS.IsNull() && !aNS->IsEmpty() && aNS->Get().IsSame(aShape)) {
         // This shape is already in document, store reference instead of shape;
@@ -386,7 +388,9 @@ void Model_BodyBuilder::storeModified(const std::list<GeomShapePtr>& theOldShape
     if (aData.get()) {
       TDF_Label aShapeLab = aData->shapeLab();
       TopoDS_Shape aShapeNew = theNewShape->impl<TopoDS_Shape>();
-      Handle(TNaming_NamedShape) aNS = TNaming_Tool::NamedShape(aShapeNew, aShapeLab);
+      Handle(TNaming_NamedShape) aNS;
+      if (TNaming_Tool::HasLabel(aShapeLab, aShapeNew))
+        aNS = TNaming_Tool::NamedShape(aShapeNew, aShapeLab);
       // the last condition is for the issue 2751 : existing shape may be found in compound-NS
       if (!aNS.IsNull() && !aNS->IsEmpty() && aNS->Get().IsSame(aShapeNew)) {
         // This shape is already in document, store reference instead of shape;

@@ -20,6 +20,7 @@
 #ifndef SketcherPrs_SensitivePoint_H
 #define SketcherPrs_SensitivePoint_H
 
+#include <SelectBasics_EntityOwner.hxx>
 #include <Select3D_SensitiveEntity.hxx>
 #include <Standard_DefineHandle.hxx>
 

@@ -33,7 +33,9 @@
 #include <QMouseEvent>
 #include <QContextMenuEvent>
 
-#define SALOME_PATCH_FOR_CTRL_WHEEL
+#if OCC_VERSION_HEX < 0x070400
+  #define SALOME_PATCH_FOR_CTRL_WHEEL
+#endif
 
 SHAPERGUI_SalomeView::SHAPERGUI_SalomeView(OCCViewer_Viewer* theViewer)
 : ModuleBase_IViewWindow(), myCurrentView(0)
@@ -405,7 +407,7 @@ void SHAPERGUI_SalomeViewer::setViewProjection(double theX, double theY,
       aView3d->SetProj(theX, theY, theZ);
       aView3d->SetTwist( theTwist );
       aView3d->FitAll(0.01, false);
-      aView3d->SetZSize(0.);
+      //aView3d->SetZSize(0.);
       if (aView3d->Depth() < 0.1)
         aView3d->DepthFitAll();
     }

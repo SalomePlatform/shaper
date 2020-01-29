@@ -176,18 +176,26 @@ void ModuleBase_Preferences::createCustomPage(ModuleBase_IPrefMgr* thePref, int 
       // Add item
       if (aProp->type() != Config_Prop::Disabled) {
         SUIT_PreferenceMgr::PrefItemType aPrefType = SUIT_PreferenceMgr::Auto;
-        if (aProp->type() == Config_Prop::Directory) {
+        switch (aProp->type()) {
+        case Config_Prop::Directory:
           aPrefType = SUIT_PreferenceMgr::File;
-        } else {
+          break;
+        case Config_Prop::Cursor:
+          aPrefType = SUIT_PreferenceMgr::Selector;
+          break;
+        default:
           aPrefType = (SUIT_PreferenceMgr::PrefItemType) aProp->type();
         }
+
         int anId = thePref->addPreference(QObject::tr(aProp->title().c_str()), aTab, aPrefType,
                                           QString::fromStdString(aProp->section()),
                                           QString::fromStdString(aProp->name()));
-        if(aProp->type() == Config_Prop::Directory) {
+
+        switch (aProp->type()) {
+        case Config_Prop::Directory:
           thePref->setItemProperty("path_type", Qtx::PT_Directory, anId);
-        }
-        if (aPrefType == SUIT_PreferenceMgr::DblSpin) {
+          break;
+        case SUIT_PreferenceMgr::DblSpin:
           if (aProp->min() != "") {
             double aMin = QString(aProp->min().c_str()).toDouble();
             thePref->setItemProperty("min", aMin, anId);
@@ -196,8 +204,8 @@ void ModuleBase_Preferences::createCustomPage(ModuleBase_IPrefMgr* thePref, int 
             double aMax = QString(aProp->max().c_str()).toDouble();
             thePref->setItemProperty("max", aMax, anId);
           }
-        }
-        if (aPrefType == SUIT_PreferenceMgr::IntSpin) {
+          break;
+        case SUIT_PreferenceMgr::IntSpin:
           if (aProp->min() != "") {
             int aMin = QString(aProp->min().c_str()).toInt();
             thePref->setItemProperty("min", aMin, anId);
@@ -206,6 +214,20 @@ void ModuleBase_Preferences::createCustomPage(ModuleBase_IPrefMgr* thePref, int 
             int aMax = QString(aProp->max().c_str()).toInt();
             thePref->setItemProperty("max", aMax, anId);
           }
+          break;
+        case Config_Prop::Cursor:
+          {
+            QList<QVariant> aIndicesList;
+            QList<QVariant> aIconsList;
+            aIndicesList << 0 << 1 << 2;
+            aIconsList << QPixmap(":pictures/ArrowCursor.png") <<
+              QPixmap(":pictures/CrossCursor.png") <<
+              QPixmap(":pictures/HandCursor.png");
+
+            thePref->setItemProperty("indexes", aIndicesList, anId);
+            thePref->setItemProperty("icons", aIconsList, anId);
+          }
+          break;
         }
       }
     }

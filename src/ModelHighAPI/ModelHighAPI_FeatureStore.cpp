@@ -148,7 +148,7 @@ static void dumpArray(std::ostringstream& theOutput, const double theArray[],
   for (int i = 0; i < theSize; ++i) {
     if (i > 0)
       theOutput << " ";
-    theOutput << std::fixed << setprecision(thePrecision)
+    theOutput << std::fixed << std::setprecision(thePrecision)
               << (fabs(theArray[i]) < TOLERANCE ? 0.0 : theArray[i]);
   }
 }
@@ -409,9 +409,9 @@ std::string ModelHighAPI_FeatureStore::dumpShape(std::shared_ptr<GeomAPI_Shape>&
     aResult<<"Volume: ";
     // volumes of too huge shapes write in the scientific format
     if (aVolume >= 1.e5)
-      aResult<<std::scientific<<setprecision(7);
+      aResult<<std::scientific<<std::setprecision(7);
     else
-      aResult<<std::fixed<<setprecision(3);
+      aResult<<std::fixed<<std::setprecision(3);
     aResult<<aVolume<<std::endl;
   }
   std::shared_ptr<GeomAPI_Pnt> aCenter = GeomAlgoAPI_ShapeTools::centreOfMass(theShape);

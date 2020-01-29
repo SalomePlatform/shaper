@@ -1,0 +1,11 @@
+<source>
+  <multi_selector id="objects"
+                  label="Sources:"
+                  tooltip="Select copied results"
+                  shape_types="objects"
+                  use_choice="false"
+                  concealment="false"
+                  allow_parts_content="true">
+    <validator id="FeaturesPlugin_ValidatorImportResults"/>
+  </multi_selector>
+</source>

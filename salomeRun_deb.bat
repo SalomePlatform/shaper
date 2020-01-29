@@ -10,6 +10,9 @@ popd
 @SET OCC_LIB_PREFIX=d
 call env_Salome.bat d
 
+rem Variable which is necessary for launching SALOME
+SET SALOME_PLEASE_SETUP_ENVIRONMENT_AS_BEFORE=1
+
 @SET SHAPER_ROOT_DIR=%ROOT_DIR%\install
 @SET SalomeAppConfig=%SHAPER_ROOT_DIR%\share\salome\resources\shaper;%GUI_ROOT_DIR%\share\salome\resources\gui
 

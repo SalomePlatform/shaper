@@ -461,9 +461,9 @@ void PartSet_Module::updateSketcherOnStart(ModuleBase_Operation* theOperation)
   }
   // It is switched off because of
   // Task #3067: 5.2.2 Drawing in the sketcher: change the mouse cursor arrow
-  //else if (sketchMgr()->isNestedSketchOperation(theOperation)) {
-  //  mySketchMgr->startNestedSketch(theOperation);
-  //}
+  else if (sketchMgr()->isNestedSketchOperation(theOperation)) {
+    mySketchMgr->startNestedSketch(theOperation);
+  }
 }
 
 //******************************************************

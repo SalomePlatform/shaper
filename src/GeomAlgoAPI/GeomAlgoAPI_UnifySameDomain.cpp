@@ -23,7 +23,6 @@
 #include <GeomAlgoAPI_DFLoader.h>
 #include <GeomAlgoAPI_ShapeTools.h>
 
-#include <ShapeUpgrade_UnifySameDomain.hxx>
 #include <TopExp_Explorer.hxx>
 #include <TopoDS_Shape.hxx>
 #include <Precision.hxx>
@@ -31,6 +30,7 @@
 #include <TopoDS_Edge.hxx>
 #include <Bnd_Box.hxx>
 #include <BRepBndLib.hxx>
+#include <ShapeUpgrade_UnifySameDomain.hxx>
 
 //==================================================================================================
 GeomAlgoAPI_UnifySameDomain::GeomAlgoAPI_UnifySameDomain(const ListOfShape& theShapes)

@@ -64,6 +64,8 @@ ConstructionPlugin_Plugin::ConstructionPlugin_Plugin()
     Config_Prop::DblSpin, "1.0");
   Config_PropManager::registerProp(SKETCH_TAB_NAME, "rotate_to_plane",
     "Rotate to plane when selected", Config_Prop::Boolean, "false");
+  Config_PropManager::registerProp(SKETCH_TAB_NAME, "operation_cursor",
+    "Cursor for Sketch operation", Config_Prop::Cursor, "0");
 
   // register this plugin
   ModelAPI_Session::get()->registerPlugin(this);

@@ -92,5 +92,8 @@
      <file>pictures/normal-view.png</file>
      <file>pictures/move_to_end.png</file>
      <file>pictures/move_to_end_split.png</file>
+     <file>pictures/ArrowCursor.png</file>
+     <file>pictures/CrossCursor.png</file>
+     <file>pictures/HandCursor.png</file>
  </qresource>
  </RCC>

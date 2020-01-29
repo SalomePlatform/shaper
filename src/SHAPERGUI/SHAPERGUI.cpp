@@ -74,7 +74,9 @@
 #include <QMenu>
 #include <QToolBar>
 
-#define SALOME_PATCH_FOR_CTRL_WHEEL
+#if OCC_VERSION_HEX < 0x070400
+  #define SALOME_PATCH_FOR_CTRL_WHEEL
+#endif
 
 extern "C" {
 SHAPERGUI_EXPORT CAM_Module* createModule()
@@ -415,6 +417,14 @@ bool SHAPERGUI::deactivateModule(SUIT_Study* theStudy)
     //}
     myWorkshop->displayer()->setSelectionColor(myOldSelectionColor);
     myProxyViewer->setSelector(0);
+
+    LightApp_SelectionMgr* aMgr = getApp()->selectionMgr();
+    QList<SUIT_Selector*> aList;
+    aMgr->selectors(aList);
+    foreach(SUIT_Selector* aSel, aList) {
+      aSel->setEnabled(aSel != mySelector);
+    }
+
     delete mySelector;
     mySelector = 0;
   }

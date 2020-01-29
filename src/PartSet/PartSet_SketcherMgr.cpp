@@ -227,15 +227,15 @@ void PartSet_SketcherMgr::onEnterViewPort()
 
   // It is switched off because of
   // Task #3067: 5.2.2 Drawing in the sketcher: change the mouse cursor arrow
-  //  if (canChangeCursor(getCurrentOperation())) {
-  //    QCursor* aCurrentCursor = QApplication::overrideCursor();
-  //    if (!aCurrentCursor || aCurrentCursor->shape() != Qt::CrossCursor) {
-  //      QApplication::setOverrideCursor(QCursor(Qt::CrossCursor));
+    if (canChangeCursor(getCurrentOperation())) {
+      QCursor* aCurrentCursor = QApplication::overrideCursor();
+      if (!aCurrentCursor || aCurrentCursor->shape() != Qt::CrossCursor) {
+        QApplication::setOverrideCursor(PartSet_Tools::getOperationCursor());
   //#ifdef DEBUG_CURSOR
   //      qDebug("onEnterViewPort() : Qt::CrossCursor");
   //#endif
-  //    }
-  //  }
+      }
+    }
 
   if (!isNestedCreateOperation(getCurrentOperation(), activeSketch()))
     return;
@@ -267,12 +267,12 @@ void PartSet_SketcherMgr::onLeaveViewPort()
   return;
   #endif
 
-//  if (canChangeCursor(getCurrentOperation())) {
-//    QApplication::restoreOverrideCursor();
+  if (canChangeCursor(getCurrentOperation())) {
+    QApplication::restoreOverrideCursor();
 //#ifdef DEBUG_CURSOR
 //    qDebug("onLeaveViewPort() : None");
 //#endif
-//  }
+  }
 
   if (!isNestedCreateOperation(getCurrentOperation(), activeSketch()))
     return;
@@ -457,9 +457,10 @@ void PartSet_SketcherMgr::onMousePressed(ModuleBase_IViewWindow* theWnd, QMouseE
           }
         }
       }
-      else
-        isRelaunchEditing = !myCurrentSelection.contains(aSPFeature);
-
+      else {
+        if (myCurrentSelection.size() > 1)
+          isRelaunchEditing = !myCurrentSelection.contains(aSPFeature);
+      }
       if (isRelaunchEditing)
         aFOperation->commit();
 
@@ -1217,30 +1218,30 @@ void PartSet_SketcherMgr::stopSketch(ModuleBase_Operation* theOperation)
   workshop()->viewer()->set2dMode(false);
 }
 
-//void PartSet_SketcherMgr::startNestedSketch(ModuleBase_Operation* theOperation)
-//{
-//  if (canChangeCursor(theOperation) && myIsMouseOverWindow) {
-//    QCursor* aCurrentCursor = QApplication::overrideCursor();
-//    if (!aCurrentCursor || aCurrentCursor->shape() != Qt::CrossCursor) {
-//      QApplication::setOverrideCursor(QCursor(Qt::CrossCursor));
+void PartSet_SketcherMgr::startNestedSketch(ModuleBase_Operation* theOperation)
+{
+  if (canChangeCursor(theOperation) && myIsMouseOverWindow) {
+    QCursor* aCurrentCursor = QApplication::overrideCursor();
+    if (!aCurrentCursor || aCurrentCursor->shape() != Qt::CrossCursor) {
+      QApplication::setOverrideCursor(PartSet_Tools::getOperationCursor());
 //#ifdef DEBUG_CURSOR
 //      qDebug("startNestedSketch() : Qt::CrossCursor");
 //#endif
-//    }
-//  }
-//}
+    }
+  }
+}
 
 void PartSet_SketcherMgr::stopNestedSketch(ModuleBase_Operation* theOperation)
 {
   myIsMouseOverViewProcessed = true;
   operationMgr()->onValidateOperation();
   // when sketch nested operation is stopped the cursor should be restored unconditionally
-  //if (canChangeCursor(theOperation)) {
-    //QApplication::restoreOverrideCursor();
+  if (canChangeCursor(theOperation)) {
+    QApplication::restoreOverrideCursor();
 #ifdef DEBUG_CURSOR
     qDebug("stopNestedSketch() : None");
 #endif
-  //}
+  }
   /// improvement to deselect automatically all eventual selected objects, when
   // returning to the neutral point of the Sketcher
   bool isClearSelectionPossible = true;
@@ -2271,8 +2272,9 @@ void PartSet_SketcherMgr::customizeSketchPresentation(const ObjectPtr& theObject
   if (aShapeType != 6/*an edge*/ && aShapeType != 7/*a vertex*/ && aShapeType != 0/*compound*/)
     return;
 
+  int aWidth = Config_PropManager::integer("Visualization", "sketch_line_width");
   if (isExternal(aFeature)) {
-    thePrs->setWidth(1);
+    thePrs->setWidth(isIncludeToResult(aFeature)? aWidth : 1);
     return;
   }
   std::string aKind = aFeature->getKind();
@@ -2286,7 +2288,6 @@ void PartSet_SketcherMgr::customizeSketchPresentation(const ObjectPtr& theObject
       thePrs->setLineStyle(SketchPlugin_SketchEntity::SKETCH_LINE_STYLE_AUXILIARY());
     }
     else {
-      int aWidth = Config_PropManager::integer("Visualization", "sketch_line_width");
       thePrs->setWidth(aWidth);
       thePrs->setLineStyle(SketchPlugin_SketchEntity::SKETCH_LINE_STYLE());
     }

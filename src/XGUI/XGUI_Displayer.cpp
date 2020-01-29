@@ -105,7 +105,11 @@ const int MOUSE_SENSITIVITY_IN_PIXEL = 10;
 void displayedObjects(const Handle(AIS_InteractiveContext)& theAIS, AIS_ListOfInteractive& theList)
 {
   // Get from null point
-  theAIS->DisplayedObjects(theList, true);
+#if OCC_VERSION_HEX < 0x070400
+	theAIS->DisplayedObjects(theList, true);
+#else
+	theAIS->DisplayedObjects(theList);
+#endif
 }
 
 QString qIntListInfo(const QIntList& theValues, const QString& theSeparator = QString(", "))
@@ -621,15 +625,16 @@ Handle(AIS_InteractiveContext) XGUI_Displayer::AISContext() const
     myContextId = aContext.get();
     if (!myWorkshop->selectionActivate()->isTrihedronActive())
       selectionActivate()->deactivateTrihedron(true);
-    aContext->DefaultDrawer()->VIsoAspect()->SetNumber(0);
-    aContext->DefaultDrawer()->UIsoAspect()->SetNumber(0);
+    // Do not modify default drawer. The same is done in ModuleBase_ResultPrs
+    //aContext->DefaultDrawer()->VIsoAspect()->SetNumber(0);
+    //aContext->DefaultDrawer()->UIsoAspect()->SetNumber(0);
 
     //Handle(AIS_Trihedron) aTrihedron = myWorkshop->viewer()->trihedron();
     //aTrihedron->getHighlightPointAspect()->SetScale(2.0);
     //aTrihedron->getHighlightPointAspect()->SetTypeOfMarker(Aspect_TOM_O_STAR);
 
     // Commented out according to discussion in bug #2825
-    //ModuleBase_IViewer::DefaultHighlightDrawer = aContext->HighlightStyle();
+    ModuleBase_IViewer::DefaultHighlightDrawer = aContext->HighlightStyle();
     //Handle(Prs3d_Drawer) aSelStyle = aContext->SelectionStyle();
     //double aDeflection =
     //  QString(ModelAPI_ResultConstruction::DEFAULT_DEFLECTION().c_str()).toDouble();
