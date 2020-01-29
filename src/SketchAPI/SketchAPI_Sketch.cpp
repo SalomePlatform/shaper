@@ -1212,18 +1212,15 @@ static std::shared_ptr<GeomAPI_Pnt2d> pointOnEllipse(const FeaturePtr& theFeatur
 }
 
 static std::shared_ptr<GeomAPI_Pnt2d> middlePointOnBSpline(const FeaturePtr& theFeature,
-                                                           const CompositeFeaturePtr& theSketch)
+                                                           SketchAPI_Sketch* theSketch)
 {
   GeomAPI_Edge anEdge(theFeature->lastResult()->shape());
   GeomPointPtr aMiddle = anEdge.middlePoint();
-
-  std::shared_ptr<SketchPlugin_Sketch> aSketch =
-      std::dynamic_pointer_cast<SketchPlugin_Sketch>(theSketch);
-  return aSketch->to2D(aMiddle);
+  return theSketch->to2D(aMiddle);
 }
 
 static std::shared_ptr<GeomAPI_Pnt2d> middlePoint(const ObjectPtr& theObject,
-                                                  const CompositeFeaturePtr& theSketch)
+                                                  SketchAPI_Sketch* theSketch)
 {
   std::shared_ptr<GeomAPI_Pnt2d> aMiddlePoint;
   FeaturePtr aFeature = ModelAPI_Feature::feature(theObject);
@@ -1259,7 +1256,7 @@ void SketchAPI_Sketch::move(const ModelHighAPI_RefAttr& theMovedEntity,
   if (aMessage->movedAttribute())
     anOriginalPosition = pointCoordinates(aMessage->movedAttribute());
   else
-    anOriginalPosition = middlePoint(aMessage->movedObject(), compositeFeature());
+    anOriginalPosition = middlePoint(aMessage->movedObject(), this);
 
   if (!anOriginalPosition)
     return; // something has gone wrong, do not process movement
