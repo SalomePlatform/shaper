@@ -87,7 +87,9 @@ private:
     QToolButton* myAddBtn;
   };
 
-  QGroupBox* createPoleWidget(BSplinePoleWidgets& thePole, const QString& theName, QWidget* theParent);
+  QGroupBox* createPoleWidget(BSplinePoleWidgets& thePole,
+                              const QString& theName,
+                              QWidget* theParent);
 
   QWidget* myPolesWgt; ///< widget to show poles and weights of B-spline curve
   QGroupBox* myPolesGroupBox;
