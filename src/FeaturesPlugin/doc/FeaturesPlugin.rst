@@ -15,6 +15,7 @@ Features plug-in provides a set of common topological operations. It implements 
    commonFeature.rst
    copyFeature.rst
    cutFeature.rst
+   defeaturingFeature.rst
    extrusionCutFeature.rst
    extrusionFeature.rst
    extrusionFuseFeature.rst

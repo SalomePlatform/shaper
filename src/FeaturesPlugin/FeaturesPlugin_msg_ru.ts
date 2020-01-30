@@ -141,4 +141,40 @@
       <translation>Выберите вспомогательные объекты.</translation>
     </message>
   </context>
+
+  <!-- Defeaturing -->
+  <context>
+    <name>Defeaturing</name>
+    <message>
+      <source>Defeaturing</source>
+      <translation>Удаление фичеров</translation>
+    </message>
+    <message>
+      <source>Faces to remove</source>
+      <translation>Удаляемые грани</translation>
+    </message>
+    <message>
+      <source>Select faces</source>
+      <translation>Выберите грани</translation>
+    </message>
+  </context>
+  <context>
+    <name>Defeaturing:FeaturesPlugin_ValidatorDefeaturingSelection</name>
+    <message>
+      <source>Error: This validator can only work with selection list attributes.</source>
+      <translation>Ошибка: валидатор поддерживает только аттрибуты типа SelectionList.</translation>
+    </message>
+    <message>
+      <source>Error: Empty attribute selection.</source>
+      <translation>Ошибка: незаполненный аттрибут.</translation>
+    </message>
+    <message>
+      <source>Error: Empty selection context.</source>
+      <translation>Ошибка: пустой контекст.</translation>
+    </message>
+    <message>
+      <source>Error: Not all selected shapes are sub-shapes of solids.</source>
+      <translation>Ошибка: не все выбранные объекты являются подэлементами твердых тел.</translation>
+    </message>
+  </context>
 </TS>

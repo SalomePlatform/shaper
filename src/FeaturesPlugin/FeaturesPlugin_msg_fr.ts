@@ -248,6 +248,42 @@
     </message>
   </context>
 
+  <!-- Defeaturing -->
+  <context>
+    <name>Defeaturing</name>
+    <message>
+      <source>Defeaturing</source>
+      <translation>Vaincre</translation>
+    </message>
+    <message>
+      <source>Faces to remove</source>
+      <translation>Visages à retirer</translation>
+    </message>
+    <message>
+      <source>Select faces</source>
+      <translation>Sélectionnez des faces</translation>
+    </message>
+  </context>
+  <context>
+    <name>Defeaturing:FeaturesPlugin_ValidatorDefeaturingSelection</name>
+    <message>
+      <source>Error: This validator can only work with selection list attributes.</source>
+      <translation>Erreur: ce validateur ne peut fonctionner qu&apos;avec des attributs de liste de sélection.</translation>
+    </message>
+    <message>
+      <source>Error: Empty attribute selection.</source>
+      <translation>La sélection d&apos;attribut est vide.</translation>
+    </message>
+    <message>
+      <source>Error: Empty selection context.</source>
+      <translation>Erreur: contexte de sélection vide.</translation>
+    </message>
+    <message>
+      <source>Error: Not all selected shapes are sub-shapes of solids.</source>
+      <translation>Erreur: toutes les formes sélectionnées ne sont pas des sous-formes de solides.</translation>
+    </message>
+  </context>
+
   <!-- Extrusion -->
   <context>
     <name>Extrusion</name>
